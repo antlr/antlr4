@@ -30,20 +30,15 @@
     <Reference Include="System"/>
   </ItemGroup>
   <ItemGroup>
-<Compile Include="TBaseListener.cs"/>
-<Compile Include="TBaseVisitor.cs"/>
 <Compile Include="AssemblyInfo.cs"/>
-<Compile Include="TListener.cs"/>
 <Compile Include="Test.cs"/>
-<Compile Include="TVisitor.cs"/>
-<Compile Include="TParser.cs"/>
-<Compile Include="TLexer.cs"/>
+<Compile Include="L.cs"/>
 </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets"/>
   <ItemGroup>
-    <ProjectReference Include="\users\ericvergnaud\Development\antlr4\antlr\antlr4-csharp\runtime\CSharp\Antlr4.Runtime\Antlr4.Runtime.mono.csproj">
+    <ProjectReference Include="Antlr4.Runtime.vs2013.csproj">
       <Project>{E1A46D9D-66CB-46E8-93B0-7FC87299ABEF}</Project>
-      <Name>Antlr4.Runtime.mono</Name>
+      <Name>Antlr4.Runtime.vs2013</Name>
     </ProjectReference>
   </ItemGroup>
 </Project>

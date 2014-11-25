@@ -1,31 +1,28 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\packages\Antlr4.4.3.0\build\Antlr4.props" Condition="Exists('..\packages\Antlr4.4.3.0\build\Antlr4.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
-    <MinimumVisualStudioVersion>10.0</MinimumVisualStudioVersion>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{06C182C5-095C-4D43-9C33-C87E305C6BC2}</ProjectGuid>
+    <ProjectGuid>{E1A46D9D-66CB-46E8-93B0-7FC87299ABEF}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Antlr4.Runtime</RootNamespace>
     <AssemblyName>Antlr4.Runtime</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <TargetFrameworkProfile>Profile328</TargetFrameworkProfile>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <BaseIntermediateOutputPath>obj\portable-net40\</BaseIntermediateOutputPath>
-    <ProjectTypeGuids>{786C830F-07A1-408B-BD7F-6EE04809D6DB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <BaseIntermediateOutputPath>obj\net20\</BaseIntermediateOutputPath>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\portable-net40\Debug\</OutputPath>
+    <OutputPath>bin\net20\Debug\</OutputPath>
     <DocumentationFile>$(OutputPath)$(AssemblyName).xml</DocumentationFile>
-    <DefineConstants>TRACE;DEBUG;PORTABLE;NET40;NET40PLUS;NET35PLUS;NET30PLUS;NET20PLUS</DefineConstants>
+    <DefineConstants>DEBUG;TRACE;NET20;NET20PLUS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <NoWarn>1591</NoWarn>
@@ -33,19 +30,17 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\portable-net40\Release\</OutputPath>
+    <OutputPath>bin\net20\Release\</OutputPath>
     <DocumentationFile>$(OutputPath)$(AssemblyName).xml</DocumentationFile>
-    <DefineConstants>TRACE;PORTABLE;NET40;NET40PLUS;NET35PLUS;NET30PLUS;NET20PLUS</DefineConstants>
+    <DefineConstants>TRACE;NET20;NET20PLUS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <NoWarn>1591</NoWarn>
   </PropertyGroup>
-  <PropertyGroup>
-    <SignAssembly>true</SignAssembly>
-  </PropertyGroup>
-  <PropertyGroup>
-    <AssemblyOriginatorKeyFile>..\..\..\..\..\..\keys\antlr\antlr-portable-net40.snk</AssemblyOriginatorKeyFile>
-  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
   <ItemGroup>
     <Compile Include="AntlrFileStream.cs" />
     <Compile Include="AntlrInputStream.cs" />
@@ -62,8 +57,9 @@
     <Compile Include="Dfa\AcceptStateInfo.cs" />
     <Compile Include="Dfa\EmptyEdgeMap`1.cs" />
     <Compile Include="IVocabulary.cs" />
+    <Compile Include="Recognizer.cs" />
+    <Compile Include="Tree\Xpath\XPathLexer.cs" />
     <Compile Include="Vocabulary.cs" />
-    <None Include="Atn\ATNSerializer.cs" />
     <Compile Include="Atn\ATNSimulator.cs" />
     <Compile Include="Atn\ATNState.cs" />
     <Compile Include="Atn\ATNType.cs" />
@@ -162,9 +158,6 @@
     <Compile Include="LexerNoViableAltException.cs" />
     <Compile Include="ListTokenSource.cs" />
     <Compile Include="Misc\Args.cs" />
-    <None Include="..\..\..\..\..\..\keys\antlr\antlr-portable-net40.snk">
-      <Link>antlr-portable-net40.snk</Link>
-    </None>
     <None Include="Misc\Array2DHashSet`1.cs" />
     <Compile Include="Misc\MurmurHash.cs" />
     <Compile Include="Misc\NullableAttribute.cs" />
@@ -188,7 +181,6 @@
     <Compile Include="ProxyErrorListener`1.cs" />
     <Compile Include="ProxyParserErrorListener.cs" />
     <Compile Include="RecognitionException.cs" />
-    <Compile Include="Recognizer`2.cs" />
     <Compile Include="RuleContext.cs" />
     <Compile Include="RuleDependencyAttribute.cs" />
     <Compile Include="RuleVersionAttribute.cs" />
@@ -198,8 +190,15 @@
     <Compile Include="Sharpen\Collections.cs" />
     <Compile Include="Sharpen\Compat\CollectionDebuggerView`2.cs" />
     <Compile Include="Sharpen\Compat\ConcurrentDictionary`2.cs" />
-    <Compile Include="Sharpen\Compat\SerializableAttribute.cs" />
+    <Compile Include="Sharpen\Compat\Enumerable.cs" />
+    <Compile Include="Sharpen\Compat\ExtensionAttribute.cs" />
+    <Compile Include="Sharpen\Compat\Funcs.cs" />
+    <Compile Include="Sharpen\Compat\HashSet`1.cs" />
+    <Compile Include="Sharpen\Compat\IStructuralComparable.cs" />
+    <Compile Include="Sharpen\Compat\IStructuralEquatable.cs" />
     <Compile Include="Sharpen\Compat\SplitOrderedList`2.cs" />
+    <Compile Include="Sharpen\Compat\Tuple.cs" />
+    <Compile Include="Sharpen\Compat\Tuples.cs" />
     <Compile Include="Sharpen\DictionaryExtensions.cs" />
     <Compile Include="Sharpen\ListExtensions.cs" />
     <Compile Include="Sharpen\Runtime.cs" />
@@ -239,29 +238,6 @@
     <Compile Include="Tree\Xpath\XPathWildcardElement.cs" />
     <Compile Include="UnbufferedCharStream.cs" />
     <Compile Include="UnbufferedTokenStream.cs" />
-    <None Include="packages.Antlr4.Runtime.portable-net40.config" />
-    <Antlr4 Include="Tree\Xpath\XPathLexer.g4">
-      <Generator>MSBuild:Compile</Generator>
-      <CustomToolNamespace>Antlr4.Runtime.Tree.Xpath</CustomToolNamespace>
-    </Antlr4>
   </ItemGroup>
-  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
-  <Import Project="$(SolutionDir)\build\KeyReporting.targets" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\packages\Antlr4.4.3.0\build\Antlr4.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Antlr4.4.3.0\build\Antlr4.props'))" />
-    <Error Condition="!Exists('..\packages\Antlr4.4.3.0\build\Antlr4.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Antlr4.4.3.0\build\Antlr4.targets'))" />
-    <Error Condition="!Exists('$(SolutionDir)\.nuget\NuGet.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\.nuget\NuGet.targets'))" />
-  </Target>
-  <Import Project="..\packages\Antlr4.4.3.0\build\Antlr4.targets" Condition="Exists('..\packages\Antlr4.4.3.0\build\Antlr4.targets')" />
-  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

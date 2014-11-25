@@ -25,7 +25,6 @@ using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Misc;
 using DFA = Antlr4.Runtime.Dfa.DFA;
 
-[System.CodeDom.Compiler.GeneratedCode("ANTLR", "4.4.1-dev")]
 [System.CLSCompliant(false)]
 public partial class XPathLexer : Lexer {
 	public const int

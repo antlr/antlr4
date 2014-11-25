@@ -32,9 +32,6 @@ using Antlr4.Runtime;
 using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Dfa;
 using Antlr4.Runtime.Sharpen;
-#if !PORTABLE || NET45PLUS
-using Stopwatch = System.Diagnostics.Stopwatch;
-#endif
 
 namespace Antlr4.Runtime.Atn
 {
@@ -100,14 +97,8 @@ namespace Antlr4.Runtime.Atn
                 this.currentDecision = decision;
                 this.currentState = null;
                 this.conflictingAltResolvedBySLL = ATN.InvalidAltNumber;
-#if !PORTABLE || NET45PLUS
-                Stopwatch stopwatch = Stopwatch.StartNew();
-#endif
                 // expensive but useful info
                 int alt = base.AdaptivePredict(input, decision, outerContext);
-#if !PORTABLE || NET45PLUS
-                decisions[decision].timeInPrediction += stopwatch.ElapsedTicks * 100;
-#endif
                 decisions[decision].invocations++;
                 int SLL_k = _sllStopIndex - _startIndex + 1;
                 decisions[decision].SLL_TotalLook += SLL_k;

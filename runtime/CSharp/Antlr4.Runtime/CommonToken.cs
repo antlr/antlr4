@@ -164,14 +164,14 @@ namespace Antlr4.Runtime
         /// <see cref="CommonToken"/>
         /// instance, the newly
         /// constructed token will share a reference to the
-        /// <see cref="text"/>
+        /// <see cref="Text()"/>
         /// field and
         /// the
         /// <see cref="Tuple{T1, T2}"/>
         /// stored in
         /// <see cref="source"/>
         /// . Otherwise,
-        /// <see cref="text"/>
+        /// <see cref="Text()"/>
         /// will
         /// be assigned the result of calling
         /// <see cref="Text()"/>

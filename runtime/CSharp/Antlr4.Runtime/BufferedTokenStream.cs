@@ -106,7 +106,7 @@ namespace Antlr4.Runtime
         /// Indicates whether the
         /// <see cref="TokenConstants.Eof"/>
         /// token has been fetched from
-        /// <see cref="tokenSource"/>
+        /// <see cref="_tokenSource"/>
         /// and added to
         /// <see cref="tokens"/>
         /// . This field improves
