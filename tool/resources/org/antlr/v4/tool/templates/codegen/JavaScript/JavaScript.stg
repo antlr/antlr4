@@ -116,6 +116,7 @@ exports.<file.grammarName>Visitor = <file.grammarName>Visitor;
 
 fileHeader(grammarFileName, ANTLRVersion) ::= <<
 // Generated from <grammarFileName; format="java-escape"> by ANTLR <ANTLRVersion>
+// jshint ignore: start
 >>
 
 Parser(parser, funcs, atn, sempredFuncs, superClass) ::= <<
@@ -463,7 +464,7 @@ Sync(s) ::= "sync(<s.expecting.name>)"
 ThrowNoViableAlt(t) ::= "throw new antlr4.error.NoViableAltException(this);"
 
 TestSetInline(s) ::= <<
-<s.bitsets:{bits | <if(rest(rest(bits.ttypes)))><bitsetBitfieldComparison(s, bits)><else><bitsetInlineComparison(s, bits)><endif>}; separator=" or ">
+<s.bitsets:{bits | <if(rest(rest(bits.ttypes)))><bitsetBitfieldComparison(s, bits)><else><bitsetInlineComparison(s, bits)><endif>}; separator=" || ">
 >>
 
 // Java language spec 15.19 - shift operators mask operands rather than overflow to 0... need range test
@@ -495,7 +496,7 @@ bitsetInlineComparison(s, bits) ::= <%
 %>
 
 cases(ttypes) ::= <<
-case <ttypes:{t | <t>}; separator=", ">:
+<ttypes:{t | case <t>:}; separator="\n">
 >>
 
 InvokeRule(r, argExprsChunks) ::= <<
@@ -800,30 +801,29 @@ var atn = new antlr4.atn.ATNDeserializer().deserialize(serializedATN);
 
 var decisionsToDFA = atn.decisionToState.map( function(ds, index) { return new antlr4.dfa.DFA(ds, index); });
     
-<lexer.tokens:{k | var <k> = <lexer.tokens.(k)>;}; separator="\n", wrap, anchor>
-    
-<rest(lexer.modes):{m| var <m> = <i>;}; separator="\n">
-    
-var modeNames = [ <lexer.modes:{m| "<m>"}; separator=", ", wrap, anchor> ];
-    
-var literalNames = [ <lexer.literalNames:{t | <t>}; null="'null'", separator=", ", wrap, anchor> ];
-
-var symbolicNames = [ <lexer.symbolicNames:{t | <t>}; null="'null'", separator=", ", wrap, anchor> ];
-    
-var ruleNames = [ <lexer.ruleNames:{r | "<r>"}; separator=", ", wrap, anchor> ];
-    
-var grammarFileName = "<lexer.grammarFileName>";
-
 function <lexer.name>(input) {
 	<if(superClass)><superClass><else>antlr4.Lexer<endif>.call(this, input);
     this._interp = new antlr4.atn.LexerATNSimulator(this, atn, decisionsToDFA, new antlr4.PredictionContextCache());
-    this.literalNames = literalNames;
-    this.symbolicNames = symbolicNames;
     return this;
 }
 
 <lexer.name>.prototype = Object.create(<if(superClass)><superClass><else>antlr4.Lexer<endif>.prototype);
 <lexer.name>.prototype.constructor = <lexer.name>;
+
+<lexer.name>.EOF = antlr4.Token.EOF;
+<lexer.tokens:{k | <lexer.name>.<k> = <lexer.tokens.(k)>;}; separator="\n", wrap, anchor>
+    
+<rest(lexer.modes):{m| <lexer.name>.<m> = <i>;}; separator="\n">
+    
+<lexer.name>.modeNames = [ <lexer.modes:{m| "<m>"}; separator=", ", wrap, anchor> ];
+    
+<lexer.name>.literalNames = [ <lexer.literalNames:{t | <t>}; null="'null'", separator=", ", wrap, anchor> ];
+
+<lexer.name>.symbolicNames = [ <lexer.symbolicNames:{t | <t>}; null="'null'", separator=", ", wrap, anchor> ];
+    
+<lexer.name>.ruleNames = [ <lexer.ruleNames:{r | "<r>"}; separator=", ", wrap, anchor> ];
+    
+<lexer.name>.grammarFileName = "<lexer.grammarFileName>";
 
 <namedActions.members>
         
