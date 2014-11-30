@@ -29,8 +29,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{4CE79A54
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Antlr4.Runtime.mono", "Antlr4.Runtime\Antlr4.Runtime.mono.csproj", "{E1A46D9D-66CB-46E8-93B0-7FC87299ABEF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Antlr4.Test.mono", "Antlr4.Test.mono\Antlr4.Test.mono.csproj", "{EDC70A11-C4C1-4209-93A6-CCE2B19E8E95}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -41,16 +39,12 @@ Global
 		{E1A46D9D-66CB-46E8-93B0-7FC87299ABEF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E1A46D9D-66CB-46E8-93B0-7FC87299ABEF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E1A46D9D-66CB-46E8-93B0-7FC87299ABEF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EDC70A11-C4C1-4209-93A6-CCE2B19E8E95}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EDC70A11-C4C1-4209-93A6-CCE2B19E8E95}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EDC70A11-C4C1-4209-93A6-CCE2B19E8E95}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EDC70A11-C4C1-4209-93A6-CCE2B19E8E95}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{4CE79A54-058D-4940-875E-7F6AA9922A7D} = {47C0086D-577C-43DA-ADC7-544F27656E45}
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = Antlr4.Test.mono\Antlr4.Test.mono.csproj
+		StartupItem = Antlr4.Runtime\Antlr4.Runtime.mono.csproj
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

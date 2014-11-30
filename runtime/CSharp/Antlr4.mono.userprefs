@@ -1,12 +1,18 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Antlr4.Runtime/Atn/ATNSerializer.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Release" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Antlr4.Runtime/Lexer.cs">
     <Files>
       <File FileName="Antlr4.Runtime/Lexer.cs" Line="1" Column="1" />
-      <File FileName="Antlr4.Runtime/Atn/LexerATNSimulator.cs" Line="39" Column="39" />
-      <File FileName="Antlr4.Runtime/Atn/ATNSerializer.cs" Line="34" Column="34" />
+      <File FileName="Antlr4.Runtime/Atn/LexerATNSimulator.cs" Line="1" Column="1" />
       <File FileName="Antlr4.Runtime/Atn/DecisionState.cs" Line="1" Column="1" />
     </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State expanded="True">
+          <Node name="Antlr4.Runtime.mono" selected="True" />
+        </State>
+      </Pad>
+    </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore>
