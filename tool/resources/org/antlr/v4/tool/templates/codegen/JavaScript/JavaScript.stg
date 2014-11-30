@@ -585,11 +585,13 @@ RulePropertyRef_start(r) ::= "(<ctx(r)>.<r.label>===null ? null : <ctx(r)>.<r.la
 RulePropertyRef_stop(r)	 ::= "(<ctx(t)>.<t.label> === null ? null : <ctx(r)>.<r.label>.stop)"
 RulePropertyRef_text(r)	 ::= "(<ctx(r)>.<r.label>===null ? null : this._input.getText(new antlr4.Interval(<ctx(r)>.<r.label>.start,<ctx(r)>.<r.label>.stop)))"
 RulePropertyRef_ctx(r)	 ::= "<ctx(r)>.<r.label>"
+RulePropertyRef_self(r)	 ::= "this"
 
 ThisRulePropertyRef_start(r) ::= "localctx.start"
 ThisRulePropertyRef_stop(r)	 ::= "localctx.stop"
 ThisRulePropertyRef_text(r)	 ::= "this._input.getText(new antlr4.Interval(localctx.start, this._input.LT(-1)))"
 ThisRulePropertyRef_ctx(r)	 ::= "localctx"
+ThisRulePropertyRef_self(r)	 ::= "this"
 
 NonLocalAttrRef(s)		 	 ::= "getInvokingContext(<s.ruleIndex>).<s.name>"
 SetNonLocalAttr(s, rhsChunks)  ::= "getInvokingContext(<s.ruleIndex>).<s.name> = <rhsChunks>"
