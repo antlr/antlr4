@@ -575,11 +575,13 @@ RulePropertyRef_start(r) ::= "(None if <ctx(r)>.<r.label> is None else <ctx(r)>.
 RulePropertyRef_stop(r)	 ::= "(None if <ctx(r)>.<r.label> is None else <ctx(r)>.<r.label>.stop)"
 RulePropertyRef_text(r)	 ::= "(None if <ctx(r)>.<r.label> is None else self._input.getText((<ctx(r)>.<r.label>.start,<ctx(r)>.<r.label>.stop)))"
 RulePropertyRef_ctx(r)	 ::= "<ctx(r)>.<r.label>"
+RulePropertyRef_self(r)	 ::= "self"
 
 ThisRulePropertyRef_start(r) ::= "localctx.start"
 ThisRulePropertyRef_stop(r)	 ::= "localctx.stop"
 ThisRulePropertyRef_text(r)	 ::= "self._input.getText((localctx.start, self._input.LT(-1)))"
 ThisRulePropertyRef_ctx(r)	 ::= "localctx"
+ThisRulePropertyRef_self(r)	 ::= "self"
 
 NonLocalAttrRef(s)		 	 ::= "getInvokingContext(<s.ruleIndex>).<s.name>"
 SetNonLocalAttr(s, rhsChunks)  ::= "getInvokingContext(<s.ruleIndex>).<s.name> = <rhsChunks>"
