@@ -132,11 +132,6 @@ from .<superClass> import <superClass>
 <endif>
 <atn>
 
-EOF = <TokenLabelType()>.EOF
-<if(parser.tokens)>
-<parser.tokens:{k | <k>=<parser.tokens.(k)>}; separator="\n", wrap, anchor>
-<endif>
-
 class <parser.name> ( <if(superClass)><superClass><else>Parser<endif> ):
 	
     grammarFileName = "<parser.grammarFileName; format="java-escape">"
@@ -155,6 +150,11 @@ class <parser.name> ( <if(superClass)><superClass><else>Parser<endif> ):
 
     ruleNames =  [ <parser.ruleNames:{r | u"<r>"}; separator=", ", wrap, anchor> ]
 	
+    EOF = <TokenLabelType()>.EOF
+    <if(parser.tokens)>
+    <parser.tokens:{k | <k>=<parser.tokens.(k)>}; separator="\n", wrap, anchor>
+    <endif>
+
     <parser:(ctor)()>
 
     <namedActions.members>
@@ -478,16 +478,16 @@ offsetShiftVar(shiftAmount, offset) ::= <%
 %>
 
 offsetShiftType(shiftAmount, offset) ::= <%
-<if(!isZero.(offset))>(<shiftAmount> - <offset>)<else><shiftAmount><endif>
+<if(!isZero.(offset))>(<parser.name>.<shiftAmount> - <offset>)<else><parser.name>.<shiftAmount><endif>
 %>
 
 // produces more efficient bytecode when bits.ttypes contains at most two items
 bitsetInlineComparison(s, bits) ::= <%
-<bits.ttypes:{ttype | <s.varName>==<ttype>}; separator=" or ">
+<bits.ttypes:{ttype | <s.varName>==<parser.name>.<ttype>}; separator=" or ">
 %>
 
 cases(ttypes) ::= <<
-if token in [<ttypes:{t | <t>}; separator=", ">]:
+if token in [<ttypes:{t | <parser.name>.<t>}; separator=", ">]:
 >>
 
 InvokeRule(r, argExprsChunks) ::= <<
@@ -497,7 +497,7 @@ self.state = <r.stateNumber>
 
 MatchToken(m) ::= <<
 self.state = <m.stateNumber>
-<if(m.labels)><m.labels:{l | <labelref(l)> = }><endif>self.match(<m.name>)
+<if(m.labels)><m.labels:{l | <labelref(l)> = }><endif>self.match(<parser.name>.<m.name>)
 >>
 
 MatchSet(m, expr, capture) ::= "<CommonSetStuff(m, expr, capture, false)>"
@@ -575,13 +575,13 @@ RulePropertyRef_start(r) ::= "(None if <ctx(r)>.<r.label> is None else <ctx(r)>.
 RulePropertyRef_stop(r)	 ::= "(None if <ctx(r)>.<r.label> is None else <ctx(r)>.<r.label>.stop)"
 RulePropertyRef_text(r)	 ::= "(None if <ctx(r)>.<r.label> is None else self._input.getText((<ctx(r)>.<r.label>.start,<ctx(r)>.<r.label>.stop)))"
 RulePropertyRef_ctx(r)	 ::= "<ctx(r)>.<r.label>"
-RulePropertyRef_self(r)	 ::= "self"
+RulePropertyRef_parser(r)	 ::= "self"
 
 ThisRulePropertyRef_start(r) ::= "localctx.start"
 ThisRulePropertyRef_stop(r)	 ::= "localctx.stop"
 ThisRulePropertyRef_text(r)	 ::= "self._input.getText((localctx.start, self._input.LT(-1)))"
 ThisRulePropertyRef_ctx(r)	 ::= "localctx"
-ThisRulePropertyRef_self(r)	 ::= "self"
+ThisRulePropertyRef_parser(r)	 ::= "self"
 
 NonLocalAttrRef(s)		 	 ::= "getInvokingContext(<s.ruleIndex>).<s.name>"
 SetNonLocalAttr(s, rhsChunks)  ::= "getInvokingContext(<s.ruleIndex>).<s.name> = <rhsChunks>"
@@ -596,21 +596,21 @@ RuleContextListDecl(rdecl) ::= "self.<rdecl.name> = list() # of <rdecl.ctxName>s
 
 ContextTokenGetterDecl(t)      ::= <<
 def <t.name>(self):
-    return self.getToken(<t.name>, 0)
+    return self.getToken(<parser.name>.<t.name>, 0)
 >>
 
 // should never be called
 ContextTokenListGetterDecl(t)  ::= <<
 def <t.name>_list(self):
-    return self.getTokens(<t.name>)
+    return self.getTokens(<parser.name>.<t.name>)
 >>
 
 ContextTokenListIndexedGetterDecl(t)  ::= <<
 def <t.name>(self, i=None):
     if i is None:
-        return self.getTokens(<t.name>)
+        return self.getTokens(<parser.name>.<t.name>)
     else:
-        return self.getToken(<t.name>, i)
+        return self.getToken(<parser.name>.<t.name>, i)
 >>
 
 ContextRuleGetterDecl(r)       ::= <<
@@ -767,8 +767,6 @@ Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass) ::= <<
 
 <atn>
 
-<lexer.tokens:{k | <k> = <lexer.tokens.(k)>}; separator="\n", wrap, anchor>
-    
 class <lexer.name>(<if(superClass)><superClass><else>Lexer<endif>):
 
     atn = ATNDeserializer().deserialize(serializedATN())
@@ -776,6 +774,8 @@ class <lexer.name>(<if(superClass)><superClass><else>Lexer<endif>):
     decisionsToDFA = [ DFA(ds, i) for i, ds in enumerate(atn.decisionToState) ]
     
     <rest(lexer.modes):{m| <m> = <i>}; separator="\n">
+    
+    <lexer.tokens:{k | <k> = <lexer.tokens.(k)>}; separator="\n", wrap, anchor>
     
     modeNames = [ <lexer.modes:{m| u"<m>"}; separator=", ", wrap, anchor> ]
     
