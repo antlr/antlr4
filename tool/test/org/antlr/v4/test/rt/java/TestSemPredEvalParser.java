@@ -427,7 +427,7 @@ public class TestSemPredEvalParser extends BaseTest {
 	                  "@after {System.out.println($ctx.toStringTree(this));}\n" +
 	                  "  : para para EOF ;\n" +
 	                  "para: paraContent NL NL ;\n" +
-	                  "paraContent : ('s'|'x'|{this._input.LA(2)!=NL}? NL)+ ;\n" +
+	                  "paraContent : ('s'|'x'|{this._input.LA(2)!=TParser.NL}? NL)+ ;\n" +
 	                  "NL : '\\n' ;\n" +
 	                  "s : 's' ;\n" +
 	                  "X : 'x' ;";

@@ -1417,6 +1417,7 @@ public class Generator {
 		file.addParserTests(input, "ReferenceToATN", "T", "a",
 			"", "\n",
 			"a 34 c", "a34c\n");
+		file.addParserTest(input, "ParserProperty", "T", "a", "abc", "valid\n", null);
 		/*CompositeParserTestMethod tm = file.addCompositeParserTest(input, "AlternateQuotes", "ModeTagsParser", "file_", "", "", null, "ModeTagsLexer");
 		tm.slaveIsLexer = true;*/
 		return file;

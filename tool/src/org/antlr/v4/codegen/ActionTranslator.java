@@ -50,14 +50,14 @@ import org.antlr.v4.codegen.model.chunk.QRetValueRef;
 import org.antlr.v4.codegen.model.chunk.RetValueRef;
 import org.antlr.v4.codegen.model.chunk.RulePropertyRef;
 import org.antlr.v4.codegen.model.chunk.RulePropertyRef_ctx;
-import org.antlr.v4.codegen.model.chunk.RulePropertyRef_self;
+import org.antlr.v4.codegen.model.chunk.RulePropertyRef_parser;
 import org.antlr.v4.codegen.model.chunk.RulePropertyRef_start;
 import org.antlr.v4.codegen.model.chunk.RulePropertyRef_stop;
 import org.antlr.v4.codegen.model.chunk.RulePropertyRef_text;
 import org.antlr.v4.codegen.model.chunk.SetAttr;
 import org.antlr.v4.codegen.model.chunk.SetNonLocalAttr;
 import org.antlr.v4.codegen.model.chunk.ThisRulePropertyRef_ctx;
-import org.antlr.v4.codegen.model.chunk.ThisRulePropertyRef_self;
+import org.antlr.v4.codegen.model.chunk.ThisRulePropertyRef_parser;
 import org.antlr.v4.codegen.model.chunk.ThisRulePropertyRef_start;
 import org.antlr.v4.codegen.model.chunk.ThisRulePropertyRef_stop;
 import org.antlr.v4.codegen.model.chunk.ThisRulePropertyRef_text;
@@ -88,7 +88,7 @@ public class ActionTranslator implements ActionSplitterListener {
 		thisRulePropToModelMap.put("stop",  ThisRulePropertyRef_stop.class);
 		thisRulePropToModelMap.put("text",  ThisRulePropertyRef_text.class);
 		thisRulePropToModelMap.put("ctx",   ThisRulePropertyRef_ctx.class);
-		thisRulePropToModelMap.put("self",  ThisRulePropertyRef_self.class);
+		thisRulePropToModelMap.put("parser",  ThisRulePropertyRef_parser.class);
 	}
 
 	public static final Map<String, Class<? extends RulePropertyRef>> rulePropToModelMap =
@@ -98,7 +98,7 @@ public class ActionTranslator implements ActionSplitterListener {
 		rulePropToModelMap.put("stop",  RulePropertyRef_stop.class);
 		rulePropToModelMap.put("text",  RulePropertyRef_text.class);
 		rulePropToModelMap.put("ctx",   RulePropertyRef_ctx.class);
-		rulePropToModelMap.put("self",  RulePropertyRef_self.class);
+		rulePropToModelMap.put("parser",  RulePropertyRef_parser.class);
 	}
 
 	public static final Map<String, Class<? extends TokenPropertyRef>> tokenPropToModelMap =

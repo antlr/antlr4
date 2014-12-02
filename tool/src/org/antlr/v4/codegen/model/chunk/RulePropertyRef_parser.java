@@ -33,8 +33,8 @@ package org.antlr.v4.codegen.model.chunk;
 import org.antlr.v4.codegen.model.decl.StructDecl;
 
 /** */
-public class RulePropertyRef_self extends RulePropertyRef {
-	public RulePropertyRef_self(StructDecl ctx, String label) {
+public class RulePropertyRef_parser extends RulePropertyRef {
+	public RulePropertyRef_parser(StructDecl ctx, String label) {
 		super(ctx, label);
 	}
 }

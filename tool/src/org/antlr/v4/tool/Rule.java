@@ -55,7 +55,7 @@ public class Rule implements AttributeResolver {
 	public static final AttributeDict predefinedRulePropertiesDict =
 		new AttributeDict(AttributeDict.DictType.PREDEFINED_RULE);
 	static {
-		predefinedRulePropertiesDict.add(new Attribute("self"));
+		predefinedRulePropertiesDict.add(new Attribute("parser"));
 		predefinedRulePropertiesDict.add(new Attribute("text"));
 		predefinedRulePropertiesDict.add(new Attribute("start"));
 		predefinedRulePropertiesDict.add(new Attribute("stop"));
