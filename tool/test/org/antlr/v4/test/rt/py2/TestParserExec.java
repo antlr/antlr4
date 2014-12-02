@@ -332,7 +332,7 @@ public class TestParserExec extends BasePython2Test {
 		String grammar = "grammar T;\n" +
 	                  "s : stmt EOF ;\n" +
 	                  "stmt : ifStmt | ID;\n" +
-	                  "ifStmt : 'if' ID stmt ('else' stmt | { self._input.LA(1)!=ELSE }?);\n" +
+	                  "ifStmt : 'if' ID stmt ('else' stmt | { self._input.LA(1)!=TParser.ELSE }?);\n" +
 	                  "ELSE : 'else';\n" +
 	                  "ID : [a-zA-Z]+;\n" +
 	                  "WS : [ \\n\\t]+ -> skip;";
@@ -450,6 +450,24 @@ public class TestParserExec extends BasePython2Test {
 	public void testReferenceToATN_2() throws Exception {
 		String found = testReferenceToATN("a 34 c");
 		assertEquals("a34c\n", found);
+		assertNull(this.stderrDuringParse);
+	}
+
+	/* this file and method are generated, any edit will be overwritten by the next generation */
+	@Test
+	public void testParserProperty() throws Exception {
+		String grammar = "grammar T;\n" +
+	                  "@members {\n" +
+	                  "def Property(self):\n" +
+	                  "    return True\n" +
+	                  "\n" +
+	                  "}\n" +
+	                  "a : {$parser.Property()}? ID {print(\"valid\")}\n" +
+	                  "  ;\n" +
+	                  "ID : 'a'..'z'+ ;\n" +
+	                  "WS : (' '|'\\n') -> skip ;";
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "a", "abc", false);
+		assertEquals("valid\n", found);
 		assertNull(this.stderrDuringParse);
 	}
 
