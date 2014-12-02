@@ -613,10 +613,10 @@ public class TestLexerExec extends BaseTest {
 		sb.append("\n");
 		sb.append("PositionAdjustingLexer.prototype.emit = function() {\n");
 		sb.append("	switch(this._type) {\n");
-		sb.append("	case TOKENS:\n");
+		sb.append("	case PositionAdjustingLexer.TOKENS:\n");
 		sb.append("		this.handleAcceptPositionForKeyword(\"tokens\");\n");
 		sb.append("		break;\n");
-		sb.append("	case LABEL:\n");
+		sb.append("	case PositionAdjustingLexer.LABEL:\n");
 		sb.append("		this.handleAcceptPositionForIdentifier();\n");
 		sb.append("		break;\n");
 		sb.append("	}\n");

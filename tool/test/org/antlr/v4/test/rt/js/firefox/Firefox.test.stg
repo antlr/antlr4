@@ -179,6 +179,14 @@ RuleInvocationStack() ::= "antlr4.Utils.arrayToString(this.getRuleInvocationStac
 
 LL_EXACT_AMBIG_DETECTION() ::= <<this._interp.predictionMode = antlr4.atn.PredictionMode.LL_EXACT_AMBIG_DETECTION;>>
 
+ParserPropertyMember() ::= <<
+@members {
+this.Property = function() {
+    return true;
+}
+}
+>>
+
 PositionAdjustingLexer() ::= <<
 
 PositionAdjustingLexer.prototype.resetAcceptPosition = function(index, line, column) {
@@ -198,10 +206,10 @@ PositionAdjustingLexer.prototype.nextToken = function() {
 
 PositionAdjustingLexer.prototype.emit = function() {
 	switch(this._type) {
-	case TOKENS:
+	case PositionAdjustingLexer.TOKENS:
 		this.handleAcceptPositionForKeyword("tokens");
 		break;
-	case LABEL:
+	case PositionAdjustingLexer.LABEL:
 		this.handleAcceptPositionForIdentifier();
 		break;
 	}
