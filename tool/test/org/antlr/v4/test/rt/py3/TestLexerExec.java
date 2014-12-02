@@ -608,9 +608,9 @@ public class TestLexerExec extends BasePython3Test {
 		sb.append("	return super(type(self),self).nextToken()\n");
 		sb.append("\n");
 		sb.append("def emit(self):\n");
-		sb.append("	if self._type==TOKENS:\n");
+		sb.append("	if self._type==PositionAdjustingLexer.TOKENS:\n");
 		sb.append("		self.handleAcceptPositionForKeyword(\"tokens\")\n");
-		sb.append("	elif self._type==LABEL:\n");
+		sb.append("	elif self._type==PositionAdjustingLexer.LABEL:\n");
 		sb.append("		self.handleAcceptPositionForIdentifier()\n");
 		sb.append("	return super(type(self),self).emit()\n");
 		sb.append("\n");
