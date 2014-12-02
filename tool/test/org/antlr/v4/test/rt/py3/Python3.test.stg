@@ -179,6 +179,14 @@ RuleInvocationStack() ::= "str_list(self.getRuleInvocationStack())"
 
 LL_EXACT_AMBIG_DETECTION() ::= <<self._interp.predictionMode =  PredictionMode.LL_EXACT_AMBIG_DETECTION>>
 
+ParserPropertyMember() ::= <<
+@members {
+def Property(self):
+    return True
+    
+}
+>>
+
 PositionAdjustingLexer() ::= <<
 
 def resetAcceptPosition(self, index, line, column):
@@ -193,9 +201,9 @@ def nextToken(self):
 	return super(type(self),self).nextToken()
 
 def emit(self):
-	if self._type==TOKENS:
+	if self._type==PositionAdjustingLexer.TOKENS:
 		self.handleAcceptPositionForKeyword("tokens")
-	elif self._type==LABEL:
+	elif self._type==PositionAdjustingLexer.LABEL:
 		self.handleAcceptPositionForIdentifier()
 	return super(type(self),self).emit()
 

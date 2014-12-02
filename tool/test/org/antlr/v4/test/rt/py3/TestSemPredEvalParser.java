@@ -427,7 +427,7 @@ public class TestSemPredEvalParser extends BasePython3Test {
 	                  "@after {print($ctx.toStringTree(recog=self))}\n" +
 	                  "  : para para EOF ;\n" +
 	                  "para: paraContent NL NL ;\n" +
-	                  "paraContent : ('s'|'x'|{self._input.LA(2)!=NL}? NL)+ ;\n" +
+	                  "paraContent : ('s'|'x'|{self._input.LA(2)!=TParser.NL}? NL)+ ;\n" +
 	                  "NL : '\\n' ;\n" +
 	                  "s : 's' ;\n" +
 	                  "X : 'x' ;";
