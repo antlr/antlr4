@@ -756,11 +756,13 @@ RulePropertyRef_start(r) ::= "(<ctx(r)>.<r.label>!=null?(<ctx(r)>.<r.label>.Star
 RulePropertyRef_stop(r)	 ::= "(<ctx(r)>.<r.label>!=null?(<ctx(r)>.<r.label>.Stop):null)"
 RulePropertyRef_text(r)	 ::= "(<ctx(r)>.<r.label>!=null?TokenStream.GetText(<ctx(r)>.<r.label>.Start,<ctx(r)>.<r.label>.Stop):null)"
 RulePropertyRef_ctx(r)	 ::= "<ctx(r)>.<r.label>"
+RulePropertyRef_parser(r)	 ::= "this"
 
 ThisRulePropertyRef_start(r) ::= "_localctx.Start"
 ThisRulePropertyRef_stop(r)	 ::= "_localctx.Stop"
 ThisRulePropertyRef_text(r)	 ::= "TokenStream.GetText(_localctx.Start, TokenStream.Lt(-1))"
 ThisRulePropertyRef_ctx(r)	 ::= "_localctx"
+ThisRulePropertyRef_parser(r)	 ::= "this"
 
 NonLocalAttrRef(s)		 ::= <%((<s.ruleName; format="cap">Context)GetInvokingContext(<s.ruleIndex>)).<csIdentifier.(s.name)>%>
 SetNonLocalAttr(s, rhsChunks)	  ::=

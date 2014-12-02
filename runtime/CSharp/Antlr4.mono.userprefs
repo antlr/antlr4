@@ -1,10 +1,9 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Antlr4.Runtime/Atn/ATNSerializer.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Release" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Antlr4.Runtime/Lexer.cs">
     <Files>
       <File FileName="Antlr4.Runtime/Lexer.cs" Line="1" Column="1" />
-      <File FileName="Antlr4.Runtime/Atn/LexerATNSimulator.cs" Line="39" Column="39" />
-      <File FileName="Antlr4.Runtime/Atn/ATNSerializer.cs" Line="34" Column="34" />
+      <File FileName="Antlr4.Runtime/Atn/LexerATNSimulator.cs" Line="1" Column="1" />
       <File FileName="Antlr4.Runtime/Atn/DecisionState.cs" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
@@ -15,4 +14,7 @@
     </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <DisabledProjects>
+    <String>../../tmp/Antlr4.Test.mono.csproj</String>
+  </DisabledProjects>
 </Properties>
