@@ -179,6 +179,14 @@ RuleInvocationStack() ::= "getRuleInvocationStack()"
 
 LL_EXACT_AMBIG_DETECTION() ::= <<_interp.setPredictionMode(PredictionMode.LL_EXACT_AMBIG_DETECTION);>>
 
+ParserPropertyMember() ::= <<
+@members {
+boolean Property() {
+	return true;
+}
+}
+>>
+
 PositionAdjustingLexer() ::= <<
 
 @Override
