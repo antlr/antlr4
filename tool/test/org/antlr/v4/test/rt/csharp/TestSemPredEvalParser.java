@@ -426,7 +426,7 @@ public class TestSemPredEvalParser extends BaseTest {
 	                  "@after {Console.WriteLine($ctx.ToStringTree(this));}\n" +
 	                  "  : para para EOF ;\n" +
 	                  "para: paraContent NL NL ;\n" +
-	                  "paraContent : ('s'|'x'|{this.InputStream.La(2)!=NL}? NL)+ ;\n" +
+	                  "paraContent : ('s'|'x'|{this.InputStream.La(2)!=TParser.NL}? NL)+ ;\n" +
 	                  "NL : '\\n' ;\n" +
 	                  "s : 's' ;\n" +
 	                  "X : 'x' ;";
