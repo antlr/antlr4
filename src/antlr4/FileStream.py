@@ -46,7 +46,7 @@ class FileStream(InputStream):
         # read binary to avoid line ending conversion
         with open(fileName, 'rb') as file:
             bytes = file.read()
-            data = codecs.decode(bytes)
+            data = codecs.decode(bytes, encoding)
             super(type(self), self).__init__(data)
 
 
