@@ -504,8 +504,11 @@ public abstract class BaseTest {
 		String propName = "antlr-javascript-runtime";
 		String prop = System.getProperty(propName);
 		if(prop==null || prop.length()==0)
+			prop = "../../antlr4-javascript/src";
+		File file = new File(prop);
+		if(!file.exists())
 			throw new RuntimeException("Missing system property:" + propName);
-		return prop;
+		return file.getAbsolutePath();
 	}
 
 	public void testErrors(String[] pairs, boolean printTree) {

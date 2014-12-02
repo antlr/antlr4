@@ -6,13 +6,13 @@ import static org.junit.Assert.*;
 public class TestLeftRecursion extends BaseTest {
 
 	String testSimple(String input) throws Exception {
-		String grammar = "grammar T;\r\n" +
-	                  "s @after {document.getElementById('output').value += $ctx.toStringTree(null, this) + '\\n';} : a ;\r\n" +
-	                  "a : a ID\r\n" +
-	                  "  | ID\r\n" +
-	                  "  ;\r\n" +
-	                  "ID : 'a'..'z'+ ;\r\n" +
-	                  "WS : (' '|'\\n') -> skip ;\r";
+		String grammar = "grammar T;\n" +
+	                  "s @after {document.getElementById('output').value += $ctx.toStringTree(null, this) + '\\n';} : a ;\n" +
+	                  "a : a ID\n" +
+	                  "  | ID\n" +
+	                  "  ;\n" +
+	                  "ID : 'a'..'z'+ ;\n" +
+	                  "WS : (' '|'\\n') -> skip ;";
 		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", input, false);
 	}
 
@@ -38,12 +38,12 @@ public class TestLeftRecursion extends BaseTest {
 	}
 
 	String testDirectCallToLeftRecursiveRule(String input) throws Exception {
-		String grammar = "grammar T;\r\n" +
-	                  "a @after {document.getElementById('output').value += $ctx.toStringTree(null, this) + '\\n';} : a ID\r\n" +
-	                  "  | ID\r\n" +
-	                  "  ;\r\n" +
-	                  "ID : 'a'..'z'+ ;\r\n" +
-	                  "WS : (' '|'\\n') -> skip ;\r";
+		String grammar = "grammar T;\n" +
+	                  "a @after {document.getElementById('output').value += $ctx.toStringTree(null, this) + '\\n';} : a ID\n" +
+	                  "  | ID\n" +
+	                  "  ;\n" +
+	                  "ID : 'a'..'z'+ ;\n" +
+	                  "WS : (' '|'\\n') -> skip ;";
 		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "a", input, false);
 	}
 
@@ -70,29 +70,29 @@ public class TestLeftRecursion extends BaseTest {
 
 	@Test
 	public void testSemPred() throws Exception {
-		String grammar = "grammar T;\r\n" +
-	                  "s @after {document.getElementById('output').value += $ctx.toStringTree(null, this) + '\\n';} : a ;\r\n" +
-	                  "a : a {true}? ID\r\n" +
-	                  "  | ID\r\n" +
-	                  "  ;\r\n" +
-	                  "ID : 'a'..'z'+ ;\r\n" +
-	                  "WS : (' '|'\\n') -> skip ;\r";
+		String grammar = "grammar T;\n" +
+	                  "s @after {document.getElementById('output').value += $ctx.toStringTree(null, this) + '\\n';} : a ;\n" +
+	                  "a : a {true}? ID\n" +
+	                  "  | ID\n" +
+	                  "  ;\n" +
+	                  "ID : 'a'..'z'+ ;\n" +
+	                  "WS : (' '|'\\n') -> skip ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", "x y z", false);
 		assertEquals("(s (a (a (a x) y) z))\n", found);
 		assertNull(this.stderrDuringParse);
 	}
 
 	String testTernaryExpr(String input) throws Exception {
-		String grammar = "grammar T;\r\n" +
-	                  "s @after {document.getElementById('output').value += $ctx.toStringTree(null, this) + '\\n';} : e EOF ; // must indicate EOF can follow or 'a<EOF>' won't match\r\n" +
-	                  "e : e '*' e\r\n" +
-	                  "  | e '+' e\r\n" +
-	                  "  |<assoc=right> e '?' e ':' e\r\n" +
-	                  "  |<assoc=right> e '=' e\r\n" +
-	                  "  | ID\r\n" +
-	                  "  ;\r\n" +
-	                  "ID : 'a'..'z'+ ;\r\n" +
-	                  "WS : (' '|'\\n') -> skip ;\r";
+		String grammar = "grammar T;\n" +
+	                  "s @after {document.getElementById('output').value += $ctx.toStringTree(null, this) + '\\n';} : e EOF ; // must indicate EOF can follow or 'a<EOF>' won't match\n" +
+	                  "e : e '*' e\n" +
+	                  "  | e '+' e\n" +
+	                  "  |<assoc=right> e '?' e ':' e\n" +
+	                  "  |<assoc=right> e '=' e\n" +
+	                  "  | ID\n" +
+	                  "  ;\n" +
+	                  "ID : 'a'..'z'+ ;\n" +
+	                  "WS : (' '|'\\n') -> skip ;";
 		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", input, false);
 	}
 
@@ -160,19 +160,19 @@ public class TestLeftRecursion extends BaseTest {
 	}
 
 	String testExpressions(String input) throws Exception {
-		String grammar = "grammar T;\r\n" +
-	                  "s @after {document.getElementById('output').value += $ctx.toStringTree(null, this) + '\\n';} : e EOF ; // must indicate EOF can follow\r\n" +
-	                  "e : e '.' ID\r\n" +
-	                  "  | e '.' 'this'\r\n" +
-	                  "  | '-' e\r\n" +
-	                  "  | e '*' e\r\n" +
-	                  "  | e ('+'|'-') e\r\n" +
-	                  "  | INT\r\n" +
-	                  "  | ID\r\n" +
-	                  "  ;\r\n" +
-	                  "ID : 'a'..'z'+ ;\r\n" +
-	                  "INT : '0'..'9'+ ;\r\n" +
-	                  "WS : (' '|'\\n') -> skip ;\r";
+		String grammar = "grammar T;\n" +
+	                  "s @after {document.getElementById('output').value += $ctx.toStringTree(null, this) + '\\n';} : e EOF ; // must indicate EOF can follow\n" +
+	                  "e : e '.' ID\n" +
+	                  "  | e '.' 'this'\n" +
+	                  "  | '-' e\n" +
+	                  "  | e '*' e\n" +
+	                  "  | e ('+'|'-') e\n" +
+	                  "  | INT\n" +
+	                  "  | ID\n" +
+	                  "  ;\n" +
+	                  "ID : 'a'..'z'+ ;\n" +
+	                  "INT : '0'..'9'+ ;\n" +
+	                  "WS : (' '|'\\n') -> skip ;";
 		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", input, false);
 	}
 
@@ -226,62 +226,62 @@ public class TestLeftRecursion extends BaseTest {
 	}
 
 	String testJavaExpressions(String input) throws Exception {
-		String grammar = "grammar T;\r\n" +
-	                  "s @after {document.getElementById('output').value += $ctx.toStringTree(null, this) + '\\n';} : e EOF ; // must indicate EOF can follow\r\n" +
-	                  "expressionList\r\n" +
-	                  "    :   e (',' e)*\r\n" +
-	                  "    ;\r\n" +
-	                  "e   :   '(' e ')'\r\n" +
-	                  "    |   'this' \r\n" +
-	                  "    |   'super'\r\n" +
-	                  "    |   INT\r\n" +
-	                  "    |   ID\r\n" +
-	                  "    |   type_ '.' 'class'\r\n" +
-	                  "    |   e '.' ID\r\n" +
-	                  "    |   e '.' 'this'\r\n" +
-	                  "    |   e '.' 'super' '(' expressionList? ')'\r\n" +
-	                  "    |   e '.' 'new' ID '(' expressionList? ')'\r\n" +
-	                  "	 |	 'new' type_ ( '(' expressionList? ')' | ('[' e ']')+)\r\n" +
-	                  "    |   e '[' e ']'\r\n" +
-	                  "    |   '(' type_ ')' e\r\n" +
-	                  "    |   e ('++' | '--')\r\n" +
-	                  "    |   e '(' expressionList? ')'\r\n" +
-	                  "    |   ('+'|'-'|'++'|'--') e\r\n" +
-	                  "    |   ('~'|'!') e\r\n" +
-	                  "    |   e ('*'|'/'|'%') e\r\n" +
-	                  "    |   e ('+'|'-') e\r\n" +
-	                  "    |   e ('<<' | '>>>' | '>>') e\r\n" +
-	                  "    |   e ('<=' | '>=' | '>' | '<') e\r\n" +
-	                  "    |   e 'instanceof' e\r\n" +
-	                  "    |   e ('==' | '!=') e\r\n" +
-	                  "    |   e '&' e\r\n" +
-	                  "    |<assoc=right> e '^' e\r\n" +
-	                  "    |   e '|' e\r\n" +
-	                  "    |   e '&&' e\r\n" +
-	                  "    |   e '||' e\r\n" +
-	                  "    |   e '?' e ':' e\r\n" +
-	                  "    |<assoc=right>\r\n" +
-	                  "        e ('='\r\n" +
-	                  "          |'+='\r\n" +
-	                  "          |'-='\r\n" +
-	                  "          |'*='\r\n" +
-	                  "          |'/='\r\n" +
-	                  "          |'&='\r\n" +
-	                  "          |'|='\r\n" +
-	                  "          |'^='\r\n" +
-	                  "          |'>>='\r\n" +
-	                  "          |'>>>='\r\n" +
-	                  "          |'<<='\r\n" +
-	                  "          |'%=') e\r\n" +
-	                  "    ;\r\n" +
-	                  "type_: ID \r\n" +
-	                  "    | ID '[' ']'\r\n" +
-	                  "    | 'int'\r\n" +
-	                  "	 | 'int' '[' ']' \r\n" +
-	                  "    ;\r\n" +
-	                  "ID : ('a'..'z'|'A'..'Z'|'_'|'$')+;\r\n" +
-	                  "INT : '0'..'9'+ ;\r\n" +
-	                  "WS : (' '|'\\n') -> skip ;\r";
+		String grammar = "grammar T;\n" +
+	                  "s @after {document.getElementById('output').value += $ctx.toStringTree(null, this) + '\\n';} : e EOF ; // must indicate EOF can follow\n" +
+	                  "expressionList\n" +
+	                  "    :   e (',' e)*\n" +
+	                  "    ;\n" +
+	                  "e   :   '(' e ')'\n" +
+	                  "    |   'this' \n" +
+	                  "    |   'super'\n" +
+	                  "    |   INT\n" +
+	                  "    |   ID\n" +
+	                  "    |   type_ '.' 'class'\n" +
+	                  "    |   e '.' ID\n" +
+	                  "    |   e '.' 'this'\n" +
+	                  "    |   e '.' 'super' '(' expressionList? ')'\n" +
+	                  "    |   e '.' 'new' ID '(' expressionList? ')'\n" +
+	                  "	 |	 'new' type_ ( '(' expressionList? ')' | ('[' e ']')+)\n" +
+	                  "    |   e '[' e ']'\n" +
+	                  "    |   '(' type_ ')' e\n" +
+	                  "    |   e ('++' | '--')\n" +
+	                  "    |   e '(' expressionList? ')'\n" +
+	                  "    |   ('+'|'-'|'++'|'--') e\n" +
+	                  "    |   ('~'|'!') e\n" +
+	                  "    |   e ('*'|'/'|'%') e\n" +
+	                  "    |   e ('+'|'-') e\n" +
+	                  "    |   e ('<<' | '>>>' | '>>') e\n" +
+	                  "    |   e ('<=' | '>=' | '>' | '<') e\n" +
+	                  "    |   e 'instanceof' e\n" +
+	                  "    |   e ('==' | '!=') e\n" +
+	                  "    |   e '&' e\n" +
+	                  "    |<assoc=right> e '^' e\n" +
+	                  "    |   e '|' e\n" +
+	                  "    |   e '&&' e\n" +
+	                  "    |   e '||' e\n" +
+	                  "    |   e '?' e ':' e\n" +
+	                  "    |<assoc=right>\n" +
+	                  "        e ('='\n" +
+	                  "          |'+='\n" +
+	                  "          |'-='\n" +
+	                  "          |'*='\n" +
+	                  "          |'/='\n" +
+	                  "          |'&='\n" +
+	                  "          |'|='\n" +
+	                  "          |'^='\n" +
+	                  "          |'>>='\n" +
+	                  "          |'>>>='\n" +
+	                  "          |'<<='\n" +
+	                  "          |'%=') e\n" +
+	                  "    ;\n" +
+	                  "type_: ID \n" +
+	                  "    | ID '[' ']'\n" +
+	                  "    | 'int'\n" +
+	                  "	 | 'int' '[' ']' \n" +
+	                  "    ;\n" +
+	                  "ID : ('a'..'z'|'A'..'Z'|'_'|'$')+;\n" +
+	                  "INT : '0'..'9'+ ;\n" +
+	                  "WS : (' '|'\\n') -> skip ;";
 		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", input, false);
 	}
 
@@ -370,20 +370,20 @@ public class TestLeftRecursion extends BaseTest {
 	}
 
 	String testDeclarations(String input) throws Exception {
-		String grammar = "grammar T;\r\n" +
-	                  "s @after {document.getElementById('output').value += $ctx.toStringTree(null, this) + '\\n';} : declarator EOF ; // must indicate EOF can follow\r\n" +
-	                  "declarator\r\n" +
-	                  "        : declarator '[' e ']'\r\n" +
-	                  "        | declarator '[' ']'\r\n" +
-	                  "        | declarator '(' ')'\r\n" +
-	                  "        | '*' declarator // binds less tight than suffixes\r\n" +
-	                  "        | '(' declarator ')'\r\n" +
-	                  "        | ID\r\n" +
-	                  "        ;\r\n" +
-	                  "e : INT ;\r\n" +
-	                  "ID : 'a'..'z'+ ;\r\n" +
-	                  "INT : '0'..'9'+ ;\r\n" +
-	                  "WS : (' '|'\\n') -> skip ;\r";
+		String grammar = "grammar T;\n" +
+	                  "s @after {document.getElementById('output').value += $ctx.toStringTree(null, this) + '\\n';} : declarator EOF ; // must indicate EOF can follow\n" +
+	                  "declarator\n" +
+	                  "        : declarator '[' e ']'\n" +
+	                  "        | declarator '[' ']'\n" +
+	                  "        | declarator '(' ')'\n" +
+	                  "        | '*' declarator // binds less tight than suffixes\n" +
+	                  "        | '(' declarator ')'\n" +
+	                  "        | ID\n" +
+	                  "        ;\n" +
+	                  "e : INT ;\n" +
+	                  "ID : 'a'..'z'+ ;\n" +
+	                  "INT : '0'..'9'+ ;\n" +
+	                  "WS : (' '|'\\n') -> skip ;";
 		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", input, false);
 	}
 
@@ -458,17 +458,16 @@ public class TestLeftRecursion extends BaseTest {
 	}
 
 	String testReturnValueAndActions(String input) throws Exception {
-		String grammar = "grammar T;\r\n" +
-	                  "s : e {document.getElementById('output').value += $e.v + '\\n';}; \r\n" +
-	                  "e returns [int v, list ignored]\r\n" +
-	                  "  : a=e '*' b=e {$v = $a.v * $b.v;}\r\n" +
-	                  "  | a=e '+' b=e {$v = $a.v + $b.v;}\r\n" +
-	                  "  | INT {$v = $INT.int;}\r\n" +
-	                  "  | '(' x=e ')' {$v = $x.v;}\r\n" +
-	                  "  ;\r\n" +
-	                  "INT : '0'..'9'+ ;\r\n" +
-	                  "WS : (' '|'\\n') -> skip ;\r\n" +
-	                  "\r";
+		String grammar = "grammar T;\n" +
+	                  "s : e {document.getElementById('output').value += $e.v + '\\n';}; \n" +
+	                  "e returns [int v, list ignored]\n" +
+	                  "  : a=e '*' b=e {$v = $a.v * $b.v;}\n" +
+	                  "  | a=e '+' b=e {$v = $a.v + $b.v;}\n" +
+	                  "  | INT {$v = $INT.int;}\n" +
+	                  "  | '(' x=e ')' {$v = $x.v;}\n" +
+	                  "  ;\n" +
+	                  "INT : '0'..'9'+ ;\n" +
+	                  "WS : (' '|'\\n') -> skip ;";
 		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", input, false);
 	}
 
@@ -501,14 +500,14 @@ public class TestLeftRecursion extends BaseTest {
 	}
 
 	String testLabelsOnOpSubrule(String input) throws Exception {
-		String grammar = "grammar T;\r\n" +
-	                  "s @after {document.getElementById('output').value += $ctx.toStringTree(null, this) + '\\n';} : e;\r\n" +
-	                  "e : a=e op=('*'|'/') b=e  {}\r\n" +
-	                  "  | INT {}\r\n" +
-	                  "  | '(' x=e ')' {}\r\n" +
-	                  "  ;\r\n" +
-	                  "INT : '0'..'9'+ ;\r\n" +
-	                  "WS : (' '|'\\n') -> skip ;\r";
+		String grammar = "grammar T;\n" +
+	                  "s @after {document.getElementById('output').value += $ctx.toStringTree(null, this) + '\\n';} : e;\n" +
+	                  "e : a=e op=('*'|'/') b=e  {}\n" +
+	                  "  | INT {}\n" +
+	                  "  | '(' x=e ')' {}\n" +
+	                  "  ;\n" +
+	                  "INT : '0'..'9'+ ;\n" +
+	                  "WS : (' '|'\\n') -> skip ;";
 		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", input, false);
 	}
 
@@ -534,20 +533,20 @@ public class TestLeftRecursion extends BaseTest {
 	}
 
 	String testReturnValueAndActionsAndLabels(String input) throws Exception {
-		String grammar = "grammar T;\r\n" +
-	                  "s : q=e {document.getElementById('output').value += $e.v + '\\n';}; \r\n" +
-	                  "e returns [int v]\r\n" +
-	                  "  : a=e op='*' b=e {$v = $a.v * $b.v;}  # mult\r\n" +
-	                  "  | a=e '+' b=e {$v = $a.v + $b.v;}     # add\r\n" +
-	                  "  | INT         {$v = $INT.int;}        # anInt\r\n" +
-	                  "  | '(' x=e ')' {$v = $x.v;}            # parens\r\n" +
-	                  "  | x=e '++'    {$v = $x.v+1;}          # inc\r\n" +
-	                  "  | e '--'                              # dec\r\n" +
-	                  "  | ID          {$v = 3;}               # anID\r\n" +
-	                  "  ; \r\n" +
-	                  "ID : 'a'..'z'+ ;\r\n" +
-	                  "INT : '0'..'9'+ ;\r\n" +
-	                  "WS : (' '|'\\n') -> skip ;\r";
+		String grammar = "grammar T;\n" +
+	                  "s : q=e {document.getElementById('output').value += $e.v + '\\n';}; \n" +
+	                  "e returns [int v]\n" +
+	                  "  : a=e op='*' b=e {$v = $a.v * $b.v;}  # mult\n" +
+	                  "  | a=e '+' b=e {$v = $a.v + $b.v;}     # add\n" +
+	                  "  | INT         {$v = $INT.int;}        # anInt\n" +
+	                  "  | '(' x=e ')' {$v = $x.v;}            # parens\n" +
+	                  "  | x=e '++'    {$v = $x.v+1;}          # inc\n" +
+	                  "  | e '--'                              # dec\n" +
+	                  "  | ID          {$v = 3;}               # anID\n" +
+	                  "  ; \n" +
+	                  "ID : 'a'..'z'+ ;\n" +
+	                  "INT : '0'..'9'+ ;\n" +
+	                  "WS : (' '|'\\n') -> skip ;";
 		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", input, false);
 	}
 
@@ -580,22 +579,22 @@ public class TestLeftRecursion extends BaseTest {
 	}
 
 	String testMultipleAlternativesWithCommonLabel(String input) throws Exception {
-		String grammar = "grammar T;\r\n" +
-	                  "s : e {document.getElementById('output').value += $e.v + '\\n';}; \r\n" +
-	                  "e returns [int v]\r\n" +
-	                  "  : e '*' e     {$v = $ctx.e(0).v * $ctx.e(1).v;}  # binary\r\n" +
-	                  "  | e '+' e     {$v = $ctx.e(0).v + $ctx.e(1).v;}  # binary\r\n" +
-	                  "  | INT         {$v = $INT.int;}                   # anInt\r\n" +
-	                  "  | '(' e ')'   {$v = $e.v;}                       # parens\r\n" +
-	                  "  | left=e INC  {$v = $left.v + 1;}      # unary\r\n" +
-	                  "  | left=e DEC  {$v = $left.v - 1;}      # unary\r\n" +
-	                  "  | ID          {$v = 3;}                                                     # anID\r\n" +
-	                  "  ; \r\n" +
-	                  "ID : 'a'..'z'+ ;\r\n" +
-	                  "INT : '0'..'9'+ ;\r\n" +
-	                  "INC : '++' ;\r\n" +
-	                  "DEC : '--' ;\r\n" +
-	                  "WS : (' '|'\\n') -> skip ;\r";
+		String grammar = "grammar T;\n" +
+	                  "s : e {document.getElementById('output').value += $e.v + '\\n';}; \n" +
+	                  "e returns [int v]\n" +
+	                  "  : e '*' e     {$v = $ctx.e(0).v * $ctx.e(1).v;}  # binary\n" +
+	                  "  | e '+' e     {$v = $ctx.e(0).v + $ctx.e(1).v;}  # binary\n" +
+	                  "  | INT         {$v = $INT.int;}                   # anInt\n" +
+	                  "  | '(' e ')'   {$v = $e.v;}                       # parens\n" +
+	                  "  | left=e INC  {$v = $left.v + 1;}      # unary\n" +
+	                  "  | left=e DEC  {$v = $left.v - 1;}      # unary\n" +
+	                  "  | ID          {$v = 3;}                                                     # anID\n" +
+	                  "  ; \n" +
+	                  "ID : 'a'..'z'+ ;\n" +
+	                  "INT : '0'..'9'+ ;\n" +
+	                  "INC : '++' ;\n" +
+	                  "DEC : '--' ;\n" +
+	                  "WS : (' '|'\\n') -> skip ;";
 		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", input, false);
 	}
 
@@ -628,17 +627,16 @@ public class TestLeftRecursion extends BaseTest {
 	}
 
 	String testPrefixOpWithActionAndLabel(String input) throws Exception {
-		String grammar = "grammar T;\r\n" +
-	                  "s : e {document.getElementById('output').value += $e.result + '\\n';} ;\r\n" +
-	                  "e returns [String result]\r\n" +
-	                  "    :   ID '=' e1=e    {$result = \"(\" + $ID.text + \"=\" + $e1.result + \")\";}\r\n" +
-	                  "    |   ID             {$result = $ID.text;}\r\n" +
-	                  "    |   e1=e '+' e2=e  {$result = \"(\" + $e1.result + \"+\" + $e2.result + \")\";}\r\n" +
-	                  "    ;\r\n" +
-	                  "ID : 'a'..'z'+ ;\r\n" +
-	                  "INT : '0'..'9'+ ;\r\n" +
-	                  "WS : (' '|'\\n') -> skip ;\r\n" +
-	                  "\r";
+		String grammar = "grammar T;\n" +
+	                  "s : e {document.getElementById('output').value += $e.result + '\\n';} ;\n" +
+	                  "e returns [String result]\n" +
+	                  "    :   ID '=' e1=e    {$result = \"(\" + $ID.text + \"=\" + $e1.result + \")\";}\n" +
+	                  "    |   ID             {$result = $ID.text;}\n" +
+	                  "    |   e1=e '+' e2=e  {$result = \"(\" + $e1.result + \"+\" + $e2.result + \")\";}\n" +
+	                  "    ;\n" +
+	                  "ID : 'a'..'z'+ ;\n" +
+	                  "INT : '0'..'9'+ ;\n" +
+	                  "WS : (' '|'\\n') -> skip ;";
 		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", input, false);
 	}
 
@@ -664,27 +662,27 @@ public class TestLeftRecursion extends BaseTest {
 	}
 
 	String testAmbigLR(String input) throws Exception {
-		String grammar = "grammar Expr;\r\n" +
-	                  "prog:   stat ;\r\n" +
-	                  "stat:   expr NEWLINE                # printExpr\r\n" +
-	                  "    |   ID '=' expr NEWLINE         # assign\r\n" +
-	                  "    |   NEWLINE                     # blank\r\n" +
-	                  "    ;\r\n" +
-	                  "expr:   expr ('*'|'/') expr      # MulDiv\r\n" +
-	                  "    |   expr ('+'|'-') expr      # AddSub\r\n" +
-	                  "    |   INT                      # int\r\n" +
-	                  "    |   ID                       # id\r\n" +
-	                  "    |   '(' expr ')'             # parens\r\n" +
-	                  "    ;\r\n" +
-	                  "\r\n" +
-	                  "MUL :   '*' ; // assigns token name to '*' used above in grammar\r\n" +
-	                  "DIV :   '/' ;\r\n" +
-	                  "ADD :   '+' ;\r\n" +
-	                  "SUB :   '-' ;\r\n" +
-	                  "ID  :   [a-zA-Z]+ ;      // match identifiers\r\n" +
-	                  "INT :   [0-9]+ ;         // match integers\r\n" +
-	                  "NEWLINE:'\\r'? '\\n' ;     // return newlines to parser (is end-statement signal)\r\n" +
-	                  "WS  :   [ \\t]+ -> skip ; // toss out whitespace\r";
+		String grammar = "grammar Expr;\n" +
+	                  "prog:   stat ;\n" +
+	                  "stat:   expr NEWLINE                # printExpr\n" +
+	                  "    |   ID '=' expr NEWLINE         # assign\n" +
+	                  "    |   NEWLINE                     # blank\n" +
+	                  "    ;\n" +
+	                  "expr:   expr ('*'|'/') expr      # MulDiv\n" +
+	                  "    |   expr ('+'|'-') expr      # AddSub\n" +
+	                  "    |   INT                      # int\n" +
+	                  "    |   ID                       # id\n" +
+	                  "    |   '(' expr ')'             # parens\n" +
+	                  "    ;\n" +
+	                  "\n" +
+	                  "MUL :   '*' ; // assigns token name to '*' used above in grammar\n" +
+	                  "DIV :   '/' ;\n" +
+	                  "ADD :   '+' ;\n" +
+	                  "SUB :   '-' ;\n" +
+	                  "ID  :   [a-zA-Z]+ ;      // match identifiers\n" +
+	                  "INT :   [0-9]+ ;         // match integers\n" +
+	                  "NEWLINE:'\\r'? '\\n' ;     // return newlines to parser (is end-statement signal)\n" +
+	                  "WS  :   [ \\t]+ -> skip ; // toss out whitespace";
 		return execParser("Expr.g4", grammar, "ExprParser", "ExprLexer", "ExprListener", "ExprVisitor", "prog", input, false);
 	}
 
@@ -724,55 +722,55 @@ public class TestLeftRecursion extends BaseTest {
 	}
 
 	String testWhitespaceInfluence(String input) throws Exception {
-		String grammar = "grammar Expr;\r\n" +
-	                  "prog : expression EOF;\r\n" +
-	                  "expression\r\n" +
-	                  "    : ID '(' expression (',' expression)* ')'               # doFunction\r\n" +
-	                  "    | '(' expression ')'                                    # doParenthesis\r\n" +
-	                  "    | '!' expression                                        # doNot\r\n" +
-	                  "    | '-' expression                                        # doNegate\r\n" +
-	                  "    | '+' expression                                        # doPositiv\r\n" +
-	                  "    | expression '^' expression                             # doPower\r\n" +
-	                  "    | expression '*' expression                             # doMultipy\r\n" +
-	                  "    | expression '/' expression                             # doDivide\r\n" +
-	                  "    | expression '%' expression                             # doModulo\r\n" +
-	                  "    | expression '-' expression                             # doMinus\r\n" +
-	                  "    | expression '+' expression                             # doPlus\r\n" +
-	                  "    | expression '=' expression                             # doEqual\r\n" +
-	                  "    | expression '!=' expression                            # doNotEqual\r\n" +
-	                  "    | expression '>' expression                             # doGreather\r\n" +
-	                  "    | expression '>=' expression                            # doGreatherEqual\r\n" +
-	                  "    | expression '<' expression                             # doLesser\r\n" +
-	                  "    | expression '<=' expression                            # doLesserEqual\r\n" +
-	                  "    | expression K_IN '(' expression (',' expression)* ')'  # doIn\r\n" +
-	                  "    | expression ( '&' | K_AND) expression                  # doAnd\r\n" +
-	                  "    | expression ( '|' | K_OR) expression                   # doOr\r\n" +
-	                  "    | '[' expression (',' expression)* ']'                  # newArray\r\n" +
-	                  "    | K_TRUE                                                # newTrueBoolean\r\n" +
-	                  "    | K_FALSE                                               # newFalseBoolean\r\n" +
-	                  "    | NUMBER                                                # newNumber\r\n" +
-	                  "    | DATE                                                  # newDateTime\r\n" +
-	                  "    | ID                                                    # newIdentifier\r\n" +
-	                  "    | SQ_STRING                                             # newString\r\n" +
-	                  "    | K_NULL                                                # newNull\r\n" +
-	                  "    ;\r\n" +
-	                  "\r\n" +
-	                  "// Fragments\r\n" +
-	                  "fragment DIGIT    : '0' .. '9';  \r\n" +
-	                  "fragment UPPER    : 'A' .. 'Z';\r\n" +
-	                  "fragment LOWER    : 'a' .. 'z';\r\n" +
-	                  "fragment LETTER   : LOWER | UPPER;\r\n" +
-	                  "fragment WORD     : LETTER | '_' | '$' | '#' | '.';\r\n" +
-	                  "fragment ALPHANUM : WORD | DIGIT;  \r\n" +
-	                  "\r\n" +
-	                  "// Tokens\r\n" +
-	                  "ID              : LETTER ALPHANUM*;\r\n" +
-	                  "NUMBER          : DIGIT+ ('.' DIGIT+)? (('e'|'E')('+'|'-')? DIGIT+)?;\r\n" +
-	                  "DATE            : '\\'' DIGIT DIGIT DIGIT DIGIT '-' DIGIT DIGIT '-' DIGIT DIGIT (' ' DIGIT DIGIT ':' DIGIT DIGIT ':' DIGIT DIGIT ('.' DIGIT+)?)? '\\'';\r\n" +
-	                  "SQ_STRING       : '\\'' ('\\'\\'' | ~'\\'')* '\\'';\r\n" +
-	                  "DQ_STRING       : '\\\"' ('\\\\\"' | ~'\\\"')* '\\\"';\r\n" +
-	                  "WS              : [ \\t\\n\\r]+ -> skip ;\r\n" +
-	                  "COMMENTS        : ('/*' .*? '*/' | '//' ~'\\n'* '\\n' ) -> skip;\r";
+		String grammar = "grammar Expr;\n" +
+	                  "prog : expression EOF;\n" +
+	                  "expression\n" +
+	                  "    : ID '(' expression (',' expression)* ')'               # doFunction\n" +
+	                  "    | '(' expression ')'                                    # doParenthesis\n" +
+	                  "    | '!' expression                                        # doNot\n" +
+	                  "    | '-' expression                                        # doNegate\n" +
+	                  "    | '+' expression                                        # doPositiv\n" +
+	                  "    | expression '^' expression                             # doPower\n" +
+	                  "    | expression '*' expression                             # doMultipy\n" +
+	                  "    | expression '/' expression                             # doDivide\n" +
+	                  "    | expression '%' expression                             # doModulo\n" +
+	                  "    | expression '-' expression                             # doMinus\n" +
+	                  "    | expression '+' expression                             # doPlus\n" +
+	                  "    | expression '=' expression                             # doEqual\n" +
+	                  "    | expression '!=' expression                            # doNotEqual\n" +
+	                  "    | expression '>' expression                             # doGreather\n" +
+	                  "    | expression '>=' expression                            # doGreatherEqual\n" +
+	                  "    | expression '<' expression                             # doLesser\n" +
+	                  "    | expression '<=' expression                            # doLesserEqual\n" +
+	                  "    | expression K_IN '(' expression (',' expression)* ')'  # doIn\n" +
+	                  "    | expression ( '&' | K_AND) expression                  # doAnd\n" +
+	                  "    | expression ( '|' | K_OR) expression                   # doOr\n" +
+	                  "    | '[' expression (',' expression)* ']'                  # newArray\n" +
+	                  "    | K_TRUE                                                # newTrueBoolean\n" +
+	                  "    | K_FALSE                                               # newFalseBoolean\n" +
+	                  "    | NUMBER                                                # newNumber\n" +
+	                  "    | DATE                                                  # newDateTime\n" +
+	                  "    | ID                                                    # newIdentifier\n" +
+	                  "    | SQ_STRING                                             # newString\n" +
+	                  "    | K_NULL                                                # newNull\n" +
+	                  "    ;\n" +
+	                  "\n" +
+	                  "// Fragments\n" +
+	                  "fragment DIGIT    : '0' .. '9';  \n" +
+	                  "fragment UPPER    : 'A' .. 'Z';\n" +
+	                  "fragment LOWER    : 'a' .. 'z';\n" +
+	                  "fragment LETTER   : LOWER | UPPER;\n" +
+	                  "fragment WORD     : LETTER | '_' | '$' | '#' | '.';\n" +
+	                  "fragment ALPHANUM : WORD | DIGIT;  \n" +
+	                  "\n" +
+	                  "// Tokens\n" +
+	                  "ID              : LETTER ALPHANUM*;\n" +
+	                  "NUMBER          : DIGIT+ ('.' DIGIT+)? (('e'|'E')('+'|'-')? DIGIT+)?;\n" +
+	                  "DATE            : '\\'' DIGIT DIGIT DIGIT DIGIT '-' DIGIT DIGIT '-' DIGIT DIGIT (' ' DIGIT DIGIT ':' DIGIT DIGIT ':' DIGIT DIGIT ('.' DIGIT+)?)? '\\'';\n" +
+	                  "SQ_STRING       : '\\'' ('\\'\\'' | ~'\\'')* '\\'';\n" +
+	                  "DQ_STRING       : '\\\"' ('\\\\\"' | ~'\\\"')* '\\\"';\n" +
+	                  "WS              : [ \\t\\n\\r]+ -> skip ;\n" +
+	                  "COMMENTS        : ('/*' .*? '*/' | '//' ~'\\n'* '\\n' ) -> skip;";
 		return execParser("Expr.g4", grammar, "ExprParser", "ExprLexer", "ExprListener", "ExprVisitor", "prog", input, false);
 	}
 
@@ -792,26 +790,26 @@ public class TestLeftRecursion extends BaseTest {
 
 	@Test
 	public void testPrecedenceFilterConsidersContext() throws Exception {
-		String grammar = "grammar T;\r\n" +
-	                  "prog \r\n" +
-	                  "@after {document.getElementById('output').value += $ctx.toStringTree(null, this) + '\\n';}\r\n" +
-	                  ": statement* EOF {};\r\n" +
-	                  "statement: letterA | statement letterA 'b' ;\r\n" +
-	                  "letterA: 'a';\r";
+		String grammar = "grammar T;\n" +
+	                  "prog \n" +
+	                  "@after {document.getElementById('output').value += $ctx.toStringTree(null, this) + '\\n';}\n" +
+	                  ": statement* EOF {};\n" +
+	                  "statement: letterA | statement letterA 'b' ;\n" +
+	                  "letterA: 'a';";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "prog", "aa", false);
 		assertEquals("(prog (statement (letterA a)) (statement (letterA a)) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 	}
 
 	String testMultipleActions(String input) throws Exception {
-		String grammar = "grammar T;\r\n" +
-	                  "s @after {document.getElementById('output').value += $ctx.toStringTree(null, this) + '\\n';} : e ;\r\n" +
-	                  "e : a=e op=('*'|'/') b=e  {}{}\r\n" +
-	                  "  | INT {}{}\r\n" +
-	                  "  | '(' x=e ')' {}{}\r\n" +
-	                  "  ;\r\n" +
-	                  "INT : '0'..'9'+ ;\r\n" +
-	                  "WS : (' '|'\\n') -> skip ;\r";
+		String grammar = "grammar T;\n" +
+	                  "s @after {document.getElementById('output').value += $ctx.toStringTree(null, this) + '\\n';} : e ;\n" +
+	                  "e : a=e op=('*'|'/') b=e  {}{}\n" +
+	                  "  | INT {}{}\n" +
+	                  "  | '(' x=e ')' {}{}\n" +
+	                  "  ;\n" +
+	                  "INT : '0'..'9'+ ;\n" +
+	                  "WS : (' '|'\\n') -> skip ;";
 		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", input, false);
 	}
 
@@ -837,15 +835,15 @@ public class TestLeftRecursion extends BaseTest {
 	}
 
 	String testMultipleActionsPredicatesOptions(String input) throws Exception {
-		String grammar = "grammar T;\r\n" +
-	                  "s @after {document.getElementById('output').value += $ctx.toStringTree(null, this) + '\\n';} : e ;\r\n" +
-	                  "e : a=e op=('*'|'/') b=e  {}{true}?\r\n" +
-	                  "  | a=e op=('+'|'-') b=e  {}<p=3>{true}?<fail='Message'>\r\n" +
-	                  "  | INT {}{}\r\n" +
-	                  "  | '(' x=e ')' {}{}\r\n" +
-	                  "  ;\r\n" +
-	                  "INT : '0'..'9'+ ;\r\n" +
-	                  "WS : (' '|'\\n') -> skip ;\r";
+		String grammar = "grammar T;\n" +
+	                  "s @after {document.getElementById('output').value += $ctx.toStringTree(null, this) + '\\n';} : e ;\n" +
+	                  "e : a=e op=('*'|'/') b=e  {}{true}?\n" +
+	                  "  | a=e op=('+'|'-') b=e  {}<p=3>{true}?<fail='Message'>\n" +
+	                  "  | INT {}{}\n" +
+	                  "  | '(' x=e ')' {}{}\n" +
+	                  "  ;\n" +
+	                  "INT : '0'..'9'+ ;\n" +
+	                  "WS : (' '|'\\n') -> skip ;";
 		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", input, false);
 	}
 
@@ -872,29 +870,29 @@ public class TestLeftRecursion extends BaseTest {
 
 	@Test
 	public void testSemPredFailOption() throws Exception {
-		String grammar = "grammar T;\r\n" +
-	                  "s @after {document.getElementById('output').value += $ctx.toStringTree(null, this) + '\\n';} : a ;\r\n" +
-	                  "a : a ID {false}?<fail='custom message'>\r\n" +
-	                  "  | ID\r\n" +
-	                  "  ;\r\n" +
-	                  "ID : 'a'..'z'+ ;\r\n" +
-	                  "WS : (' '|'\\n') -> skip ;\r";
+		String grammar = "grammar T;\n" +
+	                  "s @after {document.getElementById('output').value += $ctx.toStringTree(null, this) + '\\n';} : a ;\n" +
+	                  "a : a ID {false}?<fail='custom message'>\n" +
+	                  "  | ID\n" +
+	                  "  ;\n" +
+	                  "ID : 'a'..'z'+ ;\n" +
+	                  "WS : (' '|'\\n') -> skip ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", "x y z", false);
 		assertEquals("(s (a (a x) y z))\n", found);
 		assertEquals("line 1:4 rule a custom message\n", this.stderrDuringParse);
 	}
 
 	String testTernaryExprExplicitAssociativity(String input) throws Exception {
-		String grammar = "grammar T;\r\n" +
-	                  "s @after {document.getElementById('output').value += $ctx.toStringTree(null, this) + '\\n';} : e EOF; // must indicate EOF can follow or 'a<EOF>' won't match\r\n" +
-	                  "e :<assoc=right> e '*' e\r\n" +
-	                  "  |<assoc=right> e '+' e\r\n" +
-	                  "  |<assoc=right> e '?' e ':' e\r\n" +
-	                  "  |<assoc=right> e '=' e\r\n" +
-	                  "  | ID\r\n" +
-	                  "  ;\r\n" +
-	                  "ID : 'a'..'z'+ ;\r\n" +
-	                  "WS : (' '|'\\n') -> skip ;\r";
+		String grammar = "grammar T;\n" +
+	                  "s @after {document.getElementById('output').value += $ctx.toStringTree(null, this) + '\\n';} : e EOF; // must indicate EOF can follow or 'a<EOF>' won't match\n" +
+	                  "e :<assoc=right> e '*' e\n" +
+	                  "  |<assoc=right> e '+' e\n" +
+	                  "  |<assoc=right> e '?' e ':' e\n" +
+	                  "  |<assoc=right> e '=' e\n" +
+	                  "  | ID\n" +
+	                  "  ;\n" +
+	                  "ID : 'a'..'z'+ ;\n" +
+	                  "WS : (' '|'\\n') -> skip ;";
 		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", input, false);
 	}
 
@@ -962,19 +960,19 @@ public class TestLeftRecursion extends BaseTest {
 	}
 
 	String testReturnValueAndActionsList1(String input) throws Exception {
-		String grammar = "grammar T;\r\n" +
-	                  "s @after {document.getElementById('output').value += $ctx.toStringTree(null, this) + '\\n';} : expr EOF;\r\n" +
-	                  "expr:\r\n" +
-	                  "    a=expr '*' a=expr #Factor\r\n" +
-	                  "    | b+=expr (',' b+=expr)* '>>' c=expr #Send\r\n" +
-	                  "    | ID #JustId //semantic check on modifiers\r\n" +
-	                  ";\r\n" +
-	                  "\r\n" +
-	                  "ID  : ('a'..'z'|'A'..'Z'|'_')\r\n" +
-	                  "      ('a'..'z'|'A'..'Z'|'0'..'9'|'_')*\r\n" +
-	                  ";\r\n" +
-	                  "\r\n" +
-	                  "WS : [ \\t\\n]+ -> skip ;\r";
+		String grammar = "grammar T;\n" +
+	                  "s @after {document.getElementById('output').value += $ctx.toStringTree(null, this) + '\\n';} : expr EOF;\n" +
+	                  "expr:\n" +
+	                  "    a=expr '*' a=expr #Factor\n" +
+	                  "    | b+=expr (',' b+=expr)* '>>' c=expr #Send\n" +
+	                  "    | ID #JustId //semantic check on modifiers\n" +
+	                  ";\n" +
+	                  "\n" +
+	                  "ID  : ('a'..'z'|'A'..'Z'|'_')\n" +
+	                  "      ('a'..'z'|'A'..'Z'|'0'..'9'|'_')*\n" +
+	                  ";\n" +
+	                  "\n" +
+	                  "WS : [ \\t\\n]+ -> skip ;";
 		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", input, false);
 	}
 
@@ -1007,18 +1005,18 @@ public class TestLeftRecursion extends BaseTest {
 	}
 
 	String testReturnValueAndActionsList2(String input) throws Exception {
-		String grammar = "grammar T;\r\n" +
-	                  "s @after {document.getElementById('output').value += $ctx.toStringTree(null, this) + '\\n';} : expr EOF;\r\n" +
-	                  "expr:\r\n" +
-	                  "    a=expr '*' a=expr #Factor\r\n" +
-	                  "    | b+=expr ',' b+=expr #Comma\r\n" +
-	                  "    | b+=expr '>>' c=expr #Send\r\n" +
-	                  "    | ID #JustId //semantic check on modifiers\r\n" +
-	                  "	;\r\n" +
-	                  "ID  : ('a'..'z'|'A'..'Z'|'_')\r\n" +
-	                  "      ('a'..'z'|'A'..'Z'|'0'..'9'|'_')*\r\n" +
-	                  ";\r\n" +
-	                  "WS : [ \\t\\n]+ -> skip ;\r";
+		String grammar = "grammar T;\n" +
+	                  "s @after {document.getElementById('output').value += $ctx.toStringTree(null, this) + '\\n';} : expr EOF;\n" +
+	                  "expr:\n" +
+	                  "    a=expr '*' a=expr #Factor\n" +
+	                  "    | b+=expr ',' b+=expr #Comma\n" +
+	                  "    | b+=expr '>>' c=expr #Send\n" +
+	                  "    | ID #JustId //semantic check on modifiers\n" +
+	                  "	;\n" +
+	                  "ID  : ('a'..'z'|'A'..'Z'|'_')\n" +
+	                  "      ('a'..'z'|'A'..'Z'|'0'..'9'|'_')*\n" +
+	                  ";\n" +
+	                  "WS : [ \\t\\n]+ -> skip ;";
 		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", input, false);
 	}
 

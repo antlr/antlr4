@@ -134,16 +134,9 @@ var decisionsToDFA = atn.decisionToState.map( function(ds, index) { return new a
 
 var sharedContextCache = new antlr4.PredictionContextCache();
 
-var EOF = antlr4.Token.EOF;
-<if(parser.tokens)>
-<parser.tokens:{k | var <k> = <parser.tokens.(k)>;}; separator="\n", wrap, anchor>
-<endif>
-
 var literalNames = [ <parser.literalNames:{t | <t>}; null="'null'", separator=", ", wrap, anchor> ];
 
 var symbolicNames = [ <parser.symbolicNames:{t | <t>}; null="'null'", separator=", ", wrap, anchor> ];
-
-<parser.rules:{r | var RULE_<r.name> = <r.index>;}; separator="\n", wrap, anchor>
 
 var ruleNames =  [ <parser.ruleNames:{r | "<r>"}; separator=", ", wrap, anchor> ];
 
@@ -166,6 +159,12 @@ Object.defineProperty(<parser.name>.prototype, "atn", {
 	}
 });
 	
+<parser.name>.EOF = antlr4.Token.EOF;
+<if(parser.tokens)>
+<parser.tokens:{k | <parser.name>.<k> = <parser.tokens.(k)>;}; separator="\n", wrap, anchor>
+<endif>
+
+<parser.rules:{r | <parser.name>.RULE_<r.name> = <r.index>;}; separator="\n", wrap, anchor>
 
 <funcs; separator="\n">
 
@@ -257,7 +256,7 @@ RuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,namedActions,fina
 <parser.name>.prototype.<currentRule.name> = function(<currentRule.args:{a | <a.name>}; separator=", ">) {
 	
     var localctx = new <currentRule.ctxType>(this, this._ctx, this.state<currentRule.args:{a | , <a.name>}>);
-    this.enterRule(localctx, <currentRule.startState>, RULE_<currentRule.name>);
+    this.enterRule(localctx, <currentRule.startState>, <parser.name>.RULE_<currentRule.name>);
     <namedActions.init>
     <locals; separator="\n">
     try {
@@ -300,7 +299,7 @@ LeftRecursiveRuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,
     var localctx = new <currentRule.ctxType>(this, this._ctx, _parentState<args:{a | , <a.name>}>);
     var _prevctx = localctx;
     var _startState = <currentRule.startState>;
-    this.enterRecursionRule(localctx, <currentRule.startState>, RULE_<currentRule.name>, _p);
+    this.enterRecursionRule(localctx, <currentRule.startState>, <parser.name>.RULE_<currentRule.name>, _p);
     <namedActions.init>
     <locals; separator="\n">
     try {
@@ -487,16 +486,16 @@ offsetShiftVar(shiftAmount, offset) ::= <%
 %>
 
 offsetShiftType(shiftAmount, offset) ::= <%
-<if(!isZero.(offset))>(<shiftAmount> - <offset>)<else><shiftAmount><endif>
+<if(!isZero.(offset))>(<parser.name>.<shiftAmount> - <offset>)<else><parser.name>.<shiftAmount><endif>
 %>
 
 // produces more efficient bytecode when bits.ttypes contains at most two items
 bitsetInlineComparison(s, bits) ::= <%
-<bits.ttypes:{ttype | <s.varName>===<ttype>}; separator=" || ">
+<bits.ttypes:{ttype | <s.varName>===<parser.name>.<ttype>}; separator=" || ">
 %>
 
 cases(ttypes) ::= <<
-<ttypes:{t | case <t>:}; separator="\n">
+<ttypes:{t | case <parser.name>.<t>:}; separator="\n">
 >>
 
 InvokeRule(r, argExprsChunks) ::= <<
@@ -506,7 +505,7 @@ this.state = <r.stateNumber>;
 
 MatchToken(m) ::= <<
 this.state = <m.stateNumber>;
-<if(m.labels)><m.labels:{l | <labelref(l)> = }><endif>this.match(<m.name>);
+<if(m.labels)><m.labels:{l | <labelref(l)> = }><endif>this.match(<parser.name>.<m.name>);
 >>
 
 MatchSet(m, expr, capture) ::= "<CommonSetStuff(m, expr, capture, false)>"
@@ -585,13 +584,13 @@ RulePropertyRef_start(r) ::= "(<ctx(r)>.<r.label>===null ? null : <ctx(r)>.<r.la
 RulePropertyRef_stop(r)	 ::= "(<ctx(t)>.<t.label> === null ? null : <ctx(r)>.<r.label>.stop)"
 RulePropertyRef_text(r)	 ::= "(<ctx(r)>.<r.label>===null ? null : this._input.getText(new antlr4.Interval(<ctx(r)>.<r.label>.start,<ctx(r)>.<r.label>.stop)))"
 RulePropertyRef_ctx(r)	 ::= "<ctx(r)>.<r.label>"
-RulePropertyRef_self(r)	 ::= "this"
+RulePropertyRef_parser(r)	 ::= "this"
 
 ThisRulePropertyRef_start(r) ::= "localctx.start"
 ThisRulePropertyRef_stop(r)	 ::= "localctx.stop"
 ThisRulePropertyRef_text(r)	 ::= "this._input.getText(new antlr4.Interval(localctx.start, this._input.LT(-1)))"
 ThisRulePropertyRef_ctx(r)	 ::= "localctx"
-ThisRulePropertyRef_self(r)	 ::= "this"
+ThisRulePropertyRef_parser(r)	 ::= "this"
 
 NonLocalAttrRef(s)		 	 ::= "getInvokingContext(<s.ruleIndex>).<s.name>"
 SetNonLocalAttr(s, rhsChunks)  ::= "getInvokingContext(<s.ruleIndex>).<s.name> = <rhsChunks>"
@@ -606,7 +605,7 @@ RuleContextListDecl(rdecl) ::= "this.<rdecl.name> = []; // of <rdecl.ctxName>s"
 
 ContextTokenGetterDecl(t)      ::= <<
 <t.name> = function() {
-    return this.getToken(<t.name>, 0);
+    return this.getToken(<parser.name>.<t.name>, 0);
 };
 >>
 
@@ -622,9 +621,9 @@ ContextTokenListIndexedGetterDecl(t)  ::= <<
 		i = null;
 	}
     if(i===null) {
-        return this.getTokens(<t.name>);
+        return this.getTokens(<parser.name>.<t.name>);
     } else {
-        return this.getToken(<t.name>, i);
+        return this.getToken(<parser.name>.<t.name>, i);
     }
 };
 
@@ -682,7 +681,7 @@ function <struct.name>(parser, parent, invokingState<struct.ctorAttrs:{a | , <a.
 	}
 	<superClass>.call(this, parent, invokingState);
     this.parser = parser;
-    this.ruleIndex = RULE_<struct.derivedFromName>;
+    this.ruleIndex = <parser.name>.RULE_<struct.derivedFromName>;
     <attrs:{a | <a>}; separator="\n">
     <struct.ctorAttrs:{a | this.<a.name> = <a.name> || null;}; separator="\n">
     return this;
@@ -756,7 +755,7 @@ recRuleSetStopToken()                 ::= "this._ctx.stop = this._input.LT(-1);"
 recRuleAltStartAction(ruleName, ctxName, label) ::= <<
 localctx = new <ctxName>Context(this, _parentctx, _parentState);
 <if(label)>localctx.<label> = _prevctx;<endif>
-this.pushNewRecursionContext(localctx, _startState, RULE_<ruleName>);
+this.pushNewRecursionContext(localctx, _startState, <parser.name>.RULE_<ruleName>);
 >>
 
 recRuleLabeledAltStartAction(ruleName, currentAltLabel, label, isListLabel) ::= <<
@@ -768,7 +767,7 @@ localctx.<label>.push(_prevctx);
 localctx.<label> = _prevctx;
 <endif>
 <endif>
-this.pushNewRecursionContext(localctx, _startState, RULE_<ruleName>);
+this.pushNewRecursionContext(localctx, _startState, <parser.name>.RULE_<ruleName>);
 >>
 
 recRuleReplaceContext(ctxName) ::= <<
