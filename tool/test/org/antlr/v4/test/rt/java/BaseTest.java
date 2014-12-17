@@ -29,44 +29,6 @@
  */
 package org.antlr.v4.test.rt.java;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PrintStream;
-import java.io.StringReader;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import javax.tools.JavaCompiler;
-import javax.tools.JavaFileObject;
-import javax.tools.StandardJavaFileManager;
-import javax.tools.ToolProvider;
-
 import org.antlr.v4.Tool;
 import org.antlr.v4.automata.ATNFactory;
 import org.antlr.v4.automata.ATNPrinter;
@@ -115,6 +77,43 @@ import org.junit.runner.Description;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupString;
+
+import javax.tools.JavaCompiler;
+import javax.tools.JavaFileObject;
+import javax.tools.StandardJavaFileManager;
+import javax.tools.ToolProvider;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
+import java.io.PrintStream;
+import java.io.StringReader;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public abstract class BaseTest {
 	// -J-Dorg.antlr.v4.test.BaseTest.level=FINE
@@ -658,11 +657,7 @@ public abstract class BaseTest {
 		URLClassLoader loader =
 			new URLClassLoader(new URL[] { new File(tmpdir).toURI().toURL() },
 							   ClassLoader.getSystemClassLoader());
-		try {
-			return loader.loadClass(name);
-		} finally {
-			loader.close();
-		}
+		return loader.loadClass(name);
 	}
 
 	public Class<? extends Lexer> loadLexerClassFromTempDir(String name) throws Exception {
@@ -846,12 +841,6 @@ public abstract class BaseTest {
 			} catch (ClassNotFoundException ex) {
 				LOGGER.log(Level.SEVERE, null, ex);
 				throw new RuntimeException(ex);
-			} finally {
-				if(loader!=null) try {
-					loader.close();
-				} catch(IOException e) {
-					LOGGER.log(Level.WARNING, null, e);
-				}
 			}
 		}
 
