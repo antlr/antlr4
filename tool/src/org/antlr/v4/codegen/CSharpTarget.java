@@ -49,7 +49,7 @@ public class CSharpTarget extends Target {
 
     @Override
     public String getVersion() {
-        return "4.4"; // crossing fingers that it's close enough.
+        return "4.5"; // crossing fingers that it's close enough.
     }
 
 	@Override
