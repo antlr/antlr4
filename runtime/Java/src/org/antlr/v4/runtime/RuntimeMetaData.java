@@ -74,7 +74,7 @@ public class RuntimeMetaData {
 	 * libraries to include a literal reference to the version of the ANTLR 4
 	 * runtime library the code was compiled against.</p>
 	 */
-	public static final String VERSION = "4.4.1-dev";
+	public static final String VERSION = "4.5";
 
 	/**
 	 * This class provides detailed information about a mismatch between the
