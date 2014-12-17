@@ -51,7 +51,6 @@ import org.antlr.v4.parse.ToolANTLRParser;
 import org.antlr.v4.parse.v3TreeGrammarException;
 import org.antlr.v4.runtime.RuntimeMetaData;
 import org.antlr.v4.runtime.misc.LogManager;
-import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.semantics.SemanticPipeline;
 import org.antlr.v4.tool.ANTLRMessage;
@@ -95,18 +94,6 @@ public class Tool {
 		// Assigned in a static{} block to prevent the field from becoming a
 		// compile-time constant
 		VERSION = RuntimeMetaData.VERSION;
-		RuntimeMetaData.clearListeners();
-		RuntimeMetaData.addListener(new RuntimeMetaData.DefaultListener() {
-			@Override
-			public void reportVersionMismatch(@NotNull RuntimeMetaData.VersionMismatchException ex) throws RuntimeMetaData.VersionMismatchException {
-				if ( ex.generatingToolVersion.equals("4.4") && VERSION.equals("4.5") ) {
-					// this is ok
-				}
-				else {
-					super.reportVersionMismatch(ex);
-				}
-			}
-		});
 	}
 
 	public static final String GRAMMAR_EXTENSION = ".g4";
