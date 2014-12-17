@@ -37,7 +37,8 @@ if not os.path.exists("bilder.py"):
 # assumes bilder.py is in current directory
 from bilder import *
 
-VERSION = "4.4"
+BOOTSTRAP_VERSION = "4.4"
+VERSION = "4.5"
 JAVA_TARGET = "."
 PYTHON2_TARGET = "../antlr4-python2"
 PYTHON3_TARGET = "../antlr4-python3"
@@ -65,15 +66,14 @@ def parsers():
     antlr3("tool/src/org/antlr/v4/parse", "gen3", package="org.antlr.v4.parse")
     antlr3("tool/src/org/antlr/v4/codegen", "gen3", package="org.antlr.v4.codegen",
            args=["-lib", uniformpath("gen3/org/antlr/v4/parse")])
-    antlr4("runtime/Java/src/org/antlr/v4/runtime/tree/xpath", "gen4", package="org.antlr.v4.runtime.tree.xpath")
+    antlr4("runtime/Java/src/org/antlr/v4/runtime/tree/xpath", "gen4",
+           version=BOOTSTRAP_VERSION, package="org.antlr.v4.runtime.tree.xpath")
 
 def compile():
     require(parsers)
     cp = uniformpath("out") + os.pathsep + \
          os.path.join(JARCACHE, "antlr-3.5.1-complete.jar") + os.pathsep + \
          "runtime/Java/lib/org.abego.treelayout.core.jar" + os.pathsep
-    if os.path.exists(JARCACHE + "/antlr-" + VERSION + "-complete.jar"):
-        cp += JARCACHE + "/antlr-" + VERSION + "-complete.jar"
     srcpath = ["gen3", "gen4", "runtime/JavaAnnotations/src", "runtime/Java/src", "tool/src"]
     args = ["-Xlint", "-Xlint:-serial", "-g", "-sourcepath", string.join(srcpath, os.pathsep)]
     for sp in srcpath:
@@ -132,7 +132,7 @@ def mkjar_runtime():
         "Built-By: %s\n" +\
         "Build-Jdk: 1.6\n" +\
         "Created-By: http://www.bildtool.org\n" +\
-        "\n" 
+        "\n"
     manifest = manifest % (VERSION, os.getlogin())
     jarfile = "dist/antlr4-" + VERSION + ".jar"
     jar(jarfile, srcdir="out/runtime", manifest=manifest)
@@ -141,14 +141,13 @@ def mkjar_runtime():
 def mkjar():
     mkjar_complete()
     # put it in JARCARCHE too so bild can find it during antlr4()
-    copyfile(src="dist/antlr4-" + VERSION + "-complete.jar", trg=JARCACHE)
-    # rebuild/bootstrap XPath with 4.4 so it can use 4.4 runtime (gen'd with 4.3 at this point)
-    rmdir("gen4/org/antlr/v4/runtime/tree/xpath")  # kill 4.3-generated version
+    copyfile(src="dist/antlr4-" + VERSION + "-complete.jar", trg=JARCACHE+"/antlr-"+VERSION+"-complete.jar") # note mvn wants antlr4-ver-... but I want antlr-ver-...
+    # rebuild/bootstrap XPath with this version so it can use current runtime (gen'd with previous ANTLR at this point)
+    rmdir("gen4/org/antlr/v4/runtime/tree/xpath")  # kill previous-version-generated code
     antlr4("runtime/Java/src/org/antlr/v4/runtime/tree/xpath", "gen4", version=VERSION,
            package="org.antlr.v4.runtime.tree.xpath")
-    compile()
     mkjar_complete()  # make it again with up to date XPath lexer
-    mkjar_runtime()  # now build the runtime jar
+    mkjar_runtime()   # now build the runtime jar
 
 
 def tests():
