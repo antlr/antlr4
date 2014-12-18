@@ -2,5 +2,5 @@
 	"name" : "antlr4",
 	"description" : "JavaScript runtime for ANTRL4",
 	"keywords" : [ "lexer", "parser", "antlr", "grammar"],
-	"version" : "4.4.0"
+	"version" : "4.5"
 }

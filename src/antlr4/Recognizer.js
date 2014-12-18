@@ -45,7 +45,7 @@ Recognizer.ruleIndexMapCache = {};
 
 
 Recognizer.prototype.checkVersion = function(toolVersion) {
-    var runtimeVersion = "4.4";
+    var runtimeVersion = "4.5";
     if (runtimeVersion!==toolVersion) {
         console.log("ANTLR runtime and generated code versions disagree: "+runtimeVersion+"!="+toolVersion);
     }
