@@ -186,6 +186,11 @@ public class JavaScriptTarget extends Target {
 	}
 
 	@Override
+	public int getInlineTestSetWordSize() {
+		return 32;
+	}
+
+	@Override
 	protected boolean visibleGrammarSymbolCausesIssueInGeneratedCode(GrammarAST idNode) {
 		return getBadWords().contains(idNode.getText());
 	}
