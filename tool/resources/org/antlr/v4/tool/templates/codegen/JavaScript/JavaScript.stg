@@ -466,9 +466,9 @@ TestSetInline(s) ::= <<
 <s.bitsets:{bits | <if(rest(rest(bits.ttypes)))><bitsetBitfieldComparison(s, bits)><else><bitsetInlineComparison(s, bits)><endif>}; separator=" || ">
 >>
 
-// Java language spec 15.19 - shift operators mask operands rather than overflow to 0... need range test
+// Javascript language spec - shift operators are 32 bits long max
 testShiftInRange(shiftAmount) ::= <<
-((<shiftAmount>) & ~0x3f) == 0
+((<shiftAmount>) & ~0x1f) == 0
 >>
 
 // produces smaller bytecode only when bits.ttypes contains more than two items

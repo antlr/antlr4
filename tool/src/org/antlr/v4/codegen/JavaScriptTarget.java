@@ -41,7 +41,7 @@ import java.util.Set;
 
 /**
  *
- * @author Sam Harwell
+ * @author Eric Vergnaud
  */
 public class JavaScriptTarget extends Target {
 
