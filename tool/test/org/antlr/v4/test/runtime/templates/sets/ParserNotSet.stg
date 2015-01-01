@@ -1,0 +1,18 @@
+TestType() ::= "Parser"
+
+Grammars ::= [
+	"T.g4": {<grammar("T")>}
+]
+
+Rule() ::= "a"
+
+Input() ::= "zz"
+
+Output() ::= "z<\n>"
+
+Errors() ::= ""
+
+grammar(grammarName) ::= <<
+grammar <grammarName>;
+<Rule()> : t=~('x'|'y') 'z' {<writeln("$t.text")>} ;
+>>

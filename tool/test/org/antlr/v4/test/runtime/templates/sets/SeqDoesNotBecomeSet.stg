@@ -1,0 +1,21 @@
+TestType() ::= "Parser"
+
+Grammars ::= [
+	"T.g4": {<grammar("T")>}
+]
+
+Rule() ::= "a"
+
+Input() ::= "34"
+
+Output() ::= "34<\n>"
+
+Errors() ::= ""
+
+grammar(grammarName) ::= <<
+grammar <grammarName>;
+<Rule()> : C {<InputText():writeln()>} ;
+fragment A : '1' | '2';
+fragment B : '3' '4';
+C : A | B;
+>>

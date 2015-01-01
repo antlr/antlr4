@@ -1,0 +1,25 @@
+TestType() ::= "Parser"
+
+Grammars ::= [
+	"T.g4": {<grammar("T")>}
+]
+
+Rule() ::= "a"
+
+Input() ::= "A a B b"
+
+Output() ::= <<
+A
+a
+B
+b<\n>
+>>
+
+Errors() ::= ""
+
+grammar(grammarName) ::= <<
+grammar <grammarName>;
+<Rule()> : (A {<writeln("$A.text")>})+ ;
+A : [AaBb] ;
+WS : (' '|'\n')+ -> skip ;
+>>

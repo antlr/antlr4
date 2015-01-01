@@ -43,17 +43,17 @@
         <version>4.4-SNAPSHOT</version>
     </parent>
 
-    <artifactId>antlr4-maven-plugin</artifactId>
+    <artifactId>antlr4-testgen-maven-plugin</artifactId>
     <packaging>maven-plugin</packaging>
 
-    <name>ANTLR 4 Maven plugin</name>
-    <description>Maven plugin for ANTLR 4 grammars</description>
+    <name>ANTLR 4 Test Generator Maven plugin</name>
+    <description>Maven plugin for generating ANTLR 4 runtime tests</description>
     <url>http://www.antlr.org</url>
 
     <prerequisites>
         <maven>3.0</maven>
     </prerequisites>
-    
+
     <!-- Ancilliary information for completeness
       -->
     <inceptionYear>2009</inceptionYear>
@@ -88,7 +88,7 @@
         <dependency>
             <groupId>org.codehaus.plexus</groupId>
             <artifactId>plexus-compiler-api</artifactId>
-            <version>2.4</version>
+            <version>2.2</version>
         </dependency>
 
         <dependency>
@@ -97,27 +97,20 @@
             <version>0.0.7</version>
         </dependency>
 
-        <!--
-         The version of ANTLR tool that this version of the plugin controls.
-         We have decided that this should be in lockstep with ANTLR itself, other
-         than -1 -2 -3 etc patch releases.
-          -->
         <dependency>
             <groupId>org.antlr</groupId>
-            <artifactId>antlr4</artifactId>
-            <version>${project.version}</version>
+            <artifactId>ST4</artifactId>
+            <version>4.0.8</version>
         </dependency>
 
         <!--
           Testing requirements...
           -->
         <dependency>
-
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.11</version>
             <scope>test</scope>
-
         </dependency>
 
         <dependency>

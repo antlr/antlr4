@@ -1,0 +1,22 @@
+TestType() ::= "Parser"
+
+Grammars ::= [
+	"T.g4": {<grammar("T")>}
+]
+
+Rule() ::= "parse"
+
+Input() ::= "a"
+
+Output() ::= ""
+
+Errors() ::= <<
+line 1:0 token recognition error at: 'a'
+line 1:1 missing {} at '\<EOF>'<\n>
+>>
+
+grammar(grammarName) ::= <<
+grammar <grammarName>;
+<Rule()> : ~NEW_LINE;
+NEW_LINE: '\\r'? '\\n';
+>>

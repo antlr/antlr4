@@ -1,0 +1,28 @@
+TestType() ::= "Parser"
+
+Grammars ::= [
+	"T.g4": {<grammar("T")>}
+]
+
+Rule() ::= "a"
+
+Input ::= [
+	"1": "bbbbc",
+	"2": "c"
+]
+
+Output ::= [
+	"1": {bbbbc<\n>},
+	"2": {c<\n>}
+]
+
+Errors ::= [
+	"1": "",
+	"2": ""
+]
+
+grammar(grammarName) ::= <<
+grammar <grammarName>;
+<Rule()> : A {<InputText():writeln()>} ;
+A : 'b'* 'c' ;
+>>

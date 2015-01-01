@@ -63,6 +63,7 @@
         <module>runtime/JavaAnnotations</module>
         <module>tool</module>
         <module>antlr4-maven-plugin</module>
+        <module>antlr4-testgen-maven-plugin</module>
     </modules>
 
     <properties>

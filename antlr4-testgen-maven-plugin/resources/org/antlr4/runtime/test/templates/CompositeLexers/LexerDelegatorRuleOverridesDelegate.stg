@@ -1,0 +1,31 @@
+TestType() ::= "CompositeLexer"
+
+Grammars ::= [
+	"M.g4": {<masterGrammar("M", "S")>},
+	"S.g4": {<slaveGrammar("S")>}
+]
+
+Input() ::= "abc"
+
+Output() ::= <<
+S.A
+[@0,0:0='a',\<3>,1:0]
+[@1,1:1='b',\<1>,1:1]
+[@2,2:2='c',\<4>,1:2]
+[@3,3:2='\<EOF>',\<-1>,1:3]<\n>
+>>
+
+Errors() ::= ""
+
+masterGrammar(grammarName, slaveGrammarName) ::= <<
+lexer grammar <grammarName>;
+import <slaveGrammarName>;
+A : 'a' B {<writeln("\"M.A\"")>};
+WS : (' '|'\n') -> skip ;
+>>
+
+slaveGrammar(grammarName) ::= <<
+lexer grammar <grammarName>;
+A : 'a' {<writeln("\"S.A\"")>};
+B : 'b' {<writeln("\"S.B\"")>};
+>>

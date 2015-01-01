@@ -1,0 +1,62 @@
+         -------------
+         ANTLR v4 Maven Plugin
+         -------------
+         Jim Idle
+         -------------
+         March 2009
+         -------------
+
+ANTLR v4 Maven plugin
+
+ The ANTLR v4 Maven plugin is completely re-written as of version 4.0; if you are familiar
+ with prior versions, you should note that there are some behavioral differences that make
+ it worthwhile reading this documentation. 
+
+ The job of the plugin is essentially to tell the standard ANTLR parser generator where the
+ input grammar files are and where the output files should be generated. As with all Maven
+ plugins, there are defaults, which you are advised to comply to, but are not forced to
+ comply to.
+
+ This version of the plugin allows full control over ANTLR and allows configuration of all
+ options that are useful for a build system. The code required to calculate dependencies,
+ check the build order, and otherwise work with your grammar files is built into the ANTLR
+ tool as of version 4.0 of ANTLR and this plugin.
+
+* Plugin Versioning
+
+ The plugin version tracks the version of the ANTLR tool that it controls. Hence if you
+ use version 4.0 of the plugin, you will build your grammars using version 4.0 of the
+ ANTLR tool, version 4.2 of the plugin will use version 4.2 of the ANTLR tool and so on.
+
+ You may also find that there are patch versions of the plugin such as 4.0-1 4.0-2 and
+ so on. Use the latest patch release of the plugin.
+
+ The current version of the plugin is shown at the top of this page after the <<Last Deployed>> date.
+ 
+
+* Default directories
+
+ As with all Maven plugins, this plugin will automatically default to standard locations
+ for your grammar and import files. Organizing your source code to reflect this standard
+ layout will greatly reduce the configuration effort required. The standard layout lookd
+ like this:
+
++--
+ src/main/
+      |
+      +--- antlr4/... .g4 files organized in the required package structure
+             |
+             +--- imports/  .g4 files that are imported by other grammars.
++--
+
+ If your grammar is intended to be part of a package called <<<org.foo.bar>>> then you would
+ place it in the directory <<<src/main/antlr4/org/foo/bar>>>. The plugin will then produce
+ <<<.java>>> and <<<.tokens>>> files in the output directory <<<target/generated-sources/antlr4/org/foo/bar>>>
+ When the Java files are compiled they will be in the correct location for the Javac
+ compiler without any special configuration. The generated java files are automatically
+ submitted for compilation by the plugin.
+
+ The <<<src/main/antlr4/imports>>> directory is treated in a special way. It should contain
+ any grammar files that are imported by other grammar files (do not make subdirectories here.)
+ Such files are never built on their own, but the plugin will automatically tell the ANTLR
+ tool to look in this directory for library files.
