@@ -25,3 +25,9 @@ tool/target/
 /build/nuget/
 
 runtime/CSharp/Antlr4.Runtime/Atn/ATNSerializer.cs
+
+*.userprefs
+
+runtime/CSharp/Antlr4.mono.userprefs
+
+runtime/CSharp/Antlr4.mono.userprefs
