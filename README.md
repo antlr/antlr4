@@ -2,7 +2,7 @@
 
 ### Note to existing users
 
-Versions of ANTLR 4.4.x and before managed the C# target as a [separate tool provided by Sam Harwell](https://github.com/tunnelvisionlabs/antlr4cs/releases/tag/v4.3.0). As of 4.5, we our releasing a (mono-compatible) C# target derived from Sam's with the main tool. ANTLR 4.5 is now able to generate C#, Java, Python 2, Python 3 and JavaScript.
+Versions of ANTLR 4.4.x and before managed the C# target as a [separate tool provided by Sam Harwell](https://github.com/tunnelvisionlabs/antlr4cs/releases/tag/v4.3.0). As of 4.5, we our releasing a (mono-compatible) C# target derived from Sam's with the main tool. ANTLR 4.5 is now able to generate C#, Java, Python 2, Python 3 and JavaScript. Sam continues to work on his version of the ANTLR tool and so a C# target is also available through that.
 
 This makes it possible to use ANTLR 4 in any C# development environment, including of course Microsoft Visual Studio, but also Xamarin Studio, which runs on MacOS X.
 Given Microsoft's recent commitment to *cross-platform developer experiences*, we believe this is a great opportunity for C# developers.
