@@ -28,10 +28,10 @@ by the grammar. For example, java, cpp, csharp, c, etc...
 
 ## Authors and major contributors
 
-[Terence Parr](http://www.cs.usfca.edu/~parrt/), parrt@cs.usfca.edu
+* [Terence Parr](http://www.cs.usfca.edu/~parrt/), parrt@cs.usfca.edu
 ANTLR project lead and supreme dictator for life
 [University of San Francisco](http://www.usfca.edu/)
 
-[Sam Harwell](http://tunnelvisionlabs.com/)
+* [Sam Harwell](http://tunnelvisionlabs.com/) (Tool co-author, Java and C# target)
 
-Eric Vergnaud (Python2, Python3 targets)
+* Eric Vergnaud (Javascript, Python2, Python3 targets and significant work on C# target)
