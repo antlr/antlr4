@@ -93,7 +93,7 @@ import java.util.Map;
  * ...
  * rewriter.insertAfter(t, "text to put after t");}
  * rewriter.insertAfter(u, "text after u");}
- * System.out.println(tokens.toString());
+ * System.out.println(rewriter.toString());
  * </pre>
  *
  * <p>
@@ -103,10 +103,10 @@ import java.util.Map;
  * a C file and also its header file--all from the same buffer:</p>
  *
  * <pre>
- * tokens.insertAfter("pass1", t, "text to put after t");}
- * tokens.insertAfter("pass2", u, "text after u");}
- * System.out.println(tokens.toString("pass1"));
- * System.out.println(tokens.toString("pass2"));
+ * rewriter.insertAfter("pass1", t, "text to put after t");}
+ * rewriter.insertAfter("pass2", u, "text after u");}
+ * System.out.println(rewriter.toString("pass1"));
+ * System.out.println(rewriter.toString("pass2"));
  * </pre>
  *
  * <p>
