@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import os
 import string
+from collections import OrderedDict
 
 """
 This script uses my experimental build tool http://www.bildtool.org
@@ -53,13 +54,13 @@ test_properties = {
 "antlr-csharp-runtime-project": uniformpath(CSHARP_TARGET) + "/runtime/CSharp/Antlr4.Runtime/Antlr4.Runtime.mono.csproj"
 }
 
-TARGETS = {
-            "Java": uniformpath(JAVA_TARGET),
-            "CSharp":uniformpath(CSHARP_TARGET),
-            "Python2": uniformpath(PYTHON2_TARGET),
-            "Python3": uniformpath(PYTHON3_TARGET),
-            "JavaScript":uniformpath(JAVASCRIPT_TARGET)
-}
+TARGETS = OrderedDict([
+    ("Java", uniformpath(JAVA_TARGET)),
+    ("CSharp",uniformpath(CSHARP_TARGET)),
+    ("Python2", uniformpath(PYTHON2_TARGET)),
+    ("Python3", uniformpath(PYTHON3_TARGET)),
+    ("JavaScript",uniformpath(JAVASCRIPT_TARGET))
+])
 
 
 def parsers():
