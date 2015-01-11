@@ -11,7 +11,7 @@ is not yet supported. Please use the mvn build or ant build.
 
 You will also need python 2.7, python 3.4, node.js and mono (on Mac/Linux)
 
-!!!You must set path values in test_properties dictionary below to ensure non Java targets tests run.!!!
+!!!You might need to set path values in test_properties dictionary below to ensure non Java targets tests run.!!!
 
 mkdir -p /usr/local/antlr # somewhere appropriate where you want to install stuff
 cd /usr/local/antlr
