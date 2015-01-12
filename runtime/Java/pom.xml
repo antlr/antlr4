@@ -14,9 +14,23 @@
     <name>ANTLR 4 Runtime</name>
     <description>The ANTLR 4 Runtime</description>
 
+    <packaging>bundle</packaging>
+
     <properties>
         <!-- Assumes dot is in the system path, or specified for the build. -->
         <dot.path>dot</dot.path>
+
+        <!-- OSGi metadata -->
+        <osgi.symbolicName>${antlr4-runtime.symbolicName}</osgi.symbolicName>
+
+        <!--
+           org.antlr.v4.runtime.misc is a non-overlapping split package.
+           Since we are treating antlr4-annotations as a fragment,
+           do not try to merge packages into one bundle.
+         -->
+        <osgi.export>
+            org.antlr.v4*;version=${project.version};-split-package:=first
+        </osgi.export>
     </properties>
 
     <dependencies>
@@ -115,6 +129,10 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
             </plugin>
         </plugins>
     </build>

@@ -75,6 +75,24 @@
         <bootclasspath.compile>${bootclasspath.java6}</bootclasspath.compile>
         <bootclasspath.testCompile>${bootclasspath.java6}</bootclasspath.testCompile>
         <antlr.testinprocess>true</antlr.testinprocess>
+        <maven-bundle-plugin.version>2.3.7</maven-bundle-plugin.version>
+
+        <!-- Default OSGi metadata - see maven-bundle-plugin configuration -->
+        <osgi.symbolicName>${project.groupId}.${project.artifactId}</osgi.symbolicName>
+        <osgi.failok>false</osgi.failok>
+        <osgi.nouses>false</osgi.nouses>
+        <osgi.versionPolicy>${range;[===,=+);${@}}</osgi.versionPolicy>
+        <osgi.private/>
+        <osgi.import>
+            *
+        </osgi.import>
+        <osgi.export/>
+        <!--
+            antlr4-runtime is main bundle and host to annotations fragment bundle
+            so define symbolic name here to ensure consistent reference in annotation
+            OSGi metadata.
+        -->
+        <antlr4-runtime.symbolicName>${project.groupId}.antlr4-runtime</antlr4-runtime.symbolicName>
     </properties>
 
     <mailingLists>
@@ -135,6 +153,29 @@
     </profiles>
 
     <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.felix</groupId>
+                    <artifactId>maven-bundle-plugin</artifactId>
+                    <version>${maven-bundle-plugin.version}</version>
+                    <extensions>true</extensions>
+                    <configuration>
+                        <obrRepository>NONE</obrRepository>
+                        <manifestLocation>${project.build.directory}/META-INF</manifestLocation>
+                        <instructions>
+                            <Bundle-SymbolicName>${osgi.symbolicName}</Bundle-SymbolicName>
+                            <Import-Package>${osgi.import}</Import-Package>
+                            <Export-Package>${osgi.export}</Export-Package>
+                            <Private-Package>${osgi.private}</Private-Package>
+                            <_nouses>${osgi.nouses}</_nouses>
+                            <_versionpolicy>${osgi.versionPolicy}</_versionpolicy>
+                            <_failok>${osgi.failok}</_failok>
+                        </instructions>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
