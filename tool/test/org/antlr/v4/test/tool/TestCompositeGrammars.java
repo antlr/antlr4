@@ -385,7 +385,8 @@ public class TestCompositeGrammars extends BaseTest {
 
 	/**
 	 * This is a regression test for antlr/antlr4#670 "exception when importing
-	 * grammar".
+	 * grammar".  I think this one always worked but I found that a different
+	 * Java grammar caused an error and so I made the testImportLeftRecursiveGrammar() test below.
 	 * https://github.com/antlr/antlr4/issues/670
 	 */
 	// TODO: migrate to test framework
@@ -400,6 +401,34 @@ public class TestCompositeGrammars extends BaseTest {
 		mkdir(tmpdir);
 		writeFile(tmpdir, "Java.g4", slave);
 		String found = execParser("NewJava.g4", master, "NewJavaParser", "NewJavaLexer", "compilationUnit", "package Foo;", debug);
+		assertEquals("", found);
+		assertNull(stderrDuringParse);
+	}
+
+	/**
+	 * This is a regression test for antlr/antlr4#670 "exception when importing
+	 * grammar".
+	 * https://github.com/antlr/antlr4/issues/670
+	 */
+	// TODO: migrate to test framework
+	@Test
+	public void testImportLeftRecursiveGrammar() throws Exception {
+		String slave =
+			"grammar Java;\n" +
+			"e : '(' e ')'\n" +
+			"  | e '=' e\n" +
+			"  | ID\n" +
+			"  ;\n" +
+			"ID : [a-z]+ ;\n";
+		String master =
+			"grammar T;\n" +
+			"import Java;\n" +
+			"s : e ;\n";
+
+		System.out.println("dir "+tmpdir);
+		mkdir(tmpdir);
+		writeFile(tmpdir, "Java.g4", slave);
+		String found = execParser("T.g4", master, "TParser", "TLexer", "s", "a=b", debug);
 		assertEquals("", found);
 		assertNull(stderrDuringParse);
 	}
