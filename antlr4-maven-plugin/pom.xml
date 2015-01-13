@@ -35,7 +35,7 @@
 	<groupId>org.antlr</groupId>
 
 	<artifactId>antlr4-maven-plugin</artifactId>
-	<version>4.5</version>
+	<version>4.5-SNAPSHOT</version>
 	<packaging>maven-plugin</packaging>
 
 	<name>ANTLR 4 Maven plugin</name>
@@ -60,7 +60,7 @@
 		  <name>Terence Parr</name>
 		  <url>http://parrt.cs.usfca.edu</url>
 		  <roles>
-			  <role>Project lead - ANTLR</role>
+			  <role>Project lead</role>
 		  </roles>
 	  </developer>
 
