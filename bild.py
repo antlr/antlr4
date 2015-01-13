@@ -39,7 +39,7 @@ if not os.path.exists("bilder.py"):
 from bilder import *
 
 BOOTSTRAP_VERSION = "4.4"
-VERSION = "4.5"
+VERSION = "4.5-SNAPSHOT"
 JAVA_TARGET = "."
 PYTHON2_TARGET = "../antlr4-python2"
 PYTHON3_TARGET = "../antlr4-python3"
