@@ -192,16 +192,9 @@ public class GrammarTransformPipeline {
 		// Compute list of rules in root grammar and ensure we have a RULES node
 		GrammarAST RULES = (GrammarAST)root.getFirstChildWithType(ANTLRParser.RULES);
 		Set<String> rootRuleNames = new HashSet<String>();
-		if ( RULES==null ) { // no rules in root, make RULES node, hook in
-			RULES = (GrammarAST)adaptor.create(ANTLRParser.RULES, "RULES");
-			RULES.g = rootGrammar;
-			root.addChild(RULES);
-		}
-		else {
-			// make list of rules we have in root grammar
-			List<GrammarAST> rootRules = RULES.getNodesWithType(ANTLRParser.RULE);
-			for (GrammarAST r : rootRules) rootRuleNames.add(r.getChild(0).getText());
-		}
+		// make list of rules we have in root grammar
+		List<GrammarAST> rootRules = RULES.getNodesWithType(ANTLRParser.RULE);
+		for (GrammarAST r : rootRules) rootRuleNames.add(r.getChild(0).getText());
 
 		for (Grammar imp : imports) {
 			// COPY TOKENS
