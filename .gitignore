@@ -16,8 +16,6 @@ nbactions*.xml
 */nbproject/private/
 
 # IntelliJ projects
-*.iml
-*.ipr
 *.iws
 .idea/
 
