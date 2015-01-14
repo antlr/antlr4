@@ -246,22 +246,32 @@ def clean(dist=False):
 
 def mksrc():
     srcpath = "runtime/Java/src/org"
+    srcfiles = allfiles(srcpath, "*.java");
     jarfile = "dist/antlr4-" + VERSION + "-sources.jar"
+    if not isstale(src=newest(srcfiles), trg=jarfile):
+        return
     zip(jarfile, srcpath)
     print "Generated " + jarfile
-    jarfile = "dist/antlr4-" + VERSION + "-complete-sources.jar"
+
     srcpaths = [ srcpath, "gen3/org", "gen4/org", "runtime/JavaAnnotations/src/org", "tool/src/org"]
+    srcfiles = allfiles(srcpaths, "*.java");
+    jarfile = "dist/antlr4-" + VERSION + "-complete-sources.jar"
+    if not isstale(src=newest(srcfiles), trg=jarfile):
+        return
     zip(jarfile, srcpaths)
     print "Generated " + jarfile
 
 
 def mkdoc():
+    require(mksrc)
     # add a few source dirs to reduce the number of javadoc errors
     # JavaDoc needs antlr annotations source code
     runtimedoc = "dist/antlr4-" + VERSION + "-javadoc.jar"
     tooldoc = "dist/antlr4-" + VERSION + "-complete-javadoc.jar"
-    if not isstale("dist/antlr4"+VERSION+".jar", runtimedoc) and \
-       not isstale("dist/antlr4"+VERSION+"complete.jar", tooldoc):
+    runtime_source_jarfile = "dist/antlr4-" + VERSION + "-sources.jar"
+    tool_source_jarfile = "dist/antlr4-" + VERSION + "-complete-sources.jar"
+    if not isstale(src=runtime_source_jarfile, trg=runtimedoc) and \
+       not isstale(src=tool_source_jarfile, trg=tooldoc):
         return
     mkdir("out/Annotations")
     download("http://search.maven.org/remotecontent?filepath=org/antlr/antlr4-annotations/4.3/antlr4-annotations-4.3-sources.jar", "out/Annotations")
