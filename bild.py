@@ -201,16 +201,10 @@ def test(t, cp, juprops, args):
                 shutil.copyfile(src, dst)
     junit("out/test/" + t, cp=thiscp, verbose=False, args=juprops)
 
-def all():
-    clean(True)
-    mkjar()
-    tests()
-    mkdoc()
-    mksrc()
-    install()
-    clean()
-
 def install():
+    require(mkjar)
+    require(mksrc)
+    require(mkdoc)
     mvn_install("dist/antlr4-" + VERSION + "-complete.jar",
         "dist/antlr4-" + VERSION + "-complete-sources.jar",
         "dist/antlr4-" + VERSION + "-complete-javadoc.jar",
@@ -223,6 +217,23 @@ def install():
         "org.antlr",
         "antlr4-runtime",
         VERSION)
+
+
+def deploy():
+    require(mkjar)
+    require(mksrc)
+    require(mkdoc)
+    binjar = uniformpath("dist/antlr4-%s-complete.jar" % VERSION)
+    docjar = uniformpath("dist/antlr4-%s-complete-javadoc.jar" % VERSION)
+    srcjar = uniformpath("dist/antlr4-%s-complete-sources.jar" % VERSION)
+    mvn_deploy(binjar, docjar, srcjar, repositoryid="ossrh", groupid="org.antlr",
+               artifactid="antlr4", pomfile="tool/pom.xml", version=VERSION)
+
+    binjar = uniformpath("dist/antlr4-%s.jar" % VERSION)
+    docjar = uniformpath("dist/antlr4-%s-javadoc.jar" % VERSION)
+    srcjar = uniformpath("dist/antlr4-%s-sources.jar" % VERSION)
+    mvn_deploy(binjar, docjar, srcjar, repositoryid="ossrh", groupid="org.antlr",
+               artifactid="antlr4-runtime", pomfile="runtime/Java/pom.xml", version=VERSION)
 
 def clean(dist=False):
     if dist:
@@ -247,6 +258,11 @@ def mksrc():
 def mkdoc():
     # add a few source dirs to reduce the number of javadoc errors
     # JavaDoc needs antlr annotations source code
+    runtimedoc = "dist/antlr4-" + VERSION + "-javadoc.jar"
+    tooldoc = "dist/antlr4-" + VERSION + "-complete-javadoc.jar"
+    if not isstale("dist/antlr4"+VERSION+".jar", runtimedoc) and \
+       not isstale("dist/antlr4"+VERSION+"complete.jar", tooldoc):
+        return
     mkdir("out/Annotations")
     download("http://search.maven.org/remotecontent?filepath=org/antlr/antlr4-annotations/4.3/antlr4-annotations-4.3-sources.jar", "out/Annotations")
     unjar("out/Annotations/antlr4-annotations-4.3-sources.jar", trgdir="out/Annotations")
@@ -284,9 +300,18 @@ def mkdoc():
     mkdir("doc/Java/org/antlr/v4/runtime/atn/images")
     for f in glob.glob("runtime/Java/src/main/dot/org/antlr/v4/runtime/atn/images/*.dot"):
         dot(f, "doc/Java/org/antlr/v4/runtime/atn/images", format="svg")
-    zip("dist/antlr4-" + VERSION + "-javadoc.jar", "doc/Java")
-    zip("dist/antlr4-" + VERSION + "-complete-javadoc.jar", "doc/JavaTool")
+    zip(runtimedoc, "doc/Java")
+    zip(tooldoc, "doc/JavaTool")
 
+
+def all():
+    clean(True)
+    mkjar()
+    tests()
+    mkdoc()
+    mksrc()
+    install()
+    clean()
 
 
 processargs(globals())  # E.g., "python bild.py all"
