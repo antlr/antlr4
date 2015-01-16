@@ -139,7 +139,7 @@ def mkjar_runtime():
         "Bundle-DocURL: http://www.antlr.org\n" +\
         "Bundle-License: http://www.antlr.org/license.html\n" +\
         "Bundle-Name: ANTLR 4 Runtime\n" +\
-        "Bundle-SymbolicName: org.antlr.antlr4-runtime\n" +\
+        "Bundle-SymbolicName: org.antlr.antlr4-runtime-osgi\n" +\
         "Bundle-Vendor: ANTLR\n" +\
         "Bundle-Version: %s\n" +\
         "\n"
