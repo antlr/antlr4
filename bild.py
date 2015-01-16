@@ -125,19 +125,33 @@ def mkjar_runtime():
     args = ["-nowarn", "-Xlint", "-Xlint:-serial", "-g", "-sourcepath", string.join(srcpath, os.pathsep)]
     for sp in srcpath:
         javac(sp, "out/runtime", version="1.6", cp=cp, args=args)
+    # Prefix of Bundle- is OSGi cruft; it's not everything so we wrap with make_osgi_ready()
+    # Declan Cox describes osgi ready jar https://github.com/antlr/antlr4/pull/689.
     manifest = \
         "Implementation-Vendor: ANTLR\n" +\
         "Implementation-Vendor-Id: org.antlr\n" +\
         "Implementation-Title: ANTLR 4 Runtime\n" +\
         "Implementation-Version: %s\n" +\
         "Built-By: %s\n" +\
-        "Build-Jdk: 1.6\n" +\
+        "Build-Jdk: %s\n" +\
         "Created-By: http://www.bildtool.org\n" +\
+        "Bundle-Description: The ANTLR 4 Runtime\n" +\
+        "Bundle-DocURL: http://www.antlr.org\n" +\
+        "Bundle-License: http://www.antlr.org/license.html\n" +\
+        "Bundle-Name: ANTLR 4 Runtime\n" +\
+        "Bundle-SymbolicName: org.antlr.antlr4-runtime\n" +\
+        "Bundle-Vendor: ANTLR\n" +\
+        "Bundle-Version: %s\n" +\
         "\n"
-    manifest = manifest % (VERSION, os.getlogin())
+    manifest = manifest % (VERSION, os.getlogin(), get_java_version(), VERSION)
     jarfile = "dist/antlr4-" + VERSION + ".jar"
     jar(jarfile, srcdir="out/runtime", manifest=manifest)
     print "Generated " + jarfile
+    osgijarfile = "dist/antlr4-" + VERSION + "-osgi.jar"
+    make_osgi_ready(jarfile, osgijarfile)
+    os.rename(osgijarfile, jarfile) # copy back onto old jar
+    print "Made jar OSGi-ready " + jarfile
+
 
 def mkjar():
     mkjar_complete()
