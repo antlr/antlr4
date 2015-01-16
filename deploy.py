@@ -40,12 +40,13 @@ if not os.path.exists("bilder.py"):
 from bilder import *
 
 VERSION = "4.5"
+PYTHON2_TARGET = "../antlr4-python2"
+PYTHON3_TARGET = "../antlr4-python3"
+CSHARP_TARGET = "../antlr4-csharp"
+JAVASCRIPT_TARGET = "../antlr4-javascript"
 
 
-def maven_snapshot():
-    require(mkjar)
-    require(mksrc)
-    require(mkdoc)
+def maven_snapshot():  # assumes that you have ~/.m2/settings.xml set up
     binjar = uniformpath("dist/antlr4-%s-complete.jar" % VERSION)
     docjar = uniformpath("dist/antlr4-%s-complete-javadoc.jar" % VERSION)
     srcjar = uniformpath("dist/antlr4-%s-complete-sources.jar" % VERSION)
@@ -63,9 +64,27 @@ def maven(): # TODO
     pass
 
 
-def pypi(): # TODO
-    pass
+# TODO
+def pypi(): # assumes that you have ~/.pypirc set up
+    cmd = ["python", "setup.py", "register", "-r", "pypi"]
+    savedir= os.getcwd()
+    try:
+        os.chdir(uniformpath(PYTHON2_TARGET))
+        exec_and_log(cmd)
+        os.chdir(uniformpath(PYTHON3_TARGET))
+        #exec_and_log(cmd)
+    finally:
+        os.chdir(savedir)
 
+    cmd = ["python", "setup.py", "sdist", "upload", "-r", "pypi"]
+    savedir= os.getcwd()
+    try:
+        os.chdir(uniformpath(PYTHON2_TARGET))
+        exec_and_log(cmd)
+        os.chdir(uniformpath(PYTHON3_TARGET))
+        #exec_and_log(cmd)
+    finally:
+        os.chdir(savedir)
 
 def nuget(): # TODO
     pass
