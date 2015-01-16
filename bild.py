@@ -8,7 +8,7 @@ This script uses my experimental build tool http://www.bildtool.org
 
 In order to build the complete ANTLR4 product with Java, CSharp, Python 2/3, and JavaScript
 targets, do the following from a UNIX command line.  Windows build using this script
-is not yet supported. Please use the mvn build or ant build.
+is not yet supported.
 
 You will also need python 2.7, python 3.4, node.js and mono (on Mac/Linux)
 
@@ -23,6 +23,8 @@ git clone git@github.com:antlr/antlr4-csharp.git
 git clone git@github.com:antlr/antlr4-javascript.git
 cd antlr4
 ./bild.py tests
+
+This script must be run from the main antlr4 directory.
 """
 
 # bootstrap by downloading bilder.py if not found
@@ -165,6 +167,30 @@ def mkjar():
     mkjar_runtime()   # now build the runtime jar
 
 
+def javascript(): # TODO @eric
+    # No build to do. Just zip up the sources
+    pass
+
+
+def csharp(): # TODO @eric
+    # For C#, there are 2 equivalent projects: a VisualStudio one and a Xamarin one.
+    # You can build on windows using msbuild and on mono using xbuild and pointing to the corresponding runtime project.
+    pass
+
+
+def python_sdist(): # TODO @eric
+    # No build it to do. Just zip up the sources
+    cmd = ["python", "setup.py", "sdist"]
+    savedir= os.getcwd()
+    try:
+        os.chdir(uniformpath(PYTHON2_TARGET))
+        exec_and_log(cmd)
+        os.chdir(uniformpath(PYTHON3_TARGET))
+        exec_and_log(cmd)
+    finally:
+        os.chdir(savedir)
+
+
 def tests():
     require(mkjar)
     junit_jar, hamcrest_jar = load_junitjars()
@@ -231,31 +257,6 @@ def install():
         "org.antlr",
         "antlr4-runtime",
         VERSION)
-
-
-def deploy():
-    require(mkjar)
-    require(mksrc)
-    require(mkdoc)
-    binjar = uniformpath("dist/antlr4-%s-complete.jar" % VERSION)
-    docjar = uniformpath("dist/antlr4-%s-complete-javadoc.jar" % VERSION)
-    srcjar = uniformpath("dist/antlr4-%s-complete-sources.jar" % VERSION)
-    mvn_deploy(binjar, docjar, srcjar, repositoryid="ossrh", groupid="org.antlr",
-               artifactid="antlr4", pomfile="tool/pom.xml", version=VERSION)
-
-    binjar = uniformpath("dist/antlr4-%s.jar" % VERSION)
-    docjar = uniformpath("dist/antlr4-%s-javadoc.jar" % VERSION)
-    srcjar = uniformpath("dist/antlr4-%s-sources.jar" % VERSION)
-    mvn_deploy(binjar, docjar, srcjar, repositoryid="ossrh", groupid="org.antlr",
-               artifactid="antlr4-runtime", pomfile="runtime/Java/pom.xml", version=VERSION)
-
-def clean(dist=False):
-    if dist:
-        rmdir("dist")
-    rmdir("out")
-    rmdir("gen3")
-    rmdir("gen4")
-    rmdir("doc")
 
 
 def mksrc():
@@ -328,9 +329,20 @@ def mkdoc():
     zip(tooldoc, "doc/JavaTool")
 
 
-def all():
+def clean(dist=False):
+    if dist:
+        rmdir("dist")
+    rmdir("out")
+    rmdir("gen3")
+    rmdir("gen4")
+    rmdir("doc")
+
+
+def all():  # Note: deployment is in a separate file deploy.py
     clean(True)
     mkjar()
+    javascript()
+    python_sdist()
     tests()
     mkdoc()
     mksrc()

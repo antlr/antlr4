@@ -12,7 +12,7 @@
 
 [Release notes](https://github.com/antlr/antlr4/releases)
 
-*For installation and other getting started information, see [Getting started with v4](https://theantlrguy.atlassian.net/wiki/display/ANTLR4/Getting+Started+with+ANTLR+v4).*
+*For installation and other getting started information, see [Getting started with v4](https://theantlrguy.atlassian.net/wiki/display/ANTLR4/Getting+Started+with+ANTLR+v4). You can also read about [building ANTLR itself](https://github.com/antlr/antlr4/wiki/How-to-build-ANTLR-itself).*
 
 ## The Definitive ANTLR 4 Reference
 You can buy a book [The Definitive ANTLR 4 Reference](http://pragprog.com/book/tpantlr2/the-definitive-antlr-4-reference)
