@@ -17,8 +17,7 @@ nbactions*.xml
 
 # IntelliJ projects
 *.iws
-.idea/workspace.xml
-.idea/tasks.xml
+.idea/*
 
 # Eclipse projects
 .classpath
