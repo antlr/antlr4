@@ -67,7 +67,7 @@ public abstract class BasePython3Test extends BasePythonTest {
 	@Override
 	protected void writeParserTestFile(String parserName, String lexerName,
 			String listenerName, String visitorName,
-			String parserStartRuleName, boolean debug) {
+			String parserStartRuleName, boolean debug, boolean trace) {
 		ST outputFileST = new ST(
 				"import sys\n"
 						+ "from antlr4 import *\n"
@@ -103,12 +103,12 @@ public abstract class BasePython3Test extends BasePythonTest {
 						+ "    ParseTreeWalker.DEFAULT.walk(TreeShapeListener(), tree)\n"
 						+ "\n" + "if __name__ == '__main__':\n"
 						+ "    main(sys.argv)\n" + "\n");
-		ST createParserST = new ST("    parser = <parserName>(stream)\n");
-		if (debug) {
-			createParserST = new ST(
-					"    parser = <parserName>(stream)\n"
-							+ "    parser.addErrorListener(DiagnosticErrorListener())\n");
-		}
+		String stSource = "    parser = <parserName>(stream)\n";
+		if (debug)
+			stSource += "    parser.addErrorListener(DiagnosticErrorListener())\n";
+		if (trace)
+			stSource += "    parser.setTrace(True)\n";
+		ST createParserST = new ST(stSource);
 		outputFileST.add("createParser", createParserST);
 		outputFileST.add("parserName", parserName);
 		outputFileST.add("lexerName", lexerName);

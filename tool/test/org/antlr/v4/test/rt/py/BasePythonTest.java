@@ -416,13 +416,28 @@ public abstract class BasePythonTest {
 	}
 
 	protected String execParser(String grammarFileName,
+			String grammarStr,
+			String parserName,
+			String lexerName,
+			String listenerName,
+			String visitorName,
+			String startRuleName,
+			String input, 
+			boolean debug) {
+		return execParser(grammarFileName, grammarStr, parserName, lexerName,
+				listenerName, visitorName, startRuleName, input, debug, false);
+	}
+	
+	protected String execParser(String grammarFileName,
 								String grammarStr,
 								String parserName,
 								String lexerName,
 								String listenerName,
 								String visitorName,
 								String startRuleName,
-								String input, boolean debug)
+								String input, 
+								boolean debug,
+								boolean trace)
 	{
 		boolean success = rawGenerateAndBuildRecognizer(grammarFileName,
 														grammarStr,
@@ -436,7 +451,8 @@ public abstract class BasePythonTest {
 								 listenerName,
 								 visitorName,
 								 startRuleName,
-								 debug);
+								 debug,
+								 trace);
 		return execRecognizer();
 	}
 
@@ -486,7 +502,8 @@ public abstract class BasePythonTest {
 									   String listenerName,
 									   String visitorName,
 									   String parserStartRuleName,
-									   boolean debug)
+									   boolean debug,
+									   boolean trace)
 	{
         this.stderrDuringParse = null;
 		if ( parserName==null ) {
@@ -498,7 +515,7 @@ public abstract class BasePythonTest {
 						  listenerName,
 						  visitorName,
 						  parserStartRuleName,
-						  debug);
+						  debug, trace);
 		}
 	}
 
@@ -838,7 +855,8 @@ public abstract class BasePythonTest {
 			 String listenerName,
 			 String visitorName,
 			 String parserStartRuleName,
-			 boolean debug);
+			 boolean debug,
+			 boolean setTrace);
 	
 
 
@@ -846,7 +864,7 @@ public abstract class BasePythonTest {
 
 	public void writeRecognizer(String parserName, String lexerName,
 								String listenerName, String visitorName,
-								String parserStartRuleName, boolean debug) {
+								String parserStartRuleName, boolean debug, boolean trace) {
 		if ( parserName==null ) {
 			writeLexerTestFile(lexerName, debug);
 		}
@@ -856,7 +874,8 @@ public abstract class BasePythonTest {
 						  listenerName,
 						  visitorName,
 						  parserStartRuleName,
-						  debug);
+						  debug,
+						  trace);
 		}
 	}
 
