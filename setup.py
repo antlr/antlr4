@@ -8,6 +8,6 @@ setup(
     url='http://www.antlr.org',
     license='BSD',
     author='Eric Vergnaud, Terence Parr, Sam Harwell',
-    author_email='eric@test',
+    author_email='eric.vergnaud@wanadoo.fr',
     description='ANTLR 4.5 runtime for Python 3.4.0'
 )

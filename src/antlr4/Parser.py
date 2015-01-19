@@ -45,18 +45,23 @@ from antlr4.tree.Tree import ParseTreeListener, TerminalNode, ErrorNode
 Parser = None
 
 class TraceListener(ParseTreeListener):
-    
-    def enterEveryRule(self, parser:Parser, ctx:ParserRuleContext):
-        print("enter   " + parser.ruleNames[ctx.ruleIndex] + ", LT(1)=" + parser._input.LT(1).text)
 
-    def visitTerminal(self, parser:Parser, node:TerminalNode):
-        print("consume " + node.symbol + " rule " + parser.ruleNames[parser._ctx.ruleIndex])
+    def __init__(self, parser):
+        self._parser = parser
 
-    def visitErrorNode(self, parser:Parser, node:ErrorNode):
+    def enterEveryRule(self, ctx):
+        print("enter   " + self._parser.ruleNames[ctx.getRuleIndex()] + ", LT(1)=" + self._parser._input.LT(1).text)
+
+    def visitTerminal(self, node):
+
+        print("consume " + str(node.symbol) + " rule " + self._parser.ruleNames[self._parser._ctx.getRuleIndex()])
+
+    def visitErrorNode(self, node):
         pass
 
-    def exitEveryRule(self, parser:Parser, ctx:ParserRuleContext):
-        print("exit    " + parser.ruleNames[ctx.ruleIndex] + ", LT(1)=" + parser._input.LT(1).text)
+
+    def exitEveryRule(self, ctx):
+        print("exit    " + self._parser.ruleNames[ctx.getRuleIndex()] + ", LT(1)=" + self._parser._input.LT(1).text)
 
 
 # self is all the parsing support code essentially; most of it is error recovery stuff.#
@@ -578,5 +583,5 @@ class Parser (Recognizer):
         else:
             if self._tracer is not None:
                 self.removeParseListener(self._tracer)
-            self._tracer = TraceListener()
+            self._tracer = TraceListener(self)
             self.addParseListener(self._tracer)
