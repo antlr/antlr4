@@ -1,0 +1,13 @@
+What's in this release?
+
+ - fixed minor bugs due to mix of ascii/unicode encoding
+ - fixed bug where non-ascii input streams would fail
+ - added support for visitor pattern
+ - added support for wildcards in grammar
+
+ Breaking change:
+
+ In version 4.4, the parser/lexer had a tokenNames member.
+ This has been removed in favor of the following members:
+  - lexicalNames, containing the parsed text
+  - symbolicNames, corresponding to tokenNames
