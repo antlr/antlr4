@@ -1,164 +1,93 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.antlr</groupId>
-    <artifactId>antlr4-runtime</artifactId>
-    <version>4.5-SNAPSHOT</version>
+	<groupId>org.antlr</groupId>
+	<artifactId>antlr4-runtime</artifactId>
+	<version>4.5-SNAPSHOT</version>
 
-    <name>ANTLR 4 Runtime</name>
-    <description>The ANTLR 4 Runtime</description>
+	<name>ANTLR 4 Runtime</name>
+	<description>The ANTLR 4 Runtime</description>
 
-    <developers>
-        <developer>
-            <name>Terence Parr</name>
-            <url>http://parrt.cs.usfca.edu</url>
-            <roles>
-                <role>Project lead</role>
-            </roles>
-        </developer>
+	<!--
+	    IMPORTANT NOTE 
+	    Building ANTLR is now performed via the bild.py script. 
+		However, we still need a pom to: - manage dependencies during development 
+		- publish metadata to maven central The above are the only reason for keeping 
+		this file. No support will be provided.
+	 -->
+	<developers>
+		<developer>
+			<name>Terence Parr</name>
+			<url>http://parrt.cs.usfca.edu</url>
+			<roles>
+				<role>Project lead</role>
+			</roles>
+		</developer>
 
-        <developer>
-            <name>Sam Harwell</name>
-            <url>http://tunnelvisionlabs.com</url>
-            <roles>
-                <role>Developer - Coauthor of tool, C# target</role>
-            </roles>
-        </developer>
+		<developer>
+			<name>Sam Harwell</name>
+			<url>http://tunnelvisionlabs.com</url>
+			<roles>
+				<role>Developer - Coauthor of tool, C# target</role>
+			</roles>
+		</developer>
 
-        <developer>
-            <name>Eric Vergnaud</name>
-            <roles>
-                <role>Developer - JavaScript, C#, Python 2, Python 3</role>
-            </roles>
-        </developer>
+		<developer>
+			<name>Eric Vergnaud</name>
+			<roles>
+				<role>Developer - JavaScript, C#, Python 2, Python 3</role>
+			</roles>
+		</developer>
 
-        <developer>
-            <name>Jim Idle</name>
-            <email>jimi@idle.ws</email>
-            <url>http://www.linkedin.com/in/jimidle</url>
-            <roles>
-                <role>Developer - Maven Plugin</role>
-            </roles>
-        </developer>
-    </developers>
+		<developer>
+			<name>Jim Idle</name>
+			<email>jimi@idle.ws</email>
+			<url>http://www.linkedin.com/in/jimidle</url>
+			<roles>
+				<role>Developer - Maven Plugin</role>
+			</roles>
+		</developer>
+	</developers>
 
-    <mailingLists>
-        <mailingList>
-            <name>antlr-discussion</name>
-            <archive>https://groups.google.com/forum/?fromgroups#!forum/antlr-discussion</archive>
-        </mailingList>
-    </mailingLists>
+	<mailingLists>
+		<mailingList>
+			<name>antlr-discussion</name>
+			<archive>https://groups.google.com/forum/?fromgroups#!forum/antlr-discussion</archive>
+		</mailingList>
+	</mailingLists>
 
-    <issueManagement>
-        <system>GitHub Issues</system>
-        <url>https://github.com/antlr/antlr4/issues</url>
-    </issueManagement>
+	<issueManagement>
+		<system>GitHub Issues</system>
+		<url>https://github.com/antlr/antlr4/issues</url>
+	</issueManagement>
 
-    <scm>
-        <url>https://github.com/antlr/antlr4/tree/master</url>
-        <connection>scm:git:git://github.com/antlr/antlr4.git</connection>
-        <developerConnection>scm:git:git@github.com:antlr/antlr4.git</developerConnection>
-        <tag>HEAD</tag>
-    </scm>
+	<scm>
+		<url>https://github.com/antlr/antlr4/tree/master</url>
+		<connection>scm:git:git://github.com/antlr/antlr4.git</connection>
+		<developerConnection>scm:git:git@github.com:antlr/antlr4.git</developerConnection>
+		<tag>HEAD</tag>
+	</scm>
 
-    <distributionManagement>
-        <snapshotRepository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
-        <repository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-        </repository>
-    </distributionManagement>
+	<distributionManagement>
+		<snapshotRepository>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+		</snapshotRepository>
+		<repository>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+		</repository>
+	</distributionManagement>
 
-    <properties>
-        <!-- Assumes dot is in the system path, or specified for the build. -->
-        <dot.path>dot</dot.path>
-    </properties>
+	<dependencies>
+		<dependency>
+			<groupId>org.abego.treelayout</groupId>
+			<artifactId>org.abego.treelayout.core</artifactId>
+			<version>1.0.1</version>
+		</dependency>
 
-    <profiles>
-        <profile>
-            <id>sonatype-oss-release</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>us.bryon</groupId>
-                        <artifactId>graphviz-maven-plugin</artifactId>
-                        <version>1.0</version>
-                        <executions>
-                            <execution>
-                                <goals>
-                                    <goal>dot</goal>
-                                </goals>
-                                <configuration>
-                                    <dot>${dot.path}</dot>
-                                    <destdir>${project.build.directory}/apidocs</destdir>
-                                    <output>svg</output>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
+	</dependencies>
 
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-javadoc-plugin</artifactId>
-                        <configuration>
-                            <includeDependencySources>true</includeDependencySources>
-                            <dependencySourceIncludes>
-                                <dependencySourceInclude>org.antlr:*</dependencySourceInclude>
-                            </dependencySourceIncludes>
-                        </configuration>
-                    </plugin>
-
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-shade-plugin</artifactId>
-                        <version>2.2</version>
-                        <inherited>false</inherited>
-                        <executions>
-                            <execution>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>shade</goal>
-                                </goals>
-                                <configuration>
-                                    <minimizeJar>false</minimizeJar>
-                                    <createDependencyReducedPom>false</createDependencyReducedPom>
-                                    <shadedArtifactAttached>true</shadedArtifactAttached>
-                                    <createSourcesJar>true</createSourcesJar>
-                                    <shadedClassifierName>complete</shadedClassifierName>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
-
-    <build>
-
-        <sourceDirectory>src</sourceDirectory>
-        <resources />
-
-        <plugins>
-            <plugin>
-                <groupId>org.antlr</groupId>
-                <artifactId>antlr4-maven-plugin</artifactId>
-                <version>4.5-SNAPSHOT</version>
-                <configuration>
-                    <sourceDirectory>src</sourceDirectory>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>antlr4</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
 
 </project>
