@@ -585,6 +585,10 @@ public class Generator {
 				"aab",
 				"",
 				"line 1:1 extraneous input 'a' expecting {'b', 'c'}\n");
+		file.addParserTest(input, "SingleTokenDeletionConsumption", "T", "a",
+				"aabd",
+				"[@2,2:2='b',<1>,1:2]\n",
+				"line 1:1 extraneous input 'a' expecting {'b', 'c'}\n");
 		file.addParserTest(input, "SingleTokenInsertion", "T", "a",
 				"ac",
 				"",
@@ -596,6 +600,10 @@ public class Generator {
 		file.addParserTest(input, "SingleSetInsertion", "T", "a",
 				"ad",
 				"",
+				"line 1:1 missing {'b', 'c'} at 'd'\n");
+		file.addParserTest(input, "SingleSetInsertionConsumption", "T", "a",
+				"ad",
+				"[@0,0:0='a',<3>,1:0]\n",
 				"line 1:1 missing {'b', 'c'} at 'd'\n");
 		file.addParserTest(input, "ConjuringUpTokenFromSet", "T", "a",
 				"ad",
