@@ -154,13 +154,22 @@ def mkjar_runtime():
 
 
 def mkjar():
+    rmdir("out")
     mkjar_complete()
     # put it in JARCARCHE too so bild can find it during antlr4()
     copyfile(src="dist/antlr4-" + VERSION + "-complete.jar", trg=JARCACHE+"/antlr-"+VERSION+"-complete.jar") # note mvn wants antlr4-ver-... but I want antlr-ver-...
+
     # rebuild/bootstrap XPath with this version so it can use current runtime (gen'd with previous ANTLR at this point)
-    rmdir("gen4/org/antlr/v4/runtime/tree/xpath")  # kill previous-version-generated code
+    log("rebuilding XPath with "+VERSION)
+    print("rebuilding XPath with "+VERSION)
+    # kill previous-version-generated code
+    os.remove("out/org/antlr/v4/runtime/tree/xpath/XPathLexer.class")
+    os.remove("gen4/org/antlr/v4/runtime/tree/xpath/XPathLexer.java")
     antlr4("runtime/Java/src/org/antlr/v4/runtime/tree/xpath", "gen4", version=VERSION,
            package="org.antlr.v4.runtime.tree.xpath")
+    args = ["-Xlint", "-Xlint:-serial", "-g", "-sourcepath", "gen4"]
+    javac("gen4", "out", version="1.6", cp=uniformpath("out"), args=args) # force recompile of XPath stuff
+
     mkjar_complete()  # make it again with up to date XPath lexer
     mkjar_runtime()   # now build the runtime jar
 
