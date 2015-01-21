@@ -693,7 +693,9 @@ State = <m.stateNumber>;
 if ( <if(invert)><m.varName> \<= 0 || <else>!<endif>(<expr>) ) {
 	<if(m.labels)><m.labels:{l | <labelref(l)> = }><endif>ErrorHandler.RecoverInline(this);
 }
-Consume();
+else {
+    Consume();
+}
 >>
 
 Wildcard(w) ::= <<
@@ -916,7 +918,7 @@ _prevctx = _localctx;
 >>
 
 recRuleSetPrevCtx() ::= <<
-if ( ParseListeners!=null ) 
+if ( ParseListeners!=null )
 	TriggerExitRuleEvent();
 _prevctx = _localctx;
 >>
