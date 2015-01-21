@@ -1,17 +1,85 @@
-
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>org.antlr</groupId>
-        <artifactId>antlr4-master</artifactId>
-        <version>4.5-SNAPSHOT</version>
-    </parent>
-
+ 	<groupId>org.antlr</groupId>
     <artifactId>antlr4</artifactId>
+	<version>4.5-SNAPSHOT</version>
 
     <name>ANTLR 4 Tool</name>
     <description>The ANTLR 4 grammar compiler.</description>
+
+ 	<!--
+	    IMPORTANT NOTE 
+	    Building ANTLR is now performed via the bild.py script. 
+		However, we still need a pom to: - manage dependencies during development 
+		- publish metadata to maven central The above are the only reason for keeping 
+		this file. No support will be provided.
+	 -->
+ 
+    <developers>
+        <developer>
+            <name>Terence Parr</name>
+            <url>http://parrt.cs.usfca.edu</url>
+            <roles>
+                <role>Project lead</role>
+            </roles>
+        </developer>
+
+        <developer>
+            <name>Sam Harwell</name>
+            <url>http://tunnelvisionlabs.com</url>
+            <roles>
+                <role>Developer - Coauthor of tool, C# target</role>
+            </roles>
+        </developer>
+
+        <developer>
+            <name>Eric Vergnaud</name>
+            <roles>
+                <role>Developer - JavaScript, C#, Python 2, Python 3</role>
+            </roles>
+        </developer>
+
+        <developer>
+            <name>Jim Idle</name>
+            <email>jimi@idle.ws</email>
+            <url>http://www.linkedin.com/in/jimidle</url>
+            <roles>
+                <role>Developer - Maven Plugin</role>
+            </roles>
+        </developer>
+    </developers>
+
+    <mailingLists>
+        <mailingList>
+            <name>antlr-discussion</name>
+            <archive>https://groups.google.com/forum/?fromgroups#!forum/antlr-discussion</archive>
+        </mailingList>
+    </mailingLists>
+
+    <issueManagement>
+        <system>GitHub Issues</system>
+        <url>https://github.com/antlr/antlr4/issues</url>
+    </issueManagement>
+
+    <scm>
+        <url>https://github.com/antlr/antlr4/tree/master</url>
+        <connection>scm:git:git://github.com/antlr/antlr4.git</connection>
+        <developerConnection>scm:git:git@github.com:antlr/antlr4.git</developerConnection>
+        <tag>HEAD</tag>
+    </scm>
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+    </distributionManagement>
+
 
     <dependencies>
         <dependency>
@@ -20,29 +88,22 @@
             <version>4.11</version>
             <scope>test</scope>
         </dependency>
-    	<dependency>
-        	<groupId>org.seleniumhq.selenium</groupId>
-        	<artifactId>selenium-java</artifactId>
-        	<version>2.44.0</version>
-            <scope>test</scope>
-   		</dependency>  
         <dependency>
-           <groupId>org.eclipse.jetty</groupId>
-           <artifactId>jetty-server</artifactId>
-           <version>8.1.16.v20140903</version>
-           <scope>test</scope>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-java</artifactId>
+            <version>2.44.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-server</artifactId>
+            <version>8.1.16.v20140903</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.antlr</groupId>
             <artifactId>antlr4-runtime</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.antlr</groupId>
-            <artifactId>antlr4-annotations</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
+            <version>4.5-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.antlr</groupId>
@@ -58,114 +119,5 @@
         </dependency>
     </dependencies>
 
-    <profiles>
-        <profile>
-            <id>sonatype-oss-release</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-javadoc-plugin</artifactId>
-                        <configuration>
-                            <includeDependencySources>true</includeDependencySources>
-                            <dependencySourceIncludes>
-                                <dependencySourceInclude>org.antlr:antlr4-*</dependencySourceInclude>
-                            </dependencySourceIncludes>
-                        </configuration>
-                    </plugin>
-
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-shade-plugin</artifactId>
-                        <version>2.2</version>
-                        <inherited>false</inherited>
-                        <executions>
-                            <execution>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>shade</goal>
-                                </goals>
-                                <configuration>
-                                    <minimizeJar>true</minimizeJar>
-                                    <createDependencyReducedPom>false</createDependencyReducedPom>
-                                    <shadedArtifactAttached>true</shadedArtifactAttached>
-                                    <createSourcesJar>true</createSourcesJar>
-                                    <shadedClassifierName>complete</shadedClassifierName>
-                                    <filters>
-                                        <filter>
-                                            <artifact>org.antlr:antlr4-runtime</artifact>
-                                            <includes>
-                                                <include>org/antlr/v4/runtime/**</include>
-                                            </includes>
-                                        </filter>
-                                        <filter>
-                                            <artifact>org.antlr:antlr4-annotations</artifact>
-                                            <includes>
-                                                <include>org/antlr/v4/runtime/**</include>
-                                            </includes>
-                                        </filter>
-                                    </filters>
-                                    <transformers>
-                                        <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                            <mainClass>org.antlr.v4.Tool</mainClass>
-                                        </transformer>
-                                    </transformers>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
-
-    <build>
-
-        <sourceDirectory>src</sourceDirectory>
-        <resources>
-            <resource>
-                <directory>resources</directory>
-            </resource>
-        </resources>
-
-        <testSourceDirectory>test</testSourceDirectory>
-        <testResources>
-            <testResource>
-                <directory>test</directory>
-            </testResource>
-        </testResources>
-
-        <plugins>
-
-           <plugin>
-                <groupId>org.antlr</groupId>
-                <artifactId>antlr3-maven-plugin</artifactId>
-                <version>3.5.2</version>
-                <configuration>
-                    <sourceDirectory>src</sourceDirectory>
-                    <verbose>true</verbose>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>antlr</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>test-jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
 
 </project>

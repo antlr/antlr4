@@ -39,7 +39,7 @@ if not os.path.exists("bilder.py"):
 from bilder import *
 
 BOOTSTRAP_VERSION = "4.4"
-VERSION = "4.5-SNAPSHOT"
+VERSION = "4.5"
 JAVA_TARGET = "."
 PYTHON2_TARGET = "../antlr4-python2"
 PYTHON3_TARGET = "../antlr4-python3"
@@ -125,28 +125,51 @@ def mkjar_runtime():
     args = ["-nowarn", "-Xlint", "-Xlint:-serial", "-g", "-sourcepath", string.join(srcpath, os.pathsep)]
     for sp in srcpath:
         javac(sp, "out/runtime", version="1.6", cp=cp, args=args)
+    # Prefix of Bundle- is OSGi cruft; it's not everything so we wrap with make_osgi_ready()
+    # Declan Cox describes osgi ready jar https://github.com/antlr/antlr4/pull/689.
     manifest = \
         "Implementation-Vendor: ANTLR\n" +\
         "Implementation-Vendor-Id: org.antlr\n" +\
         "Implementation-Title: ANTLR 4 Runtime\n" +\
         "Implementation-Version: %s\n" +\
         "Built-By: %s\n" +\
-        "Build-Jdk: 1.6\n" +\
+        "Build-Jdk: %s\n" +\
         "Created-By: http://www.bildtool.org\n" +\
+        "Bundle-Description: The ANTLR 4 Runtime\n" +\
+        "Bundle-DocURL: http://www.antlr.org\n" +\
+        "Bundle-License: http://www.antlr.org/license.html\n" +\
+        "Bundle-Name: ANTLR 4 Runtime\n" +\
+        "Bundle-SymbolicName: org.antlr.antlr4-runtime-osgi\n" +\
+        "Bundle-Vendor: ANTLR\n" +\
+        "Bundle-Version: %s\n" +\
         "\n"
-    manifest = manifest % (VERSION, os.getlogin())
+    manifest = manifest % (VERSION, os.getlogin(), get_java_version(), VERSION)
     jarfile = "dist/antlr4-" + VERSION + ".jar"
     jar(jarfile, srcdir="out/runtime", manifest=manifest)
     print "Generated " + jarfile
+    osgijarfile = "dist/antlr4-" + VERSION + "-osgi.jar"
+    make_osgi_ready(jarfile, osgijarfile)
+    os.rename(osgijarfile, jarfile) # copy back onto old jar
+    print "Made jar OSGi-ready " + jarfile
+
 
 def mkjar():
+    rmdir("out")
     mkjar_complete()
     # put it in JARCARCHE too so bild can find it during antlr4()
     copyfile(src="dist/antlr4-" + VERSION + "-complete.jar", trg=JARCACHE+"/antlr-"+VERSION+"-complete.jar") # note mvn wants antlr4-ver-... but I want antlr-ver-...
+
     # rebuild/bootstrap XPath with this version so it can use current runtime (gen'd with previous ANTLR at this point)
-    rmdir("gen4/org/antlr/v4/runtime/tree/xpath")  # kill previous-version-generated code
+    log("rebuilding XPath with "+VERSION)
+    print("rebuilding XPath with "+VERSION)
+    # kill previous-version-generated code
+    os.remove("out/org/antlr/v4/runtime/tree/xpath/XPathLexer.class")
+    os.remove("gen4/org/antlr/v4/runtime/tree/xpath/XPathLexer.java")
     antlr4("runtime/Java/src/org/antlr/v4/runtime/tree/xpath", "gen4", version=VERSION,
            package="org.antlr.v4.runtime.tree.xpath")
+    args = ["-Xlint", "-Xlint:-serial", "-g", "-sourcepath", "gen4"]
+    javac("gen4", "out", version="1.6", cp=uniformpath("out"), args=args) # force recompile of XPath stuff
+
     mkjar_complete()  # make it again with up to date XPath lexer
     mkjar_runtime()   # now build the runtime jar
 
@@ -201,16 +224,10 @@ def test(t, cp, juprops, args):
                 shutil.copyfile(src, dst)
     junit("out/test/" + t, cp=thiscp, verbose=False, args=juprops)
 
-def all():
-    clean(True)
-    mkjar()
-    tests()
-    mkdoc()
-    mksrc()
-    install()
-    clean()
-
 def install():
+    require(mkjar)
+    require(mksrc)
+    require(mkdoc)
     mvn_install("dist/antlr4-" + VERSION + "-complete.jar",
         "dist/antlr4-" + VERSION + "-complete-sources.jar",
         "dist/antlr4-" + VERSION + "-complete-javadoc.jar",
@@ -224,6 +241,23 @@ def install():
         "antlr4-runtime",
         VERSION)
 
+
+def deploy():
+    require(mkjar)
+    require(mksrc)
+    require(mkdoc)
+    binjar = uniformpath("dist/antlr4-%s-complete.jar" % VERSION)
+    docjar = uniformpath("dist/antlr4-%s-complete-javadoc.jar" % VERSION)
+    srcjar = uniformpath("dist/antlr4-%s-complete-sources.jar" % VERSION)
+    mvn_deploy(binjar, docjar, srcjar, repositoryid="ossrh", groupid="org.antlr",
+               artifactid="antlr4", pomfile="tool/pom.xml", version=VERSION)
+
+    binjar = uniformpath("dist/antlr4-%s.jar" % VERSION)
+    docjar = uniformpath("dist/antlr4-%s-javadoc.jar" % VERSION)
+    srcjar = uniformpath("dist/antlr4-%s-sources.jar" % VERSION)
+    mvn_deploy(binjar, docjar, srcjar, repositoryid="ossrh", groupid="org.antlr",
+               artifactid="antlr4-runtime", pomfile="runtime/Java/pom.xml", version=VERSION)
+
 def clean(dist=False):
     if dist:
         rmdir("dist")
@@ -235,18 +269,33 @@ def clean(dist=False):
 
 def mksrc():
     srcpath = "runtime/Java/src/org"
+    srcfiles = allfiles(srcpath, "*.java");
     jarfile = "dist/antlr4-" + VERSION + "-sources.jar"
+    if not isstale(src=newest(srcfiles), trg=jarfile):
+        return
     zip(jarfile, srcpath)
     print "Generated " + jarfile
-    jarfile = "dist/antlr4-" + VERSION + "-complete-sources.jar"
+
     srcpaths = [ srcpath, "gen3/org", "gen4/org", "runtime/JavaAnnotations/src/org", "tool/src/org"]
+    srcfiles = allfiles(srcpaths, "*.java");
+    jarfile = "dist/antlr4-" + VERSION + "-complete-sources.jar"
+    if not isstale(src=newest(srcfiles), trg=jarfile):
+        return
     zip(jarfile, srcpaths)
     print "Generated " + jarfile
 
 
 def mkdoc():
+    require(mksrc)
     # add a few source dirs to reduce the number of javadoc errors
     # JavaDoc needs antlr annotations source code
+    runtimedoc = "dist/antlr4-" + VERSION + "-javadoc.jar"
+    tooldoc = "dist/antlr4-" + VERSION + "-complete-javadoc.jar"
+    runtime_source_jarfile = "dist/antlr4-" + VERSION + "-sources.jar"
+    tool_source_jarfile = "dist/antlr4-" + VERSION + "-complete-sources.jar"
+    if not isstale(src=runtime_source_jarfile, trg=runtimedoc) and \
+       not isstale(src=tool_source_jarfile, trg=tooldoc):
+        return
     mkdir("out/Annotations")
     download("http://search.maven.org/remotecontent?filepath=org/antlr/antlr4-annotations/4.3/antlr4-annotations-4.3-sources.jar", "out/Annotations")
     unjar("out/Annotations/antlr4-annotations-4.3-sources.jar", trgdir="out/Annotations")
@@ -284,9 +333,18 @@ def mkdoc():
     mkdir("doc/Java/org/antlr/v4/runtime/atn/images")
     for f in glob.glob("runtime/Java/src/main/dot/org/antlr/v4/runtime/atn/images/*.dot"):
         dot(f, "doc/Java/org/antlr/v4/runtime/atn/images", format="svg")
-    zip("dist/antlr4-" + VERSION + "-javadoc.jar", "doc/Java")
-    zip("dist/antlr4-" + VERSION + "-complete-javadoc.jar", "doc/JavaTool")
+    zip(runtimedoc, "doc/Java")
+    zip(tooldoc, "doc/JavaTool")
 
+
+def all():
+    clean(True)
+    mkjar()
+    tests()
+    mkdoc()
+    mksrc()
+    install()
+    clean()
 
 
 processargs(globals())  # E.g., "python bild.py all"

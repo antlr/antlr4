@@ -1,0 +1,13 @@
+<component name="ArtifactManager">
+  <artifact type="jar" build-on-make="true" name="antlr4:jar">
+    <output-path>/usr/local/lib</output-path>
+    <root id="archive" name="antlr-4.4.1-complete.jar">
+      <element id="module-output" name="runtime" />
+      <element id="module-output" name="tool" />
+      <element id="library" level="application" name="junit" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/runtime/Java/lib/org.abego.treelayout.core.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="/usr/local/lib/antlr-3.5.2-complete-no-st3.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="/usr/local/lib/ST-4.0.7.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>

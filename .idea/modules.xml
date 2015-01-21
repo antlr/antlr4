@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/../antlr4-csharp/tool/csharp.iml" filepath="$PROJECT_DIR$/../antlr4-csharp/tool/csharp.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../antlr4-javascript/tool/javascript.iml" filepath="$PROJECT_DIR$/../antlr4-javascript/tool/javascript.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../antlr4-python2/tool/python2.iml" filepath="$PROJECT_DIR$/../antlr4-python2/tool/python2.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../antlr4-python3/tool/python3.iml" filepath="$PROJECT_DIR$/../antlr4-python3/tool/python3.iml" />
+      <module fileurl="file://$PROJECT_DIR$/runtime/Java/runtime.iml" filepath="$PROJECT_DIR$/runtime/Java/runtime.iml" />
+      <module fileurl="file://$PROJECT_DIR$/tool/tool.iml" filepath="$PROJECT_DIR$/tool/tool.iml" />
+    </modules>
+  </component>
+</project>
