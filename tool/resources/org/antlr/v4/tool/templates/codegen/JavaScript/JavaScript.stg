@@ -522,7 +522,9 @@ this.state = <m.stateNumber>;
 <if(invert)>if(<m.varName>\<=0 || <expr>)<else>if(!(<expr>))<endif> {
     <if(m.labels)><m.labels:{l | <labelref(l)> = }><endif>this._errHandler.recoverInline(this);
 }
-this.consume();
+else {
+    this.consume();
+}
 >>
 
 Wildcard(w) ::= <<
