@@ -1,5 +1,10 @@
 package org.antlr.v4.test.rt.gen;
 
+import org.antlr.v4.test.rt.java.BaseTest;
+import org.stringtemplate.v4.ST;
+import org.stringtemplate.v4.STGroup;
+import org.stringtemplate.v4.STGroupFile;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -11,11 +16,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.antlr.v4.test.rt.java.BaseTest;
-import org.stringtemplate.v4.ST;
-import org.stringtemplate.v4.STGroup;
-import org.stringtemplate.v4.STGroupFile;
 
 public class Generator {
 
@@ -54,35 +54,35 @@ public class Generator {
 	}
 
 	private static File readCSharpDir() {
-		return new File("../../antlr4-csharp/tool/test/org/antlr/v4/test/rt/csharp");
+		return new File("../antlr4-csharp/tool/test/org/antlr/v4/test/rt/csharp");
 	}
 
 	private static File readPython2Dir() {
-		return new File("../../antlr4-python2/tool/test/org/antlr/v4/test/rt/py2");
+		return new File("../antlr4-python2/tool/test/org/antlr/v4/test/rt/py2");
 	}
 
 	private static File readPython3Dir() {
-		return new File("../../antlr4-python3/tool/test/org/antlr/v4/test/rt/py3");
+		return new File("../antlr4-python3/tool/test/org/antlr/v4/test/rt/py3");
 	}
 
 	private static File readNodeJSDir() {
-		return new File("../../antlr4-javascript/tool/test/org/antlr/v4/test/rt/js/node");
+		return new File("../antlr4-javascript/tool/test/org/antlr/v4/test/rt/js/node");
 	}
 
 	private static File readSafariDir() {
-		return new File("../../antlr4-javascript/tool/test/org/antlr/v4/test/rt/js/safari");
+		return new File("../antlr4-javascript/tool/test/org/antlr/v4/test/rt/js/safari");
 	}
 
 	private static File readFirefoxDir() {
-		return new File("../../antlr4-javascript/tool/test/org/antlr/v4/test/rt/js/firefox");
+		return new File("../antlr4-javascript/tool/test/org/antlr/v4/test/rt/js/firefox");
 	}
-	
+
 	private static File readChromeDir() {
-		return new File("../../antlr4-javascript/tool/test/org/antlr/v4/test/rt/js/chrome");
+		return new File("../antlr4-javascript/tool/test/org/antlr/v4/test/rt/js/chrome");
 	}
 
 	private static File readExplorerDir() {
-		return new File("../../antlr4-javascript/tool/test/org/antlr/v4/test/rt/js/explorer");
+		return new File("../antlr4-javascript/tool/test/org/antlr/v4/test/rt/js/explorer");
 	}
 
 	private static File readGrammarDir() throws Exception {
