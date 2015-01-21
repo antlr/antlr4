@@ -92,7 +92,7 @@ def enter<lname; format="cap">(self, ctx):
 # Exit a parse tree produced by <file.parserName>#<lname>.
 def exit<lname; format="cap">(self, ctx):
     pass
-    
+
 }; separator="\n">
 
 >>
@@ -111,7 +111,7 @@ class <file.grammarName>Visitor(ParseTreeVisitor):
 # Visit a parse tree produced by <file.parserName>#<lname>.
 def visit<lname; format="cap">(self, ctx):
     return self.visitChildren(ctx)
-    
+
 }; separator="\n">
 
 >>
@@ -133,15 +133,15 @@ from .<superClass> import <superClass>
 <atn>
 
 class <parser.name> ( <if(superClass)><superClass><else>Parser<endif> ):
-	
+
     grammarFileName = "<parser.grammarFileName; format="java-escape">"
 
     atn = ATNDeserializer().deserialize(serializedATN())
-    
+
     decisionsToDFA = [ DFA(ds, i) for i, ds in enumerate(atn.decisionToState) ]
-	
+
     sharedContextCache = PredictionContextCache()
-	
+
     literalNames = [ <parser.literalNames:{t | u<t>}; null="u\"\<INVALID>\"", separator=", ", wrap, anchor> ]
 
     symbolicNames = [ <parser.symbolicNames:{t | u<t>}; null="u\"\<INVALID>\"", separator=", ", wrap, anchor> ]
@@ -149,7 +149,7 @@ class <parser.name> ( <if(superClass)><superClass><else>Parser<endif> ):
     <parser.rules:{r | RULE_<r.name> = <r.index>}; separator="\n", wrap, anchor>
 
     ruleNames =  [ <parser.ruleNames:{r | u"<r>"}; separator=", ", wrap, anchor> ]
-	
+
     EOF = <TokenLabelType()>.EOF
     <if(parser.tokens)>
     <parser.tokens:{k | <k>=<parser.tokens.(k)>}; separator="\n", wrap, anchor>
@@ -177,7 +177,7 @@ class <parser.name> ( <if(superClass)><superClass><else>Parser<endif> ):
     <sempredFuncs.values; separator="\n">
 <endif>
 
-	
+
 
 >>
 
@@ -194,9 +194,9 @@ def action(self, localctx, ruleIndex, actionIndex):
 		action(localctx, actionIndex)
 	else:
 		raise Exception("No registered action for:" + str(ruleIndex))
-			
+
 <actionFuncs.values; separator="\n">
-		
+
 <endif>
 <if(sempredFuncs)>
 def sempred(self, localctx, ruleIndex, predIndex):
@@ -263,7 +263,7 @@ RuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,namedActions,fina
 <altLabelCtxs:{l | <altLabelCtxs.(l)>}; separator="\n">
 
 def <currentRule.name>(self<currentRule.args:{a | , <a.name>}>):
-	
+
     localctx = <parser.name>.<currentRule.ctxType>(self, self._ctx, self.state<currentRule.args:{a | , <a.name>}>)
     self.enterRule(localctx, <currentRule.startState>, self.RULE_<currentRule.name>)
     <namedActions.init>
@@ -491,7 +491,7 @@ if token in [<ttypes:{t | <parser.name>.<t>}; separator=", ">]:
 >>
 
 InvokeRule(r, argExprsChunks) ::= <<
-self.state = <r.stateNumber> 
+self.state = <r.stateNumber>
 <if(r.labels)><r.labels:{l | <labelref(l)> = }><endif>self.<r.name>(<if(r.ast.options.p)><r.ast.options.p><if(argExprsChunks)>,<endif><endif><argExprsChunks>)
 >>
 
@@ -510,7 +510,8 @@ self.state = <m.stateNumber>
 <capture>
 <if(invert)>if <m.varName> \<= 0 or <expr><else>if not(<expr>)<endif>:
 <if(m.labels)><m.labels:{l |     <labelref(l)> = }><else>    <endif>self._errHandler.recoverInline(self)
-self.consume()
+else:
+    self.consume()
 >>
 
 Wildcard(w) ::= <<
@@ -664,7 +665,7 @@ class <struct.name>(<superClass>):
 
     def getRuleIndex(self):
         return <parser.name>.RULE_<struct.derivedFromName>
-	
+
 <if(struct.provideCopyFrom)> <! don't need copy unless we have subclasses !>
     def copyFrom(self, ctx):
         super(<parser.name>.<struct.name>, self).copyFrom(ctx)
@@ -683,7 +684,7 @@ class <struct.name>(<currentRule.name; format="cap">Context):
         super(<parser.name>.<struct.name>, self).__init__(parser)
         <attrs:{a | <a>}; separator="\n">
         self.copyFrom(ctx)
-    
+
     <getters:{g | <g>}; separator="\n">
 
     <dispatchMethods; separator="\n">
@@ -770,34 +771,34 @@ Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass) ::= <<
 class <lexer.name>(<if(superClass)><superClass><else>Lexer<endif>):
 
     atn = ATNDeserializer().deserialize(serializedATN())
-    
+
     decisionsToDFA = [ DFA(ds, i) for i, ds in enumerate(atn.decisionToState) ]
-    
+
     <rest(lexer.modes):{m| <m> = <i>}; separator="\n">
-    
+
     <lexer.tokens:{k | <k> = <lexer.tokens.(k)>}; separator="\n", wrap, anchor>
-    
+
     modeNames = [ <lexer.modes:{m| u"<m>"}; separator=", ", wrap, anchor> ]
-    
+
     literalNames = [ u"\<INVALID>",
             <lexer.literalNames:{t | u<t>}; separator=", ", wrap, anchor> ]
-    
+
     symbolicNames = [ u"\<INVALID>",
             <lexer.symbolicNames:{t | u<t>}; separator=", ", wrap, anchor> ]
 
     ruleNames = [ <lexer.ruleNames:{r | u"<r>"}; separator=", ", wrap, anchor> ]
-    
+
     grammarFileName = u"<lexer.grammarFileName>"
-    
+
     def __init__(self, input=None):
         super(<lexer.name>, self).__init__(input)
         self.checkVersion("<lexerFile.ANTLRVersion>")
         self._interp = LexerATNSimulator(self, self.atn, self.decisionsToDFA, PredictionContextCache())
         self._actions = None
         self._predicates = None
-        
+
     <namedActions.members>
-        
+
     <dumpActions(lexer, "", actionFuncs, sempredFuncs)>
 
 >>
@@ -809,7 +810,7 @@ def serializedATN():
     with StringIO() as buf:
         buf.write(u"<model.serialized; wrap={")<\n>        buf.write(u"}>")
         return buf.getvalue()
-		
+
 >>
 
 /** Using a type to init value map, try to init a type; if not in table
