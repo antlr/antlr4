@@ -253,6 +253,9 @@ RuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,namedActions,fina
 
 <altLabelCtxs:{l | <altLabelCtxs.(l)>}; separator="\n">
 
+<! Define fields of this parser to export the context classes !>
+<parser.name>.<currentRule.ctxType> = <currentRule.ctxType>;
+
 <parser.name>.prototype.<currentRule.name> = function(<currentRule.args:{a | <a.name>}; separator=", ">) {
 	
     var localctx = new <currentRule.ctxType>(this, this._ctx, this.state<currentRule.args:{a | , <a.name>}>);
@@ -713,6 +716,9 @@ function <struct.name>(parser, ctx) {
 
 <struct.name>.prototype = Object.create(<currentRule.name; format="cap">Context.prototype);
 <struct.name>.prototype.constructor = <struct.name>;
+
+<! Define fields of this parser to export this struct/context class !>
+<parser.name>.<struct.name> = <struct.name>;
 
 <getters:{g | <struct.name>.prototype.<g>}; separator="\n\n">
 <dispatchMethods; separator="\n">
