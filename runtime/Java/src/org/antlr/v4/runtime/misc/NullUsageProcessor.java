@@ -45,7 +45,6 @@ import javax.lang.model.type.PrimitiveType;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.tools.Diagnostic;
-
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;

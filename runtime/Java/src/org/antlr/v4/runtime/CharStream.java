@@ -51,6 +51,5 @@ public interface CharStream extends IntStream {
 	 * @throws UnsupportedOperationException if the stream does not support
 	 * getting the text of the specified interval
 	 */
-	@NotNull
-	public String getText(@NotNull Interval interval);
+	public String getText(Interval interval);
 }

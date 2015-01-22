@@ -356,7 +356,7 @@ public class Antlr4Mojo extends AbstractMojo {
      * @param sourceDirectory
      * @exception InclusionScanException
      */
-    @NotNull
+
     private List<List<String>> processGrammarFiles(List<String> args, File sourceDirectory) throws InclusionScanException {
         // Which files under the source set should we be looking for as grammar files
         SourceMapping mapping = new SuffixMapping("g4", Collections.<String>emptySet());

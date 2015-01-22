@@ -46,10 +46,9 @@ public class LL1Analyzer {
 	 */
 	public static final int HIT_PRED = Token.INVALID_TYPE;
 
-	@NotNull
 	public final ATN atn;
 
-	public LL1Analyzer(@NotNull ATN atn) { this.atn = atn; }
+	public LL1Analyzer(ATN atn) { this.atn = atn; }
 
 	/**
 	 * Calculates the SLL(1) expected lookahead set for each outgoing transition
@@ -61,8 +60,7 @@ public class LL1Analyzer {
 	 * @param s the ATN state
 	 * @return the expected symbols for each outgoing transition of {@code s}.
 	 */
-	@Nullable
-	public IntervalSet[] getDecisionLookahead(@Nullable ATNState s) {
+	public IntervalSet[] getDecisionLookahead(ATNState s) {
 //		System.out.println("LOOK("+s.stateNumber+")");
 		if ( s==null ) {
 			return null;
@@ -100,8 +98,7 @@ public class LL1Analyzer {
 	 * @return The set of tokens that can follow {@code s} in the ATN in the
 	 * specified {@code ctx}.
 	 */
-    @NotNull
-   	public IntervalSet LOOK(@NotNull ATNState s, @Nullable RuleContext ctx) {
+   	public IntervalSet LOOK(ATNState s, RuleContext ctx) {
 		return LOOK(s, null, ctx);
    	}
 
@@ -123,8 +120,8 @@ public class LL1Analyzer {
 	 * @return The set of tokens that can follow {@code s} in the ATN in the
 	 * specified {@code ctx}.
 	 */
-    @NotNull
-   	public IntervalSet LOOK(@NotNull ATNState s, @Nullable ATNState stopState, @Nullable RuleContext ctx) {
+
+   	public IntervalSet LOOK(ATNState s, ATNState stopState, RuleContext ctx) {
    		IntervalSet r = new IntervalSet();
 		boolean seeThruPreds = true; // ignore preds; get all lookahead
 		PredictionContext lookContext = ctx != null ? PredictionContext.fromRuleContext(s.atn, ctx) : null;
@@ -163,12 +160,12 @@ public class LL1Analyzer {
 	 * outermost context is reached. This parameter has no effect if {@code ctx}
 	 * is {@code null}.
 	 */
-    protected void _LOOK(@NotNull ATNState s,
-						 @Nullable ATNState stopState,
-						 @Nullable PredictionContext ctx,
-						 @NotNull IntervalSet look,
-                         @NotNull Set<ATNConfig> lookBusy,
-						 @NotNull BitSet calledRuleStack,
+    protected void _LOOK(ATNState s,
+						 ATNState stopState,
+						 PredictionContext ctx,
+						 IntervalSet look,
+                         Set<ATNConfig> lookBusy,
+						 BitSet calledRuleStack,
 						 boolean seeThruPreds, boolean addEOF)
 	{
 //		System.out.println("_LOOK("+s.stateNumber+", ctx="+ctx);

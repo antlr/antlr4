@@ -31,8 +31,6 @@ package org.antlr.v4.runtime;
 
 import org.antlr.v4.runtime.atn.ATNConfigSet;
 import org.antlr.v4.runtime.dfa.DFA;
-import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.misc.Nullable;
 
 import java.util.BitSet;
 import java.util.Collection;
@@ -56,12 +54,12 @@ public class ProxyErrorListener implements ANTLRErrorListener {
 	}
 
 	@Override
-	public void syntaxError(@NotNull Recognizer<?, ?> recognizer,
-							@Nullable Object offendingSymbol,
+	public void syntaxError(Recognizer<?, ?> recognizer,
+							Object offendingSymbol,
 							int line,
 							int charPositionInLine,
-							@NotNull String msg,
-							@Nullable RecognitionException e)
+							String msg,
+							RecognitionException e)
 	{
 		for (ANTLRErrorListener listener : delegates) {
 			listener.syntaxError(recognizer, offendingSymbol, line, charPositionInLine, msg, e);
@@ -69,13 +67,13 @@ public class ProxyErrorListener implements ANTLRErrorListener {
 	}
 
 	@Override
-	public void reportAmbiguity(@NotNull Parser recognizer,
-								@NotNull DFA dfa,
+	public void reportAmbiguity(Parser recognizer,
+								DFA dfa,
 								int startIndex,
 								int stopIndex,
 								boolean exact,
-								@Nullable BitSet ambigAlts,
-								@NotNull ATNConfigSet configs)
+								BitSet ambigAlts,
+								ATNConfigSet configs)
 	{
 		for (ANTLRErrorListener listener : delegates) {
 			listener.reportAmbiguity(recognizer, dfa, startIndex, stopIndex, exact, ambigAlts, configs);
@@ -83,12 +81,12 @@ public class ProxyErrorListener implements ANTLRErrorListener {
 	}
 
 	@Override
-	public void reportAttemptingFullContext(@NotNull Parser recognizer,
-											@NotNull DFA dfa,
+	public void reportAttemptingFullContext(Parser recognizer,
+											DFA dfa,
 											int startIndex,
 											int stopIndex,
-											@Nullable BitSet conflictingAlts,
-											@NotNull ATNConfigSet configs)
+											BitSet conflictingAlts,
+											ATNConfigSet configs)
 	{
 		for (ANTLRErrorListener listener : delegates) {
 			listener.reportAttemptingFullContext(recognizer, dfa, startIndex, stopIndex, conflictingAlts, configs);
@@ -96,12 +94,12 @@ public class ProxyErrorListener implements ANTLRErrorListener {
 	}
 
 	@Override
-	public void reportContextSensitivity(@NotNull Parser recognizer,
-										 @NotNull DFA dfa,
+	public void reportContextSensitivity(Parser recognizer,
+										 DFA dfa,
 										 int startIndex,
 										 int stopIndex,
 										 int prediction,
-										 @NotNull ATNConfigSet configs)
+										 ATNConfigSet configs)
 	{
 		for (ANTLRErrorListener listener : delegates) {
 			listener.reportContextSensitivity(recognizer, dfa, startIndex, stopIndex, prediction, configs);

@@ -1,24 +1,24 @@
 package org.antlr.v4.test.rt.gen;
 
+import org.stringtemplate.v4.ST;
+import org.stringtemplate.v4.STGroup;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.stringtemplate.v4.ST;
-import org.stringtemplate.v4.STGroup;
-
 public class JUnitTestFile {
-	
+
 	List<JUnitTestMethod> unitTests = new ArrayList<JUnitTestMethod>();
 	public String name;
 	public List<String> tests = new ArrayList<String>();
 	public boolean importErrorQueue = false;
 	public boolean importGrammar = false;
-	
+
 	public JUnitTestFile(String name) {
 		this.name = name;
 	}
-	
+
 	public String getName() {
 		return name;
 	}
@@ -30,15 +30,15 @@ public class JUnitTestFile {
 		unitTests.add(tm);
 		return tm;
 	}
-	
+
 	public AbstractParserTestMethod addParserTests(File grammarDir, String name, String grammarName, String methodName,
 			String ... inputsAndOuputs) throws Exception {
 		AbstractParserTestMethod tm = new AbstractParserTestMethod(name, grammarName, methodName);
 		tm.loadGrammars(grammarDir, this.name);
 		unitTests.add(tm);
 		for(int i=0; i<inputsAndOuputs.length; i+=2) {
-			ConcreteParserTestMethod cm = new ConcreteParserTestMethod(name, 
-					inputsAndOuputs[i], inputsAndOuputs[i+1], null, 
+			ConcreteParserTestMethod cm = new ConcreteParserTestMethod(name,
+					inputsAndOuputs[i], inputsAndOuputs[i+1], null,
 					1 + (i/2));
 			unitTests.add(cm);
 		}
@@ -51,7 +51,7 @@ public class JUnitTestFile {
 		tm.loadGrammars(grammarDir, this.name);
 		unitTests.add(tm);
 		for(int i=0; i<inputsOuputsAndErrors.length; i+=3) {
-			ConcreteParserTestMethod cm = new ConcreteParserTestMethod(name, 
+			ConcreteParserTestMethod cm = new ConcreteParserTestMethod(name,
 					inputsOuputsAndErrors[i], inputsOuputsAndErrors[i+1], inputsOuputsAndErrors[i+2],
 					1 + (i/3));
 			unitTests.add(cm);

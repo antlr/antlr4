@@ -89,7 +89,7 @@ public class IntervalSet implements IntSet {
 	}
 
 	/** Create a set with a single element, el. */
-    @NotNull
+
     public static IntervalSet of(int a) {
 		IntervalSet s = new IntervalSet();
         s.add(a);
@@ -249,8 +249,8 @@ public class IntervalSet implements IntSet {
 	 * operation is {@code left - right}. If either of the input sets is
 	 * {@code null}, it is treated as though it was an empty set.
 	 */
-	@NotNull
-	public static IntervalSet subtract(@Nullable IntervalSet left, @Nullable IntervalSet right) {
+
+	public static IntervalSet subtract(IntervalSet left, IntervalSet right) {
 		if (left == null || left.isNil()) {
 			return new IntervalSet();
 		}
@@ -554,7 +554,7 @@ public class IntervalSet implements IntSet {
 		return toString(VocabularyImpl.fromTokenNames(tokenNames));
 	}
 
-	public String toString(@NotNull Vocabulary vocabulary) {
+	public String toString(Vocabulary vocabulary) {
 		StringBuilder buf = new StringBuilder();
 		if ( this.intervals==null || this.intervals.isEmpty() ) {
 			return "{}";
@@ -594,8 +594,8 @@ public class IntervalSet implements IntSet {
 		return elementName(VocabularyImpl.fromTokenNames(tokenNames), a);
 	}
 
-	@NotNull
-	protected String elementName(@NotNull Vocabulary vocabulary, int a) {
+
+	protected String elementName(Vocabulary vocabulary, int a) {
 		if (a == Token.EOF) {
 			return "<EOF>";
 		}

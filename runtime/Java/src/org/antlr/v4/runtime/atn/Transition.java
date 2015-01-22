@@ -96,10 +96,10 @@ public abstract class Transition {
 		}});
 
 	/** The target of this transition. */
-	@NotNull
+
 	public ATNState target;
 
-	protected Transition(@NotNull ATNState target) {
+	protected Transition(ATNState target) {
 		if (target == null) {
 			throw new NullPointerException("target cannot be null.");
 		}
@@ -122,7 +122,7 @@ public abstract class Transition {
 		return false;
 	}
 
-	@Nullable
+
 	public IntervalSet label() { return null; }
 
 	public abstract boolean matches(int symbol, int minVocabSymbol, int maxVocabSymbol);

@@ -75,7 +75,7 @@ def compile():
     cp = uniformpath("out") + os.pathsep + \
          os.path.join(JARCACHE, "antlr-3.5.1-complete.jar") + os.pathsep + \
          "runtime/Java/lib/org.abego.treelayout.core.jar" + os.pathsep
-    srcpath = ["gen3", "gen4", "runtime/JavaAnnotations/src", "runtime/Java/src", "tool/src"]
+    srcpath = ["gen3", "gen4", "runtime/Java/src", "tool/src"]
     args = ["-Xlint", "-Xlint:-serial", "-g", "-sourcepath", string.join(srcpath, os.pathsep)]
     for sp in srcpath:
         javac(sp, "out", version="1.6", cp=cp, args=args)
@@ -121,7 +121,7 @@ def mkjar_runtime():
     unjar("runtime/Java/lib/org.abego.treelayout.core.jar", trgdir="out/runtime")
     cp = uniformpath("out/runtime") + os.pathsep + \
          "runtime/Java/lib/org.abego.treelayout.core.jar"
-    srcpath = ["gen4", "runtime/JavaAnnotations/src", "runtime/Java/src"]
+    srcpath = ["gen4", "runtime/Java/src"]
     args = ["-nowarn", "-Xlint", "-Xlint:-serial", "-g", "-sourcepath", string.join(srcpath, os.pathsep)]
     for sp in srcpath:
         javac(sp, "out/runtime", version="1.6", cp=cp, args=args)
@@ -313,7 +313,7 @@ def mksrc():
     zip(jarfile, srcpath)
     print "Generated " + jarfile
 
-    srcpaths = [ srcpath, "gen3/org", "gen4/org", "runtime/JavaAnnotations/src/org", "tool/src/org"]
+    srcpaths = [ srcpath, "gen3/org", "gen4/org", "tool/src/org"]
     srcfiles = allfiles(srcpaths, "*.java");
     jarfile = "dist/antlr4-" + VERSION + "-complete-sources.jar"
     if not isstale(src=newest(srcfiles), trg=jarfile):
@@ -333,9 +333,6 @@ def mkdoc():
     if not isstale(src=runtime_source_jarfile, trg=runtimedoc) and \
        not isstale(src=tool_source_jarfile, trg=tooldoc):
         return
-    mkdir("out/Annotations")
-    download("http://search.maven.org/remotecontent?filepath=org/antlr/antlr4-annotations/4.3/antlr4-annotations-4.3-sources.jar", "out/Annotations")
-    unjar("out/Annotations/antlr4-annotations-4.3-sources.jar", trgdir="out/Annotations")
     # JavaDoc needs abego treelayout source code
     mkdir("out/TreeLayout")
     download("http://search.maven.org/remotecontent?filepath=org/abego/treelayout/org.abego.treelayout.core/1.0.1/org.abego.treelayout.core-1.0.1-sources.jar", "out/TreeLayout")
@@ -352,7 +349,6 @@ def mkdoc():
     mkdir("doc/Java")
     mkdir("doc/JavaTool")
     dirs = ["runtime/Java/src"]
-    dirs += ["out/Annotations"]
     dirs += ["out/TreeLayout"]
     exclude = ["org/antlr/runtime",
             "org/abego",

@@ -1,14 +1,14 @@
 package org.antlr.v4.test.rt.gen;
 
+import org.stringtemplate.v4.ST;
+import org.stringtemplate.v4.STGroup;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 
-import org.stringtemplate.v4.ST;
-import org.stringtemplate.v4.STGroup;
-
 public class Grammar {
-	
+
 	public String fileName;
 	public String grammarName;
 	public String[] lines;

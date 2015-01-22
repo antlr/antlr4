@@ -29,8 +29,6 @@
  */
 package org.antlr.v4.runtime;
 
-import org.antlr.v4.runtime.misc.Nullable;
-
 /**
  * This class extends {@link ParserRuleContext} by allowing the value of
  * {@link #getRuleIndex} to be explicitly set for the context.
@@ -57,7 +55,7 @@ public class InterpreterRuleContext extends ParserRuleContext {
 	 * @param invokingStateNumber The invoking state number.
 	 * @param ruleIndex The rule index for the current context.
 	 */
-	public InterpreterRuleContext(@Nullable ParserRuleContext parent,
+	public InterpreterRuleContext(ParserRuleContext parent,
 								  int invokingStateNumber,
 								  int ruleIndex)
 	{

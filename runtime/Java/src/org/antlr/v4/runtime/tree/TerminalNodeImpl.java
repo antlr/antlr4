@@ -34,8 +34,6 @@ import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.Interval;
 
-import java.util.List;
-
 public class TerminalNodeImpl implements TerminalNode {
 	public Token symbol;
 	public ParseTree parent;

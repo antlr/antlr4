@@ -97,7 +97,7 @@ class TagChunk extends Chunk {
 	 *
 	 * @return The tag for the chunk.
 	 */
-	@NotNull
+
 	public final String getTag() {
 		return tag;
 	}
@@ -108,7 +108,7 @@ class TagChunk extends Chunk {
 	 * @return The label assigned to this chunk, or {@code null} if no label is
 	 * assigned to the chunk.
 	 */
-	@Nullable
+
 	public final String getLabel() {
 		return label;
 	}

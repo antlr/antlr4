@@ -203,8 +203,8 @@ public class ParseTreePatternMatcher {
 	 * node at which the match failed. Pass in a compiled pattern instead of a
 	 * string representation of a tree pattern.
 	 */
-	@NotNull
-	public ParseTreeMatch match(@NotNull ParseTree tree, @NotNull ParseTreePattern pattern) {
+
+	public ParseTreeMatch match(ParseTree tree, ParseTreePattern pattern) {
 		MultiMap<String, ParseTree> labels = new MultiMap<String, ParseTree>();
 		ParseTree mismatchedNode = matchImpl(tree, pattern.getPatternTree(), labels);
 		return new ParseTreeMatch(tree, pattern, labels, mismatchedNode);
@@ -253,7 +253,7 @@ public class ParseTreePatternMatcher {
 	 * Used to convert the tree pattern string into a series of tokens. The
 	 * input stream is reset.
 	 */
-	@NotNull
+
 	public Lexer getLexer() {
 		return lexer;
 	}
@@ -262,7 +262,7 @@ public class ParseTreePatternMatcher {
 	 * Used to collect to the grammar file name, token names, rule names for
 	 * used to parse the pattern into a parse tree.
 	 */
-	@NotNull
+
 	public Parser getParser() {
 		return parser;
 	}
@@ -278,10 +278,10 @@ public class ParseTreePatternMatcher {
 	 * was successful. The specific node returned depends on the matching
 	 * algorithm used by the implementation, and may be overridden.
 	 */
-	@Nullable
-	protected ParseTree matchImpl(@NotNull ParseTree tree,
-								  @NotNull ParseTree patternTree,
-								  @NotNull MultiMap<String, ParseTree> labels)
+
+	protected ParseTree matchImpl(ParseTree tree,
+								  ParseTree patternTree,
+								  MultiMap<String, ParseTree> labels)
 	{
 		if (tree == null) {
 			throw new IllegalArgumentException("tree cannot be null");

@@ -31,7 +31,6 @@
 package org.antlr.v4.runtime;
 
 import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.misc.Nullable;
 
 /**
  * This class provides access to the current version of the ANTLR 4 runtime
@@ -105,7 +104,7 @@ public class RuntimeMetaData {
 	 *
 	 * @return The currently executing version of the ANTLR 4 library
 	 */
-	@NotNull
+
 	public static String getRuntimeVersion() {
 		return VERSION;
 	}
@@ -168,7 +167,7 @@ public class RuntimeMetaData {
 	 * compiled against. This should always be passed using a direct reference
 	 * to {@link #VERSION}.
 	 */
-	public static void checkVersion(@Nullable String generatingToolVersion, @NotNull String compileTimeVersion) {
+	public static void checkVersion(String generatingToolVersion, String compileTimeVersion) {
 		String runtimeVersion = VERSION;
 		boolean runtimeConflictsWithGeneratingTool = false;
 		boolean runtimeConflictsWithCompileTimeTool = false;
@@ -202,8 +201,7 @@ public class RuntimeMetaData {
 	 * @return A string of the form <em>major</em>.<em>minor</em> containing
 	 * only the major and minor components of the version string.
 	 */
-	@NotNull
-	public static String getMajorMinorVersion(@NotNull String version) {
+	public static String getMajorMinorVersion(String version) {
 		int firstDot = version.indexOf('.');
 		int secondDot = firstDot >= 0 ? version.indexOf('.', firstDot + 1) : -1;
 		int firstDash = version.indexOf('-');

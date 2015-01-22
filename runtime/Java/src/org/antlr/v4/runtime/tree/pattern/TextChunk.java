@@ -40,7 +40,7 @@ class TextChunk extends Chunk {
 	/**
 	 * This is the backing field for {@link #getText}.
 	 */
-	@NotNull
+
 	private final String text;
 
 	/**
@@ -49,7 +49,7 @@ class TextChunk extends Chunk {
 	 * @param text The text of this chunk.
 	 * @exception IllegalArgumentException if {@code text} is {@code null}.
 	 */
-	public TextChunk(@NotNull String text) {
+	public TextChunk(String text) {
 		if (text == null) {
 			throw new IllegalArgumentException("text cannot be null");
 		}
@@ -62,7 +62,7 @@ class TextChunk extends Chunk {
 	 *
 	 * @return The text of the chunk.
 	 */
-	@NotNull
+
 	public final String getText() {
 		return text;
 	}

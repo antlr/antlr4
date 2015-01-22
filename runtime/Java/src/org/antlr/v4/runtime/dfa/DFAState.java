@@ -72,13 +72,13 @@ import java.util.Set;
 public class DFAState {
 	public int stateNumber = -1;
 
-	@NotNull
+
 	public ATNConfigSet configs = new ATNConfigSet();
 
 	/** {@code edges[symbol]} points to target of symbol. Shift up by 1 so (-1)
 	 *  {@link Token#EOF} maps to {@code edges[0]}.
 	 */
-	@Nullable
+
 	public DFAState[] edges;
 
 	public boolean isAcceptState = false;
@@ -111,12 +111,12 @@ public class DFAState {
 	 *
 	 *  <p>This list is computed by {@link ParserATNSimulator#predicateDFAState}.</p>
 	 */
-	@Nullable
+
 	public PredPrediction[] predicates;
 
 	/** Map a predicate to a predicted alternative. */
 	public static class PredPrediction {
-		@NotNull
+
 		public SemanticContext pred; // never null; at least SemanticContext.NONE
 		public int alt;
 		public PredPrediction(SemanticContext pred, int alt) {
@@ -133,7 +133,7 @@ public class DFAState {
 
 	public DFAState(int stateNumber) { this.stateNumber = stateNumber; }
 
-	public DFAState(@NotNull ATNConfigSet configs) { this.configs = configs; }
+	public DFAState(ATNConfigSet configs) { this.configs = configs; }
 
 	/** Get the set of all alts mentioned by all ATN configurations in this
 	 *  DFA state.

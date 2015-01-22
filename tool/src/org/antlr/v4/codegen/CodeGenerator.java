@@ -58,11 +58,11 @@ public class CodeGenerator {
 		"<tokens.keys:{t | <t>=<tokens.(t)>\n}>" +
 		"<literals.keys:{t | <t>=<literals.(t)>\n}>";
 
-	@NotNull
+
 	public final Grammar g;
-	@NotNull
+
 	public final Tool tool;
-	@NotNull
+
 	public final String language;
 
 	private Target target;
@@ -75,11 +75,11 @@ public class CodeGenerator {
 		this.language = language;
 	}
 
-	public CodeGenerator(@NotNull Grammar g) {
+	public CodeGenerator(Grammar g) {
 		this(g.tool, g, g.getOptionString("language"));
 	}
 
-	public CodeGenerator(@NotNull Tool tool, @NotNull Grammar g, String language) {
+	public CodeGenerator(Tool tool, Grammar g, String language) {
 		this.g = g;
 		this.tool = tool;
 		this.language = language != null ? language : DEFAULT_LANGUAGE;
@@ -99,7 +99,7 @@ public class CodeGenerator {
 		return false;
 	}
 
-	@Nullable
+
 	public Target getTarget() {
 		if ( target == null && targetExists(language) ) {
 			loadLanguageTarget(language);
@@ -107,7 +107,7 @@ public class CodeGenerator {
 		return target;
 	}
 
-	@Nullable
+
 	public STGroup getTemplates() {
 		Target t = getTarget();
 		return t==null ? null : t.getTemplates();

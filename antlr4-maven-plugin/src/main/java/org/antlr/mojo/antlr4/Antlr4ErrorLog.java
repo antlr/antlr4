@@ -55,7 +55,7 @@ public class Antlr4ErrorLog implements ANTLRToolListener {
      *
      * @param log The Maven log
      */
-    public Antlr4ErrorLog(@NotNull Tool tool, @NotNull BuildContext buildContext, @NotNull Log log) {
+    public Antlr4ErrorLog(Tool tool, BuildContext buildContext, Log log) {
         this.tool = tool;
         this.buildContext = buildContext;
         this.log = log;

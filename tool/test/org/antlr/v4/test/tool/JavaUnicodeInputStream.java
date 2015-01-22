@@ -40,7 +40,7 @@ import org.antlr.v4.runtime.misc.NotNull;
  * @author Sam Harwell
  */
 public class JavaUnicodeInputStream implements CharStream {
-	@NotNull
+
 	private final CharStream source;
 	private final IntegerList escapeIndexes = new IntegerList();
 	private final IntegerList escapeCharacters = new IntegerList();
@@ -52,7 +52,7 @@ public class JavaUnicodeInputStream implements CharStream {
 
 	private int la1;
 
-	public JavaUnicodeInputStream(@NotNull CharStream source) {
+	public JavaUnicodeInputStream(CharStream source) {
 		if (source == null) {
 			throw new NullPointerException("source");
 		}

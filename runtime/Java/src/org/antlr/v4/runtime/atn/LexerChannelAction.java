@@ -33,7 +33,6 @@ package org.antlr.v4.runtime.atn;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.MurmurHash;
-import org.antlr.v4.runtime.misc.NotNull;
 
 /**
  * Implements the {@code channel} lexer action by calling
@@ -87,7 +86,7 @@ public final class LexerChannelAction implements LexerAction {
 	 * value provided by {@link #getChannel}.</p>
 	 */
 	@Override
-	public void execute(@NotNull Lexer lexer) {
+	public void execute(Lexer lexer) {
 		lexer.setChannel(channel);
 	}
 

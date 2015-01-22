@@ -47,20 +47,24 @@ public class CommonToken implements WritableToken, Serializable {
 	 * This is the backing field for {@link #getType} and {@link #setType}.
 	 */
 	protected int type;
+	
 	/**
 	 * This is the backing field for {@link #getLine} and {@link #setLine}.
 	 */
 	protected int line;
+	
 	/**
 	 * This is the backing field for {@link #getCharPositionInLine} and
 	 * {@link #setCharPositionInLine}.
 	 */
 	protected int charPositionInLine = -1; // set to invalid position
+	
 	/**
 	 * This is the backing field for {@link #getChannel} and
 	 * {@link #setChannel}.
 	 */
 	protected int channel=DEFAULT_CHANNEL;
+	
 	/**
 	 * This is the backing field for {@link #getTokenSource} and
 	 * {@link #getInputStream}.
@@ -71,7 +75,7 @@ public class CommonToken implements WritableToken, Serializable {
 	 * the same source and input stream share a reference to the same
 	 * {@link Pair} containing these values.</p>
 	 */
-	@NotNull
+
 	protected Pair<TokenSource, CharStream> source;
 
 	/**
@@ -110,7 +114,7 @@ public class CommonToken implements WritableToken, Serializable {
 		this.source = EMPTY_SOURCE;
 	}
 
-	public CommonToken(@NotNull Pair<TokenSource, CharStream> source, int type, int channel, int start, int stop) {
+	public CommonToken(Pair<TokenSource, CharStream> source, int type, int channel, int start, int stop) {
 		this.source = source;
 		this.type = type;
 		this.channel = channel;
@@ -149,7 +153,7 @@ public class CommonToken implements WritableToken, Serializable {
 	 *
 	 * @param oldToken The token to copy.
 	 */
-	public CommonToken(@NotNull Token oldToken) {
+	public CommonToken(Token oldToken) {
 		type = oldToken.getType();
 		line = oldToken.getLine();
 		index = oldToken.getTokenIndex();

@@ -33,7 +33,6 @@ package org.antlr.v4.runtime.atn;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.misc.Pair;
 
 import java.io.InvalidClassException;
@@ -96,14 +95,14 @@ public class ATNDeserializer {
 		SERIALIZED_UUID = ADDED_LEXER_ACTIONS;
 	}
 
-	@NotNull
+
 	private final ATNDeserializationOptions deserializationOptions;
 
 	public ATNDeserializer() {
 		this(ATNDeserializationOptions.getDefaultOptions());
 	}
 
-	public ATNDeserializer(@Nullable ATNDeserializationOptions deserializationOptions) {
+	public ATNDeserializer(ATNDeserializationOptions deserializationOptions) {
 		if (deserializationOptions == null) {
 			deserializationOptions = ATNDeserializationOptions.getDefaultOptions();
 		}
@@ -134,7 +133,7 @@ public class ATNDeserializer {
 	}
 
 	@SuppressWarnings("deprecation")
-	public ATN deserialize(@NotNull char[] data) {
+	public ATN deserialize(char[] data) {
 		data = data.clone();
 		// don't adjust the first value since that's the version number
 		for (int i = 1; i < data.length; i++) {
@@ -531,7 +530,7 @@ public class ATNDeserializer {
 	 *
 	 * @param atn The ATN.
 	 */
-	protected void markPrecedenceDecisions(@NotNull ATN atn) {
+	protected void markPrecedenceDecisions(ATN atn) {
 		for (ATNState state : atn.states) {
 			if (!(state instanceof StarLoopEntryState)) {
 				continue;
@@ -643,8 +642,8 @@ public class ATNDeserializer {
 		return new UUID(mostSigBits, leastSigBits);
 	}
 
-	@NotNull
-	protected Transition edgeFactory(@NotNull ATN atn,
+
+	protected Transition edgeFactory(ATN atn,
 										 int type, int src, int trg,
 										 int arg1, int arg2, int arg3,
 										 List<IntervalSet> sets)

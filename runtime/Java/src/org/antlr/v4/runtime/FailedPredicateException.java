@@ -47,17 +47,17 @@ public class FailedPredicateException extends RecognitionException {
 	private final int predicateIndex;
 	private final String predicate;
 
-	public FailedPredicateException(@NotNull Parser recognizer) {
+	public FailedPredicateException(Parser recognizer) {
 		this(recognizer, null);
 	}
 
-	public FailedPredicateException(@NotNull Parser recognizer, @Nullable String predicate) {
+	public FailedPredicateException(Parser recognizer, String predicate) {
 		this(recognizer, predicate, null);
 	}
 
-	public FailedPredicateException(@NotNull Parser recognizer,
-									@Nullable String predicate,
-									@Nullable String message)
+	public FailedPredicateException(Parser recognizer,
+									String predicate,
+									String message)
 	{
 		super(formatMessage(predicate, message), recognizer, recognizer.getInputStream(), recognizer._ctx);
 		ATNState s = recognizer.getInterpreter().atn.states.get(recognizer.getState());
@@ -84,13 +84,13 @@ public class FailedPredicateException extends RecognitionException {
 		return predicateIndex;
 	}
 
-	@Nullable
+
 	public String getPredicate() {
 		return predicate;
 	}
 
-	@NotNull
-	private static String formatMessage(@Nullable String predicate, @Nullable String message) {
+
+	private static String formatMessage(String predicate, String message) {
 		if (message != null) {
 			return message;
 		}

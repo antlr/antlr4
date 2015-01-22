@@ -32,7 +32,6 @@ package org.antlr.v4.runtime.atn;
 
 import org.antlr.v4.runtime.ANTLRErrorListener;
 import org.antlr.v4.runtime.TokenStream;
-import org.antlr.v4.runtime.misc.NotNull;
 
 /**
  * This class represents profiling event information for a context sensitivity.
@@ -65,8 +64,8 @@ public class ContextSensitivityInfo extends DecisionEventInfo {
 	 * @param stopIndex The index at which the context sensitivity was
 	 * identified during full-context prediction
 	 */
-	public ContextSensitivityInfo(int decision, @NotNull ATNConfigSet configs,
-								  @NotNull TokenStream input, int startIndex, int stopIndex)
+	public ContextSensitivityInfo(int decision, ATNConfigSet configs,
+								  TokenStream input, int startIndex, int stopIndex)
 	{
 		super(decision, configs, input, startIndex, stopIndex, true);
 	}

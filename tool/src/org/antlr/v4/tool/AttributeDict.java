@@ -73,7 +73,7 @@ public class AttributeDict {
     }
 
     /** The list of {@link Attribute} objects. */
-	@NotNull
+
     public final LinkedHashMap<String, Attribute> attributes =
         new LinkedHashMap<String, Attribute>();
 
@@ -92,8 +92,8 @@ public class AttributeDict {
     /** Return the set of keys that collide from
      *  {@code this} and {@code other}.
      */
-	@NotNull
-    public Set<String> intersection(@Nullable AttributeDict other) {
+
+    public Set<String> intersection(AttributeDict other) {
         if ( other==null || other.size()==0 || size()==0 ) {
             return Collections.emptySet();
         }

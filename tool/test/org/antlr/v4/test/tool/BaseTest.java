@@ -57,7 +57,6 @@ import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.IntegerList;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.misc.Pair;
 import org.antlr.v4.runtime.misc.Utils;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -409,7 +408,7 @@ public abstract class BaseTest {
 		return null;
 	}
 
-	protected String load(String fileName, @Nullable String encoding)
+	protected String load(String fileName, String encoding)
 		throws IOException
 	{
 		if ( fileName==null ) {
@@ -703,7 +702,7 @@ public abstract class BaseTest {
 	/** Return true if all is well */
 	protected boolean rawGenerateAndBuildRecognizer(String grammarFileName,
 													String grammarStr,
-													@Nullable String parserName,
+													String parserName,
 													String lexerName,
 													String... extraOptions)
 	{
@@ -713,7 +712,7 @@ public abstract class BaseTest {
 	/** Return true if all is well */
 	protected boolean rawGenerateAndBuildRecognizer(String grammarFileName,
 													String grammarStr,
-													@Nullable String parserName,
+													String parserName,
 													String lexerName,
 													boolean defaultListener,
 													String... extraOptions)
@@ -1367,25 +1366,25 @@ public abstract class BaseTest {
 			return null;
 		}
 
-		@NotNull
+
 		@Override
 		public String getText() {
 			throw new UnsupportedOperationException("can't give strings");
 		}
 
-		@NotNull
+
 		@Override
 		public String getText(Interval interval) {
 			throw new UnsupportedOperationException("can't give strings");
 		}
 
-		@NotNull
+
 		@Override
 		public String getText(RuleContext ctx) {
 			throw new UnsupportedOperationException("can't give strings");
 		}
 
-		@NotNull
+
 		@Override
 		public String getText(Token start, Token stop) {
 			throw new UnsupportedOperationException("can't give strings");

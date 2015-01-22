@@ -198,7 +198,7 @@ public class SemanticPipeline {
 
 	}
 
-	boolean hasTypeOrMoreCommand(@NotNull Rule r) {
+	boolean hasTypeOrMoreCommand(Rule r) {
 		GrammarAST ast = r.ast;
 		if (ast == null) {
 			return false;

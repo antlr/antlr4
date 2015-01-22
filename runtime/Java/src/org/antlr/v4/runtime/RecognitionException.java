@@ -41,13 +41,10 @@ import org.antlr.v4.runtime.misc.Nullable;
  */
 public class RecognitionException extends RuntimeException {
 	/** The {@link Recognizer} where this exception originated. */
-	@Nullable
 	private final Recognizer<?, ?> recognizer;
 
-	@Nullable
 	private final RuleContext ctx;
 
-	@Nullable
 	private final IntStream input;
 
 	/**
@@ -59,9 +56,9 @@ public class RecognitionException extends RuntimeException {
 
 	private int offendingState = -1;
 
-	public RecognitionException(@Nullable Recognizer<?, ?> recognizer,
-								@Nullable IntStream input,
-								@Nullable ParserRuleContext ctx)
+	public RecognitionException(Recognizer<?, ?> recognizer,
+								IntStream input,
+								ParserRuleContext ctx)
 	{
 		this.recognizer = recognizer;
 		this.input = input;
@@ -70,9 +67,9 @@ public class RecognitionException extends RuntimeException {
 	}
 
 	public RecognitionException(String message,
-								@Nullable Recognizer<?, ?> recognizer,
-								@Nullable IntStream input,
-								@Nullable ParserRuleContext ctx)
+								Recognizer<?, ?> recognizer,
+								IntStream input,
+								ParserRuleContext ctx)
 	{
 		super(message);
 		this.recognizer = recognizer;
@@ -108,7 +105,6 @@ public class RecognitionException extends RuntimeException {
 	 * @return The set of token types that could potentially follow the current
 	 * state in the ATN, or {@code null} if the information is not available.
 	 */
-	@Nullable
 	public IntervalSet getExpectedTokens() {
 		if (recognizer != null) {
 			return recognizer.getATN().getExpectedTokens(offendingState, ctx);
@@ -125,7 +121,6 @@ public class RecognitionException extends RuntimeException {
 	 * @return The {@link RuleContext} at the time this exception was thrown.
 	 * If the context is not available, this method returns {@code null}.
 	 */
-	@Nullable
 	public RuleContext getCtx() {
 		return ctx;
 	}
@@ -140,17 +135,16 @@ public class RecognitionException extends RuntimeException {
 	 * where this exception was thrown, or {@code null} if the stream is not
 	 * available.
 	 */
-	@Nullable
 	public IntStream getInputStream() {
 		return input;
 	}
 
-	@Nullable
+
 	public Token getOffendingToken() {
 		return offendingToken;
 	}
 
-	protected final void setOffendingToken(@Nullable Token offendingToken) {
+	protected final void setOffendingToken(Token offendingToken) {
 		this.offendingToken = offendingToken;
 	}
 
@@ -162,7 +156,6 @@ public class RecognitionException extends RuntimeException {
 	 * @return The recognizer where this exception occurred, or {@code null} if
 	 * the recognizer is not available.
 	 */
-	@Nullable
 	public Recognizer<?, ?> getRecognizer() {
 		return recognizer;
 	}

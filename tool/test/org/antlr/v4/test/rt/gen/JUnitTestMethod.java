@@ -1,8 +1,8 @@
 package org.antlr.v4.test.rt.gen;
 
-import java.io.File;
-
 import org.stringtemplate.v4.STGroup;
+
+import java.io.File;
 
 public abstract class JUnitTestMethod {
 
@@ -13,8 +13,8 @@ public abstract class JUnitTestMethod {
 	public String expectedOutput;
 	public String expectedErrors;
 	public boolean debug = false;
-	
-	protected JUnitTestMethod(String name, String grammarName, String input, 
+
+	protected JUnitTestMethod(String name, String grammarName, String input,
 			String expectedOutput, String expectedErrors, Integer index) {
 		this.name = name + (index==null ? "" : "_" + index);
 		this.grammar = new Grammar(name, grammarName);

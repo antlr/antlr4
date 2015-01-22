@@ -34,8 +34,6 @@ import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.misc.DoubleKeyMap;
 import org.antlr.v4.runtime.misc.MurmurHash;
-import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.misc.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -95,7 +93,7 @@ public abstract class PredictionContext {
 	/** Convert a {@link RuleContext} tree to a {@link PredictionContext} graph.
 	 *  Return {@link #EMPTY} if {@code outerContext} is empty or null.
 	 */
-	public static PredictionContext fromRuleContext(@NotNull ATN atn, RuleContext outerContext) {
+	public static PredictionContext fromRuleContext(ATN atn, RuleContext outerContext) {
 		if ( outerContext==null ) outerContext = RuleContext.EMPTY;
 
 		// if we are in RuleContext of start rule, s, then PredictionContext
@@ -565,9 +563,9 @@ public abstract class PredictionContext {
 
 	// From Sam
 	public static PredictionContext getCachedContext(
-		@NotNull PredictionContext context,
-		@NotNull PredictionContextCache contextCache,
-		@NotNull IdentityHashMap<PredictionContext, PredictionContext> visited)
+		PredictionContext context,
+		PredictionContextCache contextCache,
+		IdentityHashMap<PredictionContext, PredictionContext> visited)
 	{
 		if (context.isEmpty()) {
 			return context;
@@ -670,7 +668,7 @@ public abstract class PredictionContext {
 		}
 	}
 
-	public String toString(@Nullable Recognizer<?,?> recog) {
+	public String toString(Recognizer<?,?> recog) {
 		return toString();
 //		return toString(recog, ParserRuleContext.EMPTY);
 	}

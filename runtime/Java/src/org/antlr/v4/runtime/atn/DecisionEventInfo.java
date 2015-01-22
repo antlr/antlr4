@@ -47,35 +47,38 @@ public class DecisionEventInfo {
 	 * @see ATN#decisionToState
 	 */
 	public final int decision;
+
 	/**
 	 * The configuration set containing additional information relevant to the
 	 * prediction state when the current event occurred, or {@code null} if no
 	 * additional information is relevant or available.
 	 */
-	@Nullable
 	public final ATNConfigSet configs;
+
 	/**
 	 * The input token stream which is being parsed.
 	 */
-	@NotNull
 	public final TokenStream input;
+
 	/**
 	 * The token index in the input stream at which the current prediction was
 	 * originally invoked.
 	 */
 	public final int startIndex;
+
 	/**
 	 * The token index in the input stream at which the current event occurred.
 	 */
 	public final int stopIndex;
+
 	/**
 	 * {@code true} if the current event occurred during LL prediction;
 	 * otherwise, {@code false} if the input occurred during SLL prediction.
 	 */
 	public final boolean fullCtx;
 
-	public DecisionEventInfo(int decision, @Nullable ATNConfigSet configs,
-							 @NotNull TokenStream input, int startIndex,
+	public DecisionEventInfo(int decision, ATNConfigSet configs,
+							 TokenStream input, int startIndex,
 							 int stopIndex, boolean fullCtx)
 	{
 		this.decision = decision;
