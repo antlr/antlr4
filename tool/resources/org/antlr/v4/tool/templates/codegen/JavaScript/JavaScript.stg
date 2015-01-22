@@ -81,7 +81,7 @@ function <file.grammarName>Listener() {
 // Exit a parse tree produced by <file.parserName>#<lname>.
 <file.grammarName>Listener.prototype.exit<lname; format="cap"> = function(ctx) {
 \};
-    
+
 }; separator="\n">
 
 exports.<file.grammarName>Listener = <file.grammarName>Listener;
@@ -107,7 +107,7 @@ function <file.grammarName>Visitor() {
 // Visit a parse tree produced by <file.parserName>#<lname>.
 <file.grammarName>Visitor.prototype.visit<lname; format="cap"> = function(ctx) {
 \};
-    
+
 }; separator="\n">
 
 exports.<file.grammarName>Visitor = <file.grammarName>Visitor;
@@ -158,7 +158,7 @@ Object.defineProperty(<parser.name>.prototype, "atn", {
 		return atn;
 	}
 });
-	
+
 <parser.name>.EOF = antlr4.Token.EOF;
 <if(parser.tokens)>
 <parser.tokens:{k | <parser.name>.<k> = <parser.tokens.(k)>;}; separator="\n", wrap, anchor>
@@ -197,8 +197,8 @@ case <f.ruleIndex>:
 		throw "No registered action for:" + ruleIndex;
 	}
 };
-			
-<actionFuncs.values; separator="\n">	
+
+<actionFuncs.values; separator="\n">
 <endif>
 <if(sempredFuncs)>
 <lexer.name>.prototype.sempred = function(localctx, ruleIndex, predIndex) {
@@ -257,7 +257,7 @@ RuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,namedActions,fina
 <parser.name>.<currentRule.ctxType> = <currentRule.ctxType>;
 
 <parser.name>.prototype.<currentRule.name> = function(<currentRule.args:{a | <a.name>}; separator=", ">) {
-	
+
     var localctx = new <currentRule.ctxType>(this, this._ctx, this.state<currentRule.args:{a | , <a.name>}>);
     this.enterRule(localctx, <currentRule.startState>, <parser.name>.RULE_<currentRule.name>);
     <namedActions.init>
@@ -502,7 +502,7 @@ cases(ttypes) ::= <<
 >>
 
 InvokeRule(r, argExprsChunks) ::= <<
-this.state = <r.stateNumber>; 
+this.state = <r.stateNumber>;
 <if(r.labels)><r.labels:{l | <labelref(l)> = }><endif>this.<r.name>(<if(r.ast.options.p)><r.ast.options.p><if(argExprsChunks)>,<endif><endif><argExprsChunks>);
 >>
 
@@ -586,7 +586,7 @@ TokenPropertyRef_index(t) ::= "(<ctx(t)>.<t.label> === null ? 0 : <ctx(t)>.<t.la
 TokenPropertyRef_int(t) ::= "(<ctx(t)>.<t.label> === null ? 0 : parseInt(<ctx(t)>.<t.label>.text))"
 
 RulePropertyRef_start(r) ::= "(<ctx(r)>.<r.label>===null ? null : <ctx(r)>.<r.label>.start)"
-RulePropertyRef_stop(r)	 ::= "(<ctx(t)>.<t.label> === null ? null : <ctx(r)>.<r.label>.stop)"
+RulePropertyRef_stop(r)	 ::= "(<ctx(r)>.<r.label>===null ? null : <ctx(r)>.<r.label>.stop)"
 RulePropertyRef_text(r)	 ::= "(<ctx(r)>.<r.label>===null ? null : this._input.getText(new antlr4.Interval(<ctx(r)>.<r.label>.start,<ctx(r)>.<r.label>.stop)))"
 RulePropertyRef_ctx(r)	 ::= "<ctx(r)>.<r.label>"
 RulePropertyRef_parser(r)	 ::= "this"
@@ -809,7 +809,7 @@ Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass) ::= <<
 var atn = new antlr4.atn.ATNDeserializer().deserialize(serializedATN);
 
 var decisionsToDFA = atn.decisionToState.map( function(ds, index) { return new antlr4.dfa.DFA(ds, index); });
-    
+
 function <lexer.name>(input) {
 	<if(superClass)><superClass><else>antlr4.Lexer<endif>.call(this, input);
     this._interp = new antlr4.atn.LexerATNSimulator(this, atn, decisionsToDFA, new antlr4.PredictionContextCache());
@@ -821,21 +821,21 @@ function <lexer.name>(input) {
 
 <lexer.name>.EOF = antlr4.Token.EOF;
 <lexer.tokens:{k | <lexer.name>.<k> = <lexer.tokens.(k)>;}; separator="\n", wrap, anchor>
-    
+
 <rest(lexer.modes):{m| <lexer.name>.<m> = <i>;}; separator="\n">
-    
+
 <lexer.name>.modeNames = [ <lexer.modes:{m| "<m>"}; separator=", ", wrap, anchor> ];
-    
+
 <lexer.name>.literalNames = [ <lexer.literalNames:{t | <t>}; null="'null'", separator=", ", wrap, anchor> ];
 
 <lexer.name>.symbolicNames = [ <lexer.symbolicNames:{t | <t>}; null="'null'", separator=", ", wrap, anchor> ];
-    
+
 <lexer.name>.ruleNames = [ <lexer.ruleNames:{r | "<r>"}; separator=", ", wrap, anchor> ];
-    
+
 <lexer.name>.grammarFileName = "<lexer.grammarFileName>";
 
 <namedActions.members>
-        
+
 <dumpActions(lexer, "", actionFuncs, sempredFuncs)>
 
 exports.<lexer.name> = <lexer.name>;
@@ -846,7 +846,7 @@ SerializedATN(model) ::= <<
 <! only one segment, can be inlined !>
 
 var serializedATN = ["<model.serialized; wrap={",<\n>    "}>"].join("");
-		
+
 >>
 
 /** Using a type to init value map, try to init a type; if not in table
