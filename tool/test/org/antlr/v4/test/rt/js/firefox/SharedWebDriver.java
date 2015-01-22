@@ -1,16 +1,16 @@
 package org.antlr.v4.test.rt.js.firefox;
 
-import java.util.Timer;
-import java.util.TimerTask;
-
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
+
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class SharedWebDriver {
 
 	static WebDriver driver;
 	static Timer timer;
-	
+
 	public static WebDriver init() {
 		if(driver==null) {
 			driver = new FirefoxDriver();
@@ -18,7 +18,7 @@ public class SharedWebDriver {
 			timer.cancel();
 			timer = null;
 		}
-			
+
 		return driver;
 	}
 
@@ -29,7 +29,7 @@ public class SharedWebDriver {
 				timer = null;
 			}
 			timer = new Timer();
-			timer.schedule(new TimerTask() { 
+			timer.schedule(new TimerTask() {
 				@Override public void run() {
 					driver.quit();
 					driver = null;

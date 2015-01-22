@@ -1,20 +1,20 @@
 package org.antlr.v4.test.rt.js.chrome;
 
-import static org.junit.Assert.*;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
 
 import java.io.File;
 import java.net.URL;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
+import static org.junit.Assert.assertTrue;
 
 public class SharedWebDriver {
 
 	static WebDriver driver;
 	static Timer timer;
-	
+
 	public static WebDriver init() {
 		if(driver==null) {
 			String path = SharedWebDriver.class.getPackage().getName().replace(".", "/") + "/chromedriver.bin";
@@ -27,7 +27,7 @@ public class SharedWebDriver {
 			timer.cancel();
 			timer = null;
 		}
-			
+
 		return driver;
 	}
 
@@ -38,7 +38,7 @@ public class SharedWebDriver {
 				timer = null;
 			}
 			timer = new Timer();
-			timer.schedule(new TimerTask() { 
+			timer.schedule(new TimerTask() {
 				@Override public void run() {
 					driver.quit();
 					driver = null;

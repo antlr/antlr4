@@ -29,30 +29,6 @@
  */
 package org.antlr.v4.test.rt.js.explorer;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.BindException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-
 import org.antlr.v4.Tool;
 import org.antlr.v4.automata.ATNFactory;
 import org.antlr.v4.automata.ATNPrinter;
@@ -79,7 +55,6 @@ import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.IntegerList;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.semantics.SemanticPipeline;
 import org.antlr.v4.test.tool.ErrorQueue;
 import org.antlr.v4.tool.ANTLRMessage;
@@ -95,18 +70,40 @@ import org.eclipse.jetty.server.handler.DefaultHandler;
 import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.rules.TestRule;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 import org.openqa.selenium.By.ById;
-import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupString;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.BindException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public abstract class BaseTest {
 	// -J-Dorg.antlr.v4.test.BaseTest.level=FINE
@@ -117,7 +114,7 @@ public abstract class BaseTest {
 
 	public String httpdir = null;
 	public String tmpdir = null;
-	
+
 	/** If error during parser execution, store stderr here; can't return
      *  stdout and stderr.  This doesn't trap errors from running antlr.
      */
@@ -135,20 +132,20 @@ public abstract class BaseTest {
 	};
 
 	WebDriver driver;
-	
+
 	@Before
 	public void initWebDriver() {
 		System.setProperty("webdriver.ie.driver", "C:\\Program Files (x86)\\Selenium\\IEDriverServer.exe");
 		driver = new InternetExplorerDriver();
 	}
-	
+
 	@After
 	public void closeWebPage() {
 		if(driver!=null)
 			driver.quit();
 	}
-	
-	
+
+
     @Before
 	public void setUp() throws Exception {
         // new output dir for each test
@@ -156,7 +153,7 @@ public abstract class BaseTest {
     	if(prop!=null && prop.length()>0)
     		httpdir = prop;
     	else
-    		httpdir = new File(System.getProperty("java.io.tmpdir"), getClass().getSimpleName()+"-"+System.currentTimeMillis()).getAbsolutePath(); 
+    		httpdir = new File(System.getProperty("java.io.tmpdir"), getClass().getSimpleName()+"-"+System.currentTimeMillis()).getAbsolutePath();
     	File dir = new File(httpdir);
     	if(dir.exists())
     		this.eraseFiles(dir);
@@ -336,7 +333,7 @@ public abstract class BaseTest {
 								String listenerName,
 								String visitorName,
 								String startRuleName,
-								String input, 
+								String input,
 								boolean debug) throws Exception
 	{
 		boolean success = rawGenerateAndBuildRecognizer(grammarFileName,
@@ -357,7 +354,7 @@ public abstract class BaseTest {
 	/** Return true if all is well */
 	protected boolean rawGenerateAndBuildRecognizer(String grammarFileName,
 													String grammarStr,
-													@Nullable String parserName,
+													String parserName,
 													String lexerName,
 													String... extraOptions)
 	{
@@ -367,7 +364,7 @@ public abstract class BaseTest {
 	/** Return true if all is well */
 	protected boolean rawGenerateAndBuildRecognizer(String grammarFileName,
 													String grammarStr,
-													@Nullable String parserName,
+													String parserName,
 													String lexerName,
 													boolean defaultListener,
 													String... extraOptions)
@@ -422,12 +419,12 @@ public abstract class BaseTest {
 	static int httpPort = 8080;
 
 	class ServerThread extends Thread {
-		
+
 		Server server;
 		String runtimePath;
 		String fileName;
 		Exception ex;
-		
+
 		public ServerThread(String fileName) {
 			this.runtimePath = locateRuntime();
 			this.fileName = fileName;
@@ -458,7 +455,7 @@ public abstract class BaseTest {
 			}
 		}
 	}
-	
+
 	public String execHtmlPage(String fileName, String input) throws Exception {
 		// 'file' protocol is not supported by Selenium Safari driver
 		// so we run an embedded Jetty server
@@ -801,8 +798,8 @@ public abstract class BaseTest {
         "				this.print = function(s) { document.getElementById('output').value += s; }\r\n" +
         "				return this;\r\n" +
         "			};\r\n" +
-		"\r\n" +			
-		"			loadParser = function() {\r\n" +			
+		"\r\n" +
+		"			loadParser = function() {\r\n" +
         "				try {\r\n" +
         "					antlr4 = require('antlr4/index');\r\n" +
 		"					" + lexerName + " = require('./parser/" + lexerName + "');\n" +
@@ -812,7 +809,7 @@ public abstract class BaseTest {
         "				} catch (ex) {\r\n" +
         "					document.getElementById('errors').value = ex.toString();\r\n" +
         "				}\r\n" +
-		"\r\n" +			
+		"\r\n" +
 		"				listener = function() {\r\n" +
 		"					antlr4.error.ErrorListener.call(this);\r\n" +
 		"					return this;\r\n" +
@@ -822,15 +819,15 @@ public abstract class BaseTest {
 		"				listener.prototype.syntaxError = function(recognizer, offendingSymbol, line, column, msg, e) {\r\n" +
 		"    				document.getElementById('errors').value += 'line ' + line + ':' + column + ' ' + msg + '\\r\\n';\r\n" +
 		"				};\r\n" +
-		"\r\n" +			
+		"\r\n" +
         "				TreeShapeListener = function() {\r\n" +
         "					antlr4.tree.ParseTreeListener.call(this);\r\n" +
         "					return this;\r\n" +
         "				};\r\n" +
-		"\r\n" +			
+		"\r\n" +
 		"				TreeShapeListener.prototype = Object.create(antlr4.tree.ParseTreeListener.prototype);\r\n" +
 		"				TreeShapeListener.prototype.constructor = TreeShapeListener;\r\n" +
-		"\r\n" +			
+		"\r\n" +
 		"				TreeShapeListener.prototype.enterEveryRule = function(ctx) {\r\n" +
 		"					for(var i=0;i<ctx.getChildCount; i++) {\r\n" +
 		"						var child = ctx.getChild(i);\r\n" +
@@ -841,13 +838,13 @@ public abstract class BaseTest {
 		"					}\r\n" +
 		"				};\r\n" +
 		"			}\r\n" +
-		"\r\n" +			
+		"\r\n" +
 		"			test = function() {\r\n" +
 		"				document.getElementById('output').value = ''\r\n" +
 		"				var input = document.getElementById('input').value;\r\n" +
 		"    			var stream = new antlr4.InputStream(input);\n" +
 		"    			var lexer = new " + lexerName + "." + lexerName + "(stream);\n" +
-		"				lexer._listeners = [new listener()];\r\n" +	
+		"				lexer._listeners = [new listener()];\r\n" +
 	    "    			var tokens = new antlr4.CommonTokenStream(lexer);\n" +
 	    "				var parser = new " + parserName + "." + parserName + "(tokens);\n" +
 	    "				parser._listeners.push(new listener());\n" +
@@ -858,7 +855,7 @@ public abstract class BaseTest {
 		"    			var tree = parser." + parserStartRuleName + "();\n" +
 		"    			antlr4.tree.ParseTreeWalker.DEFAULT.walk(new TreeShapeListener(), tree);\n" +
 		"			};\r\n" +
-		"\r\n" +			
+		"\r\n" +
         "		</script>\r\n" +
 	    "	</head>\r\n" +
 	    "	<body>\r\n" +
@@ -869,10 +866,10 @@ public abstract class BaseTest {
 	    "		<textarea id='errors'></textarea><br>\r\n" +
 	    "	</body>\r\n" +
 	    "</html>\r\n";
-		writeFile(httpdir, "Test.html", html);	
+		writeFile(httpdir, "Test.html", html);
 	};
-	
-	
+
+
 	protected void writeLexerTestFile(String lexerName, boolean showDFA) {
 		String html = "<!DOCTYPE html>\r\n" +
 		"<html>\r\n" +
@@ -882,8 +879,8 @@ public abstract class BaseTest {
         "			antlr4 = null;\r\n" +
         "			listener = null;\r\n" +
         "			" + lexerName + " = null;\r\n" +
- 		"\r\n" +			
-		"			loadLexer = function() {\r\n" +			
+ 		"\r\n" +
+		"			loadLexer = function() {\r\n" +
         "				try {\r\n" +
         "					antlr4 = require('antlr4/index');\r\n" +
 		"					" + lexerName + " = require('./parser/" + lexerName + "');\r\n" +
@@ -900,7 +897,7 @@ public abstract class BaseTest {
 		"    				document.getElementById('errors').value += 'line ' + line + ':' + column + ' ' + msg + '\\r\\n';\r\n" +
 		"				};\r\n" +
 		"			}\r\n" +
-		"\r\n" +			
+		"\r\n" +
 		"			test = function() {\r\n" +
 		"				document.getElementById('output').value = ''\r\n" +
 		"				var input = document.getElementById('input').value;\r\n" +
@@ -912,11 +909,11 @@ public abstract class BaseTest {
 	    "    			for(var i=0; i<stream.tokens.length; i++) {\r\n" +
 	    "					document.getElementById('output').value += stream.tokens[i].toString() + '\\r\\n';\r\n" +
 		"    			}\n" +
-		(showDFA ? 
+		(showDFA ?
 		"    			document.getElementById('output').value += lexer._interp.decisionToDFA[antlr4.Lexer.DEFAULT_MODE].toLexerString();\r\n"
 						:"") +
 		"			};\r\n" +
-		"\r\n" +			
+		"\r\n" +
         "		</script>\r\n" +
 	    "	</head>\r\n" +
 	    "	<body>\r\n" +
@@ -927,7 +924,7 @@ public abstract class BaseTest {
 	    "		<textarea id='errors'></textarea><br>\r\n" +
 	    "	</body>\r\n" +
 	    "</html>\r\n";
-		writeFile(httpdir, "Test.html", html);	
+		writeFile(httpdir, "Test.html", html);
 	}
 
 	public void writeRecognizer(String parserName, String lexerName,
@@ -1087,25 +1084,25 @@ public abstract class BaseTest {
 			return null;
 		}
 
-		@NotNull
+
 		@Override
 		public String getText() {
 			throw new UnsupportedOperationException("can't give strings");
 		}
 
-		@NotNull
+
 		@Override
 		public String getText(Interval interval) {
 			throw new UnsupportedOperationException("can't give strings");
 		}
 
-		@NotNull
+
 		@Override
 		public String getText(RuleContext ctx) {
 			throw new UnsupportedOperationException("can't give strings");
 		}
 
-		@NotNull
+
 		@Override
 		public String getText(Token start, Token stop) {
 			throw new UnsupportedOperationException("can't give strings");
