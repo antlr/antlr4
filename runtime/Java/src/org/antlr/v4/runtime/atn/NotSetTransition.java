@@ -31,11 +31,9 @@
 package org.antlr.v4.runtime.atn;
 
 import org.antlr.v4.runtime.misc.IntervalSet;
-import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.misc.Nullable;
 
 public final class NotSetTransition extends SetTransition {
-	public NotSetTransition(@NotNull ATNState target, @Nullable IntervalSet set) {
+	public NotSetTransition(ATNState target, IntervalSet set) {
 		super(target, set);
 	}
 

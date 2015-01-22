@@ -86,7 +86,7 @@ public abstract class GrammarASTWithOptions extends GrammarAST {
 	@Override
 	public abstract GrammarASTWithOptions dupNode();
 
-	@NotNull
+
 	public Map<String, GrammarAST> getOptions() {
 		if (options == null) {
 			return Collections.emptyMap();

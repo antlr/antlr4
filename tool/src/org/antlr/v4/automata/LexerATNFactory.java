@@ -395,8 +395,8 @@ public class LexerATNFactory extends ParserATNFactory {
 		return _ruleRef(node);
 	}
 
-	@Nullable
-	protected LexerAction createLexerAction(@NotNull GrammarAST ID, @Nullable GrammarAST arg) {
+
+	protected LexerAction createLexerAction(GrammarAST ID, GrammarAST arg) {
 		String command = ID.getText();
 		if ("skip".equals(command) && arg == null) {
 			return LexerSkipAction.INSTANCE;
@@ -448,8 +448,8 @@ public class LexerATNFactory extends ParserATNFactory {
 		}
 	}
 
-	@Nullable
-	protected Integer getConstantValue(@Nullable String name, @Nullable Token token) {
+
+	protected Integer getConstantValue(String name, Token token) {
 		if (name == null) {
 			return null;
 		}

@@ -65,7 +65,7 @@ public class SemPred extends Action {
 	 */
 	@ModelElement public List<ActionChunk> failChunks;
 
-	public SemPred(OutputModelFactory factory, @NotNull ActionAST ast) {
+	public SemPred(OutputModelFactory factory, ActionAST ast) {
 		super(factory,ast);
 
 		assert ast.atnState != null

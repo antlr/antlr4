@@ -34,7 +34,6 @@ import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNSimulator;
 import org.antlr.v4.runtime.atn.ParseInfo;
 import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.misc.Utils;
 
 import java.util.Collections;
@@ -52,7 +51,7 @@ public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
 	private static final Map<String[], Map<String, Integer>> ruleIndexMapCache =
 		new WeakHashMap<String[], Map<String, Integer>>();
 
-	@NotNull
+
 	private List<ANTLRErrorListener> _listeners =
 		new CopyOnWriteArrayList<ANTLRErrorListener>() {{
 			add(ConsoleErrorListener.INSTANCE);
@@ -79,7 +78,6 @@ public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
 	 * @return A {@link Vocabulary} instance providing information about the
 	 * vocabulary used by the grammar.
 	 */
-	@NotNull
 	@SuppressWarnings("deprecation")
 	public Vocabulary getVocabulary() {
 		return VocabularyImpl.fromTokenNames(getTokenNames());
@@ -90,7 +88,6 @@ public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
 	 *
 	 * <p>Used for XPath and tree pattern compilation.</p>
 	 */
-	@NotNull
 	public Map<String, Integer> getTokenTypeMap() {
 		Vocabulary vocabulary = getVocabulary();
 		synchronized (tokenTypeMapCache) {
@@ -123,7 +120,6 @@ public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
 	 *
 	 * <p>Used for XPath and tree pattern compilation.</p>
 	 */
-	@NotNull
 	public Map<String, Integer> getRuleIndexMap() {
 		String[] ruleNames = getRuleNames();
 		if (ruleNames == null) {
@@ -154,7 +150,6 @@ public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
 	 * <p>For interpreters, we don't know their serialized ATN despite having
 	 * created the interpreter from it.</p>
 	 */
-	@NotNull
 	public String getSerializedATN() {
 		throw new UnsupportedOperationException("there is no serialized ATN");
 	}
@@ -169,7 +164,6 @@ public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
 	 *
 	 * @return The {@link ATN} used by the recognizer for prediction.
 	 */
-	@NotNull
 	public abstract ATN getATN();
 
 	/**
@@ -177,7 +171,6 @@ public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
 	 *
 	 * @return The ATN interpreter used by the recognizer for prediction.
 	 */
-	@NotNull
 	public ATNInterpreter getInterpreter() {
 		return _interp;
 	}
@@ -197,13 +190,12 @@ public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
 	 * @param interpreter The ATN interpreter used by the recognizer for
 	 * prediction.
 	 */
-	public void setInterpreter(@NotNull ATNInterpreter interpreter) {
+	public void setInterpreter(ATNInterpreter interpreter) {
 		_interp = interpreter;
 	}
 
 	/** What is the error header, normally line/character position information? */
-	@NotNull
-	public String getErrorHeader(@NotNull RecognitionException e) {
+	public String getErrorHeader(RecognitionException e) {
 		int line = e.getOffendingToken().getLine();
 		int charPositionInLine = e.getOffendingToken().getCharPositionInLine();
 		return "line "+line+":"+charPositionInLine;
@@ -243,7 +235,7 @@ public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
 	/**
 	 * @exception NullPointerException if {@code listener} is {@code null}.
 	 */
-	public void addErrorListener(@NotNull ANTLRErrorListener listener) {
+	public void addErrorListener(ANTLRErrorListener listener) {
 		if (listener == null) {
 			throw new NullPointerException("listener cannot be null.");
 		}
@@ -251,7 +243,7 @@ public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
 		_listeners.add(listener);
 	}
 
-	public void removeErrorListener(@NotNull ANTLRErrorListener listener) {
+	public void removeErrorListener(ANTLRErrorListener listener) {
 		_listeners.remove(listener);
 	}
 
@@ -259,7 +251,7 @@ public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
 		_listeners.clear();
 	}
 
-	@NotNull
+
 	public List<? extends ANTLRErrorListener> getErrorListeners() {
 		return _listeners;
 	}
@@ -270,15 +262,15 @@ public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
 
 	// subclass needs to override these if there are sempreds or actions
 	// that the ATN interp needs to execute
-	public boolean sempred(@Nullable RuleContext _localctx, int ruleIndex, int actionIndex) {
+	public boolean sempred(RuleContext _localctx, int ruleIndex, int actionIndex) {
 		return true;
 	}
 
-	public boolean precpred(@Nullable RuleContext localctx, int precedence) {
+	public boolean precpred(RuleContext localctx, int precedence) {
 		return true;
 	}
 
-	public void action(@Nullable RuleContext _localctx, int ruleIndex, int actionIndex) {
+	public void action(RuleContext _localctx, int ruleIndex, int actionIndex) {
 	}
 
 	public final int getState() {
@@ -302,8 +294,8 @@ public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
 
 	public abstract void setInputStream(IntStream input);
 
-	@NotNull
+
 	public abstract TokenFactory<?> getTokenFactory();
 
-	public abstract void setTokenFactory(@NotNull TokenFactory<?> input);
+	public abstract void setTokenFactory(TokenFactory<?> input);
 }

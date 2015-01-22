@@ -30,8 +30,6 @@
 
 package org.antlr.v4.runtime;
 
-import org.antlr.v4.runtime.misc.NotNull;
-
 /**
  * This class extends {@link BufferedTokenStream} with functionality to filter
  * token streams to tokens on a particular channel (tokens where
@@ -72,7 +70,7 @@ public class CommonTokenStream extends BufferedTokenStream {
 	 *
 	 * @param tokenSource The token source.
 	 */
-    public CommonTokenStream(@NotNull TokenSource tokenSource) {
+    public CommonTokenStream(TokenSource tokenSource) {
         super(tokenSource);
     }
 
@@ -86,7 +84,7 @@ public class CommonTokenStream extends BufferedTokenStream {
 	 * @param tokenSource The token source.
 	 * @param channel The channel to use for filtering tokens.
 	 */
-    public CommonTokenStream(@NotNull TokenSource tokenSource, int channel) {
+    public CommonTokenStream(TokenSource tokenSource, int channel) {
         this(tokenSource);
         this.channel = channel;
     }

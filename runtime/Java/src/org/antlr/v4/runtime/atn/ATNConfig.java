@@ -51,7 +51,6 @@ public class ATNConfig {
 	private static final int SUPPRESS_PRECEDENCE_FILTER = 0x40000000;
 
 	/** The ATN state associated with this configuration */
-	@NotNull
 	public final ATNState state;
 
 	/** What alt (or lexer rule) is predicted by this configuration */
@@ -61,7 +60,6 @@ public class ATNConfig {
 	 *  with this config.  We track only those contexts pushed during
 	 *  execution of the ATN simulator.
 	 */
-	@Nullable
 	public PredictionContext context;
 
 	/**
@@ -89,7 +87,7 @@ public class ATNConfig {
 	 */
 	public int reachesIntoOuterContext;
 
-    @NotNull
+
     public final SemanticContext semanticContext;
 
 	public ATNConfig(ATNConfig old) { // dup
@@ -100,17 +98,17 @@ public class ATNConfig {
 		this.reachesIntoOuterContext = old.reachesIntoOuterContext;
 	}
 
-	public ATNConfig(@NotNull ATNState state,
+	public ATNConfig(ATNState state,
 					 int alt,
-					 @Nullable PredictionContext context)
+					 PredictionContext context)
 	{
 		this(state, alt, context, SemanticContext.NONE);
 	}
 
-	public ATNConfig(@NotNull ATNState state,
+	public ATNConfig(ATNState state,
 					 int alt,
-					 @Nullable PredictionContext context,
-					 @NotNull SemanticContext semanticContext)
+					 PredictionContext context,
+					 SemanticContext semanticContext)
 	{
 		this.state = state;
 		this.alt = alt;
@@ -118,31 +116,31 @@ public class ATNConfig {
 		this.semanticContext = semanticContext;
 	}
 
-    public ATNConfig(@NotNull ATNConfig c, @NotNull ATNState state) {
+    public ATNConfig(ATNConfig c, ATNState state) {
    		this(c, state, c.context, c.semanticContext);
    	}
 
-	public ATNConfig(@NotNull ATNConfig c, @NotNull ATNState state,
-		 @NotNull SemanticContext semanticContext)
+	public ATNConfig(ATNConfig c, ATNState state,
+		 SemanticContext semanticContext)
 {
 		this(c, state, c.context, semanticContext);
 	}
 
-	public ATNConfig(@NotNull ATNConfig c,
-					 @NotNull SemanticContext semanticContext)
+	public ATNConfig(ATNConfig c,
+					 SemanticContext semanticContext)
 	{
 		this(c, c.state, c.context, semanticContext);
 	}
 
-    public ATNConfig(@NotNull ATNConfig c, @NotNull ATNState state,
-					 @Nullable PredictionContext context)
+    public ATNConfig(ATNConfig c, ATNState state,
+					 PredictionContext context)
 	{
         this(c, state, context, c.semanticContext);
     }
 
-	public ATNConfig(@NotNull ATNConfig c, @NotNull ATNState state,
-					 @Nullable PredictionContext context,
-                     @NotNull SemanticContext semanticContext)
+	public ATNConfig(ATNConfig c, ATNState state,
+					 PredictionContext context,
+                     SemanticContext semanticContext)
     {
 		this.state = state;
 		this.alt = c.alt;
@@ -216,7 +214,7 @@ public class ATNConfig {
 		return toString(null, true);
 	}
 
-	public String toString(@Nullable Recognizer<?, ?> recog, boolean showAlt) {
+	public String toString(Recognizer<?, ?> recog, boolean showAlt) {
 		StringBuilder buf = new StringBuilder();
 //		if ( state.ruleIndex>=0 ) {
 //			if ( recog!=null ) buf.append(recog.getRuleNames()[state.ruleIndex]+":");

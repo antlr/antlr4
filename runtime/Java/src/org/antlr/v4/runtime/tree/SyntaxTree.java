@@ -47,6 +47,6 @@ public interface SyntaxTree extends Tree {
 	 *
 	 * <p>If source interval is unknown, this returns {@link Interval#INVALID}.</p>
 	 */
-	@NotNull
+
 	Interval getSourceInterval();
 }

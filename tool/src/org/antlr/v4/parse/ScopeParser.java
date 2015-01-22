@@ -63,11 +63,11 @@ public class ScopeParser {
      *
      *  convert to an attribute scope.
      */
-	public static AttributeDict parseTypedArgList(@Nullable ActionAST action, String s, Grammar g) {
+	public static AttributeDict parseTypedArgList(ActionAST action, String s, Grammar g) {
 		return parse(action, s, ',', g);
 	}
 
-    public static AttributeDict parse(@Nullable ActionAST action, String s, char separator, Grammar g) {
+    public static AttributeDict parse(ActionAST action, String s, char separator, Grammar g) {
         AttributeDict dict = new AttributeDict();
 		List<Pair<String, Integer>> decls = splitDecls(s, separator);
 		for (Pair<String, Integer> decl : decls) {
@@ -85,7 +85,7 @@ public class ScopeParser {
      *  but if the separator is ',' you cannot use ',' in the initvalue
      *  unless you escape use "\," escape.
      */
-    public static Attribute parseAttributeDef(@Nullable ActionAST action, @NotNull Pair<String, Integer> decl, Grammar g) {
+    public static Attribute parseAttributeDef(ActionAST action, Pair<String, Integer> decl, Grammar g) {
         if ( decl.a==null ) return null;
         Attribute attr = new Attribute();
         boolean inID = false;

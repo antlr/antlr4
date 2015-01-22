@@ -34,7 +34,6 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.TokenStream;
-import org.antlr.v4.runtime.misc.NotNull;
 
 /**
  * This class represents profiling event information for semantic predicate
@@ -84,8 +83,8 @@ public class PredicateEvalInfo extends DecisionEventInfo {
 	 * @see SemanticContext#eval(Recognizer, RuleContext)
 	 */
 	public PredicateEvalInfo(int decision,
-							 @NotNull TokenStream input, int startIndex, int stopIndex,
-							 @NotNull SemanticContext semctx,
+							 TokenStream input, int startIndex, int stopIndex,
+							 SemanticContext semctx,
 							 boolean evalResult,
 							 int predictedAlt,
 							 boolean fullCtx)

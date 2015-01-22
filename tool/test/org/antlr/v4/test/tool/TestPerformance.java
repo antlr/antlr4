@@ -58,7 +58,6 @@ import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.dfa.DFAState;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.misc.Utils;
 import org.antlr.v4.runtime.tree.ErrorNode;
@@ -1168,7 +1167,7 @@ public class TestPerformance extends BaseTest {
             parserCtor.newInstance(new CommonTokenStream(tokenSource));
 
             return new ParserFactory() {
-				
+
 				@Override
                 public FileParseResult parseFile(CharStream input, int currentPass, int thread) {
 					final Checksum checksum = new CRC32();
@@ -1402,7 +1401,7 @@ public class TestPerformance extends BaseTest {
 		public final long[] parserComputedTransitions;
 		public final long[] parserFullContextTransitions;
 
-		public FileParseResult(String sourceName, int checksum, @Nullable ParseTree parseTree, int tokenCount, long startTime, Lexer lexer, Parser parser) {
+		public FileParseResult(String sourceName, int checksum, ParseTree parseTree, int tokenCount, long startTime, Lexer lexer, Parser parser) {
 			this.sourceName = sourceName;
 			this.checksum = checksum;
 			this.parseTree = parseTree;
@@ -1890,14 +1889,14 @@ public class TestPerformance extends BaseTest {
 		private final String source;
 		private Reference<CloneableANTLRFileStream> inputStream;
 
-		public InputDescriptor(@NotNull String source) {
+		public InputDescriptor(String source) {
 			this.source = source;
 			if (PRELOAD_SOURCES) {
 				getInputStream();
 			}
 		}
 
-		@NotNull
+
 		public synchronized CharStream getInputStream() {
 			CloneableANTLRFileStream stream = inputStream != null ? inputStream.get() : null;
 			if (stream == null) {

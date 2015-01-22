@@ -34,7 +34,6 @@ import org.antlr.v4.runtime.misc.AbstractEqualityComparator;
 import org.antlr.v4.runtime.misc.Array2DHashSet;
 import org.antlr.v4.runtime.misc.DoubleKeyMap;
 import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.misc.Nullable;
 
 import java.util.ArrayList;
 import java.util.BitSet;
@@ -154,8 +153,8 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	 * {@link #hasSemanticContext} when necessary.</p>
 	 */
 	public boolean add(
-		@NotNull ATNConfig config,
-		@Nullable DoubleKeyMap<PredictionContext,PredictionContext,PredictionContext> mergeCache)
+		ATNConfig config,
+		DoubleKeyMap<PredictionContext,PredictionContext,PredictionContext> mergeCache)
 	{
 		if ( readonly ) throw new IllegalStateException("This set is readonly");
 		if ( config.semanticContext!=SemanticContext.NONE ) {
@@ -208,7 +207,7 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	 *
 	 * @since 4.3
 	 */
-	@NotNull
+
 	public BitSet getAlts() {
 		BitSet alts = new BitSet();
 		for (ATNConfig config : configs) {

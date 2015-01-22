@@ -57,7 +57,7 @@ public class ATNDeserializationOptions {
 		this.generateRuleBypassTransitions = options.generateRuleBypassTransitions;
 	}
 
-	@NotNull
+
 	public static ATNDeserializationOptions getDefaultOptions() {
 		return defaultOptions;
 	}

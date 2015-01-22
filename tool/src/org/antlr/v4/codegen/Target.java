@@ -100,7 +100,7 @@ public abstract class Target {
 	 */
 	public abstract String getVersion();
 
-	@Nullable
+
 	public STGroup getTemplates() {
 		if (templates == null) {
 			String version = getVersion();
@@ -461,7 +461,7 @@ public abstract class Target {
 		return result!=null;
 	}
 
-	@Nullable
+
 	protected STGroup loadTemplates() {
 		String groupFileName = CodeGenerator.TEMPLATE_ROOT + "/" + getLanguage() + "/" + getLanguage() + STGroup.GROUP_FILE_EXTENSION;
 		STGroup result = null;

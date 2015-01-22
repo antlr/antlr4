@@ -30,7 +30,7 @@
 
 package org.antlr.v4.runtime.tree.gui;
 
-import java.awt.Font;
+import java.awt.*;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;

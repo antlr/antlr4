@@ -48,7 +48,6 @@ public interface LexerAction {
 	 *
 	 * @return The serialization type of the lexer action.
 	 */
-	@NotNull
 	LexerActionType getActionType();
 
 	/**
@@ -75,5 +74,5 @@ public interface LexerAction {
 	 *
 	 * @param lexer The lexer instance.
 	 */
-	void execute(@NotNull Lexer lexer);
+	void execute(Lexer lexer);
 }

@@ -78,7 +78,7 @@ public class ParserInterpreter extends Parser {
 	@Deprecated
 	protected final String[] tokenNames;
 	protected final String[] ruleNames;
-	@NotNull
+
 	private final Vocabulary vocabulary;
 
 	protected final Deque<Pair<ParserRuleContext, Integer>> _parentContextStack = new ArrayDeque<Pair<ParserRuleContext, Integer>>();
@@ -92,7 +92,7 @@ public class ParserInterpreter extends Parser {
 		this(grammarFileName, VocabularyImpl.fromTokenNames(tokenNames.toArray(new String[tokenNames.size()])), ruleNames, atn, input);
 	}
 
-	public ParserInterpreter(String grammarFileName, @NotNull Vocabulary vocabulary,
+	public ParserInterpreter(String grammarFileName, Vocabulary vocabulary,
 							 Collection<String> ruleNames, ATN atn, TokenStream input)
 	{
 		super(input);

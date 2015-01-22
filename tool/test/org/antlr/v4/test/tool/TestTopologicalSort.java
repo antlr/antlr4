@@ -34,7 +34,7 @@ import org.junit.Test;
 
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /** Test topo sort in GraphNode. */
 public class TestTopologicalSort extends BaseTest {

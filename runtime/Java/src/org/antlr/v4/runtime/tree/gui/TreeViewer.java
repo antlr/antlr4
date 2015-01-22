@@ -37,7 +37,6 @@ import org.abego.treelayout.util.DefaultConfiguration;
 import org.antlr.v4.runtime.misc.GraphicsSupport;
 import org.antlr.v4.runtime.misc.JFileChooserConfirmOverwrite;
 import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.misc.Utils;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.Tree;
@@ -45,21 +44,7 @@ import org.antlr.v4.runtime.tree.Trees;
 
 import javax.imageio.ImageIO;
 import javax.print.PrintException;
-import javax.swing.BorderFactory;
-import javax.swing.Icon;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSlider;
-import javax.swing.JSplitPane;
-import javax.swing.JTree;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
+import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.TreeSelectionEvent;
@@ -68,19 +53,7 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
-import java.awt.BasicStroke;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Desktop;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.CubicCurve2D;
@@ -102,7 +75,7 @@ public class TreeViewer extends JComponent {
 	public static class DefaultTreeTextProvider implements TreeTextProvider {
 		private final List<String> ruleNames;
 
-		public DefaultTreeTextProvider(@Nullable List<String> ruleNames) {
+		public DefaultTreeTextProvider(List<String> ruleNames) {
 			this.ruleNames = ruleNames;
 		}
 
@@ -158,7 +131,7 @@ public class TreeViewer extends JComponent {
 	protected Color borderColor = null;
 	protected Color textColor = Color.black;
 
-	public TreeViewer(@Nullable List<String> ruleNames, Tree tree) {
+	public TreeViewer(List<String> ruleNames, Tree tree) {
 		setRuleNames(ruleNames);
 		if ( tree!=null ) {
 			setTree(tree);
@@ -295,7 +268,7 @@ public class TreeViewer extends JComponent {
 
 	// ----------------------------------------------------------------------
 
-	@NotNull
+
 	protected static JDialog showInDialog(final TreeViewer viewer) {
 		final JDialog dialog = new JDialog();
 		dialog.setTitle("Parse Tree Inspector");
@@ -513,7 +486,7 @@ public class TreeViewer extends JComponent {
 		return scaledTreeSize;
 	}
 
-	@NotNull
+
 	public Future<JDialog> open() {
 		final TreeViewer viewer = this;
 		viewer.setScale(1.5);

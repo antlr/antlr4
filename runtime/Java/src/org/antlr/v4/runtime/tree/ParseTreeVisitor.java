@@ -30,8 +30,6 @@
 
 package org.antlr.v4.runtime.tree;
 
-import org.antlr.v4.runtime.misc.NotNull;
-
 /**
  * This interface defines the basic notion of a parse tree visitor. Generated
  * visitors implement this interface and the {@code XVisitor} interface for
@@ -48,7 +46,7 @@ public interface ParseTreeVisitor<T> {
 	 * @param tree The {@link ParseTree} to visit.
 	 * @return The result of visiting the parse tree.
 	 */
-	T visit(@NotNull ParseTree tree);
+	T visit(ParseTree tree);
 
 	/**
 	 * Visit the children of a node, and return a user-defined result of the
@@ -57,7 +55,7 @@ public interface ParseTreeVisitor<T> {
 	 * @param node The {@link RuleNode} whose children should be visited.
 	 * @return The result of visiting the children of the node.
 	 */
-	T visitChildren(@NotNull RuleNode node);
+	T visitChildren(RuleNode node);
 
 	/**
 	 * Visit a terminal node, and return a user-defined result of the operation.
@@ -65,7 +63,7 @@ public interface ParseTreeVisitor<T> {
 	 * @param node The {@link TerminalNode} to visit.
 	 * @return The result of visiting the node.
 	 */
-	T visitTerminal(@NotNull TerminalNode node);
+	T visitTerminal(TerminalNode node);
 
 	/**
 	 * Visit an error node, and return a user-defined result of the operation.
@@ -73,6 +71,6 @@ public interface ParseTreeVisitor<T> {
 	 * @param node The {@link ErrorNode} to visit.
 	 * @return The result of visiting the node.
 	 */
-	T visitErrorNode(@NotNull ErrorNode node);
+	T visitErrorNode(ErrorNode node);
 
 }

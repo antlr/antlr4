@@ -35,7 +35,6 @@ import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenStream;
-import org.antlr.v4.runtime.misc.NotNull;
 
 /**
  * This class represents profiling event information for a syntax error
@@ -63,7 +62,7 @@ public class ErrorInfo extends DecisionEventInfo {
 	 * prediction; otherwise, {@code false} if the syntax error was identified
 	 * during SLL prediction
 	 */
-	public ErrorInfo(int decision, @NotNull ATNConfigSet configs, @NotNull TokenStream input,
+	public ErrorInfo(int decision, ATNConfigSet configs, TokenStream input,
 					 int startIndex, int stopIndex, boolean fullCtx)
 	{
 		super(decision, configs, input, startIndex, stopIndex, fullCtx);

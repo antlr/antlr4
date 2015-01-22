@@ -1,14 +1,14 @@
 package org.antlr.v4.test.rt.gen;
 
-import java.io.File;
-
 import org.stringtemplate.v4.STGroup;
+
+import java.io.File;
 
 public class CompositeParserTestMethod extends ParserTestMethod {
 
 	public Grammar[] slaveGrammars;
 	public boolean slaveIsLexer = false;
-	
+
 	public CompositeParserTestMethod(String name, String grammarName,
 			String startRule, String input, String expectedOutput,
 			String expectedErrors, String ... slaves) {
@@ -16,7 +16,7 @@ public class CompositeParserTestMethod extends ParserTestMethod {
 		this.slaveGrammars = new Grammar[slaves.length];
 		for(int i=0;i<slaves.length;i++)
 			this.slaveGrammars[i] = new Grammar(name + "_" + slaves[i], slaves[i]);
-			
+
 	}
 
 	@Override
@@ -25,7 +25,7 @@ public class CompositeParserTestMethod extends ParserTestMethod {
 			slave.load(new File(grammarDir, testFileName));
 		super.loadGrammars(grammarDir, testFileName);
 	}
-	
+
 	@Override
 	public void generateGrammars(STGroup group) {
 		for(Grammar slave : slaveGrammars)

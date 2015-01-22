@@ -30,7 +30,6 @@
 package org.antlr.v4.runtime;
 
 import org.antlr.v4.runtime.misc.Interval;
-import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 import org.antlr.v4.runtime.tree.RuleNode;
@@ -154,18 +153,18 @@ public class RuleContext implements RuleNode {
 	public <T> T accept(ParseTreeVisitor<? extends T> visitor) { return visitor.visitChildren(this); }
 
 	/** Call this method to view a parse tree in a dialog box visually. */
-	public Future<JDialog> inspect(@Nullable Parser parser) {
+	public Future<JDialog> inspect(Parser parser) {
 		List<String> ruleNames = parser != null ? Arrays.asList(parser.getRuleNames()) : null;
 		return inspect(ruleNames);
 	}
 
-	public Future<JDialog> inspect(@Nullable List<String> ruleNames) {
+	public Future<JDialog> inspect(List<String> ruleNames) {
 		TreeViewer viewer = new TreeViewer(ruleNames, this);
 		return viewer.open();
 	}
 
 	/** Save this tree in a postscript file */
-	public void save(@Nullable Parser parser, String fileName)
+	public void save(Parser parser, String fileName)
 		throws IOException, PrintException
 	{
 		List<String> ruleNames = parser != null ? Arrays.asList(parser.getRuleNames()) : null;
@@ -173,7 +172,7 @@ public class RuleContext implements RuleNode {
 	}
 
 	/** Save this tree in a postscript file using a particular font name and size */
-	public void save(@Nullable Parser parser, String fileName,
+	public void save(Parser parser, String fileName,
 					 String fontName, int fontSize)
 		throws IOException
 	{
@@ -182,14 +181,14 @@ public class RuleContext implements RuleNode {
 	}
 
 	/** Save this tree in a postscript file */
-	public void save(@Nullable List<String> ruleNames, String fileName)
+	public void save(List<String> ruleNames, String fileName)
 		throws IOException, PrintException
 	{
 		Trees.writePS(this, ruleNames, fileName);
 	}
 
 	/** Save this tree in a postscript file using a particular font name and size */
-	public void save(@Nullable List<String> ruleNames, String fileName,
+	public void save(List<String> ruleNames, String fileName,
 					 String fontName, int fontSize)
 		throws IOException
 	{
@@ -201,14 +200,14 @@ public class RuleContext implements RuleNode {
 	 *  We have to know the recognizer so we can get rule names.
 	 */
 	@Override
-	public String toStringTree(@Nullable Parser recog) {
+	public String toStringTree(Parser recog) {
 		return Trees.toStringTree(this, recog);
 	}
 
 	/** Print out a whole tree, not just a node, in LISP format
 	 *  (root child1 .. childN). Print just a node if this is a leaf.
 	 */
-	public String toStringTree(@Nullable List<String> ruleNames) {
+	public String toStringTree(List<String> ruleNames) {
 		return Trees.toStringTree(this, ruleNames);
 	}
 
@@ -222,22 +221,22 @@ public class RuleContext implements RuleNode {
 		return toString((List<String>)null, (RuleContext)null);
 	}
 
-	public final String toString(@Nullable Recognizer<?,?> recog) {
+	public final String toString(Recognizer<?,?> recog) {
 		return toString(recog, ParserRuleContext.EMPTY);
 	}
 
-	public final String toString(@Nullable List<String> ruleNames) {
+	public final String toString(List<String> ruleNames) {
 		return toString(ruleNames, null);
 	}
 
 	// recog null unless ParserRuleContext, in which case we use subclass toString(...)
-	public String toString(@Nullable Recognizer<?,?> recog, @Nullable RuleContext stop) {
+	public String toString(Recognizer<?,?> recog, RuleContext stop) {
 		String[] ruleNames = recog != null ? recog.getRuleNames() : null;
 		List<String> ruleNamesList = ruleNames != null ? Arrays.asList(ruleNames) : null;
 		return toString(ruleNamesList, stop);
 	}
 
-	public String toString(@Nullable List<String> ruleNames, @Nullable RuleContext stop) {
+	public String toString(List<String> ruleNames, RuleContext stop) {
 		StringBuilder buf = new StringBuilder();
 		RuleContext p = this;
 		buf.append("[");

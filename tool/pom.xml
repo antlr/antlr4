@@ -1,11 +1,21 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+ 	<groupId>org.antlr</groupId>
     <artifactId>antlr4</artifactId>
+	<version>4.5-SNAPSHOT</version>
 
     <name>ANTLR 4 Tool</name>
     <description>The ANTLR 4 grammar compiler.</description>
 
+ 	<!--
+	    IMPORTANT NOTE 
+	    Building ANTLR is now performed via the bild.py script. 
+		However, we still need a pom to: - manage dependencies during development 
+		- publish metadata to maven central The above are the only reason for keeping 
+		this file. No support will be provided.
+	 -->
+ 
     <developers>
         <developer>
             <name>Terence Parr</name>
@@ -94,7 +104,6 @@
             <groupId>org.antlr</groupId>
             <artifactId>antlr4-runtime</artifactId>
             <version>4.5-SNAPSHOT</version>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.antlr</groupId>
@@ -110,123 +119,5 @@
         </dependency>
     </dependencies>
 
-    <profiles>
-        <profile>
-            <id>sonatype-oss-release</id>
-            <build>
-                <plugins>
-                    <plugin>
-                      <groupId>org.sonatype.plugins</groupId>
-                      <artifactId>nexus-staging-maven-plugin</artifactId>
-                      <version>1.6.3</version>
-                      <extensions>true</extensions>
-                      <configuration>
-                        <serverId>ossrh</serverId>
-                        <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-                        <autoReleaseAfterClose>true</autoReleaseAfterClose>
-                      </configuration>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-javadoc-plugin</artifactId>
-                        <configuration>
-                            <includeDependencySources>true</includeDependencySources>
-                            <dependencySourceIncludes>
-                                <dependencySourceInclude>org.antlr:antlr4-*</dependencySourceInclude>
-                            </dependencySourceIncludes>
-                        </configuration>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-shade-plugin</artifactId>
-                        <version>2.2</version>
-                        <inherited>false</inherited>
-                        <executions>
-                            <execution>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>shade</goal>
-                                </goals>
-                                <configuration>
-                                    <minimizeJar>true</minimizeJar>
-                                    <createDependencyReducedPom>false</createDependencyReducedPom>
-                                    <shadedArtifactAttached>true</shadedArtifactAttached>
-                                    <createSourcesJar>true</createSourcesJar>
-                                    <shadedClassifierName>complete</shadedClassifierName>
-                                    <filters>
-                                        <filter>
-                                            <artifact>org.antlr:antlr4-runtime</artifact>
-                                            <includes>
-                                                <include>org/antlr/v4/runtime/**</include>
-                                            </includes>
-                                        </filter>
-                                        <filter>
-                                            <artifact>org.antlr:antlr4-annotations</artifact>
-                                            <includes>
-                                                <include>org/antlr/v4/runtime/**</include>
-                                            </includes>
-                                        </filter>
-                                    </filters>
-                                    <transformers>
-                                        <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                            <mainClass>org.antlr.v4.Tool</mainClass>
-                                        </transformer>
-                                    </transformers>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
-
-    <build>
-        <sourceDirectory>src</sourceDirectory>
-        <resources>
-            <resource>
-                <directory>resources</directory>
-            </resource>
-        </resources>
-
-        <testSourceDirectory>test</testSourceDirectory>
-        <testResources>
-            <testResource>
-                <directory>test</directory>
-            </testResource>
-        </testResources>
-
-        <plugins>
-
-            <plugin>
-                <groupId>org.antlr</groupId>
-                <artifactId>antlr3-maven-plugin</artifactId>
-                <version>3.5.2</version>
-                <configuration>
-                    <sourceDirectory>src</sourceDirectory>
-                    <verbose>true</verbose>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>antlr</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>test-jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
 
 </project>

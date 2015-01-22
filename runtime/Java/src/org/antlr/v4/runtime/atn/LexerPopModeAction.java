@@ -32,7 +32,6 @@ package org.antlr.v4.runtime.atn;
 
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.misc.MurmurHash;
-import org.antlr.v4.runtime.misc.NotNull;
 
 /**
  * Implements the {@code popMode} lexer action by calling {@link Lexer#popMode}.
@@ -79,7 +78,7 @@ public final class LexerPopModeAction implements LexerAction {
 	 * <p>This action is implemented by calling {@link Lexer#popMode}.</p>
 	 */
 	@Override
-	public void execute(@NotNull Lexer lexer) {
+	public void execute(Lexer lexer) {
 		lexer.popMode();
 	}
 

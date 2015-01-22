@@ -38,9 +38,9 @@ import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LexerGrammar;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
-
 import java.util.Arrays;
+
+import static org.junit.Assert.assertEquals;
 
 public class TestATNDeserialization extends BaseTest {
 	@Test public void testSimpleNoBlock() throws Exception {

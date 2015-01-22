@@ -51,11 +51,13 @@ public class DecisionInfo {
 	 * The decision number, which is an index into {@link ATN#decisionToState}.
 	 */
 	public final int decision;
+
 	/**
 	 * The total number of times {@link ParserATNSimulator#adaptivePredict} was
 	 * invoked for this decision.
 	 */
 	public long invocations;
+
 	/**
 	 * The total time spent in {@link ParserATNSimulator#adaptivePredict} for
 	 * this decision, in nanoseconds.
@@ -79,18 +81,21 @@ public class DecisionInfo {
 	 * {@link PredictionMode#LL_EXACT_AMBIG_DETECTION} is used.
 	 */
 	public long SLL_TotalLook;
+
 	/**
 	 * Gets the minimum lookahead required for any single SLL prediction to
 	 * complete for this decision, by reaching a unique prediction, reaching an
 	 * SLL conflict state, or encountering a syntax error.
 	 */
 	public long SLL_MinLook;
+
 	/**
 	 * Gets the maximum lookahead required for any single SLL prediction to
 	 * complete for this decision, by reaching a unique prediction, reaching an
 	 * SLL conflict state, or encountering a syntax error.
 	 */
 	public long SLL_MaxLook;
+
 	/**
 	 * Gets the {@link LookaheadEventInfo} associated with the event where the
 	 * {@link #SLL_MaxLook} value was set.
@@ -103,6 +108,7 @@ public class DecisionInfo {
 	 * conflict state.
 	 */
 	public long LL_TotalLook;
+
 	/**
 	 * Gets the minimum lookahead required for any single LL prediction to
 	 * complete for this decision. An LL prediction completes when the algorithm
@@ -111,6 +117,7 @@ public class DecisionInfo {
 	 * {@link PredictionMode#LL_EXACT_AMBIG_DETECTION}, or a syntax error.
 	 */
 	public long LL_MinLook;
+
 	/**
 	 * Gets the maximum lookahead required for any single LL prediction to
 	 * complete for this decision. An LL prediction completes when the algorithm
@@ -119,6 +126,7 @@ public class DecisionInfo {
 	 * {@link PredictionMode#LL_EXACT_AMBIG_DETECTION}, or a syntax error.
 	 */
 	public long LL_MaxLook;
+
 	/**
 	 * Gets the {@link LookaheadEventInfo} associated with the event where the
 	 * {@link #LL_MaxLook} value was set.
@@ -132,6 +140,7 @@ public class DecisionInfo {
 	 * @see ContextSensitivityInfo
 	 */
 	public final List<ContextSensitivityInfo> contextSensitivities = new ArrayList<ContextSensitivityInfo>();
+
 	/**
 	 * A collection of {@link ErrorInfo} instances describing the parse errors
 	 * identified during calls to {@link ParserATNSimulator#adaptivePredict} for
@@ -140,6 +149,7 @@ public class DecisionInfo {
 	 * @see ErrorInfo
 	 */
 	public final List<ErrorInfo> errors = new ArrayList<ErrorInfo>();
+
 	/**
 	 * A collection of {@link AmbiguityInfo} instances describing the
 	 * ambiguities encountered during LL prediction for this decision.
@@ -174,6 +184,7 @@ public class DecisionInfo {
 	 * @see LexerATNSimulator#computeTargetState
 	 */
 	public long SLL_ATNTransitions;
+
 	/**
 	 * The total number of DFA transitions required during SLL prediction for
 	 * this decision.
@@ -216,6 +227,7 @@ public class DecisionInfo {
 	 * @see LexerATNSimulator#computeTargetState
 	 */
 	public long LL_ATNTransitions;
+	
 	/**
 	 * The total number of DFA transitions required during LL prediction for
 	 * this decision.

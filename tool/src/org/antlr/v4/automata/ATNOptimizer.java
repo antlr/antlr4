@@ -55,7 +55,7 @@ import java.util.List;
  */
 public class ATNOptimizer {
 
-	public static void optimize(@NotNull Grammar g, @NotNull ATN atn) {
+	public static void optimize(Grammar g, ATN atn) {
 		optimizeSets(g, atn);
 		optimizeStates(atn);
 	}

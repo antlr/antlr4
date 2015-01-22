@@ -30,8 +30,6 @@
 
 package org.antlr.v4.runtime.tree;
 
-import org.antlr.v4.runtime.misc.NotNull;
-
 public abstract class AbstractParseTreeVisitor<T> implements ParseTreeVisitor<T> {
 	/**
 	 * {@inheritDoc}
@@ -40,7 +38,7 @@ public abstract class AbstractParseTreeVisitor<T> implements ParseTreeVisitor<T>
 	 * specified tree.</p>
 	 */
 	@Override
-	public T visit(@NotNull ParseTree tree) {
+	public T visit(ParseTree tree) {
 		return tree.accept(this);
 	}
 
@@ -60,7 +58,7 @@ public abstract class AbstractParseTreeVisitor<T> implements ParseTreeVisitor<T>
 	 * method to behave properly in respect to the specific algorithm in use.</p>
 	 */
 	@Override
-	public T visitChildren(@NotNull RuleNode node) {
+	public T visitChildren(RuleNode node) {
 		T result = defaultResult();
 		int n = node.getChildCount();
 		for (int i=0; i<n; i++) {
@@ -83,7 +81,7 @@ public abstract class AbstractParseTreeVisitor<T> implements ParseTreeVisitor<T>
 	 * {@link #defaultResult defaultResult}.</p>
 	 */
 	@Override
-	public T visitTerminal(@NotNull TerminalNode node) {
+	public T visitTerminal(TerminalNode node) {
 		return defaultResult();
 	}
 
@@ -94,7 +92,7 @@ public abstract class AbstractParseTreeVisitor<T> implements ParseTreeVisitor<T>
 	 * {@link #defaultResult defaultResult}.</p>
 	 */
 	@Override
-	public T visitErrorNode(@NotNull ErrorNode node) {
+	public T visitErrorNode(ErrorNode node) {
 		return defaultResult();
 	}
 
@@ -160,7 +158,7 @@ public abstract class AbstractParseTreeVisitor<T> implements ParseTreeVisitor<T>
 	 * {@code false} to stop visiting children and immediately return the
 	 * current aggregate result from {@link #visitChildren}.
 	 */
-	protected boolean shouldVisitNextChild(@NotNull RuleNode node, T currentResult) {
+	protected boolean shouldVisitNextChild(RuleNode node, T currentResult) {
 		return true;
 	}
 

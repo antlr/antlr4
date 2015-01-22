@@ -40,8 +40,6 @@ import org.antlr.v4.runtime.atn.DecisionState;
 import org.antlr.v4.runtime.atn.ParserATNSimulator;
 import org.antlr.v4.runtime.atn.PredictionContextCache;
 import org.antlr.v4.runtime.dfa.DFA;
-import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.tool.Grammar;
 
 public class ParserInterpreterForTesting {
@@ -89,11 +87,11 @@ public class ParserInterpreterForTesting {
 	protected ParserATNSimulator atnSimulator;
 	protected TokenStream input;
 
-	public ParserInterpreterForTesting(@NotNull Grammar g) {
+	public ParserInterpreterForTesting(Grammar g) {
 		this.g = g;
 	}
 
-	public ParserInterpreterForTesting(@NotNull Grammar g, @NotNull TokenStream input) {
+	public ParserInterpreterForTesting(Grammar g, TokenStream input) {
 		Tool antlr = new Tool();
 		antlr.process(g,false);
 		parser = new DummyParser(g, g.atn, input);
@@ -102,14 +100,14 @@ public class ParserInterpreterForTesting {
 										  parser.sharedContextCache);
 	}
 
-	public int adaptivePredict(@NotNull TokenStream input, int decision,
-							   @Nullable ParserRuleContext outerContext)
+	public int adaptivePredict(TokenStream input, int decision,
+							   ParserRuleContext outerContext)
 	{
 		return atnSimulator.adaptivePredict(input, decision, outerContext);
 	}
 
-	public int matchATN(@NotNull TokenStream input,
-						@NotNull ATNState startState)
+	public int matchATN(TokenStream input,
+						ATNState startState)
 	{
 		if (startState.getNumberOfTransitions() == 1) {
 			return 1;

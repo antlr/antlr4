@@ -32,7 +32,6 @@ package org.antlr.v4.runtime.atn;
 
 import org.antlr.v4.runtime.ANTLRErrorListener;
 import org.antlr.v4.runtime.TokenStream;
-import org.antlr.v4.runtime.misc.NotNull;
 
 /**
  * This class represents profiling event information for an ambiguity.
@@ -79,7 +78,7 @@ public class AmbiguityInfo extends DecisionEventInfo {
 	 * prediction; otherwise, {@code false} if the ambiguity was identified
 	 * during SLL prediction
 	 */
-	public AmbiguityInfo(int decision, @NotNull ATNConfigSet configs, @NotNull TokenStream input,
+	public AmbiguityInfo(int decision, ATNConfigSet configs, TokenStream input,
 						 int startIndex, int stopIndex, boolean fullCtx)
 	{
 		super(decision, configs, input, startIndex, stopIndex, fullCtx);
