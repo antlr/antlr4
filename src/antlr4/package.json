@@ -1,6 +1,6 @@
 {
 	"name" : "antlr4",
-	"description" : "JavaScript runtime for ANTRL4",
+	"description" : "JavaScript runtime for ANTLR4",
 	"keywords" : [ "lexer", "parser", "antlr", "grammar"],
-	"version" : "4.5.0"
+	"version" : "4.5"
 }
