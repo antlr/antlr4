@@ -181,7 +181,13 @@ def _mkjar(): # don't wipe out out dir if we know it's done like from all()
 
 def javascript(): # TODO @eric
     # No build to do. Just zip up the sources
-    pass
+    srcpath = uniformpath(JAVASCRIPT_TARGET+"/src")
+    srcfiles = allfiles(srcpath, "*.js") + allfiles(srcpath, "*.json")
+    zipfile = "dist/antlr-javascript-runtime-"+VERSION+".zip"
+    if not isstale(src=newest(srcfiles), trg=zipfile):
+        return
+    zip(zipfile, srcpath)
+    print "Generated " + zipfile
 
 
 def csharp(): # TODO @eric
