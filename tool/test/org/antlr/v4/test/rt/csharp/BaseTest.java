@@ -29,8 +29,33 @@
  */
 package org.antlr.v4.test.rt.csharp;
 
-import static org.junit.Assert.*;
+import org.antlr.v4.Tool;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.TokenSource;
+import org.antlr.v4.runtime.WritableToken;
+import org.antlr.v4.runtime.misc.Utils;
+import org.antlr.v4.test.tool.ErrorQueue;
+import org.antlr.v4.tool.ANTLRMessage;
+import org.antlr.v4.tool.DefaultToolListener;
+import org.antlr.v4.tool.GrammarSemanticsMessage;
+import org.junit.Before;
+import org.junit.rules.TestRule;
+import org.junit.rules.TestWatcher;
+import org.junit.runner.Description;
+import org.stringtemplate.v4.ST;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathFactory;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -47,34 +72,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpression;
-import javax.xml.xpath.XPathFactory;
-
-import org.antlr.v4.Tool;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.TokenSource;
-import org.antlr.v4.runtime.WritableToken;
-import org.antlr.v4.runtime.misc.Nullable;
-import org.antlr.v4.runtime.misc.Utils;
-import org.antlr.v4.test.tool.ErrorQueue;
-import org.antlr.v4.tool.ANTLRMessage;
-import org.antlr.v4.tool.DefaultToolListener;
-import org.antlr.v4.tool.GrammarSemanticsMessage;
-import org.junit.Before;
-import org.junit.rules.TestRule;
-import org.junit.rules.TestWatcher;
-import org.junit.runner.Description;
-import org.stringtemplate.v4.ST;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public abstract class BaseTest {
 	public static final String newline = System.getProperty("line.separator");
@@ -177,7 +177,7 @@ public abstract class BaseTest {
 		return tool;
 	}
 
-	protected String load(String fileName, @Nullable String encoding)
+	protected String load(String fileName, String encoding)
 		throws IOException
 	{
 		if ( fileName==null ) {
@@ -297,7 +297,7 @@ public abstract class BaseTest {
 	}
 
 	Set<String> sourceFiles = new HashSet<String>();
-	
+
 	private void addSourceFiles(String ... files) {
 		for(String file : files)
 			this.sourceFiles.add(file);
@@ -326,7 +326,7 @@ public abstract class BaseTest {
 	/** Return true if all is well */
 	protected boolean rawGenerateRecognizer(String grammarFileName,
 													String grammarStr,
-													@Nullable String parserName,
+													String parserName,
 													String lexerName,
 													String... extraOptions)
 	{
@@ -336,7 +336,7 @@ public abstract class BaseTest {
 	/** Return true if all is well */
 	protected boolean rawGenerateRecognizer(String grammarFileName,
 													String grammarStr,
-													@Nullable String parserName,
+													String parserName,
 													String lexerName,
 													boolean defaultListener,
 													String... extraOptions)
@@ -391,7 +391,7 @@ public abstract class BaseTest {
 		compile();
 		return execTest();
 	}
-	
+
 	public boolean compile() {
 		try {
 			if(!createProject())
@@ -403,11 +403,11 @@ public abstract class BaseTest {
 			return false;
 		}
 	}
-	
+
 	private File getTestProjectFile() {
 		return new File(tmpdir, "Antlr4.Test.mono.csproj");
 	}
-	
+
 	private boolean buildProject() throws Exception {
 		String msbuild = locateMSBuild();
 		String[] args = {
@@ -426,7 +426,7 @@ public abstract class BaseTest {
 		else
 			return locateTool("xbuild");
 	}
-	
+
 	private boolean isWindows() {
 		return System.getProperty("os.name").toLowerCase().contains("windows");
 	}
@@ -501,7 +501,7 @@ public abstract class BaseTest {
 	public String execTest() {
 		try {
 			String exec = locateExec();
-			String[] args = isWindows() ? 
+			String[] args = isWindows() ?
 					new String[] { exec, new File(tmpdir, "input").getAbsolutePath() } :
 					new String[] { "mono", exec, new File(tmpdir, "input").getAbsolutePath() };
 			ProcessBuilder pb = new ProcessBuilder(args);
@@ -818,17 +818,17 @@ public abstract class BaseTest {
 		}
 		return dup;
 	}
-	
+
 	protected static void assertEquals(String msg, int a, int b) {
 		org.junit.Assert.assertEquals(msg, a, b);
 	}
-	
+
 	protected static void assertEquals(String a, String b) {
 		a = absorbExpectedDifferences(a);
 		b = absorbActualDifferences(b);
 		org.junit.Assert.assertEquals(a, b);
 	}
-	
+
 	protected static void assertNull(String a) {
 		a = absorbActualDifferences(a);
 		org.junit.Assert.assertNull(a);
@@ -846,7 +846,7 @@ public abstract class BaseTest {
 			a = null;
 		return a;
 	}
-	
+
 	private static String absorbActualDifferences(String a) {
 		if(a==null)
 			return a;
