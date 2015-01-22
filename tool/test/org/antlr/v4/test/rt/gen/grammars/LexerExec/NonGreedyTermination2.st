@@ -1,2 +1,0 @@
-lexer grammar <grammarName>;
-STRING : '"' ('""' | .)+? '"';

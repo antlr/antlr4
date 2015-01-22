@@ -29,9 +29,9 @@ public void test<test.name>() throws Exception {
 	String slave_<grammar> =<writeStringLiteral(test.SlaveGrammars.(grammar))>;
 	writeFile(tmpdir, "<grammar>.g4", slave_<grammar>);
 	}; separator="\n">
-
 <test.Grammar:{grammar |
-	String grammar = <writeStringLiteral(test.Grammar.(grammar))>;
+	<buildStringLiteral(test.Grammar.(grammar), "grammar")>
+
 <if(test.AfterGrammar)>
 	<test.AfterGrammar>
 <endif>
@@ -53,6 +53,12 @@ CompositeLexerTestMethod(test) ::= <<
 >>
 
 writeBoolean(o) ::= "<if(o && !isEmpty.(o))>true<else>false<endif>"
+
+buildStringLiteral(text, variable) ::= <<
+StringBuilder <variable>Builder = new StringBuilder(<strlen.(text)>);
+<lines.(text):{line|<variable>Builder.append("<escape.(line)>");}; separator="\n">
+String <variable> = <variable>Builder.toString();
+>>
 
 writeStringLiteral(text) ::= <%
 <if(isEmpty.(text))>
@@ -85,9 +91,9 @@ public void test<test.name>() throws Exception {
 	writeFile(tmpdir, "<grammar.grammarName>.g4", slave_<grammar.grammarName>);
 	<endif>
 	};separator="\n", wrap, anchor>!>
-
 <test.Grammar:{grammar |
-	String grammar = <writeStringLiteral(test.Grammar.(grammar))>;
+	<buildStringLiteral(test.Grammar.(grammar), "grammar")>
+
 <if(test.AfterGrammar)>
 	<test.AfterGrammar>
 <endif>

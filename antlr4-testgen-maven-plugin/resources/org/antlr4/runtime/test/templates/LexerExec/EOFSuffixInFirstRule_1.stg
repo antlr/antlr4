@@ -1,0 +1,15 @@
+import "EOFSuffixInFirstRule.stg"
+
+TestType() ::= "Lexer"
+
+Grammar ::= [
+	"L": {<grammar("L")>}
+]
+
+Input() ::= ""
+
+Output() ::= <<
+[@0,0:-1='\<EOF>',\<-1>,1:0]<\n>
+>>
+
+Errors() ::= ""

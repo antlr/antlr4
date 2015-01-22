@@ -77,6 +77,7 @@ public class Antlr4TestGeneratorMojo extends AbstractMojo {
 		targetGroup.registerModelAdaptor(STGroup.class, new STGroupModelAdaptor());
 		targetGroup.defineDictionary("escape", new JavaEscapeStringMap());
 		targetGroup.defineDictionary("lines", new LinesStringMap());
+		targetGroup.defineDictionary("strlen", new StrlenStringMap());
 
 		String rootFolder = "org/antlr4/runtime/test/templates";
 		STGroup index = new STGroupFile(rootFolder + "/Index.stg");
