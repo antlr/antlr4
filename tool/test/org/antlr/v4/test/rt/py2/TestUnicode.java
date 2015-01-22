@@ -2,7 +2,7 @@ package org.antlr.v4.test.rt.py2;
 
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class TestUnicode extends BasePython2Test {
 
