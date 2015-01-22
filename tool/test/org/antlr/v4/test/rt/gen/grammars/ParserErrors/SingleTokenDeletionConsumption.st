@@ -1,3 +1,3 @@
 grammar <grammarName>;
-set: ('b'|'c') ;
-a: 'a' set 'd' {System.out.println($set.stop);} ;
+myset: ('b'|'c') ;
+a: 'a' myset 'd' {<writeln("$myset.stop")>} ;

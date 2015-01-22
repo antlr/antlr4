@@ -153,8 +153,11 @@ def mkjar_runtime():
     print "Made jar OSGi-ready " + jarfile
 
 
-def mkjar():
+def mkjar(): # if called as root target
     rmdir("out")
+    _mkjar()
+
+def _mkjar(): # don't wipe out out dir if we know it's done like from all()
     mkjar_complete()
     # put it in JARCARCHE too so bild can find it during antlr4()
     copyfile(src="dist/antlr4-" + VERSION + "-complete.jar", trg=JARCACHE+"/antlr-"+VERSION+"-complete.jar") # note mvn wants antlr4-ver-... but I want antlr-ver-...
@@ -174,31 +177,65 @@ def mkjar():
     mkjar_runtime()   # now build the runtime jar
 
 
-def tests():
-    require(mkjar)
+def regen_tests():
+    require(_mkjar)
     junit_jar, hamcrest_jar = load_junitjars()
     cp = uniformpath("dist/antlr4-" + VERSION + "-complete.jar") \
-         + os.pathsep + uniformpath("out/test/Java") \
+         + os.pathsep + uniformpath("out/test") \
          + os.pathsep + junit_jar \
          + os.pathsep + hamcrest_jar
+    args = ["-nowarn", "-Xlint", "-Xlint:-serial", "-g"]
+    javac("tool/test", "out/test", version="1.6", cp=cp, args=args)  # all targets can use org.antlr.v4.test.*
+    java(classname="org.antlr.v4.test.rt.gen.Generator", cp="out/test:dist/antlr4-4.5-complete.jar")
+    print "test generation complete"
+    log("test generation complete")
+
+def tests():
+    require(regen_tests)
+    for t in TARGETS:
+        test_target(t)
+
+
+def test_java():
+    test_target("Java")
+
+
+def test_python2():
+    test_target("Python2")
+
+
+def test_python3():
+    test_target("Python3")
+
+
+def test_csharp():
+    test_target("CSharp")
+
+
+def test_javascript():
+    test_target("JavaScript")
+
+
+def test_target(t):
+    require(regen_tests)
+    cp = uniformpath("dist/antlr4-" + VERSION + "-complete.jar") \
+         + os.pathsep + uniformpath("out/test")
     juprops = ["-D%s=%s" % (p, test_properties[p]) for p in test_properties]
     args = ["-nowarn", "-Xlint", "-Xlint:-serial", "-g"]
-    # don't compile generator
-    skip = [ uniformpath(TARGETS['Java'] + "/tool/test/org/antlr/v4/test/rt/gen/") ]
-    javac("tool/test", "out/test/Java", version="1.6", cp=cp, args=args, skip=skip)  # all targets can use org.antlr.v4.test.*
-    for t in TARGETS:
-        print "Testing %s ..." % t
-        try:
-            test(t, cp, juprops, args)
-            print t + " tests complete"
-        except:
-            print t + " tests failed"
+    print "Testing %s ..." % t
+    try:
+        test(t, cp, juprops, args)
+        print t + " tests complete"
+    except:
+        print t + " tests failed"
 
 def test(t, cp, juprops, args):
+    junit_jar, hamcrest_jar = load_junitjars()
     srcdir = uniformpath(TARGETS[t] + "/tool/test")
     dstdir = uniformpath( "out/test/" + t)
     # Prefix CLASSPATH with individual target tests
     thiscp = dstdir + os.pathsep + cp
+    thisjarwithjunit = thiscp + os.pathsep + hamcrest_jar + os.pathsep + junit_jar
     skip = []
     if t=='Java':
         # don't test generator
@@ -207,13 +244,13 @@ def test(t, cp, juprops, args):
         # need BaseTest located in Py3 target
         base = uniformpath(TARGETS['Python3'] + "/tool/test")
         skip = [ "/org/antlr/v4/test/rt/py3/" ]
-        javac(base, "out/test/" + t, version="1.6", cp=thiscp, args=args, skip=skip)
+        javac(base, "out/test/" + t, version="1.6", cp=thisjarwithjunit, args=args, skip=skip)
         skip = []
     elif t=='JavaScript':
         # don't test browsers automatically, this is overkilling and unreliable
         browsers = ["safari","chrome","firefox","explorer"]
-        skip = [ uniformpath(srcdir + "/org/antlr/v4/test/rt/js/" + b) for b in  browsers ]
-    javac(srcdir, "out/test/" + t, version="1.6", cp=thiscp, args=args, skip=skip)
+        skip = [ uniformpath(srcdir + "/org/antlr/v4/test/rt/js/" + b) for b in browsers ]
+    javac(srcdir, trgdir="out/test/" + t, version="1.6", cp=thisjarwithjunit, args=args, skip=skip)
     # copy resource files required for testing
     files = allfiles(srcdir)
     for src in files:
@@ -225,7 +262,7 @@ def test(t, cp, juprops, args):
     junit("out/test/" + t, cp=thiscp, verbose=False, args=juprops)
 
 def install():
-    require(mkjar)
+    require(_mkjar)
     require(mksrc)
     require(mkdoc)
     mvn_install("dist/antlr4-" + VERSION + "-complete.jar",
@@ -243,7 +280,7 @@ def install():
 
 
 def deploy():
-    require(mkjar)
+    require(_mkjar)
     require(mksrc)
     require(mkdoc)
     binjar = uniformpath("dist/antlr4-%s-complete.jar" % VERSION)
@@ -339,7 +376,7 @@ def mkdoc():
 
 def all():
     clean(True)
-    mkjar()
+    _mkjar()
     tests()
     mkdoc()
     mksrc()
