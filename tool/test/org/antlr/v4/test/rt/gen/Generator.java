@@ -158,7 +158,6 @@ public class Generator {
 		list.add(buildListeners());
 		list.add(buildParserErrors());
 		list.add(buildParserExec());
-		list.add(buildParseTrees());
 		list.add(buildSemPredEvalLexer());
 		list.add(buildSemPredEvalParser());
 		return list;
@@ -434,43 +433,6 @@ public class Generator {
 				"[@2,9:9='a',<2>,1:9]\n" +
 				"[@3,10:9='<EOF>',<-1>,1:10]\n",
 				null);
-		return file;
-	}
-
-	private JUnitTestFile buildParseTrees() throws Exception {
-		JUnitTestFile file = new JUnitTestFile("ParseTrees");
-		file.addParserTest(input, "TokenAndRuleContextString", "T", "s",
-				"x",
-				"[a, s]\n(a x)\n",
-				null);
-		file.addParserTest(input, "Token2", "T", "s",
-				"xy",
-				"(a x y)\n",
-				null);
-		file.addParserTest(input, "2Alts", "T", "s",
-				"y",
-				"(a y)\n",
-				null);
-		file.addParserTest(input, "2AltLoop", "T", "s",
-				"xyyxyxz",
-				"(a x y y x y x z)\n",
-				null);
-		file.addParserTest(input, "RuleRef", "T", "s",
-				"yx",
-				"(a (b y) x)\n",
-				null);
-		file.addParserTest(input, "ExtraToken", "T", "s",
-				"xzy",
-				"(a x z y)\n", // ERRORs not shown. z is colored red in tree view
-				"line 1:1 extraneous input 'z' expecting 'y'\n");
-		file.addParserTest(input, "NoViableAlt", "T", "s",
-				"z",
-				"(a z)\n",
-				"line 1:0 mismatched input 'z' expecting {'x', 'y'}\n");
-		file.addParserTest(input, "Sync", "T", "s",
-				"xzyy!",
-				"(a x z y y !)\n",
-				"line 1:1 extraneous input 'z' expecting {'y', '!'}\n");
 		return file;
 	}
 

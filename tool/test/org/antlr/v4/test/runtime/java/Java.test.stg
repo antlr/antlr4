@@ -74,6 +74,8 @@ writeLines(textLines) ::= <%
 ParserTestMethod(test) ::= <<
 @Test
 public void test<test.name>() throws Exception {
+	mkdir(tmpdir);
+
 <!<test.slaveGrammars:{ grammar | 
 	String slave_<grammar.grammarName> = <grammar.lines:{ line | "<line>};separator="\\n\" +\n", wrap, anchor>";
 	<if(test.slaveIsLexer)>
@@ -84,19 +86,20 @@ public void test<test.name>() throws Exception {
 	<endif>
 	};separator="\n", wrap, anchor>!>
 
-	mkdir(tmpdir);
-	<test.Grammars: {grammarFileName | writeFile("<grammarFileName>", <string(test.Grammars.(grammarFileName))>);}; separator="\n", anchor>
-	writeFile(tmpdir, "<test.Grammars.keys>"
-
-	String grammar = <test.grammar.lines:{ line | "<line>};separator="\\n\" +\n", wrap, anchor>";
-	<test.afterGrammar>
-	String found = execParser("<test.grammar.grammarName>.g4", grammar, "<test.grammar.grammarName><if(!test.slaveIsLexer)>Parser<endif>", "<if(test.slaveIsLexer)><first(test.slaveGrammars).grammarName><else><test.grammar.grammarName>Lexer<endif>", "<test.startRule>", "<test.input>", <test.debug>);
-	assertEquals("<test.expectedOutput>", found);
-	<if(isEmpty.(test.Errors))>
-	assertEquals("<test.expectedErrors>", this.stderrDuringParse);
+<test.Grammar:{grammar |
+	String grammar = <writeStringLiteral(test.Grammar.(grammar))>;
+<if(test.AfterGrammar)>
+	<test.AfterGrammar>
+<endif>
+	String input =<writeStringLiteral(test.Input)>;
+	String found = execParser("<grammar>.g4", grammar, "<grammar>Parser", "<grammar>Lexer", "<test.Rule>", input, <writeBoolean(test.Debug)>);
+	assertEquals(<writeStringLiteral(test.Output)>, found);
+	<if(!isEmpty.(test.Errors))>
+	assertEquals(<writeStringLiteral(test.Errors)>, this.stderrDuringParse);
 	<else>
 	assertNull(this.stderrDuringParse);
 	<endif>
+	}>
 }
 
 >>
