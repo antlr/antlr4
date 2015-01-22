@@ -1,8 +1,11 @@
 TestType() ::= "CompositeLexer"
 
-Grammars ::= [
-	"M.g4": {<masterGrammar("M", "S")>},
-	"S.g4": {<slaveGrammar("S")>}
+Grammar ::= [
+	"M": {<masterGrammar("M", "S")>}
+]
+
+SlaveGrammars ::= [
+	"S": {<slaveGrammar("S")>}
 ]
 
 Input() ::= "abc"

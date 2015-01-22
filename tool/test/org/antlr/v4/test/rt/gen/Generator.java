@@ -150,7 +150,6 @@ public class Generator {
 
 	private Collection<JUnitTestFile> buildTests() throws Exception {
 		List<JUnitTestFile> list = new ArrayList<JUnitTestFile>();
-		list.add(buildCompositeLexers());
 		list.add(buildCompositeParsers());
 		list.add(buildFullContextParsing());
 		list.add(buildLeftRecursion());
@@ -977,21 +976,6 @@ public class Generator {
 					"line 1:3 reportAttemptingFullContext d=1 (expr), input='*'\n" +
 					"line 1:5 reportAmbiguity d=1 (expr): ambigAlts={1, 2}, input='*c'\n");
 		tm.debug = true;
-		return file;
-	}
-
-	private JUnitTestFile buildCompositeLexers() throws Exception {
-		JUnitTestFile file = new JUnitTestFile("CompositeLexers");
-		file.addCompositeLexerTest(input, "LexerDelegatorInvokesDelegateRule", "M", "abc",
-				"S.A\n" +
-				"[@0,0:0='a',<3>,1:0]\n" +
-				"[@1,1:1='b',<1>,1:1]\n" +
-				"[@2,2:2='c',<4>,1:2]\n" +
-				"[@3,3:2='<EOF>',<-1>,1:3]\n", null, "S");
-		file.addCompositeLexerTest(input, "LexerDelegatorRuleOverridesDelegate", "M", "ab",
-				"M.A\n" +
-				"[@0,0:1='ab',<1>,1:0]\n" +
-				"[@1,2:1='<EOF>',<-1>,1:2]\n", null, "S");
 		return file;
 	}
 

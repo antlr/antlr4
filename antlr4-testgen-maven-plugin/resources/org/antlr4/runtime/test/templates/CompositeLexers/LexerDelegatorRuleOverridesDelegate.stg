@@ -1,18 +1,19 @@
 TestType() ::= "CompositeLexer"
 
-Grammars ::= [
-	"M.g4": {<masterGrammar("M", "S")>},
-	"S.g4": {<slaveGrammar("S")>}
+Grammar ::= [
+	"M": {<masterGrammar("M", "S")>}
 ]
 
-Input() ::= "abc"
+SlaveGrammars ::= [
+	"S": {<slaveGrammar("S")>}
+]
+
+Input() ::= "ab"
 
 Output() ::= <<
-S.A
-[@0,0:0='a',\<3>,1:0]
-[@1,1:1='b',\<1>,1:1]
-[@2,2:2='c',\<4>,1:2]
-[@3,3:2='\<EOF>',\<-1>,1:3]<\n>
+M.A
+[@0,0:1='ab',\<1>,1:0]
+[@1,2:1='\<EOF>',\<-1>,1:2]<\n>
 >>
 
 Errors() ::= ""

@@ -1,7 +1,9 @@
 TestFile(file) ::= <<
-package org.antlr.v4.test.rt.java;
+package org.antlr4.runtime.test;
 
+import org.antlr.v4.test.rt.java.BaseTest;
 import org.junit.Test;
+
 import static org.junit.Assert.*;
 
 <if(file.importErrorQueue)>
@@ -15,28 +17,33 @@ public class Test<file.name> extends BaseTest {
 
 	<file.tests:{test | <test>}; separator="\n", wrap, anchor>
 
-}
+}<\n>
 >>
 
 LexerTestMethod(test) ::= <<
 @Test
 public void test<test.name>() throws Exception {
-<test.slaveGrammars:{ grammar | 
-	String slave_<grammar.grammarName> = <grammar.lines:{ line | "<line>};separator="\\n\" +\n", wrap, anchor>";
 	mkdir(tmpdir);
-	writeFile(tmpdir, "<grammar.grammarName>.g4", slave_<grammar.grammarName>);
-	};separator="\n", wrap, anchor>
-	StringBuilder sb = new StringBuilder();
-	<test.grammar.lines:{ line | sb.append("<line>\\n");};separator="\n", wrap, anchor>
-	String grammar = sb.toString();
-	<test.afterGrammar>
-	String found = execLexer("<test.grammar.grammarName>.g4", grammar, "<test.grammar.grammarName><if(!test.lexerOnly)>Lexer<endif>", "<test.input>", <test.showDFA>);
-	assertEquals(<test.outputLines:{ line | "<line>\\n"};separator=" + \n", wrap, anchor>, found);
-	<if(test.expectedErrors)>
-	assertEquals("<test.expectedErrors>", this.stderrDuringParse);
+
+<test.SlaveGrammars:{grammar |
+	String slave_<grammar> =<writeStringLiteral(test.SlaveGrammars.(grammar))>;
+	writeFile(tmpdir, "<grammar>.g4", slave_<grammar>);
+	}; separator="\n">
+
+<test.Grammar:{grammar |
+	String grammar = <writeStringLiteral(test.Grammar.(grammar))>;
+<if(test.AfterGrammar)>
+	<test.AfterGrammar>
+<endif>
+	String input =<writeStringLiteral(test.Input)>;
+	String found = execLexer("<grammar>.g4", grammar, "<grammar>", input, <writeBoolean(test.ShowDFA)>);
+	assertEquals(<writeStringLiteral(test.Output)>, found);
+	<if(!isEmpty.(test.Errors))>
+	assertEquals(<writeStringLiteral(test.Errors)>, this.stderrDuringParse);
 	<else>
 	assertNull(this.stderrDuringParse);
 	<endif>
+	}>
 }
 
 >>
@@ -45,6 +52,24 @@ CompositeLexerTestMethod(test) ::= <<
 <LexerTestMethod(test)>
 >>
 
+writeBoolean(o) ::= "<if(o && !isEmpty.(o))>true<else>false<endif>"
+
+writeStringLiteral(text) ::= <%
+<if(isEmpty.(text))>
+""
+<else>
+<writeLines(lines.(text))>
+<endif>
+%>
+
+writeLines(textLines) ::= <%
+<if(rest(textLines))>
+<textLines:{line|
+<\n>		"<escape.(line)>}; separator="\" +">"
+<else>
+"<escape.(first(textLines))>"
+<endif>
+%>
 
 ParserTestMethod(test) ::= <<
 @Test
@@ -67,7 +92,7 @@ public void test<test.name>() throws Exception {
 	<test.afterGrammar>
 	String found = execParser("<test.grammar.grammarName>.g4", grammar, "<test.grammar.grammarName><if(!test.slaveIsLexer)>Parser<endif>", "<if(test.slaveIsLexer)><first(test.slaveGrammars).grammarName><else><test.grammar.grammarName>Lexer<endif>", "<test.startRule>", "<test.input>", <test.debug>);
 	assertEquals("<test.expectedOutput>", found);
-	<if(test.expectedErrors)>
+	<if(isEmpty.(test.Errors))>
 	assertEquals("<test.expectedErrors>", this.stderrDuringParse);
 	<else>
 	assertNull(this.stderrDuringParse);
@@ -349,5 +374,8 @@ Declare_pred() ::= <<boolean pred(boolean v) {
 
 Invoke_pred(v) ::= <<this.pred(<v>)>>
 
-
+isEmpty ::= [
+	"": true,
+	default: false
+]
 
