@@ -196,8 +196,24 @@ def tests():
         test_target(t)
 
 
+def test_java():
+    test_target("Java")
+
+
 def test_python2():
     test_target("Python2")
+
+
+def test_python3():
+    test_target("Python3")
+
+
+def test_csharp():
+    test_target("CSharp")
+
+
+def test_javascript():
+    test_target("JavaScript")
 
 
 def test_target(t):
@@ -233,7 +249,7 @@ def test(t, cp, juprops, args):
     elif t=='JavaScript':
         # don't test browsers automatically, this is overkilling and unreliable
         browsers = ["safari","chrome","firefox","explorer"]
-        skip = [ uniformpath(srcdir + "/org/antlr/v4/test/rt/js/" + b) for b in  browsers ]
+        skip = [ uniformpath(srcdir + "/org/antlr/v4/test/rt/js/" + b) for b in browsers ]
     javac(srcdir, trgdir="out/test/" + t, version="1.6", cp=thisjarwithjunit, args=args, skip=skip)
     # copy resource files required for testing
     files = allfiles(srcdir)
