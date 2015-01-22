@@ -54,7 +54,6 @@ public interface TokenSource {
 	 * on the characters until you get a good one; errors are not passed through
 	 * to the parser.
 	 */
-	@NotNull
 	public Token nextToken();
 
 	/**
@@ -83,7 +82,6 @@ public interface TokenSource {
 	 * the input, or {@code null} if no input stream is available for the token
 	 * source.
 	 */
-	@Nullable
 	public CharStream getInputStream();
 
 	/**
@@ -91,7 +89,6 @@ public interface TokenSource {
 	 * non-null, non-empty string. If such a name is not known, this method
 	 * returns {@link IntStream#UNKNOWN_SOURCE_NAME}.
 	 */
-	@NotNull
 	public String getSourceName();
 
 	/**
@@ -100,7 +97,7 @@ public interface TokenSource {
 	 *
 	 * @param factory The {@link TokenFactory} to use for creating tokens.
 	 */
-	public void setTokenFactory(@NotNull TokenFactory<?> factory);
+	public void setTokenFactory(TokenFactory<?> factory);
 
 	/**
 	 * Gets the {@link TokenFactory} this token source is currently using for
@@ -108,6 +105,5 @@ public interface TokenSource {
 	 *
 	 * @return The {@link TokenFactory} currently used by this token source.
 	 */
-	@NotNull
 	public TokenFactory<?> getTokenFactory();
 }

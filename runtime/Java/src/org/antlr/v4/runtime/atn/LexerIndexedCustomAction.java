@@ -65,7 +65,7 @@ public final class LexerIndexedCustomAction implements LexerAction {
 	 * @param action The lexer action to execute at a particular offset in the
 	 * input {@link CharStream}.
 	 */
-	public LexerIndexedCustomAction(int offset, @NotNull LexerAction action) {
+	public LexerIndexedCustomAction(int offset, LexerAction action) {
 		this.offset = offset;
 		this.action = action;
 	}
@@ -87,7 +87,6 @@ public final class LexerIndexedCustomAction implements LexerAction {
 	 *
 	 * @return A {@link LexerAction} object which executes the lexer action.
 	 */
-	@NotNull
 	public LexerAction getAction() {
 		return action;
 	}

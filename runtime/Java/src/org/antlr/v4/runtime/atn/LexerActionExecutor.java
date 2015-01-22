@@ -36,7 +36,6 @@ import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.MurmurHash;
 import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.misc.Nullable;
 
 import java.util.Arrays;
 
@@ -52,7 +51,7 @@ import java.util.Arrays;
  * @since 4.2
  */
 public class LexerActionExecutor {
-	@NotNull
+
 	private final LexerAction[] lexerActions;
 	/**
 	 * Caches the result of {@link #hashCode} since the hash code is an element
@@ -64,7 +63,7 @@ public class LexerActionExecutor {
 	 * Constructs an executor for a sequence of {@link LexerAction} actions.
 	 * @param lexerActions The lexer actions to execute.
 	 */
-	public LexerActionExecutor(@NotNull LexerAction[] lexerActions) {
+	public LexerActionExecutor(LexerAction[] lexerActions) {
 		this.lexerActions = lexerActions;
 
 		int hash = MurmurHash.initialize();
@@ -90,8 +89,7 @@ public class LexerActionExecutor {
 	 * @return A {@link LexerActionExecutor} for executing the combine actions
 	 * of {@code lexerActionExecutor} and {@code lexerAction}.
 	 */
-	@NotNull
-	public static LexerActionExecutor append(@Nullable LexerActionExecutor lexerActionExecutor, @NotNull LexerAction lexerAction) {
+	public static LexerActionExecutor append(LexerActionExecutor lexerActionExecutor, LexerAction lexerAction) {
 		if (lexerActionExecutor == null) {
 			return new LexerActionExecutor(new LexerAction[] { lexerAction });
 		}
@@ -153,7 +151,6 @@ public class LexerActionExecutor {
 	 * Gets the lexer actions to be executed by this executor.
 	 * @return The lexer actions to be executed by this executor.
 	 */
-	@NotNull
 	public LexerAction[] getLexerActions() {
 		return lexerActions;
 	}
@@ -177,7 +174,7 @@ public class LexerActionExecutor {
 	 * {@link IntStream#seek} to set the {@code input} position to the beginning
 	 * of the token.
 	 */
-	public void execute(@NotNull Lexer lexer, CharStream input, int startIndex) {
+	public void execute(Lexer lexer, CharStream input, int startIndex) {
 		boolean requiresSeek = false;
 		int stopIndex = input.index();
 		try {

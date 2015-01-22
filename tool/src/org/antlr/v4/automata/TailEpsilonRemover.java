@@ -45,15 +45,15 @@ import org.antlr.v4.runtime.misc.NotNull;
  * @author Terence Parr
  */
 public class TailEpsilonRemover extends ATNVisitor {
-	@NotNull
+
 	private final ATN _atn;
 
-	public TailEpsilonRemover(@NotNull ATN atn) {
+	public TailEpsilonRemover(ATN atn) {
 		this._atn = atn;
 	}
 
 	@Override
-	public void visitState(@NotNull ATNState p) {
+	public void visitState(ATNState p) {
 		if (p.getStateType() == ATNState.BASIC && p.getNumberOfTransitions() == 1) {
 			ATNState q = p.transition(0).target;
 			if (p.transition(0) instanceof RuleTransition) {

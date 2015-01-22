@@ -34,7 +34,6 @@ import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.misc.MurmurHash;
-import org.antlr.v4.runtime.misc.NotNull;
 
 /**
  * Executes a custom lexer action by calling {@link Recognizer#action} with the
@@ -118,7 +117,7 @@ public final class LexerCustomAction implements LexerAction {
 	 * appropriate rule and action indexes.</p>
 	 */
 	@Override
-	public void execute(@NotNull Lexer lexer) {
+	public void execute(Lexer lexer) {
 		lexer.action(null, ruleIndex, actionIndex);
 	}
 

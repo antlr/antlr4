@@ -42,7 +42,7 @@ import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.WritableToken;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class TestCommonTokenStream extends TestBufferedTokenStream {
 

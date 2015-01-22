@@ -44,12 +44,12 @@ public class TokenTagToken extends CommonToken {
 	/**
 	 * This is the backing field for {@link #getTokenName}.
 	 */
-	@NotNull
+
 	private final String tokenName;
 	/**
 	 * This is the backing field for {@link #getLabel}.
 	 */
-	@Nullable
+
 	private final String label;
 
 	/**
@@ -59,7 +59,7 @@ public class TokenTagToken extends CommonToken {
 	 * @param tokenName The token name.
 	 * @param type The token type.
 	 */
-	public TokenTagToken(@NotNull String tokenName, int type) {
+	public TokenTagToken(String tokenName, int type) {
 		this(tokenName, type, null);
 	}
 
@@ -72,7 +72,7 @@ public class TokenTagToken extends CommonToken {
 	 * @param label The label associated with the token tag, or {@code null} if
 	 * the token tag is unlabeled.
 	 */
-	public TokenTagToken(@NotNull String tokenName, int type, @Nullable String label) {
+	public TokenTagToken(String tokenName, int type, String label) {
 		super(type);
 		this.tokenName = tokenName;
 		this.label = label;
@@ -82,7 +82,7 @@ public class TokenTagToken extends CommonToken {
 	 * Gets the token name.
 	 * @return The token name.
 	 */
-	@NotNull
+
 	public final String getTokenName() {
 		return tokenName;
 	}
@@ -93,7 +93,7 @@ public class TokenTagToken extends CommonToken {
 	 * @return The name of the label associated with the rule tag, or
 	 * {@code null} if this is an unlabeled rule tag.
 	 */
-	@Nullable
+
 	public final String getLabel() {
 		return label;
 	}

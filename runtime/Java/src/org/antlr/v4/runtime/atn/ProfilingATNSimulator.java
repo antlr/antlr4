@@ -35,8 +35,6 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.dfa.DFAState;
-import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.misc.Nullable;
 
 import java.util.BitSet;
 
@@ -192,7 +190,7 @@ public class ProfilingATNSimulator extends ParserATNSimulator {
 	}
 
 	@Override
-	protected void reportAttemptingFullContext(@NotNull DFA dfa, @Nullable BitSet conflictingAlts, @NotNull ATNConfigSet configs, int startIndex, int stopIndex) {
+	protected void reportAttemptingFullContext(DFA dfa, BitSet conflictingAlts, ATNConfigSet configs, int startIndex, int stopIndex) {
 		if ( conflictingAlts!=null ) {
 			conflictingAltResolvedBySLL = conflictingAlts.nextSetBit(0);
 		}
@@ -204,7 +202,7 @@ public class ProfilingATNSimulator extends ParserATNSimulator {
 	}
 
 	@Override
-	protected void reportContextSensitivity(@NotNull DFA dfa, int prediction, @NotNull ATNConfigSet configs, int startIndex, int stopIndex) {
+	protected void reportContextSensitivity(DFA dfa, int prediction, ATNConfigSet configs, int startIndex, int stopIndex) {
 		if ( prediction != conflictingAltResolvedBySLL ) {
 			decisions[currentDecision].contextSensitivities.add(
 					new ContextSensitivityInfo(currentDecision, configs, _input, startIndex, stopIndex)
@@ -214,8 +212,8 @@ public class ProfilingATNSimulator extends ParserATNSimulator {
 	}
 
 	@Override
-	protected void reportAmbiguity(@NotNull DFA dfa, DFAState D, int startIndex, int stopIndex, boolean exact,
-								   @Nullable BitSet ambigAlts, @NotNull ATNConfigSet configs)
+	protected void reportAmbiguity(DFA dfa, DFAState D, int startIndex, int stopIndex, boolean exact,
+								   BitSet ambigAlts, ATNConfigSet configs)
 	{
 		int prediction;
 		if ( ambigAlts!=null ) {

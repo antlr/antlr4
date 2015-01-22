@@ -29,9 +29,7 @@
  */
 package org.antlr.v4.runtime.misc;
 
-import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
-
+import javax.swing.*;
 import java.io.File;
 
 /**

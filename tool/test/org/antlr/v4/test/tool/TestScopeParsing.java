@@ -34,7 +34,7 @@ import org.antlr.v4.parse.ScopeParser;
 import org.antlr.v4.tool.Grammar;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class TestScopeParsing extends BaseTest {
     String[] argPairs = {

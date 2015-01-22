@@ -36,11 +36,11 @@ public final class EpsilonTransition extends Transition {
 
 	private final int outermostPrecedenceReturn;
 
-	public EpsilonTransition(@NotNull ATNState target) {
+	public EpsilonTransition(ATNState target) {
 		this(target, -1);
 	}
 
-	public EpsilonTransition(@NotNull ATNState target, int outermostPrecedenceReturn) {
+	public EpsilonTransition(ATNState target, int outermostPrecedenceReturn) {
 		super(target);
 		this.outermostPrecedenceReturn = outermostPrecedenceReturn;
 	}
@@ -71,7 +71,7 @@ public final class EpsilonTransition extends Transition {
 	}
 
 	@Override
-	@NotNull
+
 	public String toString() {
 		return "epsilon";
 	}

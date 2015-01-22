@@ -30,7 +30,6 @@
 package org.antlr.v4.runtime;
 
 import org.antlr.v4.runtime.misc.Interval;
-import org.antlr.v4.runtime.misc.Nullable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -294,7 +293,7 @@ public class TokenStreamRewriter {
 		replace(DEFAULT_PROGRAM_NAME, from, to, text);
 	}
 
-	public void replace(String programName, int from, int to, @Nullable Object text) {
+	public void replace(String programName, int from, int to, Object text) {
 		if ( from > to || from<0 || to<0 || to >= tokens.size() ) {
 			throw new IllegalArgumentException("replace: range invalid: "+from+".."+to+"(size="+tokens.size()+")");
 		}
@@ -304,7 +303,7 @@ public class TokenStreamRewriter {
 		rewrites.add(op);
 	}
 
-	public void replace(String programName, Token from, Token to, @Nullable Object text) {
+	public void replace(String programName, Token from, Token to, Object text) {
 		replace(programName,
 				from.getTokenIndex(),
 				to.getTokenIndex(),

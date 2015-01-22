@@ -53,14 +53,14 @@ import java.util.List;
  */
 public abstract class DefaultOutputModelFactory extends BlankOutputModelFactory {
 	// Interface to outside world
-	@NotNull
+
 	public final Grammar g;
-	@NotNull
+
 	public final CodeGenerator gen;
 
 	public OutputModelController controller;
 
-	protected DefaultOutputModelFactory(@NotNull CodeGenerator gen) {
+	protected DefaultOutputModelFactory(CodeGenerator gen) {
 		this.gen = gen;
 		this.g = gen.g;
 	}
@@ -77,7 +77,7 @@ public abstract class DefaultOutputModelFactory extends BlankOutputModelFactory 
 
 	// Convenience methods
 
-	@NotNull
+
 	@Override
 	public Grammar getGrammar() { return g; }
 
@@ -107,17 +107,17 @@ public abstract class DefaultOutputModelFactory extends BlankOutputModelFactory 
 
 	// MISC
 
-	@NotNull
+
 	public static List<SrcOp> list(SrcOp... values) {
 		return new ArrayList<SrcOp>(Arrays.asList(values));
 	}
 
-	@NotNull
+
 	public static List<SrcOp> list(Collection<? extends SrcOp> values) {
 		return new ArrayList<SrcOp>(values);
 	}
 
-	@Nullable
+
 	public Decl getCurrentDeclForName(String name) {
 		if ( getCurrentBlock().locals==null ) return null;
 		for (Decl d : getCurrentBlock().locals.elements()) {

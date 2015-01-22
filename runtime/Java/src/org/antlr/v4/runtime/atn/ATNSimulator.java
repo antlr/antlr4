@@ -59,9 +59,9 @@ public abstract class ATNSimulator {
 	}
 
 	/** Must distinguish between missing edge and edge we know leads nowhere */
-	@NotNull
+
 	public static final DFAState ERROR;
-	@NotNull
+
 	public final ATN atn;
 
 	/** The context cache maps all PredictionContext objects that are equals()
@@ -91,8 +91,8 @@ public abstract class ATNSimulator {
 		ERROR.stateNumber = Integer.MAX_VALUE;
 	}
 
-	public ATNSimulator(@NotNull ATN atn,
-						@NotNull PredictionContextCache sharedContextCache)
+	public ATNSimulator(ATN atn,
+						PredictionContextCache sharedContextCache)
 	{
 		this.atn = atn;
 		this.sharedContextCache = sharedContextCache;
@@ -135,7 +135,7 @@ public abstract class ATNSimulator {
 	 * @deprecated Use {@link ATNDeserializer#deserialize} instead.
 	 */
 	@Deprecated
-	public static ATN deserialize(@NotNull char[] data) {
+	public static ATN deserialize(char[] data) {
 		return new ATNDeserializer().deserialize(data);
 	}
 
@@ -191,8 +191,8 @@ public abstract class ATNSimulator {
 	 * @deprecated Use {@link ATNDeserializer#edgeFactory} instead.
 	 */
 	@Deprecated
-	@NotNull
-	public static Transition edgeFactory(@NotNull ATN atn,
+
+	public static Transition edgeFactory(ATN atn,
 										 int type, int src, int trg,
 										 int arg1, int arg2, int arg3,
 										 List<IntervalSet> sets)
@@ -208,15 +208,4 @@ public abstract class ATNSimulator {
 		return new ATNDeserializer().stateFactory(type, ruleIndex);
 	}
 
-/*
-	public static void dump(DFA dfa, Grammar g) {
-		DOTGenerator dot = new DOTGenerator(g);
-		String output = dot.getDOT(dfa, false);
-		System.out.println(output);
-	}
-
-	public static void dump(DFA dfa) {
-		dump(dfa, null);
-	}
-	 */
 }

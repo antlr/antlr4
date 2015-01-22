@@ -230,7 +230,7 @@ public class SymbolChecks {
 		checkLocalConflictingDeclarations(r, r.locals, r.retvals, ErrorType.LOCAL_CONFLICTS_WITH_RETVAL);
 	}
 
-	protected void checkDeclarationRuleConflicts(@NotNull Rule r, @Nullable AttributeDict attributes, @NotNull Set<String> ruleNames, @NotNull ErrorType errorType) {
+	protected void checkDeclarationRuleConflicts(Rule r, AttributeDict attributes, Set<String> ruleNames, ErrorType errorType) {
 		if (attributes == null) {
 			return;
 		}
@@ -247,7 +247,7 @@ public class SymbolChecks {
 		}
 	}
 
-	protected void checkLocalConflictingDeclarations(@NotNull Rule r, @Nullable AttributeDict attributes, @Nullable AttributeDict referenceAttributes, @NotNull ErrorType errorType) {
+	protected void checkLocalConflictingDeclarations(Rule r, AttributeDict attributes, AttributeDict referenceAttributes, ErrorType errorType) {
 		if (attributes == null || referenceAttributes == null) {
 			return;
 		}
@@ -263,7 +263,7 @@ public class SymbolChecks {
 		}
 	}
 
-	protected void checkReservedNames(@NotNull Collection<Rule> rules) {
+	protected void checkReservedNames(Collection<Rule> rules) {
 		for (Rule rule : rules) {
 			if (reservedNames.contains(rule.name)) {
 				errMgr.grammarError(ErrorType.RESERVED_RULE_NAME, g.fileName, ((GrammarAST)rule.ast.getChild(0)).getToken(), rule.name);

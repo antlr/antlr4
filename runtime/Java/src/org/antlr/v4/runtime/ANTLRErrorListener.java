@@ -35,8 +35,6 @@ import org.antlr.v4.runtime.atn.DecisionInfo;
 import org.antlr.v4.runtime.atn.ParserATNSimulator;
 import org.antlr.v4.runtime.atn.PredictionMode;
 import org.antlr.v4.runtime.dfa.DFA;
-import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.misc.Nullable;
 
 import java.util.BitSet;
 
@@ -75,12 +73,12 @@ public interface ANTLRErrorListener {
 	 *        the parser was able to recover in line without exiting the
 	 *        surrounding rule.
 	 */
-	public void syntaxError(@NotNull Recognizer<?, ?> recognizer,
-							@Nullable Object offendingSymbol,
+	public void syntaxError(Recognizer<?, ?> recognizer,
+							Object offendingSymbol,
 							int line,
 							int charPositionInLine,
-							@NotNull String msg,
-							@Nullable RecognitionException e);
+							String msg,
+							RecognitionException e);
 
 	/**
 	 * This method is called by the parser when a full-context prediction
@@ -122,13 +120,13 @@ public interface ANTLRErrorListener {
 	 * @param configs the ATN configuration set where the ambiguity was
 	 * identified
 	 */
-	void reportAmbiguity(@NotNull Parser recognizer,
-						 @NotNull DFA dfa,
+	void reportAmbiguity(Parser recognizer,
+						 DFA dfa,
 						 int startIndex,
 						 int stopIndex,
 						 boolean exact,
-						 @Nullable BitSet ambigAlts,
-						 @NotNull ATNConfigSet configs);
+						 BitSet ambigAlts,
+						 ATNConfigSet configs);
 
 	/**
 	 * This method is called when an SLL conflict occurs and the parser is about
@@ -153,12 +151,12 @@ public interface ANTLRErrorListener {
 	 * @param configs the ATN configuration set where the SLL conflict was
 	 * detected
 	 */
-	void reportAttemptingFullContext(@NotNull Parser recognizer,
-									 @NotNull DFA dfa,
+	void reportAttemptingFullContext(Parser recognizer,
+									 DFA dfa,
 									 int startIndex,
 									 int stopIndex,
-									 @Nullable BitSet conflictingAlts,
-									 @NotNull ATNConfigSet configs);
+									 BitSet conflictingAlts,
+									 ATNConfigSet configs);
 
 	/**
 	 * This method is called by the parser when a full-context prediction has a
@@ -198,10 +196,10 @@ public interface ANTLRErrorListener {
 	 * @param configs the ATN configuration set where the unambiguous prediction
 	 * was determined
 	 */
-	void reportContextSensitivity(@NotNull Parser recognizer,
-								  @NotNull DFA dfa,
+	void reportContextSensitivity(Parser recognizer,
+								  DFA dfa,
 								  int startIndex,
 								  int stopIndex,
 								  int prediction,
-								  @NotNull ATNConfigSet configs);
+								  ATNConfigSet configs);
 }

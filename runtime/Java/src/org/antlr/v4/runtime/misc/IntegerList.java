@@ -44,7 +44,7 @@ public class IntegerList {
 	private static final int INITIAL_SIZE = 4;
 	private static final int MAX_ARRAY_SIZE = Integer.MAX_VALUE - 8;
 
-	@NotNull
+
 	private int[] _data;
 
 	private int _size;
@@ -65,12 +65,12 @@ public class IntegerList {
 		}
 	}
 
-	public IntegerList(@NotNull IntegerList list) {
+	public IntegerList(IntegerList list) {
 		_data = list._data.clone();
 		_size = list._size;
 	}
 
-	public IntegerList(@NotNull Collection<Integer> list) {
+	public IntegerList(Collection<Integer> list) {
 		this(list.size());
 		for (Integer value : list) {
 			add(value);

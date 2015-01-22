@@ -31,8 +31,6 @@
 package org.antlr.v4.runtime.atn;
 
 import org.antlr.v4.runtime.TokenStream;
-import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.misc.Nullable;
 
 /**
  * This class represents profiling event information for tracking the lookahead
@@ -56,8 +54,8 @@ public class LookaheadEventInfo extends DecisionEventInfo {
 	 * prediction; otherwise, {@code false} if the current lookahead is part of
 	 * an SLL prediction
 	 */
-	public LookaheadEventInfo(int decision, @Nullable ATNConfigSet configs,
-							  @NotNull TokenStream input, int startIndex, int stopIndex,
+	public LookaheadEventInfo(int decision, ATNConfigSet configs,
+							  TokenStream input, int startIndex, int stopIndex,
 							  boolean fullCtx)
 	{
 		super(decision, configs, input, startIndex, stopIndex, fullCtx);

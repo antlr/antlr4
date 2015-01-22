@@ -32,7 +32,6 @@ package org.antlr.v4.runtime.atn;
 
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.misc.MurmurHash;
-import org.antlr.v4.runtime.misc.NotNull;
 
 /**
  * Implements the {@code type} lexer action by calling {@link Lexer#setType}
@@ -85,7 +84,7 @@ public class LexerTypeAction implements LexerAction {
 	 * value provided by {@link #getType}.</p>
 	 */
 	@Override
-	public void execute(@NotNull Lexer lexer) {
+	public void execute(Lexer lexer) {
 		lexer.setType(type);
 	}
 

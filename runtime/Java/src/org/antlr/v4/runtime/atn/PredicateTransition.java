@@ -43,7 +43,7 @@ public final class PredicateTransition extends AbstractPredicateTransition {
 	public final int predIndex;
 	public final boolean isCtxDependent;  // e.g., $i ref in pred
 
-	public PredicateTransition(@NotNull ATNState target, int ruleIndex, int predIndex, boolean isCtxDependent) {
+	public PredicateTransition(ATNState target, int ruleIndex, int predIndex, boolean isCtxDependent) {
 		super(target);
 		this.ruleIndex = ruleIndex;
 		this.predIndex = predIndex;
@@ -68,7 +68,6 @@ public final class PredicateTransition extends AbstractPredicateTransition {
    	}
 
 	@Override
-	@NotNull
 	public String toString() {
 		return "pred_"+ruleIndex+":"+predIndex;
 	}

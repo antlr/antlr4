@@ -50,15 +50,15 @@ public class DFA {
 	/** A set of all DFA states. Use {@link Map} so we can get old state back
 	 *  ({@link Set} only allows you to see if it's there).
      */
-    @NotNull
+
 	public final Map<DFAState, DFAState> states = new HashMap<DFAState, DFAState>();
-	@Nullable
+
 	public volatile DFAState s0;
 
 	public final int decision;
 
 	/** From which ATN state did we create this DFA? */
-	@NotNull
+
 	public final DecisionState atnStartState;
 
 	/**
@@ -68,11 +68,11 @@ public class DFA {
 	 */
 	private volatile boolean precedenceDfa;
 
-	public DFA(@NotNull DecisionState atnStartState) {
+	public DFA(DecisionState atnStartState) {
 		this(atnStartState, 0);
 	}
 
-	public DFA(@NotNull DecisionState atnStartState, int decision) {
+	public DFA(DecisionState atnStartState, int decision) {
 		this.atnStartState = atnStartState;
 		this.decision = decision;
 	}
@@ -186,7 +186,7 @@ public class DFA {
 	/**
 	 * Return a list of all states in this DFA, ordered by state number.
 	 */
-	@NotNull
+
 	public List<DFAState> getStates() {
 		List<DFAState> result = new ArrayList<DFAState>(states.keySet());
 		Collections.sort(result, new Comparator<DFAState>() {
@@ -206,13 +206,13 @@ public class DFA {
 	 * @deprecated Use {@link #toString(Vocabulary)} instead.
 	 */
 	@Deprecated
-	public String toString(@Nullable String[] tokenNames) {
+	public String toString(String[] tokenNames) {
 		if ( s0==null ) return "";
 		DFASerializer serializer = new DFASerializer(this,tokenNames);
 		return serializer.toString();
 	}
 
-	public String toString(@NotNull Vocabulary vocabulary) {
+	public String toString(Vocabulary vocabulary) {
 		if (s0 == null) {
 			return "";
 		}

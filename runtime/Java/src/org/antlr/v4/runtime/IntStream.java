@@ -237,6 +237,6 @@ public interface IntStream {
 	 * non-null, non-empty string. If such a name is not known, this method
 	 * returns {@link #UNKNOWN_SOURCE_NAME}.
 	 */
-	@NotNull
+
 	public String getSourceName();
 }

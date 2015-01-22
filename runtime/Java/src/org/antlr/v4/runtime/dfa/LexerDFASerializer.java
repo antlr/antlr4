@@ -34,12 +34,12 @@ import org.antlr.v4.runtime.VocabularyImpl;
 import org.antlr.v4.runtime.misc.NotNull;
 
 public class LexerDFASerializer extends DFASerializer {
-	public LexerDFASerializer(@NotNull DFA dfa) {
+	public LexerDFASerializer(DFA dfa) {
 		super(dfa, VocabularyImpl.EMPTY_VOCABULARY);
 	}
 
 	@Override
-	@NotNull
+
 	protected String getEdgeLabel(int i) {
 		return "'"+(char)i+"'";
 	}

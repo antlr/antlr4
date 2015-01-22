@@ -31,7 +31,6 @@
 package org.antlr.v4.runtime.atn;
 
 import org.antlr.v4.runtime.misc.MurmurHash;
-import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.misc.ObjectEqualityComparator;
 
@@ -39,46 +38,45 @@ public class LexerATNConfig extends ATNConfig {
 	/**
 	 * This is the backing field for {@link #getLexerActionExecutor}.
 	 */
-	@Nullable
 	private final LexerActionExecutor lexerActionExecutor;
 
 	private final boolean passedThroughNonGreedyDecision;
 
-	public LexerATNConfig(@NotNull ATNState state,
+	public LexerATNConfig(ATNState state,
 						  int alt,
-						  @Nullable PredictionContext context)
+						  PredictionContext context)
 	{
 		super(state, alt, context, SemanticContext.NONE);
 		this.passedThroughNonGreedyDecision = false;
 		this.lexerActionExecutor = null;
 	}
 
-	public LexerATNConfig(@NotNull ATNState state,
+	public LexerATNConfig(ATNState state,
 						  int alt,
-						  @Nullable PredictionContext context,
-						  @Nullable LexerActionExecutor lexerActionExecutor)
+						  PredictionContext context,
+						  LexerActionExecutor lexerActionExecutor)
 	{
 		super(state, alt, context, SemanticContext.NONE);
 		this.lexerActionExecutor = lexerActionExecutor;
 		this.passedThroughNonGreedyDecision = false;
 	}
 
-	public LexerATNConfig(@NotNull LexerATNConfig c, @NotNull ATNState state) {
+	public LexerATNConfig(LexerATNConfig c, ATNState state) {
 		super(c, state, c.context, c.semanticContext);
 		this.lexerActionExecutor = c.lexerActionExecutor;
 		this.passedThroughNonGreedyDecision = checkNonGreedyDecision(c, state);
 	}
 
-	public LexerATNConfig(@NotNull LexerATNConfig c, @NotNull ATNState state,
-						  @Nullable LexerActionExecutor lexerActionExecutor)
+	public LexerATNConfig(LexerATNConfig c, ATNState state,
+						  LexerActionExecutor lexerActionExecutor)
 	{
 		super(c, state, c.context, c.semanticContext);
 		this.lexerActionExecutor = lexerActionExecutor;
 		this.passedThroughNonGreedyDecision = checkNonGreedyDecision(c, state);
 	}
 
-	public LexerATNConfig(@NotNull LexerATNConfig c, @NotNull ATNState state,
-						  @Nullable PredictionContext context) {
+	public LexerATNConfig(LexerATNConfig c, ATNState state,
+						  PredictionContext context) {
 		super(c, state, context, c.semanticContext);
 		this.lexerActionExecutor = c.lexerActionExecutor;
 		this.passedThroughNonGreedyDecision = checkNonGreedyDecision(c, state);
@@ -88,7 +86,6 @@ public class LexerATNConfig extends ATNConfig {
 	 * Gets the {@link LexerActionExecutor} capable of executing the embedded
 	 * action(s) for the current configuration.
 	 */
-	@Nullable
 	public final LexerActionExecutor getLexerActionExecutor() {
 		return lexerActionExecutor;
 	}

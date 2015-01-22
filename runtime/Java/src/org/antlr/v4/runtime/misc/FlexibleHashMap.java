@@ -57,7 +57,7 @@ public class FlexibleHashMap<K,V> implements Map<K, V> {
 		}
 	}
 
-	@NotNull
+
 	protected final AbstractEqualityComparator<? super K> comparator;
 
 	protected LinkedList<Entry<K, V>>[] buckets;
@@ -74,11 +74,11 @@ public class FlexibleHashMap<K,V> implements Map<K, V> {
 		this(null, INITAL_CAPACITY, INITAL_BUCKET_CAPACITY);
 	}
 
-	public FlexibleHashMap(@Nullable AbstractEqualityComparator<? super K> comparator) {
+	public FlexibleHashMap(AbstractEqualityComparator<? super K> comparator) {
 		this(comparator, INITAL_CAPACITY, INITAL_BUCKET_CAPACITY);
 	}
 
-	public FlexibleHashMap(@Nullable AbstractEqualityComparator<? super K> comparator, int initialCapacity, int initialBucketCapacity) {
+	public FlexibleHashMap(AbstractEqualityComparator<? super K> comparator, int initialCapacity, int initialBucketCapacity) {
 		if (comparator == null) {
 			comparator = ObjectEqualityComparator.INSTANCE;
 		}

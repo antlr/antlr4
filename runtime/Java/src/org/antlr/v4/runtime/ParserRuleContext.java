@@ -30,14 +30,12 @@
 package org.antlr.v4.runtime;
 
 import org.antlr.v4.runtime.misc.Interval;
-import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ErrorNodeImpl;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.antlr.v4.runtime.tree.TerminalNodeImpl;
-import org.antlr.v4.runtime.tree.pattern.RuleTagToken;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -115,7 +113,7 @@ public class ParserRuleContext extends RuleContext {
 		this.stop = ctx.stop;
 	}
 
-	public ParserRuleContext(@Nullable ParserRuleContext parent, int invokingStateNumber) {
+	public ParserRuleContext(ParserRuleContext parent, int invokingStateNumber) {
 		super(parent, invokingStateNumber);
 	}
 
@@ -278,13 +276,13 @@ public class ParserRuleContext extends RuleContext {
 		return Interval.of(start.getTokenIndex(), stop.getTokenIndex());
 	}
 
-	/** 
-	 * Get the initial token in this context. 
+	/**
+	 * Get the initial token in this context.
 	 * Note that the range from start to stop is inclusive, so for rules that do not consume anything
 	 * (for example, zero length or error productions) this token may exceed stop.
 	 */
 	public Token getStart() { return start; }
-	/** 
+	/**
 	 * Get the final token in this context.
 	 * Note that the range from start to stop is inclusive, so for rules that do not consume anything
 	 * (for example, zero length or error productions) this token may precede start.

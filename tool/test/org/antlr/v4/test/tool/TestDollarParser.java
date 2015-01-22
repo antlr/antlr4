@@ -1,9 +1,10 @@
 package org.antlr.v4.test.tool;
 
-import static org.junit.Assert.*;
-
 import org.antlr.v4.test.rt.java.BaseTest;
 import org.junit.Test;
+
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class TestDollarParser extends BaseTest {
 
