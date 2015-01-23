@@ -71,7 +71,7 @@ def pypi(): # assumes that you have ~/.pypirc set up
         os.chdir(uniformpath(PYTHON2_TARGET))
         exec_and_log(cmd)
         os.chdir(uniformpath(PYTHON3_TARGET))
-        #exec_and_log(cmd)
+        exec_and_log(cmd)
     finally:
         os.chdir(savedir)
 
@@ -82,7 +82,7 @@ def pypi(): # assumes that you have ~/.pypirc set up
         os.chdir(uniformpath(PYTHON2_TARGET))
         exec_and_log(cmd)
         os.chdir(uniformpath(PYTHON3_TARGET))
-        #exec_and_log(cmd)
+        exec_and_log(cmd)
     finally:
         os.chdir(savedir)
 
