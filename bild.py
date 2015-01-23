@@ -41,7 +41,7 @@ if not os.path.exists("bilder.py"):
 from bilder import *
 
 BOOTSTRAP_VERSION = "4.4"
-VERSION = "4.5-SNAPSHOT"
+VERSION = "4.5"
 JAVA_TARGET = "."
 PYTHON2_TARGET = "../antlr4-python2"
 PYTHON3_TARGET = "../antlr4-python3"
@@ -159,6 +159,7 @@ def mkjar(): # if called as root target
     rmdir("out")
     _mkjar()
 
+
 def _mkjar(): # don't wipe out out dir if we know it's done like from all()
     mkjar_complete()
     # put it in JARCARCHE too so bild can find it during antlr4()
@@ -179,7 +180,7 @@ def _mkjar(): # don't wipe out out dir if we know it's done like from all()
     mkjar_runtime()   # now build the runtime jar
 
 
-def javascript(): # TODO @eric
+def javascript():
     # No build to do. Just zip up the sources
     srcpath = uniformpath(JAVASCRIPT_TARGET+"/src")
     srcfiles = allfiles(srcpath, "*.js") + allfiles(srcpath, "*.json")
@@ -190,14 +191,27 @@ def javascript(): # TODO @eric
     print "Generated " + zipfile
 
 
-def csharp(): # TODO @eric
+def csharp():
     # For C#, there are 2 equivalent projects: a VisualStudio one and a Xamarin one.
     # You can build on windows using msbuild and on mono using xbuild and pointing to the corresponding runtime project.
-    pass
+    # kill previous ones manually as "xbuild /t:Clean" didn't seem to do it
+    bindll=uniformpath(CSHARP_TARGET)+"/runtime/CSharp/Antlr4.Runtime/bin/net20/Release/Antlr4.Runtime.dll"
+    objdll=uniformpath(CSHARP_TARGET)+"/runtime/CSharp/Antlr4.Runtime/obj/net20/Release/Antlr4.Runtime.dll"
+    rmfile(bindll)
+    rmfile(objdll)
+    # now build
+    projfile = uniformpath(CSHARP_TARGET)+"/runtime/CSharp/Antlr4.Runtime/Antlr4.Runtime.mono.csproj"
+    cmd = ["xbuild", "/p:Configuration=Release", projfile]
+    exec_and_log(cmd)
+    # zip it up to get a version number in there
+    zipfile = "dist/antlr-csharp-runtime-"+VERSION+".zip"
+    rmfile(zipfile)
+    cmd = ["zip", "--junk-paths", zipfile, bindll]
+    exec_and_log(cmd)
+    print "Generated " + zipfile
 
 
-def python_sdist(): # TODO @eric
-    # No build it to do. Just zip up the sources
+def python_sdist():
     cmd = ["python", "setup.py", "sdist"]
     savedir= os.getcwd()
     try:
@@ -207,6 +221,18 @@ def python_sdist(): # TODO @eric
         exec_and_log(cmd)
     finally:
         os.chdir(savedir)
+
+    # copy over Python 2
+    gzfile = "antlr4-python2-runtime-" + VERSION + ".tar.gz"
+    artifact = uniformpath(PYTHON2_TARGET) + "/dist/"+gzfile
+    copyfile(artifact, "dist/"+gzfile)
+    print "Generated " + "dist/"+gzfile
+
+    # copy over Python 3
+    gzfile = "antlr4-python3-runtime-" + VERSION + ".tar.gz"
+    artifact = uniformpath(PYTHON3_TARGET) + "/dist/"+gzfile
+    copyfile(artifact, "dist/"+gzfile)
+    print "Generated " + "dist/"+gzfile
 
 
 def regen_tests():
@@ -294,6 +320,7 @@ def test(t, cp, juprops, args):
                 shutil.copyfile(src, dst)
     junit("out/test/" + t, cp=thiscp, verbose=False, args=juprops)
 
+
 def install():
     require(_mkjar)
     require(mksrc)
@@ -378,6 +405,12 @@ def mkdoc():
     zip(tooldoc, "doc/JavaTool")
 
 
+def target_artifacts():
+    javascript()
+    python_sdist()
+    csharp()
+
+
 def clean(dist=False):
     if dist:
         rmdir("dist")
@@ -390,8 +423,7 @@ def clean(dist=False):
 def all():
     clean(True)
     _mkjar()
-    javascript()
-    python_sdist()
+    target_artifacts()
     tests()
     mkdoc()
     mksrc()
