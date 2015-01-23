@@ -50,15 +50,57 @@ def mvn_snapshot():  # assumes that you have ~/.m2/settings.xml set up
     binjar = uniformpath("dist/antlr4-%s-complete.jar" % VERSION)
     docjar = uniformpath("dist/antlr4-%s-complete-javadoc.jar" % VERSION)
     srcjar = uniformpath("dist/antlr4-%s-complete-sources.jar" % VERSION)
-    mvn_deploy(binjar, docjar, srcjar, repositoryid="ossrh", groupid="org.antlr",
-               artifactid="antlr4", pomfile="tool/pom.xml", version=VERSION)
+    mvn_deploy("deploy:deploy-file",
+               binjar, docjar, srcjar, repositoryid="ossrh", groupid="org.antlr",
+               artifactid="antlr4", pomfile="tool/pom.xml", version=VERSION,
+               url="https://oss.sonatype.org/content/repositories/snapshots")
 
     binjar = uniformpath("dist/antlr4-%s.jar" % VERSION)
     docjar = uniformpath("dist/antlr4-%s-javadoc.jar" % VERSION)
     srcjar = uniformpath("dist/antlr4-%s-sources.jar" % VERSION)
-    mvn_deploy(binjar, docjar, srcjar, repositoryid="ossrh", groupid="org.antlr",
-               artifactid="antlr4-runtime", pomfile="runtime/Java/pom.xml", version=VERSION)
+    mvn_deploy("deploy:deploy-file",
+               binjar, docjar, srcjar, repositoryid="ossrh", groupid="org.antlr",
+               artifactid="antlr4-runtime", pomfile="runtime/Java/pom.xml", version=VERSION,
+               url="https://oss.sonatype.org/content/repositories/snapshots")
 
+
+# deploy to maven central
+def mvn_staging():  # assumes that you have ~/.m2/settings.xml set up
+    """
+    mvn gpg:sign-and-deploy-file \
+      -Durl=https://oss.sonatype.org/service/local/staging/deploy/maven2/ \
+      -DrepositoryId=ossrh \
+      -Dpackaging=jar \
+      -DpomFile=/Users/parrt/antlr/code/antlr4/tool/pom.xml \
+      -Dfile=/Users/parrt/antlr/code/antlr4/dist/antlr4-4.5-complete.jar \
+      -Dsources=/Users/parrt/antlr/code/antlr4/dist/antlr4-4.5-complete-sources.jar \
+      -Djavadoc=/Users/parrt/antlr/code/antlr4/dist/antlr4-4.5-complete-javadoc.jar
+
+    mvn gpg:sign-and-deploy-file \
+      -Durl=https://oss.sonatype.org/service/local/staging/deploy/maven2/ \
+      -DrepositoryId=ossrh \
+      -Dpackaging=jar \
+      -DpomFile=/Users/parrt/antlr/code/antlr4/runtime/Java/pom.xml \
+      -Dfile=/Users/parrt/antlr/code/antlr4/dist/antlr4-4.5.jar \
+      -Dsources=/Users/parrt/antlr/code/antlr4/dist/antlr4-4.5-sources.jar \
+      -Djavadoc=/Users/parrt/antlr/code/antlr4/dist/antlr4-4.5-javadoc.jar
+    """
+    # deploy the tool and Java runtime, it becomes antlr4 artifact at maven
+    binjar = uniformpath("dist/antlr4-%s-complete.jar" % VERSION)
+    docjar = uniformpath("dist/antlr4-%s-complete-javadoc.jar" % VERSION)
+    srcjar = uniformpath("dist/antlr4-%s-complete-sources.jar" % VERSION)
+    mvn_deploy("gpg:sign-and-deploy-file",
+               binjar, docjar, srcjar, repositoryid="ossrh",
+               pomfile="tool/pom.xml", url="https://oss.sonatype.org/service/local/staging/deploy/maven2/")
+
+    # deploy the runtime, it becomes antlr4-runtime artifact at maven
+    binjar = uniformpath("dist/antlr4-%s.jar" % VERSION)
+    docjar = uniformpath("dist/antlr4-%s-javadoc.jar" % VERSION)
+    srcjar = uniformpath("dist/antlr4-%s-sources.jar" % VERSION)
+    mvn_deploy("gpg:sign-and-deploy-file",
+               binjar, docjar, srcjar, repositoryid="ossrh",
+               pomfile="runtime/Java/pom.xml",
+               url="https://oss.sonatype.org/service/local/staging/deploy/maven2/")
 
 def mvn(): # TODO
     pass
