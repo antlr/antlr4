@@ -4,7 +4,7 @@
 
 	<groupId>org.antlr</groupId>
 	<artifactId>antlr4-runtime</artifactId>
-	<version>4.5-SNAPSHOT</version>
+	<version>4.5</version>
 
 	<name>ANTLR 4 Runtime</name>
 	<description>The ANTLR 4 Runtime</description>
