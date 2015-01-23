@@ -5,15 +5,24 @@
 	<groupId>org.antlr</groupId>
 	<artifactId>antlr4-runtime</artifactId>
 	<version>4.5</version>
+	<packaging>jar</packaging>
 
 	<name>ANTLR 4 Runtime</name>
 	<description>The ANTLR 4 Runtime</description>
 
+	<licenses>
+		<license>
+			<name>BSD 3-Clause License</name>
+			<url>http://opensource.org/licenses/BSD-3-Clause</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+
 	<!--
-	    IMPORTANT NOTE 
-	    Building ANTLR is now performed via the bild.py script. 
-		However, we still need a pom to: - manage dependencies during development 
-		- publish metadata to maven central The above are the only reason for keeping 
+	    IMPORTANT NOTE
+	    Building ANTLR is now performed via the bild.py script.
+		However, we still need a pom to: - manage dependencies during development
+		- publish metadata to maven central The above are the only reason for keeping
 		this file. No support will be provided.
 	 -->
 	<developers>

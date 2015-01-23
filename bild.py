@@ -327,7 +327,7 @@ def install(): # mvn installed locally in ~/.m2, java jar to /usr/local/lib if p
     require(mksrc)
     require(mkdoc)
     jarfile = "dist/antlr4-" + VERSION + "-complete.jar"
-    print_and_log("Installing "+jarfile+" and *-sources.jar, *-javadoc.jar")
+    print_and_log("Maven installing "+jarfile+" and *-sources.jar, *-javadoc.jar")
     mvn_install(jarfile,
         "dist/antlr4-" + VERSION + "-complete-sources.jar",
         "dist/antlr4-" + VERSION + "-complete-javadoc.jar",
@@ -335,7 +335,7 @@ def install(): # mvn installed locally in ~/.m2, java jar to /usr/local/lib if p
         "antlr4",
         VERSION)
     runtimejarfile = "dist/antlr4-" + VERSION + ".jar"
-    print_and_log("Installing "+runtimejarfile+" and *-sources.jar, *-javadoc.jar")
+    print_and_log("Maven installing "+runtimejarfile+" and *-sources.jar, *-javadoc.jar")
     mvn_install(runtimejarfile,
         "dist/antlr4-" + VERSION + "-sources.jar",
         "dist/antlr4-" + VERSION + "-javadoc.jar",
