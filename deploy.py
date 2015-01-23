@@ -64,7 +64,6 @@ def maven(): # TODO
     pass
 
 
-# TODO
 def pypi(): # assumes that you have ~/.pypirc set up
     cmd = ["python", "setup.py", "register", "-r", "pypi"]
     savedir= os.getcwd()
@@ -76,7 +75,8 @@ def pypi(): # assumes that you have ~/.pypirc set up
     finally:
         os.chdir(savedir)
 
-    cmd = ["python", "setup.py", "sdist", "upload", "-r", "pypi"]
+    # Upload the source distribution and the Windows installer to PyPI
+    cmd = ["python", "setup.py", "sdist", "bdist_wininst", "upload", "-r", "pypi"]
     savedir= os.getcwd()
     try:
         os.chdir(uniformpath(PYTHON2_TARGET))
