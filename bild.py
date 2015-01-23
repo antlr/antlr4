@@ -2,6 +2,7 @@
 import os
 import string
 from collections import OrderedDict
+import shutil
 
 """
 This script uses my experimental build tool http://www.bildtool.org
@@ -114,7 +115,7 @@ def mkjar_complete():
                  trgdir)
     jarfile = "dist/antlr4-" + VERSION + "-complete.jar"
     jar(jarfile, srcdir="out", manifest=manifest)
-    print "Generated " + jarfile
+    print_and_log("Generated " + jarfile)
 
 
 def mkjar_runtime():
@@ -152,7 +153,7 @@ def mkjar_runtime():
     osgijarfile = "dist/antlr4-" + VERSION + "-osgi.jar"
     make_osgi_ready(jarfile, osgijarfile)
     os.rename(osgijarfile, jarfile) # copy back onto old jar
-    print "Made jar OSGi-ready " + jarfile
+    print_and_log("Made jar OSGi-ready " + jarfile)
 
 
 def mkjar(): # if called as root target
@@ -188,7 +189,7 @@ def javascript():
     if not isstale(src=newest(srcfiles), trg=zipfile):
         return
     zip(zipfile, srcpath)
-    print "Generated " + zipfile
+    print_and_log("Generated " + zipfile)
 
 
 def csharp():
@@ -208,7 +209,7 @@ def csharp():
     rmfile(zipfile)
     cmd = ["zip", "--junk-paths", zipfile, bindll]
     exec_and_log(cmd)
-    print "Generated " + zipfile
+    print_and_log("Generated " + zipfile)
 
 
 def python_sdist():
@@ -226,13 +227,13 @@ def python_sdist():
     gzfile = "antlr4-python2-runtime-" + VERSION + ".tar.gz"
     artifact = uniformpath(PYTHON2_TARGET) + "/dist/"+gzfile
     copyfile(artifact, "dist/"+gzfile)
-    print "Generated " + "dist/"+gzfile
+    print_and_log("Generated " + "dist/"+gzfile)
 
     # copy over Python 3
     gzfile = "antlr4-python3-runtime-" + VERSION + ".tar.gz"
     artifact = uniformpath(PYTHON3_TARGET) + "/dist/"+gzfile
     copyfile(artifact, "dist/"+gzfile)
-    print "Generated " + "dist/"+gzfile
+    print_and_log("Generated " + "dist/"+gzfile)
 
 
 def regen_tests():
@@ -245,8 +246,7 @@ def regen_tests():
     args = ["-nowarn", "-Xlint", "-Xlint:-serial", "-g"]
     javac("tool/test", "out/test", version="1.6", cp=cp, args=args)  # all targets can use org.antlr.v4.test.*
     java(classname="org.antlr.v4.test.rt.gen.Generator", cp="out/test:dist/antlr4-4.5-complete.jar")
-    print "test generation complete"
-    log("test generation complete")
+    print_and_log("test generation complete")
 
 
 def tests():
@@ -281,12 +281,13 @@ def test_target(t):
          + os.pathsep + uniformpath("out/test")
     juprops = ["-D%s=%s" % (p, test_properties[p]) for p in test_properties]
     args = ["-nowarn", "-Xlint", "-Xlint:-serial", "-g"]
-    print "Testing %s ..." % t
+    print_and_log("Testing %s ..." % t)
     try:
         test(t, cp, juprops, args)
         print t + " tests complete"
     except:
         print t + " tests failed"
+
 
 def test(t, cp, juprops, args):
     junit_jar, hamcrest_jar = load_junitjars()
@@ -321,40 +322,47 @@ def test(t, cp, juprops, args):
     junit("out/test/" + t, cp=thiscp, verbose=False, args=juprops)
 
 
-def install():
+def install(): # mvn installed locally in ~/.m2, java jar to /usr/local/lib if present
     require(_mkjar)
     require(mksrc)
     require(mkdoc)
-    mvn_install("dist/antlr4-" + VERSION + "-complete.jar",
+    jarfile = "dist/antlr4-" + VERSION + "-complete.jar"
+    print_and_log("Installing "+jarfile+" and *-sources.jar, *-javadoc.jar")
+    mvn_install(jarfile,
         "dist/antlr4-" + VERSION + "-complete-sources.jar",
         "dist/antlr4-" + VERSION + "-complete-javadoc.jar",
         "org.antlr",
         "antlr4",
         VERSION)
-    mvn_install("dist/antlr4-" + VERSION + ".jar",
+    runtimejarfile = "dist/antlr4-" + VERSION + ".jar"
+    print_and_log("Installing "+runtimejarfile+" and *-sources.jar, *-javadoc.jar")
+    mvn_install(runtimejarfile,
         "dist/antlr4-" + VERSION + "-sources.jar",
         "dist/antlr4-" + VERSION + "-javadoc.jar",
         "org.antlr",
         "antlr4-runtime",
         VERSION)
-
+    if os.path.exists("/usr/local/lib"):
+        libjar = "/usr/local/lib/antlr-" + VERSION + "-complete.jar"
+        print_and_log("Installing "+libjar)
+        shutil.copyfile(jarfile, libjar)
 
 def mksrc():
     srcpath = "runtime/Java/src/org"
-    srcfiles = allfiles(srcpath, "*.java");
+    srcfiles = allfiles(srcpath, "*.java")
     jarfile = "dist/antlr4-" + VERSION + "-sources.jar"
     if not isstale(src=newest(srcfiles), trg=jarfile):
         return
     zip(jarfile, srcpath)
-    print "Generated " + jarfile
+    print_and_log("Generated " + jarfile)
 
     srcpaths = [ srcpath, "gen3/org", "gen4/org", "tool/src/org"]
-    srcfiles = allfiles(srcpaths, "*.java");
+    srcfiles = allfiles(srcpaths, "*.java")
     jarfile = "dist/antlr4-" + VERSION + "-complete-sources.jar"
     if not isstale(src=newest(srcfiles), trg=jarfile):
         return
     zip(jarfile, srcpaths)
-    print "Generated " + jarfile
+    print_and_log("Generated " + jarfile)
 
 
 def mkdoc():

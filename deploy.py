@@ -46,7 +46,7 @@ CSHARP_TARGET = "../antlr4-csharp"
 JAVASCRIPT_TARGET = "../antlr4-javascript"
 
 
-def maven_snapshot():  # assumes that you have ~/.m2/settings.xml set up
+def mvn_snapshot():  # assumes that you have ~/.m2/settings.xml set up
     binjar = uniformpath("dist/antlr4-%s-complete.jar" % VERSION)
     docjar = uniformpath("dist/antlr4-%s-complete-javadoc.jar" % VERSION)
     srcjar = uniformpath("dist/antlr4-%s-complete-sources.jar" % VERSION)
@@ -60,7 +60,7 @@ def maven_snapshot():  # assumes that you have ~/.m2/settings.xml set up
                artifactid="antlr4-runtime", pomfile="runtime/Java/pom.xml", version=VERSION)
 
 
-def maven(): # TODO
+def mvn(): # TODO
     pass
 
 
@@ -100,7 +100,7 @@ def website():
 
 
 def all():  # Note: building artifacts is in a separate file bild.py
-    maven()
+    mvn()
     pypi()
     nuget()
     website()
