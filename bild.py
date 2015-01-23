@@ -8,7 +8,7 @@ This script uses my experimental build tool http://www.bildtool.org
 
 In order to build the complete ANTLR4 product with Java, CSharp, Python 2/3, and JavaScript
 targets, do the following from a UNIX command line.  Windows build using this script
-is not yet supported. Please use the mvn build or ant build.
+is not yet supported.
 
 You will also need python 2.7, python 3.4, node.js and mono (on Mac/Linux)
 
@@ -23,6 +23,8 @@ git clone git@github.com:antlr/antlr4-csharp.git
 git clone git@github.com:antlr/antlr4-javascript.git
 cd antlr4
 ./bild.py tests
+
+This script must be run from the main antlr4 directory.
 """
 
 # bootstrap by downloading bilder.py if not found
@@ -39,7 +41,7 @@ if not os.path.exists("bilder.py"):
 from bilder import *
 
 BOOTSTRAP_VERSION = "4.4"
-VERSION = "4.5-SNAPSHOT"
+VERSION = "4.5"
 JAVA_TARGET = "."
 PYTHON2_TARGET = "../antlr4-python2"
 PYTHON3_TARGET = "../antlr4-python3"
@@ -157,6 +159,7 @@ def mkjar(): # if called as root target
     rmdir("out")
     _mkjar()
 
+
 def _mkjar(): # don't wipe out out dir if we know it's done like from all()
     mkjar_complete()
     # put it in JARCARCHE too so bild can find it during antlr4()
@@ -177,6 +180,61 @@ def _mkjar(): # don't wipe out out dir if we know it's done like from all()
     mkjar_runtime()   # now build the runtime jar
 
 
+def javascript():
+    # No build to do. Just zip up the sources
+    srcpath = uniformpath(JAVASCRIPT_TARGET+"/src")
+    srcfiles = allfiles(srcpath, "*.js") + allfiles(srcpath, "*.json")
+    zipfile = "dist/antlr-javascript-runtime-"+VERSION+".zip"
+    if not isstale(src=newest(srcfiles), trg=zipfile):
+        return
+    zip(zipfile, srcpath)
+    print "Generated " + zipfile
+
+
+def csharp():
+    # For C#, there are 2 equivalent projects: a VisualStudio one and a Xamarin one.
+    # You can build on windows using msbuild and on mono using xbuild and pointing to the corresponding runtime project.
+    # kill previous ones manually as "xbuild /t:Clean" didn't seem to do it
+    bindll=uniformpath(CSHARP_TARGET)+"/runtime/CSharp/Antlr4.Runtime/bin/net20/Release/Antlr4.Runtime.dll"
+    objdll=uniformpath(CSHARP_TARGET)+"/runtime/CSharp/Antlr4.Runtime/obj/net20/Release/Antlr4.Runtime.dll"
+    rmfile(bindll)
+    rmfile(objdll)
+    # now build
+    projfile = uniformpath(CSHARP_TARGET)+"/runtime/CSharp/Antlr4.Runtime/Antlr4.Runtime.mono.csproj"
+    cmd = ["xbuild", "/p:Configuration=Release", projfile]
+    exec_and_log(cmd)
+    # zip it up to get a version number in there
+    zipfile = "dist/antlr-csharp-runtime-"+VERSION+".zip"
+    rmfile(zipfile)
+    cmd = ["zip", "--junk-paths", zipfile, bindll]
+    exec_and_log(cmd)
+    print "Generated " + zipfile
+
+
+def python_sdist():
+    cmd = ["python", "setup.py", "sdist"]
+    savedir= os.getcwd()
+    try:
+        os.chdir(uniformpath(PYTHON2_TARGET))
+        exec_and_log(cmd)
+        os.chdir(uniformpath(PYTHON3_TARGET))
+        exec_and_log(cmd)
+    finally:
+        os.chdir(savedir)
+
+    # copy over Python 2
+    gzfile = "antlr4-python2-runtime-" + VERSION + ".tar.gz"
+    artifact = uniformpath(PYTHON2_TARGET) + "/dist/"+gzfile
+    copyfile(artifact, "dist/"+gzfile)
+    print "Generated " + "dist/"+gzfile
+
+    # copy over Python 3
+    gzfile = "antlr4-python3-runtime-" + VERSION + ".tar.gz"
+    artifact = uniformpath(PYTHON3_TARGET) + "/dist/"+gzfile
+    copyfile(artifact, "dist/"+gzfile)
+    print "Generated " + "dist/"+gzfile
+
+
 def regen_tests():
     require(_mkjar)
     junit_jar, hamcrest_jar = load_junitjars()
@@ -189,6 +247,7 @@ def regen_tests():
     java(classname="org.antlr.v4.test.rt.gen.Generator", cp="out/test:dist/antlr4-4.5-complete.jar")
     print "test generation complete"
     log("test generation complete")
+
 
 def tests():
     require(regen_tests)
@@ -261,6 +320,7 @@ def test(t, cp, juprops, args):
                 shutil.copyfile(src, dst)
     junit("out/test/" + t, cp=thiscp, verbose=False, args=juprops)
 
+
 def install():
     require(_mkjar)
     require(mksrc)
@@ -277,31 +337,6 @@ def install():
         "org.antlr",
         "antlr4-runtime",
         VERSION)
-
-
-def deploy():
-    require(_mkjar)
-    require(mksrc)
-    require(mkdoc)
-    binjar = uniformpath("dist/antlr4-%s-complete.jar" % VERSION)
-    docjar = uniformpath("dist/antlr4-%s-complete-javadoc.jar" % VERSION)
-    srcjar = uniformpath("dist/antlr4-%s-complete-sources.jar" % VERSION)
-    mvn_deploy(binjar, docjar, srcjar, repositoryid="ossrh", groupid="org.antlr",
-               artifactid="antlr4", pomfile="tool/pom.xml", version=VERSION)
-
-    binjar = uniformpath("dist/antlr4-%s.jar" % VERSION)
-    docjar = uniformpath("dist/antlr4-%s-javadoc.jar" % VERSION)
-    srcjar = uniformpath("dist/antlr4-%s-sources.jar" % VERSION)
-    mvn_deploy(binjar, docjar, srcjar, repositoryid="ossrh", groupid="org.antlr",
-               artifactid="antlr4-runtime", pomfile="runtime/Java/pom.xml", version=VERSION)
-
-def clean(dist=False):
-    if dist:
-        rmdir("dist")
-    rmdir("out")
-    rmdir("gen3")
-    rmdir("gen4")
-    rmdir("doc")
 
 
 def mksrc():
@@ -370,9 +405,25 @@ def mkdoc():
     zip(tooldoc, "doc/JavaTool")
 
 
+def target_artifacts():
+    javascript()
+    python_sdist()
+    csharp()
+
+
+def clean(dist=False):
+    if dist:
+        rmdir("dist")
+    rmdir("out")
+    rmdir("gen3")
+    rmdir("gen4")
+    rmdir("doc")
+
+
 def all():
     clean(True)
     _mkjar()
+    target_artifacts()
     tests()
     mkdoc()
     mksrc()
