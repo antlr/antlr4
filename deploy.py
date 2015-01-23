@@ -65,7 +65,7 @@ def mvn_snapshot():  # assumes that you have ~/.m2/settings.xml set up
 
 
 # deploy to maven central
-def mvn_staging():  # assumes that you have ~/.m2/settings.xml set up
+def mvn_deploy():  # assumes that you have ~/.m2/settings.xml set up
     """
     mvn gpg:sign-and-deploy-file \
       -Durl=https://oss.sonatype.org/service/local/staging/deploy/maven2/ \
@@ -89,22 +89,19 @@ def mvn_staging():  # assumes that you have ~/.m2/settings.xml set up
     binjar = uniformpath("dist/antlr4-%s-complete.jar" % VERSION)
     docjar = uniformpath("dist/antlr4-%s-complete-javadoc.jar" % VERSION)
     srcjar = uniformpath("dist/antlr4-%s-complete-sources.jar" % VERSION)
-    mvn_deploy("gpg:sign-and-deploy-file",
-               binjar, docjar, srcjar, repositoryid="ossrh",
-               pomfile="tool/pom.xml", url="https://oss.sonatype.org/service/local/staging/deploy/maven2/")
+    mvn("gpg:sign-and-deploy-file",
+        binjar, docjar, srcjar, repositoryid="ossrh",
+        pomfile="tool/pom.xml",
+        url="https://oss.sonatype.org/service/local/staging/deploy/maven2/")
 
     # deploy the runtime, it becomes antlr4-runtime artifact at maven
     binjar = uniformpath("dist/antlr4-%s.jar" % VERSION)
     docjar = uniformpath("dist/antlr4-%s-javadoc.jar" % VERSION)
     srcjar = uniformpath("dist/antlr4-%s-sources.jar" % VERSION)
-    mvn_deploy("gpg:sign-and-deploy-file",
-               binjar, docjar, srcjar, repositoryid="ossrh",
-               pomfile="runtime/Java/pom.xml",
-               url="https://oss.sonatype.org/service/local/staging/deploy/maven2/")
-
-def mvn(): # TODO
-    pass
-
+    mvn("gpg:sign-and-deploy-file",
+        binjar, docjar, srcjar, repositoryid="ossrh",
+        pomfile="runtime/Java/pom.xml",
+        url="https://oss.sonatype.org/service/local/staging/deploy/maven2/")
 
 def pypi(): # assumes that you have ~/.pypirc set up
     cmd = ["python", "setup.py", "register", "-r", "pypi"]

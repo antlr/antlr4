@@ -5,6 +5,7 @@
     <artifactId>antlr4</artifactId>
 	<version>4.5</version>
     <packaging>jar</packaging>
+    <url>http://www.antlr.org</url>
 
     <name>ANTLR 4 Tool</name>
     <description>The ANTLR 4 grammar compiler.</description>
