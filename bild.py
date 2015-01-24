@@ -328,20 +328,20 @@ def install(): # mvn installed locally in ~/.m2, java jar to /usr/local/lib if p
     require(mkdoc)
     jarfile = "dist/antlr4-" + VERSION + "-complete.jar"
     print_and_log("Maven installing "+jarfile+" and *-sources.jar, *-javadoc.jar")
-    mvn_install(jarfile,
-        "dist/antlr4-" + VERSION + "-complete-sources.jar",
-        "dist/antlr4-" + VERSION + "-complete-javadoc.jar",
-        "org.antlr",
-        "antlr4",
-        VERSION)
+    mvn_install(binjar=jarfile,
+                srcjar="dist/antlr4-" + VERSION + "-complete-sources.jar",
+                docjar="dist/antlr4-" + VERSION + "-complete-javadoc.jar",
+                groupid="org.antlr",
+                artifactid="antlr4",
+                version=VERSION)
     runtimejarfile = "dist/antlr4-" + VERSION + ".jar"
     print_and_log("Maven installing "+runtimejarfile+" and *-sources.jar, *-javadoc.jar")
-    mvn_install(runtimejarfile,
-        "dist/antlr4-" + VERSION + "-sources.jar",
-        "dist/antlr4-" + VERSION + "-javadoc.jar",
-        "org.antlr",
-        "antlr4-runtime",
-        VERSION)
+    mvn_install(binjar=runtimejarfile,
+                srcjar="dist/antlr4-" + VERSION + "-sources.jar",
+                docjar="dist/antlr4-" + VERSION + "-javadoc.jar",
+                groupid="org.antlr",
+                artifactid="antlr4-runtime",
+                version=VERSION)
     if os.path.exists("/usr/local/lib"):
         libjar = "/usr/local/lib/antlr-" + VERSION + "-complete.jar"
         print_and_log("Installing "+libjar)
