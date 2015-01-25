@@ -109,7 +109,7 @@ public class Antlr4TestGeneratorMojo extends AbstractMojo {
 		List<ST> templates = new ArrayList<ST>();
 		for (String template : testTemplates) {
 			STGroup testGroup = new STGroupFile(templateFolder + "/" + template + STGroup.GROUP_FILE_EXTENSION);
-			testGroup.importTemplates(targetGroup);
+			importLanguageTemplates(testGroup, targetGroup);
 			ST testType = testGroup.getInstanceOf("TestType");
 			if (testType == null) {
 				getLog().warn(String.format("Unable to generate tests for %s: no TestType specified.", template));
@@ -140,6 +140,29 @@ public class Antlr4TestGeneratorMojo extends AbstractMojo {
 			writeFile(targetFile, testFileTemplate.render());
 		} catch (IOException ex) {
 			getLog().error(String.format("Failed to write output file: %s", targetFile), ex);
+		}
+	}
+
+	private void importLanguageTemplates(STGroup testGroup, STGroup languageGroup) {
+		// make sure the test group is loaded
+		testGroup.load();
+
+		if (testGroup == languageGroup) {
+			assert false : "Attempted to import the language group into itself.";
+			return;
+		}
+
+		if (testGroup.getImportedGroups().isEmpty()) {
+			testGroup.importTemplates(languageGroup);
+			return;
+		}
+
+		if (testGroup.getImportedGroups().contains(languageGroup)) {
+			return;
+		}
+
+		for (STGroup importedGroup : testGroup.getImportedGroups()) {
+			importLanguageTemplates(importedGroup, languageGroup);
 		}
 	}
 

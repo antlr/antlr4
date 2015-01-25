@@ -6,16 +6,16 @@
 package org.antlr.mojo.antlr4.testgen;
 
 import org.stringtemplate.v4.Interpreter;
+import org.stringtemplate.v4.ModelAdaptor;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
-import org.stringtemplate.v4.misc.ObjectModelAdaptor;
 import org.stringtemplate.v4.misc.STNoSuchPropertyException;
 
 /**
  *
  * @author sam
  */
-public class STGroupModelAdaptor extends ObjectModelAdaptor {
+public class STGroupModelAdaptor implements ModelAdaptor {
 
 	@Override
 	public Object getProperty(Interpreter interp, ST self, Object o, Object property, String propertyName) throws STNoSuchPropertyException {
@@ -29,7 +29,18 @@ public class STGroupModelAdaptor extends ObjectModelAdaptor {
 			return template;
 		}
 
-		return super.getProperty(interp, self, o, property, propertyName);
+		if ("name".equalsIgnoreCase(propertyName)) {
+			return group.getName();
+		}
+
+		for (STGroup importedGroup : group.getImportedGroups()) {
+			Object result = getProperty(interp, self, importedGroup, property, propertyName);
+			if (result != null) {
+				return result;
+			}
+		}
+
+		return null;
 	}
 
 }

@@ -1,0 +1,9 @@
+import "PredFromAltTestedInLoopBack.stg"
+
+Input() ::= "s<\n><\n><\n>x<\n><\n>"
+
+Output() ::= <<
+(file_ (para (paraContent s) \n \n) (para (paraContent \n x) \n \n) \<EOF>)<\n>
+>>
+
+Errors() ::= ""

@@ -1,7 +1,8 @@
 TestFolders ::= [
 	"CompositeLexers": [],
 	"LexerExec": [],
-	"ParseTrees": []
+	"ParseTrees": [],
+	"SemPredEvalParser": []
 ]
 
 //TestTemplates ::= [

@@ -1,3 +1,26 @@
+TestType() ::= "Parser"
+
+Options ::= [
+	"Debug": true
+]
+
+Grammar ::= [
+	"T": {<grammar("T")>}
+]
+
+Input() ::= "x ; y"
+
+Rule() ::= "s"
+
+Output() ::= <<
+>>
+
+Errors() ::= <<
+line 1:0 no viable alternative at input 'x'
+line 1:4 no viable alternative at input 'y'<\n>
+>>
+
+grammar(grammarName) ::= <<
 grammar <grammarName>;
 s : a ';' a;
 // ';' helps us to resynchronize without consuming
@@ -9,3 +32,4 @@ a : {<False()>}? ID  {<writeln("\"alt 1\"")>}
 ID : 'a'..'z'+ ;
 INT : '0'..'9'+;
 WS : (' '|'\n') -> skip ;
+>>

@@ -1,3 +1,16 @@
+TestType() ::= "Parser"
+
+Options ::= [
+	"Debug": true
+]
+
+Grammar ::= [
+	"T": {<grammar("T")>}
+]
+
+Rule() ::= "primary"
+
+grammar(grammarName) ::= <<
 grammar <grammarName>;
 @members {<InitBooleanMember("enumKeyword",True())>}
 primary
@@ -6,3 +19,4 @@ primary
     ;
 ID : [a-z]+ ;
 WS : [ \t\n\r]+ -> skip ;
+>>
