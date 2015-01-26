@@ -153,84 +153,8 @@ public class Generator {
 		list.add(buildCompositeParsers());
 		list.add(buildFullContextParsing());
 		list.add(buildLeftRecursion());
-		list.add(buildLexerErrors());
 		list.add(buildParserExec());
 		return list;
-	}
-
-	private JUnitTestFile buildLexerErrors() throws Exception {
-		JUnitTestFile file = new JUnitTestFile("LexerErrors");
-		file.addLexerTest(input, "InvalidCharAtStart", "L",
-				"x",
-				"[@0,1:0='<EOF>',<-1>,1:1]\n",
-				"line 1:0 token recognition error at: 'x'\n");
-		file.addLexerTest(input, "StringsEmbeddedInActions", "L",
-				"[\"foo\"]",
-				"[@0,0:6='[\"foo\"]',<1>,1:0]\n" +
-				"[@1,7:6='<EOF>',<-1>,1:7]\n",
-				null, 1);
-		file.addLexerTest(input, "StringsEmbeddedInActions", "L",
-				"[\"foo]",
-				"[@0,6:5='<EOF>',<-1>,1:6]\n",
-				"line 1:0 token recognition error at: '[\"foo]'\n",
-				2);
-		file.addLexerTest(input, "EnforcedGreedyNestedBrances", "L",
-				"{ { } }",
-				"[@0,0:6='{ { } }',<1>,1:0]\n" +
-				"[@1,7:6='<EOF>',<-1>,1:7]\n",
-				null, 1);
-		file.addLexerTest(input, "EnforcedGreedyNestedBrances", "L",
-				"{ { }",
-				"[@0,5:4='<EOF>',<-1>,1:5]\n",
-				"line 1:0 token recognition error at: '{ { }'\n",
-				2);
-		file.addLexerTest(input, "InvalidCharAtStartAfterDFACache", "L",
-				"abx",
-				"[@0,0:1='ab',<1>,1:0]\n" +
-				"[@1,3:2='<EOF>',<-1>,1:3]\n",
-				"line 1:2 token recognition error at: 'x'\n");
-		file.addLexerTest(input, "InvalidCharInToken", "L",
-				"ax",
-				"[@0,2:1='<EOF>',<-1>,1:2]\n",
-				"line 1:0 token recognition error at: 'ax'\n");
-		file.addLexerTest(input, "InvalidCharInTokenAfterDFACache", "L",
-				"abax",
-				"[@0,0:1='ab',<1>,1:0]\n" +
-				"[@1,4:3='<EOF>',<-1>,1:4]\n",
-				"line 1:2 token recognition error at: 'ax'\n");
-		// The first ab caches the DFA then abx goes through the DFA but
-		// into the ATN for the x, which fails. Must go back into DFA
-		// and return to previous dfa accept state
-		file.addLexerTest(input, "DFAToATNThatFailsBackToDFA", "L",
-				"ababx",
-				"[@0,0:1='ab',<1>,1:0]\n" +
-				"[@1,2:3='ab',<1>,1:2]\n" +
-				"[@2,5:4='<EOF>',<-1>,1:5]\n",
-				"line 1:4 token recognition error at: 'x'\n");
-		// The first ab caches the DFA then abx goes through the DFA but
-		// into the ATN for the c.  It marks that hasn't except state
-		// and then keeps going in the ATN. It fails on the x, but
-		// uses the previous accepted in the ATN not DFA
-		file.addLexerTest(input, "DFAToATNThatMatchesThenFailsInATN", "L",
-				"ababcx",
-				"[@0,0:1='ab',<1>,1:0]\n" +
-				"[@1,2:4='abc',<2>,1:2]\n" +
-				"[@2,6:5='<EOF>',<-1>,1:6]\n",
-				"line 1:5 token recognition error at: 'x'\n");
-		file.addLexerTest(input, "ErrorInMiddle", "L",
-				"abx",
-				"[@0,3:2='<EOF>',<-1>,1:3]\n",
-				"line 1:0 token recognition error at: 'abx'\n");
-		LexerTestMethod tm = file.addLexerTest(input, "LexerExecDFA", "L",
-				"x : x",
-				"[@0,0:0='x',<3>,1:0]\n" +
-				"[@1,2:2=':',<1>,1:2]\n" +
-				"[@2,4:4='x',<3>,1:4]\n" +
-				"[@3,5:4='<EOF>',<-1>,1:5]\n",
-				"line 1:1 token recognition error at: ' '\n" +
-				"line 1:3 token recognition error at: ' '\n");
-		tm.lexerOnly = false;
-		return file;
 	}
 
 	private JUnitTestFile buildLeftRecursion() throws Exception {

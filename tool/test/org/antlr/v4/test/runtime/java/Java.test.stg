@@ -36,7 +36,7 @@ public void test<test.name>() throws Exception {
 	<test.AfterGrammar>
 <endif>
 	String input =<writeStringLiteral(test.Input)>;
-	String found = execLexer("<grammar>.g4", grammar, "<grammar>", input, <writeBoolean(test.Options.("ShowDFA"))>);
+	String found = execLexer("<grammar>.g4", grammar, "<grammar><if(test.Options.("CombinedGrammar"))>Lexer<endif>", input, <writeBoolean(test.Options.("ShowDFA"))>);
 	assertEquals(<writeStringLiteral(test.Output)>, found);
 	<if(!isEmpty.(test.Errors))>
 	assertEquals(<writeStringLiteral(test.Errors)>, this.stderrDuringParse);

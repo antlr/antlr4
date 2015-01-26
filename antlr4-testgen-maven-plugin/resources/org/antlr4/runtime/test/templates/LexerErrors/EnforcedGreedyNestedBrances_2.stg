@@ -1,0 +1,11 @@
+import "EnforcedGreedyNestedBrances.stg"
+
+Input() ::= "{ { }"
+
+Output() ::= <<
+[@0,5:4='\<EOF>',\<-1>,1:5]<\n>
+>>
+
+Errors() ::= <<
+line 1:0 token recognition error at: '{ { }'<\n>
+>>
