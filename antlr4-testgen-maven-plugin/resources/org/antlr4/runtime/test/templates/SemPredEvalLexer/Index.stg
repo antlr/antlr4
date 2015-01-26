@@ -1,0 +1,12 @@
+//TestFolders ::= [
+//]
+
+TestTemplates ::= [
+	"DisableRule": [],
+	"IDvsEnum": [],
+	"IDnotEnum": [],
+	"EnumNotID": [],
+	"Indent": [],
+	"LexerInputPositionSensitivePredicates": [],
+	"PredicatedKeywords": []
+]

@@ -1,0 +1,35 @@
+TestType() ::= "Lexer"
+
+Options ::= [
+	"ShowDFA": true
+]
+
+Grammar ::= [
+	"L": {<grammar("L")>}
+]
+
+Input() ::= "enum abc enum"
+
+Output() ::= <<
+[@0,0:3='enum',\<2>,1:0]
+[@1,5:7='abc',\<2>,1:5]
+[@2,9:12='enum',\<2>,1:9]
+[@3,13:12='\<EOF>',\<-1>,1:13]
+<! no 'm'-> transition...conflicts with pred !>
+s0-' '->:s5=>3
+s0-'a'->:s4=>2
+s0-'e'->:s1=>2
+:s1=>2-'n'->:s2=>2
+:s2=>2-'u'->:s3=>2
+:s4=>2-'b'->:s4=>2
+:s4=>2-'c'->:s4=>2<\n>
+>>
+
+Errors() ::= ""
+
+grammar(grammarName) ::= <<
+lexer grammar <grammarName>;
+ENUM : 'enum' { <False()> }? ;
+ID : 'a'..'z'+ ;
+WS : (' '|'\n') -> skip;
+>>
