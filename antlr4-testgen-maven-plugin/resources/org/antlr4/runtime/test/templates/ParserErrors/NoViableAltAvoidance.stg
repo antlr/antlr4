@@ -1,0 +1,35 @@
+// "a." matches 'a' to rule e but then realizes '.' won't match.
+// previously would cause noviablealt. now prediction pretends to
+// have "a' predict 2nd alt of e. Will get syntax error later so
+// let it get farther.
+
+TestType() ::= "Parser"
+
+Options ::= [
+	"Debug": false
+]
+
+Grammar ::= [
+	"T": {<grammar("T")>}
+]
+
+Input() ::= "a."
+
+Rule() ::= "s"
+
+Output() ::= <<
+>>
+
+Errors() ::= <<
+line 1:1 mismatched input '.' expecting '!'<\n>
+>>
+
+grammar(grammarName) ::= <<
+grammar <grammarName>;
+s : e '!' ;
+e : 'a' 'b'
+  | 'a'
+  ;
+DOT : '.' ;
+WS : [ \t\r\n]+ -> skip;
+>>

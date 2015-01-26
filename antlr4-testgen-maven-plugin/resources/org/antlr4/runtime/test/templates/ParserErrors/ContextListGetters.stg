@@ -1,0 +1,29 @@
+TestType() ::= "Parser"
+
+Options ::= [
+	"Debug": false
+]
+
+Grammar ::= [
+	"T": {<grammar("T")>}
+]
+
+Input() ::= "abab"
+
+Rule() ::= "s"
+
+Output() ::= <<
+abab<\n>
+>>
+
+Errors() ::= ""
+
+grammar(grammarName) ::= <<
+grammar <grammarName>;
+@parser::members{
+<DeclareContextListGettersFunction()>
+}
+s : (a | b)+;
+a : 'a' {<write("'a'")>};
+b : 'b' {<write("'b'")>};
+>>

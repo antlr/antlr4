@@ -1,3 +1,24 @@
+TestType() ::= "Parser"
+
+Options ::= [
+	"Debug": false
+]
+
+Grammar ::= [
+	"T": {<grammar("T")>}
+]
+
+Input() ::= "dog and software"
+
+Rule() ::= "start"
+
+Output() ::= <<
+{'hardware', 'software'}<\n>
+>>
+
+Errors() ::= ""
+
+grammar(grammarName) ::= <<
 grammar <grammarName>;
 start : animal (AND acClass)? service EOF;
 animal : (DOG | CAT );
@@ -12,3 +33,4 @@ acClass
 @init
 {<GetExpectedTokenNames():writeln()>}
   : ;
+>>
