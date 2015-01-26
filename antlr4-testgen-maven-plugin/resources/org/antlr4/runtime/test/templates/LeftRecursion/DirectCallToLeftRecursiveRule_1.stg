@@ -1,0 +1,9 @@
+import "DirectCallToLeftRecursiveRule.stg"
+
+Input() ::= "x"
+
+Output() ::= <<
+(a x)<\n>
+>>
+
+Errors() ::= ""

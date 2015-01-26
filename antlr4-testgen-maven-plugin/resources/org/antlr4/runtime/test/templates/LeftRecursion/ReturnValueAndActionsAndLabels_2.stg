@@ -1,0 +1,9 @@
+import "ReturnValueAndActionsAndLabels.stg"
+
+Input() ::= "1+2"
+
+Output() ::= <<
+3<\n>
+>>
+
+Errors() ::= ""

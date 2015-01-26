@@ -1,0 +1,9 @@
+import "JavaExpressions.stg"
+
+Input() ::= "a.f(x)==T.c"
+
+Output() ::= <<
+(s (e (e (e (e a) . f) ( (expressionList (e x)) )) == (e (e T) . c)) \<EOF>)<\n>
+>>
+
+Errors() ::= ""

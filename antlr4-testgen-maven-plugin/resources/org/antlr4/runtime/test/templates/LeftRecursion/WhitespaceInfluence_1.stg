@@ -1,0 +1,7 @@
+import "WhitespaceInfluence.stg"
+
+Input() ::= "Test(1,3)"
+
+Output() ::= ""
+
+Errors() ::= ""
