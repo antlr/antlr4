@@ -5,6 +5,7 @@ TestFolders ::= [
 	"LexerExec": [],
 	"Listeners": [],
 	"ParserErrors": [],
+	"ParserExec": [],
 	"ParseTrees": [],
 	"SemPredEvalLexer": [],
 	"SemPredEvalParser": []

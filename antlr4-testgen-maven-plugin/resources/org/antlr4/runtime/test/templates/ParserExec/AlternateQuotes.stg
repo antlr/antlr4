@@ -1,0 +1,42 @@
+TestType() ::= "CompositeParser"
+
+Options ::= [
+	"SlaveIsLexer": true,
+	"Debug": false
+]
+
+Grammar ::= [
+	"ModeTagsParser": {<grammar("ModeTagsParser", "ModeTagsLexer")>}
+]
+
+SlaveGrammars ::= [
+	"ModeTagsLexer": {<slaveGrammar("ModeTagsLexer")>}
+]
+
+Input() ::= ""
+
+Rule() ::= "file_"
+
+Output() ::= ""
+
+Errors() ::= ""
+
+grammar(grammarName, slaveGrammarName) ::= <<
+parser grammar <grammarName>;
+options { tokenVocab=<slaveGrammarName>; } // use tokens from <slaveGrammarName>.g4
+file_: (tag | TEXT)* ;
+tag : '«' ID '»'
+    | '«' '/' ID '»'
+    ;
+>>
+
+slaveGrammar(grammarName) ::= <<
+lexer grammar <grammarName>;
+// Default mode rules (the SEA)
+OPEN  : '«'     -> mode(ISLAND) ;       // switch to ISLAND mode
+TEXT  : ~'«'+ ;                         // clump all text together
+mode ISLAND;
+CLOSE : '»'     -> mode(DEFAULT_MODE) ; // back to SEA mode
+SLASH : '/' ;
+ID    : [a-zA-Z]+ ;                     // match/send ID in tag to parser
+>>

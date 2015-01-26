@@ -1,0 +1,27 @@
+TestType() ::= "Parser"
+
+Options ::= [
+	"Debug": false
+]
+
+Grammar ::= [
+	"T": {<grammar("T")>}
+]
+
+Input() ::= "if x if x a else b"
+
+Rule() ::= "s"
+
+Output() ::= ""
+
+Errors() ::= ""
+
+grammar(grammarName) ::= <<
+grammar <grammarName>;
+s : stmt EOF ;
+stmt : ifStmt | ID;
+ifStmt : 'if' ID stmt ('else' stmt | { <LANotEquals("1", "ELSE")> }?);
+ELSE : 'else';
+ID : [a-zA-Z]+;
+WS : [ \\n\\t]+ -> skip;
+>>

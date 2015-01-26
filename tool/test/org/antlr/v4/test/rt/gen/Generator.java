@@ -152,7 +152,6 @@ public class Generator {
 		List<JUnitTestFile> list = new ArrayList<JUnitTestFile>();
 		list.add(buildCompositeParsers());
 		list.add(buildFullContextParsing());
-		list.add(buildParserExec());
 		return list;
 	}
 
@@ -306,72 +305,5 @@ public class Generator {
 		file.addCompositeParserTest(input, "ImportLexerWithOnlyFragmentRules", "M", "program", "test test", "", null, "S");
 		return file;
 	}
-
-	private JUnitTestFile buildParserExec() throws Exception {
-		JUnitTestFile file = new JUnitTestFile("ParserExec");
-		file.addParserTest(input, "Labels", "T", "a", "abc 34;", "", null);
-		file.addParserTest(input, "ListLabelsOnSet", "T", "a", "abc 34;", "", null);
-		file.addParserTest(input, "AorB", "T", "a", "34", "alt 2\n", null);
-		file.addParserTest(input, "Basic", "T", "a", "abc 34", "abc34\n", null);
-		file.addParserTest(input, "APlus", "T", "a", "a b c", "abc\n", null);
-		file.addParserTest(input, "AorAPlus", "T", "a", "a b c", "abc\n", null);
-		file.addParserTest(input, "IfIfElseGreedyBinding1", "T", "start",
-				"if y if y x else x", "if y x else x\nif y if y x else x\n", null);
-		file.addParserTest(input, "IfIfElseGreedyBinding2", "T", "start",
-				"if y if y x else x", "if y x else x\nif y if y x else x\n", null);
-		file.addParserTest(input, "IfIfElseNonGreedyBinding1", "T", "start",
-				"if y if y x else x", "if y x\nif y if y x else x\n", null);
-		file.addParserTest(input, "IfIfElseNonGreedyBinding2", "T", "start",
-				"if y if y x else x", "if y x\nif y if y x else x\n", null);
-		file.addParserTests(input, "AStar", "T", "a",
-				"", "\n",
-				"a b c", "abc\n");
-		file.addParserTests(input, "LL1OptionalBlock", "T", "a",
-				"", "\n",
-				"a", "a\n");
-		file.addParserTests(input, "AorAStar", "T", "a",
-				"", "\n",
-				"a b c", "abc\n");
-		file.addParserTest(input, "AorBPlus", "T", "a", "a 34 c", "a34c\n", null);
-		file.addParserTests(input, "AorBStar", "T", "a",
-				"", "\n",
-				"a 34 c", "a34c\n");
-		file.addParserTests(input, "Optional", "T", "stat",
-				"x", "",
-				"if x", "",
-				"if x else x", "",
-				"if if x else x", "");
-		file.addParserTest(input, "PredicatedIfIfElse", "T", "s", "if x if x a else b", "", null);
-		/* file.addTest(input, "StartRuleWithoutEOF", "T", "s", "abc 34",
-				"Decision 0:\n" + "s0-ID->s1\n" + "s1-INT->s2\n" + "s2-EOF->:s3=>1\n", null); */
-		file.addParserTest(input, "LabelAliasingAcrossLabeledAlternatives", "T", "start", "xy", "x\ny\n", null);
-		file.addParserTest(input, "PredictionIssue334", "T", "file_", "a", "(file_ (item a) <EOF>)\n", null);
-		file.addParserTest(input, "ListLabelForClosureContext", "T", "expression", "a", "", null);
-		/**
-		 * This test ensures that {@link ParserATNSimulator} produces a correct
-		 * result when the grammar contains multiple explicit references to
-		 * {@code EOF} inside of parser rules.
-		 */
-		file.addParserTest(input, "MultipleEOFHandling", "T", "prog", "x", "", null);
-		/**
-		 * This test ensures that {@link ParserATNSimulator} does not produce a
-		 * {@link StackOverflowError} when it encounters an {@code EOF} transition
-		 * inside a closure.
-		 */
-		file.addParserTest(input, "EOFInClosure", "T", "prog", "x", "", null);
-		/**
-		 * This is a regression test for antlr/antlr4#561 "Issue with parser
-		 * generation in 4.2.2"
-		 * https://github.com/antlr/antlr4/issues/561
-		 */
-		file.addParserTests(input, "ReferenceToATN", "T", "a",
-			"", "\n",
-			"a 34 c", "a34c\n");
-		/*CompositeParserTestMethod tm = file.addCompositeParserTest(input, "AlternateQuotes", "ModeTagsParser", "file_", "", "", null, "ModeTagsLexer");
-		tm.slaveIsLexer = true;*/
-		return file;
-	}
-
-
 
 }

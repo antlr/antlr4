@@ -1,0 +1,31 @@
+TestType() ::= "Parser"
+
+Options ::= [
+	"Debug": true
+]
+
+Grammar ::= [
+	"T": {<grammar("T")>}
+]
+
+Input() ::= "abc 34"
+
+Rule() ::= "s"
+
+Output() ::= <<
+Decision 0:
+s0-ID->s1
+s1-INT->s2
+s2-EOF->:s3=>1<\n>
+>>
+
+Errors() ::= ""
+
+grammar(grammarName) ::= <<
+grammar <grammarName>;
+s @after { <DumpDFA()> }
+  : ID | ID INT ID ;
+ID : 'a'..'z'+ ;
+INT : '0'..'9'+;
+WS : (' '|'\t'|'\n') -> skip;
+>>

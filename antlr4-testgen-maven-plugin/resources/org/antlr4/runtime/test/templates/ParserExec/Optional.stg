@@ -1,0 +1,18 @@
+TestType() ::= "Parser"
+
+Options ::= [
+	"Debug": false
+]
+
+Grammar ::= [
+	"T": {<grammar("T")>}
+]
+
+Rule() ::= "stat"
+
+grammar(grammarName) ::= <<
+grammar <grammarName>;
+stat : ifstat | 'x';
+ifstat : 'if' stat ('else' stat)?;
+WS : [ \n\t]+ -> skip ;
+>>
