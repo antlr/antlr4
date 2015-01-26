@@ -165,21 +165,27 @@ public class DFA {
 	 * @param precedenceDfa {@code true} if this is a precedence DFA; otherwise,
 	 * {@code false}
 	 */
-	public final synchronized void setPrecedenceDfa(boolean precedenceDfa) {
-		if (this.precedenceDfa != precedenceDfa) {
-			this.states.clear();
-			if (precedenceDfa) {
-				DFAState precedenceState = new DFAState(new ATNConfigSet());
-				precedenceState.edges = new DFAState[0];
-				precedenceState.isAcceptState = false;
-				precedenceState.requiresFullContext = false;
-				this.s0 = precedenceState;
+	public final void setPrecedenceDfa(boolean precedenceDfa) {
+		// Synchronize on this.states since we alter the map and other code
+		// which updates the DFA synchronizes on states, not on the DFA instance
+		// itself.
+		synchronized (this.states) {
+			if (this.precedenceDfa != precedenceDfa) {
+				this.states.clear();
+				// must set precedenceDfa before s0 to ensure correct branches
+				// are followed in adaptivePredict
+				this.precedenceDfa = precedenceDfa;
+				if (precedenceDfa) {
+					DFAState precedenceState = new DFAState(new ATNConfigSet());
+					precedenceState.edges = new DFAState[0];
+					precedenceState.isAcceptState = false;
+					precedenceState.requiresFullContext = false;
+					this.s0 = precedenceState;
+				}
+				else {
+					this.s0 = null;
+				}
 			}
-			else {
-				this.s0 = null;
-			}
-
-			this.precedenceDfa = precedenceDfa;
 		}
 	}
 
