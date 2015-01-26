@@ -1,10 +1,23 @@
+TestType() ::= "Parser"
+
+Options ::= [
+	"Debug": false
+]
+
+Grammar ::= [
+	"T": {<grammar("T")>}
+]
+
+Rule() ::= "s"
+
+grammar(grammarName) ::= <<
 grammar <grammarName>;
 @parser::header {
 <ImportListener(grammarName)>
 }
 
 @parser::members {
-<LRListener(grammarName)>
+<TokenGetterListener(grammarName)>
 }
 
 s
@@ -12,13 +25,13 @@ s
 <ToStringTree("$ctx.r"):writeln()>
 <WalkListener("$ctx.r")>
 }
-	: r=e ;
-e : e op='*' e
-	| e op='+' e
-	| INT
-	;
+  : r=a ;
+a : INT INT
+  | ID
+  ;
 MULT: '*' ;
 ADD : '+' ;
 INT : [0-9]+ ;
 ID  : [a-z]+ ;
 WS : [ \t\n]+ -> skip ;
+>>

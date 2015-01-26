@@ -1,6 +1,7 @@
 TestFolders ::= [
 	"CompositeLexers": [],
 	"LexerExec": [],
+	"Listeners": [],
 	"ParserErrors": [],
 	"ParseTrees": [],
 	"SemPredEvalLexer": [],

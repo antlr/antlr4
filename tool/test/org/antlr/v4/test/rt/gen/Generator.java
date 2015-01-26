@@ -154,46 +154,8 @@ public class Generator {
 		list.add(buildFullContextParsing());
 		list.add(buildLeftRecursion());
 		list.add(buildLexerErrors());
-		list.add(buildListeners());
 		list.add(buildParserExec());
 		return list;
-	}
-
-	private JUnitTestFile buildListeners() throws Exception {
-		JUnitTestFile file = new JUnitTestFile("Listeners");
-		file.addParserTest(input, "Basic", "T", "s",
-				"1 2",
-				"(a 1 2)\n" + "1\n" + "2\n",
-				null);
-		file.addParserTests(input, "TokenGetters", "T", "s",
-				"1 2",
-				"(a 1 2)\n" +
-				"1 2 [1, 2]\n",
-				"abc",
-				"(a abc)\n" +
-				"[@0,0:2='abc',<4>,1:0]\n");
-		file.addParserTests(input, "RuleGetters", "T", "s",
-				"1 2",
-				"(a (b 1) (b 2))\n" +
-				"1 2 1\n",
-				"abc",
-				"(a (b abc))\n" +
-				"abc\n");
-		file.addParserTest(input, "LR", "T", "s",
-				"1+2*3",
-				"(e (e 1) + (e (e 2) * (e 3)))\n" +
-				"1\n" +
-				"2\n" +
-				"3\n" +
-				"2 3 2\n" +
-				"1 2 1\n",
-				null);
-		file.addParserTest(input, "LRWithLabels", "T", "s",
-				"1(2,3)",
-				"(e (e 1) ( (eList (e 2) , (e 3)) ))\n" +
-				"1\n" + "2\n" + "3\n" + "1 [13 6]\n",
-				null);
-		return file;
 	}
 
 	private JUnitTestFile buildLexerErrors() throws Exception {

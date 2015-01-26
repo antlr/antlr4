@@ -1,0 +1,12 @@
+//TestFolders ::= [
+//]
+
+TestTemplates ::= [
+	"Basic": [],
+	"TokenGetters_1": [],
+	"TokenGetters_2": [],
+	"RuleGetters_1": [],
+	"RuleGetters_2": [],
+	"LR": [],
+	"LRWithLabels": []
+]
