@@ -71,6 +71,9 @@ public class Antlr4TestGeneratorMojo extends AbstractMojo {
 	@Parameter(defaultValue = "${project.build.directory}/generated-test-sources/antlr4-tests")
 	private File outputDirectory;
 
+	@Parameter
+	private boolean visualize;
+
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		STGroup targetGroup = new STGroupFile(runtimeTemplates.getPath());
@@ -128,10 +131,13 @@ public class Antlr4TestGeneratorMojo extends AbstractMojo {
 
 		ST testFileTemplate = targetGroup.getInstanceOf("TestFile");
 		testFileTemplate.addAggr("file.{Options,name,tests}", index.rawGetDictionary("Options"), testFile, templates);
-		STViz viz = testFileTemplate.inspect();
-		try {
-			viz.waitForClose();
-		} catch (InterruptedException ex) {
+
+		if (visualize) {
+			STViz viz = testFileTemplate.inspect();
+			try {
+				viz.waitForClose();
+			} catch (InterruptedException ex) {
+			}
 		}
 
 		File targetFolder = new File(outputDirectory, templateFolder.substring(0, templateFolder.indexOf("/templates")));
