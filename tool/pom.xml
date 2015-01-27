@@ -181,6 +181,13 @@
                     </execution>
                 </executions>
             </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <!-- Override version from parent -->
+                <version>2.18.1</version>
+            </plugin>
         </plugins>
     </build>
 
