@@ -1,0 +1,31 @@
+TestType() ::= "CompositeParser"
+
+Grammar ::= [
+	"M": {<masterGrammar("M", "S")>}
+]
+
+SlaveGrammars ::= [
+	"S": {<slaveGrammar("S")>}
+]
+
+Rule() ::= "s"
+
+Input() ::= "=a"
+
+Output() ::= <<
+S.a<\n>
+>>
+
+Errors() ::= ""
+
+masterGrammar(grammarName, slaveGrammarName) ::= <<
+grammar M;
+import S;
+s : a ;
+WS : (' '|'\n') -> skip ;
+>>
+
+slaveGrammar(grammarName) ::= <<
+parser grammar S;
+a : '=' 'a' {<write("\"S.a\"")>};
+>>

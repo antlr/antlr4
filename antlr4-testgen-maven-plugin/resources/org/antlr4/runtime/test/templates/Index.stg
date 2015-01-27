@@ -1,5 +1,6 @@
 TestFolders ::= [
 	"CompositeLexers": [],
+	"CompositeParsers": [],
 	"FullContextParsing": [],
 	"LeftRecursion": [],
 	"LexerErrors": [],

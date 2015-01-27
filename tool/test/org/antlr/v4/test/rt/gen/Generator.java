@@ -150,46 +150,7 @@ public class Generator {
 
 	private Collection<JUnitTestFile> buildTests() throws Exception {
 		List<JUnitTestFile> list = new ArrayList<JUnitTestFile>();
-		list.add(buildCompositeParsers());
 		return list;
-	}
-
-	private JUnitTestFile buildCompositeParsers() throws Exception {
-		JUnitTestFile file = new JUnitTestFile("CompositeParsers");
-		file.importErrorQueue = true;
-		file.importGrammar = true;
-		file.addCompositeParserTest(input, "DelegatorInvokesDelegateRule", "M", "s", "b", "S.a\n", null, "S");
-		file.addCompositeParserTest(input, "BringInLiteralsFromDelegate", "M", "s", "=a", "S.a\n", null, "S");
-		file.addCompositeParserTest(input, "DelegatorInvokesDelegateRuleWithArgs", "M", "s", "b", "S.a1000\n", null, "S");
-		file.addCompositeParserTest(input, "DelegatorInvokesDelegateRuleWithReturnStruct", "M", "s", "b", "S.ab\n", null, "S");
-		file.addCompositeParserTest(input, "DelegatorAccessesDelegateMembers", "M", "s", "b", "foo\n", null, "S");
-		file.addCompositeParserTest(input, "DelegatorInvokesFirstVersionOfDelegateRule", "M", "s", "b", "S.a\n", null, "S", "T");
-		CompositeParserTestMethod ct = file.addCompositeParserTest(input, "DelegatesSeeSameTokenType", "M", "s", "aa", "S.x\nT.y\n", null, "S", "T");
-		ct.afterGrammar = "writeFile(tmpdir, \"M.g4\", grammar);\n" +
-			"ErrorQueue equeue = new ErrorQueue();\n" +
-			"Grammar g = new Grammar(tmpdir+\"/M.g4\", grammar, equeue);\n" +
-			"String expectedTokenIDToTypeMap = \"{EOF=-1, B=1, A=2, C=3, WS=4}\";\n" +
-			"String expectedStringLiteralToTypeMap = \"{'a'=2, 'b'=1, 'c'=3}\";\n" +
-			"String expectedTypeToTokenList = \"[B, A, C, WS]\";\n" +
-			"assertEquals(expectedTokenIDToTypeMap, g.tokenNameToTypeMap.toString());\n" +
-			"assertEquals(expectedStringLiteralToTypeMap, sort(g.stringLiteralToTypeMap).toString());\n" +
-			"assertEquals(expectedTypeToTokenList, realElements(g.typeToTokenList).toString());\n" +
-			"assertEquals(\"unexpected errors: \"+equeue, 0, equeue.errors.size());\n";
-		ct = file.addCompositeParserTest(input, "CombinedImportsCombined", "M", "s", "x 34 9", "S.x\n", null, "S");
-		ct.afterGrammar = "writeFile(tmpdir, \"M.g4\", grammar);\n" +
-				"ErrorQueue equeue = new ErrorQueue();\n" +
-				"new Grammar(tmpdir+\"/M.g4\", grammar, equeue);\n" +
-				"assertEquals(\"unexpected errors: \" + equeue, 0, equeue.errors.size());\n";
-		file.addCompositeParserTest(input, "DelegatorRuleOverridesDelegate", "M", "a", "c", "S.a\n", null, "S");
-		file.addCompositeParserTest(input, "DelegatorRuleOverridesLookaheadInDelegate", "M", "prog", "float x = 3;", "Decl: floatx=3;\n", null, "S");
-		file.addCompositeParserTest(input, "DelegatorRuleOverridesDelegates", "M", "a", "c", "M.b\nS.a\n", null, "S", "T");
-		file.addCompositeParserTest(input, "KeywordVSIDOrder", "M", "a", "abc",
-				"M.A\n" +
-				"M.a: [@0,0:2='abc',<1>,1:0]\n", null, "S");
-		file.addCompositeParserTest(input, "ImportedRuleWithAction", "M", "s", "b", "", null, "S");
-		file.addCompositeParserTest(input, "ImportedGrammarWithEmptyOptions", "M", "s", "b", "", null, "S");
-		file.addCompositeParserTest(input, "ImportLexerWithOnlyFragmentRules", "M", "program", "test test", "", null, "S");
-		return file;
 	}
 
 }

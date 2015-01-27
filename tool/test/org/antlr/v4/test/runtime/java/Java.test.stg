@@ -6,10 +6,10 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-<if(file.importErrorQueue)>
+<if(file.Options.("ImportErrorQueue"))>
 import org.antlr.v4.test.tool.ErrorQueue;
 <endif>
-<if(file.importGrammar)>
+<if(file.Options.("ImportGrammar"))>
 import org.antlr.v4.tool.Grammar;
 <endif>
 
@@ -82,21 +82,19 @@ ParserTestMethod(test) ::= <<
 public void test<test.name>() throws Exception {
 	mkdir(tmpdir);
 
-<!<test.slaveGrammars:{ grammar | 
-	String slave_<grammar.grammarName> = <grammar.lines:{ line | "<line>};separator="\\n\" +\n", wrap, anchor>";
-	<if(test.slaveIsLexer)>
-	rawGenerateAndBuildRecognizer("<grammar.grammarName>.g4", slave_<grammar.grammarName>, null, "<grammar.grammarName>");
-	<else>
-	mkdir(tmpdir);
-	writeFile(tmpdir, "<grammar.grammarName>.g4", slave_<grammar.grammarName>);
-	<endif>
-	};separator="\n", wrap, anchor>!>
+<test.SlaveGrammars:{grammar |
+	String slave_<grammar> =<writeStringLiteral(test.SlaveGrammars.(grammar))>;
+<if(test.Options.("SlaveIsLexer"))>
+	rawGenerateAndBuildRecognizer("<grammar>.g4", slave_<grammar>, null, "<grammar>");
+<else>
+	writeFile(tmpdir, "<grammar>.g4", slave_<grammar>);
+<endif>
+	}; separator="\n">
 <test.Grammar:{grammar |
 	<buildStringLiteral(test.Grammar.(grammar), "grammar")>
 
-<if(test.AfterGrammar)>
 	<test.AfterGrammar>
-<endif>
+
 	String input =<writeStringLiteral(test.Input)>;
 	String found = execParser("<grammar>.g4", grammar, "<grammar>Parser", "<grammar>Lexer", "<test.Rule>", input, <writeBoolean(test.Options.("Debug"))>);
 	assertEquals(<writeStringLiteral(test.Output)>, found);

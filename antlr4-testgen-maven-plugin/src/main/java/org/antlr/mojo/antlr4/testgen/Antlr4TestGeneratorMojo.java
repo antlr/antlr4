@@ -101,11 +101,11 @@ public class Antlr4TestGeneratorMojo extends AbstractMojo {
 
 		Map<String, Object> templates = index.rawGetDictionary("TestTemplates");
 		if (templates != null && !templates.isEmpty()) {
-			generateTestFile(targetGroup, folder.substring(folder.lastIndexOf('/') + 1), folder, new ArrayList<String>(templates.keySet()));
+			generateTestFile(index, targetGroup, folder.substring(folder.lastIndexOf('/') + 1), folder, new ArrayList<String>(templates.keySet()));
 		}
 	}
 
-	private void generateTestFile(STGroup targetGroup, String testFile, String templateFolder, Collection<String> testTemplates) {
+	private void generateTestFile(STGroup index, STGroup targetGroup, String testFile, String templateFolder, Collection<String> testTemplates) {
 		List<ST> templates = new ArrayList<ST>();
 		for (String template : testTemplates) {
 			STGroup testGroup = new STGroupFile(templateFolder + "/" + template + STGroup.GROUP_FILE_EXTENSION);
@@ -127,7 +127,7 @@ public class Antlr4TestGeneratorMojo extends AbstractMojo {
 		}
 
 		ST testFileTemplate = targetGroup.getInstanceOf("TestFile");
-		testFileTemplate.addAggr("file.{importErrorQueue,importGrammar,name,tests}", false, false, testFile, templates);
+		testFileTemplate.addAggr("file.{Options,name,tests}", index.rawGetDictionary("Options"), testFile, templates);
 		STViz viz = testFileTemplate.inspect();
 		try {
 			viz.waitForClose();
