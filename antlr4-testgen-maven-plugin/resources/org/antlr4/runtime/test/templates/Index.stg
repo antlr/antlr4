@@ -9,7 +9,8 @@ TestFolders ::= [
 	"ParserExec": [],
 	"ParseTrees": [],
 	"SemPredEvalLexer": [],
-	"SemPredEvalParser": []
+	"SemPredEvalParser": [],
+	"Sets": []
 ]
 
 //TestTemplates ::= [
