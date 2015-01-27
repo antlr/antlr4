@@ -1,3 +1,16 @@
+TestType() ::= "Parser"
+
+Options ::= [
+	"Debug": true
+]
+
+Grammar ::= [
+	"T": {<grammar("T")>}
+]
+
+Rule() ::= "s"
+
+grammar(grammarName) ::= <<
 grammar <grammarName>;
 s @after {<DumpDFA()>}
   : '$' a | '@' b ;
@@ -7,3 +20,4 @@ e : INT | ;
 ID : 'a'..'z'+ ;
 INT : '0'..'9'+ ;
 WS : (' '|'\t'|'\n')+ -> skip ;
+>>

@@ -1,3 +1,16 @@
+TestType() ::= "Parser"
+
+Options ::= [
+	"Debug": true
+]
+
+Grammar ::= [
+	"T": {<grammar("T")>}
+]
+
+Rule() ::= "s"
+
+grammar(grammarName) ::= <<
 grammar <grammarName>;
 s 
 @init {<LL_EXACT_AMBIG_DETECTION()>}
@@ -8,3 +21,4 @@ stat: 'if' ID 'then' stat ('else' ID)?
 		;
 ID : 'a'..'z'+ ;
 WS : (' '|'\t'|'\n')+ -> skip ;
+>>
