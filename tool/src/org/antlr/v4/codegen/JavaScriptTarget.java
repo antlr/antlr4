@@ -48,7 +48,7 @@ public class JavaScriptTarget extends Target {
 	protected static final String[] javaScriptKeywords = {
 		"abstract", "assert", "boolean", "break", "byte", "case", "catch",
 		"char", "class", "const", "continue", "default", "do", "double", "else",
-		"enum", "extends", "false", "final", "finally", "float", "for",
+		"enum", "extends", "false", "final", "finally", "float", "for", "function",
 		"if", "implements", "import", "instanceof", "int", "interface",
 		"long", "native", "new", "null", "package", "private", "protected",
 		"public", "return", "short", "static", "strictfp", "super", "switch",
@@ -65,7 +65,7 @@ public class JavaScriptTarget extends Target {
 
     @Override
     public String getVersion() {
-        return "4.5"; 
+        return "4.5";
     }
 
     public Set<String> getBadWords() {
@@ -215,7 +215,7 @@ public class JavaScriptTarget extends Target {
 		}
 
 	}
-	
+
 	public boolean wantsBaseListener() {
 		return false;
 	}
