@@ -45,15 +45,22 @@ import java.util.Set;
  */
 public class JavaScriptTarget extends Target {
 
+	/** Source: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Lexical_gramma */
 	protected static final String[] javaScriptKeywords = {
-		"abstract", "assert", "boolean", "break", "byte", "case", "catch",
-		"char", "class", "const", "continue", "default", "do", "double", "else",
-		"enum", "extends", "false", "final", "finally", "float", "for", "function",
-		"if", "implements", "import", "instanceof", "int", "interface",
-		"long", "native", "new", "null", "package", "private", "protected",
-		"public", "return", "short", "static", "strictfp", "super", "switch",
-		"synchronized", "this", "throw", "throws", "transient", "true", "try",
-		"void", "volatile", "while"
+		"break", "case", "class", "catch", "const", "continue", "debugger",
+		"default", "delete", "do", "else", "export", "extends", "finally", "for",
+		"function", "if", "import", "in", "instanceof", "let", "new", "return",
+		"super", "switch", "this", "throw", "try", "typeof", "var", "void",
+		"while", "with", "yield",
+		//future reserved
+		"enum", "await", "implements", "package", "protected", "static",
+		"interface", "private", "public",
+		//future reserved in older standards
+		"abstract", "boolean", "byte", "char", "double", "final", "float",
+		"goto", "int", "long", "native", "short", "synchronized", "transient",
+		"volatile",
+		//literals
+		"null", "true", "false"
 	};
 
 	/** Avoid grammar symbols in this set to prevent conflicts in gen'd code. */
