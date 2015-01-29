@@ -45,7 +45,7 @@ import java.util.Set;
  */
 public class JavaScriptTarget extends Target {
 
-	/** Source: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Lexical_gramma */
+	/** Source: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Lexical_grammar */
 	protected static final String[] javaScriptKeywords = {
 		"break", "case", "class", "catch", "const", "continue", "debugger",
 		"default", "delete", "do", "else", "export", "extends", "finally", "for",
