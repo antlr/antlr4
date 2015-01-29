@@ -67,6 +67,9 @@ class Recognizer(object):
     def addErrorListener(self, listener):
         self._listeners.append(listener)
 
+    def removeErrorListener(self, listener):
+        self._listeners.remove(listener)
+
     def getTokenTypeMap(self):
         tokenNames = self.getTokenNames()
         if tokenNames is None:
