@@ -387,17 +387,6 @@ public class ParserATNSimulator extends ATNSimulator {
 									   ", outerContext="+ outerContext.toString(parser));
 				}
 
-				/* If this is not a precedence DFA, we check the ATN start state
-				 * to determine if this ATN start state is the decision for the
-				 * closure block that determines whether a precedence rule
-				 * should continue or complete.
-				 */
-				if (!dfa.isPrecedenceDfa() && dfa.atnStartState instanceof StarLoopEntryState) {
-					if (((StarLoopEntryState)dfa.atnStartState).precedenceRuleDecision) {
-						dfa.setPrecedenceDfa(true);
-					}
-				}
-
 				boolean fullCtx = false;
 				ATNConfigSet s0_closure =
 					computeStartState(dfa.atnStartState,
