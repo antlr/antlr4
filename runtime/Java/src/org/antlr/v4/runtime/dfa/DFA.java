@@ -34,6 +34,7 @@ import org.antlr.v4.runtime.Vocabulary;
 import org.antlr.v4.runtime.VocabularyImpl;
 import org.antlr.v4.runtime.atn.ATNConfigSet;
 import org.antlr.v4.runtime.atn.DecisionState;
+import org.antlr.v4.runtime.atn.StarLoopEntryState;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 
@@ -63,10 +64,9 @@ public class DFA {
 
 	/**
 	 * {@code true} if this DFA is for a precedence decision; otherwise,
-	 * {@code false}. This is the backing field for {@link #isPrecedenceDfa},
-	 * {@link #setPrecedenceDfa}.
+	 * {@code false}. This is the backing field for {@link #isPrecedenceDfa}.
 	 */
-	private volatile boolean precedenceDfa;
+	private final boolean precedenceDfa;
 
 	public DFA(DecisionState atnStartState) {
 		this(atnStartState, 0);
@@ -75,6 +75,20 @@ public class DFA {
 	public DFA(DecisionState atnStartState, int decision) {
 		this.atnStartState = atnStartState;
 		this.decision = decision;
+
+		boolean precedenceDfa = false;
+		if (atnStartState instanceof StarLoopEntryState) {
+			if (((StarLoopEntryState)atnStartState).precedenceRuleDecision) {
+				precedenceDfa = true;
+				DFAState precedenceState = new DFAState(new ATNConfigSet());
+				precedenceState.edges = new DFAState[0];
+				precedenceState.isAcceptState = false;
+				precedenceState.requiresFullContext = false;
+				this.s0 = precedenceState;
+			}
+		}
+
+		this.precedenceDfa = precedenceDfa;
 	}
 
 	/**
@@ -149,43 +163,20 @@ public class DFA {
 	}
 
 	/**
-	 * Sets whether this is a precedence DFA. If the specified value differs
-	 * from the current DFA configuration, the following actions are taken;
-	 * otherwise no changes are made to the current DFA.
-	 *
-	 * <ul>
-	 * <li>The {@link #states} map is cleared</li>
-	 * <li>If {@code precedenceDfa} is {@code false}, the initial state
-	 * {@link #s0} is set to {@code null}; otherwise, it is initialized to a new
-	 * {@link DFAState} with an empty outgoing {@link DFAState#edges} array to
-	 * store the start states for individual precedence values.</li>
-	 * <li>The {@link #precedenceDfa} field is updated</li>
-	 * </ul>
+	 * Sets whether this is a precedence DFA.
 	 *
 	 * @param precedenceDfa {@code true} if this is a precedence DFA; otherwise,
 	 * {@code false}
+	 *
+	 * @throws UnsupportedOperationException if {@code precedenceDfa} does not
+	 * match the value of {@link #isPrecedenceDfa} for the current DFA.
+	 *
+	 * @deprecated This method no longer performs any action.
 	 */
+	@Deprecated
 	public final void setPrecedenceDfa(boolean precedenceDfa) {
-		// Synchronize on this.states since we alter the map and other code
-		// which updates the DFA synchronizes on states, not on the DFA instance
-		// itself.
-		synchronized (this.states) {
-			if (this.precedenceDfa != precedenceDfa) {
-				this.states.clear();
-				// must set precedenceDfa before s0 to ensure correct branches
-				// are followed in adaptivePredict
-				this.precedenceDfa = precedenceDfa;
-				if (precedenceDfa) {
-					DFAState precedenceState = new DFAState(new ATNConfigSet());
-					precedenceState.edges = new DFAState[0];
-					precedenceState.isAcceptState = false;
-					precedenceState.requiresFullContext = false;
-					this.s0 = precedenceState;
-				}
-				else {
-					this.s0 = null;
-				}
-			}
+		if (precedenceDfa != isPrecedenceDfa()) {
+			throw new UnsupportedOperationException("The precedenceDfa field cannot change after a DFA is constructed.");
 		}
 	}
 

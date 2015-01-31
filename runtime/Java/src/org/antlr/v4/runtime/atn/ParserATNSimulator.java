@@ -369,36 +369,22 @@ public class ParserATNSimulator extends ATNSimulator {
 		// But, do we still need an initial state?
 		try {
 			DFAState s0;
-			/* Threading note: dfa.s0 is the final value set on the DFA instance
-			 * which affects branch choice in this method. If dfa.s0 is null
-			 * (i.e. it has not been set), then we take the "slow" path through
-			 * the initialization code to ensure a correct start state is used.
-			 */
-			if (dfa.s0 == null) {
+			if (dfa.isPrecedenceDfa()) {
+				// the start state for a precedence DFA depends on the current
+				// parser precedence, and is provided by a DFA method.
+				s0 = dfa.getPrecedenceStartState(parser.getPrecedence());
+			}
+			else {
+				// the start state for a "regular" DFA is just s0
+				s0 = dfa.s0;
+			}
+
+			if (s0 == null) {
 				if ( outerContext ==null ) outerContext = ParserRuleContext.EMPTY;
 				if ( debug || debug_list_atn_decisions )  {
 					System.out.println("predictATN decision "+ dfa.decision+
 									   " exec LA(1)=="+ getLookaheadName(input) +
 									   ", outerContext="+ outerContext.toString(parser));
-				}
-
-				/* If this is not a precedence DFA, we check the ATN start state
-				 * to determine if this ATN start state is the decision for the
-				 * closure block that determines whether a precedence rule
-				 * should continue or complete.
-				 *
-				 * Threading note: cannot check the dfa.isPrecedenceDfa()
-				 * condition here, because it's possible for that value to
-				 * return true prior to dfa.s0 being set to the precedence start
-				 * state. Calling dfa.setPrecedenceDfa(true) multiple times is
-				 * safe, and the one-time performance overhead only occurs if
-				 * multiple threads try to initialize the same DFA start state
-				 * at the same time.
-				 */
-				if (dfa.atnStartState instanceof StarLoopEntryState) {
-					if (((StarLoopEntryState)dfa.atnStartState).precedenceRuleDecision) {
-						dfa.setPrecedenceDfa(true);
-					}
 				}
 
 				boolean fullCtx = false;
@@ -422,19 +408,6 @@ public class ParserATNSimulator extends ATNSimulator {
 					s0 = addDFAState(dfa, new DFAState(s0_closure));
 					dfa.s0 = s0;
 				}
-			} else if (dfa.isPrecedenceDfa()) {
-				/* Threading note: if dfa.s0 was not null, then
-				 * dfa.isPrecedenceDfa() must have already been set to the
-				 * correct value.
-				 */
-
-				// the start state for a precedence DFA depends on the current
-				// parser precedence, and is provided by a DFA method.
-				s0 = dfa.getPrecedenceStartState(parser.getPrecedence());
-			}
-			else {
-				// the start state for a "regular" DFA is just s0
-				s0 = dfa.s0;
 			}
 
 			int alt = execATN(dfa, s0, input, index, outerContext);
