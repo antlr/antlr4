@@ -17,6 +17,7 @@
       <sourceFolder url="file://$MODULE_DIR$/../gen3" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/../antlr4-maven-plugin/resources" type="java-resource" />
       <excludeFolder url="file://$MODULE_DIR$/../.idea" />
+      <excludeFolder url="file://$MODULE_DIR$/../antlr4-maven-plugin" />
       <excludeFolder url="file://$MODULE_DIR$/../build" />
       <excludeFolder url="file://$MODULE_DIR$/../runtime" />
     </content>
