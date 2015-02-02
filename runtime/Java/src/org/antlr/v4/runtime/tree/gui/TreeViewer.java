@@ -273,7 +273,7 @@ public class TreeViewer extends JComponent {
     private static final String DIALOG_X_PREFS_KEY              = "dialog_x";
     private static final String DIALOG_Y_PREFS_KEY              = "dialog_y";
     private static final String DIALOG_DIVIDER_LOC_PREFS_KEY    = "dialog_divider_location";
-    private static final String DIALOG_VIEWER_SCALE_PREFS_KEY   = "dialog_slider_location";
+    private static final String DIALOG_VIEWER_SCALE_PREFS_KEY   = "dialog_viewer_scale";
 
 	protected static JDialog showInDialog(final TreeViewer viewer) {
 		final JDialog dialog = new JDialog();
