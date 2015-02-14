@@ -46,8 +46,6 @@ import org.antlr.v4.runtime.dfa.DFAState;
 import org.antlr.v4.runtime.misc.DoubleKeyMap;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.IntervalSet;
-import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.misc.Pair;
 
 import java.util.ArrayList;
@@ -662,7 +660,7 @@ public class ParserATNSimulator extends ATNSimulator {
 
 	// comes back with reach.uniqueAlt set to a valid alt
 	protected int execATNWithFullContext(DFA dfa,
-										 DFAState D, // how far we got before failing over
+										 DFAState D, // how far we got in SLL DFA before failing over
 										 ATNConfigSet s0,
 										 TokenStream input, int startIndex,
 										 ParserRuleContext outerContext)
@@ -710,6 +708,7 @@ public class ParserATNSimulator extends ATNSimulator {
 			}
 
 //			System.out.println("altSubSets: "+altSubSets);
+//			System.err.println("reach="+reach+", "+reach.conflictingAlts);
 			reach.uniqueAlt = getUniqueAlt(reach);
 			// unique prediction?
 			if ( reach.uniqueAlt!=ATN.INVALID_ALT_NUMBER ) {
@@ -779,7 +778,8 @@ public class ParserATNSimulator extends ATNSimulator {
 		the fact that we should predict alternative 1.  We just can't say for
 		sure that there is an ambiguity without looking further.
 		*/
-		reportAmbiguity(dfa, D, startIndex, input.index(), foundExactAmbig, null, reach);
+		reportAmbiguity(dfa, D, startIndex, input.index(), foundExactAmbig,
+						reach.getAlts(), reach);
 
 		return predictedAlt;
 	}
@@ -2006,10 +2006,12 @@ public class ParserATNSimulator extends ATNSimulator {
     }
 
     /** If context sensitive parsing, we know it's ambiguity not conflict */
-    protected void reportAmbiguity(DFA dfa, DFAState D, int startIndex, int stopIndex,
+    protected void reportAmbiguity(DFA dfa,
+								   DFAState D, // the DFA state from execATN() that had SLL conflicts
+								   int startIndex, int stopIndex,
 								   boolean exact,
 								   BitSet ambigAlts,
-								   ATNConfigSet configs)
+								   ATNConfigSet configs) // configs that LL not SLL considered conflicting
 	{
 		if ( debug || retry_debug ) {
 			Interval interval = Interval.of(startIndex, stopIndex);

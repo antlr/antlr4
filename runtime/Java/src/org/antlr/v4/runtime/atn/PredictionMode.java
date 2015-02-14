@@ -33,7 +33,6 @@ package org.antlr.v4.runtime.atn;
 import org.antlr.v4.runtime.misc.AbstractEqualityComparator;
 import org.antlr.v4.runtime.misc.FlexibleHashMap;
 import org.antlr.v4.runtime.misc.MurmurHash;
-import org.antlr.v4.runtime.misc.NotNull;
 
 import java.util.BitSet;
 import java.util.Collection;
@@ -544,6 +543,15 @@ public enum PredictionMode {
 			all.or(alts);
 		}
 		return all;
+	}
+
+	/** Get union of all alts from configs. @since 4.5.1 */
+	public static BitSet getAlts(ATNConfigSet configs) {
+		BitSet alts = new BitSet();
+		for (ATNConfig config : configs) {
+			alts.set(config.alt);
+		}
+		return alts;
 	}
 
 	/**

@@ -33,7 +33,6 @@ package org.antlr.v4.runtime.tree;
 import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Utils;
 import org.antlr.v4.runtime.tree.gui.TreePostScriptGenerator;
 
@@ -219,6 +218,32 @@ public class Trees {
 			nodes.addAll(descendants(t.getChild(i)));
 		}
 		return nodes;
+	}
+
+	/** Find smallest subtree of t enclosing range startTokenIndex..stopTokenIndex
+	 *  inclusively using postorder traversal.  Recursive depth-first-search.
+	 *
+	 *  @since 4.5.1
+	 */
+	public static ParserRuleContext getRootOfSubtreeEnclosingRegion(ParseTree t,
+																	int startTokenIndex, // inclusive
+																	int stopTokenIndex)  // inclusive
+	{
+		int n = t.getChildCount();
+		for (int i = 0; i<n; i++) {
+			ParseTree child = t.getChild(i);
+			ParserRuleContext r = getRootOfSubtreeEnclosingRegion(child, startTokenIndex, stopTokenIndex);
+			if ( r!=null ) return r;
+		}
+		if ( t instanceof ParserRuleContext ) {
+			ParserRuleContext r = (ParserRuleContext) t;
+			if ( startTokenIndex>=r.getStart().getTokenIndex() && // is range fully contained in t?
+				stopTokenIndex<=r.getStop().getTokenIndex() )
+			{
+				return r;
+			}
+		}
+		return null;
 	}
 
 	private Trees() {

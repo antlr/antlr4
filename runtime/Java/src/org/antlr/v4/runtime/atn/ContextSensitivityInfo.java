@@ -64,9 +64,10 @@ public class ContextSensitivityInfo extends DecisionEventInfo {
 	 * @param stopIndex The index at which the context sensitivity was
 	 * identified during full-context prediction
 	 */
-	public ContextSensitivityInfo(int decision, ATNConfigSet configs,
+	public ContextSensitivityInfo(int decision,
+								  ATNConfigSet configs,
 								  TokenStream input, int startIndex, int stopIndex)
 	{
-		super(decision, configs, input, startIndex, stopIndex, true);
+		super( decision, configs, input, startIndex, stopIndex, true);
 	}
 }
