@@ -45,7 +45,6 @@ import org.antlr.v4.runtime.atn.RuleTransition;
 import org.antlr.v4.runtime.atn.StarLoopEntryState;
 import org.antlr.v4.runtime.atn.Transition;
 import org.antlr.v4.runtime.dfa.DFA;
-import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Pair;
 
 import java.util.ArrayDeque;
@@ -69,7 +68,10 @@ import java.util.Deque;
 public class ParserInterpreter extends Parser {
 	protected final String grammarFileName;
 	protected final ATN atn;
-	protected final BitSet pushRecursionContextStates;
+	/** This identifies StarLoopEntryState's that begin the (...)*
+	 *  precedence loops of left recursive rules.
+	 */
+	protected final BitSet statesNeedingLeftRecursionContext;
 
 	protected final DFA[] decisionToDFA; // not shared like it is for generated parsers
 	protected final PredictionContextCache sharedContextCache =
@@ -81,7 +83,37 @@ public class ParserInterpreter extends Parser {
 
 	private final Vocabulary vocabulary;
 
-	protected final Deque<Pair<ParserRuleContext, Integer>> _parentContextStack = new ArrayDeque<Pair<ParserRuleContext, Integer>>();
+	/** Tracks LR rules for adjusting the contexts */
+	protected final Deque<Pair<ParserRuleContext, Integer>> _parentContextStack =
+		new ArrayDeque<Pair<ParserRuleContext, Integer>>();
+
+	/** We need a map from (decision,inputIndex)->forced alt for computing ambiguous
+	 *  parse trees. For now, we allow exactly one override.
+	 */
+	protected int overrideDecision = -1;
+	protected int overrideDecisionInputIndex = -1;
+	protected int overrideDecisionAlt = -1;
+
+	/** A copy constructor that creates a new parser interpreter by reusing
+	 *  the fields of a previous interpreter.
+	 *
+	 *  @since 4.5.1
+	 *
+	 *  @param old The interpreter to copy
+	 */
+	public ParserInterpreter(ParserInterpreter old) {
+		super(old.getTokenStream());
+		this.atn = old.atn;
+		this.grammarFileName = old.grammarFileName;
+		this.statesNeedingLeftRecursionContext = old.statesNeedingLeftRecursionContext;
+		this.decisionToDFA = old.decisionToDFA;
+		this.tokenNames = old.tokenNames;
+		this.ruleNames = old.ruleNames;
+		this.vocabulary = old.vocabulary;
+		setInterpreter(new ParserATNSimulator(this, atn,
+											  decisionToDFA,
+											  sharedContextCache));
+	}
 
 	/**
 	 * @deprecated Use {@link #ParserInterpreter(String, Vocabulary, Collection, ATN, TokenStream)} instead.
@@ -110,15 +142,15 @@ public class ParserInterpreter extends Parser {
 			decisionToDFA[i] = new DFA(atn.getDecisionState(i), i);
 		}
 
-		// identify the ATN states where pushNewRecursionContext must be called
-		this.pushRecursionContextStates = new BitSet(atn.states.size());
+		// identify the ATN states where pushNewRecursionContext() must be called
+		this.statesNeedingLeftRecursionContext = new BitSet(atn.states.size());
 		for (ATNState state : atn.states) {
 			if (!(state instanceof StarLoopEntryState)) {
 				continue;
 			}
 
 			if (((StarLoopEntryState)state).precedenceRuleDecision) {
-				this.pushRecursionContextStates.set(state.stateNumber);
+				this.statesNeedingLeftRecursionContext.set(state.stateNumber);
 			}
 		}
 
@@ -205,7 +237,8 @@ public class ParserInterpreter extends Parser {
 
 	@Override
 	public void enterRecursionRule(ParserRuleContext localctx, int state, int ruleIndex, int precedence) {
-		_parentContextStack.push(new Pair<ParserRuleContext, Integer>(_ctx, localctx.invokingState));
+		Pair<ParserRuleContext, Integer> pair = new Pair<ParserRuleContext, Integer>(_ctx, localctx.invokingState);
+		_parentContextStack.push(pair);
 		super.enterRecursionRule(localctx, state, ruleIndex, precedence);
 	}
 
@@ -217,7 +250,13 @@ public class ParserInterpreter extends Parser {
 		int edge;
 		if (p.getNumberOfTransitions() > 1) {
 			getErrorHandler().sync(this);
-			edge = getInterpreter().adaptivePredict(_input, ((DecisionState)p).decision, _ctx);
+			int decision = ((DecisionState) p).decision;
+			if ( decision == overrideDecision && _input.index() == overrideDecisionInputIndex ) {
+				edge = overrideDecisionAlt;
+			}
+			else {
+				edge = getInterpreter().adaptivePredict(_input, decision, _ctx);
+			}
 		}
 		else {
 			edge = 1;
@@ -225,63 +264,67 @@ public class ParserInterpreter extends Parser {
 
 		Transition transition = p.transition(edge - 1);
 		switch (transition.getSerializationType()) {
-		case Transition.EPSILON:
-			if (pushRecursionContextStates.get(p.stateNumber) && !(transition.target instanceof LoopEndState)) {
-				InterpreterRuleContext ctx = new InterpreterRuleContext(_parentContextStack.peek().a, _parentContextStack.peek().b, _ctx.getRuleIndex());
-				pushNewRecursionContext(ctx, atn.ruleToStartState[p.ruleIndex].stateNumber, _ctx.getRuleIndex());
-			}
-			break;
+			case Transition.EPSILON:
+				if ( statesNeedingLeftRecursionContext.get(p.stateNumber) &&
+					 !(transition.target instanceof LoopEndState))
+				{
+					// We are at the start of a left recursive rule's (...)* loop
+					// but it's not the exit branch of loop.
+					InterpreterRuleContext ctx = new InterpreterRuleContext(_parentContextStack.peek().a, _parentContextStack.peek().b, _ctx.getRuleIndex());
+					pushNewRecursionContext(ctx, atn.ruleToStartState[p.ruleIndex].stateNumber, _ctx.getRuleIndex());
+				}
+				break;
 
-		case Transition.ATOM:
-			match(((AtomTransition)transition).label);
-			break;
+			case Transition.ATOM:
+				match(((AtomTransition)transition).label);
+				break;
 
-		case Transition.RANGE:
-		case Transition.SET:
-		case Transition.NOT_SET:
-			if (!transition.matches(_input.LA(1), Token.MIN_USER_TOKEN_TYPE, 65535)) {
-				_errHandler.recoverInline(this);
-			}
-			matchWildcard();
-			break;
+			case Transition.RANGE:
+			case Transition.SET:
+			case Transition.NOT_SET:
+				if (!transition.matches(_input.LA(1), Token.MIN_USER_TOKEN_TYPE, 65535)) {
+					_errHandler.recoverInline(this);
+				}
+				matchWildcard();
+				break;
 
-		case Transition.WILDCARD:
-			matchWildcard();
-			break;
+			case Transition.WILDCARD:
+				matchWildcard();
+				break;
 
-		case Transition.RULE:
-			RuleStartState ruleStartState = (RuleStartState)transition.target;
-			int ruleIndex = ruleStartState.ruleIndex;
-			InterpreterRuleContext ctx = new InterpreterRuleContext(_ctx, p.stateNumber, ruleIndex);
-			if (ruleStartState.isPrecedenceRule) {
-				enterRecursionRule(ctx, ruleStartState.stateNumber, ruleIndex, ((RuleTransition)transition).precedence);
-			}
-			else {
-				enterRule(ctx, transition.target.stateNumber, ruleIndex);
-			}
-			break;
+			case Transition.RULE:
+				RuleStartState ruleStartState = (RuleStartState)transition.target;
+				int ruleIndex = ruleStartState.ruleIndex;
+				InterpreterRuleContext ctx = new InterpreterRuleContext(_ctx, p.stateNumber, ruleIndex);
+				if (ruleStartState.isPrecedenceRule) {
+					enterRecursionRule(ctx, ruleStartState.stateNumber, ruleIndex, ((RuleTransition)transition).precedence);
+				}
+				else {
+					enterRule(ctx, transition.target.stateNumber, ruleIndex);
+				}
+				break;
 
-		case Transition.PREDICATE:
-			PredicateTransition predicateTransition = (PredicateTransition)transition;
-			if (!sempred(_ctx, predicateTransition.ruleIndex, predicateTransition.predIndex)) {
-				throw new FailedPredicateException(this);
-			}
+			case Transition.PREDICATE:
+				PredicateTransition predicateTransition = (PredicateTransition)transition;
+				if (!sempred(_ctx, predicateTransition.ruleIndex, predicateTransition.predIndex)) {
+					throw new FailedPredicateException(this);
+				}
 
-			break;
+				break;
 
-		case Transition.ACTION:
-			ActionTransition actionTransition = (ActionTransition)transition;
-			action(_ctx, actionTransition.ruleIndex, actionTransition.actionIndex);
-			break;
+			case Transition.ACTION:
+				ActionTransition actionTransition = (ActionTransition)transition;
+				action(_ctx, actionTransition.ruleIndex, actionTransition.actionIndex);
+				break;
 
-		case Transition.PRECEDENCE:
-			if (!precpred(_ctx, ((PrecedencePredicateTransition)transition).precedence)) {
-				throw new FailedPredicateException(this, String.format("precpred(_ctx, %d)", ((PrecedencePredicateTransition)transition).precedence));
-			}
-			break;
+			case Transition.PRECEDENCE:
+				if (!precpred(_ctx, ((PrecedencePredicateTransition)transition).precedence)) {
+					throw new FailedPredicateException(this, String.format("precpred(_ctx, %d)", ((PrecedencePredicateTransition)transition).precedence));
+				}
+				break;
 
-		default:
-			throw new UnsupportedOperationException("Unrecognized ATN transition type.");
+			default:
+				throw new UnsupportedOperationException("Unrecognized ATN transition type.");
 		}
 
 		setState(transition.target.stateNumber);
@@ -300,5 +343,51 @@ public class ParserInterpreter extends Parser {
 
 		RuleTransition ruleTransition = (RuleTransition)atn.states.get(getState()).transition(0);
 		setState(ruleTransition.followState.stateNumber);
+	}
+
+	/** Override this parser interpreters normal decision-making process
+	 *  at a particular decision and input token index. Instead of
+	 *  allowing the adaptive prediction mechanism to choose the
+	 *  first alternative within a block that leads to a successful parse,
+	 *  force it to take the alternative, 1..n for n alternatives.
+	 *
+	 *  As an implementation limitation right now, you can only specify one
+	 *  override. This is sufficient to allow construction of different
+	 *  parse trees for ambiguous input. It means re-parsing the entire input
+	 *  in general because you're never sure where an ambiguous sequence would
+	 *  live in the various parse trees. For example, in one interpretation,
+	 *  an ambiguous input sequence would be matched completely in expression
+	 *  but in another it could match all the way back to the root.
+	 *
+	 *  s : e '!'? ;
+	 *  e : ID
+	 *    | ID '!'
+	 *    ;
+	 *
+	 *  Here, x! can be matched as (s (e ID) !) or (s (e ID !)). In the first
+	 *  case, the ambiguous sequence is fully contained only by the root.
+	 *  In the second case, the ambiguous sequences fully contained within just
+	 *  e, as in: (e ID !).
+	 *
+	 *  Rather than trying to optimize this and make
+	 *  some intelligent decisions for optimization purposes, I settled on
+	 *  just re-parsing the whole input and then using
+	 *  {link Trees#getRootOfSubtreeEnclosingRegion} to find the minimal
+	 *  subtree that contains the ambiguous sequence. I originally tried to
+	 *  record the call stack at the point the parser detected and ambiguity but
+	 *  left recursive rules create a parse tree stack that does not reflect
+	 *  the actual call stack. That impedance mismatch was enough to make
+	 *  it it challenging to restart the parser at a deeply nested rule
+	 *  invocation.
+	 *
+	 *  Only parser interpreters can override decisions so as to avoid inserting
+	 *  override checking code in the critical ALL(*) prediction execution path.
+	 *
+	 *  @since 4.5.1
+	 */
+	public void addDecisionOverride(int decision, int tokenIndex, int forcedAlt) {
+		overrideDecision = decision;
+		overrideDecisionInputIndex = tokenIndex;
+		overrideDecisionAlt = forcedAlt;
 	}
 }

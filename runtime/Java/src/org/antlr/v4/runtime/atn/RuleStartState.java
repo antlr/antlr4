@@ -32,7 +32,7 @@ package org.antlr.v4.runtime.atn;
 
 public final class RuleStartState extends ATNState {
 	public RuleStopState stopState;
-	public boolean isPrecedenceRule;
+	public boolean isPrecedenceRule; //Synonymous with rule being left recursive; consider renaming.
 
 	@Override
 	public int getStateType() {

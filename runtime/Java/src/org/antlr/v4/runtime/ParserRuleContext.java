@@ -45,9 +45,8 @@ import java.util.List;
  *
  *  Contains all of the information about the current rule not stored in the
  *  RuleContext. It handles parse tree children list, Any ATN state
- *  tracing, and the default values available for rule indications:
- *  start, stop, rule index, current alt number, current
- *  ATN state.
+ *  tracing, and the default values available for rule invocations:
+ *  start, stop, rule index, current alt number.
  *
  *  Subclasses made for each rule and grammar track the parameters,
  *  return values, locals, and labels specific to that rule. These
@@ -103,9 +102,10 @@ public class ParserRuleContext extends RuleContext {
 
 	public ParserRuleContext() { }
 
-	/** COPY a ctx (I'm deliberately not using copy constructor) */
+	/** COPY a ctx (I'm deliberately not using copy constructor) to avoid
+	 *  confusion with creating node with parent. Does not copy children.
+	 */
 	public void copyFrom(ParserRuleContext ctx) {
-		// from RuleContext
 		this.parent = ctx.parent;
 		this.invokingState = ctx.invokingState;
 

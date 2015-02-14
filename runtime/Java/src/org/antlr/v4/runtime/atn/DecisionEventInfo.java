@@ -31,12 +31,19 @@
 package org.antlr.v4.runtime.atn;
 
 import org.antlr.v4.runtime.TokenStream;
-import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.misc.Nullable;
 
 /**
  * This is the base class for gathering detailed information about prediction
  * events which occur during parsing.
+ *
+ * Note that we could record the parser call stack at the time this event
+ * occurred but in the presence of left recursive rules, the stack is kind of
+ * meaningless. It's better to look at the individual configurations for their
+ * individual stacks. Of course that is a {@link PredictionContext} object
+ * not a parse tree node and so it does not have information about the extent
+ * (start...stop) of the various subtrees. Examining the stack tops of all
+ * configurations provide the return states for the rule invocations.
+ * From there you can get the enclosing rule.
  *
  * @since 4.3
  */
@@ -77,9 +84,10 @@ public class DecisionEventInfo {
 	 */
 	public final boolean fullCtx;
 
-	public DecisionEventInfo(int decision, ATNConfigSet configs,
-							 TokenStream input, int startIndex,
-							 int stopIndex, boolean fullCtx)
+	public DecisionEventInfo(int decision,
+							 ATNConfigSet configs,
+							 TokenStream input, int startIndex, int stopIndex,
+							 boolean fullCtx)
 	{
 		this.decision = decision;
 		this.fullCtx = fullCtx;

@@ -62,8 +62,10 @@ public class ErrorInfo extends DecisionEventInfo {
 	 * prediction; otherwise, {@code false} if the syntax error was identified
 	 * during SLL prediction
 	 */
-	public ErrorInfo(int decision, ATNConfigSet configs, TokenStream input,
-					 int startIndex, int stopIndex, boolean fullCtx)
+	public ErrorInfo(int decision,
+					 ATNConfigSet configs,
+					 TokenStream input, int startIndex, int stopIndex,
+					 boolean fullCtx)
 	{
 		super(decision, configs, input, startIndex, stopIndex, fullCtx);
 	}

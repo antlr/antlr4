@@ -54,7 +54,8 @@ public class LookaheadEventInfo extends DecisionEventInfo {
 	 * prediction; otherwise, {@code false} if the current lookahead is part of
 	 * an SLL prediction
 	 */
-	public LookaheadEventInfo(int decision, ATNConfigSet configs,
+	public LookaheadEventInfo(int decision,
+							  ATNConfigSet configs,
 							  TokenStream input, int startIndex, int stopIndex,
 							  boolean fullCtx)
 	{

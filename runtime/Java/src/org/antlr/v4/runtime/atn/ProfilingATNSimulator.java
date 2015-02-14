@@ -233,7 +233,8 @@ public class ProfilingATNSimulator extends ParserATNSimulator {
 			);
 		}
 		decisions[currentDecision].ambiguities.add(
-			new AmbiguityInfo(currentDecision, configs, _input, startIndex, stopIndex, configs.fullCtx)
+			new AmbiguityInfo(currentDecision, configs, ambigAlts,
+							  _input, startIndex, stopIndex, configs.fullCtx)
 		);
 		super.reportAmbiguity(dfa, D, startIndex, stopIndex, exact, ambigAlts, configs);
 	}
