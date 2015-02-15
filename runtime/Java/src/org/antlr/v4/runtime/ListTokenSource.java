@@ -1,6 +1,5 @@
 package org.antlr.v4.runtime;
 
-import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Pair;
 
 import java.util.List;

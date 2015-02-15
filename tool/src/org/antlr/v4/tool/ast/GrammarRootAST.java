@@ -33,7 +33,6 @@ package org.antlr.v4.tool.ast;
 import org.antlr.runtime.Token;
 import org.antlr.runtime.TokenStream;
 import org.antlr.runtime.tree.Tree;
-import org.antlr.v4.runtime.misc.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;

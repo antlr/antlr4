@@ -30,7 +30,6 @@
 
 package org.antlr.v4.tool;
 
-import org.antlr.runtime.Token;
 import org.antlr.v4.Tool;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;

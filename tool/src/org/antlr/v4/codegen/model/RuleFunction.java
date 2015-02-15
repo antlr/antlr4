@@ -61,14 +61,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import static org.antlr.v4.parse.ANTLRParser.RULE_REF;
 import static org.antlr.v4.parse.ANTLRParser.TOKEN_REF;
-
-import java.util.LinkedHashSet;
 
 /** */
 public class RuleFunction extends OutputModelObject {
