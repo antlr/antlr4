@@ -1,9 +1,7 @@
 package org.antlr.v4.test.rt.java;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 public class TestParserExec extends BaseTest {
 
