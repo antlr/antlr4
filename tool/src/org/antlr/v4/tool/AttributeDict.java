@@ -31,8 +31,6 @@
 package org.antlr.v4.tool;
 
 import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.tool.ast.GrammarAST;
 
 import java.util.Collections;

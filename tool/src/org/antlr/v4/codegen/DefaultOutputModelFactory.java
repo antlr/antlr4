@@ -36,8 +36,6 @@ import org.antlr.v4.codegen.model.RuleFunction;
 import org.antlr.v4.codegen.model.SrcOp;
 import org.antlr.v4.codegen.model.decl.CodeBlock;
 import org.antlr.v4.codegen.model.decl.Decl;
-import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.tool.Alternative;
 import org.antlr.v4.tool.Grammar;
 

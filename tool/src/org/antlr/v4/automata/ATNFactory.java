@@ -32,7 +32,6 @@ package org.antlr.v4.automata;
 
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNState;
-import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.tool.ast.ActionAST;
 import org.antlr.v4.tool.ast.BlockAST;
 import org.antlr.v4.tool.ast.GrammarAST;

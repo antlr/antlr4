@@ -29,9 +29,6 @@
  */
 package org.antlr.v4.runtime;
 
-import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.misc.Nullable;
-
 /**
  * This interface provides information about the vocabulary used by a
  * recognizer.

@@ -35,8 +35,6 @@ import org.antlr.v4.runtime.VocabularyImpl;
 import org.antlr.v4.runtime.atn.ATNConfigSet;
 import org.antlr.v4.runtime.atn.DecisionState;
 import org.antlr.v4.runtime.atn.StarLoopEntryState;
-import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.misc.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;

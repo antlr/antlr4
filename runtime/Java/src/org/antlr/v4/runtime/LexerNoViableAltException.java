@@ -32,7 +32,6 @@ package org.antlr.v4.runtime;
 
 import org.antlr.v4.runtime.atn.ATNConfigSet;
 import org.antlr.v4.runtime.misc.Interval;
-import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.misc.Utils;
 
 import java.util.Locale;

@@ -30,8 +30,6 @@
 
 package org.antlr.v4.runtime.tree.pattern;
 
-import org.antlr.v4.runtime.misc.NotNull;
-
 /**
  * Represents a span of raw text (concrete syntax) between tags in a tree
  * pattern string.

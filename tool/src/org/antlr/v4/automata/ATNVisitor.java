@@ -32,7 +32,6 @@ package org.antlr.v4.automata;
 
 import org.antlr.v4.runtime.atn.ATNState;
 import org.antlr.v4.runtime.atn.Transition;
-import org.antlr.v4.runtime.misc.NotNull;
 
 import java.util.HashSet;
 import java.util.Set;

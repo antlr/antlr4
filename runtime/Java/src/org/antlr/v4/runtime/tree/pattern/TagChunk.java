@@ -30,9 +30,6 @@
 
 package org.antlr.v4.runtime.tree.pattern;
 
-import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.misc.Nullable;
-
 /**
  * Represents a placeholder tag in a tree pattern. A tag can have any of the
  * following forms.

@@ -32,7 +32,6 @@ package org.antlr.v4.runtime.dfa;
 
 import org.antlr.v4.runtime.Vocabulary;
 import org.antlr.v4.runtime.VocabularyImpl;
-import org.antlr.v4.runtime.misc.NotNull;
 
 import java.util.Arrays;
 import java.util.List;

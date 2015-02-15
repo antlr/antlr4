@@ -31,8 +31,6 @@
 package org.antlr.v4.semantics;
 
 import org.antlr.v4.parse.ANTLRParser;
-import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.tool.Alternative;
 import org.antlr.v4.tool.Attribute;
 import org.antlr.v4.tool.AttributeDict;

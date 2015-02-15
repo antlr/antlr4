@@ -30,8 +30,6 @@
 package org.antlr.v4.runtime;
 
 import org.antlr.v4.runtime.atn.ATNConfigSet;
-import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.misc.Nullable;
 
 /** Indicates that the parser could not decide which of two or more paths
  *  to take based upon the remaining input. It tracks the starting token

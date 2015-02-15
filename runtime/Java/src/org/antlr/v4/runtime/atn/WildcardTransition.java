@@ -30,8 +30,6 @@
 
 package org.antlr.v4.runtime.atn;
 
-import org.antlr.v4.runtime.misc.NotNull;
-
 public final class WildcardTransition extends Transition {
 	public WildcardTransition(ATNState target) { super(target); }
 

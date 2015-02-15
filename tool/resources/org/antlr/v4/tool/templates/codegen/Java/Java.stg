@@ -66,7 +66,6 @@ ListenerFile(file, header) ::= <<
 package <file.genPackage>;
 <endif>
 <header>
-import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
 /**
@@ -106,7 +105,6 @@ package <file.genPackage>;
 <header>
 
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
@@ -163,7 +161,6 @@ VisitorFile(file, header) ::= <<
 package <file.genPackage>;
 <endif>
 <header>
-import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 
 /**
@@ -195,7 +192,6 @@ BaseVisitorFile(file, header) ::= <<
 package <file.genPackage>;
 <endif>
 <header>
-import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
 
 /**

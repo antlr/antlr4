@@ -31,7 +31,6 @@
 package org.antlr.v4.runtime.dfa;
 
 import org.antlr.v4.runtime.VocabularyImpl;
-import org.antlr.v4.runtime.misc.NotNull;
 
 public class LexerDFASerializer extends DFASerializer {
 	public LexerDFASerializer(DFA dfa) {

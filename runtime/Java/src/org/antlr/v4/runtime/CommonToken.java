@@ -30,7 +30,6 @@
 package org.antlr.v4.runtime;
 
 import org.antlr.v4.runtime.misc.Interval;
-import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Pair;
 
 import java.io.Serializable;
@@ -47,24 +46,24 @@ public class CommonToken implements WritableToken, Serializable {
 	 * This is the backing field for {@link #getType} and {@link #setType}.
 	 */
 	protected int type;
-	
+
 	/**
 	 * This is the backing field for {@link #getLine} and {@link #setLine}.
 	 */
 	protected int line;
-	
+
 	/**
 	 * This is the backing field for {@link #getCharPositionInLine} and
 	 * {@link #setCharPositionInLine}.
 	 */
 	protected int charPositionInLine = -1; // set to invalid position
-	
+
 	/**
 	 * This is the backing field for {@link #getChannel} and
 	 * {@link #setChannel}.
 	 */
 	protected int channel=DEFAULT_CHANNEL;
-	
+
 	/**
 	 * This is the backing field for {@link #getTokenSource} and
 	 * {@link #getInputStream}.

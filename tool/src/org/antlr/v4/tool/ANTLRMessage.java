@@ -31,9 +31,8 @@
 package org.antlr.v4.tool;
 
 import org.antlr.runtime.Token;
-import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.misc.Nullable;
 import org.stringtemplate.v4.ST;
+
 import java.util.Arrays;
 
 public class ANTLRMessage {

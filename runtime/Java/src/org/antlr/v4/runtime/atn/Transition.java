@@ -31,8 +31,6 @@
 package org.antlr.v4.runtime.atn;
 
 import org.antlr.v4.runtime.misc.IntervalSet;
-import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.misc.Nullable;
 
 import java.util.Arrays;
 import java.util.Collections;

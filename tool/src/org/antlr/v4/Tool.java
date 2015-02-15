@@ -51,7 +51,6 @@ import org.antlr.v4.parse.ToolANTLRParser;
 import org.antlr.v4.parse.v3TreeGrammarException;
 import org.antlr.v4.runtime.RuntimeMetaData;
 import org.antlr.v4.runtime.misc.LogManager;
-import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.semantics.SemanticPipeline;
 import org.antlr.v4.tool.ANTLRMessage;
 import org.antlr.v4.tool.ANTLRToolListener;

@@ -33,8 +33,6 @@ package org.antlr.v4.runtime.tree.pattern;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenSource;
-import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.misc.Nullable;
 
 /**
  * A {@link Token} object representing an entire subtree matched by a parser

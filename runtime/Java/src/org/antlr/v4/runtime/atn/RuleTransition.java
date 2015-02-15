@@ -30,8 +30,6 @@
 
 package org.antlr.v4.runtime.atn;
 
-import org.antlr.v4.runtime.misc.NotNull;
-
 /** */
 public final class RuleTransition extends Transition {
 	/** Ptr to the rule definition object for this rule ref */

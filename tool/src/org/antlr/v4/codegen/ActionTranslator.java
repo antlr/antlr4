@@ -30,12 +30,6 @@
 
 package org.antlr.v4.codegen;
 
-import java.lang.reflect.Constructor;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.antlr.runtime.ANTLRStringStream;
 import org.antlr.runtime.Token;
 import org.antlr.v4.codegen.model.RuleFunction;
@@ -78,6 +72,12 @@ import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.Rule;
 import org.antlr.v4.tool.ast.ActionAST;
+
+import java.lang.reflect.Constructor;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /** */
 public class ActionTranslator implements ActionSplitterListener {

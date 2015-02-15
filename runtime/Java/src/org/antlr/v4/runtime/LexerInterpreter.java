@@ -35,7 +35,6 @@ import org.antlr.v4.runtime.atn.ATNType;
 import org.antlr.v4.runtime.atn.LexerATNSimulator;
 import org.antlr.v4.runtime.atn.PredictionContextCache;
 import org.antlr.v4.runtime.dfa.DFA;
-import org.antlr.v4.runtime.misc.NotNull;
 
 import java.util.Collection;
 

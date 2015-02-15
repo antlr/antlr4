@@ -38,7 +38,6 @@ import org.antlr.v4.runtime.atn.PlusLoopbackState;
 import org.antlr.v4.runtime.atn.RuleTransition;
 import org.antlr.v4.runtime.atn.StarLoopbackState;
 import org.antlr.v4.runtime.atn.Transition;
-import org.antlr.v4.runtime.misc.NotNull;
 
 /**
  *

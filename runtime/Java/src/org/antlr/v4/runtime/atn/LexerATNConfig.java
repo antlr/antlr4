@@ -31,7 +31,6 @@
 package org.antlr.v4.runtime.atn;
 
 import org.antlr.v4.runtime.misc.MurmurHash;
-import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.misc.ObjectEqualityComparator;
 
 public class LexerATNConfig extends ATNConfig {

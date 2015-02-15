@@ -31,7 +31,6 @@
 package org.antlr.v4.runtime;
 
 import org.antlr.v4.runtime.misc.Interval;
-import org.antlr.v4.runtime.misc.NotNull;
 
 /** A source of characters for an ANTLR lexer. */
 public interface CharStream extends IntStream {

@@ -1,7 +1,9 @@
 package org.antlr.v4.test.rt.java;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public class TestCompositeLexers extends BaseTest {
 
@@ -21,10 +23,10 @@ public class TestCompositeLexers extends BaseTest {
 		sb.append("WS : (' '|'\\n') -> skip ;\n");
 		String grammar = sb.toString();
 		String found = execLexer("M.g4", grammar, "M", "abc", false);
-		assertEquals("S.A\n" + 
-	              "[@0,0:0='a',<3>,1:0]\n" + 
-	              "[@1,1:1='b',<1>,1:1]\n" + 
-	              "[@2,2:2='c',<4>,1:2]\n" + 
+		assertEquals("S.A\n" +
+	              "[@0,0:0='a',<3>,1:0]\n" +
+	              "[@1,1:1='b',<1>,1:1]\n" +
+	              "[@2,2:2='c',<4>,1:2]\n" +
 	              "[@3,3:2='<EOF>',<-1>,1:3]\n", found);
 		assertNull(this.stderrDuringParse);
 	}
@@ -45,8 +47,8 @@ public class TestCompositeLexers extends BaseTest {
 		sb.append("WS : (' '|'\\n') -> skip ;\n");
 		String grammar = sb.toString();
 		String found = execLexer("M.g4", grammar, "M", "ab", false);
-		assertEquals("M.A\n" + 
-	              "[@0,0:1='ab',<1>,1:0]\n" + 
+		assertEquals("M.A\n" +
+	              "[@0,0:1='ab',<1>,1:0]\n" +
 	              "[@1,2:1='<EOF>',<-1>,1:2]\n", found);
 		assertNull(this.stderrDuringParse);
 	}
