@@ -41,8 +41,8 @@ if not os.path.exists("bilder.py"):
 # assumes bilder.py is in current directory
 from bilder import *
 
-BOOTSTRAP_VERSION = "4.4"
-VERSION = "4.5"
+BOOTSTRAP_VERSION = "4.5"
+VERSION = "4.5.1"
 JAVA_TARGET = "."
 PYTHON2_TARGET = "../antlr4-python2"
 PYTHON3_TARGET = "../antlr4-python3"
@@ -393,22 +393,24 @@ def mkdoc():
     mkdir("doc/JavaTool")
     dirs = ["runtime/Java/src"]
     dirs += ["out/TreeLayout"]
-    exclude = ["org/antlr/runtime",
-            "org/abego",
-            "org/stringtemplate",
-            "org/antlr/stringtemplate"]
+    dirs += ["gen4"]
+    exclude = [
+        "org/antlr/runtime",
+        "org/abego",
+        "org/stringtemplate",
+        "org/antlr/stringtemplate"]
     javadoc(srcdir=dirs, trgdir="doc/Java", packages="org.antlr.v4.runtime", exclude=exclude)
     dirs += ["gen3"]
     dirs += [TARGETS[t] + "/tool/src" for t in TARGETS]
-    dirs += ["out/Antlr352Runtime"]
-    dirs += ["out/ST4"]
     javadoc(srcdir=dirs, trgdir="doc/JavaTool", packages="org.antlr.v4", exclude=exclude)
     # build stack merge PredictionContext and ATNState images from DOT
     # DOT Images are in runtime/Java/src/main/dot/org/antlr/v4/runtime/atn/images/
     # Gen into E.g., doc/Java/org/antlr/v4/runtime/atn/images/SingletonMerge_DiffRootSamePar.svg
     mkdir("doc/Java/org/antlr/v4/runtime/atn/images")
+    mkdir("doc/JavaTool/org/antlr/v4/runtime/atn/images")
     for f in glob.glob("runtime/Java/src/main/dot/org/antlr/v4/runtime/atn/images/*.dot"):
         dot(f, "doc/Java/org/antlr/v4/runtime/atn/images", format="svg")
+        dot(f, "doc/JavaTool/org/antlr/v4/runtime/atn/images", format="svg")
     zip(runtimedoc, "doc/Java")
     zip(tooldoc, "doc/JavaTool")
 
