@@ -64,3 +64,4 @@ YYYY/MM/DD, github id, Full name, email
 2014/10/26, bdkearns, Brian Kearns, bdkearns@gmail.com
 2014/10/27, michaelpj, Michael Peyton Jones, michaelpj@gmail.com
 2015/01/29, TomLottermann, Thomas Lottermann, tomlottermann@gmail.com
+2015/02/15, pavlo, Pavlo Lysov, pavlikus@gmail.com
