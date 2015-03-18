@@ -706,7 +706,7 @@ def accept(self, visitor):
 
 >>
 
-AttributeDecl(d) ::= "self.<d.name> = None"
+AttributeDecl(d) ::= "self.<d.name> = <if(d.initValue)><d.initValue><else>None<endif>"
 
 /** If we don't know location of label def x, use this template */
 labelref(x) ::= "<if(!x.isLocal)>localctx.<endif><x.name>"
