@@ -109,7 +109,7 @@ class BufferedTokenStream(TokenStream):
                 # fetched token except the last.
                 skipEofCheck = self.index < len(self.tokens) - 1
             else:
-               # no EOF token in tokens. skip check if p indexes a fetched token.
+                # no EOF token in tokens. skip check if p indexes a fetched token.
                 skipEofCheck = self.index < len(self.tokens)
         else:
             # not yet initialized
