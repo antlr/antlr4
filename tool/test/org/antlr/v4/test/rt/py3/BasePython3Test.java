@@ -68,6 +68,8 @@ public abstract class BasePython3Test extends BasePythonTest {
 	protected void writeParserTestFile(String parserName, String lexerName,
 			String listenerName, String visitorName,
 			String parserStartRuleName, boolean debug, boolean trace) {
+		if(!parserStartRuleName.endsWith(")"))
+			parserStartRuleName += "()";
 		ST outputFileST = new ST(
 				"import sys\n"
 						+ "from antlr4 import *\n"
@@ -99,7 +101,7 @@ public abstract class BasePython3Test extends BasePythonTest {
 						+ "    stream = CommonTokenStream(lexer)\n"
 						+ "<createParser>"
 						+ "    parser.buildParseTrees = True\n"
-						+ "    tree = parser.<parserStartRuleName>()\n"
+						+ "    tree = parser.<parserStartRuleName>\n"
 						+ "    ParseTreeWalker.DEFAULT.walk(TreeShapeListener(), tree)\n"
 						+ "\n" + "if __name__ == '__main__':\n"
 						+ "    main(sys.argv)\n" + "\n");
