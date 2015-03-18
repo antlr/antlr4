@@ -14,5 +14,13 @@ public class TestParams extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	@Test
+	public void testParamList() throws Exception {
+		String grammar = "grammar T;\n" +
+	                  "a[list rows]: 'a' {print(self._input.getText())} # r1 | 'A' {print(self._input.getText())} # r2;";
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "a(None)", "a", false);
+		assertEquals("a\n", found);
+		assertNull(this.stderrDuringParse);
+	}
 
 }

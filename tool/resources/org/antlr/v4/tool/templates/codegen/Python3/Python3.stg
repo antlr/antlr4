@@ -53,7 +53,12 @@ ParserFile(file, parser, namedActions) ::= <<
 # encoding: utf-8
 from antlr4 import *
 from io import StringIO
+
+<namedActions.header>
+<parser>
+
 <if(file.genListener || file.genVisitor)>
+# import Listener/Visitor last to avoid conflicting imports
 package = globals().get("__package__", None)
 ischild = len(package)>0 if package is not None else False
 if ischild:
@@ -71,14 +76,17 @@ else:
     from <file.parser.grammarName>Visitor import <file.parser.grammarName>Visitor
     <endif>
 <endif>
-
-<namedActions.header>
-<parser>
 >>
 
 ListenerFile(file, header) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 from antlr4 import *
+package = globals().get("__package__", None)
+ischild = len(package)>0 if package is not None else False
+if ischild:
+    from .<file.parserName> import <file.parserName>
+else:
+    from <file.parserName> import <file.parserName>
 <header>
 
 # This class defines a complete listener for a parse tree produced by <file.parserName>.
@@ -86,11 +94,11 @@ class <file.grammarName>Listener(ParseTreeListener):
 
     <file.listenerNames:{lname |
 # Enter a parse tree produced by <file.parserName>#<lname>.
-def enter<lname; format="cap">(self, ctx):
+def enter<lname; format="cap">(self, ctx:<file.parserName>.<lname; format="cap">Context):
     pass
 
 # Exit a parse tree produced by <file.parserName>#<lname>.
-def exit<lname; format="cap">(self, ctx):
+def exit<lname; format="cap">(self, ctx:<file.parserName>.<lname; format="cap">Context):
     pass
 
 }; separator="\n">
@@ -101,6 +109,12 @@ def exit<lname; format="cap">(self, ctx):
 VisitorFile(file, header) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 from antlr4 import *
+package = globals().get("__package__", None)
+ischild = len(package)>0 if package is not None else False
+if ischild:
+    from .<file.parserName> import <file.parserName>
+else:
+    from <file.parserName> import <file.parserName>
 <header>
 
 # This class defines a complete generic visitor for a parse tree produced by <file.parserName>.
@@ -109,7 +123,7 @@ class <file.grammarName>Visitor(ParseTreeVisitor):
 
     <file.visitorNames:{lname |
 # Visit a parse tree produced by <file.parserName>#<lname>.
-def visit<lname; format="cap">(self, ctx):
+def visit<lname; format="cap">(self, ctx:<file.parserName>.<lname; format="cap">Context):
     return self.visitChildren(ctx)
 
 }; separator="\n">
@@ -679,7 +693,7 @@ class <struct.name>(<superClass>):
 AltLabelStructDecl(struct,attrs,getters,dispatchMethods) ::= <<
 class <struct.name>(<currentRule.name; format="cap">Context):
 
-    def __init__(self, parser, ctx:ParserRuleContext): # actually a <parser.name>.<currentRule.name; format="cap">Context)
+    def __init__(self, parser, ctx:ParserRuleContext): # actually a <parser.name>.<currentRule.name; format="cap">Context
         super().__init__(parser)
         <attrs:{a | <a>}; separator="\n">
         self.copyFrom(ctx)
