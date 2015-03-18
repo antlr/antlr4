@@ -22,5 +22,15 @@ public class TestParams extends BasePython3Test {
 		assertEquals("a\n", found);
 		assertNull(this.stderrDuringParse);
 	}
+	
+	@Test
+	public void testParamInit() throws Exception {
+		String grammar = "grammar T;\n" +
+	                  "a locals[i=23]: 'a' {print(str($i))} ;";
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "a", "a", false);
+		assertEquals("23\n", found);
+		assertNull(this.stderrDuringParse);
+	}
+
 
 }
