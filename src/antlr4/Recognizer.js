@@ -55,6 +55,10 @@ Recognizer.prototype.addErrorListener = function(listener) {
     this._listeners.push(listener);
 };
 
+Recognizer.prototype.removeErrorListeners = function() {
+    this._listeners = [];
+};
+
 Recognizer.prototype.getTokenTypeMap = function() {
     var tokenNames = this.getTokenNames();
     if (tokenNames===null) {
