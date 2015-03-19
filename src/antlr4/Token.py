@@ -127,7 +127,7 @@ class CommonToken(Token):
     # {@link Token#getInputStream}.</p>
     #
     # @param oldToken The token to copy.
-     #
+    #
     def clone(self):
         t = CommonToken(self.source, self.type, self.channel, self.start, self.stop)
         t.tokenIndex = self.tokenIndex
