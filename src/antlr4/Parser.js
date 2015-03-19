@@ -34,24 +34,25 @@ var DefaultErrorStrategy = require('./error/ErrorStrategy').DefaultErrorStrategy
 var ATNDeserializer = require('./atn/ATNDeserializer').ATNDeserializer;
 var ATNDeserializationOptions = require('./atn/ATNDeserializationOptions').ATNDeserializationOptions;
 
-function TraceListener() {
+function TraceListener(parser) {
 	ParseTreeListener.call(this);
+    this.parser = parser;
 	return this;
 }
 
 TraceListener.prototype = Object.create(ParseTreeListener);
 TraceListener.prototype.constructor = TraceListener;
 
-TraceListener.prototype.enterEveryRule = function(parser, ctx) {
-	console.log("enter   " + parser.ruleNames[ctx.ruleIndex] + ", LT(1)=" + parser._input.LT(1).text);
+TraceListener.prototype.enterEveryRule = function(ctx) {
+	console.log("enter   " + this.parser.ruleNames[ctx.ruleIndex] + ", LT(1)=" + this.parser._input.LT(1).text);
 };
 
-TraceListener.prototype.visitTerminal = function(parser, node) {
-	console.log("consume " + node.symbol + " rule " + parser.ruleNames[parser._ctx.ruleIndex]);
+TraceListener.prototype.visitTerminal = function( node) {
+	console.log("consume " + node.symbol + " rule " + this.parser.ruleNames[this.parser._ctx.ruleIndex]);
 };
 
-TraceListener.prototype.exitEveryRule = function(parser, ctx) {
-	console.log("exit    " + parser.ruleNames[ctx.ruleIndex] + ", LT(1)=" + parser._input.LT(1).text);
+TraceListener.prototype.exitEveryRule = function(ctx) {
+	console.log("exit    " + this.parser.ruleNames[ctx.ruleIndex] + ", LT(1)=" + this.parser._input.LT(1).text);
 };
 
 // this is all the parsing support code essentially; most of it is error
@@ -679,7 +680,7 @@ Parser.prototype.setTrace = function(trace) {
 		if (this._tracer !== null) {
 			this.removeParseListener(this._tracer);
 		}
-		this._tracer = new TraceListener();
+		this._tracer = new TraceListener(this);
 		this.addParseListener(this._tracer);
 	}
 };

@@ -2,6 +2,8 @@
 /.settings/
 /.jshintrc
 /tmp/
+/.idea
+/target
 
 .pydevproject
 /tmp-failed/
