@@ -56,6 +56,7 @@ var INVALID_INTERVAL = Tree.INVALID_INTERVAL;
 var TerminalNode = Tree.TerminalNode;
 var TerminalNodeImpl = Tree.TerminalNodeImpl;
 var ErrorNodeImpl = Tree.ErrorNodeImpl;
+var Interval = require("./IntervalSet").Interval;
 
 function ParserRuleContext(parent, invokingStateNumber) {
 	parent = parent || null;
@@ -213,7 +214,7 @@ ParserRuleContext.prototype.getSourceInterval = function() {
     if( this.start === null || this.stop === null) {
         return INVALID_INTERVAL;
     } else {
-        return (this.start.tokenIndex, this.stop.tokenIndex);
+        return Interval(this.start.tokenIndex, this.stop.tokenIndex);
     }
 };
 
