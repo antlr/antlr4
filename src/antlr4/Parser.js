@@ -250,9 +250,10 @@ Parser.prototype.removeParseListeners = function() {
 // Notify any parse listeners of an enter rule event.
 Parser.prototype.triggerEnterRuleEvent = function() {
 	if (this._parseListeners !== null) {
+        var ctx = this._ctx;
 		this._parseListeners.map(function(listener) {
-			listener.enterEveryRule(this._ctx);
-			this._ctx.enterRule(listener);
+			listener.enterEveryRule(ctx);
+			ctx.enterRule(listener);
 		});
 	}
 };
@@ -265,9 +266,10 @@ Parser.prototype.triggerEnterRuleEvent = function() {
 Parser.prototype.triggerExitRuleEvent = function() {
 	if (this._parseListeners !== null) {
 		// reverse order walk of listeners
+        var ctx = this._ctx;
 		this._parseListeners.slice(0).reverse().map(function(listener) {
-			this._ctx.exitRule(listener);
-			listener.exitEveryRule(this._ctx);
+			ctx.exitRule(listener);
+			listener.exitEveryRule(ctx);
 		});
 	}
 };
