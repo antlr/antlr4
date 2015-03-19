@@ -135,8 +135,8 @@ class DefaultErrorStrategy(ErrorStrategy):
     # </ul>
     #
     def reportError(self, recognizer, e):
-       # if we've already reported an error and have not matched a token
-       # yet successfully, don't report any errors.
+        # if we've already reported an error and have not matched a token
+        # yet successfully, don't report any errors.
         if self.inErrorRecoveryMode(recognizer):
             return # don't report spurious errors
         self.beginErrorCondition(recognizer)
@@ -161,10 +161,10 @@ class DefaultErrorStrategy(ErrorStrategy):
         if self.lastErrorIndex==recognizer.getInputStream().index \
             and self.lastErrorStates is not None \
             and recognizer.state in self.lastErrorStates:
-           # uh oh, another error at same token index and previously-visited
-           # state in ATN; must be a case where LT(1) is in the recovery
-           # token set so nothing got consumed. Consume a single token
-           # at least to prevent an infinite loop; this is a failsafe.
+            # uh oh, another error at same token index and previously-visited
+            # state in ATN; must be a case where LT(1) is in the recovery
+            # token set so nothing got consumed. Consume a single token
+            # at least to prevent an infinite loop; this is a failsafe.
             recognizer.consume()
 
         self.lastErrorIndex = recognizer._input.index
@@ -236,7 +236,7 @@ class DefaultErrorStrategy(ErrorStrategy):
 
         if s.stateType in [ATNState.BLOCK_START, ATNState.STAR_BLOCK_START,
                                 ATNState.PLUS_BLOCK_START, ATNState.STAR_LOOP_ENTRY]:
-           # report error and recover if possible
+            # report error and recover if possible
             if self.singleTokenDeletion(recognizer)is not None:
                 return
             else:
@@ -249,8 +249,8 @@ class DefaultErrorStrategy(ErrorStrategy):
             self.consumeUntil(recognizer, whatFollowsLoopIterationOrRule)
 
         else:
-           # do nothing if we can't identify the exact kind of ATN state
-           pass
+            # do nothing if we can't identify the exact kind of ATN state
+            pass
 
     # This is called by {@link #reportError} when the exception is a
     # {@link NoViableAltException}.
