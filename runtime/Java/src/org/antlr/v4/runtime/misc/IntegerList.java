@@ -283,7 +283,7 @@ public class IntegerList {
 		int newLength;
 		if (_data.length == 0) {
 			newLength = INITIAL_SIZE;
-		} else {a
+		} else {
 			newLength = _data.length;
 		}
 
