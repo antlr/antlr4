@@ -58,8 +58,6 @@ public class IntegerList {
 		if (capacity < 0) {
 			throw new IllegalArgumentException();
 		}
-        if (capacity > MAX_ARRAY_SIZE)
-          throw new IllegalArgumentException();
 
 		if (capacity == 0) {
 			_data = EMPTY_DATA;
@@ -103,9 +101,12 @@ public class IntegerList {
 
 	public final void addAll(Collection<Integer> list) {
 		ensureCapacity(_size + list.size());
-		for (int x : list) {
-          _data[_size++] = x;
-        }
+		int current = 0;
+    		for (int x : list) {
+      			_data[_size + current] = x;
+      			current++;
+    		}
+    		_size += list.size();
 	}
 
 	public final int get(int index) {
@@ -267,8 +268,9 @@ public class IntegerList {
 		if (fromIndex < 0 || toIndex < 0 || fromIndex > _size || toIndex > _size) {
 			throw new IndexOutOfBoundsException();
 		}
-        if (fromIndex > toIndex)
-          throw new IllegalArgumentException();
+		if (fromIndex > toIndex) {
+        		throw new IllegalArgumentException();
+		}
 
 		return Arrays.binarySearch(_data, fromIndex, toIndex, key);
 	}
@@ -281,7 +283,7 @@ public class IntegerList {
 		int newLength;
 		if (_data.length == 0) {
 			newLength = INITIAL_SIZE;
-		} else {
+		} else {a
 			newLength = _data.length;
 		}
 
