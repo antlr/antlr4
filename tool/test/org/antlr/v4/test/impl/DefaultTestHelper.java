@@ -1,22 +1,24 @@
-package org.antlr.v4.test;
+package org.antlr.v4.test.impl;
 
 import org.antlr.v4.Tool;
 import org.antlr.v4.runtime.misc.Utils;
+import org.antlr.v4.test.ErrorQueue;
+import org.antlr.v4.test.TestUtils;
 import org.antlr.v4.tool.ANTLRMessage;
 import org.antlr.v4.tool.DefaultToolListener;
 import org.junit.runner.Description;
 import org.stringtemplate.v4.ST;
 
-import javax.tools.JavaCompiler;
-import javax.tools.JavaFileObject;
-import javax.tools.StandardJavaFileManager;
-import javax.tools.ToolProvider;
+import javax.tools.*;
 import java.io.File;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.charset.Charset;
 import java.util.*;
 
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -69,11 +71,11 @@ public class DefaultTestHelper extends AbstractTestDelegate {
         }
 
         JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-//		DiagnosticCollector<JavaFileObject> diagnostics =
-//			new DiagnosticCollector<JavaFileObject>();
+		DiagnosticCollector<JavaFileObject> diagnostics =
+			new DiagnosticCollector<JavaFileObject>();
 
         StandardJavaFileManager fileManager =
-                compiler.getStandardFileManager(null, null, null);
+                compiler.getStandardFileManager(diagnostics, Locale.getDefault(), Charset.forName("UTF-8"));
 
         Iterable<? extends JavaFileObject> compilationUnits =
                 fileManager.getJavaFileObjectsFromFiles(files);
@@ -81,8 +83,9 @@ public class DefaultTestHelper extends AbstractTestDelegate {
         Iterable<String> compileOptions =
                 Arrays.asList("-g", "-source", "1.6", "-target", "1.6", "-implicit:class", "-Xlint:-options", "-d", tmpdir, "-cp", tmpdir + AntlrTestSettings.PATH_SEP + AntlrTestSettings.CLASSPATH);
 
+        StringWriter extraMessages = new StringWriter();
         JavaCompiler.CompilationTask task =
-                compiler.getTask(null, fileManager, null, compileOptions, null,
+                compiler.getTask(extraMessages, fileManager, diagnostics, compileOptions, null,
                         compilationUnits);
         boolean ok = task.call();
 
@@ -92,17 +95,7 @@ public class DefaultTestHelper extends AbstractTestDelegate {
             ioe.printStackTrace(System.err);
         }
 
-//		List<String> errors = new ArrayList<String>();
-//		for (Diagnostic diagnostic : diagnostics.getDiagnostics()) {
-//			errors.add(
-//				String.valueOf(diagnostic.getLineNumber())+
-//				": " + diagnostic.getMessage(null));
-//		}
-//		if ( errors.size()>0 ) {
-//			System.err.println("compile stderr from: "+cmdLine);
-//			System.err.println(errors);
-//			return false;
-//		}
+        assertThat(diagnostics, TestUtils.hasNoErrors());
         return ok;
 
     }

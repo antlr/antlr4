@@ -1,8 +1,9 @@
-package org.antlr.v4.test;
+package org.antlr.v4.test.impl;
 
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.misc.Pair;
+import org.antlr.v4.test.ErrorQueue;
 import org.junit.runner.Description;
 
 import java.net.URL;

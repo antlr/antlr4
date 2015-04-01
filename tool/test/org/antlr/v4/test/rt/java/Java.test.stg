@@ -3,15 +3,19 @@ package org.antlr.v4.test.rt.java;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
+import static org.hamcrest.Matchers.*;
+
 
 <if(file.importErrorQueue)>
-import org.antlr.v4.test.tool.ErrorQueue;
+import org.antlr.v4.test.ErrorQueue;
 <endif>
 <if(file.importGrammar)>
 import org.antlr.v4.tool.Grammar;
 <endif>
 
-public class Test<file.name> extends BaseTest {
+import org.antlr.v4.test.AntlrTestcase;
+
+public class Test<file.name> extends AntlrTestcase {
 
 	<file.tests:{test | <test>}; separator="\n", wrap, anchor>
 
@@ -24,8 +28,8 @@ LexerTestMethod(test) ::= <<
 public void test<test.name>() throws Exception {
 <test.slaveGrammars:{ grammar | 
 	String slave_<grammar.grammarName> = <grammar.lines:{ line | "<line>};separator="\\n\" +\n", wrap, anchor>";
-	mkdir(tmpdir);
-	writeFile(tmpdir, "<grammar.grammarName>.g4", slave_<grammar.grammarName>);
+	mkdir(tmpdir());
+	writeFile(tmpdir(), "<grammar.grammarName>.g4", slave_<grammar.grammarName>);
 	};separator="\n", wrap, anchor>
 	StringBuilder sb = new StringBuilder();
 	<test.grammar.lines:{ line | sb.append("<line>\\n");};separator="\n", wrap, anchor>
@@ -34,9 +38,9 @@ public void test<test.name>() throws Exception {
 	String found = execLexer("<test.grammar.grammarName>.g4", grammar, "<test.grammar.grammarName><if(!test.lexerOnly)>Lexer<endif>", "<test.input>", <test.showDFA>);
 	assertEquals(<test.outputLines:{ line | "<line>\\n"};separator=" + \n", wrap, anchor>, found);
 	<if(test.expectedErrors)>
-	assertEquals("<test.expectedErrors>", this.stderrDuringParse);
+	assertEquals("<test.expectedErrors>", stderrDuringParse());
 	<else>
-	assertNull(this.stderrDuringParse);
+	assertThat(stderrDuringParse(), isEmptyOrNullString());
 	<endif>
 }
 
@@ -56,8 +60,8 @@ public void test<test.name>() throws Exception {
 	<if(test.slaveIsLexer)>
 	rawGenerateAndBuildRecognizer("<grammar.grammarName>.g4", slave_<grammar.grammarName>, null, "<grammar.grammarName>");
 	<else>
-	mkdir(tmpdir);
-	writeFile(tmpdir, "<grammar.grammarName>.g4", slave_<grammar.grammarName>);
+	mkdir(tmpdir());
+	writeFile(tmpdir(), "<grammar.grammarName>.g4", slave_<grammar.grammarName>);
 	<endif>
 	};separator="\n", wrap, anchor>
 	String grammar = <test.grammar.lines:{ line | "<line>};separator="\\n\" +\n", wrap, anchor>";
@@ -65,9 +69,9 @@ public void test<test.name>() throws Exception {
 	String found = execParser("<test.grammar.grammarName>.g4", grammar, "<test.grammar.grammarName><if(!test.slaveIsLexer)>Parser<endif>", "<if(test.slaveIsLexer)><first(test.slaveGrammars).grammarName><else><test.grammar.grammarName>Lexer<endif>", "<test.startRule>", "<test.input>", <test.debug>);
 	assertEquals("<test.expectedOutput>", found);
 	<if(test.expectedErrors)>
-	assertEquals("<test.expectedErrors>", this.stderrDuringParse);
+	assertEquals("<test.expectedErrors>", stderrDuringParse());
 	<else>
-	assertNull(this.stderrDuringParse);
+	assertThat(stderrDuringParse(), isEmptyOrNullString());
 	<endif>
 }
 
@@ -93,9 +97,9 @@ public void test<test.name>() throws Exception {
 	String found = test<test.baseName>("<test.input>");
 	assertEquals("<test.expectedOutput>", found);
 	<if(test.expectedErrors)>
-	assertEquals("<test.expectedErrors>", this.stderrDuringParse);
+	assertEquals("<test.expectedErrors>", stderrDuringParse());
 	<else>
-	assertNull(this.stderrDuringParse);
+	assertThat(stderrDuringParse(), isEmptyOrNullString());
 	<endif>
 }
 

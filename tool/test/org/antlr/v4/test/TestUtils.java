@@ -10,7 +10,14 @@ import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.IntegerList;
 import org.antlr.v4.semantics.SemanticPipeline;
 import org.antlr.v4.tool.*;
+import org.hamcrest.CustomTypeSafeMatcher;
+import org.hamcrest.FeatureMatcher;
+import org.hamcrest.Matcher;
 
+import javax.tools.Diagnostic;
+import javax.tools.DiagnosticCollector;
+import javax.tools.JavaFileObject;
+import java.io.IOException;
 import java.util.*;
 
 import static org.junit.Assert.*;
@@ -216,23 +223,23 @@ public class TestUtils {
             System.err.println(equeue);
         }
     }
+
     public static void checkError(ErrorQueue equeue,
-                              ANTLRMessage expectedMessage)
-            throws Exception
-    {
+                                  ANTLRMessage expectedMessage)
+            throws Exception {
         //System.out.println("errors="+equeue);
         ANTLRMessage foundMsg = null;
         for (int i = 0; i < equeue.errors.size(); i++) {
             ANTLRMessage m = equeue.errors.get(i);
-            if (m.getErrorType()==expectedMessage.getErrorType() ) {
+            if (m.getErrorType() == expectedMessage.getErrorType()) {
                 foundMsg = m;
             }
         }
-        assertTrue("no error; "+expectedMessage.getErrorType()+" expected", !equeue.errors.isEmpty());
+        assertTrue("no error; " + expectedMessage.getErrorType() + " expected", !equeue.errors.isEmpty());
         assertTrue("too many errors; " + equeue.errors, equeue.errors.size() <= 1);
         assertNotNull("couldn't find expected error: " + expectedMessage.getErrorType(), foundMsg);
-		/*
-		assertTrue("error is not a GrammarSemanticsMessage",
+        /*
+        assertTrue("error is not a GrammarSemanticsMessage",
 				   foundMsg instanceof GrammarSemanticsMessage);
 		 */
         assertArrayEquals(expectedMessage.getArgs(), foundMsg.getArgs());
@@ -302,21 +309,70 @@ public class TestUtils {
         return filtered;
     }
 
-//    public static void assertNotNullOrEmpty(String message, String text) {
-//        assertNotNull(message, text);
-//        assertFalse(message, text.isEmpty());
-//    }
-//
-//    public static void assertNotNullOrEmpty(String text) {
-//        assertNotNull(text);
-//        assertFalse(text.isEmpty());
-//    }
 
     public static String getFirstLineOfException(String stackTrace) {
 
         String[] lines = stackTrace.split("\n");
-        String prefix="Exception in thread \"main\" ";
-        return lines[0].substring(prefix.length(),lines[0].length());
+        String prefix = "Exception in thread \"main\" ";
+        return lines[0].substring(prefix.length(), lines[0].length());
     }
+
+    public static Matcher<List<Diagnostic<? extends JavaFileObject>>> containsNoErrors() {
+        return CHECK_LIST_FOR_ERRORS;
+    }
+
+    public static Matcher<DiagnosticCollector<JavaFileObject>> hasNoErrors() {
+        return CHECK_DIAGNOSTICS_FOR_ERRORS;
+    }
+
+
+
+
+
+    static final Matcher<List<Diagnostic<? extends JavaFileObject>>> CHECK_LIST_FOR_ERRORS =
+            new CustomTypeSafeMatcher<List<Diagnostic<? extends JavaFileObject>>>("successful compilation") {
+                @Override
+                protected boolean matchesSafely(List<Diagnostic<? extends JavaFileObject>> item) {
+                    for (Diagnostic<? extends JavaFileObject> diagnostic : item) {
+                        if (diagnostic.getKind() == Diagnostic.Kind.ERROR) {
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+
+                @Override
+                protected void describeMismatchSafely(List<Diagnostic<? extends JavaFileObject>> item, org.hamcrest.Description mismatchDescription) {
+                    for (Diagnostic<? extends JavaFileObject> diagnostic : item) {
+                        if (diagnostic.getKind() == Diagnostic.Kind.ERROR) {
+                            mismatchDescription
+                                    .appendText("(first) error:")
+                                    .appendText(diagnostic.getMessage(Locale.getDefault()))
+                                    .appendText("\n source: \n");
+                            String source;
+                            try {
+                                source = diagnostic.getSource().getCharContent(true).toString();
+
+                            } catch (IOException e) {
+                                source = "????";
+                            }
+                            mismatchDescription.appendText(source);
+
+                        }
+                    }
+
+                    mismatchDescription.appendText("\n all diagnostics:\n")
+                            .appendValueList("[", "\n\t", "]", item)
+                            .appendText("\n");
+                }
+            };
+    static final Matcher<DiagnosticCollector<JavaFileObject>> CHECK_DIAGNOSTICS_FOR_ERRORS =
+            new FeatureMatcher<DiagnosticCollector<JavaFileObject>, List<Diagnostic<? extends JavaFileObject>>>
+                    (CHECK_LIST_FOR_ERRORS, "successful compilation", "diagnostics") {
+                @Override
+                protected List<Diagnostic<? extends JavaFileObject>> featureValueOf(DiagnosticCollector<JavaFileObject> actual) {
+                    return actual.getDiagnostics();
+                }
+            };
 
 }

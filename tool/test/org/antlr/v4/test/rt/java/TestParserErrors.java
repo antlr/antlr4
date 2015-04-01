@@ -2,8 +2,12 @@ package org.antlr.v4.test.rt.java;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
+import static org.hamcrest.Matchers.*;
 
-public class TestParserErrors extends BaseTest {
+
+import org.antlr.v4.test.AntlrTestcase;
+
+public class TestParserErrors extends AntlrTestcase {
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
@@ -12,7 +16,7 @@ public class TestParserErrors extends BaseTest {
 	                  "a : 'a' 'b' ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a", "aa", false);
 		assertEquals("", found);
-		assertEquals("line 1:1 mismatched input 'a' expecting 'b'\n", this.stderrDuringParse);
+		assertEquals("line 1:1 mismatched input 'a' expecting 'b'\n", stderrDuringParse());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -22,7 +26,7 @@ public class TestParserErrors extends BaseTest {
 	                  "a : 'a' 'b' ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a", "aab", false);
 		assertEquals("", found);
-		assertEquals("line 1:1 extraneous input 'a' expecting 'b'\n", this.stderrDuringParse);
+		assertEquals("line 1:1 extraneous input 'a' expecting 'b'\n", stderrDuringParse());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -32,7 +36,7 @@ public class TestParserErrors extends BaseTest {
 	                  "a : 'a' ('b'|'c') ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a", "aab", false);
 		assertEquals("", found);
-		assertEquals("line 1:1 extraneous input 'a' expecting {'b', 'c'}\n", this.stderrDuringParse);
+		assertEquals("line 1:1 extraneous input 'a' expecting {'b', 'c'}\n", stderrDuringParse());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -43,7 +47,7 @@ public class TestParserErrors extends BaseTest {
 	                  "a: 'a' myset 'd' {System.out.println(\"\" + $myset.stop);} ; ";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a", "aabd", false);
 		assertEquals("[@2,2:2='b',<1>,1:2]\n", found);
-		assertEquals("line 1:1 extraneous input 'a' expecting {'b', 'c'}\n", this.stderrDuringParse);
+		assertEquals("line 1:1 extraneous input 'a' expecting {'b', 'c'}\n", stderrDuringParse());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -53,7 +57,7 @@ public class TestParserErrors extends BaseTest {
 	                  "a : 'a' 'b' 'c' ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a", "ac", false);
 		assertEquals("", found);
-		assertEquals("line 1:1 missing 'b' at 'c'\n", this.stderrDuringParse);
+		assertEquals("line 1:1 missing 'b' at 'c'\n", stderrDuringParse());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -63,7 +67,7 @@ public class TestParserErrors extends BaseTest {
 	                  "a : 'a' x='b' {System.out.println(\"conjured=\" + $x);} 'c' ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a", "ac", false);
 		assertEquals("conjured=[@-1,-1:-1='<missing 'b'>',<2>,1:1]\n", found);
-		assertEquals("line 1:1 missing 'b' at 'c'\n", this.stderrDuringParse);
+		assertEquals("line 1:1 missing 'b' at 'c'\n", stderrDuringParse());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -73,7 +77,7 @@ public class TestParserErrors extends BaseTest {
 	                  "a : 'a' ('b'|'c') 'd' ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a", "ad", false);
 		assertEquals("", found);
-		assertEquals("line 1:1 missing {'b', 'c'} at 'd'\n", this.stderrDuringParse);
+		assertEquals("line 1:1 missing {'b', 'c'} at 'd'\n", stderrDuringParse());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -84,7 +88,7 @@ public class TestParserErrors extends BaseTest {
 	                  "a: 'a' myset 'd' {System.out.println(\"\" + $myset.stop);} ; ";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a", "ad", false);
 		assertEquals("[@0,0:0='a',<3>,1:0]\n", found);
-		assertEquals("line 1:1 missing {'b', 'c'} at 'd'\n", this.stderrDuringParse);
+		assertEquals("line 1:1 missing {'b', 'c'} at 'd'\n", stderrDuringParse());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -94,7 +98,7 @@ public class TestParserErrors extends BaseTest {
 	                  "a : 'a' x=('b'|'c') {System.out.println(\"conjured=\" + $x);} 'd' ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a", "ad", false);
 		assertEquals("conjured=[@-1,-1:-1='<missing 'b'>',<2>,1:1]\n", found);
-		assertEquals("line 1:1 missing {'b', 'c'} at 'd'\n", this.stderrDuringParse);
+		assertEquals("line 1:1 missing {'b', 'c'} at 'd'\n", stderrDuringParse());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -107,7 +111,7 @@ public class TestParserErrors extends BaseTest {
 	                  "q : 'e' ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a", "ae", false);
 		assertEquals("", found);
-		assertEquals("line 1:1 no viable alternative at input 'ae'\n", this.stderrDuringParse);
+		assertEquals("line 1:1 no viable alternative at input 'ae'\n", stderrDuringParse());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -120,7 +124,7 @@ public class TestParserErrors extends BaseTest {
 	                  "q : 'e' ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a", "abe", false);
 		assertEquals("", found);
-		assertEquals("line 1:2 no viable alternative at input 'abe'\n", this.stderrDuringParse);
+		assertEquals("line 1:2 no viable alternative at input 'abe'\n", stderrDuringParse());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -133,7 +137,7 @@ public class TestParserErrors extends BaseTest {
 	                  "q : 'e' ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a", "aaae", false);
 		assertEquals("", found);
-		assertEquals("line 1:3 no viable alternative at input 'aaae'\n", this.stderrDuringParse);
+		assertEquals("line 1:3 no viable alternative at input 'aaae'\n", stderrDuringParse());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -143,7 +147,7 @@ public class TestParserErrors extends BaseTest {
 	                  "a : 'a' 'b'* ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a", "aabc", false);
 		assertEquals("", found);
-		assertEquals("line 1:1 extraneous input 'a' expecting {<EOF>, 'b'}\nline 1:3 token recognition error at: 'c'\n", this.stderrDuringParse);
+		assertEquals("line 1:1 extraneous input 'a' expecting {<EOF>, 'b'}\nline 1:3 token recognition error at: 'c'\n", stderrDuringParse());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -153,7 +157,7 @@ public class TestParserErrors extends BaseTest {
 	                  "a : 'a' 'b'* 'c';";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a", "aacabc", false);
 		assertEquals("", found);
-		assertEquals("line 1:1 extraneous input 'a' expecting {'b', 'c'}\n", this.stderrDuringParse);
+		assertEquals("line 1:1 extraneous input 'a' expecting {'b', 'c'}\n", stderrDuringParse());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -163,7 +167,7 @@ public class TestParserErrors extends BaseTest {
 	                  "a : 'a' 'b'* 'c' ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a", "ababbc", false);
 		assertEquals("", found);
-		assertEquals("line 1:2 extraneous input 'a' expecting {'b', 'c'}\n", this.stderrDuringParse);
+		assertEquals("line 1:2 extraneous input 'a' expecting {'b', 'c'}\n", stderrDuringParse());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -173,7 +177,7 @@ public class TestParserErrors extends BaseTest {
 	                  "a : 'a' 'b'* 'c' ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a", "abaaababc", false);
 		assertEquals("", found);
-		assertEquals("line 1:2 extraneous input 'a' expecting {'b', 'c'}\nline 1:6 extraneous input 'a' expecting {'b', 'c'}\n", this.stderrDuringParse);
+		assertEquals("line 1:2 extraneous input 'a' expecting {'b', 'c'}\nline 1:6 extraneous input 'a' expecting {'b', 'c'}\n", stderrDuringParse());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -183,7 +187,7 @@ public class TestParserErrors extends BaseTest {
 	                  "a : 'a' ('b'|'z'{})*;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a", "aabc", false);
 		assertEquals("", found);
-		assertEquals("line 1:1 extraneous input 'a' expecting {<EOF>, 'b', 'z'}\nline 1:3 token recognition error at: 'c'\n", this.stderrDuringParse);
+		assertEquals("line 1:1 extraneous input 'a' expecting {<EOF>, 'b', 'z'}\nline 1:3 token recognition error at: 'c'\n", stderrDuringParse());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -193,7 +197,7 @@ public class TestParserErrors extends BaseTest {
 	                  "a : 'a' ('b'|'z'{})* 'c';";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a", "aacabc", false);
 		assertEquals("", found);
-		assertEquals("line 1:1 extraneous input 'a' expecting {'b', 'z', 'c'}\n", this.stderrDuringParse);
+		assertEquals("line 1:1 extraneous input 'a' expecting {'b', 'z', 'c'}\n", stderrDuringParse());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -203,7 +207,7 @@ public class TestParserErrors extends BaseTest {
 	                  "a : 'a' ('b'|'z'{})* 'c' ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a", "ababbc", false);
 		assertEquals("", found);
-		assertEquals("line 1:2 extraneous input 'a' expecting {'b', 'z', 'c'}\n", this.stderrDuringParse);
+		assertEquals("line 1:2 extraneous input 'a' expecting {'b', 'z', 'c'}\n", stderrDuringParse());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -213,7 +217,7 @@ public class TestParserErrors extends BaseTest {
 	                  "a : 'a' ('b'|'z'{})* 'c' ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a", "abaaababc", false);
 		assertEquals("", found);
-		assertEquals("line 1:2 extraneous input 'a' expecting {'b', 'z', 'c'}\nline 1:6 extraneous input 'a' expecting {'b', 'z', 'c'}\n", this.stderrDuringParse);
+		assertEquals("line 1:2 extraneous input 'a' expecting {'b', 'z', 'c'}\nline 1:6 extraneous input 'a' expecting {'b', 'z', 'c'}\n", stderrDuringParse());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -235,7 +239,7 @@ public class TestParserErrors extends BaseTest {
 	                  "  : ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "start", "dog and software", false);
 		assertEquals("{'hardware', 'software'}\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -246,7 +250,7 @@ public class TestParserErrors extends BaseTest {
 	                  "ID : [a-z]+;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "start", "", false);
 		assertEquals("", found);
-		assertEquals("line 1:0 missing ID at '<EOF>'\n", this.stderrDuringParse);
+		assertEquals("line 1:0 missing ID at '<EOF>'\n", stderrDuringParse());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -265,7 +269,7 @@ public class TestParserErrors extends BaseTest {
 	                  "b : 'b' {System.out.print('b');};";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s", "abab", false);
 		assertEquals("abab\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -283,7 +287,7 @@ public class TestParserErrors extends BaseTest {
 	public void testDuplicatedLeftRecursiveCall_1() throws Exception {
 		String found = testDuplicatedLeftRecursiveCall("xx");
 		assertEquals("", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -291,7 +295,7 @@ public class TestParserErrors extends BaseTest {
 	public void testDuplicatedLeftRecursiveCall_2() throws Exception {
 		String found = testDuplicatedLeftRecursiveCall("xxx");
 		assertEquals("", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -299,7 +303,7 @@ public class TestParserErrors extends BaseTest {
 	public void testDuplicatedLeftRecursiveCall_3() throws Exception {
 		String found = testDuplicatedLeftRecursiveCall("xxxx");
 		assertEquals("", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -312,7 +316,7 @@ public class TestParserErrors extends BaseTest {
 	                  "ID : [a-z]+;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "start", "x:x", false);
 		assertEquals("", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -327,7 +331,7 @@ public class TestParserErrors extends BaseTest {
 	                  "WS : [ \\t\\r\\n]+ -> skip;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s", "a.", false);
 		assertEquals("", found);
-		assertEquals("line 1:1 mismatched input '.' expecting '!'\n", this.stderrDuringParse);
+		assertEquals("line 1:1 mismatched input '.' expecting '!'\n", stderrDuringParse());
 	}
 
 

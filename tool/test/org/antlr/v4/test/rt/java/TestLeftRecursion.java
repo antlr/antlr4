@@ -2,8 +2,12 @@ package org.antlr.v4.test.rt.java;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
+import static org.hamcrest.Matchers.*;
 
-public class TestLeftRecursion extends BaseTest {
+
+import org.antlr.v4.test.AntlrTestcase;
+
+public class TestLeftRecursion extends AntlrTestcase {
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
 	String testSimple(String input) throws Exception {
@@ -22,7 +26,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testSimple_1() throws Exception {
 		String found = testSimple("x");
 		assertEquals("(s (a x))\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -30,7 +34,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testSimple_2() throws Exception {
 		String found = testSimple("x y");
 		assertEquals("(s (a (a x) y))\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -38,7 +42,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testSimple_3() throws Exception {
 		String found = testSimple("x y z");
 		assertEquals("(s (a (a (a x) y) z))\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -57,7 +61,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testDirectCallToLeftRecursiveRule_1() throws Exception {
 		String found = testDirectCallToLeftRecursiveRule("x");
 		assertEquals("(a x)\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -65,7 +69,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testDirectCallToLeftRecursiveRule_2() throws Exception {
 		String found = testDirectCallToLeftRecursiveRule("x y");
 		assertEquals("(a (a x) y)\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -73,7 +77,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testDirectCallToLeftRecursiveRule_3() throws Exception {
 		String found = testDirectCallToLeftRecursiveRule("x y z");
 		assertEquals("(a (a (a x) y) z)\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -88,7 +92,7 @@ public class TestLeftRecursion extends BaseTest {
 	                  "WS : (' '|'\\n') -> skip ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s", "x y z", false);
 		assertEquals("(s (a (a (a x) y) z))\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -111,7 +115,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testTernaryExpr_1() throws Exception {
 		String found = testTernaryExpr("a");
 		assertEquals("(s (e a) <EOF>)\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -119,7 +123,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testTernaryExpr_2() throws Exception {
 		String found = testTernaryExpr("a+b");
 		assertEquals("(s (e (e a) + (e b)) <EOF>)\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -127,7 +131,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testTernaryExpr_3() throws Exception {
 		String found = testTernaryExpr("a*b");
 		assertEquals("(s (e (e a) * (e b)) <EOF>)\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -135,7 +139,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testTernaryExpr_4() throws Exception {
 		String found = testTernaryExpr("a?b:c");
 		assertEquals("(s (e (e a) ? (e b) : (e c)) <EOF>)\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -143,7 +147,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testTernaryExpr_5() throws Exception {
 		String found = testTernaryExpr("a=b=c");
 		assertEquals("(s (e (e a) = (e (e b) = (e c))) <EOF>)\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -151,7 +155,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testTernaryExpr_6() throws Exception {
 		String found = testTernaryExpr("a?b+c:d");
 		assertEquals("(s (e (e a) ? (e (e b) + (e c)) : (e d)) <EOF>)\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -159,7 +163,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testTernaryExpr_7() throws Exception {
 		String found = testTernaryExpr("a?b=c:d");
 		assertEquals("(s (e (e a) ? (e (e b) = (e c)) : (e d)) <EOF>)\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -167,7 +171,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testTernaryExpr_8() throws Exception {
 		String found = testTernaryExpr("a? b?c:d : e");
 		assertEquals("(s (e (e a) ? (e (e b) ? (e c) : (e d)) : (e e)) <EOF>)\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -175,7 +179,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testTernaryExpr_9() throws Exception {
 		String found = testTernaryExpr("a?b: c?d:e");
 		assertEquals("(s (e (e a) ? (e b) : (e (e c) ? (e d) : (e e))) <EOF>)\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -201,7 +205,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testExpressions_1() throws Exception {
 		String found = testExpressions("a");
 		assertEquals("(s (e a) <EOF>)\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -209,7 +213,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testExpressions_2() throws Exception {
 		String found = testExpressions("1");
 		assertEquals("(s (e 1) <EOF>)\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -217,7 +221,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testExpressions_3() throws Exception {
 		String found = testExpressions("a-1");
 		assertEquals("(s (e (e a) - (e 1)) <EOF>)\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -225,7 +229,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testExpressions_4() throws Exception {
 		String found = testExpressions("a.b");
 		assertEquals("(s (e (e a) . b) <EOF>)\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -233,7 +237,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testExpressions_5() throws Exception {
 		String found = testExpressions("a.this");
 		assertEquals("(s (e (e a) . this) <EOF>)\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -241,7 +245,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testExpressions_6() throws Exception {
 		String found = testExpressions("-a");
 		assertEquals("(s (e - (e a)) <EOF>)\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -249,7 +253,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testExpressions_7() throws Exception {
 		String found = testExpressions("-a+b");
 		assertEquals("(s (e (e - (e a)) + (e b)) <EOF>)\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -318,7 +322,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testJavaExpressions_1() throws Exception {
 		String found = testJavaExpressions("a|b&c");
 		assertEquals("(s (e (e a) | (e (e b) & (e c))) <EOF>)\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -326,7 +330,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testJavaExpressions_2() throws Exception {
 		String found = testJavaExpressions("(a|b)&c");
 		assertEquals("(s (e (e ( (e (e a) | (e b)) )) & (e c)) <EOF>)\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -334,7 +338,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testJavaExpressions_3() throws Exception {
 		String found = testJavaExpressions("a > b");
 		assertEquals("(s (e (e a) > (e b)) <EOF>)\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -342,7 +346,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testJavaExpressions_4() throws Exception {
 		String found = testJavaExpressions("a >> b");
 		assertEquals("(s (e (e a) >> (e b)) <EOF>)\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -350,7 +354,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testJavaExpressions_5() throws Exception {
 		String found = testJavaExpressions("a=b=c");
 		assertEquals("(s (e (e a) = (e (e b) = (e c))) <EOF>)\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -358,7 +362,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testJavaExpressions_6() throws Exception {
 		String found = testJavaExpressions("a^b^c");
 		assertEquals("(s (e (e a) ^ (e (e b) ^ (e c))) <EOF>)\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -366,7 +370,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testJavaExpressions_7() throws Exception {
 		String found = testJavaExpressions("(T)x");
 		assertEquals("(s (e ( (type_ T) ) (e x)) <EOF>)\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -374,7 +378,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testJavaExpressions_8() throws Exception {
 		String found = testJavaExpressions("new A().b");
 		assertEquals("(s (e (e new (type_ A) ( )) . b) <EOF>)\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -382,7 +386,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testJavaExpressions_9() throws Exception {
 		String found = testJavaExpressions("(T)t.f()");
 		assertEquals("(s (e (e ( (type_ T) ) (e (e t) . f)) ( )) <EOF>)\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -390,7 +394,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testJavaExpressions_10() throws Exception {
 		String found = testJavaExpressions("a.f(x)==T.c");
 		assertEquals("(s (e (e (e (e a) . f) ( (expressionList (e x)) )) == (e (e T) . c)) <EOF>)\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -398,7 +402,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testJavaExpressions_11() throws Exception {
 		String found = testJavaExpressions("a.f().g(x,1)");
 		assertEquals("(s (e (e (e (e (e a) . f) ( )) . g) ( (expressionList (e x) , (e 1)) )) <EOF>)\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -406,7 +410,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testJavaExpressions_12() throws Exception {
 		String found = testJavaExpressions("new T[((n-1) * x) + 1]");
 		assertEquals("(s (e new (type_ T) [ (e (e ( (e (e ( (e (e n) - (e 1)) )) * (e x)) )) + (e 1)) ]) <EOF>)\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -433,7 +437,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testDeclarations_1() throws Exception {
 		String found = testDeclarations("a");
 		assertEquals("(s (declarator a) <EOF>)\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -441,7 +445,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testDeclarations_2() throws Exception {
 		String found = testDeclarations("*a");
 		assertEquals("(s (declarator * (declarator a)) <EOF>)\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -449,7 +453,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testDeclarations_3() throws Exception {
 		String found = testDeclarations("**a");
 		assertEquals("(s (declarator * (declarator * (declarator a))) <EOF>)\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -457,7 +461,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testDeclarations_4() throws Exception {
 		String found = testDeclarations("a[3]");
 		assertEquals("(s (declarator (declarator a) [ (e 3) ]) <EOF>)\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -465,7 +469,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testDeclarations_5() throws Exception {
 		String found = testDeclarations("b[]");
 		assertEquals("(s (declarator (declarator b) [ ]) <EOF>)\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -473,7 +477,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testDeclarations_6() throws Exception {
 		String found = testDeclarations("(a)");
 		assertEquals("(s (declarator ( (declarator a) )) <EOF>)\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -481,7 +485,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testDeclarations_7() throws Exception {
 		String found = testDeclarations("a[]()");
 		assertEquals("(s (declarator (declarator (declarator a) [ ]) ( )) <EOF>)\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -489,7 +493,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testDeclarations_8() throws Exception {
 		String found = testDeclarations("a[][]");
 		assertEquals("(s (declarator (declarator (declarator a) [ ]) [ ]) <EOF>)\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -497,7 +501,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testDeclarations_9() throws Exception {
 		String found = testDeclarations("*a[]");
 		assertEquals("(s (declarator * (declarator (declarator a) [ ])) <EOF>)\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -505,7 +509,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testDeclarations_10() throws Exception {
 		String found = testDeclarations("(*a)[]");
 		assertEquals("(s (declarator (declarator ( (declarator * (declarator a)) )) [ ]) <EOF>)\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -528,7 +532,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testReturnValueAndActions_1() throws Exception {
 		String found = testReturnValueAndActions("4");
 		assertEquals("4\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -536,7 +540,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testReturnValueAndActions_2() throws Exception {
 		String found = testReturnValueAndActions("1+2");
 		assertEquals("3\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -544,7 +548,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testReturnValueAndActions_3() throws Exception {
 		String found = testReturnValueAndActions("1+2*3");
 		assertEquals("7\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -552,7 +556,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testReturnValueAndActions_4() throws Exception {
 		String found = testReturnValueAndActions("(1+2)*3");
 		assertEquals("9\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -573,7 +577,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testLabelsOnOpSubrule_1() throws Exception {
 		String found = testLabelsOnOpSubrule("4");
 		assertEquals("(s (e 4))\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -581,7 +585,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testLabelsOnOpSubrule_2() throws Exception {
 		String found = testLabelsOnOpSubrule("1*2/3");
 		assertEquals("(s (e (e (e 1) * (e 2)) / (e 3)))\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -589,7 +593,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testLabelsOnOpSubrule_3() throws Exception {
 		String found = testLabelsOnOpSubrule("(1/2)*3");
 		assertEquals("(s (e (e ( (e (e 1) / (e 2)) )) * (e 3)))\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -616,7 +620,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testReturnValueAndActionsAndLabels_1() throws Exception {
 		String found = testReturnValueAndActionsAndLabels("4");
 		assertEquals("4\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -624,7 +628,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testReturnValueAndActionsAndLabels_2() throws Exception {
 		String found = testReturnValueAndActionsAndLabels("1+2");
 		assertEquals("3\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -632,7 +636,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testReturnValueAndActionsAndLabels_3() throws Exception {
 		String found = testReturnValueAndActionsAndLabels("1+2*3");
 		assertEquals("7\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -640,7 +644,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testReturnValueAndActionsAndLabels_4() throws Exception {
 		String found = testReturnValueAndActionsAndLabels("i++*3");
 		assertEquals("12\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -669,7 +673,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testMultipleAlternativesWithCommonLabel_1() throws Exception {
 		String found = testMultipleAlternativesWithCommonLabel("4");
 		assertEquals("4\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -677,7 +681,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testMultipleAlternativesWithCommonLabel_2() throws Exception {
 		String found = testMultipleAlternativesWithCommonLabel("1+2");
 		assertEquals("3\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -685,7 +689,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testMultipleAlternativesWithCommonLabel_3() throws Exception {
 		String found = testMultipleAlternativesWithCommonLabel("1+2*3");
 		assertEquals("7\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -693,7 +697,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testMultipleAlternativesWithCommonLabel_4() throws Exception {
 		String found = testMultipleAlternativesWithCommonLabel("i++*3");
 		assertEquals("12\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -716,7 +720,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testPrefixOpWithActionAndLabel_1() throws Exception {
 		String found = testPrefixOpWithActionAndLabel("a");
 		assertEquals("a\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -724,7 +728,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testPrefixOpWithActionAndLabel_2() throws Exception {
 		String found = testPrefixOpWithActionAndLabel("a+b");
 		assertEquals("(a+b)\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -732,7 +736,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testPrefixOpWithActionAndLabel_3() throws Exception {
 		String found = testPrefixOpWithActionAndLabel("a=b+c");
 		assertEquals("((a=b)+c)\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -766,7 +770,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testAmbigLR_1() throws Exception {
 		String found = testAmbigLR("1\n");
 		assertEquals("", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -774,7 +778,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testAmbigLR_2() throws Exception {
 		String found = testAmbigLR("a = 5\n");
 		assertEquals("", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -782,7 +786,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testAmbigLR_3() throws Exception {
 		String found = testAmbigLR("b = 6\n");
 		assertEquals("", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -790,7 +794,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testAmbigLR_4() throws Exception {
 		String found = testAmbigLR("a+b*2\n");
 		assertEquals("", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -798,7 +802,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testAmbigLR_5() throws Exception {
 		String found = testAmbigLR("(1+2)*3\n");
 		assertEquals("", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -860,7 +864,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testWhitespaceInfluence_1() throws Exception {
 		String found = testWhitespaceInfluence("Test(1,3)");
 		assertEquals("", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -868,7 +872,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testWhitespaceInfluence_2() throws Exception {
 		String found = testWhitespaceInfluence("Test(1, 3)");
 		assertEquals("", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -882,7 +886,7 @@ public class TestLeftRecursion extends BaseTest {
 	                  "letterA: 'a';";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "prog", "aa", false);
 		assertEquals("(prog (statement (letterA a)) (statement (letterA a)) <EOF>)\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -903,7 +907,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testMultipleActions_1() throws Exception {
 		String found = testMultipleActions("4");
 		assertEquals("(s (e 4))\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -911,7 +915,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testMultipleActions_2() throws Exception {
 		String found = testMultipleActions("1*2/3");
 		assertEquals("(s (e (e (e 1) * (e 2)) / (e 3)))\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -919,7 +923,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testMultipleActions_3() throws Exception {
 		String found = testMultipleActions("(1/2)*3");
 		assertEquals("(s (e (e ( (e (e 1) / (e 2)) )) * (e 3)))\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -941,7 +945,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testMultipleActionsPredicatesOptions_1() throws Exception {
 		String found = testMultipleActionsPredicatesOptions("4");
 		assertEquals("(s (e 4))\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -949,7 +953,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testMultipleActionsPredicatesOptions_2() throws Exception {
 		String found = testMultipleActionsPredicatesOptions("1*2/3");
 		assertEquals("(s (e (e (e 1) * (e 2)) / (e 3)))\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -957,7 +961,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testMultipleActionsPredicatesOptions_3() throws Exception {
 		String found = testMultipleActionsPredicatesOptions("(1/2)*3");
 		assertEquals("(s (e (e ( (e (e 1) / (e 2)) )) * (e 3)))\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -972,7 +976,7 @@ public class TestLeftRecursion extends BaseTest {
 	                  "WS : (' '|'\\n') -> skip ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s", "x y z", false);
 		assertEquals("(s (a (a x) y z))\n", found);
-		assertEquals("line 1:4 rule a custom message\n", this.stderrDuringParse);
+		assertEquals("line 1:4 rule a custom message\n", stderrDuringParse());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -995,7 +999,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testTernaryExprExplicitAssociativity_1() throws Exception {
 		String found = testTernaryExprExplicitAssociativity("a");
 		assertEquals("(s (e a) <EOF>)\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -1003,7 +1007,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testTernaryExprExplicitAssociativity_2() throws Exception {
 		String found = testTernaryExprExplicitAssociativity("a+b");
 		assertEquals("(s (e (e a) + (e b)) <EOF>)\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -1011,7 +1015,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testTernaryExprExplicitAssociativity_3() throws Exception {
 		String found = testTernaryExprExplicitAssociativity("a*b");
 		assertEquals("(s (e (e a) * (e b)) <EOF>)\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -1019,7 +1023,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testTernaryExprExplicitAssociativity_4() throws Exception {
 		String found = testTernaryExprExplicitAssociativity("a?b:c");
 		assertEquals("(s (e (e a) ? (e b) : (e c)) <EOF>)\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -1027,7 +1031,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testTernaryExprExplicitAssociativity_5() throws Exception {
 		String found = testTernaryExprExplicitAssociativity("a=b=c");
 		assertEquals("(s (e (e a) = (e (e b) = (e c))) <EOF>)\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -1035,7 +1039,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testTernaryExprExplicitAssociativity_6() throws Exception {
 		String found = testTernaryExprExplicitAssociativity("a?b+c:d");
 		assertEquals("(s (e (e a) ? (e (e b) + (e c)) : (e d)) <EOF>)\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -1043,7 +1047,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testTernaryExprExplicitAssociativity_7() throws Exception {
 		String found = testTernaryExprExplicitAssociativity("a?b=c:d");
 		assertEquals("(s (e (e a) ? (e (e b) = (e c)) : (e d)) <EOF>)\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -1051,7 +1055,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testTernaryExprExplicitAssociativity_8() throws Exception {
 		String found = testTernaryExprExplicitAssociativity("a? b?c:d : e");
 		assertEquals("(s (e (e a) ? (e (e b) ? (e c) : (e d)) : (e e)) <EOF>)\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -1059,7 +1063,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testTernaryExprExplicitAssociativity_9() throws Exception {
 		String found = testTernaryExprExplicitAssociativity("a?b: c?d:e");
 		assertEquals("(s (e (e a) ? (e b) : (e (e c) ? (e d) : (e e))) <EOF>)\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -1085,7 +1089,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testReturnValueAndActionsList1_1() throws Exception {
 		String found = testReturnValueAndActionsList1("a*b");
 		assertEquals("(s (expr (expr a) * (expr b)) <EOF>)\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -1093,7 +1097,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testReturnValueAndActionsList1_2() throws Exception {
 		String found = testReturnValueAndActionsList1("a,c>>x");
 		assertEquals("(s (expr (expr a) , (expr c) >> (expr x)) <EOF>)\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -1101,7 +1105,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testReturnValueAndActionsList1_3() throws Exception {
 		String found = testReturnValueAndActionsList1("x");
 		assertEquals("(s (expr x) <EOF>)\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -1109,7 +1113,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testReturnValueAndActionsList1_4() throws Exception {
 		String found = testReturnValueAndActionsList1("a*b,c,x*y>>r");
 		assertEquals("(s (expr (expr (expr a) * (expr b)) , (expr c) , (expr (expr x) * (expr y)) >> (expr r)) <EOF>)\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -1134,7 +1138,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testReturnValueAndActionsList2_1() throws Exception {
 		String found = testReturnValueAndActionsList2("a*b");
 		assertEquals("(s (expr (expr a) * (expr b)) <EOF>)\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -1142,7 +1146,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testReturnValueAndActionsList2_2() throws Exception {
 		String found = testReturnValueAndActionsList2("a,c>>x");
 		assertEquals("(s (expr (expr (expr a) , (expr c)) >> (expr x)) <EOF>)\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -1150,7 +1154,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testReturnValueAndActionsList2_3() throws Exception {
 		String found = testReturnValueAndActionsList2("x");
 		assertEquals("(s (expr x) <EOF>)\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -1158,7 +1162,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testReturnValueAndActionsList2_4() throws Exception {
 		String found = testReturnValueAndActionsList2("a*b,c,x*y>>r");
 		assertEquals("(s (expr (expr (expr (expr (expr a) * (expr b)) , (expr c)) , (expr (expr x) * (expr y))) >> (expr r)) <EOF>)\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 

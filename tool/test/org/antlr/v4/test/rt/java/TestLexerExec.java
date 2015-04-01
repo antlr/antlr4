@@ -2,8 +2,12 @@ package org.antlr.v4.test.rt.java;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
+import static org.hamcrest.Matchers.*;
 
-public class TestLexerExec extends BaseTest {
+
+import org.antlr.v4.test.AntlrTestcase;
+
+public class TestLexerExec extends AntlrTestcase {
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
@@ -15,7 +19,7 @@ public class TestLexerExec extends BaseTest {
 		String found = execLexer("L.g4", grammar, "L", "\"", false);
 		assertEquals("[@0,0:0='\"',<1>,1:0]\n" + 
 	              "[@1,1:0='<EOF>',<-1>,1:1]\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -32,7 +36,7 @@ public class TestLexerExec extends BaseTest {
 	              "[@1,3:5='-21',<1>,1:3]\n" + 
 	              "[@2,7:7='3',<2>,1:7]\n" + 
 	              "[@3,8:7='<EOF>',<-1>,1:8]\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -52,7 +56,7 @@ public class TestLexerExec extends BaseTest {
 	              "[@2,4:5='\\/',<3>,1:4]\n" + 
 	              "[@3,7:8='/\\',<4>,1:7]\n" + 
 	              "[@4,9:8='<EOF>',<-1>,1:9]\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -71,7 +75,7 @@ public class TestLexerExec extends BaseTest {
 		assertEquals("[@0,0:4='-.-.-',<1>,1:0]\n" + 
 	              "[@1,5:5='!',<3>,1:5]\n" + 
 	              "[@2,6:5='<EOF>',<-1>,1:6]\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -85,7 +89,7 @@ public class TestLexerExec extends BaseTest {
 		assertEquals("[@0,0:3='\"hi\"',<1>,1:0]\n" + 
 	              "[@1,4:8='\"mom\"',<1>,1:4]\n" + 
 	              "[@2,9:8='<EOF>',<-1>,1:9]\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -98,7 +102,7 @@ public class TestLexerExec extends BaseTest {
 		String found = execLexer("L.g4", grammar, "L", "\"\"\"mom\"", false);
 		assertEquals("[@0,0:6='\"\"\"mom\"',<1>,1:0]\n" + 
 	              "[@1,7:6='<EOF>',<-1>,1:7]\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -112,7 +116,7 @@ public class TestLexerExec extends BaseTest {
 		String found = execLexer("L.g4", grammar, "L", "//blah\n//blah\n", false);
 		assertEquals("[@0,0:13='//blah\\n//blah\\n',<1>,1:0]\n" + 
 	              "[@1,14:13='<EOF>',<-1>,3:0]\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -127,7 +131,7 @@ public class TestLexerExec extends BaseTest {
 		assertEquals("[@0,0:6='//blah\\n',<1>,1:0]\n" + 
 	              "[@1,7:13='//blah\\n',<1>,2:0]\n" + 
 	              "[@2,14:13='<EOF>',<-1>,3:0]\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -141,7 +145,7 @@ public class TestLexerExec extends BaseTest {
 		String found = execLexer("L.g4", grammar, "L", "//blah\n//blah\n", false);
 		assertEquals("[@0,0:13='//blah\\n//blah\\n',<1>,1:0]\n" + 
 	              "[@1,14:13='<EOF>',<-1>,3:0]\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -156,7 +160,7 @@ public class TestLexerExec extends BaseTest {
 		assertEquals("[@0,0:6='//blah\\n',<1>,1:0]\n" + 
 	              "[@1,7:13='//blah\\n',<1>,2:0]\n" + 
 	              "[@2,14:13='<EOF>',<-1>,3:0]\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -170,7 +174,7 @@ public class TestLexerExec extends BaseTest {
 		String found = execLexer("L.g4", grammar, "L", "//blah\n//blah\n", false);
 		assertEquals("[@0,0:13='//blah\\n//blah\\n',<1>,1:0]\n" + 
 	              "[@1,14:13='<EOF>',<-1>,3:0]\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -185,7 +189,7 @@ public class TestLexerExec extends BaseTest {
 		assertEquals("[@0,0:6='//blah\\n',<1>,1:0]\n" + 
 	              "[@1,7:13='//blah\\n',<1>,2:0]\n" + 
 	              "[@2,14:13='<EOF>',<-1>,3:0]\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -202,7 +206,7 @@ public class TestLexerExec extends BaseTest {
 	              "[@2,10:34='/* /* */\\n/* /*nested*/ */',<1>,2:0]\n" + 
 	              "[@3,35:35='\\n',<2>,3:16]\n" + 
 	              "[@4,36:35='<EOF>',<-1>,4:0]\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -219,7 +223,7 @@ public class TestLexerExec extends BaseTest {
 	              "[@2,11:36='/* /* */x\\n/* /*nested*/ */',<1>,2:0]\n" + 
 	              "[@3,38:38='\\n',<2>,3:17]\n" + 
 	              "[@4,39:38='<EOF>',<-1>,4:0]\n", found);
-		assertEquals("line 1:9 token recognition error at: 'x'\nline 3:16 token recognition error at: 'x'\n", this.stderrDuringParse);
+		assertEquals("line 1:9 token recognition error at: 'x'\nline 3:16 token recognition error at: 'x'\n", stderrDuringParse());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -236,7 +240,7 @@ public class TestLexerExec extends BaseTest {
 	              "[@2,10:34='/* /* */\\n/* /*nested*/ */',<1>,2:0]\n" + 
 	              "[@3,35:35='\\n',<2>,3:16]\n" + 
 	              "[@4,36:35='<EOF>',<-1>,4:0]\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -253,7 +257,7 @@ public class TestLexerExec extends BaseTest {
 	              "[@2,11:36='/* /* */x\\n/* /*nested*/ */',<1>,2:0]\n" + 
 	              "[@3,38:38='\\n',<2>,3:17]\n" + 
 	              "[@4,39:38='<EOF>',<-1>,4:0]\n", found);
-		assertEquals("line 1:9 token recognition error at: 'x'\nline 3:16 token recognition error at: 'x'\n", this.stderrDuringParse);
+		assertEquals("line 1:9 token recognition error at: 'x'\nline 3:16 token recognition error at: 'x'\n", stderrDuringParse());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -276,7 +280,7 @@ public class TestLexerExec extends BaseTest {
 	              "ab\n" + 
 	              "[@0,0:1='ab',<1>,1:0]\n" + 
 	              "[@1,2:1='<EOF>',<-1>,1:2]\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -292,7 +296,7 @@ public class TestLexerExec extends BaseTest {
 		assertEquals("ab\n" + 
 	              "[@0,0:1='ab',<1>,1:0]\n" + 
 	              "[@1,2:1='<EOF>',<-1>,1:2]\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -310,7 +314,7 @@ public class TestLexerExec extends BaseTest {
 	              "[@0,0:0='a',<1>,1:0]\n" + 
 	              "[@1,1:1='b',<3>,1:1]\n" + 
 	              "[@2,2:1='<EOF>',<-1>,1:2]\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -331,7 +335,7 @@ public class TestLexerExec extends BaseTest {
 	              "[@5,15:15=' ',<3>,1:15]\n" + 
 	              "[@6,16:16='a',<2>,1:16]\n" + 
 	              "[@7,17:16='<EOF>',<-1>,1:17]\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -362,7 +366,7 @@ public class TestLexerExec extends BaseTest {
 	              "[@11,11:11='.',<4>,1:11]\n" + 
 	              "[@12,12:12='l',<5>,1:12]\n" + 
 	              "[@13,13:12='<EOF>',<-1>,1:13]\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -376,7 +380,7 @@ public class TestLexerExec extends BaseTest {
 		String found = execLexer("L.g4", grammar, "L", "", false);
 		assertEquals("[@0,0:-1='<EOF>',<1>,1:0]\n" + 
 	              "[@1,0:-1='<EOF>',<-1>,1:0]\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -390,7 +394,7 @@ public class TestLexerExec extends BaseTest {
 		String grammar = sb.toString();
 		String found = execLexer("L.g4", grammar, "L", "", false);
 		assertEquals("[@0,0:-1='<EOF>',<-1>,1:0]\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -405,7 +409,7 @@ public class TestLexerExec extends BaseTest {
 		String found = execLexer("L.g4", grammar, "L", "a", false);
 		assertEquals("[@0,0:0='a',<1>,1:0]\n" + 
 	              "[@1,1:0='<EOF>',<-1>,1:1]\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -422,7 +426,7 @@ public class TestLexerExec extends BaseTest {
 	              "[@0,0:1='34',<1>,1:0]\n" + 
 	              "[@1,4:5='34',<1>,2:1]\n" + 
 	              "[@2,6:5='<EOF>',<-1>,2:3]\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -439,7 +443,7 @@ public class TestLexerExec extends BaseTest {
 	              "[@0,0:1='34',<1>,1:0]\n" + 
 	              "[@1,4:5='34',<1>,2:1]\n" + 
 	              "[@2,6:5='<EOF>',<-1>,2:3]\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -454,7 +458,7 @@ public class TestLexerExec extends BaseTest {
 		assertEquals("I\n" + 
 	              "[@0,0:2='xaf',<1>,1:0]\n" + 
 	              "[@1,3:2='<EOF>',<-1>,1:3]\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -472,7 +476,7 @@ public class TestLexerExec extends BaseTest {
 	              "[@0,0:0='a',<1>,1:0]\n" + 
 	              "[@1,2:2='x',<1>,1:2]\n" + 
 	              "[@2,3:2='<EOF>',<-1>,1:3]\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -494,7 +498,7 @@ public class TestLexerExec extends BaseTest {
 	              "[@2,7:8='a2',<2>,2:4]\n" + 
 	              "[@3,10:12='abc',<2>,2:7]\n" + 
 	              "[@4,18:17='<EOF>',<-1>,3:3]\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -509,7 +513,7 @@ public class TestLexerExec extends BaseTest {
 		assertEquals("I\n" + 
 	              "[@0,0:1='00',<1>,1:0]\n" + 
 	              "[@1,3:2='<EOF>',<-1>,2:0]\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -524,7 +528,7 @@ public class TestLexerExec extends BaseTest {
 		assertEquals("I\n" + 
 	              "[@0,0:1='34',<1>,1:0]\n" + 
 	              "[@1,3:2='<EOF>',<-1>,1:3]\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -541,7 +545,7 @@ public class TestLexerExec extends BaseTest {
 	              "[@0,0:0='-',<1>,1:0]\n" + 
 	              "[@1,2:2=']',<1>,1:2]\n" + 
 	              "[@2,4:3='<EOF>',<-1>,1:4]\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -556,7 +560,7 @@ public class TestLexerExec extends BaseTest {
 		assertEquals("A\n" + 
 	              "[@0,0:0='9',<1>,1:0]\n" + 
 	              "[@1,1:0='<EOF>',<-1>,1:1]\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -571,7 +575,7 @@ public class TestLexerExec extends BaseTest {
 		assertEquals("A\n" + 
 	              "[@0,0:2='b\"a',<1>,1:0]\n" + 
 	              "[@1,3:2='<EOF>',<-1>,1:3]\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -586,7 +590,7 @@ public class TestLexerExec extends BaseTest {
 		assertEquals("A\n" + 
 	              "[@0,0:3='b\"\\a',<1>,1:0]\n" + 
 	              "[@1,4:3='<EOF>',<-1>,1:4]\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -718,7 +722,7 @@ public class TestLexerExec extends BaseTest {
 	              "[@7,41:42='+=',<2>,5:7]\n" + 
 	              "[@8,44:51='notLabel',<6>,6:0]\n" + 
 	              "[@9,53:52='<EOF>',<-1>,7:0]\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -4731,7 +4735,7 @@ public class TestLexerExec extends BaseTest {
 		String found = execLexer("L.g4", grammar, "L", "KW400", false);
 		assertEquals("[@0,0:4='KW400',<402>,1:0]\n" + 
 	              "[@1,5:4='<EOF>',<-1>,1:5]\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -4751,7 +4755,7 @@ public class TestLexerExec extends BaseTest {
 		String found = execLexer("L.g4", grammar, "L", "'xxx'", false);
 		assertEquals("[@0,0:4=''xxx'',<1>,1:0]\n" + 
 	              "[@1,5:4='<EOF>',<-1>,1:5]\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 

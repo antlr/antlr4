@@ -2,8 +2,12 @@ package org.antlr.v4.test.rt.java;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
+import static org.hamcrest.Matchers.*;
 
-public class TestListeners extends BaseTest {
+
+import org.antlr.v4.test.AntlrTestcase;
+
+public class TestListeners extends AntlrTestcase {
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
@@ -37,7 +41,7 @@ public class TestListeners extends BaseTest {
 	                  "WS : [ \\t\\n]+ -> skip ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s", "1 2", false);
 		assertEquals("(a 1 2)\n1\n2\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -81,7 +85,7 @@ public class TestListeners extends BaseTest {
 	public void testTokenGetters_1() throws Exception {
 		String found = testTokenGetters("1 2");
 		assertEquals("(a 1 2)\n1 2 [1, 2]\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -89,7 +93,7 @@ public class TestListeners extends BaseTest {
 	public void testTokenGetters_2() throws Exception {
 		String found = testTokenGetters("abc");
 		assertEquals("(a abc)\n[@0,0:2='abc',<4>,1:0]\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -134,7 +138,7 @@ public class TestListeners extends BaseTest {
 	public void testRuleGetters_1() throws Exception {
 		String found = testRuleGetters("1 2");
 		assertEquals("(a (b 1) (b 2))\n1 2 1\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -142,7 +146,7 @@ public class TestListeners extends BaseTest {
 	public void testRuleGetters_2() throws Exception {
 		String found = testRuleGetters("abc");
 		assertEquals("(a (b abc))\nabc\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -182,7 +186,7 @@ public class TestListeners extends BaseTest {
 	                  "WS : [ \\t\\n]+ -> skip ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s", "1+2*3", false);
 		assertEquals("(e (e 1) + (e (e 2) * (e 3)))\n1\n2\n3\n2 3 2\n1 2 1\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -221,7 +225,7 @@ public class TestListeners extends BaseTest {
 	                  "WS : [ \\t\\n]+ -> skip ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s", "1(2,3)", false);
 		assertEquals("(e (e 1) ( (eList (e 2) , (e 3)) ))\n1\n2\n3\n1 [13 6]\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 

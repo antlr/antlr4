@@ -2,8 +2,12 @@ package org.antlr.v4.test.rt.java;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
+import static org.hamcrest.Matchers.*;
 
-public class TestCompositeLexers extends BaseTest {
+
+import org.antlr.v4.test.AntlrTestcase;
+
+public class TestCompositeLexers extends AntlrTestcase {
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
@@ -11,8 +15,8 @@ public class TestCompositeLexers extends BaseTest {
 		String slave_S = "lexer grammar S;\n" +
 	                  "A : 'a' {System.out.println(\"S.A\");};\n" +
 	                  "C : 'c' ;";
-		mkdir(tmpdir);
-		writeFile(tmpdir, "S.g4", slave_S);
+		mkdir(tmpdir());
+		writeFile(tmpdir(), "S.g4", slave_S);
 
 		StringBuilder sb = new StringBuilder();
 		sb.append("lexer grammar M;\n");
@@ -26,7 +30,7 @@ public class TestCompositeLexers extends BaseTest {
 	              "[@1,1:1='b',<1>,1:1]\n" + 
 	              "[@2,2:2='c',<4>,1:2]\n" + 
 	              "[@3,3:2='<EOF>',<-1>,1:3]\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -35,8 +39,8 @@ public class TestCompositeLexers extends BaseTest {
 		String slave_S = "lexer grammar S;\n" +
 	                  "A : 'a' {System.out.println(\"S.A\");};\n" +
 	                  "B : 'b' {System.out.println(\"S.B\");};";
-		mkdir(tmpdir);
-		writeFile(tmpdir, "S.g4", slave_S);
+		mkdir(tmpdir());
+		writeFile(tmpdir(), "S.g4", slave_S);
 
 		StringBuilder sb = new StringBuilder();
 		sb.append("lexer grammar M;\n");
@@ -48,7 +52,7 @@ public class TestCompositeLexers extends BaseTest {
 		assertEquals("M.A\n" + 
 	              "[@0,0:1='ab',<1>,1:0]\n" + 
 	              "[@1,2:1='<EOF>',<-1>,1:2]\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 

@@ -2,8 +2,12 @@ package org.antlr.v4.test.rt.java;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
+import static org.hamcrest.Matchers.*;
 
-public class TestSemPredEvalParser extends BaseTest {
+
+import org.antlr.v4.test.AntlrTestcase;
+
+public class TestSemPredEvalParser extends AntlrTestcase {
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
@@ -18,7 +22,7 @@ public class TestSemPredEvalParser extends BaseTest {
 	                  "WS : (' '|'\\n') -> skip ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s", "x", true);
 		assertEquals("", found);
-		assertEquals("line 1:0 no viable alternative at input 'x'\n", this.stderrDuringParse);
+		assertEquals("line 1:0 no viable alternative at input 'x'\n", stderrDuringParse());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -34,7 +38,7 @@ public class TestSemPredEvalParser extends BaseTest {
 	                  "WS : (' '|'\\n') -> skip ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s", "3 4 x", true);
 		assertEquals("alt 2\nalt 2\n", found);
-		assertEquals("line 1:4 no viable alternative at input 'x'\n", this.stderrDuringParse);
+		assertEquals("line 1:4 no viable alternative at input 'x'\n", stderrDuringParse());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -47,7 +51,7 @@ public class TestSemPredEvalParser extends BaseTest {
 	                  "    ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "start", "a+b+a", false);
 		assertEquals("", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -66,7 +70,7 @@ public class TestSemPredEvalParser extends BaseTest {
 	                  "WS : (' '|'\\n') -> skip ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s", "x ; y", true);
 		assertEquals("", found);
-		assertEquals("line 1:0 no viable alternative at input 'x'\nline 1:4 no viable alternative at input 'y'\n", this.stderrDuringParse);
+		assertEquals("line 1:0 no viable alternative at input 'x'\nline 1:4 no viable alternative at input 'y'\n", stderrDuringParse());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -83,7 +87,7 @@ public class TestSemPredEvalParser extends BaseTest {
 	                  "WS : (' '|'\\n') -> skip ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s", "x y 3", true);
 		assertEquals("alt 2\nalt 2\nalt 3\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -101,7 +105,7 @@ public class TestSemPredEvalParser extends BaseTest {
 	                  "WS : (' '|'\\n') -> skip ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s", "x y", false);
 		assertEquals("alt 1\nalt 1\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -118,7 +122,7 @@ public class TestSemPredEvalParser extends BaseTest {
 	                  "WS : (' '|'\\n') -> skip ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s", "x; y", true);
 		assertEquals("alt 1\nalt 1\n", found);
-		assertEquals("line 1:0 reportAttemptingFullContext d=0 (a), input='x'\nline 1:0 reportAmbiguity d=0 (a): ambigAlts={1, 2}, input='x'\nline 1:3 reportAttemptingFullContext d=0 (a), input='y'\nline 1:3 reportAmbiguity d=0 (a): ambigAlts={1, 2}, input='y'\n", this.stderrDuringParse);
+		assertEquals("line 1:0 reportAttemptingFullContext d=0 (a), input='x'\nline 1:0 reportAmbiguity d=0 (a): ambigAlts={1, 2}, input='x'\nline 1:3 reportAttemptingFullContext d=0 (a), input='y'\nline 1:3 reportAmbiguity d=0 (a): ambigAlts={1, 2}, input='y'\n", stderrDuringParse());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -136,7 +140,7 @@ public class TestSemPredEvalParser extends BaseTest {
 	                  "WS : (' '|'\\n') -> skip ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s", "34; x; y", true);
 		assertEquals("alt 1\nalt 2\nalt 2\n", found);
-		assertEquals("line 1:4 reportAttemptingFullContext d=0 (a), input='x'\nline 1:4 reportAmbiguity d=0 (a): ambigAlts={2, 3}, input='x'\nline 1:7 reportAttemptingFullContext d=0 (a), input='y'\nline 1:7 reportAmbiguity d=0 (a): ambigAlts={2, 3}, input='y'\n", this.stderrDuringParse);
+		assertEquals("line 1:4 reportAttemptingFullContext d=0 (a), input='x'\nline 1:4 reportAmbiguity d=0 (a): ambigAlts={2, 3}, input='x'\nline 1:7 reportAttemptingFullContext d=0 (a), input='y'\nline 1:7 reportAmbiguity d=0 (a): ambigAlts={2, 3}, input='y'\n", stderrDuringParse());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -152,7 +156,7 @@ public class TestSemPredEvalParser extends BaseTest {
 	                  "WS : (' '|'\\n') -> skip ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s", "y 3 x 4", true);
 		assertEquals("alt 2\nalt 1\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -168,7 +172,7 @@ public class TestSemPredEvalParser extends BaseTest {
 	                  "WS : (' '|'\\n') -> skip ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s", "y 3 x 4", false);
 		assertEquals("", found);
-		assertEquals("line 1:0 no viable alternative at input 'y'\n", this.stderrDuringParse);
+		assertEquals("line 1:0 no viable alternative at input 'y'\n", stderrDuringParse());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -184,7 +188,7 @@ public class TestSemPredEvalParser extends BaseTest {
 	                  "WS : (' '|'\\n') -> skip ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s", "x x y", true);
 		assertEquals("alt 2\nalt 2\nalt 2\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -204,7 +208,7 @@ public class TestSemPredEvalParser extends BaseTest {
 	                  "WS : (' '|'\\n') -> skip ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s", "x 4", true);
 		assertEquals("alt 1\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -221,7 +225,7 @@ public class TestSemPredEvalParser extends BaseTest {
 	                  "WS : (' '|'\\n') -> skip ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s", "x x y", false);
 		assertEquals("alt 1\nalt 1\nalt 1\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -239,7 +243,7 @@ public class TestSemPredEvalParser extends BaseTest {
 	                  "WS : (' '|'\\n') -> skip ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s", "x x y", true);
 		assertEquals("i=1\nalt 2\ni=2\nalt 1\ni=3\nalt 2\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -257,7 +261,7 @@ public class TestSemPredEvalParser extends BaseTest {
 	                  "WS : (' '|'\\n') -> skip ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s", "a b", true);
 		assertEquals("alt 2\nalt 1\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -275,7 +279,7 @@ public class TestSemPredEvalParser extends BaseTest {
 	                  "WS : (' '|'\\n') -> skip ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s", "a b", true);
 		assertEquals("", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -293,7 +297,7 @@ public class TestSemPredEvalParser extends BaseTest {
 	                  "WS : (' '|'\\n') -> skip ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s", "a;", true);
 		assertEquals("alt 2\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -311,7 +315,7 @@ public class TestSemPredEvalParser extends BaseTest {
 	                  "WS : (' '|'\\n') -> skip ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s", "a;", true);
 		assertEquals("alt 2\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -332,7 +336,7 @@ public class TestSemPredEvalParser extends BaseTest {
 	                  "WS : (' '|'\\n') -> skip ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s", "a!", true);
 		assertEquals("eval=true\nparse\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -354,7 +358,7 @@ public class TestSemPredEvalParser extends BaseTest {
 	                  "WS : (' '|'\\n') -> skip ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s", "a!", true);
 		assertEquals("eval=true\nparse\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -375,7 +379,7 @@ public class TestSemPredEvalParser extends BaseTest {
 	                  "WS : (' '|'\\n') -> skip ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s", "a!", true);
 		assertEquals("eval=true\nparse\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -396,7 +400,7 @@ public class TestSemPredEvalParser extends BaseTest {
 	public void testPredTestedEvenWhenUnAmbig_1() throws Exception {
 		String found = testPredTestedEvenWhenUnAmbig("abc");
 		assertEquals("ID abc\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -404,7 +408,7 @@ public class TestSemPredEvalParser extends BaseTest {
 	public void testPredTestedEvenWhenUnAmbig_2() throws Exception {
 		String found = testPredTestedEvenWhenUnAmbig("enum");
 		assertEquals("", found);
-		assertEquals("line 1:0 no viable alternative at input 'enum'\n", this.stderrDuringParse);
+		assertEquals("line 1:0 no viable alternative at input 'enum'\n", stderrDuringParse());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -417,7 +421,7 @@ public class TestSemPredEvalParser extends BaseTest {
 	                  "ANY_CHAR: [_a-zA-Z0-9];";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "cppCompilationUnit", "hello", true);
 		assertEquals("", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -439,7 +443,7 @@ public class TestSemPredEvalParser extends BaseTest {
 	public void testPredFromAltTestedInLoopBack_1() throws Exception {
 		String found = testPredFromAltTestedInLoopBack("s\n\n\nx\n");
 		assertEquals("(file_ (para (paraContent s) \\n \\n) (para (paraContent \\n x \\n)) <EOF>)\n", found);
-		assertEquals("line 5:0 mismatched input '<EOF>' expecting '\n'\n", this.stderrDuringParse);
+		assertEquals("line 5:0 mismatched input '<EOF>' expecting '\n'\n", stderrDuringParse());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -447,7 +451,7 @@ public class TestSemPredEvalParser extends BaseTest {
 	public void testPredFromAltTestedInLoopBack_2() throws Exception {
 		String found = testPredFromAltTestedInLoopBack("s\n\n\nx\n\n");
 		assertEquals("(file_ (para (paraContent s) \\n \\n) (para (paraContent \\n x) \\n \\n) <EOF>)\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 

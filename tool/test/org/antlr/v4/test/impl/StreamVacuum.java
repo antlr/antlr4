@@ -1,4 +1,4 @@
-package org.antlr.v4.test;
+package org.antlr.v4.test.impl;
 
 import java.io.BufferedReader;
 import java.io.IOException;

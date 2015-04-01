@@ -1,4 +1,4 @@
-package org.antlr.v4.test;
+package org.antlr.v4.test.impl;
 
 
 import java.util.Properties;
@@ -6,7 +6,7 @@ import java.util.Properties;
 /**
  * Created by jason on 3/24/15.
  */
-class AntlrTestSettings {
+public class AntlrTestSettings {
     public static final String PATH_SEP;
 
     public static String CLASSPATH;

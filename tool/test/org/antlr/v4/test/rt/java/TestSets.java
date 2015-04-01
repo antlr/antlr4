@@ -2,8 +2,12 @@ package org.antlr.v4.test.rt.java;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
+import static org.hamcrest.Matchers.*;
 
-public class TestSets extends BaseTest {
+
+import org.antlr.v4.test.AntlrTestcase;
+
+public class TestSets extends AntlrTestcase {
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
@@ -15,7 +19,7 @@ public class TestSets extends BaseTest {
 	                  "C : A | B;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a", "34", false);
 		assertEquals("34\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -25,7 +29,7 @@ public class TestSets extends BaseTest {
 	                  "a : t=('x'|'y') {System.out.println($t.text);} ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a", "x", false);
 		assertEquals("x\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -35,7 +39,7 @@ public class TestSets extends BaseTest {
 	                  "a : t=~('x'|'y') 'z' {System.out.println($t.text);} ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a", "zz", false);
 		assertEquals("z\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -45,7 +49,7 @@ public class TestSets extends BaseTest {
 	                  "a : ~'x' 'z' {System.out.println(this._input.getText());} ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a", "zz", false);
 		assertEquals("zz\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -55,7 +59,7 @@ public class TestSets extends BaseTest {
 	                  "a : t=~'x' 'z' {System.out.println($t.text);} ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a", "zz", false);
 		assertEquals("z\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -65,7 +69,7 @@ public class TestSets extends BaseTest {
 	                  "a @after {System.out.println(this._input.getText());} : 'a' | 'b' |'c' ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a", "b", false);
 		assertEquals("b\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -76,7 +80,7 @@ public class TestSets extends BaseTest {
 	                  "A : ~'b' ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a", "x", false);
 		assertEquals("x\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -87,7 +91,7 @@ public class TestSets extends BaseTest {
 	                  "A : 'b' ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a", "bc", false);
 		assertEquals("bc\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -98,7 +102,7 @@ public class TestSets extends BaseTest {
 	                  "A : 'b'? 'c' ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a", "bc", false);
 		assertEquals("bc\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -114,7 +118,7 @@ public class TestSets extends BaseTest {
 	public void testStarLexerSingleElement_1() throws Exception {
 		String found = testStarLexerSingleElement("bbbbc");
 		assertEquals("bbbbc\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -122,7 +126,7 @@ public class TestSets extends BaseTest {
 	public void testStarLexerSingleElement_2() throws Exception {
 		String found = testStarLexerSingleElement("c");
 		assertEquals("c\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -133,7 +137,7 @@ public class TestSets extends BaseTest {
 	                  "A : 'b'+ 'c' ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a", "bbbbc", false);
 		assertEquals("bbbbc\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -143,7 +147,7 @@ public class TestSets extends BaseTest {
 	                  "a : ('a'|'b')? 'c' {System.out.println(this._input.getText());} ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a", "ac", false);
 		assertEquals("ac\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -153,7 +157,7 @@ public class TestSets extends BaseTest {
 	                  "a : ('a'|'b')* 'c' {System.out.println(this._input.getText());} ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a", "abaac", false);
 		assertEquals("abaac\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -163,7 +167,7 @@ public class TestSets extends BaseTest {
 	                  "a : ('a'|'b')+ 'c' {System.out.println(this._input.getText());} ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a", "abaac", false);
 		assertEquals("abaac\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -174,7 +178,7 @@ public class TestSets extends BaseTest {
 	                  "A : ('a'|'b')? 'c' ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a", "ac", false);
 		assertEquals("ac\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -185,7 +189,7 @@ public class TestSets extends BaseTest {
 	                  "A : ('a'|'b')* 'c' ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a", "abaac", false);
 		assertEquals("abaac\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -196,7 +200,7 @@ public class TestSets extends BaseTest {
 	                  "A : ('a'|'b')+ 'c' ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a", "abaac", false);
 		assertEquals("abaac\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -207,7 +211,7 @@ public class TestSets extends BaseTest {
 	                  "A : ~('b'|'c') ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a", "x", false);
 		assertEquals("x\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -218,7 +222,7 @@ public class TestSets extends BaseTest {
 	                  "A : h=~('b'|'c') ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a", "x", false);
 		assertEquals("x\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -231,7 +235,7 @@ public class TestSets extends BaseTest {
 	                  "B : ~('a'|'c') ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a", "x", false);
 		assertEquals("x\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -243,7 +247,7 @@ public class TestSets extends BaseTest {
 	                  "WS : (' '|'\\n')+ -> skip ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a", "A a B b", false);
 		assertEquals("A\na\nB\nb\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -254,7 +258,7 @@ public class TestSets extends BaseTest {
 	                  "NEW_LINE: '\\r'? '\\n';";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "parse", "a", false);
 		assertEquals("", found);
-		assertEquals("line 1:0 token recognition error at: 'a'\nline 1:1 missing {} at '<EOF>'\n", this.stderrDuringParse);
+		assertEquals("line 1:0 token recognition error at: 'a'\nline 1:1 missing {} at '<EOF>'\n", stderrDuringParse());
 	}
 
 
