@@ -30,13 +30,8 @@
 
 package org.antlr.v4.test.tool;
 
-import org.antlr.v4.runtime.ANTLRInputStream;
-import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.LexerInterpreter;
-import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.TokenSource;
-import org.antlr.v4.runtime.TokenStream;
-import org.antlr.v4.runtime.UnbufferedTokenStream;
+import org.antlr.v4.runtime.*;
+import org.antlr.v4.test.AntlrTestcase;
 import org.antlr.v4.tool.LexerGrammar;
 import org.junit.Test;
 
@@ -48,7 +43,7 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 
 @SuppressWarnings("unused")
-public class TestUnbufferedTokenStream extends BaseTest {
+public class TestUnbufferedTokenStream extends AntlrTestcase {
 	@Test public void testLookahead() throws Exception {
         LexerGrammar g = new LexerGrammar(
             "lexer grammar t;\n"+

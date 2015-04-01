@@ -1,29 +1,20 @@
 package org.antlr.v4.test.tool;
 
-import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.InputMismatchException;
-import org.antlr.v4.runtime.Lexer;
-import org.antlr.v4.runtime.NoViableAltException;
-import org.antlr.v4.runtime.Parser;
-import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.TokenStream;
+import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.misc.Pair;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.pattern.ParseTreeMatch;
 import org.antlr.v4.runtime.tree.pattern.ParseTreePattern;
 import org.antlr.v4.runtime.tree.pattern.ParseTreePatternMatcher;
+import org.antlr.v4.test.AntlrTestcase;
 import org.junit.Test;
 
 import java.lang.reflect.Constructor;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
-public class TestParseTreeMatcher extends BaseTest {
+public class TestParseTreeMatcher extends AntlrTestcase {
 	@Test public void testChunking() throws Exception {
 		ParseTreePatternMatcher m = new ParseTreePatternMatcher(null, null);
 		assertEquals("[ID, ' = ', expr, ' ;']", m.split("<ID> = <expr> ;").toString());
@@ -89,7 +80,7 @@ public class TestParseTreeMatcher extends BaseTest {
 			"INT : [0-9]+ ;\n" +
 			"WS : [ \\r\\n\\t]+ -> skip ;\n";
 		boolean ok =
-			rawGenerateAndBuildRecognizer("X1.g4", grammar, "X1Parser", "X1Lexer", false);
+			generateAndBuildRecognizer("X1.g4", grammar, "X1Parser", "X1Lexer", false);
 		assertTrue(ok);
 
 		ParseTreePatternMatcher m = getPatternMatcher("X1");
@@ -110,7 +101,7 @@ public class TestParseTreeMatcher extends BaseTest {
 			"INT : [0-9]+ ;\n" +
 			"WS : [ \\r\\n\\t]+ -> skip ;\n";
 		boolean ok =
-			rawGenerateAndBuildRecognizer("X2.g4", grammar, "X2Parser", "X2Lexer", false);
+			generateAndBuildRecognizer("X2.g4", grammar, "X2Parser", "X2Lexer", false);
 		assertTrue(ok);
 
 		ParseTreePatternMatcher m = getPatternMatcher("X2");
@@ -131,7 +122,7 @@ public class TestParseTreeMatcher extends BaseTest {
 			"INT : [0-9]+ ;\n" +
 			"WS : [ \\r\\n\\t]+ -> skip ;\n";
 		boolean ok =
-			rawGenerateAndBuildRecognizer("X2.g4", grammar, "X2Parser", "X2Lexer", false);
+				generateAndBuildRecognizer("X2.g4", grammar, "X2Parser", "X2Lexer", false);
 		assertTrue(ok);
 
 		ParseTreePatternMatcher m = getPatternMatcher("X2");
@@ -156,7 +147,7 @@ public class TestParseTreeMatcher extends BaseTest {
 			"INT : [0-9]+ ;\n" +
 			"WS : [ \\r\\n\\t]+ -> skip ;\n";
 		boolean ok =
-			rawGenerateAndBuildRecognizer("X2.g4", grammar, "X2Parser", "X2Lexer", false);
+				generateAndBuildRecognizer("X2.g4", grammar, "X2Parser", "X2Lexer", false);
 		assertTrue(ok);
 
 		ParseTreePatternMatcher m = getPatternMatcher("X2");
@@ -181,7 +172,7 @@ public class TestParseTreeMatcher extends BaseTest {
 			"INT : [0-9]+ ;\n" +
 			"WS : [ \\r\\n\\t]+ -> skip ;\n";
 		boolean ok =
-			rawGenerateAndBuildRecognizer("X2.g4", grammar, "X2Parser", "X2Lexer", false);
+				generateAndBuildRecognizer("X2.g4", grammar, "X2Parser", "X2Lexer", false);
 		assertTrue(ok);
 
 		ParseTreePatternMatcher m = getPatternMatcher("X2");
@@ -206,7 +197,7 @@ public class TestParseTreeMatcher extends BaseTest {
 			"INT : [0-9]+ ;\n" +
 			"WS : [ \\r\\n\\t]+ -> channel(HIDDEN) ;\n";
 		boolean ok =
-			rawGenerateAndBuildRecognizer("X2.g4", grammar, "X2Parser", "X2Lexer", false);
+				generateAndBuildRecognizer("X2.g4", grammar, "X2Parser", "X2Lexer", false);
 		assertTrue(ok);
 
 		ParseTreePatternMatcher m = getPatternMatcher("X2");
@@ -225,7 +216,7 @@ public class TestParseTreeMatcher extends BaseTest {
 			"ID : [a-z]+ ;\n" +
 			"WS : [ \\r\\n\\t]+ -> skip ;\n";
 		boolean ok =
-			rawGenerateAndBuildRecognizer("X2.g4", grammar, "X2Parser", "X2Lexer", false);
+				generateAndBuildRecognizer("X2.g4", grammar, "X2Parser", "X2Lexer", false);
 		assertTrue(ok);
 
 		ParseTreePatternMatcher m =	getPatternMatcher("X2");
@@ -421,10 +412,12 @@ public class TestParseTreeMatcher extends BaseTest {
 		String parserName = grammarName+"Parser";
 		String lexerName = grammarName+"Lexer";
 		boolean ok =
-			rawGenerateAndBuildRecognizer(grammarFileName, grammar, parserName, lexerName, false);
+			generateAndBuildRecognizer(grammarFileName, grammar, parserName, lexerName, false);
 		assertTrue(ok);
 
-		ParseTree result = execParser(startRule, input, parserName, lexerName);
+		Pair<Parser, Lexer> pl = getParserAndLexer(input, parserName, lexerName);
+		Parser parser = pl.a;
+		ParseTree result = execStartRule(startRule, parser);
 
 		ParseTreePattern p = getPattern(grammarName, pattern, startRule);
 		ParseTreeMatch match = p.match(result);

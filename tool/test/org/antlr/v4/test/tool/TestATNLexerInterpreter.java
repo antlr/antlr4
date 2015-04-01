@@ -35,6 +35,8 @@ import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNState;
 import org.antlr.v4.runtime.misc.Utils;
+import org.antlr.v4.test.AntlrTestcase;
+import org.antlr.v4.test.TestUtils;
 import org.antlr.v4.tool.DOTGenerator;
 import org.antlr.v4.tool.LexerGrammar;
 import org.junit.Test;
@@ -56,7 +58,7 @@ import static org.junit.Assert.assertEquals;
  * want, but occasionally there are some quirks as you'll see from
  * the tests below.
  */
-public class TestATNLexerInterpreter extends BaseTest {
+public class TestATNLexerInterpreter extends AntlrTestcase {
 	@Test public void testLexerTwoRules() throws Exception {
 		LexerGrammar lg = new LexerGrammar(
 			"lexer grammar L;\n"+
@@ -315,7 +317,7 @@ public class TestATNLexerInterpreter extends BaseTest {
 		DOTGenerator dot = new DOTGenerator(lg);
 		System.out.println(dot.getDOT(startState, true));
 
-		List<String> tokenTypes = getTokenTypes(lg, atn, input);
+		List<String> tokenTypes = TestUtils.getTokenTypes(lg, atn, input);
 
 		String result = Utils.join(tokenTypes.iterator(), ", ");
 		System.out.println(tokenTypes);

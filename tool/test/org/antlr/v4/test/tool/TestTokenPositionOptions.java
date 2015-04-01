@@ -33,6 +33,7 @@ import org.antlr.runtime.Token;
 import org.antlr.v4.misc.Utils;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.runtime.misc.IntervalSet;
+import org.antlr.v4.test.AntlrTestcase;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.ast.GrammarAST;
 import org.junit.Test;
@@ -42,7 +43,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
-public class TestTokenPositionOptions extends BaseTest {
+public class TestTokenPositionOptions extends AntlrTestcase {
 	@Test public void testLeftRecursionRewrite() throws Exception {
 		Grammar g = new Grammar(
 				"grammar T;\n" +

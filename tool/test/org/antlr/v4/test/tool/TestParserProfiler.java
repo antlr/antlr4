@@ -30,15 +30,13 @@
 
 package org.antlr.v4.test.tool;
 
-import org.antlr.v4.runtime.ANTLRInputStream;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.LexerInterpreter;
-import org.antlr.v4.runtime.ParserInterpreter;
-import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.atn.DecisionInfo;
+import org.antlr.v4.test.AntlrTestcase;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LexerGrammar;
 import org.antlr.v4.tool.Rule;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -47,12 +45,12 @@ import java.util.Arrays;
 import static org.junit.Assert.assertEquals;
 
 @SuppressWarnings("unused")
-public class TestParserProfiler extends BaseTest {
+public class TestParserProfiler extends AntlrTestcase {
 	LexerGrammar lg;
 
-	@Override
+	@Before
 	public void setUp() throws Exception {
-		super.setUp();
+		//super.setUp();
 		lg = new LexerGrammar(
 				"lexer grammar L;\n" +
 				"WS : [ \\r\\t\\n]+ -> channel(HIDDEN) ;\n" +
@@ -245,7 +243,7 @@ public class TestParserProfiler extends BaseTest {
 			" {decision=1, contextSensitivities=0, errors=0, ambiguities=0, SLL_lookahead=6, " +
 			"SLL_ATNTransitions=3, SLL_DFATransitions=3, LL_Fallback=0, LL_lookahead=0, LL_ATNTransitions=0}]\n";
 		assertEquals(expecting, found);
-		assertEquals(null, stderrDuringParse);
+		assertEquals(null, stderrDuringParse());
 	}
 
 	public DecisionInfo[] interpAndGetDecisionInfo(

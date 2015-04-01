@@ -32,6 +32,7 @@ package org.antlr.v4.test.tool;
 
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNSerializer;
+import org.antlr.v4.test.AntlrTestcase;
 import org.antlr.v4.tool.DOTGenerator;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LexerGrammar;
@@ -41,7 +42,7 @@ import java.util.Arrays;
 
 import static org.junit.Assert.assertEquals;
 
-public class TestATNSerialization extends BaseTest {
+public class TestATNSerialization extends AntlrTestcase {
 	@Test public void testSimpleNoBlock() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar T;\n"+

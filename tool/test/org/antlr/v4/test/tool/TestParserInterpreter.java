@@ -35,6 +35,7 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.LexerInterpreter;
 import org.antlr.v4.runtime.ParserInterpreter;
 import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.test.AntlrTestcase;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LexerGrammar;
 import org.junit.Test;
@@ -42,7 +43,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 
 
-public class TestParserInterpreter extends BaseTest {
+public class TestParserInterpreter extends AntlrTestcase {
 	@Test public void testEmptyStartRule() throws Exception {
 		LexerGrammar lg = new LexerGrammar(
 			"lexer grammar L;\n" +

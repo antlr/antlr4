@@ -30,40 +30,16 @@
 
 package org.antlr.v4.test.tool;
 
-import org.antlr.v4.runtime.ANTLRFileStream;
-import org.antlr.v4.runtime.ANTLRInputStream;
-import org.antlr.v4.runtime.BailErrorStrategy;
-import org.antlr.v4.runtime.BaseErrorListener;
-import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.DefaultErrorStrategy;
-import org.antlr.v4.runtime.DiagnosticErrorListener;
-import org.antlr.v4.runtime.Lexer;
-import org.antlr.v4.runtime.Parser;
-import org.antlr.v4.runtime.ParserInterpreter;
-import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.RecognitionException;
-import org.antlr.v4.runtime.Recognizer;
-import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.TokenSource;
-import org.antlr.v4.runtime.TokenStream;
-import org.antlr.v4.runtime.atn.ATN;
-import org.antlr.v4.runtime.atn.ATNConfig;
-import org.antlr.v4.runtime.atn.ATNConfigSet;
-import org.antlr.v4.runtime.atn.LexerATNSimulator;
-import org.antlr.v4.runtime.atn.ParserATNSimulator;
-import org.antlr.v4.runtime.atn.PredictionContextCache;
-import org.antlr.v4.runtime.atn.PredictionMode;
+import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.dfa.DFAState;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.misc.Utils;
-import org.antlr.v4.runtime.tree.ErrorNode;
-import org.antlr.v4.runtime.tree.ParseTree;
-import org.antlr.v4.runtime.tree.ParseTreeListener;
-import org.antlr.v4.runtime.tree.ParseTreeWalker;
-import org.antlr.v4.runtime.tree.TerminalNode;
+import org.antlr.v4.runtime.tree.*;
+import org.antlr.v4.test.AntlrTestcase;
+import org.antlr.v4.test.JavaUnicodeInputStream;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -78,22 +54,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.BitSet;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.TimeUnit;
+import java.util.*;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicIntegerArray;
 import java.util.logging.Level;
@@ -106,7 +68,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 @SuppressWarnings("unused")
-public class TestPerformance extends BaseTest {
+public class TestPerformance extends AntlrTestcase {
     /**
      * Parse all java files under this package within the JDK_SOURCE_ROOT
      * (environment variable or property defined on the Java command line).
@@ -697,12 +659,6 @@ public class TestPerformance extends BaseTest {
 		return sourceRoot;
 	}
 
-    @Override
-    protected void eraseTempDir() {
-        if (DELETE_TEMP_FILES) {
-            super.eraseTempDir();
-        }
-    }
 
     public static String getOptionsDescription(String topPackage) {
         StringBuilder builder = new StringBuilder();
@@ -717,20 +673,20 @@ public class TestPerformance extends BaseTest {
         builder.append(", Grammar=").append(USE_LR_GRAMMAR ? "LR" : "Standard");
         builder.append(", ForceAtn=").append(FORCE_ATN);
 
-        builder.append(newline);
+        builder.append(NEWLINE);
 
         builder.append("Op=Lex").append(RUN_PARSER ? "+Parse" : " only");
         builder.append(", Strategy=").append(BAIL_ON_ERROR ? BailErrorStrategy.class.getSimpleName() : DefaultErrorStrategy.class.getSimpleName());
         builder.append(", BuildParseTree=").append(BUILD_PARSE_TREES);
         builder.append(", WalkBlankListener=").append(BLANK_LISTENER);
 
-        builder.append(newline);
+        builder.append(NEWLINE);
 
         builder.append("Lexer=").append(REUSE_LEXER ? "setInputStream" : "newInstance");
         builder.append(", Parser=").append(REUSE_PARSER ? "setInputStream" : "newInstance");
         builder.append(", AfterPass=").append(CLEAR_DFA ? "newInstance" : "setInputStream");
 
-        builder.append(newline);
+        builder.append(NEWLINE);
 
         return builder.toString();
     }
@@ -1109,7 +1065,7 @@ public class TestPerformance extends BaseTest {
     protected void compileJavaParser(boolean leftRecursive) throws IOException {
         String grammarFileName = "Java.g4";
         String sourceName = leftRecursive ? "Java-LR.g4" : "Java.g4";
-        String body = load(sourceName, null);
+        String body = load(TestPerformance.class.getResource(sourceName), null);
         List<String> extraOptions = new ArrayList<String>();
 		extraOptions.add("-Werror");
         if (FORCE_ATN) {
@@ -1126,7 +1082,7 @@ public class TestPerformance extends BaseTest {
 		}
 		extraOptions.add("-visitor");
         String[] extraOptionsArray = extraOptions.toArray(new String[extraOptions.size()]);
-        boolean success = rawGenerateAndBuildRecognizer(grammarFileName, body, "JavaParser", "JavaLexer", true, extraOptionsArray);
+        boolean success = generateAndBuildRecognizer(grammarFileName, body, "JavaParser", "JavaLexer", true, extraOptionsArray);
         assertTrue(success);
     }
 
@@ -1153,7 +1109,7 @@ public class TestPerformance extends BaseTest {
 
     protected ParserFactory getParserFactory(String lexerName, String parserName, String listenerName, final String entryPoint) {
         try {
-            ClassLoader loader = new URLClassLoader(new URL[] { new File(tmpdir).toURI().toURL() }, ClassLoader.getSystemClassLoader());
+            ClassLoader loader = new URLClassLoader(new URL[] { new File(tmpdir()).toURI().toURL() }, ClassLoader.getSystemClassLoader());
             final Class<? extends Lexer> lexerClass = loader.loadClass(lexerName).asSubclass(Lexer.class);
             final Class<? extends Parser> parserClass = loader.loadClass(parserName).asSubclass(Parser.class);
             final Class<? extends ParseTreeListener> listenerClass = loader.loadClass(listenerName).asSubclass(ParseTreeListener.class);
@@ -1982,7 +1938,7 @@ public class TestPerformance extends BaseTest {
 		String found = execParser("Expr.g4", grammar, "ExprParser", "ExprLexer", "program",
 								  input, false);
 		Assert.assertEquals("", found);
-		Assert.assertEquals(null, stderrDuringParse);
+		Assert.assertEquals(null, stderrDuringParse());
 
 		List<String> inputs = new ArrayList<String>();
 		for (int i = 0; i < 10; i++) {
@@ -1993,7 +1949,7 @@ public class TestPerformance extends BaseTest {
 		found = execParser("Expr.g4", grammar, "ExprParser", "ExprLexer", "program",
 								  input, false);
 		Assert.assertEquals("", found);
-		Assert.assertEquals(null, stderrDuringParse);
+		Assert.assertEquals(null, stderrDuringParse());
 	}
 
 	@Test(timeout = 20000)
@@ -2005,8 +1961,8 @@ public class TestPerformance extends BaseTest {
 			"\n" +
 			"rule_%d_%d : EOF;\n";
 
-		System.out.println("dir "+tmpdir);
-		mkdir(tmpdir);
+		System.out.println("dir "+tmpdir());
+		mkdir(tmpdir());
 
 		long startTime = System.nanoTime();
 
@@ -2014,14 +1970,14 @@ public class TestPerformance extends BaseTest {
 		for (int level = 0; level < levels; level++) {
 			String leafPrefix = level == levels - 1 ? "//" : "";
 			String grammar1 = String.format(grammarFormat, level, 1, leafPrefix, level + 1, level + 1, level, 1);
-			writeFile(tmpdir, "Level_" + level + "_1.g4", grammar1);
+			writeFile(tmpdir(), "Level_" + level + "_1.g4", grammar1);
 			if (level > 0) {
 				String grammar2 = String.format(grammarFormat, level, 2, leafPrefix, level + 1, level + 1, level, 1);
-				writeFile(tmpdir, "Level_" + level + "_2.g4", grammar2);
+				writeFile(tmpdir(), "Level_" + level + "_2.g4", grammar2);
 			}
 		}
 
-		ErrorQueue equeue = antlr("Level_0_1.g4", false);
+		org.antlr.v4.test.ErrorQueue equeue = antlr("Level_0_1.g4", false);
 		Assert.assertTrue(equeue.errors.isEmpty());
 
 		long endTime = System.nanoTime();

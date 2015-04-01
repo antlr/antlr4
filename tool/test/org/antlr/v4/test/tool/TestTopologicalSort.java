@@ -30,6 +30,7 @@
 package org.antlr.v4.test.tool;
 
 import org.antlr.v4.misc.Graph;
+import org.antlr.v4.test.AntlrTestcase;
 import org.junit.Test;
 
 import java.util.List;
@@ -37,7 +38,7 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 
 /** Test topo sort in GraphNode. */
-public class TestTopologicalSort extends BaseTest {
+public class TestTopologicalSort extends AntlrTestcase {
     @Test
     public void testFairlyLargeGraph() throws Exception {
         Graph<String> g = new Graph<String>();

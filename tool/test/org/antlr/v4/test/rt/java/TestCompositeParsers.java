@@ -1,10 +1,11 @@
 package org.antlr.v4.test.rt.java;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-
-import org.antlr.v4.test.tool.ErrorQueue;
+import org.antlr.v4.test.ErrorQueue;
 import org.antlr.v4.tool.Grammar;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public class TestCompositeParsers extends BaseTest {
 

@@ -30,11 +30,12 @@
 
 package org.antlr.v4.test.tool;
 
+import org.antlr.v4.test.AntlrTestcase;
 import org.antlr.v4.tool.ErrorType;
 import org.junit.Test;
 import org.stringtemplate.v4.ST;
 
-public class TestBasicSemanticErrors extends BaseTest {
+public class TestBasicSemanticErrors extends AntlrTestcase {
     static String[] U = {
         // INPUT
         "parser grammar U;\n" +
