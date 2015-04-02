@@ -7,7 +7,6 @@ import org.antlr.v4.test.TestUtils;
 import org.antlr.v4.tool.ANTLRMessage;
 import org.antlr.v4.tool.DefaultToolListener;
 import org.junit.runner.Description;
-import org.stringtemplate.v4.ST;
 
 import javax.tools.*;
 import java.io.File;
@@ -24,8 +23,8 @@ import static org.junit.Assert.assertTrue;
 /**
  * Created by jason on 3/24/15.
  */
-public class DefaultTestHelper extends AbstractTestDelegate {
-    public static final DefaultTestHelper INSTANCE = new DefaultTestHelper();
+public class DefaultTestDelegate extends AbstractTestDelegate {
+    public static final DefaultTestDelegate INSTANCE = new DefaultTestDelegate();
 
 
     String tmpdir;
@@ -37,12 +36,15 @@ public class DefaultTestHelper extends AbstractTestDelegate {
 
         if (AntlrTestSettings.CREATE_PER_TEST_DIRECTORIES) {
             // new output dir for each test
-            String testDirectory = description.getTestClass().getSimpleName() + File.separatorChar + description.getMethodName();
+            String testDirectory = description.getTestClass().getSimpleName() +
+                                   File.separatorChar +
+                                   description.getMethodName();
             tmpdir = new File(AntlrTestSettings.BASE_TEST_DIR, testDirectory).getAbsolutePath();
 
         } else {
 
-            tmpdir = new File(AntlrTestSettings.BASE_TEST_DIR, description.getTestClass().getSimpleName()).getAbsolutePath();
+            tmpdir = new File(AntlrTestSettings.BASE_TEST_DIR,
+                              description.getTestClass().getSimpleName()).getAbsolutePath();
             if (!AntlrTestSettings.PRESERVE_TEST_DIR && new File(tmpdir).exists()) {
                 eraseGeneratedFiles();
             }
@@ -71,8 +73,8 @@ public class DefaultTestHelper extends AbstractTestDelegate {
         }
 
         JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-		DiagnosticCollector<JavaFileObject> diagnostics =
-			new DiagnosticCollector<JavaFileObject>();
+        DiagnosticCollector<JavaFileObject> diagnostics =
+                new DiagnosticCollector<JavaFileObject>();
 
         StandardJavaFileManager fileManager =
                 compiler.getStandardFileManager(diagnostics, Locale.getDefault(), Charset.forName("UTF-8"));
@@ -81,12 +83,22 @@ public class DefaultTestHelper extends AbstractTestDelegate {
                 fileManager.getJavaFileObjectsFromFiles(files);
 
         Iterable<String> compileOptions =
-                Arrays.asList("-g", "-source", "1.6", "-target", "1.6", "-implicit:class", "-Xlint:-options", "-d", tmpdir, "-cp", tmpdir + AntlrTestSettings.PATH_SEP + AntlrTestSettings.CLASSPATH);
+                Arrays.asList("-g",
+                              "-source",
+                              "1.6",
+                              "-target",
+                              "1.6",
+                              "-implicit:class",
+                              "-Xlint:-options",
+                              "-d",
+                              tmpdir,
+                              "-cp",
+                              tmpdir + AntlrTestSettings.PATH_SEP + AntlrTestSettings.CLASSPATH);
 
         StringWriter extraMessages = new StringWriter();
         JavaCompiler.CompilationTask task =
                 compiler.getTask(extraMessages, fileManager, diagnostics, compileOptions, null,
-                        compilationUnits);
+                                 compilationUnits);
         boolean ok = task.call();
 
         try {
@@ -101,11 +113,10 @@ public class DefaultTestHelper extends AbstractTestDelegate {
     }
 
 
-
     @Override
     public void mkdir(String path) {
         File f = new File(path);
-        f.mkdirs();
+        boolean ok = f.mkdirs();
     }
 
     @Override
@@ -123,9 +134,9 @@ public class DefaultTestHelper extends AbstractTestDelegate {
         try {
             ClassLoader loader =
                     new URLClassLoader(new URL[]{new File(tmpdir).toURI().toURL()},
-                            ClassLoader.getSystemClassLoader());
+                                       ClassLoader.getSystemClassLoader());
             return loader.loadClass(name);
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
@@ -165,7 +176,7 @@ public class DefaultTestHelper extends AbstractTestDelegate {
         String[] files = tmpdirF.list();
         for (int i = 0; files != null && i < files.length; i++) {
             if (files[i].endsWith(endingWith)) {
-                new File(tmpdir + File.separatorChar + files[i]).delete();
+              boolean deleted=  new File(tmpdir + File.separatorChar + files[i]).delete();
             }
         }
     }
@@ -191,11 +202,15 @@ public class DefaultTestHelper extends AbstractTestDelegate {
     }
 
     @Override
-    public String execLexer(String grammarFileName, String grammarStr, String lexerName, String input, boolean showDFA) {
+    public String execLexer(String grammarFileName,
+                            String grammarStr,
+                            String lexerName,
+                            String input,
+                            boolean showDFA) {
         boolean success = generateAndBuildRecognizer(grammarFileName,
-                grammarStr,
-                null,
-                lexerName);
+                                                     grammarStr,
+                                                     null,
+                                                     lexerName);
         assertTrue(success);
         writeFile(tmpdir, "input", input);
         writeLexerTestFile(lexerName, showDFA);
@@ -208,19 +223,26 @@ public class DefaultTestHelper extends AbstractTestDelegate {
     }
 
     @Override
-    public String execParser(String grammarFileName, String grammarStr, String parserName, String lexerName, String startRuleName, String input, boolean debug, boolean profile) {
+    public String execParser(String grammarFileName,
+                             String grammarStr,
+                             String parserName,
+                             String lexerName,
+                             String startRuleName,
+                             String input,
+                             boolean debug,
+                             boolean profile) {
         boolean success = generateAndBuildRecognizer(grammarFileName,
-                grammarStr,
-                parserName,
-                lexerName,
-                "-visitor");
+                                                     grammarStr,
+                                                     parserName,
+                                                     lexerName,
+                                                     "-visitor");
         assertTrue(success);
         writeFile(tmpdir, "input", input);
         return rawExecRecognizer(parserName,
-                lexerName,
-                startRuleName,
-                debug,
-                profile);
+                                 lexerName,
+                                 startRuleName,
+                                 debug,
+                                 profile);
     }
 
     @Override
@@ -233,7 +255,10 @@ public class DefaultTestHelper extends AbstractTestDelegate {
         return stderrDuringParse;
     }
 
-    public ErrorQueue antlr(String grammarFileName, String grammarStr, boolean defaultListener, String... extraOptions) {
+    public ErrorQueue antlr(String grammarFileName,
+                            String grammarStr,
+                            boolean defaultListener,
+                            String... extraOptions) {
 
         System.out.println("dir " + tmpdir);
         mkdir(tmpdir);
@@ -350,10 +375,10 @@ public class DefaultTestHelper extends AbstractTestDelegate {
             writeLexerTestFile(lexerName, false);
         } else {
             writeTestFile(parserName,
-                    lexerName,
-                    parserStartRuleName,
-                    debug,
-                    profile);
+                          lexerName,
+                          parserStartRuleName,
+                          debug,
+                          profile);
         }
 
         compile("Test.java");
@@ -401,8 +426,7 @@ public class DefaultTestHelper extends AbstractTestDelegate {
                 files.add(grammarFileName.substring(0, grammarFileName.lastIndexOf('.')) + "BaseVisitor.java");
             }
         }
-        boolean allIsWell = compile(files.toArray(new String[files.size()]));
-        return allIsWell;
+        return compile(files.toArray(new String[files.size()]));
     }
 
     protected void writeTestFile(String parserName,
@@ -410,81 +434,18 @@ public class DefaultTestHelper extends AbstractTestDelegate {
                                  String parserStartRuleName,
                                  boolean debug,
                                  boolean profile) {
-        ST outputFileST = new ST(
-                "import org.antlr.v4.runtime.*;\n" +
-                        "import org.antlr.v4.runtime.tree.*;\n" +
-                        "import org.antlr.v4.runtime.atn.*;\n" +
-                        "import java.util.Arrays;\n" +
-                        "\n" +
-                        "public class Test {\n" +
-                        "    public static void main(String[] args) throws Exception {\n" +
-                        "        CharStream input = new ANTLRFileStream(args[0]);\n" +
-                        "        <lexerName> lex = new <lexerName>(input);\n" +
-                        "        CommonTokenStream tokens = new CommonTokenStream(lex);\n" +
-                        "        <createParser>\n" +
-                        "		 parser.setBuildParseTree(true);\n" +
-                        "		 <profile>\n" +
-                        "        ParserRuleContext tree = parser.<parserStartRuleName>();\n" +
-                        "		 <if(profile)>System.out.println(Arrays.toString(profiler.getDecisionInfo()));<endif>\n" +
-                        "        ParseTreeWalker.DEFAULT.walk(new TreeShapeListener(), tree);\n" +
-                        "    }\n" +
-                        "\n" +
-                        "	static class TreeShapeListener implements ParseTreeListener {\n" +
-                        "		@Override public void visitTerminal(TerminalNode node) { }\n" +
-                        "		@Override public void visitErrorNode(ErrorNode node) { }\n" +
-                        "		@Override public void exitEveryRule(ParserRuleContext ctx) { }\n" +
-                        "\n" +
-                        "		@Override\n" +
-                        "		public void enterEveryRule(ParserRuleContext ctx) {\n" +
-                        "			for (int i = 0; i \\< ctx.getChildCount(); i++) {\n" +
-                        "				ParseTree parent = ctx.getChild(i).getParent();\n" +
-                        "				if (!(parent instanceof RuleNode) || ((RuleNode)parent).getRuleContext() != ctx) {\n" +
-                        "					throw new IllegalStateException(\"Invalid parse tree shape detected.\");\n" +
-                        "				}\n" +
-                        "			}\n" +
-                        "		}\n" +
-                        "	}\n" +
-                        "}"
-        );
-        ST createParserST = new ST("        <parserName> parser = new <parserName>(tokens);\n");
-        if (debug) {
-            createParserST =
-                    new ST(
-                            "        <parserName> parser = new <parserName>(tokens);\n" +
-                                    "        parser.addErrorListener(new DiagnosticErrorListener());\n");
-        }
-        if (profile) {
-            outputFileST.add("profile",
-                    "ProfilingATNSimulator profiler = new ProfilingATNSimulator(parser);\n" +
-                            "parser.setInterpreter(profiler);");
-        } else {
-            outputFileST.add("profile", new ArrayList<Object>());
-        }
-        outputFileST.add("createParser", createParserST);
-        outputFileST.add("parserName", parserName);
-        outputFileST.add("lexerName", lexerName);
-        outputFileST.add("parserStartRuleName", parserStartRuleName);
-        writeFile(tmpdir, "Test.java", outputFileST.render());
+        String code = TestCodeGenerator.generateParserTestCode("Test",
+                                                               parserName,
+                                                               lexerName,
+                                                               parserStartRuleName,
+                                                               debug,
+                                                               profile);
+        writeFile(tmpdir, "Test.java", code);
     }
 
 
     protected void writeLexerTestFile(String lexerName, boolean showDFA) {
-        ST outputFileST = new ST(
-                "import org.antlr.v4.runtime.*;\n" +
-                        "\n" +
-                        "public class Test {\n" +
-                        "    public static void main(String[] args) throws Exception {\n" +
-                        "        CharStream input = new ANTLRFileStream(args[0]);\n" +
-                        "        <lexerName> lex = new <lexerName>(input);\n" +
-                        "        CommonTokenStream tokens = new CommonTokenStream(lex);\n" +
-                        "        tokens.fill();\n" +
-                        "        for (Object t : tokens.getTokens()) System.out.println(t);\n" +
-                        (showDFA ? "System.out.print(lex.getInterpreter().getDFA(Lexer.DEFAULT_MODE).toLexerString());\n" : "") +
-                        "    }\n" +
-                        "}"
-        );
-
-        outputFileST.add("lexerName", lexerName);
-        writeFile(tmpdir, "Test.java", outputFileST.render());
+        String code = TestCodeGenerator.generateLexerTestCode("Test", showDFA, lexerName);
+        writeFile(tmpdir, "Test.java", code);
     }
 }

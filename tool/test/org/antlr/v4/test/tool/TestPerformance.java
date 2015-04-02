@@ -64,6 +64,7 @@ import java.util.zip.CRC32;
 import java.util.zip.Checksum;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.Matchers.empty;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
@@ -1978,7 +1979,7 @@ public class TestPerformance extends AntlrTestcase {
 		}
 
 		org.antlr.v4.test.ErrorQueue equeue = antlr("Level_0_1.g4", false);
-		Assert.assertTrue(equeue.errors.isEmpty());
+		assertThat(equeue.errors, empty());
 
 		long endTime = System.nanoTime();
 		System.out.format("%s milliseconds.%n", (endTime - startTime) / 1000000.0);

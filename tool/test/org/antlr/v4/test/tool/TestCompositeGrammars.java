@@ -38,8 +38,9 @@ import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.GrammarSemanticsMessage;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.hasSize;
+import static org.junit.Assert.*;
 
 public class TestCompositeGrammars extends AntlrTestcase {
 	protected boolean debug = false;
@@ -60,7 +61,8 @@ public class TestCompositeGrammars extends AntlrTestcase {
 			"WS : (' '|'\\n') -> skip ;\n" ;
 		writeFile(tmpdir(), "M.g4", master);
 		org.antlr.v4.test.ErrorQueue equeue = antlr("M.g4", false, "-lib", subdir);
-		assertEquals(equeue.size(), 0);
+		assertThat(equeue.all, empty());
+		assertThat(equeue.infos, empty());
 	}
 
 	@Test public void testImportFileNotSearchedForInOutputDir() throws Exception {
@@ -79,6 +81,7 @@ public class TestCompositeGrammars extends AntlrTestcase {
 			"WS : (' '|'\\n') -> skip ;\n" ;
 		writeFile(tmpdir(), "M.g4", master);
 		ErrorQueue equeue = antlr("M.g4", false, "-o", outdir);
+		//assertThat(equeue.errors, hasSize(2));
 		assertEquals(ErrorType.CANNOT_FIND_IMPORTED_GRAMMAR, equeue.errors.get(0).getErrorType());
 	}
 
@@ -100,8 +103,8 @@ public class TestCompositeGrammars extends AntlrTestcase {
 		String outdir = tmpdir() + "/out";
 		mkdir(outdir);
 		ErrorQueue equeue = antlr("M.g4", false, "-o", outdir, "-lib", subdir);
-		assertEquals(0, equeue.size());
-	}
+		assertThat(equeue.all, empty());
+		assertThat(equeue.infos, empty());	}
 
 	@Test public void testTokensFileInOutputDirAndImportFileInSubdir() throws Exception {
 		String slave =
@@ -125,10 +128,11 @@ public class TestCompositeGrammars extends AntlrTestcase {
 		String outdir = tmpdir() + "/out";
 		mkdir(outdir);
 		ErrorQueue equeue = antlr("MLexer.g4", false, "-o", outdir);
-		assertEquals(0, equeue.size());
+		assertThat(equeue.all, empty());
+		assertThat(equeue.infos, empty());
 		equeue = antlr("MParser.g4", false, "-o", outdir, "-lib", subdir);
-		assertEquals(0, equeue.size());
-	}
+		assertThat(equeue.all, empty());
+		assertThat(equeue.infos, empty());	}
 
 
 
@@ -156,8 +160,9 @@ public class TestCompositeGrammars extends AntlrTestcase {
 			new GrammarSemanticsMessage(expectedMsgID, g.fileName, null, expectedArg);
 		TestUtils.checkGrammarSemanticsWarning(equeue, expectedMessage);
 
-		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
-		assertEquals("unexpected warnings: "+equeue, 1, equeue.warnings.size());
+		assertThat(equeue.errors, empty());
+		assertThat(equeue.warnings, hasSize(1));
+
 	}
 
 	@Test public void testSyntaxErrorsInImportsNotThrownOut() throws Exception {
@@ -175,7 +180,7 @@ public class TestCompositeGrammars extends AntlrTestcase {
 			"WS : (' '|'\\n') -> skip ;\n" ;
 		writeFile(tmpdir(), "M.g4", master);
 		/*Grammar g =*/ new Grammar(tmpdir()+"/M.g4", master, equeue);
-
+		assertThat(equeue.errors, hasSize(2));
 		assertEquals(ErrorType.SYNTAX_ERROR, equeue.errors.get(0).getErrorType());
 	}
 
@@ -211,12 +216,12 @@ public class TestCompositeGrammars extends AntlrTestcase {
 		assertEquals(expectedTypeToTokenList,
 					 realElements(g.typeToTokenList).toString());
 
-		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
+		assertThat(equeue.errors,empty());
 
 		boolean ok =
 				generateAndBuildRecognizer("M.g4", master, "MParser", null);
-		boolean expecting = true; // should be ok
-		assertEquals(expecting, ok);
+		//boolean expecting = true; // should be ok
+		assertEquals(true, ok);
 	}
 
 	@Test public void testBigTreeOfImports() throws Exception {
@@ -263,8 +268,9 @@ public class TestCompositeGrammars extends AntlrTestcase {
 		writeFile(tmpdir(), "M.g4", master);
 		Grammar g = new Grammar(tmpdir()+"/M.g4", master, equeue);
 
-		assertEquals("[]", equeue.errors.toString());
-		assertEquals("[]", equeue.warnings.toString());
+		assertThat(equeue.errors, empty());
+		assertThat(equeue.warnings, empty());
+
 		String expectedTokenIDToTypeMap = "{EOF=-1, M=1, S=2, T=3, A=4, B=5, C=6}";
 		String expectedStringLiteralToTypeMap = "{}";
 		String expectedTypeToTokenList = "[M, S, T, A, B, C]";
@@ -278,7 +284,7 @@ public class TestCompositeGrammars extends AntlrTestcase {
 		boolean ok =
 				generateAndBuildRecognizer("M.g4", master, "MParser", null);
 		boolean expecting = true; // should be ok
-		assertEquals(expecting, ok);
+		assertEquals(true, ok);
 	}
 
 	@Test public void testRulesVisibleThroughMultilevelImport() throws Exception {
@@ -312,7 +318,7 @@ public class TestCompositeGrammars extends AntlrTestcase {
 		assertEquals(expectedTypeToTokenList,
 					 realElements(g.typeToTokenList).toString());
 
-		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
+		assertThat(equeue.errors, empty());
 	}
 
 	@Test public void testNestedComposite() throws Exception {
@@ -359,12 +365,12 @@ public class TestCompositeGrammars extends AntlrTestcase {
 		assertEquals(expectedTypeToTokenList,
 					 realElements(g.typeToTokenList).toString());
 
-		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
+		assertThat(equeue.errors, empty());
 
 		boolean ok =
 				generateAndBuildRecognizer("G3.g4", G3str, "G3Parser", null);
 		boolean expecting = true; // should be ok
-		assertEquals(expecting, ok);
+		assertEquals(true, ok);
 	}
 
 	@Test public void testHeadersPropogatedCorrectlyToImportedGrammars() throws Exception {
@@ -383,8 +389,8 @@ public class TestCompositeGrammars extends AntlrTestcase {
 
 		writeFile(tmpdir(), "M.g4", master);
 		ErrorQueue equeue = antlr("M.g4", false);
-		int expecting = 0; // should be ok
-		assertEquals(expecting, equeue.errors.size());
+		//int expecting = 0; // should be ok
+		assertThat(equeue.errors, empty());
 	}
 
 

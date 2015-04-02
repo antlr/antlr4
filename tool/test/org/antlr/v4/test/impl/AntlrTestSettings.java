@@ -72,8 +72,8 @@ public class AntlrTestSettings {
 
     public static AntlrTestDelegate getHelper() {
         if(TEST_IN_PROCESS){
-            return InProcessTestHelper.INSTANCE;
+            return InProcessTestDelegate.INSTANCE;
         }
-        return DefaultTestHelper.INSTANCE;
+        return DefaultTestDelegate.INSTANCE;
     }
 }

@@ -14,10 +14,10 @@ import java.util.logging.Logger;
 /**
  * Created by jason on 3/26/15.
  */
-public class InProcessTestHelper extends DefaultTestHelper {
-    public static final InProcessTestHelper INSTANCE = new InProcessTestHelper();
+public class InProcessTestDelegate extends DefaultTestDelegate {
+    public static final InProcessTestDelegate INSTANCE = new InProcessTestDelegate();
 
-    private static final Logger LOGGER = Logger.getLogger(InProcessTestHelper.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(InProcessTestDelegate.class.getName());
 
     @Override
     public String execClass(String className) {

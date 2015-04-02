@@ -330,7 +330,7 @@ public class TestUtils {
 
 
     static final Matcher<List<Diagnostic<? extends JavaFileObject>>> CHECK_LIST_FOR_ERRORS =
-            new CustomTypeSafeMatcher<List<Diagnostic<? extends JavaFileObject>>>("successful compilation") {
+            new CustomTypeSafeMatcher<List<Diagnostic<? extends JavaFileObject>>>("no compilation errors") {
                 @Override
                 protected boolean matchesSafely(List<Diagnostic<? extends JavaFileObject>> item) {
                     for (Diagnostic<? extends JavaFileObject> diagnostic : item) {
@@ -346,7 +346,7 @@ public class TestUtils {
                     for (Diagnostic<? extends JavaFileObject> diagnostic : item) {
                         if (diagnostic.getKind() == Diagnostic.Kind.ERROR) {
                             mismatchDescription
-                                    .appendText("(first) error:")
+                                    .appendText("(first) error:\n")
                                     .appendText(diagnostic.getMessage(Locale.getDefault()))
                                     .appendText("\n source: \n");
                             String source;
@@ -368,7 +368,7 @@ public class TestUtils {
             };
     static final Matcher<DiagnosticCollector<JavaFileObject>> CHECK_DIAGNOSTICS_FOR_ERRORS =
             new FeatureMatcher<DiagnosticCollector<JavaFileObject>, List<Diagnostic<? extends JavaFileObject>>>
-                    (CHECK_LIST_FOR_ERRORS, "successful compilation", "diagnostics") {
+                    (CHECK_LIST_FOR_ERRORS, "collector collects", "") {
                 @Override
                 protected List<Diagnostic<? extends JavaFileObject>> featureValueOf(DiagnosticCollector<JavaFileObject> actual) {
                     return actual.getDiagnostics();
