@@ -31,7 +31,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.List;
-import java.util.StringTokenizer;
 
 import static org.junit.Assert.assertEquals;
 
@@ -65,7 +64,7 @@ public class AntlrTestcase {
     }
 
     protected String tmpdir() {
-        return delegate.getGenPath();
+        return delegate.getWorkingDir();
     }
 
     protected String stderrDuringParse() {
@@ -121,7 +120,12 @@ public class AntlrTestcase {
                                                  String lexerName,
                                                  boolean defaultListener,
                                                  String... extraOptions) {
-        return delegate.generateAndBuildRecognizer(grammarFileName, grammarStr, parserName, lexerName, defaultListener, extraOptions);
+        return delegate.generateAndBuildRecognizer(grammarFileName,
+                                                   grammarStr,
+                                                   parserName,
+                                                   lexerName,
+                                                   defaultListener,
+                                                   extraOptions);
     }
 
 
@@ -159,7 +163,7 @@ public class AntlrTestcase {
                                 String startRuleName,
                                 String input, boolean debug) {
         return execParser(grammarFileName, grammarStr, parserName,
-                lexerName, startRuleName, input, debug, false);
+                          lexerName, startRuleName, input, debug, false);
     }
 
     protected String execParser(String grammarFileName,
@@ -169,7 +173,14 @@ public class AntlrTestcase {
                                 String startRuleName,
                                 String input, boolean debug,
                                 boolean profile) {
-        return delegate.execParser(grammarFileName, grammarStr, parserName, lexerName, startRuleName, input, debug, profile);
+        return delegate.execParser(grammarFileName,
+                                   grammarStr,
+                                   parserName,
+                                   lexerName,
+                                   startRuleName,
+                                   input,
+                                   debug,
+                                   profile);
     }
 
 
@@ -191,14 +202,14 @@ public class AntlrTestcase {
             ErrorQueue equeue = antlr(fileName, false);
 
             String actual = equeue.toString(true);
-            actual = actual.replace(delegate.getGenPath() + File.separator, "");
-//            System.err.println(actual);
-//            String msg = input;
-//            msg = msg.replace("\n", "\\n");
-//            msg = msg.replace("\r", "\\r");
-//            msg = msg.replace("\t", "\\t");
+            actual = actual.replace(delegate.getWorkingDir() + File.separator, "");
+           // System.err.println(actual);
+            String msg = input;
+            msg = msg.replace("\n", "\\n");
+            msg = msg.replace("\r", "\\r");
+            msg = msg.replace("\t", "\\t");
 
-            assertEquals(expect, actual);
+            assertEquals(msg,expect, actual);
         }
     }
 
@@ -235,13 +246,6 @@ public class AntlrTestcase {
         }
     }
 
-    public static String getGrammarNameFromFirstLine(String grammar) {
-        StringTokenizer tokenizer = new StringTokenizer(grammar, " \t\n\r\f;");
-        String token = tokenizer.nextToken();
-        if (!"grammar".equals(token)) token = tokenizer.nextToken();
-        if (!"grammar".equals(token)) throw new RuntimeException("????");
-        return tokenizer.nextToken();
-    }
 
     private String getFilenameFromFirstLineOfGrammar(String line) {
         String fileName = "A" + Tool.GRAMMAR_EXTENSION;

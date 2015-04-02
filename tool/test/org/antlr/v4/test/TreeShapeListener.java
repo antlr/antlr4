@@ -6,8 +6,8 @@ package org.antlr.v4.test;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.*;
-
-
+//Used by generated tests.
+@SuppressWarnings("unused")
 public class TreeShapeListener implements ParseTreeListener {
     @Override
     public void visitTerminal(TerminalNode node) {

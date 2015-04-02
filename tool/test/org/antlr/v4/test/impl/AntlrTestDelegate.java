@@ -41,7 +41,7 @@ public interface AntlrTestDelegate {
                                        boolean defaultListener,
                                        String... extraOptions);
 
-    String getGenPath();
+    String getWorkingDir();
 
     String getStdErrDuringParse();
 

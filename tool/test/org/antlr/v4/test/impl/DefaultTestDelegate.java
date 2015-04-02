@@ -171,15 +171,15 @@ public class DefaultTestDelegate extends AbstractTestDelegate {
         return null;
     }
 
-    public void eraseGeneratedFiles(String endingWith) {
-        File tmpdirF = new File(tmpdir);
-        String[] files = tmpdirF.list();
-        for (int i = 0; files != null && i < files.length; i++) {
-            if (files[i].endsWith(endingWith)) {
-              boolean deleted=  new File(tmpdir + File.separatorChar + files[i]).delete();
-            }
-        }
-    }
+//    public void eraseGeneratedFiles(String endingWith) {
+//        File tmpdirF = new File(tmpdir);
+//        String[] files = tmpdirF.list();
+//        for (int i = 0; files != null && i < files.length; i++) {
+//            if (files[i].endsWith(endingWith)) {
+//              boolean deleted=  new File(tmpdir + File.separatorChar + files[i]).delete();
+//            }
+//        }
+//    }
 
 
     public void eraseGeneratedFiles() {
@@ -238,15 +238,23 @@ public class DefaultTestDelegate extends AbstractTestDelegate {
                                                      "-visitor");
         assertTrue(success);
         writeFile(tmpdir, "input", input);
-        return rawExecRecognizer(parserName,
-                                 lexerName,
-                                 startRuleName,
-                                 debug,
-                                 profile);
+        this.stderrDuringParse = null;
+        if (parserName == null) {
+            writeLexerTestFile(lexerName, false);
+        } else {
+            writeTestFile(parserName,
+                          lexerName,
+                          startRuleName,
+                          debug,
+                          profile);
+        }
+
+        compile("Test.java");
+        return execClass("Test");
     }
 
     @Override
-    public String getGenPath() {
+    public String getWorkingDir() {
         return tmpdir;
     }
 
@@ -363,26 +371,6 @@ public class DefaultTestDelegate extends AbstractTestDelegate {
         }
 
         return equeue;
-    }
-
-    protected String rawExecRecognizer(String parserName,
-                                       String lexerName,
-                                       String parserStartRuleName,
-                                       boolean debug,
-                                       boolean profile) {
-        this.stderrDuringParse = null;
-        if (parserName == null) {
-            writeLexerTestFile(lexerName, false);
-        } else {
-            writeTestFile(parserName,
-                          lexerName,
-                          parserStartRuleName,
-                          debug,
-                          profile);
-        }
-
-        compile("Test.java");
-        return execClass("Test");
     }
 
     /**

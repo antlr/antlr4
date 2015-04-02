@@ -9,16 +9,16 @@ import java.util.Properties;
 public class AntlrTestSettings {
     public static final String PATH_SEP;
 
-    public static String CLASSPATH;
+    public static final String CLASSPATH;
 
 
-    public static boolean TEST_IN_PROCESS;
+    public static final boolean TEST_IN_PROCESS;
    // public static boolean TEST_IN_MEMORY;
-    public static boolean PRESERVE_TEST_DIR;
+    public static final boolean PRESERVE_TEST_DIR;
 
-    public static String BASE_TEST_DIR;
+    public static final String BASE_TEST_DIR;
 
-    public static boolean CREATE_PER_TEST_DIRECTORIES;
+    public static final boolean CREATE_PER_TEST_DIRECTORIES;
 
     static {
         PATH_SEP = System.getProperty("path.separator");
