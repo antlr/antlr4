@@ -66,3 +66,4 @@ YYYY/MM/DD, github id, Full name, email
 2015/01/29, TomLottermann, Thomas Lottermann, tomlottermann@gmail.com
 2015/02/15, pavlo, Pavlo Lysov, pavlikus@gmail.com
 2015/03/07, RedTailedHawk, Lawrence Parker, larry@answerrocket.com
+2015/04/03, rljacobson, Robert Jacobson, rljacobson@gmail.com
