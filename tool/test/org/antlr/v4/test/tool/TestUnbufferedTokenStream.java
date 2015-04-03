@@ -42,7 +42,6 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
-@SuppressWarnings("unused")
 public class TestUnbufferedTokenStream extends AntlrTestcase {
 	@Test public void testLookahead() throws Exception {
         LexerGrammar g = new LexerGrammar(

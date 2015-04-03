@@ -41,7 +41,6 @@ import java.io.StringReader;
 
 import static org.junit.Assert.assertEquals;
 
-@SuppressWarnings("unused")
 public class TestUnbufferedCharStream extends AntlrTestcase {
 	@Test public void testNoChar() throws Exception {
 		CharStream input = createStream("");

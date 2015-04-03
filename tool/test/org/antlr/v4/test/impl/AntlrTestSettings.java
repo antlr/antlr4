@@ -1,6 +1,8 @@
 package org.antlr.v4.test.impl;
 
 
+import org.antlr.v4.test.impl.wip.NewAntlrDelegate;
+
 import java.util.Properties;
 
 /**
@@ -13,7 +15,7 @@ public class AntlrTestSettings {
 
 
     public static final boolean TEST_IN_PROCESS;
-   // public static boolean TEST_IN_MEMORY;
+    public static boolean EXPERIMENTAL;
     public static final boolean PRESERVE_TEST_DIR;
 
     public static final String BASE_TEST_DIR;
@@ -25,7 +27,7 @@ public class AntlrTestSettings {
         CLASSPATH = System.getProperty("java.class.path");
 
         TEST_IN_PROCESS = booleanProperty(true, "antlr.testinprocess", "antlr.test.inprocess");
-       // TEST_IN_MEMORY = booleanProperty(false, "antlr.test.inmemory");
+        EXPERIMENTAL = booleanProperty(false, "antlr.test.experimental");
         PRESERVE_TEST_DIR = booleanProperty(false, "antlr.preserve-test-dir", "antlr.test.preserve-test-dir");
 
         String baseTestDir = stringProperty("antlr.java-test-dir", "antlr.test.java-test-dir");
@@ -69,11 +71,9 @@ public class AntlrTestSettings {
 
     }
 
-
     public static AntlrTestDelegate getHelper() {
-        if(TEST_IN_PROCESS){
-            return InProcessTestDelegate.INSTANCE;
-        }
-        return DefaultTestDelegate.INSTANCE;
+        if (EXPERIMENTAL) return NewAntlrDelegate.getInstace();
+        if (TEST_IN_PROCESS) return InProcessTestDelegate.getInstace();
+        return DefaultTestDelegate.getInstace();
     }
 }

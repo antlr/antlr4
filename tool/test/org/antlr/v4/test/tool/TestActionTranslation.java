@@ -34,7 +34,6 @@ import org.antlr.v4.test.AntlrTestcase;
 import org.junit.Test;
 
 /** */
-@SuppressWarnings("unused")
 public class TestActionTranslation extends AntlrTestcase {
 	String attributeTemplate =
 		"attributeTemplate(members,init,inline,finally,inline2) ::= <<\n" +

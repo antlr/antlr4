@@ -670,7 +670,7 @@ public class Generator {
 				"line 1:0 missing ID at '<EOF>'\n");
 		file.addParserTest(input, "ContextListGetters", "T", "s",
 				"abab",
-				"abab\n",
+				"abab",
 				null);
 		file.addParserTestsWithErrors(input, "DuplicatedLeftRecursiveCall", "T", "start",
 				"xx", "", null,
@@ -700,14 +700,14 @@ public class Generator {
 		file.addParserTests(input, "TokenGetters", "T", "s",
 				"1 2",
 				"(a 1 2)\n" +
-				"1 2 [1, 2]\n",
+				"1 2 [1, 2]",
 				"abc",
 				"(a abc)\n" +
 				"[@0,0:2='abc',<4>,1:0]\n");
 		file.addParserTests(input, "RuleGetters", "T", "s",
 				"1 2",
 				"(a (b 1) (b 2))\n" +
-				"1 2 1\n",
+				"1 2 1",
 				"abc",
 				"(a (b abc))\n" +
 				"abc\n");
@@ -723,7 +723,7 @@ public class Generator {
 		file.addParserTest(input, "LRWithLabels", "T", "s",
 				"1(2,3)",
 				"(e (e 1) ( (eList (e 2) , (e 3)) ))\n" +
-				"1\n" + "2\n" + "3\n" + "1 [13 6]\n",
+				"1\n" + "2\n" + "3\n" + "1 [13 6]",
 				null);
 		return file;
 	}
@@ -1335,9 +1335,9 @@ public class Generator {
 		file.importErrorQueue = true;
 		file.importGrammar = true;
 		file.addCompositeParserTest(input, "DelegatorInvokesDelegateRule", "M", "s", "b", "S.a\n", null, "S");
-		file.addCompositeParserTest(input, "BringInLiteralsFromDelegate", "M", "s", "=a", "S.a\n", null, "S");
+		file.addCompositeParserTest(input, "BringInLiteralsFromDelegate", "M", "s", "=a", "S.a", null, "S");
 		file.addCompositeParserTest(input, "DelegatorInvokesDelegateRuleWithArgs", "M", "s", "b", "S.a1000\n", null, "S");
-		file.addCompositeParserTest(input, "DelegatorInvokesDelegateRuleWithReturnStruct", "M", "s", "b", "S.ab\n", null, "S");
+		file.addCompositeParserTest(input, "DelegatorInvokesDelegateRuleWithReturnStruct", "M", "s", "b", "S.ab", null, "S");
 		file.addCompositeParserTest(input, "DelegatorAccessesDelegateMembers", "M", "s", "b", "foo\n", null, "S");
 		file.addCompositeParserTest(input, "DelegatorInvokesFirstVersionOfDelegateRule", "M", "s", "b", "S.a\n", null, "S", "T");
 		CompositeParserTestMethod ct = file.addCompositeParserTest(input, "DelegatesSeeSameTokenType", "M", "s", "aa", "S.x\nT.y\n", null, "S", "T");
@@ -1356,8 +1356,8 @@ public class Generator {
 				"ErrorQueue equeue = new ErrorQueue();\n" +
 				"new Grammar(tmpdir()+\"/M.g4\", grammar, equeue);\n" +
 				"assertEquals(\"unexpected errors: \" + equeue, 0, equeue.errors.size());\n";
-		file.addCompositeParserTest(input, "DelegatorRuleOverridesDelegate", "M", "a", "c", "S.a\n", null, "S");
-		file.addCompositeParserTest(input, "DelegatorRuleOverridesLookaheadInDelegate", "M", "prog", "float x = 3;", "Decl: floatx=3;\n", null, "S");
+		file.addCompositeParserTest(input, "DelegatorRuleOverridesDelegate", "M", "a", "c", "S.a", null, "S");
+		file.addCompositeParserTest(input, "DelegatorRuleOverridesLookaheadInDelegate", "M", "prog", "float x = 3;", "Decl: floatx=3;", null, "S");
 		file.addCompositeParserTest(input, "DelegatorRuleOverridesDelegates", "M", "a", "c", "M.b\nS.a\n", null, "S", "T");
 		file.addCompositeParserTest(input, "KeywordVSIDOrder", "M", "a", "abc",
 				"M.A\n" +

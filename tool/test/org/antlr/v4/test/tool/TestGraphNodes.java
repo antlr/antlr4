@@ -817,8 +817,7 @@ public class TestGraphNodes {
 	}
 
 	public SingletonPredictionContext createSingleton(PredictionContext parent, int payload) {
-		SingletonPredictionContext a = SingletonPredictionContext.create(parent, payload);
-		return a;
+		return SingletonPredictionContext.create(parent, payload);
 	}
 
 	public ArrayPredictionContext array(SingletonPredictionContext... nodes) {
@@ -895,12 +894,9 @@ public class TestGraphNodes {
 			}
 		}
 
-		StringBuilder builder = new StringBuilder();
-		builder.append("digraph G {\n");
-		builder.append("rankdir=LR;\n");
-		builder.append(nodes);
-		builder.append(edges);
-		builder.append("}\n");
-		return builder.toString();
+		return "digraph G {\n" +
+			   "rankdir=LR;\n" +
+			   nodes + edges +
+			   "}\n";
 	}
 }

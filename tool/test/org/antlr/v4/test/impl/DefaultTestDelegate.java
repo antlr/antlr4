@@ -24,11 +24,9 @@ import static org.junit.Assert.assertTrue;
  * Created by jason on 3/24/15.
  */
 public class DefaultTestDelegate extends AbstractTestDelegate {
-    public static final DefaultTestDelegate INSTANCE = new DefaultTestDelegate();
 
-
-    String tmpdir;
-    String stderrDuringParse;
+    protected String tmpdir;
+    protected String stderrDuringParse;
 
 
     @Override
@@ -54,14 +52,10 @@ public class DefaultTestDelegate extends AbstractTestDelegate {
     }
 
     @Override
-    public void testDidFinish() {
+    public void testDidFinish(Description description) {
         if (!AntlrTestSettings.PRESERVE_TEST_DIR && new File(tmpdir).exists()) {
             eraseGeneratedFiles();
         }
-    }
-
-    public Tool createTool(String... args) {
-        return new Tool(args);
     }
 
 
@@ -171,16 +165,6 @@ public class DefaultTestDelegate extends AbstractTestDelegate {
         return null;
     }
 
-//    public void eraseGeneratedFiles(String endingWith) {
-//        File tmpdirF = new File(tmpdir);
-//        String[] files = tmpdirF.list();
-//        for (int i = 0; files != null && i < files.length; i++) {
-//            if (files[i].endsWith(endingWith)) {
-//              boolean deleted=  new File(tmpdir + File.separatorChar + files[i]).delete();
-//            }
-//        }
-//    }
-
 
     public void eraseGeneratedFiles() {
         erase(new File(tmpdir));
@@ -242,11 +226,11 @@ public class DefaultTestDelegate extends AbstractTestDelegate {
         if (parserName == null) {
             writeLexerTestFile(lexerName, false);
         } else {
-            writeTestFile(parserName,
-                          lexerName,
-                          startRuleName,
-                          debug,
-                          profile);
+            writeParserTestFile(parserName,
+                                lexerName,
+                                startRuleName,
+                                debug,
+                                profile);
         }
 
         compile("Test.java");
@@ -263,88 +247,10 @@ public class DefaultTestDelegate extends AbstractTestDelegate {
         return stderrDuringParse;
     }
 
-    public ErrorQueue antlr(String grammarFileName,
-                            String grammarStr,
-                            boolean defaultListener,
-                            String... extraOptions) {
-
-        System.out.println("dir " + tmpdir);
-        mkdir(tmpdir);
-        writeFile(tmpdir, grammarFileName, grammarStr);
-
-
-        final List<String> options = new ArrayList<String>();
-        Collections.addAll(options, extraOptions);
-        if (!options.contains("-o")) {
-            options.add("-o");
-            options.add(tmpdir);
-        }
-        if (!options.contains("-lib")) {
-            options.add("-lib");
-            options.add(tmpdir);
-        }
-        if (!options.contains("-encoding")) {
-            options.add("-encoding");
-            options.add("UTF-8");
-        }
-        options.add(new File(tmpdir, grammarFileName).toString());
-
-        final String[] optionsA = new String[options.size()];
-        options.toArray(optionsA);
-        Tool antlr = createTool(optionsA);
-        ErrorQueue equeue = new ErrorQueue(antlr);
-        antlr.addListener(equeue);
-        if (defaultListener) {
-            antlr.addListener(new DefaultToolListener(antlr));
-        }
-        antlr.processGrammarsOnCommandLine();
-
-        if (!defaultListener && !equeue.errors.isEmpty()) {
-            System.err.println("antlr reports errors from " + options);
-            for (int i = 0; i < equeue.errors.size(); i++) {
-                ANTLRMessage msg = equeue.errors.get(i);
-                System.err.println(msg);
-            }
-            System.out.println("!!!\ngrammar:");
-            try {
-                System.out.println(new String(Utils.readFile(tmpdir + "/" + grammarFileName)));
-            } catch (IOException ioe) {
-                System.err.println(ioe.toString());
-            }
-            System.out.println("###");
-        }
-        if (!defaultListener && !equeue.warnings.isEmpty()) {
-            System.err.println("antlr reports warnings from " + options);
-            for (int i = 0; i < equeue.warnings.size(); i++) {
-                ANTLRMessage msg = equeue.warnings.get(i);
-                System.err.println(msg);
-            }
-        }
-
-        return equeue;
-    }
-
     @Override
     public ErrorQueue antlr(String grammarFileName, boolean defaultListener, String... extraOptions) {
-        final List<String> options = new ArrayList<String>();
-        Collections.addAll(options, extraOptions);
-        if (!options.contains("-o")) {
-            options.add("-o");
-            options.add(tmpdir);
-        }
-        if (!options.contains("-lib")) {
-            options.add("-lib");
-            options.add(tmpdir);
-        }
-        if (!options.contains("-encoding")) {
-            options.add("-encoding");
-            options.add("UTF-8");
-        }
-        options.add(tmpdir + File.separatorChar + grammarFileName);
-
-        final String[] optionsA = new String[options.size()];
-        options.toArray(optionsA);
-        Tool antlr = createTool(optionsA);
+        String[] opts = makeAntlrOptions(grammarFileName,extraOptions);
+        Tool antlr = createTool(opts);
         ErrorQueue equeue = new ErrorQueue(antlr);
         antlr.addListener(equeue);
         if (defaultListener) {
@@ -353,35 +259,25 @@ public class DefaultTestDelegate extends AbstractTestDelegate {
         antlr.processGrammarsOnCommandLine();
 
         if (!defaultListener && !equeue.errors.isEmpty()) {
-            System.err.println("antlr reports errors from " + options);
-            for (int i = 0; i < equeue.errors.size(); i++) {
-                ANTLRMessage msg = equeue.errors.get(i);
-                System.err.println(msg);
+            System.err.println("antlr reports errors from " + tmpdir);
+            System.err.printf("\toptions: %s%n", Arrays.toString(opts));
+            for (ANTLRMessage msg : equeue.errors) {
+                System.err.printf("\t%s%n", msg);
             }
-            System.out.println("!!!\ngrammar:");
+            System.err.println();
+            // System.out.println("!!!\ngrammar:");
             // System.out.println(new String(Utils.readFile(tmpdir + "/" + grammarFileName)));
-            System.out.println("###");
+            // System.out.println("###");
         }
         if (!defaultListener && !equeue.warnings.isEmpty()) {
-            System.err.println("antlr reports warnings from " + options);
-            for (int i = 0; i < equeue.warnings.size(); i++) {
-                ANTLRMessage msg = equeue.warnings.get(i);
-                System.err.println(msg);
+            System.err.printf("antlr reports warnings from %s%n\toptions: %s%n", tmpdir, Arrays.toString(opts));
+            for (ANTLRMessage msg : equeue.warnings) {
+                System.err.printf("\t%s%n", msg);
             }
+            System.err.println();
         }
 
         return equeue;
-    }
-
-    /**
-     * Return true if all is well
-     */
-    protected boolean generateAndBuildRecognizer(String grammarFileName,
-                                                 String grammarStr,
-                                                 String parserName,
-                                                 String lexerName,
-                                                 String... extraOptions) {
-        return generateAndBuildRecognizer(grammarFileName, grammarStr, parserName, lexerName, false, extraOptions);
     }
 
     /**
@@ -417,11 +313,11 @@ public class DefaultTestDelegate extends AbstractTestDelegate {
         return compile(files.toArray(new String[files.size()]));
     }
 
-    protected void writeTestFile(String parserName,
-                                 String lexerName,
-                                 String parserStartRuleName,
-                                 boolean debug,
-                                 boolean profile) {
+    protected void writeParserTestFile(String parserName,
+                                       String lexerName,
+                                       String parserStartRuleName,
+                                       boolean debug,
+                                       boolean profile) {
         String code = TestCodeGenerator.generateParserTestCode("Test",
                                                                parserName,
                                                                lexerName,
@@ -435,5 +331,13 @@ public class DefaultTestDelegate extends AbstractTestDelegate {
     protected void writeLexerTestFile(String lexerName, boolean showDFA) {
         String code = TestCodeGenerator.generateLexerTestCode("Test", showDFA, lexerName);
         writeFile(tmpdir, "Test.java", code);
+    }
+
+    static class Singleton {
+        public static final DefaultTestDelegate INSTANCE = new DefaultTestDelegate();
+    }
+
+    public static AntlrTestDelegate getInstace() {
+        return Singleton.INSTANCE;
     }
 }

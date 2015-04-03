@@ -44,7 +44,6 @@ import java.util.Arrays;
 
 import static org.junit.Assert.assertEquals;
 
-@SuppressWarnings("unused")
 public class TestParserProfiler extends AntlrTestcase {
 	LexerGrammar lg;
 
