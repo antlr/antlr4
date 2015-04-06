@@ -128,13 +128,6 @@ public abstract class Target {
 		getCodeGenerator().write(outputFileST, fileName);
 	}
 
-	protected void genRecognizerHeaderFile(Grammar g,
-										   ST headerFileST,
-										   String extName) // e.g., ".h"
-	{
-		// no header file by default
-	}
-
 	/** Get a meaningful name for a token type useful during code generation.
 	 *  Literals without associated names are converted to the string equivalent
 	 *  of their integer values. Used to generate x==ID and x==34 type comparisons
@@ -523,5 +516,75 @@ public abstract class Target {
 	 */
 	public boolean supportsOverloadedMethods() {
 		return true;
+	}
+
+	/**
+	 * @since 4.5
+	 */
+	public boolean wantsRecognizerCodeFile() {
+		return true;
+	}
+	
+	/**
+	 * @since 4.5
+	 */
+	public boolean wantsRecognizerHeaderFile() {
+		return false;
+	}
+
+	/**
+	 * @since 4.5
+	 */
+	public boolean wantsListerCodeFile() {
+		return true;
+	}
+	
+	/**
+	 * @since 4.5
+	 */
+	public boolean wantsListerHeaderFile() {
+		return false;
+	}
+
+	/**
+	 * @since 4.5
+	 */
+	public boolean wantsBaseListenerCodeFile() {
+		return true;
+	}
+	
+	/**
+	 * @since 4.5
+	 */
+	public boolean wantsBaseListenerHeaderFile() {
+		return false;
+	}
+
+	/**
+	 * @since 4.5
+	 */
+	public boolean wantsVisitorCodeFile() {
+		return true;
+	}
+	
+	/**
+	 * @since 4.5
+	 */
+	public boolean wantsVisitorHeaderFile() {
+		return false;
+	}
+
+	/**
+	 * @since 4.5
+	 */
+	public boolean wantsBaseVisitorCodeFile() {
+		return true;
+	}
+	
+	/**
+	 * @since 4.5
+	 */
+	public boolean wantsBaseVisitorHeaderFile() {
+		return false;
 	}
 }
