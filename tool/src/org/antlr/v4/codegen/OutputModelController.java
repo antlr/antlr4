@@ -35,7 +35,9 @@ import org.antlr.v4.analysis.LeftRecursiveRuleAltInfo;
 import org.antlr.v4.codegen.model.Action;
 import org.antlr.v4.codegen.model.AltBlock;
 import org.antlr.v4.codegen.model.BaseListenerFile;
+import org.antlr.v4.codegen.model.BaseListenerHeaderFile;
 import org.antlr.v4.codegen.model.BaseVisitorFile;
+import org.antlr.v4.codegen.model.BaseVisitorHeaderFile;
 import org.antlr.v4.codegen.model.Choice;
 import org.antlr.v4.codegen.model.CodeBlockForAlt;
 import org.antlr.v4.codegen.model.CodeBlockForOuterMostAlt;
@@ -43,16 +45,20 @@ import org.antlr.v4.codegen.model.LabeledOp;
 import org.antlr.v4.codegen.model.LeftRecursiveRuleFunction;
 import org.antlr.v4.codegen.model.Lexer;
 import org.antlr.v4.codegen.model.LexerFile;
+import org.antlr.v4.codegen.model.LexerHeaderFile;
 import org.antlr.v4.codegen.model.ListenerFile;
+import org.antlr.v4.codegen.model.ListenerHeaderFile;
 import org.antlr.v4.codegen.model.OutputModelObject;
 import org.antlr.v4.codegen.model.Parser;
 import org.antlr.v4.codegen.model.ParserFile;
+import org.antlr.v4.codegen.model.ParserHeaderFile;
 import org.antlr.v4.codegen.model.RuleActionFunction;
 import org.antlr.v4.codegen.model.RuleFunction;
 import org.antlr.v4.codegen.model.RuleSempredFunction;
 import org.antlr.v4.codegen.model.SrcOp;
 import org.antlr.v4.codegen.model.StarBlock;
 import org.antlr.v4.codegen.model.VisitorFile;
+import org.antlr.v4.codegen.model.VisitorHeaderFile;
 import org.antlr.v4.codegen.model.decl.CodeBlock;
 import org.antlr.v4.misc.Utils;
 import org.antlr.v4.parse.ANTLRParser;
@@ -112,23 +118,22 @@ public class OutputModelController {
 		CodeGenerator gen = delegate.getGenerator();
 		ParserFile file = parserFile(gen.getRecognizerFileName());
 		setRoot(file);
-		Parser parser = parser(file);
-		file.parser = parser;
+		file.parser = parser(file);
 
 		for (Rule r : g.rules.values()) {
-			buildRuleFunction(parser, r);
+			buildRuleFunction(file.parser, r);
 		}
 
 		return file;
 	}
 
 	public OutputModelObject buildLexerOutputModel() {
+		Grammar g = delegate.getGrammar();
 		CodeGenerator gen = delegate.getGenerator();
 		LexerFile file = lexerFile(gen.getRecognizerFileName());
 		setRoot(file);
 		file.lexer = lexer(file);
 
-		Grammar g = delegate.getGrammar();
 		for (Rule r : g.rules.values()) {
 			buildLexerRuleActions(file.lexer, r);
 		}
@@ -174,6 +179,67 @@ public class OutputModelController {
 
 	public Lexer lexer(LexerFile file) {
 		return new Lexer(delegate, file);
+	}
+
+	/** Header files may contain the actual code, so this is
+	 * essentially the same as above.
+	 */
+	public OutputModelObject buildParserHeaderOutputModel() {
+		Grammar g = delegate.getGrammar();
+		CodeGenerator gen = delegate.getGenerator();
+		ParserHeaderFile file = parserHeaderFile(gen.getRecognizerHeaderFileName());
+		setRoot(file);
+		file.parser = parser(file);
+
+		for (Rule r : g.rules.values()) {
+			buildRuleFunction(file.parser, r);
+		}
+
+		return file;
+	}
+
+	public OutputModelObject buildLexerHeaderOutputModel() {
+		Grammar g = delegate.getGrammar();
+		CodeGenerator gen = delegate.getGenerator();
+		LexerHeaderFile file = lexerHeaderFile(gen.getRecognizerHeaderFileName());
+		setRoot(file);
+		file.lexer = lexer(file);
+
+		for (Rule r : g.rules.values()) {
+			buildLexerRuleActions(file.lexer, r);
+		}
+
+		return file;
+	}
+
+	public OutputModelObject buildListenerHeaderOutputModel() {
+		CodeGenerator gen = delegate.getGenerator();
+		return new ListenerHeaderFile(delegate, gen.getListenerHeaderFileName());
+	}
+
+	public OutputModelObject buildBaseListenerHeaderOutputModel() {
+		CodeGenerator gen = delegate.getGenerator();
+		return new BaseListenerHeaderFile(delegate, gen.getBaseListenerHeaderFileName());
+	}
+
+	public OutputModelObject buildVisitorHeaderOutputModel() {
+		CodeGenerator gen = delegate.getGenerator();
+		return new VisitorHeaderFile(delegate, gen.getVisitorHeaderFileName());
+	}
+
+	public OutputModelObject buildBaseVisitorHeaderOutputModel() {
+		CodeGenerator gen = delegate.getGenerator();
+		return new BaseVisitorHeaderFile(delegate, gen.getBaseVisitorHeaderFileName());
+	}
+
+	public ParserHeaderFile parserHeaderFile(String fileName) {
+		ParserHeaderFile f = delegate.parserHeaderFile(fileName);
+		for (CodeGeneratorExtension ext : extensions) f = ext.parserHeaderFile(f);
+		return f;
+	}
+
+	public LexerHeaderFile lexerHeaderFile(String fileName) {
+		return new LexerHeaderFile(delegate, fileName);
 	}
 
 	/** Create RuleFunction per rule and update sempreds,actions of parser

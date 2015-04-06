@@ -39,6 +39,7 @@ import org.antlr.v4.codegen.model.LexerFile;
 import org.antlr.v4.codegen.model.OutputModelObject;
 import org.antlr.v4.codegen.model.Parser;
 import org.antlr.v4.codegen.model.ParserFile;
+import org.antlr.v4.codegen.model.ParserHeaderFile;
 import org.antlr.v4.codegen.model.RuleFunction;
 import org.antlr.v4.codegen.model.SrcOp;
 import org.antlr.v4.codegen.model.decl.CodeBlock;
@@ -62,6 +63,8 @@ public interface OutputModelFactory {
 	OutputModelController getController();
 
 	ParserFile parserFile(String fileName);
+	
+	ParserHeaderFile parserHeaderFile(String fileName);
 
 	Parser parser(ParserFile file);
 

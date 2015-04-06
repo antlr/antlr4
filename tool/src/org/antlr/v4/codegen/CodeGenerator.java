@@ -203,6 +203,26 @@ public class CodeGenerator {
 	public void writeBaseVisitor(ST outputFileST) {
 		getTarget().genFile(g, outputFileST, getBaseVisitorFileName());
 	}
+	
+	public void writeRecognizerHeader(ST outputFileST) {
+		getTarget().genFile(g, outputFileST, getRecognizerHeaderFileName());
+	}
+
+	public void writeListenerHeader(ST outputFileST) {
+		getTarget().genFile(g, outputFileST, getListenerHeaderFileName());
+	}
+
+	public void writeBaseListenerHeader(ST outputFileST) {
+		getTarget().genFile(g, outputFileST, getBaseListenerHeaderFileName());
+	}
+
+	public void writeVisitorHeader(ST outputFileST) {
+		getTarget().genFile(g, outputFileST, getVisitorHeaderFileName());
+	}
+
+	public void writeBaseVisitorHeader(ST outputFileST) {
+		getTarget().genFile(g, outputFileST, getBaseVisitorHeaderFileName());
+	}
 
 	public void writeVocabFile() {
 		// write out the vocab interchange file; used by antlr,
@@ -289,7 +309,6 @@ public class CodeGenerator {
 
 	public String getRecognizerHeaderFileName() {
 		ST extST = getTemplates().getInstanceOf("headerFileExtension");
-		if ( extST==null ) return null;
 		String recognizerHeaderName = g.getRecognizerName();
 		return recognizerHeaderName+extST.render();
 	}
@@ -297,7 +316,6 @@ public class CodeGenerator {
 	public String getListenerHeaderFileName() {
 		assert g.name != null;
 		ST extST = getTemplates().getInstanceOf("headerFileExtension");
-		if ( extST==null ) return null;
 		String listenerHeaderName = g.name + "Listener";
 		return listenerHeaderName+extST.render();
 	}
@@ -305,7 +323,6 @@ public class CodeGenerator {
 	public String getBaseListenerHeaderFileName() {
 		assert g.name != null;
 		ST extST = getTemplates().getInstanceOf("headerFileExtension");
-		if ( extST==null ) return null;
 		String listenerHeaderName = g.name + "BaseListener";
 		return listenerHeaderName+extST.render();
 	}
@@ -313,7 +330,6 @@ public class CodeGenerator {
 	public String getVisitorHeaderFileName() {
 		assert g.name != null;
 		ST extST = getTemplates().getInstanceOf("headerFileExtension");
-		if ( extST==null ) return null;
 		String visitorHeaderName = g.name + "Visitor";
 		return visitorHeaderName+extST.render();
 	}
@@ -321,7 +337,6 @@ public class CodeGenerator {
 	public String getBaseVisitorHeaderFileName() {
 		assert g.name != null;
 		ST extST = getTemplates().getInstanceOf("headerFileExtension");
-		if ( extST==null ) return null;
 		String visitorHeaderName = g.name + "BaseVisitor";
 		return visitorHeaderName+extST.render();
 	}

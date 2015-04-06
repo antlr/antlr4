@@ -535,14 +535,14 @@ public abstract class Target {
 	/**
 	 * @since 4.5
 	 */
-	public boolean wantsListerCodeFile() {
+	public boolean wantsListenerCodeFile() {
 		return true;
 	}
 	
 	/**
 	 * @since 4.5
 	 */
-	public boolean wantsListerHeaderFile() {
+	public boolean wantsListenerHeaderFile() {
 		return false;
 	}
 
