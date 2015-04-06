@@ -38,6 +38,7 @@ import org.antlr.v4.codegen.model.Lexer;
 import org.antlr.v4.codegen.model.LexerFile;
 import org.antlr.v4.codegen.model.Parser;
 import org.antlr.v4.codegen.model.ParserFile;
+import org.antlr.v4.codegen.model.ParserHeaderFile;
 import org.antlr.v4.codegen.model.RuleFunction;
 import org.antlr.v4.codegen.model.SrcOp;
 import org.antlr.v4.tool.ast.GrammarAST;
@@ -53,6 +54,8 @@ public class CodeGeneratorExtension {
 	}
 
 	public ParserFile parserFile(ParserFile f) { return f; }
+
+	public ParserHeaderFile parserHeaderFile(ParserHeaderFile f) { return f; }
 
 	public Parser parser(Parser p) { return p; }
 

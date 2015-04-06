@@ -145,6 +145,12 @@ public class CodeGenerator {
 	public ST generateBaseListener() { return walk(createController().buildBaseListenerOutputModel()); }
 	public ST generateVisitor() { return walk(createController().buildVisitorOutputModel()); }
 	public ST generateBaseVisitor() { return walk(createController().buildBaseVisitorOutputModel()); }
+	public ST generateLexerHeader() { return walk(createController().buildLexerHeaderOutputModel()); }
+	public ST generateParserHeader() { return walk(createController().buildParserHeaderOutputModel()); }
+	public ST generateListenerHeader() { return walk(createController().buildListenerHeaderOutputModel()); }
+	public ST generateBaseListenerHeader() { return walk(createController().buildBaseListenerHeaderOutputModel()); }
+	public ST generateVisitorHeader() { return walk(createController().buildVisitorHeaderOutputModel()); }
+	public ST generateBaseVisitorHeader() { return walk(createController().buildBaseVisitorHeaderOutputModel()); }
 
 	/** Generate a token vocab file with all the token names/types.  For example:
 	 *  ID=7
@@ -197,16 +203,25 @@ public class CodeGenerator {
 	public void writeBaseVisitor(ST outputFileST) {
 		getTarget().genFile(g, outputFileST, getBaseVisitorFileName());
 	}
+	
+	public void writeRecognizerHeader(ST outputFileST) {
+		getTarget().genFile(g, outputFileST, getRecognizerHeaderFileName());
+	}
 
-	public void writeHeaderFile() {
-		String fileName = getHeaderFileName();
-		if ( fileName==null ) return;
-		if ( getTemplates().isDefined("headerFile") ) {
-			ST extST = getTemplates().getInstanceOf("headerFileExtension");
-			ST headerFileST = null;
-			// TODO:  don't hide this header file generation here!
-			getTarget().genRecognizerHeaderFile(g, headerFileST, extST.render(lineWidth));
-		}
+	public void writeListenerHeader(ST outputFileST) {
+		getTarget().genFile(g, outputFileST, getListenerHeaderFileName());
+	}
+
+	public void writeBaseListenerHeader(ST outputFileST) {
+		getTarget().genFile(g, outputFileST, getBaseListenerHeaderFileName());
+	}
+
+	public void writeVisitorHeader(ST outputFileST) {
+		getTarget().genFile(g, outputFileST, getVisitorHeaderFileName());
+	}
+
+	public void writeBaseVisitorHeader(ST outputFileST) {
+		getTarget().genFile(g, outputFileST, getBaseVisitorHeaderFileName());
 	}
 
 	public void writeVocabFile() {
@@ -281,8 +296,8 @@ public class CodeGenerator {
 	public String getBaseVisitorFileName() {
 		assert g.name != null;
 		ST extST = getTemplates().getInstanceOf("codeFileExtension");
-		String listenerName = g.name + "BaseVisitor";
-		return listenerName+extST.render();
+		String visitorName = g.name + "BaseVisitor";
+		return visitorName+extST.render();
 	}
 
 	/** What is the name of the vocab file generated for this grammar?
@@ -292,11 +307,37 @@ public class CodeGenerator {
 		return g.name+VOCAB_FILE_EXTENSION;
 	}
 
-	public String getHeaderFileName() {
+	public String getRecognizerHeaderFileName() {
 		ST extST = getTemplates().getInstanceOf("headerFileExtension");
-		if ( extST==null ) return null;
-		String recognizerName = g.getRecognizerName();
-		return recognizerName+extST.render();
+		String recognizerHeaderName = g.getRecognizerName();
+		return recognizerHeaderName+extST.render();
 	}
 
+	public String getListenerHeaderFileName() {
+		assert g.name != null;
+		ST extST = getTemplates().getInstanceOf("headerFileExtension");
+		String listenerHeaderName = g.name + "Listener";
+		return listenerHeaderName+extST.render();
+	}
+
+	public String getBaseListenerHeaderFileName() {
+		assert g.name != null;
+		ST extST = getTemplates().getInstanceOf("headerFileExtension");
+		String listenerHeaderName = g.name + "BaseListener";
+		return listenerHeaderName+extST.render();
+	}
+
+	public String getVisitorHeaderFileName() {
+		assert g.name != null;
+		ST extST = getTemplates().getInstanceOf("headerFileExtension");
+		String visitorHeaderName = g.name + "Visitor";
+		return visitorHeaderName+extST.render();
+	}
+	
+	public String getBaseVisitorHeaderFileName() {
+		assert g.name != null;
+		ST extST = getTemplates().getInstanceOf("headerFileExtension");
+		String visitorHeaderName = g.name + "BaseVisitor";
+		return visitorHeaderName+extST.render();
+	}
 }
