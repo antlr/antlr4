@@ -2,8 +2,12 @@ package org.antlr.v4.test.rt.java;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
+import static org.hamcrest.Matchers.*;
 
-public class TestSemPredEvalLexer extends BaseTest {
+
+import org.antlr.v4.test.AntlrTestcase;
+
+public class TestSemPredEvalLexer extends AntlrTestcase {
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
@@ -26,7 +30,7 @@ public class TestSemPredEvalLexer extends BaseTest {
 	              ":s2=>3-'u'->:s3=>3\n" + 
 	              ":s6=>3-'b'->:s6=>3\n" + 
 	              ":s6=>3-'c'->:s6=>3\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -50,7 +54,7 @@ public class TestSemPredEvalLexer extends BaseTest {
 	              ":s2=>2-'u'->:s3=>2\n" + 
 	              ":s4=>2-'b'->:s4=>2\n" + 
 	              ":s4=>2-'c'->:s4=>2\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -68,7 +72,7 @@ public class TestSemPredEvalLexer extends BaseTest {
 	              "[@2,9:12='enum',<2>,1:9]\n" + 
 	              "[@3,13:12='<EOF>',<-1>,1:13]\n" + 
 	              "s0-' '->:s2=>3\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -86,7 +90,7 @@ public class TestSemPredEvalLexer extends BaseTest {
 	              "[@2,9:12='enum',<1>,1:9]\n" + 
 	              "[@3,13:12='<EOF>',<-1>,1:13]\n" + 
 	              "s0-' '->:s3=>3\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -117,7 +121,7 @@ public class TestSemPredEvalLexer extends BaseTest {
 	              ":s1=>1-'c'->:s1=>1\n" + 
 	              ":s1=>1-'e'->:s1=>1\n" + 
 	              ":s1=>1-'f'->:s1=>1\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -141,7 +145,7 @@ public class TestSemPredEvalLexer extends BaseTest {
 	              "[@2,6:7='ab',<1>,2:0]\n" + 
 	              "[@3,8:10='cde',<2>,2:2]\n" + 
 	              "[@4,12:11='<EOF>',<-1>,3:0]\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -161,7 +165,7 @@ public class TestSemPredEvalLexer extends BaseTest {
 	              "[@1,5:7='enu',<2>,1:5]\n" + 
 	              "[@2,9:9='a',<2>,1:9]\n" + 
 	              "[@3,10:9='<EOF>',<-1>,1:10]\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 

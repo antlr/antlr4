@@ -31,12 +31,13 @@
 package org.antlr.v4.test.tool;
 
 import org.antlr.runtime.RecognitionException;
+import org.antlr.v4.test.AntlrTestcase;
 import org.antlr.v4.tool.ErrorType;
 import org.junit.Test;
 import org.stringtemplate.v4.ST;
 
 /** */
-public class TestAttributeChecks extends BaseTest {
+public class TestAttributeChecks extends AntlrTestcase {
     String attributeTemplate =
         "parser grammar A;\n"+
         "@members {<members>}\n" +

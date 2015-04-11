@@ -35,15 +35,12 @@ import org.antlr.v4.automata.LexerATNFactory;
 import org.antlr.v4.automata.ParserATNFactory;
 import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.semantics.SemanticPipeline;
+import org.antlr.v4.test.AntlrTestcase;
+import org.antlr.v4.test.ErrorQueue;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LexerGrammar;
 import org.junit.Test;
-import org.stringtemplate.v4.AutoIndentWriter;
-import org.stringtemplate.v4.InstanceScope;
-import org.stringtemplate.v4.Interpreter;
-import org.stringtemplate.v4.ST;
-import org.stringtemplate.v4.STGroup;
-import org.stringtemplate.v4.STWriter;
+import org.stringtemplate.v4.*;
 import org.stringtemplate.v4.misc.ErrorManager;
 import org.stringtemplate.v4.misc.ErrorType;
 
@@ -54,17 +51,16 @@ import java.util.List;
 
 import static org.junit.Assert.assertFalse;
 
-public class TestCodeGeneration extends BaseTest {
+public class TestCodeGeneration extends AntlrTestcase {
 	@Test public void testArgDecl() throws Exception { // should use template not string
-		/*ErrorQueue equeue = */new ErrorQueue();
+		/*ErrorQueue equeue = new ErrorQueue();*/
 		String g =
 				"grammar T;\n" +
 				"a[int xyz] : 'a' ;\n";
 		List<String> evals = getEvalInfoForString(g, "int xyz");
 		System.out.println(evals);
-		for (int i = 0; i < evals.size(); i++) {
-			String eval = evals.get(i);
-			assertFalse("eval should not be POJO: "+eval, eval.startsWith("<pojo:"));
+		for (String eval : evals) {
+			assertFalse("eval should not be POJO: " + eval, eval.startsWith("<pojo:"));
 		}
 	}
 

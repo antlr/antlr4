@@ -2,8 +2,12 @@ package org.antlr.v4.test.rt.java;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
+import static org.hamcrest.Matchers.*;
 
-public class TestParseTrees extends BaseTest {
+
+import org.antlr.v4.test.AntlrTestcase;
+
+public class TestParseTrees extends AntlrTestcase {
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
@@ -22,7 +26,7 @@ public class TestParseTrees extends BaseTest {
 	                  "} ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s", "x", false);
 		assertEquals("[a, s]\n(a x)\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -41,7 +45,7 @@ public class TestParseTrees extends BaseTest {
 	                  "  ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s", "xy", false);
 		assertEquals("(a x y)\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -60,7 +64,7 @@ public class TestParseTrees extends BaseTest {
 	                  "  ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s", "y", false);
 		assertEquals("(a y)\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -79,7 +83,7 @@ public class TestParseTrees extends BaseTest {
 	                  "  ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s", "xyyxyxz", false);
 		assertEquals("(a x y y x y x z)\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -100,7 +104,7 @@ public class TestParseTrees extends BaseTest {
 	                  "  ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s", "yx", false);
 		assertEquals("(a (b y) x)\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -121,7 +125,7 @@ public class TestParseTrees extends BaseTest {
 	                  "  ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s", "xzy", false);
 		assertEquals("(a x z y)\n", found);
-		assertEquals("line 1:1 extraneous input 'z' expecting 'y'\n", this.stderrDuringParse);
+		assertEquals("line 1:1 extraneous input 'z' expecting 'y'\n", stderrDuringParse());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -143,7 +147,7 @@ public class TestParseTrees extends BaseTest {
 	                  " ";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s", "z", false);
 		assertEquals("(a z)\n", found);
-		assertEquals("line 1:0 mismatched input 'z' expecting {'x', 'y'}\n", this.stderrDuringParse);
+		assertEquals("line 1:0 mismatched input 'z' expecting {'x', 'y'}\n", stderrDuringParse());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -164,7 +168,7 @@ public class TestParseTrees extends BaseTest {
 	                  "  ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s", "xzyy!", false);
 		assertEquals("(a x z y y !)\n", found);
-		assertEquals("line 1:1 extraneous input 'z' expecting {'y', '!'}\n", this.stderrDuringParse);
+		assertEquals("line 1:1 extraneous input 'z' expecting {'y', '!'}\n", stderrDuringParse());
 	}
 
 

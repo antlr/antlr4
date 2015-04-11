@@ -31,12 +31,13 @@
 package org.antlr.v4.test.tool;
 
 import org.antlr.v4.parse.ScopeParser;
+import org.antlr.v4.test.AntlrTestcase;
 import org.antlr.v4.tool.Grammar;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class TestScopeParsing extends BaseTest {
+public class TestScopeParsing extends AntlrTestcase {
     String[] argPairs = {
         "",                                 "{}",
         " ",                                "{}",

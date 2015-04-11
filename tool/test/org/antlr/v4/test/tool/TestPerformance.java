@@ -30,40 +30,16 @@
 
 package org.antlr.v4.test.tool;
 
-import org.antlr.v4.runtime.ANTLRFileStream;
-import org.antlr.v4.runtime.ANTLRInputStream;
-import org.antlr.v4.runtime.BailErrorStrategy;
-import org.antlr.v4.runtime.BaseErrorListener;
-import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.DefaultErrorStrategy;
-import org.antlr.v4.runtime.DiagnosticErrorListener;
-import org.antlr.v4.runtime.Lexer;
-import org.antlr.v4.runtime.Parser;
-import org.antlr.v4.runtime.ParserInterpreter;
-import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.RecognitionException;
-import org.antlr.v4.runtime.Recognizer;
-import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.TokenSource;
-import org.antlr.v4.runtime.TokenStream;
-import org.antlr.v4.runtime.atn.ATN;
-import org.antlr.v4.runtime.atn.ATNConfig;
-import org.antlr.v4.runtime.atn.ATNConfigSet;
-import org.antlr.v4.runtime.atn.LexerATNSimulator;
-import org.antlr.v4.runtime.atn.ParserATNSimulator;
-import org.antlr.v4.runtime.atn.PredictionContextCache;
-import org.antlr.v4.runtime.atn.PredictionMode;
+import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.dfa.DFAState;
+import org.antlr.v4.runtime.misc.IntegerList;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.misc.Utils;
-import org.antlr.v4.runtime.tree.ErrorNode;
-import org.antlr.v4.runtime.tree.ParseTree;
-import org.antlr.v4.runtime.tree.ParseTreeListener;
-import org.antlr.v4.runtime.tree.ParseTreeWalker;
-import org.antlr.v4.runtime.tree.TerminalNode;
+import org.antlr.v4.runtime.tree.*;
+import org.antlr.v4.test.AntlrTestcase;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -78,22 +54,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.BitSet;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.TimeUnit;
+import java.util.*;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicIntegerArray;
 import java.util.logging.Level;
@@ -102,11 +64,12 @@ import java.util.zip.CRC32;
 import java.util.zip.Checksum;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.Matchers.empty;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-@SuppressWarnings("unused")
-public class TestPerformance extends BaseTest {
+@SuppressWarnings({"ConstantConditions", "PointlessBooleanExpression"})
+public class TestPerformance extends AntlrTestcase {
     /**
      * Parse all java files under this package within the JDK_SOURCE_ROOT
      * (environment variable or property defined on the Java command line).
@@ -697,12 +660,6 @@ public class TestPerformance extends BaseTest {
 		return sourceRoot;
 	}
 
-    @Override
-    protected void eraseTempDir() {
-        if (DELETE_TEMP_FILES) {
-            super.eraseTempDir();
-        }
-    }
 
     public static String getOptionsDescription(String topPackage) {
         StringBuilder builder = new StringBuilder();
@@ -717,20 +674,20 @@ public class TestPerformance extends BaseTest {
         builder.append(", Grammar=").append(USE_LR_GRAMMAR ? "LR" : "Standard");
         builder.append(", ForceAtn=").append(FORCE_ATN);
 
-        builder.append(newline);
+        builder.append(NEWLINE);
 
         builder.append("Op=Lex").append(RUN_PARSER ? "+Parse" : " only");
         builder.append(", Strategy=").append(BAIL_ON_ERROR ? BailErrorStrategy.class.getSimpleName() : DefaultErrorStrategy.class.getSimpleName());
         builder.append(", BuildParseTree=").append(BUILD_PARSE_TREES);
         builder.append(", WalkBlankListener=").append(BLANK_LISTENER);
 
-        builder.append(newline);
+        builder.append(NEWLINE);
 
         builder.append("Lexer=").append(REUSE_LEXER ? "setInputStream" : "newInstance");
         builder.append(", Parser=").append(REUSE_PARSER ? "setInputStream" : "newInstance");
         builder.append(", AfterPass=").append(CLEAR_DFA ? "newInstance" : "setInputStream");
 
-        builder.append(newline);
+        builder.append(NEWLINE);
 
         return builder.toString();
     }
@@ -898,8 +855,7 @@ public class TestPerformance extends BaseTest {
 				int configs = 0;
 				Set<ATNConfig> uniqueConfigs = new HashSet<ATNConfig>();
 
-				for (int i = 0; i < modeToDFA.length; i++) {
-					DFA dfa = modeToDFA[i];
+				for (DFA dfa : modeToDFA) {
 					if (dfa == null) {
 						continue;
 					}
@@ -945,18 +901,17 @@ public class TestPerformance extends BaseTest {
 				int configs = 0;
 				Set<ATNConfig> uniqueConfigs = new HashSet<ATNConfig>();
 
-                for (int i = 0; i < decisionToDFA.length; i++) {
-                    DFA dfa = decisionToDFA[i];
-                    if (dfa == null) {
-                        continue;
-                    }
+				for (DFA dfa : decisionToDFA) {
+					if (dfa == null) {
+						continue;
+					}
 
-                    states += dfa.states.size();
+					states += dfa.states.size();
 					for (DFAState state : dfa.states.values()) {
 						configs += state.configs.size();
 						uniqueConfigs.addAll(state.configs);
 					}
-                }
+				}
 
                 System.out.format("There are %d parser DFAState instances, %d configs (%d unique).%n", states, configs, uniqueConfigs.size());
 
@@ -1041,40 +996,39 @@ public class TestPerformance extends BaseTest {
             int globalConfigCount = 0;
             int[] contextsInDFAState = new int[0];
 
-            for (int i = 0; i < decisionToDFA.length; i++) {
-                DFA dfa = decisionToDFA[i];
-                if (dfa == null) {
-                    continue;
-                }
+			for (DFA dfa : decisionToDFA) {
+				if (dfa == null) {
+					continue;
+				}
 
-                if (SHOW_CONFIG_STATS) {
-                    for (DFAState state : dfa.states.keySet()) {
-                        if (state.configs.size() >= contextsInDFAState.length) {
-                            contextsInDFAState = Arrays.copyOf(contextsInDFAState, state.configs.size() + 1);
-                        }
+				if (SHOW_CONFIG_STATS) {
+					for (DFAState state : dfa.states.keySet()) {
+						if (state.configs.size() >= contextsInDFAState.length) {
+							contextsInDFAState = Arrays.copyOf(contextsInDFAState, state.configs.size() + 1);
+						}
 
-                        if (state.isAcceptState) {
-                            boolean hasGlobal = false;
-                            for (ATNConfig config : state.configs) {
-                                if (config.reachesIntoOuterContext > 0) {
-                                    globalConfigCount++;
-                                    hasGlobal = true;
-                                } else {
-                                    localConfigCount++;
-                                }
-                            }
+						if (state.isAcceptState) {
+							boolean hasGlobal = false;
+							for (ATNConfig config : state.configs) {
+								if (config.reachesIntoOuterContext > 0) {
+									globalConfigCount++;
+									hasGlobal = true;
+								} else {
+									localConfigCount++;
+								}
+							}
 
-                            if (hasGlobal) {
-                                globalDfaCount++;
-                            } else {
-                                localDfaCount++;
-                            }
-                        }
+							if (hasGlobal) {
+								globalDfaCount++;
+							} else {
+								localDfaCount++;
+							}
+						}
 
-                        contextsInDFAState[state.configs.size()]++;
-                    }
-                }
-            }
+						contextsInDFAState[state.configs.size()]++;
+					}
+				}
+			}
 
             if (SHOW_CONFIG_STATS && currentPass == 0) {
                 System.out.format("  DFA accept states: %d total, %d with only local context, %d with a global context%n", localDfaCount + globalDfaCount, localDfaCount, globalDfaCount);
@@ -1099,17 +1053,16 @@ public class TestPerformance extends BaseTest {
 
 	private static long sum(long[] array) {
 		long result = 0;
-		for (int i = 0; i < array.length; i++) {
-			result += array[i];
+		for (long anArray : array) {
+			result += anArray;
 		}
-
 		return result;
 	}
 
     protected void compileJavaParser(boolean leftRecursive) throws IOException {
         String grammarFileName = "Java.g4";
         String sourceName = leftRecursive ? "Java-LR.g4" : "Java.g4";
-        String body = load(sourceName, null);
+        String body = load(TestPerformance.class.getResource(sourceName), null);
         List<String> extraOptions = new ArrayList<String>();
 		extraOptions.add("-Werror");
         if (FORCE_ATN) {
@@ -1126,7 +1079,7 @@ public class TestPerformance extends BaseTest {
 		}
 		extraOptions.add("-visitor");
         String[] extraOptionsArray = extraOptions.toArray(new String[extraOptions.size()]);
-        boolean success = rawGenerateAndBuildRecognizer(grammarFileName, body, "JavaParser", "JavaLexer", true, extraOptionsArray);
+        boolean success = generateAndBuildRecognizer(grammarFileName, body, "JavaParser", "JavaLexer", true, extraOptionsArray);
         assertTrue(success);
     }
 
@@ -1153,7 +1106,7 @@ public class TestPerformance extends BaseTest {
 
     protected ParserFactory getParserFactory(String lexerName, String parserName, String listenerName, final String entryPoint) {
         try {
-            ClassLoader loader = new URLClassLoader(new URL[] { new File(tmpdir).toURI().toURL() }, ClassLoader.getSystemClassLoader());
+            ClassLoader loader = new URLClassLoader(new URL[] { new File(tmpdir()).toURI().toURL() }, ClassLoader.getSystemClassLoader());
             final Class<? extends Lexer> lexerClass = loader.loadClass(lexerName).asSubclass(Lexer.class);
             final Class<? extends Parser> parserClass = loader.loadClass(parserName).asSubclass(Parser.class);
             final Class<? extends ParseTreeListener> listenerClass = loader.loadClass(listenerName).asSubclass(ParseTreeListener.class);
@@ -1982,7 +1935,7 @@ public class TestPerformance extends BaseTest {
 		String found = execParser("Expr.g4", grammar, "ExprParser", "ExprLexer", "program",
 								  input, false);
 		Assert.assertEquals("", found);
-		Assert.assertEquals(null, stderrDuringParse);
+		Assert.assertEquals(null, stderrDuringParse());
 
 		List<String> inputs = new ArrayList<String>();
 		for (int i = 0; i < 10; i++) {
@@ -1993,7 +1946,7 @@ public class TestPerformance extends BaseTest {
 		found = execParser("Expr.g4", grammar, "ExprParser", "ExprLexer", "program",
 								  input, false);
 		Assert.assertEquals("", found);
-		Assert.assertEquals(null, stderrDuringParse);
+		Assert.assertEquals(null, stderrDuringParse());
 	}
 
 	@Test(timeout = 20000)
@@ -2005,8 +1958,8 @@ public class TestPerformance extends BaseTest {
 			"\n" +
 			"rule_%d_%d : EOF;\n";
 
-		System.out.println("dir "+tmpdir);
-		mkdir(tmpdir);
+		System.out.println("dir "+tmpdir());
+		mkdir(tmpdir());
 
 		long startTime = System.nanoTime();
 
@@ -2014,17 +1967,248 @@ public class TestPerformance extends BaseTest {
 		for (int level = 0; level < levels; level++) {
 			String leafPrefix = level == levels - 1 ? "//" : "";
 			String grammar1 = String.format(grammarFormat, level, 1, leafPrefix, level + 1, level + 1, level, 1);
-			writeFile(tmpdir, "Level_" + level + "_1.g4", grammar1);
+			writeFile(tmpdir(), "Level_" + level + "_1.g4", grammar1);
 			if (level > 0) {
 				String grammar2 = String.format(grammarFormat, level, 2, leafPrefix, level + 1, level + 1, level, 1);
-				writeFile(tmpdir, "Level_" + level + "_2.g4", grammar2);
+				writeFile(tmpdir(), "Level_" + level + "_2.g4", grammar2);
 			}
 		}
 
-		ErrorQueue equeue = antlr("Level_0_1.g4", false);
-		Assert.assertTrue(equeue.errors.isEmpty());
+		org.antlr.v4.test.ErrorQueue equeue = antlr("Level_0_1.g4", false);
+		assertThat(equeue.errors, empty());
 
 		long endTime = System.nanoTime();
 		System.out.format("%s milliseconds.%n", (endTime - startTime) / 1000000.0);
 	}
+
+	/**
+     *
+     * @author Sam Harwell
+     */
+     static class JavaUnicodeInputStream implements CharStream {
+
+        private final CharStream source;
+        private final IntegerList escapeIndexes = new IntegerList();
+        private final IntegerList escapeCharacters = new IntegerList();
+        private final IntegerList escapeIndirectionLevels = new IntegerList();
+
+        private int escapeListIndex;
+        private int range;
+        private int slashCount;
+
+        private int la1;
+
+        public JavaUnicodeInputStream(CharStream source) {
+            if (source == null) {
+                throw new NullPointerException("source");
+            }
+
+            this.source = source;
+            this.la1 = source.LA(1);
+        }
+
+        @Override
+        public int size() {
+            return source.size();
+        }
+
+        @Override
+        public int index() {
+            return source.index();
+        }
+
+        @Override
+        public String getSourceName() {
+            return source.getSourceName();
+        }
+
+        @Override
+        public String getText(Interval interval) {
+            return source.getText(interval);
+        }
+
+        @Override
+        public void consume() {
+            if (la1 != '\\') {
+                source.consume();
+                la1 = source.LA(1);
+                range = Math.max(range, source.index());
+                slashCount = 0;
+                return;
+            }
+
+            // make sure the next character has been processed
+            this.LA(1);
+
+            if (escapeListIndex >= escapeIndexes.size() || escapeIndexes.get(escapeListIndex) != index()) {
+                source.consume();
+                slashCount++;
+            }
+            else {
+                int indirectionLevel = escapeIndirectionLevels.get(escapeListIndex);
+                for (int i = 0; i < 6 + indirectionLevel; i++) {
+                    source.consume();
+                }
+
+                escapeListIndex++;
+                slashCount = 0;
+            }
+
+            la1 = source.LA(1);
+            assert range >= index();
+        }
+
+        @Override
+        public int LA(int i) {
+            if (i == 1 && la1 != '\\') {
+                return la1;
+            }
+
+            if (i <= 0) {
+                int desiredIndex = index() + i;
+                for (int j = escapeListIndex - 1; j >= 0; j--) {
+                    if (escapeIndexes.get(j) + 6 + escapeIndirectionLevels.get(j) > desiredIndex) {
+                        desiredIndex -= 5 + escapeIndirectionLevels.get(j);
+                    }
+
+                    if (escapeIndexes.get(j) == desiredIndex) {
+                        return escapeCharacters.get(j);
+                    }
+                }
+
+                return source.LA(desiredIndex - index());
+            }
+            else {
+                int desiredIndex = index() + i - 1;
+                for (int j = escapeListIndex; j < escapeIndexes.size(); j++) {
+                    if (escapeIndexes.get(j) == desiredIndex) {
+                        return escapeCharacters.get(j);
+                    }
+                    else if (escapeIndexes.get(j) < desiredIndex) {
+                        desiredIndex += 5 + escapeIndirectionLevels.get(j);
+                    }
+                    else {
+                        return source.LA(desiredIndex - index() + 1);
+                    }
+                }
+
+                int[] currentIndex = { index() };
+                int[] slashCountPtr = { slashCount };
+                int[] indirectionLevelPtr = { 0 };
+                for (int j = 0; j < i; j++) {
+                    int previousIndex = currentIndex[0];
+                    int c = readCharAt(currentIndex, slashCountPtr, indirectionLevelPtr);
+                    if (currentIndex[0] > range) {
+                        if (currentIndex[0] - previousIndex > 1) {
+                            escapeIndexes.add(previousIndex);
+                            escapeCharacters.add(c);
+                            escapeIndirectionLevels.add(indirectionLevelPtr[0]);
+                        }
+
+                        range = currentIndex[0];
+                    }
+
+                    if (j == i - 1) {
+                        return c;
+                    }
+                }
+
+                throw new IllegalStateException("shouldn't be reachable");
+            }
+        }
+
+        @Override
+        public int mark() {
+            return source.mark();
+        }
+
+        @Override
+        public void release(int marker) {
+            source.release(marker);
+        }
+
+        @Override
+        public void seek(int index) {
+            if (index > range) {
+                throw new UnsupportedOperationException();
+            }
+
+            source.seek(index);
+            la1 = source.LA(1);
+
+            slashCount = 0;
+            while (source.LA(-slashCount - 1) == '\\') {
+                slashCount++;
+            }
+
+            escapeListIndex = escapeIndexes.binarySearch(source.index());
+            if (escapeListIndex < 0) {
+                escapeListIndex = -escapeListIndex - 1;
+            }
+        }
+
+        private static boolean isHexDigit(int c) {
+            return c >= '0' && c <= '9'
+                || c >= 'a' && c <= 'f'
+                || c >= 'A' && c <= 'F';
+        }
+
+        private static int hexValue(int c) {
+            if (c >= '0' && c <= '9') {
+                return c - '0';
+            }
+
+            if (c >= 'a' && c <= 'f') {
+                return c - 'a' + 10;
+            }
+
+            if (c >= 'A' && c <= 'F') {
+                return c - 'A' + 10;
+            }
+
+            throw new IllegalArgumentException("c");
+        }
+
+        private int readCharAt(int[] nextIndexPtr, int[] slashCountPtr, int[] indirectionLevelPtr) {
+            assert nextIndexPtr != null && nextIndexPtr.length == 1;
+            assert slashCountPtr != null && slashCountPtr.length == 1;
+            assert indirectionLevelPtr != null && indirectionLevelPtr.length == 1;
+
+            boolean blockUnicodeEscape = (slashCountPtr[0] % 2) != 0;
+
+            int c0 = source.LA(nextIndexPtr[0] - index() + 1);
+            if (c0 == '\\') {
+                slashCountPtr[0]++;
+
+                if (!blockUnicodeEscape) {
+                    int c1 = source.LA(nextIndexPtr[0] - index() + 2);
+                    if (c1 == 'u') {
+                        int c2 = source.LA(nextIndexPtr[0] - index() + 3);
+                        indirectionLevelPtr[0] = 0;
+                        while (c2 == 'u') {
+                            indirectionLevelPtr[0]++;
+                            c2 = source.LA(nextIndexPtr[0] - index() + 3 + indirectionLevelPtr[0]);
+                        }
+
+                        int c3 = source.LA(nextIndexPtr[0] - index() + 4 + indirectionLevelPtr[0]);
+                        int c4 = source.LA(nextIndexPtr[0] - index() + 5 + indirectionLevelPtr[0]);
+                        int c5 = source.LA(nextIndexPtr[0] - index() + 6 + indirectionLevelPtr[0]);
+                        if (isHexDigit(c2) && isHexDigit(c3) && isHexDigit(c4) && isHexDigit(c5)) {
+                            int value = hexValue(c2);
+                            value = (value << 4) + hexValue(c3);
+                            value = (value << 4) + hexValue(c4);
+                            value = (value << 4) + hexValue(c5);
+
+                            nextIndexPtr[0] += 6 + indirectionLevelPtr[0];
+                            slashCountPtr[0] = 0;
+                            return value;
+                        }
+                    }
+                }
+            }
+
+            nextIndexPtr[0]++;
+            return c0;
+        }
+    }
 }

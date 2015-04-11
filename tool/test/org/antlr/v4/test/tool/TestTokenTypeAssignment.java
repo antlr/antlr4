@@ -31,6 +31,7 @@
 package org.antlr.v4.test.tool;
 
 import org.antlr.v4.runtime.Token;
+import org.antlr.v4.test.AntlrTestcase;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LexerGrammar;
 import org.junit.Test;
@@ -40,11 +41,9 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
-public class TestTokenTypeAssignment extends BaseTest {
+public class TestTokenTypeAssignment extends AntlrTestcase {
 
 	@Test
 		public void testParserSimpleTokens() throws Exception {

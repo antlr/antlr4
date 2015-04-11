@@ -36,6 +36,8 @@ import org.antlr.v4.automata.ParserATNFactory;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNState;
+import org.antlr.v4.test.AntlrTestcase;
+import org.antlr.v4.test.ErrorQueue;
 import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LexerGrammar;
@@ -49,10 +51,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.hasSize;
+import static org.junit.Assert.*;
 
-public class TestATNConstruction extends BaseTest {
+public class TestATNConstruction extends AntlrTestcase {
 	@Test
 	public void testA() throws Exception {
 		Grammar g = new Grammar(
@@ -443,12 +446,15 @@ public class TestATNConstruction extends BaseTest {
 			Tool tool = new Tool();
 			tool.removeListeners();
 			tool.addListener(errorQueue);
+			assertThat(errorQueue.all, empty());
+			assertThat(errorQueue.infos, empty());
 			assertEquals(0, errorQueue.size());
 			GrammarRootAST grammarRootAST = tool.parseGrammarFromString(gstr);
-			assertEquals(0, errorQueue.size());
+			assertThat(errorQueue.all, empty());
+			assertThat(errorQueue.infos, empty());
 			Grammar g = tool.createGrammar(grammarRootAST);
-			assertEquals(0, errorQueue.size());
-			g.fileName = "<string>";
+			assertThat(errorQueue.all, empty());
+			assertThat(errorQueue.infos, empty());			g.fileName = "<string>";
 			tool.process(g, false);
 		}
 		catch (Exception e) {
@@ -456,7 +462,7 @@ public class TestATNConstruction extends BaseTest {
 			e.printStackTrace();
 		}
 		System.out.println(errorQueue);
-		assertEquals(1, errorQueue.errors.size());
+		assertThat(errorQueue.errors, hasSize(1));
 		assertEquals(ErrorType.PARSER_RULE_REF_IN_LEXER_RULE, errorQueue.errors.get(0).getErrorType());
 		assertEquals("[a, A]", Arrays.toString(errorQueue.errors.get(0).getArgs()));
 		assertTrue(!threwException);

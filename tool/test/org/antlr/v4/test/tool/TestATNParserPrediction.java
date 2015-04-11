@@ -41,6 +41,9 @@ import org.antlr.v4.runtime.atn.LexerATNSimulator;
 import org.antlr.v4.runtime.atn.PredictionContextCache;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.IntegerList;
+import org.antlr.v4.test.AntlrTestcase;
+import org.antlr.v4.test.IntTokenStream;
+import org.antlr.v4.test.ParserInterpreterForTesting;
 import org.antlr.v4.tool.DOTGenerator;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LexerGrammar;
@@ -53,7 +56,7 @@ import static org.junit.Assert.assertEquals;
 	// NOTICE: TOKENS IN LEXER, PARSER MUST BE SAME OR TOKEN TYPE MISMATCH
 	// NOTICE: TOKENS IN LEXER, PARSER MUST BE SAME OR TOKEN TYPE MISMATCH
 
-public class TestATNParserPrediction extends BaseTest {
+public class TestATNParserPrediction extends AntlrTestcase {
 	@Test public void testAorB() throws Exception {
 		LexerGrammar lg = new LexerGrammar(
 			"lexer grammar L;\n" +

@@ -33,13 +33,12 @@ package org.antlr.v4.test.tool;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.IntervalSet;
+import org.antlr.v4.test.AntlrTestcase;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
-public class TestIntervalSet extends BaseTest {
+public class TestIntervalSet extends AntlrTestcase {
 
     /** Public default constructor used by TestRig */
     public TestIntervalSet() {

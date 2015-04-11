@@ -34,6 +34,7 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.LexerInterpreter;
 import org.antlr.v4.runtime.TokenStreamRewriter;
 import org.antlr.v4.runtime.misc.Interval;
+import org.antlr.v4.test.AntlrTestcase;
 import org.antlr.v4.tool.LexerGrammar;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -41,7 +42,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class TestTokenStreamRewriter extends BaseTest {
+public class TestTokenStreamRewriter extends AntlrTestcase {
 
 	/** Public default constructor used by TestRig */
 	public TestTokenStreamRewriter() {

@@ -30,13 +30,9 @@
 
 package org.antlr.v4.test.tool;
 
-import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.CommonTokenFactory;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.IntStream;
-import org.antlr.v4.runtime.LexerInterpreter;
-import org.antlr.v4.runtime.UnbufferedCharStream;
+import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.Interval;
+import org.antlr.v4.test.AntlrTestcase;
 import org.antlr.v4.tool.LexerGrammar;
 import org.junit.Test;
 
@@ -45,8 +41,7 @@ import java.io.StringReader;
 
 import static org.junit.Assert.assertEquals;
 
-@SuppressWarnings("unused")
-public class TestUnbufferedCharStream extends BaseTest {
+public class TestUnbufferedCharStream extends AntlrTestcase {
 	@Test public void testNoChar() throws Exception {
 		CharStream input = createStream("");
 		assertEquals(IntStream.EOF, input.LA(1));

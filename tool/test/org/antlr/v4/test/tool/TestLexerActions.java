@@ -1,10 +1,11 @@
 package org.antlr.v4.test.tool;
 
+import org.antlr.v4.test.AntlrTestcase;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class TestLexerActions extends BaseTest {
+public class TestLexerActions extends AntlrTestcase {
 	// ----- ACTIONS --------------------------------------------------------
 
 	@Test public void testActionExecutedInDFA() throws Exception {

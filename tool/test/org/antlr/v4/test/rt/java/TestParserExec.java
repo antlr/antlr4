@@ -2,8 +2,12 @@ package org.antlr.v4.test.rt.java;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
+import static org.hamcrest.Matchers.*;
 
-public class TestParserExec extends BaseTest {
+
+import org.antlr.v4.test.AntlrTestcase;
+
+public class TestParserExec extends AntlrTestcase {
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
@@ -16,7 +20,7 @@ public class TestParserExec extends BaseTest {
 	                  "WS : (' '|'\\n') -> skip ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a", "abc 34;", false);
 		assertEquals("", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -31,7 +35,7 @@ public class TestParserExec extends BaseTest {
 	                  "WS : (' '|'\\n') -> skip ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a", "abc 34;", false);
 		assertEquals("", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -48,7 +52,7 @@ public class TestParserExec extends BaseTest {
 	                  "WS : (' '|'\\n') -> skip ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a", "34", false);
 		assertEquals("alt 2\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -63,7 +67,7 @@ public class TestParserExec extends BaseTest {
 	                  "WS : (' '|'\\n') -> skip;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a", "abc 34", false);
 		assertEquals("abc34\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -77,7 +81,7 @@ public class TestParserExec extends BaseTest {
 	                  "WS : (' '|'\\n') -> skip;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a", "a b c", false);
 		assertEquals("abc\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -91,7 +95,7 @@ public class TestParserExec extends BaseTest {
 	                  "WS : (' '|'\\n') -> skip;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a", "a b c", false);
 		assertEquals("abc\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -107,7 +111,7 @@ public class TestParserExec extends BaseTest {
 	                  "WS : (' '|'\\n') -> channel(HIDDEN);";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "start", "if y if y x else x", false);
 		assertEquals("if y x else x\nif y if y x else x\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -123,7 +127,7 @@ public class TestParserExec extends BaseTest {
 	                  "WS : (' '|'\\n') -> channel(HIDDEN);";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "start", "if y if y x else x", false);
 		assertEquals("if y x else x\nif y if y x else x\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -139,7 +143,7 @@ public class TestParserExec extends BaseTest {
 	                  "WS : (' '|'\\n') -> channel(HIDDEN);";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "start", "if y if y x else x", false);
 		assertEquals("if y x\nif y if y x else x\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -155,7 +159,7 @@ public class TestParserExec extends BaseTest {
 	                  "WS : (' '|'\\n') -> channel(HIDDEN);";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "start", "if y if y x else x", false);
 		assertEquals("if y x\nif y if y x else x\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -174,7 +178,7 @@ public class TestParserExec extends BaseTest {
 	public void testAStar_1() throws Exception {
 		String found = testAStar("");
 		assertEquals("\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -182,7 +186,7 @@ public class TestParserExec extends BaseTest {
 	public void testAStar_2() throws Exception {
 		String found = testAStar("a b c");
 		assertEquals("abc\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -202,7 +206,7 @@ public class TestParserExec extends BaseTest {
 	public void testLL1OptionalBlock_1() throws Exception {
 		String found = testLL1OptionalBlock("");
 		assertEquals("\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -210,7 +214,7 @@ public class TestParserExec extends BaseTest {
 	public void testLL1OptionalBlock_2() throws Exception {
 		String found = testLL1OptionalBlock("a");
 		assertEquals("a\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -229,7 +233,7 @@ public class TestParserExec extends BaseTest {
 	public void testAorAStar_1() throws Exception {
 		String found = testAorAStar("");
 		assertEquals("\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -237,7 +241,7 @@ public class TestParserExec extends BaseTest {
 	public void testAorAStar_2() throws Exception {
 		String found = testAorAStar("a b c");
 		assertEquals("abc\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -253,7 +257,7 @@ public class TestParserExec extends BaseTest {
 	                  "WS : (' '|'\\n') -> skip ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a", "a 34 c", false);
 		assertEquals("a34c\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -274,7 +278,7 @@ public class TestParserExec extends BaseTest {
 	public void testAorBStar_1() throws Exception {
 		String found = testAorBStar("");
 		assertEquals("\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -282,7 +286,7 @@ public class TestParserExec extends BaseTest {
 	public void testAorBStar_2() throws Exception {
 		String found = testAorBStar("a 34 c");
 		assertEquals("a34c\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -299,7 +303,7 @@ public class TestParserExec extends BaseTest {
 	public void testOptional_1() throws Exception {
 		String found = testOptional("x");
 		assertEquals("", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -307,7 +311,7 @@ public class TestParserExec extends BaseTest {
 	public void testOptional_2() throws Exception {
 		String found = testOptional("if x");
 		assertEquals("", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -315,7 +319,7 @@ public class TestParserExec extends BaseTest {
 	public void testOptional_3() throws Exception {
 		String found = testOptional("if x else x");
 		assertEquals("", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -323,7 +327,7 @@ public class TestParserExec extends BaseTest {
 	public void testOptional_4() throws Exception {
 		String found = testOptional("if if x else x");
 		assertEquals("", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -338,7 +342,7 @@ public class TestParserExec extends BaseTest {
 	                  "WS : [ \\n\\t]+ -> skip;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s", "if x if x a else b", false);
 		assertEquals("", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -354,7 +358,7 @@ public class TestParserExec extends BaseTest {
 	                  "WS : (' '|'\\n') -> skip ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "start", "xy", false);
 		assertEquals("x\ny\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -375,7 +379,7 @@ public class TestParserExec extends BaseTest {
 	                  "WS      : [ \\r\\t\\n]+ -> skip;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "file_", "a", false);
 		assertEquals("(file_ (item a) <EOF>)\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -403,7 +407,7 @@ public class TestParserExec extends BaseTest {
 	                  "elseStatement : 'a' ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "expression", "a", false);
 		assertEquals("", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -413,7 +417,7 @@ public class TestParserExec extends BaseTest {
 	                  "prog : ('x' | 'x' 'y') EOF EOF;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "prog", "x", false);
 		assertEquals("", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -424,7 +428,7 @@ public class TestParserExec extends BaseTest {
 	                  "stat : 'x' ('y' | EOF)*?;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "prog", "x", false);
 		assertEquals("", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -442,7 +446,7 @@ public class TestParserExec extends BaseTest {
 	public void testReferenceToATN_1() throws Exception {
 		String found = testReferenceToATN("");
 		assertEquals("\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -450,7 +454,7 @@ public class TestParserExec extends BaseTest {
 	public void testReferenceToATN_2() throws Exception {
 		String found = testReferenceToATN("a 34 c");
 		assertEquals("a34c\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
@@ -468,7 +472,7 @@ public class TestParserExec extends BaseTest {
 	                  "WS : (' '|'\\n') -> skip ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a", "abc", false);
 		assertEquals("valid\n", found);
-		assertNull(this.stderrDuringParse);
+		assertThat(stderrDuringParse(), isEmptyOrNullString());
 	}
 
 

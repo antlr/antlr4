@@ -31,10 +31,11 @@
 package org.antlr.v4.test.tool;
 
 import org.antlr.v4.Tool;
+import org.antlr.v4.test.AntlrTestcase;
 import org.antlr.v4.tool.ErrorType;
 import org.junit.Test;
 
-public class TestToolSyntaxErrors extends BaseTest {
+public class TestToolSyntaxErrors extends AntlrTestcase {
     static String[] A = {
         // INPUT
         "grammar A;\n" +

@@ -7,16 +7,15 @@ import org.antlr.v4.runtime.misc.Pair;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.antlr.v4.runtime.tree.xpath.XPath;
+import org.antlr.v4.test.AntlrTestcase;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
-public class TestXPath extends BaseTest {
+public class TestXPath extends AntlrTestcase {
 	public static final String grammar =
 		"grammar Expr;\n" +
 		"prog:   func+ ;\n" +
@@ -53,8 +52,8 @@ public class TestXPath extends BaseTest {
 
 	@Test public void testValidPaths() throws Exception {
 		boolean ok =
-			rawGenerateAndBuildRecognizer("Expr.g4", grammar, "ExprParser",
-										  "ExprLexer", false);
+			generateAndBuildRecognizer("Expr.g4", grammar, "ExprParser",
+					"ExprLexer", false);
 		assertTrue(ok);
 
 		String xpath[] = {
@@ -113,8 +112,8 @@ public class TestXPath extends BaseTest {
 
 	@Test public void testWeirdChar() throws Exception {
 		boolean ok =
-			rawGenerateAndBuildRecognizer("Expr.g4", grammar, "ExprParser",
-										  "ExprLexer", false);
+			generateAndBuildRecognizer("Expr.g4", grammar, "ExprParser",
+					"ExprLexer", false);
 		assertTrue(ok);
 
 		String path = "&";
@@ -125,8 +124,8 @@ public class TestXPath extends BaseTest {
 
 	@Test public void testWeirdChar2() throws Exception {
 		boolean ok =
-			rawGenerateAndBuildRecognizer("Expr.g4", grammar, "ExprParser",
-										  "ExprLexer", false);
+				generateAndBuildRecognizer("Expr.g4", grammar, "ExprParser",
+						"ExprLexer", false);
 		assertTrue(ok);
 
 		String path = "//w&e/";
@@ -137,8 +136,8 @@ public class TestXPath extends BaseTest {
 
 	@Test public void testBadSyntax() throws Exception {
 		boolean ok =
-			rawGenerateAndBuildRecognizer("Expr.g4", grammar, "ExprParser",
-										  "ExprLexer", false);
+				generateAndBuildRecognizer("Expr.g4", grammar, "ExprParser",
+						"ExprLexer", false);
 		assertTrue(ok);
 
 		String path = "///";
@@ -149,8 +148,8 @@ public class TestXPath extends BaseTest {
 
 	@Test public void testMissingWordAtEnd() throws Exception {
 		boolean ok =
-			rawGenerateAndBuildRecognizer("Expr.g4", grammar, "ExprParser",
-										  "ExprLexer", false);
+				generateAndBuildRecognizer("Expr.g4", grammar, "ExprParser",
+						"ExprLexer", false);
 		assertTrue(ok);
 
 		String path = "//";
@@ -161,8 +160,8 @@ public class TestXPath extends BaseTest {
 
 	@Test public void testBadTokenName() throws Exception {
 		boolean ok =
-			rawGenerateAndBuildRecognizer("Expr.g4", grammar, "ExprParser",
-										  "ExprLexer", false);
+				generateAndBuildRecognizer("Expr.g4", grammar, "ExprParser",
+						"ExprLexer", false);
 		assertTrue(ok);
 
 		String path = "//Ick";
@@ -173,8 +172,8 @@ public class TestXPath extends BaseTest {
 
 	@Test public void testBadRuleName() throws Exception {
 		boolean ok =
-			rawGenerateAndBuildRecognizer("Expr.g4", grammar, "ExprParser",
-										  "ExprLexer", false);
+				generateAndBuildRecognizer("Expr.g4", grammar, "ExprParser",
+						"ExprLexer", false);
 		assertTrue(ok);
 
 		String path = "/prog/ick";

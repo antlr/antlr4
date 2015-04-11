@@ -8,11 +8,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Generator {
 	public static String antlrRoot = "."; // assume root is current working dir
@@ -29,17 +25,34 @@ public class Generator {
 	}
 
 	public static void main(String[] args) throws Exception {
-		if ( args.length==1 ) {
-			antlrRoot = args[0];
-		}
-		Map<String, File> configs = setup();
+        String[] targets = new String[0];
+        if (args.length >= 1) {
+            antlrRoot = args[0];
+            if (args.length > 1) {
+                targets = new String[args.length - 1];
+                System.arraycopy(args, 1, targets, 0, args.length - 1);
+            }
+
+        }
+        Map<String, File> configs = setup();
 		File source = configs.get("Source");
-		for(Map.Entry<String, File> item : configs.entrySet()) {
-			if( !"Source".equals(item.getKey()) ) {
-				Generator gen = new Generator(item.getKey(), source, item.getValue());
-				gen.generateTests();
-			}
-		}
+
+        if(targets.length>0){
+            for (String target : targets) {
+                File genDir = configs.get(target);
+                assert genDir!=null;
+                new Generator(target,source,genDir).generateTests();
+            }
+        }
+        else {
+            for (Map.Entry<String, File> item : configs.entrySet()) {
+                if (!"Source".equals(item.getKey())) {
+                    Generator gen = new Generator(item.getKey(), source, item.getValue());
+                    gen.generateTests();
+                }
+            }
+        }
+
 	}
 
 	private static Map<String, File> setup() throws Exception {
@@ -657,7 +670,7 @@ public class Generator {
 				"line 1:0 missing ID at '<EOF>'\n");
 		file.addParserTest(input, "ContextListGetters", "T", "s",
 				"abab",
-				"abab\n",
+				"abab",
 				null);
 		file.addParserTestsWithErrors(input, "DuplicatedLeftRecursiveCall", "T", "start",
 				"xx", "", null,
@@ -687,14 +700,14 @@ public class Generator {
 		file.addParserTests(input, "TokenGetters", "T", "s",
 				"1 2",
 				"(a 1 2)\n" +
-				"1 2 [1, 2]\n",
+				"1 2 [1, 2]",
 				"abc",
 				"(a abc)\n" +
 				"[@0,0:2='abc',<4>,1:0]\n");
 		file.addParserTests(input, "RuleGetters", "T", "s",
 				"1 2",
 				"(a (b 1) (b 2))\n" +
-				"1 2 1\n",
+				"1 2 1",
 				"abc",
 				"(a (b abc))\n" +
 				"abc\n");
@@ -710,7 +723,7 @@ public class Generator {
 		file.addParserTest(input, "LRWithLabels", "T", "s",
 				"1(2,3)",
 				"(e (e 1) ( (eList (e 2) , (e 3)) ))\n" +
-				"1\n" + "2\n" + "3\n" + "1 [13 6]\n",
+				"1\n" + "2\n" + "3\n" + "1 [13 6]",
 				null);
 		return file;
 	}
@@ -1322,29 +1335,29 @@ public class Generator {
 		file.importErrorQueue = true;
 		file.importGrammar = true;
 		file.addCompositeParserTest(input, "DelegatorInvokesDelegateRule", "M", "s", "b", "S.a\n", null, "S");
-		file.addCompositeParserTest(input, "BringInLiteralsFromDelegate", "M", "s", "=a", "S.a\n", null, "S");
+		file.addCompositeParserTest(input, "BringInLiteralsFromDelegate", "M", "s", "=a", "S.a", null, "S");
 		file.addCompositeParserTest(input, "DelegatorInvokesDelegateRuleWithArgs", "M", "s", "b", "S.a1000\n", null, "S");
-		file.addCompositeParserTest(input, "DelegatorInvokesDelegateRuleWithReturnStruct", "M", "s", "b", "S.ab\n", null, "S");
+		file.addCompositeParserTest(input, "DelegatorInvokesDelegateRuleWithReturnStruct", "M", "s", "b", "S.ab", null, "S");
 		file.addCompositeParserTest(input, "DelegatorAccessesDelegateMembers", "M", "s", "b", "foo\n", null, "S");
 		file.addCompositeParserTest(input, "DelegatorInvokesFirstVersionOfDelegateRule", "M", "s", "b", "S.a\n", null, "S", "T");
 		CompositeParserTestMethod ct = file.addCompositeParserTest(input, "DelegatesSeeSameTokenType", "M", "s", "aa", "S.x\nT.y\n", null, "S", "T");
-		ct.afterGrammar = "writeFile(tmpdir, \"M.g4\", grammar);\n" +
+		ct.afterGrammar = "writeFile(tmpdir(), \"M.g4\", grammar);\n" +
 			"ErrorQueue equeue = new ErrorQueue();\n" +
-			"Grammar g = new Grammar(tmpdir+\"/M.g4\", grammar, equeue);\n" +
+			"Grammar g = new Grammar(tmpdir()+\"/M.g4\", grammar, equeue);\n" +
 			"String expectedTokenIDToTypeMap = \"{EOF=-1, B=1, A=2, C=3, WS=4}\";\n" +
 			"String expectedStringLiteralToTypeMap = \"{'a'=2, 'b'=1, 'c'=3}\";\n" +
 			"String expectedTypeToTokenList = \"[B, A, C, WS]\";\n" +
 			"assertEquals(expectedTokenIDToTypeMap, g.tokenNameToTypeMap.toString());\n" +
-			"assertEquals(expectedStringLiteralToTypeMap, sort(g.stringLiteralToTypeMap).toString());\n" +
+			"assertEquals(expectedStringLiteralToTypeMap, org.antlr.v4.test.TestUtils.sort(g.stringLiteralToTypeMap).toString());\n" +
 			"assertEquals(expectedTypeToTokenList, realElements(g.typeToTokenList).toString());\n" +
 			"assertEquals(\"unexpected errors: \"+equeue, 0, equeue.errors.size());\n";
 		ct = file.addCompositeParserTest(input, "CombinedImportsCombined", "M", "s", "x 34 9", "S.x\n", null, "S");
-		ct.afterGrammar = "writeFile(tmpdir, \"M.g4\", grammar);\n" +
+		ct.afterGrammar = "writeFile(tmpdir(), \"M.g4\", grammar);\n" +
 				"ErrorQueue equeue = new ErrorQueue();\n" +
-				"new Grammar(tmpdir+\"/M.g4\", grammar, equeue);\n" +
+				"new Grammar(tmpdir()+\"/M.g4\", grammar, equeue);\n" +
 				"assertEquals(\"unexpected errors: \" + equeue, 0, equeue.errors.size());\n";
-		file.addCompositeParserTest(input, "DelegatorRuleOverridesDelegate", "M", "a", "c", "S.a\n", null, "S");
-		file.addCompositeParserTest(input, "DelegatorRuleOverridesLookaheadInDelegate", "M", "prog", "float x = 3;", "Decl: floatx=3;\n", null, "S");
+		file.addCompositeParserTest(input, "DelegatorRuleOverridesDelegate", "M", "a", "c", "S.a", null, "S");
+		file.addCompositeParserTest(input, "DelegatorRuleOverridesLookaheadInDelegate", "M", "prog", "float x = 3;", "Decl: floatx=3;", null, "S");
 		file.addCompositeParserTest(input, "DelegatorRuleOverridesDelegates", "M", "a", "c", "M.b\nS.a\n", null, "S", "T");
 		file.addCompositeParserTest(input, "KeywordVSIDOrder", "M", "a", "abc",
 				"M.A\n" +

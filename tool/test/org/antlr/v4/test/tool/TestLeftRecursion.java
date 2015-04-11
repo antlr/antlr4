@@ -30,11 +30,12 @@
 
 package org.antlr.v4.test.tool;
 
+import org.antlr.v4.test.AntlrTestcase;
 import org.antlr.v4.tool.ErrorType;
 import org.junit.Test;
 
 /** */
-public class TestLeftRecursion extends BaseTest {
+public class TestLeftRecursion extends AntlrTestcase {
 	protected boolean debug = false;
 
 	@Test public void testCheckForNonLeftRecursiveRule() throws Exception {
