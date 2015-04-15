@@ -11,3 +11,5 @@
 *.log
 
 *.zip
+
+src/test/*

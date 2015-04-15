@@ -172,8 +172,12 @@ SingletonPredictionContext.prototype.equals = function(other) {
 	} else if (this.hashString() !== other.hashString()) {
 		return false; // can't be same if hash is different
 	} else {
-		return this.returnState === other.returnState &&
-				this.parentCtx === other.parentCtx;
+		if(this.returnState !== other.returnState)
+            return false;
+        else if(this.parentCtx==null)
+            return other.parentCtx==null
+		else
+            return this.parentCtx.equals(other.parentCtx);
 	}
 };
 
