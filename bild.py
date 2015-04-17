@@ -5,7 +5,7 @@ from collections import OrderedDict
 import shutil
 
 """
-This script uses my experimental build tool http://www.bildtool.org
+This script uses my experimental build tool https://github.com/parrt/bild
 
 In order to build the complete ANTLR4 product with Java, CSharp, Python 2/3, and JavaScript
 targets, do the following from a UNIX command line.  Windows build using this script
