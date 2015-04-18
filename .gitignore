@@ -7,6 +7,7 @@
 
 .pydevproject
 /tmp-failed/
+*/node_modules/*
 
 *.log
 
