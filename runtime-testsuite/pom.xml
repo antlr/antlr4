@@ -1,57 +1,37 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-    <modelVersion>4.0.0</modelVersion>
-
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
     <groupId>org.antlr</groupId>
+    <artifactId>antlr4-master</artifactId>
     <version>4.5.1-SNAPSHOT</version>
-    <artifactId>runtime-testsuite</artifactId>
-    <packaging>jar</packaging>
+  </parent>
+  <artifactId>runtime-testsuite</artifactId>
+  <name>ANTLR 4 Runtime Test Generator</name>
+  <description>A collection of tests for ANTLR 4 Runtime libraries.</description>
 
-    <name>ANTLR 4 Runtime Test Generator</name>
-    <description>A collection of tests for ANTLR 4 Runtime libraries.</description>
-    <url>http://www.antlr.org</url>
+  <prerequisites>
+    <maven>3.0</maven>
+  </prerequisites>
 
-    <prerequisites>
-        <maven>3.0</maven>
-    </prerequisites>
+  <inceptionYear>2009</inceptionYear>
 
-    <inceptionYear>2009</inceptionYear>
+  <dependencies>
+    <dependency>
+      <groupId>org.antlr</groupId>
+      <artifactId>ST4</artifactId>
+      <version>4.0.8</version>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.11</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
 
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
-
-    <dependencies>
-
-        <dependency>
-            <groupId>org.antlr</groupId>
-            <artifactId>ST4</artifactId>
-            <version>4.0.8</version>
-        </dependency>
-
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.11</version>
-            <scope>test</scope>
-        </dependency>
-
-    </dependencies>
-    
-    <build>
-
-        <sourceDirectory>src</sourceDirectory>
-        <defaultGoal>install</defaultGoal>
-        <resources>
-            <resource>
-                <directory>resources</directory>
-            </resource>
-        </resources>
-
-        <plugins>
-
-        </plugins>
-
-    </build>
-
+  <build>
+    <sourceDirectory>src</sourceDirectory>
+  </build>
 </project>
