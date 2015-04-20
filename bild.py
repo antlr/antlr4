@@ -29,14 +29,15 @@ This script must be run from the main antlr4 directory.
 """
 
 # bootstrap by downloading bilder.py if not found
-import urllib
+import urllib2
 import os
 
 if not os.path.exists("bilder.py"):
     print "bootstrapping; downloading bilder.py"
-    urllib.urlretrieve(
-        "https://raw.githubusercontent.com/parrt/bild/master/src/python/bilder.py",
-        "bilder.py")
+    url = urllib2.urlopen("https://raw.githubusercontent.com/parrt/bild/master/src/python/bilder.py")
+    file = open('bilder.py', 'w')
+    file.write(url.read())
+    file.close()
 
 # assumes bilder.py is in current directory
 from bilder import *
