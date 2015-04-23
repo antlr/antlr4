@@ -253,7 +253,7 @@ class BufferedTokenStream(TokenStream):
     #  EOF. If channel is -1, find any non default channel token.
     def getHiddenTokensToRight(self, tokenIndex:int, channel:int=-1):
         self.lazyInit()
-        if self.tokenIndex<0 or tokenIndex>=len(self.tokens):
+        if tokenIndex<0 or tokenIndex>=len(self.tokens):
             raise Exception(str(tokenIndex) + " not in 0.." + str(len(self.tokens)-1))
         from antlr4.Lexer import Lexer
         nextOnChannel = self.nextTokenOnChannel(tokenIndex + 1, Lexer.DEFAULT_TOKEN_CHANNEL)
