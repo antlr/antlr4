@@ -229,7 +229,7 @@ class BufferedTokenStream(TokenStream):
         if i>=len(self.tokens):
             return -1
         token = self.tokens[i]
-        while token.channel!=self.channel:
+        while token.channel!=channel:
             if token.type==Token.EOF:
                 return -1
             i += 1
