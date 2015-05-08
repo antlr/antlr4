@@ -69,3 +69,4 @@ YYYY/MM/DD, github id, Full name, email
 2015/04/03, rljacobson, Robert Jacobson, rljacobson@gmail.com
 2015/04/06, ojakubcik, Ondrej Jakubcik, ojakubcik@gmail.com
 2015/04/29, jszheng, Jinshan Zheng, zheng_js@hotmail.com
+2015/05/08, ViceIce, Michael Kriese, michael.kriese@gmx.de
