@@ -377,7 +377,7 @@ namespace Antlr4.Runtime.Misc
                 {
                     continue;
                 }
-                foreach (Transition transition in state.Transitions)
+                foreach (Transition transition in state.transitions)
                 {
                     if (transition.TransitionType != TransitionType.Rule)
                     {
@@ -932,7 +932,7 @@ namespace Antlr4.Runtime.Misc
                 {
                     continue;
                 }
-                foreach (Transition transition in state.TransitionsArray)
+                foreach (Transition transition in state.transitions)
                 {
                     if (transition.TransitionType != TransitionType.Rule)
                     {
