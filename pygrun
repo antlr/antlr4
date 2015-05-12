@@ -13,7 +13,7 @@ def beautify_lisp_string(in_string):
     add_indent = ' '*indent_size
     out_string = in_string[0]  # no indent for 1st (
     indent = ''
-    for i in range(1, len(in_string)-1):
+    for i in range(1, len(in_string)):
         if in_string[i] == '(' and in_string[i+1] != ' ':
             indent += add_indent
             out_string += "\n" + indent + '('
