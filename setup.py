@@ -9,5 +9,5 @@ setup(
     license='BSD',
     author='Eric Vergnaud, Terence Parr, Sam Harwell',
     author_email='eric.vergnaud@wanadoo.fr',
-    description='ANTLR 4.5 runtime for Python 2.7.6'
+    description='ANTLR 4.5.1 runtime for Python 2.7.6'
 )
