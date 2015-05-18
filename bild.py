@@ -67,8 +67,8 @@ TARGETS = OrderedDict([
 
 
 def parsers():
-    antlr3("tool/src/org/antlr/v4/parse", "gen3", package="org.antlr.v4.parse")
-    antlr3("tool/src/org/antlr/v4/codegen", "gen3", package="org.antlr.v4.codegen",
+    antlr3("tool/src/org/antlr/v4/parse", "gen3", version="3.5.2", package="org.antlr.v4.parse")
+    antlr3("tool/src/org/antlr/v4/codegen", "gen3", version="3.5.2", package="org.antlr.v4.codegen",
            args=["-lib", uniformpath("gen3/org/antlr/v4/parse")])
     antlr4("runtime/Java/src/org/antlr/v4/runtime/tree/xpath", "gen4",
            version=BOOTSTRAP_VERSION, package="org.antlr.v4.runtime.tree.xpath")
@@ -76,7 +76,7 @@ def parsers():
 def compile():
     require(parsers)
     cp = uniformpath("out") + os.pathsep + \
-         os.path.join(JARCACHE, "antlr-3.5.1-complete.jar") + os.pathsep + \
+         os.path.join(JARCACHE, "antlr-3.5.2-complete.jar") + os.pathsep + \
          "runtime/Java/lib/org.abego.treelayout.core.jar" + os.pathsep
     srcpath = ["gen3", "gen4", "runtime/Java/src", "tool/src"]
     args = ["-Xlint", "-Xlint:-serial", "-g", "-sourcepath", string.join(srcpath, os.pathsep)]
@@ -103,8 +103,8 @@ def mkjar_complete():
     manifest = manifest % (VERSION, os.getlogin())
     # unjar required libraries
     unjar("runtime/Java/lib/org.abego.treelayout.core.jar", trgdir="out")
-    download("http://www.antlr3.org/download/antlr-3.5.1-runtime.jar", JARCACHE)
-    unjar(os.path.join(JARCACHE, "antlr-3.5.1-runtime.jar"), trgdir="out")
+    download("http://www.antlr3.org/download/antlr-3.5.2-runtime.jar", JARCACHE)
+    unjar(os.path.join(JARCACHE, "antlr-3.5.2-runtime.jar"), trgdir="out")
     download("http://www.stringtemplate.org/download/ST-4.0.8.jar", JARCACHE)
     unjar(os.path.join(JARCACHE, "ST-4.0.8.jar"), trgdir="out")
     # pull in target templates
