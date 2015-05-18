@@ -245,7 +245,7 @@ def regen_tests():
          + os.pathsep + hamcrest_jar
     args = ["-nowarn", "-Xlint", "-Xlint:-serial", "-g"]
     javac("tool/test", "out/test", version="1.6", cp=cp, args=args)  # all targets can use org.antlr.v4.test.*
-    java(classname="org.antlr.v4.test.rt.gen.Generator", cp="out/test:dist/antlr4-4.5-complete.jar")
+    java(classname="org.antlr.v4.test.rt.gen.Generator", cp="out/test:dist/antlr4-"+VERSION+"-complete.jar")
     print_and_log("test generation complete")
 
 
