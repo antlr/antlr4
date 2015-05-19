@@ -34,7 +34,7 @@ import org.antlr.v4.tool.ErrorType;
 import org.junit.Test;
 
 /** */
-public class TestLeftRecursion extends BaseTest {
+public class TestLeftRecursionToolIssues extends BaseTest {
 	protected boolean debug = false;
 
 	@Test public void testCheckForNonLeftRecursiveRule() throws Exception {
@@ -64,4 +64,60 @@ public class TestLeftRecursion extends BaseTest {
 		testErrors(new String[] { grammar, expected }, false);
 	}
 
+	/** Reproduces https://github.com/antlr/antlr4/issues/855 */
+	@Test public void testLeftRecursiveRuleRefWithArg() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"statement\n" +
+			"locals[Scope scope]\n" +
+			"    : expressionA[$scope] ';'\n" +
+			"    ;\n" +
+			"expressionA[Scope scope]\n" +
+			"    : atom[$scope]\n" +
+			"    | expressionA[$scope] '[' expressionA[$scope] ']'\n" +
+			"    ;\n" +
+			"atom[Scope scope]\n" +
+			"    : 'dummy'\n" +
+			"    ;\n";
+		String expected =
+			"error(" + ErrorType.NONCONFORMING_LR_RULE.code + "): T.g4:6:0: rule expressionA is left recursive but doesn't conform to a pattern ANTLR can handle\n";
+		testErrors(new String[]{grammar, expected}, false);
+	}
+
+	/** Reproduces https://github.com/antlr/antlr4/issues/855 */
+	@Test public void testLeftRecursiveRuleRefWithArg2() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"a[int i] : 'x'\n" +
+			"  | a[3] 'y'\n" +
+			"  ;";
+		String expected =
+			"error(" + ErrorType.NONCONFORMING_LR_RULE.code + "): T.g4:2:0: rule a is left recursive but doesn't conform to a pattern ANTLR can handle\n";
+		testErrors(new String[]{grammar, expected}, false);
+	}
+
+
+	/** Reproduces https://github.com/antlr/antlr4/issues/855 */
+	@Test public void testLeftRecursiveRuleRefWithArg3() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"a : 'x'\n" +
+			"  | a[3] 'y'\n" +
+			"  ;";
+		String expected =
+			"error(" + ErrorType.NONCONFORMING_LR_RULE.code + "): T.g4:2:0: rule a is left recursive but doesn't conform to a pattern ANTLR can handle\n";
+		testErrors(new String[]{grammar, expected}, false);
+	}
+
+
+	/** Reproduces https://github.com/antlr/antlr4/issues/822 */
+	@Test public void testIsolatedLeftRecursiveRuleRef() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"a : a | b ;\n" +
+			"b : 'B' ;\n";
+		String expected =
+			"error(" + ErrorType.NONCONFORMING_LR_RULE.code + "): T.g4:2:0: rule a is left recursive but doesn't conform to a pattern ANTLR can handle\n";
+		testErrors(new String[]{grammar, expected}, false);
+	}
 }
