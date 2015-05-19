@@ -93,7 +93,12 @@ public class LeftRecursiveRuleTransformer {
 			if ( !Grammar.isTokenName(r.name) ) {
 				if ( LeftRecursiveRuleAnalyzer.hasImmediateRecursiveRuleRefs(r.ast, r.name) ) {
 					boolean fitsPattern = translateLeftRecursiveRule(ast, (LeftRecursiveRule)r, language);
-					if ( fitsPattern ) leftRecursiveRuleNames.add(r.name);
+					if ( fitsPattern ) {
+						leftRecursiveRuleNames.add(r.name);
+					}
+					else { // better given an error that non-conforming left-recursion exists
+						tool.errMgr.grammarError(ErrorType.NONCONFORMING_LR_RULE, g.fileName, ((GrammarAST)r.ast.getChild(0)).token, r.name);
+					}
 				}
 			}
 		}
