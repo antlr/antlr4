@@ -92,7 +92,7 @@ import java.util.Map;
  * ...
  * rewriter.insertAfter(t, "text to put after t");}
  * rewriter.insertAfter(u, "text after u");}
- * System.out.println(rewriter.toString());
+ * System.out.println(rewriter.getText());
  * </pre>
  *
  * <p>
@@ -104,8 +104,8 @@ import java.util.Map;
  * <pre>
  * rewriter.insertAfter("pass1", t, "text to put after t");}
  * rewriter.insertAfter("pass2", u, "text after u");}
- * System.out.println(rewriter.toString("pass1"));
- * System.out.println(rewriter.toString("pass2"));
+ * System.out.println(rewriter.getText("pass1"));
+ * System.out.println(rewriter.getText("pass2"));
  * </pre>
  *
  * <p>
@@ -369,6 +369,13 @@ public class TokenStreamRewriter {
  	 */
 	public String getText() {
 		return getText(DEFAULT_PROGRAM_NAME, Interval.of(0,tokens.size()-1));
+	}
+
+	/** Return the text from the original tokens altered per the
+	 *  instructions given to this rewriter in programName.
+ 	 */
+	public String getText(String programName) {
+		return getText(programName, Interval.of(0,tokens.size()-1));
 	}
 
 	/** Return the text associated with the tokens in the interval from the
