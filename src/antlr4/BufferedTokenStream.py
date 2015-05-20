@@ -109,7 +109,7 @@ class BufferedTokenStream(TokenStream):
                 # fetched token except the last.
                 skipEofCheck = self.index < len(self.tokens) - 1
             else:
-               # no EOF token in tokens. skip check if p indexes a fetched token.
+                # no EOF token in tokens. skip check if p indexes a fetched token.
                 skipEofCheck = self.index < len(self.tokens)
         else:
             # not yet initialized
@@ -229,7 +229,7 @@ class BufferedTokenStream(TokenStream):
         if i>=len(self.tokens):
             return -1
         token = self.tokens[i]
-        while token.channel!=self.channel:
+        while token.channel!=channel:
             if token.type==Token.EOF:
                 return -1
             i += 1
@@ -250,7 +250,7 @@ class BufferedTokenStream(TokenStream):
     #  EOF. If channel is -1, find any non default channel token.
     def getHiddenTokensToRight(self, tokenIndex, channel=-1):
         self.lazyInit()
-        if self.tokenIndex<0 or tokenIndex>=len(self.tokens):
+        if tokenIndex<0 or tokenIndex>=len(self.tokens):
             raise Exception(str(tokenIndex) + " not in 0.." + str(len(self.tokens)-1))
         from antlr4.Lexer import Lexer
         nextOnChannel = self.nextTokenOnChannel(tokenIndex + 1, Lexer.DEFAULT_TOKEN_CHANNEL)

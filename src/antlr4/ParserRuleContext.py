@@ -113,21 +113,27 @@ class ParserRuleContext(RuleContext):
         node.parentCtx = self
         return node
 
-    def getChild(self, i, type = None):
-        if type is None:
-            return self.children[i] if len(self.children)>=i else None
+    def getChild(self, i, ttype = None):
+        if ttype is None:
+            return self.children[i] if len(self.children)>i else None
         else:
             for child in self.getChildren():
-                if not isinstance(child, type):
+                if not isinstance(child, ttype):
                     continue
                 if i==0:
                     return child
                 i -= 1
             return None
 
-    def getChildren(self):
+    def getChildren(self, ttype = None, predicate = None):
         if self.children is not None:
             for child in self.children:
+                if ttype is not None and not isinstance(child, ttype):
+                    continue
+
+                if predicate is not None and not predicate(child):
+                    continue
+                                
                 yield child
 
     def getToken(self, ttype, i):
@@ -168,7 +174,7 @@ class ParserRuleContext(RuleContext):
         return contexts
 
     def getChildCount(self):
-        return len(self.children)
+        return len(self.children) if self.children else 0
 
     def getSourceInterval(self):
         if self.start is None or self.stop is None:

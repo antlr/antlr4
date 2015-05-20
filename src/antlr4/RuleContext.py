@@ -91,7 +91,7 @@ class RuleContext(RuleNode):
     def getPayload(self):
         return self
 
-   # Return the combined text of all child nodes. This method only considers
+    # Return the combined text of all child nodes. This method only considers
     #  tokens which have been added to the parse tree.
     #  <p>
     #  Since tokens on hidden channels (e.g. whitespace or comments) are not
@@ -122,92 +122,92 @@ class RuleContext(RuleNode):
     def accept(self, visitor):
         return visitor.visitChildren(self)
 
-   # # Call this method to view a parse tree in a dialog box visually.#/
-   #  public Future<JDialog> inspect(@Nullable Parser parser) {
-   #      List<String> ruleNames = parser != null ? Arrays.asList(parser.getRuleNames()) : null;
-   #      return inspect(ruleNames);
-   #  }
-   #
-   #  public Future<JDialog> inspect(@Nullable List<String> ruleNames) {
-   #      TreeViewer viewer = new TreeViewer(ruleNames, this);
-   #      return viewer.open();
-   #  }
-   #
-   # # Save this tree in a postscript file#/
-   #  public void save(@Nullable Parser parser, String fileName)
-   #      throws IOException, PrintException
-   #  {
-   #      List<String> ruleNames = parser != null ? Arrays.asList(parser.getRuleNames()) : null;
-   #      save(ruleNames, fileName);
-   #  }
-   #
-   # # Save this tree in a postscript file using a particular font name and size#/
-   #  public void save(@Nullable Parser parser, String fileName,
-   #                   String fontName, int fontSize)
-   #      throws IOException
-   #  {
-   #      List<String> ruleNames = parser != null ? Arrays.asList(parser.getRuleNames()) : null;
-   #      save(ruleNames, fileName, fontName, fontSize);
-   #  }
-   #
-   # # Save this tree in a postscript file#/
-   #  public void save(@Nullable List<String> ruleNames, String fileName)
-   #      throws IOException, PrintException
-   #  {
-   #      Trees.writePS(this, ruleNames, fileName);
-   #  }
-   #
-   # # Save this tree in a postscript file using a particular font name and size#/
-   #  public void save(@Nullable List<String> ruleNames, String fileName,
-   #                   String fontName, int fontSize)
-   #      throws IOException
-   #  {
-   #      Trees.writePS(this, ruleNames, fileName, fontName, fontSize);
-   #  }
-   #
-   # # Print out a whole tree, not just a node, in LISP format
-   #  #  (root child1 .. childN). Print just a node if this is a leaf.
-   #  #  We have to know the recognizer so we can get rule names.
-   #  #/
-   #  @Override
-   #  public String toStringTree(@Nullable Parser recog) {
-   #      return Trees.toStringTree(this, recog);
-   #  }
-   #
-   # Print out a whole tree, not just a node, in LISP format
-   #  (root child1 .. childN). Print just a node if this is a leaf.
-   #
+    # # Call this method to view a parse tree in a dialog box visually.#/
+    #  public Future<JDialog> inspect(@Nullable Parser parser) {
+    #      List<String> ruleNames = parser != null ? Arrays.asList(parser.getRuleNames()) : null;
+    #      return inspect(ruleNames);
+    #  }
+    #
+    #  public Future<JDialog> inspect(@Nullable List<String> ruleNames) {
+    #      TreeViewer viewer = new TreeViewer(ruleNames, this);
+    #      return viewer.open();
+    #  }
+    #
+    # # Save this tree in a postscript file#/
+    #  public void save(@Nullable Parser parser, String fileName)
+    #      throws IOException, PrintException
+    #  {
+    #      List<String> ruleNames = parser != null ? Arrays.asList(parser.getRuleNames()) : null;
+    #      save(ruleNames, fileName);
+    #  }
+    #
+    # # Save this tree in a postscript file using a particular font name and size#/
+    #  public void save(@Nullable Parser parser, String fileName,
+    #                   String fontName, int fontSize)
+    #      throws IOException
+    #  {
+    #      List<String> ruleNames = parser != null ? Arrays.asList(parser.getRuleNames()) : null;
+    #      save(ruleNames, fileName, fontName, fontSize);
+    #  }
+    #
+    # # Save this tree in a postscript file#/
+    #  public void save(@Nullable List<String> ruleNames, String fileName)
+    #      throws IOException, PrintException
+    #  {
+    #      Trees.writePS(this, ruleNames, fileName);
+    #  }
+    #
+    # # Save this tree in a postscript file using a particular font name and size#/
+    #  public void save(@Nullable List<String> ruleNames, String fileName,
+    #                   String fontName, int fontSize)
+    #      throws IOException
+    #  {
+    #      Trees.writePS(this, ruleNames, fileName, fontName, fontSize);
+    #  }
+    #
+    # # Print out a whole tree, not just a node, in LISP format
+    #  #  (root child1 .. childN). Print just a node if this is a leaf.
+    #  #  We have to know the recognizer so we can get rule names.
+    #  #/
+    #  @Override
+    #  public String toStringTree(@Nullable Parser recog) {
+    #      return Trees.toStringTree(this, recog);
+    #  }
+    #
+    # Print out a whole tree, not just a node, in LISP format
+    #  (root child1 .. childN). Print just a node if this is a leaf.
+    #
     def toStringTree(self, ruleNames=None, recog=None):
         return Trees.toStringTree(self, ruleNames=ruleNames, recog=recog)
-   #  }
-   #
-   #  @Override
-   #  public String toStringTree() {
-   #      return toStringTree((List<String>)null);
-   #  }
-   #
+    #  }
+    #
+    #  @Override
+    #  public String toStringTree() {
+    #      return toStringTree((List<String>)null);
+    #  }
+    #
     def __unicode__(self):
         return self.toString(None, None)
 
-   #  @Override
-   #  public String toString() {
-   #      return toString((List<String>)null, (RuleContext)null);
-   #  }
-   #
-   #  public final String toString(@Nullable Recognizer<?,?> recog) {
-   #      return toString(recog, ParserRuleContext.EMPTY);
-   #  }
-   #
-   #  public final String toString(@Nullable List<String> ruleNames) {
-   #      return toString(ruleNames, null);
-   #  }
-   #
-   #  // recog null unless ParserRuleContext, in which case we use subclass toString(...)
-   #  public String toString(@Nullable Recognizer<?,?> recog, @Nullable RuleContext stop) {
-   #      String[] ruleNames = recog != null ? recog.getRuleNames() : null;
-   #      List<String> ruleNamesList = ruleNames != null ? Arrays.asList(ruleNames) : null;
-   #      return toString(ruleNamesList, stop);
-   #  }
+    #  @Override
+    #  public String toString() {
+    #      return toString((List<String>)null, (RuleContext)null);
+    #  }
+    #
+    #  public final String toString(@Nullable Recognizer<?,?> recog) {
+    #      return toString(recog, ParserRuleContext.EMPTY);
+    #  }
+    #
+    #  public final String toString(@Nullable List<String> ruleNames) {
+    #      return toString(ruleNames, null);
+    #  }
+    #
+    #  // recog null unless ParserRuleContext, in which case we use subclass toString(...)
+    #  public String toString(@Nullable Recognizer<?,?> recog, @Nullable RuleContext stop) {
+    #      String[] ruleNames = recog != null ? recog.getRuleNames() : null;
+    #      List<String> ruleNamesList = ruleNames != null ? Arrays.asList(ruleNames) : null;
+    #      return toString(ruleNamesList, stop);
+    #  }
 
     def toString(self, ruleNames, stop):
         with StringIO() as buf:

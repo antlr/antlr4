@@ -383,22 +383,22 @@ class ParserATNSimulator(ATNSimulator):
 
     # There are some key conditions we're looking for after computing a new
     # set of ATN configs (proposed DFA state):
-          # if the set is empty, there is no viable alternative for current symbol
-          # does the state uniquely predict an alternative?
-          # does the state have a conflict that would prevent us from
-          #   putting it on the work list?
+    # if the set is empty, there is no viable alternative for current symbol
+    # does the state uniquely predict an alternative?
+    # does the state have a conflict that would prevent us from
+    #   putting it on the work list?
 
     # We also have some key operations to do:
-          # add an edge from previous DFA state to potentially new DFA state, D,
-          #   upon current symbol but only if adding to work list, which means in all
-          #   cases except no viable alternative (and possibly non-greedy decisions?)
-          # collecting predicates and adding semantic context to DFA accept states
-          # adding rule context to context-sensitive DFA accept states
-          # consuming an input symbol
-          # reporting a conflict
-          # reporting an ambiguity
-          # reporting a context sensitivity
-          # reporting insufficient predicates
+    # add an edge from previous DFA state to potentially new DFA state, D,
+    #   upon current symbol but only if adding to work list, which means in all
+    #   cases except no viable alternative (and possibly non-greedy decisions?)
+    # collecting predicates and adding semantic context to DFA accept states
+    # adding rule context to context-sensitive DFA accept states
+    # consuming an input symbol
+    # reporting a conflict
+    # reporting an ambiguity
+    # reporting a context sensitivity
+    # reporting insufficient predicates
 
     # cover these cases:
     #    dead end
@@ -1316,40 +1316,40 @@ class ParserATNSimulator(ATNSimulator):
         altsets = PredictionMode.getConflictingAltSubsets(configs)
         return PredictionMode.getAlts(altsets)
 
-     # Sam pointed out a problem with the previous definition, v3, of
-     # ambiguous states. If we have another state associated with conflicting
-     # alternatives, we should keep going. For example, the following grammar
-     #
-     # s : (ID | ID ID?) ';' ;
-     #
-     # When the ATN simulation reaches the state before ';', it has a DFA
-     # state that looks like: [12|1|[], 6|2|[], 12|2|[]]. Naturally
-     # 12|1|[] and 12|2|[] conflict, but we cannot stop processing this node
-     # because alternative to has another way to continue, via [6|2|[]].
-     # The key is that we have a single state that has config's only associated
-     # with a single alternative, 2, and crucially the state transitions
-     # among the configurations are all non-epsilon transitions. That means
-     # we don't consider any conflicts that include alternative 2. So, we
-     # ignore the conflict between alts 1 and 2. We ignore a set of
-     # conflicting alts when there is an intersection with an alternative
-     # associated with a single alt state in the state&rarr;config-list map.
-     #
-     # It's also the case that we might have two conflicting configurations but
-     # also a 3rd nonconflicting configuration for a different alternative:
-     # [1|1|[], 1|2|[], 8|3|[]]. This can come about from grammar:
-     #
-     # a : A | A | A B ;
-     #
-     # After matching input A, we reach the stop state for rule A, state 1.
-     # State 8 is the state right before B. Clearly alternatives 1 and 2
-     # conflict and no amount of further lookahead will separate the two.
-     # However, alternative 3 will be able to continue and so we do not
-     # stop working on this state. In the previous example, we're concerned
-     # with states associated with the conflicting alternatives. Here alt
-     # 3 is not associated with the conflicting configs, but since we can continue
-     # looking for input reasonably, I don't declare the state done. We
-     # ignore a set of conflicting alts when we have an alternative
-     # that we still need to pursue.
+    # Sam pointed out a problem with the previous definition, v3, of
+    # ambiguous states. If we have another state associated with conflicting
+    # alternatives, we should keep going. For example, the following grammar
+    #
+    # s : (ID | ID ID?) ';' ;
+    #
+    # When the ATN simulation reaches the state before ';', it has a DFA
+    # state that looks like: [12|1|[], 6|2|[], 12|2|[]]. Naturally
+    # 12|1|[] and 12|2|[] conflict, but we cannot stop processing this node
+    # because alternative to has another way to continue, via [6|2|[]].
+    # The key is that we have a single state that has config's only associated
+    # with a single alternative, 2, and crucially the state transitions
+    # among the configurations are all non-epsilon transitions. That means
+    # we don't consider any conflicts that include alternative 2. So, we
+    # ignore the conflict between alts 1 and 2. We ignore a set of
+    # conflicting alts when there is an intersection with an alternative
+    # associated with a single alt state in the state&rarr;config-list map.
+    #
+    # It's also the case that we might have two conflicting configurations but
+    # also a 3rd nonconflicting configuration for a different alternative:
+    # [1|1|[], 1|2|[], 8|3|[]]. This can come about from grammar:
+    #
+    # a : A | A | A B ;
+    #
+    # After matching input A, we reach the stop state for rule A, state 1.
+    # State 8 is the state right before B. Clearly alternatives 1 and 2
+    # conflict and no amount of further lookahead will separate the two.
+    # However, alternative 3 will be able to continue and so we do not
+    # stop working on this state. In the previous example, we're concerned
+    # with states associated with the conflicting alternatives. Here alt
+    # 3 is not associated with the conflicting configs, but since we can continue
+    # looking for input reasonably, I don't declare the state done. We
+    # ignore a set of conflicting alts when we have an alternative
+    # that we still need to pursue.
     #
 
     def getConflictingAltsOrUniqueAlt(self, configs):

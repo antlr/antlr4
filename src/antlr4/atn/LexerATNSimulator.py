@@ -249,7 +249,7 @@ class LexerATNSimulator(ATNSimulator):
             if not reach.hasSemanticContext:
                 # we got nowhere on t, don't throw out this knowledge; it'd
                 # cause a failover from DFA later.
-               self. addDFAEdge(s, t, self.ERROR)
+                self. addDFAEdge(s, t, self.ERROR)
 
             # stop when we can't match any more char
             return self.ERROR
