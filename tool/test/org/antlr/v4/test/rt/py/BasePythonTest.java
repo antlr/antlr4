@@ -29,10 +29,33 @@
  */
 package org.antlr.v4.test.rt.py;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import org.antlr.v4.runtime.misc.Nullable;
+import org.antlr.v4.Tool;
+import org.antlr.v4.automata.ATNFactory;
+import org.antlr.v4.automata.ATNPrinter;
+import org.antlr.v4.automata.LexerATNFactory;
+import org.antlr.v4.automata.ParserATNFactory;
+import org.antlr.v4.codegen.CodeGenerator;
+import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CommonToken;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.IntStream;
+import org.antlr.v4.runtime.Lexer;
+import org.antlr.v4.runtime.Parser;
+import org.antlr.v4.runtime.RuleContext;
+import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.TokenSource;
+import org.antlr.v4.runtime.TokenStream;
+import org.antlr.v4.runtime.WritableToken;
+import org.antlr.v4.runtime.atn.ATN;
+import org.antlr.v4.runtime.atn.ATNDeserializer;
+import org.antlr.v4.runtime.atn.ATNSerializer;
+import org.antlr.v4.runtime.atn.ATNState;
+import org.antlr.v4.runtime.atn.DecisionState;
+import org.antlr.v4.runtime.atn.LexerATNSimulator;
+import org.antlr.v4.runtime.dfa.DFA;
+import org.antlr.v4.runtime.misc.IntegerList;
+import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.semantics.SemanticPipeline;
 import org.antlr.v4.test.tool.ErrorQueue;
@@ -51,6 +74,31 @@ import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupString;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public abstract class BasePythonTest {
 	// -J-Dorg.antlr.v4.test.BaseTest.level=FINE
 	// private static final Logger LOGGER = Logger.getLogger(BaseTest.class.getName());
@@ -58,7 +106,7 @@ public abstract class BasePythonTest {
 	public static final String pathSep = System.getProperty("path.separator");
 
 	public String tmpdir = null;
-	
+
 	/** If error during parser execution, store stderr here; can't return
      *  stdout and stderr.  This doesn't trap errors from running antlr.
      */
@@ -79,7 +127,7 @@ public abstract class BasePythonTest {
 	private String getPropertyPrefix() {
 		return "antlr-" + getLanguage().toLowerCase();
 	}
-	
+
     @Before
 	public void setUp() throws Exception {
         // new output dir for each test
@@ -88,7 +136,7 @@ public abstract class BasePythonTest {
     	if(prop!=null && prop.length()>0)
     		tmpdir = prop;
     	else
-    		tmpdir = new File(System.getProperty("java.io.tmpdir"), getClass().getSimpleName()+"-"+System.currentTimeMillis()).getAbsolutePath(); 
+    		tmpdir = new File(System.getProperty("java.io.tmpdir"), getClass().getSimpleName()+"-"+System.currentTimeMillis()).getAbsolutePath();
     }
 
     protected org.antlr.v4.Tool newTool(String[] args) {
@@ -199,7 +247,7 @@ public abstract class BasePythonTest {
 				tokenTypes.add(lg.typeToTokenList.get(ttype));
 			}
 
-			if ( t==IntStream.EOF ) {
+			if ( t== IntStream.EOF ) {
 				hitEOF = true;
 			}
 		} while ( ttype!=Token.EOF );
@@ -372,12 +420,12 @@ public abstract class BasePythonTest {
 			String listenerName,
 			String visitorName,
 			String startRuleName,
-			String input, 
+			String input,
 			boolean debug) {
 		return execParser(grammarFileName, grammarStr, parserName, lexerName,
 				listenerName, visitorName, startRuleName, input, debug, false);
 	}
-	
+
 	protected String execParser(String grammarFileName,
 								String grammarStr,
 								String parserName,
@@ -385,7 +433,7 @@ public abstract class BasePythonTest {
 								String listenerName,
 								String visitorName,
 								String startRuleName,
-								String input, 
+								String input,
 								boolean debug,
 								boolean trace)
 	{
@@ -409,7 +457,7 @@ public abstract class BasePythonTest {
 	/** Return true if all is well */
 	protected boolean rawGenerateAndBuildRecognizer(String grammarFileName,
 													String grammarStr,
-													@Nullable String parserName,
+													String parserName,
 													String lexerName,
 													String... extraOptions)
 	{
@@ -419,7 +467,7 @@ public abstract class BasePythonTest {
 	/** Return true if all is well */
 	protected boolean rawGenerateAndBuildRecognizer(String grammarFileName,
 													String grammarStr,
-													@Nullable String parserName,
+													String parserName,
 													String lexerName,
 													boolean defaultListener,
 													String... extraOptions)
@@ -481,7 +529,7 @@ public abstract class BasePythonTest {
 		try {
 			ProcessBuilder builder = new ProcessBuilder( pythonPath, modulePath, inputPath );
 			builder.environment().put("PYTHONPATH",runtimePath);
-			builder.directory(new File(tmpdir)); 
+			builder.directory(new File(tmpdir));
 			Process process = builder.start();
 			StreamVacuum stdoutVacuum = new StreamVacuum(process.getInputStream());
 			StreamVacuum stderrVacuum = new StreamVacuum(process.getErrorStream());
@@ -536,7 +584,7 @@ public abstract class BasePythonTest {
     		throw new RuntimeException("Missing system property:" + propName);
 		return file.getAbsolutePath();
 	}
-	
+
 	public void testErrors(String[] pairs, boolean printTree) {
         for (int i = 0; i < pairs.length; i+=2) {
             String input = pairs[i];
@@ -807,7 +855,7 @@ public abstract class BasePythonTest {
 			 String parserStartRuleName,
 			 boolean debug,
 			 boolean setTrace);
-	
+
 
 
 	protected abstract void writeLexerTestFile(String lexerName, boolean showDFA);
@@ -980,25 +1028,21 @@ public abstract class BasePythonTest {
 			return null;
 		}
 
-		@NotNull
 		@Override
 		public String getText() {
 			throw new UnsupportedOperationException("can't give strings");
 		}
 
-		@NotNull
 		@Override
 		public String getText(Interval interval) {
 			throw new UnsupportedOperationException("can't give strings");
 		}
 
-		@NotNull
 		@Override
 		public String getText(RuleContext ctx) {
 			throw new UnsupportedOperationException("can't give strings");
 		}
 
-		@NotNull
 		@Override
 		public String getText(Token start, Token stop) {
 			throw new UnsupportedOperationException("can't give strings");
