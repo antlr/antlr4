@@ -29,6 +29,7 @@
  */
 package org.antlr.v4.runtime.misc;
 
+import java.lang.IllegalArgumentException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -101,12 +102,11 @@ public class IntegerList {
 	public final void addAll(Collection<Integer> list) {
 		ensureCapacity(_size + list.size());
 		int current = 0;
-		for (int x : list) {
-			_data[_size + current] = x;
-			current++;
-		}
-
-		_size += list.size();
+    		for (int x : list) {
+      			_data[_size + current] = x;
+      			current++;
+    		}
+    		_size += list.size();
 	}
 
 	public final int get(int index) {
@@ -267,6 +267,9 @@ public class IntegerList {
 	public final int binarySearch(int fromIndex, int toIndex, int key) {
 		if (fromIndex < 0 || toIndex < 0 || fromIndex > _size || toIndex > _size) {
 			throw new IndexOutOfBoundsException();
+		}
+		if (fromIndex > toIndex) {
+        		throw new IllegalArgumentException();
 		}
 
 		return Arrays.binarySearch(_data, fromIndex, toIndex, key);
