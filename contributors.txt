@@ -72,3 +72,4 @@ YYYY/MM/DD, github id, Full name, email
 2015/05/08, ViceIce, Michael Kriese, michael.kriese@gmx.de
 2015/05/09, lkraz, Luke Krasnoff, luke.krasnoff@gmail.com
 2015/05/12, Pursuit92, Josh Chase, jcjoshuachase@gmail.com
+2015/05/19, DaveJarvis, Dave Jarvis
