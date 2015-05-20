@@ -459,6 +459,9 @@ Parser.prototype.enterOuterAlt = function(localctx, altNum) {
 		}
 	}
 	this._ctx = localctx;
+	if (this._parseListeners !== null) {
+		this.triggerEnterRuleEvent();
+	}
 };
 
 // Get the precedence level for the top-most precedence rule.
