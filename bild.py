@@ -152,6 +152,7 @@ def mkjar_runtime():
     print "Generated " + jarfile
     osgijarfile = "dist/antlr4-" + VERSION + "-osgi.jar"
     make_osgi_ready(jarfile, osgijarfile)
+    os.remove(jarfile)              # delete target for Windows compatibility
     os.rename(osgijarfile, jarfile) # copy back onto old jar
     print_and_log("Made jar OSGi-ready " + jarfile)
 
