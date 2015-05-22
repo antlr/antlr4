@@ -370,13 +370,16 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 		}
 
 		StringBuilder buf = new StringBuilder();
-		for (int i=tokenStartIndex; i<=tokenStopIndex; i++) {
+		int i=tokenStartIndex;
+		while ( i<=tokenStopIndex ) {
 			if ( ignore.contains(i) ) {
+				i++;
 				continue;
 			}
 
 			Token tok = tokenStream.get(i);
 
+			// Compute/hold any element options
 			StringBuilder elementOptions = new StringBuilder();
 			if (!noOptions.contains(i)) {
 				GrammarAST node = t.getNodeWithTokenIndex(tok.getTokenIndex());
@@ -402,7 +405,16 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 				}
 			}
 
-			buf.append(tok.getText());
+			buf.append(tok.getText()); // add actual text of the current token to the rewritten alternative
+			i++;                       // move to the next token
+
+			// Are there args on a rule?
+			if ( tok.getType()==RULE_REF && i<=tokenStopIndex && tokenStream.get(i).getType()==ARG_ACTION ) {
+				buf.append('['+tokenStream.get(i).getText()+']');
+				i++;
+			}
+
+			// now that we have the actual element, we can add the options.
 			if (elementOptions.length() > 0) {
 				buf.append('<').append(elementOptions).append('>');
 			}
