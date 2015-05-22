@@ -1,3 +1,5 @@
+// force complex decision
+
 TestType() ::= "Parser"
 
 Options ::= [

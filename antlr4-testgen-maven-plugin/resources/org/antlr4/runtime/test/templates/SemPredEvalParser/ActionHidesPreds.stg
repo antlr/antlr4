@@ -1,3 +1,5 @@
+// can't see preds, resolves to first alt found (1 in this case)
+
 TestType() ::= "Parser"
 
 Options ::= [
