@@ -1339,14 +1339,6 @@ public class ParserATNSimulator extends ATNSimulator {
 				configs.setOutermostConfigSet(true);
 			}
 
-			if (!useContext || enable_global_context_dfa) {
-				if (!dfa.isPrecedenceDfa() && dfa.atnStartState instanceof StarLoopEntryState) {
-					if (((StarLoopEntryState)dfa.atnStartState).precedenceRuleDecision) {
-						dfa.setPrecedenceDfa(true);
-					}
-				}
-			}
-
 			final boolean collectPredicates = true;
 			closure(reachIntermediate, configs, collectPredicates, hasMoreContext, contextCache, false);
 			boolean stepIntoGlobal = configs.getDipsIntoOuterContext();
@@ -2380,10 +2372,12 @@ public class ParserATNSimulator extends ATNSimulator {
     }
 
     /** If context sensitive parsing, we know it's ambiguity not conflict */
-    protected void reportAmbiguity(@NotNull DFA dfa, DFAState D, int startIndex, int stopIndex,
+    protected void reportAmbiguity(@NotNull DFA dfa,
+								   DFAState D, // the DFA state from execATN() that had SLL conflicts
+								   int startIndex, int stopIndex,
 								   boolean exact,
-								   @Nullable BitSet ambigAlts,
-								   @NotNull ATNConfigSet configs)
+								   @NotNull BitSet ambigAlts,
+								   @NotNull ATNConfigSet configs) // configs that LL not SLL considered conflicting
 	{
 		if ( debug || retry_debug ) {
 			Interval interval = Interval.of(startIndex, stopIndex);

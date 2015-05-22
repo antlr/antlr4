@@ -29,7 +29,6 @@
  */
 package org.antlr.v4.runtime.dfa;
 
-import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.Vocabulary;
@@ -38,6 +37,7 @@ import org.antlr.v4.runtime.atn.ATNConfigSet;
 import org.antlr.v4.runtime.atn.ATNState;
 import org.antlr.v4.runtime.atn.ATNType;
 import org.antlr.v4.runtime.atn.LexerATNSimulator;
+import org.antlr.v4.runtime.atn.StarLoopEntryState;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 
@@ -85,10 +85,9 @@ public class DFA {
 
 	/**
 	 * {@code true} if this DFA is for a precedence decision; otherwise,
-	 * {@code false}. This is the backing field for {@link #isPrecedenceDfa},
-	 * {@link #setPrecedenceDfa}.
+	 * {@code false}. This is the backing field for {@link #isPrecedenceDfa}.
 	 */
-	private volatile boolean precedenceDfa;
+	private final boolean precedenceDfa;
 
 	public DFA(@NotNull ATNState atnStartState) {
 		this(atnStartState, 0);
@@ -109,6 +108,17 @@ public class DFA {
 
 		this.emptyEdgeMap = new EmptyEdgeMap<DFAState>(minDfaEdge, maxDfaEdge);
 		this.emptyContextEdgeMap = new EmptyEdgeMap<DFAState>(-1, atnStartState.atn.states.size() - 1);
+
+		boolean isPrecedenceDfa = false;
+		if (atnStartState instanceof StarLoopEntryState) {
+			if (((StarLoopEntryState)atnStartState).precedenceRuleDecision) {
+				isPrecedenceDfa = true;
+				this.s0.set(new DFAState(emptyPrecedenceEdges, getEmptyContextEdgeMap(), new ATNConfigSet()));
+				this.s0full.set(new DFAState(emptyPrecedenceEdges, getEmptyContextEdgeMap(), new ATNConfigSet()));
+			}
+		}
+
+		this.precedenceDfa = isPrecedenceDfa;
 	}
 
 	public final int getMinDfaEdge() {
@@ -204,35 +214,20 @@ public class DFA {
 	}
 
 	/**
-	 * Sets whether this is a precedence DFA. If the specified value differs
-	 * from the current DFA configuration, the following actions are taken;
-	 * otherwise no changes are made to the current DFA.
-	 *
-	 * <ul>
-	 * <li>The {@link #states} map is cleared</li>
-	 * <li>If {@code precedenceDfa} is {@code false}, the initial state
-	 * {@link #s0} is set to {@code null}; otherwise, it is initialized to a new
-	 * {@link DFAState} with an empty outgoing {@link DFAState#edges} array to
-	 * store the start states for individual precedence values.</li>
-	 * <li>The {@link #precedenceDfa} field is updated</li>
-	 * </ul>
+	 * Sets whether this is a precedence DFA.
 	 *
 	 * @param precedenceDfa {@code true} if this is a precedence DFA; otherwise,
 	 * {@code false}
+	 *
+	 * @throws UnsupportedOperationException if {@code precedenceDfa} does not
+	 * match the value of {@link #isPrecedenceDfa} for the current DFA.
+	 *
+	 * @deprecated This method no longer performs any action.
 	 */
-	public final synchronized void setPrecedenceDfa(boolean precedenceDfa) {
-		if (this.precedenceDfa != precedenceDfa) {
-			this.states.clear();
-			if (precedenceDfa) {
-				this.s0.set(new DFAState(emptyPrecedenceEdges, getEmptyContextEdgeMap(), new ATNConfigSet()));
-				this.s0full.set(new DFAState(emptyPrecedenceEdges, getEmptyContextEdgeMap(), new ATNConfigSet()));
-			}
-			else {
-				this.s0.set(null);
-				this.s0full.set(null);
-			}
-
-			this.precedenceDfa = precedenceDfa;
+	@Deprecated
+	public final void setPrecedenceDfa(boolean precedenceDfa) {
+		if (precedenceDfa != isPrecedenceDfa()) {
+			throw new UnsupportedOperationException("The precedenceDfa field cannot change after a DFA is constructed.");
 		}
 	}
 

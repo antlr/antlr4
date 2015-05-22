@@ -193,8 +193,6 @@ public class LexerATNSimulator extends ATNSimulator {
 		if (ds0.isAcceptState()) {
 			// allow zero-length tokens
 			captureSimState(prevAccept, input, ds0);
-			// adjust index since the current input character was not yet consumed
-			prevAccept.index--;
 		}
 
 		int t = input.LA(1);
@@ -232,6 +230,14 @@ public class LexerATNSimulator extends ATNSimulator {
 				break;
 			}
 
+			// If this is a consumable input element, make sure to consume before
+			// capturing the accept state so the input index, line, and char
+			// position accurately reflect the state of the interpreter at the
+			// end of the token.
+			if (t != IntStream.EOF) {
+				consume(input);
+			}
+
 			if (target.isAcceptState()) {
 				captureSimState(prevAccept, input, target);
 				if (t == IntStream.EOF) {
@@ -239,11 +245,7 @@ public class LexerATNSimulator extends ATNSimulator {
 				}
 			}
 
-			if (t != IntStream.EOF) {
-				consume(input);
-				t = input.LA(1);
-			}
-
+			t = input.LA(1);
 			s = target; // flip; current DFA target becomes new src/from state
 		}
 
@@ -377,9 +379,6 @@ public class LexerATNSimulator extends ATNSimulator {
 		input.seek(index);
 		this.line = line;
 		this.charPositionInLine = charPos;
-		if (input.LA(1) != IntStream.EOF) {
-			consume(input);
-		}
 
 		if (lexerActionExecutor != null && recog != null) {
 			lexerActionExecutor.execute(recog, input, startIndex);

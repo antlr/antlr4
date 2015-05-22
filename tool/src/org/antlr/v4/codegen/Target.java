@@ -301,6 +301,16 @@ public abstract class Target {
 		return Integer.MAX_VALUE;
 	}
 
+	/** How many bits should be used to do inline token type tests? Java assumes
+	 *  a 64-bit word for bitsets.  Must be a valid wordsize for your target like
+	 *  8, 16, 32, 64, etc...
+	 *
+	 *  @since 4.5
+	 */
+	public int getInlineTestSetWordSize() {
+		return 64;
+	}
+
 	public boolean grammarSymbolCausesIssueInGeneratedCode(GrammarAST idNode) {
 		switch (idNode.getParent().getType()) {
 			case ANTLRParser.ASSIGN:

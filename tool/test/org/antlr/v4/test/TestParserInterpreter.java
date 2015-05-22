@@ -43,6 +43,19 @@ import static org.junit.Assert.assertEquals;
 
 
 public class TestParserInterpreter extends BaseTest {
+	@Test public void testEmptyStartRule() throws Exception {
+		LexerGrammar lg = new LexerGrammar(
+			"lexer grammar L;\n" +
+			"A : 'a' ;\n");
+		Grammar g = new Grammar(
+			"parser grammar T;\n" +
+			"s :  ;",
+			lg);
+
+		testInterp(lg, g, "s", "", "s");
+		testInterp(lg, g, "s", "a", "s");
+	}
+
 	@Test public void testA() throws Exception {
 		LexerGrammar lg = new LexerGrammar(
 			"lexer grammar L;\n" +
@@ -223,13 +236,13 @@ public class TestParserInterpreter extends BaseTest {
 
 	void testInterp(LexerGrammar lg, Grammar g,
 					String startRule, String input,
-					String parseTree)
+					String expectedParseTree)
 	{
 		LexerInterpreter lexEngine = lg.createLexerInterpreter(new ANTLRInputStream(input));
 		CommonTokenStream tokens = new CommonTokenStream(lexEngine);
 		ParserInterpreter parser = g.createParserInterpreter(tokens);
 		ParseTree t = parser.parse(g.rules.get(startRule).index);
 		System.out.println("parse tree: "+t.toStringTree(parser));
-		assertEquals(parseTree, t.toStringTree(parser));
+		assertEquals(expectedParseTree, t.toStringTree(parser));
 	}
 }

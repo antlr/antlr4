@@ -122,8 +122,74 @@ public abstract class BaseTest {
 	public static final String newline = System.getProperty("line.separator");
 	public static final String pathSep = System.getProperty("path.separator");
 
+	/**
+	 * When the {@code antlr.testinprocess} runtime property is set to
+	 * {@code true}, the test suite will attempt to load generated classes into
+	 * the test process for direct execution rather than invoking the JVM in a
+	 * new process for testing.
+	 *
+	 * <p>
+	 * In-process testing results in a substantial performance improvement, but
+	 * some test environments created by IDEs do not support the mechanisms
+	 * currently used by the tests to dynamically load compiled code. Therefore,
+	 * the default behavior (used in all other cases) favors reliable
+	 * cross-system test execution by executing generated test code in a
+	 * separate process.</p>
+	 */
 	public static final boolean TEST_IN_SAME_PROCESS = Boolean.parseBoolean(System.getProperty("antlr.testinprocess"));
 	public static final boolean STRICT_COMPILE_CHECKS = Boolean.parseBoolean(System.getProperty("antlr.strictcompile"));
+
+	/**
+	 * When the {@code antlr.preserve-test-dir} runtime property is set to
+	 * {@code true}, the temporary directories created by the test run will not
+	 * be removed at the end of the test run, even for tests that completed
+	 * successfully.
+	 *
+	 * <p>
+	 * The default behavior (used in all other cases) is removing the temporary
+	 * directories for all tests which completed successfully, and preserving
+	 * the directories for tests which failed.</p>
+	 */
+	public static final boolean PRESERVE_TEST_DIR = Boolean.parseBoolean(System.getProperty("antlr.preserve-test-dir"));
+
+	/**
+	 * The base test directory is the directory where generated files get placed
+	 * during unit test execution.
+	 *
+	 * <p>
+	 * The default value for this property is the {@code java.io.tmpdir} system
+	 * property, and can be overridden by setting the
+	 * {@code antlr.java-test-dir} property to a custom location. Note that the
+	 * {@code antlr.java-test-dir} property directly affects the
+	 * {@link #CREATE_PER_TEST_DIRECTORIES} value as well.</p>
+	 */
+	public static final String BASE_TEST_DIR;
+
+	/**
+	 * When {@code true}, a temporary directory will be created for each test
+	 * executed during the test run.
+	 *
+	 * <p>
+	 * This value is {@code true} when the {@code antlr.java-test-dir} system
+	 * property is set, and otherwise {@code false}.</p>
+	 */
+	public static final boolean CREATE_PER_TEST_DIRECTORIES;
+
+	static {
+		String baseTestDir = System.getProperty("antlr.java-test-dir");
+		boolean perTestDirectories = false;
+		if (baseTestDir == null || baseTestDir.isEmpty()) {
+			baseTestDir = System.getProperty("java.io.tmpdir");
+			perTestDirectories = true;
+		}
+
+		if (!new File(baseTestDir).isDirectory()) {
+			throw new UnsupportedOperationException("The specified base test directory does not exist: " + baseTestDir);
+		}
+
+		BASE_TEST_DIR = baseTestDir;
+		CREATE_PER_TEST_DIRECTORIES = perTestDirectories;
+	}
 
     /**
      * Build up the full classpath we need, including the surefire path (if present)
@@ -143,17 +209,26 @@ public abstract class BaseTest {
 		@Override
 		protected void succeeded(Description description) {
 			// remove tmpdir if no error.
-			eraseTempDir();
+			if (!PRESERVE_TEST_DIR) {
+				eraseTempDir();
+			}
 		}
 
 	};
 
     @Before
 	public void setUp() throws Exception {
-        // new output dir for each test
-        tmpdir = new File(System.getProperty("java.io.tmpdir"),
-						  getClass().getSimpleName()+"-"+System.currentTimeMillis()).getAbsolutePath();
-//		tmpdir = "/tmp";
+		if (CREATE_PER_TEST_DIRECTORIES) {
+			// new output dir for each test
+			String testDirectory = getClass().getSimpleName() + "-" + System.currentTimeMillis();
+			tmpdir = new File(BASE_TEST_DIR, testDirectory).getAbsolutePath();
+		}
+		else {
+			tmpdir = new File(BASE_TEST_DIR).getAbsolutePath();
+			if (!PRESERVE_TEST_DIR && new File(tmpdir).exists()) {
+				eraseFiles();
+			}
+		}
     }
 
 	protected boolean testInSameProcess() {
@@ -712,13 +787,14 @@ public abstract class BaseTest {
 		if ( parserName!=null ) {
 			files.add(parserName+".java");
 			Set<String> optionsSet = new HashSet<String>(Arrays.asList(extraOptions));
+			String grammarName = grammarFileName.substring(0, grammarFileName.lastIndexOf('.'));
 			if (!optionsSet.contains("-no-listener")) {
-				files.add(grammarFileName.substring(0, grammarFileName.lastIndexOf('.'))+"BaseListener.java");
-				files.add(grammarFileName.substring(0, grammarFileName.lastIndexOf('.'))+"Listener.java");
+				files.add(grammarName+"Listener.java");
+				files.add(grammarName+"BaseListener.java");
 			}
 			if (optionsSet.contains("-visitor")) {
-				files.add(grammarFileName.substring(0, grammarFileName.lastIndexOf('.'))+"BaseVisitor.java");
-				files.add(grammarFileName.substring(0, grammarFileName.lastIndexOf('.'))+"Visitor.java");
+				files.add(grammarName+"Visitor.java");
+				files.add(grammarName+"BaseVisitor.java");
 			}
 		}
 		boolean allIsWell = compile(files.toArray(new String[files.size()]));

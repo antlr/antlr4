@@ -478,18 +478,18 @@ public class Tool {
 			@Override
 			public void ruleRef(GrammarAST ref, ActionAST arg) {
 				RuleAST ruleAST = ruleToAST.get(ref.getText());
+				String fileName = ref.getToken().getInputStream().getSourceName();
 				if (Character.isUpperCase(currentRuleName.charAt(0)) &&
 					Character.isLowerCase(ref.getText().charAt(0)))
 				{
 					badref = true;
-					String fileName = ref.getToken().getInputStream().getSourceName();
 					errMgr.grammarError(ErrorType.PARSER_RULE_REF_IN_LEXER_RULE,
 										fileName, ref.getToken(), ref.getText(), currentRuleName);
 				}
 				else if ( ruleAST==null ) {
 					badref = true;
 					errMgr.grammarError(ErrorType.UNDEFINED_RULE_REF,
-										g.fileName, ref.token, ref.getText());
+										fileName, ref.token, ref.getText());
 				}
 			}
 			@Override

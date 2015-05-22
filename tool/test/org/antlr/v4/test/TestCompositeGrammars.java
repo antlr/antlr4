@@ -30,10 +30,13 @@
 
 package org.antlr.v4.test;
 
+import org.antlr.v4.tool.ANTLRMessage;
 import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.GrammarSemanticsMessage;
 import org.junit.Test;
+
+import java.io.File;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -58,6 +61,25 @@ public class TestCompositeGrammars extends BaseTest {
 		writeFile(tmpdir, "M.g4", master);
 		ErrorQueue equeue = antlr("M.g4", false, "-lib", subdir);
 		assertEquals(equeue.size(), 0);
+	}
+
+	@Test public void testErrorInImportedGetsRightFilename() throws Exception {
+		String slave =
+			"parser grammar S;\n" +
+			"a : 'a' | c;\n";
+		mkdir(tmpdir);
+		writeFile(tmpdir, "S.g4", slave);
+		String master =
+			"grammar M;\n" +
+			"import S;\n";
+		writeFile(tmpdir, "M.g4", master);
+		ErrorQueue equeue = antlr("M.g4", false, "-lib", tmpdir);
+		ANTLRMessage msg = equeue.errors.get(0);
+		assertEquals(ErrorType.UNDEFINED_RULE_REF, msg.getErrorType());
+		assertEquals("c", msg.getArgs()[0]);
+		assertEquals(2, msg.line);
+		assertEquals(10, msg.charPosition);
+		assertEquals("S.g4", new File(msg.fileName).getName());
 	}
 
 	@Test public void testImportFileNotSearchedForInOutputDir() throws Exception {
@@ -816,6 +838,33 @@ public class TestCompositeGrammars extends BaseTest {
 		mkdir(tmpdir);
 		writeFile(tmpdir, "Java.g4", slave);
 		String found = execParser("NewJava.g4", master, "NewJavaParser", "NewJavaLexer", "compilationUnit", "package Foo;", debug);
+		assertEquals("", found);
+		assertNull(stderrDuringParse);
+	}
+
+	/**
+	 * This is a regression test for antlr/antlr4#670 "exception when importing
+	 * grammar".
+	 * https://github.com/antlr/antlr4/issues/670
+	 */
+	@Test
+	public void testImportLeftRecursiveGrammar() throws Exception {
+		String slave =
+			"grammar Java;\n" +
+			"e : '(' e ')'\n" +
+			"  | e '=' e\n" +
+			"  | ID\n" +
+			"  ;\n" +
+			"ID : [a-z]+ ;\n";
+		String master =
+			"grammar T;\n" +
+			"import Java;\n" +
+			"s : e ;\n";
+
+		System.out.println("dir "+tmpdir);
+		mkdir(tmpdir);
+		writeFile(tmpdir, "Java.g4", slave);
+		String found = execParser("T.g4", master, "TParser", "TLexer", "s", "a=b", debug);
 		assertEquals("", found);
 		assertNull(stderrDuringParse);
 	}

@@ -325,7 +325,7 @@ public class ParserFactory extends DefaultOutputModelFactory {
 
 	@Override
 	public List<SrcOp> getLL1Test(IntervalSet look, GrammarAST blkAST) {
-		return list(new TestSetInline(this, blkAST, look));
+		return list(new TestSetInline(this, blkAST, look, gen.getTarget().getInlineTestSetWordSize()));
 	}
 
 	@Override

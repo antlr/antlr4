@@ -973,6 +973,15 @@ public enum ErrorType {
 	 */
 	LEXER_RULE_CANNOT_HAVE_BASE_CONTEXT(168, "rule '<arg>': lexer rules cannot specify a base context", ErrorSeverity.ERROR),
 
+	/**
+	 * Compiler Error 169.
+	 *
+	 * <p>rule '<em>rule</em>' is left recursive but doesn't conform to a pattern ANTLR can handle</p>
+	 *
+	 * @since 4.5
+	 */
+	NONCONFORMING_LR_RULE(169, "rule '<arg>' is left recursive but doesn't conform to a pattern ANTLR can handle", ErrorSeverity.ERROR),
+
 	/*
 	 * Backward incompatibility errors
 	 */

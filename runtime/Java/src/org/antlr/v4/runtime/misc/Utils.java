@@ -40,6 +40,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.Arrays;
+import java.util.BitSet;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -241,5 +242,19 @@ public class Utils {
 			cdata[i] = (char)data.get(i);
 		}
 		return cdata;
+	}
+
+	/**
+	 * @since 4.5
+	 */
+	@NotNull
+	public static IntervalSet toSet(@NotNull BitSet bits) {
+		IntervalSet s = new IntervalSet();
+		int i = bits.nextSetBit(0);
+		while ( i >= 0 ) {
+			s.add(i);
+			i = bits.nextSetBit(i+1);
+		}
+		return s;
 	}
 }

@@ -65,8 +65,28 @@ public class InterpreterRuleContext extends ParserRuleContext {
 		this.ruleIndex = ruleIndex;
 	}
 
+	private InterpreterRuleContext(int ruleIndex) {
+		this.ruleIndex = ruleIndex;
+	}
+
 	@Override
 	public int getRuleIndex() {
 		return ruleIndex;
+	}
+
+	/**
+	 * Copy a {@link ParserRuleContext} or {@link InterpreterRuleContext} stack
+	 * to a {@link InterpreterRuleContext} tree. Return {@code null} if
+	 * {@code ctx} is null.
+	 *
+	 * @since 4.5
+	 */
+	@Nullable
+	public static InterpreterRuleContext fromParserRuleContext(@Nullable ParserRuleContext ctx) {
+		if ( ctx==null ) return null;
+		InterpreterRuleContext dup = new InterpreterRuleContext(ctx.getRuleIndex());
+		dup.copyFrom(ctx);
+		dup.parent = fromParserRuleContext(ctx.getParent());
+		return dup;
 	}
 }

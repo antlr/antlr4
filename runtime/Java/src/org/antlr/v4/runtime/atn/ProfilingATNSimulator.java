@@ -238,7 +238,7 @@ public class ProfilingATNSimulator extends ParserATNSimulator {
 	}
 
 	@Override
-	protected void reportAmbiguity(@NotNull DFA dfa, DFAState D, int startIndex, int stopIndex, boolean exact, @Nullable BitSet ambigAlts, @NotNull ATNConfigSet configs) {
+	protected void reportAmbiguity(@NotNull DFA dfa, DFAState D, int startIndex, int stopIndex, boolean exact, @NotNull BitSet ambigAlts, @NotNull ATNConfigSet configs) {
 		int prediction;
 		if ( ambigAlts!=null ) {
 			prediction = ambigAlts.nextSetBit(0);
@@ -257,7 +257,7 @@ public class ProfilingATNSimulator extends ParserATNSimulator {
 			);
 		}
 		decisions[currentDecision].ambiguities.add(
-			new AmbiguityInfo(currentDecision, currentState, _input, startIndex, stopIndex)
+			new AmbiguityInfo(currentDecision, currentState, ambigAlts, _input, startIndex, stopIndex)
 		);
 		super.reportAmbiguity(dfa, D, startIndex, stopIndex, exact, ambigAlts, configs);
 	}

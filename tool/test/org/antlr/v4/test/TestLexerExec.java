@@ -147,7 +147,7 @@ public class TestLexerExec extends BaseTest {
 		String found = execLexer("L.g4", grammar, "L", "//blah\n//blah\n");
 		assertEquals(
 			"[@0,0:13='//blah\\n//blah\\n',<1>,1:0]\n" +
-			"[@1,14:13='<EOF>',<-1>,3:14]\n", found);
+			"[@1,14:13='<EOF>',<-1>,3:0]\n", found);
 		assertNull(stderrDuringParse);
 	}
 
@@ -162,7 +162,7 @@ public class TestLexerExec extends BaseTest {
 		assertEquals(
 			"[@0,0:6='//blah\\n',<1>,1:0]\n" +
 			"[@1,7:13='//blah\\n',<1>,2:0]\n" +
-			"[@2,14:13='<EOF>',<-1>,3:7]\n", found);
+			"[@2,14:13='<EOF>',<-1>,3:0]\n", found);
 		assertNull(stderrDuringParse);
 	}
 
@@ -176,7 +176,7 @@ public class TestLexerExec extends BaseTest {
 		String found = execLexer("L.g4", grammar, "L", "//blah\n//blah\n");
 		assertEquals(
 			"[@0,0:13='//blah\\n//blah\\n',<1>,1:0]\n" +
-			"[@1,14:13='<EOF>',<-1>,3:14]\n", found);
+			"[@1,14:13='<EOF>',<-1>,3:0]\n", found);
 		assertNull(stderrDuringParse);
 	}
 
@@ -191,7 +191,7 @@ public class TestLexerExec extends BaseTest {
 		assertEquals(
 			"[@0,0:6='//blah\\n',<1>,1:0]\n" +
 			"[@1,7:13='//blah\\n',<1>,2:0]\n" +
-			"[@2,14:13='<EOF>',<-1>,3:7]\n", found);
+			"[@2,14:13='<EOF>',<-1>,3:0]\n", found);
 		assertNull(stderrDuringParse);
 	}
 
@@ -205,7 +205,7 @@ public class TestLexerExec extends BaseTest {
 		String found = execLexer("L.g4", grammar, "L", "//blah\n//blah\n");
 		assertEquals(
 			"[@0,0:13='//blah\\n//blah\\n',<1>,1:0]\n" +
-			"[@1,14:13='<EOF>',<-1>,3:14]\n", found);
+			"[@1,14:13='<EOF>',<-1>,3:0]\n", found);
 		assertNull(stderrDuringParse);
 	}
 
@@ -220,7 +220,7 @@ public class TestLexerExec extends BaseTest {
 		assertEquals(
 			"[@0,0:6='//blah\\n',<1>,1:0]\n" +
 			"[@1,7:13='//blah\\n',<1>,2:0]\n" +
-			"[@2,14:13='<EOF>',<-1>,3:7]\n", found);
+			"[@2,14:13='<EOF>',<-1>,3:0]\n", found);
 		assertNull(stderrDuringParse);
 	}
 
@@ -237,7 +237,7 @@ public class TestLexerExec extends BaseTest {
 			"[@1,9:9='\\n',<2>,1:9]\n" +
 			"[@2,10:34='/* /* */\\n/* /*nested*/ */',<1>,2:0]\n" +
 			"[@3,35:35='\\n',<2>,3:16]\n" +
-			"[@4,36:35='<EOF>',<-1>,4:17]\n";
+			"[@4,36:35='<EOF>',<-1>,4:0]\n";
 
 		// stuff on end of comment matches another rule
 		String found = execLexer("L.g4", grammar, "L",
@@ -262,7 +262,7 @@ public class TestLexerExec extends BaseTest {
 			"[@1,10:10='\\n',<2>,1:10]\n" +
 			"[@2,11:36='/* /* */x\\n/* /*nested*/ */',<1>,2:0]\n" +
 			"[@3,38:38='\\n',<2>,3:17]\n" +
-			"[@4,39:38='<EOF>',<-1>,4:18]\n";
+			"[@4,39:38='<EOF>',<-1>,4:0]\n";
 		String found = execLexer("L.g4", grammar, "L",
 						  "/* ick */x\n" +
 						  "/* /* */x\n" +
@@ -286,7 +286,7 @@ public class TestLexerExec extends BaseTest {
 			"[@1,9:9='\\n',<2>,1:9]\n" +
 			"[@2,10:34='/* /* */\\n/* /*nested*/ */',<1>,2:0]\n" +
 			"[@3,35:35='\\n',<2>,3:16]\n" +
-			"[@4,36:35='<EOF>',<-1>,4:17]\n";
+			"[@4,36:35='<EOF>',<-1>,4:0]\n";
 
 		// stuff on end of comment matches another rule
 		String found = execLexer("L.g4", grammar, "L",
@@ -311,7 +311,7 @@ public class TestLexerExec extends BaseTest {
 			"[@1,10:10='\\n',<2>,1:10]\n" +
 			"[@2,11:36='/* /* */x\\n/* /*nested*/ */',<1>,2:0]\n" +
 			"[@3,38:38='\\n',<2>,3:17]\n" +
-			"[@4,39:38='<EOF>',<-1>,4:18]\n";
+			"[@4,39:38='<EOF>',<-1>,4:0]\n";
 		String found = execLexer("L.g4", grammar, "L",
 						  "/* ick */x\n" +
 						  "/* /* */x\n" +

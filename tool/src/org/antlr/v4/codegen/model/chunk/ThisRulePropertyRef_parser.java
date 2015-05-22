@@ -28,51 +28,13 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.antlr.v4.runtime.atn;
+package org.antlr.v4.codegen.model.chunk;
 
-import org.antlr.v4.runtime.misc.NotNull;
+import org.antlr.v4.codegen.model.decl.StructDecl;
 
-public final class EpsilonTransition extends Transition {
-
-	private final int outermostPrecedenceReturn;
-
-	public EpsilonTransition(@NotNull ATNState target) {
-		this(target, -1);
-	}
-
-	public EpsilonTransition(@NotNull ATNState target, int outermostPrecedenceReturn) {
-		super(target);
-		this.outermostPrecedenceReturn = outermostPrecedenceReturn;
-	}
-
-	/**
-	 * @return the rule index of a precedence rule for which this transition is
-	 * returning from, where the precedence value is 0; otherwise, -1.
-	 *
-	 * @see ATNConfig#isPrecedenceFilterSuppressed()
-	 * @see ParserATNSimulator#applyPrecedenceFilter(ATNConfigSet, ParserRuleContext, PredictionContextCache) 
-	 * @since 4.4.1
-	 */
-	public int outermostPrecedenceReturn() {
-		return outermostPrecedenceReturn;
-	}
-
-	@Override
-	public int getSerializationType() {
-		return EPSILON;
-	}
-
-	@Override
-	public boolean isEpsilon() { return true; }
-
-	@Override
-	public boolean matches(int symbol, int minVocabSymbol, int maxVocabSymbol) {
-		return false;
-	}
-
-	@Override
-	@NotNull
-	public String toString() {
-		return "epsilon";
+/** */
+public class ThisRulePropertyRef_parser extends RulePropertyRef {
+	public ThisRulePropertyRef_parser(StructDecl ctx, String label) {
+		super(ctx, label);
 	}
 }

@@ -126,7 +126,7 @@ public class GrammarAST extends CommonTree {
 	}
 
 	public GrammarAST getNodeWithTokenIndex(int index) {
-		if ( this.getToken().getTokenIndex()==index ) {
+		if ( this.getToken()!=null && this.getToken().getTokenIndex()==index ) {
 			return this;
 		}
 		// walk all children of root.

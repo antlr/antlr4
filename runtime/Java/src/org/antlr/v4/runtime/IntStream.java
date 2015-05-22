@@ -197,7 +197,7 @@ public interface IntStream {
 	 * Set the input cursor to the position indicated by {@code index}. If the
 	 * specified index lies past the end of the stream, the operation behaves as
 	 * though {@code index} was the index of the EOF symbol. After this method
-	 * returns without throwing an exception, the at least one of the following
+	 * returns without throwing an exception, then at least one of the following
 	 * will be true.
 	 *
 	 * <ul>

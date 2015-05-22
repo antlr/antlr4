@@ -68,6 +68,9 @@ import java.util.Deque;
 public class ParserInterpreter extends Parser {
 	protected final String grammarFileName;
 	protected final ATN atn;
+	/** This identifies StarLoopEntryState's that begin the (...)*
+	 *  precedence loops of left recursive rules.
+	 */
 	protected final BitSet pushRecursionContextStates;
 
 	@Deprecated
@@ -76,7 +79,34 @@ public class ParserInterpreter extends Parser {
 	@NotNull
 	private final Vocabulary vocabulary;
 
-	protected final Deque<Tuple2<ParserRuleContext, Integer>> _parentContextStack = new ArrayDeque<Tuple2<ParserRuleContext, Integer>>();
+	/** Tracks LR rules for adjusting the contexts */
+	protected final Deque<Tuple2<ParserRuleContext, Integer>> _parentContextStack =
+		new ArrayDeque<Tuple2<ParserRuleContext, Integer>>();
+
+	/** We need a map from (decision,inputIndex)->forced alt for computing ambiguous
+	 *  parse trees. For now, we allow exactly one override.
+	 */
+	protected int overrideDecision = -1;
+	protected int overrideDecisionInputIndex = -1;
+	protected int overrideDecisionAlt = -1;
+
+	/** A copy constructor that creates a new parser interpreter by reusing
+	 *  the fields of a previous interpreter.
+	 *
+	 *  @param old The interpreter to copy
+	 *
+	 *  @since 4.5
+	 */
+	public ParserInterpreter(@NotNull ParserInterpreter old) {
+		super(old.getInputStream());
+		this.grammarFileName = old.grammarFileName;
+		this.atn = old.atn;
+		this.pushRecursionContextStates = old.pushRecursionContextStates;
+		this.tokenNames = old.tokenNames;
+		this.ruleNames = old.ruleNames;
+		this.vocabulary = old.vocabulary;
+		setInterpreter(new ParserATNSimulator(this, atn));
+	}
 
 	/**
 	 * @deprecated Use {@link #ParserInterpreter(String, Vocabulary, Collection, ATN, TokenStream)} instead.
@@ -101,7 +131,7 @@ public class ParserInterpreter extends Parser {
 		this.ruleNames = ruleNames.toArray(new String[ruleNames.size()]);
 		this.vocabulary = vocabulary;
 
-		// identify the ATN states where pushNewRecursionContext must be called
+		// identify the ATN states where pushNewRecursionContext() must be called
 		this.pushRecursionContextStates = new BitSet(atn.states.size());
 		for (ATNState state : atn.states) {
 			if (!(state instanceof StarLoopEntryState)) {
@@ -206,7 +236,13 @@ public class ParserInterpreter extends Parser {
 		int edge;
 		if (p.getNumberOfTransitions() > 1) {
 			getErrorHandler().sync(this);
-			edge = getInterpreter().adaptivePredict(_input, ((DecisionState)p).decision, _ctx);
+			int decision = ((DecisionState) p).decision;
+			if ( decision == overrideDecision && _input.index() == overrideDecisionInputIndex ) {
+				edge = overrideDecisionAlt;
+			}
+			else {
+				edge = getInterpreter().adaptivePredict(_input, decision, _ctx);
+			}
 		}
 		else {
 			edge = 1;
@@ -215,7 +251,11 @@ public class ParserInterpreter extends Parser {
 		Transition transition = p.transition(edge - 1);
 		switch (transition.getSerializationType()) {
 		case Transition.EPSILON:
-			if (pushRecursionContextStates.get(p.stateNumber) && !(transition.target instanceof LoopEndState)) {
+			if ( pushRecursionContextStates.get(p.stateNumber) &&
+				 !(transition.target instanceof LoopEndState))
+			{
+				// We are at the start of a left recursive rule's (...)* loop
+				// but it's not the exit branch of loop.
 				InterpreterRuleContext ctx = new InterpreterRuleContext(_parentContextStack.peek().getItem1(), _parentContextStack.peek().getItem2(), _ctx.getRuleIndex());
 				pushNewRecursionContext(ctx, atn.ruleToStartState[p.ruleIndex].stateNumber, _ctx.getRuleIndex());
 			}
@@ -289,5 +329,51 @@ public class ParserInterpreter extends Parser {
 
 		RuleTransition ruleTransition = (RuleTransition)atn.states.get(getState()).transition(0);
 		setState(ruleTransition.followState.stateNumber);
+	}
+
+	/** Override this parser interpreters normal decision-making process
+	 *  at a particular decision and input token index. Instead of
+	 *  allowing the adaptive prediction mechanism to choose the
+	 *  first alternative within a block that leads to a successful parse,
+	 *  force it to take the alternative, 1..n for n alternatives.
+	 *
+	 *  As an implementation limitation right now, you can only specify one
+	 *  override. This is sufficient to allow construction of different
+	 *  parse trees for ambiguous input. It means re-parsing the entire input
+	 *  in general because you're never sure where an ambiguous sequence would
+	 *  live in the various parse trees. For example, in one interpretation,
+	 *  an ambiguous input sequence would be matched completely in expression
+	 *  but in another it could match all the way back to the root.
+	 *
+	 *  s : e '!'? ;
+	 *  e : ID
+	 *    | ID '!'
+	 *    ;
+	 *
+	 *  Here, x! can be matched as (s (e ID) !) or (s (e ID !)). In the first
+	 *  case, the ambiguous sequence is fully contained only by the root.
+	 *  In the second case, the ambiguous sequences fully contained within just
+	 *  e, as in: (e ID !).
+	 *
+	 *  Rather than trying to optimize this and make
+	 *  some intelligent decisions for optimization purposes, I settled on
+	 *  just re-parsing the whole input and then using
+	 *  {link Trees#getRootOfSubtreeEnclosingRegion} to find the minimal
+	 *  subtree that contains the ambiguous sequence. I originally tried to
+	 *  record the call stack at the point the parser detected and ambiguity but
+	 *  left recursive rules create a parse tree stack that does not reflect
+	 *  the actual call stack. That impedance mismatch was enough to make
+	 *  it it challenging to restart the parser at a deeply nested rule
+	 *  invocation.
+	 *
+	 *  Only parser interpreters can override decisions so as to avoid inserting
+	 *  override checking code in the critical ALL(*) prediction execution path.
+	 *
+	 *  @since 4.5
+	 */
+	public void addDecisionOverride(int decision, int tokenIndex, int forcedAlt) {
+		overrideDecision = decision;
+		overrideDecisionInputIndex = tokenIndex;
+		overrideDecisionAlt = forcedAlt;
 	}
 }

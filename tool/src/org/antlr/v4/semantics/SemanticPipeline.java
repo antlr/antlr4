@@ -100,13 +100,16 @@ public class SemanticPipeline {
 		BasicSemanticChecks basics = new BasicSemanticChecks(g, ruleCollector);
 		basics.process();
 
-		// don't continue if we get errors in this basic check
-		//if ( false ) return;
-
 		// TRANSFORM LEFT-RECURSIVE RULES
+		int prevErrors = g.tool.errMgr.getNumErrors();
 		LeftRecursiveRuleTransformer lrtrans =
 			new LeftRecursiveRuleTransformer(g.ast, ruleCollector.rules.values(), g);
 		lrtrans.translateLeftRecursiveRules();
+
+		// don't continue if we got errors during left-recursion elimination
+		if ( g.tool.errMgr.getNumErrors()>prevErrors ) {
+			return;
+		}
 
 		// AUTO LEFT FACTORING
 		LeftFactoringRuleTransformer lftrans = new LeftFactoringRuleTransformer(g.ast, ruleCollector.rules, g);

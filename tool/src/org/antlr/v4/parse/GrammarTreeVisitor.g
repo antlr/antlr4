@@ -79,6 +79,7 @@ package org.antlr.v4.parse;
 import org.antlr.v4.Tool;
 import org.antlr.v4.tool.*;
 import org.antlr.v4.tool.ast.*;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 }
 
@@ -105,8 +106,12 @@ public void visit(GrammarAST t, String ruleName) {
 		Method m = getClass().getMethod(ruleName);
 		m.invoke(this);
 	}
-	catch (Exception e) {
+	catch (Throwable e) {
 		ErrorManager errMgr = getErrorManager();
+		if ( e instanceof InvocationTargetException ) {
+			e = e.getCause();
+		}
+
 		if ( errMgr==null ) {
 			System.err.println("can't find rule "+ruleName+
 							   " or tree structure error: "+t.toStringTree()

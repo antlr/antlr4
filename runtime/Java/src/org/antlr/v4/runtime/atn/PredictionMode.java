@@ -553,6 +553,20 @@ public enum PredictionMode {
 	}
 
 	/**
+	 * Get union of all alts from configs.
+	 *
+	 * @since 4.5
+	 */
+	@NotNull
+	public static BitSet getAlts(@NotNull ATNConfigSet configs) {
+		BitSet alts = new BitSet();
+		for (ATNConfig config : configs) {
+			alts.set(config.getAlt());
+		}
+		return alts;
+	}
+
+	/**
 	 * This function gets the conflicting alt subsets from a configuration set.
 	 * For each configuration {@code c} in {@code configs}:
 	 *

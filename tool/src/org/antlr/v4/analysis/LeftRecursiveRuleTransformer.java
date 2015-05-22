@@ -92,9 +92,17 @@ public class LeftRecursiveRuleTransformer {
 		for (Rule r : rules) {
 			if ( !Grammar.isTokenName(r.name) ) {
 				if ( LeftRecursiveRuleAnalyzer.hasImmediateRecursiveRuleRefs(r.ast, r.name) ) {
-					g.originalTokenStream = g.tokenStream;
 					boolean fitsPattern = translateLeftRecursiveRule(ast, (LeftRecursiveRule)r, language);
-					if ( fitsPattern ) leftRecursiveRuleNames.add(r.name);
+					if ( fitsPattern ) {
+						leftRecursiveRuleNames.add(r.name);
+					}
+					else {
+						// Suppressed since this build has secondary support for left recursive rules that don't
+						// match the patterns for precedence rules.
+
+						// better given an error that non-conforming left-recursion exists
+						//tool.errMgr.grammarError(ErrorType.NONCONFORMING_LR_RULE, g.fileName, ((GrammarAST)r.ast.getChild(0)).token, r.name);
+					}
 				}
 			}
 		}
@@ -131,11 +139,15 @@ public class LeftRecursiveRuleTransformer {
 		}
 		if ( !isLeftRec ) return false;
 
-		// replace old rule's AST
+		// replace old rule's AST; first create text of altered rule
 		GrammarAST RULES = (GrammarAST)ast.getFirstChildWithType(ANTLRParser.RULES);
 		String newRuleText = leftRecursiveRuleWalker.getArtificialOpPrecRule();
 //		System.out.println("created: "+newRuleText);
-		RuleAST t = parseArtificialRule(g, newRuleText);
+		// now parse within the context of the grammar that originally created
+		// the AST we are transforming. This could be an imported grammar so
+		// we cannot just reference this.g because the role might come from
+		// the imported grammar and not the root grammar (this.g)
+		RuleAST t = parseArtificialRule(prevRuleAST.g, newRuleText);
 
 		// reuse the name token from the original AST since it refers to the proper source location in the original grammar
 		((GrammarAST)t.getChild(0)).token = ((GrammarAST)prevRuleAST.getChild(0)).getToken();

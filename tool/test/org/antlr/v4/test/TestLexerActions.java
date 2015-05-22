@@ -79,7 +79,7 @@ public class TestLexerActions extends BaseTest {
 			"Hello: Steve\n" +
 			"\n" +
 			"[@0,0:11='hello Steve\\n',<1>,1:0]\n" +
-			"[@1,12:11='<EOF>',<-1>,2:12]\n";
+			"[@1,12:11='<EOF>',<-1>,2:0]\n";
 		assertEquals(expecting, found);
 	}
 
@@ -276,7 +276,7 @@ public class TestLexerActions extends BaseTest {
 			"[@3,31:31='\\n',<4>,2:18]\n" +
 			"[@4,32:45='Another line.\\n',<1>,3:0]\n" +
 			"[@5,46:56='More line.\\n',<1>,4:0]\n" +
-			"[@6,57:56='<EOF>',<-1>,5:11]\n";
+			"[@6,57:56='<EOF>',<-1>,5:0]\n";
 		assertEquals(expecting, found);
 	}
 

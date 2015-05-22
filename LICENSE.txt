@@ -1,5 +1,5 @@
 [The "BSD license"]
-Copyright (c) 2014 Terence Parr, Sam Harwell
+Copyright (c) 2015 Terence Parr, Sam Harwell
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without

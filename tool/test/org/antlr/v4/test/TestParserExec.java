@@ -648,4 +648,22 @@ public class TestParserExec extends BaseTest {
 		assertEquals("6\n", found);
 		assertNull(stderrDuringParse);
 	}
+
+	@Test
+	public void testParserProperty() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"@members {\n" +
+			"boolean Property() {\n" +
+			"	return true;\n" +
+			"}\n" +
+			"}\n" +
+			"a : {$parser.Property()}? ID {System.out.println(\"valid\");}\n" +
+			"  ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"WS : (' '|'\\n') -> skip ;";
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a", "abc", false);
+		assertEquals("valid\n", found);
+		assertNull(this.stderrDuringParse);
+	}
 }

@@ -165,11 +165,20 @@ public class Grammar implements AttributeResolver {
 
 	public String name;
     public GrammarRootAST ast;
-	/** Track stream used to create this grammar */
+
+	/** Track token stream used to create this grammar */
 	@NotNull
 	public final org.antlr.runtime.TokenStream tokenStream;
-	/** If we transform grammar, track original unaltered token stream */
-	public org.antlr.runtime.TokenStream originalTokenStream;
+
+	/** If we transform grammar, track original unaltered token stream.
+	 *  This is set to the same value as tokenStream when tokenStream is
+	 *  initially set.
+	 *
+	 *  If this field differs from tokenStream, then we have transformed
+	 *  the grammar.
+	 */
+	@NotNull
+	public final org.antlr.runtime.TokenStream originalTokenStream;
 
     public String text; // testing only
     public String fileName;
@@ -315,6 +324,7 @@ public class Grammar implements AttributeResolver {
         this.ast = ast;
         this.name = (ast.getChild(0)).getText();
 		this.tokenStream = ast.tokenStream;
+		this.originalTokenStream = this.tokenStream;
 
 		initTokenSymbolTables();
     }
@@ -370,6 +380,7 @@ public class Grammar implements AttributeResolver {
 		}
 
 		this.tokenStream = ast.tokenStream;
+		this.originalTokenStream = this.tokenStream;
 
 		// ensure each node has pointer to surrounding grammar
 		final Grammar thiz = this;
