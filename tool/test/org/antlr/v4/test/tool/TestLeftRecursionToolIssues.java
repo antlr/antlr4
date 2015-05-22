@@ -96,7 +96,6 @@ public class TestLeftRecursionToolIssues extends BaseTest {
 		testErrors(new String[]{grammar, expected}, false);
 	}
 
-
 	/** Reproduces https://github.com/antlr/antlr4/issues/855 */
 	@Test public void testLeftRecursiveRuleRefWithArg3() throws Exception {
 		String grammar =
@@ -109,7 +108,6 @@ public class TestLeftRecursionToolIssues extends BaseTest {
 		testErrors(new String[]{grammar, expected}, false);
 	}
 
-
 	/** Reproduces https://github.com/antlr/antlr4/issues/822 */
 	@Test public void testIsolatedLeftRecursiveRuleRef() throws Exception {
 		String grammar =
@@ -118,6 +116,18 @@ public class TestLeftRecursionToolIssues extends BaseTest {
 			"b : 'B' ;\n";
 		String expected =
 			"error(" + ErrorType.NONCONFORMING_LR_RULE.code + "): T.g4:2:0: rule a is left recursive but doesn't conform to a pattern ANTLR can handle\n";
+		testErrors(new String[]{grammar, expected}, false);
+	}
+
+	/** Reproduces https://github.com/antlr/antlr4/issues/773 */
+	@Test public void testArgOnPrimaryRuleInLeftRecursiveRule() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"val: dval[1]\n" +
+			"   | val '*' val\n" +
+			"   ;\n" +
+			"dval[int  x]: '.';\n";
+		String expected = ""; // dval[1] should not be error
 		testErrors(new String[]{grammar, expected}, false);
 	}
 }
