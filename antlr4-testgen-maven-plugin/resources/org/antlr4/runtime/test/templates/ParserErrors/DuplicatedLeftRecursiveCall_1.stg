@@ -1,6 +1,6 @@
 import "DuplicatedLeftRecursiveCall.stg"
 
-Input() ::= "xx"
+Input() ::= "x"
 
 Output() ::= ""
 

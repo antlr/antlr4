@@ -26,6 +26,7 @@ TestTemplates ::= [
 	"DuplicatedLeftRecursiveCall_1": [],
 	"DuplicatedLeftRecursiveCall_2": [],
 	"DuplicatedLeftRecursiveCall_3": [],
+	"DuplicatedLeftRecursiveCall_4": [],
 	"InvalidATNStateRemoval": [],
 	"NoViableAltAvoidance": []
 ]
