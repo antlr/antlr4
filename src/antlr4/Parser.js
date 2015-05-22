@@ -434,9 +434,6 @@ Parser.prototype.enterRule = function(localctx, state, ruleIndex) {
 	if (this.buildParseTrees) {
 		this.addContextToParseTree();
 	}
-	if (this._parseListeners !== null) {
-		this.triggerEnterRuleEvent();
-	}
 };
 
 Parser.prototype.exitRule = function() {
