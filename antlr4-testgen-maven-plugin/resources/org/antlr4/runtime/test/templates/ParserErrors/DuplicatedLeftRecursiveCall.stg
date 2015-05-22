@@ -1,7 +1,7 @@
 TestType() ::= "Parser"
 
 Options ::= [
-	"Debug": false
+	"Debug": true
 ]
 
 Grammar ::= [
