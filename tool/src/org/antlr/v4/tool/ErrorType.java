@@ -956,7 +956,7 @@ public enum ErrorType {
 	 */
 	CHANNELS_BLOCK_IN_COMBINED_GRAMMAR(164, "custom channels are not supported in combined grammars", ErrorSeverity.ERROR),
 
-	NONCONFORMING_LR_RULE(165, "rule <arg> is left recursive but doesn't conform to a pattern ANTLR can handle", ErrorSeverity.ERROR),
+	NONCONFORMING_LR_RULE(169, "rule <arg> is left recursive but doesn't conform to a pattern ANTLR can handle", ErrorSeverity.ERROR),
 
 	/*
 	 * Backward incompatibility errors
