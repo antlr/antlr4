@@ -132,7 +132,7 @@ class ParserRuleContext(RuleContext):
 
     def getChildren(self):
         if self.children is None:
-            return None
+            return
         for child in self.children:
             yield child
 

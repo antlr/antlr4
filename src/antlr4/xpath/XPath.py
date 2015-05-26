@@ -99,12 +99,12 @@ class XPathLexer(Lexer):
     ID = 7
     STRING = 8
 
-    modeNames = [ u"DEFAULT_MODE" ]
+    modeNames = [ "DEFAULT_MODE" ]
 
-    literalNames = [ u"<INVALID>",
+    literalNames = [ "<INVALID>",
             "'//'", "'/'", "'*'", "'!'" ]
 
-    symbolicNames = [ u"<INVALID>",
+    symbolicNames = [ "<INVALID>",
             "TOKEN_REF", "RULE_REF", "ANYWHERE", "ROOT", "WILDCARD", "BANG",
             "ID", "STRING" ]
 

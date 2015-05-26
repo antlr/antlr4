@@ -151,13 +151,13 @@ class CommonToken(Token):
 
     def __str__(self):
         with StringIO() as buf:
-            buf.write(u"[@")
+            buf.write("[@")
             buf.write(str(self.tokenIndex))
-            buf.write(u",")
+            buf.write(",")
             buf.write(str(self.start))
-            buf.write(u":")
+            buf.write(":")
             buf.write(str(self.stop))
-            buf.write(u"='")
+            buf.write("='")
             txt = self.text
             if txt is not None:
                 txt = txt.replace("\n","\\n")
@@ -166,15 +166,15 @@ class CommonToken(Token):
             else:
                 txt = "<no text>"
             buf.write(txt)
-            buf.write(u"',<")
+            buf.write("',<")
             buf.write(str(self.type))
-            buf.write(u">")
+            buf.write(">")
             if self.channel > 0:
-                buf.write(u",channel=")
+                buf.write(",channel=")
                 buf.write(str(self.channel))
-            buf.write(u",")
+            buf.write(",")
             buf.write(str(self.line))
-            buf.write(u":")
+            buf.write(":")
             buf.write(str(self.column))
-            buf.write(u"]")
+            buf.write("]")
             return buf.getvalue()
