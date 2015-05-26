@@ -53,5 +53,5 @@ class FileStream(InputStream):
 class TestFileStream(unittest.TestCase):
 
     def testStream(self):
-        stream = FileStream("FileStream.py")
+        stream = FileStream(__file__)
         self.assertTrue(stream.size>0)
