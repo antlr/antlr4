@@ -788,12 +788,12 @@ class <lexer.name>(<if(superClass)><superClass><else>Lexer<endif>):
 
     <lexer.tokens:{k | <k> = <lexer.tokens.(k)>}; separator="\n", wrap, anchor>
 
-    modeNames = [ <lexer.modes:{m| u"<m>"}; separator=", ", wrap, anchor> ]
+    modeNames = [ <lexer.modes:{m| "<m>"}; separator=", ", wrap, anchor> ]
 
-    literalNames = [ u"\<INVALID>",
+    literalNames = [ "\<INVALID>",
             <lexer.literalNames:{t | <t>}; separator=", ", wrap, anchor> ]
 
-    symbolicNames = [ u"\<INVALID>",
+    symbolicNames = [ "\<INVALID>",
             <lexer.symbolicNames:{t | <t>}; separator=", ", wrap, anchor> ]
 
     ruleNames = [ <lexer.ruleNames:{r | "<r>"}; separator=", ", wrap, anchor> ]
