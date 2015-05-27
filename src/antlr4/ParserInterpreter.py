@@ -50,7 +50,7 @@ from antlr4.Token import Token
 from antlr4.atn.ATN import ATN
 from antlr4.atn.ATNState import StarLoopEntryState, ATNState, LoopEndState
 from antlr4.atn.ParserATNSimulator import ParserATNSimulator
-from antlr4.atn.PredictionContextCache import PredictionContextCache
+from antlr4.PredictionContext import PredictionContextCache
 from antlr4.atn.Transition import Transition
 from antlr4.error.Errors import RecognitionException, UnsupportedOperationException, FailedPredicateException
 

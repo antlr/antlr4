@@ -86,8 +86,10 @@
 # {@link #setDelimiters}. You must escape both start and stop strings
 # {@code \<} and {@code \>}.</p>
 #
-from antlr4 import Lexer, CommonTokenStream, ParserRuleContext
+from antlr4.CommonTokenStream import CommonTokenStream
 from antlr4.InputStream import InputStream
+from antlr4.ParserRuleContext import ParserRuleContext
+from antlr4.Lexer import Lexer
 from antlr4.ListTokenSource import ListTokenSource
 from antlr4.Token import Token
 from antlr4.error.ErrorStrategy import BailErrorStrategy
