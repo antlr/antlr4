@@ -68,7 +68,7 @@ class LL1Analyzer (object):
             look[alt] = set()
             lookBusy = set()
             seeThruPreds = False # fail to get lookahead upon pred
-            self._LOOK(s.transition(alt).target, None, PredictionContext.EMPTY, \
+            self._LOOK(s.transition(alt).target, None, PredictionContext.EMPTY,
                   look[alt], lookBusy, set(), seeThruPreds, False)
             # Wipe out lookahead for this alternative if we found nothing
             # or we had a predicate when we !seeThruPreds
@@ -131,7 +131,7 @@ class LL1Analyzer (object):
     # outermost context is reached. This parameter has no effect if {@code ctx}
     # is {@code null}.
     #/
-    def _LOOK(self, s:ATNState, stopState:ATNState , ctx:PredictionContext, look:IntervalSet, lookBusy:set, \
+    def _LOOK(self, s:ATNState, stopState:ATNState , ctx:PredictionContext, look:IntervalSet, lookBusy:set,
                      calledRuleStack:set, seeThruPreds:bool, addEOF:bool):
         c = ATNConfig(s, 0, ctx)
 
@@ -190,8 +190,8 @@ class LL1Analyzer (object):
             elif type(t) == WildcardTransition:
                 look.addRange( range(Token.MIN_USER_TOKEN_TYPE, self.atn.maxTokenType + 1) )
             else:
-                set = t.label
-                if set is not None:
+                set_ = t.label
+                if set_ is not None:
                     if isinstance(t, NotSetTransition):
-                        set = set.complement(Token.MIN_USER_TOKEN_TYPE, self.atn.maxTokenType)
-                    look.addSet(set)
+                        set_ = set_.complement(Token.MIN_USER_TOKEN_TYPE, self.atn.maxTokenType)
+                    look.addSet(set_)

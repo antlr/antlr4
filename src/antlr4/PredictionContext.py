@@ -303,9 +303,9 @@ def merge(a:PredictionContext, b:PredictionContext, rootIsWildcard:bool, mergeCa
 
     # convert singleton so both are arrays to normalize
     if isinstance( a, SingletonPredictionContext ):
-        a = ArrayPredictionContext(a)
+        a = ArrayPredictionContext([a.parent], [a.returnState])
     if isinstance( b, SingletonPredictionContext):
-        b = ArrayPredictionContext(b)
+        b = ArrayPredictionContext([b.parent], [b.returnState])
     return mergeArrays(a, b, rootIsWildcard, mergeCache)
 
 

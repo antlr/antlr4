@@ -126,9 +126,9 @@ class XPathLexer(Lexer):
             actions = dict()
             actions[4] = self.ID_action
             self._actions = actions
-        action = self._actions.get(ruleIndex, None)
-        if action is not None:
-            action(localctx, actionIndex)
+        _action = self._actions.get(ruleIndex, None)
+        if _action is not None:
+            _action(localctx, actionIndex)
         else:
             raise Exception("No registered action for:" + str(ruleIndex))
 
@@ -227,7 +227,8 @@ class XPath(object):
             return XPathRuleAnywhereElement(word, ruleIndex) if anywhere else XPathRuleElement(word, ruleIndex)
 
 
-    def findAll(self, tree:ParseTree, xpath:str, parser:Parser):
+    @staticmethod
+    def findAll(tree:ParseTree, xpath:str, parser:Parser):
         p = XPath(parser, xpath)
         return p.evaluate(tree)
 

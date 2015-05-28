@@ -94,7 +94,7 @@ class Trees(object):
         ancestors = []
         t = t.getParent()
         while t is not None:
-            ancestors.append(0, t) # insert at start
+            ancestors.insert(0, t) # insert at start
             t = t.getParent()
         return ancestors
 

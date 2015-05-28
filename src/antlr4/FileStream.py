@@ -41,13 +41,15 @@ from antlr4.InputStream import InputStream
 
 class FileStream(InputStream):
 
-    def __init__(self, fileName: str, encoding='ascii'):
+    def __init__(self, fileName:str, encoding:str='ascii'):
+        super().__init__(self.readDataFrom(fileName, encoding))
         self.fileName = fileName
+
+    def readDataFrom(self, fileName:str, encoding:str):
         # read binary to avoid line ending conversion
         with open(fileName, 'rb') as file:
             bytes = file.read()
-            data = codecs.decode(bytes, encoding)
-            super(type(self), self).__init__(data)
+            return codecs.decode(bytes, encoding)
 
 
 class TestFileStream(unittest.TestCase):

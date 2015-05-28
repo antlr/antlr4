@@ -188,7 +188,7 @@ class PrecedencePredicate(SemanticContext):
 
 # A semantic context which is true whenever none of the contained contexts
 # is false.
-#
+del AND
 class AND(SemanticContext):
 
     def __init__(self, a:SemanticContext, b:SemanticContext):
@@ -275,7 +275,7 @@ class AND(SemanticContext):
 #
 # A semantic context which is true whenever at least one of the contained
 # contexts is true.
-#
+del OR
 class OR (SemanticContext):
 
     def __init__(self, a:SemanticContext, b:SemanticContext):

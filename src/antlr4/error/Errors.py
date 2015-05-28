@@ -114,7 +114,7 @@ class LexerNoViableAltException(RecognitionException):
     def __str__(self):
         symbol = ""
         if self.startIndex >= 0 and self.startIndex < self.input.size():
-            symbol = self.input.getText((self.startIndex,self.startIndex))
+            symbol = self.input.getText(self.startIndex,self.startIndex)
             # TODO symbol = Utils.escapeWhitespace(symbol, false);
         return "LexerNoViableAltException" + symbol
 
