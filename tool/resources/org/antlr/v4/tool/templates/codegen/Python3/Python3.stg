@@ -153,9 +153,9 @@ class <parser.name> ( <if(superClass)><superClass><else>Parser<endif> ):
 
     sharedContextCache = PredictionContextCache()
 
-    literalNames = [ <parser.literalNames:{t | u<t>}; null="u\"\<INVALID>\"", separator=", ", wrap, anchor> ]
+    literalNames = [ <parser.literalNames:{t | <t>}; null="\"\<INVALID>\"", separator=", ", wrap, anchor> ]
 
-    symbolicNames = [ <parser.symbolicNames:{t | u<t>}; null="u\"\<INVALID>\"", separator=", ", wrap, anchor> ]
+    symbolicNames = [ <parser.symbolicNames:{t | <t>}; null="\"\<INVALID>\"", separator=", ", wrap, anchor> ]
 
     <parser.rules:{r | RULE_<r.name> = <r.index>}; separator="\n", wrap, anchor>
 
