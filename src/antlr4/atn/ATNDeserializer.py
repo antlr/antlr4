@@ -55,9 +55,6 @@ class ATNDeserializer (object):
         if options is None:
             options = ATNDeserializationOptions.defaultOptions
         self.deserializationOptions = options
-        self.edgeFactories = None
-        self.stateFactories = None
-        self.actionFactories = None
 
     # Determines if a particular serialized representation of an ATN supports
     # a particular feature, identified by the {@link UUID} used for serializing
@@ -466,56 +463,51 @@ class ATNDeserializer (object):
         allBits = (low & 0xFFFFFFFFFFFFFFFF) | (high << 64)
         return UUID(int=allBits)
 
+    edgeFactories = [ lambda args : None,
+                      lambda atn, src, trg, arg1, arg2, arg3, sets, target : EpsilonTransition(target),
+                      lambda atn, src, trg, arg1, arg2, arg3, sets, target : \
+                        RangeTransition(target, Token.EOF, arg2) if arg3 != 0 else RangeTransition(target, arg1, arg2),
+                      lambda atn, src, trg, arg1, arg2, arg3, sets, target : \
+                        RuleTransition(atn.states[arg1], arg2, arg3, target),
+                      lambda atn, src, trg, arg1, arg2, arg3, sets, target : \
+                        PredicateTransition(target, arg1, arg2, arg3 != 0),
+                      lambda atn, src, trg, arg1, arg2, arg3, sets, target : \
+                        AtomTransition(target, Token.EOF) if arg3 != 0 else AtomTransition(target, arg1),
+                      lambda atn, src, trg, arg1, arg2, arg3, sets, target : \
+                        ActionTransition(target, arg1, arg2, arg3 != 0),
+                      lambda atn, src, trg, arg1, arg2, arg3, sets, target : \
+                        SetTransition(target, sets[arg1]),
+                      lambda atn, src, trg, arg1, arg2, arg3, sets, target : \
+                        NotSetTransition(target, sets[arg1]),
+                      lambda atn, src, trg, arg1, arg2, arg3, sets, target : \
+                        WildcardTransition(target),
+                      lambda atn, src, trg, arg1, arg2, arg3, sets, target : \
+                        PrecedencePredicateTransition(target, arg1)
+                      ]
+
     def edgeFactory(self, atn:ATN, type:int, src:int, trg:int, arg1:int, arg2:int, arg3:int, sets:list):
         target = atn.states[trg]
-        if self.edgeFactories is None:
-            ef = [None] * 11
-            ef[0] = lambda args : None
-            ef[Transition.EPSILON] = lambda atn, src, trg, arg1, arg2, arg3, sets, target : \
-                EpsilonTransition(target)
-            ef[Transition.RANGE] = lambda atn, src, trg, arg1, arg2, arg3, sets, target : \
-                RangeTransition(target, Token.EOF, arg2) if arg3 != 0 else RangeTransition(target, arg1, arg2)
-            ef[Transition.RULE] = lambda atn, src, trg, arg1, arg2, arg3, sets, target : \
-                RuleTransition(atn.states[arg1], arg2, arg3, target)
-            ef[Transition.PREDICATE] = lambda atn, src, trg, arg1, arg2, arg3, sets, target : \
-                PredicateTransition(target, arg1, arg2, arg3 != 0)
-            ef[Transition.PRECEDENCE] = lambda atn, src, trg, arg1, arg2, arg3, sets, target : \
-                PrecedencePredicateTransition(target, arg1)
-            ef[Transition.ATOM] = lambda atn, src, trg, arg1, arg2, arg3, sets, target : \
-                AtomTransition(target, Token.EOF) if arg3 != 0 else AtomTransition(target, arg1)
-            ef[Transition.ACTION] = lambda atn, src, trg, arg1, arg2, arg3, sets, target : \
-                ActionTransition(target, arg1, arg2, arg3 != 0)
-            ef[Transition.SET] = lambda atn, src, trg, arg1, arg2, arg3, sets, target : \
-                SetTransition(target, sets[arg1])
-            ef[Transition.NOT_SET] = lambda atn, src, trg, arg1, arg2, arg3, sets, target : \
-                NotSetTransition(target, sets[arg1])
-            ef[Transition.WILDCARD] = lambda atn, src, trg, arg1, arg2, arg3, sets, target : \
-                WildcardTransition(target)
-            self.edgeFactories = ef
-
-        if type> len(self.edgeFactories) or self.edgeFactories[type] is None:
+        if type > len(self.edgeFactories) or self.edgeFactories[type] is None:
             raise Exception("The specified transition type: " + str(type) + " is not valid.")
         else:
             return self.edgeFactories[type](atn, src, trg, arg1, arg2, arg3, sets, target)
 
-    def stateFactory(self, type:int, ruleIndex:int):
-        if self.stateFactories is None:
-            sf = [None] * 13
-            sf[ATNState.INVALID_TYPE] = lambda : None
-            sf[ATNState.BASIC] = lambda : BasicState()
-            sf[ATNState.RULE_START] = lambda : RuleStartState()
-            sf[ATNState.BLOCK_START] = lambda : BasicBlockStartState()
-            sf[ATNState.PLUS_BLOCK_START] = lambda : PlusBlockStartState()
-            sf[ATNState.STAR_BLOCK_START] = lambda : StarBlockStartState()
-            sf[ATNState.TOKEN_START] = lambda : TokensStartState()
-            sf[ATNState.RULE_STOP] = lambda : RuleStopState()
-            sf[ATNState.BLOCK_END] = lambda : BlockEndState()
-            sf[ATNState.STAR_LOOP_BACK] = lambda : StarLoopbackState()
-            sf[ATNState.STAR_LOOP_ENTRY] = lambda : StarLoopEntryState()
-            sf[ATNState.PLUS_LOOP_BACK] = lambda : PlusLoopbackState()
-            sf[ATNState.LOOP_END] = lambda : LoopEndState()
-            self.stateFactories = sf
+    stateFactories = [  lambda : None,
+                        lambda : BasicState(),
+                        lambda : RuleStartState(),
+                        lambda : BasicBlockStartState(),
+                        lambda : PlusBlockStartState(),
+                        lambda : StarBlockStartState(),
+                        lambda : TokensStartState(),
+                        lambda : RuleStopState(),
+                        lambda : BlockEndState(),
+                        lambda : StarLoopbackState(),
+                        lambda : StarLoopEntryState(),
+                        lambda : PlusLoopbackState(),
+                        lambda : LoopEndState()
+                    ]
 
+    def stateFactory(self, type:int, ruleIndex:int):
         if type> len(self.stateFactories) or self.stateFactories[type] is None:
             raise Exception("The specified state type " + str(type) + " is not valid.")
         else:
@@ -524,20 +516,28 @@ class ATNDeserializer (object):
                 s.ruleIndex = ruleIndex
         return s
 
-    def lexerActionFactory(self, type:int, data1:int, data2:int):
-        if self.actionFactories is None:
-            af = [ None ] * 8
-            af[LexerActionType.CHANNEL] = lambda data1, data2: LexerChannelAction(data1)
-            af[LexerActionType.CUSTOM] = lambda data1, data2: LexerCustomAction(data1, data2)
-            af[LexerActionType.MODE] = lambda data1, data2: LexerModeAction(data1)
-            af[LexerActionType.MORE] = lambda data1, data2: LexerMoreAction.INSTANCE
-            af[LexerActionType.POP_MODE] = lambda data1, data2: LexerPopModeAction.INSTANCE
-            af[LexerActionType.PUSH_MODE] = lambda data1, data2: LexerPushModeAction(data1)
-            af[LexerActionType.SKIP] = lambda data1, data2: LexerSkipAction.INSTANCE
-            af[LexerActionType.TYPE] = lambda data1, data2: LexerTypeAction(data1)
-            self.actionFactories = af
+    CHANNEL = 0     #The type of a {@link LexerChannelAction} action.
+    CUSTOM = 1      #The type of a {@link LexerCustomAction} action.
+    MODE = 2        #The type of a {@link LexerModeAction} action.
+    MORE = 3        #The type of a {@link LexerMoreAction} action.
+    POP_MODE = 4    #The type of a {@link LexerPopModeAction} action.
+    PUSH_MODE = 5   #The type of a {@link LexerPushModeAction} action.
+    SKIP = 6        #The type of a {@link LexerSkipAction} action.
+    TYPE = 7        #The type of a {@link LexerTypeAction} action.
 
-        if type> len(self.actionFactories) or self.actionFactories[type] is None:
+    actionFactories = [ lambda data1, data2: LexerChannelAction(data1),
+                        lambda data1, data2: LexerCustomAction(data1, data2),
+                        lambda data1, data2: LexerModeAction(data1),
+                        lambda data1, data2: LexerMoreAction.INSTANCE,
+                        lambda data1, data2: LexerPopModeAction.INSTANCE,
+                        lambda data1, data2: LexerPushModeAction(data1),
+                        lambda data1, data2: LexerSkipAction.INSTANCE,
+                        lambda data1, data2: LexerTypeAction(data1)
+                      ]
+
+    def lexerActionFactory(self, type:int, data1:int, data2:int):
+
+        if type > len(self.actionFactories) or self.actionFactories[type] is None:
             raise Exception("The specified lexer action type " + str(type) + " is not valid.")
         else:
             return self.actionFactories[type](data1, data2)
