@@ -54,9 +54,7 @@ ParserFile(file, parser, namedActions) ::= <<
 from antlr4 import *
 from io import StringIO
 <if(file.genListener || file.genVisitor)>
-package = globals().get("__package__", None)
-ischild = len(package)>0 if package is not None else False
-if ischild:
+if __name__ is not None and "." in __name__:
     <if(file.genListener)>
     from .<file.parser.grammarName>Listener import <file.parser.grammarName>Listener
     <endif>
