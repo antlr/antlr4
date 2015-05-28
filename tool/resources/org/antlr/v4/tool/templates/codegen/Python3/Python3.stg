@@ -53,12 +53,7 @@ ParserFile(file, parser, namedActions) ::= <<
 # encoding: utf-8
 from antlr4 import *
 from io import StringIO
-
-<namedActions.header>
-<parser>
-
 <if(file.genListener || file.genVisitor)>
-# import Listener/Visitor last to avoid conflicting imports
 package = globals().get("__package__", None)
 ischild = len(package)>0 if package is not None else False
 if ischild:
@@ -76,19 +71,21 @@ else:
     from <file.parser.grammarName>Visitor import <file.parser.grammarName>Visitor
     <endif>
 <endif>
+
+<namedActions.header>
+<parser>
+
 >>
 
 ListenerFile(file, header) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 from antlr4 import *
-package = globals().get("__package__", None)
-ischild = len(package)>0 if package is not None else False
-if ischild:
-    from .<file.parserName> import <file.parserName>
-else:
-    from <file.parserName> import <file.parserName>
 <header>
 
+# Create a dummy <file.parserName> to avoid circular imports
+class <file.parserName>(object):
+	<file.listenerNames:{lname | <lname; format="cap">Context = None}; separator="\n">
+	
 # This class defines a complete listener for a parse tree produced by <file.parserName>.
 class <file.grammarName>Listener(ParseTreeListener):
 
@@ -103,19 +100,18 @@ def exit<lname; format="cap">(self, ctx:<file.parserName>.<lname; format="cap">C
 
 }; separator="\n">
 
+del <file.parserName>
 >>
 
 
 VisitorFile(file, header) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 from antlr4 import *
-package = globals().get("__package__", None)
-ischild = len(package)>0 if package is not None else False
-if ischild:
-    from .<file.parserName> import <file.parserName>
-else:
-    from <file.parserName> import <file.parserName>
 <header>
+
+# Create a dummy <file.parserName> to avoid circular imports
+class <file.parserName>(object):
+	<file.visitorNames:{lname | <lname; format="cap">Context = None}; separator="\n">
 
 # This class defines a complete generic visitor for a parse tree produced by <file.parserName>.
 
@@ -128,6 +124,7 @@ def visit<lname; format="cap">(self, ctx:<file.parserName>.<lname; format="cap">
 
 }; separator="\n">
 
+del <file.parserName>
 >>
 
 
