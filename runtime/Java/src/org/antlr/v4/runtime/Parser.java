@@ -765,6 +765,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 	 *
 	 *  The list of trees includes the actual interpretation (that for
 	 *  the minimum alternative number) and all ambiguous alternatives.
+	 *  The actual interpretation is always first.
 	 *
 	 *  This method reuses the same physical input token stream used to
 	 *  detect the ambiguity by the original parser in the first place.
@@ -796,8 +797,19 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 	 *                        is not modified by this routine and can be either
 	 *                        a generated or interpreted parser. It's token
 	 *                        stream *is* reset/seek()'d.
-	 *  @param ambiguityInfo The information about an ambiguous decision event
-	 *                       for which you want ambiguous parse trees.
+	 *  @param ambiguityInfo  The information about an ambiguous decision event
+	 *                        for which you want ambiguous parse trees.
+	 *  @param startRuleIndex The start rule for the entire grammar, not
+	 *                        the ambiguous decision. We re-parse the entire input
+	 *                        and so we need the original start rule.
+	 *
+	 *  @return               The list of all possible interpretations of
+	 *                        the input for the decision in ambiguityInfo.
+	 *                        The actual interpretation chosen by the parser
+	 *                        is always given first because this method
+	 *                        retests the input in alternative order and
+	 *                        ANTLR always resolves ambiguities by choosing
+	 *                        the first alternative that matches the input.
 	 *
 	 *  @throws RecognitionException Throws upon syntax error while matching
 	 *                               ambig input.
@@ -833,18 +845,17 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 			// get ambig trees
 			int alt = ambiguityInfo.ambigAlts.nextSetBit(0);
 			while ( alt>=0 ) {
-				// re-parse input for all ambiguous alternatives
+				// re-parse entire input for all ambiguous alternatives
 				// (don't have to do first as it's been parsed, but do again for simplicity
 				//  using this temp parser.)
 				parser.reset();
-				parser.getTokenStream().seek(ambiguityInfo.startIndex);
+				parser.getTokenStream().seek(0); // rewind the input all the way for re-parsing
 				parser.overrideDecision = ambiguityInfo.decision;
 				parser.overrideDecisionInputIndex = ambiguityInfo.startIndex;
 				parser.overrideDecisionAlt = alt;
 				ParserRuleContext t = parser.parse(startRuleIndex);
 				ParserRuleContext ambigSubTree =
-					Trees.getRootOfSubtreeEnclosingRegion(t, ambiguityInfo.startIndex,
-														  ambiguityInfo.stopIndex);
+					Trees.getRootOfSubtreeEnclosingRegion(t, ambiguityInfo.startIndex, ambiguityInfo.stopIndex);
 				trees.add(ambigSubTree);
 				alt = ambiguityInfo.ambigAlts.nextSetBit(alt+1);
 			}
