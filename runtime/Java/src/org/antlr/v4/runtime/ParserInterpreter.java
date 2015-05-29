@@ -247,22 +247,22 @@ public class ParserInterpreter extends Parser {
 	}
 
 	protected void visitState(ATNState p) {
-		int edge;
+		int altNum;
 		if (p.getNumberOfTransitions() > 1) {
 			getErrorHandler().sync(this);
 			int decision = ((DecisionState) p).decision;
 			if ( decision == overrideDecision && _input.index() == overrideDecisionInputIndex ) {
-				edge = overrideDecisionAlt;
+				altNum = overrideDecisionAlt;
 			}
 			else {
-				edge = getInterpreter().adaptivePredict(_input, decision, _ctx);
+				altNum = getInterpreter().adaptivePredict(_input, decision, _ctx);
 			}
 		}
 		else {
-			edge = 1;
+			altNum = 1;
 		}
 
-		Transition transition = p.transition(edge - 1);
+		Transition transition = p.transition(altNum - 1);
 		switch (transition.getSerializationType()) {
 			case Transition.EPSILON:
 				if ( statesNeedingLeftRecursionContext.get(p.stateNumber) &&

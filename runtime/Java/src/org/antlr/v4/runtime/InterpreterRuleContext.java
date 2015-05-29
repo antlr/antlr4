@@ -42,9 +42,7 @@ package org.antlr.v4.runtime;
  * provide equivalent functionality.</p>
  */
 public class InterpreterRuleContext extends ParserRuleContext {
-	/**
-	 * This is the backing field for {@link #getRuleIndex}.
-	 */
+	/** This is the backing field for {@link #getRuleIndex}. */
 	private int ruleIndex = -1;
 
 	public InterpreterRuleContext() { }
