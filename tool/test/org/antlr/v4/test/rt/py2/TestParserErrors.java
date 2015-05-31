@@ -17,6 +17,23 @@ public class TestParserErrors extends BasePython2Test {
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
+	public void testTokenMismatch2() throws Exception {
+		String grammar = "grammar T;\n" +
+	                  "\n" +
+	                  "stat:   ( '(' expr? ')' )? EOF ;\n" +
+	                  "expr:   ID '=' STR ;\n" +
+	                  "\n" +
+	                  "ERR :   '~FORCE_ERROR~' ;\n" +
+	                  "ID  :   [a-zA-Z]+ ;\n" +
+	                  "STR :   '\"' ~[\"]* '\"' ;\n" +
+	                  "WS  :   [ \\t\\r\\n]+ -> skip ;";
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "stat", "( ~FORCE_ERROR~ ", false);
+		assertEquals("", found);
+		assertEquals("line 1:2 mismatched input '~FORCE_ERROR~' expecting ')'\n", this.stderrDuringParse);
+	}
+
+	/* this file and method are generated, any edit will be overwritten by the next generation */
+	@Test
 	public void testSingleTokenDeletion() throws Exception {
 		String grammar = "grammar T;\n" +
 	                  "a : 'a' 'b' ;";
@@ -32,17 +49,6 @@ public class TestParserErrors extends BasePython2Test {
 	                  "a : 'a' ('b'|'c') ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "a", "aab", false);
 		assertEquals("", found);
-		assertEquals("line 1:1 extraneous input 'a' expecting {'b', 'c'}\n", this.stderrDuringParse);
-	}
-
-	/* this file and method are generated, any edit will be overwritten by the next generation */
-	@Test
-	public void testSingleTokenDeletionConsumption() throws Exception {
-		String grammar = "grammar T;\n" +
-	                  "myset: ('b'|'c') ;\n" +
-	                  "a: 'a' myset 'd' {print(\"\" + str($myset.stop))} ; ";
-		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "a", "aabd", false);
-		assertEquals("[@2,2:2='b',<1>,1:2]\n", found);
 		assertEquals("line 1:1 extraneous input 'a' expecting {'b', 'c'}\n", this.stderrDuringParse);
 	}
 
@@ -84,17 +90,6 @@ public class TestParserErrors extends BasePython2Test {
 	                  "a : 'a' ('b'|'c') 'd' ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "a", "ad", false);
 		assertEquals("", found);
-		assertEquals("line 1:1 missing {'b', 'c'} at 'd'\n", this.stderrDuringParse);
-	}
-
-	/* this file and method are generated, any edit will be overwritten by the next generation */
-	@Test
-	public void testSingleSetInsertionConsumption() throws Exception {
-		String grammar = "grammar T;\n" +
-	                  "myset: ('b'|'c') ;\n" +
-	                  "a: 'a' myset 'd' {print(\"\" + str($myset.stop))} ; ";
-		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "a", "ad", false);
-		assertEquals("[@0,0:0='a',<3>,1:0]\n", found);
 		assertEquals("line 1:1 missing {'b', 'c'} at 'd'\n", this.stderrDuringParse);
 	}
 
