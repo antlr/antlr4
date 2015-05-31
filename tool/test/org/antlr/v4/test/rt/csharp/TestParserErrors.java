@@ -16,6 +16,23 @@ public class TestParserErrors extends BaseTest {
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
+	public void testTokenMismatch2() throws Exception {
+		String grammar = "grammar T;\n" +
+	                  "\n" +
+	                  "stat:   ( '(' expr? ')' )? EOF ;\n" +
+	                  "expr:   ID '=' STR ;\n" +
+	                  "\n" +
+	                  "ERR :   '~FORCE_ERROR~' ;\n" +
+	                  "ID  :   [a-zA-Z]+ ;\n" +
+	                  "STR :   '\"' ~[\"]* '\"' ;\n" +
+	                  "WS  :   [ \\t\\r\\n]+ -> skip ;";
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "stat", "( ~FORCE_ERROR~ ", false);
+		assertEquals("", found);
+		assertEquals("line 1:2 mismatched input '~FORCE_ERROR~' expecting ')'\n", this.stderrDuringParse);
+	}
+
+	/* this file and method are generated, any edit will be overwritten by the next generation */
+	@Test
 	public void testSingleTokenDeletion() throws Exception {
 		String grammar = "grammar T;\n" +
 	                  "a : 'a' 'b' ;";
