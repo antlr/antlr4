@@ -1,0 +1,9 @@
+import "JavaExpressions.stg"
+
+Input() ::= "new A().b"
+
+Output() ::= <<
+(s (e (e new (type_ A) ( )) . b) \<EOF>)<\n>
+>>
+
+Errors() ::= ""

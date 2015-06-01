@@ -1,0 +1,7 @@
+import "AmbigLR.stg"
+
+Input() ::= "1<\n>"
+
+Output() ::= ""
+
+Errors() ::= ""

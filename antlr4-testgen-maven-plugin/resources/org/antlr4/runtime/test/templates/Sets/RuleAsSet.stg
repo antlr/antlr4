@@ -1,0 +1,24 @@
+TestType() ::= "Parser"
+
+Options ::= [
+	"Debug": false
+]
+
+Grammar ::= [
+	"T": {<grammar("T")>}
+]
+
+Input() ::= "b"
+
+Rule() ::= "a"
+
+Output() ::= <<
+b<\n>
+>>
+
+Errors() ::= ""
+
+grammar(grammarName) ::= <<
+grammar <grammarName>;
+a @after {<InputText():writeln()>} : 'a' | 'b' |'c' ;
+>>

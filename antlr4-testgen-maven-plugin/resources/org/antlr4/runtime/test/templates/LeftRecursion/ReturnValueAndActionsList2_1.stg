@@ -1,0 +1,9 @@
+import "ReturnValueAndActionsList2.stg"
+
+Input() ::= "a*b"
+
+Output() ::= <<
+(s (expr (expr a) * (expr b)) \<EOF>)<\n>
+>>
+
+Errors() ::= ""

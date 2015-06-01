@@ -1,0 +1,7 @@
+import "AorAStar.stg"
+
+Input() ::= ""
+
+Output() ::= "<\n>"
+
+Errors() ::= ""

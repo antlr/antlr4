@@ -1,0 +1,27 @@
+TestType() ::= "Parser"
+
+Options ::= [
+	"Debug": false
+]
+
+Grammar ::= [
+	"T": {<grammar("T")>}
+]
+
+Input() ::= "x"
+
+Rule() ::= "a"
+
+Output() ::= <<
+x<\n>
+>>
+
+Errors() ::= ""
+
+grammar(grammarName) ::= <<
+grammar <grammarName>;
+a : A {<writeln("$A.text")>} ;
+A : ('a'|B) ;  // this doesn't collapse to set but works
+fragment
+B : ~('a'|'c') ;
+>>

@@ -1,0 +1,10 @@
+import "TokenGetters.stg"
+
+Input() ::= "1 2"
+
+Output() ::= <<
+(a 1 2)
+1 2 [1, 2]<\n>
+>>
+
+Errors() ::= ""

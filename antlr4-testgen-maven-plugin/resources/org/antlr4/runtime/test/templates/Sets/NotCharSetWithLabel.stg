@@ -1,0 +1,25 @@
+TestType() ::= "Parser"
+
+Options ::= [
+	"Debug": false
+]
+
+Grammar ::= [
+	"T": {<grammar("T")>}
+]
+
+Input() ::= "x"
+
+Rule() ::= "a"
+
+Output() ::= <<
+x<\n>
+>>
+
+Errors() ::= ""
+
+grammar(grammarName) ::= <<
+grammar <grammarName>;
+a : A {<writeln("$A.text")>} ;
+A : h=~('b'|'c') ;
+>>

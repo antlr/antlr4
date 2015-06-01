@@ -1,0 +1,40 @@
+/**
+ * In this case, we're passing a parameter into a rule that uses that
+ * information to predict the alternatives. This is the special case
+ * where we know exactly which context we are in. The context stack
+ * is empty and we have not dipped into the outer context to make a decision.
+ */
+
+TestType() ::= "Parser"
+
+Options ::= [
+	"Debug": false
+]
+
+Grammar ::= [
+	"T": {<grammar("T")>}
+]
+
+Input() ::= "a b"
+
+Rule() ::= "s"
+
+Output() ::= <<
+alt 2
+alt 1<\n>
+>>
+
+Errors() ::= ""
+
+grammar(grammarName) ::= <<
+grammar <grammarName>;
+@members {<InitIntMember("i","0")>}
+s : a[2] a[1];
+a[int i]
+  : {<ValEquals("$i","1")>}? ID {<writeln("\"alt 1\"")>}
+  | {<ValEquals("$i","2")>}? ID {<writeln("\"alt 2\"")>}
+  ;
+ID : 'a'..'z'+ ;
+INT : '0'..'9'+;
+WS : (' '|'\n') -> skip ;
+>>

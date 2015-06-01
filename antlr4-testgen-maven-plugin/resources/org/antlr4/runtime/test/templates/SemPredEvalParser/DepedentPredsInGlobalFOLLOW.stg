@@ -1,0 +1,38 @@
+/** We cannot collect predicates that are dependent on local context if
+ *  we are doing a global follow. They appear as if they were not there at all.
+ */
+
+TestType() ::= "Parser"
+
+Options ::= [
+	"Debug": false
+]
+
+Grammar ::= [
+	"T": {<grammar("T")>}
+]
+
+Input() ::= "a!"
+
+Rule() ::= "s"
+
+Output() ::= <<
+eval=true
+parse<\n>
+>>
+
+Errors() ::= ""
+
+grammar(grammarName) ::= <<
+grammar <grammarName>;
+@members {
+<Declare_pred()>
+}
+s : a[99] ;
+a[int i] : e {<ValEquals("$i","99"):Invoke_pred()>}? {<writeln("\"parse\"")>} '!' ;
+b[int i] : e {<ValEquals("$i","99"):Invoke_pred()>}? ID ;
+e : ID | ; // non-LL(1) so we use ATN
+ID : 'a'..'z'+ ;
+INT : '0'..'9'+;
+WS : (' '|'\n') -> skip ;
+>>

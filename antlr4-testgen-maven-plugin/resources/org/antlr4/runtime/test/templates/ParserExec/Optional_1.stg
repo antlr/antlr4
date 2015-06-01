@@ -1,0 +1,7 @@
+import "Optional.stg"
+
+Input() ::= "x"
+
+Output() ::= ""
+
+Errors() ::= ""

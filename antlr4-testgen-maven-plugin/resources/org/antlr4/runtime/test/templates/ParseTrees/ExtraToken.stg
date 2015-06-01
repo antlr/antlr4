@@ -1,0 +1,34 @@
+TestType() ::= "Parser"
+
+Grammar ::= [
+	"T": {<grammar("T")>}
+]
+
+Input() ::= "xzy"
+
+Rule() ::= "s"
+
+Output() ::= <<
+(a x z y)<\n>
+>>
+
+Errors() ::= <<
+line 1:1 extraneous input 'z' expecting 'y'<\n>
+>>
+
+grammar(grammarName) ::= <<
+grammar <grammarName>;
+s
+@init {
+<BuildParseTrees()>
+}
+@after {
+<ToStringTree("$r.ctx"):writeln()>
+}
+  : r=a ;
+a : 'x' 'y'
+  ;
+Z : 'z' 
+  ;
+ 
+>>

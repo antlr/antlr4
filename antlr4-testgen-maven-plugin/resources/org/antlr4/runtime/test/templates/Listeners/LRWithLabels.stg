@@ -1,0 +1,50 @@
+TestType() ::= "Parser"
+
+Options ::= [
+	"Debug": false
+]
+
+Grammar ::= [
+	"T": {<grammar("T")>}
+]
+
+Input() ::= "1(2,3)"
+
+Rule() ::= "s"
+
+Output() ::= <<
+(e (e 1) ( (eList (e 2) , (e 3)) ))
+1
+2
+3
+1 [13 6]<\n>
+>>
+
+Errors() ::= ""
+
+grammar(grammarName) ::= <<
+grammar <grammarName>;
+@parser::header {
+<ImportListener(grammarName)>
+}
+
+@parser::members {
+<LRWithLabelsListener(grammarName)>
+}
+
+s
+@after {
+<ToStringTree("$ctx.r"):writeln()>
+<WalkListener("$ctx.r")>
+}
+  : r=e ;
+e : e '(' eList ')' # Call
+  | INT             # Int
+  ;
+eList : e (',' e)* ;
+MULT: '*' ;
+ADD : '+' ;
+INT : [0-9]+ ;
+ID  : [a-z]+ ;
+WS : [ \t\n]+ -> skip ;
+>>

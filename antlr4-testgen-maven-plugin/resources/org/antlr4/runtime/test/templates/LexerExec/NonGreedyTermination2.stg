@@ -1,0 +1,21 @@
+TestType() ::= "Lexer"
+
+Grammar ::= [
+	"L": {<grammar("L")>}
+]
+
+Input() ::= <%
+"""mom"
+%>
+
+Output() ::= <<
+[@0,0:6='"""mom"',\<1>,1:0]
+[@1,7:6='\<EOF>',\<-1>,1:7]<\n>
+>>
+
+Errors() ::= ""
+
+grammar(grammarName) ::= <<
+lexer grammar <grammarName>;
+STRING : '"' ('""' | .)+? '"';
+>>

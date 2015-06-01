@@ -1,0 +1,18 @@
+TestFolders ::= [
+	"CompositeLexers": [],
+	"CompositeParsers": [],
+	"FullContextParsing": [],
+	"LeftRecursion": [],
+	"LexerErrors": [],
+	"LexerExec": [],
+	"Listeners": [],
+	"ParserErrors": [],
+	"ParserExec": [],
+	"ParseTrees": [],
+	"SemPredEvalLexer": [],
+	"SemPredEvalParser": [],
+	"Sets": []
+]
+
+//TestTemplates ::= [
+//]

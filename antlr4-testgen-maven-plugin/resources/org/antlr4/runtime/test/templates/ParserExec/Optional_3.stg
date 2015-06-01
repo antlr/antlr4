@@ -1,0 +1,7 @@
+import "Optional.stg"
+
+Input() ::= "if x else x"
+
+Output() ::= ""
+
+Errors() ::= ""

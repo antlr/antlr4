@@ -1,0 +1,9 @@
+import "JavaExpressions.stg"
+
+Input() ::= "a.f().g(x,1)"
+
+Output() ::= <<
+(s (e (e (e (e (e a) . f) ( )) . g) ( (expressionList (e x) , (e 1)) )) \<EOF>)<\n>
+>>
+
+Errors() ::= ""

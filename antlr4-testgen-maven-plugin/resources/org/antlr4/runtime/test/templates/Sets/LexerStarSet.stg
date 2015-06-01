@@ -1,0 +1,25 @@
+TestType() ::= "Parser"
+
+Options ::= [
+	"Debug": false
+]
+
+Grammar ::= [
+	"T": {<grammar("T")>}
+]
+
+Input() ::= "abaac"
+
+Rule() ::= "a"
+
+Output() ::= <<
+abaac<\n>
+>>
+
+Errors() ::= ""
+
+grammar(grammarName) ::= <<
+grammar <grammarName>;
+a : A {<InputText():writeln()>} ;
+A : ('a'|'b')* 'c' ;
+>>

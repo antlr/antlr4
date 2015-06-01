@@ -1,0 +1,13 @@
+import "StringsEmbeddedInActions.stg"
+
+Input() ::= <<
+["foo]
+>>
+
+Output() ::= <<
+[@0,6:5='\<EOF>',\<-1>,1:6]<\n>
+>>
+
+Errors() ::= <<
+line 1:0 token recognition error at: '["foo]'<\n>
+>>

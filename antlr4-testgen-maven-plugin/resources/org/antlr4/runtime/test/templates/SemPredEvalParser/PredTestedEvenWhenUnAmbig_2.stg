@@ -1,0 +1,10 @@
+import "PredTestedEvenWhenUnAmbig.stg"
+
+Input() ::= "enum"
+
+Output() ::= <<
+>>
+
+Errors() ::= <<
+line 1:0 no viable alternative at input 'enum'<\n>
+>>

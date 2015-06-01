@@ -1,0 +1,7 @@
+import "AStar.stg"
+
+Input() ::= ""
+
+Output() ::= "<\n>"
+
+Errors() ::= ""

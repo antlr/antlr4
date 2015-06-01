@@ -1,0 +1,19 @@
+TestType() ::= "Parser"
+
+Options ::= [
+	"Debug": true
+]
+
+Grammar ::= [
+	"T": {<grammar("T")>}
+]
+
+Rule() ::= "start"
+
+grammar(grammarName) ::= <<
+grammar <grammarName>;
+start : expr EOF;
+expr : 'x'
+     | expr expr
+     ;
+>>
