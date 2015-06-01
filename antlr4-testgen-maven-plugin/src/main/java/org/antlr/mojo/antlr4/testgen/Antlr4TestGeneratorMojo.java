@@ -27,6 +27,7 @@
 */
 package org.antlr.mojo.antlr4.testgen;
 
+import org.antlr.v4.testgen.TestGenerator;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -35,19 +36,8 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
-import org.stringtemplate.v4.ST;
-import org.stringtemplate.v4.STGroup;
-import org.stringtemplate.v4.STGroupFile;
-import org.stringtemplate.v4.gui.STViz;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
 
 @Mojo(
 	name = "antlr4.testgen",
@@ -62,10 +52,10 @@ public class Antlr4TestGeneratorMojo extends AbstractMojo {
 	@Parameter(property = "project.build.sourceEncoding")
 	private String encoding;
 
-	@Parameter(property = "project", required = true, readonly = true)
+	@Parameter(property = "project", readonly = true)
 	private MavenProject project;
 
-	@Parameter(required = true)
+	@Parameter(property = "runtimeTemplates", required = true)
 	private File runtimeTemplates;
 
 	@Parameter(defaultValue = "${project.build.directory}/generated-test-sources/antlr4-tests")
@@ -76,112 +66,29 @@ public class Antlr4TestGeneratorMojo extends AbstractMojo {
 
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
-		STGroup targetGroup = new STGroupFile(runtimeTemplates.getPath());
-		targetGroup.registerModelAdaptor(STGroup.class, new STGroupModelAdaptor());
-		targetGroup.defineDictionary("escape", new JavaEscapeStringMap());
-		targetGroup.defineDictionary("lines", new LinesStringMap());
-		targetGroup.defineDictionary("strlen", new StrlenStringMap());
+		TestGenerator testGenerator = new MavenTestGenerator(encoding, runtimeTemplates, outputDirectory, visualize);
+		testGenerator.execute();
 
-		String rootFolder = "org/antlr4/runtime/test/templates";
-		STGroup index = new STGroupFile(rootFolder + "/Index.stg");
-		generateCodeForFolder(targetGroup, rootFolder, index);
-
-		project.addTestCompileSourceRoot(outputDirectory.getPath());
-	}
-
-	private void generateCodeForFolder(STGroup targetGroup, String folder, STGroup index) {
-		// make sure the index group is loaded since we call rawGetDictionary
-		index.load();
-
-		Map<String, Object> folders = index.rawGetDictionary("TestFolders");
-		if (folders != null) {
-			for (String key : folders.keySet()) {
-				String subfolder = folder + "/" + key;
-				STGroup subindex = new STGroupFile(subfolder + "/Index.stg");
-				generateCodeForFolder(targetGroup, folder + "/" + key, subindex);
-			}
-		}
-
-		Map<String, Object> templates = index.rawGetDictionary("TestTemplates");
-		if (templates != null && !templates.isEmpty()) {
-			generateTestFile(index, targetGroup, folder.substring(folder.lastIndexOf('/') + 1), folder, new ArrayList<String>(templates.keySet()));
+		if (project != null) {
+			project.addTestCompileSourceRoot(outputDirectory.getPath());
 		}
 	}
 
-	private void generateTestFile(STGroup index, STGroup targetGroup, String testFile, String templateFolder, Collection<String> testTemplates) {
-		List<ST> templates = new ArrayList<ST>();
-		for (String template : testTemplates) {
-			STGroup testGroup = new STGroupFile(templateFolder + "/" + template + STGroup.GROUP_FILE_EXTENSION);
-			importLanguageTemplates(testGroup, targetGroup);
-			ST testType = testGroup.getInstanceOf("TestType");
-			if (testType == null) {
-				getLog().warn(String.format("Unable to generate tests for %s: no TestType specified.", template));
-				continue;
-			}
+	private class MavenTestGenerator extends TestGenerator {		
 
-			ST testMethodTemplate = targetGroup.getInstanceOf(testType.render() + "TestMethod");
-			if (testMethodTemplate == null) {
-				getLog().warn(String.format("Unable to generate tests for %s: TestType '%s' is not supported by the current runtime.", template, testType.render()));
-				continue;
-			}
-
-			testMethodTemplate.add(testMethodTemplate.impl.formalArguments.keySet().iterator().next(), testGroup);
-			templates.add(testMethodTemplate);
+		public MavenTestGenerator(String encoding, File runtimeTemplates, File outputDirectory, boolean visualize) {
+			super(encoding, runtimeTemplates, outputDirectory, visualize);
 		}
 
-		ST testFileTemplate = targetGroup.getInstanceOf("TestFile");
-		testFileTemplate.addAggr("file.{Options,name,tests}", index.rawGetDictionary("Options"), testFile, templates);
-
-		if (visualize) {
-			STViz viz = testFileTemplate.inspect();
-			try {
-				viz.waitForClose();
-			} catch (InterruptedException ex) {
-			}
+		@Override
+		protected void warn(String message) {
+			getLog().warn(message);
 		}
 
-		File targetFolder = new File(outputDirectory, templateFolder.substring(0, templateFolder.indexOf("/templates")));
-		File targetFile = new File(targetFolder, "Test" + testFile + ".java");
-		try {
-			writeFile(targetFile, testFileTemplate.render());
-		} catch (IOException ex) {
-			getLog().error(String.format("Failed to write output file: %s", targetFile), ex);
-		}
-	}
-
-	private void importLanguageTemplates(STGroup testGroup, STGroup languageGroup) {
-		// make sure the test group is loaded
-		testGroup.load();
-
-		if (testGroup == languageGroup) {
-			assert false : "Attempted to import the language group into itself.";
-			return;
+		@Override
+		protected void error(String message, Throwable throwable) {
+			getLog().error(message, throwable);
 		}
 
-		if (testGroup.getImportedGroups().isEmpty()) {
-			testGroup.importTemplates(languageGroup);
-			return;
-		}
-
-		if (testGroup.getImportedGroups().contains(languageGroup)) {
-			return;
-		}
-
-		for (STGroup importedGroup : testGroup.getImportedGroups()) {
-			importLanguageTemplates(importedGroup, languageGroup);
-		}
-	}
-
-	public void writeFile(File file, String content) throws IOException {
-		file.getParentFile().mkdirs();
-
-		FileOutputStream fos = new FileOutputStream(file);
-		OutputStreamWriter osw = new OutputStreamWriter(fos, encoding != null ? encoding : "UTF-8");
-		try {
-			osw.write(content);
-		}
-		finally {
-			osw.close();
-		}
 	}
 }
