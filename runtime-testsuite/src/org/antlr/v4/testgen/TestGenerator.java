@@ -56,6 +56,38 @@ public class TestGenerator {
 
 	private final boolean visualize;
 
+	/**
+	 * $ java TestGenerator -o targetrootdir -templates target.test.stg -viz
+	 */
+	public static void main(String[] args) {
+		String outDir = ".";
+		String targetSpecificTemplateFile = "";
+		boolean viz = false;
+
+		int i = 0;
+		while (args != null && i < args.length) {
+			String arg = args[i];
+			if (arg.startsWith("-o")) {
+				i++;
+				outDir = args[i];
+			}
+			else if (arg.startsWith("-templates")) {
+				i++;
+				targetSpecificTemplateFile = args[i];
+			}
+			else if (arg.startsWith("-viz")) {
+				viz = true;
+			}
+			i++;
+		}
+
+		TestGenerator gen = new TestGenerator("UTF-8",
+											  new File(targetSpecificTemplateFile),
+											  new File(outDir),
+											  viz);
+		gen.execute();
+	}
+
 	public TestGenerator(String encoding, File runtimeTemplates, File outputDirectory, boolean visualize) {
 		this.encoding = encoding;
 		this.runtimeTemplates = runtimeTemplates;
