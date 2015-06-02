@@ -63,21 +63,7 @@ public class TestGenerator {
 	 *
 	 * Example:
 	 *
-	 * $ java org.antlr.v4.testgen.TestGenerator -o /tmp -templates ../antlr4-python2/tool/test/org/antlr/v4/test/rt/py2/Python2.test.stg
-	 Generating target Python2
-	 Generating file /tmp/org/antlr4/runtime/test/python2/TestSemPredEvalParser.java
-	 Generating file /tmp/org/antlr4/runtime/test/python2/TestLexerErrors.java
-	 Generating file /tmp/org/antlr4/runtime/test/python2/TestCompositeParsers.java
-	 Generating file /tmp/org/antlr4/runtime/test/python2/TestListeners.java
-	 Generating file /tmp/org/antlr4/runtime/test/python2/TestLeftRecursion.java
-	 Generating file /tmp/org/antlr4/runtime/test/python2/TestParserErrors.java
-	 Generating file /tmp/org/antlr4/runtime/test/python2/TestCompositeLexers.java
-	 Generating file /tmp/org/antlr4/runtime/test/python2/TestSets.java
-	 Generating file /tmp/org/antlr4/runtime/test/python2/TestParserExec.java
-	 Generating file /tmp/org/antlr4/runtime/test/python2/TestLexerExec.java
-	 Generating file /tmp/org/antlr4/runtime/test/python2/TestFullContextParsing.java
-	 Generating file /tmp/org/antlr4/runtime/test/python2/TestSemPredEvalLexer.java
-	 Generating file /tmp/org/antlr4/runtime/test/python2/TestParseTrees.java
+	 * $ java org.antlr.v4.testgen.TestGenerator -o /tmp -templates /Users/parrt/antlr/code/antlr4/tool/test/org/antlr/v4/test/runtime/java/Java.test.stg
 	 */
 	public static void main(String[] args) {
 		String outDir = null;
@@ -123,7 +109,7 @@ public class TestGenerator {
 			public File getOutputDir(String templateFolder) {
 				String targetName = getTargetNameFromTemplatesFileName();
 				// compute package
-				int packageStart = templateFolder.indexOf("org/antlr4/runtime/test/templates");
+				int packageStart = templateFolder.indexOf("org/antlr/v4/test/runtime");
 				int templatesStart = templateFolder.indexOf("/templates");
 				String packageDir = templateFolder.substring(packageStart,templatesStart);
 				File root = outputDirectory;
@@ -149,7 +135,7 @@ public class TestGenerator {
 		targetGroup.defineDictionary("lines", new LinesStringMap());
 		targetGroup.defineDictionary("strlen", new StrlenStringMap());
 
-		String rootFolder = "runtime-testsuite/resources/org/antlr4/runtime/test/templates";
+		String rootFolder = "runtime-testsuite/resources/org/antlr/v4/test/runtime/templates";
 		STGroup index = new STGroupFile(rootFolder+"/Index.stg");
 		generateCodeForFolder(targetGroup, rootFolder, index);
 	}
@@ -252,7 +238,7 @@ public class TestGenerator {
 	}
 
 	public String getTargetNameFromTemplatesFileName() {
-		// runtimeTemplates is like ../antlr4-python2/tool/test/org/antlr/v4/test/rt/py2/Python2.test.stg
+		// runtimeTemplates is like /Users/parrt/antlr/code/antlr4/tool/test/org/antlr/v4/test/runtime/java/Java.test.stg
 		// extra target name
 		int targetEnd = runtimeTemplates.getPath().indexOf(".test.stg");
 		String targetAtEnd = runtimeTemplates.getPath().substring(0, targetEnd);

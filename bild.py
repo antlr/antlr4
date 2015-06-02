@@ -1,8 +1,5 @@
 #!/usr/bin/env python
-import os
-import string
 from collections import OrderedDict
-import shutil
 
 """
 This script uses my experimental build tool http://www.bildtool.org
@@ -68,7 +65,7 @@ TARGETS = OrderedDict([
 # Base templates specific to targets needed by tests in TestFolders
 RUNTIME_TEST_TEMPLATES = {
 	"Java"     : uniformpath(JAVA_TARGET)+"/tool/test/org/antlr/v4/test/runtime/java/Java.test.stg",
-	# "CSharp"   : uniformpath(CSHARP_TARGET)+"/tool/test/org/antlr/v4/test/rt/csharp/CSharp.test.stg",
+	"CSharp"   : uniformpath(CSHARP_TARGET)+"/tool/test/org/antlr/v4/test/runtime/csharp/CSharp.test.stg",
 	# "Python2"  : uniformpath(PYTHON2_TARGET)+"/tool/test/org/antlr/v4/test/rt/py2/Python2.test.stg",
 	# "Python3"  : uniformpath(PYTHON3_TARGET)+"/tool/test/org/antlr/v4/test/rt/py3/Python3.test.stg",
 	# "NodeJS"   : uniformpath(JAVASCRIPT_TARGET)+"/tool/test/org/antlr/v4/test/rt/js/node/NodeJS.test.stg",
@@ -95,9 +92,14 @@ def compile():
     args = ["-Xlint", "-Xlint:-serial", "-g", "-sourcepath", string.join(srcpath, os.pathsep)]
     for sp in srcpath:
         javac(sp, "out", version="1.6", cp=cp, args=args)
-    # pull in targets
+    junit_jar, hamcrest_jar = load_junitjars()
+    cp += os.pathsep + uniformpath("out") \
+         + os.pathsep + junit_jar \
+         + os.pathsep + hamcrest_jar
+    # pull in targets' code gen and test rigs
     for t in TARGETS:
         javac(TARGETS[t] + "/tool/src", "out", version="1.6", cp=cp, args=args)
+        javac(TARGETS[t] + "/tool/test", "out", version="1.6", cp=cp, args=args, skip=['org/antlr/v4/test/rt'])
 
 
 def mkjar_complete():
@@ -259,11 +261,11 @@ def regen_tests():
          + os.pathsep + junit_jar \
          + os.pathsep + hamcrest_jar
     args = ["-nowarn", "-Xlint", "-Xlint:-serial", "-g"]
-    javac("tool/test", "out/test", version="1.6", cp=cp, args=args)  # all targets can use org.antlr.v4.test.*
-    for targetTemplate in RUNTIME_TEST_TEMPLATES:
+    #javac("tool/test", "out/test", version="1.6", cp=cp, args=args)  # all targets can use org.antlr.v4.test.*
+    for targetName in RUNTIME_TEST_TEMPLATES:
         java(classname="org.antlr.v4.testgen.TestGenerator", cp="out/test:dist/antlr4-"+VERSION+"-complete.jar",
-             progargs=['-o', 'gen/test', '-templates', RUNTIME_TEST_TEMPLATES[targetTemplate]])
-    javac("gen/test", "out/test", version="1.6", cp=cp, args=args)  # compile generated runtime tests
+             progargs=['-o', 'gen/test/'+targetName, '-templates', RUNTIME_TEST_TEMPLATES[targetName]])
+    #javac("gen/test", "out/test", version="1.6", cp=cp, args=args)  # compile generated runtime tests
     print_and_log("test generation complete")
 
 
@@ -294,49 +296,48 @@ def test_javascript():
 
 
 def test_target(t):
-    require(regen_tests)
-    cp = uniformpath("out/test") + os.pathsep + uniformpath("dist/antlr4-" + VERSION + "-complete.jar")
+    require(regen_tests) # gens and compiles
     juprops = ["-D%s=%s" % (p, test_properties[p]) for p in test_properties]
     args = ["-nowarn", "-Xlint", "-Xlint:-serial", "-g"]
     print_and_log("Testing %s ..." % t)
     try:
-        test(t, cp, juprops, args)
+        test(t, juprops, args)
         print t + " tests complete"
     except:
         print t + " tests failed"
 
 
-def test(t, cp, juprops, args):
+def test(t, juprops, args):
     junit_jar, hamcrest_jar = load_junitjars()
-    srcdir = uniformpath('gen')
-    dstdir = uniformpath( "out/test/" + t)
+    srcdir = uniformpath('gen/test/'+t)
+    dstdir = uniformpath("out/test/"+t)
     # Prefix CLASSPATH with individual target tests
-    thiscp = dstdir + os.pathsep + cp
-    thisjarwithjunit = thiscp + os.pathsep + hamcrest_jar + os.pathsep + junit_jar
+    cp = dstdir + os.pathsep + uniformpath("dist/antlr4-" + VERSION + "-complete.jar")
+    thisjarwithjunit = cp + os.pathsep + hamcrest_jar + os.pathsep + junit_jar
     skip = []
     if t=='Java':
         # don't test generator
-        skip = [ "/org/antlr/v4/test/rt/gen/", "TestPerformance" ]
+        skip = [ "/org/antlr/v4/test/rt/gen/", "TestPerformance.java", "TestGenerator.java" ]
     elif t=='Python2':
         # need BaseTest located in Py3 target
         base = uniformpath(TARGETS['Python3'] + "/tool/test")
         skip = [ "/org/antlr/v4/test/rt/py3/" ]
-        javac(base, "out/test/" + t, version="1.6", cp=thisjarwithjunit, args=args, skip=skip)
+        javac(base, "out/test/"+t, version="1.6", cp=thisjarwithjunit, args=args, skip=skip)
         skip = []
     elif t=='JavaScript':
         # don't test browsers automatically, this is overkill and unreliable
         browsers = ["safari","chrome","firefox","explorer"]
         skip = [ uniformpath(srcdir + "/org/antlr/v4/test/rt/js/" + b) for b in browsers ]
-    javac(srcdir, trgdir="out/test/" + t, version="1.6", cp=thisjarwithjunit, args=args, skip=skip)
+    javac(srcdir, trgdir="out/test/"+t, version="1.6", cp=thisjarwithjunit, args=args, skip=skip)
     # copy resource files required for testing
     files = allfiles(srcdir)
     for src in files:
         if not ".java" in src and not ".stg" in src and not ".DS_Store" in src:
-            dst = src.replace(srcdir, uniformpath("out/test/" + t))
+            dst = src.replace(srcdir, uniformpath("out/test/"+t))
             # only copy files from test dirs
             if os.path.exists(os.path.split(dst)[0]):
                 shutil.copyfile(src, dst)
-    junit("out/test/" + t, cp=thiscp, verbose=False, args=juprops)
+    junit("out/test/"+t, cp=uniformpath("dist/antlr4-" + VERSION + "-complete.jar"), verbose=False, args=juprops)
 
 
 def install(): # mvn installed locally in ~/.m2, java jar to /usr/local/lib if present
@@ -442,6 +443,7 @@ def clean(dist=False):
     if dist:
         rmdir("dist")
     rmdir("out")
+    rmdir("gen")
     rmdir("gen3")
     rmdir("gen4")
     rmdir("doc")
