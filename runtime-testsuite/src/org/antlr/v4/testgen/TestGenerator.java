@@ -49,27 +49,38 @@ public class TestGenerator {
 	// This project uses UTF-8, but the plugin might be used in another project
 	// which is not. Always load templates with UTF-8, but write using the
 	// specified encoding.
-	private final String encoding;
+	protected final String encoding;
 
-	private final File runtimeTemplates;
+	protected final File runtimeTemplates;
 
-	private final File outputDirectory;
+	protected final File outputDirectory;
 
-	private final boolean visualize;
+	protected final boolean visualize;
 
 	public static final String mainTestIndex = "org/antlr4/runtime/test/templates/Index.stg";
 
-	/** Execute from antlr4 root dir
+	/** Execute from antlr4 root dir:
+	 * *
 	 * $ java TestGenerator -o output-root-dir -target (Java|Python2|Python3|Javascript|CSharp) -viz
+	 * $ java TestGenerator -o output-root-dir # gen all targets
 	 *
-	 * Example:
+	 * Examples:
 	 *
+	 * $ java TestGenerator -o /tmp # gen all targets in /tmp
 	 * $ java TestGenerator -o /Users/parrt/antlr/code/antlr4/tool/test -target Java
+	 *
+	 * Gives:
+	 *
+	 * Generating target Java
+	 * Generate file /tmp/org/antlr4/runtime/test/templates/SemPredEvalParser/TestSemPredEvalParser.java
+	 * Generate file /tmp/org/antlr4/runtime/test/templates/LexerErrors/TestLexerErrors.java
+	 * Generate file /tmp/org/antlr4/runtime/test/templates/CompositeParsers/TestCompositeParsers.java
+	 * ...
 	 */
 	public static void main(String[] args) {
-		String outDir = ".";
+		String outDir = null;
 		String targetSpecificTemplateFile;
-		String target = "Java";
+		String target = null;
 		boolean viz = false;
 
 		int i = 0;
@@ -89,15 +100,43 @@ public class TestGenerator {
 			i++;
 		}
 
+		if ( outDir==null ) {
+			System.err.println("You must give an output root dir");
+			System.exit(1);
+		}
+
 		STGroup index = new STGroupFile(antlrRoot+"/runtime-testsuite/resources/"+mainTestIndex);
 		index.load();
 		Map<String, Object> folders = index.rawGetDictionary("Targets"); // get map target to .stg file
-		targetSpecificTemplateFile = (String)folders.get(target);
+		if ( target!=null ) {
+			targetSpecificTemplateFile = (String)folders.get(target);
+			genTarget(target, outDir, targetSpecificTemplateFile, viz);
+		}
+		else { // do all targets
+			for (String t : folders.keySet()) {
+				targetSpecificTemplateFile = (String)folders.get(t);
+				genTarget(t, outDir, targetSpecificTemplateFile, viz);
+			}
+		}
+	}
 
+	public static void genTarget(final String targetName, String outDir, String targetSpecificTemplateFile, boolean viz) {
 		TestGenerator gen = new TestGenerator("UTF-8",
 											  new File(targetSpecificTemplateFile),
 											  new File(outDir),
-											  viz);
+											  viz)
+		{
+			@Override
+			protected void info(String message) {
+				System.err.println(message);
+			}
+			@Override
+			public File getOutputDir(String templateFolder) {
+				int packageStart = templateFolder.indexOf("org/antlr4/runtime/test/templates");
+				return new File(new File(outputDirectory,targetName), templateFolder.substring(packageStart));
+			}
+		};
+		gen.info("Generating target " + targetName);
 		gen.execute();
 	}
 
@@ -140,6 +179,9 @@ public class TestGenerator {
 	}
 
 	private void generateTestFile(STGroup index, STGroup targetGroup, String testFile, String templateFolder, Collection<String> testTemplates) {
+		File targetFolder = getOutputDir(templateFolder);
+		File targetFile = new File(targetFolder, "Test" + testFile + ".java");
+		info("Generate file "+targetFile.getAbsolutePath());
 		List<ST> templates = new ArrayList<ST>();
 		for (String template : testTemplates) {
 			STGroup testGroup = new STGroupFile(templateFolder + "/" + template + STGroup.GROUP_FILE_EXTENSION);
@@ -171,8 +213,6 @@ public class TestGenerator {
 			}
 		}
 
-		File targetFolder = new File(outputDirectory, templateFolder.substring(0, templateFolder.indexOf("/templates")));
-		File targetFile = new File(targetFolder, "Test" + testFile + ".java");
 		try {
 			writeFile(targetFile, testFileTemplate.render());
 		} catch (IOException ex) {
@@ -214,6 +254,13 @@ public class TestGenerator {
 		finally {
 			osw.close();
 		}
+	}
+
+	public File getOutputDir(String templateFolder) {
+		return new File(outputDirectory, templateFolder.substring(0, templateFolder.indexOf("/templates")));
+	}
+
+	protected void info(String message) {
 	}
 
 	protected void warn(String message) {
