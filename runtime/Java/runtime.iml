@@ -10,7 +10,6 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="ST-4.0.7" level="application" />
     <orderEntry type="module-library">
       <library>
         <CLASSES>

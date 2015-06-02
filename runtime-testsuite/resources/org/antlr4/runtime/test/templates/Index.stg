@@ -14,5 +14,15 @@ TestFolders ::= [
 	"Sets": []
 ]
 
-//TestTemplates ::= [
-//]
+/** Base templates specific to targets needed by tests in TestFolders */
+Targets ::= [
+	"Java"     : "./tool/test/org/antlr/v4/test/runtime/java/Java.test.stg",
+	"CSharp"   : "../antlr4-csharp/tool/test/org/antlr/v4/test/rt/csharp/CSharp.test.stg",
+	"Python2"  : "../antlr4-python2/tool/test/org/antlr/v4/test/rt/py2/Python2.test.stg",
+	"Python3"  : "../antlr4-python3/tool/test/org/antlr/v4/test/rt/py3/Python3.test.stg",
+	"NodeJS"   : "../antlr4-javascript/tool/test/org/antlr/v4/test/rt/js/node/NodeJS.test.stg",
+	"Safari"   : "../antlr4-javascript/tool/test/org/antlr/v4/test/rt/js/safari/Safari.test.stg",
+	"Firefox"  : "../antlr4-javascript/tool/test/org/antlr/v4/test/rt/js/firefox/Firefox.test.stg",
+	"Chrome"   : "../antlr4-javascript/tool/test/org/antlr/v4/test/rt/js/chrome/Chrome.test.stg",
+	"Explorer" : "../antlr4-javascript/tool/test/org/antlr/v4/test/rt/js/explorer/Explorer.test.stg"
+]

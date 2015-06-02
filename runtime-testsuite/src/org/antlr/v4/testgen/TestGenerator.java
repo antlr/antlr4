@@ -44,6 +44,7 @@ import java.util.List;
 import java.util.Map;
 
 public class TestGenerator {
+	public static final String antlrRoot = "."; // assume antlr4 root dir is current working dir
 
 	// This project uses UTF-8, but the plugin might be used in another project
 	// which is not. Always load templates with UTF-8, but write using the
@@ -56,12 +57,19 @@ public class TestGenerator {
 
 	private final boolean visualize;
 
-	/**
-	 * $ java TestGenerator -o targetrootdir -templates target.test.stg -viz
+	public static final String mainTestIndex = "org/antlr4/runtime/test/templates/Index.stg";
+
+	/** Execute from antlr4 root dir
+	 * $ java TestGenerator -o output-root-dir -target (Java|Python2|Python3|Javascript|CSharp) -viz
+	 *
+	 * Example:
+	 *
+	 * $ java TestGenerator -o /Users/parrt/antlr/code/antlr4/tool/test -target Java
 	 */
 	public static void main(String[] args) {
 		String outDir = ".";
-		String targetSpecificTemplateFile = "";
+		String targetSpecificTemplateFile;
+		String target = "Java";
 		boolean viz = false;
 
 		int i = 0;
@@ -71,15 +79,20 @@ public class TestGenerator {
 				i++;
 				outDir = args[i];
 			}
-			else if (arg.startsWith("-templates")) {
+			else if (arg.startsWith("-target")) {
 				i++;
-				targetSpecificTemplateFile = args[i];
+				target = args[i];
 			}
 			else if (arg.startsWith("-viz")) {
 				viz = true;
 			}
 			i++;
 		}
+
+		STGroup index = new STGroupFile(antlrRoot+"/runtime-testsuite/resources/"+mainTestIndex);
+		index.load();
+		Map<String, Object> folders = index.rawGetDictionary("Targets"); // get map target to .stg file
+		targetSpecificTemplateFile = (String)folders.get(target);
 
 		TestGenerator gen = new TestGenerator("UTF-8",
 											  new File(targetSpecificTemplateFile),
@@ -102,8 +115,8 @@ public class TestGenerator {
 		targetGroup.defineDictionary("lines", new LinesStringMap());
 		targetGroup.defineDictionary("strlen", new StrlenStringMap());
 
-		String rootFolder = "org/antlr4/runtime/test/templates";
-		STGroup index = new STGroupFile(rootFolder + "/Index.stg");
+		String rootFolder = "runtime-testsuite/resources/org/antlr4/runtime/test/templates";
+		STGroup index = new STGroupFile(rootFolder+"/Index.stg");
 		generateCodeForFolder(targetGroup, rootFolder, index);
 	}
 

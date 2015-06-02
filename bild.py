@@ -78,7 +78,7 @@ def compile():
     cp = uniformpath("out") + os.pathsep + \
          os.path.join(JARCACHE, "antlr-3.5.2-complete.jar") + os.pathsep + \
          "runtime/Java/lib/org.abego.treelayout.core.jar" + os.pathsep
-    srcpath = ["gen3", "gen4", "runtime/Java/src", "tool/src"]
+    srcpath = ["gen3", "gen4", "runtime/Java/src", "runtime-testsuite/src", "tool/src"]
     args = ["-Xlint", "-Xlint:-serial", "-g", "-sourcepath", string.join(srcpath, os.pathsep)]
     for sp in srcpath:
         javac(sp, "out", version="1.6", cp=cp, args=args)
@@ -90,6 +90,7 @@ def compile():
 def mkjar_complete():
     require(compile)
     copytree(src="tool/resources", trg="out")  # messages, Java code gen, etc...
+    copytree(src="runtime-testsuite/resources", trg="out")  # templates for generating unit tests
     manifest = \
         "Main-Class: org.antlr.v4.Tool\n" +\
         "Implementation-Title: ANTLR 4 Tool\n" +\
