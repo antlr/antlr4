@@ -57,30 +57,31 @@ public class TestGenerator {
 
 	protected final boolean visualize;
 
-	public static final String mainTestIndex = "org/antlr4/runtime/test/templates/Index.stg";
-
 	/** Execute from antlr4 root dir:
 	 * *
-	 * $ java TestGenerator -o output-root-dir -target (Java|Python2|Python3|Javascript|CSharp) -viz
-	 * $ java TestGenerator -o output-root-dir # gen all targets
+	 * $ java TestGenerator -o output-root-dir -templates -viz
 	 *
-	 * Examples:
+	 * Example:
 	 *
-	 * $ java TestGenerator -o /tmp # gen all targets in /tmp
-	 * $ java TestGenerator -o /Users/parrt/antlr/code/antlr4/tool/test -target Java
-	 *
-	 * Gives:
-	 *
-	 * Generating target Java
-	 * Generate file /tmp/org/antlr4/runtime/test/templates/SemPredEvalParser/TestSemPredEvalParser.java
-	 * Generate file /tmp/org/antlr4/runtime/test/templates/LexerErrors/TestLexerErrors.java
-	 * Generate file /tmp/org/antlr4/runtime/test/templates/CompositeParsers/TestCompositeParsers.java
-	 * ...
+	 * $ java org.antlr.v4.testgen.TestGenerator -o /tmp -templates ../antlr4-python2/tool/test/org/antlr/v4/test/rt/py2/Python2.test.stg
+	 Generating target Python2
+	 Generating file /tmp/org/antlr4/runtime/test/python2/TestSemPredEvalParser.java
+	 Generating file /tmp/org/antlr4/runtime/test/python2/TestLexerErrors.java
+	 Generating file /tmp/org/antlr4/runtime/test/python2/TestCompositeParsers.java
+	 Generating file /tmp/org/antlr4/runtime/test/python2/TestListeners.java
+	 Generating file /tmp/org/antlr4/runtime/test/python2/TestLeftRecursion.java
+	 Generating file /tmp/org/antlr4/runtime/test/python2/TestParserErrors.java
+	 Generating file /tmp/org/antlr4/runtime/test/python2/TestCompositeLexers.java
+	 Generating file /tmp/org/antlr4/runtime/test/python2/TestSets.java
+	 Generating file /tmp/org/antlr4/runtime/test/python2/TestParserExec.java
+	 Generating file /tmp/org/antlr4/runtime/test/python2/TestLexerExec.java
+	 Generating file /tmp/org/antlr4/runtime/test/python2/TestFullContextParsing.java
+	 Generating file /tmp/org/antlr4/runtime/test/python2/TestSemPredEvalLexer.java
+	 Generating file /tmp/org/antlr4/runtime/test/python2/TestParseTrees.java
 	 */
 	public static void main(String[] args) {
 		String outDir = null;
-		String targetSpecificTemplateFile;
-		String target = null;
+		String targetSpecificTemplateFile = null;
 		boolean viz = false;
 
 		int i = 0;
@@ -90,9 +91,9 @@ public class TestGenerator {
 				i++;
 				outDir = args[i];
 			}
-			else if (arg.startsWith("-target")) {
+			else if (arg.startsWith("-templates")) {
 				i++;
-				target = args[i];
+				targetSpecificTemplateFile = args[i];
 			}
 			else if (arg.startsWith("-viz")) {
 				viz = true;
@@ -100,27 +101,15 @@ public class TestGenerator {
 			i++;
 		}
 
-		if ( outDir==null ) {
-			System.err.println("You must give an output root dir");
+		if ( outDir==null || targetSpecificTemplateFile==null ) {
+			System.err.println("You must give an output root dir and templates file");
 			System.exit(1);
 		}
 
-		STGroup index = new STGroupFile(antlrRoot+"/runtime-testsuite/resources/"+mainTestIndex);
-		index.load();
-		Map<String, Object> folders = index.rawGetDictionary("Targets"); // get map target to .stg file
-		if ( target!=null ) {
-			targetSpecificTemplateFile = (String)folders.get(target);
-			genTarget(target, outDir, targetSpecificTemplateFile, viz);
-		}
-		else { // do all targets
-			for (String t : folders.keySet()) {
-				targetSpecificTemplateFile = (String)folders.get(t);
-				genTarget(t, outDir, targetSpecificTemplateFile, viz);
-			}
-		}
+		genTarget(outDir, targetSpecificTemplateFile, viz);
 	}
 
-	public static void genTarget(final String targetName, String outDir, String targetSpecificTemplateFile, boolean viz) {
+	public static void genTarget(final String outDir, String targetSpecificTemplateFile, boolean viz) {
 		TestGenerator gen = new TestGenerator("UTF-8",
 											  new File(targetSpecificTemplateFile),
 											  new File(outDir),
@@ -132,11 +121,17 @@ public class TestGenerator {
 			}
 			@Override
 			public File getOutputDir(String templateFolder) {
+				String targetName = getTargetNameFromTemplatesFileName();
+				// compute package
 				int packageStart = templateFolder.indexOf("org/antlr4/runtime/test/templates");
-				return new File(new File(outputDirectory,targetName), templateFolder.substring(packageStart));
+				int templatesStart = templateFolder.indexOf("/templates");
+				String packageDir = templateFolder.substring(packageStart,templatesStart);
+				File root = outputDirectory;
+				File f = new File(root, packageDir);
+				return new File(f, targetName.toLowerCase());
 			}
 		};
-		gen.info("Generating target " + targetName);
+		gen.info("Generating target " + gen.getTargetNameFromTemplatesFileName());
 		gen.execute();
 	}
 
@@ -181,7 +176,7 @@ public class TestGenerator {
 	private void generateTestFile(STGroup index, STGroup targetGroup, String testFile, String templateFolder, Collection<String> testTemplates) {
 		File targetFolder = getOutputDir(templateFolder);
 		File targetFile = new File(targetFolder, "Test" + testFile + ".java");
-		info("Generate file "+targetFile.getAbsolutePath());
+		info("Generating file "+targetFile.getAbsolutePath());
 		List<ST> templates = new ArrayList<ST>();
 		for (String template : testTemplates) {
 			STGroup testGroup = new STGroupFile(templateFolder + "/" + template + STGroup.GROUP_FILE_EXTENSION);
@@ -254,6 +249,14 @@ public class TestGenerator {
 		finally {
 			osw.close();
 		}
+	}
+
+	public String getTargetNameFromTemplatesFileName() {
+		// runtimeTemplates is like ../antlr4-python2/tool/test/org/antlr/v4/test/rt/py2/Python2.test.stg
+		// extra target name
+		int targetEnd = runtimeTemplates.getPath().indexOf(".test.stg");
+		String targetAtEnd = runtimeTemplates.getPath().substring(0, targetEnd);
+		return targetAtEnd.substring(targetAtEnd.lastIndexOf('/') + 1);
 	}
 
 	public File getOutputDir(String templateFolder) {

@@ -1,5 +1,5 @@
 TestFile(file) ::= <<
-package org.antlr4.runtime.test;
+package org.antlr4.runtime.test.java;
 
 import org.antlr.v4.test.rt.java.BaseTest;
 import org.junit.Test;
@@ -326,7 +326,7 @@ walker.walk(new LeafListener(), <s>);
 TokenGetterListener(X) ::= <<
 public static class LeafListener extends TBaseListener {
 	public void exitA(TParser.AContext ctx) {
-		if (ctx.getChildCount()==2) 
+		if (ctx.getChildCount()==2)
 			System.out.printf("%s %s %s",ctx.INT(0).getSymbol().getText(),
 				ctx.INT(1).getSymbol().getText(),ctx.INT());
 		else
@@ -341,7 +341,7 @@ public static class LeafListener extends TBaseListener {
 		if (ctx.getChildCount()==2) {
 			System.out.printf("%s %s %s",ctx.b(0).start.getText(),
 				ctx.b(1).start.getText(),ctx.b().get(0).start.getText());
-		} else 
+		} else
 			System.out.println(ctx.b(0).start.getText());
 	}
 }
@@ -354,7 +354,7 @@ public static class LeafListener extends TBaseListener {
 		if (ctx.getChildCount()==3) {
 			System.out.printf("%s %s %s\n",ctx.e(0).start.getText(),
 				ctx.e(1).start.getText(), ctx.e().get(0).start.getText());
-		} else 
+		} else
 			System.out.println(ctx.INT().getSymbol().getText());
 	}
 }
@@ -380,7 +380,7 @@ void foo() {
 >>
 
 Declare_foo() ::= <<public void foo() {System.out.println("foo");}>>
-			
+
 Invoke_foo() ::= "this.foo();"
 
 Declare_pred() ::= <<boolean pred(boolean v) {

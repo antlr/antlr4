@@ -65,6 +65,19 @@ TARGETS = OrderedDict([
     ("JavaScript",uniformpath(JAVASCRIPT_TARGET))
 ])
 
+# Base templates specific to targets needed by tests in TestFolders
+RUNTIME_TEST_TEMPLATES = {
+	"Java"     : uniformpath(JAVA_TARGET)+"/tool/test/org/antlr/v4/test/runtime/java/Java.test.stg",
+	# "CSharp"   : uniformpath(CSHARP_TARGET)+"/tool/test/org/antlr/v4/test/rt/csharp/CSharp.test.stg",
+	# "Python2"  : uniformpath(PYTHON2_TARGET)+"/tool/test/org/antlr/v4/test/rt/py2/Python2.test.stg",
+	# "Python3"  : uniformpath(PYTHON3_TARGET)+"/tool/test/org/antlr/v4/test/rt/py3/Python3.test.stg",
+	# "NodeJS"   : uniformpath(JAVASCRIPT_TARGET)+"/tool/test/org/antlr/v4/test/rt/js/node/NodeJS.test.stg",
+	# "Safari"   : uniformpath(JAVASCRIPT_TARGET)+"/tool/test/org/antlr/v4/test/rt/js/safari/Safari.test.stg",
+	# "Firefox"  : uniformpath(JAVASCRIPT_TARGET)+"/tool/test/org/antlr/v4/test/rt/js/firefox/Firefox.test.stg",
+	# "Chrome"   : uniformpath(JAVASCRIPT_TARGET)+"/tool/test/org/antlr/v4/test/rt/js/chrome/Chrome.test.stg",
+	# "Explorer" : uniformpath(JAVASCRIPT_TARGET)+"/tool/test/org/antlr/v4/test/rt/js/explorer/Explorer.test.stg"
+}
+
 
 def parsers():
     antlr3("tool/src/org/antlr/v4/parse", "gen3", version="3.5.2", package="org.antlr.v4.parse")
@@ -247,7 +260,10 @@ def regen_tests():
          + os.pathsep + hamcrest_jar
     args = ["-nowarn", "-Xlint", "-Xlint:-serial", "-g"]
     javac("tool/test", "out/test", version="1.6", cp=cp, args=args)  # all targets can use org.antlr.v4.test.*
-    java(classname="org.antlr.v4.test.rt.gen.Generator", cp="out/test:dist/antlr4-"+VERSION+"-complete.jar")
+    for targetTemplate in RUNTIME_TEST_TEMPLATES:
+        java(classname="org.antlr.v4.testgen.TestGenerator", cp="out/test:dist/antlr4-"+VERSION+"-complete.jar",
+             progargs=['-o', 'gen/test', '-templates', RUNTIME_TEST_TEMPLATES[targetTemplate]])
+    javac("gen/test", "out/test", version="1.6", cp=cp, args=args)  # compile generated runtime tests
     print_and_log("test generation complete")
 
 
@@ -279,8 +295,7 @@ def test_javascript():
 
 def test_target(t):
     require(regen_tests)
-    cp = uniformpath("dist/antlr4-" + VERSION + "-complete.jar") \
-         + os.pathsep + uniformpath("out/test")
+    cp = uniformpath("out/test") + os.pathsep + uniformpath("dist/antlr4-" + VERSION + "-complete.jar")
     juprops = ["-D%s=%s" % (p, test_properties[p]) for p in test_properties]
     args = ["-nowarn", "-Xlint", "-Xlint:-serial", "-g"]
     print_and_log("Testing %s ..." % t)
@@ -293,7 +308,7 @@ def test_target(t):
 
 def test(t, cp, juprops, args):
     junit_jar, hamcrest_jar = load_junitjars()
-    srcdir = uniformpath(TARGETS[t] + "/tool/test")
+    srcdir = uniformpath('gen')
     dstdir = uniformpath( "out/test/" + t)
     # Prefix CLASSPATH with individual target tests
     thiscp = dstdir + os.pathsep + cp
@@ -309,7 +324,7 @@ def test(t, cp, juprops, args):
         javac(base, "out/test/" + t, version="1.6", cp=thisjarwithjunit, args=args, skip=skip)
         skip = []
     elif t=='JavaScript':
-        # don't test browsers automatically, this is overkilling and unreliable
+        # don't test browsers automatically, this is overkill and unreliable
         browsers = ["safari","chrome","firefox","explorer"]
         skip = [ uniformpath(srcdir + "/org/antlr/v4/test/rt/js/" + b) for b in browsers ]
     javac(srcdir, trgdir="out/test/" + t, version="1.6", cp=thisjarwithjunit, args=args, skip=skip)
