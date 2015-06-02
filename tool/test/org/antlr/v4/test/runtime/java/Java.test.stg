@@ -1,7 +1,7 @@
 TestFile(file) ::= <<
 package org.antlr4.runtime.test.java;
 
-import org.antlr.v4.test.rt.java.BaseTest;
+import org.antlr.v4.test.tool.BaseTest;
 import org.junit.Test;
 
 import static org.junit.Assert.*;

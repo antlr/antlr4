@@ -1,4 +1,0 @@
-lexer grammar <grammarName>;
-A : 'a' EOF ;
-B : 'a';
-C : 'c';
