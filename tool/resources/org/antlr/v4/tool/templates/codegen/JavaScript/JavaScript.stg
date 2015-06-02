@@ -553,14 +553,13 @@ catch (<catchArg>) {
 
 // lexer actions are not associated with model objects
 
-LexerSkipCommand()  ::= "skip()"
-LexerMoreCommand()  ::= "more()"
-LexerPopModeCommand() ::= "popMode()"
-
-LexerTypeCommand(arg)      ::= "_type = <arg>"
-LexerChannelCommand(arg)   ::= "_channel = <arg>"
-LexerModeCommand(arg)      ::= "_mode = <arg>"
-LexerPushModeCommand(arg)  ::= "pushMode(<arg>)"
+LexerSkipCommand()  ::= "this.skip()"
+LexerMoreCommand()  ::= "this.more()"
+LexerPopModeCommand() ::= "this.popMode()"
+LexerTypeCommand(arg)      ::= "this._type = <arg>"
+LexerChannelCommand(arg)   ::= "this._channel = <arg>"
+LexerModeCommand(arg)      ::= "this._mode = <arg>"
+LexerPushModeCommand(arg)  ::= "this.pushMode(<arg>)"
 
 ActionText(t) ::= "<t.text>"
 ActionTemplate(t) ::= "<t.st>"
