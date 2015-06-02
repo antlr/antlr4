@@ -112,7 +112,7 @@ PredictionContextCache.prototype.add = function(ctx) {
 	if (ctx === PredictionContext.EMPTY) {
 		return PredictionContext.EMPTY;
 	}
-	var existing = this.cache[ctx];
+	var existing = this.cache[ctx] || null;
 	if (existing !== null) {
 		return existing;
 	}
