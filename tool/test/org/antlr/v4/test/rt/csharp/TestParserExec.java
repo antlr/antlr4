@@ -2,7 +2,7 @@ package org.antlr.v4.test.rt.csharp;
 
 import org.junit.Test;
 
-public class TestParserExec extends BaseTest {
+public class TestParserExec extends org.antlr.v4.test.runtime.csharp.BaseTest {
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
