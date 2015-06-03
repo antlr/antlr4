@@ -84,11 +84,16 @@ def parsers():
            version=BOOTSTRAP_VERSION, package="org.antlr.v4.runtime.tree.xpath")
 
 def compile():
+    """
+    Compile tool, runtime, tool tests, runtime tests into ./out dir
+    Depends on treelayout jar, antlr v3, junit/hamcrest
+    """
     require(parsers)
+    require(regen_tests)
     cp = uniformpath("out") + os.pathsep + \
          os.path.join(JARCACHE, "antlr-3.5.2-complete.jar") + os.pathsep + \
          "runtime/Java/lib/org.abego.treelayout.core.jar" + os.pathsep
-    srcpath = ["gen3", "gen4", "runtime/Java/src", "runtime-testsuite/src", "tool/src"]
+    srcpath = ["gen3", "gen4", "runtime/Java/src", "tool/src"]
     args = ["-Xlint", "-Xlint:-serial", "-g", "-sourcepath", string.join(srcpath, os.pathsep)]
     for sp in srcpath:
         javac(sp, "out", version="1.6", cp=cp, args=args)
@@ -96,16 +101,18 @@ def compile():
     cp += os.pathsep + uniformpath("out") \
          + os.pathsep + junit_jar \
          + os.pathsep + hamcrest_jar
-    # pull in targets' code gen and test rigs
+    # pull in targets' code gen
     for t in TARGETS:
-        javac(TARGETS[t] + "/tool/src", "out", version="1.6", cp=cp, args=args)
-        javac(TARGETS[t] + "/tool/test", "out", version="1.6", cp=cp, args=args, skip=['org/antlr/v4/test/rt'])
+        javac(TARGETS[t] + "/tool/src",  "out", version="1.6", cp=cp, args=args)
+    # pull in generated runtime tests and runtime test support code
+    for t in RUNTIME_TEST_TEMPLATES:
+        javac(TARGETS[t] + "/tool/test", "out", version="1.6", cp=cp, args=args)
+        javac('gen/test/'+t,             "out", version="1.6", cp=cp, args=args)
 
 
 def mkjar_complete():
     require(compile)
     copytree(src="tool/resources", trg="out")  # messages, Java code gen, etc...
-    copytree(src="runtime-testsuite/resources", trg="out")  # templates for generating unit tests
     manifest = \
         "Main-Class: org.antlr.v4.Tool\n" +\
         "Implementation-Title: ANTLR 4 Tool\n" +\
@@ -254,6 +261,11 @@ def python_sdist():
 
 
 def regen_tests():
+    """
+    Generate all runtime Test*.java files for all targets into ./gen/TargetName
+    They will all get compiled in compile() so we have all together but
+    can drop from final jar in mkjar().
+    """
     # first compile runtime-testsuite; only needs ST and junit
     junit_jar, hamcrest_jar = load_junitjars()
     download("http://www.stringtemplate.org/download/ST-4.0.8.jar", JARCACHE)
@@ -270,7 +282,6 @@ def regen_tests():
     for targetName in RUNTIME_TEST_TEMPLATES:
         java(classname="org.antlr.v4.testgen.TestGenerator", cp="out/testsuite:"+cp,
              progargs=['-o', 'gen/test/'+targetName, '-templates', RUNTIME_TEST_TEMPLATES[targetName]])
-    #javac("gen/test", "out/test", version="1.6", cp=cp, args=args)  # compile generated runtime tests
     print_and_log("test generation complete")
 
 
@@ -301,48 +312,52 @@ def test_javascript():
 
 
 def test_target(t):
-    require(regen_tests) # gens and compiles
+    require(_mkjar)
     juprops = ["-D%s=%s" % (p, test_properties[p]) for p in test_properties]
     args = ["-nowarn", "-Xlint", "-Xlint:-serial", "-g"]
     print_and_log("Testing %s ..." % t)
     try:
         test(t, juprops, args)
         print t + " tests complete"
-    except:
-        print t + " tests failed"
+    except Exception as e:
+        print t + " tests failed: ", e
 
 
-def test(t, juprops, args):
+def test(target, juprops, args):
     junit_jar, hamcrest_jar = load_junitjars()
-    srcdir = uniformpath('gen/test/'+t)
-    dstdir = uniformpath("out/test/"+t)
+    srcdir = uniformpath('gen/test/'+target)
+    dstdir = uniformpath("out/test/"+target)
     # Prefix CLASSPATH with individual target tests
     cp = dstdir + os.pathsep + uniformpath("dist/antlr4-" + VERSION + "-complete.jar")
     thisjarwithjunit = cp + os.pathsep + hamcrest_jar + os.pathsep + junit_jar
     skip = []
-    if t=='Java':
+    if target=='Java':
         # don't test generator
         skip = [ "/org/antlr/v4/test/rt/gen/", "TestPerformance.java", "TestGenerator.java" ]
-    elif t=='Python2':
+    elif target=='Python2':
         # need BaseTest located in Py3 target
         base = uniformpath(TARGETS['Python3'] + "/tool/test")
         skip = [ "/org/antlr/v4/test/rt/py3/" ]
-        javac(base, "out/test/"+t, version="1.6", cp=thisjarwithjunit, args=args, skip=skip)
+        javac(base, "out/test/"+target, version="1.6", cp=thisjarwithjunit, args=args, skip=skip)
         skip = []
-    elif t=='JavaScript':
+    elif target=='JavaScript':
         # don't test browsers automatically, this is overkill and unreliable
         browsers = ["safari","chrome","firefox","explorer"]
         skip = [ uniformpath(srcdir + "/org/antlr/v4/test/rt/js/" + b) for b in browsers ]
-    javac(srcdir, trgdir="out/test/"+t, version="1.6", cp=thisjarwithjunit, args=args, skip=skip)
-    # copy resource files required for testing
-    files = allfiles(srcdir)
-    for src in files:
-        if not ".java" in src and not ".stg" in src and not ".DS_Store" in src:
-            dst = src.replace(srcdir, uniformpath("out/test/"+t))
-            # only copy files from test dirs
-            if os.path.exists(os.path.split(dst)[0]):
-                shutil.copyfile(src, dst)
-    junit("out/test/"+t, cp=uniformpath("dist/antlr4-" + VERSION + "-complete.jar"), verbose=False, args=juprops)
+    javac(srcdir, trgdir="out/test/"+target, version="1.6", cp=thisjarwithjunit, args=args, skip=skip)
+    print "DONE"
+    # copy any resource files required for testing
+    for t in TARGETS:
+        root = TARGETS[t] + "/tool/test"
+        files = allfiles(root)
+        for src in files:
+            if not ".java" in src and not ".stg" in src and not os.path.basename(src).startswith("."):
+                dst = uniformpath(src.replace(root, "out"))
+                # print src, dst
+                if os.path.exists(os.path.split(dst)[0]):
+                    shutil.copyfile(src, dst)
+    junit("out/test/"+target, cp='/Users/parrt/antlr/code/antlr4/out:'+uniformpath("dist/antlr4-" + VERSION + "-complete.jar"),
+          verbose=False, args=juprops)
 
 
 def install(): # mvn installed locally in ~/.m2, java jar to /usr/local/lib if present
@@ -444,7 +459,7 @@ def target_artifacts():
     csharp()
 
 
-def clean(dist=False):
+def clean(dist=True):
     if dist:
         rmdir("dist")
     rmdir("out")
@@ -464,5 +479,16 @@ def all():
     install()
     clean()
 
+# def duh():
+#     for t in TARGETS:
+#         root = TARGETS[t] + "/tool/test"
+#         files = allfiles(root)
+#         print t
+#         for src in files:
+#             if not ".java" in src and not ".stg" in src and not os.path.basename(src).startswith("."):
+#                 dst = uniformpath(src.replace(root, "out"));
+#                 print src, dst
+#                 if os.path.exists(os.path.split(dst)[0]):
+#                     shutil.copyfile(src, dst)
 
 processargs(globals())  # E.g., "python bild.py all"

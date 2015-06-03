@@ -106,7 +106,6 @@ import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -469,48 +468,7 @@ public abstract class BaseTest {
 			ioe.printStackTrace(System.err);
 		}
 
-//		List<String> errors = new ArrayList<String>();
-//		for (Diagnostic diagnostic : diagnostics.getDiagnostics()) {
-//			errors.add(
-//				String.valueOf(diagnostic.getLineNumber())+
-//				": " + diagnostic.getMessage(null));
-//		}
-//		if ( errors.size()>0 ) {
-//			System.err.println("compile stderr from: "+cmdLine);
-//			System.err.println(errors);
-//			return false;
-//		}
 		return ok;
-
-		/*
-		File outputDir = new File(tmpdir);
-		try {
-			Process process =
-				Runtime.getRuntime().exec(args, null, outputDir);
-			StreamVacuum stdout = new StreamVacuum(process.getInputStream());
-			StreamVacuum stderr = new StreamVacuum(process.getErrorStream());
-			stdout.start();
-			stderr.start();
-			process.waitFor();
-            stdout.join();
-            stderr.join();
-			if ( stdout.toString().length()>0 ) {
-				System.err.println("compile stdout from: "+cmdLine);
-				System.err.println(stdout);
-			}
-			if ( stderr.toString().length()>0 ) {
-				System.err.println("compile stderr from: "+cmdLine);
-				System.err.println(stderr);
-			}
-			int ret = process.exitValue();
-			return ret==0;
-		}
-		catch (Exception e) {
-			System.err.println("can't exec compilation");
-			e.printStackTrace(System.err);
-			return false;
-		}
-		*/
 	}
 
 	protected ErrorQueue antlr(String grammarFileName, boolean defaultListener, String... extraOptions) {
@@ -842,8 +800,8 @@ public abstract class BaseTest {
 				"java", "-classpath", tmpdir+pathSep+CLASSPATH,
 				className, new File(tmpdir, "input").getAbsolutePath()
 			};
-			//String cmdLine = "java -classpath "+CLASSPATH+pathSep+tmpdir+" Test " + new File(tmpdir, "input").getAbsolutePath();
-			//System.out.println("execParser: "+cmdLine);
+//			String cmdLine = Utils.join(args, " ");
+//			System.err.println("execParser: "+cmdLine);
 			Process process =
 				Runtime.getRuntime().exec(args, null, new File(tmpdir));
 			StreamVacuum stdoutVacuum = new StreamVacuum(process.getInputStream());

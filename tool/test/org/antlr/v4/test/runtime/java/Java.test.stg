@@ -1,5 +1,5 @@
 TestFile(file) ::= <<
-package org.antlr.v4.runtime.test.java;
+package org.antlr.v4.test.runtime.java;
 
 import org.antlr.v4.test.tool.BaseTest;
 import org.junit.Test;
