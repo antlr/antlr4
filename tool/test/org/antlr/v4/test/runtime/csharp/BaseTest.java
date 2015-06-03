@@ -415,8 +415,20 @@ public abstract class BaseTest {
 				"/p:Configuration=Release",
 				getTestProjectFile().getAbsolutePath()
 			};
-		Process process = Runtime.getRuntime().exec(args, null, new File(tmpdir));
+		System.err.println("Starting build "+Utils.join(args, " "));
+		Process process =
+			Runtime.getRuntime().exec(args, null, new File(tmpdir));
+		StreamVacuum stdoutVacuum = new StreamVacuum(process.getInputStream());
+		StreamVacuum stderrVacuum = new StreamVacuum(process.getErrorStream());
+		stdoutVacuum.start();
+		stderrVacuum.start();
 		process.waitFor();
+		stdoutVacuum.join();
+		stderrVacuum.join();
+		if ( stderrVacuum.toString().length()>0 ) {
+			this.stderrDuringParse = stderrVacuum.toString();
+			System.err.println("buildProject stderrVacuum: "+ stderrVacuum);
+		}
 		return process.exitValue()==0;
 	}
 
@@ -447,8 +459,13 @@ public abstract class BaseTest {
 	public boolean createProject() {
 		try {
 			String pack = this.getClass().getPackage().getName().replace(".", "/") + "/";
+			System.out.println("create project "+pack);
 			// save AssemblyInfo
 			InputStream input = Thread.currentThread().getContextClassLoader().getResourceAsStream(pack + "AssemblyInfo.cs");
+			if ( input==null ) {
+				System.err.println("Can't find " + pack + "AssemblyInfo.cs as resource");
+				return false;
+			}
 			OutputStream output = new FileOutputStream(new File(tmpdir, "AssemblyInfo.cs").getAbsolutePath());
 			while(input.available()>0) {
 				output.write(input.read());
@@ -494,6 +511,7 @@ public abstract class BaseTest {
 			transformer.transform(new DOMSource(prjXml), new StreamResult(prjFile));
 			return true;
 		} catch(Exception e) {
+			e.printStackTrace(System.err);
 			return false;
 		}
 	}
