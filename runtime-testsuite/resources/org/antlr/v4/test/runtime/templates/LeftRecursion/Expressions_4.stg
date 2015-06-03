@@ -1,0 +1,9 @@
+import "Expressions.stg"
+
+Input() ::= "a.b"
+
+Output() ::= <<
+(s (e (e a) . b) \<EOF>)<\n>
+>>
+
+Errors() ::= ""

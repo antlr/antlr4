@@ -1,0 +1,7 @@
+//TestFolders ::= [
+//]
+
+TestTemplates ::= [
+	"LexerDelegatorInvokesDelegateRule": [],
+	"LexerDelegatorRuleOverridesDelegate": []
+]

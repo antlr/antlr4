@@ -1,0 +1,33 @@
+/**
+ * This is a regression test for #270 "Fix operator += applied to a set of
+ * tokens".
+ * https://github.com/antlr/antlr4/issues/270
+ */
+
+TestType() ::= "Parser"
+
+Options ::= [
+	"Debug": false
+]
+
+Grammar ::= [
+	"T": {<grammar("T")>}
+]
+
+Input() ::= "abc 34;"
+
+Rule() ::= "a"
+
+Output() ::= ""
+
+Errors() ::= ""
+
+grammar(grammarName) ::= <<
+grammar <grammarName>;
+a : b b* ';' ;
+b : ID val+=(INT | FLOAT)*;
+ID : 'a'..'z'+ ;
+INT : '0'..'9'+;
+FLOAT : [0-9]+ '.' [0-9]+;
+WS : (' '|'\n') -> skip ;
+>>

@@ -1,0 +1,34 @@
+// checks that we throw exception if all alts
+// are covered with a predicate and none succeeds
+
+TestType() ::= "Parser"
+
+Options ::= [
+	"Debug": false
+]
+
+Grammar ::= [
+	"T": {<grammar("T")>}
+]
+
+Input() ::= "y 3 x 4"
+
+Rule() ::= "s"
+
+Output() ::= <<
+>>
+
+Errors() ::= <<
+line 1:0 no viable alternative at input 'y'<\n>
+>>
+
+grammar(grammarName) ::= <<
+grammar <grammarName>;
+s : a a;
+a : {<False()>}? ID INT {<writeln("\"alt 1\"")>}
+  | {<False()>}? ID INT {<writeln("\"alt 2\"")>}
+  ;
+ID : 'a'..'z'+ ;
+INT : '0'..'9'+;
+WS : (' '|'\n') -> skip ;
+>>

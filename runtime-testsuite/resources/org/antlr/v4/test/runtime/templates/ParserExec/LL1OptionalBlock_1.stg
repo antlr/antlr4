@@ -1,0 +1,7 @@
+import "LL1OptionalBlock.stg"
+
+Input() ::= ""
+
+Output() ::= "<\n>"
+
+Errors() ::= ""

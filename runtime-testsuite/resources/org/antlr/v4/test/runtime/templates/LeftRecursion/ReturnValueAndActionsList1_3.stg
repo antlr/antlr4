@@ -1,0 +1,9 @@
+import "ReturnValueAndActionsList1.stg"
+
+Input() ::= "x"
+
+Output() ::= <<
+(s (expr x) \<EOF>)<\n>
+>>
+
+Errors() ::= ""

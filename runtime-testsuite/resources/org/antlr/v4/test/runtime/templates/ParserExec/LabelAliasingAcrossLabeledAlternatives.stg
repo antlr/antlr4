@@ -1,0 +1,37 @@
+/**
+ * This is a regression test for antlr/antlr4#195 "label 'label' type
+ * mismatch with previous definition: TOKEN_LABEL!=RULE_LABEL"
+ * https://github.com/antlr/antlr4/issues/195
+ */
+
+TestType() ::= "Parser"
+
+Options ::= [
+	"Debug": false
+]
+
+Grammar ::= [
+	"T": {<grammar("T")>}
+]
+
+Input() ::= "xy"
+
+Rule() ::= "start"
+
+Output() ::= <<
+x
+y<\n>
+>>
+
+Errors() ::= ""
+
+grammar(grammarName) ::= <<
+grammar <grammarName>;
+start : a* EOF;
+a
+  : label=subrule {<writeln("$label.text")>} #One
+  | label='y' {<writeln("$label.text")>} #Two
+  ;
+subrule : 'x';
+WS : (' '|'\n') -> skip ;
+>>

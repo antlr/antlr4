@@ -1,0 +1,9 @@
+import "TernaryExprExplicitAssociativity.stg"
+
+Input() ::= "a"
+
+Output() ::= <<
+(s (e a) \<EOF>)<\n>
+>>
+
+Errors() ::= ""

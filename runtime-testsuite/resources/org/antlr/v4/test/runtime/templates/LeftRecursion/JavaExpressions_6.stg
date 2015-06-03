@@ -1,0 +1,9 @@
+import "JavaExpressions.stg"
+
+Input() ::= "a^b^c"
+
+Output() ::= <<
+(s (e (e a) ^ (e (e b) ^ (e c))) \<EOF>)<\n>
+>>
+
+Errors() ::= ""

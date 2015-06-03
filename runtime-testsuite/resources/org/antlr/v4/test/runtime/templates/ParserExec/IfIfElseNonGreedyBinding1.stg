@@ -1,0 +1,31 @@
+TestType() ::= "Parser"
+
+Options ::= [
+	"Debug": false
+]
+
+Grammar ::= [
+	"T": {<grammar("T")>}
+]
+
+Input() ::= "if y if y x else x"
+
+Rule() ::= "start"
+
+Output() ::= <<
+if y x
+if y if y x else x<\n>
+>>
+
+Errors() ::= ""
+
+grammar(grammarName) ::= <<
+grammar <grammarName>;
+start : statement+ ;
+statement : 'x' | ifStatement;
+ifStatement : 'if' 'y' statement ('else' statement)?? {
+<writeln("$text")>
+};
+ID : 'a'..'z'+ ;
+WS : (' '|'\n') -> channel(HIDDEN);
+>>

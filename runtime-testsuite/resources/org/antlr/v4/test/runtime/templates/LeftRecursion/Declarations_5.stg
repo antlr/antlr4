@@ -1,0 +1,9 @@
+import "Declarations.stg"
+
+Input() ::= "b[]"
+
+Output() ::= <<
+(s (declarator (declarator b) [ ]) \<EOF>)<\n>
+>>
+
+Errors() ::= ""

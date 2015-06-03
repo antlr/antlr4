@@ -1,0 +1,25 @@
+TestType() ::= "Parser"
+
+Options ::= [
+	"Debug": false
+]
+
+Grammar ::= [
+	"T": {<grammar("T")>}
+]
+
+Input() ::= "aacabc"
+
+Rule() ::= "a"
+
+Output() ::= <<
+>>
+
+Errors() ::= <<
+line 1:1 extraneous input 'a' expecting {'b', 'c'}<\n>
+>>
+
+grammar(grammarName) ::= <<
+grammar <grammarName>;
+a : 'a' 'b'* 'c';
+>>

@@ -1,0 +1,9 @@
+import "Simple.stg"
+
+Input() ::= "x"
+
+Output() ::= <<
+(s (a x))<\n>
+>>
+
+Errors() ::= ""

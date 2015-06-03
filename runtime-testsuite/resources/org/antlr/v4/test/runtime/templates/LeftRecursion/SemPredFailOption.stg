@@ -1,0 +1,31 @@
+TestType() ::= "Parser"
+
+Options ::= [
+	"Debug": false
+]
+
+Grammar ::= [
+	"T": {<grammar("T")>}
+]
+
+Input() ::= "x y z"
+
+Rule() ::= "s"
+
+Output() ::= <<
+(s (a (a x) y z))<\n>
+>>
+
+Errors() ::= <<
+line 1:4 rule a custom message<\n>
+>>
+
+grammar(grammarName) ::= <<
+grammar <grammarName>;
+s @after {<ToStringTree("$ctx"):writeln()>} : a ;
+a : a ID {<False()>}?\<fail='custom message'>
+  | ID
+  ;
+ID : 'a'..'z'+ ;
+WS : (' '|'\n') -> skip ;
+>>

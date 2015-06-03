@@ -1,0 +1,35 @@
+// The parser consumes ID and moves to the 2nd token INT.
+// To properly evaluate the predicates after matching ID INT,
+// we must correctly see come back to starting index so LT(1) works
+
+TestType() ::= "Parser"
+
+Options ::= [
+	"Debug": false
+]
+
+Grammar ::= [
+	"T": {<grammar("T")>}
+]
+
+Input() ::= "y 3 x 4"
+
+Rule() ::= "s"
+
+Output() ::= <<
+alt 2
+alt 1<\n>
+>>
+
+Errors() ::= ""
+
+grammar(grammarName) ::= <<
+grammar <grammarName>;
+s : a a;
+a : {<LTEquals("1", "\"x\"")>}? ID INT {<writeln("\"alt 1\"")>}
+  | {<LTEquals("1", "\"y\"")>}? ID INT {<writeln("\"alt 2\"")>}
+  ;
+ID : 'a'..'z'+ ;
+INT : '0'..'9'+;
+WS : (' '|'\n') -> skip ;
+>>

@@ -1,0 +1,27 @@
+TestType() ::= "Parser"
+
+Options ::= [
+	"Debug": false
+]
+
+Grammar ::= [
+	"T": {<grammar("T")>}
+]
+
+Input() ::= "aabd"
+
+Rule() ::= "a"
+
+Output() ::= <<
+[@2,2:2='b',\<1>,1:2]<\n>
+>>
+
+Errors() ::= <<
+line 1:1 extraneous input 'a' expecting {'b', 'c'}<\n>
+>>
+
+grammar(grammarName) ::= <<
+grammar <grammarName>;
+myset: ('b'|'c') ;
+a: 'a' myset 'd' {<writeln(Append("\"\"","$myset.stop"))>} ; <! bit complicated because of the JavaScript target !>
+>>
