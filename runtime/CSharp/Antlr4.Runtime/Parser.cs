@@ -800,6 +800,10 @@ namespace Antlr4.Runtime
             {
                 AddContextToParseTree();
             }
+            if (_parseListeners != null)
+            {
+                TriggerEnterRuleEvent();
+            }
         }
 
         public virtual void EnterLeftFactoredRule(ParserRuleContext localctx, int state, int ruleIndex)
