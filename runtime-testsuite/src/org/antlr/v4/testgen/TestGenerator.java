@@ -116,6 +116,8 @@ public class TestGenerator {
 				File f = new File(root, packageDir);
 				return new File(f, targetName.toLowerCase());
 			}
+			@Override
+			public String getTestTemplatesResourceDir() { return "runtime-testsuite/resources/org/antlr/v4/test/runtime/templates"; }
 		};
 		gen.info("Generating target " + gen.getTargetNameFromTemplatesFileName());
 		gen.execute();
@@ -135,7 +137,7 @@ public class TestGenerator {
 		targetGroup.defineDictionary("lines", new LinesStringMap());
 		targetGroup.defineDictionary("strlen", new StrlenStringMap());
 
-		String rootFolder = "runtime-testsuite/resources/org/antlr/v4/test/runtime/templates";
+		String rootFolder = getTestTemplatesResourceDir();
 		STGroup index = new STGroupFile(rootFolder+"/Index.stg");
 		generateCodeForFolder(targetGroup, rootFolder, index);
 	}
@@ -236,6 +238,8 @@ public class TestGenerator {
 			osw.close();
 		}
 	}
+
+	public String getTestTemplatesResourceDir() { return "org/antlr/v4/test/runtime/templates"; }
 
 	public String getTargetNameFromTemplatesFileName() {
 		// runtimeTemplates is like /Users/parrt/antlr/code/antlr4/tool/test/org/antlr/v4/test/runtime/java/Java.test.stg
