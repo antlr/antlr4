@@ -631,7 +631,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
     public void exitRule() {
 		_ctx.stop = _input.LT(-1);
         // trigger event on _ctx, before it reverts to parent
-        if ( _parseListeners != null ) triggerExitRuleEvent();
+        if ( _parseListeners != null) triggerExitRuleEvent();
 		setState(_ctx.invokingState);
 		_ctx = (ParserRuleContext)_ctx.parent;
     }
@@ -647,9 +647,6 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 			}
 		}
 		_ctx = localctx;
-		if ( _parseListeners != null ) {
-			triggerEnterRuleEvent();
-		}
 	}
 
 	/**
