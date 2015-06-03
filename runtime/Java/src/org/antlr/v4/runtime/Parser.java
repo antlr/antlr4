@@ -626,6 +626,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 		_ctx = localctx;
 		_ctx.start = _input.LT(1);
 		if (_buildParseTrees) addContextToParseTree();
+        if ( _parseListeners != null) triggerEnterRuleEvent();
 	}
 
     public void exitRule() {
