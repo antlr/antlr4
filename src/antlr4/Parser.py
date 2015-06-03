@@ -387,8 +387,6 @@ class Parser (Recognizer):
                 self._ctx.parentCtx.removeLastChild()
                 self._ctx.parentCtx.addChild(localctx)
         self._ctx = localctx
-        if self._parseListeners  is not None:
-            self.triggerEnterRuleEvent()
 
     # Get the precedence level for the top-most precedence rule.
     #
