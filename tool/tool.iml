@@ -2,7 +2,7 @@
 <module type="JAVA_MODULE" version="4">
   <component name="FacetManager">
     <facet type="Python" name="Python">
-      <configuration sdkName="Python 2.7.6 (/usr/bin/python)" />
+      <configuration sdkName="" />
     </facet>
   </component>
   <component name="NewModuleRootManager" inherit-compiler-output="true">
@@ -44,7 +44,6 @@
     <orderEntry type="library" name="maven-plugin-annotations-3.4" level="application" />
     <orderEntry type="library" name="plexus-compiler-api-1.5.3" level="application" />
     <orderEntry type="library" name="plexus-build-api-0.0.7" level="application" />
-    <orderEntry type="library" name="Python 2.7.6 (/usr/bin/python) interpreter library" level="application" />
   </component>
   <component name="PluginUploader.PluginUploadConfigurable">
     <option name="ARCHIVE_PATH" />

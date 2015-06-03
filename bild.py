@@ -254,16 +254,21 @@ def python_sdist():
 
 
 def regen_tests():
-    require(_mkjar)
+    # first compile runtime-testsuite; only needs ST and junit
     junit_jar, hamcrest_jar = load_junitjars()
-    cp = uniformpath("dist/antlr4-" + VERSION + "-complete.jar") \
-         + os.pathsep + uniformpath("out/test") \
+    download("http://www.stringtemplate.org/download/ST-4.0.8.jar", JARCACHE)
+    cp = os.path.join(JARCACHE, "ST-4.0.8.jar") \
          + os.pathsep + junit_jar \
          + os.pathsep + hamcrest_jar
     args = ["-nowarn", "-Xlint", "-Xlint:-serial", "-g"]
-    #javac("tool/test", "out/test", version="1.6", cp=cp, args=args)  # all targets can use org.antlr.v4.test.*
+    javac("runtime-testsuite/src", "out/testsuite", version="1.6", cp=cp, args=args)
+
+    # now use TestGenerator to generate Test*.java for each target using
+    # runtime templates and test templates themselves:
+    #     runtime-testsuite/resources/org/antlr/v4/test/runtime/templates
+    # generate into gen/test/Java, gen/test/CSharp, ...
     for targetName in RUNTIME_TEST_TEMPLATES:
-        java(classname="org.antlr.v4.testgen.TestGenerator", cp="out/test:dist/antlr4-"+VERSION+"-complete.jar",
+        java(classname="org.antlr.v4.testgen.TestGenerator", cp="out/testsuite:"+cp,
              progargs=['-o', 'gen/test/'+targetName, '-templates', RUNTIME_TEST_TEMPLATES[targetName]])
     #javac("gen/test", "out/test", version="1.6", cp=cp, args=args)  # compile generated runtime tests
     print_and_log("test generation complete")
