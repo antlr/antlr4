@@ -5,7 +5,7 @@ import org.junit.Test;
 import org.antlr.v4.test.tool.ErrorQueue;
 import org.antlr.v4.tool.Grammar;
 
-public class TestCompositeParsers extends BaseTest {
+public class TestCompositeParsers extends org.antlr.v4.test.runtime.csharp.BaseTest {
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
