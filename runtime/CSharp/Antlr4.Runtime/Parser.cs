@@ -850,10 +850,6 @@ namespace Antlr4.Runtime
                 }
             }
             _ctx = localctx;
-            if (_parseListeners != null)
-            {
-                TriggerEnterRuleEvent();
-            }
         }
 
         /// <summary>Get the precedence level for the top-most precedence rule.</summary>
