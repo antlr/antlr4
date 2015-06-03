@@ -345,7 +345,6 @@ def test(target, juprops, args):
         browsers = ["safari","chrome","firefox","explorer"]
         skip = [ uniformpath(srcdir + "/org/antlr/v4/test/rt/js/" + b) for b in browsers ]
     javac(srcdir, trgdir="out/test/"+target, version="1.6", cp=thisjarwithjunit, args=args, skip=skip)
-    print "DONE"
     # copy any resource files required for testing
     for t in TARGETS:
         root = TARGETS[t] + "/tool/test"
