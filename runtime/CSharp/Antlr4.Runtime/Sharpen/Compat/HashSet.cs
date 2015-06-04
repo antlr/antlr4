@@ -26,8 +26,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-#if !NET35PLUS || COMPACT
-
+#if FALSE
 using System;
 using System.Collections;
 using System.Collections.Generic;

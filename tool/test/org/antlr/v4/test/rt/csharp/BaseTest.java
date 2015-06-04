@@ -56,8 +56,10 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
+
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -447,17 +449,12 @@ public abstract class BaseTest {
 	public boolean createProject() {
 		try {
 			String pack = this.getClass().getPackage().getName().replace(".", "/") + "/";
-			// save AssemblyInfo
-			InputStream input = Thread.currentThread().getContextClassLoader().getResourceAsStream(pack + "AssemblyInfo.cs");
-			OutputStream output = new FileOutputStream(new File(tmpdir, "AssemblyInfo.cs").getAbsolutePath());
-			while(input.available()>0) {
-				output.write(input.read());
-			}
-			output.close();
-			input.close();
+			// save auxiliary files
+			saveResourceAsFile(pack + "AssemblyInfo.cs", new File(tmpdir, "AssemblyInfo.cs"));
+			saveResourceAsFile(pack + "App.config", new File(tmpdir, "App.config"));
 			// update project
 			String projectName = isWindows() ? "Antlr4.Test.vs2013.csproj" : "Antlr4.Test.mono.csproj";
-			input = Thread.currentThread().getContextClassLoader().getResourceAsStream(pack + projectName);
+			InputStream input = Thread.currentThread().getContextClassLoader().getResourceAsStream(pack + projectName);
 			Document prjXml = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(input);
 			// update runtime project reference
 			String runtimePath = System.getProperty("antlr-csharp-runtime-project");
@@ -496,6 +493,16 @@ public abstract class BaseTest {
 		} catch(Exception e) {
 			return false;
 		}
+	}
+
+	private void saveResourceAsFile(String resourceName, File file) throws IOException {
+		InputStream input = Thread.currentThread().getContextClassLoader().getResourceAsStream(resourceName);
+		OutputStream output = new FileOutputStream(file.getAbsolutePath());
+		while(input.available()>0) {
+			output.write(input.read());
+		}
+		output.close();
+		input.close();
 	}
 
 	public String execTest() {

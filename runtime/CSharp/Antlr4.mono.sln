@@ -43,9 +43,6 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{4CE79A54-058D-4940-875E-7F6AA9922A7D} = {47C0086D-577C-43DA-ADC7-544F27656E45}
 	EndGlobalSection
-	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = Antlr4.Runtime\Antlr4.Runtime.mono.csproj
-	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
