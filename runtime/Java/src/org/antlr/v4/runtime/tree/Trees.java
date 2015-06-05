@@ -35,6 +35,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.Utils;
 import org.antlr.v4.runtime.tree.gui.TreePostScriptGenerator;
+import org.antlr.v4.runtime.tree.gui.TreeTextProvider;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -100,24 +101,37 @@ public class Trees {
 		return toStringTree(t, ruleNamesList);
 	}
 
-	/** Print out a whole tree in LISP form. {@link #getNodeText} is used on the
-	 *  node payloads to get the text for the nodes.  Detect
-	 *  parse trees and extract data appropriately.
+	/** Print out a whole tree in LISP form. Arg nodeTextProvider is used on the
+	 *  node payloads to get the text for the nodes.
+	 *
+	 *  @since 4.5.1
 	 */
-	public static String toStringTree(Tree t, List<String> ruleNames) {
-		String s = Utils.escapeWhitespace(getNodeText(t, ruleNames), false);
+	public static String toStringTree(Tree t, TreeTextProvider nodeTextProvider) {
+		String s = Utils.escapeWhitespace(nodeTextProvider.getText(t), false);
 		if ( t.getChildCount()==0 ) return s;
 		StringBuilder buf = new StringBuilder();
 		buf.append("(");
-		s = Utils.escapeWhitespace(getNodeText(t, ruleNames), false);
+		s = Utils.escapeWhitespace(nodeTextProvider.getText(t), false);
 		buf.append(s);
 		buf.append(' ');
 		for (int i = 0; i<t.getChildCount(); i++) {
 			if ( i>0 ) buf.append(' ');
-			buf.append(toStringTree(t.getChild(i), ruleNames));
+			buf.append(toStringTree(t.getChild(i), nodeTextProvider));
 		}
 		buf.append(")");
 		return buf.toString();
+	}
+
+	/** Print out a whole tree in LISP form. {@link #getNodeText} is used on the
+	 *  node payloads to get the text for the nodes.
+	 */
+	public static String toStringTree(final Tree t, final List<String> ruleNames) {
+		return toStringTree(t, new TreeTextProvider() {
+			@Override
+			public String getText(Tree node) {
+				return getNodeText(node, ruleNames);
+			}
+		});
 	}
 
 	public static String getNodeText(Tree t, Parser recog) {

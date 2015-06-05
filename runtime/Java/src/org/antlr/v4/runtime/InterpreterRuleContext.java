@@ -43,7 +43,7 @@ package org.antlr.v4.runtime;
  */
 public class InterpreterRuleContext extends ParserRuleContext {
 	/** This is the backing field for {@link #getRuleIndex}. */
-	private int ruleIndex = -1;
+	protected int ruleIndex = -1;
 
 	public InterpreterRuleContext() { }
 
@@ -66,18 +66,5 @@ public class InterpreterRuleContext extends ParserRuleContext {
 	@Override
 	public int getRuleIndex() {
 		return ruleIndex;
-	}
-
-	/** Copy a {@link ParserRuleContext} or {@link InterpreterRuleContext}
-	 *  stack to a {@link InterpreterRuleContext} tree.
-	 *  Return {@link null} if {@code ctx} is null.
-	 */
-	public static InterpreterRuleContext fromParserRuleContext(ParserRuleContext ctx) {
-		if ( ctx==null ) return null;
-		InterpreterRuleContext dup = new InterpreterRuleContext();
-		dup.copyFrom(ctx);
-		dup.ruleIndex = ctx.getRuleIndex();
-		dup.parent = fromParserRuleContext(ctx.getParent());
-		return dup;
 	}
 }

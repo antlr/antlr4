@@ -76,7 +76,7 @@ public class DFA {
 
 		boolean precedenceDfa = false;
 		if (atnStartState instanceof StarLoopEntryState) {
-			if (((StarLoopEntryState)atnStartState).precedenceRuleDecision) {
+			if (((StarLoopEntryState)atnStartState).isPrecedenceDecision) {
 				precedenceDfa = true;
 				DFAState precedenceState = new DFAState(new ATNConfigSet());
 				precedenceState.edges = new DFAState[0];

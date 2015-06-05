@@ -246,7 +246,7 @@ public class DOTGenerator {
 					edgeST = stlib.getInstanceOf("edge");
 
 					String label = "<" + ruleNames[rr.ruleIndex];
-					if (((RuleStartState)rr.target).isPrecedenceRule) {
+					if (((RuleStartState)rr.target).isLeftRecursiveRule) {
 						label += "[" + rr.precedence + "]";
 					}
 					label += ">";

@@ -823,7 +823,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 			// Create a new parser interpreter to parse the ambiguous subphrase
 			ParserInterpreter parser;
 			if ( originalParser instanceof ParserInterpreter ) {
-				parser = new ParserInterpreter((ParserInterpreter) originalParser);
+				parser = ((ParserInterpreter)originalParser).copyFrom((ParserInterpreter)originalParser);
 			}
 			else {
 				char[] serializedAtn = ATNSerializer.getSerializedAsChars(originalParser.getATN());

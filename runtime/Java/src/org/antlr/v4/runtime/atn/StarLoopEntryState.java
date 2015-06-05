@@ -46,7 +46,7 @@ public final class StarLoopEntryState extends DecisionState {
 	 *
 	 * @see DFA#isPrecedenceDfa()
 	 */
-	public boolean precedenceRuleDecision;
+	public boolean isPrecedenceDecision;
 
 	@Override
 	public int getStateType() {

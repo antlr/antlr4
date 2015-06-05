@@ -210,7 +210,7 @@ public class ATNDeserializer {
 			int numPrecedenceStates = toInt(data[p++]);
 			for (int i = 0; i < numPrecedenceStates; i++) {
 				int stateNumber = toInt(data[p++]);
-				((RuleStartState)atn.states.get(stateNumber)).isPrecedenceRule = true;
+				((RuleStartState)atn.states.get(stateNumber)).isLeftRecursiveRule = true;
 			}
 		}
 
@@ -239,9 +239,6 @@ public class ATNDeserializer {
 					// this piece of unused metadata was serialized prior to the
 					// addition of LexerAction
 					int actionIndexIgnored = toInt(data[p++]);
-					if (actionIndexIgnored == 0xFFFF) {
-						actionIndexIgnored = -1;
-					}
 				}
 			}
 		}
@@ -319,7 +316,7 @@ public class ATNDeserializer {
 
 				RuleTransition ruleTransition = (RuleTransition)t;
 				int outermostPrecedenceReturn = -1;
-				if (atn.ruleToStartState[ruleTransition.target.ruleIndex].isPrecedenceRule) {
+				if (atn.ruleToStartState[ruleTransition.target.ruleIndex].isLeftRecursiveRule) {
 					if (ruleTransition.precedence == 0) {
 						outermostPrecedenceReturn = ruleTransition.target.ruleIndex;
 					}
@@ -451,7 +448,7 @@ public class ATNDeserializer {
 
 				ATNState endState;
 				Transition excludeTransition = null;
-				if (atn.ruleToStartState[i].isPrecedenceRule) {
+				if (atn.ruleToStartState[i].isLeftRecursiveRule) {
 					// wrap from the beginning of the rule to the StarLoopEntryState
 					endState = null;
 					for (ATNState state : atn.states) {
@@ -524,7 +521,7 @@ public class ATNDeserializer {
 
 	/**
 	 * Analyze the {@link StarLoopEntryState} states in the specified ATN to set
-	 * the {@link StarLoopEntryState#precedenceRuleDecision} field to the
+	 * the {@link StarLoopEntryState#isPrecedenceDecision} field to the
 	 * correct value.
 	 *
 	 * @param atn The ATN.
@@ -539,11 +536,11 @@ public class ATNDeserializer {
 			 * decision for the closure block that determines whether a
 			 * precedence rule should continue or complete.
 			 */
-			if (atn.ruleToStartState[state.ruleIndex].isPrecedenceRule) {
+			if (atn.ruleToStartState[state.ruleIndex].isLeftRecursiveRule) {
 				ATNState maybeLoopEndState = state.transition(state.getNumberOfTransitions() - 1).target;
 				if (maybeLoopEndState instanceof LoopEndState) {
 					if (maybeLoopEndState.epsilonOnlyTransitions && maybeLoopEndState.transition(0).target instanceof RuleStopState) {
-						((StarLoopEntryState)state).precedenceRuleDecision = true;
+						((StarLoopEntryState)state).isPrecedenceDecision = true;
 					}
 				}
 			}
