@@ -55,11 +55,12 @@ public class ConsoleErrorListener extends BaseErrorListener {
 	public void syntaxError(Recognizer<?, ?> recognizer,
 							Object offendingSymbol,
 							int line,
-							int charPositionInLine,
+							int startPositionInLine,
+							int endPositionInLine,
 							String msg,
 							RecognitionException e)
 	{
-		System.err.println("line " + line + ":" + charPositionInLine + " " + msg);
+		System.err.println("line " + line + ":" + startPositionInLine + " " + msg);
 	}
 
 }

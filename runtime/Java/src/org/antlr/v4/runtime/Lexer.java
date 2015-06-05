@@ -29,14 +29,14 @@
  */
 package org.antlr.v4.runtime;
 
+import java.util.ArrayList;
+import java.util.EmptyStackException;
+import java.util.List;
+
 import org.antlr.v4.runtime.atn.LexerATNSimulator;
 import org.antlr.v4.runtime.misc.IntegerStack;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.Pair;
-
-import java.util.ArrayList;
-import java.util.EmptyStackException;
-import java.util.List;
 
 /** A lexer is recognizer that draws input symbols from a character stream.
  *  lexer grammars result in a subclass of this object. A Lexer object
@@ -383,7 +383,7 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 		String msg = "token recognition error at: '"+ getErrorDisplay(text) + "'";
 
 		ANTLRErrorListener listener = getErrorListenerDispatch();
-		listener.syntaxError(this, null, _tokenStartLine, _tokenStartCharPositionInLine, msg, e);
+		listener.syntaxError(this, null, _tokenStartLine, _tokenStartCharPositionInLine, _input.index(), msg, e);
 	}
 
 	public String getErrorDisplay(String s) {

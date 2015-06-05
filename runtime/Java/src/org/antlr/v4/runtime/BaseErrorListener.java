@@ -29,10 +29,10 @@
  */
 package org.antlr.v4.runtime;
 
+import java.util.BitSet;
+
 import org.antlr.v4.runtime.atn.ATNConfigSet;
 import org.antlr.v4.runtime.dfa.DFA;
-
-import java.util.BitSet;
 
 /**
  * Provides an empty default implementation of {@link ANTLRErrorListener}. The
@@ -46,7 +46,8 @@ public class BaseErrorListener implements ANTLRErrorListener {
 	public void syntaxError(Recognizer<?, ?> recognizer,
 							Object offendingSymbol,
 							int line,
-							int charPositionInLine,
+							int startPositionInLine,
+							int endPositionInLine,
 							String msg,
 							RecognitionException e)
 	{

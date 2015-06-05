@@ -29,6 +29,13 @@
  */
 package org.antlr.v4.runtime;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.WeakHashMap;
+
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNDeserializationOptions;
 import org.antlr.v4.runtime.atn.ATNDeserializer;
@@ -51,13 +58,6 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 import org.antlr.v4.runtime.tree.Trees;
 import org.antlr.v4.runtime.tree.pattern.ParseTreePattern;
 import org.antlr.v4.runtime.tree.pattern.ParseTreePatternMatcher;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.WeakHashMap;
 
 /** This is all the parsing support code essentially; most of it is error recovery stuff. */
 public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
@@ -558,7 +558,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 		charPositionInLine = offendingToken.getCharPositionInLine();
 
 		ANTLRErrorListener listener = getErrorListenerDispatch();
-		listener.syntaxError(this, offendingToken, line, charPositionInLine, msg, e);
+		listener.syntaxError(this, offendingToken, line, charPositionInLine, charPositionInLine + offendingToken.getText().length(), msg, e);
 	}
 
 	/**

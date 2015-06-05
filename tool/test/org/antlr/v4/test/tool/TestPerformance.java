@@ -1574,7 +1574,7 @@ public class TestPerformance extends BaseTest {
 
 		@Override
 		public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol,
-								int line, int charPositionInLine,
+								int line, int startPositionInLine, int endPositionInLine,
 								String msg, RecognitionException e)
 		{
 			if (!REPORT_SYNTAX_ERRORS) {
@@ -1583,10 +1583,10 @@ public class TestPerformance extends BaseTest {
 
 			String sourceName = recognizer.getInputStream().getSourceName();
 			if (!sourceName.isEmpty()) {
-				sourceName = String.format("%s:%d:%d: ", sourceName, line, charPositionInLine);
+				sourceName = String.format("%s:%d:%d: ", sourceName, line, startPositionInLine);
 			}
 
-			System.err.println(sourceName+"line "+line+":"+charPositionInLine+" "+msg);
+			System.err.println(sourceName+"line "+line+":"+startPositionInLine+" "+msg);
 		}
 
 	}
