@@ -567,6 +567,10 @@ public class Generator {
 				"aa",
 				"",
 				"line 1:1 mismatched input 'a' expecting 'b'\n");
+		file.addParserTest(input, "TokenMismatch2", "T", "stat",
+				"( ~FORCE_ERROR~ ",
+				"",
+				"line 1:2 mismatched input '~FORCE_ERROR~' expecting ')'\n");
 		file.addParserTest(input, "SingleTokenDeletion", "T", "a",
 				"aab",
 				"",
