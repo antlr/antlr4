@@ -34,6 +34,7 @@ nbactions*.xml
 # Generated files
 out/
 doc/
+gen/
 gen3/
 gen4/
 tmp/
