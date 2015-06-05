@@ -108,7 +108,7 @@ public class ATNSerializer {
 				nonGreedyStates.add(s.stateNumber);
 			}
 
-			if (s instanceof RuleStartState && ((RuleStartState)s).isPrecedenceRule) {
+			if (s instanceof RuleStartState && ((RuleStartState)s).isLeftRecursiveRule) {
 				precedenceStates.add(s.stateNumber);
 			}
 

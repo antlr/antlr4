@@ -48,7 +48,7 @@ import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.Pair;
 
 import java.util.ArrayDeque;
-import java.util.BitSet;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Deque;
 
@@ -68,14 +68,9 @@ import java.util.Deque;
 public class ParserInterpreter extends Parser {
 	protected final String grammarFileName;
 	protected final ATN atn;
-	/** This identifies StarLoopEntryState's that begin the (...)*
-	 *  precedence loops of left recursive rules.
-	 */
-	protected final BitSet statesNeedingLeftRecursionContext;
 
 	protected final DFA[] decisionToDFA; // not shared like it is for generated parsers
-	protected final PredictionContextCache sharedContextCache =
-		new PredictionContextCache();
+	protected final PredictionContextCache sharedContextCache = new PredictionContextCache();
 
 	@Deprecated
 	protected final String[] tokenNames;
@@ -83,7 +78,19 @@ public class ParserInterpreter extends Parser {
 
 	private final Vocabulary vocabulary;
 
-	/** Tracks LR rules for adjusting the contexts */
+	/** This stack corresponds to the _parentctx, _parentState pair of locals
+	 *  that would exist on call stack frames with a recursive descent parser;
+	 *  in the generated function for a left-recursive rule you'd see:
+	 *
+	 *  private EContext e(int _p) throws RecognitionException {
+	 *      ParserRuleContext _parentctx = _ctx;    // Pair.a
+	 *      int _parentState = getState();          // Pair.b
+	 *      ...
+	 *  }
+	 *
+	 *  Those values are used to create new recursive rule invocation contexts
+	 *  associated with left operand of an alt like "expr '*' expr".
+	 */
 	protected final Deque<Pair<ParserRuleContext, Integer>> _parentContextStack =
 		new ArrayDeque<Pair<ParserRuleContext, Integer>>();
 
@@ -93,27 +100,6 @@ public class ParserInterpreter extends Parser {
 	protected int overrideDecision = -1;
 	protected int overrideDecisionInputIndex = -1;
 	protected int overrideDecisionAlt = -1;
-
-	/** A copy constructor that creates a new parser interpreter by reusing
-	 *  the fields of a previous interpreter.
-	 *
-	 *  @since 4.5.1
-	 *
-	 *  @param old The interpreter to copy
-	 */
-	public ParserInterpreter(ParserInterpreter old) {
-		super(old.getTokenStream());
-		this.atn = old.atn;
-		this.grammarFileName = old.grammarFileName;
-		this.statesNeedingLeftRecursionContext = old.statesNeedingLeftRecursionContext;
-		this.decisionToDFA = old.decisionToDFA;
-		this.tokenNames = old.tokenNames;
-		this.ruleNames = old.ruleNames;
-		this.vocabulary = old.vocabulary;
-		setInterpreter(new ParserATNSimulator(this, atn,
-											  decisionToDFA,
-											  sharedContextCache));
-	}
 
 	/**
 	 * @deprecated Use {@link #ParserInterpreter(String, Vocabulary, Collection, ATN, TokenStream)} instead.
@@ -137,27 +123,32 @@ public class ParserInterpreter extends Parser {
 
 		this.ruleNames = ruleNames.toArray(new String[ruleNames.size()]);
 		this.vocabulary = vocabulary;
-		this.decisionToDFA = new DFA[atn.getNumberOfDecisions()];
-		for (int i = 0; i < decisionToDFA.length; i++) {
-			decisionToDFA[i] = new DFA(atn.getDecisionState(i), i);
-		}
 
-		// identify the ATN states where pushNewRecursionContext() must be called
-		this.statesNeedingLeftRecursionContext = new BitSet(atn.states.size());
-		for (ATNState state : atn.states) {
-			if (!(state instanceof StarLoopEntryState)) {
-				continue;
-			}
-
-			if (((StarLoopEntryState)state).precedenceRuleDecision) {
-				this.statesNeedingLeftRecursionContext.set(state.stateNumber);
-			}
+		// init decision DFA
+		int numberOfDecisions = atn.getNumberOfDecisions();
+		this.decisionToDFA = new DFA[numberOfDecisions];
+		for (int i = 0; i < numberOfDecisions; i++) {
+			DecisionState decisionState = atn.getDecisionState(i);
+			decisionToDFA[i] = new DFA(decisionState, i);
 		}
 
 		// get atn simulator that knows how to do predictions
 		setInterpreter(new ParserATNSimulator(this, atn,
 											  decisionToDFA,
 											  sharedContextCache));
+	}
+
+	/** A factory-like copy constructor that creates a new parser interpreter by reusing
+	 *  the fields of a previous interpreter.
+	 *
+	 *  @since 4.5.1
+	 *
+	 *  @param old The interpreter to copy
+	 */
+	public ParserInterpreter copyFrom(ParserInterpreter old) {
+		return new ParserInterpreter(old.grammarFileName, old.vocabulary,
+									 Arrays.asList(old.ruleNames),
+									 old.atn, old.getTokenStream());
 	}
 
 	@Override
@@ -190,8 +181,8 @@ public class ParserInterpreter extends Parser {
 	public ParserRuleContext parse(int startRuleIndex) {
 		RuleStartState startRuleStartState = atn.ruleToStartState[startRuleIndex];
 
-		InterpreterRuleContext rootContext = new InterpreterRuleContext(null, ATNState.INVALID_STATE_NUMBER, startRuleIndex);
-		if (startRuleStartState.isPrecedenceRule) {
+		InterpreterRuleContext rootContext = createInterpreterRuleContext(null, ATNState.INVALID_STATE_NUMBER, startRuleIndex);
+		if (startRuleStartState.isLeftRecursiveRule) {
 			enterRecursionRule(rootContext, startRuleStartState.stateNumber, startRuleIndex, 0);
 		}
 		else {
@@ -204,7 +195,7 @@ public class ParserInterpreter extends Parser {
 			case ATNState.RULE_STOP :
 				// pop; return from rule
 				if ( _ctx.isEmpty() ) {
-					if (startRuleStartState.isPrecedenceRule) {
+					if (startRuleStartState.isLeftRecursiveRule) {
 						ParserRuleContext result = _ctx;
 						Pair<ParserRuleContext, Integer> parentContext = _parentContextStack.pop();
 						unrollRecursionContexts(parentContext.a);
@@ -247,31 +238,28 @@ public class ParserInterpreter extends Parser {
 	}
 
 	protected void visitState(ATNState p) {
-		int altNum;
-		if (p.getNumberOfTransitions() > 1) {
-			getErrorHandler().sync(this);
-			int decision = ((DecisionState) p).decision;
-			if ( decision == overrideDecision && _input.index() == overrideDecisionInputIndex ) {
-				altNum = overrideDecisionAlt;
-			}
-			else {
-				altNum = getInterpreter().adaptivePredict(_input, decision, _ctx);
-			}
-		}
-		else {
-			altNum = 1;
+//		System.out.println("visitState "+p.stateNumber);
+		int edge = 1;
+		if ( p instanceof DecisionState ) {
+			edge = visitDecisionsState((DecisionState) p);
 		}
 
-		Transition transition = p.transition(altNum - 1);
+		Transition transition = p.transition(edge - 1);
 		switch (transition.getSerializationType()) {
 			case Transition.EPSILON:
-				if ( statesNeedingLeftRecursionContext.get(p.stateNumber) &&
+				if ( p.getStateType()==ATNState.STAR_LOOP_ENTRY &&
+					 ((StarLoopEntryState)p).isPrecedenceDecision &&
 					 !(transition.target instanceof LoopEndState))
 				{
 					// We are at the start of a left recursive rule's (...)* loop
-					// but it's not the exit branch of loop.
-					InterpreterRuleContext ctx = new InterpreterRuleContext(_parentContextStack.peek().a, _parentContextStack.peek().b, _ctx.getRuleIndex());
-					pushNewRecursionContext(ctx, atn.ruleToStartState[p.ruleIndex].stateNumber, _ctx.getRuleIndex());
+					// and we're not taking the exit branch of loop.
+					InterpreterRuleContext localctx =
+						createInterpreterRuleContext(_parentContextStack.peek().a,
+													 _parentContextStack.peek().b,
+													 _ctx.getRuleIndex());
+					pushNewRecursionContext(localctx,
+											atn.ruleToStartState[p.ruleIndex].stateNumber,
+											_ctx.getRuleIndex());
 				}
 				break;
 
@@ -295,12 +283,12 @@ public class ParserInterpreter extends Parser {
 			case Transition.RULE:
 				RuleStartState ruleStartState = (RuleStartState)transition.target;
 				int ruleIndex = ruleStartState.ruleIndex;
-				InterpreterRuleContext ctx = new InterpreterRuleContext(_ctx, p.stateNumber, ruleIndex);
-				if (ruleStartState.isPrecedenceRule) {
-					enterRecursionRule(ctx, ruleStartState.stateNumber, ruleIndex, ((RuleTransition)transition).precedence);
+				InterpreterRuleContext newctx = createInterpreterRuleContext(_ctx, p.stateNumber, ruleIndex);
+				if (ruleStartState.isLeftRecursiveRule) {
+					enterRecursionRule(newctx, ruleStartState.stateNumber, ruleIndex, ((RuleTransition)transition).precedence);
 				}
 				else {
-					enterRule(ctx, transition.target.stateNumber, ruleIndex);
+					enterRule(newctx, transition.target.stateNumber, ruleIndex);
 				}
 				break;
 
@@ -330,9 +318,35 @@ public class ParserInterpreter extends Parser {
 		setState(transition.target.stateNumber);
 	}
 
+	protected int visitDecisionsState(DecisionState p) {
+		int edge = 1;
+		if ( p.getNumberOfTransitions()>1 ) {
+			int predictedAlt;
+			getErrorHandler().sync(this);
+			int decision = p.decision;
+			if (decision == overrideDecision && _input.index() == overrideDecisionInputIndex) {
+				predictedAlt = overrideDecisionAlt;
+			}
+			else {
+				predictedAlt = getInterpreter().adaptivePredict(_input, decision, _ctx);
+			}
+			edge = predictedAlt;
+		}
+		return edge;
+	}
+
+	/** Provide simple "factory" for InterpreterRuleContext's. */
+	protected InterpreterRuleContext createInterpreterRuleContext(
+		ParserRuleContext parent,
+		int invokingStateNumber,
+		int ruleIndex)
+	{
+		return new InterpreterRuleContext(parent, invokingStateNumber, ruleIndex);
+	}
+
 	protected void visitRuleStopState(ATNState p) {
 		RuleStartState ruleStartState = atn.ruleToStartState[p.ruleIndex];
-		if (ruleStartState.isPrecedenceRule) {
+		if (ruleStartState.isLeftRecursiveRule) {
 			Pair<ParserRuleContext, Integer> parentContext = _parentContextStack.pop();
 			unrollRecursionContexts(parentContext.a);
 			setState(parentContext.b);

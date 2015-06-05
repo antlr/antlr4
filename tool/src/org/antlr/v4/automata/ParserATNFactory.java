@@ -659,7 +659,7 @@ public class ParserATNFactory implements ATNFactory {
 			RuleStartState start = newState(RuleStartState.class, r.ast);
 			RuleStopState stop = newState(RuleStopState.class, r.ast);
 			start.stopState = stop;
-			start.isPrecedenceRule = r instanceof LeftRecursiveRule;
+			start.isLeftRecursiveRule = r instanceof LeftRecursiveRule;
 			start.setRuleIndex(r.index);
 			stop.setRuleIndex(r.index);
 			atn.ruleToStartState[r.index] = start;

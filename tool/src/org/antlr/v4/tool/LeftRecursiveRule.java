@@ -89,6 +89,53 @@ public class LeftRecursiveRule extends Rule {
 		return alts;
 	}
 
+	/** Return an array that maps predicted alt from primary decision
+	 *  to original alt of rule. For following rule, return [0, 2, 4]
+	 *
+		e : e '*' e
+		  | INT
+		  | e '+' e
+		  | ID
+		  ;
+
+	 *  That maps predicted alt 1 to original alt 2 and predicted 2 to alt 4.
+	 *
+	 *  @since 4.5.1
+	 */
+	public int[] getPrimaryAlts() {
+		if ( recPrimaryAlts.size()==0 ) return null;
+		int[] alts = new int[recPrimaryAlts.size()+1];
+		for (int i = 0; i < recPrimaryAlts.size(); i++) { // recPrimaryAlts is a List not Map like recOpAlts
+			LeftRecursiveRuleAltInfo altInfo = recPrimaryAlts.get(i);
+			alts[i+1] = altInfo.altNum;
+		}
+		return alts;
+	}
+
+	/** Return an array that maps predicted alt from recursive op decision
+	 *  to original alt of rule. For following rule, return [0, 1, 3]
+	 *
+		e : e '*' e
+		  | INT
+		  | e '+' e
+		  | ID
+		  ;
+
+	 *  That maps predicted alt 1 to original alt 1 and predicted 2 to alt 3.
+	 *
+	 *  @since 4.5.1
+	 */
+	public int[] getRecursiveOpAlts() {
+		if ( recOpAlts.size()==0 ) return null;
+		int[] alts = new int[recOpAlts.size()+1];
+		int alt = 1;
+		for (LeftRecursiveRuleAltInfo altInfo : recOpAlts.values()) {
+			alts[alt] = altInfo.altNum;
+			alt++; // recOpAlts has alts possibly with gaps
+		}
+		return alts;
+	}
+
 	/** Get -> labels from those alts we deleted for left-recursive rules. */
 	@Override
 	public Map<String, List<Pair<Integer, AltAST>>> getAltLabels() {
