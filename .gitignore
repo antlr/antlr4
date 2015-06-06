@@ -28,19 +28,22 @@ nbactions*.xml
 # Profiler results
 *.hprof
 
+# parrt's bash prompt data
+.fetch_time_cache
+
 # Playground
 #/tool/playground/
 
 # Generated files
-/out
-/doc
-/gen
-/gen3
-/gen4
-/tool/playground
+/out/
+/doc/
+/gen/
+/gen3/
+/gen4/
+/tool/playground/
 tmp/
 
 # Configurable build files
-bild.py
-bild*
-
+bilder.py
+bilder.pyc
+bild.log
