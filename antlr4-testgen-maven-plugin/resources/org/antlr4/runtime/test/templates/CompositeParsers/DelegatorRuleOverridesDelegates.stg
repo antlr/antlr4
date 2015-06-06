@@ -34,7 +34,7 @@ b : 'b' ;
 >>
 
 slaveGrammarT(grammarName) ::= <<
-parser grammar S;
+parser grammar T;
 tokens { A }
 b : 'b' {<writeln("\"T.b\"")>};
 >>

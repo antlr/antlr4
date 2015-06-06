@@ -127,8 +127,6 @@ public class TestCompositeGrammars extends BaseTest {
 		assertEquals(0, equeue.size());
 	}
 
-
-
 	@Test public void testImportedTokenVocabIgnoredWithWarning() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		String slave =
@@ -381,7 +379,6 @@ public class TestCompositeGrammars extends BaseTest {
 		int expecting = 0; // should be ok
 		assertEquals(expecting, equeue.errors.size());
 	}
-
 
 	/**
 	 * This is a regression test for antlr/antlr4#670 "exception when importing

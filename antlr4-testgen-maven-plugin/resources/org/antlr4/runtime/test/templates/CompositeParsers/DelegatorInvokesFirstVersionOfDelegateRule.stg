@@ -29,11 +29,11 @@ WS : (' '|'\n') -> skip ;
 
 slaveGrammarS(grammarName) ::= <<
 parser grammar S;
-a : B {<writeln("\"S.a\"")>};
+a : b {<writeln("\"S.a\"")>};
 b : B;
 >>
 
 slaveGrammarT(grammarName) ::= <<
 parser grammar T;
-a : B {<writeln("\"T.a\"")>};
+a : B {<writeln("\"T.a\"")>};<! hidden by S.a !>
 >>
