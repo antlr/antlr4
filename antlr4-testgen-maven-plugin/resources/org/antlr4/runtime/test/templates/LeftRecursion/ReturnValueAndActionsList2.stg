@@ -1,9 +1,9 @@
-/**
- * This is a regression test for antlr/antlr4#677 "labels not working in
- * grammar file".
+/*
+ * This is a regression test for antlr/antlr4#677 "labels not working in grammar
+ * file".
  * https://github.com/antlr/antlr4/issues/677
  *
- * <p>This test treats the {@code ,} and {@code >>} operators separately.</p>
+ * This test treats the `,` and `>>` operators separately.
  */
 
 TestType() ::= "Parser"

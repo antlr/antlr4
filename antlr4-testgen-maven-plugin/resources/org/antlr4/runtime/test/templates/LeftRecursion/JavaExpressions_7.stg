@@ -3,7 +3,7 @@ import "JavaExpressions.stg"
 Input() ::= "(T)x"
 
 Output() ::= <<
-(s (e ( (type_ T) ) (e x)) \<EOF>)<\n>
+(s (e ( (type T) ) (e x)) \<EOF>)<\n>
 >>
 
 Errors() ::= ""

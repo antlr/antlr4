@@ -1,4 +1,4 @@
-/**
+/*
  * This is a regression test for "Support direct calls to left-recursive
  * rules".
  * https://github.com/antlr/antlr4/issues/161
