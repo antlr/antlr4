@@ -1,6 +1,6 @@
-/**
- * This is a regression test for #239 "recoursive parser using implicit
- * tokens ignore white space lexer rule".
+/*
+ * This is a regression test for #239 "recoursive parser using implicit tokens
+ * ignore white space lexer rule".
  * https://github.com/antlr/antlr4/issues/239
  */
 
@@ -63,7 +63,7 @@ ID              : LETTER ALPHANUM*;
 NUMBER          : DIGIT+ ('.' DIGIT+)? (('e'|'E')('+'|'-')? DIGIT+)?;
 DATE            : '\'' DIGIT DIGIT DIGIT DIGIT '-' DIGIT DIGIT '-' DIGIT DIGIT (' ' DIGIT DIGIT ':' DIGIT DIGIT ':' DIGIT DIGIT ('.' DIGIT+)?)? '\'';
 SQ_STRING       : '\'' ('\'\'' | ~'\'')* '\'';
-DQ_STRING       : '\"' ('\\\"' | ~'\"')* '\"';
+DQ_STRING       : '"' ('\\\\"' | ~'"')* '"';
 WS              : [ \t\n\r]+ -> skip ;
 COMMENTS        : ('/*' .*? '*/' | '//' ~'\n'* '\n' ) -> skip;
 >>

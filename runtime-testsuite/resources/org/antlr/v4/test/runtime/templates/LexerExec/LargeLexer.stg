@@ -1,3 +1,8 @@
+/*
+ * This is a regression test for antlr/antlr4#76 "Serialized ATN strings
+ * should be split when longer than 2^16 bytes (class file limitation)"
+ * https://github.com/antlr/antlr4/issues/76
+ */
 TestType() ::= "Lexer"
 
 Grammar ::= [

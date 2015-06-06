@@ -21,13 +21,13 @@ Errors() ::= ""
 masterGrammar(grammarName, slaveGrammarName) ::= <<
 grammar M; // uses no rules from the import
 import S;
-s : 'b'{<Invoke_foo()>}; // gS is import pointer
+s : 'b' {<Invoke_foo()>} ; // gS is import pointer
 WS : (' '|'\n') -> skip ;
 >>
 
 slaveGrammar(grammarName) ::= <<
 parser grammar S;
-@members {
+@parser::members {
 <Declare_foo()>
 }
 a : B;

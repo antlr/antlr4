@@ -1,15 +1,19 @@
 TestType() ::= "Lexer"
 
+Options ::= [
+	"Ignore": "Currently unable to generate the required CRLF input sequence."
+]
+
 Grammar ::= [
 	"L": {<grammar("L")>}
 ]
 
-Input() ::= "00<\n>"
+Input() ::= "00<\u000D><\n>"
 
 Output() ::= <<
 I
 [@0,0:1='00',\<1>,1:0]
-[@1,3:2='\<EOF>',\<-1>,2:0]<\n>
+[@1,4:3='\<EOF>',\<-1>,2:0]<\n>
 >>
 
 Errors() ::= ""

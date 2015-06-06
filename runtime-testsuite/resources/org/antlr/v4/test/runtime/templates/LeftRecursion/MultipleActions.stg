@@ -1,4 +1,4 @@
-/**
+/*
  * This is a regression test for antlr/antlr4#625 "Duplicate action breaks
  * operator precedence"
  * https://github.com/antlr/antlr4/issues/625

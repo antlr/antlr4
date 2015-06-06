@@ -60,7 +60,7 @@ x : A {<writeln("\"S.x\"")>};
 >>
 
 slaveGrammarT(grammarName) ::= <<
-parser grammar S;
+parser grammar T;
 tokens { C, B, A } // reverse order
 y : A {<writeln("\"T.y\"")>};
 >>

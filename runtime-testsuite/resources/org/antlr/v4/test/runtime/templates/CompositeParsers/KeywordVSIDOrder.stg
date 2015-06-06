@@ -1,3 +1,7 @@
+// rules in lexer are imported at END so rules in master override
+// *and* get priority over imported rules. So importing ID doesn't
+// mess up keywords in master grammar
+
 TestType() ::= "CompositeParser"
 
 Grammar ::= [

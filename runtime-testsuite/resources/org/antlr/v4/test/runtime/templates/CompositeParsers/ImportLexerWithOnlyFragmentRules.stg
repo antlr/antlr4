@@ -1,11 +1,17 @@
+/*
+ * This is a regression test for antlr/antlr4#248 "Including grammar with only
+ * fragments breaks generated lexer".
+ * https://github.com/antlr/antlr4/issues/248
+ */
+
 TestType() ::= "CompositeParser"
 
 Grammar ::= [
-	"M": {<masterGrammar("M", "S")>}
+	"Test": {<masterGrammar("Test", "Unicode")>}
 ]
 
 SlaveGrammars ::= [
-	"S": {<slaveGrammar("S")>}
+	"Unicode": {<slaveGrammar("Unicode")>}
 ]
 
 Rule() ::= "program"
@@ -18,17 +24,22 @@ Output() ::= <<
 Errors() ::= ""
 
 masterGrammar(grammarName, slaveGrammarName) ::= <<
-grammar M;
-import S;
+grammar <grammarName>;
+import <slaveGrammarName; separator=", ">;
+
 program : 'test' 'test';
+
 WS : (UNICODE_CLASS_Zs)+ -> skip;
+
 >>
 
 slaveGrammar(grammarName) ::= <<
-lexer grammar S;
+lexer grammar <grammarName>;
+
 fragment
 UNICODE_CLASS_Zs    : '\u0020' | '\u00A0' | '\u1680' | '\u180E'
                     | '\u2000'..'\u200A'
                     | '\u202F' | '\u205F' | '\u3000'
                     ;
+
 >>
