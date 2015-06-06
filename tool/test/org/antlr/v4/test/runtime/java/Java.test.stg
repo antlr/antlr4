@@ -2,6 +2,7 @@ TestFile(file) ::= <<
 package org.antlr4.runtime.test;
 
 import org.antlr.v4.test.rt.java.BaseTest;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -21,7 +22,7 @@ public class Test<file.name> extends BaseTest {
 >>
 
 LexerTestMethod(test) ::= <<
-@Test
+<testAnnotations(test)>
 public void test<test.name>() throws Exception {
 	mkdir(tmpdir);
 
@@ -52,6 +53,13 @@ CompositeLexerTestMethod(test) ::= <<
 <LexerTestMethod(test)>
 >>
 
+testAnnotations(test) ::= <%
+@Test
+<if(test.Options.("Ignore"))>
+<\n>@Ignore(<writeStringLiteral(test.Options.("Ignore"))>)
+<endif>
+%>
+
 writeBoolean(o) ::= "<if(o && !isEmpty.(o))>true<else>false<endif>"
 
 buildStringLiteral(text, variable) ::= <<
@@ -78,7 +86,7 @@ writeLines(textLines) ::= <%
 %>
 
 ParserTestMethod(test) ::= <<
-@Test
+<testAnnotations(test)>
 public void test<test.name>() throws Exception {
 	mkdir(tmpdir);
 
@@ -125,7 +133,7 @@ String test<test.name>(String input) throws Exception {
 >>
 
 ConcreteParserTestMethod(test) ::= <<
-@Test
+<testAnnotations(test)>
 public void test<test.name>() throws Exception {
 	String found = test<test.baseName>("<test.input>");
 	assertEquals("<test.expectedOutput>", found);

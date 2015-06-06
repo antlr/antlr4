@@ -1,5 +1,9 @@
 TestType() ::= "Lexer"
 
+Options ::= [
+	"Ignore": "Currently unable to generate the required CRLF input sequence."
+]
+
 Grammar ::= [
 	"L": {<grammar("L")>}
 ]
