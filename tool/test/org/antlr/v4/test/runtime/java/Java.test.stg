@@ -57,6 +57,8 @@ testAnnotations(test) ::= <%
 @Test
 <if(test.Options.("Ignore"))>
 <\n>@Ignore(<writeStringLiteral(test.Options.("Ignore"))>)
+<elseif(IgnoredTests.(({<file.name>.<test.name>})))>
+<\n>@Ignore(<writeStringLiteral(IgnoredTests.(({<file.name>.<test.name>})))>)
 <endif>
 %>
 
@@ -390,6 +392,10 @@ Declare_pred() ::= <<boolean pred(boolean v) {
 >>
 
 Invoke_pred(v) ::= <<this.pred(<v>)>>
+
+IgnoredTests ::= [
+	default: false
+]
 
 isEmpty ::= [
 	"": true,
