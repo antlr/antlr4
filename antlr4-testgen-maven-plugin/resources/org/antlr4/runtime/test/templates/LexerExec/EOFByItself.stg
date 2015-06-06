@@ -6,6 +6,7 @@ Grammar ::= [
 
 Input() ::= ""
 
+// must get DONE EOF
 Output() ::= <<
 [@0,0:-1='\<EOF>',\<1>,1:0]
 [@1,0:-1='\<EOF>',\<-1>,1:0]<\n>

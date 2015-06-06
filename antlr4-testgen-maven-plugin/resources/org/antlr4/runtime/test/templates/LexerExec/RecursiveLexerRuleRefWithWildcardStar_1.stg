@@ -6,6 +6,7 @@ Grammar ::= [
 	"L": {<grammar("L")>}
 ]
 
+// stuff on end of comment matches another rule
 Input() ::= <<
 /* ick */
 /* /* */
