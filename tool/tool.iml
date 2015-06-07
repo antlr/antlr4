@@ -43,7 +43,6 @@
     <orderEntry type="library" name="maven-plugin-annotations-3.4" level="application" />
     <orderEntry type="library" name="plexus-compiler-api-1.5.3" level="application" />
     <orderEntry type="library" name="plexus-build-api-0.0.7" level="application" />
-    <orderEntry type="library" name="Python 2.7.8 (/usr/local/Cellar/python/2.7.8_1/Frameworks/Python.framework/Versions/2.7/bin/python2.7) interpreter library" level="application" />
   </component>
   <component name="PluginUploader.PluginUploadConfigurable">
     <option name="ARCHIVE_PATH" />
