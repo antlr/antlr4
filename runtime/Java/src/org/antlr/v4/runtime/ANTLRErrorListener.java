@@ -30,13 +30,13 @@
 
 package org.antlr.v4.runtime;
 
+import java.util.BitSet;
+
 import org.antlr.v4.runtime.atn.ATNConfigSet;
 import org.antlr.v4.runtime.atn.DecisionInfo;
 import org.antlr.v4.runtime.atn.ParserATNSimulator;
 import org.antlr.v4.runtime.atn.PredictionMode;
 import org.antlr.v4.runtime.dfa.DFA;
-
-import java.util.BitSet;
 
 /** How to emit recognition errors. */
 public interface ANTLRErrorListener {
@@ -63,8 +63,10 @@ public interface ANTLRErrorListener {
 	 * 		  started production for the decision.
 	 * @param line
 	 * 		  The line number in the input where the error occurred.
-	 * @param charPositionInLine
+	 * @param startPositionInLine
 	 * 		  The character position within that line where the error occurred.
+	 * @param endPositionInLine
+	 * 		  The character position within that line where the error ended.
 	 * @param msg
 	 * 		  The message to emit.
 	 * @param e
@@ -76,7 +78,8 @@ public interface ANTLRErrorListener {
 	public void syntaxError(Recognizer<?, ?> recognizer,
 							Object offendingSymbol,
 							int line,
-							int charPositionInLine,
+							int startPositionInLine,
+							int endPositionInLine,
 							String msg,
 							RecognitionException e);
 
