@@ -125,15 +125,11 @@ class ParserRuleContext(RuleContext):
                 i -= 1
             return None
 
-    def getChildren(self, ttype = None, predicate = None):
+    def getChildren(self, predicate = None):
         if self.children is not None:
             for child in self.children:
-                if ttype is not None and not isinstance(child, ttype):
-                    continue
-
                 if predicate is not None and not predicate(child):
                     continue
-                                
                 yield child
 
     def getToken(self, ttype, i):
