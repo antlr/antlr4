@@ -115,7 +115,7 @@ exports.<file.grammarName>Visitor = <file.grammarName>Visitor;
 
 
 fileHeader(grammarFileName, ANTLRVersion) ::= <<
-// Generated from <grammarFileName; format="java-escape"> by ANTLR <ANTLRVersion>
+// Generated from <grammarFileName> by ANTLR <ANTLRVersion>
 // jshint ignore: start
 >>
 
@@ -124,7 +124,7 @@ Parser(parser, funcs, atn, sempredFuncs, superClass) ::= <<
 var <superClass> = require('./<superClass>').<superClass>;
 <endif>
 
-var grammarFileName = "<parser.grammarFileName; format="java-escape">";
+var grammarFileName = "<parser.grammarFileName>";
 
 <atn>
 
