@@ -118,23 +118,24 @@ class ParserRuleContext(RuleContext):
         node.parentCtx = self
         return node
 
-    def getChild(self, i:int, typ:type = None):
-        if typ is None:
+    def getChild(self, i:int, ttype:type = None):
+        if ttype is None:
             return self.children[i] if len(self.children)>=i else None
         else:
             for child in self.getChildren():
-                if not isinstance(child, typ):
+                if not isinstance(child, ttype):
                     continue
                 if i==0:
                     return child
                 i -= 1
             return None
 
-    def getChildren(self):
-        if self.children is None:
-            return
-        for child in self.children:
-            yield child
+    def getChildren(self, predicate = None):
+        if self.children is not None:
+            for child in self.children:
+                if predicate is not None and not predicate(child):
+                    continue
+                yield child
 
     def getToken(self, ttype:int, i:int):
         for child in self.getChildren():
