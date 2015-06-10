@@ -127,7 +127,7 @@ del <file.parserName>
 
 
 fileHeader(grammarFileName, ANTLRVersion) ::= <<
-# Generated from <grammarFileName> by ANTLR <ANTLRVersion>
+# Generated from <grammarFileName; format="java-escape"> by ANTLR <ANTLRVersion>
 >>
 
 Parser(parser, funcs, atn, sempredFuncs, superClass) ::= <<
@@ -143,7 +143,7 @@ from .<superClass> import <superClass>
 
 class <parser.name> ( <if(superClass)><superClass><else>Parser<endif> ):
 
-    grammarFileName = "<parser.grammarFileName>"
+    grammarFileName = "<parser.grammarFileName; format="java-escape">"
 
     atn = ATNDeserializer().deserialize(serializedATN())
 
