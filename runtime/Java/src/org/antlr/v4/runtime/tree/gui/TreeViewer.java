@@ -53,7 +53,11 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.awt.geom.CubicCurve2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
@@ -683,7 +687,7 @@ public class TreeViewer extends JComponent {
 		if ( root!=null ) {
 			boolean useIdentity = true; // compare node identity
 			this.treeLayout =
-				new TreeLayout<Tree>(new TreeLayoutAdaptor(root),
+				new TreeLayout<Tree>(getTreeLayoutAdaptor(root),
 									 new TreeViewer.VariableExtentProvide(this),
 									 new DefaultConfiguration<Tree>(gapBetweenLevels,
 																	gapBetweenNodes),
@@ -695,6 +699,12 @@ public class TreeViewer extends JComponent {
 			this.treeLayout = null;
 			repaint();
 		}
+	}
+
+	/** Get an adaptor for root that indicates how to walk ANTLR trees.
+	 *  Override to change the adapter from the default of {@link TreeLayoutAdaptor}  */
+	public TreeForTreeLayout<Tree> getTreeLayoutAdaptor(Tree root) {
+		return new TreeLayoutAdaptor(root);
 	}
 
 	public double getScale() {

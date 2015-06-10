@@ -85,12 +85,18 @@ public class TreePostScriptGenerator {
 		doc = new PostScriptDocument(fontName, fontSize);
 		boolean compareNodeIdentities = true;
 		this.treeLayout =
-			new TreeLayout<Tree>(new TreeLayoutAdaptor(root),
+			new TreeLayout<Tree>(getTreeLayoutAdaptor(root),
 								 new VariableExtentProvide(),
 								 new DefaultConfiguration<Tree>(gapBetweenLevels,
 																gapBetweenNodes,
 																Configuration.Location.Bottom),
                                  compareNodeIdentities);
+	}
+
+	/** Get an adaptor for root that indicates how to walk ANTLR trees.
+	 *  Override to change the adapter from the default of {@link TreeLayoutAdaptor}  */
+	public TreeForTreeLayout<Tree> getTreeLayoutAdaptor(Tree root) {
+		return new TreeLayoutAdaptor(root);
 	}
 
 	public String getPS() {
