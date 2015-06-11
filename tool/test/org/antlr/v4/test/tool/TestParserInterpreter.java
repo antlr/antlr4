@@ -65,7 +65,21 @@ public class TestParserInterpreter extends BaseTest {
 			"s : A ;",
 			lg);
 
-		testInterp(lg, g, "s", "a", "(s a)");
+		ParseTree t = testInterp(lg, g, "s", "a", "(s a)");
+		assertEquals("0..0", t.getSourceInterval().toString());
+	}
+
+	@Test public void testEOF() throws Exception {
+		LexerGrammar lg = new LexerGrammar(
+			"lexer grammar L;\n" +
+			"A : 'a' ;\n");
+		Grammar g = new Grammar(
+			"parser grammar T;\n" +
+			"s : A EOF ;",
+			lg);
+
+		ParseTree t = testInterp(lg, g, "s", "a", "(s a <EOF>)");
+		assertEquals("0..1", t.getSourceInterval().toString());
 	}
 
 	@Test public void testAorB() throws Exception {
@@ -234,7 +248,7 @@ public class TestParserInterpreter extends BaseTest {
 		testInterp(lg, g, "e", "a+a*a", "(e (e a) + (e (e a) * (e a)))");
 	}
 
-	void testInterp(LexerGrammar lg, Grammar g,
+	ParseTree testInterp(LexerGrammar lg, Grammar g,
 					String startRule, String input,
 					String expectedParseTree)
 	{
@@ -244,5 +258,6 @@ public class TestParserInterpreter extends BaseTest {
 		ParseTree t = parser.parse(g.rules.get(startRule).index);
 		System.out.println("parse tree: "+t.toStringTree(parser));
 		assertEquals(expectedParseTree, t.toStringTree(parser));
+		return t;
 	}
 }
