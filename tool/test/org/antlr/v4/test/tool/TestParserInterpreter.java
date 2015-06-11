@@ -65,7 +65,120 @@ public class TestParserInterpreter extends BaseTest {
 			"s : A ;",
 			lg);
 
-		testInterp(lg, g, "s", "a", "(s a)");
+		ParseTree t = testInterp(lg, g, "s", "a", "(s a)");
+		assertEquals("0..0", t.getSourceInterval().toString());
+	}
+
+	@Test public void testEOF() throws Exception {
+		LexerGrammar lg = new LexerGrammar(
+			"lexer grammar L;\n" +
+			"A : 'a' ;\n");
+		Grammar g = new Grammar(
+			"parser grammar T;\n" +
+			"s : A EOF ;",
+			lg);
+
+		ParseTree t = testInterp(lg, g, "s", "a", "(s a <EOF>)");
+		assertEquals("0..1", t.getSourceInterval().toString());
+	}
+
+	@Test public void testEOFInChild() throws Exception {
+		LexerGrammar lg = new LexerGrammar(
+			"lexer grammar L;\n" +
+			"A : 'a' ;\n");
+		Grammar g = new Grammar(
+			"parser grammar T;\n" +
+			"s : x ;\n" +
+			"x : A EOF ;",
+			lg);
+
+		ParseTree t = testInterp(lg, g, "s", "a", "(s (x a <EOF>))");
+		assertEquals("0..1", t.getSourceInterval().toString());
+		assertEquals("0..1", t.getChild(0).getSourceInterval().toString());
+	}
+
+	@Test public void testEmptyRuleAfterEOFInChild() throws Exception {
+		LexerGrammar lg = new LexerGrammar(
+			"lexer grammar L;\n" +
+			"A : 'a' ;\n");
+		Grammar g = new Grammar(
+			"parser grammar T;\n" +
+			"s : x y;\n" +
+			"x : A EOF ;\n" +
+			"y : ;",
+			lg);
+
+		ParseTree t = testInterp(lg, g, "s", "a", "(s (x a <EOF>) y)");
+		assertEquals("0..1", t.getSourceInterval().toString()); // s
+		assertEquals("0..1", t.getChild(0).getSourceInterval().toString()); // x
+// unspecified		assertEquals("1..0", t.getChild(1).getSourceInterval().toString()); // y
+	}
+
+	@Test public void testEmptyRuleAfterJustEOFInChild() throws Exception {
+		LexerGrammar lg = new LexerGrammar(
+			"lexer grammar L;\n" +
+			"A : 'a' ;\n");
+		Grammar g = new Grammar(
+			"parser grammar T;\n" +
+			"s : x y;\n" +
+			"x : EOF ;\n" +
+			"y : ;",
+			lg);
+
+		ParseTree t = testInterp(lg, g, "s", "", "(s (x <EOF>) y)");
+		assertEquals("0..0", t.getSourceInterval().toString()); // s
+		assertEquals("0..0", t.getChild(0).getSourceInterval().toString()); // x
+		// this next one is a weird special case where somebody tries to match beyond in the file
+// unspecified		assertEquals("0..-1", t.getChild(1).getSourceInterval().toString()); // y
+	}
+
+	@Test public void testEmptyInput() throws Exception {
+		LexerGrammar lg = new LexerGrammar(
+			"lexer grammar L;\n" +
+			"A : 'a' ;\n");
+		Grammar g = new Grammar(
+			"parser grammar T;\n" +
+			"s : x EOF ;\n" +
+			"x : ;\n",
+			lg);
+
+		ParseTree t = testInterp(lg, g, "s", "", "(s x <EOF>)");
+		assertEquals("0..0", t.getSourceInterval().toString()); // s
+		assertEquals("0..-1", t.getChild(0).getSourceInterval().toString()); // x
+	}
+
+	@Test public void testEmptyInputWithCallsAfter() throws Exception {
+		LexerGrammar lg = new LexerGrammar(
+			"lexer grammar L;\n" +
+			"A : 'a' ;\n");
+		Grammar g = new Grammar(
+			"parser grammar T;\n" +
+			"s : x y ;\n" +
+			"x : EOF ;\n" +
+			"y : z ;\n" +
+			"z : ;",
+			lg);
+
+		ParseTree t = testInterp(lg, g, "s", "", "(s (x <EOF>) (y z))");
+		assertEquals("0..0", t.getSourceInterval().toString()); // s
+		assertEquals("0..0", t.getChild(0).getSourceInterval().toString()); // x
+// unspecified		assertEquals("0..-1", t.getChild(1).getSourceInterval().toString()); // x
+	}
+
+	@Test public void testEmptyFirstRule() throws Exception {
+		LexerGrammar lg = new LexerGrammar(
+			"lexer grammar L;\n" +
+			"A : 'a' ;\n");
+		Grammar g = new Grammar(
+			"parser grammar T;\n" +
+			"s : x A ;\n" +
+			"x : ;\n",
+			lg);
+
+		ParseTree t = testInterp(lg, g, "s", "a", "(s x a)");
+		assertEquals("0..0", t.getSourceInterval().toString()); // s
+		// This gets an empty interval because the stop token is null for x
+		assertEquals("0..-1", t.getChild(0).getSourceInterval().toString()); // x
 	}
 
 	@Test public void testAorB() throws Exception {
@@ -234,7 +347,7 @@ public class TestParserInterpreter extends BaseTest {
 		testInterp(lg, g, "e", "a+a*a", "(e (e a) + (e (e a) * (e a)))");
 	}
 
-	void testInterp(LexerGrammar lg, Grammar g,
+	ParseTree testInterp(LexerGrammar lg, Grammar g,
 					String startRule, String input,
 					String expectedParseTree)
 	{
@@ -244,5 +357,6 @@ public class TestParserInterpreter extends BaseTest {
 		ParseTree t = parser.parse(g.rules.get(startRule).index);
 		System.out.println("parse tree: "+t.toStringTree(parser));
 		assertEquals(expectedParseTree, t.toStringTree(parser));
+		return t;
 	}
 }

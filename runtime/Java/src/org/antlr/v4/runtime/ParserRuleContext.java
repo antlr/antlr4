@@ -272,7 +272,12 @@ public class ParserRuleContext extends RuleContext {
 
 	@Override
 	public Interval getSourceInterval() {
-		if ( start==null || stop==null ) return Interval.INVALID;
+		if ( start == null ) {
+			return Interval.INVALID;
+		}
+		if ( stop==null || stop.getTokenIndex()<start.getTokenIndex() ) {
+			return Interval.of(start.getTokenIndex(), start.getTokenIndex()-1); // empty
+		}
 		return Interval.of(start.getTokenIndex(), stop.getTokenIndex());
 	}
 
