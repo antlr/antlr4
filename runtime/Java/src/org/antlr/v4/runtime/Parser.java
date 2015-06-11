@@ -221,7 +221,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 	public Token match(int ttype) throws RecognitionException {
 		Token t = getCurrentToken();
 		if ( t.getType()==ttype ) {
-			if ( t.getType()==Token.EOF ) {
+			if ( ttype==Token.EOF ) {
 				matchedEOF = true;
 			}
 			_errHandler.reportMatch(this);
