@@ -42,10 +42,14 @@ public interface SyntaxTree extends Tree {
 	 * Return an {@link Interval} indicating the index in the
 	 * {@link TokenStream} of the first and last token associated with this
 	 * subtree. If this node is a leaf, then the interval represents a single
-	 * token.
+	 * token and has interval i..i for token index i.
+	 *
+	 * <p>An interval of i..j for j &lt; i indicates an empty interval.</p>
 	 *
 	 * <p>If source interval is unknown, this returns {@link Interval#INVALID}.</p>
+	 *
+	 * <p>As a weird special case, the source interval for rules matched after
+	 * EOF is unspecified.</p>
 	 */
-
 	Interval getSourceInterval();
 }

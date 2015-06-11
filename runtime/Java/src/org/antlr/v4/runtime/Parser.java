@@ -177,7 +177,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 	 */
 	protected int _syntaxErrors;
 
-	/** Indicates parser has match()ed EOF token */
+	/** Indicates parser has match()ed EOF token. See {@link #exitRule()}. */
 	protected boolean matchedEOF;
 
 	public Parser(TokenStream input) {
@@ -636,9 +636,13 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 	}
 
     public void exitRule() {
-		if ( matchedEOF ) _ctx.stop = _input.LT(1);
-		else _ctx.stop = _input.LT(-1);
-//		_ctx.stop = _input.LT(-1);
+		if ( matchedEOF ) {
+			// if we have matched EOF, it cannot consume past EOF so we use LT(1) here
+			_ctx.stop = _input.LT(1); // LT(1) will be end of file
+		}
+		else {
+			_ctx.stop = _input.LT(-1); // stop node is what we just matched
+		}
         // trigger event on _ctx, before it reverts to parent
         if ( _parseListeners != null) triggerExitRuleEvent();
 		setState(_ctx.invokingState);
