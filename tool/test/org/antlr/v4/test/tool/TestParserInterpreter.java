@@ -82,6 +82,21 @@ public class TestParserInterpreter extends BaseTest {
 		assertEquals("0..1", t.getSourceInterval().toString());
 	}
 
+	@Test public void testEOFInChild() throws Exception {
+		LexerGrammar lg = new LexerGrammar(
+			"lexer grammar L;\n" +
+			"A : 'a' ;\n");
+		Grammar g = new Grammar(
+			"parser grammar T;\n" +
+			"s : x ;\n" +
+			"x : A EOF ;",
+			lg);
+
+		ParseTree t = testInterp(lg, g, "s", "a", "(s (x a <EOF>))");
+		assertEquals("0..1", t.getSourceInterval().toString());
+		assertEquals("0..1", t.getChild(0).getSourceInterval().toString());
+	}
+
 	@Test public void testAorB() throws Exception {
 		LexerGrammar lg = new LexerGrammar(
 			"lexer grammar L;\n" +

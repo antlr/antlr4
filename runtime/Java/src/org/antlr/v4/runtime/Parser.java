@@ -177,6 +177,9 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 	 */
 	protected int _syntaxErrors;
 
+	/** Indicates parser has match()ed EOF token */
+	protected boolean matchedEOF;
+
 	public Parser(TokenStream input) {
 		setInputStream(input);
 	}
@@ -217,6 +220,9 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 	public Token match(int ttype) throws RecognitionException {
 		Token t = getCurrentToken();
 		if ( t.getType()==ttype ) {
+			if ( t.getType()==Token.EOF ) {
+				matchedEOF = true;
+			}
 			_errHandler.reportMatch(this);
 			consume();
 		}
@@ -630,7 +636,9 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 	}
 
     public void exitRule() {
-		_ctx.stop = _input.LT(-1);
+		if ( matchedEOF ) _ctx.stop = _input.LT(1);
+		else _ctx.stop = _input.LT(-1);
+//		_ctx.stop = _input.LT(-1);
         // trigger event on _ctx, before it reverts to parent
         if ( _parseListeners != null) triggerExitRuleEvent();
 		setState(_ctx.invokingState);
@@ -908,6 +916,10 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 
         return false;
     }
+
+	public boolean isMatchedEOF() {
+		return matchedEOF;
+	}
 
 	/**
 	 * Computes the set of input symbols which could follow the current parser
