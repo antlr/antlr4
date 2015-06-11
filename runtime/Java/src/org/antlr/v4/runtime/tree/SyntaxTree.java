@@ -44,7 +44,10 @@ public interface SyntaxTree extends Tree {
 	 * subtree. If this node is a leaf, then the interval represents a single
 	 * token and has interval i..i for token index i.
 	 *
-	 * <p>An interval of i..j for j &lt; i indicates an empty interval.</p>
+	 * <p>An interval of i..i-1 indicates an empty interval at position
+	 * i in the input stream, where 0 &lt;= i &lt;= the size of the input
+	 * token stream.  Currently, the code base can only have i=0..n-1 but
+	 * in concept one could have an empty interval after EOF. </p>
 	 *
 	 * <p>If source interval is unknown, this returns {@link Interval#INVALID}.</p>
 	 *
