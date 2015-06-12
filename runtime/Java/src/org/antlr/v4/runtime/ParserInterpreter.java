@@ -424,7 +424,7 @@ public class ParserInterpreter extends Parser {
 
 				Token errToken =
 					getTokenFactory().create(new Pair<TokenSource, CharStream>(tok.getTokenSource(), tok.getTokenSource().getInputStream()),
-				                             expectedTokenType, tokenText,
+				                             expectedTokenType, tok.getText(),
 				                             Token.DEFAULT_CHANNEL,
 				                            -1, -1, // invalid start/stop
 				                             tok.getLine(), tok.getCharPositionInLine());
@@ -434,7 +434,7 @@ public class ParserInterpreter extends Parser {
 				Token tok = e.getOffendingToken();
 				Token errToken =
 					getTokenFactory().create(new Pair<TokenSource, CharStream>(tok.getTokenSource(), tok.getTokenSource().getInputStream()),
-				                             Token.INVALID_TYPE, "<nonviable "+tok.getText()+">",
+				                             Token.INVALID_TYPE, tok.getText(),
 				                             Token.DEFAULT_CHANNEL,
 				                            -1, -1, // invalid start/stop
 				                             tok.getLine(), tok.getCharPositionInLine());
