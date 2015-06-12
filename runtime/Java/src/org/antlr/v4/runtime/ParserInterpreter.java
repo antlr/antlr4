@@ -218,7 +218,7 @@ public class ParserInterpreter extends Parser {
 					setState(atn.ruleToStopState[p.ruleIndex].stateNumber);
 					getContext().exception = e;
 					getErrorHandler().reportError(this, e);
-					getErrorHandler().recover(this, e);
+					recover(e);
 				}
 
 				break;
@@ -271,7 +271,7 @@ public class ParserInterpreter extends Parser {
 			case Transition.SET:
 			case Transition.NOT_SET:
 				if (!transition.matches(_input.LA(1), Token.MIN_USER_TOKEN_TYPE, 65535)) {
-					_errHandler.recoverInline(this);
+					recoverInline();
 				}
 				matchWildcard();
 				break;
@@ -403,5 +403,47 @@ public class ParserInterpreter extends Parser {
 		overrideDecision = decision;
 		overrideDecisionInputIndex = tokenIndex;
 		overrideDecisionAlt = forcedAlt;
+	}
+
+	/** Rely on the error handler for this parser but, if no tokens are consumed
+	 *  to recover, add an error node. Otherwise, nothing is seen in the parse
+	 *  tree.
+	 */
+	protected void recover(RecognitionException e) {
+		int i = _input.index();
+		getErrorHandler().recover(this, e);
+		if ( _input.index()==i ) {
+			// no input consumed, better add an error node
+			if ( e instanceof InputMismatchException ) {
+				InputMismatchException ime = (InputMismatchException)e;
+				Token tok = e.getOffendingToken();
+				int expectedTokenType = ime.getExpectedTokens().getMinElement(); // get any element
+				String tokenText;
+				if ( expectedTokenType== Token.EOF ) tokenText = "<missing EOF>";
+				else tokenText = "<mismatched "+getVocabulary().getDisplayName(expectedTokenType)+">";
+
+				Token errToken =
+					getTokenFactory().create(new Pair<TokenSource, CharStream>(tok.getTokenSource(), tok.getTokenSource().getInputStream()),
+				                             expectedTokenType, tokenText,
+				                             Token.DEFAULT_CHANNEL,
+				                            -1, -1, // invalid start/stop
+				                             tok.getLine(), tok.getCharPositionInLine());
+				_ctx.addErrorNode(errToken);
+			}
+			else { // NoViableAlt
+				Token tok = e.getOffendingToken();
+				Token errToken =
+					getTokenFactory().create(new Pair<TokenSource, CharStream>(tok.getTokenSource(), tok.getTokenSource().getInputStream()),
+				                             Token.INVALID_TYPE, "<nonviable "+tok.getText()+">",
+				                             Token.DEFAULT_CHANNEL,
+				                            -1, -1, // invalid start/stop
+				                             tok.getLine(), tok.getCharPositionInLine());
+				_ctx.addErrorNode(errToken);
+			}
+		}
+	}
+
+	protected Token recoverInline() {
+		return _errHandler.recoverInline(this);
 	}
 }
