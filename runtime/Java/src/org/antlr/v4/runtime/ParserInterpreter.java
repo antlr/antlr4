@@ -420,7 +420,7 @@ public class ParserInterpreter extends Parser {
 				int expectedTokenType = ime.getExpectedTokens().getMinElement(); // get any element
 				String tokenText;
 				if ( expectedTokenType== Token.EOF ) tokenText = "<missing EOF>";
-				else tokenText = "<mismatched "+getVocabulary().getDisplayName(expectedTokenType)+">";
+				else tokenText = "<mismatched "+tok.getText()+">";
 
 				Token errToken =
 					getTokenFactory().create(new Pair<TokenSource, CharStream>(tok.getTokenSource(), tok.getTokenSource().getInputStream()),
