@@ -76,6 +76,7 @@ public class AmbiguityInfo extends DecisionEventInfo {
 	 * @param configs The final configuration set identifying the ambiguous
 	 * alternatives for the current input
 	 * @param ambigAlts The set of alternatives in the decision that lead to a valid parse.
+	 *                  The predicted alt is the min(ambigAlts)
 	 * @param input The input token stream
 	 * @param startIndex The start index for the current prediction
 	 * @param stopIndex The index at which the ambiguity was identified during
