@@ -94,7 +94,7 @@ public class ProfilingATNSimulator extends ParserATNSimulator {
 			if ( SLL_k > decisions[decision].SLL_MaxLook ) {
 				decisions[decision].SLL_MaxLook = SLL_k;
 				decisions[decision].SLL_MaxLookEvent =
-						new LookaheadEventInfo(decision, null, input, _startIndex, _sllStopIndex, false);
+						new LookaheadEventInfo(decision, null, alt, input, _startIndex, _sllStopIndex, false);
 			}
 
 			if (_llStopIndex >= 0) {
@@ -104,7 +104,7 @@ public class ProfilingATNSimulator extends ParserATNSimulator {
 				if ( LL_k > decisions[decision].LL_MaxLook ) {
 					decisions[decision].LL_MaxLook = LL_k;
 					decisions[decision].LL_MaxLookEvent =
-							new LookaheadEventInfo(decision, null, input, _startIndex, _llStopIndex, true);
+							new LookaheadEventInfo(decision, null, alt, input, _startIndex, _llStopIndex, true);
 				}
 			}
 
