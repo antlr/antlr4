@@ -53,40 +53,6 @@ CompositeLexerTestMethod(test) ::= <<
 <LexerTestMethod(test)>
 >>
 
-testAnnotations(test) ::= <%
-@Test
-<if(test.Options.("Ignore"))>
-<\n>@Ignore(<writeStringLiteral(test.Options.("Ignore"))>)
-<elseif(IgnoredTests.(({<file.name>.<test.name>})))>
-<\n>@Ignore(<writeStringLiteral(IgnoredTests.(({<file.name>.<test.name>})))>)
-<endif>
-%>
-
-writeBoolean(o) ::= "<if(o && !isEmpty.(o))>true<else>false<endif>"
-
-buildStringLiteral(text, variable) ::= <<
-StringBuilder <variable>Builder = new StringBuilder(<strlen.(text)>);
-<lines.(text):{line|<variable>Builder.append("<escape.(line)>");}; separator="\n">
-String <variable> = <variable>Builder.toString();
->>
-
-writeStringLiteral(text) ::= <%
-<if(isEmpty.(text))>
-""
-<else>
-<writeLines(lines.(text))>
-<endif>
-%>
-
-writeLines(textLines) ::= <%
-<if(rest(textLines))>
-<textLines:{line|
-<\n>		"<escape.(line)>}; separator="\" +">"
-<else>
-"<escape.(first(textLines))>"
-<endif>
-%>
-
 ParserTestMethod(test) ::= <<
 <testAnnotations(test)>
 public void test<test.name>() throws Exception {
@@ -118,10 +84,6 @@ public void test<test.name>() throws Exception {
 
 >>
 
-string(text) ::= <<
-"<escape.(text)>"
->>
-
 CompositeParserTestMethod(test) ::= <<
 <ParserTestMethod(test)>
 >>
@@ -147,6 +109,44 @@ public void test<test.name>() throws Exception {
 }
 
 >>
+
+testAnnotations(test) ::= <%
+@Test
+<if(test.Options.("Ignore"))>
+<\n>@Ignore(<writeStringLiteral(test.Options.("Ignore"))>)
+<elseif(IgnoredTests.(({<file.name>.<test.name>})))>
+<\n>@Ignore(<writeStringLiteral(IgnoredTests.(({<file.name>.<test.name>})))>)
+<endif>
+%>
+
+buildStringLiteral(text, variable) ::= <<
+StringBuilder <variable>Builder = new StringBuilder(<strlen.(text)>);
+<lines.(text):{line|<variable>Builder.append("<escape.(line)>");}; separator="\n">
+String <variable> = <variable>Builder.toString();
+>>
+
+writeStringLiteral(text) ::= <%
+<if(isEmpty.(text))>
+""
+<else>
+<writeLines(lines.(text))>
+<endif>
+%>
+
+writeLines(textLines) ::= <%
+<if(rest(textLines))>
+<textLines:{line|
+<\n>		"<escape.(line)>}; separator="\" +">"
+<else>
+"<escape.(first(textLines))>"
+<endif>
+%>
+
+string(text) ::= <<
+"<escape.(text)>"
+>>
+
+writeBoolean(o) ::= "<if(o && !isEmpty.(o))>true<else>false<endif>"
 
 writeln(s) ::= <<System.out.println(<s>);>>
 

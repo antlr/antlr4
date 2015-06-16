@@ -68,11 +68,7 @@ RUNTIME_TEST_TEMPLATES = {
 	"CSharp"   : uniformpath(CSHARP_TARGET)+"/tool/test/org/antlr/v4/test/runtime/csharp/CSharp.test.stg",
 	"Python2"  : uniformpath(PYTHON2_TARGET)+"/tool/test/org/antlr/v4/test/runtime/python2/Python2.test.stg",
 	"Python3"  : uniformpath(PYTHON3_TARGET)+"/tool/test/org/antlr/v4/test/runtime/python3/Python3.test.stg",
-	# "NodeJS"   : uniformpath(JAVASCRIPT_TARGET)+"/tool/test/org/antlr/v4/test/rt/js/node/NodeJS.test.stg",
-	# "Safari"   : uniformpath(JAVASCRIPT_TARGET)+"/tool/test/org/antlr/v4/test/rt/js/safari/Safari.test.stg",
-	# "Firefox"  : uniformpath(JAVASCRIPT_TARGET)+"/tool/test/org/antlr/v4/test/rt/js/firefox/Firefox.test.stg",
-	# "Chrome"   : uniformpath(JAVASCRIPT_TARGET)+"/tool/test/org/antlr/v4/test/rt/js/chrome/Chrome.test.stg",
-	# "Explorer" : uniformpath(JAVASCRIPT_TARGET)+"/tool/test/org/antlr/v4/test/rt/js/explorer/Explorer.test.stg"
+	"JavaScript"   : uniformpath(JAVASCRIPT_TARGET)+"/tool/test/org/antlr/v4/test/runtime/javascript/node/Node.test.stg",
 }
 
 
@@ -108,8 +104,13 @@ def compile():
     # Special case: python2 needs code from python3
     javac(uniformpath(TARGETS['Python3'])+"/tool/test/org/antlr/v4/test/runtime/python2/BasePythonTest.java",
           "out", version="1.6", cp=cp, args=args)
+    skip = ['org/antlr/v4/test/rt',
+            'org/antlr/v4/test/runtime/javascript/chrome',
+            'org/antlr/v4/test/runtime/javascript/explorer',
+            'org/antlr/v4/test/runtime/javascript/firefox',
+            'org/antlr/v4/test/runtime/javascript/safari']
     for t in RUNTIME_TEST_TEMPLATES:
-        javac(TARGETS[t] + "/tool/test", "out", version="1.6", cp=cp, args=args, skip=['org/antlr/v4/test/rt'])
+        javac(TARGETS[t] + "/tool/test", "out", version="1.6", cp=cp, args=args, skip=skip)
         javac('gen/test/'+t,             "out", version="1.6", cp=cp, args=args)
 
 
@@ -337,17 +338,11 @@ def test(target, juprops, args):
     if target=='Java':
         # don't test generator
         skip = [ "TestPerformance.java", "TestGenerator.java" ]
-    elif target=='Python2':
-        # need BasePythonTest located in python3 target
-        # base = uniformpath(TARGETS['Python3'] + "/tool/test")
-        # skip = [ "/org/antlr/v4/test/runtime/python3/" ]
-        # javac(base+"/tool/test/org/antlr/v4/test/runtime/python2/BasePythonTest.java",
-        #       "out/test/"+target, version="1.6", cp=thisjarwithjunit, args=args, skip=skip)
-        skip = []
     elif target=='JavaScript':
         # don't test browsers automatically, this is overkill and unreliable
         browsers = ["safari","chrome","firefox","explorer"]
         skip = [ uniformpath(srcdir + "/org/antlr/v4/test/rt/js/" + b) for b in browsers ]
+        skip += [ uniformpath(srcdir + "/org/antlr/v4/test/runtime/javascript/" + b) for b in browsers ]
     javac(srcdir, trgdir="out/test/"+target, version="1.6", cp=thisjarwithjunit, args=args, skip=skip)
     # copy any resource files required for testing
     for t in TARGETS:
