@@ -28,5 +28,5 @@ WS : (' '|'\n') -> skip ;
 
 slaveGrammar(grammarName) ::= <<
 parser grammar S;
-a : B {<write("\"S.a\"")>};
+a : B {<write("\"S.a\"")>} ;
 >>

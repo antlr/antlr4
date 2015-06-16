@@ -21,12 +21,12 @@ Errors() ::= ""
 masterGrammar(grammarName, slaveGrammarName) ::= <<
 lexer grammar <grammarName>;
 import <slaveGrammarName>;
-A : 'a' B {<writeln("\"M.A\"")>};
+A : 'a' B {<writeln("\"M.A\"")>} ;
 WS : (' '|'\n') -> skip ;
 >>
 
 slaveGrammar(grammarName) ::= <<
 lexer grammar <grammarName>;
-A : 'a' {<writeln("\"S.A\"")>};
-B : 'b' {<writeln("\"S.B\"")>};
+A : 'a' {<writeln("\"S.A\"")>} ;
+B : 'b' {<writeln("\"S.B\"")>} ;
 >>
