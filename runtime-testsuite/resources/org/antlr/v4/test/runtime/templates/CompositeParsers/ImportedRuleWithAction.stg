@@ -28,5 +28,5 @@ WS : (' '|'\n') -> skip ;
 // wasn't terminating. @after was injected into M as if it were @members
 slaveGrammar(grammarName) ::= <<
 parser grammar S;
-a @after {int x;} : B;
+a @after {<InitIntMember("x","0")>} : B;
 >>

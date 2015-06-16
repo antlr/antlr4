@@ -67,7 +67,7 @@ RUNTIME_TEST_TEMPLATES = {
 	"Java"     : uniformpath(JAVA_TARGET)+"/tool/test/org/antlr/v4/test/runtime/java/Java.test.stg",
 	"CSharp"   : uniformpath(CSHARP_TARGET)+"/tool/test/org/antlr/v4/test/runtime/csharp/CSharp.test.stg",
 	# "Python2"  : uniformpath(PYTHON2_TARGET)+"/tool/test/org/antlr/v4/test/rt/py2/Python2.test.stg",
-	# "Python3"  : uniformpath(PYTHON3_TARGET)+"/tool/test/org/antlr/v4/test/rt/py3/Python3.test.stg",
+	"Python3"  : uniformpath(PYTHON3_TARGET)+"/tool/test/org/antlr/v4/test/runtime/python3/Python3.test.stg",
 	# "NodeJS"   : uniformpath(JAVASCRIPT_TARGET)+"/tool/test/org/antlr/v4/test/rt/js/node/NodeJS.test.stg",
 	# "Safari"   : uniformpath(JAVASCRIPT_TARGET)+"/tool/test/org/antlr/v4/test/rt/js/safari/Safari.test.stg",
 	# "Firefox"  : uniformpath(JAVASCRIPT_TARGET)+"/tool/test/org/antlr/v4/test/rt/js/firefox/Firefox.test.stg",
@@ -106,7 +106,7 @@ def compile():
         javac(TARGETS[t] + "/tool/src",  "out", version="1.6", cp=cp, args=args)
     # pull in generated runtime tests and runtime test support code
     for t in RUNTIME_TEST_TEMPLATES:
-        javac(TARGETS[t] + "/tool/test", "out", version="1.6", cp=cp, args=args)
+        javac(TARGETS[t] + "/tool/test", "out", version="1.6", cp=cp, args=args, skip=['org/antlr/v4/test/rt'])
         javac('gen/test/'+t,             "out", version="1.6", cp=cp, args=args)
 
 
@@ -333,11 +333,11 @@ def test(target, juprops, args):
     skip = []
     if target=='Java':
         # don't test generator
-        skip = [ "/org/antlr/v4/test/rt/gen/", "TestPerformance.java", "TestGenerator.java" ]
+        skip = [ "TestPerformance.java", "TestGenerator.java" ]
     elif target=='Python2':
-        # need BaseTest located in Py3 target
+        # need BaseTest located in python3 target
         base = uniformpath(TARGETS['Python3'] + "/tool/test")
-        skip = [ "/org/antlr/v4/test/rt/py3/" ]
+        skip = [ "/org/antlr/v4/test/runtime/python3/" ]
         javac(base, "out/test/"+target, version="1.6", cp=thisjarwithjunit, args=args, skip=skip)
         skip = []
     elif target=='JavaScript':
