@@ -66,7 +66,7 @@ TARGETS = OrderedDict([
 RUNTIME_TEST_TEMPLATES = {
 	"Java"     : uniformpath(JAVA_TARGET)+"/tool/test/org/antlr/v4/test/runtime/java/Java.test.stg",
 	"CSharp"   : uniformpath(CSHARP_TARGET)+"/tool/test/org/antlr/v4/test/runtime/csharp/CSharp.test.stg",
-	# "Python2"  : uniformpath(PYTHON2_TARGET)+"/tool/test/org/antlr/v4/test/rt/py2/Python2.test.stg",
+	"Python2"  : uniformpath(PYTHON2_TARGET)+"/tool/test/org/antlr/v4/test/runtime/python2/Python2.test.stg",
 	"Python3"  : uniformpath(PYTHON3_TARGET)+"/tool/test/org/antlr/v4/test/runtime/python3/Python3.test.stg",
 	# "NodeJS"   : uniformpath(JAVASCRIPT_TARGET)+"/tool/test/org/antlr/v4/test/rt/js/node/NodeJS.test.stg",
 	# "Safari"   : uniformpath(JAVASCRIPT_TARGET)+"/tool/test/org/antlr/v4/test/rt/js/safari/Safari.test.stg",
@@ -90,21 +90,24 @@ def compile():
     """
     require(parsers)
     require(regen_tests)
+    junit_jar, hamcrest_jar = load_junitjars()
     cp = uniformpath("out") + os.pathsep + \
          os.path.join(JARCACHE, "antlr-3.5.2-complete.jar") + os.pathsep + \
-         "runtime/Java/lib/org.abego.treelayout.core.jar" + os.pathsep
-    srcpath = ["gen3", "gen4", "runtime/Java/src", "tool/src"]
+         "runtime/Java/lib/org.abego.treelayout.core.jar" + os.pathsep + \
+         os.pathsep + uniformpath("out") + \
+         os.pathsep + junit_jar + \
+         os.pathsep + hamcrest_jar
+    srcpath = ["gen3", "gen4", "runtime/Java/src", "tool/src", "tool/test"]
     args = ["-Xlint", "-Xlint:-serial", "-g", "-sourcepath", string.join(srcpath, os.pathsep)]
     for sp in srcpath:
-        javac(sp, "out", version="1.6", cp=cp, args=args)
-    junit_jar, hamcrest_jar = load_junitjars()
-    cp += os.pathsep + uniformpath("out") \
-         + os.pathsep + junit_jar \
-         + os.pathsep + hamcrest_jar
+        javac(sp, "out", version="1.6", cp=cp, args=args, skip=['org/antlr/v4/test/rt'])
     # pull in targets' code gen
     for t in TARGETS:
         javac(TARGETS[t] + "/tool/src",  "out", version="1.6", cp=cp, args=args)
     # pull in generated runtime tests and runtime test support code
+    # Special case: python2 needs code from python3
+    javac(uniformpath(TARGETS['Python3'])+"/tool/test/org/antlr/v4/test/runtime/python2/BasePythonTest.java",
+          "out", version="1.6", cp=cp, args=args)
     for t in RUNTIME_TEST_TEMPLATES:
         javac(TARGETS[t] + "/tool/test", "out", version="1.6", cp=cp, args=args, skip=['org/antlr/v4/test/rt'])
         javac('gen/test/'+t,             "out", version="1.6", cp=cp, args=args)
@@ -335,10 +338,11 @@ def test(target, juprops, args):
         # don't test generator
         skip = [ "TestPerformance.java", "TestGenerator.java" ]
     elif target=='Python2':
-        # need BaseTest located in python3 target
-        base = uniformpath(TARGETS['Python3'] + "/tool/test")
-        skip = [ "/org/antlr/v4/test/runtime/python3/" ]
-        javac(base, "out/test/"+target, version="1.6", cp=thisjarwithjunit, args=args, skip=skip)
+        # need BasePythonTest located in python3 target
+        # base = uniformpath(TARGETS['Python3'] + "/tool/test")
+        # skip = [ "/org/antlr/v4/test/runtime/python3/" ]
+        # javac(base+"/tool/test/org/antlr/v4/test/runtime/python2/BasePythonTest.java",
+        #       "out/test/"+target, version="1.6", cp=thisjarwithjunit, args=args, skip=skip)
         skip = []
     elif target=='JavaScript':
         # don't test browsers automatically, this is overkill and unreliable
