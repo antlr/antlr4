@@ -1,8 +1,13 @@
+IgnoredTests ::= [
+	default: false
+]
+
 TestFile(file) ::= <<
 package org.antlr.v4.test.runtime.csharp;
 
 import org.antlr.v4.test.runtime.csharp.BaseTest;
 import org.junit.Test;
+import org.junit.Ignore;
 
 <if(file.Options.("ImportErrorQueue"))>
 import org.antlr.v4.test.tool.ErrorQueue;
@@ -22,7 +27,8 @@ public class Test<file.name> extends BaseTest {
 
 LexerTestMethod(test) ::= <<
 /* this file and method are generated, any edit will be overwritten by the next generation */
-@Test public void test<test.name>() throws Exception {
+<testAnnotations(test)>
+public void test<test.name>() throws Exception {
 	mkdir(tmpdir);
 <test.SlaveGrammars:{grammar |
 	String slave_<grammar> =<writeStringLiteral(test.SlaveGrammars.(grammar))>;
@@ -50,7 +56,8 @@ CompositeLexerTestMethod(test) ::= <<
 
 ParserTestMethod(test) ::= <<
 /* this file and method are generated, any edit will be overwritten by the next generation */
-@Test public void test<test.name>() throws Exception {
+<testAnnotations(test)>
+public void test<test.name>() throws Exception {
 	mkdir(tmpdir);
 <test.SlaveGrammars:{grammar |
 	String slave_<grammar> =<writeStringLiteral(test.SlaveGrammars.(grammar))>;
@@ -103,11 +110,14 @@ public void test<test.name>() throws Exception {
 
 >>
 
-string(text) ::= <<
-"<escape.(text)>"
->>
-
-writeBoolean(o) ::= "<if(o && !isEmpty.(o))>true<else>false<endif>"
+testAnnotations(test) ::= <%
+@Test
+<if(test.Options.("Ignore"))>
+<\n>@Ignore(<writeStringLiteral(test.Options.("Ignore"))>)
+<elseif(IgnoredTests.(({<file.name>.<test.name>})))>
+<\n>@Ignore(<writeStringLiteral(IgnoredTests.(({<file.name>.<test.name>})))>)
+<endif>
+%>
 
 buildStringLiteral(text, variable) ::= <<
 StringBuilder <variable>Builder = new StringBuilder(<strlen.(text)>);
@@ -131,6 +141,12 @@ writeLines(textLines) ::= <%
 "<escape.(first(textLines))>"
 <endif>
 %>
+
+string(text) ::= <<
+"<escape.(text)>"
+>>
+
+writeBoolean(o) ::= "<if(o && !isEmpty.(o))>true<else>false<endif>"
 
 writeln(s) ::= <<Console.WriteLine(<s>);>>
 
