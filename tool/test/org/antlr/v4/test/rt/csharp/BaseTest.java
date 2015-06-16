@@ -246,7 +246,8 @@ public abstract class BaseTest {
 				System.out.println(new String(Utils.readFile(tmpdir+"/"+grammarFileName)));
 			}
 			catch (IOException ioe) {
-				System.err.println(ioe.toString());
+				ioe.printStackTrace(System.err);
+				System.err.println("Can't read "+tmpdir+"/"+grammarFileName);
 			}
 			System.out.println("###");
 		}
@@ -402,6 +403,7 @@ public abstract class BaseTest {
 				return false;
 			return true;
 		} catch(Exception e) {
+			e.printStackTrace(System.err);
 			return false;
 		}
 	}
@@ -471,8 +473,9 @@ public abstract class BaseTest {
 			// update project file list
 			exp = XPathFactory.newInstance().newXPath().compile("/Project/ItemGroup[Compile/@Include='AssemblyInfo.cs']");
 			Element group = (Element)exp.evaluate(prjXml, XPathConstants.NODE);
-			if(group==null)
+			if(group==null) {
 				return false;
+			}
 			// remove existing children
 			while(group.hasChildNodes())
 				group.removeChild(group.getFirstChild());
@@ -490,7 +493,9 @@ public abstract class BaseTest {
 			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
 			transformer.transform(new DOMSource(prjXml), new StreamResult(prjFile));
 			return true;
-		} catch(Exception e) {
+		}
+		catch(Exception e) {
+			e.printStackTrace(System.err);
 			return false;
 		}
 	}
@@ -601,6 +606,7 @@ public abstract class BaseTest {
 			}
 			catch (IOException ioe) {
 				System.err.println("can't read output from process");
+				ioe.printStackTrace(System.err);
 			}
 		}
 		/** wait for the thread to finish */
