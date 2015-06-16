@@ -17,18 +17,18 @@ expressionList
     :   e (',' e)*
     ;
 e   :   '(' e ')'
-    |   'this' 
+    |   'this'
     |   'super'
     |   INT
     |   ID
-    |   type '.' 'class'
+    |   typespec '.' 'class'
     |   e '.' ID
     |   e '.' 'this'
     |   e '.' 'super' '(' expressionList? ')'
     |   e '.' 'new' ID '(' expressionList? ')'
-	 |	 'new' type ( '(' expressionList? ')' | ('[' e ']')+)
+	|   'new' typespec ( '(' expressionList? ')' | ('[' e ']')+)
     |   e '[' e ']'
-    |   '(' type ')' e
+    |   '(' typespec ')' e
     |   e ('++' | '--')
     |   e '(' expressionList? ')'
     |   ('+'|'-'|'++'|'--') e
@@ -59,10 +59,11 @@ e   :   '(' e ')'
           |'\<\<='
           |'%=') e
     ;
-type: ID 
+typespec
+    : ID
     | ID '[' ']'
     | 'int'
-	 | 'int' '[' ']' 
+	| 'int' '[' ']'
     ;
 ID : ('a'..'z'|'A'..'Z'|'_'|'$')+;
 INT : '0'..'9'+ ;

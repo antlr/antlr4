@@ -19,6 +19,7 @@
       <sourceFolder url="file://$MODULE_DIR$/test" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/../gen/test/CSharp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/../gen/test/Java" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../gen/test/Python3" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/../.idea" />
       <excludeFolder url="file://$MODULE_DIR$/../antlr4-maven-plugin" />
       <excludeFolder url="file://$MODULE_DIR$/../runtime" />
@@ -31,6 +32,10 @@
     </content>
     <content url="file://$MODULE_DIR$/../../antlr4-csharp/tool/test">
       <sourceFolder url="file://$MODULE_DIR$/../../antlr4-csharp/tool/test" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../antlr4-python3">
+      <sourceFolder url="file://$MODULE_DIR$/../../antlr4-python3/tool/test" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../antlr4-python3/tool/src" isTestSource="false" />
     </content>
     <orderEntry type="jdk" jdkName="1.7" jdkType="JavaSDK" />
     <orderEntry type="sourceFolder" forTests="false" />
