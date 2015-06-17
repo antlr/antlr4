@@ -56,6 +56,7 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -416,8 +417,7 @@ public abstract class BaseTest {
 				getTestProjectFile().getAbsolutePath()
 			};
 		System.err.println("Starting build "+Utils.join(args, " "));
-		Process process =
-			Runtime.getRuntime().exec(args, null, new File(tmpdir));
+		Process process = Runtime.getRuntime().exec(args, null, new File(tmpdir));
 		StreamVacuum stdoutVacuum = new StreamVacuum(process.getInputStream());
 		StreamVacuum stderrVacuum = new StreamVacuum(process.getErrorStream());
 		stdoutVacuum.start();
@@ -458,23 +458,13 @@ public abstract class BaseTest {
 
 	public boolean createProject() {
 		try {
-			String pack = this.getClass().getPackage().getName().replace(".", "/") + "/";
-			System.out.println("create project "+pack);
-			// save AssemblyInfo
-			InputStream input = Thread.currentThread().getContextClassLoader().getResourceAsStream(pack + "AssemblyInfo.cs");
-			if ( input==null ) {
-				System.err.println("Can't find " + pack + "AssemblyInfo.cs as resource");
-				return false;
-			}
-			OutputStream output = new FileOutputStream(new File(tmpdir, "AssemblyInfo.cs").getAbsolutePath());
-			while(input.available()>0) {
-				output.write(input.read());
-			}
-			output.close();
-			input.close();
+			String pack = BaseTest.class.getPackage().getName().replace(".", "/") + "/";
+			// save auxiliary files
+			saveResourceAsFile(pack + "AssemblyInfo.cs", new File(tmpdir, "AssemblyInfo.cs"));
+			saveResourceAsFile(pack + "App.config", new File(tmpdir, "App.config"));
 			// update project
 			String projectName = isWindows() ? "Antlr4.Test.vs2013.csproj" : "Antlr4.Test.mono.csproj";
-			input = Thread.currentThread().getContextClassLoader().getResourceAsStream(pack + projectName);
+			InputStream input = Thread.currentThread().getContextClassLoader().getResourceAsStream(pack + projectName);
 			Document prjXml = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(input);
 			// update runtime project reference
 			String runtimePath = System.getProperty("antlr-csharp-runtime-project");
@@ -516,12 +506,26 @@ public abstract class BaseTest {
 		}
 	}
 
+	private void saveResourceAsFile(String resourceName, File file) throws IOException {
+		InputStream input = Thread.currentThread().getContextClassLoader().getResourceAsStream(resourceName);
+		if ( input==null ) {
+			System.err.println("Can't find " + resourceName + " as resource");
+			throw new IOException("Missing resource:" + resourceName);
+		}
+		OutputStream output = new FileOutputStream(file.getAbsolutePath());
+		while(input.available()>0) {
+			output.write(input.read());
+		}
+		output.close();
+		input.close();
+	}
+
 	public String execTest() {
 		try {
 			String exec = locateExec();
 			String[] args = isWindows() ?
 					new String[] { exec, new File(tmpdir, "input").getAbsolutePath() } :
-					new String[] { "mono", "--runtime=v4.0.30319", exec, new File(tmpdir, "input").getAbsolutePath() };
+					new String[] { "mono", exec, new File(tmpdir, "input").getAbsolutePath() };
 			ProcessBuilder pb = new ProcessBuilder(args);
 			pb.directory(new File(tmpdir));
 			Process p = pb.start();

@@ -189,7 +189,6 @@
     <Compile Include="Sharpen\Compat\Enumerable.cs" />
     <Compile Include="Sharpen\Compat\ExtensionAttribute.cs" />
     <Compile Include="Sharpen\Compat\Funcs.cs" />
-    <Compile Include="Sharpen\Compat\HashSet`1.cs" />
     <Compile Include="Sharpen\Compat\IStructuralComparable.cs" />
     <Compile Include="Sharpen\Compat\IStructuralEquatable.cs" />
     <Compile Include="Sharpen\Compat\SplitOrderedList`2.cs" />
@@ -240,6 +239,7 @@
       <CustomToolNamespace>Antlr4.Runtime.Tree.Xpath</CustomToolNamespace>
     </None>
     <Compile Include="Recognizer.cs" />
+    <Compile Include="Sharpen\Compat\HashSet.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

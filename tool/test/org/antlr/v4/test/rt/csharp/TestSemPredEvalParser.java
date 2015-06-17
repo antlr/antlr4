@@ -1,8 +1,9 @@
 package org.antlr.v4.test.rt.csharp;
 
+import org.antlr.v4.test.runtime.csharp.BaseTest;
 import org.junit.Test;
 
-public class TestSemPredEvalParser extends org.antlr.v4.test.runtime.csharp.BaseTest {
+public class TestSemPredEvalParser extends BaseTest {
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test

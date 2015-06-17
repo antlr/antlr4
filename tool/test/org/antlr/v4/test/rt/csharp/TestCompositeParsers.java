@@ -1,11 +1,12 @@
 package org.antlr.v4.test.rt.csharp;
 
+import org.antlr.v4.test.runtime.csharp.BaseTest;
 import org.junit.Test;
 
 import org.antlr.v4.test.tool.ErrorQueue;
 import org.antlr.v4.tool.Grammar;
 
-public class TestCompositeParsers extends org.antlr.v4.test.runtime.csharp.BaseTest {
+public class TestCompositeParsers extends BaseTest {
 
 	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
