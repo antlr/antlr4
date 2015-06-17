@@ -9,6 +9,7 @@ TestFolders ::= [
 	"ParserErrors": [],
 	"ParserExec": [],
 	"ParseTrees": [],
+	"Performance": [],
 	"SemPredEvalLexer": [],
 	"SemPredEvalParser": [],
 	"Sets": []

@@ -1,0 +1,14 @@
+import "ExpressionGrammar.stg"
+
+Input() ::= <<
+<InputFragment()> or
+<InputFragment()> or
+<InputFragment()> or
+<InputFragment()> or
+<InputFragment()> or
+<InputFragment()> or
+<InputFragment()> or
+<InputFragment()> or
+<InputFragment()> or
+<InputFragment()>
+>>
