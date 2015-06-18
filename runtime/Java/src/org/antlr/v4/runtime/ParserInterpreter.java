@@ -48,7 +48,6 @@ import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.Pair;
 
 import java.util.ArrayDeque;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Deque;
 
@@ -100,6 +99,16 @@ public class ParserInterpreter extends Parser {
 	protected int overrideDecision = -1;
 	protected int overrideDecisionInputIndex = -1;
 	protected int overrideDecisionAlt = -1;
+	protected boolean overrideDecisionReached = false; // latch and only override once; error might trigger infinite loop
+
+	/** What is the current context when we override a decisions?  This tells
+	 *  us what the root of the parse tree is when using override
+	 *  for an ambiguity/lookahead check.
+	 */
+	protected InterpreterRuleContext overrideDecisionRoot = null;
+
+
+	protected InterpreterRuleContext rootContext;
 
 	/**
 	 * @deprecated Use {@link #ParserInterpreter(String, Vocabulary, Collection, ATN, TokenStream)} instead.
@@ -138,17 +147,11 @@ public class ParserInterpreter extends Parser {
 											  sharedContextCache));
 	}
 
-	/** A factory-like copy constructor that creates a new parser interpreter by reusing
-	 *  the fields of a previous interpreter.
-	 *
-	 *  @since 4.5.1
-	 *
-	 *  @param old The interpreter to copy
-	 */
-	public ParserInterpreter copyFrom(ParserInterpreter old) {
-		return new ParserInterpreter(old.grammarFileName, old.vocabulary,
-									 Arrays.asList(old.ruleNames),
-									 old.atn, old.getTokenStream());
+	@Override
+	public void reset() {
+		super.reset();
+		overrideDecisionReached = false;
+		overrideDecisionRoot = null;
 	}
 
 	@Override
@@ -181,7 +184,7 @@ public class ParserInterpreter extends Parser {
 	public ParserRuleContext parse(int startRuleIndex) {
 		RuleStartState startRuleStartState = atn.ruleToStartState[startRuleIndex];
 
-		InterpreterRuleContext rootContext = createInterpreterRuleContext(null, ATNState.INVALID_STATE_NUMBER, startRuleIndex);
+		rootContext = createInterpreterRuleContext(null, ATNState.INVALID_STATE_NUMBER, startRuleIndex);
 		if (startRuleStartState.isLeftRecursiveRule) {
 			enterRecursionRule(rootContext, startRuleStartState.stateNumber, startRuleIndex, 0);
 		}
@@ -239,12 +242,12 @@ public class ParserInterpreter extends Parser {
 
 	protected void visitState(ATNState p) {
 //		System.out.println("visitState "+p.stateNumber);
-		int edge = 1;
+		int predictedAlt = 1;
 		if ( p instanceof DecisionState ) {
-			edge = visitDecisionsState((DecisionState) p);
+			predictedAlt = visitDecisionState((DecisionState) p);
 		}
 
-		Transition transition = p.transition(edge - 1);
+		Transition transition = p.transition(predictedAlt - 1);
 		switch (transition.getSerializationType()) {
 			case Transition.EPSILON:
 				if ( p.getStateType()==ATNState.STAR_LOOP_ENTRY &&
@@ -318,21 +321,22 @@ public class ParserInterpreter extends Parser {
 		setState(transition.target.stateNumber);
 	}
 
-	protected int visitDecisionsState(DecisionState p) {
-		int edge = 1;
+	protected int visitDecisionState(DecisionState p) {
+		int predictedAlt = 1;
 		if ( p.getNumberOfTransitions()>1 ) {
-			int predictedAlt;
 			getErrorHandler().sync(this);
 			int decision = p.decision;
-			if (decision == overrideDecision && _input.index() == overrideDecisionInputIndex) {
+			if ( !overrideDecisionReached &&
+				 decision == overrideDecision && _input.index() == overrideDecisionInputIndex)
+			{
 				predictedAlt = overrideDecisionAlt;
+				overrideDecisionReached = true;
 			}
 			else {
 				predictedAlt = getInterpreter().adaptivePredict(_input, decision, _ctx);
 			}
-			edge = predictedAlt;
 		}
-		return edge;
+		return predictedAlt;
 	}
 
 	/** Provide simple "factory" for InterpreterRuleContext's. */
@@ -405,6 +409,10 @@ public class ParserInterpreter extends Parser {
 		overrideDecisionAlt = forcedAlt;
 	}
 
+	public InterpreterRuleContext getOverrideDecisionRoot() {
+		return overrideDecisionRoot;
+	}
+
 	/** Rely on the error handler for this parser but, if no tokens are consumed
 	 *  to recover, add an error node. Otherwise, nothing is seen in the parse
 	 *  tree.
@@ -418,10 +426,6 @@ public class ParserInterpreter extends Parser {
 				InputMismatchException ime = (InputMismatchException)e;
 				Token tok = e.getOffendingToken();
 				int expectedTokenType = ime.getExpectedTokens().getMinElement(); // get any element
-				String tokenText;
-				if ( expectedTokenType== Token.EOF ) tokenText = "<missing EOF>";
-				else tokenText = "<mismatched "+tok.getText()+">";
-
 				Token errToken =
 					getTokenFactory().create(new Pair<TokenSource, CharStream>(tok.getTokenSource(), tok.getTokenSource().getInputStream()),
 				                             expectedTokenType, tok.getText(),
@@ -445,5 +449,9 @@ public class ParserInterpreter extends Parser {
 
 	protected Token recoverInline() {
 		return _errHandler.recoverInline(this);
+	}
+
+	public InterpreterRuleContext getRootContext() {
+		return rootContext;
 	}
 }

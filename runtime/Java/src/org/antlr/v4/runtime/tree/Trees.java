@@ -178,7 +178,6 @@ public class Trees {
 	/** Return a list of all ancestors of this node.  The first node of
 	 *  list is the root and the last is the parent of this node.
 	 */
-
 	public static List<? extends Tree> getAncestors(Tree t) {
 		if ( t.getParent()==null ) return Collections.emptyList();
 		List<Tree> ancestors = new ArrayList<Tree>();
@@ -188,6 +187,21 @@ public class Trees {
 			t = t.getParent();
 		}
 		return ancestors;
+	}
+
+	/** Return true if t is u's parent or a node on path to root from u.
+	 *  Use == not equals().
+	 *
+	 *  @since 4.5.1
+	 */
+	public static boolean isAncestorOf(Tree t, Tree u) {
+		if ( t==null || u==null || t.getParent()==null ) return false;
+		Tree p = u.getParent();
+		while ( p!=null ) {
+			if ( t == p ) return true;
+			p = p.getParent();
+		}
+		return false;
 	}
 
 	public static Collection<ParseTree> findAllTokenNodes(ParseTree t, int ttype) {
