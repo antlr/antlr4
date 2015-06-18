@@ -34,6 +34,7 @@ import org.abego.treelayout.NodeExtentProvider;
 import org.abego.treelayout.TreeForTreeLayout;
 import org.abego.treelayout.TreeLayout;
 import org.abego.treelayout.util.DefaultConfiguration;
+import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.misc.GraphicsSupport;
 import org.antlr.v4.runtime.misc.JFileChooserConfirmOverwrite;
 import org.antlr.v4.runtime.misc.Utils;
@@ -196,11 +197,18 @@ public class TreeViewer extends JComponent {
 	protected void paintBox(Graphics g, Tree tree) {
 		Rectangle2D.Double box = getBoundsOfNode(tree);
 		// draw the box in the background
+		boolean ruleFailedAndMatchedNothing = false;
+		if ( tree instanceof ParserRuleContext ) {
+			ParserRuleContext ctx = (ParserRuleContext) tree;
+			ruleFailedAndMatchedNothing = ctx.exception != null &&
+										  ctx.stop != null && ctx.stop.getTokenIndex() < ctx.start.getTokenIndex();
+		}
 		if ( isHighlighted(tree) || boxColor!=null ||
-			 tree instanceof ErrorNode )
+			 tree instanceof ErrorNode ||
+			 ruleFailedAndMatchedNothing)
 		{
 			if ( isHighlighted(tree) ) g.setColor(highlightedBoxColor);
-			else if ( tree instanceof ErrorNode ) g.setColor(LIGHT_RED);
+			else if ( tree instanceof ErrorNode || ruleFailedAndMatchedNothing ) g.setColor(LIGHT_RED);
 			else g.setColor(boxColor);
 			g.fillRoundRect((int) box.x, (int) box.y, (int) box.width - 1,
 							(int) box.height - 1, arcSize, arcSize);
