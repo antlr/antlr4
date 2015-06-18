@@ -47,3 +47,5 @@ tmp/
 bilder.py
 bilder.pyc
 bild.log
+
+bild_output.txt
