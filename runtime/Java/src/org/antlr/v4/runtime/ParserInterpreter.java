@@ -321,6 +321,10 @@ public class ParserInterpreter extends Parser {
 		setState(transition.target.stateNumber);
 	}
 
+	/** Method visitDecisionState() is called when the interpreter reaches
+	 *  a decision state (instance of DecisionState). It gives an opportunity
+	 *  for subclasses to track interesting things.
+	 */
 	protected int visitDecisionState(DecisionState p) {
 		int predictedAlt = 1;
 		if ( p.getNumberOfTransitions()>1 ) {
@@ -339,7 +343,9 @@ public class ParserInterpreter extends Parser {
 		return predictedAlt;
 	}
 
-	/** Provide simple "factory" for InterpreterRuleContext's. */
+	/** Provide simple "factory" for InterpreterRuleContext's.
+	 *  @since 4.5.1
+	 */
 	protected InterpreterRuleContext createInterpreterRuleContext(
 		ParserRuleContext parent,
 		int invokingStateNumber,
@@ -451,6 +457,14 @@ public class ParserInterpreter extends Parser {
 		return _errHandler.recoverInline(this);
 	}
 
+	/** Return the root of the parse, which can be useful if the parser
+	 *  bails out. You still can access the top node. Note that,
+	 *  because of the way left recursive rules add children, it's possible
+	 *  that the root will not have any children if the start rule immediately
+	 *  called and left recursive rule that fails.
+	 *
+	 * @since 4.5.1
+	 */
 	public InterpreterRuleContext getRootContext() {
 		return rootContext;
 	}

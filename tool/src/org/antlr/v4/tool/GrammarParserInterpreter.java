@@ -7,7 +7,6 @@ import org.antlr.v4.runtime.ParserInterpreter;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.TokenStream;
-import org.antlr.v4.runtime.UnbufferedTokenStream;
 import org.antlr.v4.runtime.Vocabulary;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNDeserializer;
@@ -27,6 +26,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/** A heavier weight {@link ParserInterpreter} that creates parse trees
+ *  that track alternative numbers for subtree roots.
+ *
+ * @since 4.5.1
+ *
+ */
 public class GrammarParserInterpreter extends ParserInterpreter {
 	/** The grammar associated with this interpreter. Unlike the
 	 *  {@link ParserInterpreter} from the standard distribution,
@@ -108,45 +113,51 @@ public class GrammarParserInterpreter extends ParserInterpreter {
 		return track;
 	}
 
-	/**In the case of left-recursive rules,
-	 * there is typically a decision for the primary alternatives and a
-	 * decision to choose between the recursive operator alternatives.
-	 * For example, the following left recursive rule has two primary and 2
-	 * recursive alternatives.</p>
+	/** Override this method so that we can record which alternative
+	 *  was taken at each decision point. For non-left recursive rules,
+	 *  it's simple. Set decisionStatesThatSetOuterAltNumInContext
+	 *  indicates which decision states should set the outer alternative number.
 	 *
-	 e : e '*' e
-	   | '-' INT
-	   | e '+' e
-	   | ID
-	   ;
+	 *  Left recursive rules are much more complicated to deal with:
+	 *  there is typically a decision for the primary alternatives and a
+	 *  decision to choose between the recursive operator alternatives.
+	 *  For example, the following left recursive rule has two primary and 2
+	 *  recursive alternatives.</p>
+	 *
+		 e : e '*' e
+		   | '-' INT
+		   | e '+' e
+		   | ID
+		   ;
 
-	 * <p>ANTLR rewrites that rule to be</p>
+	 *  <p>ANTLR rewrites that rule to be</p>
 
-	 e[int precedence]
-		 : ('-' INT | ID)
-		 ( {...}? '*' e[5]
-		 | {...}? '+' e[3]
-		 )*
-	 	;
+		 e[int precedence]
+			 : ('-' INT | ID)
+			 ( {...}? '*' e[5]
+			 | {...}? '+' e[3]
+			 )*
+			;
 
 	 *
-	 * <p>So, there are two decisions associated with picking the outermost alt.
-	 * This complicates our tracking significantly. The outermost alternative number
-	 * is a function of the decision (ATN state) within a left recursive rule and the
-	 * predicted alternative coming back from adaptivePredict().
+	 *  <p>So, there are two decisions associated with picking the outermost alt.
+	 *  This complicates our tracking significantly. The outermost alternative number
+	 *  is a function of the decision (ATN state) within a left recursive rule and the
+	 *  predicted alternative coming back from adaptivePredict().
+	 *
+	 *  We use stateToAltsMap as a cache to avoid expensive calls to
+	 *  getRecursiveOpAlts().
 	 */
 	@Override
 	protected int visitDecisionState(DecisionState p) {
 		int predictedAlt = super.visitDecisionState(p);
 		if( p.getNumberOfTransitions() > 1) {
-//			System.out.print("decision "+p.decision+": "+predictedAlt);
+//			System.out.println("decision "+p.decision+": "+predictedAlt);
 			if( p.decision == this.overrideDecision &&
-				this._input.index() == this.overrideDecisionInputIndex)
+				this._input.index() == this.overrideDecisionInputIndex )
 			{
-//				System.out.print(" OVERRIDE");
 				overrideDecisionRoot = (GrammarInterpreterRuleContext)getContext();
 			}
-//			System.out.println();
 		}
 
 		GrammarInterpreterRuleContext ctx = (GrammarInterpreterRuleContext)_ctx;
@@ -162,7 +173,7 @@ public class GrammarParserInterpreter extends ParserInterpreter {
 						stateToAltsMap.put(p, alts); // cache it
 					}
 				}
-				else if (p.getStateType() == ATNState.STAR_BLOCK_START) {
+				else if ( p.getStateType() == ATNState.STAR_BLOCK_START ) {
 					if ( alts==null ) {
 						alts = lr.getRecursiveOpAlts();
 						stateToAltsMap.put(p, alts); // cache it
@@ -175,8 +186,7 @@ public class GrammarParserInterpreter extends ParserInterpreter {
 		return predictedAlt;
 	}
 
-	/** Given an AmbiguityInfo object that contains information about an
-	 *  ambiguous decision event, return the list of ambiguous parse trees.
+	/** Given an ambiguous parse information, return the list of ambiguous parse trees.
 	 *  An ambiguity occurs when a specific token sequence can be recognized
 	 *  in more than one way by the grammar. These ambiguities are detected only
 	 *  at decision points.
@@ -188,14 +198,12 @@ public class GrammarParserInterpreter extends ParserInterpreter {
 	 *  This method reuses the same physical input token stream used to
 	 *  detect the ambiguity by the original parser in the first place.
 	 *  This method resets/seeks within but does not alter originalParser.
-	 *  The input position is restored upon exit from this method.
-	 *  Parsers using a {@link UnbufferedTokenStream} may not be able to
-	 *  perform the necessary save index() / seek(saved_index) operation.
 	 *
 	 *  The trees are rooted at the node whose start..stop token indices
 	 *  include the start and stop indices of this ambiguity event. That is,
-	 *  the trees returns will always include the complete ambiguous subphrase
-	 *  identified by the ambiguity event.
+	 *  the trees returned will always include the complete ambiguous subphrase
+	 *  identified by the ambiguity event.  The subtrees returned will
+	 *  also always contain the node associated with the overridden decision.
 	 *
 	 *  Be aware that this method does NOT notify error or parse listeners as
 	 *  it would trigger duplicate or otherwise unwanted events.
@@ -211,12 +219,29 @@ public class GrammarParserInterpreter extends ParserInterpreter {
 	 *
 	 *  @since 4.5.1
 	 *
+	 *  @param g              From which grammar should we drive alternative
+	 *                        numbers and alternative labels.
+	 *
 	 *  @param originalParser The parser used to create ambiguityInfo; it
 	 *                        is not modified by this routine and can be either
 	 *                        a generated or interpreted parser. It's token
 	 *                        stream *is* reset/seek()'d.
-	 *  @param ambiguityInfo  The information about an ambiguous decision event
-	 *                        for which you want ambiguous parse trees.
+	 *  @param tokens		  A stream of tokens to use with the temporary parser.
+	 *                        This will often be just the token stream within the
+	 *                        original parser but here it is for flexibility.
+	 *
+	 *  @param decision       Which decision to try different alternatives for.
+	 *
+	 *  @param alts           The set of alternatives to try while re-parsing.
+	 *
+	 *  @param startIndex	  The index of the first token of the ambiguous
+	 *                        input or other input of interest.
+	 *
+	 *  @param stopIndex      The index of the last token of the ambiguous input.
+	 *                        The start and stop indexes are used primarily to
+	 *                        identify how much of the resulting parse tree
+	 *                        to return.
+	 *
 	 *  @param startRuleIndex The start rule for the entire grammar, not
 	 *                        the ambiguous decision. We re-parse the entire input
 	 *                        and so we need the original start rule.
@@ -228,18 +253,19 @@ public class GrammarParserInterpreter extends ParserInterpreter {
 	 *                        retests the input in alternative order and
 	 *                        ANTLR always resolves ambiguities by choosing
 	 *                        the first alternative that matches the input.
+	 *                        The subtree returned
 	 *
 	 *  @throws RecognitionException Throws upon syntax error while matching
 	 *                               ambig input.
 	 */
-	public static  List<ParserRuleContext> getAllPossibleParseTrees(Grammar g,
-																	Parser originalParser,
-																	TokenStream tokens,
-																	int decision,
-																	BitSet alts,
-																	int startIndex,
-																	int stopIndex,
-																	int startRuleIndex)
+	public static List<ParserRuleContext> getAllPossibleParseTrees(Grammar g,
+																   Parser originalParser,
+																   TokenStream tokens,
+																   int decision,
+																   BitSet alts,
+																   int startIndex,
+																   int stopIndex,
+																   int startRuleIndex)
 		throws RecognitionException
 	{
 		List<ParserRuleContext> trees = new ArrayList<ParserRuleContext>();
@@ -248,7 +274,7 @@ public class GrammarParserInterpreter extends ParserInterpreter {
 		if (originalParser instanceof ParserInterpreter) {
 			parser = new GrammarParserInterpreter(g, originalParser.getATN(), originalParser.getTokenStream());
 		}
-		else {
+		else { // must've been a generated parser
 			char[] serializedAtn = ATNSerializer.getSerializedAsChars(originalParser.getATN());
 			ATN deserialized = new ATNDeserializer().deserialize(serializedAtn);
 			parser = new ParserInterpreter(originalParser.getGrammarFileName(),
