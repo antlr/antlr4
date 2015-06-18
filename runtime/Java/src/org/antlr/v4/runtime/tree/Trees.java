@@ -107,6 +107,7 @@ public class Trees {
 	 *  @since 4.5.1
 	 */
 	public static String toStringTree(Tree t, TreeTextProvider nodeTextProvider) {
+		if ( t==null ) return "null";
 		String s = Utils.escapeWhitespace(nodeTextProvider.getText(t), false);
 		if ( t.getChildCount()==0 ) return s;
 		StringBuilder buf = new StringBuilder();
@@ -265,8 +266,9 @@ public class Trees {
 		if ( t instanceof ParserRuleContext ) {
 			ParserRuleContext r = (ParserRuleContext) t;
 			if ( startTokenIndex>=r.getStart().getTokenIndex() && // is range fully contained in t?
-				stopTokenIndex<=r.getStop().getTokenIndex() )
+				 (r.getStop()==null || stopTokenIndex<=r.getStop().getTokenIndex()) )
 			{
+				// note: r.getStop()==null likely implies that we bailed out of parser and there's nothing to the right
 				return r;
 			}
 		}
