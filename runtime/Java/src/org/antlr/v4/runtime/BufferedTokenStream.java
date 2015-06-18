@@ -133,11 +133,11 @@ public class BufferedTokenStream implements TokenStream {
 			if (fetchedEOF) {
 				// the last token in tokens is EOF. skip check if p indexes any
 				// fetched token except the last.
-				skipEofCheck = p < size() - 1;
+				skipEofCheck = p < tokens.size() - 1;
 			}
 			else {
 				// no EOF token in tokens. skip check if p indexes a fetched token.
-				skipEofCheck = p < size();
+				skipEofCheck = p < tokens.size();
 			}
 		}
 		else {
@@ -162,7 +162,7 @@ public class BufferedTokenStream implements TokenStream {
 	 */
     protected boolean sync(int i) {
 		assert i >= 0;
-        int n = i - size() + 1; // how many more elements we need?
+        int n = i - tokens.size() + 1; // how many more elements we need?
         //System.out.println("sync("+i+") needs "+n);
         if ( n > 0 ) {
 			int fetched = fetch(n);
@@ -184,7 +184,7 @@ public class BufferedTokenStream implements TokenStream {
         for (int i = 0; i < n; i++) {
             Token t = tokenSource.nextToken();
             if ( t instanceof WritableToken ) {
-                ((WritableToken)t).setTokenIndex(size());
+                ((WritableToken)t).setTokenIndex(tokens.size());
             }
             tokens.add(t);
             if ( t.getType()==Token.EOF ) {
@@ -198,8 +198,8 @@ public class BufferedTokenStream implements TokenStream {
 
     @Override
     public Token get(int i) {
-        if ( i < 0 || i >= size() ) {
-            throw new IndexOutOfBoundsException("token index "+i+" out of range 0.."+(size()-1));
+        if ( i < 0 || i >= tokens.size() ) {
+            throw new IndexOutOfBoundsException("token index "+i+" out of range 0.."+(tokens.size()-1));
         }
         return tokens.get(i);
     }
@@ -209,7 +209,7 @@ public class BufferedTokenStream implements TokenStream {
 		if ( start<0 || stop<0 ) return null;
 		lazyInit();
 		List<Token> subset = new ArrayList<Token>();
-		if ( stop>=size() ) stop = size()-1;
+		if ( stop>=tokens.size() ) stop = tokens.size()-1;
 		for (int i = start; i <= stop; i++) {
 			Token t = tokens.get(i);
 			if ( t.getType()==Token.EOF ) break;
@@ -235,9 +235,9 @@ public class BufferedTokenStream implements TokenStream {
 
 		int i = p + k - 1;
 		sync(i);
-        if ( i >= size() ) { // return EOF token
+        if ( i >= tokens.size() ) { // return EOF token
             // EOF must be last token
-            return tokens.get(size()-1);
+            return tokens.get(tokens.size()-1);
         }
 //		if ( i>range ) range = i;
         return tokens.get(i);
@@ -290,11 +290,11 @@ public class BufferedTokenStream implements TokenStream {
      */
     public List<Token> getTokens(int start, int stop, Set<Integer> types) {
         lazyInit();
-		if ( start<0 || stop>=size() ||
-			 stop<0  || start>=size() )
+		if ( start<0 || stop>=tokens.size() ||
+			 stop<0  || start>=tokens.size() )
 		{
 			throw new IndexOutOfBoundsException("start "+start+" or stop "+stop+
-												" not in 0.."+(size()-1));
+												" not in 0.."+(tokens.size()-1));
 		}
         if ( start>stop ) return null;
 
@@ -379,8 +379,8 @@ public class BufferedTokenStream implements TokenStream {
 	 */
 	public List<Token> getHiddenTokensToRight(int tokenIndex, int channel) {
 		lazyInit();
-		if ( tokenIndex<0 || tokenIndex>=size() ) {
-			throw new IndexOutOfBoundsException(tokenIndex+" not in 0.."+(size()-1));
+		if ( tokenIndex<0 || tokenIndex>=tokens.size() ) {
+			throw new IndexOutOfBoundsException(tokenIndex+" not in 0.."+(tokens.size()-1));
 		}
 
 		int nextOnChannel =
@@ -408,8 +408,8 @@ public class BufferedTokenStream implements TokenStream {
 	 */
 	public List<Token> getHiddenTokensToLeft(int tokenIndex, int channel) {
 		lazyInit();
-		if ( tokenIndex<0 || tokenIndex>=size() ) {
-			throw new IndexOutOfBoundsException(tokenIndex+" not in 0.."+(size()-1));
+		if ( tokenIndex<0 || tokenIndex>=tokens.size() ) {
+			throw new IndexOutOfBoundsException(tokenIndex+" not in 0.."+(tokens.size()-1));
 		}
 
 		if (tokenIndex == 0) {
@@ -468,7 +468,7 @@ public class BufferedTokenStream implements TokenStream {
 		int stop = interval.b;
         if ( start<0 || stop<0 ) return "";
         lazyInit();
-        if ( stop>=size() ) stop = size()-1;
+        if ( stop>=tokens.size() ) stop = tokens.size()-1;
 
 		StringBuilder buf = new StringBuilder();
 		for (int i = start; i <= stop; i++) {
