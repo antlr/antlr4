@@ -22,9 +22,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /** A heavier weight {@link ParserInterpreter} that creates parse trees
  *  that track alternative numbers for subtree roots.
@@ -44,9 +42,10 @@ public class GrammarParserInterpreter extends ParserInterpreter {
 
 	/** Cache {@link LeftRecursiveRule#getPrimaryAlts()} and
 	 *  {@link LeftRecursiveRule#getRecursiveOpAlts()} for states in
-	 *  {@link #decisionStatesThatSetOuterAltNumInContext}.
+	 *  {@link #decisionStatesThatSetOuterAltNumInContext}. It only
+	 *  caches decisions in left-recursive rules.
 	 */
-	protected final Map<DecisionState, int[]> stateToAltsMap = new HashMap<DecisionState, int[]>();
+	protected int[][] stateToAltsMap;
 
 	public GrammarParserInterpreter(Grammar g,
 									String grammarFileName,
@@ -65,6 +64,7 @@ public class GrammarParserInterpreter extends ParserInterpreter {
 			  input);
 		this.g = g;
 		decisionStatesThatSetOuterAltNumInContext = findOuterMostDecisionStates();
+		stateToAltsMap = new int[g.atn.getNumberOfDecisions()][];
 	}
 
 	@Override
@@ -165,18 +165,18 @@ public class GrammarParserInterpreter extends ParserInterpreter {
 			ctx.outerAltNum = predictedAlt;
 			Rule r = g.getRule(p.ruleIndex);
 			if ( atn.ruleToStartState[r.index].isLeftRecursiveRule ) {
-				int[] alts = stateToAltsMap.get(p);
+				int[] alts = stateToAltsMap[p.stateNumber];
 				LeftRecursiveRule lr = (LeftRecursiveRule) g.getRule(p.ruleIndex);
 				if (p.getStateType() == ATNState.BLOCK_START) {
 					if ( alts==null ) {
 						alts = lr.getPrimaryAlts();
-						stateToAltsMap.put(p, alts); // cache it
+						stateToAltsMap[p.stateNumber] = alts; // cache it
 					}
 				}
 				else if ( p.getStateType() == ATNState.STAR_BLOCK_START ) {
 					if ( alts==null ) {
 						alts = lr.getRecursiveOpAlts();
-						stateToAltsMap.put(p, alts); // cache it
+						stateToAltsMap[p.stateNumber] = alts; // cache it
 					}
 				}
 				ctx.outerAltNum = alts[predictedAlt];
