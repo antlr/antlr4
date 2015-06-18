@@ -30,5 +30,6 @@ TestTemplates ::= [
 	"DuplicatedLeftRecursiveCall_3": [],
 	"DuplicatedLeftRecursiveCall_4": [],
 	"InvalidATNStateRemoval": [],
-	"NoViableAltAvoidance": []
+	"NoViableAltAvoidance": [],
+	"TokenMismatch2": []
 ]
