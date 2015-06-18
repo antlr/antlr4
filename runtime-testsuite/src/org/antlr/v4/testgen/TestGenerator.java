@@ -66,6 +66,7 @@ public class TestGenerator {
 	 * $ java org.antlr.v4.testgen.TestGenerator -o /tmp -templates /Users/parrt/antlr/code/antlr4/tool/test/org/antlr/v4/test/runtime/java/Java.test.stg
 	 */
 	public static void main(String[] args) {
+		String rootDir = null;
 		String outDir = null;
 		String targetSpecificTemplateFile = null;
 		boolean viz = false;
@@ -73,7 +74,11 @@ public class TestGenerator {
 		int i = 0;
 		while (args != null && i < args.length) {
 			String arg = args[i];
-			if (arg.startsWith("-o")) {
+			if (arg.startsWith("-root")) {
+				i++;
+				rootDir = args[i];
+			}
+			else if (arg.startsWith("-o")) {
 				i++;
 				outDir = args[i];
 			}
@@ -86,7 +91,11 @@ public class TestGenerator {
 			}
 			i++;
 		}
-
+		if ( rootDir!=null) {
+			genAllTargets(rootDir, viz);
+			System.exit(0);
+		}
+		
 		if ( outDir==null || targetSpecificTemplateFile==null ) {
 			System.err.println("You must give an output root dir and templates file");
 			System.exit(1);
@@ -94,7 +103,16 @@ public class TestGenerator {
 
 		genTarget(outDir, targetSpecificTemplateFile, viz);
 	}
-
+	
+	public static void genAllTargets(final String rootDir, boolean viz) {
+		for(TargetConfiguration config : TargetConfiguration.ALL) {
+			String outDir = rootDir + config.outDir;
+			String templates = rootDir + config.templates;
+			genTarget(outDir, templates, viz);
+		}
+		
+	}
+	
 	public static void genTarget(final String outDir, String targetSpecificTemplateFile, boolean viz) {
 		TestGenerator gen = new TestGenerator("UTF-8",
 											  new File(targetSpecificTemplateFile),
@@ -109,15 +127,16 @@ public class TestGenerator {
 			public File getOutputDir(String templateFolder) {
 				String targetName = getTargetNameFromTemplatesFileName();
 				// compute package
-				int packageStart = templateFolder.indexOf("org/antlr/v4/test/runtime");
-				int templatesStart = templateFolder.indexOf("/templates");
-				String packageDir = templateFolder.substring(packageStart,templatesStart);
-				File root = outputDirectory;
-				File f = new File(root, packageDir);
-				return new File(f, targetName.toLowerCase());
+				String templatePath = runtimeTemplates.getPath();
+				int packageStart = templatePath.indexOf("org/antlr/v4/test/runtime");
+				int packageEnd = templatePath.indexOf("/" + targetName + ".test.stg");
+				String packageDir = templatePath.substring(packageStart, packageEnd);
+				return new File(outputDirectory, packageDir);
 			}
 			@Override
-			public String getTestTemplatesResourceDir() { return "runtime-testsuite/resources/org/antlr/v4/test/runtime/templates"; }
+			public String getTestTemplatesResourceDir() { 
+				return "runtime-testsuite/resources/org/antlr/v4/test/runtime/templates"; 
+			}
 		};
 		gen.info("Generating target " + gen.getTargetNameFromTemplatesFileName());
 		gen.execute();
