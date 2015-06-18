@@ -1,5 +1,6 @@
 package org.antlr.v4.test.runtime.python2;
 
+import org.antlr.v4.test.runtime.python.BasePythonTest;
 import org.stringtemplate.v4.ST;
 
 public abstract class BasePython2Test extends BasePythonTest {
