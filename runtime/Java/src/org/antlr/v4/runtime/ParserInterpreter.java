@@ -330,8 +330,8 @@ public class ParserInterpreter extends Parser {
 		if ( p.getNumberOfTransitions()>1 ) {
 			getErrorHandler().sync(this);
 			int decision = p.decision;
-			if ( !overrideDecisionReached &&
-				 decision == overrideDecision && _input.index() == overrideDecisionInputIndex)
+			if ( decision == overrideDecision && _input.index() == overrideDecisionInputIndex &&
+			     !overrideDecisionReached )
 			{
 				predictedAlt = overrideDecisionAlt;
 				overrideDecisionReached = true;
