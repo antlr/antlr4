@@ -244,4 +244,8 @@ public class ProfilingATNSimulator extends ParserATNSimulator {
 	public DecisionInfo[] getDecisionInfo() {
 		return decisions;
 	}
+
+	public DFAState getCurrentState() {
+		return currentState;
+	}
 }

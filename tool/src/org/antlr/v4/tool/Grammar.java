@@ -32,6 +32,7 @@ package org.antlr.v4.tool;
 
 import org.antlr.v4.Tool;
 import org.antlr.v4.analysis.LeftRecursiveRuleTransformer;
+import org.antlr.v4.automata.ParserATNFactory;
 import org.antlr.v4.misc.CharSupport;
 import org.antlr.v4.misc.OrderedHashMap;
 import org.antlr.v4.misc.Utils;
@@ -202,7 +203,6 @@ public class Grammar implements AttributeResolver {
 	public Map<Integer, DFA> decisionDFAs = new HashMap<Integer, DFA>();
 
 	public List<IntervalSet[]> decisionLOOK;
-
 
 	public final Tool tool;
 
@@ -505,6 +505,14 @@ public class Grammar implements AttributeResolver {
 		}
 		return null;
 		*/
+	}
+
+	public ATN getATN() {
+		if ( atn==null ) {
+			ParserATNFactory factory = new ParserATNFactory(this);
+			atn = factory.createATN();
+		}
+		return atn;
 	}
 
 	public Rule getRule(int index) { return indexToRule.get(index); }
@@ -1311,6 +1319,16 @@ public class Grammar implements AttributeResolver {
 		char[] serializedAtn = ATNSerializer.getSerializedAsChars(atn);
 		ATN deserialized = new ATNDeserializer().deserialize(serializedAtn);
 		return new LexerInterpreter(fileName, getVocabulary(), Arrays.asList(getRuleNames()), ((LexerGrammar)this).modes.keySet(), deserialized, input);
+	}
+
+	/** @since 4.5.1 */
+	public GrammarParserInterpreter createGrammarParserInterpreter(TokenStream tokenStream) {
+		if (this.isLexer()) {
+			throw new IllegalStateException("A parser interpreter can only be created for a parser or combined grammar.");
+		}
+		char[] serializedAtn = ATNSerializer.getSerializedAsChars(atn);
+		ATN deserialized = new ATNDeserializer().deserialize(serializedAtn);
+		return new GrammarParserInterpreter(this, deserialized, tokenStream);
 	}
 
 	public ParserInterpreter createParserInterpreter(TokenStream tokenStream) {

@@ -398,6 +398,7 @@ public class ParserATNSimulator extends ATNSimulator {
 					 * appropriate start state for the precedence level rather
 					 * than simply setting DFA.s0.
 					 */
+					dfa.s0.configs = s0_closure; // not used for prediction but useful to know start configs anyway
 					s0_closure = applyPrecedenceFilter(s0_closure);
 					s0 = addDFAState(dfa, new DFAState(s0_closure));
 					dfa.setPrecedenceStartState(parser.getPrecedence(), s0);

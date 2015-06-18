@@ -3,7 +3,6 @@ package org.antlr.v4.test.tool;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.LexerInterpreter;
-import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.ParserInterpreter;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.atn.ATNState;
@@ -16,6 +15,7 @@ import org.antlr.v4.runtime.atn.RuleStartState;
 import org.antlr.v4.runtime.atn.Transition;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.GrammarParserInterpreter;
 import org.antlr.v4.tool.LexerGrammar;
 import org.junit.Test;
 
@@ -211,7 +211,7 @@ public class TestAmbigParseTrees {
 	{
 		LexerInterpreter lexEngine = lg.createLexerInterpreter(new ANTLRInputStream(input));
 		CommonTokenStream tokens = new CommonTokenStream(lexEngine);
-		final ParserInterpreter parser = g.createParserInterpreter(tokens);
+		final GrammarParserInterpreter parser = g.createGrammarParserInterpreter(tokens);
 		parser.setProfile(true);
 		parser.getInterpreter().setPredictionMode(PredictionMode.LL_EXACT_AMBIG_DETECTION);
 
@@ -226,7 +226,15 @@ public class TestAmbigParseTrees {
 		assertEquals(1, ambiguities.size());
 		AmbiguityInfo ambiguityInfo = ambiguities.get(0);
 
-		List<ParserRuleContext> ambiguousParseTrees = Parser.getAmbiguousParseTrees(parser, ambiguityInfo, ruleIndex);
+		List<ParserRuleContext> ambiguousParseTrees =
+			GrammarParserInterpreter.getAllPossibleParseTrees(g,
+															  parser,
+															  tokens,
+															  ambiguityInfo.decision,
+															  ambiguityInfo.ambigAlts,
+															  ambiguityInfo.startIndex,
+															  ambiguityInfo.stopIndex,
+															  ruleIndex);
 		assertEquals(expectedAmbigAlts, ambiguityInfo.ambigAlts.toString());
 
 		assertEquals(ambiguityInfo.ambigAlts.cardinality(), ambiguousParseTrees.size());
