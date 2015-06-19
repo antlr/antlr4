@@ -320,7 +320,7 @@ public class Trees {
  	 *  @since 4.5.1
 	 */
 	public static Tree findNodeSuchThat(Tree t, Predicate<Tree> pred) {
-		if ( pred.apply(t) ) return t;
+		if ( pred.test(t) ) return t;
 
 		int n = t.getChildCount();
 		for (int i = 0 ; i < n ; i++){
