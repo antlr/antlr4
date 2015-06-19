@@ -1,11 +1,14 @@
 package org.antlr.v4.tool;
 
 import org.antlr.v4.runtime.BailErrorStrategy;
+import org.antlr.v4.runtime.DefaultErrorStrategy;
+import org.antlr.v4.runtime.InputMismatchException;
 import org.antlr.v4.runtime.InterpreterRuleContext;
 import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.ParserInterpreter;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RecognitionException;
+import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.Vocabulary;
 import org.antlr.v4.runtime.atn.ATN;
@@ -64,7 +67,7 @@ public class GrammarParserInterpreter extends ParserInterpreter {
 			  input);
 		this.g = g;
 		decisionStatesThatSetOuterAltNumInContext = findOuterMostDecisionStates();
-		stateToAltsMap = new int[g.atn.getNumberOfDecisions()][];
+		stateToAltsMap = new int[g.atn.states.size()][];
 	}
 
 	@Override
@@ -270,27 +273,7 @@ public class GrammarParserInterpreter extends ParserInterpreter {
 	{
 		List<ParserRuleContext> trees = new ArrayList<ParserRuleContext>();
 		// Create a new parser interpreter to parse the ambiguous subphrase
-		ParserInterpreter parser;
-		if (originalParser instanceof ParserInterpreter) {
-			parser = new GrammarParserInterpreter(g, originalParser.getATN(), originalParser.getTokenStream());
-		}
-		else { // must've been a generated parser
-			char[] serializedAtn = ATNSerializer.getSerializedAsChars(originalParser.getATN());
-			ATN deserialized = new ATNDeserializer().deserialize(serializedAtn);
-			parser = new ParserInterpreter(originalParser.getGrammarFileName(),
-										   originalParser.getVocabulary(),
-										   Arrays.asList(originalParser.getRuleNames()),
-										   deserialized,
-										   tokens);
-		}
-
-		parser.setInputStream(tokens);
-
-		// Make sure that we don't get any error messages from using this temporary parser
-		parser.setErrorHandler(new BailErrorStrategy());
-		parser.removeErrorListeners();
-		parser.removeParseListeners();
-		parser.getInterpreter().setPredictionMode(PredictionMode.LL_EXACT_AMBIG_DETECTION);
+		ParserInterpreter parser = getAmbuityParserInterpreter(g, originalParser, tokens);
 
 		// get ambig trees
 		int alt = alts.nextSetBit(0);
@@ -315,4 +298,126 @@ public class GrammarParserInterpreter extends ParserInterpreter {
 		return trees;
 	}
 
+	// we must parse the entire input now with decision overrides
+		// we cannot parse a subset because it could be that a decision
+		// above our decision of interest needs to read way past
+		// lookaheadInfo.stopIndex. It seems like there is no escaping
+		// the use of a full and complete token stream if we are
+		// resetting to token index 0 and re-parsing from the start symbol.
+		// It's not easy to restart parsing somewhere in the middle like a
+		// continuation because our call stack does not match the
+		// tree stack because of left recursive rule rewriting. grrrr!
+	public static List<ParserRuleContext> getLookaheadParseTrees(Grammar g,
+																 ParserInterpreter originalParser,
+																 TokenStream tokens,
+																 int startRuleIndex,
+																 int decision,
+																 int startIndex,
+																 int stopIndex)
+	{
+		List<ParserRuleContext> trees = new ArrayList<ParserRuleContext>();
+		// Create a new parser interpreter to parse the ambiguous subphrase
+		ParserInterpreter parser = getAmbuityParserInterpreter(g, originalParser, tokens);
+		BailButConsumeErrorStrategy errorHandler = new BailButConsumeErrorStrategy();
+		parser.setErrorHandler(errorHandler);
+
+		DecisionState decisionState = originalParser.getATN().decisionToState.get(decision);
+
+		for (int alt=1; alt<=decisionState.getTransitions().length; alt++) {
+			// re-parse entire input for all ambiguous alternatives
+			// (don't have to do first as it's been parsed, but do again for simplicity
+			//  using this temp parser.)
+			parser.reset();
+			parser.addDecisionOverride(decision, startIndex, alt);
+			ParserRuleContext tt = parser.parse(startRuleIndex);
+			int stopTreeAt = stopIndex;
+			if ( errorHandler.firstErrorTokenIndex>=0 ) {
+				stopTreeAt = errorHandler.firstErrorTokenIndex; // cut off rest at first error
+			}
+			ParserRuleContext subtree =
+				Trees.getRootOfSubtreeEnclosingRegion(tt,
+													  startIndex,
+													  stopTreeAt);
+			// Use higher of overridden decision tree or tree enclosing all tokens
+			if ( Trees.isAncestorOf(parser.getOverrideDecisionRoot(), subtree) ) {
+				subtree = parser.getOverrideDecisionRoot();
+			}
+			Trees.stripChildrenOutOfRange(subtree, parser.getOverrideDecisionRoot(), startIndex, stopTreeAt);
+			trees.add(subtree);
+		}
+
+		return trees;
+	}
+
+	/** Derive a new parser from an old one that has knowledge of the grammar.
+	 *  The Grammar object is used to correctly compute outer alternative
+	 *  numbers for parse tree nodes.
+	 * @param g
+	 * @param originalParser
+	 * @param tokens
+	 * @return
+	 */
+	public static ParserInterpreter getAmbuityParserInterpreter(Grammar g, Parser originalParser, TokenStream tokens) {
+		ParserInterpreter parser;
+		if (originalParser instanceof ParserInterpreter) {
+			parser = new GrammarParserInterpreter(g, originalParser.getATN(), originalParser.getTokenStream());
+		}
+		else { // must've been a generated parser
+			char[] serializedAtn = ATNSerializer.getSerializedAsChars(originalParser.getATN());
+			ATN deserialized = new ATNDeserializer().deserialize(serializedAtn);
+			parser = new ParserInterpreter(originalParser.getGrammarFileName(),
+										   originalParser.getVocabulary(),
+										   Arrays.asList(originalParser.getRuleNames()),
+										   deserialized,
+										   tokens);
+		}
+
+		parser.setInputStream(tokens);
+
+		// Make sure that we don't get any error messages from using this temporary parser
+		parser.setErrorHandler(new BailErrorStrategy());
+		parser.removeErrorListeners();
+		parser.removeParseListeners();
+		parser.getInterpreter().setPredictionMode(PredictionMode.LL_EXACT_AMBIG_DETECTION);
+		return parser;
+	}
+
+	/** We want to stop and track the first air but we cannot bail out like
+	 *  {@link BailErrorStrategy} as consume() constructs trees. We make sure
+	 *  to create an error node during recovery with this strategy. We
+	 *  consume() 1 token during the "bail out of rule" mechanism in recover()
+	 *  and let it fall out of the rule to finish constructing trees. For
+	 *  recovery in line, we throw InputMismatchException to engage recover().
+	 */
+	public static class BailButConsumeErrorStrategy extends DefaultErrorStrategy {
+		public int firstErrorTokenIndex = -1;
+		@Override
+		public void recover(Parser recognizer, RecognitionException e) {
+			int errIndex = recognizer.getInputStream().index();
+			if ( firstErrorTokenIndex == -1 ) {
+				firstErrorTokenIndex = errIndex; // latch
+			}
+//			System.err.println("recover: error at " + errIndex);
+			TokenStream input = recognizer.getInputStream();
+			if ( input.index()<input.size()-1 ) { // don't consume() eof
+				recognizer.consume(); // just kill this bad token and let it continue.
+			}
+		}
+
+		@Override
+		public Token recoverInline(Parser recognizer) throws RecognitionException {
+			int errIndex = recognizer.getInputStream().index();
+			if ( firstErrorTokenIndex == -1 ) {
+				firstErrorTokenIndex = errIndex; // latch
+			}
+//			System.err.println("recoverInline: error at " + errIndex);
+			InputMismatchException e = new InputMismatchException(recognizer);
+//			TokenStream input = recognizer.getInputStream(); // seek EOF
+//			input.seek(input.size() - 1);
+			throw e;
+		}
+
+		@Override
+		public void sync(Parser recognizer) { } // don't consume anything; let it fail later
+	}
 }

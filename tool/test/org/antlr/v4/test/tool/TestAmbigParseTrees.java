@@ -14,6 +14,7 @@ import org.antlr.v4.runtime.atn.PredictionMode;
 import org.antlr.v4.runtime.atn.RuleStartState;
 import org.antlr.v4.runtime.atn.Transition;
 import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.tree.Trees;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.GrammarParserInterpreter;
 import org.antlr.v4.tool.LexerGrammar;
@@ -38,8 +39,8 @@ public class TestAmbigParseTrees {
 			"x : B ; \n",
 			lg);
 
-		testInterpAtSpecificAlt(lg, g, "s", 1, "abc", "(s a (x b) c)");
-		testInterpAtSpecificAlt(lg, g, "s", 2, "abc", "(s a b c)");
+		testInterpAtSpecificAlt(lg, g, "s", 1, "abc", "(s:1 a (x:1 b) c)");
+		testInterpAtSpecificAlt(lg, g, "s", 2, "abc", "(s:2 a b c)");
 	}
 
 	@Test public void testAmbigAltsAtRoot() throws Exception {
@@ -60,12 +61,13 @@ public class TestAmbigParseTrees {
 		String input = "abc";
 		String expectedAmbigAlts = "{1, 2}";
 		int decision = 0;
-		String expectedOverallTree = "(s a (x b) c)";
-		String[] expectedParseTrees = {"(s a (x b) c)","(s a b c)"};
+		String expectedOverallTree = "(s:1 a (x:1 b) c)";
+		String[] expectedParseTrees = {"(s:1 a (x:1 b) c)",
+									   "(s:2 a b c)"};
 
-		testInterp(lg, g, startRule, input, decision,
-				   expectedAmbigAlts,
-				   expectedOverallTree, expectedParseTrees);
+		testAmbiguousTrees(lg, g, startRule, input, decision,
+						   expectedAmbigAlts,
+						   expectedOverallTree, expectedParseTrees);
 	}
 
 	@Test public void testAmbigAltsNotAtRoot() throws Exception {
@@ -76,24 +78,25 @@ public class TestAmbigParseTrees {
 			"C : 'c' ;\n");
 		Grammar g = new Grammar(
 			"parser grammar T;\n" +
-			"s : a ;" +
-			"a : b ;" +
-			"b : A x C" +
+			"s : x ;" +
+			"x : y ;" +
+			"y : A z C" +
 			"  | A B C" +
 			"  ;" +
-			"x : B ; \n",
+			"z : B ; \n",
 			lg);
 
 		String startRule = "s";
 		String input = "abc";
 		String expectedAmbigAlts = "{1, 2}";
 		int decision = 0;
-		String expectedOverallTree = "(s (a (b a (x b) c)))";
-		String[] expectedParseTrees = {"(b a (x b) c)","(b a b c)"};
+		String expectedOverallTree = "(s:1 (x:1 (y:1 a (z:1 b) c)))";
+		String[] expectedParseTrees = {"(y:1 a (z:1 b) c)",
+									   "(y:2 a b c)"};
 
-		testInterp(lg, g, startRule, input, decision,
-				   expectedAmbigAlts,
-				   expectedOverallTree, expectedParseTrees);
+		testAmbiguousTrees(lg, g, startRule, input, decision,
+						   expectedAmbigAlts,
+						   expectedOverallTree, expectedParseTrees);
 	}
 
 	@Test public void testAmbigAltDipsIntoOuterContextToRoot() throws Exception {
@@ -104,7 +107,6 @@ public class TestAmbigParseTrees {
 			"DOT : '.' ;\n");
 		Grammar g = new Grammar(
 			"parser grammar T;\n" +
-//			"s : e ;\n"+
 			"e : p (DOT ID)* ;\n"+
 			"p : SELF" +
 			"  | SELF DOT ID" +
@@ -114,13 +116,14 @@ public class TestAmbigParseTrees {
 		String startRule = "e";
 		String input = "self.x";
 		String expectedAmbigAlts = "{1, 2}";
-		int decision = 1; // decision in s
-		String expectedOverallTree = "(e (p self) . x)";
-		String[] expectedParseTrees = {"(e (p self) . x)","(p self . x)"};
+		int decision = 1; // decision in p
+		String expectedOverallTree = "(e:1 (p:1 self) . x)";
+		String[] expectedParseTrees = {"(e:1 (p:1 self) . x)",
+									   "(p:2 self . x)"};
 
-		testInterp(lg, g, startRule, input, decision,
-				   expectedAmbigAlts,
-				   expectedOverallTree, expectedParseTrees);
+		testAmbiguousTrees(lg, g, startRule, input, decision,
+						   expectedAmbigAlts,
+						   expectedOverallTree, expectedParseTrees);
 	}
 
 	@Test public void testAmbigAltDipsIntoOuterContextBelowRoot() throws Exception {
@@ -141,13 +144,14 @@ public class TestAmbigParseTrees {
 		String startRule = "s";
 		String input = "self.x";
 		String expectedAmbigAlts = "{1, 2}";
-		int decision = 1; // decision in s
-		String expectedOverallTree = "(s (e (p self) . x))";
-		String[] expectedParseTrees = {"(e (p self) . x)","(p self . x)"};
+		int decision = 1; // decision in p
+		String expectedOverallTree = "(s:1 (e:1 (p:1 self) . x))";
+		String[] expectedParseTrees = {"(e:1 (p:1 self) . x)", // shouldn't include s
+									   "(p:2 self . x)"};      // shouldn't include e
 
-		testInterp(lg, g, startRule, input, decision,
-				   expectedAmbigAlts,
-				   expectedOverallTree, expectedParseTrees);
+		testAmbiguousTrees(lg, g, startRule, input, decision,
+						   expectedAmbigAlts,
+						   expectedOverallTree, expectedParseTrees);
 	}
 
 	@Test public void testAmbigAltInLeftRecursiveBelowStartRule() throws Exception {
@@ -168,13 +172,14 @@ public class TestAmbigParseTrees {
 		String startRule = "s";
 		String input = "self.x";
 		String expectedAmbigAlts = "{1, 2}";
-		int decision = 1; // decision in s
-		String expectedOverallTree = "(s (e (e (p self)) . x))";
-		String[] expectedParseTrees = {"(e (e (p self)) . x)","(p self . x)"};
+		int decision = 1; // decision in p
+		String expectedOverallTree = "(s:1 (e:2 (e:1 (p:1 self)) . x))";
+		String[] expectedParseTrees = {"(e:2 (e:1 (p:1 self)) . x)",
+									   "(p:2 self . x)"};
 
-		testInterp(lg, g, startRule, input, decision,
-				   expectedAmbigAlts,
-				   expectedOverallTree, expectedParseTrees);
+		testAmbiguousTrees(lg, g, startRule, input, decision,
+						   expectedAmbigAlts,
+						   expectedOverallTree, expectedParseTrees);
 	}
 
 	@Test public void testAmbigAltInLeftRecursiveStartRule() throws Exception {
@@ -194,21 +199,24 @@ public class TestAmbigParseTrees {
 		String startRule = "e";
 		String input = "self.x";
 		String expectedAmbigAlts = "{1, 2}";
-		int decision = 1; // decision in s
-		String expectedOverallTree = "(e (e (p self)) . x)";
-		String[] expectedParseTrees = {"(e (e (p self)) . x)","(p self . x)"};
+		int decision = 1; // decision in p
+		String expectedOverallTree = "(e:2 (e:1 (p:1 self)) . x)";
+		String[] expectedParseTrees = {"(e:2 (e:1 (p:1 self)) . x)",
+									   "(p:2 self . x)"}; // shows just enough for self.x
 
-		testInterp(lg, g, startRule, input, decision,
-				   expectedAmbigAlts,
-				   expectedOverallTree, expectedParseTrees);
+		testAmbiguousTrees(lg, g, startRule, input, decision,
+						   expectedAmbigAlts,
+						   expectedOverallTree, expectedParseTrees);
 	}
 
-	public void testInterp(LexerGrammar lg, Grammar g,
-						   String startRule, String input, int decision,
-						   String expectedAmbigAlts,
-						   String overallTree,
-						   String[] expectedParseTrees)
+	public void testAmbiguousTrees(LexerGrammar lg, Grammar g,
+								   String startRule, String input, int decision,
+								   String expectedAmbigAlts,
+								   String overallTree,
+								   String[] expectedParseTrees)
 	{
+		InterpreterTreeTextProvider nodeTextProvider = new InterpreterTreeTextProvider(g.getRuleNames());
+
 		LexerInterpreter lexEngine = lg.createLexerInterpreter(new ANTLRInputStream(input));
 		CommonTokenStream tokens = new CommonTokenStream(lexEngine);
 		final GrammarParserInterpreter parser = g.createGrammarParserInterpreter(tokens);
@@ -218,7 +226,7 @@ public class TestAmbigParseTrees {
 		// PARSE
 		int ruleIndex = g.rules.get(startRule).index;
 		ParserRuleContext parseTree = parser.parse(ruleIndex);
-		assertEquals(overallTree, parseTree.toStringTree(parser));
+		assertEquals(overallTree, Trees.toStringTree(parseTree, nodeTextProvider));
 		System.out.println();
 
 		DecisionInfo[] decisionInfo = parser.getParseInfo().getDecisionInfo();
@@ -230,17 +238,17 @@ public class TestAmbigParseTrees {
 			GrammarParserInterpreter.getAllPossibleParseTrees(g,
 															  parser,
 															  tokens,
-															  ambiguityInfo.decision,
+															  decision,
 															  ambiguityInfo.ambigAlts,
 															  ambiguityInfo.startIndex,
 															  ambiguityInfo.stopIndex,
 															  ruleIndex);
 		assertEquals(expectedAmbigAlts, ambiguityInfo.ambigAlts.toString());
-
 		assertEquals(ambiguityInfo.ambigAlts.cardinality(), ambiguousParseTrees.size());
+
 		for (int i = 0; i<ambiguousParseTrees.size(); i++) {
 			ParserRuleContext t = ambiguousParseTrees.get(i);
-			assertEquals(expectedParseTrees[i], t.toStringTree(parser));
+			assertEquals(expectedParseTrees[i], Trees.toStringTree(t, nodeTextProvider));
 		}
 	}
 
@@ -251,7 +259,7 @@ public class TestAmbigParseTrees {
 	{
 		LexerInterpreter lexEngine = lg.createLexerInterpreter(new ANTLRInputStream(input));
 		CommonTokenStream tokens = new CommonTokenStream(lexEngine);
-		ParserInterpreter parser = g.createParserInterpreter(tokens);
+		ParserInterpreter parser = g.createGrammarParserInterpreter(tokens);
 		RuleStartState ruleStartState = g.atn.ruleToStartState[g.getRule(startRule).index];
 		Transition tr = ruleStartState.transition(0);
 		ATNState t2 = tr.target;
@@ -260,6 +268,7 @@ public class TestAmbigParseTrees {
 		}
 		parser.addDecisionOverride(((DecisionState)t2).decision, 0, startAlt);
 		ParseTree t = parser.parse(g.rules.get(startRule).index);
-		assertEquals(expectedParseTree, t.toStringTree(parser));
+		InterpreterTreeTextProvider nodeTextProvider = new InterpreterTreeTextProvider(g.getRuleNames());
+		assertEquals(expectedParseTree, Trees.toStringTree(t, nodeTextProvider));
 	}
 }
