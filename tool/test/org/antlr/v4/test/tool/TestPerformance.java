@@ -1943,59 +1943,6 @@ public class TestPerformance extends BaseTest {
 		}
 	}
 
-	/**
-	 * This is a regression test for antlr/antlr4#192 "Poor performance of
-	 * expression parsing".
-	 * https://github.com/antlr/antlr4/issues/192
-	 */
-	@Test(timeout = 60000)
-	public void testExpressionGrammar() {
-		String grammar =
-			"grammar Expr;\n" +
-			"\n" +
-			"program: expr EOF;\n" +
-			"\n" +
-			"expr: ID\n" +
-			"    | 'not' expr\n" +
-			"    | expr 'and' expr\n" +
-			"    | expr 'or' expr\n" +
-			"    ;\n" +
-			"\n" +
-			"ID: [a-zA-Z_][a-zA-Z_0-9]*;\n" +
-			"WS: [ \\t\\n\\r\\f]+ -> skip;\n" +
-			"ERROR: .;\n";
-		String input =
-			"not X1 and not X2 and not X3 and not X4 and not X5 and not X6 and not X7 and not X8 and not X9 and not X10 and not X11 and not X12 or\n" +
-			"    X1 and not X2 and not X3 and not X4 and not X5 and not X6 and not X7 and not X8 and not X9 and not X10 and not X11 and not X12 or\n" +
-			"not X1 and     X2 and not X3 and not X4 and not X5 and not X6 and not X7 and not X8 and not X9 and not X10 and not X11 and not X12 or\n" +
-			"not X1 and not X2 and     X3 and not X4 and not X5 and not X6 and not X7 and not X8 and not X9 and not X10 and not X11 and not X12 or\n" +
-			"not X1 and not X2 and not X3 and     X4 and not X5 and not X6 and not X7 and not X8 and not X9 and not X10 and not X11 and not X12 or\n" +
-			"not X1 and not X2 and not X3 and not X4 and     X5 and not X6 and not X7 and not X8 and not X9 and not X10 and not X11 and not X12 or\n" +
-			"not X1 and not X2 and not X3 and not X4 and not X5 and     X6 and not X7 and not X8 and not X9 and not X10 and not X11 and not X12 or\n" +
-			"not X1 and not X2 and not X3 and not X4 and not X5 and not X6 and     X7 and not X8 and not X9 and not X10 and not X11 and not X12 or\n" +
-			"not X1 and not X2 and not X3 and not X4 and not X5 and not X6 and not X7 and     X8 and not X9 and not X10 and not X11 and not X12 or\n" +
-			"not X1 and not X2 and not X3 and not X4 and not X5 and not X6 and not X7 and not X8 and     X9 and not X10 and not X11 and not X12 or\n" +
-			"not X1 and not X2 and not X3 and not X4 and not X5 and not X6 and not X7 and not X8 and not X9 and     X10 and not X11 and not X12 or\n" +
-			"not X1 and not X2 and not X3 and not X4 and not X5 and not X6 and not X7 and not X8 and not X9 and not X10 and     X11 and not X12 or\n" +
-			"not X1 and not X2 and not X3 and not X4 and not X5 and not X6 and not X7 and not X8 and not X9 and not X10 and not X11 and     X12\n";
-
-		String found = execParser("Expr.g4", grammar, "ExprParser", "ExprLexer", "program",
-								  input, false);
-		Assert.assertEquals("", found);
-		Assert.assertEquals(null, stderrDuringParse);
-
-		List<String> inputs = new ArrayList<String>();
-		for (int i = 0; i < 10; i++) {
-			inputs.add(input);
-		}
-
-		input = Utils.join(inputs.iterator(), " or\n");
-		found = execParser("Expr.g4", grammar, "ExprParser", "ExprLexer", "program",
-								  input, false);
-		Assert.assertEquals("", found);
-		Assert.assertEquals(null, stderrDuringParse);
-	}
-
 	@Test(timeout = 20000)
 	public void testExponentialInclude() {
 		String grammarFormat =

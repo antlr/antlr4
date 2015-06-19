@@ -112,6 +112,9 @@ public void test<test.name>() throws Exception {
 
 testAnnotations(test) ::= <%
 @Test
+<if(test.Options.("Timeout"))>
+(timeout = <test.Options.("Timeout")>)
+<endif>
 <if(test.Options.("Ignore"))>
 <\n>@Ignore(<writeStringLiteral(test.Options.("Ignore"))>)
 <elseif(IgnoredTests.(({<file.name>.<test.name>})))>
