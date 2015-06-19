@@ -17,6 +17,7 @@ nbactions*.xml
 
 # IntelliJ projects
 *.iws
+*.iml
 .idea/*
 
 # Eclipse projects
