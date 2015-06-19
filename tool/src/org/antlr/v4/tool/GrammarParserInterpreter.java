@@ -1,3 +1,32 @@
+/*
+ * [The "BSD license"]
+ *  Copyright (c) 2012 Terence Parr
+ *  Copyright (c) 2012 Sam Harwell
+ *  All rights reserved.
+ *
+ *  Redistribution and use in source and binary forms, with or without
+ *  modification, are permitted provided that the following conditions
+ *  are met:
+ *
+ *  1. Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ *  2. Redistributions in binary form must reproduce the above copyright
+ *     notice, this list of conditions and the following disclaimer in the
+ *     documentation and/or other materials provided with the distribution.
+ *  3. The name of the author may not be used to endorse or promote products
+ *     derived from this software without specific prior written permission.
+ *
+ *  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+ *  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ *  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+ *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ *  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 package org.antlr.v4.tool;
 
 import org.antlr.v4.runtime.BailErrorStrategy;
@@ -21,6 +50,7 @@ import org.antlr.v4.runtime.atn.RuleStartState;
 import org.antlr.v4.runtime.atn.StarLoopEntryState;
 import org.antlr.v4.runtime.tree.Trees;
 
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
@@ -273,7 +303,7 @@ public class GrammarParserInterpreter extends ParserInterpreter {
 	{
 		List<ParserRuleContext> trees = new ArrayList<ParserRuleContext>();
 		// Create a new parser interpreter to parse the ambiguous subphrase
-		ParserInterpreter parser = getAmbuityParserInterpreter(g, originalParser, tokens);
+		ParserInterpreter parser = deriveTempParserInterpreter(g, originalParser, tokens);
 
 		// get ambig trees
 		int alt = alts.nextSetBit(0);
@@ -282,7 +312,6 @@ public class GrammarParserInterpreter extends ParserInterpreter {
 			// (don't have to do first as it's been parsed, but do again for simplicity
 			//  using this temp parser.)
 			parser.reset();
-			parser.getTokenStream().seek(0); // rewind the input all the way for re-parsing
 			parser.addDecisionOverride(decision, startIndex, alt);
 			ParserRuleContext t = parser.parse(startRuleIndex);
 			GrammarInterpreterRuleContext ambigSubTree =
@@ -298,15 +327,33 @@ public class GrammarParserInterpreter extends ParserInterpreter {
 		return trees;
 	}
 
-	// we must parse the entire input now with decision overrides
-		// we cannot parse a subset because it could be that a decision
-		// above our decision of interest needs to read way past
-		// lookaheadInfo.stopIndex. It seems like there is no escaping
-		// the use of a full and complete token stream if we are
-		// resetting to token index 0 and re-parsing from the start symbol.
-		// It's not easy to restart parsing somewhere in the middle like a
-		// continuation because our call stack does not match the
-		// tree stack because of left recursive rule rewriting. grrrr!
+
+	/** Return a list of parse trees, one for each alternative in a decision
+	 *  given the same input.
+	 *
+	 *  Very similar to {@link #getAllPossibleParseTrees} except
+	 *  that it re-parses the input for every alternative in a decision,
+	 *  not just the ambiguous ones (there is no alts parameter here).
+	 *  This method also tries to reduce the size of the parse trees
+	 *  by stripping away children of the tree that are completely out of range
+	 *  of startIndex..stopIndex. Also, because errors are expected, we
+	 *  use a specialized error handler that more or less bails out
+	 *  but that also consumes the first erroneous token at least. This
+	 *  ensures that an error node will be in the parse tree for display.
+	 *
+	 *  NOTES:
+    // we must parse the entire input now with decision overrides
+	// we cannot parse a subset because it could be that a decision
+	// above our decision of interest needs to read way past
+	// lookaheadInfo.stopIndex. It seems like there is no escaping
+	// the use of a full and complete token stream if we are
+	// resetting to token index 0 and re-parsing from the start symbol.
+	// It's not easy to restart parsing somewhere in the middle like a
+	// continuation because our call stack does not match the
+	// tree stack because of left recursive rule rewriting. grrrr!
+	 *
+	 * @since 4.5.1
+	 */
 	public static List<ParserRuleContext> getLookaheadParseTrees(Grammar g,
 																 ParserInterpreter originalParser,
 																 TokenStream tokens,
@@ -317,7 +364,7 @@ public class GrammarParserInterpreter extends ParserInterpreter {
 	{
 		List<ParserRuleContext> trees = new ArrayList<ParserRuleContext>();
 		// Create a new parser interpreter to parse the ambiguous subphrase
-		ParserInterpreter parser = getAmbuityParserInterpreter(g, originalParser, tokens);
+		ParserInterpreter parser = deriveTempParserInterpreter(g, originalParser, tokens);
 		BailButConsumeErrorStrategy errorHandler = new BailButConsumeErrorStrategy();
 		parser.setErrorHandler(errorHandler);
 
@@ -351,16 +398,20 @@ public class GrammarParserInterpreter extends ParserInterpreter {
 
 	/** Derive a new parser from an old one that has knowledge of the grammar.
 	 *  The Grammar object is used to correctly compute outer alternative
-	 *  numbers for parse tree nodes.
-	 * @param g
-	 * @param originalParser
-	 * @param tokens
-	 * @return
+	 *  numbers for parse tree nodes. A parser of the same type is created
+	 *  for subclasses of {@link ParserInterpreter}.
 	 */
-	public static ParserInterpreter getAmbuityParserInterpreter(Grammar g, Parser originalParser, TokenStream tokens) {
+	public static ParserInterpreter deriveTempParserInterpreter(Grammar g, Parser originalParser, TokenStream tokens) {
 		ParserInterpreter parser;
 		if (originalParser instanceof ParserInterpreter) {
-			parser = new GrammarParserInterpreter(g, originalParser.getATN(), originalParser.getTokenStream());
+			Class<? extends ParserInterpreter> c = originalParser.getClass().asSubclass(ParserInterpreter.class);
+			try {
+				Constructor<? extends ParserInterpreter> ctor = c.getConstructor(Grammar.class, ATN.class, TokenStream.class);
+				parser = ctor.newInstance(g, originalParser.getATN(), originalParser.getTokenStream());
+			}
+			catch (Exception e) {
+				throw new IllegalArgumentException("can't create parser to match incoming "+originalParser.getClass().getSimpleName(), e);
+			}
 		}
 		else { // must've been a generated parser
 			char[] serializedAtn = ATNSerializer.getSerializedAsChars(originalParser.getATN());
@@ -382,7 +433,7 @@ public class GrammarParserInterpreter extends ParserInterpreter {
 		return parser;
 	}
 
-	/** We want to stop and track the first air but we cannot bail out like
+	/** We want to stop and track the first error but we cannot bail out like
 	 *  {@link BailErrorStrategy} as consume() constructs trees. We make sure
 	 *  to create an error node during recovery with this strategy. We
 	 *  consume() 1 token during the "bail out of rule" mechanism in recover()
