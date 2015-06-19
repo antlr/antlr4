@@ -1,0 +1,121 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.sonatype.oss</groupId>
+    <artifactId>oss-parent</artifactId>
+    <version>9</version>
+  </parent>
+  <groupId>org.antlr</groupId>
+  <artifactId>antlr4-master</artifactId>
+  <version>4.5.1-SNAPSHOT</version>
+  <packaging>pom</packaging>
+
+  <name>ANTLR 4</name>
+  <description>ANTLR 4 Master Build POM</description>
+  <url>http://www.antlr.org</url>
+  <inceptionYear>1992</inceptionYear>
+  <organization>
+    <name>ANTLR</name>
+    <url>http://www.antlr.org</url>
+  </organization>
+
+  <licenses>
+    <license>
+      <name>The BSD License</name>
+      <url>http://www.antlr.org/license.html</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+  <developers>
+    <developer>
+      <name>Terence Parr</name>
+      <url>http://antlr.org/wiki/display/~admin/Home</url>
+      <roles>
+        <role>Project lead - ANTLR</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Sam Harwell</name>
+      <url>http://tunnelvisionlabs.com</url>
+      <roles>
+        <role>Developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Eric Vergnaud</name>
+      <roles>
+        <role>Developer - JavaScript, C#, Python 2, Python 3</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Jim Idle</name>
+      <email>jimi@idle.ws</email>
+      <url>http://www.linkedin.com/in/jimidle</url>
+      <roles>
+        <role>Developer - Maven Plugin</role>
+      </roles>
+    </developer>
+  </developers>
+
+  <modules>
+    <module>runtime/Java</module>
+    <module>tool</module>
+    <module>antlr4-maven-plugin</module>
+    <module>antlr4-testgen-maven-plugin</module>
+    <module>runtime-testsuite</module>
+  </modules>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <antlr.testinprocess>true</antlr.testinprocess>
+    <java.version>1.6</java.version>
+  </properties>
+
+  <mailingLists>
+    <mailingList>
+      <name>antlr-discussion</name>
+      <archive>https://groups.google.com/forum/?fromgroups#!forum/antlr-discussion</archive>
+    </mailingList>
+  </mailingLists>
+
+  <issueManagement>
+    <system>GitHub Issues</system>
+    <url>https://github.com/antlr/antlr4/issues</url>
+  </issueManagement>
+
+  <scm>
+    <url>https://github.com/antlr/antlr4/tree/master</url>
+    <connection>scm:git:git://github.com/antlr/antlr4.git</connection>
+    <developerConnection>scm:git:git@github.com:antlr/antlr4.git</developerConnection>
+    <tag>HEAD</tag>
+  </scm>
+
+  <build>
+    <resources>
+      <resource>
+        <directory>resources</directory>
+      </resource>
+    </resources>
+    <testSourceDirectory>test</testSourceDirectory>
+    <testResources>
+      <testResource>
+        <directory>test</directory>
+      </testResource>
+    </testResources>    
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <configuration>          
+            <source>${java.version}</source>
+            <target>${java.version}</target>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>  
+</project>

@@ -32,7 +32,6 @@ package org.antlr.mojo.antlr4;
 import org.antlr.v4.Tool;
 import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.runtime.misc.MultiMap;
-import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Utils;
 import org.antlr.v4.tool.Grammar;
 import org.apache.maven.plugin.AbstractMojo;
