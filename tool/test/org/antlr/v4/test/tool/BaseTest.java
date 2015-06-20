@@ -79,6 +79,7 @@ import javax.tools.JavaCompiler;
 import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -112,6 +113,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+@SuppressWarnings("resource")
 public abstract class BaseTest {
 	// -J-Dorg.antlr.v4.test.BaseTest.level=FINE
 	private static final Logger LOGGER = Logger.getLogger(BaseTest.class.getName());
