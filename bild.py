@@ -102,7 +102,7 @@ def compile():
         javac(TARGETS[t] + "/tool/src",  "out", version="1.6", cp=cp, args=args)
     # pull in generated runtime tests and runtime test support code
     # Special case: python2 needs code from python3
-    javac(uniformpath(TARGETS['Python3'])+"/tool/test/org/antlr/v4/test/runtime/python2/BasePythonTest.java",
+    javac(uniformpath(TARGETS['Python3'])+"/tool/test/org/antlr/v4/test/runtime/python/BasePythonTest.java",
           "out", version="1.6", cp=cp, args=args)
     skip = ['org/antlr/v4/test/rt',
             'org/antlr/v4/test/runtime/javascript/chrome',
