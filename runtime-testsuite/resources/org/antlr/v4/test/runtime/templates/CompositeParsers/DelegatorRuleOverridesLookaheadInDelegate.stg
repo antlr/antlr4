@@ -23,7 +23,7 @@ masterGrammar(grammarName, slaveGrammarName) ::= <<
 grammar M;
 import S;
 prog : decl ;
-type : 'int' | 'float' ;
+type_ : 'int' | 'float' ;
 ID  : 'a'..'z'+ ;
 INT : '0'..'9'+ ;
 WS : (' '|'\n') -> skip;
@@ -31,8 +31,8 @@ WS : (' '|'\n') -> skip;
 
 slaveGrammar(grammarName) ::= <<
 parser grammar S;
-type : 'int' ;
-decl : type ID ';'
-	| type ID init ';' {<write("\"JavaDecl: \" + $text")>};
+type_ : 'int' ;
+decl : type_ ID ';'
+	| type_ ID init ';' {<write("\"JavaDecl: \" + $text")>};
 init : '=' INT;
 >>
