@@ -10,7 +10,7 @@ Grammar ::= [
 
 Input() ::= "( ~FORCE_ERROR~ "
 
-Rule() ::= "a"
+Rule() ::= "stat"
 
 Output() ::= <<
 >>
