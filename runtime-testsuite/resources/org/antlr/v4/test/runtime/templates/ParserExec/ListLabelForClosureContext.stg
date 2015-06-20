@@ -25,9 +25,6 @@ Errors() ::= ""
 grammar(grammarName) ::= <<
 grammar <grammarName>;
 ifStatement
-@after {
-<DeclareListLocal("items","$ctx.elseIfStatement()")> 
-}
     : 'if' expression
       ( ( 'then'
           executableStatement*

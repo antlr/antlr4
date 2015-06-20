@@ -14,6 +14,7 @@ import org.antlr.v4.test.tool.ErrorQueue;
 import org.antlr.v4.tool.Grammar;
 <endif>
 
+@SuppressWarnings("unused")
 public class Test<file.name> extends BaseTest {
 
 	<file.tests:{test | <test>}; separator="\n", wrap, anchor>
@@ -170,8 +171,6 @@ Append(a,b) ::= "<a> + <b>"
 Concat(a,b) ::= "<a><b>"
 
 DeclareLocal(s,v) ::= "Object <s> = <v>;"
-
-DeclareListLocal(s,v) ::= "List <s> = <v>;"
 
 AssignLocal(s,v) ::= "<s> = <v>;"
 
