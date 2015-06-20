@@ -26,7 +26,7 @@ grammar(grammarName) ::= <<
 grammar <grammarName>;
 ifStatement
 @after {
-<DeclareListLocal("items","$ctx.elseIfStatement()")> 
+<CheckVectorContext("items","$ctx.elseIfStatement()")> 
 }
     : 'if' expression
       ( ( 'then'
