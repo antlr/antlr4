@@ -134,7 +134,7 @@ from .<superClass> import <superClass>
 
 class <parser.name> ( <if(superClass)><superClass><else>Parser<endif> ):
 
-    grammarFileName = "<parser.grammarFileName">"
+    grammarFileName = "<parser.grammarFileName>"
 
     atn = ATNDeserializer().deserialize(serializedATN())
 
