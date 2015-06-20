@@ -12,7 +12,7 @@ public abstract class BasePython2Test extends BasePythonTest {
 
 	@Override
 	protected String getPythonExecutable() {
-		return "Python2.7";
+		return "python2.7";
 	}
 
 	@Override
