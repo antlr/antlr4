@@ -155,6 +155,8 @@ writeln(s) ::= <<System.out.println(<s>);>>
 
 write(s) ::= <<System.out.print(<s>);>>
 
+more() ::= " "
+
 False() ::= "false"
 
 True() ::= "true"
