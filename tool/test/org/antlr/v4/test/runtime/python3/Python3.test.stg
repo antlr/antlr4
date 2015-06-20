@@ -1,8 +1,4 @@
 IgnoredTests ::= [
-	"CompositeParsers.DelegatorInvokesDelegateRuleWithArgs": "Not yet updated for Python 3",
-	"CompositeParsers.DelegatorRuleOverridesLookaheadInDelegate": "Not yet updated for Python 3",
-	"ParserErrors.SingleTokenDeletionConsumption": "Not yet updated for Python 3",
-	"ParserErrors.SingleSetInsertionConsumption": "Not yet updated for Python 3",
 	default: false
 ]
 
@@ -20,6 +16,7 @@ import org.antlr.v4.test.tool.ErrorQueue;
 import org.antlr.v4.tool.Grammar;
 <endif>
 
+@SuppressWarnings("unused")
 public class Test<file.name> extends BasePython3Test {
 
 	<file.tests:{test | <test>}; separator="\n", wrap, anchor>
@@ -163,6 +160,8 @@ writeln(s) ::= <<print(<s>)>>
 
 write(s) ::= <<print(<s>,end='')>>
 
+more() ::= "; "
+
 False() ::= "False"
 
 True() ::= "True"
@@ -178,8 +177,6 @@ Append(a,b) ::= "<a> + str(<b>)"
 Concat(a,b) ::= "<a><b>"
 
 DeclareLocal(s,v) ::= "<s> = <v>"
-
-DeclareListLocal(s,v) ::= "<s> = <v>;"
 
 AssignLocal(s,v) ::= "<s> = <v>"
 
