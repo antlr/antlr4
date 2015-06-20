@@ -493,9 +493,12 @@ public class TestParserExec extends BasePython2Test {
 	public void testListLabelForClosureContext() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(379);
+		StringBuilder grammarBuilder = new StringBuilder(428);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("ifStatement\n");
+		grammarBuilder.append("@after {\n");
+		grammarBuilder.append("items = list($ctx.elseIfStatement()) \n");
+		grammarBuilder.append("}\n");
 		grammarBuilder.append("    : 'if' expression\n");
 		grammarBuilder.append("      ( ( 'then'\n");
 		grammarBuilder.append("          executableStatement*\n");

@@ -198,6 +198,8 @@ ModMemberEquals(n,m,v) ::= <%self.<n> % <m> == <v>%>
 
 ModMemberNotEquals(n,m,v) ::= <%self.<n> % <m> != <v>%>
 
+CheckVectorContext(s,v) ::= "<s> = list(<v>)"
+
 DumpDFA() ::= "self.dumpDFA()"
 
 Pass() ::= "pass"
