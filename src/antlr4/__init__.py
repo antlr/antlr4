@@ -1,4 +1,5 @@
 from antlr4.Token import Token
+from antlr4.InputStream import InputStream
 from antlr4.FileStream import FileStream
 from antlr4.BufferedTokenStream import TokenStream
 from antlr4.CommonTokenStream import CommonTokenStream
