@@ -150,6 +150,8 @@ writeln(s) ::= <<Console.WriteLine(<s>);>>
 
 write(s) ::= <<Console.Write(<s>);>>
 
+more() ::= " "
+
 False() ::= "false"
 
 True() ::= "true"
