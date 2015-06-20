@@ -156,6 +156,8 @@ writeln(s) ::= <<document.getElementById('output').value += <s> + '\\n';>>
 
 write(s) ::= <<document.getElementById('output').value += <s>;>>
 
+more() ::= " "
+
 False() ::= "false"
 
 True() ::= "true"
