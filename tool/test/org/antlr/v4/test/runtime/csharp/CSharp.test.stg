@@ -188,6 +188,8 @@ ModMemberEquals(n,m,v) ::= <%this.<n> % <m> == <v>%>
 
 ModMemberNotEquals(n,m,v) ::= <%this.<n> % <m> != <v>%>
 
+CheckVectorContext(s,v) ::= "Object[] <s> = <v>;"
+
 DumpDFA() ::= "this.DumpDFA();"
 
 Pass() ::= ""
