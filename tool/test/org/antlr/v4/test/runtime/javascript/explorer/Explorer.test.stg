@@ -194,6 +194,8 @@ ModMemberEquals(n,m,v) ::= <%this.<n> % <m> === <v>%>
 
 ModMemberNotEquals(n,m,v) ::= <%this.<n> % <m> != <v>%>
 
+CheckVectorContext(s,v) ::= "<s> = [].concat(<v>);"
+
 DumpDFA() ::= "this.dumpDFA();"
 
 Pass() ::= ""

@@ -17,7 +17,7 @@ public class TestCompositeParsers extends BaseTest {
 		mkdir(tmpdir);
 		String slave_S =
 			"parser grammar S;\n" +
-			"a[int x] returns [int y] : B {document.getElementById('output').value += \"S.a\";$y=1000;} ;";
+			"a[int x] returns [int y] : B {document.getElementById('output').value += \"S.a\"; $y=1000;} ;";
 		writeFile(tmpdir, "S.g4", slave_S);
 
 		StringBuilder grammarBuilder = new StringBuilder(175);
