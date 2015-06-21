@@ -105,7 +105,7 @@ namespace Antlr4.Runtime
         /// <summary>The token type for the current token</summary>
 		private int _type;
 
-		private readonly List<int> _modeStack = new List<int>();
+        private readonly Stack<int> _modeStack = new Stack<int>();
 
 		private int _mode = Antlr4.Runtime.Lexer.DefaultMode;
 
@@ -254,7 +254,7 @@ outer_continue: ;
 
         public virtual void PushMode(int m)
         {
-            _modeStack.Add(_mode);
+            _modeStack.Push(_mode);
             Mode(m);
         }
 
@@ -265,8 +265,7 @@ outer_continue: ;
                 throw new InvalidOperationException();
             }
 
-            int mode = _modeStack[_modeStack.Count - 1];
-            _modeStack.RemoveAt(_modeStack.Count - 1);
+            int mode = _modeStack.Pop();
             Mode(mode);
             return _mode;
         }
@@ -491,6 +490,40 @@ outer_continue: ;
             {
                 int channel = value;
                 _channel = channel;
+            }
+        }
+
+        public virtual Stack<int> ModeStack
+        {
+            get
+            {
+                return _modeStack;
+            }
+        }
+
+        public virtual int CurrentMode
+        {
+            get
+            {
+                return _mode;
+            }
+            set
+            {
+                int mode = value;
+                _mode = mode;
+            }
+        }
+
+        public virtual bool HitEOF
+        {
+            get
+            {
+                return _hitEOF;
+            }
+            set
+            {
+                bool hitEOF = value;
+                _hitEOF = hitEOF;
             }
         }
 
