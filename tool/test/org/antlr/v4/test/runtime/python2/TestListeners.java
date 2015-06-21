@@ -12,12 +12,17 @@ public class TestListeners extends BasePython2Test {
 	public void testTokenGetters_1() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(535);
+		StringBuilder grammarBuilder = new StringBuilder(660);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("@parser::header {\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("@parser::members {\n");
+		grammarBuilder.append("if __name__ is not None and \".\" in __name__:\n");
+		grammarBuilder.append("    from .TListener import TListener\n");
+		grammarBuilder.append("else:\n");
+		grammarBuilder.append("    from TListener import TListener\n");
+		grammarBuilder.append("\n");
 		grammarBuilder.append("class LeafListener(TListener):\n");
 		grammarBuilder.append("    def exitA(self, ctx):\n");
 		grammarBuilder.append("        if ctx.getChildCount()==2:\n");
@@ -60,12 +65,17 @@ public class TestListeners extends BasePython2Test {
 	public void testBasic() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(386);
+		StringBuilder grammarBuilder = new StringBuilder(511);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("@parser::header {\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("@parser::members {\n");
+		grammarBuilder.append("if __name__ is not None and \".\" in __name__:\n");
+		grammarBuilder.append("    from .TListener import TListener\n");
+		grammarBuilder.append("else:\n");
+		grammarBuilder.append("    from TListener import TListener\n");
+		grammarBuilder.append("\n");
 		grammarBuilder.append("class LeafListener(TListener):\n");
 		grammarBuilder.append("    def visitTerminal(self, node):\n");
 		grammarBuilder.append("        print(node.symbol.text)\n");
@@ -106,12 +116,17 @@ public class TestListeners extends BasePython2Test {
 	public void testTokenGetters_2() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(535);
+		StringBuilder grammarBuilder = new StringBuilder(660);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("@parser::header {\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("@parser::members {\n");
+		grammarBuilder.append("if __name__ is not None and \".\" in __name__:\n");
+		grammarBuilder.append("    from .TListener import TListener\n");
+		grammarBuilder.append("else:\n");
+		grammarBuilder.append("    from TListener import TListener\n");
+		grammarBuilder.append("\n");
 		grammarBuilder.append("class LeafListener(TListener):\n");
 		grammarBuilder.append("    def exitA(self, ctx):\n");
 		grammarBuilder.append("        if ctx.getChildCount()==2:\n");
@@ -154,12 +169,17 @@ public class TestListeners extends BasePython2Test {
 	public void testLRWithLabels() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(527);
+		StringBuilder grammarBuilder = new StringBuilder(652);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("@parser::header {\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("@parser::members {\n");
+		grammarBuilder.append("if __name__ is not None and \".\" in __name__:\n");
+		grammarBuilder.append("    from .TListener import TListener\n");
+		grammarBuilder.append("else:\n");
+		grammarBuilder.append("    from TListener import TListener\n");
+		grammarBuilder.append("\n");
 		grammarBuilder.append("class LeafListener(TListener):\n");
 		grammarBuilder.append("    def exitCall(self, ctx):\n");
 		grammarBuilder.append("        print(ctx.e().start.text + ' ' + str(ctx.eList()))\n");
@@ -205,12 +225,17 @@ public class TestListeners extends BasePython2Test {
 	public void testRuleGetters_1() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(572);
+		StringBuilder grammarBuilder = new StringBuilder(697);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("@parser::header {\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("@parser::members {\n");
+		grammarBuilder.append("if __name__ is not None and \".\" in __name__:\n");
+		grammarBuilder.append("    from .TListener import TListener\n");
+		grammarBuilder.append("else:\n");
+		grammarBuilder.append("    from TListener import TListener\n");
+		grammarBuilder.append("\n");
 		grammarBuilder.append("class LeafListener(TListener):\n");
 		grammarBuilder.append("    def exitA(self, ctx):\n");
 		grammarBuilder.append("        if ctx.getChildCount()==2:\n");
@@ -254,12 +279,17 @@ public class TestListeners extends BasePython2Test {
 	public void testLR() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(547);
+		StringBuilder grammarBuilder = new StringBuilder(672);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("@parser::header {\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("@parser::members {\n");
+		grammarBuilder.append("if __name__ is not None and \".\" in __name__:\n");
+		grammarBuilder.append("    from .TListener import TListener\n");
+		grammarBuilder.append("else:\n");
+		grammarBuilder.append("    from TListener import TListener\n");
+		grammarBuilder.append("\n");
 		grammarBuilder.append("class LeafListener(TListener):\n");
 		grammarBuilder.append("    def exitE(self, ctx):\n");
 		grammarBuilder.append("        if ctx.getChildCount()==3:\n");
@@ -307,12 +337,17 @@ public class TestListeners extends BasePython2Test {
 	public void testRuleGetters_2() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(572);
+		StringBuilder grammarBuilder = new StringBuilder(697);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("@parser::header {\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("@parser::members {\n");
+		grammarBuilder.append("if __name__ is not None and \".\" in __name__:\n");
+		grammarBuilder.append("    from .TListener import TListener\n");
+		grammarBuilder.append("else:\n");
+		grammarBuilder.append("    from TListener import TListener\n");
+		grammarBuilder.append("\n");
 		grammarBuilder.append("class LeafListener(TListener):\n");
 		grammarBuilder.append("    def exitA(self, ctx):\n");
 		grammarBuilder.append("        if ctx.getChildCount()==2:\n");

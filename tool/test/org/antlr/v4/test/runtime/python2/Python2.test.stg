@@ -297,6 +297,11 @@ def isIdentifierChar(c):
 >>
 
 BasicListener(X) ::= <<
+if __name__ is not None and "." in __name__:
+    from .<X>Listener import <X>Listener
+else:
+    from <X>Listener import <X>Listener
+
 class LeafListener(TListener):
     def visitTerminal(self, node):
         print(node.symbol.text)
@@ -309,6 +314,11 @@ walker.walk(TParser.LeafListener(), <s>)
 >>
 
 TokenGetterListener(X) ::= <<
+if __name__ is not None and "." in __name__:
+    from .<X>Listener import <X>Listener
+else:
+    from <X>Listener import <X>Listener
+
 class LeafListener(TListener):
     def exitA(self, ctx):
         if ctx.getChildCount()==2:
@@ -319,6 +329,11 @@ class LeafListener(TListener):
 >>
 
 RuleGetterListener(X) ::= <<
+if __name__ is not None and "." in __name__:
+    from .<X>Listener import <X>Listener
+else:
+    from <X>Listener import <X>Listener
+
 class LeafListener(TListener):
     def exitA(self, ctx):
         if ctx.getChildCount()==2:
@@ -330,6 +345,11 @@ class LeafListener(TListener):
 
 
 LRListener(X) ::= <<
+if __name__ is not None and "." in __name__:
+    from .<X>Listener import <X>Listener
+else:
+    from <X>Listener import <X>Listener
+
 class LeafListener(TListener):
     def exitE(self, ctx):
         if ctx.getChildCount()==3:
@@ -340,6 +360,11 @@ class LeafListener(TListener):
 >>
 
 LRWithLabelsListener(X) ::= <<
+if __name__ is not None and "." in __name__:
+    from .<X>Listener import <X>Listener
+else:
+    from <X>Listener import <X>Listener
+
 class LeafListener(TListener):
     def exitCall(self, ctx):
         print(ctx.e().start.text + ' ' + str(ctx.eList()))

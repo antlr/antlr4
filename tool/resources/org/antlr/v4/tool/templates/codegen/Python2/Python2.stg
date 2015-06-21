@@ -35,7 +35,6 @@
  *
  *  REQUIRED.
  */
-VERSION() ::= "4.3" // use just "x.y" and don't include bug fix release number
 
 pythonTypeInitMap ::= [
 	"bool":"False",
@@ -53,27 +52,10 @@ ParserFile(file, parser, namedActions) ::= <<
 from __future__ import print_function
 from antlr4 import *
 from io import StringIO
-<if(file.genListener || file.genVisitor)>
-package = globals().get("__package__", None)
-ischild = len(package)>0 if package is not None else False
-if ischild:
-    <if(file.genListener)>
-    from .<file.parser.grammarName>Listener import <file.parser.grammarName>Listener
-    <endif>
-    <if(file.genVisitor)>
-    from .<file.parser.grammarName>Visitor import <file.parser.grammarName>Visitor
-    <endif>
-else:
-    <if(file.genListener)>
-    from <file.parser.grammarName>Listener import <file.parser.grammarName>Listener
-    <endif>
-    <if(file.genVisitor)>
-    from <file.parser.grammarName>Visitor import <file.parser.grammarName>Visitor
-    <endif>
-<endif>
 
 <namedActions.header>
 <parser>
+
 >>
 
 ListenerFile(file, header) ::= <<
@@ -118,7 +100,7 @@ def visit<lname; format="cap">(self, ctx):
 
 
 fileHeader(grammarFileName, ANTLRVersion) ::= <<
-# Generated from <grammarFileName"> by ANTLR <ANTLRVersion>
+# Generated from <grammarFileName> by ANTLR <ANTLRVersion>
 >>
 
 Parser(parser, funcs, atn, sempredFuncs, superClass) ::= <<
@@ -693,14 +675,14 @@ class <struct.name>(<currentRule.name; format="cap">Context):
 
 ListenerDispatchMethod(method) ::= <<
 def <if(method.isEnter)>enter<else>exit<endif>Rule(self, listener):
-    if isinstance( listener, <parser.grammarName>Listener ):
+    if hasattr(listener, "<if(method.isEnter)>enter<else>exit<endif><struct.derivedFromName; format="cap">"):
         listener.<if(method.isEnter)>enter<else>exit<endif><struct.derivedFromName; format="cap">(self)
 
 >>
 
 VisitorDispatchMethod(method) ::= <<
 def accept(self, visitor):
-    if isinstance( visitor, <parser.grammarName>Visitor ):
+    if hasattr(visitor, "visit<struct.derivedFromName; format="cap">"):
         return visitor.visit<struct.derivedFromName; format="cap">(self)
     else:
         return visitor.visitChildren(self)
