@@ -181,23 +181,18 @@
     <Compile Include="RuleDependencyAttribute.cs" />
     <Compile Include="RuleVersionAttribute.cs" />
     <Compile Include="Sharpen\Arrays.cs" />
-    <Compile Include="Sharpen\AtomicReference`1.cs" />
     <Compile Include="Sharpen\BitSet.cs" />
     <Compile Include="Sharpen\Collections.cs" />
-    <Compile Include="Sharpen\Compat\CollectionDebuggerView`2.cs" />
-    <Compile Include="Sharpen\Compat\ConcurrentDictionary`2.cs" />
     <Compile Include="Sharpen\Compat\Enumerable.cs" />
     <Compile Include="Sharpen\Compat\ExtensionAttribute.cs" />
     <Compile Include="Sharpen\Compat\Funcs.cs" />
     <Compile Include="Sharpen\Compat\IStructuralComparable.cs" />
     <Compile Include="Sharpen\Compat\IStructuralEquatable.cs" />
-    <Compile Include="Sharpen\Compat\SplitOrderedList`2.cs" />
     <Compile Include="Sharpen\Compat\Tuple.cs" />
     <Compile Include="Sharpen\Compat\Tuples.cs" />
     <Compile Include="Sharpen\DictionaryExtensions.cs" />
     <Compile Include="Sharpen\ListExtensions.cs" />
     <Compile Include="Sharpen\Runtime.cs" />
-    <Compile Include="Sharpen\SequenceEqualityComparer`1.cs" />
     <Compile Include="TokenStreamRewriter.cs" />
     <Compile Include="TokenTypes.cs" />
     <Compile Include="Tree\AbstractParseTreeVisitor`1.cs" />
@@ -240,6 +235,11 @@
     </None>
     <Compile Include="Recognizer.cs" />
     <Compile Include="Sharpen\Compat\HashSet.cs" />
+    <Compile Include="Sharpen\Compat\CollectionDebuggerView.cs" />
+    <Compile Include="Sharpen\Compat\ConcurrentDictionary.cs" />
+    <Compile Include="Sharpen\Compat\SplitOrderedList.cs" />
+    <Compile Include="Sharpen\AtomicReference.cs" />
+    <Compile Include="Sharpen\SequenceEqualityComparer.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
