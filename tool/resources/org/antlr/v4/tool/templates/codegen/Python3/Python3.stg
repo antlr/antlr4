@@ -29,14 +29,12 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-// I don't check this template anymore...do you need it?
 /** ANTLR tool checks output templates are compatible with tool code generation.
  *  For now, a simple string match used on x.y of x.y.z scheme.
  *  Must match Tool.VERSION during load to templates.
  *
  *  REQUIRED.
  */
-VERSION() ::= "4.5" // use just "x.y" and don't include bug fix release number
 
 pythonTypeInitMap ::= [
 	"bool":"False",
@@ -53,22 +51,6 @@ ParserFile(file, parser, namedActions) ::= <<
 # encoding: utf-8
 from antlr4 import *
 from io import StringIO
-<if(file.genListener || file.genVisitor)>
-if __name__ is not None and "." in __name__:
-    <if(file.genListener)>
-    from .<file.parser.grammarName>Listener import <file.parser.grammarName>Listener
-    <endif>
-    <if(file.genVisitor)>
-    from .<file.parser.grammarName>Visitor import <file.parser.grammarName>Visitor
-    <endif>
-else:
-    <if(file.genListener)>
-    from <file.parser.grammarName>Listener import <file.parser.grammarName>Listener
-    <endif>
-    <if(file.genVisitor)>
-    from <file.parser.grammarName>Visitor import <file.parser.grammarName>Visitor
-    <endif>
-<endif>
 
 <namedActions.header>
 <parser>
@@ -78,12 +60,12 @@ else:
 ListenerFile(file, header) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 from antlr4 import *
+if __name__ is not None and "." in __name__:
+    from .<file.parserName> import <file.parserName>
+else:
+    from <file.parserName> import <file.parserName>
 <header>
 
-# Create a dummy <file.parserName> to avoid circular imports
-class <file.parserName>(object):
-	<file.listenerNames:{lname | <lname; format="cap">Context = None}; separator="\n">
-	
 # This class defines a complete listener for a parse tree produced by <file.parserName>.
 class <file.grammarName>Listener(ParseTreeListener):
 
@@ -98,18 +80,17 @@ def exit<lname; format="cap">(self, ctx:<file.parserName>.<lname; format="cap">C
 
 }; separator="\n">
 
-del <file.parserName>
 >>
 
 
 VisitorFile(file, header) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 from antlr4 import *
+if __name__ is not None and "." in __name__:
+    from .<file.parserName> import <file.parserName>
+else:
+    from <file.parserName> import <file.parserName>
 <header>
-
-# Create a dummy <file.parserName> to avoid circular imports
-class <file.parserName>(object):
-	<file.visitorNames:{lname | <lname; format="cap">Context = None}; separator="\n">
 
 # This class defines a complete generic visitor for a parse tree produced by <file.parserName>.
 
@@ -702,14 +683,14 @@ class <struct.name>(<currentRule.name; format="cap">Context):
 
 ListenerDispatchMethod(method) ::= <<
 def <if(method.isEnter)>enter<else>exit<endif>Rule(self, listener:ParseTreeListener):
-    if isinstance( listener, <parser.grammarName>Listener ):
+    if hasattr( listener, "<if(method.isEnter)>enter<else>exit<endif><struct.derivedFromName; format="cap">" ):
         listener.<if(method.isEnter)>enter<else>exit<endif><struct.derivedFromName; format="cap">(self)
 
 >>
 
 VisitorDispatchMethod(method) ::= <<
 def accept(self, visitor:ParseTreeVisitor):
-    if isinstance( visitor, <parser.grammarName>Visitor ):
+    if hasattr( visitor, "visit<struct.derivedFromName; format="cap">" ):
         return visitor.visit<struct.derivedFromName; format="cap">(self)
     else:
         return visitor.visitChildren(self)

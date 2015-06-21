@@ -12,13 +12,15 @@ public class TestListeners extends BasePython3Test {
 	public void testTokenGetters_1() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(535);
+		StringBuilder grammarBuilder = new StringBuilder(739);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("@parser::header {\n");
+		grammarBuilder.append("class MockListener:\n");
+		grammarBuilder.append("    pass  \n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("@parser::members {\n");
-		grammarBuilder.append("class LeafListener(TListener):\n");
+		grammarBuilder.append("class LeafListener(MockListener):\n");
 		grammarBuilder.append("    def exitA(self, ctx):\n");
 		grammarBuilder.append("        if ctx.getChildCount()==2:\n");
 		grammarBuilder.append("            print(ctx.INT(0).symbol.text + ' ' + ctx.INT(1).symbol.text + ' ' + str_list(ctx.INT()))\n");
@@ -30,6 +32,11 @@ public class TestListeners extends BasePython3Test {
 		grammarBuilder.append("s\n");
 		grammarBuilder.append("@after {\n");
 		grammarBuilder.append("print($ctx.r.toStringTree(recog=self))\n");
+		grammarBuilder.append("if __name__ is not None and \".\" in __name__:\n");
+		grammarBuilder.append("    from .TListener import TListener\n");
+		grammarBuilder.append("else:\n");
+		grammarBuilder.append("    from TListener import TListener\n");
+		grammarBuilder.append("TParser.LeafListener.__bases__ = (TListener,)\n");
 		grammarBuilder.append("walker = ParseTreeWalker()\n");
 		grammarBuilder.append("walker.walk(TParser.LeafListener(), $ctx.r)\n");
 		grammarBuilder.append("}\n");
@@ -60,13 +67,15 @@ public class TestListeners extends BasePython3Test {
 	public void testBasic() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(386);
+		StringBuilder grammarBuilder = new StringBuilder(590);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("@parser::header {\n");
+		grammarBuilder.append("class MockListener:\n");
+		grammarBuilder.append("    pass  \n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("@parser::members {\n");
-		grammarBuilder.append("class LeafListener(TListener):\n");
+		grammarBuilder.append("class LeafListener(MockListener):\n");
 		grammarBuilder.append("    def visitTerminal(self, node):\n");
 		grammarBuilder.append("        print(node.symbol.text)\n");
 		grammarBuilder.append("\n");
@@ -75,6 +84,11 @@ public class TestListeners extends BasePython3Test {
 		grammarBuilder.append("s\n");
 		grammarBuilder.append("@after {\n");
 		grammarBuilder.append("print($ctx.r.toStringTree(recog=self))\n");
+		grammarBuilder.append("if __name__ is not None and \".\" in __name__:\n");
+		grammarBuilder.append("    from .TListener import TListener\n");
+		grammarBuilder.append("else:\n");
+		grammarBuilder.append("    from TListener import TListener\n");
+		grammarBuilder.append("TParser.LeafListener.__bases__ = (TListener,)\n");
 		grammarBuilder.append("walker = ParseTreeWalker()\n");
 		grammarBuilder.append("walker.walk(TParser.LeafListener(), $ctx.r)\n");
 		grammarBuilder.append("}\n");
@@ -106,13 +120,15 @@ public class TestListeners extends BasePython3Test {
 	public void testTokenGetters_2() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(535);
+		StringBuilder grammarBuilder = new StringBuilder(739);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("@parser::header {\n");
+		grammarBuilder.append("class MockListener:\n");
+		grammarBuilder.append("    pass  \n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("@parser::members {\n");
-		grammarBuilder.append("class LeafListener(TListener):\n");
+		grammarBuilder.append("class LeafListener(MockListener):\n");
 		grammarBuilder.append("    def exitA(self, ctx):\n");
 		grammarBuilder.append("        if ctx.getChildCount()==2:\n");
 		grammarBuilder.append("            print(ctx.INT(0).symbol.text + ' ' + ctx.INT(1).symbol.text + ' ' + str_list(ctx.INT()))\n");
@@ -124,6 +140,11 @@ public class TestListeners extends BasePython3Test {
 		grammarBuilder.append("s\n");
 		grammarBuilder.append("@after {\n");
 		grammarBuilder.append("print($ctx.r.toStringTree(recog=self))\n");
+		grammarBuilder.append("if __name__ is not None and \".\" in __name__:\n");
+		grammarBuilder.append("    from .TListener import TListener\n");
+		grammarBuilder.append("else:\n");
+		grammarBuilder.append("    from TListener import TListener\n");
+		grammarBuilder.append("TParser.LeafListener.__bases__ = (TListener,)\n");
 		grammarBuilder.append("walker = ParseTreeWalker()\n");
 		grammarBuilder.append("walker.walk(TParser.LeafListener(), $ctx.r)\n");
 		grammarBuilder.append("}\n");
@@ -154,13 +175,15 @@ public class TestListeners extends BasePython3Test {
 	public void testLRWithLabels() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(527);
+		StringBuilder grammarBuilder = new StringBuilder(731);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("@parser::header {\n");
+		grammarBuilder.append("class MockListener:\n");
+		grammarBuilder.append("    pass  \n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("@parser::members {\n");
-		grammarBuilder.append("class LeafListener(TListener):\n");
+		grammarBuilder.append("class LeafListener(MockListener):\n");
 		grammarBuilder.append("    def exitCall(self, ctx):\n");
 		grammarBuilder.append("        print(ctx.e().start.text + ' ' + str(ctx.eList()))\n");
 		grammarBuilder.append("    def exitInt(self, ctx):\n");
@@ -171,6 +194,11 @@ public class TestListeners extends BasePython3Test {
 		grammarBuilder.append("s\n");
 		grammarBuilder.append("@after {\n");
 		grammarBuilder.append("print($ctx.r.toStringTree(recog=self))\n");
+		grammarBuilder.append("if __name__ is not None and \".\" in __name__:\n");
+		grammarBuilder.append("    from .TListener import TListener\n");
+		grammarBuilder.append("else:\n");
+		grammarBuilder.append("    from TListener import TListener\n");
+		grammarBuilder.append("TParser.LeafListener.__bases__ = (TListener,)\n");
 		grammarBuilder.append("walker = ParseTreeWalker()\n");
 		grammarBuilder.append("walker.walk(TParser.LeafListener(), $ctx.r)\n");
 		grammarBuilder.append("}\n");
@@ -205,13 +233,15 @@ public class TestListeners extends BasePython3Test {
 	public void testRuleGetters_1() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(572);
+		StringBuilder grammarBuilder = new StringBuilder(776);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("@parser::header {\n");
+		grammarBuilder.append("class MockListener:\n");
+		grammarBuilder.append("    pass  \n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("@parser::members {\n");
-		grammarBuilder.append("class LeafListener(TListener):\n");
+		grammarBuilder.append("class LeafListener(MockListener):\n");
 		grammarBuilder.append("    def exitA(self, ctx):\n");
 		grammarBuilder.append("        if ctx.getChildCount()==2:\n");
 		grammarBuilder.append("            print(ctx.b(0).start.text + ' ' + ctx.b(1).start.text + ' ' + ctx.b()[0].start.text)\n");
@@ -223,6 +253,11 @@ public class TestListeners extends BasePython3Test {
 		grammarBuilder.append("s\n");
 		grammarBuilder.append("@after {\n");
 		grammarBuilder.append("print($ctx.r.toStringTree(recog=self))\n");
+		grammarBuilder.append("if __name__ is not None and \".\" in __name__:\n");
+		grammarBuilder.append("    from .TListener import TListener\n");
+		grammarBuilder.append("else:\n");
+		grammarBuilder.append("    from TListener import TListener\n");
+		grammarBuilder.append("TParser.LeafListener.__bases__ = (TListener,)\n");
 		grammarBuilder.append("walker = ParseTreeWalker()\n");
 		grammarBuilder.append("walker.walk(TParser.LeafListener(), $ctx.r)\n");
 		grammarBuilder.append("}\n");
@@ -254,13 +289,15 @@ public class TestListeners extends BasePython3Test {
 	public void testLR() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(547);
+		StringBuilder grammarBuilder = new StringBuilder(751);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("@parser::header {\n");
+		grammarBuilder.append("class MockListener:\n");
+		grammarBuilder.append("    pass  \n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("@parser::members {\n");
-		grammarBuilder.append("class LeafListener(TListener):\n");
+		grammarBuilder.append("class LeafListener(MockListener):\n");
 		grammarBuilder.append("    def exitE(self, ctx):\n");
 		grammarBuilder.append("        if ctx.getChildCount()==3:\n");
 		grammarBuilder.append("            print(ctx.e(0).start.text + ' ' + ctx.e(1).start.text + ' ' + ctx.e()[0].start.text)\n");
@@ -272,6 +309,11 @@ public class TestListeners extends BasePython3Test {
 		grammarBuilder.append("s\n");
 		grammarBuilder.append("@after {\n");
 		grammarBuilder.append("print($ctx.r.toStringTree(recog=self))\n");
+		grammarBuilder.append("if __name__ is not None and \".\" in __name__:\n");
+		grammarBuilder.append("    from .TListener import TListener\n");
+		grammarBuilder.append("else:\n");
+		grammarBuilder.append("    from TListener import TListener\n");
+		grammarBuilder.append("TParser.LeafListener.__bases__ = (TListener,)\n");
 		grammarBuilder.append("walker = ParseTreeWalker()\n");
 		grammarBuilder.append("walker.walk(TParser.LeafListener(), $ctx.r)\n");
 		grammarBuilder.append("}\n");
@@ -307,13 +349,15 @@ public class TestListeners extends BasePython3Test {
 	public void testRuleGetters_2() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(572);
+		StringBuilder grammarBuilder = new StringBuilder(776);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("@parser::header {\n");
+		grammarBuilder.append("class MockListener:\n");
+		grammarBuilder.append("    pass  \n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("@parser::members {\n");
-		grammarBuilder.append("class LeafListener(TListener):\n");
+		grammarBuilder.append("class LeafListener(MockListener):\n");
 		grammarBuilder.append("    def exitA(self, ctx):\n");
 		grammarBuilder.append("        if ctx.getChildCount()==2:\n");
 		grammarBuilder.append("            print(ctx.b(0).start.text + ' ' + ctx.b(1).start.text + ' ' + ctx.b()[0].start.text)\n");
@@ -325,6 +369,11 @@ public class TestListeners extends BasePython3Test {
 		grammarBuilder.append("s\n");
 		grammarBuilder.append("@after {\n");
 		grammarBuilder.append("print($ctx.r.toStringTree(recog=self))\n");
+		grammarBuilder.append("if __name__ is not None and \".\" in __name__:\n");
+		grammarBuilder.append("    from .TListener import TListener\n");
+		grammarBuilder.append("else:\n");
+		grammarBuilder.append("    from TListener import TListener\n");
+		grammarBuilder.append("TParser.LeafListener.__bases__ = (TListener,)\n");
 		grammarBuilder.append("walker = ParseTreeWalker()\n");
 		grammarBuilder.append("walker.walk(TParser.LeafListener(), $ctx.r)\n");
 		grammarBuilder.append("}\n");

@@ -230,7 +230,9 @@ LANotEquals(i, v) ::= <%self._input.LA(<i>)!=<v>%>
 
 TokenStartColumnEquals(i) ::= <%self._tokenStartColumn==<i>%>
 
-ImportListener(X) ::= ""
+ImportListener(X) ::= <<class MockListener:
+    pass  
+>>
 
 GetExpectedTokenNames() ::= "self.getExpectedTokens().toString(self.literalNames, self.symbolicNames)"
 
@@ -297,19 +299,24 @@ def isIdentifierChar(c):
 >>
 
 BasicListener(X) ::= <<
-class LeafListener(TListener):
+class LeafListener(MockListener):
     def visitTerminal(self, node):
         print(node.symbol.text)
 
 >>
 
 WalkListener(s) ::= <<
+if __name__ is not None and "." in __name__:
+    from .TListener import TListener
+else:
+    from TListener import TListener
+TParser.LeafListener.__bases__ = (TListener,)
 walker = ParseTreeWalker()
 walker.walk(TParser.LeafListener(), <s>)
 >>
 
 TokenGetterListener(X) ::= <<
-class LeafListener(TListener):
+class LeafListener(MockListener):
     def exitA(self, ctx):
         if ctx.getChildCount()==2:
             print(ctx.INT(0).symbol.text + ' ' + ctx.INT(1).symbol.text + ' ' + str_list(ctx.INT()))
@@ -319,7 +326,7 @@ class LeafListener(TListener):
 >>
 
 RuleGetterListener(X) ::= <<
-class LeafListener(TListener):
+class LeafListener(MockListener):
     def exitA(self, ctx):
         if ctx.getChildCount()==2:
             print(ctx.b(0).start.text + ' ' + ctx.b(1).start.text + ' ' + ctx.b()[0].start.text)
@@ -330,7 +337,7 @@ class LeafListener(TListener):
 
 
 LRListener(X) ::= <<
-class LeafListener(TListener):
+class LeafListener(MockListener):
     def exitE(self, ctx):
         if ctx.getChildCount()==3:
             print(ctx.e(0).start.text + ' ' + ctx.e(1).start.text + ' ' + ctx.e()[0].start.text)
@@ -340,7 +347,7 @@ class LeafListener(TListener):
 >>
 
 LRWithLabelsListener(X) ::= <<
-class LeafListener(TListener):
+class LeafListener(MockListener):
     def exitCall(self, ctx):
         print(ctx.e().start.text + ' ' + str(ctx.eList()))
     def exitInt(self, ctx):
