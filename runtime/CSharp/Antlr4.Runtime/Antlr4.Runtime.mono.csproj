@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Antlr4.Runtime</RootNamespace>
     <AssemblyName>Antlr4.Runtime</AssemblyName>
-    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <BaseIntermediateOutputPath>obj\net20\</BaseIntermediateOutputPath>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
@@ -21,16 +21,16 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\net20\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE;NET20;NET20PLUS</DefineConstants>
+    <OutputPath>bin\net35\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;NET35PLUS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <NoWarn>1591</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <Optimize>true</Optimize>
-    <OutputPath>bin\net20\Release\</OutputPath>
-    <DefineConstants>TRACE;NET20;NET20PLUS</DefineConstants>
+    <OutputPath>bin\net35\Release\</OutputPath>
+    <DefineConstants>TRACE;NET35PLUS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <NoWarn>1591</NoWarn>
@@ -169,8 +169,6 @@
     <Compile Include="Sharpen\Arrays.cs" />
     <Compile Include="Sharpen\BitSet.cs" />
     <Compile Include="Sharpen\Collections.cs" />
-    <Compile Include="Sharpen\Compat\Enumerable.cs" />
-    <Compile Include="Sharpen\Compat\ExtensionAttribute.cs" />
     <Compile Include="Sharpen\Compat\Funcs.cs" />
     <Compile Include="Sharpen\Compat\IStructuralComparable.cs" />
     <Compile Include="Sharpen\Compat\IStructuralEquatable.cs" />
@@ -217,7 +215,6 @@
       <CustomToolNamespace>Antlr4.Runtime.Tree.Xpath</CustomToolNamespace>
     </None>
     <Compile Include="Recognizer.cs" />
-    <Compile Include="Sharpen\Compat\HashSet.cs" />
     <Compile Include="Sharpen\Compat\CollectionDebuggerView.cs" />
     <Compile Include="Sharpen\Compat\ConcurrentDictionary.cs" />
     <Compile Include="Sharpen\Compat\SplitOrderedList.cs" />

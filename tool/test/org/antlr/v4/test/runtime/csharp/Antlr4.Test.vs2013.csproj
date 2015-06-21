@@ -7,7 +7,7 @@
     <RootNamespace>Antlr4.Test.mono</RootNamespace>
     <AssemblyName>Test</AssemblyName>
     <StartupObject>Test</StartupObject>
-    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
