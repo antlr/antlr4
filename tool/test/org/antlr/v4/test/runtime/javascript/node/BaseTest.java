@@ -403,7 +403,8 @@ public abstract class BaseTest {
 				System.err.println("exec stderrVacuum: " + stderrVacuum);
 			}
 			return output;
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			System.err.println("can't exec recognizer");
 			e.printStackTrace(System.err);
 		}
@@ -413,8 +414,9 @@ public abstract class BaseTest {
 	private String locateTool(String tool) {
 		String[] roots = { "/usr/bin/", "/usr/local/bin/" };
 		for (String root : roots) {
-			if (new File(root + tool).exists())
+			if (new File(root + tool).exists()) {
 				return root + tool;
+			}
 		}
 		throw new RuntimeException("Could not locate " + tool);
 	}
@@ -423,22 +425,26 @@ public abstract class BaseTest {
 		// typically /usr/local/bin/node
 		String propName = "antlr-javascript-nodejs";
 		String prop = System.getProperty(propName);
-		if (prop == null || prop.length() == 0)
-			prop = locateTool("node");
+		if (prop == null || prop.length() == 0) {
+			prop = locateTool("nodejs");
+		}
 		File file = new File(prop);
-		if (!file.exists())
+		if (!file.exists()) {
 			throw new RuntimeException("Missing system property:" + propName);
+		}
 		return prop;
 	}
 
 	private String locateRuntime() {
 		String propName = "antlr-javascript-runtime";
 		String prop = System.getProperty(propName);
-		if (prop == null || prop.length() == 0)
+		if (prop == null || prop.length() == 0) {
 			prop = "../../antlr4-javascript/src";
+		}
 		File file = new File(prop);
-		if (!file.exists())
+		if (!file.exists()) {
 			throw new RuntimeException("Missing system property:" + propName);
+		}
 		return file.getAbsolutePath();
 	}
 
