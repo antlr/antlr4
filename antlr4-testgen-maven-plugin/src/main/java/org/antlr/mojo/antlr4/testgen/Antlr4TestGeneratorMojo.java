@@ -31,13 +31,18 @@ import org.antlr.v4.testgen.TestGenerator;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
+import org.sonatype.plexus.build.incremental.BuildContext;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 
 @Mojo(
 	name = "antlr4.testgen",
@@ -64,6 +69,9 @@ public class Antlr4TestGeneratorMojo extends AbstractMojo {
 	@Parameter
 	private boolean visualize;
 
+	@Component
+	private BuildContext buildContext;
+
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		TestGenerator testGenerator = new MavenTestGenerator(encoding, runtimeTemplates, outputDirectory, visualize);
@@ -78,6 +86,20 @@ public class Antlr4TestGeneratorMojo extends AbstractMojo {
 
 		public MavenTestGenerator(String encoding, File runtimeTemplates, File outputDirectory, boolean visualize) {
 			super(encoding, runtimeTemplates, outputDirectory, visualize);
+		}
+
+		@Override
+		public void writeFile(File file, String content) throws IOException {
+			file.getParentFile().mkdirs();
+
+			OutputStream fos = buildContext.newFileOutputStream(file);
+			OutputStreamWriter osw = new OutputStreamWriter(fos, encoding != null ? encoding : "UTF-8");
+			try {
+				osw.write(content);
+			}
+			finally {
+				osw.close();
+			}
 		}
 
 		@Override
