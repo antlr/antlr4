@@ -155,8 +155,6 @@ writeln(s) ::= <<System.out.println(<s>);>>
 
 write(s) ::= <<System.out.print(<s>);>>
 
-more() ::= " "
-
 False() ::= "false"
 
 True() ::= "true"
@@ -172,6 +170,8 @@ Append(a,b) ::= "<a> + <b>"
 Concat(a,b) ::= "<a><b>"
 
 DeclareLocal(s,v) ::= "Object <s> = <v>;"
+
+AssertIsList(v) ::= "List\<?> __ttt__ = <v>;" // just use static type system
 
 AssignLocal(s,v) ::= "<s> = <v>;"
 

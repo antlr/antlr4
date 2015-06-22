@@ -26,12 +26,12 @@ grammar(grammarName) ::= <<
 grammar <grammarName>;
 ifStatement
 @after {
-<DeclareLocal("items","$ctx.elseIfStatement()")>
+<AssertIsList("$ctx.elseIfStatement()")>
 }
     : 'if' expression
       ( ( 'then'
           executableStatement*
-          elseIfStatement*  // \<--- problem is here
+          elseIfStatement*  // \<--- problem is here; should yield a list not node
           elseStatement?
           'end' 'if'
         ) | executableStatement )
