@@ -4,7 +4,7 @@
         <pluginExecution>
             <pluginExecutionFilter>
                 <goals>
-                    <goal>antlr4</goal>
+                    <goal>antlr4.testgen</goal>
                 </goals>
             </pluginExecutionFilter>
             <action>
