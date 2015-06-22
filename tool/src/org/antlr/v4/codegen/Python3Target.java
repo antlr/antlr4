@@ -117,7 +117,7 @@ public class Python3Target extends Target {
 
 	@Override
 	public String getVersion() {
-		return "4.5";
+		return "4.5.1";
 	}
 
 	/** Avoid grammar symbols in this set to prevent conflicts in gen'd code. */
