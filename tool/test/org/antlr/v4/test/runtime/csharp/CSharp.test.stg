@@ -168,6 +168,8 @@ Concat(a,b) ::= "<a><b>"
 
 DeclareLocal(s,v) ::= "Object <s> = <v>;"
 
+AssertIsList(v) ::= "System.Collections.IList __ttt__ = <v>;" // just use static type system
+
 AssignLocal(s,v) ::= "<s> = <v>;"
 
 InitIntMember(n,v) ::= <%int <n> = <v>;%>
