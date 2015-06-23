@@ -282,9 +282,8 @@ public class TestGenerator {
 	public String getTargetNameFromTemplatesFileName() {
 		// runtimeTemplates is like /Users/parrt/antlr/code/antlr4/tool/test/org/antlr/v4/test/runtime/java/Java.test.stg
 		// extra target name
-		int targetEnd = runtimeTemplates.getPath().indexOf(".test.stg");
-		String targetAtEnd = runtimeTemplates.getPath().substring(0, targetEnd);
-		return targetAtEnd.substring(targetAtEnd.lastIndexOf('/') + 1);
+		int targetEnd = runtimeTemplates.getName().indexOf(".test.stg");
+		return runtimeTemplates.getName().substring(0, targetEnd);
 	}
 
 	public File getOutputDir(String templateFolder) {
