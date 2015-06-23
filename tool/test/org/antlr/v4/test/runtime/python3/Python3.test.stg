@@ -161,8 +161,6 @@ writeln(s) ::= <<print(<s>)>>
 
 write(s) ::= <<print(<s>,end='')>>
 
-more() ::= "; "
-
 False() ::= "False"
 
 True() ::= "True"
@@ -200,8 +198,6 @@ MemberEquals(n,v) ::= <%self.<n> == <v>%>
 ModMemberEquals(n,m,v) ::= <%self.<n> % <m> == <v>%>
 
 ModMemberNotEquals(n,m,v) ::= <%self.<n> % <m> != <v>%>
-
-CheckVectorContext(s,v) ::= "<s> = list(<v>)"
 
 DumpDFA() ::= "self.dumpDFA()"
 
