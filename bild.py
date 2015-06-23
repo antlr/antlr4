@@ -111,7 +111,7 @@ def compile():
             'org/antlr/v4/test/runtime/javascript/safari']
     for t in RUNTIME_TEST_TEMPLATES:
         javac(TARGETS[t] + "/tool/test", "out", version="1.6", cp=cp, args=args, skip=skip)
-        javac('gen/test/'+t,             "out", version="1.6", cp=cp, args=args)
+        javac('runtime-testsuite/test/'+t,             "out", version="1.6", cp=cp, args=args)
 
 
 def mkjar_complete():
@@ -266,7 +266,7 @@ def python_sdist():
 
 def regen_tests():
     """
-    Generate all runtime Test*.java files for all targets into ./gen/TargetName
+    Generate all runtime Test*.java files for all targets into ./runtime-testsuite/TargetName
     They will all get compiled in compile() so we have all together but
     can drop from final jar in mkjar().
     """
@@ -282,7 +282,7 @@ def regen_tests():
     # now use TestGenerator to generate Test*.java for each target using
     # runtime templates and test templates themselves:
     #     runtime-testsuite/resources/org/antlr/v4/test/runtime/templates
-    # generate into gen/test/Java, gen/test/CSharp, ...
+    # generate into runtime-testsuite/test/Java, runtime-testsuite/test/CSharp, ...
     for targetName in RUNTIME_TEST_TEMPLATES:
         java(classname="org.antlr.v4.testgen.TestGenerator", cp="out/testsuite:"+cp,
              progargs=['-o', 'runtime-testsuite/test/'+targetName, '-templates', RUNTIME_TEST_TEMPLATES[targetName]])
@@ -329,7 +329,7 @@ def test_target(t):
 
 def test(target, juprops, args):
     junit_jar, hamcrest_jar = load_junitjars()
-    srcdir = uniformpath('gen/test/'+target)
+    srcdir = uniformpath('runtime-testsuite/test/'+target)
     dstdir = uniformpath("out/test/"+target)
     # Prefix CLASSPATH with individual target tests
     cp = dstdir + os.pathsep + uniformpath("dist/antlr4-" + VERSION + "-complete.jar")
