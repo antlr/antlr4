@@ -285,7 +285,7 @@ def regen_tests():
     # generate into gen/test/Java, gen/test/CSharp, ...
     for targetName in RUNTIME_TEST_TEMPLATES:
         java(classname="org.antlr.v4.testgen.TestGenerator", cp="out/testsuite:"+cp,
-             progargs=['-o', 'gen/test/'+targetName, '-templates', RUNTIME_TEST_TEMPLATES[targetName]])
+             progargs=['-o', 'runtime-testsuite/test/'+targetName, '-templates', RUNTIME_TEST_TEMPLATES[targetName]])
     print_and_log("test generation complete")
 
 
