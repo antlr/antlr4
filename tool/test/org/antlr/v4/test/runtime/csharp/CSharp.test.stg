@@ -151,8 +151,6 @@ writeln(s) ::= <<Console.WriteLine(<s>);>>
 
 write(s) ::= <<Console.Write(<s>);>>
 
-more() ::= " "
-
 False() ::= "false"
 
 True() ::= "true"
@@ -190,8 +188,6 @@ MemberEquals(n,v) ::= <%this.<n> == <v>%>
 ModMemberEquals(n,m,v) ::= <%this.<n> % <m> == <v>%>
 
 ModMemberNotEquals(n,m,v) ::= <%this.<n> % <m> != <v>%>
-
-CheckVectorContext(s,v) ::= "Object[] <s> = <v>;"
 
 DumpDFA() ::= "this.DumpDFA();"
 
