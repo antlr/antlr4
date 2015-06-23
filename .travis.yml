@@ -1,9 +1,7 @@
 sudo: false
 language: java
 script:
-  - cd antlr4
   - mvn install
-  - mvn test
 jdk:
   - openjdk6
   - oraclejdk7
