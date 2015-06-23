@@ -115,7 +115,7 @@ public class Python2Target extends Target {
 
 	@Override
 	public String getVersion() {
-		return "4.5.1";
+		return "4.5.2";
 	}
 
 	public Set<String> getBadWords() {
