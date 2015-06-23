@@ -124,7 +124,7 @@ public class TestGenerator {
 				System.err.println(message);
 			}
 			@Override
-			public File getOutputDir(String templateFolder) {
+			public File getOutputDir() {
 				String targetName = getTargetNameFromTemplatesFileName();
 				// compute package
 				String templatePath = runtimeTemplates.getPath();
@@ -181,7 +181,7 @@ public class TestGenerator {
 	}
 
 	private void generateTestFile(STGroup index, STGroup targetGroup, String testFile, String templateFolder, Collection<String> testTemplates) {
-		File targetFolder = getOutputDir(templateFolder);
+		File targetFolder = getOutputDir();
 		File targetFile = new File(targetFolder, "Test" + testFile + ".java");
 		info("Generating file "+targetFile.getAbsolutePath());
 		List<ST> templates = new ArrayList<ST>();
@@ -263,13 +263,13 @@ public class TestGenerator {
 	public String getTargetNameFromTemplatesFileName() {
 		// runtimeTemplates is like /Users/parrt/antlr/code/antlr4/tool/test/org/antlr/v4/test/runtime/java/Java.test.stg
 		// extra target name
-		int targetEnd = runtimeTemplates.getPath().indexOf(".test.stg");
-		String targetAtEnd = runtimeTemplates.getPath().substring(0, targetEnd);
-		return targetAtEnd.substring(targetAtEnd.lastIndexOf('/') + 1);
+		int targetEnd = runtimeTemplates.getName().indexOf(".test.stg");
+		return runtimeTemplates.getName().substring(0, targetEnd);
 	}
 
-	public File getOutputDir(String templateFolder) {
-		return new File(outputDirectory, templateFolder.substring(0, templateFolder.indexOf("/templates")));
+	public File getOutputDir() {
+		String basePackageDir = "org/antlr/v4/test/runtime/";
+		return new File(outputDirectory, basePackageDir + getTargetNameFromTemplatesFileName().toLowerCase());
 	}
 
 	protected void info(String message) {
