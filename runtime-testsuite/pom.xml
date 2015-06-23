@@ -112,5 +112,6 @@
         <artifactId>maven-surefire-plugin</artifactId>
       </plugin>
     </plugins>
+    <testSourceDirectory>ignored</testSourceDirectory>
   </build>
 </project>
