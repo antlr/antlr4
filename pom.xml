@@ -64,7 +64,6 @@
     <module>tool</module>
     <module>antlr4-maven-plugin</module>
     <module>antlr4-testgen-maven-plugin</module>
-    <module>runtime-testsuite</module>
   </modules>
 
   <properties>
@@ -117,5 +116,15 @@
         </plugin>
       </plugins>
     </pluginManagement>
-  </build>  
+  </build> 
+  
+  <profiles>
+    <profile>
+      <id>rts</id>
+      <modules>
+        <module>runtime-testsuite</module>
+      </modules>
+    </profile>  
+  </profiles>
+   
 </project>
