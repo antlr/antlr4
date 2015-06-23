@@ -157,8 +157,6 @@ writeln(s) ::= <<console.log(<s>);>>
 
 write(s) ::= <<process.stdout.write(<s>);>>
 
-more() ::= " "
-
 False() ::= "false"
 
 True() ::= "true"
@@ -175,7 +173,7 @@ Concat(a,b) ::= "<a><b>"
 
 DeclareLocal(s,v) ::= "var <s> = <v>;"
 
-AssertIsList(v) ::= <<if ( !(v instanceof Array) ) {throw "value is not an array"}>>
+AssertIsList(v) ::= <<if ( !(v instanceof Array) ) {throw "value is not an array";}>>
 
 AssignLocal(s,v) ::= "<s> = <v>;"
 
@@ -196,8 +194,6 @@ MemberEquals(n,v) ::= <%this.<n> === <v>%>
 ModMemberEquals(n,m,v) ::= <%this.<n> % <m> === <v>%>
 
 ModMemberNotEquals(n,m,v) ::= <%this.<n> % <m> != <v>%>
-
-CheckVectorContext(s,v) ::= "<s> = [].concat(<v>);"
 
 DumpDFA() ::= "this.dumpDFA();"
 
