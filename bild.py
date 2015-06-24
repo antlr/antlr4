@@ -266,7 +266,7 @@ def python_sdist():
 
 def regen_tests():
     """
-    Generate all runtime Test*.java files for all targets into ./runtime-testsuite/TargetName
+    Generate all runtime Test*.java files for all targets into ./runtime-testsuite/test/org/antlr/v4/test/runtime/targetname
     They will all get compiled in compile() so we have all together but
     can drop from final jar in mkjar().
     """
@@ -282,10 +282,10 @@ def regen_tests():
     # now use TestGenerator to generate Test*.java for each target using
     # runtime templates and test templates themselves:
     #     runtime-testsuite/resources/org/antlr/v4/test/runtime/templates
-    # generate into runtime-testsuite/test/Java, runtime-testsuite/test/CSharp, ...
+    # generate into runtime-testsuite/test/org/antlr/v4/test/runtime/python2 etc...
     for targetName in RUNTIME_TEST_TEMPLATES:
         java(classname="org.antlr.v4.testgen.TestGenerator", cp="out/testsuite:"+cp,
-             progargs=['-o', 'runtime-testsuite/test/'+targetName, '-templates', RUNTIME_TEST_TEMPLATES[targetName]])
+             progargs=['-o', 'runtime-testsuite/test', '-templates', RUNTIME_TEST_TEMPLATES[targetName]])
     print_and_log("test generation complete")
 
 
@@ -343,7 +343,7 @@ def test(target, juprops, args):
         browsers = ["safari","chrome","firefox","explorer"]
         skip = [ uniformpath(srcdir + "/org/antlr/v4/test/rt/js/" + b) for b in browsers ]
         skip += [ uniformpath(srcdir + "/org/antlr/v4/test/runtime/javascript/" + b) for b in browsers ]
-    javac(srcdir, trgdir="out/test/"+target, version="1.6", cp=thisjarwithjunit, args=args, skip=skip)
+    javac(srcdir, trgdir="out/test", version="1.6", cp=thisjarwithjunit, args=args, skip=skip)
     # copy any resource files required for testing
     for t in TARGETS:
         root = TARGETS[t] + "/tool/test"
@@ -354,7 +354,7 @@ def test(target, juprops, args):
                 # print src, dst
                 if os.path.exists(os.path.split(dst)[0]):
                     shutil.copyfile(src, dst)
-    junit("out/test/"+target, cp='/Users/parrt/antlr/code/antlr4/out:'+uniformpath("dist/antlr4-" + VERSION + "-complete.jar"),
+    junit("out/test", cp='/Users/parrt/antlr/code/antlr4/out:'+uniformpath("dist/antlr4-" + VERSION + "-complete.jar"),
           verbose=False, args=juprops)
 
 
@@ -461,7 +461,6 @@ def clean(dist=True):
     if dist:
         rmdir("dist")
     rmdir("out")
-    rmdir("gen")
     rmdir("gen3")
     rmdir("gen4")
     rmdir("doc")
