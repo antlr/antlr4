@@ -40,6 +40,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -95,7 +96,7 @@ public class TestGenerator {
 			genAllTargets(rootDir, viz);
 			System.exit(0);
 		}
-		
+
 		if ( outDir==null || targetSpecificTemplateFile==null ) {
 			System.err.println("You must give an output root dir and templates file");
 			System.exit(1);
@@ -103,16 +104,16 @@ public class TestGenerator {
 
 		genTarget(outDir, targetSpecificTemplateFile, viz);
 	}
-	
+
 	public static void genAllTargets(final String rootDir, boolean viz) {
 		for(TargetConfiguration config : TargetConfiguration.ALL) {
 			String outDir = rootDir + config.outDir;
 			String templates = rootDir + config.templates;
 			genTarget(outDir, templates, viz);
 		}
-		
+
 	}
-	
+
 	public static void genTarget(final String outDir, String targetSpecificTemplateFile, boolean viz) {
 		TestGenerator gen = new TestGenerator("UTF-8",
 											  new File(targetSpecificTemplateFile),
@@ -134,8 +135,8 @@ public class TestGenerator {
 				return new File(outputDirectory, packageDir);
 			}
 			@Override
-			public String getTestTemplatesResourceDir() { 
-				return "runtime-testsuite/resources/org/antlr/v4/test/runtime/templates"; 
+			public String getTestTemplatesResourceDir() {
+				return "runtime-testsuite/resources/org/antlr/v4/test/runtime/templates";
 			}
 		};
 		gen.info("Generating target " + gen.getTargetNameFromTemplatesFileName());
@@ -157,36 +158,43 @@ public class TestGenerator {
 		targetGroup.defineDictionary("strlen", new StrlenStringMap());
 
 		String rootFolder = getTestTemplatesResourceDir();
-		STGroup index = new STGroupFile(rootFolder+"/Index.stg");
-		generateCodeForFolder(targetGroup, rootFolder, index);
+		generateCodeForFoldersInIndex(targetGroup, rootFolder);
 	}
 
-	private void generateCodeForFolder(STGroup targetGroup, String folder, STGroup index) {
-		// make sure the index group is loaded since we call rawGetDictionary
-		index.load();
+	protected void generateCodeForFoldersInIndex(STGroup targetGroup, String rootFolder) {
+		STGroup index = new STGroupFile(rootFolder+"/Index.stg");
+		index.load(); // make sure the index group is loaded since we call rawGetDictionary
 
 		Map<String, Object> folders = index.rawGetDictionary("TestFolders");
 		if (folders != null) {
 			for (String key : folders.keySet()) {
-				String subfolder = folder + "/" + key;
-				STGroup subindex = new STGroupFile(subfolder + "/Index.stg");
-				generateCodeForFolder(targetGroup, folder + "/" + key, subindex);
+				final String testdir = rootFolder + "/" + key;
+				STGroup testIndex = new STGroupFile(testdir + "/Index.stg");
+				testIndex.load();
+				Map<String, Object> templateNames = testIndex.rawGetDictionary("TestTemplates");
+				if ( templateNames != null && !templateNames.isEmpty() ) {
+					final ArrayList<String> sortedTemplateNames = new ArrayList<String>(templateNames.keySet());
+					Collections.sort(sortedTemplateNames);
+					generateTestFile(testIndex, targetGroup,
+									 testdir,
+									 sortedTemplateNames);
+				}
 			}
-		}
-
-		Map<String, Object> templates = index.rawGetDictionary("TestTemplates");
-		if (templates != null && !templates.isEmpty()) {
-			generateTestFile(index, targetGroup, folder.substring(folder.lastIndexOf('/') + 1), folder, new ArrayList<String>(templates.keySet()));
 		}
 	}
 
-	private void generateTestFile(STGroup index, STGroup targetGroup, String testFile, String templateFolder, Collection<String> testTemplates) {
-		File targetFolder = getOutputDir(templateFolder);
-		File targetFile = new File(targetFolder, "Test" + testFile + ".java");
+	protected void generateTestFile(STGroup index,
+									STGroup targetGroup,
+									String testdir,
+									Collection<String> testTemplates)
+	{
+		File targetFolder = getOutputDir(testdir);
+		String testName = testdir.substring(testdir.lastIndexOf('/') + 1);
+		File targetFile = new File(targetFolder, "Test" + testName + ".java");
 		info("Generating file "+targetFile.getAbsolutePath());
 		List<ST> templates = new ArrayList<ST>();
 		for (String template : testTemplates) {
-			STGroup testGroup = new STGroupFile(templateFolder + "/" + template + STGroup.GROUP_FILE_EXTENSION);
+			STGroup testGroup = new STGroupFile(testdir + "/" + template + STGroup.GROUP_FILE_EXTENSION);
 			importLanguageTemplates(testGroup, targetGroup);
 			ST testType = testGroup.getInstanceOf("TestType");
 			if (testType == null) {
@@ -205,19 +213,20 @@ public class TestGenerator {
 		}
 
 		ST testFileTemplate = targetGroup.getInstanceOf("TestFile");
-		testFileTemplate.addAggr("file.{Options,name,tests}", index.rawGetDictionary("Options"), testFile, templates);
+		testFileTemplate.addAggr("file.{Options,name,tests}", index.rawGetDictionary("Options"), testName, templates);
 
 		if (visualize) {
 			STViz viz = testFileTemplate.inspect();
 			try {
 				viz.waitForClose();
-			} catch (InterruptedException ex) {
 			}
+			catch (InterruptedException ex) { }
 		}
 
 		try {
 			writeFile(targetFile, testFileTemplate.render());
-		} catch (IOException ex) {
+		}
+		catch (IOException ex) {
 			error(String.format("Failed to write output file: %s", targetFile), ex);
 		}
 	}

@@ -111,7 +111,7 @@ def compile():
             'org/antlr/v4/test/runtime/javascript/safari']
     for t in RUNTIME_TEST_TEMPLATES:
         javac(TARGETS[t] + "/tool/test", "out", version="1.6", cp=cp, args=args, skip=skip)
-        javac('runtime-testsuite/test/'+t,             "out", version="1.6", cp=cp, args=args)
+        javac('runtime-testsuite/test',  "out", version="1.6", cp=cp)
 
 
 def mkjar_complete():

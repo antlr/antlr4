@@ -1,6 +1,3 @@
-//TestFolders ::= [
-//]
-
 TestTemplates ::= [
 	"ExpressionGrammar_1": [],
 	"ExpressionGrammar_2": []
