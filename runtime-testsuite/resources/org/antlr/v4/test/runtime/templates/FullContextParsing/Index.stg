@@ -1,6 +1,3 @@
-//TestFolders ::= [
-//]
-
 TestTemplates ::= [
 	"AmbigYieldsCtxSensitiveDFA": [],
 	"CtxSensitiveDFA_1": [],

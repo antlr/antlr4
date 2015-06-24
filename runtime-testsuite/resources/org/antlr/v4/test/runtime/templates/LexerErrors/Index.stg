@@ -1,6 +1,3 @@
-//TestFolders ::= [
-//]
-
 TestTemplates ::= [
 	"InvalidCharAtStart": [],
 	"StringsEmbeddedInActions_1": [],

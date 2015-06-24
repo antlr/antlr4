@@ -1,6 +1,3 @@
-//TestFolders ::= [
-//]
-
 TestTemplates ::= [
 	"Simple_1": [],
 	"Simple_2": [],

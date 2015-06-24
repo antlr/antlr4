@@ -1,6 +1,3 @@
-//TestFolders ::= [
-//]
-
 TestTemplates ::= [
 	"Basic": [],
 	"TokenGetters_1": [],

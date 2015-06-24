@@ -1,6 +1,3 @@
-//TestFolders ::= [
-//]
-
 TestTemplates ::= [
 	"TokenAndRuleContextString": [],
 	"Token2": [],
