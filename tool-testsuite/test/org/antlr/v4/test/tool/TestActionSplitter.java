@@ -34,6 +34,7 @@ import org.antlr.runtime.ANTLRStringStream;
 import org.antlr.runtime.Token;
 import org.antlr.v4.parse.ActionSplitter;
 import org.antlr.v4.semantics.BlankActionSplitterListener;
+import org.antlr.v4.test.runtime.java.BaseTest;
 import org.junit.Test;
 
 import java.util.ArrayList;

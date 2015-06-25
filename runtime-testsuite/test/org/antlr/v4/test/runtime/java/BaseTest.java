@@ -902,7 +902,7 @@ public abstract class BaseTest {
 		return filtered;
 	}
 
-	void checkRuleATN(Grammar g, String ruleName, String expecting) {
+	public void checkRuleATN(Grammar g, String ruleName, String expecting) {
 		DOTGenerator dot = new DOTGenerator(g);
 		System.out.println(dot.getDOT(g.atn.ruleToStartState[g.getRule(ruleName).index]));
 
@@ -1266,7 +1266,7 @@ public abstract class BaseTest {
 	}
 
 	public static class IntTokenStream implements TokenStream {
-		IntegerList types;
+		public IntegerList types;
 		int p=0;
 		public IntTokenStream(IntegerList types) { this.types = types; }
 

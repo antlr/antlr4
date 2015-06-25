@@ -37,6 +37,7 @@ import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenSource;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.UnbufferedTokenStream;
+import org.antlr.v4.test.runtime.java.BaseTest;
 import org.antlr.v4.tool.LexerGrammar;
 import org.junit.Test;
 

@@ -12,6 +12,7 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.pattern.ParseTreeMatch;
 import org.antlr.v4.runtime.tree.pattern.ParseTreePattern;
 import org.antlr.v4.runtime.tree.pattern.ParseTreePatternMatcher;
+import org.antlr.v4.test.runtime.java.BaseTest;
 import org.junit.Test;
 
 import java.lang.reflect.Constructor;

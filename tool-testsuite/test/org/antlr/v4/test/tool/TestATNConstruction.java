@@ -36,6 +36,8 @@ import org.antlr.v4.automata.ParserATNFactory;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNState;
+import org.antlr.v4.test.runtime.java.BaseTest;
+import org.antlr.v4.test.runtime.java.ErrorQueue;
 import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LexerGrammar;

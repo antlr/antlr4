@@ -33,6 +33,7 @@ package org.antlr.v4.test.tool;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.IntervalSet;
+import org.antlr.v4.test.runtime.java.BaseTest;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

@@ -30,6 +30,7 @@
 
 package org.antlr.v4.test.tool;
 
+import org.antlr.v4.test.runtime.java.BaseTest;
 import org.antlr.v4.tool.ErrorType;
 import org.junit.Test;
 

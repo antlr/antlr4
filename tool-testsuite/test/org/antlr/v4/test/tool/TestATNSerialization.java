@@ -32,6 +32,7 @@ package org.antlr.v4.test.tool;
 
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNSerializer;
+import org.antlr.v4.test.runtime.java.BaseTest;
 import org.antlr.v4.tool.DOTGenerator;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LexerGrammar;

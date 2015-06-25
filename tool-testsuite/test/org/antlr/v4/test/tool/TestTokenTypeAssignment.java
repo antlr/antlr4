@@ -31,6 +31,7 @@
 package org.antlr.v4.test.tool;
 
 import org.antlr.v4.runtime.Token;
+import org.antlr.v4.test.runtime.java.BaseTest;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LexerGrammar;
 import org.junit.Test;

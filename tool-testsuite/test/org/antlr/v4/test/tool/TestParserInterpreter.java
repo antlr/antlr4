@@ -35,6 +35,7 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.LexerInterpreter;
 import org.antlr.v4.runtime.ParserInterpreter;
 import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.test.runtime.java.BaseTest;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LexerGrammar;
 import org.junit.Test;

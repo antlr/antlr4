@@ -30,6 +30,7 @@
 package org.antlr.v4.test.tool;
 
 import org.antlr.v4.misc.Graph;
+import org.antlr.v4.test.runtime.java.BaseTest;
 import org.junit.Test;
 
 import java.util.List;

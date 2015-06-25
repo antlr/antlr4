@@ -7,6 +7,7 @@ import org.antlr.v4.runtime.misc.Pair;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.antlr.v4.runtime.tree.xpath.XPath;
+import org.antlr.v4.test.runtime.java.BaseTest;
 import org.junit.Test;
 
 import java.util.ArrayList;

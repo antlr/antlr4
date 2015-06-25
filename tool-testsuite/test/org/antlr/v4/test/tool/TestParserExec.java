@@ -30,6 +30,7 @@
 
 package org.antlr.v4.test.tool;
 
+import org.antlr.v4.test.runtime.java.BaseTest;
 import org.junit.Ignore;
 import org.junit.Test;
 

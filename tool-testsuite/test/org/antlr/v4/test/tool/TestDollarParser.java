@@ -1,5 +1,6 @@
 package org.antlr.v4.test.tool;
 
+import org.antlr.v4.test.runtime.java.BaseTest;
 import org.junit.Test;
 
 import static org.junit.Assert.assertNull;

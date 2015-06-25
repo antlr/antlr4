@@ -32,6 +32,7 @@ package org.antlr.v4.test.tool;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.Vocabulary;
 import org.antlr.v4.runtime.VocabularyImpl;
+import org.antlr.v4.test.runtime.java.BaseTest;
 import org.junit.Assert;
 import org.junit.Test;
 

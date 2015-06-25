@@ -35,6 +35,8 @@ import org.antlr.v4.automata.LexerATNFactory;
 import org.antlr.v4.automata.ParserATNFactory;
 import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.semantics.SemanticPipeline;
+import org.antlr.v4.test.runtime.java.BaseTest;
+import org.antlr.v4.test.runtime.java.ErrorQueue;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LexerGrammar;
 import org.junit.Test;

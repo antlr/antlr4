@@ -33,6 +33,7 @@ import org.antlr.runtime.Token;
 import org.antlr.v4.misc.Utils;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.runtime.misc.IntervalSet;
+import org.antlr.v4.test.runtime.java.BaseTest;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.ast.GrammarAST;
 import org.junit.Test;

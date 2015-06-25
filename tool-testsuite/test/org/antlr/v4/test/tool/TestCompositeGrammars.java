@@ -30,6 +30,8 @@
 
 package org.antlr.v4.test.tool;
 
+import org.antlr.v4.test.runtime.java.BaseTest;
+import org.antlr.v4.test.runtime.java.ErrorQueue;
 import org.antlr.v4.tool.ANTLRMessage;
 import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.Grammar;
