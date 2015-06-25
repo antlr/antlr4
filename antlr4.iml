@@ -19,6 +19,8 @@
       <sourceFolder url="file://$MODULE_DIR$/tool/target/generated-sources/antlr3" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/tool-testsuite/test" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/runtime" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/runtime/Python2/src" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/runtime/Python3/src" type="java-resource" />
       <excludeFolder url="file://$MODULE_DIR$/runtime-testsuite/test/org/antlr/v4/test/runtime/javascript/chrome" />
       <excludeFolder url="file://$MODULE_DIR$/runtime-testsuite/test/org/antlr/v4/test/runtime/javascript/explorer" />
       <excludeFolder url="file://$MODULE_DIR$/runtime-testsuite/test/org/antlr/v4/test/runtime/javascript/firefox" />
