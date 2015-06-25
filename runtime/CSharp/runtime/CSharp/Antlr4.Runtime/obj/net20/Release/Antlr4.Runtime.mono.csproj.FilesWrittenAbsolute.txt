@@ -1,0 +1,2 @@
+/Users/parrt/antlr/code/antlr4-csharp/runtime/CSharp/Antlr4.Runtime/bin/net20/Release/Antlr4.Runtime.dll
+/Users/parrt/antlr/code/antlr4-csharp/runtime/CSharp/Antlr4.Runtime/obj/net20/Release/Antlr4.Runtime.dll
