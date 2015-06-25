@@ -18,7 +18,7 @@
       <sourceFolder url="file://$MODULE_DIR$/tool/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/tool/target/generated-sources/antlr3" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/tool-testsuite/test" isTestSource="true" />
-      <excludeFolder url="file://$MODULE_DIR$/runtime-testsuite/test/org/antlr/v4/test/runtime/csharp" />
+      <sourceFolder url="file://$MODULE_DIR$/runtime/CSharp/runtime" type="java-resource" />
       <excludeFolder url="file://$MODULE_DIR$/runtime-testsuite/test/org/antlr/v4/test/runtime/javascript" />
       <excludeFolder url="file://$MODULE_DIR$/runtime-testsuite/test/org/antlr/v4/test/runtime/python2" />
       <excludeFolder url="file://$MODULE_DIR$/runtime-testsuite/test/org/antlr/v4/test/runtime/python3" />

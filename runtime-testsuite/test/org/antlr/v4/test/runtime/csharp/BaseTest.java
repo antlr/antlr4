@@ -35,7 +35,7 @@ import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenSource;
 import org.antlr.v4.runtime.WritableToken;
 import org.antlr.v4.runtime.misc.Utils;
-import org.antlr.v4.test.tool.ErrorQueue;
+import org.antlr.v4.test.runtime.java.ErrorQueue;
 import org.antlr.v4.tool.ANTLRMessage;
 import org.antlr.v4.tool.DefaultToolListener;
 import org.antlr.v4.tool.GrammarSemanticsMessage;
@@ -56,7 +56,6 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -64,6 +63,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -464,20 +464,21 @@ public abstract class BaseTest {
 			saveResourceAsFile(pack + "App.config", new File(tmpdir, "App.config"));
 			// update project
 			String projectName = isWindows() ? "Antlr4.Test.vs2013.csproj" : "Antlr4.Test.mono.csproj";
-			InputStream input = Thread.currentThread().getContextClassLoader().getResourceAsStream(pack + projectName);
+			final ClassLoader loader = Thread.currentThread().getContextClassLoader();
+			InputStream input = loader.getResourceAsStream(pack + projectName);
 			Document prjXml = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(input);
 			// update runtime project reference
-			String runtimePath = System.getProperty("antlr-csharp-runtime-project");
+			// find project file as a resource not relative pathname (now that we've merged repos)
 			String runtimeName = isWindows() ? "Antlr4.Runtime.vs2013.csproj" : "Antlr4.Runtime.mono.csproj";
-			if(runtimePath==null)
-				runtimePath = "../../antlr4-csharp/runtime/CSharp/Antlr4.Runtime/" + runtimeName;
-			File projFile = new File(runtimePath);
-			if(!projFile.exists())
-				throw new RuntimeException("C# runtime project file not found at:" + projFile.getAbsolutePath());
-			runtimePath = projFile.getAbsolutePath();
-			XPathExpression exp = XPathFactory.newInstance().newXPath().compile("/Project/ItemGroup/ProjectReference[@Include='" + runtimeName + "']");
+			final URL runtimeProj = loader.getResource("CSharp/Antlr4.Runtime/"+runtimeName);
+			if ( runtimeProj==null ) {
+				throw new RuntimeException("C# runtime project file not found at:" + runtimeProj.getPath());
+			}
+			String runtimeProjPath = runtimeProj.getPath();
+			XPathExpression exp = XPathFactory.newInstance().newXPath()
+				.compile("/Project/ItemGroup/ProjectReference[@Include='" + runtimeName + "']");
 			Element node = (Element)exp.evaluate(prjXml, XPathConstants.NODE);
-			node.setAttribute("Include", runtimePath.replace("/", "\\"));
+			node.setAttribute("Include", runtimeProjPath.replace("/", "\\"));
 			// update project file list
 			exp = XPathFactory.newInstance().newXPath().compile("/Project/ItemGroup[Compile/@Include='AssemblyInfo.cs']");
 			Element group = (Element)exp.evaluate(prjXml, XPathConstants.NODE);
