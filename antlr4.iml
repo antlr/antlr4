@@ -19,7 +19,10 @@
       <sourceFolder url="file://$MODULE_DIR$/tool/target/generated-sources/antlr3" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/tool-testsuite/test" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/runtime" type="java-resource" />
-      <excludeFolder url="file://$MODULE_DIR$/runtime-testsuite/test/org/antlr/v4/test/runtime/javascript" />
+      <excludeFolder url="file://$MODULE_DIR$/runtime-testsuite/test/org/antlr/v4/test/runtime/javascript/chrome" />
+      <excludeFolder url="file://$MODULE_DIR$/runtime-testsuite/test/org/antlr/v4/test/runtime/javascript/explorer" />
+      <excludeFolder url="file://$MODULE_DIR$/runtime-testsuite/test/org/antlr/v4/test/runtime/javascript/firefox" />
+      <excludeFolder url="file://$MODULE_DIR$/runtime-testsuite/test/org/antlr/v4/test/runtime/javascript/safari" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

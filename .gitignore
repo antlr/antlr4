@@ -10,6 +10,9 @@ user.build.properties
 # MacOSX files
 .DS_Store
 
+# Python
+*.pyc
+
 # NetBeans user configuration files
 nbactions*.xml
 /nbproject/private/
