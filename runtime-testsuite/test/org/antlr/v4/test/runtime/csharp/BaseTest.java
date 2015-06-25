@@ -470,7 +470,7 @@ public abstract class BaseTest {
 			// update runtime project reference
 			// find project file as a resource not relative pathname (now that we've merged repos)
 			String runtimeName = isWindows() ? "Antlr4.Runtime.vs2013.csproj" : "Antlr4.Runtime.mono.csproj";
-			final URL runtimeProj = loader.getResource("runtime/CSharp/Antlr4.Runtime/"+runtimeName);
+			final URL runtimeProj = loader.getResource("CSharp/runtime/CSharp/Antlr4.Runtime/"+runtimeName);
 			if ( runtimeProj==null ) {
 				throw new RuntimeException("C# runtime project file not found at:" + runtimeProj.getPath());
 			}
