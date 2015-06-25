@@ -45,7 +45,7 @@ import java.util.List;
 import java.util.Map;
 
 public class TestGenerator {
-	public static final String antlrRoot = "."; // assume antlr4 root dir is current working dir
+	public final static String[] targets = {"CSharp", "Java", "Python2", "Python3", "JavaScript"};
 
 	// This project uses UTF-8, but the plugin might be used in another project
 	// which is not. Always load templates with UTF-8, but write using the
@@ -65,6 +65,10 @@ public class TestGenerator {
 	 * Example:
 	 *
 	 * $ java org.antlr.v4.testgen.TestGenerator -o /tmp -templates /Users/parrt/antlr/code/antlr4/tool/test/org/antlr/v4/test/runtime/java/Java.test.stg
+	 * 
+	 * Most commonly:
+	 * 
+	 * $ java org.antlr.v4.testgen.TestGenerator -root /Users/parrt/antlr/code/antlr4
 	 */
 	public static void main(String[] args) {
 		String rootDir = null;
@@ -93,7 +97,7 @@ public class TestGenerator {
 			i++;
 		}
 		if ( rootDir!=null) {
-			genAllTargets(rootDir, viz);
+			genAllTargets(outDir, rootDir, viz);
 			System.exit(0);
 		}
 
@@ -105,13 +109,19 @@ public class TestGenerator {
 		genTarget(outDir, targetSpecificTemplateFile, viz);
 	}
 
-	public static void genAllTargets(final String rootDir, boolean viz) {
-		for(TargetConfiguration config : TargetConfiguration.ALL) {
-			String outDir = rootDir + config.outDir;
-			String templates = rootDir + config.templates;
+	public static void genAllTargets(String outDirRoot, final String rootDir, boolean viz) {
+		for (String t : targets) {
+			String templatesPackage = rootDir + "/runtime-testsuite/resources/org/antlr/v4/test/runtime/" + t.toLowerCase();
+			String templates = templatesPackage + "/" + t + ".test.stg";
+			if ( t.equals("JavaScript") ) {
+				templates = templatesPackage+"/node/Node.test.stg";
+			}
+			String outDir = rootDir + "/runtime-testsuite/test";
+			if ( outDirRoot!=null ) {
+				outDir = outDirRoot;
+			}
 			genTarget(outDir, templates, viz);
 		}
-
 	}
 
 	public static void genTarget(final String outDir, String targetSpecificTemplateFile, boolean viz) {
