@@ -7,9 +7,6 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-<if(file.Options.("ImportErrorQueue"))>
-import org.antlr.v4.test.tool.ErrorQueue;
-<endif>
 <if(file.Options.("ImportGrammar"))>
 import org.antlr.v4.tool.Grammar;
 <endif>
