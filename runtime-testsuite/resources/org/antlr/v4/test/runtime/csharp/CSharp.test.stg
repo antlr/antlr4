@@ -10,7 +10,7 @@ import org.junit.Test;
 import org.junit.Ignore;
 
 <if(file.Options.("ImportErrorQueue"))>
-import org.antlr.v4.test.tool.ErrorQueue;
+import org.antlr.v4.test.runtime.java.ErrorQueue;
 <endif>
 <if(file.Options.("ImportGrammar"))>
 import org.antlr.v4.tool.Grammar;
