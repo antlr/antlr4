@@ -34,8 +34,7 @@
 # graph-structured stack.
 #/
 from io import StringIO
-
-from antlr4.PredictionContext import merge
+from antlr4.PredictionContext import PredictionContext, merge
 from antlr4.Utils import str_list
 from antlr4.atn.ATN import ATN
 from antlr4.atn.ATNConfig import ATNConfig

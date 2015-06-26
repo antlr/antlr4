@@ -37,7 +37,6 @@
 #  {@link SemanticContext} within the scope of this outer class.</p>
 #
 from io import StringIO
-
 from antlr4.Recognizer import Recognizer
 from antlr4.RuleContext import RuleContext
 

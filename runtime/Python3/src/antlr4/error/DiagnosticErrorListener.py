@@ -50,11 +50,9 @@
 # </ul>
 
 from io import StringIO
-
 from antlr4 import Parser, DFA
 from antlr4.atn.ATNConfigSet import ATNConfigSet
 from antlr4.error.ErrorListener import ErrorListener
-
 
 class DiagnosticErrorListener(ErrorListener):
 

@@ -3,9 +3,8 @@ __author__ = 'jszheng'
 import optparse
 import sys
 import os
-
+import importlib
 from antlr4 import *
-
 
 
 # this is a python version of TestRig

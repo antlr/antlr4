@@ -42,8 +42,7 @@
 # <p>
 # Whitespace is not allowed.</p>
 #
-from io import StringIO
-
+from xmlrpc.client import boolean
 from antlr4 import CommonTokenStream, DFA, PredictionContextCache, Lexer, LexerATNSimulator, ParserRuleContext, TerminalNode
 from antlr4.InputStream import InputStream
 from antlr4.Parser import Parser
@@ -55,6 +54,7 @@ from antlr4.tree.Tree import ParseTree
 from antlr4.tree.Trees import Trees
 from antlr4.atn.ATNDeserializer import ATNDeserializer
 
+from io import StringIO
 
 def serializedATN():
     with StringIO() as buf:

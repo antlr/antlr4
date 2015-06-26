@@ -1,8 +1,6 @@
 from io import StringIO
 import unittest
-
 from antlr4.Token import Token
-
 
 # need forward declarations
 IntervalSet = None
