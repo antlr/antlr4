@@ -29,7 +29,6 @@
 #  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #/
 from io import StringIO
-
 from antlr4.RuleContext import RuleContext
 from antlr4.atn.ATNState import ATNState
 
@@ -70,7 +69,7 @@ class PredictionContext(object):
     #  }
     # </pre>
     #/
-
+    
     def __init__(self, cachedHashCode):
         self.cachedHashCode = cachedHashCode
 

@@ -31,9 +31,7 @@
 
 # Map a predicate to a predicted alternative.#/
 from io import StringIO
-
 from antlr4.atn.ATNConfigSet import ATNConfigSet
-
 
 class PredPrediction(object):
     def __init__(self, pred, alt):

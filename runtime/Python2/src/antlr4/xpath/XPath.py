@@ -42,8 +42,6 @@
 # <p>
 # Whitespace is not allowed.</p>
 #
-from io import StringIO
-
 from antlr4 import CommonTokenStream, DFA, PredictionContextCache, Lexer, LexerATNSimulator, ParserRuleContext, TerminalNode
 from antlr4.atn.ATNDeserializer import ATNDeserializer
 from antlr4.InputStream import InputStream
@@ -51,6 +49,8 @@ from antlr4.Token import Token
 from antlr4.error.ErrorListener import ErrorListener
 from antlr4.error.Errors import LexerNoViableAltException
 from antlr4.tree.Trees import Trees
+
+from io import StringIO
 
 
 def serializedATN():

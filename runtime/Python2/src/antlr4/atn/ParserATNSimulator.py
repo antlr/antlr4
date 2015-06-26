@@ -258,7 +258,6 @@
 #
 from __future__ import print_function
 import sys
-
 from antlr4.PredictionContext import PredictionContext, SingletonPredictionContext, PredictionContextFromRuleContext
 from antlr4.ParserRuleContext import ParserRuleContext
 from antlr4.Token import Token
@@ -269,7 +268,7 @@ from antlr4.atn.ATNConfigSet import ATNConfigSet
 from antlr4.atn.ATNSimulator import ATNSimulator
 from antlr4.atn.ATNState import StarLoopEntryState, RuleStopState
 from antlr4.atn.PredictionMode import PredictionMode
-from antlr4.atn.SemanticContext import SemanticContext, andContext, orContext
+from antlr4.atn.SemanticContext import SemanticContext, AND, andContext, orContext
 from antlr4.atn.Transition import Transition, RuleTransition, ActionTransition, AtomTransition, SetTransition, NotSetTransition
 from antlr4.dfa.DFAState import DFAState, PredPrediction
 from antlr4.error.Errors import NoViableAltException
@@ -317,7 +316,7 @@ class ParserATNSimulator(ATNSimulator):
         self._input = input
         self._startIndex = input.index
         self._outerContext = outerContext
-
+        
         dfa = self.decisionToDFA[decision]
         self._dfa = dfa
         m = input.mark()
@@ -703,7 +702,7 @@ class ParserATNSimulator(ATNSimulator):
         # For full-context reach operations, separate handling is required to
         # ensure that the alternative matching the longest overall sequence is
         # chosen when multiple such configurations can match the input.
-
+        
         skippedStopStates = None
 
         # First figure out where we can reach on input t

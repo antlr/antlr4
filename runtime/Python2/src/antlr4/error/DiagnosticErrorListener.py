@@ -50,10 +50,8 @@
 # </ul>
 
 from io import StringIO
-
 from antlr4.Utils import str_set
 from antlr4.error.ErrorListener import ErrorListener
-
 
 class DiagnosticErrorListener(ErrorListener):
 

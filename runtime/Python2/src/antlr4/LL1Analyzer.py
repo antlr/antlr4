@@ -32,12 +32,12 @@ from antlr4.IntervalSet import IntervalSet, Interval
 from antlr4.Token import Token
 from antlr4.PredictionContext import PredictionContext, SingletonPredictionContext, PredictionContextFromRuleContext
 from antlr4.atn.ATNConfig import ATNConfig
-from antlr4.atn.ATNState import RuleStopState
+from antlr4.atn.ATNState import ATNState, RuleStopState
 from antlr4.atn.Transition import WildcardTransition, NotSetTransition, AbstractPredicateTransition, RuleTransition
 
 
 class LL1Analyzer (object):
-
+    
     #* Special value added to the lookahead sets to indicate that we hit
     #  a predicate during analysis if {@code seeThruPreds==false}.
     #/

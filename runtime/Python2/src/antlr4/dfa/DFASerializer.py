@@ -31,7 +31,6 @@
 
 # A DFA walker that knows how to dump them to serialized strings.#/
 from io import StringIO
-
 from antlr4.Utils import str_list
 
 

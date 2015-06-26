@@ -1,8 +1,6 @@
 from io import StringIO
 import unittest
-
 from antlr4.Token import Token
-
 
 class Interval(object):
 
@@ -13,7 +11,7 @@ class Interval(object):
 
     def __contains__(self, item):
         return item in self.range
-
+    
     def __len__(self):
         return self.stop - self.start
 

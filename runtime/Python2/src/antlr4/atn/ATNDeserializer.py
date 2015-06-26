@@ -28,14 +28,12 @@
 #  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #/
 from uuid import UUID
-
 from antlr4.atn.ATN import ATN
 from antlr4.atn.ATNType import ATNType
 from antlr4.atn.ATNState import *
 from antlr4.atn.Transition import *
 from antlr4.atn.LexerAction import *
 from antlr4.atn.ATNDeserializationOptions import ATNDeserializationOptions
-
 
 # This is the earliest supported serialized UUID.
 BASE_SERIALIZED_UUID = UUID("AADB8D7E-AEEF-4415-AD2B-8204D6CF042E")
@@ -166,8 +164,8 @@ class ATNDeserializer (object):
         for i in range(0, numPrecedenceStates):
             stateNumber = self.readInt()
             atn.states[stateNumber].isPrecedenceRule = True
-
-    def readRules(self, atn):
+            
+    def readRules(self, atn):        
         nrules = self.readInt()
         if atn.grammarType == ATNType.LEXER:
             atn.ruleToTokenType = [0] * nrules

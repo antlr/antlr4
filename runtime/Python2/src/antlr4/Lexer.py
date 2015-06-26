@@ -34,12 +34,10 @@
 #  of speed.
 #/
 from io import StringIO
-
 from antlr4.CommonTokenFactory import CommonTokenFactory
 from antlr4.Recognizer import Recognizer
 from antlr4.Token import Token
 from antlr4.error.Errors import IllegalStateException, LexerNoViableAltException
-
 
 class TokenSource(object):
 
@@ -64,7 +62,7 @@ class Lexer(Recognizer, TokenSource):
         self._tokenFactorySourcePair = (self, input)
 
         self._interp = None # child classes must populate this
-
+        
         # The goal of all lexer rules/methods is to create a token object.
         #  self is an instance variable as multiple rules may collaborate to
         #  create a single token.  nextToken will return self object after

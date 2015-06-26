@@ -39,10 +39,8 @@
 # {@link Token#HIDDEN_CHANNEL}, use a filtering token stream such a
 # {@link CommonTokenStream}.</p>
 from io import StringIO
-
 from antlr4.Token import Token
 from antlr4.error.Errors import IllegalStateException
-
 
 # this is just to keep meaningful parameter types to Parser
 class TokenStream(object):
@@ -84,14 +82,14 @@ class BufferedTokenStream(TokenStream):
         # {@link #tokens} is trivial with this field.</li>
         # <ul>
         self.fetchedEOF = False
-
+        
     def mark(self):
         return 0
-
+    
     def release(self, marker):
         # no resources to release
         pass
-
+    
     def reset(self):
         self.seek(0)
 

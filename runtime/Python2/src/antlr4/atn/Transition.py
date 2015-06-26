@@ -42,11 +42,9 @@
 #  ATN transitions.</p>
 #
 from __builtin__ import unicode
-
 from antlr4.IntervalSet import IntervalSet, Interval
 from antlr4.Token import Token
 from antlr4.atn.SemanticContext import Predicate, PrecedencePredicate
-
 
 class Transition (object):
     # constants for serialization

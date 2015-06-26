@@ -29,10 +29,8 @@
 #  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 from __builtin__ import unicode
-
 from antlr4.Token import Token
 from antlr4.error.ErrorListener import ProxyErrorListener, ConsoleErrorListener
-
 
 class Recognizer(object):
 
@@ -68,10 +66,10 @@ class Recognizer(object):
 
     def removeErrorListener(self, listener):
         self._listeners.remove(listener)
-
+        
     def removeErrorListeners(self):
         self._listeners = []
-
+    
     def getTokenTypeMap(self):
         tokenNames = self.getTokenNames()
         if tokenNames is None:

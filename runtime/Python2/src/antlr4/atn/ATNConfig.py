@@ -37,10 +37,8 @@
 #  an ATN state.
 #/
 from io import StringIO
-
-from antlr4.atn.ATNState import DecisionState
+from antlr4.atn.ATNState import ATNState, DecisionState
 from antlr4.atn.SemanticContext import SemanticContext
-
 
 class ATNConfig(object):
 
