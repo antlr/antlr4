@@ -1,5 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="ArtifactManager">
+    <artifact type="jar" name="antlr4:jar">
+      <output-path>$PROJECT_DIR$/dist</output-path>
+      <root id="archive" name="antlr-4.5.1-complete.jar">
+        <element id="directory" name="META-INF">
+          <element id="file-copy" path="$PROJECT_DIR$/META-INF/MANIFEST.MF" />
+        </element>
+        <element id="module-output" name="antlr4" />
+        <element id="extracted-dir" path="$APPLICATION_HOME_DIR$/lib/junit-4.11.jar" path-in-jar="/" />
+        <element id="extracted-dir" path="/usr/local/lib/antlr-3.5.2-complete-no-st3.jar" path-in-jar="/" />
+        <element id="extracted-dir" path="$PROJECT_DIR$/runtime/Java/lib/org.abego.treelayout.core.jar" path-in-jar="/" />
+        <element id="extracted-dir" path="/usr/local/lib/ST-4.0.8.jar" path-in-jar="/" />
+        <element id="extracted-dir" path="$APPLICATION_HOME_DIR$/lib/hamcrest-core-1.3.jar" path-in-jar="/" />
+      </root>
+    </artifact>
+  </component>
   <component name="CompilerConfiguration">
     <option name="DEFAULT_COMPILER" value="Javac" />
     <resourceExtensions />
