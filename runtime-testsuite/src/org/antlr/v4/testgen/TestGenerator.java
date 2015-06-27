@@ -64,10 +64,6 @@ public class TestGenerator {
 	 *
 	 * Example:
 	 *
-	 * $ java org.antlr.v4.testgen.TestGenerator -o /tmp -templates /Users/parrt/antlr/code/antlr4/tool/test/org/antlr/v4/test/runtime/java/Java.test.stg
-	 * 
-	 * Most commonly:
-	 * 
 	 * $ java org.antlr.v4.testgen.TestGenerator -root /Users/parrt/antlr/code/antlr4
 	 */
 	public static void main(String[] args) {
@@ -280,8 +276,7 @@ public class TestGenerator {
 	public String getTestTemplatesResourceDir() { return "org/antlr/v4/test/runtime/templates"; }
 
 	public String getTargetNameFromTemplatesFileName() {
-		// runtimeTemplates is like /Users/parrt/antlr/code/antlr4/tool/test/org/antlr/v4/test/runtime/java/Java.test.stg
-		// extra target name
+		// runtimeTemplates is like ~/antlr/code/antlr4/runtime-testsuite/resources/org/antlr/v4/test/runtime/java/Java.test.stg
 		int targetEnd = runtimeTemplates.getName().indexOf(".test.stg");
 		return runtimeTemplates.getName().substring(0, targetEnd);
 	}

@@ -24,17 +24,6 @@
       <version>4.0.8</version>
     </dependency>
     <dependency>
-      <groupId>org.antlr</groupId>
-      <artifactId>antlr4</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.antlr</groupId>
-      <artifactId>antlr4</artifactId>
-      <version>${project.version}</version>
-      <type>test-jar</type>
-    </dependency>
-    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>4.11</version>
@@ -44,6 +33,7 @@
 
   <build>
     <sourceDirectory>src</sourceDirectory>
+    <testSourceDirectory>ignored</testSourceDirectory>
     <pluginManagement>
       <plugins>
         <plugin>
@@ -112,6 +102,5 @@
         <artifactId>maven-surefire-plugin</artifactId>
       </plugin>
     </plugins>
-    <testSourceDirectory>ignored</testSourceDirectory>
   </build>
 </project>

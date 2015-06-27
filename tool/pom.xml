@@ -85,22 +85,6 @@
           </execution>
         </executions>
       </plugin>
-
-      <plugin>
-        <groupId>org.antlr</groupId>
-        <artifactId>antlr4-testgen-maven-plugin</artifactId>
-        <version>${project.version}</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>antlr4.testgen</goal>
-            </goals>
-            <configuration>
-              <runtimeTemplates>test/org/antlr/v4/test/runtime/java/Java.test.stg</runtimeTemplates>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
     </plugins>
   </build>
 </project>
