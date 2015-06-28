@@ -67,7 +67,7 @@ public class CppTarget extends Target {
 	protected final Set<String> badWords = new HashSet<String>();
 
 	public CppTarget(CodeGenerator gen) {
-		super(gen, "C++");
+		super(gen, "Cpp");
 	}
 
 	public Set<String> getBadWords() {
@@ -197,21 +197,7 @@ public class CppTarget extends Target {
 	@Override
 	protected STGroup loadTemplates() {
 		STGroup result = super.loadTemplates();
-		result.registerRenderer(String.class, new CppStringRenderer(), true);
+		result.registerRenderer(String.class, new StringRenderer(), true);
 		return result;
-	}
-
-	protected static class CppStringRenderer extends StringRenderer {
-
-		@Override
-		public String toString(Object o, String formatString, Locale locale) {
-			if ("java-escape".equals(formatString)) {
-				// 5C is the hex code for the \ itself
-				return ((String)o).replace("\\u", "\\u005Cu");
-			}
-
-			return super.toString(o, formatString, locale);
-		}
-
 	}
 }
