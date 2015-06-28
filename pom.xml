@@ -64,7 +64,7 @@
     <module>tool</module>
     <module>runtime-testsuite</module>
     <module>antlr4-maven-plugin</module>
-<!--    <module>antlr4-testgen-maven-plugin</module> -->
+    <module>antlr4-testgen-maven-plugin</module>
     <module>tool-testsuite</module>
   </modules>
 
@@ -107,6 +107,18 @@
         <directory>test</directory>
       </testResource>
     </testResources>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <configuration>          
+            <source>${maven.compiler.source}</source>
+            <target>${maven.compiler.target}</target>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>    
   </build>
 
   <profiles>

@@ -29,19 +29,35 @@
       <version>4.11</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.antlr</groupId>
+      <artifactId>antlr4</artifactId>
+      <version>${project.version}</version>
+    </dependency>  
+    <dependency>
+      <groupId>org.antlr</groupId>
+      <artifactId>antlr4-runtime</artifactId>
+      <version>${project.version}</version>
+    </dependency>
   </dependencies>
 
   <build>
     <sourceDirectory>src</sourceDirectory>
-    <testSourceDirectory>ignored</testSourceDirectory>
+    <testSourceDirectory>test</testSourceDirectory>
+    <resources>
+      <resource>
+        <directory>resources</directory>
+      </resource>
+      <resource>
+        <directory>../runtime</directory>
+      </resource>
+    </resources>    
     <pluginManagement>
       <plugins>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
           <configuration>
-            <source>1.6</source>
-            <target>1.6</target>
             <excludes>
               <exclude>**/safari/*.java</exclude>
               <exclude>**/chrome/*.java</exclude>
@@ -71,36 +87,16 @@
     </pluginManagement>
     <plugins>
       <plugin>
-        <groupId>com.googlecode.maven-download-plugin</groupId>
-        <artifactId>download-maven-plugin</artifactId>
-        <version>1.2.1</version>
-        <configuration>
-          <skipCache>true</skipCache>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>build-helper-maven-plugin</artifactId>
-        <version>1.8</version>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
         <executions>
           <execution>
-            <id>add-test-source</id>
-            <phase>generate-test-sources</phase>
             <goals>
-              <goal>add-test-source</goal>
+              <goal>test-jar</goal>
             </goals>
-            <configuration>
-              <sources>
-                <source>target/generated-sources</source>
-              </sources>
-            </configuration>
           </execution>
         </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-      </plugin>
-    </plugins>
+      </plugin>        
+    </plugins>    
   </build>
 </project>

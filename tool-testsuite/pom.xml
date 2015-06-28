@@ -45,6 +45,12 @@
       <type>test-jar</type>
     </dependency>
     <dependency>
+      <groupId>org.antlr</groupId>
+      <artifactId>antlr4-runtime-testsuite</artifactId>
+      <version>${project.version}</version>
+      <type>test-jar</type>
+    </dependency>
+    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>4.11</version>

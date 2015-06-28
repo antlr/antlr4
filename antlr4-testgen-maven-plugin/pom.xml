@@ -181,7 +181,8 @@
                     <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
                 </configuration>
             </plugin>
-
+            
+            <!-- We'll make an integration test for this
             <plugin>
               <groupId>org.antlr</groupId>
               <artifactId>antlr4-testgen-maven-plugin</artifactId>
@@ -197,7 +198,7 @@
                 </execution>
               </executions>
             </plugin>
-
+            -->
         </plugins>
 
     </build>
