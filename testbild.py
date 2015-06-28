@@ -44,48 +44,42 @@ BUILD = "build"
 
 JUNIT = ["junit-4.11.jar", "hamcrest-core-1.3.jar"]
 
-class Goal:
-    def __init__(self,name,srcdirs,dependencies=[],usesmods=[],resources=[]):
-        self.name = name
-        self.srcdirs = srcdirs
-        self.dependencies = dependencies
-        self.usesmods = usesmods
-        self.resources = resources
-
-    def compile(self):
-        mycompile(self.name,
-                  self.srcdirs,
-                  [os.path.join(JARCACHE,d) for d in self.dependencies] +
-                  [os.path.join(BUILD,d) for d in self.usesmods])
-
-
-goals = []
-
-def goal(name,srcdirs,dependencies=[],usesmods=[],resources=[]):
-    global goals
-    goals += [Goal(name,srcdirs,dependencies,usesmods,resources)]
-
-
-goal(name="runtime",
-     srcdirs=["runtime/Java/src","gen4"],
-     dependencies=["antlr-"+BOOTSTRAP_VERSION+"-complete.jar"])
-
-goal(name="runtime-test",
-     srcdirs=["runtime-testsuite/test"],
-     dependencies=["antlr-"+BOOTSTRAP_VERSION+"-complete.jar"]+JUNIT,
-     usesmods=["runtime", "tool"],
-     resources=["runtime/CSharp/Antlr4.Runtime/Antlr4.Runtime.mono.csproj",
-                "runtime/JavaScript/src",
-                "runtime/Python2/src",
-                "runtime/Python3/src",
-                "runtime/Java/src"
-                ])
-
-goal(name="tool",
-     srcdirs=["gen3", "tool/src"],
-     dependencies=["antlr-3.5.2-runtime.jar", "ST-4.0.8.jar"],
-     usesmods=["runtime"],
-     resources=["tool/resources"])
+# class Goal:
+#     def __init__(self,name,srcdirs,dependencies=[],usesmods=[],resources=[]):
+#         self.name = name
+#         self.srcdirs = srcdirs
+#         self.dependencies = dependencies
+#         self.usesmods = usesmods
+#         self.resources = resources
+#
+#
+# goals = {}
+#
+# def goal(name,srcdirs,dependencies=[],usesmods=[],resources=[]):
+#     global goals
+#     goals[name] = Goal(name,srcdirs,dependencies,usesmods,resources)
+#
+#
+# goal(name="runtime",
+#      srcdirs=["runtime/Java/src","gen4"],
+#      dependencies=["antlr-"+BOOTSTRAP_VERSION+"-complete.jar"])
+#
+# goal(name="runtime-test",
+#      srcdirs=["runtime-testsuite/test"],
+#      dependencies=["antlr-"+BOOTSTRAP_VERSION+"-complete.jar"]+JUNIT,
+#      usesmods=["runtime", "tool"],
+#      resources=["runtime/CSharp/Antlr4.Runtime/Antlr4.Runtime.mono.csproj",
+#                 "runtime/JavaScript/src",
+#                 "runtime/Python2/src",
+#                 "runtime/Python3/src",
+#                 "runtime/Java/src"
+#                 ])
+#
+# goal(name="tool",
+#      srcdirs=["gen3", "tool/src"],
+#      dependencies=["antlr-3.5.2-runtime.jar", "ST-4.0.8.jar"],
+#      usesmods=["runtime"],
+#      resources=["tool/resources"])
 
 RUNTIME_SRC = ["runtime/Java/src","gen4"]
 RUNTIME_DEP = ["antlr-"+BOOTSTRAP_VERSION+"-complete.jar"]
@@ -126,6 +120,13 @@ def download_libs():
     copyfile(src="runtime/Java/lib/org.abego.treelayout.core.jar", trg=JARCACHE)
 
 
+# def compile_goal(goal): all
+#     print "compile "+goal.name
+#     mycompile(goal.name,
+#               goal.srcdirs,
+#               [os.path.join(JARCACHE,d) for d in goal.dependencies] +
+#               [os.path.join(BUILD,d) for d in goal.usesmods])
+
 def mycompile(goal,srcpaths,dependencies,skip=[]):
     args = ["-Xlint", "-Xlint:-serial", "-g"]
     jars=None
@@ -137,6 +138,12 @@ def mycompile(goal,srcpaths,dependencies,skip=[]):
     args += ["-sourcepath", string.join(srcpaths, ":")] # javac says always ':'
     for src in srcpaths:
         javac(srcdir=src, trgdir=trgdir, version="1.6", cp=jars, args=args, skip=skip)
+
+# for g in goals:
+#     for mod in goals[g].usesmods:
+#         compile_goal(goals[mod])
+#     compile_goal(goals[g])
+
 
 def parsers():
     antlr3("tool/src/org/antlr/v4/parse", "gen3", version="3.5.2", package="org.antlr.v4.parse")
@@ -171,8 +178,7 @@ def runtime_tests():
          RUNTIME_TEST_RES +\
          [os.path.join(BUILD,d) for d in RUNTIME_TEST_MOD_DEP]
     cp = [uniformpath(p) for p in cp]
-    for target in TARGETS:
-        junit(os.path.join(BUILD,"runtime-tests/org/antlr/v4/test/runtime/"+target.lower()), cp=string.join(cp,os.pathsep), verbose=False)
+    junit(os.path.join(BUILD,"runtime-tests"), cp=string.join(cp,os.pathsep), verbose=False)
 
 
 def tool_tests():
