@@ -44,6 +44,49 @@ BUILD = "build"
 
 JUNIT = ["junit-4.11.jar", "hamcrest-core-1.3.jar"]
 
+class Goal:
+    def __init__(self,name,srcdirs,dependencies=[],usesmods=[],resources=[]):
+        self.name = name
+        self.srcdirs = srcdirs
+        self.dependencies = dependencies
+        self.usesmods = usesmods
+        self.resources = resources
+
+    def compile(self):
+        mycompile(self.name,
+                  self.srcdirs,
+                  [os.path.join(JARCACHE,d) for d in self.dependencies] +
+                  [os.path.join(BUILD,d) for d in self.usesmods])
+
+
+goals = []
+
+def goal(name,srcdirs,dependencies=[],usesmods=[],resources=[]):
+    global goals
+    goals += [Goal(name,srcdirs,dependencies,usesmods,resources)]
+
+
+goal(name="runtime",
+     srcdirs=["runtime/Java/src","gen4"],
+     dependencies=["antlr-"+BOOTSTRAP_VERSION+"-complete.jar"])
+
+goal(name="runtime-test",
+     srcdirs=["runtime-testsuite/test"],
+     dependencies=["antlr-"+BOOTSTRAP_VERSION+"-complete.jar"]+JUNIT,
+     usesmods=["runtime", "tool"],
+     resources=["runtime/CSharp/Antlr4.Runtime/Antlr4.Runtime.mono.csproj",
+                "runtime/JavaScript/src",
+                "runtime/Python2/src",
+                "runtime/Python3/src",
+                "runtime/Java/src"
+                ])
+
+goal(name="tool",
+     srcdirs=["gen3", "tool/src"],
+     dependencies=["antlr-3.5.2-runtime.jar", "ST-4.0.8.jar"],
+     usesmods=["runtime"],
+     resources=["tool/resources"])
+
 RUNTIME_SRC = ["runtime/Java/src","gen4"]
 RUNTIME_DEP = ["antlr-"+BOOTSTRAP_VERSION+"-complete.jar"]
 RUNTIME_RES = []
