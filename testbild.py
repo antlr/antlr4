@@ -50,8 +50,14 @@ RUNTIME_RES = []
 
 RUNTIME_TEST_SRC = ["runtime-testsuite/test"]
 RUNTIME_TEST_DEP = RUNTIME_DEP + JUNIT
-RUNTIME_TEST_RES = []
-RUNTIME_TEST_MOD_DEP = ["runtime"]
+RUNTIME_TEST_RES = [
+    "runtime/CSharp/Antlr4.Runtime/Antlr4.Runtime.mono.csproj",
+    "runtime/JavaScript/src",
+    "runtime/Python2/src",
+    "runtime/Python3/src",
+    "runtime/Java/src"
+]
+RUNTIME_TEST_MOD_DEP = ["runtime", "tool"]
 RUNTIME_TEST_SKIP = [
     'org/antlr/v4/test/runtime/javascript/firefox',
     'org/antlr/v4/test/runtime/javascript/chrome',
@@ -118,6 +124,12 @@ def runtime_tests():
               [os.path.join(JARCACHE,d) for d in RUNTIME_TEST_DEP] +
               [os.path.join(BUILD,d) for d in RUNTIME_TEST_MOD_DEP],
               skip=RUNTIME_TEST_SKIP)
+    cp = [os.path.join(JARCACHE,d) for d in RUNTIME_TEST_DEP] +\
+         RUNTIME_TEST_RES +\
+         [os.path.join(BUILD,d) for d in RUNTIME_TEST_MOD_DEP]
+    cp = [uniformpath(p) for p in cp]
+    for target in TARGETS:
+        junit(os.path.join(BUILD,"runtime-tests/org/antlr/v4/test/runtime/"+target.lower()), cp=string.join(cp,os.pathsep), verbose=False)
 
 
 def tool_tests():
