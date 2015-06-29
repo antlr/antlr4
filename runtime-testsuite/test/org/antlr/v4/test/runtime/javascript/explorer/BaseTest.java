@@ -29,6 +29,30 @@
  */
 package org.antlr.v4.test.runtime.javascript.explorer;
 
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.BindException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+
 import org.antlr.v4.Tool;
 import org.antlr.v4.automata.ATNFactory;
 import org.antlr.v4.automata.ATNPrinter;
@@ -55,6 +79,7 @@ import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.IntegerList;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.semantics.SemanticPipeline;
+import org.antlr.v4.test.runtime.java.ErrorQueue;
 import org.antlr.v4.tool.ANTLRMessage;
 import org.antlr.v4.tool.DOTGenerator;
 import org.antlr.v4.tool.DefaultToolListener;
@@ -78,30 +103,6 @@ import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupString;
-
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.BindException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 public abstract class BaseTest {
 	// -J-Dorg.antlr.v4.test.BaseTest.level=FINE
@@ -139,8 +140,9 @@ public abstract class BaseTest {
 
 	@After
 	public void closeWebPage() {
-		if(driver!=null)
-			driver.quit();
+		if(driver!=null) {
+      driver.quit();
+    }
 	}
 
 
@@ -148,13 +150,15 @@ public abstract class BaseTest {
 	public void setUp() throws Exception {
         // new output dir for each test
     	String prop = System.getProperty("antlr-javascript-test-dir");
-    	if(prop!=null && prop.length()>0)
-    		httpdir = prop;
-    	else
-    		httpdir = new File(System.getProperty("java.io.tmpdir"), getClass().getSimpleName()+"-"+System.currentTimeMillis()).getAbsolutePath();
+    	if(prop!=null && prop.length()>0) {
+        httpdir = prop;
+      } else {
+        httpdir = new File(System.getProperty("java.io.tmpdir"), getClass().getSimpleName()+"-"+System.currentTimeMillis()).getAbsolutePath();
+      }
     	File dir = new File(httpdir);
-    	if(dir.exists())
-    		this.eraseFiles(dir);
+    	if(dir.exists()) {
+        this.eraseFiles(dir);
+      }
     	tmpdir = new File(httpdir, "parser").getAbsolutePath();
     }
 
@@ -460,12 +464,15 @@ public abstract class BaseTest {
 		ServerThread thread = new ServerThread(fileName);
 		thread.start();
 		try {
-			while(thread.server==null && thread.ex==null)
-				Thread.sleep(10);
-			if(thread.ex!=null)
-				throw thread.ex;
-			while(thread.server.isStarting())
-				Thread.sleep(10);
+			while(thread.server==null && thread.ex==null) {
+        Thread.sleep(10);
+      }
+			if(thread.ex!=null) {
+        throw thread.ex;
+      }
+			while(thread.server.isStarting()) {
+        Thread.sleep(10);
+      }
 			Thread.sleep(400); // despite all the above precautions, driver.get often fails if you don't give time to Jetty
 			driver.get("http://localhost:" + httpPort + "/" + fileName);
 			driver.findElement(new ById("input")).clear();
@@ -482,8 +489,9 @@ public abstract class BaseTest {
 			}
 			String value = driver.findElement(new ById("output")).getAttribute("value");
 			// mimic stdout which adds a NL
-			if(value.length()>0 && !value.endsWith("\n"))
-				value = value + "\n";
+			if(value.length()>0 && !value.endsWith("\n")) {
+        value = value + "\n";
+      }
 			return value;
 		}
 		catch (Exception e) {
@@ -492,8 +500,9 @@ public abstract class BaseTest {
 		} finally {
 			if(thread.server!=null) {
 				thread.server.stop();
-				while(!thread.server.isStopped())
-					Thread.sleep(10);
+				while(!thread.server.isStopped()) {
+          Thread.sleep(10);
+        }
 				Thread.sleep(100); // ensure the port is freed
 			}
 		}
@@ -503,11 +512,13 @@ public abstract class BaseTest {
 	private String locateRuntime() {
 		String propName = "antlr-javascript-runtime";
 		String prop = System.getProperty(propName);
-		if(prop==null || prop.length()==0)
-			prop = "../../antlr4-javascript/src";
+		if(prop==null || prop.length()==0) {
+      prop = "../../antlr4-javascript/src";
+    }
 		File file = new File(prop);
-		if(!file.exists())
-			throw new RuntimeException("Missing system property:" + propName);
+		if(!file.exists()) {
+      throw new RuntimeException("Missing system property:" + propName);
+    }
 		return file.getAbsolutePath();
 	}
 
@@ -540,7 +551,9 @@ public abstract class BaseTest {
 			int space = line.indexOf(' ', grIndex);
 			fileName = line.substring(space+1, semi)+Tool.GRAMMAR_EXTENSION;
 		}
-		if ( fileName.length()==Tool.GRAMMAR_EXTENSION.length() ) fileName = "A" + Tool.GRAMMAR_EXTENSION;
+		if ( fileName.length()==Tool.GRAMMAR_EXTENSION.length() ) {
+      fileName = "A" + Tool.GRAMMAR_EXTENSION;
+    }
 		return fileName;
 	}
 
@@ -582,7 +595,9 @@ public abstract class BaseTest {
 	List<ANTLRMessage> getMessagesOfType(List<ANTLRMessage> msgs, Class<? extends ANTLRMessage> c) {
 		List<ANTLRMessage> filtered = new ArrayList<ANTLRMessage>();
 		for (ANTLRMessage m : msgs) {
-			if ( m.getClass() == c ) filtered.add(m);
+			if ( m.getClass() == c ) {
+        filtered.add(m);
+      }
 		}
 		return filtered;
 	}
@@ -617,7 +632,9 @@ public abstract class BaseTest {
 			sem.process();
 
 			ATNFactory factory = new ParserATNFactory(g);
-			if ( g.isLexer() ) factory = new LexerATNFactory((LexerGrammar)g);
+			if ( g.isLexer() ) {
+        factory = new LexerATNFactory((LexerGrammar)g);
+      }
 			g.atn = factory.createATN();
 
 			CodeGenerator gen = new CodeGenerator(g);
@@ -928,15 +945,16 @@ public abstract class BaseTest {
 	public void writeRecognizer(String parserName, String lexerName,
 								String listenerName, String visitorName,
 								String parserStartRuleName, boolean debug) {
-		if ( parserName==null )
-			writeLexerTestFile(lexerName, debug);
-		else
-			writeParserTestFile(parserName,
+		if ( parserName==null ) {
+      writeLexerTestFile(lexerName, debug);
+    } else {
+      writeParserTestFile(parserName,
 						  lexerName,
 						  listenerName,
 						  visitorName,
 						  parserStartRuleName,
 						  debug);
+    }
 	}
 
 
@@ -961,8 +979,9 @@ public abstract class BaseTest {
        	boolean doErase = true;
     	String propName = "antlr-javascript-erase-test-dir";
     	String prop = System.getProperty(propName);
-    	if(prop!=null && prop.length()>0)
-    		doErase = Boolean.getBoolean(prop);
+    	if(prop!=null && prop.length()>0) {
+        doErase = Boolean.getBoolean(prop);
+      }
         if(doErase) {
 	        File tmpdirF = new File(httpdir);
 	        if ( tmpdirF.exists() ) {
@@ -1066,8 +1085,11 @@ public abstract class BaseTest {
 		public Token LT(int i) {
 			CommonToken t;
 			int rawIndex = p + i - 1;
-			if ( rawIndex>=types.size() ) t = new CommonToken(Token.EOF);
-			else t = new CommonToken(types.get(rawIndex));
+			if ( rawIndex>=types.size() ) {
+        t = new CommonToken(Token.EOF);
+      } else {
+        t = new CommonToken(types.get(rawIndex));
+      }
 			t.setTokenIndex(rawIndex);
 			return t;
 		}
