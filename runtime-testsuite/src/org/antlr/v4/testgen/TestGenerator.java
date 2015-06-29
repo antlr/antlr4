@@ -29,11 +29,6 @@
  */
 package org.antlr.v4.testgen;
 
-import org.stringtemplate.v4.ST;
-import org.stringtemplate.v4.STGroup;
-import org.stringtemplate.v4.STGroupFile;
-import org.stringtemplate.v4.gui.STViz;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -43,6 +38,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+
+import org.stringtemplate.v4.ST;
+import org.stringtemplate.v4.STGroup;
+import org.stringtemplate.v4.STGroupFile;
+import org.stringtemplate.v4.gui.STViz;
 
 public class TestGenerator {
 	public final static String[] targets = {"CSharp", "Java", "Python2", "Python3", "JavaScript"};
@@ -69,6 +69,7 @@ public class TestGenerator {
 	public static void main(String[] args) {
 		String rootDir = null;
 		String outDir = null;
+		String templatesRoot = null;
 		String targetSpecificTemplateFile = null;
 		boolean viz = false;
 
@@ -86,41 +87,47 @@ public class TestGenerator {
 			else if (arg.startsWith("-templates")) {
 				i++;
 				targetSpecificTemplateFile = args[i];
+				templatesRoot = targetSpecificTemplateFile;
 			}
 			else if (arg.startsWith("-viz")) {
 				viz = true;
 			}
 			i++;
 		}
+		
+		System.out.println("rootDir = " + rootDir);
+		System.out.println("outputDir = " + outDir);
+		System.out.println("templates = " + targetSpecificTemplateFile);
+		
 		if ( rootDir!=null) {
-			genAllTargets(outDir, rootDir, viz);
-			System.exit(0);
+			genAllTargets(outDir, rootDir, templatesRoot, viz);
+			return;
 		}
 
 		if ( outDir==null || targetSpecificTemplateFile==null ) {
 			System.err.println("You must give an output root dir and templates file");
-			System.exit(1);
+			return;
 		}
 
-		genTarget(outDir, targetSpecificTemplateFile, viz);
+		genTarget(outDir, targetSpecificTemplateFile, templatesRoot, viz);
 	}
 
-	public static void genAllTargets(String outDirRoot, final String rootDir, boolean viz) {
-		for (String t : targets) {
-			String templatesPackage = rootDir + "/runtime-testsuite/resources/org/antlr/v4/test/runtime/" + t.toLowerCase();
-			String templates = templatesPackage + "/" + t + ".test.stg";
-			if ( t.equals("JavaScript") ) {
+	public static void genAllTargets(String outDirRoot, final String rootDir, final String templatesRoot, boolean viz) {
+		for (String target : targets) {
+			String templatesPackage = rootDir + "/org/antlr/v4/test/runtime/" + target.toLowerCase();
+			String templates = templatesPackage + "/" + target + ".test.stg";
+			if ( target.equals("JavaScript") ) {
 				templates = templatesPackage+"/node/Node.test.stg";
 			}
 			String outDir = rootDir + "/runtime-testsuite/test";
 			if ( outDirRoot!=null ) {
 				outDir = outDirRoot;
 			}
-			genTarget(outDir, templates, viz);
+			genTarget(outDir, templates, templatesRoot, viz);
 		}
 	}
 
-	public static void genTarget(final String outDir, String targetSpecificTemplateFile, boolean viz) {
+	public static void genTarget(final String outDir, final String targetSpecificTemplateFile, final String templates, boolean viz) {
 		TestGenerator gen = new TestGenerator("UTF-8",
 											  new File(targetSpecificTemplateFile),
 											  new File(outDir),
@@ -142,9 +149,16 @@ public class TestGenerator {
 			}
 			@Override
 			public String getTestTemplatesResourceDir() {
-				return "runtime-testsuite/resources/org/antlr/v4/test/runtime/templates";
+			  return templates;
+			  //return "resources/org/antlr/v4/test/runtime/templates";
 			}
 		};
+
+		// Somehow the templates directory is getting picked up so let's block that
+		if(!targetSpecificTemplateFile.endsWith(".stg")) {
+		    return;
+		}
+		
 		gen.info("Generating target " + gen.getTargetNameFromTemplatesFileName());
 		gen.execute();
 	}

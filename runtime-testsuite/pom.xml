@@ -27,7 +27,7 @@
       <groupId>org.antlr</groupId>
       <artifactId>antlr4</artifactId>
       <version>${project.version}</version>
-    </dependency>  
+    </dependency>
     <dependency>
       <groupId>org.antlr</groupId>
       <artifactId>antlr4-runtime</artifactId>
@@ -49,8 +49,8 @@
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-server</artifactId>
       <version>8.1.16.v20140903</version>
-     <scope>test</scope>
-    </dependency>    
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>
@@ -63,8 +63,51 @@
       <resource>
         <directory>../runtime</directory>
       </resource>
-    </resources>    
+    </resources>
     <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>1.4.0</version>
+        <executions>
+          <execution>
+            <phase>generate-test-sources</phase>
+            <goals>
+              <goal>java</goal>
+            </goals>
+            <configuration>
+              <mainClass>org.antlr.v4.testgen.TestGenerator</mainClass>
+              <arguments>
+                <argument>-root</argument>
+                <argument>${basedir}/resources</argument>
+                <argument>-o</argument>
+                <argument>${basedir}/target/generated-test-sources</argument>
+                <argument>-templates</argument>
+                <argument>${basedir}/resources/org/antlr/v4/test/runtime/templates</argument>
+              </arguments>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+     <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <version>1.8</version>
+        <executions>
+          <execution>
+            <id>add-test-source</id>
+            <phase>generate-test-sources</phase>
+            <goals>
+              <goal>add-test-source</goal>
+            </goals>
+            <configuration>
+              <sources>
+                <source>target/generated-test-sources</source>
+              </sources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>      
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
@@ -75,7 +118,7 @@
             </goals>
           </execution>
         </executions>
-      </plugin>        
-    </plugins>    
+      </plugin>
+    </plugins>
   </build>
 </project>
