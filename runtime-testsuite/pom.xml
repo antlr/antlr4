@@ -64,50 +64,7 @@
         <directory>../runtime</directory>
       </resource>
     </resources>
-    <plugins>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>exec-maven-plugin</artifactId>
-        <version>1.4.0</version>
-        <executions>
-          <execution>
-            <phase>generate-test-sources</phase>
-            <goals>
-              <goal>java</goal>
-            </goals>
-            <configuration>
-              <mainClass>org.antlr.v4.testgen.TestGenerator</mainClass>
-              <arguments>
-                <argument>-root</argument>
-                <argument>${basedir}/resources</argument>
-                <argument>-o</argument>
-                <argument>${basedir}/target/generated-test-sources</argument>
-                <argument>-templates</argument>
-                <argument>${basedir}/resources/org/antlr/v4/test/runtime/templates</argument>
-              </arguments>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-     <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>build-helper-maven-plugin</artifactId>
-        <version>1.8</version>
-        <executions>
-          <execution>
-            <id>add-test-source</id>
-            <phase>generate-test-sources</phase>
-            <goals>
-              <goal>add-test-source</goal>
-            </goals>
-            <configuration>
-              <sources>
-                <source>target/generated-test-sources</source>
-              </sources>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>      
+    <plugins> 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
@@ -121,4 +78,39 @@
       </plugin>
     </plugins>
   </build>
+  
+  <profiles>
+    <profile>
+      <id>gen</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+            <version>1.4.0</version>
+            <executions>
+              <execution>
+                <phase>generate-test-sources</phase>
+                <goals>
+                  <goal>java</goal>
+                </goals>
+                <configuration>
+                  <mainClass>org.antlr.v4.testgen.TestGenerator</mainClass>
+                  <arguments>
+                    <argument>-root</argument>
+                    <argument>${basedir}/resources</argument>
+                    <argument>-o</argument>
+                    <argument>${basedir}/test</argument>
+                    <argument>-templates</argument>
+                    <argument>${basedir}/resources/org/antlr/v4/test/runtime/templates</argument>
+                  </arguments>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>        
+        </plugins>
+      </build>
+    </profile>    
+  </profiles>
+  
 </project>
