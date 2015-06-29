@@ -74,3 +74,4 @@ YYYY/MM/DD, github id, Full name, email
 2015/05/12, Pursuit92, Josh Chase, jcjoshuachase@gmail.com
 2015/05/20, peturingi, Pétur Ingi Egilsson, petur@petur.eu
 2015/05/27, jcbrinfo, Jean-Christophe Beaupré, jcbrinfo@users.noreply.github.com
+2015/06/29, jvanzyl, Jason van Zyl, jason@takari.io
