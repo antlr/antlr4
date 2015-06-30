@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata minClientVersion="2.7">
+    <id>Antlr4</id>
+    <version>0.0.0</version>
+    <authors>Sam Harwell, Terence Parr</authors>
+    <owners>Sam Harwell</owners>
+    <description>The C# target of the ANTLR 4 parser generator for Visual Studio 2010+ projects. This package supports projects targeting .NET 2.0 or newer, and built using Visual Studio 2010 or newer.</description>
+    <language>en-us</language>
+    <projectUrl>https://github.com/sharwell/antlr4cs</projectUrl>
+    <licenseUrl>https://raw.github.com/sharwell/antlr4cs/master/LICENSE.txt</licenseUrl>
+    <iconUrl>https://raw.github.com/antlr/website-antlr4/master/images/icons/antlr.png</iconUrl>
+    <copyright>Copyright © Sam Harwell 2014</copyright>
+    <releaseNotes>https://github.com/sharwell/antlr4cs/releases/v$version$</releaseNotes>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <developmentDependency>true</developmentDependency>
+    <tags>antlr antlr4 parsing</tags>
+    <title>ANTLR 4</title>
+    <summary>The C# target of the ANTLR 4 parser generator for Visual Studio 2010+ projects.</summary>
+    <dependencies>
+      <dependency id="Antlr4.Runtime" version="$version$" />
+    </dependencies>
+  </metadata>
+  <files>
+    <!-- Tools -->
+
+    <file src="..\tool\target\antlr4-csharp-$CSharpToolVersion$-complete.jar" target="tools"/>
+
+    <!-- Build Configuration -->
+
+    <file src="..\runtime\CSharp\Antlr4BuildTasks\bin\net40\$Configuration$\Antlr4.net40.props" target="build\Antlr4.props"/>
+    <file src="..\runtime\CSharp\Antlr4BuildTasks\bin\net40\$Configuration$\Antlr4.net40.targets" target="build\Antlr4.targets"/>
+    <file src="..\runtime\CSharp\Antlr4BuildTasks\bin\net40\$Configuration$\Antlr4BuildTasks.net40.dll" target="build"/>
+  </files>
+</package>
