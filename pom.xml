@@ -123,7 +123,7 @@
     <profile>
       <id>rts</id>
       <modules>
-        <module>antlr4-runtime-testsuite</module>
+        <module>runtime-testsuite</module>
         <module>tool-testsuite</module>        
       </modules>
     </profile>
