@@ -1,8 +1,0 @@
-Imported Grammar Files
-
- In order to have the ANTLR plugin automatically locate and use grammars used
- as imports in your main <<<.g4>>> files, you need to place the imported grammar
- files in the <<<imports>>> directory beneath the root directory of your grammar
- files (which is <<<src/main/antlr4>>> by default of course).
-
- For a default layout, place your import grammars in the directory: <<<src/main/antlr4/imports>>>
