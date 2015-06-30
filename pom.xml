@@ -63,6 +63,8 @@
     <module>runtime/Java</module>
     <module>tool</module>
     <module>antlr4-maven-plugin</module>
+    <module>tool-testsuite</module>
+    <module>runtime-testsuite</module>              
   </modules>
 
   <properties>
@@ -117,15 +119,4 @@
       </plugins>
     </pluginManagement>    
   </build>
-
-  <profiles>
-    <profile>
-      <id>tests</id>
-      <modules>
-        <module>runtime-testsuite</module>
-        <module>tool-testsuite</module>        
-      </modules>
-    </profile>
-  </profiles>
-
 </project>

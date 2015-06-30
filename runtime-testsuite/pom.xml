@@ -67,6 +67,15 @@
     <plugins> 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <includes>
+            <include>**/java/Test*.java</include>
+          </includes>
+        </configuration>
+      </plugin>    
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
         <executions>
           <execution>
@@ -75,7 +84,7 @@
             </goals>
           </execution>
         </executions>
-      </plugin>
+      </plugin>      
     </plugins>
   </build>
   
@@ -110,7 +119,22 @@
           </plugin>        
         </plugins>
       </build>
-    </profile>    
-  </profiles>
-  
+    </profile>
+    <profile>
+      <id>tests</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <includes>
+                <include>**/Test*.java</include>
+              </includes>
+            </configuration>
+          </plugin>            
+        </plugins>
+      </build>
+    </profile>      
+  </profiles>  
 </project>
