@@ -29,11 +29,6 @@
  */
 package org.antlr.v4.testgen;
 
-import org.stringtemplate.v4.ST;
-import org.stringtemplate.v4.STGroup;
-import org.stringtemplate.v4.STGroupFile;
-import org.stringtemplate.v4.gui.STViz;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -44,8 +39,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.stringtemplate.v4.ST;
+import org.stringtemplate.v4.STGroup;
+import org.stringtemplate.v4.STGroupFile;
+import org.stringtemplate.v4.gui.STViz;
+
 public class TestGenerator {
-	public static final String antlrRoot = "."; // assume antlr4 root dir is current working dir
+	public final static String[] targets = {"CSharp", "Java", "Python2", "Python3", "JavaScript"};
 
 	// This project uses UTF-8, but the plugin might be used in another project
 	// which is not. Always load templates with UTF-8, but write using the
@@ -64,11 +64,12 @@ public class TestGenerator {
 	 *
 	 * Example:
 	 *
-	 * $ java org.antlr.v4.testgen.TestGenerator -o /tmp -templates /Users/parrt/antlr/code/antlr4/tool/test/org/antlr/v4/test/runtime/java/Java.test.stg
+	 * $ java org.antlr.v4.testgen.TestGenerator -root /Users/parrt/antlr/code/antlr4
 	 */
 	public static void main(String[] args) {
 		String rootDir = null;
 		String outDir = null;
+		String templatesRoot = null;
 		String targetSpecificTemplateFile = null;
 		boolean viz = false;
 
@@ -86,35 +87,47 @@ public class TestGenerator {
 			else if (arg.startsWith("-templates")) {
 				i++;
 				targetSpecificTemplateFile = args[i];
+				templatesRoot = targetSpecificTemplateFile;
 			}
 			else if (arg.startsWith("-viz")) {
 				viz = true;
 			}
 			i++;
 		}
+		
+		System.out.println("rootDir = " + rootDir);
+		System.out.println("outputDir = " + outDir);
+		System.out.println("templates = " + targetSpecificTemplateFile);
+		
 		if ( rootDir!=null) {
-			genAllTargets(rootDir, viz);
-			System.exit(0);
+			genAllTargets(outDir, rootDir, templatesRoot, viz);
+			return;
 		}
 
 		if ( outDir==null || targetSpecificTemplateFile==null ) {
 			System.err.println("You must give an output root dir and templates file");
-			System.exit(1);
+			return;
 		}
 
-		genTarget(outDir, targetSpecificTemplateFile, viz);
+		genTarget(outDir, targetSpecificTemplateFile, templatesRoot, viz);
 	}
 
-	public static void genAllTargets(final String rootDir, boolean viz) {
-		for(TargetConfiguration config : TargetConfiguration.ALL) {
-			String outDir = rootDir + config.outDir;
-			String templates = rootDir + config.templates;
-			genTarget(outDir, templates, viz);
+	public static void genAllTargets(String outDirRoot, final String rootDir, final String templatesRoot, boolean viz) {
+		for (String target : targets) {
+			String templatesPackage = rootDir + "/org/antlr/v4/test/runtime/" + target.toLowerCase();
+			String templates = templatesPackage + "/" + target + ".test.stg";
+			if ( target.equals("JavaScript") ) {
+				templates = templatesPackage+"/node/Node.test.stg";
+			}
+			String outDir = rootDir + "/runtime-testsuite/test";
+			if ( outDirRoot!=null ) {
+				outDir = outDirRoot;
+			}
+			genTarget(outDir, templates, templatesRoot, viz);
 		}
-
 	}
 
-	public static void genTarget(final String outDir, String targetSpecificTemplateFile, boolean viz) {
+	public static void genTarget(final String outDir, final String targetSpecificTemplateFile, final String templates, boolean viz) {
 		TestGenerator gen = new TestGenerator("UTF-8",
 											  new File(targetSpecificTemplateFile),
 											  new File(outDir),
@@ -136,9 +149,16 @@ public class TestGenerator {
 			}
 			@Override
 			public String getTestTemplatesResourceDir() {
-				return "runtime-testsuite/resources/org/antlr/v4/test/runtime/templates";
+			  return templates;
+			  //return "resources/org/antlr/v4/test/runtime/templates";
 			}
 		};
+
+		// Somehow the templates directory is getting picked up so let's block that
+		if(!targetSpecificTemplateFile.endsWith(".stg")) {
+		    return;
+		}
+		
 		gen.info("Generating target " + gen.getTargetNameFromTemplatesFileName());
 		gen.execute();
 	}
@@ -270,11 +290,9 @@ public class TestGenerator {
 	public String getTestTemplatesResourceDir() { return "org/antlr/v4/test/runtime/templates"; }
 
 	public String getTargetNameFromTemplatesFileName() {
-		// runtimeTemplates is like /Users/parrt/antlr/code/antlr4/tool/test/org/antlr/v4/test/runtime/java/Java.test.stg
-		// extra target name
-		int targetEnd = runtimeTemplates.getPath().indexOf(".test.stg");
-		String targetAtEnd = runtimeTemplates.getPath().substring(0, targetEnd);
-		return targetAtEnd.substring(targetAtEnd.lastIndexOf('/') + 1);
+		// runtimeTemplates is like ~/antlr/code/antlr4/runtime-testsuite/resources/org/antlr/v4/test/runtime/java/Java.test.stg
+		int targetEnd = runtimeTemplates.getName().indexOf(".test.stg");
+		return runtimeTemplates.getName().substring(0, targetEnd);
 	}
 
 	public File getOutputDir(String templateFolder) {

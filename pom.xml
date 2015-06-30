@@ -63,14 +63,16 @@
     <module>runtime/Java</module>
     <module>tool</module>
     <module>antlr4-maven-plugin</module>
-    <module>antlr4-testgen-maven-plugin</module>
+    <module>tool-testsuite</module>
+    <module>runtime-testsuite</module>              
   </modules>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <antlr.testinprocess>true</antlr.testinprocess>
-    <java.version>1.6</java.version>
+    <maven.compiler.source>1.6</maven.compiler.source>
+    <maven.compiler.target>1.6</maven.compiler.target>
   </properties>
 
   <mailingLists>
@@ -103,28 +105,18 @@
       <testResource>
         <directory>test</directory>
       </testResource>
-    </testResources>    
+    </testResources>
     <pluginManagement>
       <plugins>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
           <configuration>          
-            <source>${java.version}</source>
-            <target>${java.version}</target>
+            <source>${maven.compiler.source}</source>
+            <target>${maven.compiler.target}</target>
           </configuration>
         </plugin>
       </plugins>
-    </pluginManagement>
-  </build> 
-  
-  <profiles>
-    <profile>
-      <id>rts</id>
-      <modules>
-        <module>runtime-testsuite</module>
-      </modules>
-    </profile>  
-  </profiles>
-   
+    </pluginManagement>    
+  </build>
 </project>

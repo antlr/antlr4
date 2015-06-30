@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{E1A46D9D-66CB-46E8-93B0-7FC87299ABEF}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Antlr4.Runtime</RootNamespace>
+    <AssemblyName>Antlr4.Runtime</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <BaseIntermediateOutputPath>obj\net20\</BaseIntermediateOutputPath>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\..\Antlr4.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\net35\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;NET35PLUS</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <NoWarn>1591</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <Optimize>true</Optimize>
+    <OutputPath>bin\net35\Release\</OutputPath>
+    <DefineConstants>TRACE;NET35PLUS</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <NoWarn>1591</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AntlrFileStream.cs" />
+    <Compile Include="AntlrInputStream.cs" />
+    <Compile Include="Atn\AbstractPredicateTransition.cs" />
+    <Compile Include="Atn\ActionTransition.cs" />
+    <Compile Include="Atn\AmbiguityInfo.cs" />
+    <Compile Include="Atn\ArrayPredictionContext.cs" />
+    <Compile Include="Atn\ATN.cs" />
+    <Compile Include="Atn\ATNConfig.cs" />
+    <Compile Include="Atn\ATNConfigSet.cs" />
+    <Compile Include="Atn\ATNDeserializationOptions.cs" />
+    <Compile Include="Atn\ATNDeserializer.cs" />
+    <Compile Include="Atn\ConflictInfo.cs" />
+    <Compile Include="Dfa\AcceptStateInfo.cs" />
+    <Compile Include="IVocabulary.cs" />
+    <Compile Include="Vocabulary.cs" />
+    <Compile Include="Atn\ATNSimulator.cs" />
+    <Compile Include="Atn\ATNState.cs" />
+    <Compile Include="Atn\ATNType.cs" />
+    <Compile Include="Atn\AtomTransition.cs" />
+    <Compile Include="Atn\BasicBlockStartState.cs" />
+    <Compile Include="Atn\BasicState.cs" />
+    <Compile Include="Atn\BlockEndState.cs" />
+    <Compile Include="Atn\BlockStartState.cs" />
+    <Compile Include="Atn\ContextSensitivityInfo.cs" />
+    <Compile Include="Atn\DecisionEventInfo.cs" />
+    <Compile Include="Atn\DecisionInfo.cs" />
+    <Compile Include="Atn\DecisionState.cs" />
+    <Compile Include="Atn\EmptyPredictionContext.cs" />
+    <Compile Include="Atn\EpsilonTransition.cs" />
+    <Compile Include="Atn\ErrorInfo.cs" />
+    <Compile Include="Atn\ILexerAction.cs" />
+    <Compile Include="Atn\LexerActionExecutor.cs" />
+    <Compile Include="Atn\LexerActionType.cs" />
+    <Compile Include="Atn\LexerATNSimulator.cs" />
+    <Compile Include="Atn\LexerChannelAction.cs" />
+    <Compile Include="Atn\LexerCustomAction.cs" />
+    <Compile Include="Atn\LexerIndexedCustomAction.cs" />
+    <Compile Include="Atn\LexerModeAction.cs" />
+    <Compile Include="Atn\LexerMoreAction.cs" />
+    <Compile Include="Atn\LexerPopModeAction.cs" />
+    <Compile Include="Atn\LexerPushModeAction.cs" />
+    <Compile Include="Atn\LexerSkipAction.cs" />
+    <Compile Include="Atn\LexerTypeAction.cs" />
+    <Compile Include="Atn\LL1Analyzer.cs" />
+    <Compile Include="Atn\LookaheadEventInfo.cs" />
+    <Compile Include="Atn\LoopEndState.cs" />
+    <Compile Include="Atn\NotSetTransition.cs" />
+    <Compile Include="Atn\OrderedATNConfigSet.cs" />
+    <Compile Include="Atn\ParseInfo.cs" />
+    <Compile Include="Atn\ParserATNSimulator.cs" />
+    <Compile Include="Atn\PlusBlockStartState.cs" />
+    <Compile Include="Atn\PlusLoopbackState.cs" />
+    <Compile Include="Atn\PrecedencePredicateTransition.cs" />
+    <Compile Include="Atn\PredicateEvalInfo.cs" />
+    <Compile Include="Atn\PredicateTransition.cs" />
+    <Compile Include="Atn\PredictionContext.cs" />
+    <Compile Include="Atn\PredictionContextCache.cs" />
+    <Compile Include="Atn\PredictionMode.cs" />
+    <Compile Include="Atn\ProfilingATNSimulator.cs" />
+    <Compile Include="Atn\RangeTransition.cs" />
+    <Compile Include="Atn\RuleStartState.cs" />
+    <Compile Include="Atn\RuleStopState.cs" />
+    <Compile Include="Atn\RuleTransition.cs" />
+    <Compile Include="Atn\SemanticContext.cs" />
+    <Compile Include="Atn\SetTransition.cs" />
+    <Compile Include="Atn\SimulatorState.cs" />
+    <Compile Include="Atn\SingletonPredictionContext.cs" />
+    <Compile Include="Atn\StarBlockStartState.cs" />
+    <Compile Include="Atn\StarLoopbackState.cs" />
+    <Compile Include="Atn\StarLoopEntryState.cs" />
+    <Compile Include="Atn\StateType.cs" />
+    <Compile Include="Atn\TokensStartState.cs" />
+    <Compile Include="Atn\Transition.cs" />
+    <Compile Include="Atn\TransitionType.cs" />
+    <Compile Include="Atn\WildcardTransition.cs" />
+    <Compile Include="BailErrorStrategy.cs" />
+    <Compile Include="BaseErrorListener.cs" />
+    <Compile Include="BufferedTokenStream.cs" />
+    <Compile Include="CommonToken.cs" />
+    <Compile Include="CommonTokenFactory.cs" />
+    <Compile Include="CommonTokenStream.cs" />
+    <Compile Include="ConsoleErrorListener.cs" />
+    <Compile Include="DefaultErrorStrategy.cs" />
+    <Compile Include="Dependents.cs" />
+    <Compile Include="Dfa\DFA.cs" />
+    <Compile Include="Dfa\DFASerializer.cs" />
+    <Compile Include="Dfa\DFAState.cs" />
+    <Compile Include="Dfa\LexerDFASerializer.cs" />
+    <Compile Include="DiagnosticErrorListener.cs" />
+    <Compile Include="FailedPredicateException.cs" />
+    <Compile Include="IAntlrErrorStrategy.cs" />
+    <Compile Include="ICharStream.cs" />
+    <Compile Include="IIntStream.cs" />
+    <Compile Include="InputMismatchException.cs" />
+    <Compile Include="InterpreterRuleContext.cs" />
+    <Compile Include="IParserErrorListener.cs" />
+    <Compile Include="IRecognizer.cs" />
+    <Compile Include="IToken.cs" />
+    <Compile Include="ITokenFactory.cs" />
+    <Compile Include="ITokenSource.cs" />
+    <Compile Include="ITokenStream.cs" />
+    <Compile Include="IWritableToken.cs" />
+    <Compile Include="Lexer.cs" />
+    <Compile Include="LexerInterpreter.cs" />
+    <Compile Include="LexerNoViableAltException.cs" />
+    <Compile Include="ListTokenSource.cs" />
+    <Compile Include="Misc\Args.cs" />
+    <Compile Include="Misc\MurmurHash.cs" />
+    <Compile Include="Misc\NullableAttribute.cs" />
+    <Compile Include="Misc\IIntSet.cs" />
+    <Compile Include="Misc\Interval.cs" />
+    <Compile Include="Misc\IntervalSet.cs" />
+    <Compile Include="Misc\NotNullAttribute.cs" />
+    <Compile Include="Misc\ParseCanceledException.cs" />
+    <Compile Include="Misc\RuleDependencyChecker.cs" />
+    <Compile Include="Misc\Utils.cs" />
+    <Compile Include="NoViableAltException.cs" />
+    <Compile Include="Parser.cs" />
+    <Compile Include="ParserInterpreter.cs" />
+    <Compile Include="ParserRuleContext.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ProxyParserErrorListener.cs" />
+    <Compile Include="RecognitionException.cs" />
+    <Compile Include="RuleContext.cs" />
+    <Compile Include="RuleDependencyAttribute.cs" />
+    <Compile Include="RuleVersionAttribute.cs" />
+    <Compile Include="Sharpen\Arrays.cs" />
+    <Compile Include="Sharpen\BitSet.cs" />
+    <Compile Include="Sharpen\Collections.cs" />
+    <Compile Include="Sharpen\Compat\Funcs.cs" />
+    <Compile Include="Sharpen\Compat\IStructuralComparable.cs" />
+    <Compile Include="Sharpen\Compat\IStructuralEquatable.cs" />
+    <Compile Include="Sharpen\Compat\Tuple.cs" />
+    <Compile Include="Sharpen\Compat\Tuples.cs" />
+    <Compile Include="Sharpen\DictionaryExtensions.cs" />
+    <Compile Include="Sharpen\ListExtensions.cs" />
+    <Compile Include="Sharpen\Runtime.cs" />
+    <Compile Include="TokenStreamRewriter.cs" />
+    <Compile Include="TokenTypes.cs" />
+    <Compile Include="Tree\ErrorNodeImpl.cs" />
+    <Compile Include="Tree\IErrorNode.cs" />
+    <Compile Include="Tree\IParseTree.cs" />
+    <Compile Include="Tree\IParseTreeListener.cs" />
+    <Compile Include="Tree\IRuleNode.cs" />
+    <Compile Include="Tree\ISyntaxTree.cs" />
+    <Compile Include="Tree\ITerminalNode.cs" />
+    <Compile Include="Tree\ITree.cs" />
+    <Compile Include="Tree\ParseTreeWalker.cs" />
+    <Compile Include="Tree\Pattern\Chunk.cs" />
+    <Compile Include="Tree\Pattern\ParseTreeMatch.cs" />
+    <Compile Include="Tree\Pattern\ParseTreePattern.cs" />
+    <Compile Include="Tree\Pattern\ParseTreePatternMatcher.cs" />
+    <Compile Include="Tree\Pattern\RuleTagToken.cs" />
+    <Compile Include="Tree\Pattern\TagChunk.cs" />
+    <Compile Include="Tree\Pattern\TextChunk.cs" />
+    <Compile Include="Tree\Pattern\TokenTagToken.cs" />
+    <Compile Include="Tree\TerminalNodeImpl.cs" />
+    <Compile Include="Tree\Trees.cs" />
+    <Compile Include="Tree\Xpath\XPath.cs" />
+    <Compile Include="Tree\Xpath\XPathElement.cs" />
+    <Compile Include="Tree\Xpath\XPathLexerErrorListener.cs" />
+    <Compile Include="Tree\Xpath\XPathRuleAnywhereElement.cs" />
+    <Compile Include="Tree\Xpath\XPathRuleElement.cs" />
+    <Compile Include="Tree\Xpath\XPathTokenAnywhereElement.cs" />
+    <Compile Include="Tree\Xpath\XPathTokenElement.cs" />
+    <Compile Include="Tree\Xpath\XPathWildcardAnywhereElement.cs" />
+    <Compile Include="Tree\Xpath\XPathWildcardElement.cs" />
+    <Compile Include="UnbufferedCharStream.cs" />
+    <Compile Include="UnbufferedTokenStream.cs" />
+    <Compile Include="Tree\Xpath\XPathLexer.cs" />
+    <None Include="Tree\Xpath\XPathLexer.g4">
+      <Generator>MSBuild:Compile</Generator>
+      <CustomToolNamespace>Antlr4.Runtime.Tree.Xpath</CustomToolNamespace>
+    </None>
+    <Compile Include="Recognizer.cs" />
+    <Compile Include="Sharpen\Compat\CollectionDebuggerView.cs" />
+    <Compile Include="Sharpen\Compat\ConcurrentDictionary.cs" />
+    <Compile Include="Sharpen\Compat\SplitOrderedList.cs" />
+    <Compile Include="Sharpen\AtomicReference.cs" />
+    <Compile Include="Sharpen\SequenceEqualityComparer.cs" />
+    <Compile Include="IAntlrErrorListener.cs" />
+    <Compile Include="ProxyErrorListener.cs" />
+    <Compile Include="Tree\AbstractParseTreeVisitor.cs" />
+    <Compile Include="Tree\IParseTreeVisitor.cs" />
+    <Compile Include="Tree\ParseTreeProperty.cs" />
+    <Compile Include="Misc\MultiMap.cs" />
+    <Compile Include="Dfa\AbstractEdgeMap.cs" />
+    <Compile Include="Dfa\ArrayEdgeMap.cs" />
+    <Compile Include="Dfa\EmptyEdgeMap.cs" />
+    <Compile Include="Dfa\IEdgeMap.cs" />
+    <Compile Include="Dfa\SingletonEdgeMap.cs" />
+    <Compile Include="Dfa\SparseEdgeMap.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

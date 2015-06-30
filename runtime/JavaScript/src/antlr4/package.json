@@ -1,0 +1,19 @@
+{
+  "name": "antlr4",
+  "version": "4.5.1",
+  "description": "JavaScript runtime for ANTLR4",
+  "main": "src/antlr4/index.js",
+  "repository": "antlr/antlr4-javascript.git",
+  "keywords": [
+    "lexer",
+    "parser",
+    "antlr",
+    "antlr4",
+    "grammar"
+  ],
+  "license": "BSD",
+  "bugs": {
+    "url": "https://github.com/antlr/antlr4-javascript/issues"
+  },
+  "homepage": "https://github.com/antlr/antlr4-javascript"
+}
