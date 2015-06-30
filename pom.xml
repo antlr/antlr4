@@ -121,7 +121,7 @@
 
   <profiles>
     <profile>
-      <id>rts</id>
+      <id>tests</id>
       <modules>
         <module>runtime-testsuite</module>
         <module>tool-testsuite</module>        
