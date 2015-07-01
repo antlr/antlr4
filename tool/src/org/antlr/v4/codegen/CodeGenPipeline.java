@@ -68,6 +68,7 @@ public class CodeGenPipeline {
 		if ( g.isLexer() ) {
 			ST lexer = gen.generateLexer();
 			writeRecognizer(lexer, gen);
+// TODO(dsisson): Add specific header files.
 		}
 		else {
 			ST parser = gen.generateParser();
@@ -80,7 +81,7 @@ public class CodeGenPipeline {
 				gen.writeVisitor(gen.generateVisitor());
 				gen.writeBaseVisitor(gen.generateBaseVisitor());
 			}
-			gen.writeHeaderFile();
+			gen.writeParserHeaderFile();
 		}
 		gen.writeVocabFile();
 	}
