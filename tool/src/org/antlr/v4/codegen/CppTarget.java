@@ -30,7 +30,9 @@
 
 package org.antlr.v4.codegen;
 
+import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.ast.GrammarAST;
+import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.StringRenderer;
 
@@ -68,6 +70,10 @@ public class CppTarget extends Target {
 
 	public CppTarget(CodeGenerator gen) {
 		super(gen, "Cpp");
+	}
+
+	public String getVersion() {
+		return "4.1";
 	}
 
 	public Set<String> getBadWords() {
@@ -200,4 +206,11 @@ public class CppTarget extends Target {
 		result.registerRenderer(String.class, new StringRenderer(), true);
 		return result;
 	}
+
+// MEGAHACK -- Make it so we can have different header filenames for the three types of files -- recognizer, listener, visitor.
+        @Override
+        protected void genRecognizerHeaderFile(Grammar grammar, ST headerFileST,  String extName) {
+ 		String fileName = getCodeGenerator().getRecognizerHeaderFileName();
+ 		getCodeGenerator().write(headerFileST, fileName);
+ 	}
 }

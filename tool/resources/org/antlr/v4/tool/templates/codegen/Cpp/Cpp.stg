@@ -1046,4 +1046,25 @@ initValue(typeName) ::= <<
 <cppTypeInitMap.(typeName)>
 >>
 
+headerFile(file, parser, namedActions) ::= <<
+FOOM1
+>>
+
+parserHeaderFile(file, parser, namedActions) ::= <<
+FOOM2
+>>
+
+visitorHeaderFile(file, parser, namedActions) ::= <<
+FOOM3
+>>
+
+ParserHeaderFile(file, parser, namedActions) ::= <<
+FOOM4
+>>
+
+VisitorHeaderFile(file, parser, namedActions) ::= <<
+FOOM5
+>>
+
 codeFileExtension() ::= ".cpp"
+headerFileExtension() ::= ".h"
