@@ -43,9 +43,11 @@ cppTypeInitMap ::= [
 ParserFile(file, parser, namedActions) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 <if(file.genPackage)>
-package <file.genPackage>;
+<! TODO(dsisson): Deal with the fact that we need to split the package name. !>
+namespace <file.genPackage> {
 <endif>
 <namedActions.header>
+<! TODO(dsisson): Reduce the list of includes to those absolutely necessary. !>
 #include "atn/ATN.h";
 #include "atn/ATNConfig.h";
 #include "atn/ATNConfigSet.h";
@@ -170,6 +172,9 @@ package <file.genPackage>;
 #include "tree/Trees.h";
 
 <parser>
+<if(file.genPackage)>
+}  // namespace <file.genPackage>
+<endif>
 >>
 
 ListenerFile(file, header) ::= <<
@@ -177,34 +182,39 @@ ListenerFile(file, header) ::= <<
 <header>
 #include "misc/NotNull.h";
 #include "tree/ParseTreeListener.h";
+#include "<file.parserName>.h";
 
 <if(file.genPackage)>
-namespace <file.genPackage>
+namespace <file.genPackage> {
 <endif>
 
 /**
  * This interface defines a complete listener for a parse tree produced by
  * {@link <file.parserName>}.
  */
-public interface <file.grammarName>Listener : ParseTreeListener {
+class <file.grammarName>Listener : public ParseTreeListener {
 	<file.listenerNames:{lname |
 /**
  * Enter a parse tree produced by {@link <file.parserName>#<lname>\}.
  * @param ctx the parse tree
  */
-void enter<lname; format="cap">(@NotNull <file.parserName>.<lname; format="cap">Context ctx);
+void enter<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx);
 /**
  * Exit a parse tree produced by {@link <file.parserName>#<lname>\}.
  * @param ctx the parse tree
  */
-void exit<lname; format="cap">(@NotNull <file.parserName>.<lname; format="cap">Context ctx);}; separator="\n">
+void exit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx);}; separator="\n">
 }
+
+<if(file.genPackage)>
+}  // namespace <file.genPackage>
+<endif>
 >>
 
 BaseListenerFile(file, header) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 <if(file.genPackage)>
-package <file.genPackage>;
+namespace <file.genPackage> {
 <endif>
 <header>
 
@@ -258,6 +268,9 @@ public class <file.grammarName>BaseListener implements <file.grammarName>Listene
 	 */
 	@Override public void visitErrorNode(@NotNull ErrorNode node) { }
 }
+<if(file.genPackage)>
+}  // namespace <file.genPackage>
+<endif>
 >>
 
 VisitorFile(file, header) ::= <<
