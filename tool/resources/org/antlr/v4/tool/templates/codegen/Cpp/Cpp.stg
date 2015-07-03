@@ -218,55 +218,54 @@ namespace <file.genPackage> {
 <endif>
 <header>
 
-import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.tree.ErrorNode;
-import org.antlr.v4.runtime.tree.TerminalNode;
+#include "ParserRuleContext.h";
+#include "tree/ErrorNode.h";
+#include "tree/TerminalNode.h";
 
 /**
  * This class provides an empty implementation of {@link <file.grammarName>Listener},
  * which can be extended to create a listener which only needs to handle a subset
  * of the available methods.
  */
-public class <file.grammarName>BaseListener implements <file.grammarName>Listener {
+class <file.grammarName>BaseListener : public <file.grammarName>Listener {
 	<file.listenerNames:{lname |
 /**
  * {@inheritDoc\}
  * \<p/>
  * The default implementation does nothing.
  */
-@Override public void enter<lname; format="cap">(@NotNull <file.parserName>.<lname; format="cap">Context ctx) { \}
+void enter<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { \}
 /**
  * {@inheritDoc\}
  * \<p/>
  * The default implementation does nothing.
  */
-@Override public void exit<lname; format="cap">(@NotNull <file.parserName>.<lname; format="cap">Context ctx) { \}}; separator="\n">
+void exit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { \}}; separator="\n">
 
 	/**
 	 * {@inheritDoc\}
 	 * \<p/>
 	 * The default implementation does nothing.
 	 */
-	@Override public void enterEveryRule(@NotNull ParserRuleContext ctx) { }
+	void enterEveryRule(ParserRuleContext ctx) { }
 	/**
 	 * {@inheritDoc\}
 	 * \<p/>
 	 * The default implementation does nothing.
 	 */
-	@Override public void exitEveryRule(@NotNull ParserRuleContext ctx) { }
+	void exitEveryRule(ParserRuleContext ctx) { }
 	/**
 	 * {@inheritDoc\}
 	 * \<p/>
 	 * The default implementation does nothing.
 	 */
-	@Override public void visitTerminal(@NotNull TerminalNode node) { }
+	void visitTerminal(TerminalNode node) { }
 	/**
 	 * {@inheritDoc\}
 	 * \<p/>
 	 * The default implementation does nothing.
 	 */
-	@Override public void visitErrorNode(@NotNull ErrorNode node) { }
+	void visitErrorNode(ErrorNode node) { }
 }
 <if(file.genPackage)>
 }  // namespace <file.genPackage>
@@ -276,38 +275,40 @@ public class <file.grammarName>BaseListener implements <file.grammarName>Listene
 VisitorFile(file, header) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 <if(file.genPackage)>
-package <file.genPackage>;
+namespace <file.genPackage> {
 <endif>
 <header>
-import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.tree.ParseTreeVisitor;
+#include "tree/ParseTreeVisitor.h";
 
 /**
- * This interface defines a complete generic visitor for a parse tree produced
- * by {@link <file.parserName>}.
+ * This template class defines a complete generic visitor for a parse tree
+ * produced by {@link <file.parserName>}.
  *
  * @param \<T> The return type of the visit operation. Use {@link Void} for
  * operations with no return type.
  */
-public interface <file.grammarName>Visitor\<T> extends ParseTreeVisitor\<T> {
+template T
+class <file.grammarName>Visitor : public ParseTreeVisitor {
 	<file.visitorNames:{lname |
 /**
  * Visit a parse tree produced by {@link <file.parserName>#<lname>\}.
  * @param ctx the parse tree
  * @return the visitor result
  */
-T visit<lname; format="cap">(@NotNull <file.parserName>.<lname; format="cap">Context ctx);}; separator="\n">
+T visit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx);}; separator="\n">
 }
+<if(file.genPackage)>
+}  // namespace <file.genPackage>
+<endif>
 >>
 
 BaseVisitorFile(file, header) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 <if(file.genPackage)>
-package <file.genPackage>;
+namespace <file.genPackage> {
 <endif>
 <header>
-import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
+#include "tree/AbstractParseTreeVisitor";
 
 /**
  * This class provides an empty implementation of {@link <file.grammarName>Visitor},
@@ -317,7 +318,8 @@ import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
  * @param \<T> The return type of the visit operation. Use {@link Void} for
  * operations with no return type.
  */
-public class <file.grammarName>BaseVisitor\<T> extends AbstractParseTreeVisitor\<T> implements <file.grammarName>Visitor\<T> {
+template T
+class <file.grammarName>BaseVisitor : public <file.grammarName>Visitor\<T> {
 	<file.visitorNames:{lname |
 /**
  * {@inheritDoc\}
@@ -325,8 +327,11 @@ public class <file.grammarName>BaseVisitor\<T> extends AbstractParseTreeVisitor\
  * The default implementation returns the result of calling
  * {@link #visitChildren\} on {@code ctx\}.
  */
-@Override public T visit<lname; format="cap">(@NotNull <file.parserName>.<lname; format="cap">Context ctx) { return visitChildren(ctx); \}}; separator="\n">
+T visit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { return visitChildren(ctx); \}}; separator="\n">
 }
+<if(file.genPackage)>
+}  // namespace <file.genPackage>
+<endif>
 >>
 
 fileHeader(grammarFileName, ANTLRVersion) ::= <<
@@ -338,45 +343,39 @@ Parser(parser, funcs, atn, sempredFuncs, superClass) ::= <<
 >>
 
 Parser_(parser, funcs, atn, sempredFuncs, ctor, superClass) ::= <<
-@SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
-public class <parser.name> extends <superClass> {
-	protected static final DFA[] _decisionToDFA;
-	protected static final PredictionContextCache _sharedContextCache =
+class <parser.name> : public <superClass> {
+	static DFA[] _decisionToDFA;
+	static PredictionContextCache _sharedContextCache =
 		new PredictionContextCache();
 	<if(parser.tokens)>
-	public static final int
+	static int
 		<parser.tokens:{k | <k>=<parser.tokens.(k)>}; separator=", ", wrap, anchor>;
 	<endif>
-	public static final String[] tokenNames = {
+	static const std::vector<std::wstring>& tokenNames = {
 		<parser.tokenNames:{t | <t>}; null="\"\<INVALID>\"", separator=", ", wrap, anchor>
 	};
-	public static final int
+	static int
 		<parser.rules:{r | RULE_<r.name> = <r.index>}; separator=", ", wrap, anchor>;
-	public static final String[] ruleNames = {
+	static const std::vector<std::wstring>& ruleNames = {
 		<parser.ruleNames:{r | "<r>"}; separator=", ", wrap, anchor>
 	};
 
-	@Override
-	public String getGrammarFileName() { return "<parser.grammarFileName; format="java-escape">"; }
+	const std::wstring& getGrammarFileName() { return "<parser.grammarFileName; format="java-escape">"; }
 
-	@Override
-	public String[] getTokenNames() { return tokenNames; }
+	const std::vector<std::wstring>& getTokenNames() { return tokenNames; }
 
-	@Override
-	public String[] getRuleNames() { return ruleNames; }
+	const std::vector<std::wstring>& getRuleNames() { return ruleNames; }
 
-	@Override
-	public String getSerializedATN() { return _serializedATN; }
+	const std::wstring& getSerializedATN() { return _serializedATN; }
 
-	@Override
-	public ATN getATN() { return _ATN; }
+	const ATN& getATN() { return _ATN; }
 
 	<namedActions.members>
 	<parser:(ctor)()>
 	<funcs; separator="\n">
 
 <if(sempredFuncs)>
-	public boolean sempred(RuleContext _localctx, int ruleIndex, int predIndex) {
+	boolean sempred(RuleContext _localctx, int ruleIndex, int predIndex) {
 		switch (ruleIndex) {
 		<parser.sempredFuncs.values:{f|
 case <f.ruleIndex>: return <f.name>_sempred((<f.ctxType>)_localctx, predIndex);}; separator="\n">
