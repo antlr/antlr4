@@ -176,13 +176,8 @@ public class JavaScriptTarget extends Target {
 			return targetCharValueEscape[v];
 		}
 
-		if (v >= 0x20 && v < 127 && (!Character.isDigit(v) || v == '8' || v == '9')) {
+		if (v >= 0x20 && v < 127) {
 			return String.valueOf((char)v);
-		}
-
-		if ( v>=0 && v<=127 ) {
-			String oct = Integer.toOctalString(v);
-			return "\\"+ oct;
 		}
 
 		String hex = Integer.toHexString(v|0x10000).substring(1,5);
