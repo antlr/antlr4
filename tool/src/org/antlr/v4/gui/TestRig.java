@@ -28,7 +28,7 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.antlr.v4.runtime.misc;
+package org.antlr.v4.gui;
 
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CharStream;
@@ -252,10 +252,10 @@ public class TestRig {
 					System.out.println(tree.toStringTree(parser));
 				}
 				if ( gui ) {
-					tree.inspect(parser);
+					Trees.inspect(tree, parser);
 				}
 				if ( psFile!=null ) {
-					tree.save(parser, psFile); // Generate postscript
+					Trees.save(tree, parser, psFile); // Generate postscript
 				}
 			}
 			catch (NoSuchMethodException nsme) {

@@ -28,7 +28,7 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.antlr.v4.runtime.tree.gui;
+package org.antlr.v4.gui;
 
 import org.abego.treelayout.TreeForTreeLayout;
 import org.antlr.v4.runtime.tree.Tree;

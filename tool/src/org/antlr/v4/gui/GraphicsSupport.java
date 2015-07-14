@@ -28,7 +28,7 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.antlr.v4.runtime.misc;
+package org.antlr.v4.gui;
 
 import javax.imageio.ImageIO;
 import javax.print.DocFlavor;

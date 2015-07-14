@@ -28,7 +28,7 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.antlr.v4.runtime.tree.gui;
+package org.antlr.v4.gui;
 
 /** Font metrics.  The only way to generate accurate images
  *  in any format that contain text is to know the font metrics.
