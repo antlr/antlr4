@@ -3,7 +3,7 @@ package org.antlr.v4.test.tool;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.Tree;
 import org.antlr.v4.runtime.tree.Trees;
-import org.antlr.v4.runtime.tree.gui.TreeTextProvider;
+import org.antlr.v4.gui.TreeTextProvider;
 import org.antlr.v4.tool.GrammarInterpreterRuleContext;
 
 import java.util.Arrays;

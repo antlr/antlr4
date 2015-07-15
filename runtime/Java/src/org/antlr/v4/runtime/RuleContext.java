@@ -34,7 +34,6 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 import org.antlr.v4.runtime.tree.RuleNode;
 import org.antlr.v4.runtime.tree.Trees;
-import org.antlr.v4.runtime.tree.gui.TreeViewer;
 
 import javax.print.PrintException;
 import javax.swing.*;
@@ -182,49 +181,6 @@ public class RuleContext implements RuleNode {
 
 	@Override
 	public <T> T accept(ParseTreeVisitor<? extends T> visitor) { return visitor.visitChildren(this); }
-
-	/** Call this method to view a parse tree in a dialog box visually. */
-	public Future<JDialog> inspect(Parser parser) {
-		List<String> ruleNames = parser != null ? Arrays.asList(parser.getRuleNames()) : null;
-		return inspect(ruleNames);
-	}
-
-	public Future<JDialog> inspect(List<String> ruleNames) {
-		TreeViewer viewer = new TreeViewer(ruleNames, this);
-		return viewer.open();
-	}
-
-	/** Save this tree in a postscript file */
-	public void save(Parser parser, String fileName)
-		throws IOException, PrintException
-	{
-		List<String> ruleNames = parser != null ? Arrays.asList(parser.getRuleNames()) : null;
-		save(ruleNames, fileName);
-	}
-
-	/** Save this tree in a postscript file using a particular font name and size */
-	public void save(Parser parser, String fileName,
-					 String fontName, int fontSize)
-		throws IOException
-	{
-		List<String> ruleNames = parser != null ? Arrays.asList(parser.getRuleNames()) : null;
-		save(ruleNames, fileName, fontName, fontSize);
-	}
-
-	/** Save this tree in a postscript file */
-	public void save(List<String> ruleNames, String fileName)
-		throws IOException, PrintException
-	{
-		Trees.writePS(this, ruleNames, fileName);
-	}
-
-	/** Save this tree in a postscript file using a particular font name and size */
-	public void save(List<String> ruleNames, String fileName,
-					 String fontName, int fontSize)
-		throws IOException
-	{
-		Trees.writePS(this, ruleNames, fileName, fontName, fontSize);
-	}
 
 	/** Print out a whole tree, not just a node, in LISP format
 	 *  (root child1 .. childN). Print just a node if this is a leaf.

@@ -46,6 +46,11 @@
       <version>4.0.8</version>
       <scope>compile</scope>
     </dependency>
+    <dependency>
+      <groupId>org.abego.treelayout</groupId>
+      <artifactId>org.abego.treelayout.core</artifactId>
+      <version>1.0.1</version>
+    </dependency>
   </dependencies>
 
   <build>
@@ -93,14 +98,14 @@
           <execution>
             <phase>package</phase>
             <configuration>
-              <dependencyReducedPomLocation>${project.build.directory}/dependency-reduced-pom.xml</dependencyReducedPomLocation>        
-            </configuration>            
+              <dependencyReducedPomLocation>${project.build.directory}/dependency-reduced-pom.xml</dependencyReducedPomLocation>
+            </configuration>
             <goals>
               <goal>shade</goal>
             </goals>
           </execution>
         </executions>
-      </plugin>            
+      </plugin>
     </plugins>
   </build>
 </project>
