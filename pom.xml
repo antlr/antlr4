@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.sonatype.oss</groupId>
@@ -8,7 +7,7 @@
   </parent>
   <groupId>org.antlr</groupId>
   <artifactId>antlr4-master</artifactId>
-  <version>4.5.1-SNAPSHOT</version>
+  <version>4.5.1</version>
   <packaging>pom</packaging>
 
   <name>ANTLR 4</name>
@@ -64,7 +63,7 @@
     <module>tool</module>
     <module>antlr4-maven-plugin</module>
     <module>tool-testsuite</module>
-    <module>runtime-testsuite</module>              
+    <module>runtime-testsuite</module>
   </modules>
 
   <properties>
@@ -111,12 +110,19 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
-          <configuration>          
+          <configuration>
             <source>${maven.compiler.source}</source>
             <target>${maven.compiler.target}</target>
           </configuration>
         </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <configuration>
+            <additionalparam>-Xdoclint:none</additionalparam>
+          </configuration>
+        </plugin>
       </plugins>
-    </pluginManagement>    
+    </pluginManagement>
   </build>
 </project>
