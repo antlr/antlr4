@@ -594,10 +594,10 @@ var byteToHex = createByteToHex();
 ATNDeserializer.prototype.readUUID = function() {
 	var bb = [];
 	for(var i=7;i>=0;i--) {
-		var int = this.readInt();
+		var integer = this.readInt();
 		/* jshint bitwise: false */
-		bb[(2*i)+1] = int & 0xFF;
-		bb[2*i] = (int >> 8) & 0xFF;
+		bb[(2*i)+1] = integer & 0xFF;
+		bb[2*i] = (integer >> 8) & 0xFF;
 	}
     return byteToHex[bb[0]] + byteToHex[bb[1]] +
     byteToHex[bb[2]] + byteToHex[bb[3]] + '-' +
