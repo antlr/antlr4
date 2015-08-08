@@ -179,72 +179,66 @@ public class CodeGenerator {
 	}
 
 	public void writeParserHeaderFile() {
-		String fileName = getBaseVisitorHeaderFileName();
-		if ( fileName==null ) return;
 		if ( getTemplates().isDefined("parserHeaderFile") ) {
-			ST extST = getTemplates().getInstanceOf("headerFileExtension");
+			String fileName = getBaseVisitorHeaderFileName();
+			if ( fileName==null ) return;
 			ST headerFileST = getTemplates().getInstanceOf("parserHeaderFile");
-			getTarget().genParserHeaderFile(g,headerFileST,extST.render(lineWidth));
+			getTarget().genParserHeaderFile(g,headerFileST);
 		}
 	}
 
 	public void writeRecognizer(ST outputFileST) {
 		getTarget().genFile(g, outputFileST, getRecognizerFileName());
 
-		String fileName = getRecognizerHeaderFileName();
-		if ( fileName==null ) return;
 		if ( getTemplates().isDefined("recognizerHeaderFile") ) {
-			ST extST = getTemplates().getInstanceOf("headerFileExtension");
+			String fileName = getRecognizerHeaderFileName();
+			if ( fileName==null ) return;
 			ST headerFileST = getTemplates().getInstanceOf("recognizerHeaderFile");
-			getTarget().genRecognizerHeaderFile(g,headerFileST,extST.render(lineWidth));
+			getTarget().genRecognizerHeaderFile(g,headerFileST);
 		}
 	}
 
 	public void writeListener(ST outputFileST) {
 		getTarget().genFile(g,outputFileST, getListenerFileName());
 
-		String fileName = getListenerHeaderFileName();
-		if ( fileName==null ) return;
 		if ( getTemplates().isDefined("listenerHeaderFile") ) {
-			ST extST = getTemplates().getInstanceOf("headerFileExtension");
+			String fileName = getListenerHeaderFileName();
+			if ( fileName==null ) return;
 			ST headerFileST = getTemplates().getInstanceOf("listenerHeaderFile");
-			getTarget().genListenerHeaderFile(g,headerFileST,extST.render(lineWidth));
+			getTarget().genListenerHeaderFile(g,headerFileST);
 		}
 	}
 
 	public void writeBaseListener(ST outputFileST) {
 		getTarget().genFile(g,outputFileST, getBaseListenerFileName());
 
-		String fileName = getBaseListenerHeaderFileName();
-		if ( fileName==null ) return;
 		if ( getTemplates().isDefined("baseListenerHeaderFile") ) {
-			ST extST = getTemplates().getInstanceOf("headerFileExtension");
+			String fileName = getBaseListenerHeaderFileName();
+			if ( fileName==null ) return;
 			ST headerFileST = getTemplates().getInstanceOf("baseListenerHeaderFile");
-			getTarget().genBaseListenerHeaderFile(g,headerFileST,extST.render(lineWidth));
+			getTarget().genBaseListenerHeaderFile(g,headerFileST);
 		}
 	}
 
 	public void writeVisitor(ST outputFileST) {
 		getTarget().genFile(g,outputFileST, getVisitorFileName());
 
-		String fileName = getVisitorHeaderFileName();
-		if ( fileName==null ) return;
 		if ( getTemplates().isDefined("visitorHeaderFile") ) {
-			ST extST = getTemplates().getInstanceOf("headerFileExtension");
+			String fileName = getVisitorHeaderFileName();
+			if ( fileName==null ) return;
 			ST headerFileST = getTemplates().getInstanceOf("visitorHeaderFile");
-			getTarget().genVisitorHeaderFile(g,headerFileST,extST.render(lineWidth));
+			getTarget().genVisitorHeaderFile(g,headerFileST);
 		}
 	}
 
 	public void writeBaseVisitor(ST outputFileST) {
 		getTarget().genFile(g,outputFileST, getBaseVisitorFileName());
 
-		String fileName = getBaseVisitorHeaderFileName();
-		if ( fileName==null ) return;
 		if ( getTemplates().isDefined("baseVisitorHeaderFile") ) {
-			ST extST = getTemplates().getInstanceOf("headerFileExtension");
+			String fileName = getBaseVisitorHeaderFileName();
+			if ( fileName==null ) return;
 			ST headerFileST = getTemplates().getInstanceOf("baseVisitorHeaderFile");
-			getTarget().genBaseVisitorHeaderFile(g,headerFileST,extST.render(lineWidth));
+			getTarget().genBaseVisitorHeaderFile(g,headerFileST);
 		}
 	}
 

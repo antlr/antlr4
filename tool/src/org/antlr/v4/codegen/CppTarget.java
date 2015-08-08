@@ -208,37 +208,37 @@ public class CppTarget extends Target {
 	}
 
         @Override
-        protected void genParserHeaderFile(Grammar grammar, ST headerFileST,  String extName) {
+        protected void genParserHeaderFile(Grammar grammar, ST headerFileST) {
  		String fileName = getCodeGenerator().getParserHeaderFileName();
  		getCodeGenerator().write(headerFileST, fileName);
  	}
 
         @Override
-        protected void genRecognizerHeaderFile(Grammar grammar, ST headerFileST,  String extName) {
+        protected void genRecognizerHeaderFile(Grammar grammar, ST headerFileST) {
  		String fileName = getCodeGenerator().getRecognizerHeaderFileName();
  		getCodeGenerator().write(headerFileST, fileName);
  	}
 
         @Override
-        protected void genListenerHeaderFile(Grammar grammar, ST headerFileST,  String extName) {
+        protected void genListenerHeaderFile(Grammar grammar, ST headerFileST) {
  		String fileName = getCodeGenerator().getListenerHeaderFileName();
  		getCodeGenerator().write(headerFileST, fileName);
  	}
 
         @Override
-        protected void genBaseListenerHeaderFile(Grammar grammar, ST headerFileST,  String extName) {
+        protected void genBaseListenerHeaderFile(Grammar grammar, ST headerFileST) {
  		String fileName = getCodeGenerator().getBaseListenerHeaderFileName();
  		getCodeGenerator().write(headerFileST, fileName);
  	}
 
         @Override
-        protected void genVisitorHeaderFile(Grammar grammar, ST headerFileST,  String extName) {
+        protected void genVisitorHeaderFile(Grammar grammar, ST headerFileST) {
  		String fileName = getCodeGenerator().getVisitorHeaderFileName();
  		getCodeGenerator().write(headerFileST, fileName);
  	}
 
         @Override
-        protected void genBaseVisitorHeaderFile(Grammar grammar, ST headerFileST,  String extName) {
+        protected void genBaseVisitorHeaderFile(Grammar grammar, ST headerFileST) {
  		String fileName = getCodeGenerator().getBaseVisitorHeaderFileName();
  		getCodeGenerator().write(headerFileST, fileName);
  	}

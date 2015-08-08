@@ -1065,7 +1065,24 @@ FOOM1
 >>
 
 recognizerHeaderFile(file, parser, namedActions) ::= <<
-FOOM2
+<fileHeader(file.grammarFileName, file.ANTLRVersion)>
+<if(file.genPackage)>
+namespace <file.genPackage> {
+<endif>
+<namedActions.header>
+#include "Lexer.h";
+#include "CharStream.h";
+#include "Token.h";
+#include "TokenStream.h";
+// May also need to import *
+// May also need to import atn.*
+#include "dfa/DFA.h";
+// May also need to import misc.*
+
+<parser>
+<if(file.genPackage)>
+}  // namespace <file.genPackage>
+<endif>
 >>
 
 listenerHeaderFile(file, parser, namedActions) ::= <<
