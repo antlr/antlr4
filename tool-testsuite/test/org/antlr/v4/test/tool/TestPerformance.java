@@ -415,10 +415,10 @@ public class TestPerformance extends BaseTest {
 		assertTrue("The JDK_SOURCE_ROOT environment variable must be set for performance testing.", jdkSourceRoot != null && !jdkSourceRoot.isEmpty());
 
         compileJavaParser(USE_LR_GRAMMAR);
-		final String lexerName    = USE_LR_GRAMMAR ? "JavaLRLexer"        : "JavaLexer";
-		final String parserName   = USE_LR_GRAMMAR ? "JavaLRParser"       : "JavaParser";
-		final String listenerName = USE_LR_GRAMMAR ? "JavaLRBaseListener" : "JavaBaseListener";
-		final String entryPoint = "compilationUnit";
+        final String lexerName    = USE_LR_GRAMMAR ? "JavaLRLexer"        : "JavaLexer";
+        final String parserName   = USE_LR_GRAMMAR ? "JavaLRParser"       : "JavaParser";
+        final String listenerName = USE_LR_GRAMMAR ? "JavaLRBaseListener" : "JavaBaseListener";
+        final String entryPoint = "compilationUnit";
         final ParserFactory factory = getParserFactory(lexerName, parserName, listenerName, entryPoint);
 
 		if (!TOP_PACKAGE.isEmpty()) {
