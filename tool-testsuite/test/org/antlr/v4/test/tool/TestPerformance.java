@@ -1109,10 +1109,9 @@ public class TestPerformance extends BaseTest {
 
     protected void compileJavaParser(boolean leftRecursive) throws IOException {
         String grammarFileName = leftRecursive ? "JavaLR.g4"    : "Java.g4";
-        String sourceName      = leftRecursive ? "JavaLR.g4"    : "Java.g4";
         String parserName      = leftRecursive ? "JavaLRParser" : "JavaParser";
         String lexerName       = leftRecursive ? "JavaLRLexer"  : "JavaLexer";
-        String body = load(sourceName, null);
+        String body = load(grammarFileName, null);
         List<String> extraOptions = new ArrayList<String>();
 		extraOptions.add("-Werror");
         if (FORCE_ATN) {
