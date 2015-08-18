@@ -13,11 +13,11 @@ public class TestLexerIncludeActions extends BaseTest {
 
 	@Test public void testActionPerformIncludeSourceFile() throws Exception {
 		// prepare test files
-		String fn[] = {"test_Z0.test","test_Z1.test"};
+		String fn[] = {"test_#0.test","test_#1.test"};
 		File f[] = {new File(fn[0]),new File(fn[1])};
 		FileWriter f0=new FileWriter(f[0]);
 		FileWriter f1=new FileWriter(f[1]);
-		f0.write("E F G Z2 L M");
+		f0.write("E F G #1 L M");
 		f0.close();
 		f1.write("H I J K");
 		f1.close();
@@ -25,9 +25,9 @@ public class TestLexerIncludeActions extends BaseTest {
 		String grammar =
 			"lexer grammar L;\n"+
 			"I : 'A'..'Z' {} ;\n"+
-			"CP: 'Z' ('0'|'1') { performIncludeSourceFile( \"test_\"+getText()+\".test\" ); skip(); };\n" +
+			"CP: '#' ('0'|'1') { performIncludeSourceFile( \"test_\"+getText()+\".test\" ); skip(); };\n" +
 			"WS : (' '|'\\n') -> skip ;";
-		String found = execLexer("L.g4", grammar, "L", "A B C D Z1 N O P");
+		String found = execLexer("L.g4", grammar, "L", "A B C D #0 N O P");
 		
 		// clean up test files
 		f[0].delete();
