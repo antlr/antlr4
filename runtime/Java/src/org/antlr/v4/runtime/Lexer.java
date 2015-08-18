@@ -527,6 +527,10 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 			throw new IllegalStateException("pushLexerScanner requires performIncludeSourceFile action.");
 		}
 		
+		if (this._input instanceof ANTLRInputStream == false) {
+			throw new IllegalStateException("pushLexerScanner requires input to be ANTLRInputStream.");
+		} 
+
 		LexerScannerStateStackItem stackItem = new LexerScannerStateStackItem(_input, _tokenFactorySourcePair);
 		_lexerScannerStateStack.push(stackItem);
 		
