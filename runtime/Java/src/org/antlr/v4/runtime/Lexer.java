@@ -106,11 +106,11 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 	
 	
 	/** 
-	 * Keep track of lexer states.
+	 * Keep track of lexerScanner states.
 	 * Needed to handling grammars that allow to include 
-	 * content into the current scanning. 
+	 * new content into the current scanning stream. 
 	 */
-	public final Stack<?> _lexerStateStack = new Stack(); 
+	public final Stack<LexerScannerStateStackItem> _lexerScannerStateStack = new Stack<LexerScannerStateStackItem>(); 
 	
 	/** The channel number for the current token */
 	public int _channel;
@@ -171,8 +171,8 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 			while (true) {
 				if (_hitEOF) {
 					// check if any input has been stacked
-					if (!_lexerStateStack.isEmpty()) {
-						popLexerState( );
+					if (!_lexerScannerStateStack.isEmpty()) {
+						popLexerScannerState( );
 						_hitEOF = false;
 					} else {
 						emitEOF();
@@ -182,7 +182,7 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 
 				if (_hitInclude) {
 					// store current lexer state, and open _includeFileName for reading.
-					pushLexerState( );
+					pushLexerScannerState( );
 					_hitInclude=false;					
 				}
 				
@@ -506,13 +506,18 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 	/**
 	 * Retrieve old lexer state and make it the current state.
 	 */
-	public void popLexerState() {
+	public void popLexerScannerState() {
+		LexerScannerStateStackItem stackItem ;
+		stackItem=_lexerScannerStateStack.pop();
+		// restore _input and _tokenFactorySourcePair
 	}
 
 	/**
 	 * Store current lexer state, and open new file for input.
 	 */
-	public void pushLexerState() {
+	public void pushLexerScannerState() {
+		LexerScannerStateStackItem stackItem = new LexerScannerStateStackItem(_input, _tokenFactorySourcePair);
+		_lexerScannerStateStack.push(stackItem);
 	}
 
 
