@@ -512,7 +512,11 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 		}
 		LexerScannerStateStackItem stackItem ;
 		stackItem=_lexerScannerStateStack.pop();
+		// close current input stream before continuing
+		// this._input.close();
 		// restore _input and _tokenFactorySourcePair
+		//this._input=stackItem.getInput();
+		//this._tokenFactorySourcePair=stackItem.getTokenFactorySourcePair();
 	}
 
 	/**
@@ -525,6 +529,14 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 		
 		LexerScannerStateStackItem stackItem = new LexerScannerStateStackItem(_input, _tokenFactorySourcePair);
 		_lexerScannerStateStack.push(stackItem);
+		
+		// if (this._input instanceof ANTLRInputStream) {} 
+		
+		// open _includeFileName ...
+		//this._input = ...
+        //this._tokenFactorySourcePair = new Pair<TokenSource, CharStream>(this, _input);
+        //this._input.seek(0); // ensure position is set
+        //getInterpreter().reset();
 	}
 
 
