@@ -507,6 +507,9 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 	 * Retrieve old lexer state and make it the current state.
 	 */
 	public void popLexerScannerState() {
+		if (_lexerScannerStateStack.isEmpty() == true) {
+			throw new IllegalStateException("popLexerScanner cannot operate on empty stack.");
+		}
 		LexerScannerStateStackItem stackItem ;
 		stackItem=_lexerScannerStateStack.pop();
 		// restore _input and _tokenFactorySourcePair
@@ -516,6 +519,10 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 	 * Store current lexer state, and open new file for input.
 	 */
 	public void pushLexerScannerState() {
+		if (_hitInclude == false) {
+			throw new IllegalStateException("pushLexerScanner requires performIncludeSourceFile action.");
+		}
+		
 		LexerScannerStateStackItem stackItem = new LexerScannerStateStackItem(_input, _tokenFactorySourcePair);
 		_lexerScannerStateStack.push(stackItem);
 	}
