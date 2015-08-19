@@ -531,7 +531,6 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 		_lexerScannerStateStack.push(stackItem);
 		
 		// open _includeFileName ...
-		// should just be a new file. Lexer will keep track of files included.
 		CharStream newfile = _lexerScannerIncludeSource.embedSource(_includeFileName,_includeSubstFrom,_includeSubstTo);
 		this._input = newfile;
         this._tokenFactorySourcePair = new Pair<TokenSource, CharStream>(this, _input);
@@ -541,7 +540,7 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 	
 	/**
 	 * Set how the lexer handle inclusion of source code.
-	 * @param lsis
+	 * @param LexerScannerIncludeSource
 	 */
 	public void setLexerScannerIncludeSource( LexerScannerIncludeSource lsis) {_lexerScannerIncludeSource=lsis;}
 	
