@@ -13,7 +13,7 @@ public class TestLexerIncludeActions extends BaseTest {
 
 	@Test public void testActionPerformIncludeSourceFile() throws Exception {
 		// prepare test files
-		String path="c:/temp/"; //TODO: use tmpdir variable
+		String path="/tmp/"; //TODO: use tmpdir variable
 		String fn[] = {"test_#0.test","test_#1.test"};
 		File f[] = {new File(path+fn[0]),new File(path+fn[1])};
 		FileWriter f0=new FileWriter(f[0]);
@@ -26,7 +26,7 @@ public class TestLexerIncludeActions extends BaseTest {
 		String grammar =
 			"lexer grammar L;\n"+
 			"I : 'A'..'Z' {} ;\n"+
-			"CP: '#' ('0'|'1') { performIncludeSourceFile( \"c:/temp/test_\"+getText()+\".test\" ); skip(); };\n" +
+			"CP: '#' ('0'|'1') { performIncludeSourceFile( \"/tmp/test_\"+getText()+\".test\" ); skip(); };\n" +
 			"WS: (' '|'\\n') -> skip ;";
 		String found = execLexer("L.g4", grammar, "L", "A B C D #0 N O P");
 		
