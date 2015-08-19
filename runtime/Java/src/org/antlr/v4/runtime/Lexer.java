@@ -104,13 +104,14 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 	/** Store substitution string for content to be include. */
 	public String _includeSubstTo;
 	
-	
 	/** 
 	 * Keep track of lexerScanner states.
 	 * Needed to handling grammars that allow to include 
 	 * new content into the current scanning stream. 
 	 */
 	public final Stack<LexerScannerStateStackItem> _lexerScannerStateStack = new Stack<LexerScannerStateStackItem>(); 
+
+	public LexerScannerIncludeSource _lexerScannerIncludeSource = new LexerScannerIncludeSourceImpl();
 	
 	/** The channel number for the current token */
 	public int _channel;
@@ -512,11 +513,9 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 		}
 		LexerScannerStateStackItem stackItem ;
 		stackItem=_lexerScannerStateStack.pop();
-		// close current input stream before continuing
-		// this._input.close();
 		// restore _input and _tokenFactorySourcePair
-		//this._input=stackItem.getInput();
-		//this._tokenFactorySourcePair=stackItem.getTokenFactorySourcePair();
+		this._input=stackItem.getInput();
+		this._tokenFactorySourcePair=stackItem.getTokenFactorySourcePair();
 	}
 
 	/**
@@ -527,22 +526,27 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 			throw new IllegalStateException("pushLexerScanner requires performIncludeSourceFile action.");
 		}
 		
-		if (this._input instanceof ANTLRInputStream == false) {
-			throw new IllegalStateException("pushLexerScanner requires input to be ANTLRInputStream.");
+		if (this._input instanceof ANTLRFileStream == false) {
+			throw new IllegalStateException("pushLexerScanner requires input to be ANTLRFileStream.");
 		} 
 
+		// store current lexer scanner state
 		LexerScannerStateStackItem stackItem = new LexerScannerStateStackItem(_input, _tokenFactorySourcePair);
 		_lexerScannerStateStack.push(stackItem);
 		
-		// if (this._input instanceof ANTLRInputStream) {} 
-		
 		// open _includeFileName ...
-		//this._input = ...
-        //this._tokenFactorySourcePair = new Pair<TokenSource, CharStream>(this, _input);
-        //this._input.seek(0); // ensure position is set
-        //getInterpreter().reset();
+		// should just be a new file. Lexer will keep track of files included.
+		CharStream newfile = _lexerScannerIncludeSource.embedSource(_includeFileName,_includeSubstFrom,_includeSubstTo);
+		this._input = newfile;
+        this._tokenFactorySourcePair = new Pair<TokenSource, CharStream>(this, _input);
+        this._input.seek(0); // ensure position is set
+        getInterpreter().reset();
 	}
-
-
+	
+	/**
+	 * Set how the lexer handle inclusion of source code.
+	 * @param lsis
+	 */
+	public void setLexerScannerIncludeSource( LexerScannerIncludeSource lsis) {_lexerScannerIncludeSource=lsis;}
 	
 }
