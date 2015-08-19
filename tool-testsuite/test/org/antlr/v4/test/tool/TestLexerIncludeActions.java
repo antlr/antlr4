@@ -13,7 +13,7 @@ public class TestLexerIncludeActions extends BaseTest {
 
 	@Test public void testActionPerformIncludeSourceFile() throws Exception {
 		// prepare test files
-		String path=BASE_TEST_DIR.replace('\\', '/') ;
+		String path=BASE_TEST_DIR.replace('\\', '/') +"/";
 		String fn[] = {"test_#0.test","test_#1.test"};
 		File f[] = {new File(path+fn[0]),new File(path+fn[1])};
 		FileWriter f0=new FileWriter(f[0]);
@@ -60,7 +60,7 @@ public class TestLexerIncludeActions extends BaseTest {
 
 	@Test public void testActionPerformIncludeSourceFileSubstitute() throws Exception {
 		// prepare test files
-		String path=BASE_TEST_DIR.replace('\\', '/') ;
+		String path=BASE_TEST_DIR.replace('\\', '/') +"/" ;
 		String fn[] = {"test_#0.test","test_#1.test"};
 		File f[] = {new File(path+fn[0]),new File(path+fn[1])};
 		FileWriter f0=new FileWriter(f[0]);
