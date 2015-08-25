@@ -327,7 +327,7 @@ class OR (SemanticContext):
         for context in self.opnds:
             evaluated = context.evalPrecedence(parser, outerContext)
             differs |= evaluated is not context
-            if evaluate is SemanticContext.NONE:
+            if evaluated is SemanticContext.NONE:
                 # The OR context is true if any element is true
                 return SemanticContext.NONE
             elif evaluated is not None:

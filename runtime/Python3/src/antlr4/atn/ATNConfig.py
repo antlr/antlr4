@@ -60,8 +60,6 @@ class ATNConfig(object):
         if semantic is None:
             semantic = SemanticContext.NONE
 
-        if not isinstance(state, ATNState):
-            pass
         # The ATN state associated with this configuration#/
         self.state = state
         # What alt (or lexer rule) is predicted by this configuration#/
@@ -82,7 +80,6 @@ class ATNConfig(object):
         # accurate depth since I don't ever decrement. TODO: make it a boolean then
         self.reachesIntoOuterContext = 0 if config is None else config.reachesIntoOuterContext
         self.precedenceFilterSuppressed = False if config is None else config.precedenceFilterSuppressed
-
 
     # An ATN configuration is equal to another if both have
     #  the same state, they predict the same alternative, and
