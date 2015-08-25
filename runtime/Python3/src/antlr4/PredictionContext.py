@@ -74,6 +74,9 @@ class PredictionContext(object):
     def __init__(self, cachedHashCode:int):
         self.cachedHashCode = cachedHashCode
 
+    def __len__(self):
+        return 0
+
     # This means only the {@link #EMPTY} context is in set.
     def isEmpty(self):
         return self is self.EMPTY
@@ -81,16 +84,20 @@ class PredictionContext(object):
     def hasEmptyPath(self):
         return self.getReturnState(len(self) - 1) == self.EMPTY_RETURN_STATE
 
+    def getReturnState(self, index:int):
+        raise "illegal!"
+
     def __hash__(self):
         return self.cachedHashCode
 
-
 def calculateHashCode(parent:PredictionContext, returnState:int):
-    return hash( str(parent) + str(returnState))
+    return hash("") if parent is None else hash((hash(parent), returnState))
 
-def calculateEmptyHashCode():
-    return hash("")
-
+def calculateListsHashCode(parents:[], returnStates:[] ):
+    h = 0
+    for parent, returnState in parents, returnStates:
+        h = hash((h, calculateHashCode(parent, returnState)))
+    return h
 
 #  Used to cache {@link PredictionContext} objects. Its used for the shared
 #  context cash associated with contexts in DFA states. This cache
@@ -133,7 +140,7 @@ class SingletonPredictionContext(PredictionContext):
 
     def __init__(self, parent:PredictionContext, returnState:int):
         assert returnState!=ATNState.INVALID_STATE_NUMBER
-        hashCode = calculateHashCode(parent, returnState) if parent is not None else calculateEmptyHashCode()
+        hashCode = calculateHashCode(parent, returnState)
         super().__init__(hashCode)
         self.parentCtx = parent
         self.returnState = returnState
@@ -183,14 +190,11 @@ class EmptyPredictionContext(SingletonPredictionContext):
     def isEmpty(self):
         return True
 
-    def getParent(self, index:int):
-        return None
-
-    def getReturnState(self, index:int):
-        return self.returnState
-
     def __eq__(self, other):
         return self is other
+
+    def __hash__(self):
+        return self.cachedHashCode
 
     def __str__(self):
         return "$"
@@ -204,7 +208,7 @@ class ArrayPredictionContext(PredictionContext):
     #  returnState == {@link #EMPTY_RETURN_STATE}.
 
     def __init__(self, parents:list, returnStates:list):
-        super().__init__(calculateHashCode(parents, returnStates))
+        super().__init__(calculateListsHashCode(parents, returnStates))
         assert parents is not None and len(parents)>0
         assert returnStates is not None and len(returnStates)>0
         self.parents = parents
@@ -273,15 +277,6 @@ def PredictionContextFromRuleContext(atn:ATN, outerContext:RuleContext=None):
     transition = state.transitions[0]
     return SingletonPredictionContext.create(parent, transition.followState.stateNumber)
 
-
-def calculateListsHashCode(parents:[], returnStates:int ):
-
-    with StringIO() as s:
-        for parent in parents:
-            s.write(str(parent))
-        for returnState in returnStates:
-            s.write(str(returnState))
-        return hash(s.getvalue())
 
 def merge(a:PredictionContext, b:PredictionContext, rootIsWildcard:bool, mergeCache:dict):
     assert a is not None and b is not None # must be empty context, never null

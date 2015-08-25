@@ -177,10 +177,10 @@ class ATNConfigSet(object):
         return self.hashConfigs()
 
     def hashConfigs(self):
-        with StringIO() as buf:
-            for cfg in self.configs:
-                buf.write(str(cfg))
-            return hash(buf.getvalue())
+        h = 0
+        for cfg in self.configs:
+            h = hash((h, cfg))
+        return h
 
     def __len__(self):
         return len(self.configs)
