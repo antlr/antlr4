@@ -73,12 +73,18 @@ class PredictionContext(object):
     def __init__(self, cachedHashCode):
         self.cachedHashCode = cachedHashCode
 
+    def __len__(self):
+        return 0
+
     # This means only the {@link #EMPTY} context is in set.
     def isEmpty(self):
         return self is self.EMPTY
 
     def hasEmptyPath(self):
         return self.getReturnState(len(self) - 1) == self.EMPTY_RETURN_STATE
+
+    def getReturnState(self, index):
+        raise "illegal!"
 
     def __hash__(self):
         return self.cachedHashCode
@@ -88,11 +94,13 @@ class PredictionContext(object):
 
 
 def calculateHashCode(parent, returnState):
-    return hash( str(parent) + str(returnState))
+    return hash("") if parent is None else hash((hash(parent), returnState))
 
-def calculateEmptyHashCode():
-    return hash("")
-
+def calculateListsHashCode(parents, returnStates ):
+    h = 0
+    for parent, returnState in parents, returnStates:
+        h = hash((h, calculateHashCode(parent, returnState)))
+    return h
 
 #  Used to cache {@link PredictionContext} objects. Its used for the shared
 #  context cash associated with contexts in DFA states. This cache
@@ -135,7 +143,7 @@ class SingletonPredictionContext(PredictionContext):
 
     def __init__(self, parent, returnState):
         assert returnState!=ATNState.INVALID_STATE_NUMBER
-        hashCode = calculateHashCode(parent, returnState) if parent is not None else calculateEmptyHashCode()
+        hashCode = calculateHashCode(parent, returnState)
         super(SingletonPredictionContext, self).__init__(hashCode)
         self.parentCtx = parent
         self.returnState = returnState
@@ -185,14 +193,11 @@ class EmptyPredictionContext(SingletonPredictionContext):
     def isEmpty(self):
         return True
 
-    def getParent(self, index):
-        return None
-
-    def getReturnState(self, index):
-        return self.returnState
-
     def __eq__(self, other):
         return self is other
+
+    def __hash__(self):
+        return self.cachedHashCode
 
     def __unicode__(self):
         return "$"
@@ -206,7 +211,7 @@ class ArrayPredictionContext(PredictionContext):
     #  returnState == {@link #EMPTY_RETURN_STATE}.
 
     def __init__(self, parents, returnStates):
-        super(ArrayPredictionContext, self).__init__(calculateHashCode(parents, returnStates))
+        super(ArrayPredictionContext, self).__init__(calculateListsHashCode(parents, returnStates))
         assert parents is not None and len(parents)>0
         assert returnStates is not None and len(returnStates)>0
         self.parents = parents
@@ -305,9 +310,9 @@ def merge(a, b, rootIsWildcard, mergeCache):
 
     # convert singleton so both are arrays to normalize
     if isinstance( a, SingletonPredictionContext ):
-        a = ArrayPredictionContext(a)
+        a = ArrayPredictionContext([a.parentCtx], [a.returnState])
     if isinstance( b, SingletonPredictionContext):
-        b = ArrayPredictionContext(b)
+        b = ArrayPredictionContext([b.parentCtx], [b.returnState])
     return mergeArrays(a, b, rootIsWildcard, mergeCache)
 
 
@@ -380,7 +385,7 @@ def mergeSingletons(a, b, rootIsWildcard, mergeCache):
                 payloads[0] = b.returnState
                 payloads[1] = a.returnState
             parents = [singleParent, singleParent]
-            a_ = ArrayPredictionContext(parents, payloads);
+            a_ = ArrayPredictionContext(parents, payloads)
             if mergeCache is not None:
                 mergeCache.put(a, b, a_)
             return a_

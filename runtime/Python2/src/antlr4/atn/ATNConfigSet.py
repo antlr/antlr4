@@ -34,7 +34,7 @@
 # graph-structured stack.
 #/
 from io import StringIO
-from antlr4.PredictionContext import PredictionContext, merge
+from antlr4.PredictionContext import merge
 from antlr4.Utils import str_list
 from antlr4.atn.ATN import ATN
 from antlr4.atn.SemanticContext import SemanticContext
@@ -174,10 +174,10 @@ class ATNConfigSet(object):
         return self.hashConfigs()
 
     def hashConfigs(self):
-        with StringIO() as buf:
-            for cfg in self.configs:
-                buf.write(unicode(cfg))
-            return hash(buf.getvalue())
+        h = 0
+        for cfg in self.configs:
+            h = hash((h, cfg))
+        return h
 
     def __len__(self):
         return len(self.configs)

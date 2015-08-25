@@ -136,13 +136,7 @@ class Predicate(SemanticContext):
         return parser.sempred(localctx, self.ruleIndex, self.predIndex)
 
     def __hash__(self):
-        with StringIO() as buf:
-            buf.write(unicode(self.ruleIndex))
-            buf.write(u"/")
-            buf.write(unicode(self.predIndex))
-            buf.write(u"/")
-            buf.write(unicode(self.isCtxDependent))
-            return hash(buf.getvalue())
+        return hash((self.ruleIndex, self.predIndex, self.isCtxDependent))
 
     def __eq__(self, other):
         if self is other:
@@ -220,7 +214,10 @@ class AND(SemanticContext):
             return self.opnds == other.opnds
 
     def __hash__(self):
-        return hash(str(self.opnds)+ "/AND")
+        h = 0
+        for o in self.opnds:
+            h = hash((h, o))
+        return hash((h, "AND"))
 
     #
     # {@inheritDoc}
@@ -308,7 +305,10 @@ class OR (SemanticContext):
             return self.opnds == other.opnds
 
     def __hash__(self):
-        return hash(str(self.opnds)+"/OR")
+        h = 0
+        for o in self.opnds:
+            h = hash((h, o))
+        return hash((h, "OR"))
 
     # <p>
     # The evaluation of predicates by this context is short-circuiting, but

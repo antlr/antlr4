@@ -47,7 +47,7 @@ class LexerAction(object):
         self.isPositionDependent = False
 
     def __hash__(self):
-        return hash(str(self.actionType))
+        return hash(self.actionType)
 
     def __eq__(self, other):
         return self is other
@@ -92,7 +92,7 @@ class LexerTypeAction(LexerAction):
         lexer.type = self.type
 
     def __hash__(self):
-        return hash(str(self.actionType) + str(self.type))
+        return hash((self.actionType, self.type))
 
     def __eq__(self, other):
         if self is other:
@@ -120,7 +120,7 @@ class LexerPushModeAction(LexerAction):
         lexer.pushMode(self.mode)
 
     def __hash__(self):
-        return hash(str(self.actionType) + str(self.mode))
+        return hash((self.actionType, self.mode))
 
     def __eq__(self, other):
         if self is other:
@@ -188,7 +188,7 @@ class LexerModeAction(LexerAction):
         lexer.mode(self.mode)
 
     def __hash__(self):
-        return hash(str(self.actionType) + str(self.mode))
+        return hash((self.actionType, self.mode))
 
     def __eq__(self, other):
         if self is other:
@@ -232,7 +232,7 @@ class LexerCustomAction(LexerAction):
         lexer.action(None, self.ruleIndex, self.actionIndex)
 
     def __hash__(self):
-        return hash(str(self.actionType) + str(self.ruleIndex) + str(self.actionIndex))
+        return hash((self.actionType, self.ruleIndex, self.actionIndex))
 
     def __eq__(self, other):
         if self is other:
@@ -258,7 +258,7 @@ class LexerChannelAction(LexerAction):
         lexer._channel = self.channel
 
     def __hash__(self):
-        return hash(str(self.actionType) + str(self.channel))
+        return hash((self.actionType, self.channel))
 
     def __eq__(self, other):
         if self is other:
@@ -305,7 +305,7 @@ class LexerIndexedCustomAction(LexerAction):
         self.action.execute(lexer)
 
     def __hash__(self):
-        return hash(str(self.actionType) + str(self.offset) + str(self.action))
+        return hash((self.actionType, self.offset, self.action))
 
     def __eq__(self, other):
         if self is other:
