@@ -4,6 +4,7 @@ import antlr4
 from parser.cparser import CParser
 from parser.clexer import CLexer
 from datetime import datetime
+import cProfile
 
 class ErrorListener(antlr4.error.ErrorListener.ErrorListener):
 
@@ -34,10 +35,10 @@ def main():
     sub()
     after = datetime.now()
     print(str(after-before))
-    before = after
-    sub()
-    after = datetime.now()
-    print(str(after-before))
+    # before = after
+    # sub()
+    # after = datetime.now()
+    # print(str(after-before))
 
 if __name__ == '__main__':
-    main()
+    cProfile.run("main()", sort='tottime')

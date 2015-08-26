@@ -142,7 +142,6 @@ class SingletonPredictionContext(PredictionContext):
             return SingletonPredictionContext(parent, returnState)
 
     def __init__(self, parent, returnState):
-        assert returnState!=ATNState.INVALID_STATE_NUMBER
         hashCode = calculateHashCode(parent, returnState)
         super(SingletonPredictionContext, self).__init__(hashCode)
         self.parentCtx = parent
@@ -152,11 +151,9 @@ class SingletonPredictionContext(PredictionContext):
         return 1
 
     def getParent(self, index):
-        assert index == 0
         return self.parentCtx
 
     def getReturnState(self, index):
-        assert index == 0
         return self.returnState
 
     def __eq__(self, other):
@@ -166,8 +163,6 @@ class SingletonPredictionContext(PredictionContext):
             return False
         elif not isinstance(other, SingletonPredictionContext):
             return False
-        elif hash(self) != hash(other):
-            return False # can't be same if hash is different
         else:
             return self.returnState == other.returnState and self.parentCtx==other.parentCtx
 
@@ -212,8 +207,6 @@ class ArrayPredictionContext(PredictionContext):
 
     def __init__(self, parents, returnStates):
         super(ArrayPredictionContext, self).__init__(calculateListsHashCode(parents, returnStates))
-        assert parents is not None and len(parents)>0
-        assert returnStates is not None and len(returnStates)>0
         self.parents = parents
         self.returnStates = returnStates
 
@@ -281,17 +274,7 @@ def PredictionContextFromRuleContext(atn, outerContext=None):
     return SingletonPredictionContext.create(parent, transition.followState.stateNumber)
 
 
-def calculateListsHashCode(parents, returnStates ):
-
-    with StringIO() as s:
-        for parent in parents:
-            s.write(unicode(parent))
-        for returnState in returnStates:
-            s.write(unicode(returnState))
-        return hash(s.getvalue())
-
 def merge(a, b, rootIsWildcard, mergeCache):
-    assert a is not None and b is not None # must be empty context, never null
 
     # share same graph if both same
     if a==b:
@@ -491,9 +474,9 @@ def mergeArrays(a, b, rootIsWildcard, mergeCache):
             return previous
 
     # merge sorted payloads a + b => M
-    i = 0; # walks a
-    j = 0; # walks b
-    k = 0; # walks target M array
+    i = 0 # walks a
+    j = 0 # walks b
+    k = 0 # walks target M array
 
     mergedReturnStates = [] * (len(a.returnState) + len( b.returnStates))
     mergedParents = [] * len(mergedReturnStates)
