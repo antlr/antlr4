@@ -11,6 +11,7 @@ TestTemplates ::= [
 	"LL2": [],
 	"LL3": [],
 	"LLStar": [],
+	"SingleTokenDeletionBeforePredict": [],
 	"SingleTokenDeletionBeforeLoop": [],
 	"MultiTokenDeletionBeforeLoop": [],
 	"SingleTokenDeletionDuringLoop": [],

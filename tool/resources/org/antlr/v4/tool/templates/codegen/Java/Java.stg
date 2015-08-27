@@ -531,7 +531,7 @@ do {
 
 AltBlock(choice, preamble, alts, error) ::= <<
 setState(<choice.stateNumber>);
-<!_errHandler.sync(this);!>
+_errHandler.sync(this);
 <if(choice.label)><labelref(choice.label)> = _input.LT(1);<endif>
 <preamble; separator="\n">
 switch ( getInterpreter().adaptivePredict(_input,<choice.decision>,_ctx) ) {
@@ -544,7 +544,7 @@ case <i>:
 
 OptionalBlock(choice, alts, error) ::= <<
 setState(<choice.stateNumber>);
-<!_errHandler.sync(this);!>
+_errHandler.sync(this);
 switch ( getInterpreter().adaptivePredict(_input,<choice.decision>,_ctx) ) {
 <alts:{alt |
 case <i><if(!choice.ast.greedy)>+1<endif>:
