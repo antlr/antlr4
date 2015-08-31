@@ -281,8 +281,8 @@ class Parser (Recognizer):
         if lexer is None:
             if self.getTokenStream() is not None:
                 tokenSource = self.getTokenStream().getTokenSource()
-            if isinstance( tokenSource, Lexer ):
-                lexer = tokenSource
+                if isinstance( tokenSource, Lexer ):
+                    lexer = tokenSource
         if lexer is None:
             raise UnsupportedOperationException("Parser can't discover a lexer to use")
 

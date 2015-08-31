@@ -539,9 +539,6 @@ class LexerATNSimulator(ATNSimulator):
     # configuration containing an ATN rule stop state. Later, when
     # traversing the DFA, we will know which rule to accept.
     def addDFAState(self, configs:ATNConfigSet) -> DFAState:
-        # the lexer evaluates predicates on-the-fly; by this point configs
-        # should not contain any configurations with unevaluated predicates.
-        assert not configs.hasSemanticContext
 
         proposed = DFAState(configs=configs)
         firstConfigWithRuleStopState = None

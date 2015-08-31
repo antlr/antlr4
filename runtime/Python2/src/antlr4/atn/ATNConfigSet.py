@@ -34,7 +34,7 @@
 # graph-structured stack.
 #/
 from io import StringIO
-from antlr4.PredictionContext import PredictionContext, merge
+from antlr4.PredictionContext import merge
 from antlr4.Utils import str_list
 from antlr4.atn.ATN import ATN
 from antlr4.atn.SemanticContext import SemanticContext
@@ -51,7 +51,7 @@ class ATNConfigSet(object):
     def __init__(self, fullCtx=True):
         # All configs but hashed by (s, i, _, pi) not including context. Wiped out
         # when we go readonly as this set becomes a DFA state.
-        self.configLookup = set()
+        self.configLookup = dict()
         # Indicates that this configuration set is part of a full context
         #  LL prediction. It will be used to determine how to merge $. With SLL
         #  it's a wildcard whereas it is not for LL context merge.
@@ -115,10 +115,17 @@ class ATNConfigSet(object):
         return True
 
     def getOrAdd(self, config):
-        for c in self.configLookup:
-            if c==config:
-                return c
-        self.configLookup.add(config)
+        h = hash(config)
+        l = self.configLookup.get(h, None)
+        if l is not None:
+            for c in l:
+                if c==config:
+                    return c
+        if l is None:
+            l = [config]
+            self.configLookup[h] = l
+        else:
+            l.append(config)
         return config
 
     def getStates(self):
@@ -140,7 +147,7 @@ class ATNConfigSet(object):
     def optimizeConfigs(self, interpreter):
         if self.readonly:
             raise IllegalStateException("This set is readonly")
-        if len(self.configLookup)==0:
+        if len(self.configs)==0:
             return
         for config in self.configs:
             config.context = interpreter.getCachedContext(config.context)
@@ -157,7 +164,7 @@ class ATNConfigSet(object):
             return False
 
         same = self.configs is not None and \
-            self.configs==other.configs and \
+            self.configs == other.configs and \
             self.fullCtx == other.fullCtx and \
             self.uniqueAlt == other.uniqueAlt and \
             self.conflictingAlts == other.conflictingAlts and \
@@ -174,10 +181,10 @@ class ATNConfigSet(object):
         return self.hashConfigs()
 
     def hashConfigs(self):
-        with StringIO() as buf:
-            for cfg in self.configs:
-                buf.write(unicode(cfg))
-            return hash(buf.getvalue())
+        h = 0
+        for cfg in self.configs:
+            h = hash((h, cfg))
+        return h
 
     def __len__(self):
         return len(self.configs)
@@ -185,16 +192,12 @@ class ATNConfigSet(object):
     def isEmpty(self):
         return len(self.configs)==0
 
-    def __contains__(self, item):
+    def __contains__(self, config):
         if self.configLookup is None:
             raise UnsupportedOperationException("This method is not implemented for readonly sets.")
-        return item in self.configLookup
-
-    def containsFast(self, obj):
-        if self.configLookup is None:
-            raise UnsupportedOperationException("This method is not implemented for readonly sets.")
-        return self.configLookup.containsFast(obj)
-
+        h = hash(config)
+        l = self.configLookup.get(h, None)
+        return l is not None and config in l
 
     def clear(self):
         if self.readonly:
@@ -231,7 +234,6 @@ class OrderedATNConfigSet(ATNConfigSet):
 
     def __init__(self):
         super(OrderedATNConfigSet, self).__init__()
-        # self.configLookup = set()
 
 
 
