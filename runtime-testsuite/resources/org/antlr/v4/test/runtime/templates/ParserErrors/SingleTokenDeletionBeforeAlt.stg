@@ -16,7 +16,7 @@ Output() ::= <<
 >>
 
 Errors() ::= <<
-line 1:0 extraneous input 'a' expecting {'b', 'c'}
+line 1:0 extraneous input 'a' expecting {'b', 'c'}<\n>
 >>
 
 grammar(grammarName) ::= <<
