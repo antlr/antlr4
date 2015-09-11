@@ -48,128 +48,128 @@ namespace <file.genPackage> {
 <endif>
 <namedActions.header>
 <! TODO(dsisson): Reduce the list of includes to those absolutely necessary. !>
-#include "atn/ATN.h";
-#include "atn/ATNConfig.h";
-#include "atn/ATNConfigSet.h";
-#include "atn/ATNDeserializationOptions.h";
-#include "atn/ATNDeserializer.h";
-#include "atn/ATNSerializer.h";
-#include "atn/ATNSimulator.h";
-#include "atn/ATNState.h";
-#include "atn/ATNType.h";
-#include "atn/AbstractPredicateTransition.h";
-#include "atn/ActionTransition.h";
-#include "atn/ArrayPredictionContext.h";
-#include "atn/AtomTransition.h";
-#include "atn/BasicBlockStartState.h";
-#include "atn/BasicState.h";
-#include "atn/BlockEndState.h";
-#include "atn/BlockStartState.h";
-#include "atn/DecisionState.h";
-#include "atn/EmptyPredictionContext.h";
-#include "atn/EpsilonTransition.h";
-#include "atn/LL1Analyzer.h";
-#include "atn/LexerATNConfig.h";
-#include "atn/LexerATNSimulator.h";
-#include "atn/LoopEndState.h";
-#include "atn/NotSetTransition.h";
-#include "atn/OrderedATNConfigSet.h";
-#include "atn/ParserATNSimulator.h";
-#include "atn/PlusBlockStartState.h";
-#include "atn/PlusLoopbackState.h";
-#include "atn/PrecedencePredicateTransition.h";
-#include "atn/PredicateTransition.h";
-#include "atn/PredictionContext.h";
-#include "atn/PredictionContextCache.h";
-#include "atn/PredictionMode.h";
-#include "atn/RangeTransition.h";
-#include "atn/RuleStartState.h";
-#include "atn/RuleStopState.h";
-#include "atn/RuleTransition.h";
-#include "atn/SemanticContext.h";
-#include "atn/SetTransition.h";
-#include "atn/SingletonPredictionContext.h";
-#include "atn/StarBlockStartState.h";
-#include "atn/StarLoopEntryState.h";
-#include "atn/StarLoopbackState.h";
-#include "atn/TokensStartState.h";
-#include "atn/Transition.h";
-#include "atn/WildcardTransition.h";
-#include "dfa/DFA.h";
+#include "atn/ATN.h"
+#include "atn/ATNConfig.h"
+#include "atn/ATNConfigSet.h"
+#include "atn/ATNDeserializationOptions.h"
+#include "atn/ATNDeserializer.h"
+#include "atn/ATNSerializer.h"
+#include "atn/ATNSimulator.h"
+#include "atn/ATNState.h"
+#include "atn/ATNType.h"
+#include "atn/AbstractPredicateTransition.h"
+#include "atn/ActionTransition.h"
+#include "atn/ArrayPredictionContext.h"
+#include "atn/AtomTransition.h"
+#include "atn/BasicBlockStartState.h"
+#include "atn/BasicState.h"
+#include "atn/BlockEndState.h"
+#include "atn/BlockStartState.h"
+#include "atn/DecisionState.h"
+#include "atn/EmptyPredictionContext.h"
+#include "atn/EpsilonTransition.h"
+#include "atn/LL1Analyzer.h"
+#include "atn/LexerATNConfig.h"
+#include "atn/LexerATNSimulator.h"
+#include "atn/LoopEndState.h"
+#include "atn/NotSetTransition.h"
+#include "atn/OrderedATNConfigSet.h"
+#include "atn/ParserATNSimulator.h"
+#include "atn/PlusBlockStartState.h"
+#include "atn/PlusLoopbackState.h"
+#include "atn/PrecedencePredicateTransition.h"
+#include "atn/PredicateTransition.h"
+#include "atn/PredictionContext.h"
+#include "atn/PredictionContextCache.h"
+#include "atn/PredictionMode.h"
+#include "atn/RangeTransition.h"
+#include "atn/RuleStartState.h"
+#include "atn/RuleStopState.h"
+#include "atn/RuleTransition.h"
+#include "atn/SemanticContext.h"
+#include "atn/SetTransition.h"
+#include "atn/SingletonPredictionContext.h"
+#include "atn/StarBlockStartState.h"
+#include "atn/StarLoopEntryState.h"
+#include "atn/StarLoopbackState.h"
+#include "atn/TokensStartState.h"
+#include "atn/Transition.h"
+#include "atn/WildcardTransition.h"
+#include "dfa/DFA.h"
 
-#include "ANTLRErrorListener.h";
-#include "ANTLRErrorStrategy.h";
-#include "ANTLRFileStream.h";
-#include "ANTLRInputStream.h";
-#include "BailErrorStrategy.h";
-#include "BaseErrorListener.h";
-#include "BufferedTokenStream.h";
-#include "CharStream.h";
-#include "CommonToken.h";
-#include "CommonTokenFactory.h";
-#include "CommonTokenStream.h";
-#include "ConsoleErrorListener.h";
-#include "DefaultErrorStrategy.h";
-#include "DiagnosticErrorListener.h";
-#include "Exceptions.h";
-#include "FailedPredicateException.h";
-#include "InputMismatchException.h";
-#include "IntStream.h";
-#include "InterpreterRuleContext.h";
-#include "Lexer.h";
-#include "LexerInterpreter.h";
-#include "LexerNoViableAltException.h";
-#include "ListTokenSource.h";
-#include "NoViableAltException.h";
-#include "Parser.h";
-#include "ParserInterpreter.h";
-#include "ParserRuleContext.h";
-#include "ProxyErrorListener.h";
-#include "RecognitionException.h";
-#include "Recognizer.h";
-#include "RuleContext.h";
-#include "Token.h";
-#include "TokenFactory.h";
-#include "TokenSource.h";
-#include "TokenStream.h";
-#include "TokenStreamRewriter.h";
-#include "UnbufferedCharStream.h";
-#include "UnbufferedTokenStream.h";
-#include "WritableToken.h";
+#include "ANTLRErrorListener.h"
+#include "ANTLRErrorStrategy.h"
+#include "ANTLRFileStream.h"
+#include "ANTLRInputStream.h"
+#include "BailErrorStrategy.h"
+#include "BaseErrorListener.h"
+#include "BufferedTokenStream.h"
+#include "CharStream.h"
+#include "CommonToken.h"
+#include "CommonTokenFactory.h"
+#include "CommonTokenStream.h"
+#include "ConsoleErrorListener.h"
+#include "DefaultErrorStrategy.h"
+#include "DiagnosticErrorListener.h"
+#include "Exceptions.h"
+#include "FailedPredicateException.h"
+#include "InputMismatchException.h"
+#include "IntStream.h"
+#include "InterpreterRuleContext.h"
+#include "Lexer.h"
+#include "LexerInterpreter.h"
+#include "LexerNoViableAltException.h"
+#include "ListTokenSource.h"
+#include "NoViableAltException.h"
+#include "Parser.h"
+#include "ParserInterpreter.h"
+#include "ParserRuleContext.h"
+#include "ProxyErrorListener.h"
+#include "RecognitionException.h"
+#include "Recognizer.h"
+#include "RuleContext.h"
+#include "Token.h"
+#include "TokenFactory.h"
+#include "TokenSource.h"
+#include "TokenStream.h"
+#include "TokenStreamRewriter.h"
+#include "UnbufferedCharStream.h"
+#include "UnbufferedTokenStream.h"
+#include "WritableToken.h"
 
-#include "misc/AbstractEqualityComparator.h";
-#include "misc/Array2DHashSet.h";
-#include "misc/DoubleKeyMap.h";
-#include "misc/EqualityComparator.h";
-#include "misc/GraphicsSupport.h";
-#include "misc/IntSet.h";
-#include "misc/Interval.h";
-#include "misc/IntervalSet.h";
-#include "misc/JFileChooserConfirmOverwrite.h";
-#include "misc/LogManager.h";
-#include "misc/MultiMap.h";
-#include "misc/MurmurHash.h";
-#include "misc/NotNull.h";
-#include "misc/ObjectEqualityComparator.h";
-#include "misc/OrderedHashSet.h";
-#include "misc/ParseCancellationException.h";
-#include "misc/TestRig.h";
-#include "misc/Utils.h";
+#include "misc/AbstractEqualityComparator.h"
+#include "misc/Array2DHashSet.h"
+#include "misc/DoubleKeyMap.h"
+#include "misc/EqualityComparator.h"
+#include "misc/GraphicsSupport.h"
+#include "misc/IntSet.h"
+#include "misc/Interval.h"
+#include "misc/IntervalSet.h"
+#include "misc/JFileChooserConfirmOverwrite.h"
+#include "misc/LogManager.h"
+#include "misc/MultiMap.h"
+#include "misc/MurmurHash.h"
+#include "misc/NotNull.h"
+#include "misc/ObjectEqualityComparator.h"
+#include "misc/OrderedHashSet.h"
+#include "misc/ParseCancellationException.h"
+#include "misc/TestRig.h"
+#include "misc/Utils.h"
 
-#include "tree/AbstractParseTreeVisitor.h";
-#include "tree/ErrorNode.h";
-#include "tree/ErrorNodeImpl.h";
-#include "tree/ParseTree.h";
-#include "tree/ParseTreeListener.h";
-#include "tree/ParseTreeProperty.h";
-#include "tree/ParseTreeVisitor.h";
-#include "tree/ParseTreeWalker.h";
-#include "tree/RuleNode.h";
-#include "tree/SyntaxTree.h";
-#include "tree/TerminalNode.h";
-#include "tree/TerminalNodeImpl.h";
-#include "tree/Tree.h";
-#include "tree/Trees.h";
+#include "tree/AbstractParseTreeVisitor.h"
+#include "tree/ErrorNode.h"
+#include "tree/ErrorNodeImpl.h"
+#include "tree/ParseTree.h"
+#include "tree/ParseTreeListener.h"
+#include "tree/ParseTreeProperty.h"
+#include "tree/ParseTreeVisitor.h"
+#include "tree/ParseTreeWalker.h"
+#include "tree/RuleNode.h"
+#include "tree/SyntaxTree.h"
+#include "tree/TerminalNode.h"
+#include "tree/TerminalNodeImpl.h"
+#include "tree/Tree.h"
+#include "tree/Trees.h"
 
 <parser>
 <if(file.genPackage)>
@@ -180,9 +180,9 @@ namespace <file.genPackage> {
 ListenerFile(file, header) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 <header>
-#include "misc/NotNull.h";
-#include "tree/ParseTreeListener.h";
-#include "<file.parserName>.h";
+#include "misc/NotNull.h"
+#include "tree/ParseTreeListener.h"
+#include "<file.parserName>.h"
 
 <if(file.genPackage)>
 namespace <file.genPackage> {
@@ -218,9 +218,9 @@ namespace <file.genPackage> {
 <endif>
 <header>
 
-#include "ParserRuleContext.h";
-#include "tree/ErrorNode.h";
-#include "tree/TerminalNode.h";
+#include "ParserRuleContext.h"
+#include "tree/ErrorNode.h"
+#include "tree/TerminalNode.h"
 
 /**
  * This class provides an empty implementation of {@link <file.grammarName>Listener},
@@ -278,7 +278,7 @@ VisitorFile(file, header) ::= <<
 namespace <file.genPackage> {
 <endif>
 <header>
-#include "tree/ParseTreeVisitor.h";
+#include "tree/ParseTreeVisitor.h"
 
 /**
  * This template class defines a complete generic visitor for a parse tree
@@ -308,7 +308,7 @@ BaseVisitorFile(file, header) ::= <<
 namespace <file.genPackage> {
 <endif>
 <header>
-#include "tree/AbstractParseTreeVisitor";
+#include "tree/AbstractParseTreeVisitor"
 
 /**
  * This class provides an empty implementation of {@link <file.grammarName>Visitor},
@@ -962,13 +962,13 @@ LexerFile(lexerFile, lexer, namedActions) ::= <<
 namespace <lexerFile.genPackage> {
 <endif>
 <namedActions.header>
-#include "Lexer.h";
-#include "CharStream.h";
-#include "Token.h";
-#include "TokenStream.h";
+#include "Lexer.h"
+#include "CharStream.h"
+#include "Token.h"
+#include "TokenStream.h"
 // May also need to import *
 // May also need to import atn.*
-#include "dfa/DFA.h";
+#include "dfa/DFA.h"
 // May also need to import misc.*
 
 <lexer>
@@ -978,7 +978,6 @@ namespace <lexerFile.genPackage> {
 >>
 
 Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass) ::= <<
-@SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
 public class <lexer.name> extends <superClass> {
 	static DFA[] _decisionToDFA;
 	static PredictionContextCache _sharedContextCache =
@@ -1070,13 +1069,13 @@ DISABLEDMEGAHACKRecognizerHeaderFile(file, parser, namedActions) ::= <<
 namespace <file.genPackage> {
 <endif>
 <namedActions.header>
-#include "Lexer.h";
-#include "CharStream.h";
-#include "Token.h";
-#include "TokenStream.h";
+#include "Lexer.h"
+#include "CharStream.h"
+#include "Token.h"
+#include "TokenStream.h"
 // May also need to import *
 // May also need to import atn.*
-#include "dfa/DFA.h";
+#include "dfa/DFA.h"
 // May also need to import misc.*
 
 <parser>
