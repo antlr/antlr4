@@ -1,298 +1,257 @@
-// [The "BSD license"]
-// Copyright (c) 2015 Eric Vergnaud
-// All rights reserved.
-// Fragments from Torben Haase and Steven Levithan
 //
-//  Redistribution and use in source and binary forms, with or without
-//  modification, are permitted provided that the following conditions
-//  are met:
+// This file is part of Honey Require
 //
-//  1. Redistributions of source code must retain the above copyright
-//     notice, this list of conditions and the following disclaimer.
-//  2. Redistributions in binary form must reproduce the above copyright
-//     notice, this list of conditions and the following disclaimer in the
-//     documentation and/or other materials provided with the distribution.
-//  3. The name of the author may not be used to endorse or promote products
-//     derived from this software without specific prior written permission.
+// Copyright (c) 2015 Torben Haase
 //
-//  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
-//  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-//  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-//  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
-//  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-//  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-//  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-//  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-//  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-//  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-// INFO Standalone require()
-// This is a largely rewritten standalone version of the require function.
-// The original purpose is to provide a require function compatible with NodeJS
-// So that the same code can run in both NodeJS and browsers
-// This cannot be achieved using RequireJS and comparable alternatives
-// because they all have a prototype not compatible with NodeJS's require
-// It is also that the code be able to run without a package builder
-// such as RequireJS, WebPack or other alternatives, since they slow dow development
-
-// This code was largely inspired by the following libraries and authors:
-
-// Smoothie, by Torben Haase, Flowy Apps (torben@flowyapps.com)
-// But unfortunately Smoothie's require cannot run in web workers
-// So I had to rewrite a lot of stuff, although 50% of the code is unchanged
-
-// parseUri, by Steven Levithan <stevenlevithan.com>
+// Honey Require is free software: you can redistribute it and/or modify it
+// under the terms of the MIT License (MIT).
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+//
+// You should have received a copy of the MIT License along with Honey Require.
+// If not, see <https://opensource.org/licenses/MIT>.
+//
+////////////////////////////////////////////////////////////////////////////////
 
 // NOTE The load parameter points to the function, which prepares the
-// environment for each module and runs its code. Scroll down to the end of
-// the file to see the function definition.
-
-
+//      environment for each module and runs its code. Scroll down to the end of
+//      the file to see the function definition.
 (function(load) { 'use strict';
 
-    var RequireError = function(message, fileName, lineNumber) {
-        this.name = "RequireError";
-        this.message = message;
-    }
-    RequireError.prototype = Object.create(Error.prototype);
-
-    // INFO RequireOptions
-    // The values can be set by defining a object called RequireOptions, which
-    // contains properties of the same name as the options to be changed.
-    // NOTE The RequireOptions object has to be defined before this script is loaded
-    // Changing the values in the RequireOptions object will have no effect afterwards!
-
-    // NOTE Global module paths
-    var paths = self.RequireOptions && self.RequireOptions.paths!==undefined ? self.RequireOptions.paths.slice(0) : ['./'];
-
-    // INFO Current module paths
-    // pwd[0] contains the path of the currently loading module
-    // pwd[1] contains the path its parent module and so on.
-    var pwd = Array('');
-
-    // INFO URI parser
-    function parseUri (str) {
-        var	o   = parseUri.options,
-            m   = o.parser[o.strictMode ? "strict" : "loose"].exec(str),
-            uri = {},
-            i   = 14;
-
-        while (i--) uri[o.key[i]] = m[i] || "";
-
-        uri[o.q.name] = {};
-        uri[o.key[12]].replace(o.q.parser, function ($0, $1, $2) {
-            if ($1) uri[o.q.name][$1] = $2;
-        });
-
-        return uri;
-    };
-
-    parseUri.options = {
-        strictMode: true,
-        key: ["source","protocol","authority","userInfo","user","password","host","port","relative","path","directory","file","query","anchor"],
-        q:   {
-            name:   "queryKey",
-            parser: /(?:^|&)([^&=]*)=?([^&]*)/g
-        },
-        parser: {
-            strict: /^(?:([^:\/?#]+):)?(?:\/\/((?:(([^:@]*)(?::([^:@]*))?)?@)?([^:\/?#]*)(?::(\d*))?))?((((?:[^?#\/]*\/)*)([^?#]*))(?:\?([^#]*))?(?:#(.*))?)/,
-            loose:  /^(?:(?![^:@]+:[^:@\/]*@)([^:\/?#.]+):)?(?:\/\/)?((?:(([^:@]*)(?::([^:@]*))?)?@)?([^:\/?#]*)(?::(\d*))?)(((\/(?:[^?#](?![^?#\/]*\.[^?#\/.]+(?:[?#]|$)))*\/?)?([^?#\/]*))(?:\?([^#]*))?(?:#(.*))?)/
-        }
-    };
-
-    // INFO splitDirs
-    // function used to split a full directory path into its components
-    // takes car of leading and trailing path separators
-    function splitDirs(str) {
-        var dirs = str.split("/");
-        if(!dirs[0]) dirs = dirs.slice(1);
-        if(!dirs[dirs.length-1]) dirs = dirs.slice(0,-1);
-        return dirs;
-    }
-
-    // INFO resolveUrl
-    // function used to build a full and plain url given a relative uri
-    // takes an optional location parameter when called recursively
-    // otherwise uses the location of the loading page, or script in workers
-    // the function also takes car of relative path fragments, such as ./ and ../
-    // even when they are included in a full path
-    function resolveUrl (str, location) {
-        location = location || self.location;
-        var full = parseUri(location);
-        var uri = parseUri(str);
-        if(uri.host) {
-            // cater for relative path components, the below takes care of both /./ and /../
-            var rel = uri.path.indexOf("/.");
-            if (rel > 0) {
-                location = full.protocol + "://" + full.authority + uri.path.slice(0, rel + 1); // includes the trailing slash
-                str = uri.path.slice(rel + 1);
-                return resolveUrl(str, location);
-            } else {
-                return uri;
-            }
-        } else {
-            if(uri.path.startsWith("/")) {
-                str = full.protocol + "://" + full.authority + uri.path;
-                return resolveUrl(str);
-            } else if(uri.path.startsWith("./")) {
-                var paths = splitDirs(uri.path).slice(1);
-                str = full.protocol + "://" + full.authority + full.directory + paths.join("/");
-                return resolveUrl(str);
-            } else if(uri.path.startsWith("..")) {
-                var dirs = splitDirs(full.directory);
-                var paths = splitDirs(uri.path);
-                while (paths[0] === "..") {
-                    dirs = dirs.slice(0, -1);
-                    paths = paths.slice(1);
+// NOTE Mozilla still sets the wrong fileName property for errors that occur
+//      inside an eval call (even with sourceURL). However, the stack
+//      contains the correct source, so it can be used to re-threw the error
+//      with the correct fileName property.
+// WARN Re-throwing an error object will mess up the stack trace and the
+//      column number.
+    if (typeof (new Error()).fileName == "string") {
+        self.addEventListener("error", function(evt) {
+            if (evt.error instanceof Error) {
+                if (pwd[0]) {
+                    evt.preventDefault();
+                    throw new evt.error.constructor(evt.error.message, pwd[0].uri, evt.error.lineNumber);
                 }
-                str = full.protocol + "://" + full.authority + "/" + dirs.join("/") + "/" + paths.join("/");
-                return resolveUrl(str);
-            } else
-                throw "Unsupported";
-        }
+                else {
+                    var m = evt.error.stack.match(/^[^\n@]*@([^\n]+):\d+:\d+/);
+                    if (m === null) {
+                        console.warn("Honey: unable to read file name from stack");
+                    }
+                    else if (evt.error.fileName != m[1]) {
+                        evt.preventDefault();
+                        throw new evt.error.constructor(evt.error.message, m[1], evt.error.lineNumber);
+                    }
+                }
+            }
+        }, false);
     }
 
-    // INFO Module cache
-    // Contains getter functions for the exports objects of all the loaded modules.
-    // The getter for the module 'mymod' is named '$mymod' to prevent collisions with
-    // predefined object properties (see note below). As long as a module has not been
-    // loaded the getter is either undefined or contains the module code as a function
-    var cache = new Object();
-    var locks = new Object();
+// INFO Current module descriptors
+//      pwd[0] contains the descriptor of the currently loaded module,
+//      pwd[1] contains the descriptor its parent module and so on.
 
-    // INFO Module getter
-    // Takes a module identifier, resolves it and gets the module code via an
-    // AJAX request from the module URI. If this was successful the code and
-    // some environment variables are passed to the load function. The return
-    // value is the module's `exports` object. If the cache already contains
-    // an object for the module id, this object is returned directly.
-    // NOTE If a callback function has been passed, the AJAX request is asynchronous
-    // and the mpdule exports are passed to the callback function after the
-    // module has been loaded.
+    var pwd = Array();
 
-    function require(identifier, callback) {
+// INFO Path parser
+//      Older browsers don't support the URL interface, therefore we use an
+//      anchor element as parser in that case. Thes breaks web worker support,
+//      but we don't care since these browsers also don't support web workers.
 
-        var descriptor = resolveId(identifier);
+    var parser = URL ? new URL(location.href) : document.createElement('A');
+
+// INFO Module cache
+//      Contains getter functions for the exports objects of all the loaded
+//      modules. The getter for the module 'mymod' is name '$name' to prevent
+//      collisions with predefined object properties (see note below).
+//      As long as a module has not been loaded the getter is either undefined
+//      or contains the module code as a function (in case the module has been
+//      pre-loaded in a bundle).
+// WARN IE8 supports defineProperty only for DOM objects, therfore we use a
+//      HTMLDivElement as cache in that case. This breaks web worker support,
+//      but we don't care since IE8 has no web workers at all.
+
+    try {
+        var cache = new Object();
+        Object.defineProperty(cache, "foo", {'value':"bar",'configurable':true});
+        delete cache.foo;
+    }
+    catch (e) {
+        console.warn("Honey: falling back to DOM workaround for defineProperty ("+e+")");
+        cache = document.createElement('DIV');
+    }
+
+// INFO Send lock
+//      Sending the request causes the event loop to continue. Therefore
+//      pending AJAX load events for the same url might be executed before
+//      the synchronous onLoad is called. This should be no problem, but in
+//      Chrome the responseText of the sneaked in load events will be empty.
+//      Therefore we have to lock the loading while executing send().
+
+    var lock = new Object();
+
+// INFO Honey options
+//      The values can be set by defining a object called Honey. The
+//      Honey object has to be defined before this script here is loaded
+//      and changing the values in the Honey object will have no effect
+//      afterwards!
+
+    var requirePath = self.Honey&&self.Honey.requirePath!==undefined ? self.Honey.requirePath.slice(0) : ['./'];
+    var requireCompiler = self.Honey&&self.Honey.requireCompiler!==undefined ? self.Honey.requireCompiler : null;
+
+// NOTE Parse module root paths
+    var base = [location.origin, location.href.substr(0, location.href.lastIndexOf("/")+1)];
+    for (var i=0; i<requirePath.length; i++) {
+        parser.href = (requirePath[i][0]=="."?base[1]:base[0])+requirePath[i];
+        requirePath[i] = parser.href;
+    }
+
+// NOTE Add preloaded modules to cache
+    for (var id in (self.Honey && self.Honey.requirePreloaded))
+        cache['$'+resolve(id).id] = self.Honey.requirePreloaded[id].toString();
+
+// NOTE Add module overrides to cache
+    for (var id in (self.Honey && self.Honey.requireOverrides))
+        cache['$'+resolve(id).id] = self.Honey.requireOverrides[id];
+
+// INFO Module getter
+//      Takes a module identifier, resolves it and gets the module code via an
+//      AJAX request from the module URI. If this was successful the code and
+//      some environment variables are passed to the load function. The return
+//      value is the module's `exports` object. If the cache already
+//      contains an object for the module id, this object is returned directly.
+// NOTE If a callback function has been passed, the AJAX request is asynchronous
+//      and the mpdule exports are passed to the callback function after the
+//      module has been loaded.
+
+    function require(identifier, callback, compiler) {
+        if (identifier instanceof Array) {
+            var modules = new Array();
+            var modcount = identifier.length;
+            for (var index = 0; index < identifier.length; index++) {
+                (function(id, i) {
+                    modules.push(require(id, callback&&function(mod) {
+                        modules[i] = mod;
+                        (--modcount==0) && callback(modules);
+                    }, compiler));
+                })(identifier[index], index);
+            }
+            return modules;
+        }
+
+        compiler = compiler!==undefined ? compiler : requireCompiler;
+        var descriptor = resolve(identifier);
         var cacheid = '$'+descriptor.id;
 
         if (cache[cacheid]) {
             if (typeof cache[cacheid] === 'string')
                 load(descriptor, cache, pwd, cache[cacheid]);
-            // NOTE The callback should always be called asynchronously to
-            // ensure that a cached call won't differ from an uncached one.
+            // NOTE The callback should always be called asynchronously to ensure
+            //      that a cached call won't differ from an uncached one.
             callback && setTimeout(function(){callback(cache[cacheid])}, 0);
             return cache[cacheid];
         }
 
         var request = new XMLHttpRequest();
 
-        // NOTE IE8 doesn't support the onload event, therefore we use onreadystatechange
-        // as a fallback here. However, onreadystatechange shouldn't be used for all browsers,
-        // since at least mobile Safari seems to have an issue where onreadystatechange
-        // is called twice for readyState 4.
+        // NOTE IE8 doesn't support the onload event, therefore we use
+        //      onreadystatechange as a fallback here. However, onreadystatechange
+        //      shouldn't be used for all browsers, since at least mobile Safari
+        //      seems to have an issue where onreadystatechange is called twice for
+        //      readyState 4.
         callback && (request[request.onload===null?'onload':'onreadystatechange'] = onLoad);
         request.open('GET', descriptor.uri, !!callback);
-        // NOTE Sending the request causes the event loop to continue. Therefore pending
-        // AJAX load events for the same url might be executed before this synchronous onLoad
-        // is executed. This should be no problem, but in Chrome the responseText of the sneaked
-        // in load events will be empty. Therefore we have to lock the loading while executong send().
-        locks[cacheid] = locks[cacheid]++||1;
+        lock[cacheid] = lock[cacheid]++||1;
         request.send();
-        locks[cacheid]--;
+        lock[cacheid]--;
         !callback && onLoad();
         return cache[cacheid];
 
         function onLoad() {
             if (request.readyState != 4)
                 return;
-            if (request.status != 200 && request.status != 0 ) // 0 for Safari with file protocol
-                throw new RequireError('unable to load '+descriptor.id+" ("+request.status+" "+request.statusText+")");
-            if (locks[cacheid]) {
-                console.warn("module locked: " + descriptor.id);
+            if (request.status != 200)
+                throw new Error("Honey: unable to load "+descriptor.id+" ("+request.status+" "+request.statusText+")");
+            if (lock[cacheid]) {
+                console.warn("Honey: module locked: "+descriptor.id);
                 callback && setTimeout(onLoad, 0);
                 return;
             }
-            if (!cache[cacheid])
-                load(descriptor, cache, pwd, 'function(){\n'+request.responseText+'\n}');
+            if (!cache[cacheid]) {
+                var source = compiler ? compiler(request.responseText) : request.responseText;
+                load(descriptor, cache, pwd, 'function(){\n'+source+'\n}');
+            }
             callback && callback(cache[cacheid]);
         }
     }
 
-    // INFO Module resolver
-    // Takes a module identifier and resolves it to a module id and URI.
-    // Both values are returned as a module descriptor, which can then
-    // be passed to `fetch` to load a module, and cache it by id.
+// INFO Module resolver
+//      Takes a module identifier and resolves it to a module id and URI. Both
+//      values are returned as a module descriptor, which can be passed to
+//      `fetch` to load a module.
 
-    function resolveId(identifier) {
+    function resolve(identifier) {
         // NOTE Matches [1]:[..]/[path/to/][file][.js]
         var m = identifier.match(/^(?:([^:\/]+):)?(\.\.?)?\/?((?:.*\/)?)([^\.]+)?(\..*)?$/);
-        // NOTE Matches [1]:[/path/to]
-        var p = pwd[0].match(/^(?:([^:\/]+):)?(.*)/);
-        var root = m[2] ? paths[p[1]?parseInt(p[1]):0] : paths[m[1]?parseInt(m[1]):0];
-        var url = resolveUrl((m[2]?root+p[2]+m[2]+'/':root)+m[3]+(m[4]?m[4]:'index'));
-        var id = url.source.replace(/^[^:]*:\/\/[^\/]*\/|\/(?=\/)/g, '');
-        var uri = "/"+id+(m[5]?m[5]:'.js');
-        root.replace(/[^\/]+\//g, function(r) {
-            id = (id.substr(0, r.length) == r) ?id.substr(r.length) : id = '../'+id;
-        });
+        // NOTE Matches [1]:[/path/to/]file.js
+        var p = (pwd[0]?pwd[0].id:"").match(/^(?:([^:\/]+):)?(.*\/|)[^\/]*$/);
+        var root = m[2] ? requirePath[p[1]?parseInt(p[1]):0] : requirePath[m[1]?parseInt(m[1]):0];
+        parser.href = (m[2]?root+p[2]+m[2]+'/':root)+m[3]+(m[4]?m[4]:'index');
+        var uri = parser.href+(m[5]?m[5]:'.js');
+        if (uri.substr(0,root.length) != root)
+            throw new Error("Honey: relative identifier outside of module root");
+        var id = (m[1]?m[1]+":":"0:")+parser.href.substr(root.length);
         return {'id':id,'uri':uri};
     }
 
-    // INFO Exporting require to global scope
+// INFO Exporting require to global scope
+
     if (self.require !== undefined)
-        throw new RequireError('\'require\' already defined in global scope');
+        throw new Error("Honey: '\'require\' already defined in global scope");
 
     try {
         Object.defineProperty(self, 'require', {'value':require});
-        Object.defineProperty(self.require, 'resolveUrl', {'value':resolveUrl});
-        Object.defineProperty(self.require, 'paths', {'get':function(){return paths.slice(0);}});
+        Object.defineProperty(self.require, 'resolve', {'value':resolve});
+        Object.defineProperty(self.require, 'path', {'get':function(){return requirePath.slice(0);}});
     }
     catch (e) {
-        // NOTE IE8 can't use defineProperty on non-DOM objects, so we have to fall back to unsave property assignments in this case.
+        // NOTE IE8 can't use defineProperty on non-DOM objects, so we have to fall
+        //      back to unsave property assignments in this case.
         self.require = require;
         self.require.resolve = resolve;
-        self.require.paths = paths.slice(0);
-        // NOTE We definitely need a getter for the cache, so we make the cache a DOM-object in IE8.
-        // NOTE This won't work in IE8 web workers, but as of writing, it's an acceptable trade-off
-        cache = document.createElement('DIV');
-    }
-
-    // INFO Adding preloaded modules to cache
-    for (var id in (self.RequireOptions && self.RequireOptions.preloaded))
-        cache['$'+id] = self.RequireOptions.preloaded[id].toString();
-
-    // INFO Parsing module root paths
-    for (var i=0; i<paths.length; i++) {
-        var url = resolveUrl(paths[i]);
-        paths[i] = '/'+url.source.replace(/^[^:]*:\/\/[^\/]*\/|\/(?=\/)/g, '');
+        self.require.path = requirePath.slice(0);
     }
 
 })(
 
-    // INFO Module loader
-    // Takes the module descriptor, the global variables and the module code,
-    // sets up the module environment, defines the module getter in the cache
-    // and executes the module code. If module is a bundle the code of the
-    // pre-loaded modules will be stored in the cache afterwards.
-    // NOTE This function is defined as an anonymous function, which is passed as
-    // a parameter to the closure above to provide a clean environment (only
-    // global variables, module and exports) for the loaded module. This is
-    // also the reason why `source`, `pwd` & `cache` are not named parameters.
+// INFO Module loader
+//      Takes the module descriptor, the global variables and the module code,
+//      sets up the module envirinment, defines the module getter in the cache
+//      and evaluates the module code. If module is a bundle the code of the
+//      pre-loaded modules will be stored in the cache afterwards.
+// NOTE This functions is defined as an anonymous function, which is passed as
+//      a parameter to the closure above to provide a clean environment (only
+//      global variables, module and exports) for the loaded module. This is
+//      also the reason why `source`, `pwd` & `cache` are not named parameters.
+// NOTE If we would strict use mode here, the evaluated code would be forced to be
+//      in strict mode, too.
 
     function /*load*/(module/*, cache, pwd, source*/) {
+        var global = self;
         var exports = new Object();
         Object.defineProperty(module, 'exports', {'get':function(){return exports;},'set':function(e){exports=e;}});
-        arguments[2].unshift(module.id.match(/(?:.*\/)?/)[0]);
+        arguments[2].unshift(module);
         Object.defineProperty(arguments[1], '$'+module.id, {'get':function(){return exports;}});
-        // NOTE Firebug ignores the sourceUrl when the source is composed inside the eval call.
-        var script = '('+arguments[3]+')();\n//# sourceURL='+module.uri;
-        eval(script);
+        arguments[3] = '('+arguments[3]+')();\n//# sourceURL='+module.uri;
+        eval(arguments[3]);
         // NOTE Store module code in the cache if the loaded file is a bundle
-        if (typeof module.id !== 'string') {
-            for (id in module) {
-                arguments[1]['$' + require.resolve(id).id] = module[id].toString();
-            }
-        }
+        if (typeof module.id !== 'string')
+            for (id in module)
+                arguments[1]['$'+require.resolve(id).id] = module[id].toString();
         arguments[2].shift();
     }
 
