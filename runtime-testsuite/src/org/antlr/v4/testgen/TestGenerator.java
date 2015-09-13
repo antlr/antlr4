@@ -34,6 +34,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -112,18 +113,26 @@ public class TestGenerator {
 		genTarget(outDir, targetSpecificTemplateFile, templatesRoot, viz);
 	}
 
-	public static void genAllTargets(String outDirRoot, final String rootDir, final String templatesRoot, boolean viz) {
+	public static void genAllTargets(String outDirRoot, final String rootDir, String templatesRoot, boolean viz) {
+		if(templatesRoot==null)
+			templatesRoot = rootDir + "/runtime-testsuite/resources/org/antlr/v4/test/runtime/templates";
 		for (String target : targets) {
-			String templatesPackage = rootDir + "/org/antlr/v4/test/runtime/" + target.toLowerCase();
-			String templates = templatesPackage + "/" + target + ".test.stg";
+			String templatesPackage = rootDir + "/runtime-testsuite/resources/org/antlr/v4/test/runtime/" + target.toLowerCase();
+			List<String> targetTemplates = Arrays.asList(templatesPackage + "/" + target + ".test.stg");
 			if ( target.equals("JavaScript") ) {
-				templates = templatesPackage+"/node/Node.test.stg";
+				targetTemplates = new ArrayList<String>();
+				String[] subTargets = { "Node", "Safari", "Firefox", "Explorer", "Chrome" };
+				for(String subTarget : subTargets) {
+					String subTargetTemplate = templatesPackage + "/" + subTarget.toLowerCase() + "/" + subTarget + ".test.stg";
+					targetTemplates.add(subTargetTemplate);
+				}
 			}
 			String outDir = rootDir + "/runtime-testsuite/test";
 			if ( outDirRoot!=null ) {
 				outDir = outDirRoot;
 			}
-			genTarget(outDir, templates, templatesRoot, viz);
+			for(String targetTemplate : targetTemplates)
+				genTarget(outDir, targetTemplate, templatesRoot, viz);
 		}
 	}
 
