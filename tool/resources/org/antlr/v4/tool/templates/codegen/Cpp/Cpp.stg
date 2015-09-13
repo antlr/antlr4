@@ -914,7 +914,7 @@ void <if(method.isEnter)>enter<else>exit<endif>Rule(ParseTreeListener listener) 
 VisitorDispatchMethod(method) ::= <<
 template T
 T accept(ParseTreeVisitor\<T> visitor) {
-	if ( visitor instanceof <parser.grammarName>Visitor ) return ((<parser.grammarName>Visitor\<? extends T>)visitor).visit<struct.derivedFromName; format="cap">(this);
+	if ( visitor instanceof <parser.grammarName>Visitor ) return ((<parser.grammarName>Visitor\<? : T>)visitor).visit<struct.derivedFromName; format="cap">(this);
 	else return visitor.visitChildren(this);
 }
 >>
@@ -966,10 +966,9 @@ namespace <lexerFile.genPackage> {
 #include "CharStream.h"
 #include "Token.h"
 #include "TokenStream.h"
-// May also need to import *
-// May also need to import atn.*
-#include "dfa/DFA.h"
-// May also need to import misc.*
+#include "PredictionContextCache.h"
+#include "DFA.h"
+#include "ATN.h"
 
 <lexer>
 <if(lexerFile.genPackage)>
@@ -978,21 +977,14 @@ namespace <lexerFile.genPackage> {
 >>
 
 Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass) ::= <<
-public class <lexer.name> extends <superClass> {
-	static DFA[] _decisionToDFA;
-	static PredictionContextCache _sharedContextCache =
-		new PredictionContextCache();
-	static int
+class <lexer.name> : public org::antlr::v4::runtime::<superClass> {
+	static org::antlr::v4::runtime::dfa::DFA _decisionToDFA[];
+	 org::antlr::v4::runtime::atn::PredictionContextCache *_sharedContextCache =
+		new org::antlr::v4::runtime::atn::PredictionContextCache();
+	 int
 		<lexer.tokens:{k | <k>=<lexer.tokens.(k)>}; separator=", ", wrap, anchor>;
 	<rest(lexer.modes):{m| public static final int <m> = <i>;}; separator="\n">
-	static std::vector\<std::wstring> modeNames = {
-		<lexer.modes:{m| "<m>"}; separator=", ", wrap, anchor>
-	};
-
-	static std::vector\<std::wstring> tokenNames = {
-		"\<INVALID>",
-		<lexer.tokenNames:{t | <t>}; separator=", ", wrap, anchor>
-	};
+	
 	static std::vector\<std::wstring> ruleNames = {
 		<lexer.ruleNames:{r | "<r>"}; separator=", ", wrap, anchor>
 	};
@@ -1002,8 +994,10 @@ public class <lexer.name> extends <superClass> {
 	<lexer.name>(CharStream input) {
 		super(input);
 		_interp = new LexerATNSimulator(this,_ATN,_decisionToDFA,_sharedContextCache);
+		_modeNames.insert(_modeNames.end(),<lexer.modes:{m| L"<m>"}; separator=", ", wrap, anchor>);
+	    _tokenNames.insert(_tokenNames.end(),L"\<INVALID>",<lexer.tokenNames:{t | <t>}; separator=", ", wrap, anchor>);
 	}
-
+	
 	const std::wstring& getGrammarFileName() { return "<lexer.grammarFileName>"; }
 
 	const std::vector\<std::wstring>& getTokenNames() { return tokenNames; }
@@ -1019,7 +1013,7 @@ public class <lexer.name> extends <superClass> {
 
 	<dumpActions(lexer, "", actionFuncs, sempredFuncs)>
 	<atn>
-}
+};
 >>
 
 SerializedATN(model) ::= <<
