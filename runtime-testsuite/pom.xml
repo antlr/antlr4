@@ -69,7 +69,11 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
           <includes>
+            <include>**/csharp/Test*.java</include>
             <include>**/java/Test*.java</include>
+            <include>**/javascript/node/Test*.java</include>
+            <include>**/python2/Test*.java</include>
+            <include>**/python3/Test*.java</include>
           </includes>
         </configuration>
       </plugin>    
@@ -106,8 +110,8 @@
                   <mainClass>org.antlr.v4.testgen.TestGenerator</mainClass>
                   <arguments>
                     <argument>-root</argument>
-                    <argument>${basedir}/resources</argument>
-                    <argument>-o</argument>
+                    <argument>${basedir}</argument>
+                    <argument>-outdir</argument>
                     <argument>${basedir}/test</argument>
                     <argument>-templates</argument>
                     <argument>${basedir}/resources/org/antlr/v4/test/runtime/templates</argument>
