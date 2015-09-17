@@ -153,7 +153,7 @@ public class TestPerformance extends BaseTest {
 
     /**
      * {@code true} to use the Java grammar with expressions in the v4
-     * left-recursive syntax (Java-LR.g4). {@code false} to use the standard
+     * left-recursive syntax (JavaLR.g4). {@code false} to use the standard
      * grammar (Java.g4). In either case, the grammar is renamed in the
      * temporary directory to Java.g4 before compiling.
      */
@@ -415,10 +415,10 @@ public class TestPerformance extends BaseTest {
 		assertTrue("The JDK_SOURCE_ROOT environment variable must be set for performance testing.", jdkSourceRoot != null && !jdkSourceRoot.isEmpty());
 
         compileJavaParser(USE_LR_GRAMMAR);
-		final String lexerName = "JavaLexer";
-		final String parserName = "JavaParser";
-		final String listenerName = "JavaBaseListener";
-		final String entryPoint = "compilationUnit";
+        final String lexerName    = USE_LR_GRAMMAR ? "JavaLRLexer"        : "JavaLexer";
+        final String parserName   = USE_LR_GRAMMAR ? "JavaLRParser"       : "JavaParser";
+        final String listenerName = USE_LR_GRAMMAR ? "JavaLRBaseListener" : "JavaBaseListener";
+        final String entryPoint = "compilationUnit";
         final ParserFactory factory = getParserFactory(lexerName, parserName, listenerName, entryPoint);
 
 		if (!TOP_PACKAGE.isEmpty()) {
@@ -1108,9 +1108,10 @@ public class TestPerformance extends BaseTest {
 	}
 
     protected void compileJavaParser(boolean leftRecursive) throws IOException {
-        String grammarFileName = "Java.g4";
-        String sourceName = leftRecursive ? "Java-LR.g4" : "Java.g4";
-        String body = load(sourceName, null);
+        String grammarFileName = leftRecursive ? "JavaLR.g4"    : "Java.g4";
+        String parserName      = leftRecursive ? "JavaLRParser" : "JavaParser";
+        String lexerName       = leftRecursive ? "JavaLRLexer"  : "JavaLexer";
+        String body = load(grammarFileName, null);
         List<String> extraOptions = new ArrayList<String>();
 		extraOptions.add("-Werror");
         if (FORCE_ATN) {
@@ -1127,7 +1128,7 @@ public class TestPerformance extends BaseTest {
 		}
 		extraOptions.add("-visitor");
         String[] extraOptionsArray = extraOptions.toArray(new String[extraOptions.size()]);
-        boolean success = rawGenerateAndBuildRecognizer(grammarFileName, body, "JavaParser", "JavaLexer", true, extraOptionsArray);
+        boolean success = rawGenerateAndBuildRecognizer(grammarFileName, body, parserName, lexerName, true, extraOptionsArray);
         assertTrue(success);
     }
 

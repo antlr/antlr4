@@ -168,7 +168,7 @@
  *      letter-or-digit is a character for which the method 
  *      Character.isJavaIdentifierPart(int) returns true."
  */
-grammar Java;
+grammar JavaLR;
 
 // starting point for parsing a java file
 /* The annotations are separated out to make parsing faster, but must be associated with
