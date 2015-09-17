@@ -38,26 +38,22 @@ import java.io.IOException;
  * when you construct the object.
  */
 public class ANTLRFileStream extends ANTLRInputStream {
-	protected String fileName;
-
+	private String encoding;
+	
 	public ANTLRFileStream(String fileName) throws IOException {
 		this(fileName, null);
 	}
 
 	public ANTLRFileStream(String fileName, String encoding) throws IOException {
-		this.fileName = fileName;
-		load(fileName, encoding);
+		this.name = fileName;
+		this.encoding=encoding;
+		load();
 	}
 
-	public void load(String fileName, String encoding)
+	private void load()
 		throws IOException
 	{
-		data = Utils.readFile(fileName, encoding);
+		data = Utils.readFile(this.name, this.encoding);
 		this.n = data.length;
-	}
-
-	@Override
-	public String getSourceName() {
-		return fileName;
 	}
 }
