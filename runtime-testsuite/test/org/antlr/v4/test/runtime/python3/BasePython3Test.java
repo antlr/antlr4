@@ -46,7 +46,7 @@ public abstract class BasePython3Test extends BasePythonTest {
 		if("true".equals(os))
 			return "python3";
 		else
-			return "python3.4";
+			return "python3.4"; 
 	}
 
 	@Override
