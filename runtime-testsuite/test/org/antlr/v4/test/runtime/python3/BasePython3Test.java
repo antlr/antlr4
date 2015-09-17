@@ -42,6 +42,7 @@ public abstract class BasePython3Test extends BasePythonTest {
 	@Override
 	protected String getPythonExecutable() {
 		String os = System.getenv("TRAVIS");
+		System.out.println("TRAVIS-CI detected: " + os);
 		if("true".equals(os))
 			return "python3";
 		else
