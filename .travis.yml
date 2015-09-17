@@ -1,8 +1,11 @@
+before_install:
+	- sudo apt-get update -qq
+	- sudo apt-get install -qq python3.4
 sudo: false
 language: java
 script:
-  - mvn install
+  	- mvn install
 jdk:
-  - openjdk6
-  - oraclejdk7
-  - oraclejdk8
+  	- openjdk6
+  	- oraclejdk7
+  	- oraclejdk8
