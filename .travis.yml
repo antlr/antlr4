@@ -7,5 +7,5 @@ jdk:
   - oraclejdk8
 before_install:
   - sudo apt-get update -qq
-  - sudo apt-get install -y python3
+  - sudo apt-get install -y python3.4
   - python3 --version
