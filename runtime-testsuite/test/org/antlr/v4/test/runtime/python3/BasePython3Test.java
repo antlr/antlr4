@@ -41,7 +41,11 @@ public abstract class BasePython3Test extends BasePythonTest {
 
 	@Override
 	protected String getPythonExecutable() {
-		return "python3.4";
+		String os = System.getenv("TRAVIS");
+		if("true".equals(os))
+			return "python3";
+		else
+			return "python3.4";
 	}
 
 	@Override
