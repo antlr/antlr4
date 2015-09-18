@@ -214,7 +214,7 @@ ParserRuleContext.prototype.getSourceInterval = function() {
     if( this.start === null || this.stop === null) {
         return INVALID_INTERVAL;
     } else {
-        return Interval(this.start.tokenIndex, this.stop.tokenIndex);
+        return new Interval(this.start.tokenIndex, this.stop.tokenIndex);
     }
 };
 
