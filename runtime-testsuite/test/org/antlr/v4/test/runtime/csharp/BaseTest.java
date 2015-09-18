@@ -289,7 +289,10 @@ public abstract class BaseTest {
 		writeFile(tmpdir, "input", input);
 		writeLexerTestFile(lexerName, showDFA);
 		addSourceFiles("Test.cs");
-		compile();
+		if(!compile()) {
+			System.err.println("Failed to compile!");
+			return stderrDuringParse;
+		}
 		String output = execTest();
 		if ( stderrDuringParse!=null && stderrDuringParse.length()>0 ) {
 			System.err.println(stderrDuringParse);
