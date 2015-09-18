@@ -1,3 +1,4 @@
+sudo: true
 language: java
 script:
   - mvn install
@@ -5,6 +6,9 @@ jdk:
   - openjdk6
   - oraclejdk7
   - oraclejdk8
-python:
-  - "2.7"
-  - "3.4"
+before_install: 
+  - sudo apt-get update -qq 
+  - sudo apt-get install -qq "python3.4"
+  - whereis python
+  - whereis python3
+  
