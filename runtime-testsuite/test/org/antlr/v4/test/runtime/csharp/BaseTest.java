@@ -419,8 +419,10 @@ public abstract class BaseTest {
 				"/p:Configuration=Release",
 				getTestProjectFile().getAbsolutePath()
 			};
-		System.err.println("Starting build "+Utils.join(args, " "));
-		Process process = Runtime.getRuntime().exec(args, null, new File(tmpdir));
+		System.err.println("Starting build "+ Utils.join(args, " "));
+		ProcessBuilder pb = new ProcessBuilder(args);
+		pb.directory(new File(tmpdir));
+		Process process = pb.start();
 		StreamVacuum stdoutVacuum = new StreamVacuum(process.getInputStream());
 		StreamVacuum stderrVacuum = new StreamVacuum(process.getErrorStream());
 		stdoutVacuum.start();
@@ -428,11 +430,13 @@ public abstract class BaseTest {
 		process.waitFor();
 		stdoutVacuum.join();
 		stderrVacuum.join();
-		if ( stderrVacuum.toString().length()>0 ) {
-			this.stderrDuringParse = stderrVacuum.toString();
-			System.err.println("buildProject stderrVacuum: "+ stderrVacuum);
+		// xbuild sends errors to output, so check exit code
+		boolean success = process.exitValue()==0;
+		if ( !success ) {
+			this.stderrDuringParse = stdoutVacuum.toString();
+			System.err.println("buildProject stderrVacuum: "+ this.stderrDuringParse);
 		}
-		return process.exitValue()==0;
+		return success;
 	}
 
 	private String locateMSBuild() {
@@ -475,7 +479,7 @@ public abstract class BaseTest {
 			String runtimeName = isWindows() ? "Antlr4.Runtime.vs2013.csproj" : "Antlr4.Runtime.mono.csproj";
 			final URL runtimeProj = loader.getResource("CSharp/runtime/CSharp/Antlr4.Runtime/"+runtimeName);
 			if ( runtimeProj==null ) {
-				throw new RuntimeException("C# runtime project file not found at:" + runtimeProj.getPath());
+				throw new RuntimeException("C# runtime project file not found!");
 			}
 			String runtimeProjPath = runtimeProj.getPath();
 			XPathExpression exp = XPathFactory.newInstance().newXPath()
@@ -532,12 +536,12 @@ public abstract class BaseTest {
 					new String[] { "mono", exec, new File(tmpdir, "input").getAbsolutePath() };
 			ProcessBuilder pb = new ProcessBuilder(args);
 			pb.directory(new File(tmpdir));
-			Process p = pb.start();
-			StreamVacuum stdoutVacuum = new StreamVacuum(p.getInputStream());
-			StreamVacuum stderrVacuum = new StreamVacuum(p.getErrorStream());
+			Process process = pb.start();
+			StreamVacuum stdoutVacuum = new StreamVacuum(process.getInputStream());
+			StreamVacuum stderrVacuum = new StreamVacuum(process.getErrorStream());
 			stdoutVacuum.start();
 			stderrVacuum.start();
-			p.waitFor();
+			process.waitFor();
 			stdoutVacuum.join();
 			stderrVacuum.join();
 			String output = stdoutVacuum.toString();
