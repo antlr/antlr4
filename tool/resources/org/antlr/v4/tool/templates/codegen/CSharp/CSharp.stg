@@ -931,6 +931,7 @@ namespace <file.genPackage> {
 <endif>
 <namedActions.header>
 using System;
+using System.Text;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Misc;
@@ -986,8 +987,14 @@ public partial class <csIdentifier.(lexer.name)> : <superClass; null="Lexer"> {
 
 
 SerializedATN(model) ::= <<
-public static readonly string _serializedATN =
-	"<model.serialized; wrap={"+<\n><\t>"}>";
+private static string _serializedATN = _serializeATN();
+private static string _serializeATN()
+{
+    StringBuilder sb = new StringBuilder();
+    sb.Append("<model.serialized; wrap={");<\n><\t>sb.Append("}>");
+    return sb.ToString();
+}
+
 public static readonly ATN _ATN =
 	new ATNDeserializer().Deserialize(_serializedATN.ToCharArray());
 >>
