@@ -38,22 +38,32 @@ import java.io.IOException;
  * when you construct the object.
  */
 public class ANTLRFileStream extends ANTLRInputStream {
+	@Deprecated
+	protected String fileName;
 	private String encoding;
-	
+
 	public ANTLRFileStream(String fileName) throws IOException {
 		this(fileName, null);
 	}
 
 	public ANTLRFileStream(String fileName, String encoding) throws IOException {
-		this.name = fileName;
+		this.fileName = fileName;
+		this.name=fileName;
 		this.encoding=encoding;
 		load();
 	}
 
-	private void load()
+	@Deprecated
+	public void load(String fileName, String encoding)
 		throws IOException
 	{
-		data = Utils.readFile(this.name, this.encoding);
+		data = Utils.readFile(fileName, encoding);
 		this.n = data.length;
 	}
+
+	public void load() throws IOException
+		{
+			this.data = Utils.readFile(this.name, this.encoding);
+			this.n = data.length;
+		}
 }
