@@ -35,6 +35,8 @@
 var Token = require('./../Token').Token;
 var Interval = require('./../IntervalSet').Interval;
 var INVALID_INTERVAL = new Interval(-1, -2);
+var Utils = require('../Utils.js');
+
 
 function Tree() {
 	return this;
@@ -83,6 +85,26 @@ ErrorNode.prototype.constructor = ErrorNode;
 function ParseTreeVisitor() {
 	return this;
 }
+
+ParseTreeVisitor.prototype.visit = function(ctx) {
+	if (Utils.isArray(ctx)) {
+		var self = this;
+		return ctx.map(function(child) { return visitAtom(self, child)});
+	} else {
+		return visitAtom(this, ctx);
+	}
+};
+
+var visitAtom = function(visitor, ctx) {
+	if (ctx.parser === undefined) { //is terminal
+		return;
+	}
+
+	var name = ctx.parser.ruleNames[ctx.ruleIndex];
+	var funcName = "visit" + Utils.titleCase(name);
+
+	return visitor[funcName](ctx);
+};
 
 function ParseTreeListener() {
 	return this;

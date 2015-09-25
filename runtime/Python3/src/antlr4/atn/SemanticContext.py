@@ -137,13 +137,7 @@ class Predicate(SemanticContext):
         return parser.sempred(localctx, self.ruleIndex, self.predIndex)
 
     def __hash__(self):
-        with StringIO() as buf:
-            buf.write(str(self.ruleIndex))
-            buf.write("/")
-            buf.write(str(self.predIndex))
-            buf.write("/")
-            buf.write(str(self.isCtxDependent))
-            return hash(buf.getvalue())
+        return hash((self.ruleIndex, self.predIndex, self.isCtxDependent))
 
     def __eq__(self, other):
         if self is other:
@@ -221,7 +215,10 @@ class AND(SemanticContext):
             return self.opnds == other.opnds
 
     def __hash__(self):
-        return hash(str(self.opnds)+ "/AND")
+        h = 0
+        for o in self.opnds:
+            h = hash((h, o))
+        return hash((h, "AND"))
 
     #
     # {@inheritDoc}
@@ -309,7 +306,10 @@ class OR (SemanticContext):
             return self.opnds == other.opnds
 
     def __hash__(self):
-        return hash(str(self.opnds)+"/OR")
+        h = 0
+        for o in self.opnds:
+            h = hash((h, o))
+        return hash((h, "OR"))
 
     # <p>
     # The evaluation of predicates by this context is short-circuiting, but
@@ -327,7 +327,7 @@ class OR (SemanticContext):
         for context in self.opnds:
             evaluated = context.evalPrecedence(parser, outerContext)
             differs |= evaluated is not context
-            if evaluate is SemanticContext.NONE:
+            if evaluated is SemanticContext.NONE:
                 # The OR context is true if any element is true
                 return SemanticContext.NONE
             elif evaluated is not None:

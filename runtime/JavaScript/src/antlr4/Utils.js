@@ -191,6 +191,13 @@ function escapeWhitespace(s, escapeSpaces) {
 	return s;
 }
 
+exports.isArray = function (entity) {
+	return Object.prototype.toString.call( entity ) === '[object Array]'
+};
+
+exports.titleCase = function(str) {
+	return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1);});
+};
 
 exports.Set = Set;
 exports.BitSet = BitSet;

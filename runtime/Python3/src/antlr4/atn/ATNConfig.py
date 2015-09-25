@@ -60,8 +60,6 @@ class ATNConfig(object):
         if semantic is None:
             semantic = SemanticContext.NONE
 
-        if not isinstance(state, ATNState):
-            pass
         # The ATN state associated with this configuration#/
         self.state = state
         # What alt (or lexer rule) is predicted by this configuration#/
@@ -83,7 +81,6 @@ class ATNConfig(object):
         self.reachesIntoOuterContext = 0 if config is None else config.reachesIntoOuterContext
         self.precedenceFilterSuppressed = False if config is None else config.precedenceFilterSuppressed
 
-
     # An ATN configuration is equal to another if both have
     #  the same state, they predict the same alternative, and
     #  syntactic/semantic contexts are the same.
@@ -101,10 +98,7 @@ class ATNConfig(object):
                 and self.precedenceFilterSuppressed==other.precedenceFilterSuppressed
 
     def __hash__(self):
-        return hash( str(self.state.stateNumber) + "/" +
-                 str(self.alt) + "/" +
-                 str(self.context) + "/" +
-                 str(self.semanticContext) )
+        return hash((self.state.stateNumber, self.alt, self.context, self.semanticContext))
 
     def __str__(self):
         with StringIO() as buf:
@@ -141,9 +135,9 @@ class LexerATNConfig(ATNConfig):
         self.passedThroughNonGreedyDecision = False if config is None else self.checkNonGreedyDecision(config, state)
 
     def __hash__(self):
-        return hash(str(self.state.stateNumber) + str(self.alt) + str(self.context) \
-                + str(self.semanticContext) + str(1 if self.passedThroughNonGreedyDecision else 0) \
-                + str(self.lexerActionExecutor))
+        return hash((self.state.stateNumber, self.alt, self.context,
+                self.semanticContext, self.passedThroughNonGreedyDecision,
+                self.lexerActionExecutor))
 
     def __eq__(self, other):
         if self is other:

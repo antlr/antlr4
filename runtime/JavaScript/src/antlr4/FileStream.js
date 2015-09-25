@@ -34,7 +34,7 @@
 //  when you construct the object.
 // 
 var InputStream = require('./InputStream').InputStream;
-var isNodeJs = typeof window === 'undefined';
+var isNodeJs = typeof window === 'undefined' && typeof importScripts === 'undefined';
 var fs = isNodeJs ? require("fs") : null;
 
 function FileStream(fileName) {

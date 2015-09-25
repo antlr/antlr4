@@ -716,7 +716,6 @@ class ParserATNSimulator(ATNSimulator):
                 print("testing " + self.getTokenName(t) + " at " + str(c))
 
             if isinstance(c.state, RuleStopState):
-                assert c.context.isEmpty()
                 if fullCtx or t == Token.EOF:
                     if skippedStopStates is None:
                         skippedStopStates = list()
@@ -792,7 +791,6 @@ class ParserATNSimulator(ATNSimulator):
         # multiple alternatives are viable.
         #
         if skippedStopStates is not None and ( (not fullCtx) or (not PredictionMode.hasConfigInRuleStopState(reach))):
-            assert len(skippedStopStates)>0
             for c in skippedStopStates:
                 reach.add(c, self.mergeCache)
         if len(reach)==0:
@@ -984,7 +982,6 @@ class ParserATNSimulator(ATNSimulator):
         for i in range(1, len(altToPred)):
             pred = altToPred[i]
             # unpredicated is indicated by SemanticContext.NONE
-            assert pred is not None
             if ambigAlts is not None and i in ambigAlts:
                 pairs.append(PredPrediction(pred, i))
             if pred is not SemanticContext.NONE:
@@ -1124,7 +1121,6 @@ class ParserATNSimulator(ATNSimulator):
         initialDepth = 0
         self.closureCheckingStopState(config, configs, closureBusy, collectPredicates,
                                  fullCtx, initialDepth, treatEofAsEpsilon)
-        assert not fullCtx or not configs.dipsIntoOuterContext
 
 
     def closureCheckingStopState(self, config:ATNConfig, configs:ATNConfigSet, closureBusy:set, collectPredicates:bool, fullCtx:bool, depth:int, treatEofAsEpsilon:bool):
@@ -1136,7 +1132,8 @@ class ParserATNSimulator(ATNSimulator):
             # run thru all possible stack tops in ctx
             if not config.context.isEmpty():
                 for i in range(0, len(config.context)):
-                    if config.context.getReturnState(i) is PredictionContext.EMPTY_RETURN_STATE:
+                    state = config.context.getReturnState(i)
+                    if state is PredictionContext.EMPTY_RETURN_STATE:
                         if fullCtx:
                             configs.add(ATNConfig(state=config.state, context=PredictionContext.EMPTY, config=config), self.mergeCache)
                             continue
@@ -1147,14 +1144,13 @@ class ParserATNSimulator(ATNSimulator):
                             self.closure_(config, configs, closureBusy, collectPredicates,
                                      fullCtx, depth, treatEofAsEpsilon)
                         continue
-                    returnState = self.atn.states[config.context.getReturnState(i)]
+                    returnState = self.atn.states[state]
                     newContext = config.context.getParent(i) # "pop" return state
                     c = ATNConfig(state=returnState, alt=config.alt, context=newContext, semantic=config.semanticContext)
                     # While we have context to pop back from, we may have
                     # gotten that context AFTER having falling off a rule.
                     # Make sure we track that we are now out of context.
                     c.reachesIntoOuterContext = config.reachesIntoOuterContext
-                    assert depth > - 2**63
                     self.closureCheckingStopState(c, configs, closureBusy, collectPredicates, fullCtx, depth - 1, treatEofAsEpsilon)
                 return
             elif fullCtx:
@@ -1188,7 +1184,6 @@ class ParserATNSimulator(ATNSimulator):
                     closureBusy.add(c)
                 newDepth = depth
                 if isinstance( config.state, RuleStopState):
-                    assert not fullCtx
                     # target fell off end of rule; mark resulting c as having dipped into outer context
                     # We can't get here if incoming config was rule stop and we had context
                     # track how far we dip into outer context.  Might
@@ -1205,7 +1200,6 @@ class ParserATNSimulator(ATNSimulator):
                             c.precedenceFilterSuppressed = True
                     c.reachesIntoOuterContext += 1
                     configs.dipsIntoOuterContext = True # TODO: can remove? only care when we add to set per middle of this method
-                    assert newDepth > - 2**63
                     newDepth -= 1
                     if self.debug:
                         print("dips into outer ctx: " + str(c))
@@ -1222,28 +1216,30 @@ class ParserATNSimulator(ATNSimulator):
         else:
             return "<rule " + str(index) + ">"
 
-    def getEpsilonTarget(self, config:ATNConfig, t:Transition, collectPredicates:bool, inContext:bool, fullCtx:bool, treatEofAsEpsilon:bool):
-        tt = t.serializationType
-        if tt==Transition.RULE:
-            return self.ruleTransition(config, t)
-        elif tt==Transition.PRECEDENCE:
-            return self.precedenceTransition(config, t, collectPredicates, inContext, fullCtx)
-        elif tt==Transition.PREDICATE:
-            return self.predTransition(config, t, collectPredicates, inContext, fullCtx)
-        elif tt==Transition.ACTION:
-            return self.actionTransition(config, t)
-        elif tt==Transition.EPSILON:
-            return ATNConfig(state=t.target, config=config)
-        elif tt in [ Transition.ATOM, Transition.RANGE, Transition.SET ]:
-            # EOF transitions act like epsilon transitions after the first EOF
-            # transition is traversed
-            if treatEofAsEpsilon:
-                if t.matches(Token.EOF, 0, 1):
-                    return ATNConfig(state=t.target, config=config)
-            return None
+    epsilonTargetMethods = dict()
+    epsilonTargetMethods[Transition.RULE] = lambda sim, config, t, collectPredicates, inContext, fullCtx, treatEofAsEpsilon: \
+        sim.ruleTransition(config, t)
+    epsilonTargetMethods[Transition.PRECEDENCE] = lambda sim, config, t, collectPredicates, inContext, fullCtx, treatEofAsEpsilon: \
+        sim.precedenceTransition(config, t, collectPredicates, inContext, fullCtx)
+    epsilonTargetMethods[Transition.PREDICATE] = lambda sim, config, t, collectPredicates, inContext, fullCtx, treatEofAsEpsilon: \
+        sim.predTransition(config, t, collectPredicates, inContext, fullCtx)
+    epsilonTargetMethods[Transition.ACTION] = lambda sim, config, t, collectPredicates, inContext, fullCtx, treatEofAsEpsilon: \
+        sim.actionTransition(config, t)
+    epsilonTargetMethods[Transition.EPSILON] = lambda sim, config, t, collectPredicates, inContext, fullCtx, treatEofAsEpsilon: \
+        ATNConfig(state=t.target, config=config)
+    epsilonTargetMethods[Transition.ATOM] = lambda sim, config, t, collectPredicates, inContext, fullCtx, treatEofAsEpsilon: \
+        ATNConfig(state=t.target, config=config) if treatEofAsEpsilon and t.matches(Token.EOF, 0, 1) else None
+    epsilonTargetMethods[Transition.RANGE] = lambda sim, config, t, collectPredicates, inContext, fullCtx, treatEofAsEpsilon: \
+        ATNConfig(state=t.target, config=config) if treatEofAsEpsilon and t.matches(Token.EOF, 0, 1) else None
+    epsilonTargetMethods[Transition.SET] = lambda sim, config, t, collectPredicates, inContext, fullCtx, treatEofAsEpsilon: \
+        ATNConfig(state=t.target, config=config) if treatEofAsEpsilon and t.matches(Token.EOF, 0, 1) else None
 
-        else:
+    def getEpsilonTarget(self, config:ATNConfig, t:Transition, collectPredicates:bool, inContext:bool, fullCtx:bool, treatEofAsEpsilon:bool):
+        m = self.epsilonTargetMethods.get(t.serializationType, None)
+        if m is None:
             return None
+        else:
+            return m(self, config, t, collectPredicates, inContext, fullCtx, treatEofAsEpsilon)
 
     def actionTransition(self, config:ATNConfig, t:ActionTransition):
         if self.debug:

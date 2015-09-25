@@ -501,11 +501,11 @@ class PredictionMode(Enum):
     def getConflictingAltSubsets(cls, configs:ATNConfigSet):
         configToAlts = dict()
         for c in configs:
-            s = str(c.state.stateNumber) + "/" + str(c.context)
-            alts = configToAlts.get(s, None)
+            h = hash((c.state.stateNumber, c.context))
+            alts = configToAlts.get(h, None)
             if alts is None:
                 alts = set()
-                configToAlts[s] = alts
+                configToAlts[h] = alts
             alts.add(c.alt)
         return configToAlts.values()
 
