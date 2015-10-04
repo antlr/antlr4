@@ -408,6 +408,7 @@ Parser.prototype.consume = function() {
 		} else {
 			node = this._ctx.addTokenNode(o);
 		}
+        node.invokingState = this.state;
 		if (hasListener) {
 			this._parseListeners.map(function(listener) {
 				listener.visitTerminal(node);
