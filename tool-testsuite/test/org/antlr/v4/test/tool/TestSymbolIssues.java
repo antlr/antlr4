@@ -116,10 +116,25 @@ public class TestSymbolIssues extends BaseTest {
 		"warning(" + ErrorType.TOKEN_NAME_REASSIGNMENT.code + "): E.g4:3:4: token name A is already defined\n"
 	};
 
+	static String[] F = {
+		// INPUT
+		"lexer grammar F;\n" +
+		"A: 'a';\n" +
+		"mode M1;\n" +
+		"A1: 'a';\n" +
+		"mode M2;\n" +
+		"A2: 'a';\n" +
+		"M1: 'b';\n",
+
+		// YIELDS
+		"error(" + ErrorType.MODE_CONFLICTS_WITH_TOKEN.code + "): F.g4:3:0: mode M1 conflicts with token with same name\n"
+	};
+
     @Test public void testA() { super.testErrors(A, false); }
     @Test public void testB() { super.testErrors(B, false); }
 	@Test public void testD() { super.testErrors(D, false); }
 	@Test public void testE() { super.testErrors(E, false); }
+	@Test public void testF() { super.testErrors(F, false); }
 
 	@Test public void testStringLiteralRedefs() throws Exception {
 		String grammar =

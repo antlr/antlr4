@@ -128,6 +128,8 @@ public class SemanticPipeline {
 							 collector.tokenIDRefs, collector.terminals);
 		}
 
+		symcheck.checkForModeConflicts(g);
+
 		assignChannelTypes(g, collector.channelDefs);
 
 		// CHECK RULE REFS NOW (that we've defined rules in grammar)
