@@ -955,14 +955,22 @@ public enum ErrorType {
 	 * <p>custom channels are not supported in combined grammars</p>
 	 */
 	CHANNELS_BLOCK_IN_COMBINED_GRAMMAR(164, "custom channels are not supported in combined grammars", ErrorSeverity.ERROR),
+
+	NONCONFORMING_LR_RULE(169, "rule <arg> is left recursive but doesn't conform to a pattern ANTLR can handle", ErrorSeverity.ERROR),
 	/**
-	 * Compiler Error 165.
+	 * Compiler Error 170.
+	 *
+	 * <pre>
+	 * mode M1;
+	 * A1: 'a'; // ok
+	 * mode M2;
+	 * A2: 'a'; // ok
+	 * M1: 'b'; // error 170
+	 * </pre>
 	 *
 	 * <p>mode <em>name</em> conflicts with token with same name</p>
 	 */
-	MODE_CONFLICTS_WITH_TOKEN(165, "mode <arg> conflicts with token with same name", ErrorSeverity.ERROR),
-
-	NONCONFORMING_LR_RULE(169, "rule <arg> is left recursive but doesn't conform to a pattern ANTLR can handle", ErrorSeverity.ERROR),
+	MODE_CONFLICTS_WITH_TOKEN(170, "mode <arg> conflicts with token with same name", ErrorSeverity.ERROR),
 
 	/*
 	 * Backward incompatibility errors
