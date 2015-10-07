@@ -971,6 +971,36 @@ public enum ErrorType {
 	 * <p>mode <em>name</em> conflicts with token with same name</p>
 	 */
 	MODE_CONFLICTS_WITH_TOKEN(170, "mode <arg> conflicts with token with same name", ErrorSeverity.ERROR),
+	/**
+	 * Compiler Error 171.
+	 *
+	 * <p>can not use or declare token with reserved name</p>
+	 *
+	 * <p>Reserved names: HIDDEN, DEFAULT_TOKEN_CHANNEL, SKIP, MORE, EOF, MAX_CHAR_VALUE, MIN_CHAR_VALUE.
+	 *
+	 * <p>Can be used but can not be declared: EOF</p>
+	 */
+	TOKEN_CONFLICTS_WITH_COMMON_CONSTANTS(171, "can not use or declare token with reserved name <arg>", ErrorSeverity.ERROR),
+	/**
+	 * Compiler Error 172.
+	 *
+	 * <p>can not use or declare token with reserved name</p>
+	 *
+	 * <p>Reserved names: DEFAULT_MODE, SKIP, MORE, EOF, MAX_CHAR_VALUE, MIN_CHAR_VALUE.
+	 *
+	 * <p>Can be used but can not be declared: HIDDEN, DEFAULT_TOKEN_CHANNEL</p>
+	 */
+	CHANNEL_CONFLICTS_WITH_COMMON_CONSTANTS(172, "can not use or declare channel with reserved name <arg>", ErrorSeverity.ERROR),
+	/**
+	 * Compiler Error 173.
+	 *
+	 * <p>can not use or declare token with reserved name</p>
+	 *
+	 * <p>Reserved names: HIDDEN, DEFAULT_TOKEN_CHANNEL, DEFAULT_MODE, SKIP, MORE, MAX_CHAR_VALUE, MIN_CHAR_VALUE.
+	 *
+	 * <p>Can be used and can be declared: DEFAULT_MODE</p>
+	 */
+	MODE_CONFLICTS_WITH_COMMON_CONSTANTS(173, "can not use or declare mode with reserved name <arg>", ErrorSeverity.ERROR),
 
 	/*
 	 * Backward incompatibility errors

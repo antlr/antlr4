@@ -30,6 +30,7 @@
 
 package org.antlr.v4.semantics;
 
+import org.antlr.v4.automata.LexerATNFactory;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.tool.Alternative;
@@ -69,7 +70,7 @@ public class SymbolChecks {
 
 	protected final Set<String> reservedNames = new HashSet<String>();
 	{
-		reservedNames.add("EOF");
+		reservedNames.addAll(LexerATNFactory.getCommonConstants());
 	}
 
     public SymbolChecks(Grammar g, SymbolCollector collector) {
@@ -275,6 +276,11 @@ public class SymbolChecks {
 		if (g.isLexer()) {
 			LexerGrammar lexerGrammar = (LexerGrammar)g;
 			for (String modeName : lexerGrammar.modes.keySet()) {
+				if (!modeName.equals("DEFAULT_MODE") && reservedNames.contains(modeName)) {
+					Rule rule = ((Collection<Rule>)lexerGrammar.modes.get(modeName)).iterator().next();
+					g.tool.errMgr.grammarError(ErrorType.MODE_CONFLICTS_WITH_COMMON_CONSTANTS, g.fileName, rule.ast.parent.getToken(), modeName);
+				}
+
 				if (g.getTokenType(modeName) != Token.INVALID_TYPE) {
 					Rule rule = ((Collection<Rule>)lexerGrammar.modes.get(modeName)).iterator().next();
 					g.tool.errMgr.grammarError(ErrorType.MODE_CONFLICTS_WITH_TOKEN, g.fileName, rule.ast.parent.getToken(), modeName);
