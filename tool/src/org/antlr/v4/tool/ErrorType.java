@@ -976,7 +976,7 @@ public enum ErrorType {
 	 *
 	 * <p>can not use or declare token with reserved name</p>
 	 *
-	 * <p>Reserved names: HIDDEN, DEFAULT_TOKEN_CHANNEL, SKIP, MORE, EOF, MAX_CHAR_VALUE, MIN_CHAR_VALUE.
+	 * <p>Reserved names: HIDDEN, DEFAULT_TOKEN_CHANNEL, SKIP, MORE, MAX_CHAR_VALUE, MIN_CHAR_VALUE.
 	 *
 	 * <p>Can be used but can not be declared: EOF</p>
 	 */
@@ -984,7 +984,7 @@ public enum ErrorType {
 	/**
 	 * Compiler Error 172.
 	 *
-	 * <p>can not use or declare token with reserved name</p>
+	 * <p>can not use or declare channel with reserved name</p>
 	 *
 	 * <p>Reserved names: DEFAULT_MODE, SKIP, MORE, EOF, MAX_CHAR_VALUE, MIN_CHAR_VALUE.
 	 *
@@ -994,9 +994,9 @@ public enum ErrorType {
 	/**
 	 * Compiler Error 173.
 	 *
-	 * <p>can not use or declare token with reserved name</p>
+	 * <p>can not use or declare mode with reserved name</p>
 	 *
-	 * <p>Reserved names: HIDDEN, DEFAULT_TOKEN_CHANNEL, DEFAULT_MODE, SKIP, MORE, MAX_CHAR_VALUE, MIN_CHAR_VALUE.
+	 * <p>Reserved names: HIDDEN, DEFAULT_TOKEN_CHANNEL, SKIP, MORE, MAX_CHAR_VALUE, MIN_CHAR_VALUE.
 	 *
 	 * <p>Can be used and can be declared: DEFAULT_MODE</p>
 	 */
