@@ -32,7 +32,15 @@ package org.antlr.v4.semantics;
 
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.runtime.Token;
-import org.antlr.v4.tool.*;
+import org.antlr.v4.tool.Alternative;
+import org.antlr.v4.tool.Attribute;
+import org.antlr.v4.tool.AttributeDict;
+import org.antlr.v4.tool.ErrorManager;
+import org.antlr.v4.tool.ErrorType;
+import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.LabelElementPair;
+import org.antlr.v4.tool.Rule;
+import org.antlr.v4.tool.LexerGrammar;
 import org.antlr.v4.tool.ast.GrammarAST;
 
 import java.util.Collection;
