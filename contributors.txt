@@ -77,4 +77,4 @@ YYYY/MM/DD, github id, Full name, email
 2015/06/29, jvanzyl, Jason van Zyl, jason@takari.io
 2015/08/18, krzkaczor, Krzysztof Kaczor, krzysztof@kaczor.io
 2015/09/18, worsht, Rajiv Subrahmanyam, rajiv.public@gmail.com
-2015/10/06, brwml, Bryan Wilhelm, bryan.wilhelm@live.com
+2015/10/06, brwml, Bryan Wilhelm, bryan.wilhelm@microsoft.com
