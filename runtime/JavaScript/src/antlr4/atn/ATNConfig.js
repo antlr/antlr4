@@ -162,7 +162,9 @@ LexerATNConfig.prototype.equals = function(other) {
         return false;
     } else if (this.passedThroughNonGreedyDecision !== other.passedThroughNonGreedyDecision) {
         return false;
-    } else if (this.lexerActionExecutor !== other.lexerActionExecutor) {
+    } else if (this.lexerActionExecutor ?
+            !this.lexerActionExecutor.equals(other.lexerActionExecutor)
+            : !other.lexerActionExecutor) {
         return false;
     } else {
         return ATNConfig.prototype.equals.call(this, other);
