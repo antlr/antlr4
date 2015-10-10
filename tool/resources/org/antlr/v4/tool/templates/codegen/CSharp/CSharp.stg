@@ -75,7 +75,7 @@ public interface I<file.grammarName>Listener : IParseTreeListener {
 /// Enter a parse tree produced by the \<c><lname>\</c>
 /// labeled alternative in \<see cref="<file.parserName>.<file.listenerLabelRuleNames.(lname)>()"/>.
 <else>
-/// Enter a parse tree produced by \<see cref="<file.parserName>.<lname>"/>.
+/// Enter a parse tree produced by \<see cref="<file.parserName>.<lname>()"/>.
 <endif>
 /// \</summary>
 /// \<param name="context">The parse tree.\</param>
@@ -85,7 +85,7 @@ void Enter<lname; format="cap">([NotNull] <csIdentifier.(file.parserName)>.<lnam
 /// Exit a parse tree produced by the \<c><lname>\</c>
 /// labeled alternative in \<see cref="<file.parserName>.<file.listenerLabelRuleNames.(lname)>()"/>.
 <else>
-/// Exit a parse tree produced by \<see cref="<file.parserName>.<lname>"/>.
+/// Exit a parse tree produced by \<see cref="<file.parserName>.<lname>()"/>.
 <endif>
 /// \</summary>
 /// \<param name="context">The parse tree.\</param>
@@ -123,7 +123,7 @@ public partial class <file.grammarName>BaseListener : I<file.grammarName>Listene
 /// Enter a parse tree produced by the \<c><lname>\</c>
 /// labeled alternative in \<see cref="<file.parserName>.<file.listenerLabelRuleNames.(lname)>()"/>.
 <else>
-/// Enter a parse tree produced by \<see cref="<file.parserName>.<lname>"/>.
+/// Enter a parse tree produced by \<see cref="<file.parserName>.<lname>()"/>.
 <endif>
 /// \<para>The default implementation does nothing.\</para>
 /// \</summary>
@@ -134,7 +134,7 @@ public virtual void Enter<lname; format="cap">([NotNull] <csIdentifier.(file.par
 /// Exit a parse tree produced by the \<c><lname>\</c>
 /// labeled alternative in \<see cref="<file.parserName>.<file.listenerLabelRuleNames.(lname)>()"/>.
 <else>
-/// Exit a parse tree produced by \<see cref="<file.parserName>.<lname>"/>.
+/// Exit a parse tree produced by \<see cref="<file.parserName>.<lname>()"/>.
 <endif>
 /// \<para>The default implementation does nothing.\</para>
 /// \</summary>
@@ -183,7 +183,7 @@ public interface I<file.grammarName>Visitor\<Result> : IParseTreeVisitor\<Result
 /// Visit a parse tree produced by the \<c><lname>\</c>
 /// labeled alternative in \<see cref="<file.parserName>.<file.visitorLabelRuleNames.(lname)>()"/>.
 <else>
-/// Visit a parse tree produced by \<see cref="<file.parserName>.<lname>"/>.
+/// Visit a parse tree produced by \<see cref="<file.parserName>.<lname>()"/>.
 <endif>
 /// \</summary>
 /// \<param name="context">The parse tree.\</param>
@@ -221,7 +221,7 @@ public partial class <file.grammarName>BaseVisitor\<Result> : AbstractParseTreeV
 /// Visit a parse tree produced by the \<c><lname>\</c>
 /// labeled alternative in \<see cref="<file.parserName>.<file.visitorLabelRuleNames.(lname)>()"/>.
 <else>
-/// Visit a parse tree produced by \<see cref="<file.parserName>.<lname>"/>.
+/// Visit a parse tree produced by \<see cref="<file.parserName>.<lname>()"/>.
 <endif>
 /// \<para>
 /// The default implementation returns the result of calling \<see cref="AbstractParseTreeVisitor{Result\}.VisitChildren(IRuleNode)"/>
