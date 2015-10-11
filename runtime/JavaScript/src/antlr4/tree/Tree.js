@@ -100,8 +100,9 @@ var visitAtom = function(visitor, ctx) {
 		return;
 	}
 
-	var name = ctx.parser.ruleNames[ctx.ruleIndex];
-	var funcName = "visit" + Utils.titleCase(name);
+	var exactCtxName = ctx.constructor.name.replace(/Context$/, '');
+
+	var funcName = "visit" + exactCtxName;
 
 	return visitor[funcName](ctx);
 };
