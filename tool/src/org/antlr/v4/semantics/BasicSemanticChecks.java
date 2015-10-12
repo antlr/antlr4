@@ -349,7 +349,7 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 			GrammarAST root = (GrammarAST)rulesNode.getParent();
 			GrammarAST IDNode = (GrammarAST)root.getChild(0);
 			g.tool.errMgr.grammarError(ErrorType.NO_RULES, g.fileName,
-									   null, IDNode.getText(), g);
+					null, IDNode.getText(), g);
 		}
 	}
 
@@ -489,6 +489,14 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 								   g.fileName,
 								   label,
 								   label.getText());
+	}
+
+	@Override
+	protected void enterTerminal(GrammarAST tree) {
+		String text = tree.getText();
+		if (text.equals("''")) {
+			g.tool.errMgr.grammarError(ErrorType.EMPTY_STRINGS_NOT_ALLOWED, g.fileName, tree.token);
+		}
 	}
 
 	/** Check option is appropriate for grammar, rule, subrule */

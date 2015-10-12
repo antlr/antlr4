@@ -1001,6 +1001,16 @@ public enum ErrorType {
 	 * <p>Can be used and can be declared: DEFAULT_MODE</p>
 	 */
 	MODE_CONFLICTS_WITH_COMMON_CONSTANTS(173, "can not use or declare mode with reserved name <arg>", ErrorSeverity.ERROR),
+	/**
+	 * Compiler Error 174.
+	 *
+	 * <p>empty strings not allowed</p>
+	 *
+	 * <pre>A: '''test''';</pre>
+	 * <pre>B: '';</pre>
+	 * <pre>C: 'test' '';</pre>
+	 */
+	EMPTY_STRINGS_NOT_ALLOWED(174, "empty strings not allowed", ErrorSeverity.ERROR),
 
 	/*
 	 * Backward incompatibility errors
