@@ -78,3 +78,4 @@ YYYY/MM/DD, github id, Full name, email
 2015/08/18, krzkaczor, Krzysztof Kaczor, krzysztof@kaczor.io
 2015/09/18, worsht, Rajiv Subrahmanyam, rajiv.public@gmail.com
 2015/10/08, fedotovalex, Alex Fedotov, me@alexfedotov.com
+2015/10/21, martin-probst, Martin Probst, martin-probst@web.de
