@@ -260,9 +260,6 @@ BufferedTokenStream.prototype.setTokenSource = function(tokenSource) {
 	this.index = -1;
 };
 
-BufferedTokenStream.prototype.getTokenSource = function() {
-	return this.tokenSource;
-};
 
 // Given a starting index, return the index of the next token on channel.
 // Return i if tokens[i] is on channel. Return -1 if there are no tokens
