@@ -77,9 +77,9 @@ ATN.prototype.nextTokensNoContext = function(s) {
     if (s.nextTokenWithinRule !== null ) {
         return s.nextTokenWithinRule;
     }
-    s.nextTokenWithinRule = this.nextTokensInContext(s, null);
-    s.nextTokenWithinRule.readOnly = true;
-    return s.nextTokenWithinRule;
+    var nextTokenWithinRule = this.nextTokensInContext(s, null);
+    nextTokenWithinRule.readOnly = true;
+    return nextTokenWithinRule;
 };
 
 ATN.prototype.nextTokens = function(s, ctx) {
