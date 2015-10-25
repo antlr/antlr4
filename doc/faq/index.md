@@ -21,10 +21,10 @@
 
 ## Lexical analysis
 
-* How can I parse non-ASCII text and use characters in token rules?
-* How do I replace escape characters in string tokens?
-* Why are my keywords treated as identifiers?
-* Why are there no whitespace tokens in the token stream?
+* [How can I parse non-ASCII text and use characters in token rules?](lexical.md)
+* [How do I replace escape characters in string tokens?](lexical.md)
+* [Why are my keywords treated as identifiers?](lexical.md)
+* [Why are there no whitespace tokens in the token stream?](lexical.md)
 
 ## Parse Trees
 
