@@ -1,9 +1,9 @@
-# Frequently-Asked Questions
+# Frequently-Asked Questions (FAQ)
 
 ## Getting Started
 
-* How to I install and run a simple grammar?
-* Why does my parser test program hang?
+* [How to I install and run a simple grammar?](getting-started.md)
+* [Why does my parser test program hang?](getting-started.md)
 
 ## Installation
 
