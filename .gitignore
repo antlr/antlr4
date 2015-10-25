@@ -13,6 +13,11 @@ user.build.properties
 # Python
 *.pyc
 
+# CSharp
+bin/
+obj/
+*.userprefs
+
 # NetBeans user configuration files
 nbactions*.xml
 /nbproject/private/

@@ -269,7 +269,8 @@ DefaultErrorStrategy.prototype.sync = function(recognizer) {
     case ATNState.PLUS_LOOP_BACK:
     case ATNState.STAR_LOOP_BACK:
         this.reportUnwantedToken(recognizer);
-        var expecting = recognizer.getExpectedTokens();
+        var expecting = new IntervalSet();
+        expecting.addSet(recognizer.getExpectedTokens());
         var whatFollowsLoopIterationOrRule = expecting.addSet(this.getErrorRecoverySet(recognizer));
         this.consumeUntil(recognizer, whatFollowsLoopIterationOrRule);
         break;

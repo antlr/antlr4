@@ -140,7 +140,7 @@ class LexerATNConfig(ATNConfig):
             return False
         if self.passedThroughNonGreedyDecision != other.passedThroughNonGreedyDecision:
             return False
-        if self.lexerActionExecutor is not other.lexerActionExecutor:
+        if not(self.lexerActionExecutor==other.lexerActionExecutor):
             return False
         return super(LexerATNConfig, self).__eq__(other)
 
