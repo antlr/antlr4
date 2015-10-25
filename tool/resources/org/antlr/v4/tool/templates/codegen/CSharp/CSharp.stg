@@ -119,13 +119,23 @@ using ParserRuleContext = Antlr4.Runtime.ParserRuleContext;
 public partial class <file.grammarName>BaseListener : I<file.grammarName>Listener {
 	<file.listenerNames:{lname |
 /// \<summary>
-/// Enter a parse tree produced by \<see cref="<csIdentifier.(file.parserName)>.<csIdentifier.(lname)>"/>.
+<if(file.listenerLabelRuleNames.(lname))>
+/// Enter a parse tree produced by the \<c><lname>\</c>
+/// labeled alternative in \<see cref="<file.parserName>.<file.listenerLabelRuleNames.(lname)>"/>.
+<else>
+/// Enter a parse tree produced by \<see cref="<file.parserName>.<lname>"/>.
+<endif>
 /// \<para>The default implementation does nothing.\</para>
 /// \</summary>
 /// \<param name="context">The parse tree.\</param>
 public virtual void Enter<lname; format="cap">([NotNull] <csIdentifier.(file.parserName)>.<lname; format="cap">Context context) { \}
 /// \<summary>
-/// Exit a parse tree produced by \<see cref="<csIdentifier.(file.parserName)>.<csIdentifier.(lname)>"/>.
+<if(file.listenerLabelRuleNames.(lname))>
+/// Exit a parse tree produced by the \<c><lname>\</c>
+/// labeled alternative in \<see cref="<file.parserName>.<file.listenerLabelRuleNames.(lname)>"/>.
+<else>
+/// Exit a parse tree produced by \<see cref="<file.parserName>.<lname>"/>.
+<endif>
 /// \<para>The default implementation does nothing.\</para>
 /// \</summary>
 /// \<param name="context">The parse tree.\</param>
@@ -207,7 +217,12 @@ using ParserRuleContext = Antlr4.Runtime.ParserRuleContext;
 public partial class <file.grammarName>BaseVisitor\<Result> : AbstractParseTreeVisitor\<Result>, I<file.grammarName>Visitor\<Result> {
 	<file.visitorNames:{lname |
 /// \<summary>
-/// Visit a parse tree produced by \<see cref="<csIdentifier.(file.parserName)>.<csIdentifier.(lname)>"/>.
+<if(file.visitorLabelRuleNames.(lname))>
+/// Visit a parse tree produced by the \<c><lname>\</c>
+/// labeled alternative in \<see cref="<file.parserName>.<file.visitorLabelRuleNames.(lname)>"/>.
+<else>
+/// Visit a parse tree produced by \<see cref="<file.parserName>.<lname>"/>.
+<endif>
 /// \<para>
 /// The default implementation returns the result of calling \<see cref="AbstractParseTreeVisitor{Result\}.VisitChildren(IRuleNode)"/>
 /// on \<paramref name="context"/>.
@@ -241,6 +256,8 @@ fileHeader(grammarFileName, ANTLRVersion) ::= <<
 #pragma warning disable 0219
 // Missing XML comment for publicly visible type or member '...'
 #pragma warning disable 1591
+// Ambiguous reference in cref attribute
+#pragma warning disable 419
 
 >>
 
