@@ -7,15 +7,15 @@
 
 ## Installation
 
-* Why can't ANTLR (grun) find my lexer or parser?
-* Why can't I run the ANTLR tool?
-* Why doesn't my parser compile?
+* [Why can't ANTLR (grun) find my lexer or parser?](installation.md)
+* [Why can't I run the ANTLR tool?](installation.md)
+* [Why doesn't my parser compile?](installation.md)
 
 ## General
 
-* Why do we need ANTLR v4?
-* What is the difference between ANTLR 3 and 4?
-* Why is my expression parser slow?
+* [Why do we need ANTLR v4?](general.md)
+* [What is the difference between ANTLR 3 and 4?](general.md)
+* [Why is my expression parser slow?](general.md)
 
 ## Grammar syntax
 
