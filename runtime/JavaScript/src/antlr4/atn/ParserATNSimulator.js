@@ -1637,7 +1637,7 @@ ParserATNSimulator.prototype.addDFAState = function(dfa, D) {
         return existing;
     }
     D.stateNumber = dfa.states.length;
-    if (! D.configs.readonly) {
+    if (! D.configs.readOnly) {
         D.configs.optimizeConfigs(this);
         D.configs.setReadonly(true);
     }

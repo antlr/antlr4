@@ -78,7 +78,7 @@ function ATNConfigSet(fullCtx) {
 	// the sets and they must not change. This does not protect the other
 	// fields; in particular, conflictingAlts is set after
 	// we've made this readonly.
-	this.readonly = false;
+	this.readOnly = false;
 	// Track the elements as they are added to the set; supports get(i)///
 	this.configs = [];
 
@@ -112,7 +112,7 @@ ATNConfigSet.prototype.add = function(config, mergeCache) {
 	if (mergeCache === undefined) {
 		mergeCache = null;
 	}
-	if (this.readonly) {
+	if (this.readOnly) {
 		throw "This set is readonly";
 	}
 	if (config.semanticContext !== SemanticContext.NONE) {
@@ -168,7 +168,7 @@ Object.defineProperty(ATNConfigSet.prototype, "items", {
 });
 
 ATNConfigSet.prototype.optimizeConfigs = function(interpreter) {
-	if (this.readonly) {
+	if (this.readOnly) {
 		throw "This set is readonly";
 	}
 	if (this.configLookup.length === 0) {
@@ -202,7 +202,7 @@ ATNConfigSet.prototype.equals = function(other) {
 };
 
 ATNConfigSet.prototype.hashString = function() {
-	if (this.readonly) {
+	if (this.readOnly) {
 		if (this.cachedHashString === "-1") {
 			this.cachedHashString = this.hashConfigs();
 		}
@@ -245,7 +245,7 @@ ATNConfigSet.prototype.containsFast = function(item) {
 };
 
 ATNConfigSet.prototype.clear = function() {
-	if (this.readonly) {
+	if (this.readOnly) {
 		throw "This set is readonly";
 	}
 	this.configs = [];
@@ -253,9 +253,9 @@ ATNConfigSet.prototype.clear = function() {
 	this.configLookup = new Set();
 };
 
-ATNConfigSet.prototype.setReadonly = function(readonly) {
-	this.readonly = readonly;
-	if (readonly) {
+ATNConfigSet.prototype.setReadonly = function(readOnly) {
+	this.readOnly = readOnly;
+	if (readOnly) {
 		this.configLookup = null; // can't mod, no need for lookup cache
 	}
 };

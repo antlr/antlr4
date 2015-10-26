@@ -41,7 +41,7 @@
     <dependency>
       <groupId>org.seleniumhq.selenium</groupId>
       <artifactId>selenium-java</artifactId>
-      <version>2.44.0</version>
+      <version>2.46.0</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -67,15 +67,21 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.12.4</version>
         <configuration>
           <includes>
+            <include>**/csharp/Test*.java</include>
             <include>**/java/Test*.java</include>
+            <include>**/javascript/node/Test*.java</include>
+            <include>**/python2/Test*.java</include> 
+            <include>**/python3/Test*.java</include>
           </includes>
         </configuration>
       </plugin>    
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
+        <version>2.4</version>
         <executions>
           <execution>
             <goals>
@@ -106,8 +112,8 @@
                   <mainClass>org.antlr.v4.testgen.TestGenerator</mainClass>
                   <arguments>
                     <argument>-root</argument>
-                    <argument>${basedir}/resources</argument>
-                    <argument>-o</argument>
+                    <argument>${basedir}</argument>
+                    <argument>-outdir</argument>
                     <argument>${basedir}/test</argument>
                     <argument>-templates</argument>
                     <argument>${basedir}/resources/org/antlr/v4/test/runtime/templates</argument>

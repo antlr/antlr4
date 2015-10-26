@@ -101,9 +101,6 @@ class Parser (Recognizer):
         self._syntaxErrors = 0
         self.setInputStream(input)
 
-    def __setattr__(self, key, value):
-        object.__setattr__(self, key, value)
-
     # reset the parser's state#
     def reset(self):
         if self._input is not None:
@@ -170,7 +167,7 @@ class Parser (Recognizer):
             self.consume()
         else:
             t = self._errHandler.recoverInline(self)
-            if self._buildParseTrees and t.tokenIndex == -1:
+            if self.buildParseTrees and t.tokenIndex == -1:
                 # we must have conjured up a new token during single token insertion
                 # if it's not the current symbol
                 self._ctx.addErrorNode(t)

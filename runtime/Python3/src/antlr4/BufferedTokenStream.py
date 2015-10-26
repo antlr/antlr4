@@ -131,7 +131,6 @@ class BufferedTokenStream(TokenStream):
     # @see #get(int i)
     #/
     def sync(self, i:int):
-        assert i >= 0
         n = i - len(self.tokens) + 1 # how many more elements we need?
         if n > 0 :
             fetched = self.fetch(n)
