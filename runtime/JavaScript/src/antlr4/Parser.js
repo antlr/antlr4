@@ -322,7 +322,7 @@ Parser.prototype.compileParseTreePattern = function(pattern, patternRuleIndex, l
 	lexer = lexer || null;
 	if (lexer === null) {
 		if (this.getTokenStream() !== null) {
-			var tokenSource = this.getTokenStream().getTokenSource();
+			var tokenSource = this.getTokenStream().tokenSource;
 			if (tokenSource instanceof Lexer) {
 				lexer = tokenSource;
 			}
