@@ -280,7 +280,7 @@ class Parser (Recognizer):
     def compileParseTreePattern(self, pattern, patternRuleIndex, lexer = None):
         if lexer is None:
             if self.getTokenStream() is not None:
-                tokenSource = self.getTokenStream().getTokenSource()
+                tokenSource = self.getTokenStream().tokenSource
                 if isinstance( tokenSource, Lexer ):
                     lexer = tokenSource
         if lexer is None:
