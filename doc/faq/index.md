@@ -1,5 +1,9 @@
 # Frequently-Asked Questions (FAQ)
 
+This is the main landing page for the ANTLR 4 FAQ. The links below will take you to the appropriate file containing all answers for that subcategory.
+
+*To add to or improve this FAQ, [fork](https://help.github.com/articles/fork-a-repo/) the [antlr/antlr4 repo](https://github.com/antlr/antlr4) then update this `doc/faq/index.md` or file(s) in that directory.  Submit a [pull request](https://help.github.com/articles/creating-a-pull-request/) to get your changes incorporated into the main repository. Do not mix code and FAQ updates in the sample pull request since code updates require signing the contributors.txt certificate of origin.*
+
 ## Getting Started
 
 * [How to I install and run a simple grammar?](getting-started.md)
@@ -28,19 +32,19 @@
 
 ## Parse Trees
 
-* How do I get the input text for a parse-tree subtree?
-* What if I need ASTs not parse trees for a compiler, for example?
-* When do I use listener/visitor vs XPath vs Tree pattern matching?
+* [How do I get the input text for a parse-tree subtree?](parse-trees.md)
+* [What if I need ASTs not parse trees for a compiler, for example?](parse-trees.md)
+* [When do I use listener/visitor vs XPath vs Tree pattern matching?](parse-trees.md)
 
 ## Translation
 
-* ASTs vs parse trees
-* Decoupling input walking from output generation
+* [ASTs vs parse trees](parse-trees.md)
+* [Decoupling input walking from output generation](parse-trees.md)
 
 ## Actions and semantic predicates
 
-* How do I test if an optional rule was matched?
+* [How do I test if an optional rule was matched?](actions-preds.md)
 
 ## Error handling
 
-* How do I perform semantic checking with ANTLR?
+* [How do I perform semantic checking with ANTLR?](error-handling.md)
