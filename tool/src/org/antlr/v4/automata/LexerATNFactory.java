@@ -83,7 +83,7 @@ public class LexerATNFactory extends ParserATNFactory {
 	 * actions, but are required during code generation for creating
 	 * {@link LexerAction} instances that are usable by a lexer interpreter.
 	 */
-	protected static final Map<String, Integer> COMMON_CONSTANTS = new HashMap<String, Integer>();
+	public static final Map<String, Integer> COMMON_CONSTANTS = new HashMap<String, Integer>();
 	static {
 		COMMON_CONSTANTS.put("HIDDEN", Lexer.HIDDEN);
 		COMMON_CONSTANTS.put("DEFAULT_TOKEN_CHANNEL", Lexer.DEFAULT_TOKEN_CHANNEL);

@@ -69,11 +69,6 @@ import java.util.Set;
  *  tokens and rules from the imported grammars into a single collection.
  */
 public class SemanticPipeline {
-	protected final Set<String> reservedNames = new HashSet<String>();
-	{
-		reservedNames.addAll(LexerATNFactory.getCommonConstants());
-	}
-
 	public Grammar g;
 
 	public SemanticPipeline(Grammar g) {
@@ -295,7 +290,7 @@ public class SemanticPipeline {
 				g.tool.errMgr.grammarError(ErrorType.CHANNEL_CONFLICTS_WITH_TOKEN, g.fileName, channel.token, channelName);
 			}
 
-			if (reservedNames.contains(channelName)) {
+			if (LexerATNFactory.COMMON_CONSTANTS.containsKey(channelName)) {
 				g.tool.errMgr.grammarError(ErrorType.CHANNEL_CONFLICTS_WITH_COMMON_CONSTANTS, g.fileName, channel.token, channelName);
 			}
 

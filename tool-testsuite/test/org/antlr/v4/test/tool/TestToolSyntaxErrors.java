@@ -467,11 +467,11 @@ public class TestToolSyntaxErrors extends BaseTest {
 			"Error3: '';\n" +
 			"NotError: ' ';";
 		String expected =
-			"error(" + ErrorType.EMPTY_STRINGS_NOT_ALLOWED.code + "): T.g4:2:8: empty strings not allowed\n" +
-			"error(" + ErrorType.EMPTY_STRINGS_NOT_ALLOWED.code + "): T.g4:2:16: empty strings not allowed\n" +
-			"error(" + ErrorType.EMPTY_STRINGS_NOT_ALLOWED.code + "): T.g4:3:8: empty strings not allowed\n" +
-			"error(" + ErrorType.EMPTY_STRINGS_NOT_ALLOWED.code + "): T.g4:4:15: empty strings not allowed\n" +
-			"error(" + ErrorType.EMPTY_STRINGS_NOT_ALLOWED.code + "): T.g4:5:8: empty strings not allowed\n";
+			"error(" + ErrorType.EMPTY_STRINGS_NOT_ALLOWED.code + "): T.g4:2:8: string literals cannot be empty\n" +
+			"error(" + ErrorType.EMPTY_STRINGS_NOT_ALLOWED.code + "): T.g4:2:16: string literals cannot be empty\n" +
+			"error(" + ErrorType.EMPTY_STRINGS_NOT_ALLOWED.code + "): T.g4:3:8: string literals cannot be empty\n" +
+			"error(" + ErrorType.EMPTY_STRINGS_NOT_ALLOWED.code + "): T.g4:4:15: string literals cannot be empty\n" +
+			"error(" + ErrorType.EMPTY_STRINGS_NOT_ALLOWED.code + "): T.g4:5:8: string literals cannot be empty\n";
 
 		String[] pair = new String[] {
 				grammar,

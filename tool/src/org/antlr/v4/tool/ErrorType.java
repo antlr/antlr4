@@ -978,9 +978,9 @@ public enum ErrorType {
 	 *
 	 * <p>Reserved names: HIDDEN, DEFAULT_TOKEN_CHANNEL, SKIP, MORE, MAX_CHAR_VALUE, MIN_CHAR_VALUE.
 	 *
-	 * <p>Can be used but can not be declared: EOF</p>
+	 * <p>Can be used but cannot be declared: EOF</p>
 	 */
-	TOKEN_CONFLICTS_WITH_COMMON_CONSTANTS(171, "can not use or declare token with reserved name <arg>", ErrorSeverity.ERROR),
+	TOKEN_CONFLICTS_WITH_COMMON_CONSTANTS(171, "cannot use or declare token with reserved name <arg>", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 172.
 	 *
@@ -988,9 +988,9 @@ public enum ErrorType {
 	 *
 	 * <p>Reserved names: DEFAULT_MODE, SKIP, MORE, EOF, MAX_CHAR_VALUE, MIN_CHAR_VALUE.
 	 *
-	 * <p>Can be used but can not be declared: HIDDEN, DEFAULT_TOKEN_CHANNEL</p>
+	 * <p>Can be used but cannot be declared: HIDDEN, DEFAULT_TOKEN_CHANNEL</p>
 	 */
-	CHANNEL_CONFLICTS_WITH_COMMON_CONSTANTS(172, "can not use or declare channel with reserved name <arg>", ErrorSeverity.ERROR),
+	CHANNEL_CONFLICTS_WITH_COMMON_CONSTANTS(172, "cannot use or declare channel with reserved name <arg>", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 173.
 	 *
@@ -998,9 +998,9 @@ public enum ErrorType {
 	 *
 	 * <p>Reserved names: HIDDEN, DEFAULT_TOKEN_CHANNEL, SKIP, MORE, MAX_CHAR_VALUE, MIN_CHAR_VALUE.
 	 *
-	 * <p>Can be used and can be declared: DEFAULT_MODE</p>
+	 * <p>Can be used and cannot declared: DEFAULT_MODE</p>
 	 */
-	MODE_CONFLICTS_WITH_COMMON_CONSTANTS(173, "can not use or declare mode with reserved name <arg>", ErrorSeverity.ERROR),
+	MODE_CONFLICTS_WITH_COMMON_CONSTANTS(173, "cannot use or declare mode with reserved name <arg>", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 174.
 	 *
@@ -1010,7 +1010,7 @@ public enum ErrorType {
 	 * <pre>B: '';</pre>
 	 * <pre>C: 'test' '';</pre>
 	 */
-	EMPTY_STRINGS_NOT_ALLOWED(174, "empty strings not allowed", ErrorSeverity.ERROR),
+	EMPTY_STRINGS_NOT_ALLOWED(174, "string literals cannot be empty", ErrorSeverity.ERROR),
 
 	/*
 	 * Backward incompatibility errors
