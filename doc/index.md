@@ -55,4 +55,6 @@ This documentation is a reference and summarizes grammar syntax and the key sema
 
 * Integrating ANTLR into Development Systems
 
-* Build ANTLR itself.
+* [Build ANTLR itself](building-antlr.md)
+
+* [Cutting an ANTLR Release](releasing-antlr.md)
