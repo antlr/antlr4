@@ -27,7 +27,7 @@ This documentation is a reference and summarizes grammar syntax and the key sema
 
 * [Grammar Lexicon](lexicon.md)
 
-* Grammar Structure
+* [Grammar Structure](grammars.md)
 
 * Parser Rules
 
