@@ -372,10 +372,12 @@ public class TreeViewer extends JComponent {
 
 				JTree selectedTree = (JTree) e.getSource();
 				TreePath path = selectedTree.getSelectionPath();
-				TreeNodeWrapper treeNode = (TreeNodeWrapper) path.getLastPathComponent();
+				if (path!=null) {
+					TreeNodeWrapper treeNode = (TreeNodeWrapper) path.getLastPathComponent();
 
-				// Set the clicked AST.
-				viewer.setTree((Tree) treeNode.getUserObject());
+					// Set the clicked AST.
+					viewer.setTree((Tree) treeNode.getUserObject());
+				}
 			}
 		});
 
