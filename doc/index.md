@@ -4,9 +4,9 @@ Please check [Frequently asked questions (FAQ)](faq/index.md) before asking ques
 
 Notes:
 <ul>
-<li>*To add to or improve this FAQ, [fork](https://help.github.com/articles/fork-a-repo/) the [antlr/antlr4 repo](https://github.com/antlr/antlr4) then update this `doc/index.md` or file(s) in that directory.  Submit a [pull request](https://help.github.com/articles/creating-a-pull-request/) to get your changes incorporated into the main repository. Do not mix code and FAQ updates in the sample pull request.* **You must sign the contributors.txt certificate of origin with your pull request if you've not done so before.**</li>
+<li>To add to or improve this FAQ, [fork](https://help.github.com/articles/fork-a-repo/) the [antlr/antlr4 repo](https://github.com/antlr/antlr4) then update this `doc/index.md` or file(s) in that directory.  Submit a [pull request](https://help.github.com/articles/creating-a-pull-request/) to get your changes incorporated into the main repository. Do not mix code and FAQ updates in the sample pull request. **You must sign the contributors.txt certificate of origin with your pull request if you've not done so before.**</li>
 
-<li>*Copyright © 2012, The Pragmatic Bookshelf.  Pragmatic Bookshelf grants a nonexclusive, irrevocable, royalty-free, worldwide license to reproduce, distribute, prepare derivative works, and otherwise use this contribution as part of the ANTLR project and associated documentation.*</li>
+<li>Copyright © 2012, The Pragmatic Bookshelf.  Pragmatic Bookshelf grants a nonexclusive, irrevocable, royalty-free, worldwide license to reproduce, distribute, prepare derivative works, and otherwise use this contribution as part of the ANTLR project and associated documentation.</li>
 
 <li>This text was copied with permission from the [The Definitive ANTLR 4 Reference](http://pragprog.com/book/tpantlr2/the-definitive-antlr-4-reference), though it is being morphed over time as the tool changes.</li>
 </ul>
@@ -25,7 +25,7 @@ This documentation is a reference and summarizes grammar syntax and the key sema
 
 * [Getting Started with ANTLR v4](getting-started.md)
 
-* Grammar Lexicon
+* [Grammar Lexicon](lexicon.md)
 
 * Grammar Structure
 
