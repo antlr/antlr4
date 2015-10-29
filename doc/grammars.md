@@ -41,8 +41,9 @@ lexer grammar Name;
 
 Only lexer grammars can contain `mode` specifications.
 
-Only lexer grammars can contain custom channels specifications:
- ```
+Only lexer grammars can contain custom channels specifications
+
+```
 channels {
   WHITESPACE_CHANNEL,
   COMMENTS_CHANNEL
@@ -55,7 +56,7 @@ Those channels can then be used like enums within lexer rules:
 WS : [ \r\t\n]+ -> channel(WHITESPACE_CHANNEL) ;
 ```
 
-Sections Section 15.5, [Lexer Rules](http://pragprog.com/book/tpantlr2/the-definitive-antlr-4-reference) and Section 15.3, [Parser Rules](http://pragprog.com/book/tpantlr2/the-definitive-antlr-4-reference) contain details on rule syntax. Section 15.8, Options describes grammar options and Section 15.4, Actions and Attributes has information on grammar-level actions. We’ll look at grammar imports, token specifications, and named actions next.
+Sections 15.5, [Lexer Rules](http://pragprog.com/book/tpantlr2/the-definitive-antlr-4-reference) and Section 15.3, [Parser Rules](http://pragprog.com/book/tpantlr2/the-definitive-antlr-4-reference) contain details on rule syntax. Section 15.8, Options describes grammar options and Section 15.4, Actions and Attributes has information on grammar-level actions.
 
 ## Grammar Imports
 
