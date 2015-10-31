@@ -206,6 +206,7 @@ Rule elements specify what the parser should do at a given moment just like stat
 T
 Match token T at the current input position. Tokens always begin with a capital letter.
 </tr>
+<tr>
 ’literal’
 Match the string literal at the current input position. A string literal is simply a token with a fixed string.
 </tr>
