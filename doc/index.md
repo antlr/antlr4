@@ -29,7 +29,7 @@ This documentation is a reference and summarizes grammar syntax and the key sema
 
 * [Grammar Structure](grammars.md)
 
-* Parser Rules
+* [Parser Rules](parser-rules.md)
 
 * Left-recursive rules
 
