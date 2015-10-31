@@ -4,11 +4,11 @@ Please check [Frequently asked questions (FAQ)](faq/index.md) before asking ques
 
 Notes:
 <ul>
-<li>To add to or improve this FAQ, [fork](https://help.github.com/articles/fork-a-repo/) the [antlr/antlr4 repo](https://github.com/antlr/antlr4) then update this `doc/index.md` or file(s) in that directory.  Submit a [pull request](https://help.github.com/articles/creating-a-pull-request/) to get your changes incorporated into the main repository. Do not mix code and FAQ updates in the sample pull request. **You must sign the contributors.txt certificate of origin with your pull request if you've not done so before.**</li>
+<li>To add to or improve this FAQ, <a href=https://help.github.com/articles/fork-a-repo>fork</a> the <a href=https://github.com/antlr/antlr4>antlr/antlr4 repo</a> then update this `doc/index.md` or file(s) in that directory.  Submit a <a href=https://help.github.com/articles/creating-a-pull-request>pull request</a> to get your changes incorporated into the main repository. Do not mix code and FAQ updates in the sample pull request. <b>You must sign the contributors.txt certificate of origin with your pull request if you've not done so before.</b></li>
 
 <li>Copyright © 2012, The Pragmatic Bookshelf.  Pragmatic Bookshelf grants a nonexclusive, irrevocable, royalty-free, worldwide license to reproduce, distribute, prepare derivative works, and otherwise use this contribution as part of the ANTLR project and associated documentation.</li>
 
-<li>This text was copied with permission from the [The Definitive ANTLR 4 Reference](http://pragprog.com/book/tpantlr2/the-definitive-antlr-4-reference), though it is being morphed over time as the tool changes.</li>
+<li>This text was copied with permission from the <a href=http://pragprog.com/book/tpantlr2/the-definitive-antlr-4-reference>The Definitive ANTLR 4 Reference</a>, though it is being morphed over time as the tool changes.</li>
 </ul>
 
 Links in the documentation refer to various sections of the book but have been redirected to the general book page on the publisher's site. There are two excerpts on the publisher's website that might be useful to you without having to purchase the book: [Let's get Meta](http://media.pragprog.com/titles/tpantlr2/picture.pdf) and [Building a Translator with a Listener](http://media.pragprog.com/titles/tpantlr2/listener.pdf). You should also consider reading the following books (the vid describes the reference book):
