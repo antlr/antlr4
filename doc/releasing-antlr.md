@@ -234,8 +234,17 @@ Add links to the artifacts from download.html
 
 ## Update javadoc for runtime and tool
 
+First gen javadoc:
+
 ```bash
-cd ~/antlr/sites/website-antlr4
+$ cd antlr4
+$ mvn -DskipTests javadoc:jar install
+```
+
+Then copy to website:
+
+```bash
+cd ~/antlr/sites/website-antlr4/api
 git checkout gh-pages
 git pull origin gh-pages
 cd Java
