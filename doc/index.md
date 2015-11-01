@@ -31,9 +31,9 @@ This documentation is a reference and summarizes grammar syntax and the key sema
 
 * [Parser Rules](parser-rules.md)
 
-* Left-recursive rules
+* [Left-recursive rules](left-recursion.md)
 
-* Actions and Attributes
+* [Actions and Attributes](actions.md)
 
 * Lexer Rules
 
