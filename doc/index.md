@@ -37,7 +37,7 @@ This documentation is a reference and summarizes grammar syntax and the key sema
 
 * [Lexer Rules](lexer-rules.md)
 
-* Wildcard Operator and Nongreedy Subrules
+* [Wildcard Operator and Nongreedy Subrules](wildcard.md)
 
 * Parse Tree Listeners
 
