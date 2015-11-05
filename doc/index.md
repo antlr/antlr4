@@ -35,7 +35,7 @@ This documentation is a reference and summarizes grammar syntax and the key sema
 
 * [Actions and Attributes](actions.md)
 
-* Lexer Rules
+* [Lexer Rules](lexer-rules.md)
 
 * Wildcard Operator and Nongreedy Subrules
 
