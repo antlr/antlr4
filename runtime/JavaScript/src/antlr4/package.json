@@ -3,7 +3,7 @@
   "version": "4.5.1",
   "description": "JavaScript runtime for ANTLR4",
   "main": "src/antlr4/index.js",
-  "repository": "antlr/antlr4-javascript.git",
+  "repository": "antlr/antlr4.git",
   "keywords": [
     "lexer",
     "parser",
@@ -13,7 +13,7 @@
   ],
   "license": "BSD",
   "bugs": {
-    "url": "https://github.com/antlr/antlr4-javascript/issues"
+    "url": "https://github.com/antlr/antlr4/issues"
   },
-  "homepage": "https://github.com/antlr/antlr4-javascript"
+  "homepage": "https://github.com/antlr/antlr4"
 }
