@@ -80,7 +80,7 @@ public class TestRig {
 
 	public TestRig(String[] args) throws Exception {
 		if ( args.length < 2 ) {
-			System.err.println("java org.antlr.v4.runtime.misc.TestRig GrammarName startRuleName\n" +
+			System.err.println("java org.antlr.v4.gui.TestRig GrammarName startRuleName\n" +
 							   "  [-tokens] [-tree] [-gui] [-ps file.ps] [-encoding encodingname]\n" +
 							   "  [-trace] [-diagnostics] [-SLL]\n"+
 							   "  [input-filename(s)]");
