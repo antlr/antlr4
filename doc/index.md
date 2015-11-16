@@ -39,11 +39,11 @@ This documentation is a reference and summarizes grammar syntax and the key sema
 
 * [Wildcard Operator and Nongreedy Subrules](wildcard.md)
 
-* Parse Tree Listeners
+* [Parse Tree Listeners](listeners.md)
 
-* Parse Tree Matching and XPath
+* [Parse Tree Matching and XPath](tree-matching.md)
 
-* Semantic Predicates
+* [Semantic Predicates](predicates.md)
 
 * Options
 
