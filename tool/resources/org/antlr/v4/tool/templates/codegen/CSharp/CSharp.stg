@@ -579,7 +579,7 @@ do {
 
 AltBlock(choice, preamble, alts, error) ::= <<
 State = <choice.stateNumber>;
-ErrorHandler.sync(this);
+ErrorHandler.Sync(this);
 <if(choice.label)><labelref(choice.label)> = TokenStream.Lt(1);<endif>
 <preamble; separator="\n">
 switch ( Interpreter.AdaptivePredict(TokenStream,<choice.decision>,Context) ) {
@@ -592,7 +592,7 @@ case <i>:
 
 OptionalBlock(choice, alts, error) ::= <<
 State = <choice.stateNumber>;
-ErrorHandler.sync(this);
+ErrorHandler.Sync(this);
 switch ( Interpreter.AdaptivePredict(TokenStream,<choice.decision>,Context) ) {
 <alts:{alt |
 case <i><if(!choice.ast.greedy)>+1<endif>:
