@@ -399,7 +399,7 @@ do {
 
 AltBlock(choice, preamble, alts, error) ::= <<
 this.state = <choice.stateNumber>;
-_errHandler.sync(this);
+this._errHandler.sync(this);
 <if(choice.label)><labelref(choice.label)> = _input.LT(1)<endif>
 <preamble; separator="\n">
 var la_ = this._interp.adaptivePredict(this._input,<choice.decision>,this._ctx);
@@ -414,7 +414,7 @@ case <i>:
 
 OptionalBlock(choice, alts, error) ::= <<
 this.state = <choice.stateNumber>;
-_errHandler.sync(this);
+this._errHandler.sync(this);
 var la_ = this._interp.adaptivePredict(this._input,<choice.decision>,this._ctx);
 <alts:{alt |
 if(la_===<i><if(!choice.ast.greedy)>+1<endif>) {
