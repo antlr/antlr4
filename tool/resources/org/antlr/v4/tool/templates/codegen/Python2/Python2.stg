@@ -314,7 +314,6 @@ CodeBlockForAlt(currentAltCodeBlock, locals, preamble, ops) ::= <<
 
 LL1AltBlock(choice, preamble, alts, error) ::= <<
 self.state = <choice.stateNumber>
-<!_errHandler.sync(this);!>
 <if(choice.label)><labelref(choice.label)> = _input.LT(1)<endif>
 <preamble; separator="\n">
 token = self._input.LA(1)
@@ -328,7 +327,6 @@ else:
 
 LL1OptionalBlock(choice, alts, error) ::= <<
 self.state = <choice.stateNumber>
-<!_errHandler.sync(this);!>
 token = self._input.LA(1)
 <choice.altLook,alts:{look,alt| <cases(ttypes=look)>
     <alt>
@@ -339,7 +337,6 @@ else:
 
 LL1OptionalBlockSingleAlt(choice, expr, alts, preamble, error, followExpr) ::= <<
 self.state = <choice.stateNumber>
-<!_errHandler.sync(this);!>
 <preamble; separator="\n">
 if <expr>:
     <alts; separator="\n">
@@ -378,7 +375,7 @@ while True:
 
 AltBlock(choice, preamble, alts, error) ::= <<
 self.state = <choice.stateNumber>
-<!_errHandler.sync(this);!>
+self._errHandler.sync(this);
 <if(choice.label)><labelref(choice.label)> = _input.LT(1)<endif>
 <preamble; separator="\n">
 la_ = self._interp.adaptivePredict(self._input,<choice.decision>,self._ctx)
@@ -392,7 +389,7 @@ if la_ == <i>:
 
 OptionalBlock(choice, alts, error) ::= <<
 self.state = <choice.stateNumber>
-<!_errHandler.sync(this);!>
+self._errHandler.sync(this);
 la_ = self._interp.adaptivePredict(self._input,<choice.decision>,self._ctx)
 <alts:{alt |
 if la_ == <i><if(!choice.ast.greedy)>+1<endif>:
