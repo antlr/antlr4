@@ -158,8 +158,10 @@ public class ActionTranslator implements ActionSplitterListener {
 		translator.rf = rf;
         factory.getGrammar().tool.log("action-translator", "translate " + action);
 		String altLabel = node.getAltLabel();
-		if ( rf!=null ) translator.nodeContext = rf.ruleCtx;
-		if ( altLabel!=null ) translator.nodeContext = rf.altLabelCtxs.get(altLabel);
+		if ( rf!=null ) { 
+		    translator.nodeContext = rf.ruleCtx;
+	        if ( altLabel!=null ) translator.nodeContext = rf.altLabelCtxs.get(altLabel);
+		}
 		ANTLRStringStream in = new ANTLRStringStream(action);
 		in.setLine(tokenWithinAction.getLine());
 		in.setCharPositionInLine(tokenWithinAction.getCharPositionInLine());
