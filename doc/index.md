@@ -45,9 +45,9 @@ This documentation is a reference and summarizes grammar syntax and the key sema
 
 * [Semantic Predicates](predicates.md)
 
-* Options
+* [Options](options.md)
 
-* ANTLR Tool Command Line Options
+* [ANTLR Tool Command Line Options](tool-options.md)
 
 * Runtime Libraries and Code Generation Targets
 
