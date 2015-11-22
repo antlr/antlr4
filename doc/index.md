@@ -49,7 +49,7 @@ This documentation is a reference and summarizes grammar syntax and the key sema
 
 * [ANTLR Tool Command Line Options](tool-options.md)
 
-* Runtime Libraries and Code Generation Targets
+* [Runtime Libraries and Code Generation Targets](targets.md)
 
 * Parser and lexer interpreters
 
