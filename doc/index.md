@@ -51,9 +51,7 @@ This documentation is a reference and summarizes grammar syntax and the key sema
 
 * [Runtime Libraries and Code Generation Targets](targets.md)
 
-* Parser and lexer interpreters
-
-* Integrating ANTLR into Development Systems
+* [Parser and lexer interpreters](interpreters.md)
 
 # Building / releasing ANTLR itself
 

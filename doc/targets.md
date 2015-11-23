@@ -2,7 +2,7 @@
 
 This page lists the available and upcoming ANTLR runtimes. Please note that you won't find here language specific code generators. This is because there is only one tool, written in Java, which is able to generate lexer and parser code for all targets, through command line options. The tool can be invoked from the command line, or any integration plugin to popular IDEs and build systems: Eclipse, IntelliJ, Visual Studio, Maven. So whatever your environment and target is, you should be able to run the tool and produce the code in the targeted language. As of writing, the available targets are the following:
 
-* **Java**<br>
+* [Java](java-target.md)<br>
 The [ANTLR v4 book](http://pragprog.com/book/tpantlr2/the-definitive-antlr-4-reference) has a decent summary of the runtime library.  We have added a useful XPath feature since the book was printed that lets you select bits of parse trees.
 <br>[Runtime API](http://www.antlr.org/api/Java/index.html)
 <br>See [Getting Started with ANTLR v4](getting-started.md)
