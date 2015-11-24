@@ -2,7 +2,7 @@
 
 This is the main landing page for the ANTLR 4 FAQ. The links below will take you to the appropriate file containing all answers for that subcategory.
 
-*To add to or improve this FAQ, [fork](https://help.github.com/articles/fork-a-repo/) the [antlr/antlr4 repo](https://github.com/antlr/antlr4) then update this `doc/faq/index.md` or file(s) in that directory.  Submit a [pull request](https://help.github.com/articles/creating-a-pull-request/) to get your changes incorporated into the main repository. Do not mix code and FAQ updates in the sample pull request since code updates require signing the contributors.txt certificate of origin.*
+*To add to or improve this FAQ, [fork](https://help.github.com/articles/fork-a-repo/) the [antlr/antlr4 repo](https://github.com/antlr/antlr4) then update this `doc/faq/index.md` or file(s) in that directory.  Submit a [pull request](https://help.github.com/articles/creating-a-pull-request/) to get your changes incorporated into the main repository. Do not mix code and FAQ updates in the sample pull request.* **You must sign the contributors.txt certificate of origin with your pull request if you've not done so before.**
 
 ## Getting Started
 
