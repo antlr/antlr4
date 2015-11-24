@@ -1,6 +1,6 @@
 # Installation
 
-Please read carefully: [Getting Started with ANTLR v4](https://theantlrguy.atlassian.net/wiki/display/ANTLR4/Getting+Started+with+ANTLR+v4).
+Please read carefully: [Getting Started with ANTLR v4](https://raw.githubusercontent.com/antlr/antlr4/master/doc/getting-started.md).
 
 ## Why can't ANTLR (grun) find my lexer or parser?
 

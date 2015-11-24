@@ -10,7 +10,7 @@ where a value can be an identifier, a qualified identifier (for example, a.b.c),
 
 ## Grammar Options
 
-All grammars can use the following options. In combined grammars, all options except language pertain only to the generated parser. Options may be set either within the grammar file using the options syntax (described above) or when invoking ANTLR on the command line, using the `-D` option. (see Section 15.9, [ANTLR Tool Command Line Options](https://theantlrguy.atlassian.net/wiki/display/ANTLR4/ANTLR+Tool+Command+Line+Options).) The following examples demonstrate both mechanisms; note that `-D` overrides options within the grammar.
+All grammars can use the following options. In combined grammars, all options except language pertain only to the generated parser. Options may be set either within the grammar file using the options syntax (described above) or when invoking ANTLR on the command line, using the `-D` option. (see Section 15.9, [ANTLR Tool Command Line Options](tool-options.md).) The following examples demonstrate both mechanisms; note that `-D` overrides options within the grammar.
 
 ## Rule Options
 

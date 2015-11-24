@@ -15,18 +15,18 @@ ANTLR project lead and supreme dictator for life
 ## Useful information
 
 * [Release notes](https://github.com/antlr/antlr4/releases)
-* [Getting started with v4](https://theantlrguy.atlassian.net/wiki/display/ANTLR4/Getting+Started+with+ANTLR+v4)
+* [Getting started with v4](https://raw.githubusercontent.com/antlr/antlr4/master/doc/getting-started.md)
 * [Official site](http://www.antlr.org/)
-* [Documentation](https://theantlrguy.atlassian.net/wiki/display/ANTLR4/ANTLR+4+Documentation)
-* [FAQ](https://theantlrguy.atlassian.net/wiki/display/ANTLR4/ANTLR+v4+FAQ)
+* [Documentation](https://raw.githubusercontent.com/antlr/antlr4/master/doc/index.md)
+* [FAQ](https://raw.githubusercontent.com/antlr/antlr4/master/doc/faq/index.md)
 * [API](http://www.antlr.org/api/Java/index.html)
 * [ANTLR v3](http://www.antlr3.org/)
-* [v3 to v4 Migration guide, differences](https://theantlrguy.atlassian.net/wiki/pages/viewpage.action?pageId=1900596)
+* [v3 to v4 Migration, differences](https://raw.githubusercontent.com/antlr/antlr4/master/doc/faq/general.md)
 
-You might also find the following wiki pages useful, particularly if you want to mess around with the various target languages.
+You might also find the following pages useful, particularly if you want to mess around with the various target languages.
  
-* [How to build ANTLR itself](https://github.com/antlr/antlr4/wiki/How-to-build-ANTLR-itself)
-* [How we create and deploy an ANTLR release](https://github.com/antlr/antlr4/wiki/Cutting-an-ANTLR-4-release)
+* [How to build ANTLR itself](https://raw.githubusercontent.com/antlr/antlr4/master/doc/building-antlr.md)
+* [How we create and deploy an ANTLR release](https://raw.githubusercontent.com/antlr/antlr4/master/doc/releasing-antlr.md)
 
 ## The Definitive ANTLR 4 Reference
 
