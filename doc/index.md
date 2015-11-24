@@ -53,6 +53,8 @@ This documentation is a reference and summarizes grammar syntax and the key sema
 
 * [Parser and lexer interpreters](interpreters.md)
 
+* [Resources](resources.md)
+
 # Building / releasing ANTLR itself
 
 * [Building ANTLR itself](building-antlr.md)
