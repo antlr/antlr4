@@ -172,9 +172,6 @@ public class TestRig {
 		if ( !startRuleName.equals(LEXER_START_RULE_NAME) ) {
 			String parserName = grammarName+"Parser";
 			parserClass = cl.loadClass(parserName).asSubclass(Parser.class);
-			if ( parserClass==null ) {
-				System.err.println("Can't load "+parserName);
-			}
 			Constructor<? extends Parser> parserCtor = parserClass.getConstructor(TokenStream.class);
 			parser = parserCtor.newInstance((TokenStream)null);
 		}
