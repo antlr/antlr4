@@ -14,7 +14,7 @@ Creating a new target involves the following key elements:
 ## Getting started
 
 1. Fork the `antlr/antlr4` repository at github to your own user so that you have repository `username/antlr4`.
-2. Clone `username/antlr4`, forked repository, to your local disk. Your `origin` will be the forked repository and `upstream` will be the original `antlr/antlr4` repository. Changes that you would like to contribute back to the project are done with [pull requests](https://help.github.com/articles/using-pull-requests/).
+2. Clone `username/antlr4`, forked repository, to your local disk.  Your remote `origin` will be the forked repository on GitHub. Add a remote `upstream` to the original `antlr/antlr4` repository (URL `https://github.com/antlr/antlr4.git`). Changes that you would like to contribute back to the project are done with [pull requests](https://help.github.com/articles/using-pull-requests/).
 3. Try to build it before doing anything
 ```bash
 $ mvn compile
