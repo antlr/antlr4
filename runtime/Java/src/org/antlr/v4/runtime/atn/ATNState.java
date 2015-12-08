@@ -187,7 +187,7 @@ public abstract class ATNState {
 			epsilonOnlyTransitions = e.isEpsilon();
 		}
 		else if (epsilonOnlyTransitions != e.isEpsilon()) {
-			System.err.format(Locale.getDefault(), "ATN state %d has both epsilon and non-epsilon transitions.\n", stateNumber);
+			System.err.format(Locale.getDefault(), "ATN state %d has both epsilon and non-epsilon transitions.%n", stateNumber);
 			epsilonOnlyTransitions = false;
 		}
 
