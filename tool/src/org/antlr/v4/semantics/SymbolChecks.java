@@ -40,8 +40,8 @@ import org.antlr.v4.tool.ErrorManager;
 import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LabelElementPair;
-import org.antlr.v4.tool.Rule;
 import org.antlr.v4.tool.LexerGrammar;
+import org.antlr.v4.tool.Rule;
 import org.antlr.v4.tool.ast.GrammarAST;
 
 import java.util.Collection;
@@ -277,12 +277,12 @@ public class SymbolChecks {
 			LexerGrammar lexerGrammar = (LexerGrammar)g;
 			for (String modeName : lexerGrammar.modes.keySet()) {
 				if (!modeName.equals("DEFAULT_MODE") && reservedNames.contains(modeName)) {
-					Rule rule = ((Collection<Rule>)lexerGrammar.modes.get(modeName)).iterator().next();
+					Rule rule = lexerGrammar.modes.get(modeName).iterator().next();
 					g.tool.errMgr.grammarError(ErrorType.MODE_CONFLICTS_WITH_COMMON_CONSTANTS, g.fileName, rule.ast.parent.getToken(), modeName);
 				}
 
 				if (g.getTokenType(modeName) != Token.INVALID_TYPE) {
-					Rule rule = ((Collection<Rule>)lexerGrammar.modes.get(modeName)).iterator().next();
+					Rule rule = lexerGrammar.modes.get(modeName).iterator().next();
 					g.tool.errMgr.grammarError(ErrorType.MODE_CONFLICTS_WITH_TOKEN, g.fileName, rule.ast.parent.getToken(), modeName);
 				}
 			}
