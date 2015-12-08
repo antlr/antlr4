@@ -116,10 +116,25 @@ public class TestSymbolIssues extends BaseTest {
 		"warning(" + ErrorType.TOKEN_NAME_REASSIGNMENT.code + "): E.g4:3:4: token name A is already defined\n"
 	};
 
+	static String[] F = {
+		// INPUT
+		"lexer grammar F;\n" +
+		"A: 'a';\n" +
+		"mode M1;\n" +
+		"A1: 'a';\n" +
+		"mode M2;\n" +
+		"A2: 'a';\n" +
+		"M1: 'b';\n",
+
+		// YIELDS
+		"error(" + ErrorType.MODE_CONFLICTS_WITH_TOKEN.code + "): F.g4:3:0: mode M1 conflicts with token with same name\n"
+	};
+
     @Test public void testA() { super.testErrors(A, false); }
     @Test public void testB() { super.testErrors(B, false); }
 	@Test public void testD() { super.testErrors(D, false); }
 	@Test public void testE() { super.testErrors(E, false); }
+	@Test public void testF() { super.testErrors(F, false); }
 
 	@Test public void testStringLiteralRedefs() throws Exception {
 		String grammar =
@@ -165,6 +180,45 @@ public class TestSymbolIssues extends BaseTest {
 
 			"warning(" + ErrorType.EPSILON_TOKEN.code + "): L.g4:3:0: non-fragment lexer rule WS can match the empty string\n" +
 			"warning(" + ErrorType.EPSILON_TOKEN.code + "): L.g4:5:2: non-fragment lexer rule B can match the empty string\n"
+		};
+
+		testErrors(test, false);
+	}
+
+	@Test public void testTokensModesChannelsDeclarationConflictsWithReserved() throws Exception {
+		String[] test = {
+			"lexer grammar L;\n" +
+			"channels { SKIP, HIDDEN, channel0 }\n" +
+			"A: 'a';\n" +
+			"mode MAX_CHAR_VALUE;\n" +
+			"MIN_CHAR_VALUE: 'a';\n" +
+			"mode DEFAULT_MODE;\n" +
+			"B: 'b';\n" +
+			"mode M;\n" +
+			"C: 'c';",
+
+			"error(" + ErrorType.RESERVED_RULE_NAME.code + "): L.g4:5:0: cannot declare a rule with reserved name MIN_CHAR_VALUE\n" +
+			"error(" + ErrorType.MODE_CONFLICTS_WITH_COMMON_CONSTANTS.code + "): L.g4:4:0: cannot use or declare mode with reserved name MAX_CHAR_VALUE\n" +
+			"error(" + ErrorType.CHANNEL_CONFLICTS_WITH_COMMON_CONSTANTS.code + "): L.g4:2:11: cannot use or declare channel with reserved name SKIP\n" +
+			"error(" + ErrorType.CHANNEL_CONFLICTS_WITH_COMMON_CONSTANTS.code + "): L.g4:2:17: cannot use or declare channel with reserved name HIDDEN\n"
+		};
+
+		testErrors(test, false);
+	}
+
+	@Test public void testTokensModesChannelsUsingConflictsWithReserved() throws Exception {
+		String[] test = {
+			"lexer grammar L;\n" +
+			"A: 'a' -> channel(SKIP);\n" +
+			"B: 'b' -> type(MORE);\n" +
+			"C: 'c' -> mode(SKIP);\n" +
+			"D: 'd' -> channel(HIDDEN);\n" +
+			"E: 'e' -> type(EOF);\n" +
+			"F: 'f' -> pushMode(DEFAULT_MODE);",
+
+			"error(" + ErrorType.CHANNEL_CONFLICTS_WITH_COMMON_CONSTANTS.code + "): L.g4:2:18: cannot use or declare channel with reserved name SKIP\n" +
+			"error(" + ErrorType.TOKEN_CONFLICTS_WITH_COMMON_CONSTANTS.code + "): L.g4:3:15: cannot use or declare token with reserved name MORE\n" +
+			"error(" + ErrorType.MODE_CONFLICTS_WITH_COMMON_CONSTANTS.code + "): L.g4:4:15: cannot use or declare mode with reserved name SKIP\n"
 		};
 
 		testErrors(test, false);
