@@ -445,7 +445,7 @@ public class BufferedTokenStream implements TokenStream {
 				if ( t.getChannel()==channel ) hidden.add(t);
 			}
 		}
-		if ( hidden.size()==0 ) return null;
+		if (hidden.isEmpty()) return null;
 		return hidden;
 	}
 

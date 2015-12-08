@@ -89,7 +89,7 @@ public class ListTokenSource implements TokenSource {
 		else if (eofToken != null) {
 			return eofToken.getCharPositionInLine();
 		}
-		else if (tokens.size() > 0) {
+		else if (!tokens.isEmpty()) {
 			// have to calculate the result from the line/column of the previous
 			// token, along with the text of the token.
 			Token lastToken = tokens.get(tokens.size() - 1);
@@ -117,7 +117,7 @@ public class ListTokenSource implements TokenSource {
 		if (i >= tokens.size()) {
 			if (eofToken == null) {
 				int start = -1;
-				if (tokens.size() > 0) {
+				if (!tokens.isEmpty()) {
 					int previousStop = tokens.get(tokens.size() - 1).getStopIndex();
 					if (previousStop != -1) {
 						start = previousStop + 1;
@@ -151,7 +151,7 @@ public class ListTokenSource implements TokenSource {
 		else if (eofToken != null) {
 			return eofToken.getLine();
 		}
-		else if (tokens.size() > 0) {
+		else if (!tokens.isEmpty()) {
 			// have to calculate the result from the line/column of the previous
 			// token, along with the text of the token.
 			Token lastToken = tokens.get(tokens.size() - 1);
@@ -186,7 +186,7 @@ public class ListTokenSource implements TokenSource {
 		else if (eofToken != null) {
 			return eofToken.getInputStream();
 		}
-		else if (tokens.size() > 0) {
+		else if (!tokens.isEmpty()) {
 			return tokens.get(tokens.size() - 1).getInputStream();
 		}
 

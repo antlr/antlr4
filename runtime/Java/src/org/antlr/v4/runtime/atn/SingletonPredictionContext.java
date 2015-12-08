@@ -87,7 +87,7 @@ public class SingletonPredictionContext extends PredictionContext {
 	@Override
 	public String toString() {
 		String up = parent!=null ? parent.toString() : "";
-		if ( up.length()==0 ) {
+		if (up.isEmpty()) {
 			if ( returnState == EMPTY_RETURN_STATE ) {
 				return "$";
 			}

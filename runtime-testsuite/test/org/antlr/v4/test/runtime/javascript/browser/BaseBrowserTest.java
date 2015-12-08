@@ -132,7 +132,7 @@ public abstract class BaseBrowserTest {
 	public void setUp() throws Exception {
         // new output dir for each test
     	String prop = System.getProperty("antlr-javascript-test-dir");
-    	if(prop!=null && prop.length()>0)
+    	if(prop!=null && !prop.isEmpty())
     		httpdir = prop;
     	else
     		httpdir = new File(System.getProperty("java.io.tmpdir"), getClass().getSimpleName()+"-"+System.currentTimeMillis()).getAbsolutePath();
@@ -302,7 +302,7 @@ public abstract class BaseBrowserTest {
 		assertTrue(success);
 		writeLexerTestFile(lexerName, showDFA);
 		String output = execHtmlPage("Test.html", input);
-		if ( stderrDuringParse!=null && stderrDuringParse.length()>0 ) {
+		if ( stderrDuringParse!=null && !stderrDuringParse.isEmpty()) {
 			System.err.println(stderrDuringParse);
 		}
 		return output;
@@ -462,13 +462,13 @@ public abstract class BaseBrowserTest {
 			driver.findElement(new ById("load")).click();
 			driver.findElement(new ById("submit")).click();
 			String errors = driver.findElement(new ById("errors")).getAttribute("value");
-			if(errors!=null && errors.length()>0) {
+			if(errors!=null && !errors.isEmpty()) {
 				this.stderrDuringParse = errors;
 				System.err.print(errors);
 			}
 			String value = driver.findElement(new ById("output")).getAttribute("value");
 			// mimic stdout which adds a NL
-			if(value.length()>0 && !value.endsWith("\n"))
+			if(!value.isEmpty() && !value.endsWith("\n"))
 				value = value + "\n";
 			return value;
 		}
@@ -489,7 +489,7 @@ public abstract class BaseBrowserTest {
 	private String locateRuntime() {
 		String propName = "antlr-javascript-runtime";
 		String prop = System.getProperty(propName);
-		if(prop==null || prop.length()==0)
+		if(prop==null || prop.isEmpty())
 			prop = "../runtime/JavaScript/src";
 		File file = new File(prop);
 		System.out.println(file.getAbsolutePath());
@@ -913,7 +913,7 @@ public abstract class BaseBrowserTest {
        	boolean doErase = true;
     	String propName = "antlr-javascript-erase-test-dir";
     	String prop = System.getProperty(propName);
-    	if(prop!=null && prop.length()>0)
+    	if(prop!=null && !prop.isEmpty())
     		doErase = Boolean.getBoolean(prop);
         if(doErase) {
 	        File tmpdirF = new File(httpdir);

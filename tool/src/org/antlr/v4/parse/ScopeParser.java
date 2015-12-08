@@ -69,7 +69,7 @@ public class ScopeParser {
 		List<Pair<String, Integer>> decls = splitDecls(s, separator);
 		for (Pair<String, Integer> decl : decls) {
 //            System.out.println("decl="+decl);
-            if ( decl.a.trim().length()>0 ) {
+            if (!decl.a.trim().isEmpty()) {
                 Attribute a = parseAttributeDef(action, decl, g);
                 dict.add(a);
             }
@@ -137,7 +137,7 @@ public class ScopeParser {
             attr.type += decl.a.substring(stop,rightEdgeOfDeclarator+1);
         }
         attr.type = attr.type.trim();
-        if ( attr.type.length()==0 ) {
+        if (attr.type.isEmpty()) {
             attr.type = null;
         }
 
@@ -286,7 +286,7 @@ public class ScopeParser {
 				index++;
 			}
             //System.out.println("arg="+arg);
-            if ( arg.length()>0 ) {
+            if (!arg.isEmpty()) {
                 args.add(new Pair<String, Integer>(arg.trim(), index));
             }
         }

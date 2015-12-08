@@ -101,7 +101,7 @@ public class TokenVocabParser {
 					lineNum++;
 				}
 				else {
-					if ( tokenDef.length()>0 ) { // ignore blank lines
+					if (!tokenDef.isEmpty()) { // ignore blank lines
 						tool.errMgr.toolError(ErrorType.TOKENS_FILE_SYNTAX_ERROR,
 											  vocabName + CodeGenerator.VOCAB_FILE_EXTENSION,
 											  " bad token def: " + tokenDef,
