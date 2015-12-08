@@ -455,6 +455,33 @@ public class TestToolSyntaxErrors extends BaseTest {
 	}
 
 	/**
+	 * This is a regression test for antlr/antlr4#959 "NullPointerException".
+	 * https://github.com/antlr/antlr4/issues/959
+	 */
+	@Test public void testNotAllowedEmptyStrings() {
+		String grammar =
+			"lexer grammar T;\n" +
+			"Error0: '''test''';\n" +
+			"Error1: '' 'test';\n" +
+			"Error2: 'test' '';\n" +
+			"Error3: '';\n" +
+			"NotError: ' ';";
+		String expected =
+			"error(" + ErrorType.EMPTY_STRINGS_NOT_ALLOWED.code + "): T.g4:2:8: string literals cannot be empty\n" +
+			"error(" + ErrorType.EMPTY_STRINGS_NOT_ALLOWED.code + "): T.g4:2:16: string literals cannot be empty\n" +
+			"error(" + ErrorType.EMPTY_STRINGS_NOT_ALLOWED.code + "): T.g4:3:8: string literals cannot be empty\n" +
+			"error(" + ErrorType.EMPTY_STRINGS_NOT_ALLOWED.code + "): T.g4:4:15: string literals cannot be empty\n" +
+			"error(" + ErrorType.EMPTY_STRINGS_NOT_ALLOWED.code + "): T.g4:5:8: string literals cannot be empty\n";
+
+		String[] pair = new String[] {
+				grammar,
+				expected
+		};
+
+		super.testErrors(pair, true);
+	}
+
+	/**
 	 * This test ensures the {@link ErrorType#UNRECOGNIZED_ASSOC_OPTION} warning
 	 * is produced as described in the documentation.
 	 */

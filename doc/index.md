@@ -4,7 +4,7 @@ Please check [Frequently asked questions (FAQ)](faq/index.md) before asking ques
 
 Notes:
 <ul>
-<li>To add to or improve this FAQ, <a href=https://help.github.com/articles/fork-a-repo>fork</a> the <a href=https://github.com/antlr/antlr4>antlr/antlr4 repo</a> then update this `doc/index.md` or file(s) in that directory.  Submit a <a href=https://help.github.com/articles/creating-a-pull-request>pull request</a> to get your changes incorporated into the main repository. Do not mix code and FAQ updates in the sample pull request. <b>You must sign the contributors.txt certificate of origin with your pull request if you've not done so before.</b></li>
+<li>To add to or improve this documentation, <a href=https://help.github.com/articles/fork-a-repo>fork</a> the <a href=https://github.com/antlr/antlr4>antlr/antlr4 repo</a> then update this `doc/index.md` or file(s) in that directory.  Submit a <a href=https://help.github.com/articles/creating-a-pull-request>pull request</a> to get your changes incorporated into the main repository. Do not mix code and documentation updates in the sample pull request. <b>You must sign the contributors.txt certificate of origin with your pull request if you've not done so before.</b></li>
 
 <li>Copyright © 2012, The Pragmatic Bookshelf.  Pragmatic Bookshelf grants a nonexclusive, irrevocable, royalty-free, worldwide license to reproduce, distribute, prepare derivative works, and otherwise use this contribution as part of the ANTLR project and associated documentation.</li>
 

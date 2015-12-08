@@ -80,6 +80,7 @@ YYYY/MM/DD, github id, Full name, email
 2015/09/24, HSorensen, Henrik Sorensen, henrik.b.sorensen@gmail.com
 2015/10/06, brwml, Bryan Wilhelm, bryan.wilhelm@microsoft.com
 2015/10/08, fedotovalex, Alex Fedotov, me@alexfedotov.com
+2015/10/12, KvanTTT, Ivan Kochurkin, ivan.kochurkin@gmail.com
 2015/10/21, martin-probst, Martin Probst, martin-probst@web.de
 2015/10/21, hkff, Walid Benghabrit, walid.benghabrit@mines-nantes.fr
 2015/11/25, abego, Udo Borkowski, ub@abego.org
