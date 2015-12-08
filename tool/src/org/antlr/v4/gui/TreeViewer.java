@@ -393,7 +393,8 @@ public class TreeViewer extends JComponent {
 
 		// make viz
         WindowListener exitListener = new WindowAdapter() {
-            public void windowClosing(WindowEvent e) {
+            @Override
+			public void windowClosing(WindowEvent e) {
                 prefs.putInt(DIALOG_WIDTH_PREFS_KEY, (int) dialog.getSize().getWidth());
                 prefs.putInt(DIALOG_HEIGHT_PREFS_KEY, (int) dialog.getSize().getHeight());
                 prefs.putDouble(DIALOG_X_PREFS_KEY, dialog.getLocationOnScreen().getX());

@@ -220,14 +220,17 @@ public class JavaScriptTarget extends Target {
 
 	}
 
+	@Override
 	public boolean wantsBaseListener() {
 		return false;
 	}
 
+	@Override
 	public boolean wantsBaseVisitor() {
 		return false;
 	}
 
+	@Override
 	public boolean supportsOverloadedMethods() {
 		return false;
 	}
