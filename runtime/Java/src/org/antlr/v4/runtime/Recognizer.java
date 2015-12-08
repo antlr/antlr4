@@ -189,7 +189,7 @@ public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
 	 * @param interpreter The ATN interpreter used by the recognizer for
 	 * prediction.
 	 */
-	public void setInterpreter(ATNInterpreter interpreter) {
+	public final void setInterpreter(ATNInterpreter interpreter) {
 		_interp = interpreter;
 	}
 

@@ -98,7 +98,7 @@ public class ANTLRInputStream implements CharStream {
 		this(new InputStreamReader(input), initialSize, readChunkSize);
 	}
 
-	public void load(Reader r, int size, int readChunkSize)
+	public final void load(Reader r, int size, int readChunkSize)
 		throws IOException
 	{
 		if ( r==null ) {

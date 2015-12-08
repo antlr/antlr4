@@ -643,7 +643,7 @@ public class TreeViewer extends JComponent {
 	}
 
 	@Override
-	public void setFont(Font font) {
+	public final void setFont(Font font) {
 		this.font = font;
 	}
 
@@ -691,7 +691,7 @@ public class TreeViewer extends JComponent {
 		return treeLayout.getTree();
 	}
 
-	public void setTree(Tree root) {
+	public final void setTree(Tree root) {
 		if ( root!=null ) {
 			boolean useIdentity = true; // compare node identity
 			this.treeLayout =
@@ -727,7 +727,7 @@ public class TreeViewer extends JComponent {
 		updatePreferredSize();
 	}
 
-	public void setRuleNames(List<String> ruleNames) {
+	public final void setRuleNames(List<String> ruleNames) {
 		setTreeTextProvider(new DefaultTreeTextProvider(ruleNames));
 	}
 

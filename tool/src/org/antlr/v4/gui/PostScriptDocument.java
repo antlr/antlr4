@@ -96,7 +96,7 @@ public class PostScriptDocument {
 	}
 
 	/** Compute the header separately because we need to wait for the bounding box */
-	protected StringBuilder header() {
+	protected final StringBuilder header() {
 		StringBuilder b = new StringBuilder();
 		b.append("%!PS-Adobe-3.0 EPSF-3.0\n");
 		b.append(boundingBox).append("\n");
@@ -125,7 +125,7 @@ public class PostScriptDocument {
 		return b;
 	}
 
-	public void setFont(String fontName, int fontSize) {
+	public final void setFont(String fontName, int fontSize) {
 		this.fontMetrics = new SystemFontMetrics(fontName);
 		this.fontName = fontMetrics.getFont().getPSName();
 		this.fontSize = fontSize;

@@ -219,7 +219,7 @@ public class Tool {
 		handleArgs();
 	}
 
-	protected void handleArgs() {
+	protected final void handleArgs() {
 		int i=0;
 		while ( args!=null && i<args.length ) {
 			String arg = args[i];

@@ -140,7 +140,7 @@ public class RuleFunction extends OutputModelObject {
 		startState = factory.getGrammar().atn.ruleToStartState[r.index];
 	}
 
-	public void addContextGetters(OutputModelFactory factory, Rule r) {
+	public final void addContextGetters(OutputModelFactory factory, Rule r) {
 		// Add ctx labels for elements in alts with no -> label
 		List<AltAST> altsNoLabels = r.getUnlabeledAltASTs();
 		if ( altsNoLabels!=null ) {

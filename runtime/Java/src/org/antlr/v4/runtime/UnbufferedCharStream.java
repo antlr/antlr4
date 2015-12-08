@@ -167,7 +167,7 @@ public class UnbufferedCharStream implements CharStream {
 	 * actually added to the buffer. If the return value is less than {@code n},
 	 * then EOF was reached before {@code n} characters could be added.
 	 */
-	protected int fill(int n) {
+	protected final int fill(int n) {
 		for (int i=0; i<n; i++) {
 			if (this.n > 0 && data[this.n - 1] == (char)IntStream.EOF) {
 				return i;

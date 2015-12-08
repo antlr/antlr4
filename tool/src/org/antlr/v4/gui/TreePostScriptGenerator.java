@@ -169,7 +169,7 @@ public class TreePostScriptGenerator {
 		return treeTextProvider;
 	}
 
-	public void setTreeTextProvider(TreeTextProvider treeTextProvider) {
+	public final void setTreeTextProvider(TreeTextProvider treeTextProvider) {
 		this.treeTextProvider = treeTextProvider;
 	}
 

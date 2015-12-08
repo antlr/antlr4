@@ -49,7 +49,7 @@ public class ANTLRFileStream extends ANTLRInputStream {
 		load(fileName, encoding);
 	}
 
-	public void load(String fileName, String encoding)
+	public final void load(String fileName, String encoding)
 		throws IOException
 	{
 		data = Utils.readFile(fileName, encoding);

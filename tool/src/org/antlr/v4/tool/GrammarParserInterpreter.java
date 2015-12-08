@@ -120,7 +120,7 @@ public class GrammarParserInterpreter extends ParserInterpreter {
 	 *  like a regular rule's outer block, and the star loop block (always
 	 *  there even if 1 alt).
 	 */
-	public BitSet findOuterMostDecisionStates() {
+	public final BitSet findOuterMostDecisionStates() {
 		BitSet track = new BitSet(atn.states.size());
 		int numberOfDecisions = atn.getNumberOfDecisions();
 		for (int i = 0; i < numberOfDecisions; i++) {

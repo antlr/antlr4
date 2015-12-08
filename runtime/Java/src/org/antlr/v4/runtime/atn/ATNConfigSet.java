@@ -245,7 +245,7 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	}
 
 	@Override
-	public boolean addAll(Collection<? extends ATNConfig> coll) {
+	public final boolean addAll(Collection<? extends ATNConfig> coll) {
 		for (ATNConfig c : coll) add(c);
 		return false;
 	}

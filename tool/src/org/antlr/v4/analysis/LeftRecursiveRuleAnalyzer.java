@@ -101,7 +101,7 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 		loadPrecRuleTemplates();
 	}
 
-	public void loadPrecRuleTemplates() {
+	public final void loadPrecRuleTemplates() {
 		String templateGroupFile = "org/antlr/v4/tool/templates/LeftRecursiveRules.stg";
 		recRuleTemplates = new STGroupFile(templateGroupFile);
 		if ( !recRuleTemplates.isDefined("recRule") ) {
