@@ -1,34 +1,3 @@
-/*
- * [The "BSD license"]
- *  Copyright (c) 2012 Terence Parr
- *  Copyright (c) 2012 Sam Harwell
- *  Copyright (c) 2014 Eric Vergnaud
- *  All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions
- *  are met:
- *
- *  1. Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *  2. Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *  3. The name of the author may not be used to endorse or promote products
- *     derived from this software without specific prior written permission.
- *
- *  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- *  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- *  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- *  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
-
 /** ANTLR tool checks output templates are compatible with tool code generation.
  *  For now, a simple string match used on x.y of x.y.z scheme.
  *  Must match Tool.VERSION during load to templates.
@@ -44,14 +13,23 @@ pythonTypeInitMap ::= [
 	default:"None" // anything other than a primitive type is an object
 ]
 
+
+
+
 // args must be <object-model-object>, <fields-resulting-in-STs>
 
+
+
+
 ParserFile(file, parser, namedActions) ::= <<
+
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
-var antlr4 = require('antlr4/index');
+import ("antlr")
+
 <if(file.genListener)>
 var <file.grammarName>Listener = require('./<file.grammarName>Listener').<file.grammarName>Listener;
 <endif>
+
 <if(file.genVisitor)>
 var <file.grammarName>Visitor = require('./<file.grammarName>Visitor').<file.grammarName>Visitor;
 <endif>
@@ -60,64 +38,71 @@ var <file.grammarName>Visitor = require('./<file.grammarName>Visitor').<file.gra
 <parser>
 >>
 
+
+
 ListenerFile(file, header) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
-var antlr4 = require('antlr4/index');
+package <file.grammarName>
+
+import(
+  "antlr4"
+)
 
 // This class defines a complete listener for a parse tree produced by <file.parserName>.
-function <file.grammarName>Listener() {
-	antlr4.tree.ParseTreeListener.call(this);
-	return this;
-}
 
-<file.grammarName>Listener.prototype = Object.create(antlr4.tree.ParseTreeListener.prototype);
-<file.grammarName>Listener.prototype.constructor = <file.grammarName>Listener;
+type <file.grammarName>Listener struct {
+	ParseTreeListener
+}
 
 <file.listenerNames:{lname |
 // Enter a parse tree produced by <file.parserName>#<lname>.
-<file.grammarName>Listener.prototype.enter<lname; format="cap"> = function(ctx) {
-\};
+func (l <file.grammarName>Listener) enter<lname; format="cap">(ctx) {
+\}
 
 // Exit a parse tree produced by <file.parserName>#<lname>.
-<file.grammarName>Listener.prototype.exit<lname; format="cap"> = function(ctx) {
-\};
+func (l <file.grammarName>Listener) exit<lname; format="cap">(ctx) {
+\}
 
 }; separator="\n">
 
-exports.<file.grammarName>Listener = <file.grammarName>Listener;
 >>
+
+
+
 
 
 VisitorFile(file, header) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
-var antlr4 = require('antlr4/index');
+import("antlr4")
+
 <header>
 
 // This class defines a complete generic visitor for a parse tree produced by <file.parserName>.
 
-function <file.grammarName>Visitor() {
-	antlr4.tree.ParseTreeVisitor.call(this);
-	return this;
+type <file.grammarName>Visitor struct {
+	ParseTreeVisitor
 }
-
-<file.grammarName>Visitor.prototype = Object.create(antlr4.tree.ParseTreeVisitor.prototype);
-<file.grammarName>Visitor.prototype.constructor = <file.grammarName>Visitor;
 
 <file.visitorNames:{lname |
 // Visit a parse tree produced by <file.parserName>#<lname>.
-<file.grammarName>Visitor.prototype.visit<lname; format="cap"> = function(ctx) {
-\};
+func (l <file.grammarName>Visitor) visit<lname; format="cap">(ctx) {
+\}
 
 }; separator="\n">
 
-exports.<file.grammarName>Visitor = <file.grammarName>Visitor;
 >>
+
 
 
 fileHeader(grammarFileName, ANTLRVersion) ::= <<
 // Generated from <grammarFileName; format="java-escape"> by ANTLR <ANTLRVersion>
-// jshint ignore: start
 >>
+
+
+
+
+
+
 
 Parser(parser, funcs, atn, sempredFuncs, superClass) ::= <<
 <if(superClass)>
@@ -247,6 +232,10 @@ RuleSempredFunction(r, actions) ::= <<
 
 >>
 
+
+
+
+
 RuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,namedActions,finallyAction,postamble,exceptions) ::= <<
 
 <ruleCtx>
@@ -326,17 +315,26 @@ LeftRecursiveRuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,
 
 >>
 
+
+
+
 CodeBlockForOuterMostAlt(currentOuterMostAltCodeBlock, locals, preamble, ops) ::= <<
 <if(currentOuterMostAltCodeBlock.altLabel)>localctx = new <currentOuterMostAltCodeBlock.altLabel; format="cap">Context(this, localctx);<endif>
 this.enterOuterAlt(localctx, <currentOuterMostAltCodeBlock.alt.altNum>);
 <CodeBlockForAlt(currentAltCodeBlock=currentOuterMostAltCodeBlock, ...)>
 >>
 
+
+
+
 CodeBlockForAlt(currentAltCodeBlock, locals, preamble, ops) ::= <<
 <locals; separator="\n">
 <preamble; separator="\n">
 <ops; separator="\n">
 >>
+
+
+
 
 LL1AltBlock(choice, preamble, alts, error) ::= <<
 this.state = <choice.stateNumber>;
@@ -351,6 +349,9 @@ default:
 }
 >>
 
+
+
+
 LL1OptionalBlock(choice, alts, error) ::= <<
 this.state = <choice.stateNumber>;
 switch (this._input.LA(1)) {
@@ -361,6 +362,9 @@ default:
 	<error>
 }
 >>
+
+
+
 
 LL1OptionalBlockSingleAlt(choice, expr, alts, preamble, error, followExpr) ::= <<
 this.state = <choice.stateNumber>;
@@ -732,6 +736,8 @@ ListenerDispatchMethod(method) ::= <<
 
 >>
 
+
+
 VisitorDispatchMethod(method) ::= <<
 <struct.name>.prototype.accept = function(visitor) {
     if ( visitor instanceof <parser.grammarName>Visitor ) {
@@ -742,6 +748,9 @@ VisitorDispatchMethod(method) ::= <<
 };
 
 >>
+
+
+
 
 AttributeDecl(d) ::= "this.<d.name> = <if(d.initValue)><d.initValue><else>null<endif>"
 
@@ -798,15 +807,18 @@ var antlr4 = require('antlr4/index');
 
 >>
 
+
+
+
 Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass) ::= <<
 
 <atn>
 
-var atn = new antlr4.atn.ATNDeserializer().deserialize(serializedATN);
+// TODO var atn = new antlr4.atn.ATNDeserializer().deserialize(serializedATN);
 
-var decisionsToDFA = atn.decisionToState.map( function(ds, index) { return new antlr4.dfa.DFA(ds, index); });
+// TODO var decisionsToDFA = atn.decisionToState.map( function(ds, index) { return new antlr4.dfa.DFA(ds, index); });
 
-function <lexer.name>(input) {
+// TODO function <lexer.name>(input) {
 	<if(superClass)><superClass><else>antlr4.Lexer<endif>.call(this, input);
     this._interp = new antlr4.atn.LexerATNSimulator(this, atn, decisionsToDFA, new antlr4.PredictionContextCache());
     return this;
@@ -852,4 +864,4 @@ initValue(typeName) ::= <<
 <javaTypeInitMap.(typeName)>
 >>
 
-codeFileExtension() ::= ".js"
+codeFileExtension() ::= ".go"
