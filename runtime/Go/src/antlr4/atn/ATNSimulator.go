@@ -1,10 +1,10 @@
-package antlr
+package atn
 
-var DFAState = require('./../dfa/DFAState').DFAState;
-var ATNConfigSet = require('./ATNConfigSet').ATNConfigSet;
-var getCachedPredictionContext = require('./../PredictionContext').getCachedPredictionContext;
+var DFAState = require('./../dfa/DFAState').DFAState
+var ATNConfigSet = require('./ATNConfigSet').ATNConfigSet
+var getCachedPredictionContext = require('./../PredictionContext').getCachedPredictionContext
 
-function ATNSimulator(atn, sharedContextCache) {
+func ATNSimulator(atn, sharedContextCache) {
 	
     // The context cache maps all PredictionContext objects that are ==
     //  to a single cached copy. This cache is shared across all contexts
@@ -26,21 +26,21 @@ function ATNSimulator(atn, sharedContextCache) {
     //  more time I think and doesn't save on the overall footprint
     //  so it's not worth the complexity.</p>
     ///
-    this.atn = atn;
-    this.sharedContextCache = sharedContextCache;
-    return this;
+    this.atn = atn
+    this.sharedContextCache = sharedContextCache
+    return this
 }
 
 // Must distinguish between missing edge and edge we know leads nowhere///
-ATNSimulator.ERROR = new DFAState(0x7FFFFFFF, new ATNConfigSet());
+ATNSimulator.ERROR = new DFAState(0x7FFFFFFF, new ATNConfigSet())
 
 
 func (this *ATNSimulator) getCachedContext(context) {
     if (this.sharedContextCache ==null) {
-        return context;
+        return context
     }
     var visited = {}
-    return getCachedPredictionContext(context, this.sharedContextCache, visited);
+    return getCachedPredictionContext(context, this.sharedContextCache, visited)
 }
 
 

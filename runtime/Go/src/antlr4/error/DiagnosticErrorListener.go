@@ -1,4 +1,4 @@
-package antlr
+package error
 
 //
 // This implementation of {@link ANTLRErrorListener} can be used to identify
@@ -19,33 +19,33 @@ package antlr
 // this situation occurs.</li>
 // </ul>
 
-var BitSet = require('./../Utils').BitSet;
-var ErrorListener = require('./ErrorListener').ErrorListener;
-var Interval = require('./../IntervalSet').Interval;
+var BitSet = require('./../Utils').BitSet
+var ErrorListener = require('./ErrorListener').ErrorListener
+var Interval = require('./../IntervalSet').Interval
 
-function DiagnosticErrorListener(exactOnly) {
-	ErrorListener.call(this);
-	exactOnly = exactOnly || true;
+func DiagnosticErrorListener(exactOnly) {
+	ErrorListener.call(this)
+	exactOnly = exactOnly || true
 	// whether all ambiguities or only exact ambiguities are reported.
-	this.exactOnly = exactOnly;
-	return this;
+	this.exactOnly = exactOnly
+	return this
 }
 
-DiagnosticErrorListener.prototype = Object.create(ErrorListener.prototype);
-DiagnosticErrorListener.prototype.constructor = DiagnosticErrorListener;
+DiagnosticErrorListener.prototype = Object.create(ErrorListener.prototype)
+DiagnosticErrorListener.prototype.constructor = DiagnosticErrorListener
 
 func (this *DiagnosticErrorListener) reportAmbiguity(recognizer, dfa,
 		startIndex, stopIndex, exact, ambigAlts, configs) {
 	if (this.exactOnly && !exact) {
-		return;
+		return
 	}
 	var msg = "reportAmbiguity d=" +
 			this.getDecisionDescription(recognizer, dfa) +
 			": ambigAlts=" +
 			this.getConflictingAlts(ambigAlts, configs) +
 			", input='" +
-			recognizer.getTokenStream().getText(new Interval(startIndex, stopIndex)) + "'";
-	recognizer.notifyErrorListeners(msg);
+			recognizer.getTokenStream().getText(new Interval(startIndex, stopIndex)) + "'"
+	recognizer.notifyErrorListeners(msg)
 }
 
 func (this *DiagnosticErrorListener) reportAttemptingFullContext(
@@ -53,8 +53,8 @@ func (this *DiagnosticErrorListener) reportAttemptingFullContext(
 	var msg = "reportAttemptingFullContext d=" +
 			this.getDecisionDescription(recognizer, dfa) +
 			", input='" +
-			recognizer.getTokenStream().getText(new Interval(startIndex, stopIndex)) + "'";
-	recognizer.notifyErrorListeners(msg);
+			recognizer.getTokenStream().getText(new Interval(startIndex, stopIndex)) + "'"
+	recognizer.notifyErrorListeners(msg)
 }
 
 func (this *DiagnosticErrorListener) reportContextSensitivity(
@@ -62,23 +62,23 @@ func (this *DiagnosticErrorListener) reportContextSensitivity(
 	var msg = "reportContextSensitivity d=" +
 			this.getDecisionDescription(recognizer, dfa) +
 			", input='" +
-			recognizer.getTokenStream().getText(new Interval(startIndex, stopIndex)) + "'";
-	recognizer.notifyErrorListeners(msg);
+			recognizer.getTokenStream().getText(new Interval(startIndex, stopIndex)) + "'"
+	recognizer.notifyErrorListeners(msg)
 }
 
 func (this *DiagnosticErrorListener) getDecisionDescription(recognizer, dfa) {
-	var decision = dfa.decision;
-	var ruleIndex = dfa.atnStartState.ruleIndex;
+	var decision = dfa.decision
+	var ruleIndex = dfa.atnStartState.ruleIndex
 
-	var ruleNames = recognizer.ruleNames;
+	var ruleNames = recognizer.ruleNames
 	if (ruleIndex < 0 || ruleIndex >= ruleNames.length) {
-		return "" + decision;
+		return "" + decision
 	}
-	var ruleName = ruleNames[ruleIndex] || null;
+	var ruleName = ruleNames[ruleIndex] || null
 	if (ruleName == null || ruleName.length == 0) {
-		return "" + decision;
+		return "" + decision
 	}
-	return "" + decision + " (" + ruleName + ")";
+	return "" + decision + " (" + ruleName + ")"
 }
 
 //
@@ -94,12 +94,12 @@ func (this *DiagnosticErrorListener) getDecisionDescription(recognizer, dfa) {
 //
 func (this *DiagnosticErrorListener) getConflictingAlts(reportedAlts, configs) {
 	if (reportedAlts !== null) {
-		return reportedAlts;
+		return reportedAlts
 	}
-	var result = new BitSet();
-	for (var i = 0; i < configs.items.length; i++) {
-		result.add(configs.items[i].alt);
+	var result = new BitSet()
+	for (var i = 0 i < configs.items.length i++) {
+		result.add(configs.items[i].alt)
 	}
-	return "{" + result.values().join(", ") + "}";
+	return "{" + result.values().join(", ") + "}"
 }
 

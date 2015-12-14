@@ -1,36 +1,36 @@
-package antlr
+package dfa
 
-var DFAState = require('./DFAState').DFAState;
-var ATNConfigSet = require('./../atn/ATNConfigSet').ATNConfigSet;
-var DFASerializer = require('./DFASerializer').DFASerializer;
-var LexerDFASerializer = require('./DFASerializer').LexerDFASerializer;
+var DFAState = require('./DFAState').DFAState
+var ATNConfigSet = require('./../atn/ATNConfigSet').ATNConfigSet
+var DFASerializer = require('./DFASerializer').DFASerializer
+var LexerDFASerializer = require('./DFASerializer').LexerDFASerializer
 
 type DFAStatesSet struct {
-	return this;
+	return this
 }
 
 Object.defineProperty(DFAStatesSet.prototype, "length", {
 	get : function() {
-		return Object.keys(this).length;
+		return Object.keys(this).length
 	}
-});
+})
 
-function DFA(atnStartState, decision) {
+func DFA(atnStartState, decision) {
 	if (decision == undefined) {
-		decision = 0;
+		decision = 0
 	}
 	// From which ATN state did we create this DFA?
-	this.atnStartState = atnStartState;
-	this.decision = decision;
+	this.atnStartState = atnStartState
+	this.decision = decision
 	// A set of all DFA states. Use {@link Map} so we can get old state back
 	// ({@link Set} only allows you to see if it's there).
-	this._states = new DFAStatesSet();
-	this.s0 = null;
-	// {@code true} if this DFA is for a precedence decision; otherwise,
+	this._states = new DFAStatesSet()
+	this.s0 = null
+	// {@code true} if this DFA is for a precedence decision otherwise,
 	// {@code false}. This is the backing field for {@link //isPrecedenceDfa},
 	// {@link //setPrecedenceDfa}.
-	this.precedenceDfa = false;
-	return this;
+	this.precedenceDfa = false
+	return this
 }
 
 // Get the start state for a specific precedence value.
@@ -44,13 +44,13 @@ function DFA(atnStartState, decision) {
 
 func (this *DFA) getPrecedenceStartState(precedence) {
 	if (!(this.precedenceDfa)) {
-		throw ("Only precedence DFAs may contain a precedence start state.");
+		throw ("Only precedence DFAs may contain a precedence start state.")
 	}
 	// s0.edges is never null for a precedence DFA
 	if (precedence < 0 || precedence >= this.s0.edges.length) {
-		return null;
+		return null
 	}
-	return this.s0.edges[precedence] || null;
+	return this.s0.edges[precedence] || null
 }
 
 // Set the start state for a specific precedence value.
@@ -64,21 +64,21 @@ func (this *DFA) getPrecedenceStartState(precedence) {
 //
 func (this *DFA) setPrecedenceStartState(precedence, startState) {
 	if (!(this.precedenceDfa)) {
-		throw ("Only precedence DFAs may contain a precedence start state.");
+		throw ("Only precedence DFAs may contain a precedence start state.")
 	}
 	if (precedence < 0) {
-		return;
+		return
 	}
 
 	// synchronization on s0 here is ok. when the DFA is turned into a
 	// precedence DFA, s0 will be initialized once and not updated again
 	// s0.edges is never null for a precedence DFA
-	this.s0.edges[precedence] = startState;
+	this.s0.edges[precedence] = startState
 }
 
 //
 // Sets whether this is a precedence DFA. If the specified value differs
-// from the current DFA configuration, the following actions are taken;
+// from the current DFA configuration, the following actions are taken
 // otherwise no changes are made to the current DFA.
 //
 // <ul>
@@ -90,60 +90,60 @@ func (this *DFA) setPrecedenceStartState(precedence, startState) {
 // <li>The {@link //precedenceDfa} field is updated</li>
 // </ul>
 //
-// @param precedenceDfa {@code true} if this is a precedence DFA; otherwise,
+// @param precedenceDfa {@code true} if this is a precedence DFA otherwise,
 // {@code false}
 
 func (this *DFA) setPrecedenceDfa(precedenceDfa) {
 	if (this.precedenceDfa!==precedenceDfa) {
-		this._states = new DFAStatesSet();
+		this._states = new DFAStatesSet()
 		if (precedenceDfa) {
-			var precedenceState = new DFAState(new ATNConfigSet());
-			precedenceState.edges = [];
-			precedenceState.isAcceptState = false;
-			precedenceState.requiresFullContext = false;
-			this.s0 = precedenceState;
+			var precedenceState = new DFAState(new ATNConfigSet())
+			precedenceState.edges = []
+			precedenceState.isAcceptState = false
+			precedenceState.requiresFullContext = false
+			this.s0 = precedenceState
 		} else {
-			this.s0 = null;
+			this.s0 = null
 		}
-		this.precedenceDfa = precedenceDfa;
+		this.precedenceDfa = precedenceDfa
 	}
 }
 
 Object.defineProperty(DFA.prototype, "states", {
 	get : function() {
-		return this._states;
+		return this._states
 	}
-});
+})
 
 // Return a list of all states in this DFA, ordered by state number.
 func (this *DFA) sortedStates() {
 	// states_ is a map of state/state, where key=value
-	var keys = Object.keys(this._states);
-	var list = [];
-	for(var i=0;i<keys.length;i++) {
-		list.push(this._states[keys[i]]);
+	var keys = Object.keys(this._states)
+	var list = []
+	for(var i=0i<keys.lengthi++) {
+		list.push(this._states[keys[i]])
 	}
 	return list.sort(function(a, b) {
-		return a.stateNumber - b.stateNumber;
-	});
+		return a.stateNumber - b.stateNumber
+	})
 }
 
 func (this *DFA) toString(literalNames, symbolicNames) {
-	literalNames = literalNames || null;
-	symbolicNames = symbolicNames || null;
+	literalNames = literalNames || null
+	symbolicNames = symbolicNames || null
 	if (this.s0 == null) {
-		return "";
+		return ""
 	}
-	var serializer = new DFASerializer(this, literalNames, symbolicNames);
-	return serializer.toString();
+	var serializer = new DFASerializer(this, literalNames, symbolicNames)
+	return serializer.toString()
 }
 
 func (this *DFA) toLexerString() {
 	if (this.s0 == null) {
-		return "";
+		return ""
 	}
-	var serializer = new LexerDFASerializer(this);
-	return serializer.toString();
+	var serializer = new LexerDFASerializer(this)
+	return serializer.toString()
 }
 
 

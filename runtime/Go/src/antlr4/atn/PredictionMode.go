@@ -1,18 +1,18 @@
-package antlr
+package atn
 
 //
 // This enumeration defines the prediction modes available in ANTLR 4 along with
 // utility methods for analyzing configuration sets for conflicts and/or
 // ambiguities.
 
-var Set = require('./../Utils').Set;
-var BitSet = require('./../Utils').BitSet;
-var AltDict = require('./../Utils').AltDict;
-var ATN = require('./ATN').ATN;
-var RuleStopState = require('./ATNState').RuleStopState;
+var Set = require('./../Utils').Set
+var BitSet = require('./../Utils').BitSet
+var AltDict = require('./../Utils').AltDict
+var ATN = require('./ATN').ATN
+var RuleStopState = require('./ATNState').RuleStopState
 
 type PredictionMode struct {
-	return this;
+	return this
 }
 
 //
@@ -36,7 +36,7 @@ type PredictionMode struct {
 // This prediction mode does not provide any guarantees for prediction
 // behavior for syntactically-incorrect inputs.</p>
 //
-PredictionMode.SLL = 0;
+PredictionMode.SLL = 0
 //
 // The LL(*) prediction mode. This prediction mode allows the current parser
 // context to be used for resolving SLL conflicts that occur during
@@ -55,7 +55,7 @@ PredictionMode.SLL = 0;
 // This prediction mode does not provide any guarantees for prediction
 // behavior for syntactically-incorrect inputs.</p>
 //
-PredictionMode.LL = 1;
+PredictionMode.LL = 1
 //
 // The LL(*) prediction mode with exact ambiguity detection. In addition to
 // the correctness guarantees provided by the {@link //LL} prediction mode,
@@ -73,7 +73,7 @@ PredictionMode.LL = 1;
 // This prediction mode does not provide any guarantees for prediction
 // behavior for syntactically-incorrect inputs.</p>
 //
-PredictionMode.LL_EXACT_AMBIG_DETECTION = 2;
+PredictionMode.LL_EXACT_AMBIG_DETECTION = 2
 
 
 //
@@ -114,9 +114,9 @@ PredictionMode.LL_EXACT_AMBIG_DETECTION = 2;
 // The single-alt-state thing lets prediction continue upon rules like
 // (otherwise, it would admit defeat too soon):</p>
 //
-// <p>{@code [12|1|[], 6|2|[], 12|2|[]]. s : (ID | ID ID?) ';' ;}</p>
+// <p>{@code [12|1|[], 6|2|[], 12|2|[]]. s : (ID | ID ID?) '' }</p>
 //
-// <p>When the ATN simulation reaches the state before {@code ';'}, it has a
+// <p>When the ATN simulation reaches the state before {@code ''}, it has a
 // DFA state that looks like: {@code [12|1|[], 6|2|[], 12|2|[]]}. Naturally
 // {@code 12|1|[]} and {@code 12|2|[]} conflict, but we cannot stop
 // processing this node because alternative to has another way to continue,
@@ -124,7 +124,7 @@ PredictionMode.LL_EXACT_AMBIG_DETECTION = 2;
 //
 // <p>It also let's us continue for this rule:</p>
 //
-// <p>{@code [1|1|[], 1|2|[], 8|3|[]] a : A | A | A B ;}</p>
+// <p>{@code [1|1|[], 1|2|[], 8|3|[]] a : A | A | A B }</p>
 //
 // <p>After matching input A, we reach the stop state for rule A, state 1.
 // State 8 is the state right before B. Clearly alternatives 1 and 2
@@ -175,28 +175,28 @@ PredictionMode.hasSLLConflictTerminatingPrediction = function( mode, configs) {
     // to match additional input so we terminate prediction.
     //
     if (PredictionMode.allConfigsInRuleStopStates(configs)) {
-        return true;
+        return true
     }
     // pure SLL mode parsing
     if (mode == PredictionMode.SLL) {
         // Don't bother with combining configs from different semantic
-        // contexts if we can fail over to full LL; costs more time
+        // contexts if we can fail over to full LL costs more time
         // since we'll often fail over anyway.
         if (configs.hasSemanticContext) {
             // dup configs, tossing out semantic predicates
-            var dup = new ATNConfigSet();
-            for(var i=0;i<configs.items.length;i++) {
-            	var c = configs.items[i];
-                c = new ATNConfig({semanticContext:SemanticContext.NONE}, c);
-                dup.add(c);
+            var dup = new ATNConfigSet()
+            for(var i=0i<configs.items.lengthi++) {
+            	var c = configs.items[i]
+                c = new ATNConfig({semanticContext:SemanticContext.NONE}, c)
+                dup.add(c)
             }
-            configs = dup;
+            configs = dup
         }
         // now we have combined contexts for configs with dissimilar preds
     }
     // pure SLL or combined SLL+LL mode parsing
-    var altsets = PredictionMode.getConflictingAltSubsets(configs);
-    return PredictionMode.hasConflictingAltSet(altsets) && !PredictionMode.hasStateAssociatedWithOneAlt(configs);
+    var altsets = PredictionMode.getConflictingAltSubsets(configs)
+    return PredictionMode.hasConflictingAltSet(altsets) && !PredictionMode.hasStateAssociatedWithOneAlt(configs)
 }
 
 // Checks if any configuration in {@code configs} is in a
@@ -208,13 +208,13 @@ PredictionMode.hasSLLConflictTerminatingPrediction = function( mode, configs) {
 // @return {@code true} if any configuration in {@code configs} is in a
 // {@link RuleStopState}, otherwise {@code false}
 PredictionMode.hasConfigInRuleStopState = function(configs) {
-	for(var i=0;i<configs.items.length;i++) {
-		var c = configs.items[i];
+	for(var i=0i<configs.items.lengthi++) {
+		var c = configs.items[i]
         if (c.state instanceof RuleStopState) {
-            return true;
+            return true
         }
 	}
-    return false;
+    return false
 }
 
 // Checks if all configurations in {@code configs} are in a
@@ -226,13 +226,13 @@ PredictionMode.hasConfigInRuleStopState = function(configs) {
 // @return {@code true} if all configurations in {@code configs} are in a
 // {@link RuleStopState}, otherwise {@code false}
 PredictionMode.allConfigsInRuleStopStates = function(configs) {
-	for(var i=0;i<configs.items.length;i++) {
-		var c = configs.items[i];
+	for(var i=0i<configs.items.lengthi++) {
+		var c = configs.items[i]
         if (!(c.state instanceof RuleStopState)) {
-            return false;
+            return false
         }
 	}
-    return true;
+    return true
 }
 
 //
@@ -283,7 +283,7 @@ PredictionMode.allConfigsInRuleStopStates = function(configs) {
 // <p>The biggest sin is to terminate early because it means we've made a
 // decision but were uncertain as to the eventual outcome. We haven't used
 // enough lookahead. On the other hand, announcing a conflict too late is no
-// big deal; you will still have the conflict. It's just inefficient. It
+// big deal you will still have the conflict. It's just inefficient. It
 // might even look until the end of file.</p>
 //
 // <p>No special consideration for semantic predicates is required because
@@ -331,31 +331,31 @@ PredictionMode.allConfigsInRuleStopStates = function(configs) {
 //
 // <ul>
 //
-// <li>no conflicts and more than 1 alternative in set =&gt; continue</li>
+// <li>no conflicts and more than 1 alternative in set =&gt continue</li>
 //
 // <li> {@code (s, 1, x)}, {@code (s, 2, x)}, {@code (s, 3, z)},
 // {@code (s', 1, y)}, {@code (s', 2, y)} yields non-conflicting set
 // {@code {3}} U conflicting sets {@code min({1,2})} U {@code min({1,2})} =
-// {@code {1,3}} =&gt; continue
+// {@code {1,3}} =&gt continue
 // </li>
 //
 // <li>{@code (s, 1, x)}, {@code (s, 2, x)}, {@code (s', 1, y)},
 // {@code (s', 2, y)}, {@code (s'', 1, z)} yields non-conflicting set
 // {@code {1}} U conflicting sets {@code min({1,2})} U {@code min({1,2})} =
-// {@code {1}} =&gt; stop and predict 1</li>
+// {@code {1}} =&gt stop and predict 1</li>
 //
 // <li>{@code (s, 1, x)}, {@code (s, 2, x)}, {@code (s', 1, y)},
 // {@code (s', 2, y)} yields conflicting, reduced sets {@code {1}} U
-// {@code {1}} = {@code {1}} =&gt; stop and predict 1, can announce
+// {@code {1}} = {@code {1}} =&gt stop and predict 1, can announce
 // ambiguity {@code {1,2}}</li>
 //
 // <li>{@code (s, 1, x)}, {@code (s, 2, x)}, {@code (s', 2, y)},
 // {@code (s', 3, y)} yields conflicting, reduced sets {@code {1}} U
-// {@code {2}} = {@code {1,2}} =&gt; continue</li>
+// {@code {2}} = {@code {1,2}} =&gt continue</li>
 //
 // <li>{@code (s, 1, x)}, {@code (s, 2, x)}, {@code (s', 3, y)},
 // {@code (s', 4, y)} yields conflicting, reduced sets {@code {1}} U
-// {@code {3}} = {@code {1,3}} =&gt; continue</li>
+// {@code {3}} = {@code {1,3}} =&gt continue</li>
 //
 // </ul>
 //
@@ -364,7 +364,7 @@ PredictionMode.allConfigsInRuleStopStates = function(configs) {
 // <p>If all states report the same conflicting set of alternatives, then we
 // know we have the exact ambiguity set.</p>
 //
-// <p><code>|A_<em>i</em>|&gt;1</code> and
+// <p><code>|A_<em>i</em>|&gt1</code> and
 // <code>A_<em>i</em> = A_<em>j</em></code> for all <em>i</em>, <em>j</em>.</p>
 //
 // <p>In other words, we continue examining lookahead until all {@code A_i}
@@ -377,7 +377,7 @@ PredictionMode.allConfigsInRuleStopStates = function(configs) {
 // {@code A={{1,2}}} or {@code {{1,2},{1,2}}}, etc...</p>
 //
 PredictionMode.resolvesToJustOneViableAlt = function(altsets) {
-    return PredictionMode.getSingleViableAlt(altsets);
+    return PredictionMode.getSingleViableAlt(altsets)
 }
 
 //
@@ -386,10 +386,10 @@ PredictionMode.resolvesToJustOneViableAlt = function(altsets) {
 //
 // @param altsets a collection of alternative subsets
 // @return {@code true} if every {@link BitSet} in {@code altsets} has
-// {@link BitSet//cardinality cardinality} &gt; 1, otherwise {@code false}
+// {@link BitSet//cardinality cardinality} &gt 1, otherwise {@code false}
 //
 PredictionMode.allSubsetsConflict = function(altsets) {
-    return ! PredictionMode.hasNonConflictingAltSet(altsets);
+    return ! PredictionMode.hasNonConflictingAltSet(altsets)
 }
 //
 // Determines if any single alternative subset in {@code altsets} contains
@@ -400,13 +400,13 @@ PredictionMode.allSubsetsConflict = function(altsets) {
 // {@link BitSet//cardinality cardinality} 1, otherwise {@code false}
 //
 PredictionMode.hasNonConflictingAltSet = function(altsets) {
-	for(var i=0;i<altsets.length;i++) {
-		var alts = altsets[i];
+	for(var i=0i<altsets.lengthi++) {
+		var alts = altsets[i]
         if (alts.length==1) {
-            return true;
+            return true
         }
 	}
-    return false;
+    return false
 }
 
 //
@@ -415,16 +415,16 @@ PredictionMode.hasNonConflictingAltSet = function(altsets) {
 //
 // @param altsets a collection of alternative subsets
 // @return {@code true} if {@code altsets} contains a {@link BitSet} with
-// {@link BitSet//cardinality cardinality} &gt; 1, otherwise {@code false}
+// {@link BitSet//cardinality cardinality} &gt 1, otherwise {@code false}
 //
 PredictionMode.hasConflictingAltSet = function(altsets) {
-	for(var i=0;i<altsets.length;i++) {
-		var alts = altsets[i];
+	for(var i=0i<altsets.lengthi++) {
+		var alts = altsets[i]
         if (alts.length>1) {
-            return true;
+            return true
         }
 	}
-    return false;
+    return false
 }
 
 //
@@ -435,16 +435,16 @@ PredictionMode.hasConflictingAltSet = function(altsets) {
 // others, otherwise {@code false}
 //
 PredictionMode.allSubsetsEqual = function(altsets) {
-    var first = null;
-	for(var i=0;i<altsets.length;i++) {
-		var alts = altsets[i];
+    var first = null
+	for(var i=0i<altsets.lengthi++) {
+		var alts = altsets[i]
         if (first == null) {
-            first = alts;
+            first = alts
         } else if (alts!==first) {
-            return false;
+            return false
         }
 	}
-    return true;
+    return true
 }
 
 //
@@ -455,11 +455,11 @@ PredictionMode.allSubsetsEqual = function(altsets) {
 // @param altsets a collection of alternative subsets
 //
 PredictionMode.getUniqueAlt = function(altsets) {
-    var all = PredictionMode.getAlts(altsets);
+    var all = PredictionMode.getAlts(altsets)
     if (all.length==1) {
-        return all.minValue();
+        return all.minValue()
     } else {
-        return ATN.INVALID_ALT_NUMBER;
+        return ATN.INVALID_ALT_NUMBER
     }
 }
 
@@ -471,13 +471,13 @@ PredictionMode.getUniqueAlt = function(altsets) {
 // @return the set of represented alternatives in {@code altsets}
 //
 PredictionMode.getAlts = function(altsets) {
-    var all = new BitSet();
-    altsets.map( function(alts) { all.or(alts); });
-    return all;
+    var all = new BitSet()
+    altsets.map( function(alts) { all.or(alts) })
+    return all
 }
 
 //
-// This function gets the conflicting alt subsets from a configuration set.
+// This func gets the conflicting alt subsets from a configuration set.
 // For each configuration {@code c} in {@code configs}:
 //
 // <pre>
@@ -487,24 +487,24 @@ PredictionMode.getAlts = function(altsets) {
 //
 PredictionMode.getConflictingAltSubsets = function(configs) {
     var configToAlts = {}
-	for(var i=0;i<configs.items.length;i++) {
-		var c = configs.items[i];
-        var key = "key_" + c.state.stateNumber + "/" + c.context;
-        var alts = configToAlts[key] || null;
+	for(var i=0i<configs.items.lengthi++) {
+		var c = configs.items[i]
+        var key = "key_" + c.state.stateNumber + "/" + c.context
+        var alts = configToAlts[key] || null
         if (alts == null) {
-            alts = new BitSet();
-            configToAlts[key] = alts;
+            alts = new BitSet()
+            configToAlts[key] = alts
         }
-        alts.add(c.alt);
+        alts.add(c.alt)
 	}
-	var values = [];
+	var values = []
 	for(var k in configToAlts) {
 		if(k.indexOf("key_")!==0) {
-			continue;
+			continue
 		}
-		values.push(configToAlts[k]);
+		values.push(configToAlts[k])
 	}
-    return values;
+    return values
 }
 
 //
@@ -516,39 +516,39 @@ PredictionMode.getConflictingAltSubsets = function(configs) {
 // </pre>
 //
 PredictionMode.getStateToAltMap = function(configs) {
-    var m = new AltDict();
+    var m = new AltDict()
     configs.items.map(function(c) {
-        var alts = m.get(c.state);
+        var alts = m.get(c.state)
         if (alts == null) {
-            alts = new BitSet();
-            m.put(c.state, alts);
+            alts = new BitSet()
+            m.put(c.state, alts)
         }
-        alts.add(c.alt);
-    });
-    return m;
+        alts.add(c.alt)
+    })
+    return m
 }
 
 PredictionMode.hasStateAssociatedWithOneAlt = function(configs) {
-    var values = PredictionMode.getStateToAltMap(configs).values();
-    for(var i=0;i<values.length;i++) {
+    var values = PredictionMode.getStateToAltMap(configs).values()
+    for(var i=0i<values.lengthi++) {
         if (values[i].length==1) {
-            return true;
+            return true
         }
     }
-    return false;
+    return false
 }
 
 PredictionMode.getSingleViableAlt = function(altsets) {
-    var result = null;
-	for(var i=0;i<altsets.length;i++) {
-		var alts = altsets[i];
-        var minAlt = alts.minValue();
+    var result = null
+	for(var i=0i<altsets.lengthi++) {
+		var alts = altsets[i]
+        var minAlt = alts.minValue()
         if(result==null) {
-            result = minAlt;
+            result = minAlt
         } else if(result!==minAlt) { // more than 1 viable alt
-            return ATN.INVALID_ALT_NUMBER;
+            return ATN.INVALID_ALT_NUMBER
         }
 	}
-    return result;
+    return result
 }
 

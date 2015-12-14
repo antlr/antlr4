@@ -25,74 +25,74 @@
 
 package antlr
 
-var Token = require('./Token').Token;
-var BufferedTokenStream = require('./BufferedTokenStream').BufferedTokenStream;
+var Token = require('./Token').Token
+var BufferedTokenStream = require('./BufferedTokenStream').BufferedTokenStream
 
-function CommonTokenStream(lexer, channel) {
-	BufferedTokenStream.call(this, lexer);
-    this.channel = channel==undefined ? Token.DEFAULT_CHANNEL : channel;
-    return this;
+func CommonTokenStream(lexer, channel) {
+	BufferedTokenStream.call(this, lexer)
+    this.channel = channel==undefined ? Token.DEFAULT_CHANNEL : channel
+    return this
 }
 
-CommonTokenStream.prototype = Object.create(BufferedTokenStream.prototype);
-CommonTokenStream.prototype.constructor = CommonTokenStream;
+CommonTokenStream.prototype = Object.create(BufferedTokenStream.prototype)
+CommonTokenStream.prototype.constructor = CommonTokenStream
 
 func (this *CommonTokenStream) adjustSeekIndex(i) {
-    return this.nextTokenOnChannel(i, this.channel);
+    return this.nextTokenOnChannel(i, this.channel)
 }
 
 func (this *CommonTokenStream) LB(k) {
     if (k==0 || this.index-k<0) {
-        return null;
+        return null
     }
-    var i = this.index;
-    var n = 1;
+    var i = this.index
+    var n = 1
     // find k good tokens looking backwards
     while (n <= k) {
         // skip off-channel tokens
-        i = this.previousTokenOnChannel(i - 1, this.channel);
-        n += 1;
+        i = this.previousTokenOnChannel(i - 1, this.channel)
+        n += 1
     }
     if (i < 0) {
-        return null;
+        return null
     }
-    return this.tokens[i];
+    return this.tokens[i]
 }
 
 func (this *CommonTokenStream) LT(k) {
-    this.lazyInit();
+    this.lazyInit()
     if (k == 0) {
-        return null;
+        return null
     }
     if (k < 0) {
-        return this.LB(-k);
+        return this.LB(-k)
     }
-    var i = this.index;
-    var n = 1; // we know tokens[pos] is a good one
+    var i = this.index
+    var n = 1 // we know tokens[pos] is a good one
     // find k good tokens
     while (n < k) {
         // skip off-channel tokens, but make sure to not look past EOF
         if (this.sync(i + 1)) {
-            i = this.nextTokenOnChannel(i + 1, this.channel);
+            i = this.nextTokenOnChannel(i + 1, this.channel)
         }
-        n += 1;
+        n += 1
     }
-    return this.tokens[i];
+    return this.tokens[i]
 }
 
 // Count EOF just once.///
 func (this *CommonTokenStream) getNumberOfOnChannelTokens() {
-    var n = 0;
-    this.fill();
-    for (var i =0; i< this.tokens.length;i++) {
-        var t = this.tokens[i];
+    var n = 0
+    this.fill()
+    for (var i =0 i< this.tokens.lengthi++) {
+        var t = this.tokens[i]
         if( t.channel==this.channel) {
-            n += 1;
+            n += 1
         }
         if( t.type==Token.EOF) {
-            break;
+            break
         }
     }
-    return n;
+    return n
 }
 

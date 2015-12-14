@@ -1,4 +1,4 @@
-package antlr
+package atn
 
 // Represents an executor for a sequence of lexer actions which traversed during
 // the matching operation of a lexer rule (token).
@@ -7,15 +7,15 @@ package antlr
 // efficiently, ensuring that actions appearing only at the end of the rule do
 // not cause bloating of the {@link DFA} created for the lexer.</p>
 
-var LexerIndexedCustomAction = require('./LexerAction').LexerIndexedCustomAction;
+var LexerIndexedCustomAction = require('./LexerAction').LexerIndexedCustomAction
 
-function LexerActionExecutor(lexerActions) {
-	this.lexerActions = lexerActions == null ? [] : lexerActions;
+func LexerActionExecutor(lexerActions) {
+	this.lexerActions = lexerActions == null ? [] : lexerActions
 	// Caches the result of {@link //hashCode} since the hash code is an element
 	// of the performance-critical {@link LexerATNConfig//hashCode} operation.
-	this.hashString = lexerActions.toString(); // "".join([str(la) for la in
+	this.hashString = lexerActions.toString() // "".join([str(la) for la in
 	// lexerActions]))
-	return this;
+	return this
 }
 
 // Creates a {@link LexerActionExecutor} which executes the actions for
@@ -33,10 +33,10 @@ function LexerActionExecutor(lexerActions) {
 // of {@code lexerActionExecutor} and {@code lexerAction}.
 LexerActionExecutor.append = function(lexerActionExecutor, lexerAction) {
 	if (lexerActionExecutor == null) {
-		return new LexerActionExecutor([ lexerAction ]);
+		return new LexerActionExecutor([ lexerAction ])
 	}
-	var lexerActions = lexerActionExecutor.lexerActions.concat([ lexerAction ]);
-	return new LexerActionExecutor(lexerActions);
+	var lexerActions = lexerActionExecutor.lexerActions.concat([ lexerAction ])
+	return new LexerActionExecutor(lexerActions)
 }
 
 // Creates a {@link LexerActionExecutor} which encodes the current offset
@@ -68,21 +68,21 @@ LexerActionExecutor.append = function(lexerActionExecutor, lexerAction) {
 // for all position-dependent lexer actions.
 // /
 func (this *LexerActionExecutor) fixOffsetBeforeMatch(offset) {
-	var updatedLexerActions = null;
-	for (var i = 0; i < this.lexerActions.length; i++) {
+	var updatedLexerActions = null
+	for (var i = 0 i < this.lexerActions.length i++) {
 		if (this.lexerActions[i].isPositionDependent &&
 				!(this.lexerActions[i] instanceof LexerIndexedCustomAction)) {
 			if (updatedLexerActions == null) {
-				updatedLexerActions = this.lexerActions.concat([]);
+				updatedLexerActions = this.lexerActions.concat([])
 			}
 			updatedLexerActions[i] = new LexerIndexedCustomAction(offset,
-					this.lexerActions[i]);
+					this.lexerActions[i])
 		}
 	}
 	if (updatedLexerActions == null) {
-		return this;
+		return this
 	} else {
-		return new LexerActionExecutor(updatedLexerActions);
+		return new LexerActionExecutor(updatedLexerActions)
 	}
 }
 
@@ -105,41 +105,41 @@ func (this *LexerActionExecutor) fixOffsetBeforeMatch(offset) {
 // of the token.
 // /
 func (this *LexerActionExecutor) execute(lexer, input, startIndex) {
-	var requiresSeek = false;
-	var stopIndex = input.index;
+	var requiresSeek = false
+	var stopIndex = input.index
 	try {
-		for (var i = 0; i < this.lexerActions.length; i++) {
-			var lexerAction = this.lexerActions[i];
+		for (var i = 0 i < this.lexerActions.length i++) {
+			var lexerAction = this.lexerActions[i]
 			if (lexerAction instanceof LexerIndexedCustomAction) {
-				var offset = lexerAction.offset;
-				input.seek(startIndex + offset);
-				lexerAction = lexerAction.action;
-				requiresSeek = (startIndex + offset) !== stopIndex;
+				var offset = lexerAction.offset
+				input.seek(startIndex + offset)
+				lexerAction = lexerAction.action
+				requiresSeek = (startIndex + offset) !== stopIndex
 			} else if (lexerAction.isPositionDependent) {
-				input.seek(stopIndex);
-				requiresSeek = false;
+				input.seek(stopIndex)
+				requiresSeek = false
 			}
-			lexerAction.execute(lexer);
+			lexerAction.execute(lexer)
 		}
 	} finally {
 		if (requiresSeek) {
-			input.seek(stopIndex);
+			input.seek(stopIndex)
 		}
 	}
 }
 
 func (this *LexerActionExecutor) hashString() {
-	return this.hashString;
+	return this.hashString
 }
 
 func (this *LexerActionExecutor) equals(other) {
 	if (this == other) {
-		return true;
+		return true
 	} else if (!(other instanceof LexerActionExecutor)) {
-		return false;
+		return false
 	} else {
 		return this.hashString == other.hashString &&
-				this.lexerActions == other.lexerActions;
+				this.lexerActions == other.lexerActions
 	}
 }
 

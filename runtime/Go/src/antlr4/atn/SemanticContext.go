@@ -1,4 +1,4 @@
-package antlr
+package atn
 
 // A tree structure used to record the semantic context in which
 //  an ATN configuration is valid.  It's either a single predicate,
@@ -8,10 +8,10 @@ package antlr
 //  {@link SemanticContext} within the scope of this outer class.</p>
 //
 
-var Set = require('./../Utils').Set;
+var Set = require('./../Utils').Set
 
 type SemanticContext struct {
-	return this;
+	return this
 }
 
 // For context independent predicates, we evaluate them without a local
@@ -48,189 +48,189 @@ func (this *SemanticContext) evaluate(parser, outerContext) {
 // </ul>
 //
 func (this *SemanticContext) evalPrecedence(parser, outerContext) {
-	return this;
+	return this
 }
 
 SemanticContext.andContext = function(a, b) {
 	if (a == null || a == SemanticContext.NONE) {
-		return b;
+		return b
 	}
 	if (b == null || b == SemanticContext.NONE) {
-		return a;
+		return a
 	}
-	var result = new AND(a, b);
+	var result = new AND(a, b)
 	if (result.opnds.length == 1) {
-		return result.opnds[0];
+		return result.opnds[0]
 	} else {
-		return result;
+		return result
 	}
 }
 
 SemanticContext.orContext = function(a, b) {
 	if (a == null) {
-		return b;
+		return b
 	}
 	if (b == null) {
-		return a;
+		return a
 	}
 	if (a == SemanticContext.NONE || b == SemanticContext.NONE) {
-		return SemanticContext.NONE;
+		return SemanticContext.NONE
 	}
-	var result = new OR(a, b);
+	var result = new OR(a, b)
 	if (result.opnds.length == 1) {
-		return result.opnds[0];
+		return result.opnds[0]
 	} else {
-		return result;
+		return result
 	}
 }
 
-function Predicate(ruleIndex, predIndex, isCtxDependent) {
-	SemanticContext.call(this);
-	this.ruleIndex = ruleIndex == undefined ? -1 : ruleIndex;
-	this.predIndex = predIndex == undefined ? -1 : predIndex;
-	this.isCtxDependent = isCtxDependent == undefined ? false : isCtxDependent; // e.g., $i ref in pred
-	return this;
+func Predicate(ruleIndex, predIndex, isCtxDependent) {
+	SemanticContext.call(this)
+	this.ruleIndex = ruleIndex == undefined ? -1 : ruleIndex
+	this.predIndex = predIndex == undefined ? -1 : predIndex
+	this.isCtxDependent = isCtxDependent == undefined ? false : isCtxDependent // e.g., $i ref in pred
+	return this
 }
 
-Predicate.prototype = Object.create(SemanticContext.prototype);
-Predicate.prototype.constructor = Predicate;
+Predicate.prototype = Object.create(SemanticContext.prototype)
+Predicate.prototype.constructor = Predicate
 
 //The default {@link SemanticContext}, which is semantically equivalent to
 //a predicate of the form {@code {true}?}.
 //
-SemanticContext.NONE = new Predicate();
+SemanticContext.NONE = new Predicate()
 
 
 func (this *Predicate) evaluate(parser, outerContext) {
-	var localctx = this.isCtxDependent ? outerContext : null;
-	return parser.sempred(localctx, this.ruleIndex, this.predIndex);
+	var localctx = this.isCtxDependent ? outerContext : null
+	return parser.sempred(localctx, this.ruleIndex, this.predIndex)
 }
 
 func (this *Predicate) hashString() {
-	return "" + this.ruleIndex + "/" + this.predIndex + "/" + this.isCtxDependent;
+	return "" + this.ruleIndex + "/" + this.predIndex + "/" + this.isCtxDependent
 }
 
 func (this *Predicate) equals(other) {
 	if (this == other) {
-		return true;
+		return true
 	} else if (!(other instanceof Predicate)) {
-		return false;
+		return false
 	} else {
 		return this.ruleIndex == other.ruleIndex &&
 				this.predIndex == other.predIndex &&
-				this.isCtxDependent == other.isCtxDependent;
+				this.isCtxDependent == other.isCtxDependent
 	}
 }
 
 func (this *Predicate) toString() {
-	return "{" + this.ruleIndex + ":" + this.predIndex + "}?";
+	return "{" + this.ruleIndex + ":" + this.predIndex + "}?"
 }
 
-function PrecedencePredicate(precedence) {
-	SemanticContext.call(this);
-	this.precedence = precedence == undefined ? 0 : precedence;
+func PrecedencePredicate(precedence) {
+	SemanticContext.call(this)
+	this.precedence = precedence == undefined ? 0 : precedence
 }
 
-PrecedencePredicate.prototype = Object.create(SemanticContext.prototype);
-PrecedencePredicate.prototype.constructor = PrecedencePredicate;
+PrecedencePredicate.prototype = Object.create(SemanticContext.prototype)
+PrecedencePredicate.prototype.constructor = PrecedencePredicate
 
 func (this *PrecedencePredicate) evaluate(parser, outerContext) {
-	return parser.precpred(outerContext, this.precedence);
+	return parser.precpred(outerContext, this.precedence)
 }
 
 func (this *PrecedencePredicate) evalPrecedence(parser, outerContext) {
 	if (parser.precpred(outerContext, this.precedence)) {
-		return SemanticContext.NONE;
+		return SemanticContext.NONE
 	} else {
-		return null;
+		return null
 	}
 }
 
 func (this *PrecedencePredicate) compareTo(other) {
-	return this.precedence - other.precedence;
+	return this.precedence - other.precedence
 }
 
 func (this *PrecedencePredicate) hashString() {
-	return "31";
+	return "31"
 }
 
 func (this *PrecedencePredicate) equals(other) {
 	if (this == other) {
-		return true;
+		return true
 	} else if (!(other instanceof PrecedencePredicate)) {
-		return false;
+		return false
 	} else {
-		return this.precedence == other.precedence;
+		return this.precedence == other.precedence
 	}
 }
 
 func (this *PrecedencePredicate) toString() {
-	return "{"+this.precedence+">=prec}?";
+	return "{"+this.precedence+">=prec}?"
 }
 
 
 
 PrecedencePredicate.filterPrecedencePredicates = function(set) {
-	var result = [];
+	var result = []
 	set.values().map( function(context) {
 		if (context instanceof PrecedencePredicate) {
-			result.push(context);
+			result.push(context)
 		}
-	});
-	return result;
+	})
+	return result
 }
 
 
 // A semantic context which is true whenever none of the contained contexts
 // is false.
 //
-function AND(a, b) {
-	SemanticContext.call(this);
-	var operands = new Set();
+func AND(a, b) {
+	SemanticContext.call(this)
+	var operands = new Set()
 	if (a instanceof AND) {
 		a.opnds.map(function(o) {
-			operands.add(o);
-		});
+			operands.add(o)
+		})
 	} else {
-		operands.add(a);
+		operands.add(a)
 	}
 	if (b instanceof AND) {
 		b.opnds.map(function(o) {
-			operands.add(o);
-		});
+			operands.add(o)
+		})
 	} else {
-		operands.add(b);
+		operands.add(b)
 	}
-	var precedencePredicates = PrecedencePredicate.filterPrecedencePredicates(operands);
+	var precedencePredicates = PrecedencePredicate.filterPrecedencePredicates(operands)
 	if (precedencePredicates.length > 0) {
 		// interested in the transition with the lowest precedence
-		var reduced = null;
+		var reduced = null
 		precedencePredicates.map( function(p) {
 			if(reduced==null || p.precedence<reduced.precedence) {
-				reduced = p;
+				reduced = p
 			}
-		});
-		operands.add(reduced);
+		})
+		operands.add(reduced)
 	}
-	this.opnds = operands.values();
-	return this;
+	this.opnds = operands.values()
+	return this
 }
 
-AND.prototype = Object.create(SemanticContext.prototype);
-AND.prototype.constructor = AND;
+AND.prototype = Object.create(SemanticContext.prototype)
+AND.prototype.constructor = AND
 
 func (this *AND) equals(other) {
 	if (this == other) {
-		return true;
+		return true
 	} else if (!(other instanceof AND)) {
-		return false;
+		return false
 	} else {
-		return this.opnds == other.opnds;
+		return this.opnds == other.opnds
 	}
 }
 
 func (this *AND) hashString() {
-	return "" + this.opnds + "/AND";
+	return "" + this.opnds + "/AND"
 }
 //
 // {@inheritDoc}
@@ -240,101 +240,101 @@ func (this *AND) hashString() {
 // unordered.</p>
 //
 func (this *AND) evaluate(parser, outerContext) {
-	for (var i = 0; i < this.opnds.length; i++) {
+	for (var i = 0 i < this.opnds.length i++) {
 		if (!this.opnds[i].evaluate(parser, outerContext)) {
-			return false;
+			return false
 		}
 	}
-	return true;
+	return true
 }
 
 func (this *AND) evalPrecedence(parser, outerContext) {
-	var differs = false;
-	var operands = [];
-	for (var i = 0; i < this.opnds.length; i++) {
-		var context = this.opnds[i];
-		var evaluated = context.evalPrecedence(parser, outerContext);
-		differs |= (evaluated !== context);
+	var differs = false
+	var operands = []
+	for (var i = 0 i < this.opnds.length i++) {
+		var context = this.opnds[i]
+		var evaluated = context.evalPrecedence(parser, outerContext)
+		differs |= (evaluated !== context)
 		if (evaluated == null) {
 			// The AND context is false if any element is false
-			return null;
+			return null
 		} else if (evaluated !== SemanticContext.NONE) {
 			// Reduce the result by skipping true elements
-			operands.push(evaluated);
+			operands.push(evaluated)
 		}
 	}
 	if (!differs) {
-		return this;
+		return this
 	}
 	if (operands.length == 0) {
 		// all elements were true, so the AND context is true
-		return SemanticContext.NONE;
+		return SemanticContext.NONE
 	}
-	var result = null;
+	var result = null
 	operands.map(function(o) {
-		result = result == null ? o : SemanticPredicate.andContext(result, o);
-	});
-	return result;
+		result = result == null ? o : SemanticPredicate.andContext(result, o)
+	})
+	return result
 }
 
 func (this *AND) toString() {
-	var s = "";
+	var s = ""
 	this.opnds.map(function(o) {
-		s += "&& " + o.toString();
-	});
-	return s.length > 3 ? s.slice(3) : s;
+		s += "&& " + o.toString()
+	})
+	return s.length > 3 ? s.slice(3) : s
 }
 
 //
 // A semantic context which is true whenever at least one of the contained
 // contexts is true.
 //
-function OR(a, b) {
-	SemanticContext.call(this);
-	var operands = new Set();
+func OR(a, b) {
+	SemanticContext.call(this)
+	var operands = new Set()
 	if (a instanceof OR) {
 		a.opnds.map(function(o) {
-			operands.add(o);
-		});
+			operands.add(o)
+		})
 	} else {
-		operands.add(a);
+		operands.add(a)
 	}
 	if (b instanceof OR) {
 		b.opnds.map(function(o) {
-			operands.add(o);
-		});
+			operands.add(o)
+		})
 	} else {
-		operands.add(b);
+		operands.add(b)
 	}
 
-	var precedencePredicates = PrecedencePredicate.filterPrecedencePredicates(operands);
+	var precedencePredicates = PrecedencePredicate.filterPrecedencePredicates(operands)
 	if (precedencePredicates.length > 0) {
 		// interested in the transition with the highest precedence
 		var s = precedencePredicates.sort(function(a, b) {
-			return a.compareTo(b);
-		});
-		var reduced = s[s.length-1];
-		operands.add(reduced);
+			return a.compareTo(b)
+		})
+		var reduced = s[s.length-1]
+		operands.add(reduced)
 	}
-	this.opnds = operands.values();
-	return this;
+	this.opnds = operands.values()
+	return this
 }
 
-OR.prototype = Object.create(SemanticContext.prototype);
-OR.prototype.constructor = OR;
+OR.prototype = Object.create(SemanticContext.prototype)
+OR.prototype.constructor = OR
 
 func (this *OR) constructor(other) {
 	if (this == other) {
-		return true;
+		return true
 	} else if (!(other instanceof OR)) {
-		return false;
+		return false
 	} else {
-		return this.opnds == other.opnds;
+		return this.opnds == other.opnds
 	}
 }
 
 func (this *OR) hashString() {
-	return "" + this.opnds + "/OR"; 
+	return "" + this.opnds + "/OR"
 }
 
 // <p>
@@ -342,49 +342,49 @@ func (this *OR) hashString() {
 // unordered.</p>
 //
 func (this *OR) evaluate(parser, outerContext) {
-	for (var i = 0; i < this.opnds.length; i++) {
+	for (var i = 0 i < this.opnds.length i++) {
 		if (this.opnds[i].evaluate(parser, outerContext)) {
-			return true;
+			return true
 		}
 	}
-	return false;
+	return false
 }
 
 func (this *OR) evalPrecedence(parser, outerContext) {
-	var differs = false;
-	var operands = [];
-	for (var i = 0; i < this.opnds.length; i++) {
-		var context = this.opnds[i];
-		var evaluated = context.evalPrecedence(parser, outerContext);
-		differs |= (evaluated !== context);
+	var differs = false
+	var operands = []
+	for (var i = 0 i < this.opnds.length i++) {
+		var context = this.opnds[i]
+		var evaluated = context.evalPrecedence(parser, outerContext)
+		differs |= (evaluated !== context)
 		if (evaluated == SemanticContext.NONE) {
 			// The OR context is true if any element is true
-			return SemanticContext.NONE;
+			return SemanticContext.NONE
 		} else if (evaluated !== null) {
 			// Reduce the result by skipping false elements
-			operands.push(evaluated);
+			operands.push(evaluated)
 		}
 	}
 	if (!differs) {
-		return this;
+		return this
 	}
 	if (operands.length == 0) {
 		// all elements were false, so the OR context is false
-		return null;
+		return null
 	}
-	var result = null;
+	var result = null
 	operands.map(function(o) {
-		return result == null ? o : SemanticContext.orContext(result, o);
-	});
-	return result;
+		return result == null ? o : SemanticContext.orContext(result, o)
+	})
+	return result
 }
 
 func (this *AND) toString() {
-	var s = "";
+	var s = ""
 	this.opnds.map(function(o) {
-		s += "|| " + o.toString();
-	});
-	return s.length > 3 ? s.slice(3) : s;
+		s += "|| " + o.toString()
+	})
+	return s.length > 3 ? s.slice(3) : s
 }
 
 

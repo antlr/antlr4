@@ -1,32 +1,3 @@
-//
-// [The "BSD license"]
-//  Copyright (c) 2012 Terence Parr
-//  Copyright (c) 2012 Sam Harwell
-//  Copyright (c) 2014 Eric Vergnaud
-//  All rights reserved.
-//
-//  Redistribution and use in source and binary forms, with or without
-//  modification, are permitted provided that the following conditions
-//  are met:
-//
-//  1. Redistributions of source code must retain the above copyright
-//     notice, this list of conditions and the following disclaimer.
-//  2. Redistributions in binary form must reproduce the above copyright
-//     notice, this list of conditions and the following disclaimer in the
-//     documentation and/or other materials provided with the distribution.
-//  3. The name of the author may not be used to endorse or promote products
-//     derived from this software without specific prior written permission.
-//
-//  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
-//  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-//  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-//  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
-//  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-//  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-//  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-//  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-//  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-//  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // This implementation of {@link TokenStream} loads tokens from a
 // {@link TokenSource} on-demand, and places the tokens in a buffer to provide
@@ -41,25 +12,29 @@
 
 package antlr
 
-var Token = require('./Token').Token;
-var Lexer = require('./Lexer').Lexer;
-var Interval = require('./IntervalSet').Interval;
+type TokenStream interface {
 
-// this is just to keep meaningful parameter types to Parser
-type TokenStream struct {
-	return this;
 }
 
-function BufferedTokenStream(tokenSource) {
+// this is just to keep meaningful parameter types to Parser
+type BufferedTokenStream struct {
+	tokenSource TokenStream
+	tokens []Token
+	index int
+	fetchedEOF bool
+}
 
-	TokenStream.call(this);
+func NewBufferedTokenStream(tokenSource TokenStream) BufferedTokenStream {
+
+	ts := new(BufferedTokenStream)
+
 	// The {@link TokenSource} from which tokens for this stream are fetched.
-	this.tokenSource = tokenSource;
+	ts.tokenSource = tokenSource
 
 	// A collection of all tokens fetched from the token source. The list is
 	// considered a complete view of the input once {@link //fetchedEOF} is set
 	// to {@code true}.
-	this.tokens = [];
+	ts.tokens = []
 
 	// The index into {@link //tokens} of the current token (next token to
 	// {@link //consume}). {@link //tokens}{@code [}{@link //p}{@code ]} should
@@ -71,7 +46,7 @@ function BufferedTokenStream(tokenSource) {
 	// not yet been fetched from the token source. For additional information,
 	// see the documentation of {@link IntStream} for a description of
 	// Initializing Methods.</p>
-	this.index = -1;
+	ts.index = -1
 
 	// Indicates whether the {@link Token//EOF} token has been fetched from
 	// {@link //tokenSource} and added to {@link //tokens}. This field improves
@@ -87,15 +62,13 @@ function BufferedTokenStream(tokenSource) {
 	// into
 	// {@link //tokens} is trivial with this field.</li>
 	// <ul>
-	this.fetchedEOF = false;
-	return this;
+	ts.fetchedEOF = false
+
+	return ts
 }
 
-BufferedTokenStream.prototype = Object.create(TokenStream.prototype);
-BufferedTokenStream.prototype.constructor = BufferedTokenStream;
-
-func (this *BufferedTokenStream) mark() {
-	return 0;
+func (this *BufferedTokenStream) mark() int {
+	return 0
 }
 
 func (this *BufferedTokenStream) release(marker) {
@@ -103,39 +76,39 @@ func (this *BufferedTokenStream) release(marker) {
 }
 
 func (this *BufferedTokenStream) reset() {
-	this.seek(0);
+	this.seek(0)
 }
 
-func (this *BufferedTokenStream) seek(index) {
-	this.lazyInit();
-	this.index = this.adjustSeekIndex(index);
+func (this *BufferedTokenStream) seek(index int) {
+	this.lazyInit()
+	this.index = this.adjustSeekIndex(index)
 }
 
-func (this *BufferedTokenStream) get(index) {
-	this.lazyInit();
-	return this.tokens[index];
+func (this *BufferedTokenStream) get(index int) {
+	this.lazyInit()
+	return this.tokens[index]
 }
 
 func (this *BufferedTokenStream) consume() {
-	var skipEofCheck = false;
+	var skipEofCheck = false
 	if (this.index >= 0) {
 		if (this.fetchedEOF) {
 			// the last token in tokens is EOF. skip check if p indexes any
 			// fetched token except the last.
-			skipEofCheck = this.index < this.tokens.length - 1;
+			skipEofCheck = this.index < len(this.tokens) - 1
 		} else {
 			// no EOF token in tokens. skip check if p indexes a fetched token.
-			skipEofCheck = this.index < this.tokens.length;
+			skipEofCheck = this.index < this.tokens.length
 		}
 	} else {
 		// not yet initialized
-		skipEofCheck = false;
+		skipEofCheck = false
 	}
 	if (!skipEofCheck && this.LA(1) == Token.EOF) {
-		throw "cannot consume EOF";
+		throw "cannot consume EOF"
 	}
 	if (this.sync(this.index + 1)) {
-		this.index = this.adjustSeekIndex(this.index + 1);
+		this.index = this.adjustSeekIndex(this.index + 1)
 	}
 }
 
@@ -146,12 +119,12 @@ func (this *BufferedTokenStream) consume() {
 // @see //get(int i)
 // /
 func (this *BufferedTokenStream) sync(i) {
-	var n = i - this.tokens.length + 1; // how many more elements we need?
+	var n = i - this.tokens.length + 1 // how many more elements we need?
 	if (n > 0) {
-		var fetched = this.fetch(n);
-		return fetched >= n;
+		var fetched = this.fetch(n)
+		return fetched >= n
 	}
-	return true;
+	return true
 }
 
 // Add {@code n} elements to buffer.
@@ -160,71 +133,71 @@ func (this *BufferedTokenStream) sync(i) {
 // /
 func (this *BufferedTokenStream) fetch(n) {
 	if (this.fetchedEOF) {
-		return 0;
+		return 0
 	}
-	for (var i = 0; i < n; i++) {
-		var t = this.tokenSource.nextToken();
-		t.tokenIndex = this.tokens.length;
-		this.tokens.push(t);
+	for (var i = 0 i < n i++) {
+		var t = this.tokenSource.nextToken()
+		t.tokenIndex = this.tokens.length
+		this.tokens.push(t)
 		if (t.type == Token.EOF) {
-			this.fetchedEOF = true;
-			return i + 1;
+			this.fetchedEOF = true
+			return i + 1
 		}
 	}
-	return n;
+	return n
 }
 
 // Get all tokens from start..stop inclusively///
 func (this *BufferedTokenStream) getTokens(start, stop, types) {
 	if (types == undefined) {
-		types = null;
+		types = null
 	}
 	if (start < 0 || stop < 0) {
-		return null;
+		return null
 	}
-	this.lazyInit();
-	var subset = [];
+	this.lazyInit()
+	var subset = []
 	if (stop >= this.tokens.length) {
-		stop = this.tokens.length - 1;
+		stop = this.tokens.length - 1
 	}
-	for (var i = start; i < stop; i++) {
-		var t = this.tokens[i];
+	for (var i = start i < stop i++) {
+		var t = this.tokens[i]
 		if (t.type == Token.EOF) {
-			break;
+			break
 		}
 		if (types == null || types.contains(t.type)) {
-			subset.push(t);
+			subset.push(t)
 		}
 	}
-	return subset;
+	return subset
 }
 
 func (this *BufferedTokenStream) LA(i) {
-	return this.LT(i).type;
+	return this.LT(i).type
 }
 
 func (this *BufferedTokenStream) LB(k) {
 	if (this.index - k < 0) {
-		return null;
+		return null
 	}
-	return this.tokens[this.index - k];
+	return this.tokens[this.index - k]
 }
 
 func (this *BufferedTokenStream) LT(k) {
-	this.lazyInit();
+	this.lazyInit()
 	if (k == 0) {
-		return null;
+		return null
 	}
 	if (k < 0) {
-		return this.LB(-k);
+		return this.LB(-k)
 	}
-	var i = this.index + k - 1;
-	this.sync(i);
+	var i = this.index + k - 1
+	this.sync(i)
 	if (i >= this.tokens.length) { // return EOF token
 		// EOF must be last token
-		return this.tokens[this.tokens.length - 1];
+		return this.tokens[this.tokens.length - 1]
 	}
-	return this.tokens[i];
+	return this.tokens[i]
 }
 
 // Allowed derived classes to modify the behavior of operations which change
@@ -241,25 +214,25 @@ func (this *BufferedTokenStream) LT(k) {
 // @return The adjusted target token index.
 
 func (this *BufferedTokenStream) adjustSeekIndex(i) {
-	return i;
+	return i
 }
 
 func (this *BufferedTokenStream) lazyInit() {
 	if (this.index == -1) {
-		this.setup();
+		this.setup()
 	}
 }
 
 func (this *BufferedTokenStream) setup() {
-	this.sync(0);
-	this.index = this.adjustSeekIndex(0);
+	this.sync(0)
+	this.index = this.adjustSeekIndex(0)
 }
 
 // Reset this token stream by setting its token source.///
 func (this *BufferedTokenStream) setTokenSource(tokenSource) {
-	this.tokenSource = tokenSource;
-	this.tokens = [];
-	this.index = -1;
+	this.tokenSource = tokenSource
+	this.tokens = []
+	this.index = -1
 }
 
 
@@ -268,20 +241,20 @@ func (this *BufferedTokenStream) setTokenSource(tokenSource) {
 // on channel between i and EOF.
 // /
 func (this *BufferedTokenStream) nextTokenOnChannel(i, channel) {
-	this.sync(i);
+	this.sync(i)
 	if (i >= this.tokens.length) {
-		return -1;
+		return -1
 	}
-	var token = this.tokens[i];
-	while (token.channel !== this.channel) {
+	var token = this.tokens[i]
+	while (token.channel != this.channel) {
 		if (token.type == Token.EOF) {
-			return -1;
+			return -1
 		}
-		i += 1;
-		this.sync(i);
-		token = this.tokens[i];
+		i += 1
+		this.sync(i)
+		token = this.tokens[i]
 	}
-	return i;
+	return i
 }
 
 // Given a starting index, return the index of the previous token on channel.
@@ -289,9 +262,9 @@ func (this *BufferedTokenStream) nextTokenOnChannel(i, channel) {
 // on channel between i and 0.
 func (this *BufferedTokenStream) previousTokenOnChannel(i, channel) {
 	while (i >= 0 && this.tokens[i].channel !== channel) {
-		i -= 1;
+		i -= 1
 	}
-	return i;
+	return i
 }
 
 // Collect all tokens on specified channel to the right of
@@ -300,18 +273,18 @@ func (this *BufferedTokenStream) previousTokenOnChannel(i, channel) {
 func (this *BufferedTokenStream) getHiddenTokensToRight(tokenIndex,
 		channel) {
 	if (channel == undefined) {
-		channel = -1;
+		channel = -1
 	}
-	this.lazyInit();
+	this.lazyInit()
 	if (this.tokenIndex < 0 || tokenIndex >= this.tokens.length) {
-		throw "" + tokenIndex + " not in 0.." + this.tokens.length - 1;
+		throw "" + tokenIndex + " not in 0.." + this.tokens.length - 1
 	}
 	var nextOnChannel = this.nextTokenOnChannel(tokenIndex + 1,
-			Lexer.DEFAULT_TOKEN_CHANNEL);
-	var from_ = tokenIndex + 1;
+			Lexer.DEFAULT_TOKEN_CHANNEL)
+	var from_ = tokenIndex + 1
 	// if none onchannel to right, nextOnChannel=-1 so set to = last token
-	var to = nextOnChannel == -1 ? this.tokens.length - 1 : nextOnChannel;
-	return this.filterForChannel(from_, to, channel);
+	var to = nextOnChannel == -1 ? this.tokens.length - 1 : nextOnChannel
+	return this.filterForChannel(from_, to, channel)
 }
 
 // Collect all tokens on specified channel to the left of
@@ -320,82 +293,82 @@ func (this *BufferedTokenStream) getHiddenTokensToRight(tokenIndex,
 func (this *BufferedTokenStream) getHiddenTokensToLeft(tokenIndex,
 		channel) {
 	if (channel == undefined) {
-		channel = -1;
+		channel = -1
 	}
-	this.lazyInit();
+	this.lazyInit()
 	if (tokenIndex < 0 || tokenIndex >= this.tokens.length) {
-		throw "" + tokenIndex + " not in 0.." + this.tokens.length - 1;
+		throw "" + tokenIndex + " not in 0.." + this.tokens.length - 1
 	}
 	var prevOnChannel = this.previousTokenOnChannel(tokenIndex - 1,
-			Lexer.DEFAULT_TOKEN_CHANNEL);
+			Lexer.DEFAULT_TOKEN_CHANNEL)
 	if (prevOnChannel == tokenIndex - 1) {
-		return null;
+		return null
 	}
 	// if none on channel to left, prevOnChannel=-1 then from=0
-	var from_ = prevOnChannel + 1;
-	var to = tokenIndex - 1;
-	return this.filterForChannel(from_, to, channel);
+	var from_ = prevOnChannel + 1
+	var to = tokenIndex - 1
+	return this.filterForChannel(from_, to, channel)
 }
 
 func (this *BufferedTokenStream) filterForChannel(left, right, channel) {
-	var hidden = [];
-	for (var i = left; i < right + 1; i++) {
-		var t = this.tokens[i];
+	var hidden = []
+	for (var i = left i < right + 1 i++) {
+		var t = this.tokens[i]
 		if (channel == -1) {
 			if (t.channel !== Lexer.DEFAULT_TOKEN_CHANNEL) {
-				hidden.push(t);
+				hidden.push(t)
 			}
 		} else if (t.channel == channel) {
-			hidden.push(t);
+			hidden.push(t)
 		}
 	}
 	if (hidden.length == 0) {
-		return null;
+		return null
 	}
-	return hidden;
+	return hidden
 }
 
 func (this *BufferedTokenStream) getSourceName() {
-	return this.tokenSource.getSourceName();
+	return this.tokenSource.getSourceName()
 }
 
 // Get the text of all tokens in this buffer.///
 func (this *BufferedTokenStream) getText(interval) string {
-	this.lazyInit();
-	this.fill();
+	this.lazyInit()
+	this.fill()
 	if (interval == undefined || interval == null) {
-		interval = new Interval(0, this.tokens.length - 1);
+		interval = new Interval(0, this.tokens.length - 1)
 	}
-	var start = interval.start;
+	var start = interval.start
 	if (start instanceof Token) {
-		start = start.tokenIndex;
+		start = start.tokenIndex
 	}
-	var stop = interval.stop;
+	var stop = interval.stop
 	if (stop instanceof Token) {
-		stop = stop.tokenIndex;
+		stop = stop.tokenIndex
 	}
 	if (start == null || stop == null || start < 0 || stop < 0) {
-		return "";
+		return ""
 	}
 	if (stop >= this.tokens.length) {
-		stop = this.tokens.length - 1;
+		stop = this.tokens.length - 1
 	}
-	var s = "";
-	for (var i = start; i < stop + 1; i++) {
-		var t = this.tokens[i];
+	var s = ""
+	for (var i = start i < stop + 1 i++) {
+		var t = this.tokens[i]
 		if (t.type == Token.EOF) {
-			break;
+			break
 		}
-		s = s + t.text;
+		s = s + t.text
 	}
-	return s;
+	return s
 }
 
 // Get all tokens from lexer until EOF///
 func (this *BufferedTokenStream) fill() {
-	this.lazyInit();
+	this.lazyInit()
 	while (this.fetch(1000) == 1000) {
-		continue;
+		continue
 	}
 }
 

@@ -21,51 +21,51 @@ package antlr
 //  @see ParserRuleContext
 ///
 
-var RuleNode = require('./tree/Tree').RuleNode;
-var INVALID_INTERVAL = require('./tree/Tree').INVALID_INTERVAL;
+var RuleNode = require('./tree/Tree').RuleNode
+var INVALID_INTERVAL = require('./tree/Tree').INVALID_INTERVAL
 
-function RuleContext(parent, invokingState) {
-	RuleNode.call(this);
+func RuleContext(parent, invokingState) {
+	RuleNode.call(this)
 	// What context invoked this rule?
-	this.parentCtx = parent || null;
+	this.parentCtx = parent || null
 	// What state invoked the rule associated with this context?
 	// The "return address" is the followState of invokingState
 	// If parent is null, this should be -1.
-	this.invokingState = invokingState || -1;
-	return this;
+	this.invokingState = invokingState || -1
+	return this
 }
 
-RuleContext.prototype = Object.create(RuleNode.prototype);
-RuleContext.prototype.constructor = RuleContext;
+RuleContext.prototype = Object.create(RuleNode.prototype)
+RuleContext.prototype.constructor = RuleContext
 
 func (this *RuleContext) depth() {
-	var n = 0;
-	var p = this;
+	var n = 0
+	var p = this
 	while (p !== null) {
-		p = p.parentCtx;
-		n += 1;
+		p = p.parentCtx
+		n += 1
 	}
-	return n;
+	return n
 }
 
-// A context is empty if there is no invoking state; meaning nobody call
+// A context is empty if there is no invoking state meaning nobody call
 // current context.
 func (this *RuleContext) isEmpty() {
-	return this.invokingState == -1;
+	return this.invokingState == -1
 }
 
 // satisfy the ParseTree / SyntaxTree interface
 
 func (this *RuleContext) getSourceInterval() {
-	return INVALID_INTERVAL;
+	return INVALID_INTERVAL
 }
 
 func (this *RuleContext) getRuleContext() {
-	return this;
+	return this
 }
 
 func (this *RuleContext) getPayload() {
-	return this;
+	return this
 }
 
 // Return the combined text of all child nodes. This method only considers
@@ -77,29 +77,29 @@ func (this *RuleContext) getPayload() {
 // /
 func (this *RuleContext) getText() {
 	if (this.getChildCount() == 0) {
-		return "";
+		return ""
 	} else {
 		return this.children.map(function(child) {
-			return child.getText();
-		}).join("");
+			return child.getText()
+		}).join("")
 	}
 }
 
 func (this *RuleContext) getChild(i) {
-	return null;
+	return null
 }
 
 func (this *RuleContext) getChildCount() {
-	return 0;
+	return 0
 }
 
 func (this *RuleContext) accept(visitor) {
-	return visitor.visitChildren(this);
+	return visitor.visitChildren(this)
 }
 
 //need to manage circular dependencies, so export now
 
-var Trees = require('./tree/Trees').Trees;
+var Trees = require('./tree/Trees').Trees
 
 
 // Print out a whole tree, not just a node, in LISP format
@@ -107,31 +107,31 @@ var Trees = require('./tree/Trees').Trees;
 //
 
 func (this *RuleContext) toStringTree(ruleNames, recog) {
-	return Trees.toStringTree(this, ruleNames, recog);
+	return Trees.toStringTree(this, ruleNames, recog)
 }
 
 func (this *RuleContext) toString(ruleNames, stop) {
-	ruleNames = ruleNames || null;
-	stop = stop || null;
-	var p = this;
-	var s = "[";
+	ruleNames = ruleNames || null
+	stop = stop || null
+	var p = this
+	var s = "["
 	while (p !== null && p !== stop) {
 		if (ruleNames == null) {
 			if (!p.isEmpty()) {
-				s += p.invokingState;
+				s += p.invokingState
 			}
 		} else {
-			var ri = p.ruleIndex;
+			var ri = p.ruleIndex
 			var ruleName = (ri >= 0 && ri < ruleNames.length) ? ruleNames[ri]
-					: "" + ri;
-			s += ruleName;
+					: "" + ri
+			s += ruleName
 		}
 		if (p.parentCtx !== null && (ruleNames !== null || !p.parentCtx.isEmpty())) {
-			s += " ";
+			s += " "
 		}
-		p = p.parentCtx;
+		p = p.parentCtx
 	}
-	s += "]";
-	return s;
+	s += "]"
+	return s
 }
 

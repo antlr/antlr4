@@ -5,14 +5,11 @@
 
 package antlr
 
-var CommonToken = require('./Token').CommonToken;
-
 type TokenFactory struct {
-	return this;
 }
 
-function CommonTokenFactory(copyText) {
-	TokenFactory.call(this);
+func NewCommonTokenFactory(copyText) {
+	TokenFactory.call(this)
     // Indicates whether {@link CommonToken//setText} should be called after
     // constructing tokens to explicitly set the text. This is useful for cases
     // where the input stream might not be able to provide arbitrary substrings
@@ -27,12 +24,12 @@ function CommonTokenFactory(copyText) {
     // The default value is {@code false} to avoid the performance and memory
     // overhead of copying text for every token unless explicitly requested.</p>
     //
-    this.copyText = copyText==undefined ? false : copyText;
-	return this;
+    this.copyText = copyText==undefined ? false : copyText
+	return this
 }
 
-CommonTokenFactory.prototype = Object.create(TokenFactory.prototype);
-CommonTokenFactory.prototype.constructor = CommonTokenFactory;
+CommonTokenFactory.prototype = Object.create(TokenFactory.prototype)
+CommonTokenFactory.prototype.constructor = CommonTokenFactory
 
 //
 // The default {@link CommonTokenFactory} instance.
@@ -41,24 +38,24 @@ CommonTokenFactory.prototype.constructor = CommonTokenFactory;
 // This token factory does not explicitly copy token text when constructing
 // tokens.</p>
 //
-CommonTokenFactory.DEFAULT = new CommonTokenFactory();
+CommonTokenFactory.DEFAULT = new CommonTokenFactory()
 
 func (this *CommonTokenFactory) create(source, type, text, channel, start, stop, line, column) {
-    var t = new CommonToken(source, type, channel, start, stop);
-    t.line = line;
-    t.column = column;
+    var t = new CommonToken(source, type, channel, start, stop)
+    t.line = line
+    t.column = column
     if (text !==null) {
-        t.text = text;
+        t.text = text
     } else if (this.copyText && source[1] !==null) {
-        t.text = source[1].getText(start,stop);
+        t.text = source[1].getText(start,stop)
     }
-    return t;
+    return t
 }
 
 func (this *CommonTokenFactory) createThin(type, text) {
-    var t = new CommonToken(null, type);
-    t.text = text;
-    return t;
+    var t = new CommonToken(null, type)
+    t.text = text
+    return t
 }
 
 

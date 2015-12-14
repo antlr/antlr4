@@ -1,11 +1,11 @@
-package antlr
+package atn
 
 // The following images show the relation of states and
 // {@link ATNState//transitions} for various grammar constructs.
 //
 // <ul>
 //
-// <li>Solid edges marked with an &//0949; indicate a required
+// <li>Solid edges marked with an &//0949 indicate a required
 // {@link EpsilonTransition}.</li>
 //
 // <li>Dashed edges indicate locations where any transition derived from
@@ -60,36 +60,36 @@ package antlr
 // <embed src="images/OptionalNonGreedy.svg" type="image/svg+xml"/>
 //
 
-var INITIAL_NUM_TRANSITIONS = 4;
+var INITIAL_NUM_TRANSITIONS = 4
 
 type ATNState struct {
     // Which ATN are we in?
-    this.atn = null;
-    this.stateNumber = ATNState.INVALID_STATE_NUMBER;
-    this.stateType = null;
-    this.ruleIndex = 0; // at runtime, we don't have Rule objects
-    this.epsilonOnlyTransitions = false;
+    this.atn = null
+    this.stateNumber = ATNState.INVALID_STATE_NUMBER
+    this.stateType = null
+    this.ruleIndex = 0 // at runtime, we don't have Rule objects
+    this.epsilonOnlyTransitions = false
     // Track the transitions emanating from this ATN state.
-    this.transitions = [];
+    this.transitions = []
     // Used to cache lookahead during parsing, not used during construction
-    this.nextTokenWithinRule = null;
-    return this;
+    this.nextTokenWithinRule = null
+    return this
 }
 
 // constants for serialization
-ATNState.INVALID_TYPE = 0;
-ATNState.BASIC = 1;
-ATNState.RULE_START = 2;
-ATNState.BLOCK_START = 3;
-ATNState.PLUS_BLOCK_START = 4;
-ATNState.STAR_BLOCK_START = 5;
-ATNState.TOKEN_START = 6;
-ATNState.RULE_STOP = 7;
-ATNState.BLOCK_END = 8;
-ATNState.STAR_LOOP_BACK = 9;
-ATNState.STAR_LOOP_ENTRY = 10;
-ATNState.PLUS_LOOP_BACK = 11;
-ATNState.LOOP_END = 12;
+ATNState.INVALID_TYPE = 0
+ATNState.BASIC = 1
+ATNState.RULE_START = 2
+ATNState.BLOCK_START = 3
+ATNState.PLUS_BLOCK_START = 4
+ATNState.STAR_BLOCK_START = 5
+ATNState.TOKEN_START = 6
+ATNState.RULE_STOP = 7
+ATNState.BLOCK_END = 8
+ATNState.STAR_LOOP_BACK = 9
+ATNState.STAR_LOOP_ENTRY = 10
+ATNState.PLUS_LOOP_BACK = 11
+ATNState.LOOP_END = 12
 
 ATNState.serializationNames = [
             "INVALID",
@@ -104,95 +104,95 @@ ATNState.serializationNames = [
             "STAR_LOOP_BACK",
             "STAR_LOOP_ENTRY",
             "PLUS_LOOP_BACK",
-            "LOOP_END" ];
+            "LOOP_END" ]
 
-ATNState.INVALID_STATE_NUMBER = -1;
+ATNState.INVALID_STATE_NUMBER = -1
 
 func (this *ATNState) toString() {
-	return this.stateNumber;
+	return this.stateNumber
 }
 
 func (this *ATNState) equals(other) {
     if (other instanceof ATNState) {
-        return this.stateNumber==other.stateNumber;
+        return this.stateNumber==other.stateNumber
     } else {
-        return false;
+        return false
     }
 }
 
 func (this *ATNState) isNonGreedyExitState() {
-    return false;
+    return false
 }
 
 
 func (this *ATNState) addTransition(trans, index) {
 	if(index==undefined) {
-		index = -1;
+		index = -1
 	}
     if (this.transitions.length==0) {
-        this.epsilonOnlyTransitions = trans.isEpsilon;
+        this.epsilonOnlyTransitions = trans.isEpsilon
     } else if(this.epsilonOnlyTransitions !== trans.isEpsilon) {
-        this.epsilonOnlyTransitions = false;
+        this.epsilonOnlyTransitions = false
     }
     if (index==-1) {
-        this.transitions.push(trans);
+        this.transitions.push(trans)
     } else {
-        this.transitions.splice(index, 1, trans);
+        this.transitions.splice(index, 1, trans)
     }
 }
 
 type BasicState struct {
-	ATNState.call(this);
-    this.stateType = ATNState.BASIC;
-    return this;
+	ATNState.call(this)
+    this.stateType = ATNState.BASIC
+    return this
 }
 
-BasicState.prototype = Object.create(ATNState.prototype);
-BasicState.prototype.constructor = BasicState;
+BasicState.prototype = Object.create(ATNState.prototype)
+BasicState.prototype.constructor = BasicState
 
 
 type DecisionState struct {
-	ATNState.call(this);
-    this.decision = -1;
-    this.nonGreedy = false;
-    return this;
+	ATNState.call(this)
+    this.decision = -1
+    this.nonGreedy = false
+    return this
 }
 
-DecisionState.prototype = Object.create(ATNState.prototype);
-DecisionState.prototype.constructor = DecisionState;
+DecisionState.prototype = Object.create(ATNState.prototype)
+DecisionState.prototype.constructor = DecisionState
 
 
 //  The start of a regular {@code (...)} block.
 type BlockStartState struct {
-	DecisionState.call(this);
-	this.endState = null;
-	return this;
+	DecisionState.call(this)
+	this.endState = null
+	return this
 }
 
-BlockStartState.prototype = Object.create(DecisionState.prototype);
-BlockStartState.prototype.constructor = BlockStartState;
+BlockStartState.prototype = Object.create(DecisionState.prototype)
+BlockStartState.prototype.constructor = BlockStartState
 
 
 type BasicBlockStartState struct {
-	BlockStartState.call(this);
-	this.stateType = ATNState.BLOCK_START;
-	return this;
+	BlockStartState.call(this)
+	this.stateType = ATNState.BLOCK_START
+	return this
 }
 
-BasicBlockStartState.prototype = Object.create(BlockStartState.prototype);
-BasicBlockStartState.prototype.constructor = BasicBlockStartState;
+BasicBlockStartState.prototype = Object.create(BlockStartState.prototype)
+BasicBlockStartState.prototype.constructor = BasicBlockStartState
 
 
 // Terminal node of a simple {@code (a|b|c)} block.
 type BlockEndState struct {
-	ATNState.call(this);
-	this.stateType = ATNState.BLOCK_END;
-    this.startState = null;
-    return this;
+	ATNState.call(this)
+	this.stateType = ATNState.BLOCK_END
+    this.startState = null
+    return this
 }
 
-BlockEndState.prototype = Object.create(ATNState.prototype);
-BlockEndState.prototype.constructor = BlockEndState;
+BlockEndState.prototype = Object.create(ATNState.prototype)
+BlockEndState.prototype.constructor = BlockEndState
 
 
 // The last node in the ATN for a rule, unless that rule is the start symbol.
@@ -201,108 +201,108 @@ BlockEndState.prototype.constructor = BlockEndState;
 //  error handling.
 //
 type RuleStopState struct {
-	ATNState.call(this);
-    this.stateType = ATNState.RULE_STOP;
-    return this;
+	ATNState.call(this)
+    this.stateType = ATNState.RULE_STOP
+    return this
 }
 
-RuleStopState.prototype = Object.create(ATNState.prototype);
-RuleStopState.prototype.constructor = RuleStopState;
+RuleStopState.prototype = Object.create(ATNState.prototype)
+RuleStopState.prototype.constructor = RuleStopState
 
 type RuleStartState struct {
-	ATNState.call(this);
-	this.stateType = ATNState.RULE_START;
-	this.stopState = null;
-	this.isPrecedenceRule = false;
-	return this;
+	ATNState.call(this)
+	this.stateType = ATNState.RULE_START
+	this.stopState = null
+	this.isPrecedenceRule = false
+	return this
 }
 
-RuleStartState.prototype = Object.create(ATNState.prototype);
-RuleStartState.prototype.constructor = RuleStartState;
+RuleStartState.prototype = Object.create(ATNState.prototype)
+RuleStartState.prototype.constructor = RuleStartState
 
 // Decision state for {@code A+} and {@code (A|B)+}.  It has two transitions:
 //  one to the loop back to start of the block and one to exit.
 //
 type PlusLoopbackState struct {
-	DecisionState.call(this);
-	this.stateType = ATNState.PLUS_LOOP_BACK;
-	return this;
+	DecisionState.call(this)
+	this.stateType = ATNState.PLUS_LOOP_BACK
+	return this
 }
 
-PlusLoopbackState.prototype = Object.create(DecisionState.prototype);
-PlusLoopbackState.prototype.constructor = PlusLoopbackState;
+PlusLoopbackState.prototype = Object.create(DecisionState.prototype)
+PlusLoopbackState.prototype.constructor = PlusLoopbackState
         
 
 // Start of {@code (A|B|...)+} loop. Technically a decision state, but
-//  we don't use for code generation; somebody might need it, so I'm defining
+//  we don't use for code generation somebody might need it, so I'm defining
 //  it for completeness. In reality, the {@link PlusLoopbackState} node is the
 //  real decision-making note for {@code A+}.
 //
 type PlusBlockStartState struct {
-	BlockStartState.call(this);
-	this.stateType = ATNState.PLUS_BLOCK_START;
-    this.loopBackState = null;
-    return this;
+	BlockStartState.call(this)
+	this.stateType = ATNState.PLUS_BLOCK_START
+    this.loopBackState = null
+    return this
 }
 
-PlusBlockStartState.prototype = Object.create(BlockStartState.prototype);
-PlusBlockStartState.prototype.constructor = PlusBlockStartState;
+PlusBlockStartState.prototype = Object.create(BlockStartState.prototype)
+PlusBlockStartState.prototype.constructor = PlusBlockStartState
 
 // The block that begins a closure loop.
 type StarBlockStartState struct {
-	BlockStartState.call(this);
-	this.stateType = ATNState.STAR_BLOCK_START;
-	return this;
+	BlockStartState.call(this)
+	this.stateType = ATNState.STAR_BLOCK_START
+	return this
 }
 
-StarBlockStartState.prototype = Object.create(BlockStartState.prototype);
-StarBlockStartState.prototype.constructor = StarBlockStartState;
+StarBlockStartState.prototype = Object.create(BlockStartState.prototype)
+StarBlockStartState.prototype.constructor = StarBlockStartState
 
 
 type StarLoopbackState struct {
-	ATNState.call(this);
-	this.stateType = ATNState.STAR_LOOP_BACK;
-	return this;
+	ATNState.call(this)
+	this.stateType = ATNState.STAR_LOOP_BACK
+	return this
 }
 
-StarLoopbackState.prototype = Object.create(ATNState.prototype);
-StarLoopbackState.prototype.constructor = StarLoopbackState;
+StarLoopbackState.prototype = Object.create(ATNState.prototype)
+StarLoopbackState.prototype.constructor = StarLoopbackState
 
 
 type StarLoopEntryState struct {
-	DecisionState.call(this);
-	this.stateType = ATNState.STAR_LOOP_ENTRY;
-    this.loopBackState = null;
+	DecisionState.call(this)
+	this.stateType = ATNState.STAR_LOOP_ENTRY
+    this.loopBackState = null
     // Indicates whether this state can benefit from a precedence DFA during SLL decision making.
-    this.precedenceRuleDecision = null;
-    return this;
+    this.precedenceRuleDecision = null
+    return this
 }
 
-StarLoopEntryState.prototype = Object.create(DecisionState.prototype);
-StarLoopEntryState.prototype.constructor = StarLoopEntryState;
+StarLoopEntryState.prototype = Object.create(DecisionState.prototype)
+StarLoopEntryState.prototype.constructor = StarLoopEntryState
 
 
 // Mark the end of a * or + loop.
 type LoopEndState struct {
-	ATNState.call(this);
-	this.stateType = ATNState.LOOP_END;
-	this.loopBackState = null;
-	return this;
+	ATNState.call(this)
+	this.stateType = ATNState.LOOP_END
+	this.loopBackState = null
+	return this
 }
 
-LoopEndState.prototype = Object.create(ATNState.prototype);
-LoopEndState.prototype.constructor = LoopEndState;
+LoopEndState.prototype = Object.create(ATNState.prototype)
+LoopEndState.prototype.constructor = LoopEndState
 
 
 // The Tokens rule start state linking to each lexer rule start state */
 type TokensStartState struct {
-	DecisionState.call(this);
-	this.stateType = ATNState.TOKEN_START;
-	return this;
+	DecisionState.call(this)
+	this.stateType = ATNState.TOKEN_START
+	return this
 }
 
-TokensStartState.prototype = Object.create(DecisionState.prototype);
-TokensStartState.prototype.constructor = TokensStartState;
+TokensStartState.prototype = Object.create(DecisionState.prototype)
+TokensStartState.prototype.constructor = TokensStartState
 
 
 

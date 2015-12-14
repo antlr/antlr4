@@ -1,11 +1,11 @@
-package antlr
+package error
 
 // Provides an empty default implementation of {@link ANTLRErrorListener}. The
 // default implementation of each method does nothing, but can be overridden as
 // necessary.
 
 type ErrorListener struct {
-	return this;
+	return this
 }
 
 func (this *ErrorListener) syntaxError(recognizer, offendingSymbol, line, column, msg, e) {
@@ -21,17 +21,17 @@ func (this *ErrorListener) reportContextSensitivity(recognizer, dfa, startIndex,
 }
 
 type ConsoleErrorListener struct {
-	ErrorListener.call(this);
-	return this;
+	ErrorListener.call(this)
+	return this
 }
 
-ConsoleErrorListener.prototype = Object.create(ErrorListener.prototype);
-ConsoleErrorListener.prototype.constructor = ConsoleErrorListener;
+ConsoleErrorListener.prototype = Object.create(ErrorListener.prototype)
+ConsoleErrorListener.prototype.constructor = ConsoleErrorListener
 
 //
 // Provides a default instance of {@link ConsoleErrorListener}.
 //
-ConsoleErrorListener.INSTANCE = new ConsoleErrorListener();
+ConsoleErrorListener.INSTANCE = new ConsoleErrorListener()
 
 //
 // {@inheritDoc}
@@ -46,35 +46,35 @@ ConsoleErrorListener.INSTANCE = new ConsoleErrorListener();
 // </pre>
 //
 func (this *ConsoleErrorListener) syntaxError(recognizer, offendingSymbol, line, column, msg, e) {
-    console.error("line " + line + ":" + column + " " + msg);
+    console.error("line " + line + ":" + column + " " + msg)
 }
 
-function ProxyErrorListener(delegates) {
-	ErrorListener.call(this);
+func ProxyErrorListener(delegates) {
+	ErrorListener.call(this)
     if (delegates==null) {
-        throw "delegates";
+        throw "delegates"
     }
-    this.delegates = delegates;
-	return this;
+    this.delegates = delegates
+	return this
 }
 
-ProxyErrorListener.prototype = Object.create(ErrorListener.prototype);
-ProxyErrorListener.prototype.constructor = ProxyErrorListener;
+ProxyErrorListener.prototype = Object.create(ErrorListener.prototype)
+ProxyErrorListener.prototype.constructor = ProxyErrorListener
 
 func (this *ProxyErrorListener) syntaxError(recognizer, offendingSymbol, line, column, msg, e) {
-    this.delegates.map(function(d) { d.syntaxError(recognizer, offendingSymbol, line, column, msg, e); });
+    this.delegates.map(function(d) { d.syntaxError(recognizer, offendingSymbol, line, column, msg, e) })
 }
 
 func (this *ProxyErrorListener) reportAmbiguity(recognizer, dfa, startIndex, stopIndex, exact, ambigAlts, configs) {
-    this.delegates.map(function(d) { d.reportAmbiguity(recognizer, dfa, startIndex, stopIndex, exact, ambigAlts, configs); });
+    this.delegates.map(function(d) { d.reportAmbiguity(recognizer, dfa, startIndex, stopIndex, exact, ambigAlts, configs) })
 }
 
 func (this *ProxyErrorListener) reportAttemptingFullContext(recognizer, dfa, startIndex, stopIndex, conflictingAlts, configs) {
-	this.delegates.map(function(d) { d.reportAttemptingFullContext(recognizer, dfa, startIndex, stopIndex, conflictingAlts, configs); });
+	this.delegates.map(function(d) { d.reportAttemptingFullContext(recognizer, dfa, startIndex, stopIndex, conflictingAlts, configs) })
 }
 
 func (this *ProxyErrorListener) reportContextSensitivity(recognizer, dfa, startIndex, stopIndex, prediction, configs) {
-	this.delegates.map(function(d) { d.reportContextSensitivity(recognizer, dfa, startIndex, stopIndex, prediction, configs); });
+	this.delegates.map(function(d) { d.reportContextSensitivity(recognizer, dfa, startIndex, stopIndex, prediction, configs) })
 }
 
 

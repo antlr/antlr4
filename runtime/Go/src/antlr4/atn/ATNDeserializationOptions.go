@@ -1,18 +1,18 @@
-package antlr
+package atn
 
-function ATNDeserializationOptions(copyFrom) {
+func ATNDeserializationOptions(copyFrom) {
 	if(copyFrom==undefined) {
-		copyFrom = null;
+		copyFrom = null
 	}
-	this.readOnly = false;
-    this.verifyATN = copyFrom==null ? true : copyFrom.verifyATN;
-    this.generateRuleBypassTransitions = copyFrom==null ? false : copyFrom.generateRuleBypassTransitions;
+	this.readOnly = false
+    this.verifyATN = copyFrom==null ? true : copyFrom.verifyATN
+    this.generateRuleBypassTransitions = copyFrom==null ? false : copyFrom.generateRuleBypassTransitions
 
-    return this;
+    return this
 }
 
-ATNDeserializationOptions.defaultOptions = new ATNDeserializationOptions();
-ATNDeserializationOptions.defaultOptions.readOnly = true;
+ATNDeserializationOptions.defaultOptions = new ATNDeserializationOptions()
+ATNDeserializationOptions.defaultOptions.readOnly = true
 
 //    func __setattr__(self, key, value):
 //        if key!="readOnly" and self.readOnly:
