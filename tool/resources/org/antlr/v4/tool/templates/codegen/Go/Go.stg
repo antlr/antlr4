@@ -93,6 +93,7 @@ fileHeader(grammarFileName, ANTLRVersion) ::= <<
 
 
 Parser(parser, funcs, atn, sempredFuncs, superClass) ::= <<
+package <parser.name>
 
 <if(superClass)>
 // TODO var <superClass> = require('./<superClass>').<superClass>;
