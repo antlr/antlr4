@@ -88,13 +88,11 @@ func (l <file.grammarName>Visitor) visit<lname; format="cap">(ctx) {
 
 fileHeader(grammarFileName, ANTLRVersion) ::= <<
 // Generated from <grammarFileName; format="java-escape"> by ANTLR <ANTLRVersion>
-package <file.grammarName>
 >>
 
 
 
 Parser(parser, funcs, atn, sempredFuncs, superClass) ::= <<
-package <file.grammarName>
 
 <if(superClass)>
 // TODO var <superClass> = require('./<superClass>').<superClass>;
@@ -105,17 +103,15 @@ grammarFileName := "<parser.grammarFileName; format="java-escape">";
 <atn>
 
 deserializer := new(antlr4.atn.ATNDeserializer)
-atn := deserializer.deserialize(serializedATN)
+deserializedAtn := deserializer.deserialize(serializedATN)
 
-
-// decisionsToDFA := atn.decisionToState.map( function(ds, index) { return  });
+// decisionsToDFA := deserializedAtn.decisionToState.map( function(ds, index) { return  });
 
 var decisionToDFA []Foo //TODO
 
-for index, ds := range atn.decisionToState {
+for index, ds := range deserializedAtn.decisionToState {
     decisionToDFA[index] = ds
 }
-
 
 sharedContextCache := new(PredictionContextCache)
 
