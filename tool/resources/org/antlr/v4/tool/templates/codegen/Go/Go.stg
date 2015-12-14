@@ -15,16 +15,12 @@ pythonTypeInitMap ::= [
 
 
 
-
 // args must be <object-model-object>, <fields-resulting-in-STs>
-
-
-
 
 ParserFile(file, parser, namedActions) ::= <<
 
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
-import ("antlr")
+import ("antlr/tree")
 
 <if(file.genListener)>
 var <file.grammarName>Listener = require('./<file.grammarName>Listener').<file.grammarName>Listener;
@@ -44,14 +40,12 @@ ListenerFile(file, header) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 package <file.grammarName>
 
-import(
-  "antlr4"
-)
+import("antlr4/tree") // TODO import the ParseTreeListener specifically
 
 // This class defines a complete listener for a parse tree produced by <file.parserName>.
 
 type <file.grammarName>Listener struct {
-	ParseTreeListener
+	tree.ParseTreeListener
 }
 
 <file.listenerNames:{lname |
@@ -70,10 +64,10 @@ func (l <file.grammarName>Listener) exit<lname; format="cap">(ctx) {
 
 
 
-
 VisitorFile(file, header) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
-import("antlr4")
+
+import("antlr4") // TODO import the ParseTreeListener specifically
 
 <header>
 
@@ -92,30 +86,30 @@ func (l <file.grammarName>Visitor) visit<lname; format="cap">(ctx) {
 
 >>
 
-
-
 fileHeader(grammarFileName, ANTLRVersion) ::= <<
 // Generated from <grammarFileName; format="java-escape"> by ANTLR <ANTLRVersion>
+package <file.grammarName>
 >>
 
 
 
 
 
-
-
 Parser(parser, funcs, atn, sempredFuncs, superClass) ::= <<
+package <file.grammarName>
+
 <if(superClass)>
-var <superClass> = require('./<superClass>').<superClass>;
+// TODO var <superClass> = require('./<superClass>').<superClass>;
 <endif>
 
-var grammarFileName = "<parser.grammarFileName; format="java-escape">";
+grammarFileName := "<parser.grammarFileName; format="java-escape">";
 
 <atn>
 
-var atn = new antlr4.atn.ATNDeserializer().deserialize(serializedATN);
+deserializer := antlr4.atn.ATNDeserializer{}
+atn := deserializer.deserialize(serializedATN);
 
-var decisionsToDFA = atn.decisionToState.map( function(ds, index) { return new antlr4.dfa.DFA(ds, index); });
+decisionsToDFA := atn.decisionToState.map( function(ds, index) { return new antlr4.dfa.DFA(ds, index); });
 
 var sharedContextCache = new antlr4.PredictionContextCache();
 
