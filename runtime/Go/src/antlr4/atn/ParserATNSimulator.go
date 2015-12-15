@@ -606,7 +606,7 @@ ParserATNSimulator.prototype.execATNWithFullContext = function(dfa, D, // how fa
     input.seek(startIndex)
     var t = input.LA(1)
     var predictedAlt = -1
-    while (true) { // while more work
+    for (true) { // while more work
         reach = this.computeReachSet(previous, t, fullCtx)
         if (reach==nil) {
             // if any configs in previous dipped into outer context, that

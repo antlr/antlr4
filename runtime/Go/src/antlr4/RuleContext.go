@@ -41,7 +41,7 @@ func RuleContext(parent, invokingState) {
 func (this *RuleContext) depth() {
 	var n = 0
 	var p = this
-	while (p != nil) {
+	for (p != nil) {
 		p = p.parentCtx
 		n += 1
 	}
@@ -115,7 +115,7 @@ func (this *RuleContext) toString(ruleNames, stop) {
 	stop = stop || nil
 	var p = this
 	var s = "["
-	while (p != nil && p != stop) {
+	for (p != nil && p != stop) {
 		if (ruleNames == nil) {
 			if (!p.isEmpty()) {
 				s += p.invokingState

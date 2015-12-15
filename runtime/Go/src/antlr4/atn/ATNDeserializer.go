@@ -423,7 +423,7 @@ func (this *ATNDeserializer) generateRuleBypassTransition(atn, idx) {
 	// instead
     var ruleToStartState = atn.ruleToStartState[idx]
     var count = ruleToStartState.transitions.length
-    while ( count > 0) {
+    for ( count > 0) {
         bypassStart.addTransition(ruleToStartState.transitions[count-1])
         ruleToStartState.transitions = ruleToStartState.transitions.slice(-1)
     }

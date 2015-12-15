@@ -148,7 +148,7 @@ LexerATNSimulator.prototype.execATN = function(input, ds0) {
 	var t = input.LA(1)
 	var s = ds0 // s is current/from DFA state
 
-	while (true) { // while more work
+	for (true) { // while more work
 		if (this.debug) {
 			console.log("execATN loop starting closure: " + s.configs)
 		}

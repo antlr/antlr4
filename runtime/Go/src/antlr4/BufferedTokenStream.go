@@ -241,14 +241,14 @@ func (bt *BufferedTokenStream) setTokenSource(tokenSource) {
 // Return i if tokens[i] is on channel. Return -1 if there are no tokens
 // on channel between i and EOF.
 // /
-func (bt *BufferedTokenStream) nextTokenOnChannel(i, channel) {
+func (bt *BufferedTokenStream) nextTokenOnChannel(i, channel int) {
 	bt.sync(i)
 	if (i >= len(bt.tokens)) {
 		return -1
 	}
 	var token = bt.tokens[i]
-	while (token.channel != bt.channel) {
-		if (token.type == TokenEOF) {
+	for (token.channel != bt.channel) {
+		if (token.tokenType == TokenEOF) {
 			return -1
 		}
 		i += 1
@@ -261,8 +261,8 @@ func (bt *BufferedTokenStream) nextTokenOnChannel(i, channel) {
 // Given a starting index, return the index of the previous token on channel.
 // Return i if tokens[i] is on channel. Return -1 if there are no tokens
 // on channel between i and 0.
-func (bt *BufferedTokenStream) previousTokenOnChannel(i, channel) {
-	while (i >= 0 && bt.tokens[i].channel != channel) {
+func (bt *BufferedTokenStream) previousTokenOnChannel(i, channel int) {
+	for (i >= 0 && bt.tokens[i].channel != channel) {
 		i -= 1
 	}
 	return i
@@ -271,8 +271,7 @@ func (bt *BufferedTokenStream) previousTokenOnChannel(i, channel) {
 // Collect all tokens on specified channel to the right of
 // the current token up until we see a token on DEFAULT_TOKEN_CHANNEL or
 // EOF. If channel is -1, find any non default channel token.
-func (bt *BufferedTokenStream) getHiddenTokensToRight(tokenIndex,
-		channel) {
+func (bt *BufferedTokenStream) getHiddenTokensToRight(tokenIndex, channel int) {
 	if (channel == undefined) {
 		channel = -1
 	}
@@ -291,8 +290,7 @@ func (bt *BufferedTokenStream) getHiddenTokensToRight(tokenIndex,
 // Collect all tokens on specified channel to the left of
 // the current token up until we see a token on DEFAULT_TOKEN_CHANNEL.
 // If channel is -1, find any non default channel token.
-func (bt *BufferedTokenStream) getHiddenTokensToLeft(tokenIndex,
-		channel) {
+func (bt *BufferedTokenStream) getHiddenTokensToLeft(tokenIndex, channel int) {
 	if (channel == undefined) {
 		channel = -1
 	}
@@ -311,9 +309,9 @@ func (bt *BufferedTokenStream) getHiddenTokensToLeft(tokenIndex,
 	return bt.filterForChannel(from_, to, channel)
 }
 
-func (bt *BufferedTokenStream) filterForChannel(left, right, channel) {
+func (bt *BufferedTokenStream) filterForChannel(left, right, channel int) {
 	var hidden = []
-	for var i = left; i < right + 1; i++ {
+	for i := left; i < right + 1; i++ {
 		var t = bt.tokens[i]
 		if (channel == -1) {
 			if (t.channel != LexerDefaultTokenChannel) {
@@ -334,10 +332,10 @@ func (bt *BufferedTokenStream) getSourceName() {
 }
 
 // Get the text of all tokens in bt buffer.///
-func (bt *BufferedTokenStream) getText(interval) string {
+func (bt *BufferedTokenStream) getText(interval *Interval) string {
 	bt.lazyInit()
 	bt.fill()
-	if (interval == undefined || interval == nil) {
+	if (interval == nil) {
 		interval = NewInterval(0, len(bt.tokens) - 1)
 	}
 	var start = interval.start

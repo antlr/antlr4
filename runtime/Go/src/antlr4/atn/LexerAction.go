@@ -13,21 +13,25 @@ const (
     LexerActionTypeSKIP = 6        //The type of a {@link LexerSkipAction} action.
     LexerActionTypeTYPE = 7        //The type of a {@link LexerTypeAction} action.
 )
+type LexerAction struct  {
+    actionType LexerActionType
+    isPositionDependent bool
+}
 
-func LexerAction(action) {
-    this.actionType = action
-    this.isPositionDependent = false
-    return this
+func LexerAction(action LexerActionType) *LexerAction {
+    la := new(LexerAction)
+    la.actionType = action
+    la.isPositionDependent = false
+    return la
 }
 
 func (this *LexerAction) hashString() {
     return "" + this.actionType
 }
 
-func (this *LexerAction) equals(other) {
+func (this *LexerAction) equals(other *LexerAction) {
     return this == other
 }
-
 
 
 //
@@ -46,7 +50,7 @@ type LexerSkipAction struct {
 // Provides a singleton instance of this parameterless lexer action.
 LexerSkipAction.INSTANCE = NewLexerSkipAction()
 
-func (this *LexerSkipAction) execute(lexer) {
+func (this *LexerSkipAction) execute(lexer *Lexer) {
     lexer.skip()
 }
 
@@ -65,7 +69,7 @@ func LexerTypeAction(type) {
 //LexerTypeAction.prototype = Object.create(LexerAction.prototype)
 //LexerTypeAction.prototype.constructor = LexerTypeAction
 
-func (this *LexerTypeAction) execute(lexer) {
+func (this *LexerTypeAction) execute(lexer *Lexer) {
     lexer.type = this.type
 }
 
@@ -101,7 +105,7 @@ func LexerPushModeAction(mode) {
 
 // <p>This action is implemented by calling {@link Lexer//pushMode} with the
 // value provided by {@link //getMode}.</p>
-func (this *LexerPushModeAction) execute(lexer) {
+func (this *LexerPushModeAction) execute(lexer *Lexer) {
     lexer.pushMode(this.mode)
 }
 
@@ -139,7 +143,7 @@ type LexerPopModeAction struct {
 LexerPopModeAction.INSTANCE = NewLexerPopModeAction()
 
 // <p>This action is implemented by calling {@link Lexer//popMode}.</p>
-func (this *LexerPopModeAction) execute(lexer) {
+func (this *LexerPopModeAction) execute(lexer *Lexer) {
     lexer.popMode()
 }
 
@@ -162,7 +166,7 @@ type LexerMoreAction struct {
 LexerMoreAction.INSTANCE = NewLexerMoreAction()
 
 // <p>This action is implemented by calling {@link Lexer//popMode}.</p>
-func (this *LexerMoreAction) execute(lexer) {
+func (this *LexerMoreAction) execute(lexer *Lexer) {
     lexer.more()
 }
 
@@ -184,7 +188,7 @@ func LexerModeAction(mode) {
 
 // <p>This action is implemented by calling {@link Lexer//mode} with the
 // value provided by {@link //getMode}.</p>
-func (this *LexerModeAction) execute(lexer) {
+func (this *LexerModeAction) execute(lexer *Lexer) {
     lexer.mode(this.mode)
 }
 
@@ -237,7 +241,7 @@ func LexerCustomAction(ruleIndex, actionIndex) {
 
 // <p>Custom actions are implemented by calling {@link Lexer//action} with the
 // appropriate rule and action indexes.</p>
-func (this *LexerCustomAction) execute(lexer) {
+func (this *LexerCustomAction) execute(lexer *Lexer) {
     lexer.action(nil, this.ruleIndex, this.actionIndex)
 }
 
@@ -270,7 +274,7 @@ func LexerChannelAction(channel) {
 
 // <p>This action is implemented by calling {@link Lexer//setChannel} with the
 // value provided by {@link //getChannel}.</p>
-func (this *LexerChannelAction) execute(lexer) {
+func (this *LexerChannelAction) execute(lexer *Lexer) {
     lexer._channel = this.channel
 }
 
@@ -325,9 +329,9 @@ func LexerIndexedCustomAction(offset, action) {
 
 // <p>This method calls {@link //execute} on the result of {@link //getAction}
 // using the provided {@code lexer}.</p>
-func (this *LexerIndexedCustomAction) execute(lexer) {
+func (this *LexerIndexedCustomAction) execute(lexer *Lexer) {
     // assume the input stream position was properly set by the calling code
-    this.action.execute(lexer)
+    this.action.execute(lexer *Lexer)
 }
 
 func (this *LexerIndexedCustomAction) hashString() {

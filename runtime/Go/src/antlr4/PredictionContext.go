@@ -274,8 +274,8 @@ func (this *ArrayPredictionContext) toString() string {
 // Convert a {@link RuleContext} tree to a {@link PredictionContext} graph.
 // Return {@link //EMPTY} if {@code outerContext} is empty or nil.
 // /
-func predictionContextFromRuleContext(atn, outerContext) {
-	if (outerContext == undefined || outerContext == nil) {
+func predictionContextFromRuleContext(atn *ATN, outerContext *RuleContext) {
+	if (outerContext == nil) {
 		outerContext = RuleContext.EMPTY
 	}
 	// if we are in RuleContext of start rule, s, then PredictionContext
@@ -540,7 +540,7 @@ func mergeArrays(a, b, rootIsWildcard, mergeCache) {
 	var mergedReturnStates = []
 	var mergedParents = []
 	// walk and merge to yield mergedParents, mergedReturnStates
-	while (i < a.returnStates.length && j < b.returnStates.length) {
+	for (i < a.returnStates.length && j < b.returnStates.length) {
 		var a_parent = a.parents[i]
 		var b_parent = b.parents[j]
 		if (a.returnStates[i] == b.returnStates[j]) {
@@ -680,8 +680,7 @@ func getCachedPredictionContext(context, contextCache, visited) {
 	if (parents.length == 0) {
 		updated = PredictionContext.EMPTY
 	} else if (parents.length == 1) {
-		updated = SingletonPredictionContext.create(parents[0], context
-				.getReturnState(0))
+		updated = SingletonPredictionContext.create(parents[0], context.getReturnState(0))
 	} else {
 		updated = NewArrayPredictionContext(parents, context.returnStates)
 	}

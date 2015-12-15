@@ -479,7 +479,7 @@ func (p.*Parser) unrollRecursionContexts(parentCtx) {
 	var retCtx = p._ctx // save current ctx (return value)
 	// unroll so _ctx is as it was before call to recursive method
 	if (p._parseListeners != nil) {
-		while (p._ctx != parentCtx) {
+		for (p._ctx != parentCtx) {
 			p.triggerExitRuleEvent()
 			p._ctx = p._ctx.parentCtx
 		}
@@ -496,7 +496,7 @@ func (p.*Parser) unrollRecursionContexts(parentCtx) {
 
 func (p.*Parser) getInvokingContext(ruleIndex) {
 	var ctx = p._ctx
-	while (ctx != nil) {
+	for (ctx != nil) {
 		if (ctx.ruleIndex == ruleIndex) {
 			return ctx
 		}
@@ -539,7 +539,7 @@ func (p.*Parser) isExpectedToken(symbol) {
 	if (!following.contains(TokenEpsilon)) {
 		return false
 	}
-	while (ctx != nil && ctx.invokingState >= 0 && following.contains(TokenEpsilon)) {
+	for (ctx != nil && ctx.invokingState >= 0 && following.contains(TokenEpsilon)) {
 		var invokingState = atn.states[ctx.invokingState]
 		var rt = invokingState.transitions[0]
 		following = atn.nextTokens(rt.followState)
@@ -594,7 +594,7 @@ func (p.*Parser) getRuleInvocationStack(p) {
 		p = p._ctx
 	}
 	var stack = []
-	while (p != nil) {
+	for (p != nil) {
 		// compute what follows who invoked us
 		var ruleIndex = p.ruleIndex
 		if (ruleIndex < 0) {

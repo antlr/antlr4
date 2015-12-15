@@ -87,7 +87,7 @@ func (this *ATN) addState( state) {
     this.states.push(state)
 }
 
-func (this *ATN) removeState( state) {
+func (this *ATN) removeState( state ) {
     this.states[state.stateNumber] = nil // just free mem, don't shift states in list
 }
 
@@ -137,7 +137,7 @@ func (this *ATN) getExpectedTokens( stateNumber, ctx ) {
     var expected = NewIntervalSet()
     expected.addSet(following)
     expected.removeOne(TokenEpsilon)
-    while (ctx != nil && ctx.invokingState >= 0 && following.contains(TokenEpsilon)) {
+    for (ctx != nil && ctx.invokingState >= 0 && following.contains(TokenEpsilon)) {
         var invokingState = this.states[ctx.invokingState]
         var rt = invokingState.transitions[0]
         following = this.nextTokens(rt.followState)

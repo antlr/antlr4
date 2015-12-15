@@ -667,7 +667,7 @@ func (this *DefaultErrorStrategy) getErrorRecoverySet(recognizer) {
     var atn = recognizer._interp.atn
     var ctx = recognizer._ctx
     var recoverSet = NewIntervalSet()
-    while (ctx != nil && ctx.invokingState>=0) {
+    for (ctx != nil && ctx.invokingState>=0) {
         // compute what follows who invoked us
         var invokingState = atn.states[ctx.invokingState]
         var rt = invokingState.transitions[0]
@@ -731,7 +731,7 @@ type BailErrorStrategy struct {
 //
 func (this *BailErrorStrategy) recover(recognizer, e) {
     var context = recognizer._ctx
-    while (context != nil) {
+    for (context != nil) {
         context.exception = e
         context = context.parentCtx
     }
