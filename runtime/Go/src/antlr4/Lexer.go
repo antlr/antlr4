@@ -1,27 +1,32 @@
 package antlr
 
+import (
+	"strings"
+)
+
 // A lexer is recognizer that draws input symbols from a character stream.
 //  lexer grammars result in a subclass of this object. A Lexer object
 //  uses simplified match() and error recovery mechanisms in the interest
 //  of speed.
 ///
 
-var Token = require('./Token').Token
-var Recognizer = require('./Recognizer').Recognizer
-var CommonTokenFactory = require('./CommonTokenFactory').CommonTokenFactory
-var LexerNoViableAltException = require('./error/Errors').LexerNoViableAltException
+type TokenSource interface {
 
-type TokenSource struct {
-	return this
 }
 
-func Lexer(input) {
-	Recognizer.call(this)
-	this._input = input
-	this._factory = CommonTokenFactory.DEFAULT
-	this._tokenFactorySourcePair = [ this, input ]
+type Lexer struct {
+	Recognizer
+}
 
-	this._interp = null // child classes must populate this
+func NewLexer(input InputStream) {
+
+	lexer := new(Lexer)
+
+	lexer._input = input
+	lexer._factory = CommonTokenFactory.DEFAULT
+	lexer._tokenFactorySourcePair = [ this, input ]
+
+	lexer._interp = null // child classes must populate this
 
 	// The goal of all lexer rules/methods is to create a token object.
 	// this is an instance variable as multiple rules may collaborate to
@@ -30,46 +35,50 @@ func Lexer(input) {
 	// emissions, then set this to the last token to be matched or
 	// something nonnull so that the auto token emit mechanism will not
 	// emit another token.
-	this._token = null
+	lexer._token = null
 
 	// What character index in the stream did the current token start at?
 	// Needed, for example, to get the text for current token. Set at
 	// the start of nextToken.
-	this._tokenStartCharIndex = -1
+	lexer._tokenStartCharIndex = -1
 
 	// The line on which the first character of the token resides///
-	this._tokenStartLine = -1
+	lexer._tokenStartLine = -1
 
 	// The character position of first character within the line///
-	this._tokenStartColumn = -1
+	lexer._tokenStartColumn = -1
 
 	// Once we see EOF on char stream, next token will be EOF.
 	// If you have DONE : EOF  then you see DONE EOF.
-	this._hitEOF = false
+	lexer._hitEOF = false
 
 	// The channel number for the current token///
-	this._channel = Token.DEFAULT_CHANNEL
+	lexer._channel = Token.DEFAULT_CHANNEL
 
 	// The token type for the current token///
-	this._type = Token.INVALID_TYPE
+	lexer._type = Token.INVALID_TYPE
 
-	this._modeStack = []
-	this._mode = Lexer.DEFAULT_MODE
+	lexer._modeStack = []
+	lexer._mode = Lexer.DEFAULT_MODE
 
 	// You can set the text for the current token to override what is in
 	// the input char buffer. Use setText() or can set this instance var.
 	// /
-	this._text = null
+	lexer._text = null
 
 	return this
 }
 
-Lexer.prototype = Object.create(Recognizer.prototype)
-Lexer.prototype.constructor = Lexer
+func InitLexer(input){
 
-Lexer.DEFAULT_MODE = 0
-Lexer.MORE = -2
-Lexer.SKIP = -3
+
+}
+
+const (
+	LexerDEFAULT_MODE = 0
+	LexerMORE = -2
+	LexerSKIP = -3
+)
 
 Lexer.DEFAULT_TOKEN_CHANNEL = Token.DEFAULT_CHANNEL
 Lexer.HIDDEN = Token.HIDDEN_CHANNEL
@@ -99,14 +108,14 @@ func (this *Lexer) reset() {
 // Return a token from this source i.e., match a token on the char stream.
 func (this *Lexer) nextToken() {
 	if (this._input == null) {
-		throw "nextToken requires a non-null input stream."
+		panic("nextToken requires a non-null input stream.")
 	}
 
 	// Mark start location in char stream so unbuffered streams are
 	// guaranteed at least have text of current token
 	var tokenStartMarker = this._input.mark()
 	try {
-		while (true) {
+		for (true) {
 			if (this._hitEOF) {
 				this.emitEOF()
 				return this._token
@@ -118,7 +127,7 @@ func (this *Lexer) nextToken() {
 			this._tokenStartLine = this._interp.line
 			this._text = null
 			var continueOuter = false
-			while (true) {
+			for (true) {
 				this._type = Token.INVALID_TYPE
 				var ttype = Lexer.SKIP
 				try {
@@ -318,11 +327,11 @@ func (this *Lexer) notifyListeners(e) {
 }
 
 func (this *Lexer) getErrorDisplay(s) {
-	var d = []
-	for (var i = 0 i < s.length i++) {
-		d.push(s[i])
+	var d = make([]string,s.length)
+	for i := 0; i < s.length; i++ {
+		d[i] = s[i]
 	}
-	return d.join('')
+	return strings.Join(d, "")
 }
 
 func (this *Lexer) getErrorDisplayForChar(c) {
