@@ -7,7 +7,7 @@ func TraceListener(parser) {
 }
 
 TraceListener.prototype = Object.create(ParseTreeListener)
-TraceListener.prototype.constructor = TraceListener
+//TraceListener.prototype.constructor = TraceListener
 
 func (this *TraceListener) enterEveryRule(ctx) {
 	fmt.Println("enter   " + this.parser.ruleNames[ctx.ruleIndex] + ", LT(1)=" + this.parser._input.LT(1).text)
@@ -54,7 +54,7 @@ func Parser(input) {
 	return this
 }
 
-Parser.prototype = Object.create(Recognizer.prototype)
+//Parser.prototype = Object.create(Recognizer.prototype)
 Parser.prototype.contructor = Parser
 
 // p.field maps from the serialized ATN string to the deserialized {@link
@@ -282,7 +282,7 @@ func (p.*Parser) getATNWithBypassAlts() {
 // String id = m.get("ID")
 // </pre>
 
-var Lexer = require('./Lexer').Lexer
+//var Lexer = require('./Lexer').Lexer
 
 func (p.*Parser) compileParseTreePattern(pattern, patternRuleIndex, lexer) {
 	lexer = lexer || nil

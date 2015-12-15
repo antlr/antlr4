@@ -1,8 +1,8 @@
 package antlr4
 
-var Token = require('./Token').Token
-var ConsoleErrorListener = require('./error/ErrorListener').ConsoleErrorListener
-var ProxyErrorListener = require('./error/ErrorListener').ProxyErrorListener
+//var Token = require('./Token').Token
+//var ConsoleErrorListener = require('./error/ErrorListener').ConsoleErrorListener
+//var ProxyErrorListener = require('./error/ErrorListener').ProxyErrorListener
 
 type Recognizer struct {
     this._listeners = [ ConsoleErrorListener.INSTANCE ]

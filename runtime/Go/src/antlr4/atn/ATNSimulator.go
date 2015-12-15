@@ -1,8 +1,8 @@
 package atn
 
-var DFAState = require('./../dfa/DFAState').DFAState
-var ATNConfigSet = require('./ATNConfigSet').ATNConfigSet
-var getCachedPredictionContext = require('./../PredictionContext').getCachedPredictionContext
+//var DFAState = require('./../dfa/DFAState').DFAState
+//var ATNConfigSet = require('./ATNConfigSet').ATNConfigSet
+//var getCachedPredictionContext = require('./../PredictionContext').getCachedPredictionContext
 
 func ATNSimulator(atn, sharedContextCache) {
 	

@@ -64,8 +64,8 @@ func LexerDFASerializer(dfa) {
 	return this
 }
 
-LexerDFASerializer.prototype = Object.create(DFASerializer.prototype)
-LexerDFASerializer.prototype.constructor = LexerDFASerializer
+//LexerDFASerializer.prototype = Object.create(DFASerializer.prototype)
+//LexerDFASerializer.prototype.constructor = LexerDFASerializer
 
 func (this *LexerDFASerializer) getEdgeLabel(i) {
 	return "'" + String.fromCharCode(i) + "'"

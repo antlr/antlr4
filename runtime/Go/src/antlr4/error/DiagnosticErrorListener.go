@@ -19,9 +19,9 @@ package error
 // this situation occurs.</li>
 // </ul>
 
-var BitSet = require('./../Utils').BitSet
-var ErrorListener = require('./ErrorListener').ErrorListener
-var Interval = require('./../IntervalSet').Interval
+//var BitSet = require('./../Utils').BitSet
+//var ErrorListener = require('./ErrorListener').ErrorListener
+//var Interval = require('./../IntervalSet').Interval
 
 func DiagnosticErrorListener(exactOnly) {
 	ErrorListener.call(this)
@@ -31,8 +31,8 @@ func DiagnosticErrorListener(exactOnly) {
 	return this
 }
 
-DiagnosticErrorListener.prototype = Object.create(ErrorListener.prototype)
-DiagnosticErrorListener.prototype.constructor = DiagnosticErrorListener
+//DiagnosticErrorListener.prototype = Object.create(ErrorListener.prototype)
+//DiagnosticErrorListener.prototype.constructor = DiagnosticErrorListener
 
 func (this *DiagnosticErrorListener) reportAmbiguity(recognizer, dfa,
 		startIndex, stopIndex, exact, ambigAlts, configs) {

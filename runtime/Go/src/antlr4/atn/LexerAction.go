@@ -40,8 +40,8 @@ type LexerSkipAction struct {
 	return this
 }
 
-LexerSkipAction.prototype = Object.create(LexerAction.prototype)
-LexerSkipAction.prototype.constructor = LexerSkipAction
+//LexerSkipAction.prototype = Object.create(LexerAction.prototype)
+//LexerSkipAction.prototype.constructor = LexerSkipAction
 
 // Provides a singleton instance of this parameterless lexer action.
 LexerSkipAction.INSTANCE = NewLexerSkipAction()
@@ -62,8 +62,8 @@ func LexerTypeAction(type) {
 	return this
 }
 
-LexerTypeAction.prototype = Object.create(LexerAction.prototype)
-LexerTypeAction.prototype.constructor = LexerTypeAction
+//LexerTypeAction.prototype = Object.create(LexerAction.prototype)
+//LexerTypeAction.prototype.constructor = LexerTypeAction
 
 func (this *LexerTypeAction) execute(lexer) {
     lexer.type = this.type
@@ -96,8 +96,8 @@ func LexerPushModeAction(mode) {
     return this
 }
 
-LexerPushModeAction.prototype = Object.create(LexerAction.prototype)
-LexerPushModeAction.prototype.constructor = LexerPushModeAction
+//LexerPushModeAction.prototype = Object.create(LexerAction.prototype)
+//LexerPushModeAction.prototype.constructor = LexerPushModeAction
 
 // <p>This action is implemented by calling {@link Lexer//pushMode} with the
 // value provided by {@link //getMode}.</p>
@@ -133,8 +133,8 @@ type LexerPopModeAction struct {
 	return this
 }
 
-LexerPopModeAction.prototype = Object.create(LexerAction.prototype)
-LexerPopModeAction.prototype.constructor = LexerPopModeAction
+//LexerPopModeAction.prototype = Object.create(LexerAction.prototype)
+//LexerPopModeAction.prototype.constructor = LexerPopModeAction
 
 LexerPopModeAction.INSTANCE = NewLexerPopModeAction()
 
@@ -156,8 +156,8 @@ type LexerMoreAction struct {
 	return this
 }
 
-LexerMoreAction.prototype = Object.create(LexerAction.prototype)
-LexerMoreAction.prototype.constructor = LexerMoreAction
+//LexerMoreAction.prototype = Object.create(LexerAction.prototype)
+//LexerMoreAction.prototype.constructor = LexerMoreAction
 
 LexerMoreAction.INSTANCE = NewLexerMoreAction()
 
@@ -179,8 +179,8 @@ func LexerModeAction(mode) {
     return this
 }
 
-LexerModeAction.prototype = Object.create(LexerAction.prototype)
-LexerModeAction.prototype.constructor = LexerModeAction
+//LexerModeAction.prototype = Object.create(LexerAction.prototype)
+//LexerModeAction.prototype.constructor = LexerModeAction
 
 // <p>This action is implemented by calling {@link Lexer//mode} with the
 // value provided by {@link //getMode}.</p>
@@ -232,8 +232,8 @@ func LexerCustomAction(ruleIndex, actionIndex) {
     return this
 }
 
-LexerCustomAction.prototype = Object.create(LexerAction.prototype)
-LexerCustomAction.prototype.constructor = LexerCustomAction
+//LexerCustomAction.prototype = Object.create(LexerAction.prototype)
+//LexerCustomAction.prototype.constructor = LexerCustomAction
 
 // <p>Custom actions are implemented by calling {@link Lexer//action} with the
 // appropriate rule and action indexes.</p>
@@ -265,8 +265,8 @@ func LexerChannelAction(channel) {
     return this
 }
 
-LexerChannelAction.prototype = Object.create(LexerAction.prototype)
-LexerChannelAction.prototype.constructor = LexerChannelAction
+//LexerChannelAction.prototype = Object.create(LexerAction.prototype)
+//LexerChannelAction.prototype.constructor = LexerChannelAction
 
 // <p>This action is implemented by calling {@link Lexer//setChannel} with the
 // value provided by {@link //getChannel}.</p>
@@ -320,8 +320,8 @@ func LexerIndexedCustomAction(offset, action) {
     return this
 }
 
-LexerIndexedCustomAction.prototype = Object.create(LexerAction.prototype)
-LexerIndexedCustomAction.prototype.constructor = LexerIndexedCustomAction
+//LexerIndexedCustomAction.prototype = Object.create(LexerAction.prototype)
+//LexerIndexedCustomAction.prototype.constructor = LexerIndexedCustomAction
 
 // <p>This method calls {@link //execute} on the result of {@link //getAction}
 // using the provided {@code lexer}.</p>

@@ -5,11 +5,11 @@ package atn
 // utility methods for analyzing configuration sets for conflicts and/or
 // ambiguities.
 
-var Set = require('./../Utils').Set
-var BitSet = require('./../Utils').BitSet
-var AltDict = require('./../Utils').AltDict
-var ATN = require('./ATN').ATN
-var RuleStopState = require('./ATNState').RuleStopState
+//var Set = require('./../Utils').Set
+//var BitSet = require('./../Utils').BitSet
+//var AltDict = require('./../Utils').AltDict
+//var ATN = require('./ATN').ATN
+//var RuleStopState = require('./ATNState').RuleStopState
 
 type PredictionMode struct {
 	return this

@@ -25,8 +25,8 @@ type ConsoleErrorListener struct {
 	return this
 }
 
-ConsoleErrorListener.prototype = Object.create(ErrorListener.prototype)
-ConsoleErrorListener.prototype.constructor = ConsoleErrorListener
+//ConsoleErrorListener.prototype = Object.create(ErrorListener.prototype)
+//ConsoleErrorListener.prototype.constructor = ConsoleErrorListener
 
 //
 // Provides a default instance of {@link ConsoleErrorListener}.
@@ -58,8 +58,8 @@ func ProxyErrorListener(delegates) {
 	return this
 }
 
-ProxyErrorListener.prototype = Object.create(ErrorListener.prototype)
-ProxyErrorListener.prototype.constructor = ProxyErrorListener
+//ProxyErrorListener.prototype = Object.create(ErrorListener.prototype)
+//ProxyErrorListener.prototype.constructor = ProxyErrorListener
 
 func (this *ProxyErrorListener) syntaxError(recognizer, offendingSymbol, line, column, msg, e) {
     this.delegates.map(function(d) { d.syntaxError(recognizer, offendingSymbol, line, column, msg, e) })

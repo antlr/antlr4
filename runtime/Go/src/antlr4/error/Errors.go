@@ -6,7 +6,7 @@ package error
 //  in the input, where it is in the ATN, the rule invocation stack,
 //  and what kind of problem occurred.
 
-var PredicateTransition = require('./../atn/Transition').PredicateTransition
+//var PredicateTransition = require('./../atn/Transition').PredicateTransition
 
 func RecognitionException(params) {
 	Error.call(this)
@@ -35,8 +35,8 @@ func RecognitionException(params) {
     return this
 }
 
-RecognitionException.prototype = Object.create(Error.prototype)
-RecognitionException.prototype.constructor = RecognitionException
+//RecognitionException.prototype = Object.create(Error.prototype)
+//RecognitionException.prototype.constructor = RecognitionException
 
 // <p>If the state number is not known, this method returns -1.</p>
 
@@ -69,8 +69,8 @@ func LexerNoViableAltException(lexer, input, startIndex, deadEndConfigs) {
     return this
 }
 
-LexerNoViableAltException.prototype = Object.create(RecognitionException.prototype)
-LexerNoViableAltException.prototype.constructor = LexerNoViableAltException
+//LexerNoViableAltException.prototype = Object.create(RecognitionException.prototype)
+//LexerNoViableAltException.prototype.constructor = LexerNoViableAltException
 
 func (this *LexerNoViableAltException) toString() {
     var symbol = ""
@@ -102,8 +102,8 @@ func NoViableAltException(recognizer, input, startToken, offendingToken, deadEnd
     this.offendingToken = offendingToken
 }
 
-NoViableAltException.prototype = Object.create(RecognitionException.prototype)
-NoViableAltException.prototype.constructor = NoViableAltException
+//NoViableAltException.prototype = Object.create(RecognitionException.prototype)
+//NoViableAltException.prototype.constructor = NoViableAltException
 
 // This signifies any kind of mismatched input exceptions such as
 // when the current input does not match the expected token.
@@ -113,8 +113,8 @@ func InputMismatchException(recognizer) {
     this.offendingToken = recognizer.getCurrentToken()
 }
 
-InputMismatchException.prototype = Object.create(RecognitionException.prototype)
-InputMismatchException.prototype.constructor = InputMismatchException
+//InputMismatchException.prototype = Object.create(RecognitionException.prototype)
+//InputMismatchException.prototype.constructor = InputMismatchException
 
 // A semantic predicate failed during validation. Validation of predicates
 // occurs when normally parsing the alternative just like matching a token.
@@ -138,8 +138,8 @@ func FailedPredicateException(recognizer, predicate, message) {
     return this
 }
 
-FailedPredicateException.prototype = Object.create(RecognitionException.prototype)
-FailedPredicateException.prototype.constructor = FailedPredicateException
+//FailedPredicateException.prototype = Object.create(RecognitionException.prototype)
+//FailedPredicateException.prototype.constructor = FailedPredicateException
 
 func (this *FailedPredicateException) formatMessage(predicate, message) {
     if (message !=nil) {
@@ -155,8 +155,8 @@ type ParseCancellationException struct {
 	return this
 }
 
-ParseCancellationException.prototype = Object.create(Error.prototype)
-ParseCancellationException.prototype.constructor = ParseCancellationException
+//ParseCancellationException.prototype = Object.create(Error.prototype)
+//ParseCancellationException.prototype.constructor = ParseCancellationException
 
 
 

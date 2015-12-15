@@ -12,11 +12,11 @@ package atn
 //  the states. We'll use the term Edge for the DFA to distinguish them from
 //  ATN transitions.</p>
 
-var Token = require('./../Token').Token
-var Interval = require('./../IntervalSet').Interval
-var IntervalSet = require('./../IntervalSet').IntervalSet
-var Predicate = require('./SemanticContext').Predicate
-var PrecedencePredicate = require('./SemanticContext').PrecedencePredicate
+//var Token = require('./../Token').Token
+//var Interval = require('./../IntervalSet').Interval
+//var IntervalSet = require('./../IntervalSet').IntervalSet
+//var Predicate = require('./SemanticContext').Predicate
+//var PrecedencePredicate = require('./SemanticContext').PrecedencePredicate
 
 func Transition (target) {
     // The target of this transition.
@@ -78,8 +78,8 @@ func AtomTransition(target, label) {
     return this
 }
 
-AtomTransition.prototype = Object.create(Transition.prototype)
-AtomTransition.prototype.constructor = AtomTransition
+//AtomTransition.prototype = Object.create(Transition.prototype)
+//AtomTransition.prototype.constructor = AtomTransition
 
 func (this *AtomTransition) makeLabel() {
 	var s = NewIntervalSet()
@@ -105,8 +105,8 @@ func RuleTransition(ruleStart, ruleIndex, precedence, followState) {
     return this
 }
 
-RuleTransition.prototype = Object.create(Transition.prototype)
-RuleTransition.prototype.constructor = RuleTransition
+//RuleTransition.prototype = Object.create(Transition.prototype)
+//RuleTransition.prototype.constructor = RuleTransition
 
 func (this *RuleTransition) matches(symbol, minVocabSymbol,  maxVocabSymbol) {
 	return false
@@ -121,8 +121,8 @@ func EpsilonTransition(target, outermostPrecedenceReturn) {
     return this
 }
 
-EpsilonTransition.prototype = Object.create(Transition.prototype)
-EpsilonTransition.prototype.constructor = EpsilonTransition
+//EpsilonTransition.prototype = Object.create(Transition.prototype)
+//EpsilonTransition.prototype.constructor = EpsilonTransition
 
 func (this *EpsilonTransition) matches( symbol, minVocabSymbol,  maxVocabSymbol) {
 	return false
@@ -141,8 +141,8 @@ func RangeTransition(target, start, stop) {
     return this
 }
 
-RangeTransition.prototype = Object.create(Transition.prototype)
-RangeTransition.prototype.constructor = RangeTransition
+//RangeTransition.prototype = Object.create(Transition.prototype)
+//RangeTransition.prototype.constructor = RangeTransition
 
 func (this *RangeTransition) makeLabel() {
     var s = NewIntervalSet()
@@ -163,8 +163,8 @@ func AbstractPredicateTransition(target) {
 	return this
 }
 
-AbstractPredicateTransition.prototype = Object.create(Transition.prototype)
-AbstractPredicateTransition.prototype.constructor = AbstractPredicateTransition
+//AbstractPredicateTransition.prototype = Object.create(Transition.prototype)
+//AbstractPredicateTransition.prototype.constructor = AbstractPredicateTransition
 
 func PredicateTransition(target, ruleIndex, predIndex, isCtxDependent) {
 	AbstractPredicateTransition.call(this, target)
@@ -176,8 +176,8 @@ func PredicateTransition(target, ruleIndex, predIndex, isCtxDependent) {
     return this
 }
 
-PredicateTransition.prototype = Object.create(AbstractPredicateTransition.prototype)
-PredicateTransition.prototype.constructor = PredicateTransition
+//PredicateTransition.prototype = Object.create(AbstractPredicateTransition.prototype)
+//PredicateTransition.prototype.constructor = PredicateTransition
 
 func (this *PredicateTransition) matches(symbol, minVocabSymbol,  maxVocabSymbol) {
 	return false
@@ -201,8 +201,8 @@ func ActionTransition(target, ruleIndex, actionIndex, isCtxDependent) {
     return this
 }
 
-ActionTransition.prototype = Object.create(Transition.prototype)
-ActionTransition.prototype.constructor = ActionTransition
+//ActionTransition.prototype = Object.create(Transition.prototype)
+//ActionTransition.prototype.constructor = ActionTransition
 
 
 func (this *ActionTransition) matches(symbol, minVocabSymbol,  maxVocabSymbol) {
@@ -227,8 +227,8 @@ func SetTransition(target, set) {
     return this
 }
 
-SetTransition.prototype = Object.create(Transition.prototype)
-SetTransition.prototype.constructor = SetTransition
+//SetTransition.prototype = Object.create(Transition.prototype)
+//SetTransition.prototype.constructor = SetTransition
 
 func (this *SetTransition) matches(symbol, minVocabSymbol,  maxVocabSymbol) {
 	return this.label.contains(symbol)
@@ -245,8 +245,8 @@ func NotSetTransition(target, set) {
 	return this
 }
 
-NotSetTransition.prototype = Object.create(SetTransition.prototype)
-NotSetTransition.prototype.constructor = NotSetTransition
+//NotSetTransition.prototype = Object.create(SetTransition.prototype)
+//NotSetTransition.prototype.constructor = NotSetTransition
 
 func (this *NotSetTransition) matches(symbol, minVocabSymbol,  maxVocabSymbol) {
 	return symbol >= minVocabSymbol && symbol <= maxVocabSymbol &&
@@ -263,8 +263,8 @@ func WildcardTransition(target) {
 	return this
 }
 
-WildcardTransition.prototype = Object.create(Transition.prototype)
-WildcardTransition.prototype.constructor = WildcardTransition
+//WildcardTransition.prototype = Object.create(Transition.prototype)
+//WildcardTransition.prototype.constructor = WildcardTransition
 
 
 func (this *WildcardTransition) matches(symbol, minVocabSymbol,  maxVocabSymbol) {
@@ -283,8 +283,8 @@ func PrecedencePredicateTransition(target, precedence) {
     return this
 }
 
-PrecedencePredicateTransition.prototype = Object.create(AbstractPredicateTransition.prototype)
-PrecedencePredicateTransition.prototype.constructor = PrecedencePredicateTransition
+//PrecedencePredicateTransition.prototype = Object.create(AbstractPredicateTransition.prototype)
+//PrecedencePredicateTransition.prototype.constructor = PrecedencePredicateTransition
 
 func (this *PrecedencePredicateTransition) matches(symbol, minVocabSymbol,  maxVocabSymbol) {
 	return false

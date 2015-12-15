@@ -21,7 +21,7 @@ package antlr4
 //  @see ParserRuleContext
 ///
 
-var RuleNode = require('./tree/Tree').RuleNode
+//var RuleNode = require('./tree/Tree').RuleNode
 var INVALID_INTERVAL = require('./tree/Tree').INVALID_INTERVAL
 
 func RuleContext(parent, invokingState) {
@@ -35,8 +35,8 @@ func RuleContext(parent, invokingState) {
 	return this
 }
 
-RuleContext.prototype = Object.create(RuleNode.prototype)
-RuleContext.prototype.constructor = RuleContext
+//RuleContext.prototype = Object.create(RuleNode.prototype)
+//RuleContext.prototype.constructor = RuleContext
 
 func (this *RuleContext) depth() {
 	var n = 0
@@ -99,7 +99,7 @@ func (this *RuleContext) accept(visitor) {
 
 //need to manage circular dependencies, so export now
 
-var Trees = require('./tree/Trees').Trees
+//var Trees = require('./tree/Trees').Trees
 
 
 // Print out a whole tree, not just a node, in LISP format

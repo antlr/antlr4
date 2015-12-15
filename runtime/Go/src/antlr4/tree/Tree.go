@@ -4,57 +4,76 @@ package tree
 //  It is the most abstract interface for all the trees used by ANTLR.
 ///
 
-var Token = require('./../Token').Token
-var Interval = require('./../IntervalSet').Interval
 var INVALID_INTERVAL = NewInterval(-1, -2)
-var Utils = require('../Utils.js')
-
 
 type Tree struct {
+
+}
+
+func NewTree() *Tree{
 	return this
 }
 
 type SyntaxTree struct {
+
+}
+
+func NewSyntaxTree() *SyntaxTree{
 	Tree.call(this)
 	return this
 }
 
-SyntaxTree.prototype = Object.create(Tree.prototype)
-SyntaxTree.prototype.constructor = SyntaxTree
+
 
 type ParseTree struct {
+
+}
+
+func NewParseTree() *ParseTree{
 	SyntaxTree.call(this)
 	return this
 }
 
-ParseTree.prototype = Object.create(SyntaxTree.prototype)
-ParseTree.prototype.constructor = ParseTree
+
 
 type RuleNode struct {
+
+}
+
+func NewRuleNode() *RuleNode{
 	ParseTree.call(this)
 	return this
 }
 
-RuleNode.prototype = Object.create(ParseTree.prototype)
-RuleNode.prototype.constructor = RuleNode
+
 
 type TerminalNode struct {
+
+}
+
+func NewTerminalNode() *TerminalNode{
 	ParseTree.call(this)
 	return this
 }
 
-TerminalNode.prototype = Object.create(ParseTree.prototype)
-TerminalNode.prototype.constructor = TerminalNode
+
 
 type ErrorNode struct {
+
+}
+
+func NewErrorNode() *ErrorNode{
 	TerminalNode.call(this)
 	return this
 }
 
-ErrorNode.prototype = Object.create(TerminalNode.prototype)
-ErrorNode.prototype.constructor = ErrorNode
+
 
 type ParseTreeVisitor struct {
+
+}
+
+func NewParseTreeVisitor() *ParseTreeVisitor{
 	return this
 }
 
@@ -79,6 +98,10 @@ var visitAtom = function(visitor, ctx) {
 }
 
 type ParseTreeListener struct {
+
+}
+
+func NewParseTreeListener() *ParseTreeListener{
 }
 
 func NewParseTreeListener() ParseTreeListener {
@@ -104,8 +127,7 @@ func TerminalNodeImpl(symbol) {
 	return this
 }
 
-TerminalNodeImpl.prototype = Object.create(TerminalNode.prototype)
-TerminalNodeImpl.prototype.constructor = TerminalNodeImpl
+
 
 func (this *TerminalNodeImpl) getChild(i) {
 	return nil
@@ -162,8 +184,7 @@ func ErrorNodeImpl(token) {
 	return this
 }
 
-ErrorNodeImpl.prototype = Object.create(TerminalNodeImpl.prototype)
-ErrorNodeImpl.prototype.constructor = ErrorNodeImpl
+
 
 func (this *ErrorNodeImpl) isErrorNode() {
 	return true
@@ -174,6 +195,10 @@ func (this *ErrorNodeImpl) accept(visitor) {
 }
 
 type ParseTreeWalker struct {
+
+}
+
+func NewParseTreeWalker() *ParseTreeWalker{
 	return this
 }
 

@@ -8,8 +8,8 @@ package atn
 //  an ATN state.
 ///
 
-var DecisionState = require('./ATNState').DecisionState
-var SemanticContext = require('./SemanticContext').SemanticContext
+//var DecisionState = require('./ATNState').DecisionState
+//var SemanticContext = require('./SemanticContext').SemanticContext
 
 func checkParams(params, isCfg) {
 	if(params==nil) {
@@ -117,8 +117,8 @@ func LexerATNConfig(params, config) {
     return this
 }
 
-LexerATNConfig.prototype = Object.create(ATNConfig.prototype)
-LexerATNConfig.prototype.constructor = LexerATNConfig
+//LexerATNConfig.prototype = Object.create(ATNConfig.prototype)
+//LexerATNConfig.prototype.constructor = LexerATNConfig
 
 func (this *LexerATNConfig) hashString() {
     return "" + this.state.stateNumber + this.alt + this.context +

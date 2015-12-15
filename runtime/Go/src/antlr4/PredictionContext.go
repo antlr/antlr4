@@ -1,6 +1,6 @@
 package antlr4
 
-var RuleContext = require('./RuleContext').RuleContext
+//var RuleContext = require('./RuleContext').RuleContext
 
 func PredictionContext(cachedHashString) {
 	this.cachedHashString = cachedHashString
@@ -109,7 +109,7 @@ func SingletonPredictionContext(parent, returnState) {
 	this.returnState = returnState
 }
 
-SingletonPredictionContext.prototype = Object.create(PredictionContext.prototype)
+//SingletonPredictionContext.prototype = Object.create(PredictionContext.prototype)
 SingletonPredictionContext.prototype.contructor = SingletonPredictionContext
 
 SingletonPredictionContext.create = function(parent, returnState) {
@@ -174,8 +174,8 @@ type EmptyPredictionContext struct {
 	return this
 }
 
-EmptyPredictionContext.prototype = Object.create(SingletonPredictionContext.prototype)
-EmptyPredictionContext.prototype.constructor = EmptyPredictionContext
+//EmptyPredictionContext.prototype = Object.create(SingletonPredictionContext.prototype)
+//EmptyPredictionContext.prototype.constructor = EmptyPredictionContext
 
 func (this *EmptyPredictionContext) isEmpty() {
 	return true
@@ -211,8 +211,8 @@ func ArrayPredictionContext(parents, returnStates) {
 	return this
 }
 
-ArrayPredictionContext.prototype = Object.create(PredictionContext.prototype)
-ArrayPredictionContext.prototype.constructor = ArrayPredictionContext
+//ArrayPredictionContext.prototype = Object.create(PredictionContext.prototype)
+//ArrayPredictionContext.prototype.constructor = ArrayPredictionContext
 
 func (this *ArrayPredictionContext) isEmpty() {
 	// since EMPTY_RETURN_STATE can only appear in the last position, we

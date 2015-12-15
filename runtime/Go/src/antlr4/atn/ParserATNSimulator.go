@@ -228,35 +228,35 @@ package atn
 // the input.</p>
 //
 
-var Utils = require('./../Utils')
+//var Utils = require('./../Utils')
 var Set = Utils.Set
 var BitSet = Utils.BitSet
 var DoubleDict = Utils.DoubleDict
-var ATN = require('./ATN').ATN
-var ATNConfig = require('./ATNConfig').ATNConfig
-var ATNConfigSet = require('./ATNConfigSet').ATNConfigSet
-var Token = require('./../Token').Token
-var DFAState = require('./../dfa/DFAState').DFAState
-var PredPrediction = require('./../dfa/DFAState').PredPrediction
-var ATNSimulator = require('./ATNSimulator').ATNSimulator
-var PredictionMode = require('./PredictionMode').PredictionMode
-var RuleContext = require('./../RuleContext').RuleContext
-var ParserRuleContext = require('./../ParserRuleContext').ParserRuleContext
-var SemanticContext = require('./SemanticContext').SemanticContext
-var StarLoopEntryState = require('./ATNState').StarLoopEntryState
-var RuleStopState = require('./ATNState').RuleStopState
-var PredictionContext = require('./../PredictionContext').PredictionContext
-var Interval = require('./../IntervalSet').Interval
-var Transitions = require('./Transition')
+//var ATN = require('./ATN').ATN
+//var ATNConfig = require('./ATNConfig').ATNConfig
+//var ATNConfigSet = require('./ATNConfigSet').ATNConfigSet
+//var Token = require('./../Token').Token
+//var DFAState = require('./../dfa/DFAState').DFAState
+//var PredPrediction = require('./../dfa/DFAState').PredPrediction
+//var ATNSimulator = require('./ATNSimulator').ATNSimulator
+//var PredictionMode = require('./PredictionMode').PredictionMode
+//var RuleContext = require('./../RuleContext').RuleContext
+//var ParserRuleContext = require('./../ParserRuleContext').ParserRuleContext
+//var SemanticContext = require('./SemanticContext').SemanticContext
+//var StarLoopEntryState = require('./ATNState').StarLoopEntryState
+//var RuleStopState = require('./ATNState').RuleStopState
+//var PredictionContext = require('./../PredictionContext').PredictionContext
+//var Interval = require('./../IntervalSet').Interval
+//var Transitions = require('./Transition')
 var Transition = Transitions.Transition
 var SetTransition = Transitions.SetTransition
 var NotSetTransition = Transitions.NotSetTransition
 var RuleTransition = Transitions.RuleTransition
 var ActionTransition = Transitions.ActionTransition
-var NoViableAltException = require('./../error/Errors').NoViableAltException
+//var NoViableAltException = require('./../error/Errors').NoViableAltException
 
-var SingletonPredictionContext = require('./../PredictionContext').SingletonPredictionContext
-var predictionContextFromRuleContext = require('./../PredictionContext').predictionContextFromRuleContext
+//var SingletonPredictionContext = require('./../PredictionContext').SingletonPredictionContext
+//var predictionContextFromRuleContext = require('./../PredictionContext').predictionContextFromRuleContext
 
 func ParserATNSimulator(parser, atn, decisionToDFA, sharedContextCache) {
 	ATNSimulator.call(this, atn, sharedContextCache)
@@ -281,8 +281,8 @@ func ParserATNSimulator(parser, atn, decisionToDFA, sharedContextCache) {
     return this
 }
 
-ParserATNSimulator.prototype = Object.create(ATNSimulator.prototype)
-ParserATNSimulator.prototype.constructor = ParserATNSimulator
+//ParserATNSimulator.prototype = Object.create(ATNSimulator.prototype)
+//ParserATNSimulator.prototype.constructor = ParserATNSimulator
 
 ParserATNSimulator.prototype.debug = false
 ParserATNSimulator.prototype.debug_list_atn_decisions = false

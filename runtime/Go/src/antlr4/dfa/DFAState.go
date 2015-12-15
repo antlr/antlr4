@@ -1,6 +1,6 @@
 package dfa
 
-var ATNConfigSet = require('./../atn/ATNConfigSet').ATNConfigSet
+//var ATNConfigSet = require('./../atn/ATNConfigSet').ATNConfigSet
 
 // Map a predicate to a predicted alternative.///
 

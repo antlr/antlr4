@@ -58,8 +58,8 @@ type DefaultErrorStrategy struct {
     return this
 }
 
-DefaultErrorStrategy.prototype = Object.create(ErrorStrategy.prototype)
-DefaultErrorStrategy.prototype.constructor = DefaultErrorStrategy
+//DefaultErrorStrategy.prototype = Object.create(ErrorStrategy.prototype)
+//DefaultErrorStrategy.prototype.constructor = DefaultErrorStrategy
 
 // <p>The default implementation simply calls {@link //endErrorCondition} to
 // ensure that the handler is not in error recovery mode.</p>
@@ -721,8 +721,8 @@ type BailErrorStrategy struct {
 	return this
 }
 
-BailErrorStrategy.prototype = Object.create(DefaultErrorStrategy.prototype)
-BailErrorStrategy.prototype.constructor = BailErrorStrategy
+//BailErrorStrategy.prototype = Object.create(DefaultErrorStrategy.prototype)
+//BailErrorStrategy.prototype.constructor = BailErrorStrategy
 
 // Instead of recovering from exception {@code e}, re-panic it wrapped
 // in a {@link ParseCancellationException} so it is not caught by the

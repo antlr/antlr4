@@ -1,7 +1,7 @@
 package atn
 
-var LL1Analyzer = require('./../LL1Analyzer').LL1Analyzer
-var IntervalSet = require('./../IntervalSet').IntervalSet
+//var LL1Analyzer = require('./../LL1Analyzer').LL1Analyzer
+//var IntervalSet = require('./../IntervalSet').IntervalSet
 
 type ATN struct {
     grammarType
@@ -123,7 +123,7 @@ func (this *ATN) getDecisionState( decision) {
 // @panics IllegalArgumentException if the ATN does not contain a state with
 // number {@code stateNumber}
 
-var Token = require('./../Token').Token
+//var Token = require('./../Token').Token
 
 func (this *ATN) getExpectedTokens( stateNumber, ctx ) {
     if ( stateNumber < 0 || stateNumber >= this.states.length ) {

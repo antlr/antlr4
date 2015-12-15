@@ -8,7 +8,7 @@ package atn
 //  {@link SemanticContext} within the scope of this outer class.</p>
 //
 
-var Set = require('./../Utils').Set
+//var Set = require('./../Utils').Set
 
 type SemanticContext struct {
 	return this
@@ -92,8 +92,8 @@ func Predicate(ruleIndex, predIndex, isCtxDependent) {
 	return this
 }
 
-Predicate.prototype = Object.create(SemanticContext.prototype)
-Predicate.prototype.constructor = Predicate
+//Predicate.prototype = Object.create(SemanticContext.prototype)
+//Predicate.prototype.constructor = Predicate
 
 //The default {@link SemanticContext}, which is semantically equivalent to
 //a predicate of the form {@code {true}?}.
@@ -131,8 +131,8 @@ func PrecedencePredicate(precedence) {
 	this.precedence = precedence == undefined ? 0 : precedence
 }
 
-PrecedencePredicate.prototype = Object.create(SemanticContext.prototype)
-PrecedencePredicate.prototype.constructor = PrecedencePredicate
+//PrecedencePredicate.prototype = Object.create(SemanticContext.prototype)
+//PrecedencePredicate.prototype.constructor = PrecedencePredicate
 
 func (this *PrecedencePredicate) evaluate(parser, outerContext) {
 	return parser.precpred(outerContext, this.precedence)
@@ -216,8 +216,8 @@ func AND(a, b) {
 	return this
 }
 
-AND.prototype = Object.create(SemanticContext.prototype)
-AND.prototype.constructor = AND
+//AND.prototype = Object.create(SemanticContext.prototype)
+//AND.prototype.constructor = AND
 
 func (this *AND) equals(other) {
 	if (this == other) {
@@ -320,8 +320,8 @@ func OR(a, b) {
 	return this
 }
 
-OR.prototype = Object.create(SemanticContext.prototype)
-OR.prototype.constructor = OR
+//OR.prototype = Object.create(SemanticContext.prototype)
+//OR.prototype.constructor = OR
 
 func (this *OR) constructor(other) {
 	if (this == other) {

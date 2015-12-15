@@ -16,20 +16,20 @@ package atn
 //  can simply return the predicted token type.</p>
 ///
 
-var Token = require('./../Token').Token
-var Lexer = require('./../Lexer').Lexer
-var ATN = require('./ATN').ATN
-var ATNSimulator = require('./ATNSimulator').ATNSimulator
-var DFAState = require('./../dfa/DFAState').DFAState
-var ATNConfigSet = require('./ATNConfigSet').ATNConfigSet
-var OrderedATNConfigSet = require('./ATNConfigSet').OrderedATNConfigSet
-var PredictionContext = require('./../PredictionContext').PredictionContext
-var SingletonPredictionContext = require('./../PredictionContext').SingletonPredictionContext
-var RuleStopState = require('./ATNState').RuleStopState
-var LexerATNConfig = require('./ATNConfig').LexerATNConfig
-var Transition = require('./Transition').Transition
-var LexerActionExecutor = require('./LexerActionExecutor').LexerActionExecutor
-var LexerNoViableAltException = require('./../error/Errors').LexerNoViableAltException
+//var Token = require('./../Token').Token
+//var Lexer = require('./../Lexer').Lexer
+//var ATN = require('./ATN').ATN
+//var ATNSimulator = require('./ATNSimulator').ATNSimulator
+//var DFAState = require('./../dfa/DFAState').DFAState
+//var ATNConfigSet = require('./ATNConfigSet').ATNConfigSet
+//var OrderedATNConfigSet = require('./ATNConfigSet').OrderedATNConfigSet
+//var PredictionContext = require('./../PredictionContext').PredictionContext
+//var SingletonPredictionContext = require('./../PredictionContext').SingletonPredictionContext
+//var RuleStopState = require('./ATNState').RuleStopState
+//var LexerATNConfig = require('./ATNConfig').LexerATNConfig
+//var Transition = require('./Transition').Transition
+//var LexerActionExecutor = require('./LexerActionExecutor').LexerActionExecutor
+//var LexerNoViableAltException = require('./../error/Errors').LexerNoViableAltException
 
 func resetSimState(sim) {
 	sim.index = -1
@@ -69,8 +69,8 @@ func LexerATNSimulator(recog, atn, decisionToDFA, sharedContextCache) {
 	return this
 }
 
-LexerATNSimulator.prototype = Object.create(ATNSimulator.prototype)
-LexerATNSimulator.prototype.constructor = LexerATNSimulator
+//LexerATNSimulator.prototype = Object.create(ATNSimulator.prototype)
+//LexerATNSimulator.prototype.constructor = LexerATNSimulator
 
 LexerATNSimulator.debug = false
 LexerATNSimulator.dfa_debug = false

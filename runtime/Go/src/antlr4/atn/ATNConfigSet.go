@@ -6,11 +6,11 @@ package atn
 // graph-structured stack.
 ///
 
-var ATN = require('./ATN').ATN
-var Utils = require('./../Utils')
+//var ATN = require('./ATN').ATN
+//var Utils = require('./../Utils')
 var Set = Utils.Set
-var SemanticContext = require('./SemanticContext').SemanticContext
-var merge = require('./../PredictionContext').merge
+//var SemanticContext = require('./SemanticContext').SemanticContext
+//var merge = require('./../PredictionContext').merge
 
 func hashATNConfig(c) {
 	return c.shortHashString()
@@ -246,8 +246,8 @@ type OrderedATNConfigSet struct {
 	return this
 }
 
-OrderedATNConfigSet.prototype = Object.create(ATNConfigSet.prototype)
-OrderedATNConfigSet.prototype.constructor = OrderedATNConfigSet
+//OrderedATNConfigSet.prototype = Object.create(ATNConfigSet.prototype)
+//OrderedATNConfigSet.prototype.constructor = OrderedATNConfigSet
 
 
 

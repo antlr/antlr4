@@ -7,7 +7,7 @@ package atn
 // efficiently, ensuring that actions appearing only at the end of the rule do
 // not cause bloating of the {@link DFA} created for the lexer.</p>
 
-var LexerIndexedCustomAction = require('./LexerAction').LexerIndexedCustomAction
+//var LexerIndexedCustomAction = require('./LexerAction').LexerIndexedCustomAction
 
 func LexerActionExecutor(lexerActions) {
 	this.lexerActions = lexerActions == nil ? [] : lexerActions

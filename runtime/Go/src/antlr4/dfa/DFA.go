@@ -1,9 +1,9 @@
 package dfa
 
-var DFAState = require('./DFAState').DFAState
-var ATNConfigSet = require('./../atn/ATNConfigSet').ATNConfigSet
-var DFASerializer = require('./DFASerializer').DFASerializer
-var LexerDFASerializer = require('./DFASerializer').LexerDFASerializer
+//var DFAState = require('./DFAState').DFAState
+//var ATNConfigSet = require('./../atn/ATNConfigSet').ATNConfigSet
+//var DFASerializer = require('./DFASerializer').DFASerializer
+//var LexerDFASerializer = require('./DFASerializer').LexerDFASerializer
 
 type DFAStatesSet struct {
 	return this
