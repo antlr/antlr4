@@ -11,7 +11,7 @@ func ATNDeserializationOptions(copyFrom) {
     return this
 }
 
-ATNDeserializationOptions.defaultOptions = new ATNDeserializationOptions()
+ATNDeserializationOptions.defaultOptions = NewATNDeserializationOptions()
 ATNDeserializationOptions.defaultOptions.readOnly = true
 
 //    func __setattr__(self, key, value):

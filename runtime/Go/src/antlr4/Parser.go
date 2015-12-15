@@ -106,7 +106,7 @@ func (p.*Parser) match(ttype) {
 	} else {
 		t = p._errHandler.recoverInline(p.
 		if (p.buildParseTrees && t.tokenIndex == -1) {
-			// we must have conjured up a new token during single token
+			// we must have conjured up a Newtoken during single token
 			// insertion
 			// if it's not the current symbol
 			p._ctx.addErrorNode(t)
@@ -138,7 +138,7 @@ func (p.*Parser) matchWildcard() {
 	} else {
 		t = p._errHandler.recoverInline(p.
 		if (p._buildParseTrees && t.tokenIndex == -1) {
-			// we must have conjured up a new token during single token
+			// we must have conjured up a Newtoken during single token
 			// insertion
 			// if it's not the current symbol
 			p._ctx.addErrorNode(t)
@@ -244,7 +244,7 @@ func (p.*Parser) getTokenFactory() {
 	return p._input.tokenSource._factory
 }
 
-// Tell our token source and error strategy about a new way to create tokens.//
+// Tell our token source and error strategy about a Newway to create tokens.//
 func (p.*Parser) setTokenFactory(factory) {
 	p._input.tokenSource._factory = factory
 }
@@ -262,9 +262,9 @@ func (p.*Parser) getATNWithBypassAlts() {
 	}
 	var result = p.bypassAltsAtnCache[serializedAtn]
 	if (result == nil) {
-		var deserializationOptions = new ATNDeserializationOptions()
+		var deserializationOptions = NewATNDeserializationOptions()
 		deserializationOptions.generateRuleBypassTransitions = true
-		result = new ATNDeserializer(deserializationOptions)
+		result = NewATNDeserializer(deserializationOptions)
 				.deserialize(serializedAtn)
 		p.bypassAltsAtnCache[serializedAtn] = result
 	}
@@ -297,7 +297,7 @@ func (p.*Parser) compileParseTreePattern(pattern, patternRuleIndex, lexer) {
 	if (lexer == nil) {
 		throw "Parser can't discover a lexer to use"
 	}
-	var m = new ParseTreePatternMatcher(lexer, p.
+	var m = NewParseTreePatternMatcher(lexer, p.
 	return m.compile(pattern, patternRuleIndex)
 }
 
@@ -417,7 +417,7 @@ func (p.*Parser) exitRule() {
 }
 
 func (p.*Parser) enterOuterAlt(localctx, altNum) {
-	// if we have new localctx, make sure we replace existing ctx
+	// if we have Newlocalctx, make sure we replace existing ctx
 	// that is previous child of parse tree
 	if (p.buildParseTrees && p._ctx != localctx) {
 		if (p._ctx.parentCtx != nil) {
@@ -649,7 +649,7 @@ func (p.*Parser) setTrace(trace) {
 		if (p._tracer != nil) {
 			p.removeParseListener(p._tracer)
 		}
-		p._tracer = new TraceListener(p.
+		p._tracer = NewTraceListener(p.
 		p.addParseListener(p._tracer)
 	}
 }

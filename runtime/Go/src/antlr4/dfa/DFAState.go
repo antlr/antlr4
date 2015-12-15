@@ -44,7 +44,7 @@ func DFAState(stateNumber, configs) {
 		stateNumber = -1
 	}
 	if (configs == nil) {
-		configs = new ATNConfigSet()
+		configs = NewATNConfigSet()
 	}
 	this.stateNumber = stateNumber
 	this.configs = configs
@@ -84,7 +84,7 @@ func DFAState(stateNumber, configs) {
 // Get the set of all alts mentioned by all ATN configurations in this
 // DFA state.
 func (this *DFAState) getAltSet() {
-	var alts = new Set()
+	var alts = NewSet()
 	if (this.configs != nil) {
 		for (var i = 0 i < this.configs.length i++) {
 			var c = this.configs[i]

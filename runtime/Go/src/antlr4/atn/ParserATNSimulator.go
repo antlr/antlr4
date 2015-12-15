@@ -155,7 +155,7 @@ package atn
 //
 // <p>
 // The {@link ParserATNSimulator} locks on the {@link //decisionToDFA} field when
-// it adds a new DFA object to that array. {@link //addDFAEdge}
+// it adds a NewDFA object to that array. {@link //addDFAEdge}
 // locks on the DFA for the current decision when setting the
 // {@link DFAState//edges} field. {@link //addDFAState} locks on
 // the DFA for the current decision when looking up a DFA state to see if it
@@ -190,7 +190,7 @@ package atn
 //
 // <pre>
 // parser.{@link Parser//getInterpreter() getInterpreter()}.{@link //setPredictionMode setPredictionMode}{@code (}{@link PredictionMode//SLL}{@code )}
-// parser.{@link Parser//setErrorHandler setErrorHandler}(new {@link BailErrorStrategy}())
+// parser.{@link Parser//setErrorHandler setErrorHandler}(New{@link BailErrorStrategy}())
 // </pre>
 //
 // <p>
@@ -351,10 +351,10 @@ func (this *ParserATNSimulator) adaptivePredict(input, decision, outerContext) {
                 // than simply setting DFA.s0.
                 //
                 s0_closure = this.applyPrecedenceFilter(s0_closure)
-                s0 = this.addDFAState(dfa, new DFAState(nil, s0_closure))
+                s0 = this.addDFAState(dfa, NewDFAState(nil, s0_closure))
                 dfa.setPrecedenceStartState(this.parser.getPrecedence(), s0)
             } else {
-                s0 = this.addDFAState(dfa, new DFAState(nil, s0_closure))
+                s0 = this.addDFAState(dfa, NewDFAState(nil, s0_closure))
                 dfa.s0 = s0
             }
         }
@@ -382,7 +382,7 @@ func (this *ParserATNSimulator) adaptivePredict(input, decision, outerContext) {
       //   putting it on the work list?
 
 // We also have some key operations to do:
-      // add an edge from previous DFA state to potentially new DFA state, D,
+      // add an edge from previous DFA state to potentially NewDFA state, D,
       //   upon current symbol but only if adding to work list, which means in all
       //   cases except no viable alternative (and possibly non-greedy decisions?)
       // collecting predicates and adding semantic context to DFA accept states
@@ -532,8 +532,8 @@ func (this *ParserATNSimulator) computeTargetState(dfa, previousD, t) {
         this.addDFAEdge(dfa, previousD, t, ATNSimulator.ERROR)
         return ATNSimulator.ERROR
     }
-    // create new target state we'll add to DFA after it's complete
-    var D = new DFAState(nil, reach)
+    // create Newtarget state we'll add to DFA after it's complete
+    var D = NewDFAState(nil, reach)
 
     var predictedAlt = this.getUniqueAlt(reach)
 
@@ -705,9 +705,9 @@ func (this *ParserATNSimulator) computeReachSet(closure, t, fullCtx) {
         console.log("in computeReachSet, starting closure: " + closure)
     }
     if( this.mergeCache==nil) {
-        this.mergeCache = new DoubleDict()
+        this.mergeCache = NewDoubleDict()
     }
-    var intermediate = new ATNConfigSet(fullCtx)
+    var intermediate = NewATNConfigSet(fullCtx)
 
     // Configurations already in a rule stop state indicate reaching the end
     // of the decision rule (local context) or end of the start rule (full
@@ -743,7 +743,7 @@ func (this *ParserATNSimulator) computeReachSet(closure, t, fullCtx) {
             var trans = c.state.transitions[j]
             var target = this.getReachableTarget(trans, t)
             if (target!=nil) {
-                var cfg = new ATNConfig({state:target}, c)
+                var cfg = NewATNConfig({state:target}, c)
                 intermediate.add(cfg, this.mergeCache)
                 if(this.debug) {
                     console.log("added " + cfg + " to intermediate")
@@ -780,8 +780,8 @@ func (this *ParserATNSimulator) computeReachSet(closure, t, fullCtx) {
     // operation on the intermediate set to compute its initial value.
     //
     if (reach==nil) {
-        reach = new ATNConfigSet(fullCtx)
-        var closureBusy = new Set()
+        reach = NewATNConfigSet(fullCtx)
+        var closureBusy = NewSet()
         var treatEofAsEpsilon = t == Token.EOF
         for (var k=0 k<intermediate.items.lengthk++) {
             this.closure(intermediate.items[k], reach, closureBusy, false, fullCtx, treatEofAsEpsilon)
@@ -843,14 +843,14 @@ func (this *ParserATNSimulator) computeReachSet(closure, t, fullCtx) {
 // {@code configs}.
 //
 // @return {@code configs} if all configurations in {@code configs} are in a
-// rule stop state, otherwise return a new configuration set containing only
+// rule stop state, otherwise return a Newconfiguration set containing only
 // the configurations from {@code configs} which are in a rule stop state
 //
 func (this *ParserATNSimulator) removeAllConfigsNotInRuleStopState(configs, lookToEndOfRule) {
     if (PredictionMode.allConfigsInRuleStopStates(configs)) {
         return configs
     }
-    var result = new ATNConfigSet(configs.fullCtx)
+    var result = NewATNConfigSet(configs.fullCtx)
     for(var i=0 i<configs.items.lengthi++) {
         var config = configs.items[i]
         if (config.state instanceof RuleStopState) {
@@ -861,7 +861,7 @@ func (this *ParserATNSimulator) removeAllConfigsNotInRuleStopState(configs, look
             var nextTokens = this.atn.nextTokens(config.state)
             if (nextTokens.contains(Token.EPSILON)) {
                 var endOfRuleState = this.atn.ruleToStopState[config.state.ruleIndex]
-                result.add(new ATNConfig({state:endOfRuleState}, config), this.mergeCache)
+                result.add(NewATNConfig({state:endOfRuleState}, config), this.mergeCache)
             }
         }
     }
@@ -871,11 +871,11 @@ func (this *ParserATNSimulator) removeAllConfigsNotInRuleStopState(configs, look
 func (this *ParserATNSimulator) computeStartState(p, ctx, fullCtx) {
     // always at least the implicit call to start rule
     var initialContext = predictionContextFromRuleContext(this.atn, ctx)
-    var configs = new ATNConfigSet(fullCtx)
+    var configs = NewATNConfigSet(fullCtx)
     for(var i=0i<p.transitions.lengthi++) {
         var target = p.transitions[i].target
-        var c = new ATNConfig({ state:target, alt:i+1, context:initialContext }, nil)
-        var closureBusy = new Set()
+        var c = NewATNConfig({ state:target, alt:i+1, context:initialContext }, nil)
+        var closureBusy = NewSet()
         this.closure(c, configs, closureBusy, true, fullCtx, false)
     }
     return configs
@@ -940,7 +940,7 @@ func (this *ParserATNSimulator) computeStartState(p, ctx, fullCtx) {
 func (this *ParserATNSimulator) applyPrecedenceFilter(configs) {
 	var config
 	var statesFromAlt1 = []
-    var configSet = new ATNConfigSet(configs.fullCtx)
+    var configSet = NewATNConfigSet(configs.fullCtx)
     for(var i=0 i<configs.items.length i++) {
         config = configs.items[i]
         // handle alt 1 first
@@ -954,7 +954,7 @@ func (this *ParserATNSimulator) applyPrecedenceFilter(configs) {
         }
         statesFromAlt1[config.state.stateNumber] = config.context
         if (updatedContext != config.semanticContext) {
-            configSet.add(new ATNConfig({semanticContext:updatedContext}, config), this.mergeCache)
+            configSet.add(NewATNConfig({semanticContext:updatedContext}, config), this.mergeCache)
         } else {
             configSet.add(config, this.mergeCache)
         }
@@ -1034,7 +1034,7 @@ func (this *ParserATNSimulator) getPredicatePredictions(ambigAlts, altToPred) {
         var pred = altToPred[i]
         // unpredicated is indicated by SemanticContext.NONE
         if( ambigAlts!=nil && ambigAlts.contains( i )) {
-            pairs.push(new PredPrediction(pred, i))
+            pairs.push(NewPredPrediction(pred, i))
         }
         if (pred != SemanticContext.NONE) {
             containsPredicate = true
@@ -1130,14 +1130,14 @@ func (this *ParserATNSimulator) getAltThatFinishedDecisionEntryRule(configs) {
 //  those that have preds evaluating to true/false.  If no pred, assume
 //  true pred and include in succeeded set.  Returns Pair of sets.
 //
-//  Create a new set so as not to alter the incoming parameter.
+//  Create a Newset so as not to alter the incoming parameter.
 //
 //  Assumption: the input stream has been restored to the starting point
 //  prediction, which is where predicates need to evaluate.
 //
 func (this *ParserATNSimulator) splitAccordingToSemanticValidity( configs, outerContext) {
-    var succeeded = new ATNConfigSet(configs.fullCtx)
-    var failed = new ATNConfigSet(configs.fullCtx)
+    var succeeded = NewATNConfigSet(configs.fullCtx)
+    var failed = NewATNConfigSet(configs.fullCtx)
     for(var i=0i<configs.items.length i++) {
         var c = configs.items[i]
         if (c.semanticContext != SemanticContext.NONE) {
@@ -1161,7 +1161,7 @@ func (this *ParserATNSimulator) splitAccordingToSemanticValidity( configs, outer
 //  includes pairs with nil predicates.
 //
 func (this *ParserATNSimulator) evalSemanticContext(predPredictions, outerContext, complete) {
-    var predictions = new BitSet()
+    var predictions = NewBitSet()
     for(var i=0i<predPredictions.lengthi++) {
     	var pair = predPredictions[i]
         if (pair.pred == SemanticContext.NONE) {
@@ -1217,7 +1217,7 @@ func (this *ParserATNSimulator) closureCheckingStopState(config, configs, closur
             for ( var i =0 i<config.context.length i++) {
                 if (config.context.getReturnState(i) == PredictionContext.EMPTY_RETURN_STATE) {
                     if (fullCtx) {
-                        configs.add(new ATNConfig({state:config.state, context:PredictionContext.EMPTY}, config), this.mergeCache)
+                        configs.add(NewATNConfig({state:config.state, context:PredictionContext.EMPTY}, config), this.mergeCache)
                         continue
                     } else {
                         // we have no context info, just chase follow links (if greedy)
@@ -1232,7 +1232,7 @@ func (this *ParserATNSimulator) closureCheckingStopState(config, configs, closur
                 returnState = this.atn.states[config.context.getReturnState(i)]
                 newContext = config.context.getParent(i) // "pop" return state
                 var parms = {state:returnState, alt:config.alt, context:newContext, semanticContext:config.semanticContext}
-                c = new ATNConfig(parms, nil)
+                c = NewATNConfig(parms, nil)
                 // While we have context to pop back from, we may have
                 // gotten that context AFTER having falling off a rule.
                 // Make sure we track that we are now out of context.
@@ -1327,7 +1327,7 @@ func (this *ParserATNSimulator) getEpsilonTarget(config, t, collectPredicates, i
     case Transition.ACTION:
         return this.actionTransition(config, t)
     case Transition.EPSILON:
-        return new ATNConfig({state:t.target}, config)
+        return NewATNConfig({state:t.target}, config)
     case Transition.ATOM:
     case Transition.RANGE:
     case Transition.SET:
@@ -1335,7 +1335,7 @@ func (this *ParserATNSimulator) getEpsilonTarget(config, t, collectPredicates, i
         // transition is traversed
         if (treatEofAsEpsilon) {
             if (t.matches(Token.EOF, 0, 1)) {
-                return new ATNConfig({state: t.target}, config)
+                return NewATNConfig({state: t.target}, config)
             }
         }
         return nil
@@ -1348,7 +1348,7 @@ func (this *ParserATNSimulator) actionTransition(config, t) {
     if (this.debug) {
         console.log("ACTION edge " + t.ruleIndex + ":" + t.actionIndex)
     }
-    return new ATNConfig({state:t.target}, config)
+    return NewATNConfig({state:t.target}, config)
 }
 
 func (this *ParserATNSimulator) precedenceTransition(config, pt,  collectPredicates, inContext, fullCtx) {
@@ -1371,14 +1371,14 @@ func (this *ParserATNSimulator) precedenceTransition(config, pt,  collectPredica
             var predSucceeds = pt.getPredicate().evaluate(this.parser, this._outerContext)
             this._input.seek(currentPosition)
             if (predSucceeds) {
-                c = new ATNConfig({state:pt.target}, config) // no pred context
+                c = NewATNConfig({state:pt.target}, config) // no pred context
             }
         } else {
             newSemCtx = SemanticContext.andContext(config.semanticContext, pt.getPredicate())
-            c = new ATNConfig({state:pt.target, semanticContext:newSemCtx}, config)
+            c = NewATNConfig({state:pt.target, semanticContext:newSemCtx}, config)
         }
     } else {
-        c = new ATNConfig({state:pt.target}, config)
+        c = NewATNConfig({state:pt.target}, config)
     }
     if (this.debug) {
         console.log("config from pred transition=" + c)
@@ -1406,14 +1406,14 @@ func (this *ParserATNSimulator) predTransition(config, pt, collectPredicates, in
             var predSucceeds = pt.getPredicate().evaluate(this.parser, this._outerContext)
             this._input.seek(currentPosition)
             if (predSucceeds) {
-                c = new ATNConfig({state:pt.target}, config) // no pred context
+                c = NewATNConfig({state:pt.target}, config) // no pred context
             }
         } else {
             var newSemCtx = SemanticContext.andContext(config.semanticContext, pt.getPredicate())
-            c = new ATNConfig({state:pt.target, semanticContext:newSemCtx}, config)
+            c = NewATNConfig({state:pt.target, semanticContext:newSemCtx}, config)
         }
     } else {
-        c = new ATNConfig({state:pt.target}, config)
+        c = NewATNConfig({state:pt.target}, config)
     }
     if (this.debug) {
         console.log("config from pred transition=" + c)
@@ -1427,7 +1427,7 @@ func (this *ParserATNSimulator) ruleTransition(config, t) {
     }
     var returnState = t.followState
     var newContext = SingletonPredictionContext.create(config.context, returnState.stateNumber)
-    return new ATNConfig({state:t.target, context:newContext}, config )
+    return NewATNConfig({state:t.target, context:newContext}, config )
 }
 
 func (this *ParserATNSimulator) getConflictingAlts(configs) {
@@ -1474,7 +1474,7 @@ func (this *ParserATNSimulator) getConflictingAlts(configs) {
 func (this *ParserATNSimulator) getConflictingAltsOrUniqueAlt(configs) {
     var conflictingAlts = nil
     if (configs.uniqueAlt!= ATN.INVALID_ALT_NUMBER) {
-        conflictingAlts = new BitSet()
+        conflictingAlts = NewBitSet()
         conflictingAlts.add(configs.uniqueAlt)
     } else {
         conflictingAlts = configs.conflictingAlts
@@ -1525,7 +1525,7 @@ func (this *ParserATNSimulator) dumpDeadEndConfigs(nvae) {
 }
 
 func (this *ParserATNSimulator) noViableAlt(input, outerContext, configs, startIndex) {
-    return new NoViableAltException(this.parser, input, input.get(startIndex), input.LT(1), configs, outerContext)
+    return NewNoViableAltException(this.parser, input, input.get(startIndex), input.LT(1), configs, outerContext)
 }
 
 func (this *ParserATNSimulator) getUniqueAlt(configs) {
@@ -1614,14 +1614,14 @@ func (this *ParserATNSimulator) addDFAState(dfa, D) {
     }
     dfa.states[hash] = D
     if (this.debug) {
-        console.log("adding new DFA state: " + D)
+        console.log("adding NewDFA state: " + D)
     }
     return D
 }
 
 func (this *ParserATNSimulator) reportAttemptingFullContext(dfa, conflictingAlts, configs, startIndex, stopIndex) {
     if (this.debug || this.retry_debug) {
-        var interval = new Interval(startIndex, stopIndex + 1)
+        var interval = NewInterval(startIndex, stopIndex + 1)
         console.log("reportAttemptingFullContext decision=" + dfa.decision + ":" + configs +
                            ", input=" + this.parser.getTokenStream().getText(interval))
     }
@@ -1632,7 +1632,7 @@ func (this *ParserATNSimulator) reportAttemptingFullContext(dfa, conflictingAlts
 
 func (this *ParserATNSimulator) reportContextSensitivity(dfa, prediction, configs, startIndex, stopIndex) {
     if (this.debug || this.retry_debug) {
-        var interval = new Interval(startIndex, stopIndex + 1)
+        var interval = NewInterval(startIndex, stopIndex + 1)
         console.log("reportContextSensitivity decision=" + dfa.decision + ":" + configs +
                            ", input=" + this.parser.getTokenStream().getText(interval))
     }
@@ -1645,7 +1645,7 @@ func (this *ParserATNSimulator) reportContextSensitivity(dfa, prediction, config
 func (this *ParserATNSimulator) reportAmbiguity(dfa, D, startIndex, stopIndex,
                                exact, ambigAlts, configs ) {
     if (this.debug || this.retry_debug) {
-        var interval = new Interval(startIndex, stopIndex + 1)
+        var interval = NewInterval(startIndex, stopIndex + 1)
         console.log("reportAmbiguity " + ambigAlts + ":" + configs +
                            ", input=" + this.parser.getTokenStream().getText(interval))
     }

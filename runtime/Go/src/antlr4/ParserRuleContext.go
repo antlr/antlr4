@@ -90,14 +90,14 @@ func (this *ParserRuleContext) removeLastChild() {
 }
 
 func (this *ParserRuleContext) addTokenNode(token) {
-    var node = new TerminalNodeImpl(token)
+    var node = NewTerminalNodeImpl(token)
     this.addChild(node)
     node.parentCtx = this
     return node
 }
 
 func (this *ParserRuleContext) addErrorNode(badToken) {
-    var node = new ErrorNodeImpl(badToken)
+    var node = NewErrorNodeImpl(badToken)
     this.addChild(node)
     node.parentCtx = this
     return node
@@ -187,11 +187,11 @@ func (this *ParserRuleContext) getSourceInterval() {
     if( this.start == nil || this.stop == nil) {
         return INVALID_INTERVAL
     } else {
-        return new Interval(this.start.tokenIndex, this.stop.tokenIndex)
+        return NewInterval(this.start.tokenIndex, this.stop.tokenIndex)
     }
 }
 
-RuleContext.EMPTY = new ParserRuleContext()
+RuleContext.EMPTY = NewParserRuleContext()
 
 func InterpreterRuleContext(parent, invokingStateNumber, ruleIndex) {
 	ParserRuleContext.call(parent, invokingStateNumber)

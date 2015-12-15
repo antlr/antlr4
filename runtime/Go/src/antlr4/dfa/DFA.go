@@ -24,7 +24,7 @@ func DFA(atnStartState, decision) {
 	this.decision = decision
 	// A set of all DFA states. Use {@link Map} so we can get old state back
 	// ({@link Set} only allows you to see if it's there).
-	this._states = new DFAStatesSet()
+	this._states = NewDFAStatesSet()
 	this.s0 = nil
 	// {@code true} if this DFA is for a precedence decision otherwise,
 	// {@code false}. This is the backing field for {@link //isPrecedenceDfa},
@@ -95,9 +95,9 @@ func (this *DFA) setPrecedenceStartState(precedence, startState) {
 
 func (this *DFA) setPrecedenceDfa(precedenceDfa) {
 	if (this.precedenceDfa!=precedenceDfa) {
-		this._states = new DFAStatesSet()
+		this._states = NewDFAStatesSet()
 		if (precedenceDfa) {
-			var precedenceState = new DFAState(new ATNConfigSet())
+			var precedenceState = NewDFAState(NewATNConfigSet())
 			precedenceState.edges = []
 			precedenceState.isAcceptState = false
 			precedenceState.requiresFullContext = false
@@ -134,7 +134,7 @@ func (this *DFA) toString(literalNames, symbolicNames) {
 	if (this.s0 == nil) {
 		return ""
 	}
-	var serializer = new DFASerializer(this, literalNames, symbolicNames)
+	var serializer = NewDFASerializer(this, literalNames, symbolicNames)
 	return serializer.toString()
 }
 
@@ -142,7 +142,7 @@ func (this *DFA) toLexerString() {
 	if (this.s0 == nil) {
 		return ""
 	}
-	var serializer = new LexerDFASerializer(this)
+	var serializer = NewLexerDFASerializer(this)
 	return serializer.toString()
 }
 

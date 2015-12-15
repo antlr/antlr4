@@ -149,7 +149,7 @@ func (this *ATNDeserializer) checkUUID() {
 func (this *ATNDeserializer) readATN() {
     var grammarType = this.readInt()
     var maxTokenType = this.readInt()
-    return new ATN(grammarType, maxTokenType)
+    return NewATN(grammarType, maxTokenType)
 }
 
 func (this *ATNDeserializer) readStates(atn) {
@@ -245,7 +245,7 @@ func (this *ATNDeserializer) readSets(atn) {
     var sets = []
     var m = this.readInt()
     for (var i=0 i<m i++) {
-        var iset = new IntervalSet()
+        var iset = NewIntervalSet()
         sets.push(iset)
         var n = this.readInt()
         var containsEof = this.readInt()
@@ -290,7 +290,7 @@ func (this *ATNDeserializer) readEdges(atn, sets) {
 				}
 			}
 
-			trans = new EpsilonTransition(t.followState, outermostPrecedenceReturn)
+			trans = NewEpsilonTransition(t.followState, outermostPrecedenceReturn)
             atn.ruleToStopState[t.target.ruleIndex].addTransition(trans)
         }
     }
@@ -370,11 +370,11 @@ func (this *ATNDeserializer) generateRuleBypassTransitions(atn) {
 
 func (this *ATNDeserializer) generateRuleBypassTransition(atn, idx) {
 	var i, state
-    var bypassStart = new BasicBlockStartState()
+    var bypassStart = NewBasicBlockStartState()
     bypassStart.ruleIndex = idx
     atn.addState(bypassStart)
 
-    var bypassStop = new BlockEndState()
+    var bypassStop = NewBlockEndState()
     bypassStop.ruleIndex = idx
     atn.addState(bypassStop)
 
@@ -427,14 +427,14 @@ func (this *ATNDeserializer) generateRuleBypassTransition(atn, idx) {
         bypassStart.addTransition(ruleToStartState.transitions[count-1])
         ruleToStartState.transitions = ruleToStartState.transitions.slice(-1)
     }
-    // link the new states
-    atn.ruleToStartState[idx].addTransition(new EpsilonTransition(bypassStart))
-    bypassStop.addTransition(new EpsilonTransition(endState))
+    // link the Newstates
+    atn.ruleToStartState[idx].addTransition(NewEpsilonTransition(bypassStart))
+    bypassStop.addTransition(NewEpsilonTransition(endState))
 
-    var matchState = new BasicState()
+    var matchState = NewBasicState()
     atn.addState(matchState)
-    matchState.addTransition(new AtomTransition(bypassStop, atn.ruleToTokenType[idx]))
-    bypassStart.addTransition(new EpsilonTransition(matchState))
+    matchState.addTransition(NewAtomTransition(bypassStop, atn.ruleToTokenType[idx]))
+    bypassStart.addTransition(NewEpsilonTransition(matchState))
 }
 
 func (this *ATNDeserializer) stateIsEndStateFor(state, idx) {
@@ -586,25 +586,25 @@ ATNDeserializer.prototype.edgeFactory = function(atn, type, src, trg, arg1, arg2
     var target = atn.states[trg]
     switch(type) {
     case Transition.EPSILON:
-        return new EpsilonTransition(target)
+        return NewEpsilonTransition(target)
     case Transition.RANGE:
-        return arg3 != 0 ? new RangeTransition(target, Token.EOF, arg2) : new RangeTransition(target, arg1, arg2)
+        return arg3 != 0 ? NewRangeTransition(target, Token.EOF, arg2) : NewRangeTransition(target, arg1, arg2)
     case Transition.RULE:
-        return new RuleTransition(atn.states[arg1], arg2, arg3, target)
+        return NewRuleTransition(atn.states[arg1], arg2, arg3, target)
     case Transition.PREDICATE:
-        return new PredicateTransition(target, arg1, arg2, arg3 != 0)
+        return NewPredicateTransition(target, arg1, arg2, arg3 != 0)
     case Transition.PRECEDENCE:
-        return new PrecedencePredicateTransition(target, arg1)
+        return NewPrecedencePredicateTransition(target, arg1)
     case Transition.ATOM:
-        return arg3 != 0 ? new AtomTransition(target, Token.EOF) : new AtomTransition(target, arg1)
+        return arg3 != 0 ? NewAtomTransition(target, Token.EOF) : NewAtomTransition(target, arg1)
     case Transition.ACTION:
-        return new ActionTransition(target, arg1, arg2, arg3 != 0)
+        return NewActionTransition(target, arg1, arg2, arg3 != 0)
     case Transition.SET:
-        return new SetTransition(target, sets[arg1])
+        return NewSetTransition(target, sets[arg1])
     case Transition.NOT_SET:
-        return new NotSetTransition(target, sets[arg1])
+        return NewNotSetTransition(target, sets[arg1])
     case Transition.WILDCARD:
-        return new WildcardTransition(target)
+        return NewWildcardTransition(target)
     default:
         throw "The specified transition type: " + type + " is not valid."
     }
@@ -614,18 +614,18 @@ func (this *ATNDeserializer) stateFactory(type, ruleIndex) {
     if (this.stateFactories == nil) {
         var sf = []
         sf[ATNState.INVALID_TYPE] = nil
-        sf[ATNState.BASIC] = function() { return new BasicState() }
-        sf[ATNState.RULE_START] = function() { return new RuleStartState() }
-        sf[ATNState.BLOCK_START] = function() { return new BasicBlockStartState() }
-        sf[ATNState.PLUS_BLOCK_START] = function() { return new PlusBlockStartState() }
-        sf[ATNState.STAR_BLOCK_START] = function() { return new StarBlockStartState() }
-        sf[ATNState.TOKEN_START] = function() { return new TokensStartState() }
-        sf[ATNState.RULE_STOP] = function() { return new RuleStopState() }
-        sf[ATNState.BLOCK_END] = function() { return new BlockEndState() }
-        sf[ATNState.STAR_LOOP_BACK] = function() { return new StarLoopbackState() }
-        sf[ATNState.STAR_LOOP_ENTRY] = function() { return new StarLoopEntryState() }
-        sf[ATNState.PLUS_LOOP_BACK] = function() { return new PlusLoopbackState() }
-        sf[ATNState.LOOP_END] = function() { return new LoopEndState() }
+        sf[ATNState.BASIC] = function() { return NewBasicState() }
+        sf[ATNState.RULE_START] = function() { return NewRuleStartState() }
+        sf[ATNState.BLOCK_START] = function() { return NewBasicBlockStartState() }
+        sf[ATNState.PLUS_BLOCK_START] = function() { return NewPlusBlockStartState() }
+        sf[ATNState.STAR_BLOCK_START] = function() { return NewStarBlockStartState() }
+        sf[ATNState.TOKEN_START] = function() { return NewTokensStartState() }
+        sf[ATNState.RULE_STOP] = function() { return NewRuleStopState() }
+        sf[ATNState.BLOCK_END] = function() { return NewBlockEndState() }
+        sf[ATNState.STAR_LOOP_BACK] = function() { return NewStarLoopbackState() }
+        sf[ATNState.STAR_LOOP_ENTRY] = function() { return NewStarLoopEntryState() }
+        sf[ATNState.PLUS_LOOP_BACK] = function() { return NewPlusLoopbackState() }
+        sf[ATNState.LOOP_END] = function() { return NewLoopEndState() }
         this.stateFactories = sf
     }
     if (type>this.stateFactories.length || this.stateFactories[type] == nil) {
@@ -642,14 +642,14 @@ func (this *ATNDeserializer) stateFactory(type, ruleIndex) {
 ATNDeserializer.prototype.lexerActionFactory = function(type, data1, data2) {
     if (this.actionFactories == nil) {
         var af = []
-        af[LexerActionType.CHANNEL] = function(data1, data2) { return new LexerChannelAction(data1) }
-        af[LexerActionType.CUSTOM] = function(data1, data2) { return new LexerCustomAction(data1, data2) }
-        af[LexerActionType.MODE] = function(data1, data2) { return new LexerModeAction(data1) }
+        af[LexerActionType.CHANNEL] = function(data1, data2) { return NewLexerChannelAction(data1) }
+        af[LexerActionType.CUSTOM] = function(data1, data2) { return NewLexerCustomAction(data1, data2) }
+        af[LexerActionType.MODE] = function(data1, data2) { return NewLexerModeAction(data1) }
         af[LexerActionType.MORE] = function(data1, data2) { return LexerMoreAction.INSTANCE }
         af[LexerActionType.POP_MODE] = function(data1, data2) { return LexerPopModeAction.INSTANCE }
-        af[LexerActionType.PUSH_MODE] = function(data1, data2) { return new LexerPushModeAction(data1) }
+        af[LexerActionType.PUSH_MODE] = function(data1, data2) { return NewLexerPushModeAction(data1) }
         af[LexerActionType.SKIP] = function(data1, data2) { return LexerSkipAction.INSTANCE }
-        af[LexerActionType.TYPE] = function(data1, data2) { return new LexerTypeAction(data1) }
+        af[LexerActionType.TYPE] = function(data1, data2) { return NewLexerTypeAction(data1) }
         this.actionFactories = af
     }
     if (type>this.actionFactories.length || this.actionFactories[type] == nil) {

@@ -55,7 +55,7 @@ func NewATN(grammarType , maxTokenType) ATN {
 //  the rule surrounding {@code s}. In other words, the set will be
 //  restricted to tokens reachable staying within {@code s}'s rule.
 func (this *ATN) nextTokensInContext(s, ctx) {
-    var anal = new LL1Analyzer(this)
+    var anal = NewLL1Analyzer(this)
     return anal.LOOK(s, nil, ctx)
 }
 
@@ -134,7 +134,7 @@ func (this *ATN) getExpectedTokens( stateNumber, ctx ) {
     if (!following.contains(Token.EPSILON)) {
         return following
     }
-    var expected = new IntervalSet()
+    var expected = NewIntervalSet()
     expected.addSet(following)
     expected.removeOne(Token.EPSILON)
     while (ctx != nil && ctx.invokingState >= 0 && following.contains(Token.EPSILON)) {

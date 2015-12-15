@@ -86,7 +86,7 @@ func (i *IntervalSet) addInterval(v Interval) {
 			}
 			// overlapping range -> adjust and reduce
 			else if (v.start <= i.stop) {
-				i.intervals[k] = new Interval(Math.min(i.start, v.start), Math.max(i.stop, v.stop))
+				i.intervals[k] = NewInterval(Math.min(i.start, v.start), Math.max(i.stop, v.stop))
 				i.reduce(k)
 				return
 			}
@@ -167,8 +167,8 @@ func (i *IntervalSet) removeRange(v Interval) {
             }
             // check for including range, split it
             else if(v.start>i.start && v.stop<i.stop) {
-                i.intervals[k] = new Interval(i.start, v.start)
-                var x = new Interval(v.stop, i.stop)
+                i.intervals[k] = NewInterval(i.start, v.start)
+                var x = NewInterval(v.stop, i.stop)
                 i.intervals.splice(k, 0, x)
                 return
             }
@@ -179,11 +179,11 @@ func (i *IntervalSet) removeRange(v Interval) {
             }
             // check for lower boundary
             else if(v.start<i.stop) {
-                i.intervals[k] = new Interval(i.start, v.start)
+                i.intervals[k] = NewInterval(i.start, v.start)
             }
             // check for upper boundary
             else if(v.stop<i.stop) {
-                i.intervals[k] = new Interval(v.stop, i.stop)
+                i.intervals[k] = NewInterval(v.stop, i.stop)
             }
             k += 1
         }

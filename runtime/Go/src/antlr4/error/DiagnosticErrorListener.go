@@ -44,7 +44,7 @@ func (this *DiagnosticErrorListener) reportAmbiguity(recognizer, dfa,
 			": ambigAlts=" +
 			this.getConflictingAlts(ambigAlts, configs) +
 			", input='" +
-			recognizer.getTokenStream().getText(new Interval(startIndex, stopIndex)) + "'"
+			recognizer.getTokenStream().getText(NewInterval(startIndex, stopIndex)) + "'"
 	recognizer.notifyErrorListeners(msg)
 }
 
@@ -53,7 +53,7 @@ func (this *DiagnosticErrorListener) reportAttemptingFullContext(
 	var msg = "reportAttemptingFullContext d=" +
 			this.getDecisionDescription(recognizer, dfa) +
 			", input='" +
-			recognizer.getTokenStream().getText(new Interval(startIndex, stopIndex)) + "'"
+			recognizer.getTokenStream().getText(NewInterval(startIndex, stopIndex)) + "'"
 	recognizer.notifyErrorListeners(msg)
 }
 
@@ -62,7 +62,7 @@ func (this *DiagnosticErrorListener) reportContextSensitivity(
 	var msg = "reportContextSensitivity d=" +
 			this.getDecisionDescription(recognizer, dfa) +
 			", input='" +
-			recognizer.getTokenStream().getText(new Interval(startIndex, stopIndex)) + "'"
+			recognizer.getTokenStream().getText(NewInterval(startIndex, stopIndex)) + "'"
 	recognizer.notifyErrorListeners(msg)
 }
 
@@ -96,7 +96,7 @@ func (this *DiagnosticErrorListener) getConflictingAlts(reportedAlts, configs) {
 	if (reportedAlts != nil) {
 		return reportedAlts
 	}
-	var result = new BitSet()
+	var result = NewBitSet()
 	for (var i = 0 i < configs.items.length i++) {
 		result.add(configs.items[i].alt)
 	}

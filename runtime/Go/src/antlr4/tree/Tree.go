@@ -6,7 +6,7 @@ package tree
 
 var Token = require('./../Token').Token
 var Interval = require('./../IntervalSet').Interval
-var INVALID_INTERVAL = new Interval(-1, -2)
+var INVALID_INTERVAL = NewInterval(-1, -2)
 var Utils = require('../Utils.js')
 
 
@@ -128,7 +128,7 @@ func (this *TerminalNodeImpl) getSourceInterval() {
 		return INVALID_INTERVAL
 	}
 	var tokenIndex = this.symbol.tokenIndex
-	return new Interval(tokenIndex, tokenIndex)
+	return NewInterval(tokenIndex, tokenIndex)
 }
 
 func (this *TerminalNodeImpl) getChildCount() {
@@ -211,7 +211,7 @@ func (this *ParseTreeWalker) exitRule(listener, r) {
 	listener.exitEveryRule(ctx)
 }
 
-ParseTreeWalker.DEFAULT = new ParseTreeWalker()
+ParseTreeWalker.DEFAULT = NewParseTreeWalker()
 
 
 

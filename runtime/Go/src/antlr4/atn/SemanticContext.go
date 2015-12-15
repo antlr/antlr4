@@ -43,7 +43,7 @@ func (this *SemanticContext) evaluate(parser, outerContext) {
 // precedence predicates are evaluated.</li>
 // <li>{@code this}: if the semantic context is not changed as a result of
 // precedence predicate evaluation.</li>
-// <li>A non-{@code nil} {@link SemanticContext}: the new simplified
+// <li>A non-{@code nil} {@link SemanticContext}: the Newsimplified
 // semantic context after precedence predicates are evaluated.</li>
 // </ul>
 //
@@ -58,7 +58,7 @@ SemanticContext.andContext = function(a, b) {
 	if (b == nil || b == SemanticContext.NONE) {
 		return a
 	}
-	var result = new AND(a, b)
+	var result = NewAND(a, b)
 	if (result.opnds.length == 1) {
 		return result.opnds[0]
 	} else {
@@ -76,7 +76,7 @@ SemanticContext.orContext = function(a, b) {
 	if (a == SemanticContext.NONE || b == SemanticContext.NONE) {
 		return SemanticContext.NONE
 	}
-	var result = new OR(a, b)
+	var result = NewOR(a, b)
 	if (result.opnds.length == 1) {
 		return result.opnds[0]
 	} else {
@@ -98,7 +98,7 @@ Predicate.prototype.constructor = Predicate
 //The default {@link SemanticContext}, which is semantically equivalent to
 //a predicate of the form {@code {true}?}.
 //
-SemanticContext.NONE = new Predicate()
+SemanticContext.NONE = NewPredicate()
 
 
 func (this *Predicate) evaluate(parser, outerContext) {
@@ -186,7 +186,7 @@ PrecedencePredicate.filterPrecedencePredicates = function(set) {
 //
 func AND(a, b) {
 	SemanticContext.call(this)
-	var operands = new Set()
+	var operands = NewSet()
 	if (a instanceof AND) {
 		a.opnds.map(function(o) {
 			operands.add(o)
@@ -291,7 +291,7 @@ func (this *AND) toString() {
 //
 func OR(a, b) {
 	SemanticContext.call(this)
-	var operands = new Set()
+	var operands = NewSet()
 	if (a instanceof OR) {
 		a.opnds.map(function(o) {
 			operands.add(o)

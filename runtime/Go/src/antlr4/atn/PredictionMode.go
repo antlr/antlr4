@@ -184,10 +184,10 @@ PredictionMode.hasSLLConflictTerminatingPrediction = function( mode, configs) {
         // since we'll often fail over anyway.
         if (configs.hasSemanticContext) {
             // dup configs, tossing out semantic predicates
-            var dup = new ATNConfigSet()
+            var dup = NewATNConfigSet()
             for(var i=0i<configs.items.lengthi++) {
             	var c = configs.items[i]
-                c = new ATNConfig({semanticContext:SemanticContext.NONE}, c)
+                c = NewATNConfig({semanticContext:SemanticContext.NONE}, c)
                 dup.add(c)
             }
             configs = dup
@@ -471,7 +471,7 @@ PredictionMode.getUniqueAlt = function(altsets) {
 // @return the set of represented alternatives in {@code altsets}
 //
 PredictionMode.getAlts = function(altsets) {
-    var all = new BitSet()
+    var all = NewBitSet()
     altsets.map( function(alts) { all.or(alts) })
     return all
 }
@@ -492,7 +492,7 @@ PredictionMode.getConflictingAltSubsets = function(configs) {
         var key = "key_" + c.state.stateNumber + "/" + c.context
         var alts = configToAlts[key] || nil
         if (alts == nil) {
-            alts = new BitSet()
+            alts = NewBitSet()
             configToAlts[key] = alts
         }
         alts.add(c.alt)
@@ -516,11 +516,11 @@ PredictionMode.getConflictingAltSubsets = function(configs) {
 // </pre>
 //
 PredictionMode.getStateToAltMap = function(configs) {
-    var m = new AltDict()
+    var m = NewAltDict()
     configs.items.map(function(c) {
         var alts = m.get(c.state)
         if (alts == nil) {
-            alts = new BitSet()
+            alts = NewBitSet()
             m.put(c.state, alts)
         }
         alts.add(c.alt)

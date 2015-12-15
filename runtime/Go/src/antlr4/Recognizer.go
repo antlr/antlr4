@@ -84,7 +84,7 @@ func (this *Recognizer) getErrorHeader(e) {
 //  to use t.toString() (which, for CommonToken, dumps everything about
 //  the token). This is better than forcing you to override a method in
 //  your token objects because you don't have to go modify your lexer
-//  so that it creates a new Java type.
+//  so that it creates a NewJava type.
 //
 // @deprecated This method is not called by the ANTLR 4 Runtime. Specific
 // implementations of {@link ANTLRErrorStrategy} may provide a similar
@@ -108,7 +108,7 @@ func (this *Recognizer) getTokenErrorDisplay(t) {
 }
 
 func (this *Recognizer) getErrorListenerDispatch() {
-    return new ProxyErrorListener(this._listeners)
+    return NewProxyErrorListener(this._listeners)
 }
 
 // subclass needs to override these if there are sempreds or actions

@@ -42,7 +42,7 @@ LexerSkipAction.prototype = Object.create(LexerAction.prototype)
 LexerSkipAction.prototype.constructor = LexerSkipAction
 
 // Provides a singleton instance of this parameterless lexer action.
-LexerSkipAction.INSTANCE = new LexerSkipAction()
+LexerSkipAction.INSTANCE = NewLexerSkipAction()
 
 func (this *LexerSkipAction) execute(lexer) {
     lexer.skip()
@@ -134,7 +134,7 @@ type LexerPopModeAction struct {
 LexerPopModeAction.prototype = Object.create(LexerAction.prototype)
 LexerPopModeAction.prototype.constructor = LexerPopModeAction
 
-LexerPopModeAction.INSTANCE = new LexerPopModeAction()
+LexerPopModeAction.INSTANCE = NewLexerPopModeAction()
 
 // <p>This action is implemented by calling {@link Lexer//popMode}.</p>
 func (this *LexerPopModeAction) execute(lexer) {
@@ -157,7 +157,7 @@ type LexerMoreAction struct {
 LexerMoreAction.prototype = Object.create(LexerAction.prototype)
 LexerMoreAction.prototype.constructor = LexerMoreAction
 
-LexerMoreAction.INSTANCE = new LexerMoreAction()
+LexerMoreAction.INSTANCE = NewLexerMoreAction()
 
 // <p>This action is implemented by calling {@link Lexer//popMode}.</p>
 func (this *LexerMoreAction) execute(lexer) {
@@ -255,7 +255,7 @@ func (this *LexerCustomAction) equals(other) {
 
 // Implements the {@code channel} lexer action by calling
 // {@link Lexer//setChannel} with the assigned channel.
-// Constructs a new {@code channel} action with the specified channel value.
+// Constructs a New{@code channel} action with the specified channel value.
 // @param channel The channel value to pass to {@link Lexer//setChannel}.
 func LexerChannelAction(channel) {
 	LexerAction.call(this, LexerActionType.CHANNEL)
@@ -299,7 +299,7 @@ func (this *LexerChannelAction) toString() {
 // lexer actions, see {@link LexerActionExecutor//append} and
 // {@link LexerActionExecutor//fixOffsetBeforeMatch}.</p>
 
-// Constructs a new indexed custom action by associating a character offset
+// Constructs a Newindexed custom action by associating a character offset
 // with a {@link LexerAction}.
 //
 // <p>Note: This class is only required for lexer actions for which

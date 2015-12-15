@@ -33,10 +33,10 @@ func LexerActionExecutor(lexerActions) {
 // of {@code lexerActionExecutor} and {@code lexerAction}.
 LexerActionExecutor.append = function(lexerActionExecutor, lexerAction) {
 	if (lexerActionExecutor == nil) {
-		return new LexerActionExecutor([ lexerAction ])
+		return NewLexerActionExecutor([ lexerAction ])
 	}
 	var lexerActions = lexerActionExecutor.lexerActions.concat([ lexerAction ])
-	return new LexerActionExecutor(lexerActions)
+	return NewLexerActionExecutor(lexerActions)
 }
 
 // Creates a {@link LexerActionExecutor} which encodes the current offset
@@ -75,14 +75,14 @@ func (this *LexerActionExecutor) fixOffsetBeforeMatch(offset) {
 			if (updatedLexerActions == nil) {
 				updatedLexerActions = this.lexerActions.concat([])
 			}
-			updatedLexerActions[i] = new LexerIndexedCustomAction(offset,
+			updatedLexerActions[i] = NewLexerIndexedCustomAction(offset,
 					this.lexerActions[i])
 		}
 	}
 	if (updatedLexerActions == nil) {
 		return this
 	} else {
-		return new LexerActionExecutor(updatedLexerActions)
+		return NewLexerActionExecutor(updatedLexerActions)
 	}
 }
 

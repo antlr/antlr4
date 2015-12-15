@@ -82,7 +82,7 @@ AtomTransition.prototype = Object.create(Transition.prototype)
 AtomTransition.prototype.constructor = AtomTransition
 
 func (this *AtomTransition) makeLabel() {
-	var s = new IntervalSet()
+	var s = NewIntervalSet()
     s.addOne(this.label_)
     return s
 }
@@ -145,7 +145,7 @@ RangeTransition.prototype = Object.create(Transition.prototype)
 RangeTransition.prototype.constructor = RangeTransition
 
 func (this *RangeTransition) makeLabel() {
-    var s = new IntervalSet()
+    var s = NewIntervalSet()
     s.addRange(this.start, this.stop)
     return s
 }
@@ -184,7 +184,7 @@ func (this *PredicateTransition) matches(symbol, minVocabSymbol,  maxVocabSymbol
 }
 
 func (this *PredicateTransition) getPredicate() {
-	return new Predicate(this.ruleIndex, this.predIndex, this.isCtxDependent)
+	return NewPredicate(this.ruleIndex, this.predIndex, this.isCtxDependent)
 }
 
 func (this *PredicateTransition) toString() {
@@ -221,7 +221,7 @@ func SetTransition(target, set) {
     if (set !=undefined && set !=nil) {
         this.label = set
     } else {
-        this.label = new IntervalSet()
+        this.label = NewIntervalSet()
         this.label.addOne(Token.INVALID_TYPE)
     }
     return this
@@ -291,7 +291,7 @@ func (this *PrecedencePredicateTransition) matches(symbol, minVocabSymbol,  maxV
 }
 
 func (this *PrecedencePredicateTransition) getPredicate() {
-	return new PrecedencePredicate(this.precedence)
+	return NewPrecedencePredicate(this.precedence)
 }
 
 func (this *PrecedencePredicateTransition) toString() {

@@ -234,13 +234,13 @@ func (this *DefaultErrorStrategy) sync(recognizer) {
         if( this.singleTokenDeletion(recognizer) != nil) {
             return
         } else {
-            throw new InputMismatchException(recognizer)
+            throw NewInputMismatchException(recognizer)
         }
         break
     case ATNState.PLUS_LOOP_BACK:
     case ATNState.STAR_LOOP_BACK:
         this.reportUnwantedToken(recognizer)
-        var expecting = new IntervalSet()
+        var expecting = NewIntervalSet()
         expecting.addSet(recognizer.getExpectedTokens())
         var whatFollowsLoopIterationOrRule = expecting.addSet(this.getErrorRecoverySet(recognizer))
         this.consumeUntil(recognizer, whatFollowsLoopIterationOrRule)
@@ -265,7 +265,7 @@ func (this *DefaultErrorStrategy) reportNoViableAlternative(recognizer, e) {
         if (e.startToken.type==Token.EOF) {
             input = "<EOF>"
         } else {
-            input = tokens.getText(new Interval(e.startToken, e.offendingToken))
+            input = tokens.getText(NewInterval(e.startToken, e.offendingToken))
         }
     } else {
         input = "<unknown input>"
@@ -424,7 +424,7 @@ func (this *DefaultErrorStrategy) recoverInline(recognizer) {
         return this.getMissingSymbol(recognizer)
     }
     // even that didn't work must throw the exception
-    throw new InputMismatchException(recognizer)
+    throw NewInputMismatchException(recognizer)
 }
 
 //
@@ -547,7 +547,7 @@ func (this *DefaultErrorStrategy) getExpectedTokens(recognizer) {
 // to use t.toString() (which, for CommonToken, dumps everything about
 // the token). This is better than forcing you to override a method in
 // your token objects because you don't have to go modify your lexer
-// so that it creates a new Java type.
+// so that it creates a NewJava type.
 //
 func (this *DefaultErrorStrategy) getTokenErrorDisplay(t) {
     if (t == nil) {
@@ -666,7 +666,7 @@ func (this *DefaultErrorStrategy) escapeWSAndQuote(s) {
 func (this *DefaultErrorStrategy) getErrorRecoverySet(recognizer) {
     var atn = recognizer._interp.atn
     var ctx = recognizer._ctx
-    var recoverSet = new IntervalSet()
+    var recoverSet = NewIntervalSet()
     while (ctx != nil && ctx.invokingState>=0) {
         // compute what follows who invoked us
         var invokingState = atn.states[ctx.invokingState]
@@ -712,7 +712,7 @@ func (this *DefaultErrorStrategy) consumeUntil(recognizer, set) {
 // </ul>
 //
 // <p>
-// {@code myparser.setErrorHandler(new BailErrorStrategy())}</p>
+// {@code myparser.setErrorHandler(NewBailErrorStrategy())}</p>
 //
 // @see Parser//setErrorHandler(ANTLRErrorStrategy)
 //
@@ -735,14 +735,14 @@ func (this *BailErrorStrategy) recover(recognizer, e) {
         context.exception = e
         context = context.parentCtx
     }
-    throw new ParseCancellationException(e)
+    throw NewParseCancellationException(e)
 }
     
 // Make sure we don't attempt to recover inline if the parser
 // successfully recovers, it won't throw an exception.
 //
 func (this *BailErrorStrategy) recoverInline(recognizer) {
-    this.recover(recognizer, new InputMismatchException(recognizer))
+    this.recover(recognizer, NewInputMismatchException(recognizer))
 }
 
 // Make sure we don't attempt to recover from problems in subrules.//

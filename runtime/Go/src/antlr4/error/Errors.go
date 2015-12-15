@@ -13,7 +13,7 @@ func RecognitionException(params) {
 	if (!!Error.captureStackTrace) {
         Error.captureStackTrace(this, RecognitionException)
 	} else {
-		var stack = new Error().stack
+		var stack = NewError().stack
 	}
 	this.message = params.message
     this.recognizer = params.recognizer

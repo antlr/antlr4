@@ -32,7 +32,7 @@ func ATNSimulator(atn, sharedContextCache) {
 }
 
 // Must distinguish between missing edge and edge we know leads nowhere///
-ATNSimulator.ERROR = new DFAState(0x7FFFFFFF, new ATNConfigSet())
+ATNSimulator.ERROR = NewDFAState(0x7FFFFFFF, NewATNConfigSet())
 
 
 func (this *ATNSimulator) getCachedContext(context) {

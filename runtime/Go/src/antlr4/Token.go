@@ -87,7 +87,7 @@ CommonToken.prototype.constructor = CommonToken
 // {@link //source} for tokens that do not have a source.
 CommonToken.EMPTY_SOURCE = [ nil, nil ]
 
-// Constructs a new {@link CommonToken} as a copy of another {@link Token}.
+// Constructs a New{@link CommonToken} as a copy of another {@link Token}.
 //
 // <p>
 // If {@code oldToken} is also a {@link CommonToken} instance, the newly
@@ -100,7 +100,7 @@ CommonToken.EMPTY_SOURCE = [ nil, nil ]
 // @param oldToken The token to copy.
 //
 func (this *CommonToken) clone() {
-	var t = new CommonToken(this.source, this.type, this.channel, this.start,
+	var t = NewCommonToken(this.source, this.type, this.channel, this.start,
 			this.stop)
 	t.tokenIndex = this.tokenIndex
 	t.line = this.line

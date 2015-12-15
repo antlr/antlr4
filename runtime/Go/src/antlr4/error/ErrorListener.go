@@ -31,7 +31,7 @@ ConsoleErrorListener.prototype.constructor = ConsoleErrorListener
 //
 // Provides a default instance of {@link ConsoleErrorListener}.
 //
-ConsoleErrorListener.INSTANCE = new ConsoleErrorListener()
+ConsoleErrorListener.INSTANCE = NewConsoleErrorListener()
 
 //
 // {@inheritDoc}

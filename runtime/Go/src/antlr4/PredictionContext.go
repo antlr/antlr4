@@ -76,7 +76,7 @@ type PredictionContextCache struct {
 }
 
 // Add a context to the cache and return it. If the context already exists,
-// return that one instead and do not add a new context to the cache.
+// return that one instead and do not add a Newcontext to the cache.
 // Protect shared cache from unsafe thread access.
 //
 func (this *PredictionContextCache) add(ctx) {
@@ -117,7 +117,7 @@ SingletonPredictionContext.create = function(parent, returnState) {
 		// someone can pass in the bits of an array ctx that mean $
 		return PredictionContext.EMPTY
 	} else {
-		return new SingletonPredictionContext(parent, returnState)
+		return NewSingletonPredictionContext(parent, returnState)
 	}
 }
 
@@ -197,7 +197,7 @@ func (this *EmptyPredictionContext) toString() {
 	return "$"
 }
 
-PredictionContext.EMPTY = new EmptyPredictionContext()
+PredictionContext.EMPTY = NewEmptyPredictionContext()
 
 func ArrayPredictionContext(parents, returnStates) {
 	// Parent can be nil only if full ctx mode and we make an array
@@ -321,10 +321,10 @@ func merge(a, b, rootIsWildcard, mergeCache) {
 	}
 	// convert singleton so both are arrays to normalize
 	if (a instanceof SingletonPredictionContext) {
-		a = new ArrayPredictionContext([a.getParent()], [a.returnState])
+		a = NewArrayPredictionContext([a.getParent()], [a.returnState])
 	}
 	if (b instanceof SingletonPredictionContext) {
-		b = new ArrayPredictionContext([b.getParent()], [b.returnState])
+		b = NewArrayPredictionContext([b.getParent()], [b.returnState])
 	}
 	return mergeArrays(a, b, rootIsWildcard, mergeCache)
 }
@@ -337,7 +337,7 @@ func merge(a, b, rootIsWildcard, mergeCache) {
 // type="image/svg+xml"/></p>
 //
 // <p>Same stack top, parents differ merge parents giving array node, then
-// remainders of those graphs. A new root node is created to point to the
+// remainders of those graphs. A Newroot node is created to point to the
 // merged parents.<br>
 // <embed src="images/SingletonMerge_SameRootDiffPar.svg"
 // type="image/svg+xml"/></p>
@@ -392,7 +392,7 @@ func mergeSingletons(a, b, rootIsWildcard, mergeCache) {
 		// else: ax + ay = a'[x,y]
 		// merge parents x and y, giving array node with x,y then remainders
 		// of those graphs. dup a, a' points at merged array
-		// new joined parent so create new singleton pointing to it, a'
+		// Newjoined parent so create Newsingleton pointing to it, a'
 		var spc = SingletonPredictionContext.create(parent, a.returnState)
 		if (mergeCache != nil) {
 			mergeCache.set(a, b, spc)
@@ -414,7 +414,7 @@ func mergeSingletons(a, b, rootIsWildcard, mergeCache) {
 				payloads[1] = a.returnState
 			}
 			var parents = [ singleParent, singleParent ]
-			var apc = new ArrayPredictionContext(parents, payloads)
+			var apc = NewArrayPredictionContext(parents, payloads)
 			if (mergeCache != nil) {
 				mergeCache.set(a, b, apc)
 			}
@@ -430,7 +430,7 @@ func mergeSingletons(a, b, rootIsWildcard, mergeCache) {
 			payloads[1] = a.returnState
 			parents = [ b.parentCtx, a.parentCtx ]
 		}
-		var a_ = new ArrayPredictionContext(parents, payloads)
+		var a_ = NewArrayPredictionContext(parents, payloads)
 		if (mergeCache != nil) {
 			mergeCache.set(a, b, a_)
 		}
@@ -491,11 +491,11 @@ func mergeRoot(a, b, rootIsWildcard) {
 			var payloads = [ b.returnState,
 					PredictionContext.EMPTY_RETURN_STATE ]
 			var parents = [ b.parentCtx, nil ]
-			return new ArrayPredictionContext(parents, payloads)
+			return NewArrayPredictionContext(parents, payloads)
 		} else if (b == PredictionContext.EMPTY) { // x + $ = [$,x] ($ is always first if present)
 			var payloads = [ a.returnState, PredictionContext.EMPTY_RETURN_STATE ]
 			var parents = [ a.parentCtx, nil ]
-			return new ArrayPredictionContext(parents, payloads)
+			return NewArrayPredictionContext(parents, payloads)
 		}
 	}
 	return nil
@@ -601,7 +601,7 @@ func mergeArrays(a, b, rootIsWildcard, mergeCache) {
 		mergedReturnStates = mergedReturnStates.slice(0, k)
 	}
 
-	var M = new ArrayPredictionContext(mergedParents, mergedReturnStates)
+	var M = NewArrayPredictionContext(mergedParents, mergedReturnStates)
 
 	// if we created same array as a or b, return that instead
 	// TODO: track whether this is possible above during merge sort for speed
@@ -683,7 +683,7 @@ func getCachedPredictionContext(context, contextCache, visited) {
 		updated = SingletonPredictionContext.create(parents[0], context
 				.getReturnState(0))
 	} else {
-		updated = new ArrayPredictionContext(parents, context.returnStates)
+		updated = NewArrayPredictionContext(parents, context.returnStates)
 	}
 	contextCache.add(updated)
 	visited[updated] = updated

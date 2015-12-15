@@ -40,7 +40,7 @@ func ATNConfigSet(fullCtx) {
 	// use a hash table that lets us specify the equals/hashcode operation.
 	// All configs but hashed by (s, i, _, pi) not including context. Wiped out
 	// when we go readonly as this set becomes a DFA state.
-	this.configLookup = new Set(hashATNConfig, equalATNConfigs)
+	this.configLookup = NewSet(hashATNConfig, equalATNConfigs)
 	// Indicates that this configuration set is part of a full context
 	// LL prediction. It will be used to determine how to merge $. With SLL
 	// it's a wildcard whereas it is not for LL context merge.
@@ -71,7 +71,7 @@ func ATNConfigSet(fullCtx) {
 	return this
 }
 
-// Adding a new config means merging contexts with existing configs for
+// Adding a Newconfig means merging contexts with existing configs for
 // {@code (s, i, pi, _)}, where {@code s} is the
 // {@link ATNConfig//state}, {@code i} is the {@link ATNConfig//alt}, and
 // {@code pi} is the {@link ATNConfig//semanticContext}. We use
@@ -103,7 +103,7 @@ func (this *ATNConfigSet) add(config, mergeCache) {
 	var rootIsWildcard = !this.fullCtx
 	var merged = merge(existing.context, config.context, rootIsWildcard, mergeCache)
 	// no need to check for existing.context, config.context in cache
-	// since only way to create new graphs is "call rule" and here. We
+	// since only way to create Newgraphs is "call rule" and here. We
 	// cache at both places.
 	existing.reachesIntoOuterContext = Math.max( existing.reachesIntoOuterContext, config.reachesIntoOuterContext)
 	// make sure to preserve the precedence filter suppression during the merge
@@ -115,7 +115,7 @@ func (this *ATNConfigSet) add(config, mergeCache) {
 }
 
 func (this *ATNConfigSet) getStates() {
-	var states = new Set()
+	var states = NewSet()
 	for (var i = 0 i < this.configs.length i++) {
 		states.add(this.configs[i].state)
 	}
@@ -222,7 +222,7 @@ func (this *ATNConfigSet) clear() {
 	}
 	this.configs = []
 	this.cachedHashString = "-1"
-	this.configLookup = new Set()
+	this.configLookup = NewSet()
 }
 
 func (this *ATNConfigSet) setReadonly(readOnly) {
@@ -242,7 +242,7 @@ func (this *ATNConfigSet) toString() {
 
 type OrderedATNConfigSet struct {
 	ATNConfigSet.call(this)
-	this.configLookup = new Set()
+	this.configLookup = NewSet()
 	return this
 }
 

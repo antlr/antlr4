@@ -257,7 +257,7 @@ func (l *Lexer) emitToken(token) {
 // outermost lexical rule. The token object should point into the
 // char buffer start..stop. If there is a text override in 'text',
 // use that to set the token's text. Override l method to emit
-// custom Token objects or provide a new factory.
+// custom Token objects or provide a Newfactory.
 // /
 func (l *Lexer) emit() {
 	var t = l._factory.create(l._tokenFactorySourcePair, l._type,

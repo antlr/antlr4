@@ -338,7 +338,7 @@ func (bt *BufferedTokenStream) getText(interval) string {
 	bt.lazyInit()
 	bt.fill()
 	if (interval == undefined || interval == nil) {
-		interval = new Interval(0, len(bt.tokens) - 1)
+		interval = NewInterval(0, len(bt.tokens) - 1)
 	}
 	var start = interval.start
 	if (start instanceof Token) {
