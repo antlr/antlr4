@@ -50,7 +50,7 @@ func (this *LexerSkipAction) execute(lexer) {
     lexer.skip()
 }
 
-func (this *LexerSkipAction) toString() {
+func (this *LexerSkipAction) toString() string {
 	return "skip"
 }
 
@@ -84,7 +84,7 @@ func (this *LexerTypeAction) equals(other) {
     }
 }
 
-func (this *LexerTypeAction) toString() {
+func (this *LexerTypeAction) toString() string {
     return "type(" + this.type + ")"
 }
 
@@ -119,7 +119,7 @@ func (this *LexerPushModeAction) equals(other) {
     }
 }
 
-func (this *LexerPushModeAction) toString() {
+func (this *LexerPushModeAction) toString() string {
 	return "pushMode(" + this.mode + ")"
 }
 
@@ -143,7 +143,7 @@ func (this *LexerPopModeAction) execute(lexer) {
     lexer.popMode()
 }
 
-func (this *LexerPopModeAction) toString() {
+func (this *LexerPopModeAction) toString() string {
 	return "popMode"
 }
 
@@ -166,7 +166,7 @@ func (this *LexerMoreAction) execute(lexer) {
     lexer.more()
 }
 
-func (this *LexerMoreAction) toString() {
+func (this *LexerMoreAction) toString() string {
     return "more"
 }
 
@@ -202,7 +202,7 @@ func (this *LexerModeAction) equals(other) {
     }
 }
 
-func (this *LexerModeAction) toString() {
+func (this *LexerModeAction) toString() string {
     return "mode(" + this.mode + ")"
 }
 
@@ -288,7 +288,7 @@ func (this *LexerChannelAction) equals(other) {
     }
 }
 
-func (this *LexerChannelAction) toString() {
+func (this *LexerChannelAction) toString() string {
     return "channel(" + this.channel + ")"
 }
 

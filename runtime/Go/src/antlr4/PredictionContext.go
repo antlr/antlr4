@@ -156,7 +156,7 @@ func (this *SingletonPredictionContext) hashString() {
 	return this.cachedHashString
 }
 
-func (this *SingletonPredictionContext) toString() {
+func (this *SingletonPredictionContext) toString() string {
 	var up = this.parentCtx == nil ? "" : this.parentCtx.toString()
 	if (up.length == 0) {
 		if (this.returnState == this.EMPTY_RETURN_STATE) {
@@ -193,7 +193,7 @@ func (this *EmptyPredictionContext) equals(other) {
 	return this == other
 }
 
-func (this *EmptyPredictionContext) toString() {
+func (this *EmptyPredictionContext) toString() string {
 	return "$"
 }
 
@@ -247,7 +247,7 @@ func (this *ArrayPredictionContext) equals(other) {
 	}
 }
 
-func (this *ArrayPredictionContext) toString() {
+func (this *ArrayPredictionContext) toString() string {
 	if (this.isEmpty()) {
 		return "[]"
 	} else {

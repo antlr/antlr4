@@ -141,7 +141,7 @@ Object.defineProperty(CommonToken.prototype, "text", {
 	}
 })
 
-func (this *CommonToken) toString() {
+func (this *CommonToken) toString() string {
 	var txt = this.text
 	if (txt != nil) {
 		txt = txt.replace(/\n/g, "\\n").replace(/\r/g, "\\r").replace(/\t/g, "\\t")

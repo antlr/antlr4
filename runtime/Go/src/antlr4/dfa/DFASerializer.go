@@ -10,7 +10,7 @@ func DFASerializer(dfa, literalNames, symbolicNames) {
 	return this
 }
 
-func (this *DFASerializer) toString() {
+func (this *DFASerializer) toString() string {
    if(this.dfa.s0 == nil) {
        return nil
    }

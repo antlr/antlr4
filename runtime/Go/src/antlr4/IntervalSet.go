@@ -23,7 +23,7 @@ func (i *Interval) contains(item int) {
 	return item >= i.start && item < i.stop
 }
 
-func (i *Interval) toString() {
+func (i *Interval) toString() string {
 	if(i.start==i.stop-1) {
 		return strconv.Itoa(i.start)
 	} else {

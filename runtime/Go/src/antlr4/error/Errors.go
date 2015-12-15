@@ -58,7 +58,7 @@ func (this *RecognitionException) getExpectedTokens() {
     }
 }
 
-func (this *RecognitionException) toString() {
+func (this *RecognitionException) toString() string {
     return this.message
 }
 
@@ -72,7 +72,7 @@ func LexerNoViableAltException(lexer, input, startIndex, deadEndConfigs) {
 //LexerNoViableAltException.prototype = Object.create(RecognitionException.prototype)
 //LexerNoViableAltException.prototype.constructor = LexerNoViableAltException
 
-func (this *LexerNoViableAltException) toString() {
+func (this *LexerNoViableAltException) toString() string {
     var symbol = ""
     if (this.startIndex >= 0 && this.startIndex < this.input.size) {
         symbol = this.input.getText((this.startIndex,this.startIndex))

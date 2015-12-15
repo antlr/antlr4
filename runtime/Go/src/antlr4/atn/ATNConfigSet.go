@@ -232,7 +232,7 @@ func (this *ATNConfigSet) setReadonly(readOnly) {
 	}
 }
 
-func (this *ATNConfigSet) toString() {
+func (this *ATNConfigSet) toString() string {
 	return Utils.arrayToString(this.configs) +
 		(this.hasSemanticContext ? ",hasSemanticContext=" + this.hasSemanticContext : "") +
 		(this.uniqueAlt != ATN.INVALID_ALT_NUMBER ? ",uniqueAlt=" + this.uniqueAlt : "") +

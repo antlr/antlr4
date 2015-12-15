@@ -127,7 +127,7 @@ var ATNState.serializationNames = [
             "PLUS_LOOP_BACK",
             "LOOP_END" ]
 
-func (this *ATNState) toString() {
+func (this *ATNState) toString() string {
 	return this.stateNumber
 }
 

@@ -165,7 +165,7 @@ func (this *TerminalNodeImpl) getText() {
 	return this.symbol.text
 }
 
-func (this *TerminalNodeImpl) toString() {
+func (this *TerminalNodeImpl) toString() string {
 	if (this.symbol.type == TokenEOF) {
 		return "<EOF>"
 	} else {

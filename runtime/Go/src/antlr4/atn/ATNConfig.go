@@ -95,7 +95,7 @@ func (this *ATNConfig) hashString() {
              "/" + this.semanticContext.hashString()
 }
 
-func (this *ATNConfig) toString() {
+func (this *ATNConfig) toString() string {
     return "(" + this.state + "," + this.alt +
         (this.context!=nil ? ",[" + this.context.toString() + "]" : "") +
         (this.semanticContext != SemanticContext.NONE ?

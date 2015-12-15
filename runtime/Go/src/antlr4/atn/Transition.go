@@ -91,7 +91,7 @@ func (this *AtomTransition) matches( symbol, minVocabSymbol,  maxVocabSymbol) {
     return this.label_ == symbol
 }
 
-func (this *AtomTransition) toString() {
+func (this *AtomTransition) toString() string {
 	return this.label_
 }
 
@@ -128,7 +128,7 @@ func (this *EpsilonTransition) matches( symbol, minVocabSymbol,  maxVocabSymbol)
 	return false
 }
 
-func (this *EpsilonTransition) toString() {
+func (this *EpsilonTransition) toString() string {
 	return "epsilon"
 }
 
@@ -154,7 +154,7 @@ func (this *RangeTransition) matches(symbol, minVocabSymbol,  maxVocabSymbol) {
 	return symbol >= this.start && symbol <= this.stop
 }
 
-func (this *RangeTransition) toString() {
+func (this *RangeTransition) toString() string {
 	return "'" + String.fromCharCode(this.start) + "'..'" + String.fromCharCode(this.stop) + "'"
 }
 
@@ -187,7 +187,7 @@ func (this *PredicateTransition) getPredicate() {
 	return NewPredicate(this.ruleIndex, this.predIndex, this.isCtxDependent)
 }
 
-func (this *PredicateTransition) toString() {
+func (this *PredicateTransition) toString() string {
 	return "pred_" + this.ruleIndex + ":" + this.predIndex
 }
 
@@ -209,7 +209,7 @@ func (this *ActionTransition) matches(symbol, minVocabSymbol,  maxVocabSymbol) {
 	return false
 }
 
-func (this *ActionTransition) toString() {
+func (this *ActionTransition) toString() string {
 	return "action_" + this.ruleIndex + ":" + this.actionIndex
 }
         
@@ -235,7 +235,7 @@ func (this *SetTransition) matches(symbol, minVocabSymbol,  maxVocabSymbol) {
 }
         
 
-func (this *SetTransition) toString() {
+func (this *SetTransition) toString() string {
 	return this.label.toString()
 }
 
@@ -253,7 +253,7 @@ func (this *NotSetTransition) matches(symbol, minVocabSymbol,  maxVocabSymbol) {
 			!SetTransition.prototype.matches.call(this, symbol, minVocabSymbol, maxVocabSymbol)
 }
 
-func (this *NotSetTransition) toString() {
+func (this *NotSetTransition) toString() string {
 	return '~' + SetTransition.prototype.toString.call(this)
 }
 
@@ -271,7 +271,7 @@ func (this *WildcardTransition) matches(symbol, minVocabSymbol,  maxVocabSymbol)
 	return symbol >= minVocabSymbol && symbol <= maxVocabSymbol
 }
 
-func (this *WildcardTransition) toString() {
+func (this *WildcardTransition) toString() string {
 	return "."
 }
 
@@ -294,7 +294,7 @@ func (this *PrecedencePredicateTransition) getPredicate() {
 	return NewPrecedencePredicate(this.precedence)
 }
 
-func (this *PrecedencePredicateTransition) toString() {
+func (this *PrecedencePredicateTransition) toString() string {
 	return this.precedence + " >= _p"
 }
         

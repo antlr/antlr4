@@ -10,7 +10,7 @@ func PredPrediction(pred, alt) {
 	return this
 }
 
-func (this *PredPrediction) toString() {
+func (this *PredPrediction) toString() string {
 	return "(" + this.pred + ", " + this.alt + ")"
 }
 
@@ -120,7 +120,7 @@ func (this *DFAState) equals(other) {
 	}
 }
 
-func (this *DFAState) toString() {
+func (this *DFAState) toString() string {
 	return "" + this.stateNumber + ":" + this.hashString()
 }
 

@@ -80,7 +80,7 @@ func (this *Set) values() {
 	return l
 }
 
-func (this *Set) toString() {
+func (this *Set) toString() string {
 	return arrayToString(this.values())
 }
 
@@ -131,7 +131,7 @@ Object.defineProperty(BitSet.prototype, "length", {
 	}
 })
 
-func (this *BitSet) toString() {
+func (this *BitSet) toString() string {
 	return "{" + this.values().join(", ") + "}"
 }
 

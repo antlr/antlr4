@@ -122,7 +122,7 @@ func (this *Predicate) equals(other) {
 	}
 }
 
-func (this *Predicate) toString() {
+func (this *Predicate) toString() string {
 	return "{" + this.ruleIndex + ":" + this.predIndex + "}?"
 }
 
@@ -164,7 +164,7 @@ func (this *PrecedencePredicate) equals(other) {
 	}
 }
 
-func (this *PrecedencePredicate) toString() {
+func (this *PrecedencePredicate) toString() string {
 	return "{"+this.precedence+">=prec}?"
 }
 
@@ -277,7 +277,7 @@ func (this *AND) evalPrecedence(parser, outerContext) {
 	return result
 }
 
-func (this *AND) toString() {
+func (this *AND) toString() string {
 	var s = ""
 	this.opnds.map(function(o) {
 		s += "&& " + o.toString()
@@ -379,7 +379,7 @@ func (this *OR) evalPrecedence(parser, outerContext) {
 	return result
 }
 
-func (this *AND) toString() {
+func (this *AND) toString() string {
 	var s = ""
 	this.opnds.map(function(o) {
 		s += "|| " + o.toString()
