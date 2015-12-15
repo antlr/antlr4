@@ -435,10 +435,10 @@ PredictionMode.hasConflictingAltSet = function(altsets) {
 // others, otherwise {@code false}
 //
 PredictionMode.allSubsetsEqual = function(altsets) {
-    var first = null
+    var first = nil
 	for(var i=0i<altsets.lengthi++) {
 		var alts = altsets[i]
-        if (first == null) {
+        if (first == nil) {
             first = alts
         } else if (alts!==first) {
             return false
@@ -490,8 +490,8 @@ PredictionMode.getConflictingAltSubsets = function(configs) {
 	for(var i=0i<configs.items.lengthi++) {
 		var c = configs.items[i]
         var key = "key_" + c.state.stateNumber + "/" + c.context
-        var alts = configToAlts[key] || null
-        if (alts == null) {
+        var alts = configToAlts[key] || nil
+        if (alts == nil) {
             alts = new BitSet()
             configToAlts[key] = alts
         }
@@ -519,7 +519,7 @@ PredictionMode.getStateToAltMap = function(configs) {
     var m = new AltDict()
     configs.items.map(function(c) {
         var alts = m.get(c.state)
-        if (alts == null) {
+        if (alts == nil) {
             alts = new BitSet()
             m.put(c.state, alts)
         }
@@ -539,11 +539,11 @@ PredictionMode.hasStateAssociatedWithOneAlt = function(configs) {
 }
 
 PredictionMode.getSingleViableAlt = function(altsets) {
-    var result = null
+    var result = nil
 	for(var i=0i<altsets.lengthi++) {
 		var alts = altsets[i]
         var minAlt = alts.minValue()
-        if(result==null) {
+        if(result==nil) {
             result = minAlt
         } else if(result!==minAlt) { // more than 1 viable alt
             return ATN.INVALID_ALT_NUMBER

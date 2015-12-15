@@ -11,18 +11,18 @@ func DFASerializer(dfa, literalNames, symbolicNames) {
 }
 
 func (this *DFASerializer) toString() {
-   if(this.dfa.s0 == null) {
-       return null
+   if(this.dfa.s0 == nil) {
+       return nil
    }
    var buf = ""
    var states = this.dfa.sortedStates()
    for(var i=0i<states.lengthi++) {
        var s = states[i]
-       if(s.edges!==null) {
+       if(s.edges!==nil) {
             var n = s.edges.length
             for(var j=0j<nj++) {
-                var t = s.edges[j] || null
-                if(t!==null && t.stateNumber !== 0x7FFFFFFF) {
+                var t = s.edges[j] || nil
+                if(t!==nil && t.stateNumber !== 0x7FFFFFFF) {
                     buf = buf.concat(this.getStateString(s))
                     buf = buf.concat("-")
                     buf = buf.concat(this.getEdgeLabel(j))
@@ -33,13 +33,13 @@ func (this *DFASerializer) toString() {
             }
        }
    }
-   return buf.length==0 ? null : buf
+   return buf.length==0 ? nil : buf
 }
 
 func (this *DFASerializer) getEdgeLabel(i) {
     if (i==0) {
         return "EOF"
-    } else if(this.literalNames !==null || this.symbolicNames!==null) {
+    } else if(this.literalNames !==nil || this.symbolicNames!==nil) {
         return this.literalNames[i-1] || this.symbolicNames[i-1]
     } else {
         return String.fromCharCode(i-1)
@@ -49,7 +49,7 @@ func (this *DFASerializer) getEdgeLabel(i) {
 func (this *DFASerializer) getStateString(s) {
     var baseStateStr = ( s.isAcceptState ? ":" : "") + "s" + s.stateNumber + ( s.requiresFullContext ? "^" : "")
     if(s.isAcceptState) {
-        if (s.predicates !== null) {
+        if (s.predicates !== nil) {
             return baseStateStr + "=>" + s.predicates.toString()
         } else {
             return baseStateStr + "=>" + s.prediction.toString()
@@ -60,7 +60,7 @@ func (this *DFASerializer) getStateString(s) {
 }
 
 func LexerDFASerializer(dfa) {
-	DFASerializer.call(this, dfa, null)
+	DFASerializer.call(this, dfa, nil)
 	return this
 }
 

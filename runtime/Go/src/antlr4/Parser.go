@@ -1,12 +1,5 @@
 package antlr4
 
-var Token = require('./Token').Token
-var ParseTreeListener = require('./tree/Tree').ParseTreeListener
-var Recognizer = require('./Recognizer').Recognizer
-var DefaultErrorStrategy = require('./error/ErrorStrategy').DefaultErrorStrategy
-var ATNDeserializer = require('./atn/ATNDeserializer').ATNDeserializer
-var ATNDeserializationOptions = require('./atn/ATNDeserializationOptions').ATNDeserializationOptions
-
 func TraceListener(parser) {
 	ParseTreeListener.call(this)
     this.parser = parser
@@ -17,54 +10,54 @@ TraceListener.prototype = Object.create(ParseTreeListener)
 TraceListener.prototype.constructor = TraceListener
 
 func (this *TraceListener) enterEveryRule(ctx) {
-	console.log("enter   " + this.parser.ruleNames[ctx.ruleIndex] + ", LT(1)=" + this.parser._input.LT(1).text)
+	fmt.Println("enter   " + this.parser.ruleNames[ctx.ruleIndex] + ", LT(1)=" + this.parser._input.LT(1).text)
 }
 
 func (this *TraceListener) visitTerminal( node) {
-	console.log("consume " + node.symbol + " rule " + this.parser.ruleNames[this.parser._ctx.ruleIndex])
+	fmt.Println("consume " + node.symbol + " rule " + this.parser.ruleNames[this.parser._ctx.ruleIndex])
 }
 
 func (this *TraceListener) exitEveryRule(ctx) {
-	console.log("exit    " + this.parser.ruleNames[ctx.ruleIndex] + ", LT(1)=" + this.parser._input.LT(1).text)
+	fmt.Println("exit    " + this.parser.ruleNames[ctx.ruleIndex] + ", LT(1)=" + this.parser._input.LT(1).text)
 }
 
-// this is all the parsing support code essentially most of it is error
+// p.is all the parsing support code essentially most of it is error
 // recovery stuff.//
 func Parser(input) {
-	Recognizer.call(this)
+	Recognizer.call(p.
 	// The input stream.
-	this._input = null
+	p._input = nil
 	// The error handling strategy for the parser. The default value is a new
 	// instance of {@link DefaultErrorStrategy}.
-	this._errHandler = new DefaultErrorStrategy()
-	this._precedenceStack = []
-	this._precedenceStack.push(0)
+	p._errHandler = NewDefaultErrorStrategy()
+	p._precedenceStack = []
+	p._precedenceStack.push(0)
 	// The {@link ParserRuleContext} object for the currently executing rule.
-	// this is always non-null during the parsing process.
-	this._ctx = null
+	// p.is always non-nil during the parsing process.
+	p._ctx = nil
 	// Specifies whether or not the parser should construct a parse tree during
 	// the parsing process. The default value is {@code true}.
-	this.buildParseTrees = true
+	p.buildParseTrees = true
 	// When {@link //setTrace}{@code (true)} is called, a reference to the
 	// {@link TraceListener} is stored here so it can be easily removed in a
 	// later call to {@link //setTrace}{@code (false)}. The listener itself is
-	// implemented as a parser listener so this field is not directly used by
+	// implemented as a parser listener so p.field is not directly used by
 	// other parser methods.
-	this._tracer = null
+	p._tracer = nil
 	// The list of {@link ParseTreeListener} listeners registered to receive
 	// events during the parse.
-	this._parseListeners = null
-	// The number of syntax errors reported during parsing. this value is
+	p._parseListeners = nil
+	// The number of syntax errors reported during parsing. p.value is
 	// incremented each time {@link //notifyErrorListeners} is called.
-	this._syntaxErrors = 0
-	this.setInputStream(input)
+	p._syntaxErrors = 0
+	p.setInputStream(input)
 	return this
 }
 
 Parser.prototype = Object.create(Recognizer.prototype)
 Parser.prototype.contructor = Parser
 
-// this field maps from the serialized ATN string to the deserialized {@link
+// p.field maps from the serialized ATN string to the deserialized {@link
 // ATN} with
 // bypass alternatives.
 //
@@ -73,18 +66,18 @@ Parser.prototype.contructor = Parser
 Parser.bypassAltsAtnCache = {}
 
 // reset the parser's state//
-func (this *Parser) reset() {
-	if (this._input !== null) {
-		this._input.seek(0)
+func (p.*Parser) reset() {
+	if (p._input !== nil) {
+		p._input.seek(0)
 	}
-	this._errHandler.reset(this)
-	this._ctx = null
-	this._syntaxErrors = 0
-	this.setTrace(false)
-	this._precedenceStack = []
-	this._precedenceStack.push(0)
-	if (this._interp !== null) {
-		this._interp.reset()
+	p._errHandler.reset(p.
+	p._ctx = nil
+	p._syntaxErrors = 0
+	p.setTrace(false)
+	p._precedenceStack = []
+	p._precedenceStack.push(0)
+	if (p._interp !== nil) {
+		p._interp.reset()
 	}
 }
 
@@ -105,18 +98,18 @@ func (this *Parser) reset() {
 // {@code ttype} and the error strategy could not recover from the
 // mismatched symbol
 
-func (this *Parser) match(ttype) {
-	var t = this.getCurrentToken()
+func (p.*Parser) match(ttype) {
+	var t = p.getCurrentToken()
 	if (t.type == ttype) {
-		this._errHandler.reportMatch(this)
-		this.consume()
+		p._errHandler.reportMatch(p.
+		p.consume()
 	} else {
-		t = this._errHandler.recoverInline(this)
-		if (this.buildParseTrees && t.tokenIndex == -1) {
+		t = p._errHandler.recoverInline(p.
+		if (p.buildParseTrees && t.tokenIndex == -1) {
 			// we must have conjured up a new token during single token
 			// insertion
 			// if it's not the current symbol
-			this._ctx.addErrorNode(t)
+			p._ctx.addErrorNode(t)
 		}
 	}
 	return t
@@ -137,25 +130,25 @@ func (this *Parser) match(ttype) {
 // a wildcard and the error strategy could not recover from the mismatched
 // symbol
 
-func (this *Parser) matchWildcard() {
-	var t = this.getCurrentToken()
+func (p.*Parser) matchWildcard() {
+	var t = p.getCurrentToken()
 	if (t.type > 0) {
-		this._errHandler.reportMatch(this)
-		this.consume()
+		p._errHandler.reportMatch(p.
+		p.consume()
 	} else {
-		t = this._errHandler.recoverInline(this)
-		if (this._buildParseTrees && t.tokenIndex == -1) {
+		t = p._errHandler.recoverInline(p.
+		if (p._buildParseTrees && t.tokenIndex == -1) {
 			// we must have conjured up a new token during single token
 			// insertion
 			// if it's not the current symbol
-			this._ctx.addErrorNode(t)
+			p._ctx.addErrorNode(t)
 		}
 	}
 	return t
 }
 
-func (this *Parser) getParseListeners() {
-	return this._parseListeners || []
+func (p.*Parser) getParseListeners() {
+	return p._parseListeners || []
 }
 
 // Registers {@code listener} to receive events during the parsing process.
@@ -184,47 +177,47 @@ func (this *Parser) getParseListeners() {
 //
 // @param listener the listener to add
 //
-// @throws NullPointerException if {@code} listener is {@code null}
+// @throws nilPointerException if {@code} listener is {@code nil}
 //
-func (this *Parser) addParseListener(listener) {
-	if (listener == null) {
+func (p.*Parser) addParseListener(listener) {
+	if (listener == nil) {
 		throw "listener"
 	}
-	if (this._parseListeners == null) {
-		this._parseListeners = []
+	if (p._parseListeners == nil) {
+		p._parseListeners = []
 	}
-	this._parseListeners.push(listener)
+	p._parseListeners.push(listener)
 }
 
 //
 // Remove {@code listener} from the list of parse listeners.
 //
-// <p>If {@code listener} is {@code null} or has not been added as a parse
-// listener, this method does nothing.</p>
+// <p>If {@code listener} is {@code nil} or has not been added as a parse
+// listener, p.method does nothing.</p>
 // @param listener the listener to remove
 //
-func (this *Parser) removeParseListener(listener) {
-	if (this._parseListeners !== null) {
-		var idx = this._parseListeners.indexOf(listener)
+func (p.*Parser) removeParseListener(listener) {
+	if (p._parseListeners !== nil) {
+		var idx = p._parseListeners.indexOf(listener)
 		if (idx >= 0) {
-			this._parseListeners.splice(idx, 1)
+			p._parseListeners.splice(idx, 1)
 		}
-		if (this._parseListeners.length == 0) {
-			this._parseListeners = null
+		if (p._parseListeners.length == 0) {
+			p._parseListeners = nil
 		}
 	}
 }
 
 // Remove all parse listeners.
-func (this *Parser) removeParseListeners() {
-	this._parseListeners = null
+func (p.*Parser) removeParseListeners() {
+	p._parseListeners = nil
 }
 
 // Notify any parse listeners of an enter rule event.
-func (this *Parser) triggerEnterRuleEvent() {
-	if (this._parseListeners !== null) {
-        var ctx = this._ctx
-		this._parseListeners.map(function(listener) {
+func (p.*Parser) triggerEnterRuleEvent() {
+	if (p._parseListeners !== nil) {
+        var ctx = p._ctx
+		p._parseListeners.map(function(listener) {
 			listener.enterEveryRule(ctx)
 			ctx.enterRule(listener)
 		})
@@ -236,24 +229,24 @@ func (this *Parser) triggerEnterRuleEvent() {
 //
 // @see //addParseListener
 //
-func (this *Parser) triggerExitRuleEvent() {
-	if (this._parseListeners !== null) {
+func (p.*Parser) triggerExitRuleEvent() {
+	if (p._parseListeners !== nil) {
 		// reverse order walk of listeners
-        var ctx = this._ctx
-		this._parseListeners.slice(0).reverse().map(function(listener) {
+        var ctx = p._ctx
+		p._parseListeners.slice(0).reverse().map(function(listener) {
 			ctx.exitRule(listener)
 			listener.exitEveryRule(ctx)
 		})
 	}
 }
 
-func (this *Parser) getTokenFactory() {
-	return this._input.tokenSource._factory
+func (p.*Parser) getTokenFactory() {
+	return p._input.tokenSource._factory
 }
 
 // Tell our token source and error strategy about a new way to create tokens.//
-func (this *Parser) setTokenFactory(factory) {
-	this._input.tokenSource._factory = factory
+func (p.*Parser) setTokenFactory(factory) {
+	p._input.tokenSource._factory = factory
 }
 
 // The ATN with bypass alternatives is expensive to create so we create it
@@ -262,18 +255,18 @@ func (this *Parser) setTokenFactory(factory) {
 // @throws UnsupportedOperationException if the current parser does not
 // implement the {@link //getSerializedATN()} method.
 //
-func (this *Parser) getATNWithBypassAlts() {
-	var serializedAtn = this.getSerializedATN()
-	if (serializedAtn == null) {
+func (p.*Parser) getATNWithBypassAlts() {
+	var serializedAtn = p.getSerializedATN()
+	if (serializedAtn == nil) {
 		throw "The current parser does not support an ATN with bypass alternatives."
 	}
-	var result = this.bypassAltsAtnCache[serializedAtn]
-	if (result == null) {
+	var result = p.bypassAltsAtnCache[serializedAtn]
+	if (result == nil) {
 		var deserializationOptions = new ATNDeserializationOptions()
 		deserializationOptions.generateRuleBypassTransitions = true
 		result = new ATNDeserializer(deserializationOptions)
 				.deserialize(serializedAtn)
-		this.bypassAltsAtnCache[serializedAtn] = result
+		p.bypassAltsAtnCache[serializedAtn] = result
 	}
 	return result
 }
@@ -291,67 +284,67 @@ func (this *Parser) getATNWithBypassAlts() {
 
 var Lexer = require('./Lexer').Lexer
 
-func (this *Parser) compileParseTreePattern(pattern, patternRuleIndex, lexer) {
-	lexer = lexer || null
-	if (lexer == null) {
-		if (this.getTokenStream() !== null) {
-			var tokenSource = this.getTokenStream().tokenSource
+func (p.*Parser) compileParseTreePattern(pattern, patternRuleIndex, lexer) {
+	lexer = lexer || nil
+	if (lexer == nil) {
+		if (p.getTokenStream() !== nil) {
+			var tokenSource = p.getTokenStream().tokenSource
 			if (tokenSource instanceof Lexer) {
 				lexer = tokenSource
 			}
 		}
 	}
-	if (lexer == null) {
+	if (lexer == nil) {
 		throw "Parser can't discover a lexer to use"
 	}
-	var m = new ParseTreePatternMatcher(lexer, this)
+	var m = new ParseTreePatternMatcher(lexer, p.
 	return m.compile(pattern, patternRuleIndex)
 }
 
-func (this *Parser) getInputStream() {
-	return this.getTokenStream()
+func (p.*Parser) getInputStream() {
+	return p.getTokenStream()
 }
 
-func (this *Parser) setInputStream(input) {
-	this.setTokenStream(input)
+func (p.*Parser) setInputStream(input) {
+	p.setTokenStream(input)
 }
 
-func (this *Parser) getTokenStream() {
-	return this._input
+func (p.*Parser) getTokenStream() {
+	return p._input
 }
 
 // Set the token stream and reset the parser.//
-func (this *Parser) setTokenStream(input) {
-	this._input = null
-	this.reset()
-	this._input = input
+func (p.*Parser) setTokenStream(input) {
+	p._input = nil
+	p.reset()
+	p._input = input
 }
 
 // Match needs to return the current input symbol, which gets put
 // into the label for the associated token ref e.g., x=ID.
 //
-func (this *Parser) getCurrentToken() {
-	return this._input.LT(1)
+func (p.*Parser) getCurrentToken() {
+	return p._input.LT(1)
 }
 
-func (this *Parser) notifyErrorListeners(msg, offendingToken, err) {
-	offendingToken = offendingToken || null
-	err = err || null
-	if (offendingToken == null) {
-		offendingToken = this.getCurrentToken()
+func (p.*Parser) notifyErrorListeners(msg, offendingToken, err) {
+	offendingToken = offendingToken || nil
+	err = err || nil
+	if (offendingToken == nil) {
+		offendingToken = p.getCurrentToken()
 	}
-	this._syntaxErrors += 1
+	p._syntaxErrors += 1
 	var line = offendingToken.line
 	var column = offendingToken.column
-	var listener = this.getErrorListenerDispatch()
-	listener.syntaxError(this, offendingToken, line, column, msg, err)
+	var listener = p.getErrorListenerDispatch()
+	listener.syntaxError(p. offendingToken, line, column, msg, err)
 }
 
 //
 // Consume and return the {@linkplain //getCurrentToken current symbol}.
 //
 // <p>E.g., given the following input with {@code A} being the current
-// lookahead symbol, this func moves the cursor to {@code B} and returns
+// lookahead symbol, p.func moves the cursor to {@code B} and returns
 // {@code A}.</p>
 //
 // <pre>
@@ -368,22 +361,22 @@ func (this *Parser) notifyErrorListeners(msg, offendingToken, err) {
 // {@link ParseTreeListener//visitErrorNode} is called on any parse
 // listeners.
 //
-func (this *Parser) consume() {
-	var o = this.getCurrentToken()
+func (p.*Parser) consume() {
+	var o = p.getCurrentToken()
 	if (o.type !== Token.EOF) {
-		this.getInputStream().consume()
+		p.getInputStream().consume()
 	}
-	var hasListener = this._parseListeners !== null && this._parseListeners.length > 0
-	if (this.buildParseTrees || hasListener) {
+	var hasListener = p._parseListeners !== nil && p._parseListeners.length > 0
+	if (p.buildParseTrees || hasListener) {
 		var node
-		if (this._errHandler.inErrorRecoveryMode(this)) {
-			node = this._ctx.addErrorNode(o)
+		if (p._errHandler.inErrorRecoveryMode(p.) {
+			node = p._ctx.addErrorNode(o)
 		} else {
-			node = this._ctx.addTokenNode(o)
+			node = p._ctx.addTokenNode(o)
 		}
-        node.invokingState = this.state
+        node.invokingState = p.state
 		if (hasListener) {
-			this._parseListeners.map(function(listener) {
+			p._parseListeners.map(function(listener) {
 				listener.visitTerminal(node)
 			})
 		}
@@ -391,48 +384,48 @@ func (this *Parser) consume() {
 	return o
 }
 
-func (this *Parser) addContextToParseTree() {
+func (p.*Parser) addContextToParseTree() {
 	// add current context to parent if we have a parent
-	if (this._ctx.parentCtx !== null) {
-		this._ctx.parentCtx.addChild(this._ctx)
+	if (p._ctx.parentCtx !== nil) {
+		p._ctx.parentCtx.addChild(p._ctx)
 	}
 }
 
 // Always called by generated parsers upon entry to a rule. Access field
 // {@link //_ctx} get the current context.
 
-func (this *Parser) enterRule(localctx, state, ruleIndex) {
-	this.state = state
-	this._ctx = localctx
-	this._ctx.start = this._input.LT(1)
-	if (this.buildParseTrees) {
-		this.addContextToParseTree()
+func (p.*Parser) enterRule(localctx, state, ruleIndex) {
+	p.state = state
+	p._ctx = localctx
+	p._ctx.start = p._input.LT(1)
+	if (p.buildParseTrees) {
+		p.addContextToParseTree()
 	}
-	if (this._parseListeners !== null) {
-		this.triggerEnterRuleEvent()
+	if (p._parseListeners !== nil) {
+		p.triggerEnterRuleEvent()
 	}
 }
 
-func (this *Parser) exitRule() {
-	this._ctx.stop = this._input.LT(-1)
+func (p.*Parser) exitRule() {
+	p._ctx.stop = p._input.LT(-1)
 	// trigger event on _ctx, before it reverts to parent
-	if (this._parseListeners !== null) {
-		this.triggerExitRuleEvent()
+	if (p._parseListeners !== nil) {
+		p.triggerExitRuleEvent()
 	}
-	this.state = this._ctx.invokingState
-	this._ctx = this._ctx.parentCtx
+	p.state = p._ctx.invokingState
+	p._ctx = p._ctx.parentCtx
 }
 
-func (this *Parser) enterOuterAlt(localctx, altNum) {
+func (p.*Parser) enterOuterAlt(localctx, altNum) {
 	// if we have new localctx, make sure we replace existing ctx
 	// that is previous child of parse tree
-	if (this.buildParseTrees && this._ctx !== localctx) {
-		if (this._ctx.parentCtx !== null) {
-			this._ctx.parentCtx.removeLastChild()
-			this._ctx.parentCtx.addChild(localctx)
+	if (p.buildParseTrees && p._ctx !== localctx) {
+		if (p._ctx.parentCtx !== nil) {
+			p._ctx.parentCtx.removeLastChild()
+			p._ctx.parentCtx.addChild(localctx)
 		}
 	}
-	this._ctx = localctx
+	p._ctx = localctx
 }
 
 // Get the precedence level for the top-most precedence rule.
@@ -440,22 +433,22 @@ func (this *Parser) enterOuterAlt(localctx, altNum) {
 // @return The precedence level for the top-most precedence rule, or -1 if
 // the parser context is not nested within a precedence rule.
 
-func (this *Parser) getPrecedence() {
-	if (this._precedenceStack.length == 0) {
+func (p.*Parser) getPrecedence() {
+	if (p._precedenceStack.length == 0) {
 		return -1
 	} else {
-		return this._precedenceStack[this._precedenceStack.length-1]
+		return p._precedenceStack[p._precedenceStack.length-1]
 	}
 }
 
-func (this *Parser) enterRecursionRule(localctx, state, ruleIndex,
+func (p.*Parser) enterRecursionRule(localctx, state, ruleIndex,
 		precedence) {
-	this.state = state
-	this._precedenceStack.push(precedence)
-	this._ctx = localctx
-	this._ctx.start = this._input.LT(1)
-	if (this._parseListeners !== null) {
-		this.triggerEnterRuleEvent() // simulates rule entry for
+	p.state = state
+	p._precedenceStack.push(precedence)
+	p._ctx = localctx
+	p._ctx.start = p._input.LT(1)
+	if (p._parseListeners !== nil) {
+		p.triggerEnterRuleEvent() // simulates rule entry for
 										// left-recursive rules
 	}
 }
@@ -463,67 +456,67 @@ func (this *Parser) enterRecursionRule(localctx, state, ruleIndex,
 //
 // Like {@link //enterRule} but for recursive rules.
 
-func (this *Parser) pushNewRecursionContext(localctx, state, ruleIndex) {
-	var previous = this._ctx
+func (p.*Parser) pushNewRecursionContext(localctx, state, ruleIndex) {
+	var previous = p._ctx
 	previous.parentCtx = localctx
 	previous.invokingState = state
-	previous.stop = this._input.LT(-1)
+	previous.stop = p._input.LT(-1)
 
-	this._ctx = localctx
-	this._ctx.start = previous.start
-	if (this.buildParseTrees) {
-		this._ctx.addChild(previous)
+	p._ctx = localctx
+	p._ctx.start = previous.start
+	if (p.buildParseTrees) {
+		p._ctx.addChild(previous)
 	}
-	if (this._parseListeners !== null) {
-		this.triggerEnterRuleEvent() // simulates rule entry for
+	if (p._parseListeners !== nil) {
+		p.triggerEnterRuleEvent() // simulates rule entry for
 										// left-recursive rules
 	}
 }
 
-func (this *Parser) unrollRecursionContexts(parentCtx) {
-	this._precedenceStack.pop()
-	this._ctx.stop = this._input.LT(-1)
-	var retCtx = this._ctx // save current ctx (return value)
+func (p.*Parser) unrollRecursionContexts(parentCtx) {
+	p._precedenceStack.pop()
+	p._ctx.stop = p._input.LT(-1)
+	var retCtx = p._ctx // save current ctx (return value)
 	// unroll so _ctx is as it was before call to recursive method
-	if (this._parseListeners !== null) {
-		while (this._ctx !== parentCtx) {
-			this.triggerExitRuleEvent()
-			this._ctx = this._ctx.parentCtx
+	if (p._parseListeners !== nil) {
+		while (p._ctx !== parentCtx) {
+			p.triggerExitRuleEvent()
+			p._ctx = p._ctx.parentCtx
 		}
 	} else {
-		this._ctx = parentCtx
+		p._ctx = parentCtx
 	}
 	// hook into tree
 	retCtx.parentCtx = parentCtx
-	if (this.buildParseTrees && parentCtx !== null) {
+	if (p.buildParseTrees && parentCtx !== nil) {
 		// add return ctx into invoking rule's tree
 		parentCtx.addChild(retCtx)
 	}
 }
 
-func (this *Parser) getInvokingContext(ruleIndex) {
-	var ctx = this._ctx
-	while (ctx !== null) {
+func (p.*Parser) getInvokingContext(ruleIndex) {
+	var ctx = p._ctx
+	while (ctx !== nil) {
 		if (ctx.ruleIndex == ruleIndex) {
 			return ctx
 		}
 		ctx = ctx.parentCtx
 	}
-	return null
+	return nil
 }
 
-func (this *Parser) precpred(localctx, precedence) {
-	return precedence >= this._precedenceStack[this._precedenceStack.length-1]
+func (p.*Parser) precpred(localctx, precedence) {
+	return precedence >= p._precedenceStack[p._precedenceStack.length-1]
 }
 
-func (this *Parser) inContext(context) {
+func (p.*Parser) inContext(context) {
 	// TODO: useful in parser?
 	return false
 }
 
 //
 // Checks whether or not {@code symbol} can follow the current state in the
-// ATN. The behavior of this method is equivalent to the following, but is
+// ATN. The behavior of p.method is equivalent to the following, but is
 // implemented such that the complete context-sensitive follow set does not
 // need to be explicitly constructed.
 //
@@ -535,10 +528,10 @@ func (this *Parser) inContext(context) {
 // @return {@code true} if {@code symbol} can follow the current state in
 // the ATN, otherwise {@code false}.
 
-func (this *Parser) isExpectedToken(symbol) {
-	var atn = this._interp.atn
-	var ctx = this._ctx
-	var s = atn.states[this.state]
+func (p.*Parser) isExpectedToken(symbol) {
+	var atn = p._interp.atn
+	var ctx = p._ctx
+	var s = atn.states[p.state]
 	var following = atn.nextTokens(s)
 	if (following.contains(symbol)) {
 		return true
@@ -546,7 +539,7 @@ func (this *Parser) isExpectedToken(symbol) {
 	if (!following.contains(Token.EPSILON)) {
 		return false
 	}
-	while (ctx !== null && ctx.invokingState >= 0 && following.contains(Token.EPSILON)) {
+	while (ctx !== nil && ctx.invokingState >= 0 && following.contains(Token.EPSILON)) {
 		var invokingState = atn.states[ctx.invokingState]
 		var rt = invokingState.transitions[0]
 		following = atn.nextTokens(rt.followState)
@@ -568,20 +561,20 @@ func (this *Parser) isExpectedToken(symbol) {
 //
 // @see ATN//getExpectedTokens(int, RuleContext)
 //
-func (this *Parser) getExpectedTokens() {
-	return this._interp.atn.getExpectedTokens(this.state, this._ctx)
+func (p.*Parser) getExpectedTokens() {
+	return p._interp.atn.getExpectedTokens(p.state, p._ctx)
 }
 
-func (this *Parser) getExpectedTokensWithinCurrentRule() {
-	var atn = this._interp.atn
-	var s = atn.states[this.state]
+func (p.*Parser) getExpectedTokensWithinCurrentRule() {
+	var atn = p._interp.atn
+	var s = atn.states[p.state]
 	return atn.nextTokens(s)
 }
 
 // Get a rule's index (i.e., {@code RULE_ruleName} field) or -1 if not found.//
-func (this *Parser) getRuleIndex(ruleName) {
-	var ruleIndex = this.getRuleIndexMap()[ruleName]
-	if (ruleIndex !== null) {
+func (p.*Parser) getRuleIndex(ruleName) {
+	var ruleIndex = p.getRuleIndexMap()[ruleName]
+	if (ruleIndex !== nil) {
 		return ruleIndex
 	} else {
 		return -1
@@ -593,21 +586,21 @@ func (this *Parser) getRuleIndex(ruleName) {
 // you want more details such as the file/line info of where
 // in the ATN a rule is invoked.
 //
-// this is very useful for error messages.
+// p.is very useful for error messages.
 //
-func (this *Parser) getRuleInvocationStack(p) {
-	p = p || null
-	if (p == null) {
-		p = this._ctx
+func (p.*Parser) getRuleInvocationStack(p) {
+	p = p || nil
+	if (p == nil) {
+		p = p._ctx
 	}
 	var stack = []
-	while (p !== null) {
+	while (p !== nil) {
 		// compute what follows who invoked us
 		var ruleIndex = p.ruleIndex
 		if (ruleIndex < 0) {
 			stack.push("n/a")
 		} else {
-			stack.push(this.ruleNames[ruleIndex])
+			stack.push(p.ruleNames[ruleIndex])
 		}
 		p = p.parentCtx
 	}
@@ -615,20 +608,20 @@ func (this *Parser) getRuleInvocationStack(p) {
 }
 
 // For debugging and other purposes.//
-func (this *Parser) getDFAStrings() {
-	return this._interp.decisionToDFA.toString()
+func (p.*Parser) getDFAStrings() {
+	return p._interp.decisionToDFA.toString()
 }
 // For debugging and other purposes.//
-func (this *Parser) dumpDFA() {
+func (p.*Parser) dumpDFA() {
 	var seenOne = false
-	for (var i = 0 i < this._interp.decisionToDFA.length i++) {
-		var dfa = this._interp.decisionToDFA[i]
+	for (var i = 0 i < p._interp.decisionToDFA.length i++) {
+		var dfa = p._interp.decisionToDFA[i]
 		if (dfa.states.length > 0) {
 			if (seenOne) {
-				console.log()
+				fmt.Println()
 			}
-			this.printer.println("Decision " + dfa.decision + ":")
-			this.printer.print(dfa.toString(this.literalNames, this.symbolicNames))
+			p.printer.println("Decision " + dfa.decision + ":")
+			p.printer.print(dfa.toString(p.literalNames, p.symbolicNames))
 			seenOne = true
 		}
 	}
@@ -636,28 +629,28 @@ func (this *Parser) dumpDFA() {
 
 /*
 "			printer = function() {\r\n" +
-"				this.println = function(s) { document.getElementById('output') += s + '\\n' }\r\n" +
-"				this.print = function(s) { document.getElementById('output') += s }\r\n" +
+"				p.println = function(s) { document.getElementById('output') += s + '\\n' }\r\n" +
+"				p.print = function(s) { document.getElementById('output') += s }\r\n" +
 "			}\r\n" +
 */
 
-func (this *Parser) getSourceName() {
-	return this._input.sourceName
+func (p.*Parser) getSourceName() {
+	return p._input.sourceName
 }
 
 // During a parse is sometimes useful to listen in on the rule entry and exit
-// events as well as token matches. this is for quick and dirty debugging.
+// events as well as token matches. p.is for quick and dirty debugging.
 //
-func (this *Parser) setTrace(trace) {
+func (p.*Parser) setTrace(trace) {
 	if (!trace) {
-		this.removeParseListener(this._tracer)
-		this._tracer = null
+		p.removeParseListener(p._tracer)
+		p._tracer = nil
 	} else {
-		if (this._tracer !== null) {
-			this.removeParseListener(this._tracer)
+		if (p._tracer !== nil) {
+			p.removeParseListener(p._tracer)
 		}
-		this._tracer = new TraceListener(this)
-		this.addParseListener(this._tracer)
+		p._tracer = new TraceListener(p.
+		p.addParseListener(p._tracer)
 	}
 }
 

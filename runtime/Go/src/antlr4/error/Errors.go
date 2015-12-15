@@ -22,14 +22,14 @@ func RecognitionException(params) {
     // The current {@link Token} when an error occurred. Since not all streams
     // support accessing symbols by index, we have to track the {@link Token}
     // instance itself.
-    this.offendingToken = null
+    this.offendingToken = nil
     // Get the ATN state number the parser was in at the time the error
     // occurred. For {@link NoViableAltException} and
     // {@link LexerNoViableAltException} exceptions, this is the
     // {@link DecisionState} number. For others, it is the state whose outgoing
     // edge we couldn't match.
     this.offendingState = -1
-    if (this.recognizer!==null) {
+    if (this.recognizer!==nil) {
         this.offendingState = this.recognizer.state
     }
     return this
@@ -45,16 +45,16 @@ RecognitionException.prototype.constructor = RecognitionException
 // previously matched symbol at the time this exception was thrown.
 //
 // <p>If the set of expected tokens is not known and could not be computed,
-// this method returns {@code null}.</p>
+// this method returns {@code nil}.</p>
 //
 // @return The set of token types that could potentially follow the current
-// state in the ATN, or {@code null} if the information is not available.
+// state in the ATN, or {@code nil} if the information is not available.
 // /
 func (this *RecognitionException) getExpectedTokens() {
-    if (this.recognizer!==null) {
+    if (this.recognizer!==nil) {
         return this.recognizer.atn.getExpectedTokens(this.offendingState, this.ctx)
     } else {
-        return null
+        return nil
     }
 }
 
@@ -63,7 +63,7 @@ func (this *RecognitionException) toString() {
 }
 
 func LexerNoViableAltException(lexer, input, startIndex, deadEndConfigs) {
-	RecognitionException.call(this, {message:"", recognizer:lexer, input:input, ctx:null})
+	RecognitionException.call(this, {message:"", recognizer:lexer, input:input, ctx:nil})
     this.startIndex = startIndex
     this.deadEndConfigs = deadEndConfigs
     return this
@@ -122,7 +122,7 @@ InputMismatchException.prototype.constructor = InputMismatchException
 // prediction.
 
 func FailedPredicateException(recognizer, predicate, message) {
-	RecognitionException.call(this, {message:this.formatMessage(predicate,message || null), recognizer:recognizer,
+	RecognitionException.call(this, {message:this.formatMessage(predicate,message || nil), recognizer:recognizer,
                          input:recognizer.getInputStream(), ctx:recognizer._ctx})
     var s = recognizer._interp.atn.states[recognizer.state]
     var trans = s.transitions[0]
@@ -142,7 +142,7 @@ FailedPredicateException.prototype = Object.create(RecognitionException.prototyp
 FailedPredicateException.prototype.constructor = FailedPredicateException
 
 func (this *FailedPredicateException) formatMessage(predicate, message) {
-    if (message !==null) {
+    if (message !==nil) {
         return message
     } else {
         return "failed predicate: {" + predicate + "}?"

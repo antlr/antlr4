@@ -12,18 +12,18 @@ var DecisionState = require('./ATNState').DecisionState
 var SemanticContext = require('./SemanticContext').SemanticContext
 
 func checkParams(params, isCfg) {
-	if(params==null) {
-		var result = { state:null, alt:null, context:null, semanticContext:null }
+	if(params==nil) {
+		var result = { state:nil, alt:nil, context:nil, semanticContext:nil }
 		if(isCfg) {
 			result.reachesIntoOuterContext = 0
 		}
 		return result
 	} else {
 		var props = {}
-		props.state = params.state || null
-		props.alt = params.alt || null
-		props.context = params.context || null
-		props.semanticContext = params.semanticContext || null
+		props.state = params.state || nil
+		props.alt = params.alt || nil
+		props.context = params.context || nil
+		props.semanticContext = params.semanticContext || nil
 		if(isCfg) {
 			props.reachesIntoOuterContext = params.reachesIntoOuterContext || 0
 			props.precedenceFilterSuppressed = params.precedenceFilterSuppressed || false
@@ -37,15 +37,15 @@ func ATNConfig(params, config) {
 	params = checkParams(params)
 	config = checkParams(config, true)
     // The ATN state associated with this configuration///
-    this.state = params.state!==null ? params.state : config.state
+    this.state = params.state!==nil ? params.state : config.state
     // What alt (or lexer rule) is predicted by this configuration///
-    this.alt = params.alt!==null ? params.alt : config.alt
+    this.alt = params.alt!==nil ? params.alt : config.alt
     // The stack of invoking states leading to the rule/states associated
     //  with this config.  We track only those contexts pushed during
     //  execution of the ATN simulator.
-    this.context = params.context!==null ? params.context : config.context
-    this.semanticContext = params.semanticContext!==null ? params.semanticContext :
-        (config.semanticContext!==null ? config.semanticContext : SemanticContext.NONE)
+    this.context = params.context!==nil ? params.context : config.context
+    this.semanticContext = params.semanticContext!==nil ? params.semanticContext :
+        (config.semanticContext!==nil ? config.semanticContext : SemanticContext.NONE)
     // We cannot execute predicates dependent upon local context unless
     // we know for sure we are in the correct context. Because there is
     // no way to do this efficiently, we simply cannot evaluate
@@ -61,9 +61,9 @@ func ATNConfig(params, config) {
 }
 
 func (this *ATNConfig) checkContext(params, config) {
-	if((params.context==null || params.context==undefined) &&
-			(config==null || config.context==null || config.context==undefined)) {
-		this.context = null
+	if((params.context==nil || params.context==undefined) &&
+			(config==nil || config.context==nil || config.context==undefined)) {
+		this.context = nil
 	}
 }
 
@@ -79,7 +79,7 @@ func (this *ATNConfig) equals(other) {
     } else {
         return this.state.stateNumber==other.state.stateNumber &&
             this.alt==other.alt &&
-            (this.context==null ? other.context==null : this.context.equals(other.context)) &&
+            (this.context==nil ? other.context==nil : this.context.equals(other.context)) &&
             this.semanticContext.equals(other.semanticContext) &&
             this.precedenceFilterSuppressed==other.precedenceFilterSuppressed
     }
@@ -91,13 +91,13 @@ func (this *ATNConfig) shortHashString() {
 
 func (this *ATNConfig) hashString() {
     return "" + this.state.stateNumber + "/" + this.alt + "/" +
-             (this.context==null ? "" : this.context.hashString()) +
+             (this.context==nil ? "" : this.context.hashString()) +
              "/" + this.semanticContext.hashString()
 }
 
 func (this *ATNConfig) toString() {
     return "(" + this.state + "," + this.alt +
-        (this.context!==null ? ",[" + this.context.toString() + "]" : "") +
+        (this.context!==nil ? ",[" + this.context.toString() + "]" : "") +
         (this.semanticContext !== SemanticContext.NONE ?
                 ("," + this.semanticContext.toString())
                 : "") +
@@ -111,9 +111,9 @@ func LexerATNConfig(params, config) {
 	ATNConfig.call(this, params, config)
     
     // This is the backing field for {@link //getLexerActionExecutor}.
-	var lexerActionExecutor = params.lexerActionExecutor || null
-    this.lexerActionExecutor = lexerActionExecutor || (config!==null ? config.lexerActionExecutor : null)
-    this.passedThroughNonGreedyDecision = config!==null ? this.checkNonGreedyDecision(config, this.state) : false
+	var lexerActionExecutor = params.lexerActionExecutor || nil
+    this.lexerActionExecutor = lexerActionExecutor || (config!==nil ? config.lexerActionExecutor : nil)
+    this.passedThroughNonGreedyDecision = config!==nil ? this.checkNonGreedyDecision(config, this.state) : false
     return this
 }
 

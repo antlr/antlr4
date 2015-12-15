@@ -27,10 +27,10 @@ var INVALID_INTERVAL = require('./tree/Tree').INVALID_INTERVAL
 func RuleContext(parent, invokingState) {
 	RuleNode.call(this)
 	// What context invoked this rule?
-	this.parentCtx = parent || null
+	this.parentCtx = parent || nil
 	// What state invoked the rule associated with this context?
 	// The "return address" is the followState of invokingState
-	// If parent is null, this should be -1.
+	// If parent is nil, this should be -1.
 	this.invokingState = invokingState || -1
 	return this
 }
@@ -41,7 +41,7 @@ RuleContext.prototype.constructor = RuleContext
 func (this *RuleContext) depth() {
 	var n = 0
 	var p = this
-	while (p !== null) {
+	while (p !== nil) {
 		p = p.parentCtx
 		n += 1
 	}
@@ -86,7 +86,7 @@ func (this *RuleContext) getText() {
 }
 
 func (this *RuleContext) getChild(i) {
-	return null
+	return nil
 }
 
 func (this *RuleContext) getChildCount() {
@@ -111,12 +111,12 @@ func (this *RuleContext) toStringTree(ruleNames, recog) {
 }
 
 func (this *RuleContext) toString(ruleNames, stop) {
-	ruleNames = ruleNames || null
-	stop = stop || null
+	ruleNames = ruleNames || nil
+	stop = stop || nil
 	var p = this
 	var s = "["
-	while (p !== null && p !== stop) {
-		if (ruleNames == null) {
+	while (p !== nil && p !== stop) {
+		if (ruleNames == nil) {
 			if (!p.isEmpty()) {
 				s += p.invokingState
 			}
@@ -126,7 +126,7 @@ func (this *RuleContext) toString(ruleNames, stop) {
 					: "" + ri
 			s += ruleName
 		}
-		if (p.parentCtx !== null && (ruleNames !== null || !p.parentCtx.isEmpty())) {
+		if (p.parentCtx !== nil && (ruleNames !== nil || !p.parentCtx.isEmpty())) {
 			s += " "
 		}
 		p = p.parentCtx

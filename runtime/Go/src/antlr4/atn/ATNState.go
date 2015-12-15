@@ -64,15 +64,15 @@ var INITIAL_NUM_TRANSITIONS = 4
 
 type ATNState struct {
     // Which ATN are we in?
-    this.atn = null
+    this.atn = nil
     this.stateNumber = ATNState.INVALID_STATE_NUMBER
-    this.stateType = null
+    this.stateType = nil
     this.ruleIndex = 0 // at runtime, we don't have Rule objects
     this.epsilonOnlyTransitions = false
     // Track the transitions emanating from this ATN state.
     this.transitions = []
     // Used to cache lookahead during parsing, not used during construction
-    this.nextTokenWithinRule = null
+    this.nextTokenWithinRule = nil
     return this
 }
 
@@ -165,7 +165,7 @@ DecisionState.prototype.constructor = DecisionState
 //  The start of a regular {@code (...)} block.
 type BlockStartState struct {
 	DecisionState.call(this)
-	this.endState = null
+	this.endState = nil
 	return this
 }
 
@@ -187,7 +187,7 @@ BasicBlockStartState.prototype.constructor = BasicBlockStartState
 type BlockEndState struct {
 	ATNState.call(this)
 	this.stateType = ATNState.BLOCK_END
-    this.startState = null
+    this.startState = nil
     return this
 }
 
@@ -212,7 +212,7 @@ RuleStopState.prototype.constructor = RuleStopState
 type RuleStartState struct {
 	ATNState.call(this)
 	this.stateType = ATNState.RULE_START
-	this.stopState = null
+	this.stopState = nil
 	this.isPrecedenceRule = false
 	return this
 }
@@ -241,7 +241,7 @@ PlusLoopbackState.prototype.constructor = PlusLoopbackState
 type PlusBlockStartState struct {
 	BlockStartState.call(this)
 	this.stateType = ATNState.PLUS_BLOCK_START
-    this.loopBackState = null
+    this.loopBackState = nil
     return this
 }
 
@@ -272,9 +272,9 @@ StarLoopbackState.prototype.constructor = StarLoopbackState
 type StarLoopEntryState struct {
 	DecisionState.call(this)
 	this.stateType = ATNState.STAR_LOOP_ENTRY
-    this.loopBackState = null
+    this.loopBackState = nil
     // Indicates whether this state can benefit from a precedence DFA during SLL decision making.
-    this.precedenceRuleDecision = null
+    this.precedenceRuleDecision = nil
     return this
 }
 
@@ -286,7 +286,7 @@ StarLoopEntryState.prototype.constructor = StarLoopEntryState
 type LoopEndState struct {
 	ATNState.call(this)
 	this.stateType = ATNState.LOOP_END
-	this.loopBackState = null
+	this.loopBackState = nil
 	return this
 }
 

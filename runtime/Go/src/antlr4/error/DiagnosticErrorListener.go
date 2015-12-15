@@ -74,8 +74,8 @@ func (this *DiagnosticErrorListener) getDecisionDescription(recognizer, dfa) {
 	if (ruleIndex < 0 || ruleIndex >= ruleNames.length) {
 		return "" + decision
 	}
-	var ruleName = ruleNames[ruleIndex] || null
-	if (ruleName == null || ruleName.length == 0) {
+	var ruleName = ruleNames[ruleIndex] || nil
+	if (ruleName == nil || ruleName.length == 0) {
 		return "" + decision
 	}
 	return "" + decision + " (" + ruleName + ")"
@@ -89,11 +89,11 @@ func (this *DiagnosticErrorListener) getDecisionDescription(recognizer, dfa) {
 // @param reportedAlts The set of conflicting or ambiguous alternatives, as
 // reported by the parser.
 // @param configs The conflicting or ambiguous configuration set.
-// @return Returns {@code reportedAlts} if it is not {@code null}, otherwise
+// @return Returns {@code reportedAlts} if it is not {@code nil}, otherwise
 // returns the set of alternatives represented in {@code configs}.
 //
 func (this *DiagnosticErrorListener) getConflictingAlts(reportedAlts, configs) {
-	if (reportedAlts !== null) {
+	if (reportedAlts !== nil) {
 		return reportedAlts
 	}
 	var result = new BitSet()

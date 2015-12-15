@@ -48,16 +48,16 @@ func (this *CommonTokenFactory) create(source, type, text, channel, start, stop,
     var t = new CommonToken(source, type, channel, start, stop)
     t.line = line
     t.column = column
-    if (text !==null) {
+    if (text !==nil) {
         t.text = text
-    } else if (this.copyText && source[1] !==null) {
+    } else if (this.copyText && source[1] !==nil) {
         t.text = source[1].getText(start,stop)
     }
     return t
 }
 
 func (this *CommonTokenFactory) createThin(type, text) {
-    var t = new CommonToken(null, type)
+    var t = new CommonToken(nil, type)
     t.text = text
     return t
 }

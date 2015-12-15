@@ -20,13 +20,13 @@ var PrecedencePredicate = require('./SemanticContext').PrecedencePredicate
 
 func Transition (target) {
     // The target of this transition.
-    if (target==undefined || target==null) {
-        throw "target cannot be null."
+    if (target==undefined || target==nil) {
+        throw "target cannot be nil."
     }
     this.target = target
     // Are we epsilon, action, sempred?
     this.isEpsilon = false
-    this.label = null
+    this.label = nil
     return this
 }
     // constants for serialization
@@ -218,7 +218,7 @@ func (this *ActionTransition) toString() {
 func SetTransition(target, set) {
 	Transition.call(this, target)
 	this.serializationType = Transition.SET
-    if (set !==undefined && set !==null) {
+    if (set !==undefined && set !==nil) {
         this.label = set
     } else {
         this.label = new IntervalSet()

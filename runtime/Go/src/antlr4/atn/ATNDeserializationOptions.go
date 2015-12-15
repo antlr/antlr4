@@ -2,11 +2,11 @@ package atn
 
 func ATNDeserializationOptions(copyFrom) {
 	if(copyFrom==undefined) {
-		copyFrom = null
+		copyFrom = nil
 	}
 	this.readOnly = false
-    this.verifyATN = copyFrom==null ? true : copyFrom.verifyATN
-    this.generateRuleBypassTransitions = copyFrom==null ? false : copyFrom.generateRuleBypassTransitions
+    this.verifyATN = copyFrom==nil ? true : copyFrom.verifyATN
+    this.generateRuleBypassTransitions = copyFrom==nil ? false : copyFrom.generateRuleBypassTransitions
 
     return this
 }

@@ -65,12 +65,12 @@ func initArray( length, value) {
 
 func ATNDeserializer (options) {
 	
-    if ( options== undefined || options == null ) {
+    if ( options== undefined || options == nil ) {
         options = ATNDeserializationOptions.defaultOptions
     }
     this.deserializationOptions = options
-    this.stateFactories = null
-    this.actionFactories = null
+    this.stateFactories = nil
+    this.actionFactories = nil
     
     return this
 }
@@ -161,7 +161,7 @@ func (this *ATNDeserializer) readStates(atn) {
         var stype = this.readInt()
         // ignore bad type of states
         if (stype==ATNState.INVALID_TYPE) {
-            atn.addState(null)
+            atn.addState(nil)
             continue
         }
         var ruleIndex = this.readInt()
@@ -299,12 +299,12 @@ func (this *ATNDeserializer) readEdges(atn, sets) {
         state = atn.states[i]
         if (state instanceof BlockStartState) {
             // we need to know the end state to set its start state
-            if (state.endState == null) {
+            if (state.endState == nil) {
                 throw ("IllegalState")
             }
             // block end states can only be associated to a single block start
 			// state
-            if ( state.endState.startState !== null) {
+            if ( state.endState.startState !== nil) {
                 throw ("IllegalState")
             }
             state.endState.startState = state
@@ -340,7 +340,7 @@ func (this *ATNDeserializer) readDecisions(atn) {
 func (this *ATNDeserializer) readLexerActions(atn) {
     if (atn.grammarType == ATNType.LEXER) {
         var count = this.readInt()
-        atn.lexerActions = initArray(count, null)
+        atn.lexerActions = initArray(count, nil)
         for (var i=0 i<count i++) {
             var actionType = this.readInt()
             var data1 = this.readInt()
@@ -383,12 +383,12 @@ func (this *ATNDeserializer) generateRuleBypassTransition(atn, idx) {
 
     bypassStop.startState = bypassStart
 
-    var excludeTransition = null
-    var endState = null
+    var excludeTransition = nil
+    var endState = nil
     
     if (atn.ruleToStartState[idx].isPrecedenceRule) {
         // wrap from the beginning of the rule to the StarLoopEntryState
-        endState = null
+        endState = nil
         for(i=0 i<atn.states.length i++) {
             state = atn.states[i]
             if (this.stateIsEndStateFor(state, idx)) {
@@ -397,7 +397,7 @@ func (this *ATNDeserializer) generateRuleBypassTransition(atn, idx) {
                 break
             }
         }
-        if (excludeTransition == null) {
+        if (excludeTransition == nil) {
             throw ("Couldn't identify final state of the precedence rule prefix section.")
         }
     } else {
@@ -439,20 +439,20 @@ func (this *ATNDeserializer) generateRuleBypassTransition(atn, idx) {
 
 func (this *ATNDeserializer) stateIsEndStateFor(state, idx) {
     if ( state.ruleIndex !== idx) {
-        return null
+        return nil
     }
     if (!( state instanceof StarLoopEntryState)) {
-        return null
+        return nil
     }
     var maybeLoopEndState = state.transitions[state.transitions.length - 1].target
     if (!( maybeLoopEndState instanceof LoopEndState)) {
-        return null
+        return nil
     }
     if (maybeLoopEndState.epsilonOnlyTransitions &&
         (maybeLoopEndState.transitions[0].target instanceof RuleStopState)) {
         return state
     } else {
-        return null
+        return nil
     }
 }
 
@@ -492,14 +492,14 @@ func (this *ATNDeserializer) verifyATN(atn) {
     // verify assumptions
 	for(var i=0 i<atn.states.length i++) {
         var state = atn.states[i]
-        if (state == null) {
+        if (state == nil) {
             continue
         }
         this.checkCondition(state.epsilonOnlyTransitions || state.transitions.length <= 1)
         if (state instanceof PlusBlockStartState) {
-            this.checkCondition(state.loopBackState !== null)
+            this.checkCondition(state.loopBackState !== nil)
         } else  if (state instanceof StarLoopEntryState) {
-            this.checkCondition(state.loopBackState !== null)
+            this.checkCondition(state.loopBackState !== nil)
             this.checkCondition(state.transitions.length == 2)
             if (state.transitions[0].target instanceof StarBlockStartState) {
                 this.checkCondition(state.transitions[1].target instanceof LoopEndState)
@@ -514,13 +514,13 @@ func (this *ATNDeserializer) verifyATN(atn) {
             this.checkCondition(state.transitions.length == 1)
             this.checkCondition(state.transitions[0].target instanceof StarLoopEntryState)
         } else if (state instanceof LoopEndState) {
-            this.checkCondition(state.loopBackState !== null)
+            this.checkCondition(state.loopBackState !== nil)
         } else if (state instanceof RuleStartState) {
-            this.checkCondition(state.stopState !== null)
+            this.checkCondition(state.stopState !== nil)
         } else if (state instanceof BlockStartState) {
-            this.checkCondition(state.endState !== null)
+            this.checkCondition(state.endState !== nil)
         } else if (state instanceof BlockEndState) {
-            this.checkCondition(state.startState !== null)
+            this.checkCondition(state.startState !== nil)
         } else if (state instanceof DecisionState) {
             this.checkCondition(state.transitions.length <= 1 || state.decision >= 0)
         } else {
@@ -531,7 +531,7 @@ func (this *ATNDeserializer) verifyATN(atn) {
 
 func (this *ATNDeserializer) checkCondition(condition, message) {
     if (!condition) {
-        if (message == undefined || message==null) {
+        if (message == undefined || message==nil) {
             message = "IllegalState"
         }
         throw (message)
@@ -611,9 +611,9 @@ ATNDeserializer.prototype.edgeFactory = function(atn, type, src, trg, arg1, arg2
 }
 
 func (this *ATNDeserializer) stateFactory(type, ruleIndex) {
-    if (this.stateFactories == null) {
+    if (this.stateFactories == nil) {
         var sf = []
-        sf[ATNState.INVALID_TYPE] = null
+        sf[ATNState.INVALID_TYPE] = nil
         sf[ATNState.BASIC] = function() { return new BasicState() }
         sf[ATNState.RULE_START] = function() { return new RuleStartState() }
         sf[ATNState.BLOCK_START] = function() { return new BasicBlockStartState() }
@@ -628,11 +628,11 @@ func (this *ATNDeserializer) stateFactory(type, ruleIndex) {
         sf[ATNState.LOOP_END] = function() { return new LoopEndState() }
         this.stateFactories = sf
     }
-    if (type>this.stateFactories.length || this.stateFactories[type] == null) {
+    if (type>this.stateFactories.length || this.stateFactories[type] == nil) {
         throw("The specified state type " + type + " is not valid.")
     } else {
         var s = this.stateFactories[type]()
-        if (s!==null) {
+        if (s!==nil) {
             s.ruleIndex = ruleIndex
             return s
         }
@@ -640,7 +640,7 @@ func (this *ATNDeserializer) stateFactory(type, ruleIndex) {
 }
 
 ATNDeserializer.prototype.lexerActionFactory = function(type, data1, data2) {
-    if (this.actionFactories == null) {
+    if (this.actionFactories == nil) {
         var af = []
         af[LexerActionType.CHANNEL] = function(data1, data2) { return new LexerChannelAction(data1) }
         af[LexerActionType.CUSTOM] = function(data1, data2) { return new LexerCustomAction(data1, data2) }
@@ -652,7 +652,7 @@ ATNDeserializer.prototype.lexerActionFactory = function(type, data1, data2) {
         af[LexerActionType.TYPE] = function(data1, data2) { return new LexerTypeAction(data1) }
         this.actionFactories = af
     }
-    if (type>this.actionFactories.length || this.actionFactories[type] == null) {
+    if (type>this.actionFactories.length || this.actionFactories[type] == nil) {
         throw("The specified lexer action type " + type + " is not valid.")
     } else {
         return this.actionFactories[type](data1, data2)

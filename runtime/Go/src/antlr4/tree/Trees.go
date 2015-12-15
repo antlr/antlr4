@@ -15,9 +15,9 @@ type Trees struct {
 //  node payloads to get the text for the nodes.  Detect
 //  parse trees and extract data appropriately.
 Trees.toStringTree = function(tree, ruleNames, recog) {
-	ruleNames = ruleNames || null
-	recog = recog || null
-    if(recog!==null) {
+	ruleNames = ruleNames || nil
+	recog = recog || nil
+    if(recog!==nil) {
        ruleNames = recog.ruleNames
     }
     var s = Trees.getNodeText(tree, ruleNames)
@@ -40,18 +40,18 @@ Trees.toStringTree = function(tree, ruleNames, recog) {
 }
 
 Trees.getNodeText = function(t, ruleNames, recog) {
-	ruleNames = ruleNames || null
-	recog = recog || null
-    if(recog!==null) {
+	ruleNames = ruleNames || nil
+	recog = recog || nil
+    if(recog!==nil) {
         ruleNames = recog.ruleNames
     }
-    if(ruleNames!==null) {
+    if(ruleNames!==nil) {
        if (t instanceof RuleNode) {
            return ruleNames[t.getRuleContext().ruleIndex]
        } else if ( t instanceof ErrorNode) {
            return t.toString()
        } else if(t instanceof TerminalNode) {
-           if(t.symbol!==null) {
+           if(t.symbol!==nil) {
                return t.symbol.text
            }
        }
@@ -80,7 +80,7 @@ Trees.getChildren = function(t) {
 Trees.getAncestors = function(t) {
     var ancestors = []
     t = t.getParent()
-    while(t!==null) {
+    while(t!==nil) {
         ancestors = [t].concat(ancestors)
         t = t.getParent()
     }

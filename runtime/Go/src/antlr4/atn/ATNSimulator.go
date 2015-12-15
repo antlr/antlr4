@@ -36,7 +36,7 @@ ATNSimulator.ERROR = new DFAState(0x7FFFFFFF, new ATNConfigSet())
 
 
 func (this *ATNSimulator) getCachedContext(context) {
-    if (this.sharedContextCache ==null) {
+    if (this.sharedContextCache ==nil) {
         return context
     }
     var visited = {}

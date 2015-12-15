@@ -32,8 +32,8 @@ var ErrorNodeImpl = Tree.ErrorNodeImpl
 var Interval = require("./IntervalSet").Interval
 
 func ParserRuleContext(parent, invokingStateNumber) {
-	parent = parent || null
-	invokingStateNumber = invokingStateNumber || null
+	parent = parent || nil
+	invokingStateNumber = invokingStateNumber || nil
 	RuleContext.call(this, parent, invokingStateNumber)
 	this.ruleIndex = -1
     // * If we are debugging or building a parse tree for a visitor,
@@ -42,12 +42,12 @@ func ParserRuleContext(parent, invokingStateNumber) {
     // operation because we don't the need to track the details about
     // how we parse this rule.
     // /
-    this.children = null
-    this.start = null
-    this.stop = null
+    this.children = nil
+    this.start = nil
+    this.stop = nil
     // The exception that forced this rule to return. If the rule successfully
-    // completed, this is {@code null}.
-    this.exception = null
+    // completed, this is {@code nil}.
+    this.exception = nil
 }
 
 ParserRuleContext.prototype = Object.create(RuleContext.prototype)
@@ -58,7 +58,7 @@ func (this *ParserRuleContext) copyFrom(ctx) {
     // from RuleContext
     this.parentCtx = ctx.parentCtx
     this.invokingState = ctx.invokingState
-    this.children = null
+    this.children = nil
     this.start = ctx.start
     this.stop = ctx.stop
 }
@@ -72,7 +72,7 @@ func (this *ParserRuleContext) exitRule(listener) {
 
 // * Does not set parent link other add methods do that///
 func (this *ParserRuleContext) addChild(child) {
-    if (this.children == null) {
+    if (this.children == nil) {
         this.children = []
     }
     this.children.push(child)
@@ -84,7 +84,7 @@ func (this *ParserRuleContext) addChild(child) {
 // generic ruleContext object.
 // /
 func (this *ParserRuleContext) removeLastChild() {
-    if (this.children !== null) {
+    if (this.children !== nil) {
         this.children.pop()
     }
 }
@@ -104,9 +104,9 @@ func (this *ParserRuleContext) addErrorNode(badToken) {
 }
 
 func (this *ParserRuleContext) getChild(i, type) {
-	type = type || null
-	if (type == null) {
-		return this.children.length>=i ? this.children[i] : null
+	type = type || nil
+	if (type == nil) {
+		return this.children.length>=i ? this.children[i] : nil
 	} else {
 		for(var j=0 j<this.children.length j++) {
 			var child = this.children[j]
@@ -118,7 +118,7 @@ func (this *ParserRuleContext) getChild(i, type) {
 				}
 			}
 		}
-		return null
+		return nil
     }
 }
 
@@ -136,11 +136,11 @@ func (this *ParserRuleContext) getToken(ttype, i) {
 			}
         }
 	}
-    return null
+    return nil
 }
 
 func (this *ParserRuleContext) getTokens(ttype ) {
-    if (this.children== null) {
+    if (this.children== nil) {
         return []
     } else {
 		var tokens = []
@@ -161,7 +161,7 @@ func (this *ParserRuleContext) getTypedRuleContext(ctxType, i) {
 }
 
 func (this *ParserRuleContext) getTypedRuleContexts(ctxType) {
-    if (this.children== null) {
+    if (this.children== nil) {
         return []
     } else {
 		var contexts = []
@@ -176,7 +176,7 @@ func (this *ParserRuleContext) getTypedRuleContexts(ctxType) {
 }
 
 func (this *ParserRuleContext) getChildCount() {
-	if (this.children== null) {
+	if (this.children== nil) {
 		return 0
 	} else {
 		return this.children.length
@@ -184,7 +184,7 @@ func (this *ParserRuleContext) getChildCount() {
 }
 
 func (this *ParserRuleContext) getSourceInterval() {
-    if( this.start == null || this.stop == null) {
+    if( this.start == nil || this.stop == nil) {
         return INVALID_INTERVAL
     } else {
         return new Interval(this.start.tokenIndex, this.stop.tokenIndex)

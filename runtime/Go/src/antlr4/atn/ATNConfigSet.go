@@ -20,7 +20,7 @@ func equalATNConfigs(a, b) {
 	if ( a==b ) {
 		return true
 	}
-	if ( a==null || b==null ) {
+	if ( a==nil || b==nil ) {
 		return false
 	}
 	return a.state.stateNumber==b.state.stateNumber &&
@@ -59,7 +59,7 @@ func ATNConfigSet(fullCtx) {
 	// TODO: can we track conflicts as they are added to save scanning configs
 	// later?
 	this.uniqueAlt = 0
-	this.conflictingAlts = null
+	this.conflictingAlts = nil
 
 	// Used in parser and lexer. In lexer, it indicates we hit a pred
 	// while computing a closure operation. Don't make a DFA state from this.
@@ -82,7 +82,7 @@ func ATNConfigSet(fullCtx) {
 // /
 func (this *ATNConfigSet) add(config, mergeCache) {
 	if (mergeCache == undefined) {
-		mergeCache = null
+		mergeCache = nil
 	}
 	if (this.readOnly) {
 		throw "This set is readonly"
@@ -165,7 +165,7 @@ func (this *ATNConfigSet) equals(other) {
 	} else if (!(other instanceof ATNConfigSet)) {
 		return false
 	}
-	return this.configs !== null && this.configs.equals(other.configs) &&
+	return this.configs !== nil && this.configs.equals(other.configs) &&
 			this.fullCtx == other.fullCtx &&
 			this.uniqueAlt == other.uniqueAlt &&
 			this.conflictingAlts == other.conflictingAlts &&
@@ -203,14 +203,14 @@ func (this *ATNConfigSet) isEmpty() {
 }
 
 func (this *ATNConfigSet) contains(item) {
-	if (this.configLookup == null) {
+	if (this.configLookup == nil) {
 		throw "This method is not implemented for readonly sets."
 	}
 	return this.configLookup.contains(item)
 }
 
 func (this *ATNConfigSet) containsFast(item) {
-	if (this.configLookup == null) {
+	if (this.configLookup == nil) {
 		throw "This method is not implemented for readonly sets."
 	}
 	return this.configLookup.containsFast(item)
@@ -228,7 +228,7 @@ func (this *ATNConfigSet) clear() {
 func (this *ATNConfigSet) setReadonly(readOnly) {
 	this.readOnly = readOnly
 	if (readOnly) {
-		this.configLookup = null // can't mod, no need for lookup cache
+		this.configLookup = nil // can't mod, no need for lookup cache
 	}
 }
 
@@ -236,7 +236,7 @@ func (this *ATNConfigSet) toString() {
 	return Utils.arrayToString(this.configs) +
 		(this.hasSemanticContext ? ",hasSemanticContext=" + this.hasSemanticContext : "") +
 		(this.uniqueAlt !== ATN.INVALID_ALT_NUMBER ? ",uniqueAlt=" + this.uniqueAlt : "") +
-		(this.conflictingAlts !== null ? ",conflictingAlts=" + this.conflictingAlts : "") +
+		(this.conflictingAlts !== nil ? ",conflictingAlts=" + this.conflictingAlts : "") +
 		(this.dipsIntoOuterContext ? ",dipsIntoOuterContext" : "")
 }
 

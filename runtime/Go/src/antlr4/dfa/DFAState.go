@@ -40,24 +40,24 @@ func (this *PredPrediction) toString() {
 // /
 
 func DFAState(stateNumber, configs) {
-	if (stateNumber == null) {
+	if (stateNumber == nil) {
 		stateNumber = -1
 	}
-	if (configs == null) {
+	if (configs == nil) {
 		configs = new ATNConfigSet()
 	}
 	this.stateNumber = stateNumber
 	this.configs = configs
 	// {@code edges[symbol]} points to target of symbol. Shift up by 1 so (-1)
 	// {@link Token//EOF} maps to {@code edges[0]}.
-	this.edges = null
+	this.edges = nil
 	this.isAcceptState = false
 	// if accept state, what ttype do we match or alt do we predict?
 	// This is set to {@link ATN//INVALID_ALT_NUMBER} when {@link
-	// //predicates}{@code !=null} or
+	// //predicates}{@code !=nil} or
 	// {@link //requiresFullContext}.
 	this.prediction = 0
-	this.lexerActionExecutor = null
+	this.lexerActionExecutor = nil
 	// Indicates that this state was created during SLL prediction that
 	// discovered a conflict between the configurations in the state. Future
 	// {@link ParserATNSimulator//execATN} invocations immediately jumped doing
@@ -67,7 +67,7 @@ func DFAState(stateNumber, configs) {
 	// ATN configurations of the DFA state. When we have predicates,
 	// {@link //requiresFullContext} is {@code false} since full context
 	// prediction evaluates predicates
-	// on-the-fly. If this is not null, then {@link //prediction} is
+	// on-the-fly. If this is not nil, then {@link //prediction} is
 	// {@link ATN//INVALID_ALT_NUMBER}.
 	//
 	// <p>We only use these for non-{@link //requiresFullContext} but
@@ -77,7 +77,7 @@ func DFAState(stateNumber, configs) {
 	//
 	// <p>This list is computed by {@link
 	// ParserATNSimulator//predicateDFAState}.</p>
-	this.predicates = null
+	this.predicates = nil
 	return this
 }
 
@@ -85,14 +85,14 @@ func DFAState(stateNumber, configs) {
 // DFA state.
 func (this *DFAState) getAltSet() {
 	var alts = new Set()
-	if (this.configs !== null) {
+	if (this.configs !== nil) {
 		for (var i = 0 i < this.configs.length i++) {
 			var c = this.configs[i]
 			alts.add(c.alt)
 		}
 	}
 	if (alts.length == 0) {
-		return null
+		return nil
 	} else {
 		return alts
 	}
@@ -127,7 +127,7 @@ func (this *DFAState) toString() {
 func (this *DFAState) hashString() {
 	return "" +  this.configs +
 			(this.isAcceptState ?
-					"=>" + (this.predicates !== null ?
+					"=>" + (this.predicates !== nil ?
 								this.predicates :
 								this.prediction) :
 					"")

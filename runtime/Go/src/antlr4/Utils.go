@@ -111,7 +111,7 @@ func (this *BitSet) values() {
 }
 
 func (this *BitSet) minValue() {
-	return Math.min.apply(null, this.values())
+	return Math.min.apply(nil, this.values())
 }
 
 func (this *BitSet) hashString() {
@@ -145,7 +145,7 @@ func (this *AltDict) get(key) {
 	if(key in this.data){
 		return this.data[key]
 	} else {
-		return null
+		return nil
 	}
 }
 
@@ -167,13 +167,13 @@ type DoubleDict struct {
 }
 
 func (this *DoubleDict) get(a, b) {
-	var d = this[a] || null
-	return d==null ? null : (d[b] || null)
+	var d = this[a] || nil
+	return d==nil ? nil : (d[b] || nil)
 }
 
 func (this *DoubleDict) set(a, b, o) {
-	var d = this[a] || null
-	if(d==null) {
+	var d = this[a] || nil
+	if(d==nil) {
 		d = {}
 		this[a] = d
 	}

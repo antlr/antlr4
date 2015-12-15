@@ -5,15 +5,15 @@ package antlr4
 // we obtained this token.
 
 type Token struct {
-	this.source = null
-	this.type = null // token type of the token
-	this.channel = null // The parser ignores everything not on DEFAULT_CHANNEL
-	this.start = null // optional return -1 if not implemented.
-	this.stop = null // optional return -1 if not implemented.
-	this.tokenIndex = null // from 0..n-1 of the token object in the input stream
-	this.line = null // line=1..n of the 1st character
-	this.column = null // beginning of the line at which it occurs, 0..n-1
-	this._text = null // text of the token.
+	this.source = nil
+	this.type = nil // token type of the token
+	this.channel = nil // The parser ignores everything not on DEFAULT_CHANNEL
+	this.start = nil // optional return -1 if not implemented.
+	this.stop = nil // optional return -1 if not implemented.
+	this.tokenIndex = nil // from 0..n-1 of the token object in the input stream
+	this.line = nil // line=1..n of the 1st character
+	this.column = nil // beginning of the line at which it occurs, 0..n-1
+	this._text = nil // text of the token.
 	return this
 }
 
@@ -39,10 +39,10 @@ Token.DEFAULT_CHANNEL = 0
 Token.HIDDEN_CHANNEL = 1
 
 // Explicitly set the text for this token. If {code text} is not
-// {@code null}, then {@link //getText} will return this value rather than
+// {@code nil}, then {@link //getText} will return this value rather than
 // extracting the text from the input.
 //
-// @param text The explicit text of the token, or {@code null} if the text
+// @param text The explicit text of the token, or {@code nil} if the text
 // should be obtained from the input along with the start and stop indexes
 // of the token.
 
@@ -66,12 +66,12 @@ func (this *Token) getInputStream() {
 func CommonToken(source, type, channel, start, stop) {
 	Token.call(this)
 	this.source = source !== undefined ? source : CommonToken.EMPTY_SOURCE
-	this.type = type !== undefined ? type : null
+	this.type = type !== undefined ? type : nil
 	this.channel = channel !== undefined ? channel : Token.DEFAULT_CHANNEL
 	this.start = start !== undefined ? start : -1
 	this.stop = stop !== undefined ? stop : -1
 	this.tokenIndex = -1
-	if (this.source[0] !== null) {
+	if (this.source[0] !== nil) {
 		this.line = source[0].line
 		this.column = source[0].column
 	} else {
@@ -85,7 +85,7 @@ CommonToken.prototype.constructor = CommonToken
 
 // An empty {@link Pair} which is used as the default value of
 // {@link //source} for tokens that do not have a source.
-CommonToken.EMPTY_SOURCE = [ null, null ]
+CommonToken.EMPTY_SOURCE = [ nil, nil ]
 
 // Constructs a new {@link CommonToken} as a copy of another {@link Token}.
 //
@@ -111,12 +111,12 @@ func (this *CommonToken) clone() {
 
 Object.defineProperty(CommonToken.prototype, "text", {
 	get : function() {
-		if (this._text !== null) {
+		if (this._text !== nil) {
 			return this._text
 		}
 		var input = this.getInputStream()
-		if (input == null) {
-			return null
+		if (input == nil) {
+			return nil
 		}
 		var n = input.size
 		if (this.start < n && this.stop < n) {
@@ -132,7 +132,7 @@ Object.defineProperty(CommonToken.prototype, "text", {
 
 func (this *CommonToken) toString() {
 	var txt = this.text
-	if (txt !== null) {
+	if (txt !== nil) {
 		txt = txt.replace(/\n/g, "\\n").replace(/\r/g, "\\r").replace(/\t/g, "\\t")
 	} else {
 		txt = "<no text>"

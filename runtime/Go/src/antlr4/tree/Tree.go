@@ -99,7 +99,7 @@ func (this *ParseTreeListener) exitEveryRule(node) {
 
 func TerminalNodeImpl(symbol) {
 	TerminalNode.call(this)
-	this.parentCtx = null
+	this.parentCtx = nil
 	this.symbol = symbol
 	return this
 }
@@ -108,7 +108,7 @@ TerminalNodeImpl.prototype = Object.create(TerminalNode.prototype)
 TerminalNodeImpl.prototype.constructor = TerminalNodeImpl
 
 func (this *TerminalNodeImpl) getChild(i) {
-	return null
+	return nil
 }
 
 func (this *TerminalNodeImpl) getSymbol() {
@@ -124,7 +124,7 @@ func (this *TerminalNodeImpl) getPayload() {
 }
 
 func (this *TerminalNodeImpl) getSourceInterval() {
-	if (this.symbol == null) {
+	if (this.symbol == nil) {
 		return INVALID_INTERVAL
 	}
 	var tokenIndex = this.symbol.tokenIndex

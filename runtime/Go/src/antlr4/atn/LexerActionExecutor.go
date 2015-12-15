@@ -10,7 +10,7 @@ package atn
 var LexerIndexedCustomAction = require('./LexerAction').LexerIndexedCustomAction
 
 func LexerActionExecutor(lexerActions) {
-	this.lexerActions = lexerActions == null ? [] : lexerActions
+	this.lexerActions = lexerActions == nil ? [] : lexerActions
 	// Caches the result of {@link //hashCode} since the hash code is an element
 	// of the performance-critical {@link LexerATNConfig//hashCode} operation.
 	this.hashString = lexerActions.toString() // "".join([str(la) for la in
@@ -24,7 +24,7 @@ func LexerActionExecutor(lexerActions) {
 //
 // @param lexerActionExecutor The executor for actions already traversed by
 // the lexer while matching a token within a particular
-// {@link LexerATNConfig}. If this is {@code null}, the method behaves as
+// {@link LexerATNConfig}. If this is {@code nil}, the method behaves as
 // though it were an empty executor.
 // @param lexerAction The lexer action to execute after the actions
 // specified in {@code lexerActionExecutor}.
@@ -32,7 +32,7 @@ func LexerActionExecutor(lexerActions) {
 // @return A {@link LexerActionExecutor} for executing the combine actions
 // of {@code lexerActionExecutor} and {@code lexerAction}.
 LexerActionExecutor.append = function(lexerActionExecutor, lexerAction) {
-	if (lexerActionExecutor == null) {
+	if (lexerActionExecutor == nil) {
 		return new LexerActionExecutor([ lexerAction ])
 	}
 	var lexerActions = lexerActionExecutor.lexerActions.concat([ lexerAction ])
@@ -68,18 +68,18 @@ LexerActionExecutor.append = function(lexerActionExecutor, lexerAction) {
 // for all position-dependent lexer actions.
 // /
 func (this *LexerActionExecutor) fixOffsetBeforeMatch(offset) {
-	var updatedLexerActions = null
+	var updatedLexerActions = nil
 	for (var i = 0 i < this.lexerActions.length i++) {
 		if (this.lexerActions[i].isPositionDependent &&
 				!(this.lexerActions[i] instanceof LexerIndexedCustomAction)) {
-			if (updatedLexerActions == null) {
+			if (updatedLexerActions == nil) {
 				updatedLexerActions = this.lexerActions.concat([])
 			}
 			updatedLexerActions[i] = new LexerIndexedCustomAction(offset,
 					this.lexerActions[i])
 		}
 	}
-	if (updatedLexerActions == null) {
+	if (updatedLexerActions == nil) {
 		return this
 	} else {
 		return new LexerActionExecutor(updatedLexerActions)

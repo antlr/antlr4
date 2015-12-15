@@ -15,7 +15,7 @@ type SemanticContext struct {
 }
 
 // For context independent predicates, we evaluate them without a local
-// context (i.e., null context). That way, we can evaluate them without
+// context (i.e., nil context). That way, we can evaluate them without
 // having to create proper rule-specific context during prediction (as
 // opposed to the parser, which creates them naturally). In a practical
 // sense, this avoids a cast exception from RuleContext to myruleContext.
@@ -39,11 +39,11 @@ func (this *SemanticContext) evaluate(parser, outerContext) {
 // <ul>
 // <li>{@link //NONE}: if the predicate simplifies to {@code true} after
 // precedence predicates are evaluated.</li>
-// <li>{@code null}: if the predicate simplifies to {@code false} after
+// <li>{@code nil}: if the predicate simplifies to {@code false} after
 // precedence predicates are evaluated.</li>
 // <li>{@code this}: if the semantic context is not changed as a result of
 // precedence predicate evaluation.</li>
-// <li>A non-{@code null} {@link SemanticContext}: the new simplified
+// <li>A non-{@code nil} {@link SemanticContext}: the new simplified
 // semantic context after precedence predicates are evaluated.</li>
 // </ul>
 //
@@ -52,10 +52,10 @@ func (this *SemanticContext) evalPrecedence(parser, outerContext) {
 }
 
 SemanticContext.andContext = function(a, b) {
-	if (a == null || a == SemanticContext.NONE) {
+	if (a == nil || a == SemanticContext.NONE) {
 		return b
 	}
-	if (b == null || b == SemanticContext.NONE) {
+	if (b == nil || b == SemanticContext.NONE) {
 		return a
 	}
 	var result = new AND(a, b)
@@ -67,10 +67,10 @@ SemanticContext.andContext = function(a, b) {
 }
 
 SemanticContext.orContext = function(a, b) {
-	if (a == null) {
+	if (a == nil) {
 		return b
 	}
-	if (b == null) {
+	if (b == nil) {
 		return a
 	}
 	if (a == SemanticContext.NONE || b == SemanticContext.NONE) {
@@ -102,7 +102,7 @@ SemanticContext.NONE = new Predicate()
 
 
 func (this *Predicate) evaluate(parser, outerContext) {
-	var localctx = this.isCtxDependent ? outerContext : null
+	var localctx = this.isCtxDependent ? outerContext : nil
 	return parser.sempred(localctx, this.ruleIndex, this.predIndex)
 }
 
@@ -142,7 +142,7 @@ func (this *PrecedencePredicate) evalPrecedence(parser, outerContext) {
 	if (parser.precpred(outerContext, this.precedence)) {
 		return SemanticContext.NONE
 	} else {
-		return null
+		return nil
 	}
 }
 
@@ -204,9 +204,9 @@ func AND(a, b) {
 	var precedencePredicates = PrecedencePredicate.filterPrecedencePredicates(operands)
 	if (precedencePredicates.length > 0) {
 		// interested in the transition with the lowest precedence
-		var reduced = null
+		var reduced = nil
 		precedencePredicates.map( function(p) {
-			if(reduced==null || p.precedence<reduced.precedence) {
+			if(reduced==nil || p.precedence<reduced.precedence) {
 				reduced = p
 			}
 		})
@@ -255,9 +255,9 @@ func (this *AND) evalPrecedence(parser, outerContext) {
 		var context = this.opnds[i]
 		var evaluated = context.evalPrecedence(parser, outerContext)
 		differs |= (evaluated !== context)
-		if (evaluated == null) {
+		if (evaluated == nil) {
 			// The AND context is false if any element is false
-			return null
+			return nil
 		} else if (evaluated !== SemanticContext.NONE) {
 			// Reduce the result by skipping true elements
 			operands.push(evaluated)
@@ -270,9 +270,9 @@ func (this *AND) evalPrecedence(parser, outerContext) {
 		// all elements were true, so the AND context is true
 		return SemanticContext.NONE
 	}
-	var result = null
+	var result = nil
 	operands.map(function(o) {
-		result = result == null ? o : SemanticPredicate.andContext(result, o)
+		result = result == nil ? o : SemanticPredicate.andContext(result, o)
 	})
 	return result
 }
@@ -360,7 +360,7 @@ func (this *OR) evalPrecedence(parser, outerContext) {
 		if (evaluated == SemanticContext.NONE) {
 			// The OR context is true if any element is true
 			return SemanticContext.NONE
-		} else if (evaluated !== null) {
+		} else if (evaluated !== nil) {
 			// Reduce the result by skipping false elements
 			operands.push(evaluated)
 		}
@@ -370,11 +370,11 @@ func (this *OR) evalPrecedence(parser, outerContext) {
 	}
 	if (operands.length == 0) {
 		// all elements were false, so the OR context is false
-		return null
+		return nil
 	}
-	var result = null
+	var result = nil
 	operands.map(function(o) {
-		return result == null ? o : SemanticContext.orContext(result, o)
+		return result == nil ? o : SemanticContext.orContext(result, o)
 	})
 	return result
 }

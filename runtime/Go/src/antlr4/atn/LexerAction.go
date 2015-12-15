@@ -236,7 +236,7 @@ LexerCustomAction.prototype.constructor = LexerCustomAction
 // <p>Custom actions are implemented by calling {@link Lexer//action} with the
 // appropriate rule and action indexes.</p>
 func (this *LexerCustomAction) execute(lexer) {
-    lexer.action(null, this.ruleIndex, this.actionIndex)
+    lexer.action(nil, this.ruleIndex, this.actionIndex)
 }
 
 func (this *LexerCustomAction) hashString() {

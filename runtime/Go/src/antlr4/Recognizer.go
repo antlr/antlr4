@@ -6,7 +6,7 @@ var ProxyErrorListener = require('./error/ErrorListener').ProxyErrorListener
 
 type Recognizer struct {
     this._listeners = [ ConsoleErrorListener.INSTANCE ]
-    this._interp = null
+    this._interp = nil
     this._stateNumber = -1
     return this
 }
@@ -32,7 +32,7 @@ func (this *Recognizer) removeErrorListeners() {
 
 func (this *Recognizer) getTokenTypeMap() {
     var tokenNames = this.getTokenNames()
-    if (tokenNames==null) {
+    if (tokenNames==nil) {
         throw("The current recognizer does not provide a list of token names.")
     }
     var result = this.tokenTypeMapCache[tokenNames]
@@ -50,7 +50,7 @@ func (this *Recognizer) getTokenTypeMap() {
 //
 func (this *Recognizer) getRuleIndexMap() {
     var ruleNames = this.getRuleNames()
-    if (ruleNames==null) {
+    if (ruleNames==nil) {
         throw("The current recognizer does not provide a list of rule names.")
     }
     var result = this.ruleIndexMapCache[ruleNames]
@@ -93,11 +93,11 @@ func (this *Recognizer) getErrorHeader(e) {
 // {@link DefaultErrorStrategy//getTokenErrorDisplay}.
 //
 func (this *Recognizer) getTokenErrorDisplay(t) {
-    if (t==null) {
+    if (t==nil) {
         return "<no token>"
     }
     var s = t.text
-    if (s==null) {
+    if (s==nil) {
         if (t.type==Token.EOF) {
             s = "<EOF>"
         } else {

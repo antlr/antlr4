@@ -40,14 +40,14 @@ LL1Analyzer.HIT_PRED = Token.INVALID_TYPE
 // of an {@link ATNState}. The returned array has one element for each
 // outgoing transition in {@code s}. If the closure from transition
 // <em>i</em> leads to a semantic predicate before matching a symbol, the
-// element at index <em>i</em> of the result will be {@code null}.
+// element at index <em>i</em> of the result will be {@code nil}.
 //
 // @param s the ATN state
 // @return the expected symbols for each outgoing transition of {@code s}.
 ///
 LL1func (this *Analyzer) getDecisionLookahead(s) {
-    if (s == null) {
-        return null
+    if (s == nil) {
+        return nil
     }
     var count = s.transitions.length
     var look = []
@@ -55,12 +55,12 @@ LL1func (this *Analyzer) getDecisionLookahead(s) {
         look[alt] = new IntervalSet()
         var lookBusy = new Set()
         var seeThruPreds = false // fail to get lookahead upon pred
-        this._LOOK(s.transition(alt).target, null, PredictionContext.EMPTY,
+        this._LOOK(s.transition(alt).target, nil, PredictionContext.EMPTY,
               look[alt], lookBusy, new BitSet(), seeThruPreds, false)
         // Wipe out lookahead for this alternative if we found nothing
         // or we had a predicate when we !seeThruPreds
         if (look[alt].length==0 || look[alt].contains(LL1Analyzer.HIT_PRED)) {
-            look[alt] = null
+            look[alt] = nil
         }
     }
     return look
@@ -70,15 +70,15 @@ LL1func (this *Analyzer) getDecisionLookahead(s) {
 // Compute set of tokens that can follow {@code s} in the ATN in the
 // specified {@code ctx}.
 //
-// <p>If {@code ctx} is {@code null} and the end of the rule containing
+// <p>If {@code ctx} is {@code nil} and the end of the rule containing
 // {@code s} is reached, {@link Token//EPSILON} is added to the result set.
-// If {@code ctx} is not {@code null} and the end of the outermost rule is
+// If {@code ctx} is not {@code nil} and the end of the outermost rule is
 // reached, {@link Token//EOF} is added to the result set.</p>
 //
 // @param s the ATN state
 // @param stopState the ATN state to stop at. This can be a
 // {@link BlockEndState} to detect epsilon paths through a closure.
-// @param ctx the complete parser context, or {@code null} if the context
+// @param ctx the complete parser context, or {@code nil} if the context
 // should be ignored
 //
 // @return The set of tokens that can follow {@code s} in the ATN in the
@@ -87,8 +87,8 @@ LL1func (this *Analyzer) getDecisionLookahead(s) {
 LL1func (this *Analyzer) LOOK(s, stopState, ctx) {
     var r = new IntervalSet()
     var seeThruPreds = true // ignore preds get all lookahead
-	ctx = ctx || null
-    var lookContext = ctx!==null ? predictionContextFromRuleContext(s.atn, ctx) : null
+	ctx = ctx || nil
+    var lookContext = ctx!==nil ? predictionContextFromRuleContext(s.atn, ctx) : nil
     this._LOOK(s, stopState, lookContext, r, new Set(), new BitSet(), seeThruPreds, true)
     return r
 }
@@ -97,16 +97,16 @@ LL1func (this *Analyzer) LOOK(s, stopState, ctx) {
 // Compute set of tokens that can follow {@code s} in the ATN in the
 // specified {@code ctx}.
 //
-// <p>If {@code ctx} is {@code null} and {@code stopState} or the end of the
+// <p>If {@code ctx} is {@code nil} and {@code stopState} or the end of the
 // rule containing {@code s} is reached, {@link Token//EPSILON} is added to
-// the result set. If {@code ctx} is not {@code null} and {@code addEOF} is
+// the result set. If {@code ctx} is not {@code nil} and {@code addEOF} is
 // {@code true} and {@code stopState} or the end of the outermost rule is
 // reached, {@link Token//EOF} is added to the result set.</p>
 //
 // @param s the ATN state.
 // @param stopState the ATN state to stop at. This can be a
 // {@link BlockEndState} to detect epsilon paths through a closure.
-// @param ctx The outer context, or {@code null} if the outer context should
+// @param ctx The outer context, or {@code nil} if the outer context should
 // not be used.
 // @param look The result lookahead set.
 // @param lookBusy A set used for preventing epsilon closures in the ATN
@@ -121,7 +121,7 @@ LL1func (this *Analyzer) LOOK(s, stopState, ctx) {
 // result if one is encountered.
 // @param addEOF Add {@link Token//EOF} to the result if the end of the
 // outermost context is reached. This parameter has no effect if {@code ctx}
-// is {@code null}.
+// is {@code nil}.
 ///
 LL1func (this *Analyzer) _LOOK(s, stopState , ctx, look, lookBusy, calledRuleStack, seeThruPreds, addEOF) {
     var c = new ATNConfig({state:s, alt:0}, ctx)
@@ -130,7 +130,7 @@ LL1func (this *Analyzer) _LOOK(s, stopState , ctx, look, lookBusy, calledRuleSta
     }
     lookBusy.add(c)
     if (s == stopState) {
-        if (ctx ==null) {
+        if (ctx ==nil) {
             look.addOne(Token.EPSILON)
             return
         } else if (ctx.isEmpty() && addEOF) {
@@ -139,7 +139,7 @@ LL1func (this *Analyzer) _LOOK(s, stopState , ctx, look, lookBusy, calledRuleSta
         }
     }
     if (s instanceof RuleStopState ) {
-        if (ctx ==null) {
+        if (ctx ==nil) {
             look.addOne(Token.EPSILON)
             return
         } else if (ctx.isEmpty() && addEOF) {
@@ -188,7 +188,7 @@ LL1func (this *Analyzer) _LOOK(s, stopState , ctx, look, lookBusy, calledRuleSta
             look.addRange( Token.MIN_USER_TOKEN_TYPE, this.atn.maxTokenType )
         } else {
             var set = t.label
-            if (set !== null) {
+            if (set !== nil) {
                 if (t instanceof NotSetTransition) {
                     set = set.complement(Token.MIN_USER_TOKEN_TYPE, this.atn.maxTokenType)
                 }

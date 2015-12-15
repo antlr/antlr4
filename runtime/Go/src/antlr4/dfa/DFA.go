@@ -25,7 +25,7 @@ func DFA(atnStartState, decision) {
 	// A set of all DFA states. Use {@link Map} so we can get old state back
 	// ({@link Set} only allows you to see if it's there).
 	this._states = new DFAStatesSet()
-	this.s0 = null
+	this.s0 = nil
 	// {@code true} if this DFA is for a precedence decision otherwise,
 	// {@code false}. This is the backing field for {@link //isPrecedenceDfa},
 	// {@link //setPrecedenceDfa}.
@@ -37,7 +37,7 @@ func DFA(atnStartState, decision) {
 //
 // @param precedence The current precedence.
 // @return The start state corresponding to the specified precedence, or
-// {@code null} if no start state exists for the specified precedence.
+// {@code nil} if no start state exists for the specified precedence.
 //
 // @throws IllegalStateException if this is not a precedence DFA.
 // @see //isPrecedenceDfa()
@@ -46,11 +46,11 @@ func (this *DFA) getPrecedenceStartState(precedence) {
 	if (!(this.precedenceDfa)) {
 		throw ("Only precedence DFAs may contain a precedence start state.")
 	}
-	// s0.edges is never null for a precedence DFA
+	// s0.edges is never nil for a precedence DFA
 	if (precedence < 0 || precedence >= this.s0.edges.length) {
-		return null
+		return nil
 	}
-	return this.s0.edges[precedence] || null
+	return this.s0.edges[precedence] || nil
 }
 
 // Set the start state for a specific precedence value.
@@ -72,7 +72,7 @@ func (this *DFA) setPrecedenceStartState(precedence, startState) {
 
 	// synchronization on s0 here is ok. when the DFA is turned into a
 	// precedence DFA, s0 will be initialized once and not updated again
-	// s0.edges is never null for a precedence DFA
+	// s0.edges is never nil for a precedence DFA
 	this.s0.edges[precedence] = startState
 }
 
@@ -84,7 +84,7 @@ func (this *DFA) setPrecedenceStartState(precedence, startState) {
 // <ul>
 // <li>The {@link //states} map is cleared</li>
 // <li>If {@code precedenceDfa} is {@code false}, the initial state
-// {@link //s0} is set to {@code null} otherwise, it is initialized to a new
+// {@link //s0} is set to {@code nil} otherwise, it is initialized to a new
 // {@link DFAState} with an empty outgoing {@link DFAState//edges} array to
 // store the start states for individual precedence values.</li>
 // <li>The {@link //precedenceDfa} field is updated</li>
@@ -103,7 +103,7 @@ func (this *DFA) setPrecedenceDfa(precedenceDfa) {
 			precedenceState.requiresFullContext = false
 			this.s0 = precedenceState
 		} else {
-			this.s0 = null
+			this.s0 = nil
 		}
 		this.precedenceDfa = precedenceDfa
 	}
@@ -129,9 +129,9 @@ func (this *DFA) sortedStates() {
 }
 
 func (this *DFA) toString(literalNames, symbolicNames) {
-	literalNames = literalNames || null
-	symbolicNames = symbolicNames || null
-	if (this.s0 == null) {
+	literalNames = literalNames || nil
+	symbolicNames = symbolicNames || nil
+	if (this.s0 == nil) {
 		return ""
 	}
 	var serializer = new DFASerializer(this, literalNames, symbolicNames)
@@ -139,7 +139,7 @@ func (this *DFA) toString(literalNames, symbolicNames) {
 }
 
 func (this *DFA) toLexerString() {
-	if (this.s0 == null) {
+	if (this.s0 == nil) {
 		return ""
 	}
 	var serializer = new LexerDFASerializer(this)

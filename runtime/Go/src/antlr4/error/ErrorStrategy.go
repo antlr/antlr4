@@ -54,7 +54,7 @@ type DefaultErrorStrategy struct {
     // one token/tree node is consumed for two errors.
     //
     this.lastErrorIndex = -1
-    this.lastErrorStates = null
+    this.lastErrorStates = nil
     return this
 }
 
@@ -89,7 +89,7 @@ func (this *DefaultErrorStrategy) inErrorRecoveryMode(recognizer) {
 //
 func (this *DefaultErrorStrategy) endErrorCondition(recognizer) {
     this.errorRecoveryMode = false
-    this.lastErrorStates = null
+    this.lastErrorStates = nil
     this.lastErrorIndex = -1
 }
 
@@ -149,7 +149,7 @@ func (this *DefaultErrorStrategy) reportError(recognizer, e) {
 //
 func (this *DefaultErrorStrategy) recover(recognizer, e) {
     if (this.lastErrorIndex==recognizer.getInputStream().index &&
-        this.lastErrorStates !== null && this.lastErrorStates.indexOf(recognizer.state)>=0) {
+        this.lastErrorStates !== nil && this.lastErrorStates.indexOf(recognizer.state)>=0) {
 		// uh oh, another error at same token index and previously-visited
 		// state in ATN must be a case where LT(1) is in the recovery
 		// token set so nothing got consumed. Consume a single token
@@ -157,7 +157,7 @@ func (this *DefaultErrorStrategy) recover(recognizer, e) {
 		recognizer.consume()
     }
     this.lastErrorIndex = recognizer._input.index
-    if (this.lastErrorStates == null) {
+    if (this.lastErrorStates == nil) {
         this.lastErrorStates = []
     }
     this.lastErrorStates.push(recognizer.state)
@@ -231,7 +231,7 @@ func (this *DefaultErrorStrategy) sync(recognizer) {
     case ATNState.PLUS_BLOCK_START:
     case ATNState.STAR_LOOP_ENTRY:
        // report error and recover if possible
-        if( this.singleTokenDeletion(recognizer) !== null) {
+        if( this.singleTokenDeletion(recognizer) !== nil) {
             return
         } else {
             throw new InputMismatchException(recognizer)
@@ -261,7 +261,7 @@ func (this *DefaultErrorStrategy) sync(recognizer) {
 func (this *DefaultErrorStrategy) reportNoViableAlternative(recognizer, e) {
     var tokens = recognizer.getTokenStream()
     var input
-    if(tokens !== null) {
+    if(tokens !== nil) {
         if (e.startToken.type==Token.EOF) {
             input = "<EOF>"
         } else {
@@ -331,7 +331,7 @@ func (this *DefaultErrorStrategy) reportUnwantedToken(recognizer) {
     var expecting = this.getExpectedTokens(recognizer)
     var msg = "extraneous input " + tokenName + " expecting " +
         expecting.toString(recognizer.literalNames, recognizer.symbolicNames)
-    recognizer.notifyErrorListeners(msg, t, null)
+    recognizer.notifyErrorListeners(msg, t, nil)
 }
 // This method is called to report a syntax error which requires the
 // insertion of a missing token into the input stream. At the time this
@@ -358,7 +358,7 @@ func (this *DefaultErrorStrategy) reportMissingToken(recognizer) {
     var expecting = this.getExpectedTokens(recognizer)
     var msg = "missing " + expecting.toString(recognizer.literalNames, recognizer.symbolicNames) +
           " at " + this.getTokenErrorDisplay(t)
-    recognizer.notifyErrorListeners(msg, t, null)
+    recognizer.notifyErrorListeners(msg, t, nil)
 }
 
 // <p>The default implementation attempts to recover from the mismatched input
@@ -413,7 +413,7 @@ func (this *DefaultErrorStrategy) reportMissingToken(recognizer) {
 func (this *DefaultErrorStrategy) recoverInline(recognizer) {
     // SINGLE TOKEN DELETION
     var matchedSymbol = this.singleTokenDeletion(recognizer)
-    if (matchedSymbol !== null) {
+    if (matchedSymbol !== nil) {
         // we have deleted the extra token.
         // now, move past ttype token as if all were ok
         recognizer.consume()
@@ -463,8 +463,8 @@ func (this *DefaultErrorStrategy) singleTokenInsertion(recognizer) {
 
 // This method implements the single-token deletion inline error recovery
 // strategy. It is called by {@link //recoverInline} to attempt to recover
-// from mismatched input. If this method returns null, the parser and error
-// handler state will not have changed. If this method returns non-null,
+// from mismatched input. If this method returns nil, the parser and error
+// handler state will not have changed. If this method returns non-nil,
 // {@code recognizer} will <em>not</em> be in error recovery mode since the
 // returned token was a successful match.
 //
@@ -477,7 +477,7 @@ func (this *DefaultErrorStrategy) singleTokenInsertion(recognizer) {
 // @param recognizer the parser instance
 // @return the successfully matched {@link Token} instance if single-token
 // deletion successfully recovers from the mismatched input, otherwise
-// {@code null}
+// {@code nil}
 //
 func (this *DefaultErrorStrategy) singleTokenDeletion(recognizer) {
     var nextTokenType = recognizer.getTokenStream().LA(2)
@@ -494,7 +494,7 @@ func (this *DefaultErrorStrategy) singleTokenDeletion(recognizer) {
         this.reportMatch(recognizer) // we know current token is correct
         return matchedSymbol
     } else {
-        return null
+        return nil
     }
 }
 
@@ -529,7 +529,7 @@ func (this *DefaultErrorStrategy) getMissingSymbol(recognizer) {
     }
     var current = currentSymbol
     var lookback = recognizer.getTokenStream().LT(-1)
-    if (current.type==Token.EOF && lookback !== null) {
+    if (current.type==Token.EOF && lookback !== nil) {
         current = lookback
     }
     return recognizer.getTokenFactory().create(current.source,
@@ -550,11 +550,11 @@ func (this *DefaultErrorStrategy) getExpectedTokens(recognizer) {
 // so that it creates a new Java type.
 //
 func (this *DefaultErrorStrategy) getTokenErrorDisplay(t) {
-    if (t == null) {
+    if (t == nil) {
         return "<no token>"
     }
     var s = t.text
-    if (s == null) {
+    if (s == nil) {
         if (t.type==Token.EOF) {
             s = "<EOF>"
         } else {
@@ -667,7 +667,7 @@ func (this *DefaultErrorStrategy) getErrorRecoverySet(recognizer) {
     var atn = recognizer._interp.atn
     var ctx = recognizer._ctx
     var recoverSet = new IntervalSet()
-    while (ctx !== null && ctx.invokingState>=0) {
+    while (ctx !== nil && ctx.invokingState>=0) {
         // compute what follows who invoked us
         var invokingState = atn.states[ctx.invokingState]
         var rt = invokingState.transitions[0]
@@ -731,7 +731,7 @@ BailErrorStrategy.prototype.constructor = BailErrorStrategy
 //
 func (this *BailErrorStrategy) recover(recognizer, e) {
     var context = recognizer._ctx
-    while (context !== null) {
+    while (context !== nil) {
         context.exception = e
         context = context.parentCtx
     }

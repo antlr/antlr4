@@ -51,7 +51,7 @@ func (this *ConsoleErrorListener) syntaxError(recognizer, offendingSymbol, line,
 
 func ProxyErrorListener(delegates) {
 	ErrorListener.call(this)
-    if (delegates==null) {
+    if (delegates==nil) {
         throw "delegates"
     }
     this.delegates = delegates
