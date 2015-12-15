@@ -1,23 +1,31 @@
-package antlr
+package antlr4
 
-var Set = require('./Utils').Set
-var BitSet = require('./Utils').BitSet
-var Token = require('./Token').Token
-var ATNConfig = require('./atn/ATNConfig').ATNConfig
-var Interval = require('./IntervalSet').Interval
-var IntervalSet = require('./IntervalSet').IntervalSet
-var RuleStopState = require('./atn/ATNState').RuleStopState
-var RuleTransition = require('./atn/Transition').RuleTransition
-var NotSetTransition = require('./atn/Transition').NotSetTransition
-var WildcardTransition = require('./atn/Transition').WildcardTransition
-var AbstractPredicateTransition = require('./atn/Transition').AbstractPredicateTransition
+import (
+    "antlr4/atn"
+)
 
-var pc = require('./PredictionContext')
-var predictionContextFromRuleContext = pc.predictionContextFromRuleContext
-var PredictionContext = pc.PredictionContext
-var SingletonPredictionContext = pc.SingletonPredictionContext
+//var Set = require('./Utils').Set
+//var BitSet = require('./Utils').BitSet
+//var Token = require('./Token').Token
+//var ATNConfig = require('./atn/ATNConfig').ATNConfig
+//var Interval = require('./IntervalSet').Interval
+//var IntervalSet = require('./IntervalSet').IntervalSet
+//var RuleStopState = require('./atn/ATNState').RuleStopState
+//var RuleTransition = require('./atn/Transition').RuleTransition
+//var NotSetTransition = require('./atn/Transition').NotSetTransition
+//var WildcardTransition = require('./atn/Transition').WildcardTransition
+//var AbstractPredicateTransition = require('./atn/Transition').AbstractPredicateTransition
+//
+//var pc = require('./PredictionContext')
+//var predictionContextFromRuleContext = pc.predictionContextFromRuleContext
+//var PredictionContext = pc.PredictionContext
+//var SingletonPredictionContext = pc.SingletonPredictionContext
 
-func LL1Analyzer (atn) {
+type LL1Analyzer struct {
+    atn atn.ATN
+}
+
+func NewLL1Analyzer (atn) *LL1Analyzer {
     this.atn = atn
 }
 

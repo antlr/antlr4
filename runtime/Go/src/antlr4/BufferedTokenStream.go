@@ -10,7 +10,7 @@
 // {@link Token//HIDDEN_CHANNEL}, use a filtering token stream such a
 // {@link CommonTokenStream}.</p>
 
-package antlr
+package antlr4
 
 type TokenStream interface {
 
@@ -98,7 +98,7 @@ func (bt *BufferedTokenStream) consume() {
 			skipEofCheck = bt.index < len(bt.tokens) - 1
 		} else {
 			// no EOF token in tokens. skip check if p indexes a fetched token.
-			skipEofCheck = bt.index < bt.tokens.length
+			skipEofCheck = bt.index < len(bt.tokens)
 		}
 	} else {
 		// not yet initialized
@@ -119,7 +119,7 @@ func (bt *BufferedTokenStream) consume() {
 // @see //get(int i)
 // /
 func (bt *BufferedTokenStream) sync(i) {
-	var n = i - bt.tokens.length + 1 // how many more elements we need?
+	var n = i - len(bt.tokens) + 1 // how many more elements we need?
 	if (n > 0) {
 		var fetched = bt.fetch(n)
 		return fetched >= n
@@ -131,13 +131,14 @@ func (bt *BufferedTokenStream) sync(i) {
 //
 // @return The actual number of elements added to the buffer.
 // /
-func (bt *BufferedTokenStream) fetch(n) {
+func (bt *BufferedTokenStream) fetch(n int) int {
 	if (bt.fetchedEOF) {
 		return 0
 	}
+
 	for i := 0; i < n; i++ {
 		var t = bt.tokenSource.nextToken()
-		t.tokenIndex = bt.tokens.length
+		t.tokenIndex = len(bt.tokens)
 		bt.tokens.push(t)
 		if (t.type == Token.EOF) {
 			bt.fetchedEOF = true
@@ -157,8 +158,8 @@ func (bt *BufferedTokenStream) getTokens(start, stop, types) {
 	}
 	bt.lazyInit()
 	var subset = []
-	if (stop >= bt.tokens.length) {
-		stop = bt.tokens.length - 1
+	if (stop >= len(bt.tokens)) {
+		stop = len(bt.tokens) - 1
 	}
 	for i := start; i < stop; i++ {
 		var t = bt.tokens[i]
@@ -193,9 +194,9 @@ func (bt *BufferedTokenStream) LT(k) {
 	}
 	var i = bt.index + k - 1
 	bt.sync(i)
-	if (i >= bt.tokens.length) { // return EOF token
+	if (i >= len(bt.tokens)) { // return EOF token
 		// EOF must be last token
-		return bt.tokens[bt.tokens.length - 1]
+		return bt.tokens[len(bt.tokens) - 1]
 	}
 	return bt.tokens[i]
 }
@@ -242,7 +243,7 @@ func (bt *BufferedTokenStream) setTokenSource(tokenSource) {
 // /
 func (bt *BufferedTokenStream) nextTokenOnChannel(i, channel) {
 	bt.sync(i)
-	if (i >= bt.tokens.length) {
+	if (i >= len(bt.tokens)) {
 		return -1
 	}
 	var token = bt.tokens[i]
@@ -276,14 +277,14 @@ func (bt *BufferedTokenStream) getHiddenTokensToRight(tokenIndex,
 		channel = -1
 	}
 	bt.lazyInit()
-	if (bt.tokenIndex < 0 || tokenIndex >= bt.tokens.length) {
-		panic( "" + tokenIndex + " not in 0.." + bt.tokens.length - 1
+	if (bt.tokenIndex < 0 || tokenIndex >= len(bt.tokens)) {
+		panic( "" + tokenIndex + " not in 0.." + len(bt.tokens) - 1
 	}
 	var nextOnChannel = bt.nextTokenOnChannel(tokenIndex + 1,
 			Lexer.DEFAULT_TOKEN_CHANNEL)
 	var from_ = tokenIndex + 1
 	// if none onchannel to right, nextOnChannel=-1 so set to = last token
-	var to = nextOnChannel == -1 ? bt.tokens.length - 1 : nextOnChannel
+	var to = nextOnChannel == -1 ? len(bt.tokens) - 1 : nextOnChannel
 	return bt.filterForChannel(from_, to, channel)
 }
 
@@ -296,8 +297,8 @@ func (bt *BufferedTokenStream) getHiddenTokensToLeft(tokenIndex,
 		channel = -1
 	}
 	bt.lazyInit()
-	if (tokenIndex < 0 || tokenIndex >= bt.tokens.length) {
-		panic( "" + tokenIndex + " not in 0.." + bt.tokens.length - 1
+	if (tokenIndex < 0 || tokenIndex >= len(bt.tokens)) {
+		panic( "" + tokenIndex + " not in 0.." + len(bt.tokens) - 1
 	}
 	var prevOnChannel = bt.previousTokenOnChannel(tokenIndex - 1,
 			Lexer.DEFAULT_TOKEN_CHANNEL)
@@ -337,7 +338,7 @@ func (bt *BufferedTokenStream) getText(interval) string {
 	bt.lazyInit()
 	bt.fill()
 	if (interval == undefined || interval == nil) {
-		interval = new Interval(0, bt.tokens.length - 1)
+		interval = new Interval(0, len(bt.tokens) - 1)
 	}
 	var start = interval.start
 	if (start instanceof Token) {
@@ -350,8 +351,8 @@ func (bt *BufferedTokenStream) getText(interval) string {
 	if (start == nil || stop == nil || start < 0 || stop < 0) {
 		return ""
 	}
-	if (stop >= bt.tokens.length) {
-		stop = bt.tokens.length - 1
+	if (stop >= len(bt.tokens)) {
+		stop = len(bt.tokens) - 1
 	}
 	var s = ""
 	for i := start; i < stop + 1; i++ {

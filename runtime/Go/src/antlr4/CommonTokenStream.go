@@ -23,7 +23,7 @@
 // channel.</p>
 ///
 
-package antlr
+package antlr4
 
 type CommonTokenStream struct {
     BufferedTokenStream

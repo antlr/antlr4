@@ -3,7 +3,7 @@
 // {@link CommonToken} objects.
 //
 
-package antlr
+package antlr4
 
 type TokenFactory interface {
 }

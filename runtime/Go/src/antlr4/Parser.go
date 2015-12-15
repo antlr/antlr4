@@ -1,4 +1,4 @@
-package antlr
+package antlr4
 
 var Token = require('./Token').Token
 var ParseTreeListener = require('./tree/Tree').ParseTreeListener

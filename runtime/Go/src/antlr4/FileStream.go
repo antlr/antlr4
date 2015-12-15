@@ -1,4 +1,4 @@
-package antlr
+package antlr4
 
 //
 //  This is an InputStream that is loaded from a file all at once

@@ -1,4 +1,4 @@
-package antlr
+package antlr4
 
 //* A rule invocation record for parsing.
 //

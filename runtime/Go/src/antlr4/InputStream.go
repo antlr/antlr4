@@ -1,4 +1,4 @@
-package antlr
+package antlr4
 
 // Vacuum all input from a string and then treat it like a buffer.
 

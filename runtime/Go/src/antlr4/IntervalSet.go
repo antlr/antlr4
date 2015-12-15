@@ -1,4 +1,9 @@
-package antlr
+package antlr4
+
+import (
+	"strings"
+	"strconv"
+)
 
 type Interval struct {
 	start int
@@ -20,46 +25,54 @@ func (i *Interval) contains(item int) {
 
 func (i *Interval) toString() {
 	if(i.start==i.stop-1) {
-		return i.start.toString()
+		return strconv.Itoa(i.start)
 	} else {
-		return i.start.toString() + ".." + (i.stop-1).toString()
+		return strconv.Itoa(i.start) + ".." + strconv.Itoa(i.stop-1)
 	}
 }
 
-Object.defineProperty(Interval.prototype, "length", {
-	get : function() {
-		return i.stop - i.start
-	}
-})
+func (i *Interval) length() int {
+	return i.stop - i.start
+}
 
 type IntervalSet struct {
-	i.intervals = null
-	i.readOnly = false
+	intervals []Interval
+	readOnly bool
 }
 
-func (i *IntervalSet) first(v) {
-	if (i.intervals == null || i.intervals.length==0) {
+func NewIntervalSet() *IntervalSet {
+
+	i := new(IntervalSet)
+
+	i.intervals = nil
+	i.readOnly = false
+
+	return i
+}
+
+func (i *IntervalSet) first(v int) int {
+	if (i.intervals == nil || len(i.intervals)==0) {
 		return Token.INVALID_TYPE
 	} else {
 		return i.intervals[0].start
 	}
 }
 
-func (i *IntervalSet) addOne(v) {
-	i.addInterval(new Interval(v, v + 1))
+func (i *IntervalSet) addOne(v int) {
+	i.addInterval(NewInterval(v, v + 1))
 }
 
-func (i *IntervalSet) addRange(l, h) {
-	i.addInterval(new Interval(l, h + 1))
+func (i *IntervalSet) addRange(l int, h int) {
+	i.addInterval(NewInterval(l, h + 1))
 }
 
-func (i *IntervalSet) addInterval(v) {
-	if (i.intervals == null) {
-		i.intervals = []
-		i.intervals.push(v)
+func (i *IntervalSet) addInterval(v Interval) {
+	if (i.intervals == nil) {
+		i.intervals = make([]Interval, 0)
+		append( i.intervals, v )
 	} else {
 		// find insert pos
-		for (var k = 0 k < i.intervals.length k++) {
+		for k := 0; k < len(i.intervals); k++ {
 			var i = i.intervals[k]
 			// distinct range -> insert
 			if (v.stop < i.start) {
@@ -83,19 +96,19 @@ func (i *IntervalSet) addInterval(v) {
 	}
 }
 
-func (i *IntervalSet) addSet(other) {
-	if (other.intervals != null) {
-		for (var k = 0 k < other.intervals.length k++) {
+func (i *IntervalSet) addSet(other IntervalSet) *IntervalSet {
+	if (other.intervals != nil) {
+		for k := 0; k < len(other.intervals); k++ {
 			var i = other.intervals[k]
-			i.addInterval(new Interval(i.start, i.stop))
+			i.addInterval(NewInterval(i.start, i.stop))
 		}
 	}
 	return i
 }
 
-func (i *IntervalSet) reduce(k) {
+func (i *IntervalSet) reduce(k int) {
 	// only need to reduce if k is not the last
-	if (k < i.intervalslength - 1) {
+	if (k < len(i.intervals) - 1) {
 		var l = i.intervals[k]
 		var r = i.intervals[k + 1]
 		// if r contained in l
@@ -103,26 +116,26 @@ func (i *IntervalSet) reduce(k) {
 			i.intervals.pop(k + 1)
 			i.reduce(k)
 		} else if (l.stop >= r.start) {
-			i.intervals[k] = new Interval(l.start, r.stop)
+			i.intervals[k] = NewInterval(l.start, r.stop)
 			i.intervals.pop(k + 1)
 		}
 	}
 }
 
-func (i *IntervalSet) complement(start, stop) {
-    var result = new IntervalSet()
-    result.addInterval(new Interval(start,stop+1))
-    for(var i=0 i<i.intervals.length i++) {
-        result.removeRange(i.intervals[i])
+func (is *IntervalSet) complement(start int, stop int) *IntervalSet {
+    var result = NewIntervalSet()
+    result.addInterval(NewInterval(start,stop+1))
+    for i := 0; i< len(is.intervals); i++ {
+        result.removeRange(is.intervals[i])
     }
     return result
 }
 
-func (i *IntervalSet) contains(item) {
-	if (i.intervals == null) {
+func (i *IntervalSet) contains(item Interval) bool {
+	if (i.intervals == nil) {
 		return false
 	} else {
-		for (var k = 0 k < i.intervals.length k++) {
+		for k := 0; k < len(i.intervals); k++ {
 			if(i.intervals[k].contains(item)) {
 				return true
 			}
@@ -131,20 +144,22 @@ func (i *IntervalSet) contains(item) {
 	}
 }
 
-Object.defineProperty(IntervalSet.prototype, "length", {
-	get : function() {
-		var len = 0
-		i.intervals.map(function(i) {len += i.length})
-		return len
-	}
-})
+func (is *IntervalSet) length() int {
+	len := 0
 
-func (i *IntervalSet) removeRange(v) {
-    if(v.start==v.stop-1) {
+	for _,v := range is.intervals {
+		len += v.length()
+	}
+
+	return len
+}
+
+func (i *IntervalSet) removeRange(v Interval) {
+    if v.start==v.stop-1 {
         i.removeOne(v.start)
     } else if (i.intervals!=nil) {
-        var k = 0
-        for n :=0 n<i.intervals.length n++) {
+        k:= 0
+        for n :=0; n<len( i.intervals ); n++ {
             var i = i.intervals[k]
             // intervals are ordered
             if (v.stop<=i.start) {
@@ -175,47 +190,49 @@ func (i *IntervalSet) removeRange(v) {
     }
 }
 
-func (i *IntervalSet) removeOne(v) {
-	if (i.intervals != null) {
-		for (var k = 0 k < i.intervals.length k++) {
-			var i = i.intervals[k]
-			// intervals is ordered
-			if (v < i.start) {
+func (is *IntervalSet) removeOne(v *Interval) {
+	if(v.start==v.stop-1) {
+		is.removeOne(v.start)
+	} else if (is.intervals!=nil) {
+		var k = 0
+		for n := 0; n < len(is.intervals); n++ {
+			i := is.intervals[k]
+			// intervals are ordered
+			if v.stop<=i.start {
 				return
 			}
-			// check for single value range
-			else if (v == i.start && v == i.stop - 1) {
-				i.intervals.splice(k, 1)
+			// check for including range, split it
+			else if(v.start>i.start && v.stop<i.stop) {
+				is.intervals[k] = NewInterval(i.start, v.start)
+				var x = NewInterval(v.stop, i.stop)
+				is.intervals.splice(k, 0, x)
 				return
+			}
+			// check for included range, remove it
+			else if(v.start<=i.start && v.stop>=i.stop) {
+				is.intervals.splice(k, 1)
+				k = k - 1; // need another pass
 			}
 			// check for lower boundary
-			else if (v == i.start) {
-				i.intervals[k] = new Interval(i.start + 1, i.stop)
-				return
+			else if(v.start<i.stop) {
+				is.intervals[k] = NewInterval(i.start, v.start)
 			}
 			// check for upper boundary
-			else if (v == i.stop - 1) {
-				i.intervals[k] = new Interval(i.start, i.stop - 1)
-				return
+			else if(v.stop<i.stop) {
+				is.intervals[k] = NewInterval(v.stop, i.stop)
 			}
-			// split existing range
-			else if (v < i.stop - 1) {
-				var x = new Interval(i.start, v)
-				i.start = v + 1
-				i.intervals.splice(k, 0, x)
-				return
-			}
+			k += 1
 		}
 	}
 }
 
-func (i *IntervalSet) toString(literalNames, symbolicNames, elemsAreChar) {
-	literalNames = literalNames || null
-	symbolicNames = symbolicNames || null
+func (i *IntervalSet) toString(literalNames []string, symbolicNames []string, elemsAreChar bool) string {
+	literalNames = literalNames || nil
+	symbolicNames = symbolicNames || nil
 	elemsAreChar = elemsAreChar || false
-	if (i.intervals == null) {
+	if (i.intervals == nil) {
 		return "{}"
-	} else if(literalNames!=null || symbolicNames!=null) {
+	} else if(literalNames!=nil || symbolicNames!=nil) {
 		return i.toTokenString(literalNames, symbolicNames)
 	} else if(elemsAreChar) {
 		return i.toCharString()
@@ -224,22 +241,23 @@ func (i *IntervalSet) toString(literalNames, symbolicNames, elemsAreChar) {
 	}
 }
 
-func (i *IntervalSet) toCharString() {
-	var names = []
-	for (var i = 0 i < i.intervals.length i++) {
-		var v = i.intervals[i]
+func (is *IntervalSet) toCharString() {
+	var names = make([]string, len(is.intervals))
+
+	for i := 0; i < len( is.intervals ); i++ {
+		var v = is.intervals[i]
 		if(v.stop==v.start+1) {
 			if ( v.start==Token.EOF ) {
-				names.push("<EOF>")
+				append(names, "<EOF>")
 			} else {
-				names.push("'" + String.fromCharCode(v.start) + "'")
+				append(names, ("'" + String.fromCharCode(v.start) + "'"))
 			}
 		} else {
-			names.push("'" + String.fromCharCode(v.start) + "'..'" + String.fromCharCode(v.stop-1) + "'")
+			append(names, "'" + String.fromCharCode(v.start) + "'..'" + String.fromCharCode(v.stop-1) + "'")
 		}
 	}
-	if (names.length > 1) {
-		return "{" + names.join(", ") + "}"
+	if (len(names) > 1) {
+		return "{" + strings.Join(names, ", ") + "}"
 	} else {
 		return names[0]
 	}
@@ -248,7 +266,7 @@ func (i *IntervalSet) toCharString() {
 
 func (i *IntervalSet) toIndexString() {
 	var names = []
-	for (var i = 0 i < i.intervals.length i++) {
+	for (var i = 0 i < len( i.intervals ) i++) {
 		var v = i.intervals[i]
 		if(v.stop==v.start+1) {
 			if ( v.start==Token.EOF ) {
@@ -261,18 +279,18 @@ func (i *IntervalSet) toIndexString() {
 		}
 	}
 	if (names.length > 1) {
-		return "{" + names.join(", ") + "}"
+		return "{" + string.Join(names, ", ") + "}"
 	} else {
 		return names[0]
 	}
 }
 
 
-func (i *IntervalSet) toTokenString(literalNames, symbolicNames) {
+func (i *IntervalSet) toTokenString(literalNames []string, symbolicNames []string) string {
 	var names = []
-	for (var i = 0 i < i.intervals.length i++) {
+	for i := 0; i < len( i.intervals ); i++ {
 		var v = i.intervals[i]
-		for (var j = v.start j < v.stop j++) {
+		for j := v.start; j < v.stop; j++ {
 			names.push(i.elementName(literalNames, symbolicNames, j))
 		}
 	}
@@ -283,7 +301,7 @@ func (i *IntervalSet) toTokenString(literalNames, symbolicNames) {
 	}
 }
 
-func (i *IntervalSet) elementName(literalNames, symbolicNames, a) {
+func (i *IntervalSet) elementName(literalNames []string, symbolicNames []string, a int) string {
 	if (a == Token.EOF) {
 		return "<EOF>"
 	} else if (a == Token.EPSILON) {

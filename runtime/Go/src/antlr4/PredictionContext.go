@@ -1,4 +1,4 @@
-package antlr
+package antlr4
 
 var RuleContext = require('./RuleContext').RuleContext
 
