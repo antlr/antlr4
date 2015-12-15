@@ -241,7 +241,7 @@ func (this *LexerATNSimulator) computeTargetState(input, s, t) {
 
 	if (reach.items.length == 0) { // we got nowhere on t from s
 		if (!reach.hasSemanticContext) {
-			// we got nowhere on t, don't throw out this knowledge it'd
+			// we got nowhere on t, don't panic out this knowledge it'd
 			// cause a failover from DFA later.
 			this.addDFAEdge(s, t, ATNSimulator.ERROR)
 		}
@@ -263,7 +263,7 @@ func (this *LexerATNSimulator) failOrAccept(prevAccept, input, reach, t) {
 		if (t == TokenEOF && input.index == this.startIndex) {
 			return TokenEOF
 		}
-		throw NewLexerNoViableAltException(this.recog, input, this.startIndex, reach)
+		panic NewLexerNoViableAltException(this.recog, input, this.startIndex, reach)
 	}
 }
 
@@ -409,7 +409,7 @@ func (this *LexerATNSimulator) getEpsilonTarget(input, config, trans,
 		var newContext = SingletonPredictionContext.create(config.context, trans.followState.stateNumber)
 		cfg = NewLexerATNConfig( { state:trans.target, context:newContext}, config)
 	} else if (trans.serializationType == Transition.PRECEDENCE) {
-		throw "Precedence predicates are not supported in lexers."
+		panic "Precedence predicates are not supported in lexers."
 	} else if (trans.serializationType == Transition.PREDICATE) {
 		// Track traversing semantic predicates. If we traverse,
 		// we cannot add a DFA state for this "reach" computation

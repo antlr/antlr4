@@ -21,7 +21,7 @@ var PrecedencePredicate = require('./SemanticContext').PrecedencePredicate
 func Transition (target) {
     // The target of this transition.
     if (target==undefined || target==nil) {
-        throw "target cannot be nil."
+        panic "target cannot be nil."
     }
     this.target = target
     // Are we epsilon, action, sempred?

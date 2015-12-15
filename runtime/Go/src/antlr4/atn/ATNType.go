@@ -6,8 +6,9 @@ type ATNType struct {
 	
 }
 
-ATNType.LEXER = 0
-ATNType.PARSER = 1
-
+const (
+	ATNTypeLexer = 0
+	ATNTypeParser = 1
+)
 
 

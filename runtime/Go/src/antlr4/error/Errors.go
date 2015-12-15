@@ -42,7 +42,7 @@ RecognitionException.prototype.constructor = RecognitionException
 
 //
 // Gets the set of input symbols which could potentially follow the
-// previously matched symbol at the time this exception was thrown.
+// previously matched symbol at the time this exception was panicn.
 //
 // <p>If the set of expected tokens is not known and could not be computed,
 // this method returns {@code nil}.</p>

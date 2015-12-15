@@ -123,7 +123,7 @@ package atn
 // When building a DFA accept state during ATN simulation, we evaluate any
 // predicates and return the sole semantically valid alternative. If there is
 // more than 1 alternative, we report an ambiguity. If there are 0 alternatives,
-// we throw an exception. Alternatives without predicates act like they have
+// we panic an exception. Alternatives without predicates act like they have
 // true predicates. The simple way to think about it is to strip away all
 // alternatives with false predicates and choose the minimum alternative that
 // remains.</p>
@@ -131,7 +131,7 @@ package atn
 // <p>
 // When we start in the DFA and reach an accept state that's predicated, we test
 // those and return the minimum semantically viable alternative. If no
-// alternatives are viable, we throw an exception.</p>
+// alternatives are viable, we panic an exception.</p>
 //
 // <p>
 // During full LL ATN simulation, closure always evaluates predicates and
@@ -434,7 +434,7 @@ ParserATNSimulator.prototype.execATN = function(dfa, s0, input, startIndex, oute
             if(alt!=ATN.INVALID_ALT_NUMBER) {
                 return alt
             } else {
-                throw e
+                panic e
             }
         }
         if(D.requiresFullContext && this.predictionMode != PredictionMode.SLL) {
@@ -478,7 +478,7 @@ ParserATNSimulator.prototype.execATN = function(dfa, s0, input, startIndex, oute
             input.seek(startIndex)
             var alts = this.evalSemanticContext(D.predicates, outerContext, true)
             if (alts.length==0) {
-                throw this.noViableAlt(input, outerContext, D.configs, startIndex)
+                panic this.noViableAlt(input, outerContext, D.configs, startIndex)
             } else if (alts.length==1) {
                 return alts.minValue()
             } else {
@@ -624,7 +624,7 @@ ParserATNSimulator.prototype.execATNWithFullContext = function(dfa, D, // how fa
             if(alt!=ATN.INVALID_ALT_NUMBER) {
                 return alt
             } else {
-                throw e
+                panic e
             }
         }
         var altSubSets = PredictionMode.getConflictingAltSubsets(reach)
@@ -1048,7 +1048,7 @@ func (this *ParserATNSimulator) getPredicatePredictions(ambigAlts, altToPred) {
 
 //
 // This method is used to improve the localization of error messages by
-// choosing an alternative rather than throwing a
+// choosing an alternative rather than panicing a
 // {@link NoViableAltException} in particular prediction scenarios where the
 // {@link //ERROR} state was reached during ATN simulation.
 //
@@ -1075,7 +1075,7 @@ func (this *ParserATNSimulator) getPredicatePredictions(ambigAlts, altToPred) {
 // the parser. Specifically, this could occur if the <em>only</em> configuration
 // capable of successfully parsing to the end of the decision rule is
 // blocked by a semantic predicate. By choosing this alternative within
-// {@link //adaptivePredict} instead of throwing a
+// {@link //adaptivePredict} instead of panicing a
 // {@link NoViableAltException}, the resulting
 // {@link FailedPredicateException} in the parser will identify the specific
 // predicate which is preventing the parser from successfully parsing the
@@ -1207,7 +1207,7 @@ func (this *ParserATNSimulator) closureCheckingStopState(config, configs, closur
         console.log("closure(" + config.toString(this.parser,true) + ")")
         console.log("configs(" + configs.toString() + ")")
         if(config.reachesIntoOuterContext>50) {
-            throw "problem"
+            panic "problem"
         }
     }
     if (config.state instanceof RuleStopState) {

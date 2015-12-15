@@ -226,19 +226,19 @@ func (this *DefaultErrorStrategy) sync(recognizer) {
         return
     }
     switch (s.stateType) {
-    case ATNState.BLOCK_START:
-    case ATNState.STAR_BLOCK_START:
-    case ATNState.PLUS_BLOCK_START:
-    case ATNState.STAR_LOOP_ENTRY:
+    case ATNStateBLOCK_START:
+    case ATNStateSTAR_BLOCK_START:
+    case ATNStatePLUS_BLOCK_START:
+    case ATNStateSTAR_LOOP_ENTRY:
        // report error and recover if possible
         if( this.singleTokenDeletion(recognizer) != nil) {
             return
         } else {
-            throw NewInputMismatchException(recognizer)
+            panic NewInputMismatchException(recognizer)
         }
         break
-    case ATNState.PLUS_LOOP_BACK:
-    case ATNState.STAR_LOOP_BACK:
+    case ATNStatePLUS_LOOP_BACK:
+    case ATNStateSTAR_LOOP_BACK:
         this.reportUnwantedToken(recognizer)
         var expecting = NewIntervalSet()
         expecting.addSet(recognizer.getExpectedTokens())
@@ -363,7 +363,7 @@ func (this *DefaultErrorStrategy) reportMissingToken(recognizer) {
 
 // <p>The default implementation attempts to recover from the mismatched input
 // by using single token insertion and deletion as described below. If the
-// recovery attempt fails, this method throws an
+// recovery attempt fails, this method panics an
 // {@link InputMismatchException}.</p>
 //
 // <p><strong>EXTRA TOKEN</strong> (single token deletion)</p>
@@ -423,8 +423,8 @@ func (this *DefaultErrorStrategy) recoverInline(recognizer) {
     if (this.singleTokenInsertion(recognizer)) {
         return this.getMissingSymbol(recognizer)
     }
-    // even that didn't work must throw the exception
-    throw NewInputMismatchException(recognizer)
+    // even that didn't work must panic the exception
+    panic NewInputMismatchException(recognizer)
 }
 
 //
@@ -633,7 +633,7 @@ func (this *DefaultErrorStrategy) escapeWSAndQuote(s) {
 // In this case, for input "[]", LA(1) is ']' and in the set, so we would
 // not consume anything. After printing an error, rule c would
 // return normally. Rule b would not find the required '^' though.
-// At this point, it gets a mismatched token error and throws an
+// At this point, it gets a mismatched token error and panics an
 // exception (since LA(1) is not in the viable following token
 // set). The rule exception handler tries to recover, but finds
 // the same recovery set and doesn't consume anything. Rule b
@@ -724,7 +724,7 @@ type BailErrorStrategy struct {
 BailErrorStrategy.prototype = Object.create(DefaultErrorStrategy.prototype)
 BailErrorStrategy.prototype.constructor = BailErrorStrategy
 
-// Instead of recovering from exception {@code e}, re-throw it wrapped
+// Instead of recovering from exception {@code e}, re-panic it wrapped
 // in a {@link ParseCancellationException} so it is not caught by the
 // rule func catches. Use {@link Exception//getCause()} to get the
 // original {@link RecognitionException}.
@@ -735,11 +735,11 @@ func (this *BailErrorStrategy) recover(recognizer, e) {
         context.exception = e
         context = context.parentCtx
     }
-    throw NewParseCancellationException(e)
+    panic NewParseCancellationException(e)
 }
     
 // Make sure we don't attempt to recover inline if the parser
-// successfully recovers, it won't throw an exception.
+// successfully recovers, it won't panic an exception.
 //
 func (this *BailErrorStrategy) recoverInline(recognizer) {
     this.recover(recognizer, NewInputMismatchException(recognizer))

@@ -3,14 +3,16 @@ package atn
 type LexerActionType struct {
 }
 
-LexerActionType.CHANNEL = 0     //The type of a {@link LexerChannelAction} action.
-LexerActionType.CUSTOM = 1      //The type of a {@link LexerCustomAction} action.
-LexerActionType.MODE = 2        //The type of a {@link LexerModeAction} action.
-LexerActionType.MORE = 3        //The type of a {@link LexerMoreAction} action.
-LexerActionType.POP_MODE = 4    //The type of a {@link LexerPopModeAction} action.
-LexerActionType.PUSH_MODE = 5   //The type of a {@link LexerPushModeAction} action.
-LexerActionType.SKIP = 6        //The type of a {@link LexerSkipAction} action.
-LexerActionType.TYPE = 7        //The type of a {@link LexerTypeAction} action.
+const (
+    LexerActionTypeCHANNEL = 0     //The type of a {@link LexerChannelAction} action.
+    LexerActionTypeCUSTOM = 1      //The type of a {@link LexerCustomAction} action.
+    LexerActionTypeMODE = 2        //The type of a {@link LexerModeAction} action.
+    LexerActionTypeMORE = 3        //The type of a {@link LexerMoreAction} action.
+    LexerActionTypePOP_MODE = 4    //The type of a {@link LexerPopModeAction} action.
+    LexerActionTypePUSH_MODE = 5   //The type of a {@link LexerPushModeAction} action.
+    LexerActionTypeSKIP = 6        //The type of a {@link LexerSkipAction} action.
+    LexerActionTypeTYPE = 7        //The type of a {@link LexerTypeAction} action.
+)
 
 func LexerAction(action) {
     this.actionType = action
@@ -34,7 +36,7 @@ func (this *LexerAction) equals(other) {
 // <p>The {@code skip} command does not have any parameters, so this action is
 // implemented as a singleton instance exposed by {@link //INSTANCE}.</p>
 type LexerSkipAction struct {
-	LexerAction.call(this, LexerActionType.SKIP)
+	LexerAction.call(this, LexerActionTypeSKIP)
 	return this
 }
 
@@ -55,7 +57,7 @@ func (this *LexerSkipAction) toString() {
 //  Implements the {@code type} lexer action by calling {@link Lexer//setType}
 // with the assigned type.
 func LexerTypeAction(type) {
-	LexerAction.call(this, LexerActionType.TYPE)
+	LexerAction.call(this, LexerActionTypeTYPE)
 	this.type = type
 	return this
 }
@@ -89,7 +91,7 @@ func (this *LexerTypeAction) toString() {
 // Implements the {@code pushMode} lexer action by calling
 // {@link Lexer//pushMode} with the assigned mode.
 func LexerPushModeAction(mode) {
-	LexerAction.call(this, LexerActionType.PUSH_MODE)
+	LexerAction.call(this, LexerActionTypePUSH_MODE)
     this.mode = mode
     return this
 }
@@ -127,7 +129,7 @@ func (this *LexerPushModeAction) toString() {
 // <p>The {@code popMode} command does not have any parameters, so this action is
 // implemented as a singleton instance exposed by {@link //INSTANCE}.</p>
 type LexerPopModeAction struct {
-	LexerAction.call(this,LexerActionType.POP_MODE)
+	LexerAction.call(this,LexerActionTypePOP_MODE)
 	return this
 }
 
@@ -150,7 +152,7 @@ func (this *LexerPopModeAction) toString() {
 // <p>The {@code more} command does not have any parameters, so this action is
 // implemented as a singleton instance exposed by {@link //INSTANCE}.</p>
 type LexerMoreAction struct {
-	LexerAction.call(this, LexerActionType.MORE)
+	LexerAction.call(this, LexerActionTypeMORE)
 	return this
 }
 
@@ -172,7 +174,7 @@ func (this *LexerMoreAction) toString() {
 // Implements the {@code mode} lexer action by calling {@link Lexer//mode} with
 // the assigned mode.
 func LexerModeAction(mode) {
-	LexerAction.call(this, LexerActionType.MODE)
+	LexerAction.call(this, LexerActionTypeMODE)
     this.mode = mode
     return this
 }
@@ -223,7 +225,7 @@ func (this *LexerModeAction) toString() {
     // {@link Recognizer//action}.
 
 func LexerCustomAction(ruleIndex, actionIndex) {
-	LexerAction.call(this, LexerActionType.CUSTOM)
+	LexerAction.call(this, LexerActionTypeCUSTOM)
     this.ruleIndex = ruleIndex
     this.actionIndex = actionIndex
     this.isPositionDependent = true
@@ -258,7 +260,7 @@ func (this *LexerCustomAction) equals(other) {
 // Constructs a New{@code channel} action with the specified channel value.
 // @param channel The channel value to pass to {@link Lexer//setChannel}.
 func LexerChannelAction(channel) {
-	LexerAction.call(this, LexerActionType.CHANNEL)
+	LexerAction.call(this, LexerActionTypeCHANNEL)
     this.channel = channel
     return this
 }

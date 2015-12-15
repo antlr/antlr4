@@ -85,7 +85,7 @@ func (this *ATNConfigSet) add(config, mergeCache) {
 		mergeCache = nil
 	}
 	if (this.readOnly) {
-		throw "This set is readonly"
+		panic "This set is readonly"
 	}
 	if (config.semanticContext != SemanticContext.NONE) {
 		this.hasSemanticContext = true
@@ -141,7 +141,7 @@ Object.defineProperty(ATNConfigSet.prototype, "items", {
 
 func (this *ATNConfigSet) optimizeConfigs(interpreter) {
 	if (this.readOnly) {
-		throw "This set is readonly"
+		panic "This set is readonly"
 	}
 	if (this.configLookup.length == 0) {
 		return
@@ -204,21 +204,21 @@ func (this *ATNConfigSet) isEmpty() {
 
 func (this *ATNConfigSet) contains(item) {
 	if (this.configLookup == nil) {
-		throw "This method is not implemented for readonly sets."
+		panic "This method is not implemented for readonly sets."
 	}
 	return this.configLookup.contains(item)
 }
 
 func (this *ATNConfigSet) containsFast(item) {
 	if (this.configLookup == nil) {
-		throw "This method is not implemented for readonly sets."
+		panic "This method is not implemented for readonly sets."
 	}
 	return this.configLookup.containsFast(item)
 }
 
 func (this *ATNConfigSet) clear() {
 	if (this.readOnly) {
-		throw "This set is readonly"
+		panic "This set is readonly"
 	}
 	this.configs = []
 	this.cachedHashString = "-1"

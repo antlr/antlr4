@@ -39,12 +39,12 @@ func DFA(atnStartState, decision) {
 // @return The start state corresponding to the specified precedence, or
 // {@code nil} if no start state exists for the specified precedence.
 //
-// @throws IllegalStateException if this is not a precedence DFA.
+// @panics IllegalStateException if this is not a precedence DFA.
 // @see //isPrecedenceDfa()
 
 func (this *DFA) getPrecedenceStartState(precedence) {
 	if (!(this.precedenceDfa)) {
-		throw ("Only precedence DFAs may contain a precedence start state.")
+		panic ("Only precedence DFAs may contain a precedence start state.")
 	}
 	// s0.edges is never nil for a precedence DFA
 	if (precedence < 0 || precedence >= this.s0.edges.length) {
@@ -59,12 +59,12 @@ func (this *DFA) getPrecedenceStartState(precedence) {
 // @param startState The start state corresponding to the specified
 // precedence.
 //
-// @throws IllegalStateException if this is not a precedence DFA.
+// @panics IllegalStateException if this is not a precedence DFA.
 // @see //isPrecedenceDfa()
 //
 func (this *DFA) setPrecedenceStartState(precedence, startState) {
 	if (!(this.precedenceDfa)) {
-		throw ("Only precedence DFAs may contain a precedence start state.")
+		panic ("Only precedence DFAs may contain a precedence start state.")
 	}
 	if (precedence < 0) {
 		return

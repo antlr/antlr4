@@ -94,7 +94,7 @@ func (p.*Parser) reset() {
 //
 // @param ttype the token type to match
 // @return the matched symbol
-// @throws RecognitionException if the current input symbol did not match
+// @panics RecognitionException if the current input symbol did not match
 // {@code ttype} and the error strategy could not recover from the
 // mismatched symbol
 
@@ -126,7 +126,7 @@ func (p.*Parser) match(ttype) {
 // the parse tree by calling {@link ParserRuleContext//addErrorNode}.</p>
 //
 // @return the matched symbol
-// @throws RecognitionException if the current input symbol did not match
+// @panics RecognitionException if the current input symbol did not match
 // a wildcard and the error strategy could not recover from the mismatched
 // symbol
 
@@ -177,11 +177,11 @@ func (p.*Parser) getParseListeners() {
 //
 // @param listener the listener to add
 //
-// @throws nilPointerException if {@code} listener is {@code nil}
+// @panics nilPointerException if {@code} listener is {@code nil}
 //
 func (p.*Parser) addParseListener(listener) {
 	if (listener == nil) {
-		throw "listener"
+		panic "listener"
 	}
 	if (p._parseListeners == nil) {
 		p._parseListeners = []
@@ -252,13 +252,13 @@ func (p.*Parser) setTokenFactory(factory) {
 // The ATN with bypass alternatives is expensive to create so we create it
 // lazily.
 //
-// @throws UnsupportedOperationException if the current parser does not
+// @panics UnsupportedOperationException if the current parser does not
 // implement the {@link //getSerializedATN()} method.
 //
 func (p.*Parser) getATNWithBypassAlts() {
 	var serializedAtn = p.getSerializedATN()
 	if (serializedAtn == nil) {
-		throw "The current parser does not support an ATN with bypass alternatives."
+		panic "The current parser does not support an ATN with bypass alternatives."
 	}
 	var result = p.bypassAltsAtnCache[serializedAtn]
 	if (result == nil) {
@@ -295,7 +295,7 @@ func (p.*Parser) compileParseTreePattern(pattern, patternRuleIndex, lexer) {
 		}
 	}
 	if (lexer == nil) {
-		throw "Parser can't discover a lexer to use"
+		panic "Parser can't discover a lexer to use"
 	}
 	var m = NewParseTreePatternMatcher(lexer, p.
 	return m.compile(pattern, patternRuleIndex)

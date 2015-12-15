@@ -32,7 +32,7 @@ func (this *Recognizer) removeErrorListeners() {
 func (this *Recognizer) getTokenTypeMap() {
     var tokenNames = this.getTokenNames()
     if (tokenNames==nil) {
-        throw("The current recognizer does not provide a list of token names.")
+        panic("The current recognizer does not provide a list of token names.")
     }
     var result = this.tokenTypeMapCache[tokenNames]
     if(result==undefined) {
@@ -50,7 +50,7 @@ func (this *Recognizer) getTokenTypeMap() {
 func (this *Recognizer) getRuleIndexMap() {
     var ruleNames = this.getRuleNames()
     if (ruleNames==nil) {
-        throw("The current recognizer does not provide a list of rule names.")
+        panic("The current recognizer does not provide a list of rule names.")
     }
     var result = this.ruleIndexMapCache[ruleNames]
     if(result==undefined) {

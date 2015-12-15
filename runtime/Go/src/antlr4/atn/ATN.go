@@ -120,14 +120,14 @@ func (this *ATN) getDecisionState( decision) {
 // @param context the full parse context
 // @return The set of potentially valid input symbols which could follow the
 // specified state in the specified context.
-// @throws IllegalArgumentException if the ATN does not contain a state with
+// @panics IllegalArgumentException if the ATN does not contain a state with
 // number {@code stateNumber}
 
 var Token = require('./../Token').Token
 
 func (this *ATN) getExpectedTokens( stateNumber, ctx ) {
     if ( stateNumber < 0 || stateNumber >= this.states.length ) {
-        throw("Invalid state number.")
+        panic("Invalid state number.")
     }
     var s = this.states[stateNumber]
     var following = this.nextTokens(s)
