@@ -1,6 +1,6 @@
-grammar Arithmetic;
+grammar JSArithmetic;
 
-options { language = Go; }
+options { language = JavaScript; }
 
 equation  
     : expression relop expression
