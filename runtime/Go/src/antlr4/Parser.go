@@ -67,7 +67,7 @@ Parser.bypassAltsAtnCache = {}
 
 // reset the parser's state//
 func (p.*Parser) reset() {
-	if (p._input !== nil) {
+	if (p._input != nil) {
 		p._input.seek(0)
 	}
 	p._errHandler.reset(p.
@@ -76,7 +76,7 @@ func (p.*Parser) reset() {
 	p.setTrace(false)
 	p._precedenceStack = []
 	p._precedenceStack.push(0)
-	if (p._interp !== nil) {
+	if (p._interp != nil) {
 		p._interp.reset()
 	}
 }
@@ -197,7 +197,7 @@ func (p.*Parser) addParseListener(listener) {
 // @param listener the listener to remove
 //
 func (p.*Parser) removeParseListener(listener) {
-	if (p._parseListeners !== nil) {
+	if (p._parseListeners != nil) {
 		var idx = p._parseListeners.indexOf(listener)
 		if (idx >= 0) {
 			p._parseListeners.splice(idx, 1)
@@ -215,7 +215,7 @@ func (p.*Parser) removeParseListeners() {
 
 // Notify any parse listeners of an enter rule event.
 func (p.*Parser) triggerEnterRuleEvent() {
-	if (p._parseListeners !== nil) {
+	if (p._parseListeners != nil) {
         var ctx = p._ctx
 		p._parseListeners.map(function(listener) {
 			listener.enterEveryRule(ctx)
@@ -230,7 +230,7 @@ func (p.*Parser) triggerEnterRuleEvent() {
 // @see //addParseListener
 //
 func (p.*Parser) triggerExitRuleEvent() {
-	if (p._parseListeners !== nil) {
+	if (p._parseListeners != nil) {
 		// reverse order walk of listeners
         var ctx = p._ctx
 		p._parseListeners.slice(0).reverse().map(function(listener) {
@@ -287,7 +287,7 @@ var Lexer = require('./Lexer').Lexer
 func (p.*Parser) compileParseTreePattern(pattern, patternRuleIndex, lexer) {
 	lexer = lexer || nil
 	if (lexer == nil) {
-		if (p.getTokenStream() !== nil) {
+		if (p.getTokenStream() != nil) {
 			var tokenSource = p.getTokenStream().tokenSource
 			if (tokenSource instanceof Lexer) {
 				lexer = tokenSource
@@ -363,10 +363,10 @@ func (p.*Parser) notifyErrorListeners(msg, offendingToken, err) {
 //
 func (p.*Parser) consume() {
 	var o = p.getCurrentToken()
-	if (o.type !== Token.EOF) {
+	if (o.type != Token.EOF) {
 		p.getInputStream().consume()
 	}
-	var hasListener = p._parseListeners !== nil && p._parseListeners.length > 0
+	var hasListener = p._parseListeners != nil && p._parseListeners.length > 0
 	if (p.buildParseTrees || hasListener) {
 		var node
 		if (p._errHandler.inErrorRecoveryMode(p.) {
@@ -386,7 +386,7 @@ func (p.*Parser) consume() {
 
 func (p.*Parser) addContextToParseTree() {
 	// add current context to parent if we have a parent
-	if (p._ctx.parentCtx !== nil) {
+	if (p._ctx.parentCtx != nil) {
 		p._ctx.parentCtx.addChild(p._ctx)
 	}
 }
@@ -401,7 +401,7 @@ func (p.*Parser) enterRule(localctx, state, ruleIndex) {
 	if (p.buildParseTrees) {
 		p.addContextToParseTree()
 	}
-	if (p._parseListeners !== nil) {
+	if (p._parseListeners != nil) {
 		p.triggerEnterRuleEvent()
 	}
 }
@@ -409,7 +409,7 @@ func (p.*Parser) enterRule(localctx, state, ruleIndex) {
 func (p.*Parser) exitRule() {
 	p._ctx.stop = p._input.LT(-1)
 	// trigger event on _ctx, before it reverts to parent
-	if (p._parseListeners !== nil) {
+	if (p._parseListeners != nil) {
 		p.triggerExitRuleEvent()
 	}
 	p.state = p._ctx.invokingState
@@ -419,8 +419,8 @@ func (p.*Parser) exitRule() {
 func (p.*Parser) enterOuterAlt(localctx, altNum) {
 	// if we have new localctx, make sure we replace existing ctx
 	// that is previous child of parse tree
-	if (p.buildParseTrees && p._ctx !== localctx) {
-		if (p._ctx.parentCtx !== nil) {
+	if (p.buildParseTrees && p._ctx != localctx) {
+		if (p._ctx.parentCtx != nil) {
 			p._ctx.parentCtx.removeLastChild()
 			p._ctx.parentCtx.addChild(localctx)
 		}
@@ -447,7 +447,7 @@ func (p.*Parser) enterRecursionRule(localctx, state, ruleIndex,
 	p._precedenceStack.push(precedence)
 	p._ctx = localctx
 	p._ctx.start = p._input.LT(1)
-	if (p._parseListeners !== nil) {
+	if (p._parseListeners != nil) {
 		p.triggerEnterRuleEvent() // simulates rule entry for
 										// left-recursive rules
 	}
@@ -467,7 +467,7 @@ func (p.*Parser) pushNewRecursionContext(localctx, state, ruleIndex) {
 	if (p.buildParseTrees) {
 		p._ctx.addChild(previous)
 	}
-	if (p._parseListeners !== nil) {
+	if (p._parseListeners != nil) {
 		p.triggerEnterRuleEvent() // simulates rule entry for
 										// left-recursive rules
 	}
@@ -478,8 +478,8 @@ func (p.*Parser) unrollRecursionContexts(parentCtx) {
 	p._ctx.stop = p._input.LT(-1)
 	var retCtx = p._ctx // save current ctx (return value)
 	// unroll so _ctx is as it was before call to recursive method
-	if (p._parseListeners !== nil) {
-		while (p._ctx !== parentCtx) {
+	if (p._parseListeners != nil) {
+		while (p._ctx != parentCtx) {
 			p.triggerExitRuleEvent()
 			p._ctx = p._ctx.parentCtx
 		}
@@ -488,7 +488,7 @@ func (p.*Parser) unrollRecursionContexts(parentCtx) {
 	}
 	// hook into tree
 	retCtx.parentCtx = parentCtx
-	if (p.buildParseTrees && parentCtx !== nil) {
+	if (p.buildParseTrees && parentCtx != nil) {
 		// add return ctx into invoking rule's tree
 		parentCtx.addChild(retCtx)
 	}
@@ -496,7 +496,7 @@ func (p.*Parser) unrollRecursionContexts(parentCtx) {
 
 func (p.*Parser) getInvokingContext(ruleIndex) {
 	var ctx = p._ctx
-	while (ctx !== nil) {
+	while (ctx != nil) {
 		if (ctx.ruleIndex == ruleIndex) {
 			return ctx
 		}
@@ -539,7 +539,7 @@ func (p.*Parser) isExpectedToken(symbol) {
 	if (!following.contains(Token.EPSILON)) {
 		return false
 	}
-	while (ctx !== nil && ctx.invokingState >= 0 && following.contains(Token.EPSILON)) {
+	while (ctx != nil && ctx.invokingState >= 0 && following.contains(Token.EPSILON)) {
 		var invokingState = atn.states[ctx.invokingState]
 		var rt = invokingState.transitions[0]
 		following = atn.nextTokens(rt.followState)
@@ -574,7 +574,7 @@ func (p.*Parser) getExpectedTokensWithinCurrentRule() {
 // Get a rule's index (i.e., {@code RULE_ruleName} field) or -1 if not found.//
 func (p.*Parser) getRuleIndex(ruleName) {
 	var ruleIndex = p.getRuleIndexMap()[ruleName]
-	if (ruleIndex !== nil) {
+	if (ruleIndex != nil) {
 		return ruleIndex
 	} else {
 		return -1
@@ -594,7 +594,7 @@ func (p.*Parser) getRuleInvocationStack(p) {
 		p = p._ctx
 	}
 	var stack = []
-	while (p !== nil) {
+	while (p != nil) {
 		// compute what follows who invoked us
 		var ruleIndex = p.ruleIndex
 		if (ruleIndex < 0) {
@@ -646,7 +646,7 @@ func (p.*Parser) setTrace(trace) {
 		p.removeParseListener(p._tracer)
 		p._tracer = nil
 	} else {
-		if (p._tracer !== nil) {
+		if (p._tracer != nil) {
 			p.removeParseListener(p._tracer)
 		}
 		p._tracer = new TraceListener(p.

@@ -63,7 +63,7 @@ func (this *ATN) nextTokensInContext(s, ctx) {
 // staying in same rule. {@link Token//EPSILON} is in set if we reach end of
 // rule.
 func (this *ATN) nextTokensNoContext(s) {
-    if (s.nextTokenWithinRule !== nil ) {
+    if (s.nextTokenWithinRule != nil ) {
         return s.nextTokenWithinRule
     }
     s.nextTokenWithinRule = this.nextTokensInContext(s, nil)
@@ -80,7 +80,7 @@ func (this *ATN) nextTokens(s, ctx) {
 }
 
 func (this *ATN) addState( state) {
-    if ( state !== nil ) {
+    if ( state != nil ) {
         state.atn = this
         state.stateNumber = this.states.length
     }
@@ -137,7 +137,7 @@ func (this *ATN) getExpectedTokens( stateNumber, ctx ) {
     var expected = new IntervalSet()
     expected.addSet(following)
     expected.removeOne(Token.EPSILON)
-    while (ctx !== nil && ctx.invokingState >= 0 && following.contains(Token.EPSILON)) {
+    while (ctx != nil && ctx.invokingState >= 0 && following.contains(Token.EPSILON)) {
         var invokingState = this.states[ctx.invokingState]
         var rt = invokingState.transitions[0]
         following = this.nextTokens(rt.followState)

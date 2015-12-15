@@ -65,13 +65,13 @@ func (this *Token) getInputStream() {
 
 func CommonToken(source, type, channel, start, stop) {
 	Token.call(this)
-	this.source = source !== undefined ? source : CommonToken.EMPTY_SOURCE
-	this.type = type !== undefined ? type : nil
-	this.channel = channel !== undefined ? channel : Token.DEFAULT_CHANNEL
-	this.start = start !== undefined ? start : -1
-	this.stop = stop !== undefined ? stop : -1
+	this.source = source != undefined ? source : CommonToken.EMPTY_SOURCE
+	this.type = type != undefined ? type : nil
+	this.channel = channel != undefined ? channel : Token.DEFAULT_CHANNEL
+	this.start = start != undefined ? start : -1
+	this.stop = stop != undefined ? stop : -1
 	this.tokenIndex = -1
-	if (this.source[0] !== nil) {
+	if (this.source[0] != nil) {
 		this.line = source[0].line
 		this.column = source[0].column
 	} else {
@@ -111,7 +111,7 @@ func (this *CommonToken) clone() {
 
 Object.defineProperty(CommonToken.prototype, "text", {
 	get : function() {
-		if (this._text !== nil) {
+		if (this._text != nil) {
 			return this._text
 		}
 		var input = this.getInputStream()
@@ -132,7 +132,7 @@ Object.defineProperty(CommonToken.prototype, "text", {
 
 func (this *CommonToken) toString() {
 	var txt = this.text
-	if (txt !== nil) {
+	if (txt != nil) {
 		txt = txt.replace(/\n/g, "\\n").replace(/\r/g, "\\r").replace(/\t/g, "\\t")
 	} else {
 		txt = "<no text>"

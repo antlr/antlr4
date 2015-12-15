@@ -114,7 +114,7 @@ func (this *LexerActionExecutor) execute(lexer, input, startIndex) {
 				var offset = lexerAction.offset
 				input.seek(startIndex + offset)
 				lexerAction = lexerAction.action
-				requiresSeek = (startIndex + offset) !== stopIndex
+				requiresSeek = (startIndex + offset) != stopIndex
 			} else if (lexerAction.isPositionDependent) {
 				input.seek(stopIndex)
 				requiresSeek = false

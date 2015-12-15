@@ -131,7 +131,7 @@ func (this *ATNState) addTransition(trans, index) {
 	}
     if (this.transitions.length==0) {
         this.epsilonOnlyTransitions = trans.isEpsilon
-    } else if(this.epsilonOnlyTransitions !== trans.isEpsilon) {
+    } else if(this.epsilonOnlyTransitions != trans.isEpsilon) {
         this.epsilonOnlyTransitions = false
     }
     if (index==-1) {

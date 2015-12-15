@@ -41,7 +41,7 @@ RuleContext.prototype.constructor = RuleContext
 func (this *RuleContext) depth() {
 	var n = 0
 	var p = this
-	while (p !== nil) {
+	while (p != nil) {
 		p = p.parentCtx
 		n += 1
 	}
@@ -115,7 +115,7 @@ func (this *RuleContext) toString(ruleNames, stop) {
 	stop = stop || nil
 	var p = this
 	var s = "["
-	while (p !== nil && p !== stop) {
+	while (p != nil && p != stop) {
 		if (ruleNames == nil) {
 			if (!p.isEmpty()) {
 				s += p.invokingState
@@ -126,7 +126,7 @@ func (this *RuleContext) toString(ruleNames, stop) {
 					: "" + ri
 			s += ruleName
 		}
-		if (p.parentCtx !== nil && (ruleNames !== nil || !p.parentCtx.isEmpty())) {
+		if (p.parentCtx != nil && (ruleNames != nil || !p.parentCtx.isEmpty())) {
 			s += " "
 		}
 		p = p.parentCtx

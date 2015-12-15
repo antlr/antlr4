@@ -132,7 +132,7 @@ func (this *ATNDeserializer) reset(data) {
 
 func (this *ATNDeserializer) checkVersion() {
     var version = this.readInt()
-    if ( version !== SERIALIZED_VERSION ) {
+    if ( version != SERIALIZED_VERSION ) {
         throw ("Could not deserialize ATN with version " + version + " (expected " + SERIALIZED_VERSION + ").")
     }
 }
@@ -249,7 +249,7 @@ func (this *ATNDeserializer) readSets(atn) {
         sets.push(iset)
         var n = this.readInt()
         var containsEof = this.readInt()
-        if (containsEof!==0) {
+        if (containsEof!=0) {
             iset.addOne(-1)
         }
         for (var j=0 j<n j++) {
@@ -304,7 +304,7 @@ func (this *ATNDeserializer) readEdges(atn, sets) {
             }
             // block end states can only be associated to a single block start
 			// state
-            if ( state.endState.startState !== nil) {
+            if ( state.endState.startState != nil) {
                 throw ("IllegalState")
             }
             state.endState.startState = state
@@ -438,7 +438,7 @@ func (this *ATNDeserializer) generateRuleBypassTransition(atn, idx) {
 }
 
 func (this *ATNDeserializer) stateIsEndStateFor(state, idx) {
-    if ( state.ruleIndex !== idx) {
+    if ( state.ruleIndex != idx) {
         return nil
     }
     if (!( state instanceof StarLoopEntryState)) {
@@ -497,9 +497,9 @@ func (this *ATNDeserializer) verifyATN(atn) {
         }
         this.checkCondition(state.epsilonOnlyTransitions || state.transitions.length <= 1)
         if (state instanceof PlusBlockStartState) {
-            this.checkCondition(state.loopBackState !== nil)
+            this.checkCondition(state.loopBackState != nil)
         } else  if (state instanceof StarLoopEntryState) {
-            this.checkCondition(state.loopBackState !== nil)
+            this.checkCondition(state.loopBackState != nil)
             this.checkCondition(state.transitions.length == 2)
             if (state.transitions[0].target instanceof StarBlockStartState) {
                 this.checkCondition(state.transitions[1].target instanceof LoopEndState)
@@ -514,13 +514,13 @@ func (this *ATNDeserializer) verifyATN(atn) {
             this.checkCondition(state.transitions.length == 1)
             this.checkCondition(state.transitions[0].target instanceof StarLoopEntryState)
         } else if (state instanceof LoopEndState) {
-            this.checkCondition(state.loopBackState !== nil)
+            this.checkCondition(state.loopBackState != nil)
         } else if (state instanceof RuleStartState) {
-            this.checkCondition(state.stopState !== nil)
+            this.checkCondition(state.stopState != nil)
         } else if (state instanceof BlockStartState) {
-            this.checkCondition(state.endState !== nil)
+            this.checkCondition(state.endState != nil)
         } else if (state instanceof BlockEndState) {
-            this.checkCondition(state.startState !== nil)
+            this.checkCondition(state.startState != nil)
         } else if (state instanceof DecisionState) {
             this.checkCondition(state.transitions.length <= 1 || state.decision >= 0)
         } else {
@@ -588,17 +588,17 @@ ATNDeserializer.prototype.edgeFactory = function(atn, type, src, trg, arg1, arg2
     case Transition.EPSILON:
         return new EpsilonTransition(target)
     case Transition.RANGE:
-        return arg3 !== 0 ? new RangeTransition(target, Token.EOF, arg2) : new RangeTransition(target, arg1, arg2)
+        return arg3 != 0 ? new RangeTransition(target, Token.EOF, arg2) : new RangeTransition(target, arg1, arg2)
     case Transition.RULE:
         return new RuleTransition(atn.states[arg1], arg2, arg3, target)
     case Transition.PREDICATE:
-        return new PredicateTransition(target, arg1, arg2, arg3 !== 0)
+        return new PredicateTransition(target, arg1, arg2, arg3 != 0)
     case Transition.PRECEDENCE:
         return new PrecedencePredicateTransition(target, arg1)
     case Transition.ATOM:
-        return arg3 !== 0 ? new AtomTransition(target, Token.EOF) : new AtomTransition(target, arg1)
+        return arg3 != 0 ? new AtomTransition(target, Token.EOF) : new AtomTransition(target, arg1)
     case Transition.ACTION:
-        return new ActionTransition(target, arg1, arg2, arg3 !== 0)
+        return new ActionTransition(target, arg1, arg2, arg3 != 0)
     case Transition.SET:
         return new SetTransition(target, sets[arg1])
     case Transition.NOT_SET:
@@ -632,7 +632,7 @@ func (this *ATNDeserializer) stateFactory(type, ruleIndex) {
         throw("The specified state type " + type + " is not valid.")
     } else {
         var s = this.stateFactories[type]()
-        if (s!==nil) {
+        if (s!=nil) {
             s.ruleIndex = ruleIndex
             return s
         }

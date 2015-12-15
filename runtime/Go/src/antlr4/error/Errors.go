@@ -29,7 +29,7 @@ func RecognitionException(params) {
     // {@link DecisionState} number. For others, it is the state whose outgoing
     // edge we couldn't match.
     this.offendingState = -1
-    if (this.recognizer!==nil) {
+    if (this.recognizer!=nil) {
         this.offendingState = this.recognizer.state
     }
     return this
@@ -51,7 +51,7 @@ RecognitionException.prototype.constructor = RecognitionException
 // state in the ATN, or {@code nil} if the information is not available.
 // /
 func (this *RecognitionException) getExpectedTokens() {
-    if (this.recognizer!==nil) {
+    if (this.recognizer!=nil) {
         return this.recognizer.atn.getExpectedTokens(this.offendingState, this.ctx)
     } else {
         return nil
@@ -142,7 +142,7 @@ FailedPredicateException.prototype = Object.create(RecognitionException.prototyp
 FailedPredicateException.prototype.constructor = FailedPredicateException
 
 func (this *FailedPredicateException) formatMessage(predicate, message) {
-    if (message !==nil) {
+    if (message !=nil) {
         return message
     } else {
         return "failed predicate: {" + predicate + "}?"

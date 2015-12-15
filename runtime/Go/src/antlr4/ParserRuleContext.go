@@ -84,7 +84,7 @@ func (this *ParserRuleContext) addChild(child) {
 // generic ruleContext object.
 // /
 func (this *ParserRuleContext) removeLastChild() {
-    if (this.children !== nil) {
+    if (this.children != nil) {
         this.children.pop()
     }
 }

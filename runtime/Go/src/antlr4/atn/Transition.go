@@ -218,7 +218,7 @@ func (this *ActionTransition) toString() {
 func SetTransition(target, set) {
 	Transition.call(this, target)
 	this.serializationType = Transition.SET
-    if (set !==undefined && set !==nil) {
+    if (set !=undefined && set !=nil) {
         this.label = set
     } else {
         this.label = new IntervalSet()

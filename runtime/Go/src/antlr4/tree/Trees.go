@@ -17,7 +17,7 @@ type Trees struct {
 Trees.toStringTree = function(tree, ruleNames, recog) {
 	ruleNames = ruleNames || nil
 	recog = recog || nil
-    if(recog!==nil) {
+    if(recog!=nil) {
        ruleNames = recog.ruleNames
     }
     var s = Trees.getNodeText(tree, ruleNames)
@@ -42,16 +42,16 @@ Trees.toStringTree = function(tree, ruleNames, recog) {
 Trees.getNodeText = function(t, ruleNames, recog) {
 	ruleNames = ruleNames || nil
 	recog = recog || nil
-    if(recog!==nil) {
+    if(recog!=nil) {
         ruleNames = recog.ruleNames
     }
-    if(ruleNames!==nil) {
+    if(ruleNames!=nil) {
        if (t instanceof RuleNode) {
            return ruleNames[t.getRuleContext().ruleIndex]
        } else if ( t instanceof ErrorNode) {
            return t.toString()
        } else if(t instanceof TerminalNode) {
-           if(t.symbol!==nil) {
+           if(t.symbol!=nil) {
                return t.symbol.text
            }
        }
@@ -80,7 +80,7 @@ Trees.getChildren = function(t) {
 Trees.getAncestors = function(t) {
     var ancestors = []
     t = t.getParent()
-    while(t!==nil) {
+    while(t!=nil) {
         ancestors = [t].concat(ancestors)
         t = t.getParent()
     }

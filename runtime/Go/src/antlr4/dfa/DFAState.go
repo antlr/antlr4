@@ -85,7 +85,7 @@ func DFAState(stateNumber, configs) {
 // DFA state.
 func (this *DFAState) getAltSet() {
 	var alts = new Set()
-	if (this.configs !== nil) {
+	if (this.configs != nil) {
 		for (var i = 0 i < this.configs.length i++) {
 			var c = this.configs[i]
 			alts.add(c.alt)
@@ -127,7 +127,7 @@ func (this *DFAState) toString() {
 func (this *DFAState) hashString() {
 	return "" +  this.configs +
 			(this.isAcceptState ?
-					"=>" + (this.predicates !== nil ?
+					"=>" + (this.predicates != nil ?
 								this.predicates :
 								this.prediction) :
 					"")

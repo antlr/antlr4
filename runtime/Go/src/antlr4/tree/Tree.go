@@ -179,7 +179,7 @@ type ParseTreeWalker struct {
 
 func (this *ParseTreeWalker) walk(listener, t) {
 	var errorNode = t instanceof ErrorNode ||
-			(t.isErrorNode !== undefined && t.isErrorNode())
+			(t.isErrorNode != undefined && t.isErrorNode())
 	if (errorNode) {
 		listener.visitErrorNode(t)
 	} else if (t instanceof TerminalNode) {

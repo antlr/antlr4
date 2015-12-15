@@ -14,10 +14,9 @@ type Recognizer struct {
 Recognizer.tokenTypeMapCache = {}
 Recognizer.ruleIndexMapCache = {}
 
-
 func (this *Recognizer) checkVersion(toolVersion) {
     var runtimeVersion = "4.5.1"
-    if (runtimeVersion!==toolVersion) {
+    if (runtimeVersion!=toolVersion) {
         console.log("ANTLR runtime and generated code versions disagree: "+runtimeVersion+"!="+toolVersion)
     }
 }
@@ -63,7 +62,7 @@ func (this *Recognizer) getRuleIndexMap() {
 
 func (this *Recognizer) getTokenType(tokenName) {
     var ttype = this.getTokenTypeMap()[tokenName]
-    if (ttype !==undefined) {
+    if (ttype !=undefined) {
         return ttype
     } else {
         return Token.INVALID_TYPE

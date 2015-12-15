@@ -88,7 +88,7 @@ LL1func (this *Analyzer) LOOK(s, stopState, ctx) {
     var r = new IntervalSet()
     var seeThruPreds = true // ignore preds get all lookahead
 	ctx = ctx || nil
-    var lookContext = ctx!==nil ? predictionContextFromRuleContext(s.atn, ctx) : nil
+    var lookContext = ctx!=nil ? predictionContextFromRuleContext(s.atn, ctx) : nil
     this._LOOK(s, stopState, lookContext, r, new Set(), new BitSet(), seeThruPreds, true)
     return r
 }
@@ -146,7 +146,7 @@ LL1func (this *Analyzer) _LOOK(s, stopState , ctx, look, lookBusy, calledRuleSta
             look.addOne(Token.EOF)
             return
         }
-        if (ctx !== PredictionContext.EMPTY) {
+        if (ctx != PredictionContext.EMPTY) {
             // run thru all possible stack tops in ctx
             for(var i=0 i<ctx.length i++) {
                 var returnState = this.atn.states[ctx.getReturnState(i)]
@@ -188,7 +188,7 @@ LL1func (this *Analyzer) _LOOK(s, stopState , ctx, look, lookBusy, calledRuleSta
             look.addRange( Token.MIN_USER_TOKEN_TYPE, this.atn.maxTokenType )
         } else {
             var set = t.label
-            if (set !== nil) {
+            if (set != nil) {
                 if (t instanceof NotSetTransition) {
                     set = set.complement(Token.MIN_USER_TOKEN_TYPE, this.atn.maxTokenType)
                 }

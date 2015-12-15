@@ -87,7 +87,7 @@ func (this *ATNConfigSet) add(config, mergeCache) {
 	if (this.readOnly) {
 		throw "This set is readonly"
 	}
-	if (config.semanticContext !== SemanticContext.NONE) {
+	if (config.semanticContext != SemanticContext.NONE) {
 		this.hasSemanticContext = true
 	}
 	if (config.reachesIntoOuterContext > 0) {
@@ -126,7 +126,7 @@ func (this *ATNConfigSet) getPredicates() {
 	var preds = []
 	for (var i = 0 i < this.configs.length i++) {
 		var c = this.configs[i].semanticContext
-		if (c !== SemanticContext.NONE) {
+		if (c != SemanticContext.NONE) {
 			preds.push(c.semanticContext)
 		}
 	}
@@ -165,7 +165,7 @@ func (this *ATNConfigSet) equals(other) {
 	} else if (!(other instanceof ATNConfigSet)) {
 		return false
 	}
-	return this.configs !== nil && this.configs.equals(other.configs) &&
+	return this.configs != nil && this.configs.equals(other.configs) &&
 			this.fullCtx == other.fullCtx &&
 			this.uniqueAlt == other.uniqueAlt &&
 			this.conflictingAlts == other.conflictingAlts &&
@@ -235,8 +235,8 @@ func (this *ATNConfigSet) setReadonly(readOnly) {
 func (this *ATNConfigSet) toString() {
 	return Utils.arrayToString(this.configs) +
 		(this.hasSemanticContext ? ",hasSemanticContext=" + this.hasSemanticContext : "") +
-		(this.uniqueAlt !== ATN.INVALID_ALT_NUMBER ? ",uniqueAlt=" + this.uniqueAlt : "") +
-		(this.conflictingAlts !== nil ? ",conflictingAlts=" + this.conflictingAlts : "") +
+		(this.uniqueAlt != ATN.INVALID_ALT_NUMBER ? ",uniqueAlt=" + this.uniqueAlt : "") +
+		(this.conflictingAlts != nil ? ",conflictingAlts=" + this.conflictingAlts : "") +
 		(this.dipsIntoOuterContext ? ",dipsIntoOuterContext" : "")
 }
 

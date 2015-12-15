@@ -94,7 +94,7 @@ func (this *DFA) setPrecedenceStartState(precedence, startState) {
 // {@code false}
 
 func (this *DFA) setPrecedenceDfa(precedenceDfa) {
-	if (this.precedenceDfa!==precedenceDfa) {
+	if (this.precedenceDfa!=precedenceDfa) {
 		this._states = new DFAStatesSet()
 		if (precedenceDfa) {
 			var precedenceState = new DFAState(new ATNConfigSet())

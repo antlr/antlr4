@@ -440,7 +440,7 @@ PredictionMode.allSubsetsEqual = function(altsets) {
 		var alts = altsets[i]
         if (first == nil) {
             first = alts
-        } else if (alts!==first) {
+        } else if (alts!=first) {
             return false
         }
 	}
@@ -499,7 +499,7 @@ PredictionMode.getConflictingAltSubsets = function(configs) {
 	}
 	var values = []
 	for(var k in configToAlts) {
-		if(k.indexOf("key_")!==0) {
+		if(k.indexOf("key_")!=0) {
 			continue
 		}
 		values.push(configToAlts[k])
@@ -545,7 +545,7 @@ PredictionMode.getSingleViableAlt = function(altsets) {
         var minAlt = alts.minValue()
         if(result==nil) {
             result = minAlt
-        } else if(result!==minAlt) { // more than 1 viable alt
+        } else if(result!=minAlt) { // more than 1 viable alt
             return ATN.INVALID_ALT_NUMBER
         }
 	}

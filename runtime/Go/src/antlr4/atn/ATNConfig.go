@@ -37,15 +37,15 @@ func ATNConfig(params, config) {
 	params = checkParams(params)
 	config = checkParams(config, true)
     // The ATN state associated with this configuration///
-    this.state = params.state!==nil ? params.state : config.state
+    this.state = params.state!=nil ? params.state : config.state
     // What alt (or lexer rule) is predicted by this configuration///
-    this.alt = params.alt!==nil ? params.alt : config.alt
+    this.alt = params.alt!=nil ? params.alt : config.alt
     // The stack of invoking states leading to the rule/states associated
     //  with this config.  We track only those contexts pushed during
     //  execution of the ATN simulator.
-    this.context = params.context!==nil ? params.context : config.context
-    this.semanticContext = params.semanticContext!==nil ? params.semanticContext :
-        (config.semanticContext!==nil ? config.semanticContext : SemanticContext.NONE)
+    this.context = params.context!=nil ? params.context : config.context
+    this.semanticContext = params.semanticContext!=nil ? params.semanticContext :
+        (config.semanticContext!=nil ? config.semanticContext : SemanticContext.NONE)
     // We cannot execute predicates dependent upon local context unless
     // we know for sure we are in the correct context. Because there is
     // no way to do this efficiently, we simply cannot evaluate
@@ -97,8 +97,8 @@ func (this *ATNConfig) hashString() {
 
 func (this *ATNConfig) toString() {
     return "(" + this.state + "," + this.alt +
-        (this.context!==nil ? ",[" + this.context.toString() + "]" : "") +
-        (this.semanticContext !== SemanticContext.NONE ?
+        (this.context!=nil ? ",[" + this.context.toString() + "]" : "") +
+        (this.semanticContext != SemanticContext.NONE ?
                 ("," + this.semanticContext.toString())
                 : "") +
         (this.reachesIntoOuterContext>0 ?
@@ -112,8 +112,8 @@ func LexerATNConfig(params, config) {
     
     // This is the backing field for {@link //getLexerActionExecutor}.
 	var lexerActionExecutor = params.lexerActionExecutor || nil
-    this.lexerActionExecutor = lexerActionExecutor || (config!==nil ? config.lexerActionExecutor : nil)
-    this.passedThroughNonGreedyDecision = config!==nil ? this.checkNonGreedyDecision(config, this.state) : false
+    this.lexerActionExecutor = lexerActionExecutor || (config!=nil ? config.lexerActionExecutor : nil)
+    this.passedThroughNonGreedyDecision = config!=nil ? this.checkNonGreedyDecision(config, this.state) : false
     return this
 }
 
@@ -131,7 +131,7 @@ func (this *LexerATNConfig) equals(other) {
         return true
     } else if (!(other instanceof LexerATNConfig)) {
         return false
-    } else if (this.passedThroughNonGreedyDecision !== other.passedThroughNonGreedyDecision) {
+    } else if (this.passedThroughNonGreedyDecision != other.passedThroughNonGreedyDecision) {
         return false
     } else if (this.lexerActionExecutor ?
             !this.lexerActionExecutor.equals(other.lexerActionExecutor)

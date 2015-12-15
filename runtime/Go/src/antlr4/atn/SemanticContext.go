@@ -254,11 +254,11 @@ func (this *AND) evalPrecedence(parser, outerContext) {
 	for (var i = 0 i < this.opnds.length i++) {
 		var context = this.opnds[i]
 		var evaluated = context.evalPrecedence(parser, outerContext)
-		differs |= (evaluated !== context)
+		differs |= (evaluated != context)
 		if (evaluated == nil) {
 			// The AND context is false if any element is false
 			return nil
-		} else if (evaluated !== SemanticContext.NONE) {
+		} else if (evaluated != SemanticContext.NONE) {
 			// Reduce the result by skipping true elements
 			operands.push(evaluated)
 		}
@@ -356,11 +356,11 @@ func (this *OR) evalPrecedence(parser, outerContext) {
 	for (var i = 0 i < this.opnds.length i++) {
 		var context = this.opnds[i]
 		var evaluated = context.evalPrecedence(parser, outerContext)
-		differs |= (evaluated !== context)
+		differs |= (evaluated != context)
 		if (evaluated == SemanticContext.NONE) {
 			// The OR context is true if any element is true
 			return SemanticContext.NONE
-		} else if (evaluated !== nil) {
+		} else if (evaluated != nil) {
 			// Reduce the result by skipping false elements
 			operands.push(evaluated)
 		}

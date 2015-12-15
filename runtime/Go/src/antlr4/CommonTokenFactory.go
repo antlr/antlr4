@@ -48,9 +48,9 @@ func (this *CommonTokenFactory) create(source, type, text, channel, start, stop,
     var t = new CommonToken(source, type, channel, start, stop)
     t.line = line
     t.column = column
-    if (text !==nil) {
+    if (text !=nil) {
         t.text = text
-    } else if (this.copyText && source[1] !==nil) {
+    } else if (this.copyText && source[1] !=nil) {
         t.text = source[1].getText(start,stop)
     }
     return t

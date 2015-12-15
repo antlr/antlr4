@@ -93,7 +93,7 @@ func (this *DiagnosticErrorListener) getDecisionDescription(recognizer, dfa) {
 // returns the set of alternatives represented in {@code configs}.
 //
 func (this *DiagnosticErrorListener) getConflictingAlts(reportedAlts, configs) {
-	if (reportedAlts !== nil) {
+	if (reportedAlts != nil) {
 		return reportedAlts
 	}
 	var result = new BitSet()
