@@ -252,7 +252,7 @@ func (this *ArrayPredictionContext) toString() {
 		return "[]"
 	} else {
 		var s = "["
-		for (var i = 0 i < this.returnStates.length i++) {
+		for i := 0; i < len(this.returnStates); i++ {
 			if (i > 0) {
 				s = s + ", "
 			}
@@ -575,13 +575,13 @@ func mergeArrays(a, b, rootIsWildcard, mergeCache) {
 	}
 	// copy over any payloads remaining in either array
 	if (i < a.returnStates.length) {
-		for (var p = i p < a.returnStates.length p++) {
+		for p := i p < a.returnStates.length p++) {
 			mergedParents[k] = a.parents[p]
 			mergedReturnStates[k] = a.returnStates[p]
 			k += 1
 		}
 	} else {
-		for (var p = j p < b.returnStates.length p++) {
+		for p := j p < b.returnStates.length p++) {
 			mergedParents[k] = b.parents[p]
 			mergedReturnStates[k] = b.returnStates[p]
 			k += 1
@@ -632,13 +632,13 @@ func mergeArrays(a, b, rootIsWildcard, mergeCache) {
 func combineCommonParents(parents) {
 	var uniqueParents = {}
 
-	for (var p = 0 p < parents.length p++) {
+	for p := 0; p < len(parents); p++ {
 		var parent = parents[p]
 		if (!(parent in uniqueParents)) {
 			uniqueParents[parent] = parent
 		}
 	}
-	for (var q = 0 q < parents.length q++) {
+	for q := 0; q < len(parents); q++ {
 		parents[q] = uniqueParents[parents[q]]
 	}
 }
@@ -658,12 +658,12 @@ func getCachedPredictionContext(context, contextCache, visited) {
 	}
 	var changed = false
 	var parents = []
-	for (var i = 0 i < parents.length i++) {
+	for i := 0; i < len(parents); i++ {
 		var parent = getCachedPredictionContext(context.getParent(i), contextCache, visited)
 		if (changed || parent != context.getParent(i)) {
 			if (!changed) {
 				parents = []
-				for (var j = 0 j < context.length j++) {
+				for j := 0; j < len(context); j++ {
 					parents[j] = context.getParent(j)
 				}
 				changed = true
@@ -706,7 +706,7 @@ func getAllContextNodes(context, nodes, visited) {
 		}
 		visited[context] = context
 		nodes.push(context)
-		for (var i = 0 i < context.length i++) {
+		for i := 0; i < len(context); i++ {
 			getAllContextNodes(context.getParent(i), nodes, visited)
 		}
 		return nodes

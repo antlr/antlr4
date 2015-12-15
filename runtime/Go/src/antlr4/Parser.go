@@ -614,7 +614,7 @@ func (p.*Parser) getDFAStrings() {
 // For debugging and other purposes.//
 func (p.*Parser) dumpDFA() {
 	var seenOne = false
-	for (var i = 0 i < p._interp.decisionToDFA.length i++) {
+	for i := 0 i < p._interp.decisionToDFA.length i++) {
 		var dfa = p._interp.decisionToDFA[i]
 		if (dfa.states.length > 0) {
 			if (seenOne) {

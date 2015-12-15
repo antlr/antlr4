@@ -97,7 +97,7 @@ func (this *DiagnosticErrorListener) getConflictingAlts(reportedAlts, configs) {
 		return reportedAlts
 	}
 	var result = NewBitSet()
-	for (var i = 0 i < configs.items.length i++) {
+	for i := 0; i < len(configs.items); i++ {
 		result.add(configs.items[i].alt)
 	}
 	return "{" + result.values().join(", ") + "}"

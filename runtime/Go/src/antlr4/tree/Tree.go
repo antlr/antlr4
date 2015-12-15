@@ -211,7 +211,7 @@ func (this *ParseTreeWalker) walk(listener, t) {
 		listener.visitTerminal(t)
 	} else {
 		this.enterRule(listener, t)
-		for (var i = 0 i < t.getChildCount() i++) {
+		for i := 0 i < t.getChildCount() i++) {
 			var child = t.getChild(i)
 			this.walk(listener, child)
 		}

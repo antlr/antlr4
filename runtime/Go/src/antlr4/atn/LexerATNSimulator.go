@@ -275,7 +275,7 @@ func (this *LexerATNSimulator) getReachableConfigSet(input, closure,
 	// this is used to skip processing for configs which have a lower priority
 	// than a config that already reached an accept state for the same rule
 	var skipAlt = ATN.INVALID_ALT_NUMBER
-	for (var i = 0 i < closure.items.length i++) {
+	for i := 0; i < len(closure.items); i++ {
 		var cfg = closure.items[i]
 		var currentAltReachedAcceptState = (cfg.alt == skipAlt)
 		if (currentAltReachedAcceptState && cfg.passedThroughNonGreedyDecision) {
@@ -285,7 +285,7 @@ func (this *LexerATNSimulator) getReachableConfigSet(input, closure,
 			console.log("testing %s at %s\n", this.getTokenName(t), cfg
 					.toString(this.recog, true))
 		}
-		for (var j = 0 j < cfg.state.transitions.length j++) {
+		for j := 0; j < len(cfg.state.transitions); j++ {
 			var trans = cfg.state.transitions[j] // for each transition
 			var target = this.getReachableTarget(trans, t)
 			if (target != nil) {
@@ -331,7 +331,7 @@ func (this *LexerATNSimulator) getReachableTarget(trans, t) {
 func (this *LexerATNSimulator) computeStartState(input, p) {
 	var initialContext = PredictionContext.EMPTY
 	var configs = NewOrderedATNConfigSet()
-	for (var i = 0 i < p.transitions.length i++) {
+	for i := 0; i < len(p.transitions); i++ {
 		var target = p.transitions[i].target
         var cfg = NewLexerATNConfig({state:target, alt:i+1, context:initialContext}, nil)
 		this.closure(input, cfg, configs, false, false, false)
@@ -371,7 +371,7 @@ func (this *LexerATNSimulator) closure(input, config, configs,
 			}
 		}
 		if (config.context != nil && !config.context.isEmpty()) {
-			for (var i = 0 i < config.context.length i++) {
+			for i := 0; i < len(config.context); i++ {
 				if (config.context.getReturnState(i) != PredictionContext.EMPTY_RETURN_STATE) {
 					var newContext = config.context.getParent(i) // "pop" return state
 					var returnState = this.atn.states[config.context.getReturnState(i)]
@@ -390,7 +390,7 @@ func (this *LexerATNSimulator) closure(input, config, configs,
 			configs.add(config)
 		}
 	}
-	for (var j = 0 j < config.state.transitions.length j++) {
+	for j := 0; j < len(config.state.transitions); j++ {
 		var trans = config.state.transitions[j]
 		cfg = this.getEpsilonTarget(input, config, trans, configs, speculative, treatEofAsEpsilon)
 		if (cfg != nil) {
@@ -574,7 +574,7 @@ func (this *LexerATNSimulator) addDFAEdge(from_, tk, to, cfgs) {
 func (this *LexerATNSimulator) addDFAState(configs) {
 	var proposed = NewDFAState(nil, configs)
 	var firstConfigWithRuleStopState = nil
-	for (var i = 0 i < configs.items.length i++) {
+	for i := 0; i < len(configs.items); i++ {
 		var cfg = configs.items[i]
 		if (cfg.state instanceof RuleStopState) {
 			firstConfigWithRuleStopState = cfg

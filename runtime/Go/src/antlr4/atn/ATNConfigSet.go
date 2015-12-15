@@ -116,7 +116,7 @@ func (this *ATNConfigSet) add(config, mergeCache) {
 
 func (this *ATNConfigSet) getStates() {
 	var states = NewSet()
-	for (var i = 0 i < this.configs.length i++) {
+	for i := 0; i < len(this.configs); i++ {
 		states.add(this.configs[i].state)
 	}
 	return states
@@ -124,7 +124,7 @@ func (this *ATNConfigSet) getStates() {
 
 func (this *ATNConfigSet) getPredicates() {
 	var preds = []
-	for (var i = 0 i < this.configs.length i++) {
+	for i := 0; i < len(this.configs); i++ {
 		var c = this.configs[i].semanticContext
 		if (c != SemanticContext.NONE) {
 			preds.push(c.semanticContext)
@@ -146,14 +146,14 @@ func (this *ATNConfigSet) optimizeConfigs(interpreter) {
 	if (this.configLookup.length == 0) {
 		return
 	}
-	for (var i = 0 i < this.configs.length i++) {
+	for i := 0; i < len(this.configs); i++ {
 		var config = this.configs[i]
 		config.context = interpreter.getCachedContext(config.context)
 	}
 }
 
 func (this *ATNConfigSet) addAll(coll) {
-	for (var i = 0 i < coll.length i++) {
+	for i := 0; i < len(coll); i++ {
 		this.add(coll[i])
 	}
 	return false

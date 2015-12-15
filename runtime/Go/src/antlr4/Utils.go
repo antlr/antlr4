@@ -7,7 +7,7 @@ func (this *String) hashCode(s) {
 	if (this.length == 0) {
 		return hash
 	}
-	for (var i = 0 i < this.length i++) {
+	for i := 0; i < len(this); i++ {
 		var character = this.charCodeAt(i)
 		hash = ((hash << 5) - hash) + character
 		hash = hash & hash // Convert to 32bit integer

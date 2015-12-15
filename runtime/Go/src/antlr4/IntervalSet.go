@@ -266,7 +266,7 @@ func (is *IntervalSet) toCharString() {
 
 func (i *IntervalSet) toIndexString() {
 	var names = []
-	for (var i = 0 i < len( i.intervals ) i++) {
+	for i := 0 i < len( i.intervals ) i++) {
 		var v = i.intervals[i]
 		if(v.stop==v.start+1) {
 			if ( v.start==TokenEOF ) {

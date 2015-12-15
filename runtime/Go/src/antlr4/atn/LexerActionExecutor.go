@@ -69,7 +69,7 @@ LexerActionExecutor.append = function(lexerActionExecutor, lexerAction) {
 // /
 func (this *LexerActionExecutor) fixOffsetBeforeMatch(offset) {
 	var updatedLexerActions = nil
-	for (var i = 0 i < this.lexerActions.length i++) {
+	for i := 0; i < len(this.lexerActions); i++ {
 		if (this.lexerActions[i].isPositionDependent &&
 				!(this.lexerActions[i] instanceof LexerIndexedCustomAction)) {
 			if (updatedLexerActions == nil) {
@@ -108,7 +108,7 @@ func (this *LexerActionExecutor) execute(lexer, input, startIndex) {
 	var requiresSeek = false
 	var stopIndex = input.index
 	try {
-		for (var i = 0 i < this.lexerActions.length i++) {
+		for i := 0; i < len(this.lexerActions); i++ {
 			var lexerAction = this.lexerActions[i]
 			if (lexerAction instanceof LexerIndexedCustomAction) {
 				var offset = lexerAction.offset

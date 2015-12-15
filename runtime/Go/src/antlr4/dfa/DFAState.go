@@ -86,7 +86,7 @@ func DFAState(stateNumber, configs) {
 func (this *DFAState) getAltSet() {
 	var alts = NewSet()
 	if (this.configs != nil) {
-		for (var i = 0 i < this.configs.length i++) {
+		for i := 0; i < len(this.configs); i++ {
 			var c = this.configs[i]
 			alts.add(c.alt)
 		}

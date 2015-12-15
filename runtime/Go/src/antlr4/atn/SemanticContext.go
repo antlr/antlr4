@@ -240,7 +240,7 @@ func (this *AND) hashString() {
 // unordered.</p>
 //
 func (this *AND) evaluate(parser, outerContext) {
-	for (var i = 0 i < this.opnds.length i++) {
+	for i := 0; i < len(this.opnds); i++ {
 		if (!this.opnds[i].evaluate(parser, outerContext)) {
 			return false
 		}
@@ -251,7 +251,7 @@ func (this *AND) evaluate(parser, outerContext) {
 func (this *AND) evalPrecedence(parser, outerContext) {
 	var differs = false
 	var operands = []
-	for (var i = 0 i < this.opnds.length i++) {
+	for i := 0; i < len(this.opnds); i++ {
 		var context = this.opnds[i]
 		var evaluated = context.evalPrecedence(parser, outerContext)
 		differs |= (evaluated != context)
@@ -342,7 +342,7 @@ func (this *OR) hashString() {
 // unordered.</p>
 //
 func (this *OR) evaluate(parser, outerContext) {
-	for (var i = 0 i < this.opnds.length i++) {
+	for i := 0; i < len(this.opnds); i++ {
 		if (this.opnds[i].evaluate(parser, outerContext)) {
 			return true
 		}
@@ -353,7 +353,7 @@ func (this *OR) evaluate(parser, outerContext) {
 func (this *OR) evalPrecedence(parser, outerContext) {
 	var differs = false
 	var operands = []
-	for (var i = 0 i < this.opnds.length i++) {
+	for i := 0; i < len(this.opnds); i++ {
 		var context = this.opnds[i]
 		var evaluated = context.evalPrecedence(parser, outerContext)
 		differs |= (evaluated != context)

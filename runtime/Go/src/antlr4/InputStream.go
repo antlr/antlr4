@@ -25,7 +25,7 @@ func NewInputStream(data string) *InputStream {
 func _loadString(stream) {
 	stream.index = 0
 	stream.data = []
-	for (var i = 0 i < stream.strdata.length i++) {
+	for i := 0; i < stream.strdata.length; i++) {
 		stream.data.push(stream.strdata.charCodeAt(i))
 	}
 	stream.size = stream.data.length
