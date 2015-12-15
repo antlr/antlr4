@@ -489,7 +489,7 @@ ParserATNSimulator.prototype.execATN = function(dfa, s0, input, startIndex, oute
         }
         previousD = D
 
-        if (t != Token.EOF) {
+        if (t != TokenEOF) {
             input.consume()
             t = input.LA(1)
         }
@@ -656,7 +656,7 @@ ParserATNSimulator.prototype.execATNWithFullContext = function(dfa, D, // how fa
             // So, keep going.
         }
         previous = reach
-        if( t != Token.EOF) {
+        if( t != TokenEOF) {
             input.consume()
             t = input.LA(1)
         }
@@ -728,7 +728,7 @@ func (this *ParserATNSimulator) computeReachSet(closure, t, fullCtx) {
             console.log("testing " + this.getTokenName(t) + " at " + c)
         }
         if (c.state instanceof RuleStopState) {
-            if (fullCtx || t == Token.EOF) {
+            if (fullCtx || t == TokenEOF) {
                 if (skippedStopStates==nil) {
                     skippedStopStates = []
                 }
@@ -763,7 +763,7 @@ func (this *ParserATNSimulator) computeReachSet(closure, t, fullCtx) {
     // condition is not true when one or more configurations have been
     // withheld in skippedStopStates, or when the current symbol is EOF.
     //
-    if (skippedStopStates==nil && t!=Token.EOF) {
+    if (skippedStopStates==nil && t!=TokenEOF) {
         if (intermediate.items.length==1) {
             // Don't pursue the closure if there is just one state.
             // It can only have one alternative just add to result
@@ -782,12 +782,12 @@ func (this *ParserATNSimulator) computeReachSet(closure, t, fullCtx) {
     if (reach==nil) {
         reach = NewATNConfigSet(fullCtx)
         var closureBusy = NewSet()
-        var treatEofAsEpsilon = t == Token.EOF
+        var treatEofAsEpsilon = t == TokenEOF
         for (var k=0 k<intermediate.items.lengthk++) {
             this.closure(intermediate.items[k], reach, closureBusy, false, fullCtx, treatEofAsEpsilon)
         }
     }
-    if (t == Token.EOF) {
+    if (t == TokenEOF) {
         // After consuming EOF no additional input is possible, so we are
         // only interested in configurations which reached the end of the
         // decision rule (local context) or end of the start rule (full
@@ -859,7 +859,7 @@ func (this *ParserATNSimulator) removeAllConfigsNotInRuleStopState(configs, look
         }
         if (lookToEndOfRule && config.state.epsilonOnlyTransitions) {
             var nextTokens = this.atn.nextTokens(config.state)
-            if (nextTokens.contains(Token.EPSILON)) {
+            if (nextTokens.contains(TokenEpsilon)) {
                 var endOfRuleState = this.atn.ruleToStopState[config.state.ruleIndex]
                 result.add(NewATNConfig({state:endOfRuleState}, config), this.mergeCache)
             }
@@ -1334,7 +1334,7 @@ func (this *ParserATNSimulator) getEpsilonTarget(config, t, collectPredicates, i
         // EOF transitions act like epsilon transitions after the first EOF
         // transition is traversed
         if (treatEofAsEpsilon) {
-            if (t.matches(Token.EOF, 0, 1)) {
+            if (t.matches(TokenEOF, 0, 1)) {
                 return NewATNConfig({state: t.target}, config)
             }
         }
@@ -1483,7 +1483,7 @@ func (this *ParserATNSimulator) getConflictingAltsOrUniqueAlt(configs) {
 }
 
 func (this *ParserATNSimulator) getTokenName( t) {
-    if (t==Token.EOF) {
+    if (t==TokenEOF) {
         return "EOF"
     }
     if( this.parser!=nil && this.parser.literalNames!=nil) {

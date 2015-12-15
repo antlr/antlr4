@@ -363,7 +363,7 @@ func (p.*Parser) notifyErrorListeners(msg, offendingToken, err) {
 //
 func (p.*Parser) consume() {
 	var o = p.getCurrentToken()
-	if (o.type != Token.EOF) {
+	if (o.type != TokenEOF) {
 		p.getInputStream().consume()
 	}
 	var hasListener = p._parseListeners != nil && p._parseListeners.length > 0
@@ -536,10 +536,10 @@ func (p.*Parser) isExpectedToken(symbol) {
 	if (following.contains(symbol)) {
 		return true
 	}
-	if (!following.contains(Token.EPSILON)) {
+	if (!following.contains(TokenEpsilon)) {
 		return false
 	}
-	while (ctx != nil && ctx.invokingState >= 0 && following.contains(Token.EPSILON)) {
+	while (ctx != nil && ctx.invokingState >= 0 && following.contains(TokenEpsilon)) {
 		var invokingState = atn.states[ctx.invokingState]
 		var rt = invokingState.transitions[0]
 		following = atn.nextTokens(rt.followState)
@@ -548,7 +548,7 @@ func (p.*Parser) isExpectedToken(symbol) {
 		}
 		ctx = ctx.parentCtx
 	}
-	if (following.contains(Token.EPSILON) && symbol == Token.EOF) {
+	if (following.contains(TokenEpsilon) && symbol == TokenEOF) {
 		return true
 	} else {
 		return false

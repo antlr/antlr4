@@ -42,7 +42,7 @@ func (is *InputStream) reset() {
 
 func (is *InputStream) consume() {
 	if (is.index >= is.size) {
-		// assert is.LA(1) == Token.EOF
+		// assert is.LA(1) == TokenEOF
 		panic ("cannot consume EOF")
 	}
 	is.index += 1
@@ -57,7 +57,7 @@ func (is *InputStream) LA(offset int) {
 	}
 	var pos = is.index + offset - 1
 	if (pos < 0 || pos >= is.size) { // invalid
-		return Token.EOF
+		return TokenEOF
 	}
 	return is.data[pos]
 }

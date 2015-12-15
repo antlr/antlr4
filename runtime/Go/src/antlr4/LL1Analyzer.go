@@ -34,7 +34,7 @@ func NewLL1Analyzer (atn) *LL1Analyzer {
 //* Special value added to the lookahead sets to indicate that we hit
 //  a predicate during analysis if {@code seeThruPreds==false}.
 ///
-LL1Analyzer.HIT_PRED = Token.INVALID_TYPE
+LL1Analyzer.HIT_PRED = TokenInvalidType
 
 //*
 // Calculates the SLL(1) expected lookahead set for each outgoing transition
@@ -132,19 +132,19 @@ func (la *LL1Analyzer) _LOOK(s, stopState , ctx, look, lookBusy, calledRuleStack
     lookBusy.add(c)
     if (s == stopState) {
         if (ctx ==nil) {
-            look.addOne(Token.EPSILON)
+            look.addOne(TokenEpsilon)
             return
         } else if (ctx.isEmpty() && addEOF) {
-            look.addOne(Token.EOF)
+            look.addOne(TokenEOF)
             return
         }
     }
     if (s instanceof RuleStopState ) {
         if (ctx ==nil) {
-            look.addOne(Token.EPSILON)
+            look.addOne(TokenEpsilon)
             return
         } else if (ctx.isEmpty() && addEOF) {
-            look.addOne(Token.EOF)
+            look.addOne(TokenEOF)
             return
         }
         if (ctx != PredictionContext.EMPTY) {
@@ -186,12 +186,12 @@ func (la *LL1Analyzer) _LOOK(s, stopState , ctx, look, lookBusy, calledRuleStack
         } else if( t.isEpsilon) {
             la._LOOK(t.target, stopState, ctx, look, lookBusy, calledRuleStack, seeThruPreds, addEOF)
         } else if (t.constructor == WildcardTransition) {
-            look.addRange( Token.MIN_USER_TOKEN_TYPE, la.atn.maxTokenType )
+            look.addRange( TokenMinUserTokenType, la.atn.maxTokenType )
         } else {
             var set = t.label
             if (set != nil) {
                 if (t instanceof NotSetTransition) {
-                    set = set.complement(Token.MIN_USER_TOKEN_TYPE, la.atn.maxTokenType)
+                    set = set.complement(TokenMinUserTokenType, la.atn.maxTokenType)
                 }
                 look.addSet(set)
             }

@@ -1,14 +1,14 @@
 package error
 
-var Token = require('./../Token').Token
-var Errors = require('./Errors')
-var NoViableAltException = Errors.NoViableAltException
-var InputMismatchException = Errors.InputMismatchException
-var FailedPredicateException = Errors.FailedPredicateException
-var ParseCancellationException = Errors.ParseCancellationException
-var ATNState = require('./../atn/ATNState').ATNState
-var Interval = require('./../IntervalSet').Interval
-var IntervalSet = require('./../IntervalSet').IntervalSet
+//var Token = require('./../Token').Token
+//var Errors = require('./Errors')
+//var NoViableAltException = Errors.NoViableAltException
+//var InputMismatchException = Errors.InputMismatchException
+//var FailedPredicateException = Errors.FailedPredicateException
+//var ParseCancellationException = Errors.ParseCancellationException
+//var ATNState = require('./../atn/ATNState').ATNState
+//var Interval = require('./../IntervalSet').Interval
+//var IntervalSet = require('./../IntervalSet').IntervalSet
 
 type ErrorStrategy struct {
 	
@@ -218,7 +218,7 @@ func (this *DefaultErrorStrategy) sync(recognizer) {
     var s = recognizer._interp.atn.states[recognizer.state]
     var la = recognizer.getTokenStream().LA(1)
     // try cheaper subset first might get lucky. seems to shave a wee bit off
-    if (la==Token.EOF || recognizer.atn.nextTokens(s).contains(la)) {
+    if (la==TokenEOF || recognizer.atn.nextTokens(s).contains(la)) {
         return
     }
     // Return but don't end recovery. only do that upon valid token match
@@ -262,7 +262,7 @@ func (this *DefaultErrorStrategy) reportNoViableAlternative(recognizer, e) {
     var tokens = recognizer.getTokenStream()
     var input
     if(tokens != nil) {
-        if (e.startToken.type==Token.EOF) {
+        if (e.startToken.type==TokenEOF) {
             input = "<EOF>"
         } else {
             input = tokens.getText(NewInterval(e.startToken, e.offendingToken))
@@ -522,18 +522,18 @@ func (this *DefaultErrorStrategy) getMissingSymbol(recognizer) {
     var expecting = this.getExpectedTokens(recognizer)
     var expectedTokenType = expecting.first() // get any element
     var tokenText
-    if (expectedTokenType==Token.EOF) {
+    if (expectedTokenType==TokenEOF) {
         tokenText = "<missing EOF>"
     } else {
         tokenText = "<missing " + recognizer.literalNames[expectedTokenType] + ">"
     }
     var current = currentSymbol
     var lookback = recognizer.getTokenStream().LT(-1)
-    if (current.type==Token.EOF && lookback != nil) {
+    if (current.type==TokenEOF && lookback != nil) {
         current = lookback
     }
     return recognizer.getTokenFactory().create(current.source,
-        expectedTokenType, tokenText, Token.DEFAULT_CHANNEL,
+        expectedTokenType, tokenText, TokenDefaultChannel,
         -1, -1, current.line, current.column)
 }
 
@@ -555,7 +555,7 @@ func (this *DefaultErrorStrategy) getTokenErrorDisplay(t) {
     }
     var s = t.text
     if (s == nil) {
-        if (t.type==Token.EOF) {
+        if (t.type==TokenEOF) {
             s = "<EOF>"
         } else {
             s = "<" + t.type + ">"
@@ -675,14 +675,14 @@ func (this *DefaultErrorStrategy) getErrorRecoverySet(recognizer) {
         recoverSet.addSet(follow)
         ctx = ctx.parentCtx
     }
-    recoverSet.removeOne(Token.EPSILON)
+    recoverSet.removeOne(TokenEpsilon)
     return recoverSet
 }
 
 // Consume tokens until one matches the given token set.//
 func (this *DefaultErrorStrategy) consumeUntil(recognizer, set) {
     var ttype = recognizer.getTokenStream().LA(1)
-    while( ttype != Token.EOF && !set.contains(ttype)) {
+    while( ttype != TokenEOF && !set.contains(ttype)) {
         recognizer.consume()
         ttype = recognizer.getTokenStream().LA(1)
     }

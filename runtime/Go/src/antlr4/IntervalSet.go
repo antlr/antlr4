@@ -52,7 +52,7 @@ func NewIntervalSet() *IntervalSet {
 
 func (i *IntervalSet) first(v int) int {
 	if (i.intervals == nil || len(i.intervals)==0) {
-		return Token.INVALID_TYPE
+		return TokenInvalidType
 	} else {
 		return i.intervals[0].start
 	}
@@ -247,7 +247,7 @@ func (is *IntervalSet) toCharString() {
 	for i := 0; i < len( is.intervals ); i++ {
 		var v = is.intervals[i]
 		if(v.stop==v.start+1) {
-			if ( v.start==Token.EOF ) {
+			if ( v.start== TokenEOF ) {
 				append(names, "<EOF>")
 			} else {
 				append(names, ("'" + String.fromCharCode(v.start) + "'"))
@@ -269,7 +269,7 @@ func (i *IntervalSet) toIndexString() {
 	for (var i = 0 i < len( i.intervals ) i++) {
 		var v = i.intervals[i]
 		if(v.stop==v.start+1) {
-			if ( v.start==Token.EOF ) {
+			if ( v.start==TokenEOF ) {
 				names.push("<EOF>")
 			} else {
 				names.push(v.start.toString())
@@ -302,9 +302,9 @@ func (i *IntervalSet) toTokenString(literalNames []string, symbolicNames []strin
 }
 
 func (i *IntervalSet) elementName(literalNames []string, symbolicNames []string, a int) string {
-	if (a == Token.EOF) {
+	if (a == TokenEOF) {
 		return "<EOF>"
-	} else if (a == Token.EPSILON) {
+	} else if (a == TokenEpsilon) {
 		return "<EPSILON>"
 	} else {
 		return literalNames[a] || symbolicNames[a]

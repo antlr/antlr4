@@ -37,7 +37,7 @@ func (this *Recognizer) getTokenTypeMap() {
     var result = this.tokenTypeMapCache[tokenNames]
     if(result==undefined) {
         result = tokenNames.reduce(function(o, k, i) { o[k] = i })
-        result.EOF = Token.EOF
+        result.EOF = TokenEOF
         this.tokenTypeMapCache[tokenNames] = result
     }
     return result
@@ -65,7 +65,7 @@ func (this *Recognizer) getTokenType(tokenName) {
     if (ttype !=undefined) {
         return ttype
     } else {
-        return Token.INVALID_TYPE
+        return TokenInvalidType
     }
 }
 
@@ -97,7 +97,7 @@ func (this *Recognizer) getTokenErrorDisplay(t) {
     }
     var s = t.text
     if (s==nil) {
-        if (t.type==Token.EOF) {
+        if (t.type==TokenEOF) {
             s = "<EOF>"
         } else {
             s = "<" + t.type + ">"

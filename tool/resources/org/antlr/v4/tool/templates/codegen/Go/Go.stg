@@ -139,7 +139,7 @@ func New<parser.name>(input) <parser.name> {
 }
 
 const(
-    <parser.name>EOF = antlr4.Token.EOF
+    <parser.name>EOF = antlr4.TokenEOF
     <if(parser.tokens)>
     <parser.tokens:{k | <parser.name><k> = <parser.tokens.(k)>}; separator="\n", wrap, anchor>
     <endif>
@@ -845,7 +845,7 @@ func New<lexer.name>(input *antlr4.TokenStream) <lexer.name> {
     lex.symbolicNames = [...]string{ <lexer.symbolicNames:{t | <t>}; null="nil", separator=", ", wrap, anchor> }
     lex.ruleNames = [...]string{ <lexer.ruleNames:{r | "<r>"}; separator=", ", wrap, anchor> }
     lex.grammarFileName = "<lexer.grammarFileName>"
-    lex.EOF = antlr4.Token.EOF
+    lex.EOF = antlr4.TokenEOF
 
     return lex
 }

@@ -5,38 +5,43 @@ package antlr4
 // we obtained this token.
 
 type Token struct {
-	this.source = nil
-	this.type = nil // token type of the token
-	this.channel = nil // The parser ignores everything not on DEFAULT_CHANNEL
-	this.start = nil // optional return -1 if not implemented.
-	this.stop = nil // optional return -1 if not implemented.
-	this.tokenIndex = nil // from 0..n-1 of the token object in the input stream
-	this.line = nil // line=1..n of the 1st character
-	this.column = nil // beginning of the line at which it occurs, 0..n-1
-	this._text = nil // text of the token.
-	return this
+	source *TokenSource
+	tokenType int // token type of the token
+	channel int // The parser ignores everything not on DEFAULT_CHANNEL
+	start int // optional return -1 if not implemented.
+	stop int // optional return -1 if not implemented.
+	tokenIndex int // from 0..n-1 of the token object in the input stream
+	line int // line=1..n of the 1st character
+	column int // beginning of the line at which it occurs, 0..n-1
+	text string // text of the token.
 }
 
-Token.INVALID_TYPE = 0
+func NewToken() *Token {
+	return new(Token)
+}
 
-// During lookahead operations, this "token" signifies we hit rule end ATN state
-// and did not follow it despite needing to.
-Token.EPSILON = -2
+const (
+	TokenInvalidType = 0
 
-Token.MIN_USER_TOKEN_TYPE = 1
+	// During lookahead operations, this "token" signifies we hit rule end ATN state
+	// and did not follow it despite needing to.
+	TokenEpsilon = -2
 
-Token.EOF = -1
+	TokenMinUserTokenType = 1
 
-// All tokens go to the parser (unless skip() is called in that rule)
-// on a particular "channel". The parser tunes to a particular channel
-// so that whitespace etc... can go to the parser on a "hidden" channel.
+	TokenEOF = -1
 
-Token.DEFAULT_CHANNEL = 0
+	// All tokens go to the parser (unless skip() is called in that rule)
+	// on a particular "channel". The parser tunes to a particular channel
+	// so that whitespace etc... can go to the parser on a "hidden" channel.
 
-// Anything on different channel than DEFAULT_CHANNEL is not parsed
-// by parser.
+	TokenDefaultChannel = 0
 
-Token.HIDDEN_CHANNEL = 1
+	// Anything on different channel than DEFAULT_CHANNEL is not parsed
+	// by parser.
+
+	TokenHiddenChannel = 1
+)
 
 // Explicitly set the text for this token. If {code text} is not
 // {@code nil}, then {@link //getText} will return this value rather than
@@ -46,14 +51,16 @@ Token.HIDDEN_CHANNEL = 1
 // should be obtained from the input along with the start and stop indexes
 // of the token.
 
-Object.defineProperty(Token.prototype, "text", {
-	get : function() {
-		return this._text
-	},
-	set : function(text) {
-		this._text = text
-	}
-})
+//
+//
+//Object.defineProperty(Token.prototype, "text", {
+//	get : function() {
+//		return this._text
+//	},
+//	set : function(text) {
+//		this._text = text
+//	}
+//})
 
 func (this *Token) getTokenSource() {
 	return this.source[0]
@@ -63,29 +70,33 @@ func (this *Token) getInputStream() {
 	return this.source[1]
 }
 
-func CommonToken(source, type, channel, start, stop) {
-	Token.call(this)
-	this.source = source != undefined ? source : CommonToken.EMPTY_SOURCE
-	this.type = type != undefined ? type : nil
-	this.channel = channel != undefined ? channel : Token.DEFAULT_CHANNEL
-	this.start = start != undefined ? start : -1
-	this.stop = stop != undefined ? stop : -1
-	this.tokenIndex = -1
-	if (this.source[0] != nil) {
-		this.line = source[0].line
-		this.column = source[0].column
-	} else {
-		this.column = -1
-	}
-	return this
+type CommonToken struct {
+	Token
 }
 
-CommonToken.prototype = Object.create(Token.prototype)
-CommonToken.prototype.constructor = CommonToken
+func NewCommonToken(source *InputStream, tokenType int, channel, start int, stop int) *CommonToken {
+
+	t := NewToken()
+
+	t.source = source
+	t.tokenType = -1
+	t.channel = channel
+	t.start = start
+	t.stop = stop
+	t.tokenIndex = -1
+	if (t.source[0] != nil) {
+		t.line = source[0].line
+		t.column = source[0].column
+	} else {
+		t.column = -1
+	}
+	return t
+}
 
 // An empty {@link Pair} which is used as the default value of
 // {@link //source} for tokens that do not have a source.
-CommonToken.EMPTY_SOURCE = [ nil, nil ]
+
+//CommonToken.EMPTY_SOURCE = [ nil, nil ]
 
 // Constructs a New{@link CommonToken} as a copy of another {@link Token}.
 //
@@ -99,13 +110,13 @@ CommonToken.EMPTY_SOURCE = [ nil, nil ]
 //
 // @param oldToken The token to copy.
 //
-func (this *CommonToken) clone() {
-	var t = NewCommonToken(this.source, this.type, this.channel, this.start,
-			this.stop)
-	t.tokenIndex = this.tokenIndex
-	t.line = this.line
-	t.column = this.column
-	t.text = this.text
+func (ct *CommonToken) clone() {
+	var t = NewCommonToken(ct.source, ct.tokenType, ct.channel, ct.start,
+			ct.stop)
+	t.tokenIndex = ct.tokenIndex
+	t.line = ct.line
+	t.column = ct.column
+	t.text = ct.text
 	return t
 }
 
@@ -138,7 +149,7 @@ func (this *CommonToken) toString() {
 		txt = "<no text>"
 	}
 	return "[@" + this.tokenIndex + "," + this.start + ":" + this.stop + "='" +
-			txt + "',<" + this.type + ">" +
+			txt + "',<" + this.tokenType + ">" +
 			(this.channel > 0 ? ",channel=" + this.channel : "") + "," +
 			this.line + ":" + this.column + "]"
 }

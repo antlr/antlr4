@@ -74,20 +74,20 @@ func NewLexer(input *InputStream) *Lexer {
 	lexer._hitEOF = false
 
 	// The channel number for the current token///
-	lexer._channel = Token.DEFAULT_CHANNEL
+	lexer._channel = TokenDefaultChannel
 
 	// The token type for the current token///
-	lexer._type = Token.INVALID_TYPE
+	lexer._type = TokenInvalidType
 
 	lexer._modeStack = []
-	lexer._mode = LexerDEFAULT_MODE
+	lexer._mode = LexerDefaultMode
 
 	// You can set the text for the current token to override what is in
 	// the input char buffer. Use setText() or can set l instance var.
 	// /
 	lexer._text = nil
 
-	return l
+	return lexer
 }
 
 func InitLexer(lexer Lexer){
@@ -97,16 +97,16 @@ func InitLexer(lexer Lexer){
 }
 
 const (
-	LexerDEFAULT_MODE = 0
-	LexerMORE = -2
-	LexerSKIP = -3
+	LexerDefaultMode = 0
+	LexerMore = -2
+	LexerSkip = -3
 )
 
 const (
-	LexerDEFAULT_TOKEN_CHANNEL = Token.DEFAULT_CHANNEL
-	LexerHIDDEN = Token.HIDDEN_CHANNEL
-	LexerMIN_CHAR_VALUE = '\u0000'
-	LexerMAX_CHAR_VALUE = '\uFFFE'
+	LexerDefaultTokenChannel = TokenDefaultChannel
+	LexerHidden = TokenHiddenChannel
+	LexerMinCharValue = '\u0000'
+	LexerMaxCharValue = '\uFFFE'
 )
 
 func (l *Lexer) reset() {
@@ -115,15 +115,15 @@ func (l *Lexer) reset() {
 		l._input.seek(0) // rewind the input
 	}
 	l._token = nil
-	l._type = Token.INVALID_TYPE
-	l._channel = Token.DEFAULT_CHANNEL
+	l._type = TokenInvalidType
+	l._channel = TokenDefaultChannel
 	l._tokenStartCharIndex = -1
 	l._tokenStartColumn = -1
 	l._tokenStartLine = -1
 	l._text = nil
 
 	l._hitEOF = false
-	l._mode = LexerDEFAULT_MODE
+	l._mode = LexerDefaultMode
 	l._modeStack = []
 
 	l._interp.reset()
@@ -145,32 +145,32 @@ func (l *Lexer) nextToken() {
 				return l._token
 			}
 			l._token = nil
-			l._channel = Token.DEFAULT_CHANNEL
+			l._channel = TokenDefaultChannel
 			l._tokenStartCharIndex = l._input.index
 			l._tokenStartColumn = l._interp.column
 			l._tokenStartLine = l._interp.line
 			l._text = nil
 			var continueOuter = false
 			for (true) {
-				l._type = Token.INVALID_TYPE
-				var ttype = LexerSKIP
+				l._type = TokenInvalidType
+				var ttype = LexerSkip
 				try {
 					ttype = l._interp.match(l._input, l._mode)
 				} catch (e) {
 					l.notifyListeners(e) // report error
 					l.recover(e)
 				}
-				if (l._input.LA(1) == Token.EOF) {
+				if (l._input.LA(1) == TokenEOF) {
 					l._hitEOF = true
 				}
-				if (l._type == Token.INVALID_TYPE) {
+				if (l._type == TokenInvalidType) {
 					l._type = ttype
 				}
-				if (l._type == LexerSKIP) {
+				if (l._type == LexerSkip) {
 					continueOuter = true
 					break
 				}
-				if (l._type != LexerMORE) {
+				if (l._type != LexerMore) {
 					break
 				}
 			}
@@ -196,11 +196,11 @@ func (l *Lexer) nextToken() {
 // and emits it.
 // /
 func (l *Lexer) skip() {
-	l._type = LexerSKIP
+	l._type = LexerSkip
 }
 
 func (l *Lexer) more() {
-	l._type = LexerMORE
+	l._type = LexerMore
 }
 
 func (l *Lexer) mode(m) {
@@ -270,8 +270,8 @@ func (l *Lexer) emit() {
 func (l *Lexer) emitEOF() {
 	var cpos = l.column
 	var lpos = l.line
-	var eof = l._factory.create(l._tokenFactorySourcePair, Token.EOF,
-			nil, Token.DEFAULT_CHANNEL, l._input.index,
+	var eof = l._factory.create(l._tokenFactorySourcePair, TokenEOF,
+			nil, TokenDefaultChannel, l._input.index,
 			l._input.index - 1, lpos, cpos)
 	l.emitToken(eof)
 	return eof
@@ -330,7 +330,7 @@ Object.defineProperty(Lexer.prototype, "text", {
 func (l *Lexer) getAllTokens() {
 	var tokens = []
 	var t = l.nextToken()
-	while (t.type != Token.EOF) {
+	for (t.type != TokenEOF) {
 		tokens.push(t)
 		t = l.nextToken()
 	}
@@ -356,7 +356,7 @@ func (l *Lexer) getErrorDisplay(s) {
 }
 
 func (l *Lexer) getErrorDisplayForChar(c rune) string {
-	if (c.charCodeAt(0) == Token.EOF) {
+	if (c.charCodeAt(0) == TokenEOF) {
 		return "<EOF>"
 	} else if (c == '\n') {
 		return "\\n"
@@ -379,7 +379,7 @@ func (l *Lexer) getCharErrorDisplay(c) string {
 // to do sophisticated error recovery if you are in a fragment rule.
 // /
 func (l *Lexer) recover(re) {
-	if (l._input.LA(1) != Token.EOF) {
+	if (l._input.LA(1) != TokenEOF) {
 		if (ok, re := re.(LexerNoViableAltException)) {
 			// skip a char and try again
 			l._interp.consume(l._input)

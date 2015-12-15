@@ -104,7 +104,7 @@ func (bt *BufferedTokenStream) consume() {
 		// not yet initialized
 		skipEofCheck = false
 	}
-	if (!skipEofCheck && bt.LA(1) == Token.EOF) {
+	if (!skipEofCheck && bt.LA(1) == TokenEOF) {
 		panic( "cannot consume EOF" )
 	}
 	if (bt.sync(bt.index + 1)) {
@@ -140,7 +140,7 @@ func (bt *BufferedTokenStream) fetch(n int) int {
 		var t = bt.tokenSource.nextToken()
 		t.tokenIndex = len(bt.tokens)
 		bt.tokens.push(t)
-		if (t.type == Token.EOF) {
+		if (t.type == TokenEOF) {
 			bt.fetchedEOF = true
 			return i + 1
 		}
@@ -163,7 +163,7 @@ func (bt *BufferedTokenStream) getTokens(start, stop, types) {
 	}
 	for i := start; i < stop; i++ {
 		var t = bt.tokens[i]
-		if (t.type == Token.EOF) {
+		if (t.type == TokenEOF) {
 			break
 		}
 		if (types == nil || types.contains(t.type)) {
@@ -248,7 +248,7 @@ func (bt *BufferedTokenStream) nextTokenOnChannel(i, channel) {
 	}
 	var token = bt.tokens[i]
 	while (token.channel != bt.channel) {
-		if (token.type == Token.EOF) {
+		if (token.type == TokenEOF) {
 			return -1
 		}
 		i += 1
@@ -281,7 +281,7 @@ func (bt *BufferedTokenStream) getHiddenTokensToRight(tokenIndex,
 		panic( "" + tokenIndex + " not in 0.." + len(bt.tokens) - 1
 	}
 	var nextOnChannel = bt.nextTokenOnChannel(tokenIndex + 1,
-			Lexer.DEFAULT_TOKEN_CHANNEL)
+			LexerDefaultTokenChannel)
 	var from_ = tokenIndex + 1
 	// if none onchannel to right, nextOnChannel=-1 so set to = last token
 	var to = nextOnChannel == -1 ? len(bt.tokens) - 1 : nextOnChannel
@@ -301,7 +301,7 @@ func (bt *BufferedTokenStream) getHiddenTokensToLeft(tokenIndex,
 		panic( "" + tokenIndex + " not in 0.." + len(bt.tokens) - 1
 	}
 	var prevOnChannel = bt.previousTokenOnChannel(tokenIndex - 1,
-			Lexer.DEFAULT_TOKEN_CHANNEL)
+			LexerDefaultTokenChannel)
 	if (prevOnChannel == tokenIndex - 1) {
 		return nil
 	}
@@ -316,7 +316,7 @@ func (bt *BufferedTokenStream) filterForChannel(left, right, channel) {
 	for var i = left; i < right + 1; i++ {
 		var t = bt.tokens[i]
 		if (channel == -1) {
-			if (t.channel != Lexer.DEFAULT_TOKEN_CHANNEL) {
+			if (t.channel != LexerDefaultTokenChannel) {
 				hidden.push(t)
 			}
 		} else if (t.channel == channel) {
@@ -357,7 +357,7 @@ func (bt *BufferedTokenStream) getText(interval) string {
 	var s = ""
 	for i := start; i < stop + 1; i++ {
 		var t = bt.tokens[i]
-		if (t.type == Token.EOF) {
+		if (t.type == TokenEOF) {
 			break
 		}
 		s = s + t.text

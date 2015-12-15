@@ -217,7 +217,7 @@ func (this *ATNDeserializer) readRules(atn) {
         if ( atn.grammarType == ATNType.LEXER ) {
             var tokenType = this.readInt()
             if (tokenType == 0xFFFF) {
-                tokenType = Token.EOF
+                tokenType = TokenEOF
             }
             atn.ruleToTokenType[i] = tokenType
         }
@@ -588,7 +588,7 @@ ATNDeserializer.prototype.edgeFactory = function(atn, type, src, trg, arg1, arg2
     case Transition.EPSILON:
         return NewEpsilonTransition(target)
     case Transition.RANGE:
-        return arg3 != 0 ? NewRangeTransition(target, Token.EOF, arg2) : NewRangeTransition(target, arg1, arg2)
+        return arg3 != 0 ? NewRangeTransition(target, TokenEOF, arg2) : NewRangeTransition(target, arg1, arg2)
     case Transition.RULE:
         return NewRuleTransition(atn.states[arg1], arg2, arg3, target)
     case Transition.PREDICATE:
@@ -596,7 +596,7 @@ ATNDeserializer.prototype.edgeFactory = function(atn, type, src, trg, arg1, arg2
     case Transition.PRECEDENCE:
         return NewPrecedencePredicateTransition(target, arg1)
     case Transition.ATOM:
-        return arg3 != 0 ? NewAtomTransition(target, Token.EOF) : NewAtomTransition(target, arg1)
+        return arg3 != 0 ? NewAtomTransition(target, TokenEOF) : NewAtomTransition(target, arg1)
     case Transition.ACTION:
         return NewActionTransition(target, arg1, arg2, arg3 != 0)
     case Transition.SET:

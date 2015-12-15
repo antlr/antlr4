@@ -222,7 +222,7 @@ func SetTransition(target, set) {
         this.label = set
     } else {
         this.label = NewIntervalSet()
-        this.label.addOne(Token.INVALID_TYPE)
+        this.label.addOne(TokenInvalidType)
     }
     return this
 }

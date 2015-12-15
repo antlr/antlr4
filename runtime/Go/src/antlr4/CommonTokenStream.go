@@ -31,11 +31,13 @@ type CommonTokenStream struct {
 
 func NewCommonTokenStream(lexer Lexer, channel) {
 
-    ts := new(BufferedTokenStream)
+    ts := new(CommonTokenStream)
 
 	BufferedTokenStream.call(ts, lexer)
     ts.channel = channel
     return ts
+
+
 }
 
 func (ts *CommonTokenStream) adjustSeekIndex(i int) {
@@ -90,7 +92,7 @@ func (ts *CommonTokenStream) getNumberOfOnChannelTokens() {
         if  t.channel==ts.channel {
             n += 1
         }
-        if  t.type==Token.EOF {
+        if  t.type==TokenEOF {
             break
         }
     }

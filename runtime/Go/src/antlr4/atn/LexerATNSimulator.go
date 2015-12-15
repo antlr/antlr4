@@ -61,7 +61,7 @@ func LexerATNSimulator(recog, atn, decisionToDFA, sharedContextCache) {
 	// The index of the character relative to the beginning of the line
 	// 0..n-1///
 	this.column = 0
-	this.mode = Lexer.DEFAULT_MODE
+	this.mode = LexerDefaultMode
 	// Used during DFA/ATN exec to record the most recent accept configuration
 	// info
 	this.prevAccept = NewSimState()
@@ -110,7 +110,7 @@ func (this *LexerATNSimulator) reset() {
 	this.startIndex = -1
 	this.line = 1
 	this.column = 0
-	this.mode = Lexer.DEFAULT_MODE
+	this.mode = LexerDefaultMode
 }
 
 func (this *LexerATNSimulator) matchATN(input) {
@@ -184,12 +184,12 @@ LexerATNSimulator.prototype.execATN = function(input, ds0) {
 		// capturing the accept state so the input index, line, and char
 		// position accurately reflect the state of the interpreter at the
 		// end of the token.
-		if (t != Token.EOF) {
+		if (t != TokenEOF) {
 			this.consume(input)
 		}
 		if (target.isAcceptState) {
 			this.captureSimState(this.prevAccept, input, target)
-			if (t == Token.EOF) {
+			if (t == TokenEOF) {
 				break
 			}
 		}
@@ -260,8 +260,8 @@ func (this *LexerATNSimulator) failOrAccept(prevAccept, input, reach, t) {
 		return prevAccept.dfaState.prediction
 	} else {
 		// if no accept and EOF is first char, return EOF
-		if (t == Token.EOF && input.index == this.startIndex) {
-			return Token.EOF
+		if (t == TokenEOF && input.index == this.startIndex) {
+			return TokenEOF
 		}
 		throw NewLexerNoViableAltException(this.recog, input, this.startIndex, reach)
 	}
@@ -293,7 +293,7 @@ func (this *LexerATNSimulator) getReachableConfigSet(input, closure,
 				if (lexerActionExecutor != nil) {
 					lexerActionExecutor = lexerActionExecutor.fixOffsetBeforeMatch(input.index - this.startIndex)
 				}
-				var treatEofAsEpsilon = (t == Token.EOF)
+				var treatEofAsEpsilon = (t == TokenEOF)
 				var config = NewLexerATNConfig({state:target, lexerActionExecutor:lexerActionExecutor}, cfg)
 				if (this.closure(input, config, reach,
 						currentAltReachedAcceptState, true, treatEofAsEpsilon)) {
@@ -463,7 +463,7 @@ func (this *LexerATNSimulator) getEpsilonTarget(input, config, trans,
 				trans.serializationType == Transition.RANGE ||
 				trans.serializationType == Transition.SET) {
 		if (treatEofAsEpsilon) {
-			if (trans.matches(Token.EOF, 0, 0xFFFF)) {
+			if (trans.matches(TokenEOF, 0, 0xFFFF)) {
 				cfg = NewLexerATNConfig( { state:trans.target }, config)
 			}
 		}

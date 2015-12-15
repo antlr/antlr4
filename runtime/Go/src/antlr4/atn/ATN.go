@@ -131,22 +131,22 @@ func (this *ATN) getExpectedTokens( stateNumber, ctx ) {
     }
     var s = this.states[stateNumber]
     var following = this.nextTokens(s)
-    if (!following.contains(Token.EPSILON)) {
+    if (!following.contains(TokenEpsilon)) {
         return following
     }
     var expected = NewIntervalSet()
     expected.addSet(following)
-    expected.removeOne(Token.EPSILON)
-    while (ctx != nil && ctx.invokingState >= 0 && following.contains(Token.EPSILON)) {
+    expected.removeOne(TokenEpsilon)
+    while (ctx != nil && ctx.invokingState >= 0 && following.contains(TokenEpsilon)) {
         var invokingState = this.states[ctx.invokingState]
         var rt = invokingState.transitions[0]
         following = this.nextTokens(rt.followState)
         expected.addSet(following)
-        expected.removeOne(Token.EPSILON)
+        expected.removeOne(TokenEpsilon)
         ctx = ctx.parentCtx
     }
-    if (following.contains(Token.EPSILON)) {
-        expected.addOne(Token.EOF)
+    if (following.contains(TokenEpsilon)) {
+        expected.addOne(TokenEOF)
     }
     return expected
 }
