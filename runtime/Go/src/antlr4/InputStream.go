@@ -1,105 +1,104 @@
 package antlr
 
-var Token = require('./Token').Token
-
 // Vacuum all input from a string and then treat it like a buffer.
 
+
+type InputStream struct {
+	name string
+	strdata string
+	index int
+	size int
+}
+
+func NewInputStream(data string) *InputStream {
+
+	is := new(InputStream)
+
+	is.name = "<empty>"
+	is.strdata = data
+	_loadString(is)
+
+	return is
+
+}
+
 func _loadString(stream) {
-	stream._index = 0
+	stream.index = 0
 	stream.data = []
 	for (var i = 0 i < stream.strdata.length i++) {
 		stream.data.push(stream.strdata.charCodeAt(i))
 	}
-	stream._size = stream.data.length
+	stream.size = stream.data.length
 }
 
-func InputStream(data) {
-	this.name = "<empty>"
-	this.strdata = data
-	_loadString(this)
-	return this
-}
-
-Object.defineProperty(InputStream.prototype, "index", {
-	get : function() {
-		return this._index
-	}
-})
-
-Object.defineProperty(InputStream.prototype, "size", {
-	get : function() {
-		return this._size
-	}
-})
 
 // Reset the stream so that it's in the same state it was
 // when the object was created *except* the data array is not
 // touched.
 //
-func (this *InputStream) reset() {
-	this._index = 0
+func (is *InputStream) reset() {
+	is.index = 0
 }
 
-func (this *InputStream) consume() {
-	if (this._index >= this._size) {
-		// assert this.LA(1) == Token.EOF
-		throw ("cannot consume EOF")
+func (is *InputStream) consume() {
+	if (is.index >= is.size) {
+		// assert is.LA(1) == Token.EOF
+		panic ("cannot consume EOF")
 	}
-	this._index += 1
+	is.index += 1
 }
 
-func (this *InputStream) LA(offset) {
+func (is *InputStream) LA(offset int) {
 	if (offset == 0) {
 		return 0 // undefined
 	}
 	if (offset < 0) {
 		offset += 1 // e.g., translate LA(-1) to use offset=0
 	}
-	var pos = this._index + offset - 1
-	if (pos < 0 || pos >= this._size) { // invalid
+	var pos = is.index + offset - 1
+	if (pos < 0 || pos >= is.size) { // invalid
 		return Token.EOF
 	}
-	return this.data[pos]
+	return is.data[pos]
 }
 
-func (this *InputStream) LT(offset) {
-	return this.LA(offset)
+func (is *InputStream) LT(offset int) {
+	return is.LA(offset)
 }
 
 // mark/release do nothing we have entire buffer
-func (this *InputStream) mark() {
+func (is *InputStream) mark() {
 	return -1
 }
 
-func (this *InputStream) release(marker) {
+func (is *InputStream) release(marker int) {
 }
 
-// consume() ahead until p==_index can't just set p=_index as we must
+// consume() ahead until p==index can't just set p=index as we must
 // update line and column. If we seek backwards, just set p
 //
-func (this *InputStream) seek(_index) {
-	if (_index <= this._index) {
-		this._index = _index // just jump don't update stream state (line,
-								// ...)
+func (is *InputStream) seek(index int) {
+	if (index <= is.index) {
+		is.index = index // just jump don't update stream state (line,...)
 		return
 	}
 	// seek forward
-	this._index = Math.min(_index, this._size)
+	is.index = Math.min(index, is.size)
 }
 
-func (this *InputStream) getText(start, stop) {
-	if (stop >= this._size) {
-		stop = this._size - 1
+func (is *InputStream) getText(start int, stop int) string {
+	if (stop >= is.size) {
+		stop = is.size - 1
 	}
-	if (start >= this._size) {
+	if (start >= is.size) {
 		return ""
 	} else {
-		return this.strdata.slice(start, stop + 1)
+		return is.strdata.slice(start, stop + 1)
 	}
 }
 
-func (this *InputStream) toString() {
-	return this.strdata
+func (is *InputStream) toString() string {
+	return is.strdata
 }
 
 

@@ -5,11 +5,17 @@
 
 package antlr
 
-type TokenFactory struct {
+type TokenFactory interface {
 }
 
-func NewCommonTokenFactory(copyText) {
-	TokenFactory.call(this)
+type CommonTokenFactory struct {
+    copyText bool
+}
+
+func NewCommonTokenFactory(copyText bool) CommonTokenFactory {
+
+    tf := new(CommonTokenFactory)
+
     // Indicates whether {@link CommonToken//setText} should be called after
     // constructing tokens to explicitly set the text. This is useful for cases
     // where the input stream might not be able to provide arbitrary substrings
@@ -24,12 +30,10 @@ func NewCommonTokenFactory(copyText) {
     // The default value is {@code false} to avoid the performance and memory
     // overhead of copying text for every token unless explicitly requested.</p>
     //
-    this.copyText = copyText==undefined ? false : copyText
-	return this
-}
+    tf.copyText = copyText
 
-CommonTokenFactory.prototype = Object.create(TokenFactory.prototype)
-CommonTokenFactory.prototype.constructor = CommonTokenFactory
+	return tf
+}
 
 //
 // The default {@link CommonTokenFactory} instance.
@@ -38,7 +42,7 @@ CommonTokenFactory.prototype.constructor = CommonTokenFactory
 // This token factory does not explicitly copy token text when constructing
 // tokens.</p>
 //
-CommonTokenFactory.DEFAULT = new CommonTokenFactory()
+var CommonTokenFactoryDEFAULT = NewCommonTokenFactory(false)
 
 func (this *CommonTokenFactory) create(source, type, text, channel, start, stop, line, column) {
     var t = new CommonToken(source, type, channel, start, stop)

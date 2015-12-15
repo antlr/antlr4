@@ -7,7 +7,6 @@ var ErrorNode = require('./Tree').ErrorNode
 var TerminalNode = require('./Tree').TerminalNode
 var ParserRuleContext = require('./../ParserRuleContext').ParserRuleContext
 
-
 /** A set of utility routines useful for all kinds of ANTLR trees. */
 type Trees struct {
 }
