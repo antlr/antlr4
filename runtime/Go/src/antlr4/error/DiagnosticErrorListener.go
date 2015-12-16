@@ -1,4 +1,9 @@
 package error
+import (
+	"antlr4"
+	"antlr4/atn"
+	"antlr4/dfa"
+)
 
 //
 // This implementation of {@link ANTLRErrorListener} can be used to identify
@@ -23,19 +28,24 @@ package error
 //var ErrorListener = require('./ErrorListener').ErrorListener
 //var Interval = require('./../IntervalSet').Interval
 
-func DiagnosticErrorListener(exactOnly) {
-	ErrorListener.call(this)
-	exactOnly = exactOnly || true
+type DiagnosticErrorListener struct {
+	ErrorListener
+	exactOnly bool
+}
+
+func DiagnosticErrorListener(exactOnly bool) {
+
+	n = new(DiagnosticErrorListener)
+
 	// whether all ambiguities or only exact ambiguities are reported.
-	this.exactOnly = exactOnly
-	return this
+	n.exactOnly = exactOnly
+	return n
 }
 
 //DiagnosticErrorListener.prototype = Object.create(ErrorListener.prototype)
 //DiagnosticErrorListener.prototype.constructor = DiagnosticErrorListener
 
-func (this *DiagnosticErrorListener) reportAmbiguity(recognizer, dfa,
-		startIndex, stopIndex, exact, ambigAlts, configs) {
+func (this *DiagnosticErrorListener) reportAmbiguity(recognizer *antlr4.Parser, dfa *dfa.DFA, startIndex, stopIndex int, exact bool, ambigAlts *antlr4.BitSet, configs *atn.ATNConfigSet) {
 	if (this.exactOnly && !exact) {
 		return
 	}
@@ -48,8 +58,8 @@ func (this *DiagnosticErrorListener) reportAmbiguity(recognizer, dfa,
 	recognizer.notifyErrorListeners(msg)
 }
 
-func (this *DiagnosticErrorListener) reportAttemptingFullContext(
-		recognizer, dfa, startIndex, stopIndex, conflictingAlts, configs) {
+func (this *DiagnosticErrorListener) reportAttemptingFullContext(recognizer *antlr4.Parser, dfa *dfa.DFA, startIndex, stopIndex int, conflictingAlts *antlr4.BitSet, configs *atn.ATNConfigSet) {
+
 	var msg = "reportAttemptingFullContext d=" +
 			this.getDecisionDescription(recognizer, dfa) +
 			", input='" +
@@ -57,8 +67,7 @@ func (this *DiagnosticErrorListener) reportAttemptingFullContext(
 	recognizer.notifyErrorListeners(msg)
 }
 
-func (this *DiagnosticErrorListener) reportContextSensitivity(
-		recognizer, dfa, startIndex, stopIndex, prediction, configs) {
+func (this *DiagnosticErrorListener) reportContextSensitivity(recognizer *antlr4.Parser, dfa *dfa.DFA, startIndex, stopIndex, prediction int, configs *atn.ATNConfigSet) {
 	var msg = "reportContextSensitivity d=" +
 			this.getDecisionDescription(recognizer, dfa) +
 			", input='" +
@@ -66,7 +75,7 @@ func (this *DiagnosticErrorListener) reportContextSensitivity(
 	recognizer.notifyErrorListeners(msg)
 }
 
-func (this *DiagnosticErrorListener) getDecisionDescription(recognizer, dfa) {
+func (this *DiagnosticErrorListener) getDecisionDescription(recognizer, dfa *dfa.DFA) {
 	var decision = dfa.decision
 	var ruleIndex = dfa.atnStartState.ruleIndex
 
@@ -96,10 +105,9 @@ func (this *DiagnosticErrorListener) getConflictingAlts(reportedAlts, configs) {
 	if (reportedAlts != nil) {
 		return reportedAlts
 	}
-	var result = NewBitSet()
+	var result = antlr4.NewBitSet()
 	for i := 0; i < len(configs.items); i++ {
 		result.add(configs.items[i].alt)
 	}
 	return "{" + result.values().join(", ") + "}"
 }
-

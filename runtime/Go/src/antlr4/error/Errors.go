@@ -1,5 +1,8 @@
 package error
-import "antlr4"
+
+import (
+	"antlr4"
+)
 
 // The root of the ANTLR exception hierarchy. In general, ANTLR tracks just
 //  3 kinds of errors: prediction errors, failed predicate errors, and

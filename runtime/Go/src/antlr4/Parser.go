@@ -35,7 +35,7 @@ func (this *TraceListener) exitEveryRule(ctx) {
 
 type Parser struct {
 	Recognizer
-	_input *TokenSource
+	_input *Lexer
 	_errHandler *error.ErrorStrategy
 	_precedenceStack IntStack
 	_ctx RuleContext
@@ -125,13 +125,13 @@ func (p *Parser) reset() {
 // {@code ttype} and the error strategy could not recover from the
 // mismatched symbol
 
-func (p *Parser) match(ttype) {
+func (p *Parser) match(ttype int) *Token {
 	var t = p.getCurrentToken()
 	if (t.tokenType == ttype) {
 		p._errHandler.reportMatch(p.
 		p.consume()
 	} else {
-		t = p._errHandler.recoverInline(p.
+		t = p._errHandler.recoverInline(p)
 		if (p.buildParseTrees && t.tokenIndex == -1) {
 			// we must have conjured up a Newtoken during single token
 			// insertion
@@ -211,9 +211,9 @@ func (p *Parser) addParseListener(listener *tree.ParseTreeListener) {
 		panic("listener")
 	}
 	if (p._parseListeners == nil) {
-		p._parseListeners = []
+		p._parseListeners = new([]tree.ParseTreeListener)
 	}
-	p._parseListeners.push(listener)
+	p._parseListeners = append(p._parseListeners, listener)
 }
 
 //
@@ -314,8 +314,8 @@ func (p *Parser) getATNWithBypassAlts() {
 
 //var Lexer = require('./Lexer').Lexer
 
-func (p *Parser) compileParseTreePattern(pattern, patternRuleIndex, lexer) {
-	lexer = lexer || nil
+func (p *Parser) compileParseTreePattern(pattern, patternRuleIndex, lexer *Lexer) {
+
 	if (lexer == nil) {
 		if (p.getTokenStream() != nil) {
 			var tokenSource = p.getTokenStream().tokenSource
@@ -325,9 +325,9 @@ func (p *Parser) compileParseTreePattern(pattern, patternRuleIndex, lexer) {
 		}
 	}
 	if (lexer == nil) {
-		panic "Parser can't discover a lexer to use"
+		panic("Parser can't discover a lexer to use")
 	}
-	var m = NewParseTreePatternMatcher(lexer, p.
+	var m = NewParseTreePatternMatcher(lexer, p)
 	return m.compile(pattern, patternRuleIndex)
 }
 
@@ -353,7 +353,7 @@ func (p *Parser) setTokenStream(input) {
 // Match needs to return the current input symbol, which gets put
 // into the label for the associated token ref e.g., x=ID.
 //
-func (p *Parser) getCurrentToken() int {
+func (p *Parser) getCurrentToken() *Token {
 	return p._input.LT(1)
 }
 
@@ -424,7 +424,7 @@ func (p *Parser) addContextToParseTree() {
 // Always called by generated parsers upon entry to a rule. Access field
 // {@link //_ctx} get the current context.
 
-func (p *Parser) enterRule(localctx, state, ruleIndex) {
+func (p *Parser) enterRule(localctx, state, ruleIndex int) {
 	p.state = state
 	p._ctx = localctx
 	p._ctx.start = p._input.LT(1)
@@ -671,7 +671,7 @@ func (p *Parser) getSourceName() {
 // During a parse is sometimes useful to listen in on the rule entry and exit
 // events as well as token matches. p.is for quick and dirty debugging.
 //
-func (p *Parser) setTrace(trace) {
+func (p *Parser) setTrace(trace bool) {
 	if (!trace) {
 		p.removeParseListener(p._tracer)
 		p._tracer = nil

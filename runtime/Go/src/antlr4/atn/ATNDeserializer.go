@@ -600,7 +600,7 @@ ATNDeserializer.prototype.edgeFactory = function(atn, type, src, trg, arg1, arg2
     case Transition.ACTION:
         return NewActionTransition(target, arg1, arg2, arg3 != 0)
     case Transition.SET:
-        return NewSetTransition(target, sets[arg1])
+        return antlr4.NewSetTransition(target, sets[arg1])
     case Transition.NOT_SET:
         return NewNotSetTransition(target, sets[arg1])
     case Transition.WILDCARD:

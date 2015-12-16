@@ -2,17 +2,15 @@ package antlr4
 
 import (
     "fmt"
+    "strings"
+    "antlr4/atn"
     "antlr4/tree"
     "antlr4/error"
 )
 
-//var Token = require('./Token').Token
-//var ConsoleErrorListener = require('./error/ErrorListener').ConsoleErrorListener
-//var ProxyErrorListener = require('./error/ErrorListener').ProxyErrorListener
-
 type Recognizer struct {
     _listeners []tree.ParseTreeListener
-    _interp *Parser
+    _interp *atn.ATNSimulator
     state int
 }
 
@@ -41,20 +39,20 @@ func (this *Recognizer) addErrorListener(listener *tree.ParseTreeListener) {
 func (this *Recognizer) removeErrorListeners() {
     this._listeners = make([]tree.ParseTreeListener, 1)
 }
-
-func (this *Recognizer) getTokenTypeMap() {
-    var tokenNames = this.getTokenNames()
-    if (tokenNames==nil) {
-        panic("The current recognizer does not provide a list of token names.")
-    }
-    var result = tokenTypeMapCache[tokenNames]
-    if(result==nil) {
-        result = tokenNames.reduce(function(o, k, i) { o[k] = i })
-        result.EOF = TokenEOF
-        tokenTypeMapCache[tokenNames] = result
-    }
-    return result
-}
+//
+//func (this *Recognizer) getTokenTypeMap() {
+//    var tokenNames = this.getTokenNames()
+//    if (tokenNames==nil) {
+//        panic("The current recognizer does not provide a list of token names.")
+//    }
+//    var result = tokenTypeMapCache[tokenNames]
+//    if(result==nil) {
+//        result = tokenNames.reduce(function(o, k, i) { o[k] = i })
+//        result.EOF = TokenEOF
+//        tokenTypeMapCache[tokenNames] = result
+//    }
+//    return result
+//}
 
 // Get a map from rule names to rule indexes.
 //
@@ -72,22 +70,23 @@ func (this *Recognizer) getRuleIndexMap() {
     }
     return result
 }
-
-func (this *Recognizer) getTokenType(tokenName string) int {
-    var ttype = this.getTokenTypeMap()[tokenName]
-    if (ttype !=nil) {
-        return ttype
-    } else {
-        return TokenInvalidType
-    }
-}
+//
+//func (this *Recognizer) getTokenType(tokenName string) int {
+//    var ttype = this.getTokenTypeMap()[tokenName]
+//    if (ttype !=nil) {
+//        return ttype
+//    } else {
+//        return TokenInvalidType
+//    }
+//}
 
 
 // What is the error header, normally line/character position information?//
-func (this *Recognizer) getErrorHeader(e) {
-    var line = e.getOffendingToken().line
-    var column = e.getOffendingToken().column
-    return "line " + line + ":" + column
+func (this *Recognizer) getErrorHeader(e error) string {
+    panic("Method not defined!")
+//    var line = e.getOffendingToken().line
+//    var column = e.getOffendingToken().column
+//    return "line " + line + ":" + column
 }
 
 
@@ -108,7 +107,7 @@ func (this *Recognizer) getTokenErrorDisplay(t *Token) string {
     if (t==nil) {
         return "<no token>"
     }
-    var s = t.text
+    var s = t.text()
     if s==nil {
         if (t.tokenType==TokenEOF) {
             s = "<EOF>"
@@ -116,7 +115,10 @@ func (this *Recognizer) getTokenErrorDisplay(t *Token) string {
             s = "<" + t.tokenType + ">"
         }
     }
-    s = s.replace("\n","\\n").replace("\r","\\r").replace("\t","\\t")
+    s = strings.Replace(s,"\t","\\t", -1)
+    s = strings.Replace(s,"\n","\\n", -1)
+    s = strings.Replace(s,"\r","\\r", -1)
+
     return "'" + s + "'"
 }
 
@@ -130,7 +132,7 @@ func (this *Recognizer) sempred(localctx *RuleContext, ruleIndex int, actionInde
     return true
 }
 
-func (this *Recognizer) precpred(localctx *RuleContext, precedence) {
+func (this *Recognizer) precpred(localctx *RuleContext, precedence int) bool {
     return true
 }
 
@@ -140,15 +142,5 @@ func (this *Recognizer) precpred(localctx *RuleContext, precedence) {
 //context objects form a stack that lets us see the stack of
 //invoking rules. Combine this and we have complete ATN
 //configuration information.
-
-//Object.defineProperty(Recognizer.prototype, "state", {
-//	get : function() {
-//		return this._stateNumber
-//	},
-//	set : function(state) {
-//		this._stateNumber = state
-//	}
-//})
-
 
 

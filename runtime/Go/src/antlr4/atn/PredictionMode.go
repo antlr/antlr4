@@ -477,7 +477,7 @@ PredictionModegetUniqueAlt = function(altsets) {
 // @return the set of represented alternatives in {@code altsets}
 //
 PredictionModegetAlts = function(altsets) {
-    var all = NewBitSet()
+    var all = antlr4.NewBitSet()
     altsets.map( function(alts) { all.or(alts) })
     return all
 }
@@ -498,7 +498,7 @@ PredictionModegetConflictingAltSubsets = function(configs) {
         var key = "key_" + c.state.stateNumber + "/" + c.context
         var alts = configToAlts[key] || nil
         if (alts == nil) {
-            alts = NewBitSet()
+            alts = antlr4.NewBitSet()
             configToAlts[key] = alts
         }
         alts.add(c.alt)
@@ -526,7 +526,7 @@ PredictionModegetStateToAltMap = function(configs) {
     configs.items.map(function(c) {
         var alts = m.get(c.state)
         if (alts == nil) {
-            alts = NewBitSet()
+            alts = antlr4.NewBitSet()
             m.put(c.state, alts)
         }
         alts.add(c.alt)

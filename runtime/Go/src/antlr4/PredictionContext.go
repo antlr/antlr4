@@ -1,7 +1,5 @@
 package antlr4
 
-//var RuleContext = require('./RuleContext').RuleContext
-
 type PredictionContext struct {
 	cachedHashString string
 }
@@ -19,7 +17,8 @@ func NewPredictionContext(cachedHashString string) *PredictionContext {
 // {@code//+x =//}.
 // /
 const (
-	PredictionContext.EMPTY = nil
+	PredictionContextEMPTY = nil
+	PredictionContextEMPTY_RETURN_STATE = 0x7FFFFFFF
 )
 
 
@@ -27,7 +26,6 @@ const (
 // doesn't mean wildcard: {@code $ + x = [$,x]}. Here,
 // {@code $} = {@link //EMPTY_RETURN_STATE}.
 // /
-PredictionContext.EMPTY_RETURN_STATE = 0x7FFFFFFF
 
 PredictionContext.globalNodeCount = 1
 PredictionContext.id = PredictionContext.globalNodeCount
@@ -59,11 +57,11 @@ PredictionContext.id = PredictionContext.globalNodeCount
 
 // This means only the {@link //EMPTY} context is in set.
 func (this *PredictionContext) isEmpty() {
-	return this == PredictionContext.EMPTY
+	return this == PredictionContextEMPTY
 }
 
 func (this *PredictionContext) hasEmptyPath() {
-	return this.getReturnState(this.length - 1) == PredictionContext.EMPTY_RETURN_STATE
+	return this.getReturnState(this.length - 1) == PredictionContextEMPTY_RETURN_STATE
 }
 
 func (this *PredictionContext) hashString() {

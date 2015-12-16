@@ -1,37 +1,48 @@
 package error
 
+import (
+	"antlr4"
+	"antlr4/atn"
+	"antlr4/dfa"
+	"fmt"
+)
+
 // Provides an empty default implementation of {@link ANTLRErrorListener}. The
 // default implementation of each method does nothing, but can be overridden as
 // necessary.
 
 type ErrorListener struct {
-	return this
+
 }
 
-func (this *ErrorListener) syntaxError(recognizer, offendingSymbol, line, column, msg, e) {
+func NewErrorListener() *ErrorListener {
+	return new(ErrorListener)
 }
 
-func (this *ErrorListener) reportAmbiguity(recognizer, dfa, startIndex, stopIndex, exact, ambigAlts, configs) {
+func (this *ErrorListener) syntaxError(recognizer *antlr4.Parser, offendingSymbol interface{}, line, column int, msg string, e *RecognitionException) {
 }
 
-func (this *ErrorListener) reportAttemptingFullContext(recognizer, dfa, startIndex, stopIndex, conflictingAlts, configs) {
+func (this *ErrorListener) reportAmbiguity(recognizer *antlr4.Parser, dfa *dfa.DFA, startIndex, stopIndex int, exact bool, ambigAlts *antlr4.BitSet, configs *atn.ATNConfigSet) {
 }
 
-func (this *ErrorListener) reportContextSensitivity(recognizer, dfa, startIndex, stopIndex, prediction, configs) {
+func (this *ErrorListener) reportAttemptingFullContext(recognizer *antlr4.Parser, dfa *dfa.DFA, startIndex, stopIndex int, conflictingAlts *antlr4.BitSet, configs *atn.ATNConfigSet) {
+}
+
+func (this *ErrorListener) reportContextSensitivity(recognizer *antlr4.Parser, dfa *dfa.DFA, startIndex, stopIndex, prediction int, configs *atn.ATNConfigSet) {
 }
 
 type ConsoleErrorListener struct {
-	ErrorListener.call(this)
-	return this
+	ErrorListener
 }
 
-//ConsoleErrorListener.prototype = Object.create(ErrorListener.prototype)
-//ConsoleErrorListener.prototype.constructor = ConsoleErrorListener
+func NewConsoleErrorListener() *ConsoleErrorListener {
+	return new(ConsoleErrorListener)
+}
 
 //
 // Provides a default instance of {@link ConsoleErrorListener}.
 //
-ConsoleErrorListener.INSTANCE = NewConsoleErrorListener()
+var ConsoleErrorListenerINSTANCE = NewConsoleErrorListener()
 
 //
 // {@inheritDoc}
@@ -45,37 +56,49 @@ ConsoleErrorListener.INSTANCE = NewConsoleErrorListener()
 // line <em>line</em>:<em>charPositionInLine</em> <em>msg</em>
 // </pre>
 //
-func (this *ConsoleErrorListener) syntaxError(recognizer, offendingSymbol, line, column, msg, e) {
-    console.error("line " + line + ":" + column + " " + msg)
+func (this *ConsoleErrorListener) syntaxError(recognizer *antlr4.Parser, offendingSymbol interface{}, line, column int, msg string, e *RecognitionException) {
+    fmt.Errorf("line " + line + ":" + column + " " + msg)
 }
 
-func ProxyErrorListener(delegates) {
-	ErrorListener.call(this)
+type ProxyErrorListener struct {
+	ErrorListener
+	delegates []ErrorListener
+}
+
+func NewProxyErrorListener(delegates []ErrorListener) *ConsoleErrorListener {
     if (delegates==nil) {
-        panic "delegates"
+        panic("delegates is not provided")
     }
-    this.delegates = delegates
-	return this
+	l := new(ProxyErrorListener)
+    l.delegates = delegates
+	return l
 }
 
-//ProxyErrorListener.prototype = Object.create(ErrorListener.prototype)
-//ProxyErrorListener.prototype.constructor = ProxyErrorListener
-
-func (this *ProxyErrorListener) syntaxError(recognizer, offendingSymbol, line, column, msg, e) {
-    this.delegates.map(function(d) { d.syntaxError(recognizer, offendingSymbol, line, column, msg, e) })
+func (this *ProxyErrorListener) syntaxError(recognizer *antlr4.Parser, offendingSymbol interface{}, line, column int, msg string, e *RecognitionException) {
+    for _,d := range this.delegates {
+		d.syntaxError(recognizer, offendingSymbol, line, column, msg, e)
+	}
 }
 
-func (this *ProxyErrorListener) reportAmbiguity(recognizer, dfa, startIndex, stopIndex, exact, ambigAlts, configs) {
-    this.delegates.map(function(d) { d.reportAmbiguity(recognizer, dfa, startIndex, stopIndex, exact, ambigAlts, configs) })
+func (this *ProxyErrorListener) reportAmbiguity(recognizer *antlr4.Parser, dfa *dfa.DFA, startIndex, stopIndex int, exact bool, ambigAlts *antlr4.BitSet, configs *atn.ATNConfigSet) {
+	for _,d := range this.delegates {
+		d.reportAmbiguity(recognizer, dfa, startIndex, stopIndex, exact, ambigAlts, configs)
+	}
 }
 
-func (this *ProxyErrorListener) reportAttemptingFullContext(recognizer, dfa, startIndex, stopIndex, conflictingAlts, configs) {
-	this.delegates.map(function(d) { d.reportAttemptingFullContext(recognizer, dfa, startIndex, stopIndex, conflictingAlts, configs) })
+func (this *ProxyErrorListener) reportAttemptingFullContext(recognizer *antlr4.Parser, dfa *dfa.DFA, startIndex, stopIndex int, conflictingAlts *antlr4.BitSet, configs *atn.ATNConfigSet) {
+	for _,d := range this.delegates {
+		d.reportAttemptingFullContext(recognizer, dfa, startIndex, stopIndex, conflictingAlts, configs)
+	}
 }
 
-func (this *ProxyErrorListener) reportContextSensitivity(recognizer, dfa, startIndex, stopIndex, prediction, configs) {
-	this.delegates.map(function(d) { d.reportContextSensitivity(recognizer, dfa, startIndex, stopIndex, prediction, configs) })
+func (this *ProxyErrorListener) reportContextSensitivity(recognizer *antlr4.Parser, dfa *dfa.DFA, startIndex, stopIndex, prediction int, configs *atn.ATNConfigSet) {
+	for _,d := range this.delegates {
+		d.reportContextSensitivity(recognizer, dfa, startIndex, stopIndex, prediction, configs)
+	}
 }
+
+
 
 
 

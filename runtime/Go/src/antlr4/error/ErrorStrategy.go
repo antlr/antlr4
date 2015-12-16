@@ -1,40 +1,32 @@
 package error
 
 import (
+    "fmt"
     "antlr4"
     "antlr4/atn"
+    "strings"
 )
-
-//var Token = require('./../Token').Token
-//var Errors = require('./Errors')
-//var NoViableAltException = Errors.NoViableAltException
-//var InputMismatchException = Errors.InputMismatchException
-//var FailedPredicateException = Errors.FailedPredicateException
-//var ParseCancellationException = Errors.ParseCancellationException
-//var ATNState = require('./../atn/ATNState').ATNState
-//var Interval = require('./../IntervalSet').Interval
-//var IntervalSet = require('./../IntervalSet').IntervalSet
 
 type ErrorStrategy struct {
 
 }
 
-func (this *ErrorStrategy) reset(recognizer *antlr4.Recognizer){
+func (this *ErrorStrategy) reset(recognizer *antlr4.Parser){
 }
 
-func (this *ErrorStrategy) recoverInline(recognizer *antlr4.Recognizer){
+func (this *ErrorStrategy) recoverInline(recognizer *antlr4.Parser){
 }
 
-func (this *ErrorStrategy) recover(recognizer *antlr4.Recognizer, e *Error){
+func (this *ErrorStrategy) recover(recognizer *antlr4.Parser, e *Error){
 }
 
-func (this *ErrorStrategy) sync(recognizer *antlr4.Recognizer){
+func (this *ErrorStrategy) sync(recognizer *antlr4.Parser){
 }
 
-func (this *ErrorStrategy) inErrorRecoveryMode(recognizer *antlr4.Recognizer){
+func (this *ErrorStrategy) inErrorRecoveryMode(recognizer *antlr4.Parser){
 }
 
-func (this *ErrorStrategy) reportError(recognizer *antlr4.Recognizer){
+func (this *ErrorStrategy) reportError(recognizer *antlr4.Parser){
 }
 
 // This is the default implementation of {@link ANTLRErrorStrategy} used for
@@ -77,7 +69,7 @@ func DefaultErrorStrategy() *DefaultErrorStrategy {
 
 // <p>The default implementation simply calls {@link //endErrorCondition} to
 // ensure that the handler is not in error recovery mode.</p>
-func (this *DefaultErrorStrategy) reset(recognizer *antlr4.Recognizer) {
+func (this *DefaultErrorStrategy) reset(recognizer *antlr4.Parser) {
     this.endErrorCondition(recognizer)
 }
 
@@ -87,11 +79,11 @@ func (this *DefaultErrorStrategy) reset(recognizer *antlr4.Recognizer) {
 //
 // @param recognizer the parser instance
 //
-func (this *DefaultErrorStrategy) beginErrorCondition(recognizer *antlr4.Recognizer) {
+func (this *DefaultErrorStrategy) beginErrorCondition(recognizer *antlr4.Parser) {
     this.errorRecoveryMode = true
 }
 
-func (this *DefaultErrorStrategy) inErrorRecoveryMode(recognizer *antlr4.Recognizer) {
+func (this *DefaultErrorStrategy) inErrorRecoveryMode(recognizer *antlr4.Parser) {
     return this.errorRecoveryMode
 }
 
@@ -101,7 +93,7 @@ func (this *DefaultErrorStrategy) inErrorRecoveryMode(recognizer *antlr4.Recogni
 //
 // @param recognizer
 //
-func (this *DefaultErrorStrategy) endErrorCondition(recognizer *antlr4.Recognizer) {
+func (this *DefaultErrorStrategy) endErrorCondition(recognizer *antlr4.Parser) {
     this.errorRecoveryMode = false
     this.lastErrorStates = nil
     this.lastErrorIndex = -1
@@ -112,7 +104,7 @@ func (this *DefaultErrorStrategy) endErrorCondition(recognizer *antlr4.Recognize
 //
 // <p>The default implementation simply calls {@link //endErrorCondition}.</p>
 //
-func (this *DefaultErrorStrategy) reportMatch(recognizer *antlr4.Recognizer) {
+func (this *DefaultErrorStrategy) reportMatch(recognizer *antlr4.Parser) {
     this.endErrorCondition(recognizer)
 }
 
@@ -135,23 +127,25 @@ func (this *DefaultErrorStrategy) reportMatch(recognizer *antlr4.Recognizer) {
 // the exception</li>
 // </ul>
 //
-func (this *DefaultErrorStrategy) reportError(recognizer, e) {
+func (this *DefaultErrorStrategy) reportError(recognizer *antlr4.Parser, e *) {
    // if we've already reported an error and have not matched a token
    // yet successfully, don't report any errors.
     if(this.inErrorRecoveryMode(recognizer)) {
         return // don't report spurious errors
     }
     this.beginErrorCondition(recognizer)
-    if ( e instanceof NoViableAltException ) {
-        this.reportNoViableAlternative(recognizer, e)
-    } else if ( e instanceof InputMismatchException ) {
-        this.reportInputMismatch(recognizer, e)
-    } else if ( e instanceof FailedPredicateException ) {
-        this.reportFailedPredicate(recognizer, e)
-    } else {
-        fmt.Println("unknown recognition error type: " + e.constructor.name)
-        fmt.Println(e.stack)
-        recognizer.notifyErrorListeners(e.getOffendingToken(), e.getMessage(), e)
+
+    switch e.(type) {
+        default:
+            fmt.Println("unknown recognition error type: " + e.constructor.name)
+            fmt.Println(e.stack)
+            recognizer.notifyErrorListeners(e.getOffendingToken(), e.getMessage(), e)
+        case NoViableAltException:
+            this.reportNoViableAlternative(recognizer, e)
+        case InputMismatchException:
+            this.reportInputMismatch(recognizer, e)
+        case FailedPredicateException:
+            this.reportFailedPredicate(recognizer, e)
     }
 }
 //
@@ -161,7 +155,7 @@ func (this *DefaultErrorStrategy) reportError(recognizer, e) {
 // until we find one in the resynchronization set--loosely the set of tokens
 // that can follow the current rule.</p>
 //
-func (this *DefaultErrorStrategy) recover(recognizer, e) {
+func (this *DefaultErrorStrategy) recover(recognizer *antlr4.Parser, e *RecognitionException) {
     if (this.lastErrorIndex==recognizer.getInputStream().index &&
         this.lastErrorStates != nil && this.lastErrorStates.indexOf(recognizer.state)>=0) {
 		// uh oh, another error at same token index and previously-visited
@@ -224,7 +218,7 @@ func (this *DefaultErrorStrategy) recover(recognizer, e) {
 // some reason speed is suffering for you, you can turn off this
 // functionality by simply overriding this method as a blank { }.</p>
 //
-func (this *DefaultErrorStrategy) sync(recognizer *antlr4.Recognizer) {
+func (this *DefaultErrorStrategy) sync(recognizer *antlr4.Parser) {
     // If already recovering, don't try to sync
     if (this.inErrorRecoveryMode(recognizer)) {
         return
@@ -232,35 +226,35 @@ func (this *DefaultErrorStrategy) sync(recognizer *antlr4.Recognizer) {
     var s = recognizer._interp.atn.states[recognizer.state]
     var la = recognizer.getTokenStream().LA(1)
     // try cheaper subset first might get lucky. seems to shave a wee bit off
-    if (la==TokenEOF || recognizer.atn.nextTokens(s).contains(la)) {
+    if (la==antlr4.TokenEOF || recognizer.atn.nextTokens(s).contains(la)) {
         return
     }
     // Return but don't end recovery. only do that upon valid token match
     if(recognizer.isExpectedToken(la)) {
         return
     }
-    switch (s.stateType) {
-    case atn.ATNStateBLOCK_START:
-    case atn.ATNStateSTAR_BLOCK_START:
-    case atn.ATNStatePLUS_BLOCK_START:
-    case atn.ATNStateSTAR_LOOP_ENTRY:
-       // report error and recover if possible
-        if( this.singleTokenDeletion(recognizer) != nil) {
-            return
-        } else {
-            panic NewInputMismatchException(recognizer)
-        }
-        break
-    case atn.ATNStatePLUS_LOOP_BACK:
-    case atn.ATNStateSTAR_LOOP_BACK:
-        this.reportUnwantedToken(recognizer)
-        var expecting = antlr4.NewIntervalSet()
-        expecting.addSet(recognizer.getExpectedTokens())
-        var whatFollowsLoopIterationOrRule = expecting.addSet(this.getErrorRecoverySet(recognizer))
-        this.consumeUntil(recognizer, whatFollowsLoopIterationOrRule)
-        break
-    default:
-        // do nothing if we can't identify the exact kind of ATN state
+    switch (s.stateType *RecognitionException) {
+        case atn.ATNStateBLOCK_START:
+        case atn.ATNStateSTAR_BLOCK_START:
+        case atn.ATNStatePLUS_BLOCK_START:
+        case atn.ATNStateSTAR_LOOP_ENTRY:
+           // report error and recover if possible
+            if( this.singleTokenDeletion(recognizer) != nil) {
+                return
+            } else {
+                panic(NewInputMismatchException(recognizer))
+            }
+            break
+        case atn.ATNStatePLUS_LOOP_BACK:
+        case atn.ATNStateSTAR_LOOP_BACK:
+            this.reportUnwantedToken(recognizer)
+            var expecting = antlr4.NewIntervalSet()
+            expecting.addSet(recognizer.getExpectedTokens())
+            var whatFollowsLoopIterationOrRule = expecting.addSet(this.getErrorRecoverySet(recognizer))
+            this.consumeUntil(recognizer, whatFollowsLoopIterationOrRule)
+            break
+        default:
+            // do nothing if we can't identify the exact kind of ATN state
     }
 }
 
@@ -272,11 +266,11 @@ func (this *DefaultErrorStrategy) sync(recognizer *antlr4.Recognizer) {
 // @param recognizer the parser instance
 // @param e the recognition exception
 //
-func (this *DefaultErrorStrategy) reportNoViableAlternative(recognizer, e) {
+func (this *DefaultErrorStrategy) reportNoViableAlternative(recognizer *antlr4.Parser, e *RecognitionException) {
     var tokens = recognizer.getTokenStream()
     var input
     if(tokens != nil) {
-        if (e.startToken.type==TokenEOF) {
+        if (e.startToken.tokenType==antlr4.TokenEOF) {
             input = "<EOF>"
         } else {
             input = tokens.getText(NewInterval(e.startToken, e.offendingToken))
@@ -297,7 +291,7 @@ func (this *DefaultErrorStrategy) reportNoViableAlternative(recognizer, e) {
 // @param recognizer the parser instance
 // @param e the recognition exception
 //
-func (this *DefaultErrorStrategy) reportInputMismatch(recognizer, e) {
+func (this *DefaultErrorStrategy) reportInputMismatch(recognizer *antlr4.Parser, e *RecognitionException) {
     var msg = "mismatched input " + this.getTokenErrorDisplay(e.offendingToken) +
           " expecting " + e.getExpectedTokens().toString(recognizer.literalNames, recognizer.symbolicNames)
     recognizer.notifyErrorListeners(msg, e.offendingToken, e)
@@ -312,7 +306,7 @@ func (this *DefaultErrorStrategy) reportInputMismatch(recognizer, e) {
 // @param recognizer the parser instance
 // @param e the recognition exception
 //
-func (this *DefaultErrorStrategy) reportFailedPredicate(recognizer, e) {
+func (this *DefaultErrorStrategy) reportFailedPredicate(recognizer *antlr4.Parser, e *RecognitionException) {
     var ruleName = recognizer.ruleNames[recognizer._ctx.ruleIndex]
     var msg = "rule " + ruleName + " " + e.message
     recognizer.notifyErrorListeners(msg, e.offendingToken, e)
@@ -335,7 +329,7 @@ func (this *DefaultErrorStrategy) reportFailedPredicate(recognizer, e) {
 //
 // @param recognizer the parser instance
 //
-func (this *DefaultErrorStrategy) reportUnwantedToken(recognizer *antlr4.Recognizer) {
+func (this *DefaultErrorStrategy) reportUnwantedToken(recognizer *antlr4.Parser) {
     if (this.inErrorRecoveryMode(recognizer)) {
         return
     }
@@ -363,7 +357,7 @@ func (this *DefaultErrorStrategy) reportUnwantedToken(recognizer *antlr4.Recogni
 //
 // @param recognizer the parser instance
 //
-func (this *DefaultErrorStrategy) reportMissingToken(recognizer *antlr4.Recognizer) {
+func (this *DefaultErrorStrategy) reportMissingToken(recognizer *antlr4.Parser) {
     if ( this.inErrorRecoveryMode(recognizer)) {
         return
     }
@@ -424,7 +418,7 @@ func (this *DefaultErrorStrategy) reportMissingToken(recognizer *antlr4.Recogniz
 // is in the set of tokens that can follow the {@code ')'} token reference
 // in rule {@code atom}. It can assume that you forgot the {@code ')'}.
 //
-func (this *DefaultErrorStrategy) recoverInline(recognizer *antlr4.Recognizer) {
+func (this *DefaultErrorStrategy) recoverInline(recognizer *antlr4.Parser) {
     // SINGLE TOKEN DELETION
     var matchedSymbol = this.singleTokenDeletion(recognizer)
     if (matchedSymbol != nil) {
@@ -438,7 +432,7 @@ func (this *DefaultErrorStrategy) recoverInline(recognizer *antlr4.Recognizer) {
         return this.getMissingSymbol(recognizer)
     }
     // even that didn't work must panic the exception
-    panic NewInputMismatchException(recognizer)
+    panic(NewInputMismatchException(recognizer))
 }
 
 //
@@ -458,7 +452,7 @@ func (this *DefaultErrorStrategy) recoverInline(recognizer *antlr4.Recognizer) {
 // @return {@code true} if single-token insertion is a viable recovery
 // strategy for the current mismatched input, otherwise {@code false}
 //
-func (this *DefaultErrorStrategy) singleTokenInsertion(recognizer *antlr4.Recognizer) {
+func (this *DefaultErrorStrategy) singleTokenInsertion(recognizer *antlr4.Parser) {
     var currentSymbolType = recognizer.getTokenStream().LA(1)
     // if current token is consistent with what could come after current
     // ATN state, then we know we're missing a token error recovery
@@ -493,7 +487,7 @@ func (this *DefaultErrorStrategy) singleTokenInsertion(recognizer *antlr4.Recogn
 // deletion successfully recovers from the mismatched input, otherwise
 // {@code nil}
 //
-func (this *DefaultErrorStrategy) singleTokenDeletion(recognizer *antlr4.Recognizer) {
+func (this *DefaultErrorStrategy) singleTokenDeletion(recognizer *antlr4.Parser) {
     var nextTokenType = recognizer.getTokenStream().LA(2)
     var expecting = this.getExpectedTokens(recognizer)
     if (expecting.contains(nextTokenType)) {
@@ -531,27 +525,25 @@ func (this *DefaultErrorStrategy) singleTokenDeletion(recognizer *antlr4.Recogni
 // If you change what tokens must be created by the lexer,
 // override this method to create the appropriate tokens.
 //
-func (this *DefaultErrorStrategy) getMissingSymbol(recognizer *antlr4.Recognizer) {
+func (this *DefaultErrorStrategy) getMissingSymbol(recognizer *antlr4.Parser) {
     var currentSymbol = recognizer.getCurrentToken()
     var expecting = this.getExpectedTokens(recognizer)
     var expectedTokenType = expecting.first() // get any element
     var tokenText
-    if (expectedTokenType==TokenEOF) {
+    if (expectedTokenType==antlr4.TokenEOF) {
         tokenText = "<missing EOF>"
     } else {
         tokenText = "<missing " + recognizer.literalNames[expectedTokenType] + ">"
     }
     var current = currentSymbol
     var lookback = recognizer.getTokenStream().LT(-1)
-    if (current.type==TokenEOF && lookback != nil) {
+    if (current.tokenType==antlr4.TokenEOF && lookback != nil) {
         current = lookback
     }
-    return recognizer.getTokenFactory().create(current.source,
-        expectedTokenType, tokenText, TokenDefaultChannel,
-        -1, -1, current.line, current.column)
+    return recognizer.getTokenFactory().create(current.source,  expectedTokenType, tokenText, TokenDefaultChannel, -1, -1, current.line, current.column)
 }
 
-func (this *DefaultErrorStrategy) getExpectedTokens(recognizer *antlr4.Recognizer) {
+func (this *DefaultErrorStrategy) getExpectedTokens(recognizer *antlr4.Parser) {
     return recognizer.getExpectedTokens()
 }
 
@@ -563,25 +555,25 @@ func (this *DefaultErrorStrategy) getExpectedTokens(recognizer *antlr4.Recognize
 // your token objects because you don't have to go modify your lexer
 // so that it creates a NewJava type.
 //
-func (this *DefaultErrorStrategy) getTokenErrorDisplay(t) {
+func (this *DefaultErrorStrategy) getTokenErrorDisplay(t *antlr4.Token) string {
     if (t == nil) {
         return "<no token>"
     }
     var s = t.text
     if (s == nil) {
-        if (t.type==TokenEOF) {
+        if (t.tokenType==antlr4.TokenEOF) {
             s = "<EOF>"
         } else {
-            s = "<" + t.type + ">"
+            s = "<" + t.tokenType + ">"
         }
     }
     return this.escapeWSAndQuote(s)
 }
 
-func (this *DefaultErrorStrategy) escapeWSAndQuote(s) {
-    s = s.replace(/\n/g,"\\n")
-    s = s.replace(/\r/g,"\\r")
-    s = s.replace(/\t/g,"\\t")
+func (this *DefaultErrorStrategy) escapeWSAndQuote(s string) string {
+    s = strings.Replace(s,"\t","\\t", -1)
+    s = strings.Replace(s,"\n","\\n", -1)
+    s = strings.Replace(s,"\r","\\r", -1)
     return "'" + s + "'"
 }
 
@@ -677,10 +669,10 @@ func (this *DefaultErrorStrategy) escapeWSAndQuote(s) {
 // Like Grosch I implement context-sensitive FOLLOW sets that are combined
 // at run-time upon error to avoid overhead during parsing.
 //
-func (this *DefaultErrorStrategy) getErrorRecoverySet(recognizer *antlr4.Recognizer) {
+func (this *DefaultErrorStrategy) getErrorRecoverySet(recognizer *antlr4.Parser) *antlr4.IntervalSet {
     var atn = recognizer._interp.atn
     var ctx = recognizer._ctx
-    var recoverSet = NewIntervalSet()
+    var recoverSet = antlr4.NewIntervalSet()
     for (ctx != nil && ctx.invokingState>=0) {
         // compute what follows who invoked us
         var invokingState = atn.states[ctx.invokingState]
@@ -694,9 +686,9 @@ func (this *DefaultErrorStrategy) getErrorRecoverySet(recognizer *antlr4.Recogni
 }
 
 // Consume tokens until one matches the given token set.//
-func (this *DefaultErrorStrategy) consumeUntil(recognizer, set) {
+func (this *DefaultErrorStrategy) consumeUntil(recognizer *antlr4.Parser, set) {
     var ttype = recognizer.getTokenStream().LA(1)
-    while( ttype != TokenEOF && !set.contains(ttype)) {
+    for( ttype != antlr4.antlr4.TokenEOF && !set.contains(ttype)) {
         recognizer.consume()
         ttype = recognizer.getTokenStream().LA(1)
     }
@@ -743,24 +735,24 @@ type BailErrorStrategy struct {
 // rule func catches. Use {@link Exception//getCause()} to get the
 // original {@link RecognitionException}.
 //
-func (this *BailErrorStrategy) recover(recognizer, e) {
+func (this *BailErrorStrategy) recover(recognizer *antlr4.Parser, e *RecognitionException) {
     var context = recognizer._ctx
     for (context != nil) {
         context.exception = e
         context = context.parentCtx
     }
-    panic NewParseCancellationException(e)
+    panic(NewParseCancellationException(e))
 }
     
 // Make sure we don't attempt to recover inline if the parser
 // successfully recovers, it won't panic an exception.
 //
-func (this *BailErrorStrategy) recoverInline(recognizer *antlr4.Recognizer) {
+func (this *BailErrorStrategy) recoverInline(recognizer *antlr4.Parser) {
     this.recover(recognizer, NewInputMismatchException(recognizer))
 }
 
 // Make sure we don't attempt to recover from problems in subrules.//
-func (this *BailErrorStrategy) sync(recognizer *antlr4.Recognizer) {
+func (this *BailErrorStrategy) sync(recognizer *antlr4.Parser) {
     // pass
 }
 

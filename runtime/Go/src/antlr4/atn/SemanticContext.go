@@ -1,5 +1,9 @@
 package atn
 
+import (
+	"antlr4"
+)
+
 // A tree structure used to record the semantic context in which
 //  an ATN configuration is valid.  It's either a single predicate,
 //  a conjunction {@code p1&&p2}, or a sum of products {@code p1||p2}.
@@ -11,7 +15,11 @@ package atn
 //var Set = require('./../Utils').Set
 
 type SemanticContext struct {
-	return this
+
+}
+
+func NewSemanticContext() *SemanticContext {
+	return new(SemanticContext)
 }
 
 // For context independent predicates, we evaluate them without a local
@@ -84,12 +92,20 @@ SemanticContext.orContext = function(a, b) {
 	}
 }
 
-func Predicate(ruleIndex, predIndex, isCtxDependent) {
-	SemanticContext.call(this)
-	this.ruleIndex = ruleIndex == nil ? -1 : ruleIndex
-	this.predIndex = predIndex == nil ? -1 : predIndex
-	this.isCtxDependent = isCtxDependent == nil ? false : isCtxDependent // e.g., $i ref in pred
-	return this
+type Predicate struct {
+	SemanticContext
+	ruleIndex int
+	predIndex int
+	isCtxDependent bool
+}
+
+func Predicate(ruleIndex, predIndex int, isCtxDependent bool) {
+	p := &Predicate{SemanticContext{}}
+
+	p.ruleIndex = ruleIndex
+	p.predIndex = predIndex
+	p.isCtxDependent = isCtxDependent // e.g., $i ref in pred
+	return p
 }
 
 //Predicate.prototype = Object.create(SemanticContext.prototype)
@@ -98,7 +114,7 @@ func Predicate(ruleIndex, predIndex, isCtxDependent) {
 //The default {@link SemanticContext}, which is semantically equivalent to
 //a predicate of the form {@code {true}?}.
 //
-SemanticContext.NONE = NewPredicate()
+var SemanticContextNONE = NewPredicate()
 
 
 func (this *Predicate) evaluate(parser, outerContext) {
@@ -186,7 +202,7 @@ PrecedencePredicate.filterPrecedencePredicates = function(set) {
 //
 func AND(a, b) {
 	SemanticContext.call(this)
-	var operands = NewSet()
+	var operands = antlr4.antlr4.NewSet()
 	if _, ok := a.(AND); ok {
 		a.opnds.map(function(o) {
 			operands.add(o)
@@ -291,7 +307,7 @@ func (this *AND) toString() string {
 //
 func OR(a, b) {
 	SemanticContext.call(this)
-	var operands = NewSet()
+	var operands = antlr4.NewSet()
 	if _, ok := a.(OR); ok {
 		a.opnds.map(function(o) {
 			operands.add(o)

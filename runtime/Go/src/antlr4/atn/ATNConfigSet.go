@@ -1,5 +1,9 @@
 package atn
 
+import (
+	"antlr4"
+)
+
 //
 // Specialized {@link Set}{@code <}{@link ATNConfig}{@code >} that can track
 // info about the set, with support for combining similar configurations using a
@@ -40,7 +44,7 @@ func ATNConfigSet(fullCtx) {
 	// use a hash table that lets us specify the equals/hashcode operation.
 	// All configs but hashed by (s, i, _, pi) not including context. Wiped out
 	// when we go readonly as this set becomes a DFA state.
-	this.configLookup = NewSet(hashATNConfig, equalATNConfigs)
+	this.configLookup = antlr4.NewSet(hashATNConfig, equalATNConfigs)
 	// Indicates that this configuration set is part of a full context
 	// LL prediction. It will be used to determine how to merge $. With SLL
 	// it's a wildcard whereas it is not for LL context merge.
@@ -115,7 +119,7 @@ func (this *ATNConfigSet) add(config, mergeCache) {
 }
 
 func (this *ATNConfigSet) getStates() {
-	var states = NewSet()
+	var states = antlr4.NewSet()
 	for i := 0; i < len(this.configs); i++ {
 		states.add(this.configs[i].state)
 	}
@@ -222,7 +226,7 @@ func (this *ATNConfigSet) clear() {
 	}
 	this.configs = []
 	this.cachedHashString = "-1"
-	this.configLookup = NewSet()
+	this.configLookup = antlr4.NewSet()
 }
 
 func (this *ATNConfigSet) setReadonly(readOnly) {
@@ -242,7 +246,7 @@ func (this *ATNConfigSet) toString() string {
 
 type OrderedATNConfigSet struct {
 	ATNConfigSet.call(this)
-	this.configLookup = NewSet()
+	this.configLookup = antlr4.NewSet()
 	return this
 }
 
