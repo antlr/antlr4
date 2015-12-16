@@ -111,7 +111,7 @@ func New<parser.name>(input) <parser.name> {
 
     // TODO could be package level variable
 
-    var deserializer = atn.ATNDeserializer()
+    var deserializer = atn.NewATNDeserializer()
     var deserializedAtn = deserializer.deserialize(serializedATN)
     var decisionToDFA = make([]dfa.DFA,len(deserializedAtn.decisionToState))
 
@@ -826,7 +826,7 @@ func New<lexer.name>(input *antlr4.TokenStream) <lexer.name> {
 
     // TODO could be package level variables
 
-    var deserializer = atn.ATNDeserializer()
+    var deserializer = atn.NewATNDeserializer()
     var deserializedAtn = deserializer.deserialize(serializedATN)
 
     var decisionToDFA = make([]dfa.DFA,len(deserializedAtn.decisionToState))
@@ -839,7 +839,7 @@ func New<lexer.name>(input *antlr4.TokenStream) <lexer.name> {
 
 	antlr4.InitLexer(lex, input);
 
-    lex._interp = atn.NewLexerATNSimulator(lex, atn, decisionsToDFA, antlr4.NewPredictionContextCache())
+    lex._interp = atn.NewLexerATNSimulator(lex, atn, decisionToDFA, antlr4.NewPredictionContextCache())
     lex.modeNames = [...]string{ <lexer.modes:{m| "<m>"}; separator=", ", wrap, anchor> }
     lex.literalNames = [...]string{ <lexer.literalNames:{t | <t>}; null="nil", separator=", ", wrap, anchor> }
     lex.symbolicNames = [...]string{ <lexer.symbolicNames:{t | <t>}; null="nil", separator=", ", wrap, anchor> }

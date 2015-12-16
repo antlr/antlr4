@@ -3,6 +3,7 @@ package antlr4
 import (
 	"strings"
 	"fmt"
+	"antlr4/atn"
 )
 
 // A lexer is recognizer that draws input symbols from a character stream.
@@ -22,13 +23,14 @@ type TokenFactorySourcePair struct {
 	inputStream InputStream
 }
 
+
 type Lexer struct {
 	Recognizer
 
 	_input *InputStream
 	_factory *TokenFactory
 	_tokenFactorySourcePair TokenFactorySourcePair
-	_interp *Parser
+	_interp *atn.LexerATNSimulator
 	_token int
 	_tokenStartCharIndex int
 	_tokenStartLine int
@@ -36,7 +38,7 @@ type Lexer struct {
 	_hitEOF int
 	_channel int
 	_type int
-	_modeStack []
+	_modeStack IntStack
 	_mode int
 	_text string
 }
@@ -81,7 +83,7 @@ func NewLexer(input *InputStream) *Lexer {
 	// The token type for the current token///
 	lexer._type = TokenInvalidType
 
-	lexer._modeStack = []
+	lexer._modeStack = make([]int,0)
 	lexer._mode = LexerDefaultMode
 
 	// You can set the text for the current token to override what is in
@@ -126,20 +128,20 @@ func (l *Lexer) reset() {
 
 	l._hitEOF = false
 	l._mode = LexerDefaultMode
-	l._modeStack = []
+	l._modeStack = make([]int, 0)
 
 	l._interp.reset()
 }
 
 // Return a token from l source i.e., match a token on the char stream.
-func (l *Lexer) nextToken() {
+func (l *Lexer) nextToken() Token {
 	if (l._input == nil) {
 		panic("nextToken requires a non-nil input stream.")
 	}
 
 	// Mark start location in char stream so unbuffered streams are
 	// guaranteed at least have text of current token
-	var tokenStartMarker = l._input.mark()
+	// var tokenStartMarker = l._input.mark()
 	try {
 		for (true) {
 			if (l._hitEOF) {
@@ -205,40 +207,41 @@ func (l *Lexer) more() {
 	l._type = LexerMore
 }
 
-func (l *Lexer) mode(m) {
+func (l *Lexer) mode(m int) {
 	l._mode = m
 }
 
-func (l *Lexer) pushMode(m) {
+func (l *Lexer) pushMode(m int) {
 	if (l._interp.debug) {
 		fmt.Println("pushMode " + m)
 	}
-	l._modeStack.push(l._mode)
+	l._modeStack.Push(l._mode)
 	l.mode(m)
 }
 
 func (l *Lexer) popMode() {
-	if (l._modeStack.length == 0) {
+	if ( len(l._modeStack) == 0) {
 		panic("Empty Stack")
 	}
 	if (l._interp.debug) {
 		fmt.Println("popMode back to " + l._modeStack.slice(0, -1))
 	}
-	l.mode(l._modeStack.pop())
+	i, _ := l._modeStack.Pop()
+	l.mode(i)
 	return l._mode
 }
 
 
 func (l *Lexer) inputStream() *InputStream {
-	return _l.input
+	return l._input
 }
 
-func (l *Lexer) setInputStream() {
+func (l *Lexer) setInputStream(input *InputStream) {
 	l._input = nil
-	l._tokenFactorySourcePair = [ l, l._input ]
+	l._tokenFactorySourcePair = TokenFactorySourcePair{l, l._input}
 	l.reset()
 	l._input = input
-	l._tokenFactorySourcePair = [ l, l._input ]
+	l._tokenFactorySourcePair = TokenFactorySourcePair{l, l._input}
 }
 
 
@@ -251,7 +254,7 @@ func (l *Lexer) sourceName() string {
 // and getToken (to push tokens into a list and pull from that list
 // rather than a single variable as l implementation does).
 // /
-func (l *Lexer) emitToken(token) {
+func (l *Lexer) emitToken(token int) {
 	l._token = token
 }
 
@@ -262,19 +265,15 @@ func (l *Lexer) emitToken(token) {
 // custom Token objects or provide a Newfactory.
 // /
 func (l *Lexer) emit() {
-	var t = l._factory.create(l._tokenFactorySourcePair, l._type,
-			l._text, l._channel, l._tokenStartCharIndex, l.getCharIndex() - 1, l._tokenStartLine,
-			l._tokenStartColumn)
+	var t = l._factory.create(l._tokenFactorySourcePair, l._type, l._text, l._channel, l._tokenStartCharIndex, l.getCharIndex() - 1, l._tokenStartLine, l._tokenStartColumn)
 	l.emitToken(t)
 	return t
 }
 
-func (l *Lexer) emitEOF() {
-	var cpos = l.column
-	var lpos = l.line
-	var eof = l._factory.create(l._tokenFactorySourcePair, TokenEOF,
-			nil, TokenDefaultChannel, l._input.index,
-			l._input.index - 1, lpos, cpos)
+func (l *Lexer) emitEOF() int {
+	var cpos = l.column()
+	var lpos = l.line()
+	var eof = l._factory.create(l._tokenFactorySourcePair, TokenEOF, nil, TokenDefaultChannel, l._input.index,  l._input.index - 1, lpos, cpos)
 	l.emitToken(eof)
 	return eof
 }
@@ -288,25 +287,6 @@ Object.defineProperty(Lexer.prototype, "type", {
 	}
 })
 
-Object.defineProperty(Lexer.prototype, "line", {
-	get : function() {
-		return l._interp.line
-	},
-	set : function(line) {
-		l._interp.line = line
-	}
-})
-
-Object.defineProperty(Lexer.prototype, "column", {
-	get : function() {
-		return l._interp.column
-	},
-	set : function(column) {
-		l._interp.column = column
-	}
-})
-
-
 // What is the index of the current character of lookahead?///
 func (l *Lexer) getCharIndex() {
 	return l._input.index
@@ -314,44 +294,44 @@ func (l *Lexer) getCharIndex() {
 
 // Return the text matched so far for the current token or any text override.
 //Set the complete text of l token it wipes any previous changes to the text.
-Object.defineProperty(Lexer.prototype, "text", {
-	get : function() {
-		if (l._text != nil) {
-			return l._text
-		} else {
-			return l._interp.getText(l._input)
-		}
-	},
-	set : function(text) {
-		l._text = text
-	}
-})
+//Object.defineProperty(Lexer.prototype, "text", {
+//	get : function() {
+//		if (l._text != nil) {
+//			return l._text
+//		} else {
+//			return l._interp.getText(l._input)
+//		}
+//	},
+//	set : function(text) {
+//		l._text = text
+//	}
+//})
+
 // Return a list of all Token objects in input char stream.
 // Forces load of all tokens. Does not include EOF token.
 // /
-func (l *Lexer) getAllTokens() {
-	var tokens = []
+func (l *Lexer) getAllTokens() []Token {
+	var tokens = make([]Token, 0)
 	var t = l.nextToken()
-	for (t.type != TokenEOF) {
-		tokens.push(t)
+	for (t.tokenType != TokenEOF) {
+		tokens = append(tokens, t)
 		t = l.nextToken()
 	}
 	return tokens
 }
 
-func (l *Lexer) notifyListeners(e) {
+func (l *Lexer) notifyListeners(e error) {
 	var start = l._tokenStartCharIndex
 	var stop = l._input.index
 	var text = l._input.getText(start, stop)
 	var msg = "token recognition error at: '" + l.getErrorDisplay(text) + "'"
 	var listener = l.getErrorListenerDispatch()
-	listener.syntaxError(l, nil, l._tokenStartLine,
-			l._tokenStartColumn, msg, e)
+	listener.syntaxError(l, nil, l._tokenStartLine, l._tokenStartColumn, msg, e)
 }
 
-func (l *Lexer) getErrorDisplay(s) {
-	var d = make([]string,s.length)
-	for i := 0; i < s.length; i++ {
+func (l *Lexer) getErrorDisplay(s []string) string {
+	var d = make([]string,len(s))
+	for i := 0; i < len(s); i++ {
 		d[i] = s[i]
 	}
 	return strings.Join(d, "")
@@ -380,9 +360,9 @@ func (l *Lexer) getCharErrorDisplay(c) string {
 // it all works out. You can instead use the rule invocation stack
 // to do sophisticated error recovery if you are in a fragment rule.
 // /
-func (l *Lexer) recover(re) {
+func (l *Lexer) recover(re error) {
 	if (l._input.LA(1) != TokenEOF) {
-		if re, ok := re.(LexerNoViableAltException); ok {
+		if _, ok := re.(error.LexerNoViableAltException); ok {
 			// skip a char and try again
 			l._interp.consume(l._input)
 		} else {

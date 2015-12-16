@@ -69,7 +69,7 @@ func (is *InputStream) LT(offset int) {
 }
 
 // mark/release do nothing we have entire buffer
-func (is *InputStream) mark() {
+func (is *InputStream) mark() int {
 	return -1
 }
 

@@ -4,29 +4,12 @@ import (
     "antlr4/atn"
 )
 
-//var Set = require('./Utils').Set
-//var BitSet = require('./Utils').BitSet
-//var Token = require('./Token').Token
-//var ATNConfig = require('./atn/ATNConfig').ATNConfig
-//var Interval = require('./IntervalSet').Interval
-//var IntervalSet = require('./IntervalSet').IntervalSet
-//var RuleStopState = require('./atn/ATNState').RuleStopState
-//var RuleTransition = require('./atn/Transition').RuleTransition
-//var NotSetTransition = require('./atn/Transition').NotSetTransition
-//var WildcardTransition = require('./atn/Transition').WildcardTransition
-//var AbstractPredicateTransition = require('./atn/Transition').AbstractPredicateTransition
-//
-//var pc = require('./PredictionContext')
-//var predictionContextFromRuleContext = pc.predictionContextFromRuleContext
-//var PredictionContext = pc.PredictionContext
-//var SingletonPredictionContext = pc.SingletonPredictionContext
-
 type LL1Analyzer struct {
-    atn atn.ATN
+    atn *atn.ATN
 }
 
-func NewLL1Analyzer (atn) *LL1Analyzer {
-    la = new(LL1Analyzer)
+func NewLL1Analyzer (atn *atn.ATN) *LL1Analyzer {
+    la := new(LL1Analyzer)
     la.atn = atn
     return la
 }
@@ -34,7 +17,9 @@ func NewLL1Analyzer (atn) *LL1Analyzer {
 //* Special value added to the lookahead sets to indicate that we hit
 //  a predicate during analysis if {@code seeThruPreds==false}.
 ///
-LL1Analyzer.HIT_PRED = TokenInvalidType
+const (
+    LL1AnalyzerHIT_PRED = TokenInvalidType
+)
 
 //*
 // Calculates the SLL(1) expected lookahead set for each outgoing transition
@@ -50,14 +35,13 @@ func (la *LL1Analyzer) getDecisionLookahead(s) {
     if (s == nil) {
         return nil
     }
-    var count = s.transitions.length
+    var count = len(s.transitions)
     var look = []
-    for(var alt=0 alt< count alt++) {
+    for alt := 0; alt < count; alt++ {
         look[alt] = NewIntervalSet()
         var lookBusy = NewSet()
         var seeThruPreds = false // fail to get lookahead upon pred
-        la._LOOK(s.transition(alt).target, nil, PredictionContext.EMPTY,
-              look[alt], lookBusy, NewBitSet(), seeThruPreds, false)
+        la._LOOK(s.transition(alt).target, nil, PredictionContext.EMPTY, look[alt], lookBusy, NewBitSet(), seeThruPreds, false)
         // Wipe out lookahead for la alternative if we found nothing
         // or we had a predicate when we !seeThruPreds
         if (look[alt].length==0 || look[alt].contains(LL1Analyzer.HIT_PRED)) {
@@ -85,11 +69,13 @@ func (la *LL1Analyzer) getDecisionLookahead(s) {
 // @return The set of tokens that can follow {@code s} in the ATN in the
 // specified {@code ctx}.
 ///
-func (la *LL1Analyzer) LOOK(s, stopState, ctx) {
+func (la *LL1Analyzer) LOOK(s, stopState int, ctx *RuleContext) *IntervalSet {
     var r = NewIntervalSet()
     var seeThruPreds = true // ignore preds get all lookahead
-	ctx = ctx || nil
-    var lookContext = ctx!=nil ? predictionContextFromRuleContext(s.atn, ctx) : nil
+    var lookContext *RuleContext
+    if (ctx != nil){
+        predictionContextFromRuleContext(s.atn, ctx)
+    }
     la._LOOK(s, stopState, lookContext, r, NewSet(), NewBitSet(), seeThruPreds, true)
     return r
 }
@@ -124,8 +110,8 @@ func (la *LL1Analyzer) LOOK(s, stopState, ctx) {
 // outermost context is reached. This parameter has no effect if {@code ctx}
 // is {@code nil}.
 ///
-func (la *LL1Analyzer) _LOOK(s, stopState , ctx, look, lookBusy, calledRuleStack, seeThruPreds, addEOF) {
-    var c = NewATNConfig({state:s, alt:0}, ctx)
+func (la *LL1Analyzer) _LOOK(s, stopState int, ctx *RuleContext, look *Set, lookBusy, calledRuleStack, seeThruPreds, addEOF) {
+    var c = atn.NewATNConfig({state:s, alt:0}, ctx)
     if (lookBusy.contains(c)) {
         return
     }
@@ -164,7 +150,7 @@ func (la *LL1Analyzer) _LOOK(s, stopState , ctx, look, lookBusy, calledRuleStack
             return
         }
     }
-    for j :=0; j<s.transitions.length; j++ {
+    for j := 0; j < len(s.transitions); j++ {
         var t = s.transitions[j]
         if (t.constructor == RuleTransition) {
             if (calledRuleStack.contains(t.target.ruleIndex)) {
