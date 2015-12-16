@@ -1,5 +1,9 @@
 package antlr4
 
+import (
+	"antlr4/tree"
+)
+
 //  A rule context is a record of a single rule invocation. It knows
 //  which context invoked it, if any. If there is no parent context, then
 //  naturally the invoking state is not valid.  The parent link
@@ -24,15 +28,23 @@ package antlr4
 //var RuleNode = require('./tree/Tree').RuleNode
 var INVALID_INTERVAL = require('./tree/Tree').INVALID_INTERVAL
 
-func RuleContext(parent, invokingState) {
+type RuleContext struct {
+	RuleNode
+	parentCtx *RuleContext
+	invokingState int
+}
+
+func NewRuleContext(parent *RuleContext, invokingState int)  *RuleContext {
 	RuleNode.call(this)
+
+	rn := new(RuleContext)
 	// What context invoked this rule?
-	this.parentCtx = parent || nil
+	rn.parentCtx = parent || nil
 	// What state invoked the rule associated with this context?
 	// The "return address" is the followState of invokingState
 	// If parent is nil, this should be -1.
-	this.invokingState = invokingState || -1
-	return this
+	rn.invokingState = invokingState || -1
+	return rn
 }
 
 //RuleContext.prototype = Object.create(RuleNode.prototype)
@@ -60,11 +72,11 @@ func (this *RuleContext) getSourceInterval() {
 	return INVALID_INTERVAL
 }
 
-func (this *RuleContext) getRuleContext() {
+func (this *RuleContext) getRuleContext() *RuleContext {
 	return this
 }
 
-func (this *RuleContext) getPayload() {
+func (this *RuleContext) getPayload() *RuleContext {
 	return this
 }
 
@@ -93,7 +105,7 @@ func (this *RuleContext) getChildCount() {
 	return 0
 }
 
-func (this *RuleContext) accept(visitor) {
+func (this *RuleContext) accept(visitor *tree.TreeNodeVisitor) {
 	return visitor.visitChildren(this)
 }
 
@@ -122,8 +134,7 @@ func (this *RuleContext) toString(ruleNames, stop) {
 			}
 		} else {
 			var ri = p.ruleIndex
-			var ruleName = (ri >= 0 && ri < ruleNames.length) ? ruleNames[ri]
-					: "" + ri
+			var ruleName = (ri >= 0 && ri < ruleNames.length) ? ruleNames[ri] : "" + ri
 			s += ruleName
 		}
 		if (p.parentCtx != nil && (ruleNames != nil || !p.parentCtx.isEmpty())) {

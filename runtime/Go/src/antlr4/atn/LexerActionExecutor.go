@@ -110,7 +110,7 @@ func (this *LexerActionExecutor) execute(lexer, input, startIndex) {
 	try {
 		for i := 0; i < len(this.lexerActions); i++ {
 			var lexerAction = this.lexerActions[i]
-			if (lexerAction instanceof LexerIndexedCustomAction) {
+			if _, ok := lexerAction.(LexerIndexedCustomAction); ok {
 				var offset = lexerAction.offset
 				input.seek(startIndex + offset)
 				lexerAction = lexerAction.action
@@ -135,7 +135,7 @@ func (this *LexerActionExecutor) hashString() {
 func (this *LexerActionExecutor) equals(other) {
 	if (this == other) {
 		return true
-	} else if (!(other instanceof LexerActionExecutor)) {
+	} else if (!_, ok := other.(LexerActionExecutor); ok) {
 		return false
 	} else {
 		return this.hashString == other.hashString &&

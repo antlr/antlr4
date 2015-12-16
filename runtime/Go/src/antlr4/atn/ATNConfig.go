@@ -74,7 +74,7 @@ func (this *ATNConfig) checkContext(params, config) {
 func (this *ATNConfig) equals(other) {
     if (this == other) {
         return true
-    } else if (! (other instanceof ATNConfig)) {
+    } else if (! _, ok := other.(ATNConfig); ok) {
         return false
     } else {
         return this.state.stateNumber==other.state.stateNumber &&
@@ -129,7 +129,7 @@ func (this *LexerATNConfig) hashString() {
 func (this *LexerATNConfig) equals(other) {
     if (this == other) {
         return true
-    } else if (!(other instanceof LexerATNConfig)) {
+    } else if (!_, ok := other.(LexerATNConfig); ok) {
         return false
     } else if (this.passedThroughNonGreedyDecision != other.passedThroughNonGreedyDecision) {
         return false
@@ -144,7 +144,7 @@ func (this *LexerATNConfig) equals(other) {
 
 func (this *LexerATNConfig) checkNonGreedyDecision(source, target) {
     return source.passedThroughNonGreedyDecision ||
-        (target instanceof DecisionState) && target.nonGreedy
+        _, ok := target.(DecisionState); ok && target.nonGreedy
 }
 
 

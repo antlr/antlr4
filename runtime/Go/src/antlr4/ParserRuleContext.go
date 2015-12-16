@@ -118,7 +118,7 @@ func (prc *ParserRuleContext) getChild(i, type) {
 	} else {
 		for(var j=0 j<len(prc.children) j++) {
 			var child = prc.children[j]
-			if(child instanceof type) {
+			if_, ok := child.(type); ok {
 				if(i==0) {
 					return child
 				} else {
@@ -131,10 +131,10 @@ func (prc *ParserRuleContext) getChild(i, type) {
 }
 
 
-func (prc *ParserRuleContext) getToken(ttype, i) {
-	for(var j=0 j<len(prc.children) j++) {
+func (prc *ParserRuleContext) getToken(ttype, i int) {
+	for j :=0; j<len(prc.children); j++ {
 		var child = prc.children[j]
-		if (child instanceof TerminalNode) {
+		if _, ok := child.(TerminalNode); ok {
 			if (child.symbol.type == ttype) {
 				if(i==0) {
 					return child
@@ -147,14 +147,14 @@ func (prc *ParserRuleContext) getToken(ttype, i) {
     return nil
 }
 
-func (prc *ParserRuleContext) getTokens(ttype ) {
+func (prc *ParserRuleContext) getTokens(ttype int) {
     if (prc.children== nil) {
         return []
     } else {
 		var tokens = []
-		for(var j=0 j<len(prc.children) j++) {
+		for j:=0; j<len(prc.children); j++ {
 			var child = prc.children[j]
-			if (child instanceof TerminalNode) {
+			if _, ok := child.(TerminalNode); ok {
 				if (child.symbol.type == ttype) {
 					tokens.push(child)
 				}
@@ -175,7 +175,7 @@ func (prc *ParserRuleContext) getTypedRuleContexts(ctxType) {
 		var contexts = []
 		for(var j=0 j<len(prc.children) j++) {
 			var child = prc.children[j]
-			if (child instanceof ctxType) {
+			if _, ok := child.(ctxType); ok {
 				contexts.push(child)
 			}
 		}

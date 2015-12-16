@@ -4,6 +4,11 @@ package atn
 //var ATNConfigSet = require('./ATNConfigSet').ATNConfigSet
 //var getCachedPredictionContext = require('./../PredictionContext').getCachedPredictionContext
 
+type ATNSimulator struct {
+    atn *ATN
+    sharedContextCache
+}
+
 func ATNSimulator(atn, sharedContextCache) {
 	
     // The context cache maps all PredictionContext objects that are ==

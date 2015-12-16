@@ -2,14 +2,26 @@ package antlr4
 
 //var RuleContext = require('./RuleContext').RuleContext
 
-func PredictionContext(cachedHashString) {
-	this.cachedHashString = cachedHashString
+type PredictionContext struct {
+	cachedHashString string
+}
+
+func NewPredictionContext(cachedHashString string) *PredictionContext {
+
+	pc := new(PredictionContext)
+
+	pc.cachedHashString = cachedHashString
+
+	return pc
 }
 
 // Represents {@code $} in local context prediction, which means wildcard.
 // {@code//+x =//}.
 // /
-PredictionContext.EMPTY = nil
+const (
+	PredictionContext.EMPTY = nil
+)
+
 
 // Represents {@code $} in an array in full context mode, when {@code $}
 // doesn't mean wildcard: {@code $ + x = [$,x]}. Here,
@@ -138,7 +150,7 @@ func (this *SingletonPredictionContext) getReturnState(index) {
 func (this *SingletonPredictionContext) equals(other) {
 	if (this == other) {
 		return true
-	} else if (!(other instanceof SingletonPredictionContext)) {
+	} else if (!_, ok := other.(SingletonPredictionContext); ok) {
 		return false
 	} else if (this.hashString() != other.hashString()) {
 		return false // can't be same if hash is different
@@ -237,7 +249,7 @@ func (this *ArrayPredictionContext) getReturnState(index) {
 func (this *ArrayPredictionContext) equals(other) {
 	if (this == other) {
 		return true
-	} else if (!(other instanceof ArrayPredictionContext)) {
+	} else if (!_, ok := other.(ArrayPredictionContext); ok) {
 		return false
 	} else if (this.hashString != other.hashString()) {
 		return false // can't be same if hash is different
@@ -312,18 +324,18 @@ func merge(a, b, rootIsWildcard, mergeCache) {
 	// At least one of a or b is array
 	// If one is $ and rootIsWildcard, return $ as// wildcard
 	if (rootIsWildcard) {
-		if (a instanceof EmptyPredictionContext) {
+		if _, ok := a.(EmptyPredictionContext); ok {
 			return a
 		}
-		if (b instanceof EmptyPredictionContext) {
+		if _, ok := b.(EmptyPredictionContext); ok {
 			return b
 		}
 	}
 	// convert singleton so both are arrays to normalize
-	if (a instanceof SingletonPredictionContext) {
+	if _, ok := a.(SingletonPredictionContext); ok {
 		a = NewArrayPredictionContext([a.getParent()], [a.returnState])
 	}
-	if (b instanceof SingletonPredictionContext) {
+	if _, ok := b.(SingletonPredictionContext); ok {
 		b = NewArrayPredictionContext([b.getParent()], [b.returnState])
 	}
 	return mergeArrays(a, b, rootIsWildcard, mergeCache)

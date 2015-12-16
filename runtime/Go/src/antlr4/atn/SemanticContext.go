@@ -113,7 +113,7 @@ func (this *Predicate) hashString() {
 func (this *Predicate) equals(other) {
 	if (this == other) {
 		return true
-	} else if (!(other instanceof Predicate)) {
+	} else if (!_, ok := other.(Predicate); ok) {
 		return false
 	} else {
 		return this.ruleIndex == other.ruleIndex &&
@@ -157,7 +157,7 @@ func (this *PrecedencePredicate) hashString() {
 func (this *PrecedencePredicate) equals(other) {
 	if (this == other) {
 		return true
-	} else if (!(other instanceof PrecedencePredicate)) {
+	} else if (!_, ok := other.(PrecedencePredicate); ok) {
 		return false
 	} else {
 		return this.precedence == other.precedence
@@ -173,7 +173,7 @@ func (this *PrecedencePredicate) toString() string {
 PrecedencePredicate.filterPrecedencePredicates = function(set) {
 	var result = []
 	set.values().map( function(context) {
-		if (context instanceof PrecedencePredicate) {
+		if _, ok := context.(PrecedencePredicate); ok {
 			result.push(context)
 		}
 	})
@@ -187,14 +187,14 @@ PrecedencePredicate.filterPrecedencePredicates = function(set) {
 func AND(a, b) {
 	SemanticContext.call(this)
 	var operands = NewSet()
-	if (a instanceof AND) {
+	if _, ok := a.(AND); ok {
 		a.opnds.map(function(o) {
 			operands.add(o)
 		})
 	} else {
 		operands.add(a)
 	}
-	if (b instanceof AND) {
+	if _, ok := b.(AND); ok {
 		b.opnds.map(function(o) {
 			operands.add(o)
 		})
@@ -222,7 +222,7 @@ func AND(a, b) {
 func (this *AND) equals(other) {
 	if (this == other) {
 		return true
-	} else if (!(other instanceof AND)) {
+	} else if (!_, ok := other.(AND); ok) {
 		return false
 	} else {
 		return this.opnds == other.opnds
@@ -292,14 +292,14 @@ func (this *AND) toString() string {
 func OR(a, b) {
 	SemanticContext.call(this)
 	var operands = NewSet()
-	if (a instanceof OR) {
+	if _, ok := a.(OR); ok {
 		a.opnds.map(function(o) {
 			operands.add(o)
 		})
 	} else {
 		operands.add(a)
 	}
-	if (b instanceof OR) {
+	if _, ok := b.(OR); ok {
 		b.opnds.map(function(o) {
 			operands.add(o)
 		})
@@ -326,7 +326,7 @@ func OR(a, b) {
 func (this *OR) constructor(other) {
 	if (this == other) {
 		return true
-	} else if (!(other instanceof OR)) {
+	} else if (!_, ok := other.(OR); ok) {
 		return false
 	} else {
 		return this.opnds == other.opnds

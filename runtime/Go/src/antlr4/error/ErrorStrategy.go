@@ -135,8 +135,8 @@ func (this *DefaultErrorStrategy) reportError(recognizer, e) {
     } else if ( e instanceof FailedPredicateException ) {
         this.reportFailedPredicate(recognizer, e)
     } else {
-        console.log("unknown recognition error type: " + e.constructor.name)
-        console.log(e.stack)
+        fmt.Println("unknown recognition error type: " + e.constructor.name)
+        fmt.Println(e.stack)
         recognizer.notifyErrorListeners(e.getOffendingToken(), e.getMessage(), e)
     }
 }

@@ -172,7 +172,7 @@ func (this *ATNDeserializer) readStates(atn) {
         if (stype == ATNStateLOOP_END) { // special case
             var loopBackStateNumber = this.readInt()
             loopBackStateNumbers.push([s, loopBackStateNumber])
-        } else if(s instanceof BlockStartState) {
+        } else if_, ok := s.(BlockStartState); ok {
             var endStateNumber = this.readInt()
             endStateNumbers.push([s, endStateNumber])
         }
@@ -225,7 +225,7 @@ func (this *ATNDeserializer) readRules(atn) {
     atn.ruleToStopState = initArray(nrules, 0)
     for (i=0 i<atn.states.length i++) {
         var state = atn.states[i]
-        if (!(state instanceof RuleStopState)) {
+        if (!_, ok := state.(RuleStopState); ok) {
             continue
         }
         atn.ruleToStopState[state.ruleIndex] = state
@@ -280,7 +280,7 @@ func (this *ATNDeserializer) readEdges(atn, sets) {
         state = atn.states[i]
         for (j=0 j<state.transitions.length j++) {
             var t = state.transitions[j]
-            if (!(t instanceof RuleTransition)) {
+            if (!_, ok := t.(RuleTransition); ok) {
                 continue
             }
 			var outermostPrecedenceReturn = -1
@@ -297,7 +297,7 @@ func (this *ATNDeserializer) readEdges(atn, sets) {
 
     for (i=0 i<atn.states.length i++) {
         state = atn.states[i]
-        if (state instanceof BlockStartState) {
+        if _, ok := state.(BlockStartState); ok {
             // we need to know the end state to set its start state
             if (state.endState == nil) {
                 panic ("IllegalState")
@@ -309,17 +309,17 @@ func (this *ATNDeserializer) readEdges(atn, sets) {
             }
             state.endState.startState = state
         }
-        if (state instanceof PlusLoopbackState) {
+        if _, ok := state.(PlusLoopbackState); ok {
             for (j=0 j<state.transitions.length j++) {
                 target = state.transitions[j].target
-                if (target instanceof PlusBlockStartState) {
+                if _, ok := target.(PlusBlockStartState); ok {
                     target.loopBackState = state
                 }
             }
-        } else if (state instanceof StarLoopbackState) {
+        } else if _, ok := state.(StarLoopbackState); ok {
             for (j=0 j<state.transitions.length j++) {
                 target = state.transitions[j].target
-                if (target instanceof StarLoopEntryState) {
+                if _, ok := target.(StarLoopEntryState); ok {
                     target.loopBackState = state
                 }
             }
@@ -475,7 +475,7 @@ func (this *ATNDeserializer) markPrecedenceDecisions(atn) {
         //
         if ( atn.ruleToStartState[state.ruleIndex].isPrecedenceRule) {
             var maybeLoopEndState = state.transitions[state.transitions.length - 1].target
-            if (maybeLoopEndState instanceof LoopEndState) {
+            if _, ok := maybeLoopEndState.(LoopEndState); ok {
                 if ( maybeLoopEndState.epsilonOnlyTransitions &&
                         (maybeLoopEndState.transitions[0].target instanceof RuleStopState)) {
                     state.precedenceRuleDecision = true
@@ -496,9 +496,9 @@ func (this *ATNDeserializer) verifyATN(atn) {
             continue
         }
         this.checkCondition(state.epsilonOnlyTransitions || state.transitions.length <= 1)
-        if (state instanceof PlusBlockStartState) {
+        if _, ok := state.(PlusBlockStartState); ok {
             this.checkCondition(state.loopBackState != nil)
-        } else  if (state instanceof StarLoopEntryState) {
+        } else  if _, ok := state.(StarLoopEntryState); ok {
             this.checkCondition(state.loopBackState != nil)
             this.checkCondition(state.transitions.length == 2)
             if (state.transitions[0].target instanceof StarBlockStartState) {
@@ -510,21 +510,21 @@ func (this *ATNDeserializer) verifyATN(atn) {
             } else {
                 panic("IllegalState")
             }
-        } else if (state instanceof StarLoopbackState) {
+        } else if _, ok := state.(StarLoopbackState); ok {
             this.checkCondition(state.transitions.length == 1)
             this.checkCondition(state.transitions[0].target instanceof StarLoopEntryState)
-        } else if (state instanceof LoopEndState) {
+        } else if _, ok := state.(LoopEndState); ok {
             this.checkCondition(state.loopBackState != nil)
-        } else if (state instanceof RuleStartState) {
+        } else if _, ok := state.(RuleStartState); ok {
             this.checkCondition(state.stopState != nil)
-        } else if (state instanceof BlockStartState) {
+        } else if _, ok := state.(BlockStartState); ok {
             this.checkCondition(state.endState != nil)
-        } else if (state instanceof BlockEndState) {
+        } else if _, ok := state.(BlockEndState); ok {
             this.checkCondition(state.startState != nil)
-        } else if (state instanceof DecisionState) {
+        } else if _, ok := state.(DecisionState); ok {
             this.checkCondition(state.transitions.length <= 1 || state.decision >= 0)
         } else {
-            this.checkCondition(state.transitions.length <= 1 || (state instanceof RuleStopState))
+            this.checkCondition(state.transitions.length <= 1 || _, ok := state.(RuleStopState); ok)
         }
 	}
 }

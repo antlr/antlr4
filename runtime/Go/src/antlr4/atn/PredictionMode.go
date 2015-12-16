@@ -12,69 +12,75 @@ package atn
 //var RuleStopState = require('./ATNState').RuleStopState
 
 type PredictionMode struct {
-	return this
+
 }
 
-//
-// The SLL(*) prediction mode. This prediction mode ignores the current
-// parser context when making predictions. This is the fastest prediction
-// mode, and provides correct results for many grammars. This prediction
-// mode is more powerful than the prediction mode provided by ANTLR 3, but
-// may result in syntax errors for grammar and input combinations which are
-// not SLL.
-//
-// <p>
-// When using this prediction mode, the parser will either return a correct
-// parse tree (i.e. the same parse tree that would be returned with the
-// {@link //LL} prediction mode), or it will report a syntax error. If a
-// syntax error is encountered when using the {@link //SLL} prediction mode,
-// it may be due to either an actual syntax error in the input or indicate
-// that the particular combination of grammar and input requires the more
-// powerful {@link //LL} prediction abilities to complete successfully.</p>
-//
-// <p>
-// This prediction mode does not provide any guarantees for prediction
-// behavior for syntactically-incorrect inputs.</p>
-//
-PredictionMode.SLL = 0
-//
-// The LL(*) prediction mode. This prediction mode allows the current parser
-// context to be used for resolving SLL conflicts that occur during
-// prediction. This is the fastest prediction mode that guarantees correct
-// parse results for all combinations of grammars with syntactically correct
-// inputs.
-//
-// <p>
-// When using this prediction mode, the parser will make correct decisions
-// for all syntactically-correct grammar and input combinations. However, in
-// cases where the grammar is truly ambiguous this prediction mode might not
-// report a precise answer for <em>exactly which</em> alternatives are
-// ambiguous.</p>
-//
-// <p>
-// This prediction mode does not provide any guarantees for prediction
-// behavior for syntactically-incorrect inputs.</p>
-//
-PredictionMode.LL = 1
-//
-// The LL(*) prediction mode with exact ambiguity detection. In addition to
-// the correctness guarantees provided by the {@link //LL} prediction mode,
-// this prediction mode instructs the prediction algorithm to determine the
-// complete and exact set of ambiguous alternatives for every ambiguous
-// decision encountered while parsing.
-//
-// <p>
-// This prediction mode may be used for diagnosing ambiguities during
-// grammar development. Due to the performance overhead of calculating sets
-// of ambiguous alternatives, this prediction mode should be avoided when
-// the exact results are not necessary.</p>
-//
-// <p>
-// This prediction mode does not provide any guarantees for prediction
-// behavior for syntactically-incorrect inputs.</p>
-//
-PredictionMode.LL_EXACT_AMBIG_DETECTION = 2
+func NewPredictionMode() *PredictionMode {
+	return new(PredictionMode)
+}
 
+const (
+	//
+	// The SLL(*) prediction mode. This prediction mode ignores the current
+	// parser context when making predictions. This is the fastest prediction
+	// mode, and provides correct results for many grammars. This prediction
+	// mode is more powerful than the prediction mode provided by ANTLR 3, but
+	// may result in syntax errors for grammar and input combinations which are
+	// not SLL.
+	//
+	// <p>
+	// When using this prediction mode, the parser will either return a correct
+	// parse tree (i.e. the same parse tree that would be returned with the
+	// {@link //LL} prediction mode), or it will report a syntax error. If a
+	// syntax error is encountered when using the {@link //SLL} prediction mode,
+	// it may be due to either an actual syntax error in the input or indicate
+	// that the particular combination of grammar and input requires the more
+	// powerful {@link //LL} prediction abilities to complete successfully.</p>
+	//
+	// <p>
+	// This prediction mode does not provide any guarantees for prediction
+	// behavior for syntactically-incorrect inputs.</p>
+	//
+	PredictionModeSLL = 0
+	//
+	// The LL(*) prediction mode. This prediction mode allows the current parser
+	// context to be used for resolving SLL conflicts that occur during
+	// prediction. This is the fastest prediction mode that guarantees correct
+	// parse results for all combinations of grammars with syntactically correct
+	// inputs.
+	//
+	// <p>
+	// When using this prediction mode, the parser will make correct decisions
+	// for all syntactically-correct grammar and input combinations. However, in
+	// cases where the grammar is truly ambiguous this prediction mode might not
+	// report a precise answer for <em>exactly which</em> alternatives are
+	// ambiguous.</p>
+	//
+	// <p>
+	// This prediction mode does not provide any guarantees for prediction
+	// behavior for syntactically-incorrect inputs.</p>
+	//
+	PredictionModeLL = 1
+	//
+	// The LL(*) prediction mode with exact ambiguity detection. In addition to
+	// the correctness guarantees provided by the {@link //LL} prediction mode,
+	// this prediction mode instructs the prediction algorithm to determine the
+	// complete and exact set of ambiguous alternatives for every ambiguous
+	// decision encountered while parsing.
+	//
+	// <p>
+	// This prediction mode may be used for diagnosing ambiguities during
+	// grammar development. Due to the performance overhead of calculating sets
+	// of ambiguous alternatives, this prediction mode should be avoided when
+	// the exact results are not necessary.</p>
+	//
+	// <p>
+	// This prediction mode does not provide any guarantees for prediction
+	// behavior for syntactically-incorrect inputs.</p>
+	//
+	PredictionModeLL_EXACT_AMBIG_DETECTION = 2
+
+)
 
 //
 // Computes the SLL prediction termination condition.
@@ -168,17 +174,17 @@ PredictionMode.LL_EXACT_AMBIG_DETECTION = 2
 // the configurations to strip out all of the predicates so that a standard
 // {@link ATNConfigSet} will merge everything ignoring predicates.</p>
 //
-PredictionMode.hasSLLConflictTerminatingPrediction = function( mode, configs) {
+PredictionModehasSLLConflictTerminatingPrediction = function( mode, configs) {
     // Configs in rule stop states indicate reaching the end of the decision
     // rule (local context) or end of start rule (full context). If all
     // configs meet this condition, then none of the configurations is able
     // to match additional input so we terminate prediction.
     //
-    if (PredictionMode.allConfigsInRuleStopStates(configs)) {
+    if (PredictionModeallConfigsInRuleStopStates(configs)) {
         return true
     }
     // pure SLL mode parsing
-    if (mode == PredictionMode.SLL) {
+    if (mode == PredictionModeSLL) {
         // Don't bother with combining configs from different semantic
         // contexts if we can fail over to full LL costs more time
         // since we'll often fail over anyway.
@@ -195,8 +201,8 @@ PredictionMode.hasSLLConflictTerminatingPrediction = function( mode, configs) {
         // now we have combined contexts for configs with dissimilar preds
     }
     // pure SLL or combined SLL+LL mode parsing
-    var altsets = PredictionMode.getConflictingAltSubsets(configs)
-    return PredictionMode.hasConflictingAltSet(altsets) && !PredictionMode.hasStateAssociatedWithOneAlt(configs)
+    var altsets = PredictionModegetConflictingAltSubsets(configs)
+    return PredictionModehasConflictingAltSet(altsets) && !PredictionModehasStateAssociatedWithOneAlt(configs)
 }
 
 // Checks if any configuration in {@code configs} is in a
@@ -207,7 +213,7 @@ PredictionMode.hasSLLConflictTerminatingPrediction = function( mode, configs) {
 // @param configs the configuration set to test
 // @return {@code true} if any configuration in {@code configs} is in a
 // {@link RuleStopState}, otherwise {@code false}
-PredictionMode.hasConfigInRuleStopState = function(configs) {
+PredictionModehasConfigInRuleStopState = function(configs) {
 	for(var i=0i<configs.items.lengthi++) {
 		var c = configs.items[i]
         if (c.state instanceof RuleStopState) {
@@ -225,7 +231,7 @@ PredictionMode.hasConfigInRuleStopState = function(configs) {
 // @param configs the configuration set to test
 // @return {@code true} if all configurations in {@code configs} are in a
 // {@link RuleStopState}, otherwise {@code false}
-PredictionMode.allConfigsInRuleStopStates = function(configs) {
+PredictionModeallConfigsInRuleStopStates = function(configs) {
 	for(var i=0i<configs.items.lengthi++) {
 		var c = configs.items[i]
         if (!(c.state instanceof RuleStopState)) {
@@ -376,8 +382,8 @@ PredictionMode.allConfigsInRuleStopStates = function(configs) {
 // we need exact ambiguity detection when the sets look like
 // {@code A={{1,2}}} or {@code {{1,2},{1,2}}}, etc...</p>
 //
-PredictionMode.resolvesToJustOneViableAlt = function(altsets) {
-    return PredictionMode.getSingleViableAlt(altsets)
+PredictionModeresolvesToJustOneViableAlt = function(altsets) {
+    return PredictionModegetSingleViableAlt(altsets)
 }
 
 //
@@ -388,8 +394,8 @@ PredictionMode.resolvesToJustOneViableAlt = function(altsets) {
 // @return {@code true} if every {@link BitSet} in {@code altsets} has
 // {@link BitSet//cardinality cardinality} &gt 1, otherwise {@code false}
 //
-PredictionMode.allSubsetsConflict = function(altsets) {
-    return ! PredictionMode.hasNonConflictingAltSet(altsets)
+PredictionModeallSubsetsConflict = function(altsets) {
+    return ! PredictionModehasNonConflictingAltSet(altsets)
 }
 //
 // Determines if any single alternative subset in {@code altsets} contains
@@ -399,7 +405,7 @@ PredictionMode.allSubsetsConflict = function(altsets) {
 // @return {@code true} if {@code altsets} contains a {@link BitSet} with
 // {@link BitSet//cardinality cardinality} 1, otherwise {@code false}
 //
-PredictionMode.hasNonConflictingAltSet = function(altsets) {
+PredictionModehasNonConflictingAltSet = function(altsets) {
 	for(var i=0i<altsets.lengthi++) {
 		var alts = altsets[i]
         if (alts.length==1) {
@@ -417,7 +423,7 @@ PredictionMode.hasNonConflictingAltSet = function(altsets) {
 // @return {@code true} if {@code altsets} contains a {@link BitSet} with
 // {@link BitSet//cardinality cardinality} &gt 1, otherwise {@code false}
 //
-PredictionMode.hasConflictingAltSet = function(altsets) {
+PredictionModehasConflictingAltSet = function(altsets) {
 	for(var i=0i<altsets.lengthi++) {
 		var alts = altsets[i]
         if (alts.length>1) {
@@ -434,7 +440,7 @@ PredictionMode.hasConflictingAltSet = function(altsets) {
 // @return {@code true} if every member of {@code altsets} is equal to the
 // others, otherwise {@code false}
 //
-PredictionMode.allSubsetsEqual = function(altsets) {
+PredictionModeallSubsetsEqual = function(altsets) {
     var first = nil
 	for(var i=0i<altsets.lengthi++) {
 		var alts = altsets[i]
@@ -454,8 +460,8 @@ PredictionMode.allSubsetsEqual = function(altsets) {
 //
 // @param altsets a collection of alternative subsets
 //
-PredictionMode.getUniqueAlt = function(altsets) {
-    var all = PredictionMode.getAlts(altsets)
+PredictionModegetUniqueAlt = function(altsets) {
+    var all = PredictionModegetAlts(altsets)
     if (all.length==1) {
         return all.minValue()
     } else {
@@ -470,7 +476,7 @@ PredictionMode.getUniqueAlt = function(altsets) {
 // @param altsets a collection of alternative subsets
 // @return the set of represented alternatives in {@code altsets}
 //
-PredictionMode.getAlts = function(altsets) {
+PredictionModegetAlts = function(altsets) {
     var all = NewBitSet()
     altsets.map( function(alts) { all.or(alts) })
     return all
@@ -485,7 +491,7 @@ PredictionMode.getAlts = function(altsets) {
 // alt and not pred
 // </pre>
 //
-PredictionMode.getConflictingAltSubsets = function(configs) {
+PredictionModegetConflictingAltSubsets = function(configs) {
     var configToAlts = {}
 	for(var i=0i<configs.items.lengthi++) {
 		var c = configs.items[i]
@@ -515,7 +521,7 @@ PredictionMode.getConflictingAltSubsets = function(configs) {
 // map[c.{@link ATNConfig//state state}] U= c.{@link ATNConfig//alt alt}
 // </pre>
 //
-PredictionMode.getStateToAltMap = function(configs) {
+PredictionModegetStateToAltMap = function(configs) {
     var m = NewAltDict()
     configs.items.map(function(c) {
         var alts = m.get(c.state)
@@ -528,8 +534,8 @@ PredictionMode.getStateToAltMap = function(configs) {
     return m
 }
 
-PredictionMode.hasStateAssociatedWithOneAlt = function(configs) {
-    var values = PredictionMode.getStateToAltMap(configs).values()
+PredictionModehasStateAssociatedWithOneAlt = function(configs) {
+    var values = PredictionModegetStateToAltMap(configs).values()
     for(var i=0i<values.lengthi++) {
         if (values[i].length==1) {
             return true
@@ -538,7 +544,7 @@ PredictionMode.hasStateAssociatedWithOneAlt = function(configs) {
     return false
 }
 
-PredictionMode.getSingleViableAlt = function(altsets) {
+PredictionModegetSingleViableAlt = function(altsets) {
     var result = nil
 	for(var i=0i<altsets.lengthi++) {
 		var alts = altsets[i]

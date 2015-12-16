@@ -162,7 +162,7 @@ func (this *ATNConfigSet) addAll(coll) {
 func (this *ATNConfigSet) equals(other) {
 	if (this == other) {
 		return true
-	} else if (!(other instanceof ATNConfigSet)) {
+	} else if (!_, ok := other.(ATNConfigSet); ok) {
 		return false
 	}
 	return this.configs != nil && this.configs.equals(other.configs) &&

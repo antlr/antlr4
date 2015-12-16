@@ -1,23 +1,32 @@
 package antlr4
 
+import (
+    "fmt"
+)
 //var Token = require('./Token').Token
 //var ConsoleErrorListener = require('./error/ErrorListener').ConsoleErrorListener
 //var ProxyErrorListener = require('./error/ErrorListener').ProxyErrorListener
 
 type Recognizer struct {
+    _listeners []Listener
+    _interp
+    state int
+}
+
+type Recognizer struct {
     this._listeners = [ ConsoleErrorListener.INSTANCE ]
     this._interp = nil
-    this._stateNumber = -1
+    this.state = -1
     return this
 }
 
 Recognizer.tokenTypeMapCache = {}
 Recognizer.ruleIndexMapCache = {}
 
-func (this *Recognizer) checkVersion(toolVersion) {
+func (this *Recognizer) checkVersion(toolVersion string) {
     var runtimeVersion = "4.5.1"
     if (runtimeVersion!=toolVersion) {
-        console.log("ANTLR runtime and generated code versions disagree: "+runtimeVersion+"!="+toolVersion)
+        fmt.Println("ANTLR runtime and generated code versions disagree: "+runtimeVersion+"!="+toolVersion)
     }
 }
 

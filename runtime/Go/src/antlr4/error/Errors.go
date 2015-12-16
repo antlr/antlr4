@@ -126,7 +126,7 @@ func FailedPredicateException(recognizer, predicate, message) {
                          input:recognizer.getInputStream(), ctx:recognizer._ctx})
     var s = recognizer._interp.atn.states[recognizer.state]
     var trans = s.transitions[0]
-    if (trans instanceof PredicateTransition) {
+    if _, ok := trans.(PredicateTransition); ok {
         this.ruleIndex = trans.ruleIndex
         this.predicateIndex = trans.predIndex
     } else {

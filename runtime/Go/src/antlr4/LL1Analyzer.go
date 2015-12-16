@@ -190,7 +190,7 @@ func (la *LL1Analyzer) _LOOK(s, stopState , ctx, look, lookBusy, calledRuleStack
         } else {
             var set = t.label
             if (set != nil) {
-                if (t instanceof NotSetTransition) {
+                if _, ok := t.(NotSetTransition); ok {
                     set = set.complement(TokenMinUserTokenType, la.atn.maxTokenType)
                 }
                 look.addSet(set)

@@ -46,11 +46,11 @@ Trees.getNodeText = function(t, ruleNames, recog) {
         ruleNames = recog.ruleNames
     }
     if(ruleNames!=nil) {
-       if (t instanceof RuleNode) {
+       if _, ok := t.(RuleNode); ok {
            return ruleNames[t.getRuleContext().ruleIndex]
        } else if ( t instanceof ErrorNode) {
            return t.toString()
-       } else if(t instanceof TerminalNode) {
+       } else if_, ok := t.(TerminalNode); ok {
            if(t.symbol!=nil) {
                return t.symbol.text
            }
@@ -103,11 +103,11 @@ Trees.findAllNodes = function(t, index, findTokens) {
 
 Trees._findAllNodes = function(t, index, findTokens, nodes) {
 	// check this node (the root) first
-	if(findTokens && (t instanceof TerminalNode)) {
+	if(findTokens && _, ok := t.(TerminalNode); ok) {
 		if(t.symbol.type==index) {
 			nodes.push(t)
 		}
-	} else if(!findTokens && (t instanceof ParserRuleContext)) {
+	} else if(!findTokens && _, ok := t.(ParserRuleContext); ok) {
 		if(t.ruleIndex==index) {
 			nodes.push(t)
 		}

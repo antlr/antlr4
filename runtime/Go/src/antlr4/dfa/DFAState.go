@@ -113,7 +113,7 @@ func (this *DFAState) equals(other) {
 	// compare set of ATN configurations in this set with other
 	if (this == other) {
 		return true
-	} else if (!(other instanceof DFAState)) {
+	} else if (!_, ok := other.(DFAState); ok) {
 		return false
 	} else {
 		return this.configs.equals(other.configs)

@@ -207,7 +207,7 @@ func (this *ParseTreeWalker) walk(listener, t) {
 			(t.isErrorNode != undefined && t.isErrorNode())
 	if (errorNode) {
 		listener.visitErrorNode(t)
-	} else if (t instanceof TerminalNode) {
+	} else if _, ok := t.(TerminalNode); ok {
 		listener.visitTerminal(t)
 	} else {
 		this.enterRule(listener, t)

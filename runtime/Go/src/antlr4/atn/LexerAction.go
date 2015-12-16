@@ -81,7 +81,7 @@ func (this *LexerTypeAction) hashString() {
 func (this *LexerTypeAction) equals(other) {
     if(this == other) {
         return true
-    } else if (! (other instanceof LexerTypeAction)) {
+    } else if (! _, ok := other.(LexerTypeAction); ok) {
         return false
     } else {
         return this.type == other.type
@@ -116,7 +116,7 @@ func (this *LexerPushModeAction) hashString() {
 func (this *LexerPushModeAction) equals(other) {
     if (this == other) {
         return true
-    } else if (! (other instanceof LexerPushModeAction)) {
+    } else if (! _, ok := other.(LexerPushModeAction); ok) {
         return false
     } else {
         return this.mode == other.mode
@@ -199,7 +199,7 @@ func (this *LexerModeAction) hashString() {
 func (this *LexerModeAction) equals(other) {
     if (this == other) {
         return true
-    } else if (! (other instanceof LexerModeAction)) {
+    } else if (! _, ok := other.(LexerModeAction); ok) {
         return false
     } else {
         return this.mode == other.mode
@@ -252,7 +252,7 @@ func (this *LexerCustomAction) hashString() {
 func (this *LexerCustomAction) equals(other) {
     if (this == other) {
         return true
-    } else if (! (other instanceof LexerCustomAction)) {
+    } else if (! _, ok := other.(LexerCustomAction); ok) {
         return false
     } else {
         return this.ruleIndex == other.ruleIndex && this.actionIndex == other.actionIndex
@@ -285,7 +285,7 @@ func (this *LexerChannelAction) hashString() {
 func (this *LexerChannelAction) equals(other) {
     if (this == other) {
         return true
-    } else if (! (other instanceof LexerChannelAction)) {
+    } else if (! _, ok := other.(LexerChannelAction); ok) {
         return false
     } else {
         return this.channel == other.channel
@@ -341,7 +341,7 @@ func (this *LexerIndexedCustomAction) hashString() {
 func (this *LexerIndexedCustomAction) equals(other) {
     if (this == other) {
         return true
-    } else if (! (other instanceof LexerIndexedCustomAction)) {
+    } else if (! _, ok := other.(LexerIndexedCustomAction); ok) {
         return false
     } else {
         return this.offset == other.offset && this.action == other.action

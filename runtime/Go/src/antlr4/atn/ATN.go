@@ -16,7 +16,7 @@ type ATN struct {
     modeToStartState
 }
 
-func NewATN(grammarType , maxTokenType) ATN {
+func NewATN(grammarType , maxTokenType) *ATN {
 
     atn := new(ATN)
 

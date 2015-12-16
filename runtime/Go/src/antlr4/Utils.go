@@ -119,7 +119,7 @@ func (this *BitSet) hashString() {
 }
 
 func (this *BitSet) equals(other) {
-	if(!(other instanceof BitSet)) {
+	if(!_, ok := other.(BitSet); ok) {
 		return false
 	}
 	return this.hashString()==other.hashString()

@@ -289,7 +289,7 @@ func (p.*Parser) compileParseTreePattern(pattern, patternRuleIndex, lexer) {
 	if (lexer == nil) {
 		if (p.getTokenStream() != nil) {
 			var tokenSource = p.getTokenStream().tokenSource
-			if (tokenSource instanceof Lexer) {
+			if _, ok := tokenSource.(Lexer); ok {
 				lexer = tokenSource
 			}
 		}
