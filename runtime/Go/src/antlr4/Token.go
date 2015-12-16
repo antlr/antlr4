@@ -76,7 +76,7 @@ type CommonToken struct {
 
 func NewCommonToken(source *InputStream, tokenType int, channel, start int, stop int) *CommonToken {
 
-	t := NewToken()
+	t := CommonToken{Token{}}
 
 	t.source = source
 	t.tokenType = -1

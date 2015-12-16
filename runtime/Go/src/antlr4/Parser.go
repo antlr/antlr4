@@ -1,12 +1,23 @@
 package antlr4
 
-func TraceListener(parser) {
-	ParseTreeListener.call(this)
-    this.parser = parser
-	return this
+import (
+	"fmt"
+	"antlr4/tree"
+	"antlr4/error"
+)
+
+type TraceListener struct {
+	tree.ParseTreeListener
+	parser *Parser
 }
 
-TraceListener.prototype = Object.create(ParseTreeListener)
+func NewTraceListener(parser *Parser) *TraceListener {
+	tl := &TraceListener{tree.ParseTreeListener{}}
+    tl.parser = parser
+	return tl
+}
+
+//TraceListener.prototype = Object.create(ParseTreeListener)
 //TraceListener.prototype.constructor = TraceListener
 
 func (this *TraceListener) enterEveryRule(ctx) {
@@ -21,15 +32,23 @@ func (this *TraceListener) exitEveryRule(ctx) {
 	fmt.Println("exit    " + this.parser.ruleNames[ctx.ruleIndex] + ", LT(1)=" + this.parser._input.LT(1).text)
 }
 
+type Parser struct {
+	Recognizer
+	_input *TokenStream
+	_errHandler *error.ErrorStrategy
+}
+
 // p.is all the parsing support code essentially most of it is error
 // recovery stuff.//
-func Parser(input) {
-	Recognizer.call(p.
+func Parser(input *TokenStream) *Parser {
+
+	p := &Parser{Recognizer{}}
+
 	// The input stream.
 	p._input = nil
 	// The error handling strategy for the parser. The default value is a new
 	// instance of {@link DefaultErrorStrategy}.
-	p._errHandler = NewDefaultErrorStrategy()
+	p._errHandler = error.NewDefaultErrorStrategy()
 	p._precedenceStack = []
 	p._precedenceStack.push(0)
 	// The {@link ParserRuleContext} object for the currently executing rule.
@@ -55,7 +74,7 @@ func Parser(input) {
 }
 
 //Parser.prototype = Object.create(Recognizer.prototype)
-Parser.prototype.contructor = Parser
+//Parser.prototype.contructor = Parser
 
 // p.field maps from the serialized ATN string to the deserialized {@link
 // ATN} with
@@ -63,10 +82,10 @@ Parser.prototype.contructor = Parser
 //
 // @see ATNDeserializationOptions//isGenerateRuleBypassTransitions()
 //
-Parser.bypassAltsAtnCache = {}
+var bypassAltsAtnCache = make(map[string]int)
 
 // reset the parser's state//
-func (p.*Parser) reset() {
+func (p *Parser) reset() {
 	if (p._input != nil) {
 		p._input.seek(0)
 	}

@@ -1,6 +1,7 @@
 package error
 
 import (
+    "antlr4"
     "antlr4/atn"
 )
 
@@ -15,41 +16,49 @@ import (
 //var IntervalSet = require('./../IntervalSet').IntervalSet
 
 type ErrorStrategy struct {
-	
+
 }
 
-func (this *ErrorStrategy) reset(recognizer){
+func (this *ErrorStrategy) reset(recognizer *antlr4.Recognizer){
 }
 
-func (this *ErrorStrategy) recoverInline(recognizer){
+func (this *ErrorStrategy) recoverInline(recognizer *antlr4.Recognizer){
 }
 
-func (this *ErrorStrategy) recover(recognizer, e){
+func (this *ErrorStrategy) recover(recognizer *antlr4.Recognizer, e *Error){
 }
 
-func (this *ErrorStrategy) sync(recognizer){
+func (this *ErrorStrategy) sync(recognizer *antlr4.Recognizer){
 }
 
-func (this *ErrorStrategy) inErrorRecoveryMode(recognizer){
+func (this *ErrorStrategy) inErrorRecoveryMode(recognizer *antlr4.Recognizer){
 }
 
-func (this *ErrorStrategy) reportError(recognizer){
+func (this *ErrorStrategy) reportError(recognizer *antlr4.Recognizer){
 }
-
-
 
 // This is the default implementation of {@link ANTLRErrorStrategy} used for
 // error reporting and recovery in ANTLR parsers.
 //
 type DefaultErrorStrategy struct {
-	ErrorStrategy.call(this)
+    ErrorStrategy
+
+    errorRecoveryMode bool
+    lastErrorIndex int
+    lastErrorStates []int
+}
+
+func DefaultErrorStrategy() *DefaultErrorStrategy {
+
+	d := new(DefaultErrorStrategy)
+
     // Indicates whether the error strategy is currently "recovering from an
     // error". This is used to suppress reporting multiple error messages while
     // attempting to recover from a detected syntax error.
     //
     // @see //inErrorRecoveryMode
     //
-    this.errorRecoveryMode = false
+    d.errorRecoveryMode = false
 
     // The index into the input stream where the last error occurred.
     // This is used to prevent infinite loops where an error is found
@@ -57,9 +66,10 @@ type DefaultErrorStrategy struct {
     // ad nauseum. This is a failsafe mechanism to guarantee that at least
     // one token/tree node is consumed for two errors.
     //
-    this.lastErrorIndex = -1
-    this.lastErrorStates = nil
-    return this
+    d.lastErrorIndex = -1
+    d.lastErrorStates = nil
+
+    return d
 }
 
 //DefaultErrorStrategy.prototype = Object.create(ErrorStrategy.prototype)
@@ -67,7 +77,7 @@ type DefaultErrorStrategy struct {
 
 // <p>The default implementation simply calls {@link //endErrorCondition} to
 // ensure that the handler is not in error recovery mode.</p>
-func (this *DefaultErrorStrategy) reset(recognizer) {
+func (this *DefaultErrorStrategy) reset(recognizer *antlr4.Recognizer) {
     this.endErrorCondition(recognizer)
 }
 
@@ -77,11 +87,11 @@ func (this *DefaultErrorStrategy) reset(recognizer) {
 //
 // @param recognizer the parser instance
 //
-func (this *DefaultErrorStrategy) beginErrorCondition(recognizer) {
+func (this *DefaultErrorStrategy) beginErrorCondition(recognizer *antlr4.Recognizer) {
     this.errorRecoveryMode = true
 }
 
-func (this *DefaultErrorStrategy) inErrorRecoveryMode(recognizer) {
+func (this *DefaultErrorStrategy) inErrorRecoveryMode(recognizer *antlr4.Recognizer) {
     return this.errorRecoveryMode
 }
 
@@ -91,7 +101,7 @@ func (this *DefaultErrorStrategy) inErrorRecoveryMode(recognizer) {
 //
 // @param recognizer
 //
-func (this *DefaultErrorStrategy) endErrorCondition(recognizer) {
+func (this *DefaultErrorStrategy) endErrorCondition(recognizer *antlr4.Recognizer) {
     this.errorRecoveryMode = false
     this.lastErrorStates = nil
     this.lastErrorIndex = -1
@@ -102,7 +112,7 @@ func (this *DefaultErrorStrategy) endErrorCondition(recognizer) {
 //
 // <p>The default implementation simply calls {@link //endErrorCondition}.</p>
 //
-func (this *DefaultErrorStrategy) reportMatch(recognizer) {
+func (this *DefaultErrorStrategy) reportMatch(recognizer *antlr4.Recognizer) {
     this.endErrorCondition(recognizer)
 }
 
@@ -214,7 +224,7 @@ func (this *DefaultErrorStrategy) recover(recognizer, e) {
 // some reason speed is suffering for you, you can turn off this
 // functionality by simply overriding this method as a blank { }.</p>
 //
-func (this *DefaultErrorStrategy) sync(recognizer) {
+func (this *DefaultErrorStrategy) sync(recognizer *antlr4.Recognizer) {
     // If already recovering, don't try to sync
     if (this.inErrorRecoveryMode(recognizer)) {
         return
@@ -230,10 +240,10 @@ func (this *DefaultErrorStrategy) sync(recognizer) {
         return
     }
     switch (s.stateType) {
-    case ATNStateBLOCK_START:
-    case ATNStateSTAR_BLOCK_START:
-    case ATNStatePLUS_BLOCK_START:
-    case ATNStateSTAR_LOOP_ENTRY:
+    case atn.ATNStateBLOCK_START:
+    case atn.ATNStateSTAR_BLOCK_START:
+    case atn.ATNStatePLUS_BLOCK_START:
+    case atn.ATNStateSTAR_LOOP_ENTRY:
        // report error and recover if possible
         if( this.singleTokenDeletion(recognizer) != nil) {
             return
@@ -241,10 +251,10 @@ func (this *DefaultErrorStrategy) sync(recognizer) {
             panic NewInputMismatchException(recognizer)
         }
         break
-    case ATNStatePLUS_LOOP_BACK:
-    case ATNStateSTAR_LOOP_BACK:
+    case atn.ATNStatePLUS_LOOP_BACK:
+    case atn.ATNStateSTAR_LOOP_BACK:
         this.reportUnwantedToken(recognizer)
-        var expecting = NewIntervalSet()
+        var expecting = antlr4.NewIntervalSet()
         expecting.addSet(recognizer.getExpectedTokens())
         var whatFollowsLoopIterationOrRule = expecting.addSet(this.getErrorRecoverySet(recognizer))
         this.consumeUntil(recognizer, whatFollowsLoopIterationOrRule)
@@ -325,7 +335,7 @@ func (this *DefaultErrorStrategy) reportFailedPredicate(recognizer, e) {
 //
 // @param recognizer the parser instance
 //
-func (this *DefaultErrorStrategy) reportUnwantedToken(recognizer) {
+func (this *DefaultErrorStrategy) reportUnwantedToken(recognizer *antlr4.Recognizer) {
     if (this.inErrorRecoveryMode(recognizer)) {
         return
     }
@@ -353,7 +363,7 @@ func (this *DefaultErrorStrategy) reportUnwantedToken(recognizer) {
 //
 // @param recognizer the parser instance
 //
-func (this *DefaultErrorStrategy) reportMissingToken(recognizer) {
+func (this *DefaultErrorStrategy) reportMissingToken(recognizer *antlr4.Recognizer) {
     if ( this.inErrorRecoveryMode(recognizer)) {
         return
     }
@@ -414,7 +424,7 @@ func (this *DefaultErrorStrategy) reportMissingToken(recognizer) {
 // is in the set of tokens that can follow the {@code ')'} token reference
 // in rule {@code atom}. It can assume that you forgot the {@code ')'}.
 //
-func (this *DefaultErrorStrategy) recoverInline(recognizer) {
+func (this *DefaultErrorStrategy) recoverInline(recognizer *antlr4.Recognizer) {
     // SINGLE TOKEN DELETION
     var matchedSymbol = this.singleTokenDeletion(recognizer)
     if (matchedSymbol != nil) {
@@ -448,7 +458,7 @@ func (this *DefaultErrorStrategy) recoverInline(recognizer) {
 // @return {@code true} if single-token insertion is a viable recovery
 // strategy for the current mismatched input, otherwise {@code false}
 //
-func (this *DefaultErrorStrategy) singleTokenInsertion(recognizer) {
+func (this *DefaultErrorStrategy) singleTokenInsertion(recognizer *antlr4.Recognizer) {
     var currentSymbolType = recognizer.getTokenStream().LA(1)
     // if current token is consistent with what could come after current
     // ATN state, then we know we're missing a token error recovery
@@ -483,7 +493,7 @@ func (this *DefaultErrorStrategy) singleTokenInsertion(recognizer) {
 // deletion successfully recovers from the mismatched input, otherwise
 // {@code nil}
 //
-func (this *DefaultErrorStrategy) singleTokenDeletion(recognizer) {
+func (this *DefaultErrorStrategy) singleTokenDeletion(recognizer *antlr4.Recognizer) {
     var nextTokenType = recognizer.getTokenStream().LA(2)
     var expecting = this.getExpectedTokens(recognizer)
     if (expecting.contains(nextTokenType)) {
@@ -521,7 +531,7 @@ func (this *DefaultErrorStrategy) singleTokenDeletion(recognizer) {
 // If you change what tokens must be created by the lexer,
 // override this method to create the appropriate tokens.
 //
-func (this *DefaultErrorStrategy) getMissingSymbol(recognizer) {
+func (this *DefaultErrorStrategy) getMissingSymbol(recognizer *antlr4.Recognizer) {
     var currentSymbol = recognizer.getCurrentToken()
     var expecting = this.getExpectedTokens(recognizer)
     var expectedTokenType = expecting.first() // get any element
@@ -541,7 +551,7 @@ func (this *DefaultErrorStrategy) getMissingSymbol(recognizer) {
         -1, -1, current.line, current.column)
 }
 
-func (this *DefaultErrorStrategy) getExpectedTokens(recognizer) {
+func (this *DefaultErrorStrategy) getExpectedTokens(recognizer *antlr4.Recognizer) {
     return recognizer.getExpectedTokens()
 }
 
@@ -667,7 +677,7 @@ func (this *DefaultErrorStrategy) escapeWSAndQuote(s) {
 // Like Grosch I implement context-sensitive FOLLOW sets that are combined
 // at run-time upon error to avoid overhead during parsing.
 //
-func (this *DefaultErrorStrategy) getErrorRecoverySet(recognizer) {
+func (this *DefaultErrorStrategy) getErrorRecoverySet(recognizer *antlr4.Recognizer) {
     var atn = recognizer._interp.atn
     var ctx = recognizer._ctx
     var recoverSet = NewIntervalSet()
@@ -745,12 +755,12 @@ func (this *BailErrorStrategy) recover(recognizer, e) {
 // Make sure we don't attempt to recover inline if the parser
 // successfully recovers, it won't panic an exception.
 //
-func (this *BailErrorStrategy) recoverInline(recognizer) {
+func (this *BailErrorStrategy) recoverInline(recognizer *antlr4.Recognizer) {
     this.recover(recognizer, NewInputMismatchException(recognizer))
 }
 
 // Make sure we don't attempt to recover from problems in subrules.//
-func (this *BailErrorStrategy) sync(recognizer) {
+func (this *BailErrorStrategy) sync(recognizer *antlr4.Recognizer) {
     // pass
 }
 

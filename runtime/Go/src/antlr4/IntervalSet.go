@@ -11,7 +11,7 @@ type Interval struct {
 }
 
 /* stop is not included! */
-func NewInterval(start int, stop int) Interval{
+func NewInterval(start, stop int) Interval{
 	i := new(Interval)
 
 	i.start = start
@@ -69,7 +69,7 @@ func (i *IntervalSet) addRange(l int, h int) {
 func (i *IntervalSet) addInterval(v Interval) {
 	if (i.intervals == nil) {
 		i.intervals = make([]Interval, 0)
-		append( i.intervals, v )
+		i.intervals = append( i.intervals, v )
 	} else {
 		// find insert pos
 		for k := 0; k < len(i.intervals); k++ {
@@ -198,11 +198,11 @@ func (is *IntervalSet) removeOne(v *Interval) {
 		for n := 0; n < len(is.intervals); n++ {
 			i := is.intervals[k]
 			// intervals are ordered
-			if v.stop<=i.start {
+			if v.stop <= i.start {
 				return
 			}
-			// check for including range, split it
-			else if(v.start>i.start && v.stop<i.stop) {
+			else if v.start>i.start && v.stop<i.stop {
+				// check for including range, split it
 				is.intervals[k] = NewInterval(i.start, v.start)
 				var x = NewInterval(v.stop, i.stop)
 				is.intervals.splice(k, 0, x)
@@ -264,38 +264,38 @@ func (is *IntervalSet) toCharString() {
 }
 
 
-func (i *IntervalSet) toIndexString() {
-	var names = []
-	for i := 0 i < len( i.intervals ) i++) {
-		var v = i.intervals[i]
+func (is *IntervalSet) toIndexString() {
+	var names = make([]string, 0)
+	for i := 0; i < len( is.intervals ); i++ {
+		var v = is.intervals[i]
 		if(v.stop==v.start+1) {
 			if ( v.start==TokenEOF ) {
-				names.push("<EOF>")
+				names = append( names, "<EOF>")
 			} else {
-				names.push(v.start.toString())
+				names = append( names, v.start.toString())
 			}
 		} else {
-			names.push(v.start.toString() + ".." + (v.stop-1).toString())
+			names = append( names, v.start.toString() + ".." + (v.stop-1).toString())
 		}
 	}
-	if (names.length > 1) {
-		return "{" + string.Join(names, ", ") + "}"
+	if (len(names) > 1) {
+		return "{" + strings.Join(names, ", ") + "}"
 	} else {
 		return names[0]
 	}
 }
 
 
-func (i *IntervalSet) toTokenString(literalNames []string, symbolicNames []string) string {
-	var names = []
-	for i := 0; i < len( i.intervals ); i++ {
-		var v = i.intervals[i]
+func (is *IntervalSet) toTokenString(literalNames []string, symbolicNames []string) string {
+	var names = make([]string, 0)
+	for i := 0; i < len( is.intervals ); i++ {
+		var v = is.intervals[i]
 		for j := v.start; j < v.stop; j++ {
-			names.push(i.elementName(literalNames, symbolicNames, j))
+			names = append(names, is.elementName(literalNames, symbolicNames, j))
 		}
 	}
-	if (names.length > 1) {
-		return "{" + names.join(", ") + "}"
+	if (len(names) > 1) {
+		return "{" + strings.Join(names,", ") + "}"
 	} else {
 		return names[0]
 	}

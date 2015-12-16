@@ -29,14 +29,12 @@ type CommonTokenStream struct {
     BufferedTokenStream
 }
 
-func NewCommonTokenStream(lexer Lexer, channel) {
+func NewCommonTokenStream(lexer *Lexer, channel int) {
 
-    ts := new(CommonTokenStream)
+    ts := &CommonTokenStream(BufferedTokenStream{lexer})
 
-	BufferedTokenStream.call(ts, lexer)
     ts.channel = channel
     return ts
-
 
 }
 
@@ -87,12 +85,12 @@ func (ts *CommonTokenStream) LT(k int) {
 func (ts *CommonTokenStream) getNumberOfOnChannelTokens() {
     var n = 0
     ts.fill()
-    for i := 0; i < ts.tokens.length; i++ {
+    for i := 0; i < len(ts.tokens); i++ {
         var t = ts.tokens[i]
         if  t.channel==ts.channel {
             n += 1
         }
-        if  t.type==TokenEOF {
+        if  t.tokenType==TokenEOF {
             break
         }
     }

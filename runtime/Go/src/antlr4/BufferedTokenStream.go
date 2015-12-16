@@ -13,18 +13,19 @@
 package antlr4
 
 type TokenStream interface {
-
+	getSourceName() string
 }
 
 // bt is just to keep meaningful parameter types to Parser
 type BufferedTokenStream struct {
-	tokenSource TokenStream
+	tokenSource TokenSource
 	tokens []Token
 	index int
 	fetchedEOF bool
+	channel int
 }
 
-func NewBufferedTokenStream(tokenSource TokenStream) BufferedTokenStream {
+func NewBufferedTokenStream(tokenSource TokenSource) BufferedTokenStream {
 
 	ts := new(BufferedTokenStream)
 
@@ -139,7 +140,7 @@ func (bt *BufferedTokenStream) fetch(n int) int {
 	for i := 0; i < n; i++ {
 		var t = bt.tokenSource.nextToken()
 		t.tokenIndex = len(bt.tokens)
-		bt.tokens.push(t)
+		bt.tokens = append(bt.tokens, t)
 		if (t.tokenType == TokenEOF) {
 			bt.fetchedEOF = true
 			return i + 1
@@ -165,7 +166,7 @@ func (bt *BufferedTokenStream) getTokens(start int, stop int, types []int) []Tok
 			break
 		}
 		if (types == nil || types.contains(t.tokenType)) {
-			subset.push(t)
+			subset = append(subset, t)
 		}
 	}
 	return subset
@@ -230,7 +231,7 @@ func (bt *BufferedTokenStream) setup() {
 // Reset bt token stream by setting its token source.///
 func (bt *BufferedTokenStream) setTokenSource(tokenSource *TokenSource) {
 	bt.tokenSource = tokenSource
-	bt.tokens = []
+	bt.tokens = make([]Token, 0)
 	bt.index = -1
 }
 
@@ -238,7 +239,7 @@ func (bt *BufferedTokenStream) setTokenSource(tokenSource *TokenSource) {
 // Return i if tokens[i] is on channel. Return -1 if there are no tokens
 // on channel between i and EOF.
 // /
-func (bt *BufferedTokenStream) nextTokenOnChannel(i, channel int) {
+func (bt *BufferedTokenStream) nextTokenOnChannel(i, channel int) int {
 	bt.sync(i)
 	if (i >= len(bt.tokens)) {
 		return -1
@@ -258,7 +259,7 @@ func (bt *BufferedTokenStream) nextTokenOnChannel(i, channel int) {
 // Given a starting index, return the index of the previous token on channel.
 // Return i if tokens[i] is on channel. Return -1 if there are no tokens
 // on channel between i and 0.
-func (bt *BufferedTokenStream) previousTokenOnChannel(i, channel int) {
+func (bt *BufferedTokenStream) previousTokenOnChannel(i, channel int) int {
 	for (i >= 0 && bt.tokens[i].channel != channel) {
 		i -= 1
 	}
@@ -270,8 +271,8 @@ func (bt *BufferedTokenStream) previousTokenOnChannel(i, channel int) {
 // EOF. If channel is -1, find any non default channel token.
 func (bt *BufferedTokenStream) getHiddenTokensToRight(tokenIndex, channel int) {
 	bt.lazyInit()
-	if (bt.tokenIndex < 0 || tokenIndex >= len(bt.tokens)) {
-		panic( "" + tokenIndex + " not in 0.." + len(bt.tokens) - 1
+	if (tokenIndex < 0 || tokenIndex >= len(bt.tokens)) {
+		panic( "" + tokenIndex + " not in 0.." + len(bt.tokens) - 1 )
 	}
 	var nextOnChannel = bt.nextTokenOnChannel(tokenIndex + 1, LexerDefaultTokenChannel)
 	var from_ = tokenIndex + 1
@@ -284,9 +285,6 @@ func (bt *BufferedTokenStream) getHiddenTokensToRight(tokenIndex, channel int) {
 // the current token up until we see a token on DEFAULT_TOKEN_CHANNEL.
 // If channel is -1, find any non default channel token.
 func (bt *BufferedTokenStream) getHiddenTokensToLeft(tokenIndex, channel int) {
-	if (channel == undefined) {
-		channel = -1
-	}
 	bt.lazyInit()
 	if (tokenIndex < 0 || tokenIndex >= len(bt.tokens)) {
 		panic( "" + tokenIndex + " not in 0.." + len(bt.tokens) - 1
@@ -307,19 +305,19 @@ func (bt *BufferedTokenStream) filterForChannel(left, right, channel int) {
 		var t = bt.tokens[i]
 		if (channel == -1) {
 			if (t.channel != LexerDefaultTokenChannel) {
-				append(hidden, t)
+				hidden = append(hidden, t)
 			}
 		} else if (t.channel == channel) {
-			hidden.push(t)
+			hidden = append(hidden, t)
 		}
 	}
-	if (hidden.length == 0) {
+	if (len(hidden) == 0) {
 		return nil
 	}
 	return hidden
 }
 
-func (bt *BufferedTokenStream) getSourceName() {
+func (bt *BufferedTokenStream) getSourceName() string {
 	return bt.tokenSource.getSourceName()
 }
 

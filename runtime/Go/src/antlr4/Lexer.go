@@ -12,7 +12,9 @@ import (
 ///
 
 type TokenSource interface {
-
+	getSourceName() string
+	getText(int, int) string
+	nextToken() Token
 }
 
 type TokenFactorySourcePair struct {
@@ -24,9 +26,9 @@ type Lexer struct {
 	Recognizer
 
 	_input *InputStream
-	_factory
+	_factory *TokenFactory
 	_tokenFactorySourcePair TokenFactorySourcePair
-	_interp
+	_interp *Parser
 	_token int
 	_tokenStartCharIndex int
 	_tokenStartLine int
@@ -34,7 +36,7 @@ type Lexer struct {
 	_hitEOF int
 	_channel int
 	_type int
-	_modeStack
+	_modeStack []
 	_mode int
 	_text string
 }
@@ -44,8 +46,8 @@ func NewLexer(input *InputStream) *Lexer {
 	lexer := &Lexer{Recognizer{}}
 
 	lexer._input = input
-	lexer._factory = CommonTokenFactory.DEFAULT
-	lexer._tokenFactorySourcePair = TokenFactorySourcePair{l, input}
+	lexer._factory = CommonTokenFactoryDEFAULT
+	lexer._tokenFactorySourcePair = TokenFactorySourcePair{lexer, input}
 
 	lexer._interp = nil // child classes must populate l
 

@@ -1,7 +1,10 @@
 package antlr4
 
-// Vacuum all input from a string and then treat it like a buffer.
+import (
+	"math"
+)
 
+// Vacuum all input from a string and then treat it like a buffer.
 
 type InputStream struct {
 	name string
@@ -25,12 +28,11 @@ func NewInputStream(data string) *InputStream {
 func _loadString(stream) {
 	stream.index = 0
 	stream.data = []
-	for i := 0; i < stream.strdata.length; i++) {
+	for i := 0; i < stream.strdata.length; i++ {
 		stream.data.push(stream.strdata.charCodeAt(i))
 	}
 	stream.size = stream.data.length
 }
-
 
 // Reset the stream so that it's in the same state it was
 // when the object was created *except* the data array is not
@@ -83,7 +85,7 @@ func (is *InputStream) seek(index int) {
 		return
 	}
 	// seek forward
-	is.index = Math.min(index, is.size)
+	is.index = math.Min(index, is.size)
 }
 
 func (is *InputStream) getText(start int, stop int) string {

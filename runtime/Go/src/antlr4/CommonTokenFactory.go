@@ -44,7 +44,7 @@ func NewCommonTokenFactory(copyText bool) *CommonTokenFactory {
 //
 var CommonTokenFactoryDEFAULT = NewCommonTokenFactory(false)
 
-func (this *CommonTokenFactory) create(source *TokenSource, ttype, text, channel, start, stop, line, column int) {
+func (this *CommonTokenFactory) create(source *TokenSource, ttype, text, channel, start, stop, line, column int) *CommonToken {
     var t = NewCommonToken(source, ttype, channel, start, stop)
     t.line = line
     t.column = column
@@ -56,7 +56,7 @@ func (this *CommonTokenFactory) create(source *TokenSource, ttype, text, channel
     return t
 }
 
-func (this *CommonTokenFactory) createThin(ttype int, text string) {
+func (this *CommonTokenFactory) createThin(ttype int, text string) *CommonToken {
     var t = NewCommonToken(nil, ttype)
     t.text = text
     return t

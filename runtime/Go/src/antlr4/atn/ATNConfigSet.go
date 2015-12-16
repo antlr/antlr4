@@ -8,7 +8,7 @@ package atn
 
 //var ATN = require('./ATN').ATN
 //var Utils = require('./../Utils')
-var Set = Utils.Set
+//var Set = Utils.Set
 //var SemanticContext = require('./SemanticContext').SemanticContext
 //var merge = require('./../PredictionContext').merge
 

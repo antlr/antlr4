@@ -3,7 +3,9 @@ package antlr4
 import (
     "fmt"
     "antlr4/tree"
+    "antlr4/error"
 )
+
 //var Token = require('./Token').Token
 //var ConsoleErrorListener = require('./error/ErrorListener').ConsoleErrorListener
 //var ProxyErrorListener = require('./error/ErrorListener').ProxyErrorListener
@@ -16,7 +18,7 @@ type Recognizer struct {
 
 func NewRecognizer() *Recognizer {
     rec := new(Recognizer)
-    rec._listeners = []tree.ParseTreeListener{ ConsoleErrorListener.INSTANCE }
+    rec._listeners = []tree.ParseTreeListener{ error.ConsoleErrorListenerINSTANCE }
     rec._interp = nil
     rec.state = -1
     return rec
@@ -71,7 +73,7 @@ func (this *Recognizer) getRuleIndexMap() {
     return result
 }
 
-func (this *Recognizer) getTokenType(tokenName) {
+func (this *Recognizer) getTokenType(tokenName string) int {
     var ttype = this.getTokenTypeMap()[tokenName]
     if (ttype !=undefined) {
         return ttype
@@ -119,7 +121,7 @@ func (this *Recognizer) getTokenErrorDisplay(t *Token) string {
 }
 
 func (this *Recognizer) getErrorListenerDispatch() {
-    return NewProxyErrorListener(this._listeners)
+    return error.NewProxyErrorListener(this._listeners)
 }
 
 // subclass needs to override these if there are sempreds or actions
