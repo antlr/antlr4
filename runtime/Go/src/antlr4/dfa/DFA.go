@@ -16,7 +16,7 @@ Object.defineProperty(DFAStatesSet.prototype, "length", {
 })
 
 func DFA(atnStartState, decision) {
-	if (decision == undefined) {
+	if (decision == nil) {
 		decision = 0
 	}
 	// From which ATN state did we create this DFA?

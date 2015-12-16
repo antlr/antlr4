@@ -72,7 +72,7 @@ func (this *ATN) nextTokensNoContext(s) {
 }
 
 func (this *ATN) nextTokens(s, ctx) {
-    if ( ctx==undefined ) {
+    if ( ctx==nil ) {
         return this.nextTokensNoContext(s)
     } else {
         return this.nextTokensInContext(s, ctx)

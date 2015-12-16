@@ -214,7 +214,7 @@ func (this *LexerATNSimulator) getExistingTargetState(s, t) {
 	}
 
 	var target = s.edges[t - LexerATNSimulator.MIN_DFA_EDGE]
-	if(target==undefined) {
+	if(target==nil) {
 		target = nil
 	}
 	if (this.debug && target != nil) {
@@ -523,10 +523,10 @@ func (this *LexerATNSimulator) captureSimState(settings, input, dfaState) {
 }
 
 func (this *LexerATNSimulator) addDFAEdge(from_, tk, to, cfgs) {
-	if (to == undefined) {
+	if (to == nil) {
 		to = nil
 	}
-	if (cfgs == undefined) {
+	if (cfgs == nil) {
 		cfgs = nil
 	}
 	if (to == nil && cfgs != nil) {

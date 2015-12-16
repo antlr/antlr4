@@ -1,7 +1,7 @@
 package atn
 
 func ATNDeserializationOptions(copyFrom) {
-	if(copyFrom==undefined) {
+	if(copyFrom==nil) {
 		copyFrom = nil
 	}
 	this.readOnly = false

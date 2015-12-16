@@ -86,9 +86,9 @@ SemanticContext.orContext = function(a, b) {
 
 func Predicate(ruleIndex, predIndex, isCtxDependent) {
 	SemanticContext.call(this)
-	this.ruleIndex = ruleIndex == undefined ? -1 : ruleIndex
-	this.predIndex = predIndex == undefined ? -1 : predIndex
-	this.isCtxDependent = isCtxDependent == undefined ? false : isCtxDependent // e.g., $i ref in pred
+	this.ruleIndex = ruleIndex == nil ? -1 : ruleIndex
+	this.predIndex = predIndex == nil ? -1 : predIndex
+	this.isCtxDependent = isCtxDependent == nil ? false : isCtxDependent // e.g., $i ref in pred
 	return this
 }
 
@@ -128,7 +128,7 @@ func (this *Predicate) toString() string {
 
 func PrecedencePredicate(precedence) {
 	SemanticContext.call(this)
-	this.precedence = precedence == undefined ? 0 : precedence
+	this.precedence = precedence == nil ? 0 : precedence
 }
 
 //PrecedencePredicate.prototype = Object.create(SemanticContext.prototype)

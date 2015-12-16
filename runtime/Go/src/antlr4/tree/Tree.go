@@ -85,7 +85,7 @@ func (this *ParseTreeVisitor) visit(ctx) {
 }
 
 func visitAtom(visitor, ctx) {
-	if (ctx.parser == undefined) { //is terminal
+	if (ctx.parser == nil) { //is terminal
 		return
 	}
 
@@ -206,7 +206,7 @@ func NewParseTreeWalker() *ParseTreeWalker{
 
 func (this *ParseTreeWalker) walk(listener, t) {
 	var errorNode = t instanceof ErrorNode ||
-			(t.isErrorNode != undefined && t.isErrorNode())
+			(t.isErrorNode != nil && t.isErrorNode())
 	if (errorNode) {
 		listener.visitErrorNode(t)
 	} else if _, ok := t.(TerminalNode); ok {

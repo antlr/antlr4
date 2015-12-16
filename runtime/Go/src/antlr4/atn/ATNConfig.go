@@ -61,8 +61,8 @@ func ATNConfig(params, config) {
 }
 
 func (this *ATNConfig) checkContext(params, config) {
-	if((params.context==nil || params.context==undefined) &&
-			(config==nil || config.context==nil || config.context==undefined)) {
+	if((params.context==nil || params.context==nil) &&
+			(config==nil || config.context==nil || config.context==nil)) {
 		this.context = nil
 	}
 }

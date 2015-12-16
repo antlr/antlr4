@@ -52,7 +52,7 @@ func (is *InputStream) consume() {
 
 func (is *InputStream) LA(offset int) {
 	if (offset == 0) {
-		return 0 // undefined
+		return 0 // nil
 	}
 	if (offset < 0) {
 		offset += 1 // e.g., translate LA(-1) to use offset=0

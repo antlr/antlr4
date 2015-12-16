@@ -19,7 +19,7 @@ import (
 //  Note text is not an actual field of a rule return value it is computed
 //  from start and stop using the input stream's toString() method.  I
 //  could add a ctor to prc so that we can pass in and store the input
-//  stream, but I'm not sure we want to do that.  It would seem to be undefined
+//  stream, but I'm not sure we want to do that.  It would seem to be nil
 //  to get the .text property anyway if the rule matches tokens from multiple
 //  input streams.
 //

@@ -65,7 +65,7 @@ func initArray( length, value) {
 
 func ATNDeserializer (options) {
 	
-    if ( options== undefined || options == nil ) {
+    if ( options== nil || options == nil ) {
         options = ATNDeserializationOptions.defaultOptions
     }
     this.deserializationOptions = options
@@ -531,7 +531,7 @@ func (this *ATNDeserializer) verifyATN(atn) {
 
 func (this *ATNDeserializer) checkCondition(condition, message) {
     if (!condition) {
-        if (message == undefined || message==nil) {
+        if (message == nil || message==nil) {
             message = "IllegalState"
         }
         panic (message)

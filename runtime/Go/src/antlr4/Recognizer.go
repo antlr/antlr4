@@ -66,7 +66,7 @@ func (this *Recognizer) getRuleIndexMap() {
         panic("The current recognizer does not provide a list of rule names.")
     }
     var result = ruleIndexMapCache[ruleNames]
-    if(result==undefined) {
+    if(result==nil) {
         result = ruleNames.reduce(function(o, k, i) { o[k] = i })
         ruleIndexMapCache[ruleNames] = result
     }
@@ -75,7 +75,7 @@ func (this *Recognizer) getRuleIndexMap() {
 
 func (this *Recognizer) getTokenType(tokenName string) int {
     var ttype = this.getTokenTypeMap()[tokenName]
-    if (ttype !=undefined) {
+    if (ttype !=nil) {
         return ttype
     } else {
         return TokenInvalidType

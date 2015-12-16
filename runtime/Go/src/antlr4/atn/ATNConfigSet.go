@@ -44,7 +44,7 @@ func ATNConfigSet(fullCtx) {
 	// Indicates that this configuration set is part of a full context
 	// LL prediction. It will be used to determine how to merge $. With SLL
 	// it's a wildcard whereas it is not for LL context merge.
-	this.fullCtx = fullCtx == undefined ? true : fullCtx
+	this.fullCtx = fullCtx == nil ? true : fullCtx
 	// Indicates that the set of configurations is read-only. Do not
 	// allow any code to manipulate the set DFA states will point at
 	// the sets and they must not change. This does not protect the other
@@ -81,7 +81,7 @@ func ATNConfigSet(fullCtx) {
 // {@link //hasSemanticContext} when necessary.</p>
 // /
 func (this *ATNConfigSet) add(config, mergeCache) {
-	if (mergeCache == undefined) {
+	if (mergeCache == nil) {
 		mergeCache = nil
 	}
 	if (this.readOnly) {

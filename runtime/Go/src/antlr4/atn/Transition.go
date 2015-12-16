@@ -20,7 +20,7 @@ package atn
 
 func Transition (target) {
     // The target of this transition.
-    if (target==undefined || target==nil) {
+    if (target==nil || target==nil) {
         panic "target cannot be nil."
     }
     this.target = target
@@ -195,8 +195,8 @@ func ActionTransition(target, ruleIndex, actionIndex, isCtxDependent) {
 	Transition.call(this, target)
     this.serializationType = Transition.ACTION
     this.ruleIndex = ruleIndex
-    this.actionIndex = actionIndex==undefined ? -1 : actionIndex
-    this.isCtxDependent = isCtxDependent==undefined ? false : isCtxDependent // e.g., $i ref in pred
+    this.actionIndex = actionIndex==nil ? -1 : actionIndex
+    this.isCtxDependent = isCtxDependent==nil ? false : isCtxDependent // e.g., $i ref in pred
     this.isEpsilon = true
     return this
 }
@@ -218,7 +218,7 @@ func (this *ActionTransition) toString() string {
 func SetTransition(target, set) {
 	Transition.call(this, target)
 	this.serializationType = Transition.SET
-    if (set !=undefined && set !=nil) {
+    if (set !=nil && set !=nil) {
         this.label = set
     } else {
         this.label = NewIntervalSet()
