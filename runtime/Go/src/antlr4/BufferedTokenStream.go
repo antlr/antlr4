@@ -234,7 +234,6 @@ func (bt *BufferedTokenStream) setTokenSource(tokenSource *TokenSource) {
 	bt.index = -1
 }
 
-
 // Given a starting index, return the index of the next token on channel.
 // Return i if tokens[i] is on channel. Return -1 if there are no tokens
 // on channel between i and EOF.

@@ -41,7 +41,7 @@ type Lexer struct {
 
 func NewLexer(input *InputStream) *Lexer {
 
-	lexer := new(Lexer)
+	lexer := &Lexer{Recognizer{}}
 
 	lexer._input = input
 	lexer._factory = CommonTokenFactory.DEFAULT
@@ -380,7 +380,7 @@ func (l *Lexer) getCharErrorDisplay(c) string {
 // /
 func (l *Lexer) recover(re) {
 	if (l._input.LA(1) != TokenEOF) {
-		if (ok, re := re.(LexerNoViableAltException)) {
+		if re, ok := re.(LexerNoViableAltException); ok {
 			// skip a char and try again
 			l._interp.consume(l._input)
 		} else {

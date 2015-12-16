@@ -2,26 +2,28 @@ package antlr4
 
 import (
     "fmt"
+    "antlr4/tree"
 )
 //var Token = require('./Token').Token
 //var ConsoleErrorListener = require('./error/ErrorListener').ConsoleErrorListener
 //var ProxyErrorListener = require('./error/ErrorListener').ProxyErrorListener
 
 type Recognizer struct {
-    _listeners []Listener
-    _interp
+    _listeners []tree.ParseTreeListener
+    _interp *Parser
     state int
 }
 
-type Recognizer struct {
-    this._listeners = [ ConsoleErrorListener.INSTANCE ]
-    this._interp = nil
-    this.state = -1
-    return this
+func NewRecognizer() *Recognizer {
+    rec := new(Recognizer)
+    rec._listeners = []tree.ParseTreeListener{ ConsoleErrorListener.INSTANCE }
+    rec._interp = nil
+    rec.state = -1
+    return rec
 }
 
-Recognizer.tokenTypeMapCache = {}
-Recognizer.ruleIndexMapCache = {}
+var tokenTypeMapCache = make(map[string]int)
+var ruleIndexMapCache = make(map[string]int)
 
 func (this *Recognizer) checkVersion(toolVersion string) {
     var runtimeVersion = "4.5.1"
@@ -30,12 +32,12 @@ func (this *Recognizer) checkVersion(toolVersion string) {
     }
 }
 
-func (this *Recognizer) addErrorListener(listener) {
-    this._listeners.push(listener)
+func (this *Recognizer) addErrorListener(listener *tree.ParseTreeListener) {
+    append(this._listeners, listener)
 }
 
 func (this *Recognizer) removeErrorListeners() {
-    this._listeners = []
+    this._listeners = make([]tree.ParseTreeListener, 1)
 }
 
 func (this *Recognizer) getTokenTypeMap() {
@@ -43,11 +45,11 @@ func (this *Recognizer) getTokenTypeMap() {
     if (tokenNames==nil) {
         panic("The current recognizer does not provide a list of token names.")
     }
-    var result = this.tokenTypeMapCache[tokenNames]
+    var result = tokenTypeMapCache[tokenNames]
     if(result==undefined) {
         result = tokenNames.reduce(function(o, k, i) { o[k] = i })
         result.EOF = TokenEOF
-        this.tokenTypeMapCache[tokenNames] = result
+        tokenTypeMapCache[tokenNames] = result
     }
     return result
 }
@@ -61,10 +63,10 @@ func (this *Recognizer) getRuleIndexMap() {
     if (ruleNames==nil) {
         panic("The current recognizer does not provide a list of rule names.")
     }
-    var result = this.ruleIndexMapCache[ruleNames]
+    var result = ruleIndexMapCache[ruleNames]
     if(result==undefined) {
         result = ruleNames.reduce(function(o, k, i) { o[k] = i })
-        this.ruleIndexMapCache[ruleNames] = result
+        ruleIndexMapCache[ruleNames] = result
     }
     return result
 }
@@ -100,16 +102,16 @@ func (this *Recognizer) getErrorHeader(e) {
 // feature when necessary. For example, see
 // {@link DefaultErrorStrategy//getTokenErrorDisplay}.
 //
-func (this *Recognizer) getTokenErrorDisplay(t) {
+func (this *Recognizer) getTokenErrorDisplay(t *Token) string {
     if (t==nil) {
         return "<no token>"
     }
     var s = t.text
-    if (s==nil) {
-        if (t.type==TokenEOF) {
+    if s==nil {
+        if (t.tokenType==TokenEOF) {
             s = "<EOF>"
         } else {
-            s = "<" + t.type + ">"
+            s = "<" + t.tokenType + ">"
         }
     }
     s = s.replace("\n","\\n").replace("\r","\\r").replace("\t","\\t")
@@ -122,11 +124,11 @@ func (this *Recognizer) getErrorListenerDispatch() {
 
 // subclass needs to override these if there are sempreds or actions
 // that the ATN interp needs to execute
-func (this *Recognizer) sempred(localctx, ruleIndex, actionIndex) {
+func (this *Recognizer) sempred(localctx *RuleContext, ruleIndex int, actionIndex int) {
     return true
 }
 
-func (this *Recognizer) precpred(localctx , precedence) {
+func (this *Recognizer) precpred(localctx *RuleContext, precedence) {
     return true
 }
 
@@ -137,14 +139,14 @@ func (this *Recognizer) precpred(localctx , precedence) {
 //invoking rules. Combine this and we have complete ATN
 //configuration information.
 
-Object.defineProperty(Recognizer.prototype, "state", {
-	get : function() {
-		return this._stateNumber
-	},
-	set : function(state) {
-		this._stateNumber = state
-	}
-})
+//Object.defineProperty(Recognizer.prototype, "state", {
+//	get : function() {
+//		return this._stateNumber
+//	},
+//	set : function(state) {
+//		this._stateNumber = state
+//	}
+//})
 
 
 

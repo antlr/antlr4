@@ -1,21 +1,25 @@
 package tree
 
+import (
+	"antlr4"
+)
+
 // The basic notion of a tree has a parent, a payload, and a list of children.
 //  It is the most abstract interface for all the trees used by ANTLR.
 ///
 
-var INVALID_INTERVAL = NewInterval(-1, -2)
+var INVALID_INTERVAL = antlr4.NewInterval(-1, -2)
 
 type Tree struct {
 
 }
 
-func NewTree() *Tree{
-	return this
+func NewTree() *Tree {
+	return new(Tree)
 }
 
 type SyntaxTree struct {
-
+	Tree
 }
 
 func NewSyntaxTree() *SyntaxTree{
@@ -23,10 +27,8 @@ func NewSyntaxTree() *SyntaxTree{
 	return this
 }
 
-
-
 type ParseTree struct {
-
+	SyntaxTree
 }
 
 func NewParseTree() *ParseTree{
@@ -35,9 +37,8 @@ func NewParseTree() *ParseTree{
 }
 
 
-
 type RuleNode struct {
-
+	ParseTree
 }
 
 func NewRuleNode() *RuleNode{
@@ -46,9 +47,8 @@ func NewRuleNode() *RuleNode{
 }
 
 
-
 type TerminalNode struct {
-
+	ParseTree
 }
 
 func NewTerminalNode() *TerminalNode{
@@ -59,7 +59,7 @@ func NewTerminalNode() *TerminalNode{
 
 
 type ErrorNode struct {
-
+	TerminalNode
 }
 
 func NewErrorNode() *ErrorNode{
@@ -67,14 +67,12 @@ func NewErrorNode() *ErrorNode{
 	return this
 }
 
-
-
 type ParseTreeVisitor struct {
 
 }
 
-func NewParseTreeVisitor() *ParseTreeVisitor{
-	return this
+func NewParseTreeVisitor() *ParseTreeVisitor {
+	return new(ParseTreeVisitor)
 }
 
 func (this *ParseTreeVisitor) visit(ctx) {
@@ -86,7 +84,7 @@ func (this *ParseTreeVisitor) visit(ctx) {
 	}
 }
 
-var visitAtom = function(visitor, ctx) {
+func visitAtom(visitor, ctx) {
 	if (ctx.parser == undefined) { //is terminal
 		return
 	}
@@ -101,7 +99,7 @@ type ParseTreeListener struct {
 
 }
 
-func NewParseTreeListener() *ParseTreeListener{
+func NewParseTreeListener() *ParseTreeListener {
 }
 
 func NewParseTreeListener() ParseTreeListener {
@@ -120,14 +118,18 @@ func (this *ParseTreeListener) enterEveryRule(node) {
 func (this *ParseTreeListener) exitEveryRule(node) {
 }
 
-func TerminalNodeImpl(symbol) {
-	TerminalNode.call(this)
-	this.parentCtx = nil
-	this.symbol = symbol
-	return this
+type TerminalNodeImpl struct {
+	TerminalNode
+	parentCtx
+	symbol
 }
 
-
+func TerminalNodeImpl(symbol) {
+	tn := &TerminalNodeImpl{TerminalNode{}}
+	tn.parentCtx = nil
+	tn.symbol = symbol
+	return tn
+}
 
 func (this *TerminalNodeImpl) getChild(i) {
 	return nil
@@ -166,7 +168,7 @@ func (this *TerminalNodeImpl) getText() {
 }
 
 func (this *TerminalNodeImpl) toString() string {
-	if (this.symbol.type == TokenEOF) {
+	if (this.symbol.tokenType == TokenEOF) {
 		return "<EOF>"
 	} else {
 		return this.symbol.text
@@ -237,13 +239,3 @@ func (this *ParseTreeWalker) exitRule(listener, r) {
 }
 
 ParseTreeWalker.DEFAULT = NewParseTreeWalker()
-
-
-
-
-
-
-
-
-
-exports.INVALID_INTERVAL = INVALID_INTERVAL

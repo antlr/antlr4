@@ -12,7 +12,7 @@ type CommonTokenFactory struct {
     copyText bool
 }
 
-func NewCommonTokenFactory(copyText bool) CommonTokenFactory {
+func NewCommonTokenFactory(copyText bool) *CommonTokenFactory {
 
     tf := new(CommonTokenFactory)
 
@@ -44,8 +44,8 @@ func NewCommonTokenFactory(copyText bool) CommonTokenFactory {
 //
 var CommonTokenFactoryDEFAULT = NewCommonTokenFactory(false)
 
-func (this *CommonTokenFactory) create(source, type, text, channel, start, stop, line, column) {
-    var t = NewCommonToken(source, type, channel, start, stop)
+func (this *CommonTokenFactory) create(source *TokenSource, ttype, text, channel, start, stop, line, column int) {
+    var t = NewCommonToken(source, ttype, channel, start, stop)
     t.line = line
     t.column = column
     if (text !=nil) {
@@ -56,8 +56,8 @@ func (this *CommonTokenFactory) create(source, type, text, channel, start, stop,
     return t
 }
 
-func (this *CommonTokenFactory) createThin(type, text) {
-    var t = NewCommonToken(nil, type)
+func (this *CommonTokenFactory) createThin(ttype int, text string) {
+    var t = NewCommonToken(nil, ttype)
     t.text = text
     return t
 }

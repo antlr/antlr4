@@ -1,4 +1,5 @@
 package error
+import "antlr4"
 
 // The root of the ANTLR exception hierarchy. In general, ANTLR tracks just
 //  3 kinds of errors: prediction errors, failed predicate errors, and
@@ -8,13 +9,22 @@ package error
 
 //var PredicateTransition = require('./../atn/Transition').PredicateTransition
 
+type RecognitionException struct {
+
+	message string
+	recognizer antlr4.Recognizer
+
+}
+
 func RecognitionException(params) {
 	Error.call(this)
+
 	if (!!Error.captureStackTrace) {
         Error.captureStackTrace(this, RecognitionException)
 	} else {
 		var stack = NewError().stack
 	}
+
 	this.message = params.message
     this.recognizer = params.recognizer
     this.input = params.input

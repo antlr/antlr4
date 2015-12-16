@@ -1,5 +1,9 @@
 package error
 
+import (
+    "antlr4/atn"
+)
+
 //var Token = require('./../Token').Token
 //var Errors = require('./Errors')
 //var NoViableAltException = Errors.NoViableAltException
