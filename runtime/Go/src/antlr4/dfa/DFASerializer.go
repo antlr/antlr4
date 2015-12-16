@@ -3,6 +3,10 @@ package dfa
 // A DFA walker that knows how to dump them to serialized strings.#/
 
 
+type DFASerializer struct {
+
+}
+
 func DFASerializer(dfa, literalNames, symbolicNames) {
 	this.dfa = dfa
 	this.literalNames = literalNames || []

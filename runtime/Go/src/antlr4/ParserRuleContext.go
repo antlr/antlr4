@@ -1,5 +1,9 @@
 package antlr4
 
+import (
+	"antlr4/tree"
+)
+
 //* A rule invocation record for parsing.
 //
 //  Contains all of the information about the current rule not stored in the
@@ -72,10 +76,10 @@ func (prc *ParserRuleContext) copyFrom(ctx *RuleContext) {
 }
 
 // Double dispatch methods for listeners
-func (prc *ParserRuleContext) enterRule(listener *ParseTreeListener) {
+func (prc *ParserRuleContext) enterRule(listener *tree.ParseTreeListener) {
 }
 
-func (prc *ParserRuleContext) exitRule(listener *ParseTreeListener) {
+func (prc *ParserRuleContext) exitRule(listener *tree.ParseTreeListener) {
 }
 
 // * Does not set parent link other add methods do that///

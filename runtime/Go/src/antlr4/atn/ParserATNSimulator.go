@@ -1,5 +1,10 @@
 package atn
 
+import (
+    "antlr4"
+    "fmt"
+)
+
 //
 // The embodiment of the adaptive LL(*), ALL(*), parsing strategy.
 //
@@ -721,7 +726,7 @@ func (this *ParserATNSimulator) computeReachSet(closure, t, fullCtx) {
     var skippedStopStates = nil
 
     // First figure out where we can reach on input t
-    for (var i=0 i<closure.items.lengthi++) {
+    for i:=0; i<len(closure.items); i++ {
         var c = closure.items[i]
         if(this.debug) {
             fmt.Println("testing " + this.getTokenName(t) + " at " + c)

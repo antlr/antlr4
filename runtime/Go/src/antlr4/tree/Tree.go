@@ -8,7 +8,7 @@ import (
 //  It is the most abstract interface for all the trees used by ANTLR.
 ///
 
-var INVALID_INTERVAL = antlr4.NewInterval(-1, -2)
+var TreeINVALID_INTERVAL = antlr4.NewInterval(-1, -2)
 
 type Tree struct {
 
@@ -238,4 +238,4 @@ func (this *ParseTreeWalker) exitRule(listener, r) {
 	listener.exitEveryRule(ctx)
 }
 
-ParseTreeWalker.DEFAULT = NewParseTreeWalker()
+var ParseTreeWalkerDEFAULT = NewParseTreeWalker()

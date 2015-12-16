@@ -1,11 +1,20 @@
 package antlr4
 
+import (
+	"strings"
+)
+
+type TokenSourceInputStreamPair struct {
+	tokenSource *TokenSource
+	inputStream *InputStream
+}
+
 // A token has properties: text, type, line, character position in the line
 // (so we can ignore tabs), token channel, index, and source from which
 // we obtained this token.
 
 type Token struct {
-	source *TokenSource
+	source *TokenSourceInputStreamPair
 	tokenType int // token type of the token
 	channel int // The parser ignores everything not on DEFAULT_CHANNEL
 	start int // optional return -1 if not implemented.
@@ -13,7 +22,7 @@ type Token struct {
 	tokenIndex int // from 0..n-1 of the token object in the input stream
 	line int // line=1..n of the 1st character
 	column int // beginning of the line at which it occurs, 0..n-1
-	text string // text of the token.
+	_text string // text of the token.
 }
 
 func NewToken() *Token {
@@ -62,19 +71,19 @@ const (
 //	}
 //})
 
-func (this *Token) getTokenSource() {
-	return this.source[0]
+func (this *Token) getTokenSource() *TokenSource {
+	return this.source.tokenSource
 }
 
-func (this *Token) getInputStream() {
-	return this.source[1]
+func (this *Token) getInputStream() *InputStream {
+	return this.source.inputStream
 }
 
 type CommonToken struct {
 	Token
 }
 
-func NewCommonToken(source *InputStream, tokenType int, channel, start int, stop int) *CommonToken {
+func NewCommonToken(source *TokenSourceInputStreamPair, tokenType int, channel, start int, stop int) *CommonToken {
 
 	t := CommonToken{Token{}}
 
@@ -85,8 +94,8 @@ func NewCommonToken(source *InputStream, tokenType int, channel, start int, stop
 	t.stop = stop
 	t.tokenIndex = -1
 	if (t.source[0] != nil) {
-		t.line = source[0].line
-		t.column = source[0].column
+		t.line = source.tokenSource.line()
+		t.column = source.tokenSource.column()
 	} else {
 		t.column = -1
 	}
@@ -120,38 +129,46 @@ func (ct *CommonToken) clone() {
 	return t
 }
 
-Object.defineProperty(CommonToken.prototype, "text", {
-	get : function() {
-		if (this._text != nil) {
-			return this._text
-		}
-		var input = this.getInputStream()
-		if (input == nil) {
-			return nil
-		}
-		var n = input.size
-		if (this.start < n && this.stop < n) {
-			return input.getText(this.start, this.stop)
-		} else {
-			return "<EOF>"
-		}
-	},
-	set : function(text) {
-		this._text = text
+func (this *CommonToken) text() string {
+	if (this._text != nil) {
+		return this._text
 	}
-})
+	var input = this.getInputStream()
+	if (input == nil) {
+		return nil
+	}
+	var n = input.size
+	if (this.start < n && this.stop < n) {
+		return input.getText(this.start, this.stop)
+	} else {
+		return "<EOF>"
+	}
+}
+
+func (this *CommonToken) setText(text string) {
+	this._text = text
+}
 
 func (this *CommonToken) toString() string {
 	var txt = this.text
 	if (txt != nil) {
-		txt = txt.replace(/\n/g, "\\n").replace(/\r/g, "\\r").replace(/\t/g, "\\t")
+		txt = strings.Replace(txt, "\n", "", -1)
+		txt = strings.Replace(txt, "\r", "", -1)
+		txt = strings.Replace(txt, "\t", "", -1)
 	} else {
 		txt = "<no text>"
 	}
+
+	var ch string;
+	if (this.channel > 0){
+		ch = ",channel=" + this.channel
+	} else {
+		ch = ""
+	}
+
 	return "[@" + this.tokenIndex + "," + this.start + ":" + this.stop + "='" +
 			txt + "',<" + this.tokenType + ">" +
-			(this.channel > 0 ? ",channel=" + this.channel : "") + "," +
-			this.line + ":" + this.column + "]"
+			ch + "," + this.line + ":" + this.column + "]"
 }
 
 

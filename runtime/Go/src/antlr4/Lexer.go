@@ -16,13 +16,14 @@ type TokenSource interface {
 	getSourceName() string
 	getText(int, int) string
 	nextToken() Token
+	column() int
+	line() int
 }
 
 type TokenFactorySourcePair struct {
 	factory TokenFactory
 	inputStream InputStream
 }
-
 
 type Lexer struct {
 	Recognizer

@@ -48,7 +48,7 @@ func (this *Recognizer) getTokenTypeMap() {
         panic("The current recognizer does not provide a list of token names.")
     }
     var result = tokenTypeMapCache[tokenNames]
-    if(result==undefined) {
+    if(result==nil) {
         result = tokenNames.reduce(function(o, k, i) { o[k] = i })
         result.EOF = TokenEOF
         tokenTypeMapCache[tokenNames] = result

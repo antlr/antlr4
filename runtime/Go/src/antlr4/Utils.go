@@ -5,6 +5,8 @@ import (
 	"errors"
 	"strings"
 	"hash/fnv"
+	"math"
+	"regexp"
 )
 
 
@@ -35,17 +37,17 @@ func arrayToString(a []interface{}) string{
 }
 
 
-func (s *string) hashCode() int {
+func hashCode(s string) int {
 	h := fnv.New32a()
-	h.Write([]byte((*s)))
+	h.Write([]byte((s)))
 	return h.Sum32()
 }
 
 
 type Set struct {
 	data map[int][]interface{}
-	hashfunc func(interface{}) string
-	equalsfunc func(interface{},interface{}) bool
+	hashFunction func(interface{}) string
+	equalsFunction func(interface{},interface{}) bool
 }
 
 func NewSet(hashFunction func(interface{}) string, equalsFunction func(interface{},interface{}) bool) *Set {
@@ -55,15 +57,15 @@ func NewSet(hashFunction func(interface{}) string, equalsFunction func(interface
 	s.data = make(map[string]interface{})
 
 	if (hashFunction == nil){
-		s.hashfunc = standardHashFunction
+		s.hashFunction = standardHashFunction
 	} else {
-		s.hashfunc = hashFunction
+		s.hashFunction = hashFunction
 	}
 
 	if (equalsFunction == nil){
-		s.equalsfunc = standardEqualsFunction
+		s.equalsFunction = standardEqualsFunction
 	} else {
-		s.equalsfunc = equalsFunction
+		s.equalsFunction = equalsFunction
 	}
 
 	return s
@@ -74,7 +76,9 @@ func standardEqualsFunction(a interface{}, b interface{}) bool {
 }
 
 func standardHashFunction(a interface{}) string {
-	return a.hashString()
+	h := fnv.New32a()
+	h.Write([]byte((a)))
+	return h.Sum32()
 }
 
 func (this *Set) length() int {
@@ -82,28 +86,37 @@ func (this *Set) length() int {
 }
 
 func (this *Set) add(value interface{}) {
-	var hash = this.hashFunction(value)
-	var key = "hash_" + hash.hashCode()
 
-	if key_,values := range this.data {
-		for i=0; i<len(values); i++) {
+	var hash = this.hashFunction(value)
+	var key = "hash_" + hashCode(hash)
+	values := this.data[key]
+
+	if this.data[key] != nil {
+
+		for i := 0; i < len(values); i++ {
 			if(this.equalsFunction(value, values[i])) {
 				return values[i]
 			}
 		}
-		values.push(value)
-		return value
-	} else {
-		this.data[key] = [ value ]
+
+		this.data[key] = append( this.data[key], value )
 		return value
 	}
+
+	this.data[key] = []interface{}{ value }
+	return value
 }
 
 func (this *Set) contains(value interface{}) bool {
-	var hash = this.hashFunction(value)
-	var key = hash.hashCode()
-	if k,values := range this.data {
-		for i :=0; i < len(values); i++ {
+
+	hash := this.hashFunction(value)
+	key := hashCode(hash)
+
+	values := this.data[key]
+
+	if this.data[key] != nil {
+
+		for i := 0; i < len(values); i++ {
 			if(this.equalsFunction(value, values[i])) {
 				return true
 			}
@@ -116,8 +129,8 @@ func (this *Set) values() []interface{} {
 	var l = make([]interface{}, len(this.data))
 
 	for key,_ := range this.data {
-		if(key.indexOf("hash_")==0) {
-			l = l.concat(this.data[key])
+		if strings.Index(key, "hash_") == 0 {
+			l = append(l, this.data[key]...)
 		}
 	}
 	return l
@@ -128,59 +141,74 @@ func (this *Set) toString() string {
 }
 
 
-
-
 type BitSet struct {
-	this.data = []
-	return this
+	data map[int]bool
 }
 
-type BitSet struct {
-	this.data = []
-	return this
+func NewBitSet() *BitSet {
+	b := new(BitSet)
+	b.data = new(map[int]bool)
+	return b
 }
 
-func (this *BitSet) add(value) {
+func (this *BitSet) add(value bool) {
 	this.data[value] = true
 }
 
-func (this *BitSet) or(set) {
-	var bits = this
-	Object.keys(set.data).map( function(alt) { bits.add(alt) })
+func (this *BitSet) or(set *BitSet) {
+	for k,_ := range set.data {
+		this.add(k)
+	}
 }
 
-func (this *BitSet) remove(value) {
-	delete this.data[value]
+func (this *BitSet) remove(value int) {
+	delete(this.data, value)
 }
 
-func (this *BitSet) contains(value) {
+func (this *BitSet) contains(value int) {
 	return this.data[value] == true
 }
 
-func (this *BitSet) values() {
-	return Object.keys(this.data)
+func (this *BitSet) values() []int {
+	ks := make([]interface{}, len(this.data))
+	i := 0
+	for k,_ := range this.data {
+		ks[i] = k
+		i++
+	}
+	return ks
 }
 
 func (this *BitSet) minValue() {
-	return Math.min.apply(nil, this.values())
+	min := math.MinInt32
+
+	for k,_ := range this.data {
+		if k < min {
+			min = k
+		}
+	}
+
+	return min
 }
 
+// TODO this may not work the same as the JavaScript version
 func (this *BitSet) hashString() {
-	return this.values().toString()
+	h := fnv.New32a()
+	h.Write([]byte(this.data))
+	return h.Sum32()
 }
 
-func (this *BitSet) equals(other) {
-	if(!_, ok := other.(BitSet); ok) {
+func (this *BitSet) equals(other interface{}) bool {
+	otherBitSet, ok := other.(BitSet); !ok
+	if  !ok {
 		return false
 	}
-	return this.hashString()==other.hashString()
+	return this.hashString()==otherBitSet.hashString()
 }
 
-Object.defineProperty(BitSet.prototype, "length", {
-	get : function() {
-		return this.values().length
-	}
-})
+func (this *BitSet) length() int {
+	return len(this.data)
+}
 
 func (this *BitSet) toString() string {
 	return "{" + strings.Join(this.values(), ", ") + "}"
@@ -252,23 +280,25 @@ func (this *DoubleDict) set(a, b string, o interface{}) {
 	d[b] = o
 }
 
+func EscapeWhitespace(s string, escapeSpaces bool) string {
 
-func escapeWhitespace(s, escapeSpaces) {
-	s = s.replace("\t","\\t")
-	s = s.replace("\n","\\n")
-	s = s.replace("\r","\\r")
+	s = strings.Replace(s,"\t","\\t", -1)
+	s = strings.Replace(s,"\n","\\n", -1)
+	s = strings.Replace(s,"\r","\\r", -1)
 	if(escapeSpaces) {
-		s = s.replace(" ","\u00B7")
+		s = strings.Replace(s," ","\u00B7", -1)
 	}
 	return s
 }
 
-//exports.isArray = func (entity) {
-//	return Object.prototype.toString.call( entity ) == '[object Array]'
-//}
+func TitleCase(str string) string {
 
-exports.titleCase = function(str) {
-	return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1)})
+	//	func (re *Regexp) ReplaceAllStringFunc(src string, repl func(string) string) string
+	//	return str.replace(//g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1)})
+	re := regexp.MustCompile("\w\S*")
+	return re.ReplaceAllStringFunc(str, func(s string) {
+		return strings.ToUpper(s[0:1]) + s[1:2]
+	})
 }
 
 
