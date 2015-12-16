@@ -1,48 +1,92 @@
-func arrayToString(a) {
-	return "[" + a.join(", ") + "]"
-}
+package antlr4
 
-func (this *String) hashCode(s) {
-	var hash = 0
-	if (this.length == 0) {
-		return hash
+import (
+	"fmt"
+	"errors"
+	"strings"
+	"hash/fnv"
+)
+
+
+// A simple integer stack
+
+type IntStack []int
+
+var ErrEmptyStack = errors.New("Stack is empty")
+
+func (s *IntStack) Pop() (int, error) {
+	l := len(*s)-1
+	if l < 0 {
+		return 0, ErrEmptyStack
 	}
-	for i := 0; i < len(this); i++ {
-		var character = this.charCodeAt(i)
-		hash = ((hash << 5) - hash) + character
-		hash = hash & hash // Convert to 32bit integer
+	v := (*s)[l]
+	*s = (*s)[0:l]
+	return v, nil
+}
+
+func (s *IntStack) Push(e int) {
+	*s = append(*s, e)
+}
+
+
+
+func arrayToString(a []interface{}) string{
+	return fmt.Sprintf( a )
+}
+
+
+func (s *string) hashCode() int {
+	h := fnv.New32a()
+	h.Write([]byte((*s)))
+	return h.Sum32()
+}
+
+
+type Set struct {
+	data map[int][]interface{}
+	hashfunc func(interface{}) string
+	equalsfunc func(interface{},interface{}) bool
+}
+
+func NewSet(hashFunction func(interface{}) string, equalsFunction func(interface{},interface{}) bool) *Set {
+
+	s := new(Set)
+
+	s.data = make(map[string]interface{})
+
+	if (hashFunction == nil){
+		s.hashfunc = standardHashFunction
+	} else {
+		s.hashfunc = hashFunction
 	}
-	return hash
+
+	if (equalsFunction == nil){
+		s.equalsfunc = standardEqualsFunction
+	} else {
+		s.equalsfunc = equalsFunction
+	}
+
+	return s
 }
 
-func standardEqualsFunction(a,b) {
-	return a.equals(b)
+func standardEqualsFunction(a interface{}, b interface{}) bool {
+	return a == b
 }
 
-func standardHashFunction(a) {
+func standardHashFunction(a interface{}) string {
 	return a.hashString()
 }
 
-func Set(hashFunction, equalsFunction) {
-	this.data = {}
-	this.hashfunc = hashfunc || standardHashFunction
-	this.equalsfunc = equalsfunc || standardEqualsFunction
-	return this
+func (this *Set) length() int {
+	return len(this.data)
 }
 
-Object.defineProperty(Set.prototype, "length", {
-	get : function() {
-		return this.values().length
-	}
-})
-
-func (this *Set) add(value) {
+func (this *Set) add(value interface{}) {
 	var hash = this.hashFunction(value)
 	var key = "hash_" + hash.hashCode()
-	if(key in this.data) {
-		var i
-		var values = this.data[key]
-		for(i=0i<values.length i++) {
+
+	if key_,values := range this.data {
+		for i=0; i<len(values); i++) {
 			if(this.equalsFunction(value, values[i])) {
 				return values[i]
 			}
@@ -55,13 +99,11 @@ func (this *Set) add(value) {
 	}
 }
 
-func (this *Set) contains(value) {
+func (this *Set) contains(value interface{}) bool {
 	var hash = this.hashFunction(value)
 	var key = hash.hashCode()
-	if(key in this.data) {
-		var i
-		var values = this.data[key]
-		for(i=0i<values.length i++) {
+	if k,values := range this.data {
+		for i :=0; i < len(values); i++ {
 			if(this.equalsFunction(value, values[i])) {
 				return true
 			}
@@ -70,9 +112,10 @@ func (this *Set) contains(value) {
 	return false
 }
 
-func (this *Set) values() {
-	var l = []
-	for(var key in this.data) {
+func (this *Set) values() []interface{} {
+	var l = make([]interface{}, len(this.data))
+
+	for key,_ := range this.data {
 		if(key.indexOf("hash_")==0) {
 			l = l.concat(this.data[key])
 		}
@@ -82,6 +125,14 @@ func (this *Set) values() {
 
 func (this *Set) toString() string {
 	return arrayToString(this.values())
+}
+
+
+
+
+type BitSet struct {
+	this.data = []
+	return this
 }
 
 type BitSet struct {
@@ -132,51 +183,72 @@ Object.defineProperty(BitSet.prototype, "length", {
 })
 
 func (this *BitSet) toString() string {
-	return "{" + this.values().join(", ") + "}"
+	return "{" + strings.Join(this.values(), ", ") + "}"
 }
+
+
+
 
 type AltDict struct {
-	this.data = {}
-	return this
+	data map[string]interface{}
 }
 
-func (this *AltDict) get(key) {
+func NewAltDict() *AltDict {
+	d := new(AltDict)
+	d.data = make(map[string]interface{})
+	return d
+}
+
+func (this *AltDict) get(key string) interface{} {
 	key = "k-" + key
-	if(key in this.data){
-		return this.data[key]
-	} else {
-		return nil
-	}
+	return this.data[key]
 }
 
-func (this *AltDict) put(key, value) {
+func (this *AltDict) put(key string, value interface{}) {
 	key = "k-" + key
 	this.data[key] = value
 }
 
-func (this *AltDict) values() {
-	var data = this.data
-	var keys = Object.keys(this.data)
-	return keys.map(function(key) {
-		return data[key]
-	})
+func (this *AltDict) values() []interface{} {
+	vs := make([]interface{}, len(this.data))
+	i := 0
+	for _,v := range this.data {
+		vs[i] = v
+		i++
+	}
+	return vs
 }
+
+
 
 type DoubleDict struct {
-	return this
+	data map[string]map[string]interface{}
 }
 
-func (this *DoubleDict) get(a, b) {
-	var d = this[a] || nil
-	return d==nil ? nil : (d[b] || nil)
+func NewDoubleDict() *DoubleDict {
+	dd := new(DoubleDict)
+	dd.data = make(map[string]map[string]interface{})
+	return dd
 }
 
-func (this *DoubleDict) set(a, b, o) {
-	var d = this[a] || nil
-	if(d==nil) {
-		d = {}
-		this[a] = d
+func (this *DoubleDict) get(a string, b string) interface{} {
+	var d = this.data[a] || nil
+
+	if (d == nil){
+		return nil
 	}
+
+	return d[b]
+}
+
+func (this *DoubleDict) set(a, b string, o interface{}) {
+	var d = this.data[a]
+
+	if(d==nil) {
+		d = make(map[string]interface{})
+		this.data[a] = d
+	}
+
 	d[b] = o
 }
 
@@ -191,9 +263,9 @@ func escapeWhitespace(s, escapeSpaces) {
 	return s
 }
 
-exports.isArray = func (entity) {
-	return Object.prototype.toString.call( entity ) == '[object Array]'
-}
+//exports.isArray = func (entity) {
+//	return Object.prototype.toString.call( entity ) == '[object Array]'
+//}
 
 exports.titleCase = function(str) {
 	return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1)})
