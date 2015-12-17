@@ -1,4 +1,5 @@
 package atn
+import "antlr4/dfa"
 
 // When we hit an accept state in either the DFA or the ATN, we
 //  have to notify the character stream to start buffering characters
@@ -16,22 +17,7 @@ package atn
 //  can simply return the predicted token type.</p>
 ///
 
-//var Token = require('./../Token').Token
-//var Lexer = require('./../Lexer').Lexer
-//var ATN = require('./ATN').ATN
-//var ATNSimulator = require('./ATNSimulator').ATNSimulator
-//var DFAState = require('./../dfa/DFAState').DFAState
-//var ATNConfigSet = require('./ATNConfigSet').ATNConfigSet
-//var OrderedATNConfigSet = require('./ATNConfigSet').OrderedATNConfigSet
-//var PredictionContext = require('./../PredictionContext').PredictionContext
-//var SingletonPredictionContext = require('./../PredictionContext').SingletonPredictionContext
-//var RuleStopState = require('./ATNState').RuleStopState
-//var LexerATNConfig = require('./ATNConfig').LexerATNConfig
-//var Transition = require('./Transition').Transition
-//var LexerActionExecutor = require('./LexerActionExecutor').LexerActionExecutor
-//var LexerNoViableAltException = require('./../error/Errors').LexerNoViableAltException
-
-func resetSimState(sim) {
+func resetSimState(sim *SimState) {
 	sim.index = -1
 	sim.line = 0
 	sim.column = -1
@@ -39,8 +25,18 @@ func resetSimState(sim) {
 }
 
 type SimState struct {
+	index int
+	line int
+	column int
+	dfaState *dfa.DFAState
+}
+
+func NewSimState() *SimState {
+
+	this := new(SimState)
 	resetSimState(this)
 	return this
+
 }
 
 func (this *SimState) reset() {
