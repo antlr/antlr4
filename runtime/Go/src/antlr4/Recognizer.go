@@ -16,10 +16,14 @@ type Recognizer struct {
 
 func NewRecognizer() *Recognizer {
     rec := new(Recognizer)
+    rec.initRecognizer()
+    return rec
+}
+
+func (rec *Recognizer) initRecognizer() {
     rec._listeners = []tree.ParseTreeListener{ error.ConsoleErrorListenerINSTANCE }
     rec._interp = nil
     rec.state = -1
-    return rec
 }
 
 var tokenTypeMapCache = make(map[[]string]int)
@@ -160,7 +164,7 @@ func (this *Recognizer) getTokenErrorDisplay(t *Token) string {
     return "'" + s + "'"
 }
 
-func (this *Recognizer) getErrorListenerDispatch() {
+func (this *Recognizer) getErrorListenerDispatch() *error.ErrorListener {
     return error.NewProxyErrorListener(this._listeners)
 }
 

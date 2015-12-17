@@ -12,20 +12,38 @@
 
 package antlr4
 
-type TokenStream interface {
+type IntStream interface {
+	consume()
+	LA(i int) int
+	mark() int
+	release(marker int)
+	index() int
+	seek(index int)
+	size() int
 	getSourceName() string
+}
+
+type TokenStream interface {
+	IntStream
+	LT(k int) *Token
+	get(index int) *Token
+	getTokenSource() *TokenSource
+	getText() string
+	getTextFromInterval(Interval) string
+	getTextFromRuleContext(*RuleContext) string
+	getTextFromTokens(*Token, *Token) string
 }
 
 // bt is just to keep meaningful parameter types to Parser
 type BufferedTokenStream struct {
-	tokenSource TokenSource
-	tokens []Token
+	tokenSource *TokenSource
+	tokens []*Token
 	index int
 	fetchedEOF bool
 	channel int
 }
 
-func NewBufferedTokenStream(tokenSource TokenSource) BufferedTokenStream {
+func NewBufferedTokenStream(tokenSource *TokenSource) *BufferedTokenStream {
 
 	ts := new(BufferedTokenStream)
 
@@ -85,7 +103,7 @@ func (bt *BufferedTokenStream) seek(index int) {
 	bt.index = bt.adjustSeekIndex(index)
 }
 
-func (bt *BufferedTokenStream) get(index int) {
+func (bt *BufferedTokenStream) get(index int) *Token {
 	bt.lazyInit()
 	return bt.tokens[index]
 }
@@ -138,7 +156,7 @@ func (bt *BufferedTokenStream) fetch(n int) int {
 	}
 
 	for i := 0; i < n; i++ {
-		var t = bt.tokenSource.nextToken()
+		var t *Token  = bt.tokenSource.nextToken()
 		t.tokenIndex = len(bt.tokens)
 		bt.tokens = append(bt.tokens, t)
 		if (t.tokenType == TokenEOF) {

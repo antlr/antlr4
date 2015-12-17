@@ -30,13 +30,20 @@ type RuleContext struct {
 	parentCtx *RuleContext
 	invokingState int
 	ruleIndex int
-	children []RuleContext
+	children []*RuleContext
 }
 
 func NewRuleContext(parent *RuleContext, invokingState int)  *RuleContext {
-//	tree.RuleNode.call(this)
 
-	rn := RuleContext{tree.RuleNode{}}
+	rn := &RuleContext{tree.RuleNode{}}
+
+	rn.initRuleNode()
+	rn.initRuleContext(parent, invokingState)
+
+	return rn
+}
+
+func (rn *RuleContext) initRuleContext(parent *RuleContext, invokingState int) {
 
 	// What context invoked this rule?
 	rn.parentCtx = parent
@@ -49,8 +56,6 @@ func NewRuleContext(parent *RuleContext, invokingState int)  *RuleContext {
 	} else {
 		rn.invokingState = invokingState
 	}
-
-	return rn
 }
 
 func (this *RuleContext) depth() {
@@ -65,13 +70,13 @@ func (this *RuleContext) depth() {
 
 // A context is empty if there is no invoking state meaning nobody call
 // current context.
-func (this *RuleContext) isEmpty() {
+func (this *RuleContext) isEmpty() bool {
 	return this.invokingState == -1
 }
 
 // satisfy the ParseTree / SyntaxTree interface
 
-func (this *RuleContext) getSourceInterval() {
+func (this *RuleContext) getSourceInterval() *Interval {
 	return tree.TreeINVALID_INTERVAL
 }
 
@@ -112,7 +117,7 @@ func (this *RuleContext) getChildCount() {
 }
 
 func (this *RuleContext) accept(visitor *tree.ParseTreeVisitor) {
-	return visitor.visitChildren(this)
+	visitor.visitChildren(this)
 }
 
 //need to manage circular dependencies, so export now
@@ -128,7 +133,7 @@ func (this *RuleContext) toStringTree(ruleNames []string, recog *Recognizer) str
 func (this *RuleContext) toString(ruleNames []string, stop *RuleContext) string {
 	ruleNames = ruleNames || nil
 	stop = stop || nil
-	var p = this
+	var p *RuleContext = this
 	var s = "["
 	for (p != nil && p != stop) {
 		if (ruleNames == nil) {

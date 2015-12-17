@@ -19,16 +19,17 @@ func NewTraceListener(parser *Parser) *TraceListener {
 }
 
 func (this *TraceListener) enterEveryRule(ctx *ParserRuleContext) {
-	fmt.Println("enter   " + this.parser.ruleNames[ctx.ruleIndex] + ", LT(1)=" + this.parser._input.LT(1).text)
+	fmt.Println("enter   " + this.parser.getRuleNames()[ctx.ruleIndex] + ", LT(1)=" + this.parser._input.LT(1).text())
 }
 
 func (this *TraceListener) visitTerminal( node *tree.TerminalNode ) {
-	fmt.Println("consume " + node.symbol + " rule " + this.parser.ruleNames[this.parser._ctx.ruleIndex])
+	fmt.Println("consume " + node.symbol + " rule " + this.parser.getRuleNames()[this.parser._ctx.ruleIndex])
 }
 
 func (this *TraceListener) exitEveryRule(ctx *ParserRuleContext) {
-	fmt.Println("exit    " + this.parser.ruleNames[ctx.ruleIndex] + ", LT(1)=" + this.parser._input.LT(1).text)
+	fmt.Println("exit    " + this.parser.getRuleNames()[ctx.ruleIndex] + ", LT(1)=" + this.parser._input.LT(1).text())
 }
+
 
 type Parser struct {
 	Recognizer
@@ -38,15 +39,17 @@ type Parser struct {
 	_ctx *ParserRuleContext
 	buildParseTrees bool
 	_tracer bool
-	_parseListeners []tree.ParseTreeListener
+	_parseListeners []*tree.ParseTreeListener
 	_syntaxErrors int
 }
 
 // p.is all the parsing support code essentially most of it is error
 // recovery stuff.//
-func Parser(input *TokenStream) *Parser {
+func NewParser(input *TokenStream) *Parser {
 
-	p := &Parser{Recognizer{}}
+	p := new(Parser)
+
+	p.initRecognizer()
 
 	// The input stream.
 	p._input = nil
@@ -74,11 +77,9 @@ func Parser(input *TokenStream) *Parser {
 	// incremented each time {@link //notifyErrorListeners} is called.
 	p._syntaxErrors = 0
 	p.setInputStream(input)
+
 	return p
 }
-
-//Parser.prototype = Object.create(Recognizer.prototype)
-//Parser.prototype.contructor = Parser
 
 // p.field maps from the serialized ATN string to the deserialized {@link
 // ATN} with
@@ -124,7 +125,7 @@ func (p *Parser) reset() {
 func (p *Parser) match(ttype int) *Token {
 	var t = p.getCurrentToken()
 	if (t.tokenType == ttype) {
-		p._errHandler.reportMatch(p.
+		p._errHandler.reportMatch(p)
 		p.consume()
 	} else {
 		t = p._errHandler.recoverInline(p)
@@ -156,7 +157,7 @@ func (p *Parser) match(ttype int) *Token {
 func (p *Parser) matchWildcard() {
 	var t = p.getCurrentToken()
 	if (t.tokenType > 0) {
-		p._errHandler.reportMatch(p.
+		p._errHandler.reportMatch(p)
 		p.consume()
 	} else {
 		t = p._errHandler.recoverInline(p)
@@ -267,12 +268,12 @@ func (p *Parser) triggerExitRuleEvent() {
 }
 
 func (p *Parser) getTokenFactory() {
-	return p._input.tokenSource._factory
+	return p._input.getTokenSource()._factory
 }
 
 // Tell our token source and error strategy about a Newway to create tokens.//
 func (p *Parser) setTokenFactory(factory) {
-	p._input.tokenSource._factory = factory
+	p._input.getTokenSource()._factory = factory
 }
 
 // The ATN with bypass alternatives is expensive to create so we create it
@@ -284,7 +285,7 @@ func (p *Parser) setTokenFactory(factory) {
 func (p *Parser) getATNWithBypassAlts() {
 	var serializedAtn = p.getSerializedATN()
 	if (serializedAtn == nil) {
-		panic "The current parser does not support an ATN with bypass alternatives."
+		panic("The current parser does not support an ATN with bypass alternatives.")
 	}
 	var result = p.bypassAltsAtnCache[serializedAtn]
 	if (result == nil) {
@@ -311,7 +312,7 @@ func (p *Parser) compileParseTreePattern(pattern, patternRuleIndex, lexer *Lexer
 
 	if (lexer == nil) {
 		if (p.getTokenStream() != nil) {
-			var tokenSource = p.getTokenStream().tokenSource
+			var tokenSource = p.getTokenStream().getTokenSource()
 			if _, ok := tokenSource.(Lexer); ok {
 				lexer = tokenSource
 			}
@@ -320,8 +321,10 @@ func (p *Parser) compileParseTreePattern(pattern, patternRuleIndex, lexer *Lexer
 	if (lexer == nil) {
 		panic("Parser can't discover a lexer to use")
 	}
-	var m = NewParseTreePatternMatcher(lexer, p)
-	return m.compile(pattern, patternRuleIndex)
+
+	panic("NewParseTreePatternMatcher not implemented!")
+//	var m = NewParseTreePatternMatcher(lexer, p)
+//	return m.compile(pattern, patternRuleIndex)
 }
 
 func (p *Parser) getInputStream() *TokenStream {
@@ -350,7 +353,7 @@ func (p *Parser) getCurrentToken() *Token {
 	return p._input.LT(1)
 }
 
-func (p *Parser) notifyErrorListeners(msg, offendingToken, err) {
+func (p *Parser) notifyErrorListeners(msg string, offendingToken *Token, err *error.RecognitionException) {
 	offendingToken = offendingToken || nil
 	err = err || nil
 	if (offendingToken == nil) {
@@ -359,8 +362,8 @@ func (p *Parser) notifyErrorListeners(msg, offendingToken, err) {
 	p._syntaxErrors += 1
 	var line = offendingToken.line
 	var column = offendingToken.column
-	var listener = p.getErrorListenerDispatch()
-	listener.syntaxError(p. offendingToken, line, column, msg, err)
+	var listener := p.getErrorListenerDispatch()
+	listener.syntaxError(p, offendingToken, line, column, msg, err)
 }
 
 //
@@ -671,7 +674,7 @@ func (p *Parser) setTrace(trace *TraceListener) {
 		if (p._tracer != nil) {
 			p.removeParseListener(p._tracer)
 		}
-		p._tracer = NewTraceListener(p.
+		p._tracer = NewTraceListener(p)
 		p.addParseListener(p._tracer)
 	}
 }

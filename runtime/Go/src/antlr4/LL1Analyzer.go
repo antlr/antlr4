@@ -109,15 +109,18 @@ func (la *LL1Analyzer) LOOK(s, stopState int, ctx *RuleContext) *IntervalSet {
 // @param addEOF Add {@link Token//EOF} to the result if the end of the
 // outermost context is reached. This parameter has no effect if {@code ctx}
 // is {@code nil}.
-///
-func (la *LL1Analyzer) _LOOK(s, stopState int, ctx *RuleContext, look *Set, lookBusy, calledRuleStack, seeThruPreds, addEOF) {
-    var c = atn.NewATNConfig({state:s, alt:0}, ctx)
-    if (lookBusy.contains(c)) {
+
+
+func (la *LL1Analyzer) _LOOK(s, stopState *atn.ATNState, ctx *PredictionContext, look *IntervalSet, lookBusy *Set, calledRuleStack *BitSet, seeThruPreds, addEOF bool) {
+
+    c := atn.NewATNConfig6(s, 0, ctx)
+
+    if !lookBusy.add(c) {
         return
     }
-    lookBusy.add(c)
+
     if (s == stopState) {
-        if (ctx ==nil) {
+        if (ctx == nil) {
             look.addOne(TokenEpsilon)
             return
         } else if (ctx.isEmpty() && addEOF) {
@@ -125,61 +128,85 @@ func (la *LL1Analyzer) _LOOK(s, stopState int, ctx *RuleContext, look *Set, look
             return
         }
     }
-    if (s instanceof RuleStopState ) {
-        if (ctx ==nil) {
+
+    _,ok := s.(atn.RuleStopState)
+
+    if ok {
+        if ( ctx==nil ) {
             look.addOne(TokenEpsilon)
             return
         } else if (ctx.isEmpty() && addEOF) {
             look.addOne(TokenEOF)
             return
         }
-        if (ctx != PredictionContext.EMPTY) {
+
+        if ( ctx != PredictionContextEMPTY ) {
+
             // run thru all possible stack tops in ctx
-            for(var i=0 i<ctx.length i++) {
-                var returnState = la.atn.states[ctx.getReturnState(i)]
-                var removed = calledRuleStack.contains(returnState.ruleIndex)
-                try {
-                    calledRuleStack.remove(returnState.ruleIndex)
-                    la._LOOK(returnState, stopState, ctx.getParent(i), look, lookBusy, calledRuleStack, seeThruPreds, addEOF)
-                } finally {
+            for i := 0; i < ctx.length(); i++ {
+
+                returnState := atn.states.get(ctx.getReturnState(i))
+//					System.out.println("popping back to "+retState)
+
+                removed := calledRuleStack.get(returnState.ruleIndex)
+
+                defer func(){
                     if (removed) {
-                        calledRuleStack.add(returnState.ruleIndex)
+                        calledRuleStack.set(returnState.ruleIndex)
                     }
-                }
+                }()
+
+                calledRuleStack.clear(returnState.ruleIndex)
+                la._LOOK(returnState, stopState, ctx.getParent(i), look, lookBusy, calledRuleStack, seeThruPreds, addEOF)
+
             }
             return
         }
     }
-    for j := 0; j < len(s.transitions); j++ {
-        var t = s.transitions[j]
-        if (t.constructor == RuleTransition) {
-            if (calledRuleStack.contains(t.target.ruleIndex)) {
+
+    n := len(s.transitions)
+
+    for i:=0; i<n; i++ {
+        t := s.transitions[i]
+
+        if ( t.getClass() == RuleTransition.class ) {
+            if (calledRuleStack.get(((RuleTransition)t).target.ruleIndex)) {
                 continue
             }
-            var newContext = SingletonPredictionContext.create(ctx, t.followState.stateNumber)
+
+            newContext :=
+                SingletonPredictionContext.create(ctx, ((RuleTransition)t).followState.stateNumber)
+
             try {
-                calledRuleStack.add(t.target.ruleIndex)
-                la._LOOK(t.target, stopState, newContext, look, lookBusy, calledRuleStack, seeThruPreds, addEOF)
-            } finally {
-                calledRuleStack.remove(t.target.ruleIndex)
+                calledRuleStack.set(((RuleTransition)t).target.ruleIndex)
+                _LOOK(t.target, stopState, newContext, look, lookBusy, calledRuleStack, seeThruPreds, addEOF)
             }
-        } else if (t instanceof AbstractPredicateTransition ) {
-            if (seeThruPreds) {
-                la._LOOK(t.target, stopState, ctx, look, lookBusy, calledRuleStack, seeThruPreds, addEOF)
-            } else {
-                look.addOne(LL1Analyzer.HIT_PRED)
+            finally {
+                calledRuleStack.clear(((RuleTransition)t).target.ruleIndex)
             }
-        } else if( t.isEpsilon) {
-            la._LOOK(t.target, stopState, ctx, look, lookBusy, calledRuleStack, seeThruPreds, addEOF)
-        } else if (t.constructor == WildcardTransition) {
-            look.addRange( TokenMinUserTokenType, la.atn.maxTokenType )
-        } else {
-            var set = t.label
+        }
+        else if ( t instanceof AbstractPredicateTransition ) {
+            if ( seeThruPreds ) {
+                _LOOK(t.target, stopState, ctx, look, lookBusy, calledRuleStack, seeThruPreds, addEOF)
+            }
+            else {
+                look.add(HIT_PRED)
+            }
+        }
+        else if ( t.isEpsilon() ) {
+            _LOOK(t.target, stopState, ctx, look, lookBusy, calledRuleStack, seeThruPreds, addEOF)
+        }
+        else if ( t.getClass() == WildcardTransition.class ) {
+            look.addAll( IntervalSet.of(Token.MIN_USER_TOKEN_TYPE, atn.maxTokenType) )
+        }
+        else {
+//				System.out.println("adding "+ t)
+            IntervalSet set = t.label()
             if (set != nil) {
-                if _, ok := t.(NotSetTransition); ok {
-                    set = set.complement(TokenMinUserTokenType, la.atn.maxTokenType)
+                if (t instanceof NotSetTransition) {
+                    set = set.complement(IntervalSet.of(Token.MIN_USER_TOKEN_TYPE, atn.maxTokenType))
                 }
-                look.addSet(set)
+                look.addAll(set)
             }
         }
     }

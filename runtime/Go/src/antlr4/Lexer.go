@@ -13,16 +13,18 @@ import (
 ///
 
 type TokenSource interface {
+	nextToken() *Token
+	getLine() int
+	getCharPositionInLine() int
+	getInputStream() *InputStream
 	getSourceName() string
-	getText(int, int) string
-	nextToken() Token
-	column() int
-	line() int
+	setTokenFactory(factory *TokenFactory)
+	getTokenFactory() *TokenFactory
 }
 
 type TokenFactorySourcePair struct {
-	factory TokenFactory
-	inputStream InputStream
+	factory *TokenFactory
+	inputStream *InputStream
 }
 
 type Lexer struct {
@@ -30,7 +32,7 @@ type Lexer struct {
 
 	_input *InputStream
 	_factory *TokenFactory
-	_tokenFactorySourcePair TokenFactorySourcePair
+	_tokenFactorySourcePair *TokenFactorySourcePair
 	_interp *atn.LexerATNSimulator
 	_token int
 	_tokenStartCharIndex int
@@ -46,7 +48,9 @@ type Lexer struct {
 
 func NewLexer(input *InputStream) *Lexer {
 
-	lexer := &Lexer{Recognizer{}}
+	lexer := new(Lexer)
+
+	lexer.initRecognizer()
 
 	lexer._input = input
 	lexer._factory = CommonTokenFactoryDEFAULT
@@ -279,6 +283,8 @@ func (l *Lexer) emitEOF() int {
 	return eof
 }
 
+
+
 Object.defineProperty(Lexer.prototype, "type", {
 	get : function() {
 		return l.type
@@ -339,7 +345,7 @@ func (l *Lexer) getErrorDisplay(s []string) string {
 }
 
 func (l *Lexer) getErrorDisplayForChar(c rune) string {
-	if (c.charCodeAt(0) == TokenEOF) {
+	if (c == TokenEOF) {
 		return "<EOF>"
 	} else if (c == '\n') {
 		return "\\n"

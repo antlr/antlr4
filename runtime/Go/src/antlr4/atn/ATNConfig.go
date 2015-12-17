@@ -1,4 +1,8 @@
 package atn
+import (
+	"antlr4"
+	"reflect"
+)
 
 // A tuple: (ATN state, predicted alt, syntactic, semantic context).
 //  The syntactic context is a graph-structured stack node whose
@@ -6,82 +10,144 @@ package atn
 //  chain used to arrive at the state.  The semantic context is
 //  the tree of semantic predicates encountered before reaching
 //  an ATN state.
-///
+//
 
-//var DecisionState = require('./ATNState').DecisionState
-//var SemanticContext = require('./SemanticContext').SemanticContext
-
-func checkParams(params, isCfg) {
-	if(params==nil) {
-		var result = { state:nil, alt:nil, context:nil, semanticContext:nil }
-		if(isCfg) {
-			result.reachesIntoOuterContext = 0
-		}
-		return result
-	} else {
-		var props = {}
-		props.state = params.state || nil
-		props.alt = params.alt || nil
-		props.context = params.context || nil
-		props.semanticContext = params.semanticContext || nil
-		if(isCfg) {
-			props.reachesIntoOuterContext = params.reachesIntoOuterContext || 0
-			props.precedenceFilterSuppressed = params.precedenceFilterSuppressed || false
-		}
-		return props
-	}
+type ATNConfig struct {
+	precedenceFilterSuppressed int
+	state *ATNState
+	alt int
+	context *antlr4.PredictionContext
+	semanticContext int
+	reachesIntoOuterContext int
 }
 
-func ATNConfig(params, config) {
-	this.checkContext(params, config)
-	params = checkParams(params)
-	config = checkParams(config, true)
-    // The ATN state associated with this configuration///
-    this.state = params.state!=nil ? params.state : config.state
-    // What alt (or lexer rule) is predicted by this configuration///
-    this.alt = params.alt!=nil ? params.alt : config.alt
-    // The stack of invoking states leading to the rule/states associated
-    //  with this config.  We track only those contexts pushed during
-    //  execution of the ATN simulator.
-    this.context = params.context!=nil ? params.context : config.context
-    this.semanticContext = params.semanticContext!=nil ? params.semanticContext :
-        (config.semanticContext!=nil ? config.semanticContext : SemanticContext.NONE)
-    // We cannot execute predicates dependent upon local context unless
-    // we know for sure we are in the correct context. Because there is
-    // no way to do this efficiently, we simply cannot evaluate
-    // dependent predicates unless we are in the rule that initially
-    // invokes the ATN simulator.
-    //
-    // closure() tracks the depth of how far we dip into the
-    // outer context: depth &gt 0.  Note that it may not be totally
-    // accurate depth since I don't ever decrement. TODO: make it a boolean then
-    this.reachesIntoOuterContext = config.reachesIntoOuterContext
-    this.precedenceFilterSuppressed = config.precedenceFilterSuppressed
-    return this
+func NewATNConfig7(old *ATNConfig) *ATNConfig { // dup
+	a := new(ATNConfig)
+	a.state = old.state;
+	a.alt = old.alt;
+	a.context = old.context;
+	a.semanticContext = old.semanticContext;
+	a.reachesIntoOuterContext = old.reachesIntoOuterContext;
+	return a
 }
 
-func (this *ATNConfig) checkContext(params, config) {
-	if((params.context==nil || params.context==nil) &&
-			(config==nil || config.context==nil || config.context==nil)) {
-		this.context = nil
-	}
+func NewATNConfig6(state *ATNState, alt int, context *antlr4.PredictionContext) *ATNConfig {
+	return NewATNConfig(state, alt, context, SemanticContextNONE);
 }
+
+func NewATNConfig5(state *ATNState, alt int, context *antlr4.PredictionContext, semanticContext *SemanticContext) *ATNConfig {
+	a := new(ATNConfig)
+	a.state = state;
+	a.alt = alt;
+	a.context = context;
+	a.semanticContext = semanticContext;
+	return a
+}
+
+func NewATNConfig4(c *ATNConfig, state *ATNState) *ATNConfig {
+	return NewATNConfig(c, state, c.context, c.semanticContext);
+}
+
+func NewATNConfig3(c *ATNConfig, state *ATNState, semanticContext *SemanticContext) *ATNConfig {
+	return NewATNConfig(c, state, c.context, semanticContext);
+}
+
+func NewATNConfig2(c *ATNConfig, semanticContext *SemanticContext) *ATNConfig {
+	return NewATNConfig(c, c.state, c.context, semanticContext);
+}
+
+func NewATNConfig1(c *ATNConfig, state *ATNState, context *antlr4.PredictionContext) *ATNConfig {
+	return NewATNConfig(c, state, context, c.semanticContext);
+}
+
+func NewATNConfig(c *ATNConfig, state *ATNState, context *antlr4.PredictionContext, semanticContext *SemanticContext) *ATNConfig {
+	a := new(ATNConfig)
+	a.state = state;
+	a.alt = c.alt;
+	a.context = context;
+	a.semanticContext = semanticContext;
+	a.reachesIntoOuterContext = c.reachesIntoOuterContext;
+	return a
+}
+
+//
+//
+//func checkParams(params *ATNConfig, isCfg bool) *ATNConfigParams {
+//	if(params == nil) {
+//		var result = { state:nil, alt:nil, context:nil, semanticContext:nil }
+//		if(isCfg) {
+//			result.reachesIntoOuterContext = 0
+//		}
+//		return result
+//	} else {
+//		var props = {}
+//		props.state = params.state || nil
+//		props.alt = params.alt || nil
+//		props.context = params.context || nil
+//		props.semanticContext = params.semanticContext || nil
+//		if(isCfg) {
+//			props.reachesIntoOuterContext = params.reachesIntoOuterContext || 0
+//			props.precedenceFilterSuppressed = params.precedenceFilterSuppressed || false
+//		}
+//		return props
+//	}
+//}
+//
+//
+//func NewATNConfig(params *ATNConfig, config *ATNConfig) *ATNConfig {
+//
+//	this := new(ATNConfig)
+//
+//	this.checkContext(params, config)
+//
+//	params = checkParams(params, false)
+//	config = checkParams(config, true)
+//
+//	if params.state != nil {
+//		this.state = params.state
+//	} else {
+//		this.state = config.state
+//	}
+//
+//	if params.alt != nil {
+//		this.alt = params.alt
+//	} else {
+//		this.alt = config.alt
+//	}
+//
+//    this.context = params.context!=nil ? params.context : config.context
+//
+//    this.semanticContext = params.semanticContext!=nil ? params.semanticContext :
+//        (config.semanticContext!=nil ? config.semanticContext : SemanticContext.NONE)
+//
+//    this.reachesIntoOuterContext = config.reachesIntoOuterContext
+//    this.precedenceFilterSuppressed = config.precedenceFilterSuppressed
+//
+//    return this
+//}
+//
+//
+//
+//
+//
+//func (this *ATNConfig) checkContext(params, config) {
+//	if((params.context==nil || params.context==nil) &&
+//			(config==nil || config.context==nil || config.context==nil)) {
+//		this.context = nil
+//	}
+//}
 
 // An ATN configuration is equal to another if both have
 //  the same state, they predict the same alternative, and
 //  syntactic/semantic contexts are the same.
 ///
-func (this *ATNConfig) equals(other) {
+func (this *ATNConfig) equals(other interface{}) bool {
     if (this == other) {
         return true
-    } else if (! _, ok := other.(ATNConfig); ok) {
+    } else if _, ok := other.(*ATNConfig); !ok {
         return false
     } else {
-        return this.state.stateNumber==other.state.stateNumber &&
-            this.alt==other.alt &&
-            (this.context==nil ? other.context==nil : this.context.equals(other.context)) &&
-            this.semanticContext.equals(other.semanticContext) &&
-            this.precedenceFilterSuppressed==other.precedenceFilterSuppressed
+        return reflect.DeepEqual(this, other)
     }
 }
 
@@ -107,6 +173,10 @@ func (this *ATNConfig) toString() string {
 }
 
 
+type LexerATNConfig struct {
+	ATNConfig
+}
+
 func LexerATNConfig(params, config) {
 	ATNConfig.call(this, params, config)
     
@@ -116,9 +186,6 @@ func LexerATNConfig(params, config) {
     this.passedThroughNonGreedyDecision = config!=nil ? this.checkNonGreedyDecision(config, this.state) : false
     return this
 }
-
-//LexerATNConfig.prototype = Object.create(ATNConfig.prototype)
-//LexerATNConfig.prototype.constructor = LexerATNConfig
 
 func (this *LexerATNConfig) hashString() {
     return "" + this.state.stateNumber + this.alt + this.context +
