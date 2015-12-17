@@ -169,42 +169,35 @@ func (la *LL1Analyzer) _LOOK(s, stopState *atn.ATNState, ctx *PredictionContext,
     for i:=0; i<n; i++ {
         t := s.transitions[i]
 
-        if ( t.getClass() == RuleTransition.class ) {
-            if (calledRuleStack.get(((RuleTransition)t).target.ruleIndex)) {
+        if t1, ok := t.(*atn.RuleTransition); ok {
+
+            if (calledRuleStack.get(t1.target.ruleIndex)) {
                 continue
             }
 
-            newContext :=
-                SingletonPredictionContext.create(ctx, ((RuleTransition)t).followState.stateNumber)
+            newContext := SingletonPredictionContextcreate(ctx, t1.followState.stateNumber)
 
-            try {
-                calledRuleStack.set(((RuleTransition)t).target.ruleIndex)
-                _LOOK(t.target, stopState, newContext, look, lookBusy, calledRuleStack, seeThruPreds, addEOF)
-            }
-            finally {
-                calledRuleStack.clear(((RuleTransition)t).target.ruleIndex)
-            }
-        }
-        else if ( t instanceof AbstractPredicateTransition ) {
+            defer func(){
+                calledRuleStack.remove(t1.target.ruleIndex);
+            }()
+
+            calledRuleStack.set(t1.target.ruleIndex)
+            la._LOOK(t.target, stopState, newContext, look, lookBusy, calledRuleStack, seeThruPreds, addEOF)
+        } else if t2, ok := t.(*atn.AbstractPredicateTransition); ok {
             if ( seeThruPreds ) {
-                _LOOK(t.target, stopState, ctx, look, lookBusy, calledRuleStack, seeThruPreds, addEOF)
-            }
-            else {
+                la._LOOK(t2.target, stopState, ctx, look, lookBusy, calledRuleStack, seeThruPreds, addEOF)
+            } else {
                 look.add(HIT_PRED)
             }
-        }
-        else if ( t.isEpsilon() ) {
-            _LOOK(t.target, stopState, ctx, look, lookBusy, calledRuleStack, seeThruPreds, addEOF)
-        }
-        else if ( t.getClass() == WildcardTransition.class ) {
-            look.addAll( IntervalSet.of(Token.MIN_USER_TOKEN_TYPE, atn.maxTokenType) )
-        }
-        else {
-//				System.out.println("adding "+ t)
-            IntervalSet set = t.label()
+        } else if ( t.isEpsilon() ) {
+            la._LOOK(t.target, stopState, ctx, look, lookBusy, calledRuleStack, seeThruPreds, addEOF)
+        } else if _, ok := t.(*atn.WildcardTransition); ok {
+            look.addRange( TokenMinUserTokenType, la.atn.maxTokenType );
+        }  else {
+            set := t.label()
             if (set != nil) {
-                if (t instanceof NotSetTransition) {
-                    set = set.complement(IntervalSet.of(Token.MIN_USER_TOKEN_TYPE, atn.maxTokenType))
+                if _, ok := t.(*atn.NotSetTransition); ok {
+                    set = set.complement(TokenMinUserTokenType, la.atn.maxTokenType);
                 }
                 look.addAll(set)
             }

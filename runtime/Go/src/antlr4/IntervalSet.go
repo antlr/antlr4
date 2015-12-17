@@ -3,6 +3,7 @@ package antlr4
 import (
 	"strings"
 	"strconv"
+	"math"
 )
 
 type Interval struct {
@@ -62,45 +63,41 @@ func (i *IntervalSet) addOne(v int) {
 	i.addInterval(NewInterval(v, v + 1))
 }
 
-func (i *IntervalSet) addRange(l int, h int) {
+func (i *IntervalSet) addRange(l, h int) {
 	i.addInterval(NewInterval(l, h + 1))
 }
 
-func (i *IntervalSet) addInterval(v Interval) {
-	if (i.intervals == nil) {
-		i.intervals = make([]Interval, 0)
-		i.intervals = append( i.intervals, v )
+func (is *IntervalSet) addInterval(v Interval) {
+	if (is.intervals == nil) {
+		is.intervals = make([]Interval, 0)
+		is.intervals = append( is.intervals, v )
 	} else {
 		// find insert pos
-		for k := 0; k < len(i.intervals); k++ {
-			var i = i.intervals[k]
+		for k := 0; k < len(is.intervals); k++ {
+			var i = is.intervals[k]
 			// distinct range -> insert
 			if (v.stop < i.start) {
-				i.intervals.splice(k, 0, v)
+				is.intervals.splice(k, 0, v)
 				return
-			}
-			// contiguous range -> adjust
-			else if (v.stop == i.start) {
-				i.intervals[k].start = v.start
+			} else if (v.stop == i.start) {
+				is.intervals[k].start = v.start
 				return
-			}
-			// overlapping range -> adjust and reduce
-			else if (v.start <= i.stop) {
-				i.intervals[k] = NewInterval(Math.min(i.start, v.start), Math.max(i.stop, v.stop))
-				i.reduce(k)
+			} else if (v.start <= i.stop) {
+				is.intervals[k] = NewInterval(math.Min(i.start, v.start), math.Max(i.stop, v.stop))
+				is.reduce(k)
 				return
 			}
 		}
 		// greater than any existing
-		i.intervals.push(v)
+		is.intervals = append(is.intervals, v)
 	}
 }
 
 func (i *IntervalSet) addSet(other IntervalSet) *IntervalSet {
 	if (other.intervals != nil) {
 		for k := 0; k < len(other.intervals); k++ {
-			var i = other.intervals[k]
-			i.addInterval(NewInterval(i.start, i.stop))
+			var i2 = other.intervals[k]
+			i.addInterval(NewInterval(i2.start, i2.stop))
 		}
 	}
 	return i
@@ -154,36 +151,28 @@ func (is *IntervalSet) length() int {
 	return len
 }
 
-func (i *IntervalSet) removeRange(v Interval) {
+func (is *IntervalSet) removeRange(v Interval) {
     if v.start==v.stop-1 {
-        i.removeOne(v.start)
-    } else if (i.intervals!=nil) {
+        is.removeOne(v.start)
+    } else if (is.intervals!=nil) {
         k:= 0
-        for n :=0; n<len( i.intervals ); n++ {
-            var i = i.intervals[k]
+        for n :=0; n<len( is.intervals ); n++ {
+            var i = is.intervals[k]
             // intervals are ordered
             if (v.stop<=i.start) {
                 return
-            }
-            // check for including range, split it
-            else if(v.start>i.start && v.stop<i.stop) {
-                i.intervals[k] = NewInterval(i.start, v.start)
+            } else if(v.start>i.start && v.stop<i.stop) {
+                is.intervals[k] = NewInterval(i.start, v.start)
                 var x = NewInterval(v.stop, i.stop)
-                i.intervals.splice(k, 0, x)
+                is.intervals.splice(k, 0, x)
                 return
-            }
-            // check for included range, remove it
-            else if(v.start<=i.start && v.stop>=i.stop) {
-                i.intervals.splice(k, 1)
+            } else if(v.start<=i.start && v.stop>=i.stop) {
+                is.intervals.splice(k, 1)
                 k = k - 1 // need another pass
-            }
-            // check for lower boundary
-            else if(v.start<i.stop) {
-                i.intervals[k] = NewInterval(i.start, v.start)
-            }
-            // check for upper boundary
-            else if(v.stop<i.stop) {
-                i.intervals[k] = NewInterval(v.stop, i.stop)
+            } else if(v.start<i.stop) {
+                is.intervals[k] = NewInterval(i.start, v.start)
+            } else if(v.stop<i.stop) {
+                is.intervals[k] = NewInterval(v.stop, i.stop)
             }
             k += 1
         }
@@ -200,25 +189,18 @@ func (is *IntervalSet) removeOne(v *Interval) {
 			// intervals are ordered
 			if v.stop <= i.start {
 				return
-			}
-			else if v.start>i.start && v.stop<i.stop {
+			} else if v.start>i.start && v.stop<i.stop {
 				// check for including range, split it
 				is.intervals[k] = NewInterval(i.start, v.start)
 				var x = NewInterval(v.stop, i.stop)
 				is.intervals.splice(k, 0, x)
 				return
-			}
-			// check for included range, remove it
-			else if(v.start<=i.start && v.stop>=i.stop) {
+			} else if(v.start<=i.start && v.stop>=i.stop) {
 				is.intervals.splice(k, 1)
 				k = k - 1; // need another pass
-			}
-			// check for lower boundary
-			else if(v.start<i.stop) {
+			} else if(v.start<i.stop) {
 				is.intervals[k] = NewInterval(i.start, v.start)
-			}
-			// check for upper boundary
-			else if(v.stop<i.stop) {
+			} else if(v.stop<i.stop) {
 				is.intervals[k] = NewInterval(v.stop, i.stop)
 			}
 			k += 1
@@ -226,10 +208,12 @@ func (is *IntervalSet) removeOne(v *Interval) {
 	}
 }
 
-func (i *IntervalSet) toString(literalNames []string, symbolicNames []string, elemsAreChar bool) string {
-	literalNames = literalNames || nil
-	symbolicNames = symbolicNames || nil
-	elemsAreChar = elemsAreChar || false
+func (i *IntervalSet) toString() string {
+	return i.toStringVerbose(nil,nil,false)
+}
+
+func (i *IntervalSet) toStringVerbose(literalNames []string, symbolicNames []string, elemsAreChar bool) string {
+
 	if (i.intervals == nil) {
 		return "{}"
 	} else if(literalNames!=nil || symbolicNames!=nil) {
@@ -250,10 +234,10 @@ func (is *IntervalSet) toCharString() {
 			if ( v.start== TokenEOF ) {
 				append(names, "<EOF>")
 			} else {
-				append(names, ("'" + String.fromCharCode(v.start) + "'"))
+				append(names, ("'" + string(v.start) + "'"))
 			}
 		} else {
-			append(names, "'" + String.fromCharCode(v.start) + "'..'" + String.fromCharCode(v.stop-1) + "'")
+			append(names, "'" + string(v.start) + "'..'" + string(v.stop-1) + "'")
 		}
 	}
 	if (len(names) > 1) {
@@ -272,10 +256,10 @@ func (is *IntervalSet) toIndexString() {
 			if ( v.start==TokenEOF ) {
 				names = append( names, "<EOF>")
 			} else {
-				names = append( names, v.start.toString())
+				names = append( names, string(v.start))
 			}
 		} else {
-			names = append( names, v.start.toString() + ".." + (v.stop-1).toString())
+			names = append( names, string(v.start) + ".." + string(v.stop-1))
 		}
 	}
 	if (len(names) > 1) {

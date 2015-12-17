@@ -1,301 +1,409 @@
 package atn
+import (
+	"antlr4"
+	"fmt"
+)
 
-//  An ATN transition between any two ATN states.  Subclasses define
 //  atom, set, epsilon, action, predicate, rule transitions.
 //
 //  <p>This is a one way link.  It emanates from a state (usually via a list of
 //  transitions) and has a target state.</p>
 //
 //  <p>Since we never have to change the ATN transitions once we construct it,
-//  we can fix these transitions as specific classes. The DFA transitions
-//  on the other hand need to update the labels as it adds transitions to
 //  the states. We'll use the term Edge for the DFA to distinguish them from
 //  ATN transitions.</p>
 
-//var Token = require('./../Token').Token
-//var Interval = require('./../IntervalSet').Interval
-//var IntervalSet = require('./../IntervalSet').IntervalSet
-//var Predicate = require('./SemanticContext').Predicate
-//var PrecedencePredicate = require('./SemanticContext').PrecedencePredicate
+//func ([A-Z]+Transition)[ ]?\([A-Za-z, ]+\) \*([A-Z]+Transition) {\n\tTransition\.call\(t, target\)
 
-func Transition (target) {
-    // The target of this transition.
-    if (target==nil || target==nil) {
-        panic "target cannot be nil."
-    }
-    this.target = target
-    // Are we epsilon, action, sempred?
-    this.isEpsilon = false
-    this.label = nil
-    return this
+type Transition struct {
+	target *ATNState
+	isEpsilon bool
+	label *antlr4.IntervalSet
 }
-    // constants for serialization
-Transition.EPSILON = 1
-Transition.RANGE = 2
-Transition.RULE = 3
-Transition.PREDICATE = 4 // e.g., {isType(input.LT(1))}?
-Transition.ATOM = 5
-Transition.ACTION = 6
-Transition.SET = 7 // ~(A|B) or ~atom, wildcard, which convert to next 2
-Transition.NOT_SET = 8
-Transition.WILDCARD = 9
-Transition.PRECEDENCE = 10
 
-Transition.serializationNames = [
-            "INVALID",
-            "EPSILON",
-            "RANGE",
-            "RULE",
-            "PREDICATE",
-            "ATOM",
-            "ACTION",
-            "SET",
-            "NOT_SET",
-            "WILDCARD",
-            "PRECEDENCE"
-        ]
+func Transition (target *ATNState) *Transition {
 
-Transition.serializationTypes = {
-        EpsilonTransition: Transition.EPSILON,
-        RangeTransition: Transition.RANGE,
-        RuleTransition: Transition.RULE,
-        PredicateTransition: Transition.PREDICATE,
-        AtomTransition: Transition.ATOM,
-        ActionTransition: Transition.ACTION,
-        SetTransition: Transition.SET,
-        NotSetTransition: Transition.NOT_SET,
-        WildcardTransition: Transition.WILDCARD,
-        PrecedencePredicateTransition: Transition.PRECEDENCE
+	if (target==nil || target==nil) {
+        panic("target cannot be nil.")
     }
+
+	t := new(Transition)
+	t.initTransition(target)
+
+    return t
+}
+
+func (t *Transition) initTransition(target *ATNState) {
+	t.target = target
+	// Are we epsilon, action, sempred?
+	t.isEpsilon = false
+	t.label = nil
+}
+
+const(
+	TransitionEPSILON = 1
+	TransitionRANGE = 2
+	TransitionRULE = 3
+	TransitionPREDICATE = 4 // e.g., {isType(input.LT(1))}?
+	TransitionATOM = 5
+	TransitionACTION = 6
+	TransitionSET = 7 // ~(A|B) or ~atom, wildcard, which convert to next 2
+	TransitionNOT_SET = 8
+	TransitionWILDCARD = 9
+	TransitionPRECEDENCE = 10
+)
+
+
+var TransitionserializationNames = []string{
+	"INVALID",
+	"EPSILON",
+	"RANGE",
+	"RULE",
+	"PREDICATE",
+	"ATOM",
+	"ACTION",
+	"SET",
+	"NOT_SET",
+	"WILDCARD",
+	"PRECEDENCE",
+}
+
+//var TransitionserializationTypes struct {
+//	EpsilonTransition int
+//	RangeTransition int
+//	RuleTransition int
+//	PredicateTransition int
+//	AtomTransition int
+//	ActionTransition int
+//	SetTransition int
+//	NotSetTransition int
+//	WildcardTransition int
+//	PrecedencePredicateTransition int
+//}{
+//	TransitionEPSILON,
+//	TransitionRANGE,
+//	TransitionRULE,
+//	TransitionPREDICATE,
+//	TransitionATOM,
+//	TransitionACTION,
+//	TransitionSET,
+//	TransitionNOT_SET,
+//	TransitionWILDCARD,
+//	TransitionPRECEDENCE
+//}
 
 
 // TODO: make all transitions sets? no, should remove set edges
-func AtomTransition(target, label) {
-	Transition.call(this, target)
-	this.label_ = label // The token type or character value or, signifies special label.
-    this.label = this.makeLabel()
-    this.serializationType = Transition.ATOM
-    return this
+type AtomTransition struct {
+	Transition
+	label_ int
+	label *antlr4.IntervalSet
+	serializationType int
 }
 
-//AtomTransition.prototype = Object.create(Transition.prototype)
-//AtomTransition.prototype.constructor = AtomTransition
+func NewAtomTransition ( target *ATNState, label int ) *AtomTransition {
 
-func (this *AtomTransition) makeLabel() {
-	var s = NewIntervalSet()
-    s.addOne(this.label_)
+	t := new(AtomTransition)
+	t.initTransition( target )
+
+	t.label_ = label // The token type or character value or, signifies special label.
+    t.label = t.makeLabel()
+    t.serializationType = TransitionATOM
+	
+    return t
+}
+
+func (t *AtomTransition) makeLabel() *antlr4.IntervalSet {
+	var s = antlr4.NewIntervalSet()
+    s.addOne(t.label_)
     return s
 }
 
-func (this *AtomTransition) matches( symbol, minVocabSymbol,  maxVocabSymbol) {
-    return this.label_ == symbol
+func (t *AtomTransition) matches( symbol, minVocabSymbol,  maxVocabSymbol int ) bool {
+    return t.label_ == symbol
 }
 
-func (this *AtomTransition) toString() string {
-	return this.label_
+func (t *AtomTransition) toString() string {
+	return t.label_
 }
 
-func RuleTransition(ruleStart, ruleIndex, precedence, followState) {
-	Transition.call(this, ruleStart)
-    this.ruleIndex = ruleIndex // ptr to the rule definition object for this rule ref
-    this.precedence = precedence
-    this.followState = followState // what node to begin computations following ref to rule
-    this.serializationType = Transition.RULE
-    this.isEpsilon = true
-    return this
+type RuleTransition struct {
+	Transition
+	ruleIndex, precedence, followState, serializationType int
 }
 
-//RuleTransition.prototype = Object.create(Transition.prototype)
-//RuleTransition.prototype.constructor = RuleTransition
+func NewRuleTransition ( ruleStart *ATNState, ruleIndex, precedence, followState int ) *RuleTransition {
 
-func (this *RuleTransition) matches(symbol, minVocabSymbol,  maxVocabSymbol) {
+	t := new(RuleTransition)
+	t.initTransition( ruleStart )
+
+    t.ruleIndex = ruleIndex
+	t.precedence = precedence
+    t.followState = followState
+	t.serializationType = TransitionRULE
+    t.isEpsilon = true
+
+    return t
+}
+
+
+func (t *RuleTransition) matches(symbol, minVocabSymbol,  maxVocabSymbol int) bool {
 	return false
 }
 
 
-func EpsilonTransition(target, outermostPrecedenceReturn) {
-	Transition.call(this, target)
-    this.serializationType = Transition.EPSILON
-    this.isEpsilon = true
-    this.outermostPrecedenceReturn = outermostPrecedenceReturn
-    return this
+type EpsilonTransition struct {
+	Transition
+
+	isEpsilon bool
+	outermostPrecedenceReturn, serializationType int
 }
 
-//EpsilonTransition.prototype = Object.create(Transition.prototype)
-//EpsilonTransition.prototype.constructor = EpsilonTransition
+func NewEpsilonTransition ( target *ATNState, outermostPrecedenceReturn int ) *EpsilonTransition {
 
-func (this *EpsilonTransition) matches( symbol, minVocabSymbol,  maxVocabSymbol) {
+	t := new(EpsilonTransition)
+	t.initTransition( target )
+
+    t.serializationType = TransitionEPSILON
+    t.isEpsilon = true
+    t.outermostPrecedenceReturn = outermostPrecedenceReturn
+    return t
+}
+
+
+func (t *EpsilonTransition) matches( symbol, minVocabSymbol,  maxVocabSymbol int ) {
 	return false
 }
 
-func (this *EpsilonTransition) toString() string {
+func (t *EpsilonTransition) toString() string {
 	return "epsilon"
 }
 
-func RangeTransition(target, start, stop) {
-	Transition.call(this, target)
-	this.serializationType = Transition.RANGE
-    this.start = start
-    this.stop = stop
-    this.label = this.makeLabel()
-    return this
+type RangeTransition struct {
+	Transition
+
+	serializationType, start, stop int
 }
 
-//RangeTransition.prototype = Object.create(Transition.prototype)
-//RangeTransition.prototype.constructor = RangeTransition
+func NewRangeTransition ( target *ATNState, start, stop int ) *RangeTransition {
 
-func (this *RangeTransition) makeLabel() {
-    var s = NewIntervalSet()
-    s.addRange(this.start, this.stop)
+	t := new(RangeTransition)
+	t.initTransition( target )
+
+	t.serializationType = TransitionRANGE
+    t.start = start
+    t.stop = stop
+    t.label = t.makeLabel()
+    return t
+}
+
+
+func (t *RangeTransition) makeLabel() *antlr4.IntervalSet {
+    var s = antlr4.NewIntervalSet()
+    s.addRange(t.start, t.stop)
     return s
 }
 
-func (this *RangeTransition) matches(symbol, minVocabSymbol,  maxVocabSymbol) {
-	return symbol >= this.start && symbol <= this.stop
+func (t *RangeTransition) matches(symbol, minVocabSymbol,  maxVocabSymbol int) {
+	return symbol >= t.start && symbol <= t.stop
 }
 
-func (this *RangeTransition) toString() string {
-	return "'" + String.fromCharCode(this.start) + "'..'" + String.fromCharCode(this.stop) + "'"
+func (t *RangeTransition) toString() string {
+	return "'" + string(t.start) + "'..'" + string(t.stop) + "'"
+}
+//
+//type AbstractPredicateTransition struct {
+//	Transition
+//}
+//
+//func NewAbstractPredicateTransition ( target *ATNState ) *AbstractPredicateTransition {
+//
+//	t := new(AbstractPredicateTransition)
+//	t.initTransition( target )
+//
+//	return t
+//}
+
+
+type PredicateTransition struct {
+	Transition
+
+	isCtxDependent bool
+	ruleIndex, predIndex, serializationType int
 }
 
-func AbstractPredicateTransition(target) {
-	Transition.call(this, target)
-	return this
+func PredicateTransition ( target *ATNState, ruleIndex, predIndex int, isCtxDependent bool ) *PredicateTransition {
+
+	t := new(PredicateTransition)
+	t.initTransition(target)
+
+    t.serializationType = TransitionPREDICATE
+    t.ruleIndex = ruleIndex
+    t.predIndex = predIndex
+    t.isCtxDependent = isCtxDependent // e.g., $i ref in pred
+    t.isEpsilon = true
+    return t
 }
 
-//AbstractPredicateTransition.prototype = Object.create(Transition.prototype)
-//AbstractPredicateTransition.prototype.constructor = AbstractPredicateTransition
 
-func PredicateTransition(target, ruleIndex, predIndex, isCtxDependent) {
-	AbstractPredicateTransition.call(this, target)
-    this.serializationType = Transition.PREDICATE
-    this.ruleIndex = ruleIndex
-    this.predIndex = predIndex
-    this.isCtxDependent = isCtxDependent // e.g., $i ref in pred
-    this.isEpsilon = true
-    return this
-}
-
-//PredicateTransition.prototype = Object.create(AbstractPredicateTransition.prototype)
-//PredicateTransition.prototype.constructor = PredicateTransition
-
-func (this *PredicateTransition) matches(symbol, minVocabSymbol,  maxVocabSymbol) {
+func (t *PredicateTransition) matches(symbol, minVocabSymbol,  maxVocabSymbol int) bool {
 	return false
 }
 
-func (this *PredicateTransition) getPredicate() {
-	return NewPredicate(this.ruleIndex, this.predIndex, this.isCtxDependent)
+func (t *PredicateTransition) getPredicate() *Predicate {
+	return NewPredicate(t.ruleIndex, t.predIndex, t.isCtxDependent)
 }
 
-func (this *PredicateTransition) toString() string {
-	return "pred_" + this.ruleIndex + ":" + this.predIndex
+func (t *PredicateTransition) toString() string {
+	return "pred_" + t.ruleIndex + ":" + t.predIndex
 }
 
-func ActionTransition(target, ruleIndex, actionIndex, isCtxDependent) {
-	Transition.call(this, target)
-    this.serializationType = Transition.ACTION
-    this.ruleIndex = ruleIndex
-    this.actionIndex = actionIndex==nil ? -1 : actionIndex
-    this.isCtxDependent = isCtxDependent==nil ? false : isCtxDependent // e.g., $i ref in pred
-    this.isEpsilon = true
-    return this
+type ActionTransition struct {
+	Transition
+
+	isCtxDependent bool
+	ruleIndex, actionIndex, predIndex, serializationType int
 }
 
-//ActionTransition.prototype = Object.create(Transition.prototype)
-//ActionTransition.prototype.constructor = ActionTransition
+func NewActionTransition ( target *ATNState, ruleIndex, actionIndex int, isCtxDependent bool ) *ActionTransition {
+
+	t := new(ActionTransition)
+	t.initTransition( target )
+
+    t.serializationType = TransitionACTION
+    t.ruleIndex = ruleIndex
+    t.actionIndex = actionIndex
+    t.isCtxDependent = isCtxDependent // e.g., $i ref in pred
+    t.isEpsilon = true
+    return t
+}
 
 
-func (this *ActionTransition) matches(symbol, minVocabSymbol,  maxVocabSymbol) {
+
+func (t *ActionTransition) matches(symbol, minVocabSymbol,  maxVocabSymbol int) bool {
 	return false
 }
 
-func (this *ActionTransition) toString() string {
-	return "action_" + this.ruleIndex + ":" + this.actionIndex
+func (t *ActionTransition) toString() string {
+	return "action_" + t.ruleIndex + ":" + t.actionIndex
 }
         
 
-// A transition containing a set of values.
-func SetTransition(target, set) {
-	Transition.call(this, target)
-	this.serializationType = Transition.SET
-    if (set !=nil && set !=nil) {
-        this.label = set
-    } else {
-        this.label = NewIntervalSet()
-        this.label.addOne(TokenInvalidType)
-    }
-    return this
+type SetTransition struct {
+	Transition
+
+	serializationType int
 }
 
-//SetTransition.prototype = Object.create(Transition.prototype)
-//SetTransition.prototype.constructor = SetTransition
+func NewSetTransition ( target *ATNState, set *antlr4.IntervalSet ) *SetTransition {
 
-func (this *SetTransition) matches(symbol, minVocabSymbol,  maxVocabSymbol) {
-	return this.label.contains(symbol)
+	t := new(SetTransition)
+	t.initTransition( target )
+	t.initSetTransition( set )
+
+    return t
+}
+
+func (t *SetTransition) initSetTransition( set *antlr4.IntervalSet ) {
+
+	t.serializationType = TransitionSET
+	if (set !=nil && set !=nil) {
+		t.label = set
+	} else {
+		t.label = antlr4.NewIntervalSet()
+		t.label.addOne(antlr4.TokenInvalidType)
+	}
+
+}
+
+
+func (t *SetTransition) matches(symbol, minVocabSymbol,  maxVocabSymbol int) bool {
+	return t.label.contains(symbol)
 }
         
 
-func (this *SetTransition) toString() string {
-	return this.label.toString()
+func (t *SetTransition) toString() string {
+	return t.label.toString()
 }
 
-func NotSetTransition(target, set) {
-	SetTransition.call(this, target, set)
-	this.serializationType = Transition.NOT_SET
-	return this
+
+type NotSetTransition struct {
+	SetTransition
 }
 
-//NotSetTransition.prototype = Object.create(SetTransition.prototype)
-//NotSetTransition.prototype.constructor = NotSetTransition
+func NotSetTransition ( target *ATNState, set *antlr4.IntervalSet) *NotSetTransition {
 
-func (this *NotSetTransition) matches(symbol, minVocabSymbol,  maxVocabSymbol) {
-	return symbol >= minVocabSymbol && symbol <= maxVocabSymbol &&
-			!SetTransition.prototype.matches.call(this, symbol, minVocabSymbol, maxVocabSymbol)
+	t := new(NotSetTransition)
+	t.initTransition( target )
+	t.initSetTransition( target )
+
+	t.serializationType = TransitionNOT_SET
+
+	return t
 }
 
-func (this *NotSetTransition) toString() string {
-	return '~' + SetTransition.prototype.toString.call(this)
+
+func (t *NotSetTransition) matches(symbol, minVocabSymbol,  maxVocabSymbol int) bool {
+	return symbol >= minVocabSymbol && symbol <= maxVocabSymbol && !SetTransition.prototype.matches.call(t, symbol, minVocabSymbol, maxVocabSymbol)
 }
 
-func WildcardTransition(target) {
-	Transition.call(this, target)
-	this.serializationType = Transition.WILDCARD
-	return this
+func (t *NotSetTransition) toString() string {
+	return '~' + t.label.toString()
 }
 
-//WildcardTransition.prototype = Object.create(Transition.prototype)
-//WildcardTransition.prototype.constructor = WildcardTransition
+type WildcardTransition struct {
+	Transition
 
+	serializationType int
+}
 
-func (this *WildcardTransition) matches(symbol, minVocabSymbol,  maxVocabSymbol) {
+func NewWildcardTransition ( target *ATNState ) *WildcardTransition {
+
+	t := new(WildcardTransition)
+	t.initTransition( target )
+
+	t.serializationType = TransitionWILDCARD
+	return t
+}
+
+func (t *WildcardTransition) matches(symbol, minVocabSymbol,  maxVocabSymbol int) bool {
 	return symbol >= minVocabSymbol && symbol <= maxVocabSymbol
 }
 
-func (this *WildcardTransition) toString() string {
+func (t *WildcardTransition) toString() string {
 	return "."
 }
 
-func PrecedencePredicateTransition(target, precedence) {
-	AbstractPredicateTransition.call(this, target)
-    this.serializationType = Transition.PRECEDENCE
-    this.precedence = precedence
-    this.isEpsilon = true
-    return this
+type PrecedencePredicateTransition struct {
+	Transition
+
+	precedence int
+	serializationType int
 }
 
-//PrecedencePredicateTransition.prototype = Object.create(AbstractPredicateTransition.prototype)
-//PrecedencePredicateTransition.prototype.constructor = PrecedencePredicateTransition
+func PrecedencePredicateTransition ( target *ATNState, precedence int ) *PrecedencePredicateTransition {
 
-func (this *PrecedencePredicateTransition) matches(symbol, minVocabSymbol,  maxVocabSymbol) {
+	t := new(PrecedencePredicateTransition)
+	t.initTransition( target )
+
+    t.serializationType = TransitionPRECEDENCE
+    t.precedence = precedence
+    t.isEpsilon = true
+
+    return t
+}
+
+
+func (t *PrecedencePredicateTransition) matches(symbol, minVocabSymbol,  maxVocabSymbol int) {
 	return false
 }
 
-func (this *PrecedencePredicateTransition) getPredicate() {
-	return NewPrecedencePredicate(this.precedence)
+func (t *PrecedencePredicateTransition) getPredicate() *NewPrecedencePredicate {
+	return NewPrecedencePredicate(t.precedence)
 }
 
-func (this *PrecedencePredicateTransition) toString() string {
-	return this.precedence + " >= _p"
+func (t *PrecedencePredicateTransition) toString() string {
+	return fmt.Sprint(t.precedence) + " >= _p"
 }
         
 
