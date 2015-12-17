@@ -22,11 +22,11 @@ func NewRecognizer() *Recognizer {
     return rec
 }
 
-var tokenTypeMapCache = make(map[string]int)
-var ruleIndexMapCache = make(map[string]int)
+var tokenTypeMapCache = make(map[[]string]int)
+var ruleIndexMapCache = make(map[[]string]int)
 
 func (this *Recognizer) checkVersion(toolVersion string) {
-    var runtimeVersion = "4.5.1"
+    var runtimeVersion = "4.5.2"
     if (runtimeVersion!=toolVersion) {
         fmt.Println("ANTLR runtime and generated code versions disagree: "+runtimeVersion+"!="+toolVersion)
     }
@@ -37,7 +37,15 @@ func (this *Recognizer) addErrorListener(listener *tree.ParseTreeListener) {
 }
 
 func (this *Recognizer) removeErrorListeners() {
-    this._listeners = make([]tree.ParseTreeListener, 1)
+    this._listeners = make([]tree.ParseTreeListener, 0)
+}
+
+func (this *Recognizer) getRuleNames() []string {
+    return nil
+}
+
+func (this *Recognizer) getTokenNames() []string {
+    return nil
 }
 
 //func (this *Recognizer) getTokenTypeMap() {
@@ -59,27 +67,55 @@ func (this *Recognizer) removeErrorListeners() {
 // <p>Used for XPath and tree pattern compilation.</p>
 //
 func (this *Recognizer) getRuleIndexMap() {
-    var ruleNames = this.getRuleNames()
-    if (ruleNames==nil) {
-        panic("The current recognizer does not provide a list of rule names.")
-    }
-    var result = ruleIndexMapCache[ruleNames]
-    if(result==nil) {
-
-
-
-        result = ruleNames.reduce(function(o, k, i) { o[k] = i })
-        ruleIndexMapCache[ruleNames] = result
-    }
-    return result
-}
+    panic("Method not defined!")
+//    var ruleNames = this.getRuleNames()
+//    if (ruleNames==nil) {
+//        panic("The current recognizer does not provide a list of rule names.")
+//    }
 //
-//func (this *Recognizer) getTokenType(tokenName string) int {
+//    var result = ruleIndexMapCache[ruleNames]
+//    if(result==nil) {
+//        result = ruleNames.reduce(function(o, k, i) { o[k] = i })
+//        ruleIndexMapCache[ruleNames] = result
+//    }
+//    return result
+}
+
+func (this *Recognizer) getTokenType(tokenName string) int {
+    panic("Method not defined!")
 //    var ttype = this.getTokenTypeMap()[tokenName]
 //    if (ttype !=nil) {
 //        return ttype
 //    } else {
 //        return TokenInvalidType
+//    }
+}
+
+//func (this *Recognizer) getTokenTypeMap() map[string]int {
+//    Vocabulary vocabulary = getVocabulary();
+//
+//    synchronized (tokenTypeMapCache) {
+//        Map<String, Integer> result = tokenTypeMapCache.get(vocabulary);
+//        if (result == null) {
+//            result = new HashMap<String, Integer>();
+//            for (int i = 0; i < getATN().maxTokenType; i++) {
+//                String literalName = vocabulary.getLiteralName(i);
+//                if (literalName != null) {
+//                    result.put(literalName, i);
+//                }
+//
+//                String symbolicName = vocabulary.getSymbolicName(i);
+//                if (symbolicName != null) {
+//                    result.put(symbolicName, i);
+//                }
+//            }
+//
+//            result.put("EOF", Token.EOF);
+//            result = Collections.unmodifiableMap(result);
+//            tokenTypeMapCache.put(vocabulary, result);
+//        }
+//
+//        return result;
 //    }
 //}
 

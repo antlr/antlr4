@@ -464,8 +464,7 @@ func (p *Parser) getPrecedence() {
 	}
 }
 
-func (p *Parser) enterRecursionRule(localctx, state, ruleIndex,
-		precedence) {
+func (p *Parser) enterRecursionRule(localctx, state, ruleIndex, precedence) {
 	p.state = state
 	p._precedenceStack.push(precedence)
 	p._ctx = localctx
@@ -595,7 +594,7 @@ func (p *Parser) getExpectedTokensWithinCurrentRule() {
 }
 
 // Get a rule's index (i.e., {@code RULE_ruleName} field) or -1 if not found.//
-func (p *Parser) getRuleIndex(ruleName) {
+func (p *Parser) getRuleIndex(ruleName string) int {
 	var ruleIndex = p.getRuleIndexMap()[ruleName]
 	if (ruleIndex != nil) {
 		return ruleIndex

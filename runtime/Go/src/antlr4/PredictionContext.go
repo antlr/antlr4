@@ -1,4 +1,8 @@
 package antlr4
+import (
+	"antlr4/atn"
+	"fmt"
+)
 
 type PredictionContext struct {
 	cachedHashString string
@@ -7,7 +11,6 @@ type PredictionContext struct {
 func NewPredictionContext(cachedHashString string) *PredictionContext {
 
 	pc := new(PredictionContext)
-
 	pc.cachedHashString = cachedHashString
 
 	return pc
@@ -17,18 +20,18 @@ func NewPredictionContext(cachedHashString string) *PredictionContext {
 // {@code//+x =//}.
 // /
 const (
-	PredictionContextEMPTY = nil
 	PredictionContextEMPTY_RETURN_STATE = 0x7FFFFFFF
 )
 
+var PredictionContextEMPTY *PredictionContext = nil
 
 // Represents {@code $} in an array in full context mode, when {@code $}
 // doesn't mean wildcard: {@code $ + x = [$,x]}. Here,
 // {@code $} = {@link //EMPTY_RETURN_STATE}.
 // /
 
-PredictionContext.globalNodeCount = 1
-PredictionContext.id = PredictionContext.globalNodeCount
+var PredictionContextglobalNodeCount = 1
+var PredictionContextid = PredictionContextglobalNodeCount
 
 // Stores the computed hash code of this {@link PredictionContext}. The hash
 // code is computed in parts to match the following reference algorithm.
@@ -61,19 +64,31 @@ func (this *PredictionContext) isEmpty() {
 }
 
 func (this *PredictionContext) hasEmptyPath() {
-	return this.getReturnState(this.length - 1) == PredictionContextEMPTY_RETURN_STATE
+	return this.getReturnState(this.length() - 1) == PredictionContextEMPTY_RETURN_STATE
 }
 
 func (this *PredictionContext) hashString() {
 	return this.cachedHashString
 }
 
-func calculateHashString(parent, returnState) {
-	return "" + parent + returnState
+func calculateHashString(parent *PredictionContext, returnState int) string {
+	return "" + fmt.Sprint(parent) + fmt.Sprint(returnState)
 }
 
-type calculateEmptyHashString struct {
+func calculateEmptyHashString() string {
 	return ""
+}
+
+func (this *PredictionContext) getParent(index int) PredictionContext {
+	panic("Not implemented")
+}
+
+func (this *PredictionContext) length() int {
+	panic("Not implemented")
+}
+
+func (this *PredictionContext) getReturnState(index int) int {
+	panic("Not implemented")
 }
 
 // Used to cache {@link PredictionContext} objects. Its used for the shared
@@ -81,17 +96,22 @@ type calculateEmptyHashString struct {
 // can be used for both lexers and parsers.
 
 type PredictionContextCache struct {
-	this.cache = {}
-	return this
+	cache map[*PredictionContext]*PredictionContext
+}
+
+func NewPredictionContextCache()  {
+	t := new(PredictionContextCache)
+	t.cache = make(map[*PredictionContext]*PredictionContext)
+	return t
 }
 
 // Add a context to the cache and return it. If the context already exists,
 // return that one instead and do not add a Newcontext to the cache.
 // Protect shared cache from unsafe thread access.
 //
-func (this *PredictionContextCache) add(ctx) {
-	if (ctx == PredictionContext.EMPTY) {
-		return PredictionContext.EMPTY
+func (this *PredictionContextCache) add(ctx *PredictionContext) {
+	if (ctx == PredictionContextEMPTY) {
+		return PredictionContextEMPTY
 	}
 	var existing = this.cache[ctx] || nil
 	if (existing != nil) {
@@ -101,64 +121,80 @@ func (this *PredictionContextCache) add(ctx) {
 	return ctx
 }
 
-func (this *PredictionContextCache) get(ctx) {
-	return this.cache[ctx] || nil
+func (this *PredictionContextCache) get(ctx *PredictionContext) {
+	return this.cache[ctx]
 }
 
-Object.defineProperty(PredictionContextCache.prototype, "length", {
-	get : function() {
-		return this.cache.length
-	}
-})
-
-func SingletonPredictionContext(parent, returnState) {
-	var hashString = parent != nil ? calculateHashString(parent, returnState)
-			: calculateEmptyHashString()
-	PredictionContext.call(this, hashString)
-	this.parentCtx = parent
-	this.returnState = returnState
+func (this *PredictionContextCache) length() int {
+	return len(this.cache)
 }
 
-//SingletonPredictionContext.prototype = Object.create(PredictionContext.prototype)
-SingletonPredictionContext.prototype.contructor = SingletonPredictionContext
 
-SingletonPredictionContext.create = function(parent, returnState) {
-	if (returnState == PredictionContext.EMPTY_RETURN_STATE && parent == nil) {
+type SingletonPredictionContext struct {
+	PredictionContext
+	parentCtx *PredictionContext
+	returnState int
+}
+
+func NewSingletonPredictionContext(parent *PredictionContext, returnState int) {
+	s := new(SingletonPredictionContext)
+
+//	var hashString string
+//
+//	if (parent != nil){
+//		hashString = calculateHashString(parent, returnState)
+//	} else {
+//		hashString = calculateEmptyHashString()
+//	}
+
+	panic("Must initializer parent predicition context")
+//	PredictionContext.call(s, hashString)
+
+	s.parentCtx = parent
+	s.returnState = returnState
+
+	return s
+}
+
+func SingletonPredictionContextcreate(parent PredictionContext, returnState int) *SingletonPredictionContext {
+	if (returnState == PredictionContextEMPTY_RETURN_STATE && parent == nil) {
 		// someone can pass in the bits of an array ctx that mean $
-		return PredictionContext.EMPTY
+		return PredictionContextEMPTY
 	} else {
 		return NewSingletonPredictionContext(parent, returnState)
 	}
 }
 
-Object.defineProperty(SingletonPredictionContext.prototype, "length", {
-	get : function() {
-		return 1
-	}
-})
+func (this *SingletonPredictionContext) length() int {
+	return 1
+}
 
-func (this *SingletonPredictionContext) getParent(index) {
+func (this *SingletonPredictionContext) getParent(index int) PredictionContext {
 	return this.parentCtx
 }
 
-func (this *SingletonPredictionContext) getReturnState(index) {
+func (this *SingletonPredictionContext) getReturnState(index int) int {
 	return this.returnState
 }
 
-func (this *SingletonPredictionContext) equals(other) {
+func (this *SingletonPredictionContext) equals(other *PredictionContext) {
 	if (this == other) {
 		return true
-	} else if (!_, ok := other.(SingletonPredictionContext); ok) {
+	} else if _, ok := other.(*SingletonPredictionContext); !ok {
 		return false
 	} else if (this.hashString() != other.hashString()) {
 		return false // can't be same if hash is different
 	} else {
-		if(this.returnState != other.returnState)
-            return false
-        else if(this.parentCtx==nil)
-            return other.parentCtx==nil
-		else
-            return this.parentCtx.equals(other.parentCtx)
+
+		otherP := other.(*SingletonPredictionContext)
+
+		if this.returnState != other.getReturnState(0) {
+			return false
+		} else if(this.parentCtx==nil) {
+			return otherP.parentCtx == nil
+		} else {
+			return this.parentCtx.equals(otherP.parentCtx)
+		}
 	}
 }
 
@@ -167,9 +203,16 @@ func (this *SingletonPredictionContext) hashString() {
 }
 
 func (this *SingletonPredictionContext) toString() string {
-	var up = this.parentCtx == nil ? "" : this.parentCtx.toString()
-	if (up.length == 0) {
-		if (this.returnState == this.EMPTY_RETURN_STATE) {
+	var up string
+
+	if (this.parentCtx == nil){
+		up = ""
+	} else {
+		up = fmt.Sprint(this.parentCtx)
+	}
+
+	if (len(up) == 0) {
+		if (this.returnState == PredictionContextEMPTY_RETURN_STATE) {
 			return "$"
 		} else {
 			return "" + this.returnState
@@ -180,26 +223,31 @@ func (this *SingletonPredictionContext) toString() string {
 }
 
 type EmptyPredictionContext struct {
-	SingletonPredictionContext.call(this, nil, PredictionContext.EMPTY_RETURN_STATE)
-	return this
+	SingletonPredictionContext
 }
 
-//EmptyPredictionContext.prototype = Object.create(SingletonPredictionContext.prototype)
-//EmptyPredictionContext.prototype.constructor = EmptyPredictionContext
+func NewEmptyPredictionContext() *EmptyPredictionContext {
+
+	panic("Must init SingletonPredictionContext")
+//	SingletonPredictionContext.call(this, nil, PredictionContextEMPTY_RETURN_STATE)
+
+	p := new(EmptyPredictionContext)
+	return p
+}
 
 func (this *EmptyPredictionContext) isEmpty() {
 	return true
 }
 
-func (this *EmptyPredictionContext) getParent(index) {
+func (this *EmptyPredictionContext) getParent(index int) PredictionContext {
 	return nil
 }
 
-func (this *EmptyPredictionContext) getReturnState(index) {
+func (this *EmptyPredictionContext) getReturnState(index int) int {
 	return this.returnState
 }
 
-func (this *EmptyPredictionContext) equals(other) {
+func (this *EmptyPredictionContext) equals(other *PredictionContext) bool {
 	return this == other
 }
 
@@ -207,53 +255,59 @@ func (this *EmptyPredictionContext) toString() string {
 	return "$"
 }
 
-PredictionContext.EMPTY = NewEmptyPredictionContext()
+var PredictionContextEMPTY = NewEmptyPredictionContext()
 
-func ArrayPredictionContext(parents, returnStates) {
+type ArrayPredictionContext struct {
+	PredictionContext
+	parents []*PredictionContext
+	returnStates []int
+}
+
+func NewArrayPredictionContext(parents []*PredictionContext, returnStates []int) *ArrayPredictionContext {
 	// Parent can be nil only if full ctx mode and we make an array
 	// from {@link //EMPTY} and non-empty. We merge {@link //EMPTY} by using
 	// nil parent and
 	// returnState == {@link //EMPTY_RETURN_STATE}.
-	var hash = calculateHashString(parents, returnStates)
-	PredictionContext.call(this, hash)
-	this.parents = parents
-	this.returnStates = returnStates
-	return this
-}
 
-//ArrayPredictionContext.prototype = Object.create(PredictionContext.prototype)
-//ArrayPredictionContext.prototype.constructor = ArrayPredictionContext
+	c := new(ArrayPredictionContext)
+
+	panic("Must init PredictionContext")
+//	var hash = calculateHashString(parents, returnStates)
+//	PredictionContext.call(c, hash)
+	c.parents = parents
+	c.returnStates = returnStates
+
+	return c
+}
 
 func (this *ArrayPredictionContext) isEmpty() {
 	// since EMPTY_RETURN_STATE can only appear in the last position, we
 	// don't need to verify that size==1
-	return this.returnStates[0] == PredictionContext.EMPTY_RETURN_STATE
+	return this.returnStates[0] == PredictionContextEMPTY_RETURN_STATE
 }
 
-Object.defineProperty(ArrayPredictionContext.prototype, "length", {
-	get : function() {
-		return this.returnStates.length
-	}
-})
+func (this *ArrayPredictionContext) length() int {
+	return len(this.returnStates)
+}
 
-func (this *ArrayPredictionContext) getParent(index) {
+func (this *ArrayPredictionContext) getParent(index int) *PredictionContext {
 	return this.parents[index]
 }
 
-func (this *ArrayPredictionContext) getReturnState(index) {
+func (this *ArrayPredictionContext) getReturnState(index int) int {
 	return this.returnStates[index]
 }
 
-func (this *ArrayPredictionContext) equals(other) {
+func (this *ArrayPredictionContext) equals(other *PredictionContext) {
 	if (this == other) {
 		return true
-	} else if (!_, ok := other.(ArrayPredictionContext); ok) {
+	} else if _, ok := other.(*ArrayPredictionContext); !ok {
 		return false
 	} else if (this.hashString != other.hashString()) {
 		return false // can't be same if hash is different
 	} else {
-		return this.returnStates == other.returnStates &&
-				this.parents == other.parents
+		otherP := other.(*ArrayPredictionContext)
+		return this.returnStates == otherP.returnStates && this.parents == otherP.parents
 	}
 }
 
@@ -266,7 +320,7 @@ func (this *ArrayPredictionContext) toString() string {
 			if (i > 0) {
 				s = s + ", "
 			}
-			if (this.returnStates[i] == PredictionContext.EMPTY_RETURN_STATE) {
+			if (this.returnStates[i] == PredictionContextEMPTY_RETURN_STATE) {
 				s = s + "$"
 				continue
 			}
@@ -284,40 +338,48 @@ func (this *ArrayPredictionContext) toString() string {
 // Convert a {@link RuleContext} tree to a {@link PredictionContext} graph.
 // Return {@link //EMPTY} if {@code outerContext} is empty or nil.
 // /
-func predictionContextFromRuleContext(atn *ATN, outerContext *RuleContext) {
+func predictionContextFromRuleContext(a *atn.ATN, outerContext *RuleContext) *PredictionContext {
 	if (outerContext == nil) {
-		outerContext = RuleContext.EMPTY
+		outerContext = RuleContextEMPTY
 	}
 	// if we are in RuleContext of start rule, s, then PredictionContext
 	// is EMPTY. Nobody called us. (if we are empty, return empty)
-	if (outerContext.parentCtx == nil || outerContext == RuleContext.EMPTY) {
-		return PredictionContext.EMPTY
+	if (outerContext.parentCtx == nil || outerContext == RuleContextEMPTY) {
+		return PredictionContextEMPTY
 	}
 	// If we have a parent, convert it to a PredictionContext graph
-	var parent = predictionContextFromRuleContext(atn, outerContext.parentCtx)
-	var state = atn.states[outerContext.invokingState]
+	var parent = predictionContextFromRuleContext(a, outerContext.parentCtx)
+	var state = a.states[outerContext.invokingState]
 	var transition = state.transitions[0]
-	return SingletonPredictionContext.create(parent, transition.followState.stateNumber)
+
+	return SingletonPredictionContextcreate(parent, transition.followState.stateNumber)
 }
 
-func calculateListsHashString(parents, returnStates) {
+func calculateListsHashString(parents []PredictionContext, returnStates []int) {
 	var s = ""
-	parents.map(function(p) {
-		s = s + p
-	})
-	returnStates.map(function(r) {
-		s = s + r
-	})
+
+	for _, p := range parents {
+		s += fmt.Sprint(p)
+	}
+
+	for _, r := range returnStates {
+		s += fmt.Sprint(r)
+	}
+
 	return s
 }
 
-func merge(a, b, rootIsWildcard, mergeCache) {
+func merge(a, b *PredictionContext, rootIsWildcard bool, mergeCache *DoubleDict) *PredictionContext {
 	// share same graph if both same
 	if (a == b) {
 		return a
 	}
-	if (a instanceof SingletonPredictionContext && b instanceof SingletonPredictionContext) {
-		return mergeSingletons(a, b, rootIsWildcard, mergeCache)
+
+	ac, ok1 := a.(*SingletonPredictionContext)
+	bc, ok2 := a.(*SingletonPredictionContext)
+
+	if (ok1 && ok2) {
+		return mergeSingletons(ac, bc, rootIsWildcard, mergeCache)
 	}
 	// At least one of a or b is array
 	// If one is $ and rootIsWildcard, return $ as// wildcard
@@ -331,10 +393,10 @@ func merge(a, b, rootIsWildcard, mergeCache) {
 	}
 	// convert singleton so both are arrays to normalize
 	if _, ok := a.(SingletonPredictionContext); ok {
-		a = NewArrayPredictionContext([a.getParent()], [a.returnState])
+		a = NewArrayPredictionContext([]*PredictionContext{ a.getParent(0) }, []int{ a.getReturnState(0) })
 	}
 	if _, ok := b.(SingletonPredictionContext); ok {
-		b = NewArrayPredictionContext([b.getParent()], [b.returnState])
+		b = NewArrayPredictionContext( []*PredictionContext{ b.getParent(0) }, []int{ b.getReturnState(0) })
 	}
 	return mergeArrays(a, b, rootIsWildcard, mergeCache)
 }
@@ -370,7 +432,7 @@ func merge(a, b, rootIsWildcard, mergeCache) {
 // otherwise false to indicate a full-context merge
 // @param mergeCache
 // /
-func mergeSingletons(a, b, rootIsWildcard, mergeCache) {
+func mergeSingletons(a, b *SingletonPredictionContext, rootIsWildcard bool, mergeCache *DoubleDict) *PredictionContext {
 	if (mergeCache != nil) {
 		var previous = mergeCache.get(a, b)
 		if (previous != nil) {
@@ -403,14 +465,14 @@ func mergeSingletons(a, b, rootIsWildcard, mergeCache) {
 		// merge parents x and y, giving array node with x,y then remainders
 		// of those graphs. dup a, a' points at merged array
 		// Newjoined parent so create Newsingleton pointing to it, a'
-		var spc = SingletonPredictionContext.create(parent, a.returnState)
+		var spc = SingletonPredictionContextcreate(parent, a.returnState)
 		if (mergeCache != nil) {
 			mergeCache.set(a, b, spc)
 		}
 		return spc
 	} else { // a != b payloads differ
 		// see if we can collapse parents due to $+x parents if local ctx
-		var singleParent = nil
+		var singleParent *PredictionContext = nil
 		if (a == b || (a.parentCtx != nil && a.parentCtx == b.parentCtx)) { // ax +
 																				// bx =
 																				// [a,b]x
@@ -418,12 +480,12 @@ func mergeSingletons(a, b, rootIsWildcard, mergeCache) {
 		}
 		if (singleParent != nil) { // parents are same
 			// sort payloads and use same parent
-			var payloads = [ a.returnState, b.returnState ]
+			var payloads = []int{ a.returnState, b.returnState }
 			if (a.returnState > b.returnState) {
 				payloads[0] = b.returnState
 				payloads[1] = a.returnState
 			}
-			var parents = [ singleParent, singleParent ]
+			var parents = []*PredictionContext{ singleParent, singleParent }
 			var apc = NewArrayPredictionContext(parents, payloads)
 			if (mergeCache != nil) {
 				mergeCache.set(a, b, apc)
@@ -433,12 +495,12 @@ func mergeSingletons(a, b, rootIsWildcard, mergeCache) {
 		// parents differ and can't merge them. Just pack together
 		// into array can't merge.
 		// ax + by = [ax,by]
-		var payloads = [ a.returnState, b.returnState ]
-		var parents = [ a.parentCtx, b.parentCtx ]
+		var payloads = []int{ a.returnState, b.returnState }
+		var parents = []*PredictionContext{ a.parentCtx, b.parentCtx }
 		if (a.returnState > b.returnState) { // sort by payload
 			payloads[0] = b.returnState
 			payloads[1] = a.returnState
-			parents = [ b.parentCtx, a.parentCtx ]
+			parents = []*PredictionContext{  b.parentCtx, a.parentCtx }
 		}
 		var a_ = NewArrayPredictionContext(parents, payloads)
 		if (mergeCache != nil) {
@@ -486,25 +548,24 @@ func mergeSingletons(a, b, rootIsWildcard, mergeCache) {
 // @param rootIsWildcard {@code true} if this is a local-context merge,
 // otherwise false to indicate a full-context merge
 // /
-func mergeRoot(a, b, rootIsWildcard) {
+func mergeRoot(a, b *SingletonPredictionContext, rootIsWildcard bool) *PredictionContext {
 	if (rootIsWildcard) {
-		if (a == PredictionContext.EMPTY) {
-			return PredictionContext.EMPTY // // + b =//
+		if (a == PredictionContextEMPTY) {
+			return PredictionContextEMPTY // // + b =//
 		}
-		if (b == PredictionContext.EMPTY) {
-			return PredictionContext.EMPTY // a +// =//
+		if (b == PredictionContextEMPTY) {
+			return PredictionContextEMPTY // a +// =//
 		}
 	} else {
-		if (a == PredictionContext.EMPTY && b == PredictionContext.EMPTY) {
-			return PredictionContext.EMPTY // $ + $ = $
-		} else if (a == PredictionContext.EMPTY) { // $ + x = [$,x]
-			var payloads = [ b.returnState,
-					PredictionContext.EMPTY_RETURN_STATE ]
-			var parents = [ b.parentCtx, nil ]
+		if (a == PredictionContextEMPTY && b == PredictionContextEMPTY) {
+			return PredictionContextEMPTY // $ + $ = $
+		} else if (a == PredictionContextEMPTY) { // $ + x = [$,x]
+			var payloads = []int{ b.returnState, PredictionContextEMPTY_RETURN_STATE }
+			var parents = []*PredictionContext{ b.parentCtx, nil }
 			return NewArrayPredictionContext(parents, payloads)
-		} else if (b == PredictionContext.EMPTY) { // x + $ = [$,x] ($ is always first if present)
-			var payloads = [ a.returnState, PredictionContext.EMPTY_RETURN_STATE ]
-			var parents = [ a.parentCtx, nil ]
+		} else if (b == PredictionContextEMPTY) { // x + $ = [$,x] ($ is always first if present)
+			var payloads = []int{ a.returnState, PredictionContextEMPTY_RETURN_STATE }
+			var parents = []*PredictionContext{ a.parentCtx, nil }
 			return NewArrayPredictionContext(parents, payloads)
 		}
 	}
@@ -531,7 +592,7 @@ func mergeRoot(a, b, rootIsWildcard) {
 // {@link SingletonPredictionContext}.<br>
 // <embed src="images/ArrayMerge_EqualTop.svg" type="image/svg+xml"/></p>
 // /
-func mergeArrays(a, b, rootIsWildcard, mergeCache) {
+func mergeArrays(a, b *ArrayPredictionContext, rootIsWildcard bool, mergeCache *DoubleDict) *PredictionContext {
 	if (mergeCache != nil) {
 		var previous = mergeCache.get(a, b)
 		if (previous != nil) {
@@ -547,18 +608,17 @@ func mergeArrays(a, b, rootIsWildcard, mergeCache) {
 	var j = 0 // walks b
 	var k = 0 // walks target M array
 
-	var mergedReturnStates = []
-	var mergedParents = []
+	var mergedReturnStates = make([]int,0)
+	var mergedParents = make([]*PredictionContext,0)
 	// walk and merge to yield mergedParents, mergedReturnStates
-	for (i < a.returnStates.length && j < b.returnStates.length) {
+	for i < len(a.returnStates) && j < len(b.returnStates) {
 		var a_parent = a.parents[i]
 		var b_parent = b.parents[j]
 		if (a.returnStates[i] == b.returnStates[j]) {
 			// same payload (stack tops are equal), must yield merged singleton
 			var payload = a.returnStates[i]
 			// $+$ = $
-			var bothDollars = payload == PredictionContext.EMPTY_RETURN_STATE &&
-					a_parent == nil && b_parent == nil
+			var bothDollars = payload == PredictionContextEMPTY_RETURN_STATE && a_parent == nil && b_parent == nil
 			var ax_ax = (a_parent != nil && b_parent != nil && a_parent == b_parent) // ax+ax
 																							// ->
 																							// ax
@@ -584,31 +644,30 @@ func mergeArrays(a, b, rootIsWildcard, mergeCache) {
 		k += 1
 	}
 	// copy over any payloads remaining in either array
-	if (i < a.returnStates.length) {
-		for p := i p < a.returnStates.length p++) {
+	if (i < len(a.returnStates)) {
+		for p := i; p < len(a.returnStates); p++ {
 			mergedParents[k] = a.parents[p]
 			mergedReturnStates[k] = a.returnStates[p]
 			k += 1
 		}
 	} else {
-		for p := j p < b.returnStates.length p++) {
+		for p := j; p < len(b.returnStates); p++ {
 			mergedParents[k] = b.parents[p]
 			mergedReturnStates[k] = b.returnStates[p]
 			k += 1
 		}
 	}
 	// trim merged if we combined a few that had same stack tops
-	if (k < mergedParents.length) { // write index < last position trim
+	if (k < len(mergedParents)) { // write index < last position trim
 		if (k == 1) { // for just one merged element, return singleton top
-			var a_ = SingletonPredictionContext.create(mergedParents[0],
-					mergedReturnStates[0])
+			var a_ = SingletonPredictionContextcreate(mergedParents[0], mergedReturnStates[0])
 			if (mergeCache != nil) {
 				mergeCache.set(a, b, a_)
 			}
 			return a_
 		}
-		mergedParents = mergedParents.slice(0, k)
-		mergedReturnStates = mergedReturnStates.slice(0, k)
+		mergedParents = mergedParents[0:k]
+		mergedReturnStates = mergedReturnStates[0:k]
 	}
 
 	var M = NewArrayPredictionContext(mergedParents, mergedReturnStates)
@@ -639,12 +698,12 @@ func mergeArrays(a, b, rootIsWildcard, mergeCache) {
 // Make pass over all <em>M</em> {@code parents} merge any {@code equals()}
 // ones.
 // /
-func combineCommonParents(parents) {
-	var uniqueParents = {}
+func combineCommonParents(parents []*PredictionContext) {
+	var uniqueParents = map[*PredictionContext]*PredictionContext
 
 	for p := 0; p < len(parents); p++ {
 		var parent = parents[p]
-		if (!(parent in uniqueParents)) {
+		if uniqueParents[parent] == nil {
 			uniqueParents[parent] = parent
 		}
 	}
@@ -653,74 +712,74 @@ func combineCommonParents(parents) {
 	}
 }
 
-func getCachedPredictionContext(context, contextCache, visited) {
-	if (context.isEmpty()) {
-		return context
-	}
-	var existing = visited[context] || nil
-	if (existing != nil) {
-		return existing
-	}
-	existing = contextCache.get(context)
-	if (existing != nil) {
-		visited[context] = existing
-		return existing
-	}
-	var changed = false
-	var parents = []
-	for i := 0; i < len(parents); i++ {
-		var parent = getCachedPredictionContext(context.getParent(i), contextCache, visited)
-		if (changed || parent != context.getParent(i)) {
-			if (!changed) {
-				parents = []
-				for j := 0; j < len(context); j++ {
-					parents[j] = context.getParent(j)
-				}
-				changed = true
-			}
-			parents[i] = parent
-		}
-	}
-	if (!changed) {
-		contextCache.add(context)
-		visited[context] = context
-		return context
-	}
-	var updated = nil
-	if (parents.length == 0) {
-		updated = PredictionContext.EMPTY
-	} else if (parents.length == 1) {
-		updated = SingletonPredictionContext.create(parents[0], context.getReturnState(0))
-	} else {
-		updated = NewArrayPredictionContext(parents, context.returnStates)
-	}
-	contextCache.add(updated)
-	visited[updated] = updated
-	visited[context] = updated
-
-	return updated
-}
+//func getCachedPredictionContext(context *PredictionContext, contextCache *PredictionContextCache, visited) *PredictionContext {
+//	if (context.isEmpty()) {
+//		return context
+//	}
+//	var existing = visited[context] || nil
+//	if (existing != nil) {
+//		return existing
+//	}
+//	existing = contextCache.get(context)
+//	if (existing != nil) {
+//		visited[context] = existing
+//		return existing
+//	}
+//	var changed = false
+//	var parents = []
+//	for i := 0; i < len(parents); i++ {
+//		var parent = getCachedPredictionContext(context.getParent(i), contextCache, visited)
+//		if (changed || parent != context.getParent(i)) {
+//			if (!changed) {
+//				parents = []
+//				for j := 0; j < len(context); j++ {
+//					parents[j] = context.getParent(j)
+//				}
+//				changed = true
+//			}
+//			parents[i] = parent
+//		}
+//	}
+//	if (!changed) {
+//		contextCache.add(context)
+//		visited[context] = context
+//		return context
+//	}
+//	var updated = nil
+//	if (parents.length == 0) {
+//		updated = PredictionContextEMPTY
+//	} else if (parents.length == 1) {
+//		updated = SingletonPredictionContext.create(parents[0], context.getReturnState(0))
+//	} else {
+//		updated = NewArrayPredictionContext(parents, context.returnStates)
+//	}
+//	contextCache.add(updated)
+//	visited[updated] = updated
+//	visited[context] = updated
+//
+//	return updated
+//}
 
 // ter's recursive version of Sam's getAllNodes()
-func getAllContextNodes(context, nodes, visited) {
-	if (nodes == nil) {
-		nodes = []
-		return getAllContextNodes(context, nodes, visited)
-	} else if (visited == nil) {
-		visited = {}
-		return getAllContextNodes(context, nodes, visited)
-	} else {
-		if (context == nil || visited[context] != nil) {
-			return nodes
-		}
-		visited[context] = context
-		nodes.push(context)
-		for i := 0; i < len(context); i++ {
-			getAllContextNodes(context.getParent(i), nodes, visited)
-		}
-		return nodes
-	}
-}
+//func getAllContextNodes(context, nodes, visited) {
+//	if (nodes == nil) {
+//		nodes = []
+//		return getAllContextNodes(context, nodes, visited)
+//	} else if (visited == nil) {
+//		visited = {}
+//		return getAllContextNodes(context, nodes, visited)
+//	} else {
+//		if (context == nil || visited[context] != nil) {
+//			return nodes
+//		}
+//		visited[context] = context
+//		nodes.push(context)
+//		for i := 0; i < len(context); i++ {
+//			getAllContextNodes(context.getParent(i), nodes, visited)
+//		}
+//		return nodes
+//	}
+//}
 
 
 

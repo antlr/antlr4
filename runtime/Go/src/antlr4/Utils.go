@@ -30,8 +30,6 @@ func (s *IntStack) Push(e int) {
 	*s = append(*s, e)
 }
 
-
-
 func arrayToString(a []interface{}) string{
 	return fmt.Sprintf( a )
 }
