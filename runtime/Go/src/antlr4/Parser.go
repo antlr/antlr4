@@ -18,32 +18,28 @@ func NewTraceListener(parser *Parser) *TraceListener {
 	return tl
 }
 
-//TraceListener.prototype = Object.create(ParseTreeListener)
-//TraceListener.prototype.constructor = TraceListener
-
-func (this *TraceListener) enterEveryRule(ctx) {
+func (this *TraceListener) enterEveryRule(ctx *ParserRuleContext) {
 	fmt.Println("enter   " + this.parser.ruleNames[ctx.ruleIndex] + ", LT(1)=" + this.parser._input.LT(1).text)
 }
 
-func (this *TraceListener) visitTerminal( node) {
+func (this *TraceListener) visitTerminal( node *tree.TerminalNode ) {
 	fmt.Println("consume " + node.symbol + " rule " + this.parser.ruleNames[this.parser._ctx.ruleIndex])
 }
 
-func (this *TraceListener) exitEveryRule(ctx) {
+func (this *TraceListener) exitEveryRule(ctx *ParserRuleContext) {
 	fmt.Println("exit    " + this.parser.ruleNames[ctx.ruleIndex] + ", LT(1)=" + this.parser._input.LT(1).text)
 }
 
 type Parser struct {
 	Recognizer
-	_input *Lexer
+	_input *TokenStream
 	_errHandler *error.ErrorStrategy
 	_precedenceStack IntStack
-	_ctx RuleContext
+	_ctx *ParserRuleContext
 	buildParseTrees bool
 	_tracer bool
 	_parseListeners []tree.ParseTreeListener
 	_syntaxErrors int
-
 }
 
 // p.is all the parsing support code essentially most of it is error
@@ -163,7 +159,7 @@ func (p *Parser) matchWildcard() {
 		p._errHandler.reportMatch(p.
 		p.consume()
 	} else {
-		t = p._errHandler.recoverInline(p.
+		t = p._errHandler.recoverInline(p)
 		if (p._buildParseTrees && t.tokenIndex == -1) {
 			// we must have conjured up a Newtoken during single token
 			// insertion
@@ -292,10 +288,9 @@ func (p *Parser) getATNWithBypassAlts() {
 	}
 	var result = p.bypassAltsAtnCache[serializedAtn]
 	if (result == nil) {
-		var deserializationOptions = NewATNDeserializationOptions()
+		var deserializationOptions = atn.NewATNDeserializationOptions()
 		deserializationOptions.generateRuleBypassTransitions = true
-		result = NewATNDeserializer(deserializationOptions)
-				.deserialize(serializedAtn)
+		result = atn.NewATNDeserializer(deserializationOptions).deserialize(serializedAtn)
 		p.bypassAltsAtnCache[serializedAtn] = result
 	}
 	return result
@@ -311,8 +306,6 @@ func (p *Parser) getATNWithBypassAlts() {
 // ParseTreeMatch m = p.match(t)
 // String id = m.get("ID")
 // </pre>
-
-//var Lexer = require('./Lexer').Lexer
 
 func (p *Parser) compileParseTreePattern(pattern, patternRuleIndex, lexer *Lexer) {
 
@@ -331,20 +324,20 @@ func (p *Parser) compileParseTreePattern(pattern, patternRuleIndex, lexer *Lexer
 	return m.compile(pattern, patternRuleIndex)
 }
 
-func (p *Parser) getInputStream() {
+func (p *Parser) getInputStream() *TokenStream {
 	return p.getTokenStream()
 }
 
-func (p *Parser) setInputStream(input) {
+func (p *Parser) setInputStream(input *TokenStream) {
 	p.setTokenStream(input)
 }
 
-func (p *Parser) getTokenStream() {
+func (p *Parser) getTokenStream() *TokenStream {
 	return p._input
 }
 
 // Set the token stream and reset the parser.//
-func (p *Parser) setTokenStream(input) {
+func (p *Parser) setTokenStream(input *TokenStream) {
 	p._input = nil
 	p.reset()
 	p._input = input
@@ -393,7 +386,7 @@ func (p *Parser) notifyErrorListeners(msg, offendingToken, err) {
 //
 func (p *Parser) consume() {
 	var o = p.getCurrentToken()
-	if (o.type != TokenEOF) {
+	if (o.tokenType != TokenEOF) {
 		p.getInputStream().consume()
 	}
 	var hasListener = p._parseListeners != nil && p._parseListeners.length > 0
@@ -644,7 +637,7 @@ func (p *Parser) getDFAStrings() {
 // For debugging and other purposes.//
 func (p *Parser) dumpDFA() {
 	var seenOne = false
-	for i := 0 i < p._interp.decisionToDFA.length i++) {
+	for i := 0; i < p._interp.decisionToDFA.length; i++) {
 		var dfa = p._interp.decisionToDFA[i]
 		if (dfa.states.length > 0) {
 			if (seenOne) {
@@ -664,15 +657,15 @@ func (p *Parser) dumpDFA() {
 "			}\r\n" +
 */
 
-func (p *Parser) getSourceName() {
+func (p *Parser) getSourceName() string {
 	return p._input.sourceName
 }
 
 // During a parse is sometimes useful to listen in on the rule entry and exit
 // events as well as token matches. p.is for quick and dirty debugging.
 //
-func (p *Parser) setTrace(trace bool) {
-	if (!trace) {
+func (p *Parser) setTrace(trace *TraceListener) {
+	if (trace == nil) {
 		p.removeParseListener(p._tracer)
 		p._tracer = nil
 	} else {

@@ -100,9 +100,6 @@ type ParseTreeListener struct {
 }
 
 func NewParseTreeListener() *ParseTreeListener {
-}
-
-func NewParseTreeListener() ParseTreeListener {
 	return new(ParseTreeListener)
 }
 
@@ -120,7 +117,7 @@ func (this *ParseTreeListener) exitEveryRule(node) {
 
 type TerminalNodeImpl struct {
 	TerminalNode
-	parentCtx
+	parentCtx *antlr4.RuleContext
 	symbol
 }
 

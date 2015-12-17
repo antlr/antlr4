@@ -60,16 +60,13 @@ const (
 // should be obtained from the input along with the start and stop indexes
 // of the token.
 
-//
-//
-//Object.defineProperty(Token.prototype, "text", {
-//	get : function() {
-//		return this._text
-//	},
-//	set : function(text) {
-//		this._text = text
-//	}
-//})
+func (this *Token) text() string{
+	return this._text
+}
+
+func (this *Token) setText(s string) {
+	this._text = s
+}
 
 func (this *Token) getTokenSource() *TokenSource {
 	return this.source.tokenSource

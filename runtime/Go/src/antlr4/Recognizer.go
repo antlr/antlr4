@@ -39,7 +39,7 @@ func (this *Recognizer) addErrorListener(listener *tree.ParseTreeListener) {
 func (this *Recognizer) removeErrorListeners() {
     this._listeners = make([]tree.ParseTreeListener, 1)
 }
-//
+
 //func (this *Recognizer) getTokenTypeMap() {
 //    var tokenNames = this.getTokenNames()
 //    if (tokenNames==nil) {
@@ -65,6 +65,9 @@ func (this *Recognizer) getRuleIndexMap() {
     }
     var result = ruleIndexMapCache[ruleNames]
     if(result==nil) {
+
+
+
         result = ruleNames.reduce(function(o, k, i) { o[k] = i })
         ruleIndexMapCache[ruleNames] = result
     }
@@ -79,7 +82,6 @@ func (this *Recognizer) getRuleIndexMap() {
 //        return TokenInvalidType
 //    }
 //}
-
 
 // What is the error header, normally line/character position information?//
 func (this *Recognizer) getErrorHeader(e error) string {

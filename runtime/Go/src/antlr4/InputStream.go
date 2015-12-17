@@ -4,12 +4,13 @@ import (
 	"math"
 )
 
-// Vacuum all input from a string and then treat it like a buffer.
+// Vacuums all input from a string and then treat it like a buffer.
 
 type InputStream struct {
 	name string
 	strdata string
 	index int
+	data []rune
 	size int
 }
 
@@ -19,19 +20,17 @@ func NewInputStream(data string) *InputStream {
 
 	is.name = "<empty>"
 	is.strdata = data
-	_loadString(is)
+	loadString(is)
 
 	return is
-
 }
 
-func _loadString(stream) {
+func loadString(stream *InputStream) {
+
 	stream.index = 0
-	stream.data = []
-	for i := 0; i < stream.strdata.length; i++ {
-		stream.data.push(stream.strdata.charCodeAt(i))
-	}
-	stream.size = stream.data.length
+	stream.data = []rune(stream.strdata)
+	stream.size = len(stream.data)
+
 }
 
 // Reset the stream so that it's in the same state it was
