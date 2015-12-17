@@ -151,5 +151,5 @@ func (this *ATN) getExpectedTokens( stateNumber, ctx ) {
     return expected
 }
 
-ATN.INVALID_ALT_NUMBER = 0
+var ATNINVALID_ALT_NUMBER = 0
 
