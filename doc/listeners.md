@@ -8,7 +8,7 @@ By default, ANTLR-generated parsers build a data structure called a parse tree o
 
 The interior nodes of the parse tree are phrase names that group and identify their children. The root node is the most abstract phrase name, in this case `stat` (short for statement). The leaves of a parse tree are always the input tokens. Parse trees sit between a language recognizer and an interpreter or translator implementation. They are extremely effective data structures because they contain all of the input and complete knowledge of how the parser grouped the symbols into phrases. Better yet, they are easy to understand and the parser generates them automatically (unless you turn them off with `parser.setBuildParseTree(false)`).
 
-Because we specify phrase structure with a set of rules, parse tree subtree roots correspond to grammar rule names. ANTLR has a ParseTreeWalker that knows how to walk these parse trees and trigger events in listener implementation objects that you can create. ANTLR generates listener interfaces for you also, unless you turn that off with a commandline option. You can also have it generate visitors. For example from a Java.g4 grammar, ANTLR generates:
+Because we specify phrase structure with a set of rules, parse tree subtree roots correspond to grammar rule names. ANTLR has a ParseTreeWalker that knows how to walk these parse trees and trigger events in listener implementation objects that you can create. The ANTLR tool generates listener interfaces for you also, unless you turn that off with a commandline option. You can also have it generate visitors. For example from a Java.g4 grammar, ANTLR generates:
 
 ```java
 public interface JavaListener extends ParseTreeListener<Token> {
@@ -27,11 +27,10 @@ Assuming you've created a listener object called `MyListener`, here is how to ca
 JavaLexer lexer = new JavaLexer(input);
 CommonTokenStream tokens = new CommonTokenStream(lexer);
 JavaParser parser = new JavaParser(tokens);
-ParserRuleContext tree = parser.compilationUnit(); // parse
- 
-ParseTreeWalker walker = new ParseTreeWalker(); // create standard walker
+JavaParser.CompilationUnitContext tree = parser.compilationUnit(); // parse a compilationUnit
+
 MyListener extractor = new MyListener(parser);
-walker.walk(extractor, tree); // initiate walk of tree with listener
+ParseTreeWalker.DEFAULT.walk(extractor, tree); // initiate walk of tree with listener in use of default walker
 ```
 
 Listeners and visitors are great because they keep application-specific code out of grammars, making grammars easier to read and preventing them from getting entangled with a particular application.
