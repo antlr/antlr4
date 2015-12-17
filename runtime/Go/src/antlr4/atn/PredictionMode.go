@@ -174,7 +174,7 @@ const (
 // the configurations to strip out all of the predicates so that a standard
 // {@link ATNConfigSet} will merge everything ignoring predicates.</p>
 //
-PredictionModehasSLLConflictTerminatingPrediction = function( mode, configs) {
+func PredictionModehasSLLConflictTerminatingPrediction( mode, configs ) {
     // Configs in rule stop states indicate reaching the end of the decision
     // rule (local context) or end of start rule (full context). If all
     // configs meet this condition, then none of the configurations is able

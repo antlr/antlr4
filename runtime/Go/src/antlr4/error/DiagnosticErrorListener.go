@@ -35,7 +35,7 @@ type DiagnosticErrorListener struct {
 
 func DiagnosticErrorListener(exactOnly bool) {
 
-	n = new(DiagnosticErrorListener)
+	n := new(DiagnosticErrorListener)
 
 	// whether all ambiguities or only exact ambiguities are reported.
 	n.exactOnly = exactOnly
@@ -75,7 +75,7 @@ func (this *DiagnosticErrorListener) reportContextSensitivity(recognizer *antlr4
 	recognizer.notifyErrorListeners(msg)
 }
 
-func (this *DiagnosticErrorListener) getDecisionDescription(recognizer, dfa *dfa.DFA) {
+func (this *DiagnosticErrorListener) getDecisionDescription(recognizer *antlr4.Parser, dfa *dfa.DFA) {
 	var decision = dfa.decision
 	var ruleIndex = dfa.atnStartState.ruleIndex
 

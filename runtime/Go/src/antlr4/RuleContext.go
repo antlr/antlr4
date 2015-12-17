@@ -36,8 +36,6 @@ type RuleContext struct {
 func NewRuleContext(parent *RuleContext, invokingState int)  *RuleContext {
 
 	rn := &RuleContext{tree.RuleNode{}}
-
-	rn.initRuleNode()
 	rn.initRuleContext(parent, invokingState)
 
 	return rn

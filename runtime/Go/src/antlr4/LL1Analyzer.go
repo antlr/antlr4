@@ -30,21 +30,20 @@ const (
 //
 // @param s the ATN state
 // @return the expected symbols for each outgoing transition of {@code s}.
-///
-func (la *LL1Analyzer) getDecisionLookahead(s) {
+func (la *LL1Analyzer) getDecisionLookahead(s *atn.ATNState) []*IntervalSet {
     if (s == nil) {
         return nil
     }
     var count = len(s.transitions)
-    var look = []
+    var look = make([]*IntervalSet)
     for alt := 0; alt < count; alt++ {
         look[alt] = NewIntervalSet()
-        var lookBusy = NewSet()
+        var lookBusy = NewSet(nil,nil)
         var seeThruPreds = false // fail to get lookahead upon pred
-        la._LOOK(s.transition(alt).target, nil, PredictionContext.EMPTY, look[alt], lookBusy, NewBitSet(), seeThruPreds, false)
+        la._LOOK(s.transitions(alt).target, nil, PredictionContextEMPTY, look[alt], lookBusy, NewBitSet(), seeThruPreds, false)
         // Wipe out lookahead for la alternative if we found nothing
         // or we had a predicate when we !seeThruPreds
-        if (look[alt].length==0 || look[alt].contains(LL1Analyzer.HIT_PRED)) {
+        if (look[alt].length==0 || look[alt].contains(LL1AnalyzerHIT_PRED)) {
             look[alt] = nil
         }
     }

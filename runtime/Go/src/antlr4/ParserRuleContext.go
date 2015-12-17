@@ -32,6 +32,7 @@ import (
 
 type ParserRuleContext struct {
 	RuleContext
+
 	ruleIndex int
 	children []RuleContext
 	start, stop *Token
@@ -225,8 +226,7 @@ type InterpreterRuleContext struct {
 func NewInterpreterRuleContext(parent *InterpreterRuleContext, invokingStateNumber, ruleIndex int) {
 
 	prc := new(InterpreterRuleContext)
-
-	prc.init(parent, invokingStateNumber)
+	prc.initParserRuleContext( parent, invokingStateNumber )
 
     prc.ruleIndex = ruleIndex
 

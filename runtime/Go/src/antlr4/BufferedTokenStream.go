@@ -168,13 +168,13 @@ func (bt *BufferedTokenStream) fetch(n int) int {
 }
 
 // Get all tokens from start..stop inclusively///
-func (bt *BufferedTokenStream) getTokens(start int, stop int, types []int) []Token {
+func (bt *BufferedTokenStream) getTokens(start int, stop int, types []int) []*Token {
 
 	if (start < 0 || stop < 0) {
 		return nil
 	}
 	bt.lazyInit()
-	var subset = []
+	var subset = (make[]*Token)
 	if (stop >= len(bt.tokens)) {
 		stop = len(bt.tokens) - 1
 	}
@@ -295,7 +295,12 @@ func (bt *BufferedTokenStream) getHiddenTokensToRight(tokenIndex, channel int) {
 	var nextOnChannel = bt.nextTokenOnChannel(tokenIndex + 1, LexerDefaultTokenChannel)
 	var from_ = tokenIndex + 1
 	// if none onchannel to right, nextOnChannel=-1 so set to = last token
-	var to = nextOnChannel == -1 ? len(bt.tokens) - 1 : nextOnChannel
+	var to int
+	if (nextOnChannel == -1){
+		to = len(bt.tokens) - 1
+	} else {
+		to = nextOnChannel
+	}
 	return bt.filterForChannel(from_, to, channel)
 }
 
@@ -305,7 +310,7 @@ func (bt *BufferedTokenStream) getHiddenTokensToRight(tokenIndex, channel int) {
 func (bt *BufferedTokenStream) getHiddenTokensToLeft(tokenIndex, channel int) {
 	bt.lazyInit()
 	if (tokenIndex < 0 || tokenIndex >= len(bt.tokens)) {
-		panic( "" + tokenIndex + " not in 0.." + len(bt.tokens) - 1
+		panic( "" + tokenIndex + " not in 0.." + len(bt.tokens) - 1 )
 	}
 	var prevOnChannel = bt.previousTokenOnChannel(tokenIndex - 1, LexerDefaultTokenChannel)
 	if (prevOnChannel == tokenIndex - 1) {

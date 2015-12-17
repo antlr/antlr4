@@ -1,15 +1,16 @@
 package atn
 
-//var DFAState = require('./../dfa/DFAState').DFAState
-//var ATNConfigSet = require('./ATNConfigSet').ATNConfigSet
-//var getCachedPredictionContext = require('./../PredictionContext').getCachedPredictionContext
+import (
+    "antlr4"
+    "antlr4/dfa"
+)
 
 type ATNSimulator struct {
     atn *ATN
-    sharedContextCache
+    sharedContextCache *antlr4.PredictionContextCache
 }
 
-func ATNSimulator(atn, sharedContextCache) {
+func ATNSimulator(atn *ATN, sharedContextCache *antlr4.PredictionContextCache) *ATNSimulator {
 	
     // The context cache maps all PredictionContext objects that are ==
     //  to a single cached copy. This cache is shared across all contexts
@@ -30,21 +31,23 @@ func ATNSimulator(atn, sharedContextCache) {
     //  whacked after each adaptivePredict(). It cost a little bit
     //  more time I think and doesn't save on the overall footprint
     //  so it's not worth the complexity.</p>
-    ///
+
+    this := new(ATNSimulator)
+
     this.atn = atn
     this.sharedContextCache = sharedContextCache
+
     return this
 }
 
 // Must distinguish between missing edge and edge we know leads nowhere///
-ATNSimulator.ERROR = NewDFAState(0x7FFFFFFF, NewATNConfigSet())
+var ATNSimulatorERROR = dfa.NewDFAState(0x7FFFFFFF, NewATNConfigSet())
 
-
-func (this *ATNSimulator) getCachedContext(context) {
-    if (this.sharedContextCache ==nil) {
+func (this *ATNSimulator) getCachedContext(context *antlr4.PredictionContext) *antlr4.PredictionContext {
+    if (this.sharedContextCache == nil) {
         return context
     }
-    var visited = {}
+    var visited = make(map[*antlr4.PredictionContext]*antlr4.PredictionContext)
     return getCachedPredictionContext(context, this.sharedContextCache, visited)
 }
 

@@ -1,4 +1,5 @@
 package atn
+import "antlr4"
 
 // The following images show the relation of states and
 // {@link ATNState//transitions} for various grammar constructs.
@@ -70,27 +71,32 @@ type ATNState struct {
 	ruleIndex int
 	epsilonOnlyTransitions bool
 	// Track the transitions emanating from this ATN state.
-	transitions []Transition
+	transitions []*Transition
 	// Used to cache lookahead during parsing, not used during construction
-	nextTokenWithinRule *Token
+	nextTokenWithinRule *antlr4.Token
 }
 
 func NewATNState() *ATNState {
 
 	as := new(ATNState)
-
-    // Which ATN are we in?
-    as.atn = nil
-    as.stateNumber = ATNStateINVALID_STATE_NUMBER
-    as.stateType = nil
-    as.ruleIndex = 0 // at runtime, we don't have Rule objects
-    as.epsilonOnlyTransitions = false
-    // Track the transitions emanating from this ATN state.
-    as.transitions = make([]Transition, 0)
-    // Used to cache lookahead during parsing, not used during construction
-    as.nextTokenWithinRule = nil
+	as.initATNState()
 
     return as
+}
+
+func (as *ATNState) initATNState(){
+
+	// Which ATN are we in?
+	as.atn = nil
+	as.stateNumber = ATNStateINVALID_STATE_NUMBER
+	as.stateType = nil
+	as.ruleIndex = 0 // at runtime, we don't have Rule objects
+	as.epsilonOnlyTransitions = false
+	// Track the transitions emanating from this ATN state.
+	as.transitions = make([]Transition, 0)
+	// Used to cache lookahead during parsing, not used during construction
+	as.nextTokenWithinRule = nil
+
 }
 
 const (
@@ -111,21 +117,21 @@ const (
 
 	ATNStateINVALID_STATE_NUMBER = -1
 )
-
-var ATNState.serializationNames = [
-            "INVALID",
-            "BASIC",
-            "RULE_START",
-            "BLOCK_START",
-            "PLUS_BLOCK_START",
-            "STAR_BLOCK_START",
-            "TOKEN_START",
-            "RULE_STOP",
-            "BLOCK_END",
-            "STAR_LOOP_BACK",
-            "STAR_LOOP_ENTRY",
-            "PLUS_LOOP_BACK",
-            "LOOP_END" ]
+//
+//var ATNState.serializationNames = [
+//            "INVALID",
+//            "BASIC",
+//            "RULE_START",
+//            "BLOCK_START",
+//            "PLUS_BLOCK_START",
+//            "STAR_BLOCK_START",
+//            "TOKEN_START",
+//            "RULE_STOP",
+//            "BLOCK_END",
+//            "STAR_LOOP_BACK",
+//            "STAR_LOOP_ENTRY",
+//            "PLUS_LOOP_BACK",
+//            "LOOP_END" ]
 
 func (this *ATNState) toString() string {
 	return this.stateNumber
@@ -143,71 +149,109 @@ func (this *ATNState) isNonGreedyExitState() {
     return false
 }
 
-
-func (this *ATNState) addTransition(trans int, index int) {
+func (this *ATNState) addTransition(trans *Transition, index int) {
     if ( len(this.transitions) == 0 ) {
         this.epsilonOnlyTransitions = trans.isEpsilon
     } else if(this.epsilonOnlyTransitions != trans.isEpsilon) {
         this.epsilonOnlyTransitions = false
     }
     if (index==-1) {
-        this.transitions.push(trans)
+		this.transitions = append(this.transitions, trans)
     } else {
         this.transitions.splice(index, 1, trans)
     }
 }
 
 type BasicState struct {
-
+	ATNState
 }
 
 func NewBasicState() *BasicState {
-	ATNState.call(this)
+	this := new(BasicState)
+	this.initATNState()
+
     this.stateType = ATNStateBASIC
     return this
 }
 
 type DecisionState struct {
+	ATNState
 
+	decision int
+	nonGreedy bool
 }
 
 func NewDecisionState() *DecisionState {
-	ATNState.call(this)
-    this.decision = -1
-    this.nonGreedy = false
+
+	this := new(DecisionState)
+
+	this.initATNState()
+	this.initDecisionState()
+
     return this
+}
+
+func (this *DecisionState) initDecisionState() {
+
+	this.decision = -1
+	this.nonGreedy = false
+
 }
 
 //  The start of a regular {@code (...)} block.
 type BlockStartState struct {
+	DecisionState
 
+	endState *ATNState
 }
 
 func NewBlockStartState() *BlockStartState {
-	DecisionState.call(this)
-	this.endState = nil
+
+	this := new(BlockStartState)
+
+	this.initATNState()
+	this.initDecisionState()
+
 	return this
 }
 
-type BasicBlockStartState struct {
+func (this *BlockStartState) initBlockStartState() {
+
+	this.endState = nil
 
 }
 
+type BasicBlockStartState struct {
+	BlockStartState
+}
+
 func NewBasicBlockStartState() *BasicBlockStartState {
-	BlockStartState.call(this)
+
+	this := new(BasicBlockStartState)
+
+	this.initATNState()
+	this.initDecisionState()
+	this.initBlockStartState()
+
 	this.stateType = ATNStateBLOCK_START
 	return this
 }
 
 // Terminal node of a simple {@code (a|b|c)} block.
 type BlockEndState struct {
+	ATNState
 
+	startState *ATNState
 }
 
 func NewBlockEndState() *BlockEndState {
-	ATNState.call(this)
+
+	this := new(BlockEndState)
+
+	this.initATNState()
 	this.stateType = ATNStateBLOCK_END
     this.startState = nil
+
     return this
 }
 
@@ -217,24 +261,33 @@ func NewBlockEndState() *BlockEndState {
 //  error handling.
 //
 type RuleStopState struct {
-
+	ATNState
 }
 
 func NewRuleStopState() *RuleStopState {
-	ATNState.call(this)
+	this := new(RuleStopState)
+
+	this.initATNState()
     this.stateType = ATNStateRULE_STOP
     return this
 }
 
 type RuleStartState struct {
+	ATNState
 
+	stopState *ATNState
+	isPrecedenceRule bool
 }
 
 func NewRuleStartState() *RuleStartState {
-	ATNState.call(this)
+
+	this := new(RuleStartState)
+
+	this.initATNState()
 	this.stateType = ATNStateRULE_START
 	this.stopState = nil
 	this.isPrecedenceRule = false
+
 	return this
 }
 
@@ -242,11 +295,17 @@ func NewRuleStartState() *RuleStartState {
 //  one to the loop back to start of the block and one to exit.
 //
 type PlusLoopbackState struct {
-
+	BlockStartState
 }
 
 func NewPlusLoopbackState() *PlusLoopbackState {
-	DecisionState.call(this)
+
+	this := new(PlusLoopbackState)
+
+	this.initATNState()
+	this.initDecisionState()
+	this.initBlockStartState()
+
 	this.stateType = ATNStatePLUS_LOOP_BACK
 	return this
 }
@@ -257,72 +316,113 @@ func NewPlusLoopbackState() *PlusLoopbackState {
 //  real decision-making note for {@code A+}.
 //
 type PlusBlockStartState struct {
+	BlockStartState
 
+	loopBackState *ATNState
 }
 
 func NewPlusBlockStartState() *PlusBlockStartState {
-	BlockStartState.call(this)
+
+	this := new(PlusBlockStartState)
+
+	this.initATNState()
+	this.initDecisionState()
+	this.initBlockStartState()
+
 	this.stateType = ATNStatePLUS_BLOCK_START
     this.loopBackState = nil
+
     return this
 }
 
 // The block that begins a closure loop.
 type StarBlockStartState struct {
-
+	BlockStartState
 }
 
 func NewStarBlockStartState() *StarBlockStartState {
-	BlockStartState.call(this)
+
+	this := new(StarBlockStartState)
+
+	this.initATNState()
+	this.initDecisionState()
+	this.initBlockStartState()
+
 	this.stateType = ATNStateSTAR_BLOCK_START
+
 	return this
 }
 
 
 type StarLoopbackState struct {
-
+	ATNState
 }
 
 func NewStarLoopbackState() *StarLoopbackState {
-	ATNState.call(this)
+
+	this := new(StarLoopbackState)
+
+	this.initATNState()
+
 	this.stateType = ATNStateSTAR_LOOP_BACK
 	return this
 }
 
 
 type StarLoopEntryState struct {
+	DecisionState
 
+	loopBackState *ATNState
+	precedenceRuleDecision bool
 }
 
 func NewStarLoopEntryState() *StarLoopEntryState {
-	DecisionState.call(this)
+
+	this := new(StarLoopEntryState)
+
+	this.initATNState()
+	this.initDecisionState()
+
 	this.stateType = ATNStateSTAR_LOOP_ENTRY
     this.loopBackState = nil
+
     // Indicates whether this state can benefit from a precedence DFA during SLL decision making.
-    this.precedenceRuleDecision = nil
+    this.precedenceRuleDecision = false
+
     return this
 }
 
 
 // Mark the end of a * or + loop.
 type LoopEndState struct {
-
+	ATNState
+	loopBackState *ATNState
 }
 
 func NewLoopEndState() *LoopEndState {
-	ATNState.call(this)
+
+	this := new(LoopEndState)
+
+	this.initATNState()
+
 	this.stateType = ATNStateLOOP_END
 	this.loopBackState = nil
+
 	return this
 }
 
 // The Tokens rule start state linking to each lexer rule start state */
 type TokensStartState struct {
-
+	DecisionState
 }
 
 func NewTokensStartState() *TokensStartState {
-	DecisionState.call(this)
+
+	this := new(TokensStartState)
+
+	this.initATNState()
+	this.initDecisionState()
+
 	this.stateType = ATNStateTOKEN_START
 	return this
 }

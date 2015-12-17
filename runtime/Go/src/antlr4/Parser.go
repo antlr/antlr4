@@ -101,7 +101,7 @@ func (p *Parser) reset() {
 	p._precedenceStack = make([]int, 0)
 	p._precedenceStack.Push(0)
 	if (p._interp != nil) {
-		p._interp.reset()
+		*p._interp.reset()
 	}
 }
 
@@ -154,7 +154,7 @@ func (p *Parser) match(ttype int) *Token {
 // a wildcard and the error strategy could not recover from the mismatched
 // symbol
 
-func (p *Parser) matchWildcard() {
+func (p *Parser) matchWildcard() *Token {
 	var t = p.getCurrentToken()
 	if (t.tokenType > 0) {
 		p._errHandler.reportMatch(p)
@@ -171,8 +171,11 @@ func (p *Parser) matchWildcard() {
 	return t
 }
 
-func (p *Parser) getParseListeners() {
-	return p._parseListeners || []
+func (p *Parser) getParseListeners() []*tree.ParseTreeListener {
+	if (p._parseListeners == nil){
+		return make([]*tree.ParseTreeListener)
+	}
+	return p._parseListeners
 }
 
 // Registers {@code listener} to receive events during the parsing process.
@@ -392,19 +395,19 @@ func (p *Parser) consume() {
 	if (o.tokenType != TokenEOF) {
 		p.getInputStream().consume()
 	}
-	var hasListener = p._parseListeners != nil && p._parseListeners.length > 0
+	var hasListener = p._parseListeners != nil && len(p._parseListeners) > 0
 	if (p.buildParseTrees || hasListener) {
-		var node
-		if (p._errHandler.inErrorRecoveryMode(p.) {
+		var node *tree.ErrorNodeImpl
+		if (p._errHandler.inErrorRecoveryMode(p)) {
 			node = p._ctx.addErrorNode(o)
 		} else {
 			node = p._ctx.addTokenNode(o)
 		}
         node.invokingState = p.state
 		if (hasListener) {
-			p._parseListeners.map(function(listener) {
-				listener.visitTerminal(node)
-			})
+			for _, l := range p._parseListeners {
+				l.visitTerminal(node)
+			}
 		}
 	}
 	return o
@@ -420,7 +423,7 @@ func (p *Parser) addContextToParseTree() {
 // Always called by generated parsers upon entry to a rule. Access field
 // {@link //_ctx} get the current context.
 
-func (p *Parser) enterRule(localctx, state, ruleIndex int) {
+func (p *Parser) enterRule(localctx *ParserRuleContext, state, ruleIndex int) {
 	p.state = state
 	p._ctx = localctx
 	p._ctx.start = p._input.LT(1)
@@ -442,7 +445,7 @@ func (p *Parser) exitRule() {
 	p._ctx = p._ctx.parentCtx
 }
 
-func (p *Parser) enterOuterAlt(localctx, altNum) {
+func (p *Parser) enterOuterAlt(localctx *ParserRuleContext, altNum int) {
 	// if we have Newlocalctx, make sure we replace existing ctx
 	// that is previous child of parse tree
 	if (p.buildParseTrees && p._ctx != localctx) {
@@ -459,17 +462,17 @@ func (p *Parser) enterOuterAlt(localctx, altNum) {
 // @return The precedence level for the top-most precedence rule, or -1 if
 // the parser context is not nested within a precedence rule.
 
-func (p *Parser) getPrecedence() {
-	if (p._precedenceStack.length == 0) {
+func (p *Parser) getPrecedence() int {
+	if ( len(p._precedenceStack) == 0) {
 		return -1
 	} else {
-		return p._precedenceStack[p._precedenceStack.length-1]
+		return p._precedenceStack[ len(p._precedenceStack) -1]
 	}
 }
 
-func (p *Parser) enterRecursionRule(localctx, state, ruleIndex, precedence) {
+func (p *Parser) enterRecursionRule(localctx *ParserRuleContext, state, ruleIndex, precedence int) {
 	p.state = state
-	p._precedenceStack.push(precedence)
+	p._precedenceStack.Push(precedence)
 	p._ctx = localctx
 	p._ctx.start = p._input.LT(1)
 	if (p._parseListeners != nil) {
@@ -481,7 +484,7 @@ func (p *Parser) enterRecursionRule(localctx, state, ruleIndex, precedence) {
 //
 // Like {@link //enterRule} but for recursive rules.
 
-func (p *Parser) pushNewRecursionContext(localctx, state, ruleIndex) {
+func (p *Parser) pushNewRecursionContext(localctx *ParserRuleContext, state, ruleIndex int) {
 	var previous = p._ctx
 	previous.parentCtx = localctx
 	previous.invokingState = state
@@ -498,8 +501,8 @@ func (p *Parser) pushNewRecursionContext(localctx, state, ruleIndex) {
 	}
 }
 
-func (p *Parser) unrollRecursionContexts(parentCtx) {
-	p._precedenceStack.pop()
+func (p *Parser) unrollRecursionContexts(parentCtx *ParserRuleContext) {
+	p._precedenceStack.Pop()
 	p._ctx.stop = p._input.LT(-1)
 	var retCtx = p._ctx // save current ctx (return value)
 	// unroll so _ctx is as it was before call to recursive method
@@ -519,7 +522,7 @@ func (p *Parser) unrollRecursionContexts(parentCtx) {
 	}
 }
 
-func (p *Parser) getInvokingContext(ruleIndex) {
+func (p *Parser) getInvokingContext(ruleIndex int) *ParserRuleContext {
 	var ctx = p._ctx
 	for (ctx != nil) {
 		if (ctx.ruleIndex == ruleIndex) {
@@ -530,11 +533,11 @@ func (p *Parser) getInvokingContext(ruleIndex) {
 	return nil
 }
 
-func (p *Parser) precpred(localctx, precedence) {
-	return precedence >= p._precedenceStack[p._precedenceStack.length-1]
+func (p *Parser) precpred(localctx, precedence int) {
+	return precedence >= p._precedenceStack[ len(p._precedenceStack) -1]
 }
 
-func (p *Parser) inContext(context) {
+func (p *Parser) inContext(context *ParserRuleContext) bool {
 	// TODO: useful in parser?
 	return false
 }
@@ -553,8 +556,8 @@ func (p *Parser) inContext(context) {
 // @return {@code true} if {@code symbol} can follow the current state in
 // the ATN, otherwise {@code false}.
 
-func (p *Parser) isExpectedToken(symbol) {
-	var atn = p._interp.atn
+func (p *Parser) isExpectedToken(symbol *Token) bool {
+	var atn *atn.ATN = p._interp.atn
 	var ctx = p._ctx
 	var s = atn.states[p.state]
 	var following = atn.nextTokens(s)
@@ -586,11 +589,11 @@ func (p *Parser) isExpectedToken(symbol) {
 //
 // @see ATN//getExpectedTokens(int, RuleContext)
 //
-func (p *Parser) getExpectedTokens() {
+func (p *Parser) getExpectedTokens() []*Token {
 	return p._interp.atn.getExpectedTokens(p.state, p._ctx)
 }
 
-func (p *Parser) getExpectedTokensWithinCurrentRule() {
+func (p *Parser) getExpectedTokensWithinCurrentRule() []*Token {
 	var atn = p._interp.atn
 	var s = atn.states[p.state]
 	return atn.nextTokens(s)
@@ -611,31 +614,31 @@ func (p *Parser) getRuleIndex(ruleName string) int {
 // you want more details such as the file/line info of where
 // in the ATN a rule is invoked.
 //
-// p.is very useful for error messages.
-//
-func (p *Parser) getRuleInvocationStack(p) {
-	p = p || nil
+// this very useful for error messages.
+
+func (this *Parser) getRuleInvocationStack(p *ParserRuleContext) []string {
 	if (p == nil) {
-		p = p._ctx
+		p = this._ctx;
 	}
-	var stack = []
+	var stack = make([]string)
 	for (p != nil) {
 		// compute what follows who invoked us
-		var ruleIndex = p.ruleIndex
+		var ruleIndex = p.ruleIndex;
 		if (ruleIndex < 0) {
-			stack.push("n/a")
+			stack = append(stack, "n/a")
 		} else {
-			stack.push(p.ruleNames[ruleIndex])
+			stack = append(stack, this.getRuleNames()[ruleIndex]);
 		}
-		p = p.parentCtx
+		p = p.parentCtx;
 	}
-	return stack
-}
+	return stack;
+};
 
 // For debugging and other purposes.//
 func (p *Parser) getDFAStrings() {
 	return p._interp.decisionToDFA.toString()
 }
+
 // For debugging and other purposes.//
 func (p *Parser) dumpDFA() {
 	var seenOne = false
