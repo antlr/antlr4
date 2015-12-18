@@ -352,7 +352,7 @@ function OR(a, b) {
 OR.prototype = Object.create(SemanticContext.prototype);
 OR.prototype.constructor = OR;
 
-OR.prototype.constructor = function(other) {
+OR.prototype.equals = function(other) {
 	if (this === other) {
 		return true;
 	} else if (!(other instanceof OR)) {
@@ -402,13 +402,17 @@ OR.prototype.evalPrecedence = function(parser, outerContext) {
 		return null;
 	}
 	var result = null;
-	operands.map(function(o) {
-		return result === null ? o : SemanticContext.orContext(result, o);
+	operands.forEach(function(o) {
+		if (result === null) {
+			result = o
+		} else {
+			result = SemanticContext.orContext(result, o);
+		}
 	});
 	return result;
 };
 
-AND.prototype.toString = function() {
+OR.prototype.toString = function() {
 	var s = "";
 	this.opnds.map(function(o) {
 		s += "|| " + o.toString();
