@@ -44,20 +44,20 @@ func NewCommonTokenFactory(copyText bool) *CommonTokenFactory {
 //
 var CommonTokenFactoryDEFAULT = NewCommonTokenFactory(false)
 
-func (this *CommonTokenFactory) create(source *TokenSource, ttype, text, channel, start, stop, line, column int) *CommonToken {
+func (this *CommonTokenFactory) create(source *TokenFactorySourcePair, ttype, text, channel, start, stop, line, column int) *CommonToken {
     var t = NewCommonToken(source, ttype, channel, start, stop)
     t.line = line
     t.column = column
     if (text !=nil) {
         t.text = text
     } else if (this.copyText && source[1] !=nil) {
-        t.text = source[1].getText(start,stop)
+        t.text = source.inputStream.getText(start,stop)
     }
     return t
 }
 
 func (this *CommonTokenFactory) createThin(ttype int, text string) *CommonToken {
-    var t = NewCommonToken(nil, ttype)
+    var t = NewCommonToken(nil, ttype, TokenDefaultChannel, -1, -1)
     t.text = text
     return t
 }

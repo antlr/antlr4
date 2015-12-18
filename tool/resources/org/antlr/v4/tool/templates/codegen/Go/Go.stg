@@ -666,12 +666,10 @@ type <struct.name> struct {
 }
 
 func New<struct.name>(parser *antlr4.Parser, parent *antlr4.ParserRuleContext, invokingState int<struct.ctorAttrs:{a | , <a.name>}>) <struct.name> {
-	// if( invokingState==nil ) {
-	//	invokingState = -1
-	//}
-	<superClass>.call(this, parent, invokingState) // TODO
 
-	var p = new(<struct.name>)
+    var p = new(<struct.name>)
+    p.initParserRuleContext( parent, invokingState )
+
     p.parser = parser
     p.ruleIndex = <parser.name>RULE_<struct.derivedFromName>
     <attrs:{a | <a>}; separator="\n">
@@ -705,6 +703,8 @@ func New<struct.name>(parser *antlr4.Parser, ctx *antlr4.ParserRuleContext) <str
     var p = new(<struct.name>)
 
 	<currentRule.name; format="cap">Context.call(this, parser)
+
+
     <attrs:{a | <a>;}; separator="\n">
     <currentRule.name; format="cap">Context.prototype.copyFrom.call(this, ctx)
 
@@ -822,7 +822,7 @@ type <lexer.name> struct {
     EOF string
 }
 
-func New<lexer.name>(input *antlr4.TokenStream) <lexer.name> {
+func New<lexer.name>(input *antlr4.TokenStream) *<lexer.name> {
 
     // TODO could be package level variables
 
@@ -837,7 +837,7 @@ func New<lexer.name>(input *antlr4.TokenStream) <lexer.name> {
 
 	lex := new(<lexer.name>)
 
-	antlr4.InitLexer(lex, input);
+	antlr4.initLexer(lex, input);
 
     lex._interp = atn.NewLexerATNSimulator(lex, atn, decisionToDFA, antlr4.NewPredictionContextCache())
     lex.modeNames = [...]string{ <lexer.modes:{m| "<m>"}; separator=", ", wrap, anchor> }

@@ -1,5 +1,8 @@
 package atn
-import "antlr4/dfa"
+import (
+	"antlr4/dfa"
+	"fmt"
+)
 
 // When we hit an accept state in either the DFA or the ATN, we
 //  have to notify the character stream to start buffering characters
@@ -343,8 +346,7 @@ func (this *LexerATNSimulator) computeStartState(input, p) {
 //
 // @return {@code true} if an accept state is reached, otherwise
 // {@code false}.
-func (this *LexerATNSimulator) closure(input, config, configs,
-		currentAltReachedAcceptState, speculative, treatEofAsEpsilon) {
+func (this *LexerATNSimulator) closure(input, config, configs, currentAltReachedAcceptState, speculative, treatEofAsEpsilon) {
 	var cfg = nil
 	if (this.debug) {
 		fmt.Println("closure(" + config.toString(this.recog, true) + ")")

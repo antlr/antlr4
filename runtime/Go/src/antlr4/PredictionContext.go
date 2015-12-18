@@ -1,4 +1,5 @@
 package antlr4
+
 import (
 	"antlr4/atn"
 	"fmt"
