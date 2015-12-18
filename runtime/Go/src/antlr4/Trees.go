@@ -1,75 +1,70 @@
 package antlr4
-
-//var Utils = require('./../Utils')
-//var Token = require('./../Token').Token
-//var RuleNode = require('./Tree').RuleNode
-//var ErrorNode = require('./Tree').ErrorNode
-//var TerminalNode = require('./Tree').TerminalNode
-//var ParserRuleContext = require('./../ParserRuleContext').ParserRuleContext
+import "fmt"
 
 /** A set of utility routines useful for all kinds of ANTLR trees. */
-type Trees struct {
-}
 
 // Print out a whole tree in LISP form. {@link //getNodeText} is used on the
 //  node payloads to get the text for the nodes.  Detect
 //  parse trees and extract data appropriately.
-Trees.toStringTree = function(tree, ruleNames, recog) {
-	ruleNames = ruleNames || nil
-	recog = recog || nil
+func TreestoStringTree(tree *Tree, ruleNames []string, recog *Parser) string {
+
     if(recog!=nil) {
-       ruleNames = recog.ruleNames
+       ruleNames = recog.getRuleNames()
     }
-    var s = Trees.getNodeText(tree, ruleNames)
-    s = Utils.escapeWhitespace(s, false)
+
+    var s = TreesgetNodeText(tree, ruleNames, nil)
+
+    s = EscapeWhitespace(s, false)
     var c = tree.getChildCount()
     if(c==0) {
         return s
     }
     var res = "(" + s + ' '
     if(c>0) {
-        s = Trees.toStringTree(tree.getChild(0), ruleNames)
-        res = res.concat(s)
+        s = TreestoStringTree(tree.getChild(0), ruleNames, nil)
+        res += s
     }
-    for(var i=1i<ci++) {
-        s = Trees.toStringTree(tree.getChild(i), ruleNames)
-        res = res.concat(' ' + s)
+    for i :=1; i<c; i++ {
+        s = TreestoStringTree(tree.getChild(i), ruleNames, nil)
+        res += (' ' + s)
     }
-    res = res.concat(")")
+    res += ")"
     return res
 }
 
-Trees.getNodeText = function(t, ruleNames, recog) {
-	ruleNames = ruleNames || nil
-	recog = recog || nil
+func TreesgetNodeText(t *Tree, ruleNames []string, recog *Parser) string {
+
     if(recog!=nil) {
-        ruleNames = recog.ruleNames
+        ruleNames = recog.getRuleNames()
     }
+
     if(ruleNames!=nil) {
-       if _, ok := t.(RuleNode); ok {
-           return ruleNames[t.getRuleContext().ruleIndex]
-       } else if ( t instanceof ErrorNode) {
-           return t.toString()
-       } else if_, ok := t.(TerminalNode); ok {
-           if(t.symbol!=nil) {
-               return t.symbol.text
+       if t2, ok := t.(*RuleNode); ok {
+           return ruleNames[t2.getRuleContext().ruleIndex]
+       } else if t2, ok := t.(*ErrorNode); ok {
+           return fmt.Printf(t2)
+       } else if t2, ok := t.(*TerminalNode); ok {
+           if(t2.getSymbol()!=nil) {
+               return t2.getSymbol().text
            }
        }
     }
+
     // no recog for rule names
     var payload = t.getPayload()
-    if (payload instanceof Token ) {
-       return payload.text
+    if p2, ok := payload.(*Token); ok {
+       return p2.text
     }
-    return t.getPayload().toString()
+
+    return fmt.Printf(t.getPayload())
 }
 
 
 // Return ordered list of all children of this node
-Trees.getChildren = function(t) {
-	var list = []
-	for(var i=0i<t.getChildCount()i++) {
-		list.push(t.getChild(i))
+func TreesgetChildren(t *Tree) []*Tree {
+	var list = make([]*Tree)
+	for i := 0;i< t.getChildCount();i++ {
+		list = append(list, t.getChild(i))
 	}
 	return list
 }
@@ -77,51 +72,56 @@ Trees.getChildren = function(t) {
 // Return a list of all ancestors of this node.  The first node of
 //  list is the root and the last is the parent of this node.
 //
-Trees.getAncestors = function(t) {
-    var ancestors = []
+func TreesgetAncestors(t *Tree) []*Tree {
+    var ancestors = make([]*Tree)
     t = t.getParent()
-    while(t!=nil) {
-        ancestors = [t].concat(ancestors)
+    for(t!=nil) {
+		f := make([]*Tree, t)
+		ancestors = append(f, ancestors...)
         t = t.getParent()
     }
     return ancestors
 }
    
-Trees.findAllTokenNodes = function(t, ttype) {
-    return Trees.findAllNodes(t, ttype, true)
+func TreesfindAllTokenNodes(t *ParseTree, ttype int) []*ParseTree {
+    return TreesfindAllNodes(t, ttype, true)
 }
 
-Trees.findAllRuleNodes = function(t, ruleIndex) {
-	return Trees.findAllNodes(t, ruleIndex, false)
+func TreesfindAllRuleNodes(t *ParseTree, ruleIndex int) []*ParseTree  {
+	return TreesfindAllNodes(t, ruleIndex, false)
 }
 
-Trees.findAllNodes = function(t, index, findTokens) {
-	var nodes = []
-	Trees._findAllNodes(t, index, findTokens, nodes)
+func TreesfindAllNodes(t *ParseTree, index int, findTokens bool) {
+	var nodes = make([]*ParseTree)
+	Trees_findAllNodes(t, index, findTokens, nodes)
 	return nodes
 }
 
-Trees._findAllNodes = function(t, index, findTokens, nodes) {
+func Trees_findAllNodes(t *ParseTree, index int, findTokens bool, nodes []*ParseTree) {
 	// check this node (the root) first
-	if(findTokens && _, ok := t.(TerminalNode); ok) {
-		if(t.symbol.type==index) {
-			nodes.push(t)
+
+	t2, ok := t.(*TerminalNode)
+	t3, ok2 := t.(*ParserRuleContext)
+
+	if findTokens && ok {
+		if(t2.getSymbol().tokenType==index) {
+			nodes = append(nodes, t2)
 		}
-	} else if(!findTokens && _, ok := t.(ParserRuleContext); ok) {
-		if(t.ruleIndex==index) {
-			nodes.push(t)
+	} else if(!findTokens && ok2) {
+		if(t3.ruleIndex==index) {
+			nodes = append(nodes, t3)
 		}
 	}
 	// check children
-	for(var i=0i<t.getChildCount()i++) {
-		Trees._findAllNodes(t.getChild(i), index, findTokens, nodes)
+	for i := 0;i<t.getChildCount(); i++ {
+		Trees_findAllNodes(t.getChild(i), index, findTokens, nodes)
 	}
 }
 
-Trees.descendants = function(t) {
-	var nodes = [t]
-    for(var i=0i<t.getChildCount()i++) {
-        nodes = nodes.concat(Trees.descendants(t.getChild(i)))
+func Treesdescendants(t *ParseTree) []*ParseTree {
+	var nodes = make([]*ParseTree, t)
+    for i := 0; i<t.getChildCount(); i++ {
+		nodes = append(nodes, Treesdescendants(t.getChild(i))...)
     }
     return nodes
 }
