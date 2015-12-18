@@ -129,7 +129,7 @@ func (this *ATNConfigSet) add(config *ATNConfig, mergeCache DoubleDict) bool {
 }
 
 func (this *ATNConfigSet) getStates() {
-	var states = NewSet()
+	var states = NewSet(nil,nil)
 	for i := 0; i < len(this.configs); i++ {
 		states.add(this.configs[i].state)
 	}

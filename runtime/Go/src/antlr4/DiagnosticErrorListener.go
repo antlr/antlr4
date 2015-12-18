@@ -1,4 +1,5 @@
 package antlr4
+import "strings"
 
 //
 // This implementation of {@link ANTLRErrorListener} can be used to identify
@@ -19,16 +20,13 @@ package antlr4
 // this situation occurs.</li>
 // </ul>
 
-//var BitSet = require('./../Utils').BitSet
-//var ErrorListener = require('./ErrorListener').ErrorListener
-//var Interval = require('./../IntervalSet').Interval
-
 type DiagnosticErrorListener struct {
 	ErrorListener
+
 	exactOnly bool
 }
 
-func DiagnosticErrorListener(exactOnly bool) {
+func NewDiagnosticErrorListener(exactOnly bool) *DiagnosticErrorListener {
 
 	n := new(DiagnosticErrorListener)
 
@@ -36,9 +34,6 @@ func DiagnosticErrorListener(exactOnly bool) {
 	n.exactOnly = exactOnly
 	return n
 }
-
-//DiagnosticErrorListener.prototype = Object.create(ErrorListener.prototype)
-//DiagnosticErrorListener.prototype.constructor = DiagnosticErrorListener
 
 func (this *DiagnosticErrorListener) reportAmbiguity(recognizer *Parser, dfa *DFA, startIndex, stopIndex int, exact bool, ambigAlts *BitSet, configs *ATNConfigSet) {
 	if (this.exactOnly && !exact) {
@@ -49,8 +44,8 @@ func (this *DiagnosticErrorListener) reportAmbiguity(recognizer *Parser, dfa *DF
 			": ambigAlts=" +
 			this.getConflictingAlts(ambigAlts, configs) +
 			", input='" +
-			recognizer.getTokenStream().getText(NewInterval(startIndex, stopIndex)) + "'"
-	recognizer.notifyErrorListeners(msg)
+			recognizer.getTokenStream().getTextFromInterval(NewInterval(startIndex, stopIndex)) + "'"
+	recognizer.notifyErrorListeners(msg, nil, nil)
 }
 
 func (this *DiagnosticErrorListener) reportAttemptingFullContext(recognizer *Parser, dfa *DFA, startIndex, stopIndex int, conflictingAlts *BitSet, configs *ATNConfigSet) {
@@ -58,28 +53,28 @@ func (this *DiagnosticErrorListener) reportAttemptingFullContext(recognizer *Par
 	var msg = "reportAttemptingFullContext d=" +
 			this.getDecisionDescription(recognizer, dfa) +
 			", input='" +
-			recognizer.getTokenStream().getText(NewInterval(startIndex, stopIndex)) + "'"
-	recognizer.notifyErrorListeners(msg)
+			recognizer.getTokenStream().getTextFromInterval(NewInterval(startIndex, stopIndex)) + "'"
+	recognizer.notifyErrorListeners(msg, nil, nil)
 }
 
 func (this *DiagnosticErrorListener) reportContextSensitivity(recognizer *Parser, dfa *DFA, startIndex, stopIndex, prediction int, configs *ATNConfigSet) {
 	var msg = "reportContextSensitivity d=" +
 			this.getDecisionDescription(recognizer, dfa) +
 			", input='" +
-			recognizer.getTokenStream().getText(NewInterval(startIndex, stopIndex)) + "'"
-	recognizer.notifyErrorListeners(msg)
+			recognizer.getTokenStream().getTextFromInterval(NewInterval(startIndex, stopIndex)) + "'"
+	recognizer.notifyErrorListeners(msg, nil, nil)
 }
 
 func (this *DiagnosticErrorListener) getDecisionDescription(recognizer *Parser, dfa *DFA) {
 	var decision = dfa.decision
 	var ruleIndex = dfa.atnStartState.ruleIndex
 
-	var ruleNames = recognizer.ruleNames
-	if (ruleIndex < 0 || ruleIndex >= ruleNames.length) {
+	var ruleNames = recognizer.getRuleNames()
+	if (ruleIndex < 0 || ruleIndex >= len(ruleNames)) {
 		return "" + decision
 	}
 	var ruleName = ruleNames[ruleIndex] || nil
-	if (ruleName == nil || ruleName.length == 0) {
+	if (ruleName == nil || len(ruleName) == 0) {
 		return "" + decision
 	}
 	return "" + decision + " (" + ruleName + ")"
@@ -96,13 +91,13 @@ func (this *DiagnosticErrorListener) getDecisionDescription(recognizer *Parser, 
 // @return Returns {@code reportedAlts} if it is not {@code nil}, otherwise
 // returns the set of alternatives represented in {@code configs}.
 //
-func (this *DiagnosticErrorListener) getConflictingAlts(reportedAlts, configs) {
+func (this *DiagnosticErrorListener) getConflictingAlts(reportedAlts *BitSet, set *ATNConfigSet) *BitSet {
 	if (reportedAlts != nil) {
 		return reportedAlts
 	}
 	var result = NewBitSet()
-	for i := 0; i < len(configs.items); i++ {
-		result.add(configs.items[i].alt)
+	for i := 0; i < len(set.configs); i++ {
+		result.add(set.configs[i].alt)
 	}
-	return "{" + result.values().join(", ") + "}"
+	return "{" + strings.Join(result.values(), ", ") + "}"
 }
