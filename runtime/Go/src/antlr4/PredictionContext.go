@@ -712,8 +712,12 @@ func combineCommonParents(parents []*PredictionContext) {
 	}
 }
 
-//func getCachedPredictionContext(context *PredictionContext, contextCache *PredictionContextCache, visited) *PredictionContext {
-//	if (context.isEmpty()) {
+func getCachedPredictionContext(context *PredictionContext, contextCache *PredictionContextCache, visited map[*PredictionContext]*PredictionContext) *PredictionContext {
+
+	panic("getCachedPredictionContext not implemented")
+
+	return nil
+	//	if (context.isEmpty()) {
 //		return context
 //	}
 //	var existing = visited[context] || nil
@@ -758,7 +762,7 @@ func combineCommonParents(parents []*PredictionContext) {
 //	visited[context] = updated
 //
 //	return updated
-//}
+}
 
 // ter's recursive version of Sam's getAllNodes()
 //func getAllContextNodes(context, nodes, visited) {

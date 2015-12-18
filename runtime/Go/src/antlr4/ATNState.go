@@ -78,12 +78,12 @@ type ATNState struct {
 func NewATNState() *ATNState {
 
 	as := new(ATNState)
-	as.initATNState()
+	as.InitATNState()
 
     return as
 }
 
-func (as *ATNState) initATNState(){
+func (as *ATNState) InitATNState(){
 
 	// Which ATN are we in?
 	as.atn = nil
@@ -167,7 +167,7 @@ type BasicState struct {
 
 func NewBasicState() *BasicState {
 	this := new(BasicState)
-	this.initATNState()
+	this.InitATNState()
 
     this.stateType = ATNStateBASIC
     return this
@@ -184,13 +184,13 @@ func NewDecisionState() *DecisionState {
 
 	this := new(DecisionState)
 
-	this.initATNState()
-	this.initDecisionState()
+	this.InitATNState()
+	this.InitDecisionState()
 
     return this
 }
 
-func (this *DecisionState) initDecisionState() {
+func (this *DecisionState) InitDecisionState() {
 
 	this.decision = -1
 	this.nonGreedy = false
@@ -208,13 +208,13 @@ func NewBlockStartState() *BlockStartState {
 
 	this := new(BlockStartState)
 
-	this.initATNState()
-	this.initDecisionState()
+	this.InitATNState()
+	this.InitDecisionState()
 
 	return this
 }
 
-func (this *BlockStartState) initBlockStartState() {
+func (this *BlockStartState) InitBlockStartState() {
 
 	this.endState = nil
 
@@ -228,9 +228,9 @@ func NewBasicBlockStartState() *BasicBlockStartState {
 
 	this := new(BasicBlockStartState)
 
-	this.initATNState()
-	this.initDecisionState()
-	this.initBlockStartState()
+	this.InitATNState()
+	this.InitDecisionState()
+	this.InitBlockStartState()
 
 	this.stateType = ATNStateBLOCK_START
 	return this
@@ -247,7 +247,7 @@ func NewBlockEndState() *BlockEndState {
 
 	this := new(BlockEndState)
 
-	this.initATNState()
+	this.InitATNState()
 	this.stateType = ATNStateBLOCK_END
     this.startState = nil
 
@@ -266,7 +266,7 @@ type RuleStopState struct {
 func NewRuleStopState() *RuleStopState {
 	this := new(RuleStopState)
 
-	this.initATNState()
+	this.InitATNState()
     this.stateType = ATNStateRULE_STOP
     return this
 }
@@ -282,7 +282,7 @@ func NewRuleStartState() *RuleStartState {
 
 	this := new(RuleStartState)
 
-	this.initATNState()
+	this.InitATNState()
 	this.stateType = ATNStateRULE_START
 	this.stopState = nil
 	this.isPrecedenceRule = false
@@ -301,9 +301,9 @@ func NewPlusLoopbackState() *PlusLoopbackState {
 
 	this := new(PlusLoopbackState)
 
-	this.initATNState()
-	this.initDecisionState()
-	this.initBlockStartState()
+	this.InitATNState()
+	this.InitDecisionState()
+	this.InitBlockStartState()
 
 	this.stateType = ATNStatePLUS_LOOP_BACK
 	return this
@@ -324,9 +324,9 @@ func NewPlusBlockStartState() *PlusBlockStartState {
 
 	this := new(PlusBlockStartState)
 
-	this.initATNState()
-	this.initDecisionState()
-	this.initBlockStartState()
+	this.InitATNState()
+	this.InitDecisionState()
+	this.InitBlockStartState()
 
 	this.stateType = ATNStatePLUS_BLOCK_START
     this.loopBackState = nil
@@ -343,9 +343,9 @@ func NewStarBlockStartState() *StarBlockStartState {
 
 	this := new(StarBlockStartState)
 
-	this.initATNState()
-	this.initDecisionState()
-	this.initBlockStartState()
+	this.InitATNState()
+	this.InitDecisionState()
+	this.InitBlockStartState()
 
 	this.stateType = ATNStateSTAR_BLOCK_START
 
@@ -361,7 +361,7 @@ func NewStarLoopbackState() *StarLoopbackState {
 
 	this := new(StarLoopbackState)
 
-	this.initATNState()
+	this.InitATNState()
 
 	this.stateType = ATNStateSTAR_LOOP_BACK
 	return this
@@ -379,8 +379,8 @@ func NewStarLoopEntryState() *StarLoopEntryState {
 
 	this := new(StarLoopEntryState)
 
-	this.initATNState()
-	this.initDecisionState()
+	this.InitATNState()
+	this.InitDecisionState()
 
 	this.stateType = ATNStateSTAR_LOOP_ENTRY
     this.loopBackState = nil
@@ -402,7 +402,7 @@ func NewLoopEndState() *LoopEndState {
 
 	this := new(LoopEndState)
 
-	this.initATNState()
+	this.InitATNState()
 
 	this.stateType = ATNStateLOOP_END
 	this.loopBackState = nil
@@ -419,8 +419,8 @@ func NewTokensStartState() *TokensStartState {
 
 	this := new(TokensStartState)
 
-	this.initATNState()
-	this.initDecisionState()
+	this.InitATNState()
+	this.InitDecisionState()
 
 	this.stateType = ATNStateTOKEN_START
 	return this

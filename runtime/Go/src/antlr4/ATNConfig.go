@@ -64,11 +64,11 @@ func NewATNConfig1(c *ATNConfig, state *ATNState, context *PredictionContext) *A
 func NewATNConfig(c *ATNConfig, state *ATNState, context *PredictionContext, semanticContext *SemanticContext) *ATNConfig {
 	a := new(ATNConfig)
 
-	a.initATNConfig2(c, state, context, semanticContext)
+	a.InitATNConfig2(c, state, context, semanticContext)
 	return a
 }
 
-func (a *ATNConfig) initATNConfig2(c *ATNConfig, state *ATNState, context *PredictionContext, semanticContext  *SemanticContext) {
+func (a *ATNConfig) InitATNConfig2(c *ATNConfig, state *ATNState, context *PredictionContext, semanticContext  *SemanticContext) {
 
 	a.state = state;
 	a.alt = c.alt;
@@ -206,7 +206,7 @@ func NewLexerATNConfig( state *ATNState, alt int, context *PredictionContext) *L
 
 	this := new(LexerATNConfig)
 
-	this.initATNConfig(state, alt, context, SemanticContextNONE)
+	this.InitATNConfig(state, alt, context, SemanticContextNONE)
     this.lexerActionExecutor = nil
     this.passedThroughNonGreedyDecision = false
 

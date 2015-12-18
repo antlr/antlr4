@@ -3,6 +3,7 @@ package antlr4
 import (
     "fmt"
     "strings"
+    "reflect"
 )
 
 type ErrorStrategy struct {
@@ -15,7 +16,7 @@ func (this *ErrorStrategy) reset(recognizer *Parser){
 func (this *ErrorStrategy) recoverInline(recognizer *Parser){
 }
 
-func (this *ErrorStrategy) recover(recognizer *Parser, e *Error){
+func (this *ErrorStrategy) recover(recognizer *Parser, e *RecognitionException){
 }
 
 func (this *ErrorStrategy) sync(recognizer *Parser){
@@ -35,12 +36,17 @@ type DefaultErrorStrategy struct {
 
     errorRecoveryMode bool
     lastErrorIndex int
-    lastErrorStates []int
+    lastErrorStates *IntervalSet
 }
 
-func DefaultErrorStrategy() *DefaultErrorStrategy {
+func NewDefaultErrorStrategy() *DefaultErrorStrategy {
 
 	d := new(DefaultErrorStrategy)
+    d.InitDefaultErrorStrategy()
+    return d
+}
+
+func (d *DefaultErrorStrategy) InitDefaultErrorStrategy() {
 
     // Indicates whether the error strategy is currently "recovering from an
     // error". This is used to suppress reporting multiple error messages while
@@ -59,11 +65,7 @@ func DefaultErrorStrategy() *DefaultErrorStrategy {
     d.lastErrorIndex = -1
     d.lastErrorStates = nil
 
-    return d
 }
-
-//DefaultErrorStrategy.prototype = Object.create(ErrorStrategy.prototype)
-//DefaultErrorStrategy.prototype.constructor = DefaultErrorStrategy
 
 // <p>The default implementation simply calls {@link //endErrorCondition} to
 // ensure that the handler is not in error recovery mode.</p>
@@ -125,7 +127,7 @@ func (this *DefaultErrorStrategy) reportMatch(recognizer *Parser) {
 // the exception</li>
 // </ul>
 //
-func (this *DefaultErrorStrategy) reportError(recognizer *Parser, e *) {
+func (this *DefaultErrorStrategy) reportError(recognizer *Parser, e *RecognitionException) {
    // if we've already reported an error and have not matched a token
    // yet successfully, don't report any errors.
     if(this.inErrorRecoveryMode(recognizer)) {
@@ -135,9 +137,9 @@ func (this *DefaultErrorStrategy) reportError(recognizer *Parser, e *) {
 
     switch e.(type) {
         default:
-            fmt.Println("unknown recognition error type: " + e.constructor.name)
-            fmt.Println(e.stack)
-            recognizer.notifyErrorListeners(e.getOffendingToken(), e.getMessage(), e)
+            fmt.Println("unknown recognition error type: " + reflect.TypeOf(e).Name())
+//            fmt.Println(e.stack)
+            recognizer.notifyErrorListeners(e.offendingToken, e.message, e)
         case NoViableAltException:
             this.reportNoViableAlternative(recognizer, e)
         case InputMismatchException:
@@ -146,6 +148,7 @@ func (this *DefaultErrorStrategy) reportError(recognizer *Parser, e *) {
             this.reportFailedPredicate(recognizer, e)
     }
 }
+
 //
 // {@inheritDoc}
 //
@@ -154,19 +157,20 @@ func (this *DefaultErrorStrategy) reportError(recognizer *Parser, e *) {
 // that can follow the current rule.</p>
 //
 func (this *DefaultErrorStrategy) recover(recognizer *Parser, e *RecognitionException) {
-    if (this.lastErrorIndex==recognizer.getInputStream().index &&
-        this.lastErrorStates != nil && this.lastErrorStates.indexOf(recognizer.state)>=0) {
+
+    if (this.lastErrorIndex==recognizer.getInputStream().index() &&
+        this.lastErrorStates != nil && this.lastErrorStates.contains(recognizer.state)) {
 		// uh oh, another error at same token index and previously-visited
 		// state in ATN must be a case where LT(1) is in the recovery
 		// token set so nothing got consumed. Consume a single token
 		// at least to prevent an infinite loop this is a failsafe.
 		recognizer.consume()
     }
-    this.lastErrorIndex = recognizer._input.index
+    this.lastErrorIndex = recognizer._input.index()
     if (this.lastErrorStates == nil) {
-        this.lastErrorStates = []
+        this.lastErrorStates = NewIntervalSet()
     }
-    this.lastErrorStates.push(recognizer.state)
+    this.lastErrorStates.addOne(recognizer.state)
     var followSet = this.getErrorRecoverySet(recognizer)
     this.consumeUntil(recognizer, followSet)
 }
@@ -224,7 +228,7 @@ func (this *DefaultErrorStrategy) sync(recognizer *Parser) {
     var s = recognizer._interp.atn.states[recognizer.state]
     var la = recognizer.getTokenStream().LA(1)
     // try cheaper subset first might get lucky. seems to shave a wee bit off
-    if (la==TokenEOF || recognizer.atn.nextTokens(s).contains(la)) {
+    if (la==TokenEOF || recognizer.getATN().nextTokens(s).contains(la)) {
         return
     }
     // Return but don't end recovery. only do that upon valid token match
@@ -264,14 +268,14 @@ func (this *DefaultErrorStrategy) sync(recognizer *Parser) {
 // @param recognizer the parser instance
 // @param e the recognition exception
 //
-func (this *DefaultErrorStrategy) reportNoViableAlternative(recognizer *Parser, e *RecognitionException) {
-    var tokens = recognizer.getTokenStream()
-    var input
+func (this *DefaultErrorStrategy) reportNoViableAlternative(recognizer *Parser, e *NoViableAltException) {
+    var tokens  = recognizer.getTokenStream()
+    var input string
     if(tokens != nil) {
         if (e.startToken.tokenType==TokenEOF) {
             input = "<EOF>"
         } else {
-            input = tokens.getText(NewInterval(e.startToken, e.offendingToken))
+            input = tokens.getTextFromInterval(NewInterval(e.startToken, e.offendingToken))
         }
     } else {
         input = "<unknown input>"
@@ -305,7 +309,7 @@ func (this *DefaultErrorStrategy) reportInputMismatch(recognizer *Parser, e *Rec
 // @param e the recognition exception
 //
 func (this *DefaultErrorStrategy) reportFailedPredicate(recognizer *Parser, e *RecognitionException) {
-    var ruleName = recognizer.ruleNames[recognizer._ctx.ruleIndex]
+    var ruleName = recognizer.getRuleNames()[recognizer._ctx.ruleIndex]
     var msg = "rule " + ruleName + " " + e.message
     recognizer.notifyErrorListeners(msg, e.offendingToken, e)
 }
@@ -336,7 +340,7 @@ func (this *DefaultErrorStrategy) reportUnwantedToken(recognizer *Parser) {
     var tokenName = this.getTokenErrorDisplay(t)
     var expecting = this.getExpectedTokens(recognizer)
     var msg = "extraneous input " + tokenName + " expecting " +
-        expecting.toString(recognizer.literalNames, recognizer.symbolicNames)
+        expecting.toStringVerbose(recognizer.literalNames, recognizer.symbolicNames, false)
     recognizer.notifyErrorListeners(msg, t, nil)
 }
 // This method is called to report a syntax error which requires the
@@ -362,7 +366,7 @@ func (this *DefaultErrorStrategy) reportMissingToken(recognizer *Parser) {
     this.beginErrorCondition(recognizer)
     var t = recognizer.getCurrentToken()
     var expecting = this.getExpectedTokens(recognizer)
-    var msg = "missing " + expecting.toString(recognizer.literalNames, recognizer.symbolicNames) +
+    var msg = "missing " + expecting.toStringVerbose(recognizer.literalNames, recognizer.symbolicNames, false) +
           " at " + this.getTokenErrorDisplay(t)
     recognizer.notifyErrorListeners(msg, t, nil)
 }
@@ -485,7 +489,7 @@ func (this *DefaultErrorStrategy) singleTokenInsertion(recognizer *Parser) {
 // deletion successfully recovers from the mismatched input, otherwise
 // {@code nil}
 //
-func (this *DefaultErrorStrategy) singleTokenDeletion(recognizer *Parser) {
+func (this *DefaultErrorStrategy) singleTokenDeletion(recognizer *Parser) Token {
     var nextTokenType = recognizer.getTokenStream().LA(2)
     var expecting = this.getExpectedTokens(recognizer)
     if (expecting.contains(nextTokenType)) {
@@ -526,8 +530,8 @@ func (this *DefaultErrorStrategy) singleTokenDeletion(recognizer *Parser) {
 func (this *DefaultErrorStrategy) getMissingSymbol(recognizer *Parser) {
     var currentSymbol = recognizer.getCurrentToken()
     var expecting = this.getExpectedTokens(recognizer)
-    var expectedTokenType = expecting.first() // get any element
-    var tokenText
+    var expectedTokenType = expecting.first()
+    var tokenText string
     if (expectedTokenType==TokenEOF) {
         tokenText = "<missing EOF>"
     } else {
@@ -538,10 +542,12 @@ func (this *DefaultErrorStrategy) getMissingSymbol(recognizer *Parser) {
     if (current.tokenType==TokenEOF && lookback != nil) {
         current = lookback
     }
-    return recognizer.getTokenFactory().create(current.source,  expectedTokenType, tokenText, TokenDefaultChannel, -1, -1, current.line, current.column)
+
+    tf := recognizer.getTokenFactory()
+    return tf.create(current.source,  expectedTokenType, tokenText, TokenDefaultChannel, -1, -1, current.line, current.column)
 }
 
-func (this *DefaultErrorStrategy) getExpectedTokens(recognizer *Parser) {
+func (this *DefaultErrorStrategy) getExpectedTokens(recognizer *Parser) *IntervalSet {
     return recognizer.getExpectedTokens()
 }
 
@@ -675,7 +681,7 @@ func (this *DefaultErrorStrategy) getErrorRecoverySet(recognizer *Parser) *Inter
         // compute what follows who invoked us
         var invokingState = atn.states[ctx.invokingState]
         var rt = invokingState.transitions[0]
-        var follow = atn.nextTokens(rt.followState)
+        var follow = atn.nextTokens(rt.(*RuleTransition).followState, nil)
         recoverSet.addSet(follow)
         ctx = ctx.parentCtx
     }
@@ -684,7 +690,7 @@ func (this *DefaultErrorStrategy) getErrorRecoverySet(recognizer *Parser) *Inter
 }
 
 // Consume tokens until one matches the given token set.//
-func (this *DefaultErrorStrategy) consumeUntil(recognizer *Parser, set) {
+func (this *DefaultErrorStrategy) consumeUntil(recognizer *Parser, set *IntervalSet) {
     var ttype = recognizer.getTokenStream().LA(1)
     for( ttype != TokenEOF && !set.contains(ttype)) {
         recognizer.consume()
@@ -719,14 +725,18 @@ func (this *DefaultErrorStrategy) consumeUntil(recognizer *Parser, set) {
 // {@code myparser.setErrorHandler(NewBailErrorStrategy())}</p>
 //
 // @see Parser//setErrorHandler(ANTLRErrorStrategy)
-//
+
 type BailErrorStrategy struct {
-	DefaultErrorStrategy.call(this)
-	return this
+    DefaultErrorStrategy
 }
 
-//BailErrorStrategy.prototype = Object.create(DefaultErrorStrategy.prototype)
-//BailErrorStrategy.prototype.constructor = BailErrorStrategy
+func NewBailErrorStrategy() *BailErrorStrategy {
+
+    this := new(BailErrorStrategy)
+    this.InitDefaultErrorStrategy()
+
+	return this
+}
 
 // Instead of recovering from exception {@code e}, re-panic it wrapped
 // in a {@link ParseCancellationException} so it is not caught by the
@@ -739,7 +749,7 @@ func (this *BailErrorStrategy) recover(recognizer *Parser, e *RecognitionExcepti
         context.exception = e
         context = context.parentCtx
     }
-    panic(NewParseCancellationException(e))
+    panic(NewParseCancellationException()) // TODO we don't emit e properly
 }
     
 // Make sure we don't attempt to recover inline if the parser

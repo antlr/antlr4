@@ -13,11 +13,11 @@ type Recognizer struct {
 
 func NewRecognizer() *Recognizer {
     rec := new(Recognizer)
-    rec.initRecognizer()
+    rec.InitRecognizer()
     return rec
 }
 
-func (rec *Recognizer) initRecognizer() {
+func (rec *Recognizer) InitRecognizer() {
     rec._listeners = []ParseTreeListener{ ConsoleErrorListenerINSTANCE }
     rec._interp = nil
     rec.state = -1

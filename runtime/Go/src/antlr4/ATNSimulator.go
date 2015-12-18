@@ -5,7 +5,7 @@ type ATNSimulator struct {
     sharedContextCache *PredictionContextCache
 }
 
-func ATNSimulator(atn *ATN, sharedContextCache *PredictionContextCache) *ATNSimulator {
+func NewATNSimulator(atn *ATN, sharedContextCache *PredictionContextCache) *ATNSimulator {
 	
     // The context cache maps all PredictionContext objects that are ==
     //  to a single cached copy. This cache is shared across all contexts
@@ -29,14 +29,18 @@ func ATNSimulator(atn *ATN, sharedContextCache *PredictionContextCache) *ATNSimu
 
     this := new(ATNSimulator)
 
-    this.atn = atn
-    this.sharedContextCache = sharedContextCache
+    this.InitATNSimulator(atn, sharedContextCache)
 
     return this
 }
 
+func (this *ATNSimulator) InitATNSimulator(atn *ATN, sharedContextCache *PredictionContextCache) {
+    this.atn = atn
+    this.sharedContextCache = sharedContextCache
+}
+
 // Must distinguish between missing edge and edge we know leads nowhere///
-var ATNSimulatorERROR = NewDFAState(0x7FFFFFFF, NewATNConfigSet())
+var ATNSimulatorERROR = NewDFAState(0x7FFFFFFF, NewATNConfigSet(false))
 
 func (this *ATNSimulator) getCachedContext(context *PredictionContext) *PredictionContext {
     if (this.sharedContextCache == nil) {

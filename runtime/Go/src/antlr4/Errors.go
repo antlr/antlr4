@@ -33,12 +33,12 @@ func NewRecognitionException(message string, recognizer *Recognizer, input *Inpu
 	// TODO may be able to use - "runtime" func Stack(buf []byte, all bool) int
 
 	t := new(RecognitionException)
-	t.initRecognitionException(message, recognizer, input, ctx)
+	t.InitRecognitionException(message, recognizer, input, ctx)
 
     return t
 }
 
-func (t *RecognitionException) initRecognitionException(message string, recognizer *Recognizer, input *InputStream, ctx *RuleContext){
+func (t *RecognitionException) InitRecognitionException(message string, recognizer *Recognizer, input *InputStream, ctx *RuleContext){
 
 	t.message = message
 	t.recognizer = recognizer
@@ -99,7 +99,7 @@ func NewLexerNoViableAltException(lexer *Lexer, input *InputStream, startIndex i
 
 	this := new (LexerNoViableAltException)
 
-	this.initRecognitionException("", lexer, input, nil)
+	this.InitRecognitionException("", lexer, input, nil)
 
 	this.startIndex = startIndex
     this.deadEndConfigs = deadEndConfigs
@@ -152,7 +152,7 @@ func NoViableAltException(recognizer *Parser, input *InputStream, startToken *To
 	}
 
 	this := new(NoViableAltException)
-	this.initRecognitionException("", recognizer, input, ctx)
+	this.InitRecognitionException("", recognizer, input, ctx)
 
     // Which configurations did we try at input.index() that couldn't match
 	// input.LT(1)?//
@@ -179,7 +179,7 @@ type InputMismatchException struct {
 func NewInputMismatchException(recognizer *Parser) *InputMismatchException {
 
 	this := new(InputMismatchException)
-	this.initRecognitionException("", recognizer, recognizer.getInputStream(), recognizer._ctx)
+	this.InitRecognitionException("", recognizer, recognizer.getInputStream(), recognizer._ctx)
 
 	this.offendingToken = recognizer.getCurrentToken()
 
@@ -206,7 +206,7 @@ func NewFailedPredicateException(recognizer *Parser, predicate string, message s
 
 	this := new(FailedPredicateException)
 
-	this.initRecognitionException(this.formatMessage(predicate, message), recognizer, recognizer.getInputStream(), recognizer._ctx)
+	this.InitRecognitionException(this.formatMessage(predicate, message), recognizer, recognizer.getInputStream(), recognizer._ctx)
 
     var s = recognizer._interp.atn.states[recognizer.state]
     var trans = s.transitions[0]

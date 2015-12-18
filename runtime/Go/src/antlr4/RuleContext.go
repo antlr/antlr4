@@ -35,12 +35,12 @@ type RuleContext struct {
 func NewRuleContext(parent *RuleContext, invokingState int)  *RuleContext {
 
 	rn := &RuleContext{RuleNode{}}
-	rn.initRuleContext(parent, invokingState)
+	rn.InitRuleContext(parent, invokingState)
 
 	return rn
 }
 
-func (rn *RuleContext) initRuleContext(parent *RuleContext, invokingState int) {
+func (rn *RuleContext) InitRuleContext(parent *RuleContext, invokingState int) {
 
 	// What context invoked this rule?
 	rn.parentCtx = parent

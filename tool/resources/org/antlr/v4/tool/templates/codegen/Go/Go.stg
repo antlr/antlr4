@@ -106,10 +106,10 @@ func New<parser.name>(input) <parser.name> {
 
     var deserializer = NewATNDeserializer()
     var deserializedAtn = deserializer.deserialize(serializedATN)
-    var decisionToDFA = make([]dfa.DFA,len(deserializedAtn.decisionToState))
+    var decisionToDFA = make([]DFA,len(deserializedAtn.decisionToState))
 
     for index, ds := range deserializedAtn.decisionToState {
-        decisionToDFA[index] = dfa.NewDFA(ds, index)
+        decisionToDFA[index] = NewDFA(ds, index)
     }
 
     var sharedContextCache = NewPredictionContextCache()
@@ -661,7 +661,7 @@ type <struct.name> struct {
 func New<struct.name>(parser *Parser, parent *ParserRuleContext, invokingState int<struct.ctorAttrs:{a | , <a.name>}>) <struct.name> {
 
     var p = new(<struct.name>)
-    p.initParserRuleContext( parent, invokingState )
+    p.InitParserRuleContext( parent, invokingState )
 
     p.parser = parser
     p.ruleIndex = <parser.name>RULE_<struct.derivedFromName>
@@ -738,7 +738,7 @@ func (s *<struct.name>) accept(visitor *ParseTreeVisitor) {
 
 
 
-AttributeDecl(d) ::= "p.<d.name> = <if(d.initValue)><d.initValue><else>null<endif>"
+AttributeDecl(d) ::= "p.<d.name> = <if(d.InitValue)><d.InitValue><else>null<endif>"
 
 /** If we don't know location of label def x, use this template */
 labelref(x) ::= "<if(!x.isLocal)>localctx.<endif><x.name>"
@@ -820,15 +820,15 @@ func New<lexer.name>(input *TokenStream) *<lexer.name> {
     var deserializer = NewATNDeserializer()
     var deserializedAtn = deserializer.deserialize(serializedATN)
 
-    var decisionToDFA = make([]dfa.DFA,len(deserializedAtn.decisionToState))
+    var decisionToDFA = make([]DFA,len(deserializedAtn.decisionToState))
 
     for index, ds := range deserializedAtn.decisionToState {
-        decisionToDFA[index] = dfa.NewDFA(ds, index)
+        decisionToDFA[index] = NewDFA(ds, index)
     }
 
 	lex := new(<lexer.name>)
 
-	initLexer(lex, input);
+	this.InitLexer(lex, input);
 
     lex._interp = NewLexerATNSimulator(lex, atn, decisionToDFA, NewPredictionContextCache())
     lex.modeNames = [...]string{ <lexer.modes:{m| "<m>"}; separator=", ", wrap, anchor> }
@@ -865,7 +865,7 @@ var serializedATN = strings.Join( [...]string{"<model.serialized; wrap={",<\n>  
 /** Using a type to init value map, try to init a type; if not in table
  *	must be an object, default value is "nil".
  */
-initValue(typeName) ::= <<
+InitValue(typeName) ::= <<
 <javaTypeInitMap.(typeName)>
 >>
 

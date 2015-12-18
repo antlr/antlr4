@@ -25,6 +25,7 @@ type IntStream interface {
 
 type TokenStream interface {
 	IntStream
+
 	LT(k int) *Token
 	get(index int) *Token
 	getTokenSource() *TokenSource
@@ -168,13 +169,13 @@ func (bt *BufferedTokenStream) fetch(n int) int {
 }
 
 // Get all tokens from start..stop inclusively///
-func (bt *BufferedTokenStream) getTokens(start int, stop int, types []int) []*Token {
+func (bt *BufferedTokenStream) getTokens(start int, stop int, types *IntervalSet) []*Token {
 
 	if (start < 0 || stop < 0) {
 		return nil
 	}
 	bt.lazyInit()
-	var subset = (make[]*Token)
+	var subset = make([]*Token)
 	if (stop >= len(bt.tokens)) {
 		stop = len(bt.tokens) - 1
 	}

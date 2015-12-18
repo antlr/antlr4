@@ -38,6 +38,9 @@ type Parser struct {
 	_tracer bool
 	_parseListeners []*ParseTreeListener
 	_syntaxErrors int
+
+	literalNames []string
+	symbolicNames []string
 }
 
 // p.is all the parsing support code essentially most of it is error
@@ -46,7 +49,7 @@ func NewParser(input *TokenStream) *Parser {
 
 	p := new(Parser)
 
-	p.initRecognizer()
+	p.InitRecognizer()
 
 	// The input stream.
 	p._input = nil
@@ -271,12 +274,12 @@ func (this *Parser) getATN() *ATN {
 	return this.atn
 }
 
-func (p *Parser) getTokenFactory() {
+func (p *Parser) getTokenFactory() *TokenFactory {
 	return p._input.getTokenSource()._factory
 }
 
 // Tell our token source and error strategy about a Newway to create tokens.//
-func (p *Parser) setTokenFactory(factory) {
+func (p *Parser) setTokenFactory(factory *TokenFactory) {
 	p._input.getTokenSource()._factory = factory
 }
 
@@ -590,14 +593,14 @@ func (p *Parser) isExpectedToken(symbol *Token) bool {
 //
 // @see ATN//getExpectedTokens(int, RuleContext)
 //
-func (p *Parser) getExpectedTokens() []*Token {
+func (p *Parser) getExpectedTokens() *IntervalSet {
 	return p._interp.atn.getExpectedTokens(p.state, p._ctx)
 }
 
-func (p *Parser) getExpectedTokensWithinCurrentRule() []*Token {
+func (p *Parser) getExpectedTokensWithinCurrentRule() *IntervalSet {
 	var atn = p._interp.atn
 	var s = atn.states[p.state]
-	return atn.nextTokens(s)
+	return atn.nextTokens(s,nil)
 }
 
 // Get a rule's index (i.e., {@code RULE_ruleName} field) or -1 if not found.//
@@ -643,9 +646,9 @@ func (p *Parser) getDFAStrings() {
 // For debugging and other purposes.//
 func (p *Parser) dumpDFA() {
 	var seenOne = false
-	for i := 0; i < p._interp.decisionToDFA.length; i++) {
+	for i := 0; i < p._interp.decisionToDFA.length; i++ {
 		var dfa = p._interp.decisionToDFA[i]
-		if (dfa.states.length > 0) {
+		if ( len(dfa.states) > 0) {
 			if (seenOne) {
 				fmt.Println()
 			}

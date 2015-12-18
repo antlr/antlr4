@@ -49,13 +49,13 @@ func NewLexer(input *InputStream) *Lexer {
 
 	lexer := new(Lexer)
 
-	lexer.initRecognizer()
-	lexer.initLexer(input)
+	lexer.InitRecognizer()
+	lexer.InitLexer(input)
 
 	return lexer
 }
 
-func (l *Lexer) initLexer(input *InputStream){
+func (l *Lexer) InitLexer(input *InputStream){
 
 	l._input = input
 	l._factory = CommonTokenFactoryDEFAULT

@@ -41,12 +41,12 @@ func NewATNConfigSet(fullCtx bool) *ATNConfigSet {
 
 	this := new(ATNConfigSet)
 
-	this.initATNConfigSet(fullCtx)
+	this.InitATNConfigSet(fullCtx)
 
 	return this
 }
 
-func (a *ATNConfigSet) initATNConfigSet(fullCtx bool) {
+func (a *ATNConfigSet) InitATNConfigSet(fullCtx bool) {
 
 	// The reason that we need a.is because we don't want the hash map to use
 	// the standard hash code and equals. We need all configurations with the
@@ -264,7 +264,7 @@ func NewOrderedATNConfigSet() *OrderedATNConfigSet {
 
 	this := new(OrderedATNConfigSet)
 
-	this.initATNConfigSet(false)
+	this.InitATNConfigSet(false)
 	this.configLookup = NewSet(nil, nil)
 
 	return this

@@ -85,12 +85,12 @@ type TerminalNodeImpl struct {
 func NewTerminalNodeImpl(symbol *Token) *TerminalNodeImpl {
 	tn := &TerminalNodeImpl{TerminalNode{}}
 
-	tn.initTerminalNodeImpl(symbol)
+	tn.InitTerminalNodeImpl(symbol)
 
 	return tn
 }
 
-func (this *TerminalNodeImpl) initTerminalNodeImpl(symbol *Token) {
+func (this *TerminalNodeImpl) InitTerminalNodeImpl(symbol *Token) {
 	this.parentCtx = nil
 	this.symbol = symbol
 }
@@ -154,7 +154,7 @@ type ErrorNodeImpl struct {
 
 func NewErrorNodeImpl(token *Token) *ErrorNodeImpl {
 	en := new(ErrorNodeImpl)
-	en.initTerminalNodeImpl(token)
+	en.InitTerminalNodeImpl(token)
 	return en
 }
 

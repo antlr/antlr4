@@ -33,7 +33,7 @@ function IntervalSet() {
 	this.readOnly = false;
 }
 
-IntervalSet.prototype.first = function(v) {
+IntervalSet.prototype.first = function() {
 	if (this.intervals === null || this.intervals.length===0) {
 		return Token.INVALID_TYPE;
 	} else {

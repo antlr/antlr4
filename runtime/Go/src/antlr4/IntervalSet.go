@@ -51,8 +51,8 @@ func NewIntervalSet() *IntervalSet {
 	return i
 }
 
-func (i *IntervalSet) first(v int) int {
-	if (i.intervals == nil || len(i.intervals)==0) {
+func (i *IntervalSet) first() int {
+	if (len(i.intervals)==0) {
 		return TokenInvalidType
 	} else {
 		return i.intervals[0].start
