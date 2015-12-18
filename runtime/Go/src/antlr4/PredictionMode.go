@@ -179,14 +179,13 @@ func PredictionModehasSLLConflictTerminatingPrediction( mode int, configs *ATNCo
         // since we'll often fail over anyway.
         if (configs.hasSemanticContext) {
             // dup configs, tossing out semantic predicates
-            var dup = NewATNConfigSet()
-			for i:= 0; i< len(configs.items); i++ {
-            	var c = configs.items[i]
+            var dup = NewATNConfigSet(false)
+			for i:= 0; i< len(configs.configs); i++ {
+            	var c = configs.configs[i]
 
 				//				NewATNConfig({semanticContext:}, c)
-                c = NewATNConfig(c, SemanticContextNONE)
-
-                dup.add(c)
+                c = NewATNConfig4(c, SemanticContextNONE)
+                dup.add(c, nil)
             }
             configs = dup
         }
@@ -206,8 +205,8 @@ func PredictionModehasSLLConflictTerminatingPrediction( mode int, configs *ATNCo
 // @return {@code true} if any configuration in {@code configs} is in a
 // {@link RuleStopState}, otherwise {@code false}
 func PredictionModehasConfigInRuleStopState(configs *ATNConfigSet) bool {
-	for i:= 0; i< len(configs.items); i++ {
-		var c = configs.items[i]
+	for i:= 0; i< len(configs.configs); i++ {
+		var c = configs.configs[i]
 		if _, ok := c.state.(*RuleStopState); ok {
             return true
         }
@@ -225,8 +224,8 @@ func PredictionModehasConfigInRuleStopState(configs *ATNConfigSet) bool {
 // {@link RuleStopState}, otherwise {@code false}
 func PredictionModeallConfigsInRuleStopStates(configs *ATNConfigSet) bool {
 
-	for i:= 0; i < len(configs.items); i++ {
-		var c = configs.items[i]
+	for i:= 0; i < len(configs.configs); i++ {
+		var c = configs.configs[i]
 
         if _, ok := c.state.(*RuleStopState); !ok {
             return false
@@ -435,7 +434,8 @@ func PredictionModehasConflictingAltSet(altsets []*BitSet) bool {
 // others, otherwise {@code false}
 //
 func PredictionModeallSubsetsEqual(altsets []*BitSet) bool {
-    var first = nil
+    var first *BitSet = nil
+
 	for i:=0; i<len(altsets); i++{
 		var alts = altsets[i]
         if (first == nil) {
@@ -444,6 +444,7 @@ func PredictionModeallSubsetsEqual(altsets []*BitSet) bool {
             return false
         }
 	}
+
     return true
 }
 
@@ -487,26 +488,27 @@ func PredictionModegetAlts(altsets []*BitSet) *BitSet {
 // alt and not pred
 // </pre>
 //
-func PredictionModegetConflictingAltSubsets(configs *ATNConfigSet) {
-    var configToAlts = {}
-	for i :=0; i < len(configs.items); i++ {
-		var c = configs.items[i]
+func PredictionModegetConflictingAltSubsets(configs *ATNConfigSet) []int {
+    var configToAlts = make(map[string]int)
+
+	for i :=0; i < len(configs.configs); i++ {
+		var c = configs.configs[i]
         var key = "key_" + c.state.stateNumber + "/" + c.context
-        var alts = configToAlts[key] || nil
-        if (alts == nil) {
+        var alts = configToAlts[key]
+        if (alts != nil) {
             alts = NewBitSet()
             configToAlts[key] = alts
         }
-        alts.add(c.alt)
+        alts.(*BitSet).add(c.alt)
 	}
 
-	var values = []
+	var values = make([]int)
 
 	for k,_ := range configToAlts {
 		if( strings.Index( k, "key_") != 0) {
 			continue
 		}
-		values.push(configToAlts[k])
+		values = append(values, configToAlts[k])
 	}
     return values
 }
@@ -519,16 +521,16 @@ func PredictionModegetConflictingAltSubsets(configs *ATNConfigSet) {
 // map[c.{@link ATNConfig//state state}] U= c.{@link ATNConfig//alt alt}
 // </pre>
 //
-func PredictionModegetStateToAltMap(configs *ATNConfigSet) {
+func PredictionModegetStateToAltMap(configs *ATNConfigSet) *AltDict {
     var m = NewAltDict()
 
-	for _, c := range configs.items {
+	for _, c := range configs.configs {
         var alts = m.get(c.state)
         if (alts == nil) {
             alts = NewBitSet()
             m.put(c.state, alts)
         }
-        alts.add(c.alt)
+        alts.(*BitSet).add(c.alt)
     }
     return m
 }
@@ -536,7 +538,7 @@ func PredictionModegetStateToAltMap(configs *ATNConfigSet) {
 func PredictionModehasStateAssociatedWithOneAlt (configs *ATNConfigSet) bool {
     var values = PredictionModegetStateToAltMap(configs).values()
     for i:=0; i<len(values); i++ {
-        if (values[i].length==1) {
+        if ( len(values[i])==1) {
             return true
         }
     }
@@ -545,6 +547,7 @@ func PredictionModehasStateAssociatedWithOneAlt (configs *ATNConfigSet) bool {
 
 func PredictionModegetSingleViableAlt (altsets []*BitSet) int {
     var result = ATNINVALID_ALT_NUMBER
+
 	for i:=0; i<len(altsets); i++{
 		var alts = altsets[i]
         var minAlt = alts.minValue()

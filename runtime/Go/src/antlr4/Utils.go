@@ -179,8 +179,8 @@ func (this *BitSet) values() []int {
 	return ks
 }
 
-func (this *BitSet) minValue() {
-	min := math.MinInt32
+func (this *BitSet) minValue() int {
+	min := 0
 
 	for k,_ := range this.data {
 		if k < min {
