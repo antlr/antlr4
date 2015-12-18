@@ -1,8 +1,5 @@
 package antlr4
 
-type LexerActionType struct {
-}
-
 const (
     LexerActionTypeCHANNEL = 0     //The type of a {@link LexerChannelAction} action.
     LexerActionTypeCUSTOM = 1      //The type of a {@link LexerCustomAction} action.
@@ -14,18 +11,22 @@ const (
     LexerActionTypeTYPE = 7        //The type of a {@link LexerTypeAction} action.
 )
 type LexerAction struct  {
-    actionType LexerActionType
+    actionType int
     isPositionDependent bool
 }
 
-func LexerAction(action LexerActionType) *LexerAction {
+func NewLexerAction(action int) *LexerAction {
     la := new(LexerAction)
-    la.actionType = action
-    la.isPositionDependent = false
+    la.InitLexerAction(action)
     return la
 }
 
-func (this *LexerAction) hashString() {
+func (la *LexerAction) InitLexerAction(action int){
+    la.actionType = action
+    la.isPositionDependent = false
+}
+
+func (this *LexerAction) hashString() string {
     return "" + this.actionType
 }
 
@@ -40,15 +41,17 @@ func (this *LexerAction) equals(other *LexerAction) {
 // <p>The {@code skip} command does not have any parameters, so this action is
 // implemented as a singleton instance exposed by {@link //INSTANCE}.</p>
 type LexerSkipAction struct {
-	LexerAction.call(this, LexerActionTypeSKIP)
-	return this
+    LexerAction
 }
 
-//LexerSkipAction.prototype = Object.create(LexerAction.prototype)
-//LexerSkipAction.prototype.constructor = LexerSkipAction
+func NewLexerSkipAction() *LexerSkipAction {
+    la := new(LexerAction)
+    la.InitLexerAction(LexerActionTypeSKIP)
+	return la
+}
 
 // Provides a singleton instance of this parameterless lexer action.
-LexerSkipAction.INSTANCE = NewLexerSkipAction()
+var exerSkipActionINSTANCE = NewLexerSkipAction()
 
 func (this *LexerSkipAction) execute(lexer *Lexer) {
     lexer.skip()
@@ -60,48 +63,58 @@ func (this *LexerSkipAction) toString() string {
 
 //  Implements the {@code type} lexer action by calling {@link Lexer//setType}
 // with the assigned type.
-func LexerTypeAction(type) {
-	LexerAction.call(this, LexerActionTypeTYPE)
-	this.type = type
+type LexerTypeAction struct {
+	LexerAction
+
+    _type int
+}
+
+func NewLexerTypeAction(_type int) *LexerTypeAction {
+	this := new(LexerTypeAction)
+	this.InitLexerAction( LexerActionTypeTYPE )
+	this._type = _type
 	return this
 }
 
-//LexerTypeAction.prototype = Object.create(LexerAction.prototype)
-//LexerTypeAction.prototype.constructor = LexerTypeAction
-
 func (this *LexerTypeAction) execute(lexer *Lexer) {
-    lexer.type = this.type
+    lexer._type = this._type
 }
 
-func (this *LexerTypeAction) hashString() {
-	return "" + this.actionType + this.type
+func (this *LexerTypeAction) hashString() string {
+	return "" + this.actionType + this._type
 }
 
 
-func (this *LexerTypeAction) equals(other) {
+func (this *LexerTypeAction) equals(other *LexerAction) bool {
     if(this == other) {
         return true
-    } else if (! _, ok := other.(LexerTypeAction); ok) {
+    } else if _, ok := other.(*LexerTypeAction); !ok {
         return false
     } else {
-        return this.type == other.type
+        return this._type == other.(*LexerTypeAction)._type
     }
 }
 
 func (this *LexerTypeAction) toString() string {
-    return "type(" + this.type + ")"
+    return "actionType(" + this._type + ")"
 }
 
 // Implements the {@code pushMode} lexer action by calling
 // {@link Lexer//pushMode} with the assigned mode.
-func LexerPushModeAction(mode) {
-	LexerAction.call(this, LexerActionTypePUSH_MODE)
+type LexerPushModeAction struct {
+	LexerAction
+
+    mode int
+}
+
+func NewLexerPushModeAction(mode int) *LexerPushModeAction {
+
+    this := new(LexerPushModeAction)
+    this.InitLexerAction( LexerActionTypePUSH_MODE )
+
     this.mode = mode
     return this
 }
-
-//LexerPushModeAction.prototype = Object.create(LexerAction.prototype)
-//LexerPushModeAction.prototype.constructor = LexerPushModeAction
 
 // <p>This action is implemented by calling {@link Lexer//pushMode} with the
 // value provided by {@link //getMode}.</p>
@@ -109,17 +122,17 @@ func (this *LexerPushModeAction) execute(lexer *Lexer) {
     lexer.pushMode(this.mode)
 }
 
-func (this *LexerPushModeAction) hashString() {
+func (this *LexerPushModeAction) hashString() string {
     return "" + this.actionType + this.mode
 }
 
-func (this *LexerPushModeAction) equals(other) {
+func (this *LexerPushModeAction) equals(other *LexerAction) bool {
     if (this == other) {
         return true
-    } else if (! _, ok := other.(LexerPushModeAction); ok) {
+    } else if  _, ok := other.(*LexerPushModeAction); !ok {
         return false
     } else {
-        return this.mode == other.mode
+        return this.mode == other.(*LexerPushModeAction).mode
     }
 }
 
@@ -133,14 +146,19 @@ func (this *LexerPushModeAction) toString() string {
 // <p>The {@code popMode} command does not have any parameters, so this action is
 // implemented as a singleton instance exposed by {@link //INSTANCE}.</p>
 type LexerPopModeAction struct {
-	LexerAction.call(this,LexerActionTypePOP_MODE)
+    LexerAction
+}
+
+func NewLexerPopModeAction() *LexerPopModeAction {
+
+    this := new(LexerPopModeAction)
+
+    this.InitLexerAction( LexerActionTypePOP_MODE )
+
 	return this
 }
 
-//LexerPopModeAction.prototype = Object.create(LexerAction.prototype)
-//LexerPopModeAction.prototype.constructor = LexerPopModeAction
-
-LexerPopModeAction.INSTANCE = NewLexerPopModeAction()
+var LexerPopModeActionINSTANCE = NewLexerPopModeAction()
 
 // <p>This action is implemented by calling {@link Lexer//popMode}.</p>
 func (this *LexerPopModeAction) execute(lexer *Lexer) {
@@ -155,15 +173,19 @@ func (this *LexerPopModeAction) toString() string {
 //
 // <p>The {@code more} command does not have any parameters, so this action is
 // implemented as a singleton instance exposed by {@link //INSTANCE}.</p>
+
 type LexerMoreAction struct {
-	LexerAction.call(this, LexerActionTypeMORE)
+    LexerAction
+}
+
+func NewLexerMoreAction() *LexerMoreAction {
+    this := new(LexerModeAction)
+    this.InitLexerAction( LexerActionTypeMORE )
+
 	return this
 }
 
-//LexerMoreAction.prototype = Object.create(LexerAction.prototype)
-//LexerMoreAction.prototype.constructor = LexerMoreAction
-
-LexerMoreAction.INSTANCE = NewLexerMoreAction()
+var LexerMoreActionINSTANCE = NewLexerMoreAction()
 
 // <p>This action is implemented by calling {@link Lexer//popMode}.</p>
 func (this *LexerMoreAction) execute(lexer *Lexer) {
@@ -177,14 +199,18 @@ func (this *LexerMoreAction) toString() string {
 
 // Implements the {@code mode} lexer action by calling {@link Lexer//mode} with
 // the assigned mode.
-func LexerModeAction(mode) {
-	LexerAction.call(this, LexerActionTypeMODE)
+type LexerModeAction struct {
+	LexerAction
+
+    mode int
+}
+
+func NewLexerModeAction(mode int) *LexerModeAction {
+	this := new(LexerModeAction)
+	this.InitLexerAction( LexerActionTypeMODE )
     this.mode = mode
     return this
 }
-
-//LexerModeAction.prototype = Object.create(LexerAction.prototype)
-//LexerModeAction.prototype.constructor = LexerModeAction
 
 // <p>This action is implemented by calling {@link Lexer//mode} with the
 // value provided by {@link //getMode}.</p>
@@ -192,17 +218,17 @@ func (this *LexerModeAction) execute(lexer *Lexer) {
     lexer.mode(this.mode)
 }
 
-func (this *LexerModeAction) hashString() {
+func (this *LexerModeAction) hashString() string {
 	return "" + this.actionType + this.mode
 }
 
-func (this *LexerModeAction) equals(other) {
+func (this *LexerModeAction) equals(other *LexerAction) bool {
     if (this == other) {
         return true
-    } else if (! _, ok := other.(LexerModeAction); ok) {
+    } else if  _, ok := other.(*LexerModeAction); !ok {
         return false
     } else {
-        return this.mode == other.mode
+        return this.mode == other.(*LexerModeAction).mode
     }
 }
 
@@ -219,25 +245,27 @@ func (this *LexerModeAction) toString() string {
 // syntax in ANTLR 4, as well as actions created for lexer commands where the
 // command argument could not be evaluated when the grammar was compiled.</p>
 
+// Constructs a custom lexer action with the specified rule and action
+// indexes.
+//
+// @param ruleIndex The rule index to use for calls to
+// {@link Recognizer//action}.
+// @param actionIndex The action index to use for calls to
+// {@link Recognizer//action}.
 
-    // Constructs a custom lexer action with the specified rule and action
-    // indexes.
-    //
-    // @param ruleIndex The rule index to use for calls to
-    // {@link Recognizer//action}.
-    // @param actionIndex The action index to use for calls to
-    // {@link Recognizer//action}.
+type LexerCustomAction struct {
+	LexerAction
+    ruleIndex, actionIndex int
+}
 
-func LexerCustomAction(ruleIndex, actionIndex) {
-	LexerAction.call(this, LexerActionTypeCUSTOM)
+func NewLexerCustomAction(ruleIndex, actionIndex int) *LexerCustomAction {
+	this := new(LexerCustomAction)
+	this.InitLexerAction( LexerActionTypeCUSTOM )
     this.ruleIndex = ruleIndex
     this.actionIndex = actionIndex
     this.isPositionDependent = true
     return this
 }
-
-//LexerCustomAction.prototype = Object.create(LexerAction.prototype)
-//LexerCustomAction.prototype.constructor = LexerCustomAction
 
 // <p>Custom actions are implemented by calling {@link Lexer//action} with the
 // appropriate rule and action indexes.</p>
@@ -245,17 +273,17 @@ func (this *LexerCustomAction) execute(lexer *Lexer) {
     lexer.action(nil, this.ruleIndex, this.actionIndex)
 }
 
-func (this *LexerCustomAction) hashString() {
+func (this *LexerCustomAction) hashString() string {
     return "" + this.actionType + this.ruleIndex + this.actionIndex
 }
 
-func (this *LexerCustomAction) equals(other) {
+func (this *LexerCustomAction) equals(other *LexerAction) bool {
     if (this == other) {
         return true
-    } else if (! _, ok := other.(LexerCustomAction); ok) {
+    } else if  _, ok := other.(*LexerCustomAction); !ok {
         return false
     } else {
-        return this.ruleIndex == other.ruleIndex && this.actionIndex == other.actionIndex
+        return this.ruleIndex == other.(*LexerCustomAction).ruleIndex && this.actionIndex == other.(*LexerCustomAction).actionIndex
     }
 }
 
@@ -263,8 +291,15 @@ func (this *LexerCustomAction) equals(other) {
 // {@link Lexer//setChannel} with the assigned channel.
 // Constructs a New{@code channel} action with the specified channel value.
 // @param channel The channel value to pass to {@link Lexer//setChannel}.
-func LexerChannelAction(channel) {
-	LexerAction.call(this, LexerActionTypeCHANNEL)
+type LexerChannelAction struct {
+	LexerAction
+
+    channel int
+}
+
+func NewLexerChannelAction(channel int) *LexerChannelAction {
+	this := new(LexerChannelAction)
+	this.InitLexerAction( LexerActionTypeCHANNEL )
     this.channel = channel
     return this
 }
@@ -278,17 +313,17 @@ func (this *LexerChannelAction) execute(lexer *Lexer) {
     lexer._channel = this.channel
 }
 
-func (this *LexerChannelAction) hashString() {
+func (this *LexerChannelAction) hashString() string {
     return "" + this.actionType + this.channel
 }
 
-func (this *LexerChannelAction) equals(other) {
+func (this *LexerChannelAction) equals(other *LexerAction) bool {
     if (this == other) {
         return true
-    } else if (! _, ok := other.(LexerChannelAction); ok) {
+    } else if _, ok := other.(*LexerChannelAction); !ok {
         return false
     } else {
-        return this.channel == other.channel
+        return this.channel == other.(*LexerChannelAction).channel
     }
 }
 
@@ -316,16 +351,25 @@ func (this *LexerChannelAction) toString() string {
 // executed.
 // @param action The lexer action to execute at a particular offset in the
 // input {@link CharStream}.
-func LexerIndexedCustomAction(offset, action) {
-	LexerAction.call(this, action.actionType)
+type LexerIndexedCustomAction struct {
+	LexerAction
+
+    offset int
+    action *LexerAction
+    isPositionDependent bool
+}
+
+func NewLexerIndexedCustomAction(offset int, action *LexerAction) *LexerIndexedCustomAction {
+
+    this := new(LexerIndexedCustomAction)
+    this.InitLexerAction( action.actionType )
+
     this.offset = offset
     this.action = action
     this.isPositionDependent = true
+
     return this
 }
-
-//LexerIndexedCustomAction.prototype = Object.create(LexerAction.prototype)
-//LexerIndexedCustomAction.prototype.constructor = LexerIndexedCustomAction
 
 // <p>This method calls {@link //execute} on the result of {@link //getAction}
 // using the provided {@code lexer}.</p>
@@ -334,17 +378,17 @@ func (this *LexerIndexedCustomAction) execute(lexer *Lexer) {
     this.action.execute(lexer *Lexer)
 }
 
-func (this *LexerIndexedCustomAction) hashString() {
+func (this *LexerIndexedCustomAction) hashString() string {
     return "" + this.actionType + this.offset + this.action
 }
 
-func (this *LexerIndexedCustomAction) equals(other) {
+func (this *LexerIndexedCustomAction) equals(other *LexerAction) bool {
     if (this == other) {
         return true
-    } else if (! _, ok := other.(LexerIndexedCustomAction); ok) {
+    } else if _, ok := other.(*LexerIndexedCustomAction); !ok {
         return false
     } else {
-        return this.offset == other.offset && this.action == other.action
+        return this.offset == other.(*LexerIndexedCustomAction).offset && this.action == other.(*LexerIndexedCustomAction).action
     }
 }
 

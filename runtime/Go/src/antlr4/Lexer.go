@@ -43,6 +43,7 @@ type Lexer struct {
 	_modeStack IntStack
 	_mode int
 	_text string
+	actionType int
 }
 
 func NewLexer(input *InputStream) *Lexer {
