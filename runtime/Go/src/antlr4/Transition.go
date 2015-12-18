@@ -18,6 +18,7 @@ type Transition struct {
 	target *ATNState
 	isEpsilon bool
 	label *IntervalSet
+	serializationType int
 }
 
 func Transition (target *ATNState) *Transition {
@@ -37,6 +38,10 @@ func (t *Transition) InitTransition(target *ATNState) {
 	// Are we epsilon, action, sempred?
 	t.isEpsilon = false
 	t.label = nil
+}
+
+func (t *Transition) matches( symbol, minVocabSymbol,  maxVocabSymbol int ) bool {
+	panic("Not implemented")
 }
 
 const(
@@ -97,7 +102,6 @@ type AtomTransition struct {
 	Transition
 	label_ int
 	label *IntervalSet
-	serializationType int
 }
 
 func NewAtomTransition ( target *ATNState, label int ) *AtomTransition {
@@ -128,7 +132,7 @@ func (t *AtomTransition) toString() string {
 
 type RuleTransition struct {
 	Transition
-	ruleIndex, precedence, followState, serializationType int
+	ruleIndex, precedence, followState int
 }
 
 func NewRuleTransition ( ruleStart *ATNState, ruleIndex, precedence, followState int ) *RuleTransition {
@@ -155,7 +159,7 @@ type EpsilonTransition struct {
 	Transition
 
 	isEpsilon bool
-	outermostPrecedenceReturn, serializationType int
+	outermostPrecedenceReturn int
 }
 
 func NewEpsilonTransition ( target *ATNState, outermostPrecedenceReturn int ) *EpsilonTransition {
@@ -181,7 +185,7 @@ func (t *EpsilonTransition) toString() string {
 type RangeTransition struct {
 	Transition
 
-	serializationType, start, stop int
+	start, stop int
 }
 
 func NewRangeTransition ( target *ATNState, start, stop int ) *RangeTransition {
@@ -228,7 +232,7 @@ type PredicateTransition struct {
 	Transition
 
 	isCtxDependent bool
-	ruleIndex, predIndex, serializationType int
+	ruleIndex, predIndex int
 }
 
 func PredicateTransition ( target *ATNState, ruleIndex, predIndex int, isCtxDependent bool ) *PredicateTransition {
@@ -261,7 +265,7 @@ type ActionTransition struct {
 	Transition
 
 	isCtxDependent bool
-	ruleIndex, actionIndex, predIndex, serializationType int
+	ruleIndex, actionIndex, predIndex int
 }
 
 func NewActionTransition ( target *ATNState, ruleIndex, actionIndex int, isCtxDependent bool ) *ActionTransition {
@@ -290,8 +294,6 @@ func (t *ActionTransition) toString() string {
 
 type SetTransition struct {
 	Transition
-
-	serializationType int
 }
 
 func NewSetTransition ( target *ATNState, set *IntervalSet ) *SetTransition {
@@ -352,8 +354,6 @@ func (t *NotSetTransition) toString() string {
 
 type WildcardTransition struct {
 	Transition
-
-	serializationType int
 }
 
 func NewWildcardTransition ( target *ATNState ) *WildcardTransition {
@@ -377,7 +377,6 @@ type PrecedencePredicateTransition struct {
 	Transition
 
 	precedence int
-	serializationType int
 }
 
 func PrecedencePredicateTransition ( target *ATNState, precedence int ) *PrecedencePredicateTransition {

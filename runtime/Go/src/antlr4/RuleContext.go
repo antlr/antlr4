@@ -92,7 +92,7 @@ func (this *RuleContext) getPayload() *RuleContext {
 // added to the parse trees, they will not appear in the output of this
 // method.
 //
-func (this *RuleContext) getText() {
+func (this *RuleContext) getText() string {
 	if (this.getChildCount() == 0) {
 		return ""
 	} else {
@@ -128,8 +128,7 @@ func (this *RuleContext) toStringTree(ruleNames []string, recog *Recognizer) str
 }
 
 func (this *RuleContext) toString(ruleNames []string, stop *RuleContext) string {
-	ruleNames = ruleNames || nil
-	stop = stop || nil
+
 	var p *RuleContext = this
 	var s = "["
 	for (p != nil && p != stop) {

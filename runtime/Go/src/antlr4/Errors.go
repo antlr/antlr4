@@ -132,7 +132,7 @@ type NoViableAltException struct {
 // of the offending input and also knows where the parser was
 // in the various paths when the error. Reported by reportNoViableAlternative()
 //
-func NoViableAltException(recognizer *Parser, input *InputStream, startToken *Token,
+func NewNoViableAltException(recognizer *Parser, input *InputStream, startToken *Token,
 	offendingToken *Token, deadEndConfigs *ATNConfigSet, ctx *ParserRuleContext) *NoViableAltException {
 
 	if (ctx == nil){

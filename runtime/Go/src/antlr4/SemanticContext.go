@@ -17,7 +17,7 @@ type SemanticContext interface {
 	toString() string
 }
 
-func SemanticContextandContext(a, b *SemanticContext) {
+func SemanticContextandContext(a, b *SemanticContext) *SemanticContext {
 	if (a == nil || a == SemanticContextNONE) {
 		return b
 	}
@@ -32,7 +32,7 @@ func SemanticContextandContext(a, b *SemanticContext) {
 	}
 }
 
-func SemanticContextorContext(a, b *SemanticContext) {
+func SemanticContextorContext(a, b *SemanticContext) *SemanticContext {
 	if (a == nil) {
 		return b
 	}

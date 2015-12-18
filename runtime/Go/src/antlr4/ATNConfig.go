@@ -64,11 +64,11 @@ func NewATNConfig1(c *ATNConfig, state *ATNState, context *PredictionContext) *A
 func NewATNConfig(c *ATNConfig, state *ATNState, context *PredictionContext, semanticContext *SemanticContext) *ATNConfig {
 	a := new(ATNConfig)
 
-	a.InitATNConfig2(c, state, context, semanticContext)
+	a.InitATNConfig(c, state, context, semanticContext)
 	return a
 }
 
-func (a *ATNConfig) InitATNConfig2(c *ATNConfig, state *ATNState, context *PredictionContext, semanticContext  *SemanticContext) {
+func (a *ATNConfig) InitATNConfig(c *ATNConfig, state *ATNState, context *PredictionContext, semanticContext  *SemanticContext) {
 
 	a.state = state;
 	a.alt = c.alt;
@@ -198,6 +198,7 @@ func (this *ATNConfig) toString() string {
 
 type LexerATNConfig struct {
 	ATNConfig
+
 	lexerActionExecutor *LexerActionExecutor
 	passedThroughNonGreedyDecision bool
 }
@@ -227,18 +228,29 @@ func (this *LexerATNConfig) hashString() {
 }
 
 func (this *LexerATNConfig) equals(other *ATNConfig) bool {
+
+	othert, ok := other.(*LexerATNConfig)
+
     if (this == other) {
         return true
-    } else if _, ok := other.(*LexerATNConfig); !ok {
+    } else if !ok {
         return false
-    } else if (this.passedThroughNonGreedyDecision != other.passedThroughNonGreedyDecision) {
+    } else if (this.passedThroughNonGreedyDecision != othert.passedThroughNonGreedyDecision) {
         return false
-    } else if (this.lexerActionExecutor ?
-            !this.lexerActionExecutor.equals(other.lexerActionExecutor)
-            : !other.lexerActionExecutor) {
+    }
+
+	var b bool
+	if (this.lexerActionExecutor != nil){
+		b  = !this.lexerActionExecutor.equals(othert.lexerActionExecutor)
+	} else {
+		b = !othert.lexerActionExecutor
+	}
+
+	if (b) {
         return false
     } else {
-        return ATNConfig.prototype.equals.call(this, other)
+		panic("Not implemented")
+//        return ATNConfig.prototype.equals.call(this, other)
     }
 }
 

@@ -1536,7 +1536,7 @@ ParserATNSimulator.prototype.getLookaheadName = function(input) {
 //
 ParserATNSimulator.prototype.dumpDeadEndConfigs = function(nvae) {
     console.log("dead end configs: ");
-    var decs = nvae.getDeadEndConfigs();
+    var decs = nvae.deadEndConfigs;
     for(var i=0; i<decs.length; i++) {
     	var c = decs[i];
         var trans = "no edges";
