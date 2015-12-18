@@ -40,16 +40,16 @@ import(
 // This class defines a complete listener for a parse tree produced by <file.parserName>.
 
 type <file.grammarName>Listener struct {
-	tree.ParseTreeListener
+	ParseTreeListener
 }
 
 <file.listenerNames:{lname |
 // Enter a parse tree produced by <file.parserName>#<lname>.
-func (l *<file.grammarName>Listener) enter<lname; format="cap">(ctx *antlr4.ParserRuleContext) {
+func (l *<file.grammarName>Listener) enter<lname; format="cap">(ctx *ParserRuleContext) {
 \}
 
 // Exit a parse tree produced by <file.parserName>#<lname>.
-func (l *<file.grammarName>Listener) exit<lname; format="cap">(ctx *antlr4.ParserRuleContext) {
+func (l *<file.grammarName>Listener) exit<lname; format="cap">(ctx *ParserRuleContext) {
 \}
 
 }; separator="\n">
@@ -70,12 +70,12 @@ import(
 // This class defines a complete generic visitor for a parse tree produced by <file.parserName>.
 
 type <file.grammarName>Visitor struct {
-	tree.ParseTreeVisitor
+	ParseTreeVisitor
 }
 
 <file.visitorNames:{lname |
 // Visit a parse tree produced by <file.parserName>#<lname>.
-func (l <file.grammarName>Visitor) visit<lname; format="cap">(ctx *antlr4.ParserRuleContext) {
+func (l <file.grammarName>Visitor) visit<lname; format="cap">(ctx *ParserRuleContext) {
 \}
 
 }; separator="\n">
@@ -92,8 +92,8 @@ var <superClass> = require('./<superClass>').<superClass> // TODO
 <atn>
 
 type <parser.name> struct {
-    <superClass; null="antlr4.Parser">
-    _interp *atn.ParserATNSimulator
+    <superClass; null="Parser">
+    _interp *ParserATNSimulator
     ruleNames []string
     literalNames []string
     symbolicNames []string
@@ -104,7 +104,7 @@ func New<parser.name>(input) <parser.name> {
 
     // TODO could be package level variable
 
-    var deserializer = atn.NewATNDeserializer()
+    var deserializer = NewATNDeserializer()
     var deserializedAtn = deserializer.deserialize(serializedATN)
     var decisionToDFA = make([]dfa.DFA,len(deserializedAtn.decisionToState))
 
@@ -112,7 +112,7 @@ func New<parser.name>(input) <parser.name> {
         decisionToDFA[index] = dfa.NewDFA(ds, index)
     }
 
-    var sharedContextCache = antlr4.NewPredictionContextCache()
+    var sharedContextCache = NewPredictionContextCache()
 
     var literalNames = [...]string{ <parser.literalNames:{t | <t>}; null="nil", separator=", ", wrap, anchor> }
     var symbolicNames = [...]string{ <parser.symbolicNames:{t | <t>}; null="nil", separator=", ", wrap, anchor> }
@@ -121,7 +121,7 @@ func New<parser.name>(input) <parser.name> {
     // init the parser
     parser := new(<parser.name>)
 
-    parser._interp = atn.NewParserATNSimulator(parser, atn, decisionToDFA, sharedContextCache)
+    parser._interp = NewParserATNSimulator(parser, atn, decisionToDFA, sharedContextCache)
     parser.ruleNames = ruleNames
     parser.literalNames = literalNames
     parser.symbolicNames = symbolicNames
@@ -132,7 +132,7 @@ func New<parser.name>(input) <parser.name> {
 }
 
 const(
-    <parser.name>EOF = antlr4.TokenEOF
+    <parser.name>EOF = TokenEOF
     <if(parser.tokens)>
     <parser.tokens:{k | <parser.name><k> = <parser.tokens.(k)>}; separator="\n", wrap, anchor>
     <endif>
@@ -407,7 +407,7 @@ StarBlock(choice, alts, sync, iteration) ::= <<
 p.state = <choice.stateNumber>
 p._errHandler.sync(p)
 _alt := p._interp.adaptivePredict(p._input,<choice.decision>,p._ctx)
-for _alt!=<choice.exitAlt> && _alt!= atn.ATN.INVALID_ALT_NUMBER {
+for _alt!=<choice.exitAlt> && _alt!= ATNINVALID_ALT_NUMBER {
     if(_alt==1<if(!choice.ast.greedy)>+1<endif>) {
         <iteration>
         <alts> <! should only be one !>
@@ -423,7 +423,7 @@ PlusBlock(choice, alts, error) ::= <<
 p.state = <choice.blockStartStateNumber>; <! alt block decision !>
 p._errHandler.sync(p)
 _alt := 1<if(!choice.ast.greedy)>+1<endif>
-for ok := true; ok; ok = _alt!=<choice.exitAlt> && _alt!= atn.ATN.INVALID_ALT_NUMBER {
+for ok := true; ok; ok = _alt!=<choice.exitAlt> && _alt!= ATNINVALID_ALT_NUMBER {
 	switch _alt) {
 	<alts:{alt|
 case <i><if(!choice.ast.greedy)>+1<endif>:
@@ -563,13 +563,13 @@ TokenPropertyRef_int(t) ::= "(<ctx(t)>.<t.label> == null ? 0 : parseInt(<ctx(t)>
 
 RulePropertyRef_start(r) ::= "(<ctx(r)>.<r.label>==null ? null : <ctx(r)>.<r.label>.start)"
 RulePropertyRef_stop(r)	 ::= "(<ctx(r)>.<r.label>==null ? null : <ctx(r)>.<r.label>.stop)"
-RulePropertyRef_text(r)	 ::= "(<ctx(r)>.<r.label>==null ? null : p._input.getText(new antlr4.Interval(<ctx(r)>.<r.label>.start,<ctx(r)>.<r.label>.stop)))"
+RulePropertyRef_text(r)	 ::= "(<ctx(r)>.<r.label>==null ? null : p._input.getText(new Interval(<ctx(r)>.<r.label>.start,<ctx(r)>.<r.label>.stop)))"
 RulePropertyRef_ctx(r)	 ::= "<ctx(r)>.<r.label>"
 RulePropertyRef_parser(r)	 ::= "this"
 
 ThisRulePropertyRef_start(r) ::= "localctx.start"
 ThisRulePropertyRef_stop(r)	 ::= "localctx.stop"
-ThisRulePropertyRef_text(r)	 ::= "p._input.getText(new antlr4.Interval(localctx.start, p._input.LT(-1)))"
+ThisRulePropertyRef_text(r)	 ::= "p._input.getText(new Interval(localctx.start, p._input.LT(-1)))"
 ThisRulePropertyRef_ctx(r)	 ::= "localctx"
 ThisRulePropertyRef_parser(r)	 ::= "p"
 
@@ -649,16 +649,16 @@ CaptureNextToken(d) ::= "<d.varName> = p._input.LT(1)"
 CaptureNextTokenType(d) ::= "<d.varName> = p._input.LA(1);"
 
 StructDecl(struct,ctorAttrs,attrs,getters,dispatchMethods,interfaces,extensionMembers,
-           superClass={antlr4.ParserRuleContext}) ::= <<
+           superClass={ParserRuleContext}) ::= <<
 
 type <struct.name> struct {
-    antlr4.ParserRuleContext
-    parent *antlr4.ParserRuleContext
-    parser *antlr4.Parser
+    ParserRuleContext
+    parent *ParserRuleContext
+    parser *Parser
     ruleIndex
 }
 
-func New<struct.name>(parser *antlr4.Parser, parent *antlr4.ParserRuleContext, invokingState int<struct.ctorAttrs:{a | , <a.name>}>) <struct.name> {
+func New<struct.name>(parser *Parser, parent *ParserRuleContext, invokingState int<struct.ctorAttrs:{a | , <a.name>}>) <struct.name> {
 
     var p = new(<struct.name>)
     p.initParserRuleContext( parent, invokingState )
@@ -686,12 +686,12 @@ func (s *<struct.name>) copyFrom(ctx <struct.name>) {
 AltLabelStructDecl(struct,attrs,getters,dispatchMethods) ::= <<
 
 type <struct.name> struct {
-    parent *antlr4.ParserRuleContext
-    parser *antlr4.Parser
+    parent *ParserRuleContext
+    parser *Parser
     ruleIndex int
 }
 
-func New<struct.name>(parser *antlr4.Parser, ctx *antlr4.ParserRuleContext) <struct.name> {
+func New<struct.name>(parser *Parser, ctx *ParserRuleContext) <struct.name> {
 
     var p = new(<struct.name>)
 
@@ -711,7 +711,7 @@ func New<struct.name>(parser *antlr4.Parser, ctx *antlr4.ParserRuleContext) <str
 
 
 ListenerDispatchMethod(method) ::= <<
-func (s *<struct.name>) <if(method.isEnter)>enter<else>exit<endif>Rule(listener *tree.ParseTreeListener) {
+func (s *<struct.name>) <if(method.isEnter)>enter<else>exit<endif>Rule(listener *ParseTreeListener) {
     // TODO
     switch t := listener.(type) {
     case *<parser.grammarName>Listener:
@@ -723,7 +723,7 @@ func (s *<struct.name>) <if(method.isEnter)>enter<else>exit<endif>Rule(listener 
 
 
 VisitorDispatchMethod(method) ::= <<
-func (s *<struct.name>) accept(visitor *tree.ParseTreeVisitor) {
+func (s *<struct.name>) accept(visitor *ParseTreeVisitor) {
 
     switch t := listener.(type) {
     case *<parser.grammarName>Listener:
@@ -803,8 +803,8 @@ Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass) ::= <<
 <atn>
 
 type <lexer.name> struct {
-    <if(superClass)><superClass><else>antlr4.Lexer<endif>
-    _interp *atn.LexerATNSimulator
+    <if(superClass)><superClass><else>Lexer<endif>
+    _interp *LexerATNSimulator
     modeNames []string
     literalNames []string
     symbolicNames []string
@@ -813,11 +813,11 @@ type <lexer.name> struct {
     EOF string
 }
 
-func New<lexer.name>(input *antlr4.TokenStream) *<lexer.name> {
+func New<lexer.name>(input *TokenStream) *<lexer.name> {
 
     // TODO could be package level variables
 
-    var deserializer = atn.NewATNDeserializer()
+    var deserializer = NewATNDeserializer()
     var deserializedAtn = deserializer.deserialize(serializedATN)
 
     var decisionToDFA = make([]dfa.DFA,len(deserializedAtn.decisionToState))
@@ -828,15 +828,15 @@ func New<lexer.name>(input *antlr4.TokenStream) *<lexer.name> {
 
 	lex := new(<lexer.name>)
 
-	antlr4.initLexer(lex, input);
+	initLexer(lex, input);
 
-    lex._interp = atn.NewLexerATNSimulator(lex, atn, decisionToDFA, antlr4.NewPredictionContextCache())
+    lex._interp = NewLexerATNSimulator(lex, atn, decisionToDFA, NewPredictionContextCache())
     lex.modeNames = [...]string{ <lexer.modes:{m| "<m>"}; separator=", ", wrap, anchor> }
     lex.literalNames = [...]string{ <lexer.literalNames:{t | <t>}; null="nil", separator=", ", wrap, anchor> }
     lex.symbolicNames = [...]string{ <lexer.symbolicNames:{t | <t>}; null="nil", separator=", ", wrap, anchor> }
     lex.ruleNames = [...]string{ <lexer.ruleNames:{r | "<r>"}; separator=", ", wrap, anchor> }
     lex.grammarFileName = "<lexer.grammarFileName>"
-    lex.EOF = antlr4.TokenEOF
+    lex.EOF = TokenEOF
 
     return lex
 }

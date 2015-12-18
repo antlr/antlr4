@@ -38,11 +38,11 @@ func NewCommonTokenStream(lexer *Lexer, channel int) {
 
 }
 
-func (ts *CommonTokenStream) adjustSeekIndex(i int) {
+func (ts *CommonTokenStream) adjustSeekIndex(i int) int {
     return ts.nextTokenOnChannel(i, ts.channel)
 }
 
-func (ts *CommonTokenStream) LB(k int) {
+func (ts *CommonTokenStream) LB(k int) Token {
     if (k==0 || ts.index-k<0) {
         return nil
     }
@@ -60,7 +60,7 @@ func (ts *CommonTokenStream) LB(k int) {
     return ts.tokens[i]
 }
 
-func (ts *CommonTokenStream) LT(k int) {
+func (ts *CommonTokenStream) LT(k int) Token {
     ts.lazyInit()
     if (k == 0) {
         return nil
@@ -82,7 +82,7 @@ func (ts *CommonTokenStream) LT(k int) {
 }
 
 // Count EOF just once.///
-func (ts *CommonTokenStream) getNumberOfOnChannelTokens() {
+func (ts *CommonTokenStream) getNumberOfOnChannelTokens() int {
     var n = 0
     ts.fill()
     for i := 0; i < len(ts.tokens); i++ {

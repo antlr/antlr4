@@ -9,46 +9,56 @@ import (
 //  in the input, where it is in the ATN, the rule invocation stack,
 //  and what kind of problem occurred.
 
-//var PredicateTransition = require('./../atn/Transition').PredicateTransition
-
 type RecognitionException struct {
 
 	message string
-	recognizer Recognizer
+	recognizer *Recognizer
+	offendingToken *Token
+	offendingState int
+	ctx *RuleContext
+	input *InputStream
 
 }
 
-func RecognitionException(params) {
-	Error.call(this)
+func NewRecognitionException(message string, recognizer *Recognizer, input *InputStream, ctx *RuleContext) *RecognitionException {
 
-	if (!!Error.captureStackTrace) {
-        Error.captureStackTrace(this, RecognitionException)
-	} else {
-		var stack = NewError().stack
+// todo
+//	Error.call(this)
+//
+//	if (!!Error.captureStackTrace) {
+//        Error.captureStackTrace(this, RecognitionException)
+//	} else {
+//		var stack = NewError().stack
+//	}
+	// TODO may be able to use - "runtime" func Stack(buf []byte, all bool) int
+
+	t := new(RecognitionException)
+	t.initRecognitionException(message, recognizer, input, ctx)
+
+    return t
+}
+
+func (t *RecognitionException) initRecognitionException(message string, recognizer *Recognizer, input *InputStream, ctx *RuleContext){
+
+	t.message = message
+	t.recognizer = recognizer
+	t.input = input
+	t.ctx = ctx
+	// The current {@link Token} when an error occurred. Since not all streams
+	// support accessing symbols by index, we have to track the {@link Token}
+	// instance itself.
+	t.offendingToken = nil
+	// Get the ATN state number the parser was in at the time the error
+	// occurred. For {@link NoViableAltException} and
+	// {@link LexerNoViableAltException} exceptions, this is the
+	// {@link DecisionState} number. For others, it is the state whose outgoing
+	// edge we couldn't match.
+	t.offendingState = -1
+	if (t.recognizer!=nil) {
+		t.offendingState = t.recognizer.state
 	}
 
-	this.message = params.message
-    this.recognizer = params.recognizer
-    this.input = params.input
-    this.ctx = params.ctx
-    // The current {@link Token} when an error occurred. Since not all streams
-    // support accessing symbols by index, we have to track the {@link Token}
-    // instance itself.
-    this.offendingToken = nil
-    // Get the ATN state number the parser was in at the time the error
-    // occurred. For {@link NoViableAltException} and
-    // {@link LexerNoViableAltException} exceptions, this is the
-    // {@link DecisionState} number. For others, it is the state whose outgoing
-    // edge we couldn't match.
-    this.offendingState = -1
-    if (this.recognizer!=nil) {
-        this.offendingState = this.recognizer.state
-    }
-    return this
 }
-
-//RecognitionException.prototype = Object.create(Error.prototype)
-//RecognitionException.prototype.constructor = RecognitionException
 
 // <p>If the state number is not known, this method returns -1.</p>
 
@@ -64,7 +74,7 @@ func RecognitionException(params) {
 // /
 func (this *RecognitionException) getExpectedTokens() {
     if (this.recognizer!=nil) {
-        return this.recognizer.atn.getExpectedTokens(this.offendingState, this.ctx)
+        return this.recognizer.getATN().getExpectedTokens(this.offendingState, this.ctx)
     } else {
         return nil
     }
@@ -74,22 +84,47 @@ func (this *RecognitionException) toString() string {
     return this.message
 }
 
-func LexerNoViableAltException(lexer, input, startIndex, deadEndConfigs) {
-	RecognitionException.call(this, {message:"", recognizer:lexer, input:input, ctx:nil})
-    this.startIndex = startIndex
-    this.deadEndConfigs = deadEndConfigs
-    return this
+
+type LexerNoViableAltException struct {
+
+	RecognitionException
+
+	startIndex int
+	deadEndConfigs *ATNConfigSet
+
 }
 
-//LexerNoViableAltException.prototype = Object.create(RecognitionException.prototype)
-//LexerNoViableAltException.prototype.constructor = LexerNoViableAltException
+func NewLexerNoViableAltException(lexer *Lexer, input *InputStream, startIndex int,
+	deadEndConfigs *ATNConfigSet) *LexerNoViableAltException {
+
+	this := new (LexerNoViableAltException)
+
+	this.initRecognitionException("", lexer, input, nil)
+
+	this.startIndex = startIndex
+    this.deadEndConfigs = deadEndConfigs
+
+    return this
+}
 
 func (this *LexerNoViableAltException) toString() string {
     var symbol = ""
     if (this.startIndex >= 0 && this.startIndex < this.input.size) {
-        symbol = this.input.getText((this.startIndex,this.startIndex))
+        symbol = this.input.getText(this.startIndex,this.startIndex)
     }
     return "LexerNoViableAltException" + symbol
+}
+
+
+type NoViableAltException struct {
+
+	RecognitionException
+
+	startToken *Token
+	offendingToken *Token
+	ctx *ParserRuleContext
+	deadEndConfigs *ATNConfigSet
+
 }
 
 // Indicates that the parser could not decide which of two or more paths
@@ -97,12 +132,28 @@ func (this *LexerNoViableAltException) toString() string {
 // of the offending input and also knows where the parser was
 // in the various paths when the error. Reported by reportNoViableAlternative()
 //
-func NoViableAltException(recognizer, input, startToken, offendingToken, deadEndConfigs, ctx) {
-	ctx = ctx || recognizer._ctx
-	offendingToken = offendingToken || recognizer.getCurrentToken()
-	startToken = startToken || recognizer.getCurrentToken()
-	input = input || recognizer.getInputStream()
-	RecognitionException.call(this, {message:"", recognizer:recognizer, input:input, ctx:ctx})
+func NoViableAltException(recognizer *Parser, input *InputStream, startToken *Token,
+	offendingToken *Token, deadEndConfigs *ATNConfigSet, ctx *ParserRuleContext) *NoViableAltException {
+
+	if (ctx == nil){
+		ctx = recognizer._ctx
+	}
+
+	if (offendingToken == nil){
+		offendingToken = recognizer.getCurrentToken()
+	}
+
+	if (startToken == nil){
+		startToken = recognizer.getCurrentToken()
+	}
+
+	if (input == nil){
+		input = recognizer.getInputStream()
+	}
+
+	this := new(NoViableAltException)
+	this.initRecognitionException("", recognizer, input, ctx)
+
     // Which configurations did we try at input.index() that couldn't match
 	// input.LT(1)?//
     this.deadEndConfigs = deadEndConfigs
@@ -112,48 +163,67 @@ func NoViableAltException(recognizer, input, startToken, offendingToken, deadEnd
     // buffer all of the tokens but later we might not have access to those.)
     this.startToken = startToken
     this.offendingToken = offendingToken
+
+	return this
 }
 
-//NoViableAltException.prototype = Object.create(RecognitionException.prototype)
-//NoViableAltException.prototype.constructor = NoViableAltException
+type InputMismatchException struct {
+
+	RecognitionException
+
+}
 
 // This signifies any kind of mismatched input exceptions such as
 // when the current input does not match the expected token.
 //
-func InputMismatchException(recognizer) {
-	RecognitionException.call(this, {message:"", recognizer:recognizer, input:recognizer.getInputStream(), ctx:recognizer._ctx})
-    this.offendingToken = recognizer.getCurrentToken()
-}
+func NewInputMismatchException(recognizer *Parser) *InputMismatchException {
 
-//InputMismatchException.prototype = Object.create(RecognitionException.prototype)
-//InputMismatchException.prototype.constructor = InputMismatchException
+	this := new(InputMismatchException)
+	this.initRecognitionException("", recognizer, recognizer.getInputStream(), recognizer._ctx)
+
+	this.offendingToken = recognizer.getCurrentToken()
+
+	return this
+
+}
 
 // A semantic predicate failed during validation. Validation of predicates
 // occurs when normally parsing the alternative just like matching a token.
 // Disambiguating predicate evaluation occurs when we test a predicate during
 // prediction.
 
-func FailedPredicateException(recognizer, predicate, message) {
-	RecognitionException.call(this, {message:this.formatMessage(predicate,message || nil), recognizer:recognizer,
-                         input:recognizer.getInputStream(), ctx:recognizer._ctx})
+type FailedPredicateException struct {
+
+	RecognitionException
+
+	ruleIndex int
+	predicateIndex int
+	predicate string
+
+}
+
+func NewFailedPredicateException(recognizer *Parser, predicate string, message string) *FailedPredicateException {
+
+	this := new(FailedPredicateException)
+
+	this.initRecognitionException(this.formatMessage(predicate, message), recognizer, recognizer.getInputStream(), recognizer._ctx)
+
     var s = recognizer._interp.atn.states[recognizer.state]
     var trans = s.transitions[0]
-    if _, ok := trans.(PredicateTransition); ok {
-        this.ruleIndex = trans.ruleIndex
-        this.predicateIndex = trans.predIndex
+    if trans2, ok := trans.(PredicateTransition); ok {
+        this.ruleIndex = trans2.ruleIndex
+        this.predicateIndex = trans2.predIndex
     } else {
         this.ruleIndex = 0
         this.predicateIndex = 0
     }
     this.predicate = predicate
     this.offendingToken = recognizer.getCurrentToken()
+
     return this
 }
 
-//FailedPredicateException.prototype = Object.create(RecognitionException.prototype)
-//FailedPredicateException.prototype.constructor = FailedPredicateException
-
-func (this *FailedPredicateException) formatMessage(predicate, message) {
+func (this *FailedPredicateException) formatMessage(predicate, message string) string {
     if (message !=nil) {
         return message
     } else {
@@ -162,16 +232,14 @@ func (this *FailedPredicateException) formatMessage(predicate, message) {
 }
 
 type ParseCancellationException struct {
-	Error.call(this)
-	Error.captureStackTrace(this, ParseCancellationException)
-	return this
+
 }
 
-//ParseCancellationException.prototype = Object.create(Error.prototype)
-//ParseCancellationException.prototype.constructor = ParseCancellationException
-
-
-
+func NewParseCancellationException() *ParseCancellationException {
+//	Error.call(this)
+//	Error.captureStackTrace(this, ParseCancellationException)
+	return new(ParseCancellationException)
+}
 
 
 

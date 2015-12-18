@@ -1,8 +1,5 @@
 package antlr4
 
-import (
-        )
-
 type ATNSimulator struct {
     atn *ATN
     sharedContextCache *PredictionContextCache

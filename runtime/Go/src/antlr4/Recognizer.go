@@ -49,6 +49,10 @@ func (this *Recognizer) getTokenNames() []string {
     return nil
 }
 
+func (this *Recognizer) getATN() *ATN {
+    return this._interp.atn
+}
+
 //func (this *Recognizer) getTokenTypeMap() {
 //    var tokenNames = this.getTokenNames()
 //    if (tokenNames==nil) {

@@ -267,6 +267,10 @@ func (p *Parser) triggerExitRuleEvent() {
 	}
 }
 
+func (this *Parser) getATN() *ATN {
+	return this.atn
+}
+
 func (p *Parser) getTokenFactory() {
 	return p._input.getTokenSource()._factory
 }
