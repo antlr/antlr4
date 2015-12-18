@@ -1,14 +1,13 @@
 package antlr4
 
 import (
-    "antlr4/atn"
-)
+    )
 
 type LL1Analyzer struct {
-    atn *atn.ATN
+    atn *ATN
 }
 
-func NewLL1Analyzer (atn *atn.ATN) *LL1Analyzer {
+func NewLL1Analyzer (atn *ATN) *LL1Analyzer {
     la := new(LL1Analyzer)
     la.atn = atn
     return la
@@ -30,7 +29,7 @@ const (
 //
 // @param s the ATN state
 // @return the expected symbols for each outgoing transition of {@code s}.
-func (la *LL1Analyzer) getDecisionLookahead(s *atn.ATNState) []*IntervalSet {
+func (la *LL1Analyzer) getDecisionLookahead(s *ATNState) []*IntervalSet {
     if (s == nil) {
         return nil
     }
@@ -110,9 +109,9 @@ func (la *LL1Analyzer) LOOK(s, stopState int, ctx *RuleContext) *IntervalSet {
 // is {@code nil}.
 
 
-func (la *LL1Analyzer) _LOOK(s, stopState *atn.ATNState, ctx *PredictionContext, look *IntervalSet, lookBusy *Set, calledRuleStack *BitSet, seeThruPreds, addEOF bool) {
+func (la *LL1Analyzer) _LOOK(s, stopState *ATNState, ctx *PredictionContext, look *IntervalSet, lookBusy *Set, calledRuleStack *BitSet, seeThruPreds, addEOF bool) {
 
-    c := atn.NewATNConfig6(s, 0, ctx)
+    c := NewATNConfig6(s, 0, ctx)
 
     if !lookBusy.add(c) {
         return
@@ -128,7 +127,7 @@ func (la *LL1Analyzer) _LOOK(s, stopState *atn.ATNState, ctx *PredictionContext,
         }
     }
 
-    _,ok := s.(atn.RuleStopState)
+    _,ok := s.(RuleStopState)
 
     if ok {
         if ( ctx==nil ) {
@@ -168,7 +167,7 @@ func (la *LL1Analyzer) _LOOK(s, stopState *atn.ATNState, ctx *PredictionContext,
     for i:=0; i<n; i++ {
         t := s.transitions[i]
 
-        if t1, ok := t.(*atn.RuleTransition); ok {
+        if t1, ok := t.(*RuleTransition); ok {
 
             if (calledRuleStack.get(t1.target.ruleIndex)) {
                 continue
@@ -182,7 +181,7 @@ func (la *LL1Analyzer) _LOOK(s, stopState *atn.ATNState, ctx *PredictionContext,
 
             calledRuleStack.set(t1.target.ruleIndex)
             la._LOOK(t.target, stopState, newContext, look, lookBusy, calledRuleStack, seeThruPreds, addEOF)
-        } else if t2, ok := t.(*atn.AbstractPredicateTransition); ok {
+        } else if t2, ok := t.(*AbstractPredicateTransition); ok {
             if ( seeThruPreds ) {
                 la._LOOK(t2.target, stopState, ctx, look, lookBusy, calledRuleStack, seeThruPreds, addEOF)
             } else {
@@ -190,12 +189,12 @@ func (la *LL1Analyzer) _LOOK(s, stopState *atn.ATNState, ctx *PredictionContext,
             }
         } else if ( t.isEpsilon() ) {
             la._LOOK(t.target, stopState, ctx, look, lookBusy, calledRuleStack, seeThruPreds, addEOF)
-        } else if _, ok := t.(*atn.WildcardTransition); ok {
+        } else if _, ok := t.(*WildcardTransition); ok {
             look.addRange( TokenMinUserTokenType, la.atn.maxTokenType );
         }  else {
             set := t.label()
             if (set != nil) {
-                if _, ok := t.(*atn.NotSetTransition); ok {
+                if _, ok := t.(*NotSetTransition); ok {
                     set = set.complement(TokenMinUserTokenType, la.atn.maxTokenType);
                 }
                 look.addAll(set)

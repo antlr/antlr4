@@ -1,5 +1,4 @@
-package atn
-import "antlr4"
+package antlr4
 
 // The following images show the relation of states and
 // {@link ATNState//transitions} for various grammar constructs.
@@ -73,7 +72,7 @@ type ATNState struct {
 	// Track the transitions emanating from this ATN state.
 	transitions []*Transition
 	// Used to cache lookahead during parsing, not used during construction
-	nextTokenWithinRule *antlr4.Token
+	nextTokenWithinRule *Token
 }
 
 func NewATNState() *ATNState {

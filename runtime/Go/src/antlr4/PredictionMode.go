@@ -1,7 +1,6 @@
-package atn
+package antlr4
 import (
-	"antlr4"
-	"strings"
+		"strings"
 )
 
 //
@@ -377,7 +376,7 @@ func PredictionModeallConfigsInRuleStopStates(configs *ATNConfigSet) bool {
 // we need exact ambiguity detection when the sets look like
 // {@code A={{1,2}}} or {@code {{1,2},{1,2}}}, etc...</p>
 //
-func PredictionModeresolvesToJustOneViableAlt(altsets []*antlr4.BitSet) bool {
+func PredictionModeresolvesToJustOneViableAlt(altsets []*BitSet) bool {
     return PredictionModegetSingleViableAlt(altsets)
 }
 
@@ -389,7 +388,7 @@ func PredictionModeresolvesToJustOneViableAlt(altsets []*antlr4.BitSet) bool {
 // @return {@code true} if every {@link BitSet} in {@code altsets} has
 // {@link BitSet//cardinality cardinality} &gt 1, otherwise {@code false}
 //
-func PredictionModeallSubsetsConflict(altsets []*antlr4.BitSet) bool {
+func PredictionModeallSubsetsConflict(altsets []*BitSet) bool {
     return !PredictionModehasNonConflictingAltSet(altsets)
 }
 //
@@ -400,7 +399,7 @@ func PredictionModeallSubsetsConflict(altsets []*antlr4.BitSet) bool {
 // @return {@code true} if {@code altsets} contains a {@link BitSet} with
 // {@link BitSet//cardinality cardinality} 1, otherwise {@code false}
 //
-func PredictionModehasNonConflictingAltSet(altsets []*antlr4.BitSet) bool {
+func PredictionModehasNonConflictingAltSet(altsets []*BitSet) bool {
 	for i:=0; i<len(altsets); i++{
 		var alts = altsets[i]
         if (len(alts)==1) {
@@ -418,7 +417,7 @@ func PredictionModehasNonConflictingAltSet(altsets []*antlr4.BitSet) bool {
 // @return {@code true} if {@code altsets} contains a {@link BitSet} with
 // {@link BitSet//cardinality cardinality} &gt 1, otherwise {@code false}
 //
-func PredictionModehasConflictingAltSet(altsets []*antlr4.BitSet) bool {
+func PredictionModehasConflictingAltSet(altsets []*BitSet) bool {
 	for i:=0; i<len(altsets); i++{
 		var alts = altsets[i]
         if (len(alts)>1) {
@@ -435,7 +434,7 @@ func PredictionModehasConflictingAltSet(altsets []*antlr4.BitSet) bool {
 // @return {@code true} if every member of {@code altsets} is equal to the
 // others, otherwise {@code false}
 //
-func PredictionModeallSubsetsEqual(altsets []*antlr4.BitSet) bool {
+func PredictionModeallSubsetsEqual(altsets []*BitSet) bool {
     var first = nil
 	for i:=0; i<len(altsets); i++{
 		var alts = altsets[i]
@@ -455,7 +454,7 @@ func PredictionModeallSubsetsEqual(altsets []*antlr4.BitSet) bool {
 //
 // @param altsets a collection of alternative subsets
 //
-func PredictionModegetUniqueAlt(altsets []*antlr4.BitSet) int {
+func PredictionModegetUniqueAlt(altsets []*BitSet) int {
     var all = PredictionModegetAlts(altsets)
     if (len(all)==1) {
         return all.minValue()
@@ -471,8 +470,8 @@ func PredictionModegetUniqueAlt(altsets []*antlr4.BitSet) int {
 // @param altsets a collection of alternative subsets
 // @return the set of represented alternatives in {@code altsets}
 //
-func PredictionModegetAlts(altsets []*antlr4.BitSet) *antlr4.BitSet {
-    var all = antlr4.NewBitSet()
+func PredictionModegetAlts(altsets []*BitSet) *BitSet {
+    var all = NewBitSet()
 	for _, alts := range altsets {
 		all.or(alts)
 	}
@@ -495,7 +494,7 @@ func PredictionModegetConflictingAltSubsets(configs *ATNConfigSet) {
         var key = "key_" + c.state.stateNumber + "/" + c.context
         var alts = configToAlts[key] || nil
         if (alts == nil) {
-            alts = antlr4.NewBitSet()
+            alts = NewBitSet()
             configToAlts[key] = alts
         }
         alts.add(c.alt)
@@ -521,12 +520,12 @@ func PredictionModegetConflictingAltSubsets(configs *ATNConfigSet) {
 // </pre>
 //
 func PredictionModegetStateToAltMap(configs *ATNConfigSet) {
-    var m = antlr4.NewAltDict()
+    var m = NewAltDict()
 
 	for _, c := range configs.items {
         var alts = m.get(c.state)
         if (alts == nil) {
-            alts = antlr4.NewBitSet()
+            alts = NewBitSet()
             m.put(c.state, alts)
         }
         alts.add(c.alt)
@@ -544,7 +543,7 @@ func PredictionModehasStateAssociatedWithOneAlt (configs *ATNConfigSet) bool {
     return false
 }
 
-func PredictionModegetSingleViableAlt (altsets []*antlr4.BitSet) int {
+func PredictionModegetSingleViableAlt (altsets []*BitSet) int {
     var result = ATNINVALID_ALT_NUMBER
 	for i:=0; i<len(altsets); i++{
 		var alts = altsets[i]

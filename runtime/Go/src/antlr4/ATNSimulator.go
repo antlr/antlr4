@@ -1,16 +1,14 @@
-package atn
+package antlr4
 
 import (
-    "antlr4"
-    "antlr4/dfa"
-)
+        )
 
 type ATNSimulator struct {
     atn *ATN
-    sharedContextCache *antlr4.PredictionContextCache
+    sharedContextCache *PredictionContextCache
 }
 
-func ATNSimulator(atn *ATN, sharedContextCache *antlr4.PredictionContextCache) *ATNSimulator {
+func ATNSimulator(atn *ATN, sharedContextCache *PredictionContextCache) *ATNSimulator {
 	
     // The context cache maps all PredictionContext objects that are ==
     //  to a single cached copy. This cache is shared across all contexts
@@ -41,13 +39,13 @@ func ATNSimulator(atn *ATN, sharedContextCache *antlr4.PredictionContextCache) *
 }
 
 // Must distinguish between missing edge and edge we know leads nowhere///
-var ATNSimulatorERROR = dfa.NewDFAState(0x7FFFFFFF, NewATNConfigSet())
+var ATNSimulatorERROR = NewDFAState(0x7FFFFFFF, NewATNConfigSet())
 
-func (this *ATNSimulator) getCachedContext(context *antlr4.PredictionContext) *antlr4.PredictionContext {
+func (this *ATNSimulator) getCachedContext(context *PredictionContext) *PredictionContext {
     if (this.sharedContextCache == nil) {
         return context
     }
-    var visited = make(map[*antlr4.PredictionContext]*antlr4.PredictionContext)
+    var visited = make(map[*PredictionContext]*PredictionContext)
     return getCachedPredictionContext(context, this.sharedContextCache, visited)
 }
 

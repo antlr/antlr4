@@ -1,8 +1,7 @@
-package atn
+package antlr4
 
 import (
-	"antlr4"
-)
+	)
 
 // A tree structure used to record the semantic context in which
 //  an ATN configuration is valid.  It's either a single predicate,
@@ -202,7 +201,7 @@ PrecedencePredicate.filterPrecedencePredicates = function(set) {
 //
 func AND(a, b) {
 	SemanticContext.call(this)
-	var operands = antlr4.antlr4.NewSet()
+	var operands = NewSet()
 	if _, ok := a.(AND); ok {
 		a.opnds.map(function(o) {
 			operands.add(o)
@@ -307,7 +306,7 @@ func (this *AND) toString() string {
 //
 func OR(a, b) {
 	SemanticContext.call(this)
-	var operands = antlr4.NewSet()
+	var operands = NewSet()
 	if _, ok := a.(OR); ok {
 		a.opnds.map(function(o) {
 			operands.add(o)

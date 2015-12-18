@@ -3,14 +3,11 @@ package antlr4
 import (
     "fmt"
     "strings"
-    "antlr4/atn"
-    "antlr4/tree"
-    "antlr4/error"
-)
+            )
 
 type Recognizer struct {
-    _listeners []tree.ParseTreeListener
-    _interp *atn.ATNSimulator
+    _listeners []ParseTreeListener
+    _interp *ATNSimulator
     state int
 }
 
@@ -21,7 +18,7 @@ func NewRecognizer() *Recognizer {
 }
 
 func (rec *Recognizer) initRecognizer() {
-    rec._listeners = []tree.ParseTreeListener{ error.ConsoleErrorListenerINSTANCE }
+    rec._listeners = []ParseTreeListener{ ConsoleErrorListenerINSTANCE }
     rec._interp = nil
     rec.state = -1
 }
@@ -36,12 +33,12 @@ func (this *Recognizer) checkVersion(toolVersion string) {
     }
 }
 
-func (this *Recognizer) addErrorListener(listener *tree.ParseTreeListener) {
+func (this *Recognizer) addErrorListener(listener *ParseTreeListener) {
     append(this._listeners, listener)
 }
 
 func (this *Recognizer) removeErrorListeners() {
-    this._listeners = make([]tree.ParseTreeListener, 0)
+    this._listeners = make([]ParseTreeListener, 0)
 }
 
 func (this *Recognizer) getRuleNames() []string {
@@ -164,8 +161,8 @@ func (this *Recognizer) getTokenErrorDisplay(t *Token) string {
     return "'" + s + "'"
 }
 
-func (this *Recognizer) getErrorListenerDispatch() *error.ErrorListener {
-    return error.NewProxyErrorListener(this._listeners)
+func (this *Recognizer) getErrorListenerDispatch() *ErrorListener {
+    return NewProxyErrorListener(this._listeners)
 }
 
 // subclass needs to override these if there are sempreds or actions

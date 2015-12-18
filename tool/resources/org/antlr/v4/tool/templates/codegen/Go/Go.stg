@@ -17,9 +17,6 @@ package parser // <file.grammarName>
 
 import(
     "antlr4"
-    "antlr4/atn"
-    "antlr4/dfa"
-    "antlr4/tree"
     "strings"
 )
 
@@ -38,7 +35,6 @@ package parser // <file.grammarName>
 
 import(
     "antlr4"
-    "antlr4/tree"
 )
 
 // This class defines a complete listener for a parse tree produced by <file.parserName>.
@@ -67,9 +63,6 @@ package parser // <file.grammarName>
 
 import(
     "antlr4"
-    "antlr4/atn"
-    "antlr4/dfa"
-    "antlr4/tree"
 )
 
 <header>
@@ -796,8 +789,6 @@ package parser
 
 import (
     "antlr4"
-    "antlr4/atn"
-    "antlr4/dfa"
     "strings"
 )
 

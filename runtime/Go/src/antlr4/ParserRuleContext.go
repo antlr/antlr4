@@ -1,9 +1,7 @@
 package antlr4
 
 import (
-	"antlr4/error"
-	"antlr4/tree"
-	"reflect"
+			"reflect"
 )
 
 //* A rule invocation record for parsing.
@@ -36,7 +34,7 @@ type ParserRuleContext struct {
 	ruleIndex int
 	children []RuleContext
 	start, stop *Token
-	exception *error.RecognitionException
+	exception *RecognitionException
 }
 
 func NewParserRuleContext(parent *ParserRuleContext, invokingStateNumber int) *ParserRuleContext {
@@ -82,10 +80,10 @@ func (prc *ParserRuleContext) copyFrom(ctx *ParserRuleContext) {
 }
 
 // Double dispatch methods for listeners
-func (prc *ParserRuleContext) enterRule(listener *tree.ParseTreeListener) {
+func (prc *ParserRuleContext) enterRule(listener *ParseTreeListener) {
 }
 
-func (prc *ParserRuleContext) exitRule(listener *tree.ParseTreeListener) {
+func (prc *ParserRuleContext) exitRule(listener *ParseTreeListener) {
 }
 
 // * Does not set parent link other add methods do that///
@@ -107,15 +105,15 @@ func (prc *ParserRuleContext) removeLastChild() {
     }
 }
 
-func (prc *ParserRuleContext) addTokenNode(token *Token) *tree.TerminalNodeImpl {
-    var node = tree.NewTerminalNodeImpl(token)
+func (prc *ParserRuleContext) addTokenNode(token *Token) *TerminalNodeImpl {
+    var node = NewTerminalNodeImpl(token)
     prc.addChild(node)
     node.parentCtx = prc
     return node
 }
 
-func (prc *ParserRuleContext) addErrorNode(badToken *Token) *tree.ErrorNodeImpl {
-    var node = tree.NewErrorNodeImpl(badToken)
+func (prc *ParserRuleContext) addErrorNode(badToken *Token) *ErrorNodeImpl {
+    var node = NewErrorNodeImpl(badToken)
     prc.addChild(node)
     node.parentCtx = prc
     return node
@@ -144,11 +142,11 @@ func (prc *ParserRuleContext) getChild(i int, childType reflect.Type) {
 }
 
 
-func (prc *ParserRuleContext) getToken(ttype int, i int) *tree.TerminalNode {
+func (prc *ParserRuleContext) getToken(ttype int, i int) *TerminalNode {
 
 	for j :=0; j<len(prc.children); j++ {
 		var child = prc.children[j]
-		if _, ok := child.(*tree.TerminalNode); ok {
+		if _, ok := child.(*TerminalNode); ok {
 			if (child.symbol.tokenType == ttype) {
 				if(i==0) {
 					return child
@@ -161,14 +159,14 @@ func (prc *ParserRuleContext) getToken(ttype int, i int) *tree.TerminalNode {
     return nil
 }
 
-func (prc *ParserRuleContext) getTokens(ttype int) []*tree.TerminalNode {
+func (prc *ParserRuleContext) getTokens(ttype int) []*TerminalNode {
     if (prc.children== nil) {
-        return make([]*tree.TerminalNode)
+        return make([]*TerminalNode)
     } else {
-		var tokens = make([]*tree.TerminalNode)
+		var tokens = make([]*TerminalNode)
 		for j:=0; j<len(prc.children); j++ {
 			var child = prc.children[j]
-			if tchild, ok := child.(*tree.TerminalNode); ok {
+			if tchild, ok := child.(*TerminalNode); ok {
 				if (tchild.symbol.tokenType == ttype) {
 					tokens = append(tokens, tchild)
 				}
@@ -209,7 +207,7 @@ func (prc *ParserRuleContext) getChildCount() {
 
 func (prc *ParserRuleContext) getSourceInterval() {
     if( prc.start == nil || prc.stop == nil) {
-        return tree.TreeINVALID_INTERVAL
+        return TreeINVALID_INTERVAL
     } else {
         return NewInterval(prc.start.tokenIndex, prc.stop.tokenIndex)
     }

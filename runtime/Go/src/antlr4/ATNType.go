@@ -1,4 +1,4 @@
-package atn
+package antlr4
 
 // Represents the type of recognizer an ATN applies to.
 

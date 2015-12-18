@@ -1,8 +1,7 @@
-package error
+package antlr4
 
 import (
-	"antlr4"
-)
+	)
 
 // The root of the ANTLR exception hierarchy. In general, ANTLR tracks just
 //  3 kinds of errors: prediction errors, failed predicate errors, and
@@ -15,7 +14,7 @@ import (
 type RecognitionException struct {
 
 	message string
-	recognizer antlr4.Recognizer
+	recognizer Recognizer
 
 }
 

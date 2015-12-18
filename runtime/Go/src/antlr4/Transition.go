@@ -1,7 +1,6 @@
-package atn
+package antlr4
 import (
-	"antlr4"
-	"fmt"
+		"fmt"
 )
 
 //  atom, set, epsilon, action, predicate, rule transitions.
@@ -18,7 +17,7 @@ import (
 type Transition struct {
 	target *ATNState
 	isEpsilon bool
-	label *antlr4.IntervalSet
+	label *IntervalSet
 }
 
 func Transition (target *ATNState) *Transition {
@@ -97,7 +96,7 @@ var TransitionserializationNames = []string{
 type AtomTransition struct {
 	Transition
 	label_ int
-	label *antlr4.IntervalSet
+	label *IntervalSet
 	serializationType int
 }
 
@@ -113,8 +112,8 @@ func NewAtomTransition ( target *ATNState, label int ) *AtomTransition {
     return t
 }
 
-func (t *AtomTransition) makeLabel() *antlr4.IntervalSet {
-	var s = antlr4.NewIntervalSet()
+func (t *AtomTransition) makeLabel() *IntervalSet {
+	var s = NewIntervalSet()
     s.addOne(t.label_)
     return s
 }
@@ -198,8 +197,8 @@ func NewRangeTransition ( target *ATNState, start, stop int ) *RangeTransition {
 }
 
 
-func (t *RangeTransition) makeLabel() *antlr4.IntervalSet {
-    var s = antlr4.NewIntervalSet()
+func (t *RangeTransition) makeLabel() *IntervalSet {
+    var s = NewIntervalSet()
     s.addRange(t.start, t.stop)
     return s
 }
@@ -295,7 +294,7 @@ type SetTransition struct {
 	serializationType int
 }
 
-func NewSetTransition ( target *ATNState, set *antlr4.IntervalSet ) *SetTransition {
+func NewSetTransition ( target *ATNState, set *IntervalSet ) *SetTransition {
 
 	t := new(SetTransition)
 	t.initTransition( target )
@@ -304,14 +303,14 @@ func NewSetTransition ( target *ATNState, set *antlr4.IntervalSet ) *SetTransiti
     return t
 }
 
-func (t *SetTransition) initSetTransition( set *antlr4.IntervalSet ) {
+func (t *SetTransition) initSetTransition( set *IntervalSet ) {
 
 	t.serializationType = TransitionSET
 	if (set !=nil && set !=nil) {
 		t.label = set
 	} else {
-		t.label = antlr4.NewIntervalSet()
-		t.label.addOne(antlr4.TokenInvalidType)
+		t.label = NewIntervalSet()
+		t.label.addOne(TokenInvalidType)
 	}
 
 }
@@ -331,7 +330,7 @@ type NotSetTransition struct {
 	SetTransition
 }
 
-func NotSetTransition ( target *ATNState, set *antlr4.IntervalSet) *NotSetTransition {
+func NotSetTransition ( target *ATNState, set *IntervalSet) *NotSetTransition {
 
 	t := new(NotSetTransition)
 	t.initTransition( target )

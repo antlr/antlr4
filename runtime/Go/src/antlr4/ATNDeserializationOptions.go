@@ -1,18 +1,24 @@
-package atn
+package antlr4
 
-func ATNDeserializationOptions(copyFrom) {
-	if(copyFrom==nil) {
-		copyFrom = nil
-	}
-	this.readOnly = false
-    this.verifyATN = copyFrom==nil ? true : copyFrom.verifyATN
-    this.generateRuleBypassTransitions = copyFrom==nil ? false : copyFrom.generateRuleBypassTransitions
-
-    return this
+type ATNDeserializationOptions struct {
+	readOnly bool
+	verifyATN bool
+	generateRuleBypassTransitions bool
 }
 
-ATNDeserializationOptions.defaultOptions = NewATNDeserializationOptions()
-ATNDeserializationOptions.defaultOptions.readOnly = true
+func NewATNDeserializationOptions(copyFrom *ATNDeserializationOptions) *ATNDeserializationOptions {
+	o := new(ATNDeserializationOptions)
+
+	if (copyFrom != nil){
+		o.readOnly = copyFrom.readOnly
+		o.verifyATN = copyFrom.verifyATN
+		o.generateRuleBypassTransitions = copyFrom.generateRuleBypassTransitions
+	}
+
+    return o
+}
+
+var ATNDeserializationOptionsdefaultOptions = &ATNDeserializationOptions{true}
 
 //    func __setattr__(self, key, value):
 //        if key!="readOnly" and self.readOnly:

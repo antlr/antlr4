@@ -1,7 +1,6 @@
-package atn
+package antlr4
 import (
-	"antlr4/dfa"
-	"fmt"
+		"fmt"
 )
 
 // When we hit an accept state in either the DFA or the ATN, we
@@ -31,7 +30,7 @@ type SimState struct {
 	index int
 	line int
 	column int
-	dfaState *dfa.DFAState
+	dfaState *DFAState
 }
 
 func NewSimState() *SimState {

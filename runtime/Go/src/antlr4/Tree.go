@@ -1,14 +1,11 @@
-package tree
+package antlr4
 
-import (
-	"antlr4"
-)
 
 // The basic notion of a tree has a parent, a payload, and a list of children.
 //  It is the most abstract interface for all the trees used by ANTLR.
 ///
 
-var TreeINVALID_INTERVAL = antlr4.NewInterval(-1, -2)
+var TreeINVALID_INTERVAL = NewInterval(-1, -2)
 
 type Tree interface {
 	getParent() *Tree
@@ -20,7 +17,7 @@ type Tree interface {
 
 type SyntaxTree interface {
 	Tree
-	getSourceInterval() *antlr4.Interval
+	getSourceInterval() *Interval
 }
 
 type ParseTree interface {
@@ -28,17 +25,17 @@ type ParseTree interface {
 //	<T> T accept(ParseTreeVisitor<? extends T> visitor);
 	accept(visitor *ParseTreeVisitor)
 	getText() string
-	toStringTree(parser *antlr4.Parser) string
+	toStringTree(parser *Parser) string
 }
 
 type RuleNode interface {
 	ParseTree
-	getRuleContext() *antlr4.RuleContext
+	getRuleContext() *RuleContext
 }
 
 type TerminalNode interface {
 	ParseTree
-	getSymbol() *antlr4.Token
+	getSymbol() *Token
 }
 
 type ErrorNode interface {
@@ -76,18 +73,16 @@ type ParseTreeVisitor interface {
 type ParseTreeListener interface {
 	visitTerminal(node *TerminalNode)
 	visitErrorNode(node *ErrorNode)
-	enterEveryRule(ctx *antlr4.ParserRuleContext)
-	exitEveryRule(ctx *antlr4.ParserRuleContext)
+	enterEveryRule(ctx *ParserRuleContext)
+	exitEveryRule(ctx *ParserRuleContext)
 }
-
-
 
 type TerminalNodeImpl struct {
-	parentCtx *antlr4.RuleContext
-	symbol *antlr4.Token
+	parentCtx *RuleContext
+	symbol *Token
 }
 
-func NewTerminalNodeImpl(symbol *antlr4.Token) *TerminalNodeImpl {
+func NewTerminalNodeImpl(symbol *Token) *TerminalNodeImpl {
 	tn := &TerminalNodeImpl{TerminalNode{}}
 
 	tn.initTerminalNodeImpl(symbol)
@@ -95,7 +90,7 @@ func NewTerminalNodeImpl(symbol *antlr4.Token) *TerminalNodeImpl {
 	return tn
 }
 
-func (this *TerminalNodeImpl) initTerminalNodeImpl(symbol *antlr4.Token) {
+func (this *TerminalNodeImpl) initTerminalNodeImpl(symbol *Token) {
 	this.parentCtx = nil
 	this.symbol = symbol
 }
@@ -104,7 +99,7 @@ func (this *TerminalNodeImpl) getChild(i int) *Tree {
 	return nil
 }
 
-func (this *TerminalNodeImpl) getSymbol() *antlr4.Token {
+func (this *TerminalNodeImpl) getSymbol() *Token {
 	return this.symbol
 }
 
@@ -112,16 +107,16 @@ func (this *TerminalNodeImpl) getParent() *Tree {
 	return this.parentCtx
 }
 
-func (this *TerminalNodeImpl) getPayload() *antlr4.Token {
+func (this *TerminalNodeImpl) getPayload() *Token {
 	return this.symbol
 }
 
-func (this *TerminalNodeImpl) getSourceInterval() *antlr4.Interval {
+func (this *TerminalNodeImpl) getSourceInterval() *Interval {
 	if (this.symbol == nil) {
 		return TreeINVALID_INTERVAL
 	}
 	var tokenIndex = this.symbol.tokenIndex
-	return antlr4.NewInterval(tokenIndex, tokenIndex)
+	return NewInterval(tokenIndex, tokenIndex)
 }
 
 func (this *TerminalNodeImpl) getChildCount() {
@@ -157,7 +152,7 @@ type ErrorNodeImpl struct {
 	TerminalNodeImpl
 }
 
-func NewErrorNodeImpl(token *antlr4.Token) *ErrorNodeImpl {
+func NewErrorNodeImpl(token *Token) *ErrorNodeImpl {
 	en := new(ErrorNodeImpl)
 	en.initTerminalNodeImpl(token)
 	return en
@@ -203,13 +198,13 @@ func (this *ParseTreeWalker) walk(listener *ParseTreeListener, t *Tree) {
 // the rule specific. We to them in reverse order upon finishing the node.
 //
 func (this *ParseTreeWalker) enterRule(listener *ParseTreeListener, r *RuleNode) {
-	var ctx = r.getRuleContext().(*antlr4.ParserRuleContext)
+	var ctx = r.getRuleContext().(*ParserRuleContext)
 	listener.enterEveryRule(ctx)
 	ctx.enterRule(listener)
 }
 
 func (this *ParseTreeWalker) exitRule(listene *ParseTreeListener, r *RuleNode) {
-	var ctx = r.getRuleContext().(*antlr4.ParserRuleContext)
+	var ctx = r.getRuleContext().(*ParserRuleContext)
 	ctx.exitRule(listener)
 	listener.exitEveryRule(ctx)
 }

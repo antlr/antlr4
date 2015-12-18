@@ -1,4 +1,4 @@
-package atn
+package antlr4
 
 // This is the earliest supported serialized UUID.
 // stick to serialized version for now, we don't need a UUID instance
@@ -522,7 +522,7 @@ var byteToHex = createByteToHex()
 	
 func (this *ATNDeserializer) readUUID() {
 	var bb = []
-	for(var i=7i>=0i--) {
+	for  i:=7;i>=0;i-- {
 		var int = this.readInt()
 		/* jshint bitwise: false */
 		bb[(2*i)+1] = int & 0xFF
@@ -556,7 +556,7 @@ ATNDeserializer.prototype.edgeFactory = function(atn, type, src, trg, arg1, arg2
     case Transition.ACTION:
         return NewActionTransition(target, arg1, arg2, arg3 != 0)
     case Transition.SET:
-        return antlr4.NewSetTransition(target, sets[arg1])
+        return NewSetTransition(target, sets[arg1])
     case Transition.NOT_SET:
         return NewNotSetTransition(target, sets[arg1])
     case Transition.WILDCARD:

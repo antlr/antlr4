@@ -3,7 +3,6 @@ package antlr4
 import (
 	"strings"
 	"fmt"
-	"antlr4/atn"
 )
 
 // A lexer is recognizer that draws input symbols from a character stream.
@@ -33,7 +32,7 @@ type Lexer struct {
 	_input *InputStream
 	_factory *TokenFactory
 	_tokenFactorySourcePair *TokenFactorySourcePair
-	_interp *atn.LexerATNSimulator
+	_interp *LexerATNSimulator
 	_token int
 	_tokenStartCharIndex int
 	_tokenStartLine int
@@ -365,7 +364,7 @@ func (l *Lexer) getCharErrorDisplay(c) string {
 // /
 func (l *Lexer) recover(re error) {
 	if (l._input.LA(1) != TokenEOF) {
-		if _, ok := re.(error.LexerNoViableAltException); ok {
+		if _, ok := re.(LexerNoViableAltException); ok {
 			// skip a char and try again
 			l._interp.consume(l._input)
 		} else {

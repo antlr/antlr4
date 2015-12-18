@@ -85,7 +85,7 @@ func (this *Set) length() int {
 	return len(this.data)
 }
 
-func (this *Set) add(value interface{}) {
+func (this *Set) add(value interface{}) interface{} {
 
 	var hash = this.hashFunction(value)
 	var key = "hash_" + hashCode(hash)

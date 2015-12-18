@@ -1,4 +1,4 @@
-package atn
+package antlr4
 
 // Represents an executor for a sequence of lexer actions which traversed during
 // the matching operation of a lexer rule (token).

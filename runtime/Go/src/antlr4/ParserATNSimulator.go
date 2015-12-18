@@ -1,8 +1,7 @@
-package atn
+package antlr4
 
 import (
-    "antlr4"
-    "fmt"
+        "fmt"
 )
 
 //
@@ -785,7 +784,7 @@ func (this *ParserATNSimulator) computeReachSet(closure, t, fullCtx) {
     //
     if (reach==nil) {
         reach = NewATNConfigSet(fullCtx)
-        var closureBusy = antlr4.NewSet()
+        var closureBusy = NewSet()
         var treatEofAsEpsilon = t == TokenEOF
         for (var k=0 k<intermediate.items.lengthk++) {
             this.closure(intermediate.items[k], reach, closureBusy, false, fullCtx, treatEofAsEpsilon)
@@ -879,7 +878,7 @@ func (this *ParserATNSimulator) computeStartState(p, ctx, fullCtx) {
     for(var i=0i<p.transitions.lengthi++) {
         var target = p.transitions[i].target
         var c = NewATNConfig({ state:target, alt:i+1, context:initialContext }, nil)
-        var closureBusy = antlr4.NewSet()
+        var closureBusy = NewSet()
         this.closure(c, configs, closureBusy, true, fullCtx, false)
     }
     return configs
@@ -1134,7 +1133,7 @@ func (this *ParserATNSimulator) getAltThatFinishedDecisionEntryRule(configs) {
 //  those that have preds evaluating to true/false.  If no pred, assume
 //  true pred and include in succeeded set.  Returns Pair of sets.
 //
-//  Create a antlr4.NewSet so as not to alter the incoming parameter.
+//  Create a NewSet so as not to alter the incoming parameter.
 //
 //  Assumption: the input stream has been restored to the starting point
 //  prediction, which is where predicates need to evaluate.
@@ -1165,7 +1164,7 @@ func (this *ParserATNSimulator) splitAccordingToSemanticValidity( configs, outer
 //  includes pairs with nil predicates.
 //
 func (this *ParserATNSimulator) evalSemanticContext(predPredictions, outerContext, complete) {
-    var predictions = antlr4.NewBitSet()
+    var predictions = NewBitSet()
     for(var i=0i<predPredictions.lengthi++) {
     	var pair = predPredictions[i]
         if (pair.pred == SemanticContext.NONE) {
@@ -1478,7 +1477,7 @@ func (this *ParserATNSimulator) getConflictingAlts(configs) {
 func (this *ParserATNSimulator) getConflictingAltsOrUniqueAlt(configs) {
     var conflictingAlts = nil
     if (configs.uniqueAlt!= ATN.INVALID_ALT_NUMBER) {
-        conflictingAlts = antlr4.NewBitSet()
+        conflictingAlts = NewBitSet()
         conflictingAlts.add(configs.uniqueAlt)
     } else {
         conflictingAlts = configs.conflictingAlts

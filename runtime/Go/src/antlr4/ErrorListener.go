@@ -1,10 +1,7 @@
-package error
+package antlr4
 
 import (
-	"antlr4"
-	"antlr4/atn"
-	"antlr4/dfa"
-	"fmt"
+				"fmt"
 )
 
 // Provides an empty default implementation of {@link ANTLRErrorListener}. The
@@ -19,16 +16,16 @@ func NewErrorListener() *ErrorListener {
 	return new(ErrorListener)
 }
 
-func (this *ErrorListener) syntaxError(recognizer *antlr4.Parser, offendingSymbol interface{}, line, column int, msg string, e *RecognitionException) {
+func (this *ErrorListener) syntaxError(recognizer *Parser, offendingSymbol interface{}, line, column int, msg string, e *RecognitionException) {
 }
 
-func (this *ErrorListener) reportAmbiguity(recognizer *antlr4.Parser, dfa *dfa.DFA, startIndex, stopIndex int, exact bool, ambigAlts *antlr4.BitSet, configs *atn.ATNConfigSet) {
+func (this *ErrorListener) reportAmbiguity(recognizer *Parser, dfa *DFA, startIndex, stopIndex int, exact bool, ambigAlts *BitSet, configs *ATNConfigSet) {
 }
 
-func (this *ErrorListener) reportAttemptingFullContext(recognizer *antlr4.Parser, dfa *dfa.DFA, startIndex, stopIndex int, conflictingAlts *antlr4.BitSet, configs *atn.ATNConfigSet) {
+func (this *ErrorListener) reportAttemptingFullContext(recognizer *Parser, dfa *DFA, startIndex, stopIndex int, conflictingAlts *BitSet, configs *ATNConfigSet) {
 }
 
-func (this *ErrorListener) reportContextSensitivity(recognizer *antlr4.Parser, dfa *dfa.DFA, startIndex, stopIndex, prediction int, configs *atn.ATNConfigSet) {
+func (this *ErrorListener) reportContextSensitivity(recognizer *Parser, dfa *DFA, startIndex, stopIndex, prediction int, configs *ATNConfigSet) {
 }
 
 type ConsoleErrorListener struct {
@@ -56,7 +53,7 @@ var ConsoleErrorListenerINSTANCE = NewConsoleErrorListener()
 // line <em>line</em>:<em>charPositionInLine</em> <em>msg</em>
 // </pre>
 //
-func (this *ConsoleErrorListener) syntaxError(recognizer *antlr4.Parser, offendingSymbol interface{}, line, column int, msg string, e *RecognitionException) {
+func (this *ConsoleErrorListener) syntaxError(recognizer *Parser, offendingSymbol interface{}, line, column int, msg string, e *RecognitionException) {
     fmt.Errorf("line " + line + ":" + column + " " + msg)
 }
 
@@ -74,25 +71,25 @@ func NewProxyErrorListener(delegates []ErrorListener) *ConsoleErrorListener {
 	return l
 }
 
-func (this *ProxyErrorListener) syntaxError(recognizer *antlr4.Parser, offendingSymbol interface{}, line, column int, msg string, e *RecognitionException) {
+func (this *ProxyErrorListener) syntaxError(recognizer *Parser, offendingSymbol interface{}, line, column int, msg string, e *RecognitionException) {
     for _,d := range this.delegates {
 		d.syntaxError(recognizer, offendingSymbol, line, column, msg, e)
 	}
 }
 
-func (this *ProxyErrorListener) reportAmbiguity(recognizer *antlr4.Parser, dfa *dfa.DFA, startIndex, stopIndex int, exact bool, ambigAlts *antlr4.BitSet, configs *atn.ATNConfigSet) {
+func (this *ProxyErrorListener) reportAmbiguity(recognizer *Parser, dfa *DFA, startIndex, stopIndex int, exact bool, ambigAlts *BitSet, configs *ATNConfigSet) {
 	for _,d := range this.delegates {
 		d.reportAmbiguity(recognizer, dfa, startIndex, stopIndex, exact, ambigAlts, configs)
 	}
 }
 
-func (this *ProxyErrorListener) reportAttemptingFullContext(recognizer *antlr4.Parser, dfa *dfa.DFA, startIndex, stopIndex int, conflictingAlts *antlr4.BitSet, configs *atn.ATNConfigSet) {
+func (this *ProxyErrorListener) reportAttemptingFullContext(recognizer *Parser, dfa *DFA, startIndex, stopIndex int, conflictingAlts *BitSet, configs *ATNConfigSet) {
 	for _,d := range this.delegates {
 		d.reportAttemptingFullContext(recognizer, dfa, startIndex, stopIndex, conflictingAlts, configs)
 	}
 }
 
-func (this *ProxyErrorListener) reportContextSensitivity(recognizer *antlr4.Parser, dfa *dfa.DFA, startIndex, stopIndex, prediction int, configs *atn.ATNConfigSet) {
+func (this *ProxyErrorListener) reportContextSensitivity(recognizer *Parser, dfa *DFA, startIndex, stopIndex, prediction int, configs *ATNConfigSet) {
 	for _,d := range this.delegates {
 		d.reportContextSensitivity(recognizer, dfa, startIndex, stopIndex, prediction, configs)
 	}

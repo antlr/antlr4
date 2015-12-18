@@ -1,24 +1,35 @@
-package dfa
-
-//var DFAState = require('./DFAState').DFAState
-//var ATNConfigSet = require('./../atn/ATNConfigSet').ATNConfigSet
-//var DFASerializer = require('./DFASerializer').DFASerializer
-//var LexerDFASerializer = require('./DFASerializer').LexerDFASerializer
+package antlr4
 
 type DFAStatesSet struct {
-	return this
+	states map[string]DFAState
 }
 
-Object.defineProperty(DFAStatesSet.prototype, "length", {
-	get : function() {
-		return Object.keys(this).length
-	}
-})
+func NewDFAStatesSet() *DFAStatesSet {
+	n := new(DFAStatesSet)
+	n.states = make(map[string]DFAState)
+	return n
+}
 
-func DFA(atnStartState, decision) {
+func (this *DFAStatesSet) length() int {
+	return len(this.states)
+}
+
+type DFA struct {
+	atnStartState *DecisionState
+	decision int
+	_states *DFAStatesSet
+	s0 DFAState
+	precedenceDfa bool
+}
+
+func NewDFA(atnStartState *DecisionState, decision int) *DFA {
+
 	if (decision == nil) {
 		decision = 0
 	}
+
+	this := new(DFA)
+
 	// From which ATN state did we create this DFA?
 	this.atnStartState = atnStartState
 	this.decision = decision
@@ -30,6 +41,7 @@ func DFA(atnStartState, decision) {
 	// {@code false}. This is the backing field for {@link //isPrecedenceDfa},
 	// {@link //setPrecedenceDfa}.
 	this.precedenceDfa = false
+
 	return this
 }
 
@@ -42,15 +54,15 @@ func DFA(atnStartState, decision) {
 // @panics IllegalStateException if this is not a precedence DFA.
 // @see //isPrecedenceDfa()
 
-func (this *DFA) getPrecedenceStartState(precedence) {
+func (this *DFA) getPrecedenceStartState(precedence int) *DFAState {
 	if (!(this.precedenceDfa)) {
-		panic ("Only precedence DFAs may contain a precedence start state.")
+		panic("Only precedence DFAs may contain a precedence start state.")
 	}
 	// s0.edges is never nil for a precedence DFA
 	if (precedence < 0 || precedence >= this.s0.edges.length) {
 		return nil
 	}
-	return this.s0.edges[precedence] || nil
+	return this.s0.edges[precedence]
 }
 
 // Set the start state for a specific precedence value.
@@ -62,7 +74,7 @@ func (this *DFA) getPrecedenceStartState(precedence) {
 // @panics IllegalStateException if this is not a precedence DFA.
 // @see //isPrecedenceDfa()
 //
-func (this *DFA) setPrecedenceStartState(precedence, startState) {
+func (this *DFA) setPrecedenceStartState(precedence int, startState *DFAState)  {
 	if (!(this.precedenceDfa)) {
 		panic ("Only precedence DFAs may contain a precedence start state.")
 	}
@@ -93,11 +105,11 @@ func (this *DFA) setPrecedenceStartState(precedence, startState) {
 // @param precedenceDfa {@code true} if this is a precedence DFA otherwise,
 // {@code false}
 
-func (this *DFA) setPrecedenceDfa(precedenceDfa) {
+func (this *DFA) setPrecedenceDfa(precedenceDfa bool) {
 	if (this.precedenceDfa!=precedenceDfa) {
 		this._states = NewDFAStatesSet()
 		if (precedenceDfa) {
-			var precedenceState = NewDFAState(NewATNConfigSet())
+			var precedenceState = NewDFAState(NewATNConfigSet(false))
 			precedenceState.edges = []
 			precedenceState.isAcceptState = false
 			precedenceState.requiresFullContext = false
@@ -109,28 +121,28 @@ func (this *DFA) setPrecedenceDfa(precedenceDfa) {
 	}
 }
 
-Object.defineProperty(DFA.prototype, "states", {
-	get : function() {
-		return this._states
-	}
-})
-
-// Return a list of all states in this DFA, ordered by state number.
-func (this *DFA) sortedStates() {
-	// states_ is a map of state/state, where key=value
-	var keys = Object.keys(this._states)
-	var list = []
-	for(var i=0i<keys.lengthi++) {
-		list.push(this._states[keys[i]])
-	}
-	return list.sort(function(a, b) {
-		return a.stateNumber - b.stateNumber
-	})
+func (this *DFA) states(precedenceDfa bool) *DFAStatesSet {
+	return this._states
 }
 
-func (this *DFA) toString(literalNames, symbolicNames) {
-	literalNames = literalNames || nil
-	symbolicNames = symbolicNames || nil
+// Return a list of all states in this DFA, ordered by state number.
+func (this *DFA) sortedStates() []*DFAState {
+
+	panic("Not implemented")
+
+	return nil
+	// states_ is a map of state/state, where key=value
+//	var keys = Object.keys(this._states)
+//	var list = []
+//	for i:=0; i<keys.length; i++ {
+//		list.push(this._states[keys[i]])
+//	}
+//	return list.sort(function(a, b) {
+//		return a.stateNumber - b.stateNumber
+//	})
+}
+
+func (this *DFA) toString(literalNames []string, symbolicNames []string) string {
 	if (this.s0 == nil) {
 		return ""
 	}

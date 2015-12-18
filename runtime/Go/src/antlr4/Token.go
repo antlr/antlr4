@@ -23,17 +23,7 @@ type Token struct {
 	line int // line=1..n of the 1st character
 	column int // beginning of the line at which it occurs, 0..n-1
 	_text string // text of the token.
-
-//	String getText();
-//	int getType();
-//	int getLine();
-//	int getCharPositionInLine();
-//	int getChannel();
-//	int getTokenIndex();
-//	int getStartIndex();
-//	int getStopIndex();
-//	TokenSource getTokenSource();
-//	CharStream getInputStream();
+	readOnly bool
 }
 
 const (

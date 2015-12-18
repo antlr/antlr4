@@ -1,4 +1,4 @@
-package atn
+package antlr4
 
 type LexerActionType struct {
 }

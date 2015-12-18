@@ -1,8 +1,7 @@
 package antlr4
 
 import (
-	"antlr4/tree"
-)
+	)
 
 //  A rule context is a record of a single rule invocation. It knows
 //  which context invoked it, if any. If there is no parent context, then
@@ -26,7 +25,7 @@ import (
 //
 
 type RuleContext struct {
-	tree.RuleNode
+	RuleNode
 	parentCtx *RuleContext
 	invokingState int
 	ruleIndex int
@@ -35,7 +34,7 @@ type RuleContext struct {
 
 func NewRuleContext(parent *RuleContext, invokingState int)  *RuleContext {
 
-	rn := &RuleContext{tree.RuleNode{}}
+	rn := &RuleContext{RuleNode{}}
 	rn.initRuleContext(parent, invokingState)
 
 	return rn
@@ -75,7 +74,7 @@ func (this *RuleContext) isEmpty() bool {
 // satisfy the ParseTree / SyntaxTree interface
 
 func (this *RuleContext) getSourceInterval() *Interval {
-	return tree.TreeINVALID_INTERVAL
+	return TreeINVALID_INTERVAL
 }
 
 func (this *RuleContext) getRuleContext() *RuleContext {
@@ -114,7 +113,7 @@ func (this *RuleContext) getChildCount() {
 	return 0
 }
 
-func (this *RuleContext) accept(visitor *tree.ParseTreeVisitor) {
+func (this *RuleContext) accept(visitor *ParseTreeVisitor) {
 	visitor.visitChildren(this)
 }
 
@@ -125,7 +124,7 @@ func (this *RuleContext) accept(visitor *tree.ParseTreeVisitor) {
 //
 
 func (this *RuleContext) toStringTree(ruleNames []string, recog *Recognizer) string {
-	return tree.Trees.toStringTree(this, ruleNames, recog)
+	return Trees.toStringTree(this, ruleNames, recog)
 }
 
 func (this *RuleContext) toString(ruleNames []string, stop *RuleContext) string {

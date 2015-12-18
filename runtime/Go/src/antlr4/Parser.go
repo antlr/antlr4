@@ -2,18 +2,15 @@ package antlr4
 
 import (
 	"fmt"
-	"antlr4/atn"
-	"antlr4/tree"
-	"antlr4/error"
-)
+			)
 
 type TraceListener struct {
-	tree.ParseTreeListener
+	ParseTreeListener
 	parser *Parser
 }
 
 func NewTraceListener(parser *Parser) *TraceListener {
-	tl := &TraceListener{tree.ParseTreeListener{}}
+	tl := &TraceListener{ParseTreeListener{}}
     tl.parser = parser
 	return tl
 }
@@ -22,7 +19,7 @@ func (this *TraceListener) enterEveryRule(ctx *ParserRuleContext) {
 	fmt.Println("enter   " + this.parser.getRuleNames()[ctx.ruleIndex] + ", LT(1)=" + this.parser._input.LT(1).text())
 }
 
-func (this *TraceListener) visitTerminal( node *tree.TerminalNode ) {
+func (this *TraceListener) visitTerminal( node *TerminalNode ) {
 	fmt.Println("consume " + node.symbol + " rule " + this.parser.getRuleNames()[this.parser._ctx.ruleIndex])
 }
 
@@ -34,12 +31,12 @@ func (this *TraceListener) exitEveryRule(ctx *ParserRuleContext) {
 type Parser struct {
 	Recognizer
 	_input *TokenStream
-	_errHandler *error.ErrorStrategy
+	_errHandler *ErrorStrategy
 	_precedenceStack IntStack
 	_ctx *ParserRuleContext
 	buildParseTrees bool
 	_tracer bool
-	_parseListeners []*tree.ParseTreeListener
+	_parseListeners []*ParseTreeListener
 	_syntaxErrors int
 }
 
@@ -55,7 +52,7 @@ func NewParser(input *TokenStream) *Parser {
 	p._input = nil
 	// The error handling strategy for the parser. The default value is a new
 	// instance of {@link DefaultErrorStrategy}.
-	p._errHandler = error.NewDefaultErrorStrategy()
+	p._errHandler = NewDefaultErrorStrategy()
 	p._precedenceStack = make([]int, 0)
 	p._precedenceStack.Push(0)
 	// The {@link ParserRuleContext} object for the currently executing rule.
@@ -171,9 +168,9 @@ func (p *Parser) matchWildcard() *Token {
 	return t
 }
 
-func (p *Parser) getParseListeners() []*tree.ParseTreeListener {
+func (p *Parser) getParseListeners() []*ParseTreeListener {
 	if (p._parseListeners == nil){
-		return make([]*tree.ParseTreeListener)
+		return make([]*ParseTreeListener)
 	}
 	return p._parseListeners
 }
@@ -206,12 +203,12 @@ func (p *Parser) getParseListeners() []*tree.ParseTreeListener {
 //
 // @panics nilPointerException if {@code} listener is {@code nil}
 //
-func (p *Parser) addParseListener(listener *tree.ParseTreeListener) {
+func (p *Parser) addParseListener(listener *ParseTreeListener) {
 	if (listener == nil) {
 		panic("listener")
 	}
 	if (p._parseListeners == nil) {
-		p._parseListeners = new([]tree.ParseTreeListener)
+		p._parseListeners = new([]ParseTreeListener)
 	}
 	p._parseListeners = append(p._parseListeners, listener)
 }
@@ -223,7 +220,7 @@ func (p *Parser) addParseListener(listener *tree.ParseTreeListener) {
 // listener, p.method does nothing.</p>
 // @param listener the listener to remove
 //
-func (p *Parser) removeParseListener(listener *tree.ParseTreeListener) {
+func (p *Parser) removeParseListener(listener *ParseTreeListener) {
 	if (p._parseListeners != nil) {
 		var idx = p._parseListeners.indexOf(listener)
 		if (idx >= 0) {
@@ -292,9 +289,9 @@ func (p *Parser) getATNWithBypassAlts() {
 	}
 	var result = p.bypassAltsAtnCache[serializedAtn]
 	if (result == nil) {
-		var deserializationOptions = atn.NewATNDeserializationOptions()
+		var deserializationOptions = NewATNDeserializationOptions()
 		deserializationOptions.generateRuleBypassTransitions = true
-		result = atn.NewATNDeserializer(deserializationOptions).deserialize(serializedAtn)
+		result = NewATNDeserializer(deserializationOptions).deserialize(serializedAtn)
 		p.bypassAltsAtnCache[serializedAtn] = result
 	}
 	return result
@@ -356,7 +353,7 @@ func (p *Parser) getCurrentToken() *Token {
 	return p._input.LT(1)
 }
 
-func (p *Parser) notifyErrorListeners(msg string, offendingToken *Token, err *error.RecognitionException) {
+func (p *Parser) notifyErrorListeners(msg string, offendingToken *Token, err *RecognitionException) {
 	offendingToken = offendingToken || nil
 	err = err || nil
 	if (offendingToken == nil) {
@@ -397,7 +394,7 @@ func (p *Parser) consume() {
 	}
 	var hasListener = p._parseListeners != nil && len(p._parseListeners) > 0
 	if (p.buildParseTrees || hasListener) {
-		var node *tree.ErrorNodeImpl
+		var node *ErrorNodeImpl
 		if (p._errHandler.inErrorRecoveryMode(p)) {
 			node = p._ctx.addErrorNode(o)
 		} else {
@@ -557,7 +554,7 @@ func (p *Parser) inContext(context *ParserRuleContext) bool {
 // the ATN, otherwise {@code false}.
 
 func (p *Parser) isExpectedToken(symbol *Token) bool {
-	var atn *atn.ATN = p._interp.atn
+	var atn *ATN = p._interp.atn
 	var ctx = p._ctx
 	var s = atn.states[p.state]
 	var following = atn.nextTokens(s)

@@ -1,17 +1,27 @@
-package dfa
+package antlr4
 
-//var ATNConfigSet = require('./../atn/ATNConfigSet').ATNConfigSet
+import (
+	"fmt"
+)
 
 // Map a predicate to a predicted alternative.///
 
-func PredPrediction(pred, alt) {
+type PredPrediction struct {
+	alt int
+	pred int
+}
+
+func NewPredPrediction(pred, alt int) *PredPrediction {
+	this := new(PredPrediction)
+
 	this.alt = alt
 	this.pred = pred
+
 	return this
 }
 
 func (this *PredPrediction) toString() string {
-	return "(" + this.pred + ", " + this.alt + ")"
+	return "(" + fmt.Sprint(this.pred) + ", " + fmt.Sprint(this.alt) + ")"
 }
 
 // A DFA state represents a set of possible ATN configurations.
@@ -39,13 +49,25 @@ func (this *PredPrediction) toString() string {
 // meaning that state was reached via a different set of rule invocations.</p>
 // /
 
-func DFAState(stateNumber, configs) {
-	if (stateNumber == nil) {
-		stateNumber = -1
-	}
+type DFAState struct {
+	stateNumber int
+	configs *ATNConfigSet
+	edges []*DFAState
+	isAcceptState bool
+	prediction int
+	lexerActionExecutor *LexerActionExecutor
+	requiresFullContext bool
+	predicates []PredPrediction
+}
+
+func NewDFAState(stateNumber int, configs *NewATNConfigSet) *DFAState {
+
 	if (configs == nil) {
-		configs = NewATNConfigSet()
+		configs = NewATNConfigSet(false)
 	}
+
+	this := new(DFAState)
+
 	this.stateNumber = stateNumber
 	this.configs = configs
 	// {@code edges[symbol]} points to target of symbol. Shift up by 1 so (-1)
@@ -84,7 +106,7 @@ func DFAState(stateNumber, configs) {
 // Get the set of all alts mentioned by all ATN configurations in this
 // DFA state.
 func (this *DFAState) getAltSet() {
-	var alts = NewSet()
+	var alts = NewSet(nil,nil)
 	if (this.configs != nil) {
 		for i := 0; i < len(this.configs); i++ {
 			var c = this.configs[i]
@@ -109,28 +131,35 @@ func (this *DFAState) getAltSet() {
 // {@link ParserATNSimulator//addDFAState} we need to know if any other state
 // exists that has this exact set of ATN configurations. The
 // {@link //stateNumber} is irrelevant.</p>
-func (this *DFAState) equals(other) {
-	// compare set of ATN configurations in this set with other
+func (this *DFAState) equals(other interface{}) bool {
+
 	if (this == other) {
 		return true
-	} else if (!_, ok := other.(DFAState); ok) {
+	} else if _, ok := other.(*DFAState); !ok {
 		return false
-	} else {
-		return this.configs.equals(other.configs)
 	}
+
+	return this.configs.equals(other.configs)
 }
 
 func (this *DFAState) toString() string {
 	return "" + this.stateNumber + ":" + this.hashString()
 }
 
-func (this *DFAState) hashString() {
-	return "" +  this.configs +
-			(this.isAcceptState ?
-					"=>" + (this.predicates != nil ?
-								this.predicates :
-								this.prediction) :
-					"")
+func (this *DFAState) hashString() string {
+
+	panic("Not implementd")
+//	var s string
+//	if (this.acceptState){
+//
+//	}
+//
+//	return "" +  this.configs +
+//			(this.isAcceptState ?
+//					"=>" + (this.predicates != nil ?
+//								this.predicates :
+//								this.prediction) :
+//					"")
 }
 
 

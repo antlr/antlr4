@@ -1,4 +1,4 @@
-package tree
+package antlr4
 
 //var Utils = require('./../Utils')
 //var Token = require('./../Token').Token

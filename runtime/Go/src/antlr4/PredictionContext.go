@@ -1,7 +1,6 @@
 package antlr4
 
 import (
-	"antlr4/atn"
 	"fmt"
 )
 
@@ -339,7 +338,7 @@ func (this *ArrayPredictionContext) toString() string {
 // Convert a {@link RuleContext} tree to a {@link PredictionContext} graph.
 // Return {@link //EMPTY} if {@code outerContext} is empty or nil.
 // /
-func predictionContextFromRuleContext(a *atn.ATN, outerContext *RuleContext) *PredictionContext {
+func predictionContextFromRuleContext(a *ATN, outerContext *RuleContext) *PredictionContext {
 	if (outerContext == nil) {
 		outerContext = RuleContextEMPTY
 	}
