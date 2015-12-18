@@ -11,8 +11,6 @@ import (
 //  {@link SemanticContext} within the scope of this outer class.</p>
 //
 
-//var Set = require('./../Utils').Set
-
 type SemanticContext struct {
 
 }

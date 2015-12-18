@@ -7,14 +7,31 @@ package antlr4
 // efficiently, ensuring that actions appearing only at the end of the rule do
 // not cause bloating of the {@link DFA} created for the lexer.</p>
 
-//var LexerIndexedCustomAction = require('./LexerAction').LexerIndexedCustomAction
+type LexerActionExecutor struct {
+	lexerActions []*LexerAction
+	hashString string
+}
 
-func LexerActionExecutor(lexerActions) {
-	this.lexerActions = lexerActions == nil ? [] : lexerActions
+func NewLexerActionExecutor(lexerActions []*LexerAction) *LexerActionExecutor {
+
+	if (lexerActions == nil){
+		lexerActions = make([]*LexerAction)
+	}
+
+	this := new(LexerActionExecutor)
+
+	this.lexerActions = lexerActions
+
 	// Caches the result of {@link //hashCode} since the hash code is an element
 	// of the performance-critical {@link LexerATNConfig//hashCode} operation.
-	this.hashString = lexerActions.toString() // "".join([str(la) for la in
-	// lexerActions]))
+
+	var s string
+	for _, a := range lexerActions {
+		s += a.hashString()
+	}
+
+	this.hashString = s // "".join([str(la) for la in
+
 	return this
 }
 
@@ -31,11 +48,14 @@ func LexerActionExecutor(lexerActions) {
 //
 // @return A {@link LexerActionExecutor} for executing the combine actions
 // of {@code lexerActionExecutor} and {@code lexerAction}.
-LexerActionExecutor.append = function(lexerActionExecutor, lexerAction) {
+func LexerActionExecutorappend(lexerActionExecutor *LexerActionExecutor, lexerAction *LexerAction) *LexerActionExecutor {
 	if (lexerActionExecutor == nil) {
-		return NewLexerActionExecutor([ lexerAction ])
+		return NewLexerActionExecutor([]*LexerAction{lexerAction})
 	}
-	var lexerActions = lexerActionExecutor.lexerActions.concat([ lexerAction ])
+
+	var lexerActions = append(lexerActionExecutor.lexerActions, lexerAction )
+
+//	var lexerActions = lexerActionExecutor.lexerActions.concat([ lexerAction ])
 	return NewLexerActionExecutor(lexerActions)
 }
 
@@ -67,16 +87,20 @@ LexerActionExecutor.append = function(lexerActionExecutor, lexerAction) {
 // @return A {@link LexerActionExecutor} which stores input stream offsets
 // for all position-dependent lexer actions.
 // /
-func (this *LexerActionExecutor) fixOffsetBeforeMatch(offset) {
-	var updatedLexerActions = nil
+func (this *LexerActionExecutor) fixOffsetBeforeMatch(offset int) *LexerActionExecutor {
+	var updatedLexerActions []*LexerAction = nil
 	for i := 0; i < len(this.lexerActions); i++ {
-		if (this.lexerActions[i].isPositionDependent &&
-				!(this.lexerActions[i] instanceof LexerIndexedCustomAction)) {
+		_, ok := this.lexerActions[i].(*LexerIndexedCustomAction)
+		if (this.lexerActions[i].isPositionDependent && !ok){
 			if (updatedLexerActions == nil) {
-				updatedLexerActions = this.lexerActions.concat([])
+				updatedLexerActions = make([]*LexerAction)
+
+				for _,a:= range this.lexerActions {
+					updatedLexerActions = append(updatedLexerActions, a)
+				}
 			}
-			updatedLexerActions[i] = NewLexerIndexedCustomAction(offset,
-					this.lexerActions[i])
+
+			updatedLexerActions[i] = NewLexerIndexedCustomAction(offset, this.lexerActions[i])
 		}
 	}
 	if (updatedLexerActions == nil) {
@@ -104,27 +128,28 @@ func (this *LexerActionExecutor) fixOffsetBeforeMatch(offset) {
 // {@link IntStream//seek} to set the {@code input} position to the beginning
 // of the token.
 // /
-func (this *LexerActionExecutor) execute(lexer, input, startIndex) {
+func (this *LexerActionExecutor) execute(lexer *Lexer, input *InputStream, startIndex int) {
 	var requiresSeek = false
 	var stopIndex = input.index
-	try {
-		for i := 0; i < len(this.lexerActions); i++ {
-			var lexerAction = this.lexerActions[i]
-			if _, ok := lexerAction.(LexerIndexedCustomAction); ok {
-				var offset = lexerAction.offset
-				input.seek(startIndex + offset)
-				lexerAction = lexerAction.action
-				requiresSeek = (startIndex + offset) != stopIndex
-			} else if (lexerAction.isPositionDependent) {
-				input.seek(stopIndex)
-				requiresSeek = false
-			}
-			lexerAction.execute(lexer)
-		}
-	} finally {
+
+	defer func(){
 		if (requiresSeek) {
 			input.seek(stopIndex)
 		}
+	}()
+
+	for i := 0; i < len(this.lexerActions); i++ {
+		var lexerAction *LexerAction = this.lexerActions[i]
+		if la, ok := lexerAction.(*LexerIndexedCustomAction); ok {
+			var offset = la.offset
+			input.seek(startIndex + offset)
+			lexerAction = la.action
+			requiresSeek = (startIndex + offset) != stopIndex
+		} else if (lexerAction.isPositionDependent) {
+			input.seek(stopIndex)
+			requiresSeek = false
+		}
+		lexerAction.execute(lexer)
 	}
 }
 
@@ -132,14 +157,14 @@ func (this *LexerActionExecutor) hashString() {
 	return this.hashString
 }
 
-func (this *LexerActionExecutor) equals(other) {
+func (this *LexerActionExecutor) equals(other interface{}) bool {
 	if (this == other) {
 		return true
-	} else if (!_, ok := other.(LexerActionExecutor); ok) {
+	} else if _, ok := other.(*LexerActionExecutor); !ok {
 		return false
 	} else {
-		return this.hashString == other.hashString &&
-				this.lexerActions == other.lexerActions
+		return this.hashString == other.(*LexerActionExecutor).hashString &&
+				this.lexerActions == other.(*LexerActionExecutor).lexerActions
 	}
 }
 

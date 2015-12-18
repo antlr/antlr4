@@ -26,6 +26,10 @@ func (la *LexerAction) InitLexerAction(action int){
     la.isPositionDependent = false
 }
 
+func (this *LexerAction) execute(lexer *Lexer) {
+    panic("Not implemented")
+}
+
 func (this *LexerAction) hashString() string {
     return "" + this.actionType
 }
@@ -33,7 +37,6 @@ func (this *LexerAction) hashString() string {
 func (this *LexerAction) equals(other *LexerAction) {
     return this == other
 }
-
 
 //
 // Implements the {@code skip} lexer action by calling {@link Lexer//skip}.
@@ -375,7 +378,7 @@ func NewLexerIndexedCustomAction(offset int, action *LexerAction) *LexerIndexedC
 // using the provided {@code lexer}.</p>
 func (this *LexerIndexedCustomAction) execute(lexer *Lexer) {
     // assume the input stream position was properly set by the calling code
-    this.action.execute(lexer *Lexer)
+    this.action.execute(lexer)
 }
 
 func (this *LexerIndexedCustomAction) hashString() string {
