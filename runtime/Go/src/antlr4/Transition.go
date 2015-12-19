@@ -235,7 +235,7 @@ type PredicateTransition struct {
 	ruleIndex, predIndex int
 }
 
-func PredicateTransition ( target *ATNState, ruleIndex, predIndex int, isCtxDependent bool ) *PredicateTransition {
+func NewPredicateTransition ( target *ATNState, ruleIndex, predIndex int, isCtxDependent bool ) *PredicateTransition {
 
 	t := new(PredicateTransition)
 	t.InitTransition(target)
@@ -332,7 +332,7 @@ type NotSetTransition struct {
 	SetTransition
 }
 
-func NotSetTransition ( target *ATNState, set *IntervalSet) *NotSetTransition {
+func NewNotSetTransition ( target *ATNState, set *IntervalSet) *NotSetTransition {
 
 	t := new(NotSetTransition)
 	t.InitTransition( target )
@@ -379,7 +379,7 @@ type PrecedencePredicateTransition struct {
 	precedence int
 }
 
-func PrecedencePredicateTransition ( target *ATNState, precedence int ) *PrecedencePredicateTransition {
+func NewPrecedencePredicateTransition ( target *ATNState, precedence int ) *PrecedencePredicateTransition {
 
 	t := new(PrecedencePredicateTransition)
 	t.InitTransition( target )
@@ -396,7 +396,7 @@ func (t *PrecedencePredicateTransition) matches(symbol, minVocabSymbol,  maxVoca
 	return false
 }
 
-func (t *PrecedencePredicateTransition) getPredicate() *NewPrecedencePredicate {
+func (t *PrecedencePredicateTransition) getPredicate() *PrecedencePredicate {
 	return NewPrecedencePredicate(t.precedence)
 }
 

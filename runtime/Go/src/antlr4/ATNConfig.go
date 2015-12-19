@@ -78,73 +78,6 @@ func (a *ATNConfig) InitATNConfig(c *ATNConfig, state *ATNState, context *Predic
 
 }
 
-//
-//
-//func checkParams(params *ATNConfig, isCfg bool) *ATNConfigParams {
-//	if(params == nil) {
-//		var result = { state:nil, alt:nil, context:nil, semanticContext:nil }
-//		if(isCfg) {
-//			result.reachesIntoOuterContext = 0
-//		}
-//		return result
-//	} else {
-//		var props = {}
-//		props.state = params.state || nil
-//		props.alt = params.alt || nil
-//		props.context = params.context || nil
-//		props.semanticContext = params.semanticContext || nil
-//		if(isCfg) {
-//			props.reachesIntoOuterContext = params.reachesIntoOuterContext || 0
-//			props.precedenceFilterSuppressed = params.precedenceFilterSuppressed || false
-//		}
-//		return props
-//	}
-//}
-//
-//
-//func NewATNConfig(params *ATNConfig, config *ATNConfig) *ATNConfig {
-//
-//	this := new(ATNConfig)
-//
-//	this.checkContext(params, config)
-//
-//	params = checkParams(params, false)
-//	config = checkParams(config, true)
-//
-//	if params.state != nil {
-//		this.state = params.state
-//	} else {
-//		this.state = config.state
-//	}
-//
-//	if params.alt != nil {
-//		this.alt = params.alt
-//	} else {
-//		this.alt = config.alt
-//	}
-//
-//    this.context = params.context!=nil ? params.context : config.context
-//
-//    this.semanticContext = params.semanticContext!=nil ? params.semanticContext :
-//        (config.semanticContext!=nil ? config.semanticContext : SemanticContext.NONE)
-//
-//    this.reachesIntoOuterContext = config.reachesIntoOuterContext
-//    this.precedenceFilterSuppressed = config.precedenceFilterSuppressed
-//
-//    return this
-//}
-//
-//
-//
-//
-//
-//func (this *ATNConfig) checkContext(params, config) {
-//	if((params.context==nil || params.context==nil) &&
-//			(config==nil || config.context==nil || config.context==nil)) {
-//		this.context = nil
-//	}
-//}
-
 // An ATN configuration is equal to another if both have
 //  the same state, they predict the same alternative, and
 //  syntactic/semantic contexts are the same.
@@ -203,10 +136,73 @@ type LexerATNConfig struct {
 	passedThroughNonGreedyDecision bool
 }
 
-func NewLexerATNConfig( state *ATNState, alt int, context *PredictionContext) *LexerATNConfig {
+
+
+
+
+
+
+func checkNonGreedyDecision(source *LexerATNConfig, target *ATNState) bool {
+	ds, ok := target.(*DecisionState)
+	return source.passedThroughNonGreedyDecision || (ok && ds.nonGreedy)
+}
+
+func NewLexerATNConfig6(state *ATNState, alt int, context *PredictionContext) *LexerATNConfig {
 
 	this := new(LexerATNConfig)
 
+	this.InitATNConfig(state, alt, context, SemanticContextNONE)
+	this.passedThroughNonGreedyDecision = false
+	this.lexerActionExecutor = nil
+	return this
+}
+
+func NewLexerATNConfig5(state *ATNState, alt int, context *PredictionContext, lexerActionExecutor *LexerActionExecutor) *LexerATNConfig {
+
+	this := new(LexerATNConfig)
+
+	this.InitATNConfig(state, alt, context, SemanticContextNONE)
+	this.lexerActionExecutor = lexerActionExecutor
+	this.passedThroughNonGreedyDecision = false
+	return this
+}
+
+func NewLexerATNConfig4(c *LexerATNConfig, state *ATNState)  *LexerATNConfig {
+
+	this := new(LexerATNConfig)
+
+	this.InitATNConfig(c, state, c.context, c.semanticContext)
+	this.lexerActionExecutor = c.lexerActionExecutor
+	this.passedThroughNonGreedyDecision = checkNonGreedyDecision(c, state)
+	return this
+}
+
+func NewLexerATNConfig3(c *LexerATNConfig, state *ATNState, lexerActionExecutor *LexerActionExecutor) *LexerATNConfig {
+
+	this := new(LexerATNConfig)
+
+	this.InitATNConfig(c, state, c.context, c.semanticContext)
+	this.lexerActionExecutor = lexerActionExecutor
+	this.passedThroughNonGreedyDecision = checkNonGreedyDecision(c, state)
+	return this
+}
+
+func NewLexerATNConfig2(c *LexerATNConfig, state *ATNState,  context *PredictionContext) *LexerATNConfig {
+
+	this := new(LexerATNConfig)
+
+	this.InitATNConfig(c, state, context, c.semanticContext)
+	this.lexerActionExecutor = c.lexerActionExecutor
+	this.passedThroughNonGreedyDecision = checkNonGreedyDecision(c, state)
+	return this
+}
+
+
+func NewLexerATNConfig1( state *ATNState, alt int, context *PredictionContext) *LexerATNConfig {
+
+	this := new(LexerATNConfig)
+
+	// c *ATNConfig, state *ATNState, context *PredictionContext, semanticContext  *SemanticContext
 	this.InitATNConfig(state, alt, context, SemanticContextNONE)
 
     this.lexerActionExecutor = nil
@@ -214,6 +210,7 @@ func NewLexerATNConfig( state *ATNState, alt int, context *PredictionContext) *L
 
     return this
 }
+
 
 func (this *LexerATNConfig) hashString() {
 	var f string
@@ -254,10 +251,5 @@ func (this *LexerATNConfig) equals(other *ATNConfig) bool {
 //        return ATNConfig.prototype.equals.call(this, other)
     }
 }
-
-//func (this *LexerATNConfig) checkNonGreedyDecision(source, target) {
-//    return source.passedThroughNonGreedyDecision ||
-//        _, ok := target.(DecisionState); ok && target.nonGreedy
-//}
 
 

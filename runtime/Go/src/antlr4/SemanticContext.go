@@ -107,16 +107,13 @@ type PrecedencePredicate struct {
 	precedence int
 }
 
-func PrecedencePredicate(precedence int) *PrecedencePredicate {
+func NewPrecedencePredicate(precedence int) *PrecedencePredicate {
 
 	this := new(PrecedencePredicate)
 	this.precedence = precedence
 
 	return this
 }
-
-//PrecedencePredicate.prototype = Object.create(SemanticContext.prototype)
-//PrecedencePredicate.prototype.constructor = PrecedencePredicate
 
 func (this *PrecedencePredicate) evaluate(parser *Recognizer, outerContext *RuleContext) *SemanticContext {
 	return parser.precpred(outerContext, this.precedence)
@@ -272,7 +269,7 @@ func (this *AND) evalPrecedence(parser *Recognizer, outerContext *RuleContext) *
 		if (result == nil){
 			result = 0
 		} else  {
-			result = SemanticPredicateandContext(result, o)
+			result = SemanticContextandContext(result, o)
 		}
 	}
 
