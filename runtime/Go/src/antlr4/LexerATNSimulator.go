@@ -292,8 +292,8 @@ func (this *LexerATNSimulator) getReachableConfigSet(input *InputStream, closure
 	// this is used to skip processing for configs which have a lower priority
 	// than a config that already reached an accept state for the same rule
 	var skipAlt = ATNINVALID_ALT_NUMBER
-	for i := 0; i < len(closure.items); i++ {
-		var cfg = closure.items[i]
+	for i := 0; i < len(closure.configs); i++ {
+		var cfg = closure.configs[i]
 		var currentAltReachedAcceptState = (cfg.alt == skipAlt)
 		if (currentAltReachedAcceptState && cfg.passedThroughNonGreedyDecision) {
 			continue
@@ -421,6 +421,8 @@ func (this *LexerATNSimulator) closure(input *InputStream, config *LexerATNConfi
 func (this *LexerATNSimulator) getEpsilonTarget(input *InputStream, config *LexerATNConfig, trans *Transition,
 		configs *ATNConfigSet, speculative, treatEofAsEpsilon bool) *LexerATNConfig {
 
+	var cfg *LexerATNConfig
+
 	if (trans.serializationType == TransitionRULE) {
 		var newContext = SingletonPredictionContext.create(config.context, trans.followState.stateNumber)
 		cfg = NewLexerATNConfig( { state:trans.target, context:newContext}, config)
@@ -466,8 +468,7 @@ func (this *LexerATNSimulator) getEpsilonTarget(input *InputStream, config *Lexe
 			// getEpsilonTarget to return two configurations, so
 			// additional modifications are needed before we can support
 			// the split operation.
-			var lexerActionExecutor = LexerActionExecutor.append(config.lexerActionExecutor,
-					this.atn.lexerActions[trans.actionIndex])
+			var lexerActionExecutor = LexerActionExecutorappend(config.lexerActionExecutor, this.atn.lexerActions[trans.actionIndex])
 			cfg = NewLexerATNConfig({ state:trans.target, lexerActionExecutor:lexerActionExecutor }, config)
 		} else {
 			// ignore actions in referenced rules
@@ -570,7 +571,7 @@ func (this *LexerATNSimulator) addDFAEdge(from_ *DFAState, tk int, to *DFAState 
 	}
 	if (from_.edges == nil) {
 		// make room for tokens 1..n and -1 masquerading as index 0
-		from_.edges = []
+		from_.edges = make([]*DFAState, LexerATNSimulatorMAX_DFA_EDGE-LexerATNSimulatorMIN_DFA_EDGE+1)
 	}
 	from_.edges[tk - LexerATNSimulatorMIN_DFA_EDGE] = to // connect
 
@@ -584,17 +585,21 @@ func (this *LexerATNSimulator) addDFAEdge(from_ *DFAState, tk int, to *DFAState 
 func (this *LexerATNSimulator) addDFAState(configs *ATNConfigSet) *DFAState {
 
 	var proposed = NewDFAState(nil, configs)
-	var firstConfigWithRuleStopState = nil
-	for i := 0; i < len(configs.items); i++ {
-		var cfg = configs.items[i]
-		if (cfg.state instanceof RuleStopState) {
+	var firstConfigWithRuleStopState *ATNConfig = nil
+
+	for i := 0; i < len(configs.configs); i++ {
+		var cfg = configs.configs[i]
+
+		_, ok := cfg.state.(*RuleStopState)
+
+		if (ok) {
 			firstConfigWithRuleStopState = cfg
 			break
 		}
 	}
 	if (firstConfigWithRuleStopState != nil) {
 		proposed.isAcceptState = true
-		proposed.lexerActionExecutor = firstConfigWithRuleStopState.lexerActionExecutor
+		proposed.lexerActionExecutor = firstConfigWithRuleStopState.(*LexerATNConfig).lexerActionExecutor
 		proposed.prediction = this.atn.ruleToTokenType[firstConfigWithRuleStopState.state.ruleIndex]
 	}
 	var hash = proposed.hashString()

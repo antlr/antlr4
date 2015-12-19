@@ -208,6 +208,7 @@ func NewLexerATNConfig( state *ATNState, alt int, context *PredictionContext) *L
 	this := new(LexerATNConfig)
 
 	this.InitATNConfig(state, alt, context, SemanticContextNONE)
+
     this.lexerActionExecutor = nil
     this.passedThroughNonGreedyDecision = false
 
