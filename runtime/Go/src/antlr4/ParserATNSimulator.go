@@ -18,7 +18,7 @@ type ParserATNSimulator struct {
 
 func NewParserATNSimulator(parser *Parser, atn *ATN, decisionToDFA []*DFA, sharedContextCache *PredictionContextCache) *ParserATNSimulator {
 
-    this := new(ParserATNSimulator)s
+    this := new(ParserATNSimulator)
 
     this.InitParserATNSimulator(parser, atn, decisionToDFA, sharedContextCache)
 

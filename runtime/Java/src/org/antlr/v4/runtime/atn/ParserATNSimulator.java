@@ -570,7 +570,7 @@ public class ParserATNSimulator extends ATNSimulator {
 	 * {@code t}, or {@code null} if the target state for this edge is not
 	 * already cached
 	 */
-	protected DFAState getExistingTargetState(DFAState previousD, int t) {
+	protected DFAState getExistingTargetState( previousD, int t) {
 		DFAState[] edges = previousD.edges;
 		if (edges == null || t + 1 < 0 || t + 1 >= edges.length) {
 			return null;
