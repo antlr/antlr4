@@ -54,7 +54,7 @@ func NewLexerSkipAction() *LexerSkipAction {
 }
 
 // Provides a singleton instance of this parameterless lexer action.
-var exerSkipActionINSTANCE = NewLexerSkipAction()
+var LexerSkipActionINSTANCE = NewLexerSkipAction()
 
 func (this *LexerSkipAction) execute(lexer *Lexer) {
     lexer.skip()

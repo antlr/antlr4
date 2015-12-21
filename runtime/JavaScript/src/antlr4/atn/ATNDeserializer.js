@@ -168,7 +168,7 @@ ATNDeserializer.prototype.checkUUID = function() {
     var uuid = this.readUUID();
     if (SUPPORTED_UUIDS.indexOf(uuid)<0) {
         throw ("Could not deserialize ATN with UUID: " + uuid +
-                        " (expected " + SERIALIZED_UUID + " or a legacy UUID).", uuid, SERIALIZED_UUID);
+                        " (expected " + SERIALIZED_UUID + " or a legacy UUID).");
     }
     this.uuid = uuid;
 };

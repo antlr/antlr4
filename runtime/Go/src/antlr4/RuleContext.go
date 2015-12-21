@@ -114,7 +114,7 @@ func (this *RuleContext) getChildCount() {
 }
 
 func (this *RuleContext) accept(visitor *ParseTreeVisitor) {
-	visitor.visitChildren(this)
+	(*visitor).visitChildren(this)
 }
 
 //need to manage circular dependencies, so export now
@@ -124,7 +124,7 @@ func (this *RuleContext) accept(visitor *ParseTreeVisitor) {
 //
 
 func (this *RuleContext) toStringTree(ruleNames []string, recog *Recognizer) string {
-	return Trees.toStringTree(this, ruleNames, recog)
+	return TreestoStringTree(this, ruleNames, recog)
 }
 
 func (this *RuleContext) toString(ruleNames []string, stop *RuleContext) string {

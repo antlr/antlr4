@@ -155,7 +155,7 @@ ATNConfigSet.prototype.getPredicates = function() {
 	for (var i = 0; i < this.configs.length; i++) {
 		var c = this.configs[i].semanticContext;
 		if (c !== SemanticContext.NONE) {
-			preds.push(c.semanticContext);
+			preds.push(c);
 		}
 	}
 	return preds;
@@ -241,7 +241,7 @@ ATNConfigSet.prototype.containsFast = function(item) {
 	if (this.configLookup === null) {
 		throw "This method is not implemented for readonly sets.";
 	}
-	return this.configLookup.containsFast(item);
+	return this.configLookup.contains(item);
 };
 
 ATNConfigSet.prototype.clear = function() {

@@ -39,7 +39,7 @@ func (la *LL1Analyzer) getDecisionLookahead(s *ATNState) []*IntervalSet {
         look[alt] = NewIntervalSet()
         var lookBusy = NewSet(nil,nil)
         var seeThruPreds = false // fail to get lookahead upon pred
-        la._LOOK(s.transitions(alt).target, nil, PredictionContextEMPTY, look[alt], lookBusy, NewBitSet(), seeThruPreds, false)
+        la._LOOK(s.transitions[alt].target, nil, PredictionContextEMPTY, look[alt], lookBusy, NewBitSet(), seeThruPreds, false)
         // Wipe out lookahead for la alternative if we found nothing
         // or we had a predicate when we !seeThruPreds
         if (look[alt].length==0 || look[alt].contains(LL1AnalyzerHIT_PRED)) {
@@ -67,14 +67,14 @@ func (la *LL1Analyzer) getDecisionLookahead(s *ATNState) []*IntervalSet {
 // @return The set of tokens that can follow {@code s} in the ATN in the
 // specified {@code ctx}.
 ///
-func (la *LL1Analyzer) LOOK(s, stopState int, ctx *RuleContext) *IntervalSet {
+func (la *LL1Analyzer) LOOK(s *ATNState, stopState int, ctx *RuleContext) *IntervalSet {
     var r = NewIntervalSet()
     var seeThruPreds = true // ignore preds get all lookahead
     var lookContext *RuleContext
     if (ctx != nil){
         predictionContextFromRuleContext(s.atn, ctx)
     }
-    la._LOOK(s, stopState, lookContext, r, NewSet(), NewBitSet(), seeThruPreds, true)
+    la._LOOK(s, stopState, lookContext, r, NewSet(nil, nil), NewBitSet(), seeThruPreds, true)
     return r
 }
     
@@ -127,7 +127,7 @@ func (la *LL1Analyzer) _LOOK(s, stopState *ATNState, ctx *PredictionContext, loo
         }
     }
 
-    _,ok := s.(RuleStopState)
+    _,ok := s.(*RuleStopState)
 
     if ok {
         if ( ctx==nil ) {
@@ -143,14 +143,15 @@ func (la *LL1Analyzer) _LOOK(s, stopState *ATNState, ctx *PredictionContext, loo
             // run thru all possible stack tops in ctx
             for i := 0; i < ctx.length(); i++ {
 
-                returnState := atn.states.get(ctx.getReturnState(i))
+                returnState := la.atn.states[ctx.getReturnState(i)]
 //					System.out.println("popping back to "+retState)
 
-                removed := calledRuleStack.get(returnState.ruleIndex)
+                removed := calledRuleStack[returnState.ruleIndex]
 
+                // TODO this is incorrect
                 defer func(){
                     if (removed) {
-                        calledRuleStack.set(returnState.ruleIndex)
+                        calledRuleStack.add(returnState.ruleIndex)
                     }
                 }()
 
@@ -169,7 +170,7 @@ func (la *LL1Analyzer) _LOOK(s, stopState *ATNState, ctx *PredictionContext, loo
 
         if t1, ok := t.(*RuleTransition); ok {
 
-            if (calledRuleStack.get(t1.target.ruleIndex)) {
+            if (calledRuleStack[t1.target.ruleIndex]) {
                 continue
             }
 
@@ -179,25 +180,25 @@ func (la *LL1Analyzer) _LOOK(s, stopState *ATNState, ctx *PredictionContext, loo
                 calledRuleStack.remove(t1.target.ruleIndex);
             }()
 
-            calledRuleStack.set(t1.target.ruleIndex)
+            calledRuleStack.add(t1.target.ruleIndex)
             la._LOOK(t.target, stopState, newContext, look, lookBusy, calledRuleStack, seeThruPreds, addEOF)
         } else if t2, ok := t.(*AbstractPredicateTransition); ok {
             if ( seeThruPreds ) {
                 la._LOOK(t2.target, stopState, ctx, look, lookBusy, calledRuleStack, seeThruPreds, addEOF)
             } else {
-                look.add(HIT_PRED)
+                look.addOne(LL1AnalyzerHIT_PRED)
             }
         } else if ( t.isEpsilon() ) {
             la._LOOK(t.target, stopState, ctx, look, lookBusy, calledRuleStack, seeThruPreds, addEOF)
         } else if _, ok := t.(*WildcardTransition); ok {
             look.addRange( TokenMinUserTokenType, la.atn.maxTokenType );
         }  else {
-            set := t.label()
+            set := t.label
             if (set != nil) {
                 if _, ok := t.(*NotSetTransition); ok {
                     set = set.complement(TokenMinUserTokenType, la.atn.maxTokenType);
                 }
-                look.addAll(set)
+                look.addInterval(set)
             }
         }
     }

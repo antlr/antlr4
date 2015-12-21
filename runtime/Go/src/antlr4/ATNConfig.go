@@ -18,7 +18,7 @@ type ATNConfig struct {
 	state *ATNState
 	alt int
 	context *PredictionContext
-	semanticContext  *SemanticContext
+	semanticContext  SemanticContext
 	reachesIntoOuterContext int
 }
 
@@ -36,7 +36,7 @@ func NewATNConfig6(state *ATNState, alt int, context *PredictionContext) *ATNCon
 	return NewATNConfig(state, alt, context, SemanticContextNONE);
 }
 
-func NewATNConfig5(state *ATNState, alt int, context *PredictionContext, semanticContext *SemanticContext) *ATNConfig {
+func NewATNConfig5(state *ATNState, alt int, context *PredictionContext, semanticContext SemanticContext) *ATNConfig {
 	a := new(ATNConfig)
 	a.state = state;
 	a.alt = alt;
@@ -129,22 +129,12 @@ func (this *ATNConfig) toString() string {
 }
 
 
+
 type LexerATNConfig struct {
 	ATNConfig
 
 	lexerActionExecutor *LexerActionExecutor
 	passedThroughNonGreedyDecision bool
-}
-
-
-
-
-
-
-
-func checkNonGreedyDecision(source *LexerATNConfig, target *ATNState) bool {
-	ds, ok := target.(*DecisionState)
-	return source.passedThroughNonGreedyDecision || (ok && ds.nonGreedy)
 }
 
 func NewLexerATNConfig6(state *ATNState, alt int, context *PredictionContext) *LexerATNConfig {
@@ -252,4 +242,7 @@ func (this *LexerATNConfig) equals(other *ATNConfig) bool {
     }
 }
 
-
+func checkNonGreedyDecision(source *LexerATNConfig, target *ATNState) bool {
+	ds, ok := target.(*DecisionState)
+	return source.passedThroughNonGreedyDecision || (ok && ds.nonGreedy)
+}

@@ -59,7 +59,7 @@ func (this *DFA) getPrecedenceStartState(precedence int) *DFAState {
 		panic("Only precedence DFAs may contain a precedence start state.")
 	}
 	// s0.edges is never nil for a precedence DFA
-	if (precedence < 0 || precedence >= this.s0.edges.length) {
+	if (precedence < 0 || precedence >= len(this.s0.edges)) {
 		return nil
 	}
 	return this.s0.edges[precedence]
@@ -109,7 +109,7 @@ func (this *DFA) setPrecedenceDfa(precedenceDfa bool) {
 	if (this.precedenceDfa!=precedenceDfa) {
 		this._states = NewDFAStatesSet()
 		if (precedenceDfa) {
-			var precedenceState = NewDFAState(NewATNConfigSet(false))
+			var precedenceState = NewDFAState(-1, NewATNConfigSet(false))
 			precedenceState.edges = make([]*DFAState)
 			precedenceState.isAcceptState = false
 			precedenceState.requiresFullContext = false

@@ -6,6 +6,7 @@
 package antlr4
 
 type TokenFactory interface {
+    create(source *TokenFactorySourcePair, ttype, text, channel, start, stop, line, column int) *Token
 }
 
 type CommonTokenFactory struct {
@@ -44,7 +45,7 @@ func NewCommonTokenFactory(copyText bool) *CommonTokenFactory {
 //
 var CommonTokenFactoryDEFAULT = NewCommonTokenFactory(false)
 
-func (this *CommonTokenFactory) create(source *TokenFactorySourcePair, ttype, text, channel, start, stop, line, column int) *CommonToken {
+func (this *CommonTokenFactory) create(source *TokenFactorySourcePair, ttype, text, channel, start, stop, line, column int) *Token {
     var t = NewCommonToken(source, ttype, channel, start, stop)
     t.line = line
     t.column = column

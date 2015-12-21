@@ -8,7 +8,6 @@ import (
 
 type InputStream struct {
 	name    string
-	strdata string
 	index   int
 	data    []rune
 	size    int
@@ -19,18 +18,11 @@ func NewInputStream(data string) *InputStream {
 	is := new(InputStream)
 
 	is.name = "<empty>"
-	is.strdata = data
-	loadString(is)
+	is.index = 0
+	is.data = []rune(data)
+	is.size = len(is.data) // number of runes
 
 	return is
-}
-
-func loadString(stream *InputStream) {
-
-	stream.index = 0
-	stream.data = []rune(stream.strdata)
-	stream.size = len(stream.data)
-
 }
 
 // Reset the stream so that it's in the same state it was
@@ -49,7 +41,7 @@ func (is *InputStream) consume() {
 	is.index += 1
 }
 
-func (is *InputStream) LA(offset int) {
+func (is *InputStream) LA(offset int) int {
 	if offset == 0 {
 		return 0 // nil
 	}
@@ -63,7 +55,7 @@ func (is *InputStream) LA(offset int) {
 	return is.data[pos]
 }
 
-func (is *InputStream) LT(offset int) {
+func (is *InputStream) LT(offset int) int {
 	return is.LA(offset)
 }
 
@@ -94,10 +86,10 @@ func (is *InputStream) getText(start int, stop int) string {
 	if start >= is.size {
 		return ""
 	} else {
-		return is.strdata.slice(start, stop+1)
+		return is.data[start:stop+1]
 	}
 }
 
 func (is *InputStream) toString() string {
-	return is.strdata
+	return is.data
 }

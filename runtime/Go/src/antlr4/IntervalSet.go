@@ -67,7 +67,7 @@ func (i *IntervalSet) addRange(l, h int) {
 	i.addInterval(NewInterval(l, h + 1))
 }
 
-func (is *IntervalSet) addInterval(v Interval) {
+func (is *IntervalSet) addInterval(v *Interval) {
 	if (is.intervals == nil) {
 		is.intervals = make([]Interval, 0)
 		is.intervals = append( is.intervals, v )
@@ -77,7 +77,8 @@ func (is *IntervalSet) addInterval(v Interval) {
 			var i = is.intervals[k]
 			// distinct range -> insert
 			if (v.stop < i.start) {
-				is.intervals.splice(k, 0, v)
+				// is.intervals = splice(k, 0, v)
+				is.intervals = append(is.intervals[0:k], append([]*Interval{v}, is.intervals[k:]...)...)
 				return
 			} else if (v.stop == i.start) {
 				is.intervals[k].start = v.start
@@ -110,11 +111,11 @@ func (i *IntervalSet) reduce(k int) {
 		var r = i.intervals[k + 1]
 		// if r contained in l
 		if (l.stop >= r.stop) {
-			i.intervals.pop(k + 1)
+			i.intervals = i.intervals[0:len(i.intervals)-1] // pop(k + 1)
 			i.reduce(k)
 		} else if (l.stop >= r.start) {
 			i.intervals[k] = NewInterval(l.start, r.stop)
-			i.intervals.pop(k + 1)
+			i.intervals = i.intervals[0:len(i.intervals)-1] // i.intervals.pop(k + 1)
 		}
 	}
 }
@@ -151,7 +152,7 @@ func (is *IntervalSet) length() int {
 	return len
 }
 
-func (is *IntervalSet) removeRange(v Interval) {
+func (is *IntervalSet) removeRange(v *Interval) {
     if v.start==v.stop-1 {
         is.removeOne(v.start)
     } else if (is.intervals!=nil) {
@@ -164,10 +165,12 @@ func (is *IntervalSet) removeRange(v Interval) {
             } else if(v.start>i.start && v.stop<i.stop) {
                 is.intervals[k] = NewInterval(i.start, v.start)
                 var x = NewInterval(v.stop, i.stop)
-                is.intervals.splice(k, 0, x)
+				// is.intervals.splice(k, 0, x)
+				is.intervals = append(is.intervals[0:k], append([]*Interval{x}, is.intervals[k:]...)...)
                 return
             } else if(v.start<=i.start && v.stop>=i.stop) {
-                is.intervals.splice(k, 1)
+//                is.intervals.splice(k, 1)
+				is.intervals = append(is.intervals[0:k], is.intervals[k+1]...)
                 k = k - 1 // need another pass
             } else if(v.start<i.stop) {
                 is.intervals[k] = NewInterval(i.start, v.start)
@@ -179,6 +182,7 @@ func (is *IntervalSet) removeRange(v Interval) {
     }
 }
 
+// TODO this looks like a dupe of removeRange...
 func (is *IntervalSet) removeOne(v *Interval) {
 	if(v.start==v.stop-1) {
 		is.removeOne(v.start)
@@ -193,10 +197,12 @@ func (is *IntervalSet) removeOne(v *Interval) {
 				// check for including range, split it
 				is.intervals[k] = NewInterval(i.start, v.start)
 				var x = NewInterval(v.stop, i.stop)
-				is.intervals.splice(k, 0, x)
+				// is.intervals.splice(k, 0, x)
+				is.intervals = append(is.intervals[0:k], append([]*Interval{x}, is.intervals[k:]...)...)
 				return
 			} else if(v.start<=i.start && v.stop>=i.stop) {
-				is.intervals.splice(k, 1)
+				// is.intervals.splice(k, 1)
+				is.intervals = append(is.intervals[0:k], is.intervals[k+1]...)
 				k = k - 1; // need another pass
 			} else if(v.start<i.stop) {
 				is.intervals[k] = NewInterval(i.start, v.start)

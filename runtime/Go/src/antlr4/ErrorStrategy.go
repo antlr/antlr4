@@ -7,7 +7,6 @@ import (
 )
 
 type ErrorStrategy struct {
-
 }
 
 func (this *ErrorStrategy) reset(recognizer *Parser){
@@ -26,6 +25,10 @@ func (this *ErrorStrategy) inErrorRecoveryMode(recognizer *Parser){
 }
 
 func (this *ErrorStrategy) reportError(recognizer *Parser){
+}
+
+func (this *ErrorStrategy) reportMatch(recognizer *Parser) {
+
 }
 
 // This is the default implementation of {@link ANTLRErrorStrategy} used for
@@ -166,7 +169,7 @@ func (this *DefaultErrorStrategy) recover(recognizer *Parser, e *RecognitionExce
 		// at least to prevent an infinite loop this is a failsafe.
 		recognizer.consume()
     }
-    this.lastErrorIndex = recognizer._input.index()
+    this.lastErrorIndex = recognizer.getInputStream().index()
     if (this.lastErrorStates == nil) {
         this.lastErrorStates = NewIntervalSet()
     }
@@ -295,7 +298,7 @@ func (this *DefaultErrorStrategy) reportNoViableAlternative(recognizer *Parser, 
 //
 func (this *DefaultErrorStrategy) reportInputMismatch(recognizer *Parser, e *RecognitionException) {
     var msg = "mismatched input " + this.getTokenErrorDisplay(e.offendingToken) +
-          " expecting " + e.getExpectedTokens().toString(recognizer.literalNames, recognizer.symbolicNames)
+          " expecting " + e.getExpectedTokens().toStringVerbose(recognizer.literalNames, recognizer.symbolicNames, false)
     recognizer.notifyErrorListeners(msg, e.offendingToken, e)
 }
 
@@ -527,7 +530,7 @@ func (this *DefaultErrorStrategy) singleTokenDeletion(recognizer *Parser) Token 
 // If you change what tokens must be created by the lexer,
 // override this method to create the appropriate tokens.
 //
-func (this *DefaultErrorStrategy) getMissingSymbol(recognizer *Parser) {
+func (this *DefaultErrorStrategy) getMissingSymbol(recognizer *Parser) *Token {
     var currentSymbol = recognizer.getCurrentToken()
     var expecting = this.getExpectedTokens(recognizer)
     var expectedTokenType = expecting.first()

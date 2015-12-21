@@ -124,7 +124,7 @@ func (this *TerminalNodeImpl) getChildCount() {
 }
 
 func (this *TerminalNodeImpl) accept(visitor *ParseTreeVisitor ) interface{} {
-	return visitor.visitTerminal(this)
+	return (*visitor).visitTerminal(this)
 }
 
 func (this *TerminalNodeImpl) getText() string {
@@ -163,7 +163,7 @@ func (this *ErrorNodeImpl) isErrorNode() bool {
 }
 
 func (this *ErrorNodeImpl) accept( visitor *ParseTreeVisitor ) interface{} {
-	return visitor.visitErrorNode(this)
+	return (*visitor).visitErrorNode(this)
 }
 
 
@@ -179,12 +179,12 @@ func NewParseTreeWalker() *ParseTreeWalker {
 func (this *ParseTreeWalker) walk(listener *ParseTreeListener, t *Tree) {
 
 	if errorNode, ok := t.(*ErrorNode); ok {
-		listener.visitErrorNode(errorNode)
+		(*listener).visitErrorNode(errorNode)
 	} else if term, ok := t.(TerminalNode); ok {
-		listener.visitTerminal(term)
+		(*listener).visitTerminal(term)
 	} else {
 		this.enterRule(listener, t)
-		for i := 0; i < t.getChildCount(); i++ {
+		for i := 0; i < len(t.children); i++ {
 			var child = t.getChild(i)
 			this.walk(listener, child)
 		}
@@ -199,7 +199,7 @@ func (this *ParseTreeWalker) walk(listener *ParseTreeListener, t *Tree) {
 //
 func (this *ParseTreeWalker) enterRule(listener *ParseTreeListener, r *RuleNode) {
 	var ctx = r.getRuleContext().(*ParserRuleContext)
-	listener.enterEveryRule(ctx)
+	(*listener).enterEveryRule(ctx)
 	ctx.enterRule(listener)
 }
 

@@ -6,9 +6,11 @@ import (
             )
 
 type Recognizer struct {
+
     _listeners []ParseTreeListener
-    _interp *ATNSimulator
+    _interp ATNSimulator
     state int
+
 }
 
 func NewRecognizer() *Recognizer {
@@ -31,6 +33,10 @@ func (this *Recognizer) checkVersion(toolVersion string) {
     if (runtimeVersion!=toolVersion) {
         fmt.Println("ANTLR runtime and generated code versions disagree: "+runtimeVersion+"!="+toolVersion)
     }
+}
+
+func (this *Recognizer) action( _localctx *RuleContext, ruleIndex, actionIndex int) {
+    panic("action not implemented on Recognizer!")
 }
 
 func (this *Recognizer) addErrorListener(listener *ParseTreeListener) {

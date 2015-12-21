@@ -108,8 +108,8 @@ func NewDFAState(stateNumber int, configs *NewATNConfigSet) *DFAState {
 func (this *DFAState) getAltSet() {
 	var alts = NewSet(nil,nil)
 	if (this.configs != nil) {
-		for i := 0; i < len(this.configs); i++ {
-			var c = this.configs[i]
+		for i := 0; i < len(this.configs.configs); i++ {
+			var c = this.configs.configs[i]
 			alts.add(c.alt)
 		}
 	}
@@ -139,7 +139,7 @@ func (this *DFAState) equals(other interface{}) bool {
 		return false
 	}
 
-	return this.configs.equals(other.configs)
+	return this.configs.equals(other.(*DFAState).configs)
 }
 
 func (this *DFAState) toString() string {

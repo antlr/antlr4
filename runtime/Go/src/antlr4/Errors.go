@@ -72,7 +72,7 @@ func (t *RecognitionException) InitRecognitionException(message string, recogniz
 // @return The set of token types that could potentially follow the current
 // state in the ATN, or {@code nil} if the information is not available.
 // /
-func (this *RecognitionException) getExpectedTokens() {
+func (this *RecognitionException) getExpectedTokens() *IntervalSet {
     if (this.recognizer!=nil) {
         return this.recognizer.getATN().getExpectedTokens(this.offendingState, this.ctx)
     } else {

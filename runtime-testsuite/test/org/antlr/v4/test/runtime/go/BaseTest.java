@@ -27,7 +27,7 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.antlr.v4.test.runtime.javascript.node;
+package org.antlr.v4.test.runtime.go;
 
 import org.antlr.v4.Tool;
 import org.antlr.v4.automata.ATNFactory;

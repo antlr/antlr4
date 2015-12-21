@@ -139,9 +139,9 @@ func (this *ATNConfigSet) getStates() {
 func (this *ATNConfigSet) getPredicates() []SemanticContext {
 	var preds = make([]SemanticContext)
 	for i := 0; i < len(this.configs); i++ {
-		var c = this.configs[i].semanticContext
+		c := this.configs[i].semanticContext
 		if (c != SemanticContextNONE) {
-			preds = append(preds, c.semanticContext)
+			preds = append(preds, c)
 		}
 	}
 	return preds
@@ -166,7 +166,7 @@ func (this *ATNConfigSet) optimizeConfigs(interpreter *ATNSimulator) {
 
 func (this *ATNConfigSet) addAll(coll []*ATNConfig) bool{
 	for i := 0; i < len(coll); i++ {
-		this.add(coll[i])
+		this.add(coll[i],nil)
 	}
 	return false
 }
@@ -179,8 +179,9 @@ func (this *ATNConfigSet) equals(other interface{}) bool {
 	}
 
 	other2 := other.(*ATNConfigSet)
+
 	return this.configs != nil &&
-			this.configs.equals(other2.configs) &&
+//			this.configs.equals(other2.configs) && // TODO is this necessary?
 			this.fullCtx == other2.fullCtx &&
 			this.uniqueAlt == other2.uniqueAlt &&
 			this.conflictingAlts == other2.conflictingAlts &&
@@ -208,11 +209,11 @@ func (this *ATNConfigSet) hashConfigs() {
 }
 
 func (this *ATNConfigSet) length() int {
-	return this.configs.length
+	return len(this.configs)
 }
 
 func (this *ATNConfigSet) isEmpty() bool {
-	return this.configs.length == 0
+	return len(this.configs) == 0
 }
 
 func (this *ATNConfigSet) contains(item *ATNConfig ) bool {
@@ -226,7 +227,7 @@ func (this *ATNConfigSet) containsFast(item *ATNConfig ) bool {
 	if (this.configLookup == nil) {
 		panic("This method is not implemented for readonly sets.")
 	}
-	return this.configLookup.containsFast(item)
+	return this.configLookup.contains(item) // TODO containsFast is not implemented for Set
 }
 
 func (this *ATNConfigSet) clear() {

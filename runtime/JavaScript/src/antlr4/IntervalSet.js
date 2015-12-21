@@ -96,11 +96,11 @@ IntervalSet.prototype.reduce = function(k) {
 		var r = this.intervals[k + 1];
 		// if r contained in l
 		if (l.stop >= r.stop) {
-			this.intervals.pop(k + 1);
+			this.intervals.pop(k + 1); // what is intended here? pop takes no args
 			this.reduce(k);
 		} else if (l.stop >= r.start) {
 			this.intervals[k] = new Interval(l.start, r.stop);
-			this.intervals.pop(k + 1);
+			this.intervals.pop(k + 1); // what is intended here? pop takes no args
 		}
 	}
 };

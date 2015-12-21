@@ -58,13 +58,13 @@ var ParserATNSimulatorprototyperetry_debug = false
 func (this *ParserATNSimulator) reset() {
 }
 
-func (this *ParserATNSimulator) adaptivePredict(input *TokenStream, decision int, outerContext *ParserRuleContext) int {
+func (this *ParserATNSimulator) adaptivePredict(input TokenStream, decision int, outerContext *ParserRuleContext) int {
 
     if (ParserATNSimulatorprototypedebug || ParserATNSimulatorprototypedebug_list_atn_decisions) {
         fmt.Println("adaptivePredict decision " + decision +
                                " exec LA(1)==" + this.getLookaheadName(input) +
                                " line " + input.LT(1).line + ":" +
-                               input.LT(1).column)
+                                input.LT(1).column)
     }
 
     this._input = input
@@ -171,7 +171,7 @@ func (this *ParserATNSimulator) adaptivePredict(input *TokenStream, decision int
 //    conflict
 //    conflict + preds
 //
-func (this *ParserATNSimulator) execATN(dfa *DFA, s0 *DFAState, input *TokenStream, startIndex int, outerContext *ParserRuleContext ) int {
+func (this *ParserATNSimulator) execATN(dfa *DFA, s0 *DFAState, input TokenStream, startIndex int, outerContext *ParserRuleContext ) int {
 
     if (ParserATNSimulatorprototypedebug || ParserATNSimulatorprototypedebug_list_atn_decisions) {
         fmt.Println("execATN decision " + dfa.decision +
@@ -366,7 +366,7 @@ func (this *ParserATNSimulator) predicateDFAState(dfaState *DFAState, decisionSt
 }
 
 // comes back with reach.uniqueAlt set to a valid alt
-func (this *ParserATNSimulator) execATNWithFullContext(dfa *DFA, D *DFAState, s0 *ATNConfigSet, input *TokenStream, startIndex int, outerContext *ParserRuleContext) int{
+func (this *ParserATNSimulator) execATNWithFullContext(dfa *DFA, D *DFAState, s0 *ATNConfigSet, input TokenStream, startIndex int, outerContext *ParserRuleContext) int{
 
     if (ParserATNSimulatorprototypedebug || ParserATNSimulatorprototypedebug_list_atn_decisions) {
         fmt.Println("execATNWithFullContext "+s0)
@@ -752,7 +752,7 @@ func (this *ParserATNSimulator) applyPrecedenceFilter(configs *ATNConfigSet) *AT
         // filter the prediction context for alternatives predicting alt>1
         // (basically a graph subtraction algorithm).
 		if (!config.precedenceFilterSuppressed) {
-            var context = statesFromAlt1[config.state.stateNumber] || nil
+            var context = statesFromAlt1[config.state.stateNumber]
             if (context!=nil && context.equals(config.context)) {
                 // eliminated
                 continue

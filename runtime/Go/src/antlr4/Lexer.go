@@ -33,7 +33,7 @@ type Lexer struct {
 	_factory *TokenFactory
 	_tokenFactorySourcePair *TokenFactorySourcePair
 	_interp *LexerATNSimulator
-	_token int
+	_token *Token
 	_tokenStartCharIndex int
 	_tokenStartLine int
 	_tokenStartColumn int
@@ -137,63 +137,76 @@ func (l *Lexer) reset() {
 	l._interp.reset()
 }
 
+
+func (l *Lexer) safeMatch() (ret int) {
+
+	// previously in catch block
+	defer func(){
+		if e := recover(); e != nil {
+			l.notifyListeners(e) // report error
+			l.recover(e)
+			ret = LexerSkip // default
+		}
+	}()
+
+	return l._interp.match(l._input, l._mode)
+}
+
 // Return a token from l source i.e., match a token on the char stream.
-func (l *Lexer) nextToken() Token {
+func (l *Lexer) nextToken() *Token {
 	if (l._input == nil) {
 		panic("nextToken requires a non-nil input stream.")
 	}
 
-	// Mark start location in char stream so unbuffered streams are
-	// guaranteed at least have text of current token
-	// var tokenStartMarker = l._input.mark()
-	try {
-		for (true) {
-			if (l._hitEOF) {
-				l.emitEOF()
-				return l._token
-			}
-			l._token = nil
-			l._channel = TokenDefaultChannel
-			l._tokenStartCharIndex = l._input.index
-			l._tokenStartColumn = l._interp.column
-			l._tokenStartLine = l._interp.line
-			l._text = nil
-			var continueOuter = false
-			for (true) {
-				l._type = TokenInvalidType
-				var ttype = LexerSkip
-				try {
-					ttype = l._interp.match(l._input, l._mode)
-				} catch (e) {
-					l.notifyListeners(e) // report error
-					l.recover(e)
-				}
-				if (l._input.LA(1) == TokenEOF) {
-					l._hitEOF = true
-				}
-				if (l._type == TokenInvalidType) {
-					l._type = ttype
-				}
-				if (l._type == LexerSkip) {
-					continueOuter = true
-					break
-				}
-				if (l._type != LexerMore) {
-					break
-				}
-			}
-			if (continueOuter) {
-				continue
-			}
-			if (l._token == nil) {
-				l.emit()
-			}
-			return l._token
-		}
-	} finally {
+	// do this when done consuming
+	var tokenStartMarker = l._input.mark()
+
+	// previously in finally block
+	defer func(){
 		// make sure we release marker after match or
 		// unbuffered char stream will keep buffering
 		l._input.release(tokenStartMarker)
+	}()
+
+	for (true) {
+		if (l._hitEOF) {
+			l.emitEOF()
+			return l._token
+		}
+		l._token = nil
+		l._channel = TokenDefaultChannel
+		l._tokenStartCharIndex = l._input.index
+		l._tokenStartColumn = l._interp.column
+		l._tokenStartLine = l._interp.line
+		l._text = nil
+		var continueOuter = false
+		for (true) {
+			l._type = TokenInvalidType
+			var ttype = LexerSkip
+
+			ttype = l.safeMatch()
+
+			if (l._input.LA(1) == TokenEOF) {
+				l._hitEOF = true
+			}
+			if (l._type == TokenInvalidType) {
+				l._type = ttype
+			}
+			if (l._type == LexerSkip) {
+				continueOuter = true
+				break
+			}
+			if (l._type != LexerMore) {
+				break
+			}
+		}
+		if (continueOuter) {
+			continue
+		}
+		if (l._token == nil) {
+			l.emit()
+		}
+		return l._token
 	}
 }
 
@@ -216,7 +229,7 @@ func (l *Lexer) mode(m int) {
 }
 
 func (l *Lexer) pushMode(m int) {
-	if (l._interp.debug) {
+	if (LexerATNSimulatordebug) {
 		fmt.Println("pushMode " + m)
 	}
 	l._modeStack.Push(l._mode)
@@ -227,8 +240,8 @@ func (l *Lexer) popMode() {
 	if ( len(l._modeStack) == 0) {
 		panic("Empty Stack")
 	}
-	if (l._interp.debug) {
-		fmt.Println("popMode back to " + l._modeStack.slice(0, -1))
+	if (LexerATNSimulatordebug) {
+		fmt.Println("popMode back to " + l._modeStack[0:len(l._modeStack)-1])
 	}
 	i, _ := l._modeStack.Pop()
 	l.mode(i)
@@ -275,15 +288,22 @@ func (l *Lexer) emit() {
 }
 
 func (l *Lexer) emitEOF() int {
-	var cpos = l.column()
-	var lpos = l.line()
+	cpos := l.getCharPositionInLine();
+	lpos := l.getLine();
 	var eof = l._factory.create(l._tokenFactorySourcePair, TokenEOF, nil, TokenDefaultChannel, l._input.index,  l._input.index - 1, lpos, cpos)
 	l.emitToken(eof)
 	return eof
 }
 
+func (l *Lexer) getCharPositionInLine() int {
+	return l._interp.column
+}
 
-func (l *Lexer) getType() {
+func (l *Lexer) getLine() int {
+	return l._interp.line
+}
+
+func (l *Lexer) getType() int {
 	return l._type
 }
 
@@ -354,7 +374,7 @@ func (l *Lexer) getErrorDisplayForChar(c rune) string {
 	}
 }
 
-func (l *Lexer) getCharErrorDisplay(c) string {
+func (l *Lexer) getCharErrorDisplay(c rune) string {
 	return "'" + l.getErrorDisplayForChar(c) + "'"
 }
 

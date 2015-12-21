@@ -29,8 +29,9 @@ type TokenStream interface {
 	LT(k int) *Token
 	get(index int) *Token
 	getTokenSource() *TokenSource
+	setTokenSource(*TokenSource)
 	getText() string
-	getTextFromInterval(Interval) string
+	getTextFromInterval(*Interval) string
 	getTextFromRuleContext(*RuleContext) string
 	getTextFromTokens(*Token, *Token) string
 }
@@ -157,7 +158,7 @@ func (bt *BufferedTokenStream) fetch(n int) int {
 	}
 
 	for i := 0; i < n; i++ {
-		var t *Token  = bt.tokenSource.nextToken()
+		var t *Token = (*bt.tokenSource).nextToken()
 		t.tokenIndex = len(bt.tokens)
 		bt.tokens = append(bt.tokens, t)
 		if (t.tokenType == TokenEOF) {
@@ -323,8 +324,8 @@ func (bt *BufferedTokenStream) getHiddenTokensToLeft(tokenIndex, channel int) {
 	return bt.filterForChannel(from_, to, channel)
 }
 
-func (bt *BufferedTokenStream) filterForChannel(left, right, channel int) {
-	var hidden = []
+func (bt *BufferedTokenStream) filterForChannel(left, right, channel int) []*Token {
+	var hidden = make([]*Token)
 	for i := left; i < right + 1; i++ {
 		var t = bt.tokens[i]
 		if (channel == -1) {
@@ -342,7 +343,7 @@ func (bt *BufferedTokenStream) filterForChannel(left, right, channel int) {
 }
 
 func (bt *BufferedTokenStream) getSourceName() string {
-	return bt.tokenSource.getSourceName()
+	return (*bt.tokenSource).getSourceName()
 }
 
 // Get the text of all tokens in bt buffer.///
@@ -353,12 +354,12 @@ func (bt *BufferedTokenStream) getText(interval *Interval) string {
 		interval = NewInterval(0, len(bt.tokens) - 1)
 	}
 	var start = interval.start
-	if _, ok := start.(Token); ok {
-		start = start.tokenIndex
+	if s2, ok := start.(*Token); ok {
+		start = s2.tokenIndex
 	}
 	var stop = interval.stop
-	if _, ok := stop.(Token); ok {
-		stop = stop.tokenIndex
+	if s2, ok := stop.(*Token); ok {
+		stop = s2.tokenIndex
 	}
 	if (start == nil || stop == nil || start < 0 || stop < 0) {
 		return ""

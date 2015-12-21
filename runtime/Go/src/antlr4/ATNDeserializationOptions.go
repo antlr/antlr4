@@ -20,9 +20,4 @@ func NewATNDeserializationOptions(copyFrom *ATNDeserializationOptions) *ATNDeser
 
 var ATNDeserializationOptionsdefaultOptions = &ATNDeserializationOptions{true}
 
-//    func __setattr__(self, key, value):
-//        if key!="readOnly" and self.readOnly:
-//            raise Exception("The object is read only.")
-//        super(type(self), self).__setattr__(key,value)
-
 

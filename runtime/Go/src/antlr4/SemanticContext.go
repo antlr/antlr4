@@ -14,6 +14,7 @@ import (
 type SemanticContext interface {
 	evaluate(parser *Recognizer, outerContext *RuleContext) bool
 	evalPrecedence(parser *Recognizer, outerContext *RuleContext) *SemanticContext
+	equals(interface{}) bool
 	toString() string
 }
 

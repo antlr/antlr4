@@ -61,7 +61,7 @@ type LexerATNSimulator struct {
 
 }
 
-func LexerATNSimulator(recog *Lexer, atn *ATN, decisionToDFA []*DFA, sharedContextCache *PredictionContextCache) {
+func NewLexerATNSimulator(recog *Lexer, atn *ATN, decisionToDFA []*DFA, sharedContextCache *PredictionContextCache) {
 
 	this := new(LexerATNSimulator)
 
@@ -299,7 +299,7 @@ func (this *LexerATNSimulator) getReachableConfigSet(input *InputStream, closure
 			continue
 		}
 		if (LexerATNSimulatordebug) {
-			fmt.Println("testing %s at %s\n", this.getTokenName(t), cfg.toString(this.recog, true))
+			fmt.Println("testing %s at %s\n", this.getTokenName(t), cfg.toString()) // this.recog, true))
 		}
 		for j := 0; j < len(cfg.state.transitions); j++ {
 			var trans = cfg.state.transitions[j] // for each transition
@@ -366,7 +366,7 @@ func (this *LexerATNSimulator) closure(input *InputStream, config *LexerATNConfi
 	currentAltReachedAcceptState, speculative, treatEofAsEpsilon bool) bool {
 
 	if (LexerATNSimulatordebug) {
-		fmt.Println("closure(" + config.toString(this.recog, true) + ")")
+		fmt.Println("closure(" + config.toString() + ")")  // config.toString(this.recog, true) + ")")
 	}
 
 	_, ok :=config.state.(*RuleStopState)
@@ -472,7 +472,7 @@ func (this *LexerATNSimulator) getEpsilonTarget(input *InputStream, config *Lexe
 			// getEpsilonTarget to return two configurations, so
 			// additional modifications are needed before we can support
 			// the split operation.
-			var lexerActionExecutor = LexerActionExecutorappend(config.lexerActionExecutor, this.atn.lexerActions[trans.actionIndex])
+			var lexerActionExecutor = LexerActionExecutorappend(config.lexerActionExecutor, this.atn.lexerActions[trans.(*ActionTransition).actionIndex])
 			cfg = NewLexerATNConfig3(config, trans.target, lexerActionExecutor)
 		} else {
 			// ignore actions in referenced rules

@@ -116,7 +116,7 @@ const (
 
 	ATNStateINVALID_STATE_NUMBER = -1
 )
-//
+
 //var ATNState.serializationNames = [
 //            "INVALID",
 //            "BASIC",
@@ -157,7 +157,8 @@ func (this *ATNState) addTransition(trans *Transition, index int) {
     if (index==-1) {
 		this.transitions = append(this.transitions, trans)
     } else {
-        this.transitions.splice(index, 1, trans)
+		this.transitions = append(this.transitions[:index], append([]*Transition{ trans }, this.transitions[index:]...)...)
+//        this.transitions.splice(index, 1, trans)
     }
 }
 
@@ -201,7 +202,7 @@ func (this *DecisionState) InitDecisionState() {
 type BlockStartState struct {
 	DecisionState
 
-	endState *ATNState
+	endState *BlockEndState
 }
 
 func NewBlockStartState() *BlockStartState {

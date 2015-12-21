@@ -132,10 +132,12 @@ func (t *AtomTransition) toString() string {
 
 type RuleTransition struct {
 	Transition
-	ruleIndex, precedence, followState int
+	followState *ATNState
+	ruleIndex, precedence int
+
 }
 
-func NewRuleTransition ( ruleStart *ATNState, ruleIndex, precedence, followState int ) *RuleTransition {
+func NewRuleTransition ( ruleStart *ATNState, ruleIndex, precedence int, followState *RuleTransition ) *RuleTransition {
 
 	t := new(RuleTransition)
 	t.InitTransition( ruleStart )
@@ -214,19 +216,18 @@ func (t *RangeTransition) matches(symbol, minVocabSymbol,  maxVocabSymbol int) {
 func (t *RangeTransition) toString() string {
 	return "'" + string(t.start) + "'..'" + string(t.stop) + "'"
 }
-//
-//type AbstractPredicateTransition struct {
-//	Transition
-//}
-//
-//func NewAbstractPredicateTransition ( target *ATNState ) *AbstractPredicateTransition {
-//
-//	t := new(AbstractPredicateTransition)
-//	t.InitTransition( target )
-//
-//	return t
-//}
 
+type AbstractPredicateTransition struct {
+	Transition
+}
+
+func NewAbstractPredicateTransition ( target *ATNState ) *AbstractPredicateTransition {
+
+	t := new(AbstractPredicateTransition)
+	t.InitTransition( target )
+
+	return t
+}
 
 type PredicateTransition struct {
 	Transition
@@ -345,7 +346,7 @@ func NewNotSetTransition ( target *ATNState, set *IntervalSet) *NotSetTransition
 
 
 func (t *NotSetTransition) matches(symbol, minVocabSymbol,  maxVocabSymbol int) bool {
-	return symbol >= minVocabSymbol && symbol <= maxVocabSymbol && !SetTransition.prototype.matches.call(t, symbol, minVocabSymbol, maxVocabSymbol)
+	return symbol >= minVocabSymbol && symbol <= maxVocabSymbol && !t.label.contains( symbol)
 }
 
 func (t *NotSetTransition) toString() string {

@@ -155,6 +155,10 @@ func (this *BitSet) add(value bool) {
 	this.data[value] = true
 }
 
+func (this *BitSet) clear(index int) {
+	delete(this.data, index)
+}
+
 func (this *BitSet) or(set *BitSet) {
 	for k,_ := range set.data {
 		this.add(k)
