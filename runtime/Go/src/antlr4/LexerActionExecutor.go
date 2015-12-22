@@ -9,7 +9,7 @@ package antlr4
 
 type LexerActionExecutor struct {
 	lexerActions []*LexerAction
-	hashString string
+	cachedHashString string
 }
 
 func NewLexerActionExecutor(lexerActions []*LexerAction) *LexerActionExecutor {
@@ -30,7 +30,7 @@ func NewLexerActionExecutor(lexerActions []*LexerAction) *LexerActionExecutor {
 		s += a.hashString()
 	}
 
-	this.hashString = s // "".join([str(la) for la in
+	this.cachedHashString = s // "".join([str(la) for la in
 
 	return this
 }

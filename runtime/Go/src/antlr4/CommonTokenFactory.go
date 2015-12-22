@@ -6,7 +6,7 @@
 package antlr4
 
 type TokenFactory interface {
-    create(source *TokenFactorySourcePair, ttype, text, channel, start, stop, line, column int) *Token
+    create(source *TokenSourceInputStreamPair, ttype int, text string, channel, start, stop, line, column int) *Token
 }
 
 type CommonTokenFactory struct {
@@ -45,22 +45,22 @@ func NewCommonTokenFactory(copyText bool) *CommonTokenFactory {
 //
 var CommonTokenFactoryDEFAULT = NewCommonTokenFactory(false)
 
-func (this *CommonTokenFactory) create(source *TokenFactorySourcePair, ttype, text, channel, start, stop, line, column int) *Token {
+func (this *CommonTokenFactory) create(source *TokenSourceInputStreamPair, ttype int, text string, channel, start, stop, line, column int) *Token {
     var t = NewCommonToken(source, ttype, channel, start, stop)
     t.line = line
     t.column = column
-    if (text !=nil) {
-        t.text = text
-    } else if (this.copyText && source[1] !=nil) {
-        t.text = source.inputStream.getText(start,stop)
+    if (text != "") {
+        t.setText( text )
+    } else if (this.copyText && source.inputStream != nil) {
+        t.setText(  source.inputStream.getText(start,stop) )
     }
-    return t
+    return t.Token
 }
 
-func (this *CommonTokenFactory) createThin(ttype int, text string) *CommonToken {
+func (this *CommonTokenFactory) createThin(ttype int, text string) *Token {
     var t = NewCommonToken(nil, ttype, TokenDefaultChannel, -1, -1)
-    t.text = text
-    return t
+    t.setText( text )
+    return t.Token
 }
 
 

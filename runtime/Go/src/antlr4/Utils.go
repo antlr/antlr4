@@ -5,10 +5,22 @@ import (
 	"errors"
 	"strings"
 	"hash/fnv"
-	"math"
-	"regexp"
+//	"regexp"
 )
 
+func intMin(a,b int) int {
+	if a < b {
+		return a
+	}
+	return b
+}
+
+func intMax(a,b int) int {
+	if a > b {
+		return a
+	}
+	return b
+}
 
 // A simple integer stack
 
@@ -151,7 +163,7 @@ func NewBitSet() *BitSet {
 	return b
 }
 
-func (this *BitSet) add(value bool) {
+func (this *BitSet) add(value int) {
 	this.data[value] = true
 }
 
@@ -299,10 +311,15 @@ func TitleCase(str string) string {
 
 	//	func (re *Regexp) ReplaceAllStringFunc(src string, repl func(string) string) string
 	//	return str.replace(//g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1)})
-	re := regexp.MustCompile("\w\S*")
-	return re.ReplaceAllStringFunc(str, func(s string) {
-		return strings.ToUpper(s[0:1]) + s[1:2]
-	})
+
+	panic("Not implemented")
+
+//	re := regexp.MustCompile("\w\S*")
+//	return re.ReplaceAllStringFunc(str, func(s string) {
+//		return strings.ToUpper(s[0:1]) + s[1:2]
+//	})
+	return nil
+
 }
 
 

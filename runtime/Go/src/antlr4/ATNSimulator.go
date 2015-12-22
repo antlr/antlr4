@@ -42,11 +42,11 @@ func (this *ATNSimulator) InitATNSimulator(atn *ATN, sharedContextCache *Predict
 // Must distinguish between missing edge and edge we know leads nowhere///
 var ATNSimulatorERROR = NewDFAState(0x7FFFFFFF, NewATNConfigSet(false))
 
-func (this *ATNSimulator) getCachedContext(context *PredictionContext) *PredictionContext {
+func (this *ATNSimulator) getCachedContext(context IPredictionContext) IPredictionContext {
     if (this.sharedContextCache == nil) {
         return context
     }
-    var visited = make(map[*PredictionContext]*PredictionContext)
+    var visited = make(map[IPredictionContext]IPredictionContext)
     return getCachedPredictionContext(context, this.sharedContextCache, visited)
 }
 

@@ -18,6 +18,6 @@ func NewATNDeserializationOptions(copyFrom *ATNDeserializationOptions) *ATNDeser
     return o
 }
 
-var ATNDeserializationOptionsdefaultOptions = &ATNDeserializationOptions{true}
+var ATNDeserializationOptionsdefaultOptions = &ATNDeserializationOptions{true,false,false}
 
 

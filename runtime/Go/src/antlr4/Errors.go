@@ -9,18 +9,24 @@ import (
 //  in the input, where it is in the ATN, the rule invocation stack,
 //  and what kind of problem occurred.
 
+
+type IRecognitionException interface {
+	getOffendingToken() *Token
+	getMessage() string
+}
+
 type RecognitionException struct {
 
 	message string
-	recognizer *Recognizer
+	recognizer IRecognizer
 	offendingToken *Token
 	offendingState int
-	ctx *RuleContext
+	ctx IRuleContext
 	input *InputStream
 
 }
 
-func NewRecognitionException(message string, recognizer *Recognizer, input *InputStream, ctx *RuleContext) *RecognitionException {
+func NewRecognitionException(message string, recognizer IRecognizer, input *InputStream, ctx IRuleContext) *RecognitionException {
 
 // todo
 //	Error.call(this)
@@ -38,7 +44,7 @@ func NewRecognitionException(message string, recognizer *Recognizer, input *Inpu
     return t
 }
 
-func (t *RecognitionException) InitRecognitionException(message string, recognizer *Recognizer, input *InputStream, ctx *RuleContext){
+func (t *RecognitionException) InitRecognitionException(message string, recognizer IRecognizer, input *InputStream, ctx IRuleContext){
 
 	t.message = message
 	t.recognizer = recognizer
@@ -55,9 +61,16 @@ func (t *RecognitionException) InitRecognitionException(message string, recogniz
 	// edge we couldn't match.
 	t.offendingState = -1
 	if (t.recognizer!=nil) {
-		t.offendingState = t.recognizer.state
+		t.offendingState = t.recognizer.getState()
 	}
+}
 
+func (this *RecognitionException) getMessage() string {
+	return this.message
+}
+
+func (this *RecognitionException) getOffendingToken() *Token {
+	return this.offendingToken
 }
 
 // <p>If the state number is not known, this method returns -1.</p>
@@ -132,8 +145,7 @@ type NoViableAltException struct {
 // of the offending input and also knows where the parser was
 // in the various paths when the error. Reported by reportNoViableAlternative()
 //
-func NewNoViableAltException(recognizer *Parser, input *InputStream, startToken *Token,
-	offendingToken *Token, deadEndConfigs *ATNConfigSet, ctx *ParserRuleContext) *NoViableAltException {
+func NewNoViableAltException(recognizer *Parser, input *InputStream, startToken *Token, offendingToken *Token, deadEndConfigs *ATNConfigSet, ctx *ParserRuleContext) *NoViableAltException {
 
 	if (ctx == nil){
 		ctx = recognizer._ctx
@@ -168,9 +180,7 @@ func NewNoViableAltException(recognizer *Parser, input *InputStream, startToken 
 }
 
 type InputMismatchException struct {
-
 	RecognitionException
-
 }
 
 // This signifies any kind of mismatched input exceptions such as
@@ -209,8 +219,8 @@ func NewFailedPredicateException(recognizer *Parser, predicate string, message s
 	this.InitRecognitionException(this.formatMessage(predicate, message), recognizer, recognizer.getInputStream(), recognizer._ctx)
 
     var s = recognizer._interp.atn.states[recognizer.state]
-    var trans = s.transitions[0]
-    if trans2, ok := trans.(PredicateTransition); ok {
+    var trans = s.getTransitions()[0]
+    if trans2, ok := trans.(*PredicateTransition); ok {
         this.ruleIndex = trans2.ruleIndex
         this.predicateIndex = trans2.predIndex
     } else {
@@ -224,7 +234,7 @@ func NewFailedPredicateException(recognizer *Parser, predicate string, message s
 }
 
 func (this *FailedPredicateException) formatMessage(predicate, message string) string {
-    if (message !=nil) {
+    if (message != "") {
         return message
     } else {
         return "failed predicate: {" + predicate + "}?"

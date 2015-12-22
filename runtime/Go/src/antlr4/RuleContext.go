@@ -24,17 +24,26 @@ import (
 //  @see ParserRuleContext
 //
 
-type RuleContext struct {
+type IRuleContext interface {
 	RuleNode
-	parentCtx *RuleContext
-	invokingState int
-	ruleIndex int
-	children []*RuleContext
+
+	getInvokingState()int
+	getRuleIndex()int
+	getChildren()[]IRuleContext
+	isEmpty() bool
 }
 
-func NewRuleContext(parent *RuleContext, invokingState int)  *RuleContext {
+type RuleContext struct {
+	parentCtx IRuleContext
+	invokingState int
+	ruleIndex int
+	children []IRuleContext
+}
 
-	rn := &RuleContext{RuleNode{}}
+func NewRuleContext(parent IRuleContext, invokingState int)  *RuleContext {
+
+	rn := new(RuleContext)
+
 	rn.InitRuleContext(parent, invokingState)
 
 	return rn
@@ -53,6 +62,22 @@ func (rn *RuleContext) InitRuleContext(parent *RuleContext, invokingState int) {
 	} else {
 		rn.invokingState = invokingState
 	}
+}
+
+func (this *RuleContext) getParent() Tree {
+	return this.parentCtx
+}
+
+func (this *RuleContext) getInvokingState() int {
+	return this.getInvokingState()
+}
+
+func (this *RuleContext) getRuleIndex() int{
+	return this.ruleIndex
+}
+
+func (this *RuleContext) getChildren() []IRuleContext {
+	return this.children
 }
 
 func (this *RuleContext) depth() {
@@ -77,11 +102,11 @@ func (this *RuleContext) getSourceInterval() *Interval {
 	return TreeINVALID_INTERVAL
 }
 
-func (this *RuleContext) getRuleContext() *RuleContext {
+func (this *RuleContext) getRuleContext() IRuleContext {
 	return this
 }
 
-func (this *RuleContext) getPayload() *RuleContext {
+func (this *RuleContext) getPayload() interface{} {
 	return this
 }
 
@@ -123,7 +148,7 @@ func (this *RuleContext) accept(visitor *ParseTreeVisitor) {
 // (root child1 .. childN). Print just a node if this is a leaf.
 //
 
-func (this *RuleContext) toStringTree(ruleNames []string, recog *Recognizer) string {
+func (this *RuleContext) toStringTree(ruleNames []string, recog IRecognizer) string {
 	return TreestoStringTree(this, ruleNames, recog)
 }
 

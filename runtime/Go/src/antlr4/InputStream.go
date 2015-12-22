@@ -1,9 +1,5 @@
 package antlr4
 
-import (
-	"math"
-)
-
 // Vacuums all input from a string and then treat it like a buffer.
 
 type InputStream struct {
@@ -52,7 +48,7 @@ func (is *InputStream) LA(offset int) int {
 	if pos < 0 || pos >= is.size { // invalid
 		return TokenEOF
 	}
-	return is.data[pos]
+	return int(is.data[pos])
 }
 
 func (is *InputStream) LT(offset int) int {
@@ -76,7 +72,7 @@ func (is *InputStream) seek(index int) {
 		return
 	}
 	// seek forward
-	is.index = math.Min(index, is.size)
+	is.index = intMin(index, is.size)
 }
 
 func (is *InputStream) getText(start int, stop int) string {
@@ -86,10 +82,10 @@ func (is *InputStream) getText(start int, stop int) string {
 	if start >= is.size {
 		return ""
 	} else {
-		return is.data[start:stop+1]
+		return string(is.data[start:stop+1])
 	}
 }
 
 func (is *InputStream) toString() string {
-	return is.data
+	return string(is.data)
 }

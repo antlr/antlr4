@@ -2,6 +2,7 @@ package antlr4
 
 import (
 	"fmt"
+	"strconv"
 )
 
 // Map a predicate to a predicted alternative.///
@@ -60,7 +61,7 @@ type DFAState struct {
 	predicates []PredPrediction
 }
 
-func NewDFAState(stateNumber int, configs *NewATNConfigSet) *DFAState {
+func NewDFAState(stateNumber int, configs *ATNConfigSet) *DFAState {
 
 	if (configs == nil) {
 		configs = NewATNConfigSet(false)
@@ -105,15 +106,15 @@ func NewDFAState(stateNumber int, configs *NewATNConfigSet) *DFAState {
 
 // Get the set of all alts mentioned by all ATN configurations in this
 // DFA state.
-func (this *DFAState) getAltSet() {
+func (this *DFAState) getAltSet() *Set {
 	var alts = NewSet(nil,nil)
 	if (this.configs != nil) {
 		for i := 0; i < len(this.configs.configs); i++ {
 			var c = this.configs.configs[i]
-			alts.add(c.alt)
+			alts.add(c.getAlt())
 		}
 	}
-	if (alts.length == 0) {
+	if (alts.length() == 0) {
 		return nil
 	} else {
 		return alts
@@ -143,7 +144,7 @@ func (this *DFAState) equals(other interface{}) bool {
 }
 
 func (this *DFAState) toString() string {
-	return "" + this.stateNumber + ":" + this.hashString()
+	return strconv.Itoa(this.stateNumber) + ":" + this.hashString()
 }
 
 func (this *DFAState) hashString() string {

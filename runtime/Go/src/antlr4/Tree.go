@@ -8,33 +8,37 @@ package antlr4
 var TreeINVALID_INTERVAL = NewInterval(-1, -2)
 
 type Tree interface {
-	getParent() *Tree
-	getPayload() *interface{}
-	getChild(i int) *Tree
+	getParent() Tree
+	getPayload() interface{}
+	getChild(i int) Tree
 	getChildCount() int
-	toStringTree() string
+//	toStringTree() string
 }
 
 type SyntaxTree interface {
 	Tree
+
 	getSourceInterval() *Interval
 }
 
 type ParseTree interface {
 	SyntaxTree
+
 //	<T> T accept(ParseTreeVisitor<? extends T> visitor);
 	accept(visitor *ParseTreeVisitor)
 	getText() string
-	toStringTree(parser *Parser) string
+//	toStringTree([]string, IRecognizer) string
 }
 
 type RuleNode interface {
 	ParseTree
-	getRuleContext() *RuleContext
+
+	getRuleContext() IRuleContext
 }
 
 type TerminalNode interface {
 	ParseTree
+
 	getSymbol() *Token
 }
 

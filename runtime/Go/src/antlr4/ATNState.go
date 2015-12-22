@@ -1,66 +1,30 @@
 package antlr4
-
-// The following images show the relation of states and
-// {@link ATNState//transitions} for various grammar constructs.
-//
-// <ul>
-//
-// <li>Solid edges marked with an &//0949 indicate a required
-// {@link EpsilonTransition}.</li>
-//
-// <li>Dashed edges indicate locations where any transition derived from
-// {@link Transition} might appear.</li>
-//
-// <li>Dashed nodes are place holders for either a sequence of linked
-// {@link BasicState} states or the inclusion of a block representing a nested
-// construct in one of the forms below.</li>
-//
-// <li>Nodes showing multiple outgoing alternatives with a {@code ...} support
-// any number of alternatives (one or more). Nodes without the {@code ...} only
-// support the exact number of alternatives shown in the diagram.</li>
-//
-// </ul>
-//
-// <h2>Basic Blocks</h2>
-//
-// <h3>Rule</h3>
-//
-// <embed src="images/Rule.svg" type="image/svg+xml"/>
-//
-// <h3>Block of 1 or more alternatives</h3>
-//
-// <embed src="images/Block.svg" type="image/svg+xml"/>
-//
-// <h2>Greedy Loops</h2>
-//
-// <h3>Greedy Closure: {@code (...)*}</h3>
-//
-// <embed src="images/ClosureGreedy.svg" type="image/svg+xml"/>
-//
-// <h3>Greedy Positive Closure: {@code (...)+}</h3>
-//
-// <embed src="images/PositiveClosureGreedy.svg" type="image/svg+xml"/>
-//
-// <h3>Greedy Optional: {@code (...)?}</h3>
-//
-// <embed src="images/OptionalGreedy.svg" type="image/svg+xml"/>
-//
-// <h2>Non-Greedy Loops</h2>
-//
-// <h3>Non-Greedy Closure: {@code (...)*?}</h3>
-//
-// <embed src="images/ClosureNonGreedy.svg" type="image/svg+xml"/>
-//
-// <h3>Non-Greedy Positive Closure: {@code (...)+?}</h3>
-//
-// <embed src="images/PositiveClosureNonGreedy.svg" type="image/svg+xml"/>
-//
-// <h3>Non-Greedy Optional: {@code (...)??}</h3>
-//
-// <embed src="images/OptionalNonGreedy.svg" type="image/svg+xml"/>
-//
+import "strconv"
 
 var INITIAL_NUM_TRANSITIONS = 4
+
+type IATNState interface {
+
+	getEpsilonOnlyTransitions() bool
+
+	getRuleIndex() int
+	setRuleIndex(int)
+
+	getNextTokenWithinRule() *IntervalSet
+	setNextTokenWithinRule(*IntervalSet)
+
+	getATN() *ATN
+	setATN(*ATN)
+
+	getStateType() int
+
+	getStateNumber() int
+	setStateNumber(int)
+
+	getTransitions() []ITransition
+	setTransitions( []ITransition )
+	addTransition(ITransition, int)
+}
 
 type ATNState struct {
 	// Which ATN are we in?
@@ -70,9 +34,9 @@ type ATNState struct {
 	ruleIndex int
 	epsilonOnlyTransitions bool
 	// Track the transitions emanating from this ATN state.
-	transitions []*Transition
+	transitions []ITransition
 	// Used to cache lookahead during parsing, not used during construction
-	nextTokenWithinRule *Token
+	nextTokenWithinRule *IntervalSet
 }
 
 func NewATNState() *ATNState {
@@ -80,7 +44,7 @@ func NewATNState() *ATNState {
 	as := new(ATNState)
 	as.InitATNState()
 
-    return as
+	return as
 }
 
 func (as *ATNState) InitATNState(){
@@ -88,18 +52,65 @@ func (as *ATNState) InitATNState(){
 	// Which ATN are we in?
 	as.atn = nil
 	as.stateNumber = ATNStateINVALID_STATE_NUMBER
-	as.stateType = nil
+	as.stateType = ATNStateInvalidType
 	as.ruleIndex = 0 // at runtime, we don't have Rule objects
 	as.epsilonOnlyTransitions = false
 	// Track the transitions emanating from this ATN state.
-	as.transitions = make([]Transition, 0)
+	as.transitions = make([]ITransition, 0)
 	// Used to cache lookahead during parsing, not used during construction
 	as.nextTokenWithinRule = nil
 
 }
 
+func (as *ATNState) getRuleIndex() int {
+	return as.ruleIndex
+}
+
+func (as *ATNState) setRuleIndex(v int) {
+	as.ruleIndex = v
+}
+func (as *ATNState) getEpsilonOnlyTransitions() bool {
+	return as.epsilonOnlyTransitions
+}
+
+func (as *ATNState) getATN() *ATN {
+	return as.atn
+}
+
+func (as *ATNState) setATN(atn *ATN) {
+	as.atn = atn
+}
+
+func (as *ATNState) getTransitions() []ITransition {
+	return as.transitions
+}
+
+func (as *ATNState) setTransitions(t []ITransition) {
+	as.transitions = t
+}
+
+func (as *ATNState) getStateType() int {
+	return as.stateType
+}
+
+func (as *ATNState) getStateNumber() int {
+	return as.stateNumber
+}
+
+func (as *ATNState) setStateNumber(stateNumber int) {
+	as.stateNumber = stateNumber
+}
+
+func (as *ATNState) getNextTokenWithinRule() *IntervalSet {
+	return as.nextTokenWithinRule
+}
+
+func (as *ATNState) setNextTokenWithinRule(v *IntervalSet)  {
+	as.nextTokenWithinRule = v
+}
+
 const (
-	// constants for serialization
+// constants for serialization
 	ATNStateInvalidType = 0
 	ATNStateBASIC = 1
 	ATNStateRULE_START = 2
@@ -133,49 +144,49 @@ const (
 //            "LOOP_END" ]
 
 func (this *ATNState) toString() string {
-	return this.stateNumber
+	return strconv.Itoa(this.stateNumber)
 }
 
-func (this *ATNState) equals(other *ATNState) bool {
-    if ok := other.(ATNState); ok {
-        return this.stateNumber == other.stateNumber
-    } else {
-        return false
-    }
+func (this *ATNState) equals(other interface{}) bool {
+	if ot, ok := other.(IATNState); ok {
+		return this.stateNumber == ot.getStateNumber()
+	} else {
+		return false
+	}
 }
 
-func (this *ATNState) isNonGreedyExitState() {
-    return false
+func (this *ATNState) isNonGreedyExitState() bool {
+	return false
 }
 
-func (this *ATNState) addTransition(trans *Transition, index int) {
-    if ( len(this.transitions) == 0 ) {
-        this.epsilonOnlyTransitions = trans.isEpsilon
-    } else if(this.epsilonOnlyTransitions != trans.isEpsilon) {
-        this.epsilonOnlyTransitions = false
-    }
-    if (index==-1) {
+func (this *ATNState) addTransition(trans ITransition, index int) {
+	if ( len(this.transitions) == 0 ) {
+		this.epsilonOnlyTransitions = trans.getIsEpsilon()
+	} else if(this.epsilonOnlyTransitions != trans.getIsEpsilon()) {
+		this.epsilonOnlyTransitions = false
+	}
+	if (index==-1) {
 		this.transitions = append(this.transitions, trans)
-    } else {
-		this.transitions = append(this.transitions[:index], append([]*Transition{ trans }, this.transitions[index:]...)...)
-//        this.transitions.splice(index, 1, trans)
-    }
+	} else {
+		this.transitions = append(this.transitions[:index], append([]ITransition{ trans }, this.transitions[index:]...)...)
+		//        this.transitions.splice(index, 1, trans)
+	}
 }
 
 type BasicState struct {
-	ATNState
+	*ATNState
 }
 
 func NewBasicState() *BasicState {
 	this := new(BasicState)
 	this.InitATNState()
 
-    this.stateType = ATNStateBASIC
-    return this
+	this.stateType = ATNStateBASIC
+	return this
 }
 
 type DecisionState struct {
-	ATNState
+	*ATNState
 
 	decision int
 	nonGreedy bool
@@ -188,7 +199,7 @@ func NewDecisionState() *DecisionState {
 	this.InitATNState()
 	this.InitDecisionState()
 
-    return this
+	return this
 }
 
 func (this *DecisionState) InitDecisionState() {
@@ -200,7 +211,7 @@ func (this *DecisionState) InitDecisionState() {
 
 //  The start of a regular {@code (...)} block.
 type BlockStartState struct {
-	DecisionState
+	*DecisionState
 
 	endState *BlockEndState
 }
@@ -222,7 +233,7 @@ func (this *BlockStartState) InitBlockStartState() {
 }
 
 type BasicBlockStartState struct {
-	BlockStartState
+	*BlockStartState
 }
 
 func NewBasicBlockStartState() *BasicBlockStartState {
@@ -237,11 +248,12 @@ func NewBasicBlockStartState() *BasicBlockStartState {
 	return this
 }
 
+
 // Terminal node of a simple {@code (a|b|c)} block.
 type BlockEndState struct {
 	ATNState
 
-	startState *ATNState
+	startState IATNState
 }
 
 func NewBlockEndState() *BlockEndState {
@@ -250,9 +262,9 @@ func NewBlockEndState() *BlockEndState {
 
 	this.InitATNState()
 	this.stateType = ATNStateBLOCK_END
-    this.startState = nil
+	this.startState = nil
 
-    return this
+	return this
 }
 
 // The last node in the ATN for a rule, unless that rule is the start symbol.
@@ -268,14 +280,14 @@ func NewRuleStopState() *RuleStopState {
 	this := new(RuleStopState)
 
 	this.InitATNState()
-    this.stateType = ATNStateRULE_STOP
-    return this
+	this.stateType = ATNStateRULE_STOP
+	return this
 }
 
 type RuleStartState struct {
 	ATNState
 
-	stopState *ATNState
+	stopState IATNState
 	isPrecedenceRule bool
 }
 
@@ -295,7 +307,7 @@ func NewRuleStartState() *RuleStartState {
 //  one to the loop back to start of the block and one to exit.
 //
 type PlusLoopbackState struct {
-	BlockStartState
+	*BlockStartState
 }
 
 func NewPlusLoopbackState() *PlusLoopbackState {
@@ -316,9 +328,9 @@ func NewPlusLoopbackState() *PlusLoopbackState {
 //  real decision-making note for {@code A+}.
 //
 type PlusBlockStartState struct {
-	BlockStartState
+	*BlockStartState
 
-	loopBackState *ATNState
+	loopBackState IATNState
 }
 
 func NewPlusBlockStartState() *PlusBlockStartState {
@@ -330,14 +342,14 @@ func NewPlusBlockStartState() *PlusBlockStartState {
 	this.InitBlockStartState()
 
 	this.stateType = ATNStatePLUS_BLOCK_START
-    this.loopBackState = nil
+	this.loopBackState = nil
 
-    return this
+	return this
 }
 
 // The block that begins a closure loop.
 type StarBlockStartState struct {
-	BlockStartState
+	*BlockStartState
 }
 
 func NewStarBlockStartState() *StarBlockStartState {
@@ -355,7 +367,7 @@ func NewStarBlockStartState() *StarBlockStartState {
 
 
 type StarLoopbackState struct {
-	ATNState
+	*ATNState
 }
 
 func NewStarLoopbackState() *StarLoopbackState {
@@ -370,9 +382,9 @@ func NewStarLoopbackState() *StarLoopbackState {
 
 
 type StarLoopEntryState struct {
-	DecisionState
+	*DecisionState
 
-	loopBackState *ATNState
+	loopBackState IATNState
 	precedenceRuleDecision bool
 }
 
@@ -384,19 +396,19 @@ func NewStarLoopEntryState() *StarLoopEntryState {
 	this.InitDecisionState()
 
 	this.stateType = ATNStateSTAR_LOOP_ENTRY
-    this.loopBackState = nil
+	this.loopBackState = nil
 
-    // Indicates whether this state can benefit from a precedence DFA during SLL decision making.
-    this.precedenceRuleDecision = false
+	// Indicates whether this state can benefit from a precedence DFA during SLL decision making.
+	this.precedenceRuleDecision = false
 
-    return this
+	return this
 }
 
 
 // Mark the end of a * or + loop.
 type LoopEndState struct {
-	ATNState
-	loopBackState *ATNState
+	*ATNState
+	loopBackState IATNState
 }
 
 func NewLoopEndState() *LoopEndState {
@@ -413,7 +425,7 @@ func NewLoopEndState() *LoopEndState {
 
 // The Tokens rule start state linking to each lexer rule start state */
 type TokensStartState struct {
-	DecisionState
+	*DecisionState
 }
 
 func NewTokensStartState() *TokensStartState {

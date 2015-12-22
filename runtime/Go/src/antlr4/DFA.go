@@ -18,15 +18,11 @@ type DFA struct {
 	atnStartState *DecisionState
 	decision int
 	_states *DFAStatesSet
-	s0 DFAState
+	s0 *DFAState
 	precedenceDfa bool
 }
 
 func NewDFA(atnStartState *DecisionState, decision int) *DFA {
-
-	if (decision == nil) {
-		decision = 0
-	}
 
 	this := new(DFA)
 
@@ -110,7 +106,7 @@ func (this *DFA) setPrecedenceDfa(precedenceDfa bool) {
 		this._states = NewDFAStatesSet()
 		if (precedenceDfa) {
 			var precedenceState = NewDFAState(-1, NewATNConfigSet(false))
-			precedenceState.edges = make([]*DFAState)
+			precedenceState.edges = make([]*DFAState,0)
 			precedenceState.isAcceptState = false
 			precedenceState.requiresFullContext = false
 			this.s0 = precedenceState
@@ -150,7 +146,7 @@ func (this *DFA) toString(literalNames []string, symbolicNames []string) string 
 	return serializer.toString()
 }
 
-func (this *DFA) toLexerString() {
+func (this *DFA) toLexerString() string {
 	if (this.s0 == nil) {
 		return ""
 	}

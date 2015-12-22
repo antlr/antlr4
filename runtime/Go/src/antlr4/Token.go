@@ -5,7 +5,7 @@ import (
 )
 
 type TokenSourceInputStreamPair struct {
-	tokenSource *TokenSource
+	tokenSource TokenSource
 	inputStream *InputStream
 }
 
@@ -65,7 +65,7 @@ func (this *Token) setText(s string) {
 	this._text = s
 }
 
-func (this *Token) getTokenSource() *TokenSource {
+func (this *Token) getTokenSource() TokenSource {
 	return this.source.tokenSource
 }
 
@@ -74,7 +74,7 @@ func (this *Token) getInputStream() *InputStream {
 }
 
 type CommonToken struct {
-	Token
+	*Token
 }
 
 func NewCommonToken(source *TokenSourceInputStreamPair, tokenType, channel, start, stop int) *CommonToken {

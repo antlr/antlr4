@@ -26,23 +26,24 @@
 package antlr4
 
 type CommonTokenStream struct {
-    BufferedTokenStream
+    *BufferedTokenStream
 }
 
-func NewCommonTokenStream(lexer *Lexer, channel int) {
+func NewCommonTokenStream(lexer ILexer, channel int) *CommonTokenStream {
 
-    ts := &CommonTokenStream(BufferedTokenStream{lexer})
+    ts := new(CommonTokenStream)
+    ts.InitBufferedTokenStream(lexer)
 
     ts.channel = channel
-    return ts
 
+    return ts
 }
 
 func (ts *CommonTokenStream) adjustSeekIndex(i int) int {
     return ts.nextTokenOnChannel(i, ts.channel)
 }
 
-func (ts *CommonTokenStream) LB(k int) Token {
+func (ts *CommonTokenStream) LB(k int) *Token {
     if (k==0 || ts.index-k<0) {
         return nil
     }
@@ -60,7 +61,7 @@ func (ts *CommonTokenStream) LB(k int) Token {
     return ts.tokens[i]
 }
 
-func (ts *CommonTokenStream) LT(k int) Token {
+func (ts *CommonTokenStream) LT(k int) *Token {
     ts.lazyInit()
     if (k == 0) {
         return nil

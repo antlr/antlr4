@@ -335,7 +335,7 @@ func (this *LexerATNSimulator) accept(input *InputStream, lexerActionExecutor *L
 	}
 }
 
-func (this *LexerATNSimulator) getReachableTarget(trans *Transition, t int) *ATNState {
+func (this *LexerATNSimulator) getReachableTarget(trans ITransition, t int) IATNState {
 	if (trans.matches(t, 0, 0xFFFE)) {
 		return trans.target
 	} else {
@@ -343,7 +343,7 @@ func (this *LexerATNSimulator) getReachableTarget(trans *Transition, t int) *ATN
 	}
 }
 
-func (this *LexerATNSimulator) computeStartState(input *InputStream, p *ATNState ) *OrderedATNConfigSet {
+func (this *LexerATNSimulator) computeStartState(input *InputStream, p IATNState ) *OrderedATNConfigSet {
 
 	var configs = NewOrderedATNConfigSet()
 	for i := 0; i < len(p.transitions); i++ {
@@ -417,7 +417,7 @@ func (this *LexerATNSimulator) closure(input *InputStream, config *LexerATNConfi
 }
 
 // side-effect: can alter configs.hasSemanticContext
-func (this *LexerATNSimulator) getEpsilonTarget(input *InputStream, config *LexerATNConfig, trans *Transition,
+func (this *LexerATNSimulator) getEpsilonTarget(input *InputStream, config *LexerATNConfig, trans ITransition,
 		configs *ATNConfigSet, speculative, treatEofAsEpsilon bool) *LexerATNConfig {
 
 	var cfg *LexerATNConfig

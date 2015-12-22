@@ -17,13 +17,15 @@ type TokenSource interface {
 	getCharPositionInLine() int
 	getInputStream() *InputStream
 	getSourceName() string
-	setTokenFactory(factory *TokenFactory)
-	getTokenFactory() *TokenFactory
+	setTokenFactory(factory TokenFactory)
+	getTokenFactory() TokenFactory
 }
 
-type TokenFactorySourcePair struct {
-	factory *TokenFactory
-	inputStream *InputStream
+type ILexer interface {
+	TokenSource
+
+	setChannel(int)
+	pushMode(int)
 }
 
 type Lexer struct {
@@ -31,7 +33,7 @@ type Lexer struct {
 
 	_input *InputStream
 	_factory *TokenFactory
-	_tokenFactorySourcePair *TokenFactorySourcePair
+	_tokenFactorySourcePair *TokenSourceInputStreamPair
 	_interp *LexerATNSimulator
 	_token *Token
 	_tokenStartCharIndex int

@@ -1,5 +1,7 @@
 package antlr4
-import "strings"
+import (
+	"strconv"
+)
 
 //
 // This implementation of {@link ANTLRErrorListener} can be used to identify
@@ -21,7 +23,7 @@ import "strings"
 // </ul>
 
 type DiagnosticErrorListener struct {
-	ErrorListener
+	*DefaultErrorListener
 
 	exactOnly bool
 }
@@ -42,7 +44,7 @@ func (this *DiagnosticErrorListener) reportAmbiguity(recognizer *Parser, dfa *DF
 	var msg = "reportAmbiguity d=" +
 			this.getDecisionDescription(recognizer, dfa) +
 			": ambigAlts=" +
-			this.getConflictingAlts(ambigAlts, configs) +
+			this.getConflictingAlts(ambigAlts, configs).toString() +
 			", input='" +
 			recognizer.getTokenStream().getTextFromInterval(NewInterval(startIndex, stopIndex)) + "'"
 	recognizer.notifyErrorListeners(msg, nil, nil)
@@ -65,19 +67,19 @@ func (this *DiagnosticErrorListener) reportContextSensitivity(recognizer *Parser
 	recognizer.notifyErrorListeners(msg, nil, nil)
 }
 
-func (this *DiagnosticErrorListener) getDecisionDescription(recognizer *Parser, dfa *DFA) {
+func (this *DiagnosticErrorListener) getDecisionDescription(recognizer *Parser, dfa *DFA) string {
 	var decision = dfa.decision
 	var ruleIndex = dfa.atnStartState.ruleIndex
 
 	var ruleNames = recognizer.getRuleNames()
 	if (ruleIndex < 0 || ruleIndex >= len(ruleNames)) {
-		return "" + decision
+		return strconv.Itoa(decision)
 	}
-	var ruleName = ruleNames[ruleIndex] || nil
-	if (ruleName == nil || len(ruleName) == 0) {
-		return "" + decision
+	var ruleName = ruleNames[ruleIndex]
+	if (ruleName == "") {
+		return strconv.Itoa(decision)
 	}
-	return "" + decision + " (" + ruleName + ")"
+	return strconv.Itoa(decision) + " (" + ruleName + ")"
 }
 
 //
@@ -97,7 +99,15 @@ func (this *DiagnosticErrorListener) getConflictingAlts(reportedAlts *BitSet, se
 	}
 	var result = NewBitSet()
 	for i := 0; i < len(set.configs); i++ {
-		result.add(set.configs[i].alt)
+		result.add(set.configs[i].getAlt())
 	}
-	return "{" + strings.Join(result.values(), ", ") + "}"
+
+	return result
+
+//	valuestrings := make([]string, len(result.values()))
+//	for i,v := range result.values() {
+//		valuestrings[i] = strconv.Itoa(v)
+//	}
+//
+//	return "{" + strings.Join(valuestrings, ", ") + "}"
 }

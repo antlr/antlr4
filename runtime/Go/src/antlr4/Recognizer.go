@@ -5,6 +5,11 @@ import (
     "strings"
             )
 
+type IRecognizer interface {
+	getState() int
+	getATN() *ATN
+}
+
 type Recognizer struct {
 
     _listeners []ParseTreeListener
@@ -57,6 +62,10 @@ func (this *Recognizer) getTokenNames() []string {
 
 func (this *Recognizer) getATN() *ATN {
     return this._interp.atn
+}
+
+func (this *Recognizer) getState() int {
+	return this.state
 }
 
 //func (this *Recognizer) getTokenTypeMap() {
@@ -171,7 +180,7 @@ func (this *Recognizer) getTokenErrorDisplay(t *Token) string {
     return "'" + s + "'"
 }
 
-func (this *Recognizer) getErrorListenerDispatch() *ErrorListener {
+func (this *Recognizer) getErrorListenerDispatch() IErrorListener {
     return NewProxyErrorListener(this._listeners)
 }
 

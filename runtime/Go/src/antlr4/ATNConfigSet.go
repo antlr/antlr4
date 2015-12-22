@@ -1,9 +1,7 @@
 package antlr4
 import (
-	"math"
 	"fmt"
 )
-
 
 //
 // Specialized {@link Set}{@code <}{@link ATNConfig}{@code >} that can track
@@ -11,29 +9,31 @@ import (
 // graph-structured stack.
 ///
 
-func hashATNConfig(c *ATNConfig) string {
-	return c.shortHashString()
+func hashATNConfig(c interface{}) string {
+	return c.(*ATNConfig).shortHashString()
 }
 
-func equalATNConfigs(a, b *ATNConfig) bool {
+func equalATNConfigs(a, b interface{}) bool {
 	if ( a==b ) {
 		return true
 	}
 	if ( a==nil || b==nil ) {
 		return false
 	}
-	return a.state.stateNumber==b.state.stateNumber && a.alt==b.alt && a.semanticContext.equals(b.semanticContext)
+	return a.(*ATNConfig).state.getStateNumber()==b.(*ATNConfig).state.getStateNumber() &&
+		a.(*ATNConfig).alt==b.(*ATNConfig).alt &&
+		a.(*ATNConfig).semanticContext.equals(b.(*ATNConfig).semanticContext)
 }
 
 type ATNConfigSet struct {
 	readOnly bool
 	fullCtx bool
-	configLookup Set
-	conflictingAlts BitSet
+	configLookup *Set
+	conflictingAlts *BitSet
 	cachedHashString string
 	hasSemanticContext bool
 	dipsIntoOuterContext bool
-	configs []*ATNConfig
+	configs []IATNConfig
 	uniqueAlt int
 }
 
@@ -70,7 +70,7 @@ func (a *ATNConfigSet) InitATNConfigSet(fullCtx bool) {
 	// we've made a.readonly.
 	a.readOnly = false
 	// Track the elements as they are added to the set supports get(i)///
-	a.configs = make([]*ATNConfig)
+	a.configs = make([]IATNConfig, 0)
 
 	// TODO: these fields make me pretty uncomfortable but nice to pack up info
 	// together, saves recomputation
@@ -96,50 +96,50 @@ func (a *ATNConfigSet) InitATNConfigSet(fullCtx bool) {
 // <p>This method updates {@link //dipsIntoOuterContext} and
 // {@link //hasSemanticContext} when necessary.</p>
 // /
-func (this *ATNConfigSet) add(config *ATNConfig, mergeCache DoubleDict) bool {
+func (this *ATNConfigSet) add(config IATNConfig, mergeCache *DoubleDict) bool {
 
 	if (this.readOnly) {
 		panic("This set is readonly")
 	}
-	if (config.semanticContext != SemanticContextNONE) {
+	if (config.getSemanticContext() != SemanticContextNONE) {
 		this.hasSemanticContext = true
 	}
-	if (config.reachesIntoOuterContext > 0) {
+	if (config.getReachesIntoOuterContext() > 0) {
 		this.dipsIntoOuterContext = true
 	}
-	var existing *ATNConfig = this.configLookup.add(config).(*ATNConfig)
+	var existing = this.configLookup.add(config).(IATNConfig)
 	if (existing == config) {
 		this.cachedHashString = "-1"
-		this.configs = append(this.configs, config )// track order here
+		this.configs = append( this.configs, config )// track order here
 		return true
 	}
 	// a previous (s,i,pi,_), merge with it and save result
 	var rootIsWildcard = !this.fullCtx
-	var merged = merge(existing.context, config.context, rootIsWildcard, mergeCache)
+	var merged = merge(existing.getContext(), config.getContext(), rootIsWildcard, mergeCache)
 	// no need to check for existing.context, config.context in cache
 	// since only way to create Newgraphs is "call rule" and here. We
 	// cache at both places.
-	existing.reachesIntoOuterContext = math.Max( existing.reachesIntoOuterContext, config.reachesIntoOuterContext)
+	existing.setReachesIntoOuterContext( intMax( existing.getReachesIntoOuterContext(), config.getReachesIntoOuterContext()) )
 	// make sure to preserve the precedence filter suppression during the merge
-	if (config.precedenceFilterSuppressed) {
-		existing.precedenceFilterSuppressed = true
+	if (config.getPrecedenceFilterSuppressed()) {
+		existing.setPrecedenceFilterSuppressed( true )
 	}
-	existing.context = merged // replace context no need to alt mapping
+	existing.setContext( merged )// replace context no need to alt mapping
 	return true
 }
 
-func (this *ATNConfigSet) getStates() {
+func (this *ATNConfigSet) getStates() *Set {
 	var states = NewSet(nil,nil)
 	for i := 0; i < len(this.configs); i++ {
-		states.add(this.configs[i].state)
+		states.add(this.configs[i].getState())
 	}
 	return states
 }
 
 func (this *ATNConfigSet) getPredicates() []SemanticContext {
-	var preds = make([]SemanticContext)
+	var preds = make([]SemanticContext,0)
 	for i := 0; i < len(this.configs); i++ {
-		c := this.configs[i].semanticContext
+		c := this.configs[i].getSemanticContext()
 		if (c != SemanticContextNONE) {
 			preds = append(preds, c)
 		}
@@ -147,7 +147,7 @@ func (this *ATNConfigSet) getPredicates() []SemanticContext {
 	return preds
 }
 
-func (this *ATNConfigSet) getItems() []*ATNConfig {
+func (this *ATNConfigSet) getItems() []IATNConfig {
 	return this.configs
 }
 
@@ -155,12 +155,12 @@ func (this *ATNConfigSet) optimizeConfigs(interpreter *ATNSimulator) {
 	if (this.readOnly) {
 		panic("This set is readonly")
 	}
-	if (this.configLookup.length == 0) {
+	if (this.configLookup.length() == 0) {
 		return
 	}
 	for i := 0; i < len(this.configs); i++ {
 		var config = this.configs[i]
-		config.context = interpreter.getCachedContext(config.context)
+		config.setContext(interpreter.getCachedContext(config.getContext()))
 	}
 }
 
@@ -200,7 +200,7 @@ func (this *ATNConfigSet) hashString() string {
 	}
 }
 
-func (this *ATNConfigSet) hashConfigs() {
+func (this *ATNConfigSet) hashConfigs() string {
 	var s = ""
 	for _, c := range this.configs {
 		s += fmt.Sprint(c)
@@ -234,7 +234,7 @@ func (this *ATNConfigSet) clear() {
 	if (this.readOnly) {
 		panic("This set is readonly")
 	}
-	this.configs = make([]*ATNConfig)
+	this.configs = make([]IATNConfig, 0)
 	this.cachedHashString = "-1"
 	this.configLookup = NewSet(hashATNConfig, equalATNConfigs)
 }

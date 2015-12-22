@@ -29,12 +29,13 @@ import (
 
 
 type ParserRuleContext struct {
-	RuleContext
+	*RuleContext
 
+	parentCtx *ParserRuleContext
 	ruleIndex int
 	children []RuleContext
 	start, stop *Token
-	exception *RecognitionException
+	exception IRecognitionException
 }
 
 func NewParserRuleContext(parent *ParserRuleContext, invokingStateNumber int) *ParserRuleContext {
@@ -119,13 +120,17 @@ func (prc *ParserRuleContext) addErrorNode(badToken *Token) *ErrorNodeImpl {
     return node
 }
 
-func (prc *ParserRuleContext) getChild(i int, childType reflect.Type) {
+func (prc *ParserRuleContext) getChild(i int) Tree {
+	if (prc.children != nil && len(prc.children) >= i){
+		return prc.children[i]
+	} else {
+		return nil
+	}
+}
+
+func (prc *ParserRuleContext) getChildOfType(i int, childType reflect.Type) IRuleContext {
 	if (childType == nil) {
-		if (prc.children != nil && len(prc.children) >= i){
-			return prc.children[i]
-		} else {
-			return nil
-		}
+		return prc.getChild(i)
 	} else {
 		for j :=0; j<len(prc.children); j++ {
 			var child = prc.children[j]
@@ -197,7 +202,7 @@ func (prc *ParserRuleContext) getTypedRuleContexts(ctxType reflect.Type) []*inte
 //	}
 }
 
-func (prc *ParserRuleContext) getChildCount() {
+func (prc *ParserRuleContext) getChildCount() int {
 	if (prc.children== nil) {
 		return 0
 	} else {
@@ -205,7 +210,7 @@ func (prc *ParserRuleContext) getChildCount() {
 	}
 }
 
-func (prc *ParserRuleContext) getSourceInterval() {
+func (prc *ParserRuleContext) getSourceInterval() *Interval {
     if( prc.start == nil || prc.stop == nil) {
         return TreeINVALID_INTERVAL
     } else {
@@ -213,7 +218,7 @@ func (prc *ParserRuleContext) getSourceInterval() {
     }
 }
 
-var RuleContextEMPTY = NewParserRuleContext(nil, nil)
+var RuleContextEMPTY = NewParserRuleContext(nil, -1)
 
 
 type InterpreterRuleContext struct {

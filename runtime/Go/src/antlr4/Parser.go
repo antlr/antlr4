@@ -27,14 +27,13 @@ func (this *TraceListener) exitEveryRule(ctx *ParserRuleContext) {
 	fmt.Println("exit    " + this.parser.getRuleNames()[ctx.ruleIndex] + ", LT(1)=" + this.parser._input.LT(1).text())
 }
 
-
 type Parser struct {
 	Recognizer
 
 	_input TokenStream
 	_errHandler ErrorStrategy
 	_precedenceStack IntStack
-	_ctx ParserRuleContext
+	_ctx *ParserRuleContext
 	buildParseTrees bool
 	_tracer bool
 	_parseListeners []*ParseTreeListener
@@ -276,12 +275,12 @@ func (this *Parser) getATN() *ATN {
 	return this._interp.atn
 }
 
-func (p *Parser) getTokenFactory() *TokenFactory {
+func (p *Parser) getTokenFactory() TokenFactory {
 	return (*p._input.getTokenSource()).getTokenFactory()
 }
 
 // Tell our token source and error strategy about a Newway to create tokens.//
-func (p *Parser) setTokenFactory(factory *TokenFactory) {
+func (p *Parser) setTokenFactory(factory TokenFactory) {
 	(*p._input.getTokenSource()).setTokenFactory( factory )
 }
 
@@ -321,11 +320,11 @@ func (p *Parser) getATNWithBypassAlts() {
 // String id = m.get("ID")
 // </pre>
 
-func (p *Parser) compileParseTreePattern(pattern, patternRuleIndex, lexer *Lexer) {
+func (p *Parser) compileParseTreePattern(pattern, patternRuleIndex, lexer ILexer) {
 
 	if (lexer == nil) {
 		if (p.getTokenStream() != nil) {
-			var tokenSource = (*p.getTokenStream()).getTokenSource()
+			var tokenSource = p.getTokenStream().getTokenSource()
 			if _, ok := tokenSource.(Lexer); ok {
 				lexer = tokenSource
 			}
@@ -341,19 +340,19 @@ func (p *Parser) compileParseTreePattern(pattern, patternRuleIndex, lexer *Lexer
 }
 
 func (p *Parser) getInputStream() *InputStream {
-	return p.getTokenStream()
+	return p.getTokenStream().(*InputStream)
 }
 
-func (p *Parser) setInputStream(input *TokenStream) {
+func (p *Parser) setInputStream(input TokenStream) {
 	p.setTokenStream(input)
 }
 
-func (p *Parser) getTokenStream() *TokenStream {
+func (p *Parser) getTokenStream() TokenStream {
 	return p._input
 }
 
 // Set the token stream and reset the parser.//
-func (p *Parser) setTokenStream(input *TokenStream) {
+func (p *Parser) setTokenStream(input TokenStream) {
 	p._input = nil
 	p.reset()
 	p._input = input
@@ -366,7 +365,7 @@ func (p *Parser) getCurrentToken() *Token {
 	return p._input.LT(1)
 }
 
-func (p *Parser) notifyErrorListeners(msg string, offendingToken *Token, err *RecognitionException) {
+func (p *Parser) notifyErrorListeners(msg string, offendingToken *Token, err IRecognitionException) {
 	offendingToken = offendingToken || nil
 	err = err || nil
 	if (offendingToken == nil) {
@@ -566,7 +565,7 @@ func (p *Parser) inContext(context *ParserRuleContext) bool {
 // @return {@code true} if {@code symbol} can follow the current state in
 // the ATN, otherwise {@code false}.
 
-func (p *Parser) isExpectedToken(symbol *Token) bool {
+func (p *Parser) isExpectedToken(symbol int) bool {
 	var atn *ATN = p._interp.atn
 	var ctx = p._ctx
 	var s = atn.states[p.state]
@@ -579,7 +578,7 @@ func (p *Parser) isExpectedToken(symbol *Token) bool {
 	}
 	for (ctx != nil && ctx.invokingState >= 0 && following.contains(TokenEpsilon)) {
 		var invokingState = atn.states[ctx.invokingState]
-		var rt = invokingState.transitions[0]
+		var rt = invokingState.getTransitions()[0]
 		following = atn.nextTokens(rt.(*RuleTransition).followState,nil)
 		if (following.contains(symbol)) {
 			return true
