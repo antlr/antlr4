@@ -68,11 +68,11 @@ var PredictionContextid = PredictionContextglobalNodeCount
 // /
 
 // This means only the {@link //EMPTY} context is in set.
-func (this *PredictionContext) isEmpty() {
+func (this *PredictionContext) isEmpty() bool {
 	return this == PredictionContextEMPTY
 }
 
-func (this *PredictionContext) hasEmptyPath() {
+func (this *PredictionContext) hasEmptyPath() bool {
 	return this.getReturnState(this.length() - 1) == PredictionContextEMPTY_RETURN_STATE
 }
 
@@ -186,7 +186,7 @@ func (this *SingletonPredictionContext) getReturnState(index int) int {
 	return this.returnState
 }
 
-func (this *SingletonPredictionContext) equals(other IPredictionContext) {
+func (this *SingletonPredictionContext) equals(other IPredictionContext) bool {
 	if (this == other) {
 		return true
 	} else if _, ok := other.(*SingletonPredictionContext); !ok {
@@ -207,7 +207,7 @@ func (this *SingletonPredictionContext) equals(other IPredictionContext) {
 	}
 }
 
-func (this *SingletonPredictionContext) hashString() {
+func (this *SingletonPredictionContext) hashString() string {
 	return this.cachedHashString
 }
 
@@ -244,11 +244,11 @@ func NewEmptyPredictionContext() *EmptyPredictionContext {
 	return p
 }
 
-func (this *EmptyPredictionContext) isEmpty() {
+func (this *EmptyPredictionContext) isEmpty() bool {
 	return true
 }
 
-func (this *EmptyPredictionContext) getParent(index int) PredictionContext {
+func (this *EmptyPredictionContext) getParent(index int) IPredictionContext {
 	return nil
 }
 
@@ -256,7 +256,7 @@ func (this *EmptyPredictionContext) getReturnState(index int) int {
 	return this.returnState
 }
 
-func (this *EmptyPredictionContext) equals(other *PredictionContext) bool {
+func (this *EmptyPredictionContext) equals(other IPredictionContext) bool {
 	return this == other
 }
 
@@ -289,7 +289,7 @@ func NewArrayPredictionContext(parents []IPredictionContext, returnStates []int)
 	return c
 }
 
-func (this *ArrayPredictionContext) isEmpty() {
+func (this *ArrayPredictionContext) isEmpty() bool {
 	// since EMPTY_RETURN_STATE can only appear in the last position, we
 	// don't need to verify that size==1
 	return this.returnStates[0] == PredictionContextEMPTY_RETURN_STATE
@@ -307,7 +307,7 @@ func (this *ArrayPredictionContext) getReturnState(index int) int {
 	return this.returnStates[index]
 }
 
-func (this *ArrayPredictionContext) equals(other IPredictionContext) {
+func (this *ArrayPredictionContext) equals(other IPredictionContext) bool {
 	if (this == other) {
 		return true
 	} else if _, ok := other.(*ArrayPredictionContext); !ok {

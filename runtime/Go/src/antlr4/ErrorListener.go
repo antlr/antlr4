@@ -11,7 +11,7 @@ import (
 
 
 type IErrorListener interface {
-	syntaxError(recognizer *Parser, offendingSymbol interface{}, line, column int, msg string, e *RecognitionException)
+	syntaxError(recognizer *Parser, offendingSymbol interface{}, line, column int, msg string, e IRecognitionException)
 	reportAmbiguity(recognizer *Parser, dfa *DFA, startIndex, stopIndex int, exact bool, ambigAlts *BitSet, configs *ATNConfigSet)
 	reportAttemptingFullContext(recognizer *Parser, dfa *DFA, startIndex, stopIndex int, conflictingAlts *BitSet, configs *ATNConfigSet)
 	reportContextSensitivity(recognizer *Parser, dfa *DFA, startIndex, stopIndex, prediction int, configs *ATNConfigSet)
@@ -25,7 +25,7 @@ func NewErrorListener() *DefaultErrorListener {
 	return new(DefaultErrorListener)
 }
 
-func (this *DefaultErrorListener) syntaxError(recognizer *Parser, offendingSymbol interface{}, line, column int, msg string, e *RecognitionException) {
+func (this *DefaultErrorListener) syntaxError(recognizer *Parser, offendingSymbol interface{}, line, column int, msg string, e IRecognitionException) {
 }
 
 func (this *DefaultErrorListener) reportAmbiguity(recognizer *Parser, dfa *DFA, startIndex, stopIndex int, exact bool, ambigAlts *BitSet, configs *ATNConfigSet) {
@@ -62,7 +62,7 @@ var ConsoleErrorListenerINSTANCE = NewConsoleErrorListener()
 // line <em>line</em>:<em>charPositionInLine</em> <em>msg</em>
 // </pre>
 //
-func (this *ConsoleErrorListener) syntaxError(recognizer *Parser, offendingSymbol interface{}, line, column int, msg string, e *RecognitionException) {
+func (this *ConsoleErrorListener) syntaxError(recognizer *Parser, offendingSymbol interface{}, line, column int, msg string, e IRecognitionException) {
     fmt.Errorf("line " + strconv.Itoa(line) + ":" + strconv.Itoa(column) + " " + msg)
 }
 
@@ -80,7 +80,7 @@ func NewProxyErrorListener(delegates []IErrorListener) *ProxyErrorListener {
 	return l
 }
 
-func (this *ProxyErrorListener) syntaxError(recognizer *Parser, offendingSymbol interface{}, line, column int, msg string, e *RecognitionException) {
+func (this *ProxyErrorListener) syntaxError(recognizer *Parser, offendingSymbol interface{}, line, column int, msg string, e IRecognitionException) {
     for _,d := range this.delegates {
 		d.syntaxError(recognizer, offendingSymbol, line, column, msg, e)
 	}

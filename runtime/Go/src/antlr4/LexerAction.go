@@ -104,7 +104,6 @@ func (this *LexerTypeAction) hashString() string {
 	return "" + this.actionType + this._type
 }
 
-
 func (this *LexerTypeAction) equals(other ILexerAction) bool {
     if(this == other) {
         return true

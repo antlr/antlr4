@@ -181,7 +181,7 @@ func (this *BitSet) remove(value int) {
 	delete(this.data, value)
 }
 
-func (this *BitSet) contains(value int) {
+func (this *BitSet) contains(value int) bool {
 	return this.data[value] == true
 }
 

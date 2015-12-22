@@ -42,7 +42,7 @@ func (la *LL1Analyzer) getDecisionLookahead(s IATNState) []*IntervalSet {
         la._LOOK(s.getTransitions()[alt].getTarget(), nil, PredictionContextEMPTY, look[alt], lookBusy, NewBitSet(), seeThruPreds, false)
         // Wipe out lookahead for la alternative if we found nothing
         // or we had a predicate when we !seeThruPreds
-        if (look[alt].length==0 || look[alt].contains(LL1AnalyzerHIT_PRED)) {
+        if (look[alt].length()==0 || look[alt].contains(LL1AnalyzerHIT_PRED)) {
             look[alt] = nil
         }
     }
@@ -70,7 +70,7 @@ func (la *LL1Analyzer) getDecisionLookahead(s IATNState) []*IntervalSet {
 func (la *LL1Analyzer) LOOK(s, stopState IATNState, ctx *RuleContext) *IntervalSet {
     var r = NewIntervalSet()
     var seeThruPreds = true // ignore preds get all lookahead
-    var lookContext *RuleContext
+    var lookContext IPredictionContext
     if (ctx != nil){
         predictionContextFromRuleContext(s.getATN(), ctx)
     }
@@ -113,7 +113,7 @@ func (la *LL1Analyzer) _LOOK(s, stopState IATNState, ctx IPredictionContext, loo
 
     c := NewATNConfig6(s, 0, ctx)
 
-    if !lookBusy.add(c) {
+    if lookBusy.add(c) == nil {
         return
     }
 
@@ -146,7 +146,7 @@ func (la *LL1Analyzer) _LOOK(s, stopState IATNState, ctx IPredictionContext, loo
                 returnState := la.atn.states[ctx.getReturnState(i)]
 //					System.out.println("popping back to "+retState)
 
-                removed := calledRuleStack[returnState.getRuleIndex()]
+                removed := calledRuleStack.contains(returnState.getRuleIndex())
 
                 // TODO this is incorrect
                 defer func(){
@@ -170,7 +170,7 @@ func (la *LL1Analyzer) _LOOK(s, stopState IATNState, ctx IPredictionContext, loo
 
         if t1, ok := t.(*RuleTransition); ok {
 
-            if (calledRuleStack[t1.getTarget().getRuleIndex()]) {
+            if (calledRuleStack.contains(t1.getTarget().getRuleIndex())) {
                 continue
             }
 
@@ -198,7 +198,7 @@ func (la *LL1Analyzer) _LOOK(s, stopState IATNState, ctx IPredictionContext, loo
                 if _, ok := t.(*NotSetTransition); ok {
                     set = set.complement(TokenMinUserTokenType, la.atn.maxTokenType);
                 }
-                look.addInterval(set)
+                look.addSet(set)
             }
         }
     }
