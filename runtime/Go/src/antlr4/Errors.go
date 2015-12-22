@@ -22,11 +22,11 @@ type RecognitionException struct {
 	offendingToken *Token
 	offendingState int
 	ctx IRuleContext
-	input *InputStream
+	input CharStream
 
 }
 
-func NewRecognitionException(message string, recognizer IRecognizer, input *InputStream, ctx IRuleContext) *RecognitionException {
+func NewRecognitionException(message string, recognizer IRecognizer, input CharStream, ctx IRuleContext) *RecognitionException {
 
 // todo
 //	Error.call(this)
@@ -44,7 +44,7 @@ func NewRecognitionException(message string, recognizer IRecognizer, input *Inpu
     return t
 }
 
-func (t *RecognitionException) InitRecognitionException(message string, recognizer IRecognizer, input *InputStream, ctx IRuleContext){
+func (t *RecognitionException) InitRecognitionException(message string, recognizer IRecognizer, input CharStream, ctx IRuleContext){
 
 	t.message = message
 	t.recognizer = recognizer
@@ -107,7 +107,7 @@ type LexerNoViableAltException struct {
 
 }
 
-func NewLexerNoViableAltException(lexer *Lexer, input *InputStream, startIndex int,
+func NewLexerNoViableAltException(lexer *Lexer, input CharStream, startIndex int,
 	deadEndConfigs *ATNConfigSet) *LexerNoViableAltException {
 
 	this := new (LexerNoViableAltException)
@@ -122,8 +122,8 @@ func NewLexerNoViableAltException(lexer *Lexer, input *InputStream, startIndex i
 
 func (this *LexerNoViableAltException) toString() string {
     var symbol = ""
-    if (this.startIndex >= 0 && this.startIndex < this.input.size) {
-        symbol = this.input.getText(this.startIndex,this.startIndex)
+    if (this.startIndex >= 0 && this.startIndex < this.input.size()) {
+        symbol = this.input.getTextFromInterval(NewInterval(this.startIndex,this.startIndex))
     }
     return "LexerNoViableAltException" + symbol
 }
@@ -135,7 +135,7 @@ type NoViableAltException struct {
 
 	startToken *Token
 	offendingToken *Token
-	ctx *ParserRuleContext
+	ctx IParserRuleContext
 	deadEndConfigs *ATNConfigSet
 
 }
@@ -145,10 +145,10 @@ type NoViableAltException struct {
 // of the offending input and also knows where the parser was
 // in the various paths when the error. Reported by reportNoViableAlternative()
 //
-func NewNoViableAltException(recognizer *Parser, input *InputStream, startToken *Token, offendingToken *Token, deadEndConfigs *ATNConfigSet, ctx *ParserRuleContext) *NoViableAltException {
+func NewNoViableAltException(recognizer IParser, input CharStream, startToken *Token, offendingToken *Token, deadEndConfigs *ATNConfigSet, ctx IParserRuleContext) *NoViableAltException {
 
 	if (ctx == nil){
-		ctx = recognizer._ctx
+		ctx = recognizer.getParserRuleContext()
 	}
 
 	if (offendingToken == nil){

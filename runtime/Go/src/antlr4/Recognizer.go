@@ -3,18 +3,24 @@ package antlr4
 import (
     "fmt"
     "strings"
-            )
+
+	"strconv"
+)
 
 type IRecognizer interface {
 	getState() int
 	getATN() *ATN
 	action( _localctx IRuleContext, ruleIndex, actionIndex int)
 	getRuleNames() []string
+	getErrorListenerDispatch() IErrorListener
+
+	sempred(localctx IRuleContext, ruleIndex int, actionIndex int) bool
+	precpred(localctx IRuleContext, precedence int) bool
 }
 
 type Recognizer struct {
 
-    _listeners []ParseTreeListener
+    _listeners []IErrorListener
     state int
 
 }
@@ -26,12 +32,12 @@ func NewRecognizer() *Recognizer {
 }
 
 func (rec *Recognizer) InitRecognizer() {
-    rec._listeners = []ParseTreeListener{ ConsoleErrorListenerINSTANCE }
+    rec._listeners = []IErrorListener{ ConsoleErrorListenerINSTANCE }
     rec.state = -1
 }
 
-var tokenTypeMapCache = make(map[[]string]int)
-var ruleIndexMapCache = make(map[[]string]int)
+var tokenTypeMapCache = make(map[string]int)
+var ruleIndexMapCache = make(map[string]int)
 
 func (this *Recognizer) checkVersion(toolVersion string) {
     var runtimeVersion = "4.5.2"
@@ -44,12 +50,12 @@ func (this *Recognizer) action( context IRuleContext, ruleIndex, actionIndex int
     panic("action not implemented on Recognizer!")
 }
 
-func (this *Recognizer) addErrorListener(listener *ParseTreeListener) {
-    append(this._listeners, listener)
+func (this *Recognizer) addErrorListener(listener IErrorListener) {
+	this._listeners = append(this._listeners, listener)
 }
 
 func (this *Recognizer) removeErrorListeners() {
-    this._listeners = make([]ParseTreeListener, 0)
+    this._listeners = make([]IErrorListener, 0)
 }
 
 func (this *Recognizer) getRuleNames() []string {
@@ -82,7 +88,7 @@ func (this *Recognizer) getState() int {
 //
 // <p>Used for XPath and tree pattern compilation.</p>
 //
-func (this *Recognizer) getRuleIndexMap() {
+func (this *Recognizer) getRuleIndexMap() map[string]int {
     panic("Method not defined!")
 //    var ruleNames = this.getRuleNames()
 //    if (ruleNames==nil) {
@@ -136,11 +142,10 @@ func (this *Recognizer) getTokenType(tokenName string) int {
 //}
 
 // What is the error header, normally line/character position information?//
-func (this *Recognizer) getErrorHeader(e error) string {
-    panic("Method not defined!")
-//    var line = e.getOffendingToken().line
-//    var column = e.getOffendingToken().column
-//    return "line " + line + ":" + column
+func (this *Recognizer) getErrorHeader(e IRecognitionException) string {
+    var line = e.getOffendingToken().line
+    var column = e.getOffendingToken().column
+    return "line " + strconv.Itoa(line) + ":" + strconv.Itoa(column)
 }
 
 
@@ -162,11 +167,11 @@ func (this *Recognizer) getTokenErrorDisplay(t *Token) string {
         return "<no token>"
     }
     var s = t.text()
-    if s==nil {
+    if s=="" {
         if (t.tokenType==TokenEOF) {
             s = "<EOF>"
         } else {
-            s = "<" + t.tokenType + ">"
+            s = "<" + strconv.Itoa(t.tokenType) + ">"
         }
     }
     s = strings.Replace(s,"\t","\\t", -1)
@@ -182,19 +187,10 @@ func (this *Recognizer) getErrorListenerDispatch() IErrorListener {
 
 // subclass needs to override these if there are sempreds or actions
 // that the ATN interp needs to execute
-func (this *Recognizer) sempred(localctx *RuleContext, ruleIndex int, actionIndex int) bool {
+func (this *Recognizer) sempred(localctx IRuleContext, ruleIndex int, actionIndex int) bool {
     return true
 }
 
-func (this *Recognizer) precpred(localctx *RuleContext, precedence int) bool {
+func (this *Recognizer) precpred(localctx IRuleContext, precedence int) bool {
     return true
 }
-
-//Indicate that the recognizer has changed internal state that is
-//consistent with the ATN state passed in.  This way we always know
-//where we are in the ATN as the parser goes along. The rule
-//context objects form a stack that lets us see the stack of
-//invoking rules. Combine this and we have complete ATN
-//configuration information.
-
-

@@ -6,6 +6,8 @@ import (
 	"strings"
 	"hash/fnv"
 //	"regexp"
+	"bytes"
+	"encoding/gob"
 )
 
 func intMin(a,b int) int {
@@ -43,21 +45,17 @@ func (s *IntStack) Push(e int) {
 }
 
 func arrayToString(a []interface{}) string{
-	return fmt.Sprintf( a )
+	return fmt.Sprint( a )
 }
 
-
-
-
-func hashCode(s string) int {
+func hashCode(s string) string {
 	h := fnv.New32a()
 	h.Write([]byte((s)))
-	return h.Sum32()
+	return fmt.Sprint(h.Sum32())
 }
 
-
 type Set struct {
-	data map[int][]interface{}
+	data map[string][]interface{}
 	hashFunction func(interface{}) string
 	equalsFunction func(interface{},interface{}) bool
 }
@@ -66,7 +64,7 @@ func NewSet(hashFunction func(interface{}) string, equalsFunction func(interface
 
 	s := new(Set)
 
-	s.data = make(map[string]interface{})
+	s.data = make( map[string][]interface{})
 
 	if (hashFunction == nil){
 		s.hashFunction = standardHashFunction
@@ -84,13 +82,24 @@ func NewSet(hashFunction func(interface{}) string, equalsFunction func(interface
 }
 
 func standardEqualsFunction(a interface{}, b interface{}) bool {
-	return a == b
+	return standardHashFunction(a) == standardHashFunction(b)
+}
+
+func getBytes(key interface{}) ([]byte, error) {
+	var buf bytes.Buffer
+	enc := gob.NewEncoder(&buf)
+	err := enc.Encode(key)
+	if err != nil {
+		return nil, err
+	}
+	return buf.Bytes(), nil
 }
 
 func standardHashFunction(a interface{}) string {
 	h := fnv.New32a()
-	h.Write([]byte((a)))
-	return h.Sum32()
+	v,_ := getBytes(a)
+	h.Write(v)
+	return fmt.Sprint(h.Sum32())
 }
 
 func (this *Set) length() int {
@@ -149,7 +158,7 @@ func (this *Set) values() []interface{} {
 }
 
 func (this *Set) toString() string {
-	return arrayToString(this.values())
+	return fmt.Sprint(this.data)
 }
 
 
@@ -159,7 +168,7 @@ type BitSet struct {
 
 func NewBitSet() *BitSet {
 	b := new(BitSet)
-	b.data = new(map[int]bool)
+	b.data = make(map[int]bool)
 	return b
 }
 
@@ -186,7 +195,7 @@ func (this *BitSet) contains(value int) bool {
 }
 
 func (this *BitSet) values() []int {
-	ks := make([]interface{}, len(this.data))
+	ks := make([]int, len(this.data))
 	i := 0
 	for k,_ := range this.data {
 		ks[i] = k
@@ -207,19 +216,23 @@ func (this *BitSet) minValue() int {
 	return min
 }
 
-// TODO this may not work the same as the JavaScript version
-func (this *BitSet) hashString() {
-	h := fnv.New32a()
-	h.Write([]byte(this.data))
-	return h.Sum32()
-}
-
 func (this *BitSet) equals(other interface{}) bool {
-	otherBitSet, ok := other.(BitSet); !ok
+	otherBitSet, ok := other.(*BitSet)
 	if  !ok {
 		return false
 	}
-	return this.hashString()==otherBitSet.hashString()
+
+	if len(this.data) != len(otherBitSet.data){
+		return false
+	}
+
+	for k,v := range this.data {
+		if otherBitSet.data[k] != v {
+			return false
+		}
+	}
+
+	return true
 }
 
 func (this *BitSet) length() int {
@@ -227,10 +240,8 @@ func (this *BitSet) length() int {
 }
 
 func (this *BitSet) toString() string {
-	return "{" + strings.Join(this.values(), ", ") + "}"
+	return fmt.Sprint(this.data)
 }
-
-
 
 
 type AltDict struct {
@@ -276,7 +287,7 @@ func NewDoubleDict() *DoubleDict {
 }
 
 func (this *DoubleDict) get(a string, b string) interface{} {
-	var d = this.data[a] || nil
+	var d = this.data[a]
 
 	if (d == nil){
 		return nil
@@ -318,7 +329,7 @@ func TitleCase(str string) string {
 //	return re.ReplaceAllStringFunc(str, func(s string) {
 //		return strings.ToUpper(s[0:1]) + s[1:2]
 //	})
-	return nil
+	return ""
 
 }
 

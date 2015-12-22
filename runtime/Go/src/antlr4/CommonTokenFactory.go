@@ -6,7 +6,7 @@
 package antlr4
 
 type TokenFactory interface {
-    create(source *TokenSourceInputStreamPair, ttype int, text string, channel, start, stop, line, column int) *Token
+    create(source *TokenSourceCharStreamPair, ttype int, text string, channel, start, stop, line, column int) *Token
 }
 
 type CommonTokenFactory struct {
@@ -45,14 +45,14 @@ func NewCommonTokenFactory(copyText bool) *CommonTokenFactory {
 //
 var CommonTokenFactoryDEFAULT = NewCommonTokenFactory(false)
 
-func (this *CommonTokenFactory) create(source *TokenSourceInputStreamPair, ttype int, text string, channel, start, stop, line, column int) *Token {
+func (this *CommonTokenFactory) create(source *TokenSourceCharStreamPair, ttype int, text string, channel, start, stop, line, column int) *Token {
     var t = NewCommonToken(source, ttype, channel, start, stop)
     t.line = line
     t.column = column
     if (text != "") {
         t.setText( text )
-    } else if (this.copyText && source.inputStream != nil) {
-        t.setText(  source.inputStream.getText(start,stop) )
+    } else if (this.copyText && source.charStream != nil) {
+        t.setText(  source.charStream.getTextFromInterval(NewInterval(start,stop)))
     }
     return t.Token
 }

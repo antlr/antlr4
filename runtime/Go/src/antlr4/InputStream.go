@@ -1,7 +1,5 @@
 package antlr4
 
-// Vacuums all input from a string and then treat it like a buffer.
-
 type InputStream struct {
 	name    string
 	index   int
@@ -21,10 +19,6 @@ func NewInputStream(data string) *InputStream {
 	return is
 }
 
-// Reset the stream so that it's in the same state it was
-// when the object was created *except* the data array is not
-// touched.
-//
 func (is *InputStream) reset() {
 	is.index = 0
 }
@@ -63,9 +57,6 @@ func (is *InputStream) mark() int {
 func (is *InputStream) release(marker int) {
 }
 
-// consume() ahead until p==index can't just set p=index as we must
-// update line and column. If we seek backwards, just set p
-//
 func (is *InputStream) seek(index int) {
 	if index <= is.index {
 		is.index = index // just jump don't update stream state (line,...)

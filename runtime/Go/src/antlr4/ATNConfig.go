@@ -54,31 +54,30 @@ func NewATNConfig6(state IATNState, alt int, context IPredictionContext) *ATNCon
 	return NewATNConfig5(state, alt, context, SemanticContextNONE);
 }
 
-func NewATNConfig5(state IATNState,
-alt int, context IPredictionContext, semanticContext SemanticContext) *ATNConfig {
+func NewATNConfig5(state IATNState, alt int, context IPredictionContext, semanticContext SemanticContext) *ATNConfig {
 	a := new(ATNConfig)
 
 	a.InitATNConfig2(state, alt, context, semanticContext)
 	return a
 }
 
-func NewATNConfig4(c *ATNConfig, state IATNState) *ATNConfig {
-	return NewATNConfig(c, state, c.context, c.semanticContext);
+func NewATNConfig4(c IATNConfig , state IATNState) *ATNConfig {
+	return NewATNConfig(c, state, c.getContext(), c.getSemanticContext());
 }
 
-func NewATNConfig3(c *ATNConfig, state IATNState, semanticContext SemanticContext) *ATNConfig {
-	return NewATNConfig(c, state, c.context, semanticContext);
+func NewATNConfig3(c IATNConfig , state IATNState, semanticContext SemanticContext) *ATNConfig {
+	return NewATNConfig(c, state, c.getContext(), semanticContext);
 }
 
-func NewATNConfig2(c *ATNConfig, semanticContext SemanticContext) *ATNConfig {
-	return NewATNConfig(c, c.state, c.context, semanticContext);
+func NewATNConfig2(c IATNConfig , semanticContext SemanticContext) *ATNConfig {
+	return NewATNConfig(c, c.getState(), c.getContext(), semanticContext);
 }
 
-func NewATNConfig1(c *ATNConfig, state IATNState, context IPredictionContext) *ATNConfig {
-	return NewATNConfig(c, state, context, c.semanticContext);
+func NewATNConfig1(c IATNConfig , state IATNState, context IPredictionContext) *ATNConfig {
+	return NewATNConfig(c, state, context, c.getSemanticContext());
 }
 
-func NewATNConfig(c *ATNConfig, state IATNState, context IPredictionContext, semanticContext SemanticContext) *ATNConfig {
+func NewATNConfig(c IATNConfig , state IATNState, context IPredictionContext, semanticContext SemanticContext) *ATNConfig {
 	a := new(ATNConfig)
 
 	a.InitATNConfig(c, state, context, semanticContext)
@@ -224,7 +223,7 @@ func NewLexerATNConfig4(c *LexerATNConfig, state IATNState)  *LexerATNConfig {
 
 	this := new(LexerATNConfig)
 
-	this.InitATNConfig(c, state, c.context, c.semanticContext)
+	this.InitATNConfig(c, state, c.getContext(), c.getSemanticContext())
 	this.lexerActionExecutor = c.lexerActionExecutor
 	this.passedThroughNonGreedyDecision = checkNonGreedyDecision(c, state)
 	return this
@@ -234,7 +233,7 @@ func NewLexerATNConfig3(c *LexerATNConfig, state IATNState, lexerActionExecutor 
 
 	this := new(LexerATNConfig)
 
-	this.InitATNConfig(c, state, c.context, c.semanticContext)
+	this.InitATNConfig(c, state, c.getContext(), c.getSemanticContext())
 	this.lexerActionExecutor = lexerActionExecutor
 	this.passedThroughNonGreedyDecision = checkNonGreedyDecision(c, state)
 	return this
@@ -244,7 +243,7 @@ func NewLexerATNConfig2(c *LexerATNConfig, state IATNState,  context IPrediction
 
 	this := new(LexerATNConfig)
 
-	this.InitATNConfig(c, state, context, c.semanticContext)
+	this.InitATNConfig(c, state, context, c.getSemanticContext())
 	this.lexerActionExecutor = c.lexerActionExecutor
 	this.passedThroughNonGreedyDecision = checkNonGreedyDecision(c, state)
 	return this
@@ -255,7 +254,7 @@ func NewLexerATNConfig1( state IATNState, alt int, context IPredictionContext) *
 
 	this := new(LexerATNConfig)
 
-	// c *ATNConfig, state IATNState, context IPredictionContext, semanticContext  SemanticContext
+	// c IATNConfig , state IATNState, context IPredictionContext, semanticContext  SemanticContext
 	this.InitATNConfig2(state, alt, context, SemanticContextNONE)
 
     this.lexerActionExecutor = nil

@@ -391,7 +391,7 @@ func (this *ATNDeserializer) generateRuleBypassTransition(atn *ATN, idx int) {
     atn.addState(bypassStop)
 
     bypassStart.endState = bypassStop
-    var bs = bypassStart
+
     atn.defineDecisionState(bypassStart.DecisionState)
 
     bypassStop.startState = bypassStart

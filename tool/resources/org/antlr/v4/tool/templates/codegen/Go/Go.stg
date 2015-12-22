@@ -93,6 +93,7 @@ var <superClass> = require('./<superClass>').<superClass> // TODO
 
 type <parser.name> struct {
     <superClass; null="Parser">
+
     _interp *ParserATNSimulator
     ruleNames []string
     literalNames []string
@@ -652,7 +653,8 @@ StructDecl(struct,ctorAttrs,attrs,getters,dispatchMethods,interfaces,extensionMe
            superClass={ParserRuleContext}) ::= <<
 
 type <struct.name> struct {
-    ParserRuleContext
+    *ParserRuleContext
+
     parent *ParserRuleContext
     parser *Parser
     ruleIndex

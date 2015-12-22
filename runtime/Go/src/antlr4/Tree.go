@@ -9,9 +9,12 @@ var TreeINVALID_INTERVAL = NewInterval(-1, -2)
 
 type Tree interface {
 	getParent() Tree
+	setParent(Tree)
 	getPayload() interface{}
 	getChild(i int) Tree
 	getChildCount() int
+	getChildren() []Tree
+	setChildren([]Tree)
 //	toStringTree() string
 }
 
@@ -25,7 +28,7 @@ type ParseTree interface {
 	SyntaxTree
 
 //	<T> T accept(ParseTreeVisitor<? extends T> visitor);
-	accept(visitor *ParseTreeVisitor)
+	accept(visitor ParseTreeVisitor) interface{}
 	getText() string
 //	toStringTree([]string, IRecognizer) string
 }
@@ -48,13 +51,14 @@ type ErrorNode interface {
 
 type ParseTreeVisitor interface {
 	// NOTE: removed type arguments
-	visit(tree *ParseTree) interface{}
-	visitChildren(node *RuleNode) interface{}
-	visitTerminal(node *TerminalNode) interface{}
-	visitErrorNode(node *ErrorNode) interface{}
+	visit(tree ParseTree) interface{}
+	visitChildren(node RuleNode) interface{}
+	visitTerminal(node TerminalNode) interface{}
+	visitErrorNode(node ErrorNode) interface{}
 }
 
-//func (this *ParseTreeVisitor) visit(ctx) {
+// TODO
+//func (this ParseTreeVisitor) visit(ctx) {
 //	if (Utils.isArray(ctx)) {
 //		var self = this
 //		return ctx.map(function(child) { return visitAtom(self, child)})
@@ -75,19 +79,20 @@ type ParseTreeVisitor interface {
 //}
 
 type ParseTreeListener interface {
-	visitTerminal(node *TerminalNode)
-	visitErrorNode(node *ErrorNode)
-	enterEveryRule(ctx *ParserRuleContext)
-	exitEveryRule(ctx *ParserRuleContext)
+	visitTerminal(node TerminalNode)
+	visitErrorNode(node ErrorNode)
+	enterEveryRule(ctx IParserRuleContext)
+	exitEveryRule(ctx IParserRuleContext)
 }
 
 type TerminalNodeImpl struct {
-	parentCtx *RuleContext
+	parentCtx IRuleContext
+
 	symbol *Token
 }
 
 func NewTerminalNodeImpl(symbol *Token) *TerminalNodeImpl {
-	tn := &TerminalNodeImpl{TerminalNode{}}
+	tn := new(TerminalNodeImpl)
 
 	tn.InitTerminalNodeImpl(symbol)
 
@@ -99,19 +104,32 @@ func (this *TerminalNodeImpl) InitTerminalNodeImpl(symbol *Token) {
 	this.symbol = symbol
 }
 
-func (this *TerminalNodeImpl) getChild(i int) *Tree {
+func (this *TerminalNodeImpl) getChild(i int) Tree {
 	return nil
 }
+
+func (this *TerminalNodeImpl) getChildren() []Tree {
+	return nil
+}
+
+func (this *TerminalNodeImpl) setChildren(t []Tree) {
+	panic("Cannot set children on terminal node")
+}
+
 
 func (this *TerminalNodeImpl) getSymbol() *Token {
 	return this.symbol
 }
 
-func (this *TerminalNodeImpl) getParent() *Tree {
+func (this *TerminalNodeImpl) getParent() Tree {
 	return this.parentCtx
 }
 
-func (this *TerminalNodeImpl) getPayload() *Token {
+func (this *TerminalNodeImpl) setParent(t Tree) {
+	this.parentCtx = t.(IRuleContext)
+}
+
+func (this *TerminalNodeImpl) getPayload() interface{} {
 	return this.symbol
 }
 
@@ -123,12 +141,12 @@ func (this *TerminalNodeImpl) getSourceInterval() *Interval {
 	return NewInterval(tokenIndex, tokenIndex)
 }
 
-func (this *TerminalNodeImpl) getChildCount() {
+func (this *TerminalNodeImpl) getChildCount() int {
 	return 0
 }
 
-func (this *TerminalNodeImpl) accept(visitor *ParseTreeVisitor ) interface{} {
-	return (*visitor).visitTerminal(this)
+func (this *TerminalNodeImpl) accept(visitor ParseTreeVisitor ) interface{} {
+	return visitor.visitTerminal(this)
 }
 
 func (this *TerminalNodeImpl) getText() string {
@@ -139,11 +157,9 @@ func (this *TerminalNodeImpl) toString() string {
 	if (this.symbol.tokenType == TokenEOF) {
 		return "<EOF>"
 	} else {
-		return this.symbol.text
+		return this.symbol.text()
 	}
 }
-
-
 
 
 // Represents a token that was consumed during resynchronization
@@ -153,7 +169,7 @@ func (this *TerminalNodeImpl) toString() string {
 // upon no viable alternative exceptions.
 
 type ErrorNodeImpl struct {
-	TerminalNodeImpl
+	*TerminalNodeImpl
 }
 
 func NewErrorNodeImpl(token *Token) *ErrorNodeImpl {
@@ -166,10 +182,9 @@ func (this *ErrorNodeImpl) isErrorNode() bool {
 	return true
 }
 
-func (this *ErrorNodeImpl) accept( visitor *ParseTreeVisitor ) interface{} {
-	return (*visitor).visitErrorNode(this)
+func (this *ErrorNodeImpl) accept( visitor ParseTreeVisitor ) interface{} {
+	return visitor.visitErrorNode(this)
 }
-
 
 
 type ParseTreeWalker struct {
@@ -180,19 +195,19 @@ func NewParseTreeWalker() *ParseTreeWalker {
 	return new(ParseTreeWalker)
 }
 
-func (this *ParseTreeWalker) walk(listener *ParseTreeListener, t *Tree) {
+func (this *ParseTreeWalker) walk(listener ParseTreeListener, t Tree) {
 
-	if errorNode, ok := t.(*ErrorNode); ok {
-		(*listener).visitErrorNode(errorNode)
+	if errorNode, ok := t.(ErrorNode); ok {
+		listener.visitErrorNode(errorNode)
 	} else if term, ok := t.(TerminalNode); ok {
-		(*listener).visitTerminal(term)
+		listener.visitTerminal(term)
 	} else {
-		this.enterRule(listener, t)
-		for i := 0; i < len(t.children); i++ {
+		this.enterRule(listener, t.(RuleNode))
+		for i := 0; i < t.getChildCount(); i++ {
 			var child = t.getChild(i)
 			this.walk(listener, child)
 		}
-		this.exitRule(listener, t)
+		this.exitRule(listener, t.(RuleNode))
 	}
 }
 //
@@ -201,14 +216,14 @@ func (this *ParseTreeWalker) walk(listener *ParseTreeListener, t *Tree) {
 // {@link RuleContext}-specific event. First we trigger the generic and then
 // the rule specific. We to them in reverse order upon finishing the node.
 //
-func (this *ParseTreeWalker) enterRule(listener *ParseTreeListener, r *RuleNode) {
-	var ctx = r.getRuleContext().(*ParserRuleContext)
-	(*listener).enterEveryRule(ctx)
+func (this *ParseTreeWalker) enterRule(listener ParseTreeListener, r RuleNode) {
+	var ctx = r.getRuleContext().(IParserRuleContext)
+	listener.enterEveryRule(ctx)
 	ctx.enterRule(listener)
 }
 
-func (this *ParseTreeWalker) exitRule(listene *ParseTreeListener, r *RuleNode) {
-	var ctx = r.getRuleContext().(*ParserRuleContext)
+func (this *ParseTreeWalker) exitRule(listener ParseTreeListener, r RuleNode) {
+	var ctx = r.getRuleContext().(IParserRuleContext)
 	ctx.exitRule(listener)
 	listener.exitEveryRule(ctx)
 }

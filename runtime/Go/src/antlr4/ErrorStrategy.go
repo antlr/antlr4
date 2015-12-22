@@ -172,7 +172,7 @@ func (this *DefaultErrorStrategy) reportError(recognizer IParser, e IRecognition
 //
 func (this *DefaultErrorStrategy) recover(recognizer IParser, e IRecognitionException) {
 
-    if (this.lastErrorIndex==recognizer.getInputStream().index &&
+    if (this.lastErrorIndex==recognizer.getInputStream().index() &&
         this.lastErrorStates != nil && this.lastErrorStates.contains(recognizer.getState())) {
 		// uh oh, another error at same token index and previously-visited
 		// state in ATN must be a case where LT(1) is in the recovery
@@ -180,7 +180,7 @@ func (this *DefaultErrorStrategy) recover(recognizer IParser, e IRecognitionExce
 		// at least to prevent an infinite loop this is a failsafe.
 		recognizer.consume()
     }
-    this.lastErrorIndex = recognizer.getInputStream().index
+    this.lastErrorIndex = recognizer.getInputStream().index()
     if (this.lastErrorStates == nil) {
         this.lastErrorStates = NewIntervalSet()
     }
@@ -323,7 +323,7 @@ func (this *DefaultErrorStrategy) reportInputMismatch(recognizer IParser, e *Inp
 // @param e the recognition exception
 //
 func (this *DefaultErrorStrategy) reportFailedPredicate(recognizer IParser, e *FailedPredicateException) {
-    var ruleName = recognizer.getRuleNames()[recognizer.getParserRuleContext().ruleIndex]
+    var ruleName = recognizer.getRuleNames()[recognizer.getParserRuleContext().getRuleIndex()]
     var msg = "rule " + ruleName + " " + e.message
     recognizer.notifyErrorListeners(msg, e.offendingToken, e)
 }
@@ -476,7 +476,7 @@ func (this *DefaultErrorStrategy) singleTokenInsertion(recognizer IParser) bool 
     var atn = recognizer.getInterpreter().atn
     var currentState = atn.states[recognizer.getState()]
     var next = currentState.getTransitions()[0].getTarget()
-    var expectingAtLL2 = atn.nextTokens(next, recognizer.getParserRuleContext().RuleContext)
+    var expectingAtLL2 = atn.nextTokens(next, recognizer.getParserRuleContext())
     if (expectingAtLL2.contains(currentSymbolType) ){
         this.reportMissingToken(recognizer)
         return true
@@ -691,13 +691,13 @@ func (this *DefaultErrorStrategy) getErrorRecoverySet(recognizer IParser) *Inter
     var atn = recognizer.getInterpreter().atn
     var ctx = recognizer.getParserRuleContext()
     var recoverSet = NewIntervalSet()
-    for (ctx != nil && ctx.invokingState>=0) {
+    for (ctx != nil && ctx.getInvokingState()>=0) {
         // compute what follows who invoked us
-        var invokingState = atn.states[ctx.invokingState]
+        var invokingState = atn.states[ctx.getInvokingState()]
         var rt = invokingState.getTransitions()[0]
         var follow = atn.nextTokens(rt.(*RuleTransition).followState, nil)
         recoverSet.addSet(follow)
-        ctx = ctx.parentCtx
+        ctx = ctx.getParent().(IParserRuleContext)
     }
     recoverSet.removeOne(TokenEpsilon)
     return recoverSet
@@ -760,8 +760,8 @@ func NewBailErrorStrategy() *BailErrorStrategy {
 func (this *BailErrorStrategy) recover(recognizer IParser, e IRecognitionException) {
     var context = recognizer.getParserRuleContext()
     for (context != nil) {
-        context.exception = e
-        context = context.parentCtx
+        context.setException(e)
+        context = context.getParent().(IParserRuleContext)
     }
     panic(NewParseCancellationException()) // TODO we don't emit e properly
 }

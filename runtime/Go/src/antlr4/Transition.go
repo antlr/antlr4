@@ -1,6 +1,7 @@
 package antlr4
 import (
 	"fmt"
+	"strconv"
 )
 
 //  atom, set, epsilon, action, predicate, rule transitions.
@@ -126,7 +127,7 @@ var TransitionserializationNames = []string{
 
 // TODO: make all transitions sets? no, should remove set edges
 type AtomTransition struct {
-	Transition
+	*Transition
 	label_ int
 	label *IntervalSet
 }
@@ -154,11 +155,11 @@ func (t *AtomTransition) matches( symbol, minVocabSymbol,  maxVocabSymbol int ) 
 }
 
 func (t *AtomTransition) toString() string {
-	return t.label_
+	return strconv.Itoa(t.label_)
 }
 
 type RuleTransition struct {
-	Transition
+	*Transition
 
 	followState IATNState
 	ruleIndex, precedence int
@@ -186,7 +187,7 @@ func (t *RuleTransition) matches(symbol, minVocabSymbol,  maxVocabSymbol int) bo
 
 
 type EpsilonTransition struct {
-	Transition
+	*Transition
 
 	isEpsilon bool
 	outermostPrecedenceReturn int
@@ -213,7 +214,7 @@ func (t *EpsilonTransition) toString() string {
 }
 
 type RangeTransition struct {
-	Transition
+	*Transition
 
 	start, stop int
 }
@@ -246,7 +247,7 @@ func (t *RangeTransition) toString() string {
 }
 
 type AbstractPredicateTransition struct {
-	Transition
+	*Transition
 }
 
 func NewAbstractPredicateTransition ( target IATNState ) *AbstractPredicateTransition {
@@ -258,7 +259,7 @@ func NewAbstractPredicateTransition ( target IATNState ) *AbstractPredicateTrans
 }
 
 type PredicateTransition struct {
-	Transition
+	*Transition
 
 	isCtxDependent bool
 	ruleIndex, predIndex int
@@ -287,11 +288,11 @@ func (t *PredicateTransition) getPredicate() *Predicate {
 }
 
 func (t *PredicateTransition) toString() string {
-	return "pred_" + t.ruleIndex + ":" + t.predIndex
+	return "pred_" + strconv.Itoa(t.ruleIndex) + ":" + strconv.Itoa(t.predIndex)
 }
 
 type ActionTransition struct {
-	Transition
+	*Transition
 
 	isCtxDependent bool
 	ruleIndex, actionIndex, predIndex int
@@ -317,12 +318,12 @@ func (t *ActionTransition) matches(symbol, minVocabSymbol,  maxVocabSymbol int) 
 }
 
 func (t *ActionTransition) toString() string {
-	return "action_" + t.ruleIndex + ":" + t.actionIndex
+	return "action_" + strconv.Itoa(t.ruleIndex) + ":" + strconv.Itoa(t.actionIndex)
 }
 
 
 type SetTransition struct {
-	Transition
+	*Transition
 }
 
 func NewSetTransition ( target IATNState, set *IntervalSet ) *SetTransition {
@@ -365,7 +366,7 @@ func NewNotSetTransition ( target IATNState, set *IntervalSet) *NotSetTransition
 
 	t := new(NotSetTransition)
 	t.InitTransition( target )
-	t.InitSetTransition( target )
+	t.InitSetTransition( set )
 
 	t.serializationType = TransitionNOT_SET
 
@@ -378,11 +379,11 @@ func (t *NotSetTransition) matches(symbol, minVocabSymbol,  maxVocabSymbol int) 
 }
 
 func (t *NotSetTransition) toString() string {
-	return '~' + t.label.toString()
+	return "~" + t.label.toString()
 }
 
 type WildcardTransition struct {
-	Transition
+	*Transition
 }
 
 func NewWildcardTransition ( target IATNState ) *WildcardTransition {
@@ -403,7 +404,7 @@ func (t *WildcardTransition) toString() string {
 }
 
 type PrecedencePredicateTransition struct {
-	Transition
+	*Transition
 
 	precedence int
 }

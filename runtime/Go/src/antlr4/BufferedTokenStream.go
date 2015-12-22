@@ -13,30 +13,6 @@
 package antlr4
 import "strconv"
 
-type IntStream interface {
-	consume()
-	LA(i int) int
-	mark() int
-	release(marker int)
-	index() int
-	seek(index int)
-	size() int
-	getSourceName() string
-}
-
-type TokenStream interface {
-	IntStream
-
-	LT(k int) *Token
-	get(index int) *Token
-	getTokenSource() TokenSource
-	setTokenSource(TokenSource)
-	getText() string
-	getTextFromInterval(*Interval) string
-	getTextFromRuleContext(*RuleContext) string
-	getTextFromTokens(*Token, *Token) string
-}
-
 // bt is just to keep meaningful parameter types to Parser
 type BufferedTokenStream struct {
 	tokenSource TokenSource

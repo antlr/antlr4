@@ -1,7 +1,8 @@
 package antlr4
 
 import (
-	)
+	"strconv"
+)
 
 //  A rule context is a record of a single rule invocation. It knows
 //  which context invoked it, if any. If there is no parent context, then
@@ -28,16 +29,19 @@ type IRuleContext interface {
 	RuleNode
 
 	getInvokingState()int
+	setInvokingState(int)
+
 	getRuleIndex()int
-	getChildren()[]IRuleContext
 	isEmpty() bool
+
+	toString([]string, IRuleContext) string
 }
 
 type RuleContext struct {
 	parentCtx IRuleContext
 	invokingState int
 	ruleIndex int
-	children []IRuleContext
+	children []Tree
 }
 
 func NewRuleContext(parent IRuleContext, invokingState int)  *RuleContext {
@@ -49,7 +53,7 @@ func NewRuleContext(parent IRuleContext, invokingState int)  *RuleContext {
 	return rn
 }
 
-func (rn *RuleContext) InitRuleContext(parent *RuleContext, invokingState int) {
+func (rn *RuleContext) InitRuleContext(parent IRuleContext, invokingState int) {
 
 	// What context invoked this rule?
 	rn.parentCtx = parent
@@ -64,27 +68,36 @@ func (rn *RuleContext) InitRuleContext(parent *RuleContext, invokingState int) {
 	}
 }
 
-func (this *RuleContext) getParent() Tree {
-	return this.parentCtx
+func (this *RuleContext) setChildren(elems []Tree){
+	this.children = elems
 }
+
+func (this *RuleContext) setParent(v Tree){
+	this.parentCtx = v.(IRuleContext)
+}
+
 
 func (this *RuleContext) getInvokingState() int {
 	return this.getInvokingState()
+}
+
+func (this *RuleContext) setInvokingState(t int) {
+	this.invokingState = t
 }
 
 func (this *RuleContext) getRuleIndex() int{
 	return this.ruleIndex
 }
 
-func (this *RuleContext) getChildren() []IRuleContext {
+func (this *RuleContext) getChildren() []Tree {
 	return this.children
 }
 
-func (this *RuleContext) depth() {
+func (this *RuleContext) depth() int {
 	var n = 0
-	var p = this
+	var p Tree = this
 	for (p != nil) {
-		p = p.parentCtx
+		p = p.getParent()
 		n += 1
 	}
 	return n
@@ -123,23 +136,27 @@ func (this *RuleContext) getText() string {
 	} else {
 		var s string
 		for _, child := range this.children {
-			s += child.getText()
+			s += child.(IRuleContext).getText()
 		}
 
 		return s
 	}
 }
 
-func (this *RuleContext) getChild(i int) {
+func (this *RuleContext) getChild(i int) Tree {
 	return nil
 }
 
-func (this *RuleContext) getChildCount() {
+func (this *RuleContext) getParent() Tree {
+	return this.parentCtx
+}
+
+func (this *RuleContext) getChildCount() int {
 	return 0
 }
 
-func (this *RuleContext) accept(visitor *ParseTreeVisitor) {
-	(*visitor).visitChildren(this)
+func (this *RuleContext) accept(visitor ParseTreeVisitor) interface{} {
+	return visitor.visitChildren(this)
 }
 
 //need to manage circular dependencies, so export now
@@ -152,29 +169,29 @@ func (this *RuleContext) toStringTree(ruleNames []string, recog IRecognizer) str
 	return TreestoStringTree(this, ruleNames, recog)
 }
 
-func (this *RuleContext) toString(ruleNames []string, stop *RuleContext) string {
+func (this *RuleContext) toString(ruleNames []string, stop IRuleContext) string {
 
-	var p *RuleContext = this
+	var p IRuleContext = this
 	var s = "["
 	for (p != nil && p != stop) {
 		if (ruleNames == nil) {
 			if (!p.isEmpty()) {
-				s += p.invokingState
+				s += strconv.Itoa(p.getInvokingState())
 			}
 		} else {
-			var ri = p.ruleIndex
+			var ri = p.getRuleIndex()
 			var ruleName string
 			if (ri >= 0 && ri < len(ruleNames)) {
 				ruleName = ruleNames[ri]
 			} else {
-				ruleName = "" + ri
+				ruleName = strconv.Itoa(ri)
 			}
 			s += ruleName
 		}
-		if (p.parentCtx != nil && (ruleNames != nil || !p.parentCtx.isEmpty())) {
+		if (p.getParent() != nil && (ruleNames != nil || !p.getParent().(IRuleContext).isEmpty())) {
 			s += " "
 		}
-		p = p.parentCtx
+		p = p.getParent().(IRuleContext)
 	}
 	s += "]"
 	return s

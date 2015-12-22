@@ -11,18 +11,6 @@ import (
 //  of speed.
 ///
 
-type TokenSource interface {
-	nextToken() *Token
-	getLine() int
-	skip()
-	more()
-	getCharPositionInLine() int
-	getInputStream() *InputStream
-	getSourceName() string
-	setTokenFactory(factory TokenFactory)
-	getTokenFactory() TokenFactory
-}
-
 type ILexer interface {
 	TokenSource
 	IRecognizer
@@ -38,9 +26,9 @@ type ILexer interface {
 type Lexer struct {
 	Recognizer
 
-	_input *InputStream
+	_input CharStream
 	_factory TokenFactory
-	_tokenFactorySourcePair *TokenSourceInputStreamPair
+	_tokenFactorySourcePair *TokenSourceCharStreamPair
 	_interp *LexerATNSimulator
 	_token *Token
 	_tokenStartCharIndex int
@@ -55,7 +43,7 @@ type Lexer struct {
 	actionType int
 }
 
-func NewLexer(input *InputStream) *Lexer {
+func NewLexer(input CharStream) *Lexer {
 
 	lexer := new(Lexer)
 
@@ -65,11 +53,11 @@ func NewLexer(input *InputStream) *Lexer {
 	return lexer
 }
 
-func (l *Lexer) InitLexer(input *InputStream){
+func (l *Lexer) InitLexer(input CharStream){
 
 	l._input = input
 	l._factory = CommonTokenFactoryDEFAULT
-	l._tokenFactorySourcePair = &TokenSourceInputStreamPair{l, input}
+	l._tokenFactorySourcePair = &TokenSourceCharStreamPair{l, input}
 
 	l._interp = nil // child classes must populate l
 
@@ -146,14 +134,12 @@ func (l *Lexer) reset() {
 	l._interp.reset()
 }
 
-func (l *Lexer) getInputStream() *InputStream {
+func (l *Lexer) getInputStream() CharStream {
 	return l._input
 }
 
 func (l *Lexer) getSourceName() string {
-	panic("Not implemented")
-	return ""
-//	return l._input.sourceName
+	return l._input.getSourceName()
 }
 
 func (l *Lexer) setChannel(v int){
@@ -207,7 +193,7 @@ func (l *Lexer) nextToken() *Token {
 		}
 		l._token = nil
 		l._channel = TokenDefaultChannel
-		l._tokenStartCharIndex = l._input.index
+		l._tokenStartCharIndex = l._input.index()
 		l._tokenStartColumn = l._interp.column
 		l._tokenStartLine = l._interp.line
 		l._text = nil
@@ -283,16 +269,16 @@ func (l *Lexer) popMode() int {
 }
 
 
-func (l *Lexer) inputStream() *InputStream {
+func (l *Lexer) inputStream() CharStream {
 	return l._input
 }
 
-func (l *Lexer) setInputStream(input *InputStream) {
+func (l *Lexer) setInputStream(input CharStream) {
 	l._input = nil
-	l._tokenFactorySourcePair = &TokenSourceInputStreamPair{l, l._input}
+	l._tokenFactorySourcePair = &TokenSourceCharStreamPair{l, l._input}
 	l.reset()
 	l._input = input
-	l._tokenFactorySourcePair = &TokenSourceInputStreamPair{l, l._input}
+	l._tokenFactorySourcePair = &TokenSourceCharStreamPair{l, l._input}
 }
 
 // By default does not support multiple emits per nextToken invocation
@@ -319,7 +305,7 @@ func (l *Lexer) emit() *Token {
 func (l *Lexer) emitEOF() *Token {
 	cpos := l.getCharPositionInLine();
 	lpos := l.getLine();
-	var eof = l._factory.create(l._tokenFactorySourcePair, TokenEOF, "", TokenDefaultChannel, l._input.index,  l._input.index - 1, lpos, cpos)
+	var eof = l._factory.create(l._tokenFactorySourcePair, TokenEOF, "", TokenDefaultChannel, l._input.index(),  l._input.index() - 1, lpos, cpos)
 	l.emitToken(eof)
 	return eof
 }
@@ -342,7 +328,7 @@ func (l *Lexer) setType(t int) {
 
 // What is the index of the current character of lookahead?///
 func (l *Lexer) getCharIndex() int {
-	return l._input.index
+	return l._input.index()
 }
 
 // Return the text matched so far for the current token or any text override.
@@ -378,8 +364,8 @@ func (l *Lexer) getAllTokens() []*Token {
 
 func (l *Lexer) notifyListeners(e IRecognitionException) {
 	var start = l._tokenStartCharIndex
-	var stop = l._input.index
-	var text = l._input.getText(start, stop)
+	var stop = l._input.index()
+	var text = l._input.getTextFromInterval(NewInterval(start, stop))
 	var msg = "token recognition error at: '" + text + "'"
 	var listener = l.getErrorListenerDispatch()
 	listener.syntaxError(l, nil, l._tokenStartLine, l._tokenStartColumn, msg, e)

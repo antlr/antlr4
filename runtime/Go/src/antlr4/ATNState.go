@@ -1,6 +1,42 @@
 package antlr4
 import "strconv"
 
+
+const (
+// constants for serialization
+	ATNStateInvalidType = 0
+	ATNStateBASIC = 1
+	ATNStateRULE_START = 2
+	ATNStateBLOCK_START = 3
+	ATNStatePLUS_BLOCK_START = 4
+	ATNStateSTAR_BLOCK_START = 5
+	ATNStateTOKEN_START = 6
+	ATNStateRULE_STOP = 7
+	ATNStateBLOCK_END = 8
+	ATNStateSTAR_LOOP_BACK = 9
+	ATNStateSTAR_LOOP_ENTRY = 10
+	ATNStatePLUS_LOOP_BACK = 11
+	ATNStateLOOP_END = 12
+
+	ATNStateINVALID_STATE_NUMBER = -1
+)
+
+//var ATNState.serializationNames = [
+//            "INVALID",
+//            "BASIC",
+//            "RULE_START",
+//            "BLOCK_START",
+//            "PLUS_BLOCK_START",
+//            "STAR_BLOCK_START",
+//            "TOKEN_START",
+//            "RULE_STOP",
+//            "BLOCK_END",
+//            "STAR_LOOP_BACK",
+//            "STAR_LOOP_ENTRY",
+//            "PLUS_LOOP_BACK",
+//            "LOOP_END" ]
+
+
 var INITIAL_NUM_TRANSITIONS = 4
 
 type IATNState interface {
@@ -24,6 +60,8 @@ type IATNState interface {
 	getTransitions() []ITransition
 	setTransitions( []ITransition )
 	addTransition(ITransition, int)
+
+	toString() string
 }
 
 type ATNState struct {
@@ -108,40 +146,6 @@ func (as *ATNState) getNextTokenWithinRule() *IntervalSet {
 func (as *ATNState) setNextTokenWithinRule(v *IntervalSet)  {
 	as.nextTokenWithinRule = v
 }
-
-const (
-// constants for serialization
-	ATNStateInvalidType = 0
-	ATNStateBASIC = 1
-	ATNStateRULE_START = 2
-	ATNStateBLOCK_START = 3
-	ATNStatePLUS_BLOCK_START = 4
-	ATNStateSTAR_BLOCK_START = 5
-	ATNStateTOKEN_START = 6
-	ATNStateRULE_STOP = 7
-	ATNStateBLOCK_END = 8
-	ATNStateSTAR_LOOP_BACK = 9
-	ATNStateSTAR_LOOP_ENTRY = 10
-	ATNStatePLUS_LOOP_BACK = 11
-	ATNStateLOOP_END = 12
-
-	ATNStateINVALID_STATE_NUMBER = -1
-)
-
-//var ATNState.serializationNames = [
-//            "INVALID",
-//            "BASIC",
-//            "RULE_START",
-//            "BLOCK_START",
-//            "PLUS_BLOCK_START",
-//            "STAR_BLOCK_START",
-//            "TOKEN_START",
-//            "RULE_STOP",
-//            "BLOCK_END",
-//            "STAR_LOOP_BACK",
-//            "STAR_LOOP_ENTRY",
-//            "PLUS_LOOP_BACK",
-//            "LOOP_END" ]
 
 func (this *ATNState) toString() string {
 	return strconv.Itoa(this.stateNumber)

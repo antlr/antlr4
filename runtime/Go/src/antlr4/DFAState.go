@@ -9,10 +9,10 @@ import (
 
 type PredPrediction struct {
 	alt int
-	pred int
+	pred SemanticContext
 }
 
-func NewPredPrediction(pred, alt int) *PredPrediction {
+func NewPredPrediction(pred SemanticContext, alt int) *PredPrediction {
 	this := new(PredPrediction)
 
 	this.alt = alt
@@ -58,7 +58,7 @@ type DFAState struct {
 	prediction int
 	lexerActionExecutor *LexerActionExecutor
 	requiresFullContext bool
-	predicates []PredPrediction
+	predicates []*PredPrediction
 }
 
 func NewDFAState(stateNumber int, configs *ATNConfigSet) *DFAState {

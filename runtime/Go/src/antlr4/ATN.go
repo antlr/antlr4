@@ -51,7 +51,7 @@ func NewATN(grammarType int, maxTokenType int) *ATN {
 //  If {@code ctx} is nil, the set of tokens will not include what can follow
 //  the rule surrounding {@code s}. In other words, the set will be
 //  restricted to tokens reachable staying within {@code s}'s rule.
-func (this *ATN) nextTokensInContext(s IATNState, ctx *RuleContext) *IntervalSet {
+func (this *ATN) nextTokensInContext(s IATNState, ctx IRuleContext) *IntervalSet {
     var anal = NewLL1Analyzer(this)
     return anal.LOOK(s, nil, ctx)
 }
@@ -68,7 +68,7 @@ func (this *ATN) nextTokensNoContext(s IATNState) *IntervalSet {
     return s.getNextTokenWithinRule()
 }
 
-func (this *ATN) nextTokens(s IATNState, ctx *RuleContext) *IntervalSet {
+func (this *ATN) nextTokens(s IATNState, ctx IRuleContext) *IntervalSet {
     if ( ctx==nil ) {
         return this.nextTokensNoContext(s)
     } else {
