@@ -27,6 +27,8 @@ type IATNConfig interface {
 
 	getReachesIntoOuterContext() int
 	setReachesIntoOuterContext(int)
+
+	toString() string
 }
 
 type ATNConfig struct {

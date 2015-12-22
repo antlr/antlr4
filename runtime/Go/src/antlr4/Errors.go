@@ -186,10 +186,10 @@ type InputMismatchException struct {
 // This signifies any kind of mismatched input exceptions such as
 // when the current input does not match the expected token.
 //
-func NewInputMismatchException(recognizer *Parser) *InputMismatchException {
+func NewInputMismatchException(recognizer IParser) *InputMismatchException {
 
 	this := new(InputMismatchException)
-	this.InitRecognitionException("", recognizer, recognizer.getInputStream(), recognizer._ctx)
+	this.InitRecognitionException("", recognizer, recognizer.getInputStream(), recognizer.getParserRuleContext())
 
 	this.offendingToken = recognizer.getCurrentToken()
 

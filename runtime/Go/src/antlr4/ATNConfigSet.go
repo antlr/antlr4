@@ -257,7 +257,7 @@ func (this *ATNConfigSet) toString() string {
 }
 
 type OrderedATNConfigSet struct {
-	ATNConfigSet
+	*ATNConfigSet
 }
 
 

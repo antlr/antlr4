@@ -1,7 +1,6 @@
 package antlr4
 
 import (
-	"strings"
 	"fmt"
 	"strconv"
 )
@@ -15,6 +14,8 @@ import (
 type TokenSource interface {
 	nextToken() *Token
 	getLine() int
+	skip()
+	more()
 	getCharPositionInLine() int
 	getInputStream() *InputStream
 	getSourceName() string
@@ -24,9 +25,14 @@ type TokenSource interface {
 
 type ILexer interface {
 	TokenSource
+	IRecognizer
 
 	setChannel(int)
 	pushMode(int)
+	popMode() int
+	setType(int)
+	mode(int)
+
 }
 
 type Lexer struct {
@@ -148,6 +154,10 @@ func (l *Lexer) getSourceName() string {
 	panic("Not implemented")
 	return ""
 //	return l._input.sourceName
+}
+
+func (l *Lexer) setChannel(v int){
+	l._channel = v
 }
 
 func (l *Lexer) getTokenFactory() TokenFactory {
@@ -301,15 +311,15 @@ func (l *Lexer) emitToken(token *Token) {
 // custom Token objects or provide a Newfactory.
 // /
 func (l *Lexer) emit() *Token {
-	var t = l._factory.create(l._tokenFactorySourcePair, l._type, l._text, l._channel, l._tokenStartCharIndex, l.getCharIndex() - 1, l._tokenStartLine, l._tokenStartColumn)
+	var t = l._factory.create(l._tokenFactorySourcePair, l._type, *l._text, l._channel, l._tokenStartCharIndex, l.getCharIndex() - 1, l._tokenStartLine, l._tokenStartColumn)
 	l.emitToken(t)
 	return t
 }
 
-func (l *Lexer) emitEOF() int {
+func (l *Lexer) emitEOF() *Token {
 	cpos := l.getCharPositionInLine();
 	lpos := l.getLine();
-	var eof = l._factory.create(l._tokenFactorySourcePair, TokenEOF, nil, TokenDefaultChannel, l._input.index,  l._input.index - 1, lpos, cpos)
+	var eof = l._factory.create(l._tokenFactorySourcePair, TokenEOF, "", TokenDefaultChannel, l._input.index,  l._input.index - 1, lpos, cpos)
 	l.emitToken(eof)
 	return eof
 }
@@ -331,7 +341,7 @@ func (l *Lexer) setType(t int) {
 }
 
 // What is the index of the current character of lookahead?///
-func (l *Lexer) getCharIndex() {
+func (l *Lexer) getCharIndex() int {
 	return l._input.index
 }
 
@@ -339,21 +349,25 @@ func (l *Lexer) getCharIndex() {
 //Set the complete text of l token it wipes any previous changes to the text.
 func (l *Lexer) text() string {
 	if (l._text != nil) {
-		return l._text
+		return *l._text
 	} else {
 		return l._interp.getText(l._input)
 	}
 }
 
 func (l *Lexer) setText(text string) {
-	l._text = text
+	*l._text = text
+}
+
+func (this *Lexer) getATN() *ATN {
+	return this._interp.atn
 }
 
 // Return a list of all Token objects in input char stream.
 // Forces load of all tokens. Does not include EOF token.
 // /
-func (l *Lexer) getAllTokens() []Token {
-	var tokens = make([]Token, 0)
+func (l *Lexer) getAllTokens() []*Token {
+	var tokens = make([]*Token, 0)
 	var t = l.nextToken()
 	for (t.tokenType != TokenEOF) {
 		tokens = append(tokens, t)
@@ -366,17 +380,9 @@ func (l *Lexer) notifyListeners(e IRecognitionException) {
 	var start = l._tokenStartCharIndex
 	var stop = l._input.index
 	var text = l._input.getText(start, stop)
-	var msg = "token recognition error at: '" + l.getErrorDisplay(text) + "'"
+	var msg = "token recognition error at: '" + text + "'"
 	var listener = l.getErrorListenerDispatch()
 	listener.syntaxError(l, nil, l._tokenStartLine, l._tokenStartColumn, msg, e)
-}
-
-func (l *Lexer) getErrorDisplay(s []string) string {
-	var d = make([]string,len(s))
-	for i := 0; i < len(s); i++ {
-		d[i] = s[i]
-	}
-	return strings.Join(d, "")
 }
 
 func (l *Lexer) getErrorDisplayForChar(c rune) string {
@@ -389,7 +395,7 @@ func (l *Lexer) getErrorDisplayForChar(c rune) string {
 	} else if (c == '\r') {
 		return "\\r"
 	} else {
-		return c
+		return string(c)
 	}
 }
 
@@ -404,7 +410,7 @@ func (l *Lexer) getCharErrorDisplay(c rune) string {
 // /
 func (l *Lexer) recover(re IRecognitionException) {
 	if (l._input.LA(1) != TokenEOF) {
-		if _, ok := re.(LexerNoViableAltException); ok {
+		if _, ok := re.(*LexerNoViableAltException); ok {
 			// skip a char and try again
 			l._interp.consume(l._input)
 		} else {

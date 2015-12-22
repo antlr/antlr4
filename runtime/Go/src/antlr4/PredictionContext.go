@@ -11,6 +11,7 @@ type IPredictionContext interface {
 	equals(IPredictionContext) bool
 	length() int
 	isEmpty() bool
+	hasEmptyPath() bool
 }
 
 type PredictionContext struct {
@@ -31,8 +32,6 @@ func NewPredictionContext(cachedHashString string) *PredictionContext {
 const (
 	PredictionContextEMPTY_RETURN_STATE = 0x7FFFFFFF
 )
-
-//var PredictionContextEMPTY *PredictionContext = nil
 
 // Represents {@code $} in an array in full context mode, when {@code $}
 // doesn't mean wildcard: {@code $ + x = [$,x]}. Here,

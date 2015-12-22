@@ -8,12 +8,13 @@ import (
 type IRecognizer interface {
 	getState() int
 	getATN() *ATN
+	action( _localctx IRuleContext, ruleIndex, actionIndex int)
+	getRuleNames() []string
 }
 
 type Recognizer struct {
 
     _listeners []ParseTreeListener
-    _interp ATNSimulator
     state int
 
 }
@@ -26,7 +27,6 @@ func NewRecognizer() *Recognizer {
 
 func (rec *Recognizer) InitRecognizer() {
     rec._listeners = []ParseTreeListener{ ConsoleErrorListenerINSTANCE }
-    rec._interp = nil
     rec.state = -1
 }
 
@@ -40,7 +40,7 @@ func (this *Recognizer) checkVersion(toolVersion string) {
     }
 }
 
-func (this *Recognizer) action( _localctx *RuleContext, ruleIndex, actionIndex int) {
+func (this *Recognizer) action( context IRuleContext, ruleIndex, actionIndex int) {
     panic("action not implemented on Recognizer!")
 }
 
@@ -58,10 +58,6 @@ func (this *Recognizer) getRuleNames() []string {
 
 func (this *Recognizer) getTokenNames() []string {
     return nil
-}
-
-func (this *Recognizer) getATN() *ATN {
-    return this._interp.atn
 }
 
 func (this *Recognizer) getState() int {
@@ -186,7 +182,7 @@ func (this *Recognizer) getErrorListenerDispatch() IErrorListener {
 
 // subclass needs to override these if there are sempreds or actions
 // that the ATN interp needs to execute
-func (this *Recognizer) sempred(localctx *RuleContext, ruleIndex int, actionIndex int) {
+func (this *Recognizer) sempred(localctx *RuleContext, ruleIndex int, actionIndex int) bool {
     return true
 }
 

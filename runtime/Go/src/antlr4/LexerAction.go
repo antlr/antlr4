@@ -1,4 +1,5 @@
 package antlr4
+import "strconv"
 
 const (
     LexerActionTypeCHANNEL = 0     //The type of a {@link LexerChannelAction} action.
@@ -48,7 +49,7 @@ func (this *LexerAction) getIsPositionDependent() bool {
 }
 
 func (this *LexerAction) hashString() string {
-    return "" + this.actionType
+    return strconv.Itoa(this.actionType)
 }
 
 func (this *LexerAction) equals(other ILexerAction) bool {
@@ -61,11 +62,11 @@ func (this *LexerAction) equals(other ILexerAction) bool {
 // <p>The {@code skip} command does not have any parameters, so this action is
 // implemented as a singleton instance exposed by {@link //INSTANCE}.</p>
 type LexerSkipAction struct {
-    LexerAction
+    *LexerAction
 }
 
 func NewLexerSkipAction() *LexerSkipAction {
-    la := new(LexerAction)
+    la := new(LexerSkipAction)
     la.InitLexerAction(LexerActionTypeSKIP)
 	return la
 }
@@ -84,7 +85,7 @@ func (this *LexerSkipAction) toString() string {
 //  Implements the {@code type} lexer action by calling {@link Lexer//setType}
 // with the assigned type.
 type LexerTypeAction struct {
-	LexerAction
+	*LexerAction
 
     _type int
 }
@@ -97,11 +98,11 @@ func NewLexerTypeAction(_type int) *LexerTypeAction {
 }
 
 func (this *LexerTypeAction) execute(lexer ILexer) {
-    lexer._type = this._type
+    lexer.setType( this._type )
 }
 
 func (this *LexerTypeAction) hashString() string {
-	return "" + this.actionType + this._type
+	return strconv.Itoa(this.actionType) + strconv.Itoa(this._type)
 }
 
 func (this *LexerTypeAction) equals(other ILexerAction) bool {
@@ -115,13 +116,13 @@ func (this *LexerTypeAction) equals(other ILexerAction) bool {
 }
 
 func (this *LexerTypeAction) toString() string {
-    return "actionType(" + this._type + ")"
+    return "actionType(" + strconv.Itoa(this._type) + ")"
 }
 
 // Implements the {@code pushMode} lexer action by calling
 // {@link Lexer//pushMode} with the assigned mode.
 type LexerPushModeAction struct {
-	LexerAction
+	*LexerAction
 
     mode int
 }
@@ -142,7 +143,7 @@ func (this *LexerPushModeAction) execute(lexer ILexer) {
 }
 
 func (this *LexerPushModeAction) hashString() string {
-    return "" + this.actionType + this.mode
+    return strconv.Itoa(this.actionType) + strconv.Itoa(this.mode)
 }
 
 func (this *LexerPushModeAction) equals(other ILexerAction) bool {
@@ -156,7 +157,7 @@ func (this *LexerPushModeAction) equals(other ILexerAction) bool {
 }
 
 func (this *LexerPushModeAction) toString() string {
-	return "pushMode(" + this.mode + ")"
+	return "pushMode(" + strconv.Itoa(this.mode) + ")"
 }
 
 // Implements the {@code popMode} lexer action by calling {@link Lexer//popMode}.
@@ -164,7 +165,7 @@ func (this *LexerPushModeAction) toString() string {
 // <p>The {@code popMode} command does not have any parameters, so this action is
 // implemented as a singleton instance exposed by {@link //INSTANCE}.</p>
 type LexerPopModeAction struct {
-    LexerAction
+    *LexerAction
 }
 
 func NewLexerPopModeAction() *LexerPopModeAction {
@@ -193,10 +194,10 @@ func (this *LexerPopModeAction) toString() string {
 // implemented as a singleton instance exposed by {@link //INSTANCE}.</p>
 
 type LexerMoreAction struct {
-    LexerAction
+    *LexerAction
 }
 
-func NewLexerMoreAction() *LexerMoreAction {
+func NewLexerMoreAction() *LexerModeAction {
     this := new(LexerModeAction)
     this.InitLexerAction( LexerActionTypeMORE )
 
@@ -218,7 +219,7 @@ func (this *LexerMoreAction) toString() string {
 // Implements the {@code mode} lexer action by calling {@link Lexer//mode} with
 // the assigned mode.
 type LexerModeAction struct {
-	LexerAction
+	*LexerAction
 
     mode int
 }
@@ -237,7 +238,7 @@ func (this *LexerModeAction) execute(lexer ILexer) {
 }
 
 func (this *LexerModeAction) hashString() string {
-	return "" + this.actionType + this.mode
+	return strconv.Itoa(this.actionType) + strconv.Itoa(this.mode)
 }
 
 func (this *LexerModeAction) equals(other ILexerAction) bool {
@@ -251,7 +252,7 @@ func (this *LexerModeAction) equals(other ILexerAction) bool {
 }
 
 func (this *LexerModeAction) toString() string {
-    return "mode(" + this.mode + ")"
+    return "mode(" + strconv.Itoa(this.mode) + ")"
 }
 
 // Executes a custom lexer action by calling {@link Recognizer//action} with the
@@ -272,7 +273,7 @@ func (this *LexerModeAction) toString() string {
 // {@link Recognizer//action}.
 
 type LexerCustomAction struct {
-	LexerAction
+	*LexerAction
     ruleIndex, actionIndex int
 }
 
@@ -292,7 +293,7 @@ func (this *LexerCustomAction) execute(lexer ILexer) {
 }
 
 func (this *LexerCustomAction) hashString() string {
-    return "" + this.actionType + this.ruleIndex + this.actionIndex
+    return strconv.Itoa(this.actionType) + strconv.Itoa(this.ruleIndex) + strconv.Itoa(this.actionIndex)
 }
 
 func (this *LexerCustomAction) equals(other ILexerAction) bool {
@@ -310,7 +311,7 @@ func (this *LexerCustomAction) equals(other ILexerAction) bool {
 // Constructs a New{@code channel} action with the specified channel value.
 // @param channel The channel value to pass to {@link Lexer//setChannel}.
 type LexerChannelAction struct {
-	LexerAction
+	*LexerAction
 
     channel int
 }
@@ -329,7 +330,7 @@ func (this *LexerChannelAction) execute(lexer ILexer) {
 }
 
 func (this *LexerChannelAction) hashString() string {
-    return "" + this.actionType + this.channel
+    return strconv.Itoa(this.actionType) + strconv.Itoa(this.channel)
 }
 
 func (this *LexerChannelAction) equals(other ILexerAction) bool {
@@ -343,7 +344,7 @@ func (this *LexerChannelAction) equals(other ILexerAction) bool {
 }
 
 func (this *LexerChannelAction) toString() string {
-    return "channel(" + this.channel + ")"
+    return "channel(" + strconv.Itoa(this.channel) + ")"
 }
 
 // This implementation of {@link LexerAction} is used for tracking input offsets
@@ -367,20 +368,20 @@ func (this *LexerChannelAction) toString() string {
 // @param action The lexer action to execute at a particular offset in the
 // input {@link CharStream}.
 type LexerIndexedCustomAction struct {
-	LexerAction
+	*LexerAction
 
     offset int
-    action ILexerAction
+    lexerAction ILexerAction
     isPositionDependent bool
 }
 
-func NewLexerIndexedCustomAction(offset int, action ILexerAction) *LexerIndexedCustomAction {
+func NewLexerIndexedCustomAction(offset int, lexerAction ILexerAction) *LexerIndexedCustomAction {
 
     this := new(LexerIndexedCustomAction)
-    this.InitLexerAction( action.actionType )
+    this.InitLexerAction( lexerAction.getActionType() )
 
     this.offset = offset
-    this.action = action
+    this.lexerAction = lexerAction
     this.isPositionDependent = true
 
     return this
@@ -390,11 +391,11 @@ func NewLexerIndexedCustomAction(offset int, action ILexerAction) *LexerIndexedC
 // using the provided {@code lexer}.</p>
 func (this *LexerIndexedCustomAction) execute(lexer ILexer) {
     // assume the input stream position was properly set by the calling code
-    this.action.execute(lexer)
+    this.lexerAction.execute(lexer)
 }
 
 func (this *LexerIndexedCustomAction) hashString() string {
-    return "" + this.actionType + this.offset + this.action
+    return strconv.Itoa(this.actionType) + strconv.Itoa(this.offset) + this.lexerAction.hashString()
 }
 
 func (this *LexerIndexedCustomAction) equals(other ILexerAction) bool {
@@ -403,7 +404,7 @@ func (this *LexerIndexedCustomAction) equals(other ILexerAction) bool {
     } else if _, ok := other.(*LexerIndexedCustomAction); !ok {
         return false
     } else {
-        return this.offset == other.(*LexerIndexedCustomAction).offset && this.action == other.(*LexerIndexedCustomAction).action
+        return this.offset == other.(*LexerIndexedCustomAction).offset && this.lexerAction == other.(*LexerIndexedCustomAction).lexerAction
     }
 }
 

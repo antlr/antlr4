@@ -5,12 +5,11 @@ import (
 			)
 
 type TraceListener struct {
-	ParseTreeListener
 	parser *Parser
 }
 
 func NewTraceListener(parser *Parser) *TraceListener {
-	tl := &TraceListener{ParseTreeListener{}}
+	tl := new(TraceListener)
     tl.parser = parser
 	return tl
 }
@@ -20,24 +19,43 @@ func (this *TraceListener) enterEveryRule(ctx *ParserRuleContext) {
 }
 
 func (this *TraceListener) visitTerminal( node TerminalNode ) {
-	fmt.Println("consume " + node.getSymbol() + " rule " + this.parser.getRuleNames()[this.parser._ctx.ruleIndex])
+	fmt.Println("consume " + fmt.Sprint(node.getSymbol()) + " rule " + this.parser.getRuleNames()[this.parser._ctx.ruleIndex])
 }
 
 func (this *TraceListener) exitEveryRule(ctx *ParserRuleContext) {
 	fmt.Println("exit    " + this.parser.getRuleNames()[ctx.ruleIndex] + ", LT(1)=" + this.parser._input.LT(1).text())
 }
 
+type IParser interface {
+	IRecognizer
+
+	getInterpreter() *ParserATNSimulator
+	getInputStream() *InputStream
+	consume()
+	getCurrentToken() *Token
+	getTokenStream() TokenStream
+	getTokenFactory() TokenFactory
+	getLiteralNames() []string
+	getSymbolicNames() []string
+	getExpectedTokens() *IntervalSet
+	getParserRuleContext() *ParserRuleContext
+	notifyErrorListeners(msg string, offendingToken *Token, err IRecognitionException)
+	isExpectedToken(symbol int) bool
+
+}
+
 type Parser struct {
 	Recognizer
 
 	_input TokenStream
-	_errHandler ErrorStrategy
+	_errHandler IErrorStrategy
 	_precedenceStack IntStack
 	_ctx *ParserRuleContext
 	buildParseTrees bool
-	_tracer bool
+	_tracer *TraceListener
 	_parseListeners []*ParseTreeListener
 	_syntaxErrors int
+	_interp *ParserATNSimulator
 
 	literalNames []string
 	symbolicNames []string
@@ -45,7 +63,7 @@ type Parser struct {
 
 // p.is all the parsing support code essentially most of it is error
 // recovery stuff.//
-func NewParser(input *TokenStream) *Parser {
+func NewParser(input TokenStream) *Parser {
 
 	p := new(Parser)
 
@@ -94,10 +112,10 @@ func (p *Parser) reset() {
 	if (p._input != nil) {
 		p._input.seek(0)
 	}
-	p._errHandler.reset()
+	p._errHandler.reset(p)
 	p._ctx = nil
 	p._syntaxErrors = 0
-	p.setTrace(false)
+	p.setTrace(nil)
 	p._precedenceStack = make([]int, 0)
 	p._precedenceStack.Push(0)
 	if (p._interp != nil) {
@@ -171,9 +189,13 @@ func (p *Parser) matchWildcard() *Token {
 	return t
 }
 
+func (p *Parser) getParserRuleContext() *ParserRuleContext {
+	return p._ctx
+}
+
 func (p *Parser) getParseListeners() []*ParseTreeListener {
 	if (p._parseListeners == nil){
-		return make([]*ParseTreeListener)
+		return make([]*ParseTreeListener,0)
 	}
 	return p._parseListeners
 }
@@ -211,7 +233,7 @@ func (p *Parser) addParseListener(listener *ParseTreeListener) {
 		panic("listener")
 	}
 	if (p._parseListeners == nil) {
-		p._parseListeners = new([]ParseTreeListener)
+		p._parseListeners = make([]*ParseTreeListener, 0)
 	}
 	p._parseListeners = append(p._parseListeners, listener)
 }
@@ -271,17 +293,29 @@ func (p *Parser) triggerExitRuleEvent() {
 	}
 }
 
+func (this *Parser) getLiteralNames() []string {
+	return this.literalNames
+}
+
+func (this *Parser) getSymbolicNames() []string {
+	return this.symbolicNames
+}
+
+func (this *Parser) getInterpreter() *ParserATNSimulator {
+	return this._interp
+}
+
 func (this *Parser) getATN() *ATN {
 	return this._interp.atn
 }
 
 func (p *Parser) getTokenFactory() TokenFactory {
-	return (*p._input.getTokenSource()).getTokenFactory()
+	return p._input.getTokenSource().getTokenFactory()
 }
 
 // Tell our token source and error strategy about a Newway to create tokens.//
 func (p *Parser) setTokenFactory(factory TokenFactory) {
-	(*p._input.getTokenSource()).setTokenFactory( factory )
+	p._input.getTokenSource().setTokenFactory( factory )
 }
 
 // The ATN with bypass alternatives is expensive to create so we create it
@@ -322,19 +356,20 @@ func (p *Parser) getATNWithBypassAlts() {
 
 func (p *Parser) compileParseTreePattern(pattern, patternRuleIndex, lexer ILexer) {
 
-	if (lexer == nil) {
-		if (p.getTokenStream() != nil) {
-			var tokenSource = p.getTokenStream().getTokenSource()
-			if _, ok := tokenSource.(Lexer); ok {
-				lexer = tokenSource
-			}
-		}
-	}
-	if (lexer == nil) {
-		panic("Parser can't discover a lexer to use")
-	}
-
 	panic("NewParseTreePatternMatcher not implemented!")
+//
+//	if (lexer == nil) {
+//		if (p.getTokenStream() != nil) {
+//			var tokenSource = p.getTokenStream().getTokenSource()
+//			if _, ok := tokenSource.(ILexer); ok {
+//				lexer = tokenSource
+//			}
+//		}
+//	}
+//	if (lexer == nil) {
+//		panic("Parser can't discover a lexer to use")
+//	}
+
 //	var m = NewParseTreePatternMatcher(lexer, p)
 //	return m.compile(pattern, patternRuleIndex)
 }

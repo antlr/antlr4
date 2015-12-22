@@ -1,23 +1,9 @@
 package antlr4
 
-type DFAStatesSet struct {
-	states map[string]DFAState
-}
-
-func NewDFAStatesSet() *DFAStatesSet {
-	n := new(DFAStatesSet)
-	n.states = make(map[string]DFAState)
-	return n
-}
-
-func (this *DFAStatesSet) length() int {
-	return len(this.states)
-}
-
 type DFA struct {
 	atnStartState *DecisionState
 	decision int
-	_states *DFAStatesSet
+	_states map[string]*DFAState
 	s0 *DFAState
 	precedenceDfa bool
 }
@@ -31,7 +17,7 @@ func NewDFA(atnStartState *DecisionState, decision int) *DFA {
 	this.decision = decision
 	// A set of all DFA states. Use {@link Map} so we can get old state back
 	// ({@link Set} only allows you to see if it's there).
-	this._states = NewDFAStatesSet()
+	this._states = make(map[string]*DFAState)
 	this.s0 = nil
 	// {@code true} if this DFA is for a precedence decision otherwise,
 	// {@code false}. This is the backing field for {@link //isPrecedenceDfa},
@@ -103,7 +89,7 @@ func (this *DFA) setPrecedenceStartState(precedence int, startState *DFAState)  
 
 func (this *DFA) setPrecedenceDfa(precedenceDfa bool) {
 	if (this.precedenceDfa!=precedenceDfa) {
-		this._states = NewDFAStatesSet()
+		this._states = make(map[string]*DFAState)
 		if (precedenceDfa) {
 			var precedenceState = NewDFAState(-1, NewATNConfigSet(false))
 			precedenceState.edges = make([]*DFAState,0)
@@ -117,7 +103,7 @@ func (this *DFA) setPrecedenceDfa(precedenceDfa bool) {
 	}
 }
 
-func (this *DFA) states(precedenceDfa bool) *DFAStatesSet {
+func (this *DFA) getStates() map[string]*DFAState {
 	return this._states
 }
 
