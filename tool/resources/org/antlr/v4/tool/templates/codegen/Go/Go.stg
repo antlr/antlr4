@@ -1,6 +1,15 @@
+/** ANTLR tool checks output templates are compatible with tool code generation.
+ *  For now, a simple string Match used on x.y of x.y.z scheme.
+ *  Must Match Tool.VERSION during load to templates.
+ *
+ *  REQUIRED.
+ */
+
 fileHeader(grammarFileName, ANTLRVersion) ::= <<
 // Generated from <grammarFileName; format="java-escape"> by ANTLR <ANTLRVersion>
 >>
+
+// args must be <object-model-object>, <fields-resulting-in-STs>
 
 ParserFile(file, parser, namedActions) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
@@ -16,6 +25,8 @@ import (
 <parser>
 
 >>
+
+
 
 ListenerFile(file, header) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
@@ -41,6 +52,7 @@ func (l *<file.grammarName>Listener) exit<lname; format="cap">(ctx antlr4.IParse
 }; separator="\n">
 
 >>
+
 
 VisitorFile(file, header) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
@@ -80,12 +92,7 @@ var symbolicNames = []string{ <parser.symbolicNames:{t | <t>}; null="nil", separ
 var ruleNames =  []string{ <parser.ruleNames:{r | "<r>"}; separator=", ", wrap, anchor> }
 
 type <parser.name> struct {
-    *<superClass; null="antlr4.Parser">
-
-    ruleNames []string
-    literalNames []string
-    symbolicNames []string
-    grammarFileName string
+    <superClass; null="*antlr4.Parser">
 }
 
 func New<parser.name>(input antlr4.TokenStream) *<parser.name> {
@@ -102,11 +109,11 @@ func New<parser.name>(input antlr4.TokenStream) *<parser.name> {
     parser.InitParser(input)
 
     parser.Interpreter = antlr4.NewParserATNSimulator(parser, deserializedATN, decisionToDFA, sharedContextCache)
-    parser.ruleNames = ruleNames
-    parser.literalNames = literalNames
-    parser.symbolicNames = symbolicNames
+    parser.RuleNames = ruleNames
+    parser.LiteralNames = literalNames
+    parser.SymbolicNames = symbolicNames
 	<namedActions.members>
-    parser.grammarFileName = "<parser.grammarFileName; format="java-escape">"
+    parser.GrammarFileName = "<parser.grammarFileName; format="java-escape">"
 
     return parser
 }
@@ -722,7 +729,7 @@ labelref(x) ::= "<if(!x.isLocal)>localctx.<endif><x.name>"
 ctx(actionChunk) ::= "localctx"
 
 // used for left-recursive rules
-recRuleAltPredicate(ruleName,opPrec)  ::= "p.precpred(p.GetParserRuleContext(), <opPrec>)"
+recRuleAltPredicate(ruleName,opPrec)  ::= "p.Precpred(p.GetParserRuleContext(), <opPrec>)"
 recRuleSetReturnAction(src,name)	  ::= "$<name>=$<src>.<name>"
 recRuleSetStopToken()                 ::= "p.GetParserRuleContext().stop = p.GetTokenStream().LT(-1);"
 
@@ -788,10 +795,6 @@ type <lexer.name> struct {
     <if(superClass)><superClass><else>*antlr4.Lexer<endif>
 
     modeNames []string
-    literalNames []string
-    symbolicNames []string
-    ruleNames []string
-    grammarFileName string
     EOF string
 }
 
@@ -810,10 +813,10 @@ func New<lexer.name>(input antlr4.CharStream) *<lexer.name> {
     lex.Interpreter = antlr4.NewLexerATNSimulator(lex, lexerAtn, lexerDecisionToDFA, antlr4.NewPredictionContextCache())
 
     lex.modeNames = lexerModeNames
-    lex.ruleNames = lexerRuleNames
-    lex.literalNames = lexerLiteralNames
-    lex.symbolicNames = lexerSymbolicNames
-    lex.grammarFileName = "<lexer.grammarFileName>"
+    lex.RuleNames = lexerRuleNames
+    lex.LiteralNames = lexerLiteralNames
+    lex.SymbolicNames = lexerSymbolicNames
+    lex.GrammarFileName = "<lexer.grammarFileName>"
     lex.EOF = antlr4.TokenEOF
 
     return lex

@@ -1,9 +1,5 @@
 package antlr4
 
-import (
-	"fmt"
-)
-
 type IParser interface {
 	IRecognizer
 
@@ -13,8 +9,6 @@ type IParser interface {
 	GetTokenFactory() TokenFactory
 	GetParserRuleContext() IParserRuleContext
 	Consume() *Token
-	GetLiteralNames() []string
-	GetSymbolicNames() []string
 
 	getInputStream() CharStream
 	getCurrentToken() *Token
@@ -29,9 +23,6 @@ type Parser struct {
 	*Recognizer
 
 	Interpreter *ParserATNSimulator
-	LiteralNames  []string
-	SymbolicNames []string
-	GrammarFileName string
 
 	_input           TokenStream
 	_errHandler      IErrorStrategy
@@ -644,7 +635,7 @@ func (this *Parser) getRuleInvocationStack(p IParserRuleContext) []string {
 		if ruleIndex < 0 {
 			stack = append(stack, "n/a")
 		} else {
-			stack = append(stack, this.getRuleNames()[ruleIndex])
+			stack = append(stack, this.GetRuleNames()[ruleIndex])
 		}
 		p = p.GetParent().(IParserRuleContext)
 	}

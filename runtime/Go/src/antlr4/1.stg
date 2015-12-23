@@ -93,11 +93,6 @@ var ruleNames =  []string{ <parser.ruleNames:{r | "<r>"}; separator=", ", wrap, 
 
 type <parser.name> struct {
     <superClass; null="*antlr4.Parser">
-
-    ruleNames []string
-    literalNames []string
-    symbolicNames []string
-    grammarFileName string
 }
 
 func New<parser.name>(input antlr4.TokenStream) *<parser.name> {
@@ -114,11 +109,11 @@ func New<parser.name>(input antlr4.TokenStream) *<parser.name> {
     parser.InitParser(input)
 
     parser.Interpreter = antlr4.NewParserATNSimulator(parser, deserializedATN, decisionToDFA, sharedContextCache)
-    parser.ruleNames = ruleNames
-    parser.literalNames = literalNames
-    parser.symbolicNames = symbolicNames
+    parser.RuleNames = ruleNames
+    parser.LiteralNames = literalNames
+    parser.SymbolicNames = symbolicNames
 	<namedActions.members>
-    parser.grammarFileName = "<parser.grammarFileName; format="java-escape">"
+    parser.GrammarFileName = "<parser.grammarFileName; format="java-escape">"
 
     return parser
 }
@@ -800,10 +795,6 @@ type <lexer.name> struct {
     <if(superClass)><superClass><else>*antlr4.Lexer<endif>
 
     modeNames []string
-    literalNames []string
-    symbolicNames []string
-    ruleNames []string
-    grammarFileName string
     EOF string
 }
 
@@ -822,10 +813,10 @@ func New<lexer.name>(input antlr4.CharStream) *<lexer.name> {
     lex.Interpreter = antlr4.NewLexerATNSimulator(lex, lexerAtn, lexerDecisionToDFA, antlr4.NewPredictionContextCache())
 
     lex.modeNames = lexerModeNames
-    lex.ruleNames = lexerRuleNames
-    lex.literalNames = lexerLiteralNames
-    lex.symbolicNames = lexerSymbolicNames
-    lex.grammarFileName = "<lexer.grammarFileName>"
+    lex.RuleNames = lexerRuleNames
+    lex.LiteralNames = lexerLiteralNames
+    lex.SymbolicNames = lexerSymbolicNames
+    lex.GrammarFileName = "<lexer.grammarFileName>"
     lex.EOF = antlr4.TokenEOF
 
     return lex

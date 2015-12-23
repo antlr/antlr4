@@ -8,20 +8,29 @@ import (
 )
 
 type IRecognizer interface {
-	GetState() int
-	SetState(int)
-	getATN() *ATN
-	Action(_localctx IRuleContext, ruleIndex, actionIndex int)
-	getRuleNames() []string
-	getErrorListenerDispatch() IErrorListener
 
+	GetLiteralNames() []string
+	GetSymbolicNames() []string
+	GetRuleNames() []string
 	Sempred(localctx IRuleContext, ruleIndex int, actionIndex int) bool
 	Precpred(localctx IRuleContext, precedence int) bool
+
+	GetState() int
+	SetState(int)
+	Action(_localctx IRuleContext, ruleIndex, actionIndex int)
+	getATN() *ATN
+	getErrorListenerDispatch() IErrorListener
+
 }
 
 type Recognizer struct {
 	_listeners []IErrorListener
 	state      int
+
+	RuleNames  []string
+	LiteralNames  []string
+	SymbolicNames []string
+	GrammarFileName string
 }
 
 func NewRecognizer() *Recognizer {
@@ -57,12 +66,20 @@ func (this *Recognizer) removeErrorListeners() {
 	this._listeners = make([]IErrorListener, 0)
 }
 
-func (this *Recognizer) getRuleNames() []string {
-	return nil
+func (this *Recognizer) GetRuleNames() []string {
+	return this.RuleNames
 }
 
 func (this *Recognizer) GetTokenNames() []string {
-	return nil
+	return this.LiteralNames
+}
+
+func (this *Recognizer) GetSymbolicNames() []string {
+	return this.SymbolicNames
+}
+
+func (this *Recognizer) GetLiteralNames() []string {
+	return this.LiteralNames
 }
 
 func (this *Recognizer) GetState() int {
@@ -93,7 +110,7 @@ func (this *Recognizer) SetState(v int) {
 //
 func (this *Recognizer) getRuleIndexMap() map[string]int {
 	panic("Method not defined!")
-	//    var ruleNames = this.getRuleNames()
+	//    var ruleNames = this.GetRuleNames()
 	//    if (ruleNames==nil) {
 	//        panic("The current recognizer does not provide a list of rule names.")
 	//    }

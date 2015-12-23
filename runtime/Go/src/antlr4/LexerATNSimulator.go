@@ -374,7 +374,7 @@ func (this *LexerATNSimulator) closure(input CharStream, config *LexerATNConfig,
 	if ok {
 		if LexerATNSimulatordebug {
 			if this.recog != nil {
-				fmt.Println("closure at %s rule stop %s\n", this.recog.getRuleNames()[config.state.getRuleIndex()], config)
+				fmt.Println("closure at %s rule stop %s\n", this.recog.GetRuleNames()[config.state.getRuleIndex()], config)
 			} else {
 				fmt.Println("closure at rule stop %s\n", config)
 			}

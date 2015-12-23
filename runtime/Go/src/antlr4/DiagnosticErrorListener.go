@@ -72,7 +72,7 @@ func (this *DiagnosticErrorListener) getDecisionDescription(recognizer *Parser, 
 	var decision = dfa.decision
 	var ruleIndex = dfa.atnStartState.ruleIndex
 
-	var ruleNames = recognizer.getRuleNames()
+	var ruleNames = recognizer.GetRuleNames()
 	if ruleIndex < 0 || ruleIndex >= len(ruleNames) {
 		return strconv.Itoa(decision)
 	}

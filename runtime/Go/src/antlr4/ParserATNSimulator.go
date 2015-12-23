@@ -105,7 +105,7 @@ func (this *ParserATNSimulator) AdaptivePredict(input TokenStream, decision int,
 		if ParserATNSimulatorprototypedebug || ParserATNSimulatorprototypedebug_list_atn_decisions {
 			fmt.Println("predictATN decision " + strconv.Itoa(dfa.decision) +
 				" exec LA(1)==" + this.getLookaheadName(input) +
-				", outerContext=" + outerContext.toString(this.parser.getRuleNames(), nil))
+				", outerContext=" + outerContext.toString(this.parser.GetRuleNames(), nil))
 		}
 		// If this is not a precedence DFA, we check the ATN start state
 		// to determine if this ATN start state is the decision for the
@@ -1097,7 +1097,7 @@ func (this *ParserATNSimulator) closure_(config IATNConfig, configs *ATNConfigSe
 
 func (this *ParserATNSimulator) getRuleName(index int) string {
 	if this.parser != nil && index >= 0 {
-		return this.parser.getRuleNames()[index]
+		return this.parser.GetRuleNames()[index]
 	} else {
 		return "<rule " + fmt.Sprint(index) + ">"
 	}

@@ -139,7 +139,7 @@ func (l *Lexer) getInputStream() CharStream {
 }
 
 func (l *Lexer) GetSourceName() string {
-	return l.grammarFileName
+	return l.GrammarFileName
 }
 
 func (l *Lexer) setChannel(v int) {

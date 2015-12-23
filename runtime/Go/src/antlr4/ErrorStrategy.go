@@ -323,7 +323,7 @@ func (this *DefaultErrorStrategy) reportInputMisMatch(recognizer IParser, e *Inp
 // @param e the recognition exception
 //
 func (this *DefaultErrorStrategy) reportFailedPredicate(recognizer IParser, e *FailedPredicateException) {
-	var ruleName = recognizer.getRuleNames()[recognizer.GetParserRuleContext().getRuleIndex()]
+	var ruleName = recognizer.GetRuleNames()[recognizer.GetParserRuleContext().getRuleIndex()]
 	var msg = "rule " + ruleName + " " + e.message
 	recognizer.notifyErrorListeners(msg, e.offendingToken, e)
 }

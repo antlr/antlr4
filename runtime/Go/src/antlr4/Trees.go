@@ -10,7 +10,7 @@ import "fmt"
 func TreestoStringTree(tree Tree, ruleNames []string, recog IRecognizer) string {
 
 	if recog != nil {
-		ruleNames = recog.getRuleNames()
+		ruleNames = recog.GetRuleNames()
 	}
 
 	var s = TreesgetNodeText(tree, ruleNames, nil)
@@ -36,7 +36,7 @@ func TreestoStringTree(tree Tree, ruleNames []string, recog IRecognizer) string 
 func TreesgetNodeText(t Tree, ruleNames []string, recog *Parser) string {
 
 	if recog != nil {
-		ruleNames = recog.getRuleNames()
+		ruleNames = recog.GetRuleNames()
 	}
 
 	if ruleNames != nil {
