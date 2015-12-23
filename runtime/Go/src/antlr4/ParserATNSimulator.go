@@ -139,7 +139,7 @@ func (this *ParserATNSimulator) AdaptivePredict(input TokenStream, decision int,
 	}
 	var alt = this.execATN(dfa, s0, input, index, outerContext)
 	if ParserATNSimulatorprototypedebug {
-		fmt.Println("DFA after predictATN: " + dfa.toString(this.parser.getLiteralNames(), nil))
+		fmt.Println("DFA after predictATN: " + dfa.toString(this.parser.GetLiteralNames(), nil))
 	}
 	return alt
 
@@ -1293,12 +1293,12 @@ func (this *ParserATNSimulator) GetTokenName(t int) string {
 	if t == TokenEOF {
 		return "EOF"
 	}
-	if this.parser != nil && this.parser.getLiteralNames() != nil {
-		if t >= len(this.parser.getLiteralNames()) {
-			fmt.Println(strconv.Itoa(t) + " ttype out of range: " + strings.Join(this.parser.getLiteralNames(), ","))
+	if this.parser != nil && this.parser.GetLiteralNames() != nil {
+		if t >= len(this.parser.GetLiteralNames()) {
+			fmt.Println(strconv.Itoa(t) + " ttype out of range: " + strings.Join(this.parser.GetLiteralNames(), ","))
 			//            fmt.Println(this.parser.getInputStream().GetTokens())
 		} else {
-			return this.parser.getLiteralNames()[t] + "<" + strconv.Itoa(t) + ">"
+			return this.parser.GetLiteralNames()[t] + "<" + strconv.Itoa(t) + ">"
 		}
 	}
 	return "" + strconv.Itoa(t)
@@ -1398,7 +1398,7 @@ func (this *ParserATNSimulator) addDFAEdge(dfa *DFA, from_ *DFAState, t int, to 
 	if ParserATNSimulatorprototypedebug {
 		var names []string
 		if this.parser != nil {
-			names = this.parser.getLiteralNames()
+			names = this.parser.GetLiteralNames()
 		}
 
 		fmt.Println("DFA=\n" + dfa.toString(names, nil))

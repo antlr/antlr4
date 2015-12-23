@@ -309,7 +309,7 @@ func (this *DefaultErrorStrategy) reportNoViableAlternative(recognizer IParser, 
 //
 func (this *DefaultErrorStrategy) reportInputMisMatch(recognizer IParser, e *InputMisMatchException) {
 	var msg = "misMatched input " + this.GetTokenErrorDisplay(e.offendingToken) +
-		" expecting " + e.getExpectedTokens().toStringVerbose(recognizer.getLiteralNames(), recognizer.getSymbolicNames(), false)
+		" expecting " + e.getExpectedTokens().toStringVerbose(recognizer.GetLiteralNames(), recognizer.GetSymbolicNames(), false)
 	recognizer.notifyErrorListeners(msg, e.offendingToken, e)
 }
 
@@ -354,7 +354,7 @@ func (this *DefaultErrorStrategy) reportUnwantedToken(recognizer IParser) {
 	var tokenName = this.GetTokenErrorDisplay(t)
 	var expecting = this.getExpectedTokens(recognizer)
 	var msg = "extraneous input " + tokenName + " expecting " +
-		expecting.toStringVerbose(recognizer.getLiteralNames(), recognizer.getSymbolicNames(), false)
+		expecting.toStringVerbose(recognizer.GetLiteralNames(), recognizer.GetSymbolicNames(), false)
 	recognizer.notifyErrorListeners(msg, t, nil)
 }
 
@@ -381,7 +381,7 @@ func (this *DefaultErrorStrategy) reportMissingToken(recognizer IParser) {
 	this.beginErrorCondition(recognizer)
 	var t = recognizer.getCurrentToken()
 	var expecting = this.getExpectedTokens(recognizer)
-	var msg = "missing " + expecting.toStringVerbose(recognizer.getLiteralNames(), recognizer.getSymbolicNames(), false) +
+	var msg = "missing " + expecting.toStringVerbose(recognizer.GetLiteralNames(), recognizer.GetSymbolicNames(), false) +
 		" at " + this.GetTokenErrorDisplay(t)
 	recognizer.notifyErrorListeners(msg, t, nil)
 }
@@ -550,7 +550,7 @@ func (this *DefaultErrorStrategy) getMissingSymbol(recognizer IParser) *Token {
 	if expectedTokenType == TokenEOF {
 		tokenText = "<missing EOF>"
 	} else {
-		tokenText = "<missing " + recognizer.getLiteralNames()[expectedTokenType] + ">"
+		tokenText = "<missing " + recognizer.GetLiteralNames()[expectedTokenType] + ">"
 	}
 	var current = currentSymbol
 	var lookback = recognizer.GetTokenStream().LT(-1)

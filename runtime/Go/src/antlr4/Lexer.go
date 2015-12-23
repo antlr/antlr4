@@ -138,7 +138,7 @@ func (l *Lexer) getInputStream() CharStream {
 	return l._input
 }
 
-func (l *Lexer) getSourceName() string {
+func (l *Lexer) GetSourceName() string {
 	return l.grammarFileName
 }
 

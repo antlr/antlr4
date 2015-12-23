@@ -4,57 +4,34 @@ import (
 	"fmt"
 )
 
-type TraceListener struct {
-	parser *Parser
-}
-
-func NewTraceListener(parser *Parser) *TraceListener {
-	tl := new(TraceListener)
-	tl.parser = parser
-	return tl
-}
-
-func (this *TraceListener) visitErrorNode(_ ErrorNode) {
-}
-
-func (this *TraceListener) enterEveryRule(ctx IParserRuleContext) {
-	fmt.Println("enter   " + this.parser.getRuleNames()[ctx.getRuleIndex()] + ", LT(1)=" + this.parser._input.LT(1).text())
-}
-
-func (this *TraceListener) visitTerminal(node TerminalNode) {
-	fmt.Println("consume " + fmt.Sprint(node.getSymbol()) + " rule " + this.parser.getRuleNames()[this.parser._ctx.getRuleIndex()])
-}
-
-func (this *TraceListener) exitEveryRule(ctx IParserRuleContext) {
-	fmt.Println("exit    " + this.parser.getRuleNames()[ctx.getRuleIndex()] + ", LT(1)=" + this.parser._input.LT(1).text())
-}
-
 type IParser interface {
 	IRecognizer
 
 	GetInterpreter() *ParserATNSimulator
-	GetErrorHandler()  IErrorStrategy
+	GetErrorHandler() IErrorStrategy
 	GetTokenStream() TokenStream
 	GetTokenFactory() TokenFactory
 	GetParserRuleContext() IParserRuleContext
+	Consume() *Token
+	GetLiteralNames() []string
+	GetSymbolicNames() []string
 
 	getInputStream() CharStream
-	Consume() *Token
 	getCurrentToken() *Token
-	getLiteralNames() []string
-	getSymbolicNames() []string
 	getExpectedTokens() *IntervalSet
 	notifyErrorListeners(msg string, offendingToken *Token, err IRecognitionException)
 	isExpectedToken(symbol int) bool
 	getPrecedence() int
 	getRuleInvocationStack(IParserRuleContext) []string
-
 }
 
 type Parser struct {
 	*Recognizer
 
 	Interpreter *ParserATNSimulator
+	LiteralNames  []string
+	SymbolicNames []string
+	GrammarFileName string
 
 	_input           TokenStream
 	_errHandler      IErrorStrategy
@@ -65,8 +42,6 @@ type Parser struct {
 	_parseListeners  []ParseTreeListener
 	_syntaxErrors    int
 
-	literalNames  []string
-	symbolicNames []string
 }
 
 // p.is all the parsing support code essentially most of it is error
@@ -311,12 +286,12 @@ func (p *Parser) triggerExitRuleEvent() {
 	}
 }
 
-func (this *Parser) getLiteralNames() []string {
-	return this.literalNames
+func (this *Parser) GetLiteralNames() []string {
+	return this.LiteralNames
 }
 
-func (this *Parser) getSymbolicNames() []string {
-	return this.symbolicNames
+func (this *Parser) GetSymbolicNames() []string {
+	return this.SymbolicNames
 }
 
 func (this *Parser) GetInterpreter() *ParserATNSimulator {
@@ -694,21 +669,14 @@ func (p *Parser) dumpDFA() {
 	//				fmt.Println()
 	//			}
 	//			p.printer.println("Decision " + dfa.decision + ":")
-	//			p.printer.print(dfa.toString(p.literalNames, p.symbolicNames))
+	//			p.printer.print(dfa.toString(p.LiteralNames, p.SymbolicNames))
 	//			seenOne = true
 	//		}
 	//	}
 }
 
-/*
-"			printer = function() {\r\n" +
-"				p.println = function(s) { document.getElementById('output') += s + '\\n' }\r\n" +
-"				p.print = function(s) { document.getElementById('output') += s }\r\n" +
-"			}\r\n" +
-*/
-
-func (p *Parser) getSourceName() string {
-	return p._input.getSourceName()
+func (p *Parser) GetSourceName() string {
+	return p.GrammarFileName
 }
 
 // During a parse is sometimes useful to listen in on the rule entry and exit

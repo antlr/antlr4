@@ -328,8 +328,8 @@ func (bt *BufferedTokenStream) filterForChannel(left, right, channel int) []*Tok
 	return hidden
 }
 
-func (bt *BufferedTokenStream) getSourceName() string {
-	return bt.tokenSource.getSourceName()
+func (bt *BufferedTokenStream) GetSourceName() string {
+	return bt.tokenSource.GetSourceName()
 }
 
 // Get the text of all tokens in bt buffer.///

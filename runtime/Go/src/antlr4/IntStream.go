@@ -8,5 +8,5 @@ type IntStream interface {
 	index() int
 	seek(index int)
 	size() int
-	getSourceName() string
+	GetSourceName() string
 }

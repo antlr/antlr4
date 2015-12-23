@@ -1,7 +1,7 @@
 package antlr4
 
 type ATN struct {
-	DecisionToState []*DecisionState
+	DecisionToState      []*DecisionState
 	grammarType          int
 	maxTokenType         int
 	states               []IATNState
