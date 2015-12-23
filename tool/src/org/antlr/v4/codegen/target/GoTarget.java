@@ -186,7 +186,7 @@ public class GoTarget extends Target {
 				return ((String)o).replace("\\u", "\\u005Cu");
 			}
 
-			return super.toString(o, formatString, locale).replace("\\'", "\'");
+			return super.toString(o, formatString, locale);
 		}
 
 	}

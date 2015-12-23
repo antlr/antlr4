@@ -98,7 +98,7 @@ type <parser.name> struct {
     grammarFileName string
 }
 
-func New<parser.name>(input TokenStream) <parser.name> {
+func New<parser.name>(input antlr4.TokenStream) *<parser.name> {
 
     var decisionToDFA = make([]antlr4.DFA,len(deserializedAtn.DecisionToState))
     var sharedContextCache = antlr4.NewPredictionContextCache()
