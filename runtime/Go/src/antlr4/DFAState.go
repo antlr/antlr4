@@ -75,7 +75,7 @@ func NewDFAState(stateNumber int, configs *ATNConfigSet) *DFAState {
 	// {@link Token//EOF} maps to {@code edges[0]}.
 	this.edges = nil
 	this.isAcceptState = false
-	// if accept state, what ttype do we match or alt do we predict?
+	// if accept state, what ttype do we Match or alt do we predict?
 	// This is set to {@link ATN//INVALID_ALT_NUMBER} when {@link
 	// //predicates}{@code !=nil} or
 	// {@link //requiresFullContext}.

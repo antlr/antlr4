@@ -18,7 +18,7 @@ type IATNConfig interface {
 	getPrecedenceFilterSuppressed() bool
 	setPrecedenceFilterSuppressed(bool)
 
-	getState() IATNState
+	GetState() IATNState
 	getAlt() int
 	getSemanticContext() SemanticContext
 
@@ -70,7 +70,7 @@ func NewATNConfig3(c IATNConfig, state IATNState, semanticContext SemanticContex
 }
 
 func NewATNConfig2(c IATNConfig, semanticContext SemanticContext) *ATNConfig {
-	return NewATNConfig(c, c.getState(), c.getContext(), semanticContext)
+	return NewATNConfig(c, c.GetState(), c.getContext(), semanticContext)
 }
 
 func NewATNConfig1(c IATNConfig, state IATNState, context IPredictionContext) *ATNConfig {
@@ -92,7 +92,7 @@ func (this *ATNConfig) setPrecedenceFilterSuppressed(v bool) {
 	this.precedenceFilterSuppressed = v
 }
 
-func (this *ATNConfig) getState() IATNState {
+func (this *ATNConfig) GetState() IATNState {
 	return this.state
 }
 
@@ -153,7 +153,7 @@ func (this *ATNConfig) equals(other interface{}) bool {
 }
 
 func (this *ATNConfig) shortHashString() string {
-	return "" + strconv.Itoa(this.state.getStateNumber()) + "/" + strconv.Itoa(this.alt) + "/" + this.semanticContext.toString()
+	return "" + strconv.Itoa(this.state.GetStateNumber()) + "/" + strconv.Itoa(this.alt) + "/" + this.semanticContext.toString()
 }
 
 func (this *ATNConfig) hashString() string {
@@ -165,7 +165,7 @@ func (this *ATNConfig) hashString() string {
 		c = this.context.hashString()
 	}
 
-	return "" + strconv.Itoa(this.state.getStateNumber()) + "/" + strconv.Itoa(this.alt) + "/" + c + "/" + this.semanticContext.toString()
+	return "" + strconv.Itoa(this.state.GetStateNumber()) + "/" + strconv.Itoa(this.alt) + "/" + c + "/" + this.semanticContext.toString()
 }
 
 func (this *ATNConfig) toString() string {
@@ -268,7 +268,7 @@ func (this *LexerATNConfig) hashString() string {
 		f = "0"
 	}
 
-	return "" + strconv.Itoa(this.state.getStateNumber()) + strconv.Itoa(this.alt) + fmt.Sprint(this.context) +
+	return "" + strconv.Itoa(this.state.GetStateNumber()) + strconv.Itoa(this.alt) + fmt.Sprint(this.context) +
 		fmt.Sprint(this.semanticContext) + f + fmt.Sprint(this.lexerActionExecutor)
 }
 

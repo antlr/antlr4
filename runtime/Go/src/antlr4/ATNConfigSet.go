@@ -21,7 +21,7 @@ func equalATNConfigs(a, b interface{}) bool {
 	if a == nil || b == nil {
 		return false
 	}
-	return a.(*ATNConfig).state.getStateNumber() == b.(*ATNConfig).state.getStateNumber() &&
+	return a.(*ATNConfig).state.GetStateNumber() == b.(*ATNConfig).state.GetStateNumber() &&
 		a.(*ATNConfig).alt == b.(*ATNConfig).alt &&
 		a.(*ATNConfig).semanticContext.equals(b.(*ATNConfig).semanticContext)
 }
@@ -129,10 +129,10 @@ func (this *ATNConfigSet) add(config IATNConfig, mergeCache *DoubleDict) bool {
 	return true
 }
 
-func (this *ATNConfigSet) getStates() *Set {
+func (this *ATNConfigSet) GetStates() *Set {
 	var states = NewSet(nil, nil)
 	for i := 0; i < len(this.configs); i++ {
-		states.add(this.configs[i].getState())
+		states.add(this.configs[i].GetState())
 	}
 	return states
 }

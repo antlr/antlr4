@@ -9,5 +9,5 @@ type TokenSource interface {
 	getInputStream() CharStream
 	getSourceName() string
 	setTokenFactory(factory TokenFactory)
-	getTokenFactory() TokenFactory
+	GetTokenFactory() TokenFactory
 }

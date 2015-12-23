@@ -2,7 +2,6 @@ package antlr4
 
 type ATN struct {
 	DecisionToState []*DecisionState
-
 	grammarType          int
 	maxTokenType         int
 	states               []IATNState
@@ -80,13 +79,13 @@ func (this *ATN) nextTokens(s IATNState, ctx IRuleContext) *IntervalSet {
 func (this *ATN) addState(state IATNState) {
 	if state != nil {
 		state.setATN(this)
-		state.setStateNumber(len(this.states))
+		state.SetStateNumber(len(this.states))
 	}
 	this.states = append(this.states, state)
 }
 
 func (this *ATN) removeState(state IATNState) {
-	this.states[state.getStateNumber()] = nil // just free mem, don't shift states in list
+	this.states[state.GetStateNumber()] = nil // just free mem, don't shift states in list
 }
 
 func (this *ATN) defineDecisionState(s *DecisionState) int {
@@ -108,7 +107,7 @@ func (this *ATN) getDecisionState(decision int) *DecisionState {
 // considers the complete parser context, but does not evaluate semantic
 // predicates (i.e. all predicates encountered during the calculation are
 // assumed true). If a path in the ATN exists from the starting state to the
-// {@link RuleStopState} of the outermost context without matching any
+// {@link RuleStopState} of the outermost context without Matching any
 // symbols, {@link Token//EOF} is added to the returned set.
 //
 // <p>If {@code context} is {@code nil}, it is treated as
@@ -141,7 +140,7 @@ func (this *ATN) getExpectedTokens(stateNumber int, ctx IRuleContext) *IntervalS
 		following = this.nextTokens(rt.(*RuleTransition).followState, nil)
 		expected.addSet(following)
 		expected.removeOne(TokenEpsilon)
-		ctx = ctx.getParent().(IRuleContext)
+		ctx = ctx.GetParent().(IRuleContext)
 	}
 	if following.contains(TokenEpsilon) {
 		expected.addOne(TokenEOF)

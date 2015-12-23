@@ -23,7 +23,7 @@ const (
 // Calculates the SLL(1) expected lookahead set for each outgoing transition
 // of an {@link ATNState}. The returned array has one element for each
 // outgoing transition in {@code s}. If the closure from transition
-// <em>i</em> leads to a semantic predicate before matching a symbol, the
+// <em>i</em> leads to a semantic predicate before Matching a symbol, the
 // element at index <em>i</em> of the result will be {@code nil}.
 //
 // @param s the ATN state
@@ -154,7 +154,7 @@ func (la *LL1Analyzer) _LOOK(s, stopState IATNState, ctx IPredictionContext, loo
 				}()
 
 				calledRuleStack.clear(returnState.getRuleIndex())
-				la._LOOK(returnState, stopState, ctx.getParent(i), look, lookBusy, calledRuleStack, seeThruPreds, addEOF)
+				la._LOOK(returnState, stopState, ctx.GetParent(i), look, lookBusy, calledRuleStack, seeThruPreds, addEOF)
 
 			}
 			return
@@ -172,7 +172,7 @@ func (la *LL1Analyzer) _LOOK(s, stopState IATNState, ctx IPredictionContext, loo
 				continue
 			}
 
-			newContext := SingletonPredictionContextcreate(ctx, t1.followState.getStateNumber())
+			newContext := SingletonPredictionContextcreate(ctx, t1.followState.GetStateNumber())
 
 			defer func() {
 				calledRuleStack.remove(t1.getTarget().getRuleIndex())

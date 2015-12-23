@@ -8,14 +8,15 @@ import (
 )
 
 type IRecognizer interface {
-	getState() int
+	GetState() int
+	SetState(int)
 	getATN() *ATN
-	action(_localctx IRuleContext, ruleIndex, actionIndex int)
+	Action(_localctx IRuleContext, ruleIndex, actionIndex int)
 	getRuleNames() []string
 	getErrorListenerDispatch() IErrorListener
 
-	sempred(localctx IRuleContext, ruleIndex int, actionIndex int) bool
-	precpred(localctx IRuleContext, precedence int) bool
+	Sempred(localctx IRuleContext, ruleIndex int, actionIndex int) bool
+	Precpred(localctx IRuleContext, precedence int) bool
 }
 
 type Recognizer struct {
@@ -44,7 +45,7 @@ func (this *Recognizer) checkVersion(toolVersion string) {
 	}
 }
 
-func (this *Recognizer) action(context IRuleContext, ruleIndex, actionIndex int) {
+func (this *Recognizer) Action(context IRuleContext, ruleIndex, actionIndex int) {
 	panic("action not implemented on Recognizer!")
 }
 
@@ -60,16 +61,20 @@ func (this *Recognizer) getRuleNames() []string {
 	return nil
 }
 
-func (this *Recognizer) getTokenNames() []string {
+func (this *Recognizer) GetTokenNames() []string {
 	return nil
 }
 
-func (this *Recognizer) getState() int {
+func (this *Recognizer) GetState() int {
 	return this.state
 }
 
-//func (this *Recognizer) getTokenTypeMap() {
-//    var tokenNames = this.getTokenNames()
+func (this *Recognizer) SetState(v int) {
+	this.state = v
+}
+
+//func (this *Recognizer) GetTokenTypeMap() {
+//    var tokenNames = this.GetTokenNames()
 //    if (tokenNames==nil) {
 //        panic("The current recognizer does not provide a list of token names.")
 //    }
@@ -101,9 +106,9 @@ func (this *Recognizer) getRuleIndexMap() map[string]int {
 	//    return result
 }
 
-func (this *Recognizer) getTokenType(tokenName string) int {
+func (this *Recognizer) GetTokenType(tokenName string) int {
 	panic("Method not defined!")
-	//    var ttype = this.getTokenTypeMap()[tokenName]
+	//    var ttype = this.GetTokenTypeMap()[tokenName]
 	//    if (ttype !=nil) {
 	//        return ttype
 	//    } else {
@@ -111,10 +116,10 @@ func (this *Recognizer) getTokenType(tokenName string) int {
 	//    }
 }
 
-//func (this *Recognizer) getTokenTypeMap() map[string]int {
+//func (this *Recognizer) GetTokenTypeMap() map[string]int {
 //    Vocabulary vocabulary = getVocabulary();
 //
-//    synchronized (tokenTypeMapCache) {
+//    Synchronized (tokenTypeMapCache) {
 //        Map<String, Integer> result = tokenTypeMapCache.get(vocabulary);
 //        if (result == null) {
 //            result = new HashMap<String, Integer>();
@@ -157,9 +162,9 @@ func (this *Recognizer) getErrorHeader(e IRecognitionException) string {
 // @deprecated This method is not called by the ANTLR 4 Runtime. Specific
 // implementations of {@link ANTLRErrorStrategy} may provide a similar
 // feature when necessary. For example, see
-// {@link DefaultErrorStrategy//getTokenErrorDisplay}.
+// {@link DefaultErrorStrategy//GetTokenErrorDisplay}.
 //
-func (this *Recognizer) getTokenErrorDisplay(t *Token) string {
+func (this *Recognizer) GetTokenErrorDisplay(t *Token) string {
 	if t == nil {
 		return "<no token>"
 	}
@@ -184,10 +189,10 @@ func (this *Recognizer) getErrorListenerDispatch() IErrorListener {
 
 // subclass needs to override these if there are sempreds or actions
 // that the ATN interp needs to execute
-func (this *Recognizer) sempred(localctx IRuleContext, ruleIndex int, actionIndex int) bool {
+func (this *Recognizer) Sempred(localctx IRuleContext, ruleIndex int, actionIndex int) bool {
 	return true
 }
 
-func (this *Recognizer) precpred(localctx IRuleContext, precedence int) bool {
+func (this *Recognizer) Precpred(localctx IRuleContext, precedence int) bool {
 	return true
 }

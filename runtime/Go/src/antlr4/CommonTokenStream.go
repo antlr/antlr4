@@ -5,7 +5,7 @@
 //
 // <p>
 // This token stream provides access to all tokens by index or when calling
-// methods like {@link //getText}. The channel filtering is only used for code
+// methods like {@link //GetText}. The channel filtering is only used for code
 // accessing tokens via the lookahead methods {@link //LA}, {@link //LT}, and
 // {@link //LB}.</p>
 //
@@ -18,7 +18,7 @@
 //
 // <p>
 // Note: lexer rules which use the {@code ->skip} lexer command or call
-// {@link Lexer//skip} do not produce tokens at all, so input text matched by
+// {@link Lexer//skip} do not produce tokens at all, so input text Matched by
 // such a rule will not be available as part of the token stream, regardless of
 // channel.</p>
 ///
@@ -74,7 +74,7 @@ func (ts *CommonTokenStream) LT(k int) *Token {
 	// find k good tokens
 	for n < k {
 		// skip off-channel tokens, but make sure to not look past EOF
-		if ts.sync(i + 1) {
+		if ts.Sync(i + 1) {
 			i = ts.nextTokenOnChannel(i+1, ts.channel)
 		}
 		n += 1

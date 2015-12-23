@@ -122,7 +122,7 @@ const (
 //
 // <p>{@code [1|1|[], 1|2|[], 8|3|[]] a : A | A | A B }</p>
 //
-// <p>After matching input A, we reach the stop state for rule A, state 1.
+// <p>After Matching input A, we reach the stop state for rule A, state 1.
 // State 8 is the state right before B. Clearly alternatives 1 and 2
 // conflict and no amount of further lookahead will separate the two.
 // However, alternative 3 will be able to continue and so we do not stop
@@ -168,7 +168,7 @@ func PredictionModehasSLLConflictTerminatingPrediction(mode int, configs *ATNCon
 	// Configs in rule stop states indicate reaching the end of the decision
 	// rule (local context) or end of start rule (full context). If all
 	// configs meet this condition, then none of the configurations is able
-	// to match additional input so we terminate prediction.
+	// to Match additional input so we terminate prediction.
 	//
 	if PredictionModeallConfigsInRuleStopStates(configs) {
 		return true
@@ -208,7 +208,7 @@ func PredictionModehasSLLConflictTerminatingPrediction(mode int, configs *ATNCon
 func PredictionModehasConfigInRuleStopState(configs *ATNConfigSet) bool {
 	for i := 0; i < len(configs.configs); i++ {
 		var c = configs.configs[i]
-		if _, ok := c.getState().(*RuleStopState); ok {
+		if _, ok := c.GetState().(*RuleStopState); ok {
 			return true
 		}
 	}
@@ -228,7 +228,7 @@ func PredictionModeallConfigsInRuleStopStates(configs *ATNConfigSet) bool {
 	for i := 0; i < len(configs.configs); i++ {
 		var c = configs.configs[i]
 
-		if _, ok := c.getState().(*RuleStopState); !ok {
+		if _, ok := c.GetState().(*RuleStopState); !ok {
 			return false
 		}
 	}
@@ -495,7 +495,7 @@ func PredictionModegetConflictingAltSubsets(configs *ATNConfigSet) []*BitSet {
 
 	for i := 0; i < len(configs.configs); i++ {
 		var c = configs.configs[i]
-		var key = "key_" + strconv.Itoa(c.getState().getStateNumber()) + "/" + c.getContext().toString()
+		var key = "key_" + strconv.Itoa(c.GetState().GetStateNumber()) + "/" + c.getContext().toString()
 		var alts = configToAlts[key]
 		if alts != nil {
 			alts = NewBitSet()
@@ -523,14 +523,14 @@ func PredictionModegetConflictingAltSubsets(configs *ATNConfigSet) []*BitSet {
 // map[c.{@link ATNConfig//state state}] U= c.{@link ATNConfig//alt alt}
 // </pre>
 //
-func PredictionModegetStateToAltMap(configs *ATNConfigSet) *AltDict {
+func PredictionModeGetStateToAltMap(configs *ATNConfigSet) *AltDict {
 	var m = NewAltDict()
 
 	for _, c := range configs.configs {
-		var alts = m.get(c.getState().toString())
+		var alts = m.get(c.GetState().toString())
 		if alts == nil {
 			alts = NewBitSet()
-			m.put(c.getState().toString(), alts)
+			m.put(c.GetState().toString(), alts)
 		}
 		alts.(*BitSet).add(c.getAlt())
 	}
@@ -538,7 +538,7 @@ func PredictionModegetStateToAltMap(configs *ATNConfigSet) *AltDict {
 }
 
 func PredictionModehasStateAssociatedWithOneAlt(configs *ATNConfigSet) bool {
-	var values = PredictionModegetStateToAltMap(configs).values()
+	var values = PredictionModeGetStateToAltMap(configs).values()
 	for i := 0; i < len(values); i++ {
 		if values[i].(*BitSet).length() == 1 {
 			return true

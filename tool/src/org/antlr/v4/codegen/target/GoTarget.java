@@ -52,7 +52,7 @@ public class GoTarget extends Target {
 		badWords.add("rule");
 		badWords.add("parserRule");
 	}
-//
+
 //	/**
 //	 * {@inheritDoc}
 //	 * <p/>
@@ -132,7 +132,7 @@ public class GoTarget extends Target {
 //		System.out.println("AfTER: " + s);
 //		return s;
 //	}
-//
+
 //	@Override
 //	public String encodeIntAsCharEscape(int v) {
 //		if (v < Character.MIN_VALUE || v > Character.MAX_VALUE) {
@@ -150,7 +150,6 @@ public class GoTarget extends Target {
 //		String hex = Integer.toHexString(v|0x10000).substring(1,5);
 //		String h2 = "\\u"+hex;
 //
-//		System.out.println("Token : " + h2);
 //		return h2;
 //	}
 

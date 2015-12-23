@@ -1,7 +1,7 @@
 package antlr4
 
 type IntStream interface {
-	consume()
+	Consume()
 	LA(int) int
 	mark() int
 	release(marker int)

@@ -289,7 +289,7 @@ func NewLexerCustomAction(ruleIndex, actionIndex int) *LexerCustomAction {
 // <p>Custom actions are implemented by calling {@link Lexer//action} with the
 // appropriate rule and action indexes.</p>
 func (this *LexerCustomAction) execute(lexer ILexer) {
-	lexer.action(nil, this.ruleIndex, this.actionIndex)
+	lexer.Action(nil, this.ruleIndex, this.actionIndex)
 }
 
 func (this *LexerCustomAction) hashString() string {

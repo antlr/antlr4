@@ -74,11 +74,11 @@ func TreesgetChildren(t Tree) []Tree {
 //
 func TreesgetAncestors(t Tree) []Tree {
 	var ancestors = make([]Tree, 0)
-	t = t.getParent()
+	t = t.GetParent()
 	for t != nil {
 		f := []Tree{t}
 		ancestors = append(f, ancestors...)
-		t = t.getParent()
+		t = t.GetParent()
 	}
 	return ancestors
 }

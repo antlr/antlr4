@@ -12,7 +12,7 @@ import (
 //
 // <ul>
 // <li><b>Ambiguities</b>: These are cases where more than one path through the
-// grammar can match the input.</li>
+// grammar can Match the input.</li>
 // <li><b>Weak context sensitivity</b>: These are cases where full-context
 // prediction resolved an SLL conflict to a unique alternative which equaled the
 // minimum alternative of the SLL conflict.</li>
@@ -47,7 +47,7 @@ func (this *DiagnosticErrorListener) reportAmbiguity(recognizer *Parser, dfa *DF
 		": ambigAlts=" +
 		this.getConflictingAlts(ambigAlts, configs).toString() +
 		", input='" +
-		recognizer.getTokenStream().getTextFromInterval(NewInterval(startIndex, stopIndex)) + "'"
+		recognizer.GetTokenStream().GetTextFromInterval(NewInterval(startIndex, stopIndex)) + "'"
 	recognizer.notifyErrorListeners(msg, nil, nil)
 }
 
@@ -56,7 +56,7 @@ func (this *DiagnosticErrorListener) reportAttemptingFullContext(recognizer *Par
 	var msg = "reportAttemptingFullContext d=" +
 		this.getDecisionDescription(recognizer, dfa) +
 		", input='" +
-		recognizer.getTokenStream().getTextFromInterval(NewInterval(startIndex, stopIndex)) + "'"
+		recognizer.GetTokenStream().GetTextFromInterval(NewInterval(startIndex, stopIndex)) + "'"
 	recognizer.notifyErrorListeners(msg, nil, nil)
 }
 
@@ -64,7 +64,7 @@ func (this *DiagnosticErrorListener) reportContextSensitivity(recognizer *Parser
 	var msg = "reportContextSensitivity d=" +
 		this.getDecisionDescription(recognizer, dfa) +
 		", input='" +
-		recognizer.getTokenStream().getTextFromInterval(NewInterval(startIndex, stopIndex)) + "'"
+		recognizer.GetTokenStream().GetTextFromInterval(NewInterval(startIndex, stopIndex)) + "'"
 	recognizer.notifyErrorListeners(msg, nil, nil)
 }
 

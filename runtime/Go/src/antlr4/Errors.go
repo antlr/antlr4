@@ -4,7 +4,7 @@ import ()
 
 // The root of the ANTLR exception hierarchy. In general, ANTLR tracks just
 //  3 kinds of errors: prediction errors, failed predicate errors, and
-//  mismatched input errors. In each case, the parser knows where it is
+//  misMatched input errors. In each case, the parser knows where it is
 //  in the input, where it is in the ATN, the rule invocation stack,
 //  and what kind of problem occurred.
 
@@ -54,10 +54,10 @@ func (t *RecognitionException) InitRecognitionException(message string, recogniz
 	// occurred. For {@link NoViableAltException} and
 	// {@link LexerNoViableAltException} exceptions, this is the
 	// {@link DecisionState} number. For others, it is the state whose outgoing
-	// edge we couldn't match.
+	// edge we couldn't Match.
 	t.offendingState = -1
 	if t.recognizer != nil {
-		t.offendingState = t.recognizer.getState()
+		t.offendingState = t.recognizer.GetState()
 	}
 }
 
@@ -73,7 +73,7 @@ func (this *RecognitionException) getOffendingToken() *Token {
 
 //
 // Gets the set of input symbols which could potentially follow the
-// previously matched symbol at the time this exception was panicn.
+// previously Matched symbol at the time this exception was panicn.
 //
 // <p>If the set of expected tokens is not known and could not be computed,
 // this method returns {@code nil}.</p>
@@ -116,7 +116,7 @@ func NewLexerNoViableAltException(lexer *Lexer, input CharStream, startIndex int
 func (this *LexerNoViableAltException) toString() string {
 	var symbol = ""
 	if this.startIndex >= 0 && this.startIndex < this.input.size() {
-		symbol = this.input.getTextFromInterval(NewInterval(this.startIndex, this.startIndex))
+		symbol = this.input.GetTextFromInterval(NewInterval(this.startIndex, this.startIndex))
 	}
 	return "LexerNoViableAltException" + symbol
 }
@@ -138,7 +138,7 @@ type NoViableAltException struct {
 func NewNoViableAltException(recognizer IParser, input CharStream, startToken *Token, offendingToken *Token, deadEndConfigs *ATNConfigSet, ctx IParserRuleContext) *NoViableAltException {
 
 	if ctx == nil {
-		ctx = recognizer.getParserRuleContext()
+		ctx = recognizer.GetParserRuleContext()
 	}
 
 	if offendingToken == nil {
@@ -156,7 +156,7 @@ func NewNoViableAltException(recognizer IParser, input CharStream, startToken *T
 	this := new(NoViableAltException)
 	this.InitRecognitionException("", recognizer, input, ctx)
 
-	// Which configurations did we try at input.index() that couldn't match
+	// Which configurations did we try at input.index() that couldn't Match
 	// input.LT(1)?//
 	this.deadEndConfigs = deadEndConfigs
 	// The token object at the start index the input stream might
@@ -169,17 +169,17 @@ func NewNoViableAltException(recognizer IParser, input CharStream, startToken *T
 	return this
 }
 
-type InputMismatchException struct {
+type InputMisMatchException struct {
 	RecognitionException
 }
 
-// This signifies any kind of mismatched input exceptions such as
-// when the current input does not match the expected token.
+// This signifies any kind of misMatched input exceptions such as
+// when the current input does not Match the expected token.
 //
-func NewInputMismatchException(recognizer IParser) *InputMismatchException {
+func NewInputMisMatchException(recognizer IParser) *InputMisMatchException {
 
-	this := new(InputMismatchException)
-	this.InitRecognitionException("", recognizer, recognizer.getInputStream(), recognizer.getParserRuleContext())
+	this := new(InputMisMatchException)
+	this.InitRecognitionException("", recognizer, recognizer.getInputStream(), recognizer.GetParserRuleContext())
 
 	this.offendingToken = recognizer.getCurrentToken()
 
@@ -188,7 +188,7 @@ func NewInputMismatchException(recognizer IParser) *InputMismatchException {
 }
 
 // A semantic predicate failed during validation. Validation of predicates
-// occurs when normally parsing the alternative just like matching a token.
+// occurs when normally parsing the alternative just like Matching a token.
 // Disambiguating predicate evaluation occurs when we test a predicate during
 // prediction.
 

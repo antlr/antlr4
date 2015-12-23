@@ -20,7 +20,7 @@ type ITransition interface {
 	getIsEpsilon() bool
 	getLabel() *IntervalSet
 	getSerializationType() int
-	matches(int, int, int) bool
+	Matches(int, int, int) bool
 }
 
 type Transition struct {
@@ -69,7 +69,7 @@ func (t *Transition) getSerializationType() int {
 	return t.serializationType
 }
 
-func (t *Transition) matches(symbol, minVocabSymbol, maxVocabSymbol int) bool {
+func (t *Transition) Matches(symbol, minVocabSymbol, maxVocabSymbol int) bool {
 	panic("Not implemented")
 }
 
@@ -149,7 +149,7 @@ func (t *AtomTransition) makeLabel() *IntervalSet {
 	return s
 }
 
-func (t *AtomTransition) matches(symbol, minVocabSymbol, maxVocabSymbol int) bool {
+func (t *AtomTransition) Matches(symbol, minVocabSymbol, maxVocabSymbol int) bool {
 	return t.label_ == symbol
 }
 
@@ -178,7 +178,7 @@ func NewRuleTransition(ruleStart IATNState, ruleIndex, precedence int, followSta
 	return t
 }
 
-func (t *RuleTransition) matches(symbol, minVocabSymbol, maxVocabSymbol int) bool {
+func (t *RuleTransition) Matches(symbol, minVocabSymbol, maxVocabSymbol int) bool {
 	return false
 }
 
@@ -200,7 +200,7 @@ func NewEpsilonTransition(target IATNState, outermostPrecedenceReturn int) *Epsi
 	return t
 }
 
-func (t *EpsilonTransition) matches(symbol, minVocabSymbol, maxVocabSymbol int) bool {
+func (t *EpsilonTransition) Matches(symbol, minVocabSymbol, maxVocabSymbol int) bool {
 	return false
 }
 
@@ -232,7 +232,7 @@ func (t *RangeTransition) makeLabel() *IntervalSet {
 	return s
 }
 
-func (t *RangeTransition) matches(symbol, minVocabSymbol, maxVocabSymbol int) bool {
+func (t *RangeTransition) Matches(symbol, minVocabSymbol, maxVocabSymbol int) bool {
 	return symbol >= t.start && symbol <= t.stop
 }
 
@@ -272,7 +272,7 @@ func NewPredicateTransition(target IATNState, ruleIndex, predIndex int, isCtxDep
 	return t
 }
 
-func (t *PredicateTransition) matches(symbol, minVocabSymbol, maxVocabSymbol int) bool {
+func (t *PredicateTransition) Matches(symbol, minVocabSymbol, maxVocabSymbol int) bool {
 	return false
 }
 
@@ -304,7 +304,7 @@ func NewActionTransition(target IATNState, ruleIndex, actionIndex int, isCtxDepe
 	return t
 }
 
-func (t *ActionTransition) matches(symbol, minVocabSymbol, maxVocabSymbol int) bool {
+func (t *ActionTransition) Matches(symbol, minVocabSymbol, maxVocabSymbol int) bool {
 	return false
 }
 
@@ -337,7 +337,7 @@ func (t *SetTransition) InitSetTransition(set *IntervalSet) {
 
 }
 
-func (t *SetTransition) matches(symbol, minVocabSymbol, maxVocabSymbol int) bool {
+func (t *SetTransition) Matches(symbol, minVocabSymbol, maxVocabSymbol int) bool {
 	return t.label.contains(symbol)
 }
 
@@ -360,7 +360,7 @@ func NewNotSetTransition(target IATNState, set *IntervalSet) *NotSetTransition {
 	return t
 }
 
-func (t *NotSetTransition) matches(symbol, minVocabSymbol, maxVocabSymbol int) bool {
+func (t *NotSetTransition) Matches(symbol, minVocabSymbol, maxVocabSymbol int) bool {
 	return symbol >= minVocabSymbol && symbol <= maxVocabSymbol && !t.label.contains(symbol)
 }
 
@@ -381,7 +381,7 @@ func NewWildcardTransition(target IATNState) *WildcardTransition {
 	return t
 }
 
-func (t *WildcardTransition) matches(symbol, minVocabSymbol, maxVocabSymbol int) bool {
+func (t *WildcardTransition) Matches(symbol, minVocabSymbol, maxVocabSymbol int) bool {
 	return symbol >= minVocabSymbol && symbol <= maxVocabSymbol
 }
 
@@ -407,7 +407,7 @@ func NewPrecedencePredicateTransition(target IATNState, precedence int) *Precede
 	return t
 }
 
-func (t *PrecedencePredicateTransition) matches(symbol, minVocabSymbol, maxVocabSymbol int) bool {
+func (t *PrecedencePredicateTransition) Matches(symbol, minVocabSymbol, maxVocabSymbol int) bool {
 	return false
 }
 

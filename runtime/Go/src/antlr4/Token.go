@@ -51,7 +51,7 @@ const (
 )
 
 // Explicitly set the text for this token. If {code text} is not
-// {@code nil}, then {@link //getText} will return this value rather than
+// {@code nil}, then {@link //GetText} will return this value rather than
 // extracting the text from the input.
 //
 // @param text The explicit text of the token, or {@code nil} if the text
@@ -66,7 +66,7 @@ func (this *Token) setText(s string) {
 	this._text = s
 }
 
-func (this *Token) getTokenSource() TokenSource {
+func (this *Token) GetTokenSource() TokenSource {
 	return this.source.tokenSource
 }
 
@@ -108,8 +108,8 @@ func NewCommonToken(source *TokenSourceCharStreamPair, tokenType, channel, start
 // If {@code oldToken} is also a {@link CommonToken} instance, the newly
 // constructed token will share a reference to the {@link //text} field and
 // the {@link Pair} stored in {@link //source}. Otherwise, {@link //text} will
-// be assigned the result of calling {@link //getText}, and {@link //source}
-// will be constructed from the result of {@link Token//getTokenSource} and
+// be assigned the result of calling {@link //GetText}, and {@link //source}
+// will be constructed from the result of {@link Token//GetTokenSource} and
 // {@link Token//getInputStream}.</p>
 //
 // @param oldToken The token to copy.
@@ -134,7 +134,7 @@ func (this *CommonToken) text() string {
 	}
 	var n = input.size()
 	if this.start < n && this.stop < n {
-		return input.getTextFromInterval(NewInterval(this.start, this.stop))
+		return input.GetTextFromInterval(NewInterval(this.start, this.stop))
 	} else {
 		return "<EOF>"
 	}

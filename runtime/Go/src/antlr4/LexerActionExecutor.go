@@ -1,7 +1,7 @@
 package antlr4
 
 // Represents an executor for a sequence of lexer actions which traversed during
-// the matching operation of a lexer rule (token).
+// the Matching operation of a lexer rule (token).
 //
 // <p>The executor tracks position information for position-dependent lexer actions
 // efficiently, ensuring that actions appearing only at the end of the rule do
@@ -40,7 +40,7 @@ func NewLexerActionExecutor(lexerActions []ILexerAction) *LexerActionExecutor {
 // {@code lexerAction}.
 //
 // @param lexerActionExecutor The executor for actions already traversed by
-// the lexer while matching a token within a particular
+// the lexer while Matching a token within a particular
 // {@link LexerATNConfig}. If this is {@code nil}, the method behaves as
 // though it were an empty executor.
 // @param lexerAction The lexer action to execute after the actions
@@ -67,10 +67,10 @@ func LexerActionExecutorappend(lexerActionExecutor *LexerActionExecutor, lexerAc
 // {@link IntStream//seek} on the input {@link CharStream} to set the input
 // position to the <em>end</em> of the current token. This behavior provides
 // for efficient DFA representation of lexer actions which appear at the end
-// of a lexer rule, even when the lexer rule matches a variable number of
+// of a lexer rule, even when the lexer rule Matches a variable number of
 // characters.</p>
 //
-// <p>Prior to traversing a match transition in the ATN, the current offset
+// <p>Prior to traversing a Match transition in the ATN, the current offset
 // from the token start index is assigned to all position-dependent lexer
 // actions which have not already been assigned a fixed offset. By storing
 // the offsets relative to the token start index, the DFA representation of

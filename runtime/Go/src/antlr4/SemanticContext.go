@@ -85,7 +85,7 @@ func (this *Predicate) evaluate(parser IRecognizer, outerContext IRuleContext) b
 		localctx = outerContext
 	}
 
-	return parser.sempred(localctx, this.ruleIndex, this.predIndex)
+	return parser.Sempred(localctx, this.ruleIndex, this.predIndex)
 }
 
 func (this *Predicate) hashString() string {
@@ -121,11 +121,11 @@ func NewPrecedencePredicate(precedence int) *PrecedencePredicate {
 }
 
 func (this *PrecedencePredicate) evaluate(parser IRecognizer, outerContext IRuleContext) bool {
-	return parser.precpred(outerContext, this.precedence)
+	return parser.Precpred(outerContext, this.precedence)
 }
 
 func (this *PrecedencePredicate) evalPrecedence(parser IRecognizer, outerContext IRuleContext) SemanticContext {
-	if parser.precpred(outerContext, this.precedence) {
+	if parser.Precpred(outerContext, this.precedence) {
 		return SemanticContextNONE
 	} else {
 		return nil

@@ -23,7 +23,7 @@ func (is *InputStream) reset() {
 	is.index = 0
 }
 
-func (is *InputStream) consume() {
+func (is *InputStream) Consume() {
 	if is.index >= is.size {
 		// assert is.LA(1) == TokenEOF
 		panic("cannot consume EOF")
@@ -66,7 +66,7 @@ func (is *InputStream) seek(index int) {
 	is.index = intMin(index, is.size)
 }
 
-func (is *InputStream) getText(start int, stop int) string {
+func (is *InputStream) GetText(start int, stop int) string {
 	if stop >= is.size {
 		stop = is.size - 1
 	}

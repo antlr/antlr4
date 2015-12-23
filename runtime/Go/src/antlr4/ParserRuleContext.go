@@ -7,10 +7,10 @@ import (
 type IParserRuleContext interface {
 	IRuleContext
 
-	setException(IRecognitionException)
+	SetException(IRecognitionException)
 	addTokenNode(token *Token) *TerminalNodeImpl
 	addErrorNode(badToken *Token) *ErrorNodeImpl
-	enterRule(listener ParseTreeListener)
+	EnterRule(listener ParseTreeListener)
 	exitRule(listener ParseTreeListener)
 
 	setStart(*Token)
@@ -61,11 +61,11 @@ func (prc *ParserRuleContext) InitParserRuleContext(parent IParserRuleContext, i
 
 }
 
-func (prc *ParserRuleContext) setException(e IRecognitionException) {
+func (prc *ParserRuleContext) SetException(e IRecognitionException) {
 	prc.exception = e
 }
 
-func (prc *ParserRuleContext) getParent() Tree {
+func (prc *ParserRuleContext) GetParent() Tree {
 	return prc.parentCtx
 }
 
@@ -90,7 +90,7 @@ func (prc *ParserRuleContext) copyFrom(ctx *ParserRuleContext) {
 }
 
 // Double dispatch methods for listeners
-func (prc *ParserRuleContext) enterRule(listener ParseTreeListener) {
+func (prc *ParserRuleContext) EnterRule(listener ParseTreeListener) {
 }
 
 func (prc *ParserRuleContext) exitRule(listener ParseTreeListener) {
@@ -113,7 +113,7 @@ func (prc *ParserRuleContext) addChild(child IRuleContext) IRuleContext {
 	return child
 }
 
-// * Used by enterOuterAlt to toss out a RuleContext previously added as
+// * Used by EnterOuterAlt to toss out a RuleContext previously added as
 // we entered a rule. If we have // label, we will need to remove
 // generic ruleContext object.
 // /
@@ -181,7 +181,7 @@ func (prc *ParserRuleContext) getStop() *Token {
 	return prc.stop
 }
 
-func (prc *ParserRuleContext) getToken(ttype int, i int) TerminalNode {
+func (prc *ParserRuleContext) GetToken(ttype int, i int) TerminalNode {
 
 	for j := 0; j < len(prc.children); j++ {
 		var child = prc.children[j]
@@ -198,7 +198,7 @@ func (prc *ParserRuleContext) getToken(ttype int, i int) TerminalNode {
 	return nil
 }
 
-func (prc *ParserRuleContext) getTokens(ttype int) []TerminalNode {
+func (prc *ParserRuleContext) GetTokens(ttype int) []TerminalNode {
 	if prc.children == nil {
 		return make([]TerminalNode, 0)
 	} else {
@@ -215,13 +215,13 @@ func (prc *ParserRuleContext) getTokens(ttype int) []TerminalNode {
 	}
 }
 
-func (prc *ParserRuleContext) getTypedRuleContext(ctxType reflect.Type, i int) *interface{} {
-	panic("getTypedRuleContexts not implemented")
+func (prc *ParserRuleContext) GetTypedRuleContext(ctxType reflect.Type, i int) *interface{} {
+	panic("GetTypedRuleContexts not implemented")
 	//    return prc.getChild(i, ctxType)
 }
 
-func (prc *ParserRuleContext) getTypedRuleContexts(ctxType reflect.Type) []*interface{} {
-	panic("getTypedRuleContexts not implemented")
+func (prc *ParserRuleContext) GetTypedRuleContexts(ctxType reflect.Type) []*interface{} {
+	panic("GetTypedRuleContexts not implemented")
 	//    if (prc.children== nil) {
 	//        return []
 	//    } else {

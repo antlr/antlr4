@@ -7,7 +7,7 @@ import (
 
 type IPredictionContext interface {
 	hashString() string
-	getParent(int) IPredictionContext
+	GetParent(int) IPredictionContext
 	getReturnState(int) int
 	equals(IPredictionContext) bool
 	length() int
@@ -44,7 +44,7 @@ var PredictionContextglobalNodeCount = 1
 var PredictionContextid = PredictionContextglobalNodeCount
 
 // Stores the computed hash code of this {@link PredictionContext}. The hash
-// code is computed in parts to match the following reference algorithm.
+// code is computed in parts to Match the following reference algorithm.
 //
 // <pre>
 // private int referenceHashCode() {
@@ -52,8 +52,8 @@ var PredictionContextid = PredictionContextglobalNodeCount
 // //INITIAL_HASH})
 //
 // for (int i = 0 i &lt {@link //size()} i++) {
-// hash = {@link MurmurHash//update MurmurHash.update}(hash, {@link //getParent
-// getParent}(i))
+// hash = {@link MurmurHash//update MurmurHash.update}(hash, {@link //GetParent
+// GetParent}(i))
 // }
 //
 // for (int i = 0 i &lt {@link //size()} i++) {
@@ -92,7 +92,7 @@ func (this *PredictionContext) toString() string {
 	panic("Not implemented")
 }
 
-func (this *PredictionContext) getParent(index int) IPredictionContext {
+func (this *PredictionContext) GetParent(index int) IPredictionContext {
 	panic("Not implemented")
 }
 
@@ -185,7 +185,7 @@ func (this *SingletonPredictionContext) length() int {
 	return 1
 }
 
-func (this *SingletonPredictionContext) getParent(index int) IPredictionContext {
+func (this *SingletonPredictionContext) GetParent(index int) IPredictionContext {
 	return this.parentCtx
 }
 
@@ -257,7 +257,7 @@ func (this *EmptyPredictionContext) isEmpty() bool {
 	return true
 }
 
-func (this *EmptyPredictionContext) getParent(index int) IPredictionContext {
+func (this *EmptyPredictionContext) GetParent(index int) IPredictionContext {
 	return nil
 }
 
@@ -310,7 +310,7 @@ func (this *ArrayPredictionContext) length() int {
 	return len(this.returnStates)
 }
 
-func (this *ArrayPredictionContext) getParent(index int) IPredictionContext {
+func (this *ArrayPredictionContext) GetParent(index int) IPredictionContext {
 	return this.parents[index]
 }
 
@@ -364,15 +364,15 @@ func predictionContextFromRuleContext(a *ATN, outerContext IRuleContext) IPredic
 	}
 	// if we are in RuleContext of start rule, s, then PredictionContext
 	// is EMPTY. Nobody called us. (if we are empty, return empty)
-	if outerContext.getParent() == nil || outerContext == RuleContextEMPTY {
+	if outerContext.GetParent() == nil || outerContext == RuleContextEMPTY {
 		return PredictionContextEMPTY
 	}
 	// If we have a parent, convert it to a PredictionContext graph
-	var parent = predictionContextFromRuleContext(a, outerContext.getParent().(IRuleContext))
+	var parent = predictionContextFromRuleContext(a, outerContext.GetParent().(IRuleContext))
 	var state = a.states[outerContext.getInvokingState()]
 	var transition = state.getTransitions()[0]
 
-	return SingletonPredictionContextcreate(parent, transition.(*RuleTransition).followState.getStateNumber())
+	return SingletonPredictionContextcreate(parent, transition.(*RuleTransition).followState.GetStateNumber())
 }
 
 func calculateListsHashString(parents []PredictionContext, returnStates []int) string {
@@ -413,10 +413,10 @@ func merge(a, b IPredictionContext, rootIsWildcard bool, mergeCache *DoubleDict)
 	}
 	// convert singleton so both are arrays to normalize
 	if _, ok := a.(*SingletonPredictionContext); ok {
-		a = NewArrayPredictionContext([]IPredictionContext{a.getParent(0)}, []int{a.getReturnState(0)})
+		a = NewArrayPredictionContext([]IPredictionContext{a.GetParent(0)}, []int{a.getReturnState(0)})
 	}
 	if _, ok := b.(*SingletonPredictionContext); ok {
-		b = NewArrayPredictionContext([]IPredictionContext{b.getParent(0)}, []int{b.getReturnState(0)})
+		b = NewArrayPredictionContext([]IPredictionContext{b.GetParent(0)}, []int{b.getReturnState(0)})
 	}
 	return mergeArrays(a.(*ArrayPredictionContext), b.(*ArrayPredictionContext), rootIsWildcard, mergeCache)
 }
@@ -581,11 +581,11 @@ func mergeRoot(a, b ISingletonPredictionContext, rootIsWildcard bool) IPredictio
 			return PredictionContextEMPTY // $ + $ = $
 		} else if a == PredictionContextEMPTY { // $ + x = [$,x]
 			var payloads = []int{b.getReturnState(-1), PredictionContextEMPTY_RETURN_STATE}
-			var parents = []IPredictionContext{b.getParent(-1), nil}
+			var parents = []IPredictionContext{b.GetParent(-1), nil}
 			return NewArrayPredictionContext(parents, payloads)
 		} else if b == PredictionContextEMPTY { // x + $ = [$,x] ($ is always first if present)
 			var payloads = []int{a.getReturnState(-1), PredictionContextEMPTY_RETURN_STATE}
-			var parents = []IPredictionContext{a.getParent(-1), nil}
+			var parents = []IPredictionContext{a.GetParent(-1), nil}
 			return NewArrayPredictionContext(parents, payloads)
 		}
 	}
@@ -752,12 +752,12 @@ func getCachedPredictionContext(context IPredictionContext, contextCache *Predic
 	//	var changed = false
 	//	var parents = []
 	//	for i := 0; i < len(parents); i++ {
-	//		var parent = getCachedPredictionContext(context.getParent(i), contextCache, visited)
-	//		if (changed || parent != context.getParent(i)) {
+	//		var parent = getCachedPredictionContext(context.GetParent(i), contextCache, visited)
+	//		if (changed || parent != context.GetParent(i)) {
 	//			if (!changed) {
 	//				parents = []
 	//				for j := 0; j < len(context); j++ {
-	//					parents[j] = context.getParent(j)
+	//					parents[j] = context.GetParent(j)
 	//				}
 	//				changed = true
 	//			}
@@ -799,7 +799,7 @@ func getCachedPredictionContext(context IPredictionContext, contextCache *Predic
 //		visited[context] = context
 //		nodes.push(context)
 //		for i := 0; i < len(context); i++ {
-//			getAllContextNodes(context.getParent(i), nodes, visited)
+//			getAllContextNodes(context.GetParent(i), nodes, visited)
 //		}
 //		return nodes
 //	}

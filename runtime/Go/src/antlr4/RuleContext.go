@@ -97,7 +97,7 @@ func (this *RuleContext) depth() int {
 	var n = 0
 	var p Tree = this
 	for p != nil {
-		p = p.getParent()
+		p = p.GetParent()
 		n += 1
 	}
 	return n
@@ -130,13 +130,13 @@ func (this *RuleContext) getPayload() interface{} {
 // added to the parse trees, they will not appear in the output of this
 // method.
 //
-func (this *RuleContext) getText() string {
+func (this *RuleContext) GetText() string {
 	if this.getChildCount() == 0 {
 		return ""
 	} else {
 		var s string
 		for _, child := range this.children {
-			s += child.(IRuleContext).getText()
+			s += child.(IRuleContext).GetText()
 		}
 
 		return s
@@ -147,7 +147,7 @@ func (this *RuleContext) getChild(i int) Tree {
 	return nil
 }
 
-func (this *RuleContext) getParent() Tree {
+func (this *RuleContext) GetParent() Tree {
 	return this.parentCtx
 }
 
@@ -188,10 +188,10 @@ func (this *RuleContext) toString(ruleNames []string, stop IRuleContext) string 
 			}
 			s += ruleName
 		}
-		if p.getParent() != nil && (ruleNames != nil || !p.getParent().(IRuleContext).isEmpty()) {
+		if p.GetParent() != nil && (ruleNames != nil || !p.GetParent().(IRuleContext).isEmpty()) {
 			s += " "
 		}
-		p = p.getParent().(IRuleContext)
+		p = p.GetParent().(IRuleContext)
 	}
 	s += "]"
 	return s

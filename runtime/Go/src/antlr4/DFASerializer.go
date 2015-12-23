@@ -50,11 +50,11 @@ func (this *DFASerializer) toString() string {
 			for j := 0; j < n; j++ {
 				var t = s.edges[j]
 				if t != nil && t.stateNumber != 0x7FFFFFFF {
-					buf += this.getStateString(s)
+					buf += this.GetStateString(s)
 					buf += "-"
 					buf += this.getEdgeLabel(j)
 					buf += "->"
-					buf += this.getStateString(t)
+					buf += this.GetStateString(t)
 					buf += "\n"
 				}
 			}
@@ -81,7 +81,7 @@ func (this *DFASerializer) getEdgeLabel(i int) string {
 	}
 }
 
-func (this *DFASerializer) getStateString(s *DFAState) string {
+func (this *DFASerializer) GetStateString(s *DFAState) string {
 
 	var a, b string
 

@@ -92,7 +92,7 @@ func (bt *BufferedTokenStream) get(index int) *Token {
 	return bt.tokens[index]
 }
 
-func (bt *BufferedTokenStream) consume() {
+func (bt *BufferedTokenStream) Consume() {
 	var skipEofCheck = false
 	if bt.index >= 0 {
 		if bt.fetchedEOF {
@@ -110,7 +110,7 @@ func (bt *BufferedTokenStream) consume() {
 	if !skipEofCheck && bt.LA(1) == TokenEOF {
 		panic("cannot consume EOF")
 	}
-	if bt.sync(bt.index + 1) {
+	if bt.Sync(bt.index + 1) {
 		bt.index = bt.adjustSeekIndex(bt.index + 1)
 	}
 }
@@ -121,7 +121,7 @@ func (bt *BufferedTokenStream) consume() {
 // {@code false}.
 // @see //get(int i)
 // /
-func (bt *BufferedTokenStream) sync(i int) bool {
+func (bt *BufferedTokenStream) Sync(i int) bool {
 	var n = i - len(bt.tokens) + 1 // how many more elements we need?
 	if n > 0 {
 		var fetched = bt.fetch(n)
@@ -152,7 +152,7 @@ func (bt *BufferedTokenStream) fetch(n int) int {
 }
 
 // Get all tokens from start..stop inclusively///
-func (bt *BufferedTokenStream) getTokens(start int, stop int, types *IntervalSet) []*Token {
+func (bt *BufferedTokenStream) GetTokens(start int, stop int, types *IntervalSet) []*Token {
 
 	if start < 0 || stop < 0 {
 		return nil
@@ -194,7 +194,7 @@ func (bt *BufferedTokenStream) LT(k int) *Token {
 		return bt.LB(-k)
 	}
 	var i = bt.index + k - 1
-	bt.sync(i)
+	bt.Sync(i)
 	if i >= len(bt.tokens) { // return EOF token
 		// EOF must be last token
 		return bt.tokens[len(bt.tokens)-1]
@@ -226,11 +226,11 @@ func (bt *BufferedTokenStream) lazyInit() {
 }
 
 func (bt *BufferedTokenStream) setup() {
-	bt.sync(0)
+	bt.Sync(0)
 	bt.index = bt.adjustSeekIndex(0)
 }
 
-func (bt *BufferedTokenStream) getTokenSource() TokenSource {
+func (bt *BufferedTokenStream) GetTokenSource() TokenSource {
 	return bt.tokenSource
 }
 
@@ -246,7 +246,7 @@ func (bt *BufferedTokenStream) setTokenSource(tokenSource TokenSource) {
 // on channel between i and EOF.
 // /
 func (bt *BufferedTokenStream) nextTokenOnChannel(i, channel int) int {
-	bt.sync(i)
+	bt.Sync(i)
 	if i >= len(bt.tokens) {
 		return -1
 	}
@@ -256,7 +256,7 @@ func (bt *BufferedTokenStream) nextTokenOnChannel(i, channel int) int {
 			return -1
 		}
 		i += 1
-		bt.sync(i)
+		bt.Sync(i)
 		token = bt.tokens[i]
 	}
 	return i
@@ -333,7 +333,7 @@ func (bt *BufferedTokenStream) getSourceName() string {
 }
 
 // Get the text of all tokens in bt buffer.///
-func (bt *BufferedTokenStream) getText(interval *Interval) string {
+func (bt *BufferedTokenStream) GetText(interval *Interval) string {
 	bt.lazyInit()
 	bt.fill()
 	if interval == nil {

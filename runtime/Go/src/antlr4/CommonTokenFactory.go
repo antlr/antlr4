@@ -21,10 +21,10 @@ func NewCommonTokenFactory(copyText bool) *CommonTokenFactory {
 	// constructing tokens to explicitly set the text. This is useful for cases
 	// where the input stream might not be able to provide arbitrary substrings
 	// of text from the input after the lexer creates a token (e.g. the
-	// implementation of {@link CharStream//getText} in
+	// implementation of {@link CharStream//GetText} in
 	// {@link UnbufferedCharStream} panics an
 	// {@link UnsupportedOperationException}). Explicitly setting the token text
-	// allows {@link Token//getText} to be called at any time regardless of the
+	// allows {@link Token//GetText} to be called at any time regardless of the
 	// input stream implementation.
 	//
 	// <p>
@@ -52,7 +52,7 @@ func (this *CommonTokenFactory) create(source *TokenSourceCharStreamPair, ttype 
 	if text != "" {
 		t.setText(text)
 	} else if this.copyText && source.charStream != nil {
-		t.setText(source.charStream.getTextFromInterval(NewInterval(start, stop)))
+		t.setText(source.charStream.GetTextFromInterval(NewInterval(start, stop)))
 	}
 	return t.Token
 }

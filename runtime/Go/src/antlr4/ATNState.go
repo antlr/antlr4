@@ -50,10 +50,10 @@ type IATNState interface {
 	getATN() *ATN
 	setATN(*ATN)
 
-	getStateType() int
+	GetStateType() int
 
-	getStateNumber() int
-	setStateNumber(int)
+	GetStateNumber() int
+	SetStateNumber(int)
 
 	getTransitions() []ITransition
 	setTransitions([]ITransition)
@@ -125,15 +125,15 @@ func (as *ATNState) setTransitions(t []ITransition) {
 	as.transitions = t
 }
 
-func (as *ATNState) getStateType() int {
+func (as *ATNState) GetStateType() int {
 	return as.stateType
 }
 
-func (as *ATNState) getStateNumber() int {
+func (as *ATNState) GetStateNumber() int {
 	return as.stateNumber
 }
 
-func (as *ATNState) setStateNumber(stateNumber int) {
+func (as *ATNState) SetStateNumber(stateNumber int) {
 	as.stateNumber = stateNumber
 }
 
@@ -151,7 +151,7 @@ func (this *ATNState) toString() string {
 
 func (this *ATNState) equals(other interface{}) bool {
 	if ot, ok := other.(IATNState); ok {
-		return this.stateNumber == ot.getStateNumber()
+		return this.stateNumber == ot.GetStateNumber()
 	} else {
 		return false
 	}

@@ -7,7 +7,7 @@ import (
 
 // A lexer is recognizer that draws input symbols from a character stream.
 //  lexer grammars result in a subclass of this object. A Lexer object
-//  uses simplified match() and error recovery mechanisms in the interest
+//  uses simplified Match() and error recovery mechanisms in the interest
 //  of speed.
 ///
 
@@ -23,7 +23,7 @@ type ILexer interface {
 }
 
 type Lexer struct {
-	Recognizer
+	*Recognizer
 
 	Interpreter *LexerATNSimulator
 
@@ -64,8 +64,8 @@ func (l *Lexer) InitLexer(input CharStream) {
 	// The goal of all lexer rules/methods is to create a token object.
 	// l is an instance variable as multiple rules may collaborate to
 	// create a single token. nextToken will return l object after
-	// matching lexer rule(s). If you subclass to allow multiple token
-	// emissions, then set l to the last token to be matched or
+	// Matching lexer rule(s). If you subclass to allow multiple token
+	// emissions, then set l to the last token to be Matched or
 	// something nonnil so that the auto token emit mechanism will not
 	// emit another token.
 	l._token = nil
@@ -139,14 +139,14 @@ func (l *Lexer) getInputStream() CharStream {
 }
 
 func (l *Lexer) getSourceName() string {
-	return l._input.getSourceName()
+	return l.grammarFileName
 }
 
 func (l *Lexer) setChannel(v int) {
 	l._channel = v
 }
 
-func (l *Lexer) getTokenFactory() TokenFactory {
+func (l *Lexer) GetTokenFactory() TokenFactory {
 	return l._factory
 }
 
@@ -161,16 +161,16 @@ func (l *Lexer) safeMatch() (ret int) {
 		if e := recover(); e != nil {
 			if re, ok := e.(IRecognitionException); ok {
 				l.notifyListeners(re) // report error
-				l.recover(re)
+				l.Recover(re)
 				ret = LexerSkip // default
 			}
 		}
 	}()
 
-	return l.Interpreter.match(l._input, l._mode)
+	return l.Interpreter.Match(l._input, l._mode)
 }
 
-// Return a token from l source i.e., match a token on the char stream.
+// Return a token from l source i.e., Match a token on the char stream.
 func (l *Lexer) nextToken() *Token {
 	if l._input == nil {
 		panic("nextToken requires a non-nil input stream.")
@@ -181,7 +181,7 @@ func (l *Lexer) nextToken() *Token {
 
 	// previously in finally block
 	defer func() {
-		// make sure we release marker after match or
+		// make sure we release marker after Match or
 		// unbuffered char stream will keep buffering
 		l._input.release(tokenStartMarker)
 	}()
@@ -282,7 +282,7 @@ func (l *Lexer) setInputStream(input CharStream) {
 
 // By default does not support multiple emits per nextToken invocation
 // for efficiency reasons. Subclass and override l method, nextToken,
-// and getToken (to push tokens into a list and pull from that list
+// and GetToken (to push tokens into a list and pull from that list
 // rather than a single variable as l implementation does).
 // /
 func (l *Lexer) emitToken(token *Token) {
@@ -330,13 +330,13 @@ func (l *Lexer) getCharIndex() int {
 	return l._input.index()
 }
 
-// Return the text matched so far for the current token or any text override.
+// Return the text Matched so far for the current token or any text override.
 //Set the complete text of l token it wipes any previous changes to the text.
 func (l *Lexer) text() string {
 	if l._text != nil {
 		return *l._text
 	} else {
-		return l.Interpreter.getText(l._input)
+		return l.Interpreter.GetText(l._input)
 	}
 }
 
@@ -364,7 +364,7 @@ func (l *Lexer) getAllTokens() []*Token {
 func (l *Lexer) notifyListeners(e IRecognitionException) {
 	var start = l._tokenStartCharIndex
 	var stop = l._input.index()
-	var text = l._input.getTextFromInterval(NewInterval(start, stop))
+	var text = l._input.GetTextFromInterval(NewInterval(start, stop))
 	var msg = "token recognition error at: '" + text + "'"
 	var listener = l.getErrorListenerDispatch()
 	listener.syntaxError(l, nil, l._tokenStartLine, l._tokenStartColumn, msg, e)
@@ -388,19 +388,19 @@ func (l *Lexer) getCharErrorDisplay(c rune) string {
 	return "'" + l.getErrorDisplayForChar(c) + "'"
 }
 
-// Lexers can normally match any char in it's vocabulary after matching
+// Lexers can normally Match any char in it's vocabulary after Matching
 // a token, so do the easy thing and just kill a character and hope
 // it all works out. You can instead use the rule invocation stack
 // to do sophisticated error recovery if you are in a fragment rule.
 // /
-func (l *Lexer) recover(re IRecognitionException) {
+func (l *Lexer) Recover(re IRecognitionException) {
 	if l._input.LA(1) != TokenEOF {
 		if _, ok := re.(*LexerNoViableAltException); ok {
 			// skip a char and try again
 			l.Interpreter.consume(l._input)
 		} else {
 			// TODO: Do we lose character or line position information?
-			l._input.consume()
+			l._input.Consume()
 		}
 	}
 }

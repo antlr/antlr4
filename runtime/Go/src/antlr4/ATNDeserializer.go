@@ -443,10 +443,10 @@ func (this *ATNDeserializer) generateRuleBypassTransition(atn *ATN, idx int) {
 	atn.ruleToStartState[idx].addTransition(NewEpsilonTransition(bypassStart, -1), -1)
 	bypassStop.addTransition(NewEpsilonTransition(endState, -1), -1)
 
-	var matchState = NewBasicState()
-	atn.addState(matchState)
-	matchState.addTransition(NewAtomTransition(bypassStop, atn.ruleToTokenType[idx]), -1)
-	bypassStart.addTransition(NewEpsilonTransition(matchState, -1), -1)
+	var MatchState = NewBasicState()
+	atn.addState(MatchState)
+	MatchState.addTransition(NewAtomTransition(bypassStop, atn.ruleToTokenType[idx]), -1)
+	bypassStart.addTransition(NewEpsilonTransition(MatchState, -1), -1)
 }
 
 func (this *ATNDeserializer) stateIsEndStateFor(state IATNState, idx int) IATNState {

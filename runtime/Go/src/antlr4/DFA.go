@@ -64,7 +64,7 @@ func (this *DFA) setPrecedenceStartState(precedence int, startState *DFAState) {
 		return
 	}
 
-	// synchronization on s0 here is ok. when the DFA is turned into a
+	// Synchronization on s0 here is ok. when the DFA is turned into a
 	// precedence DFA, s0 will be initialized once and not updated again
 	// s0.edges is never nil for a precedence DFA
 	this.s0.edges[precedence] = startState
@@ -103,7 +103,7 @@ func (this *DFA) setPrecedenceDfa(precedenceDfa bool) {
 	}
 }
 
-func (this *DFA) getStates() map[string]*DFAState {
+func (this *DFA) GetStates() map[string]*DFAState {
 	return this._states
 }
 

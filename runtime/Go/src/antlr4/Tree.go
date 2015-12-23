@@ -7,7 +7,7 @@ package antlr4
 var TreeINVALID_INTERVAL = NewInterval(-1, -2)
 
 type Tree interface {
-	getParent() Tree
+	GetParent() Tree
 	setParent(Tree)
 	getPayload() interface{}
 	getChild(i int) Tree
@@ -28,7 +28,7 @@ type ParseTree interface {
 
 	//	<T> T accept(ParseTreeVisitor<? extends T> visitor);
 	accept(visitor ParseTreeVisitor) interface{}
-	getText() string
+	GetText() string
 	//	toStringTree([]string, IRecognizer) string
 }
 
@@ -119,7 +119,7 @@ func (this *TerminalNodeImpl) getSymbol() *Token {
 	return this.symbol
 }
 
-func (this *TerminalNodeImpl) getParent() Tree {
+func (this *TerminalNodeImpl) GetParent() Tree {
 	return this.parentCtx
 }
 
@@ -147,7 +147,7 @@ func (this *TerminalNodeImpl) accept(visitor ParseTreeVisitor) interface{} {
 	return visitor.visitTerminal(this)
 }
 
-func (this *TerminalNodeImpl) getText() string {
+func (this *TerminalNodeImpl) GetText() string {
 	return this.symbol.text()
 }
 
@@ -159,8 +159,8 @@ func (this *TerminalNodeImpl) toString() string {
 	}
 }
 
-// Represents a token that was consumed during resynchronization
-// rather than during a valid match operation. For example,
+// Represents a token that was consumed during reSynchronization
+// rather than during a valid Match operation. For example,
 // we will create this kind of a node during single token insertion
 // and deletion as well as during "consume until error recovery set"
 // upon no viable alternative exceptions.
@@ -197,7 +197,7 @@ func (this *ParseTreeWalker) walk(listener ParseTreeListener, t Tree) {
 	} else if term, ok := t.(TerminalNode); ok {
 		listener.visitTerminal(term)
 	} else {
-		this.enterRule(listener, t.(RuleNode))
+		this.EnterRule(listener, t.(RuleNode))
 		for i := 0; i < t.getChildCount(); i++ {
 			var child = t.getChild(i)
 			this.walk(listener, child)
@@ -212,10 +212,10 @@ func (this *ParseTreeWalker) walk(listener ParseTreeListener, t Tree) {
 // {@link RuleContext}-specific event. First we trigger the generic and then
 // the rule specific. We to them in reverse order upon finishing the node.
 //
-func (this *ParseTreeWalker) enterRule(listener ParseTreeListener, r RuleNode) {
+func (this *ParseTreeWalker) EnterRule(listener ParseTreeListener, r RuleNode) {
 	var ctx = r.getRuleContext().(IParserRuleContext)
 	listener.enterEveryRule(ctx)
-	ctx.enterRule(listener)
+	ctx.EnterRule(listener)
 }
 
 func (this *ParseTreeWalker) exitRule(listener ParseTreeListener, r RuleNode) {
