@@ -8,7 +8,7 @@ import (
 // Map a predicate to a predicted alternative.///
 
 type PredPrediction struct {
-	alt int
+	alt  int
 	pred SemanticContext
 }
 
@@ -51,19 +51,19 @@ func (this *PredPrediction) toString() string {
 // /
 
 type DFAState struct {
-	stateNumber int
-	configs *ATNConfigSet
-	edges []*DFAState
-	isAcceptState bool
-	prediction int
+	stateNumber         int
+	configs             *ATNConfigSet
+	edges               []*DFAState
+	isAcceptState       bool
+	prediction          int
 	lexerActionExecutor *LexerActionExecutor
 	requiresFullContext bool
-	predicates []*PredPrediction
+	predicates          []*PredPrediction
 }
 
 func NewDFAState(stateNumber int, configs *ATNConfigSet) *DFAState {
 
-	if (configs == nil) {
+	if configs == nil {
 		configs = NewATNConfigSet(false)
 	}
 
@@ -107,14 +107,14 @@ func NewDFAState(stateNumber int, configs *ATNConfigSet) *DFAState {
 // Get the set of all alts mentioned by all ATN configurations in this
 // DFA state.
 func (this *DFAState) getAltSet() *Set {
-	var alts = NewSet(nil,nil)
-	if (this.configs != nil) {
+	var alts = NewSet(nil, nil)
+	if this.configs != nil {
 		for i := 0; i < len(this.configs.configs); i++ {
 			var c = this.configs.configs[i]
 			alts.add(c.getAlt())
 		}
 	}
-	if (alts.length() == 0) {
+	if alts.length() == 0 {
 		return nil
 	} else {
 		return alts
@@ -134,7 +134,7 @@ func (this *DFAState) getAltSet() *Set {
 // {@link //stateNumber} is irrelevant.</p>
 func (this *DFAState) equals(other interface{}) bool {
 
-	if (this == other) {
+	if this == other {
 		return true
 	} else if _, ok := other.(*DFAState); !ok {
 		return false
@@ -150,17 +150,15 @@ func (this *DFAState) toString() string {
 func (this *DFAState) hashString() string {
 
 	panic("Not implementd")
-//	var s string
-//	if (this.acceptState){
-//
-//	}
-//
-//	return "" +  this.configs +
-//			(this.isAcceptState ?
-//					"=>" + (this.predicates != nil ?
-//								this.predicates :
-//								this.prediction) :
-//					"")
+	//	var s string
+	//	if (this.acceptState){
+	//
+	//	}
+	//
+	//	return "" +  this.configs +
+	//			(this.isAcceptState ?
+	//					"=>" + (this.predicates != nil ?
+	//								this.predicates :
+	//								this.prediction) :
+	//					"")
 }
-
-

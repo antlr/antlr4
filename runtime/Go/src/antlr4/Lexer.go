@@ -20,27 +20,27 @@ type ILexer interface {
 	popMode() int
 	setType(int)
 	mode(int)
-
 }
 
 type Lexer struct {
 	Recognizer
 
-	_input CharStream
-	_factory TokenFactory
+	Interpreter *LexerATNSimulator
+
+	_input                  CharStream
+	_factory                TokenFactory
 	_tokenFactorySourcePair *TokenSourceCharStreamPair
-	_interp *LexerATNSimulator
-	_token *Token
-	_tokenStartCharIndex int
-	_tokenStartLine int
-	_tokenStartColumn int
-	_hitEOF bool
-	_channel int
-	_type int
-	_modeStack IntStack
-	_mode int
-	_text *string
-	actionType int
+	_token                  *Token
+	_tokenStartCharIndex    int
+	_tokenStartLine         int
+	_tokenStartColumn       int
+	_hitEOF                 bool
+	_channel                int
+	_type                   int
+	_modeStack              IntStack
+	_mode                   int
+	_text                   *string
+	actionType              int
 }
 
 func NewLexer(input CharStream) *Lexer {
@@ -53,13 +53,13 @@ func NewLexer(input CharStream) *Lexer {
 	return lexer
 }
 
-func (l *Lexer) InitLexer(input CharStream){
+func (l *Lexer) InitLexer(input CharStream) {
 
 	l._input = input
 	l._factory = CommonTokenFactoryDEFAULT
 	l._tokenFactorySourcePair = &TokenSourceCharStreamPair{l, input}
 
-	l._interp = nil // child classes must populate l
+	l.Interpreter = nil // child classes must populate it
 
 	// The goal of all lexer rules/methods is to create a token object.
 	// l is an instance variable as multiple rules may collaborate to
@@ -91,7 +91,7 @@ func (l *Lexer) InitLexer(input CharStream){
 	// The token type for the current token///
 	l._type = TokenInvalidType
 
-	l._modeStack = make([]int,0)
+	l._modeStack = make([]int, 0)
 	l._mode = LexerDefaultMode
 
 	// You can set the text for the current token to override what is in
@@ -103,20 +103,20 @@ func (l *Lexer) InitLexer(input CharStream){
 
 const (
 	LexerDefaultMode = 0
-	LexerMore = -2
-	LexerSkip = -3
+	LexerMore        = -2
+	LexerSkip        = -3
 )
 
 const (
 	LexerDefaultTokenChannel = TokenDefaultChannel
-	LexerHidden = TokenHiddenChannel
-	LexerMinCharValue = '\u0000'
-	LexerMaxCharValue = '\uFFFE'
+	LexerHidden              = TokenHiddenChannel
+	LexerMinCharValue        = '\u0000'
+	LexerMaxCharValue        = '\uFFFE'
 )
 
 func (l *Lexer) reset() {
 	// wack Lexer state variables
-	if (l._input != nil) {
+	if l._input != nil {
 		l._input.seek(0) // rewind the input
 	}
 	l._token = nil
@@ -131,7 +131,7 @@ func (l *Lexer) reset() {
 	l._mode = LexerDefaultMode
 	l._modeStack = make([]int, 0)
 
-	l._interp.reset()
+	l.Interpreter.reset()
 }
 
 func (l *Lexer) getInputStream() CharStream {
@@ -142,7 +142,7 @@ func (l *Lexer) getSourceName() string {
 	return l._input.getSourceName()
 }
 
-func (l *Lexer) setChannel(v int){
+func (l *Lexer) setChannel(v int) {
 	l._channel = v
 }
 
@@ -157,9 +157,9 @@ func (l *Lexer) setTokenFactory(f TokenFactory) {
 func (l *Lexer) safeMatch() (ret int) {
 
 	// previously in catch block
-	defer func(){
+	defer func() {
 		if e := recover(); e != nil {
-			if re,ok := e.(IRecognitionException); ok {
+			if re, ok := e.(IRecognitionException); ok {
 				l.notifyListeners(re) // report error
 				l.recover(re)
 				ret = LexerSkip // default
@@ -167,12 +167,12 @@ func (l *Lexer) safeMatch() (ret int) {
 		}
 	}()
 
-	return l._interp.match(l._input, l._mode)
+	return l.Interpreter.match(l._input, l._mode)
 }
 
 // Return a token from l source i.e., match a token on the char stream.
 func (l *Lexer) nextToken() *Token {
-	if (l._input == nil) {
+	if l._input == nil {
 		panic("nextToken requires a non-nil input stream.")
 	}
 
@@ -180,48 +180,48 @@ func (l *Lexer) nextToken() *Token {
 	var tokenStartMarker = l._input.mark()
 
 	// previously in finally block
-	defer func(){
+	defer func() {
 		// make sure we release marker after match or
 		// unbuffered char stream will keep buffering
 		l._input.release(tokenStartMarker)
 	}()
 
-	for (true) {
-		if (l._hitEOF) {
+	for true {
+		if l._hitEOF {
 			l.emitEOF()
 			return l._token
 		}
 		l._token = nil
 		l._channel = TokenDefaultChannel
 		l._tokenStartCharIndex = l._input.index()
-		l._tokenStartColumn = l._interp.column
-		l._tokenStartLine = l._interp.line
+		l._tokenStartColumn = l.Interpreter.column
+		l._tokenStartLine = l.Interpreter.line
 		l._text = nil
 		var continueOuter = false
-		for (true) {
+		for true {
 			l._type = TokenInvalidType
 			var ttype = LexerSkip
 
 			ttype = l.safeMatch()
 
-			if (l._input.LA(1) == TokenEOF) {
+			if l._input.LA(1) == TokenEOF {
 				l._hitEOF = true
 			}
-			if (l._type == TokenInvalidType) {
+			if l._type == TokenInvalidType {
 				l._type = ttype
 			}
-			if (l._type == LexerSkip) {
+			if l._type == LexerSkip {
 				continueOuter = true
 				break
 			}
-			if (l._type != LexerMore) {
+			if l._type != LexerMore {
 				break
 			}
 		}
-		if (continueOuter) {
+		if continueOuter {
 			continue
 		}
-		if (l._token == nil) {
+		if l._token == nil {
 			l.emit()
 		}
 		return l._token
@@ -249,7 +249,7 @@ func (l *Lexer) mode(m int) {
 }
 
 func (l *Lexer) pushMode(m int) {
-	if (LexerATNSimulatordebug) {
+	if LexerATNSimulatordebug {
 		fmt.Println("pushMode " + strconv.Itoa(m))
 	}
 	l._modeStack.Push(l._mode)
@@ -257,17 +257,16 @@ func (l *Lexer) pushMode(m int) {
 }
 
 func (l *Lexer) popMode() int {
-	if ( len(l._modeStack) == 0) {
+	if len(l._modeStack) == 0 {
 		panic("Empty Stack")
 	}
-	if (LexerATNSimulatordebug) {
+	if LexerATNSimulatordebug {
 		fmt.Println("popMode back to " + fmt.Sprint(l._modeStack[0:len(l._modeStack)-1]))
 	}
 	i, _ := l._modeStack.Pop()
 	l.mode(i)
 	return l._mode
 }
-
 
 func (l *Lexer) inputStream() CharStream {
 	return l._input
@@ -297,25 +296,25 @@ func (l *Lexer) emitToken(token *Token) {
 // custom Token objects or provide a Newfactory.
 // /
 func (l *Lexer) emit() *Token {
-	var t = l._factory.create(l._tokenFactorySourcePair, l._type, *l._text, l._channel, l._tokenStartCharIndex, l.getCharIndex() - 1, l._tokenStartLine, l._tokenStartColumn)
+	var t = l._factory.create(l._tokenFactorySourcePair, l._type, *l._text, l._channel, l._tokenStartCharIndex, l.getCharIndex()-1, l._tokenStartLine, l._tokenStartColumn)
 	l.emitToken(t)
 	return t
 }
 
 func (l *Lexer) emitEOF() *Token {
-	cpos := l.getCharPositionInLine();
-	lpos := l.getLine();
-	var eof = l._factory.create(l._tokenFactorySourcePair, TokenEOF, "", TokenDefaultChannel, l._input.index(),  l._input.index() - 1, lpos, cpos)
+	cpos := l.getCharPositionInLine()
+	lpos := l.getLine()
+	var eof = l._factory.create(l._tokenFactorySourcePair, TokenEOF, "", TokenDefaultChannel, l._input.index(), l._input.index()-1, lpos, cpos)
 	l.emitToken(eof)
 	return eof
 }
 
 func (l *Lexer) getCharPositionInLine() int {
-	return l._interp.column
+	return l.Interpreter.column
 }
 
 func (l *Lexer) getLine() int {
-	return l._interp.line
+	return l.Interpreter.line
 }
 
 func (l *Lexer) getType() int {
@@ -334,10 +333,10 @@ func (l *Lexer) getCharIndex() int {
 // Return the text matched so far for the current token or any text override.
 //Set the complete text of l token it wipes any previous changes to the text.
 func (l *Lexer) text() string {
-	if (l._text != nil) {
+	if l._text != nil {
 		return *l._text
 	} else {
-		return l._interp.getText(l._input)
+		return l.Interpreter.getText(l._input)
 	}
 }
 
@@ -346,7 +345,7 @@ func (l *Lexer) setText(text string) {
 }
 
 func (this *Lexer) getATN() *ATN {
-	return this._interp.atn
+	return this.Interpreter.atn
 }
 
 // Return a list of all Token objects in input char stream.
@@ -355,7 +354,7 @@ func (this *Lexer) getATN() *ATN {
 func (l *Lexer) getAllTokens() []*Token {
 	var tokens = make([]*Token, 0)
 	var t = l.nextToken()
-	for (t.tokenType != TokenEOF) {
+	for t.tokenType != TokenEOF {
 		tokens = append(tokens, t)
 		t = l.nextToken()
 	}
@@ -372,13 +371,13 @@ func (l *Lexer) notifyListeners(e IRecognitionException) {
 }
 
 func (l *Lexer) getErrorDisplayForChar(c rune) string {
-	if (c == TokenEOF) {
+	if c == TokenEOF {
 		return "<EOF>"
-	} else if (c == '\n') {
+	} else if c == '\n' {
 		return "\\n"
-	} else if (c == '\t') {
+	} else if c == '\t' {
 		return "\\t"
-	} else if (c == '\r') {
+	} else if c == '\r' {
 		return "\\r"
 	} else {
 		return string(c)
@@ -395,15 +394,13 @@ func (l *Lexer) getCharErrorDisplay(c rune) string {
 // to do sophisticated error recovery if you are in a fragment rule.
 // /
 func (l *Lexer) recover(re IRecognitionException) {
-	if (l._input.LA(1) != TokenEOF) {
+	if l._input.LA(1) != TokenEOF {
 		if _, ok := re.(*LexerNoViableAltException); ok {
 			// skip a char and try again
-			l._interp.consume(l._input)
+			l.Interpreter.consume(l._input)
 		} else {
 			// TODO: Do we lose character or line position information?
 			l._input.consume()
 		}
 	}
 }
-
-

@@ -1,22 +1,22 @@
 package antlr4
+
 import "strconv"
 
-
 const (
-// constants for serialization
-	ATNStateInvalidType = 0
-	ATNStateBASIC = 1
-	ATNStateRULE_START = 2
-	ATNStateBLOCK_START = 3
+	// constants for serialization
+	ATNStateInvalidType      = 0
+	ATNStateBASIC            = 1
+	ATNStateRULE_START       = 2
+	ATNStateBLOCK_START      = 3
 	ATNStatePLUS_BLOCK_START = 4
 	ATNStateSTAR_BLOCK_START = 5
-	ATNStateTOKEN_START = 6
-	ATNStateRULE_STOP = 7
-	ATNStateBLOCK_END = 8
-	ATNStateSTAR_LOOP_BACK = 9
-	ATNStateSTAR_LOOP_ENTRY = 10
-	ATNStatePLUS_LOOP_BACK = 11
-	ATNStateLOOP_END = 12
+	ATNStateTOKEN_START      = 6
+	ATNStateRULE_STOP        = 7
+	ATNStateBLOCK_END        = 8
+	ATNStateSTAR_LOOP_BACK   = 9
+	ATNStateSTAR_LOOP_ENTRY  = 10
+	ATNStatePLUS_LOOP_BACK   = 11
+	ATNStateLOOP_END         = 12
 
 	ATNStateINVALID_STATE_NUMBER = -1
 )
@@ -36,11 +36,9 @@ const (
 //            "PLUS_LOOP_BACK",
 //            "LOOP_END" ]
 
-
 var INITIAL_NUM_TRANSITIONS = 4
 
 type IATNState interface {
-
 	getEpsilonOnlyTransitions() bool
 
 	getRuleIndex() int
@@ -58,7 +56,7 @@ type IATNState interface {
 	setStateNumber(int)
 
 	getTransitions() []ITransition
-	setTransitions( []ITransition )
+	setTransitions([]ITransition)
 	addTransition(ITransition, int)
 
 	toString() string
@@ -66,10 +64,10 @@ type IATNState interface {
 
 type ATNState struct {
 	// Which ATN are we in?
-	atn *ATN
-	stateNumber int
-	stateType int
-	ruleIndex int
+	atn                    *ATN
+	stateNumber            int
+	stateType              int
+	ruleIndex              int
 	epsilonOnlyTransitions bool
 	// Track the transitions emanating from this ATN state.
 	transitions []ITransition
@@ -85,7 +83,7 @@ func NewATNState() *ATNState {
 	return as
 }
 
-func (as *ATNState) InitATNState(){
+func (as *ATNState) InitATNState() {
 
 	// Which ATN are we in?
 	as.atn = nil
@@ -143,7 +141,7 @@ func (as *ATNState) getNextTokenWithinRule() *IntervalSet {
 	return as.nextTokenWithinRule
 }
 
-func (as *ATNState) setNextTokenWithinRule(v *IntervalSet)  {
+func (as *ATNState) setNextTokenWithinRule(v *IntervalSet) {
 	as.nextTokenWithinRule = v
 }
 
@@ -164,15 +162,15 @@ func (this *ATNState) isNonGreedyExitState() bool {
 }
 
 func (this *ATNState) addTransition(trans ITransition, index int) {
-	if ( len(this.transitions) == 0 ) {
+	if len(this.transitions) == 0 {
 		this.epsilonOnlyTransitions = trans.getIsEpsilon()
-	} else if(this.epsilonOnlyTransitions != trans.getIsEpsilon()) {
+	} else if this.epsilonOnlyTransitions != trans.getIsEpsilon() {
 		this.epsilonOnlyTransitions = false
 	}
-	if (index==-1) {
+	if index == -1 {
 		this.transitions = append(this.transitions, trans)
 	} else {
-		this.transitions = append(this.transitions[:index], append([]ITransition{ trans }, this.transitions[index:]...)...)
+		this.transitions = append(this.transitions[:index], append([]ITransition{trans}, this.transitions[index:]...)...)
 		//        this.transitions.splice(index, 1, trans)
 	}
 }
@@ -192,7 +190,7 @@ func NewBasicState() *BasicState {
 type DecisionState struct {
 	*ATNState
 
-	decision int
+	decision  int
 	nonGreedy bool
 }
 
@@ -252,7 +250,6 @@ func NewBasicBlockStartState() *BasicBlockStartState {
 	return this
 }
 
-
 // Terminal node of a simple {@code (a|b|c)} block.
 type BlockEndState struct {
 	ATNState
@@ -291,7 +288,7 @@ func NewRuleStopState() *RuleStopState {
 type RuleStartState struct {
 	ATNState
 
-	stopState IATNState
+	stopState        IATNState
 	isPrecedenceRule bool
 }
 
@@ -369,7 +366,6 @@ func NewStarBlockStartState() *StarBlockStartState {
 	return this
 }
 
-
 type StarLoopbackState struct {
 	*ATNState
 }
@@ -384,11 +380,10 @@ func NewStarLoopbackState() *StarLoopbackState {
 	return this
 }
 
-
 type StarLoopEntryState struct {
 	*DecisionState
 
-	loopBackState IATNState
+	loopBackState          IATNState
 	precedenceRuleDecision bool
 }
 
@@ -407,7 +402,6 @@ func NewStarLoopEntryState() *StarLoopEntryState {
 
 	return this
 }
-
 
 // Mark the end of a * or + loop.
 type LoopEndState struct {
@@ -442,18 +436,3 @@ func NewTokensStartState() *TokensStartState {
 	this.stateType = ATNStateTOKEN_START
 	return this
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

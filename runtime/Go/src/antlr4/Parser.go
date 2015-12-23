@@ -2,7 +2,7 @@ package antlr4
 
 import (
 	"fmt"
-			)
+)
 
 type TraceListener struct {
 	parser *Parser
@@ -10,7 +10,7 @@ type TraceListener struct {
 
 func NewTraceListener(parser *Parser) *TraceListener {
 	tl := new(TraceListener)
-    tl.parser = parser
+	tl.parser = parser
 	return tl
 }
 
@@ -21,7 +21,7 @@ func (this *TraceListener) enterEveryRule(ctx IParserRuleContext) {
 	fmt.Println("enter   " + this.parser.getRuleNames()[ctx.getRuleIndex()] + ", LT(1)=" + this.parser._input.LT(1).text())
 }
 
-func (this *TraceListener) visitTerminal( node TerminalNode ) {
+func (this *TraceListener) visitTerminal(node TerminalNode) {
 	fmt.Println("consume " + fmt.Sprint(node.getSymbol()) + " rule " + this.parser.getRuleNames()[this.parser._ctx.getRuleIndex()])
 }
 
@@ -46,23 +46,23 @@ type IParser interface {
 	isExpectedToken(symbol int) bool
 	getPrecedence() int
 	getRuleInvocationStack(IParserRuleContext) []string
-
 }
 
 type Parser struct {
 	*Recognizer
 
-	_input TokenStream
-	_errHandler IErrorStrategy
-	_precedenceStack IntStack
-	_ctx IParserRuleContext
-	buildParseTrees bool
-	_tracer *TraceListener
-	_parseListeners []ParseTreeListener
-	_syntaxErrors int
-	_interp *ParserATNSimulator
+	Interpreter *ParserATNSimulator
 
-	literalNames []string
+	_input           TokenStream
+	_errHandler      IErrorStrategy
+	_precedenceStack IntStack
+	_ctx             IParserRuleContext
+	buildParseTrees  bool
+	_tracer          *TraceListener
+	_parseListeners  []ParseTreeListener
+	_syntaxErrors    int
+
+	literalNames  []string
 	symbolicNames []string
 }
 
@@ -71,6 +71,13 @@ type Parser struct {
 func NewParser(input TokenStream) *Parser {
 
 	p := new(Parser)
+
+	p.InitParser(input)
+
+	return p
+}
+
+func (p *Parser) InitParser(input TokenStream) {
 
 	p.InitRecognizer()
 
@@ -100,8 +107,6 @@ func NewParser(input TokenStream) *Parser {
 	// incremented each time {@link //notifyErrorListeners} is called.
 	p._syntaxErrors = 0
 	p.setInputStream(input)
-
-	return p
 }
 
 // p.field maps from the serialized ATN string to the deserialized {@link
@@ -114,7 +119,7 @@ var bypassAltsAtnCache = make(map[string]int)
 
 // reset the parser's state//
 func (p *Parser) reset() {
-	if (p._input != nil) {
+	if p._input != nil {
 		p._input.seek(0)
 	}
 	p._errHandler.reset(p)
@@ -123,8 +128,8 @@ func (p *Parser) reset() {
 	p.setTrace(nil)
 	p._precedenceStack = make([]int, 0)
 	p._precedenceStack.Push(0)
-	if (p._interp != nil) {
-		p._interp.reset()
+	if p.Interpreter != nil {
+		p.Interpreter.reset()
 	}
 }
 
@@ -147,12 +152,12 @@ func (p *Parser) reset() {
 
 func (p *Parser) match(ttype int) *Token {
 	var t = p.getCurrentToken()
-	if (t.tokenType == ttype) {
+	if t.tokenType == ttype {
 		p._errHandler.reportMatch(p)
 		p.consume()
 	} else {
 		t = p._errHandler.recoverInline(p)
-		if (p.buildParseTrees && t.tokenIndex == -1) {
+		if p.buildParseTrees && t.tokenIndex == -1 {
 			// we must have conjured up a Newtoken during single token
 			// insertion
 			// if it's not the current symbol
@@ -161,6 +166,7 @@ func (p *Parser) match(ttype int) *Token {
 	}
 	return t
 }
+
 // Match current input symbol as a wildcard. If the symbol type matches
 // (i.e. has a value greater than 0), {@link ANTLRErrorStrategy//reportMatch}
 // and {@link //consume} are called to complete the match process.
@@ -179,12 +185,12 @@ func (p *Parser) match(ttype int) *Token {
 
 func (p *Parser) matchWildcard() *Token {
 	var t = p.getCurrentToken()
-	if (t.tokenType > 0) {
+	if t.tokenType > 0 {
 		p._errHandler.reportMatch(p)
 		p.consume()
 	} else {
 		t = p._errHandler.recoverInline(p)
-		if (p.buildParseTrees && t.tokenIndex == -1) {
+		if p.buildParseTrees && t.tokenIndex == -1 {
 			// we must have conjured up a Newtoken during single token
 			// insertion
 			// if it's not the current symbol
@@ -199,8 +205,8 @@ func (p *Parser) getParserRuleContext() IParserRuleContext {
 }
 
 func (p *Parser) getParseListeners() []ParseTreeListener {
-	if (p._parseListeners == nil){
-		return make([]ParseTreeListener,0)
+	if p._parseListeners == nil {
+		return make([]ParseTreeListener, 0)
 	}
 	return p._parseListeners
 }
@@ -234,10 +240,10 @@ func (p *Parser) getParseListeners() []ParseTreeListener {
 // @panics nilPointerException if {@code} listener is {@code nil}
 //
 func (p *Parser) addParseListener(listener ParseTreeListener) {
-	if (listener == nil) {
+	if listener == nil {
 		panic("listener")
 	}
-	if (p._parseListeners == nil) {
+	if p._parseListeners == nil {
 		p._parseListeners = make([]ParseTreeListener, 0)
 	}
 	p._parseListeners = append(p._parseListeners, listener)
@@ -252,15 +258,15 @@ func (p *Parser) addParseListener(listener ParseTreeListener) {
 //
 func (p *Parser) removeParseListener(listener ParseTreeListener) {
 	panic("Not implemented!")
-//	if (p._parseListeners != nil) {
-//		var idx = p._parseListeners.indexOf(listener)
-//		if (idx >= 0) {
-//			p._parseListeners.splice(idx, 1)
-//		}
-//		if (len(p._parseListeners) == 0) {
-//			p._parseListeners = nil
-//		}
-//	}
+	//	if (p._parseListeners != nil) {
+	//		var idx = p._parseListeners.indexOf(listener)
+	//		if (idx >= 0) {
+	//			p._parseListeners.splice(idx, 1)
+	//		}
+	//		if (len(p._parseListeners) == 0) {
+	//			p._parseListeners = nil
+	//		}
+	//	}
 }
 
 // Remove all parse listeners.
@@ -270,9 +276,9 @@ func (p *Parser) removeParseListeners() {
 
 // Notify any parse listeners of an enter rule event.
 func (p *Parser) triggerEnterRuleEvent() {
-	if (p._parseListeners != nil) {
-        var ctx = p._ctx
-		for _,listener := range p._parseListeners {
+	if p._parseListeners != nil {
+		var ctx = p._ctx
+		for _, listener := range p._parseListeners {
 			listener.enterEveryRule(ctx)
 			ctx.enterRule(listener)
 		}
@@ -285,9 +291,9 @@ func (p *Parser) triggerEnterRuleEvent() {
 // @see //addParseListener
 //
 func (p *Parser) triggerExitRuleEvent() {
-	if (p._parseListeners != nil) {
+	if p._parseListeners != nil {
 		// reverse order walk of listeners
-        ctx := p._ctx
+		ctx := p._ctx
 		l := len(p._parseListeners) - 1
 
 		for i := range p._parseListeners {
@@ -307,11 +313,11 @@ func (this *Parser) getSymbolicNames() []string {
 }
 
 func (this *Parser) getInterpreter() *ParserATNSimulator {
-	return this._interp
+	return this.Interpreter
 }
 
 func (this *Parser) getATN() *ATN {
-	return this._interp.atn
+	return this.Interpreter.atn
 }
 
 func (p *Parser) getTokenFactory() TokenFactory {
@@ -320,7 +326,7 @@ func (p *Parser) getTokenFactory() TokenFactory {
 
 // Tell our token source and error strategy about a Newway to create tokens.//
 func (p *Parser) setTokenFactory(factory TokenFactory) {
-	p._input.getTokenSource().setTokenFactory( factory )
+	p._input.getTokenSource().setTokenFactory(factory)
 }
 
 // The ATN with bypass alternatives is expensive to create so we create it
@@ -334,18 +340,18 @@ func (p *Parser) getATNWithBypassAlts() {
 	// TODO
 	panic("Not implemented!")
 
-//	var serializedAtn = p.getSerializedATN()
-//	if (serializedAtn == nil) {
-//		panic("The current parser does not support an ATN with bypass alternatives.")
-//	}
-//	var result = p.bypassAltsAtnCache[serializedAtn]
-//	if (result == nil) {
-//		var deserializationOptions = NewATNDeserializationOptions(nil)
-//		deserializationOptions.generateRuleBypassTransitions = true
-//		result = NewATNDeserializer(deserializationOptions).deserialize(serializedAtn)
-//		p.bypassAltsAtnCache[serializedAtn] = result
-//	}
-//	return result
+	//	var serializedAtn = p.getSerializedATN()
+	//	if (serializedAtn == nil) {
+	//		panic("The current parser does not support an ATN with bypass alternatives.")
+	//	}
+	//	var result = p.bypassAltsAtnCache[serializedAtn]
+	//	if (result == nil) {
+	//		var deserializationOptions = NewATNDeserializationOptions(nil)
+	//		deserializationOptions.generateRuleBypassTransitions = true
+	//		result = NewATNDeserializer(deserializationOptions).deserialize(serializedAtn)
+	//		p.bypassAltsAtnCache[serializedAtn] = result
+	//	}
+	//	return result
 }
 
 // The preferred method of getting a tree pattern. For example, here's a
@@ -362,21 +368,21 @@ func (p *Parser) getATNWithBypassAlts() {
 func (p *Parser) compileParseTreePattern(pattern, patternRuleIndex, lexer ILexer) {
 
 	panic("NewParseTreePatternMatcher not implemented!")
-//
-//	if (lexer == nil) {
-//		if (p.getTokenStream() != nil) {
-//			var tokenSource = p.getTokenStream().getTokenSource()
-//			if _, ok := tokenSource.(ILexer); ok {
-//				lexer = tokenSource
-//			}
-//		}
-//	}
-//	if (lexer == nil) {
-//		panic("Parser can't discover a lexer to use")
-//	}
+	//
+	//	if (lexer == nil) {
+	//		if (p.getTokenStream() != nil) {
+	//			var tokenSource = p.getTokenStream().getTokenSource()
+	//			if _, ok := tokenSource.(ILexer); ok {
+	//				lexer = tokenSource
+	//			}
+	//		}
+	//	}
+	//	if (lexer == nil) {
+	//		panic("Parser can't discover a lexer to use")
+	//	}
 
-//	var m = NewParseTreePatternMatcher(lexer, p)
-//	return m.compile(pattern, patternRuleIndex)
+	//	var m = NewParseTreePatternMatcher(lexer, p)
+	//	return m.compile(pattern, patternRuleIndex)
 }
 
 func (p *Parser) getInputStream() CharStream {
@@ -406,7 +412,7 @@ func (p *Parser) getCurrentToken() *Token {
 }
 
 func (p *Parser) notifyErrorListeners(msg string, offendingToken *Token, err IRecognitionException) {
-	if (offendingToken == nil) {
+	if offendingToken == nil {
 		offendingToken = p.getCurrentToken()
 	}
 	p._syntaxErrors += 1
@@ -418,28 +424,28 @@ func (p *Parser) notifyErrorListeners(msg string, offendingToken *Token, err IRe
 
 func (p *Parser) consume() *Token {
 	var o = p.getCurrentToken()
-	if (o.tokenType != TokenEOF) {
+	if o.tokenType != TokenEOF {
 		p.getInputStream().consume()
 	}
 	var hasListener = p._parseListeners != nil && len(p._parseListeners) > 0
-	if (p.buildParseTrees || hasListener) {
-		if (p._errHandler.inErrorRecoveryMode(p)) {
+	if p.buildParseTrees || hasListener {
+		if p._errHandler.inErrorRecoveryMode(p) {
 			var node = p._ctx.addErrorNode(o)
-			if (p._parseListeners != nil) {
+			if p._parseListeners != nil {
 				for _, l := range p._parseListeners {
-					l.visitErrorNode(node);
+					l.visitErrorNode(node)
 				}
 			}
 
 		} else {
-			node := p._ctx.addTokenNode(o);
-			if (p._parseListeners != nil) {
+			node := p._ctx.addTokenNode(o)
+			if p._parseListeners != nil {
 				for _, l := range p._parseListeners {
 					l.visitTerminal(node)
 				}
 			}
 		}
-//        node.invokingState = p.state
+		//        node.invokingState = p.state
 	}
 
 	return o
@@ -447,27 +453,27 @@ func (p *Parser) consume() *Token {
 
 func (p *Parser) addContextToParseTree() {
 	// add current context to parent if we have a parent
-	if (p._ctx.getParent() != nil) {
-		p._ctx.getParent().setChildren( append(p._ctx.getParent().getChildren(), p._ctx) )
+	if p._ctx.getParent() != nil {
+		p._ctx.getParent().setChildren(append(p._ctx.getParent().getChildren(), p._ctx))
 	}
 }
 
 func (p *Parser) enterRule(localctx IParserRuleContext, state, ruleIndex int) {
 	p.state = state
 	p._ctx = localctx
-	p._ctx.setStart( p._input.LT(1) )
-	if (p.buildParseTrees) {
+	p._ctx.setStart(p._input.LT(1))
+	if p.buildParseTrees {
 		p.addContextToParseTree()
 	}
-	if (p._parseListeners != nil) {
+	if p._parseListeners != nil {
 		p.triggerEnterRuleEvent()
 	}
 }
 
 func (p *Parser) exitRule() {
-	p._ctx.setStop( p._input.LT(-1) )
+	p._ctx.setStop(p._input.LT(-1))
 	// trigger event on _ctx, before it reverts to parent
-	if (p._parseListeners != nil) {
+	if p._parseListeners != nil {
 		p.triggerExitRuleEvent()
 	}
 	p.state = p._ctx.getInvokingState()
@@ -477,8 +483,8 @@ func (p *Parser) exitRule() {
 func (p *Parser) enterOuterAlt(localctx IParserRuleContext, altNum int) {
 	// if we have Newlocalctx, make sure we replace existing ctx
 	// that is previous child of parse tree
-	if (p.buildParseTrees && p._ctx != localctx) {
-		if (p._ctx.getParent() != nil) {
+	if p.buildParseTrees && p._ctx != localctx {
+		if p._ctx.getParent() != nil {
 			p._ctx.getParent().(IParserRuleContext).removeLastChild()
 			p._ctx.getParent().(IParserRuleContext).addChild(localctx)
 		}
@@ -492,10 +498,10 @@ func (p *Parser) enterOuterAlt(localctx IParserRuleContext, altNum int) {
 // the parser context is not nested within a precedence rule.
 
 func (p *Parser) getPrecedence() int {
-	if ( len(p._precedenceStack) == 0) {
+	if len(p._precedenceStack) == 0 {
 		return -1
 	} else {
-		return p._precedenceStack[ len(p._precedenceStack) -1]
+		return p._precedenceStack[len(p._precedenceStack)-1]
 	}
 }
 
@@ -503,10 +509,10 @@ func (p *Parser) enterRecursionRule(localctx IParserRuleContext, state, ruleInde
 	p.state = state
 	p._precedenceStack.Push(precedence)
 	p._ctx = localctx
-	p._ctx.setStart( p._input.LT(1) )
-	if (p._parseListeners != nil) {
+	p._ctx.setStart(p._input.LT(1))
+	if p._parseListeners != nil {
 		p.triggerEnterRuleEvent() // simulates rule entry for
-										// left-recursive rules
+		// left-recursive rules
 	}
 }
 
@@ -515,28 +521,28 @@ func (p *Parser) enterRecursionRule(localctx IParserRuleContext, state, ruleInde
 
 func (p *Parser) pushNewRecursionContext(localctx IParserRuleContext, state, ruleIndex int) {
 	var previous = p._ctx
-	previous.setParent( localctx )
-	previous.setInvokingState( state )
-	previous.setStart( p._input.LT(-1) )
+	previous.setParent(localctx)
+	previous.setInvokingState(state)
+	previous.setStart(p._input.LT(-1))
 
 	p._ctx = localctx
-	p._ctx.setStart( previous.getStart() )
-	if (p.buildParseTrees) {
+	p._ctx.setStart(previous.getStart())
+	if p.buildParseTrees {
 		p._ctx.addChild(previous)
 	}
-	if (p._parseListeners != nil) {
+	if p._parseListeners != nil {
 		p.triggerEnterRuleEvent() // simulates rule entry for
-										// left-recursive rules
+		// left-recursive rules
 	}
 }
 
 func (p *Parser) unrollRecursionContexts(parentCtx IParserRuleContext) {
 	p._precedenceStack.Pop()
-	p._ctx.setStop(  p._input.LT(-1) )
+	p._ctx.setStop(p._input.LT(-1))
 	var retCtx = p._ctx // save current ctx (return value)
 	// unroll so _ctx is as it was before call to recursive method
-	if (p._parseListeners != nil) {
-		for (p._ctx != parentCtx) {
+	if p._parseListeners != nil {
+		for p._ctx != parentCtx {
 			p.triggerExitRuleEvent()
 			p._ctx = p._ctx.getParent().(IParserRuleContext)
 		}
@@ -544,8 +550,8 @@ func (p *Parser) unrollRecursionContexts(parentCtx IParserRuleContext) {
 		p._ctx = parentCtx
 	}
 	// hook into tree
-	retCtx.setParent( parentCtx )
-	if (p.buildParseTrees && parentCtx != nil) {
+	retCtx.setParent(parentCtx)
+	if p.buildParseTrees && parentCtx != nil {
 		// add return ctx into invoking rule's tree
 		parentCtx.addChild(retCtx)
 	}
@@ -553,8 +559,8 @@ func (p *Parser) unrollRecursionContexts(parentCtx IParserRuleContext) {
 
 func (p *Parser) getInvokingContext(ruleIndex int) IParserRuleContext {
 	var ctx = p._ctx
-	for (ctx != nil) {
-		if (ctx.getRuleIndex() == ruleIndex) {
+	for ctx != nil {
+		if ctx.getRuleIndex() == ruleIndex {
 			return ctx
 		}
 		ctx = ctx.getParent().(IParserRuleContext)
@@ -563,7 +569,7 @@ func (p *Parser) getInvokingContext(ruleIndex int) IParserRuleContext {
 }
 
 func (p *Parser) precpred(localctx IRuleContext, precedence int) bool {
-	return precedence >= p._precedenceStack[ len(p._precedenceStack) -1]
+	return precedence >= p._precedenceStack[len(p._precedenceStack)-1]
 }
 
 func (p *Parser) inContext(context IParserRuleContext) bool {
@@ -586,26 +592,26 @@ func (p *Parser) inContext(context IParserRuleContext) bool {
 // the ATN, otherwise {@code false}.
 
 func (p *Parser) isExpectedToken(symbol int) bool {
-	var atn *ATN = p._interp.atn
+	var atn *ATN = p.Interpreter.atn
 	var ctx = p._ctx
 	var s = atn.states[p.state]
-	var following = atn.nextTokens(s,nil)
-	if (following.contains(symbol)) {
+	var following = atn.nextTokens(s, nil)
+	if following.contains(symbol) {
 		return true
 	}
-	if (!following.contains(TokenEpsilon)) {
+	if !following.contains(TokenEpsilon) {
 		return false
 	}
-	for (ctx != nil && ctx.getInvokingState() >= 0 && following.contains(TokenEpsilon)) {
+	for ctx != nil && ctx.getInvokingState() >= 0 && following.contains(TokenEpsilon) {
 		var invokingState = atn.states[ctx.getInvokingState()]
 		var rt = invokingState.getTransitions()[0]
-		following = atn.nextTokens(rt.(*RuleTransition).followState,nil)
-		if (following.contains(symbol)) {
+		following = atn.nextTokens(rt.(*RuleTransition).followState, nil)
+		if following.contains(symbol) {
 			return true
 		}
 		ctx = ctx.getParent().(IParserRuleContext)
 	}
-	if (following.contains(TokenEpsilon) && symbol == TokenEOF) {
+	if following.contains(TokenEpsilon) && symbol == TokenEOF {
 		return true
 	} else {
 		return false
@@ -619,19 +625,19 @@ func (p *Parser) isExpectedToken(symbol int) bool {
 // @see ATN//getExpectedTokens(int, RuleContext)
 //
 func (p *Parser) getExpectedTokens() *IntervalSet {
-	return p._interp.atn.getExpectedTokens(p.state, p._ctx)
+	return p.Interpreter.atn.getExpectedTokens(p.state, p._ctx)
 }
 
 func (p *Parser) getExpectedTokensWithinCurrentRule() *IntervalSet {
-	var atn = p._interp.atn
+	var atn = p.Interpreter.atn
 	var s = atn.states[p.state]
-	return atn.nextTokens(s,nil)
+	return atn.nextTokens(s, nil)
 }
 
 // Get a rule's index (i.e., {@code RULE_ruleName} field) or -1 if not found.//
 func (p *Parser) getRuleIndex(ruleName string) int {
 	var ruleIndex, ok = p.getRuleIndexMap()[ruleName]
-	if (ok) {
+	if ok {
 		return ruleIndex
 	} else {
 		return -1
@@ -646,45 +652,45 @@ func (p *Parser) getRuleIndex(ruleName string) int {
 // this very useful for error messages.
 
 func (this *Parser) getRuleInvocationStack(p IParserRuleContext) []string {
-	if (p == nil) {
-		p = this._ctx;
+	if p == nil {
+		p = this._ctx
 	}
-	var stack = make([]string,0)
-	for (p != nil) {
+	var stack = make([]string, 0)
+	for p != nil {
 		// compute what follows who invoked us
-		var ruleIndex = p.getRuleIndex();
-		if (ruleIndex < 0) {
+		var ruleIndex = p.getRuleIndex()
+		if ruleIndex < 0 {
 			stack = append(stack, "n/a")
 		} else {
-			stack = append(stack, this.getRuleNames()[ruleIndex]);
+			stack = append(stack, this.getRuleNames()[ruleIndex])
 		}
-		p = p.getParent().(IParserRuleContext);
+		p = p.getParent().(IParserRuleContext)
 	}
-	return stack;
-};
+	return stack
+}
 
 // For debugging and other purposes.//
 func (p *Parser) getDFAStrings() {
 	panic("dumpDFA Not implemented!")
-//	return p._interp.decisionToDFA.toString()
+	//	return p._interp.decisionToDFA.toString()
 }
 
 // For debugging and other purposes.//
 func (p *Parser) dumpDFA() {
 	panic("dumpDFA Not implemented!")
 
-//	var seenOne = false
-//	for i := 0; i < p._interp.decisionToDFA.length; i++ {
-//		var dfa = p._interp.decisionToDFA[i]
-//		if ( len(dfa.states) > 0) {
-//			if (seenOne) {
-//				fmt.Println()
-//			}
-//			p.printer.println("Decision " + dfa.decision + ":")
-//			p.printer.print(dfa.toString(p.literalNames, p.symbolicNames))
-//			seenOne = true
-//		}
-//	}
+	//	var seenOne = false
+	//	for i := 0; i < p._interp.decisionToDFA.length; i++ {
+	//		var dfa = p._interp.decisionToDFA[i]
+	//		if ( len(dfa.states) > 0) {
+	//			if (seenOne) {
+	//				fmt.Println()
+	//			}
+	//			p.printer.println("Decision " + dfa.decision + ":")
+	//			p.printer.print(dfa.toString(p.literalNames, p.symbolicNames))
+	//			seenOne = true
+	//		}
+	//	}
 }
 
 /*
@@ -702,15 +708,14 @@ func (p *Parser) getSourceName() string {
 // events as well as token matches. p.is for quick and dirty debugging.
 //
 func (p *Parser) setTrace(trace *TraceListener) {
-	if (trace == nil) {
+	if trace == nil {
 		p.removeParseListener(p._tracer)
 		p._tracer = nil
 	} else {
-		if (p._tracer != nil) {
+		if p._tracer != nil {
 			p.removeParseListener(p._tracer)
 		}
 		p._tracer = NewTraceListener(p)
 		p.addParseListener(p._tracer)
 	}
 }
-

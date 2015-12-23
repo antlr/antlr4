@@ -26,75 +26,74 @@
 package antlr4
 
 type CommonTokenStream struct {
-    *BufferedTokenStream
+	*BufferedTokenStream
 }
 
 func NewCommonTokenStream(lexer ILexer, channel int) *CommonTokenStream {
 
-    ts := new(CommonTokenStream)
-    ts.InitBufferedTokenStream(lexer)
+	ts := new(CommonTokenStream)
+	ts.InitBufferedTokenStream(lexer)
 
-    ts.channel = channel
+	ts.channel = channel
 
-    return ts
+	return ts
 }
 
 func (ts *CommonTokenStream) adjustSeekIndex(i int) int {
-    return ts.nextTokenOnChannel(i, ts.channel)
+	return ts.nextTokenOnChannel(i, ts.channel)
 }
 
 func (ts *CommonTokenStream) LB(k int) *Token {
-    if (k==0 || ts.index-k<0) {
-        return nil
-    }
-    var i = ts.index
-    var n = 1
-    // find k good tokens looking backwards
-    for (n <= k) {
-        // skip off-channel tokens
-        i = ts.previousTokenOnChannel(i - 1, ts.channel)
-        n += 1
-    }
-    if (i < 0) {
-        return nil
-    }
-    return ts.tokens[i]
+	if k == 0 || ts.index-k < 0 {
+		return nil
+	}
+	var i = ts.index
+	var n = 1
+	// find k good tokens looking backwards
+	for n <= k {
+		// skip off-channel tokens
+		i = ts.previousTokenOnChannel(i-1, ts.channel)
+		n += 1
+	}
+	if i < 0 {
+		return nil
+	}
+	return ts.tokens[i]
 }
 
 func (ts *CommonTokenStream) LT(k int) *Token {
-    ts.lazyInit()
-    if (k == 0) {
-        return nil
-    }
-    if (k < 0) {
-        return ts.LB(-k)
-    }
-    var i = ts.index
-    var n = 1 // we know tokens[pos] is a good one
-    // find k good tokens
-    for n < k {
-        // skip off-channel tokens, but make sure to not look past EOF
-        if (ts.sync(i + 1)) {
-            i = ts.nextTokenOnChannel(i + 1, ts.channel)
-        }
-        n += 1
-    }
-    return ts.tokens[i]
+	ts.lazyInit()
+	if k == 0 {
+		return nil
+	}
+	if k < 0 {
+		return ts.LB(-k)
+	}
+	var i = ts.index
+	var n = 1 // we know tokens[pos] is a good one
+	// find k good tokens
+	for n < k {
+		// skip off-channel tokens, but make sure to not look past EOF
+		if ts.sync(i + 1) {
+			i = ts.nextTokenOnChannel(i+1, ts.channel)
+		}
+		n += 1
+	}
+	return ts.tokens[i]
 }
 
 // Count EOF just once.///
 func (ts *CommonTokenStream) getNumberOfOnChannelTokens() int {
-    var n = 0
-    ts.fill()
-    for i := 0; i < len(ts.tokens); i++ {
-        var t = ts.tokens[i]
-        if  t.channel==ts.channel {
-            n += 1
-        }
-        if  t.tokenType==TokenEOF {
-            break
-        }
-    }
-    return n
+	var n = 0
+	ts.fill()
+	for i := 0; i < len(ts.tokens); i++ {
+		var t = ts.tokens[i]
+		if t.channel == ts.channel {
+			n += 1
+		}
+		if t.tokenType == TokenEOF {
+			break
+		}
+	}
+	return n
 }
-

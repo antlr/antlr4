@@ -1,14 +1,13 @@
 package antlr4
 
 import (
-				"fmt"
+	"fmt"
 	"strconv"
 )
 
 // Provides an empty default implementation of {@link ANTLRErrorListener}. The
 // default implementation of each method does nothing, but can be overridden as
 // necessary.
-
 
 type IErrorListener interface {
 	syntaxError(recognizer IRecognizer, offendingSymbol interface{}, line, column int, msg string, e IRecognitionException)
@@ -18,7 +17,6 @@ type IErrorListener interface {
 }
 
 type DefaultErrorListener struct {
-
 }
 
 func NewErrorListener() *DefaultErrorListener {
@@ -63,7 +61,7 @@ var ConsoleErrorListenerINSTANCE = NewConsoleErrorListener()
 // </pre>
 //
 func (this *ConsoleErrorListener) syntaxError(recognizer IRecognizer, offendingSymbol interface{}, line, column int, msg string, e IRecognitionException) {
-    fmt.Errorf("line " + strconv.Itoa(line) + ":" + strconv.Itoa(column) + " " + msg)
+	fmt.Errorf("line " + strconv.Itoa(line) + ":" + strconv.Itoa(column) + " " + msg)
 }
 
 type ProxyErrorListener struct {
@@ -72,41 +70,34 @@ type ProxyErrorListener struct {
 }
 
 func NewProxyErrorListener(delegates []IErrorListener) *ProxyErrorListener {
-    if (delegates==nil) {
-        panic("delegates is not provided")
-    }
+	if delegates == nil {
+		panic("delegates is not provided")
+	}
 	l := new(ProxyErrorListener)
-    l.delegates = delegates
+	l.delegates = delegates
 	return l
 }
 
 func (this *ProxyErrorListener) syntaxError(recognizer IRecognizer, offendingSymbol interface{}, line, column int, msg string, e IRecognitionException) {
-    for _,d := range this.delegates {
+	for _, d := range this.delegates {
 		d.syntaxError(recognizer, offendingSymbol, line, column, msg, e)
 	}
 }
 
 func (this *ProxyErrorListener) reportAmbiguity(recognizer IParser, dfa *DFA, startIndex, stopIndex int, exact bool, ambigAlts *BitSet, configs *ATNConfigSet) {
-	for _,d := range this.delegates {
+	for _, d := range this.delegates {
 		d.reportAmbiguity(recognizer, dfa, startIndex, stopIndex, exact, ambigAlts, configs)
 	}
 }
 
 func (this *ProxyErrorListener) reportAttemptingFullContext(recognizer IParser, dfa *DFA, startIndex, stopIndex int, conflictingAlts *BitSet, configs *ATNConfigSet) {
-	for _,d := range this.delegates {
+	for _, d := range this.delegates {
 		d.reportAttemptingFullContext(recognizer, dfa, startIndex, stopIndex, conflictingAlts, configs)
 	}
 }
 
 func (this *ProxyErrorListener) reportContextSensitivity(recognizer IParser, dfa *DFA, startIndex, stopIndex, prediction int, configs *ATNConfigSet) {
-	for _,d := range this.delegates {
+	for _, d := range this.delegates {
 		d.reportContextSensitivity(recognizer, dfa, startIndex, stopIndex, prediction, configs)
 	}
 }
-
-
-
-
-
-
-

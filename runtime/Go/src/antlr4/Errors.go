@@ -1,7 +1,6 @@
 package antlr4
 
-import (
-	)
+import ()
 
 // The root of the ANTLR exception hierarchy. In general, ANTLR tracks just
 //  3 kinds of errors: prediction errors, failed predicate errors, and
@@ -9,42 +8,39 @@ import (
 //  in the input, where it is in the ATN, the rule invocation stack,
 //  and what kind of problem occurred.
 
-
 type IRecognitionException interface {
 	getOffendingToken() *Token
 	getMessage() string
 }
 
 type RecognitionException struct {
-
-	message string
-	recognizer IRecognizer
+	message        string
+	recognizer     IRecognizer
 	offendingToken *Token
 	offendingState int
-	ctx IRuleContext
-	input CharStream
-
+	ctx            IRuleContext
+	input          CharStream
 }
 
 func NewRecognitionException(message string, recognizer IRecognizer, input CharStream, ctx IRuleContext) *RecognitionException {
 
-// todo
-//	Error.call(this)
-//
-//	if (!!Error.captureStackTrace) {
-//        Error.captureStackTrace(this, RecognitionException)
-//	} else {
-//		var stack = NewError().stack
-//	}
+	// todo
+	//	Error.call(this)
+	//
+	//	if (!!Error.captureStackTrace) {
+	//        Error.captureStackTrace(this, RecognitionException)
+	//	} else {
+	//		var stack = NewError().stack
+	//	}
 	// TODO may be able to use - "runtime" func Stack(buf []byte, all bool) int
 
 	t := new(RecognitionException)
 	t.InitRecognitionException(message, recognizer, input, ctx)
 
-    return t
+	return t
 }
 
-func (t *RecognitionException) InitRecognitionException(message string, recognizer IRecognizer, input CharStream, ctx IRuleContext){
+func (t *RecognitionException) InitRecognitionException(message string, recognizer IRecognizer, input CharStream, ctx IRuleContext) {
 
 	t.message = message
 	t.recognizer = recognizer
@@ -60,7 +56,7 @@ func (t *RecognitionException) InitRecognitionException(message string, recogniz
 	// {@link DecisionState} number. For others, it is the state whose outgoing
 	// edge we couldn't match.
 	t.offendingState = -1
-	if (t.recognizer!=nil) {
+	if t.recognizer != nil {
 		t.offendingState = t.recognizer.getState()
 	}
 }
@@ -86,58 +82,52 @@ func (this *RecognitionException) getOffendingToken() *Token {
 // state in the ATN, or {@code nil} if the information is not available.
 // /
 func (this *RecognitionException) getExpectedTokens() *IntervalSet {
-    if (this.recognizer!=nil) {
-        return this.recognizer.getATN().getExpectedTokens(this.offendingState, this.ctx)
-    } else {
-        return nil
-    }
+	if this.recognizer != nil {
+		return this.recognizer.getATN().getExpectedTokens(this.offendingState, this.ctx)
+	} else {
+		return nil
+	}
 }
 
 func (this *RecognitionException) toString() string {
-    return this.message
+	return this.message
 }
 
-
 type LexerNoViableAltException struct {
-
 	RecognitionException
 
-	startIndex int
+	startIndex     int
 	deadEndConfigs *ATNConfigSet
-
 }
 
 func NewLexerNoViableAltException(lexer *Lexer, input CharStream, startIndex int,
 	deadEndConfigs *ATNConfigSet) *LexerNoViableAltException {
 
-	this := new (LexerNoViableAltException)
+	this := new(LexerNoViableAltException)
 
 	this.InitRecognitionException("", lexer, input, nil)
 
 	this.startIndex = startIndex
-    this.deadEndConfigs = deadEndConfigs
+	this.deadEndConfigs = deadEndConfigs
 
-    return this
+	return this
 }
 
 func (this *LexerNoViableAltException) toString() string {
-    var symbol = ""
-    if (this.startIndex >= 0 && this.startIndex < this.input.size()) {
-        symbol = this.input.getTextFromInterval(NewInterval(this.startIndex,this.startIndex))
-    }
-    return "LexerNoViableAltException" + symbol
+	var symbol = ""
+	if this.startIndex >= 0 && this.startIndex < this.input.size() {
+		symbol = this.input.getTextFromInterval(NewInterval(this.startIndex, this.startIndex))
+	}
+	return "LexerNoViableAltException" + symbol
 }
 
-
 type NoViableAltException struct {
-
 	RecognitionException
 
-	startToken *Token
+	startToken     *Token
 	offendingToken *Token
-	ctx IParserRuleContext
+	ctx            IParserRuleContext
 	deadEndConfigs *ATNConfigSet
-
 }
 
 // Indicates that the parser could not decide which of two or more paths
@@ -147,34 +137,34 @@ type NoViableAltException struct {
 //
 func NewNoViableAltException(recognizer IParser, input CharStream, startToken *Token, offendingToken *Token, deadEndConfigs *ATNConfigSet, ctx IParserRuleContext) *NoViableAltException {
 
-	if (ctx == nil){
+	if ctx == nil {
 		ctx = recognizer.getParserRuleContext()
 	}
 
-	if (offendingToken == nil){
+	if offendingToken == nil {
 		offendingToken = recognizer.getCurrentToken()
 	}
 
-	if (startToken == nil){
+	if startToken == nil {
 		startToken = recognizer.getCurrentToken()
 	}
 
-	if (input == nil){
+	if input == nil {
 		input = recognizer.getInputStream()
 	}
 
 	this := new(NoViableAltException)
 	this.InitRecognitionException("", recognizer, input, ctx)
 
-    // Which configurations did we try at input.index() that couldn't match
+	// Which configurations did we try at input.index() that couldn't match
 	// input.LT(1)?//
-    this.deadEndConfigs = deadEndConfigs
-    // The token object at the start index the input stream might
-    // not be buffering tokens so get a reference to it. (At the
-    // time the error occurred, of course the stream needs to keep a
-    // buffer all of the tokens but later we might not have access to those.)
-    this.startToken = startToken
-    this.offendingToken = offendingToken
+	this.deadEndConfigs = deadEndConfigs
+	// The token object at the start index the input stream might
+	// not be buffering tokens so get a reference to it. (At the
+	// time the error occurred, of course the stream needs to keep a
+	// buffer all of the tokens but later we might not have access to those.)
+	this.startToken = startToken
+	this.offendingToken = offendingToken
 
 	return this
 }
@@ -203,13 +193,11 @@ func NewInputMismatchException(recognizer IParser) *InputMismatchException {
 // prediction.
 
 type FailedPredicateException struct {
-
 	RecognitionException
 
-	ruleIndex int
+	ruleIndex      int
 	predicateIndex int
-	predicate string
-
+	predicate      string
 }
 
 func NewFailedPredicateException(recognizer *Parser, predicate string, message string) *FailedPredicateException {
@@ -218,38 +206,34 @@ func NewFailedPredicateException(recognizer *Parser, predicate string, message s
 
 	this.InitRecognitionException(this.formatMessage(predicate, message), recognizer, recognizer.getInputStream(), recognizer._ctx)
 
-    var s = recognizer._interp.atn.states[recognizer.state]
-    var trans = s.getTransitions()[0]
-    if trans2, ok := trans.(*PredicateTransition); ok {
-        this.ruleIndex = trans2.ruleIndex
-        this.predicateIndex = trans2.predIndex
-    } else {
-        this.ruleIndex = 0
-        this.predicateIndex = 0
-    }
-    this.predicate = predicate
-    this.offendingToken = recognizer.getCurrentToken()
+	var s = recognizer.Interpreter.atn.states[recognizer.state]
+	var trans = s.getTransitions()[0]
+	if trans2, ok := trans.(*PredicateTransition); ok {
+		this.ruleIndex = trans2.ruleIndex
+		this.predicateIndex = trans2.predIndex
+	} else {
+		this.ruleIndex = 0
+		this.predicateIndex = 0
+	}
+	this.predicate = predicate
+	this.offendingToken = recognizer.getCurrentToken()
 
-    return this
+	return this
 }
 
 func (this *FailedPredicateException) formatMessage(predicate, message string) string {
-    if (message != "") {
-        return message
-    } else {
-        return "failed predicate: {" + predicate + "}?"
-    }
+	if message != "" {
+		return message
+	} else {
+		return "failed predicate: {" + predicate + "}?"
+	}
 }
 
 type ParseCancellationException struct {
-
 }
 
 func NewParseCancellationException() *ParseCancellationException {
-//	Error.call(this)
-//	Error.captureStackTrace(this, ParseCancellationException)
+	//	Error.call(this)
+	//	Error.captureStackTrace(this, ParseCancellationException)
 	return new(ParseCancellationException)
 }
-
-
-

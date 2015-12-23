@@ -1,23 +1,22 @@
 package antlr4
 
-import (
-    )
+import ()
 
 type LL1Analyzer struct {
-    atn *ATN
+	atn *ATN
 }
 
-func NewLL1Analyzer (atn *ATN) *LL1Analyzer {
-    la := new(LL1Analyzer)
-    la.atn = atn
-    return la
+func NewLL1Analyzer(atn *ATN) *LL1Analyzer {
+	la := new(LL1Analyzer)
+	la.atn = atn
+	return la
 }
 
 //* Special value added to the lookahead sets to indicate that we hit
 //  a predicate during analysis if {@code seeThruPreds==false}.
 ///
 const (
-    LL1AnalyzerHIT_PRED = TokenInvalidType
+	LL1AnalyzerHIT_PRED = TokenInvalidType
 )
 
 //*
@@ -30,23 +29,23 @@ const (
 // @param s the ATN state
 // @return the expected symbols for each outgoing transition of {@code s}.
 func (la *LL1Analyzer) getDecisionLookahead(s IATNState) []*IntervalSet {
-    if (s == nil) {
-        return nil
-    }
-    var count = len(s.getTransitions())
-    var look = make([]*IntervalSet, count)
-    for alt := 0; alt < count; alt++ {
-        look[alt] = NewIntervalSet()
-        var lookBusy = NewSet(nil,nil)
-        var seeThruPreds = false // fail to get lookahead upon pred
-        la._LOOK(s.getTransitions()[alt].getTarget(), nil, PredictionContextEMPTY, look[alt], lookBusy, NewBitSet(), seeThruPreds, false)
-        // Wipe out lookahead for la alternative if we found nothing
-        // or we had a predicate when we !seeThruPreds
-        if (look[alt].length()==0 || look[alt].contains(LL1AnalyzerHIT_PRED)) {
-            look[alt] = nil
-        }
-    }
-    return look
+	if s == nil {
+		return nil
+	}
+	var count = len(s.getTransitions())
+	var look = make([]*IntervalSet, count)
+	for alt := 0; alt < count; alt++ {
+		look[alt] = NewIntervalSet()
+		var lookBusy = NewSet(nil, nil)
+		var seeThruPreds = false // fail to get lookahead upon pred
+		la._LOOK(s.getTransitions()[alt].getTarget(), nil, PredictionContextEMPTY, look[alt], lookBusy, NewBitSet(), seeThruPreds, false)
+		// Wipe out lookahead for la alternative if we found nothing
+		// or we had a predicate when we !seeThruPreds
+		if look[alt].length() == 0 || look[alt].contains(LL1AnalyzerHIT_PRED) {
+			look[alt] = nil
+		}
+	}
+	return look
 }
 
 //*
@@ -68,16 +67,16 @@ func (la *LL1Analyzer) getDecisionLookahead(s IATNState) []*IntervalSet {
 // specified {@code ctx}.
 ///
 func (la *LL1Analyzer) LOOK(s, stopState IATNState, ctx IRuleContext) *IntervalSet {
-    var r = NewIntervalSet()
-    var seeThruPreds = true // ignore preds get all lookahead
-    var lookContext IPredictionContext
-    if (ctx != nil){
-        predictionContextFromRuleContext(s.getATN(), ctx)
-    }
-    la._LOOK(s, stopState, lookContext, r, NewSet(nil, nil), NewBitSet(), seeThruPreds, true)
-    return r
+	var r = NewIntervalSet()
+	var seeThruPreds = true // ignore preds get all lookahead
+	var lookContext IPredictionContext
+	if ctx != nil {
+		predictionContextFromRuleContext(s.getATN(), ctx)
+	}
+	la._LOOK(s, stopState, lookContext, r, NewSet(nil, nil), NewBitSet(), seeThruPreds, true)
+	return r
 }
-    
+
 //*
 // Compute set of tokens that can follow {@code s} in the ATN in the
 // specified {@code ctx}.
@@ -108,98 +107,97 @@ func (la *LL1Analyzer) LOOK(s, stopState IATNState, ctx IRuleContext) *IntervalS
 // outermost context is reached. This parameter has no effect if {@code ctx}
 // is {@code nil}.
 
-
 func (la *LL1Analyzer) _LOOK(s, stopState IATNState, ctx IPredictionContext, look *IntervalSet, lookBusy *Set, calledRuleStack *BitSet, seeThruPreds, addEOF bool) {
 
-    c := NewATNConfig6(s, 0, ctx)
+	c := NewATNConfig6(s, 0, ctx)
 
-    if lookBusy.add(c) == nil {
-        return
-    }
+	if lookBusy.add(c) == nil {
+		return
+	}
 
-    if (s == stopState) {
-        if (ctx == nil) {
-            look.addOne(TokenEpsilon)
-            return
-        } else if (ctx.isEmpty() && addEOF) {
-            look.addOne(TokenEOF)
-            return
-        }
-    }
+	if s == stopState {
+		if ctx == nil {
+			look.addOne(TokenEpsilon)
+			return
+		} else if ctx.isEmpty() && addEOF {
+			look.addOne(TokenEOF)
+			return
+		}
+	}
 
-    _,ok := s.(*RuleStopState)
+	_, ok := s.(*RuleStopState)
 
-    if ok {
-        if ( ctx==nil ) {
-            look.addOne(TokenEpsilon)
-            return
-        } else if (ctx.isEmpty() && addEOF) {
-            look.addOne(TokenEOF)
-            return
-        }
+	if ok {
+		if ctx == nil {
+			look.addOne(TokenEpsilon)
+			return
+		} else if ctx.isEmpty() && addEOF {
+			look.addOne(TokenEOF)
+			return
+		}
 
-        if ( ctx != PredictionContextEMPTY ) {
+		if ctx != PredictionContextEMPTY {
 
-            // run thru all possible stack tops in ctx
-            for i := 0; i < ctx.length(); i++ {
+			// run thru all possible stack tops in ctx
+			for i := 0; i < ctx.length(); i++ {
 
-                returnState := la.atn.states[ctx.getReturnState(i)]
-//					System.out.println("popping back to "+retState)
+				returnState := la.atn.states[ctx.getReturnState(i)]
+				//					System.out.println("popping back to "+retState)
 
-                removed := calledRuleStack.contains(returnState.getRuleIndex())
+				removed := calledRuleStack.contains(returnState.getRuleIndex())
 
-                // TODO this is incorrect
-                defer func(){
-                    if (removed) {
-                        calledRuleStack.add(returnState.getRuleIndex())
-                    }
-                }()
+				// TODO this is incorrect
+				defer func() {
+					if removed {
+						calledRuleStack.add(returnState.getRuleIndex())
+					}
+				}()
 
-                calledRuleStack.clear(returnState.getRuleIndex())
-                la._LOOK(returnState, stopState, ctx.getParent(i), look, lookBusy, calledRuleStack, seeThruPreds, addEOF)
+				calledRuleStack.clear(returnState.getRuleIndex())
+				la._LOOK(returnState, stopState, ctx.getParent(i), look, lookBusy, calledRuleStack, seeThruPreds, addEOF)
 
-            }
-            return
-        }
-    }
+			}
+			return
+		}
+	}
 
-    n := len(s.getTransitions())
+	n := len(s.getTransitions())
 
-    for i:=0; i<n; i++ {
-        t := s.getTransitions()[i]
+	for i := 0; i < n; i++ {
+		t := s.getTransitions()[i]
 
-        if t1, ok := t.(*RuleTransition); ok {
+		if t1, ok := t.(*RuleTransition); ok {
 
-            if (calledRuleStack.contains(t1.getTarget().getRuleIndex())) {
-                continue
-            }
+			if calledRuleStack.contains(t1.getTarget().getRuleIndex()) {
+				continue
+			}
 
-            newContext := SingletonPredictionContextcreate(ctx, t1.followState.getStateNumber())
+			newContext := SingletonPredictionContextcreate(ctx, t1.followState.getStateNumber())
 
-            defer func(){
-                calledRuleStack.remove(t1.getTarget().getRuleIndex());
-            }()
+			defer func() {
+				calledRuleStack.remove(t1.getTarget().getRuleIndex())
+			}()
 
-            calledRuleStack.add(t1.getTarget().getRuleIndex())
-            la._LOOK(t.getTarget(), stopState, newContext, look, lookBusy, calledRuleStack, seeThruPreds, addEOF)
-        } else if t2, ok := t.(*AbstractPredicateTransition); ok {
-            if ( seeThruPreds ) {
-                la._LOOK(t2.getTarget(), stopState, ctx, look, lookBusy, calledRuleStack, seeThruPreds, addEOF)
-            } else {
-                look.addOne(LL1AnalyzerHIT_PRED)
-            }
-        } else if ( t.getIsEpsilon() ) {
-            la._LOOK(t.getTarget(), stopState, ctx, look, lookBusy, calledRuleStack, seeThruPreds, addEOF)
-        } else if _, ok := t.(*WildcardTransition); ok {
-            look.addRange( TokenMinUserTokenType, la.atn.maxTokenType );
-        }  else {
-            set := t.getLabel()
-            if (set != nil) {
-                if _, ok := t.(*NotSetTransition); ok {
-                    set = set.complement(TokenMinUserTokenType, la.atn.maxTokenType);
-                }
-                look.addSet(set)
-            }
-        }
-    }
+			calledRuleStack.add(t1.getTarget().getRuleIndex())
+			la._LOOK(t.getTarget(), stopState, newContext, look, lookBusy, calledRuleStack, seeThruPreds, addEOF)
+		} else if t2, ok := t.(*AbstractPredicateTransition); ok {
+			if seeThruPreds {
+				la._LOOK(t2.getTarget(), stopState, ctx, look, lookBusy, calledRuleStack, seeThruPreds, addEOF)
+			} else {
+				look.addOne(LL1AnalyzerHIT_PRED)
+			}
+		} else if t.getIsEpsilon() {
+			la._LOOK(t.getTarget(), stopState, ctx, look, lookBusy, calledRuleStack, seeThruPreds, addEOF)
+		} else if _, ok := t.(*WildcardTransition); ok {
+			look.addRange(TokenMinUserTokenType, la.atn.maxTokenType)
+		} else {
+			set := t.getLabel()
+			if set != nil {
+				if _, ok := t.(*NotSetTransition); ok {
+					set = set.complement(TokenMinUserTokenType, la.atn.maxTokenType)
+				}
+				look.addSet(set)
+			}
+		}
+	}
 }

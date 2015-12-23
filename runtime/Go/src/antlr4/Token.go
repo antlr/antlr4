@@ -1,13 +1,13 @@
 package antlr4
 
 import (
-	"strings"
 	"strconv"
+	"strings"
 )
 
 type TokenSourceCharStreamPair struct {
 	tokenSource TokenSource
-	charStream CharStream
+	charStream  CharStream
 }
 
 // A token has properties: text, type, line, character position in the line
@@ -15,16 +15,16 @@ type TokenSourceCharStreamPair struct {
 // we obtained this token.
 
 type Token struct {
-	source *TokenSourceCharStreamPair
-	tokenType int // token type of the token
-	channel int // The parser ignores everything not on DEFAULT_CHANNEL
-	start int // optional return -1 if not implemented.
-	stop int // optional return -1 if not implemented.
-	tokenIndex int // from 0..n-1 of the token object in the input stream
-	line int // line=1..n of the 1st character
-	column int // beginning of the line at which it occurs, 0..n-1
-	_text string // text of the token.
-	readOnly bool
+	source     *TokenSourceCharStreamPair
+	tokenType  int    // token type of the token
+	channel    int    // The parser ignores everything not on DEFAULT_CHANNEL
+	start      int    // optional return -1 if not implemented.
+	stop       int    // optional return -1 if not implemented.
+	tokenIndex int    // from 0..n-1 of the token object in the input stream
+	line       int    // line=1..n of the 1st character
+	column     int    // beginning of the line at which it occurs, 0..n-1
+	_text      string // text of the token.
+	readOnly   bool
 }
 
 const (
@@ -58,7 +58,7 @@ const (
 // should be obtained from the input along with the start and stop indexes
 // of the token.
 
-func (this *Token) text() string{
+func (this *Token) text() string {
 	return this._text
 }
 
@@ -88,7 +88,7 @@ func NewCommonToken(source *TokenSourceCharStreamPair, tokenType, channel, start
 	t.start = start
 	t.stop = stop
 	t.tokenIndex = -1
-	if (t.source.tokenSource != nil) {
+	if t.source.tokenSource != nil {
 		t.line = source.tokenSource.getLine()
 		t.column = source.tokenSource.getCharPositionInLine()
 	} else {
@@ -116,7 +116,7 @@ func NewCommonToken(source *TokenSourceCharStreamPair, tokenType, channel, start
 //
 func (ct *CommonToken) clone() *CommonToken {
 	var t = NewCommonToken(ct.source, ct.tokenType, ct.channel, ct.start,
-			ct.stop)
+		ct.stop)
 	t.tokenIndex = ct.tokenIndex
 	t.line = ct.line
 	t.column = ct.column
@@ -125,15 +125,15 @@ func (ct *CommonToken) clone() *CommonToken {
 }
 
 func (this *CommonToken) text() string {
-	if (this._text != "") {
+	if this._text != "" {
 		return this._text
 	}
 	var input = this.getInputStream()
-	if (input == nil) {
+	if input == nil {
 		return ""
 	}
 	var n = input.size()
-	if (this.start < n && this.stop < n) {
+	if this.start < n && this.stop < n {
 		return input.getTextFromInterval(NewInterval(this.start, this.stop))
 	} else {
 		return "<EOF>"
@@ -146,7 +146,7 @@ func (this *CommonToken) setText(text string) {
 
 func (this *CommonToken) toString() string {
 	var txt = this.text()
-	if (txt != "") {
+	if txt != "" {
 		txt = strings.Replace(txt, "\n", "", -1)
 		txt = strings.Replace(txt, "\r", "", -1)
 		txt = strings.Replace(txt, "\t", "", -1)
@@ -154,17 +154,14 @@ func (this *CommonToken) toString() string {
 		txt = "<no text>"
 	}
 
-	var ch string;
-	if (this.channel > 0){
+	var ch string
+	if this.channel > 0 {
 		ch = ",channel=" + strconv.Itoa(this.channel)
 	} else {
 		ch = ""
 	}
 
 	return "[@" + strconv.Itoa(this.tokenIndex) + "," + strconv.Itoa(this.start) + ":" + strconv.Itoa(this.stop) + "='" +
-			txt + "',<" + strconv.Itoa(this.tokenType) + ">" +
-			ch + "," + strconv.Itoa(this.line) + ":" + strconv.Itoa(this.column) + "]"
+		txt + "',<" + strconv.Itoa(this.tokenType) + ">" +
+		ch + "," + strconv.Itoa(this.line) + ":" + strconv.Itoa(this.column) + "]"
 }
-
-
-

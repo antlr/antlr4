@@ -28,23 +28,24 @@ import (
 type IRuleContext interface {
 	RuleNode
 
-	getInvokingState()int
+	getInvokingState() int
 	setInvokingState(int)
 
-	getRuleIndex()int
+	getRuleIndex() int
+
 	isEmpty() bool
 
 	toString([]string, IRuleContext) string
 }
 
 type RuleContext struct {
-	parentCtx IRuleContext
+	parentCtx     IRuleContext
 	invokingState int
-	ruleIndex int
-	children []Tree
+	RuleIndex     int
+	children      []Tree
 }
 
-func NewRuleContext(parent IRuleContext, invokingState int)  *RuleContext {
+func NewRuleContext(parent IRuleContext, invokingState int) *RuleContext {
 
 	rn := new(RuleContext)
 
@@ -61,21 +62,20 @@ func (rn *RuleContext) InitRuleContext(parent IRuleContext, invokingState int) {
 	// What state invoked the rule associated with this context?
 	// The "return address" is the followState of invokingState
 	// If parent is nil, this should be -1.
-	if (parent == nil){
+	if parent == nil {
 		rn.invokingState = -1
 	} else {
 		rn.invokingState = invokingState
 	}
 }
 
-func (this *RuleContext) setChildren(elems []Tree){
+func (this *RuleContext) setChildren(elems []Tree) {
 	this.children = elems
 }
 
-func (this *RuleContext) setParent(v Tree){
+func (this *RuleContext) setParent(v Tree) {
 	this.parentCtx = v.(IRuleContext)
 }
-
 
 func (this *RuleContext) getInvokingState() int {
 	return this.getInvokingState()
@@ -85,8 +85,8 @@ func (this *RuleContext) setInvokingState(t int) {
 	this.invokingState = t
 }
 
-func (this *RuleContext) getRuleIndex() int{
-	return this.ruleIndex
+func (this *RuleContext) getRuleIndex() int {
+	return this.RuleIndex
 }
 
 func (this *RuleContext) getChildren() []Tree {
@@ -96,7 +96,7 @@ func (this *RuleContext) getChildren() []Tree {
 func (this *RuleContext) depth() int {
 	var n = 0
 	var p Tree = this
-	for (p != nil) {
+	for p != nil {
 		p = p.getParent()
 		n += 1
 	}
@@ -131,7 +131,7 @@ func (this *RuleContext) getPayload() interface{} {
 // method.
 //
 func (this *RuleContext) getText() string {
-	if (this.getChildCount() == 0) {
+	if this.getChildCount() == 0 {
 		return ""
 	} else {
 		var s string
@@ -173,22 +173,22 @@ func (this *RuleContext) toString(ruleNames []string, stop IRuleContext) string 
 
 	var p IRuleContext = this
 	var s = "["
-	for (p != nil && p != stop) {
-		if (ruleNames == nil) {
-			if (!p.isEmpty()) {
+	for p != nil && p != stop {
+		if ruleNames == nil {
+			if !p.isEmpty() {
 				s += strconv.Itoa(p.getInvokingState())
 			}
 		} else {
 			var ri = p.getRuleIndex()
 			var ruleName string
-			if (ri >= 0 && ri < len(ruleNames)) {
+			if ri >= 0 && ri < len(ruleNames) {
 				ruleName = ruleNames[ri]
 			} else {
 				ruleName = strconv.Itoa(ri)
 			}
 			s += ruleName
 		}
-		if (p.getParent() != nil && (ruleNames != nil || !p.getParent().(IRuleContext).isEmpty())) {
+		if p.getParent() != nil && (ruleNames != nil || !p.getParent().(IRuleContext).isEmpty()) {
 			s += " "
 		}
 		p = p.getParent().(IRuleContext)
@@ -196,4 +196,3 @@ func (this *RuleContext) toString(ruleNames []string, stop IRuleContext) string 
 	s += "]"
 	return s
 }
-

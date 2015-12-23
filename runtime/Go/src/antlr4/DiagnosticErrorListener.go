@@ -1,4 +1,5 @@
 package antlr4
+
 import (
 	"strconv"
 )
@@ -38,32 +39,32 @@ func NewDiagnosticErrorListener(exactOnly bool) *DiagnosticErrorListener {
 }
 
 func (this *DiagnosticErrorListener) reportAmbiguity(recognizer *Parser, dfa *DFA, startIndex, stopIndex int, exact bool, ambigAlts *BitSet, configs *ATNConfigSet) {
-	if (this.exactOnly && !exact) {
+	if this.exactOnly && !exact {
 		return
 	}
 	var msg = "reportAmbiguity d=" +
-			this.getDecisionDescription(recognizer, dfa) +
-			": ambigAlts=" +
-			this.getConflictingAlts(ambigAlts, configs).toString() +
-			", input='" +
-			recognizer.getTokenStream().getTextFromInterval(NewInterval(startIndex, stopIndex)) + "'"
+		this.getDecisionDescription(recognizer, dfa) +
+		": ambigAlts=" +
+		this.getConflictingAlts(ambigAlts, configs).toString() +
+		", input='" +
+		recognizer.getTokenStream().getTextFromInterval(NewInterval(startIndex, stopIndex)) + "'"
 	recognizer.notifyErrorListeners(msg, nil, nil)
 }
 
 func (this *DiagnosticErrorListener) reportAttemptingFullContext(recognizer *Parser, dfa *DFA, startIndex, stopIndex int, conflictingAlts *BitSet, configs *ATNConfigSet) {
 
 	var msg = "reportAttemptingFullContext d=" +
-			this.getDecisionDescription(recognizer, dfa) +
-			", input='" +
-			recognizer.getTokenStream().getTextFromInterval(NewInterval(startIndex, stopIndex)) + "'"
+		this.getDecisionDescription(recognizer, dfa) +
+		", input='" +
+		recognizer.getTokenStream().getTextFromInterval(NewInterval(startIndex, stopIndex)) + "'"
 	recognizer.notifyErrorListeners(msg, nil, nil)
 }
 
 func (this *DiagnosticErrorListener) reportContextSensitivity(recognizer *Parser, dfa *DFA, startIndex, stopIndex, prediction int, configs *ATNConfigSet) {
 	var msg = "reportContextSensitivity d=" +
-			this.getDecisionDescription(recognizer, dfa) +
-			", input='" +
-			recognizer.getTokenStream().getTextFromInterval(NewInterval(startIndex, stopIndex)) + "'"
+		this.getDecisionDescription(recognizer, dfa) +
+		", input='" +
+		recognizer.getTokenStream().getTextFromInterval(NewInterval(startIndex, stopIndex)) + "'"
 	recognizer.notifyErrorListeners(msg, nil, nil)
 }
 
@@ -72,11 +73,11 @@ func (this *DiagnosticErrorListener) getDecisionDescription(recognizer *Parser, 
 	var ruleIndex = dfa.atnStartState.ruleIndex
 
 	var ruleNames = recognizer.getRuleNames()
-	if (ruleIndex < 0 || ruleIndex >= len(ruleNames)) {
+	if ruleIndex < 0 || ruleIndex >= len(ruleNames) {
 		return strconv.Itoa(decision)
 	}
 	var ruleName = ruleNames[ruleIndex]
-	if (ruleName == "") {
+	if ruleName == "" {
 		return strconv.Itoa(decision)
 	}
 	return strconv.Itoa(decision) + " (" + ruleName + ")"
@@ -94,7 +95,7 @@ func (this *DiagnosticErrorListener) getDecisionDescription(recognizer *Parser, 
 // returns the set of alternatives represented in {@code configs}.
 //
 func (this *DiagnosticErrorListener) getConflictingAlts(reportedAlts *BitSet, set *ATNConfigSet) *BitSet {
-	if (reportedAlts != nil) {
+	if reportedAlts != nil {
 		return reportedAlts
 	}
 	var result = NewBitSet()
@@ -104,10 +105,10 @@ func (this *DiagnosticErrorListener) getConflictingAlts(reportedAlts *BitSet, se
 
 	return result
 
-//	valuestrings := make([]string, len(result.values()))
-//	for i,v := range result.values() {
-//		valuestrings[i] = strconv.Itoa(v)
-//	}
-//
-//	return "{" + strings.Join(valuestrings, ", ") + "}"
+	//	valuestrings := make([]string, len(result.values()))
+	//	for i,v := range result.values() {
+	//		valuestrings[i] = strconv.Itoa(v)
+	//	}
+	//
+	//	return "{" + strings.Join(valuestrings, ", ") + "}"
 }

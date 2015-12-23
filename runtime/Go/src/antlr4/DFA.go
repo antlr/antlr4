@@ -2,9 +2,9 @@ package antlr4
 
 type DFA struct {
 	atnStartState *DecisionState
-	decision int
-	_states map[string]*DFAState
-	s0 *DFAState
+	decision      int
+	_states       map[string]*DFAState
+	s0            *DFAState
 	precedenceDfa bool
 }
 
@@ -37,11 +37,11 @@ func NewDFA(atnStartState *DecisionState, decision int) *DFA {
 // @see //isPrecedenceDfa()
 
 func (this *DFA) getPrecedenceStartState(precedence int) *DFAState {
-	if (!(this.precedenceDfa)) {
+	if !(this.precedenceDfa) {
 		panic("Only precedence DFAs may contain a precedence start state.")
 	}
 	// s0.edges is never nil for a precedence DFA
-	if (precedence < 0 || precedence >= len(this.s0.edges)) {
+	if precedence < 0 || precedence >= len(this.s0.edges) {
 		return nil
 	}
 	return this.s0.edges[precedence]
@@ -56,11 +56,11 @@ func (this *DFA) getPrecedenceStartState(precedence int) *DFAState {
 // @panics IllegalStateException if this is not a precedence DFA.
 // @see //isPrecedenceDfa()
 //
-func (this *DFA) setPrecedenceStartState(precedence int, startState *DFAState)  {
-	if (!(this.precedenceDfa)) {
-		panic ("Only precedence DFAs may contain a precedence start state.")
+func (this *DFA) setPrecedenceStartState(precedence int, startState *DFAState) {
+	if !(this.precedenceDfa) {
+		panic("Only precedence DFAs may contain a precedence start state.")
 	}
-	if (precedence < 0) {
+	if precedence < 0 {
 		return
 	}
 
@@ -88,11 +88,11 @@ func (this *DFA) setPrecedenceStartState(precedence int, startState *DFAState)  
 // {@code false}
 
 func (this *DFA) setPrecedenceDfa(precedenceDfa bool) {
-	if (this.precedenceDfa!=precedenceDfa) {
+	if this.precedenceDfa != precedenceDfa {
 		this._states = make(map[string]*DFAState)
-		if (precedenceDfa) {
+		if precedenceDfa {
 			var precedenceState = NewDFAState(-1, NewATNConfigSet(false))
-			precedenceState.edges = make([]*DFAState,0)
+			precedenceState.edges = make([]*DFAState, 0)
 			precedenceState.isAcceptState = false
 			precedenceState.requiresFullContext = false
 			this.s0 = precedenceState
@@ -114,18 +114,18 @@ func (this *DFA) sortedStates() []*DFAState {
 
 	return nil
 	// states_ is a map of state/state, where key=value
-//	var keys = Object.keys(this._states)
-//	var list = []
-//	for i:=0; i<keys.length; i++ {
-//		list.push(this._states[keys[i]])
-//	}
-//	return list.sort(function(a, b) {
-//		return a.stateNumber - b.stateNumber
-//	})
+	//	var keys = Object.keys(this._states)
+	//	var list = []
+	//	for i:=0; i<keys.length; i++ {
+	//		list.push(this._states[keys[i]])
+	//	}
+	//	return list.sort(function(a, b) {
+	//		return a.stateNumber - b.stateNumber
+	//	})
 }
 
 func (this *DFA) toString(literalNames []string, symbolicNames []string) string {
-	if (this.s0 == nil) {
+	if this.s0 == nil {
 		return ""
 	}
 	var serializer = NewDFASerializer(this, literalNames, symbolicNames)
@@ -133,11 +133,9 @@ func (this *DFA) toString(literalNames []string, symbolicNames []string) string 
 }
 
 func (this *DFA) toLexerString() string {
-	if (this.s0 == nil) {
+	if this.s0 == nil {
 		return ""
 	}
 	var serializer = NewLexerDFASerializer(this)
 	return serializer.toString()
 }
-
-

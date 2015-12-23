@@ -1,23 +1,21 @@
 package antlr4
 
 type ATNDeserializationOptions struct {
-	readOnly bool
-	verifyATN bool
+	readOnly                      bool
+	verifyATN                     bool
 	generateRuleBypassTransitions bool
 }
 
 func NewATNDeserializationOptions(copyFrom *ATNDeserializationOptions) *ATNDeserializationOptions {
 	o := new(ATNDeserializationOptions)
 
-	if (copyFrom != nil){
+	if copyFrom != nil {
 		o.readOnly = copyFrom.readOnly
 		o.verifyATN = copyFrom.verifyATN
 		o.generateRuleBypassTransitions = copyFrom.generateRuleBypassTransitions
 	}
 
-    return o
+	return o
 }
 
-var ATNDeserializationOptionsdefaultOptions = &ATNDeserializationOptions{true,false,false}
-
-
+var ATNDeserializationOptionsdefaultOptions = &ATNDeserializationOptions{true, false, false}

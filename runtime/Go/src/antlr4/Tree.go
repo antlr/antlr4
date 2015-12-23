@@ -1,6 +1,5 @@
 package antlr4
 
-
 // The basic notion of a tree has a parent, a payload, and a list of children.
 //  It is the most abstract interface for all the trees used by ANTLR.
 ///
@@ -15,7 +14,7 @@ type Tree interface {
 	getChildCount() int
 	getChildren() []Tree
 	setChildren([]Tree)
-//	toStringTree() string
+	//	toStringTree() string
 }
 
 type SyntaxTree interface {
@@ -27,10 +26,10 @@ type SyntaxTree interface {
 type ParseTree interface {
 	SyntaxTree
 
-//	<T> T accept(ParseTreeVisitor<? extends T> visitor);
+	//	<T> T accept(ParseTreeVisitor<? extends T> visitor);
 	accept(visitor ParseTreeVisitor) interface{}
 	getText() string
-//	toStringTree([]string, IRecognizer) string
+	//	toStringTree([]string, IRecognizer) string
 }
 
 type RuleNode interface {
@@ -116,7 +115,6 @@ func (this *TerminalNodeImpl) setChildren(t []Tree) {
 	panic("Cannot set children on terminal node")
 }
 
-
 func (this *TerminalNodeImpl) getSymbol() *Token {
 	return this.symbol
 }
@@ -134,7 +132,7 @@ func (this *TerminalNodeImpl) getPayload() interface{} {
 }
 
 func (this *TerminalNodeImpl) getSourceInterval() *Interval {
-	if (this.symbol == nil) {
+	if this.symbol == nil {
 		return TreeINVALID_INTERVAL
 	}
 	var tokenIndex = this.symbol.tokenIndex
@@ -145,7 +143,7 @@ func (this *TerminalNodeImpl) getChildCount() int {
 	return 0
 }
 
-func (this *TerminalNodeImpl) accept(visitor ParseTreeVisitor ) interface{} {
+func (this *TerminalNodeImpl) accept(visitor ParseTreeVisitor) interface{} {
 	return visitor.visitTerminal(this)
 }
 
@@ -154,13 +152,12 @@ func (this *TerminalNodeImpl) getText() string {
 }
 
 func (this *TerminalNodeImpl) toString() string {
-	if (this.symbol.tokenType == TokenEOF) {
+	if this.symbol.tokenType == TokenEOF {
 		return "<EOF>"
 	} else {
 		return this.symbol.text()
 	}
 }
-
 
 // Represents a token that was consumed during resynchronization
 // rather than during a valid match operation. For example,
@@ -182,13 +179,11 @@ func (this *ErrorNodeImpl) isErrorNode() bool {
 	return true
 }
 
-func (this *ErrorNodeImpl) accept( visitor ParseTreeVisitor ) interface{} {
+func (this *ErrorNodeImpl) accept(visitor ParseTreeVisitor) interface{} {
 	return visitor.visitErrorNode(this)
 }
 
-
 type ParseTreeWalker struct {
-
 }
 
 func NewParseTreeWalker() *ParseTreeWalker {
@@ -210,6 +205,7 @@ func (this *ParseTreeWalker) walk(listener ParseTreeListener, t Tree) {
 		this.exitRule(listener, t.(RuleNode))
 	}
 }
+
 //
 // The discovery of a rule node, involves sending two events: the generic
 // {@link ParseTreeListener//enterEveryRule} and a

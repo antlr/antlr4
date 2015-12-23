@@ -2,8 +2,8 @@ package antlr4
 
 import (
 	"bytes"
-	"os"
 	"io"
+	"os"
 )
 
 //
@@ -25,7 +25,4 @@ func NewFileStream(fileName string) {
 	io.Copy(buf, f)           // Error handling elided for brevity.
 	f.Close()
 
-
 }
-
-

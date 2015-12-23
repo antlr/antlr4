@@ -8,13 +8,13 @@ package antlr4
 // not cause bloating of the {@link DFA} created for the lexer.</p>
 
 type LexerActionExecutor struct {
-	lexerActions []ILexerAction
+	lexerActions     []ILexerAction
 	cachedHashString string
 }
 
 func NewLexerActionExecutor(lexerActions []ILexerAction) *LexerActionExecutor {
 
-	if (lexerActions == nil){
+	if lexerActions == nil {
 		lexerActions = make([]ILexerAction, 0)
 	}
 
@@ -49,13 +49,13 @@ func NewLexerActionExecutor(lexerActions []ILexerAction) *LexerActionExecutor {
 // @return A {@link LexerActionExecutor} for executing the combine actions
 // of {@code lexerActionExecutor} and {@code lexerAction}.
 func LexerActionExecutorappend(lexerActionExecutor *LexerActionExecutor, lexerAction ILexerAction) *LexerActionExecutor {
-	if (lexerActionExecutor == nil) {
+	if lexerActionExecutor == nil {
 		return NewLexerActionExecutor([]ILexerAction{lexerAction})
 	}
 
-	var lexerActions = append(lexerActionExecutor.lexerActions, lexerAction )
+	var lexerActions = append(lexerActionExecutor.lexerActions, lexerAction)
 
-//	var lexerActions = lexerActionExecutor.lexerActions.concat([ lexerAction ])
+	//	var lexerActions = lexerActionExecutor.lexerActions.concat([ lexerAction ])
 	return NewLexerActionExecutor(lexerActions)
 }
 
@@ -91,11 +91,11 @@ func (this *LexerActionExecutor) fixOffsetBeforeMatch(offset int) *LexerActionEx
 	var updatedLexerActions []ILexerAction = nil
 	for i := 0; i < len(this.lexerActions); i++ {
 		_, ok := this.lexerActions[i].(*LexerIndexedCustomAction)
-		if (this.lexerActions[i].getIsPositionDependent() && !ok){
-			if (updatedLexerActions == nil) {
-				updatedLexerActions = make([]ILexerAction,0)
+		if this.lexerActions[i].getIsPositionDependent() && !ok {
+			if updatedLexerActions == nil {
+				updatedLexerActions = make([]ILexerAction, 0)
 
-				for _,a:= range this.lexerActions {
+				for _, a := range this.lexerActions {
 					updatedLexerActions = append(updatedLexerActions, a)
 				}
 			}
@@ -103,7 +103,7 @@ func (this *LexerActionExecutor) fixOffsetBeforeMatch(offset int) *LexerActionEx
 			updatedLexerActions[i] = NewLexerIndexedCustomAction(offset, this.lexerActions[i])
 		}
 	}
-	if (updatedLexerActions == nil) {
+	if updatedLexerActions == nil {
 		return this
 	} else {
 		return NewLexerActionExecutor(updatedLexerActions)
@@ -132,8 +132,8 @@ func (this *LexerActionExecutor) execute(lexer *Lexer, input CharStream, startIn
 	var requiresSeek = false
 	var stopIndex = input.index()
 
-	defer func(){
-		if (requiresSeek) {
+	defer func() {
+		if requiresSeek {
 			input.seek(stopIndex)
 		}
 	}()
@@ -145,7 +145,7 @@ func (this *LexerActionExecutor) execute(lexer *Lexer, input CharStream, startIn
 			input.seek(startIndex + offset)
 			lexerAction = la.lexerAction
 			requiresSeek = (startIndex + offset) != stopIndex
-		} else if (lexerAction.getIsPositionDependent()) {
+		} else if lexerAction.getIsPositionDependent() {
 			input.seek(stopIndex)
 			requiresSeek = false
 		}
@@ -158,14 +158,12 @@ func (this *LexerActionExecutor) hashString() string {
 }
 
 func (this *LexerActionExecutor) equals(other interface{}) bool {
-	if (this == other) {
+	if this == other {
 		return true
 	} else if _, ok := other.(*LexerActionExecutor); !ok {
 		return false
 	} else {
 		return this.cachedHashString == other.(*LexerActionExecutor).cachedHashString &&
-				&this.lexerActions == &other.(*LexerActionExecutor).lexerActions
+			&this.lexerActions == &other.(*LexerActionExecutor).lexerActions
 	}
 }
-
-

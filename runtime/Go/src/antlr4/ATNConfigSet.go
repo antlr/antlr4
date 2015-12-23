@@ -1,4 +1,5 @@
 package antlr4
+
 import (
 	"fmt"
 )
@@ -14,27 +15,27 @@ func hashATNConfig(c interface{}) string {
 }
 
 func equalATNConfigs(a, b interface{}) bool {
-	if ( a==b ) {
+	if a == b {
 		return true
 	}
-	if ( a==nil || b==nil ) {
+	if a == nil || b == nil {
 		return false
 	}
-	return a.(*ATNConfig).state.getStateNumber()==b.(*ATNConfig).state.getStateNumber() &&
-		a.(*ATNConfig).alt==b.(*ATNConfig).alt &&
+	return a.(*ATNConfig).state.getStateNumber() == b.(*ATNConfig).state.getStateNumber() &&
+		a.(*ATNConfig).alt == b.(*ATNConfig).alt &&
 		a.(*ATNConfig).semanticContext.equals(b.(*ATNConfig).semanticContext)
 }
 
 type ATNConfigSet struct {
-	readOnly bool
-	fullCtx bool
-	configLookup *Set
-	conflictingAlts *BitSet
-	cachedHashString string
-	hasSemanticContext bool
+	readOnly             bool
+	fullCtx              bool
+	configLookup         *Set
+	conflictingAlts      *BitSet
+	cachedHashString     string
+	hasSemanticContext   bool
 	dipsIntoOuterContext bool
-	configs []IATNConfig
-	uniqueAlt int
+	configs              []IATNConfig
+	uniqueAlt            int
 }
 
 func NewATNConfigSet(fullCtx bool) *ATNConfigSet {
@@ -98,19 +99,19 @@ func (a *ATNConfigSet) InitATNConfigSet(fullCtx bool) {
 // /
 func (this *ATNConfigSet) add(config IATNConfig, mergeCache *DoubleDict) bool {
 
-	if (this.readOnly) {
+	if this.readOnly {
 		panic("This set is readonly")
 	}
-	if (config.getSemanticContext() != SemanticContextNONE) {
+	if config.getSemanticContext() != SemanticContextNONE {
 		this.hasSemanticContext = true
 	}
-	if (config.getReachesIntoOuterContext() > 0) {
+	if config.getReachesIntoOuterContext() > 0 {
 		this.dipsIntoOuterContext = true
 	}
 	var existing = this.configLookup.add(config).(IATNConfig)
-	if (existing == config) {
+	if existing == config {
 		this.cachedHashString = "-1"
-		this.configs = append( this.configs, config )// track order here
+		this.configs = append(this.configs, config) // track order here
 		return true
 	}
 	// a previous (s,i,pi,_), merge with it and save result
@@ -119,17 +120,17 @@ func (this *ATNConfigSet) add(config IATNConfig, mergeCache *DoubleDict) bool {
 	// no need to check for existing.context, config.context in cache
 	// since only way to create Newgraphs is "call rule" and here. We
 	// cache at both places.
-	existing.setReachesIntoOuterContext( intMax( existing.getReachesIntoOuterContext(), config.getReachesIntoOuterContext()) )
+	existing.setReachesIntoOuterContext(intMax(existing.getReachesIntoOuterContext(), config.getReachesIntoOuterContext()))
 	// make sure to preserve the precedence filter suppression during the merge
-	if (config.getPrecedenceFilterSuppressed()) {
-		existing.setPrecedenceFilterSuppressed( true )
+	if config.getPrecedenceFilterSuppressed() {
+		existing.setPrecedenceFilterSuppressed(true)
 	}
-	existing.setContext( merged )// replace context no need to alt mapping
+	existing.setContext(merged) // replace context no need to alt mapping
 	return true
 }
 
 func (this *ATNConfigSet) getStates() *Set {
-	var states = NewSet(nil,nil)
+	var states = NewSet(nil, nil)
 	for i := 0; i < len(this.configs); i++ {
 		states.add(this.configs[i].getState())
 	}
@@ -137,10 +138,10 @@ func (this *ATNConfigSet) getStates() *Set {
 }
 
 func (this *ATNConfigSet) getPredicates() []SemanticContext {
-	var preds = make([]SemanticContext,0)
+	var preds = make([]SemanticContext, 0)
 	for i := 0; i < len(this.configs); i++ {
 		c := this.configs[i].getSemanticContext()
-		if (c != SemanticContextNONE) {
+		if c != SemanticContextNONE {
 			preds = append(preds, c)
 		}
 	}
@@ -152,10 +153,10 @@ func (this *ATNConfigSet) getItems() []IATNConfig {
 }
 
 func (this *ATNConfigSet) optimizeConfigs(interpreter *ATNSimulator) {
-	if (this.readOnly) {
+	if this.readOnly {
 		panic("This set is readonly")
 	}
-	if (this.configLookup.length() == 0) {
+	if this.configLookup.length() == 0 {
 		return
 	}
 	for i := 0; i < len(this.configs); i++ {
@@ -164,15 +165,15 @@ func (this *ATNConfigSet) optimizeConfigs(interpreter *ATNSimulator) {
 	}
 }
 
-func (this *ATNConfigSet) addAll(coll []*ATNConfig) bool{
+func (this *ATNConfigSet) addAll(coll []*ATNConfig) bool {
 	for i := 0; i < len(coll); i++ {
-		this.add(coll[i],nil)
+		this.add(coll[i], nil)
 	}
 	return false
 }
 
 func (this *ATNConfigSet) equals(other interface{}) bool {
-	if (this == other) {
+	if this == other {
 		return true
 	} else if _, ok := other.(*ATNConfigSet); !ok {
 		return false
@@ -181,17 +182,17 @@ func (this *ATNConfigSet) equals(other interface{}) bool {
 	other2 := other.(*ATNConfigSet)
 
 	return this.configs != nil &&
-//			this.configs.equals(other2.configs) && // TODO is this necessary?
-			this.fullCtx == other2.fullCtx &&
-			this.uniqueAlt == other2.uniqueAlt &&
-			this.conflictingAlts == other2.conflictingAlts &&
-			this.hasSemanticContext == other2.hasSemanticContext &&
-			this.dipsIntoOuterContext == other2.dipsIntoOuterContext
+		//			this.configs.equals(other2.configs) && // TODO is this necessary?
+		this.fullCtx == other2.fullCtx &&
+		this.uniqueAlt == other2.uniqueAlt &&
+		this.conflictingAlts == other2.conflictingAlts &&
+		this.hasSemanticContext == other2.hasSemanticContext &&
+		this.dipsIntoOuterContext == other2.dipsIntoOuterContext
 }
 
 func (this *ATNConfigSet) hashString() string {
-	if (this.readOnly) {
-		if (this.cachedHashString == "-1") {
+	if this.readOnly {
+		if this.cachedHashString == "-1" {
 			this.cachedHashString = this.hashConfigs()
 		}
 		return this.cachedHashString
@@ -216,22 +217,22 @@ func (this *ATNConfigSet) isEmpty() bool {
 	return len(this.configs) == 0
 }
 
-func (this *ATNConfigSet) contains(item *ATNConfig ) bool {
-	if (this.configLookup == nil) {
+func (this *ATNConfigSet) contains(item *ATNConfig) bool {
+	if this.configLookup == nil {
 		panic("This method is not implemented for readonly sets.")
 	}
 	return this.configLookup.contains(item)
 }
 
-func (this *ATNConfigSet) containsFast(item *ATNConfig ) bool {
-	if (this.configLookup == nil) {
+func (this *ATNConfigSet) containsFast(item *ATNConfig) bool {
+	if this.configLookup == nil {
 		panic("This method is not implemented for readonly sets.")
 	}
 	return this.configLookup.contains(item) // TODO containsFast is not implemented for Set
 }
 
 func (this *ATNConfigSet) clear() {
-	if (this.readOnly) {
+	if this.readOnly {
 		panic("This set is readonly")
 	}
 	this.configs = make([]IATNConfig, 0)
@@ -241,7 +242,7 @@ func (this *ATNConfigSet) clear() {
 
 func (this *ATNConfigSet) setReadonly(readOnly bool) {
 	this.readOnly = readOnly
-	if (readOnly) {
+	if readOnly {
 		this.configLookup = nil // can't mod, no need for lookup cache
 	}
 }
@@ -249,17 +250,16 @@ func (this *ATNConfigSet) setReadonly(readOnly bool) {
 func (this *ATNConfigSet) toString() string {
 	panic("not implemented")
 	return ""
-//	return Utils.arrayToString(this.configs) +
-//		(this.hasSemanticContext ? ",hasSemanticContext=" + this.hasSemanticContext : "") +
-//		(this.uniqueAlt != ATN.INVALID_ALT_NUMBER ? ",uniqueAlt=" + this.uniqueAlt : "") +
-//		(this.conflictingAlts != nil ? ",conflictingAlts=" + this.conflictingAlts : "") +
-//		(this.dipsIntoOuterContext ? ",dipsIntoOuterContext" : "")
+	//	return Utils.arrayToString(this.configs) +
+	//		(this.hasSemanticContext ? ",hasSemanticContext=" + this.hasSemanticContext : "") +
+	//		(this.uniqueAlt != ATN.INVALID_ALT_NUMBER ? ",uniqueAlt=" + this.uniqueAlt : "") +
+	//		(this.conflictingAlts != nil ? ",conflictingAlts=" + this.conflictingAlts : "") +
+	//		(this.dipsIntoOuterContext ? ",dipsIntoOuterContext" : "")
 }
 
 type OrderedATNConfigSet struct {
 	*ATNConfigSet
 }
-
 
 func NewOrderedATNConfigSet() *OrderedATNConfigSet {
 
@@ -270,6 +270,3 @@ func NewOrderedATNConfigSet() *OrderedATNConfigSet {
 
 	return this
 }
-
-
-

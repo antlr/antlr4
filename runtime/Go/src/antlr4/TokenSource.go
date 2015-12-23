@@ -1,7 +1,6 @@
 package antlr4
 
 type TokenSource interface {
-
 	nextToken() *Token
 	skip()
 	more()
@@ -11,6 +10,4 @@ type TokenSource interface {
 	getSourceName() string
 	setTokenFactory(factory TokenFactory)
 	getTokenFactory() TokenFactory
-
 }
-

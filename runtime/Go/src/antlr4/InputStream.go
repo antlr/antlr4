@@ -1,10 +1,10 @@
 package antlr4
 
 type InputStream struct {
-	name    string
-	index   int
-	data    []rune
-	size    int
+	name  string
+	index int
+	data  []rune
+	size  int
 }
 
 func NewInputStream(data string) *InputStream {
@@ -73,7 +73,7 @@ func (is *InputStream) getText(start int, stop int) string {
 	if start >= is.size {
 		return ""
 	} else {
-		return string(is.data[start:stop+1])
+		return string(is.data[start : stop+1])
 	}
 }
 

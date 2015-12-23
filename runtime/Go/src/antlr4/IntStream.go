@@ -1,7 +1,6 @@
 package antlr4
 
 type IntStream interface {
-
 	consume()
 	LA(int) int
 	mark() int
@@ -10,5 +9,4 @@ type IntStream interface {
 	seek(index int)
 	size() int
 	getSourceName() string
-
 }

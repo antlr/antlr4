@@ -1,4 +1,3 @@
-
 // This implementation of {@link TokenStream} loads tokens from a
 // {@link TokenSource} on-demand, and places the tokens in a buffer to provide
 // access to any previous token by index.
@@ -11,16 +10,17 @@
 // {@link CommonTokenStream}.</p>
 
 package antlr4
+
 import "strconv"
 
 // bt is just to keep meaningful parameter types to Parser
 type BufferedTokenStream struct {
 	tokenSource TokenSource
 
-	tokens []*Token
-	index int
+	tokens     []*Token
+	index      int
 	fetchedEOF bool
-	channel int
+	channel    int
 }
 
 func NewBufferedTokenStream(tokenSource TokenSource) *BufferedTokenStream {
@@ -30,7 +30,7 @@ func NewBufferedTokenStream(tokenSource TokenSource) *BufferedTokenStream {
 	return ts
 }
 
-func (ts *BufferedTokenStream) InitBufferedTokenStream(tokenSource TokenSource){
+func (ts *BufferedTokenStream) InitBufferedTokenStream(tokenSource TokenSource) {
 
 	// The {@link TokenSource} from which tokens for bt stream are fetched.
 	ts.tokenSource = tokenSource
@@ -94,11 +94,11 @@ func (bt *BufferedTokenStream) get(index int) *Token {
 
 func (bt *BufferedTokenStream) consume() {
 	var skipEofCheck = false
-	if (bt.index >= 0) {
-		if (bt.fetchedEOF) {
+	if bt.index >= 0 {
+		if bt.fetchedEOF {
 			// the last token in tokens is EOF. skip check if p indexes any
 			// fetched token except the last.
-			skipEofCheck = bt.index < len(bt.tokens) - 1
+			skipEofCheck = bt.index < len(bt.tokens)-1
 		} else {
 			// no EOF token in tokens. skip check if p indexes a fetched token.
 			skipEofCheck = bt.index < len(bt.tokens)
@@ -107,10 +107,10 @@ func (bt *BufferedTokenStream) consume() {
 		// not yet initialized
 		skipEofCheck = false
 	}
-	if (!skipEofCheck && bt.LA(1) == TokenEOF) {
-		panic( "cannot consume EOF" )
+	if !skipEofCheck && bt.LA(1) == TokenEOF {
+		panic("cannot consume EOF")
 	}
-	if (bt.sync(bt.index + 1)) {
+	if bt.sync(bt.index + 1) {
 		bt.index = bt.adjustSeekIndex(bt.index + 1)
 	}
 }
@@ -123,7 +123,7 @@ func (bt *BufferedTokenStream) consume() {
 // /
 func (bt *BufferedTokenStream) sync(i int) bool {
 	var n = i - len(bt.tokens) + 1 // how many more elements we need?
-	if (n > 0) {
+	if n > 0 {
 		var fetched = bt.fetch(n)
 		return fetched >= n
 	}
@@ -143,7 +143,7 @@ func (bt *BufferedTokenStream) fetch(n int) int {
 		var t *Token = bt.tokenSource.nextToken()
 		t.tokenIndex = len(bt.tokens)
 		bt.tokens = append(bt.tokens, t)
-		if (t.tokenType == TokenEOF) {
+		if t.tokenType == TokenEOF {
 			bt.fetchedEOF = true
 			return i + 1
 		}
@@ -154,20 +154,20 @@ func (bt *BufferedTokenStream) fetch(n int) int {
 // Get all tokens from start..stop inclusively///
 func (bt *BufferedTokenStream) getTokens(start int, stop int, types *IntervalSet) []*Token {
 
-	if (start < 0 || stop < 0) {
+	if start < 0 || stop < 0 {
 		return nil
 	}
 	bt.lazyInit()
 	var subset = make([]*Token, 0)
-	if (stop >= len(bt.tokens)) {
+	if stop >= len(bt.tokens) {
 		stop = len(bt.tokens) - 1
 	}
 	for i := start; i < stop; i++ {
 		var t = bt.tokens[i]
-		if (t.tokenType == TokenEOF) {
+		if t.tokenType == TokenEOF {
 			break
 		}
-		if (types == nil || types.contains(t.tokenType)) {
+		if types == nil || types.contains(t.tokenType) {
 			subset = append(subset, t)
 		}
 	}
@@ -179,25 +179,25 @@ func (bt *BufferedTokenStream) LA(i int) int {
 }
 
 func (bt *BufferedTokenStream) LB(k int) *Token {
-	if (bt.index - k < 0) {
+	if bt.index-k < 0 {
 		return nil
 	}
-	return bt.tokens[bt.index - k]
+	return bt.tokens[bt.index-k]
 }
 
 func (bt *BufferedTokenStream) LT(k int) *Token {
 	bt.lazyInit()
-	if (k == 0) {
+	if k == 0 {
 		return nil
 	}
-	if (k < 0) {
+	if k < 0 {
 		return bt.LB(-k)
 	}
 	var i = bt.index + k - 1
 	bt.sync(i)
-	if (i >= len(bt.tokens)) { // return EOF token
+	if i >= len(bt.tokens) { // return EOF token
 		// EOF must be last token
-		return bt.tokens[len(bt.tokens) - 1]
+		return bt.tokens[len(bt.tokens)-1]
 	}
 	return bt.tokens[i]
 }
@@ -220,7 +220,7 @@ func (bt *BufferedTokenStream) adjustSeekIndex(i int) int {
 }
 
 func (bt *BufferedTokenStream) lazyInit() {
-	if (bt.index == -1) {
+	if bt.index == -1 {
 		bt.setup()
 	}
 }
@@ -247,12 +247,12 @@ func (bt *BufferedTokenStream) setTokenSource(tokenSource TokenSource) {
 // /
 func (bt *BufferedTokenStream) nextTokenOnChannel(i, channel int) int {
 	bt.sync(i)
-	if (i >= len(bt.tokens)) {
+	if i >= len(bt.tokens) {
 		return -1
 	}
 	var token = bt.tokens[i]
-	for (token.channel != bt.channel) {
-		if (token.tokenType == TokenEOF) {
+	for token.channel != bt.channel {
+		if token.tokenType == TokenEOF {
 			return -1
 		}
 		i += 1
@@ -266,7 +266,7 @@ func (bt *BufferedTokenStream) nextTokenOnChannel(i, channel int) int {
 // Return i if tokens[i] is on channel. Return -1 if there are no tokens
 // on channel between i and 0.
 func (bt *BufferedTokenStream) previousTokenOnChannel(i, channel int) int {
-	for (i >= 0 && bt.tokens[i].channel != channel) {
+	for i >= 0 && bt.tokens[i].channel != channel {
 		i -= 1
 	}
 	return i
@@ -277,14 +277,14 @@ func (bt *BufferedTokenStream) previousTokenOnChannel(i, channel int) int {
 // EOF. If channel is -1, find any non default channel token.
 func (bt *BufferedTokenStream) getHiddenTokensToRight(tokenIndex, channel int) []*Token {
 	bt.lazyInit()
-	if (tokenIndex < 0 || tokenIndex >= len(bt.tokens)) {
-		panic( strconv.Itoa(tokenIndex) + " not in 0.." + strconv.Itoa(len(bt.tokens) - 1) )
+	if tokenIndex < 0 || tokenIndex >= len(bt.tokens) {
+		panic(strconv.Itoa(tokenIndex) + " not in 0.." + strconv.Itoa(len(bt.tokens)-1))
 	}
-	var nextOnChannel = bt.nextTokenOnChannel(tokenIndex + 1, LexerDefaultTokenChannel)
+	var nextOnChannel = bt.nextTokenOnChannel(tokenIndex+1, LexerDefaultTokenChannel)
 	var from_ = tokenIndex + 1
 	// if none onchannel to right, nextOnChannel=-1 so set to = last token
 	var to int
-	if (nextOnChannel == -1){
+	if nextOnChannel == -1 {
 		to = len(bt.tokens) - 1
 	} else {
 		to = nextOnChannel
@@ -297,11 +297,11 @@ func (bt *BufferedTokenStream) getHiddenTokensToRight(tokenIndex, channel int) [
 // If channel is -1, find any non default channel token.
 func (bt *BufferedTokenStream) getHiddenTokensToLeft(tokenIndex, channel int) []*Token {
 	bt.lazyInit()
-	if (tokenIndex < 0 || tokenIndex >= len(bt.tokens)) {
-		panic( strconv.Itoa(tokenIndex) + " not in 0.." + strconv.Itoa(len(bt.tokens) - 1) )
+	if tokenIndex < 0 || tokenIndex >= len(bt.tokens) {
+		panic(strconv.Itoa(tokenIndex) + " not in 0.." + strconv.Itoa(len(bt.tokens)-1))
 	}
-	var prevOnChannel = bt.previousTokenOnChannel(tokenIndex - 1, LexerDefaultTokenChannel)
-	if (prevOnChannel == tokenIndex - 1) {
+	var prevOnChannel = bt.previousTokenOnChannel(tokenIndex-1, LexerDefaultTokenChannel)
+	if prevOnChannel == tokenIndex-1 {
 		return nil
 	}
 	// if none on channel to left, prevOnChannel=-1 then from=0
@@ -311,18 +311,18 @@ func (bt *BufferedTokenStream) getHiddenTokensToLeft(tokenIndex, channel int) []
 }
 
 func (bt *BufferedTokenStream) filterForChannel(left, right, channel int) []*Token {
-	var hidden = make([]*Token,0)
-	for i := left; i < right + 1; i++ {
+	var hidden = make([]*Token, 0)
+	for i := left; i < right+1; i++ {
 		var t = bt.tokens[i]
-		if (channel == -1) {
-			if (t.channel != LexerDefaultTokenChannel) {
+		if channel == -1 {
+			if t.channel != LexerDefaultTokenChannel {
 				hidden = append(hidden, t)
 			}
-		} else if (t.channel == channel) {
+		} else if t.channel == channel {
 			hidden = append(hidden, t)
 		}
 	}
-	if (len(hidden) == 0) {
+	if len(hidden) == 0 {
 		return nil
 	}
 	return hidden
@@ -336,27 +336,27 @@ func (bt *BufferedTokenStream) getSourceName() string {
 func (bt *BufferedTokenStream) getText(interval *Interval) string {
 	bt.lazyInit()
 	bt.fill()
-	if (interval == nil) {
-		interval = NewInterval(0, len(bt.tokens) - 1)
+	if interval == nil {
+		interval = NewInterval(0, len(bt.tokens)-1)
 	}
 	var start = interval.start
-//	if s2, ok := start.(*Token); ok {
-//		start = s2.tokenIndex
-//	}
+	//	if s2, ok := start.(*Token); ok {
+	//		start = s2.tokenIndex
+	//	}
 	var stop = interval.stop
-//	if s2, ok := stop.(*Token); ok {
-//		stop = s2.tokenIndex
-//	}
-	if (start < 0 || stop < 0) {
+	//	if s2, ok := stop.(*Token); ok {
+	//		stop = s2.tokenIndex
+	//	}
+	if start < 0 || stop < 0 {
 		return ""
 	}
-	if (stop >= len(bt.tokens)) {
+	if stop >= len(bt.tokens) {
 		stop = len(bt.tokens) - 1
 	}
 	var s = ""
-	for i := start; i < stop + 1; i++ {
+	for i := start; i < stop+1; i++ {
 		var t = bt.tokens[i]
-		if (t.tokenType == TokenEOF) {
+		if t.tokenType == TokenEOF {
 			break
 		}
 		s += t.text()
@@ -367,9 +367,7 @@ func (bt *BufferedTokenStream) getText(interval *Interval) string {
 // Get all tokens from lexer until EOF///
 func (bt *BufferedTokenStream) fill() {
 	bt.lazyInit()
-	for (bt.fetch(1000) == 1000) {
+	for bt.fetch(1000) == 1000 {
 		continue
 	}
 }
-
-
