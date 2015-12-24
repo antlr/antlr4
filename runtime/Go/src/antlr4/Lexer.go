@@ -48,7 +48,7 @@ func NewLexer(input CharStream) *Lexer {
 	lexer := new(Lexer)
 
 	lexer.InitRecognizer()
-	lexer.InitLexer(input)
+	lexer.Lexer = NewLexer(input)
 
 	return lexer
 }

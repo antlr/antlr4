@@ -32,7 +32,7 @@ type CommonTokenStream struct {
 func NewCommonTokenStream(lexer ILexer, channel int) *CommonTokenStream {
 
 	ts := new(CommonTokenStream)
-	ts.InitBufferedTokenStream(lexer)
+	ts.BufferedTokenStream = NewBufferedTokenStream(lexer)
 
 	ts.channel = channel
 

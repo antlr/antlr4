@@ -42,7 +42,7 @@ func NewParser(input TokenStream) *Parser {
 
 	p := new(Parser)
 
-	p.InitParser(input)
+	p.Parser = NewParser(input)
 
 	return p
 }

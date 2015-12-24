@@ -93,7 +93,7 @@ type TerminalNodeImpl struct {
 func NewTerminalNodeImpl(symbol *Token) *TerminalNodeImpl {
 	tn := new(TerminalNodeImpl)
 
-	tn.InitTerminalNodeImpl(symbol)
+	tn.TerminalNodeImpl = NewTerminalNodeImpl(symbol)
 
 	return tn
 }
@@ -171,7 +171,7 @@ type ErrorNodeImpl struct {
 
 func NewErrorNodeImpl(token *Token) *ErrorNodeImpl {
 	en := new(ErrorNodeImpl)
-	en.InitTerminalNodeImpl(token)
+	en.TerminalNodeImpl = NewTerminalNodeImpl(token)
 	return en
 }
 

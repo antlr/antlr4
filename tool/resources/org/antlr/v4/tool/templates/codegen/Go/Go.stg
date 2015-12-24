@@ -122,7 +122,7 @@ func New<parser.name>(input antlr4.TokenStream) *<parser.name> {
 
     parser := new(<parser.name>)
 
-    parser.InitParser(input)
+    parser.Parser = NewParser(input)
 
     parser.Interpreter = antlr4.NewParserATNSimulator(parser, deserializedATN, decisionToDFA, sharedContextCache)
     parser.RuleNames = ruleNames
@@ -823,7 +823,7 @@ func New<lexer.name>(input antlr4.CharStream) *<lexer.name> {
 
 	lex := new(<lexer.name>)
 
-	lex.InitLexer(input)
+	lex.Lexer = NewLexer(input)
 
     lex.Interpreter = antlr4.NewLexerATNSimulator(lex, lexerAtn, lexerDecisionToDFA, antlr4.NewPredictionContextCache())
 

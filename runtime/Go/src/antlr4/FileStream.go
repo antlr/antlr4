@@ -32,7 +32,7 @@ func NewFileStream(fileName string) *FileStream {
 	s := string(buf.Bytes())
 
 	fmt.Println(s)
-	fs.InitInputStream(s)
+	fs.InputStream = NewInputStream(s)
 
 	return fs
 

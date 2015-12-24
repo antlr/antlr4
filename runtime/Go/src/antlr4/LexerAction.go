@@ -28,7 +28,7 @@ type LexerAction struct {
 
 func NewLexerAction(action int) *LexerAction {
 	la := new(LexerAction)
-	la.InitLexerAction(action)
+	la.LexerAction = NewLexerAction(action)
 	return la
 }
 
@@ -68,7 +68,7 @@ type LexerSkipAction struct {
 
 func NewLexerSkipAction() *LexerSkipAction {
 	la := new(LexerSkipAction)
-	la.InitLexerAction(LexerActionTypeSKIP)
+	la.LexerAction = NewLexerAction(LexerActionTypeSKIP)
 	return la
 }
 
@@ -93,7 +93,7 @@ type LexerTypeAction struct {
 
 func NewLexerTypeAction(_type int) *LexerTypeAction {
 	this := new(LexerTypeAction)
-	this.InitLexerAction(LexerActionTypeTYPE)
+	this.LexerAction = NewLexerAction(LexerActionTypeTYPE)
 	this._type = _type
 	return this
 }
@@ -131,7 +131,7 @@ type LexerPushModeAction struct {
 func NewLexerPushModeAction(mode int) *LexerPushModeAction {
 
 	this := new(LexerPushModeAction)
-	this.InitLexerAction(LexerActionTypePUSH_MODE)
+	this.LexerAction = NewLexerAction(LexerActionTypePUSH_MODE)
 
 	this.mode = mode
 	return this
@@ -173,7 +173,7 @@ func NewLexerPopModeAction() *LexerPopModeAction {
 
 	this := new(LexerPopModeAction)
 
-	this.InitLexerAction(LexerActionTypePOP_MODE)
+	this.LexerAction = NewLexerAction(LexerActionTypePOP_MODE)
 
 	return this
 }
@@ -200,7 +200,7 @@ type LexerMoreAction struct {
 
 func NewLexerMoreAction() *LexerModeAction {
 	this := new(LexerModeAction)
-	this.InitLexerAction(LexerActionTypeMORE)
+	this.LexerAction = NewLexerAction(LexerActionTypeMORE)
 
 	return this
 }
@@ -226,7 +226,7 @@ type LexerModeAction struct {
 
 func NewLexerModeAction(mode int) *LexerModeAction {
 	this := new(LexerModeAction)
-	this.InitLexerAction(LexerActionTypeMODE)
+	this.LexerAction = NewLexerAction(LexerActionTypeMODE)
 	this.mode = mode
 	return this
 }
@@ -279,7 +279,7 @@ type LexerCustomAction struct {
 
 func NewLexerCustomAction(ruleIndex, actionIndex int) *LexerCustomAction {
 	this := new(LexerCustomAction)
-	this.InitLexerAction(LexerActionTypeCUSTOM)
+	this.LexerAction = NewLexerAction(LexerActionTypeCUSTOM)
 	this.ruleIndex = ruleIndex
 	this.actionIndex = actionIndex
 	this.isPositionDependent = true
@@ -318,7 +318,7 @@ type LexerChannelAction struct {
 
 func NewLexerChannelAction(channel int) *LexerChannelAction {
 	this := new(LexerChannelAction)
-	this.InitLexerAction(LexerActionTypeCHANNEL)
+	this.LexerAction = NewLexerAction(LexerActionTypeCHANNEL)
 	this.channel = channel
 	return this
 }

@@ -11,7 +11,7 @@ func NewInputStream(data string) *InputStream {
 
 	is := new(InputStream)
 
-	is.InitInputStream(data)
+	is.InputStream = NewInputStream(data)
 
 	return is
 }

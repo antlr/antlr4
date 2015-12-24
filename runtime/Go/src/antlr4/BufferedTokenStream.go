@@ -26,7 +26,7 @@ type BufferedTokenStream struct {
 func NewBufferedTokenStream(tokenSource TokenSource) *BufferedTokenStream {
 
 	ts := new(BufferedTokenStream)
-	ts.InitBufferedTokenStream(tokenSource)
+	ts.BufferedTokenStream = NewBufferedTokenStream(tokenSource)
 	return ts
 }
 

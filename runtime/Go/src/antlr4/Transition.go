@@ -37,7 +37,7 @@ func NewTransition(target IATNState) *Transition {
 	}
 
 	t := new(Transition)
-	t.InitTransition(target)
+	t.Transition = NewTransition(target)
 
 	return t
 }
@@ -134,7 +134,7 @@ type AtomTransition struct {
 func NewAtomTransition(target IATNState, label int) *AtomTransition {
 
 	t := new(AtomTransition)
-	t.InitTransition(target)
+	t.Transition = NewTransition(target)
 
 	t.label_ = label // The token type or character value or, signifies special label.
 	t.label = t.makeLabel()
@@ -167,7 +167,7 @@ type RuleTransition struct {
 func NewRuleTransition(ruleStart IATNState, ruleIndex, precedence int, followState IATNState) *RuleTransition {
 
 	t := new(RuleTransition)
-	t.InitTransition(ruleStart)
+	t.Transition = NewTransition(ruleStart)
 
 	t.ruleIndex = ruleIndex
 	t.precedence = precedence
@@ -192,7 +192,7 @@ type EpsilonTransition struct {
 func NewEpsilonTransition(target IATNState, outermostPrecedenceReturn int) *EpsilonTransition {
 
 	t := new(EpsilonTransition)
-	t.InitTransition(target)
+	t.Transition = NewTransition(target)
 
 	t.serializationType = TransitionEPSILON
 	t.isEpsilon = true
@@ -217,7 +217,7 @@ type RangeTransition struct {
 func NewRangeTransition(target IATNState, start, stop int) *RangeTransition {
 
 	t := new(RangeTransition)
-	t.InitTransition(target)
+	t.Transition = NewTransition(target)
 
 	t.serializationType = TransitionRANGE
 	t.start = start
@@ -247,7 +247,7 @@ type AbstractPredicateTransition struct {
 func NewAbstractPredicateTransition(target IATNState) *AbstractPredicateTransition {
 
 	t := new(AbstractPredicateTransition)
-	t.InitTransition(target)
+	t.Transition = NewTransition(target)
 
 	return t
 }
@@ -262,7 +262,7 @@ type PredicateTransition struct {
 func NewPredicateTransition(target IATNState, ruleIndex, predIndex int, isCtxDependent bool) *PredicateTransition {
 
 	t := new(PredicateTransition)
-	t.InitTransition(target)
+	t.Transition = NewTransition(target)
 
 	t.serializationType = TransitionPREDICATE
 	t.ruleIndex = ruleIndex
@@ -294,7 +294,7 @@ type ActionTransition struct {
 func NewActionTransition(target IATNState, ruleIndex, actionIndex int, isCtxDependent bool) *ActionTransition {
 
 	t := new(ActionTransition)
-	t.InitTransition(target)
+	t.Transition = NewTransition(target)
 
 	t.serializationType = TransitionACTION
 	t.ruleIndex = ruleIndex
@@ -319,8 +319,8 @@ type SetTransition struct {
 func NewSetTransition(target IATNState, set *IntervalSet) *SetTransition {
 
 	t := new(SetTransition)
-	t.InitTransition(target)
-	t.InitSetTransition(set)
+	t.Transition = NewTransition(target)
+	t.SetTransition = NewSetTransition(set)
 
 	return t
 }
@@ -352,8 +352,8 @@ type NotSetTransition struct {
 func NewNotSetTransition(target IATNState, set *IntervalSet) *NotSetTransition {
 
 	t := new(NotSetTransition)
-	t.InitTransition(target)
-	t.InitSetTransition(set)
+	t.Transition = NewTransition(target)
+	t.SetTransition = NewSetTransition(set)
 
 	t.serializationType = TransitionNOT_SET
 
@@ -375,7 +375,7 @@ type WildcardTransition struct {
 func NewWildcardTransition(target IATNState) *WildcardTransition {
 
 	t := new(WildcardTransition)
-	t.InitTransition(target)
+	t.Transition = NewTransition(target)
 
 	t.serializationType = TransitionWILDCARD
 	return t
@@ -398,7 +398,7 @@ type PrecedencePredicateTransition struct {
 func NewPrecedencePredicateTransition(target IATNState, precedence int) *PrecedencePredicateTransition {
 
 	t := new(PrecedencePredicateTransition)
-	t.InitTransition(target)
+	t.Transition = NewTransition(target)
 
 	t.serializationType = TransitionPRECEDENCE
 	t.precedence = precedence

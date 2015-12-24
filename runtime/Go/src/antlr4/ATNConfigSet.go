@@ -42,7 +42,7 @@ func NewATNConfigSet(fullCtx bool) *ATNConfigSet {
 
 	this := new(ATNConfigSet)
 
-	this.InitATNConfigSet(fullCtx)
+	this.ATNConfigSet = NewATNConfigSet(fullCtx)
 
 	return this
 }
@@ -265,7 +265,7 @@ func NewOrderedATNConfigSet() *OrderedATNConfigSet {
 
 	this := new(OrderedATNConfigSet)
 
-	this.InitATNConfigSet(false)
+	this.ATNConfigSet = NewATNConfigSet(false)
 	this.configLookup = NewSet(nil, nil)
 
 	return this
