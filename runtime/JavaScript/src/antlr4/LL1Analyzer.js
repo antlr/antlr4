@@ -145,7 +145,7 @@ LL1Analyzer.prototype.LOOK = function(s, stopState, ctx) {
 // is {@code null}.
 ///
 LL1Analyzer.prototype._LOOK = function(s, stopState , ctx, look, lookBusy, calledRuleStack, seeThruPreds, addEOF) {
-    var c = new ATNConfig({state:s, alt:0}, ctx);
+    var c = new ATNConfig({state:s, alt:0, context: ctx}, null);
     if (lookBusy.contains(c)) {
         return;
     }
