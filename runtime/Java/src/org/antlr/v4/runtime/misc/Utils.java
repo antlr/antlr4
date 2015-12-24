@@ -30,9 +30,6 @@
 
 package org.antlr.v4.runtime.misc;
 
-import java.awt.*;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -149,38 +146,6 @@ public class Utils {
 			isr.close();
 		}
 		return data;
-	}
-
-	public static void waitForClose(final Window window) throws InterruptedException {
-		final Object lock = new Object();
-
-		Thread t = new Thread() {
-			@Override
-			public void run() {
-				synchronized (lock) {
-					while (window.isVisible()) {
-						try {
-							lock.wait(500);
-						} catch (InterruptedException e) {
-						}
-					}
-				}
-			}
-		};
-
-		t.start();
-
-		window.addWindowListener(new WindowAdapter() {
-			@Override
-			public void windowClosing(WindowEvent arg0) {
-				synchronized (lock) {
-					window.setVisible(false);
-					lock.notify();
-				}
-			}
-		});
-
-		t.join();
 	}
 
 	/** Convert array of strings to string&rarr;index map. Useful for
