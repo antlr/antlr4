@@ -106,12 +106,12 @@ func NewDFAState(stateNumber int, configs *ATNConfigSet) *DFAState {
 
 // Get the set of all alts mentioned by all ATN configurations in this
 // DFA state.
-func (this *DFAState) getAltSet() *Set {
+func (this *DFAState) GetAltSet() *Set {
 	var alts = NewSet(nil, nil)
 	if this.configs != nil {
 		for i := 0; i < len(this.configs.configs); i++ {
 			var c = this.configs.configs[i]
-			alts.add(c.getAlt())
+			alts.add(c.GetAlt())
 		}
 	}
 	if alts.length() == 0 {

@@ -458,7 +458,7 @@ func PredictionModeallSubsetsEqual(altsets []*BitSet) bool {
 // @param altsets a collection of alternative subsets
 //
 func PredictionModegetUniqueAlt(altsets []*BitSet) int {
-	var all = PredictionModegetAlts(altsets)
+	var all = PredictionModeGetAlts(altsets)
 	if all.length() == 1 {
 		return all.minValue()
 	} else {
@@ -473,7 +473,7 @@ func PredictionModegetUniqueAlt(altsets []*BitSet) int {
 // @param altsets a collection of alternative subsets
 // @return the set of represented alternatives in {@code altsets}
 //
-func PredictionModegetAlts(altsets []*BitSet) *BitSet {
+func PredictionModeGetAlts(altsets []*BitSet) *BitSet {
 	var all = NewBitSet()
 	for _, alts := range altsets {
 		all.or(alts)
@@ -495,13 +495,13 @@ func PredictionModegetConflictingAltSubsets(configs *ATNConfigSet) []*BitSet {
 
 	for i := 0; i < len(configs.configs); i++ {
 		var c = configs.configs[i]
-		var key = "key_" + strconv.Itoa(c.GetState().GetStateNumber()) + "/" + c.getContext().toString()
+		var key = "key_" + strconv.Itoa(c.GetState().GetStateNumber()) + "/" + c.GetContext().toString()
 		var alts = configToAlts[key]
 		if alts != nil {
 			alts = NewBitSet()
 			configToAlts[key] = alts
 		}
-		alts.add(c.getAlt())
+		alts.add(c.GetAlt())
 	}
 
 	var values = make([]*BitSet, 0)
@@ -532,7 +532,7 @@ func PredictionModeGetStateToAltMap(configs *ATNConfigSet) *AltDict {
 			alts = NewBitSet()
 			m.put(c.GetState().toString(), alts)
 		}
-		alts.(*BitSet).add(c.getAlt())
+		alts.(*BitSet).add(c.GetAlt())
 	}
 	return m
 }

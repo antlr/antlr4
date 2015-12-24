@@ -19,14 +19,14 @@ type IATNConfig interface {
 	setPrecedenceFilterSuppressed(bool)
 
 	GetState() IATNState
-	getAlt() int
-	getSemanticContext() SemanticContext
+	GetAlt() int
+	GetSemanticContext() SemanticContext
 
-	getContext() IPredictionContext
-	setContext(IPredictionContext)
+	GetContext() IPredictionContext
+	SetContext(IPredictionContext)
 
-	getReachesIntoOuterContext() int
-	setReachesIntoOuterContext(int)
+	GetReachesIntoOuterContext() int
+	SetReachesIntoOuterContext(int)
 
 	toString() string
 }
@@ -62,19 +62,19 @@ func NewATNConfig5(state IATNState, alt int, context IPredictionContext, semanti
 }
 
 func NewATNConfig4(c IATNConfig, state IATNState) *ATNConfig {
-	return NewATNConfig(c, state, c.getContext(), c.getSemanticContext())
+	return NewATNConfig(c, state, c.GetContext(), c.GetSemanticContext())
 }
 
 func NewATNConfig3(c IATNConfig, state IATNState, semanticContext SemanticContext) *ATNConfig {
-	return NewATNConfig(c, state, c.getContext(), semanticContext)
+	return NewATNConfig(c, state, c.GetContext(), semanticContext)
 }
 
 func NewATNConfig2(c IATNConfig, semanticContext SemanticContext) *ATNConfig {
-	return NewATNConfig(c, c.GetState(), c.getContext(), semanticContext)
+	return NewATNConfig(c, c.GetState(), c.GetContext(), semanticContext)
 }
 
 func NewATNConfig1(c IATNConfig, state IATNState, context IPredictionContext) *ATNConfig {
-	return NewATNConfig(c, state, context, c.getSemanticContext())
+	return NewATNConfig(c, state, context, c.GetSemanticContext())
 }
 
 func NewATNConfig(c IATNConfig, state IATNState, context IPredictionContext, semanticContext SemanticContext) *ATNConfig {
@@ -96,36 +96,36 @@ func (this *ATNConfig) GetState() IATNState {
 	return this.state
 }
 
-func (this *ATNConfig) getAlt() int {
+func (this *ATNConfig) GetAlt() int {
 	return this.alt
 }
 
-func (this *ATNConfig) setContext(v IPredictionContext) {
+func (this *ATNConfig) SetContext(v IPredictionContext) {
 	this.context = v
 }
-func (this *ATNConfig) getContext() IPredictionContext {
+func (this *ATNConfig) GetContext() IPredictionContext {
 	return this.context
 }
 
-func (this *ATNConfig) getSemanticContext() SemanticContext {
+func (this *ATNConfig) GetSemanticContext() SemanticContext {
 	return this.semanticContext
 }
 
-func (this *ATNConfig) getReachesIntoOuterContext() int {
+func (this *ATNConfig) GetReachesIntoOuterContext() int {
 	return this.reachesIntoOuterContext
 }
 
-func (this *ATNConfig) setReachesIntoOuterContext(v int) {
+func (this *ATNConfig) SetReachesIntoOuterContext(v int) {
 	this.reachesIntoOuterContext = v
 }
 
 func (a *ATNConfig) InitATNConfig(c IATNConfig, state IATNState, context IPredictionContext, semanticContext SemanticContext) {
 
 	a.state = state
-	a.alt = c.getAlt()
+	a.alt = c.GetAlt()
 	a.context = context
 	a.semanticContext = semanticContext
-	a.reachesIntoOuterContext = c.getReachesIntoOuterContext()
+	a.reachesIntoOuterContext = c.GetReachesIntoOuterContext()
 
 }
 
@@ -220,7 +220,7 @@ func NewLexerATNConfig4(c *LexerATNConfig, state IATNState) *LexerATNConfig {
 
 	this := new(LexerATNConfig)
 
-	this.InitATNConfig(c, state, c.getContext(), c.getSemanticContext())
+	this.InitATNConfig(c, state, c.GetContext(), c.GetSemanticContext())
 	this.lexerActionExecutor = c.lexerActionExecutor
 	this.passedThroughNonGreedyDecision = checkNonGreedyDecision(c, state)
 	return this
@@ -230,7 +230,7 @@ func NewLexerATNConfig3(c *LexerATNConfig, state IATNState, lexerActionExecutor 
 
 	this := new(LexerATNConfig)
 
-	this.InitATNConfig(c, state, c.getContext(), c.getSemanticContext())
+	this.InitATNConfig(c, state, c.GetContext(), c.GetSemanticContext())
 	this.lexerActionExecutor = lexerActionExecutor
 	this.passedThroughNonGreedyDecision = checkNonGreedyDecision(c, state)
 	return this
@@ -240,7 +240,7 @@ func NewLexerATNConfig2(c *LexerATNConfig, state IATNState, context IPredictionC
 
 	this := new(LexerATNConfig)
 
-	this.InitATNConfig(c, state, context, c.getSemanticContext())
+	this.InitATNConfig(c, state, context, c.GetSemanticContext())
 	this.lexerActionExecutor = c.lexerActionExecutor
 	this.passedThroughNonGreedyDecision = checkNonGreedyDecision(c, state)
 	return this

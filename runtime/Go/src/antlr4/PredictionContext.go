@@ -370,7 +370,7 @@ func predictionContextFromRuleContext(a *ATN, outerContext IRuleContext) IPredic
 	// If we have a parent, convert it to a PredictionContext graph
 	var parent = predictionContextFromRuleContext(a, outerContext.GetParent().(IRuleContext))
 	var state = a.states[outerContext.getInvokingState()]
-	var transition = state.getTransitions()[0]
+	var transition = state.GetTransitions()[0]
 
 	return SingletonPredictionContextcreate(parent, transition.(*RuleTransition).followState.GetStateNumber())
 }
@@ -732,7 +732,7 @@ func combineCommonParents(parents []IPredictionContext) {
 	}
 }
 
-func getCachedPredictionContext(context IPredictionContext, contextCache *PredictionContextCache, visited map[IPredictionContext]IPredictionContext) IPredictionContext {
+func getCachedPredictionContext(context IPredictionContext, contextCache *PredictionContextCache, Visited map[IPredictionContext]IPredictionContext) IPredictionContext {
 
 	panic("getCachedPredictionContext not implemented")
 
@@ -740,19 +740,19 @@ func getCachedPredictionContext(context IPredictionContext, contextCache *Predic
 	//	if (context.isEmpty()) {
 	//		return context
 	//	}
-	//	var existing = visited[context] || nil
+	//	var existing = Visited[context] || nil
 	//	if (existing != nil) {
 	//		return existing
 	//	}
 	//	existing = contextCache.get(context)
 	//	if (existing != nil) {
-	//		visited[context] = existing
+	//		Visited[context] = existing
 	//		return existing
 	//	}
 	//	var changed = false
 	//	var parents = []
 	//	for i := 0; i < len(parents); i++ {
-	//		var parent = getCachedPredictionContext(context.GetParent(i), contextCache, visited)
+	//		var parent = getCachedPredictionContext(context.GetParent(i), contextCache, Visited)
 	//		if (changed || parent != context.GetParent(i)) {
 	//			if (!changed) {
 	//				parents = []
@@ -766,7 +766,7 @@ func getCachedPredictionContext(context IPredictionContext, contextCache *Predic
 	//	}
 	//	if (!changed) {
 	//		contextCache.add(context)
-	//		visited[context] = context
+	//		Visited[context] = context
 	//		return context
 	//	}
 	//	var updated = nil
@@ -778,28 +778,28 @@ func getCachedPredictionContext(context IPredictionContext, contextCache *Predic
 	//		updated = NewArrayPredictionContext(parents, context.returnStates)
 	//	}
 	//	contextCache.add(updated)
-	//	visited[updated] = updated
-	//	visited[context] = updated
+	//	Visited[updated] = updated
+	//	Visited[context] = updated
 	//
 	//	return updated
 }
 
 // ter's recursive version of Sam's getAllNodes()
-//func getAllContextNodes(context, nodes, visited) {
+//func getAllContextNodes(context, nodes, Visited) {
 //	if (nodes == nil) {
 //		nodes = []
-//		return getAllContextNodes(context, nodes, visited)
-//	} else if (visited == nil) {
-//		visited = {}
-//		return getAllContextNodes(context, nodes, visited)
+//		return getAllContextNodes(context, nodes, Visited)
+//	} else if (Visited == nil) {
+//		Visited = {}
+//		return getAllContextNodes(context, nodes, Visited)
 //	} else {
-//		if (context == nil || visited[context] != nil) {
+//		if (context == nil || Visited[context] != nil) {
 //			return nodes
 //		}
-//		visited[context] = context
+//		Visited[context] = context
 //		nodes.push(context)
 //		for i := 0; i < len(context); i++ {
-//			getAllContextNodes(context.GetParent(i), nodes, visited)
+//			getAllContextNodes(context.GetParent(i), nodes, Visited)
 //		}
 //		return nodes
 //	}

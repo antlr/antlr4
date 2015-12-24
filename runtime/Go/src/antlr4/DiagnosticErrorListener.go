@@ -100,7 +100,7 @@ func (this *DiagnosticErrorListener) getConflictingAlts(reportedAlts *BitSet, se
 	}
 	var result = NewBitSet()
 	for i := 0; i < len(set.configs); i++ {
-		result.add(set.configs[i].getAlt())
+		result.add(set.configs[i].GetAlt())
 	}
 
 	return result

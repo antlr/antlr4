@@ -102,10 +102,10 @@ func (this *ATNConfigSet) add(config IATNConfig, mergeCache *DoubleDict) bool {
 	if this.readOnly {
 		panic("This set is readonly")
 	}
-	if config.getSemanticContext() != SemanticContextNONE {
+	if config.GetSemanticContext() != SemanticContextNONE {
 		this.hasSemanticContext = true
 	}
-	if config.getReachesIntoOuterContext() > 0 {
+	if config.GetReachesIntoOuterContext() > 0 {
 		this.dipsIntoOuterContext = true
 	}
 	var existing = this.configLookup.add(config).(IATNConfig)
@@ -116,16 +116,16 @@ func (this *ATNConfigSet) add(config IATNConfig, mergeCache *DoubleDict) bool {
 	}
 	// a previous (s,i,pi,_), merge with it and save result
 	var rootIsWildcard = !this.fullCtx
-	var merged = merge(existing.getContext(), config.getContext(), rootIsWildcard, mergeCache)
+	var merged = merge(existing.GetContext(), config.GetContext(), rootIsWildcard, mergeCache)
 	// no need to check for existing.context, config.context in cache
 	// since only way to create Newgraphs is "call rule" and here. We
 	// cache at both places.
-	existing.setReachesIntoOuterContext(intMax(existing.getReachesIntoOuterContext(), config.getReachesIntoOuterContext()))
+	existing.SetReachesIntoOuterContext(intMax(existing.GetReachesIntoOuterContext(), config.GetReachesIntoOuterContext()))
 	// make sure to preserve the precedence filter suppression during the merge
 	if config.getPrecedenceFilterSuppressed() {
 		existing.setPrecedenceFilterSuppressed(true)
 	}
-	existing.setContext(merged) // replace context no need to alt mapping
+	existing.SetContext(merged) // replace context no need to alt mapping
 	return true
 }
 
@@ -140,7 +140,7 @@ func (this *ATNConfigSet) GetStates() *Set {
 func (this *ATNConfigSet) getPredicates() []SemanticContext {
 	var preds = make([]SemanticContext, 0)
 	for i := 0; i < len(this.configs); i++ {
-		c := this.configs[i].getSemanticContext()
+		c := this.configs[i].GetSemanticContext()
 		if c != SemanticContextNONE {
 			preds = append(preds, c)
 		}
@@ -161,7 +161,7 @@ func (this *ATNConfigSet) optimizeConfigs(interpreter *ATNSimulator) {
 	}
 	for i := 0; i < len(this.configs); i++ {
 		var config = this.configs[i]
-		config.setContext(interpreter.getCachedContext(config.getContext()))
+		config.SetContext(interpreter.getCachedContext(config.GetContext()))
 	}
 }
 

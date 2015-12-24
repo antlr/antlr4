@@ -18,7 +18,7 @@ type IRecognizer interface {
 	GetState() int
 	SetState(int)
 	Action(_localctx IRuleContext, ruleIndex, actionIndex int)
-	getATN() *ATN
+	GetATN() *ATN
 	getErrorListenerDispatch() IErrorListener
 
 }
@@ -75,7 +75,7 @@ func (this *Recognizer) GetTokenNames() []string {
 }
 
 func (this *Recognizer) GetSymbolicNames() []string {
-	return this.SymbolicNames
+	return this.LiteralNames
 }
 
 func (this *Recognizer) GetLiteralNames() []string {
@@ -140,7 +140,7 @@ func (this *Recognizer) GetTokenType(tokenName string) int {
 //        Map<String, Integer> result = tokenTypeMapCache.get(vocabulary);
 //        if (result == null) {
 //            result = new HashMap<String, Integer>();
-//            for (int i = 0; i < getATN().maxTokenType; i++) {
+//            for (int i = 0; i < GetATN().maxTokenType; i++) {
 //                String literalName = vocabulary.getLiteralName(i);
 //                if (literalName != null) {
 //                    result.put(literalName, i);

@@ -26,8 +26,8 @@ type SyntaxTree interface {
 type ParseTree interface {
 	SyntaxTree
 
-	//	<T> T accept(ParseTreeVisitor<? extends T> visitor);
-	accept(visitor ParseTreeVisitor) interface{}
+	//	<T> T accept(ParseTreeVisitor<? extends T> Visitor);
+	accept(Visitor ParseTreeVisitor) interface{}
 	GetText() string
 	//	toStringTree([]string, IRecognizer) string
 }
@@ -50,38 +50,38 @@ type ErrorNode interface {
 
 type ParseTreeVisitor interface {
 	// NOTE: removed type arguments
-	visit(tree ParseTree) interface{}
-	visitChildren(node RuleNode) interface{}
-	visitTerminal(node TerminalNode) interface{}
-	visitErrorNode(node ErrorNode) interface{}
+	Visit(tree ParseTree) interface{}
+	VisitChildren(node RuleNode) interface{}
+	VisitTerminal(node TerminalNode) interface{}
+	VisitErrorNode(node ErrorNode) interface{}
 }
 
 // TODO
-//func (this ParseTreeVisitor) visit(ctx) {
+//func (this ParseTreeVisitor) Visit(ctx) {
 //	if (Utils.isArray(ctx)) {
 //		var self = this
-//		return ctx.map(function(child) { return visitAtom(self, child)})
+//		return ctx.map(function(child) { return VisitAtom(self, child)})
 //	} else {
-//		return visitAtom(this, ctx)
+//		return VisitAtom(this, ctx)
 //	}
 //}
 //
-//func visitAtom(visitor, ctx) {
+//func VisitAtom(Visitor, ctx) {
 //	if (ctx.parser == nil) { //is terminal
 //		return
 //	}
 //
 //	var name = ctx.parser.ruleNames[ctx.ruleIndex]
-//	var funcName = "visit" + Utils.titleCase(name)
+//	var funcName = "Visit" + Utils.titleCase(name)
 //
-//	return visitor[funcName](ctx)
+//	return Visitor[funcName](ctx)
 //}
 
 type ParseTreeListener interface {
-	visitTerminal(node TerminalNode)
-	visitErrorNode(node ErrorNode)
-	enterEveryRule(ctx IParserRuleContext)
-	exitEveryRule(ctx IParserRuleContext)
+	VisitTerminal(node TerminalNode)
+	VisitErrorNode(node ErrorNode)
+	EnterEveryRule(ctx IParserRuleContext)
+	ExitEveryRule(ctx IParserRuleContext)
 }
 
 type TerminalNodeImpl struct {
@@ -143,8 +143,8 @@ func (this *TerminalNodeImpl) getChildCount() int {
 	return 0
 }
 
-func (this *TerminalNodeImpl) accept(visitor ParseTreeVisitor) interface{} {
-	return visitor.visitTerminal(this)
+func (this *TerminalNodeImpl) accept(Visitor ParseTreeVisitor) interface{} {
+	return Visitor.VisitTerminal(this)
 }
 
 func (this *TerminalNodeImpl) GetText() string {
@@ -179,8 +179,8 @@ func (this *ErrorNodeImpl) isErrorNode() bool {
 	return true
 }
 
-func (this *ErrorNodeImpl) accept(visitor ParseTreeVisitor) interface{} {
-	return visitor.visitErrorNode(this)
+func (this *ErrorNodeImpl) accept(Visitor ParseTreeVisitor) interface{} {
+	return Visitor.VisitErrorNode(this)
 }
 
 type ParseTreeWalker struct {
@@ -193,35 +193,35 @@ func NewParseTreeWalker() *ParseTreeWalker {
 func (this *ParseTreeWalker) walk(listener ParseTreeListener, t Tree) {
 
 	if errorNode, ok := t.(ErrorNode); ok {
-		listener.visitErrorNode(errorNode)
+		listener.VisitErrorNode(errorNode)
 	} else if term, ok := t.(TerminalNode); ok {
-		listener.visitTerminal(term)
+		listener.VisitTerminal(term)
 	} else {
 		this.EnterRule(listener, t.(RuleNode))
 		for i := 0; i < t.getChildCount(); i++ {
 			var child = t.getChild(i)
 			this.walk(listener, child)
 		}
-		this.exitRule(listener, t.(RuleNode))
+		this.ExitRule(listener, t.(RuleNode))
 	}
 }
 
 //
 // The discovery of a rule node, involves sending two events: the generic
-// {@link ParseTreeListener//enterEveryRule} and a
+// {@link ParseTreeListener//EnterEveryRule} and a
 // {@link RuleContext}-specific event. First we trigger the generic and then
 // the rule specific. We to them in reverse order upon finishing the node.
 //
 func (this *ParseTreeWalker) EnterRule(listener ParseTreeListener, r RuleNode) {
 	var ctx = r.getRuleContext().(IParserRuleContext)
-	listener.enterEveryRule(ctx)
+	listener.EnterEveryRule(ctx)
 	ctx.EnterRule(listener)
 }
 
-func (this *ParseTreeWalker) exitRule(listener ParseTreeListener, r RuleNode) {
+func (this *ParseTreeWalker) ExitRule(listener ParseTreeListener, r RuleNode) {
 	var ctx = r.getRuleContext().(IParserRuleContext)
-	ctx.exitRule(listener)
-	listener.exitEveryRule(ctx)
+	ctx.ExitRule(listener)
+	listener.ExitEveryRule(ctx)
 }
 
 var ParseTreeWalkerDEFAULT = NewParseTreeWalker()

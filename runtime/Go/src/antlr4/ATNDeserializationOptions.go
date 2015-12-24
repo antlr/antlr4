@@ -6,13 +6,13 @@ type ATNDeserializationOptions struct {
 	generateRuleBypassTransitions bool
 }
 
-func NewATNDeserializationOptions(copyFrom *ATNDeserializationOptions) *ATNDeserializationOptions {
+func NewATNDeserializationOptions(CopyFrom *ATNDeserializationOptions) *ATNDeserializationOptions {
 	o := new(ATNDeserializationOptions)
 
-	if copyFrom != nil {
-		o.readOnly = copyFrom.readOnly
-		o.verifyATN = copyFrom.verifyATN
-		o.generateRuleBypassTransitions = copyFrom.generateRuleBypassTransitions
+	if CopyFrom != nil {
+		o.readOnly = CopyFrom.readOnly
+		o.verifyATN = CopyFrom.verifyATN
+		o.generateRuleBypassTransitions = CopyFrom.generateRuleBypassTransitions
 	}
 
 	return o

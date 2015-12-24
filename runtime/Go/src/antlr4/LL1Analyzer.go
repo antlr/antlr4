@@ -32,13 +32,13 @@ func (la *LL1Analyzer) getDecisionLookahead(s IATNState) []*IntervalSet {
 	if s == nil {
 		return nil
 	}
-	var count = len(s.getTransitions())
+	var count = len(s.GetTransitions())
 	var look = make([]*IntervalSet, count)
 	for alt := 0; alt < count; alt++ {
 		look[alt] = NewIntervalSet()
 		var lookBusy = NewSet(nil, nil)
 		var seeThruPreds = false // fail to get lookahead upon pred
-		la._LOOK(s.getTransitions()[alt].getTarget(), nil, PredictionContextEMPTY, look[alt], lookBusy, NewBitSet(), seeThruPreds, false)
+		la._LOOK(s.GetTransitions()[alt].getTarget(), nil, PredictionContextEMPTY, look[alt], lookBusy, NewBitSet(), seeThruPreds, false)
 		// Wipe out lookahead for la alternative if we found nothing
 		// or we had a predicate when we !seeThruPreds
 		if look[alt].length() == 0 || look[alt].contains(LL1AnalyzerHIT_PRED) {
@@ -71,7 +71,7 @@ func (la *LL1Analyzer) LOOK(s, stopState IATNState, ctx IRuleContext) *IntervalS
 	var seeThruPreds = true // ignore preds get all lookahead
 	var lookContext IPredictionContext
 	if ctx != nil {
-		predictionContextFromRuleContext(s.getATN(), ctx)
+		predictionContextFromRuleContext(s.GetATN(), ctx)
 	}
 	la._LOOK(s, stopState, lookContext, r, NewSet(nil, nil), NewBitSet(), seeThruPreds, true)
 	return r
@@ -144,16 +144,16 @@ func (la *LL1Analyzer) _LOOK(s, stopState IATNState, ctx IPredictionContext, loo
 				returnState := la.atn.states[ctx.getReturnState(i)]
 				//					System.out.println("popping back to "+retState)
 
-				removed := calledRuleStack.contains(returnState.getRuleIndex())
+				removed := calledRuleStack.contains(returnState.GetRuleIndex())
 
 				// TODO this is incorrect
 				defer func() {
 					if removed {
-						calledRuleStack.add(returnState.getRuleIndex())
+						calledRuleStack.add(returnState.GetRuleIndex())
 					}
 				}()
 
-				calledRuleStack.clear(returnState.getRuleIndex())
+				calledRuleStack.clear(returnState.GetRuleIndex())
 				la._LOOK(returnState, stopState, ctx.GetParent(i), look, lookBusy, calledRuleStack, seeThruPreds, addEOF)
 
 			}
@@ -161,24 +161,24 @@ func (la *LL1Analyzer) _LOOK(s, stopState IATNState, ctx IPredictionContext, loo
 		}
 	}
 
-	n := len(s.getTransitions())
+	n := len(s.GetTransitions())
 
 	for i := 0; i < n; i++ {
-		t := s.getTransitions()[i]
+		t := s.GetTransitions()[i]
 
 		if t1, ok := t.(*RuleTransition); ok {
 
-			if calledRuleStack.contains(t1.getTarget().getRuleIndex()) {
+			if calledRuleStack.contains(t1.getTarget().GetRuleIndex()) {
 				continue
 			}
 
 			newContext := SingletonPredictionContextcreate(ctx, t1.followState.GetStateNumber())
 
 			defer func() {
-				calledRuleStack.remove(t1.getTarget().getRuleIndex())
+				calledRuleStack.remove(t1.getTarget().GetRuleIndex())
 			}()
 
-			calledRuleStack.add(t1.getTarget().getRuleIndex())
+			calledRuleStack.add(t1.getTarget().GetRuleIndex())
 			la._LOOK(t.getTarget(), stopState, newContext, look, lookBusy, calledRuleStack, seeThruPreds, addEOF)
 		} else if t2, ok := t.(*AbstractPredicateTransition); ok {
 			if seeThruPreds {

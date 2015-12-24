@@ -285,25 +285,25 @@ func (this *ATNDeserializer) readEdges(atn *ATN, sets []*IntervalSet) {
 		var arg3 = this.readInt()
 		trans := this.edgeFactory(atn, ttype, src, trg, arg1, arg2, arg3, sets)
 		var srcState = atn.states[src]
-		srcState.addTransition(trans, -1)
+		srcState.AddTransition(trans, -1)
 	}
 	// edges for rule stop states can be derived, so they aren't serialized
 	for i := 0; i < len(atn.states); i++ {
 		state := atn.states[i]
-		for j := 0; j < len(state.getTransitions()); j++ {
-			var t, ok = state.getTransitions()[j].(*RuleTransition)
+		for j := 0; j < len(state.GetTransitions()); j++ {
+			var t, ok = state.GetTransitions()[j].(*RuleTransition)
 			if !ok {
 				continue
 			}
 			var outermostPrecedenceReturn = -1
-			if atn.ruleToStartState[t.getTarget().getRuleIndex()].isPrecedenceRule {
+			if atn.ruleToStartState[t.getTarget().GetRuleIndex()].isPrecedenceRule {
 				if t.precedence == 0 {
-					outermostPrecedenceReturn = t.getTarget().getRuleIndex()
+					outermostPrecedenceReturn = t.getTarget().GetRuleIndex()
 				}
 			}
 
 			trans := NewEpsilonTransition(t.followState, outermostPrecedenceReturn)
-			atn.ruleToStopState[t.getTarget().getRuleIndex()].addTransition(trans, -1)
+			atn.ruleToStopState[t.getTarget().GetRuleIndex()].AddTransition(trans, -1)
 		}
 	}
 
@@ -322,15 +322,15 @@ func (this *ATNDeserializer) readEdges(atn *ATN, sets []*IntervalSet) {
 			s2.endState.startState = state
 		}
 		if s2, ok := state.(*PlusLoopbackState); ok {
-			for j := 0; j < len(s2.getTransitions()); j++ {
-				target := s2.getTransitions()[j].getTarget()
+			for j := 0; j < len(s2.GetTransitions()); j++ {
+				target := s2.GetTransitions()[j].getTarget()
 				if t2, ok := target.(*PlusBlockStartState); ok {
 					t2.loopBackState = state
 				}
 			}
 		} else if s2, ok := state.(*StarLoopbackState); ok {
-			for j := 0; j < len(s2.getTransitions()); j++ {
-				target := s2.getTransitions()[j].getTarget()
+			for j := 0; j < len(s2.GetTransitions()); j++ {
+				target := s2.GetTransitions()[j].getTarget()
 				if t2, ok := target.(*StarLoopEntryState); ok {
 					t2.loopBackState = state
 				}
@@ -405,7 +405,7 @@ func (this *ATNDeserializer) generateRuleBypassTransition(atn *ATN, idx int) {
 			state := atn.states[i]
 			if this.stateIsEndStateFor(state, idx) != nil {
 				endState = state
-				excludeTransition = state.(*StarLoopEntryState).loopBackState.getTransitions()[0]
+				excludeTransition = state.(*StarLoopEntryState).loopBackState.GetTransitions()[0]
 				break
 			}
 		}
@@ -420,8 +420,8 @@ func (this *ATNDeserializer) generateRuleBypassTransition(atn *ATN, idx int) {
 	// target blockEnd instead
 	for i := 0; i < len(atn.states); i++ {
 		state := atn.states[i]
-		for j := 0; j < len(state.getTransitions()); j++ {
-			var transition = state.getTransitions()[j]
+		for j := 0; j < len(state.GetTransitions()); j++ {
+			var transition = state.GetTransitions()[j]
 			if transition == excludeTransition {
 				continue
 			}
@@ -434,34 +434,34 @@ func (this *ATNDeserializer) generateRuleBypassTransition(atn *ATN, idx int) {
 	// all transitions leaving the rule start state need to leave blockStart
 	// instead
 	var ruleToStartState = atn.ruleToStartState[idx]
-	var count = len(ruleToStartState.getTransitions())
+	var count = len(ruleToStartState.GetTransitions())
 	for count > 0 {
-		bypassStart.addTransition(ruleToStartState.getTransitions()[count-1], -1)
-		ruleToStartState.setTransitions([]ITransition{ruleToStartState.getTransitions()[len(ruleToStartState.getTransitions())-1]})
+		bypassStart.AddTransition(ruleToStartState.GetTransitions()[count-1], -1)
+		ruleToStartState.SetTransitions([]ITransition{ruleToStartState.GetTransitions()[len(ruleToStartState.GetTransitions())-1]})
 	}
 	// link the new states
-	atn.ruleToStartState[idx].addTransition(NewEpsilonTransition(bypassStart, -1), -1)
-	bypassStop.addTransition(NewEpsilonTransition(endState, -1), -1)
+	atn.ruleToStartState[idx].AddTransition(NewEpsilonTransition(bypassStart, -1), -1)
+	bypassStop.AddTransition(NewEpsilonTransition(endState, -1), -1)
 
 	var MatchState = NewBasicState()
 	atn.addState(MatchState)
-	MatchState.addTransition(NewAtomTransition(bypassStop, atn.ruleToTokenType[idx]), -1)
-	bypassStart.addTransition(NewEpsilonTransition(MatchState, -1), -1)
+	MatchState.AddTransition(NewAtomTransition(bypassStop, atn.ruleToTokenType[idx]), -1)
+	bypassStart.AddTransition(NewEpsilonTransition(MatchState, -1), -1)
 }
 
 func (this *ATNDeserializer) stateIsEndStateFor(state IATNState, idx int) IATNState {
-	if state.getRuleIndex() != idx {
+	if state.GetRuleIndex() != idx {
 		return nil
 	}
 	if _, ok := state.(*StarLoopEntryState); !ok {
 		return nil
 	}
-	var maybeLoopEndState = state.getTransitions()[len(state.getTransitions())-1].getTarget()
+	var maybeLoopEndState = state.GetTransitions()[len(state.GetTransitions())-1].getTarget()
 	if _, ok := maybeLoopEndState.(*LoopEndState); !ok {
 		return nil
 	}
 
-	_, ok := maybeLoopEndState.getTransitions()[0].getTarget().(*RuleStopState)
+	_, ok := maybeLoopEndState.GetTransitions()[0].getTarget().(*RuleStopState)
 
 	if maybeLoopEndState.(*LoopEndState).epsilonOnlyTransitions && ok {
 		return state
@@ -487,10 +487,10 @@ func (this *ATNDeserializer) markPrecedenceDecisions(atn *ATN) {
 		// decision for the closure block that determines whether a
 		// precedence rule should continue or complete.
 		//
-		if atn.ruleToStartState[state.getRuleIndex()].isPrecedenceRule {
-			var maybeLoopEndState = state.getTransitions()[len(state.getTransitions())-1].getTarget()
+		if atn.ruleToStartState[state.GetRuleIndex()].isPrecedenceRule {
+			var maybeLoopEndState = state.GetTransitions()[len(state.GetTransitions())-1].getTarget()
 			if s3, ok := maybeLoopEndState.(*LoopEndState); ok {
-				s := maybeLoopEndState.getTransitions()[0].getTarget()
+				s := maybeLoopEndState.GetTransitions()[0].getTarget()
 				_, ok2 := s.(*RuleStopState)
 				if s3.epsilonOnlyTransitions && ok2 {
 					s.(*StarLoopEntryState).precedenceRuleDecision = true
@@ -511,7 +511,7 @@ func (this *ATNDeserializer) verifyATN(atn *ATN) {
 		if state == nil {
 			continue
 		}
-		this.checkCondition(state.getEpsilonOnlyTransitions() || len(state.getTransitions()) <= 1, "")
+		this.checkCondition(state.GetEpsilonOnlyTransitions() || len(state.GetTransitions()) <= 1, "")
 
 		switch s2 := state.(type) {
 
@@ -520,15 +520,15 @@ func (this *ATNDeserializer) verifyATN(atn *ATN) {
 		case *StarLoopEntryState:
 
 			this.checkCondition(s2.loopBackState != nil, "")
-			this.checkCondition(len(s2.getTransitions()) == 2, "")
+			this.checkCondition(len(s2.GetTransitions()) == 2, "")
 
 			switch s2 := state.(type) {
 			case *StarBlockStartState:
-				_, ok2 := s2.getTransitions()[1].getTarget().(*LoopEndState)
+				_, ok2 := s2.GetTransitions()[1].getTarget().(*LoopEndState)
 				this.checkCondition(ok2, "")
 				this.checkCondition(!s2.nonGreedy, "")
 			case *LoopEndState:
-				s3, ok2 := s2.getTransitions()[1].getTarget().(*StarBlockStartState)
+				s3, ok2 := s2.GetTransitions()[1].getTarget().(*StarBlockStartState)
 				this.checkCondition(ok2, "")
 				this.checkCondition(s3.nonGreedy, "")
 			default:
@@ -536,8 +536,8 @@ func (this *ATNDeserializer) verifyATN(atn *ATN) {
 			}
 
 		case *StarLoopbackState:
-			this.checkCondition(len(state.getTransitions()) == 1, "")
-			_, ok2 := state.getTransitions()[0].getTarget().(*StarLoopEntryState)
+			this.checkCondition(len(state.GetTransitions()) == 1, "")
+			_, ok2 := state.GetTransitions()[0].getTarget().(*StarLoopEntryState)
 			this.checkCondition(ok2, "")
 		case *LoopEndState:
 			this.checkCondition(s2.loopBackState != nil, "")
@@ -548,10 +548,10 @@ func (this *ATNDeserializer) verifyATN(atn *ATN) {
 		case *BlockEndState:
 			this.checkCondition(s2.startState != nil, "")
 		case *DecisionState:
-			this.checkCondition(len(s2.getTransitions()) <= 1 || s2.decision >= 0, "")
+			this.checkCondition(len(s2.GetTransitions()) <= 1 || s2.decision >= 0, "")
 		default:
 			_, ok := s2.(*RuleStopState)
-			this.checkCondition(len(s2.getTransitions()) <= 1 || ok, "")
+			this.checkCondition(len(s2.GetTransitions()) <= 1 || ok, "")
 		}
 	}
 }
@@ -683,7 +683,7 @@ func (this *ATNDeserializer) stateFactory(typeIndex, ruleIndex int) IATNState {
 		panic(message)
 	}
 
-	s.setRuleIndex(ruleIndex)
+	s.SetRuleIndex(ruleIndex)
 	return s
 }
 

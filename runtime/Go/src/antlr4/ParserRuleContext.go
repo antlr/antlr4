@@ -11,7 +11,7 @@ type IParserRuleContext interface {
 	addTokenNode(token *Token) *TerminalNodeImpl
 	addErrorNode(badToken *Token) *ErrorNodeImpl
 	EnterRule(listener ParseTreeListener)
-	exitRule(listener ParseTreeListener)
+	ExitRule(listener ParseTreeListener)
 
 	setStart(*Token)
 	getStart() *Token
@@ -46,7 +46,7 @@ func (prc *ParserRuleContext) InitParserRuleContext(parent IParserRuleContext, i
 	prc.InitRuleContext(parent, invokingStateNumber)
 
 	prc.RuleIndex = -1
-	// * If we are debugging or building a parse tree for a visitor,
+	// * If we are debugging or building a parse tree for a Visitor,
 	// we need to track all of the tokens and rule invocations associated
 	// with prc rule's context. This is empty for parsing w/o tree constr.
 	// operation because we don't the need to track the details about
@@ -80,7 +80,7 @@ func (prc *ParserRuleContext) setChildren(cs []Tree) {
 	}
 }
 
-func (prc *ParserRuleContext) copyFrom(ctx *ParserRuleContext) {
+func (prc *ParserRuleContext) CopyFrom(ctx *ParserRuleContext) {
 	// from RuleContext
 	prc.parentCtx = ctx.parentCtx
 	prc.invokingState = ctx.invokingState
@@ -93,7 +93,7 @@ func (prc *ParserRuleContext) copyFrom(ctx *ParserRuleContext) {
 func (prc *ParserRuleContext) EnterRule(listener ParseTreeListener) {
 }
 
-func (prc *ParserRuleContext) exitRule(listener ParseTreeListener) {
+func (prc *ParserRuleContext) ExitRule(listener ParseTreeListener) {
 }
 
 // * Does not set parent link other add methods do that///
@@ -215,12 +215,12 @@ func (prc *ParserRuleContext) GetTokens(ttype int) []TerminalNode {
 	}
 }
 
-func (prc *ParserRuleContext) GetTypedRuleContext(ctxType reflect.Type, i int) *interface{} {
+func (prc *ParserRuleContext) GetTypedRuleContext(ctxType reflect.Type, i int) interface{} {
 	panic("GetTypedRuleContexts not implemented")
 	//    return prc.getChild(i, ctxType)
 }
 
-func (prc *ParserRuleContext) GetTypedRuleContexts(ctxType reflect.Type) []*interface{} {
+func (prc *ParserRuleContext) GetTypedRuleContexts(ctxType reflect.Type) []interface{} {
 	panic("GetTypedRuleContexts not implemented")
 	//    if (prc.children== nil) {
 	//        return []

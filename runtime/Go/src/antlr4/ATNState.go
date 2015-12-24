@@ -39,25 +39,25 @@ const (
 var INITIAL_NUM_TRANSITIONS = 4
 
 type IATNState interface {
-	getEpsilonOnlyTransitions() bool
+	GetEpsilonOnlyTransitions() bool
 
-	getRuleIndex() int
-	setRuleIndex(int)
+	GetRuleIndex() int
+	SetRuleIndex(int)
 
-	getNextTokenWithinRule() *IntervalSet
-	setNextTokenWithinRule(*IntervalSet)
+	GetNextTokenWithinRule() *IntervalSet
+	SetNextTokenWithinRule(*IntervalSet)
 
-	getATN() *ATN
-	setATN(*ATN)
+	GetATN() *ATN
+	SetATN(*ATN)
 
 	GetStateType() int
 
 	GetStateNumber() int
 	SetStateNumber(int)
 
-	getTransitions() []ITransition
-	setTransitions([]ITransition)
-	addTransition(ITransition, int)
+	GetTransitions() []ITransition
+	SetTransitions([]ITransition)
+	AddTransition(ITransition, int)
 
 	toString() string
 }
@@ -98,30 +98,30 @@ func (as *ATNState) InitATNState() {
 
 }
 
-func (as *ATNState) getRuleIndex() int {
+func (as *ATNState) GetRuleIndex() int {
 	return as.ruleIndex
 }
 
-func (as *ATNState) setRuleIndex(v int) {
+func (as *ATNState) SetRuleIndex(v int) {
 	as.ruleIndex = v
 }
-func (as *ATNState) getEpsilonOnlyTransitions() bool {
+func (as *ATNState) GetEpsilonOnlyTransitions() bool {
 	return as.epsilonOnlyTransitions
 }
 
-func (as *ATNState) getATN() *ATN {
+func (as *ATNState) GetATN() *ATN {
 	return as.atn
 }
 
-func (as *ATNState) setATN(atn *ATN) {
+func (as *ATNState) SetATN(atn *ATN) {
 	as.atn = atn
 }
 
-func (as *ATNState) getTransitions() []ITransition {
+func (as *ATNState) GetTransitions() []ITransition {
 	return as.transitions
 }
 
-func (as *ATNState) setTransitions(t []ITransition) {
+func (as *ATNState) SetTransitions(t []ITransition) {
 	as.transitions = t
 }
 
@@ -137,11 +137,11 @@ func (as *ATNState) SetStateNumber(stateNumber int) {
 	as.stateNumber = stateNumber
 }
 
-func (as *ATNState) getNextTokenWithinRule() *IntervalSet {
+func (as *ATNState) GetNextTokenWithinRule() *IntervalSet {
 	return as.nextTokenWithinRule
 }
 
-func (as *ATNState) setNextTokenWithinRule(v *IntervalSet) {
+func (as *ATNState) SetNextTokenWithinRule(v *IntervalSet) {
 	as.nextTokenWithinRule = v
 }
 
@@ -161,7 +161,7 @@ func (this *ATNState) isNonGreedyExitState() bool {
 	return false
 }
 
-func (this *ATNState) addTransition(trans ITransition, index int) {
+func (this *ATNState) AddTransition(trans ITransition, index int) {
 	if len(this.transitions) == 0 {
 		this.epsilonOnlyTransitions = trans.getIsEpsilon()
 	} else if this.epsilonOnlyTransitions != trans.getIsEpsilon() {

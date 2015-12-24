@@ -83,7 +83,7 @@ func (this *RecognitionException) getOffendingToken() *Token {
 // /
 func (this *RecognitionException) getExpectedTokens() *IntervalSet {
 	if this.recognizer != nil {
-		return this.recognizer.getATN().getExpectedTokens(this.offendingState, this.ctx)
+		return this.recognizer.GetATN().getExpectedTokens(this.offendingState, this.ctx)
 	} else {
 		return nil
 	}
@@ -100,7 +100,7 @@ type LexerNoViableAltException struct {
 	deadEndConfigs *ATNConfigSet
 }
 
-func NewLexerNoViableAltException(lexer *Lexer, input CharStream, startIndex int,
+func NewLexerNoViableAltException(lexer ILexer, input CharStream, startIndex int,
 	deadEndConfigs *ATNConfigSet) *LexerNoViableAltException {
 
 	this := new(LexerNoViableAltException)
@@ -207,7 +207,7 @@ func NewFailedPredicateException(recognizer *Parser, predicate string, message s
 	this.InitRecognitionException(this.formatMessage(predicate, message), recognizer, recognizer.getInputStream(), recognizer._ctx)
 
 	var s = recognizer.Interpreter.atn.states[recognizer.state]
-	var trans = s.getTransitions()[0]
+	var trans = s.GetTransitions()[0]
 	if trans2, ok := trans.(*PredicateTransition); ok {
 		this.ruleIndex = trans2.ruleIndex
 		this.predicateIndex = trans2.predIndex

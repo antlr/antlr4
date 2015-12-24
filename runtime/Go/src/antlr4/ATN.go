@@ -1,5 +1,7 @@
 package antlr4
 
+var ATNINVALID_ALT_NUMBER = 0
+
 type ATN struct {
 	DecisionToState      []*DecisionState
 	grammarType          int
@@ -60,12 +62,12 @@ func (this *ATN) nextTokensInContext(s IATNState, ctx IRuleContext) *IntervalSet
 // staying in same rule. {@link Token//EPSILON} is in set if we reach end of
 // rule.
 func (this *ATN) nextTokensNoContext(s IATNState) *IntervalSet {
-	if s.getNextTokenWithinRule() != nil {
-		return s.getNextTokenWithinRule()
+	if s.GetNextTokenWithinRule() != nil {
+		return s.GetNextTokenWithinRule()
 	}
-	s.setNextTokenWithinRule(this.nextTokensInContext(s, nil))
-	s.getNextTokenWithinRule().readOnly = true
-	return s.getNextTokenWithinRule()
+	s.SetNextTokenWithinRule(this.nextTokensInContext(s, nil))
+	s.GetNextTokenWithinRule().readOnly = true
+	return s.GetNextTokenWithinRule()
 }
 
 func (this *ATN) nextTokens(s IATNState, ctx IRuleContext) *IntervalSet {
@@ -78,7 +80,7 @@ func (this *ATN) nextTokens(s IATNState, ctx IRuleContext) *IntervalSet {
 
 func (this *ATN) addState(state IATNState) {
 	if state != nil {
-		state.setATN(this)
+		state.SetATN(this)
 		state.SetStateNumber(len(this.states))
 	}
 	this.states = append(this.states, state)
@@ -120,8 +122,6 @@ func (this *ATN) getDecisionState(decision int) *DecisionState {
 // @panics IllegalArgumentException if the ATN does not contain a state with
 // number {@code stateNumber}
 
-//var Token = require('./../Token').Token
-
 func (this *ATN) getExpectedTokens(stateNumber int, ctx IRuleContext) *IntervalSet {
 	if stateNumber < 0 || stateNumber >= len(this.states) {
 		panic("Invalid state number.")
@@ -136,7 +136,7 @@ func (this *ATN) getExpectedTokens(stateNumber int, ctx IRuleContext) *IntervalS
 	expected.removeOne(TokenEpsilon)
 	for ctx != nil && ctx.getInvokingState() >= 0 && following.contains(TokenEpsilon) {
 		var invokingState = this.states[ctx.getInvokingState()]
-		var rt = invokingState.getTransitions()[0]
+		var rt = invokingState.GetTransitions()[0]
 		following = this.nextTokens(rt.(*RuleTransition).followState, nil)
 		expected.addSet(following)
 		expected.removeOne(TokenEpsilon)
@@ -148,4 +148,3 @@ func (this *ATN) getExpectedTokens(stateNumber int, ctx IRuleContext) *IntervalS
 	return expected
 }
 
-var ATNINVALID_ALT_NUMBER = 0

@@ -344,7 +344,7 @@ func (l *Lexer) setText(text string) {
 	*l._text = text
 }
 
-func (this *Lexer) getATN() *ATN {
+func (this *Lexer) GetATN() *ATN {
 	return this.Interpreter.atn
 }
 

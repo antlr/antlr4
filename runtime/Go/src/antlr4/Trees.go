@@ -41,7 +41,7 @@ func TreesgetNodeText(t Tree, ruleNames []string, recog *Parser) string {
 
 	if ruleNames != nil {
 		if t2, ok := t.(RuleNode); ok {
-			return ruleNames[t2.getRuleContext().getRuleIndex()]
+			return ruleNames[t2.getRuleContext().GetRuleIndex()]
 		} else if t2, ok := t.(ErrorNode); ok {
 			return fmt.Sprint(t2)
 		} else if t2, ok := t.(TerminalNode); ok {
@@ -108,7 +108,7 @@ func Trees_findAllNodes(t ParseTree, index int, findTokens bool, nodes []ParseTr
 			nodes = append(nodes, t2)
 		}
 	} else if !findTokens && ok2 {
-		if t3.getRuleIndex() == index {
+		if t3.GetRuleIndex() == index {
 			nodes = append(nodes, t3)
 		}
 	}

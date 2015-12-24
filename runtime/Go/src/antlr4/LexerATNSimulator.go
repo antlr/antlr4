@@ -50,7 +50,7 @@ func (this *SimState) reset() {
 type LexerATNSimulator struct {
 	ATNSimulator
 
-	recog          *Lexer
+	recog          ILexer
 	predictionMode int
 	decisionToDFA  []*DFA
 	mergeCache     DoubleDict
@@ -62,7 +62,7 @@ type LexerATNSimulator struct {
 	Match_calls    int
 }
 
-func NewLexerATNSimulator(recog *Lexer, atn *ATN, decisionToDFA []*DFA, sharedContextCache *PredictionContextCache) *LexerATNSimulator {
+func NewLexerATNSimulator(recog ILexer, atn *ATN, decisionToDFA []*DFA, sharedContextCache *PredictionContextCache) *LexerATNSimulator {
 
 	this := new(LexerATNSimulator)
 
@@ -295,15 +295,15 @@ func (this *LexerATNSimulator) getReachableConfigSet(input CharStream, closure *
 	var skipAlt = ATNINVALID_ALT_NUMBER
 	for i := 0; i < len(closure.configs); i++ {
 		var cfg = closure.configs[i]
-		var currentAltReachedAcceptState = (cfg.getAlt() == skipAlt)
+		var currentAltReachedAcceptState = (cfg.GetAlt() == skipAlt)
 		if currentAltReachedAcceptState && cfg.(*LexerATNConfig).passedThroughNonGreedyDecision {
 			continue
 		}
 		if LexerATNSimulatordebug {
 			fmt.Printf("testing %s at %s\n", this.GetTokenName(t), cfg.toString()) // this.recog, true))
 		}
-		for j := 0; j < len(cfg.GetState().getTransitions()); j++ {
-			var trans = cfg.GetState().getTransitions()[j] // for each transition
+		for j := 0; j < len(cfg.GetState().GetTransitions()); j++ {
+			var trans = cfg.GetState().GetTransitions()[j] // for each transition
 			var target = this.getReachableTarget(trans, t)
 			if target != nil {
 				var lexerActionExecutor = cfg.(*LexerATNConfig).lexerActionExecutor
@@ -316,7 +316,7 @@ func (this *LexerATNSimulator) getReachableConfigSet(input CharStream, closure *
 					currentAltReachedAcceptState, true, treatEofAsEpsilon) {
 					// any remaining configs for this alt have a lower priority
 					// than the one that just reached an accept state.
-					skipAlt = cfg.getAlt()
+					skipAlt = cfg.GetAlt()
 				}
 			}
 		}
@@ -347,8 +347,8 @@ func (this *LexerATNSimulator) getReachableTarget(trans ITransition, t int) IATN
 func (this *LexerATNSimulator) computeStartState(input CharStream, p IATNState) *OrderedATNConfigSet {
 
 	var configs = NewOrderedATNConfigSet()
-	for i := 0; i < len(p.getTransitions()); i++ {
-		var target = p.getTransitions()[i].getTarget()
+	for i := 0; i < len(p.GetTransitions()); i++ {
+		var target = p.GetTransitions()[i].getTarget()
 		var cfg = NewLexerATNConfig6(target, i+1, PredictionContextEMPTY)
 		this.closure(input, cfg, configs.ATNConfigSet, false, false, false)
 	}
@@ -374,7 +374,7 @@ func (this *LexerATNSimulator) closure(input CharStream, config *LexerATNConfig,
 	if ok {
 		if LexerATNSimulatordebug {
 			if this.recog != nil {
-				fmt.Println("closure at %s rule stop %s\n", this.recog.GetRuleNames()[config.state.getRuleIndex()], config)
+				fmt.Println("closure at %s rule stop %s\n", this.recog.GetRuleNames()[config.state.GetRuleIndex()], config)
 			} else {
 				fmt.Println("closure at rule stop %s\n", config)
 			}
@@ -401,13 +401,13 @@ func (this *LexerATNSimulator) closure(input CharStream, config *LexerATNConfig,
 		return currentAltReachedAcceptState
 	}
 	// optimization
-	if !config.state.getEpsilonOnlyTransitions() {
+	if !config.state.GetEpsilonOnlyTransitions() {
 		if !currentAltReachedAcceptState || !config.passedThroughNonGreedyDecision {
 			configs.add(config, nil)
 		}
 	}
-	for j := 0; j < len(config.state.getTransitions()); j++ {
-		var trans = config.state.getTransitions()[j]
+	for j := 0; j < len(config.state.GetTransitions()); j++ {
+		var trans = config.state.GetTransitions()[j]
 		cfg := this.getEpsilonTarget(input, config, trans, configs, speculative, treatEofAsEpsilon)
 		if cfg != nil {
 			currentAltReachedAcceptState = this.closure(input, cfg, configs,
@@ -605,7 +605,7 @@ func (this *LexerATNSimulator) addDFAState(configs *ATNConfigSet) *DFAState {
 	if firstConfigWithRuleStopState != nil {
 		proposed.isAcceptState = true
 		proposed.lexerActionExecutor = firstConfigWithRuleStopState.(*LexerATNConfig).lexerActionExecutor
-		proposed.prediction = this.atn.ruleToTokenType[firstConfigWithRuleStopState.GetState().getRuleIndex()]
+		proposed.prediction = this.atn.ruleToTokenType[firstConfigWithRuleStopState.GetState().GetRuleIndex()]
 	}
 	var hash = proposed.hashString()
 	var dfa = this.decisionToDFA[this.mode]

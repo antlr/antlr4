@@ -128,7 +128,7 @@ func (this *LexerActionExecutor) fixOffsetBeforeMatch(offset int) *LexerActionEx
 // {@link IntStream//seek} to set the {@code input} position to the beginning
 // of the token.
 // /
-func (this *LexerActionExecutor) execute(lexer *Lexer, input CharStream, startIndex int) {
+func (this *LexerActionExecutor) execute(lexer ILexer, input CharStream, startIndex int) {
 	var requiresSeek = false
 	var stopIndex = input.index()
 

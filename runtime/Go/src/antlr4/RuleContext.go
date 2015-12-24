@@ -31,7 +31,7 @@ type IRuleContext interface {
 	getInvokingState() int
 	setInvokingState(int)
 
-	getRuleIndex() int
+	GetRuleIndex() int
 
 	isEmpty() bool
 
@@ -85,7 +85,7 @@ func (this *RuleContext) setInvokingState(t int) {
 	this.invokingState = t
 }
 
-func (this *RuleContext) getRuleIndex() int {
+func (this *RuleContext) GetRuleIndex() int {
 	return this.RuleIndex
 }
 
@@ -155,8 +155,8 @@ func (this *RuleContext) getChildCount() int {
 	return 0
 }
 
-func (this *RuleContext) accept(visitor ParseTreeVisitor) interface{} {
-	return visitor.visitChildren(this)
+func (this *RuleContext) accept(Visitor ParseTreeVisitor) interface{} {
+	return Visitor.VisitChildren(this)
 }
 
 //need to manage circular dependencies, so export now
@@ -179,7 +179,7 @@ func (this *RuleContext) toString(ruleNames []string, stop IRuleContext) string 
 				s += strconv.Itoa(p.getInvokingState())
 			}
 		} else {
-			var ri = p.getRuleIndex()
+			var ri = p.GetRuleIndex()
 			var ruleName string
 			if ri >= 0 && ri < len(ruleNames) {
 				ruleName = ruleNames[ri]

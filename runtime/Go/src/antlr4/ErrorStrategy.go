@@ -174,7 +174,7 @@ func (this *DefaultErrorStrategy) Recover(recognizer IParser, e IRecognitionExce
 
 	if this.lastErrorIndex == recognizer.getInputStream().index() &&
 		this.lastErrorStates != nil && this.lastErrorStates.contains(recognizer.GetState()) {
-		// uh oh, another error at same token index and previously-visited
+		// uh oh, another error at same token index and previously-Visited
 		// state in ATN must be a case where LT(1) is in the recovery
 		// token set so nothing got consumed. Consume a single token
 		// at least to prevent an infinite loop this is a failsafe.
@@ -242,7 +242,7 @@ func (this *DefaultErrorStrategy) Sync(recognizer IParser) {
 	var s = recognizer.GetInterpreter().atn.states[recognizer.GetState()]
 	var la = recognizer.GetTokenStream().LA(1)
 	// try cheaper subset first might get lucky. seems to shave a wee bit off
-	if la == TokenEOF || recognizer.getATN().nextTokens(s, nil).contains(la) {
+	if la == TokenEOF || recognizer.GetATN().nextTokens(s, nil).contains(la) {
 		return
 	}
 	// Return but don't end recovery. only do that upon valid token Match
@@ -323,7 +323,7 @@ func (this *DefaultErrorStrategy) reportInputMisMatch(recognizer IParser, e *Inp
 // @param e the recognition exception
 //
 func (this *DefaultErrorStrategy) reportFailedPredicate(recognizer IParser, e *FailedPredicateException) {
-	var ruleName = recognizer.GetRuleNames()[recognizer.GetParserRuleContext().getRuleIndex()]
+	var ruleName = recognizer.GetRuleNames()[recognizer.GetParserRuleContext().GetRuleIndex()]
 	var msg = "rule " + ruleName + " " + e.message
 	recognizer.notifyErrorListeners(msg, e.offendingToken, e)
 }
@@ -476,7 +476,7 @@ func (this *DefaultErrorStrategy) singleTokenInsertion(recognizer IParser) bool 
 	// is free to conjure up and insert the missing token
 	var atn = recognizer.GetInterpreter().atn
 	var currentState = atn.states[recognizer.GetState()]
-	var next = currentState.getTransitions()[0].getTarget()
+	var next = currentState.GetTransitions()[0].getTarget()
 	var expectingAtLL2 = atn.nextTokens(next, recognizer.GetParserRuleContext())
 	if expectingAtLL2.contains(currentSymbolType) {
 		this.reportMissingToken(recognizer)
@@ -695,7 +695,7 @@ func (this *DefaultErrorStrategy) getErrorRecoverySet(recognizer IParser) *Inter
 	for ctx != nil && ctx.getInvokingState() >= 0 {
 		// compute what follows who invoked us
 		var invokingState = atn.states[ctx.getInvokingState()]
-		var rt = invokingState.getTransitions()[0]
+		var rt = invokingState.GetTransitions()[0]
 		var follow = atn.nextTokens(rt.(*RuleTransition).followState, nil)
 		recoverSet.addSet(follow)
 		ctx = ctx.GetParent().(IParserRuleContext)
