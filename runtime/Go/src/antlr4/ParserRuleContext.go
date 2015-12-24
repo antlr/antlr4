@@ -35,14 +35,6 @@ func NewParserRuleContext(parent IParserRuleContext, invokingStateNumber int) *P
 
 	prc := new(ParserRuleContext)
 
-	prc.ParserRuleContext = NewParserRuleContext(parent, invokingStateNumber)
-
-	return prc
-
-}
-
-func (prc *ParserRuleContext) InitParserRuleContext(parent IParserRuleContext, invokingStateNumber int) {
-
 	prc.RuleContext = NewRuleContext(parent, invokingStateNumber)
 
 	prc.RuleIndex = -1
@@ -58,6 +50,8 @@ func (prc *ParserRuleContext) InitParserRuleContext(parent IParserRuleContext, i
 	// The exception that forced prc rule to return. If the rule successfully
 	// completed, prc is {@code nil}.
 	prc.exception = nil
+
+	return prc
 
 }
 

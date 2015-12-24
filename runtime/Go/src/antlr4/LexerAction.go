@@ -28,14 +28,13 @@ type LexerAction struct {
 
 func NewLexerAction(action int) *LexerAction {
 	la := new(LexerAction)
-	la.LexerAction = NewLexerAction(action)
+
+	la.actionType = action
+	la.isPositionDependent = false
+
 	return la
 }
 
-func (la *LexerAction) InitLexerAction(action int) {
-	la.actionType = action
-	la.isPositionDependent = false
-}
 
 func (this *LexerAction) execute(lexer ILexer) {
 	panic("Not implemented")

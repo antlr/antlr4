@@ -78,12 +78,6 @@ type ATNState struct {
 func NewATNState() *ATNState {
 
 	as := new(ATNState)
-	as.ATNState = NewATNState()
-
-	return as
-}
-
-func (as *ATNState) InitATNState() {
 
 	// Which ATN are we in?
 	as.atn = nil
@@ -96,6 +90,7 @@ func (as *ATNState) InitATNState() {
 	// Used to cache lookahead during parsing, not used during construction
 	as.nextTokenWithinRule = nil
 
+	return as
 }
 
 func (as *ATNState) GetRuleIndex() int {
@@ -199,16 +194,11 @@ func NewDecisionState() *DecisionState {
 	this := new(DecisionState)
 
 	this.ATNState = NewATNState()
-	this.DecisionState = NewDecisionState()
-
-	return this
-}
-
-func (this *DecisionState) InitDecisionState() {
 
 	this.decision = -1
 	this.nonGreedy = false
 
+	return this
 }
 
 //  The start of a regular {@code (...)} block.
@@ -223,14 +213,9 @@ func NewBlockStartState() *BlockStartState {
 	this := new(BlockStartState)
 
 	this.DecisionState = NewDecisionState()
-
-	return this
-}
-
-func (this *BlockStartState) InitBlockStartState() {
-
 	this.endState = nil
 
+	return this
 }
 
 type BasicBlockStartState struct {
@@ -249,7 +234,7 @@ func NewBasicBlockStartState() *BasicBlockStartState {
 
 // Terminal node of a simple {@code (a|b|c)} block.
 type BlockEndState struct {
-	ATNState
+	*ATNState
 
 	startState IATNState
 }
@@ -271,7 +256,7 @@ func NewBlockEndState() *BlockEndState {
 //  error handling.
 //
 type RuleStopState struct {
-	ATNState
+	*ATNState
 }
 
 func NewRuleStopState() *RuleStopState {
@@ -283,7 +268,7 @@ func NewRuleStopState() *RuleStopState {
 }
 
 type RuleStartState struct {
-	ATNState
+	*ATNState
 
 	stopState        IATNState
 	isPrecedenceRule bool
@@ -396,6 +381,7 @@ func NewStarLoopEntryState() *StarLoopEntryState {
 // Mark the end of a * or + loop.
 type LoopEndState struct {
 	*ATNState
+
 	loopBackState IATNState
 }
 

@@ -48,7 +48,7 @@ func (this *SimState) reset() {
 }
 
 type LexerATNSimulator struct {
-	ATNSimulator
+	*ATNSimulator
 
 	recog          ILexer
 	predictionMode int
@@ -190,10 +190,10 @@ func (this *LexerATNSimulator) execATN(input CharStream, ds0 *DFAState) int {
 		// A character will take us back to an existing DFA state
 		// that already has lots of edges out of it. e.g., .* in comments.
 		// print("Target for:" + str(s) + " and:" + str(t))
-		var target = this.getExistingTarGetState(s, t)
+		var target = this.getExistingTargetState(s, t)
 		// print("Existing:" + str(target))
 		if target == nil {
-			target = this.computeTarGetState(input, s, t)
+			target = this.computeTargetState(input, s, t)
 			// print("Computed:" + str(target))
 		}
 		if target == ATNSimulatorERROR {
@@ -227,7 +227,7 @@ func (this *LexerATNSimulator) execATN(input CharStream, ds0 *DFAState) int {
 // @return The existing target DFA state for the given input symbol
 // {@code t}, or {@code nil} if the target state for this edge is not
 // already cached
-func (this *LexerATNSimulator) getExistingTarGetState(s *DFAState, t int) *DFAState {
+func (this *LexerATNSimulator) getExistingTargetState(s *DFAState, t int) *DFAState {
 	if s.edges == nil || t < LexerATNSimulatorMIN_DFA_EDGE || t > LexerATNSimulatorMAX_DFA_EDGE {
 		return nil
 	}
@@ -252,7 +252,7 @@ func (this *LexerATNSimulator) getExistingTarGetState(s *DFAState, t int) *DFASt
 // @return The computed target DFA state for the given input symbol
 // {@code t}. If {@code t} does not lead to a valid DFA state, this method
 // returns {@link //ERROR}.
-func (this *LexerATNSimulator) computeTarGetState(input CharStream, s *DFAState, t int) *DFAState {
+func (this *LexerATNSimulator) computeTargetState(input CharStream, s *DFAState, t int) *DFAState {
 	var reach = NewOrderedATNConfigSet()
 	// if we don't find an existing DFA state
 	// Fill reach starting from closure, following t transitions
@@ -304,7 +304,7 @@ func (this *LexerATNSimulator) getReachableConfigSet(input CharStream, closure *
 		}
 		for j := 0; j < len(cfg.GetState().GetTransitions()); j++ {
 			var trans = cfg.GetState().GetTransitions()[j] // for each transition
-			var target = this.getReachableTarGet(trans, t)
+			var target = this.getReachableTarget(trans, t)
 			if target != nil {
 				var lexerActionExecutor = cfg.(*LexerATNConfig).lexerActionExecutor
 				if lexerActionExecutor != nil {
@@ -336,9 +336,9 @@ func (this *LexerATNSimulator) accept(input CharStream, lexerActionExecutor *Lex
 	}
 }
 
-func (this *LexerATNSimulator) getReachableTarGet(trans ITransition, t int) IATNState {
+func (this *LexerATNSimulator) getReachableTarget(trans ITransition, t int) IATNState {
 	if trans.Matches(t, 0, 0xFFFE) {
-		return trans.getTarGet()
+		return trans.getTarget()
 	} else {
 		return nil
 	}
@@ -348,7 +348,7 @@ func (this *LexerATNSimulator) computeStartState(input CharStream, p IATNState) 
 
 	var configs = NewOrderedATNConfigSet()
 	for i := 0; i < len(p.GetTransitions()); i++ {
-		var target = p.GetTransitions()[i].getTarGet()
+		var target = p.GetTransitions()[i].getTarget()
 		var cfg = NewLexerATNConfig6(target, i+1, PredictionContextEMPTY)
 		this.closure(input, cfg, configs.ATNConfigSet, false, false, false)
 	}
@@ -408,7 +408,7 @@ func (this *LexerATNSimulator) closure(input CharStream, config *LexerATNConfig,
 	}
 	for j := 0; j < len(config.state.GetTransitions()); j++ {
 		var trans = config.state.GetTransitions()[j]
-		cfg := this.getEpsilonTarGet(input, config, trans, configs, speculative, treatEofAsEpsilon)
+		cfg := this.getEpsilonTarget(input, config, trans, configs, speculative, treatEofAsEpsilon)
 		if cfg != nil {
 			currentAltReachedAcceptState = this.closure(input, cfg, configs,
 				currentAltReachedAcceptState, speculative, treatEofAsEpsilon)
@@ -418,7 +418,7 @@ func (this *LexerATNSimulator) closure(input CharStream, config *LexerATNConfig,
 }
 
 // side-effect: can alter configs.hasSemanticContext
-func (this *LexerATNSimulator) getEpsilonTarGet(input CharStream, config *LexerATNConfig, trans ITransition,
+func (this *LexerATNSimulator) getEpsilonTarget(input CharStream, config *LexerATNConfig, trans ITransition,
 	configs *ATNConfigSet, speculative, treatEofAsEpsilon bool) *LexerATNConfig {
 
 	var cfg *LexerATNConfig
@@ -427,7 +427,7 @@ func (this *LexerATNSimulator) getEpsilonTarGet(input CharStream, config *LexerA
 
 		rt := trans.(*RuleTransition)
 		var newContext = SingletonPredictionContextCreate(config.context, rt.followState.GetStateNumber())
-		cfg = NewLexerATNConfig2(config, trans.getTarGet(), newContext)
+		cfg = NewLexerATNConfig2(config, trans.getTarget(), newContext)
 
 	} else if trans.getSerializationType() == TransitionPRECEDENCE {
 		panic("Precedence predicates are not supported in lexers.")
@@ -457,7 +457,7 @@ func (this *LexerATNSimulator) getEpsilonTarGet(input CharStream, config *LexerA
 		}
 		configs.hasSemanticContext = true
 		if this.evaluatePredicate(input, pt.ruleIndex, pt.predIndex, speculative) {
-			cfg = NewLexerATNConfig4(config, trans.getTarGet())
+			cfg = NewLexerATNConfig4(config, trans.getTarget())
 		}
 	} else if trans.getSerializationType() == TransitionACTION {
 		if config.context == nil || config.context.hasEmptyPath() {
@@ -474,19 +474,19 @@ func (this *LexerATNSimulator) getEpsilonTarGet(input CharStream, config *LexerA
 			// additional modifications are needed before we can support
 			// the split operation.
 			var lexerActionExecutor = LexerActionExecutorappend(config.lexerActionExecutor, this.atn.lexerActions[trans.(*ActionTransition).actionIndex])
-			cfg = NewLexerATNConfig3(config, trans.getTarGet(), lexerActionExecutor)
+			cfg = NewLexerATNConfig3(config, trans.getTarget(), lexerActionExecutor)
 		} else {
 			// ignore actions in referenced rules
-			cfg = NewLexerATNConfig4(config, trans.getTarGet())
+			cfg = NewLexerATNConfig4(config, trans.getTarget())
 		}
 	} else if trans.getSerializationType() == TransitionEPSILON {
-		cfg = NewLexerATNConfig4(config, trans.getTarGet())
+		cfg = NewLexerATNConfig4(config, trans.getTarget())
 	} else if trans.getSerializationType() == TransitionATOM ||
 		trans.getSerializationType() == TransitionRANGE ||
 		trans.getSerializationType() == TransitionSET {
 		if treatEofAsEpsilon {
 			if trans.Matches(TokenEOF, 0, 0xFFFF) {
-				cfg = NewLexerATNConfig4(config, trans.getTarGet())
+				cfg = NewLexerATNConfig4(config, trans.getTarget())
 			}
 		}
 	}

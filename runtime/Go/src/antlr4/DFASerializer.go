@@ -24,15 +24,11 @@ func NewDFASerializer(dfa *DFA, literalNames, symbolicNames []string) *DFASerial
 
 	this := new(DFASerializer)
 
-	this.DFASerializer = NewDFASerializer(dfa, literalNames, symbolicNames)
-
-	return this
-}
-
-func (this *DFASerializer) InitDFASerializer(dfa *DFA, literalNames, symbolicNames []string) {
 	this.dfa = dfa
 	this.literalNames = literalNames
 	this.symbolicNames = symbolicNames
+
+	return this
 }
 
 func (this *DFASerializer) toString() string {
@@ -106,7 +102,7 @@ func (this *DFASerializer) GetStateString(s *DFAState) string {
 }
 
 type LexerDFASerializer struct {
-	DFASerializer
+	*DFASerializer
 }
 
 func NewLexerDFASerializer(dfa *DFA) *LexerDFASerializer {

@@ -36,12 +36,6 @@ func NewRecognitionException(message string, recognizer IRecognizer, input IntSt
 	// TODO may be able to use - "runtime" func Stack(buf []byte, all bool) int
 
 	t := new(RecognitionException)
-	t.RecognitionException = NewRecognitionException(message, recognizer, input, ctx)
-
-	return t
-}
-
-func (t *RecognitionException) InitRecognitionException(message string, recognizer IRecognizer, input IntStream, ctx IRuleContext) {
 
 	t.message = message
 	t.recognizer = recognizer
@@ -60,6 +54,8 @@ func (t *RecognitionException) InitRecognitionException(message string, recogniz
 	if t.recognizer != nil {
 		t.offendingState = t.recognizer.GetState()
 	}
+
+	return t
 }
 
 func (this *RecognitionException) GetMessage() string {
@@ -137,7 +133,7 @@ type NoViableAltException struct {
 // Indicates that the parser could not decide which of two or more paths
 // to take based upon the remaining input. It tracks the starting token
 // of the offending input and also knows where the parser was
-// in the various paths when the error. Reported by reportNoViableAlternative()
+// in the various paths when the error. Reported by ReportNoViableAlternative()
 //
 func NewNoViableAltException(recognizer IParser, input TokenStream, startToken *Token, offendingToken *Token, deadEndConfigs *ATNConfigSet, ctx IParserRuleContext) *NoViableAltException {
 

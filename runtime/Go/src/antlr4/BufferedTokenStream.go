@@ -26,11 +26,6 @@ type BufferedTokenStream struct {
 func NewBufferedTokenStream(tokenSource TokenSource) *BufferedTokenStream {
 
 	ts := new(BufferedTokenStream)
-	ts.BufferedTokenStream = NewBufferedTokenStream(tokenSource)
-	return ts
-}
-
-func (ts *BufferedTokenStream) InitBufferedTokenStream(tokenSource TokenSource) {
 
 	// The {@link TokenSource} from which tokens for bt stream are fetched.
 	ts.tokenSource = tokenSource
@@ -68,6 +63,7 @@ func (ts *BufferedTokenStream) InitBufferedTokenStream(tokenSource TokenSource) 
 	// <ul>
 	ts.fetchedEOF = false
 
+	return ts
 }
 
 func (bt *BufferedTokenStream) Mark() int {

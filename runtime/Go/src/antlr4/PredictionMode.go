@@ -22,7 +22,7 @@ const (
 	// <p>
 	// When using this prediction mode, the parser will either return a correct
 	// parse tree (i.e. the same parse tree that would be returned with the
-	// {@link //LL} prediction mode), or it will report a syntax error. If a
+	// {@link //LL} prediction mode), or it will Report a syntax error. If a
 	// syntax error is encountered when using the {@link //SLL} prediction mode,
 	// it may be due to either an actual syntax error in the input or indicate
 	// that the particular combination of grammar and input requires the more
@@ -44,7 +44,7 @@ const (
 	// When using this prediction mode, the parser will make correct decisions
 	// for all syntactically-correct grammar and input combinations. However, in
 	// cases where the grammar is truly ambiguous this prediction mode might not
-	// report a precise answer for <em>exactly which</em> alternatives are
+	// Report a precise answer for <em>exactly which</em> alternatives are
 	// ambiguous.</p>
 	//
 	// <p>
@@ -361,7 +361,7 @@ func PredictionModeallConfigsInRuleStopStates(configs *ATNConfigSet) bool {
 //
 // <p><strong>EXACT AMBIGUITY DETECTION</strong></p>
 //
-// <p>If all states report the same conflicting set of alternatives, then we
+// <p>If all states Report the same conflicting set of alternatives, then we
 // know we have the exact ambiguity set.</p>
 //
 // <p><code>|A_<em>i</em>|&gt1</code> and

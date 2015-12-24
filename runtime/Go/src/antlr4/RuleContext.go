@@ -49,13 +49,6 @@ func NewRuleContext(parent IRuleContext, invokingState int) *RuleContext {
 
 	rn := new(RuleContext)
 
-	rn.RuleContext = NewRuleContext(parent, invokingState)
-
-	return rn
-}
-
-func (rn *RuleContext) InitRuleContext(parent IRuleContext, invokingState int) {
-
 	// What context invoked this rule?
 	rn.parentCtx = parent
 
@@ -67,6 +60,8 @@ func (rn *RuleContext) InitRuleContext(parent IRuleContext, invokingState int) {
 	} else {
 		rn.invokingState = invokingState
 	}
+
+	return rn
 }
 
 func (this *RuleContext) setChildren(elems []Tree) {

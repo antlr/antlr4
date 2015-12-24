@@ -35,13 +35,9 @@ type Recognizer struct {
 
 func NewRecognizer() *Recognizer {
 	rec := new(Recognizer)
-	rec.Recognizer = NewRecognizer()
-	return rec
-}
-
-func (rec *Recognizer) InitRecognizer() {
 	rec._listeners = []IErrorListener{ConsoleErrorListenerINSTANCE}
 	rec.state = -1
+	return rec
 }
 
 var tokenTypeMapCache = make(map[string]int)

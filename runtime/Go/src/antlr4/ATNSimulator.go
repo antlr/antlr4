@@ -9,14 +9,10 @@ func NewATNSimulator(atn *ATN, sharedContextCache *PredictionContextCache) *ATNS
 
 	this := new(ATNSimulator)
 
-	this.ATNSimulator = NewATNSimulator(atn, sharedContextCache)
-
-	return this
-}
-
-func (this *ATNSimulator) InitATNSimulator(atn *ATN, sharedContextCache *PredictionContextCache) {
 	this.atn = atn
 	this.sharedContextCache = sharedContextCache
+
+	return this
 }
 
 var ATNSimulatorERROR = NewDFAState(0x7FFFFFFF, NewATNConfigSet(false))

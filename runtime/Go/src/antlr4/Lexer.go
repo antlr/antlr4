@@ -48,18 +48,12 @@ func NewLexer(input CharStream) *Lexer {
 	lexer := new(Lexer)
 
 	lexer.Recognizer = NewRecognizer()
-	lexer.Lexer = NewLexer(input)
 
-	return lexer
-}
+	lexer._input = input
+	lexer._factory = CommonTokenFactoryDEFAULT
+	lexer._tokenFactorySourcePair = &TokenSourceCharStreamPair{lexer, input}
 
-func (l *Lexer) InitLexer(input CharStream) {
-
-	l._input = input
-	l._factory = CommonTokenFactoryDEFAULT
-	l._tokenFactorySourcePair = &TokenSourceCharStreamPair{l, input}
-
-	l.Interpreter = nil // child classes must populate it
+	lexer.Interpreter = nil // child classes must populate it
 
 	// The goal of all lexer rules/methods is to create a token object.
 	// l is an instance variable as multiple rules may collaborate to
@@ -68,37 +62,38 @@ func (l *Lexer) InitLexer(input CharStream) {
 	// emissions, then set l to the last token to be Matched or
 	// something nonnil so that the auto token emit mechanism will not
 	// emit another token.
-	l._token = nil
+	lexer._token = nil
 
 	// What character index in the stream did the current token start at?
 	// Needed, for example, to get the text for current token. Set at
 	// the start of nextToken.
-	l._tokenStartCharIndex = -1
+	lexer._tokenStartCharIndex = -1
 
 	// The line on which the first character of the token resides///
-	l._tokenStartLine = -1
+	lexer._tokenStartLine = -1
 
 	// The character position of first character within the line///
-	l._tokenStartColumn = -1
+	lexer._tokenStartColumn = -1
 
 	// Once we see EOF on char stream, next token will be EOF.
 	// If you have DONE : EOF  then you see DONE EOF.
-	l._hitEOF = false
+	lexer._hitEOF = false
 
 	// The channel number for the current token///
-	l._channel = TokenDefaultChannel
+	lexer._channel = TokenDefaultChannel
 
 	// The token type for the current token///
-	l._type = TokenInvalidType
+	lexer._type = TokenInvalidType
 
-	l._modeStack = make([]int, 0)
-	l._mode = LexerDefaultMode
+	lexer._modeStack = make([]int, 0)
+	lexer._mode = LexerDefaultMode
 
 	// You can set the text for the current token to override what is in
 	// the input char buffer. Use setText() or can set l instance var.
 	// /
-	l._text = nil
+	lexer._text = nil
 
+	return lexer
 }
 
 const (
@@ -160,7 +155,7 @@ func (l *Lexer) safeMatch() (ret int) {
 	defer func() {
 		if e := recover(); e != nil {
 			if re, ok := e.(IRecognitionException); ok {
-				l.notifyListeners(re) // report error
+				l.notifyListeners(re) // Report error
 				l.Recover(re)
 				ret = LexerSkip // default
 			}
@@ -367,7 +362,7 @@ func (l *Lexer) notifyListeners(e IRecognitionException) {
 	var text = l._input.GetTextFromInterval(NewInterval(start, stop))
 	var msg = "token recognition error at: '" + text + "'"
 	var listener = l.getErrorListenerDispatch()
-	listener.syntaxError(l, nil, l._tokenStartLine, l._tokenStartColumn, msg, e)
+	listener.SyntaxError(l, nil, l._tokenStartLine, l._tokenStartColumn, msg, e)
 }
 
 func (l *Lexer) getErrorDisplayForChar(c rune) string {

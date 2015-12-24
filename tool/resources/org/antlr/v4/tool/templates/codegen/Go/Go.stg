@@ -122,7 +122,7 @@ func New<parser.name>(input antlr4.TokenStream) *<parser.name> {
 
     parser := new(<parser.name>)
 
-    parser.Parser = NewParser(input)
+    parser.Parser = antlr4.NewParser(input)
 
     parser.Interpreter = antlr4.NewParserATNSimulator(parser, deserializedATN, decisionToDFA, sharedContextCache)
     parser.RuleNames = ruleNames
@@ -663,7 +663,7 @@ func New<struct.name>(parser antlr4.IParser, parent antlr4.IParserRuleContext, i
 
     var p = new(<struct.name>)
 
-    p.ParserRuleContext = NewParserRuleContext( parent, invokingState )
+    p.ParserRuleContext = antlr4.NewParserRuleContext( parent, invokingState )
 
     p.parser = parser
     p.RuleIndex = <parser.name>RULE_<struct.derivedFromName>
@@ -823,7 +823,7 @@ func New<lexer.name>(input antlr4.CharStream) *<lexer.name> {
 
 	lex := new(<lexer.name>)
 
-	lex.Lexer = NewLexer(input)
+	lex.Lexer = antlr4.NewLexer(input)
 
     lex.Interpreter = antlr4.NewLexerATNSimulator(lex, lexerAtn, lexerDecisionToDFA, antlr4.NewPredictionContextCache())
 

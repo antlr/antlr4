@@ -40,14 +40,7 @@ type ATNConfigSet struct {
 
 func NewATNConfigSet(fullCtx bool) *ATNConfigSet {
 
-	this := new(ATNConfigSet)
-
-	this.ATNConfigSet = NewATNConfigSet(fullCtx)
-
-	return this
-}
-
-func (a *ATNConfigSet) InitATNConfigSet(fullCtx bool) {
+	a := new(ATNConfigSet)
 
 	// The reason that we need a.is because we don't want the hash map to use
 	// the standard hash code and equals. We need all configurations with the
@@ -86,6 +79,8 @@ func (a *ATNConfigSet) InitATNConfigSet(fullCtx bool) {
 	a.dipsIntoOuterContext = false
 
 	a.cachedHashString = "-1"
+
+	return a
 }
 
 // Adding a Newconfig means merging contexts with existing configs for

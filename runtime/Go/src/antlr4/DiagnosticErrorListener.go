@@ -33,16 +33,16 @@ func NewDiagnosticErrorListener(exactOnly bool) *DiagnosticErrorListener {
 
 	n := new(DiagnosticErrorListener)
 
-	// whether all ambiguities or only exact ambiguities are reported.
+	// whether all ambiguities or only exact ambiguities are Reported.
 	n.exactOnly = exactOnly
 	return n
 }
 
-func (this *DiagnosticErrorListener) reportAmbiguity(recognizer *Parser, dfa *DFA, startIndex, stopIndex int, exact bool, ambigAlts *BitSet, configs *ATNConfigSet) {
+func (this *DiagnosticErrorListener) ReportAmbiguity(recognizer *Parser, dfa *DFA, startIndex, stopIndex int, exact bool, ambigAlts *BitSet, configs *ATNConfigSet) {
 	if this.exactOnly && !exact {
 		return
 	}
-	var msg = "reportAmbiguity d=" +
+	var msg = "ReportAmbiguity d=" +
 		this.getDecisionDescription(recognizer, dfa) +
 		": ambigAlts=" +
 		this.getConflictingAlts(ambigAlts, configs).toString() +
@@ -51,17 +51,17 @@ func (this *DiagnosticErrorListener) reportAmbiguity(recognizer *Parser, dfa *DF
 	recognizer.notifyErrorListeners(msg, nil, nil)
 }
 
-func (this *DiagnosticErrorListener) reportAttemptingFullContext(recognizer *Parser, dfa *DFA, startIndex, stopIndex int, conflictingAlts *BitSet, configs *ATNConfigSet) {
+func (this *DiagnosticErrorListener) ReportAttemptingFullContext(recognizer *Parser, dfa *DFA, startIndex, stopIndex int, conflictingAlts *BitSet, configs *ATNConfigSet) {
 
-	var msg = "reportAttemptingFullContext d=" +
+	var msg = "ReportAttemptingFullContext d=" +
 		this.getDecisionDescription(recognizer, dfa) +
 		", input='" +
 		recognizer.GetTokenStream().GetTextFromInterval(NewInterval(startIndex, stopIndex)) + "'"
 	recognizer.notifyErrorListeners(msg, nil, nil)
 }
 
-func (this *DiagnosticErrorListener) reportContextSensitivity(recognizer *Parser, dfa *DFA, startIndex, stopIndex, prediction int, configs *ATNConfigSet) {
-	var msg = "reportContextSensitivity d=" +
+func (this *DiagnosticErrorListener) ReportContextSensitivity(recognizer *Parser, dfa *DFA, startIndex, stopIndex, prediction int, configs *ATNConfigSet) {
+	var msg = "ReportContextSensitivity d=" +
 		this.getDecisionDescription(recognizer, dfa) +
 		", input='" +
 		recognizer.GetTokenStream().GetTextFromInterval(NewInterval(startIndex, stopIndex)) + "'"
@@ -88,15 +88,15 @@ func (this *DiagnosticErrorListener) getDecisionDescription(recognizer *Parser, 
 // configuration set, if that information was not already provided by the
 // parser.
 //
-// @param reportedAlts The set of conflicting or ambiguous alternatives, as
-// reported by the parser.
+// @param ReportedAlts The set of conflicting or ambiguous alternatives, as
+// Reported by the parser.
 // @param configs The conflicting or ambiguous configuration set.
-// @return Returns {@code reportedAlts} if it is not {@code nil}, otherwise
+// @return Returns {@code ReportedAlts} if it is not {@code nil}, otherwise
 // returns the set of alternatives represented in {@code configs}.
 //
-func (this *DiagnosticErrorListener) getConflictingAlts(reportedAlts *BitSet, set *ATNConfigSet) *BitSet {
-	if reportedAlts != nil {
-		return reportedAlts
+func (this *DiagnosticErrorListener) getConflictingAlts(ReportedAlts *BitSet, set *ATNConfigSet) *BitSet {
+	if ReportedAlts != nil {
+		return ReportedAlts
 	}
 	var result = NewBitSet()
 	for i := 0; i < len(set.configs); i++ {

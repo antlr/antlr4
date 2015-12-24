@@ -154,12 +154,9 @@ type SingletonPredictionContext struct {
 }
 
 func NewSingletonPredictionContext(parent IPredictionContext, returnState int) *SingletonPredictionContext {
-	s := new(SingletonPredictionContext)
-	s.SingletonPredictionContext = NewSingletonPredictionContext(parent, returnState)
-	return s
-}
 
-func (s *SingletonPredictionContext) InitSingletonPredictionContext(parent IPredictionContext, returnState int) {
+	s := new(SingletonPredictionContext)
+	s.PredictionContext = NewPredictionContext("")
 
 	if parent != nil {
 		s.cachedHashString = calculateHashString(parent, returnState)
@@ -170,6 +167,7 @@ func (s *SingletonPredictionContext) InitSingletonPredictionContext(parent IPred
 	s.parentCtx = parent
 	s.returnState = returnState
 
+	return s
 }
 
 func SingletonPredictionContextCreate(parent IPredictionContext, returnState int) IPredictionContext {
@@ -287,8 +285,7 @@ func NewArrayPredictionContext(parents []IPredictionContext, returnStates []int)
 	// returnState == {@link //EMPTY_RETURN_STATE}.
 
 	c := new(ArrayPredictionContext)
-
-	c.cachedHashString = ""
+	c.PredictionContext = NewPredictionContext("")
 
 	for i := range parents {
 		c.cachedHashString += calculateHashString(parents[i], returnStates[i])

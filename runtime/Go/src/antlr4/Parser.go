@@ -32,7 +32,7 @@ type Parser struct {
 	buildParseTrees  bool
 	_tracer          *TraceListener
 	_parseListeners  []ParseTreeListener
-	_syntaxErrors    int
+	_SyntaxErrors    int
 
 }
 
@@ -42,12 +42,6 @@ func NewParser(input TokenStream) *Parser {
 
 	p := new(Parser)
 
-	p.Parser = NewParser(input)
-
-	return p
-}
-
-func (p *Parser) InitParser(input TokenStream) {
 
 	p.Recognizer = NewRecognizer()
 
@@ -73,10 +67,12 @@ func (p *Parser) InitParser(input TokenStream) {
 	// The list of {@link ParseTreeListener} listeners registered to receive
 	// events during the parse.
 	p._parseListeners = nil
-	// The number of syntax errors reported during parsing. p.value is
+	// The number of syntax errors Reported during parsing. p.value is
 	// incremented each time {@link //notifyErrorListeners} is called.
-	p._syntaxErrors = 0
+	p._SyntaxErrors = 0
 	p.setInputStream(input)
+
+	return p
 }
 
 // p.field maps from the serialized ATN string to the deserialized {@link
@@ -94,7 +90,7 @@ func (p *Parser) reset() {
 	}
 	p._errHandler.reset(p)
 	p._ctx = nil
-	p._syntaxErrors = 0
+	p._SyntaxErrors = 0
 	p.setTrace(nil)
 	p._precedenceStack = make([]int, 0)
 	p._precedenceStack.Push(0)
@@ -112,7 +108,7 @@ func (p *Parser) GetParseListeners() []ParseTreeListener {
 }
 
 // Match current input symbol against {@code ttype}. If the symbol type
-// Matches, {@link ANTLRErrorStrategy//reportMatch} and {@link //consume} are
+// Matches, {@link ANTLRErrorStrategy//ReportMatch} and {@link //consume} are
 // called to complete the Match process.
 //
 // <p>If the symbol type does not Match,
@@ -131,7 +127,7 @@ func (p *Parser) GetParseListeners() []ParseTreeListener {
 func (p *Parser) Match(ttype int) *Token {
 	var t = p.getCurrentToken()
 	if t.tokenType == ttype {
-		p._errHandler.reportMatch(p)
+		p._errHandler.ReportMatch(p)
 		p.Consume()
 	} else {
 		t = p._errHandler.RecoverInline(p)
@@ -146,7 +142,7 @@ func (p *Parser) Match(ttype int) *Token {
 }
 
 // Match current input symbol as a wildcard. If the symbol type Matches
-// (i.e. has a value greater than 0), {@link ANTLRErrorStrategy//reportMatch}
+// (i.e. has a value greater than 0), {@link ANTLRErrorStrategy//ReportMatch}
 // and {@link //consume} are called to complete the Match process.
 //
 // <p>If the symbol type does not Match,
@@ -164,7 +160,7 @@ func (p *Parser) Match(ttype int) *Token {
 func (p *Parser) MatchWildcard() *Token {
 	var t = p.getCurrentToken()
 	if t.tokenType > 0 {
-		p._errHandler.reportMatch(p)
+		p._errHandler.ReportMatch(p)
 		p.Consume()
 	} else {
 		t = p._errHandler.RecoverInline(p)
@@ -385,11 +381,11 @@ func (p *Parser) notifyErrorListeners(msg string, offendingToken *Token, err IRe
 	if offendingToken == nil {
 		offendingToken = p.getCurrentToken()
 	}
-	p._syntaxErrors += 1
+	p._SyntaxErrors += 1
 	var line = offendingToken.line
 	var column = offendingToken.column
 	listener := p.getErrorListenerDispatch()
-	listener.syntaxError(p, offendingToken, line, column, msg, err)
+	listener.SyntaxError(p, offendingToken, line, column, msg, err)
 }
 
 func (p *Parser) Consume() *Token {

@@ -10,10 +10,10 @@ import (
 // necessary.
 
 type IErrorListener interface {
-	syntaxError(recognizer IRecognizer, offendingSymbol interface{}, line, column int, msg string, e IRecognitionException)
-	reportAmbiguity(recognizer IParser, dfa *DFA, startIndex, stopIndex int, exact bool, ambigAlts *BitSet, configs *ATNConfigSet)
-	reportAttemptingFullContext(recognizer IParser, dfa *DFA, startIndex, stopIndex int, conflictingAlts *BitSet, configs *ATNConfigSet)
-	reportContextSensitivity(recognizer IParser, dfa *DFA, startIndex, stopIndex, prediction int, configs *ATNConfigSet)
+	SyntaxError(recognizer IRecognizer, offendingSymbol interface{}, line, column int, msg string, e IRecognitionException)
+	ReportAmbiguity(recognizer IParser, dfa *DFA, startIndex, stopIndex int, exact bool, ambigAlts *BitSet, configs *ATNConfigSet)
+	ReportAttemptingFullContext(recognizer IParser, dfa *DFA, startIndex, stopIndex int, conflictingAlts *BitSet, configs *ATNConfigSet)
+	ReportContextSensitivity(recognizer IParser, dfa *DFA, startIndex, stopIndex, prediction int, configs *ATNConfigSet)
 }
 
 type DefaultErrorListener struct {
@@ -23,16 +23,16 @@ func NewErrorListener() *DefaultErrorListener {
 	return new(DefaultErrorListener)
 }
 
-func (this *DefaultErrorListener) syntaxError(recognizer IRecognizer, offendingSymbol interface{}, line, column int, msg string, e IRecognitionException) {
+func (this *DefaultErrorListener) SyntaxError(recognizer IRecognizer, offendingSymbol interface{}, line, column int, msg string, e IRecognitionException) {
 }
 
-func (this *DefaultErrorListener) reportAmbiguity(recognizer IParser, dfa *DFA, startIndex, stopIndex int, exact bool, ambigAlts *BitSet, configs *ATNConfigSet) {
+func (this *DefaultErrorListener) ReportAmbiguity(recognizer IParser, dfa *DFA, startIndex, stopIndex int, exact bool, ambigAlts *BitSet, configs *ATNConfigSet) {
 }
 
-func (this *DefaultErrorListener) reportAttemptingFullContext(recognizer IParser, dfa *DFA, startIndex, stopIndex int, conflictingAlts *BitSet, configs *ATNConfigSet) {
+func (this *DefaultErrorListener) ReportAttemptingFullContext(recognizer IParser, dfa *DFA, startIndex, stopIndex int, conflictingAlts *BitSet, configs *ATNConfigSet) {
 }
 
-func (this *DefaultErrorListener) reportContextSensitivity(recognizer IParser, dfa *DFA, startIndex, stopIndex, prediction int, configs *ATNConfigSet) {
+func (this *DefaultErrorListener) ReportContextSensitivity(recognizer IParser, dfa *DFA, startIndex, stopIndex, prediction int, configs *ATNConfigSet) {
 }
 
 type ConsoleErrorListener struct {
@@ -60,7 +60,7 @@ var ConsoleErrorListenerINSTANCE = NewConsoleErrorListener()
 // line <em>line</em>:<em>charPositionInLine</em> <em>msg</em>
 // </pre>
 //
-func (this *ConsoleErrorListener) syntaxError(recognizer IRecognizer, offendingSymbol interface{}, line, column int, msg string, e IRecognitionException) {
+func (this *ConsoleErrorListener) SyntaxError(recognizer IRecognizer, offendingSymbol interface{}, line, column int, msg string, e IRecognitionException) {
 	fmt.Errorf("line " + strconv.Itoa(line) + ":" + strconv.Itoa(column) + " " + msg)
 }
 
@@ -78,26 +78,26 @@ func NewProxyErrorListener(delegates []IErrorListener) *ProxyErrorListener {
 	return l
 }
 
-func (this *ProxyErrorListener) syntaxError(recognizer IRecognizer, offendingSymbol interface{}, line, column int, msg string, e IRecognitionException) {
+func (this *ProxyErrorListener) SyntaxError(recognizer IRecognizer, offendingSymbol interface{}, line, column int, msg string, e IRecognitionException) {
 	for _, d := range this.delegates {
-		d.syntaxError(recognizer, offendingSymbol, line, column, msg, e)
+		d.SyntaxError(recognizer, offendingSymbol, line, column, msg, e)
 	}
 }
 
-func (this *ProxyErrorListener) reportAmbiguity(recognizer IParser, dfa *DFA, startIndex, stopIndex int, exact bool, ambigAlts *BitSet, configs *ATNConfigSet) {
+func (this *ProxyErrorListener) ReportAmbiguity(recognizer IParser, dfa *DFA, startIndex, stopIndex int, exact bool, ambigAlts *BitSet, configs *ATNConfigSet) {
 	for _, d := range this.delegates {
-		d.reportAmbiguity(recognizer, dfa, startIndex, stopIndex, exact, ambigAlts, configs)
+		d.ReportAmbiguity(recognizer, dfa, startIndex, stopIndex, exact, ambigAlts, configs)
 	}
 }
 
-func (this *ProxyErrorListener) reportAttemptingFullContext(recognizer IParser, dfa *DFA, startIndex, stopIndex int, conflictingAlts *BitSet, configs *ATNConfigSet) {
+func (this *ProxyErrorListener) ReportAttemptingFullContext(recognizer IParser, dfa *DFA, startIndex, stopIndex int, conflictingAlts *BitSet, configs *ATNConfigSet) {
 	for _, d := range this.delegates {
-		d.reportAttemptingFullContext(recognizer, dfa, startIndex, stopIndex, conflictingAlts, configs)
+		d.ReportAttemptingFullContext(recognizer, dfa, startIndex, stopIndex, conflictingAlts, configs)
 	}
 }
 
-func (this *ProxyErrorListener) reportContextSensitivity(recognizer IParser, dfa *DFA, startIndex, stopIndex, prediction int, configs *ATNConfigSet) {
+func (this *ProxyErrorListener) ReportContextSensitivity(recognizer IParser, dfa *DFA, startIndex, stopIndex, prediction int, configs *ATNConfigSet) {
 	for _, d := range this.delegates {
-		d.reportContextSensitivity(recognizer, dfa, startIndex, stopIndex, prediction, configs)
+		d.ReportContextSensitivity(recognizer, dfa, startIndex, stopIndex, prediction, configs)
 	}
 }

@@ -93,15 +93,12 @@ type TerminalNodeImpl struct {
 func NewTerminalNodeImpl(symbol *Token) *TerminalNodeImpl {
 	tn := new(TerminalNodeImpl)
 
-	tn.TerminalNodeImpl = NewTerminalNodeImpl(symbol)
+	tn.parentCtx = nil
+	tn.symbol = symbol
 
 	return tn
 }
 
-func (this *TerminalNodeImpl) InitTerminalNodeImpl(symbol *Token) {
-	this.parentCtx = nil
-	this.symbol = symbol
-}
 
 func (this *TerminalNodeImpl) getChild(i int) Tree {
 	return nil

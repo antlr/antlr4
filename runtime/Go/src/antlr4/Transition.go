@@ -15,8 +15,8 @@ import (
 //  ATN transitions.</p>
 
 type ITransition interface {
-	getTarGet() IATNState
-	setTarGet(IATNState)
+	getTarget() IATNState
+	setTarget(IATNState)
 	getIsEpsilon() bool
 	getLabel() *IntervalSet
 	getSerializationType() int
@@ -37,23 +37,20 @@ func NewTransition(target IATNState) *Transition {
 	}
 
 	t := new(Transition)
-	t.Transition = NewTransition(target)
 
-	return t
-}
-
-func (t *Transition) InitTransition(target IATNState) {
 	t.target = target
 	// Are we epsilon, action, sempred?
 	t.isEpsilon = false
 	t.label = nil
+
+	return t
 }
 
-func (t *Transition) getTarGet() IATNState {
+func (t *Transition) getTarget() IATNState {
 	return t.target
 }
 
-func (t *Transition) setTarGet(s IATNState) {
+func (t *Transition) setTarget(s IATNState) {
 	t.target = s
 }
 
@@ -320,12 +317,6 @@ func NewSetTransition(target IATNState, set *IntervalSet) *SetTransition {
 
 	t := new(SetTransition)
 	t.Transition = NewTransition(target)
-	t.SetTransition = NewSetTransition(set)
-
-	return t
-}
-
-func (t *SetTransition) InitSetTransition(set *IntervalSet) {
 
 	t.serializationType = TransitionSET
 	if set != nil && set != nil {
@@ -335,6 +326,7 @@ func (t *SetTransition) InitSetTransition(set *IntervalSet) {
 		t.label.addOne(TokenInvalidType)
 	}
 
+	return t
 }
 
 func (t *SetTransition) Matches(symbol, minVocabSymbol, maxVocabSymbol int) bool {
@@ -346,14 +338,14 @@ func (t *SetTransition) toString() string {
 }
 
 type NotSetTransition struct {
-	SetTransition
+	*SetTransition
 }
 
 func NewNotSetTransition(target IATNState, set *IntervalSet) *NotSetTransition {
 
 	t := new(NotSetTransition)
-	t.Transition = NewTransition(target)
-	t.SetTransition = NewSetTransition(set)
+
+	t.SetTransition = NewSetTransition(target, set)
 
 	t.serializationType = TransitionNOT_SET
 

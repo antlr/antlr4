@@ -189,7 +189,7 @@ func (this *ATNConfig) toString() string {
 }
 
 type LexerATNConfig struct {
-	ATNConfig
+	*ATNConfig
 
 	lexerActionExecutor            *LexerActionExecutor
 	passedThroughNonGreedyDecision bool
@@ -199,7 +199,7 @@ func NewLexerATNConfig6(state IATNState, alt int, context IPredictionContext) *L
 
 	this := new(LexerATNConfig)
 
-	this.ATNConfig = NewATNConfig(state, alt, context, SemanticContextNONE)
+	this.ATNConfig = NewATNConfig5(state, alt, context, SemanticContextNONE)
 
 	this.passedThroughNonGreedyDecision = false
 	this.lexerActionExecutor = nil
@@ -210,7 +210,7 @@ func NewLexerATNConfig5(state IATNState, alt int, context IPredictionContext, le
 
 	this := new(LexerATNConfig)
 
-	this.ATNConfig = NewATNConfig(state, alt, context, SemanticContextNONE)
+	this.ATNConfig = NewATNConfig5(state, alt, context, SemanticContextNONE)
 	this.lexerActionExecutor = lexerActionExecutor
 	this.passedThroughNonGreedyDecision = false
 	return this
@@ -250,8 +250,7 @@ func NewLexerATNConfig1(state IATNState, alt int, context IPredictionContext) *L
 
 	this := new(LexerATNConfig)
 
-	// c IATNConfig , state IATNState, context IPredictionContext, semanticContext  SemanticContext
-	this.ATNConfig = NewATNConfig(state, alt, context, SemanticContextNONE)
+	this.ATNConfig = NewATNConfig5(state, alt, context, SemanticContextNONE)
 
 	this.lexerActionExecutor = nil
 	this.passedThroughNonGreedyDecision = false

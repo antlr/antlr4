@@ -14,39 +14,13 @@ type IErrorStrategy interface {
 	Sync(IParser)
 	inErrorRecoveryMode(IParser) bool
 	ReportError(IParser, IRecognitionException)
-	reportMatch(IParser)
-}
-
-type ErrorStrategy struct {
-}
-
-func (this *ErrorStrategy) reset(recognizer IParser) {
-}
-
-func (this *ErrorStrategy) RecoverInline(recognizer IParser) {
-}
-
-func (this *ErrorStrategy) Recover(recognizer IParser, e IRecognitionException) {
-}
-
-func (this *ErrorStrategy) Sync(recognizer IParser) {
-}
-
-func (this *ErrorStrategy) inErrorRecoveryMode(recognizer IParser) {
-}
-
-func (this *ErrorStrategy) ReportError(recognizer IParser, e IRecognitionException) {
-}
-
-func (this *ErrorStrategy) reportMatch(recognizer IParser) {
-
+	ReportMatch(IParser)
 }
 
 // This is the default implementation of {@link ANTLRErrorStrategy} used for
-// error reporting and recovery in ANTLR parsers.
+// error Reporting and recovery in ANTLR parsers.
 //
 type DefaultErrorStrategy struct {
-	*ErrorStrategy
 
 	errorRecoveryMode bool
 	lastErrorIndex    int
@@ -56,14 +30,9 @@ type DefaultErrorStrategy struct {
 func NewDefaultErrorStrategy() *DefaultErrorStrategy {
 
 	d := new(DefaultErrorStrategy)
-	d.DefaultErrorStrategy = NewDefaultErrorStrategy()
-	return d
-}
-
-func (d *DefaultErrorStrategy) InitDefaultErrorStrategy() {
 
 	// Indicates whether the error strategy is currently "recovering from an
-	// error". This is used to suppress reporting multiple error messages while
+	// error". This is used to suppress Reporting multiple error messages while
 	// attempting to recover from a detected syntax error.
 	//
 	// @see //inErrorRecoveryMode
@@ -78,7 +47,7 @@ func (d *DefaultErrorStrategy) InitDefaultErrorStrategy() {
 	//
 	d.lastErrorIndex = -1
 	d.lastErrorStates = nil
-
+	return d
 }
 
 // <p>The default implementation simply calls {@link //endErrorCondition} to
@@ -89,7 +58,7 @@ func (this *DefaultErrorStrategy) reset(recognizer IParser) {
 
 //
 // This method is called to enter error recovery mode when a recognition
-// exception is reported.
+// exception is Reported.
 //
 // @param recognizer the parser instance
 //
@@ -118,7 +87,7 @@ func (this *DefaultErrorStrategy) endErrorCondition(recognizer IParser) {
 //
 // <p>The default implementation simply calls {@link //endErrorCondition}.</p>
 //
-func (this *DefaultErrorStrategy) reportMatch(recognizer IParser) {
+func (this *DefaultErrorStrategy) ReportMatch(recognizer IParser) {
 	this.endErrorCondition(recognizer)
 }
 
@@ -127,25 +96,25 @@ func (this *DefaultErrorStrategy) reportMatch(recognizer IParser) {
 //
 // <p>The default implementation returns immediately if the handler is already
 // in error recovery mode. Otherwise, it calls {@link //beginErrorCondition}
-// and dispatches the reporting task based on the runtime type of {@code e}
+// and dispatches the Reporting task based on the runtime type of {@code e}
 // according to the following table.</p>
 //
 // <ul>
 // <li>{@link NoViableAltException}: Dispatches the call to
-// {@link //reportNoViableAlternative}</li>
+// {@link //ReportNoViableAlternative}</li>
 // <li>{@link InputMisMatchException}: Dispatches the call to
-// {@link //reportInputMisMatch}</li>
+// {@link //ReportInputMisMatch}</li>
 // <li>{@link FailedPredicateException}: Dispatches the call to
-// {@link //reportFailedPredicate}</li>
-// <li>All other types: calls {@link Parser//notifyErrorListeners} to report
+// {@link //ReportFailedPredicate}</li>
+// <li>All other types: calls {@link Parser//notifyErrorListeners} to Report
 // the exception</li>
 // </ul>
 //
 func (this *DefaultErrorStrategy) ReportError(recognizer IParser, e IRecognitionException) {
-	// if we've already reported an error and have not Matched a token
-	// yet successfully, don't report any errors.
+	// if we've already Reported an error and have not Matched a token
+	// yet successfully, don't Report any errors.
 	if this.inErrorRecoveryMode(recognizer) {
-		return // don't report spurious errors
+		return // don't Report spurious errors
 	}
 	this.beginErrorCondition(recognizer)
 
@@ -155,11 +124,11 @@ func (this *DefaultErrorStrategy) ReportError(recognizer IParser, e IRecognition
 		//            fmt.Println(e.stack)
 		recognizer.notifyErrorListeners(e.GetMessage(), e.GetOffendingToken(), e)
 	case *NoViableAltException:
-		this.reportNoViableAlternative(recognizer, t)
+		this.ReportNoViableAlternative(recognizer, t)
 	case *InputMisMatchException:
-		this.reportInputMisMatch(recognizer, t)
+		this.ReportInputMisMatch(recognizer, t)
 	case *FailedPredicateException:
-		this.reportFailedPredicate(recognizer, t)
+		this.ReportFailedPredicate(recognizer, t)
 	}
 }
 
@@ -254,7 +223,7 @@ func (this *DefaultErrorStrategy) Sync(recognizer IParser) {
 	case ATNStateSTAR_BLOCK_START:
 	case ATNStatePLUS_BLOCK_START:
 	case ATNStateSTAR_LOOP_ENTRY:
-		// report error and recover if possible
+		// Report error and recover if possible
 		if this.singleTokenDeletion(recognizer) != nil {
 			return
 		} else {
@@ -263,7 +232,7 @@ func (this *DefaultErrorStrategy) Sync(recognizer IParser) {
 		break
 	case ATNStatePLUS_LOOP_BACK:
 	case ATNStateSTAR_LOOP_BACK:
-		this.reportUnwantedToken(recognizer)
+		this.ReportUnwantedToken(recognizer)
 		var expecting = NewIntervalSet()
 		expecting.addSet(recognizer.getExpectedTokens())
 		var whatFollowsLoopIterationOrRule = expecting.addSet(this.getErrorRecoverySet(recognizer))
@@ -282,7 +251,7 @@ func (this *DefaultErrorStrategy) Sync(recognizer IParser) {
 // @param recognizer the parser instance
 // @param e the recognition exception
 //
-func (this *DefaultErrorStrategy) reportNoViableAlternative(recognizer IParser, e *NoViableAltException) {
+func (this *DefaultErrorStrategy) ReportNoViableAlternative(recognizer IParser, e *NoViableAltException) {
 	var tokens = recognizer.GetTokenStream()
 	var input string
 	if tokens != nil {
@@ -307,7 +276,7 @@ func (this *DefaultErrorStrategy) reportNoViableAlternative(recognizer IParser, 
 // @param recognizer the parser instance
 // @param e the recognition exception
 //
-func (this *DefaultErrorStrategy) reportInputMisMatch(recognizer IParser, e *InputMisMatchException) {
+func (this *DefaultErrorStrategy) ReportInputMisMatch(recognizer IParser, e *InputMisMatchException) {
 	var msg = "misMatched input " + this.GetTokenErrorDisplay(e.offendingToken) +
 		" expecting " + e.getExpectedTokens().toStringVerbose(recognizer.GetLiteralNames(), recognizer.GetSymbolicNames(), false)
 	recognizer.notifyErrorListeners(msg, e.offendingToken, e)
@@ -322,13 +291,13 @@ func (this *DefaultErrorStrategy) reportInputMisMatch(recognizer IParser, e *Inp
 // @param recognizer the parser instance
 // @param e the recognition exception
 //
-func (this *DefaultErrorStrategy) reportFailedPredicate(recognizer IParser, e *FailedPredicateException) {
+func (this *DefaultErrorStrategy) ReportFailedPredicate(recognizer IParser, e *FailedPredicateException) {
 	var ruleName = recognizer.GetRuleNames()[recognizer.GetParserRuleContext().GetRuleIndex()]
 	var msg = "rule " + ruleName + " " + e.message
 	recognizer.notifyErrorListeners(msg, e.offendingToken, e)
 }
 
-// This method is called to report a syntax error which requires the removal
+// This method is called to Report a syntax error which requires the removal
 // of a token from the input stream. At the time this method is called, the
 // erroneous symbol is current {@code LT(1)} symbol and has not yet been
 // removed from the input stream. When this method returns,
@@ -345,7 +314,7 @@ func (this *DefaultErrorStrategy) reportFailedPredicate(recognizer IParser, e *F
 //
 // @param recognizer the parser instance
 //
-func (this *DefaultErrorStrategy) reportUnwantedToken(recognizer IParser) {
+func (this *DefaultErrorStrategy) ReportUnwantedToken(recognizer IParser) {
 	if this.inErrorRecoveryMode(recognizer) {
 		return
 	}
@@ -358,7 +327,7 @@ func (this *DefaultErrorStrategy) reportUnwantedToken(recognizer IParser) {
 	recognizer.notifyErrorListeners(msg, t, nil)
 }
 
-// This method is called to report a syntax error which requires the
+// This method is called to Report a syntax error which requires the
 // insertion of a missing token into the input stream. At the time this
 // method is called, the missing token has not yet been inserted. When this
 // method returns, {@code recognizer} is in error recovery mode.
@@ -374,7 +343,7 @@ func (this *DefaultErrorStrategy) reportUnwantedToken(recognizer IParser) {
 //
 // @param recognizer the parser instance
 //
-func (this *DefaultErrorStrategy) reportMissingToken(recognizer IParser) {
+func (this *DefaultErrorStrategy) ReportMissingToken(recognizer IParser) {
 	if this.inErrorRecoveryMode(recognizer) {
 		return
 	}
@@ -476,10 +445,10 @@ func (this *DefaultErrorStrategy) singleTokenInsertion(recognizer IParser) bool 
 	// is free to conjure up and insert the missing token
 	var atn = recognizer.GetInterpreter().atn
 	var currentState = atn.states[recognizer.GetState()]
-	var next = currentState.GetTransitions()[0].getTarGet()
+	var next = currentState.GetTransitions()[0].getTarget()
 	var expectingAtLL2 = atn.nextTokens(next, recognizer.GetParserRuleContext())
 	if expectingAtLL2.contains(currentSymbolType) {
-		this.reportMissingToken(recognizer)
+		this.ReportMissingToken(recognizer)
 		return true
 	} else {
 		return false
@@ -494,9 +463,9 @@ func (this *DefaultErrorStrategy) singleTokenInsertion(recognizer IParser) bool 
 // returned token was a successful Match.
 //
 // <p>If the single-token deletion is successful, this method calls
-// {@link //reportUnwantedToken} to report the error, followed by
+// {@link //ReportUnwantedToken} to Report the error, followed by
 // {@link Parser//consume} to actually "delete" the extraneous token. Then,
-// before returning {@link //reportMatch} is called to signal a successful
+// before returning {@link //ReportMatch} is called to signal a successful
 // Match.</p>
 //
 // @param recognizer the parser instance
@@ -508,7 +477,7 @@ func (this *DefaultErrorStrategy) singleTokenDeletion(recognizer IParser) *Token
 	var nextTokenType = recognizer.GetTokenStream().LA(2)
 	var expecting = this.getExpectedTokens(recognizer)
 	if expecting.contains(nextTokenType) {
-		this.reportUnwantedToken(recognizer)
+		this.ReportUnwantedToken(recognizer)
 		// print("recoverFromMisMatchedToken deleting " \
 		// + str(recognizer.GetTokenStream().LT(1)) \
 		// + " since " + str(recognizer.GetTokenStream().LT(2)) \
@@ -516,7 +485,7 @@ func (this *DefaultErrorStrategy) singleTokenDeletion(recognizer IParser) *Token
 		recognizer.Consume() // simply delete extra token
 		// we want to return the token we're actually Matching
 		var MatchedSymbol = recognizer.getCurrentToken()
-		this.reportMatch(recognizer) // we know current token is correct
+		this.ReportMatch(recognizer) // we know current token is correct
 		return MatchedSymbol
 	} else {
 		return nil
@@ -731,7 +700,7 @@ func (this *DefaultErrorStrategy) consumeUntil(recognizer IParser, set *Interval
 // implementation of {@link BailErrorStrategy//Sync} improves the performance of
 // the first stage.</li>
 // <li><strong>Silent validation:</strong> When syntax errors are not being
-// reported or logged, and the parse result is simply ignored if errors occur,
+// Reported or logged, and the parse result is simply ignored if errors occur,
 // the {@link BailErrorStrategy} avoids wasting work on recovering from errors
 // when the result will be ignored either way.</li>
 // </ul>
@@ -742,12 +711,13 @@ func (this *DefaultErrorStrategy) consumeUntil(recognizer IParser, set *Interval
 // @see Parser//setErrorHandler(ANTLRErrorStrategy)
 
 type BailErrorStrategy struct {
-	DefaultErrorStrategy
+	*DefaultErrorStrategy
 }
 
 func NewBailErrorStrategy() *BailErrorStrategy {
 
 	this := new(BailErrorStrategy)
+
 	this.DefaultErrorStrategy = NewDefaultErrorStrategy()
 
 	return this

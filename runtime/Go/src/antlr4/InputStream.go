@@ -11,18 +11,12 @@ func NewInputStream(data string) *InputStream {
 
 	is := new(InputStream)
 
-	is.InputStream = NewInputStream(data)
-
-	return is
-}
-
-func (is *InputStream) InitInputStream(data string) {
-
 	is.name = "<empty>"
 	is.index = 0
 	is.data = []rune(data)
 	is.size = len(is.data) // number of runes
 
+	return is
 }
 
 func (is *InputStream) reset() {
