@@ -5,6 +5,8 @@ import (
 	"strings"
 )
 
+
+
 type TokenSourceCharStreamPair struct {
 	tokenSource TokenSource
 	charStream  CharStream
@@ -66,11 +68,15 @@ func (this *Token) setText(s string) {
 	this._text = s
 }
 
+func (this *Token) GetTokenIndex() int {
+	return this.tokenIndex
+}
+
 func (this *Token) GetTokenSource() TokenSource {
 	return this.source.tokenSource
 }
 
-func (this *Token) getInputStream() CharStream {
+func (this *Token) GetInputStream() CharStream {
 	return this.source.charStream
 }
 
@@ -110,7 +116,7 @@ func NewCommonToken(source *TokenSourceCharStreamPair, tokenType, channel, start
 // the {@link Pair} stored in {@link //source}. Otherwise, {@link //text} will
 // be assigned the result of calling {@link //GetText}, and {@link //source}
 // will be constructed from the result of {@link Token//GetTokenSource} and
-// {@link Token//getInputStream}.</p>
+// {@link Token//GetInputStream}.</p>
 //
 // @param oldToken The token to copy.
 //
@@ -128,11 +134,11 @@ func (this *CommonToken) text() string {
 	if this._text != "" {
 		return this._text
 	}
-	var input = this.getInputStream()
+	var input = this.GetInputStream()
 	if input == nil {
 		return ""
 	}
-	var n = input.size()
+	var n = input.Size()
 	if this.start < n && this.stop < n {
 		return input.GetTextFromInterval(NewInterval(this.start, this.stop))
 	} else {

@@ -137,7 +137,7 @@ func (this *Recognizer) GetTokenType(tokenName string) int {
 //    Vocabulary vocabulary = getVocabulary();
 //
 //    Synchronized (tokenTypeMapCache) {
-//        Map<String, Integer> result = tokenTypeMapCache.get(vocabulary);
+//        Map<String, Integer> result = tokenTypeMapCache.Get(vocabulary);
 //        if (result == null) {
 //            result = new HashMap<String, Integer>();
 //            for (int i = 0; i < GetATN().maxTokenType; i++) {
@@ -163,8 +163,8 @@ func (this *Recognizer) GetTokenType(tokenName string) int {
 
 // What is the error header, normally line/character position information?//
 func (this *Recognizer) getErrorHeader(e IRecognitionException) string {
-	var line = e.getOffendingToken().line
-	var column = e.getOffendingToken().column
+	var line = e.GetOffendingToken().line
+	var column = e.GetOffendingToken().column
 	return "line " + strconv.Itoa(line) + ":" + strconv.Itoa(column)
 }
 

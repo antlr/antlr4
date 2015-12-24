@@ -252,7 +252,7 @@ func NewAltDict() *AltDict {
 	return d
 }
 
-func (this *AltDict) get(key string) interface{} {
+func (this *AltDict) Get(key string) interface{} {
 	key = "k-" + key
 	return this.data[key]
 }
@@ -282,7 +282,7 @@ func NewDoubleDict() *DoubleDict {
 	return dd
 }
 
-func (this *DoubleDict) get(a string, b string) interface{} {
+func (this *DoubleDict) Get(a string, b string) interface{} {
 	var d = this.data[a]
 
 	if d == nil {

@@ -53,105 +53,15 @@ public class GoTarget extends Target {
 		badWords.add("parserRule");
 	}
 
-//	/**
-//	 * {@inheritDoc}
-//	 * <p/>
-//	 * For Java, this is the translation {@code 'a\n"'} &rarr; {@code "a\n\""}.
-//	 * Expect single quotes around the incoming literal. Just flip the quotes
-//	 * and replace double quotes with {@code \"}.
-//	 * <p/>
-//	 * Note that we have decided to allow people to use '\"' without penalty, so
-//	 * we must build the target string in a loop as {@link String#replace}
-//	 * cannot handle both {@code \"} and {@code "} without a lot of messing
-//	 * around.
-//	 */
-//	@Override
-//	public String getTargetStringLiteralFromANTLRStringLiteral(
-//		CodeGenerator generator,
-//		String literal, boolean addQuotes)
-//	{
-//		System.out.println(literal);
-//		System.out.println("GO TARGET!");
-//
-//		StringBuilder sb = new StringBuilder();
-//		String is = literal;
-//
-//		if ( addQuotes ) sb.append('"');
-//
-//		for (int i = 1; i < is.length() -1; i++) {
-//			if  (is.charAt(i) == '\\') {
-//				// Anything escaped is what it is! We assume that
-//				// people know how to escape characters correctly. However
-//				// we catch anything that does not need an escape in Java (which
-//				// is what the default implementation is dealing with and remove
-//				// the escape. The C target does this for instance.
-//				//
-//				switch (is.charAt(i+1)) {
-//					// Pass through any escapes that Java also needs
-//					//
-//					case    '"':
-//					case    'n':
-//					case    'r':
-//					case    't':
-//					case    'b':
-//					case    'f':
-//					case    '\\':
-//						// Pass the escape through
-//						sb.append('\\');
-//						break;
-//
-//					case    'u':    // Assume unnnn
-//						// Pass the escape through as double \\
-//						// so that Java leaves as \u0000 string not char
-//						sb.append('\\');
-//						sb.append('\\');
-//						break;
-//
-//					default:
-//						// Remove the escape by virtue of not adding it here
-//						// Thus \' becomes ' and so on
-//						break;
-//				}
-//
-//				// Go past the \ character
-//				i++;
-//			} else {
-//				// Characters that don't need \ in ANTLR 'strings' but do in Java
-//				if (is.charAt(i) == '"') {
-//					// We need to escape " in Java
-//					sb.append('\\');
-//				}
-//			}
-//			// Add in the next character, which may have been escaped
-//			sb.append(is.charAt(i));
-//		}
-//
-//		if ( addQuotes ) sb.append('"');
-//
-//		String s = sb.toString();
-//		System.out.println("AfTER: " + s);
-//		return s;
-//	}
+	private final static String ZEROES = "0000";
 
-//	@Override
-//	public String encodeIntAsCharEscape(int v) {
-//		if (v < Character.MIN_VALUE || v > Character.MAX_VALUE) {
-//			throw new IllegalArgumentException(String.format("Cannot encode the specified value: %d", v));
-//		}
-//
-//		if (v >= 0 && v < targetCharValueEscape.length && targetCharValueEscape[v] != null) {
-//			return targetCharValueEscape[v];
-//		}
-//
-//		if (v >= 0x20 && v < 127) {
-//			return String.valueOf((char)v);
-//		}
-//
-//		String hex = Integer.toHexString(v|0x10000).substring(1,5);
-//		String h2 = "\\u"+hex;
-//
-//		return h2;
-//	}
+	@Override
+	public String encodeIntAsCharEscape(int v) {
+		// we encode as uint16 in hex format
+		String s = Integer.toString(v, 16);
+		String intAsString = s.length() <= 4 ? ZEROES.substring(s.length()) + s : s;
+		return "0x" + intAsString + ",";
+	}
 
 	@Override
 	public int getSerializedATNSegmentLimit() {

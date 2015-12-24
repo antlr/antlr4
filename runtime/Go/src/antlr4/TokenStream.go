@@ -5,11 +5,11 @@ type TokenStream interface {
 
 	LT(k int) *Token
 
-	get(index int) *Token
+	Get(index int) *Token
 	GetTokenSource() TokenSource
-	setTokenSource(TokenSource)
+	SetTokenSource(TokenSource)
 
-	GetText() string
+	GetAllText() string
 	GetTextFromInterval(*Interval) string
 	GetTextFromRuleContext(IRuleContext) string
 	GetTextFromTokens(*Token, *Token) string

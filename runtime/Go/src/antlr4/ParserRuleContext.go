@@ -244,7 +244,7 @@ func (prc *ParserRuleContext) getChildCount() int {
 	}
 }
 
-func (prc *ParserRuleContext) getSourceInterval() *Interval {
+func (prc *ParserRuleContext) GetSourceInterval() *Interval {
 	if prc.start == nil || prc.stop == nil {
 		return TreeINVALID_INTERVAL
 	} else {

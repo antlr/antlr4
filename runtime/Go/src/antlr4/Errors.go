@@ -9,8 +9,9 @@ import ()
 //  and what kind of problem occurred.
 
 type IRecognitionException interface {
-	getOffendingToken() *Token
-	getMessage() string
+	GetOffendingToken() *Token
+	GetMessage() string
+	GetInputStream() IntStream
 }
 
 type RecognitionException struct {
@@ -19,10 +20,10 @@ type RecognitionException struct {
 	offendingToken *Token
 	offendingState int
 	ctx            IRuleContext
-	input          CharStream
+	input          IntStream
 }
 
-func NewRecognitionException(message string, recognizer IRecognizer, input CharStream, ctx IRuleContext) *RecognitionException {
+func NewRecognitionException(message string, recognizer IRecognizer, input IntStream, ctx IRuleContext) *RecognitionException {
 
 	// todo
 	//	Error.call(this)
@@ -40,7 +41,7 @@ func NewRecognitionException(message string, recognizer IRecognizer, input CharS
 	return t
 }
 
-func (t *RecognitionException) InitRecognitionException(message string, recognizer IRecognizer, input CharStream, ctx IRuleContext) {
+func (t *RecognitionException) InitRecognitionException(message string, recognizer IRecognizer, input IntStream, ctx IRuleContext) {
 
 	t.message = message
 	t.recognizer = recognizer
@@ -61,12 +62,16 @@ func (t *RecognitionException) InitRecognitionException(message string, recogniz
 	}
 }
 
-func (this *RecognitionException) getMessage() string {
+func (this *RecognitionException) GetMessage() string {
 	return this.message
 }
 
-func (this *RecognitionException) getOffendingToken() *Token {
+func (this *RecognitionException) GetOffendingToken() *Token {
 	return this.offendingToken
+}
+
+func (this *RecognitionException) GetInputStream() IntStream {
+	return this.input
 }
 
 // <p>If the state number is not known, this method returns -1.</p>
@@ -94,14 +99,13 @@ func (this *RecognitionException) toString() string {
 }
 
 type LexerNoViableAltException struct {
-	RecognitionException
+	*RecognitionException
 
 	startIndex     int
 	deadEndConfigs *ATNConfigSet
 }
 
-func NewLexerNoViableAltException(lexer ILexer, input CharStream, startIndex int,
-	deadEndConfigs *ATNConfigSet) *LexerNoViableAltException {
+func NewLexerNoViableAltException(lexer ILexer, input CharStream, startIndex int, deadEndConfigs *ATNConfigSet) *LexerNoViableAltException {
 
 	this := new(LexerNoViableAltException)
 
@@ -115,14 +119,14 @@ func NewLexerNoViableAltException(lexer ILexer, input CharStream, startIndex int
 
 func (this *LexerNoViableAltException) toString() string {
 	var symbol = ""
-	if this.startIndex >= 0 && this.startIndex < this.input.size() {
-		symbol = this.input.GetTextFromInterval(NewInterval(this.startIndex, this.startIndex))
+	if this.startIndex >= 0 && this.startIndex < this.input.Size() {
+		symbol = this.input.(CharStream).GetTextFromInterval(NewInterval(this.startIndex, this.startIndex))
 	}
 	return "LexerNoViableAltException" + symbol
 }
 
 type NoViableAltException struct {
-	RecognitionException
+	*RecognitionException
 
 	startToken     *Token
 	offendingToken *Token
@@ -135,7 +139,7 @@ type NoViableAltException struct {
 // of the offending input and also knows where the parser was
 // in the various paths when the error. Reported by reportNoViableAlternative()
 //
-func NewNoViableAltException(recognizer IParser, input CharStream, startToken *Token, offendingToken *Token, deadEndConfigs *ATNConfigSet, ctx IParserRuleContext) *NoViableAltException {
+func NewNoViableAltException(recognizer IParser, input TokenStream, startToken *Token, offendingToken *Token, deadEndConfigs *ATNConfigSet, ctx IParserRuleContext) *NoViableAltException {
 
 	if ctx == nil {
 		ctx = recognizer.GetParserRuleContext()
@@ -150,13 +154,13 @@ func NewNoViableAltException(recognizer IParser, input CharStream, startToken *T
 	}
 
 	if input == nil {
-		input = recognizer.getInputStream()
+		input = recognizer.GetInputStream().(TokenStream)
 	}
 
 	this := new(NoViableAltException)
 	this.InitRecognitionException("", recognizer, input, ctx)
 
-	// Which configurations did we try at input.index() that couldn't Match
+	// Which configurations did we try at input.Index() that couldn't Match
 	// input.LT(1)?//
 	this.deadEndConfigs = deadEndConfigs
 	// The token object at the start index the input stream might
@@ -170,7 +174,7 @@ func NewNoViableAltException(recognizer IParser, input CharStream, startToken *T
 }
 
 type InputMisMatchException struct {
-	RecognitionException
+	*RecognitionException
 }
 
 // This signifies any kind of misMatched input exceptions such as
@@ -179,7 +183,7 @@ type InputMisMatchException struct {
 func NewInputMisMatchException(recognizer IParser) *InputMisMatchException {
 
 	this := new(InputMisMatchException)
-	this.InitRecognitionException("", recognizer, recognizer.getInputStream(), recognizer.GetParserRuleContext())
+	this.InitRecognitionException("", recognizer, recognizer.GetInputStream(), recognizer.GetParserRuleContext())
 
 	this.offendingToken = recognizer.getCurrentToken()
 
@@ -193,7 +197,7 @@ func NewInputMisMatchException(recognizer IParser) *InputMisMatchException {
 // prediction.
 
 type FailedPredicateException struct {
-	RecognitionException
+	*RecognitionException
 
 	ruleIndex      int
 	predicateIndex int
@@ -204,7 +208,7 @@ func NewFailedPredicateException(recognizer *Parser, predicate string, message s
 
 	this := new(FailedPredicateException)
 
-	this.InitRecognitionException(this.formatMessage(predicate, message), recognizer, recognizer.getInputStream(), recognizer._ctx)
+	this.InitRecognitionException(this.formatMessage(predicate, message), recognizer, recognizer.GetInputStream(), recognizer._ctx)
 
 	var s = recognizer.Interpreter.atn.states[recognizer.state]
 	var trans = s.GetTransitions()[0]

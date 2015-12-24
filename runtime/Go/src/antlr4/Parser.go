@@ -11,7 +11,7 @@ type IParser interface {
 	Consume() *Token
 	GetParseListeners() []ParseTreeListener
 
-	getInputStream() CharStream
+	GetInputStream() IntStream
 	getCurrentToken() *Token
 	getExpectedTokens() *IntervalSet
 	notifyErrorListeners(msg string, offendingToken *Token, err IRecognitionException)
@@ -90,7 +90,7 @@ var bypassAltsAtnCache = make(map[string]int)
 // reset the parser's state//
 func (p *Parser) reset() {
 	if p._input != nil {
-		p._input.seek(0)
+		p._input.Seek(0)
 	}
 	p._errHandler.reset(p)
 	p._ctx = nil
@@ -332,7 +332,7 @@ func (p *Parser) GetATNWithBypassAlts() {
 // ParseTreePattern p = parser.compileParseTreePattern("&ltID&gt+0",
 // MyParser.RULE_expr)
 // ParseTreeMatch m = p.Match(t)
-// String id = m.get("ID")
+// String id = m.Get("ID")
 // </pre>
 
 func (p *Parser) compileParseTreePattern(pattern, patternRuleIndex, lexer ILexer) {
@@ -355,8 +355,8 @@ func (p *Parser) compileParseTreePattern(pattern, patternRuleIndex, lexer ILexer
 	//	return m.compile(pattern, patternRuleIndex)
 }
 
-func (p *Parser) getInputStream() CharStream {
-	return p.GetTokenStream().(CharStream)
+func (p *Parser) GetInputStream() IntStream {
+	return p.GetTokenStream()
 }
 
 func (p *Parser) setInputStream(input TokenStream) {
@@ -395,7 +395,7 @@ func (p *Parser) notifyErrorListeners(msg string, offendingToken *Token, err IRe
 func (p *Parser) Consume() *Token {
 	var o = p.getCurrentToken()
 	if o.tokenType != TokenEOF {
-		p.getInputStream().Consume()
+		p.GetInputStream().Consume()
 	}
 	var hasListener = p._parseListeners != nil && len(p._parseListeners) > 0
 	if p.buildParseTrees || hasListener {

@@ -6,7 +6,7 @@ type TokenSource interface {
 	more()
 	getLine() int
 	getCharPositionInLine() int
-	getInputStream() CharStream
+	GetInputStream() CharStream
 	GetSourceName() string
 	setTokenFactory(factory TokenFactory)
 	GetTokenFactory() TokenFactory

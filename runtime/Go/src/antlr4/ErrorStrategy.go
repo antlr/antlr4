@@ -153,7 +153,7 @@ func (this *DefaultErrorStrategy) ReportError(recognizer IParser, e IRecognition
 	default:
 		fmt.Println("unknown recognition error type: " + reflect.TypeOf(e).Name())
 		//            fmt.Println(e.stack)
-		recognizer.notifyErrorListeners(e.getMessage(), e.getOffendingToken(), e)
+		recognizer.notifyErrorListeners(e.GetMessage(), e.GetOffendingToken(), e)
 	case *NoViableAltException:
 		this.reportNoViableAlternative(recognizer, t)
 	case *InputMisMatchException:
@@ -163,7 +163,7 @@ func (this *DefaultErrorStrategy) ReportError(recognizer IParser, e IRecognition
 	}
 }
 
-//
+
 // {@inheritDoc}
 //
 // <p>The default implementation reSynchronizes the parser by consuming tokens
@@ -172,7 +172,7 @@ func (this *DefaultErrorStrategy) ReportError(recognizer IParser, e IRecognition
 //
 func (this *DefaultErrorStrategy) Recover(recognizer IParser, e IRecognitionException) {
 
-	if this.lastErrorIndex == recognizer.getInputStream().index() &&
+	if this.lastErrorIndex == recognizer.GetInputStream().Index() &&
 		this.lastErrorStates != nil && this.lastErrorStates.contains(recognizer.GetState()) {
 		// uh oh, another error at same token index and previously-Visited
 		// state in ATN must be a case where LT(1) is in the recovery
@@ -180,7 +180,7 @@ func (this *DefaultErrorStrategy) Recover(recognizer IParser, e IRecognitionExce
 		// at least to prevent an infinite loop this is a failsafe.
 		recognizer.Consume()
 	}
-	this.lastErrorIndex = recognizer.getInputStream().index()
+	this.lastErrorIndex = recognizer.GetInputStream().Index()
 	if this.lastErrorStates == nil {
 		this.lastErrorStates = NewIntervalSet()
 	}
@@ -476,7 +476,7 @@ func (this *DefaultErrorStrategy) singleTokenInsertion(recognizer IParser) bool 
 	// is free to conjure up and insert the missing token
 	var atn = recognizer.GetInterpreter().atn
 	var currentState = atn.states[recognizer.GetState()]
-	var next = currentState.GetTransitions()[0].getTarget()
+	var next = currentState.GetTransitions()[0].getTarGet()
 	var expectingAtLL2 = atn.nextTokens(next, recognizer.GetParserRuleContext())
 	if expectingAtLL2.contains(currentSymbolType) {
 		this.reportMissingToken(recognizer)
@@ -559,7 +559,7 @@ func (this *DefaultErrorStrategy) getMissingSymbol(recognizer IParser) *Token {
 	}
 
 	tf := recognizer.GetTokenFactory()
-	return tf.create(current.source, expectedTokenType, tokenText, TokenDefaultChannel, -1, -1, current.line, current.column)
+	return tf.Create(current.source, expectedTokenType, tokenText, TokenDefaultChannel, -1, -1, current.line, current.column)
 }
 
 func (this *DefaultErrorStrategy) getExpectedTokens(recognizer IParser) *IntervalSet {

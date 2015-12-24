@@ -46,7 +46,7 @@ func (ts *BufferedTokenStream) InitBufferedTokenStream(tokenSource TokenSource) 
 	// {@link //LT LT(1)}.
 	//
 	// <p>This field is set to -1 when the stream is first constructed or when
-	// {@link //setTokenSource} is called, indicating that the first token has
+	// {@link //SetTokenSource} is called, indicating that the first token has
 	// not yet been fetched from the token source. For additional information,
 	// see the documentation of {@link IntStream} for a description of
 	// Initializing Methods.</p>
@@ -70,24 +70,24 @@ func (ts *BufferedTokenStream) InitBufferedTokenStream(tokenSource TokenSource) 
 
 }
 
-func (bt *BufferedTokenStream) mark() int {
+func (bt *BufferedTokenStream) Mark() int {
 	return 0
 }
 
-func (bt *BufferedTokenStream) release(marker int) {
+func (bt *BufferedTokenStream) Release(marker int) {
 	// no resources to release
 }
 
 func (bt *BufferedTokenStream) reset() {
-	bt.seek(0)
+	bt.Seek(0)
 }
 
-func (bt *BufferedTokenStream) seek(index int) {
+func (bt *BufferedTokenStream) Seek(index int) {
 	bt.lazyInit()
 	bt.index = bt.adjustSeekIndex(index)
 }
 
-func (bt *BufferedTokenStream) get(index int) *Token {
+func (bt *BufferedTokenStream) Get(index int) *Token {
 	bt.lazyInit()
 	return bt.tokens[index]
 }
@@ -119,7 +119,7 @@ func (bt *BufferedTokenStream) Consume() {
 //
 // @return {@code true} if a token is located at index {@code i}, otherwise
 // {@code false}.
-// @see //get(int i)
+// @see //Get(int i)
 // /
 func (bt *BufferedTokenStream) Sync(i int) bool {
 	var n = i - len(bt.tokens) + 1 // how many more elements we need?
@@ -235,7 +235,7 @@ func (bt *BufferedTokenStream) GetTokenSource() TokenSource {
 }
 
 // Reset bt token stream by setting its token source.///
-func (bt *BufferedTokenStream) setTokenSource(tokenSource TokenSource) {
+func (bt *BufferedTokenStream) SetTokenSource(tokenSource TokenSource) {
 	bt.tokenSource = tokenSource
 	bt.tokens = make([]*Token, 0)
 	bt.index = -1
@@ -332,21 +332,34 @@ func (bt *BufferedTokenStream) GetSourceName() string {
 	return bt.tokenSource.GetSourceName()
 }
 
-// Get the text of all tokens in bt buffer.///
-func (bt *BufferedTokenStream) GetText(interval *Interval) string {
+func (bt *BufferedTokenStream) Size() int {
+	return len(bt.tokens)
+}
+
+func (bt *BufferedTokenStream) Index() int {
+	return bt.index
+}
+
+func (bt *BufferedTokenStream) GetAllText() string {
+	return bt.GetTextFromInterval(nil)
+}
+
+func (bt *BufferedTokenStream) GetTextFromTokens(start, end *Token) string {
+	return bt.GetTextFromInterval(NewInterval(start.GetTokenIndex(), end.GetTokenIndex()))
+}
+
+func (bt *BufferedTokenStream) GetTextFromRuleContext(interval IRuleContext) string {
+	return bt.GetTextFromInterval(interval.GetSourceInterval())
+}
+
+func (bt *BufferedTokenStream) GetTextFromInterval(interval *Interval) string {
 	bt.lazyInit()
 	bt.fill()
 	if interval == nil {
 		interval = NewInterval(0, len(bt.tokens)-1)
 	}
 	var start = interval.start
-	//	if s2, ok := start.(*Token); ok {
-	//		start = s2.tokenIndex
-	//	}
 	var stop = interval.stop
-	//	if s2, ok := stop.(*Token); ok {
-	//		stop = s2.tokenIndex
-	//	}
 	if start < 0 || stop < 0 {
 		return ""
 	}

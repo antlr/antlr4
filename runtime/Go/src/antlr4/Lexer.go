@@ -117,7 +117,7 @@ const (
 func (l *Lexer) reset() {
 	// wack Lexer state variables
 	if l._input != nil {
-		l._input.seek(0) // rewind the input
+		l._input.Seek(0) // rewind the input
 	}
 	l._token = nil
 	l._type = TokenInvalidType
@@ -134,7 +134,7 @@ func (l *Lexer) reset() {
 	l.Interpreter.reset()
 }
 
-func (l *Lexer) getInputStream() CharStream {
+func (l *Lexer) GetInputStream() CharStream {
 	return l._input
 }
 
@@ -177,13 +177,13 @@ func (l *Lexer) nextToken() *Token {
 	}
 
 	// do this when done consuming
-	var tokenStartMarker = l._input.mark()
+	var tokenStartMarker = l._input.Mark()
 
 	// previously in finally block
 	defer func() {
 		// make sure we release marker after Match or
 		// unbuffered char stream will keep buffering
-		l._input.release(tokenStartMarker)
+		l._input.Release(tokenStartMarker)
 	}()
 
 	for true {
@@ -193,7 +193,7 @@ func (l *Lexer) nextToken() *Token {
 		}
 		l._token = nil
 		l._channel = TokenDefaultChannel
-		l._tokenStartCharIndex = l._input.index()
+		l._tokenStartCharIndex = l._input.Index()
 		l._tokenStartColumn = l.Interpreter.column
 		l._tokenStartLine = l.Interpreter.line
 		l._text = nil
@@ -296,7 +296,7 @@ func (l *Lexer) emitToken(token *Token) {
 // custom Token objects or provide a Newfactory.
 // /
 func (l *Lexer) emit() *Token {
-	var t = l._factory.create(l._tokenFactorySourcePair, l._type, *l._text, l._channel, l._tokenStartCharIndex, l.getCharIndex()-1, l._tokenStartLine, l._tokenStartColumn)
+	var t = l._factory.Create(l._tokenFactorySourcePair, l._type, *l._text, l._channel, l._tokenStartCharIndex, l.getCharIndex()-1, l._tokenStartLine, l._tokenStartColumn)
 	l.emitToken(t)
 	return t
 }
@@ -304,7 +304,7 @@ func (l *Lexer) emit() *Token {
 func (l *Lexer) emitEOF() *Token {
 	cpos := l.getCharPositionInLine()
 	lpos := l.getLine()
-	var eof = l._factory.create(l._tokenFactorySourcePair, TokenEOF, "", TokenDefaultChannel, l._input.index(), l._input.index()-1, lpos, cpos)
+	var eof = l._factory.Create(l._tokenFactorySourcePair, TokenEOF, "", TokenDefaultChannel, l._input.Index(), l._input.Index()-1, lpos, cpos)
 	l.emitToken(eof)
 	return eof
 }
@@ -327,7 +327,7 @@ func (l *Lexer) setType(t int) {
 
 // What is the index of the current character of lookahead?///
 func (l *Lexer) getCharIndex() int {
-	return l._input.index()
+	return l._input.Index()
 }
 
 // Return the text Matched so far for the current token or any text override.
@@ -363,7 +363,7 @@ func (l *Lexer) getAllTokens() []*Token {
 
 func (l *Lexer) notifyListeners(e IRecognitionException) {
 	var start = l._tokenStartCharIndex
-	var stop = l._input.index()
+	var stop = l._input.Index()
 	var text = l._input.GetTextFromInterval(NewInterval(start, stop))
 	var msg = "token recognition error at: '" + text + "'"
 	var listener = l.getErrorListenerDispatch()

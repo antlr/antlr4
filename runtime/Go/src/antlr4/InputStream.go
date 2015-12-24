@@ -11,12 +11,18 @@ func NewInputStream(data string) *InputStream {
 
 	is := new(InputStream)
 
+	is.InitInputStream(data)
+
+	return is
+}
+
+func (is *InputStream) InitInputStream(data string) {
+
 	is.name = "<empty>"
 	is.index = 0
 	is.data = []rune(data)
 	is.size = len(is.data) // number of runes
 
-	return is
 }
 
 func (is *InputStream) reset() {
@@ -49,15 +55,23 @@ func (is *InputStream) LT(offset int) int {
 	return is.LA(offset)
 }
 
+func (is *InputStream) Index() int {
+	return is.index
+}
+
+func (is *InputStream) Size() int {
+	return is.size
+}
+
 // mark/release do nothing we have entire buffer
-func (is *InputStream) mark() int {
+func (is *InputStream) Mark() int {
 	return -1
 }
 
-func (is *InputStream) release(marker int) {
+func (is *InputStream) Release(marker int) {
 }
 
-func (is *InputStream) seek(index int) {
+func (is *InputStream) Seek(index int) {
 	if index <= is.index {
 		is.index = index // just jump don't update stream state (line,...)
 		return
@@ -75,6 +89,10 @@ func (is *InputStream) GetText(start int, stop int) string {
 	} else {
 		return string(is.data[start : stop+1])
 	}
+}
+
+func (is *InputStream) GetTextFromInterval(i *Interval) string {
+	return is.GetText(i.start, i.stop)
 }
 
 func (is *InputStream) toString() string {

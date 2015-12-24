@@ -38,7 +38,7 @@ func (la *LL1Analyzer) getDecisionLookahead(s IATNState) []*IntervalSet {
 		look[alt] = NewIntervalSet()
 		var lookBusy = NewSet(nil, nil)
 		var seeThruPreds = false // fail to get lookahead upon pred
-		la._LOOK(s.GetTransitions()[alt].getTarget(), nil, PredictionContextEMPTY, look[alt], lookBusy, NewBitSet(), seeThruPreds, false)
+		la._LOOK(s.GetTransitions()[alt].getTarGet(), nil, PredictionContextEMPTY, look[alt], lookBusy, NewBitSet(), seeThruPreds, false)
 		// Wipe out lookahead for la alternative if we found nothing
 		// or we had a predicate when we !seeThruPreds
 		if look[alt].length() == 0 || look[alt].contains(LL1AnalyzerHIT_PRED) {
@@ -168,26 +168,26 @@ func (la *LL1Analyzer) _LOOK(s, stopState IATNState, ctx IPredictionContext, loo
 
 		if t1, ok := t.(*RuleTransition); ok {
 
-			if calledRuleStack.contains(t1.getTarget().GetRuleIndex()) {
+			if calledRuleStack.contains(t1.getTarGet().GetRuleIndex()) {
 				continue
 			}
 
-			newContext := SingletonPredictionContextcreate(ctx, t1.followState.GetStateNumber())
+			newContext := SingletonPredictionContextCreate(ctx, t1.followState.GetStateNumber())
 
 			defer func() {
-				calledRuleStack.remove(t1.getTarget().GetRuleIndex())
+				calledRuleStack.remove(t1.getTarGet().GetRuleIndex())
 			}()
 
-			calledRuleStack.add(t1.getTarget().GetRuleIndex())
-			la._LOOK(t.getTarget(), stopState, newContext, look, lookBusy, calledRuleStack, seeThruPreds, addEOF)
+			calledRuleStack.add(t1.getTarGet().GetRuleIndex())
+			la._LOOK(t.getTarGet(), stopState, newContext, look, lookBusy, calledRuleStack, seeThruPreds, addEOF)
 		} else if t2, ok := t.(*AbstractPredicateTransition); ok {
 			if seeThruPreds {
-				la._LOOK(t2.getTarget(), stopState, ctx, look, lookBusy, calledRuleStack, seeThruPreds, addEOF)
+				la._LOOK(t2.getTarGet(), stopState, ctx, look, lookBusy, calledRuleStack, seeThruPreds, addEOF)
 			} else {
 				look.addOne(LL1AnalyzerHIT_PRED)
 			}
 		} else if t.getIsEpsilon() {
-			la._LOOK(t.getTarget(), stopState, ctx, look, lookBusy, calledRuleStack, seeThruPreds, addEOF)
+			la._LOOK(t.getTarGet(), stopState, ctx, look, lookBusy, calledRuleStack, seeThruPreds, addEOF)
 		} else if _, ok := t.(*WildcardTransition); ok {
 			look.addRange(TokenMinUserTokenType, la.atn.maxTokenType)
 		} else {

@@ -101,7 +101,7 @@ var <superClass> = require('./<superClass>').<superClass> // TODO
 
 var parserATN = <atn>
 var deserializer = antlr4.NewATNDeserializer(nil)
-var deserializedATN = deserializer.Deserialize( []rune( parserATN ) )
+var deserializedATN = deserializer.DeserializeFromUInt16( parserATN )
 
 var literalNames = []string{ <parser.literalNames:{t | <t>}; null="\"\"", separator=", ", wrap, anchor> }
 var symbolicNames = []string{ <parser.symbolicNames:{t | <t>}; null="\"\"", separator=", ", wrap, anchor> }
@@ -459,7 +459,7 @@ testShiftInRange(shiftAmount) ::= <<
 
 // produces smaller bytecode only when bits.ttypes contains more than two items
 bitsetBitfieldComparison(s, bits) ::= <%
-(<testShiftInRange({<offsetShiftVar(s.varName, bits.shift)>})> && ((1 \<\< <offsetShiftVar(s.varName, bits.shift)>) & (<bits.ttypes:{ttype | (1 \<\< <offsetShiftType(ttype, bits.shift)>)}; separator=" | ">)) != 0)
+(<testShiftInRange({<offsetShiftVar(s.varName, bits.shift)>})> && ((1 \<\< uint(<offsetShiftVar(s.varName, bits.shift)>)) & (<bits.ttypes:{ttype | (1 \<\< <offsetShiftType(ttype, bits.shift)>)}; separator=" | ">)) != 0)
 %>
 
 isZero ::= [
@@ -799,7 +799,7 @@ Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass) ::= <<
 
 var serializedLexerAtn = <atn>
 var lexerDeserializer = antlr4.NewATNDeserializer(nil)
-var lexerAtn = lexerDeserializer.Deserialize( []rune( serializedLexerAtn ) )
+var lexerAtn = lexerDeserializer.DeserializeFromUInt16( serializedLexerAtn )
 
 var lexerModeNames = []string{ <lexer.modes:{m| "<m>"}; separator=", ", wrap, anchor> }
 var lexerLiteralNames = []string{ <lexer.literalNames:{t | <t>}; null="\"\"", separator=", ", wrap, anchor> }
@@ -853,7 +853,7 @@ const (
 
 SerializedATN(model) ::= <<
 <! only one segment, can be inlined !>
-""
+[]uint16{ <model.serialized; wrap={<\n>    }> }
 
 >>
 

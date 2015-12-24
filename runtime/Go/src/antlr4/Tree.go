@@ -20,7 +20,7 @@ type Tree interface {
 type SyntaxTree interface {
 	Tree
 
-	getSourceInterval() *Interval
+	GetSourceInterval() *Interval
 }
 
 type ParseTree interface {
@@ -131,7 +131,7 @@ func (this *TerminalNodeImpl) getPayload() interface{} {
 	return this.symbol
 }
 
-func (this *TerminalNodeImpl) getSourceInterval() *Interval {
+func (this *TerminalNodeImpl) GetSourceInterval() *Interval {
 	if this.symbol == nil {
 		return TreeINVALID_INTERVAL
 	}

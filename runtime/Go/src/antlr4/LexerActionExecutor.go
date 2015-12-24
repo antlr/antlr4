@@ -130,11 +130,11 @@ func (this *LexerActionExecutor) fixOffsetBeforeMatch(offset int) *LexerActionEx
 // /
 func (this *LexerActionExecutor) execute(lexer ILexer, input CharStream, startIndex int) {
 	var requiresSeek = false
-	var stopIndex = input.index()
+	var stopIndex = input.Index()
 
 	defer func() {
 		if requiresSeek {
-			input.seek(stopIndex)
+			input.Seek(stopIndex)
 		}
 	}()
 
@@ -142,11 +142,11 @@ func (this *LexerActionExecutor) execute(lexer ILexer, input CharStream, startIn
 		var lexerAction ILexerAction = this.lexerActions[i]
 		if la, ok := lexerAction.(*LexerIndexedCustomAction); ok {
 			var offset = la.offset
-			input.seek(startIndex + offset)
+			input.Seek(startIndex + offset)
 			lexerAction = la.lexerAction
 			requiresSeek = (startIndex + offset) != stopIndex
 		} else if lexerAction.getIsPositionDependent() {
-			input.seek(stopIndex)
+			input.Seek(stopIndex)
 			requiresSeek = false
 		}
 		lexerAction.execute(lexer)

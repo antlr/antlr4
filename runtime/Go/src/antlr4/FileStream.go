@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"io"
 	"os"
+	"fmt"
 )
 
 //
@@ -12,17 +13,31 @@ import (
 //
 
 type FileStream struct {
-	InputStream
+	*InputStream
+
 	filename string
 }
 
-func NewFileStream(fileName string) {
+func NewFileStream(fileName string) *FileStream {
 
 	buf := bytes.NewBuffer(nil)
 
-	// TODO
 	f, _ := os.Open(fileName) // Error handling elided for brevity.
 	io.Copy(buf, f)           // Error handling elided for brevity.
 	f.Close()
 
+	fs := new(FileStream)
+
+	fs.filename = fileName
+	s := string(buf.Bytes())
+
+	fmt.Println(s)
+	fs.InitInputStream(s)
+
+	return fs
+
+}
+
+func (f *FileStream) GetSourceName() string {
+	return f.filename
 }

@@ -15,8 +15,8 @@ import (
 //  ATN transitions.</p>
 
 type ITransition interface {
-	getTarget() IATNState
-	setTarget(IATNState)
+	getTarGet() IATNState
+	setTarGet(IATNState)
 	getIsEpsilon() bool
 	getLabel() *IntervalSet
 	getSerializationType() int
@@ -49,11 +49,11 @@ func (t *Transition) InitTransition(target IATNState) {
 	t.label = nil
 }
 
-func (t *Transition) getTarget() IATNState {
+func (t *Transition) getTarGet() IATNState {
 	return t.target
 }
 
-func (t *Transition) setTarget(s IATNState) {
+func (t *Transition) setTarGet(s IATNState) {
 	t.target = s
 }
 

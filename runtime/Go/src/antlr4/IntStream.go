@@ -1,12 +1,14 @@
 package antlr4
 
 type IntStream interface {
+
 	Consume()
 	LA(int) int
-	mark() int
-	release(marker int)
-	index() int
-	seek(index int)
-	size() int
+	Mark() int
+	Release(marker int)
+	Index() int
+	Seek(index int)
+	Size() int
 	GetSourceName() string
+
 }

@@ -70,7 +70,7 @@ func (a *ATNConfigSet) InitATNConfigSet(fullCtx bool) {
 	// fields in particular, conflictingAlts is set after
 	// we've made a.readonly.
 	a.readOnly = false
-	// Track the elements as they are added to the set supports get(i)///
+	// Track the elements as they are added to the set supports Get(i)///
 	a.configs = make([]IATNConfig, 0)
 
 	// TODO: these fields make me pretty uncomfortable but nice to pack up info

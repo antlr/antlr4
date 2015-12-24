@@ -51,18 +51,18 @@ var PredictionContextid = PredictionContextglobalNodeCount
 // int hash = {@link MurmurHash//initialize MurmurHash.initialize}({@link
 // //INITIAL_HASH})
 //
-// for (int i = 0 i &lt {@link //size()} i++) {
+// for (int i = 0 i &lt {@link //Size()} i++) {
 // hash = {@link MurmurHash//update MurmurHash.update}(hash, {@link //GetParent
 // GetParent}(i))
 // }
 //
-// for (int i = 0 i &lt {@link //size()} i++) {
+// for (int i = 0 i &lt {@link //Size()} i++) {
 // hash = {@link MurmurHash//update MurmurHash.update}(hash, {@link
 // //getReturnState getReturnState}(i))
 // }
 //
 // hash = {@link MurmurHash//finish MurmurHash.finish}(hash, 2// {@link
-// //size()})
+// //Size()})
 // return hash
 // }
 // </pre>
@@ -134,7 +134,7 @@ func (this *PredictionContextCache) add(ctx IPredictionContext) IPredictionConte
 	return ctx
 }
 
-func (this *PredictionContextCache) get(ctx IPredictionContext) IPredictionContext {
+func (this *PredictionContextCache) Get(ctx IPredictionContext) IPredictionContext {
 	return this.cache[ctx]
 }
 
@@ -172,7 +172,7 @@ func (s *SingletonPredictionContext) InitSingletonPredictionContext(parent IPred
 
 }
 
-func SingletonPredictionContextcreate(parent IPredictionContext, returnState int) IPredictionContext {
+func SingletonPredictionContextCreate(parent IPredictionContext, returnState int) IPredictionContext {
 	if returnState == PredictionContextEMPTY_RETURN_STATE && parent == nil {
 		// someone can pass in the bits of an array ctx that mean $
 		return PredictionContextEMPTY
@@ -372,7 +372,7 @@ func predictionContextFromRuleContext(a *ATN, outerContext IRuleContext) IPredic
 	var state = a.states[outerContext.getInvokingState()]
 	var transition = state.GetTransitions()[0]
 
-	return SingletonPredictionContextcreate(parent, transition.(*RuleTransition).followState.GetStateNumber())
+	return SingletonPredictionContextCreate(parent, transition.(*RuleTransition).followState.GetStateNumber())
 }
 
 func calculateListsHashString(parents []PredictionContext, returnStates []int) string {
@@ -454,11 +454,11 @@ func merge(a, b IPredictionContext, rootIsWildcard bool, mergeCache *DoubleDict)
 // /
 func mergeSingletons(a, b *SingletonPredictionContext, rootIsWildcard bool, mergeCache *DoubleDict) IPredictionContext {
 	if mergeCache != nil {
-		var previous = mergeCache.get(a.hashString(), b.hashString())
+		var previous = mergeCache.Get(a.hashString(), b.hashString())
 		if previous != nil {
 			return previous.(IPredictionContext)
 		}
-		previous = mergeCache.get(b.hashString(), a.hashString())
+		previous = mergeCache.Get(b.hashString(), a.hashString())
 		if previous != nil {
 			return previous.(IPredictionContext)
 		}
@@ -485,7 +485,7 @@ func mergeSingletons(a, b *SingletonPredictionContext, rootIsWildcard bool, merg
 		// merge parents x and y, giving array node with x,y then remainders
 		// of those graphs. dup a, a' points at merged array
 		// Newjoined parent so create Newsingleton pointing to it, a'
-		var spc = SingletonPredictionContextcreate(parent, a.returnState)
+		var spc = SingletonPredictionContextCreate(parent, a.returnState)
 		if mergeCache != nil {
 			mergeCache.set(a.hashString(), b.hashString(), spc)
 		}
@@ -614,11 +614,11 @@ func mergeRoot(a, b ISingletonPredictionContext, rootIsWildcard bool) IPredictio
 // /
 func mergeArrays(a, b *ArrayPredictionContext, rootIsWildcard bool, mergeCache *DoubleDict) IPredictionContext {
 	if mergeCache != nil {
-		var previous = mergeCache.get(a.hashString(), b.hashString())
+		var previous = mergeCache.Get(a.hashString(), b.hashString())
 		if previous != nil {
 			return previous.(IPredictionContext)
 		}
-		previous = mergeCache.get(b.hashString(), a.hashString())
+		previous = mergeCache.Get(b.hashString(), a.hashString())
 		if previous != nil {
 			return previous.(IPredictionContext)
 		}
@@ -680,7 +680,7 @@ func mergeArrays(a, b *ArrayPredictionContext, rootIsWildcard bool, mergeCache *
 	// trim merged if we combined a few that had same stack tops
 	if k < len(mergedParents) { // write index < last position trim
 		if k == 1 { // for just one merged element, return singleton top
-			var a_ = SingletonPredictionContextcreate(mergedParents[0], mergedReturnStates[0])
+			var a_ = SingletonPredictionContextCreate(mergedParents[0], mergedReturnStates[0])
 			if mergeCache != nil {
 				mergeCache.set(a.hashString(), b.hashString(), a_)
 			}
@@ -744,7 +744,7 @@ func getCachedPredictionContext(context IPredictionContext, contextCache *Predic
 	//	if (existing != nil) {
 	//		return existing
 	//	}
-	//	existing = contextCache.get(context)
+	//	existing = contextCache.Get(context)
 	//	if (existing != nil) {
 	//		Visited[context] = existing
 	//		return existing
@@ -773,7 +773,7 @@ func getCachedPredictionContext(context IPredictionContext, contextCache *Predic
 	//	if (parents.length == 0) {
 	//		updated = PredictionContextEMPTY
 	//	} else if (parents.length == 1) {
-	//		updated = SingletonPredictionContext.create(parents[0], context.getReturnState(0))
+	//		updated = SingletonPredictionContext.Create(parents[0], context.getReturnState(0))
 	//	} else {
 	//		updated = NewArrayPredictionContext(parents, context.returnStates)
 	//	}

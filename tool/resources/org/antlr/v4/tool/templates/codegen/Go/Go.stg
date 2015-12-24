@@ -101,7 +101,7 @@ var <superClass> = require('./<superClass>').<superClass> // TODO
 
 var parserATN = <atn>
 var deserializer = antlr4.NewATNDeserializer(nil)
-var deserializedATN = deserializer.Deserialize( []rune( parserATN ) )
+var deserializedATN = deserializer.DeserializeFromUInt16( parserATN )
 
 var literalNames = []string{ <parser.literalNames:{t | <t>}; null="\"\"", separator=", ", wrap, anchor> }
 var symbolicNames = []string{ <parser.symbolicNames:{t | <t>}; null="\"\"", separator=", ", wrap, anchor> }
@@ -151,7 +151,7 @@ const (
 func (p *<parser.name>) Sempred(localctx, ruleIndex int, predIndex int) {
 	switch ruleIndex {
 	<parser.sempredFuncs.values:{f | case <f.ruleIndex>:
-		return p.<f.name>_Sempred(localctx, predIndex);}; separator="\n">
+		return p.<f.name; format="cap">_Sempred(localctx, predIndex);}; separator="\n">
     default:
         panic("No predicate with index:" + ruleIndex)
    }
@@ -168,7 +168,7 @@ func (l *<lexer.name>) Action(localctx, ruleIndex int, actionIndex int) {
 	switch ruleIndex {
 	<recog.actionFuncs.values:{f|
 case <f.ruleIndex>:
-	p.<f.name>_Action(localctx, actionIndex)
+	p.<f.name; format="cap">_Action(localctx, actionIndex)
 	}; separator="\n">
 	default:
 		panic("No registered action for:" + ruleIndex)
@@ -197,7 +197,7 @@ func (l *<lexer.name>) Sempred(localctx, ruleIndex, predIndex) {
  */
 RuleActionFunction(r, actions) ::= <<
 
-func (l *<lexer.name>) <r.name>_Action(localctx , actionIndex) {
+func (l *<lexer.name>) <r.name; format="cap">_Action(localctx , actionIndex) {
 	switch actionIndex {
 	<actions:{index|
 case <index>:
@@ -213,7 +213,7 @@ case <index>:
  * overriding implementation impossible to maintain.
  */
 RuleSempredFunction(r, actions) ::= <<
-func (s *<if(parser)><parser.name><else><lexer.name><endif>) <r.name>_Sempred(localctx, predIndex int) {
+func (s *<if(parser)><parser.name><else><lexer.name><endif>) <r.name; format="cap">_Sempred(localctx, predIndex int) {
 	switch predIndex {
 		<actions:{index| case <index>:
 	return <actions.(index)>;}; separator="\n">
@@ -232,7 +232,7 @@ RuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,namedActions,fina
 
 <altLabelCtxs:{l | <altLabelCtxs.(l)>}; separator="\n">
 
-func (p *<parser.name>) <currentRule.name>(<currentRule.args:{a | <a.name>}; separator=", ">) *<currentRule.ctxType> {
+func (p *<parser.name>) <currentRule.name; format="cap">(<currentRule.args:{a | <a.name>}; separator=", ">) *<currentRule.ctxType> {
 
     localctx := New<currentRule.ctxType>(p, p.GetParserRuleContext(), p.GetState()<currentRule.args:{a | , <a.name>}>)
     p.EnterRule(localctx, <currentRule.startState>, <parser.name>RULE_<currentRule.name>)
@@ -276,7 +276,7 @@ LeftRecursiveRuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,
 <ruleCtx>
 <altLabelCtxs:{l | <altLabelCtxs.(l)>}; separator="\n">
 
-func (p *<parser.name>) <currentRule.name>(_p<if(currentRule.args)>, <args:{a | , <a>}><endif>) *<currentRule.ctxType> {
+func (p *<parser.name>) <currentRule.name; format="cap">(_p<if(currentRule.args)>, <args:{a | , <a>}><endif>) *<currentRule.ctxType> {
 
     _parentctx := p.GetParent().(IParserRuleContext)
     _parentState := p.GetState()
@@ -459,7 +459,7 @@ testShiftInRange(shiftAmount) ::= <<
 
 // produces smaller bytecode only when bits.ttypes contains more than two items
 bitsetBitfieldComparison(s, bits) ::= <%
-(<testShiftInRange({<offsetShiftVar(s.varName, bits.shift)>})> && ((1 \<\< <offsetShiftVar(s.varName, bits.shift)>) & (<bits.ttypes:{ttype | (1 \<\< <offsetShiftType(ttype, bits.shift)>)}; separator=" | ">)) != 0)
+(<testShiftInRange({<offsetShiftVar(s.varName, bits.shift)>})> && ((1 \<\< uint(<offsetShiftVar(s.varName, bits.shift)>)) & (<bits.ttypes:{ttype | (1 \<\< <offsetShiftType(ttype, bits.shift)>)}; separator=" | ">)) != 0)
 %>
 
 isZero ::= [
@@ -486,7 +486,7 @@ cases(ttypes) ::= <<
 
 InvokeRule(r, argExprsChunks) ::= <<
 p.SetState(<r.stateNumber>)
-<if(r.labels)><r.labels:{l | <labelref(l)> = }><endif>p.<r.name>(<if(r.ast.options.p)><r.ast.options.p><if(argExprsChunks)>,<endif><endif><argExprsChunks>)
+<if(r.labels)><r.labels:{l | <labelref(l)> = }><endif>p.<r.name; format="cap">(<if(r.ast.options.p)><r.ast.options.p><if(argExprsChunks)>,<endif><endif><argExprsChunks>)
 >>
 
 MatchToken(m) ::= <<
@@ -535,13 +535,13 @@ catch (<catchArg>) {
 
 // lexer actions are not associated with model objects
 
-LexerSkipCommand()  ::= "p.skip()"
-LexerMoreCommand()  ::= "p.more()"
-LexerPopModeCommand() ::= "p.popMode()"
-LexerTypeCommand(arg)      ::= "p._type = <arg>"
-LexerChannelCommand(arg)   ::= "p._channel = <arg>"
-LexerModeCommand(arg)      ::= "p._mode = <arg>"
-LexerPushModeCommand(arg)  ::= "p.pushMode(<arg>)"
+LexerSkipCommand()  ::= "p.Skip()"
+LexerMoreCommand()  ::= "p.More()"
+LexerPopModeCommand() ::= "p.PopMode()"
+LexerTypeCommand(arg)      ::= "p.SetType(<arg>)"
+LexerChannelCommand(arg)   ::= "p.SetChannel(<arg>)"
+LexerModeCommand(arg)      ::= "p.SetMode(<arg>)"
+LexerPushModeCommand(arg)  ::= "p.PushMode(<arg>)"
 
 ActionText(t) ::= "<t.text>"
 ActionTemplate(t) ::= "<t.st>"
@@ -578,8 +578,8 @@ ThisRulePropertyRef_text(r)	 ::= "p.GetTokenStream().GetTextFromInterval(NewInte
 ThisRulePropertyRef_ctx(r)	 ::= "localctx"
 ThisRulePropertyRef_parser(r)	 ::= "p"
 
-NonLocalAttrRef(s)		 	 ::= "getInvokingContext(<s.ruleIndex>).<s.name>"
-SetNonLocalAttr(s, rhsChunks)  ::= "getInvokingContext(<s.ruleIndex>).<s.name> = <rhsChunks>"
+NonLocalAttrRef(s)		 	 ::= "GetInvokingContext(<s.ruleIndex>).<s.name>"
+SetNonLocalAttr(s, rhsChunks)  ::= "GetInvokingContext(<s.ruleIndex>).<s.name> = <rhsChunks>"
 
 AddToLabelList(a) ::= "<ctx(a.label)>.<a.listName> = append(<ctx(a.label)>.<a.listName>, push(<labelref(a.label)>)"
 
@@ -590,7 +590,7 @@ RuleContextDecl(r) ::= "p.<r.name> = nil // reflect.TypeOf((*<r.ctxName>)(nil)).
 RuleContextListDecl(rdecl) ::= "p.<rdecl.name> = [] // of <rdecl.ctxName>s"
 
 ContextTokenGetterDecl(t)      ::= <<
-<t.name>() interface{} {
+<t.name; format="cap">() interface{} {
     return s.GetToken(<parser.name><t.name>, 0)
 }
 >>
@@ -602,7 +602,7 @@ def <t.name>_list(self):
 >>
 
 ContextTokenListIndexedGetterDecl(t)  ::= <<
-<t.name>(i int) interface{} {
+<t.name; format="cap">(i int) interface{} {
     if i \< 0 {
         return s.GetTokens(<parser.name><t.name>)
     } else {
@@ -613,20 +613,20 @@ ContextTokenListIndexedGetterDecl(t)  ::= <<
 >>
 
 ContextRuleGetterDecl(r)       ::= <<
-<r.name>() interface{} {
+<r.name; format="cap">() interface{} {
     return s.GetTypedRuleContext(reflect.TypeOf((*<r.ctxName>)(nil)).Elem(),0)
 }
 >>
 
 // should never be called
 ContextRuleListGetterDecl(r)   ::= <<
-func <r.name>_list(self):
+func <r.name; format="cap">_list(self):
     return s.GetTypedRuleContexts(reflect.TypeOf((*<r.ctxName>)(nil)).Elem())
 
 >>
 
 ContextRuleListIndexedGetterDecl(r)   ::= <<
-<r.name>(i int) interface{} {
+<r.name; format="cap">(i int) interface{} {
     if i \< 0 {
         return s.GetTypedRuleContexts(reflect.TypeOf((*<r.ctxName>)(nil)).Elem())
     } else {
@@ -721,7 +721,7 @@ func (s *<struct.name>) <if(method.isEnter)>Enter<else>Exit<endif>Rule(listener 
 
 
 VisitorDispatchMethod(method) ::= <<
-func (s *<struct.name>) accept(Visitor antlr4.ParseTreeVisitor) interface{} {
+func (s *<struct.name>) Accept(Visitor antlr4.ParseTreeVisitor) interface{} {
 
     switch t := listener.(type) {
     case *<parser.grammarName>Listener:
@@ -799,7 +799,7 @@ Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass) ::= <<
 
 var serializedLexerAtn = <atn>
 var lexerDeserializer = antlr4.NewATNDeserializer(nil)
-var lexerAtn = lexerDeserializer.Deserialize( []rune( serializedLexerAtn ) )
+var lexerAtn = lexerDeserializer.DeserializeFromUInt16( serializedLexerAtn )
 
 var lexerModeNames = []string{ <lexer.modes:{m| "<m>"}; separator=", ", wrap, anchor> }
 var lexerLiteralNames = []string{ <lexer.literalNames:{t | <t>}; null="\"\"", separator=", ", wrap, anchor> }
@@ -853,7 +853,7 @@ const (
 
 SerializedATN(model) ::= <<
 <! only one segment, can be inlined !>
-""
+[]uint16{ <model.serialized; wrap={<\n>    }> }
 
 >>
 

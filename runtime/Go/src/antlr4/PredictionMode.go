@@ -527,7 +527,7 @@ func PredictionModeGetStateToAltMap(configs *ATNConfigSet) *AltDict {
 	var m = NewAltDict()
 
 	for _, c := range configs.configs {
-		var alts = m.get(c.GetState().toString())
+		var alts = m.Get(c.GetState().toString())
 		if alts == nil {
 			alts = NewBitSet()
 			m.put(c.GetState().toString(), alts)
