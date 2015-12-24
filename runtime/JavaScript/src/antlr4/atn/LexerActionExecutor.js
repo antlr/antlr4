@@ -42,7 +42,7 @@ function LexerActionExecutor(lexerActions) {
 	this.lexerActions = lexerActions === null ? [] : lexerActions;
 	// Caches the result of {@link //hashCode} since the hash code is an element
 	// of the performance-critical {@link LexerATNConfig//hashCode} operation.
-	this.hashString = lexerActions.toString(); // "".join([str(la) for la in
+	this._hashString = lexerActions.toString(); // "".join([str(la) for la in
 	// lexerActions]))
 	return this;
 }
@@ -158,7 +158,7 @@ LexerActionExecutor.prototype.execute = function(lexer, input, startIndex) {
 };
 
 LexerActionExecutor.prototype.hashString = function() {
-	return this.hashString;
+	return this._hashString;
 };
 
 LexerActionExecutor.prototype.equals = function(other) {
@@ -167,7 +167,7 @@ LexerActionExecutor.prototype.equals = function(other) {
 	} else if (!(other instanceof LexerActionExecutor)) {
 		return false;
 	} else {
-		return this.hashString === other.hashString &&
+		return this._hashString === other._hashString &&
 				this.lexerActions === other.lexerActions;
 	}
 };
