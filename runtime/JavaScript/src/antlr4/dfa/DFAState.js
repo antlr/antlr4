@@ -30,6 +30,8 @@
 ///
 
 var ATNConfigSet = require('./../atn/ATNConfigSet').ATNConfigSet;
+var Utils = require('./../Utils');
+var Set = Utils.Set;
 
 // Map a predicate to a predicted alternative.///
 
