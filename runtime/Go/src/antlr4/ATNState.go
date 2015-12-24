@@ -78,7 +78,7 @@ type ATNState struct {
 func NewATNState() *ATNState {
 
 	as := new(ATNState)
-	as.InitATNState()
+	as.ATNState = NewATNState()
 
 	return as
 }
@@ -181,7 +181,7 @@ type BasicState struct {
 
 func NewBasicState() *BasicState {
 	this := new(BasicState)
-	this.InitATNState()
+	this.ATNState = NewATNState()
 
 	this.stateType = ATNStateBASIC
 	return this
@@ -198,8 +198,8 @@ func NewDecisionState() *DecisionState {
 
 	this := new(DecisionState)
 
-	this.InitATNState()
-	this.InitDecisionState()
+	this.ATNState = NewATNState()
+	this.DecisionState = NewDecisionState()
 
 	return this
 }
@@ -222,8 +222,7 @@ func NewBlockStartState() *BlockStartState {
 
 	this := new(BlockStartState)
 
-	this.InitATNState()
-	this.InitDecisionState()
+	this.DecisionState = NewDecisionState()
 
 	return this
 }
@@ -242,9 +241,7 @@ func NewBasicBlockStartState() *BasicBlockStartState {
 
 	this := new(BasicBlockStartState)
 
-	this.InitATNState()
-	this.InitDecisionState()
-	this.InitBlockStartState()
+	this.BlockStartState = NewBlockStartState()
 
 	this.stateType = ATNStateBLOCK_START
 	return this
@@ -261,7 +258,7 @@ func NewBlockEndState() *BlockEndState {
 
 	this := new(BlockEndState)
 
-	this.InitATNState()
+	this.ATNState = NewATNState()
 	this.stateType = ATNStateBLOCK_END
 	this.startState = nil
 
@@ -280,7 +277,7 @@ type RuleStopState struct {
 func NewRuleStopState() *RuleStopState {
 	this := new(RuleStopState)
 
-	this.InitATNState()
+	this.ATNState = NewATNState()
 	this.stateType = ATNStateRULE_STOP
 	return this
 }
@@ -296,7 +293,7 @@ func NewRuleStartState() *RuleStartState {
 
 	this := new(RuleStartState)
 
-	this.InitATNState()
+	this.ATNState = NewATNState()
 	this.stateType = ATNStateRULE_START
 	this.stopState = nil
 	this.isPrecedenceRule = false
@@ -315,9 +312,7 @@ func NewPlusLoopbackState() *PlusLoopbackState {
 
 	this := new(PlusLoopbackState)
 
-	this.InitATNState()
-	this.InitDecisionState()
-	this.InitBlockStartState()
+	this.BlockStartState = NewBlockStartState()
 
 	this.stateType = ATNStatePLUS_LOOP_BACK
 	return this
@@ -338,9 +333,7 @@ func NewPlusBlockStartState() *PlusBlockStartState {
 
 	this := new(PlusBlockStartState)
 
-	this.InitATNState()
-	this.InitDecisionState()
-	this.InitBlockStartState()
+	this.BlockStartState = NewBlockStartState()
 
 	this.stateType = ATNStatePLUS_BLOCK_START
 	this.loopBackState = nil
@@ -357,9 +350,7 @@ func NewStarBlockStartState() *StarBlockStartState {
 
 	this := new(StarBlockStartState)
 
-	this.InitATNState()
-	this.InitDecisionState()
-	this.InitBlockStartState()
+	this.BlockStartState = NewBlockStartState()
 
 	this.stateType = ATNStateSTAR_BLOCK_START
 
@@ -374,7 +365,7 @@ func NewStarLoopbackState() *StarLoopbackState {
 
 	this := new(StarLoopbackState)
 
-	this.InitATNState()
+	this.ATNState = NewATNState()
 
 	this.stateType = ATNStateSTAR_LOOP_BACK
 	return this
@@ -391,8 +382,7 @@ func NewStarLoopEntryState() *StarLoopEntryState {
 
 	this := new(StarLoopEntryState)
 
-	this.InitATNState()
-	this.InitDecisionState()
+	this.DecisionState = NewDecisionState()
 
 	this.stateType = ATNStateSTAR_LOOP_ENTRY
 	this.loopBackState = nil
@@ -413,7 +403,7 @@ func NewLoopEndState() *LoopEndState {
 
 	this := new(LoopEndState)
 
-	this.InitATNState()
+	this.ATNState = NewATNState()
 
 	this.stateType = ATNStateLOOP_END
 	this.loopBackState = nil
@@ -430,8 +420,7 @@ func NewTokensStartState() *TokensStartState {
 
 	this := new(TokensStartState)
 
-	this.InitATNState()
-	this.InitDecisionState()
+	this.DecisionState = NewDecisionState()
 
 	this.stateType = ATNStateTOKEN_START
 	return this

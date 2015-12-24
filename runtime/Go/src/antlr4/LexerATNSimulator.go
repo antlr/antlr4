@@ -66,7 +66,7 @@ func NewLexerATNSimulator(recog ILexer, atn *ATN, decisionToDFA []*DFA, sharedCo
 
 	this := new(LexerATNSimulator)
 
-	this.InitATNSimulator(atn, sharedContextCache)
+	this.ATNSimulator = NewATNSimulator(atn, sharedContextCache)
 
 	this.decisionToDFA = decisionToDFA
 	this.recog = recog

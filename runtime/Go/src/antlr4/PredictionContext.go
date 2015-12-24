@@ -155,7 +155,7 @@ type SingletonPredictionContext struct {
 
 func NewSingletonPredictionContext(parent IPredictionContext, returnState int) *SingletonPredictionContext {
 	s := new(SingletonPredictionContext)
-	s.InitSingletonPredictionContext(parent, returnState)
+	s.SingletonPredictionContext = NewSingletonPredictionContext(parent, returnState)
 	return s
 }
 
@@ -248,7 +248,7 @@ func NewEmptyPredictionContext() *EmptyPredictionContext {
 
 	p := new(EmptyPredictionContext)
 
-	p.InitSingletonPredictionContext(nil, PredictionContextEMPTY_RETURN_STATE)
+	p.SingletonPredictionContext = NewSingletonPredictionContext(nil, PredictionContextEMPTY_RETURN_STATE)
 
 	return p
 }

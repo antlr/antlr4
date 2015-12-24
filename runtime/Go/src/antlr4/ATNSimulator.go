@@ -9,7 +9,7 @@ func NewATNSimulator(atn *ATN, sharedContextCache *PredictionContextCache) *ATNS
 
 	this := new(ATNSimulator)
 
-	this.InitATNSimulator(atn, sharedContextCache)
+	this.ATNSimulator = NewATNSimulator(atn, sharedContextCache)
 
 	return this
 }

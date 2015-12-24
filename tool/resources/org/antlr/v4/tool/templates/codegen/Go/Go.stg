@@ -663,7 +663,7 @@ func New<struct.name>(parser antlr4.IParser, parent antlr4.IParserRuleContext, i
 
     var p = new(<struct.name>)
 
-    p.InitParserRuleContext( parent, invokingState )
+    p.ParserRuleContext = NewParserRuleContext( parent, invokingState )
 
     p.parser = parser
     p.RuleIndex = <parser.name>RULE_<struct.derivedFromName>

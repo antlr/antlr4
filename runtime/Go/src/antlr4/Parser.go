@@ -49,7 +49,7 @@ func NewParser(input TokenStream) *Parser {
 
 func (p *Parser) InitParser(input TokenStream) {
 
-	p.InitRecognizer()
+	p.Recognizer = NewRecognizer()
 
 	// The input stream.
 	p._input = nil

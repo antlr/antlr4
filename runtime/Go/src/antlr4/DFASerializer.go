@@ -24,7 +24,7 @@ func NewDFASerializer(dfa *DFA, literalNames, symbolicNames []string) *DFASerial
 
 	this := new(DFASerializer)
 
-	this.InitDFASerializer(dfa, literalNames, symbolicNames)
+	this.DFASerializer = NewDFASerializer(dfa, literalNames, symbolicNames)
 
 	return this
 }
@@ -113,7 +113,7 @@ func NewLexerDFASerializer(dfa *DFA) *LexerDFASerializer {
 
 	this := new(LexerDFASerializer)
 
-	this.InitDFASerializer(dfa, nil, nil)
+	this.DFASerializer = NewDFASerializer(dfa, nil, nil)
 
 	return this
 }

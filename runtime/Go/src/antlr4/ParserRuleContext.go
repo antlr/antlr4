@@ -35,7 +35,7 @@ func NewParserRuleContext(parent IParserRuleContext, invokingStateNumber int) *P
 
 	prc := new(ParserRuleContext)
 
-	prc.InitParserRuleContext(parent, invokingStateNumber)
+	prc.ParserRuleContext = NewParserRuleContext(parent, invokingStateNumber)
 
 	return prc
 
@@ -43,7 +43,7 @@ func NewParserRuleContext(parent IParserRuleContext, invokingStateNumber int) *P
 
 func (prc *ParserRuleContext) InitParserRuleContext(parent IParserRuleContext, invokingStateNumber int) {
 
-	prc.InitRuleContext(parent, invokingStateNumber)
+	prc.RuleContext = NewRuleContext(parent, invokingStateNumber)
 
 	prc.RuleIndex = -1
 	// * If we are debugging or building a parse tree for a Visitor,
@@ -266,7 +266,7 @@ func NewInterpreterRuleContext(parent InterpreterRuleContext, invokingStateNumbe
 
 	prc := new(InterpreterRuleContext)
 
-	prc.InitParserRuleContext(parent, invokingStateNumber)
+	prc.ParserRuleContext = NewParserRuleContext(parent, invokingStateNumber)
 
 	prc.RuleIndex = ruleIndex
 

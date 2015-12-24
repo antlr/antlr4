@@ -36,7 +36,7 @@ func NewRecognitionException(message string, recognizer IRecognizer, input IntSt
 	// TODO may be able to use - "runtime" func Stack(buf []byte, all bool) int
 
 	t := new(RecognitionException)
-	t.InitRecognitionException(message, recognizer, input, ctx)
+	t.RecognitionException = NewRecognitionException(message, recognizer, input, ctx)
 
 	return t
 }
@@ -109,7 +109,7 @@ func NewLexerNoViableAltException(lexer ILexer, input CharStream, startIndex int
 
 	this := new(LexerNoViableAltException)
 
-	this.InitRecognitionException("", lexer, input, nil)
+	this.RecognitionException = NewRecognitionException("", lexer, input, nil)
 
 	this.startIndex = startIndex
 	this.deadEndConfigs = deadEndConfigs
@@ -158,7 +158,7 @@ func NewNoViableAltException(recognizer IParser, input TokenStream, startToken *
 	}
 
 	this := new(NoViableAltException)
-	this.InitRecognitionException("", recognizer, input, ctx)
+	this.RecognitionException = NewRecognitionException("", recognizer, input, ctx)
 
 	// Which configurations did we try at input.Index() that couldn't Match
 	// input.LT(1)?//
@@ -183,7 +183,7 @@ type InputMisMatchException struct {
 func NewInputMisMatchException(recognizer IParser) *InputMisMatchException {
 
 	this := new(InputMisMatchException)
-	this.InitRecognitionException("", recognizer, recognizer.GetInputStream(), recognizer.GetParserRuleContext())
+	this.RecognitionException = NewRecognitionException("", recognizer, recognizer.GetInputStream(), recognizer.GetParserRuleContext())
 
 	this.offendingToken = recognizer.getCurrentToken()
 
@@ -208,7 +208,7 @@ func NewFailedPredicateException(recognizer *Parser, predicate string, message s
 
 	this := new(FailedPredicateException)
 
-	this.InitRecognitionException(this.formatMessage(predicate, message), recognizer, recognizer.GetInputStream(), recognizer._ctx)
+	this.RecognitionException = NewRecognitionException(this.formatMessage(predicate, message), recognizer, recognizer.GetInputStream(), recognizer._ctx)
 
 	var s = recognizer.Interpreter.atn.states[recognizer.state]
 	var trans = s.GetTransitions()[0]

@@ -23,14 +23,14 @@ func NewParserATNSimulator(parser IParser, atn *ATN, decisionToDFA []*DFA, share
 
 	this := new(ParserATNSimulator)
 
-	this.InitParserATNSimulator(parser, atn, decisionToDFA, sharedContextCache)
+	this.ParserATNSimulator = NewParserATNSimulator(parser, atn, decisionToDFA, sharedContextCache)
 
 	return this
 }
 
 func (this *ParserATNSimulator) InitParserATNSimulator(parser IParser, atn *ATN, decisionToDFA []*DFA, sharedContextCache *PredictionContextCache) {
 
-	this.InitATNSimulator(atn, sharedContextCache)
+	this.ATNSimulator = NewATNSimulator(atn, sharedContextCache)
 
 	this.parser = parser
 	this.decisionToDFA = decisionToDFA

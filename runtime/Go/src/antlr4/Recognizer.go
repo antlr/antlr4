@@ -35,7 +35,7 @@ type Recognizer struct {
 
 func NewRecognizer() *Recognizer {
 	rec := new(Recognizer)
-	rec.InitRecognizer()
+	rec.Recognizer = NewRecognizer()
 	return rec
 }
 

@@ -56,7 +56,7 @@ type DefaultErrorStrategy struct {
 func NewDefaultErrorStrategy() *DefaultErrorStrategy {
 
 	d := new(DefaultErrorStrategy)
-	d.InitDefaultErrorStrategy()
+	d.DefaultErrorStrategy = NewDefaultErrorStrategy()
 	return d
 }
 
@@ -748,7 +748,7 @@ type BailErrorStrategy struct {
 func NewBailErrorStrategy() *BailErrorStrategy {
 
 	this := new(BailErrorStrategy)
-	this.InitDefaultErrorStrategy()
+	this.DefaultErrorStrategy = NewDefaultErrorStrategy()
 
 	return this
 }

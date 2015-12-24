@@ -378,7 +378,7 @@ type LexerIndexedCustomAction struct {
 func NewLexerIndexedCustomAction(offset int, lexerAction ILexerAction) *LexerIndexedCustomAction {
 
 	this := new(LexerIndexedCustomAction)
-	this.InitLexerAction(lexerAction.getActionType())
+	this.LexerAction = NewLexerAction(lexerAction.getActionType())
 
 	this.offset = offset
 	this.lexerAction = lexerAction

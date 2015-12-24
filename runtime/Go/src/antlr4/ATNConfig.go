@@ -199,7 +199,7 @@ func NewLexerATNConfig6(state IATNState, alt int, context IPredictionContext) *L
 
 	this := new(LexerATNConfig)
 
-	this.InitATNConfig2(state, alt, context, SemanticContextNONE)
+	this.ATNConfig = NewATNConfig(state, alt, context, SemanticContextNONE)
 
 	this.passedThroughNonGreedyDecision = false
 	this.lexerActionExecutor = nil
@@ -210,7 +210,7 @@ func NewLexerATNConfig5(state IATNState, alt int, context IPredictionContext, le
 
 	this := new(LexerATNConfig)
 
-	this.InitATNConfig2(state, alt, context, SemanticContextNONE)
+	this.ATNConfig = NewATNConfig(state, alt, context, SemanticContextNONE)
 	this.lexerActionExecutor = lexerActionExecutor
 	this.passedThroughNonGreedyDecision = false
 	return this
@@ -220,7 +220,7 @@ func NewLexerATNConfig4(c *LexerATNConfig, state IATNState) *LexerATNConfig {
 
 	this := new(LexerATNConfig)
 
-	this.InitATNConfig(c, state, c.GetContext(), c.GetSemanticContext())
+	this.ATNConfig = NewATNConfig(c, state, c.GetContext(), c.GetSemanticContext())
 	this.lexerActionExecutor = c.lexerActionExecutor
 	this.passedThroughNonGreedyDecision = checkNonGreedyDecision(c, state)
 	return this
@@ -230,7 +230,7 @@ func NewLexerATNConfig3(c *LexerATNConfig, state IATNState, lexerActionExecutor 
 
 	this := new(LexerATNConfig)
 
-	this.InitATNConfig(c, state, c.GetContext(), c.GetSemanticContext())
+	this.ATNConfig = NewATNConfig(c, state, c.GetContext(), c.GetSemanticContext())
 	this.lexerActionExecutor = lexerActionExecutor
 	this.passedThroughNonGreedyDecision = checkNonGreedyDecision(c, state)
 	return this
@@ -240,7 +240,7 @@ func NewLexerATNConfig2(c *LexerATNConfig, state IATNState, context IPredictionC
 
 	this := new(LexerATNConfig)
 
-	this.InitATNConfig(c, state, context, c.GetSemanticContext())
+	this.ATNConfig = NewATNConfig(c, state, context, c.GetSemanticContext())
 	this.lexerActionExecutor = c.lexerActionExecutor
 	this.passedThroughNonGreedyDecision = checkNonGreedyDecision(c, state)
 	return this
@@ -251,7 +251,7 @@ func NewLexerATNConfig1(state IATNState, alt int, context IPredictionContext) *L
 	this := new(LexerATNConfig)
 
 	// c IATNConfig , state IATNState, context IPredictionContext, semanticContext  SemanticContext
-	this.InitATNConfig2(state, alt, context, SemanticContextNONE)
+	this.ATNConfig = NewATNConfig(state, alt, context, SemanticContextNONE)
 
 	this.lexerActionExecutor = nil
 	this.passedThroughNonGreedyDecision = false

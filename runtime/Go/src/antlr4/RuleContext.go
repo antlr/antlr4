@@ -49,7 +49,7 @@ func NewRuleContext(parent IRuleContext, invokingState int) *RuleContext {
 
 	rn := new(RuleContext)
 
-	rn.InitRuleContext(parent, invokingState)
+	rn.RuleContext = NewRuleContext(parent, invokingState)
 
 	return rn
 }
