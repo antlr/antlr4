@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"unicode/utf16"
 )
 
 // This is the earliest supported serialized UUID.
@@ -20,19 +21,20 @@ var SERIALIZED_VERSION = 3
 // This is the current serialized UUID.
 var SERIALIZED_UUID = BASE_SERIALIZED_UUID
 
-func initIntArray(length, value int) []int {
-	var tmp = make([]int, length)
 
-	for i := range tmp {
-		tmp[i] = value
-	}
+type LoopEndStateIntPair struct {
+	item0 *LoopEndState
+	item1 int
+}
 
-	return tmp
+type BlockStartStateIntPair struct {
+	item0 IBlockStartState
+	item1 int
 }
 
 type ATNDeserializer struct {
 	deserializationOptions *ATNDeserializationOptions
-	data                   []uint16
+	data                   []rune
 	pos                    int
 	uuid                   string
 }
@@ -50,6 +52,15 @@ func NewATNDeserializer(options *ATNDeserializationOptions) *ATNDeserializer {
 	return this
 }
 
+func stringInSlice(a string, list []string) int {
+	for i, b := range list {
+		if b == a {
+			return i
+		}
+	}
+	return -1
+}
+
 // Determines if a particular serialized representation of an ATN supports
 // a particular feature, identified by the {@link UUID} used for serializing
 // the ATN at the time the feature was first introduced.
@@ -62,15 +73,6 @@ func NewATNDeserializer(options *ATNDeserializationOptions) *ATNDeserializer {
 // serialized ATN at or after the feature identified by {@code feature} was
 // introduced otherwise, {@code false}.
 
-func stringInSlice(a string, list []string) int {
-	for i, b := range list {
-		if b == a {
-			return i
-		}
-	}
-	return -1
-}
-
 func (this *ATNDeserializer) isFeatureSupported(feature, actualUuid string) bool {
 	var idx1 = stringInSlice(feature, SUPPORTED_UUIDS)
 	if idx1 < 0 {
@@ -82,7 +84,7 @@ func (this *ATNDeserializer) isFeatureSupported(feature, actualUuid string) bool
 
 func (this *ATNDeserializer) DeserializeFromUInt16(data []uint16) *ATN {
 
-	this.reset(data)
+	this.reset( utf16.Decode(data) )
 	this.checkVersion()
 	this.checkUUID()
 	var atn = this.readATN()
@@ -104,9 +106,9 @@ func (this *ATNDeserializer) DeserializeFromUInt16(data []uint16) *ATN {
 
 }
 
-func (this *ATNDeserializer) reset(data []uint16) {
+func (this *ATNDeserializer) reset(data []rune) {
 
-	temp := make([]uint16, len(data))
+	temp := make([]rune, len(data))
 
 	for i, c := range data {
 		// don't adjust the first value since that's the version number
@@ -142,22 +144,13 @@ func (this *ATNDeserializer) readATN() *ATN {
 	return NewATN(grammarType, maxTokenType)
 }
 
-type LoopEndStateIntPair struct {
-	item0 *LoopEndState
-	item1 int
-}
-
-type BlockStartStateIntPair struct {
-	item0 *BlockStartState
-	item1 int
-}
-
 func (this *ATNDeserializer) readStates(atn *ATN) {
 
 	var loopBackStateNumbers = make([]LoopEndStateIntPair, 0)
 	var endStateNumbers = make([]BlockStartStateIntPair, 0)
 
 	var nstates = this.readInt()
+
 	for i := 0; i < nstates; i++ {
 		var stype = this.readInt()
 		// ignore bad type of states
@@ -170,12 +163,12 @@ func (this *ATNDeserializer) readStates(atn *ATN) {
 			ruleIndex = -1
 		}
 		var s = this.stateFactory(stype, ruleIndex)
-		if stype == ATNStateLOOP_END { // special case
+		if stype == ATNStateLOOP_END {
 			var loopBackStateNumber = this.readInt()
 			loopBackStateNumbers = append(loopBackStateNumbers, LoopEndStateIntPair{s.(*LoopEndState), loopBackStateNumber})
-		} else if _, ok := s.(*BlockStartState); ok {
+		} else if s2, ok := s.(IBlockStartState); ok {
 			var endStateNumber = this.readInt()
-			endStateNumbers = append(endStateNumbers, BlockStartStateIntPair{s.(*BlockStartState), endStateNumber})
+			endStateNumbers = append(endStateNumbers, BlockStartStateIntPair{s2, endStateNumber})
 		}
 		atn.addState(s)
 	}
@@ -188,13 +181,13 @@ func (this *ATNDeserializer) readStates(atn *ATN) {
 
 	for j := 0; j < len(endStateNumbers); j++ {
 		pair := endStateNumbers[j]
-		pair.item0.endState = atn.states[pair.item1].(*BlockEndState)
+		pair.item0.setEndState(atn.states[pair.item1].(*BlockEndState))
 	}
 
 	var numNonGreedyStates = this.readInt()
 	for j := 0; j < numNonGreedyStates; j++ {
 		stateNumber := this.readInt()
-		atn.states[stateNumber].(*DecisionState).nonGreedy = true
+		atn.states[stateNumber].(IDecisionState).setNonGreedy( true )
 	}
 
 	var numPrecedenceStates = this.readInt()
@@ -331,9 +324,9 @@ func (this *ATNDeserializer) readDecisions(atn *ATN) {
 	var ndecisions = this.readInt()
 	for i := 0; i < ndecisions; i++ {
 		var s = this.readInt()
-		var decState = atn.states[s].(*DecisionState)
+		var decState = atn.states[s].(IDecisionState)
 		atn.DecisionToState = append(atn.DecisionToState, decState)
-		decState.decision = i
+		decState.setDecision( i )
 	}
 }
 
@@ -535,8 +528,8 @@ func (this *ATNDeserializer) verifyATN(atn *ATN) {
 			this.checkCondition(s2.endState != nil, "")
 		case *BlockEndState:
 			this.checkCondition(s2.startState != nil, "")
-		case *DecisionState:
-			this.checkCondition(len(s2.GetTransitions()) <= 1 || s2.decision >= 0, "")
+		case IDecisionState:
+			this.checkCondition(len(s2.GetTransitions()) <= 1 || s2.getDecision() >= 0, "")
 		default:
 			_, ok := s2.(*RuleStopState)
 			this.checkCondition(len(s2.GetTransitions()) <= 1 || ok, "")
@@ -557,12 +550,6 @@ func (this *ATNDeserializer) readInt() int {
 	v := this.data[this.pos]
 	this.pos += 1
 	return int(v)
-}
-
-func (this *ATNDeserializer) readInt32() int {
-	var low = this.readInt()
-	var high = this.readInt()
-	return low | (high << 16)
 }
 
 //func (this *ATNDeserializer) readLong() int64 {

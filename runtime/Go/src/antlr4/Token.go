@@ -88,6 +88,8 @@ func NewCommonToken(source *TokenSourceCharStreamPair, tokenType, channel, start
 
 	t := new(CommonToken)
 
+	t.Token = new(Token)
+
 	t.source = source
 	t.tokenType = -1
 	t.channel = channel

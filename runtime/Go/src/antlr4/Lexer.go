@@ -39,7 +39,7 @@ type Lexer struct {
 	_type                   int
 	_modeStack              IntStack
 	_mode                   int
-	_text                   *string
+	_text                   string
 	actionType              int
 }
 
@@ -91,7 +91,7 @@ func NewLexer(input CharStream) *Lexer {
 	// You can set the text for the current token to override what is in
 	// the input char buffer. Use setText() or can set l instance var.
 	// /
-	lexer._text = nil
+	lexer._text = ""
 
 	return lexer
 }
@@ -120,7 +120,7 @@ func (l *Lexer) reset() {
 	l._tokenStartCharIndex = -1
 	l._tokenStartColumn = -1
 	l._tokenStartLine = -1
-	l._text = nil
+	l._text = ""
 
 	l._hitEOF = false
 	l._mode = LexerDefaultMode
@@ -191,7 +191,7 @@ func (l *Lexer) nextToken() *Token {
 		l._tokenStartCharIndex = l._input.Index()
 		l._tokenStartColumn = l.Interpreter.column
 		l._tokenStartLine = l.Interpreter.line
-		l._text = nil
+		l._text = ""
 		var continueOuter = false
 		for true {
 			l._type = TokenInvalidType
@@ -291,7 +291,7 @@ func (l *Lexer) emitToken(token *Token) {
 // custom Token objects or provide a Newfactory.
 // /
 func (l *Lexer) emit() *Token {
-	var t = l._factory.Create(l._tokenFactorySourcePair, l._type, *l._text, l._channel, l._tokenStartCharIndex, l.getCharIndex()-1, l._tokenStartLine, l._tokenStartColumn)
+	var t = l._factory.Create(l._tokenFactorySourcePair, l._type, l._text, l._channel, l._tokenStartCharIndex, l.getCharIndex()-1, l._tokenStartLine, l._tokenStartColumn)
 	l.emitToken(t)
 	return t
 }
@@ -328,15 +328,15 @@ func (l *Lexer) getCharIndex() int {
 // Return the text Matched so far for the current token or any text override.
 //Set the complete text of l token it wipes any previous changes to the text.
 func (l *Lexer) text() string {
-	if l._text != nil {
-		return *l._text
+	if l._text != "" {
+		return l._text
 	} else {
 		return l.Interpreter.GetText(l._input)
 	}
 }
 
 func (l *Lexer) setText(text string) {
-	*l._text = text
+	l._text = text
 }
 
 func (this *Lexer) GetATN() *ATN {

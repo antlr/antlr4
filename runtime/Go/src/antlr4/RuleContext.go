@@ -73,7 +73,7 @@ func (this *RuleContext) setParent(v Tree) {
 }
 
 func (this *RuleContext) getInvokingState() int {
-	return this.getInvokingState()
+	return this.invokingState
 }
 
 func (this *RuleContext) setInvokingState(t int) {

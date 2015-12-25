@@ -3,7 +3,7 @@ package antlr4
 var ATNINVALID_ALT_NUMBER = 0
 
 type ATN struct {
-	DecisionToState      []*DecisionState
+	DecisionToState      []IDecisionState
 	grammarType          int
 	maxTokenType         int
 	states               []IATNState
@@ -28,7 +28,7 @@ func NewATN(grammarType int, maxTokenType int) *ATN {
 	// Each subrule/rule is a decision point and we must track them so we
 	//  can go back later and build DFA predictors for them.  This includes
 	//  all the rules, subrules, optional blocks, ()+, ()* etc...
-	atn.DecisionToState = make([]*DecisionState, 0)
+	atn.DecisionToState = make([]IDecisionState, 0)
 	// Maps from rule index to starting state number.
 	atn.ruleToStartState = make([]*RuleStartState, 0)
 	// Maps from rule index to stop state number.
@@ -90,13 +90,13 @@ func (this *ATN) removeState(state IATNState) {
 	this.states[state.GetStateNumber()] = nil // just free mem, don't shift states in list
 }
 
-func (this *ATN) defineDecisionState(s *DecisionState) int {
+func (this *ATN) defineDecisionState(s IDecisionState) int {
 	this.DecisionToState = append(this.DecisionToState, s)
-	s.decision = len(this.DecisionToState) - 1
-	return s.decision
+	s.setDecision( len(this.DecisionToState) - 1 )
+	return s.getDecision()
 }
 
-func (this *ATN) getDecisionState(decision int) *DecisionState {
+func (this *ATN) getDecisionState(decision int) IDecisionState {
 	if len(this.DecisionToState) == 0 {
 		return nil
 	} else {

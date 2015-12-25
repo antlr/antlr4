@@ -1,14 +1,14 @@
 package antlr4
 
 type DFA struct {
-	atnStartState *DecisionState
+	atnStartState IDecisionState
 	decision      int
 	_states       map[string]*DFAState
 	s0            *DFAState
 	precedenceDfa bool
 }
 
-func NewDFA(atnStartState *DecisionState, decision int) *DFA {
+func NewDFA(atnStartState IDecisionState, decision int) *DFA {
 
 	this := new(DFA)
 

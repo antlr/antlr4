@@ -297,6 +297,10 @@ func NewArrayPredictionContext(parents []IPredictionContext, returnStates []int)
 	return c
 }
 
+func (c *ArrayPredictionContext) GetReturnStates() []int {
+	return c.returnStates
+}
+
 func (this *ArrayPredictionContext) isEmpty() bool {
 	// since EMPTY_RETURN_STATE can only appear in the last position, we
 	// don't need to verify that size==1
@@ -729,74 +733,71 @@ func combineCommonParents(parents []IPredictionContext) {
 	}
 }
 
-func getCachedPredictionContext(context IPredictionContext, contextCache *PredictionContextCache, Visited map[IPredictionContext]IPredictionContext) IPredictionContext {
+func getCachedPredictionContext(context IPredictionContext, contextCache *PredictionContextCache, visited map[IPredictionContext]IPredictionContext) IPredictionContext {
 
-	panic("getCachedPredictionContext not implemented")
+	if (context.isEmpty()) {
+		return context
+	}
+	var existing = visited[context]
+	if (existing != nil) {
+		return existing
+	}
+	existing = contextCache.Get(context)
+	if (existing != nil) {
+		visited[context] = existing
+		return existing
+	}
+	var changed = false
+	var parents = make([]IPredictionContext, context.length())
+	for i := 0; i < len(parents); i++ {
+		var parent = getCachedPredictionContext(context.GetParent(i), contextCache, visited)
+		if (changed || parent != context.GetParent(i)) {
+			if (!changed) {
+				parents = make([]IPredictionContext, context.length())
+				for j := 0; j < context.length(); j++ {
+					parents[j] = context.GetParent(j)
+				}
+				changed = true
+			}
+			parents[i] = parent
+		}
+	}
+	if (!changed) {
+		contextCache.add(context)
+		visited[context] = context
+		return context
+	}
+	var updated IPredictionContext = nil
+	if (len(parents) == 0) {
+		updated = PredictionContextEMPTY
+	} else if (len(parents) == 1) {
+		updated = SingletonPredictionContextCreate(parents[0], context.getReturnState(0))
+	} else {
+		updated = NewArrayPredictionContext(parents, context.(*ArrayPredictionContext).GetReturnStates())
+	}
+	contextCache.add(updated)
+	visited[updated] = updated
+	visited[context] = updated
 
-	return nil
-	//	if (context.isEmpty()) {
-	//		return context
-	//	}
-	//	var existing = Visited[context] || nil
-	//	if (existing != nil) {
-	//		return existing
-	//	}
-	//	existing = contextCache.Get(context)
-	//	if (existing != nil) {
-	//		Visited[context] = existing
-	//		return existing
-	//	}
-	//	var changed = false
-	//	var parents = []
-	//	for i := 0; i < len(parents); i++ {
-	//		var parent = getCachedPredictionContext(context.GetParent(i), contextCache, Visited)
-	//		if (changed || parent != context.GetParent(i)) {
-	//			if (!changed) {
-	//				parents = []
-	//				for j := 0; j < len(context); j++ {
-	//					parents[j] = context.GetParent(j)
-	//				}
-	//				changed = true
-	//			}
-	//			parents[i] = parent
-	//		}
-	//	}
-	//	if (!changed) {
-	//		contextCache.add(context)
-	//		Visited[context] = context
-	//		return context
-	//	}
-	//	var updated = nil
-	//	if (parents.length == 0) {
-	//		updated = PredictionContextEMPTY
-	//	} else if (parents.length == 1) {
-	//		updated = SingletonPredictionContext.Create(parents[0], context.getReturnState(0))
-	//	} else {
-	//		updated = NewArrayPredictionContext(parents, context.returnStates)
-	//	}
-	//	contextCache.add(updated)
-	//	Visited[updated] = updated
-	//	Visited[context] = updated
-	//
-	//	return updated
+	return updated
 }
 
 // ter's recursive version of Sam's getAllNodes()
-//func getAllContextNodes(context, nodes, Visited) {
+//func getAllContextNodes(context, nodes, visited) {
 //	if (nodes == nil) {
 //		nodes = []
-//		return getAllContextNodes(context, nodes, Visited)
-//	} else if (Visited == nil) {
-//		Visited = {}
-//		return getAllContextNodes(context, nodes, Visited)
+//		return getAllContextNodes(context, nodes, visited)
+//	} else if (visited == nil) {
+//		visited = {}
+//		return getAllContextNodes(context, nodes, visited)
 //	} else {
-//		if (context == nil || Visited[context] != nil) {
+//		if (context == nil || visited[context] != nil) {
 //			return nodes
 //		}
-//		Visited[context] = context
+//		visited[context] = context
 //		nodes.push(context)
 //		for i := 0; i < len(context); i++ {
-//			getAllContextNodes(context.GetParent(i), nodes, Visited)
+//			getAllContextNodes(context.GetParent(i), nodes, visited)
 //		}
 //		return nodes
 //	}

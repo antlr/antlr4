@@ -231,16 +231,28 @@ func (p *Parser) addParseListener(listener ParseTreeListener) {
 // @param listener the listener to remove
 //
 func (p *Parser) removeParseListener(listener ParseTreeListener) {
-	panic("Not implemented!")
-	//	if (p._parseListeners != nil) {
-	//		var idx = p._parseListeners.indexOf(listener)
-	//		if (idx >= 0) {
-	//			p._parseListeners.splice(idx, 1)
-	//		}
-	//		if (len(p._parseListeners) == 0) {
-	//			p._parseListeners = nil
-	//		}
-	//	}
+
+	if (p._parseListeners != nil) {
+
+		idx := -1
+		for i,v := range p._parseListeners {
+			if v == listener {
+				idx = i
+				break;
+			}
+		}
+
+		if (idx == -1){
+			return
+		}
+
+		// remove the listener from the slice
+		p._parseListeners = append( p._parseListeners[0:idx], p._parseListeners[idx+1:]... )
+
+		if (len(p._parseListeners) == 0) {
+			p._parseListeners = nil
+		}
+	}
 }
 
 // Remove all parse listeners.
@@ -443,7 +455,11 @@ func (p *Parser) ExitRule() {
 		p.TriggerExitRuleEvent()
 	}
 	p.state = p._ctx.getInvokingState()
-	p._ctx = p._ctx.GetParent().(IParserRuleContext)
+	if (p._ctx.GetParent() != nil){
+		p._ctx = p._ctx.GetParent().(IParserRuleContext)
+	} else {
+		p._ctx = nil
+	}
 }
 
 func (p *Parser) EnterOuterAlt(localctx IParserRuleContext, altNum int) {

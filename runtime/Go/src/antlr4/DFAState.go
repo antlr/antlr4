@@ -149,16 +149,14 @@ func (this *DFAState) toString() string {
 
 func (this *DFAState) hashString() string {
 
-	panic("Not implementd")
-	//	var s string
-	//	if (this.acceptState){
-	//
-	//	}
-	//
-	//	return "" +  this.configs +
-	//			(this.isAcceptState ?
-	//					"=>" + (this.predicates != nil ?
-	//								this.predicates :
-	//								this.prediction) :
-	//					"")
+	var s string
+	if (this.isAcceptState) {
+		if (this.predicates == nil) {
+			s = "=>" + fmt.Sprint(this.predicates)
+		} else {
+			s = "=>" + fmt.Sprint(this.prediction)
+		}
+	}
+
+	return fmt.Sprint(this.configs) + s
 }

@@ -53,14 +53,9 @@ public class GoTarget extends Target {
 		badWords.add("parserRule");
 	}
 
-	private final static String ZEROES = "0000";
-
 	@Override
 	public String encodeIntAsCharEscape(int v) {
-		// we encode as uint16 in hex format
-		String s = Integer.toString(v, 16);
-		String intAsString = s.length() <= 4 ? ZEROES.substring(s.length()) + s : s;
-		return "0x" + intAsString + ",";
+		return Integer.toString(v) + ",";
 	}
 
 	@Override

@@ -3,7 +3,7 @@ package antlr4
 import "strconv"
 
 const (
-	// constants for serialization
+// constants for serialization
 	ATNStateInvalidType      = 0
 	ATNStateBASIC            = 1
 	ATNStateRULE_START       = 2
@@ -182,6 +182,18 @@ func NewBasicState() *BasicState {
 	return this
 }
 
+type IDecisionState interface {
+
+	IATNState
+
+	getDecision() int
+	setDecision(int)
+
+	getNonGreedy() bool
+	setNonGreedy(bool)
+
+}
+
 type DecisionState struct {
 	*ATNState
 
@@ -201,6 +213,31 @@ func NewDecisionState() *DecisionState {
 	return this
 }
 
+func (s *DecisionState) getDecision() int {
+	return s.decision
+}
+
+func (s *DecisionState) setDecision(b int) {
+	s.decision = b
+}
+
+func (s *DecisionState) getNonGreedy() bool {
+	return s.nonGreedy
+}
+
+func (s *DecisionState) setNonGreedy(b bool) {
+	s.nonGreedy = b
+}
+
+type IBlockStartState interface {
+
+	IDecisionState
+
+	getEndState() *BlockEndState
+	setEndState(*BlockEndState)
+
+}
+
 //  The start of a regular {@code (...)} block.
 type BlockStartState struct {
 	*DecisionState
@@ -218,6 +255,14 @@ func NewBlockStartState() *BlockStartState {
 	return this
 }
 
+func (s *BlockStartState) getEndState() *BlockEndState {
+	return s.endState
+}
+
+func (s *BlockStartState) setEndState(b *BlockEndState) {
+	s.endState = b
+}
+
 type BasicBlockStartState struct {
 	*BlockStartState
 }
@@ -231,6 +276,7 @@ func NewBasicBlockStartState() *BasicBlockStartState {
 	this.stateType = ATNStateBLOCK_START
 	return this
 }
+
 
 // Terminal node of a simple {@code (a|b|c)} block.
 type BlockEndState struct {
@@ -290,14 +336,14 @@ func NewRuleStartState() *RuleStartState {
 //  one to the loop back to start of the block and one to exit.
 //
 type PlusLoopbackState struct {
-	*BlockStartState
+	*DecisionState
 }
 
 func NewPlusLoopbackState() *PlusLoopbackState {
 
 	this := new(PlusLoopbackState)
 
-	this.BlockStartState = NewBlockStartState()
+	this.DecisionState = NewDecisionState()
 
 	this.stateType = ATNStatePLUS_LOOP_BACK
 	return this

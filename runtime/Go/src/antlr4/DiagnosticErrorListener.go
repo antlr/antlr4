@@ -70,7 +70,7 @@ func (this *DiagnosticErrorListener) ReportContextSensitivity(recognizer *Parser
 
 func (this *DiagnosticErrorListener) getDecisionDescription(recognizer *Parser, dfa *DFA) string {
 	var decision = dfa.decision
-	var ruleIndex = dfa.atnStartState.ruleIndex
+	var ruleIndex = dfa.atnStartState.GetRuleIndex()
 
 	var ruleNames = recognizer.GetRuleNames()
 	if ruleIndex < 0 || ruleIndex >= len(ruleNames) {

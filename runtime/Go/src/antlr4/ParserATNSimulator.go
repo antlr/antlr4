@@ -47,10 +47,10 @@ func NewParserATNSimulator(parser IParser, atn *ATN, decisionToDFA []*DFA, share
 	return this
 }
 
-var ParserATNSimulatorprototypedebug = false
-var ParserATNSimulatorprototypedebug_list_atn_decisions = false
-var ParserATNSimulatorprototypedfa_debug = false
-var ParserATNSimulatorprototyperetry_debug = false
+var ParserATNSimulatorprototypedebug = true
+var ParserATNSimulatorprototypedebug_list_atn_decisions = true
+var ParserATNSimulatorprototypedfa_debug = true
+var ParserATNSimulatorprototyperetry_debug = true
 
 func (this *ParserATNSimulator) reset() {
 }
@@ -344,7 +344,7 @@ func (this *ParserATNSimulator) computeTargetState(dfa *DFA, previousD *DFAState
 	return D
 }
 
-func (this *ParserATNSimulator) predicateDFAState(dfaState *DFAState, decisionState *DecisionState) {
+func (this *ParserATNSimulator) predicateDFAState(dfaState *DFAState, decisionState IDecisionState) {
 	// We need to test all predicates, even in DFA states that
 	// uniquely predict alternative.
 	var nalts = len(decisionState.GetTransitions())
@@ -655,7 +655,7 @@ func (this *ParserATNSimulator) computeStartState(p IATNState, ctx IRuleContext,
 	var configs = NewATNConfigSet(fullCtx)
 	for i := 0; i < len(p.GetTransitions()); i++ {
 		var target = p.GetTransitions()[i].getTarget()
-		var c = NewATNConfig5(target, i+1, initialContext, nil)
+		var c = NewATNConfig6(target, i+1, initialContext)
 		var closureBusy = NewSet(nil, nil)
 		this.closure(c, configs, closureBusy, true, fullCtx, false)
 	}
@@ -1284,6 +1284,10 @@ func (this *ParserATNSimulator) getConflictingAltsOrUniqueAlt(configs *ATNConfig
 }
 
 func (this *ParserATNSimulator) GetTokenName(t int) string {
+
+	fmt.Println(t)
+	fmt.Println(this.parser.GetLiteralNames())
+
 	if t == TokenEOF {
 		return "EOF"
 	}

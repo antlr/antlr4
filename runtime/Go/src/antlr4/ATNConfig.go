@@ -57,7 +57,15 @@ func NewATNConfig6(state IATNState, alt int, context IPredictionContext) *ATNCon
 func NewATNConfig5(state IATNState, alt int, context IPredictionContext, semanticContext SemanticContext) *ATNConfig {
 	a := new(ATNConfig)
 
-	a.InitATNConfig2(state, alt, context, semanticContext)
+	if (semanticContext == nil){
+		panic("SemanticContext cannot be null!")
+	}
+
+	a.state = state
+	a.alt = alt
+	a.context = context
+	a.semanticContext = semanticContext
+
 	return a
 }
 
@@ -80,7 +88,16 @@ func NewATNConfig1(c IATNConfig, state IATNState, context IPredictionContext) *A
 func NewATNConfig(c IATNConfig, state IATNState, context IPredictionContext, semanticContext SemanticContext) *ATNConfig {
 	a := new(ATNConfig)
 
-	a.InitATNConfig(c, state, context, semanticContext)
+	if (semanticContext == nil){
+		panic("SemanticContext cannot be null!")
+	}
+
+	a.state = state
+	a.alt = c.GetAlt()
+	a.context = context
+	a.semanticContext = semanticContext
+	a.reachesIntoOuterContext = c.GetReachesIntoOuterContext()
+
 	return a
 }
 
@@ -117,25 +134,6 @@ func (this *ATNConfig) GetReachesIntoOuterContext() int {
 
 func (this *ATNConfig) SetReachesIntoOuterContext(v int) {
 	this.reachesIntoOuterContext = v
-}
-
-func (a *ATNConfig) InitATNConfig(c IATNConfig, state IATNState, context IPredictionContext, semanticContext SemanticContext) {
-
-	a.state = state
-	a.alt = c.GetAlt()
-	a.context = context
-	a.semanticContext = semanticContext
-	a.reachesIntoOuterContext = c.GetReachesIntoOuterContext()
-
-}
-
-func (a *ATNConfig) InitATNConfig2(state IATNState, alt int, context IPredictionContext, semanticContext SemanticContext) {
-
-	a.state = state
-	a.alt = alt
-	a.context = context
-	a.semanticContext = semanticContext
-
 }
 
 // An ATN configuration is equal to another if both have
@@ -299,6 +297,6 @@ func (this *LexerATNConfig) equals(other interface{}) bool {
 }
 
 func checkNonGreedyDecision(source *LexerATNConfig, target IATNState) bool {
-	ds, ok := target.(*DecisionState)
-	return source.passedThroughNonGreedyDecision || (ok && ds.nonGreedy)
+	ds, ok := target.(IDecisionState)
+	return source.passedThroughNonGreedyDecision || (ok && ds.getNonGreedy())
 }
