@@ -1285,16 +1285,13 @@ func (this *ParserATNSimulator) getConflictingAltsOrUniqueAlt(configs *ATNConfig
 
 func (this *ParserATNSimulator) GetTokenName(t int) string {
 
-	fmt.Println(t)
-	fmt.Println(this.parser.GetLiteralNames())
-
 	if t == TokenEOF {
 		return "EOF"
 	}
 	if this.parser != nil && this.parser.GetLiteralNames() != nil {
 		if t >= len(this.parser.GetLiteralNames()) {
 			fmt.Println(strconv.Itoa(t) + " ttype out of range: " + strings.Join(this.parser.GetLiteralNames(), ","))
-			//            fmt.Println(this.parser.GetInputStream().GetTokens())
+			fmt.Println(this.parser.GetInputStream().(TokenStream).GetAllText())
 		} else {
 			return this.parser.GetLiteralNames()[t] + "<" + strconv.Itoa(t) + ">"
 		}

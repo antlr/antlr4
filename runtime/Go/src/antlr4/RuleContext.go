@@ -186,7 +186,12 @@ func (this *RuleContext) toString(ruleNames []string, stop IRuleContext) string 
 		if p.GetParent() != nil && (ruleNames != nil || !p.GetParent().(IRuleContext).isEmpty()) {
 			s += " "
 		}
-		p = p.GetParent().(IRuleContext)
+		pi := p.GetParent()
+		if (pi != nil){
+			p = pi.(IRuleContext)
+		} else {
+			p = nil
+		}
 	}
 	s += "]"
 	return s

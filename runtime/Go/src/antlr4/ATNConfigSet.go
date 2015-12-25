@@ -243,13 +243,15 @@ func (this *ATNConfigSet) setReadonly(readOnly bool) {
 }
 
 func (this *ATNConfigSet) toString() string {
-	panic("not implemented")
 	return ""
-	//	return Utils.arrayToString(this.configs) +
-	//		(this.hasSemanticContext ? ",hasSemanticContext=" + this.hasSemanticContext : "") +
-	//		(this.uniqueAlt != ATN.INVALID_ALT_NUMBER ? ",uniqueAlt=" + this.uniqueAlt : "") +
-	//		(this.conflictingAlts != nil ? ",conflictingAlts=" + this.conflictingAlts : "") +
-	//		(this.dipsIntoOuterContext ? ",dipsIntoOuterContext" : "")
+
+
+
+	return Utils.arrayToString(this.configs) +
+		(this.hasSemanticContext ? ",hasSemanticContext=" + this.hasSemanticContext : "") +
+		(this.uniqueAlt != ATN.INVALID_ALT_NUMBER ? ",uniqueAlt=" + this.uniqueAlt : "") +
+		(this.conflictingAlts != nil ? ",conflictingAlts=" + this.conflictingAlts : "") +
+		(this.dipsIntoOuterContext ? ",dipsIntoOuterContext" : "")
 }
 
 type OrderedATNConfigSet struct {
