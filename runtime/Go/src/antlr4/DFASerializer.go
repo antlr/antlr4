@@ -31,7 +31,7 @@ func NewDFASerializer(dfa *DFA, literalNames, symbolicNames []string) *DFASerial
 	return this
 }
 
-func (this *DFASerializer) toString() string {
+func (this *DFASerializer) String() string {
 
 	if this.dfa.s0 == nil {
 		return ""

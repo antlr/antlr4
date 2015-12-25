@@ -45,7 +45,7 @@ func (this *DiagnosticErrorListener) ReportAmbiguity(recognizer *Parser, dfa *DF
 	var msg = "ReportAmbiguity d=" +
 		this.getDecisionDescription(recognizer, dfa) +
 		": ambigAlts=" +
-		this.getConflictingAlts(ambigAlts, configs).toString() +
+		this.getConflictingAlts(ambigAlts, configs).String() +
 		", input='" +
 		recognizer.GetTokenStream().GetTextFromInterval(NewInterval(startIndex, stopIndex)) + "'"
 	recognizer.notifyErrorListeners(msg, nil, nil)

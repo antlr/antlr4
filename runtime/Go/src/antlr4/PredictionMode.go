@@ -495,7 +495,7 @@ func PredictionModegetConflictingAltSubsets(configs *ATNConfigSet) []*BitSet {
 
 	for i := 0; i < len(configs.configs); i++ {
 		var c = configs.configs[i]
-		var key = "key_" + strconv.Itoa(c.GetState().GetStateNumber()) + "/" + c.GetContext().toString()
+		var key = "key_" + strconv.Itoa(c.GetState().GetStateNumber()) + "/" + c.GetContext().String()
 		var alts = configToAlts[key]
 		if alts == nil {
 			alts = NewBitSet()
@@ -527,10 +527,10 @@ func PredictionModeGetStateToAltMap(configs *ATNConfigSet) *AltDict {
 	var m = NewAltDict()
 
 	for _, c := range configs.configs {
-		var alts = m.Get(c.GetState().toString())
+		var alts = m.Get(c.GetState().String())
 		if alts == nil {
 			alts = NewBitSet()
-			m.put(c.GetState().toString(), alts)
+			m.put(c.GetState().String(), alts)
 		}
 		alts.(*BitSet).add(c.GetAlt())
 	}

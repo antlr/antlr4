@@ -35,7 +35,7 @@ type IRuleContext interface {
 
 	isEmpty() bool
 
-	toString([]string, IRuleContext) string
+	String([]string, IRuleContext) string
 }
 
 type RuleContext struct {
@@ -160,11 +160,11 @@ func (this *RuleContext) accept(Visitor ParseTreeVisitor) interface{} {
 // (root child1 .. childN). Print just a node if this is a leaf.
 //
 
-func (this *RuleContext) toStringTree(ruleNames []string, recog IRecognizer) string {
-	return TreestoStringTree(this, ruleNames, recog)
+func (this *RuleContext) StringTree(ruleNames []string, recog IRecognizer) string {
+	return TreesStringTree(this, ruleNames, recog)
 }
 
-func (this *RuleContext) toString(ruleNames []string, stop IRuleContext) string {
+func (this *RuleContext) String(ruleNames []string, stop IRuleContext) string {
 
 	var p IRuleContext = this
 	var s = "["

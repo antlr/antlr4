@@ -90,7 +90,7 @@ func (this *RecognitionException) getExpectedTokens() *IntervalSet {
 	}
 }
 
-func (this *RecognitionException) toString() string {
+func (this *RecognitionException) String() string {
 	return this.message
 }
 
@@ -113,7 +113,7 @@ func NewLexerNoViableAltException(lexer ILexer, input CharStream, startIndex int
 	return this
 }
 
-func (this *LexerNoViableAltException) toString() string {
+func (this *LexerNoViableAltException) String() string {
 	var symbol = ""
 	if this.startIndex >= 0 && this.startIndex < this.input.Size() {
 		symbol = this.input.(CharStream).GetTextFromInterval(NewInterval(this.startIndex, this.startIndex))

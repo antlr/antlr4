@@ -89,6 +89,6 @@ func (is *InputStream) GetTextFromInterval(i *Interval) string {
 	return is.GetText(i.start, i.stop)
 }
 
-func (is *InputStream) toString() string {
+func (is *InputStream) String() string {
 	return string(is.data)
 }

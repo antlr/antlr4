@@ -44,7 +44,7 @@ func (s *IntStack) Push(e int) {
 	*s = append(*s, e)
 }
 
-func arrayToString(a []interface{}) string {
+func arrayString(a []interface{}) string {
 	return fmt.Sprint(a)
 }
 
@@ -157,7 +157,7 @@ func (this *Set) values() []interface{} {
 	return l
 }
 
-func (this *Set) toString() string {
+func (this *Set) String() string {
 	return fmt.Sprint(this.data)
 }
 
@@ -238,7 +238,7 @@ func (this *BitSet) length() int {
 	return len(this.data)
 }
 
-func (this *BitSet) toString() string {
+func (this *BitSet) String() string {
 	return fmt.Sprint(this.data)
 }
 

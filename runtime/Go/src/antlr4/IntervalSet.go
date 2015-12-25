@@ -23,7 +23,7 @@ func (i *Interval) contains(item int) bool {
 	return item >= i.start && item < i.stop
 }
 
-func (i *Interval) toString() string {
+func (i *Interval) String() string {
 	if i.start == i.stop-1 {
 		return strconv.Itoa(i.start)
 	} else {
@@ -209,11 +209,11 @@ func (is *IntervalSet) removeOne(v int) {
 	}
 }
 
-func (i *IntervalSet) toString() string {
-	return i.toStringVerbose(nil, nil, false)
+func (i *IntervalSet) String() string {
+	return i.StringVerbose(nil, nil, false)
 }
 
-func (i *IntervalSet) toStringVerbose(literalNames []string, symbolicNames []string, elemsAreChar bool) string {
+func (i *IntervalSet) StringVerbose(literalNames []string, symbolicNames []string, elemsAreChar bool) string {
 
 	if i.intervals == nil {
 		return "{}"

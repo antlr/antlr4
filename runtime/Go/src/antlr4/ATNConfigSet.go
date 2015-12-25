@@ -250,15 +250,17 @@ func (this *ATNConfigSet) setReadonly(readOnly bool) {
 	}
 }
 
-func (this *ATNConfigSet) toString() string {
-	s := ""
+func (this *ATNConfigSet) String() string {
+	s := "["
 
 	for i,c := range this.configs {
-		s += c.toString()
+		s += c.String()
 		if (i != len(this.configs)-1){
 			s += ","
 		}
 	}
+
+	s += "]"
 
 	if (this.hasSemanticContext){
 		s += ",hasSemanticContext=" + fmt.Sprint(this.hasSemanticContext)
@@ -269,7 +271,7 @@ func (this *ATNConfigSet) toString() string {
 	}
 
 	if ( this.conflictingAlts != nil ){
-		s += ",conflictingAlts=" + this.conflictingAlts.toString()
+		s += ",conflictingAlts=" + this.conflictingAlts.String()
 	}
 
 	if (this.dipsIntoOuterContext) {

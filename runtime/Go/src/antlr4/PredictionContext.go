@@ -13,7 +13,7 @@ type IPredictionContext interface {
 	length() int
 	isEmpty() bool
 	hasEmptyPath() bool
-	toString() string
+	String() string
 }
 
 type PredictionContext struct {
@@ -81,14 +81,14 @@ func (this *PredictionContext) hashString() string {
 }
 
 func calculateHashString(parent IPredictionContext, returnState int) string {
-	return parent.toString() + strconv.Itoa(returnState)
+	return parent.String() + strconv.Itoa(returnState)
 }
 
 func calculateEmptyHashString() string {
 	return ""
 }
 
-func (this *PredictionContext) toString() string {
+func (this *PredictionContext) String() string {
 	panic("Not implemented")
 }
 
@@ -216,13 +216,13 @@ func (this *SingletonPredictionContext) hashString() string {
 	return this.cachedHashString
 }
 
-func (this *SingletonPredictionContext) toString() string {
+func (this *SingletonPredictionContext) String() string {
 	var up string
 
 	if this.parentCtx == nil {
 		up = ""
 	} else {
-		up = this.parentCtx.toString()
+		up = this.parentCtx.String()
 	}
 
 	if len(up) == 0 {
@@ -267,7 +267,7 @@ func (this *EmptyPredictionContext) equals(other IPredictionContext) bool {
 	return this == other
 }
 
-func (this *EmptyPredictionContext) toString() string {
+func (this *EmptyPredictionContext) String() string {
 	return "$"
 }
 
@@ -332,7 +332,7 @@ func (this *ArrayPredictionContext) equals(other IPredictionContext) bool {
 	}
 }
 
-func (this *ArrayPredictionContext) toString() string {
+func (this *ArrayPredictionContext) String() string {
 	if this.isEmpty() {
 		return "[]"
 	} else {
@@ -347,7 +347,7 @@ func (this *ArrayPredictionContext) toString() string {
 			}
 			s = s + strconv.Itoa(this.returnStates[i])
 			if this.parents[i] != nil {
-				s = s + " " + this.parents[i].toString()
+				s = s + " " + this.parents[i].String()
 			} else {
 				s = s + "nil"
 			}

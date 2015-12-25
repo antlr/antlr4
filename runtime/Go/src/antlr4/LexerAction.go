@@ -78,7 +78,7 @@ func (this *LexerSkipAction) execute(lexer ILexer) {
 	lexer.skip()
 }
 
-func (this *LexerSkipAction) toString() string {
+func (this *LexerSkipAction) String() string {
 	return "skip"
 }
 
@@ -115,7 +115,7 @@ func (this *LexerTypeAction) equals(other ILexerAction) bool {
 	}
 }
 
-func (this *LexerTypeAction) toString() string {
+func (this *LexerTypeAction) String() string {
 	return "actionType(" + strconv.Itoa(this._type) + ")"
 }
 
@@ -156,7 +156,7 @@ func (this *LexerPushModeAction) equals(other ILexerAction) bool {
 	}
 }
 
-func (this *LexerPushModeAction) toString() string {
+func (this *LexerPushModeAction) String() string {
 	return "pushMode(" + strconv.Itoa(this.mode) + ")"
 }
 
@@ -184,7 +184,7 @@ func (this *LexerPopModeAction) execute(lexer ILexer) {
 	lexer.popMode()
 }
 
-func (this *LexerPopModeAction) toString() string {
+func (this *LexerPopModeAction) String() string {
 	return "popMode"
 }
 
@@ -211,7 +211,7 @@ func (this *LexerMoreAction) execute(lexer ILexer) {
 	lexer.more()
 }
 
-func (this *LexerMoreAction) toString() string {
+func (this *LexerMoreAction) String() string {
 	return "more"
 }
 
@@ -250,7 +250,7 @@ func (this *LexerModeAction) equals(other ILexerAction) bool {
 	}
 }
 
-func (this *LexerModeAction) toString() string {
+func (this *LexerModeAction) String() string {
 	return "mode(" + strconv.Itoa(this.mode) + ")"
 }
 
@@ -342,7 +342,7 @@ func (this *LexerChannelAction) equals(other ILexerAction) bool {
 	}
 }
 
-func (this *LexerChannelAction) toString() string {
+func (this *LexerChannelAction) String() string {
 	return "channel(" + strconv.Itoa(this.channel) + ")"
 }
 

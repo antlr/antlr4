@@ -21,7 +21,7 @@ func NewPredPrediction(pred SemanticContext, alt int) *PredPrediction {
 	return this
 }
 
-func (this *PredPrediction) toString() string {
+func (this *PredPrediction) String() string {
 	return "(" + fmt.Sprint(this.pred) + ", " + fmt.Sprint(this.alt) + ")"
 }
 
@@ -143,7 +143,7 @@ func (this *DFAState) equals(other interface{}) bool {
 	return this.configs.equals(other.(*DFAState).configs)
 }
 
-func (this *DFAState) toString() string {
+func (this *DFAState) String() string {
 	return strconv.Itoa(this.stateNumber) + ":" + this.hashString()
 }
 

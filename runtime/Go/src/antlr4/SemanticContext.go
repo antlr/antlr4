@@ -17,7 +17,7 @@ type SemanticContext interface {
 	evaluate(parser IRecognizer, outerContext IRuleContext) bool
 	evalPrecedence(parser IRecognizer, outerContext IRuleContext) SemanticContext
 	equals(interface{}) bool
-	toString() string
+	String() string
 }
 
 func SemanticContextandContext(a, b SemanticContext) SemanticContext {
@@ -104,7 +104,7 @@ func (this *Predicate) equals(other interface{}) bool {
 	}
 }
 
-func (this *Predicate) toString() string {
+func (this *Predicate) String() string {
 	return "{" + strconv.Itoa(this.ruleIndex) + ":" + strconv.Itoa(this.predIndex) + "}?"
 }
 
@@ -150,7 +150,7 @@ func (this *PrecedencePredicate) equals(other interface{}) bool {
 	}
 }
 
-func (this *PrecedencePredicate) toString() string {
+func (this *PrecedencePredicate) String() string {
 	return "{" + strconv.Itoa(this.precedence) + ">=prec}?"
 }
 
@@ -290,11 +290,11 @@ func (this *AND) evalPrecedence(parser IRecognizer, outerContext IRuleContext) S
 	return result
 }
 
-func (this *AND) toString() string {
+func (this *AND) String() string {
 	var s = ""
 
 	for _, o := range this.opnds {
-		s += "&& " + o.toString()
+		s += "&& " + o.String()
 	}
 
 	if len(s) > 3 {
@@ -423,11 +423,11 @@ func (this *OR) evalPrecedence(parser IRecognizer, outerContext IRuleContext) Se
 	return result
 }
 
-func (this *OR) toString() string {
+func (this *OR) String() string {
 	var s = ""
 
 	for _, o := range this.opnds {
-		s += "|| " + o.toString()
+		s += "|| " + o.String()
 	}
 
 	if len(s) > 3 {

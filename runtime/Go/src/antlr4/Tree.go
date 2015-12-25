@@ -14,7 +14,7 @@ type Tree interface {
 	getChildCount() int
 	getChildren() []Tree
 	setChildren([]Tree)
-	//	toStringTree() string
+	//	StringTree() string
 }
 
 type SyntaxTree interface {
@@ -29,7 +29,7 @@ type ParseTree interface {
 	//	<T> T accept(ParseTreeVisitor<? extends T> Visitor);
 	accept(Visitor ParseTreeVisitor) interface{}
 	GetText() string
-	//	toStringTree([]string, IRecognizer) string
+	//	StringTree([]string, IRecognizer) string
 }
 
 type RuleNode interface {
@@ -148,7 +148,7 @@ func (this *TerminalNodeImpl) GetText() string {
 	return this.symbol.text()
 }
 
-func (this *TerminalNodeImpl) toString() string {
+func (this *TerminalNodeImpl) String() string {
 	if this.symbol.tokenType == TokenEOF {
 		return "<EOF>"
 	} else {

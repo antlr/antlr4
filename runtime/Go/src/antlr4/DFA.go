@@ -129,12 +129,12 @@ func (this *DFA) sortedStates() []*DFAState {
 	return vs
 }
 
-func (this *DFA) toString(literalNames []string, symbolicNames []string) string {
+func (this *DFA) String(literalNames []string, symbolicNames []string) string {
 	if this.s0 == nil {
 		return ""
 	}
 	var serializer = NewDFASerializer(this, literalNames, symbolicNames)
-	return serializer.toString()
+	return serializer.String()
 }
 
 func (this *DFA) toLexerString() string {
@@ -142,5 +142,5 @@ func (this *DFA) toLexerString() string {
 		return ""
 	}
 	var serializer = NewLexerDFASerializer(this)
-	return serializer.toString()
+	return serializer.String()
 }

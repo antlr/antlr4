@@ -654,7 +654,7 @@ func (this *Parser) getRuleInvocationStack(p IParserRuleContext) []string {
 // For debugging and other purposes.//
 func (p *Parser) getDFAStrings() {
 	panic("dumpDFA Not implemented!")
-	//	return p._interp.decisionToDFA.toString()
+	//	return p._interp.decisionToDFA.String()
 }
 
 // For debugging and other purposes.//
@@ -669,7 +669,7 @@ func (p *Parser) dumpDFA() {
 	//				fmt.Println()
 	//			}
 	//			p.printer.println("Decision " + dfa.decision + ":")
-	//			p.printer.print(dfa.toString(p.LiteralNames, p.SymbolicNames))
+	//			p.printer.print(dfa.String(p.LiteralNames, p.SymbolicNames))
 	//			seenOne = true
 	//		}
 	//	}

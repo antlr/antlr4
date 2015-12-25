@@ -152,7 +152,7 @@ func (this *CommonToken) setText(text string) {
 	this._text = text
 }
 
-func (this *CommonToken) toString() string {
+func (this *CommonToken) String() string {
 	var txt = this.text()
 	if txt != "" {
 		txt = strings.Replace(txt, "\n", "", -1)

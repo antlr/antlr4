@@ -135,7 +135,7 @@ func (this *LexerATNSimulator) MatchATN(input CharStream) int {
 	var startState = this.atn.modeToStartState[this.mode]
 
 	if LexerATNSimulatordebug {
-		fmt.Println("MatchATN mode " + strconv.Itoa(this.mode) + " start: " + startState.toString())
+		fmt.Println("MatchATN mode " + strconv.Itoa(this.mode) + " start: " + startState.String())
 	}
 	var old_mode = this.mode
 	var s0_closure = this.computeStartState(input, startState)
@@ -158,7 +158,7 @@ func (this *LexerATNSimulator) MatchATN(input CharStream) int {
 
 func (this *LexerATNSimulator) execATN(input CharStream, ds0 *DFAState) int {
 	if LexerATNSimulatordebug {
-		fmt.Println("start state closure=" + ds0.configs.toString())
+		fmt.Println("start state closure=" + ds0.configs.String())
 	}
 	if ds0.isAcceptState {
 		// allow zero-length tokens
@@ -169,7 +169,7 @@ func (this *LexerATNSimulator) execATN(input CharStream, ds0 *DFAState) int {
 
 	for true { // while more work
 		if LexerATNSimulatordebug {
-			fmt.Println("execATN loop starting closure: " + s.configs.toString())
+			fmt.Println("execATN loop starting closure: " + s.configs.String())
 		}
 
 		// As we move src->trg, src->trg, we keep track of the previous trg to
@@ -300,7 +300,7 @@ func (this *LexerATNSimulator) getReachableConfigSet(input CharStream, closure *
 			continue
 		}
 		if LexerATNSimulatordebug {
-			fmt.Printf("testing %s at %s\n", this.GetTokenName(t), cfg.toString()) // this.recog, true))
+			fmt.Printf("testing %s at %s\n", this.GetTokenName(t), cfg.String()) // this.recog, true))
 		}
 		for j := 0; j < len(cfg.GetState().GetTransitions()); j++ {
 			var trans = cfg.GetState().GetTransitions()[j] // for each transition
@@ -367,7 +367,7 @@ func (this *LexerATNSimulator) closure(input CharStream, config *LexerATNConfig,
 	currentAltReachedAcceptState, speculative, treatEofAsEpsilon bool) bool {
 
 	if LexerATNSimulatordebug {
-		fmt.Println("closure(" + config.toString() + ")") // config.toString(this.recog, true) + ")")
+		fmt.Println("closure(" + config.String() + ")") // config.String(this.recog, true) + ")")
 	}
 
 	_, ok := config.state.(*RuleStopState)
@@ -572,7 +572,7 @@ func (this *LexerATNSimulator) addDFAEdge(from_ *DFAState, tk int, to *DFAState,
 		return to
 	}
 	if LexerATNSimulatordebug {
-		fmt.Println("EDGE " + from_.toString() + " -> " + to.toString() + " upon " + strconv.Itoa(tk))
+		fmt.Println("EDGE " + from_.String() + " -> " + to.String() + " upon " + strconv.Itoa(tk))
 	}
 	if from_.edges == nil {
 		// make room for tokens 1..n and -1 masquerading as index 0

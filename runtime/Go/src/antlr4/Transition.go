@@ -150,7 +150,7 @@ func (t *AtomTransition) Matches(symbol, minVocabSymbol, maxVocabSymbol int) boo
 	return t.label_ == symbol
 }
 
-func (t *AtomTransition) toString() string {
+func (t *AtomTransition) String() string {
 	return strconv.Itoa(t.label_)
 }
 
@@ -201,7 +201,7 @@ func (t *EpsilonTransition) Matches(symbol, minVocabSymbol, maxVocabSymbol int) 
 	return false
 }
 
-func (t *EpsilonTransition) toString() string {
+func (t *EpsilonTransition) String() string {
 	return "epsilon"
 }
 
@@ -233,7 +233,7 @@ func (t *RangeTransition) Matches(symbol, minVocabSymbol, maxVocabSymbol int) bo
 	return symbol >= t.start && symbol <= t.stop
 }
 
-func (t *RangeTransition) toString() string {
+func (t *RangeTransition) String() string {
 	return "'" + string(t.start) + "'..'" + string(t.stop) + "'"
 }
 
@@ -277,7 +277,7 @@ func (t *PredicateTransition) getPredicate() *Predicate {
 	return NewPredicate(t.ruleIndex, t.predIndex, t.isCtxDependent)
 }
 
-func (t *PredicateTransition) toString() string {
+func (t *PredicateTransition) String() string {
 	return "pred_" + strconv.Itoa(t.ruleIndex) + ":" + strconv.Itoa(t.predIndex)
 }
 
@@ -305,7 +305,7 @@ func (t *ActionTransition) Matches(symbol, minVocabSymbol, maxVocabSymbol int) b
 	return false
 }
 
-func (t *ActionTransition) toString() string {
+func (t *ActionTransition) String() string {
 	return "action_" + strconv.Itoa(t.ruleIndex) + ":" + strconv.Itoa(t.actionIndex)
 }
 
@@ -333,8 +333,8 @@ func (t *SetTransition) Matches(symbol, minVocabSymbol, maxVocabSymbol int) bool
 	return t.label.contains(symbol)
 }
 
-func (t *SetTransition) toString() string {
-	return t.label.toString()
+func (t *SetTransition) String() string {
+	return t.label.String()
 }
 
 type NotSetTransition struct {
@@ -356,8 +356,8 @@ func (t *NotSetTransition) Matches(symbol, minVocabSymbol, maxVocabSymbol int) b
 	return symbol >= minVocabSymbol && symbol <= maxVocabSymbol && !t.label.contains(symbol)
 }
 
-func (t *NotSetTransition) toString() string {
-	return "~" + t.label.toString()
+func (t *NotSetTransition) String() string {
+	return "~" + t.label.String()
 }
 
 type WildcardTransition struct {
@@ -377,7 +377,7 @@ func (t *WildcardTransition) Matches(symbol, minVocabSymbol, maxVocabSymbol int)
 	return symbol >= minVocabSymbol && symbol <= maxVocabSymbol
 }
 
-func (t *WildcardTransition) toString() string {
+func (t *WildcardTransition) String() string {
 	return "."
 }
 
@@ -407,6 +407,6 @@ func (t *PrecedencePredicateTransition) getPredicate() *PrecedencePredicate {
 	return NewPrecedencePredicate(t.precedence)
 }
 
-func (t *PrecedencePredicateTransition) toString() string {
+func (t *PrecedencePredicateTransition) String() string {
 	return fmt.Sprint(t.precedence) + " >= _p"
 }

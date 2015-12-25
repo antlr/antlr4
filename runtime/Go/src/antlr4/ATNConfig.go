@@ -28,7 +28,7 @@ type IATNConfig interface {
 	GetReachesIntoOuterContext() int
 	SetReachesIntoOuterContext(int)
 
-	toString() string
+	String() string
 }
 
 type ATNConfig struct {
@@ -151,7 +151,7 @@ func (this *ATNConfig) equals(other interface{}) bool {
 }
 
 func (this *ATNConfig) shortHashString() string {
-	return "" + strconv.Itoa(this.state.GetStateNumber()) + "/" + strconv.Itoa(this.alt) + "/" + this.semanticContext.toString()
+	return "" + strconv.Itoa(this.state.GetStateNumber()) + "/" + strconv.Itoa(this.alt) + "/" + this.semanticContext.String()
 }
 
 func (this *ATNConfig) hashString() string {
@@ -163,10 +163,10 @@ func (this *ATNConfig) hashString() string {
 		c = this.context.hashString()
 	}
 
-	return "" + strconv.Itoa(this.state.GetStateNumber()) + "/" + strconv.Itoa(this.alt) + "/" + c + "/" + this.semanticContext.toString()
+	return "" + strconv.Itoa(this.state.GetStateNumber()) + "/" + strconv.Itoa(this.alt) + "/" + c + "/" + this.semanticContext.String()
 }
 
-func (this *ATNConfig) toString() string {
+func (this *ATNConfig) String() string {
 
 	var a string
 	if this.context != nil {

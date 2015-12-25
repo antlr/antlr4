@@ -278,7 +278,7 @@ func (this *DefaultErrorStrategy) ReportNoViableAlternative(recognizer IParser, 
 //
 func (this *DefaultErrorStrategy) ReportInputMisMatch(recognizer IParser, e *InputMisMatchException) {
 	var msg = "misMatched input " + this.GetTokenErrorDisplay(e.offendingToken) +
-		" expecting " + e.getExpectedTokens().toStringVerbose(recognizer.GetLiteralNames(), recognizer.GetSymbolicNames(), false)
+		" expecting " + e.getExpectedTokens().StringVerbose(recognizer.GetLiteralNames(), recognizer.GetSymbolicNames(), false)
 	recognizer.notifyErrorListeners(msg, e.offendingToken, e)
 }
 
@@ -323,7 +323,7 @@ func (this *DefaultErrorStrategy) ReportUnwantedToken(recognizer IParser) {
 	var tokenName = this.GetTokenErrorDisplay(t)
 	var expecting = this.getExpectedTokens(recognizer)
 	var msg = "extraneous input " + tokenName + " expecting " +
-		expecting.toStringVerbose(recognizer.GetLiteralNames(), recognizer.GetSymbolicNames(), false)
+		expecting.StringVerbose(recognizer.GetLiteralNames(), recognizer.GetSymbolicNames(), false)
 	recognizer.notifyErrorListeners(msg, t, nil)
 }
 
@@ -350,7 +350,7 @@ func (this *DefaultErrorStrategy) ReportMissingToken(recognizer IParser) {
 	this.beginErrorCondition(recognizer)
 	var t = recognizer.getCurrentToken()
 	var expecting = this.getExpectedTokens(recognizer)
-	var msg = "missing " + expecting.toStringVerbose(recognizer.GetLiteralNames(), recognizer.GetSymbolicNames(), false) +
+	var msg = "missing " + expecting.StringVerbose(recognizer.GetLiteralNames(), recognizer.GetSymbolicNames(), false) +
 		" at " + this.GetTokenErrorDisplay(t)
 	recognizer.notifyErrorListeners(msg, t, nil)
 }
@@ -538,7 +538,7 @@ func (this *DefaultErrorStrategy) getExpectedTokens(recognizer IParser) *Interva
 // How should a token be displayed in an error message? The default
 // is to display just the text, but during development you might
 // want to have a lot of information spit out. Override in that case
-// to use t.toString() (which, for CommonToken, dumps everything about
+// to use t.String() (which, for CommonToken, dumps everything about
 // the token). This is better than forcing you to override a method in
 // your token objects because you don't have to go modify your lexer
 // so that it creates a NewJava type.

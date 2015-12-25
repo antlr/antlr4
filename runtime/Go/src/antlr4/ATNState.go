@@ -59,7 +59,7 @@ type IATNState interface {
 	SetTransitions([]ITransition)
 	AddTransition(ITransition, int)
 
-	toString() string
+	String() string
 }
 
 type ATNState struct {
@@ -140,7 +140,7 @@ func (as *ATNState) SetNextTokenWithinRule(v *IntervalSet) {
 	as.nextTokenWithinRule = v
 }
 
-func (this *ATNState) toString() string {
+func (this *ATNState) String() string {
 	return strconv.Itoa(this.stateNumber)
 }
 
