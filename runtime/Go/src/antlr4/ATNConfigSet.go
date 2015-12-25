@@ -21,9 +21,17 @@ func equalATNConfigs(a, b interface{}) bool {
 	if a == nil || b == nil {
 		return false
 	}
-	return a.(*ATNConfig).state.GetStateNumber() == b.(*ATNConfig).state.GetStateNumber() &&
-		a.(*ATNConfig).alt == b.(*ATNConfig).alt &&
-		a.(*ATNConfig).semanticContext.equals(b.(*ATNConfig).semanticContext)
+
+	ai,ok := a.(IATNConfig)
+	bi,ok1 := b.(IATNConfig)
+
+	if (!ok || !ok1) {
+		return false
+	}
+
+	return ai.GetState().GetStateNumber() == bi.GetState().GetStateNumber() &&
+		ai.GetAlt() == bi.GetAlt() &&
+		ai.GetSemanticContext().equals(bi.GetSemanticContext())
 }
 
 type ATNConfigSet struct {
@@ -32,7 +40,7 @@ type ATNConfigSet struct {
 	configLookup         *Set
 	conflictingAlts      *BitSet
 	cachedHashString     string
-	hasSemanticContext   bool
+	hasSemanticContext   bool``
 	dipsIntoOuterContext bool
 	configs              []IATNConfig
 	uniqueAlt            int
@@ -243,15 +251,29 @@ func (this *ATNConfigSet) setReadonly(readOnly bool) {
 }
 
 func (this *ATNConfigSet) toString() string {
-	return ""
+	s := ""
 
+	for _,c := range this.configs {
+		s += c.toString()
+	}
 
+	if (this.hasSemanticContext){
+		s += ",hasSemanticContext=" + fmt.Sprint(this.hasSemanticContext)
+	}
 
-	return Utils.arrayToString(this.configs) +
-		(this.hasSemanticContext ? ",hasSemanticContext=" + this.hasSemanticContext : "") +
-		(this.uniqueAlt != ATN.INVALID_ALT_NUMBER ? ",uniqueAlt=" + this.uniqueAlt : "") +
-		(this.conflictingAlts != nil ? ",conflictingAlts=" + this.conflictingAlts : "") +
-		(this.dipsIntoOuterContext ? ",dipsIntoOuterContext" : "")
+	if (this.uniqueAlt != ATNINVALID_ALT_NUMBER ){
+		s += ",uniqueAlt=" + fmt.Sprint(this.uniqueAlt)
+	}
+
+	if ( this.conflictingAlts != nil ){
+		s += ",conflictingAlts=" + this.conflictingAlts.toString()
+	}
+
+	if (this.dipsIntoOuterContext) {
+		s += ",dipsIntoOuterContext"
+	}
+
+	return s
 }
 
 type OrderedATNConfigSet struct {
