@@ -497,7 +497,7 @@ func PredictionModegetConflictingAltSubsets(configs *ATNConfigSet) []*BitSet {
 		var c = configs.configs[i]
 		var key = "key_" + strconv.Itoa(c.GetState().GetStateNumber()) + "/" + c.GetContext().toString()
 		var alts = configToAlts[key]
-		if alts != nil {
+		if alts == nil {
 			alts = NewBitSet()
 			configToAlts[key] = alts
 		}

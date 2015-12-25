@@ -1,4 +1,5 @@
 package antlr4
+import "sort"
 
 type DFA struct {
 	atnStartState IDecisionState
@@ -107,21 +108,25 @@ func (this *DFA) GetStates() map[string]*DFAState {
 	return this._states
 }
 
+type DFAStateList []*DFAState
+
+func (a DFAStateList) Len() int           { return len(a) }
+func (a DFAStateList) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a DFAStateList) Less(i, j int) bool { return a[i].stateNumber < a[j].stateNumber }
+
 // Return a list of all states in this DFA, ordered by state number.
 func (this *DFA) sortedStates() []*DFAState {
 
-	panic("Not implemented")
+	// extract the values
+	vs := make([]*DFAState, len(this._states))
+	i := 0
+	for _,v := range this._states {
+		vs[i] = v
+		i++
+	}
 
-	return nil
-	// states_ is a map of state/state, where key=value
-	//	var keys = Object.keys(this._states)
-	//	var list = []
-	//	for i:=0; i<keys.length; i++ {
-	//		list.push(this._states[keys[i]])
-	//	}
-	//	return list.sort(function(a, b) {
-	//		return a.stateNumber - b.stateNumber
-	//	})
+	sort.Sort(DFAStateList(vs))
+	return vs
 }
 
 func (this *DFA) toString(literalNames []string, symbolicNames []string) string {

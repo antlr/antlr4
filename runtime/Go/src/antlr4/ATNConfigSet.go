@@ -253,8 +253,11 @@ func (this *ATNConfigSet) setReadonly(readOnly bool) {
 func (this *ATNConfigSet) toString() string {
 	s := ""
 
-	for _,c := range this.configs {
+	for i,c := range this.configs {
 		s += c.toString()
+		if (i != len(this.configs)-1){
+			s += ","
+		}
 	}
 
 	if (this.hasSemanticContext){
