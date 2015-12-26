@@ -106,7 +106,7 @@ func (this *DefaultErrorStrategy) ReportMatch(recognizer IParser) {
 // {@link //ReportInputMisMatch}</li>
 // <li>{@link FailedPredicateException}: Dispatches the call to
 // {@link //ReportFailedPredicate}</li>
-// <li>All other types: calls {@link Parser//notifyErrorListeners} to Report
+// <li>All other types: calls {@link Parser//NotifyErrorListeners} to Report
 // the exception</li>
 // </ul>
 //
@@ -122,7 +122,7 @@ func (this *DefaultErrorStrategy) ReportError(recognizer IParser, e IRecognition
 	default:
 		fmt.Println("unknown recognition error type: " + reflect.TypeOf(e).Name())
 		//            fmt.Println(e.stack)
-		recognizer.notifyErrorListeners(e.GetMessage(), e.GetOffendingToken(), e)
+		recognizer.NotifyErrorListeners(e.GetMessage(), e.GetOffendingToken(), e)
 	case *NoViableAltException:
 		this.ReportNoViableAlternative(recognizer, t)
 	case *InputMisMatchException:
@@ -264,7 +264,7 @@ func (this *DefaultErrorStrategy) ReportNoViableAlternative(recognizer IParser, 
 		input = "<unknown input>"
 	}
 	var msg = "no viable alternative at input " + this.escapeWSAndQuote(input)
-	recognizer.notifyErrorListeners(msg, e.offendingToken, e)
+	recognizer.NotifyErrorListeners(msg, e.offendingToken, e)
 }
 
 //
@@ -279,7 +279,7 @@ func (this *DefaultErrorStrategy) ReportNoViableAlternative(recognizer IParser, 
 func (this *DefaultErrorStrategy) ReportInputMisMatch(recognizer IParser, e *InputMisMatchException) {
 	var msg = "misMatched input " + this.GetTokenErrorDisplay(e.offendingToken) +
 		" expecting " + e.getExpectedTokens().StringVerbose(recognizer.GetLiteralNames(), recognizer.GetSymbolicNames(), false)
-	recognizer.notifyErrorListeners(msg, e.offendingToken, e)
+	recognizer.NotifyErrorListeners(msg, e.offendingToken, e)
 }
 
 //
@@ -294,7 +294,7 @@ func (this *DefaultErrorStrategy) ReportInputMisMatch(recognizer IParser, e *Inp
 func (this *DefaultErrorStrategy) ReportFailedPredicate(recognizer IParser, e *FailedPredicateException) {
 	var ruleName = recognizer.GetRuleNames()[recognizer.GetParserRuleContext().GetRuleIndex()]
 	var msg = "rule " + ruleName + " " + e.message
-	recognizer.notifyErrorListeners(msg, e.offendingToken, e)
+	recognizer.NotifyErrorListeners(msg, e.offendingToken, e)
 }
 
 // This method is called to Report a syntax error which requires the removal
@@ -310,7 +310,7 @@ func (this *DefaultErrorStrategy) ReportFailedPredicate(recognizer IParser, e *F
 // <p>The default implementation simply returns if the handler is already in
 // error recovery mode. Otherwise, it calls {@link //beginErrorCondition} to
 // enter error recovery mode, followed by calling
-// {@link Parser//notifyErrorListeners}.</p>
+// {@link Parser//NotifyErrorListeners}.</p>
 //
 // @param recognizer the parser instance
 //
@@ -324,7 +324,7 @@ func (this *DefaultErrorStrategy) ReportUnwantedToken(recognizer IParser) {
 	var expecting = this.getExpectedTokens(recognizer)
 	var msg = "extraneous input " + tokenName + " expecting " +
 		expecting.StringVerbose(recognizer.GetLiteralNames(), recognizer.GetSymbolicNames(), false)
-	recognizer.notifyErrorListeners(msg, t, nil)
+	recognizer.NotifyErrorListeners(msg, t, nil)
 }
 
 // This method is called to Report a syntax error which requires the
@@ -339,7 +339,7 @@ func (this *DefaultErrorStrategy) ReportUnwantedToken(recognizer IParser) {
 // <p>The default implementation simply returns if the handler is already in
 // error recovery mode. Otherwise, it calls {@link //beginErrorCondition} to
 // enter error recovery mode, followed by calling
-// {@link Parser//notifyErrorListeners}.</p>
+// {@link Parser//NotifyErrorListeners}.</p>
 //
 // @param recognizer the parser instance
 //
@@ -352,7 +352,7 @@ func (this *DefaultErrorStrategy) ReportMissingToken(recognizer IParser) {
 	var expecting = this.getExpectedTokens(recognizer)
 	var msg = "missing " + expecting.StringVerbose(recognizer.GetLiteralNames(), recognizer.GetSymbolicNames(), false) +
 		" at " + this.GetTokenErrorDisplay(t)
-	recognizer.notifyErrorListeners(msg, t, nil)
+	recognizer.NotifyErrorListeners(msg, t, nil)
 }
 
 // <p>The default implementation attempts to recover from the misMatched input

@@ -1462,6 +1462,7 @@ public class ParserATNSimulator extends ATNSimulator {
 						   boolean fullCtx,
 						   boolean treatEofAsEpsilon)
 	{
+		console.log("closure");
 		final int initialDepth = 0;
 		closureCheckingStopState(config, configs, closureBusy, collectPredicates,
 								 fullCtx,

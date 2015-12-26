@@ -182,7 +182,6 @@ func (t *RuleTransition) Matches(symbol, minVocabSymbol, maxVocabSymbol int) boo
 type EpsilonTransition struct {
 	*Transition
 
-	isEpsilon                 bool
 	outermostPrecedenceReturn int
 }
 

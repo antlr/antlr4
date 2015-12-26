@@ -151,7 +151,7 @@ func (this *ATNConfig) equals(other interface{}) bool {
 }
 
 func (this *ATNConfig) shortHashString() string {
-	return "" + strconv.Itoa(this.state.GetStateNumber()) + "/" + strconv.Itoa(this.alt) + "/" + this.semanticContext.String()
+	return strconv.Itoa(this.state.GetStateNumber()) + "/" + strconv.Itoa(this.alt) + "/" + this.semanticContext.String()
 }
 
 func (this *ATNConfig) hashString() string {
@@ -163,7 +163,7 @@ func (this *ATNConfig) hashString() string {
 		c = this.context.hashString()
 	}
 
-	return "" + strconv.Itoa(this.state.GetStateNumber()) + "/" + strconv.Itoa(this.alt) + "/" + c + "/" + this.semanticContext.String()
+	return strconv.Itoa(this.state.GetStateNumber()) + "/" + strconv.Itoa(this.alt) + "/" + c + "/" + this.semanticContext.String()
 }
 
 func (this *ATNConfig) String() string {
@@ -175,7 +175,7 @@ func (this *ATNConfig) String() string {
 
 	var b string
 	if this.semanticContext != SemanticContextNONE {
-		b = ("," + fmt.Sprint(this.semanticContext))
+		b = "," + fmt.Sprint(this.semanticContext)
 	}
 
 	var c string
@@ -185,6 +185,10 @@ func (this *ATNConfig) String() string {
 
 	return "(" + fmt.Sprint(this.state) + "," + strconv.Itoa(this.alt) + a + b + c + ")"
 }
+
+
+
+
 
 type LexerATNConfig struct {
 	*ATNConfig
@@ -265,7 +269,7 @@ func (this *LexerATNConfig) hashString() string {
 		f = "0"
 	}
 
-	return "" + strconv.Itoa(this.state.GetStateNumber()) + strconv.Itoa(this.alt) + fmt.Sprint(this.context) +
+	return strconv.Itoa(this.state.GetStateNumber()) + strconv.Itoa(this.alt) + fmt.Sprint(this.context) +
 		fmt.Sprint(this.semanticContext) + f + fmt.Sprint(this.lexerActionExecutor)
 }
 

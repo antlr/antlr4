@@ -47,10 +47,10 @@ func NewParserATNSimulator(parser IParser, atn *ATN, decisionToDFA []*DFA, share
 	return this
 }
 
-var ParserATNSimulatorDebug = true
-var ParserATNSimulatorListATNDecisions = true
-var ParserATNSimulatorDFADebug = true
-var ParserATNSimulatorRetryDebug = true
+var ParserATNSimulatorDebug = false
+var ParserATNSimulatorListATNDecisions = false
+var ParserATNSimulatorDFADebug = false
+var ParserATNSimulatorRetryDebug = false
 
 func (this *ParserATNSimulator) reset() {
 }
@@ -966,13 +966,6 @@ func (this *ParserATNSimulator) evalSemanticContext(predPredictions []*PredPredi
 	return predictions
 }
 
-// TODO: If we are doing predicates, there is no point in pursuing
-//     closure operations if we reach a DFA state that uniquely predicts
-//     alternative. We will not be caching that DFA state and it is a
-//     waste to pursue the closure. Might have to advance when we do
-//     ambig detection thought :(
-//
-
 func (this *ParserATNSimulator) closure(config IATNConfig, configs *ATNConfigSet, closureBusy *Set, collectPredicates, fullCtx, treatEofAsEpsilon bool) {
 	var initialDepth = 0
 	this.closureCheckingStopState(config, configs, closureBusy, collectPredicates,
@@ -982,7 +975,7 @@ func (this *ParserATNSimulator) closure(config IATNConfig, configs *ATNConfigSet
 func (this *ParserATNSimulator) closureCheckingStopState(config IATNConfig, configs *ATNConfigSet, closureBusy *Set, collectPredicates, fullCtx bool, depth int, treatEofAsEpsilon bool) {
 
 	if ParserATNSimulatorDebug {
-		fmt.Println("closure(" + config.String() + ")") //config.String(this.parser,true) + ")")
+		fmt.Println("closure(" + config.String() + ")")
 		fmt.Println("configs(" + configs.String() + ")")
 		if config.GetReachesIntoOuterContext() > 50 {
 			panic("problem")

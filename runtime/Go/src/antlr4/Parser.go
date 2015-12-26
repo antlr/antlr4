@@ -14,7 +14,7 @@ type IParser interface {
 	GetInputStream() IntStream
 	getCurrentToken() *Token
 	getExpectedTokens() *IntervalSet
-	notifyErrorListeners(msg string, offendingToken *Token, err IRecognitionException)
+	NotifyErrorListeners(msg string, offendingToken *Token, err IRecognitionException)
 	isExpectedToken(symbol int) bool
 	getPrecedence() int
 	getRuleInvocationStack(IParserRuleContext) []string
@@ -68,7 +68,7 @@ func NewParser(input TokenStream) *Parser {
 	// events during the parse.
 	p._parseListeners = nil
 	// The number of syntax errors Reported during parsing. p.value is
-	// incremented each time {@link //notifyErrorListeners} is called.
+	// incremented each time {@link //NotifyErrorListeners} is called.
 	p._SyntaxErrors = 0
 	p.setInputStream(input)
 
@@ -389,7 +389,7 @@ func (p *Parser) getCurrentToken() *Token {
 	return p._input.LT(1)
 }
 
-func (p *Parser) notifyErrorListeners(msg string, offendingToken *Token, err IRecognitionException) {
+func (p *Parser) NotifyErrorListeners(msg string, offendingToken *Token, err IRecognitionException) {
 	if offendingToken == nil {
 		offendingToken = p.getCurrentToken()
 	}

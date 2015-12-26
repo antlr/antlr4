@@ -15,6 +15,10 @@ func hashATNConfig(c interface{}) string {
 }
 
 func equalATNConfigs(a, b interface{}) bool {
+
+	fmt.Println("compare")
+	fmt.Println(a)
+
 	if a == b {
 		return true
 	}
@@ -30,9 +34,10 @@ func equalATNConfigs(a, b interface{}) bool {
 	}
 
 	return ai.GetState().GetStateNumber() == bi.GetState().GetStateNumber() &&
-		ai.GetAlt() == bi.GetAlt() &&
-		ai.GetSemanticContext().equals(bi.GetSemanticContext())
+	ai.GetAlt() == bi.GetAlt() &&
+	ai.GetSemanticContext().equals(bi.GetSemanticContext())
 }
+
 
 type ATNConfigSet struct {
 	readOnly             bool
@@ -101,6 +106,8 @@ func NewATNConfigSet(fullCtx bool) *ATNConfigSet {
 // {@link //hasSemanticContext} when necessary.</p>
 // /
 func (this *ATNConfigSet) add(config IATNConfig, mergeCache *DoubleDict) bool {
+
+//	fmt.Println("DEBUG = Adding config : " + config.String())
 
 	if this.readOnly {
 		panic("This set is readonly")

@@ -61,7 +61,7 @@ var ConsoleErrorListenerINSTANCE = NewConsoleErrorListener()
 // </pre>
 //
 func (this *ConsoleErrorListener) SyntaxError(recognizer IRecognizer, offendingSymbol interface{}, line, column int, msg string, e IRecognitionException) {
-	fmt.Errorf("line " + strconv.Itoa(line) + ":" + strconv.Itoa(column) + " " + msg)
+	fmt.Println("line " + strconv.Itoa(line) + ":" + strconv.Itoa(column) + " " + msg)
 }
 
 type ProxyErrorListener struct {

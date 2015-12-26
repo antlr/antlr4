@@ -7,7 +7,7 @@ import (
 //
 // This implementation of {@link ANTLRErrorListener} can be used to identify
 // certain potential correctness and performance problems in grammars. "Reports"
-// are made by calling {@link Parser//notifyErrorListeners} with the appropriate
+// are made by calling {@link Parser//NotifyErrorListeners} with the appropriate
 // message.
 //
 // <ul>
@@ -48,7 +48,7 @@ func (this *DiagnosticErrorListener) ReportAmbiguity(recognizer *Parser, dfa *DF
 		this.getConflictingAlts(ambigAlts, configs).String() +
 		", input='" +
 		recognizer.GetTokenStream().GetTextFromInterval(NewInterval(startIndex, stopIndex)) + "'"
-	recognizer.notifyErrorListeners(msg, nil, nil)
+	recognizer.NotifyErrorListeners(msg, nil, nil)
 }
 
 func (this *DiagnosticErrorListener) ReportAttemptingFullContext(recognizer *Parser, dfa *DFA, startIndex, stopIndex int, conflictingAlts *BitSet, configs *ATNConfigSet) {
@@ -57,7 +57,7 @@ func (this *DiagnosticErrorListener) ReportAttemptingFullContext(recognizer *Par
 		this.getDecisionDescription(recognizer, dfa) +
 		", input='" +
 		recognizer.GetTokenStream().GetTextFromInterval(NewInterval(startIndex, stopIndex)) + "'"
-	recognizer.notifyErrorListeners(msg, nil, nil)
+	recognizer.NotifyErrorListeners(msg, nil, nil)
 }
 
 func (this *DiagnosticErrorListener) ReportContextSensitivity(recognizer *Parser, dfa *DFA, startIndex, stopIndex, prediction int, configs *ATNConfigSet) {
@@ -65,7 +65,7 @@ func (this *DiagnosticErrorListener) ReportContextSensitivity(recognizer *Parser
 		this.getDecisionDescription(recognizer, dfa) +
 		", input='" +
 		recognizer.GetTokenStream().GetTextFromInterval(NewInterval(startIndex, stopIndex)) + "'"
-	recognizer.notifyErrorListeners(msg, nil, nil)
+	recognizer.NotifyErrorListeners(msg, nil, nil)
 }
 
 func (this *DiagnosticErrorListener) getDecisionDescription(recognizer *Parser, dfa *DFA) string {
