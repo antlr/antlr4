@@ -726,9 +726,11 @@ ArithmeticParser.prototype.relop = function() {
         this.state = 56;
         _la = this._input.LA(1);
         if(!((((_la) & ~0x1f) == 0 && ((1 << _la) & ((1 << ArithmeticParser.GT) | (1 << ArithmeticParser.LT) | (1 << ArithmeticParser.EQ))) !== 0))) {
+        console.log("DEBUG1")
         this._errHandler.recoverInline(this);
         }
         else {
+            console.log("DEBUG2")
             this.consume();
         }
     } catch (re) {

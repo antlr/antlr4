@@ -7,11 +7,6 @@ import (
 
 // A DFA walker that knows how to dump them to serialized strings.
 
-type IDFASerializer interface {
-
-}
-
-
 type DFASerializer struct {
 	dfa                         *DFA
 	literalNames, symbolicNames []string
@@ -44,8 +39,7 @@ func (this *DFASerializer) String() string {
 
 	var buf = ""
 	var states = this.dfa.sortedStates()
-	for i := 0; i < len(states); i++ {
-		var s = states[i]
+	for _,s := range states {
 		if s.edges != nil {
 			var n = len(s.edges)
 			for j := 0; j < n; j++ {

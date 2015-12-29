@@ -454,7 +454,7 @@ TestSetInline(s) ::= <<
 
 // Javascript language spec - shift operators are 32 bits long max
 testShiftInRange(shiftAmount) ::= <<
-((<shiftAmount>) & 0x1f) == 0
+((<shiftAmount>) & -(0x1f+1)) == 0
 >>
 
 // produces smaller bytecode only when bits.ttypes contains more than two items

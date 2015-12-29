@@ -97,7 +97,6 @@ BufferedTokenStream.prototype.mark = function() {
 };
 
 BufferedTokenStream.prototype.release = function(marker) {
-console.log("Nothing to release")
 	// no resources to release
 };
 

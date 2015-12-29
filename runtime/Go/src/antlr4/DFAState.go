@@ -121,6 +121,10 @@ func (this *DFAState) GetAltSet() *Set {
 	}
 }
 
+func (this *DFAState) setPrediction(v int) {
+	this.prediction = v
+}
+
 // Two {@link DFAState} instances are equal if their ATN configuration sets
 // are the same. This method is used to see if a state already exists.
 //
@@ -151,8 +155,8 @@ func (this *DFAState) String() string {
 func (this *DFAState) Hash() string {
 
 	var s string
-	if (this.isAcceptState) {
-		if (this.predicates != nil) {
+	if this.isAcceptState {
+		if this.predicates != nil {
 			s = "=>" + fmt.Sprint(this.predicates)
 		} else {
 			s = "=>" + fmt.Sprint(this.prediction)

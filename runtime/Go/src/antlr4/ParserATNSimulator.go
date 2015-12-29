@@ -327,19 +327,19 @@ func (this *ParserATNSimulator) computeTargetState(dfa *DFA, previousD *DFAState
 		// NO CONFLICT, UNIQUELY PREDICTED ALT
 		D.isAcceptState = true
 		D.configs.uniqueAlt = predictedAlt
-		D.prediction = predictedAlt
+		D.setPrediction( predictedAlt )
 	} else if PredictionModehasSLLConflictTerminatingPrediction(this.predictionMode, reach) {
 		// MORE THAN ONE VIABLE ALTERNATIVE
 		D.configs.conflictingAlts = this.getConflictingAlts(reach)
 		D.requiresFullContext = true
 		// in SLL-only mode, we will stop at this state and return the minimum alt
 		D.isAcceptState = true
-		D.prediction = D.configs.conflictingAlts.minValue()
+		D.setPrediction( D.configs.conflictingAlts.minValue() )
 	}
 	if D.isAcceptState && D.configs.hasSemanticContext {
 		this.predicateDFAState(D, this.atn.getDecisionState(dfa.decision))
 		if D.predicates != nil {
-			D.prediction = ATNINVALID_ALT_NUMBER
+			D.setPrediction( ATNINVALID_ALT_NUMBER )
 		}
 	}
 	// all adds to dfa are done after we've created full D state
@@ -357,12 +357,12 @@ func (this *ParserATNSimulator) predicateDFAState(dfaState *DFAState, decisionSt
 	var altToPred = this.getPredsForAmbigAlts(altsToCollectPredsFrom, dfaState.configs, nalts)
 	if altToPred != nil {
 		dfaState.predicates = this.getPredicatePredictions(altsToCollectPredsFrom, altToPred)
-		dfaState.prediction = ATNINVALID_ALT_NUMBER // make sure we use preds
+		dfaState.setPrediction( ATNINVALID_ALT_NUMBER ) // make sure we use preds
 	} else {
 		// There are preds in configs but they might go away
 		// when OR'd together like {p}? || NONE == NONE. If neither
 		// alt has preds, resolve to min alt
-		dfaState.prediction = altsToCollectPredsFrom.minValue()
+		dfaState.setPrediction( altsToCollectPredsFrom.minValue() )
 	}
 }
 
@@ -1071,7 +1071,6 @@ func (this *ParserATNSimulator) closure_(config IATNConfig, configs *ATNConfigSe
 					fmt.Println(c)
 					fmt.Println(closureBusy)
 				}
-
 
 				if this._dfa != nil && this._dfa.precedenceDfa {
 					fmt.Println("DEBUG 4")

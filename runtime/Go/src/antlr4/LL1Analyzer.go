@@ -175,7 +175,7 @@ func (la *LL1Analyzer) _LOOK(s, stopState IATNState, ctx IPredictionContext, loo
 			for i := 0; i < ctx.length(); i++ {
 
 				returnState := la.atn.states[ctx.getReturnState(i)]
-				la.__LOOK(returnState, stopState, ctx.GetParent(i), look, lookBusy, calledRuleStack, seeThruPreds, addEOF, i)
+				la.__LOOK(returnState, stopState, ctx, look, lookBusy, calledRuleStack, seeThruPreds, addEOF, i)
 
 			}
 			return

@@ -219,7 +219,7 @@ func (this *BitSet) values() []int {
 }
 
 func (this *BitSet) minValue() int {
-	min := 0
+	min := 2147483647
 
 	for k, _ := range this.data {
 		if k < min {

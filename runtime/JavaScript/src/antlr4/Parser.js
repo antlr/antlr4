@@ -141,7 +141,6 @@ Parser.prototype.match = function(ttype) {
 	if (t.type === ttype) {
 		this._errHandler.reportMatch(this);
 		this.consume();
-		console.log("consume done")
 	} else {
 		t = this._errHandler.recoverInline(this);
 		if (this.buildParseTrees && t.tokenIndex === -1) {
