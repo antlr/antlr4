@@ -125,6 +125,8 @@ func (p *Parser) GetParseListeners() []ParseTreeListener {
 // misMatched symbol
 
 func (p *Parser) Match(ttype int) IToken {
+
+	fmt.Println("get current token")
 	var t = p.getCurrentToken()
 
 	fmt.Println("TOKEN IS " + t.GetText())
@@ -141,6 +143,9 @@ func (p *Parser) Match(ttype int) IToken {
 			p._ctx.addErrorNode(t)
 		}
 	}
+
+	fmt.Println("match done")
+
 	return t
 }
 
@@ -406,7 +411,9 @@ func (p *Parser) NotifyErrorListeners(msg string, offendingToken IToken, err IRe
 func (p *Parser) Consume() IToken {
 	var o = p.getCurrentToken()
 	if o.GetTokenType() != TokenEOF {
+		fmt.Println("Consuming")
 		p.GetInputStream().Consume()
+		fmt.Println("Done consuming")
 	}
 	var hasListener = p._parseListeners != nil && len(p._parseListeners) > 0
 	if p.BuildParseTrees || hasListener {

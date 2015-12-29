@@ -1,4 +1,5 @@
 package antlr4
+import "fmt"
 
 type InputStream struct {
 	name  string
@@ -66,6 +67,7 @@ func (is *InputStream) Mark() int {
 }
 
 func (is *InputStream) Release(marker int) {
+	fmt.Println("RELEASING")
 }
 
 func (is *InputStream) Seek(index int) {

@@ -107,21 +107,25 @@ func (this *LexerATNSimulator) Match(input CharStream, mode int) int {
 
 	fmt.Println("Match")
 
-
 	this.Match_calls += 1
 	this.mode = mode
 	var mark = input.Mark()
 
 	defer func() {
+		fmt.Println("FINALLY")
 		input.Release(mark)
 	}()
 
 	this.startIndex = input.Index()
 	this.prevAccept.reset()
+
 	var dfa = this.decisionToDFA[mode]
+
 	if dfa.s0 == nil {
+		fmt.Println("MatchATN")
 		return this.MatchATN(input)
 	} else {
+		fmt.Println("execATN")
 		return this.execATN(input, dfa.s0)
 	}
 }
@@ -159,15 +163,7 @@ func (this *LexerATNSimulator) MatchATN(input CharStream) int {
 	return predict
 }
 
-var countA = 0
-
 func (this *LexerATNSimulator) execATN(input CharStream, ds0 *DFAState) int {
-
-	countA += 1
-
-	if (countA == 2) {
-		panic("GAH")
-	}
 
 	if LexerATNSimulatorDebug {
 		fmt.Println("start state closure=" + ds0.configs.String())
@@ -228,7 +224,7 @@ func (this *LexerATNSimulator) execATN(input CharStream, ds0 *DFAState) int {
 		s = target // flip current DFA target becomes Newsrc/from state
 	}
 
-	fmt.Println("OUT")
+	fmt.Println("DONE WITH execATN loop")
 	return this.failOrAccept(this.prevAccept, input, s.configs, t)
 }
 

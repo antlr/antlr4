@@ -97,6 +97,7 @@ BufferedTokenStream.prototype.mark = function() {
 };
 
 BufferedTokenStream.prototype.release = function(marker) {
+console.log("Nothing to release")
 	// no resources to release
 };
 
@@ -129,10 +130,12 @@ BufferedTokenStream.prototype.consume = function() {
 		// not yet initialized
 		skipEofCheck = false;
 	}
+	console.log("consume 1")
 	if (!skipEofCheck && this.LA(1) === Token.EOF) {
 		throw "cannot consume EOF";
 	}
 	if (this.sync(this.index + 1)) {
+		console.log("consume 2")
 		this.index = this.adjustSeekIndex(this.index + 1);
 	}
 };
@@ -147,6 +150,10 @@ BufferedTokenStream.prototype.sync = function(i) {
 	var n = i - this.tokens.length + 1; // how many more elements we need?
 	if (n > 0) {
 		var fetched = this.fetch(n);
+		var e = new Error();
+		console.log("sync done")
+		console.log(e.stack)
+
 		return fetched >= n;
 	}
 	return true;
@@ -162,6 +169,7 @@ BufferedTokenStream.prototype.fetch = function(n) {
 	}
 	for (var i = 0; i < n; i++) {
 		var t = this.tokenSource.nextToken();
+		console.log("fetch loop")
 		t.tokenIndex = this.tokens.length;
 		this.tokens.push(t);
 		if (t.type === Token.EOF) {
@@ -169,6 +177,8 @@ BufferedTokenStream.prototype.fetch = function(n) {
 			return i + 1;
 		}
 	}
+
+	console.log("fetch done")
 	return n;
 };
 

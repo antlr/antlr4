@@ -58,7 +58,8 @@ func (this *CommonTokenFactory) Create(source *TokenSourceCharStreamPair, ttype 
 	} else if this.copyText && source.charStream != nil {
 		t.SetText(source.charStream.GetTextFromInterval(NewInterval(start, stop)))
 	}
-	return t.Token
+
+	return t
 
 }
 
@@ -68,5 +69,5 @@ func (this *CommonTokenFactory) createThin(ttype int, text string) IToken {
 
 	var t = NewCommonToken(nil, ttype, TokenDefaultChannel, -1, -1)
 	t.SetText(text)
-	return t.Token
+	return t
 }

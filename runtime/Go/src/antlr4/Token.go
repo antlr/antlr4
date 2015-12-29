@@ -98,15 +98,6 @@ func (this *Token) GetSource() *TokenSourceCharStreamPair{
 	return this.source
 }
 
-func (this *Token) GetText() string {
-	return this._text
-}
-
-
-func (this *Token) SetText(s string) {
-	this._text = s
-}
-
 func (this *Token) GetTokenIndex() int {
 	return this.tokenIndex
 }

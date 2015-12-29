@@ -13,6 +13,7 @@ package antlr4
 
 import (
 	"strconv"
+	"fmt"
 )
 
 // bt is just to keep meaningful parameter types to Parser
@@ -105,10 +106,13 @@ func (bt *BufferedTokenStream) Consume() {
 		// not yet initialized
 		skipEofCheck = false
 	}
+
+	fmt.Println("Consume 1")
 	if !skipEofCheck && bt.LA(1) == TokenEOF {
 		panic("cannot consume EOF")
 	}
 	if bt.Sync(bt.index + 1) {
+		fmt.Println("Consume 2")
 		bt.index = bt.adjustSeekIndex(bt.index + 1)
 	}
 }
@@ -123,6 +127,7 @@ func (bt *BufferedTokenStream) Sync(i int) bool {
 	var n = i - len(bt.tokens) + 1 // how many more elements we need?
 	if n > 0 {
 		var fetched = bt.fetch(n)
+		fmt.Println("Sync done")
 		return fetched >= n
 	}
 	return true
@@ -139,6 +144,7 @@ func (bt *BufferedTokenStream) fetch(n int) int {
 
 	for i := 0; i < n; i++ {
 		var t IToken = bt.tokenSource.nextToken()
+		fmt.Println("fetch loop")
 		t.SetTokenIndex( len(bt.tokens) )
 		bt.tokens = append(bt.tokens, t)
 		if t.GetTokenType() == TokenEOF {
@@ -146,6 +152,8 @@ func (bt *BufferedTokenStream) fetch(n int) int {
 			return i + 1
 		}
 	}
+
+	fmt.Println("fetch done")
 	return n
 }
 

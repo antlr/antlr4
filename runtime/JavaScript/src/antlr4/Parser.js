@@ -133,12 +133,15 @@ Parser.prototype.reset = function() {
 // mismatched symbol
 
 Parser.prototype.match = function(ttype) {
+
+	console.log("get current token")
 	var t = this.getCurrentToken();
 
 	console.log("TOKEN IS " + t.text)
 	if (t.type === ttype) {
 		this._errHandler.reportMatch(this);
 		this.consume();
+		console.log("consume done")
 	} else {
 		t = this._errHandler.recoverInline(this);
 		if (this.buildParseTrees && t.tokenIndex === -1) {
@@ -148,6 +151,9 @@ Parser.prototype.match = function(ttype) {
 			this._ctx.addErrorNode(t);
 		}
 	}
+
+	console.log("Match done")
+
 	return t;
 };
 // Match current input symbol as a wildcard. If the symbol type matches
@@ -400,8 +406,11 @@ Parser.prototype.notifyErrorListeners = function(msg, offendingToken, err) {
 Parser.prototype.consume = function() {
 	var o = this.getCurrentToken();
 	if (o.type !== Token.EOF) {
+		console.log("Consuming")
 		this.getInputStream().consume();
+		console.log("done consuming")
 	}
+
 	var hasListener = this._parseListeners !== null && this._parseListeners.length > 0;
 	if (this.buildParseTrees || hasListener) {
 		var node;

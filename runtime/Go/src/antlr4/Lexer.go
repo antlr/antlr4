@@ -211,7 +211,10 @@ func (l *Lexer) nextToken() IToken {
 			if l._type != LexerMore {
 				break
 			}
+			fmt.Println("lex inner loop")
 		}
+
+		fmt.Println("lex loop")
 		if continueOuter {
 			continue
 		}
@@ -290,6 +293,7 @@ func (l *Lexer) emitToken(token IToken) {
 // custom Token objects or provide a Newfactory.
 // /
 func (l *Lexer) emit() IToken {
+	fmt.Println("emit")
 	var t = l._factory.Create(l._tokenFactorySourcePair, l._type, l._text, l._channel, l._tokenStartCharIndex, l.getCharIndex()-1, l._tokenStartLine, l._tokenStartColumn)
 	l.emitToken(t)
 	return t
@@ -298,6 +302,7 @@ func (l *Lexer) emit() IToken {
 func (l *Lexer) emitEOF() IToken {
 	cpos := l.getCharPositionInLine()
 	lpos := l.getLine()
+	fmt.Println("emitEOF")
 	var eof = l._factory.Create(l._tokenFactorySourcePair, TokenEOF, "", TokenDefaultChannel, l._input.Index(), l._input.Index()-1, lpos, cpos)
 	l.emitToken(eof)
 	return eof

@@ -128,11 +128,16 @@ LexerATNSimulator.prototype.match = function(input, mode) {
 		this.prevAccept.reset();
 		var dfa = this.decisionToDFA[mode];
 		if (dfa.s0 === null) {
+			console.log("matchATN")
 			return this.matchATN(input);
 		} else {
-			return this.execATN(input, dfa.s0);
+			console.log("execATN")
+			console.log((new Error()).stack)
+			var res = this.execATN(input, dfa.s0);
+			return res;
 		}
 	} finally {
+		console.log("FINALLY")
 		input.release(mark);
 	}
 };
@@ -229,8 +234,10 @@ LexerATNSimulator.prototype.execATN = function(input, ds0) {
 		s = target; // flip; current DFA target becomes new src/from state
 	}
 
-	console.log("OUT")
-	return this.failOrAccept(this.prevAccept, input, s.configs, t);
+	console.log("Done with execATN loop")
+	var res = this.failOrAccept(this.prevAccept, input, s.configs, t);
+	console.log("Done with failOrAccept", res)
+	return res;
 };
 
 // Get an existing target state for an edge in the DFA. If the target state
@@ -287,11 +294,15 @@ LexerATNSimulator.prototype.computeTargetState = function(input, s, t) {
 };
 
 LexerATNSimulator.prototype.failOrAccept = function(prevAccept, input, reach, t) {
+
 	if (this.prevAccept.dfaState !== null) {
+
 		var lexerActionExecutor = prevAccept.dfaState.lexerActionExecutor;
 		this.accept(input, lexerActionExecutor, this.startIndex,
 				prevAccept.index, prevAccept.line, prevAccept.column);
-		console.log(prevAccept.dfaState.prediction)
+
+		console.log("Prevaccept", prevAccept.dfaState.prediction)
+
 		return prevAccept.dfaState.prediction;
 	} else {
 		// if no accept and EOF is first char, return EOF
@@ -341,8 +352,7 @@ LexerATNSimulator.prototype.getReachableConfigSet = function(input, closure,
 	}
 };
 
-LexerATNSimulator.prototype.accept = function(input, lexerActionExecutor,
-		startIndex, index, line, charPos) {
+LexerATNSimulator.prototype.accept = function(input, lexerActionExecutor, startIndex, index, line, charPos) {
 	if (this.debug) {
 		console.log("ACTION %s", lexerActionExecutor);
 	}

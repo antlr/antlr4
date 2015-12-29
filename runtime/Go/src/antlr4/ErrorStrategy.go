@@ -544,6 +544,8 @@ func (this *DefaultErrorStrategy) getMissingSymbol(recognizer IParser) IToken {
 	}
 
 	tf := recognizer.GetTokenFactory()
+
+	fmt.Println("Missing symbol error")
 	return tf.Create( current.GetSource(), expectedTokenType, tokenText, TokenDefaultChannel, -1, -1, current.GetLine(), current.GetColumn())
 }
 

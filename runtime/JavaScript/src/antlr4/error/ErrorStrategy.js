@@ -573,6 +573,9 @@ DefaultErrorStrategy.prototype.getMissingSymbol = function(recognizer) {
     if (current.type===Token.EOF && lookback !== null) {
         current = lookback;
     }
+
+    fmt.Println("Missing symbol error")
+
     return recognizer.getTokenFactory().create(current.source,
         expectedTokenType, tokenText, Token.DEFAULT_CHANNEL,
         -1, -1, current.line, current.column);

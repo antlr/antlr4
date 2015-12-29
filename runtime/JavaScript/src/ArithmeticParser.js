@@ -818,6 +818,7 @@ ArithmeticParser.prototype.number = function() {
         do {
             this.state = 61;
             this.match(ArithmeticParser.DIGIT);
+            console.log("Done with match")
             this.state = 64; 
             this._errHandler.sync(this);
             _la = this._input.LA(1);

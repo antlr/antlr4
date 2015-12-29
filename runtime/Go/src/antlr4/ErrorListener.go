@@ -19,7 +19,7 @@ type IErrorListener interface {
 type DefaultErrorListener struct {
 }
 
-func NewErrorListener() *DefaultErrorListener {
+func NewDefaultErrorListener() *DefaultErrorListener {
 	return new(DefaultErrorListener)
 }
 
