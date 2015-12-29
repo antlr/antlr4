@@ -177,9 +177,11 @@ BufferedTokenStream.prototype.getTokens = function(start, stop, types) {
 	if (types === undefined) {
 		types = null;
 	}
+
 	if (start < 0 || stop < 0) {
 		return null;
 	}
+
 	this.lazyInit();
 	var subset = [];
 	if (stop >= this.tokens.length) {
@@ -194,6 +196,7 @@ BufferedTokenStream.prototype.getTokens = function(start, stop, types) {
 			subset.push(t);
 		}
 	}
+
 	return subset;
 };
 

@@ -11,19 +11,17 @@ import (
 ///
 
 func hashATNConfig(c interface{}) string {
-	return c.(*ATNConfig).shortHashString()
+	return c.(IATNConfig).shortHashString()
 }
 
 func equalATNConfigs(a, b interface{}) bool {
 
-	fmt.Println("compare")
-	fmt.Println(a)
+	if a == nil || b == nil {
+		return false
+	}
 
 	if a == b {
 		return true
-	}
-	if a == nil || b == nil {
-		return false
 	}
 
 	ai,ok := a.(IATNConfig)
@@ -34,8 +32,8 @@ func equalATNConfigs(a, b interface{}) bool {
 	}
 
 	return ai.GetState().GetStateNumber() == bi.GetState().GetStateNumber() &&
-	ai.GetAlt() == bi.GetAlt() &&
-	ai.GetSemanticContext().equals(bi.GetSemanticContext())
+		ai.GetAlt() == bi.GetAlt() &&
+		ai.GetSemanticContext().equals(bi.GetSemanticContext())
 }
 
 
@@ -107,8 +105,6 @@ func NewATNConfigSet(fullCtx bool) *ATNConfigSet {
 // /
 func (this *ATNConfigSet) add(config IATNConfig, mergeCache *DoubleDict) bool {
 
-//	fmt.Println("DEBUG = Adding config : " + config.String())
-
 	if this.readOnly {
 		panic("This set is readonly")
 	}
@@ -136,6 +132,7 @@ func (this *ATNConfigSet) add(config IATNConfig, mergeCache *DoubleDict) bool {
 		existing.setPrecedenceFilterSuppressed(true)
 	}
 	existing.SetContext(merged) // replace context no need to alt mapping
+
 	return true
 }
 
@@ -288,6 +285,9 @@ func (this *ATNConfigSet) String() string {
 	return s
 }
 
+
+
+
 type OrderedATNConfigSet struct {
 	*ATNConfigSet
 }
@@ -297,7 +297,7 @@ func NewOrderedATNConfigSet() *OrderedATNConfigSet {
 	this := new(OrderedATNConfigSet)
 
 	this.ATNConfigSet = NewATNConfigSet(false)
-	this.configLookup = NewSet(nil, nil)
+//	this.configLookup = NewSet(nil, nil) // TODO not sure why this would be overriden
 
 	return this
 }

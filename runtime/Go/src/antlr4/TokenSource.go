@@ -1,7 +1,7 @@
 package antlr4
 
 type TokenSource interface {
-	nextToken() *Token
+	nextToken() IToken
 	skip()
 	more()
 	getLine() int

@@ -43,7 +43,7 @@ func (ts *CommonTokenStream) adjustSeekIndex(i int) int {
 	return ts.nextTokenOnChannel(i, ts.channel)
 }
 
-func (ts *CommonTokenStream) LB(k int) *Token {
+func (ts *CommonTokenStream) LB(k int) IToken {
 	if k == 0 || ts.index-k < 0 {
 		return nil
 	}
@@ -61,7 +61,7 @@ func (ts *CommonTokenStream) LB(k int) *Token {
 	return ts.tokens[i]
 }
 
-func (ts *CommonTokenStream) LT(k int) *Token {
+func (ts *CommonTokenStream) LT(k int) IToken {
 	ts.lazyInit()
 	if k == 0 {
 		return nil
@@ -88,10 +88,10 @@ func (ts *CommonTokenStream) getNumberOfOnChannelTokens() int {
 	ts.fill()
 	for i := 0; i < len(ts.tokens); i++ {
 		var t = ts.tokens[i]
-		if t.channel == ts.channel {
+		if t.GetChannel() == ts.channel {
 			n += 1
 		}
-		if t.tokenType == TokenEOF {
+		if t.GetTokenType() == TokenEOF {
 			break
 		}
 	}

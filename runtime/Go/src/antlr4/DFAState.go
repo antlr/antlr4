@@ -132,6 +132,7 @@ func (this *DFAState) GetAltSet() *Set {
 // {@link ParserATNSimulator//addDFAState} we need to know if any other state
 // exists that has this exact set of ATN configurations. The
 // {@link //stateNumber} is irrelevant.</p>
+
 func (this *DFAState) equals(other interface{}) bool {
 
 	if this == other {
@@ -151,7 +152,7 @@ func (this *DFAState) hashString() string {
 
 	var s string
 	if (this.isAcceptState) {
-		if (this.predicates == nil) {
+		if (this.predicates != nil) {
 			s = "=>" + fmt.Sprint(this.predicates)
 		} else {
 			s = "=>" + fmt.Sprint(this.prediction)

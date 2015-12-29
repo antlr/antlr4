@@ -72,10 +72,6 @@ func (this *PredictionContext) isEmpty() bool {
 	return false
 }
 
-func (this *PredictionContext) hasEmptyPath() bool {
-	return this.getReturnState(this.length()-1) == PredictionContextEMPTY_RETURN_STATE
-}
-
 func (this *PredictionContext) hashString() string {
 	return this.cachedHashString
 }
@@ -86,22 +82,6 @@ func calculateHashString(parent IPredictionContext, returnState int) string {
 
 func calculateEmptyHashString() string {
 	return ""
-}
-
-func (this *PredictionContext) String() string {
-	panic("Not implemented")
-}
-
-func (this *PredictionContext) GetParent(index int) IPredictionContext {
-	panic("Not implemented")
-}
-
-func (this *PredictionContext) length() int {
-	panic("Not implemented")
-}
-
-func (this *PredictionContext) getReturnState(index int) int {
-	panic("Not implemented")
 }
 
 // Used to cache {@link PredictionContext} objects. Its used for the shared
@@ -189,6 +169,10 @@ func (this *SingletonPredictionContext) GetParent(index int) IPredictionContext 
 
 func (this *SingletonPredictionContext) getReturnState(index int) int {
 	return this.returnState
+}
+
+func (this *SingletonPredictionContext) hasEmptyPath() bool {
+	return this.returnState == PredictionContextEMPTY_RETURN_STATE
 }
 
 func (this *SingletonPredictionContext) equals(other IPredictionContext) bool {
@@ -301,6 +285,10 @@ func (c *ArrayPredictionContext) GetReturnStates() []int {
 	return c.returnStates
 }
 
+func (this *ArrayPredictionContext) hasEmptyPath() bool {
+	return this.getReturnState(this.length()-1) == PredictionContextEMPTY_RETURN_STATE
+}
+
 func (this *ArrayPredictionContext) isEmpty() bool {
 	// since EMPTY_RETURN_STATE can only appear in the last position, we
 	// don't need to verify that size==1
@@ -320,9 +308,7 @@ func (this *ArrayPredictionContext) getReturnState(index int) int {
 }
 
 func (this *ArrayPredictionContext) equals(other IPredictionContext) bool {
-	if this == other {
-		return true
-	} else if _, ok := other.(*ArrayPredictionContext); !ok {
+	if _, ok := other.(*ArrayPredictionContext); !ok {
 		return false
 	} else if this.cachedHashString != other.hashString() {
 		return false // can't be same if hash is different

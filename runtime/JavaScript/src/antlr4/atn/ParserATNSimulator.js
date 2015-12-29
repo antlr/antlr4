@@ -313,7 +313,7 @@ function ParserATNSimulator(parser, atn, decisionToDFA, sharedContextCache) {
 ParserATNSimulator.prototype = Object.create(ATNSimulator.prototype);
 ParserATNSimulator.prototype.constructor = ParserATNSimulator;
 
-ParserATNSimulator.prototype.debug = false;
+ParserATNSimulator.prototype.debug = true;
 ParserATNSimulator.prototype.debug_list_atn_decisions = false;
 ParserATNSimulator.prototype.dfa_debug = false;
 ParserATNSimulator.prototype.retry_debug = false;
@@ -323,6 +323,9 @@ ParserATNSimulator.prototype.reset = function() {
 };
 
 ParserATNSimulator.prototype.adaptivePredict = function(input, decision, outerContext) {
+
+    console.log("adaptive predict")
+
     if (this.debug || this.debug_list_atn_decisions) {
         console.log("adaptivePredict decision " + decision +
                                " exec LA(1)==" + this.getLookaheadName(input) +
@@ -1512,13 +1515,16 @@ ParserATNSimulator.prototype.getConflictingAltsOrUniqueAlt = function(configs) {
 };
 
 ParserATNSimulator.prototype.getTokenName = function( t) {
+
+    console.log("Get token name")
+
     if (t===Token.EOF) {
         return "EOF";
     }
     if( this.parser!==null && this.parser.literalNames!==null) {
         if (t >= this.parser.literalNames.length) {
             console.log("" + t + " ttype out of range: " + this.parser.literalNames);
-            console.log("" + this.parser.getInputStream().getTokens());
+//            console.log(this.parser.getInputStream().getTokens());
         } else {
             return this.parser.literalNames[t] + "<" + t + ">";
         }
@@ -1529,7 +1535,7 @@ ParserATNSimulator.prototype.getTokenName = function( t) {
 ParserATNSimulator.prototype.getLookaheadName = function(input) {
     return this.getTokenName(input.LA(1));
 };
-
+``
 // Used for debugging in adaptivePredict around execATN but I cut
 //  it out for clarity now that alg. works well. We can leave this
 //  "dead" code for a bit.

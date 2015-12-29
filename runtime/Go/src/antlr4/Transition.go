@@ -26,7 +26,8 @@ type ITransition interface {
 type Transition struct {
 	target            IATNState
 	isEpsilon         bool
-	label             *IntervalSet
+	label_ int
+	label  *IntervalSet
 	serializationType int
 }
 
@@ -124,8 +125,6 @@ var TransitionserializationNames = []string{
 // TODO: make all transitions sets? no, should remove set edges
 type AtomTransition struct {
 	*Transition
-	label_ int
-	label  *IntervalSet
 }
 
 func NewAtomTransition(target IATNState, label int) *AtomTransition {
@@ -236,6 +235,11 @@ func (t *RangeTransition) String() string {
 	return "'" + string(t.start) + "'..'" + string(t.stop) + "'"
 }
 
+type IAbstractPredicateTransition interface {
+	ITransition
+	IAbstractPredicateTransitionFoo()
+}
+
 type AbstractPredicateTransition struct {
 	*Transition
 }
@@ -248,8 +252,10 @@ func NewAbstractPredicateTransition(target IATNState) *AbstractPredicateTransiti
 	return t
 }
 
+func (a *AbstractPredicateTransition) IAbstractPredicateTransitionFoo(){}
+
 type PredicateTransition struct {
-	*Transition
+	*AbstractPredicateTransition
 
 	isCtxDependent       bool
 	ruleIndex, predIndex int
@@ -258,7 +264,7 @@ type PredicateTransition struct {
 func NewPredicateTransition(target IATNState, ruleIndex, predIndex int, isCtxDependent bool) *PredicateTransition {
 
 	t := new(PredicateTransition)
-	t.Transition = NewTransition(target)
+	t.AbstractPredicateTransition = NewAbstractPredicateTransition(target)
 
 	t.serializationType = TransitionPREDICATE
 	t.ruleIndex = ruleIndex
@@ -381,7 +387,7 @@ func (t *WildcardTransition) String() string {
 }
 
 type PrecedencePredicateTransition struct {
-	*Transition
+	*AbstractPredicateTransition
 
 	precedence int
 }
@@ -389,7 +395,7 @@ type PrecedencePredicateTransition struct {
 func NewPrecedencePredicateTransition(target IATNState, precedence int) *PrecedencePredicateTransition {
 
 	t := new(PrecedencePredicateTransition)
-	t.Transition = NewTransition(target)
+	t.AbstractPredicateTransition = NewAbstractPredicateTransition(target)
 
 	t.serializationType = TransitionPRECEDENCE
 	t.precedence = precedence

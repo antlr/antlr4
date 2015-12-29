@@ -8,16 +8,16 @@ type IParserRuleContext interface {
 	IRuleContext
 
 	SetException(IRecognitionException)
-	addTokenNode(token *Token) *TerminalNodeImpl
-	addErrorNode(badToken *Token) *ErrorNodeImpl
+	addTokenNode(token IToken) *TerminalNodeImpl
+	addErrorNode(badToken IToken) *ErrorNodeImpl
 	EnterRule(listener ParseTreeListener)
 	ExitRule(listener ParseTreeListener)
 
-	setStart(*Token)
-	getStart() *Token
+	setStart(IToken)
+	getStart() IToken
 
-	setStop(*Token)
-	getStop() *Token
+	setStop(IToken)
+	getStop() IToken
 
 	addChild(child IRuleContext) IRuleContext
 	removeLastChild()
@@ -27,7 +27,7 @@ type ParserRuleContext struct {
 	*RuleContext
 
 	children    []ParseTree
-	start, stop *Token
+	start, stop IToken
 	exception   IRecognitionException
 }
 
@@ -117,7 +117,7 @@ func (prc *ParserRuleContext) removeLastChild() {
 	}
 }
 
-func (prc *ParserRuleContext) addTokenNode(token *Token) *TerminalNodeImpl {
+func (prc *ParserRuleContext) addTokenNode(token IToken) *TerminalNodeImpl {
 
 	var node = NewTerminalNodeImpl(token)
 	prc.addTerminalNodeChild(node)
@@ -126,7 +126,7 @@ func (prc *ParserRuleContext) addTokenNode(token *Token) *TerminalNodeImpl {
 
 }
 
-func (prc *ParserRuleContext) addErrorNode(badToken *Token) *ErrorNodeImpl {
+func (prc *ParserRuleContext) addErrorNode(badToken IToken) *ErrorNodeImpl {
 	var node = NewErrorNodeImpl(badToken)
 	prc.addTerminalNodeChild(node)
 	node.parentCtx = prc
@@ -159,19 +159,19 @@ func (prc *ParserRuleContext) getChildOfType(i int, childType reflect.Type) IRul
 	}
 }
 
-func (prc *ParserRuleContext) setStart(t *Token) {
+func (prc *ParserRuleContext) setStart(t IToken) {
 	prc.start = t
 }
 
-func (prc *ParserRuleContext) getStart() *Token {
+func (prc *ParserRuleContext) getStart() IToken {
 	return prc.start
 }
 
-func (prc *ParserRuleContext) setStop(t *Token) {
+func (prc *ParserRuleContext) setStop(t IToken) {
 	prc.stop = t
 }
 
-func (prc *ParserRuleContext) getStop() *Token {
+func (prc *ParserRuleContext) getStop() IToken {
 	return prc.stop
 }
 
@@ -180,7 +180,7 @@ func (prc *ParserRuleContext) GetToken(ttype int, i int) TerminalNode {
 	for j := 0; j < len(prc.children); j++ {
 		var child = prc.children[j]
 		if c2, ok := child.(TerminalNode); ok {
-			if c2.getSymbol().tokenType == ttype {
+			if c2.getSymbol().GetTokenType() == ttype {
 				if i == 0 {
 					return c2
 				} else {
@@ -200,7 +200,7 @@ func (prc *ParserRuleContext) GetTokens(ttype int) []TerminalNode {
 		for j := 0; j < len(prc.children); j++ {
 			var child = prc.children[j]
 			if tchild, ok := child.(TerminalNode); ok {
-				if tchild.getSymbol().tokenType == ttype {
+				if tchild.getSymbol().GetTokenType() == ttype {
 					tokens = append(tokens, tchild)
 				}
 			}
@@ -242,7 +242,7 @@ func (prc *ParserRuleContext) GetSourceInterval() *Interval {
 	if prc.start == nil || prc.stop == nil {
 		return TreeINVALID_INTERVAL
 	} else {
-		return NewInterval(prc.start.tokenIndex, prc.stop.tokenIndex)
+		return NewInterval(prc.start.GetTokenIndex(), prc.stop.GetTokenIndex())
 	}
 }
 

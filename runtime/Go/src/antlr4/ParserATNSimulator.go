@@ -47,7 +47,7 @@ func NewParserATNSimulator(parser IParser, atn *ATN, decisionToDFA []*DFA, share
 	return this
 }
 
-var ParserATNSimulatorDebug = false
+var ParserATNSimulatorDebug = true
 var ParserATNSimulatorListATNDecisions = false
 var ParserATNSimulatorDFADebug = false
 var ParserATNSimulatorRetryDebug = false
@@ -57,11 +57,14 @@ func (this *ParserATNSimulator) reset() {
 
 func (this *ParserATNSimulator) AdaptivePredict(input TokenStream, decision int, outerContext IParserRuleContext) int {
 
+	fmt.Println("Adaptive preduct")
+
 	if ParserATNSimulatorDebug || ParserATNSimulatorListATNDecisions {
+
 		fmt.Println("AdaptivePredict decision " + strconv.Itoa(decision) +
 			" exec LA(1)==" + this.getLookaheadName(input) +
-			" line " + strconv.Itoa(input.LT(1).line) + ":" +
-			strconv.Itoa(input.LT(1).column))
+			" line " + strconv.Itoa(input.LT(1).GetLine()) + ":" +
+			strconv.Itoa(input.LT(1).GetColumn()))
 	}
 
 	this._input = input
@@ -174,7 +177,7 @@ func (this *ParserATNSimulator) execATN(dfa *DFA, s0 *DFAState, input TokenStrea
 	if ParserATNSimulatorDebug || ParserATNSimulatorListATNDecisions {
 		fmt.Println("execATN decision " + strconv.Itoa(dfa.decision) +
 			" exec LA(1)==" + this.getLookaheadName(input) +
-			" line " + strconv.Itoa(input.LT(1).line) + ":" + strconv.Itoa(input.LT(1).column))
+			" line " + strconv.Itoa(input.LT(1).GetLine()) + ":" + strconv.Itoa(input.LT(1).GetColumn()))
 	}
 
 	var previousD = s0
@@ -1278,18 +1281,22 @@ func (this *ParserATNSimulator) getConflictingAltsOrUniqueAlt(configs *ATNConfig
 
 func (this *ParserATNSimulator) GetTokenName(t int) string {
 
+	fmt.Println("Get token name")
+
 	if t == TokenEOF {
 		return "EOF"
 	}
+
 	if this.parser != nil && this.parser.GetLiteralNames() != nil {
 		if t >= len(this.parser.GetLiteralNames()) {
 			fmt.Println(strconv.Itoa(t) + " ttype out of range: " + strings.Join(this.parser.GetLiteralNames(), ","))
-			fmt.Println(this.parser.GetInputStream().(TokenStream).GetAllText())
+//			fmt.Println(this.parser.GetInputStream().(TokenStream).GetAllText()) // this seems incorrect
 		} else {
 			return this.parser.GetLiteralNames()[t] + "<" + strconv.Itoa(t) + ">"
 		}
 	}
-	return "" + strconv.Itoa(t)
+
+	return strconv.Itoa(t)
 }
 
 func (this *ParserATNSimulator) getLookaheadName(input TokenStream) string {

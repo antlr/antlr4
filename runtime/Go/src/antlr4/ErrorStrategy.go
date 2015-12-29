@@ -9,7 +9,7 @@ import (
 
 type IErrorStrategy interface {
 	reset(IParser)
-	RecoverInline(IParser) *Token
+	RecoverInline(IParser) IToken
 	Recover(IParser, IRecognitionException)
 	Sync(IParser)
 	inErrorRecoveryMode(IParser) bool
@@ -208,20 +208,35 @@ func (this *DefaultErrorStrategy) Sync(recognizer IParser) {
 	if this.inErrorRecoveryMode(recognizer) {
 		return
 	}
+
+	fmt.Println("STATE" + strconv.Itoa(recognizer.GetState()))
+
 	var s = recognizer.GetInterpreter().atn.states[recognizer.GetState()]
 	var la = recognizer.GetTokenStream().LA(1)
+
+	fmt.Println("LA" + strconv.Itoa(la))
+
 	// try cheaper subset first might get lucky. seems to shave a wee bit off
 	if la == TokenEOF || recognizer.GetATN().nextTokens(s, nil).contains(la) {
+		fmt.Println("OK1")
 		return
 	}
 	// Return but don't end recovery. only do that upon valid token Match
 	if recognizer.isExpectedToken(la) {
+		fmt.Println("OK2")
 		return
 	}
+
+	fmt.Println("LA" + strconv.Itoa(la))
+	fmt.Println(recognizer.GetATN().nextTokens(s, nil))
+
 	switch s.GetStateType() {
 	case ATNStateBLOCK_START:
+		fallthrough
 	case ATNStateSTAR_BLOCK_START:
+		fallthrough
 	case ATNStatePLUS_BLOCK_START:
+		fallthrough
 	case ATNStateSTAR_LOOP_ENTRY:
 		// Report error and recover if possible
 		if this.singleTokenDeletion(recognizer) != nil {
@@ -229,15 +244,14 @@ func (this *DefaultErrorStrategy) Sync(recognizer IParser) {
 		} else {
 			panic(NewInputMisMatchException(recognizer))
 		}
-		break
 	case ATNStatePLUS_LOOP_BACK:
+		fallthrough
 	case ATNStateSTAR_LOOP_BACK:
 		this.ReportUnwantedToken(recognizer)
 		var expecting = NewIntervalSet()
 		expecting.addSet(recognizer.getExpectedTokens())
 		var whatFollowsLoopIterationOrRule = expecting.addSet(this.getErrorRecoverySet(recognizer))
 		this.consumeUntil(recognizer, whatFollowsLoopIterationOrRule)
-		break
 	default:
 		// do nothing if we can't identify the exact kind of ATN state
 	}
@@ -255,7 +269,7 @@ func (this *DefaultErrorStrategy) ReportNoViableAlternative(recognizer IParser, 
 	var tokens = recognizer.GetTokenStream()
 	var input string
 	if tokens != nil {
-		if e.startToken.tokenType == TokenEOF {
+		if e.startToken.GetTokenType() == TokenEOF {
 			input = "<EOF>"
 		} else {
 			input = tokens.GetTextFromTokens(e.startToken, e.offendingToken)
@@ -279,6 +293,7 @@ func (this *DefaultErrorStrategy) ReportNoViableAlternative(recognizer IParser, 
 func (this *DefaultErrorStrategy) ReportInputMisMatch(recognizer IParser, e *InputMisMatchException) {
 	var msg = "misMatched input " + this.GetTokenErrorDisplay(e.offendingToken) +
 		" expecting " + e.getExpectedTokens().StringVerbose(recognizer.GetLiteralNames(), recognizer.GetSymbolicNames(), false)
+	panic(msg)
 	recognizer.NotifyErrorListeners(msg, e.offendingToken, e)
 }
 
@@ -324,6 +339,7 @@ func (this *DefaultErrorStrategy) ReportUnwantedToken(recognizer IParser) {
 	var expecting = this.getExpectedTokens(recognizer)
 	var msg = "extraneous input " + tokenName + " expecting " +
 		expecting.StringVerbose(recognizer.GetLiteralNames(), recognizer.GetSymbolicNames(), false)
+	panic(msg)
 	recognizer.NotifyErrorListeners(msg, t, nil)
 }
 
@@ -404,7 +420,7 @@ func (this *DefaultErrorStrategy) ReportMissingToken(recognizer IParser) {
 // is in the set of tokens that can follow the {@code ')'} token reference
 // in rule {@code atom}. It can assume that you forgot the {@code ')'}.
 //
-func (this *DefaultErrorStrategy) RecoverInline(recognizer IParser) *Token {
+func (this *DefaultErrorStrategy) RecoverInline(recognizer IParser) IToken {
 	// SINGLE TOKEN DELETION
 	var MatchedSymbol = this.singleTokenDeletion(recognizer)
 	if MatchedSymbol != nil {
@@ -473,7 +489,7 @@ func (this *DefaultErrorStrategy) singleTokenInsertion(recognizer IParser) bool 
 // deletion successfully recovers from the misMatched input, otherwise
 // {@code nil}
 //
-func (this *DefaultErrorStrategy) singleTokenDeletion(recognizer IParser) *Token {
+func (this *DefaultErrorStrategy) singleTokenDeletion(recognizer IParser) IToken {
 	var nextTokenType = recognizer.GetTokenStream().LA(2)
 	var expecting = this.getExpectedTokens(recognizer)
 	if expecting.contains(nextTokenType) {
@@ -511,7 +527,7 @@ func (this *DefaultErrorStrategy) singleTokenDeletion(recognizer IParser) *Token
 // If you change what tokens must be created by the lexer,
 // override this method to create the appropriate tokens.
 //
-func (this *DefaultErrorStrategy) getMissingSymbol(recognizer IParser) *Token {
+func (this *DefaultErrorStrategy) getMissingSymbol(recognizer IParser) IToken {
 	var currentSymbol = recognizer.getCurrentToken()
 	var expecting = this.getExpectedTokens(recognizer)
 	var expectedTokenType = expecting.first()
@@ -523,12 +539,12 @@ func (this *DefaultErrorStrategy) getMissingSymbol(recognizer IParser) *Token {
 	}
 	var current = currentSymbol
 	var lookback = recognizer.GetTokenStream().LT(-1)
-	if current.tokenType == TokenEOF && lookback != nil {
+	if current.GetTokenType() == TokenEOF && lookback != nil {
 		current = lookback
 	}
 
 	tf := recognizer.GetTokenFactory()
-	return tf.Create(current.source, expectedTokenType, tokenText, TokenDefaultChannel, -1, -1, current.line, current.column)
+	return tf.Create( current.GetSource(), expectedTokenType, tokenText, TokenDefaultChannel, -1, -1, current.GetLine(), current.GetColumn())
 }
 
 func (this *DefaultErrorStrategy) getExpectedTokens(recognizer IParser) *IntervalSet {
@@ -543,16 +559,16 @@ func (this *DefaultErrorStrategy) getExpectedTokens(recognizer IParser) *Interva
 // your token objects because you don't have to go modify your lexer
 // so that it creates a NewJava type.
 //
-func (this *DefaultErrorStrategy) GetTokenErrorDisplay(t *Token) string {
+func (this *DefaultErrorStrategy) GetTokenErrorDisplay(t IToken) string {
 	if t == nil {
 		return "<no token>"
 	}
-	var s = t.text()
+	var s = t.GetText()
 	if s == "" {
-		if t.tokenType == TokenEOF {
+		if t.GetTokenType() == TokenEOF {
 			s = "<EOF>"
 		} else {
-			s = "<" + strconv.Itoa(t.tokenType) + ">"
+			s = "<" + strconv.Itoa(t.GetTokenType()) + ">"
 		}
 	}
 	return this.escapeWSAndQuote(s)

@@ -30,7 +30,7 @@ type Lexer struct {
 	_input                  CharStream
 	_factory                TokenFactory
 	_tokenFactorySourcePair *TokenSourceCharStreamPair
-	_token                  *Token
+	_token                  IToken
 	_tokenStartCharIndex    int
 	_tokenStartLine         int
 	_tokenStartColumn       int
@@ -166,12 +166,11 @@ func (l *Lexer) safeMatch() (ret int) {
 }
 
 // Return a token from l source i.e., Match a token on the char stream.
-func (l *Lexer) nextToken() *Token {
+func (l *Lexer) nextToken() IToken {
 	if l._input == nil {
 		panic("nextToken requires a non-nil input stream.")
 	}
 
-	// do this when done consuming
 	var tokenStartMarker = l._input.Mark()
 
 	// previously in finally block
@@ -244,7 +243,7 @@ func (l *Lexer) mode(m int) {
 }
 
 func (l *Lexer) pushMode(m int) {
-	if LexerATNSimulatordebug {
+	if LexerATNSimulatorDebug {
 		fmt.Println("pushMode " + strconv.Itoa(m))
 	}
 	l._modeStack.Push(l._mode)
@@ -255,7 +254,7 @@ func (l *Lexer) popMode() int {
 	if len(l._modeStack) == 0 {
 		panic("Empty Stack")
 	}
-	if LexerATNSimulatordebug {
+	if LexerATNSimulatorDebug {
 		fmt.Println("popMode back to " + fmt.Sprint(l._modeStack[0:len(l._modeStack)-1]))
 	}
 	i, _ := l._modeStack.Pop()
@@ -280,7 +279,7 @@ func (l *Lexer) setInputStream(input CharStream) {
 // and GetToken (to push tokens into a list and pull from that list
 // rather than a single variable as l implementation does).
 // /
-func (l *Lexer) emitToken(token *Token) {
+func (l *Lexer) emitToken(token IToken) {
 	l._token = token
 }
 
@@ -290,13 +289,13 @@ func (l *Lexer) emitToken(token *Token) {
 // use that to set the token's text. Override l method to emit
 // custom Token objects or provide a Newfactory.
 // /
-func (l *Lexer) emit() *Token {
+func (l *Lexer) emit() IToken {
 	var t = l._factory.Create(l._tokenFactorySourcePair, l._type, l._text, l._channel, l._tokenStartCharIndex, l.getCharIndex()-1, l._tokenStartLine, l._tokenStartColumn)
 	l.emitToken(t)
 	return t
 }
 
-func (l *Lexer) emitEOF() *Token {
+func (l *Lexer) emitEOF() IToken {
 	cpos := l.getCharPositionInLine()
 	lpos := l.getLine()
 	var eof = l._factory.Create(l._tokenFactorySourcePair, TokenEOF, "", TokenDefaultChannel, l._input.Index(), l._input.Index()-1, lpos, cpos)
@@ -346,11 +345,13 @@ func (this *Lexer) GetATN() *ATN {
 // Return a list of all Token objects in input char stream.
 // Forces load of all tokens. Does not include EOF token.
 // /
-func (l *Lexer) getAllTokens() []*Token {
-	var tokens = make([]*Token, 0)
+func (l *Lexer) getAllTokens() []IToken {
+	fmt.Println("getAllTokens")
+	var tokens = make([]IToken, 0)
 	var t = l.nextToken()
-	for t.tokenType != TokenEOF {
+	for t.GetTokenType() != TokenEOF {
 		tokens = append(tokens, t)
+		fmt.Println("getAllTokens")
 		t = l.nextToken()
 	}
 	return tokens

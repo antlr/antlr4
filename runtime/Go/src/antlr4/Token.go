@@ -5,8 +5,6 @@ import (
 	"strings"
 )
 
-
-
 type TokenSourceCharStreamPair struct {
 	tokenSource TokenSource
 	charStream  CharStream
@@ -15,6 +13,26 @@ type TokenSourceCharStreamPair struct {
 // A token has properties: text, type, line, character position in the line
 // (so we can ignore tabs), token channel, index, and source from which
 // we obtained this token.
+
+
+type IToken interface {
+	GetSource() *TokenSourceCharStreamPair
+	GetTokenType() int
+	GetChannel() int
+	GetStart() int
+	GetStop() int
+	GetLine() int
+	GetColumn() int
+
+	GetText() string
+	SetText(s string)
+
+	GetTokenIndex() int
+	SetTokenIndex(v int)
+
+	GetTokenSource() TokenSource
+	GetInputStream() CharStream
+}
 
 type Token struct {
 	source     *TokenSourceCharStreamPair
@@ -52,24 +70,49 @@ const (
 	TokenHiddenChannel = 1
 )
 
-// Explicitly set the text for this token. If {code text} is not
-// {@code nil}, then {@link //GetText} will return this value rather than
-// extracting the text from the input.
-//
-// @param text The explicit text of the token, or {@code nil} if the text
-// should be obtained from the input along with the start and stop indexes
-// of the token.
+func (this *Token) GetChannel() int {
+	return this.channel
+}
 
-func (this *Token) text() string {
+func (this *Token) GetStart() int {
+	return this.start
+}
+
+func (this *Token) GetStop() int {
+	return this.stop
+}
+
+func (this *Token) GetLine() int {
+	return this.line
+}
+
+func (this *Token) GetColumn() int {
+	return this.column
+}
+
+func (this *Token) GetTokenType() int {
+	return this.tokenType
+}
+
+func (this *Token) GetSource() *TokenSourceCharStreamPair{
+	return this.source
+}
+
+func (this *Token) GetText() string {
 	return this._text
 }
 
-func (this *Token) setText(s string) {
+
+func (this *Token) SetText(s string) {
 	this._text = s
 }
 
 func (this *Token) GetTokenIndex() int {
 	return this.tokenIndex
+}
+
+func (this *Token) SetTokenIndex(v int) {
+	this.tokenIndex = v
 }
 
 func (this *Token) GetTokenSource() TokenSource {
@@ -91,7 +134,7 @@ func NewCommonToken(source *TokenSourceCharStreamPair, tokenType, channel, start
 	t.Token = new(Token)
 
 	t.source = source
-	t.tokenType = -1
+	t.tokenType = tokenType
 	t.channel = channel
 	t.start = start
 	t.stop = stop
@@ -123,16 +166,15 @@ func NewCommonToken(source *TokenSourceCharStreamPair, tokenType, channel, start
 // @param oldToken The token to copy.
 //
 func (ct *CommonToken) clone() *CommonToken {
-	var t = NewCommonToken(ct.source, ct.tokenType, ct.channel, ct.start,
-		ct.stop)
-	t.tokenIndex = ct.tokenIndex
-	t.line = ct.line
-	t.column = ct.column
-	t._text = ct.text()
+	var t = NewCommonToken(ct.source, ct.tokenType, ct.channel, ct.start, ct.stop)
+	t.tokenIndex = ct.GetTokenIndex()
+	t.line = ct.GetLine()
+	t.column = ct.GetColumn()
+	t._text = ct.GetText()
 	return t
 }
 
-func (this *CommonToken) text() string {
+func (this *CommonToken) GetText() string {
 	if this._text != "" {
 		return this._text
 	}
@@ -148,12 +190,12 @@ func (this *CommonToken) text() string {
 	}
 }
 
-func (this *CommonToken) setText(text string) {
+func (this *CommonToken) SetText(text string) {
 	this._text = text
 }
 
 func (this *CommonToken) String() string {
-	var txt = this.text()
+	var txt = this.GetText()
 	if txt != "" {
 		txt = strings.Replace(txt, "\n", "", -1)
 		txt = strings.Replace(txt, "\r", "", -1)

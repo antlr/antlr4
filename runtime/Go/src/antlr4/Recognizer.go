@@ -83,6 +83,8 @@ func (this *Recognizer) GetState() int {
 }
 
 func (this *Recognizer) SetState(v int) {
+	fmt.Println("SETTING STATE " + strconv.Itoa(v) + " from " +  strconv.Itoa(this.state))
+
 	this.state = v
 }
 
@@ -159,8 +161,8 @@ func (this *Recognizer) GetTokenType(tokenName string) int {
 
 // What is the error header, normally line/character position information?//
 func (this *Recognizer) getErrorHeader(e IRecognitionException) string {
-	var line = e.GetOffendingToken().line
-	var column = e.GetOffendingToken().column
+	var line = e.GetOffendingToken().GetLine()
+	var column = e.GetOffendingToken().GetColumn()
 	return "line " + strconv.Itoa(line) + ":" + strconv.Itoa(column)
 }
 
@@ -177,16 +179,16 @@ func (this *Recognizer) getErrorHeader(e IRecognitionException) string {
 // feature when necessary. For example, see
 // {@link DefaultErrorStrategy//GetTokenErrorDisplay}.
 //
-func (this *Recognizer) GetTokenErrorDisplay(t *Token) string {
+func (this *Recognizer) GetTokenErrorDisplay(t IToken) string {
 	if t == nil {
 		return "<no token>"
 	}
-	var s = t.text()
+	var s = t.GetText()
 	if s == "" {
-		if t.tokenType == TokenEOF {
+		if t.GetTokenType() == TokenEOF {
 			s = "<EOF>"
 		} else {
-			s = "<" + strconv.Itoa(t.tokenType) + ">"
+			s = "<" + strconv.Itoa(t.GetTokenType()) + ">"
 		}
 	}
 	s = strings.Replace(s, "\t", "\\t", -1)

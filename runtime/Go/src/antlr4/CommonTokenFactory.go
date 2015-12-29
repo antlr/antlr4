@@ -4,9 +4,10 @@
 //
 
 package antlr4
+import "fmt"
 
 type TokenFactory interface {
-	Create(source *TokenSourceCharStreamPair, ttype int, text string, channel, start, stop, line, column int) *Token
+	Create(source *TokenSourceCharStreamPair, ttype int, text string, channel, start, stop, line, column int) IToken
 }
 
 type CommonTokenFactory struct {
@@ -45,22 +46,27 @@ func NewCommonTokenFactory(copyText bool) *CommonTokenFactory {
 //
 var CommonTokenFactoryDEFAULT = NewCommonTokenFactory(false)
 
-func (this *CommonTokenFactory) Create(source *TokenSourceCharStreamPair, ttype int, text string, channel, start, stop, line, column int) *Token {
+func (this *CommonTokenFactory) Create(source *TokenSourceCharStreamPair, ttype int, text string, channel, start, stop, line, column int) IToken {
+
+	fmt.Println("Token factory creating: " + text)
 
 	var t = NewCommonToken(source, ttype, channel, start, stop)
 	t.line = line
 	t.column = column
 	if text != "" {
-		t.setText(text)
+		t.SetText(text)
 	} else if this.copyText && source.charStream != nil {
-		t.setText(source.charStream.GetTextFromInterval(NewInterval(start, stop)))
+		t.SetText(source.charStream.GetTextFromInterval(NewInterval(start, stop)))
 	}
 	return t.Token
 
 }
 
-func (this *CommonTokenFactory) createThin(ttype int, text string) *Token {
+func (this *CommonTokenFactory) createThin(ttype int, text string) IToken {
+
+	fmt.Println("Token factory creating: " + text)
+
 	var t = NewCommonToken(nil, ttype, TokenDefaultChannel, -1, -1)
-	t.setText(text)
+	t.SetText(text)
 	return t.Token
 }

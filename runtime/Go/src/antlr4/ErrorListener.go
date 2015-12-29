@@ -24,15 +24,19 @@ func NewErrorListener() *DefaultErrorListener {
 }
 
 func (this *DefaultErrorListener) SyntaxError(recognizer IRecognizer, offendingSymbol interface{}, line, column int, msg string, e IRecognitionException) {
+	fmt.Println("SyntaxError!")
 }
 
 func (this *DefaultErrorListener) ReportAmbiguity(recognizer IParser, dfa *DFA, startIndex, stopIndex int, exact bool, ambigAlts *BitSet, configs *ATNConfigSet) {
+	fmt.Println("ReportAmbiguity!")
 }
 
 func (this *DefaultErrorListener) ReportAttemptingFullContext(recognizer IParser, dfa *DFA, startIndex, stopIndex int, conflictingAlts *BitSet, configs *ATNConfigSet) {
+	fmt.Println("ReportAttemptingFullContext!")
 }
 
 func (this *DefaultErrorListener) ReportContextSensitivity(recognizer IParser, dfa *DFA, startIndex, stopIndex, prediction int, configs *ATNConfigSet) {
+	fmt.Println("ReportContextSensitivity!")
 }
 
 type ConsoleErrorListener struct {

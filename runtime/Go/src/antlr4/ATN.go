@@ -1,4 +1,5 @@
 package antlr4
+import "fmt"
 
 var ATNINVALID_ALT_NUMBER = 0
 
@@ -55,7 +56,8 @@ func NewATN(grammarType int, maxTokenType int) *ATN {
 //  restricted to tokens reachable staying within {@code s}'s rule.
 func (this *ATN) nextTokensInContext(s IATNState, ctx IRuleContext) *IntervalSet {
 	var anal = NewLL1Analyzer(this)
-	return anal.LOOK(s, nil, ctx)
+	var res = anal.LOOK(s, nil, ctx)
+	return res
 }
 
 // Compute the set of valid tokens that can occur starting in {@code s} and
@@ -63,8 +65,11 @@ func (this *ATN) nextTokensInContext(s IATNState, ctx IRuleContext) *IntervalSet
 // rule.
 func (this *ATN) nextTokensNoContext(s IATNState) *IntervalSet {
 	if s.GetNextTokenWithinRule() != nil {
+		fmt.Println("DEBUG 1")
 		return s.GetNextTokenWithinRule()
 	}
+	fmt.Println("DEBUG 2")
+	fmt.Println(this.nextTokensInContext(s, nil))
 	s.SetNextTokenWithinRule(this.nextTokensInContext(s, nil))
 	s.GetNextTokenWithinRule().readOnly = true
 	return s.GetNextTokenWithinRule()

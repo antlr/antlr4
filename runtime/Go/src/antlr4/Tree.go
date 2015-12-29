@@ -41,7 +41,7 @@ type RuleNode interface {
 type TerminalNode interface {
 	ParseTree
 
-	getSymbol() *Token
+	getSymbol() IToken
 }
 
 type ErrorNode interface {
@@ -87,10 +87,10 @@ type ParseTreeListener interface {
 type TerminalNodeImpl struct {
 	parentCtx IRuleContext
 
-	symbol *Token
+	symbol IToken
 }
 
-func NewTerminalNodeImpl(symbol *Token) *TerminalNodeImpl {
+func NewTerminalNodeImpl(symbol IToken) *TerminalNodeImpl {
 	tn := new(TerminalNodeImpl)
 
 	tn.parentCtx = nil
@@ -112,7 +112,7 @@ func (this *TerminalNodeImpl) setChildren(t []Tree) {
 	panic("Cannot set children on terminal node")
 }
 
-func (this *TerminalNodeImpl) getSymbol() *Token {
+func (this *TerminalNodeImpl) getSymbol() IToken {
 	return this.symbol
 }
 
@@ -132,7 +132,7 @@ func (this *TerminalNodeImpl) GetSourceInterval() *Interval {
 	if this.symbol == nil {
 		return TreeINVALID_INTERVAL
 	}
-	var tokenIndex = this.symbol.tokenIndex
+	var tokenIndex = this.symbol.GetTokenIndex()
 	return NewInterval(tokenIndex, tokenIndex)
 }
 
@@ -145,14 +145,14 @@ func (this *TerminalNodeImpl) accept(Visitor ParseTreeVisitor) interface{} {
 }
 
 func (this *TerminalNodeImpl) GetText() string {
-	return this.symbol.text()
+	return this.symbol.GetText()
 }
 
 func (this *TerminalNodeImpl) String() string {
-	if this.symbol.tokenType == TokenEOF {
+	if this.symbol.GetTokenType() == TokenEOF {
 		return "<EOF>"
 	} else {
-		return this.symbol.text()
+		return this.symbol.GetText()
 	}
 }
 
@@ -166,7 +166,7 @@ type ErrorNodeImpl struct {
 	*TerminalNodeImpl
 }
 
-func NewErrorNodeImpl(token *Token) *ErrorNodeImpl {
+func NewErrorNodeImpl(token IToken) *ErrorNodeImpl {
 	en := new(ErrorNodeImpl)
 	en.TerminalNodeImpl = NewTerminalNodeImpl(token)
 	return en

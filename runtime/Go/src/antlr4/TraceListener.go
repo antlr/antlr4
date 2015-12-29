@@ -16,7 +16,7 @@ func (this *TraceListener) VisitErrorNode(_ ErrorNode) {
 }
 
 func (this *TraceListener) EnterEveryRule(ctx IParserRuleContext) {
-	fmt.Println("enter   " + this.parser.GetRuleNames()[ctx.GetRuleIndex()] + ", LT(1)=" + this.parser._input.LT(1).text())
+	fmt.Println("enter   " + this.parser.GetRuleNames()[ctx.GetRuleIndex()] + ", LT(1)=" + this.parser._input.LT(1).GetText())
 }
 
 func (this *TraceListener) VisitTerminal(node TerminalNode) {
@@ -24,5 +24,5 @@ func (this *TraceListener) VisitTerminal(node TerminalNode) {
 }
 
 func (this *TraceListener) ExitEveryRule(ctx IParserRuleContext) {
-	fmt.Println("exit    " + this.parser.GetRuleNames()[ctx.GetRuleIndex()] + ", LT(1)=" + this.parser._input.LT(1).text())
+	fmt.Println("exit    " + this.parser.GetRuleNames()[ctx.GetRuleIndex()] + ", LT(1)=" + this.parser._input.LT(1).GetText())
 }

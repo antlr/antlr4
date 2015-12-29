@@ -11,13 +11,15 @@
 
 package antlr4
 
-import "strconv"
+import (
+	"strconv"
+)
 
 // bt is just to keep meaningful parameter types to Parser
 type BufferedTokenStream struct {
 	tokenSource TokenSource
 
-	tokens     []*Token
+	tokens     []IToken
 	index      int
 	fetchedEOF bool
 	channel    int
@@ -33,7 +35,7 @@ func NewBufferedTokenStream(tokenSource TokenSource) *BufferedTokenStream {
 	// A collection of all tokens fetched from the token source. The list is
 	// considered a complete view of the input once {@link //fetchedEOF} is set
 	// to {@code true}.
-	ts.tokens = make([]*Token, 0)
+	ts.tokens = make([]IToken, 0)
 
 	// The index into {@link //tokens} of the current token (next token to
 	// {@link //consume}). {@link //tokens}{@code [}{@link //p}{@code ]} should
@@ -83,7 +85,7 @@ func (bt *BufferedTokenStream) Seek(index int) {
 	bt.index = bt.adjustSeekIndex(index)
 }
 
-func (bt *BufferedTokenStream) Get(index int) *Token {
+func (bt *BufferedTokenStream) Get(index int) IToken {
 	bt.lazyInit()
 	return bt.tokens[index]
 }
@@ -136,10 +138,10 @@ func (bt *BufferedTokenStream) fetch(n int) int {
 	}
 
 	for i := 0; i < n; i++ {
-		var t *Token = bt.tokenSource.nextToken()
-		t.tokenIndex = len(bt.tokens)
+		var t IToken = bt.tokenSource.nextToken()
+		t.SetTokenIndex( len(bt.tokens) )
 		bt.tokens = append(bt.tokens, t)
-		if t.tokenType == TokenEOF {
+		if t.GetTokenType() == TokenEOF {
 			bt.fetchedEOF = true
 			return i + 1
 		}
@@ -148,22 +150,22 @@ func (bt *BufferedTokenStream) fetch(n int) int {
 }
 
 // Get all tokens from start..stop inclusively///
-func (bt *BufferedTokenStream) GetTokens(start int, stop int, types *IntervalSet) []*Token {
+func (bt *BufferedTokenStream) GetTokens(start int, stop int, types *IntervalSet) []IToken {
 
 	if start < 0 || stop < 0 {
 		return nil
 	}
 	bt.lazyInit()
-	var subset = make([]*Token, 0)
+	var subset = make([]IToken, 0)
 	if stop >= len(bt.tokens) {
 		stop = len(bt.tokens) - 1
 	}
 	for i := start; i < stop; i++ {
 		var t = bt.tokens[i]
-		if t.tokenType == TokenEOF {
+		if t.GetTokenType() == TokenEOF {
 			break
 		}
-		if types == nil || types.contains(t.tokenType) {
+		if types == nil || types.contains(t.GetTokenType()) {
 			subset = append(subset, t)
 		}
 	}
@@ -171,17 +173,17 @@ func (bt *BufferedTokenStream) GetTokens(start int, stop int, types *IntervalSet
 }
 
 func (bt *BufferedTokenStream) LA(i int) int {
-	return bt.LT(i).tokenType
+	return bt.LT(i).GetTokenType()
 }
 
-func (bt *BufferedTokenStream) LB(k int) *Token {
+func (bt *BufferedTokenStream) LB(k int) IToken {
 	if bt.index-k < 0 {
 		return nil
 	}
 	return bt.tokens[bt.index-k]
 }
 
-func (bt *BufferedTokenStream) LT(k int) *Token {
+func (bt *BufferedTokenStream) LT(k int) IToken {
 	bt.lazyInit()
 	if k == 0 {
 		return nil
@@ -233,7 +235,7 @@ func (bt *BufferedTokenStream) GetTokenSource() TokenSource {
 // Reset bt token stream by setting its token source.///
 func (bt *BufferedTokenStream) SetTokenSource(tokenSource TokenSource) {
 	bt.tokenSource = tokenSource
-	bt.tokens = make([]*Token, 0)
+	bt.tokens = make([]IToken, 0)
 	bt.index = -1
 }
 
@@ -247,8 +249,8 @@ func (bt *BufferedTokenStream) nextTokenOnChannel(i, channel int) int {
 		return -1
 	}
 	var token = bt.tokens[i]
-	for token.channel != bt.channel {
-		if token.tokenType == TokenEOF {
+	for token.GetChannel() != bt.channel {
+		if token.GetTokenType() == TokenEOF {
 			return -1
 		}
 		i += 1
@@ -262,7 +264,7 @@ func (bt *BufferedTokenStream) nextTokenOnChannel(i, channel int) int {
 // Return i if tokens[i] is on channel. Return -1 if there are no tokens
 // on channel between i and 0.
 func (bt *BufferedTokenStream) previousTokenOnChannel(i, channel int) int {
-	for i >= 0 && bt.tokens[i].channel != channel {
+	for i >= 0 && bt.tokens[i].GetChannel() != channel {
 		i -= 1
 	}
 	return i
@@ -271,7 +273,7 @@ func (bt *BufferedTokenStream) previousTokenOnChannel(i, channel int) int {
 // Collect all tokens on specified channel to the right of
 // the current token up until we see a token on DEFAULT_TOKEN_CHANNEL or
 // EOF. If channel is -1, find any non default channel token.
-func (bt *BufferedTokenStream) getHiddenTokensToRight(tokenIndex, channel int) []*Token {
+func (bt *BufferedTokenStream) getHiddenTokensToRight(tokenIndex, channel int) []IToken {
 	bt.lazyInit()
 	if tokenIndex < 0 || tokenIndex >= len(bt.tokens) {
 		panic(strconv.Itoa(tokenIndex) + " not in 0.." + strconv.Itoa(len(bt.tokens)-1))
@@ -291,7 +293,7 @@ func (bt *BufferedTokenStream) getHiddenTokensToRight(tokenIndex, channel int) [
 // Collect all tokens on specified channel to the left of
 // the current token up until we see a token on DEFAULT_TOKEN_CHANNEL.
 // If channel is -1, find any non default channel token.
-func (bt *BufferedTokenStream) getHiddenTokensToLeft(tokenIndex, channel int) []*Token {
+func (bt *BufferedTokenStream) getHiddenTokensToLeft(tokenIndex, channel int) []IToken {
 	bt.lazyInit()
 	if tokenIndex < 0 || tokenIndex >= len(bt.tokens) {
 		panic(strconv.Itoa(tokenIndex) + " not in 0.." + strconv.Itoa(len(bt.tokens)-1))
@@ -306,15 +308,15 @@ func (bt *BufferedTokenStream) getHiddenTokensToLeft(tokenIndex, channel int) []
 	return bt.filterForChannel(from_, to, channel)
 }
 
-func (bt *BufferedTokenStream) filterForChannel(left, right, channel int) []*Token {
-	var hidden = make([]*Token, 0)
+func (bt *BufferedTokenStream) filterForChannel(left, right, channel int) []IToken {
+	var hidden = make([]IToken, 0)
 	for i := left; i < right+1; i++ {
 		var t = bt.tokens[i]
 		if channel == -1 {
-			if t.channel != LexerDefaultTokenChannel {
+			if t.GetChannel() != LexerDefaultTokenChannel {
 				hidden = append(hidden, t)
 			}
-		} else if t.channel == channel {
+		} else if t.GetChannel() == channel {
 			hidden = append(hidden, t)
 		}
 	}
@@ -340,7 +342,7 @@ func (bt *BufferedTokenStream) GetAllText() string {
 	return bt.GetTextFromInterval(nil)
 }
 
-func (bt *BufferedTokenStream) GetTextFromTokens(start, end *Token) string {
+func (bt *BufferedTokenStream) GetTextFromTokens(start, end IToken) string {
 	return bt.GetTextFromInterval(NewInterval(start.GetTokenIndex(), end.GetTokenIndex()))
 }
 
@@ -349,11 +351,13 @@ func (bt *BufferedTokenStream) GetTextFromRuleContext(interval IRuleContext) str
 }
 
 func (bt *BufferedTokenStream) GetTextFromInterval(interval *Interval) string {
+
 	bt.lazyInit()
 	bt.fill()
 	if interval == nil {
 		interval = NewInterval(0, len(bt.tokens)-1)
 	}
+
 	var start = interval.start
 	var stop = interval.stop
 	if start < 0 || stop < 0 {
@@ -362,14 +366,16 @@ func (bt *BufferedTokenStream) GetTextFromInterval(interval *Interval) string {
 	if stop >= len(bt.tokens) {
 		stop = len(bt.tokens) - 1
 	}
+
 	var s = ""
 	for i := start; i < stop+1; i++ {
 		var t = bt.tokens[i]
-		if t.tokenType == TokenEOF {
+		if t.GetTokenType() == TokenEOF {
 			break
 		}
-		s += t.text()
+		s += t.GetText()
 	}
+
 	return s
 }
 

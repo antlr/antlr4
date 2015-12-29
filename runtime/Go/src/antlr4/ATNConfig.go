@@ -29,6 +29,8 @@ type IATNConfig interface {
 	SetReachesIntoOuterContext(int)
 
 	String() string
+
+	shortHashString() string
 }
 
 type ATNConfig struct {

@@ -9,7 +9,7 @@ import ()
 //  and what kind of problem occurred.
 
 type IRecognitionException interface {
-	GetOffendingToken() *Token
+	GetOffendingToken() IToken
 	GetMessage() string
 	GetInputStream() IntStream
 }
@@ -17,7 +17,7 @@ type IRecognitionException interface {
 type RecognitionException struct {
 	message        string
 	recognizer     IRecognizer
-	offendingToken *Token
+	offendingToken IToken
 	offendingState int
 	ctx            IRuleContext
 	input          IntStream
@@ -62,7 +62,7 @@ func (this *RecognitionException) GetMessage() string {
 	return this.message
 }
 
-func (this *RecognitionException) GetOffendingToken() *Token {
+func (this *RecognitionException) GetOffendingToken() IToken {
 	return this.offendingToken
 }
 
@@ -124,8 +124,8 @@ func (this *LexerNoViableAltException) String() string {
 type NoViableAltException struct {
 	*RecognitionException
 
-	startToken     *Token
-	offendingToken *Token
+	startToken     IToken
+	offendingToken IToken
 	ctx            IParserRuleContext
 	deadEndConfigs *ATNConfigSet
 }
@@ -135,7 +135,7 @@ type NoViableAltException struct {
 // of the offending input and also knows where the parser was
 // in the various paths when the error. Reported by ReportNoViableAlternative()
 //
-func NewNoViableAltException(recognizer IParser, input TokenStream, startToken *Token, offendingToken *Token, deadEndConfigs *ATNConfigSet, ctx IParserRuleContext) *NoViableAltException {
+func NewNoViableAltException(recognizer IParser, input TokenStream, startToken IToken, offendingToken IToken, deadEndConfigs *ATNConfigSet, ctx IParserRuleContext) *NoViableAltException {
 
 	if ctx == nil {
 		ctx = recognizer.GetParserRuleContext()

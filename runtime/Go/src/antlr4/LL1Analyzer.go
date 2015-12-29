@@ -1,6 +1,8 @@
 package antlr4
 
-import ()
+import (
+	"fmt"
+)
 
 type LL1Analyzer struct {
 	atn *ATN
@@ -71,9 +73,18 @@ func (la *LL1Analyzer) LOOK(s, stopState IATNState, ctx IRuleContext) *IntervalS
 	var seeThruPreds = true // ignore preds get all lookahead
 	var lookContext IPredictionContext
 	if ctx != nil {
-		predictionContextFromRuleContext(s.GetATN(), ctx)
+		lookContext = predictionContextFromRuleContext(s.GetATN(), ctx)
 	}
+	fmt.Println("DEBUG 5")
+//	fmt.Println("DEBUG" + lookContext.String())
+	fmt.Println(s)
+	fmt.Println(stopState)
+	fmt.Println(lookContext)
+	fmt.Println(r)
+	fmt.Println(seeThruPreds)
+	fmt.Println("=====")
 	la._LOOK(s, stopState, lookContext, r, NewSet(nil, nil), NewBitSet(), seeThruPreds, true)
+	fmt.Println(r)
 	return r
 }
 
@@ -107,15 +118,36 @@ func (la *LL1Analyzer) LOOK(s, stopState IATNState, ctx IRuleContext) *IntervalS
 // outermost context is reached. This parameter has no effect if {@code ctx}
 // is {@code nil}.
 
+
+func (la *LL1Analyzer) __LOOK(s, stopState IATNState, ctx IPredictionContext, look *IntervalSet, lookBusy *Set, calledRuleStack *BitSet, seeThruPreds, addEOF bool, i int){
+
+	returnState := la.atn.states[ctx.getReturnState(i)]
+
+	removed := calledRuleStack.contains(returnState.GetRuleIndex())
+
+	defer func() {
+		if removed {
+			calledRuleStack.add(returnState.GetRuleIndex())
+		}
+	}()
+
+	calledRuleStack.remove(returnState.GetRuleIndex())
+	la._LOOK(returnState, stopState, ctx.GetParent(i), look, lookBusy, calledRuleStack, seeThruPreds, addEOF)
+
+}
+
 func (la *LL1Analyzer) _LOOK(s, stopState IATNState, ctx IPredictionContext, look *IntervalSet, lookBusy *Set, calledRuleStack *BitSet, seeThruPreds, addEOF bool) {
 
 	c := NewATNConfig6(s, 0, ctx)
 
-	if lookBusy.add(c) == nil {
+	if lookBusy.contains(c) {
 		return
 	}
 
+	lookBusy.add(c)
+
 	if s == stopState {
+		fmt.Println("DEBUG 6")
 		if ctx == nil {
 			look.addOne(TokenEpsilon)
 			return
@@ -137,24 +169,13 @@ func (la *LL1Analyzer) _LOOK(s, stopState IATNState, ctx IPredictionContext, loo
 		}
 
 		if ctx != PredictionContextEMPTY {
+			fmt.Println("DEBUG 7")
 
 			// run thru all possible stack tops in ctx
 			for i := 0; i < ctx.length(); i++ {
 
 				returnState := la.atn.states[ctx.getReturnState(i)]
-				//					System.out.println("popping back to "+retState)
-
-				removed := calledRuleStack.contains(returnState.GetRuleIndex())
-
-				// TODO this is incorrect
-				defer func() {
-					if removed {
-						calledRuleStack.add(returnState.GetRuleIndex())
-					}
-				}()
-
-				calledRuleStack.clear(returnState.GetRuleIndex())
-				la._LOOK(returnState, stopState, ctx.GetParent(i), look, lookBusy, calledRuleStack, seeThruPreds, addEOF)
+				la.__LOOK(returnState, stopState, ctx.GetParent(i), look, lookBusy, calledRuleStack, seeThruPreds, addEOF, i)
 
 			}
 			return
@@ -167,6 +188,7 @@ func (la *LL1Analyzer) _LOOK(s, stopState IATNState, ctx IPredictionContext, loo
 		t := s.GetTransitions()[i]
 
 		if t1, ok := t.(*RuleTransition); ok {
+			fmt.Println("DEBUG 8")
 
 			if calledRuleStack.contains(t1.getTarget().GetRuleIndex()) {
 				continue
@@ -174,24 +196,34 @@ func (la *LL1Analyzer) _LOOK(s, stopState IATNState, ctx IPredictionContext, loo
 
 			newContext := SingletonPredictionContextCreate(ctx, t1.followState.GetStateNumber())
 
-			defer func() {
-				calledRuleStack.remove(t1.getTarget().GetRuleIndex())
-			}()
+			la.___LOOK(stopState, newContext, look, lookBusy, calledRuleStack, seeThruPreds, addEOF, t1)
 
-			calledRuleStack.add(t1.getTarget().GetRuleIndex())
-			la._LOOK(t.getTarget(), stopState, newContext, look, lookBusy, calledRuleStack, seeThruPreds, addEOF)
-		} else if t2, ok := t.(*AbstractPredicateTransition); ok {
+			fmt.Println(look)
+//
+//			defer func() {
+//				calledRuleStack.remove(t1.getTarget().GetRuleIndex())
+//			}()
+//
+//			calledRuleStack.add(t1.getTarget().GetRuleIndex())
+//			la._LOOK(t1.getTarget(), stopState, newContext, look, lookBusy, calledRuleStack, seeThruPreds, addEOF)
+
+		} else if t2, ok := t.(IAbstractPredicateTransition); ok {
+			fmt.Println("DEBUG 9")
 			if seeThruPreds {
 				la._LOOK(t2.getTarget(), stopState, ctx, look, lookBusy, calledRuleStack, seeThruPreds, addEOF)
 			} else {
 				look.addOne(LL1AnalyzerHIT_PRED)
 			}
 		} else if t.getIsEpsilon() {
+			fmt.Println("DEBUG 10")
 			la._LOOK(t.getTarget(), stopState, ctx, look, lookBusy, calledRuleStack, seeThruPreds, addEOF)
 		} else if _, ok := t.(*WildcardTransition); ok {
+			fmt.Println("DEBUG 11")
 			look.addRange(TokenMinUserTokenType, la.atn.maxTokenType)
 		} else {
+			fmt.Println("DEBUG 12")
 			set := t.getLabel()
+			fmt.Println(set)
 			if set != nil {
 				if _, ok := t.(*NotSetTransition); ok {
 					set = set.complement(TokenMinUserTokenType, la.atn.maxTokenType)
@@ -200,4 +232,18 @@ func (la *LL1Analyzer) _LOOK(s, stopState IATNState, ctx IPredictionContext, loo
 			}
 		}
 	}
+}
+
+func (la *LL1Analyzer) ___LOOK(stopState IATNState, ctx IPredictionContext, look *IntervalSet, lookBusy *Set, calledRuleStack *BitSet, seeThruPreds, addEOF bool, t1 *RuleTransition) {
+
+	newContext := SingletonPredictionContextCreate(ctx, t1.followState.GetStateNumber())
+
+	defer func() {
+		calledRuleStack.remove(t1.getTarget().GetRuleIndex())
+	}()
+
+	calledRuleStack.add(t1.getTarget().GetRuleIndex())
+	la._LOOK(t1.getTarget(), stopState, newContext, look, lookBusy, calledRuleStack, seeThruPreds, addEOF)
+
+
 }

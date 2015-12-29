@@ -32,6 +32,7 @@ func (is *InputStream) Consume() {
 }
 
 func (is *InputStream) LA(offset int) int {
+
 	if offset == 0 {
 		return 0 // nil
 	}
@@ -39,9 +40,11 @@ func (is *InputStream) LA(offset int) int {
 		offset += 1 // e.g., translate LA(-1) to use offset=0
 	}
 	var pos = is.index + offset - 1
+
 	if pos < 0 || pos >= is.size { // invalid
 		return TokenEOF
 	}
+
 	return int(is.data[pos])
 }
 

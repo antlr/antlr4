@@ -134,6 +134,8 @@ Parser.prototype.reset = function() {
 
 Parser.prototype.match = function(ttype) {
 	var t = this.getCurrentToken();
+
+	console.log("TOKEN IS " + t.text)
 	if (t.type === ttype) {
 		this._errHandler.reportMatch(this);
 		this.consume();

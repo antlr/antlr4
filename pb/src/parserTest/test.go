@@ -15,7 +15,11 @@ func main() {
 
 	p := parser.NewArithmeticParser(s)
 
+    p.BuildParseTrees = true
+
 	p.Equation()
+
+
 
 }
 

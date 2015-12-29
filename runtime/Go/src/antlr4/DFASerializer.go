@@ -5,7 +5,12 @@ import (
 	"strconv"
 )
 
-// A DFA walker that knows how to dump them to serialized strings.#/
+// A DFA walker that knows how to dump them to serialized strings.
+
+type IDFASerializer interface {
+
+}
+
 
 type DFASerializer struct {
 	dfa                         *DFA
@@ -66,14 +71,12 @@ func (this *DFASerializer) String() string {
 func (this *DFASerializer) getEdgeLabel(i int) string {
 	if i == 0 {
 		return "EOF"
-	} else if this.literalNames != nil || this.symbolicNames != nil {
-		if this.literalNames[i-1] == "" {
-			return this.literalNames[i-1]
-		} else {
-			return this.symbolicNames[i-1]
-		}
+	} else if this.literalNames != nil && i - 1 < len(this.literalNames) {
+		return this.literalNames[i-1]
+	} else if this.symbolicNames != nil && i - 1 < len(this.symbolicNames) {
+		return this.symbolicNames[i-1]
 	} else {
-		return string(i - 1)
+		return strconv.Itoa(i-1)
 	}
 }
 
@@ -101,6 +104,8 @@ func (this *DFASerializer) GetStateString(s *DFAState) string {
 	}
 }
 
+
+
 type LexerDFASerializer struct {
 	*DFASerializer
 }
@@ -116,4 +121,36 @@ func NewLexerDFASerializer(dfa *DFA) *LexerDFASerializer {
 
 func (this *LexerDFASerializer) getEdgeLabel(i int) string {
 	return "'" + string(i) + "'"
+}
+
+func (this *LexerDFASerializer) String() string {
+
+	if this.dfa.s0 == nil {
+		return ""
+	}
+
+	var buf = ""
+	var states = this.dfa.sortedStates()
+	for i := 0; i < len(states); i++ {
+		var s = states[i]
+		if s.edges != nil {
+			var n = len(s.edges)
+			for j := 0; j < n; j++ {
+				var t = s.edges[j]
+				if t != nil && t.stateNumber != 0x7FFFFFFF {
+					buf += this.GetStateString(s)
+					buf += "-"
+					buf += this.getEdgeLabel(j)
+					buf += "->"
+					buf += this.GetStateString(t)
+					buf += "\n"
+				}
+			}
+		}
+	}
+	if len(buf) == 0 {
+		return ""
+	}
+
+	return buf
 }

@@ -44,10 +44,6 @@ func (s *IntStack) Push(e int) {
 	*s = append(*s, e)
 }
 
-func arrayString(a []interface{}) string {
-	return fmt.Sprint(a)
-}
-
 func hashCode(s string) string {
 	h := fnv.New32a()
 	h.Write([]byte((s)))
@@ -81,8 +77,11 @@ func NewSet(hashFunction func(interface{}) string, equalsFunction func(interface
 	return s
 }
 
-func standardEqualsFunction(a interface{}, b interface{}) bool {
-	return standardHashFunction(a) == standardHashFunction(b)
+func standardHashFunction(a interface{}) string {
+	h := fnv.New32a()
+	v, _ := getBytes(a)
+	h.Write(v)
+	return fmt.Sprint(h.Sum32())
 }
 
 func getBytes(key interface{}) ([]byte, error) {
@@ -95,12 +94,11 @@ func getBytes(key interface{}) ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-func standardHashFunction(a interface{}) string {
-	h := fnv.New32a()
-	v, _ := getBytes(a)
-	h.Write(v)
-	return fmt.Sprint(h.Sum32())
+
+func standardEqualsFunction(a interface{}, b interface{}) bool {
+	return standardHashFunction(a) == standardHashFunction(b)
 }
+
 
 func (this *Set) length() int {
 	return len(this.data)
@@ -110,6 +108,7 @@ func (this *Set) add(value interface{}) interface{} {
 
 	var hash = this.hashFunction(value)
 	var key = "hash_" + hashCode(hash)
+
 	values := this.data[key]
 
 	if this.data[key] != nil {

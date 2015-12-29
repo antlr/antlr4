@@ -1,4 +1,5 @@
 package antlr4
+import "fmt"
 
 type IParser interface {
 	IRecognizer
@@ -8,13 +9,13 @@ type IParser interface {
 	GetTokenStream() TokenStream
 	GetTokenFactory() TokenFactory
 	GetParserRuleContext() IParserRuleContext
-	Consume() *Token
+	Consume() IToken
 	GetParseListeners() []ParseTreeListener
 
 	GetInputStream() IntStream
-	getCurrentToken() *Token
+	getCurrentToken() IToken
 	getExpectedTokens() *IntervalSet
-	NotifyErrorListeners(msg string, offendingToken *Token, err IRecognitionException)
+	NotifyErrorListeners(msg string, offendingToken IToken, err IRecognitionException)
 	isExpectedToken(symbol int) bool
 	getPrecedence() int
 	getRuleInvocationStack(IParserRuleContext) []string
@@ -23,17 +24,17 @@ type IParser interface {
 type Parser struct {
 	*Recognizer
 
-	Interpreter *ParserATNSimulator
+	Interpreter     *ParserATNSimulator
+	BuildParseTrees bool
 
 	_input           TokenStream
 	_errHandler      IErrorStrategy
 	_precedenceStack IntStack
 	_ctx             IParserRuleContext
-	buildParseTrees  bool
-	_tracer          *TraceListener
-	_parseListeners  []ParseTreeListener
-	_SyntaxErrors    int
 
+	_tracer         *TraceListener
+	_parseListeners []ParseTreeListener
+	_SyntaxErrors   int
 }
 
 // p.is all the parsing support code essentially most of it is error
@@ -41,7 +42,6 @@ type Parser struct {
 func NewParser(input TokenStream) *Parser {
 
 	p := new(Parser)
-
 
 	p.Recognizer = NewRecognizer()
 
@@ -57,7 +57,7 @@ func NewParser(input TokenStream) *Parser {
 	p._ctx = nil
 	// Specifies whether or not the parser should construct a parse tree during
 	// the parsing process. The default value is {@code true}.
-	p.buildParseTrees = true
+	p.BuildParseTrees = true
 	// When {@link //setTrace}{@code (true)} is called, a reference to the
 	// {@link TraceListener} is stored here so it can be easily removed in a
 	// later call to {@link //setTrace}{@code (false)}. The listener itself is
@@ -124,14 +124,17 @@ func (p *Parser) GetParseListeners() []ParseTreeListener {
 // {@code ttype} and the error strategy could not recover from the
 // misMatched symbol
 
-func (p *Parser) Match(ttype int) *Token {
+func (p *Parser) Match(ttype int) IToken {
 	var t = p.getCurrentToken()
-	if t.tokenType == ttype {
+
+	fmt.Println("TOKEN IS " + t.GetText())
+
+	if t.GetTokenType() == ttype {
 		p._errHandler.ReportMatch(p)
 		p.Consume()
 	} else {
 		t = p._errHandler.RecoverInline(p)
-		if p.buildParseTrees && t.tokenIndex == -1 {
+		if p.BuildParseTrees && t.GetTokenIndex() == -1 {
 			// we must have conjured up a Newtoken during single token
 			// insertion
 			// if it's not the current symbol
@@ -157,14 +160,14 @@ func (p *Parser) Match(ttype int) *Token {
 // a wildcard and the error strategy could not recover from the misMatched
 // symbol
 
-func (p *Parser) MatchWildcard() *Token {
+func (p *Parser) MatchWildcard() IToken {
 	var t = p.getCurrentToken()
-	if t.tokenType > 0 {
+	if t.GetTokenType() > 0 {
 		p._errHandler.ReportMatch(p)
 		p.Consume()
 	} else {
 		t = p._errHandler.RecoverInline(p)
-		if p.buildParseTrees && t.tokenIndex == -1 {
+		if p.BuildParseTrees && t.GetTokenIndex() == -1 {
 			// we must have conjured up a Newtoken during single token
 			// insertion
 			// if it's not the current symbol
@@ -232,24 +235,24 @@ func (p *Parser) addParseListener(listener ParseTreeListener) {
 //
 func (p *Parser) removeParseListener(listener ParseTreeListener) {
 
-	if (p._parseListeners != nil) {
+	if p._parseListeners != nil {
 
 		idx := -1
-		for i,v := range p._parseListeners {
+		for i, v := range p._parseListeners {
 			if v == listener {
 				idx = i
-				break;
+				break
 			}
 		}
 
-		if (idx == -1){
+		if idx == -1 {
 			return
 		}
 
 		// remove the listener from the slice
-		p._parseListeners = append( p._parseListeners[0:idx], p._parseListeners[idx+1:]... )
+		p._parseListeners = append(p._parseListeners[0:idx], p._parseListeners[idx+1:]...)
 
-		if (len(p._parseListeners) == 0) {
+		if len(p._parseListeners) == 0 {
 			p._parseListeners = nil
 		}
 	}
@@ -385,28 +388,28 @@ func (p *Parser) setTokenStream(input TokenStream) {
 // Match needs to return the current input symbol, which gets put
 // into the label for the associated token ref e.g., x=ID.
 //
-func (p *Parser) getCurrentToken() *Token {
+func (p *Parser) getCurrentToken() IToken {
 	return p._input.LT(1)
 }
 
-func (p *Parser) NotifyErrorListeners(msg string, offendingToken *Token, err IRecognitionException) {
+func (p *Parser) NotifyErrorListeners(msg string, offendingToken IToken, err IRecognitionException) {
 	if offendingToken == nil {
 		offendingToken = p.getCurrentToken()
 	}
 	p._SyntaxErrors += 1
-	var line = offendingToken.line
-	var column = offendingToken.column
+	var line = offendingToken.GetLine()
+	var column = offendingToken.GetColumn()
 	listener := p.getErrorListenerDispatch()
 	listener.SyntaxError(p, offendingToken, line, column, msg, err)
 }
 
-func (p *Parser) Consume() *Token {
+func (p *Parser) Consume() IToken {
 	var o = p.getCurrentToken()
-	if o.tokenType != TokenEOF {
+	if o.GetTokenType() != TokenEOF {
 		p.GetInputStream().Consume()
 	}
 	var hasListener = p._parseListeners != nil && len(p._parseListeners) > 0
-	if p.buildParseTrees || hasListener {
+	if p.BuildParseTrees || hasListener {
 		if p._errHandler.inErrorRecoveryMode(p) {
 			var node = p._ctx.addErrorNode(o)
 			if p._parseListeners != nil {
@@ -437,10 +440,10 @@ func (p *Parser) addContextToParseTree() {
 }
 
 func (p *Parser) EnterRule(localctx IParserRuleContext, state, ruleIndex int) {
-	p.state = state
+	p.SetState(state)
 	p._ctx = localctx
 	p._ctx.setStart(p._input.LT(1))
-	if p.buildParseTrees {
+	if p.BuildParseTrees {
 		p.addContextToParseTree()
 	}
 	if p._parseListeners != nil {
@@ -454,8 +457,8 @@ func (p *Parser) ExitRule() {
 	if p._parseListeners != nil {
 		p.TriggerExitRuleEvent()
 	}
-	p.state = p._ctx.getInvokingState()
-	if (p._ctx.GetParent() != nil){
+	p.SetState(p._ctx.getInvokingState())
+	if p._ctx.GetParent() != nil {
 		p._ctx = p._ctx.GetParent().(IParserRuleContext)
 	} else {
 		p._ctx = nil
@@ -465,7 +468,7 @@ func (p *Parser) ExitRule() {
 func (p *Parser) EnterOuterAlt(localctx IParserRuleContext, altNum int) {
 	// if we have Newlocalctx, make sure we replace existing ctx
 	// that is previous child of parse tree
-	if p.buildParseTrees && p._ctx != localctx {
+	if p.BuildParseTrees && p._ctx != localctx {
 		if p._ctx.GetParent() != nil {
 			p._ctx.GetParent().(IParserRuleContext).removeLastChild()
 			p._ctx.GetParent().(IParserRuleContext).addChild(localctx)
@@ -488,7 +491,7 @@ func (p *Parser) getPrecedence() int {
 }
 
 func (p *Parser) EnterRecursionRule(localctx IParserRuleContext, state, ruleIndex, precedence int) {
-	p.state = state
+	p.SetState(state)
 	p._precedenceStack.Push(precedence)
 	p._ctx = localctx
 	p._ctx.setStart(p._input.LT(1))
@@ -509,7 +512,7 @@ func (p *Parser) PushNewRecursionContext(localctx IParserRuleContext, state, rul
 
 	p._ctx = localctx
 	p._ctx.setStart(previous.getStart())
-	if p.buildParseTrees {
+	if p.BuildParseTrees {
 		p._ctx.addChild(previous)
 	}
 	if p._parseListeners != nil {
@@ -533,7 +536,7 @@ func (p *Parser) UnrollRecursionContexts(parentCtx IParserRuleContext) {
 	}
 	// hook into tree
 	retCtx.setParent(parentCtx)
-	if p.buildParseTrees && parentCtx != nil {
+	if p.BuildParseTrees && parentCtx != nil {
 		// add return ctx into invoking rule's tree
 		parentCtx.addChild(retCtx)
 	}
