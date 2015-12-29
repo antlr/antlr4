@@ -132,7 +132,6 @@ LexerATNSimulator.prototype.match = function(input, mode) {
 			return this.matchATN(input);
 		} else {
 			console.log("execATN")
-			console.log((new Error()).stack)
 			var res = this.execATN(input, dfa.s0);
 			return res;
 		}
@@ -235,9 +234,7 @@ LexerATNSimulator.prototype.execATN = function(input, ds0) {
 	}
 
 	console.log("Done with execATN loop")
-	var res = this.failOrAccept(this.prevAccept, input, s.configs, t);
-	console.log("Done with failOrAccept", res)
-	return res;
+	return this.failOrAccept(this.prevAccept, input, s.configs, t);
 };
 
 // Get an existing target state for an edge in the DFA. If the target state

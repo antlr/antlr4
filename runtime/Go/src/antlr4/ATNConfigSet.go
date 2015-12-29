@@ -11,7 +11,7 @@ import (
 ///
 
 func hashATNConfig(c interface{}) string {
-	return c.(IATNConfig).shortHashString()
+	return c.(IATNConfig).shortHash()
 }
 
 func equalATNConfigs(a, b interface{}) bool {
@@ -197,7 +197,7 @@ func (this *ATNConfigSet) equals(other interface{}) bool {
 		this.dipsIntoOuterContext == other2.dipsIntoOuterContext
 }
 
-func (this *ATNConfigSet) hashString() string {
+func (this *ATNConfigSet) Hash() string {
 	if this.readOnly {
 		if this.cachedHashString == "-1" {
 			this.cachedHashString = this.hashConfigs()

@@ -6,8 +6,8 @@ import (
 	"hash/fnv"
 	"strings"
 	//	"regexp"
-	"bytes"
-	"encoding/gob"
+//	"bytes"
+//	"encoding/gob"
 )
 
 func intMin(a, b int) int {
@@ -44,11 +44,6 @@ func (s *IntStack) Push(e int) {
 	*s = append(*s, e)
 }
 
-func hashCode(s string) string {
-	h := fnv.New32a()
-	h.Write([]byte((s)))
-	return fmt.Sprint(h.Sum32())
-}
 
 type Set struct {
 	data           map[string][]interface{}
@@ -78,27 +73,39 @@ func NewSet(hashFunction func(interface{}) string, equalsFunction func(interface
 }
 
 func standardHashFunction(a interface{}) string {
+	h, ok := a.(Hasher)
+
+	if ok {
+		return h.Hash()
+	}
+
+	return fmt.Sprint(a)
+}
+
+//func getBytes(key interface{}) ([]byte, error) {
+//	var buf bytes.Buffer
+//	enc := gob.NewEncoder(&buf)
+//	err := enc.Encode(key)
+//	if err != nil {
+//		return nil, err
+//	}
+//	return buf.Bytes(), nil
+//}
+
+
+type Hasher interface {
+	Hash() string
+}
+
+func hashCode(s string) string {
 	h := fnv.New32a()
-	v, _ := getBytes(a)
-	h.Write(v)
+	h.Write([]byte((s)))
 	return fmt.Sprint(h.Sum32())
 }
-
-func getBytes(key interface{}) ([]byte, error) {
-	var buf bytes.Buffer
-	enc := gob.NewEncoder(&buf)
-	err := enc.Encode(key)
-	if err != nil {
-		return nil, err
-	}
-	return buf.Bytes(), nil
-}
-
 
 func standardEqualsFunction(a interface{}, b interface{}) bool {
 	return standardHashFunction(a) == standardHashFunction(b)
 }
-
 
 func (this *Set) length() int {
 	return len(this.data)
@@ -130,7 +137,7 @@ func (this *Set) add(value interface{}) interface{} {
 func (this *Set) contains(value interface{}) bool {
 
 	hash := this.hashFunction(value)
-	key := hashCode(hash)
+	key := "hash_" + hashCode(hash)
 
 	values := this.data[key]
 
@@ -157,7 +164,16 @@ func (this *Set) values() []interface{} {
 }
 
 func (this *Set) String() string {
-	return fmt.Sprint(this.data)
+
+	s := ""
+
+	for _,av := range this.data {
+		for _,v := range av {
+			s += fmt.Sprint(v)
+		}
+	}
+
+	return s
 }
 
 type BitSet struct {

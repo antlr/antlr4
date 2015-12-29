@@ -15,6 +15,8 @@ import (
 //
 
 type IATNConfig interface {
+	Hasher
+
 	getPrecedenceFilterSuppressed() bool
 	setPrecedenceFilterSuppressed(bool)
 
@@ -30,7 +32,7 @@ type IATNConfig interface {
 
 	String() string
 
-	shortHashString() string
+	shortHash() string
 }
 
 type ATNConfig struct {
@@ -152,17 +154,17 @@ func (this *ATNConfig) equals(other interface{}) bool {
 	}
 }
 
-func (this *ATNConfig) shortHashString() string {
+func (this *ATNConfig) shortHash() string {
 	return strconv.Itoa(this.state.GetStateNumber()) + "/" + strconv.Itoa(this.alt) + "/" + this.semanticContext.String()
 }
 
-func (this *ATNConfig) hashString() string {
+func (this *ATNConfig) Hash() string {
 
 	var c string
 	if this.context == nil {
 		c = ""
 	} else {
-		c = this.context.hashString()
+		c = this.context.Hash()
 	}
 
 	return strconv.Itoa(this.state.GetStateNumber()) + "/" + strconv.Itoa(this.alt) + "/" + c + "/" + this.semanticContext.String()
@@ -262,7 +264,7 @@ func NewLexerATNConfig1(state IATNState, alt int, context IPredictionContext) *L
 	return this
 }
 
-func (this *LexerATNConfig) hashString() string {
+func (this *LexerATNConfig) Hash() string {
 	var f string
 
 	if this.passedThroughNonGreedyDecision {

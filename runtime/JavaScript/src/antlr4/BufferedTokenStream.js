@@ -150,9 +150,7 @@ BufferedTokenStream.prototype.sync = function(i) {
 	var n = i - this.tokens.length + 1; // how many more elements we need?
 	if (n > 0) {
 		var fetched = this.fetch(n);
-		var e = new Error();
 		console.log("sync done")
-		console.log(e.stack)
 
 		return fetched >= n;
 	}

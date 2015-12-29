@@ -145,10 +145,10 @@ func (this *DFAState) equals(other interface{}) bool {
 }
 
 func (this *DFAState) String() string {
-	return strconv.Itoa(this.stateNumber) + ":" + this.hashString()
+	return strconv.Itoa(this.stateNumber) + ":" + this.Hash()
 }
 
-func (this *DFAState) hashString() string {
+func (this *DFAState) Hash() string {
 
 	var s string
 	if (this.isAcceptState) {

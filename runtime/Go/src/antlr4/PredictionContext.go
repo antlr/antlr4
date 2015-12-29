@@ -6,7 +6,7 @@ import (
 )
 
 type IPredictionContext interface {
-	hashString() string
+	Hash() string
 	GetParent(int) IPredictionContext
 	getReturnState(int) int
 	equals(IPredictionContext) bool
@@ -72,7 +72,7 @@ func (this *PredictionContext) isEmpty() bool {
 	return false
 }
 
-func (this *PredictionContext) hashString() string {
+func (this *PredictionContext) Hash() string {
 	return this.cachedHashString
 }
 
@@ -180,7 +180,7 @@ func (this *SingletonPredictionContext) equals(other IPredictionContext) bool {
 		return true
 	} else if _, ok := other.(*SingletonPredictionContext); !ok {
 		return false
-	} else if this.hashString() != other.hashString() {
+	} else if this.Hash() != other.Hash() {
 		return false // can't be same if hash is different
 	} else {
 
@@ -196,7 +196,7 @@ func (this *SingletonPredictionContext) equals(other IPredictionContext) bool {
 	}
 }
 
-func (this *SingletonPredictionContext) hashString() string {
+func (this *SingletonPredictionContext) Hash() string {
 	return this.cachedHashString
 }
 
@@ -310,7 +310,7 @@ func (this *ArrayPredictionContext) getReturnState(index int) int {
 func (this *ArrayPredictionContext) equals(other IPredictionContext) bool {
 	if _, ok := other.(*ArrayPredictionContext); !ok {
 		return false
-	} else if this.cachedHashString != other.hashString() {
+	} else if this.cachedHashString != other.Hash() {
 		return false // can't be same if hash is different
 	} else {
 		otherP := other.(*ArrayPredictionContext)
@@ -441,11 +441,11 @@ func merge(a, b IPredictionContext, rootIsWildcard bool, mergeCache *DoubleDict)
 // /
 func mergeSingletons(a, b *SingletonPredictionContext, rootIsWildcard bool, mergeCache *DoubleDict) IPredictionContext {
 	if mergeCache != nil {
-		var previous = mergeCache.Get(a.hashString(), b.hashString())
+		var previous = mergeCache.Get(a.Hash(), b.Hash())
 		if previous != nil {
 			return previous.(IPredictionContext)
 		}
-		previous = mergeCache.Get(b.hashString(), a.hashString())
+		previous = mergeCache.Get(b.Hash(), a.Hash())
 		if previous != nil {
 			return previous.(IPredictionContext)
 		}
@@ -454,7 +454,7 @@ func mergeSingletons(a, b *SingletonPredictionContext, rootIsWildcard bool, merg
 	var rootMerge = mergeRoot(a, b, rootIsWildcard)
 	if rootMerge != nil {
 		if mergeCache != nil {
-			mergeCache.set(a.hashString(), b.hashString(), rootMerge)
+			mergeCache.set(a.Hash(), b.Hash(), rootMerge)
 		}
 		return rootMerge
 	}
@@ -474,7 +474,7 @@ func mergeSingletons(a, b *SingletonPredictionContext, rootIsWildcard bool, merg
 		// Newjoined parent so create Newsingleton pointing to it, a'
 		var spc = SingletonPredictionContextCreate(parent, a.returnState)
 		if mergeCache != nil {
-			mergeCache.set(a.hashString(), b.hashString(), spc)
+			mergeCache.set(a.Hash(), b.Hash(), spc)
 		}
 		return spc
 	} else { // a != b payloads differ
@@ -495,7 +495,7 @@ func mergeSingletons(a, b *SingletonPredictionContext, rootIsWildcard bool, merg
 			var parents = []IPredictionContext{singleParent, singleParent}
 			var apc = NewArrayPredictionContext(parents, payloads)
 			if mergeCache != nil {
-				mergeCache.set(a.hashString(), b.hashString(), apc)
+				mergeCache.set(a.Hash(), b.Hash(), apc)
 			}
 			return apc
 		}
@@ -511,7 +511,7 @@ func mergeSingletons(a, b *SingletonPredictionContext, rootIsWildcard bool, merg
 		}
 		var a_ = NewArrayPredictionContext(parents, payloads)
 		if mergeCache != nil {
-			mergeCache.set(a.hashString(), b.hashString(), a_)
+			mergeCache.set(a.Hash(), b.Hash(), a_)
 		}
 		return a_
 	}
@@ -601,11 +601,11 @@ func mergeRoot(a, b ISingletonPredictionContext, rootIsWildcard bool) IPredictio
 // /
 func mergeArrays(a, b *ArrayPredictionContext, rootIsWildcard bool, mergeCache *DoubleDict) IPredictionContext {
 	if mergeCache != nil {
-		var previous = mergeCache.Get(a.hashString(), b.hashString())
+		var previous = mergeCache.Get(a.Hash(), b.Hash())
 		if previous != nil {
 			return previous.(IPredictionContext)
 		}
-		previous = mergeCache.Get(b.hashString(), a.hashString())
+		previous = mergeCache.Get(b.Hash(), a.Hash())
 		if previous != nil {
 			return previous.(IPredictionContext)
 		}
@@ -669,7 +669,7 @@ func mergeArrays(a, b *ArrayPredictionContext, rootIsWildcard bool, mergeCache *
 		if k == 1 { // for just one merged element, return singleton top
 			var a_ = SingletonPredictionContextCreate(mergedParents[0], mergedReturnStates[0])
 			if mergeCache != nil {
-				mergeCache.set(a.hashString(), b.hashString(), a_)
+				mergeCache.set(a.Hash(), b.Hash(), a_)
 			}
 			return a_
 		}
@@ -683,20 +683,20 @@ func mergeArrays(a, b *ArrayPredictionContext, rootIsWildcard bool, mergeCache *
 	// TODO: track whether this is possible above during merge sort for speed
 	if M == a {
 		if mergeCache != nil {
-			mergeCache.set(a.hashString(), b.hashString(), a)
+			mergeCache.set(a.Hash(), b.Hash(), a)
 		}
 		return a
 	}
 	if M == b {
 		if mergeCache != nil {
-			mergeCache.set(a.hashString(), b.hashString(), b)
+			mergeCache.set(a.Hash(), b.Hash(), b)
 		}
 		return b
 	}
 	combineCommonParents(mergedParents)
 
 	if mergeCache != nil {
-		mergeCache.set(a.hashString(), b.hashString(), M)
+		mergeCache.set(a.Hash(), b.Hash(), M)
 	}
 	return M
 }

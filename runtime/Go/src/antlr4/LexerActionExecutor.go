@@ -27,7 +27,7 @@ func NewLexerActionExecutor(lexerActions []ILexerAction) *LexerActionExecutor {
 
 	var s string
 	for _, a := range lexerActions {
-		s += a.hashString()
+		s += a.Hash()
 	}
 
 	this.cachedHashString = s // "".join([str(la) for la in
@@ -153,7 +153,7 @@ func (this *LexerActionExecutor) execute(lexer ILexer, input CharStream, startIn
 	}
 }
 
-func (this *LexerActionExecutor) hashString() string {
+func (this *LexerActionExecutor) Hash() string {
 	return this.cachedHashString
 }
 

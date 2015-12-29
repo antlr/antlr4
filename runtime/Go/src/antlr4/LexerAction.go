@@ -17,7 +17,7 @@ type ILexerAction interface {
 	getActionType() int
 	getIsPositionDependent() bool
 	execute(lexer ILexer)
-	hashString() string
+	Hash() string
 	equals(other ILexerAction) bool
 }
 
@@ -48,7 +48,7 @@ func (this *LexerAction) getIsPositionDependent() bool {
 	return this.isPositionDependent
 }
 
-func (this *LexerAction) hashString() string {
+func (this *LexerAction) Hash() string {
 	return strconv.Itoa(this.actionType)
 }
 
@@ -101,7 +101,7 @@ func (this *LexerTypeAction) execute(lexer ILexer) {
 	lexer.setType(this._type)
 }
 
-func (this *LexerTypeAction) hashString() string {
+func (this *LexerTypeAction) Hash() string {
 	return strconv.Itoa(this.actionType) + strconv.Itoa(this._type)
 }
 
@@ -142,7 +142,7 @@ func (this *LexerPushModeAction) execute(lexer ILexer) {
 	lexer.pushMode(this.mode)
 }
 
-func (this *LexerPushModeAction) hashString() string {
+func (this *LexerPushModeAction) Hash() string {
 	return strconv.Itoa(this.actionType) + strconv.Itoa(this.mode)
 }
 
@@ -236,7 +236,7 @@ func (this *LexerModeAction) execute(lexer ILexer) {
 	lexer.mode(this.mode)
 }
 
-func (this *LexerModeAction) hashString() string {
+func (this *LexerModeAction) Hash() string {
 	return strconv.Itoa(this.actionType) + strconv.Itoa(this.mode)
 }
 
@@ -291,7 +291,7 @@ func (this *LexerCustomAction) execute(lexer ILexer) {
 	lexer.Action(nil, this.ruleIndex, this.actionIndex)
 }
 
-func (this *LexerCustomAction) hashString() string {
+func (this *LexerCustomAction) Hash() string {
 	return strconv.Itoa(this.actionType) + strconv.Itoa(this.ruleIndex) + strconv.Itoa(this.actionIndex)
 }
 
@@ -328,7 +328,7 @@ func (this *LexerChannelAction) execute(lexer ILexer) {
 	lexer.setChannel(this.channel)
 }
 
-func (this *LexerChannelAction) hashString() string {
+func (this *LexerChannelAction) Hash() string {
 	return strconv.Itoa(this.actionType) + strconv.Itoa(this.channel)
 }
 
@@ -393,8 +393,8 @@ func (this *LexerIndexedCustomAction) execute(lexer ILexer) {
 	this.lexerAction.execute(lexer)
 }
 
-func (this *LexerIndexedCustomAction) hashString() string {
-	return strconv.Itoa(this.actionType) + strconv.Itoa(this.offset) + this.lexerAction.hashString()
+func (this *LexerIndexedCustomAction) Hash() string {
+	return strconv.Itoa(this.actionType) + strconv.Itoa(this.offset) + this.lexerAction.Hash()
 }
 
 func (this *LexerIndexedCustomAction) equals(other ILexerAction) bool {

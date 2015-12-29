@@ -1254,6 +1254,7 @@ ParserATNSimulator.prototype.closureCheckingStopState = function(config, configs
                     } else {
                         // we have no context info, just chase follow links (if greedy)
                         if (this.debug) {
+                            console.log("DEBUG 1")
                             console.log("FALLING off rule " + this.getRuleName(config.state.ruleIndex));
                         }
                         this.closure_(config, configs, closureBusy, collectPredicates,
@@ -1279,6 +1280,7 @@ ParserATNSimulator.prototype.closureCheckingStopState = function(config, configs
         } else {
             // else if we have no context info, just chase follow links (if greedy)
             if (this.debug) {
+                console.log("DEBUG 2")
                 console.log("FALLING off rule " + this.getRuleName(config.state.ruleIndex));
             }
         }
@@ -1288,6 +1290,7 @@ ParserATNSimulator.prototype.closureCheckingStopState = function(config, configs
 
 // Do the actual work of walking epsilon edges//
 ParserATNSimulator.prototype.closure_ = function(config, configs, closureBusy, collectPredicates, fullCtx, depth, treatEofAsEpsilon) {
+    console.log("closure_")
     var p = config.state;
     // optimization
     if (! p.epsilonOnlyTransitions) {
@@ -1300,12 +1303,15 @@ ParserATNSimulator.prototype.closure_ = function(config, configs, closureBusy, c
         var continueCollecting = collectPredicates && !(t instanceof ActionTransition);
         var c = this.getEpsilonTarget(config, t, continueCollecting, depth === 0, fullCtx, treatEofAsEpsilon);
         if (c!==null) {
+            console.log("DEBUG 1")
 			if (!t.isEpsilon && closureBusy.add(c)!==c){
 				// avoid infinite recursion for EOF* and EOF+
 				continue;
 			}
             var newDepth = depth;
             if ( config.state instanceof RuleStopState) {
+
+                console.log("DEBUG 2")
                 // target fell off end of rule; mark resulting c as having dipped into outer context
                 // We can't get here if incoming config was rule stop and we had context
                 // track how far we dip into outer context.  Might
@@ -1313,11 +1319,16 @@ ParserATNSimulator.prototype.closure_ = function(config, configs, closureBusy, c
                 // preds if this is > 0.
 
                 if (closureBusy.add(c)!==c) {
+                    console.log("DEBUG 3")
                     // avoid infinite recursion for right-recursive rules
                     continue;
+                } else {
+                    console.log(c.toString())
+                    console.log(closureBusy.toString())
                 }
 
 				if (this._dfa !== null && this._dfa.precedenceDfa) {
+				    console.log("DEBUG 4")
 					if (t.outermostPrecedenceReturn === this._dfa.atnStartState.ruleIndex) {
 						c.precedenceFilterSuppressed = true;
 					}
@@ -1327,6 +1338,7 @@ ParserATNSimulator.prototype.closure_ = function(config, configs, closureBusy, c
                 configs.dipsIntoOuterContext = true; // TODO: can remove? only care when we add to set per middle of this method
                 newDepth -= 1;
                 if (this.debug) {
+//                    console.log((new Error()).stack)
                     console.log("dips into outer ctx: " + c);
                 }
             } else if (t instanceof RuleTransition) {

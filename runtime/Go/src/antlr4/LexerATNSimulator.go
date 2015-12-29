@@ -625,7 +625,7 @@ func (this *LexerATNSimulator) addDFAState(configs *ATNConfigSet) *DFAState {
 		proposed.lexerActionExecutor = firstConfigWithRuleStopState.(*LexerATNConfig).lexerActionExecutor
 		proposed.prediction = this.atn.ruleToTokenType[firstConfigWithRuleStopState.GetState().GetRuleIndex()]
 	}
-	var hash = proposed.hashString()
+	var hash = proposed.Hash()
 	var dfa = this.decisionToDFA[this.mode]
 	var existing = dfa.GetStates()[hash]
 	if existing != nil {

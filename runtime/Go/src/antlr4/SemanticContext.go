@@ -88,7 +88,7 @@ func (this *Predicate) evaluate(parser IRecognizer, outerContext IRuleContext) b
 	return parser.Sempred(localctx, this.ruleIndex, this.predIndex)
 }
 
-func (this *Predicate) hashString() string {
+func (this *Predicate) Hash() string {
 	return strconv.Itoa(this.ruleIndex) + "/" + strconv.Itoa(this.predIndex) + "/" + fmt.Sprint(this.isCtxDependent)
 }
 
@@ -136,7 +136,7 @@ func (this *PrecedencePredicate) compareTo(other *PrecedencePredicate) int {
 	return this.precedence - other.precedence
 }
 
-func (this *PrecedencePredicate) hashString() string {
+func (this *PrecedencePredicate) Hash() string {
 	return "31"
 }
 
@@ -232,7 +232,7 @@ func (this *AND) equals(other interface{}) bool {
 	}
 }
 
-func (this *AND) hashString() string {
+func (this *AND) Hash() string {
 	return fmt.Sprint(this.opnds) + "/AND"
 }
 
@@ -371,7 +371,7 @@ func (this *OR) equals(other interface{}) bool {
 	}
 }
 
-func (this *OR) hashString() string {
+func (this *OR) Hash() string {
 	return fmt.Sprint(this.opnds) + "/OR"
 }
 
