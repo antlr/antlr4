@@ -8,17 +8,17 @@ type Parser interface {
 	GetErrorHandler() IErrorStrategy
 	GetTokenStream() TokenStream
 	GetTokenFactory() TokenFactory
-	GetParserRuleContext() IParserRuleContext
+	GetParserRuleContext() ParserRuleContext
 	Consume() IToken
 	GetParseListeners() []ParseTreeListener
 
 	GetInputStream() IntStream
 	getCurrentToken() IToken
 	getExpectedTokens() *IntervalSet
-	NotifyErrorListeners(msg string, offendingToken IToken, err IRecognitionException)
+	NotifyErrorListeners(msg string, offendingToken IToken, err RecognitionException)
 	isExpectedToken(symbol int) bool
 	getPrecedence() int
-	getRuleInvocationStack(IParserRuleContext) []string
+	getRuleInvocationStack(ParserRuleContext) []string
 }
 
 type BaseParser struct {
@@ -30,7 +30,7 @@ type BaseParser struct {
 	_input           TokenStream
 	_errHandler      IErrorStrategy
 	_precedenceStack IntStack
-	_ctx             IParserRuleContext
+	_ctx ParserRuleContext
 
 	_tracer         *TraceListener
 	_parseListeners []ParseTreeListener
@@ -188,7 +188,7 @@ func (p *BaseParser) MatchWildcard() IToken {
 	return t
 }
 
-func (p *BaseParser) GetParserRuleContext() IParserRuleContext {
+func (p *BaseParser) GetParserRuleContext() ParserRuleContext {
 	return p._ctx
 }
 
@@ -357,7 +357,7 @@ func (p *BaseParser) GetATNWithBypassAlts() {
 // String id = m.Get("ID")
 // </pre>
 
-func (p *BaseParser) compileParseTreePattern(pattern, patternRuleIndex, lexer ILexer) {
+func (p *BaseParser) compileParseTreePattern(pattern, patternRuleIndex, lexer Lexer) {
 
 	panic("NewParseTreePatternMatcher not implemented!")
 	//
@@ -403,7 +403,7 @@ func (p *BaseParser) getCurrentToken() IToken {
 	return p._input.LT(1)
 }
 
-func (p *BaseParser) NotifyErrorListeners(msg string, offendingToken IToken, err IRecognitionException) {
+func (p *BaseParser) NotifyErrorListeners(msg string, offendingToken IToken, err RecognitionException) {
 	if offendingToken == nil {
 		offendingToken = p.getCurrentToken()
 	}
@@ -456,7 +456,7 @@ func (p *BaseParser) addContextToParseTree() {
 	}
 }
 
-func (p *BaseParser) EnterRule(localctx IParserRuleContext, state, ruleIndex int) {
+func (p *BaseParser) EnterRule(localctx ParserRuleContext, state, ruleIndex int) {
 	p.SetState(state)
 	p._ctx = localctx
 	p._ctx.setStart(p._input.LT(1))
@@ -476,19 +476,19 @@ func (p *BaseParser) ExitRule() {
 	}
 	p.SetState(p._ctx.getInvokingState())
 	if p._ctx.GetParent() != nil {
-		p._ctx = p._ctx.GetParent().(IParserRuleContext)
+		p._ctx = p._ctx.GetParent().(ParserRuleContext)
 	} else {
 		p._ctx = nil
 	}
 }
 
-func (p *BaseParser) EnterOuterAlt(localctx IParserRuleContext, altNum int) {
+func (p *BaseParser) EnterOuterAlt(localctx ParserRuleContext, altNum int) {
 	// if we have Newlocalctx, make sure we replace existing ctx
 	// that is previous child of parse tree
 	if p.BuildParseTrees && p._ctx != localctx {
 		if p._ctx.GetParent() != nil {
-			p._ctx.GetParent().(IParserRuleContext).removeLastChild()
-			p._ctx.GetParent().(IParserRuleContext).addChild(localctx)
+			p._ctx.GetParent().(ParserRuleContext).removeLastChild()
+			p._ctx.GetParent().(ParserRuleContext).addChild(localctx)
 		}
 	}
 	p._ctx = localctx
@@ -507,7 +507,7 @@ func (p *BaseParser) getPrecedence() int {
 	}
 }
 
-func (p *BaseParser) EnterRecursionRule(localctx IParserRuleContext, state, ruleIndex, precedence int) {
+func (p *BaseParser) EnterRecursionRule(localctx ParserRuleContext, state, ruleIndex, precedence int) {
 	p.SetState(state)
 	p._precedenceStack.Push(precedence)
 	p._ctx = localctx
@@ -521,7 +521,7 @@ func (p *BaseParser) EnterRecursionRule(localctx IParserRuleContext, state, rule
 //
 // Like {@link //EnterRule} but for recursive rules.
 
-func (p *BaseParser) PushNewRecursionContext(localctx IParserRuleContext, state, ruleIndex int) {
+func (p *BaseParser) PushNewRecursionContext(localctx ParserRuleContext, state, ruleIndex int) {
 	var previous = p._ctx
 	previous.setParent(localctx)
 	previous.setInvokingState(state)
@@ -538,7 +538,7 @@ func (p *BaseParser) PushNewRecursionContext(localctx IParserRuleContext, state,
 	}
 }
 
-func (p *BaseParser) UnrollRecursionContexts(parentCtx IParserRuleContext) {
+func (p *BaseParser) UnrollRecursionContexts(parentCtx ParserRuleContext) {
 	p._precedenceStack.Pop()
 	p._ctx.setStop(p._input.LT(-1))
 	var retCtx = p._ctx // save current ctx (return value)
@@ -546,7 +546,7 @@ func (p *BaseParser) UnrollRecursionContexts(parentCtx IParserRuleContext) {
 	if p._parseListeners != nil {
 		for p._ctx != parentCtx {
 			p.TriggerExitRuleEvent()
-			p._ctx = p._ctx.GetParent().(IParserRuleContext)
+			p._ctx = p._ctx.GetParent().(ParserRuleContext)
 		}
 	} else {
 		p._ctx = parentCtx
@@ -559,22 +559,22 @@ func (p *BaseParser) UnrollRecursionContexts(parentCtx IParserRuleContext) {
 	}
 }
 
-func (p *BaseParser) getInvokingContext(ruleIndex int) IParserRuleContext {
+func (p *BaseParser) getInvokingContext(ruleIndex int) ParserRuleContext {
 	var ctx = p._ctx
 	for ctx != nil {
 		if ctx.GetRuleIndex() == ruleIndex {
 			return ctx
 		}
-		ctx = ctx.GetParent().(IParserRuleContext)
+		ctx = ctx.GetParent().(ParserRuleContext)
 	}
 	return nil
 }
 
-func (p *BaseParser) Precpred(localctx IRuleContext, precedence int) bool {
+func (p *BaseParser) Precpred(localctx RuleContext, precedence int) bool {
 	return precedence >= p._precedenceStack[len(p._precedenceStack)-1]
 }
 
-func (p *BaseParser) inContext(context IParserRuleContext) bool {
+func (p *BaseParser) inContext(context ParserRuleContext) bool {
 	// TODO: useful in parser?
 	return false
 }
@@ -611,7 +611,7 @@ func (p *BaseParser) isExpectedToken(symbol int) bool {
 		if following.contains(symbol) {
 			return true
 		}
-		ctx = ctx.GetParent().(IParserRuleContext)
+		ctx = ctx.GetParent().(ParserRuleContext)
 	}
 	if following.contains(TokenEpsilon) && symbol == TokenEOF {
 		return true
@@ -653,7 +653,7 @@ func (p *BaseParser) GetRuleIndex(ruleName string) int {
 //
 // this very useful for error messages.
 
-func (this *BaseParser) getRuleInvocationStack(p IParserRuleContext) []string {
+func (this *BaseParser) getRuleInvocationStack(p ParserRuleContext) []string {
 	if p == nil {
 		p = this._ctx
 	}
@@ -666,7 +666,7 @@ func (this *BaseParser) getRuleInvocationStack(p IParserRuleContext) []string {
 		} else {
 			stack = append(stack, this.GetRuleNames()[ruleIndex])
 		}
-		p = p.GetParent().(IParserRuleContext)
+		p = p.GetParent().(ParserRuleContext)
 	}
 	return stack
 }

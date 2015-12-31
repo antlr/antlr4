@@ -10,10 +10,10 @@ import (
 type IErrorStrategy interface {
 	reset(Parser)
 	RecoverInline(Parser) IToken
-	Recover(Parser, IRecognitionException)
+	Recover(Parser, RecognitionException)
 	Sync(Parser)
 	inErrorRecoveryMode(Parser) bool
-	ReportError(Parser, IRecognitionException)
+	ReportError(Parser, RecognitionException)
 	ReportMatch(Parser)
 }
 
@@ -110,7 +110,7 @@ func (this *DefaultErrorStrategy) ReportMatch(recognizer Parser) {
 // the exception</li>
 // </ul>
 //
-func (this *DefaultErrorStrategy) ReportError(recognizer Parser, e IRecognitionException) {
+func (this *DefaultErrorStrategy) ReportError(recognizer Parser, e RecognitionException) {
 	// if we've already Reported an error and have not Matched a token
 	// yet successfully, don't Report any errors.
 	if this.inErrorRecoveryMode(recognizer) {
@@ -139,7 +139,7 @@ func (this *DefaultErrorStrategy) ReportError(recognizer Parser, e IRecognitionE
 // until we find one in the reSynchronization set--loosely the set of tokens
 // that can follow the current rule.</p>
 //
-func (this *DefaultErrorStrategy) Recover(recognizer Parser, e IRecognitionException) {
+func (this *DefaultErrorStrategy) Recover(recognizer Parser, e RecognitionException) {
 
 	if this.lastErrorIndex == recognizer.GetInputStream().Index() &&
 		this.lastErrorStates != nil && this.lastErrorStates.contains(recognizer.GetState()) {
@@ -697,7 +697,7 @@ func (this *DefaultErrorStrategy) getErrorRecoverySet(recognizer Parser) *Interv
 		var rt = invokingState.GetTransitions()[0]
 		var follow = atn.nextTokens(rt.(*RuleTransition).followState, nil)
 		recoverSet.addSet(follow)
-		ctx = ctx.GetParent().(IParserRuleContext)
+		ctx = ctx.GetParent().(ParserRuleContext)
 	}
 	recoverSet.removeOne(TokenEpsilon)
 	return recoverSet
@@ -758,11 +758,11 @@ func NewBailErrorStrategy() *BailErrorStrategy {
 // rule func catches. Use {@link Exception//getCause()} to get the
 // original {@link RecognitionException}.
 //
-func (this *BailErrorStrategy) Recover(recognizer Parser, e IRecognitionException) {
+func (this *BailErrorStrategy) Recover(recognizer Parser, e RecognitionException) {
 	var context = recognizer.GetParserRuleContext()
 	for context != nil {
 		context.SetException(e)
-		context = context.GetParent().(IParserRuleContext)
+		context = context.GetParent().(ParserRuleContext)
 	}
 	panic(NewParseCancellationException()) // TODO we don't emit e properly
 }

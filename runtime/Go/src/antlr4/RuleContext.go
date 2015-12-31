@@ -25,7 +25,7 @@ import (
 //  @see ParserRuleContext
 //
 
-type IRuleContext interface {
+type RuleContext interface {
 	RuleNode
 
 	getInvokingState() int
@@ -35,19 +35,19 @@ type IRuleContext interface {
 
 	isEmpty() bool
 
-	String([]string, IRuleContext) string
+	String([]string, RuleContext) string
 }
 
-type RuleContext struct {
-	parentCtx     IRuleContext
+type BaseRuleContext struct {
+	parentCtx RuleContext
 	invokingState int
 	RuleIndex     int
 	children      []Tree
 }
 
-func NewRuleContext(parent IRuleContext, invokingState int) *RuleContext {
+func NewBaseRuleContext(parent RuleContext, invokingState int) *BaseRuleContext {
 
-	rn := new(RuleContext)
+	rn := new(BaseRuleContext)
 
 	// What context invoked this rule?
 	rn.parentCtx = parent
@@ -64,31 +64,31 @@ func NewRuleContext(parent IRuleContext, invokingState int) *RuleContext {
 	return rn
 }
 
-func (this *RuleContext) setChildren(elems []Tree) {
+func (this *BaseRuleContext) setChildren(elems []Tree) {
 	this.children = elems
 }
 
-func (this *RuleContext) setParent(v Tree) {
-	this.parentCtx = v.(IRuleContext)
+func (this *BaseRuleContext) setParent(v Tree) {
+	this.parentCtx = v.(RuleContext)
 }
 
-func (this *RuleContext) getInvokingState() int {
+func (this *BaseRuleContext) getInvokingState() int {
 	return this.invokingState
 }
 
-func (this *RuleContext) setInvokingState(t int) {
+func (this *BaseRuleContext) setInvokingState(t int) {
 	this.invokingState = t
 }
 
-func (this *RuleContext) GetRuleIndex() int {
+func (this *BaseRuleContext) GetRuleIndex() int {
 	return this.RuleIndex
 }
 
-func (this *RuleContext) getChildren() []Tree {
+func (this *BaseRuleContext) getChildren() []Tree {
 	return this.children
 }
 
-func (this *RuleContext) depth() int {
+func (this *BaseRuleContext) depth() int {
 	var n = 0
 	var p Tree = this
 	for p != nil {
@@ -100,21 +100,21 @@ func (this *RuleContext) depth() int {
 
 // A context is empty if there is no invoking state meaning nobody call
 // current context.
-func (this *RuleContext) isEmpty() bool {
+func (this *BaseRuleContext) isEmpty() bool {
 	return this.invokingState == -1
 }
 
 // satisfy the ParseTree / SyntaxTree interface
 
-func (this *RuleContext) GetSourceInterval() *Interval {
+func (this *BaseRuleContext) GetSourceInterval() *Interval {
 	return TreeINVALID_INTERVAL
 }
 
-func (this *RuleContext) getRuleContext() IRuleContext {
+func (this *BaseRuleContext) getRuleContext() RuleContext {
 	return this
 }
 
-func (this *RuleContext) getPayload() interface{} {
+func (this *BaseRuleContext) getPayload() interface{} {
 	return this
 }
 
@@ -125,32 +125,32 @@ func (this *RuleContext) getPayload() interface{} {
 // added to the parse trees, they will not appear in the output of this
 // method.
 //
-func (this *RuleContext) GetText() string {
+func (this *BaseRuleContext) GetText() string {
 	if this.getChildCount() == 0 {
 		return ""
 	} else {
 		var s string
 		for _, child := range this.children {
-			s += child.(IRuleContext).GetText()
+			s += child.(RuleContext).GetText()
 		}
 
 		return s
 	}
 }
 
-func (this *RuleContext) getChild(i int) Tree {
+func (this *BaseRuleContext) getChild(i int) Tree {
 	return nil
 }
 
-func (this *RuleContext) GetParent() Tree {
+func (this *BaseRuleContext) GetParent() Tree {
 	return this.parentCtx
 }
 
-func (this *RuleContext) getChildCount() int {
+func (this *BaseRuleContext) getChildCount() int {
 	return 0
 }
 
-func (this *RuleContext) accept(Visitor ParseTreeVisitor) interface{} {
+func (this *BaseRuleContext) accept(Visitor ParseTreeVisitor) interface{} {
 	return Visitor.VisitChildren(this)
 }
 
@@ -160,13 +160,13 @@ func (this *RuleContext) accept(Visitor ParseTreeVisitor) interface{} {
 // (root child1 .. childN). Print just a node if this is a leaf.
 //
 
-func (this *RuleContext) StringTree(ruleNames []string, recog Recognizer) string {
+func (this *BaseRuleContext) StringTree(ruleNames []string, recog Recognizer) string {
 	return TreesStringTree(this, ruleNames, recog)
 }
 
-func (this *RuleContext) String(ruleNames []string, stop IRuleContext) string {
+func (this *BaseRuleContext) String(ruleNames []string, stop RuleContext) string {
 
-	var p IRuleContext = this
+	var p RuleContext = this
 	var s = "["
 	for p != nil && p != stop {
 		if ruleNames == nil {
@@ -183,12 +183,12 @@ func (this *RuleContext) String(ruleNames []string, stop IRuleContext) string {
 			}
 			s += ruleName
 		}
-		if p.GetParent() != nil && (ruleNames != nil || !p.GetParent().(IRuleContext).isEmpty()) {
+		if p.GetParent() != nil && (ruleNames != nil || !p.GetParent().(RuleContext).isEmpty()) {
 			s += " "
 		}
 		pi := p.GetParent()
 		if (pi != nil){
-			p = pi.(IRuleContext)
+			p = pi.(RuleContext)
 		} else {
 			p = nil
 		}

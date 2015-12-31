@@ -35,7 +35,7 @@ type ParseTree interface {
 type RuleNode interface {
 	ParseTree
 
-	getRuleContext() IRuleContext
+	getRuleContext() RuleContext
 }
 
 type TerminalNode interface {
@@ -80,12 +80,12 @@ type ParseTreeVisitor interface {
 type ParseTreeListener interface {
 	VisitTerminal(node TerminalNode)
 	VisitErrorNode(node ErrorNode)
-	EnterEveryRule(ctx IParserRuleContext)
-	ExitEveryRule(ctx IParserRuleContext)
+	EnterEveryRule(ctx ParserRuleContext)
+	ExitEveryRule(ctx ParserRuleContext)
 }
 
 type TerminalNodeImpl struct {
-	parentCtx IRuleContext
+	parentCtx RuleContext
 
 	symbol IToken
 }
@@ -121,7 +121,7 @@ func (this *TerminalNodeImpl) GetParent() Tree {
 }
 
 func (this *TerminalNodeImpl) setParent(t Tree) {
-	this.parentCtx = t.(IRuleContext)
+	this.parentCtx = t.(RuleContext)
 }
 
 func (this *TerminalNodeImpl) getPayload() interface{} {
@@ -210,13 +210,13 @@ func (this *ParseTreeWalker) walk(listener ParseTreeListener, t Tree) {
 // the rule specific. We to them in reverse order upon finishing the node.
 //
 func (this *ParseTreeWalker) EnterRule(listener ParseTreeListener, r RuleNode) {
-	var ctx = r.getRuleContext().(IParserRuleContext)
+	var ctx = r.getRuleContext().(ParserRuleContext)
 	listener.EnterEveryRule(ctx)
 	ctx.EnterRule(listener)
 }
 
 func (this *ParseTreeWalker) ExitRule(listener ParseTreeListener, r RuleNode) {
-	var ctx = r.getRuleContext().(IParserRuleContext)
+	var ctx = r.getRuleContext().(ParserRuleContext)
 	ctx.ExitRule(listener)
 	listener.ExitEveryRule(ctx)
 }

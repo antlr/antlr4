@@ -271,7 +271,7 @@ func (bt *CommonTokenStream) GetTextFromTokens(start, end IToken) string {
 	return bt.GetTextFromInterval(NewInterval(start.GetTokenIndex(), end.GetTokenIndex()))
 }
 
-func (bt *CommonTokenStream) GetTextFromRuleContext(interval IRuleContext) string {
+func (bt *CommonTokenStream) GetTextFromRuleContext(interval RuleContext) string {
 	return bt.GetTextFromInterval(interval.GetSourceInterval())
 }
 
@@ -323,7 +323,7 @@ type CommonTokenStream struct {
 	channel    int
 }
 
-func NewCommonTokenStream(lexer ILexer, channel int) *CommonTokenStream {
+func NewCommonTokenStream(lexer Lexer, channel int) *CommonTokenStream {
 
 	ts := new(CommonTokenStream)
 

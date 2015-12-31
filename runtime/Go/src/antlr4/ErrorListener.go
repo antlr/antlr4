@@ -10,7 +10,7 @@ import (
 // necessary.
 
 type IErrorListener interface {
-	SyntaxError(recognizer Recognizer, offendingSymbol interface{}, line, column int, msg string, e IRecognitionException)
+	SyntaxError(recognizer Recognizer, offendingSymbol interface{}, line, column int, msg string, e RecognitionException)
 	ReportAmbiguity(recognizer Parser, dfa *DFA, startIndex, stopIndex int, exact bool, ambigAlts *BitSet, configs ATNConfigSet)
 	ReportAttemptingFullContext(recognizer Parser, dfa *DFA, startIndex, stopIndex int, conflictingAlts *BitSet, configs ATNConfigSet)
 	ReportContextSensitivity(recognizer Parser, dfa *DFA, startIndex, stopIndex, prediction int, configs ATNConfigSet)
@@ -23,7 +23,7 @@ func NewDefaultErrorListener() *DefaultErrorListener {
 	return new(DefaultErrorListener)
 }
 
-func (this *DefaultErrorListener) SyntaxError(recognizer Recognizer, offendingSymbol interface{}, line, column int, msg string, e IRecognitionException) {
+func (this *DefaultErrorListener) SyntaxError(recognizer Recognizer, offendingSymbol interface{}, line, column int, msg string, e RecognitionException) {
 	if PortDebug {
 		fmt.Println("SyntaxError!")
 	}
@@ -72,7 +72,7 @@ var ConsoleErrorListenerINSTANCE = NewConsoleErrorListener()
 // line <em>line</em>:<em>charPositionInLine</em> <em>msg</em>
 // </pre>
 //
-func (this *ConsoleErrorListener) SyntaxError(recognizer Recognizer, offendingSymbol interface{}, line, column int, msg string, e IRecognitionException) {
+func (this *ConsoleErrorListener) SyntaxError(recognizer Recognizer, offendingSymbol interface{}, line, column int, msg string, e RecognitionException) {
 	fmt.Println("line " + strconv.Itoa(line) + ":" + strconv.Itoa(column) + " " + msg)
 }
 
@@ -90,7 +90,7 @@ func NewProxyErrorListener(delegates []IErrorListener) *ProxyErrorListener {
 	return l
 }
 
-func (this *ProxyErrorListener) SyntaxError(recognizer Recognizer, offendingSymbol interface{}, line, column int, msg string, e IRecognitionException) {
+func (this *ProxyErrorListener) SyntaxError(recognizer Recognizer, offendingSymbol interface{}, line, column int, msg string, e RecognitionException) {
 	for _, d := range this.delegates {
 		d.SyntaxError(recognizer, offendingSymbol, line, column, msg, e)
 	}

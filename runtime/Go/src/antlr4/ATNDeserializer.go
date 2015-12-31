@@ -187,7 +187,7 @@ func (this *ATNDeserializer) readStates(atn *ATN) {
 	var numNonGreedyStates = this.readInt()
 	for j := 0; j < numNonGreedyStates; j++ {
 		stateNumber := this.readInt()
-		atn.states[stateNumber].(IDecisionState).setNonGreedy( true )
+		atn.states[stateNumber].(DecisionState).setNonGreedy( true )
 	}
 
 	var numPrecedenceStates = this.readInt()
@@ -324,7 +324,7 @@ func (this *ATNDeserializer) readDecisions(atn *ATN) {
 	var ndecisions = this.readInt()
 	for i := 0; i < ndecisions; i++ {
 		var s = this.readInt()
-		var decState = atn.states[s].(IDecisionState)
+		var decState = atn.states[s].(DecisionState)
 		atn.DecisionToState = append(atn.DecisionToState, decState)
 		decState.setDecision( i )
 	}
@@ -333,7 +333,7 @@ func (this *ATNDeserializer) readDecisions(atn *ATN) {
 func (this *ATNDeserializer) readLexerActions(atn *ATN) {
 	if atn.grammarType == ATNTypeLexer {
 		var count = this.readInt()
-		atn.lexerActions = make([]ILexerAction, count) // initIntArray(count, nil)
+		atn.lexerActions = make([]LexerAction, count) // initIntArray(count, nil)
 		for i := 0; i < count; i++ {
 			var actionType = this.readInt()
 			var data1 = this.readInt()
@@ -372,12 +372,12 @@ func (this *ATNDeserializer) generateRuleBypassTransition(atn *ATN, idx int) {
 
 	bypassStart.endState = bypassStop
 
-	atn.defineDecisionState(bypassStart.DecisionState)
+	atn.defineDecisionState(bypassStart.BaseDecisionState)
 
 	bypassStop.startState = bypassStart
 
-	var excludeTransition ITransition = nil
-	var endState IATNState = nil
+	var excludeTransition Transition = nil
+	var endState ATNState = nil
 
 	if atn.ruleToStartState[idx].isPrecedenceRule {
 		// wrap from the beginning of the rule to the StarLoopEntryState
@@ -418,7 +418,7 @@ func (this *ATNDeserializer) generateRuleBypassTransition(atn *ATN, idx int) {
 	var count = len(ruleToStartState.GetTransitions())
 	for count > 0 {
 		bypassStart.AddTransition(ruleToStartState.GetTransitions()[count-1], -1)
-		ruleToStartState.SetTransitions([]ITransition{ruleToStartState.GetTransitions()[len(ruleToStartState.GetTransitions())-1]})
+		ruleToStartState.SetTransitions([]Transition{ruleToStartState.GetTransitions()[len(ruleToStartState.GetTransitions())-1]})
 	}
 	// link the new states
 	atn.ruleToStartState[idx].AddTransition(NewEpsilonTransition(bypassStart, -1), -1)
@@ -430,7 +430,7 @@ func (this *ATNDeserializer) generateRuleBypassTransition(atn *ATN, idx int) {
 	bypassStart.AddTransition(NewEpsilonTransition(MatchState, -1), -1)
 }
 
-func (this *ATNDeserializer) stateIsEndStateFor(state IATNState, idx int) IATNState {
+func (this *ATNDeserializer) stateIsEndStateFor(state ATNState, idx int) ATNState {
 	if state.GetRuleIndex() != idx {
 		return nil
 	}
@@ -528,7 +528,7 @@ func (this *ATNDeserializer) verifyATN(atn *ATN) {
 			this.checkCondition(s2.endState != nil, "")
 		case *BlockEndState:
 			this.checkCondition(s2.startState != nil, "")
-		case IDecisionState:
+		case DecisionState:
 			this.checkCondition(len(s2.GetTransitions()) <= 1 || s2.getDecision() >= 0, "")
 		default:
 			_, ok := s2.(*RuleStopState)
@@ -586,7 +586,7 @@ func (this *ATNDeserializer) readUUID() string {
 		byteToHex[bb[14]] + byteToHex[bb[15]]
 }
 
-func (this *ATNDeserializer) edgeFactory(atn *ATN, typeIndex, src, trg, arg1, arg2, arg3 int, sets []*IntervalSet) ITransition {
+func (this *ATNDeserializer) edgeFactory(atn *ATN, typeIndex, src, trg, arg1, arg2, arg3 int, sets []*IntervalSet) Transition {
 
 	var target = atn.states[trg]
 
@@ -624,9 +624,9 @@ func (this *ATNDeserializer) edgeFactory(atn *ATN, typeIndex, src, trg, arg1, ar
 	panic("The specified transition type is not valid.")
 }
 
-func (this *ATNDeserializer) stateFactory(typeIndex, ruleIndex int) IATNState {
+func (this *ATNDeserializer) stateFactory(typeIndex, ruleIndex int) ATNState {
 
-	var s IATNState
+	var s ATNState
 	switch typeIndex {
 	case ATNStateInvalidType:
 		return nil
@@ -663,7 +663,7 @@ func (this *ATNDeserializer) stateFactory(typeIndex, ruleIndex int) IATNState {
 	return s
 }
 
-func (this *ATNDeserializer) lexerActionFactory(typeIndex, data1, data2 int) ILexerAction {
+func (this *ATNDeserializer) lexerActionFactory(typeIndex, data1, data2 int) LexerAction {
 	switch typeIndex {
 	case LexerActionTypeCHANNEL:
 		return NewLexerChannelAction(data1)

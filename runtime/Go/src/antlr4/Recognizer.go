@@ -12,12 +12,12 @@ type Recognizer interface {
 	GetLiteralNames() []string
 	GetSymbolicNames() []string
 	GetRuleNames() []string
-	Sempred(localctx IRuleContext, ruleIndex int, actionIndex int) bool
-	Precpred(localctx IRuleContext, precedence int) bool
+	Sempred(localctx RuleContext, ruleIndex int, actionIndex int) bool
+	Precpred(localctx RuleContext, precedence int) bool
 
 	GetState() int
 	SetState(int)
-	Action(_localctx IRuleContext, ruleIndex, actionIndex int)
+	Action(_localctx RuleContext, ruleIndex, actionIndex int)
 	GetATN() *ATN
 	getErrorListenerDispatch() IErrorListener
 
@@ -50,7 +50,7 @@ func (this *BaseRecognizer) checkVersion(toolVersion string) {
 	}
 }
 
-func (this *BaseRecognizer) Action(context IRuleContext, ruleIndex, actionIndex int) {
+func (this *BaseRecognizer) Action(context RuleContext, ruleIndex, actionIndex int) {
 	panic("action not implemented on Recognizer!")
 }
 
@@ -162,7 +162,7 @@ func (this *BaseRecognizer) GetTokenType(tokenName string) int {
 //}
 
 // What is the error header, normally line/character position information?//
-func (this *BaseRecognizer) getErrorHeader(e IRecognitionException) string {
+func (this *BaseRecognizer) getErrorHeader(e RecognitionException) string {
 	var line = e.GetOffendingToken().GetLine()
 	var column = e.GetOffendingToken().GetColumn()
 	return "line " + strconv.Itoa(line) + ":" + strconv.Itoa(column)
@@ -206,10 +206,10 @@ func (this *BaseRecognizer) getErrorListenerDispatch() IErrorListener {
 
 // subclass needs to override these if there are sempreds or actions
 // that the ATN interp needs to execute
-func (this *BaseRecognizer) Sempred(localctx IRuleContext, ruleIndex int, actionIndex int) bool {
+func (this *BaseRecognizer) Sempred(localctx RuleContext, ruleIndex int, actionIndex int) bool {
 	return true
 }
 
-func (this *BaseRecognizer) Precpred(localctx IRuleContext, precedence int) bool {
+func (this *BaseRecognizer) Precpred(localctx RuleContext, precedence int) bool {
 	return true
 }

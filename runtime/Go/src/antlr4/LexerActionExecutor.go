@@ -8,14 +8,14 @@ package antlr4
 // not cause bloating of the {@link DFA} created for the lexer.</p>
 
 type LexerActionExecutor struct {
-	lexerActions     []ILexerAction
+	lexerActions     []LexerAction
 	cachedHashString string
 }
 
-func NewLexerActionExecutor(lexerActions []ILexerAction) *LexerActionExecutor {
+func NewLexerActionExecutor(lexerActions []LexerAction) *LexerActionExecutor {
 
 	if lexerActions == nil {
-		lexerActions = make([]ILexerAction, 0)
+		lexerActions = make([]LexerAction, 0)
 	}
 
 	this := new(LexerActionExecutor)
@@ -48,9 +48,9 @@ func NewLexerActionExecutor(lexerActions []ILexerAction) *LexerActionExecutor {
 //
 // @return A {@link LexerActionExecutor} for executing the combine actions
 // of {@code lexerActionExecutor} and {@code lexerAction}.
-func LexerActionExecutorappend(lexerActionExecutor *LexerActionExecutor, lexerAction ILexerAction) *LexerActionExecutor {
+func LexerActionExecutorappend(lexerActionExecutor *LexerActionExecutor, lexerAction LexerAction) *LexerActionExecutor {
 	if lexerActionExecutor == nil {
-		return NewLexerActionExecutor([]ILexerAction{lexerAction})
+		return NewLexerActionExecutor([]LexerAction{lexerAction})
 	}
 
 	var lexerActions = append(lexerActionExecutor.lexerActions, lexerAction)
@@ -88,12 +88,12 @@ func LexerActionExecutorappend(lexerActionExecutor *LexerActionExecutor, lexerAc
 // for all position-dependent lexer actions.
 // /
 func (this *LexerActionExecutor) fixOffsetBeforeMatch(offset int) *LexerActionExecutor {
-	var updatedLexerActions []ILexerAction = nil
+	var updatedLexerActions []LexerAction = nil
 	for i := 0; i < len(this.lexerActions); i++ {
 		_, ok := this.lexerActions[i].(*LexerIndexedCustomAction)
 		if this.lexerActions[i].getIsPositionDependent() && !ok {
 			if updatedLexerActions == nil {
-				updatedLexerActions = make([]ILexerAction, 0)
+				updatedLexerActions = make([]LexerAction, 0)
 
 				for _, a := range this.lexerActions {
 					updatedLexerActions = append(updatedLexerActions, a)
@@ -128,7 +128,7 @@ func (this *LexerActionExecutor) fixOffsetBeforeMatch(offset int) *LexerActionEx
 // {@link IntStream//seek} to set the {@code input} position to the beginning
 // of the token.
 // /
-func (this *LexerActionExecutor) execute(lexer ILexer, input CharStream, startIndex int) {
+func (this *LexerActionExecutor) execute(lexer Lexer, input CharStream, startIndex int) {
 	var requiresSeek = false
 	var stopIndex = input.Index()
 
@@ -139,7 +139,7 @@ func (this *LexerActionExecutor) execute(lexer ILexer, input CharStream, startIn
 	}()
 
 	for i := 0; i < len(this.lexerActions); i++ {
-		var lexerAction ILexerAction = this.lexerActions[i]
+		var lexerAction LexerAction = this.lexerActions[i]
 		if la, ok := lexerAction.(*LexerIndexedCustomAction); ok {
 			var offset = la.offset
 			input.Seek(startIndex + offset)

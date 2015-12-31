@@ -1,23 +1,26 @@
 package antlr4
 import "fmt"
 
+// Temporary - for debugging purposes of the Go port
 const (
 	PortDebug = false
 )
 
-var ATNINVALID_ALT_NUMBER = 0
+var ATNInvalidAltNumber = 0
 
 type ATN struct {
-	DecisionToState      []IDecisionState
+
+	DecisionToState      []DecisionState
 	grammarType          int
 	maxTokenType         int
-	states               []IATNState
+	states               []ATNState
 	ruleToStartState     []*RuleStartState
 	ruleToStopState      []*RuleStopState
 	modeNameToStartState map[string]*TokensStartState
 	modeToStartState     []*TokensStartState
 	ruleToTokenType      []int
-	lexerActions         []ILexerAction
+	lexerActions         []LexerAction
+
 }
 
 func NewATN(grammarType int, maxTokenType int) *ATN {
@@ -29,11 +32,11 @@ func NewATN(grammarType int, maxTokenType int) *ATN {
 	atn.grammarType = grammarType
 	// The maximum value for any symbol recognized by a transition in the ATN.
 	atn.maxTokenType = maxTokenType
-	atn.states = make([]IATNState, 0)
+	atn.states = make([]ATNState, 0)
 	// Each subrule/rule is a decision point and we must track them so we
 	//  can go back later and build DFA predictors for them.  This includes
 	//  all the rules, subrules, optional blocks, ()+, ()* etc...
-	atn.DecisionToState = make([]IDecisionState, 0)
+	atn.DecisionToState = make([]DecisionState, 0)
 	// Maps from rule index to starting state number.
 	atn.ruleToStartState = make([]*RuleStartState, 0)
 	// Maps from rule index to stop state number.
@@ -58,7 +61,7 @@ func NewATN(grammarType int, maxTokenType int) *ATN {
 //  If {@code ctx} is nil, the set of tokens will not include what can follow
 //  the rule surrounding {@code s}. In other words, the set will be
 //  restricted to tokens reachable staying within {@code s}'s rule.
-func (this *ATN) nextTokensInContext(s IATNState, ctx IRuleContext) *IntervalSet {
+func (this *ATN) nextTokensInContext(s ATNState, ctx RuleContext) *IntervalSet {
 	var anal = NewLL1Analyzer(this)
 	var res = anal.LOOK(s, nil, ctx)
 	return res
@@ -67,7 +70,7 @@ func (this *ATN) nextTokensInContext(s IATNState, ctx IRuleContext) *IntervalSet
 // Compute the set of valid tokens that can occur starting in {@code s} and
 // staying in same rule. {@link Token//EPSILON} is in set if we reach end of
 // rule.
-func (this *ATN) nextTokensNoContext(s IATNState) *IntervalSet {
+func (this *ATN) nextTokensNoContext(s ATNState) *IntervalSet {
 	if s.GetNextTokenWithinRule() != nil {
 		if PortDebug {
 			fmt.Println("DEBUG 1")
@@ -83,7 +86,7 @@ func (this *ATN) nextTokensNoContext(s IATNState) *IntervalSet {
 	return s.GetNextTokenWithinRule()
 }
 
-func (this *ATN) nextTokens(s IATNState, ctx IRuleContext) *IntervalSet {
+func (this *ATN) nextTokens(s ATNState, ctx RuleContext) *IntervalSet {
 	if ctx == nil {
 		return this.nextTokensNoContext(s)
 	} else {
@@ -91,7 +94,7 @@ func (this *ATN) nextTokens(s IATNState, ctx IRuleContext) *IntervalSet {
 	}
 }
 
-func (this *ATN) addState(state IATNState) {
+func (this *ATN) addState(state ATNState) {
 	if state != nil {
 		state.SetATN(this)
 		state.SetStateNumber(len(this.states))
@@ -99,17 +102,17 @@ func (this *ATN) addState(state IATNState) {
 	this.states = append(this.states, state)
 }
 
-func (this *ATN) removeState(state IATNState) {
+func (this *ATN) removeState(state ATNState) {
 	this.states[state.GetStateNumber()] = nil // just free mem, don't shift states in list
 }
 
-func (this *ATN) defineDecisionState(s IDecisionState) int {
+func (this *ATN) defineDecisionState(s DecisionState) int {
 	this.DecisionToState = append(this.DecisionToState, s)
 	s.setDecision( len(this.DecisionToState) - 1 )
 	return s.getDecision()
 }
 
-func (this *ATN) getDecisionState(decision int) IDecisionState {
+func (this *ATN) getDecisionState(decision int) DecisionState {
 	if len(this.DecisionToState) == 0 {
 		return nil
 	} else {
@@ -135,7 +138,7 @@ func (this *ATN) getDecisionState(decision int) IDecisionState {
 // @panics IllegalArgumentException if the ATN does not contain a state with
 // number {@code stateNumber}
 
-func (this *ATN) getExpectedTokens(stateNumber int, ctx IRuleContext) *IntervalSet {
+func (this *ATN) getExpectedTokens(stateNumber int, ctx RuleContext) *IntervalSet {
 	if stateNumber < 0 || stateNumber >= len(this.states) {
 		panic("Invalid state number.")
 	}
@@ -153,7 +156,7 @@ func (this *ATN) getExpectedTokens(stateNumber int, ctx IRuleContext) *IntervalS
 		following = this.nextTokens(rt.(*RuleTransition).followState, nil)
 		expected.addSet(following)
 		expected.removeOne(TokenEpsilon)
-		ctx = ctx.GetParent().(IRuleContext)
+		ctx = ctx.GetParent().(RuleContext)
 	}
 	if following.contains(TokenEpsilon) {
 		expected.addOne(TokenEOF)

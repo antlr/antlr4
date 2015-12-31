@@ -8,22 +8,22 @@ import ()
 //  in the input, where it is in the ATN, the rule invocation stack,
 //  and what kind of problem occurred.
 
-type IRecognitionException interface {
+type RecognitionException interface {
 	GetOffendingToken() IToken
 	GetMessage() string
 	GetInputStream() IntStream
 }
 
-type RecognitionException struct {
+type BaseRecognitionException struct {
 	message        string
 	recognizer Recognizer
 	offendingToken IToken
 	offendingState int
-	ctx            IRuleContext
+	ctx RuleContext
 	input          IntStream
 }
 
-func NewRecognitionException(message string, recognizer Recognizer, input IntStream, ctx IRuleContext) *RecognitionException {
+func NewBaseRecognitionException(message string, recognizer Recognizer, input IntStream, ctx RuleContext) *BaseRecognitionException {
 
 	// todo
 	//	Error.call(this)
@@ -35,7 +35,7 @@ func NewRecognitionException(message string, recognizer Recognizer, input IntStr
 	//	}
 	// TODO may be able to use - "runtime" func Stack(buf []byte, all bool) int
 
-	t := new(RecognitionException)
+	t := new(BaseRecognitionException)
 
 	t.message = message
 	t.recognizer = recognizer
@@ -58,15 +58,15 @@ func NewRecognitionException(message string, recognizer Recognizer, input IntStr
 	return t
 }
 
-func (this *RecognitionException) GetMessage() string {
+func (this *BaseRecognitionException) GetMessage() string {
 	return this.message
 }
 
-func (this *RecognitionException) GetOffendingToken() IToken {
+func (this *BaseRecognitionException) GetOffendingToken() IToken {
 	return this.offendingToken
 }
 
-func (this *RecognitionException) GetInputStream() IntStream {
+func (this *BaseRecognitionException) GetInputStream() IntStream {
 	return this.input
 }
 
@@ -82,7 +82,7 @@ func (this *RecognitionException) GetInputStream() IntStream {
 // @return The set of token types that could potentially follow the current
 // state in the ATN, or {@code nil} if the information is not available.
 // /
-func (this *RecognitionException) getExpectedTokens() *IntervalSet {
+func (this *BaseRecognitionException) getExpectedTokens() *IntervalSet {
 	if this.recognizer != nil {
 		return this.recognizer.GetATN().getExpectedTokens(this.offendingState, this.ctx)
 	} else {
@@ -90,22 +90,22 @@ func (this *RecognitionException) getExpectedTokens() *IntervalSet {
 	}
 }
 
-func (this *RecognitionException) String() string {
+func (this *BaseRecognitionException) String() string {
 	return this.message
 }
 
 type LexerNoViableAltException struct {
-	*RecognitionException
+	*BaseRecognitionException
 
 	startIndex     int
 	deadEndConfigs ATNConfigSet
 }
 
-func NewLexerNoViableAltException(lexer ILexer, input CharStream, startIndex int, deadEndConfigs ATNConfigSet) *LexerNoViableAltException {
+func NewLexerNoViableAltException(lexer Lexer, input CharStream, startIndex int, deadEndConfigs ATNConfigSet) *LexerNoViableAltException {
 
 	this := new(LexerNoViableAltException)
 
-	this.RecognitionException = NewRecognitionException("", lexer, input, nil)
+	this.BaseRecognitionException = NewBaseRecognitionException("", lexer, input, nil)
 
 	this.startIndex = startIndex
 	this.deadEndConfigs = deadEndConfigs
@@ -122,11 +122,11 @@ func (this *LexerNoViableAltException) String() string {
 }
 
 type NoViableAltException struct {
-	*RecognitionException
+	*BaseRecognitionException
 
 	startToken     IToken
 	offendingToken IToken
-	ctx            IParserRuleContext
+	ctx ParserRuleContext
 	deadEndConfigs ATNConfigSet
 }
 
@@ -135,7 +135,7 @@ type NoViableAltException struct {
 // of the offending input and also knows where the parser was
 // in the various paths when the error. Reported by ReportNoViableAlternative()
 //
-func NewNoViableAltException(recognizer Parser, input TokenStream, startToken IToken, offendingToken IToken, deadEndConfigs ATNConfigSet, ctx IParserRuleContext) *NoViableAltException {
+func NewNoViableAltException(recognizer Parser, input TokenStream, startToken IToken, offendingToken IToken, deadEndConfigs ATNConfigSet, ctx ParserRuleContext) *NoViableAltException {
 
 	if ctx == nil {
 		ctx = recognizer.GetParserRuleContext()
@@ -154,7 +154,7 @@ func NewNoViableAltException(recognizer Parser, input TokenStream, startToken IT
 	}
 
 	this := new(NoViableAltException)
-	this.RecognitionException = NewRecognitionException("", recognizer, input, ctx)
+	this.BaseRecognitionException = NewBaseRecognitionException("", recognizer, input, ctx)
 
 	// Which configurations did we try at input.Index() that couldn't Match
 	// input.LT(1)?//
@@ -170,7 +170,7 @@ func NewNoViableAltException(recognizer Parser, input TokenStream, startToken IT
 }
 
 type InputMisMatchException struct {
-	*RecognitionException
+	*BaseRecognitionException
 }
 
 // This signifies any kind of misMatched input exceptions such as
@@ -179,7 +179,7 @@ type InputMisMatchException struct {
 func NewInputMisMatchException(recognizer Parser) *InputMisMatchException {
 
 	this := new(InputMisMatchException)
-	this.RecognitionException = NewRecognitionException("", recognizer, recognizer.GetInputStream(), recognizer.GetParserRuleContext())
+	this.BaseRecognitionException = NewBaseRecognitionException("", recognizer, recognizer.GetInputStream(), recognizer.GetParserRuleContext())
 
 	this.offendingToken = recognizer.getCurrentToken()
 
@@ -193,7 +193,7 @@ func NewInputMisMatchException(recognizer Parser) *InputMisMatchException {
 // prediction.
 
 type FailedPredicateException struct {
-	*RecognitionException
+	*BaseRecognitionException
 
 	ruleIndex      int
 	predicateIndex int
@@ -204,7 +204,7 @@ func NewFailedPredicateException(recognizer *BaseParser, predicate string, messa
 
 	this := new(FailedPredicateException)
 
-	this.RecognitionException = NewRecognitionException(this.formatMessage(predicate, message), recognizer, recognizer.GetInputStream(), recognizer._ctx)
+	this.BaseRecognitionException = NewBaseRecognitionException(this.formatMessage(predicate, message), recognizer, recognizer.GetInputStream(), recognizer._ctx)
 
 	var s = recognizer.Interpreter.atn.states[recognizer.state]
 	var trans = s.GetTransitions()[0]

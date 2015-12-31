@@ -1,13 +1,13 @@
 package antlr4
 
-type ATNSimulator struct {
+type BaseATNSimulator struct {
 	atn                *ATN
 	sharedContextCache *PredictionContextCache
 }
 
-func NewATNSimulator(atn *ATN, sharedContextCache *PredictionContextCache) *ATNSimulator {
+func NewBaseATNSimulator(atn *ATN, sharedContextCache *PredictionContextCache) *BaseATNSimulator {
 
-	this := new(ATNSimulator)
+	this := new(BaseATNSimulator)
 
 	this.atn = atn
 	this.sharedContextCache = sharedContextCache
@@ -15,9 +15,9 @@ func NewATNSimulator(atn *ATN, sharedContextCache *PredictionContextCache) *ATNS
 	return this
 }
 
-var ATNSimulatorERROR = NewDFAState(0x7FFFFFFF, NewBaseATNConfigSet(false))
+var ATNSimulatorError = NewDFAState(0x7FFFFFFF, NewBaseATNConfigSet(false))
 
-func (this *ATNSimulator) getCachedContext(context IPredictionContext) IPredictionContext {
+func (this *BaseATNSimulator) getCachedContext(context IPredictionContext) IPredictionContext {
 	if this.sharedContextCache == nil {
 		return context
 	}

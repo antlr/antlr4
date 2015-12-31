@@ -183,8 +183,8 @@ func PredictionModehasSLLConflictTerminatingPrediction(mode int, configs ATNConf
 			var dup = NewBaseATNConfigSet(false)
 			for _, c := range configs.GetItems() {
 
-				//				NewATNConfig({semanticContext:}, c)
-				c = NewATNConfig2(c, SemanticContextNONE)
+				//				NewBaseATNConfig({semanticContext:}, c)
+				c = NewBaseATNConfig2(c, SemanticContextNONE)
 				dup.Add(c, nil)
 			}
 			configs = dup
@@ -458,7 +458,7 @@ func PredictionModegetUniqueAlt(altsets []*BitSet) int {
 	if all.length() == 1 {
 		return all.minValue()
 	} else {
-		return ATNINVALID_ALT_NUMBER
+		return ATNInvalidAltNumber
 	}
 }
 
@@ -543,15 +543,15 @@ func PredictionModehasStateAssociatedWithOneAlt(configs ATNConfigSet) bool {
 }
 
 func PredictionModegetSingleViableAlt(altsets []*BitSet) int {
-	var result = ATNINVALID_ALT_NUMBER
+	var result = ATNInvalidAltNumber
 
 	for i := 0; i < len(altsets); i++ {
 		var alts = altsets[i]
 		var minAlt = alts.minValue()
-		if result == ATNINVALID_ALT_NUMBER {
+		if result == ATNInvalidAltNumber {
 			result = minAlt
 		} else if result != minAlt { // more than 1 viable alt
-			return ATNINVALID_ALT_NUMBER
+			return ATNInvalidAltNumber
 		}
 	}
 	return result

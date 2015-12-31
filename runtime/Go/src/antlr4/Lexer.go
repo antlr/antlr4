@@ -11,7 +11,8 @@ import (
 //  of speed.
 ///
 
-type ILexer interface {
+type Lexer interface {
+
 	TokenSource
 	Recognizer
 
@@ -22,7 +23,7 @@ type ILexer interface {
 	mode(int)
 }
 
-type Lexer struct {
+type BaseLexer struct {
 	*BaseRecognizer
 
 	Interpreter *LexerATNSimulator
@@ -43,9 +44,9 @@ type Lexer struct {
 	actionType              int
 }
 
-func NewLexer(input CharStream) *Lexer {
+func NewBaseLexer(input CharStream) *BaseLexer {
 
-	lexer := new(Lexer)
+	lexer := new(BaseLexer)
 
 	lexer.BaseRecognizer = NewBaseRecognizer()
 
@@ -109,7 +110,7 @@ const (
 	LexerMaxCharValue        = '\uFFFE'
 )
 
-func (l *Lexer) reset() {
+func (l *BaseLexer) reset() {
 	// wack Lexer state variables
 	if l._input != nil {
 		l._input.Seek(0) // rewind the input
@@ -129,32 +130,32 @@ func (l *Lexer) reset() {
 	l.Interpreter.reset()
 }
 
-func (l *Lexer) GetInputStream() CharStream {
+func (l *BaseLexer) GetInputStream() CharStream {
 	return l._input
 }
 
-func (l *Lexer) GetSourceName() string {
+func (l *BaseLexer) GetSourceName() string {
 	return l.GrammarFileName
 }
 
-func (l *Lexer) setChannel(v int) {
+func (l *BaseLexer) setChannel(v int) {
 	l._channel = v
 }
 
-func (l *Lexer) GetTokenFactory() TokenFactory {
+func (l *BaseLexer) GetTokenFactory() TokenFactory {
 	return l._factory
 }
 
-func (l *Lexer) setTokenFactory(f TokenFactory) {
+func (l *BaseLexer) setTokenFactory(f TokenFactory) {
 	l._factory = f
 }
 
-func (l *Lexer) safeMatch() (ret int) {
+func (l *BaseLexer) safeMatch() (ret int) {
 
 	// previously in catch block
 	defer func() {
 		if e := recover(); e != nil {
-			if re, ok := e.(IRecognitionException); ok {
+			if re, ok := e.(RecognitionException); ok {
 				l.notifyListeners(re) // Report error
 				l.Recover(re)
 				ret = LexerSkip // default
@@ -166,7 +167,7 @@ func (l *Lexer) safeMatch() (ret int) {
 }
 
 // Return a token from l source i.e., Match a token on the char stream.
-func (l *Lexer) nextToken() IToken {
+func (l *BaseLexer) nextToken() IToken {
 	if l._input == nil {
 		panic("nextToken requires a non-nil input stream.")
 	}
@@ -237,19 +238,19 @@ func (l *Lexer) nextToken() IToken {
 // if token==nil at end of any token rule, it creates one for you
 // and emits it.
 // /
-func (l *Lexer) skip() {
+func (l *BaseLexer) skip() {
 	l._type = LexerSkip
 }
 
-func (l *Lexer) more() {
+func (l *BaseLexer) more() {
 	l._type = LexerMore
 }
 
-func (l *Lexer) mode(m int) {
+func (l *BaseLexer) mode(m int) {
 	l._mode = m
 }
 
-func (l *Lexer) pushMode(m int) {
+func (l *BaseLexer) pushMode(m int) {
 	if LexerATNSimulatorDebug {
 		fmt.Println("pushMode " + strconv.Itoa(m))
 	}
@@ -257,7 +258,7 @@ func (l *Lexer) pushMode(m int) {
 	l.mode(m)
 }
 
-func (l *Lexer) popMode() int {
+func (l *BaseLexer) popMode() int {
 	if len(l._modeStack) == 0 {
 		panic("Empty Stack")
 	}
@@ -269,11 +270,11 @@ func (l *Lexer) popMode() int {
 	return l._mode
 }
 
-func (l *Lexer) inputStream() CharStream {
+func (l *BaseLexer) inputStream() CharStream {
 	return l._input
 }
 
-func (l *Lexer) setInputStream(input CharStream) {
+func (l *BaseLexer) setInputStream(input CharStream) {
 	l._input = nil
 	l._tokenFactorySourcePair = &TokenSourceCharStreamPair{l, l._input}
 	l.reset()
@@ -286,7 +287,7 @@ func (l *Lexer) setInputStream(input CharStream) {
 // and GetToken (to push tokens into a list and pull from that list
 // rather than a single variable as l implementation does).
 // /
-func (l *Lexer) emitToken(token IToken) {
+func (l *BaseLexer) emitToken(token IToken) {
 	l._token = token
 }
 
@@ -296,7 +297,7 @@ func (l *Lexer) emitToken(token IToken) {
 // use that to set the token's text. Override l method to emit
 // custom Token objects or provide a Newfactory.
 // /
-func (l *Lexer) emit() IToken {
+func (l *BaseLexer) emit() IToken {
 	if PortDebug {
 		fmt.Println("emit")
 	}
@@ -305,7 +306,7 @@ func (l *Lexer) emit() IToken {
 	return t
 }
 
-func (l *Lexer) emitEOF() IToken {
+func (l *BaseLexer) emitEOF() IToken {
 	cpos := l.getCharPositionInLine()
 	lpos := l.getLine()
 	if PortDebug {
@@ -316,30 +317,30 @@ func (l *Lexer) emitEOF() IToken {
 	return eof
 }
 
-func (l *Lexer) getCharPositionInLine() int {
+func (l *BaseLexer) getCharPositionInLine() int {
 	return l.Interpreter.column
 }
 
-func (l *Lexer) getLine() int {
+func (l *BaseLexer) getLine() int {
 	return l.Interpreter.line
 }
 
-func (l *Lexer) getType() int {
+func (l *BaseLexer) getType() int {
 	return l._type
 }
 
-func (l *Lexer) setType(t int) {
+func (l *BaseLexer) setType(t int) {
 	l._type = t
 }
 
 // What is the index of the current character of lookahead?///
-func (l *Lexer) getCharIndex() int {
+func (l *BaseLexer) getCharIndex() int {
 	return l._input.Index()
 }
 
 // Return the text Matched so far for the current token or any text override.
 //Set the complete text of l token it wipes any previous changes to the text.
-func (l *Lexer) text() string {
+func (l *BaseLexer) text() string {
 	if l._text != "" {
 		return l._text
 	} else {
@@ -347,18 +348,18 @@ func (l *Lexer) text() string {
 	}
 }
 
-func (l *Lexer) setText(text string) {
+func (l *BaseLexer) setText(text string) {
 	l._text = text
 }
 
-func (this *Lexer) GetATN() *ATN {
+func (this *BaseLexer) GetATN() *ATN {
 	return this.Interpreter.atn
 }
 
 // Return a list of all Token objects in input char stream.
 // Forces load of all tokens. Does not include EOF token.
 // /
-func (l *Lexer) getAllTokens() []IToken {
+func (l *BaseLexer) getAllTokens() []IToken {
 	if PortDebug {
 		fmt.Println("getAllTokens")
 	}
@@ -374,7 +375,7 @@ func (l *Lexer) getAllTokens() []IToken {
 	return tokens
 }
 
-func (l *Lexer) notifyListeners(e IRecognitionException) {
+func (l *BaseLexer) notifyListeners(e RecognitionException) {
 	var start = l._tokenStartCharIndex
 	var stop = l._input.Index()
 	var text = l._input.GetTextFromInterval(NewInterval(start, stop))
@@ -383,7 +384,7 @@ func (l *Lexer) notifyListeners(e IRecognitionException) {
 	listener.SyntaxError(l, nil, l._tokenStartLine, l._tokenStartColumn, msg, e)
 }
 
-func (l *Lexer) getErrorDisplayForChar(c rune) string {
+func (l *BaseLexer) getErrorDisplayForChar(c rune) string {
 	if c == TokenEOF {
 		return "<EOF>"
 	} else if c == '\n' {
@@ -397,7 +398,7 @@ func (l *Lexer) getErrorDisplayForChar(c rune) string {
 	}
 }
 
-func (l *Lexer) getCharErrorDisplay(c rune) string {
+func (l *BaseLexer) getCharErrorDisplay(c rune) string {
 	return "'" + l.getErrorDisplayForChar(c) + "'"
 }
 
@@ -406,7 +407,7 @@ func (l *Lexer) getCharErrorDisplay(c rune) string {
 // it all works out. You can instead use the rule invocation stack
 // to do sophisticated error recovery if you are in a fragment rule.
 // /
-func (l *Lexer) Recover(re IRecognitionException) {
+func (l *BaseLexer) Recover(re RecognitionException) {
 	if l._input.LA(1) != TokenEOF {
 		if _, ok := re.(*LexerNoViableAltException); ok {
 			// skip a char and try again

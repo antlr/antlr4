@@ -20,7 +20,7 @@ type ATNConfig interface {
 	getPrecedenceFilterSuppressed() bool
 	setPrecedenceFilterSuppressed(bool)
 
-	GetState() IATNState
+	GetState() ATNState
 	GetAlt() int
 	GetSemanticContext() SemanticContext
 
@@ -37,14 +37,14 @@ type ATNConfig interface {
 
 type BaseATNConfig struct {
 	precedenceFilterSuppressed bool
-	state                      IATNState
+	state ATNState
 	alt                        int
 	context                    IPredictionContext
 	semanticContext            SemanticContext
 	reachesIntoOuterContext    int
 }
 
-func NewATNConfig7(old *BaseATNConfig) *BaseATNConfig { // dup
+func NewBaseATNConfig7(old *BaseATNConfig) *BaseATNConfig { // dup
 	a := new(BaseATNConfig)
 	a.state = old.state
 	a.alt = old.alt
@@ -54,11 +54,11 @@ func NewATNConfig7(old *BaseATNConfig) *BaseATNConfig { // dup
 	return a
 }
 
-func NewATNConfig6(state IATNState, alt int, context IPredictionContext) *BaseATNConfig {
-	return NewATNConfig5(state, alt, context, SemanticContextNONE)
+func NewBaseATNConfig6(state ATNState, alt int, context IPredictionContext) *BaseATNConfig {
+	return NewBaseATNConfig5(state, alt, context, SemanticContextNONE)
 }
 
-func NewATNConfig5(state IATNState, alt int, context IPredictionContext, semanticContext SemanticContext) *BaseATNConfig {
+func NewBaseATNConfig5(state ATNState, alt int, context IPredictionContext, semanticContext SemanticContext) *BaseATNConfig {
 	a := new(BaseATNConfig)
 
 	if (semanticContext == nil){
@@ -73,23 +73,23 @@ func NewATNConfig5(state IATNState, alt int, context IPredictionContext, semanti
 	return a
 }
 
-func NewATNConfig4(c ATNConfig, state IATNState) *BaseATNConfig {
-	return NewATNConfig(c, state, c.GetContext(), c.GetSemanticContext())
+func NewBaseATNConfig4(c ATNConfig, state ATNState) *BaseATNConfig {
+	return NewBaseATNConfig(c, state, c.GetContext(), c.GetSemanticContext())
 }
 
-func NewATNConfig3(c ATNConfig, state IATNState, semanticContext SemanticContext) *BaseATNConfig {
-	return NewATNConfig(c, state, c.GetContext(), semanticContext)
+func NewBaseATNConfig3(c ATNConfig, state ATNState, semanticContext SemanticContext) *BaseATNConfig {
+	return NewBaseATNConfig(c, state, c.GetContext(), semanticContext)
 }
 
-func NewATNConfig2(c ATNConfig, semanticContext SemanticContext) *BaseATNConfig {
-	return NewATNConfig(c, c.GetState(), c.GetContext(), semanticContext)
+func NewBaseATNConfig2(c ATNConfig, semanticContext SemanticContext) *BaseATNConfig {
+	return NewBaseATNConfig(c, c.GetState(), c.GetContext(), semanticContext)
 }
 
-func NewATNConfig1(c ATNConfig, state IATNState, context IPredictionContext) *BaseATNConfig {
-	return NewATNConfig(c, state, context, c.GetSemanticContext())
+func NewBaseATNConfig1(c ATNConfig, state ATNState, context IPredictionContext) *BaseATNConfig {
+	return NewBaseATNConfig(c, state, context, c.GetSemanticContext())
 }
 
-func NewATNConfig(c ATNConfig, state IATNState, context IPredictionContext, semanticContext SemanticContext) *BaseATNConfig {
+func NewBaseATNConfig(c ATNConfig, state ATNState, context IPredictionContext, semanticContext SemanticContext) *BaseATNConfig {
 	a := new(BaseATNConfig)
 
 	if (semanticContext == nil){
@@ -113,7 +113,7 @@ func (this *BaseATNConfig) setPrecedenceFilterSuppressed(v bool) {
 	this.precedenceFilterSuppressed = v
 }
 
-func (this *BaseATNConfig) GetState() IATNState {
+func (this *BaseATNConfig) GetState() ATNState {
 	return this.state
 }
 
@@ -201,62 +201,62 @@ type LexerATNConfig struct {
 	passedThroughNonGreedyDecision bool
 }
 
-func NewLexerATNConfig6(state IATNState, alt int, context IPredictionContext) *LexerATNConfig {
+func NewLexerATNConfig6(state ATNState, alt int, context IPredictionContext) *LexerATNConfig {
 
 	this := new(LexerATNConfig)
 
-	this.BaseATNConfig = NewATNConfig5(state, alt, context, SemanticContextNONE)
+	this.BaseATNConfig = NewBaseATNConfig5(state, alt, context, SemanticContextNONE)
 
 	this.passedThroughNonGreedyDecision = false
 	this.lexerActionExecutor = nil
 	return this
 }
 
-func NewLexerATNConfig5(state IATNState, alt int, context IPredictionContext, lexerActionExecutor *LexerActionExecutor) *LexerATNConfig {
+func NewLexerATNConfig5(state ATNState, alt int, context IPredictionContext, lexerActionExecutor *LexerActionExecutor) *LexerATNConfig {
 
 	this := new(LexerATNConfig)
 
-	this.BaseATNConfig = NewATNConfig5(state, alt, context, SemanticContextNONE)
+	this.BaseATNConfig = NewBaseATNConfig5(state, alt, context, SemanticContextNONE)
 	this.lexerActionExecutor = lexerActionExecutor
 	this.passedThroughNonGreedyDecision = false
 	return this
 }
 
-func NewLexerATNConfig4(c *LexerATNConfig, state IATNState) *LexerATNConfig {
+func NewLexerATNConfig4(c *LexerATNConfig, state ATNState) *LexerATNConfig {
 
 	this := new(LexerATNConfig)
 
-	this.BaseATNConfig = NewATNConfig(c, state, c.GetContext(), c.GetSemanticContext())
+	this.BaseATNConfig = NewBaseATNConfig(c, state, c.GetContext(), c.GetSemanticContext())
 	this.lexerActionExecutor = c.lexerActionExecutor
 	this.passedThroughNonGreedyDecision = checkNonGreedyDecision(c, state)
 	return this
 }
 
-func NewLexerATNConfig3(c *LexerATNConfig, state IATNState, lexerActionExecutor *LexerActionExecutor) *LexerATNConfig {
+func NewLexerATNConfig3(c *LexerATNConfig, state ATNState, lexerActionExecutor *LexerActionExecutor) *LexerATNConfig {
 
 	this := new(LexerATNConfig)
 
-	this.BaseATNConfig = NewATNConfig(c, state, c.GetContext(), c.GetSemanticContext())
+	this.BaseATNConfig = NewBaseATNConfig(c, state, c.GetContext(), c.GetSemanticContext())
 	this.lexerActionExecutor = lexerActionExecutor
 	this.passedThroughNonGreedyDecision = checkNonGreedyDecision(c, state)
 	return this
 }
 
-func NewLexerATNConfig2(c *LexerATNConfig, state IATNState, context IPredictionContext) *LexerATNConfig {
+func NewLexerATNConfig2(c *LexerATNConfig, state ATNState, context IPredictionContext) *LexerATNConfig {
 
 	this := new(LexerATNConfig)
 
-	this.BaseATNConfig = NewATNConfig(c, state, context, c.GetSemanticContext())
+	this.BaseATNConfig = NewBaseATNConfig(c, state, context, c.GetSemanticContext())
 	this.lexerActionExecutor = c.lexerActionExecutor
 	this.passedThroughNonGreedyDecision = checkNonGreedyDecision(c, state)
 	return this
 }
 
-func NewLexerATNConfig1(state IATNState, alt int, context IPredictionContext) *LexerATNConfig {
+func NewLexerATNConfig1(state ATNState, alt int, context IPredictionContext) *LexerATNConfig {
 
 	this := new(LexerATNConfig)
 
-	this.BaseATNConfig = NewATNConfig5(state, alt, context, SemanticContextNONE)
+	this.BaseATNConfig = NewBaseATNConfig5(state, alt, context, SemanticContextNONE)
 
 	this.lexerActionExecutor = nil
 	this.passedThroughNonGreedyDecision = false
@@ -304,7 +304,7 @@ func (this *LexerATNConfig) equals(other interface{}) bool {
 	}
 }
 
-func checkNonGreedyDecision(source *LexerATNConfig, target IATNState) bool {
-	ds, ok := target.(IDecisionState)
+func checkNonGreedyDecision(source *LexerATNConfig, target ATNState) bool {
+	ds, ok := target.(DecisionState)
 	return source.passedThroughNonGreedyDecision || (ok && ds.getNonGreedy())
 }

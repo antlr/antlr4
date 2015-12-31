@@ -345,7 +345,7 @@ func (this *ArrayPredictionContext) String() string {
 // Convert a {@link RuleContext} tree to a {@link PredictionContext} graph.
 // Return {@link //EMPTY} if {@code outerContext} is empty or nil.
 // /
-func predictionContextFromRuleContext(a *ATN, outerContext IRuleContext) IPredictionContext {
+func predictionContextFromRuleContext(a *ATN, outerContext RuleContext) IPredictionContext {
 	if outerContext == nil {
 		outerContext = RuleContextEMPTY
 	}
@@ -355,7 +355,7 @@ func predictionContextFromRuleContext(a *ATN, outerContext IRuleContext) IPredic
 		return PredictionContextEMPTY
 	}
 	// If we have a parent, convert it to a PredictionContext graph
-	var parent = predictionContextFromRuleContext(a, outerContext.GetParent().(IRuleContext))
+	var parent = predictionContextFromRuleContext(a, outerContext.GetParent().(RuleContext))
 	var state = a.states[outerContext.getInvokingState()]
 	var transition = state.GetTransitions()[0]
 

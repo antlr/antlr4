@@ -101,7 +101,7 @@ func Trees_findAllNodes(t ParseTree, index int, findTokens bool, nodes []ParseTr
 	// check this node (the root) first
 
 	t2, ok := t.(TerminalNode)
-	t3, ok2 := t.(IParserRuleContext)
+	t3, ok2 := t.(ParserRuleContext)
 
 	if findTokens && ok {
 		if t2.getSymbol().GetTokenType() == index {

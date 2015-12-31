@@ -14,30 +14,30 @@ import (
 //  the states. We'll use the term Edge for the DFA to distinguish them from
 //  ATN transitions.</p>
 
-type ITransition interface {
-	getTarget() IATNState
-	setTarget(IATNState)
+type Transition interface {
+	getTarget() ATNState
+	setTarget(ATNState)
 	getIsEpsilon() bool
 	getLabel() *IntervalSet
 	getSerializationType() int
 	Matches(int, int, int) bool
 }
 
-type Transition struct {
-	target            IATNState
+type BaseTransition struct {
+	target ATNState
 	isEpsilon         bool
 	label_ int
 	label  *IntervalSet
 	serializationType int
 }
 
-func NewTransition(target IATNState) *Transition {
+func NewBaseTransition(target ATNState) *BaseTransition {
 
 	if target == nil || target == nil {
 		panic("target cannot be nil.")
 	}
 
-	t := new(Transition)
+	t := new(BaseTransition)
 
 	t.target = target
 	// Are we epsilon, action, sempred?
@@ -47,27 +47,27 @@ func NewTransition(target IATNState) *Transition {
 	return t
 }
 
-func (t *Transition) getTarget() IATNState {
+func (t *BaseTransition) getTarget() ATNState {
 	return t.target
 }
 
-func (t *Transition) setTarget(s IATNState) {
+func (t *BaseTransition) setTarget(s ATNState) {
 	t.target = s
 }
 
-func (t *Transition) getIsEpsilon() bool {
+func (t *BaseTransition) getIsEpsilon() bool {
 	return t.isEpsilon
 }
 
-func (t *Transition) getLabel() *IntervalSet {
+func (t *BaseTransition) getLabel() *IntervalSet {
 	return t.label
 }
 
-func (t *Transition) getSerializationType() int {
+func (t *BaseTransition) getSerializationType() int {
 	return t.serializationType
 }
 
-func (t *Transition) Matches(symbol, minVocabSymbol, maxVocabSymbol int) bool {
+func (t *BaseTransition) Matches(symbol, minVocabSymbol, maxVocabSymbol int) bool {
 	panic("Not implemented")
 }
 
@@ -124,13 +124,13 @@ var TransitionserializationNames = []string{
 
 // TODO: make all transitions sets? no, should remove set edges
 type AtomTransition struct {
-	*Transition
+	*BaseTransition
 }
 
-func NewAtomTransition(target IATNState, label int) *AtomTransition {
+func NewAtomTransition(target ATNState, label int) *AtomTransition {
 
 	t := new(AtomTransition)
-	t.Transition = NewTransition(target)
+	t.BaseTransition = NewBaseTransition(target)
 
 	t.label_ = label // The token type or character value or, signifies special label.
 	t.label = t.makeLabel()
@@ -154,16 +154,16 @@ func (t *AtomTransition) String() string {
 }
 
 type RuleTransition struct {
-	*Transition
+	*BaseTransition
 
-	followState           IATNState
+	followState ATNState
 	ruleIndex, precedence int
 }
 
-func NewRuleTransition(ruleStart IATNState, ruleIndex, precedence int, followState IATNState) *RuleTransition {
+func NewRuleTransition(ruleStart ATNState, ruleIndex, precedence int, followState ATNState) *RuleTransition {
 
 	t := new(RuleTransition)
-	t.Transition = NewTransition(ruleStart)
+	t.BaseTransition = NewBaseTransition(ruleStart)
 
 	t.ruleIndex = ruleIndex
 	t.precedence = precedence
@@ -179,15 +179,15 @@ func (t *RuleTransition) Matches(symbol, minVocabSymbol, maxVocabSymbol int) boo
 }
 
 type EpsilonTransition struct {
-	*Transition
+	*BaseTransition
 
 	outermostPrecedenceReturn int
 }
 
-func NewEpsilonTransition(target IATNState, outermostPrecedenceReturn int) *EpsilonTransition {
+func NewEpsilonTransition(target ATNState, outermostPrecedenceReturn int) *EpsilonTransition {
 
 	t := new(EpsilonTransition)
-	t.Transition = NewTransition(target)
+	t.BaseTransition = NewBaseTransition(target)
 
 	t.serializationType = TransitionEPSILON
 	t.isEpsilon = true
@@ -204,15 +204,15 @@ func (t *EpsilonTransition) String() string {
 }
 
 type RangeTransition struct {
-	*Transition
+	*BaseTransition
 
 	start, stop int
 }
 
-func NewRangeTransition(target IATNState, start, stop int) *RangeTransition {
+func NewRangeTransition(target ATNState, start, stop int) *RangeTransition {
 
 	t := new(RangeTransition)
-	t.Transition = NewTransition(target)
+	t.BaseTransition = NewBaseTransition(target)
 
 	t.serializationType = TransitionRANGE
 	t.start = start
@@ -235,36 +235,36 @@ func (t *RangeTransition) String() string {
 	return "'" + string(t.start) + "'..'" + string(t.stop) + "'"
 }
 
-type IAbstractPredicateTransition interface {
-	ITransition
+type AbstractPredicateTransition interface {
+	Transition
 	IAbstractPredicateTransitionFoo()
 }
 
-type AbstractPredicateTransition struct {
-	*Transition
+type BaseAbstractPredicateTransition struct {
+	*BaseTransition
 }
 
-func NewAbstractPredicateTransition(target IATNState) *AbstractPredicateTransition {
+func NewBasePredicateTransition(target ATNState) *BaseAbstractPredicateTransition {
 
-	t := new(AbstractPredicateTransition)
-	t.Transition = NewTransition(target)
+	t := new(BaseAbstractPredicateTransition)
+	t.BaseTransition = NewBaseTransition(target)
 
 	return t
 }
 
-func (a *AbstractPredicateTransition) IAbstractPredicateTransitionFoo(){}
+func (a *BaseAbstractPredicateTransition) IAbstractPredicateTransitionFoo(){}
 
 type PredicateTransition struct {
-	*AbstractPredicateTransition
+	*BaseAbstractPredicateTransition
 
 	isCtxDependent       bool
 	ruleIndex, predIndex int
 }
 
-func NewPredicateTransition(target IATNState, ruleIndex, predIndex int, isCtxDependent bool) *PredicateTransition {
+func NewPredicateTransition(target ATNState, ruleIndex, predIndex int, isCtxDependent bool) *PredicateTransition {
 
 	t := new(PredicateTransition)
-	t.AbstractPredicateTransition = NewAbstractPredicateTransition(target)
+	t.BaseAbstractPredicateTransition = NewBasePredicateTransition(target)
 
 	t.serializationType = TransitionPREDICATE
 	t.ruleIndex = ruleIndex
@@ -287,16 +287,16 @@ func (t *PredicateTransition) String() string {
 }
 
 type ActionTransition struct {
-	*Transition
+	*BaseTransition
 
 	isCtxDependent                    bool
 	ruleIndex, actionIndex, predIndex int
 }
 
-func NewActionTransition(target IATNState, ruleIndex, actionIndex int, isCtxDependent bool) *ActionTransition {
+func NewActionTransition(target ATNState, ruleIndex, actionIndex int, isCtxDependent bool) *ActionTransition {
 
 	t := new(ActionTransition)
-	t.Transition = NewTransition(target)
+	t.BaseTransition = NewBaseTransition(target)
 
 	t.serializationType = TransitionACTION
 	t.ruleIndex = ruleIndex
@@ -315,13 +315,13 @@ func (t *ActionTransition) String() string {
 }
 
 type SetTransition struct {
-	*Transition
+	*BaseTransition
 }
 
-func NewSetTransition(target IATNState, set *IntervalSet) *SetTransition {
+func NewSetTransition(target ATNState, set *IntervalSet) *SetTransition {
 
 	t := new(SetTransition)
-	t.Transition = NewTransition(target)
+	t.BaseTransition = NewBaseTransition(target)
 
 	t.serializationType = TransitionSET
 	if set != nil && set != nil {
@@ -346,7 +346,7 @@ type NotSetTransition struct {
 	*SetTransition
 }
 
-func NewNotSetTransition(target IATNState, set *IntervalSet) *NotSetTransition {
+func NewNotSetTransition(target ATNState, set *IntervalSet) *NotSetTransition {
 
 	t := new(NotSetTransition)
 
@@ -366,13 +366,13 @@ func (t *NotSetTransition) String() string {
 }
 
 type WildcardTransition struct {
-	*Transition
+	*BaseTransition
 }
 
-func NewWildcardTransition(target IATNState) *WildcardTransition {
+func NewWildcardTransition(target ATNState) *WildcardTransition {
 
 	t := new(WildcardTransition)
-	t.Transition = NewTransition(target)
+	t.BaseTransition = NewBaseTransition(target)
 
 	t.serializationType = TransitionWILDCARD
 	return t
@@ -387,15 +387,15 @@ func (t *WildcardTransition) String() string {
 }
 
 type PrecedencePredicateTransition struct {
-	*AbstractPredicateTransition
+	*BaseAbstractPredicateTransition
 
 	precedence int
 }
 
-func NewPrecedencePredicateTransition(target IATNState, precedence int) *PrecedencePredicateTransition {
+func NewPrecedencePredicateTransition(target ATNState, precedence int) *PrecedencePredicateTransition {
 
 	t := new(PrecedencePredicateTransition)
-	t.AbstractPredicateTransition = NewAbstractPredicateTransition(target)
+	t.BaseAbstractPredicateTransition = NewBasePredicateTransition(target)
 
 	t.serializationType = TransitionPRECEDENCE
 	t.precedence = precedence

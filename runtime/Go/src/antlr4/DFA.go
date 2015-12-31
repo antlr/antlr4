@@ -2,14 +2,14 @@ package antlr4
 import "sort"
 
 type DFA struct {
-	atnStartState IDecisionState
+	atnStartState DecisionState
 	decision      int
 	_states       map[string]*DFAState
 	s0            *DFAState
 	precedenceDfa bool
 }
 
-func NewDFA(atnStartState IDecisionState, decision int) *DFA {
+func NewDFA(atnStartState DecisionState, decision int) *DFA {
 
 	this := new(DFA)
 

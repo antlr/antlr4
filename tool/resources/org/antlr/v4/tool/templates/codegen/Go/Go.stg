@@ -40,10 +40,10 @@ type <file.grammarName>Listener struct {
 
 }
 
-func (l *<file.grammarName>Listener) EnterEveryRule(node antlr4.IParserRuleContext) {
+func (l *<file.grammarName>Listener) EnterEveryRule(node antlr4.ParserRuleContext) {
 \}
 
-func (l *<file.grammarName>Listener) ExitEveryRule(node antlr4.IParserRuleContext) {
+func (l *<file.grammarName>Listener) ExitEveryRule(node antlr4.ParserRuleContext) {
 \}
 
 func (l *<file.grammarName>Listener) VisitTerminal(ctx antlr4.TerminalNode) {
@@ -54,11 +54,11 @@ func (l *<file.grammarName>Listener) VisitErrorNode(ctx antlr4.ErrorNode) {
 
 <file.listenerNames:{lname |
 // Enter a parse tree produced by <file.parserName>#<lname>.
-func (l *<file.grammarName>Listener) Enter<lname; format="cap">(ctx antlr4.IParserRuleContext) {
+func (l *<file.grammarName>Listener) Enter<lname; format="cap">(ctx antlr4.ParserRuleContext) {
 \}
 
 // Exit a parse tree produced by <file.parserName>#<lname>.
-func (l *<file.grammarName>Listener) Exit<lname; format="cap">(ctx antlr4.IParserRuleContext) {
+func (l *<file.grammarName>Listener) Exit<lname; format="cap">(ctx antlr4.ParserRuleContext) {
 \}
 
 }; separator="\n">
@@ -86,7 +86,7 @@ type <file.grammarName>Visitor struct {
 
 <file.VisitorNames:{lname |
 // Visit a parse tree produced by <file.parserName>#<lname>.
-func (l <file.grammarName>Visitor) Visit<lname; format="cap">(ctx IParserRuleContext) {
+func (l <file.grammarName>Visitor) Visit<lname; format="cap">(ctx antlr4.ParserRuleContext) {
 \}
 
 }; separator="\n">
@@ -108,7 +108,7 @@ var symbolicNames = []string{ <parser.symbolicNames:{t | <t>}; null="\"\"", sepa
 var ruleNames =  []string{ <parser.ruleNames:{r | "<r>"}; separator=", ", wrap, anchor> }
 
 type <parser.name> struct {
-    <superClass; null="*antlr4.Parser">
+    <superClass; null="*antlr4.BaseParser">
 }
 
 func New<parser.name>(input antlr4.TokenStream) *<parser.name> {
@@ -122,7 +122,7 @@ func New<parser.name>(input antlr4.TokenStream) *<parser.name> {
 
     parser := new(<parser.name>)
 
-    parser.Parser = antlr4.NewParser(input)
+    parser.BaseParser = antlr4.NewBaseParser(input)
 
     parser.Interpreter = antlr4.NewParserATNSimulator(parser, deserializedATN, decisionToDFA, sharedContextCache)
     parser.RuleNames = ruleNames
@@ -249,7 +249,7 @@ func (p *<parser.name>) <currentRule.name; format="cap">(<currentRule.args:{a | 
             <if(exceptions)>
             <exceptions; separator="\n">
             <else>
-            if v, ok := err.(antlr4.IRecognitionException); ok {
+            if v, ok := err.(antlr4.RecognitionException); ok {
                 localctx.SetException( v )
                 p.GetErrorHandler().ReportError(p, v)
                 p.GetErrorHandler().Recover(p, v)
@@ -278,7 +278,7 @@ LeftRecursiveRuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,
 
 func (p *<parser.name>) <currentRule.name; format="cap">(_p<if(currentRule.args)>, <args:{a | , <a>}><endif>) *<currentRule.ctxType> {
 
-    _parentctx := p.GetParent().(IParserRuleContext)
+    _parentctx := p.GetParent().(ParserRuleContext)
     _parentState := p.GetState()
     localctx := New<currentRule.ctxType>(p, p.GetParserRuleContext(), _parentState<args:{a | , <a.name>}>)
     _prevctx := localctx
@@ -294,7 +294,7 @@ func (p *<parser.name>) <currentRule.name; format="cap">(_p<if(currentRule.args)
 
     defer func(){
         if err := recover(); err != nil {
-            if v, ok := err.(antlr4.IRecognitionException); ok {
+            if v, ok := err.(antlr4.RecognitionException); ok {
                 localctx.SetException(v)
                 p.GetErrorHandler().ReportError(p, v)
                 p.GetErrorHandler().Recover(p, v)
@@ -654,16 +654,16 @@ StructDecl(struct,ctorAttrs,attrs,getters,dispatchMethods,interfaces,extensionMe
            superClass={ParserRuleContext}) ::= <<
 
 type <struct.name> struct {
-    *antlr4.ParserRuleContext
+    *antlr4.BaseParserRuleContext
 
-    parser antlr4.IParser
+    parser antlr4.Parser
 }
 
-func New<struct.name>(parser antlr4.IParser, parent antlr4.IParserRuleContext, invokingState int<struct.ctorAttrs:{a | , <a.name>}>) *<struct.name> {
+func New<struct.name>(parser antlr4.Parser, parent antlr4.ParserRuleContext, invokingState int<struct.ctorAttrs:{a | , <a.name>}>) *<struct.name> {
 
     var p = new(<struct.name>)
 
-    p.ParserRuleContext = antlr4.NewParserRuleContext( parent, invokingState )
+    p.BaseParserRuleContext = antlr4.NewBaseParserRuleContext( parent, invokingState )
 
     p.parser = parser
     p.RuleIndex = <parser.name>RULE_<struct.derivedFromName>
@@ -688,11 +688,11 @@ func (s *<struct.name>) CopyFrom(ctx <struct.name>) {
 AltLabelStructDecl(struct,attrs,getters,dispatchMethods) ::= <<
 
 type <struct.name> struct {
-    parent antlr4.IParserRuleContext
-    parser antlr4.IParser
+    parent antlr4.ParserRuleContext
+    parser antlr4.Parser
 }
 
-func New<struct.name>(parser antlr4.IParser, ctx antlr4.IParserRuleContext) *<struct.name> {
+func New<struct.name>(parser antlr4.Parser, ctx antlr4.ParserRuleContext) *<struct.name> {
 
     var p = new(<struct.name>)
 
@@ -807,7 +807,7 @@ var lexerSymbolicNames = []string{ <lexer.symbolicNames:{t | <t>}; null="\"\"", 
 var lexerRuleNames = []string{ <lexer.ruleNames:{r | "<r>"}; separator=", ", wrap, anchor> }
 
 type <lexer.name> struct {
-    *<if(superClass)><superClass><else>antlr4.Lexer<endif>
+    *<if(superClass)><superClass><else>antlr4.BaseLexer<endif>
 
     modeNames []string
     // EOF string
@@ -823,7 +823,7 @@ func New<lexer.name>(input antlr4.CharStream) *<lexer.name> {
 
 	lex := new(<lexer.name>)
 
-	lex.Lexer = antlr4.NewLexer(input)
+	lex.BaseLexer = antlr4.NewBaseLexer(input)
 
     lex.Interpreter = antlr4.NewLexerATNSimulator(lex, lexerAtn, lexerDecisionToDFA, antlr4.NewPredictionContextCache())
 

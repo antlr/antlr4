@@ -7,21 +7,21 @@ import (
 type ATNConfigSet interface {
 	Hasher
 
-	Add(config ATNConfig, mergeCache *DoubleDict) bool
-	AddAll(coll []ATNConfig) bool
+	Add(ATNConfig, *DoubleDict) bool
+	AddAll([]ATNConfig) bool
 
 	GetStates() *Set
 	GetPredicates() []SemanticContext
 	GetItems() []ATNConfig
 
-	OptimizeConfigs(interpreter *ATNSimulator)
+	OptimizeConfigs(interpreter *BaseATNSimulator)
 
 	Equals(other interface{}) bool
 
 	Length() int
 	IsEmpty() bool
-	Contains(item *BaseATNConfig) bool
-	ContainsFast(item *BaseATNConfig) bool
+	Contains(ATNConfig) bool
+	ContainsFast(ATNConfig) bool
 	Clear()
 	String() string
 
@@ -177,7 +177,7 @@ func (this *BaseATNConfigSet) GetItems() []ATNConfig {
 	return this.configs
 }
 
-func (this *BaseATNConfigSet) OptimizeConfigs(interpreter *ATNSimulator) {
+func (this *BaseATNConfigSet) OptimizeConfigs(interpreter *BaseATNSimulator) {
 	if this.readOnly {
 		panic("This set is readonly")
 	}
@@ -242,14 +242,14 @@ func (this *BaseATNConfigSet) IsEmpty() bool {
 	return len(this.configs) == 0
 }
 
-func (this *BaseATNConfigSet) Contains(item *BaseATNConfig) bool {
+func (this *BaseATNConfigSet) Contains(item ATNConfig) bool {
 	if this.configLookup == nil {
 		panic("This method is not implemented for readonly sets.")
 	}
 	return this.configLookup.contains(item)
 }
 
-func (this *BaseATNConfigSet) ContainsFast(item *BaseATNConfig) bool {
+func (this *BaseATNConfigSet) ContainsFast(item ATNConfig) bool {
 	if this.configLookup == nil {
 		panic("This method is not implemented for readonly sets.")
 	}
@@ -320,7 +320,7 @@ func (this *BaseATNConfigSet) String() string {
 		s += ",hasSemanticContext=" + fmt.Sprint(this.hasSemanticContext)
 	}
 
-	if (this.uniqueAlt != ATNINVALID_ALT_NUMBER ){
+	if (this.uniqueAlt != ATNInvalidAltNumber ){
 		s += ",uniqueAlt=" + fmt.Sprint(this.uniqueAlt)
 	}
 

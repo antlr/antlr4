@@ -30,7 +30,7 @@ const (
 //
 // @param s the ATN state
 // @return the expected symbols for each outgoing transition of {@code s}.
-func (la *LL1Analyzer) getDecisionLookahead(s IATNState) []*IntervalSet {
+func (la *LL1Analyzer) getDecisionLookahead(s ATNState) []*IntervalSet {
 	if s == nil {
 		return nil
 	}
@@ -68,7 +68,7 @@ func (la *LL1Analyzer) getDecisionLookahead(s IATNState) []*IntervalSet {
 // @return The set of tokens that can follow {@code s} in the ATN in the
 // specified {@code ctx}.
 ///
-func (la *LL1Analyzer) LOOK(s, stopState IATNState, ctx IRuleContext) *IntervalSet {
+func (la *LL1Analyzer) LOOK(s, stopState ATNState, ctx RuleContext) *IntervalSet {
 	var r = NewIntervalSet()
 	var seeThruPreds = true // ignore preds get all lookahead
 	var lookContext IPredictionContext
@@ -123,7 +123,7 @@ func (la *LL1Analyzer) LOOK(s, stopState IATNState, ctx IRuleContext) *IntervalS
 // is {@code nil}.
 
 
-func (la *LL1Analyzer) __LOOK(s, stopState IATNState, ctx IPredictionContext, look *IntervalSet, lookBusy *Set, calledRuleStack *BitSet, seeThruPreds, addEOF bool, i int){
+func (la *LL1Analyzer) __LOOK(s, stopState ATNState, ctx IPredictionContext, look *IntervalSet, lookBusy *Set, calledRuleStack *BitSet, seeThruPreds, addEOF bool, i int){
 
 	returnState := la.atn.states[ctx.getReturnState(i)]
 
@@ -140,9 +140,9 @@ func (la *LL1Analyzer) __LOOK(s, stopState IATNState, ctx IPredictionContext, lo
 
 }
 
-func (la *LL1Analyzer) _LOOK(s, stopState IATNState, ctx IPredictionContext, look *IntervalSet, lookBusy *Set, calledRuleStack *BitSet, seeThruPreds, addEOF bool) {
+func (la *LL1Analyzer) _LOOK(s, stopState ATNState, ctx IPredictionContext, look *IntervalSet, lookBusy *Set, calledRuleStack *BitSet, seeThruPreds, addEOF bool) {
 
-	c := NewATNConfig6(s, 0, ctx)
+	c := NewBaseATNConfig6(s, 0, ctx)
 
 	if lookBusy.contains(c) {
 		return
@@ -212,7 +212,7 @@ func (la *LL1Analyzer) _LOOK(s, stopState IATNState, ctx IPredictionContext, loo
 				fmt.Println(look)
 			}
 
-		} else if t2, ok := t.(IAbstractPredicateTransition); ok {
+		} else if t2, ok := t.(AbstractPredicateTransition); ok {
 			if PortDebug {
 				fmt.Println("DEBUG 9")
 			}
@@ -249,7 +249,7 @@ func (la *LL1Analyzer) _LOOK(s, stopState IATNState, ctx IPredictionContext, loo
 	}
 }
 
-func (la *LL1Analyzer) ___LOOK(stopState IATNState, ctx IPredictionContext, look *IntervalSet, lookBusy *Set, calledRuleStack *BitSet, seeThruPreds, addEOF bool, t1 *RuleTransition) {
+func (la *LL1Analyzer) ___LOOK(stopState ATNState, ctx IPredictionContext, look *IntervalSet, lookBusy *Set, calledRuleStack *BitSet, seeThruPreds, addEOF bool, t1 *RuleTransition) {
 
 	newContext := SingletonPredictionContextCreate(ctx, t1.followState.GetStateNumber())
 
