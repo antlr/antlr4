@@ -1,4 +1,5 @@
 package antlr4
+
 import "fmt"
 
 // Temporary - for debugging purposes of the Go port
@@ -9,7 +10,6 @@ const (
 var ATNInvalidAltNumber = 0
 
 type ATN struct {
-
 	DecisionToState      []DecisionState
 	grammarType          int
 	maxTokenType         int
@@ -20,7 +20,6 @@ type ATN struct {
 	modeToStartState     []*TokensStartState
 	ruleToTokenType      []int
 	lexerActions         []LexerAction
-
 }
 
 func NewATN(grammarType int, maxTokenType int) *ATN {
@@ -108,7 +107,7 @@ func (this *ATN) removeState(state ATNState) {
 
 func (this *ATN) defineDecisionState(s DecisionState) int {
 	this.DecisionToState = append(this.DecisionToState, s)
-	s.setDecision( len(this.DecisionToState) - 1 )
+	s.setDecision(len(this.DecisionToState) - 1)
 	return s.getDecision()
 }
 
@@ -163,4 +162,3 @@ func (this *ATN) getExpectedTokens(stateNumber int, ctx RuleContext) *IntervalSe
 	}
 	return expected
 }
-

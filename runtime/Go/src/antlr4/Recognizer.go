@@ -8,7 +8,6 @@ import (
 )
 
 type Recognizer interface {
-
 	GetLiteralNames() []string
 	GetSymbolicNames() []string
 	GetRuleNames() []string
@@ -20,16 +19,15 @@ type Recognizer interface {
 	Action(_localctx RuleContext, ruleIndex, actionIndex int)
 	GetATN() *ATN
 	getErrorListenerDispatch() ErrorListener
-
 }
 
 type BaseRecognizer struct {
 	_listeners []ErrorListener
 	state      int
 
-	RuleNames  []string
-	LiteralNames  []string
-	SymbolicNames []string
+	RuleNames       []string
+	LiteralNames    []string
+	SymbolicNames   []string
 	GrammarFileName string
 }
 
@@ -84,7 +82,7 @@ func (this *BaseRecognizer) GetState() int {
 
 func (this *BaseRecognizer) SetState(v int) {
 	if PortDebug {
-		fmt.Println("SETTING STATE " + strconv.Itoa(v) + " from " +  strconv.Itoa(this.state))
+		fmt.Println("SETTING STATE " + strconv.Itoa(v) + " from " + strconv.Itoa(this.state))
 	}
 
 	this.state = v

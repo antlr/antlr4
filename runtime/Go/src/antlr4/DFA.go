@@ -1,4 +1,5 @@
 package antlr4
+
 import "sort"
 
 type DFA struct {
@@ -120,7 +121,7 @@ func (this *DFA) sortedStates() []*DFAState {
 	// extract the values
 	vs := make([]*DFAState, len(this._states))
 	i := 0
-	for _,v := range this._states {
+	for _, v := range this._states {
 		vs[i] = v
 		i++
 	}

@@ -83,7 +83,7 @@ func (this *ATNDeserializer) isFeatureSupported(feature, actualUuid string) bool
 
 func (this *ATNDeserializer) DeserializeFromUInt16(data []uint16) *ATN {
 
-	this.reset( utf16.Decode(data) )
+	this.reset(utf16.Decode(data))
 	this.checkVersion()
 	this.checkUUID()
 	var atn = this.readATN()
@@ -186,7 +186,7 @@ func (this *ATNDeserializer) readStates(atn *ATN) {
 	var numNonGreedyStates = this.readInt()
 	for j := 0; j < numNonGreedyStates; j++ {
 		stateNumber := this.readInt()
-		atn.states[stateNumber].(DecisionState).setNonGreedy( true )
+		atn.states[stateNumber].(DecisionState).setNonGreedy(true)
 	}
 
 	var numPrecedenceStates = this.readInt()
@@ -325,7 +325,7 @@ func (this *ATNDeserializer) readDecisions(atn *ATN) {
 		var s = this.readInt()
 		var decState = atn.states[s].(DecisionState)
 		atn.DecisionToState = append(atn.DecisionToState, decState)
-		decState.setDecision( i )
+		decState.setDecision(i)
 	}
 }
 

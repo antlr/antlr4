@@ -122,8 +122,7 @@ func (la *LL1Analyzer) LOOK(s, stopState ATNState, ctx RuleContext) *IntervalSet
 // outermost context is reached. This parameter has no effect if {@code ctx}
 // is {@code nil}.
 
-
-func (la *LL1Analyzer) __LOOK(s, stopState ATNState, ctx PredictionContext, look *IntervalSet, lookBusy *Set, calledRuleStack *BitSet, seeThruPreds, addEOF bool, i int){
+func (la *LL1Analyzer) __LOOK(s, stopState ATNState, ctx PredictionContext, look *IntervalSet, lookBusy *Set, calledRuleStack *BitSet, seeThruPreds, addEOF bool, i int) {
 
 	returnState := la.atn.states[ctx.getReturnState(i)]
 
@@ -259,6 +258,5 @@ func (la *LL1Analyzer) ___LOOK(stopState ATNState, ctx PredictionContext, look *
 
 	calledRuleStack.add(t1.getTarget().GetRuleIndex())
 	la._LOOK(t1.getTarget(), stopState, newContext, look, lookBusy, calledRuleStack, seeThruPreds, addEOF)
-
 
 }

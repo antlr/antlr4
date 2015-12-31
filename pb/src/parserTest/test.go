@@ -5,13 +5,9 @@ import (
 	"parser"
 )
 
-
 type MyErrorListener struct {
 	*MyErrorListener
 }
-
-
-
 
 func main() {
 
@@ -23,16 +19,8 @@ func main() {
 
 	p := parser.NewArithmeticParser(s)
 
-    p.BuildParseTrees = true
+	p.BuildParseTrees = true
 
 	p.Equation()
 
-
-
-
-
 }
-
-
-
-

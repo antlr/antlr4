@@ -39,7 +39,7 @@ func (this *DFASerializer) String() string {
 
 	var buf = ""
 	var states = this.dfa.sortedStates()
-	for _,s := range states {
+	for _, s := range states {
 		if s.edges != nil {
 			var n = len(s.edges)
 			for j := 0; j < n; j++ {
@@ -65,12 +65,12 @@ func (this *DFASerializer) String() string {
 func (this *DFASerializer) getEdgeLabel(i int) string {
 	if i == 0 {
 		return "EOF"
-	} else if this.literalNames != nil && i - 1 < len(this.literalNames) {
+	} else if this.literalNames != nil && i-1 < len(this.literalNames) {
 		return this.literalNames[i-1]
-	} else if this.symbolicNames != nil && i - 1 < len(this.symbolicNames) {
+	} else if this.symbolicNames != nil && i-1 < len(this.symbolicNames) {
 		return this.symbolicNames[i-1]
 	} else {
-		return strconv.Itoa(i-1)
+		return strconv.Itoa(i - 1)
 	}
 }
 
@@ -97,8 +97,6 @@ func (this *DFASerializer) GetStateString(s *DFAState) string {
 		return baseStateStr
 	}
 }
-
-
 
 type LexerDFASerializer struct {
 	*DFASerializer

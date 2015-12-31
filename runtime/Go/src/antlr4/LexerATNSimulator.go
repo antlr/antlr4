@@ -50,7 +50,7 @@ func (this *SimState) reset() {
 type LexerATNSimulator struct {
 	*BaseATNSimulator
 
-	recog Lexer
+	recog          Lexer
 	predictionMode int
 	decisionToDFA  []*DFA
 	mergeCache     DoubleDict
@@ -487,7 +487,7 @@ func (this *LexerATNSimulator) getEpsilonTarget(input CharStream, config *LexerA
 		if LexerATNSimulatorDebug {
 			fmt.Println("EVAL rule " + strconv.Itoa(trans.(*PredicateTransition).ruleIndex) + ":" + strconv.Itoa(pt.predIndex))
 		}
-		configs.SetHasSemanticContext( true )
+		configs.SetHasSemanticContext(true)
 		if this.evaluatePredicate(input, pt.ruleIndex, pt.predIndex, speculative) {
 			cfg = NewLexerATNConfig4(config, trans.getTarget())
 		}
@@ -590,7 +590,7 @@ func (this *LexerATNSimulator) addDFAEdge(from_ *DFAState, tk int, to *DFAState,
 		// state, we can continue in pure DFA mode from there.
 		// /
 		var suppressEdge = cfgs.HasSemanticContext()
-		cfgs.SetHasSemanticContext( false )
+		cfgs.SetHasSemanticContext(false)
 
 		to = this.addDFAState(cfgs)
 

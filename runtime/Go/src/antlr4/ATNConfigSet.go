@@ -207,12 +207,12 @@ func (this *BaseATNConfigSet) Equals(other interface{}) bool {
 	other2 := other.(*BaseATNConfigSet)
 
 	return this.configs != nil &&
-	//			this.configs.equals(other2.configs) && // TODO is this necessary?
-	this.fullCtx == other2.fullCtx &&
-	this.uniqueAlt == other2.uniqueAlt &&
-	this.conflictingAlts == other2.conflictingAlts &&
-	this.hasSemanticContext == other2.hasSemanticContext &&
-	this.dipsIntoOuterContext == other2.dipsIntoOuterContext
+		//			this.configs.equals(other2.configs) && // TODO is this necessary?
+		this.fullCtx == other2.fullCtx &&
+		this.uniqueAlt == other2.uniqueAlt &&
+		this.conflictingAlts == other2.conflictingAlts &&
+		this.hasSemanticContext == other2.hasSemanticContext &&
+		this.dipsIntoOuterContext == other2.dipsIntoOuterContext
 }
 
 func (this *BaseATNConfigSet) Hash() string {
@@ -307,36 +307,33 @@ func (this *BaseATNConfigSet) SetReadOnly(readOnly bool) {
 func (this *BaseATNConfigSet) String() string {
 	s := "["
 
-	for i,c := range this.configs {
+	for i, c := range this.configs {
 		s += c.String()
-		if (i != len(this.configs)-1){
+		if i != len(this.configs)-1 {
 			s += ","
 		}
 	}
 
 	s += "]"
 
-	if (this.hasSemanticContext){
+	if this.hasSemanticContext {
 		s += ",hasSemanticContext=" + fmt.Sprint(this.hasSemanticContext)
 	}
 
-	if (this.uniqueAlt != ATNInvalidAltNumber ){
+	if this.uniqueAlt != ATNInvalidAltNumber {
 		s += ",uniqueAlt=" + fmt.Sprint(this.uniqueAlt)
 	}
 
-	if ( this.conflictingAlts != nil ){
+	if this.conflictingAlts != nil {
 		s += ",conflictingAlts=" + this.conflictingAlts.String()
 	}
 
-	if (this.dipsIntoOuterContext) {
+	if this.dipsIntoOuterContext {
 		s += ",dipsIntoOuterContext"
 	}
 
 	return s
 }
-
-
-
 
 type OrderedATNConfigSet struct {
 	*BaseATNConfigSet
@@ -352,7 +349,6 @@ func NewOrderedATNConfigSet() *OrderedATNConfigSet {
 	return this
 }
 
-
 func hashATNConfig(c interface{}) string {
 	return c.(ATNConfig).shortHash()
 }
@@ -367,14 +363,14 @@ func equalATNConfigs(a, b interface{}) bool {
 		return true
 	}
 
-	ai,ok := a.(ATNConfig)
-	bi,ok1 := b.(ATNConfig)
+	ai, ok := a.(ATNConfig)
+	bi, ok1 := b.(ATNConfig)
 
-	if (!ok || !ok1) {
+	if !ok || !ok1 {
 		return false
 	}
 
 	return ai.GetState().GetStateNumber() == bi.GetState().GetStateNumber() &&
-	ai.GetAlt() == bi.GetAlt() &&
-	ai.GetSemanticContext().equals(bi.GetSemanticContext())
+		ai.GetAlt() == bi.GetAlt() &&
+		ai.GetSemanticContext().equals(bi.GetSemanticContext())
 }

@@ -12,7 +12,6 @@ import (
 ///
 
 type Lexer interface {
-
 	TokenSource
 	Recognizer
 
@@ -31,7 +30,7 @@ type BaseLexer struct {
 	_input                  CharStream
 	_factory                TokenFactory
 	_tokenFactorySourcePair *TokenSourceCharStreamPair
-	_token Token
+	_token                  Token
 	_tokenStartCharIndex    int
 	_tokenStartLine         int
 	_tokenStartColumn       int

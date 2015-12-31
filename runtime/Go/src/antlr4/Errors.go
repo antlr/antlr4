@@ -16,10 +16,10 @@ type RecognitionException interface {
 
 type BaseRecognitionException struct {
 	message        string
-	recognizer Recognizer
+	recognizer     Recognizer
 	offendingToken Token
 	offendingState int
-	ctx RuleContext
+	ctx            RuleContext
 	input          IntStream
 }
 
@@ -126,7 +126,7 @@ type NoViableAltException struct {
 
 	startToken     Token
 	offendingToken Token
-	ctx ParserRuleContext
+	ctx            ParserRuleContext
 	deadEndConfigs ATNConfigSet
 }
 

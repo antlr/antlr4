@@ -99,7 +99,6 @@ func NewTerminalNodeImpl(symbol Token) *TerminalNodeImpl {
 	return tn
 }
 
-
 func (this *TerminalNodeImpl) getChild(i int) Tree {
 	return nil
 }

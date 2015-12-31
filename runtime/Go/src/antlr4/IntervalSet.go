@@ -1,9 +1,9 @@
 package antlr4
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
-	"fmt"
 )
 
 type Interval struct {

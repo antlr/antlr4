@@ -39,7 +39,7 @@ type RuleContext interface {
 }
 
 type BaseRuleContext struct {
-	parentCtx RuleContext
+	parentCtx     RuleContext
 	invokingState int
 	RuleIndex     int
 	children      []Tree
@@ -187,7 +187,7 @@ func (this *BaseRuleContext) String(ruleNames []string, stop RuleContext) string
 			s += " "
 		}
 		pi := p.GetParent()
-		if (pi != nil){
+		if pi != nil {
 			p = pi.(RuleContext)
 		} else {
 			p = nil

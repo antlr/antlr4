@@ -3,14 +3,14 @@ package antlr4
 import "strconv"
 
 const (
-	LexerActionTypeChannel = 0 //The type of a {@link LexerChannelAction} action.
-	LexerActionTypeCustom = 1 //The type of a {@link LexerCustomAction} action.
-	LexerActionTypeMode = 2 //The type of a {@link LexerModeAction} action.
-	LexerActionTypeMore = 3 //The type of a {@link LexerMoreAction} action.
-	LexerActionTypePopMode = 4 //The type of a {@link LexerPopModeAction} action.
+	LexerActionTypeChannel  = 0 //The type of a {@link LexerChannelAction} action.
+	LexerActionTypeCustom   = 1 //The type of a {@link LexerCustomAction} action.
+	LexerActionTypeMode     = 2 //The type of a {@link LexerModeAction} action.
+	LexerActionTypeMore     = 3 //The type of a {@link LexerMoreAction} action.
+	LexerActionTypePopMode  = 4 //The type of a {@link LexerPopModeAction} action.
 	LexerActionTypePushMode = 5 //The type of a {@link LexerPushModeAction} action.
-	LexerActionTypeSkip = 6 //The type of a {@link LexerSkipAction} action.
-	LexerActionTypeType = 7 //The type of a {@link LexerTypeAction} action.
+	LexerActionTypeSkip     = 6 //The type of a {@link LexerSkipAction} action.
+	LexerActionTypeType     = 7 //The type of a {@link LexerTypeAction} action.
 )
 
 type LexerAction interface {
@@ -34,7 +34,6 @@ func NewBaseLexerAction(action int) *BaseLexerAction {
 
 	return la
 }
-
 
 func (this *BaseLexerAction) execute(lexer Lexer) {
 	panic("Not implemented")
@@ -370,7 +369,7 @@ type LexerIndexedCustomAction struct {
 	*BaseLexerAction
 
 	offset              int
-	lexerAction LexerAction
+	lexerAction         LexerAction
 	isPositionDependent bool
 }
 

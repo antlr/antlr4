@@ -21,7 +21,6 @@ type ErrorStrategy interface {
 // error Reporting and recovery in ANTLR parsers.
 //
 type DefaultErrorStrategy struct {
-
 	errorRecoveryMode bool
 	lastErrorIndex    int
 	lastErrorStates   *IntervalSet
@@ -131,7 +130,6 @@ func (this *DefaultErrorStrategy) ReportError(recognizer Parser, e RecognitionEx
 		this.ReportFailedPredicate(recognizer, t)
 	}
 }
-
 
 // {@inheritDoc}
 //
@@ -558,7 +556,7 @@ func (this *DefaultErrorStrategy) getMissingSymbol(recognizer Parser) Token {
 	if PortDebug {
 		fmt.Println("Missing symbol error")
 	}
-	return tf.Create( current.GetSource(), expectedTokenType, tokenText, TokenDefaultChannel, -1, -1, current.GetLine(), current.GetColumn())
+	return tf.Create(current.GetSource(), expectedTokenType, tokenText, TokenDefaultChannel, -1, -1, current.GetLine(), current.GetColumn())
 }
 
 func (this *DefaultErrorStrategy) getExpectedTokens(recognizer Parser) *IntervalSet {

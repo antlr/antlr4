@@ -99,7 +99,7 @@ func (this *DiagnosticErrorListener) getConflictingAlts(ReportedAlts *BitSet, se
 		return ReportedAlts
 	}
 	var result = NewBitSet()
-	for _,c := range set.GetItems() {
+	for _, c := range set.GetItems() {
 		result.add(c.GetAlt())
 	}
 

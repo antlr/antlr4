@@ -24,10 +24,10 @@ type Transition interface {
 }
 
 type BaseTransition struct {
-	target ATNState
+	target            ATNState
 	isEpsilon         bool
-	label_ int
-	label  *IntervalSet
+	label_            int
+	label             *IntervalSet
 	serializationType int
 }
 
@@ -156,7 +156,7 @@ func (t *AtomTransition) String() string {
 type RuleTransition struct {
 	*BaseTransition
 
-	followState ATNState
+	followState           ATNState
 	ruleIndex, precedence int
 }
 
@@ -252,7 +252,7 @@ func NewBasePredicateTransition(target ATNState) *BaseAbstractPredicateTransitio
 	return t
 }
 
-func (a *BaseAbstractPredicateTransition) IAbstractPredicateTransitionFoo(){}
+func (a *BaseAbstractPredicateTransition) IAbstractPredicateTransitionFoo() {}
 
 type PredicateTransition struct {
 	*BaseAbstractPredicateTransition

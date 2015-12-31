@@ -2,9 +2,9 @@ package antlr4
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"os"
-	"fmt"
 )
 
 //

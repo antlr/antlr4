@@ -12,10 +12,9 @@
 package antlr4
 
 import (
-	"strconv"
 	"fmt"
+	"strconv"
 )
-
 
 func (bt *CommonTokenStream) Mark() int {
 	return 0
@@ -101,7 +100,7 @@ func (bt *CommonTokenStream) fetch(n int) int {
 		if PortDebug {
 			fmt.Println("fetch loop")
 		}
-		t.SetTokenIndex( len(bt.tokens) )
+		t.SetTokenIndex(len(bt.tokens))
 		bt.tokens = append(bt.tokens, t)
 		if t.GetTokenType() == TokenEOF {
 			bt.fetchedEOF = true
@@ -311,8 +310,6 @@ func (bt *CommonTokenStream) fill() {
 		continue
 	}
 }
-
-
 
 type CommonTokenStream struct {
 	tokenSource TokenSource

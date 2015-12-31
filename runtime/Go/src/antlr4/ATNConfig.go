@@ -37,9 +37,9 @@ type ATNConfig interface {
 
 type BaseATNConfig struct {
 	precedenceFilterSuppressed bool
-	state ATNState
+	state                      ATNState
 	alt                        int
-	context PredictionContext
+	context                    PredictionContext
 	semanticContext            SemanticContext
 	reachesIntoOuterContext    int
 }
@@ -61,7 +61,7 @@ func NewBaseATNConfig6(state ATNState, alt int, context PredictionContext) *Base
 func NewBaseATNConfig5(state ATNState, alt int, context PredictionContext, semanticContext SemanticContext) *BaseATNConfig {
 	a := new(BaseATNConfig)
 
-	if (semanticContext == nil){
+	if semanticContext == nil {
 		panic("SemanticContext cannot be null!")
 	}
 
@@ -92,7 +92,7 @@ func NewBaseATNConfig1(c ATNConfig, state ATNState, context PredictionContext) *
 func NewBaseATNConfig(c ATNConfig, state ATNState, context PredictionContext, semanticContext SemanticContext) *BaseATNConfig {
 	a := new(BaseATNConfig)
 
-	if (semanticContext == nil){
+	if semanticContext == nil {
 		panic("SemanticContext cannot be null!")
 	}
 
@@ -189,10 +189,6 @@ func (this *BaseATNConfig) String() string {
 
 	return "(" + fmt.Sprint(this.state) + "," + strconv.Itoa(this.alt) + a + b + c + ")"
 }
-
-
-
-
 
 type LexerATNConfig struct {
 	*BaseATNConfig

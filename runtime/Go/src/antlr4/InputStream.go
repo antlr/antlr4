@@ -1,4 +1,5 @@
 package antlr4
+
 import "fmt"
 
 type InputStream struct {

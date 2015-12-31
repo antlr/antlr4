@@ -4,6 +4,7 @@
 //
 
 package antlr4
+
 import "fmt"
 
 type TokenFactory interface {

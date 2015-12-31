@@ -129,7 +129,7 @@ type SingletonPredictionContext interface {
 type BaseSingletonPredictionContext struct {
 	*BasePredictionContext
 
-	parentCtx PredictionContext
+	parentCtx   PredictionContext
 	returnState int
 }
 
@@ -721,15 +721,15 @@ func combineCommonParents(parents []PredictionContext) {
 
 func getCachedBasePredictionContext(context PredictionContext, contextCache *PredictionContextCache, visited map[PredictionContext]PredictionContext) PredictionContext {
 
-	if (context.isEmpty()) {
+	if context.isEmpty() {
 		return context
 	}
 	var existing = visited[context]
-	if (existing != nil) {
+	if existing != nil {
 		return existing
 	}
 	existing = contextCache.Get(context)
-	if (existing != nil) {
+	if existing != nil {
 		visited[context] = existing
 		return existing
 	}
@@ -737,8 +737,8 @@ func getCachedBasePredictionContext(context PredictionContext, contextCache *Pre
 	var parents = make([]PredictionContext, context.length())
 	for i := 0; i < len(parents); i++ {
 		var parent = getCachedBasePredictionContext(context.GetParent(i), contextCache, visited)
-		if (changed || parent != context.GetParent(i)) {
-			if (!changed) {
+		if changed || parent != context.GetParent(i) {
+			if !changed {
 				parents = make([]PredictionContext, context.length())
 				for j := 0; j < context.length(); j++ {
 					parents[j] = context.GetParent(j)
@@ -748,15 +748,15 @@ func getCachedBasePredictionContext(context PredictionContext, contextCache *Pre
 			parents[i] = parent
 		}
 	}
-	if (!changed) {
+	if !changed {
 		contextCache.add(context)
 		visited[context] = context
 		return context
 	}
 	var updated PredictionContext = nil
-	if (len(parents) == 0) {
+	if len(parents) == 0 {
 		updated = BasePredictionContextEMPTY
-	} else if (len(parents) == 1) {
+	} else if len(parents) == 1 {
 		updated = SingletonBasePredictionContextCreate(parents[0], context.getReturnState(0))
 	} else {
 		updated = NewArrayPredictionContext(parents, context.(*ArrayPredictionContext).GetReturnStates())

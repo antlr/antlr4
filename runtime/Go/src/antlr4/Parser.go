@@ -1,4 +1,5 @@
 package antlr4
+
 import "fmt"
 
 type Parser interface {
@@ -28,9 +29,9 @@ type BaseParser struct {
 	BuildParseTrees bool
 
 	_input           TokenStream
-	_errHandler ErrorStrategy
+	_errHandler      ErrorStrategy
 	_precedenceStack IntStack
-	_ctx ParserRuleContext
+	_ctx             ParserRuleContext
 
 	_tracer         *TraceListener
 	_parseListeners []ParseTreeListener

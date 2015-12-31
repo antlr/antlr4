@@ -52,7 +52,7 @@ func (this *PredPrediction) String() string {
 
 type DFAState struct {
 	stateNumber         int
-	configs ATNConfigSet
+	configs             ATNConfigSet
 	edges               []*DFAState
 	isAcceptState       bool
 	prediction          int
@@ -109,7 +109,7 @@ func NewDFAState(stateNumber int, configs ATNConfigSet) *DFAState {
 func (this *DFAState) GetAltSet() *Set {
 	var alts = NewSet(nil, nil)
 	if this.configs != nil {
-		for _,c := range this.configs.GetItems() {
+		for _, c := range this.configs.GetItems() {
 			alts.add(c.GetAlt())
 		}
 	}

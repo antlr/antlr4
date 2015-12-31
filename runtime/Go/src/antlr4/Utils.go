@@ -6,8 +6,8 @@ import (
 	"hash/fnv"
 	"strings"
 	//	"regexp"
-//	"bytes"
-//	"encoding/gob"
+	//	"bytes"
+	//	"encoding/gob"
 )
 
 func intMin(a, b int) int {
@@ -43,7 +43,6 @@ func (s *IntStack) Pop() (int, error) {
 func (s *IntStack) Push(e int) {
 	*s = append(*s, e)
 }
-
 
 type Set struct {
 	data           map[string][]interface{}
@@ -91,7 +90,6 @@ func standardHashFunction(a interface{}) string {
 //	}
 //	return buf.Bytes(), nil
 //}
-
 
 type Hasher interface {
 	Hash() string
@@ -167,8 +165,8 @@ func (this *Set) String() string {
 
 	s := ""
 
-	for _,av := range this.data {
-		for _,v := range av {
+	for _, av := range this.data {
+		for _, v := range av {
 			s += fmt.Sprint(v)
 		}
 	}

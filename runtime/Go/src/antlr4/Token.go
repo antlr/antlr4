@@ -14,7 +14,6 @@ type TokenSourceCharStreamPair struct {
 // (so we can ignore tabs), token channel, index, and source from which
 // we obtained this token.
 
-
 type Token interface {
 	GetSource() *TokenSourceCharStreamPair
 	GetTokenType() int
@@ -94,7 +93,7 @@ func (this *BaseToken) GetTokenType() int {
 	return this.tokenType
 }
 
-func (this *BaseToken) GetSource() *TokenSourceCharStreamPair{
+func (this *BaseToken) GetSource() *TokenSourceCharStreamPair {
 	return this.source
 }
 

@@ -28,7 +28,7 @@ type BaseParserRuleContext struct {
 
 	children    []ParseTree
 	start, stop Token
-	exception RecognitionException
+	exception   RecognitionException
 }
 
 func NewBaseParserRuleContext(parent ParserRuleContext, invokingStateNumber int) *BaseParserRuleContext {
