@@ -14,8 +14,8 @@ import (
 //
 
 type SemanticContext interface {
-	evaluate(parser IRecognizer, outerContext IRuleContext) bool
-	evalPrecedence(parser IRecognizer, outerContext IRuleContext) SemanticContext
+	evaluate(parser Recognizer, outerContext IRuleContext) bool
+	evalPrecedence(parser Recognizer, outerContext IRuleContext) SemanticContext
 	equals(interface{}) bool
 	String() string
 }
@@ -73,11 +73,11 @@ func NewPredicate(ruleIndex, predIndex int, isCtxDependent bool) *Predicate {
 
 var SemanticContextNONE SemanticContext = NewPredicate(-1, -1, false)
 
-func (this *Predicate) evalPrecedence(parser IRecognizer, outerContext IRuleContext) SemanticContext {
+func (this *Predicate) evalPrecedence(parser Recognizer, outerContext IRuleContext) SemanticContext {
 	return this
 }
 
-func (this *Predicate) evaluate(parser IRecognizer, outerContext IRuleContext) bool {
+func (this *Predicate) evaluate(parser Recognizer, outerContext IRuleContext) bool {
 
 	var localctx IRuleContext = nil
 
@@ -120,11 +120,11 @@ func NewPrecedencePredicate(precedence int) *PrecedencePredicate {
 	return this
 }
 
-func (this *PrecedencePredicate) evaluate(parser IRecognizer, outerContext IRuleContext) bool {
+func (this *PrecedencePredicate) evaluate(parser Recognizer, outerContext IRuleContext) bool {
 	return parser.Precpred(outerContext, this.precedence)
 }
 
-func (this *PrecedencePredicate) evalPrecedence(parser IRecognizer, outerContext IRuleContext) SemanticContext {
+func (this *PrecedencePredicate) evalPrecedence(parser Recognizer, outerContext IRuleContext) SemanticContext {
 	if parser.Precpred(outerContext, this.precedence) {
 		return SemanticContextNONE
 	} else {
@@ -243,7 +243,7 @@ func (this *AND) Hash() string {
 // The evaluation of predicates by this context is short-circuiting, but
 // unordered.</p>
 //
-func (this *AND) evaluate(parser IRecognizer, outerContext IRuleContext) bool {
+func (this *AND) evaluate(parser Recognizer, outerContext IRuleContext) bool {
 	for i := 0; i < len(this.opnds); i++ {
 		if !this.opnds[i].evaluate(parser, outerContext) {
 			return false
@@ -252,7 +252,7 @@ func (this *AND) evaluate(parser IRecognizer, outerContext IRuleContext) bool {
 	return true
 }
 
-func (this *AND) evalPrecedence(parser IRecognizer, outerContext IRuleContext) SemanticContext {
+func (this *AND) evalPrecedence(parser Recognizer, outerContext IRuleContext) SemanticContext {
 	var differs = false
 	var operands = make([]SemanticContext, 0)
 
@@ -379,7 +379,7 @@ func (this *OR) Hash() string {
 // The evaluation of predicates by this context is short-circuiting, but
 // unordered.</p>
 //
-func (this *OR) evaluate(parser IRecognizer, outerContext IRuleContext) bool {
+func (this *OR) evaluate(parser Recognizer, outerContext IRuleContext) bool {
 	for i := 0; i < len(this.opnds); i++ {
 		if this.opnds[i].evaluate(parser, outerContext) {
 			return true
@@ -388,7 +388,7 @@ func (this *OR) evaluate(parser IRecognizer, outerContext IRuleContext) bool {
 	return false
 }
 
-func (this *OR) evalPrecedence(parser IRecognizer, outerContext IRuleContext) SemanticContext {
+func (this *OR) evalPrecedence(parser Recognizer, outerContext IRuleContext) SemanticContext {
 	var differs = false
 	var operands = make([]SemanticContext, 0)
 	for i := 0; i < len(this.opnds); i++ {

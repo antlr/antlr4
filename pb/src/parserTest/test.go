@@ -5,6 +5,14 @@ import (
 	"parser"
 )
 
+
+type MyErrorListener struct {
+	*MyErrorListener
+}
+
+
+
+
 func main() {
 
 	a := antlr4.NewFileStream("foo.txt")
@@ -18,6 +26,8 @@ func main() {
     p.BuildParseTrees = true
 
 	p.Equation()
+
+
 
 
 

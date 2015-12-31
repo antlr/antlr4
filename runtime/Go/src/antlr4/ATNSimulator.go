@@ -15,7 +15,7 @@ func NewATNSimulator(atn *ATN, sharedContextCache *PredictionContextCache) *ATNS
 	return this
 }
 
-var ATNSimulatorERROR = NewDFAState(0x7FFFFFFF, NewATNConfigSet(false))
+var ATNSimulatorERROR = NewDFAState(0x7FFFFFFF, NewBaseATNConfigSet(false))
 
 func (this *ATNSimulator) getCachedContext(context IPredictionContext) IPredictionContext {
 	if this.sharedContextCache == nil {

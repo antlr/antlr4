@@ -13,7 +13,7 @@ import (
 
 type ILexer interface {
 	TokenSource
-	IRecognizer
+	Recognizer
 
 	setChannel(int)
 	pushMode(int)
@@ -23,7 +23,7 @@ type ILexer interface {
 }
 
 type Lexer struct {
-	*Recognizer
+	*BaseRecognizer
 
 	Interpreter *LexerATNSimulator
 
@@ -47,7 +47,7 @@ func NewLexer(input CharStream) *Lexer {
 
 	lexer := new(Lexer)
 
-	lexer.Recognizer = NewRecognizer()
+	lexer.BaseRecognizer = NewBaseRecognizer()
 
 	lexer._input = input
 	lexer._factory = CommonTokenFactoryDEFAULT

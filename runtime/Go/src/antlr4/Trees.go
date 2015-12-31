@@ -7,7 +7,7 @@ import "fmt"
 // Print out a whole tree in LISP form. {@link //getNodeText} is used on the
 //  node payloads to get the text for the nodes.  Detect
 //  parse trees and extract data appropriately.
-func TreesStringTree(tree Tree, ruleNames []string, recog IRecognizer) string {
+func TreesStringTree(tree Tree, ruleNames []string, recog Recognizer) string {
 
 	if recog != nil {
 		ruleNames = recog.GetRuleNames()
@@ -33,7 +33,7 @@ func TreesStringTree(tree Tree, ruleNames []string, recog IRecognizer) string {
 	return res
 }
 
-func TreesgetNodeText(t Tree, ruleNames []string, recog *Parser) string {
+func TreesgetNodeText(t Tree, ruleNames []string, recog *BaseParser) string {
 
 	if recog != nil {
 		ruleNames = recog.GetRuleNames()

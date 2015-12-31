@@ -38,7 +38,7 @@ func NewDiagnosticErrorListener(exactOnly bool) *DiagnosticErrorListener {
 	return n
 }
 
-func (this *DiagnosticErrorListener) ReportAmbiguity(recognizer *Parser, dfa *DFA, startIndex, stopIndex int, exact bool, ambigAlts *BitSet, configs *ATNConfigSet) {
+func (this *DiagnosticErrorListener) ReportAmbiguity(recognizer *BaseParser, dfa *DFA, startIndex, stopIndex int, exact bool, ambigAlts *BitSet, configs ATNConfigSet) {
 	if this.exactOnly && !exact {
 		return
 	}
@@ -51,7 +51,7 @@ func (this *DiagnosticErrorListener) ReportAmbiguity(recognizer *Parser, dfa *DF
 	recognizer.NotifyErrorListeners(msg, nil, nil)
 }
 
-func (this *DiagnosticErrorListener) ReportAttemptingFullContext(recognizer *Parser, dfa *DFA, startIndex, stopIndex int, conflictingAlts *BitSet, configs *ATNConfigSet) {
+func (this *DiagnosticErrorListener) ReportAttemptingFullContext(recognizer *BaseParser, dfa *DFA, startIndex, stopIndex int, conflictingAlts *BitSet, configs ATNConfigSet) {
 
 	var msg = "ReportAttemptingFullContext d=" +
 		this.getDecisionDescription(recognizer, dfa) +
@@ -60,7 +60,7 @@ func (this *DiagnosticErrorListener) ReportAttemptingFullContext(recognizer *Par
 	recognizer.NotifyErrorListeners(msg, nil, nil)
 }
 
-func (this *DiagnosticErrorListener) ReportContextSensitivity(recognizer *Parser, dfa *DFA, startIndex, stopIndex, prediction int, configs *ATNConfigSet) {
+func (this *DiagnosticErrorListener) ReportContextSensitivity(recognizer *BaseParser, dfa *DFA, startIndex, stopIndex, prediction int, configs ATNConfigSet) {
 	var msg = "ReportContextSensitivity d=" +
 		this.getDecisionDescription(recognizer, dfa) +
 		", input='" +
@@ -68,7 +68,7 @@ func (this *DiagnosticErrorListener) ReportContextSensitivity(recognizer *Parser
 	recognizer.NotifyErrorListeners(msg, nil, nil)
 }
 
-func (this *DiagnosticErrorListener) getDecisionDescription(recognizer *Parser, dfa *DFA) string {
+func (this *DiagnosticErrorListener) getDecisionDescription(recognizer *BaseParser, dfa *DFA) string {
 	var decision = dfa.decision
 	var ruleIndex = dfa.atnStartState.GetRuleIndex()
 
@@ -94,21 +94,14 @@ func (this *DiagnosticErrorListener) getDecisionDescription(recognizer *Parser, 
 // @return Returns {@code ReportedAlts} if it is not {@code nil}, otherwise
 // returns the set of alternatives represented in {@code configs}.
 //
-func (this *DiagnosticErrorListener) getConflictingAlts(ReportedAlts *BitSet, set *ATNConfigSet) *BitSet {
+func (this *DiagnosticErrorListener) getConflictingAlts(ReportedAlts *BitSet, set ATNConfigSet) *BitSet {
 	if ReportedAlts != nil {
 		return ReportedAlts
 	}
 	var result = NewBitSet()
-	for i := 0; i < len(set.configs); i++ {
-		result.add(set.configs[i].GetAlt())
+	for _,c := range set.GetItems() {
+		result.add(c.GetAlt())
 	}
 
 	return result
-
-	//	valuestrings := make([]string, len(result.values()))
-	//	for i,v := range result.values() {
-	//		valuestrings[i] = strconv.Itoa(v)
-	//	}
-	//
-	//	return "{" + strings.Join(valuestrings, ", ") + "}"
 }

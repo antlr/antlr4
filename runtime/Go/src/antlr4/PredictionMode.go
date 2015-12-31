@@ -164,7 +164,7 @@ const (
 // the configurations to strip out all of the predicates so that a standard
 // {@link ATNConfigSet} will merge everything ignoring predicates.</p>
 //
-func PredictionModehasSLLConflictTerminatingPrediction(mode int, configs *ATNConfigSet) bool {
+func PredictionModehasSLLConflictTerminatingPrediction(mode int, configs ATNConfigSet) bool {
 	// Configs in rule stop states indicate reaching the end of the decision
 	// rule (local context) or end of start rule (full context). If all
 	// configs meet this condition, then none of the configurations is able
@@ -178,15 +178,14 @@ func PredictionModehasSLLConflictTerminatingPrediction(mode int, configs *ATNCon
 		// Don't bother with combining configs from different semantic
 		// contexts if we can fail over to full LL costs more time
 		// since we'll often fail over anyway.
-		if configs.hasSemanticContext {
+		if configs.HasSemanticContext() {
 			// dup configs, tossing out semantic predicates
-			var dup = NewATNConfigSet(false)
-			for i := 0; i < len(configs.configs); i++ {
-				var c = configs.configs[i]
+			var dup = NewBaseATNConfigSet(false)
+			for _, c := range configs.GetItems() {
 
 				//				NewATNConfig({semanticContext:}, c)
 				c = NewATNConfig2(c, SemanticContextNONE)
-				dup.add(c, nil)
+				dup.Add(c, nil)
 			}
 			configs = dup
 		}
@@ -205,9 +204,8 @@ func PredictionModehasSLLConflictTerminatingPrediction(mode int, configs *ATNCon
 // @param configs the configuration set to test
 // @return {@code true} if any configuration in {@code configs} is in a
 // {@link RuleStopState}, otherwise {@code false}
-func PredictionModehasConfigInRuleStopState(configs *ATNConfigSet) bool {
-	for i := 0; i < len(configs.configs); i++ {
-		var c = configs.configs[i]
+func PredictionModehasConfigInRuleStopState(configs ATNConfigSet) bool {
+	for _, c := range configs.GetItems() {
 		if _, ok := c.GetState().(*RuleStopState); ok {
 			return true
 		}
@@ -223,11 +221,9 @@ func PredictionModehasConfigInRuleStopState(configs *ATNConfigSet) bool {
 // @param configs the configuration set to test
 // @return {@code true} if all configurations in {@code configs} are in a
 // {@link RuleStopState}, otherwise {@code false}
-func PredictionModeallConfigsInRuleStopStates(configs *ATNConfigSet) bool {
+func PredictionModeallConfigsInRuleStopStates(configs ATNConfigSet) bool {
 
-	for i := 0; i < len(configs.configs); i++ {
-		var c = configs.configs[i]
-
+	for _, c := range configs.GetItems() {
 		if _, ok := c.GetState().(*RuleStopState); !ok {
 			return false
 		}
@@ -490,11 +486,10 @@ func PredictionModeGetAlts(altsets []*BitSet) *BitSet {
 // alt and not pred
 // </pre>
 //
-func PredictionModegetConflictingAltSubsets(configs *ATNConfigSet) []*BitSet {
+func PredictionModegetConflictingAltSubsets(configs ATNConfigSet) []*BitSet {
 	var configToAlts = make(map[string]*BitSet)
 
-	for i := 0; i < len(configs.configs); i++ {
-		var c = configs.configs[i]
+	for _, c := range configs.GetItems() {
 		var key = "key_" + strconv.Itoa(c.GetState().GetStateNumber()) + "/" + c.GetContext().String()
 		var alts = configToAlts[key]
 		if alts == nil {
@@ -523,10 +518,10 @@ func PredictionModegetConflictingAltSubsets(configs *ATNConfigSet) []*BitSet {
 // map[c.{@link ATNConfig//state state}] U= c.{@link ATNConfig//alt alt}
 // </pre>
 //
-func PredictionModeGetStateToAltMap(configs *ATNConfigSet) *AltDict {
+func PredictionModeGetStateToAltMap(configs ATNConfigSet) *AltDict {
 	var m = NewAltDict()
 
-	for _, c := range configs.configs {
+	for _, c := range configs.GetItems() {
 		var alts = m.Get(c.GetState().String())
 		if alts == nil {
 			alts = NewBitSet()
@@ -537,7 +532,7 @@ func PredictionModeGetStateToAltMap(configs *ATNConfigSet) *AltDict {
 	return m
 }
 
-func PredictionModehasStateAssociatedWithOneAlt(configs *ATNConfigSet) bool {
+func PredictionModehasStateAssociatedWithOneAlt(configs ATNConfigSet) bool {
 	var values = PredictionModeGetStateToAltMap(configs).values()
 	for i := 0; i < len(values); i++ {
 		if values[i].(*BitSet).length() == 1 {

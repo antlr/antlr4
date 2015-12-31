@@ -160,7 +160,7 @@ func (this *RuleContext) accept(Visitor ParseTreeVisitor) interface{} {
 // (root child1 .. childN). Print just a node if this is a leaf.
 //
 
-func (this *RuleContext) StringTree(ruleNames []string, recog IRecognizer) string {
+func (this *RuleContext) StringTree(ruleNames []string, recog Recognizer) string {
 	return TreesStringTree(this, ruleNames, recog)
 }
 

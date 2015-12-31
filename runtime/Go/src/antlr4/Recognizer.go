@@ -7,7 +7,7 @@ import (
 	"strconv"
 )
 
-type IRecognizer interface {
+type Recognizer interface {
 
 	GetLiteralNames() []string
 	GetSymbolicNames() []string
@@ -23,7 +23,7 @@ type IRecognizer interface {
 
 }
 
-type Recognizer struct {
+type BaseRecognizer struct {
 	_listeners []IErrorListener
 	state      int
 
@@ -33,8 +33,8 @@ type Recognizer struct {
 	GrammarFileName string
 }
 
-func NewRecognizer() *Recognizer {
-	rec := new(Recognizer)
+func NewBaseRecognizer() *BaseRecognizer {
+	rec := new(BaseRecognizer)
 	rec._listeners = []IErrorListener{ConsoleErrorListenerINSTANCE}
 	rec.state = -1
 	return rec
@@ -43,46 +43,46 @@ func NewRecognizer() *Recognizer {
 var tokenTypeMapCache = make(map[string]int)
 var ruleIndexMapCache = make(map[string]int)
 
-func (this *Recognizer) checkVersion(toolVersion string) {
+func (this *BaseRecognizer) checkVersion(toolVersion string) {
 	var runtimeVersion = "4.5.2"
 	if runtimeVersion != toolVersion {
 		fmt.Println("ANTLR runtime and generated code versions disagree: " + runtimeVersion + "!=" + toolVersion)
 	}
 }
 
-func (this *Recognizer) Action(context IRuleContext, ruleIndex, actionIndex int) {
+func (this *BaseRecognizer) Action(context IRuleContext, ruleIndex, actionIndex int) {
 	panic("action not implemented on Recognizer!")
 }
 
-func (this *Recognizer) addErrorListener(listener IErrorListener) {
+func (this *BaseRecognizer) addErrorListener(listener IErrorListener) {
 	this._listeners = append(this._listeners, listener)
 }
 
-func (this *Recognizer) removeErrorListeners() {
+func (this *BaseRecognizer) removeErrorListeners() {
 	this._listeners = make([]IErrorListener, 0)
 }
 
-func (this *Recognizer) GetRuleNames() []string {
+func (this *BaseRecognizer) GetRuleNames() []string {
 	return this.RuleNames
 }
 
-func (this *Recognizer) GetTokenNames() []string {
+func (this *BaseRecognizer) GetTokenNames() []string {
 	return this.LiteralNames
 }
 
-func (this *Recognizer) GetSymbolicNames() []string {
+func (this *BaseRecognizer) GetSymbolicNames() []string {
 	return this.LiteralNames
 }
 
-func (this *Recognizer) GetLiteralNames() []string {
+func (this *BaseRecognizer) GetLiteralNames() []string {
 	return this.LiteralNames
 }
 
-func (this *Recognizer) GetState() int {
+func (this *BaseRecognizer) GetState() int {
 	return this.state
 }
 
-func (this *Recognizer) SetState(v int) {
+func (this *BaseRecognizer) SetState(v int) {
 	if PortDebug {
 		fmt.Println("SETTING STATE " + strconv.Itoa(v) + " from " +  strconv.Itoa(this.state))
 	}
@@ -108,7 +108,7 @@ func (this *Recognizer) SetState(v int) {
 //
 // <p>Used for XPath and tree pattern compilation.</p>
 //
-func (this *Recognizer) getRuleIndexMap() map[string]int {
+func (this *BaseRecognizer) getRuleIndexMap() map[string]int {
 	panic("Method not defined!")
 	//    var ruleNames = this.GetRuleNames()
 	//    if (ruleNames==nil) {
@@ -123,7 +123,7 @@ func (this *Recognizer) getRuleIndexMap() map[string]int {
 	//    return result
 }
 
-func (this *Recognizer) GetTokenType(tokenName string) int {
+func (this *BaseRecognizer) GetTokenType(tokenName string) int {
 	panic("Method not defined!")
 	//    var ttype = this.GetTokenTypeMap()[tokenName]
 	//    if (ttype !=nil) {
@@ -162,7 +162,7 @@ func (this *Recognizer) GetTokenType(tokenName string) int {
 //}
 
 // What is the error header, normally line/character position information?//
-func (this *Recognizer) getErrorHeader(e IRecognitionException) string {
+func (this *BaseRecognizer) getErrorHeader(e IRecognitionException) string {
 	var line = e.GetOffendingToken().GetLine()
 	var column = e.GetOffendingToken().GetColumn()
 	return "line " + strconv.Itoa(line) + ":" + strconv.Itoa(column)
@@ -181,7 +181,7 @@ func (this *Recognizer) getErrorHeader(e IRecognitionException) string {
 // feature when necessary. For example, see
 // {@link DefaultErrorStrategy//GetTokenErrorDisplay}.
 //
-func (this *Recognizer) GetTokenErrorDisplay(t IToken) string {
+func (this *BaseRecognizer) GetTokenErrorDisplay(t IToken) string {
 	if t == nil {
 		return "<no token>"
 	}
@@ -200,16 +200,16 @@ func (this *Recognizer) GetTokenErrorDisplay(t IToken) string {
 	return "'" + s + "'"
 }
 
-func (this *Recognizer) getErrorListenerDispatch() IErrorListener {
+func (this *BaseRecognizer) getErrorListenerDispatch() IErrorListener {
 	return NewProxyErrorListener(this._listeners)
 }
 
 // subclass needs to override these if there are sempreds or actions
 // that the ATN interp needs to execute
-func (this *Recognizer) Sempred(localctx IRuleContext, ruleIndex int, actionIndex int) bool {
+func (this *BaseRecognizer) Sempred(localctx IRuleContext, ruleIndex int, actionIndex int) bool {
 	return true
 }
 
-func (this *Recognizer) Precpred(localctx IRuleContext, precedence int) bool {
+func (this *BaseRecognizer) Precpred(localctx IRuleContext, precedence int) bool {
 	return true
 }

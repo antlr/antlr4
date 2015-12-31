@@ -52,7 +52,7 @@ func (this *PredPrediction) String() string {
 
 type DFAState struct {
 	stateNumber         int
-	configs             *ATNConfigSet
+	configs ATNConfigSet
 	edges               []*DFAState
 	isAcceptState       bool
 	prediction          int
@@ -61,10 +61,10 @@ type DFAState struct {
 	predicates          []*PredPrediction
 }
 
-func NewDFAState(stateNumber int, configs *ATNConfigSet) *DFAState {
+func NewDFAState(stateNumber int, configs ATNConfigSet) *DFAState {
 
 	if configs == nil {
-		configs = NewATNConfigSet(false)
+		configs = NewBaseATNConfigSet(false)
 	}
 
 	this := new(DFAState)
@@ -109,8 +109,7 @@ func NewDFAState(stateNumber int, configs *ATNConfigSet) *DFAState {
 func (this *DFAState) GetAltSet() *Set {
 	var alts = NewSet(nil, nil)
 	if this.configs != nil {
-		for i := 0; i < len(this.configs.configs); i++ {
-			var c = this.configs.configs[i]
+		for _,c := range this.configs.GetItems() {
 			alts.add(c.GetAlt())
 		}
 	}
@@ -145,7 +144,7 @@ func (this *DFAState) equals(other interface{}) bool {
 		return false
 	}
 
-	return this.configs.equals(other.(*DFAState).configs)
+	return this.configs.Equals(other.(*DFAState).configs)
 }
 
 func (this *DFAState) String() string {

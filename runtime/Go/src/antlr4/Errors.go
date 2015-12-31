@@ -16,14 +16,14 @@ type IRecognitionException interface {
 
 type RecognitionException struct {
 	message        string
-	recognizer     IRecognizer
+	recognizer Recognizer
 	offendingToken IToken
 	offendingState int
 	ctx            IRuleContext
 	input          IntStream
 }
 
-func NewRecognitionException(message string, recognizer IRecognizer, input IntStream, ctx IRuleContext) *RecognitionException {
+func NewRecognitionException(message string, recognizer Recognizer, input IntStream, ctx IRuleContext) *RecognitionException {
 
 	// todo
 	//	Error.call(this)
@@ -98,10 +98,10 @@ type LexerNoViableAltException struct {
 	*RecognitionException
 
 	startIndex     int
-	deadEndConfigs *ATNConfigSet
+	deadEndConfigs ATNConfigSet
 }
 
-func NewLexerNoViableAltException(lexer ILexer, input CharStream, startIndex int, deadEndConfigs *ATNConfigSet) *LexerNoViableAltException {
+func NewLexerNoViableAltException(lexer ILexer, input CharStream, startIndex int, deadEndConfigs ATNConfigSet) *LexerNoViableAltException {
 
 	this := new(LexerNoViableAltException)
 
@@ -127,7 +127,7 @@ type NoViableAltException struct {
 	startToken     IToken
 	offendingToken IToken
 	ctx            IParserRuleContext
-	deadEndConfigs *ATNConfigSet
+	deadEndConfigs ATNConfigSet
 }
 
 // Indicates that the parser could not decide which of two or more paths
@@ -135,7 +135,7 @@ type NoViableAltException struct {
 // of the offending input and also knows where the parser was
 // in the various paths when the error. Reported by ReportNoViableAlternative()
 //
-func NewNoViableAltException(recognizer IParser, input TokenStream, startToken IToken, offendingToken IToken, deadEndConfigs *ATNConfigSet, ctx IParserRuleContext) *NoViableAltException {
+func NewNoViableAltException(recognizer Parser, input TokenStream, startToken IToken, offendingToken IToken, deadEndConfigs ATNConfigSet, ctx IParserRuleContext) *NoViableAltException {
 
 	if ctx == nil {
 		ctx = recognizer.GetParserRuleContext()
@@ -176,7 +176,7 @@ type InputMisMatchException struct {
 // This signifies any kind of misMatched input exceptions such as
 // when the current input does not Match the expected token.
 //
-func NewInputMisMatchException(recognizer IParser) *InputMisMatchException {
+func NewInputMisMatchException(recognizer Parser) *InputMisMatchException {
 
 	this := new(InputMisMatchException)
 	this.RecognitionException = NewRecognitionException("", recognizer, recognizer.GetInputStream(), recognizer.GetParserRuleContext())
@@ -200,7 +200,7 @@ type FailedPredicateException struct {
 	predicate      string
 }
 
-func NewFailedPredicateException(recognizer *Parser, predicate string, message string) *FailedPredicateException {
+func NewFailedPredicateException(recognizer *BaseParser, predicate string, message string) *FailedPredicateException {
 
 	this := new(FailedPredicateException)
 

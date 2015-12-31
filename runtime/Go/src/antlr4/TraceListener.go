@@ -3,10 +3,10 @@ package antlr4
 import "fmt"
 
 type TraceListener struct {
-	parser *Parser
+	parser *BaseParser
 }
 
-func NewTraceListener(parser *Parser) *TraceListener {
+func NewTraceListener(parser *BaseParser) *TraceListener {
 	tl := new(TraceListener)
 	tl.parser = parser
 	return tl
