@@ -21,10 +21,10 @@ type SemanticContext interface {
 }
 
 func SemanticContextandContext(a, b SemanticContext) SemanticContext {
-	if a == nil || a == SemanticContextNONE {
+	if a == nil || a == SemanticContextNone {
 		return b
 	}
-	if b == nil || b == SemanticContextNONE {
+	if b == nil || b == SemanticContextNone {
 		return a
 	}
 	var result = NewAND(a, b)
@@ -42,8 +42,8 @@ func SemanticContextorContext(a, b SemanticContext) SemanticContext {
 	if b == nil {
 		return a
 	}
-	if a == SemanticContextNONE || b == SemanticContextNONE {
-		return SemanticContextNONE
+	if a == SemanticContextNone || b == SemanticContextNone {
+		return SemanticContextNone
 	}
 	var result = NewOR(a, b)
 	if len(result.opnds) == 1 {
@@ -71,7 +71,7 @@ func NewPredicate(ruleIndex, predIndex int, isCtxDependent bool) *Predicate {
 //The default {@link SemanticContext}, which is semantically equivalent to
 //a predicate of the form {@code {true}?}.
 
-var SemanticContextNONE SemanticContext = NewPredicate(-1, -1, false)
+var SemanticContextNone SemanticContext = NewPredicate(-1, -1, false)
 
 func (this *Predicate) evalPrecedence(parser Recognizer, outerContext RuleContext) SemanticContext {
 	return this
@@ -126,7 +126,7 @@ func (this *PrecedencePredicate) evaluate(parser Recognizer, outerContext RuleCo
 
 func (this *PrecedencePredicate) evalPrecedence(parser Recognizer, outerContext RuleContext) SemanticContext {
 	if parser.Precpred(outerContext, this.precedence) {
-		return SemanticContextNONE
+		return SemanticContextNone
 	} else {
 		return nil
 	}
@@ -263,7 +263,7 @@ func (this *AND) evalPrecedence(parser Recognizer, outerContext RuleContext) Sem
 		if evaluated == nil {
 			// The AND context is false if any element is false
 			return nil
-		} else if evaluated != SemanticContextNONE {
+		} else if evaluated != SemanticContextNone {
 			// Reduce the result by skipping true elements
 			operands = append(operands, evaluated)
 		}
@@ -274,7 +274,7 @@ func (this *AND) evalPrecedence(parser Recognizer, outerContext RuleContext) Sem
 
 	if len(operands) == 0 {
 		// all elements were true, so the AND context is true
-		return SemanticContextNONE
+		return SemanticContextNone
 	}
 
 	var result SemanticContext = nil
@@ -395,9 +395,9 @@ func (this *OR) evalPrecedence(parser Recognizer, outerContext RuleContext) Sema
 		var context = this.opnds[i]
 		var evaluated = context.evalPrecedence(parser, outerContext)
 		differs = differs || (evaluated != context)
-		if evaluated == SemanticContextNONE {
+		if evaluated == SemanticContextNone {
 			// The OR context is true if any element is true
-			return SemanticContextNONE
+			return SemanticContextNone
 		} else if evaluated != nil {
 			// Reduce the result by skipping false elements
 			operands = append(operands, evaluated)

@@ -8,16 +8,16 @@ type ParserRuleContext interface {
 	RuleContext
 
 	SetException(RecognitionException)
-	addTokenNode(token IToken) *TerminalNodeImpl
-	addErrorNode(badToken IToken) *ErrorNodeImpl
+	addTokenNode(token Token) *TerminalNodeImpl
+	addErrorNode(badToken Token) *ErrorNodeImpl
 	EnterRule(listener ParseTreeListener)
 	ExitRule(listener ParseTreeListener)
 
-	setStart(IToken)
-	getStart() IToken
+	setStart(Token)
+	getStart() Token
 
-	setStop(IToken)
-	getStop() IToken
+	setStop(Token)
+	getStop() Token
 
 	addChild(child RuleContext) RuleContext
 	removeLastChild()
@@ -27,7 +27,7 @@ type BaseParserRuleContext struct {
 	*BaseRuleContext
 
 	children    []ParseTree
-	start, stop IToken
+	start, stop Token
 	exception RecognitionException
 }
 
@@ -117,7 +117,7 @@ func (prc *BaseParserRuleContext) removeLastChild() {
 	}
 }
 
-func (prc *BaseParserRuleContext) addTokenNode(token IToken) *TerminalNodeImpl {
+func (prc *BaseParserRuleContext) addTokenNode(token Token) *TerminalNodeImpl {
 
 	var node = NewTerminalNodeImpl(token)
 	prc.addTerminalNodeChild(node)
@@ -126,7 +126,7 @@ func (prc *BaseParserRuleContext) addTokenNode(token IToken) *TerminalNodeImpl {
 
 }
 
-func (prc *BaseParserRuleContext) addErrorNode(badToken IToken) *ErrorNodeImpl {
+func (prc *BaseParserRuleContext) addErrorNode(badToken Token) *ErrorNodeImpl {
 	var node = NewErrorNodeImpl(badToken)
 	prc.addTerminalNodeChild(node)
 	node.parentCtx = prc
@@ -159,19 +159,19 @@ func (prc *BaseParserRuleContext) getChildOfType(i int, childType reflect.Type) 
 	}
 }
 
-func (prc *BaseParserRuleContext) setStart(t IToken) {
+func (prc *BaseParserRuleContext) setStart(t Token) {
 	prc.start = t
 }
 
-func (prc *BaseParserRuleContext) getStart() IToken {
+func (prc *BaseParserRuleContext) getStart() Token {
 	return prc.start
 }
 
-func (prc *BaseParserRuleContext) setStop(t IToken) {
+func (prc *BaseParserRuleContext) setStop(t Token) {
 	prc.stop = t
 }
 
-func (prc *BaseParserRuleContext) getStop() IToken {
+func (prc *BaseParserRuleContext) getStop() Token {
 	return prc.stop
 }
 
@@ -240,7 +240,7 @@ func (prc *BaseParserRuleContext) getChildCount() int {
 
 func (prc *BaseParserRuleContext) GetSourceInterval() *Interval {
 	if prc.start == nil || prc.stop == nil {
-		return TreeINVALID_INTERVAL
+		return TreeInvalidInterval
 	} else {
 		return NewInterval(prc.start.GetTokenIndex(), prc.stop.GetTokenIndex())
 	}

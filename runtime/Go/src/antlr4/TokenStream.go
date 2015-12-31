@@ -3,14 +3,14 @@ package antlr4
 type TokenStream interface {
 	IntStream
 
-	LT(k int) IToken
+	LT(k int) Token
 
-	Get(index int) IToken
+	Get(index int) Token
 	GetTokenSource() TokenSource
 	SetTokenSource(TokenSource)
 
 	GetAllText() string
 	GetTextFromInterval(*Interval) string
 	GetTextFromRuleContext(RuleContext) string
-	GetTextFromTokens(IToken, IToken) string
+	GetTextFromTokens(Token, Token) string
 }

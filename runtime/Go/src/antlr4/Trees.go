@@ -53,7 +53,7 @@ func TreesgetNodeText(t Tree, ruleNames []string, recog *BaseParser) string {
 
 	// no recog for rule names
 	var payload = t.getPayload()
-	if p2, ok := payload.(IToken); ok {
+	if p2, ok := payload.(Token); ok {
 		return p2.GetText()
 	}
 

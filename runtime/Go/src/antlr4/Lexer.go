@@ -31,7 +31,7 @@ type BaseLexer struct {
 	_input                  CharStream
 	_factory                TokenFactory
 	_tokenFactorySourcePair *TokenSourceCharStreamPair
-	_token                  IToken
+	_token Token
 	_tokenStartCharIndex    int
 	_tokenStartLine         int
 	_tokenStartColumn       int
@@ -167,7 +167,7 @@ func (l *BaseLexer) safeMatch() (ret int) {
 }
 
 // Return a token from l source i.e., Match a token on the char stream.
-func (l *BaseLexer) nextToken() IToken {
+func (l *BaseLexer) nextToken() Token {
 	if l._input == nil {
 		panic("nextToken requires a non-nil input stream.")
 	}
@@ -287,7 +287,7 @@ func (l *BaseLexer) setInputStream(input CharStream) {
 // and GetToken (to push tokens into a list and pull from that list
 // rather than a single variable as l implementation does).
 // /
-func (l *BaseLexer) emitToken(token IToken) {
+func (l *BaseLexer) emitToken(token Token) {
 	l._token = token
 }
 
@@ -297,7 +297,7 @@ func (l *BaseLexer) emitToken(token IToken) {
 // use that to set the token's text. Override l method to emit
 // custom Token objects or provide a Newfactory.
 // /
-func (l *BaseLexer) emit() IToken {
+func (l *BaseLexer) emit() Token {
 	if PortDebug {
 		fmt.Println("emit")
 	}
@@ -306,7 +306,7 @@ func (l *BaseLexer) emit() IToken {
 	return t
 }
 
-func (l *BaseLexer) emitEOF() IToken {
+func (l *BaseLexer) emitEOF() Token {
 	cpos := l.getCharPositionInLine()
 	lpos := l.getLine()
 	if PortDebug {
@@ -359,11 +359,11 @@ func (this *BaseLexer) GetATN() *ATN {
 // Return a list of all Token objects in input char stream.
 // Forces load of all tokens. Does not include EOF token.
 // /
-func (l *BaseLexer) getAllTokens() []IToken {
+func (l *BaseLexer) getAllTokens() []Token {
 	if PortDebug {
 		fmt.Println("getAllTokens")
 	}
-	var tokens = make([]IToken, 0)
+	var tokens = make([]Token, 0)
 	var t = l.nextToken()
 	for t.GetTokenType() != TokenEOF {
 		tokens = append(tokens, t)

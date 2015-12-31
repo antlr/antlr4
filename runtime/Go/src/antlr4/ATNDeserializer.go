@@ -10,17 +10,16 @@ import (
 
 // This is the earliest supported serialized UUID.
 // stick to serialized version for now, we don't need a UUID instance
-var BASE_SERIALIZED_UUID = "AADB8D7E-AEEF-4415-AD2B-8204D6CF042E"
+var BaseSerializedUUID = "AADB8D7E-AEEF-4415-AD2B-8204D6CF042E"
 
 // This list contains all of the currently supported UUIDs, ordered by when
 // the feature first appeared in this branch.
-var SUPPORTED_UUIDS = []string{BASE_SERIALIZED_UUID}
+var SupportedUUIDs = []string{BaseSerializedUUID}
 
-var SERIALIZED_VERSION = 3
+var SerializedVersion = 3
 
 // This is the current serialized UUID.
-var SERIALIZED_UUID = BASE_SERIALIZED_UUID
-
+var SerializedUUID = BaseSerializedUUID
 
 type LoopEndStateIntPair struct {
 	item0 *LoopEndState
@@ -74,11 +73,11 @@ func stringInSlice(a string, list []string) int {
 // introduced otherwise, {@code false}.
 
 func (this *ATNDeserializer) isFeatureSupported(feature, actualUuid string) bool {
-	var idx1 = stringInSlice(feature, SUPPORTED_UUIDS)
+	var idx1 = stringInSlice(feature, SupportedUUIDs)
 	if idx1 < 0 {
 		return false
 	}
-	var idx2 = stringInSlice(actualUuid, SUPPORTED_UUIDS)
+	var idx2 = stringInSlice(actualUuid, SupportedUUIDs)
 	return idx2 >= idx1
 }
 
@@ -125,15 +124,15 @@ func (this *ATNDeserializer) reset(data []rune) {
 
 func (this *ATNDeserializer) checkVersion() {
 	var version = this.readInt()
-	if version != SERIALIZED_VERSION {
-		panic("Could not deserialize ATN with version " + strconv.Itoa(version) + " (expected " + strconv.Itoa(SERIALIZED_VERSION) + ").")
+	if version != SerializedVersion {
+		panic("Could not deserialize ATN with version " + strconv.Itoa(version) + " (expected " + strconv.Itoa(SerializedVersion) + ").")
 	}
 }
 
 func (this *ATNDeserializer) checkUUID() {
 	var uuid = this.readUUID()
-	if stringInSlice(uuid, SUPPORTED_UUIDS) < 0 {
-		panic("Could not deserialize ATN with UUID: " + uuid + " (expected " + SERIALIZED_UUID + " or a legacy UUID).")
+	if stringInSlice(uuid, SupportedUUIDs) < 0 {
+		panic("Could not deserialize ATN with UUID: " + uuid + " (expected " + SerializedUUID + " or a legacy UUID).")
 	}
 	this.uuid = uuid
 }
@@ -163,7 +162,7 @@ func (this *ATNDeserializer) readStates(atn *ATN) {
 			ruleIndex = -1
 		}
 		var s = this.stateFactory(stype, ruleIndex)
-		if stype == ATNStateLOOP_END {
+		if stype == ATNStateLoopEnd {
 			var loopBackStateNumber = this.readInt()
 			loopBackStateNumbers = append(loopBackStateNumbers, LoopEndStateIntPair{s.(*LoopEndState), loopBackStateNumber})
 		} else if s2, ok := s.(IBlockStartState); ok {
@@ -630,29 +629,29 @@ func (this *ATNDeserializer) stateFactory(typeIndex, ruleIndex int) ATNState {
 	switch typeIndex {
 	case ATNStateInvalidType:
 		return nil
-	case ATNStateBASIC:
+	case ATNStateBasic:
 		s = NewBasicState()
-	case ATNStateRULE_START:
+	case ATNStateRuleStart:
 		s = NewRuleStartState()
-	case ATNStateBLOCK_START:
+	case ATNStateBlockStart:
 		s = NewBasicBlockStartState()
-	case ATNStatePLUS_BLOCK_START:
+	case ATNStatePlusBlockStart:
 		s = NewPlusBlockStartState()
-	case ATNStateSTAR_BLOCK_START:
+	case ATNStateStarBlockStart:
 		s = NewStarBlockStartState()
-	case ATNStateTOKEN_START:
+	case ATNStateTokenStart:
 		s = NewTokensStartState()
-	case ATNStateRULE_STOP:
+	case ATNStateRuleStop:
 		s = NewRuleStopState()
-	case ATNStateBLOCK_END:
+	case ATNStateBlockEnd:
 		s = NewBlockEndState()
-	case ATNStateSTAR_LOOP_BACK:
+	case ATNStateStarLoopBack:
 		s = NewStarLoopbackState()
-	case ATNStateSTAR_LOOP_ENTRY:
+	case ATNStateStarLoopEntry:
 		s = NewStarLoopEntryState()
-	case ATNStatePLUS_LOOP_BACK:
+	case ATNStatePlusLoopBack:
 		s = NewPlusLoopbackState()
-	case ATNStateLOOP_END:
+	case ATNStateLoopEnd:
 		s = NewLoopEndState()
 	default:
 		message := fmt.Sprintf("The specified state type %d is not valid.", typeIndex)
@@ -665,21 +664,21 @@ func (this *ATNDeserializer) stateFactory(typeIndex, ruleIndex int) ATNState {
 
 func (this *ATNDeserializer) lexerActionFactory(typeIndex, data1, data2 int) LexerAction {
 	switch typeIndex {
-	case LexerActionTypeCHANNEL:
+	case LexerActionTypeChannel:
 		return NewLexerChannelAction(data1)
-	case LexerActionTypeCUSTOM:
+	case LexerActionTypeCustom:
 		return NewLexerCustomAction(data1, data2)
-	case LexerActionTypeMODE:
+	case LexerActionTypeMode:
 		return NewLexerModeAction(data1)
-	case LexerActionTypeMORE:
+	case LexerActionTypeMore:
 		return LexerMoreActionINSTANCE
-	case LexerActionTypePOP_MODE:
+	case LexerActionTypePopMode:
 		return LexerPopModeActionINSTANCE
-	case LexerActionTypePUSH_MODE:
+	case LexerActionTypePushMode:
 		return NewLexerPushModeAction(data1)
-	case LexerActionTypeSKIP:
+	case LexerActionTypeSkip:
 		return LexerSkipActionINSTANCE
-	case LexerActionTypeTYPE:
+	case LexerActionTypeType:
 		return NewLexerTypeAction(data1)
 	default:
 		message := fmt.Sprintf("The specified lexer action typeIndex%d is not valid.", typeIndex)

@@ -17,10 +17,10 @@ func NewBaseATNSimulator(atn *ATN, sharedContextCache *PredictionContextCache) *
 
 var ATNSimulatorError = NewDFAState(0x7FFFFFFF, NewBaseATNConfigSet(false))
 
-func (this *BaseATNSimulator) getCachedContext(context IPredictionContext) IPredictionContext {
+func (this *BaseATNSimulator) getCachedContext(context PredictionContext) PredictionContext {
 	if this.sharedContextCache == nil {
 		return context
 	}
-	var visited = make(map[IPredictionContext]IPredictionContext)
-	return getCachedPredictionContext(context, this.sharedContextCache, visited)
+	var visited = make(map[PredictionContext]PredictionContext)
+	return getCachedBasePredictionContext(context, this.sharedContextCache, visited)
 }

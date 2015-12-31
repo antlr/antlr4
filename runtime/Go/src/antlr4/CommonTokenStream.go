@@ -34,7 +34,7 @@ func (bt *CommonTokenStream) Seek(index int) {
 	bt.index = bt.adjustSeekIndex(index)
 }
 
-func (bt *CommonTokenStream) Get(index int) IToken {
+func (bt *CommonTokenStream) Get(index int) Token {
 	bt.lazyInit()
 	return bt.tokens[index]
 }
@@ -97,7 +97,7 @@ func (bt *CommonTokenStream) fetch(n int) int {
 	}
 
 	for i := 0; i < n; i++ {
-		var t IToken = bt.tokenSource.nextToken()
+		var t Token = bt.tokenSource.nextToken()
 		if PortDebug {
 			fmt.Println("fetch loop")
 		}
@@ -116,13 +116,13 @@ func (bt *CommonTokenStream) fetch(n int) int {
 }
 
 // Get all tokens from start..stop inclusively///
-func (bt *CommonTokenStream) GetTokens(start int, stop int, types *IntervalSet) []IToken {
+func (bt *CommonTokenStream) GetTokens(start int, stop int, types *IntervalSet) []Token {
 
 	if start < 0 || stop < 0 {
 		return nil
 	}
 	bt.lazyInit()
-	var subset = make([]IToken, 0)
+	var subset = make([]Token, 0)
 	if stop >= len(bt.tokens) {
 		stop = len(bt.tokens) - 1
 	}
@@ -160,7 +160,7 @@ func (bt *CommonTokenStream) GetTokenSource() TokenSource {
 // Reset bt token stream by setting its token source.///
 func (bt *CommonTokenStream) SetTokenSource(tokenSource TokenSource) {
 	bt.tokenSource = tokenSource
-	bt.tokens = make([]IToken, 0)
+	bt.tokens = make([]Token, 0)
 	bt.index = -1
 }
 
@@ -198,7 +198,7 @@ func (bt *CommonTokenStream) previousTokenOnChannel(i, channel int) int {
 // Collect all tokens on specified channel to the right of
 // the current token up until we see a token on DEFAULT_TOKEN_CHANNEL or
 // EOF. If channel is -1, find any non default channel token.
-func (bt *CommonTokenStream) getHiddenTokensToRight(tokenIndex, channel int) []IToken {
+func (bt *CommonTokenStream) getHiddenTokensToRight(tokenIndex, channel int) []Token {
 	bt.lazyInit()
 	if tokenIndex < 0 || tokenIndex >= len(bt.tokens) {
 		panic(strconv.Itoa(tokenIndex) + " not in 0.." + strconv.Itoa(len(bt.tokens)-1))
@@ -218,7 +218,7 @@ func (bt *CommonTokenStream) getHiddenTokensToRight(tokenIndex, channel int) []I
 // Collect all tokens on specified channel to the left of
 // the current token up until we see a token on DEFAULT_TOKEN_CHANNEL.
 // If channel is -1, find any non default channel token.
-func (bt *CommonTokenStream) getHiddenTokensToLeft(tokenIndex, channel int) []IToken {
+func (bt *CommonTokenStream) getHiddenTokensToLeft(tokenIndex, channel int) []Token {
 	bt.lazyInit()
 	if tokenIndex < 0 || tokenIndex >= len(bt.tokens) {
 		panic(strconv.Itoa(tokenIndex) + " not in 0.." + strconv.Itoa(len(bt.tokens)-1))
@@ -233,8 +233,8 @@ func (bt *CommonTokenStream) getHiddenTokensToLeft(tokenIndex, channel int) []IT
 	return bt.filterForChannel(from_, to, channel)
 }
 
-func (bt *CommonTokenStream) filterForChannel(left, right, channel int) []IToken {
-	var hidden = make([]IToken, 0)
+func (bt *CommonTokenStream) filterForChannel(left, right, channel int) []Token {
+	var hidden = make([]Token, 0)
 	for i := left; i < right+1; i++ {
 		var t = bt.tokens[i]
 		if channel == -1 {
@@ -267,7 +267,7 @@ func (bt *CommonTokenStream) GetAllText() string {
 	return bt.GetTextFromInterval(nil)
 }
 
-func (bt *CommonTokenStream) GetTextFromTokens(start, end IToken) string {
+func (bt *CommonTokenStream) GetTextFromTokens(start, end Token) string {
 	return bt.GetTextFromInterval(NewInterval(start.GetTokenIndex(), end.GetTokenIndex()))
 }
 
@@ -317,7 +317,7 @@ func (bt *CommonTokenStream) fill() {
 type CommonTokenStream struct {
 	tokenSource TokenSource
 
-	tokens     []IToken
+	tokens     []Token
 	index      int
 	fetchedEOF bool
 	channel    int
@@ -333,7 +333,7 @@ func NewCommonTokenStream(lexer Lexer, channel int) *CommonTokenStream {
 	// A collection of all tokens fetched from the token source. The list is
 	// considered a complete view of the input once {@link //fetchedEOF} is set
 	// to {@code true}.
-	ts.tokens = make([]IToken, 0)
+	ts.tokens = make([]Token, 0)
 
 	// The index into {@link //tokens} of the current token (next token to
 	// {@link //consume}). {@link //tokens}{@code [}{@link //p}{@code ]} should
@@ -372,7 +372,7 @@ func (ts *CommonTokenStream) adjustSeekIndex(i int) int {
 	return ts.nextTokenOnChannel(i, ts.channel)
 }
 
-func (ts *CommonTokenStream) LB(k int) IToken {
+func (ts *CommonTokenStream) LB(k int) Token {
 	if k == 0 || ts.index-k < 0 {
 		return nil
 	}
@@ -390,7 +390,7 @@ func (ts *CommonTokenStream) LB(k int) IToken {
 	return ts.tokens[i]
 }
 
-func (ts *CommonTokenStream) LT(k int) IToken {
+func (ts *CommonTokenStream) LT(k int) Token {
 	ts.lazyInit()
 	if k == 0 {
 		return nil

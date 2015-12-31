@@ -7,9 +7,9 @@ import (
 	"strings"
 )
 
-type IErrorStrategy interface {
+type ErrorStrategy interface {
 	reset(Parser)
-	RecoverInline(Parser) IToken
+	RecoverInline(Parser) Token
 	Recover(Parser, RecognitionException)
 	Sync(Parser)
 	inErrorRecoveryMode(Parser) bool
@@ -241,22 +241,22 @@ func (this *DefaultErrorStrategy) Sync(recognizer Parser) {
 	}
 
 	switch s.GetStateType() {
-	case ATNStateBLOCK_START:
+	case ATNStateBlockStart:
 		fallthrough
-	case ATNStateSTAR_BLOCK_START:
+	case ATNStateStarBlockStart:
 		fallthrough
-	case ATNStatePLUS_BLOCK_START:
+	case ATNStatePlusBlockStart:
 		fallthrough
-	case ATNStateSTAR_LOOP_ENTRY:
+	case ATNStateStarLoopEntry:
 		// Report error and recover if possible
 		if this.singleTokenDeletion(recognizer) != nil {
 			return
 		} else {
 			panic(NewInputMisMatchException(recognizer))
 		}
-	case ATNStatePLUS_LOOP_BACK:
+	case ATNStatePlusLoopBack:
 		fallthrough
-	case ATNStateSTAR_LOOP_BACK:
+	case ATNStateStarLoopBack:
 		this.ReportUnwantedToken(recognizer)
 		var expecting = NewIntervalSet()
 		expecting.addSet(recognizer.getExpectedTokens())
@@ -430,7 +430,7 @@ func (this *DefaultErrorStrategy) ReportMissingToken(recognizer Parser) {
 // is in the set of tokens that can follow the {@code ')'} token reference
 // in rule {@code atom}. It can assume that you forgot the {@code ')'}.
 //
-func (this *DefaultErrorStrategy) RecoverInline(recognizer Parser) IToken {
+func (this *DefaultErrorStrategy) RecoverInline(recognizer Parser) Token {
 	// SINGLE TOKEN DELETION
 	var MatchedSymbol = this.singleTokenDeletion(recognizer)
 	if MatchedSymbol != nil {
@@ -499,7 +499,7 @@ func (this *DefaultErrorStrategy) singleTokenInsertion(recognizer Parser) bool {
 // deletion successfully recovers from the misMatched input, otherwise
 // {@code nil}
 //
-func (this *DefaultErrorStrategy) singleTokenDeletion(recognizer Parser) IToken {
+func (this *DefaultErrorStrategy) singleTokenDeletion(recognizer Parser) Token {
 	var nextTokenType = recognizer.GetTokenStream().LA(2)
 	var expecting = this.getExpectedTokens(recognizer)
 	if expecting.contains(nextTokenType) {
@@ -537,7 +537,7 @@ func (this *DefaultErrorStrategy) singleTokenDeletion(recognizer Parser) IToken 
 // If you change what tokens must be created by the lexer,
 // override this method to create the appropriate tokens.
 //
-func (this *DefaultErrorStrategy) getMissingSymbol(recognizer Parser) IToken {
+func (this *DefaultErrorStrategy) getMissingSymbol(recognizer Parser) Token {
 	var currentSymbol = recognizer.getCurrentToken()
 	var expecting = this.getExpectedTokens(recognizer)
 	var expectedTokenType = expecting.first()
@@ -573,7 +573,7 @@ func (this *DefaultErrorStrategy) getExpectedTokens(recognizer Parser) *Interval
 // your token objects because you don't have to go modify your lexer
 // so that it creates a NewJava type.
 //
-func (this *DefaultErrorStrategy) GetTokenErrorDisplay(t IToken) string {
+func (this *DefaultErrorStrategy) GetTokenErrorDisplay(t Token) string {
 	if t == nil {
 		return "<no token>"
 	}

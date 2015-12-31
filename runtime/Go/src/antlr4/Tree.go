@@ -4,7 +4,7 @@ package antlr4
 //  It is the most abstract interface for all the trees used by ANTLR.
 ///
 
-var TreeINVALID_INTERVAL = NewInterval(-1, -2)
+var TreeInvalidInterval = NewInterval(-1, -2)
 
 type Tree interface {
 	GetParent() Tree
@@ -41,7 +41,7 @@ type RuleNode interface {
 type TerminalNode interface {
 	ParseTree
 
-	getSymbol() IToken
+	getSymbol() Token
 }
 
 type ErrorNode interface {
@@ -87,10 +87,10 @@ type ParseTreeListener interface {
 type TerminalNodeImpl struct {
 	parentCtx RuleContext
 
-	symbol IToken
+	symbol Token
 }
 
-func NewTerminalNodeImpl(symbol IToken) *TerminalNodeImpl {
+func NewTerminalNodeImpl(symbol Token) *TerminalNodeImpl {
 	tn := new(TerminalNodeImpl)
 
 	tn.parentCtx = nil
@@ -112,7 +112,7 @@ func (this *TerminalNodeImpl) setChildren(t []Tree) {
 	panic("Cannot set children on terminal node")
 }
 
-func (this *TerminalNodeImpl) getSymbol() IToken {
+func (this *TerminalNodeImpl) getSymbol() Token {
 	return this.symbol
 }
 
@@ -130,7 +130,7 @@ func (this *TerminalNodeImpl) getPayload() interface{} {
 
 func (this *TerminalNodeImpl) GetSourceInterval() *Interval {
 	if this.symbol == nil {
-		return TreeINVALID_INTERVAL
+		return TreeInvalidInterval
 	}
 	var tokenIndex = this.symbol.GetTokenIndex()
 	return NewInterval(tokenIndex, tokenIndex)
@@ -166,7 +166,7 @@ type ErrorNodeImpl struct {
 	*TerminalNodeImpl
 }
 
-func NewErrorNodeImpl(token IToken) *ErrorNodeImpl {
+func NewErrorNodeImpl(token Token) *ErrorNodeImpl {
 	en := new(ErrorNodeImpl)
 	en.TerminalNodeImpl = NewTerminalNodeImpl(token)
 	return en

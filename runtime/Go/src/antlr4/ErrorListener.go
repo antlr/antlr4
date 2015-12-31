@@ -9,7 +9,7 @@ import (
 // default implementation of each method does nothing, but can be overridden as
 // necessary.
 
-type IErrorListener interface {
+type ErrorListener interface {
 	SyntaxError(recognizer Recognizer, offendingSymbol interface{}, line, column int, msg string, e RecognitionException)
 	ReportAmbiguity(recognizer Parser, dfa *DFA, startIndex, stopIndex int, exact bool, ambigAlts *BitSet, configs ATNConfigSet)
 	ReportAttemptingFullContext(recognizer Parser, dfa *DFA, startIndex, stopIndex int, conflictingAlts *BitSet, configs ATNConfigSet)
@@ -78,10 +78,10 @@ func (this *ConsoleErrorListener) SyntaxError(recognizer Recognizer, offendingSy
 
 type ProxyErrorListener struct {
 	*DefaultErrorListener
-	delegates []IErrorListener
+	delegates []ErrorListener
 }
 
-func NewProxyErrorListener(delegates []IErrorListener) *ProxyErrorListener {
+func NewProxyErrorListener(delegates []ErrorListener) *ProxyErrorListener {
 	if delegates == nil {
 		panic("delegates is not provided")
 	}

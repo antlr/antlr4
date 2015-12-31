@@ -5,38 +5,23 @@ import "strconv"
 const (
 // constants for serialization
 	ATNStateInvalidType      = 0
-	ATNStateBASIC            = 1
-	ATNStateRULE_START       = 2
-	ATNStateBLOCK_START      = 3
-	ATNStatePLUS_BLOCK_START = 4
-	ATNStateSTAR_BLOCK_START = 5
-	ATNStateTOKEN_START      = 6
-	ATNStateRULE_STOP        = 7
-	ATNStateBLOCK_END        = 8
-	ATNStateSTAR_LOOP_BACK   = 9
-	ATNStateSTAR_LOOP_ENTRY  = 10
-	ATNStatePLUS_LOOP_BACK   = 11
-	ATNStateLOOP_END         = 12
+	ATNStateBasic = 1
+	ATNStateRuleStart = 2
+	ATNStateBlockStart = 3
+	ATNStatePlusBlockStart = 4
+	ATNStateStarBlockStart = 5
+	ATNStateTokenStart = 6
+	ATNStateRuleStop = 7
+	ATNStateBlockEnd = 8
+	ATNStateStarLoopBack = 9
+	ATNStateStarLoopEntry = 10
+	ATNStatePlusLoopBack = 11
+	ATNStateLoopEnd = 12
 
-	ATNStateINVALID_STATE_NUMBER = -1
+	ATNStateInvalidStateNumber = -1
 )
 
-//var ATNState.serializationNames = [
-//            "INVALID",
-//            "BASIC",
-//            "RULE_START",
-//            "BLOCK_START",
-//            "PLUS_BLOCK_START",
-//            "STAR_BLOCK_START",
-//            "TOKEN_START",
-//            "RULE_STOP",
-//            "BLOCK_END",
-//            "STAR_LOOP_BACK",
-//            "STAR_LOOP_ENTRY",
-//            "PLUS_LOOP_BACK",
-//            "LOOP_END" ]
-
-var INITIAL_NUM_TRANSITIONS = 4
+var ATNStateInitialNumTransitions = 4
 
 type ATNState interface {
 	GetEpsilonOnlyTransitions() bool
@@ -81,7 +66,7 @@ func NewBaseATNState() *BaseATNState {
 
 	// Which ATN are we in?
 	as.atn = nil
-	as.stateNumber = ATNStateINVALID_STATE_NUMBER
+	as.stateNumber = ATNStateInvalidStateNumber
 	as.stateType = ATNStateInvalidType
 	as.ruleIndex = 0 // at runtime, we don't have Rule objects
 	as.epsilonOnlyTransitions = false
@@ -178,7 +163,7 @@ func NewBasicState() *BasicState {
 	this := new(BasicState)
 	this.BaseATNState = NewBaseATNState()
 
-	this.stateType = ATNStateBASIC
+	this.stateType = ATNStateBasic
 	return this
 }
 
@@ -273,7 +258,7 @@ func NewBasicBlockStartState() *BasicBlockStartState {
 
 	this.BlockStartState = NewBlockStartState()
 
-	this.stateType = ATNStateBLOCK_START
+	this.stateType = ATNStateBlockStart
 	return this
 }
 
@@ -290,7 +275,7 @@ func NewBlockEndState() *BlockEndState {
 	this := new(BlockEndState)
 
 	this.BaseATNState = NewBaseATNState()
-	this.stateType = ATNStateBLOCK_END
+	this.stateType = ATNStateBlockEnd
 	this.startState = nil
 
 	return this
@@ -309,7 +294,7 @@ func NewRuleStopState() *RuleStopState {
 	this := new(RuleStopState)
 
 	this.BaseATNState = NewBaseATNState()
-	this.stateType = ATNStateRULE_STOP
+	this.stateType = ATNStateRuleStop
 	return this
 }
 
@@ -325,7 +310,7 @@ func NewRuleStartState() *RuleStartState {
 	this := new(RuleStartState)
 
 	this.BaseATNState = NewBaseATNState()
-	this.stateType = ATNStateRULE_START
+	this.stateType = ATNStateRuleStart
 	this.stopState = nil
 	this.isPrecedenceRule = false
 
@@ -345,7 +330,7 @@ func NewPlusLoopbackState() *PlusLoopbackState {
 
 	this.BaseDecisionState = NewBaseDecisionState()
 
-	this.stateType = ATNStatePLUS_LOOP_BACK
+	this.stateType = ATNStatePlusLoopBack
 	return this
 }
 
@@ -366,7 +351,7 @@ func NewPlusBlockStartState() *PlusBlockStartState {
 
 	this.BlockStartState = NewBlockStartState()
 
-	this.stateType = ATNStatePLUS_BLOCK_START
+	this.stateType = ATNStatePlusBlockStart
 	this.loopBackState = nil
 
 	return this
@@ -383,7 +368,7 @@ func NewStarBlockStartState() *StarBlockStartState {
 
 	this.BlockStartState = NewBlockStartState()
 
-	this.stateType = ATNStateSTAR_BLOCK_START
+	this.stateType = ATNStateStarBlockStart
 
 	return this
 }
@@ -398,7 +383,7 @@ func NewStarLoopbackState() *StarLoopbackState {
 
 	this.BaseATNState = NewBaseATNState()
 
-	this.stateType = ATNStateSTAR_LOOP_BACK
+	this.stateType = ATNStateStarLoopBack
 	return this
 }
 
@@ -415,7 +400,7 @@ func NewStarLoopEntryState() *StarLoopEntryState {
 
 	this.BaseDecisionState = NewBaseDecisionState()
 
-	this.stateType = ATNStateSTAR_LOOP_ENTRY
+	this.stateType = ATNStateStarLoopEntry
 	this.loopBackState = nil
 
 	// Indicates whether this state can benefit from a precedence DFA during SLL decision making.
@@ -437,7 +422,7 @@ func NewLoopEndState() *LoopEndState {
 
 	this.BaseATNState = NewBaseATNState()
 
-	this.stateType = ATNStateLOOP_END
+	this.stateType = ATNStateLoopEnd
 	this.loopBackState = nil
 
 	return this
@@ -454,6 +439,6 @@ func NewTokensStartState() *TokensStartState {
 
 	this.BaseDecisionState = NewBaseDecisionState()
 
-	this.stateType = ATNStateTOKEN_START
+	this.stateType = ATNStateTokenStart
 	return this
 }

@@ -374,7 +374,7 @@ func (this *LexerATNSimulator) computeStartState(input CharStream, p ATNState) *
 	var configs = NewOrderedATNConfigSet()
 	for i := 0; i < len(p.GetTransitions()); i++ {
 		var target = p.GetTransitions()[i].getTarget()
-		var cfg = NewLexerATNConfig6(target, i+1, PredictionContextEMPTY)
+		var cfg = NewLexerATNConfig6(target, i+1, BasePredictionContextEMPTY)
 		this.closure(input, cfg, configs.BaseATNConfigSet, false, false, false)
 	}
 
@@ -416,13 +416,13 @@ func (this *LexerATNSimulator) closure(input CharStream, config *LexerATNConfig,
 				configs.Add(config, nil)
 				return true
 			} else {
-				configs.Add(NewLexerATNConfig2(config, config.state, PredictionContextEMPTY), nil)
+				configs.Add(NewLexerATNConfig2(config, config.state, BasePredictionContextEMPTY), nil)
 				currentAltReachedAcceptState = true
 			}
 		}
 		if config.context != nil && !config.context.isEmpty() {
 			for i := 0; i < config.context.length(); i++ {
-				if config.context.getReturnState(i) != PredictionContextEMPTY_RETURN_STATE {
+				if config.context.getReturnState(i) != BasePredictionContextEMPTY_RETURN_STATE {
 					var newContext = config.context.GetParent(i) // "pop" return state
 					var returnState = this.atn.states[config.context.getReturnState(i)]
 					cfg := NewLexerATNConfig2(config, returnState, newContext)
@@ -458,7 +458,7 @@ func (this *LexerATNSimulator) getEpsilonTarget(input CharStream, config *LexerA
 	if trans.getSerializationType() == TransitionRULE {
 
 		rt := trans.(*RuleTransition)
-		var newContext = SingletonPredictionContextCreate(config.context, rt.followState.GetStateNumber())
+		var newContext = SingletonBasePredictionContextCreate(config.context, rt.followState.GetStateNumber())
 		cfg = NewLexerATNConfig2(config, trans.getTarget(), newContext)
 
 	} else if trans.getSerializationType() == TransitionPRECEDENCE {

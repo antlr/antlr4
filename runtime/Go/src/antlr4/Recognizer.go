@@ -19,12 +19,12 @@ type Recognizer interface {
 	SetState(int)
 	Action(_localctx RuleContext, ruleIndex, actionIndex int)
 	GetATN() *ATN
-	getErrorListenerDispatch() IErrorListener
+	getErrorListenerDispatch() ErrorListener
 
 }
 
 type BaseRecognizer struct {
-	_listeners []IErrorListener
+	_listeners []ErrorListener
 	state      int
 
 	RuleNames  []string
@@ -35,7 +35,7 @@ type BaseRecognizer struct {
 
 func NewBaseRecognizer() *BaseRecognizer {
 	rec := new(BaseRecognizer)
-	rec._listeners = []IErrorListener{ConsoleErrorListenerINSTANCE}
+	rec._listeners = []ErrorListener{ConsoleErrorListenerINSTANCE}
 	rec.state = -1
 	return rec
 }
@@ -54,12 +54,12 @@ func (this *BaseRecognizer) Action(context RuleContext, ruleIndex, actionIndex i
 	panic("action not implemented on Recognizer!")
 }
 
-func (this *BaseRecognizer) addErrorListener(listener IErrorListener) {
+func (this *BaseRecognizer) addErrorListener(listener ErrorListener) {
 	this._listeners = append(this._listeners, listener)
 }
 
 func (this *BaseRecognizer) removeErrorListeners() {
-	this._listeners = make([]IErrorListener, 0)
+	this._listeners = make([]ErrorListener, 0)
 }
 
 func (this *BaseRecognizer) GetRuleNames() []string {
@@ -181,7 +181,7 @@ func (this *BaseRecognizer) getErrorHeader(e RecognitionException) string {
 // feature when necessary. For example, see
 // {@link DefaultErrorStrategy//GetTokenErrorDisplay}.
 //
-func (this *BaseRecognizer) GetTokenErrorDisplay(t IToken) string {
+func (this *BaseRecognizer) GetTokenErrorDisplay(t Token) string {
 	if t == nil {
 		return "<no token>"
 	}
@@ -200,7 +200,7 @@ func (this *BaseRecognizer) GetTokenErrorDisplay(t IToken) string {
 	return "'" + s + "'"
 }
 
-func (this *BaseRecognizer) getErrorListenerDispatch() IErrorListener {
+func (this *BaseRecognizer) getErrorListenerDispatch() ErrorListener {
 	return NewProxyErrorListener(this._listeners)
 }
 

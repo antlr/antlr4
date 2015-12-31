@@ -107,7 +107,7 @@ func (this *BaseRuleContext) isEmpty() bool {
 // satisfy the ParseTree / SyntaxTree interface
 
 func (this *BaseRuleContext) GetSourceInterval() *Interval {
-	return TreeINVALID_INTERVAL
+	return TreeInvalidInterval
 }
 
 func (this *BaseRuleContext) getRuleContext() RuleContext {

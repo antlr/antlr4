@@ -118,7 +118,7 @@ func (this *BaseATNConfigSet) Add(config ATNConfig, mergeCache *DoubleDict) bool
 	if this.readOnly {
 		panic("This set is readonly")
 	}
-	if config.GetSemanticContext() != SemanticContextNONE {
+	if config.GetSemanticContext() != SemanticContextNone {
 		this.hasSemanticContext = true
 	}
 	if config.GetReachesIntoOuterContext() > 0 {
@@ -166,7 +166,7 @@ func (this *BaseATNConfigSet) GetPredicates() []SemanticContext {
 	var preds = make([]SemanticContext, 0)
 	for i := 0; i < len(this.configs); i++ {
 		c := this.configs[i].GetSemanticContext()
-		if c != SemanticContextNONE {
+		if c != SemanticContextNone {
 			preds = append(preds, c)
 		}
 	}

@@ -64,11 +64,7 @@ func (l *<file.grammarName>Listener) Exit<lname; format="cap">(ctx antlr4.Parser
 }; separator="\n">
 
 
-
-
-
 >>
-
 
 VisitorFile(file, header) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
@@ -413,7 +409,7 @@ StarBlock(choice, alts, Sync, iteration) ::= <<
 p.SetState(<choice.stateNumber>)
 p.GetErrorHandler().Sync(p)
 _alt := p.GetInterpreter().AdaptivePredict(p.GetTokenStream(),<choice.decision>,p.GetParserRuleContext())
-for _alt!=<choice.exitAlt> && _alt!= antlr4.ATNINVALID_ALT_NUMBER {
+for _alt!=<choice.exitAlt> && _alt!= antlr4.ATNInvalidAltNumber {
     if(_alt==1<if(!choice.ast.greedy)>+1<endif>) {
         <iteration>
         <alts> <! should only be one !>
@@ -429,7 +425,7 @@ PlusBlock(choice, alts, error) ::= <<
 p.SetState(<choice.blockStartStateNumber>) <! alt block decision !>
 p.GetErrorHandler().Sync(p)
 _alt := 1<if(!choice.ast.greedy)>+1<endif>
-for ok := true; ok; ok = _alt!=<choice.exitAlt> && _alt!= antlr4.ATNINVALID_ALT_NUMBER {
+for ok := true; ok; ok = _alt!=<choice.exitAlt> && _alt!= antlr4.ATNInvalidAltNumber {
 	switch _alt {
 	<alts:{alt|
 case <i><if(!choice.ast.greedy)>+1<endif>:

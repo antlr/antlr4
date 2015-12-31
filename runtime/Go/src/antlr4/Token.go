@@ -15,7 +15,7 @@ type TokenSourceCharStreamPair struct {
 // we obtained this token.
 
 
-type IToken interface {
+type Token interface {
 	GetSource() *TokenSourceCharStreamPair
 	GetTokenType() int
 	GetChannel() int
@@ -34,7 +34,7 @@ type IToken interface {
 	GetInputStream() CharStream
 }
 
-type Token struct {
+type BaseToken struct {
 	source     *TokenSourceCharStreamPair
 	tokenType  int    // token type of the token
 	channel    int    // The parser ignores everything not on DEFAULT_CHANNEL
@@ -70,59 +70,59 @@ const (
 	TokenHiddenChannel = 1
 )
 
-func (this *Token) GetChannel() int {
+func (this *BaseToken) GetChannel() int {
 	return this.channel
 }
 
-func (this *Token) GetStart() int {
+func (this *BaseToken) GetStart() int {
 	return this.start
 }
 
-func (this *Token) GetStop() int {
+func (this *BaseToken) GetStop() int {
 	return this.stop
 }
 
-func (this *Token) GetLine() int {
+func (this *BaseToken) GetLine() int {
 	return this.line
 }
 
-func (this *Token) GetColumn() int {
+func (this *BaseToken) GetColumn() int {
 	return this.column
 }
 
-func (this *Token) GetTokenType() int {
+func (this *BaseToken) GetTokenType() int {
 	return this.tokenType
 }
 
-func (this *Token) GetSource() *TokenSourceCharStreamPair{
+func (this *BaseToken) GetSource() *TokenSourceCharStreamPair{
 	return this.source
 }
 
-func (this *Token) GetTokenIndex() int {
+func (this *BaseToken) GetTokenIndex() int {
 	return this.tokenIndex
 }
 
-func (this *Token) SetTokenIndex(v int) {
+func (this *BaseToken) SetTokenIndex(v int) {
 	this.tokenIndex = v
 }
 
-func (this *Token) GetTokenSource() TokenSource {
+func (this *BaseToken) GetTokenSource() TokenSource {
 	return this.source.tokenSource
 }
 
-func (this *Token) GetInputStream() CharStream {
+func (this *BaseToken) GetInputStream() CharStream {
 	return this.source.charStream
 }
 
 type CommonToken struct {
-	*Token
+	*BaseToken
 }
 
 func NewCommonToken(source *TokenSourceCharStreamPair, tokenType, channel, start, stop int) *CommonToken {
 
 	t := new(CommonToken)
 
-	t.Token = new(Token)
+	t.BaseToken = new(BaseToken)
 
 	t.source = source
 	t.tokenType = tokenType

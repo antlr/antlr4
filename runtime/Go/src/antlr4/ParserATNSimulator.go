@@ -722,7 +722,7 @@ func (this *ParserATNSimulator) computeStartState(p ATNState, ctx RuleContext, f
 //
 func (this *ParserATNSimulator) applyPrecedenceFilter(configs ATNConfigSet) ATNConfigSet {
 
-	var statesFromAlt1 = make(map[int]IPredictionContext)
+	var statesFromAlt1 = make(map[int]PredictionContext)
 	var configSet = NewBaseATNConfigSet(configs.FullContext())
 
 	for _,config := range configs.GetItems() {
@@ -782,8 +782,8 @@ func (this *ParserATNSimulator) getPredsForAmbigAlts(ambigAlts *BitSet, configs 
 	for i := 1; i < nalts+1; i++ {
 		var pred = altToPred[i]
 		if pred == nil {
-			altToPred[i] = SemanticContextNONE
-		} else if pred != SemanticContextNONE {
+			altToPred[i] = SemanticContextNone
+		} else if pred != SemanticContextNone {
 			nPredAlts += 1
 		}
 	}
@@ -806,7 +806,7 @@ func (this *ParserATNSimulator) getPredicatePredictions(ambigAlts *BitSet, altTo
 		if ambigAlts != nil && ambigAlts.contains(i) {
 			pairs = append(pairs, NewPredPrediction(pred, i))
 		}
-		if pred != SemanticContextNONE {
+		if pred != SemanticContextNone {
 			containsPredicate = true
 		}
 	}
@@ -915,7 +915,7 @@ func (this *ParserATNSimulator) splitAccordingToSemanticValidity(configs ATNConf
 	var failed = NewBaseATNConfigSet(configs.FullContext())
 
 	for _, c := range configs.GetItems() {
-		if c.GetSemanticContext() != SemanticContextNONE {
+		if c.GetSemanticContext() != SemanticContextNone {
 			var predicateEvaluationResult = c.GetSemanticContext().evaluate(this.parser, outerContext)
 			if predicateEvaluationResult {
 				succeeded.Add(c, nil)
@@ -939,7 +939,7 @@ func (this *ParserATNSimulator) evalSemanticContext(predPredictions []*PredPredi
 	var predictions = NewBitSet()
 	for i := 0; i < len(predPredictions); i++ {
 		var pair = predPredictions[i]
-		if pair.pred == SemanticContextNONE {
+		if pair.pred == SemanticContextNone {
 			predictions.add(pair.alt)
 			if !complete {
 				break
@@ -985,9 +985,9 @@ func (this *ParserATNSimulator) closureCheckingStopState(config ATNConfig, confi
 		// run thru all possible stack tops in ctx
 		if !config.GetContext().isEmpty() {
 			for i := 0; i < config.GetContext().length(); i++ {
-				if config.GetContext().getReturnState(i) == PredictionContextEMPTY_RETURN_STATE {
+				if config.GetContext().getReturnState(i) == BasePredictionContextEMPTY_RETURN_STATE {
 					if fullCtx {
-						configs.Add(NewBaseATNConfig1(config, config.GetState(), PredictionContextEMPTY), this.mergeCache)
+						configs.Add(NewBaseATNConfig1(config, config.GetState(), BasePredictionContextEMPTY), this.mergeCache)
 						continue
 					} else {
 						// we have no context info, just chase follow links (if greedy)
@@ -1244,7 +1244,7 @@ func (this *ParserATNSimulator) ruleTransition(config ATNConfig, t *RuleTransiti
 		fmt.Println("CALL rule " + this.getRuleName(t.getTarget().GetRuleIndex()) + ", ctx=" + config.GetContext().String())
 	}
 	var returnState = t.followState
-	var newContext = SingletonPredictionContextCreate(config.GetContext(), returnState.GetStateNumber())
+	var newContext = SingletonBasePredictionContextCreate(config.GetContext(), returnState.GetStateNumber())
 	return NewBaseATNConfig1(config, t.getTarget(), newContext)
 }
 

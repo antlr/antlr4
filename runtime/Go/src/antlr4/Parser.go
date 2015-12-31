@@ -5,17 +5,17 @@ type Parser interface {
 	Recognizer
 
 	GetInterpreter() *ParserATNSimulator
-	GetErrorHandler() IErrorStrategy
+	GetErrorHandler() ErrorStrategy
 	GetTokenStream() TokenStream
 	GetTokenFactory() TokenFactory
 	GetParserRuleContext() ParserRuleContext
-	Consume() IToken
+	Consume() Token
 	GetParseListeners() []ParseTreeListener
 
 	GetInputStream() IntStream
-	getCurrentToken() IToken
+	getCurrentToken() Token
 	getExpectedTokens() *IntervalSet
-	NotifyErrorListeners(msg string, offendingToken IToken, err RecognitionException)
+	NotifyErrorListeners(msg string, offendingToken Token, err RecognitionException)
 	isExpectedToken(symbol int) bool
 	getPrecedence() int
 	getRuleInvocationStack(ParserRuleContext) []string
@@ -28,7 +28,7 @@ type BaseParser struct {
 	BuildParseTrees bool
 
 	_input           TokenStream
-	_errHandler      IErrorStrategy
+	_errHandler ErrorStrategy
 	_precedenceStack IntStack
 	_ctx ParserRuleContext
 
@@ -99,7 +99,7 @@ func (p *BaseParser) reset() {
 	}
 }
 
-func (p *BaseParser) GetErrorHandler() IErrorStrategy {
+func (p *BaseParser) GetErrorHandler() ErrorStrategy {
 	return p._errHandler
 }
 
@@ -124,7 +124,7 @@ func (p *BaseParser) GetParseListeners() []ParseTreeListener {
 // {@code ttype} and the error strategy could not recover from the
 // misMatched symbol
 
-func (p *BaseParser) Match(ttype int) IToken {
+func (p *BaseParser) Match(ttype int) Token {
 
 	if PortDebug {
 		fmt.Println("get current token")
@@ -171,7 +171,7 @@ func (p *BaseParser) Match(ttype int) IToken {
 // a wildcard and the error strategy could not recover from the misMatched
 // symbol
 
-func (p *BaseParser) MatchWildcard() IToken {
+func (p *BaseParser) MatchWildcard() Token {
 	var t = p.getCurrentToken()
 	if t.GetTokenType() > 0 {
 		p._errHandler.ReportMatch(p)
@@ -399,11 +399,11 @@ func (p *BaseParser) setTokenStream(input TokenStream) {
 // Match needs to return the current input symbol, which gets put
 // into the label for the associated token ref e.g., x=ID.
 //
-func (p *BaseParser) getCurrentToken() IToken {
+func (p *BaseParser) getCurrentToken() Token {
 	return p._input.LT(1)
 }
 
-func (p *BaseParser) NotifyErrorListeners(msg string, offendingToken IToken, err RecognitionException) {
+func (p *BaseParser) NotifyErrorListeners(msg string, offendingToken Token, err RecognitionException) {
 	if offendingToken == nil {
 		offendingToken = p.getCurrentToken()
 	}
@@ -414,7 +414,7 @@ func (p *BaseParser) NotifyErrorListeners(msg string, offendingToken IToken, err
 	listener.SyntaxError(p, offendingToken, line, column, msg, err)
 }
 
-func (p *BaseParser) Consume() IToken {
+func (p *BaseParser) Consume() Token {
 	var o = p.getCurrentToken()
 	if o.GetTokenType() != TokenEOF {
 		if PortDebug {

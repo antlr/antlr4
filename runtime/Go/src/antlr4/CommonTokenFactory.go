@@ -7,7 +7,7 @@ package antlr4
 import "fmt"
 
 type TokenFactory interface {
-	Create(source *TokenSourceCharStreamPair, ttype int, text string, channel, start, stop, line, column int) IToken
+	Create(source *TokenSourceCharStreamPair, ttype int, text string, channel, start, stop, line, column int) Token
 }
 
 type CommonTokenFactory struct {
@@ -46,7 +46,7 @@ func NewCommonTokenFactory(copyText bool) *CommonTokenFactory {
 //
 var CommonTokenFactoryDEFAULT = NewCommonTokenFactory(false)
 
-func (this *CommonTokenFactory) Create(source *TokenSourceCharStreamPair, ttype int, text string, channel, start, stop, line, column int) IToken {
+func (this *CommonTokenFactory) Create(source *TokenSourceCharStreamPair, ttype int, text string, channel, start, stop, line, column int) Token {
 
 	if PortDebug {
 		fmt.Println("Token factory creating: " + text)
@@ -65,7 +65,7 @@ func (this *CommonTokenFactory) Create(source *TokenSourceCharStreamPair, ttype 
 
 }
 
-func (this *CommonTokenFactory) createThin(ttype int, text string) IToken {
+func (this *CommonTokenFactory) createThin(ttype int, text string) Token {
 
 	if PortDebug {
 		fmt.Println("Token factory creating: " + text)

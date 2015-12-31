@@ -3,14 +3,14 @@ package antlr4
 import "strconv"
 
 const (
-	LexerActionTypeCHANNEL   = 0 //The type of a {@link LexerChannelAction} action.
-	LexerActionTypeCUSTOM    = 1 //The type of a {@link LexerCustomAction} action.
-	LexerActionTypeMODE      = 2 //The type of a {@link LexerModeAction} action.
-	LexerActionTypeMORE      = 3 //The type of a {@link LexerMoreAction} action.
-	LexerActionTypePOP_MODE  = 4 //The type of a {@link LexerPopModeAction} action.
-	LexerActionTypePUSH_MODE = 5 //The type of a {@link LexerPushModeAction} action.
-	LexerActionTypeSKIP      = 6 //The type of a {@link LexerSkipAction} action.
-	LexerActionTypeTYPE      = 7 //The type of a {@link LexerTypeAction} action.
+	LexerActionTypeChannel = 0 //The type of a {@link LexerChannelAction} action.
+	LexerActionTypeCustom = 1 //The type of a {@link LexerCustomAction} action.
+	LexerActionTypeMode = 2 //The type of a {@link LexerModeAction} action.
+	LexerActionTypeMore = 3 //The type of a {@link LexerMoreAction} action.
+	LexerActionTypePopMode = 4 //The type of a {@link LexerPopModeAction} action.
+	LexerActionTypePushMode = 5 //The type of a {@link LexerPushModeAction} action.
+	LexerActionTypeSkip = 6 //The type of a {@link LexerSkipAction} action.
+	LexerActionTypeType = 7 //The type of a {@link LexerTypeAction} action.
 )
 
 type LexerAction interface {
@@ -67,7 +67,7 @@ type LexerSkipAction struct {
 
 func NewLexerSkipAction() *LexerSkipAction {
 	la := new(LexerSkipAction)
-	la.BaseLexerAction = NewBaseLexerAction(LexerActionTypeSKIP)
+	la.BaseLexerAction = NewBaseLexerAction(LexerActionTypeSkip)
 	return la
 }
 
@@ -92,7 +92,7 @@ type LexerTypeAction struct {
 
 func NewLexerTypeAction(_type int) *LexerTypeAction {
 	this := new(LexerTypeAction)
-	this.BaseLexerAction = NewBaseLexerAction(LexerActionTypeTYPE)
+	this.BaseLexerAction = NewBaseLexerAction(LexerActionTypeType)
 	this._type = _type
 	return this
 }
@@ -130,7 +130,7 @@ type LexerPushModeAction struct {
 func NewLexerPushModeAction(mode int) *LexerPushModeAction {
 
 	this := new(LexerPushModeAction)
-	this.BaseLexerAction = NewBaseLexerAction(LexerActionTypePUSH_MODE)
+	this.BaseLexerAction = NewBaseLexerAction(LexerActionTypePushMode)
 
 	this.mode = mode
 	return this
@@ -172,7 +172,7 @@ func NewLexerPopModeAction() *LexerPopModeAction {
 
 	this := new(LexerPopModeAction)
 
-	this.BaseLexerAction = NewBaseLexerAction(LexerActionTypePOP_MODE)
+	this.BaseLexerAction = NewBaseLexerAction(LexerActionTypePopMode)
 
 	return this
 }
@@ -199,7 +199,7 @@ type LexerMoreAction struct {
 
 func NewLexerMoreAction() *LexerModeAction {
 	this := new(LexerModeAction)
-	this.BaseLexerAction = NewBaseLexerAction(LexerActionTypeMORE)
+	this.BaseLexerAction = NewBaseLexerAction(LexerActionTypeMore)
 
 	return this
 }
@@ -225,7 +225,7 @@ type LexerModeAction struct {
 
 func NewLexerModeAction(mode int) *LexerModeAction {
 	this := new(LexerModeAction)
-	this.BaseLexerAction = NewBaseLexerAction(LexerActionTypeMODE)
+	this.BaseLexerAction = NewBaseLexerAction(LexerActionTypeMode)
 	this.mode = mode
 	return this
 }
@@ -278,7 +278,7 @@ type LexerCustomAction struct {
 
 func NewLexerCustomAction(ruleIndex, actionIndex int) *LexerCustomAction {
 	this := new(LexerCustomAction)
-	this.BaseLexerAction = NewBaseLexerAction(LexerActionTypeCUSTOM)
+	this.BaseLexerAction = NewBaseLexerAction(LexerActionTypeCustom)
 	this.ruleIndex = ruleIndex
 	this.actionIndex = actionIndex
 	this.isPositionDependent = true
@@ -317,7 +317,7 @@ type LexerChannelAction struct {
 
 func NewLexerChannelAction(channel int) *LexerChannelAction {
 	this := new(LexerChannelAction)
-	this.BaseLexerAction = NewBaseLexerAction(LexerActionTypeCHANNEL)
+	this.BaseLexerAction = NewBaseLexerAction(LexerActionTypeChannel)
 	this.channel = channel
 	return this
 }

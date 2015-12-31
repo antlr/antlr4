@@ -5,24 +5,24 @@ import (
 	"strconv"
 )
 
-type IPredictionContext interface {
+type PredictionContext interface {
 	Hash() string
-	GetParent(int) IPredictionContext
+	GetParent(int) PredictionContext
 	getReturnState(int) int
-	equals(IPredictionContext) bool
+	equals(PredictionContext) bool
 	length() int
 	isEmpty() bool
 	hasEmptyPath() bool
 	String() string
 }
 
-type PredictionContext struct {
+type BasePredictionContext struct {
 	cachedHashString string
 }
 
-func NewPredictionContext(cachedHashString string) *PredictionContext {
+func NewBasePredictionContext(cachedHashString string) *BasePredictionContext {
 
-	pc := new(PredictionContext)
+	pc := new(BasePredictionContext)
 	pc.cachedHashString = cachedHashString
 
 	return pc
@@ -32,7 +32,7 @@ func NewPredictionContext(cachedHashString string) *PredictionContext {
 // {@code//+x =//}.
 // /
 const (
-	PredictionContextEMPTY_RETURN_STATE = 0x7FFFFFFF
+	BasePredictionContextEMPTY_RETURN_STATE = 0x7FFFFFFF
 )
 
 // Represents {@code $} in an array in full context mode, when {@code $}
@@ -40,10 +40,10 @@ const (
 // {@code $} = {@link //EMPTY_RETURN_STATE}.
 // /
 
-var PredictionContextglobalNodeCount = 1
-var PredictionContextid = PredictionContextglobalNodeCount
+var BasePredictionContextglobalNodeCount = 1
+var BasePredictionContextid = BasePredictionContextglobalNodeCount
 
-// Stores the computed hash code of this {@link PredictionContext}. The hash
+// Stores the computed hash code of this {@link BasePredictionContext}. The hash
 // code is computed in parts to Match the following reference algorithm.
 //
 // <pre>
@@ -68,15 +68,15 @@ var PredictionContextid = PredictionContextglobalNodeCount
 // </pre>
 //
 
-func (this *PredictionContext) isEmpty() bool {
+func (this *BasePredictionContext) isEmpty() bool {
 	return false
 }
 
-func (this *PredictionContext) Hash() string {
+func (this *BasePredictionContext) Hash() string {
 	return this.cachedHashString
 }
 
-func calculateHashString(parent IPredictionContext, returnState int) string {
+func calculateHashString(parent PredictionContext, returnState int) string {
 	return parent.String() + strconv.Itoa(returnState)
 }
 
@@ -84,17 +84,17 @@ func calculateEmptyHashString() string {
 	return ""
 }
 
-// Used to cache {@link PredictionContext} objects. Its used for the shared
+// Used to cache {@link BasePredictionContext} objects. Its used for the shared
 // context cash associated with contexts in DFA states. This cache
 // can be used for both lexers and parsers.
 
 type PredictionContextCache struct {
-	cache map[IPredictionContext]IPredictionContext
+	cache map[PredictionContext]PredictionContext
 }
 
 func NewPredictionContextCache() *PredictionContextCache {
 	t := new(PredictionContextCache)
-	t.cache = make(map[IPredictionContext]IPredictionContext)
+	t.cache = make(map[PredictionContext]PredictionContext)
 	return t
 }
 
@@ -102,9 +102,9 @@ func NewPredictionContextCache() *PredictionContextCache {
 // return that one instead and do not add a Newcontext to the cache.
 // Protect shared cache from unsafe thread access.
 //
-func (this *PredictionContextCache) add(ctx IPredictionContext) IPredictionContext {
-	if ctx == PredictionContextEMPTY {
-		return PredictionContextEMPTY
+func (this *PredictionContextCache) add(ctx PredictionContext) PredictionContext {
+	if ctx == BasePredictionContextEMPTY {
+		return BasePredictionContextEMPTY
 	}
 	var existing = this.cache[ctx]
 	if existing != nil {
@@ -114,7 +114,7 @@ func (this *PredictionContextCache) add(ctx IPredictionContext) IPredictionConte
 	return ctx
 }
 
-func (this *PredictionContextCache) Get(ctx IPredictionContext) IPredictionContext {
+func (this *PredictionContextCache) Get(ctx PredictionContext) PredictionContext {
 	return this.cache[ctx]
 }
 
@@ -122,21 +122,21 @@ func (this *PredictionContextCache) length() int {
 	return len(this.cache)
 }
 
-type ISingletonPredictionContext interface {
-	IPredictionContext
+type SingletonPredictionContext interface {
+	PredictionContext
 }
 
-type SingletonPredictionContext struct {
-	*PredictionContext
+type BaseSingletonPredictionContext struct {
+	*BasePredictionContext
 
-	parentCtx   IPredictionContext
+	parentCtx PredictionContext
 	returnState int
 }
 
-func NewSingletonPredictionContext(parent IPredictionContext, returnState int) *SingletonPredictionContext {
+func NewBaseSingletonPredictionContext(parent PredictionContext, returnState int) *BaseSingletonPredictionContext {
 
-	s := new(SingletonPredictionContext)
-	s.PredictionContext = NewPredictionContext("")
+	s := new(BaseSingletonPredictionContext)
+	s.BasePredictionContext = NewBasePredictionContext("")
 
 	if parent != nil {
 		s.cachedHashString = calculateHashString(parent, returnState)
@@ -150,41 +150,41 @@ func NewSingletonPredictionContext(parent IPredictionContext, returnState int) *
 	return s
 }
 
-func SingletonPredictionContextCreate(parent IPredictionContext, returnState int) IPredictionContext {
-	if returnState == PredictionContextEMPTY_RETURN_STATE && parent == nil {
+func SingletonBasePredictionContextCreate(parent PredictionContext, returnState int) PredictionContext {
+	if returnState == BasePredictionContextEMPTY_RETURN_STATE && parent == nil {
 		// someone can pass in the bits of an array ctx that mean $
-		return PredictionContextEMPTY
+		return BasePredictionContextEMPTY
 	} else {
-		return NewSingletonPredictionContext(parent, returnState)
+		return NewBaseSingletonPredictionContext(parent, returnState)
 	}
 }
 
-func (this *SingletonPredictionContext) length() int {
+func (this *BaseSingletonPredictionContext) length() int {
 	return 1
 }
 
-func (this *SingletonPredictionContext) GetParent(index int) IPredictionContext {
+func (this *BaseSingletonPredictionContext) GetParent(index int) PredictionContext {
 	return this.parentCtx
 }
 
-func (this *SingletonPredictionContext) getReturnState(index int) int {
+func (this *BaseSingletonPredictionContext) getReturnState(index int) int {
 	return this.returnState
 }
 
-func (this *SingletonPredictionContext) hasEmptyPath() bool {
-	return this.returnState == PredictionContextEMPTY_RETURN_STATE
+func (this *BaseSingletonPredictionContext) hasEmptyPath() bool {
+	return this.returnState == BasePredictionContextEMPTY_RETURN_STATE
 }
 
-func (this *SingletonPredictionContext) equals(other IPredictionContext) bool {
+func (this *BaseSingletonPredictionContext) equals(other PredictionContext) bool {
 	if this == other {
 		return true
-	} else if _, ok := other.(*SingletonPredictionContext); !ok {
+	} else if _, ok := other.(*BaseSingletonPredictionContext); !ok {
 		return false
 	} else if this.Hash() != other.Hash() {
 		return false // can't be same if hash is different
 	} else {
 
-		otherP := other.(*SingletonPredictionContext)
+		otherP := other.(*BaseSingletonPredictionContext)
 
 		if this.returnState != other.getReturnState(0) {
 			return false
@@ -196,11 +196,11 @@ func (this *SingletonPredictionContext) equals(other IPredictionContext) bool {
 	}
 }
 
-func (this *SingletonPredictionContext) Hash() string {
+func (this *BaseSingletonPredictionContext) Hash() string {
 	return this.cachedHashString
 }
 
-func (this *SingletonPredictionContext) String() string {
+func (this *BaseSingletonPredictionContext) String() string {
 	var up string
 
 	if this.parentCtx == nil {
@@ -210,7 +210,7 @@ func (this *SingletonPredictionContext) String() string {
 	}
 
 	if len(up) == 0 {
-		if this.returnState == PredictionContextEMPTY_RETURN_STATE {
+		if this.returnState == BasePredictionContextEMPTY_RETURN_STATE {
 			return "$"
 		} else {
 			return strconv.Itoa(this.returnState)
@@ -220,17 +220,17 @@ func (this *SingletonPredictionContext) String() string {
 	}
 }
 
-var PredictionContextEMPTY = NewEmptyPredictionContext()
+var BasePredictionContextEMPTY = NewEmptyPredictionContext()
 
 type EmptyPredictionContext struct {
-	*SingletonPredictionContext
+	*BaseSingletonPredictionContext
 }
 
 func NewEmptyPredictionContext() *EmptyPredictionContext {
 
 	p := new(EmptyPredictionContext)
 
-	p.SingletonPredictionContext = NewSingletonPredictionContext(nil, PredictionContextEMPTY_RETURN_STATE)
+	p.BaseSingletonPredictionContext = NewBaseSingletonPredictionContext(nil, BasePredictionContextEMPTY_RETURN_STATE)
 
 	return p
 }
@@ -239,7 +239,7 @@ func (this *EmptyPredictionContext) isEmpty() bool {
 	return true
 }
 
-func (this *EmptyPredictionContext) GetParent(index int) IPredictionContext {
+func (this *EmptyPredictionContext) GetParent(index int) PredictionContext {
 	return nil
 }
 
@@ -247,7 +247,7 @@ func (this *EmptyPredictionContext) getReturnState(index int) int {
 	return this.returnState
 }
 
-func (this *EmptyPredictionContext) equals(other IPredictionContext) bool {
+func (this *EmptyPredictionContext) equals(other PredictionContext) bool {
 	return this == other
 }
 
@@ -256,20 +256,20 @@ func (this *EmptyPredictionContext) String() string {
 }
 
 type ArrayPredictionContext struct {
-	*PredictionContext
+	*BasePredictionContext
 
-	parents      []IPredictionContext
+	parents      []PredictionContext
 	returnStates []int
 }
 
-func NewArrayPredictionContext(parents []IPredictionContext, returnStates []int) *ArrayPredictionContext {
+func NewArrayPredictionContext(parents []PredictionContext, returnStates []int) *ArrayPredictionContext {
 	// Parent can be nil only if full ctx mode and we make an array
 	// from {@link //EMPTY} and non-empty. We merge {@link //EMPTY} by using
 	// nil parent and
 	// returnState == {@link //EMPTY_RETURN_STATE}.
 
 	c := new(ArrayPredictionContext)
-	c.PredictionContext = NewPredictionContext("")
+	c.BasePredictionContext = NewBasePredictionContext("")
 
 	for i := range parents {
 		c.cachedHashString += calculateHashString(parents[i], returnStates[i])
@@ -286,20 +286,20 @@ func (c *ArrayPredictionContext) GetReturnStates() []int {
 }
 
 func (this *ArrayPredictionContext) hasEmptyPath() bool {
-	return this.getReturnState(this.length()-1) == PredictionContextEMPTY_RETURN_STATE
+	return this.getReturnState(this.length()-1) == BasePredictionContextEMPTY_RETURN_STATE
 }
 
 func (this *ArrayPredictionContext) isEmpty() bool {
 	// since EMPTY_RETURN_STATE can only appear in the last position, we
 	// don't need to verify that size==1
-	return this.returnStates[0] == PredictionContextEMPTY_RETURN_STATE
+	return this.returnStates[0] == BasePredictionContextEMPTY_RETURN_STATE
 }
 
 func (this *ArrayPredictionContext) length() int {
 	return len(this.returnStates)
 }
 
-func (this *ArrayPredictionContext) GetParent(index int) IPredictionContext {
+func (this *ArrayPredictionContext) GetParent(index int) PredictionContext {
 	return this.parents[index]
 }
 
@@ -307,7 +307,7 @@ func (this *ArrayPredictionContext) getReturnState(index int) int {
 	return this.returnStates[index]
 }
 
-func (this *ArrayPredictionContext) equals(other IPredictionContext) bool {
+func (this *ArrayPredictionContext) equals(other PredictionContext) bool {
 	if _, ok := other.(*ArrayPredictionContext); !ok {
 		return false
 	} else if this.cachedHashString != other.Hash() {
@@ -327,7 +327,7 @@ func (this *ArrayPredictionContext) String() string {
 			if i > 0 {
 				s = s + ", "
 			}
-			if this.returnStates[i] == PredictionContextEMPTY_RETURN_STATE {
+			if this.returnStates[i] == BasePredictionContextEMPTY_RETURN_STATE {
 				s = s + "$"
 				continue
 			}
@@ -342,27 +342,27 @@ func (this *ArrayPredictionContext) String() string {
 	}
 }
 
-// Convert a {@link RuleContext} tree to a {@link PredictionContext} graph.
+// Convert a {@link RuleContext} tree to a {@link BasePredictionContext} graph.
 // Return {@link //EMPTY} if {@code outerContext} is empty or nil.
 // /
-func predictionContextFromRuleContext(a *ATN, outerContext RuleContext) IPredictionContext {
+func predictionContextFromRuleContext(a *ATN, outerContext RuleContext) PredictionContext {
 	if outerContext == nil {
 		outerContext = RuleContextEMPTY
 	}
-	// if we are in RuleContext of start rule, s, then PredictionContext
+	// if we are in RuleContext of start rule, s, then BasePredictionContext
 	// is EMPTY. Nobody called us. (if we are empty, return empty)
 	if outerContext.GetParent() == nil || outerContext == RuleContextEMPTY {
-		return PredictionContextEMPTY
+		return BasePredictionContextEMPTY
 	}
-	// If we have a parent, convert it to a PredictionContext graph
+	// If we have a parent, convert it to a BasePredictionContext graph
 	var parent = predictionContextFromRuleContext(a, outerContext.GetParent().(RuleContext))
 	var state = a.states[outerContext.getInvokingState()]
 	var transition = state.GetTransitions()[0]
 
-	return SingletonPredictionContextCreate(parent, transition.(*RuleTransition).followState.GetStateNumber())
+	return SingletonBasePredictionContextCreate(parent, transition.(*RuleTransition).followState.GetStateNumber())
 }
 
-func calculateListsHashString(parents []PredictionContext, returnStates []int) string {
+func calculateListsHashString(parents []BasePredictionContext, returnStates []int) string {
 	var s = ""
 
 	for _, p := range parents {
@@ -376,14 +376,14 @@ func calculateListsHashString(parents []PredictionContext, returnStates []int) s
 	return s
 }
 
-func merge(a, b IPredictionContext, rootIsWildcard bool, mergeCache *DoubleDict) IPredictionContext {
+func merge(a, b PredictionContext, rootIsWildcard bool, mergeCache *DoubleDict) PredictionContext {
 	// share same graph if both same
 	if a == b {
 		return a
 	}
 
-	ac, ok1 := a.(*SingletonPredictionContext)
-	bc, ok2 := a.(*SingletonPredictionContext)
+	ac, ok1 := a.(*BaseSingletonPredictionContext)
+	bc, ok2 := a.(*BaseSingletonPredictionContext)
 
 	if ok1 && ok2 {
 		return mergeSingletons(ac, bc, rootIsWildcard, mergeCache)
@@ -399,17 +399,17 @@ func merge(a, b IPredictionContext, rootIsWildcard bool, mergeCache *DoubleDict)
 		}
 	}
 	// convert singleton so both are arrays to normalize
-	if _, ok := a.(*SingletonPredictionContext); ok {
-		a = NewArrayPredictionContext([]IPredictionContext{a.GetParent(0)}, []int{a.getReturnState(0)})
+	if _, ok := a.(*BaseSingletonPredictionContext); ok {
+		a = NewArrayPredictionContext([]PredictionContext{a.GetParent(0)}, []int{a.getReturnState(0)})
 	}
-	if _, ok := b.(*SingletonPredictionContext); ok {
-		b = NewArrayPredictionContext([]IPredictionContext{b.GetParent(0)}, []int{b.getReturnState(0)})
+	if _, ok := b.(*BaseSingletonPredictionContext); ok {
+		b = NewArrayPredictionContext([]PredictionContext{b.GetParent(0)}, []int{b.getReturnState(0)})
 	}
 	return mergeArrays(a.(*ArrayPredictionContext), b.(*ArrayPredictionContext), rootIsWildcard, mergeCache)
 }
 
 //
-// Merge two {@link SingletonPredictionContext} instances.
+// Merge two {@link SingletonBasePredictionContext} instances.
 //
 // <p>Stack tops equal, parents merge is same return left graph.<br>
 // <embed src="images/SingletonMerge_SameRootSamePar.svg"
@@ -433,21 +433,21 @@ func merge(a, b IPredictionContext, rootIsWildcard bool, mergeCache *DoubleDict)
 // <embed src="images/SingletonMerge_DiffRootDiffPar.svg"
 // type="image/svg+xml"/></p>
 //
-// @param a the first {@link SingletonPredictionContext}
-// @param b the second {@link SingletonPredictionContext}
+// @param a the first {@link SingletonBasePredictionContext}
+// @param b the second {@link SingletonBasePredictionContext}
 // @param rootIsWildcard {@code true} if this is a local-context merge,
 // otherwise false to indicate a full-context merge
 // @param mergeCache
 // /
-func mergeSingletons(a, b *SingletonPredictionContext, rootIsWildcard bool, mergeCache *DoubleDict) IPredictionContext {
+func mergeSingletons(a, b *BaseSingletonPredictionContext, rootIsWildcard bool, mergeCache *DoubleDict) PredictionContext {
 	if mergeCache != nil {
 		var previous = mergeCache.Get(a.Hash(), b.Hash())
 		if previous != nil {
-			return previous.(IPredictionContext)
+			return previous.(PredictionContext)
 		}
 		previous = mergeCache.Get(b.Hash(), a.Hash())
 		if previous != nil {
-			return previous.(IPredictionContext)
+			return previous.(PredictionContext)
 		}
 	}
 
@@ -472,14 +472,14 @@ func mergeSingletons(a, b *SingletonPredictionContext, rootIsWildcard bool, merg
 		// merge parents x and y, giving array node with x,y then remainders
 		// of those graphs. dup a, a' points at merged array
 		// Newjoined parent so create Newsingleton pointing to it, a'
-		var spc = SingletonPredictionContextCreate(parent, a.returnState)
+		var spc = SingletonBasePredictionContextCreate(parent, a.returnState)
 		if mergeCache != nil {
 			mergeCache.set(a.Hash(), b.Hash(), spc)
 		}
 		return spc
 	} else { // a != b payloads differ
 		// see if we can collapse parents due to $+x parents if local ctx
-		var singleParent IPredictionContext = nil
+		var singleParent PredictionContext = nil
 		if a == b || (a.parentCtx != nil && a.parentCtx == b.parentCtx) { // ax +
 			// bx =
 			// [a,b]x
@@ -492,7 +492,7 @@ func mergeSingletons(a, b *SingletonPredictionContext, rootIsWildcard bool, merg
 				payloads[0] = b.returnState
 				payloads[1] = a.returnState
 			}
-			var parents = []IPredictionContext{singleParent, singleParent}
+			var parents = []PredictionContext{singleParent, singleParent}
 			var apc = NewArrayPredictionContext(parents, payloads)
 			if mergeCache != nil {
 				mergeCache.set(a.Hash(), b.Hash(), apc)
@@ -503,11 +503,11 @@ func mergeSingletons(a, b *SingletonPredictionContext, rootIsWildcard bool, merg
 		// into array can't merge.
 		// ax + by = [ax,by]
 		var payloads = []int{a.returnState, b.returnState}
-		var parents = []IPredictionContext{a.parentCtx, b.parentCtx}
+		var parents = []PredictionContext{a.parentCtx, b.parentCtx}
 		if a.returnState > b.returnState { // sort by payload
 			payloads[0] = b.returnState
 			payloads[1] = a.returnState
-			parents = []IPredictionContext{b.parentCtx, a.parentCtx}
+			parents = []PredictionContext{b.parentCtx, a.parentCtx}
 		}
 		var a_ = NewArrayPredictionContext(parents, payloads)
 		if mergeCache != nil {
@@ -550,29 +550,29 @@ func mergeSingletons(a, b *SingletonPredictionContext, rootIsWildcard bool, merg
 //
 // <p><embed src="images/FullMerge_SameRoot.svg" type="image/svg+xml"/></p>
 //
-// @param a the first {@link SingletonPredictionContext}
-// @param b the second {@link SingletonPredictionContext}
+// @param a the first {@link SingletonBasePredictionContext}
+// @param b the second {@link SingletonBasePredictionContext}
 // @param rootIsWildcard {@code true} if this is a local-context merge,
 // otherwise false to indicate a full-context merge
 // /
-func mergeRoot(a, b ISingletonPredictionContext, rootIsWildcard bool) IPredictionContext {
+func mergeRoot(a, b SingletonPredictionContext, rootIsWildcard bool) PredictionContext {
 	if rootIsWildcard {
-		if a == PredictionContextEMPTY {
-			return PredictionContextEMPTY // // + b =//
+		if a == BasePredictionContextEMPTY {
+			return BasePredictionContextEMPTY // // + b =//
 		}
-		if b == PredictionContextEMPTY {
-			return PredictionContextEMPTY // a +// =//
+		if b == BasePredictionContextEMPTY {
+			return BasePredictionContextEMPTY // a +// =//
 		}
 	} else {
-		if a == PredictionContextEMPTY && b == PredictionContextEMPTY {
-			return PredictionContextEMPTY // $ + $ = $
-		} else if a == PredictionContextEMPTY { // $ + x = [$,x]
-			var payloads = []int{b.getReturnState(-1), PredictionContextEMPTY_RETURN_STATE}
-			var parents = []IPredictionContext{b.GetParent(-1), nil}
+		if a == BasePredictionContextEMPTY && b == BasePredictionContextEMPTY {
+			return BasePredictionContextEMPTY // $ + $ = $
+		} else if a == BasePredictionContextEMPTY { // $ + x = [$,x]
+			var payloads = []int{b.getReturnState(-1), BasePredictionContextEMPTY_RETURN_STATE}
+			var parents = []PredictionContext{b.GetParent(-1), nil}
 			return NewArrayPredictionContext(parents, payloads)
-		} else if b == PredictionContextEMPTY { // x + $ = [$,x] ($ is always first if present)
-			var payloads = []int{a.getReturnState(-1), PredictionContextEMPTY_RETURN_STATE}
-			var parents = []IPredictionContext{a.GetParent(-1), nil}
+		} else if b == BasePredictionContextEMPTY { // x + $ = [$,x] ($ is always first if present)
+			var payloads = []int{a.getReturnState(-1), BasePredictionContextEMPTY_RETURN_STATE}
+			var parents = []PredictionContext{a.GetParent(-1), nil}
 			return NewArrayPredictionContext(parents, payloads)
 		}
 	}
@@ -580,7 +580,7 @@ func mergeRoot(a, b ISingletonPredictionContext, rootIsWildcard bool) IPredictio
 }
 
 //
-// Merge two {@link ArrayPredictionContext} instances.
+// Merge two {@link ArrayBasePredictionContext} instances.
 //
 // <p>Different tops, different parents.<br>
 // <embed src="images/ArrayMerge_DiffTopDiffPar.svg" type="image/svg+xml"/></p>
@@ -596,18 +596,18 @@ func mergeRoot(a, b ISingletonPredictionContext, rootIsWildcard bool) IPredictio
 // type="image/svg+xml"/></p>
 //
 // <p>Equal tops, merge parents and reduce top to
-// {@link SingletonPredictionContext}.<br>
+// {@link SingletonBasePredictionContext}.<br>
 // <embed src="images/ArrayMerge_EqualTop.svg" type="image/svg+xml"/></p>
 // /
-func mergeArrays(a, b *ArrayPredictionContext, rootIsWildcard bool, mergeCache *DoubleDict) IPredictionContext {
+func mergeArrays(a, b *ArrayPredictionContext, rootIsWildcard bool, mergeCache *DoubleDict) PredictionContext {
 	if mergeCache != nil {
 		var previous = mergeCache.Get(a.Hash(), b.Hash())
 		if previous != nil {
-			return previous.(IPredictionContext)
+			return previous.(PredictionContext)
 		}
 		previous = mergeCache.Get(b.Hash(), a.Hash())
 		if previous != nil {
-			return previous.(IPredictionContext)
+			return previous.(PredictionContext)
 		}
 	}
 	// merge sorted payloads a + b => M
@@ -616,7 +616,7 @@ func mergeArrays(a, b *ArrayPredictionContext, rootIsWildcard bool, mergeCache *
 	var k = 0 // walks target M array
 
 	var mergedReturnStates = make([]int, 0)
-	var mergedParents = make([]IPredictionContext, 0)
+	var mergedParents = make([]PredictionContext, 0)
 	// walk and merge to yield mergedParents, mergedReturnStates
 	for i < len(a.returnStates) && j < len(b.returnStates) {
 		var a_parent = a.parents[i]
@@ -625,7 +625,7 @@ func mergeArrays(a, b *ArrayPredictionContext, rootIsWildcard bool, mergeCache *
 			// same payload (stack tops are equal), must yield merged singleton
 			var payload = a.returnStates[i]
 			// $+$ = $
-			var bothDollars = payload == PredictionContextEMPTY_RETURN_STATE && a_parent == nil && b_parent == nil
+			var bothDollars = payload == BasePredictionContextEMPTY_RETURN_STATE && a_parent == nil && b_parent == nil
 			var ax_ax = (a_parent != nil && b_parent != nil && a_parent == b_parent) // ax+ax
 			// ->
 			// ax
@@ -667,7 +667,7 @@ func mergeArrays(a, b *ArrayPredictionContext, rootIsWildcard bool, mergeCache *
 	// trim merged if we combined a few that had same stack tops
 	if k < len(mergedParents) { // write index < last position trim
 		if k == 1 { // for just one merged element, return singleton top
-			var a_ = SingletonPredictionContextCreate(mergedParents[0], mergedReturnStates[0])
+			var a_ = SingletonBasePredictionContextCreate(mergedParents[0], mergedReturnStates[0])
 			if mergeCache != nil {
 				mergeCache.set(a.Hash(), b.Hash(), a_)
 			}
@@ -705,8 +705,8 @@ func mergeArrays(a, b *ArrayPredictionContext, rootIsWildcard bool, mergeCache *
 // Make pass over all <em>M</em> {@code parents} merge any {@code equals()}
 // ones.
 // /
-func combineCommonParents(parents []IPredictionContext) {
-	var uniqueParents = make(map[IPredictionContext]IPredictionContext)
+func combineCommonParents(parents []PredictionContext) {
+	var uniqueParents = make(map[PredictionContext]PredictionContext)
 
 	for p := 0; p < len(parents); p++ {
 		var parent = parents[p]
@@ -719,7 +719,7 @@ func combineCommonParents(parents []IPredictionContext) {
 	}
 }
 
-func getCachedPredictionContext(context IPredictionContext, contextCache *PredictionContextCache, visited map[IPredictionContext]IPredictionContext) IPredictionContext {
+func getCachedBasePredictionContext(context PredictionContext, contextCache *PredictionContextCache, visited map[PredictionContext]PredictionContext) PredictionContext {
 
 	if (context.isEmpty()) {
 		return context
@@ -734,12 +734,12 @@ func getCachedPredictionContext(context IPredictionContext, contextCache *Predic
 		return existing
 	}
 	var changed = false
-	var parents = make([]IPredictionContext, context.length())
+	var parents = make([]PredictionContext, context.length())
 	for i := 0; i < len(parents); i++ {
-		var parent = getCachedPredictionContext(context.GetParent(i), contextCache, visited)
+		var parent = getCachedBasePredictionContext(context.GetParent(i), contextCache, visited)
 		if (changed || parent != context.GetParent(i)) {
 			if (!changed) {
-				parents = make([]IPredictionContext, context.length())
+				parents = make([]PredictionContext, context.length())
 				for j := 0; j < context.length(); j++ {
 					parents[j] = context.GetParent(j)
 				}
@@ -753,11 +753,11 @@ func getCachedPredictionContext(context IPredictionContext, contextCache *Predic
 		visited[context] = context
 		return context
 	}
-	var updated IPredictionContext = nil
+	var updated PredictionContext = nil
 	if (len(parents) == 0) {
-		updated = PredictionContextEMPTY
+		updated = BasePredictionContextEMPTY
 	} else if (len(parents) == 1) {
-		updated = SingletonPredictionContextCreate(parents[0], context.getReturnState(0))
+		updated = SingletonBasePredictionContextCreate(parents[0], context.getReturnState(0))
 	} else {
 		updated = NewArrayPredictionContext(parents, context.(*ArrayPredictionContext).GetReturnStates())
 	}
