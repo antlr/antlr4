@@ -134,10 +134,14 @@ Parser.prototype.reset = function() {
 
 Parser.prototype.match = function(ttype) {
 
-	console.log("get current token")
+	if (PORT_DEBUG) {
+		console.log("get current token")
+	}
 	var t = this.getCurrentToken();
 
-	console.log("TOKEN IS " + t.text)
+	if (PORT_DEBUG) {
+		console.log("TOKEN IS " + t.text)
+	}
 	if (t.type === ttype) {
 		this._errHandler.reportMatch(this);
 		this.consume();
@@ -151,7 +155,9 @@ Parser.prototype.match = function(ttype) {
 		}
 	}
 
-	console.log("Match done")
+	if (PORT_DEBUG) {
+		console.log("Match done")
+	}
 
 	return t;
 };
@@ -405,9 +411,13 @@ Parser.prototype.notifyErrorListeners = function(msg, offendingToken, err) {
 Parser.prototype.consume = function() {
 	var o = this.getCurrentToken();
 	if (o.type !== Token.EOF) {
-		console.log("Consuming")
+		if (PORT_DEBUG) {
+			console.log("Consuming")
+		}
 		this.getInputStream().consume();
-		console.log("done consuming")
+		if (PORT_DEBUG) {
+			console.log("done consuming")
+		}
 	}
 
 	var hasListener = this._parseListeners !== null && this._parseListeners.length > 0;

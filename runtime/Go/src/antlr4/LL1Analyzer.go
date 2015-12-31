@@ -75,16 +75,20 @@ func (la *LL1Analyzer) LOOK(s, stopState IATNState, ctx IRuleContext) *IntervalS
 	if ctx != nil {
 		lookContext = predictionContextFromRuleContext(s.GetATN(), ctx)
 	}
-	fmt.Println("DEBUG 5")
-//	fmt.Println("DEBUG" + lookContext.String())
-	fmt.Println(s)
-	fmt.Println(stopState)
-	fmt.Println(lookContext)
-	fmt.Println(r)
-	fmt.Println(seeThruPreds)
-	fmt.Println("=====")
+	if PortDebug {
+		fmt.Println("DEBUG 5")
+		//	fmt.Println("DEBUG" + lookContext.String())
+		fmt.Println(s)
+		fmt.Println(stopState)
+		fmt.Println(lookContext)
+		fmt.Println(r)
+		fmt.Println(seeThruPreds)
+		fmt.Println("=====")
+	}
 	la._LOOK(s, stopState, lookContext, r, NewSet(nil, nil), NewBitSet(), seeThruPreds, true)
-	fmt.Println(r)
+	if PortDebug {
+		fmt.Println(r)
+	}
 	return r
 }
 
@@ -147,7 +151,9 @@ func (la *LL1Analyzer) _LOOK(s, stopState IATNState, ctx IPredictionContext, loo
 	lookBusy.add(c)
 
 	if s == stopState {
-		fmt.Println("DEBUG 6")
+		if PortDebug {
+			fmt.Println("DEBUG 6")
+		}
 		if ctx == nil {
 			look.addOne(TokenEpsilon)
 			return
@@ -169,7 +175,9 @@ func (la *LL1Analyzer) _LOOK(s, stopState IATNState, ctx IPredictionContext, loo
 		}
 
 		if ctx != PredictionContextEMPTY {
-			fmt.Println("DEBUG 7")
+			if PortDebug {
+				fmt.Println("DEBUG 7")
+			}
 
 			// run thru all possible stack tops in ctx
 			for i := 0; i < ctx.length(); i++ {
@@ -188,7 +196,9 @@ func (la *LL1Analyzer) _LOOK(s, stopState IATNState, ctx IPredictionContext, loo
 		t := s.GetTransitions()[i]
 
 		if t1, ok := t.(*RuleTransition); ok {
-			fmt.Println("DEBUG 8")
+			if PortDebug {
+				fmt.Println("DEBUG 8")
+			}
 
 			if calledRuleStack.contains(t1.getTarget().GetRuleIndex()) {
 				continue
@@ -198,32 +208,37 @@ func (la *LL1Analyzer) _LOOK(s, stopState IATNState, ctx IPredictionContext, loo
 
 			la.___LOOK(stopState, newContext, look, lookBusy, calledRuleStack, seeThruPreds, addEOF, t1)
 
-			fmt.Println(look)
-//
-//			defer func() {
-//				calledRuleStack.remove(t1.getTarget().GetRuleIndex())
-//			}()
-//
-//			calledRuleStack.add(t1.getTarget().GetRuleIndex())
-//			la._LOOK(t1.getTarget(), stopState, newContext, look, lookBusy, calledRuleStack, seeThruPreds, addEOF)
+			if PortDebug {
+				fmt.Println(look)
+			}
 
 		} else if t2, ok := t.(IAbstractPredicateTransition); ok {
-			fmt.Println("DEBUG 9")
+			if PortDebug {
+				fmt.Println("DEBUG 9")
+			}
 			if seeThruPreds {
 				la._LOOK(t2.getTarget(), stopState, ctx, look, lookBusy, calledRuleStack, seeThruPreds, addEOF)
 			} else {
 				look.addOne(LL1AnalyzerHIT_PRED)
 			}
 		} else if t.getIsEpsilon() {
-			fmt.Println("DEBUG 10")
+			if PortDebug {
+				fmt.Println("DEBUG 10")
+			}
 			la._LOOK(t.getTarget(), stopState, ctx, look, lookBusy, calledRuleStack, seeThruPreds, addEOF)
 		} else if _, ok := t.(*WildcardTransition); ok {
-			fmt.Println("DEBUG 11")
+			if PortDebug {
+				fmt.Println("DEBUG 11")
+			}
 			look.addRange(TokenMinUserTokenType, la.atn.maxTokenType)
 		} else {
-			fmt.Println("DEBUG 12")
+			if PortDebug {
+				fmt.Println("DEBUG 12")
+			}
 			set := t.getLabel()
-			fmt.Println(set)
+			if PortDebug {
+				fmt.Println(set)
+			}
 			if set != nil {
 				if _, ok := t.(*NotSetTransition); ok {
 					set = set.complement(TokenMinUserTokenType, la.atn.maxTokenType)

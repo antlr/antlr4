@@ -169,10 +169,14 @@ Lexer.prototype.nextToken = function() {
 					break;
 				}
 
-				console.log("lex inner loop")
+				if (PORT_DEBUG) {
+					console.log("lex inner loop")
+				}
 			}
 
-			console.log("lex loop")
+			if (PORT_DEBUG) {
+				console.log("lex loop")
+			}
 
 			if (continueOuter) {
 				continue;
@@ -262,7 +266,9 @@ Lexer.prototype.emitToken = function(token) {
 // custom Token objects or provide a new factory.
 // /
 Lexer.prototype.emit = function() {
-	console.log("emit")
+	if (PORT_DEBUG) {
+		console.log("emit")
+	}
 	var t = this._factory.create(this._tokenFactorySourcePair, this._type,
 			this._text, this._channel, this._tokenStartCharIndex, this
 					.getCharIndex() - 1, this._tokenStartLine,
@@ -272,7 +278,9 @@ Lexer.prototype.emit = function() {
 };
 
 Lexer.prototype.emitEOF = function() {
-	console.log("emitEOF")
+	if (PORT_DEBUG) {
+		console.log("emitEOF")
+	}
 	var cpos = this.column;
 	var lpos = this.line;
 	var eof = this._factory.create(this._tokenFactorySourcePair, Token.EOF,

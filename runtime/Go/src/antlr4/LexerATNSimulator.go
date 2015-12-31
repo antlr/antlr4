@@ -88,7 +88,7 @@ func NewLexerATNSimulator(recog ILexer, atn *ATN, decisionToDFA []*DFA, sharedCo
 	return this
 }
 
-var LexerATNSimulatorDebug = true
+var LexerATNSimulatorDebug = false
 var LexerATNSimulatorDFADebug = false
 
 var LexerATNSimulatorMIN_DFA_EDGE = 0
@@ -105,14 +105,18 @@ func (this *LexerATNSimulator) copyState(simulator *LexerATNSimulator) {
 
 func (this *LexerATNSimulator) Match(input CharStream, mode int) int {
 
-	fmt.Println("Match")
+	if PortDebug {
+		fmt.Println("Match")
+	}
 
 	this.Match_calls += 1
 	this.mode = mode
 	var mark = input.Mark()
 
 	defer func() {
-		fmt.Println("FINALLY")
+		if PortDebug {
+			fmt.Println("FINALLY")
+		}
 		input.Release(mark)
 	}()
 
@@ -122,10 +126,14 @@ func (this *LexerATNSimulator) Match(input CharStream, mode int) int {
 	var dfa = this.decisionToDFA[mode]
 
 	if dfa.s0 == nil {
-		fmt.Println("MatchATN")
+		if PortDebug {
+			fmt.Println("MatchATN")
+		}
 		return this.MatchATN(input)
 	} else {
-		fmt.Println("execATN")
+		if PortDebug {
+			fmt.Println("execATN")
+		}
 		return this.execATN(input, dfa.s0)
 	}
 }
@@ -224,7 +232,9 @@ func (this *LexerATNSimulator) execATN(input CharStream, ds0 *DFAState) int {
 		s = target // flip current DFA target becomes Newsrc/from state
 	}
 
-	fmt.Println("DONE WITH execATN loop")
+	if PortDebug {
+		fmt.Println("DONE WITH execATN loop")
+	}
 	return this.failOrAccept(this.prevAccept, input, s.configs, t)
 }
 
@@ -286,7 +296,9 @@ func (this *LexerATNSimulator) failOrAccept(prevAccept *SimState, input CharStre
 		var lexerActionExecutor = prevAccept.dfaState.lexerActionExecutor
 		this.accept(input, lexerActionExecutor, this.startIndex, prevAccept.index, prevAccept.line, prevAccept.column)
 
-		fmt.Println(prevAccept.dfaState.prediction)
+		if PortDebug {
+			fmt.Println(prevAccept.dfaState.prediction)
+		}
 		return prevAccept.dfaState.prediction
 	} else {
 		// if no accept and EOF is first char, return EOF
@@ -357,7 +369,9 @@ func (this *LexerATNSimulator) getReachableTarget(trans ITransition, t int) IATN
 
 func (this *LexerATNSimulator) computeStartState(input CharStream, p IATNState) *OrderedATNConfigSet {
 
-	fmt.Println("DEBUG" + strconv.Itoa(len(p.GetTransitions())))
+	if PortDebug {
+		fmt.Println("DEBUG" + strconv.Itoa(len(p.GetTransitions())))
+	}
 
 	var configs = NewOrderedATNConfigSet()
 	for i := 0; i < len(p.GetTransitions()); i++ {
@@ -366,7 +380,9 @@ func (this *LexerATNSimulator) computeStartState(input CharStream, p IATNState) 
 		this.closure(input, cfg, configs.ATNConfigSet, false, false, false)
 	}
 
-	fmt.Println("DEBUG" + configs.String())
+	if PortDebug {
+		fmt.Println("DEBUG" + configs.String())
+	}
 
 	return configs
 }
@@ -661,7 +677,9 @@ func (this *LexerATNSimulator) consume(input CharStream) {
 }
 
 func (this *LexerATNSimulator) GetTokenName(tt int) string {
-	fmt.Println(tt)
+	if PortDebug {
+		fmt.Println(tt)
+	}
 	if tt == -1 {
 		return "EOF"
 	} else {

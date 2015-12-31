@@ -1,6 +1,10 @@
 package antlr4
 import "fmt"
 
+const (
+	PortDebug = false
+)
+
 var ATNINVALID_ALT_NUMBER = 0
 
 type ATN struct {
@@ -65,11 +69,15 @@ func (this *ATN) nextTokensInContext(s IATNState, ctx IRuleContext) *IntervalSet
 // rule.
 func (this *ATN) nextTokensNoContext(s IATNState) *IntervalSet {
 	if s.GetNextTokenWithinRule() != nil {
-		fmt.Println("DEBUG 1")
+		if PortDebug {
+			fmt.Println("DEBUG 1")
+		}
 		return s.GetNextTokenWithinRule()
 	}
-	fmt.Println("DEBUG 2")
-	fmt.Println(this.nextTokensInContext(s, nil))
+	if PortDebug {
+		fmt.Println("DEBUG 2")
+		fmt.Println(this.nextTokensInContext(s, nil))
+	}
 	s.SetNextTokenWithinRule(this.nextTokensInContext(s, nil))
 	s.GetNextTokenWithinRule().readOnly = true
 	return s.GetNextTokenWithinRule()

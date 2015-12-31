@@ -126,10 +126,14 @@ func (p *Parser) GetParseListeners() []ParseTreeListener {
 
 func (p *Parser) Match(ttype int) IToken {
 
-	fmt.Println("get current token")
+	if PortDebug {
+		fmt.Println("get current token")
+	}
 	var t = p.getCurrentToken()
 
-	fmt.Println("TOKEN IS " + t.GetText())
+	if PortDebug {
+		fmt.Println("TOKEN IS " + t.GetText())
+	}
 
 	if t.GetTokenType() == ttype {
 		p._errHandler.ReportMatch(p)
@@ -144,7 +148,9 @@ func (p *Parser) Match(ttype int) IToken {
 		}
 	}
 
-	fmt.Println("match done")
+	if PortDebug {
+		fmt.Println("match done")
+	}
 
 	return t
 }
@@ -411,9 +417,13 @@ func (p *Parser) NotifyErrorListeners(msg string, offendingToken IToken, err IRe
 func (p *Parser) Consume() IToken {
 	var o = p.getCurrentToken()
 	if o.GetTokenType() != TokenEOF {
-		fmt.Println("Consuming")
+		if PortDebug {
+			fmt.Println("Consuming")
+		}
 		p.GetInputStream().Consume()
-		fmt.Println("Done consuming")
+		if PortDebug {
+			fmt.Println("Done consuming")
+		}
 	}
 	var hasListener = p._parseListeners != nil && len(p._parseListeners) > 0
 	if p.BuildParseTrees || hasListener {

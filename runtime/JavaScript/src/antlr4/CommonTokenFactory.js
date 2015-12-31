@@ -74,7 +74,9 @@ CommonTokenFactory.DEFAULT = new CommonTokenFactory();
 
 CommonTokenFactory.prototype.create = function(source, type, text, channel, start, stop, line, column) {
 
-    console.log("Token factory creating: " + text)
+    if (PORT_DEBUG) {
+        console.log("Token factory creating: " + text)
+    }
 
     var t = new CommonToken(source, type, channel, start, stop);
     t.line = line;
@@ -89,7 +91,9 @@ CommonTokenFactory.prototype.create = function(source, type, text, channel, star
 
 CommonTokenFactory.prototype.createThin = function(type, text) {
 
-    console.log("Token factory creating: " + text)
+    if (PORT_DEBUG) {
+        console.log("Token factory creating: " + text)
+    }
 
     var t = new CommonToken(null, type);
     t.text = text;

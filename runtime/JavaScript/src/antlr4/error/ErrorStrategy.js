@@ -245,26 +245,35 @@ DefaultErrorStrategy.prototype.sync = function(recognizer) {
         return;
     }
 
-    console.log("STATE" + recognizer.state)
+    if (PORT_DEBUG) {
+        console.log("STATE" + recognizer.state)
+    }
 
     var s = recognizer._interp.atn.states[recognizer.state];
     var la = recognizer.getTokenStream().LA(1);
 
-    console.log("LA" + la);
+    if (PORT_DEBUG) {
+        console.log("LA" + la);
+    }
 
     // try cheaper subset first; might get lucky. seems to shave a wee bit off
     if (la===Token.EOF || recognizer.atn.nextTokens(s).contains(la)) {
-        console.log("OK1")
+        if (PORT_DEBUG) {
+            console.log("OK1")
+        }
         return;
     }
     // Return but don't end recovery. only do that upon valid token match
     if(recognizer.isExpectedToken(la)) {
-    console.log("OK2")
+        if (PORT_DEBUG) {
+            console.log("OK2")
+        }
         return;
     }
 
-    console.log("LA" + la)
-//    console.log(recognizer.GetATN().nextTokens(s, nil))
+    if (PORT_DEBUG) {
+        console.log("LA" + la)
+    }
 
     switch (s.stateType) {
     case ATNState.BLOCK_START:

@@ -726,11 +726,9 @@ ArithmeticParser.prototype.relop = function() {
         this.state = 56;
         _la = this._input.LA(1);
         if(!((((_la) & ~0x1f) == 0 && ((1 << _la) & ((1 << ArithmeticParser.GT) | (1 << ArithmeticParser.LT) | (1 << ArithmeticParser.EQ))) !== 0))) {
-        console.log("DEBUG1")
         this._errHandler.recoverInline(this);
         }
         else {
-            console.log("DEBUG2")
             this.consume();
         }
     } catch (re) {
@@ -820,7 +818,6 @@ ArithmeticParser.prototype.number = function() {
         do {
             this.state = 61;
             this.match(ArithmeticParser.DIGIT);
-            console.log("Done with match")
             this.state = 64; 
             this._errHandler.sync(this);
             _la = this._input.LA(1);

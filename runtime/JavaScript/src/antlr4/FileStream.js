@@ -42,7 +42,9 @@ function FileStream(fileName) {
 	InputStream.call(this, data);
 	this.fileName = fileName;
 
-	console.log(data);
+	if (PORT_DEBUG) {
+		console.log(data);
+	}
 	return this;
 }
 

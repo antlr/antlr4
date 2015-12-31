@@ -1,3 +1,5 @@
+PORT_DEBUG = false
+
 var antlr4 = require("./antlr4/index"),
     tree = antlr4.tree
     ArithmeticLexer = require("./ArithmeticLexer").ArithmeticLexer,

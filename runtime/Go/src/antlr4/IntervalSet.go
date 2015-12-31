@@ -68,7 +68,9 @@ func (i *IntervalSet) addRange(l, h int) {
 }
 
 func (is *IntervalSet) addInterval(v *Interval) {
-	fmt.Println("addInterval" + v.String())
+	if PortDebug {
+		fmt.Println("addInterval" + v.String())
+	}
 	if is.intervals == nil {
 		is.intervals = make([]*Interval, 0)
 		is.intervals = append(is.intervals, v)
@@ -96,9 +98,13 @@ func (is *IntervalSet) addInterval(v *Interval) {
 }
 
 func (i *IntervalSet) addSet(other *IntervalSet) *IntervalSet {
-	fmt.Println("addSet")
+	if PortDebug {
+		fmt.Println("addSet")
+	}
 	if other.intervals != nil {
-		fmt.Println(len(other.intervals))
+		if PortDebug {
+			fmt.Println(len(other.intervals))
+		}
 		for k := 0; k < len(other.intervals); k++ {
 			var i2 = other.intervals[k]
 			i.addInterval(NewInterval(i2.start, i2.stop))

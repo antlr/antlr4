@@ -209,26 +209,36 @@ func (this *DefaultErrorStrategy) Sync(recognizer IParser) {
 		return
 	}
 
-	fmt.Println("STATE" + strconv.Itoa(recognizer.GetState()))
+	if PortDebug {
+		fmt.Println("STATE" + strconv.Itoa(recognizer.GetState()))
+	}
 
 	var s = recognizer.GetInterpreter().atn.states[recognizer.GetState()]
 	var la = recognizer.GetTokenStream().LA(1)
 
-	fmt.Println("LA" + strconv.Itoa(la))
+	if PortDebug {
+		fmt.Println("LA" + strconv.Itoa(la))
+	}
 
 	// try cheaper subset first might get lucky. seems to shave a wee bit off
 	if la == TokenEOF || recognizer.GetATN().nextTokens(s, nil).contains(la) {
-		fmt.Println("OK1")
+		if PortDebug {
+			fmt.Println("OK1")
+		}
 		return
 	}
 	// Return but don't end recovery. only do that upon valid token Match
 	if recognizer.isExpectedToken(la) {
-		fmt.Println("OK2")
+		if PortDebug {
+			fmt.Println("OK2")
+		}
 		return
 	}
 
-	fmt.Println("LA" + strconv.Itoa(la))
-	fmt.Println(recognizer.GetATN().nextTokens(s, nil))
+	if PortDebug {
+		fmt.Println("LA" + strconv.Itoa(la))
+		fmt.Println(recognizer.GetATN().nextTokens(s, nil))
+	}
 
 	switch s.GetStateType() {
 	case ATNStateBLOCK_START:
@@ -545,7 +555,9 @@ func (this *DefaultErrorStrategy) getMissingSymbol(recognizer IParser) IToken {
 
 	tf := recognizer.GetTokenFactory()
 
-	fmt.Println("Missing symbol error")
+	if PortDebug {
+		fmt.Println("Missing symbol error")
+	}
 	return tf.Create( current.GetSource(), expectedTokenType, tokenText, TokenDefaultChannel, -1, -1, current.GetLine(), current.GetColumn())
 }
 

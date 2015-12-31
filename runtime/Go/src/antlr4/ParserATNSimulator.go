@@ -47,7 +47,7 @@ func NewParserATNSimulator(parser IParser, atn *ATN, decisionToDFA []*DFA, share
 	return this
 }
 
-var ParserATNSimulatorDebug = true
+var ParserATNSimulatorDebug = false
 var ParserATNSimulatorListATNDecisions = false
 var ParserATNSimulatorDFADebug = false
 var ParserATNSimulatorRetryDebug = false
@@ -57,7 +57,9 @@ func (this *ParserATNSimulator) reset() {
 
 func (this *ParserATNSimulator) AdaptivePredict(input TokenStream, decision int, outerContext IParserRuleContext) int {
 
-	fmt.Println("Adaptive preduct")
+	if PortDebug {
+		fmt.Println("Adaptive predict")
+	}
 
 	if ParserATNSimulatorDebug || ParserATNSimulatorListATNDecisions {
 
@@ -998,7 +1000,9 @@ func (this *ParserATNSimulator) closureCheckingStopState(config IATNConfig, conf
 					} else {
 						// we have no context info, just chase follow links (if greedy)
 						if ParserATNSimulatorDebug {
-							fmt.Println("DEBUG 1")
+							if PortDebug {
+								fmt.Println("DEBUG 1")
+							}
 							fmt.Println("FALLING off rule " + this.getRuleName(config.GetState().GetRuleIndex()))
 						}
 						this.closure_(config, configs, closureBusy, collectPredicates, fullCtx, depth, treatEofAsEpsilon)
@@ -1023,7 +1027,9 @@ func (this *ParserATNSimulator) closureCheckingStopState(config IATNConfig, conf
 		} else {
 			// else if we have no context info, just chase follow links (if greedy)
 			if ParserATNSimulatorDebug {
-				fmt.Println("DEBUG 2")
+				if PortDebug {
+					fmt.Println("DEBUG 2")
+				}
 				fmt.Println("FALLING off rule " + this.getRuleName(config.GetState().GetRuleIndex()))
 			}
 		}
@@ -1033,7 +1039,9 @@ func (this *ParserATNSimulator) closureCheckingStopState(config IATNConfig, conf
 
 // Do the actual work of walking epsilon edges//
 func (this *ParserATNSimulator) closure_(config IATNConfig, configs *ATNConfigSet, closureBusy *Set, collectPredicates, fullCtx bool, depth int, treatEofAsEpsilon bool) {
-	fmt.Println("closure_")
+	if PortDebug {
+		fmt.Println("closure_")
+	}
 	var p = config.GetState()
 	// optimization
 	if !p.GetEpsilonOnlyTransitions() {
@@ -1047,7 +1055,9 @@ func (this *ParserATNSimulator) closure_(config IATNConfig, configs *ATNConfigSe
 		var continueCollecting = collectPredicates && !ok
 		var c = this.getEpsilonTarget(config, t, continueCollecting, depth == 0, fullCtx, treatEofAsEpsilon)
 		if c != nil {
-			fmt.Println("DEBUG 1")
+			if PortDebug {
+				fmt.Println("DEBUG 1")
+			}
 			if !t.getIsEpsilon() && closureBusy.add(c) != c {
 				// avoid infinite recursion for EOF* and EOF+
 				continue
@@ -1056,7 +1066,9 @@ func (this *ParserATNSimulator) closure_(config IATNConfig, configs *ATNConfigSe
 
 			if _, ok := config.GetState().(*RuleStopState); ok {
 
-				fmt.Println("DEBUG 2")
+				if PortDebug {
+					fmt.Println("DEBUG 2")
+				}
 				// target fell off end of rule mark resulting c as having dipped into outer context
 				// We can't get here if incoming config was rule stop and we had context
 				// track how far we dip into outer context.  Might
@@ -1064,16 +1076,22 @@ func (this *ParserATNSimulator) closure_(config IATNConfig, configs *ATNConfigSe
 				// preds if this is > 0.
 
 				if closureBusy.add(c) != c {
-					fmt.Println("DEBUG 3")
+					if PortDebug {
+						fmt.Println("DEBUG 3")
+					}
 					// avoid infinite recursion for right-recursive rules
 					continue
 				} else {
-					fmt.Println(c)
-					fmt.Println(closureBusy)
+					if PortDebug {
+						fmt.Println(c)
+						fmt.Println(closureBusy)
+					}
 				}
 
 				if this._dfa != nil && this._dfa.precedenceDfa {
-					fmt.Println("DEBUG 4")
+					if PortDebug {
+						fmt.Println("DEBUG 4")
+					}
 					if t.(*EpsilonTransition).outermostPrecedenceReturn == this._dfa.atnStartState.GetRuleIndex() {
 						c.precedenceFilterSuppressed = true
 					}
@@ -1292,7 +1310,9 @@ func (this *ParserATNSimulator) getConflictingAltsOrUniqueAlt(configs *ATNConfig
 
 func (this *ParserATNSimulator) GetTokenName(t int) string {
 
-	fmt.Println("Get token name")
+	if PortDebug {
+		fmt.Println("Get token name")
+	}
 
 	if t == TokenEOF {
 		return "EOF"

@@ -313,7 +313,7 @@ function ParserATNSimulator(parser, atn, decisionToDFA, sharedContextCache) {
 ParserATNSimulator.prototype = Object.create(ATNSimulator.prototype);
 ParserATNSimulator.prototype.constructor = ParserATNSimulator;
 
-ParserATNSimulator.prototype.debug = true;
+ParserATNSimulator.prototype.debug = false;
 ParserATNSimulator.prototype.debug_list_atn_decisions = false;
 ParserATNSimulator.prototype.dfa_debug = false;
 ParserATNSimulator.prototype.retry_debug = false;
@@ -324,7 +324,9 @@ ParserATNSimulator.prototype.reset = function() {
 
 ParserATNSimulator.prototype.adaptivePredict = function(input, decision, outerContext) {
 
-    console.log("adaptive predict")
+    if (PORT_DEBUG) {
+        console.log("adaptive predict")
+    }
 
     if (this.debug || this.debug_list_atn_decisions) {
         console.log("adaptivePredict decision " + decision +
@@ -1254,7 +1256,9 @@ ParserATNSimulator.prototype.closureCheckingStopState = function(config, configs
                     } else {
                         // we have no context info, just chase follow links (if greedy)
                         if (this.debug) {
-                            console.log("DEBUG 1")
+                            if (PORT_DEBUG) {
+                                console.log("DEBUG 1")
+                            }
                             console.log("FALLING off rule " + this.getRuleName(config.state.ruleIndex));
                         }
                         this.closure_(config, configs, closureBusy, collectPredicates,
@@ -1280,7 +1284,9 @@ ParserATNSimulator.prototype.closureCheckingStopState = function(config, configs
         } else {
             // else if we have no context info, just chase follow links (if greedy)
             if (this.debug) {
-                console.log("DEBUG 2")
+                if (PORT_DEBUG) {
+                    console.log("DEBUG 2")
+                }
                 console.log("FALLING off rule " + this.getRuleName(config.state.ruleIndex));
             }
         }
@@ -1290,7 +1296,9 @@ ParserATNSimulator.prototype.closureCheckingStopState = function(config, configs
 
 // Do the actual work of walking epsilon edges//
 ParserATNSimulator.prototype.closure_ = function(config, configs, closureBusy, collectPredicates, fullCtx, depth, treatEofAsEpsilon) {
-    console.log("closure_")
+    if (PORT_DEBUG) {
+        console.log("closure_")
+    }
     var p = config.state;
     // optimization
     if (! p.epsilonOnlyTransitions) {
@@ -1303,7 +1311,9 @@ ParserATNSimulator.prototype.closure_ = function(config, configs, closureBusy, c
         var continueCollecting = collectPredicates && !(t instanceof ActionTransition);
         var c = this.getEpsilonTarget(config, t, continueCollecting, depth === 0, fullCtx, treatEofAsEpsilon);
         if (c!==null) {
-            console.log("DEBUG 1")
+            if (PORT_DEBUG) {
+                console.log("DEBUG 1")
+            }
 			if (!t.isEpsilon && closureBusy.add(c)!==c){
 				// avoid infinite recursion for EOF* and EOF+
 				continue;
@@ -1311,7 +1321,9 @@ ParserATNSimulator.prototype.closure_ = function(config, configs, closureBusy, c
             var newDepth = depth;
             if ( config.state instanceof RuleStopState) {
 
-                console.log("DEBUG 2")
+                if (PORT_DEBUG) {
+                    console.log("DEBUG 2")
+                }
                 // target fell off end of rule; mark resulting c as having dipped into outer context
                 // We can't get here if incoming config was rule stop and we had context
                 // track how far we dip into outer context.  Might
@@ -1319,16 +1331,22 @@ ParserATNSimulator.prototype.closure_ = function(config, configs, closureBusy, c
                 // preds if this is > 0.
 
                 if (closureBusy.add(c)!==c) {
-                    console.log("DEBUG 3")
+                    if (PORT_DEBUG) {
+                        console.log("DEBUG 3")
+                    }
                     // avoid infinite recursion for right-recursive rules
                     continue;
                 } else {
-                    console.log(c.toString())
-                    console.log(closureBusy.toString())
+                    if (PORT_DEBUG) {
+                        console.log(c.toString())
+                        console.log(closureBusy.toString())
+                    }
                 }
 
 				if (this._dfa !== null && this._dfa.precedenceDfa) {
-				    console.log("DEBUG 4")
+				    if (PORT_DEBUG) {
+				        console.log("DEBUG 4")
+				    }
 					if (t.outermostPrecedenceReturn === this._dfa.atnStartState.ruleIndex) {
 						c.precedenceFilterSuppressed = true;
 					}
@@ -1528,7 +1546,9 @@ ParserATNSimulator.prototype.getConflictingAltsOrUniqueAlt = function(configs) {
 
 ParserATNSimulator.prototype.getTokenName = function( t) {
 
-    console.log("Get token name")
+    if (PORT_DEBUG) {
+        console.log("Get token name")
+    }
 
     if (t===Token.EOF) {
         return "EOF";

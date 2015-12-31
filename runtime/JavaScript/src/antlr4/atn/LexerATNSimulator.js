@@ -101,7 +101,7 @@ function LexerATNSimulator(recog, atn, decisionToDFA, sharedContextCache) {
 LexerATNSimulator.prototype = Object.create(ATNSimulator.prototype);
 LexerATNSimulator.prototype.constructor = LexerATNSimulator;
 
-LexerATNSimulator.prototype.debug = true;
+LexerATNSimulator.prototype.debug = false;
 LexerATNSimulator.prototype.dfa_debug = false;
 
 LexerATNSimulator.MIN_DFA_EDGE = 0;
@@ -118,7 +118,9 @@ LexerATNSimulator.prototype.copyState = function(simulator) {
 
 LexerATNSimulator.prototype.match = function(input, mode) {
 
-	console.log("MATCH")
+	if (PORT_DEBUG) {
+		console.log("MATCH")
+	}
 
 	this.match_calls += 1;
 	this.mode = mode;
@@ -128,15 +130,21 @@ LexerATNSimulator.prototype.match = function(input, mode) {
 		this.prevAccept.reset();
 		var dfa = this.decisionToDFA[mode];
 		if (dfa.s0 === null) {
-			console.log("matchATN")
+			if (PORT_DEBUG) {
+				console.log("matchATN")
+			}
 			return this.matchATN(input);
 		} else {
-			console.log("execATN")
+			if (PORT_DEBUG) {
+				console.log("execATN")
+			}
 			var res = this.execATN(input, dfa.s0);
 			return res;
 		}
 	} finally {
-		console.log("FINALLY")
+		if (PORT_DEBUG) {
+			console.log("FINALLY")
+		}
 		input.release(mark);
 	}
 };
@@ -233,7 +241,9 @@ LexerATNSimulator.prototype.execATN = function(input, ds0) {
 		s = target; // flip; current DFA target becomes new src/from state
 	}
 
-	console.log("Done with execATN loop")
+	if (PORT_DEBUG) {
+		console.log("Done with execATN loop")
+	}
 	return this.failOrAccept(this.prevAccept, input, s.configs, t);
 };
 
@@ -298,7 +308,9 @@ LexerATNSimulator.prototype.failOrAccept = function(prevAccept, input, reach, t)
 		this.accept(input, lexerActionExecutor, this.startIndex,
 				prevAccept.index, prevAccept.line, prevAccept.column);
 
-		console.log("Prevaccept", prevAccept.dfaState.prediction)
+		if (PORT_DEBUG) {
+			console.log("Prevaccept", prevAccept.dfaState.prediction)
+		}
 
 		return prevAccept.dfaState.prediction;
 	} else {
@@ -669,7 +681,9 @@ LexerATNSimulator.prototype.consume = function(input) {
 };
 
 LexerATNSimulator.prototype.getTokenName = function(tt) {
-	console.log(tt);
+	if (PORT_DEBUG) {
+		console.log(tt);
+	}
 	if (tt === -1) {
 		return "EOF";
 	} else {

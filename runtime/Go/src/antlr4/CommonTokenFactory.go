@@ -48,7 +48,9 @@ var CommonTokenFactoryDEFAULT = NewCommonTokenFactory(false)
 
 func (this *CommonTokenFactory) Create(source *TokenSourceCharStreamPair, ttype int, text string, channel, start, stop, line, column int) IToken {
 
-	fmt.Println("Token factory creating: " + text)
+	if PortDebug {
+		fmt.Println("Token factory creating: " + text)
+	}
 
 	var t = NewCommonToken(source, ttype, channel, start, stop)
 	t.line = line
@@ -65,7 +67,9 @@ func (this *CommonTokenFactory) Create(source *TokenSourceCharStreamPair, ttype 
 
 func (this *CommonTokenFactory) createThin(ttype int, text string) IToken {
 
-	fmt.Println("Token factory creating: " + text)
+	if PortDebug {
+		fmt.Println("Token factory creating: " + text)
+	}
 
 	var t = NewCommonToken(nil, ttype, TokenDefaultChannel, -1, -1)
 	t.SetText(text)

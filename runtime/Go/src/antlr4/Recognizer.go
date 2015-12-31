@@ -83,7 +83,9 @@ func (this *Recognizer) GetState() int {
 }
 
 func (this *Recognizer) SetState(v int) {
-	fmt.Println("SETTING STATE " + strconv.Itoa(v) + " from " +  strconv.Itoa(this.state))
+	if PortDebug {
+		fmt.Println("SETTING STATE " + strconv.Itoa(v) + " from " +  strconv.Itoa(this.state))
+	}
 
 	this.state = v
 }

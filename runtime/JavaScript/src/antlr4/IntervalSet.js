@@ -50,7 +50,9 @@ IntervalSet.prototype.addRange = function(l, h) {
 };
 
 IntervalSet.prototype.addInterval = function(v) {
-	console.log("addInterval" + v.toString())
+	if (PORT_DEBUG) {
+		console.log("addInterval" + v.toString())
+	}
 	if (this.intervals === null) {
 		this.intervals = [];
 		this.intervals.push(v);
@@ -81,9 +83,13 @@ IntervalSet.prototype.addInterval = function(v) {
 };
 
 IntervalSet.prototype.addSet = function(other) {
-	console.log("addSet")
+	if (PORT_DEBUG) {
+		console.log("addSet")
+	}
 	if (other.intervals !== null) {
-		console.log(other.intervals.length)
+		if (PORT_DEBUG) {
+			console.log(other.intervals.length)
+		}
 		for (var k = 0; k < other.intervals.length; k++) {
 			var i = other.intervals[k];
 			this.addInterval(new Interval(i.start, i.stop));

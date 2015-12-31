@@ -31,7 +31,9 @@ func NewFileStream(fileName string) *FileStream {
 	fs.filename = fileName
 	s := string(buf.Bytes())
 
-	fmt.Println(s)
+	if PortDebug {
+		fmt.Println(s)
+	}
 	fs.InputStream = NewInputStream(s)
 
 	return fs
