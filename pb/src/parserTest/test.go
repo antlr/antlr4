@@ -39,6 +39,6 @@ func main() {
 	var printer = NewMyPrinter()
 	antlr4.ParseTreeWalkerDefault.Walk(printer, tree);
 
-	fmt.Println( tree.GetChildren()[0].GetChildren()[0].GetChildren()[0].GetChildren()[0].GetChildren()[0].GetChildren()[0].GetChildren()[0] );
+	// fmt.Println( tree.GetChildren()[0].GetChildren()[0].GetChildren()[0].GetChildren()[0].GetChildren()[0].GetChildren()[0].GetChildren()[0] );
 
 }
