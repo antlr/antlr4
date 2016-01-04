@@ -176,13 +176,13 @@ What remains to be done is have our validate function actually validate the inpu
 
 To start with, let's load ANTLR and your parser, listener etc.. Easy, since you could write:
 
-```
+```js
 var antlr4 = require('antlr4/index');
 ```
 
 This may work, but it's actually unreliable. The reason is that the require function used by ANTLR, which exactly mimics the NodeJS require function, uses a different syntax than the require function that comes with ACE. So we need to bring in a require function that conforms to the NodeJS syntax. I personally use one that comes from Torben Haase's Honey project, which you can find here. But hey, now we're going to have 2 'require' functions not compatible with each other! Indeed, this is why you need to take special care, as follows:
 
-```
+```js
 // load nodejs compatible require
 var ace_require = require;
 require = undefined;
@@ -200,10 +200,12 @@ try {
 } finally {
     require = ace_require;
 }
+```
 Please note the try-finally construct. ANTLR uses 'require' synchronously so it's perfectly safe to ignore the ACE 'require' while running ANTLR code. ACE itself does not guarantee synchronous execution, so you are much safer always switching 'require' back to 'ace_require'.
 Now detecting deep syntax errors in your code is a task for your ANTLR listener or visitor or whatever piece of code you've delegated this to. We're not going to describe this here, since it would require some knowledge of your language. However, detecting grammar syntax errors is something ANTLR does beautifully (isn't that why you went for ANTLR in the first place?). So what we will illustrate here is how to report grammar syntax errors. I have no doubt that from there, you will be able to extend the validator to suit your specific needs.
 Whenever ANTLR encounters an unexpected token, it fires an error. By default, the error is routed to an error listener which simply writes to the console.
 What we need to do is replace this listener by our own listener, se we can route errors to the ACE editor. First, let's create such a listener:
+```js
 // class for gathering errors and posting them to ACE editor
 var AnnotatingErrorListener = function(annotations) {
     antlr4.error.ErrorListener.call(this);
@@ -222,9 +224,9 @@ AnnotatingErrorListener.prototype.syntaxError = function(recognizer, offendingSy
         type: "error"
  });
 };
-
+```
 With this, all that remains to be done is plug the listener in when we parse the code. Here is how I do it:
-
+```js
 var validate = function(input) {
     var stream = new antlr4.InputStream(input);
     var lexer = new mylanguage.MyLexer(stream);
@@ -236,7 +238,7 @@ var validate = function(input) {
     parser.addErrorListener(listener);
     parser.parseMyRule();
     return annotations;
-};
+};```
 You know what? That's it! You now have an ACE editor that does syntax validation using ANTLR! I hope you find this useful, and simple enough to get started.
 What I did not address here is packaging, not something I'm an expert at. The good news is that it makes development simple, since I don't have to run any compilation process. I just edit my code, reload my editor page, and check how it goes.
 Now wait, hey! How do you debug this? Well, as usual, using Chrome, since neither Firefox or Safari are able to debug worker code. What a shame...
