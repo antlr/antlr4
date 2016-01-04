@@ -11,7 +11,12 @@ package parser // <file.grammarName>
 import (
     "antlr4"
     "reflect"
+    "fmt"
 )
+
+// suppress unused import error, many tests
+// require fmt.
+var _ = fmt.Printf
 
 <namedActions.header>
 
@@ -141,12 +146,12 @@ const (
 <funcs; separator="\n">
 
 <if(sempredFuncs)>
-func (p *<parser.name>) Sempred(localctx, ruleIndex int, predIndex int) {
+func (p *<parser.name>) Sempred(localctx antlr4.RuleContext, ruleIndex, predIndex int) {
 	switch ruleIndex {
 	<parser.sempredFuncs.values:{f | case <f.ruleIndex>:
 		return p.<f.name; format="cap">_Sempred(localctx, predIndex);}; separator="\n">
     default:
-        panic("No predicate with index:" + ruleIndex)
+        panic("No predicate with index:" + fmt.Sprint(ruleIndex))
    }
 }
 
@@ -157,26 +162,26 @@ func (p *<parser.name>) Sempred(localctx, ruleIndex int, predIndex int) {
 
 dumpActions(recog, argFuncs, actionFuncs, sempredFuncs) ::= <<
 <if(actionFuncs)>
-func (l *<lexer.name>) Action(localctx, ruleIndex int, actionIndex int) {
+func (l *<lexer.name>) Action(localctx antlr4.RuleContext, ruleIndex, actionIndex int) {
 	switch ruleIndex {
 	<recog.actionFuncs.values:{f|
 case <f.ruleIndex>:
-	p.<f.name; format="cap">_Action(localctx, actionIndex)
+	l.<f.name; format="cap">_Action(localctx, actionIndex)
 	}; separator="\n">
 	default:
-		panic("No registered action for:" + ruleIndex)
+		panic("No registered action for:" + fmt.Sprint(ruleIndex))
 	}
 }
 
 <actionFuncs.values; separator="\n">
 <endif>
 <if(sempredFuncs)>
-func (l *<lexer.name>) Sempred(localctx, ruleIndex, predIndex) {
+func (l *<lexer.name>) Sempred(localctx antlr4.RuleContext, ruleIndex, predIndex int) {
 	switch ruleIndex {
 		<recog.sempredFuncs.values:{f| case <f.ruleIndex>:
 	return l.<f.name>_Sempred(localctx, predIndex);}; separator="\n">
     	default:
-    		panic("No registered predicate for:" + ruleIndex)
+    		panic("No registered predicate for:" + fmt.Sprint(ruleIndex))
     }
 }
 
@@ -190,14 +195,14 @@ func (l *<lexer.name>) Sempred(localctx, ruleIndex, predIndex) {
  */
 RuleActionFunction(r, actions) ::= <<
 
-func (l *<lexer.name>) <r.name; format="cap">_Action(localctx , actionIndex) {
+func (l *<lexer.name>) <r.name; format="cap">_Action(localctx antlr4.RuleContext, actionIndex int) {
 	switch actionIndex {
 	<actions:{index|
 case <index>:
 	<actions.(index)>
 	}; separator="\n">
 	default:
-		panic("No registered action for:" + actionIndex)
+		panic("No registered action for:" + fmt.Sprint(actionIndex))
 	}
 }
 >>
@@ -206,12 +211,12 @@ case <index>:
  * overriding implementation impossible to maintain.
  */
 RuleSempredFunction(r, actions) ::= <<
-func (s *<if(parser)><parser.name><else><lexer.name><endif>) <r.name; format="cap">_Sempred(localctx, predIndex int) {
+func (s *<if(parser)><parser.name><else><lexer.name><endif>) <r.name; format="cap">_Sempred(localctx  antlr4.RuleContext, predIndex int) {
 	switch predIndex {
 		<actions:{index| case <index>:
 	return <actions.(index)>;}; separator="\n">
 		default:
-			panic("No predicate with index:" + predIndex)
+			panic("No predicate with index:" + fmt.Sprint(predIndex))
 	}
 }
 
@@ -786,7 +791,12 @@ package parser
 
 import (
     "antlr4"
+    "fmt"
 )
+
+// suppress unused import error, many tests
+// require fmt.
+var _ = fmt.Printf
 
 <namedActions.header>
 

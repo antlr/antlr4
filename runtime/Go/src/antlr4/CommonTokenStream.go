@@ -16,6 +16,64 @@ import (
 	"strconv"
 )
 
+type CommonTokenStream struct {
+	tokenSource TokenSource
+
+	tokens     []Token
+	index      int
+	fetchedEOF bool
+	channel    int
+}
+
+func NewCommonTokenStream(lexer Lexer, channel int) *CommonTokenStream {
+
+	ts := new(CommonTokenStream)
+
+	// The {@link TokenSource} from which tokens for bt stream are fetched.
+	ts.tokenSource = lexer
+
+	// A collection of all tokens fetched from the token source. The list is
+	// considered a complete view of the input once {@link //fetchedEOF} is set
+	// to {@code true}.
+	ts.tokens = make([]Token, 0)
+
+	// The index into {@link //tokens} of the current token (next token to
+	// {@link //consume}). {@link //tokens}{@code [}{@link //p}{@code ]} should
+	// be
+	// {@link //LT LT(1)}.
+	//
+	// <p>This field is set to -1 when the stream is first constructed or when
+	// {@link //SetTokenSource} is called, indicating that the first token has
+	// not yet been fetched from the token source. For additional information,
+	// see the documentation of {@link IntStream} for a description of
+	// Initializing Methods.</p>
+	ts.index = -1
+
+	// Indicates whether the {@link Token//EOF} token has been fetched from
+	// {@link //tokenSource} and added to {@link //tokens}. This field improves
+	// performance for the following cases:
+	//
+	// <ul>
+	// <li>{@link //consume}: The lookahead check in {@link //consume} to
+	// prevent
+	// consuming the EOF symbol is optimized by checking the values of
+	// {@link //fetchedEOF} and {@link //p} instead of calling {@link
+	// //LA}.</li>
+	// <li>{@link //fetch}: The check to prevent adding multiple EOF symbols
+	// into
+	// {@link //tokens} is trivial with bt field.</li>
+	// <ul>
+	ts.fetchedEOF = false
+
+	ts.channel = channel
+
+	return ts
+}
+
+func (bt *CommonTokenStream) GetAllTokens() []Token {
+	return bt.tokens
+}
+
 func (bt *CommonTokenStream) Mark() int {
 	return 0
 }
@@ -277,7 +335,7 @@ func (bt *CommonTokenStream) GetTextFromRuleContext(interval RuleContext) string
 func (bt *CommonTokenStream) GetTextFromInterval(interval *Interval) string {
 
 	bt.lazyInit()
-	bt.fill()
+	bt.Fill()
 	if interval == nil {
 		interval = NewInterval(0, len(bt.tokens)-1)
 	}
@@ -304,65 +362,11 @@ func (bt *CommonTokenStream) GetTextFromInterval(interval *Interval) string {
 }
 
 // Get all tokens from lexer until EOF///
-func (bt *CommonTokenStream) fill() {
+func (bt *CommonTokenStream) Fill() {
 	bt.lazyInit()
 	for bt.fetch(1000) == 1000 {
 		continue
 	}
-}
-
-type CommonTokenStream struct {
-	tokenSource TokenSource
-
-	tokens     []Token
-	index      int
-	fetchedEOF bool
-	channel    int
-}
-
-func NewCommonTokenStream(lexer Lexer, channel int) *CommonTokenStream {
-
-	ts := new(CommonTokenStream)
-
-	// The {@link TokenSource} from which tokens for bt stream are fetched.
-	ts.tokenSource = lexer
-
-	// A collection of all tokens fetched from the token source. The list is
-	// considered a complete view of the input once {@link //fetchedEOF} is set
-	// to {@code true}.
-	ts.tokens = make([]Token, 0)
-
-	// The index into {@link //tokens} of the current token (next token to
-	// {@link //consume}). {@link //tokens}{@code [}{@link //p}{@code ]} should
-	// be
-	// {@link //LT LT(1)}.
-	//
-	// <p>This field is set to -1 when the stream is first constructed or when
-	// {@link //SetTokenSource} is called, indicating that the first token has
-	// not yet been fetched from the token source. For additional information,
-	// see the documentation of {@link IntStream} for a description of
-	// Initializing Methods.</p>
-	ts.index = -1
-
-	// Indicates whether the {@link Token//EOF} token has been fetched from
-	// {@link //tokenSource} and added to {@link //tokens}. This field improves
-	// performance for the following cases:
-	//
-	// <ul>
-	// <li>{@link //consume}: The lookahead check in {@link //consume} to
-	// prevent
-	// consuming the EOF symbol is optimized by checking the values of
-	// {@link //fetchedEOF} and {@link //p} instead of calling {@link
-	// //LA}.</li>
-	// <li>{@link //fetch}: The check to prevent adding multiple EOF symbols
-	// into
-	// {@link //tokens} is trivial with bt field.</li>
-	// <ul>
-	ts.fetchedEOF = false
-
-	ts.channel = channel
-
-	return ts
 }
 
 func (ts *CommonTokenStream) adjustSeekIndex(i int) int {
@@ -411,7 +415,7 @@ func (ts *CommonTokenStream) LT(k int) Token {
 // Count EOF just once.///
 func (ts *CommonTokenStream) getNumberOfOnChannelTokens() int {
 	var n = 0
-	ts.fill()
+	ts.Fill()
 	for i := 0; i < len(ts.tokens); i++ {
 		var t = ts.tokens[i]
 		if t.GetChannel() == ts.channel {

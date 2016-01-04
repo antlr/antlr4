@@ -11,12 +11,14 @@ type Recognizer interface {
 	GetLiteralNames() []string
 	GetSymbolicNames() []string
 	GetRuleNames() []string
-	Sempred(localctx RuleContext, ruleIndex int, actionIndex int) bool
-	Precpred(localctx RuleContext, precedence int) bool
+	Sempred(RuleContext, int, int) bool
+	Precpred(RuleContext, int) bool
 
 	GetState() int
 	SetState(int)
-	Action(_localctx RuleContext, ruleIndex, actionIndex int)
+	Action(RuleContext, int, int)
+	AddErrorListener(ErrorListener)
+	RemoveErrorListeners()
 	GetATN() *ATN
 	getErrorListenerDispatch() ErrorListener
 }
@@ -52,11 +54,11 @@ func (this *BaseRecognizer) Action(context RuleContext, ruleIndex, actionIndex i
 	panic("action not implemented on Recognizer!")
 }
 
-func (this *BaseRecognizer) addErrorListener(listener ErrorListener) {
+func (this *BaseRecognizer) AddErrorListener(listener ErrorListener) {
 	this._listeners = append(this._listeners, listener)
 }
 
-func (this *BaseRecognizer) removeErrorListeners() {
+func (this *BaseRecognizer) RemoveErrorListeners() {
 	this._listeners = make([]ErrorListener, 0)
 }
 

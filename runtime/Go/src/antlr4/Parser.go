@@ -16,8 +16,8 @@ type Parser interface {
 	GetInputStream() IntStream
 	getCurrentToken() Token
 	getExpectedTokens() *IntervalSet
-	NotifyErrorListeners(msg string, offendingToken Token, err RecognitionException)
-	isExpectedToken(symbol int) bool
+	NotifyErrorListeners(string, Token, RecognitionException)
+	isExpectedToken(int) bool
 	getPrecedence() int
 	getRuleInvocationStack(ParserRuleContext) []string
 }

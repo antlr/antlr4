@@ -83,6 +83,12 @@ type ParseTreeListener interface {
 	ExitEveryRule(ctx ParserRuleContext)
 }
 
+type BaseParseTreeListener struct {}
+func (l *BaseParseTreeListener) VisitTerminal(node TerminalNode){}
+func (l *BaseParseTreeListener) VisitErrorNode(node ErrorNode){}
+func (l *BaseParseTreeListener) EnterEveryRule(ctx ParserRuleContext){}
+func (l *BaseParseTreeListener) ExitEveryRule(ctx ParserRuleContext){}
+
 type TerminalNodeImpl struct {
 	parentCtx RuleContext
 

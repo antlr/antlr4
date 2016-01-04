@@ -166,7 +166,7 @@ func (this *LexerATNSimulator) MatchATN(input CharStream) int {
 	var predict = this.execATN(input, next)
 
 	if LexerATNSimulatorDebug {
-		fmt.Println("DFA after MatchATN: " + this.decisionToDFA[old_mode].toLexerString())
+		fmt.Println("DFA after MatchATN: " + this.decisionToDFA[old_mode].ToLexerString())
 	}
 	return predict
 }

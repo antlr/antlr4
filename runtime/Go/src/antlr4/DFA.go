@@ -138,7 +138,7 @@ func (this *DFA) String(literalNames []string, symbolicNames []string) string {
 	return serializer.String()
 }
 
-func (this *DFA) toLexerString() string {
+func (this *DFA) ToLexerString() string {
 	if this.s0 == nil {
 		return ""
 	}
