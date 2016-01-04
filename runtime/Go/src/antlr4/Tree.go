@@ -1,5 +1,6 @@
 package antlr4
 
+
 // The basic notion of a tree has a parent, a payload, and a list of children.
 //  It is the most abstract interface for all the trees used by ANTLR.
 ///
@@ -8,12 +9,11 @@ var TreeInvalidInterval = NewInterval(-1, -2)
 
 type Tree interface {
 	GetParent() Tree
-	setParent(Tree)
-	getPayload() interface{}
-	getChild(i int) Tree
-	getChildCount() int
-	getChildren() []Tree
-	setChildren([]Tree)
+	SetParent(Tree)
+	GetPayload() interface{}
+	GetChild(i int) Tree
+	GetChildCount() int
+	GetChildren() []Tree
 	//	StringTree() string
 }
 
@@ -26,8 +26,7 @@ type SyntaxTree interface {
 type ParseTree interface {
 	SyntaxTree
 
-	//	<T> T accept(ParseTreeVisitor<? extends T> Visitor);
-	accept(Visitor ParseTreeVisitor) interface{}
+	Accept(Visitor ParseTreeVisitor) interface{}
 	GetText() string
 	//	StringTree([]string, IRecognizer) string
 }
@@ -35,13 +34,13 @@ type ParseTree interface {
 type RuleNode interface {
 	ParseTree
 
-	getRuleContext() RuleContext
+	GetRuleContext() RuleContext
 }
 
 type TerminalNode interface {
 	ParseTree
 
-	getSymbol() Token
+	GetSymbol() Token
 }
 
 type ErrorNode interface {
@@ -99,19 +98,19 @@ func NewTerminalNodeImpl(symbol Token) *TerminalNodeImpl {
 	return tn
 }
 
-func (this *TerminalNodeImpl) getChild(i int) Tree {
+func (this *TerminalNodeImpl) GetChild(i int) Tree {
 	return nil
 }
 
-func (this *TerminalNodeImpl) getChildren() []Tree {
+func (this *TerminalNodeImpl) GetChildren() []Tree {
 	return nil
 }
 
-func (this *TerminalNodeImpl) setChildren(t []Tree) {
+func (this *TerminalNodeImpl) SetChildren(t []Tree) {
 	panic("Cannot set children on terminal node")
 }
 
-func (this *TerminalNodeImpl) getSymbol() Token {
+func (this *TerminalNodeImpl) GetSymbol() Token {
 	return this.symbol
 }
 
@@ -119,11 +118,11 @@ func (this *TerminalNodeImpl) GetParent() Tree {
 	return this.parentCtx
 }
 
-func (this *TerminalNodeImpl) setParent(t Tree) {
+func (this *TerminalNodeImpl) SetParent(t Tree) {
 	this.parentCtx = t.(RuleContext)
 }
 
-func (this *TerminalNodeImpl) getPayload() interface{} {
+func (this *TerminalNodeImpl) GetPayload() interface{} {
 	return this.symbol
 }
 
@@ -135,11 +134,11 @@ func (this *TerminalNodeImpl) GetSourceInterval() *Interval {
 	return NewInterval(tokenIndex, tokenIndex)
 }
 
-func (this *TerminalNodeImpl) getChildCount() int {
+func (this *TerminalNodeImpl) GetChildCount() int {
 	return 0
 }
 
-func (this *TerminalNodeImpl) accept(Visitor ParseTreeVisitor) interface{} {
+func (this *TerminalNodeImpl) Accept(Visitor ParseTreeVisitor) interface{} {
 	return Visitor.VisitTerminal(this)
 }
 
@@ -171,11 +170,11 @@ func NewErrorNodeImpl(token Token) *ErrorNodeImpl {
 	return en
 }
 
-func (this *ErrorNodeImpl) isErrorNode() bool {
+func (this *ErrorNodeImpl) IsErrorNode() bool {
 	return true
 }
 
-func (this *ErrorNodeImpl) accept(Visitor ParseTreeVisitor) interface{} {
+func (this *ErrorNodeImpl) Accept(Visitor ParseTreeVisitor) interface{} {
 	return Visitor.VisitErrorNode(this)
 }
 
@@ -186,7 +185,7 @@ func NewParseTreeWalker() *ParseTreeWalker {
 	return new(ParseTreeWalker)
 }
 
-func (this *ParseTreeWalker) walk(listener ParseTreeListener, t Tree) {
+func (this *ParseTreeWalker) Walk(listener ParseTreeListener, t Tree) {
 
 	if errorNode, ok := t.(ErrorNode); ok {
 		listener.VisitErrorNode(errorNode)
@@ -194,9 +193,9 @@ func (this *ParseTreeWalker) walk(listener ParseTreeListener, t Tree) {
 		listener.VisitTerminal(term)
 	} else {
 		this.EnterRule(listener, t.(RuleNode))
-		for i := 0; i < t.getChildCount(); i++ {
-			var child = t.getChild(i)
-			this.walk(listener, child)
+		for i := 0; i < t.GetChildCount(); i++ {
+			var child = t.GetChild(i)
+			this.Walk(listener, child)
 		}
 		this.ExitRule(listener, t.(RuleNode))
 	}
@@ -209,15 +208,15 @@ func (this *ParseTreeWalker) walk(listener ParseTreeListener, t Tree) {
 // the rule specific. We to them in reverse order upon finishing the node.
 //
 func (this *ParseTreeWalker) EnterRule(listener ParseTreeListener, r RuleNode) {
-	var ctx = r.getRuleContext().(ParserRuleContext)
+	var ctx = r.GetRuleContext().(ParserRuleContext)
 	listener.EnterEveryRule(ctx)
 	ctx.EnterRule(listener)
 }
 
 func (this *ParseTreeWalker) ExitRule(listener ParseTreeListener, r RuleNode) {
-	var ctx = r.getRuleContext().(ParserRuleContext)
+	var ctx = r.GetRuleContext().(ParserRuleContext)
 	ctx.ExitRule(listener)
 	listener.ExitEveryRule(ctx)
 }
 
-var ParseTreeWalkerDEFAULT = NewParseTreeWalker()
+var ParseTreeWalkerDefault = NewParseTreeWalker()

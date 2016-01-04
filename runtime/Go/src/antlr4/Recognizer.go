@@ -106,7 +106,8 @@ func (this *BaseRecognizer) SetState(v int) {
 //
 // <p>Used for XPath and tree pattern compilation.</p>
 //
-func (this *BaseRecognizer) getRuleIndexMap() map[string]int {
+func (this *BaseRecognizer) GetRuleIndexMap() map[string]int {
+	
 	panic("Method not defined!")
 	//    var ruleNames = this.GetRuleNames()
 	//    if (ruleNames==nil) {
@@ -144,7 +145,7 @@ func (this *BaseRecognizer) GetTokenType(tokenName string) int {
 //                    result.put(literalName, i);
 //                }
 //
-//                String symbolicName = vocabulary.getSymbolicName(i);
+//                String symbolicName = vocabulary.GetSymbolicName(i);
 //                if (symbolicName != null) {
 //                    result.put(symbolicName, i);
 //                }
@@ -160,7 +161,7 @@ func (this *BaseRecognizer) GetTokenType(tokenName string) int {
 //}
 
 // What is the error header, normally line/character position information?//
-func (this *BaseRecognizer) getErrorHeader(e RecognitionException) string {
+func (this *BaseRecognizer) GetErrorHeader(e RecognitionException) string {
 	var line = e.GetOffendingToken().GetLine()
 	var column = e.GetOffendingToken().GetColumn()
 	return "line " + strconv.Itoa(line) + ":" + strconv.Itoa(column)

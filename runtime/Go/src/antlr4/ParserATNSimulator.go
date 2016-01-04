@@ -99,7 +99,7 @@ func (this *ParserATNSimulator) AdaptivePredict(input TokenStream, decision int,
 
 	if s0 == nil {
 		if outerContext == nil {
-			outerContext = RuleContextEMPTY
+			outerContext = RuleContextEmpty
 		}
 		if ParserATNSimulatorDebug || ParserATNSimulatorListATNDecisions {
 			fmt.Println("predictATN decision " + strconv.Itoa(dfa.decision) +
@@ -119,7 +119,7 @@ func (this *ParserATNSimulator) AdaptivePredict(input TokenStream, decision int,
 			}
 		}
 		var fullCtx = false
-		var s0_closure = this.computeStartState(dfa.atnStartState, RuleContextEMPTY, fullCtx)
+		var s0_closure = this.computeStartState(dfa.atnStartState, RuleContextEmpty, fullCtx)
 
 		if dfa.precedenceDfa {
 			// If this is a precedence DFA, we use applyPrecedenceFilter

@@ -22,11 +22,11 @@ KeyPrinter.prototype = Object.create(ArithmeticListener.prototype);
 KeyPrinter.prototype.constructor = KeyPrinter;
 
 // override default listener behavior
-KeyPrinter.prototype.exitAtom = function(ctx) {
+KeyPrinter.prototype.enterAtom = function(ctx) {
     console.log("Oh, a atom!");
 };
 
-KeyPrinter.prototype.exitExpression = function(ctx) {
+KeyPrinter.prototype.enterExpression = function(ctx) {
     console.log("Oh, an expression!");
 };
 

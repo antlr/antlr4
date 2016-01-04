@@ -1,10 +1,3 @@
-/** ANTLR tool checks output templates are compatible with tool code generation.
- *  For now, a simple string Match used on x.y of x.y.z scheme.
- *  Must Match Tool.VERSION during load to templates.
- *
- *  REQUIRED.
- */
-
 fileHeader(grammarFileName, ANTLRVersion) ::= <<
 // Generated from <grammarFileName; format="java-escape"> by ANTLR <ANTLRVersion>
 >>
@@ -26,43 +19,50 @@ import (
 
 >>
 
-
-
 ListenerFile(file, header) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 package parser // <file.grammarName>
 
 import "antlr4"
 
-// This class defines a complete listener for a parse tree produced by <file.parserName>
+// A complete listener for a parse tree produced by <file.parserName>
 
-type <file.grammarName>Listener struct {
-
-}
-
-func (l *<file.grammarName>Listener) EnterEveryRule(node antlr4.ParserRuleContext) {
-\}
-
-func (l *<file.grammarName>Listener) ExitEveryRule(node antlr4.ParserRuleContext) {
-\}
-
-func (l *<file.grammarName>Listener) VisitTerminal(ctx antlr4.TerminalNode) {
-\}
-
-func (l *<file.grammarName>Listener) VisitErrorNode(ctx antlr4.ErrorNode) {
-\}
+type <file.grammarName>Listener interface {
+    antlr4.ParseTreeListener
 
 <file.listenerNames:{lname |
-// Enter a parse tree produced by <file.parserName>#<lname>.
-func (l *<file.grammarName>Listener) Enter<lname; format="cap">(ctx antlr4.ParserRuleContext) {
-\}
-
-// Exit a parse tree produced by <file.parserName>#<lname>.
-func (l *<file.grammarName>Listener) Exit<lname; format="cap">(ctx antlr4.ParserRuleContext) {
-\}
-
+    Enter<lname; format="cap">(*<lname; format="cap">Context)
+    Exit<lname; format="cap">(*<lname; format="cap">Context)
 }; separator="\n">
+}
 
+>>
+
+BaseListenerFile(file, header) ::= <<
+<fileHeader(file.grammarFileName, file.ANTLRVersion)>
+package parser // <file.grammarName>
+
+import "antlr4"
+
+// A complete base listener for a parse tree produced by <file.parserName>
+
+type Base<file.grammarName>Listener struct {
+}
+
+func (s *Base<file.grammarName>Listener) VisitTerminal(node antlr4.TerminalNode){}
+
+func (s *Base<file.grammarName>Listener) VisitErrorNode(node antlr4.ErrorNode){}
+
+func (s *Base<file.grammarName>Listener) EnterEveryRule(ctx antlr4.ParserRuleContext){}
+
+func (s *Base<file.grammarName>Listener) ExitEveryRule(ctx antlr4.ParserRuleContext){}
+
+<file.listenerNames:{lname |
+
+func (s *Base<file.grammarName>Listener) Enter<lname; format="cap">(ctx *<lname; format="cap">Context) {\}
+
+func (s *Base<file.grammarName>Listener) Exit<lname; format="cap">(ctx *<lname; format="cap">Context){\}
+}; separator="\n">
 
 >>
 
@@ -74,19 +74,16 @@ import "antlr4"
 
 <header>
 
-// This class defines a complete generic Visitor for a parse tree produced by <file.parserName>.
+// A complete Visitor for a parse tree produced by <file.parserName>.
 
-type <file.grammarName>Visitor struct {
-
-}
+type <file.grammarName>Visitor interface {
+    antlr4.ParseTreeVisitor
 
 <file.VisitorNames:{lname |
-// Visit a parse tree produced by <file.parserName>#<lname>.
-func (l <file.grammarName>Visitor) Visit<lname; format="cap">(ctx antlr4.ParserRuleContext) {
-\}
-
+    // Visit a parse tree produced by <file.parserName>#<lname>.
+    Visit<lname; format="cap">(ctx antlr4.ParserRuleContext)
 }; separator="\n">
-
+}
 >>
 
 Parser(parser, funcs, atn, sempredFuncs, superClass) ::= <<
@@ -676,6 +673,12 @@ func (s *<struct.name>) CopyFrom(ctx <struct.name>) {
     <struct.attrs:{a | s.<a.name> = ctx.<a.name>;}; separator="\n">
 }
 <endif>
+
+func (s *<struct.name>) GetRuleContext() antlr4.RuleContext {
+    // Go does not truly support inheritance nor virtual method calls, so we need to implement this directly
+    return s
+}
+
 <dispatchMethods; separator="\n">
 <extensionMembers; separator="\n">
 
@@ -692,10 +695,10 @@ func New<struct.name>(parser antlr4.Parser, ctx antlr4.ParserRuleContext) *<stru
 
     var p = new(<struct.name>)
 
-	<currentRule.name; format="cap">Context.call(this, parser)
+	// TODO <currentRule.name; format="cap">Context.call(this, parser)
 
     <attrs:{a | <a>;}; separator="\n">
-    <currentRule.name; format="cap">Context.prototype.CopyFrom.call(this, ctx)
+    // TODO <currentRule.name; format="cap">Context.prototype.CopyFrom.call(this, ctx)
 
     return p
 }
@@ -709,7 +712,7 @@ func New<struct.name>(parser antlr4.Parser, ctx antlr4.ParserRuleContext) *<stru
 ListenerDispatchMethod(method) ::= <<
 func (s *<struct.name>) <if(method.isEnter)>Enter<else>Exit<endif>Rule(listener antlr4.ParseTreeListener) {
 
-    listener.(*<parser.grammarName>Listener).<if(method.isEnter)>Enter<else>Exit<endif><struct.derivedFromName; format="cap">(s)
+    listener.(<parser.grammarName>Listener).<if(method.isEnter)>Enter<else>Exit<endif><struct.derivedFromName; format="cap">(s)
 
 }
 
@@ -720,7 +723,7 @@ VisitorDispatchMethod(method) ::= <<
 func (s *<struct.name>) Accept(Visitor antlr4.ParseTreeVisitor) interface{} {
 
     switch t := listener.(type) {
-    case *<parser.grammarName>Listener:
+    case <parser.grammarName>Listener:
         return t.Visit<struct.derivedFromName; format="cap">(s)
     default:
         return t.VisitChildren(s)

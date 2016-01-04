@@ -149,8 +149,8 @@ func (this *ATN) getExpectedTokens(stateNumber int, ctx RuleContext) *IntervalSe
 	var expected = NewIntervalSet()
 	expected.addSet(following)
 	expected.removeOne(TokenEpsilon)
-	for ctx != nil && ctx.getInvokingState() >= 0 && following.contains(TokenEpsilon) {
-		var invokingState = this.states[ctx.getInvokingState()]
+	for ctx != nil && ctx.GetInvokingState() >= 0 && following.contains(TokenEpsilon) {
+		var invokingState = this.states[ctx.GetInvokingState()]
 		var rt = invokingState.GetTransitions()[0]
 		following = this.nextTokens(rt.(*RuleTransition).followState, nil)
 		expected.addSet(following)

@@ -96,11 +96,11 @@ public class GoTarget extends Target {
 	}
 
 	public boolean wantsBaseListener() {
-		return false;
+		return true;
 	}
 
 	public boolean wantsBaseVisitor() {
-		return false;
+		return true;
 	}
 
 	public boolean supportsOverloadedMethods() {

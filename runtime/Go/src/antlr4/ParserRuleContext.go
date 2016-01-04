@@ -2,33 +2,37 @@ package antlr4
 
 import (
 	"reflect"
+	"strconv"
+	"fmt"
 )
 
 type ParserRuleContext interface {
 	RuleContext
 
 	SetException(RecognitionException)
-	addTokenNode(token Token) *TerminalNodeImpl
-	addErrorNode(badToken Token) *ErrorNodeImpl
+
+	AddTokenNode(token Token) *TerminalNodeImpl
+	AddErrorNode(badToken Token) *ErrorNodeImpl
+
 	EnterRule(listener ParseTreeListener)
 	ExitRule(listener ParseTreeListener)
 
-	setStart(Token)
-	getStart() Token
+	SetStart(Token)
+	GetStart() Token
 
-	setStop(Token)
-	getStop() Token
+	SetStop(Token)
+	GetStop() Token
 
-	addChild(child RuleContext) RuleContext
-	removeLastChild()
+	AddChild(child RuleContext) RuleContext
+	RemoveLastChild()
 }
 
 type BaseParserRuleContext struct {
 	*BaseRuleContext
 
-	children    []ParseTree
 	start, stop Token
 	exception   RecognitionException
+	children []Tree
 }
 
 func NewBaseParserRuleContext(parent ParserRuleContext, invokingStateNumber int) *BaseParserRuleContext {
@@ -59,19 +63,8 @@ func (prc *BaseParserRuleContext) SetException(e RecognitionException) {
 	prc.exception = e
 }
 
-func (prc *BaseParserRuleContext) GetParent() Tree {
-	return prc.parentCtx
-}
-
-func (prc *BaseParserRuleContext) setParent(ctx Tree) {
-	prc.parentCtx = ctx.(ParserRuleContext)
-}
-
-func (prc *BaseParserRuleContext) setChildren(cs []Tree) {
-	prc.children = make([]ParseTree, len(cs))
-	for _, c := range cs {
-		prc.addChild(c.(RuleContext))
-	}
+func (prc *BaseParserRuleContext) GetChildren() []Tree {
+	return prc.children
 }
 
 func (prc *BaseParserRuleContext) CopyFrom(ctx *BaseParserRuleContext) {
@@ -83,25 +76,46 @@ func (prc *BaseParserRuleContext) CopyFrom(ctx *BaseParserRuleContext) {
 	prc.stop = ctx.stop
 }
 
+func (this *BaseParserRuleContext) GetText() string {
+	if this.GetChildCount() == 0 {
+		return ""
+	} else {
+		var s string
+		for _, child := range this.children {
+			s += child.(ParseTree).GetText()
+		}
+
+		return s
+	}
+}
+
 // Double dispatch methods for listeners
 func (prc *BaseParserRuleContext) EnterRule(listener ParseTreeListener) {
+	fmt.Println("Do nothing enter")
 }
 
 func (prc *BaseParserRuleContext) ExitRule(listener ParseTreeListener) {
+	fmt.Println("Do nothing exit")
 }
 
 // * Does not set parent link other add methods do that///
 func (prc *BaseParserRuleContext) addTerminalNodeChild(child TerminalNode) TerminalNode {
 	if prc.children == nil {
-		prc.children = make([]ParseTree, 0)
+		prc.children = make([]Tree, 0)
+	}
+	if child == nil {
+		panic("Child may not be null")
 	}
 	prc.children = append(prc.children, child)
 	return child
 }
 
-func (prc *BaseParserRuleContext) addChild(child RuleContext) RuleContext {
+func (prc *BaseParserRuleContext) AddChild(child RuleContext) RuleContext {
 	if prc.children == nil {
-		prc.children = make([]ParseTree, 0)
+		prc.children = make([]Tree, 0)
+	}
+	if child == nil {
+		panic("Child may not be null")
 	}
 	prc.children = append(prc.children, child)
 	return child
@@ -111,13 +125,13 @@ func (prc *BaseParserRuleContext) addChild(child RuleContext) RuleContext {
 // we entered a rule. If we have // label, we will need to remove
 // generic ruleContext object.
 // /
-func (prc *BaseParserRuleContext) removeLastChild() {
+func (prc *BaseParserRuleContext) RemoveLastChild() {
 	if prc.children != nil && len(prc.children) > 0 {
 		prc.children = prc.children[0 : len(prc.children)-1]
 	}
 }
 
-func (prc *BaseParserRuleContext) addTokenNode(token Token) *TerminalNodeImpl {
+func (prc *BaseParserRuleContext) AddTokenNode(token Token) *TerminalNodeImpl {
 
 	var node = NewTerminalNodeImpl(token)
 	prc.addTerminalNodeChild(node)
@@ -126,14 +140,14 @@ func (prc *BaseParserRuleContext) addTokenNode(token Token) *TerminalNodeImpl {
 
 }
 
-func (prc *BaseParserRuleContext) addErrorNode(badToken Token) *ErrorNodeImpl {
+func (prc *BaseParserRuleContext) AddErrorNode(badToken Token) *ErrorNodeImpl {
 	var node = NewErrorNodeImpl(badToken)
 	prc.addTerminalNodeChild(node)
 	node.parentCtx = prc
 	return node
 }
 
-func (prc *BaseParserRuleContext) getChild(i int) Tree {
+func (prc *BaseParserRuleContext) GetChild(i int) Tree {
 	if prc.children != nil && len(prc.children) >= i {
 		return prc.children[i]
 	} else {
@@ -141,9 +155,9 @@ func (prc *BaseParserRuleContext) getChild(i int) Tree {
 	}
 }
 
-func (prc *BaseParserRuleContext) getChildOfType(i int, childType reflect.Type) RuleContext {
+func (prc *BaseParserRuleContext) GetChildOfType(i int, childType reflect.Type) RuleContext {
 	if childType == nil {
-		return prc.getChild(i).(RuleContext)
+		return prc.GetChild(i).(RuleContext)
 	} else {
 		for j := 0; j < len(prc.children); j++ {
 			var child = prc.children[j]
@@ -159,19 +173,31 @@ func (prc *BaseParserRuleContext) getChildOfType(i int, childType reflect.Type) 
 	}
 }
 
-func (prc *BaseParserRuleContext) setStart(t Token) {
+func (this *BaseParserRuleContext) StringTree(ruleNames []string, recog Recognizer) string {
+	return TreesStringTree(this, ruleNames, recog)
+}
+
+func (prc *BaseParserRuleContext) GetRuleContext() RuleContext {
+	return prc
+}
+
+func (this *BaseParserRuleContext) Accept(Visitor ParseTreeVisitor) interface{} {
+	return Visitor.VisitChildren(this)
+}
+
+func (prc *BaseParserRuleContext) SetStart(t Token) {
 	prc.start = t
 }
 
-func (prc *BaseParserRuleContext) getStart() Token {
+func (prc *BaseParserRuleContext) GetStart() Token {
 	return prc.start
 }
 
-func (prc *BaseParserRuleContext) setStop(t Token) {
+func (prc *BaseParserRuleContext) SetStop(t Token) {
 	prc.stop = t
 }
 
-func (prc *BaseParserRuleContext) getStop() Token {
+func (prc *BaseParserRuleContext) GetStop() Token {
 	return prc.stop
 }
 
@@ -180,7 +206,7 @@ func (prc *BaseParserRuleContext) GetToken(ttype int, i int) TerminalNode {
 	for j := 0; j < len(prc.children); j++ {
 		var child = prc.children[j]
 		if c2, ok := child.(TerminalNode); ok {
-			if c2.getSymbol().GetTokenType() == ttype {
+			if c2.GetSymbol().GetTokenType() == ttype {
 				if i == 0 {
 					return c2
 				} else {
@@ -200,13 +226,17 @@ func (prc *BaseParserRuleContext) GetTokens(ttype int) []TerminalNode {
 		for j := 0; j < len(prc.children); j++ {
 			var child = prc.children[j]
 			if tchild, ok := child.(TerminalNode); ok {
-				if tchild.getSymbol().GetTokenType() == ttype {
+				if tchild.GetSymbol().GetTokenType() == ttype {
 					tokens = append(tokens, tchild)
 				}
 			}
 		}
 		return tokens
 	}
+}
+
+func (prc *BaseParserRuleContext) GetPayload() interface{}{
+	return prc
 }
 
 func (prc *BaseParserRuleContext) GetTypedRuleContext(ctxType reflect.Type, i int) interface{} {
@@ -230,7 +260,7 @@ func (prc *BaseParserRuleContext) GetTypedRuleContexts(ctxType reflect.Type) []i
 	//	}
 }
 
-func (prc *BaseParserRuleContext) getChildCount() int {
+func (prc *BaseParserRuleContext) GetChildCount() int {
 	if prc.children == nil {
 		return 0
 	} else {
@@ -246,19 +276,61 @@ func (prc *BaseParserRuleContext) GetSourceInterval() *Interval {
 	}
 }
 
-var RuleContextEMPTY = NewBaseParserRuleContext(nil, -1)
+//need to manage circular dependencies, so export now
 
-type IInterpreterRuleContext interface {
+// Print out a whole tree, not just a node, in LISP format
+// (root child1 .. childN). Print just a node if this is a leaf.
+//
+
+func (this *BaseParserRuleContext) String(ruleNames []string, stop RuleContext) string {
+
+	var p ParserRuleContext = this
+	var s = "["
+	for p != nil && p != stop {
+		if ruleNames == nil {
+			if !p.IsEmpty() {
+				s += strconv.Itoa(p.GetInvokingState())
+			}
+		} else {
+			var ri = p.GetRuleIndex()
+			var ruleName string
+			if ri >= 0 && ri < len(ruleNames) {
+				ruleName = ruleNames[ri]
+			} else {
+				ruleName = strconv.Itoa(ri)
+			}
+			s += ruleName
+		}
+		if p.GetParent() != nil && (ruleNames != nil || !p.GetParent().(ParserRuleContext).IsEmpty()) {
+			s += " "
+		}
+		pi := p.GetParent()
+		if pi != nil {
+			p = pi.(ParserRuleContext)
+		} else {
+			p = nil
+		}
+	}
+	s += "]"
+	return s
+}
+
+
+var RuleContextEmpty = NewBaseParserRuleContext(nil, -1)
+
+
+
+type InterpreterRuleContext interface {
 	ParserRuleContext
 }
 
-type InterpreterRuleContext struct {
+type BaseInterpreterRuleContext struct {
 	*BaseParserRuleContext
 }
 
-func NewInterpreterRuleContext(parent InterpreterRuleContext, invokingStateNumber, ruleIndex int) *InterpreterRuleContext {
+func NewBaseInterpreterRuleContext(parent BaseInterpreterRuleContext, invokingStateNumber, ruleIndex int) *BaseInterpreterRuleContext {
 
-	prc := new(InterpreterRuleContext)
+	prc := new(BaseInterpreterRuleContext)
 
 	prc.BaseParserRuleContext = NewBaseParserRuleContext(parent, invokingStateNumber)
 

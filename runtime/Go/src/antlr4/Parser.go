@@ -145,7 +145,7 @@ func (p *BaseParser) Match(ttype int) Token {
 			// we must have conjured up a Newtoken during single token
 			// insertion
 			// if it's not the current symbol
-			p._ctx.addErrorNode(t)
+			p._ctx.AddErrorNode(t)
 		}
 	}
 
@@ -183,7 +183,7 @@ func (p *BaseParser) MatchWildcard() Token {
 			// we must have conjured up a Newtoken during single token
 			// insertion
 			// if it's not the current symbol
-			p._ctx.addErrorNode(t)
+			p._ctx.AddErrorNode(t)
 		}
 	}
 	return t
@@ -429,7 +429,7 @@ func (p *BaseParser) Consume() Token {
 	var hasListener = p._parseListeners != nil && len(p._parseListeners) > 0
 	if p.BuildParseTrees || hasListener {
 		if p._errHandler.inErrorRecoveryMode(p) {
-			var node = p._ctx.addErrorNode(o)
+			var node = p._ctx.AddErrorNode(o)
 			if p._parseListeners != nil {
 				for _, l := range p._parseListeners {
 					l.VisitErrorNode(node)
@@ -437,7 +437,7 @@ func (p *BaseParser) Consume() Token {
 			}
 
 		} else {
-			node := p._ctx.addTokenNode(o)
+			node := p._ctx.AddTokenNode(o)
 			if p._parseListeners != nil {
 				for _, l := range p._parseListeners {
 					l.VisitTerminal(node)
@@ -453,14 +453,14 @@ func (p *BaseParser) Consume() Token {
 func (p *BaseParser) addContextToParseTree() {
 	// add current context to parent if we have a parent
 	if p._ctx.GetParent() != nil {
-		p._ctx.GetParent().setChildren(append(p._ctx.GetParent().getChildren(), p._ctx))
+		p._ctx.GetParent().(ParserRuleContext).AddChild(p._ctx)
 	}
 }
 
 func (p *BaseParser) EnterRule(localctx ParserRuleContext, state, ruleIndex int) {
 	p.SetState(state)
 	p._ctx = localctx
-	p._ctx.setStart(p._input.LT(1))
+	p._ctx.SetStart(p._input.LT(1))
 	if p.BuildParseTrees {
 		p.addContextToParseTree()
 	}
@@ -470,12 +470,12 @@ func (p *BaseParser) EnterRule(localctx ParserRuleContext, state, ruleIndex int)
 }
 
 func (p *BaseParser) ExitRule() {
-	p._ctx.setStop(p._input.LT(-1))
+	p._ctx.SetStop(p._input.LT(-1))
 	// trigger event on _ctx, before it reverts to parent
 	if p._parseListeners != nil {
 		p.TriggerExitRuleEvent()
 	}
-	p.SetState(p._ctx.getInvokingState())
+	p.SetState(p._ctx.GetInvokingState())
 	if p._ctx.GetParent() != nil {
 		p._ctx = p._ctx.GetParent().(ParserRuleContext)
 	} else {
@@ -488,8 +488,8 @@ func (p *BaseParser) EnterOuterAlt(localctx ParserRuleContext, altNum int) {
 	// that is previous child of parse tree
 	if p.BuildParseTrees && p._ctx != localctx {
 		if p._ctx.GetParent() != nil {
-			p._ctx.GetParent().(ParserRuleContext).removeLastChild()
-			p._ctx.GetParent().(ParserRuleContext).addChild(localctx)
+			p._ctx.GetParent().(ParserRuleContext).RemoveLastChild()
+			p._ctx.GetParent().(ParserRuleContext).AddChild(localctx)
 		}
 	}
 	p._ctx = localctx
@@ -512,7 +512,7 @@ func (p *BaseParser) EnterRecursionRule(localctx ParserRuleContext, state, ruleI
 	p.SetState(state)
 	p._precedenceStack.Push(precedence)
 	p._ctx = localctx
-	p._ctx.setStart(p._input.LT(1))
+	p._ctx.SetStart(p._input.LT(1))
 	if p._parseListeners != nil {
 		p.TriggerEnterRuleEvent() // simulates rule entry for
 		// left-recursive rules
@@ -524,14 +524,14 @@ func (p *BaseParser) EnterRecursionRule(localctx ParserRuleContext, state, ruleI
 
 func (p *BaseParser) PushNewRecursionContext(localctx ParserRuleContext, state, ruleIndex int) {
 	var previous = p._ctx
-	previous.setParent(localctx)
-	previous.setInvokingState(state)
-	previous.setStart(p._input.LT(-1))
+	previous.SetParent(localctx)
+	previous.SetInvokingState(state)
+	previous.SetStart(p._input.LT(-1))
 
 	p._ctx = localctx
-	p._ctx.setStart(previous.getStart())
+	p._ctx.SetStart(previous.GetStart())
 	if p.BuildParseTrees {
-		p._ctx.addChild(previous)
+		p._ctx.AddChild(previous)
 	}
 	if p._parseListeners != nil {
 		p.TriggerEnterRuleEvent() // simulates rule entry for
@@ -541,7 +541,7 @@ func (p *BaseParser) PushNewRecursionContext(localctx ParserRuleContext, state, 
 
 func (p *BaseParser) UnrollRecursionContexts(parentCtx ParserRuleContext) {
 	p._precedenceStack.Pop()
-	p._ctx.setStop(p._input.LT(-1))
+	p._ctx.SetStop(p._input.LT(-1))
 	var retCtx = p._ctx // save current ctx (return value)
 	// unroll so _ctx is as it was before call to recursive method
 	if p._parseListeners != nil {
@@ -553,10 +553,10 @@ func (p *BaseParser) UnrollRecursionContexts(parentCtx ParserRuleContext) {
 		p._ctx = parentCtx
 	}
 	// hook into tree
-	retCtx.setParent(parentCtx)
+	retCtx.SetParent(parentCtx)
 	if p.BuildParseTrees && parentCtx != nil {
 		// add return ctx into invoking rule's tree
-		parentCtx.addChild(retCtx)
+		parentCtx.AddChild(retCtx)
 	}
 }
 
@@ -605,8 +605,8 @@ func (p *BaseParser) isExpectedToken(symbol int) bool {
 	if !following.contains(TokenEpsilon) {
 		return false
 	}
-	for ctx != nil && ctx.getInvokingState() >= 0 && following.contains(TokenEpsilon) {
-		var invokingState = atn.states[ctx.getInvokingState()]
+	for ctx != nil && ctx.GetInvokingState() >= 0 && following.contains(TokenEpsilon) {
+		var invokingState = atn.states[ctx.GetInvokingState()]
 		var rt = invokingState.GetTransitions()[0]
 		following = atn.nextTokens(rt.(*RuleTransition).followState, nil)
 		if following.contains(symbol) {
@@ -639,7 +639,7 @@ func (p *BaseParser) getExpectedTokensWithinCurrentRule() *IntervalSet {
 
 // Get a rule's index (i.e., {@code RULE_ruleName} field) or -1 if not found.//
 func (p *BaseParser) GetRuleIndex(ruleName string) int {
-	var ruleIndex, ok = p.getRuleIndexMap()[ruleName]
+	var ruleIndex, ok = p.GetRuleIndexMap()[ruleName]
 	if ok {
 		return ruleIndex
 	} else {

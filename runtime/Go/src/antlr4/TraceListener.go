@@ -20,7 +20,7 @@ func (this *TraceListener) EnterEveryRule(ctx ParserRuleContext) {
 }
 
 func (this *TraceListener) VisitTerminal(node TerminalNode) {
-	fmt.Println("consume " + fmt.Sprint(node.getSymbol()) + " rule " + this.parser.GetRuleNames()[this.parser._ctx.GetRuleIndex()])
+	fmt.Println("consume " + fmt.Sprint(node.GetSymbol()) + " rule " + this.parser.GetRuleNames()[this.parser._ctx.GetRuleIndex()])
 }
 
 func (this *TraceListener) ExitEveryRule(ctx ParserRuleContext) {

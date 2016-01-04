@@ -689,9 +689,9 @@ func (this *DefaultErrorStrategy) getErrorRecoverySet(recognizer Parser) *Interv
 	var atn = recognizer.GetInterpreter().atn
 	var ctx = recognizer.GetParserRuleContext()
 	var recoverSet = NewIntervalSet()
-	for ctx != nil && ctx.getInvokingState() >= 0 {
+	for ctx != nil && ctx.GetInvokingState() >= 0 {
 		// compute what follows who invoked us
-		var invokingState = atn.states[ctx.getInvokingState()]
+		var invokingState = atn.states[ctx.GetInvokingState()]
 		var rt = invokingState.GetTransitions()[0]
 		var follow = atn.nextTokens(rt.(*RuleTransition).followState, nil)
 		recoverSet.addSet(follow)

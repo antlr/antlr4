@@ -16,17 +16,17 @@ func TreesStringTree(tree Tree, ruleNames []string, recog Recognizer) string {
 	var s = TreesgetNodeText(tree, ruleNames, nil)
 
 	s = EscapeWhitespace(s, false)
-	var c = tree.getChildCount()
+	var c = tree.GetChildCount()
 	if c == 0 {
 		return s
 	}
 	var res = "(" + s + " "
 	if c > 0 {
-		s = TreesStringTree(tree.getChild(0), ruleNames, nil)
+		s = TreesStringTree(tree.GetChild(0), ruleNames, nil)
 		res += s
 	}
 	for i := 1; i < c; i++ {
-		s = TreesStringTree(tree.getChild(i), ruleNames, nil)
+		s = TreesStringTree(tree.GetChild(i), ruleNames, nil)
 		res += (" " + s)
 	}
 	res += ")"
@@ -41,30 +41,30 @@ func TreesgetNodeText(t Tree, ruleNames []string, recog *BaseParser) string {
 
 	if ruleNames != nil {
 		if t2, ok := t.(RuleNode); ok {
-			return ruleNames[t2.getRuleContext().GetRuleIndex()]
+			return ruleNames[t2.GetRuleContext().GetRuleIndex()]
 		} else if t2, ok := t.(ErrorNode); ok {
 			return fmt.Sprint(t2)
 		} else if t2, ok := t.(TerminalNode); ok {
-			if t2.getSymbol() != nil {
-				return t2.getSymbol().GetText()
+			if t2.GetSymbol() != nil {
+				return t2.GetSymbol().GetText()
 			}
 		}
 	}
 
 	// no recog for rule names
-	var payload = t.getPayload()
+	var payload = t.GetPayload()
 	if p2, ok := payload.(Token); ok {
 		return p2.GetText()
 	}
 
-	return fmt.Sprint(t.getPayload())
+	return fmt.Sprint(t.GetPayload())
 }
 
 // Return ordered list of all children of this node
-func TreesgetChildren(t Tree) []Tree {
+func TreesGetChildren(t Tree) []Tree {
 	var list = make([]Tree, 0)
-	for i := 0; i < t.getChildCount(); i++ {
-		list = append(list, t.getChild(i))
+	for i := 0; i < t.GetChildCount(); i++ {
+		list = append(list, t.GetChild(i))
 	}
 	return list
 }
@@ -104,7 +104,7 @@ func Trees_findAllNodes(t ParseTree, index int, findTokens bool, nodes []ParseTr
 	t3, ok2 := t.(ParserRuleContext)
 
 	if findTokens && ok {
-		if t2.getSymbol().GetTokenType() == index {
+		if t2.GetSymbol().GetTokenType() == index {
 			nodes = append(nodes, t2)
 		}
 	} else if !findTokens && ok2 {
@@ -113,15 +113,15 @@ func Trees_findAllNodes(t ParseTree, index int, findTokens bool, nodes []ParseTr
 		}
 	}
 	// check children
-	for i := 0; i < t.getChildCount(); i++ {
-		Trees_findAllNodes(t.getChild(i).(ParseTree), index, findTokens, nodes)
+	for i := 0; i < t.GetChildCount(); i++ {
+		Trees_findAllNodes(t.GetChild(i).(ParseTree), index, findTokens, nodes)
 	}
 }
 
 func Treesdescendants(t ParseTree) []ParseTree {
 	var nodes = []ParseTree{t}
-	for i := 0; i < t.getChildCount(); i++ {
-		nodes = append(nodes, Treesdescendants(t.getChild(i).(ParseTree))...)
+	for i := 0; i < t.GetChildCount(); i++ {
+		nodes = append(nodes, Treesdescendants(t.GetChild(i).(ParseTree))...)
 	}
 	return nodes
 }

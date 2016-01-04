@@ -212,7 +212,7 @@ func (s *BaseDecisionState) setNonGreedy(b bool) {
 	s.nonGreedy = b
 }
 
-type IBlockStartState interface {
+type BlockStartState interface {
 	DecisionState
 
 	getEndState() *BlockEndState
@@ -220,15 +220,15 @@ type IBlockStartState interface {
 }
 
 //  The start of a regular {@code (...)} block.
-type BlockStartState struct {
+type BaseBlockStartState struct {
 	*BaseDecisionState
 
 	endState *BlockEndState
 }
 
-func NewBlockStartState() *BlockStartState {
+func NewBlockStartState() *BaseBlockStartState {
 
-	this := new(BlockStartState)
+	this := new(BaseBlockStartState)
 
 	this.BaseDecisionState = NewBaseDecisionState()
 	this.endState = nil
@@ -236,23 +236,23 @@ func NewBlockStartState() *BlockStartState {
 	return this
 }
 
-func (s *BlockStartState) getEndState() *BlockEndState {
+func (s *BaseBlockStartState) getEndState() *BlockEndState {
 	return s.endState
 }
 
-func (s *BlockStartState) setEndState(b *BlockEndState) {
+func (s *BaseBlockStartState) setEndState(b *BlockEndState) {
 	s.endState = b
 }
 
 type BasicBlockStartState struct {
-	*BlockStartState
+	*BaseBlockStartState
 }
 
 func NewBasicBlockStartState() *BasicBlockStartState {
 
 	this := new(BasicBlockStartState)
 
-	this.BlockStartState = NewBlockStartState()
+	this.BaseBlockStartState = NewBlockStartState()
 
 	this.stateType = ATNStateBlockStart
 	return this
@@ -335,7 +335,7 @@ func NewPlusLoopbackState() *PlusLoopbackState {
 //  real decision-making note for {@code A+}.
 //
 type PlusBlockStartState struct {
-	*BlockStartState
+	*BaseBlockStartState
 
 	loopBackState ATNState
 }
@@ -344,7 +344,7 @@ func NewPlusBlockStartState() *PlusBlockStartState {
 
 	this := new(PlusBlockStartState)
 
-	this.BlockStartState = NewBlockStartState()
+	this.BaseBlockStartState = NewBlockStartState()
 
 	this.stateType = ATNStatePlusBlockStart
 	this.loopBackState = nil
@@ -354,14 +354,14 @@ func NewPlusBlockStartState() *PlusBlockStartState {
 
 // The block that begins a closure loop.
 type StarBlockStartState struct {
-	*BlockStartState
+	*BaseBlockStartState
 }
 
 func NewStarBlockStartState() *StarBlockStartState {
 
 	this := new(StarBlockStartState)
 
-	this.BlockStartState = NewBlockStartState()
+	this.BaseBlockStartState = NewBlockStartState()
 
 	this.stateType = ATNStateStarBlockStart
 

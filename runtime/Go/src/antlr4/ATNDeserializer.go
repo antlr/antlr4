@@ -27,7 +27,7 @@ type LoopEndStateIntPair struct {
 }
 
 type BlockStartStateIntPair struct {
-	item0 IBlockStartState
+	item0 BlockStartState
 	item1 int
 }
 
@@ -165,7 +165,7 @@ func (this *ATNDeserializer) readStates(atn *ATN) {
 		if stype == ATNStateLoopEnd {
 			var loopBackStateNumber = this.readInt()
 			loopBackStateNumbers = append(loopBackStateNumbers, LoopEndStateIntPair{s.(*LoopEndState), loopBackStateNumber})
-		} else if s2, ok := s.(IBlockStartState); ok {
+		} else if s2, ok := s.(BlockStartState); ok {
 			var endStateNumber = this.readInt()
 			endStateNumbers = append(endStateNumbers, BlockStartStateIntPair{s2, endStateNumber})
 		}
@@ -289,7 +289,7 @@ func (this *ATNDeserializer) readEdges(atn *ATN, sets []*IntervalSet) {
 
 	for i := 0; i < len(atn.states); i++ {
 		state := atn.states[i]
-		if s2, ok := state.(*BlockStartState); ok {
+		if s2, ok := state.(*BaseBlockStartState); ok {
 			// we need to know the end state to set its start state
 			if s2.endState == nil {
 				panic("IllegalState")
@@ -523,7 +523,7 @@ func (this *ATNDeserializer) verifyATN(atn *ATN) {
 			this.checkCondition(s2.loopBackState != nil, "")
 		case *RuleStartState:
 			this.checkCondition(s2.stopState != nil, "")
-		case *BlockStartState:
+		case *BaseBlockStartState:
 			this.checkCondition(s2.endState != nil, "")
 		case *BlockEndState:
 			this.checkCondition(s2.startState != nil, "")

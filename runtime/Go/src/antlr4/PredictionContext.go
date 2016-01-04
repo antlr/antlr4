@@ -347,16 +347,16 @@ func (this *ArrayPredictionContext) String() string {
 // /
 func predictionContextFromRuleContext(a *ATN, outerContext RuleContext) PredictionContext {
 	if outerContext == nil {
-		outerContext = RuleContextEMPTY
+		outerContext = RuleContextEmpty
 	}
 	// if we are in RuleContext of start rule, s, then BasePredictionContext
 	// is EMPTY. Nobody called us. (if we are empty, return empty)
-	if outerContext.GetParent() == nil || outerContext == RuleContextEMPTY {
+	if outerContext.GetParent() == nil || outerContext == RuleContextEmpty {
 		return BasePredictionContextEMPTY
 	}
 	// If we have a parent, convert it to a BasePredictionContext graph
 	var parent = predictionContextFromRuleContext(a, outerContext.GetParent().(RuleContext))
-	var state = a.states[outerContext.getInvokingState()]
+	var state = a.states[outerContext.GetInvokingState()]
 	var transition = state.GetTransitions()[0]
 
 	return SingletonBasePredictionContextCreate(parent, transition.(*RuleTransition).followState.GetStateNumber())
