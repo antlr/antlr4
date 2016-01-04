@@ -69,7 +69,7 @@ func (this *BaseRecognizer) GetTokenNames() []string {
 }
 
 func (this *BaseRecognizer) GetSymbolicNames() []string {
-	return this.LiteralNames
+	return this.SymbolicNames
 }
 
 func (this *BaseRecognizer) GetLiteralNames() []string {

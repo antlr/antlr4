@@ -274,6 +274,11 @@ IntervalSet.prototype.toIndexString = function() {
 
 
 IntervalSet.prototype.toTokenString = function(literalNames, symbolicNames) {
+	console.log(symbolicNames)
+	console.log(literalNames)
+	console.log(symbolicNames.length)
+	console.log(literalNames.length)
+	console.log(this.toString())
 	var names = [];
 	for (var i = 0; i < this.intervals.length; i++) {
 		var v = this.intervals[i];

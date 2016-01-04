@@ -282,8 +282,7 @@ func (is *IntervalSet) toIndexString() string {
 
 func (is *IntervalSet) toTokenString(literalNames []string, symbolicNames []string) string {
 	var names = make([]string, 0)
-	for i := 0; i < len(is.intervals); i++ {
-		var v = is.intervals[i]
+	for _,v := range is.intervals {
 		for j := v.start; j < v.stop; j++ {
 			names = append(names, is.elementName(literalNames, symbolicNames, j))
 		}
@@ -301,7 +300,7 @@ func (i *IntervalSet) elementName(literalNames []string, symbolicNames []string,
 	} else if a == TokenEpsilon {
 		return "<EPSILON>"
 	} else {
-		if literalNames[a] != "" {
+		if a < len(literalNames) && literalNames[a] != "" {
 			return literalNames[a]
 		} else {
 			return symbolicNames[a]

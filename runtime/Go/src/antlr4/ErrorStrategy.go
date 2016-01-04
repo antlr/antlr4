@@ -347,7 +347,6 @@ func (this *DefaultErrorStrategy) ReportUnwantedToken(recognizer Parser) {
 	var expecting = this.getExpectedTokens(recognizer)
 	var msg = "extraneous input " + tokenName + " expecting " +
 		expecting.StringVerbose(recognizer.GetLiteralNames(), recognizer.GetSymbolicNames(), false)
-	panic(msg)
 	recognizer.NotifyErrorListeners(msg, t, nil)
 }
 
