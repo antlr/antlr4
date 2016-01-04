@@ -190,7 +190,9 @@ var Honey = { 'requirePath': ['..'] }; // walk up to js folder, see Honey docs
 importScripts("../lib/require.js");
 var antlr4_require = require;
 require = ace_require;
+```
 Now it's safe to load antlr, and the parsers generated for your language. Assuming that your language files (generated or hand-built) are in a folder with an index.js file that calls require for each file, your parser loading code can be as simple as follows:
+```js
 // load antlr4 and myLanguage
 var antlr4, mylanguage;
 try {
