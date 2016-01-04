@@ -240,7 +240,8 @@ var validate = function(input) {
     parser.addErrorListener(listener);
     parser.parseMyRule();
     return annotations;
-};```
+};
+```
 You know what? That's it! You now have an ACE editor that does syntax validation using ANTLR! I hope you find this useful, and simple enough to get started.
 What I did not address here is packaging, not something I'm an expert at. The good news is that it makes development simple, since I don't have to run any compilation process. I just edit my code, reload my editor page, and check how it goes.
 Now wait, hey! How do you debug this? Well, as usual, using Chrome, since neither Firefox or Safari are able to debug worker code. What a shame...
