@@ -14,9 +14,10 @@ import (
     "fmt"
 )
 
-// suppress unused import error, many tests
-// require fmt.
+// suppress unused import error, we aren't guaranteed
+// to have reflect or fmt used in the generated code below
 var _ = fmt.Printf
+var _ = reflect.Copy
 
 <namedActions.header>
 
@@ -84,11 +85,27 @@ import "antlr4"
 type <file.grammarName>Visitor interface {
     antlr4.ParseTreeVisitor
 
-<file.VisitorNames:{lname |
+<file.visitorNames:{lname |
     // Visit a parse tree produced by <file.parserName>#<lname>.
-    Visit<lname; format="cap">(ctx antlr4.ParserRuleContext)
+    Visit<lname; format="cap">(ctx *<lname; format="cap">Context) interface{\}
 }; separator="\n">
 }
+>>
+
+BaseVisitorFile(file, header) ::= <<
+<fileHeader(file.grammarFileName, file.ANTLRVersion)>
+package parser // <file.grammarName>
+
+import "antlr4"
+
+type Base<file.grammarName>Visitor struct {
+    *antlr4.BaseParseTreeVisitor
+}
+
+<file.visitorNames:{lname |
+func (v *Base<file.grammarName>Visitor) Visit<lname; format="cap">(ctx *<lname; format="cap">Context) interface{\} {
+    return v.VisitChildren(ctx)
+\}}; separator="\n">
 >>
 
 Parser(parser, funcs, atn, sempredFuncs, superClass) ::= <<
@@ -126,11 +143,12 @@ func New<parser.name>(input antlr4.TokenStream) *<parser.name> {
     parser.RuleNames = ruleNames
     parser.LiteralNames = literalNames
     parser.SymbolicNames = symbolicNames
-	<namedActions.members>
     parser.GrammarFileName = "<parser.grammarFileName; format="java-escape">"
 
     return parser
 }
+
+<namedActions.members>
 
 const(
     <parser.name>EOF = antlr4.TokenEOF
@@ -713,32 +731,25 @@ func New<struct.name>(parser antlr4.Parser, ctx antlr4.ParserRuleContext) *<stru
 
 >>
 
-
 ListenerDispatchMethod(method) ::= <<
 func (s *<struct.name>) <if(method.isEnter)>Enter<else>Exit<endif>Rule(listener antlr4.ParseTreeListener) {
 
     listener.(<parser.grammarName>Listener).<if(method.isEnter)>Enter<else>Exit<endif><struct.derivedFromName; format="cap">(s)
 
 }
-
 >>
 
-
 VisitorDispatchMethod(method) ::= <<
-func (s *<struct.name>) Accept(Visitor antlr4.ParseTreeVisitor) interface{} {
+func (s *<struct.name>) Accept(visitor antlr4.ParseTreeVisitor) interface{} {
 
-    switch t := listener.(type) {
-    case <parser.grammarName>Listener:
+    switch t := visitor.(type) {
+    case <parser.grammarName>Visitor:
         return t.Visit<struct.derivedFromName; format="cap">(s)
     default:
         return t.VisitChildren(s)
     }
 }
-
 >>
-
-
-
 
 AttributeDecl(d) ::= "p.<d.name> = <if(d.InitValue)><d.InitValue><else>null<endif>"
 

@@ -60,6 +60,10 @@ func NewBaseRuleContext(parent RuleContext, invokingState int) *BaseRuleContext 
 	return rn
 }
 
+func (this *BaseRuleContext) GetBaseRuleContext() *BaseRuleContext {
+	return this
+}
+
 func (this *BaseRuleContext) SetParent(v Tree) {
 	this.parentCtx = v.(RuleContext)
 }

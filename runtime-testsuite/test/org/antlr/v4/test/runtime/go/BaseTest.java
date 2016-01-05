@@ -770,7 +770,7 @@ public abstract class BaseTest {
 						+")\n"
 						+ "\n"
 						+ "type TreeShapeListener struct {\n"
-						+ "	*antlr4.BaseParseTreeListener\n"
+						+ "	*parser.Base<listenerName>\n"
 						+ "}\n"
 						+ "\n"
 						+ "func NewTreeShapeListener() *TreeShapeListener {\n"
@@ -780,9 +780,8 @@ public abstract class BaseTest {
 						+ "func (this *TreeShapeListener) EnterEveryRule(ctx antlr4.ParserRuleContext) {\n"
 						+ "	for i := 0; i\\<ctx.GetChildCount(); i++ {\n"
 						+ "		child := ctx.GetChild(i)\n"
-						+ "		parent := child.GetParent()\n"
 						+ "		parentR,ok := child.GetParent().(antlr4.RuleNode)\n"
-						+ "		if parent.GetRuleContext() != ctx || !ok {\n"
+						+ "		if !ok || parentR.GetBaseRuleContext() != ctx.GetBaseRuleContext() {\n"
 						+ "			panic(\"Invalid parse tree shape detected.\")\n"
 						+ "		}\n"
 						+ "	}\n"
@@ -810,9 +809,11 @@ public abstract class BaseTest {
 		outputFileST.add("lexerName", lexerName);
 		outputFileST.add("listenerName", listenerName);
 		outputFileST.add("visitorName", visitorName);
-		outputFileST.add("parserStartRuleName", parserStartRuleName);
+		outputFileST.add("parserStartRuleName", parserStartRuleName.substring(0, 1).toUpperCase() + parserStartRuleName.substring(1) );
 		writeFile(tmpdir, "Test.go", outputFileST.render());
 	}
+
+
 
 	protected void writeLexerTestFile(String lexerName, boolean showDFA) {
 		ST outputFileST = new ST(

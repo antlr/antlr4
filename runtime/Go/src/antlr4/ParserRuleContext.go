@@ -3,7 +3,6 @@ package antlr4
 import (
 	"reflect"
 	"strconv"
-	"fmt"
 )
 
 type ParserRuleContext interface {
@@ -91,11 +90,9 @@ func (this *BaseParserRuleContext) GetText() string {
 
 // Double dispatch methods for listeners
 func (prc *BaseParserRuleContext) EnterRule(listener ParseTreeListener) {
-	fmt.Println("Do nothing enter")
 }
 
 func (prc *BaseParserRuleContext) ExitRule(listener ParseTreeListener) {
-	fmt.Println("Do nothing exit")
 }
 
 // * Does not set parent link other add methods do that///
@@ -181,8 +178,8 @@ func (prc *BaseParserRuleContext) GetRuleContext() RuleContext {
 	return prc
 }
 
-func (this *BaseParserRuleContext) Accept(Visitor ParseTreeVisitor) interface{} {
-	return Visitor.VisitChildren(this)
+func (this *BaseParserRuleContext) Accept(visitor ParseTreeVisitor) interface{} {
+	return visitor.VisitChildren(this)
 }
 
 func (prc *BaseParserRuleContext) SetStart(t Token) {

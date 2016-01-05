@@ -35,6 +35,7 @@ type RuleNode interface {
 	ParseTree
 
 	GetRuleContext() RuleContext
+	GetBaseRuleContext() *BaseRuleContext
 }
 
 type TerminalNode interface {
@@ -48,12 +49,18 @@ type ErrorNode interface {
 }
 
 type ParseTreeVisitor interface {
-	// NOTE: removed type arguments
 	Visit(tree ParseTree) interface{}
 	VisitChildren(node RuleNode) interface{}
 	VisitTerminal(node TerminalNode) interface{}
 	VisitErrorNode(node ErrorNode) interface{}
 }
+
+type BaseParseTreeVisitor struct {}
+
+func (v *BaseParseTreeVisitor) Visit(tree ParseTree) interface{} { return nil }
+func (v *BaseParseTreeVisitor) VisitChildren(node RuleNode) interface{} { return nil }
+func (v *BaseParseTreeVisitor) VisitTerminal(node TerminalNode) interface{} { return nil }
+func (v *BaseParseTreeVisitor) VisitErrorNode(node ErrorNode) interface{} { return nil }
 
 // TODO
 //func (this ParseTreeVisitor) Visit(ctx) {
@@ -144,8 +151,8 @@ func (this *TerminalNodeImpl) GetChildCount() int {
 	return 0
 }
 
-func (this *TerminalNodeImpl) Accept(Visitor ParseTreeVisitor) interface{} {
-	return Visitor.VisitTerminal(this)
+func (this *TerminalNodeImpl) Accept(v ParseTreeVisitor) interface{} {
+	return v.VisitTerminal(this)
 }
 
 func (this *TerminalNodeImpl) GetText() string {
@@ -180,8 +187,8 @@ func (this *ErrorNodeImpl) IsErrorNode() bool {
 	return true
 }
 
-func (this *ErrorNodeImpl) Accept(Visitor ParseTreeVisitor) interface{} {
-	return Visitor.VisitErrorNode(this)
+func (this *ErrorNodeImpl) Accept(v ParseTreeVisitor) interface{} {
+	return v.VisitErrorNode(this)
 }
 
 type ParseTreeWalker struct {
