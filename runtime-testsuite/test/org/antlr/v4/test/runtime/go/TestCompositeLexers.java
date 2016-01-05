@@ -14,7 +14,7 @@ public class TestCompositeLexers extends BaseTest {
 		mkdir(parserpkgdir);
 		String slave_S =
 			"lexer grammar S;\n" +
-			"A : 'a' {fmt.Println(\"S.A\");};\n" +
+			"A : 'a' {fmt.Println(\"S.A\")};\n" +
 			"C : 'c' ;";
 		writeFile(parserpkgdir, "S.g4", slave_S);
 
@@ -42,15 +42,15 @@ public class TestCompositeLexers extends BaseTest {
 		mkdir(parserpkgdir);
 		String slave_S =
 			"lexer grammar S;\n" +
-			"A : 'a' {fmt.Println(\"S.A\");} ;\n" +
-			"B : 'b' {fmt.Println(\"S.B\");} ;";
+			"A : 'a' {fmt.Println(\"S.A\")} ;\n" +
+			"B : 'b' {fmt.Println(\"S.B\")} ;";
 		writeFile(parserpkgdir, "S.g4", slave_S);
 
 
-		StringBuilder grammarBuilder = new StringBuilder(86);
+		StringBuilder grammarBuilder = new StringBuilder(85);
 		grammarBuilder.append("lexer grammar M;\n");
 		grammarBuilder.append("import S;\n");
-		grammarBuilder.append("A : 'a' B {fmt.Println(\"M.A\");} ;\n");
+		grammarBuilder.append("A : 'a' B {fmt.Println(\"M.A\")} ;\n");
 		grammarBuilder.append("WS : (' '|'\\n') -> skip ;");
 		String grammar = grammarBuilder.toString();
 		String input ="ab";

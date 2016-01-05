@@ -12,10 +12,10 @@ public class TestParserExec extends BaseTest {
 	@Test
 	public void testAPlus() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(84);
+		StringBuilder grammarBuilder = new StringBuilder(83);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("a : ID+ {\n");
-		grammarBuilder.append("fmt.Println($text);\n");
+		grammarBuilder.append("fmt.Println($text)\n");
 		grammarBuilder.append("};\n");
 		grammarBuilder.append("ID : 'a'..'z'+;\n");
 		grammarBuilder.append("WS : (' '|'\\n') -> skip;");
@@ -32,10 +32,10 @@ public class TestParserExec extends BaseTest {
 	@Test
 	public void testAStar_1() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(84);
+		StringBuilder grammarBuilder = new StringBuilder(83);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("a : ID* {\n");
-		grammarBuilder.append("fmt.Println($text);\n");
+		grammarBuilder.append("fmt.Println($text)\n");
 		grammarBuilder.append("};\n");
 		grammarBuilder.append("ID : 'a'..'z'+;\n");
 		grammarBuilder.append("WS : (' '|'\\n') -> skip;");
@@ -52,10 +52,10 @@ public class TestParserExec extends BaseTest {
 	@Test
 	public void testAStar_2() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(84);
+		StringBuilder grammarBuilder = new StringBuilder(83);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("a : ID* {\n");
-		grammarBuilder.append("fmt.Println($text);\n");
+		grammarBuilder.append("fmt.Println($text)\n");
 		grammarBuilder.append("};\n");
 		grammarBuilder.append("ID : 'a'..'z'+;\n");
 		grammarBuilder.append("WS : (' '|'\\n') -> skip;");
@@ -72,10 +72,10 @@ public class TestParserExec extends BaseTest {
 	@Test
 	public void testAorAPlus() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(89);
+		StringBuilder grammarBuilder = new StringBuilder(88);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("a : (ID|ID)+ {\n");
-		grammarBuilder.append("fmt.Println($text);\n");
+		grammarBuilder.append("fmt.Println($text)\n");
 		grammarBuilder.append("};\n");
 		grammarBuilder.append("ID : 'a'..'z'+;\n");
 		grammarBuilder.append("WS : (' '|'\\n') -> skip;");
@@ -92,10 +92,10 @@ public class TestParserExec extends BaseTest {
 	@Test
 	public void testAorAStar_1() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(89);
+		StringBuilder grammarBuilder = new StringBuilder(88);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("a : (ID|ID)* {\n");
-		grammarBuilder.append("fmt.Println($text);\n");
+		grammarBuilder.append("fmt.Println($text)\n");
 		grammarBuilder.append("};\n");
 		grammarBuilder.append("ID : 'a'..'z'+;\n");
 		grammarBuilder.append("WS : (' '|'\\n') -> skip;");
@@ -112,10 +112,10 @@ public class TestParserExec extends BaseTest {
 	@Test
 	public void testAorAStar_2() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(89);
+		StringBuilder grammarBuilder = new StringBuilder(88);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("a : (ID|ID)* {\n");
-		grammarBuilder.append("fmt.Println($text);\n");
+		grammarBuilder.append("fmt.Println($text)\n");
 		grammarBuilder.append("};\n");
 		grammarBuilder.append("ID : 'a'..'z'+;\n");
 		grammarBuilder.append("WS : (' '|'\\n') -> skip;");
@@ -132,12 +132,12 @@ public class TestParserExec extends BaseTest {
 	@Test
 	public void testAorB() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(136);
+		StringBuilder grammarBuilder = new StringBuilder(134);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("a : ID {\n");
-		grammarBuilder.append("fmt.Println(\"alt 1\");\n");
+		grammarBuilder.append("fmt.Println(\"alt 1\")\n");
 		grammarBuilder.append("} | INT {\n");
-		grammarBuilder.append("fmt.Println(\"alt 2\");\n");
+		grammarBuilder.append("fmt.Println(\"alt 2\")\n");
 		grammarBuilder.append("};\n");
 		grammarBuilder.append("ID : 'a'..'z'+ ;\n");
 		grammarBuilder.append("INT : '0'..'9'+;\n");
@@ -155,11 +155,11 @@ public class TestParserExec extends BaseTest {
 	@Test
 	public void testAorBPlus() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(112);
+		StringBuilder grammarBuilder = new StringBuilder(111);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("a : (ID|INT{\n");
 		grammarBuilder.append("})+ {\n");
-		grammarBuilder.append("fmt.Println($text);\n");
+		grammarBuilder.append("fmt.Println($text)\n");
 		grammarBuilder.append("};\n");
 		grammarBuilder.append("ID : 'a'..'z'+ ;\n");
 		grammarBuilder.append("INT : '0'..'9'+;\n");
@@ -177,11 +177,11 @@ public class TestParserExec extends BaseTest {
 	@Test
 	public void testAorBStar_1() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(112);
+		StringBuilder grammarBuilder = new StringBuilder(111);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("a : (ID|INT{\n");
 		grammarBuilder.append("})* {\n");
-		grammarBuilder.append("fmt.Println($text);\n");
+		grammarBuilder.append("fmt.Println($text)\n");
 		grammarBuilder.append("};\n");
 		grammarBuilder.append("ID : 'a'..'z'+ ;\n");
 		grammarBuilder.append("INT : '0'..'9'+;\n");
@@ -199,11 +199,11 @@ public class TestParserExec extends BaseTest {
 	@Test
 	public void testAorBStar_2() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(112);
+		StringBuilder grammarBuilder = new StringBuilder(111);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("a : (ID|INT{\n");
 		grammarBuilder.append("})* {\n");
-		grammarBuilder.append("fmt.Println($text);\n");
+		grammarBuilder.append("fmt.Println($text)\n");
 		grammarBuilder.append("};\n");
 		grammarBuilder.append("ID : 'a'..'z'+ ;\n");
 		grammarBuilder.append("INT : '0'..'9'+;\n");
@@ -221,10 +221,10 @@ public class TestParserExec extends BaseTest {
 	@Test
 	public void testBasic() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(105);
+		StringBuilder grammarBuilder = new StringBuilder(104);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("a : ID INT {\n");
-		grammarBuilder.append("fmt.Println($text);\n");
+		grammarBuilder.append("fmt.Println($text)\n");
 		grammarBuilder.append("};\n");
 		grammarBuilder.append("ID : 'a'..'z'+ ;\n");
 		grammarBuilder.append("INT : '0'..'9'+;\n");
@@ -259,12 +259,12 @@ public class TestParserExec extends BaseTest {
 	@Test
 	public void testIfIfElseGreedyBinding1() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(193);
+		StringBuilder grammarBuilder = new StringBuilder(192);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("start : statement+ ;\n");
 		grammarBuilder.append("statement : 'x' | ifStatement;\n");
 		grammarBuilder.append("ifStatement : 'if' 'y' statement ('else' statement)? {\n");
-		grammarBuilder.append("fmt.Println($text);\n");
+		grammarBuilder.append("fmt.Println($text)\n");
 		grammarBuilder.append("};\n");
 		grammarBuilder.append("ID : 'a'..'z'+ ;\n");
 		grammarBuilder.append("WS : (' '|'\\n') -> channel(HIDDEN);");
@@ -283,12 +283,12 @@ public class TestParserExec extends BaseTest {
 	@Test
 	public void testIfIfElseGreedyBinding2() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(193);
+		StringBuilder grammarBuilder = new StringBuilder(192);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("start : statement+ ;\n");
 		grammarBuilder.append("statement : 'x' | ifStatement;\n");
 		grammarBuilder.append("ifStatement : 'if' 'y' statement ('else' statement|) {\n");
-		grammarBuilder.append("fmt.Println($text);\n");
+		grammarBuilder.append("fmt.Println($text)\n");
 		grammarBuilder.append("};\n");
 		grammarBuilder.append("ID : 'a'..'z'+ ;\n");
 		grammarBuilder.append("WS : (' '|'\\n') -> channel(HIDDEN);");
@@ -307,12 +307,12 @@ public class TestParserExec extends BaseTest {
 	@Test
 	public void testIfIfElseNonGreedyBinding1() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(194);
+		StringBuilder grammarBuilder = new StringBuilder(193);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("start : statement+ ;\n");
 		grammarBuilder.append("statement : 'x' | ifStatement;\n");
 		grammarBuilder.append("ifStatement : 'if' 'y' statement ('else' statement)?? {\n");
-		grammarBuilder.append("fmt.Println($text);\n");
+		grammarBuilder.append("fmt.Println($text)\n");
 		grammarBuilder.append("};\n");
 		grammarBuilder.append("ID : 'a'..'z'+ ;\n");
 		grammarBuilder.append("WS : (' '|'\\n') -> channel(HIDDEN);");
@@ -331,12 +331,12 @@ public class TestParserExec extends BaseTest {
 	@Test
 	public void testIfIfElseNonGreedyBinding2() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(193);
+		StringBuilder grammarBuilder = new StringBuilder(192);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("start : statement+ ;\n");
 		grammarBuilder.append("statement : 'x' | ifStatement;\n");
 		grammarBuilder.append("ifStatement : 'if' 'y' statement (|'else' statement) {\n");
-		grammarBuilder.append("fmt.Println($text);\n");
+		grammarBuilder.append("fmt.Println($text)\n");
 		grammarBuilder.append("};\n");
 		grammarBuilder.append("ID : 'a'..'z'+ ;\n");
 		grammarBuilder.append("WS : (' '|'\\n') -> channel(HIDDEN);");
@@ -355,10 +355,10 @@ public class TestParserExec extends BaseTest {
 	@Test
 	public void testLL1OptionalBlock_1() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(110);
+		StringBuilder grammarBuilder = new StringBuilder(109);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("a : (ID|{}INT)? {\n");
-		grammarBuilder.append("fmt.Println($text);\n");
+		grammarBuilder.append("fmt.Println($text)\n");
 		grammarBuilder.append("};\n");
 		grammarBuilder.append("ID : 'a'..'z'+;\n");
 		grammarBuilder.append("INT : '0'..'9'+ ;\n");
@@ -376,10 +376,10 @@ public class TestParserExec extends BaseTest {
 	@Test
 	public void testLL1OptionalBlock_2() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(110);
+		StringBuilder grammarBuilder = new StringBuilder(109);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("a : (ID|{}INT)? {\n");
-		grammarBuilder.append("fmt.Println($text);\n");
+		grammarBuilder.append("fmt.Println($text)\n");
 		grammarBuilder.append("};\n");
 		grammarBuilder.append("ID : 'a'..'z'+;\n");
 		grammarBuilder.append("INT : '0'..'9'+ ;\n");
@@ -397,12 +397,12 @@ public class TestParserExec extends BaseTest {
 	@Test
 	public void testLabelAliasingAcrossLabeledAlternatives() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(171);
+		StringBuilder grammarBuilder = new StringBuilder(169);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("start : a* EOF;\n");
 		grammarBuilder.append("a\n");
-		grammarBuilder.append("  : label=subrule {fmt.Println($label.text);} #One\n");
-		grammarBuilder.append("  | label='y' {fmt.Println($label.text);} #Two\n");
+		grammarBuilder.append("  : label=subrule {fmt.Println($label.text)} #One\n");
+		grammarBuilder.append("  | label='y' {fmt.Println($label.text)} #Two\n");
 		grammarBuilder.append("  ;\n");
 		grammarBuilder.append("subrule : 'x';\n");
 		grammarBuilder.append("WS : (' '|'\\n') -> skip ;");
@@ -584,14 +584,14 @@ public class TestParserExec extends BaseTest {
 	@Test
 	public void testParserProperty() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(158);
+		StringBuilder grammarBuilder = new StringBuilder(157);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("@members {\n");
 		grammarBuilder.append("bool Property() {\n");
 		grammarBuilder.append("  return true;\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("}\n");
-		grammarBuilder.append("a : {$parser.Property()}? ID {fmt.Println(\"valid\");}\n");
+		grammarBuilder.append("a : {$parser.Property()}? ID {fmt.Println(\"valid\")}\n");
 		grammarBuilder.append("  ;\n");
 		grammarBuilder.append("ID : 'a'..'z'+ ;\n");
 		grammarBuilder.append("WS : (' '|'\\n') -> skip ;");
@@ -629,13 +629,13 @@ public class TestParserExec extends BaseTest {
 	@Test
 	public void testPredictionIssue334() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(248);
+		StringBuilder grammarBuilder = new StringBuilder(246);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("file_ @init{\n");
-		grammarBuilder.append("SetErrorHandler(new BailErrorStrategy());\n");
+		grammarBuilder.append("SetErrorHandler(NewBailErrorStrategy());\n");
 		grammarBuilder.append("} \n");
 		grammarBuilder.append("@after {\n");
-		grammarBuilder.append("fmt.Println($ctx.toStringTree(this));\n");
+		grammarBuilder.append("fmt.Println($ctx.toStringTree(this))\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("  :   item (SEMICOLON item)* SEMICOLON? EOF ;\n");
 		grammarBuilder.append("item : A B?;\n");
@@ -656,9 +656,9 @@ public class TestParserExec extends BaseTest {
 	@Test
 	public void testReferenceToATN_1() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(113);
+		StringBuilder grammarBuilder = new StringBuilder(112);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("a : (ID|ATN)* ATN? {fmt.Println($text);} ;\n");
+		grammarBuilder.append("a : (ID|ATN)* ATN? {fmt.Println($text)} ;\n");
 		grammarBuilder.append("ID : 'a'..'z'+ ;\n");
 		grammarBuilder.append("ATN : '0'..'9'+;\n");
 		grammarBuilder.append("WS : (' '|'\\n') -> skip ;");
@@ -675,9 +675,9 @@ public class TestParserExec extends BaseTest {
 	@Test
 	public void testReferenceToATN_2() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(113);
+		StringBuilder grammarBuilder = new StringBuilder(112);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("a : (ID|ATN)* ATN? {fmt.Println($text);} ;\n");
+		grammarBuilder.append("a : (ID|ATN)* ATN? {fmt.Println($text)} ;\n");
 		grammarBuilder.append("ID : 'a'..'z'+ ;\n");
 		grammarBuilder.append("ATN : '0'..'9'+;\n");
 		grammarBuilder.append("WS : (' '|'\\n') -> skip ;");

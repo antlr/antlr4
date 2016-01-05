@@ -12,9 +12,9 @@ public class TestParserErrors extends BaseTest {
 	@Test
 	public void testConjuringUpToken() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(63);
+		StringBuilder grammarBuilder = new StringBuilder(62);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("a : 'a' x='b' {fmt.Println(\"conjured=\" + $x);} 'c' ;");
+		grammarBuilder.append("a : 'a' x='b' {fmt.Println(\"conjured=\" + $x)} 'c' ;");
 		String grammar = grammarBuilder.toString();
 		String input ="ac";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
@@ -29,9 +29,9 @@ public class TestParserErrors extends BaseTest {
 	@Test
 	public void testConjuringUpTokenFromSet() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(69);
+		StringBuilder grammarBuilder = new StringBuilder(68);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("a : 'a' x=('b'|'c') {fmt.Println(\"conjured=\" + $x);} 'd' ;");
+		grammarBuilder.append("a : 'a' x=('b'|'c') {fmt.Println(\"conjured=\" + $x)} 'd' ;");
 		String grammar = grammarBuilder.toString();
 		String input ="ad";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
@@ -46,7 +46,7 @@ public class TestParserErrors extends BaseTest {
 	@Test
 	public void testContextListGetters() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(207);
+		StringBuilder grammarBuilder = new StringBuilder(205);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("@parser::members{\n");
 		grammarBuilder.append("func foo() {\n");
@@ -56,8 +56,8 @@ public class TestParserErrors extends BaseTest {
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("s : (a | b)+;\n");
-		grammarBuilder.append("a : 'a' {fmt.Print('a');};\n");
-		grammarBuilder.append("b : 'b' {fmt.Print('b');};");
+		grammarBuilder.append("a : 'a' {fmt.Print('a')};\n");
+		grammarBuilder.append("b : 'b' {fmt.Print('b')};");
 		String grammar = grammarBuilder.toString();
 		String input ="abab";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
@@ -184,7 +184,7 @@ public class TestParserErrors extends BaseTest {
 	@Test
 	public void testLL1ErrorInfo() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(299);
+		StringBuilder grammarBuilder = new StringBuilder(298);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("start : animal (AND acClass)? service EOF;\n");
 		grammarBuilder.append("animal : (DOG | CAT );\n");
@@ -197,7 +197,7 @@ public class TestParserErrors extends BaseTest {
 		grammarBuilder.append("WS : ' ' -> skip ;\n");
 		grammarBuilder.append("acClass\n");
 		grammarBuilder.append("@init\n");
-		grammarBuilder.append("{fmt.Println(this.GetExpectedTokens().toString(this.tokenNames));}\n");
+		grammarBuilder.append("{fmt.Println(this.GetExpectedTokens().toString(this.tokenNames))}\n");
 		grammarBuilder.append("  : ;");
 		String grammar = grammarBuilder.toString();
 		String input ="dog and software";
@@ -383,10 +383,10 @@ public class TestParserErrors extends BaseTest {
 	@Test
 	public void testSingleSetInsertionConsumption() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(82);
+		StringBuilder grammarBuilder = new StringBuilder(81);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("myset: ('b'|'c') ;\n");
-		grammarBuilder.append("a: 'a' myset 'd' {fmt.Println(\"\" + $myset.stop);} ; ");
+		grammarBuilder.append("a: 'a' myset 'd' {fmt.Println(\"\" + $myset.stop)} ; ");
 		String grammar = grammarBuilder.toString();
 		String input ="ad";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
@@ -496,10 +496,10 @@ public class TestParserErrors extends BaseTest {
 	@Test
 	public void testSingleTokenDeletionConsumption() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(82);
+		StringBuilder grammarBuilder = new StringBuilder(81);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("myset: ('b'|'c') ;\n");
-		grammarBuilder.append("a: 'a' myset 'd' {fmt.Println(\"\" + $myset.stop);} ; ");
+		grammarBuilder.append("a: 'a' myset 'd' {fmt.Println(\"\" + $myset.stop)} ; ");
 		String grammar = grammarBuilder.toString();
 		String input ="aabd";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",

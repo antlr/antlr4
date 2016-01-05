@@ -187,9 +187,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testDeclarations_1() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(392);
+		StringBuilder grammarBuilder = new StringBuilder(391);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this));} : declarator EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this))} : declarator EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("declarator\n");
 		grammarBuilder.append("        : declarator '[' e ']'\n");
 		grammarBuilder.append("        | declarator '[' ']'\n");
@@ -215,9 +215,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testDeclarations_10() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(392);
+		StringBuilder grammarBuilder = new StringBuilder(391);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this));} : declarator EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this))} : declarator EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("declarator\n");
 		grammarBuilder.append("        : declarator '[' e ']'\n");
 		grammarBuilder.append("        | declarator '[' ']'\n");
@@ -243,9 +243,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testDeclarations_2() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(392);
+		StringBuilder grammarBuilder = new StringBuilder(391);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this));} : declarator EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this))} : declarator EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("declarator\n");
 		grammarBuilder.append("        : declarator '[' e ']'\n");
 		grammarBuilder.append("        | declarator '[' ']'\n");
@@ -271,9 +271,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testDeclarations_3() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(392);
+		StringBuilder grammarBuilder = new StringBuilder(391);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this));} : declarator EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this))} : declarator EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("declarator\n");
 		grammarBuilder.append("        : declarator '[' e ']'\n");
 		grammarBuilder.append("        | declarator '[' ']'\n");
@@ -299,9 +299,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testDeclarations_4() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(392);
+		StringBuilder grammarBuilder = new StringBuilder(391);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this));} : declarator EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this))} : declarator EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("declarator\n");
 		grammarBuilder.append("        : declarator '[' e ']'\n");
 		grammarBuilder.append("        | declarator '[' ']'\n");
@@ -327,9 +327,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testDeclarations_5() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(392);
+		StringBuilder grammarBuilder = new StringBuilder(391);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this));} : declarator EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this))} : declarator EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("declarator\n");
 		grammarBuilder.append("        : declarator '[' e ']'\n");
 		grammarBuilder.append("        | declarator '[' ']'\n");
@@ -355,9 +355,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testDeclarations_6() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(392);
+		StringBuilder grammarBuilder = new StringBuilder(391);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this));} : declarator EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this))} : declarator EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("declarator\n");
 		grammarBuilder.append("        : declarator '[' e ']'\n");
 		grammarBuilder.append("        | declarator '[' ']'\n");
@@ -383,9 +383,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testDeclarations_7() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(392);
+		StringBuilder grammarBuilder = new StringBuilder(391);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this));} : declarator EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this))} : declarator EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("declarator\n");
 		grammarBuilder.append("        : declarator '[' e ']'\n");
 		grammarBuilder.append("        | declarator '[' ']'\n");
@@ -411,9 +411,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testDeclarations_8() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(392);
+		StringBuilder grammarBuilder = new StringBuilder(391);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this));} : declarator EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this))} : declarator EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("declarator\n");
 		grammarBuilder.append("        : declarator '[' e ']'\n");
 		grammarBuilder.append("        | declarator '[' ']'\n");
@@ -439,9 +439,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testDeclarations_9() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(392);
+		StringBuilder grammarBuilder = new StringBuilder(391);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this));} : declarator EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this))} : declarator EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("declarator\n");
 		grammarBuilder.append("        : declarator '[' e ']'\n");
 		grammarBuilder.append("        | declarator '[' ']'\n");
@@ -467,9 +467,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testDirectCallToLeftRecursiveRule_1() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(120);
+		StringBuilder grammarBuilder = new StringBuilder(119);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("a @after {fmt.Println($ctx.toStringTree(this));} : a ID\n");
+		grammarBuilder.append("a @after {fmt.Println($ctx.toStringTree(this))} : a ID\n");
 		grammarBuilder.append("  | ID\n");
 		grammarBuilder.append("  ;\n");
 		grammarBuilder.append("ID : 'a'..'z'+ ;\n");
@@ -487,9 +487,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testDirectCallToLeftRecursiveRule_2() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(120);
+		StringBuilder grammarBuilder = new StringBuilder(119);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("a @after {fmt.Println($ctx.toStringTree(this));} : a ID\n");
+		grammarBuilder.append("a @after {fmt.Println($ctx.toStringTree(this))} : a ID\n");
 		grammarBuilder.append("  | ID\n");
 		grammarBuilder.append("  ;\n");
 		grammarBuilder.append("ID : 'a'..'z'+ ;\n");
@@ -507,9 +507,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testDirectCallToLeftRecursiveRule_3() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(120);
+		StringBuilder grammarBuilder = new StringBuilder(119);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("a @after {fmt.Println($ctx.toStringTree(this));} : a ID\n");
+		grammarBuilder.append("a @after {fmt.Println($ctx.toStringTree(this))} : a ID\n");
 		grammarBuilder.append("  | ID\n");
 		grammarBuilder.append("  ;\n");
 		grammarBuilder.append("ID : 'a'..'z'+ ;\n");
@@ -527,9 +527,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testExpressions_1() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(251);
+		StringBuilder grammarBuilder = new StringBuilder(250);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this));} : e EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this))} : e EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("e : e '.' ID\n");
 		grammarBuilder.append("  | e '.' 'this'\n");
 		grammarBuilder.append("  | '-' e\n");
@@ -554,9 +554,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testExpressions_2() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(251);
+		StringBuilder grammarBuilder = new StringBuilder(250);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this));} : e EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this))} : e EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("e : e '.' ID\n");
 		grammarBuilder.append("  | e '.' 'this'\n");
 		grammarBuilder.append("  | '-' e\n");
@@ -581,9 +581,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testExpressions_3() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(251);
+		StringBuilder grammarBuilder = new StringBuilder(250);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this));} : e EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this))} : e EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("e : e '.' ID\n");
 		grammarBuilder.append("  | e '.' 'this'\n");
 		grammarBuilder.append("  | '-' e\n");
@@ -608,9 +608,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testExpressions_4() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(251);
+		StringBuilder grammarBuilder = new StringBuilder(250);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this));} : e EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this))} : e EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("e : e '.' ID\n");
 		grammarBuilder.append("  | e '.' 'this'\n");
 		grammarBuilder.append("  | '-' e\n");
@@ -635,9 +635,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testExpressions_5() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(251);
+		StringBuilder grammarBuilder = new StringBuilder(250);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this));} : e EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this))} : e EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("e : e '.' ID\n");
 		grammarBuilder.append("  | e '.' 'this'\n");
 		grammarBuilder.append("  | '-' e\n");
@@ -662,9 +662,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testExpressions_6() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(251);
+		StringBuilder grammarBuilder = new StringBuilder(250);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this));} : e EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this))} : e EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("e : e '.' ID\n");
 		grammarBuilder.append("  | e '.' 'this'\n");
 		grammarBuilder.append("  | '-' e\n");
@@ -689,9 +689,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testExpressions_7() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(251);
+		StringBuilder grammarBuilder = new StringBuilder(250);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this));} : e EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this))} : e EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("e : e '.' ID\n");
 		grammarBuilder.append("  | e '.' 'this'\n");
 		grammarBuilder.append("  | '-' e\n");
@@ -716,9 +716,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testJavaExpressions_1() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(1248);
+		StringBuilder grammarBuilder = new StringBuilder(1247);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this));} : e EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this))} : e EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("expressionList\n");
 		grammarBuilder.append("    :   e (',' e)*\n");
 		grammarBuilder.append("    ;\n");
@@ -787,9 +787,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testJavaExpressions_10() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(1248);
+		StringBuilder grammarBuilder = new StringBuilder(1247);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this));} : e EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this))} : e EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("expressionList\n");
 		grammarBuilder.append("    :   e (',' e)*\n");
 		grammarBuilder.append("    ;\n");
@@ -858,9 +858,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testJavaExpressions_11() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(1248);
+		StringBuilder grammarBuilder = new StringBuilder(1247);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this));} : e EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this))} : e EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("expressionList\n");
 		grammarBuilder.append("    :   e (',' e)*\n");
 		grammarBuilder.append("    ;\n");
@@ -929,9 +929,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testJavaExpressions_12() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(1248);
+		StringBuilder grammarBuilder = new StringBuilder(1247);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this));} : e EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this))} : e EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("expressionList\n");
 		grammarBuilder.append("    :   e (',' e)*\n");
 		grammarBuilder.append("    ;\n");
@@ -1000,9 +1000,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testJavaExpressions_2() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(1248);
+		StringBuilder grammarBuilder = new StringBuilder(1247);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this));} : e EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this))} : e EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("expressionList\n");
 		grammarBuilder.append("    :   e (',' e)*\n");
 		grammarBuilder.append("    ;\n");
@@ -1071,9 +1071,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testJavaExpressions_3() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(1248);
+		StringBuilder grammarBuilder = new StringBuilder(1247);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this));} : e EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this))} : e EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("expressionList\n");
 		grammarBuilder.append("    :   e (',' e)*\n");
 		grammarBuilder.append("    ;\n");
@@ -1142,9 +1142,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testJavaExpressions_4() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(1248);
+		StringBuilder grammarBuilder = new StringBuilder(1247);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this));} : e EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this))} : e EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("expressionList\n");
 		grammarBuilder.append("    :   e (',' e)*\n");
 		grammarBuilder.append("    ;\n");
@@ -1213,9 +1213,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testJavaExpressions_5() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(1248);
+		StringBuilder grammarBuilder = new StringBuilder(1247);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this));} : e EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this))} : e EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("expressionList\n");
 		grammarBuilder.append("    :   e (',' e)*\n");
 		grammarBuilder.append("    ;\n");
@@ -1284,9 +1284,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testJavaExpressions_6() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(1248);
+		StringBuilder grammarBuilder = new StringBuilder(1247);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this));} : e EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this))} : e EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("expressionList\n");
 		grammarBuilder.append("    :   e (',' e)*\n");
 		grammarBuilder.append("    ;\n");
@@ -1355,9 +1355,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testJavaExpressions_7() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(1248);
+		StringBuilder grammarBuilder = new StringBuilder(1247);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this));} : e EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this))} : e EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("expressionList\n");
 		grammarBuilder.append("    :   e (',' e)*\n");
 		grammarBuilder.append("    ;\n");
@@ -1426,9 +1426,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testJavaExpressions_8() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(1248);
+		StringBuilder grammarBuilder = new StringBuilder(1247);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this));} : e EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this))} : e EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("expressionList\n");
 		grammarBuilder.append("    :   e (',' e)*\n");
 		grammarBuilder.append("    ;\n");
@@ -1497,9 +1497,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testJavaExpressions_9() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(1248);
+		StringBuilder grammarBuilder = new StringBuilder(1247);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this));} : e EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this))} : e EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("expressionList\n");
 		grammarBuilder.append("    :   e (',' e)*\n");
 		grammarBuilder.append("    ;\n");
@@ -1568,9 +1568,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testLabelsOnOpSubrule_1() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(171);
+		StringBuilder grammarBuilder = new StringBuilder(170);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this));} : e;\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this))} : e;\n");
 		grammarBuilder.append("e : a=e op=('*'|'/') b=e  {}\n");
 		grammarBuilder.append("  | INT {}\n");
 		grammarBuilder.append("  | '(' x=e ')' {}\n");
@@ -1590,9 +1590,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testLabelsOnOpSubrule_2() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(171);
+		StringBuilder grammarBuilder = new StringBuilder(170);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this));} : e;\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this))} : e;\n");
 		grammarBuilder.append("e : a=e op=('*'|'/') b=e  {}\n");
 		grammarBuilder.append("  | INT {}\n");
 		grammarBuilder.append("  | '(' x=e ')' {}\n");
@@ -1612,9 +1612,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testLabelsOnOpSubrule_3() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(171);
+		StringBuilder grammarBuilder = new StringBuilder(170);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this));} : e;\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this))} : e;\n");
 		grammarBuilder.append("e : a=e op=('*'|'/') b=e  {}\n");
 		grammarBuilder.append("  | INT {}\n");
 		grammarBuilder.append("  | '(' x=e ')' {}\n");
@@ -1634,9 +1634,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testMultipleActionsPredicatesOptions_1() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(240);
+		StringBuilder grammarBuilder = new StringBuilder(239);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this));} : e ;\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this))} : e ;\n");
 		grammarBuilder.append("e : a=e op=('*'|'/') b=e  {}{true}?\n");
 		grammarBuilder.append("  | a=e op=('+'|'-') b=e  {}<p=3>{true}?<fail='Message'>\n");
 		grammarBuilder.append("  | INT {}{}\n");
@@ -1657,9 +1657,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testMultipleActionsPredicatesOptions_2() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(240);
+		StringBuilder grammarBuilder = new StringBuilder(239);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this));} : e ;\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this))} : e ;\n");
 		grammarBuilder.append("e : a=e op=('*'|'/') b=e  {}{true}?\n");
 		grammarBuilder.append("  | a=e op=('+'|'-') b=e  {}<p=3>{true}?<fail='Message'>\n");
 		grammarBuilder.append("  | INT {}{}\n");
@@ -1680,9 +1680,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testMultipleActionsPredicatesOptions_3() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(240);
+		StringBuilder grammarBuilder = new StringBuilder(239);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this));} : e ;\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this))} : e ;\n");
 		grammarBuilder.append("e : a=e op=('*'|'/') b=e  {}{true}?\n");
 		grammarBuilder.append("  | a=e op=('+'|'-') b=e  {}<p=3>{true}?<fail='Message'>\n");
 		grammarBuilder.append("  | INT {}{}\n");
@@ -1703,9 +1703,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testMultipleActions_1() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(178);
+		StringBuilder grammarBuilder = new StringBuilder(177);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this));} : e ;\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this))} : e ;\n");
 		grammarBuilder.append("e : a=e op=('*'|'/') b=e  {}{}\n");
 		grammarBuilder.append("  | INT {}{}\n");
 		grammarBuilder.append("  | '(' x=e ')' {}{}\n");
@@ -1725,9 +1725,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testMultipleActions_2() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(178);
+		StringBuilder grammarBuilder = new StringBuilder(177);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this));} : e ;\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this))} : e ;\n");
 		grammarBuilder.append("e : a=e op=('*'|'/') b=e  {}{}\n");
 		grammarBuilder.append("  | INT {}{}\n");
 		grammarBuilder.append("  | '(' x=e ')' {}{}\n");
@@ -1747,9 +1747,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testMultipleActions_3() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(178);
+		StringBuilder grammarBuilder = new StringBuilder(177);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this));} : e ;\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this))} : e ;\n");
 		grammarBuilder.append("e : a=e op=('*'|'/') b=e  {}{}\n");
 		grammarBuilder.append("  | INT {}{}\n");
 		grammarBuilder.append("  | '(' x=e ')' {}{}\n");
@@ -1769,16 +1769,16 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testMultipleAlternativesWithCommonLabel_1() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(723);
+		StringBuilder grammarBuilder = new StringBuilder(720);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s : e {fmt.Println($e.v);};\n");
+		grammarBuilder.append("s : e {fmt.Println($e.v)};\n");
 		grammarBuilder.append("e returns [int v]\n");
 		grammarBuilder.append("  : e '*' e     {$v = ((BinaryContext)$ctx).e(0).v * ((BinaryContext)$ctx).e(1).v;}  # binary\n");
 		grammarBuilder.append("  | e '+' e     {$v = ((BinaryContext)$ctx).e(0).v + ((BinaryContext)$ctx).e(1).v;}  # binary\n");
 		grammarBuilder.append("  | INT         {$v = $INT.int;}                   # anInt\n");
 		grammarBuilder.append("  | '(' e ')'   {$v = $e.v;}                       # parens\n");
-		grammarBuilder.append("  | left=e INC  {assert(((UnaryContext)$ctx).INC() != null);$v = $left.v + 1;}      # unary\n");
-		grammarBuilder.append("  | left=e DEC  {assert(((UnaryContext)$ctx).DEC() != null);$v = $left.v - 1;}      # unary\n");
+		grammarBuilder.append("  | left=e INC  {assert(((UnaryContext)$ctx).INC() != null)$v = $left.v + 1;}      # unary\n");
+		grammarBuilder.append("  | left=e DEC  {assert(((UnaryContext)$ctx).DEC() != null)$v = $left.v - 1;}      # unary\n");
 		grammarBuilder.append("  | ID          {$v = 3;}                                                     # anID\n");
 		grammarBuilder.append("  ;\n");
 		grammarBuilder.append("ID : 'a'..'z'+ ;\n");
@@ -1799,16 +1799,16 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testMultipleAlternativesWithCommonLabel_2() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(723);
+		StringBuilder grammarBuilder = new StringBuilder(720);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s : e {fmt.Println($e.v);};\n");
+		grammarBuilder.append("s : e {fmt.Println($e.v)};\n");
 		grammarBuilder.append("e returns [int v]\n");
 		grammarBuilder.append("  : e '*' e     {$v = ((BinaryContext)$ctx).e(0).v * ((BinaryContext)$ctx).e(1).v;}  # binary\n");
 		grammarBuilder.append("  | e '+' e     {$v = ((BinaryContext)$ctx).e(0).v + ((BinaryContext)$ctx).e(1).v;}  # binary\n");
 		grammarBuilder.append("  | INT         {$v = $INT.int;}                   # anInt\n");
 		grammarBuilder.append("  | '(' e ')'   {$v = $e.v;}                       # parens\n");
-		grammarBuilder.append("  | left=e INC  {assert(((UnaryContext)$ctx).INC() != null);$v = $left.v + 1;}      # unary\n");
-		grammarBuilder.append("  | left=e DEC  {assert(((UnaryContext)$ctx).DEC() != null);$v = $left.v - 1;}      # unary\n");
+		grammarBuilder.append("  | left=e INC  {assert(((UnaryContext)$ctx).INC() != null)$v = $left.v + 1;}      # unary\n");
+		grammarBuilder.append("  | left=e DEC  {assert(((UnaryContext)$ctx).DEC() != null)$v = $left.v - 1;}      # unary\n");
 		grammarBuilder.append("  | ID          {$v = 3;}                                                     # anID\n");
 		grammarBuilder.append("  ;\n");
 		grammarBuilder.append("ID : 'a'..'z'+ ;\n");
@@ -1829,16 +1829,16 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testMultipleAlternativesWithCommonLabel_3() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(723);
+		StringBuilder grammarBuilder = new StringBuilder(720);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s : e {fmt.Println($e.v);};\n");
+		grammarBuilder.append("s : e {fmt.Println($e.v)};\n");
 		grammarBuilder.append("e returns [int v]\n");
 		grammarBuilder.append("  : e '*' e     {$v = ((BinaryContext)$ctx).e(0).v * ((BinaryContext)$ctx).e(1).v;}  # binary\n");
 		grammarBuilder.append("  | e '+' e     {$v = ((BinaryContext)$ctx).e(0).v + ((BinaryContext)$ctx).e(1).v;}  # binary\n");
 		grammarBuilder.append("  | INT         {$v = $INT.int;}                   # anInt\n");
 		grammarBuilder.append("  | '(' e ')'   {$v = $e.v;}                       # parens\n");
-		grammarBuilder.append("  | left=e INC  {assert(((UnaryContext)$ctx).INC() != null);$v = $left.v + 1;}      # unary\n");
-		grammarBuilder.append("  | left=e DEC  {assert(((UnaryContext)$ctx).DEC() != null);$v = $left.v - 1;}      # unary\n");
+		grammarBuilder.append("  | left=e INC  {assert(((UnaryContext)$ctx).INC() != null)$v = $left.v + 1;}      # unary\n");
+		grammarBuilder.append("  | left=e DEC  {assert(((UnaryContext)$ctx).DEC() != null)$v = $left.v - 1;}      # unary\n");
 		grammarBuilder.append("  | ID          {$v = 3;}                                                     # anID\n");
 		grammarBuilder.append("  ;\n");
 		grammarBuilder.append("ID : 'a'..'z'+ ;\n");
@@ -1859,16 +1859,16 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testMultipleAlternativesWithCommonLabel_4() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(723);
+		StringBuilder grammarBuilder = new StringBuilder(720);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s : e {fmt.Println($e.v);};\n");
+		grammarBuilder.append("s : e {fmt.Println($e.v)};\n");
 		grammarBuilder.append("e returns [int v]\n");
 		grammarBuilder.append("  : e '*' e     {$v = ((BinaryContext)$ctx).e(0).v * ((BinaryContext)$ctx).e(1).v;}  # binary\n");
 		grammarBuilder.append("  | e '+' e     {$v = ((BinaryContext)$ctx).e(0).v + ((BinaryContext)$ctx).e(1).v;}  # binary\n");
 		grammarBuilder.append("  | INT         {$v = $INT.int;}                   # anInt\n");
 		grammarBuilder.append("  | '(' e ')'   {$v = $e.v;}                       # parens\n");
-		grammarBuilder.append("  | left=e INC  {assert(((UnaryContext)$ctx).INC() != null);$v = $left.v + 1;}      # unary\n");
-		grammarBuilder.append("  | left=e DEC  {assert(((UnaryContext)$ctx).DEC() != null);$v = $left.v - 1;}      # unary\n");
+		grammarBuilder.append("  | left=e INC  {assert(((UnaryContext)$ctx).INC() != null)$v = $left.v + 1;}      # unary\n");
+		grammarBuilder.append("  | left=e DEC  {assert(((UnaryContext)$ctx).DEC() != null)$v = $left.v - 1;}      # unary\n");
 		grammarBuilder.append("  | ID          {$v = 3;}                                                     # anID\n");
 		grammarBuilder.append("  ;\n");
 		grammarBuilder.append("ID : 'a'..'z'+ ;\n");
@@ -1889,10 +1889,10 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testPrecedenceFilterConsidersContext() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(143);
+		StringBuilder grammarBuilder = new StringBuilder(142);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("prog \n");
-		grammarBuilder.append("@after {fmt.Println($ctx.toStringTree(this));}\n");
+		grammarBuilder.append("@after {fmt.Println($ctx.toStringTree(this))}\n");
 		grammarBuilder.append(": statement* EOF {};\n");
 		grammarBuilder.append("statement: letterA | statement letterA 'b' ;\n");
 		grammarBuilder.append("letterA: 'a';");
@@ -1909,9 +1909,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testPrefixOpWithActionAndLabel_1() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(336);
+		StringBuilder grammarBuilder = new StringBuilder(335);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s : e {fmt.Println($e.result);} ;\n");
+		grammarBuilder.append("s : e {fmt.Println($e.result)} ;\n");
 		grammarBuilder.append("e returns [String result]\n");
 		grammarBuilder.append("    :   ID '=' e1=e    {$result = \"(\" + $ID.text + \"=\" + $e1.result + \")\";}\n");
 		grammarBuilder.append("    |   ID             {$result = $ID.text;}\n");
@@ -1933,9 +1933,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testPrefixOpWithActionAndLabel_2() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(336);
+		StringBuilder grammarBuilder = new StringBuilder(335);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s : e {fmt.Println($e.result);} ;\n");
+		grammarBuilder.append("s : e {fmt.Println($e.result)} ;\n");
 		grammarBuilder.append("e returns [String result]\n");
 		grammarBuilder.append("    :   ID '=' e1=e    {$result = \"(\" + $ID.text + \"=\" + $e1.result + \")\";}\n");
 		grammarBuilder.append("    |   ID             {$result = $ID.text;}\n");
@@ -1957,9 +1957,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testPrefixOpWithActionAndLabel_3() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(336);
+		StringBuilder grammarBuilder = new StringBuilder(335);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s : e {fmt.Println($e.result);} ;\n");
+		grammarBuilder.append("s : e {fmt.Println($e.result)} ;\n");
 		grammarBuilder.append("e returns [String result]\n");
 		grammarBuilder.append("    :   ID '=' e1=e    {$result = \"(\" + $ID.text + \"=\" + $e1.result + \")\";}\n");
 		grammarBuilder.append("    |   ID             {$result = $ID.text;}\n");
@@ -1981,9 +1981,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testReturnValueAndActionsAndLabels_1() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(454);
+		StringBuilder grammarBuilder = new StringBuilder(453);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s : q=e {fmt.Println($e.v);}; \n");
+		grammarBuilder.append("s : q=e {fmt.Println($e.v)}; \n");
 		grammarBuilder.append("e returns [int v]\n");
 		grammarBuilder.append("  : a=e op='*' b=e {$v = $a.v * $b.v;}  # mult\n");
 		grammarBuilder.append("  | a=e '+' b=e {$v = $a.v + $b.v;}     # add\n");
@@ -2009,9 +2009,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testReturnValueAndActionsAndLabels_2() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(454);
+		StringBuilder grammarBuilder = new StringBuilder(453);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s : q=e {fmt.Println($e.v);}; \n");
+		grammarBuilder.append("s : q=e {fmt.Println($e.v)}; \n");
 		grammarBuilder.append("e returns [int v]\n");
 		grammarBuilder.append("  : a=e op='*' b=e {$v = $a.v * $b.v;}  # mult\n");
 		grammarBuilder.append("  | a=e '+' b=e {$v = $a.v + $b.v;}     # add\n");
@@ -2037,9 +2037,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testReturnValueAndActionsAndLabels_3() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(454);
+		StringBuilder grammarBuilder = new StringBuilder(453);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s : q=e {fmt.Println($e.v);}; \n");
+		grammarBuilder.append("s : q=e {fmt.Println($e.v)}; \n");
 		grammarBuilder.append("e returns [int v]\n");
 		grammarBuilder.append("  : a=e op='*' b=e {$v = $a.v * $b.v;}  # mult\n");
 		grammarBuilder.append("  | a=e '+' b=e {$v = $a.v + $b.v;}     # add\n");
@@ -2065,9 +2065,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testReturnValueAndActionsAndLabels_4() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(454);
+		StringBuilder grammarBuilder = new StringBuilder(453);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s : q=e {fmt.Println($e.v);}; \n");
+		grammarBuilder.append("s : q=e {fmt.Println($e.v)}; \n");
 		grammarBuilder.append("e returns [int v]\n");
 		grammarBuilder.append("  : a=e op='*' b=e {$v = $a.v * $b.v;}  # mult\n");
 		grammarBuilder.append("  | a=e '+' b=e {$v = $a.v + $b.v;}     # add\n");
@@ -2093,9 +2093,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testReturnValueAndActionsList1_1() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(301);
+		StringBuilder grammarBuilder = new StringBuilder(300);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this));} : expr EOF;\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this))} : expr EOF;\n");
 		grammarBuilder.append("expr:\n");
 		grammarBuilder.append("    a=expr '*' a=expr #Factor\n");
 		grammarBuilder.append("    | b+=expr (',' b+=expr)* '>>' c=expr #Send\n");
@@ -2120,9 +2120,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testReturnValueAndActionsList1_2() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(301);
+		StringBuilder grammarBuilder = new StringBuilder(300);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this));} : expr EOF;\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this))} : expr EOF;\n");
 		grammarBuilder.append("expr:\n");
 		grammarBuilder.append("    a=expr '*' a=expr #Factor\n");
 		grammarBuilder.append("    | b+=expr (',' b+=expr)* '>>' c=expr #Send\n");
@@ -2147,9 +2147,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testReturnValueAndActionsList1_3() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(301);
+		StringBuilder grammarBuilder = new StringBuilder(300);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this));} : expr EOF;\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this))} : expr EOF;\n");
 		grammarBuilder.append("expr:\n");
 		grammarBuilder.append("    a=expr '*' a=expr #Factor\n");
 		grammarBuilder.append("    | b+=expr (',' b+=expr)* '>>' c=expr #Send\n");
@@ -2174,9 +2174,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testReturnValueAndActionsList1_4() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(301);
+		StringBuilder grammarBuilder = new StringBuilder(300);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this));} : expr EOF;\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this))} : expr EOF;\n");
 		grammarBuilder.append("expr:\n");
 		grammarBuilder.append("    a=expr '*' a=expr #Factor\n");
 		grammarBuilder.append("    | b+=expr (',' b+=expr)* '>>' c=expr #Send\n");
@@ -2201,9 +2201,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testReturnValueAndActionsList2_1() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(318);
+		StringBuilder grammarBuilder = new StringBuilder(317);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this));} : expr EOF;\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this))} : expr EOF;\n");
 		grammarBuilder.append("expr:\n");
 		grammarBuilder.append("    a=expr '*' a=expr #Factor\n");
 		grammarBuilder.append("    | b+=expr ',' b+=expr #Comma\n");
@@ -2227,9 +2227,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testReturnValueAndActionsList2_2() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(318);
+		StringBuilder grammarBuilder = new StringBuilder(317);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this));} : expr EOF;\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this))} : expr EOF;\n");
 		grammarBuilder.append("expr:\n");
 		grammarBuilder.append("    a=expr '*' a=expr #Factor\n");
 		grammarBuilder.append("    | b+=expr ',' b+=expr #Comma\n");
@@ -2253,9 +2253,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testReturnValueAndActionsList2_3() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(318);
+		StringBuilder grammarBuilder = new StringBuilder(317);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this));} : expr EOF;\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this))} : expr EOF;\n");
 		grammarBuilder.append("expr:\n");
 		grammarBuilder.append("    a=expr '*' a=expr #Factor\n");
 		grammarBuilder.append("    | b+=expr ',' b+=expr #Comma\n");
@@ -2279,9 +2279,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testReturnValueAndActionsList2_4() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(318);
+		StringBuilder grammarBuilder = new StringBuilder(317);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this));} : expr EOF;\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this))} : expr EOF;\n");
 		grammarBuilder.append("expr:\n");
 		grammarBuilder.append("    a=expr '*' a=expr #Factor\n");
 		grammarBuilder.append("    | b+=expr ',' b+=expr #Comma\n");
@@ -2305,9 +2305,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testReturnValueAndActions_1() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(254);
+		StringBuilder grammarBuilder = new StringBuilder(253);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s : e {fmt.Println($e.v);}; \n");
+		grammarBuilder.append("s : e {fmt.Println($e.v)}; \n");
 		grammarBuilder.append("e returns [int v, List<String> ignored]\n");
 		grammarBuilder.append("  : a=e '*' b=e {$v = $a.v * $b.v;}\n");
 		grammarBuilder.append("  | a=e '+' b=e {$v = $a.v + $b.v;}\n");
@@ -2329,9 +2329,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testReturnValueAndActions_2() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(254);
+		StringBuilder grammarBuilder = new StringBuilder(253);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s : e {fmt.Println($e.v);}; \n");
+		grammarBuilder.append("s : e {fmt.Println($e.v)}; \n");
 		grammarBuilder.append("e returns [int v, List<String> ignored]\n");
 		grammarBuilder.append("  : a=e '*' b=e {$v = $a.v * $b.v;}\n");
 		grammarBuilder.append("  | a=e '+' b=e {$v = $a.v + $b.v;}\n");
@@ -2353,9 +2353,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testReturnValueAndActions_3() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(254);
+		StringBuilder grammarBuilder = new StringBuilder(253);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s : e {fmt.Println($e.v);}; \n");
+		grammarBuilder.append("s : e {fmt.Println($e.v)}; \n");
 		grammarBuilder.append("e returns [int v, List<String> ignored]\n");
 		grammarBuilder.append("  : a=e '*' b=e {$v = $a.v * $b.v;}\n");
 		grammarBuilder.append("  | a=e '+' b=e {$v = $a.v + $b.v;}\n");
@@ -2377,9 +2377,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testReturnValueAndActions_4() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(254);
+		StringBuilder grammarBuilder = new StringBuilder(253);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s : e {fmt.Println($e.v);}; \n");
+		grammarBuilder.append("s : e {fmt.Println($e.v)}; \n");
 		grammarBuilder.append("e returns [int v, List<String> ignored]\n");
 		grammarBuilder.append("  : a=e '*' b=e {$v = $a.v * $b.v;}\n");
 		grammarBuilder.append("  | a=e '+' b=e {$v = $a.v + $b.v;}\n");
@@ -2401,9 +2401,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testSemPred() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(136);
+		StringBuilder grammarBuilder = new StringBuilder(135);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this));} : a ;\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this))} : a ;\n");
 		grammarBuilder.append("a : a {true}? ID\n");
 		grammarBuilder.append("  | ID\n");
 		grammarBuilder.append("  ;\n");
@@ -2422,9 +2422,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testSemPredFailOption() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(160);
+		StringBuilder grammarBuilder = new StringBuilder(159);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this));} : a ;\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this))} : a ;\n");
 		grammarBuilder.append("a : a ID {false}?<fail='custom message'>\n");
 		grammarBuilder.append("  | ID\n");
 		grammarBuilder.append("  ;\n");
@@ -2444,9 +2444,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testSimple_1() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(128);
+		StringBuilder grammarBuilder = new StringBuilder(127);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this));} : a ;\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this))} : a ;\n");
 		grammarBuilder.append("a : a ID\n");
 		grammarBuilder.append("  | ID\n");
 		grammarBuilder.append("  ;\n");
@@ -2465,9 +2465,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testSimple_2() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(128);
+		StringBuilder grammarBuilder = new StringBuilder(127);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this));} : a ;\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this))} : a ;\n");
 		grammarBuilder.append("a : a ID\n");
 		grammarBuilder.append("  | ID\n");
 		grammarBuilder.append("  ;\n");
@@ -2486,9 +2486,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testSimple_3() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(128);
+		StringBuilder grammarBuilder = new StringBuilder(127);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this));} : a ;\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this))} : a ;\n");
 		grammarBuilder.append("a : a ID\n");
 		grammarBuilder.append("  | ID\n");
 		grammarBuilder.append("  ;\n");
@@ -2507,9 +2507,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testTernaryExprExplicitAssociativity_1() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(284);
+		StringBuilder grammarBuilder = new StringBuilder(283);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this));} : e EOF; // must indicate EOF can follow or 'a<EOF>' won't match\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this))} : e EOF; // must indicate EOF can follow or 'a<EOF>' won't match\n");
 		grammarBuilder.append("e :<assoc=right> e '*' e\n");
 		grammarBuilder.append("  |<assoc=right> e '+' e\n");
 		grammarBuilder.append("  |<assoc=right> e '?' e ':' e\n");
@@ -2531,9 +2531,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testTernaryExprExplicitAssociativity_2() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(284);
+		StringBuilder grammarBuilder = new StringBuilder(283);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this));} : e EOF; // must indicate EOF can follow or 'a<EOF>' won't match\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this))} : e EOF; // must indicate EOF can follow or 'a<EOF>' won't match\n");
 		grammarBuilder.append("e :<assoc=right> e '*' e\n");
 		grammarBuilder.append("  |<assoc=right> e '+' e\n");
 		grammarBuilder.append("  |<assoc=right> e '?' e ':' e\n");
@@ -2555,9 +2555,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testTernaryExprExplicitAssociativity_3() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(284);
+		StringBuilder grammarBuilder = new StringBuilder(283);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this));} : e EOF; // must indicate EOF can follow or 'a<EOF>' won't match\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this))} : e EOF; // must indicate EOF can follow or 'a<EOF>' won't match\n");
 		grammarBuilder.append("e :<assoc=right> e '*' e\n");
 		grammarBuilder.append("  |<assoc=right> e '+' e\n");
 		grammarBuilder.append("  |<assoc=right> e '?' e ':' e\n");
@@ -2579,9 +2579,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testTernaryExprExplicitAssociativity_4() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(284);
+		StringBuilder grammarBuilder = new StringBuilder(283);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this));} : e EOF; // must indicate EOF can follow or 'a<EOF>' won't match\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this))} : e EOF; // must indicate EOF can follow or 'a<EOF>' won't match\n");
 		grammarBuilder.append("e :<assoc=right> e '*' e\n");
 		grammarBuilder.append("  |<assoc=right> e '+' e\n");
 		grammarBuilder.append("  |<assoc=right> e '?' e ':' e\n");
@@ -2603,9 +2603,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testTernaryExprExplicitAssociativity_5() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(284);
+		StringBuilder grammarBuilder = new StringBuilder(283);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this));} : e EOF; // must indicate EOF can follow or 'a<EOF>' won't match\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this))} : e EOF; // must indicate EOF can follow or 'a<EOF>' won't match\n");
 		grammarBuilder.append("e :<assoc=right> e '*' e\n");
 		grammarBuilder.append("  |<assoc=right> e '+' e\n");
 		grammarBuilder.append("  |<assoc=right> e '?' e ':' e\n");
@@ -2627,9 +2627,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testTernaryExprExplicitAssociativity_6() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(284);
+		StringBuilder grammarBuilder = new StringBuilder(283);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this));} : e EOF; // must indicate EOF can follow or 'a<EOF>' won't match\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this))} : e EOF; // must indicate EOF can follow or 'a<EOF>' won't match\n");
 		grammarBuilder.append("e :<assoc=right> e '*' e\n");
 		grammarBuilder.append("  |<assoc=right> e '+' e\n");
 		grammarBuilder.append("  |<assoc=right> e '?' e ':' e\n");
@@ -2651,9 +2651,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testTernaryExprExplicitAssociativity_7() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(284);
+		StringBuilder grammarBuilder = new StringBuilder(283);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this));} : e EOF; // must indicate EOF can follow or 'a<EOF>' won't match\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this))} : e EOF; // must indicate EOF can follow or 'a<EOF>' won't match\n");
 		grammarBuilder.append("e :<assoc=right> e '*' e\n");
 		grammarBuilder.append("  |<assoc=right> e '+' e\n");
 		grammarBuilder.append("  |<assoc=right> e '?' e ':' e\n");
@@ -2675,9 +2675,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testTernaryExprExplicitAssociativity_8() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(284);
+		StringBuilder grammarBuilder = new StringBuilder(283);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this));} : e EOF; // must indicate EOF can follow or 'a<EOF>' won't match\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this))} : e EOF; // must indicate EOF can follow or 'a<EOF>' won't match\n");
 		grammarBuilder.append("e :<assoc=right> e '*' e\n");
 		grammarBuilder.append("  |<assoc=right> e '+' e\n");
 		grammarBuilder.append("  |<assoc=right> e '?' e ':' e\n");
@@ -2699,9 +2699,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testTernaryExprExplicitAssociativity_9() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(284);
+		StringBuilder grammarBuilder = new StringBuilder(283);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this));} : e EOF; // must indicate EOF can follow or 'a<EOF>' won't match\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this))} : e EOF; // must indicate EOF can follow or 'a<EOF>' won't match\n");
 		grammarBuilder.append("e :<assoc=right> e '*' e\n");
 		grammarBuilder.append("  |<assoc=right> e '+' e\n");
 		grammarBuilder.append("  |<assoc=right> e '?' e ':' e\n");
@@ -2723,9 +2723,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testTernaryExpr_1() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(259);
+		StringBuilder grammarBuilder = new StringBuilder(258);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this));} : e EOF ; // must indicate EOF can follow or 'a<EOF>' won't match\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this))} : e EOF ; // must indicate EOF can follow or 'a<EOF>' won't match\n");
 		grammarBuilder.append("e : e '*' e\n");
 		grammarBuilder.append("  | e '+' e\n");
 		grammarBuilder.append("  |<assoc=right> e '?' e ':' e\n");
@@ -2747,9 +2747,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testTernaryExpr_2() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(259);
+		StringBuilder grammarBuilder = new StringBuilder(258);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this));} : e EOF ; // must indicate EOF can follow or 'a<EOF>' won't match\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this))} : e EOF ; // must indicate EOF can follow or 'a<EOF>' won't match\n");
 		grammarBuilder.append("e : e '*' e\n");
 		grammarBuilder.append("  | e '+' e\n");
 		grammarBuilder.append("  |<assoc=right> e '?' e ':' e\n");
@@ -2771,9 +2771,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testTernaryExpr_3() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(259);
+		StringBuilder grammarBuilder = new StringBuilder(258);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this));} : e EOF ; // must indicate EOF can follow or 'a<EOF>' won't match\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this))} : e EOF ; // must indicate EOF can follow or 'a<EOF>' won't match\n");
 		grammarBuilder.append("e : e '*' e\n");
 		grammarBuilder.append("  | e '+' e\n");
 		grammarBuilder.append("  |<assoc=right> e '?' e ':' e\n");
@@ -2795,9 +2795,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testTernaryExpr_4() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(259);
+		StringBuilder grammarBuilder = new StringBuilder(258);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this));} : e EOF ; // must indicate EOF can follow or 'a<EOF>' won't match\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this))} : e EOF ; // must indicate EOF can follow or 'a<EOF>' won't match\n");
 		grammarBuilder.append("e : e '*' e\n");
 		grammarBuilder.append("  | e '+' e\n");
 		grammarBuilder.append("  |<assoc=right> e '?' e ':' e\n");
@@ -2819,9 +2819,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testTernaryExpr_5() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(259);
+		StringBuilder grammarBuilder = new StringBuilder(258);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this));} : e EOF ; // must indicate EOF can follow or 'a<EOF>' won't match\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this))} : e EOF ; // must indicate EOF can follow or 'a<EOF>' won't match\n");
 		grammarBuilder.append("e : e '*' e\n");
 		grammarBuilder.append("  | e '+' e\n");
 		grammarBuilder.append("  |<assoc=right> e '?' e ':' e\n");
@@ -2843,9 +2843,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testTernaryExpr_6() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(259);
+		StringBuilder grammarBuilder = new StringBuilder(258);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this));} : e EOF ; // must indicate EOF can follow or 'a<EOF>' won't match\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this))} : e EOF ; // must indicate EOF can follow or 'a<EOF>' won't match\n");
 		grammarBuilder.append("e : e '*' e\n");
 		grammarBuilder.append("  | e '+' e\n");
 		grammarBuilder.append("  |<assoc=right> e '?' e ':' e\n");
@@ -2867,9 +2867,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testTernaryExpr_7() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(259);
+		StringBuilder grammarBuilder = new StringBuilder(258);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this));} : e EOF ; // must indicate EOF can follow or 'a<EOF>' won't match\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this))} : e EOF ; // must indicate EOF can follow or 'a<EOF>' won't match\n");
 		grammarBuilder.append("e : e '*' e\n");
 		grammarBuilder.append("  | e '+' e\n");
 		grammarBuilder.append("  |<assoc=right> e '?' e ':' e\n");
@@ -2891,9 +2891,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testTernaryExpr_8() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(259);
+		StringBuilder grammarBuilder = new StringBuilder(258);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this));} : e EOF ; // must indicate EOF can follow or 'a<EOF>' won't match\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this))} : e EOF ; // must indicate EOF can follow or 'a<EOF>' won't match\n");
 		grammarBuilder.append("e : e '*' e\n");
 		grammarBuilder.append("  | e '+' e\n");
 		grammarBuilder.append("  |<assoc=right> e '?' e ':' e\n");
@@ -2915,9 +2915,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testTernaryExpr_9() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(259);
+		StringBuilder grammarBuilder = new StringBuilder(258);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this));} : e EOF ; // must indicate EOF can follow or 'a<EOF>' won't match\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.toStringTree(this))} : e EOF ; // must indicate EOF can follow or 'a<EOF>' won't match\n");
 		grammarBuilder.append("e : e '*' e\n");
 		grammarBuilder.append("  | e '+' e\n");
 		grammarBuilder.append("  |<assoc=right> e '?' e ':' e\n");

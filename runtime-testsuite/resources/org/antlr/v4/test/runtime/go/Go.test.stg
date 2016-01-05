@@ -149,9 +149,9 @@ string(text) ::= <<
 
 writeBoolean(o) ::= "<if(o && !isEmpty.(o))>true<else>false<endif>"
 
-writeln(s) ::= <<fmt.Println(<s>);>>
+writeln(s) ::= <<fmt.Println(<s>)>>
 
-write(s) ::= <<fmt.Print(<s>);>>
+write(s) ::= <<fmt.Print(<s>)>>
 
 False() ::= "false"
 
@@ -159,7 +159,7 @@ True() ::= "true"
 
 Not(v) ::= "!<v>"
 
-Assert(s) ::= <<assert(<s>);>>
+Assert(s) ::= <<assert(<s>)>>
 
 Cast(t,v) ::= "((<t>)<v>)"
 
@@ -167,7 +167,7 @@ Append(a,b) ::= "<a> + <b>"
 
 Concat(a,b) ::= "<a><b>"
 
-DeclareLocal(s,v) ::= "Object <s> = <v>;"
+DeclareLocal(s,v) ::= "<s> := <v>"
 
 AssertIsList(v) ::= "List\<?> __ttt__ = <v>;" // just use type system
 
@@ -191,15 +191,15 @@ ModMemberEquals(n,m,v) ::= <%this.<n> % <m> == <v>%>
 
 ModMemberNotEquals(n,m,v) ::= <%this.<n> % <m> != <v>%>
 
-DumpDFA() ::= "this.DumpDFA();"
+DumpDFA() ::= "p.DumpDFA()"
 
 Pass() ::= ""
 
 StringList() ::= "List\<String>"
 
-BuildParseTrees() ::= "SetBuildParseTree(true);"
+BuildParseTrees() ::= "this.BuildParseTrees = true"
 
-BailErrorStrategy() ::= <%SetErrorHandler(new BailErrorStrategy());%>
+BailErrorStrategy() ::= <%SetErrorHandler(NewBailErrorStrategy());%>
 
 ToStringTree(s) ::= <%<s>.toStringTree(this)%>
 
@@ -243,7 +243,7 @@ package antlrtest
 //@Override
 func (this *PositionAdjustingLexer) NextToken() *Token {
 	if (!(_interp instanceof PositionAdjustingLexerATNSimulator)) {
-		_interp = new PositionAdjustingLexerATNSimulator(this, _ATN, _decisionToDFA, _sharedContextCache);
+		_interp = NewPositionAdjustingLexerATNSimulator(this, _ATN, _decisionToDFA, _sharedContextCache);
 	}
 
 	return super.nextToken();
@@ -323,8 +323,8 @@ type LeafListener extends TBaseListener {
 >>
 
 WalkListener(s) ::= <<
-ParseTreeWalker walker = new ParseTreeWalker();
-walker.walk(new LeafListener(), <s>);
+ParseTreeWalker walker = NewParseTreeWalker();
+walker.walk(NewLeafListener(), <s>);
 >>
 
 TokenGetterListener(X) ::= <<

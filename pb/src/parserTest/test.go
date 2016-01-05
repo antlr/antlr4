@@ -3,7 +3,7 @@ package main
 import (
 	"antlr4"
 	"parser"
-	"fmt"
+	//"fmt"
 )
 
 /*
@@ -27,11 +27,11 @@ func main() {
 
 	a := antlr4.NewFileStream("foo.txt")
 
-	l := parser.NewArithmeticLexer(a)
+	l := parser.NewMLexer(a)
 
 	s := antlr4.NewCommonTokenStream(l, 0)
 
-	p := parser.NewExprParser(s)
+	p := parser.NewMParser(s)
 
 	p.BuildParseTrees = true
 

@@ -16,7 +16,7 @@ public class TestCompositeParsers extends BaseTest {
 		mkdir(parserpkgdir);
 		String slave_S =
 			"parser grammar S;\n" +
-			"a : '=' 'a' {fmt.Print(\"S.a\");};";
+			"a : '=' 'a' {fmt.Print(\"S.a\")};";
 		writeFile(parserpkgdir, "S.g4", slave_S);
 
 		StringBuilder grammarBuilder = new StringBuilder(54);
@@ -40,7 +40,7 @@ public class TestCompositeParsers extends BaseTest {
 		String slave_S =
 			"parser grammar S;\n" +
 			"tokens { A, B, C }\n" +
-			"x : 'x' INT {fmt.Println(\"S.x\");};\n" +
+			"x : 'x' INT {fmt.Println(\"S.x\")};\n" +
 			"INT : '0'..'9'+ ;\n" +
 			"WS : (' '|'\\n') -> skip ;";
 		writeFile(parserpkgdir, "S.g4", slave_S);
@@ -65,13 +65,13 @@ public class TestCompositeParsers extends BaseTest {
 		String slave_T =
 			"parser grammar T;\n" +
 			"tokens { C, B, A } // reverse order\n" +
-			"y : A {fmt.Println(\"T.y\");};";
+			"y : A {fmt.Println(\"T.y\")};";
 		writeFile(parserpkgdir, "T.g4", slave_T);
 
 		String slave_S =
 			"parser grammar S;\n" +
 			"tokens { A, B, C }\n" +
-			"x : A {fmt.Println(\"S.x\");};";
+			"x : A {fmt.Println(\"S.x\")};";
 		writeFile(parserpkgdir, "S.g4", slave_S);
 
 		StringBuilder grammarBuilder = new StringBuilder(598);
@@ -135,7 +135,7 @@ public class TestCompositeParsers extends BaseTest {
 		mkdir(parserpkgdir);
 		String slave_S =
 			"parser grammar S;\n" +
-			"a : B {fmt.Println(\"S.a\");};";
+			"a : B {fmt.Println(\"S.a\")};";
 		writeFile(parserpkgdir, "S.g4", slave_S);
 
 		StringBuilder grammarBuilder = new StringBuilder(104);
@@ -159,13 +159,13 @@ public class TestCompositeParsers extends BaseTest {
 		mkdir(parserpkgdir);
 		String slave_S =
 			"parser grammar S;\n" +
-			"a[int x] returns [int y] : B {fmt.Print(\"S.a\");} {$y=1000;} ;";
+			"a[int x] returns [int y] : B {fmt.Print(\"S.a\")} {$y=1000;} ;";
 		writeFile(parserpkgdir, "S.g4", slave_S);
 
-		StringBuilder grammarBuilder = new StringBuilder(138);
+		StringBuilder grammarBuilder = new StringBuilder(137);
 		grammarBuilder.append("grammar M;\n");
 		grammarBuilder.append("import S;\n");
-		grammarBuilder.append("s : label=a[3] {fmt.Println($label.y);} ;\n");
+		grammarBuilder.append("s : label=a[3] {fmt.Println($label.y)} ;\n");
 		grammarBuilder.append("B : 'b' ; // defines B from inherited token space\n");
 		grammarBuilder.append("WS : (' '|'\\n') -> skip ;");
 		String grammar = grammarBuilder.toString();
@@ -183,13 +183,13 @@ public class TestCompositeParsers extends BaseTest {
 		mkdir(parserpkgdir);
 		String slave_S =
 			"parser grammar S;\n" +
-			"a : B {fmt.Print(\"S.a\");} ;";
+			"a : B {fmt.Print(\"S.a\")} ;";
 		writeFile(parserpkgdir, "S.g4", slave_S);
 
-		StringBuilder grammarBuilder = new StringBuilder(126);
+		StringBuilder grammarBuilder = new StringBuilder(125);
 		grammarBuilder.append("grammar M;\n");
 		grammarBuilder.append("import S;\n");
-		grammarBuilder.append("s : a {fmt.Print($a.text);} ;\n");
+		grammarBuilder.append("s : a {fmt.Print($a.text)} ;\n");
 		grammarBuilder.append("B : 'b' ; // defines B from inherited token space\n");
 		grammarBuilder.append("WS : (' '|'\\n') -> skip ;");
 		String grammar = grammarBuilder.toString();
@@ -207,12 +207,12 @@ public class TestCompositeParsers extends BaseTest {
 		mkdir(parserpkgdir);
 		String slave_T =
 			"parser grammar T;\n" +
-			"a : B {fmt.Println(\"T.a\");};";
+			"a : B {fmt.Println(\"T.a\")};";
 		writeFile(parserpkgdir, "T.g4", slave_T);
 
 		String slave_S =
 			"parser grammar S;\n" +
-			"a : b {fmt.Println(\"S.a\");};\n" +
+			"a : b {fmt.Println(\"S.a\")};\n" +
 			"b : B;";
 		writeFile(parserpkgdir, "S.g4", slave_S);
 
@@ -237,7 +237,7 @@ public class TestCompositeParsers extends BaseTest {
 		mkdir(parserpkgdir);
 		String slave_S =
 			"parser grammar S;\n" +
-			"a : b {fmt.Print(\"S.a\");};\n" +
+			"a : b {fmt.Print(\"S.a\")};\n" +
 			"b : B ;";
 		writeFile(parserpkgdir, "S.g4", slave_S);
 
@@ -262,19 +262,19 @@ public class TestCompositeParsers extends BaseTest {
 		String slave_T =
 			"parser grammar T;\n" +
 			"tokens { A }\n" +
-			"b : 'b' {fmt.Println(\"T.b\");};";
+			"b : 'b' {fmt.Println(\"T.b\")};";
 		writeFile(parserpkgdir, "T.g4", slave_T);
 
 		String slave_S =
 			"parser grammar S;\n" +
-			"a : b {fmt.Println(\"S.a\");};\n" +
+			"a : b {fmt.Println(\"S.a\")};\n" +
 			"b : 'b' ;";
 		writeFile(parserpkgdir, "S.g4", slave_S);
 
-		StringBuilder grammarBuilder = new StringBuilder(88);
+		StringBuilder grammarBuilder = new StringBuilder(87);
 		grammarBuilder.append("grammar M;\n");
 		grammarBuilder.append("import S, T;\n");
-		grammarBuilder.append("b : 'b'|'c' {fmt.Println(\"M.b\");}|B|A;\n");
+		grammarBuilder.append("b : 'b'|'c' {fmt.Println(\"M.b\")}|B|A;\n");
 		grammarBuilder.append("WS : (' '|'\\n') -> skip ;");
 		String grammar = grammarBuilder.toString();
 		String input ="c";
@@ -295,7 +295,7 @@ public class TestCompositeParsers extends BaseTest {
 			"parser grammar S;\n" +
 			"type_ : 'int' ;\n" +
 			"decl : type_ ID ';'\n" +
-			"	| type_ ID init ';' {fmt.Print(\"JavaDecl: \" + $text);};\n" +
+			"	| type_ ID init ';' {fmt.Print(\"JavaDecl: \" + $text)};\n" +
 			"init : '=' INT;";
 		writeFile(parserpkgdir, "S.g4", slave_S);
 
@@ -404,11 +404,11 @@ public class TestCompositeParsers extends BaseTest {
 			"ID : 'a'..'z'+;";
 		writeFile(parserpkgdir, "S.g4", slave_S);
 
-		StringBuilder grammarBuilder = new StringBuilder(115);
+		StringBuilder grammarBuilder = new StringBuilder(113);
 		grammarBuilder.append("grammar M;\n");
 		grammarBuilder.append("import S;\n");
-		grammarBuilder.append("a : A {fmt.Println(\"M.a: \" + $A);};\n");
-		grammarBuilder.append("A : 'abc' {fmt.Println(\"M.A\");};\n");
+		grammarBuilder.append("a : A {fmt.Println(\"M.a: \" + $A)};\n");
+		grammarBuilder.append("A : 'abc' {fmt.Println(\"M.A\")};\n");
 		grammarBuilder.append("WS : (' '|'\\n') -> skip ;");
 		String grammar = grammarBuilder.toString();
 		String input ="abc";

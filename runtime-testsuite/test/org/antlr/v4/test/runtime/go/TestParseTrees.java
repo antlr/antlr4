@@ -12,14 +12,14 @@ public class TestParseTrees extends BaseTest {
 	@Test
 	public void test2AltLoop() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(133);
+		StringBuilder grammarBuilder = new StringBuilder(135);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s\n");
 		grammarBuilder.append("@init {\n");
-		grammarBuilder.append("SetBuildParseTree(true);\n");
+		grammarBuilder.append("this.BuildParseTrees = true\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("@after {\n");
-		grammarBuilder.append("fmt.Println($r.ctx.toStringTree(this));\n");
+		grammarBuilder.append("fmt.Println($r.ctx.toStringTree(this))\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("  : r=a ;\n");
 		grammarBuilder.append("a : ('x' | 'y')* 'z'\n");
@@ -37,14 +37,14 @@ public class TestParseTrees extends BaseTest {
 	@Test
 	public void test2Alts() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(126);
+		StringBuilder grammarBuilder = new StringBuilder(128);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s\n");
 		grammarBuilder.append("@init {\n");
-		grammarBuilder.append("SetBuildParseTree(true);\n");
+		grammarBuilder.append("this.BuildParseTrees = true\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("@after {\n");
-		grammarBuilder.append("fmt.Println($r.ctx.toStringTree(this));\n");
+		grammarBuilder.append("fmt.Println($r.ctx.toStringTree(this))\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("  : r=a ;\n");
 		grammarBuilder.append("a : 'x' | 'y'\n");
@@ -62,14 +62,14 @@ public class TestParseTrees extends BaseTest {
 	@Test
 	public void testExtraToken() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(139);
+		StringBuilder grammarBuilder = new StringBuilder(141);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s\n");
 		grammarBuilder.append("@init {\n");
-		grammarBuilder.append("SetBuildParseTree(true);\n");
+		grammarBuilder.append("this.BuildParseTrees = true\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("@after {\n");
-		grammarBuilder.append("fmt.Println($r.ctx.toStringTree(this));\n");
+		grammarBuilder.append("fmt.Println($r.ctx.toStringTree(this))\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("  : r=a ;\n");
 		grammarBuilder.append("a : 'x' 'y'\n");
@@ -91,14 +91,14 @@ public class TestParseTrees extends BaseTest {
 	@Test
 	public void testNoViableAlt() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(141);
+		StringBuilder grammarBuilder = new StringBuilder(143);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s\n");
 		grammarBuilder.append("@init {\n");
-		grammarBuilder.append("SetBuildParseTree(true);\n");
+		grammarBuilder.append("this.BuildParseTrees = true\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("@after {\n");
-		grammarBuilder.append("fmt.Println($r.ctx.toStringTree(this));\n");
+		grammarBuilder.append("fmt.Println($r.ctx.toStringTree(this))\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("  : r=a ;\n");
 		grammarBuilder.append("a : 'x' | 'y'\n");
@@ -120,14 +120,14 @@ public class TestParseTrees extends BaseTest {
 	@Test
 	public void testRuleRef() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(135);
+		StringBuilder grammarBuilder = new StringBuilder(137);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s\n");
 		grammarBuilder.append("@init {\n");
-		grammarBuilder.append("SetBuildParseTree(true);\n");
+		grammarBuilder.append("this.BuildParseTrees = true\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("@after {\n");
-		grammarBuilder.append("fmt.Println($r.ctx.toStringTree(this));\n");
+		grammarBuilder.append("fmt.Println($r.ctx.toStringTree(this))\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("  : r=a ;\n");
 		grammarBuilder.append("a : b 'x'\n");
@@ -147,14 +147,14 @@ public class TestParseTrees extends BaseTest {
 	@Test
 	public void testSync() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(142);
+		StringBuilder grammarBuilder = new StringBuilder(144);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s\n");
 		grammarBuilder.append("@init {\n");
-		grammarBuilder.append("SetBuildParseTree(true);\n");
+		grammarBuilder.append("this.BuildParseTrees = true\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("@after {\n");
-		grammarBuilder.append("fmt.Println($r.ctx.toStringTree(this));\n");
+		grammarBuilder.append("fmt.Println($r.ctx.toStringTree(this))\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("  : r=a ;\n");
 		grammarBuilder.append("a : 'x' 'y'* '!'\n");
@@ -175,14 +175,14 @@ public class TestParseTrees extends BaseTest {
 	@Test
 	public void testToken2() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(124);
+		StringBuilder grammarBuilder = new StringBuilder(126);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s\n");
 		grammarBuilder.append("@init {\n");
-		grammarBuilder.append("SetBuildParseTree(true);\n");
+		grammarBuilder.append("this.BuildParseTrees = true\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("@after {\n");
-		grammarBuilder.append("fmt.Println($r.ctx.toStringTree(this));\n");
+		grammarBuilder.append("fmt.Println($r.ctx.toStringTree(this))\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("  : r=a ;\n");
 		grammarBuilder.append("a : 'x' 'y'\n");
@@ -200,18 +200,18 @@ public class TestParseTrees extends BaseTest {
 	@Test
 	public void testTokenAndRuleContextString() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(162);
+		StringBuilder grammarBuilder = new StringBuilder(163);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s\n");
 		grammarBuilder.append("@init {\n");
-		grammarBuilder.append("SetBuildParseTree(true);\n");
+		grammarBuilder.append("this.BuildParseTrees = true\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("@after {\n");
-		grammarBuilder.append("fmt.Println($r.ctx.toStringTree(this));\n");
+		grammarBuilder.append("fmt.Println($r.ctx.toStringTree(this))\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("  : r=a ;\n");
 		grammarBuilder.append("a : 'x' { \n");
-		grammarBuilder.append("fmt.Println(GetRuleInvocationStack());\n");
+		grammarBuilder.append("fmt.Println(GetRuleInvocationStack())\n");
 		grammarBuilder.append("} ;");
 		String grammar = grammarBuilder.toString();
 		String input ="x";

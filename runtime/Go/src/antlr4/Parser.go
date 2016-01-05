@@ -1,6 +1,9 @@
 package antlr4
 
-import "fmt"
+import (
+	"fmt"
+	"strconv"
+)
 
 type Parser interface {
 	Recognizer
@@ -673,27 +676,23 @@ func (this *BaseParser) getRuleInvocationStack(p ParserRuleContext) []string {
 }
 
 // For debugging and other purposes.//
-func (p *BaseParser) getDFAStrings() {
-	panic("dumpDFA Not implemented!")
-	//	return p._interp.decisionToDFA.String()
+func (p *BaseParser) GetDFAStrings() string {
+	return fmt.Sprint(p.Interpreter.decisionToDFA)
 }
 
 // For debugging and other purposes.//
-func (p *BaseParser) dumpDFA() {
-	panic("dumpDFA Not implemented!")
-
-	//	var seenOne = false
-	//	for i := 0; i < p._interp.decisionToDFA.length; i++ {
-	//		var dfa = p._interp.decisionToDFA[i]
-	//		if ( len(dfa.states) > 0) {
-	//			if (seenOne) {
-	//				fmt.Println()
-	//			}
-	//			p.printer.println("Decision " + dfa.decision + ":")
-	//			p.printer.print(dfa.String(p.LiteralNames, p.SymbolicNames))
-	//			seenOne = true
-	//		}
-	//	}
+func (p *BaseParser) DumpDFA() {
+	var seenOne = false
+	for _, dfa := range p.Interpreter.decisionToDFA {
+		if ( len(dfa.GetStates()) > 0) {
+			if (seenOne) {
+				fmt.Println()
+			}
+			fmt.Println("Decision " + strconv.Itoa(dfa.decision) + ":")
+			fmt.Print(dfa.String(p.LiteralNames, p.SymbolicNames))
+			seenOne = true
+		}
+	}
 }
 
 func (p *BaseParser) GetSourceName() string {

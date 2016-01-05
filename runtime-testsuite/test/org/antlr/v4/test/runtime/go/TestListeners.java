@@ -12,7 +12,7 @@ public class TestListeners extends BaseTest {
 	@Test
 	public void testBasic() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(436);
+		StringBuilder grammarBuilder = new StringBuilder(433);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("@parser::header {\n");
 		grammarBuilder.append("}\n");
@@ -27,9 +27,9 @@ public class TestListeners extends BaseTest {
 		grammarBuilder.append("\n");
 		grammarBuilder.append("s\n");
 		grammarBuilder.append("@after {\n");
-		grammarBuilder.append("fmt.Println($ctx.r.toStringTree(this));\n");
-		grammarBuilder.append("ParseTreeWalker walker = new ParseTreeWalker();\n");
-		grammarBuilder.append("walker.walk(new LeafListener(), $ctx.r);\n");
+		grammarBuilder.append("fmt.Println($ctx.r.toStringTree(this))\n");
+		grammarBuilder.append("ParseTreeWalker walker = NewParseTreeWalker();\n");
+		grammarBuilder.append("walker.walk(NewLeafListener(), $ctx.r);\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("  : r=a ;\n");
 		grammarBuilder.append("a : INT INT\n");
@@ -56,7 +56,7 @@ public class TestListeners extends BaseTest {
 	@Test
 	public void testLR() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(610);
+		StringBuilder grammarBuilder = new StringBuilder(607);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("@parser::header {\n");
 		grammarBuilder.append("}\n");
@@ -75,9 +75,9 @@ public class TestListeners extends BaseTest {
 		grammarBuilder.append("\n");
 		grammarBuilder.append("s\n");
 		grammarBuilder.append("@after {\n");
-		grammarBuilder.append("fmt.Println($ctx.r.toStringTree(this));\n");
-		grammarBuilder.append("ParseTreeWalker walker = new ParseTreeWalker();\n");
-		grammarBuilder.append("walker.walk(new LeafListener(), $ctx.r);\n");
+		grammarBuilder.append("fmt.Println($ctx.r.toStringTree(this))\n");
+		grammarBuilder.append("ParseTreeWalker walker = NewParseTreeWalker();\n");
+		grammarBuilder.append("walker.walk(NewLeafListener(), $ctx.r);\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("	: r=e ;\n");
 		grammarBuilder.append("e : e op='*' e\n");
@@ -108,7 +108,7 @@ public class TestListeners extends BaseTest {
 	@Test
 	public void testLRWithLabels() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(600);
+		StringBuilder grammarBuilder = new StringBuilder(597);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("@parser::header {\n");
 		grammarBuilder.append("}\n");
@@ -126,9 +126,9 @@ public class TestListeners extends BaseTest {
 		grammarBuilder.append("\n");
 		grammarBuilder.append("s\n");
 		grammarBuilder.append("@after {\n");
-		grammarBuilder.append("fmt.Println($ctx.r.toStringTree(this));\n");
-		grammarBuilder.append("ParseTreeWalker walker = new ParseTreeWalker();\n");
-		grammarBuilder.append("walker.walk(new LeafListener(), $ctx.r);\n");
+		grammarBuilder.append("fmt.Println($ctx.r.toStringTree(this))\n");
+		grammarBuilder.append("ParseTreeWalker walker = NewParseTreeWalker();\n");
+		grammarBuilder.append("walker.walk(NewLeafListener(), $ctx.r);\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("  : r=e ;\n");
 		grammarBuilder.append("e : e '(' eList ')' # Call\n");
@@ -158,7 +158,7 @@ public class TestListeners extends BaseTest {
 	@Test
 	public void testRuleGetters_1() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(627);
+		StringBuilder grammarBuilder = new StringBuilder(624);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("@parser::header {\n");
 		grammarBuilder.append("}\n");
@@ -177,9 +177,9 @@ public class TestListeners extends BaseTest {
 		grammarBuilder.append("\n");
 		grammarBuilder.append("s\n");
 		grammarBuilder.append("@after {\n");
-		grammarBuilder.append("fmt.Println($ctx.r.toStringTree(this));\n");
-		grammarBuilder.append("ParseTreeWalker walker = new ParseTreeWalker();\n");
-		grammarBuilder.append("walker.walk(new LeafListener(), $ctx.r);\n");
+		grammarBuilder.append("fmt.Println($ctx.r.toStringTree(this))\n");
+		grammarBuilder.append("ParseTreeWalker walker = NewParseTreeWalker();\n");
+		grammarBuilder.append("walker.walk(NewLeafListener(), $ctx.r);\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("  : r=a ;\n");
 		grammarBuilder.append("a : b b		// forces list\n");
@@ -206,7 +206,7 @@ public class TestListeners extends BaseTest {
 	@Test
 	public void testRuleGetters_2() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(627);
+		StringBuilder grammarBuilder = new StringBuilder(624);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("@parser::header {\n");
 		grammarBuilder.append("}\n");
@@ -225,9 +225,9 @@ public class TestListeners extends BaseTest {
 		grammarBuilder.append("\n");
 		grammarBuilder.append("s\n");
 		grammarBuilder.append("@after {\n");
-		grammarBuilder.append("fmt.Println($ctx.r.toStringTree(this));\n");
-		grammarBuilder.append("ParseTreeWalker walker = new ParseTreeWalker();\n");
-		grammarBuilder.append("walker.walk(new LeafListener(), $ctx.r);\n");
+		grammarBuilder.append("fmt.Println($ctx.r.toStringTree(this))\n");
+		grammarBuilder.append("ParseTreeWalker walker = NewParseTreeWalker();\n");
+		grammarBuilder.append("walker.walk(NewLeafListener(), $ctx.r);\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("  : r=a ;\n");
 		grammarBuilder.append("a : b b		// forces list\n");
@@ -254,7 +254,7 @@ public class TestListeners extends BaseTest {
 	@Test
 	public void testTokenGetters_1() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(571);
+		StringBuilder grammarBuilder = new StringBuilder(568);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("@parser::header {\n");
 		grammarBuilder.append("}\n");
@@ -273,9 +273,9 @@ public class TestListeners extends BaseTest {
 		grammarBuilder.append("\n");
 		grammarBuilder.append("s\n");
 		grammarBuilder.append("@after {\n");
-		grammarBuilder.append("fmt.Println($ctx.r.toStringTree(this));\n");
-		grammarBuilder.append("ParseTreeWalker walker = new ParseTreeWalker();\n");
-		grammarBuilder.append("walker.walk(new LeafListener(), $ctx.r);\n");
+		grammarBuilder.append("fmt.Println($ctx.r.toStringTree(this))\n");
+		grammarBuilder.append("ParseTreeWalker walker = NewParseTreeWalker();\n");
+		grammarBuilder.append("walker.walk(NewLeafListener(), $ctx.r);\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("  : r=a ;\n");
 		grammarBuilder.append("a : INT INT\n");
@@ -301,7 +301,7 @@ public class TestListeners extends BaseTest {
 	@Test
 	public void testTokenGetters_2() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(571);
+		StringBuilder grammarBuilder = new StringBuilder(568);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("@parser::header {\n");
 		grammarBuilder.append("}\n");
@@ -320,9 +320,9 @@ public class TestListeners extends BaseTest {
 		grammarBuilder.append("\n");
 		grammarBuilder.append("s\n");
 		grammarBuilder.append("@after {\n");
-		grammarBuilder.append("fmt.Println($ctx.r.toStringTree(this));\n");
-		grammarBuilder.append("ParseTreeWalker walker = new ParseTreeWalker();\n");
-		grammarBuilder.append("walker.walk(new LeafListener(), $ctx.r);\n");
+		grammarBuilder.append("fmt.Println($ctx.r.toStringTree(this))\n");
+		grammarBuilder.append("ParseTreeWalker walker = NewParseTreeWalker();\n");
+		grammarBuilder.append("walker.walk(NewLeafListener(), $ctx.r);\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("  : r=a ;\n");
 		grammarBuilder.append("a : INT INT\n");

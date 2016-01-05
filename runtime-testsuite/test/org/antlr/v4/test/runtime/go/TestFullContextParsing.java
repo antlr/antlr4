@@ -12,9 +12,9 @@ public class TestFullContextParsing extends BaseTest {
 	@Test
 	public void testAmbigYieldsCtxSensitiveDFA() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(101);
+		StringBuilder grammarBuilder = new StringBuilder(97);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {this.DumpDFA();}\n");
+		grammarBuilder.append("s @after {p.DumpDFA()}\n");
 		grammarBuilder.append("	: ID | ID {} ;\n");
 		grammarBuilder.append("ID : 'a'..'z'+;\n");
 		grammarBuilder.append("WS : (' '|'\\t'|'\\n')+ -> skip ;");
@@ -34,11 +34,11 @@ public class TestFullContextParsing extends BaseTest {
 	@Test
 	public void testAmbiguityNoLoop() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(209);
+		StringBuilder grammarBuilder = new StringBuilder(208);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("prog\n");
 		grammarBuilder.append("@init {_interp.SetPredictionMode(PredictionModeLL_EXACT_AMBIG_DETECTION);}\n");
-		grammarBuilder.append("	: expr expr {fmt.Println(\"alt 1\");}\n");
+		grammarBuilder.append("	: expr expr {fmt.Println(\"alt 1\")}\n");
 		grammarBuilder.append("	| expr\n");
 		grammarBuilder.append("	;\n");
 		grammarBuilder.append("expr: '@'\n");
@@ -65,9 +65,9 @@ public class TestFullContextParsing extends BaseTest {
 	@Test
 	public void testCtxSensitiveDFATwoDiffInput() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(165);
+		StringBuilder grammarBuilder = new StringBuilder(161);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {this.DumpDFA();}\n");
+		grammarBuilder.append("s @after {p.DumpDFA()}\n");
 		grammarBuilder.append("  : ('$' a | '@' b)+ ;\n");
 		grammarBuilder.append("a : e ID ;\n");
 		grammarBuilder.append("b : e INT ID ;\n");
@@ -96,9 +96,9 @@ public class TestFullContextParsing extends BaseTest {
 	@Test
 	public void testCtxSensitiveDFA_1() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(162);
+		StringBuilder grammarBuilder = new StringBuilder(158);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {this.DumpDFA();}\n");
+		grammarBuilder.append("s @after {p.DumpDFA()}\n");
 		grammarBuilder.append("  : '$' a | '@' b ;\n");
 		grammarBuilder.append("a : e ID ;\n");
 		grammarBuilder.append("b : e INT ID ;\n");
@@ -125,9 +125,9 @@ public class TestFullContextParsing extends BaseTest {
 	@Test
 	public void testCtxSensitiveDFA_2() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(162);
+		StringBuilder grammarBuilder = new StringBuilder(158);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {this.DumpDFA();}\n");
+		grammarBuilder.append("s @after {p.DumpDFA()}\n");
 		grammarBuilder.append("  : '$' a | '@' b ;\n");
 		grammarBuilder.append("a : e ID ;\n");
 		grammarBuilder.append("b : e INT ID ;\n");
@@ -154,11 +154,11 @@ public class TestFullContextParsing extends BaseTest {
 	@Test
 	public void testExprAmbiguity_1() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(283);
+		StringBuilder grammarBuilder = new StringBuilder(282);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s\n");
 		grammarBuilder.append("@init {_interp.SetPredictionMode(PredictionModeLL_EXACT_AMBIG_DETECTION);}\n");
-		grammarBuilder.append(":   expr[0] {fmt.Println($expr.ctx.toStringTree(this));};\n");
+		grammarBuilder.append(":   expr[0] {fmt.Println($expr.ctx.toStringTree(this))};\n");
 		grammarBuilder.append("	expr[int _p]\n");
 		grammarBuilder.append("		: ID \n");
 		grammarBuilder.append("		( \n");
@@ -184,11 +184,11 @@ public class TestFullContextParsing extends BaseTest {
 	@Test
 	public void testExprAmbiguity_2() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(283);
+		StringBuilder grammarBuilder = new StringBuilder(282);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s\n");
 		grammarBuilder.append("@init {_interp.SetPredictionMode(PredictionModeLL_EXACT_AMBIG_DETECTION);}\n");
-		grammarBuilder.append(":   expr[0] {fmt.Println($expr.ctx.toStringTree(this));};\n");
+		grammarBuilder.append(":   expr[0] {fmt.Println($expr.ctx.toStringTree(this))};\n");
 		grammarBuilder.append("	expr[int _p]\n");
 		grammarBuilder.append("		: ID \n");
 		grammarBuilder.append("		( \n");
@@ -216,11 +216,11 @@ public class TestFullContextParsing extends BaseTest {
 	@Test
 	public void testFullContextIF_THEN_ELSEParse_1() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(237);
+		StringBuilder grammarBuilder = new StringBuilder(233);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s \n");
 		grammarBuilder.append("@init {_interp.SetPredictionMode(PredictionModeLL_EXACT_AMBIG_DETECTION);}\n");
-		grammarBuilder.append("@after {this.DumpDFA();}\n");
+		grammarBuilder.append("@after {p.DumpDFA()}\n");
 		grammarBuilder.append("	: '{' stat* '}' ;\n");
 		grammarBuilder.append("stat: 'if' ID 'then' stat ('else' ID)?\n");
 		grammarBuilder.append("		| 'return'\n");
@@ -242,11 +242,11 @@ public class TestFullContextParsing extends BaseTest {
 	@Test
 	public void testFullContextIF_THEN_ELSEParse_2() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(237);
+		StringBuilder grammarBuilder = new StringBuilder(233);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s \n");
 		grammarBuilder.append("@init {_interp.SetPredictionMode(PredictionModeLL_EXACT_AMBIG_DETECTION);}\n");
-		grammarBuilder.append("@after {this.DumpDFA();}\n");
+		grammarBuilder.append("@after {p.DumpDFA()}\n");
 		grammarBuilder.append("	: '{' stat* '}' ;\n");
 		grammarBuilder.append("stat: 'if' ID 'then' stat ('else' ID)?\n");
 		grammarBuilder.append("		| 'return'\n");
@@ -271,11 +271,11 @@ public class TestFullContextParsing extends BaseTest {
 	@Test
 	public void testFullContextIF_THEN_ELSEParse_3() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(237);
+		StringBuilder grammarBuilder = new StringBuilder(233);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s \n");
 		grammarBuilder.append("@init {_interp.SetPredictionMode(PredictionModeLL_EXACT_AMBIG_DETECTION);}\n");
-		grammarBuilder.append("@after {this.DumpDFA();}\n");
+		grammarBuilder.append("@after {p.DumpDFA()}\n");
 		grammarBuilder.append("	: '{' stat* '}' ;\n");
 		grammarBuilder.append("stat: 'if' ID 'then' stat ('else' ID)?\n");
 		grammarBuilder.append("		| 'return'\n");
@@ -301,11 +301,11 @@ public class TestFullContextParsing extends BaseTest {
 	@Test
 	public void testFullContextIF_THEN_ELSEParse_4() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(237);
+		StringBuilder grammarBuilder = new StringBuilder(233);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s \n");
 		grammarBuilder.append("@init {_interp.SetPredictionMode(PredictionModeLL_EXACT_AMBIG_DETECTION);}\n");
-		grammarBuilder.append("@after {this.DumpDFA();}\n");
+		grammarBuilder.append("@after {p.DumpDFA()}\n");
 		grammarBuilder.append("	: '{' stat* '}' ;\n");
 		grammarBuilder.append("stat: 'if' ID 'then' stat ('else' ID)?\n");
 		grammarBuilder.append("		| 'return'\n");
@@ -332,11 +332,11 @@ public class TestFullContextParsing extends BaseTest {
 	@Test
 	public void testFullContextIF_THEN_ELSEParse_5() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(237);
+		StringBuilder grammarBuilder = new StringBuilder(233);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s \n");
 		grammarBuilder.append("@init {_interp.SetPredictionMode(PredictionModeLL_EXACT_AMBIG_DETECTION);}\n");
-		grammarBuilder.append("@after {this.DumpDFA();}\n");
+		grammarBuilder.append("@after {p.DumpDFA()}\n");
 		grammarBuilder.append("	: '{' stat* '}' ;\n");
 		grammarBuilder.append("stat: 'if' ID 'then' stat ('else' ID)?\n");
 		grammarBuilder.append("		| 'return'\n");
@@ -366,11 +366,11 @@ public class TestFullContextParsing extends BaseTest {
 	@Test
 	public void testFullContextIF_THEN_ELSEParse_6() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(237);
+		StringBuilder grammarBuilder = new StringBuilder(233);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s \n");
 		grammarBuilder.append("@init {_interp.SetPredictionMode(PredictionModeLL_EXACT_AMBIG_DETECTION);}\n");
-		grammarBuilder.append("@after {this.DumpDFA();}\n");
+		grammarBuilder.append("@after {p.DumpDFA()}\n");
 		grammarBuilder.append("	: '{' stat* '}' ;\n");
 		grammarBuilder.append("stat: 'if' ID 'then' stat ('else' ID)?\n");
 		grammarBuilder.append("		| 'return'\n");
@@ -400,14 +400,14 @@ public class TestFullContextParsing extends BaseTest {
 	@Test
 	public void testLoopsSimulateTailRecursion() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(309);
+		StringBuilder grammarBuilder = new StringBuilder(307);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("prog\n");
 		grammarBuilder.append("@init {_interp.SetPredictionMode(PredictionModeLL_EXACT_AMBIG_DETECTION);}\n");
 		grammarBuilder.append("	: expr_or_assign*;\n");
 		grammarBuilder.append("expr_or_assign\n");
-		grammarBuilder.append("	: expr '++' {fmt.Println(\"fail.\");}\n");
-		grammarBuilder.append("	|  expr {fmt.Println(\"pass: \"+$expr.text);}\n");
+		grammarBuilder.append("	: expr '++' {fmt.Println(\"fail.\")}\n");
+		grammarBuilder.append("	|  expr {fmt.Println(\"pass: \"+$expr.text)}\n");
 		grammarBuilder.append("	;\n");
 		grammarBuilder.append("expr: expr_primary ('<-' ID)?;\n");
 		grammarBuilder.append("expr_primary\n");
@@ -432,9 +432,9 @@ public class TestFullContextParsing extends BaseTest {
 	@Test
 	public void testSLLSeesEOFInLLGrammar() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(149);
+		StringBuilder grammarBuilder = new StringBuilder(145);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {this.DumpDFA();}\n");
+		grammarBuilder.append("s @after {p.DumpDFA()}\n");
 		grammarBuilder.append("  : a;\n");
 		grammarBuilder.append("a : e ID ;\n");
 		grammarBuilder.append("b : e INT ID ;\n");

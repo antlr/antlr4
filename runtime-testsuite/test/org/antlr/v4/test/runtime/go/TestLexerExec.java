@@ -13,13 +13,13 @@ public class TestLexerExec extends BaseTest {
 	public void testActionPlacement() throws Exception {
 		mkdir(parserpkgdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(288);
+		StringBuilder grammarBuilder = new StringBuilder(283);
 		grammarBuilder.append("lexer grammar L;\n");
-		grammarBuilder.append("I : ({fmt.Println(\"stuff fail: \" + this.GetText());} 'a'\n");
-		grammarBuilder.append("| {fmt.Println(\"stuff0: \" + this.GetText());}\n");
-		grammarBuilder.append("		'a' {fmt.Println(\"stuff1: \" + this.GetText());}\n");
-		grammarBuilder.append("		'b' {fmt.Println(\"stuff2: \" + this.GetText());})\n");
-		grammarBuilder.append("		{fmt.Println(this.GetText());} ;\n");
+		grammarBuilder.append("I : ({fmt.Println(\"stuff fail: \" + this.GetText())} 'a'\n");
+		grammarBuilder.append("| {fmt.Println(\"stuff0: \" + this.GetText())}\n");
+		grammarBuilder.append("		'a' {fmt.Println(\"stuff1: \" + this.GetText())}\n");
+		grammarBuilder.append("		'b' {fmt.Println(\"stuff2: \" + this.GetText())})\n");
+		grammarBuilder.append("		{fmt.Println(this.GetText())} ;\n");
 		grammarBuilder.append("WS : (' '|'\\n') -> skip ;\n");
 		grammarBuilder.append("J : .;");
 		String grammar = grammarBuilder.toString();
@@ -40,9 +40,9 @@ public class TestLexerExec extends BaseTest {
 	public void testCharSet() throws Exception {
 		mkdir(parserpkgdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(79);
+		StringBuilder grammarBuilder = new StringBuilder(78);
 		grammarBuilder.append("lexer grammar L;\n");
-		grammarBuilder.append("I : '0'..'9'+ {fmt.Println(\"I\");} ;\n");
+		grammarBuilder.append("I : '0'..'9'+ {fmt.Println(\"I\")} ;\n");
 		grammarBuilder.append("WS : [ \\n\\u000D] -> skip ;");
 		String grammar = grammarBuilder.toString();
 		String input =
@@ -63,9 +63,9 @@ public class TestLexerExec extends BaseTest {
 	public void testCharSetInSet() throws Exception {
 		mkdir(parserpkgdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(86);
+		StringBuilder grammarBuilder = new StringBuilder(85);
 		grammarBuilder.append("lexer grammar L;\n");
-		grammarBuilder.append("I : (~[ab \\n]|'a')  {fmt.Println(\"I\");} ;\n");
+		grammarBuilder.append("I : (~[ab \\n]|'a')  {fmt.Println(\"I\")} ;\n");
 		grammarBuilder.append("WS : [ \\n\\u000D]+ -> skip ;");
 		String grammar = grammarBuilder.toString();
 		String input ="a x";
@@ -84,9 +84,9 @@ public class TestLexerExec extends BaseTest {
 	public void testCharSetNot() throws Exception {
 		mkdir(parserpkgdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(89);
+		StringBuilder grammarBuilder = new StringBuilder(88);
 		grammarBuilder.append("lexer grammar L;\n");
-		grammarBuilder.append("I : ~[ab \\n] ~[ \\ncd]* {fmt.Println(\"I\");} ;\n");
+		grammarBuilder.append("I : ~[ab \\n] ~[ \\ncd]* {fmt.Println(\"I\")} ;\n");
 		grammarBuilder.append("WS : [ \\n\\u000D]+ -> skip ;");
 		String grammar = grammarBuilder.toString();
 		String input ="xaf";
@@ -103,9 +103,9 @@ public class TestLexerExec extends BaseTest {
 	public void testCharSetPlus() throws Exception {
 		mkdir(parserpkgdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(80);
+		StringBuilder grammarBuilder = new StringBuilder(79);
 		grammarBuilder.append("lexer grammar L;\n");
-		grammarBuilder.append("I : '0'..'9'+ {fmt.Println(\"I\");} ;\n");
+		grammarBuilder.append("I : '0'..'9'+ {fmt.Println(\"I\")} ;\n");
 		grammarBuilder.append("WS : [ \\n\\u000D]+ -> skip ;");
 		String grammar = grammarBuilder.toString();
 		String input =
@@ -126,10 +126,10 @@ public class TestLexerExec extends BaseTest {
 	public void testCharSetRange() throws Exception {
 		mkdir(parserpkgdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(129);
+		StringBuilder grammarBuilder = new StringBuilder(127);
 		grammarBuilder.append("lexer grammar L;\n");
-		grammarBuilder.append("I : [0-9]+ {fmt.Println(\"I\");} ;\n");
-		grammarBuilder.append("ID : [a-zA-Z] [a-zA-Z0-9]* {fmt.Println(\"ID\");} ;\n");
+		grammarBuilder.append("I : [0-9]+ {fmt.Println(\"I\")} ;\n");
+		grammarBuilder.append("ID : [a-zA-Z] [a-zA-Z0-9]* {fmt.Println(\"ID\")} ;\n");
 		grammarBuilder.append("WS : [ \\n\\u0009\\r]+ -> skip ;");
 		String grammar = grammarBuilder.toString();
 		String input =
@@ -155,9 +155,9 @@ public class TestLexerExec extends BaseTest {
 	public void testCharSetWithEscapedChar() throws Exception {
 		mkdir(parserpkgdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(88);
+		StringBuilder grammarBuilder = new StringBuilder(87);
 		grammarBuilder.append("lexer grammar L;\n");
-		grammarBuilder.append("DASHBRACK : [\\-\\]]+ {fmt.Println(\"DASHBRACK\");} ;\n");
+		grammarBuilder.append("DASHBRACK : [\\-\\]]+ {fmt.Println(\"DASHBRACK\")} ;\n");
 		grammarBuilder.append("WS : [ \\u]+ -> skip ;");
 		String grammar = grammarBuilder.toString();
 		String input ="- ] ";
@@ -176,9 +176,9 @@ public class TestLexerExec extends BaseTest {
 	public void testCharSetWithMissingEndRange() throws Exception {
 		mkdir(parserpkgdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(76);
+		StringBuilder grammarBuilder = new StringBuilder(75);
 		grammarBuilder.append("lexer grammar L;\n");
-		grammarBuilder.append("I : [0-]+ {fmt.Println(\"I\");} ;\n");
+		grammarBuilder.append("I : [0-]+ {fmt.Println(\"I\")} ;\n");
 		grammarBuilder.append("WS : [ \\n\\u000D]+ -> skip ;");
 		String grammar = grammarBuilder.toString();
 		String input ="00\n";
@@ -195,9 +195,9 @@ public class TestLexerExec extends BaseTest {
 	public void testCharSetWithMissingEscapeChar() throws Exception {
 		mkdir(parserpkgdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(71);
+		StringBuilder grammarBuilder = new StringBuilder(70);
 		grammarBuilder.append("lexer grammar L;\n");
-		grammarBuilder.append("I : [0-9]+ {fmt.Println(\"I\");} ;\n");
+		grammarBuilder.append("I : [0-9]+ {fmt.Println(\"I\")} ;\n");
 		grammarBuilder.append("WS : [ \\u]+ -> skip ;");
 		String grammar = grammarBuilder.toString();
 		String input ="34 ";
@@ -214,9 +214,9 @@ public class TestLexerExec extends BaseTest {
 	public void testCharSetWithQuote1() throws Exception {
 		mkdir(parserpkgdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(74);
+		StringBuilder grammarBuilder = new StringBuilder(73);
 		grammarBuilder.append("lexer grammar L;\n");
-		grammarBuilder.append("A : [\"a-z]+ {fmt.Println(\"A\");} ;\n");
+		grammarBuilder.append("A : [\"a-z]+ {fmt.Println(\"A\")} ;\n");
 		grammarBuilder.append("WS : [ \\n\\t]+ -> skip ;");
 		String grammar = grammarBuilder.toString();
 		String input ="b\"a";
@@ -233,9 +233,9 @@ public class TestLexerExec extends BaseTest {
 	public void testCharSetWithQuote2() throws Exception {
 		mkdir(parserpkgdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(75);
+		StringBuilder grammarBuilder = new StringBuilder(74);
 		grammarBuilder.append("lexer grammar L;\n");
-		grammarBuilder.append("A : [\"\\\\ab]+ {fmt.Println(\"A\");} ;\n");
+		grammarBuilder.append("A : [\"\\\\ab]+ {fmt.Println(\"A\")} ;\n");
 		grammarBuilder.append("WS : [ \\n\\t]+ -> skip ;");
 		String grammar = grammarBuilder.toString();
 		String input ="b\"\\a";
@@ -252,9 +252,9 @@ public class TestLexerExec extends BaseTest {
 	public void testCharSetWithReversedRange() throws Exception {
 		mkdir(parserpkgdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(72);
+		StringBuilder grammarBuilder = new StringBuilder(71);
 		grammarBuilder.append("lexer grammar L;\n");
-		grammarBuilder.append("A : [z-a9]+ {fmt.Println(\"A\");} ;\n");
+		grammarBuilder.append("A : [z-a9]+ {fmt.Println(\"A\")} ;\n");
 		grammarBuilder.append("WS : [ \\u]+ -> skip ;");
 		String grammar = grammarBuilder.toString();
 		String input ="9";
@@ -345,9 +345,9 @@ public class TestLexerExec extends BaseTest {
 	public void testGreedyConfigs() throws Exception {
 		mkdir(parserpkgdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(99);
+		StringBuilder grammarBuilder = new StringBuilder(98);
 		grammarBuilder.append("lexer grammar L;\n");
-		grammarBuilder.append("I : ('a' | 'ab') {fmt.Println(this.GetText());} ;\n");
+		grammarBuilder.append("I : ('a' | 'ab') {fmt.Println(this.GetText())} ;\n");
 		grammarBuilder.append("WS : (' '|'\\n') -> skip ;\n");
 		grammarBuilder.append("J : .;");
 		String grammar = grammarBuilder.toString();
@@ -4503,11 +4503,11 @@ public class TestLexerExec extends BaseTest {
 	public void testNonGreedyConfigs() throws Exception {
 		mkdir(parserpkgdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(134);
+		StringBuilder grammarBuilder = new StringBuilder(132);
 		grammarBuilder.append("lexer grammar L;\n");
-		grammarBuilder.append("I : .*? ('a' | 'ab') {fmt.Println(this.GetText());} ;\n");
+		grammarBuilder.append("I : .*? ('a' | 'ab') {fmt.Println(this.GetText())} ;\n");
 		grammarBuilder.append("WS : (' '|'\\n') -> skip ;\n");
-		grammarBuilder.append("J : . {fmt.Println(this.GetText());};");
+		grammarBuilder.append("J : . {fmt.Println(this.GetText())};");
 		String grammar = grammarBuilder.toString();
 		String input ="ab";
 		String found = execLexer("L.g4", grammar, "L", input, false);
@@ -4625,7 +4625,7 @@ public class TestLexerExec extends BaseTest {
 	public void testPositionAdjustingLexer() throws Exception {
 		mkdir(parserpkgdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(2634);
+		StringBuilder grammarBuilder = new StringBuilder(2633);
 		grammarBuilder.append("lexer grammar PositionAdjustingLexer;\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("@members {\n");
@@ -4634,7 +4634,7 @@ public class TestLexerExec extends BaseTest {
 		grammarBuilder.append("//@Override\n");
 		grammarBuilder.append("func (this *PositionAdjustingLexer) NextToken() *Token {\n");
 		grammarBuilder.append("	if (!(_interp instanceof PositionAdjustingLexerATNSimulator)) {\n");
-		grammarBuilder.append("		_interp = new PositionAdjustingLexerATNSimulator(this, _ATN, _decisionToDFA, _sharedContextCache);\n");
+		grammarBuilder.append("		_interp = NewPositionAdjustingLexerATNSimulator(this, _ATN, _decisionToDFA, _sharedContextCache);\n");
 		grammarBuilder.append("	}\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("	return super.nextToken();\n");

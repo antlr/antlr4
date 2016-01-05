@@ -113,11 +113,11 @@ public class TestSemPredEvalLexer extends BaseTest {
 	public void testIndent() throws Exception {
 		mkdir(parserpkgdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(154);
+		StringBuilder grammarBuilder = new StringBuilder(153);
 		grammarBuilder.append("lexer grammar L;\n");
 		grammarBuilder.append("ID : [a-z]+  ;\n");
 		grammarBuilder.append("INDENT : [ \\t]+ { this._tokenStartCharPositionInLine==0 }?\n");
-		grammarBuilder.append("         { fmt.Println(\"INDENT\"); }  ;\n");
+		grammarBuilder.append("         { fmt.Println(\"INDENT\") }  ;\n");
 		grammarBuilder.append("NL : '\\n';\n");
 		grammarBuilder.append("WS : [ \\t]+ ;");
 		String grammar = grammarBuilder.toString();
@@ -150,10 +150,10 @@ public class TestSemPredEvalLexer extends BaseTest {
 	public void testLexerInputPositionSensitivePredicates() throws Exception {
 		mkdir(parserpkgdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(264);
+		StringBuilder grammarBuilder = new StringBuilder(262);
 		grammarBuilder.append("lexer grammar L;\n");
-		grammarBuilder.append("WORD1 : ID1+ { fmt.Println(this.GetText()); } ;\n");
-		grammarBuilder.append("WORD2 : ID2+ { fmt.Println(this.GetText()); } ;\n");
+		grammarBuilder.append("WORD1 : ID1+ { fmt.Println(this.GetText()) } ;\n");
+		grammarBuilder.append("WORD2 : ID2+ { fmt.Println(this.GetText()) } ;\n");
 		grammarBuilder.append("fragment ID1 : { this.GetCharPositionInLine() < 2 }? [a-zA-Z];\n");
 		grammarBuilder.append("fragment ID2 : { this.GetCharPositionInLine() >= 2 }? [a-zA-Z];\n");
 		grammarBuilder.append("WS : (' '|'\\n') -> skip;");
@@ -180,10 +180,10 @@ public class TestSemPredEvalLexer extends BaseTest {
 	public void testPredicatedKeywords() throws Exception {
 		mkdir(parserpkgdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(173);
+		StringBuilder grammarBuilder = new StringBuilder(171);
 		grammarBuilder.append("lexer grammar L;\n");
-		grammarBuilder.append("ENUM : [a-z]+ { this.GetText().equals(\"enum\") }? { fmt.Println(\"enum!\"); } ;\n");
-		grammarBuilder.append("ID   : [a-z]+ { fmt.Println(\"ID \" + this.GetText()); } ;\n");
+		grammarBuilder.append("ENUM : [a-z]+ { this.GetText().equals(\"enum\") }? { fmt.Println(\"enum!\") } ;\n");
+		grammarBuilder.append("ID   : [a-z]+ { fmt.Println(\"ID \" + this.GetText()) } ;\n");
 		grammarBuilder.append("WS   : [ \\n] -> skip ;");
 		String grammar = grammarBuilder.toString();
 		String input ="enum enu a";
