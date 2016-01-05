@@ -6,6 +6,7 @@ import (
 	"fmt"
 )
 
+/*
 type MyListener struct {
 	*parser.BaseArithmeticListener
 }
@@ -21,7 +22,7 @@ func (k *MyListener) EnterExpression(ctx *parser.ExpressionContext) {
 func (k *MyListener) EnterAtom(ctx *parser.AtomContext) {
 	fmt.Println(ctx)
 }
-
+*/
 func main() {
 
 	a := antlr4.NewFileStream("foo.txt")
@@ -30,14 +31,12 @@ func main() {
 
 	s := antlr4.NewCommonTokenStream(l, 0)
 
-	p := parser.NewArithmeticParser(s)
+	p := parser.NewExprParser(s)
 
 	p.BuildParseTrees = true
 
-	var tree = p.Equation()
-
-	var printer = NewMyPrinter()
-	antlr4.ParseTreeWalkerDefault.Walk(printer, tree);
+	//var printer = NewMyPrinter()
+	//antlr4.ParseTreeWalkerDefault.Walk(printer, tree);
 
 	// fmt.Println( tree.GetChildren()[0].GetChildren()[0].GetChildren()[0].GetChildren()[0].GetChildren()[0].GetChildren()[0].GetChildren()[0] );
 

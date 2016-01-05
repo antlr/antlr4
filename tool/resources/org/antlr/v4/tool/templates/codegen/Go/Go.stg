@@ -12,12 +12,15 @@ import (
     "antlr4"
     "reflect"
     "fmt"
+    "strconv"
 )
 
-// suppress unused import error, we aren't guaranteed
-// to have reflect or fmt used in the generated code below
+// Stopgap to suppress unused import error. We aren't certain
+// to have these imports used in the generated code below
+
 var _ = fmt.Printf
 var _ = reflect.Copy
+var _ = strconv.Itoa
 
 <namedActions.header>
 
@@ -164,7 +167,7 @@ const (
 <funcs; separator="\n">
 
 <if(sempredFuncs)>
-func (p *<parser.name>) Sempred(localctx antlr4.RuleContext, ruleIndex, predIndex int) {
+func (p *<parser.name>) Sempred(localctx antlr4.RuleContext, ruleIndex, predIndex int) bool {
 	switch ruleIndex {
 	<parser.sempredFuncs.values:{f | case <f.ruleIndex>:
 		return p.<f.name; format="cap">_Sempred(localctx, predIndex);}; separator="\n">
@@ -194,7 +197,7 @@ case <f.ruleIndex>:
 <actionFuncs.values; separator="\n">
 <endif>
 <if(sempredFuncs)>
-func (l *<lexer.name>) Sempred(localctx antlr4.RuleContext, ruleIndex, predIndex int) {
+func (l *<lexer.name>) Sempred(localctx antlr4.RuleContext, ruleIndex, predIndex int) bool {
 	switch ruleIndex {
 		<recog.sempredFuncs.values:{f| case <f.ruleIndex>:
 	return l.<f.name>_Sempred(localctx, predIndex);}; separator="\n">
@@ -229,7 +232,7 @@ case <index>:
  * overriding implementation impossible to maintain.
  */
 RuleSempredFunction(r, actions) ::= <<
-func (s *<if(parser)><parser.name><else><lexer.name><endif>) <r.name; format="cap">_Sempred(localctx  antlr4.RuleContext, predIndex int) {
+func (p *<if(parser)><parser.name><else><lexer.name><endif>) <r.name; format="cap">_Sempred(localctx  antlr4.RuleContext, predIndex int) {
 	switch predIndex {
 		<actions:{index| case <index>:
 	return <actions.(index)>;}; separator="\n">
@@ -292,12 +295,13 @@ LeftRecursiveRuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,
 <ruleCtx>
 <altLabelCtxs:{l | <altLabelCtxs.(l)>}; separator="\n">
 
-func (p *<parser.name>) <currentRule.name; format="cap">(_p<if(currentRule.args)>, <args:{a | , <a>}><endif>) *<currentRule.ctxType> {
+func (p *<parser.name>) <currentRule.name; format="cap">(_p int<if(currentRule.args)>, <args:{a | , <a>}><endif>) *<currentRule.ctxType> {
 
-    _parentctx := p.GetParent().(ParserRuleContext)
+    _parentctx := p.GetParserRuleContext()
     _parentState := p.GetState()
     localctx := New<currentRule.ctxType>(p, p.GetParserRuleContext(), _parentState<args:{a | , <a.name>}>)
     _prevctx := localctx
+    var _ antlr4.ParserRuleContext = _prevctx // to prevent unused variable warning
     _startState := <currentRule.startState>
     p.EnterRecursionRule(localctx, <currentRule.startState>, <parser.name>RULE_<currentRule.name>, _p)
     <namedActions.init>
@@ -462,7 +466,7 @@ case <i><if(!choice.ast.greedy)>+1<endif>:
 
 Sync(s) ::= "Sync(<s.expecting.name>)"
 
-ThrowNoViableAlt(t) ::= "panic(NewNoViableAltException(p))"
+ThrowNoViableAlt(t) ::= "panic(antlr4.NewNoViableAltException(p, nil, nil, nil, nil, nil))"
 
 TestSetInline(s) ::= <<
 <s.bitsets:{bits | <if(rest(rest(bits.ttypes)))><bitsetBitfieldComparison(s, bits)><else><bitsetInlineComparison(s, bits)><endif>}; separator=" || ">
@@ -539,7 +543,7 @@ ArgAction(a, chunks) ::= "<chunks>"
 SemPred(p, chunks, failChunks) ::= <<
 p.SetState(<p.stateNumber>)
 if !( <chunks>) {
-    panic( FailedPredicateException(p, <p.predicate><if(failChunks)>, <failChunks><elseif(p.msg)>, <p.msg><endif>))
+    panic( antlr4.NewFailedPredicateException(p, <p.predicate><if(failChunks)>, <failChunks><elseif(p.msg)>, <p.msg><else>, ""<endif>))
 }
 >>
 
@@ -574,23 +578,23 @@ SetAttr(s,rhsChunks) ::= "<ctx(s)>.<s.name> = <rhsChunks>"
 TokenLabelType() ::= "<file.TokenLabelType; null={Token}>"
 InputSymbolType() ::= "<file.InputSymbolType; null={Token}>"
 
-TokenPropertyRef_text(t) ::= "(<ctx(t)>.<t.label>==null ? null : <ctx(t)>.<t.label>.text)"
-TokenPropertyRef_type(t) ::= "(<ctx(t)>.<t.label> == null ? 0 : <ctx(t)>.<t.label>.type)"
-TokenPropertyRef_line(t) ::= "(<ctx(t)>.<t.label> == null ? 0 : <ctx(t)>.<t.label>.line)"
-TokenPropertyRef_pos(t) ::= "(<ctx(t)>.<t.label> == null ? 0 : <ctx(t)>.<t.label>.column)"
-TokenPropertyRef_channel(t) ::= "(<ctx(t)>.<t.label> == null ? 0 : <ctx(t)>.<t.label>.channel)"
-TokenPropertyRef_index(t) ::= "(<ctx(t)>.<t.label> == null ? 0 : <ctx(t)>.<t.label>.tokenIndex)"
-TokenPropertyRef_int(t) ::= "(<ctx(t)>.<t.label> == null ? 0 : parseInt(<ctx(t)>.<t.label>.text))"
+TokenPropertyRef_text(t) ::= "(<ctx(t)>.<t.label>==null ? null : <ctx(t)>.<t.label>.GetText())"
+TokenPropertyRef_type(t) ::= "(<ctx(t)>.<t.label> == null ? 0 : <ctx(t)>.<t.label>.GetTokenType())"
+TokenPropertyRef_line(t) ::= "(<ctx(t)>.<t.label> == null ? 0 : <ctx(t)>.<t.label>.GetLine())"
+TokenPropertyRef_pos(t) ::= "(<ctx(t)>.<t.label> == null ? 0 : <ctx(t)>.<t.label>.GetColumn())"
+TokenPropertyRef_channel(t) ::= "(<ctx(t)>.<t.label> == null ? 0 : <ctx(t)>.<t.label>.GetChannel())"
+TokenPropertyRef_index(t) ::= "(<ctx(t)>.<t.label> == null ? 0 : <ctx(t)>.<t.label>.GetTokenIndex())"
+TokenPropertyRef_int(t) ::= "(<ctx(t)>.<t.label> == null ? 0 : strconv.Atoi(<ctx(t)>.<t.label>.GetText()))"
 
-RulePropertyRef_start(r) ::= "(<ctx(r)>.<r.label>==null ? null : <ctx(r)>.<r.label>.start)"
-RulePropertyRef_stop(r)	 ::= "(<ctx(r)>.<r.label>==null ? null : <ctx(r)>.<r.label>.stop)"
-RulePropertyRef_text(r)	 ::= "(<ctx(r)>.<r.label>==null ? null : p.GetTokenStream().GetTextFromInterval(NewInterval(<ctx(r)>.<r.label>.GetStart(),<ctx(r)>.<r.label>.GetStop())))"
+RulePropertyRef_start(r) ::= "(<ctx(r)>.<r.label>==null ? null : <ctx(r)>.<r.label>.GetStart())"
+RulePropertyRef_stop(r)	 ::= "(<ctx(r)>.<r.label>==null ? null : <ctx(r)>.<r.label>.GetStop())"
+RulePropertyRef_text(r)	 ::= "(<ctx(r)>.<r.label>==null ? null : p.GetTokenStream().GetTextFromInterval(antlr4.NewInterval(<ctx(r)>.<r.label>.GetStart(),<ctx(r)>.<r.label>.GetStop())))"
 RulePropertyRef_ctx(r)	 ::= "<ctx(r)>.<r.label>"
-RulePropertyRef_parser(r)	 ::= "this"
+RulePropertyRef_parser(r)	 ::= "p"
 
-ThisRulePropertyRef_start(r) ::= "localctx.start"
-ThisRulePropertyRef_stop(r)	 ::= "localctx.stop"
-ThisRulePropertyRef_text(r)	 ::= "p.GetTokenStream().GetTextFromInterval(NewInterval(localctx.GetStart(), p.GetTokenStream().LT(-1)))"
+ThisRulePropertyRef_start(r) ::= "localctx.GetStart()"
+ThisRulePropertyRef_stop(r)	 ::= "localctx.GetStop()"
+ThisRulePropertyRef_text(r)	 ::= "p.GetTokenStream().GetTextFromInterval(antlr4.NewInterval(localctx.GetStart(), p.GetTokenStream().LT(-1)))"
 ThisRulePropertyRef_ctx(r)	 ::= "localctx"
 ThisRulePropertyRef_parser(r)	 ::= "p"
 
@@ -684,15 +688,15 @@ func New<struct.name>(parser antlr4.Parser, parent antlr4.ParserRuleContext, inv
     p.parser = parser
     p.RuleIndex = <parser.name>RULE_<struct.derivedFromName>
     <attrs:{a | <a>}; separator="\n">
-    <struct.ctorAttrs:{a | p.<a.name> = <a.name> || null;}; separator="\n">
+    <struct.ctorAttrs:{a | p.<a.name> = <a.name>}; separator="\n">
     return p
 }
 
 <getters:{g | func (s *<struct.name>) <g>}; separator="\n\n">
 
 <if(struct.provideCopyFrom)> <! don't need copy unless we have subclasses !>
-func (s *<struct.name>) CopyFrom(ctx <struct.name>) {
-    <superClass>.prototype.CopyFrom.call(s, ctx)
+func (s *<struct.name>) CopyFrom(ctx *<struct.name>) {
+    s.BaseParserRuleContext.CopyFrom(ctx)
     <struct.attrs:{a | s.<a.name> = ctx.<a.name>;}; separator="\n">
 }
 <endif>
@@ -710,20 +714,26 @@ func (s *<struct.name>) GetRuleContext() antlr4.RuleContext {
 AltLabelStructDecl(struct,attrs,getters,dispatchMethods) ::= <<
 
 type <struct.name> struct {
-    parent antlr4.ParserRuleContext
-    parser antlr4.Parser
+    *<currentRule.name; format="cap">Context
 }
 
 func New<struct.name>(parser antlr4.Parser, ctx antlr4.ParserRuleContext) *<struct.name> {
 
     var p = new(<struct.name>)
 
-	// TODO <currentRule.name; format="cap">Context.call(this, parser)
+    p.<currentRule.name; format="cap">Context = new(<currentRule.name; format="cap">Context)
 
     <attrs:{a | <a>;}; separator="\n">
-    // TODO <currentRule.name; format="cap">Context.prototype.CopyFrom.call(this, ctx)
+
+    p.parser = parser
+    p.CopyFrom(ctx)
 
     return p
+}
+
+func (s *<struct.name>) GetRuleContext() antlr4.RuleContext {
+    // Go does not truly support inheritance nor virtual method calls, so we need to implement this directly
+    return s
 }
 
 <getters:{g | func (s *<struct.name>) <g>}; separator="\n\n">
@@ -733,15 +743,12 @@ func New<struct.name>(parser antlr4.Parser, ctx antlr4.ParserRuleContext) *<stru
 
 ListenerDispatchMethod(method) ::= <<
 func (s *<struct.name>) <if(method.isEnter)>Enter<else>Exit<endif>Rule(listener antlr4.ParseTreeListener) {
-
     listener.(<parser.grammarName>Listener).<if(method.isEnter)>Enter<else>Exit<endif><struct.derivedFromName; format="cap">(s)
-
 }
 >>
 
 VisitorDispatchMethod(method) ::= <<
 func (s *<struct.name>) Accept(visitor antlr4.ParseTreeVisitor) interface{} {
-
     switch t := visitor.(type) {
     case <parser.grammarName>Visitor:
         return t.Visit<struct.derivedFromName; format="cap">(s)
@@ -751,7 +758,7 @@ func (s *<struct.name>) Accept(visitor antlr4.ParseTreeVisitor) interface{} {
 }
 >>
 
-AttributeDecl(d) ::= "p.<d.name> = <if(d.InitValue)><d.InitValue><else>null<endif>"
+AttributeDecl(d) ::= "p.<d.name> = <if(d.initValue)><d.initValue><else>null<endif>"
 
 /** If we don't know location of label def x, use this template */
 labelref(x) ::= "<if(!x.isLocal)>localctx.<endif><x.name>"
@@ -762,19 +769,19 @@ ctx(actionChunk) ::= "localctx"
 // used for left-recursive rules
 recRuleAltPredicate(ruleName,opPrec)  ::= "p.Precpred(p.GetParserRuleContext(), <opPrec>)"
 recRuleSetReturnAction(src,name)	  ::= "$<name>=$<src>.<name>"
-recRuleSetStopToken()                 ::= "p.GetParserRuleContext().stop = p.GetTokenStream().LT(-1);"
+recRuleSetStopToken()                 ::= "p.GetParserRuleContext().SetStop( p.GetTokenStream().LT(-1) )"
 
 recRuleAltStartAction(ruleName, ctxName, label) ::= <<
-localctx = New<ctxName>Context(this, _parentctx, _parentState)
+localctx = New<ctxName>Context(p, _parentctx, _parentState)
 <if(label)>localctx.<label> = _prevctx;<endif>
 p.PushNewRecursionContext(localctx, _startState, <parser.name>RULE_<ruleName>)
 >>
 
 recRuleLabeledAltStartAction(ruleName, currentAltLabel, label, isListLabel) ::= <<
-localctx = New<currentAltLabel; format="cap">Context(this, New<ruleName; format="cap">Context(this, _parentctx, _parentState))
+localctx = New<currentAltLabel; format="cap">Context(p, New<ruleName; format="cap">Context(p, _parentctx, _parentState))
 <if(label)>
 <if(isListLabel)>
-localctx.<label>.push(_prevctx)
+localctx.<label> = append( localctx.<label>, _prevctx))
 <else>
 localctx.<label> = _prevctx
 <endif>
@@ -783,13 +790,13 @@ p.PushNewRecursionContext(localctx, _startState, <parser.name>RULE_<ruleName>)
 >>
 
 recRuleReplaceContext(ctxName) ::= <<
-localctx = New<ctxName>Context(this, localctx)
+localctx = New<ctxName>Context(p, localctx)
 p.GetParserRuleContext() = localctx
 _prevctx = localctx
 >>
 
 recRuleSetPrevCtx() ::= <<
-if(p.GetParseListeners()!=nil) {
+if p.GetParseListeners()!=nil {
     p.TriggerExitRuleEvent()
 }
 _prevctx = localctx
@@ -882,7 +889,7 @@ SerializedATN(model) ::= <<
  * Using a type to init value map, try to init a type; if not in table
  *	must be an object, default value is "nil".
  */
-InitValue(typeName) ::= <<
+initValue(typeName) ::= <<
 <javaTypeInitMap.(typeName)>
 >>
 
