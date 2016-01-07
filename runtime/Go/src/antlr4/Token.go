@@ -57,7 +57,7 @@ const (
 
 	TokenEOF = -1
 
-	// All tokens go to the parser (unless skip() is called in that rule)
+	// All tokens go to the parser (unless Skip() is called in that rule)
 	// on a particular "channel". The parser tunes to a particular channel
 	// so that whitespace etc... can go to the parser on a "hidden" channel.
 
@@ -130,8 +130,8 @@ func NewCommonToken(source *TokenSourceCharStreamPair, tokenType, channel, start
 	t.stop = stop
 	t.tokenIndex = -1
 	if t.source.tokenSource != nil {
-		t.line = source.tokenSource.getLine()
-		t.column = source.tokenSource.getCharPositionInLine()
+		t.line = source.tokenSource.GetLine()
+		t.column = source.tokenSource.GetCharPositionInLine()
 	} else {
 		t.column = -1
 	}

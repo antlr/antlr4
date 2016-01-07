@@ -313,11 +313,11 @@ func (this *LexerATNSimulator) failOrAccept(prevAccept *SimState, input CharStre
 // we can reach upon input {@code t}. Parameter {@code reach} is a return
 // parameter.
 func (this *LexerATNSimulator) getReachableConfigSet(input CharStream, closure ATNConfigSet, reach ATNConfigSet, t int) {
-	// this is used to skip processing for configs which have a lower priority
+	// this is used to Skip processing for configs which have a lower priority
 	// than a config that already reached an accept state for the same rule
-	var skipAlt = ATNInvalidAltNumber
+	var SkipAlt = ATNInvalidAltNumber
 	for _, cfg := range closure.GetItems() {
-		var currentAltReachedAcceptState = (cfg.GetAlt() == skipAlt)
+		var currentAltReachedAcceptState = (cfg.GetAlt() == SkipAlt)
 		if currentAltReachedAcceptState && cfg.(*LexerATNConfig).passedThroughNonGreedyDecision {
 			continue
 		}
@@ -337,7 +337,7 @@ func (this *LexerATNSimulator) getReachableConfigSet(input CharStream, closure A
 					currentAltReachedAcceptState, true, treatEofAsEpsilon) {
 					// any remaining configs for this alt have a lower priority
 					// than the one that just reached an accept state.
-					skipAlt = cfg.GetAlt()
+					SkipAlt = cfg.GetAlt()
 				}
 			}
 		}
@@ -530,7 +530,7 @@ func (this *LexerATNSimulator) getEpsilonTarget(input CharStream, config *LexerA
 // <p>If {@code speculative} is {@code true}, this method was called before
 // {@link //consume} for the Matched character. This method should call
 // {@link //consume} before evaluating the predicate to ensure position
-// sensitive values, including {@link Lexer//GetText}, {@link Lexer//getLine},
+// sensitive values, including {@link Lexer//GetText}, {@link Lexer//GetLine},
 // and {@link Lexer//getcolumn}, properly reflect the current
 // lexer state. This method should restore {@code input} and the simulator
 // to the original state before returning (i.e. undo the actions made by the

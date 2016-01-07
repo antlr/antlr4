@@ -1,11 +1,11 @@
 package antlr4
 
 type TokenSource interface {
-	nextToken() Token
-	skip()
-	more()
-	getLine() int
-	getCharPositionInLine() int
+	NextToken() Token
+	Skip()
+	More()
+	GetLine() int
+	GetCharPositionInLine() int
 	GetInputStream() CharStream
 	GetSourceName() string
 	setTokenFactory(factory TokenFactory)

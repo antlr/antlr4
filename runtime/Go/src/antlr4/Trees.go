@@ -13,7 +13,7 @@ func TreesStringTree(tree Tree, ruleNames []string, recog Recognizer) string {
 		ruleNames = recog.GetRuleNames()
 	}
 
-	var s = TreesgetNodeText(tree, ruleNames, nil)
+	var s = TreesGetNodeText(tree, ruleNames, nil)
 
 	s = EscapeWhitespace(s, false)
 	var c = tree.GetChildCount()
@@ -33,7 +33,7 @@ func TreesStringTree(tree Tree, ruleNames []string, recog Recognizer) string {
 	return res
 }
 
-func TreesgetNodeText(t Tree, ruleNames []string, recog *BaseParser) string {
+func TreesGetNodeText(t Tree, ruleNames []string, recog Parser) string {
 
 	if recog != nil {
 		ruleNames = recog.GetRuleNames()

@@ -1,7 +1,4 @@
 grammar Expr;
-
-options { language = Go; }
-
 prog:   stat ;
 stat:   expr NEWLINE                # printExpr
     |   ID '=' expr NEWLINE         # assign

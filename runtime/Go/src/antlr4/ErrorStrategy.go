@@ -219,14 +219,14 @@ func (this *DefaultErrorStrategy) Sync(recognizer Parser) {
 	}
 
 	// try cheaper subset first might get lucky. seems to shave a wee bit off
-	if la == TokenEOF || recognizer.GetATN().nextTokens(s, nil).contains(la) {
+	if la == TokenEOF || recognizer.GetATN().NextTokens(s, nil).contains(la) {
 		if PortDebug {
 			fmt.Println("OK1")
 		}
 		return
 	}
 	// Return but don't end recovery. only do that upon valid token Match
-	if recognizer.isExpectedToken(la) {
+	if recognizer.IsExpectedToken(la) {
 		if PortDebug {
 			fmt.Println("OK2")
 		}
@@ -235,7 +235,7 @@ func (this *DefaultErrorStrategy) Sync(recognizer Parser) {
 
 	if PortDebug {
 		fmt.Println("LA" + strconv.Itoa(la))
-		fmt.Println(recognizer.GetATN().nextTokens(s, nil))
+		fmt.Println(recognizer.GetATN().NextTokens(s, nil))
 	}
 
 	switch s.GetStateType() {
@@ -257,7 +257,7 @@ func (this *DefaultErrorStrategy) Sync(recognizer Parser) {
 	case ATNStateStarLoopBack:
 		this.ReportUnwantedToken(recognizer)
 		var expecting = NewIntervalSet()
-		expecting.addSet(recognizer.getExpectedTokens())
+		expecting.addSet(recognizer.GetExpectedTokens())
 		var whatFollowsLoopIterationOrRule = expecting.addSet(this.getErrorRecoverySet(recognizer))
 		this.consumeUntil(recognizer, whatFollowsLoopIterationOrRule)
 	default:
@@ -342,7 +342,7 @@ func (this *DefaultErrorStrategy) ReportUnwantedToken(recognizer Parser) {
 		return
 	}
 	this.beginErrorCondition(recognizer)
-	var t = recognizer.getCurrentToken()
+	var t = recognizer.GetCurrentToken()
 	var tokenName = this.GetTokenErrorDisplay(t)
 	var expecting = this.getExpectedTokens(recognizer)
 	var msg = "extraneous input " + tokenName + " expecting " +
@@ -371,7 +371,7 @@ func (this *DefaultErrorStrategy) ReportMissingToken(recognizer Parser) {
 		return
 	}
 	this.beginErrorCondition(recognizer)
-	var t = recognizer.getCurrentToken()
+	var t = recognizer.GetCurrentToken()
 	var expecting = this.getExpectedTokens(recognizer)
 	var msg = "missing " + expecting.StringVerbose(recognizer.GetLiteralNames(), recognizer.GetSymbolicNames(), false) +
 		" at " + this.GetTokenErrorDisplay(t)
@@ -469,7 +469,7 @@ func (this *DefaultErrorStrategy) singleTokenInsertion(recognizer Parser) bool {
 	var atn = recognizer.GetInterpreter().atn
 	var currentState = atn.states[recognizer.GetState()]
 	var next = currentState.GetTransitions()[0].getTarget()
-	var expectingAtLL2 = atn.nextTokens(next, recognizer.GetParserRuleContext())
+	var expectingAtLL2 = atn.NextTokens(next, recognizer.GetParserRuleContext())
 	if expectingAtLL2.contains(currentSymbolType) {
 		this.ReportMissingToken(recognizer)
 		return true
@@ -497,9 +497,9 @@ func (this *DefaultErrorStrategy) singleTokenInsertion(recognizer Parser) bool {
 // {@code nil}
 //
 func (this *DefaultErrorStrategy) singleTokenDeletion(recognizer Parser) Token {
-	var nextTokenType = recognizer.GetTokenStream().LA(2)
+	var NextTokenType = recognizer.GetTokenStream().LA(2)
 	var expecting = this.getExpectedTokens(recognizer)
-	if expecting.contains(nextTokenType) {
+	if expecting.contains(NextTokenType) {
 		this.ReportUnwantedToken(recognizer)
 		// print("recoverFromMisMatchedToken deleting " \
 		// + str(recognizer.GetTokenStream().LT(1)) \
@@ -507,7 +507,7 @@ func (this *DefaultErrorStrategy) singleTokenDeletion(recognizer Parser) Token {
 		// + " is what we want", file=sys.stderr)
 		recognizer.Consume() // simply delete extra token
 		// we want to return the token we're actually Matching
-		var MatchedSymbol = recognizer.getCurrentToken()
+		var MatchedSymbol = recognizer.GetCurrentToken()
 		this.ReportMatch(recognizer) // we know current token is correct
 		return MatchedSymbol
 	} else {
@@ -535,7 +535,7 @@ func (this *DefaultErrorStrategy) singleTokenDeletion(recognizer Parser) Token {
 // override this method to create the appropriate tokens.
 //
 func (this *DefaultErrorStrategy) getMissingSymbol(recognizer Parser) Token {
-	var currentSymbol = recognizer.getCurrentToken()
+	var currentSymbol = recognizer.GetCurrentToken()
 	var expecting = this.getExpectedTokens(recognizer)
 	var expectedTokenType = expecting.first()
 	var tokenText string
@@ -559,7 +559,7 @@ func (this *DefaultErrorStrategy) getMissingSymbol(recognizer Parser) Token {
 }
 
 func (this *DefaultErrorStrategy) getExpectedTokens(recognizer Parser) *IntervalSet {
-	return recognizer.getExpectedTokens()
+	return recognizer.GetExpectedTokens()
 }
 
 // How should a token be displayed in an error message? The default
@@ -692,7 +692,7 @@ func (this *DefaultErrorStrategy) getErrorRecoverySet(recognizer Parser) *Interv
 		// compute what follows who invoked us
 		var invokingState = atn.states[ctx.GetInvokingState()]
 		var rt = invokingState.GetTransitions()[0]
-		var follow = atn.nextTokens(rt.(*RuleTransition).followState, nil)
+		var follow = atn.NextTokens(rt.(*RuleTransition).followState, nil)
 		recoverSet.addSet(follow)
 		ctx = ctx.GetParent().(ParserRuleContext)
 	}

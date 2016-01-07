@@ -110,15 +110,17 @@ public class TestCompositeParsers extends BaseTest {
 		String slave_S =
 			"parser grammar S;\n" +
 			"@parser::members {\n" +
-			"	func foo() {fmt.Println(\"foo\")}\n" +
+			"func foo() {\n" +
+			"	fmt.Println(\"foo\")\n" +
+			"}\n" +
 			"}\n" +
 			"a : B;";
 		writeFile(parserpkgdir, "S.g4", slave_S);
 
-		StringBuilder grammarBuilder = new StringBuilder(122);
+		StringBuilder grammarBuilder = new StringBuilder(121);
 		grammarBuilder.append("grammar M; // uses no rules from the import\n");
 		grammarBuilder.append("import S;\n");
-		grammarBuilder.append("s : 'b' {foo();} ; // gS is import pointer\n");
+		grammarBuilder.append("s : 'b' {foo()} ; // gS is import pointer\n");
 		grammarBuilder.append("WS : (' '|'\\n') -> skip ;");
 		String grammar = grammarBuilder.toString();
 		String input ="b";
@@ -377,7 +379,7 @@ public class TestCompositeParsers extends BaseTest {
 		mkdir(parserpkgdir);
 		String slave_S =
 			"parser grammar S;\n" +
-			"a @after {int x = 0;} : B;";
+			"a @after {var x int = 0;} : B;";
 		writeFile(parserpkgdir, "S.g4", slave_S);
 
 		StringBuilder grammarBuilder = new StringBuilder(62);

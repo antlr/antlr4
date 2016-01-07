@@ -38,7 +38,7 @@ func NewDiagnosticErrorListener(exactOnly bool) *DiagnosticErrorListener {
 	return n
 }
 
-func (this *DiagnosticErrorListener) ReportAmbiguity(recognizer *BaseParser, dfa *DFA, startIndex, stopIndex int, exact bool, ambigAlts *BitSet, configs ATNConfigSet) {
+func (this *DiagnosticErrorListener) ReportAmbiguity(recognizer Parser, dfa *DFA, startIndex, stopIndex int, exact bool, ambigAlts *BitSet, configs ATNConfigSet) {
 	if this.exactOnly && !exact {
 		return
 	}
@@ -51,7 +51,7 @@ func (this *DiagnosticErrorListener) ReportAmbiguity(recognizer *BaseParser, dfa
 	recognizer.NotifyErrorListeners(msg, nil, nil)
 }
 
-func (this *DiagnosticErrorListener) ReportAttemptingFullContext(recognizer *BaseParser, dfa *DFA, startIndex, stopIndex int, conflictingAlts *BitSet, configs ATNConfigSet) {
+func (this *DiagnosticErrorListener) ReportAttemptingFullContext(recognizer Parser, dfa *DFA, startIndex, stopIndex int, conflictingAlts *BitSet, configs ATNConfigSet) {
 
 	var msg = "ReportAttemptingFullContext d=" +
 		this.getDecisionDescription(recognizer, dfa) +
@@ -60,7 +60,7 @@ func (this *DiagnosticErrorListener) ReportAttemptingFullContext(recognizer *Bas
 	recognizer.NotifyErrorListeners(msg, nil, nil)
 }
 
-func (this *DiagnosticErrorListener) ReportContextSensitivity(recognizer *BaseParser, dfa *DFA, startIndex, stopIndex, prediction int, configs ATNConfigSet) {
+func (this *DiagnosticErrorListener) ReportContextSensitivity(recognizer Parser, dfa *DFA, startIndex, stopIndex, prediction int, configs ATNConfigSet) {
 	var msg = "ReportContextSensitivity d=" +
 		this.getDecisionDescription(recognizer, dfa) +
 		", input='" +
@@ -68,7 +68,7 @@ func (this *DiagnosticErrorListener) ReportContextSensitivity(recognizer *BasePa
 	recognizer.NotifyErrorListeners(msg, nil, nil)
 }
 
-func (this *DiagnosticErrorListener) getDecisionDescription(recognizer *BaseParser, dfa *DFA) string {
+func (this *DiagnosticErrorListener) getDecisionDescription(recognizer Parser, dfa *DFA) string {
 	var decision = dfa.decision
 	var ruleIndex = dfa.atnStartState.GetRuleIndex()
 

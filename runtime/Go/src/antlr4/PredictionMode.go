@@ -69,7 +69,7 @@ const (
 	// This prediction mode does not provide any guarantees for prediction
 	// behavior for syntactically-incorrect inputs.</p>
 	//
-	PredictionModeLL_EXACT_AMBIG_DETECTION = 2
+	PredictionModeLLExactAmbigDetection = 2
 )
 
 //

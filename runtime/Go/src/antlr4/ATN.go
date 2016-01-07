@@ -60,7 +60,7 @@ func NewATN(grammarType int, maxTokenType int) *ATN {
 //  If {@code ctx} is nil, the set of tokens will not include what can follow
 //  the rule surrounding {@code s}. In other words, the set will be
 //  restricted to tokens reachable staying within {@code s}'s rule.
-func (this *ATN) nextTokensInContext(s ATNState, ctx RuleContext) *IntervalSet {
+func (this *ATN) NextTokensInContext(s ATNState, ctx RuleContext) *IntervalSet {
 	var anal = NewLL1Analyzer(this)
 	var res = anal.LOOK(s, nil, ctx)
 	return res
@@ -69,7 +69,7 @@ func (this *ATN) nextTokensInContext(s ATNState, ctx RuleContext) *IntervalSet {
 // Compute the set of valid tokens that can occur starting in {@code s} and
 // staying in same rule. {@link Token//EPSILON} is in set if we reach end of
 // rule.
-func (this *ATN) nextTokensNoContext(s ATNState) *IntervalSet {
+func (this *ATN) NextTokensNoContext(s ATNState) *IntervalSet {
 	if s.GetNextTokenWithinRule() != nil {
 		if PortDebug {
 			fmt.Println("DEBUG 1")
@@ -78,18 +78,18 @@ func (this *ATN) nextTokensNoContext(s ATNState) *IntervalSet {
 	}
 	if PortDebug {
 		fmt.Println("DEBUG 2")
-		fmt.Println(this.nextTokensInContext(s, nil))
+		fmt.Println(this.NextTokensInContext(s, nil))
 	}
-	s.SetNextTokenWithinRule(this.nextTokensInContext(s, nil))
+	s.SetNextTokenWithinRule(this.NextTokensInContext(s, nil))
 	s.GetNextTokenWithinRule().readOnly = true
 	return s.GetNextTokenWithinRule()
 }
 
-func (this *ATN) nextTokens(s ATNState, ctx RuleContext) *IntervalSet {
+func (this *ATN) NextTokens(s ATNState, ctx RuleContext) *IntervalSet {
 	if ctx == nil {
-		return this.nextTokensNoContext(s)
+		return this.NextTokensNoContext(s)
 	} else {
-		return this.nextTokensInContext(s, ctx)
+		return this.NextTokensInContext(s, ctx)
 	}
 }
 
@@ -142,7 +142,7 @@ func (this *ATN) getExpectedTokens(stateNumber int, ctx RuleContext) *IntervalSe
 		panic("Invalid state number.")
 	}
 	var s = this.states[stateNumber]
-	var following = this.nextTokens(s, nil)
+	var following = this.NextTokens(s, nil)
 	if !following.contains(TokenEpsilon) {
 		return following
 	}
@@ -152,7 +152,7 @@ func (this *ATN) getExpectedTokens(stateNumber int, ctx RuleContext) *IntervalSe
 	for ctx != nil && ctx.GetInvokingState() >= 0 && following.contains(TokenEpsilon) {
 		var invokingState = this.states[ctx.GetInvokingState()]
 		var rt = invokingState.GetTransitions()[0]
-		following = this.nextTokens(rt.(*RuleTransition).followState, nil)
+		following = this.NextTokens(rt.(*RuleTransition).followState, nil)
 		expected.addSet(following)
 		expected.removeOne(TokenEpsilon)
 		ctx = ctx.GetParent().(RuleContext)

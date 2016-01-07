@@ -56,9 +56,9 @@ func (this *BaseLexerAction) equals(other LexerAction) bool {
 }
 
 //
-// Implements the {@code skip} lexer action by calling {@link Lexer//skip}.
+// Implements the {@code Skip} lexer action by calling {@link Lexer//Skip}.
 //
-// <p>The {@code skip} command does not have any parameters, so this action is
+// <p>The {@code Skip} command does not have any parameters, so this action is
 // implemented as a singleton instance exposed by {@link //INSTANCE}.</p>
 type LexerSkipAction struct {
 	*BaseLexerAction
@@ -74,7 +74,7 @@ func NewLexerSkipAction() *LexerSkipAction {
 var LexerSkipActionINSTANCE = NewLexerSkipAction()
 
 func (this *LexerSkipAction) execute(lexer Lexer) {
-	lexer.skip()
+	lexer.Skip()
 }
 
 func (this *LexerSkipAction) String() string {
@@ -207,7 +207,7 @@ var LexerMoreActionINSTANCE = NewLexerMoreAction()
 
 // <p>This action is implemented by calling {@link Lexer//popMode}.</p>
 func (this *LexerMoreAction) execute(lexer Lexer) {
-	lexer.more()
+	lexer.More()
 }
 
 func (this *LexerMoreAction) String() string {

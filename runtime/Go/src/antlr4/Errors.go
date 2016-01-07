@@ -142,11 +142,11 @@ func NewNoViableAltException(recognizer Parser, input TokenStream, startToken To
 	}
 
 	if offendingToken == nil {
-		offendingToken = recognizer.getCurrentToken()
+		offendingToken = recognizer.GetCurrentToken()
 	}
 
 	if startToken == nil {
-		startToken = recognizer.getCurrentToken()
+		startToken = recognizer.GetCurrentToken()
 	}
 
 	if input == nil {
@@ -181,7 +181,7 @@ func NewInputMisMatchException(recognizer Parser) *InputMisMatchException {
 	this := new(InputMisMatchException)
 	this.BaseRecognitionException = NewBaseRecognitionException("", recognizer, recognizer.GetInputStream(), recognizer.GetParserRuleContext())
 
-	this.offendingToken = recognizer.getCurrentToken()
+	this.offendingToken = recognizer.GetCurrentToken()
 
 	return this
 
@@ -200,13 +200,13 @@ type FailedPredicateException struct {
 	predicate      string
 }
 
-func NewFailedPredicateException(recognizer *BaseParser, predicate string, message string) *FailedPredicateException {
+func NewFailedPredicateException(recognizer Parser, predicate string, message string) *FailedPredicateException {
 
 	this := new(FailedPredicateException)
 
-	this.BaseRecognitionException = NewBaseRecognitionException(this.formatMessage(predicate, message), recognizer, recognizer.GetInputStream(), recognizer._ctx)
+	this.BaseRecognitionException = NewBaseRecognitionException(this.formatMessage(predicate, message), recognizer, recognizer.GetInputStream(), recognizer.GetParserRuleContext())
 
-	var s = recognizer.Interpreter.atn.states[recognizer.state]
+	var s = recognizer.GetInterpreter().atn.states[recognizer.GetState()]
 	var trans = s.GetTransitions()[0]
 	if trans2, ok := trans.(*PredicateTransition); ok {
 		this.ruleIndex = trans2.ruleIndex
@@ -216,7 +216,7 @@ func NewFailedPredicateException(recognizer *BaseParser, predicate string, messa
 		this.predicateIndex = 0
 	}
 	this.predicate = predicate
-	this.offendingToken = recognizer.getCurrentToken()
+	this.offendingToken = recognizer.GetCurrentToken()
 
 	return this
 }

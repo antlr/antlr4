@@ -26,21 +26,22 @@ type BaseLexer struct {
 	*BaseRecognizer
 
 	Interpreter *LexerATNSimulator
+	TokenStartCharIndex int
+	TokenStartLine int
+	TokenStartColumn int
+	ActionType int
 
 	_input                  CharStream
 	_factory                TokenFactory
 	_tokenFactorySourcePair *TokenSourceCharStreamPair
 	_token                  Token
-	_tokenStartCharIndex    int
-	_tokenStartLine         int
-	_tokenStartColumn       int
 	_hitEOF                 bool
 	_channel                int
 	_type                   int
 	_modeStack              IntStack
 	_mode                   int
 	_text                   string
-	actionType              int
+
 }
 
 func NewBaseLexer(input CharStream) *BaseLexer {
@@ -57,7 +58,7 @@ func NewBaseLexer(input CharStream) *BaseLexer {
 
 	// The goal of all lexer rules/methods is to create a token object.
 	// l is an instance variable as multiple rules may collaborate to
-	// create a single token. nextToken will return l object after
+	// create a single token. NextToken will return l object after
 	// Matching lexer rule(s). If you subclass to allow multiple token
 	// emissions, then set l to the last token to be Matched or
 	// something nonnil so that the auto token emit mechanism will not
@@ -66,14 +67,14 @@ func NewBaseLexer(input CharStream) *BaseLexer {
 
 	// What character index in the stream did the current token start at?
 	// Needed, for example, to get the text for current token. Set at
-	// the start of nextToken.
-	lexer._tokenStartCharIndex = -1
+	// the start of NextToken.
+	lexer.TokenStartCharIndex = -1
 
 	// The line on which the first character of the token resides///
-	lexer._tokenStartLine = -1
+	lexer.TokenStartLine = -1
 
 	// The character position of first character within the line///
-	lexer._tokenStartColumn = -1
+	lexer.TokenStartColumn = -1
 
 	// Once we see EOF on char stream, next token will be EOF.
 	// If you have DONE : EOF  then you see DONE EOF.
@@ -117,9 +118,9 @@ func (l *BaseLexer) reset() {
 	l._token = nil
 	l._type = TokenInvalidType
 	l._channel = TokenDefaultChannel
-	l._tokenStartCharIndex = -1
-	l._tokenStartColumn = -1
-	l._tokenStartLine = -1
+	l.TokenStartCharIndex = -1
+	l.TokenStartColumn = -1
+	l.TokenStartLine = -1
 	l._text = ""
 
 	l._hitEOF = false
@@ -166,9 +167,9 @@ func (l *BaseLexer) safeMatch() (ret int) {
 }
 
 // Return a token from l source i.e., Match a token on the char stream.
-func (l *BaseLexer) nextToken() Token {
+func (l *BaseLexer) NextToken() Token {
 	if l._input == nil {
-		panic("nextToken requires a non-nil input stream.")
+		panic("NextToken requires a non-nil input stream.")
 	}
 
 	var tokenStartMarker = l._input.Mark()
@@ -187,9 +188,9 @@ func (l *BaseLexer) nextToken() Token {
 		}
 		l._token = nil
 		l._channel = TokenDefaultChannel
-		l._tokenStartCharIndex = l._input.Index()
-		l._tokenStartColumn = l.Interpreter.column
-		l._tokenStartLine = l.Interpreter.line
+		l.TokenStartCharIndex = l._input.Index()
+		l.TokenStartColumn = l.Interpreter.column
+		l.TokenStartLine = l.Interpreter.line
 		l._text = ""
 		var continueOuter = false
 		for true {
@@ -231,17 +232,17 @@ func (l *BaseLexer) nextToken() Token {
 	return nil
 }
 
-// Instruct the lexer to skip creating a token for current lexer rule
-// and look for another token. nextToken() knows to keep looking when
+// Instruct the lexer to Skip creating a token for current lexer rule
+// and look for another token. NextToken() knows to keep looking when
 // a lexer rule finishes with token set to SKIP_TOKEN. Recall that
 // if token==nil at end of any token rule, it creates one for you
 // and emits it.
 // /
-func (l *BaseLexer) skip() {
+func (l *BaseLexer) Skip() {
 	l._type = LexerSkip
 }
 
-func (l *BaseLexer) more() {
+func (l *BaseLexer) More() {
 	l._type = LexerMore
 }
 
@@ -281,8 +282,8 @@ func (l *BaseLexer) setInputStream(input CharStream) {
 	l._tokenFactorySourcePair = &TokenSourceCharStreamPair{l, l._input}
 }
 
-// By default does not support multiple emits per nextToken invocation
-// for efficiency reasons. Subclass and override l method, nextToken,
+// By default does not support multiple emits per NextToken invocation
+// for efficiency reasons. Subclass and override l method, NextToken,
 // and GetToken (to push tokens into a list and pull from that list
 // rather than a single variable as l implementation does).
 // /
@@ -300,14 +301,14 @@ func (l *BaseLexer) emit() Token {
 	if PortDebug {
 		fmt.Println("emit")
 	}
-	var t = l._factory.Create(l._tokenFactorySourcePair, l._type, l._text, l._channel, l._tokenStartCharIndex, l.getCharIndex()-1, l._tokenStartLine, l._tokenStartColumn)
+	var t = l._factory.Create(l._tokenFactorySourcePair, l._type, l._text, l._channel, l.TokenStartCharIndex, l.getCharIndex()-1, l.TokenStartLine, l.TokenStartColumn)
 	l.emitToken(t)
 	return t
 }
 
 func (l *BaseLexer) emitEOF() Token {
-	cpos := l.getCharPositionInLine()
-	lpos := l.getLine()
+	cpos := l.GetCharPositionInLine()
+	lpos := l.GetLine()
 	if PortDebug {
 		fmt.Println("emitEOF")
 	}
@@ -316,11 +317,11 @@ func (l *BaseLexer) emitEOF() Token {
 	return eof
 }
 
-func (l *BaseLexer) getCharPositionInLine() int {
+func (l *BaseLexer) GetCharPositionInLine() int {
 	return l.Interpreter.column
 }
 
-func (l *BaseLexer) getLine() int {
+func (l *BaseLexer) GetLine() int {
 	return l.Interpreter.line
 }
 
@@ -363,24 +364,24 @@ func (l *BaseLexer) getAllTokens() []Token {
 		fmt.Println("getAllTokens")
 	}
 	var tokens = make([]Token, 0)
-	var t = l.nextToken()
+	var t = l.NextToken()
 	for t.GetTokenType() != TokenEOF {
 		tokens = append(tokens, t)
 		if PortDebug {
 			fmt.Println("getAllTokens")
 		}
-		t = l.nextToken()
+		t = l.NextToken()
 	}
 	return tokens
 }
 
 func (l *BaseLexer) notifyListeners(e RecognitionException) {
-	var start = l._tokenStartCharIndex
+	var start = l.TokenStartCharIndex
 	var stop = l._input.Index()
 	var text = l._input.GetTextFromInterval(NewInterval(start, stop))
 	var msg = "token recognition error at: '" + text + "'"
-	var listener = l.getErrorListenerDispatch()
-	listener.SyntaxError(l, nil, l._tokenStartLine, l._tokenStartColumn, msg, e)
+	var listener = l.GetErrorListenerDispatch()
+	listener.SyntaxError(l, nil, l.TokenStartLine, l.TokenStartColumn, msg, e)
 }
 
 func (l *BaseLexer) getErrorDisplayForChar(c rune) string {
@@ -409,7 +410,7 @@ func (l *BaseLexer) getCharErrorDisplay(c rune) string {
 func (l *BaseLexer) Recover(re RecognitionException) {
 	if l._input.LA(1) != TokenEOF {
 		if _, ok := re.(*LexerNoViableAltException); ok {
-			// skip a char and try again
+			// Skip a char and try again
 			l.Interpreter.consume(l._input)
 		} else {
 			// TODO: Do we lose character or line position information?

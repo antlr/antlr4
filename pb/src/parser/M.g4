@@ -1,5 +1,5 @@
 grammar M;
-options { language = JavaScript; }
+options { language = Go; }
 import S;
 s : a;
 B : 'b';

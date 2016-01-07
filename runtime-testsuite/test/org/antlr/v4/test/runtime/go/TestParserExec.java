@@ -608,11 +608,11 @@ public class TestParserExec extends BaseTest {
 	@Test
 	public void testPredicatedIfIfElse() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(175);
+		StringBuilder grammarBuilder = new StringBuilder(182);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s : stmt EOF ;\n");
 		grammarBuilder.append("stmt : ifStmt | ID;\n");
-		grammarBuilder.append("ifStmt : 'if' ID stmt ('else' stmt | { this._input.LA(1)!=TParser.ELSE }?);\n");
+		grammarBuilder.append("ifStmt : 'if' ID stmt ('else' stmt | { p.GetTokenStream().LA(1)!=TParser.ELSE }?);\n");
 		grammarBuilder.append("ELSE : 'else';\n");
 		grammarBuilder.append("ID : [a-zA-Z]+;\n");
 		grammarBuilder.append("WS : [ \\n\\t]+ -> skip;");
@@ -632,10 +632,10 @@ public class TestParserExec extends BaseTest {
 		StringBuilder grammarBuilder = new StringBuilder(246);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("file_ @init{\n");
-		grammarBuilder.append("SetErrorHandler(NewBailErrorStrategy());\n");
+		grammarBuilder.append("SetErrorHandler(NewBailErrorStrategy())\n");
 		grammarBuilder.append("} \n");
 		grammarBuilder.append("@after {\n");
-		grammarBuilder.append("fmt.Println($ctx.toStringTree(this))\n");
+		grammarBuilder.append("fmt.Println($ctx.ToStringTree(nil,p))\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("  :   item (SEMICOLON item)* SEMICOLON? EOF ;\n");
 		grammarBuilder.append("item : A B?;\n");

@@ -232,7 +232,7 @@ case <index>:
  * overriding implementation impossible to maintain.
  */
 RuleSempredFunction(r, actions) ::= <<
-func (p *<if(parser)><parser.name><else><lexer.name><endif>) <r.name; format="cap">_Sempred(localctx  antlr4.RuleContext, predIndex int) {
+func (p *<if(parser)><parser.name><else><lexer.name><endif>) <r.name; format="cap">_Sempred(localctx  antlr4.RuleContext, predIndex int) bool {
 	switch predIndex {
 		<actions:{index| case <index>:
 	return <actions.(index)>;}; separator="\n">
@@ -256,7 +256,7 @@ func (p *<parser.name>) <currentRule.name; format="cap">(<currentRule.args:{a | 
     localctx := New<currentRule.ctxType>(p, p.GetParserRuleContext(), p.GetState()<currentRule.args:{a | , <a.name>}>)
     p.EnterRule(localctx, <currentRule.startState>, <parser.name>RULE_<currentRule.name>)
     <namedActions.init>
-    <locals; separator="\n">
+    <if(locals)>var <locals; separator="\nvar "><endif>
 
     defer func(){
         <finallyAction>
@@ -305,7 +305,7 @@ func (p *<parser.name>) <currentRule.name; format="cap">(_p int<if(currentRule.a
     _startState := <currentRule.startState>
     p.EnterRecursionRule(localctx, <currentRule.startState>, <parser.name>RULE_<currentRule.name>, _p)
     <namedActions.init>
-    <locals; separator="\n">
+    <if(locals)>var <locals; separator="\nvar "><endif>
 
     defer func(){
         <finallyAction>
@@ -340,7 +340,7 @@ p.EnterOuterAlt(localctx, <currentOuterMostAltCodeBlock.alt.altNum>)
 >>
 
 CodeBlockForAlt(currentAltCodeBlock, locals, preamble, ops) ::= <<
-<locals; separator="\n">
+<if(locals)>var <locals; separator="\nvar "><endif>
 <preamble; separator="\n">
 <ops; separator="\n">
 >>
@@ -578,17 +578,17 @@ SetAttr(s,rhsChunks) ::= "<ctx(s)>.<s.name> = <rhsChunks>"
 TokenLabelType() ::= "<file.TokenLabelType; null={antlr4.Token}>"
 InputSymbolType() ::= "<file.InputSymbolType; null={antlr4.Token}>"
 
-TokenPropertyRef_text(t) ::= "(<ctx(t)>.<t.label>==null ? null : <ctx(t)>.<t.label>.GetText())"
-TokenPropertyRef_type(t) ::= "(<ctx(t)>.<t.label> == null ? 0 : <ctx(t)>.<t.label>.GetTokenType())"
-TokenPropertyRef_line(t) ::= "(<ctx(t)>.<t.label> == null ? 0 : <ctx(t)>.<t.label>.GetLine())"
-TokenPropertyRef_pos(t) ::= "(<ctx(t)>.<t.label> == null ? 0 : <ctx(t)>.<t.label>.GetColumn())"
-TokenPropertyRef_channel(t) ::= "(<ctx(t)>.<t.label> == null ? 0 : <ctx(t)>.<t.label>.GetChannel())"
-TokenPropertyRef_index(t) ::= "(<ctx(t)>.<t.label> == null ? 0 : <ctx(t)>.<t.label>.GetTokenIndex())"
-TokenPropertyRef_int(t) ::= "(<ctx(t)>.<t.label> == null ? 0 : strconv.Atoi(<ctx(t)>.<t.label>.GetText()))"
+TokenPropertyRef_text(t) ::= "(func() string { if <ctx(t)>.<t.label> == nil { return \"\" } else { return <ctx(t)>.<t.label>.GetText() }}())"
+TokenPropertyRef_type(t) ::=  "(func() int { if <ctx(t)>.<t.label> == nil { return 0 } else { return <ctx(t)>.<t.label>.GetTokenType() }}())"
+TokenPropertyRef_line(t) ::= "(func() int { if <ctx(t)>.<t.label> == nil { return 0 } else { return <ctx(t)>.<t.label>.GetLine() }}())"
+TokenPropertyRef_pos(t) ::= "(func() int { if <ctx(t)>.<t.label> == nil { return 0 } else { return <ctx(t)>.<t.label>.GetColumn() }}())"
+TokenPropertyRef_channel(t) ::= "(func() int { if <ctx(t)>.<t.label> == nil { return 0 } else { return <ctx(t)>.<t.label>.GetChannel() }}())"
+TokenPropertyRef_index(t) ::= "(func() int { if <ctx(t)>.<t.label> == nil { return 0 } else { return <ctx(t)>.<t.label>.GetTokenIndex() }}())"
+TokenPropertyRef_int(t) ::= "(func() int { if <ctx(t)>.<t.label> == nil { return 0 } else { return strconv.Atoi(<ctx(t)>.<t.label>.GetText()) }}())"
 
-RulePropertyRef_start(r) ::= "(<ctx(r)>.<r.label>==null ? null : <ctx(r)>.<r.label>.GetStart())"
-RulePropertyRef_stop(r)	 ::= "(<ctx(r)>.<r.label>==null ? null : <ctx(r)>.<r.label>.GetStop())"
-RulePropertyRef_text(r)	 ::= "(<ctx(r)>.<r.label>==null ? null : p.GetTokenStream().GetText(<ctx(r)>.<r.label>.GetStart().GetTokenIndex(),<ctx(r)>.<r.label>.GetStop().GetTokenIndex()))"
+RulePropertyRef_start(r) ::= "(func() antlr4.Token { if <ctx(r)>.<r.label> == nil { return nil } else { return <ctx(r)>.<r.label>.GetStart() }}())"
+RulePropertyRef_stop(r)	 ::= "(func() antlr4.Token { if <ctx(r)>.<r.label> == nil { return nil } else { return <ctx(r)>.<r.label>.GetStop() }}())"
+RulePropertyRef_text(r)	 ::= "(func() string { if <ctx(r)>.<r.label> == nil { return \"\" } else { return p.GetTokenStream().GetTextFromInterval( antlr4.NewInterval( <ctx(r)>.<r.label>.GetStart().GetTokenIndex(),<ctx(r)>.<r.label>.GetStop().GetTokenIndex())) }}())"
 RulePropertyRef_ctx(r)	 ::= "<ctx(r)>.<r.label>"
 RulePropertyRef_parser(r)	 ::= "p"
 
@@ -695,7 +695,7 @@ func New<struct.name>(parser antlr4.Parser, parent antlr4.ParserRuleContext, inv
 
 <if(struct.provideCopyFrom)> <! don't need copy unless we have subclasses !>
 func (s *<struct.name>) CopyFrom(ctx *<struct.name>) {
-    s.BaseParserRuleContext.CopyFrom(ctx)
+    s.BaseParserRuleContext.CopyFrom(ctx.BaseParserRuleContext)
     <struct.attrs:{a | s.<a.name> = ctx.<a.name>;}; separator="\n">
 }
 <endif>
@@ -723,9 +723,8 @@ func New<struct.name>(parser antlr4.Parser, ctx antlr4.ParserRuleContext) *<stru
     var p = new(<struct.name>)
 
     p.<currentRule.name; format="cap">Context = new(<currentRule.name; format="cap">Context)
-
     p.parser = parser
-    p.CopyFrom(ctx)
+    p.CopyFrom(ctx.(*<currentRule.name; format="cap">Context))
 
     return p
 }

@@ -802,7 +802,7 @@ public abstract class BaseTest {
 		if (debug) {
 			createParserST = new ST(
 					"	p := parser.New<parserName>(stream)\n"
-							+ "	p.AddErrorListener(antlr4.NewDiagnosticErrorListener())\n");
+							+ "	p.AddErrorListener(antlr4.NewDiagnosticErrorListener(true))\n");
 		}
 		outputFileST.add("createParser", createParserST);
 		outputFileST.add("parserName", parserName);

@@ -57,7 +57,7 @@ type BaseATNState struct {
 	// Track the transitions emanating from this ATN state.
 	transitions []Transition
 	// Used to cache lookahead during parsing, not used during construction
-	nextTokenWithinRule *IntervalSet
+	NextTokenWithinRule *IntervalSet
 }
 
 func NewBaseATNState() *BaseATNState {
@@ -73,7 +73,7 @@ func NewBaseATNState() *BaseATNState {
 	// Track the transitions emanating from this ATN state.
 	as.transitions = make([]Transition, 0)
 	// Used to cache lookahead during parsing, not used during construction
-	as.nextTokenWithinRule = nil
+	as.NextTokenWithinRule = nil
 
 	return as
 }
@@ -118,11 +118,11 @@ func (as *BaseATNState) SetStateNumber(stateNumber int) {
 }
 
 func (as *BaseATNState) GetNextTokenWithinRule() *IntervalSet {
-	return as.nextTokenWithinRule
+	return as.NextTokenWithinRule
 }
 
 func (as *BaseATNState) SetNextTokenWithinRule(v *IntervalSet) {
-	as.nextTokenWithinRule = v
+	as.NextTokenWithinRule = v
 }
 
 func (this *BaseATNState) String() string {

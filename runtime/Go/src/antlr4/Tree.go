@@ -14,7 +14,6 @@ type Tree interface {
 	GetChild(i int) Tree
 	GetChildCount() int
 	GetChildren() []Tree
-	//	StringTree() string
 }
 
 type SyntaxTree interface {
@@ -28,7 +27,8 @@ type ParseTree interface {
 
 	Accept(Visitor ParseTreeVisitor) interface{}
 	GetText() string
-	//	StringTree([]string, IRecognizer) string
+
+	ToStringTree([]string, Recognizer) string
 }
 
 type RuleNode interface {
@@ -165,6 +165,10 @@ func (this *TerminalNodeImpl) String() string {
 	} else {
 		return this.symbol.GetText()
 	}
+}
+
+func (this *TerminalNodeImpl) ToStringTree(s []string, r Recognizer) string {
+	return this.String()
 }
 
 // Represents a token that was consumed during reSynchronization

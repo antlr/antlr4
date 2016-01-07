@@ -638,7 +638,7 @@ func mergeArrays(a, b *ArrayPredictionContext, rootIsWildcard bool, mergeCache *
 				mergedReturnStates[k] = payload
 			}
 			i += 1 // hop over left one as usual
-			j += 1 // but also skip one in right side since we merge
+			j += 1 // but also Skip one in right side since we merge
 		} else if a.returnStates[i] < b.returnStates[j] { // copy a[i] to M
 			mergedParents[k] = a_parent
 			mergedReturnStates[k] = a.returnStates[i]

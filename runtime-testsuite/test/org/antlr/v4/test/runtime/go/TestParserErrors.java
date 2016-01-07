@@ -184,7 +184,7 @@ public class TestParserErrors extends BaseTest {
 	@Test
 	public void testLL1ErrorInfo() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(298);
+		StringBuilder grammarBuilder = new StringBuilder(314);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("start : animal (AND acClass)? service EOF;\n");
 		grammarBuilder.append("animal : (DOG | CAT );\n");
@@ -197,7 +197,7 @@ public class TestParserErrors extends BaseTest {
 		grammarBuilder.append("WS : ' ' -> skip ;\n");
 		grammarBuilder.append("acClass\n");
 		grammarBuilder.append("@init\n");
-		grammarBuilder.append("{fmt.Println(this.GetExpectedTokens().toString(this.tokenNames))}\n");
+		grammarBuilder.append("{fmt.Println(p.GetExpectedTokens().StringVerbose(p.GetTokenNames(), nil, false))}\n");
 		grammarBuilder.append("  : ;");
 		String grammar = grammarBuilder.toString();
 		String input ="dog and software";

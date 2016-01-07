@@ -20,7 +20,7 @@ type Recognizer interface {
 	AddErrorListener(ErrorListener)
 	RemoveErrorListeners()
 	GetATN() *ATN
-	getErrorListenerDispatch() ErrorListener
+	GetErrorListenerDispatch() ErrorListener
 }
 
 type BaseRecognizer struct {
@@ -201,7 +201,7 @@ func (this *BaseRecognizer) GetTokenErrorDisplay(t Token) string {
 	return "'" + s + "'"
 }
 
-func (this *BaseRecognizer) getErrorListenerDispatch() ErrorListener {
+func (this *BaseRecognizer) GetErrorListenerDispatch() ErrorListener {
 	return NewProxyErrorListener(this._listeners)
 }
 

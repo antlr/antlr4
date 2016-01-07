@@ -264,7 +264,7 @@ func (this *AND) evalPrecedence(parser Recognizer, outerContext RuleContext) Sem
 			// The AND context is false if any element is false
 			return nil
 		} else if evaluated != SemanticContextNone {
-			// Reduce the result by skipping true elements
+			// Reduce the result by Skipping true elements
 			operands = append(operands, evaluated)
 		}
 	}
@@ -399,7 +399,7 @@ func (this *OR) evalPrecedence(parser Recognizer, outerContext RuleContext) Sema
 			// The OR context is true if any element is true
 			return SemanticContextNone
 		} else if evaluated != nil {
-			// Reduce the result by skipping false elements
+			// Reduce the result by Skipping false elements
 			operands = append(operands, evaluated)
 		}
 	}

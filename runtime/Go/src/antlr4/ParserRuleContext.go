@@ -170,7 +170,7 @@ func (prc *BaseParserRuleContext) GetChildOfType(i int, childType reflect.Type) 
 	}
 }
 
-func (this *BaseParserRuleContext) StringTree(ruleNames []string, recog Recognizer) string {
+func (this *BaseParserRuleContext) ToStringTree(ruleNames []string, recog Recognizer) string {
 	return TreesStringTree(this, ruleNames, recog)
 }
 

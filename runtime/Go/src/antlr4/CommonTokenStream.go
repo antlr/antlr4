@@ -97,25 +97,25 @@ func (bt *CommonTokenStream) Get(index int) Token {
 }
 
 func (bt *CommonTokenStream) Consume() {
-	var skipEofCheck = false
+	var SkipEofCheck = false
 	if bt.index >= 0 {
 		if bt.fetchedEOF {
-			// the last token in tokens is EOF. skip check if p indexes any
+			// the last token in tokens is EOF. Skip check if p indexes any
 			// fetched token except the last.
-			skipEofCheck = bt.index < len(bt.tokens)-1
+			SkipEofCheck = bt.index < len(bt.tokens)-1
 		} else {
-			// no EOF token in tokens. skip check if p indexes a fetched token.
-			skipEofCheck = bt.index < len(bt.tokens)
+			// no EOF token in tokens. Skip check if p indexes a fetched token.
+			SkipEofCheck = bt.index < len(bt.tokens)
 		}
 	} else {
 		// not yet initialized
-		skipEofCheck = false
+		SkipEofCheck = false
 	}
 
 	if PortDebug {
 		fmt.Println("Consume 1")
 	}
-	if !skipEofCheck && bt.LA(1) == TokenEOF {
+	if !SkipEofCheck && bt.LA(1) == TokenEOF {
 		panic("cannot consume EOF")
 	}
 	if bt.Sync(bt.index + 1) {
@@ -154,7 +154,7 @@ func (bt *CommonTokenStream) fetch(n int) int {
 	}
 
 	for i := 0; i < n; i++ {
-		var t Token = bt.tokenSource.nextToken()
+		var t Token = bt.tokenSource.NextToken()
 		if PortDebug {
 			fmt.Println("fetch loop")
 		}
@@ -225,7 +225,7 @@ func (bt *CommonTokenStream) SetTokenSource(tokenSource TokenSource) {
 // Return i if tokens[i] is on channel. Return -1 if there are no tokens
 // on channel between i and EOF.
 // /
-func (bt *CommonTokenStream) nextTokenOnChannel(i, channel int) int {
+func (bt *CommonTokenStream) NextTokenOnChannel(i, channel int) int {
 	bt.Sync(i)
 	if i >= len(bt.tokens) {
 		return -1
@@ -260,7 +260,7 @@ func (bt *CommonTokenStream) getHiddenTokensToRight(tokenIndex, channel int) []T
 	if tokenIndex < 0 || tokenIndex >= len(bt.tokens) {
 		panic(strconv.Itoa(tokenIndex) + " not in 0.." + strconv.Itoa(len(bt.tokens)-1))
 	}
-	var nextOnChannel = bt.nextTokenOnChannel(tokenIndex+1, LexerDefaultTokenChannel)
+	var nextOnChannel = bt.NextTokenOnChannel(tokenIndex+1, LexerDefaultTokenChannel)
 	var from_ = tokenIndex + 1
 	// if none onchannel to right, nextOnChannel=-1 so set to = last token
 	var to int
@@ -370,7 +370,7 @@ func (bt *CommonTokenStream) Fill() {
 }
 
 func (ts *CommonTokenStream) adjustSeekIndex(i int) int {
-	return ts.nextTokenOnChannel(i, ts.channel)
+	return ts.NextTokenOnChannel(i, ts.channel)
 }
 
 func (ts *CommonTokenStream) LB(k int) Token {
@@ -381,7 +381,7 @@ func (ts *CommonTokenStream) LB(k int) Token {
 	var n = 1
 	// find k good tokens looking backwards
 	for n <= k {
-		// skip off-channel tokens
+		// Skip off-channel tokens
 		i = ts.previousTokenOnChannel(i-1, ts.channel)
 		n += 1
 	}
@@ -403,9 +403,9 @@ func (ts *CommonTokenStream) LT(k int) Token {
 	var n = 1 // we know tokens[pos] is a good one
 	// find k good tokens
 	for n < k {
-		// skip off-channel tokens, but make sure to not look past EOF
+		// Skip off-channel tokens, but make sure to not look past EOF
 		if ts.Sync(i + 1) {
-			i = ts.nextTokenOnChannel(i+1, ts.channel)
+			i = ts.NextTokenOnChannel(i+1, ts.channel)
 		}
 		n += 1
 	}

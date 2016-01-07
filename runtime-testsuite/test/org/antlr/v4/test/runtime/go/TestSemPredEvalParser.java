@@ -12,9 +12,9 @@ public class TestSemPredEvalParser extends BaseTest {
 	@Test
 	public void test2UnpredicatedAlts() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(290);
+		StringBuilder grammarBuilder = new StringBuilder(300);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s : {_interp.SetPredictionMode(PredictionModeLL_EXACT_AMBIG_DETECTION);} a ';' a; // do 2x: once in ATN, next in DFA\n");
+		grammarBuilder.append("s : {p.Interpreter.SetPredictionMode(antlr4.PredictionModeLLExactAmbigDetection);} a ';' a; // do 2x: once in ATN, next in DFA\n");
 		grammarBuilder.append("a : ID {fmt.Println(\"alt 1\")}\n");
 		grammarBuilder.append("  | ID {fmt.Println(\"alt 2\")}\n");
 		grammarBuilder.append("  | {false}? ID {fmt.Println(\"alt 3\")}\n");
@@ -42,9 +42,9 @@ public class TestSemPredEvalParser extends BaseTest {
 	@Test
 	public void test2UnpredicatedAltsAndOneOrthogonalAlt() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(341);
+		StringBuilder grammarBuilder = new StringBuilder(351);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s : {_interp.SetPredictionMode(PredictionModeLL_EXACT_AMBIG_DETECTION);} a ';' a ';' a;\n");
+		grammarBuilder.append("s : {p.Interpreter.SetPredictionMode(antlr4.PredictionModeLLExactAmbigDetection);} a ';' a ';' a;\n");
 		grammarBuilder.append("a : INT {fmt.Println(\"alt 1\")}\n");
 		grammarBuilder.append("  | ID {fmt.Println(\"alt 2\")} // must pick this one for ID since pred is false\n");
 		grammarBuilder.append("  | ID {fmt.Println(\"alt 3\")}\n");
@@ -74,9 +74,9 @@ public class TestSemPredEvalParser extends BaseTest {
 	@Test
 	public void testActionHidesPreds() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(223);
+		StringBuilder grammarBuilder = new StringBuilder(227);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("@members {int i = 0;}\n");
+		grammarBuilder.append("@members {var i int = 0;}\n");
 		grammarBuilder.append("s : a+ ;\n");
 		grammarBuilder.append("a : {this.i = 1;} ID {this.i == 1}? {fmt.Println(\"alt 1\")}\n");
 		grammarBuilder.append("  | {this.i = 2;} ID {this.i == 2}? {fmt.Println(\"alt 2\")}\n");
@@ -294,13 +294,13 @@ public class TestSemPredEvalParser extends BaseTest {
 	@Test
 	public void testPredFromAltTestedInLoopBack_1() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(203);
+		StringBuilder grammarBuilder = new StringBuilder(211);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("file_\n");
-		grammarBuilder.append("@after {fmt.Println($ctx.toStringTree(this))}\n");
+		grammarBuilder.append("@after {fmt.Println($ctx.ToStringTree(nil,p))}\n");
 		grammarBuilder.append("  : para para EOF ;\n");
 		grammarBuilder.append("para: paraContent NL NL ;\n");
-		grammarBuilder.append("paraContent : ('s'|'x'|{this._input.LA(2)!=TParser.NL}? NL)+ ;\n");
+		grammarBuilder.append("paraContent : ('s'|'x'|{p.GetTokenStream().LA(2)!=TParser.NL}? NL)+ ;\n");
 		grammarBuilder.append("NL : '\\n' ;\n");
 		grammarBuilder.append("s : 's' ;\n");
 		grammarBuilder.append("X : 'x' ;");
@@ -324,13 +324,13 @@ public class TestSemPredEvalParser extends BaseTest {
 	@Test
 	public void testPredFromAltTestedInLoopBack_2() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(203);
+		StringBuilder grammarBuilder = new StringBuilder(211);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("file_\n");
-		grammarBuilder.append("@after {fmt.Println($ctx.toStringTree(this))}\n");
+		grammarBuilder.append("@after {fmt.Println($ctx.ToStringTree(nil,p))}\n");
 		grammarBuilder.append("  : para para EOF ;\n");
 		grammarBuilder.append("para: paraContent NL NL ;\n");
-		grammarBuilder.append("paraContent : ('s'|'x'|{this._input.LA(2)!=TParser.NL}? NL)+ ;\n");
+		grammarBuilder.append("paraContent : ('s'|'x'|{p.GetTokenStream().LA(2)!=TParser.NL}? NL)+ ;\n");
 		grammarBuilder.append("NL : '\\n' ;\n");
 		grammarBuilder.append("s : 's' ;\n");
 		grammarBuilder.append("X : 'x' ;");
@@ -352,9 +352,9 @@ public class TestSemPredEvalParser extends BaseTest {
 	@Test
 	public void testPredTestedEvenWhenUnAmbig_1() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(199);
+		StringBuilder grammarBuilder = new StringBuilder(202);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("@members {bool enumKeyword = true;}\n");
+		grammarBuilder.append("@members {var enumKeyword bool= true;}\n");
 		grammarBuilder.append("primary\n");
 		grammarBuilder.append("    :   ID {fmt.Println(\"ID \"+$ID.text)}\n");
 		grammarBuilder.append("    |   {!this.enumKeyword}? 'enum' {fmt.Println(\"enum\")}\n");
@@ -374,9 +374,9 @@ public class TestSemPredEvalParser extends BaseTest {
 	@Test
 	public void testPredTestedEvenWhenUnAmbig_2() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(199);
+		StringBuilder grammarBuilder = new StringBuilder(202);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("@members {bool enumKeyword = true;}\n");
+		grammarBuilder.append("@members {var enumKeyword bool= true;}\n");
 		grammarBuilder.append("primary\n");
 		grammarBuilder.append("    :   ID {fmt.Println(\"ID \"+$ID.text)}\n");
 		grammarBuilder.append("    |   {!this.enumKeyword}? 'enum' {fmt.Println(\"enum\")}\n");
@@ -397,9 +397,9 @@ public class TestSemPredEvalParser extends BaseTest {
 	@Test
 	public void testPredicateDependentOnArg() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(198);
+		StringBuilder grammarBuilder = new StringBuilder(202);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("@members {int i = 0;}\n");
+		grammarBuilder.append("@members {var i int = 0;}\n");
 		grammarBuilder.append("s : a[2] a[1];\n");
 		grammarBuilder.append("a[int i]\n");
 		grammarBuilder.append("  : {$i==1}? ID {fmt.Println(\"alt 1\")}\n");
@@ -423,9 +423,9 @@ public class TestSemPredEvalParser extends BaseTest {
 	@Test
 	public void testPredicateDependentOnArg2() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(154);
+		StringBuilder grammarBuilder = new StringBuilder(158);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("@members {int i = 0;}\n");
+		grammarBuilder.append("@members {var i int = 0;}\n");
 		grammarBuilder.append("s : a[2] a[1];\n");
 		grammarBuilder.append("a[int i]\n");
 		grammarBuilder.append("  : {$i==1}? ID \n");
@@ -476,11 +476,11 @@ public class TestSemPredEvalParser extends BaseTest {
 	@Test
 	public void testRewindBeforePredEval() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(237);
+		StringBuilder grammarBuilder = new StringBuilder(241);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s : a a;\n");
-		grammarBuilder.append("a : {this._input.LT(1).GetText().equals(\"x\")}? ID INT {fmt.Println(\"alt 1\")}\n");
-		grammarBuilder.append("  | {this._input.LT(1).GetText().equals(\"y\")}? ID INT {fmt.Println(\"alt 2\")}\n");
+		grammarBuilder.append("a : {p.GetTokenStream().LT(1).GetText() == \"x\"}? ID INT {fmt.Println(\"alt 1\")}\n");
+		grammarBuilder.append("  | {p.GetTokenStream().LT(1).GetText() == \"y\"}? ID INT {fmt.Println(\"alt 2\")}\n");
 		grammarBuilder.append("  ;\n");
 		grammarBuilder.append("ID : 'a'..'z'+ ;\n");
 		grammarBuilder.append("INT : '0'..'9'+;\n");
@@ -599,9 +599,9 @@ public class TestSemPredEvalParser extends BaseTest {
 	@Test
 	public void testToLeftWithVaryingPredicate() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(247);
+		StringBuilder grammarBuilder = new StringBuilder(251);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("@members {int i = 0;}\n");
+		grammarBuilder.append("@members {var i int = 0;}\n");
 		grammarBuilder.append("s : ({this.i += 1;\n");
 		grammarBuilder.append("fmt.Println(\"i=\" + this.i)} a)+ ;\n");
 		grammarBuilder.append("a : {this.i % 2 == 0}? ID {fmt.Println(\"alt 1\")}\n");
