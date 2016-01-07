@@ -170,7 +170,7 @@ const (
 func (p *<parser.name>) Sempred(localctx antlr4.RuleContext, ruleIndex, predIndex int) bool {
 	switch ruleIndex {
 	<parser.sempredFuncs.values:{f | case <f.ruleIndex>:
-		return p.<f.name; format="cap">_Sempred(localctx, predIndex);}; separator="\n">
+		return p.<f.name; format="cap">_Sempred(localctx.(*<f.name; format="cap">Context), predIndex)}; separator="\n">
     default:
         panic("No predicate with index:" + fmt.Sprint(ruleIndex))
    }
@@ -187,7 +187,7 @@ func (l *<lexer.name>) Action(localctx antlr4.RuleContext, ruleIndex, actionInde
 	switch ruleIndex {
 	<recog.actionFuncs.values:{f|
 case <f.ruleIndex>:
-	l.<f.name; format="cap">_Action(localctx, actionIndex)
+	l.<f.name; format="cap">_Action(localctx<if(!f.isRuleContext)>.(*<f.ctxType>)<endif>, actionIndex)
 	}; separator="\n">
 	default:
 		panic("No registered action for:" + fmt.Sprint(ruleIndex))
@@ -200,7 +200,7 @@ case <f.ruleIndex>:
 func (l *<lexer.name>) Sempred(localctx antlr4.RuleContext, ruleIndex, predIndex int) bool {
 	switch ruleIndex {
 		<recog.sempredFuncs.values:{f| case <f.ruleIndex>:
-	return l.<f.name>_Sempred(localctx, predIndex);}; separator="\n">
+	return l.<f.name>_Sempred(localctx<if(!f.isRuleContext)>.(*<f.ctxType>)<endif>, predIndex);}; separator="\n">
     	default:
     		panic("No registered predicate for:" + fmt.Sprint(ruleIndex))
     }
@@ -216,7 +216,7 @@ func (l *<lexer.name>) Sempred(localctx antlr4.RuleContext, ruleIndex, predIndex
  */
 RuleActionFunction(r, actions) ::= <<
 
-func (l *<lexer.name>) <r.name; format="cap">_Action(localctx antlr4.RuleContext, actionIndex int) {
+func (l *<lexer.name>) <r.name; format="cap">_Action(localctx <if(r.isRuleContext)>antlr4.RuleContext<else>*<r.ctxType><endif>, actionIndex int) {
 	switch actionIndex {
 	<actions:{index|
 case <index>:
@@ -232,7 +232,7 @@ case <index>:
  * overriding implementation impossible to maintain.
  */
 RuleSempredFunction(r, actions) ::= <<
-func (p *<if(parser)><parser.name><else><lexer.name><endif>) <r.name; format="cap">_Sempred(localctx  antlr4.RuleContext, predIndex int) bool {
+func (p *<if(parser)><parser.name><else><lexer.name><endif>) <r.name; format="cap">_Sempred(localctx <if(r.isRuleContext)>antlr4.RuleContext<else>*<r.ctxType><endif>, predIndex int) bool {
 	switch predIndex {
 		<actions:{index| case <index>:
 	return <actions.(index)>;}; separator="\n">
@@ -251,9 +251,9 @@ RuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,namedActions,fina
 
 <altLabelCtxs:{l | <altLabelCtxs.(l)>}; separator="\n">
 
-func (p *<parser.name>) <currentRule.name; format="cap">(<currentRule.args:{a | <a.name> <a.type>}; separator=", ">) *<currentRule.ctxType> {
+func (p *<parser.name>) <currentRule.name; format="cap">(<currentRule.args:{a | <a.name> <a.type>}; separator=", ">) antlr4.ParserRuleContext {
 
-    localctx := New<currentRule.ctxType>(p, p.GetParserRuleContext(), p.GetState()<currentRule.args:{a | , <a.name>}>)
+    var localctx antlr4.ParserRuleContext = New<currentRule.ctxType>(p, p.GetParserRuleContext(), p.GetState()<currentRule.args:{a | , <a.name>}>)
     p.EnterRule(localctx, <currentRule.startState>, <parser.name>RULE_<currentRule.name>)
     <namedActions.init>
     <if(locals)>var <locals; separator="\nvar "><endif>
@@ -295,12 +295,12 @@ LeftRecursiveRuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,
 <ruleCtx>
 <altLabelCtxs:{l | <altLabelCtxs.(l)>}; separator="\n">
 
-func (p *<parser.name>) <currentRule.name; format="cap">(_p int<if(currentRule.args)>, <args:{a | , <a.name> <a.type>}><endif>) *<currentRule.ctxType> {
+func (p *<parser.name>) <currentRule.name; format="cap">(_p int<if(currentRule.args)>, <args:{a | , <a.name> <a.type>}><endif>) antlr4.ParserRuleContext {
 
-    _parentctx := p.GetParserRuleContext()
+    var _parentctx antlr4.ParserRuleContext = p.GetParserRuleContext()
     _parentState := p.GetState()
-    localctx := New<currentRule.ctxType>(p, p.GetParserRuleContext(), _parentState<args:{a | , <a.name>}>)
-    _prevctx := localctx
+    var localctx antlr4.ParserRuleContext = New<currentRule.ctxType>(p, p.GetParserRuleContext(), _parentState<args:{a | , <a.name>}>)
+    var _prevctx antlr4.ParserRuleContext = localctx
     var _ antlr4.ParserRuleContext = _prevctx // to prevent unused variable warning
     _startState := <currentRule.startState>
     p.EnterRecursionRule(localctx, <currentRule.startState>, <parser.name>RULE_<currentRule.name>, _p)
@@ -605,9 +605,10 @@ AddToLabelList(a) ::= "<ctx(a.label)>.<a.listName> = append(<ctx(a.label)>.<a.li
 
 TokenDecl(t) ::= "<t.name> <TokenLabelType()>"
 TokenTypeDecl(t) ::= "<t.name> int"
-TokenListDecl(t) ::= "var <t.name> Token[] = make([]<TokenLabelType()>, 0)"
+TokenListDecl(t) ::= "<t.name> antlr4.Token[] // = make([]<TokenLabelType()>, 0)"
+
 RuleContextDecl(r) ::= "<r.name> *<r.ctxName>"
-RuleContextListDecl(rdecl) ::= "var <rdecl.name> []*<rdecl.ctxName>  = make([]*<rdecl.ctxName>, 0)"
+RuleContextListDecl(rdecl) ::= "<rdecl.name> []*<rdecl.ctxName> //  = make([]*<rdecl.ctxName>, 0)"
 
 ContextTokenGetterDecl(t)      ::= <<
 <t.name; format="cap">() interface{} {
@@ -687,6 +688,9 @@ func New<struct.name>(parser antlr4.Parser, parent antlr4.ParserRuleContext, inv
 
     p.parser = parser
     p.RuleIndex = <parser.name>RULE_<struct.derivedFromName>
+
+    // TODO initialize list attrs
+
     <struct.ctorAttrs:{a | p.<a.name> = <a.name>}; separator="\n">
     return p
 }
@@ -791,7 +795,7 @@ p.PushNewRecursionContext(localctx, _startState, <parser.name>RULE_<ruleName>)
 
 recRuleReplaceContext(ctxName) ::= <<
 localctx = New<ctxName>Context(p, localctx)
-p.GetParserRuleContext() = localctx
+p.SetParserRuleContext(localctx)
 _prevctx = localctx
 >>
 

@@ -458,8 +458,7 @@ func (this *ATNDeserializer) stateIsEndStateFor(state ATNState, idx int) ATNStat
 // @param atn The ATN.
 //
 func (this *ATNDeserializer) markPrecedenceDecisions(atn *ATN) {
-	for i := 0; i < len(atn.states); i++ {
-		var state = atn.states[i]
+	for _, state := range atn.states {
 		if _, ok := state.(*StarLoopEntryState); !ok {
 			continue
 		}
@@ -468,12 +467,15 @@ func (this *ATNDeserializer) markPrecedenceDecisions(atn *ATN) {
 		// precedence rule should continue or complete.
 		//
 		if atn.ruleToStartState[state.GetRuleIndex()].isPrecedenceRule {
+
 			var maybeLoopEndState = state.GetTransitions()[len(state.GetTransitions())-1].getTarget()
+
 			if s3, ok := maybeLoopEndState.(*LoopEndState); ok {
-				s := maybeLoopEndState.GetTransitions()[0].getTarget()
-				_, ok2 := s.(*RuleStopState)
+
+				_, ok2 := maybeLoopEndState.GetTransitions()[0].getTarget().(*RuleStopState)
+
 				if s3.epsilonOnlyTransitions && ok2 {
-					s.(*StarLoopEntryState).precedenceRuleDecision = true
+					state.(*StarLoopEntryState).precedenceRuleDecision = true
 				}
 			}
 		}

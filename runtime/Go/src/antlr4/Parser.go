@@ -13,6 +13,7 @@ type Parser interface {
 	GetTokenStream() TokenStream
 	GetTokenFactory() TokenFactory
 	GetParserRuleContext() ParserRuleContext
+	SetParserRuleContext(ParserRuleContext)
 	Consume() Token
 	GetParseListeners() []ParseTreeListener
 
@@ -190,6 +191,10 @@ func (p *BaseParser) MatchWildcard() Token {
 
 func (p *BaseParser) GetParserRuleContext() ParserRuleContext {
 	return p._ctx
+}
+
+func (p *BaseParser) SetParserRuleContext(v ParserRuleContext)  {
+	p._ctx = v
 }
 
 func (p *BaseParser) GetParseListeners() []ParseTreeListener {

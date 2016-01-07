@@ -27,11 +27,11 @@ func main() {
 
 	a := antlr4.NewFileStream("foo.txt")
 
-	l := parser.NewTLexer(a)
+	l := parser.NewExprLexer(a)
 
 	s := antlr4.NewCommonTokenStream(l, 0)
 
-	p := parser.NewTParser(s)
+	p := parser.NewExprParser(s)
 
 	p.BuildParseTrees = true
 

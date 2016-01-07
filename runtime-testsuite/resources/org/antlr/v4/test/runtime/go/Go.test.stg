@@ -163,7 +163,7 @@ Assert(s) ::= <<assert(<s>)>>
 
 Cast(t,v) ::= "((<t>)<v>)"
 
-Append(a,b) ::= "<a> + <b>"
+Append(a,b) ::= "<a> + fmt.Sprint(<b>)"
 
 Concat(a,b) ::= "<a><b>"
 
@@ -173,9 +173,9 @@ AssertIsList(v) ::= "List\<?> __ttt__ = <v>;" // just use type system
 
 AssignLocal(s,v) ::= "<s> = <v>;"
 
-InitIntMember(n,v) ::= <%var <n> int = <v>;%>
+InitIntMember(n,v) ::= <%var <n> int = <v>; var _ int = <n>; // to disable unused var %>
 
-InitBooleanMember(n,v) ::= <%var <n> bool= <v>;%>
+InitBooleanMember(n,v) ::= <%var <n> bool= <v>; var _ bool = <n>; // to disable unused var %>
 
 GetMember(n) ::= <%this.<n>%>
 
@@ -197,7 +197,7 @@ Pass() ::= ""
 
 StringList() ::= "[]string"
 
-BuildParseTrees() ::= "this.BuildParseTrees = true"
+BuildParseTrees() ::= "p.BuildParseTrees = true"
 
 BailErrorStrategy() ::= <%SetErrorHandler(NewBailErrorStrategy())%>
 

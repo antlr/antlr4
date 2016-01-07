@@ -12,11 +12,11 @@ public class TestParseTrees extends BaseTest {
 	@Test
 	public void test2AltLoop() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(136);
+		StringBuilder grammarBuilder = new StringBuilder(133);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s\n");
 		grammarBuilder.append("@init {\n");
-		grammarBuilder.append("this.BuildParseTrees = true\n");
+		grammarBuilder.append("p.BuildParseTrees = true\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("@after {\n");
 		grammarBuilder.append("fmt.Println($r.ctx.ToStringTree(nil,p))\n");
@@ -37,11 +37,11 @@ public class TestParseTrees extends BaseTest {
 	@Test
 	public void test2Alts() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(129);
+		StringBuilder grammarBuilder = new StringBuilder(126);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s\n");
 		grammarBuilder.append("@init {\n");
-		grammarBuilder.append("this.BuildParseTrees = true\n");
+		grammarBuilder.append("p.BuildParseTrees = true\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("@after {\n");
 		grammarBuilder.append("fmt.Println($r.ctx.ToStringTree(nil,p))\n");
@@ -62,11 +62,11 @@ public class TestParseTrees extends BaseTest {
 	@Test
 	public void testExtraToken() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(142);
+		StringBuilder grammarBuilder = new StringBuilder(139);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s\n");
 		grammarBuilder.append("@init {\n");
-		grammarBuilder.append("this.BuildParseTrees = true\n");
+		grammarBuilder.append("p.BuildParseTrees = true\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("@after {\n");
 		grammarBuilder.append("fmt.Println($r.ctx.ToStringTree(nil,p))\n");
@@ -91,11 +91,11 @@ public class TestParseTrees extends BaseTest {
 	@Test
 	public void testNoViableAlt() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(144);
+		StringBuilder grammarBuilder = new StringBuilder(141);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s\n");
 		grammarBuilder.append("@init {\n");
-		grammarBuilder.append("this.BuildParseTrees = true\n");
+		grammarBuilder.append("p.BuildParseTrees = true\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("@after {\n");
 		grammarBuilder.append("fmt.Println($r.ctx.ToStringTree(nil,p))\n");
@@ -120,11 +120,11 @@ public class TestParseTrees extends BaseTest {
 	@Test
 	public void testRuleRef() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(138);
+		StringBuilder grammarBuilder = new StringBuilder(135);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s\n");
 		grammarBuilder.append("@init {\n");
-		grammarBuilder.append("this.BuildParseTrees = true\n");
+		grammarBuilder.append("p.BuildParseTrees = true\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("@after {\n");
 		grammarBuilder.append("fmt.Println($r.ctx.ToStringTree(nil,p))\n");
@@ -147,11 +147,11 @@ public class TestParseTrees extends BaseTest {
 	@Test
 	public void testSync() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(145);
+		StringBuilder grammarBuilder = new StringBuilder(142);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s\n");
 		grammarBuilder.append("@init {\n");
-		grammarBuilder.append("this.BuildParseTrees = true\n");
+		grammarBuilder.append("p.BuildParseTrees = true\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("@after {\n");
 		grammarBuilder.append("fmt.Println($r.ctx.ToStringTree(nil,p))\n");
@@ -175,11 +175,11 @@ public class TestParseTrees extends BaseTest {
 	@Test
 	public void testToken2() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(127);
+		StringBuilder grammarBuilder = new StringBuilder(124);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s\n");
 		grammarBuilder.append("@init {\n");
-		grammarBuilder.append("this.BuildParseTrees = true\n");
+		grammarBuilder.append("p.BuildParseTrees = true\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("@after {\n");
 		grammarBuilder.append("fmt.Println($r.ctx.ToStringTree(nil,p))\n");
@@ -200,11 +200,11 @@ public class TestParseTrees extends BaseTest {
 	@Test
 	public void testTokenAndRuleContextString() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(166);
+		StringBuilder grammarBuilder = new StringBuilder(163);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s\n");
 		grammarBuilder.append("@init {\n");
-		grammarBuilder.append("this.BuildParseTrees = true\n");
+		grammarBuilder.append("p.BuildParseTrees = true\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("@after {\n");
 		grammarBuilder.append("fmt.Println($r.ctx.ToStringTree(nil,p))\n");

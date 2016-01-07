@@ -38,6 +38,7 @@ import java.util.LinkedHashMap;
 public class RuleActionFunction extends OutputModelObject {
 	public String name;
 	public String ctxType;
+	public boolean isRuleContext;
 	public int ruleIndex;
 
 	/** Map actionIndex to Action */
@@ -48,6 +49,7 @@ public class RuleActionFunction extends OutputModelObject {
 		super(factory);
 		name = r.name;
 		ruleIndex = r.index;
+		isRuleContext = ctxType.equals("RuleContext");
 		this.ctxType = ctxType;
 	}
 }

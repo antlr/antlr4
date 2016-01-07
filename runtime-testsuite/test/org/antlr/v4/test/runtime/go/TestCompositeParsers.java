@@ -379,7 +379,7 @@ public class TestCompositeParsers extends BaseTest {
 		mkdir(parserpkgdir);
 		String slave_S =
 			"parser grammar S;\n" +
-			"a @after {var x int = 0;} : B;";
+			"a @after {var x int = 0; var _ int = x; // to disable unused var } : B;";
 		writeFile(parserpkgdir, "S.g4", slave_S);
 
 		StringBuilder grammarBuilder = new StringBuilder(62);
@@ -406,10 +406,10 @@ public class TestCompositeParsers extends BaseTest {
 			"ID : 'a'..'z'+;";
 		writeFile(parserpkgdir, "S.g4", slave_S);
 
-		StringBuilder grammarBuilder = new StringBuilder(113);
+		StringBuilder grammarBuilder = new StringBuilder(125);
 		grammarBuilder.append("grammar M;\n");
 		grammarBuilder.append("import S;\n");
-		grammarBuilder.append("a : A {fmt.Println(\"M.a: \" + $A)};\n");
+		grammarBuilder.append("a : A {fmt.Println(\"M.a: \" + fmt.Sprint($A))};\n");
 		grammarBuilder.append("A : 'abc' {fmt.Println(\"M.A\")};\n");
 		grammarBuilder.append("WS : (' '|'\\n') -> skip ;");
 		String grammar = grammarBuilder.toString();

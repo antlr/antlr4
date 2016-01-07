@@ -12,9 +12,9 @@ public class TestParserErrors extends BaseTest {
 	@Test
 	public void testConjuringUpToken() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(62);
+		StringBuilder grammarBuilder = new StringBuilder(74);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("a : 'a' x='b' {fmt.Println(\"conjured=\" + $x)} 'c' ;");
+		grammarBuilder.append("a : 'a' x='b' {fmt.Println(\"conjured=\" + fmt.Sprint($x))} 'c' ;");
 		String grammar = grammarBuilder.toString();
 		String input ="ac";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
@@ -29,9 +29,9 @@ public class TestParserErrors extends BaseTest {
 	@Test
 	public void testConjuringUpTokenFromSet() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(68);
+		StringBuilder grammarBuilder = new StringBuilder(80);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("a : 'a' x=('b'|'c') {fmt.Println(\"conjured=\" + $x)} 'd' ;");
+		grammarBuilder.append("a : 'a' x=('b'|'c') {fmt.Println(\"conjured=\" + fmt.Sprint($x))} 'd' ;");
 		String grammar = grammarBuilder.toString();
 		String input ="ad";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
@@ -383,10 +383,10 @@ public class TestParserErrors extends BaseTest {
 	@Test
 	public void testSingleSetInsertionConsumption() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(81);
+		StringBuilder grammarBuilder = new StringBuilder(93);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("myset: ('b'|'c') ;\n");
-		grammarBuilder.append("a: 'a' myset 'd' {fmt.Println(\"\" + $myset.stop)} ; ");
+		grammarBuilder.append("a: 'a' myset 'd' {fmt.Println(\"\" + fmt.Sprint($myset.stop))} ; ");
 		String grammar = grammarBuilder.toString();
 		String input ="ad";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
@@ -496,10 +496,10 @@ public class TestParserErrors extends BaseTest {
 	@Test
 	public void testSingleTokenDeletionConsumption() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(81);
+		StringBuilder grammarBuilder = new StringBuilder(93);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("myset: ('b'|'c') ;\n");
-		grammarBuilder.append("a: 'a' myset 'd' {fmt.Println(\"\" + $myset.stop)} ; ");
+		grammarBuilder.append("a: 'a' myset 'd' {fmt.Println(\"\" + fmt.Sprint($myset.stop))} ; ");
 		String grammar = grammarBuilder.toString();
 		String input ="aabd";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
