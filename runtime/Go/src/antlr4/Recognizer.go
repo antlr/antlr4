@@ -11,6 +11,7 @@ type Recognizer interface {
 	GetLiteralNames() []string
 	GetSymbolicNames() []string
 	GetRuleNames() []string
+
 	Sempred(RuleContext, int, int) bool
 	Precpred(RuleContext, int) bool
 

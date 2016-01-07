@@ -69,6 +69,13 @@ func (this *DFA) setPrecedenceStartState(precedence int, startState *DFAState) {
 	// Synchronization on s0 here is ok. when the DFA is turned into a
 	// precedence DFA, s0 will be initialized once and not updated again
 	// s0.edges is never nil for a precedence DFA
+
+	// s0.edges is never null for a precedence DFA
+	if (precedence >= len(this.s0.edges)) {
+		// enlarge the slice
+		this.s0.edges = append( this.s0.edges, make([]*DFAState, precedence + 1 - len(this.s0.edges))...)
+	}
+
 	this.s0.edges[precedence] = startState
 }
 

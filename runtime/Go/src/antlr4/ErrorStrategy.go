@@ -301,7 +301,6 @@ func (this *DefaultErrorStrategy) ReportNoViableAlternative(recognizer Parser, e
 func (this *DefaultErrorStrategy) ReportInputMisMatch(recognizer Parser, e *InputMisMatchException) {
 	var msg = "misMatched input " + this.GetTokenErrorDisplay(e.offendingToken) +
 		" expecting " + e.getExpectedTokens().StringVerbose(recognizer.GetLiteralNames(), recognizer.GetSymbolicNames(), false)
-	panic(msg)
 	recognizer.NotifyErrorListeners(msg, e.offendingToken, e)
 }
 
