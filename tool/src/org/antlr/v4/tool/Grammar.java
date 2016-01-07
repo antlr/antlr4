@@ -104,6 +104,7 @@ public class Grammar implements AttributeResolver {
 		parserOptions.add("TokenLabelType");
 		parserOptions.add("tokenVocab");
 		parserOptions.add("language");
+		parserOptions.add("caseInsensitive");
 	}
 
 	public static final Set<String> lexerOptions = parserOptions;
@@ -442,11 +443,22 @@ public class Grammar implements AttributeResolver {
 		if ( rules.get(r.name)!=null ) {
 			return false;
 		}
-
+		defineCaseInsensitive(r);
 		rules.put(r.name, r);
 		r.index = ruleNumber++;
 		indexToRule.add(r);
 		return true;
+	}
+
+	private void defineCaseInsensitive(Rule r) {
+		if (r.caseInsensitive) {
+			IntervalSet set = new IntervalSet(ANTLRParser.STRING_LITERAL, ANTLRParser.ALT);
+			List<GrammarAST> terminals = r.ast.getNodesWithTypePreorderDFS(set);
+			for (GrammarAST grammarAST : terminals) {
+				GrammarASTWithOptions astWithOptions = (GrammarASTWithOptions) grammarAST;
+				astWithOptions.setOption("caseInsensitive", new GrammarAST(ANTLRParser.STRING_LITERAL));
+			}
+		}
 	}
 
 	/**

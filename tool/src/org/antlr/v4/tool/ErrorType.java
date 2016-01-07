@@ -1006,11 +1006,33 @@ public enum ErrorType {
 	 *
 	 * <p>empty strings not allowed</p>
 	 *
-	 * <pre>A: '''test''';</pre>
-	 * <pre>B: '';</pre>
-	 * <pre>C: 'test' '';</pre>
+	 * <pre>
+	 * A: '''test''';
+	 * B: '';
+	 * C: 'test' '';
+	 * D: [];
+	 * E: [f-a];
+	 * </pre>
 	 */
-	EMPTY_STRINGS_NOT_ALLOWED(174, "string literals cannot be empty", ErrorSeverity.ERROR),
+	STRING_LITERALS_AND_SETS_CANNOT_BE_EMPTY(174, "string literals and sets cannot be empty: <arg>", ErrorSeverity.ERROR),
+	/**
+	 * Compiler Warning 175.
+	 */
+	CASE_INSENSITIVE_MAY_WORKS_INCORRECTLY(175, "case insensitive may works incorrectly with \"<arg>\" character set", ErrorSeverity.WARNING),
+	/**
+	 * Compiler Warning 176
+	 * Rarely used but actual with caseInsensitive option.
+	 *
+	 * <p>chars "a-f" declared multiply times in set [a-fc-m]</p>
+	 *
+	 * <pre>
+	 * A:    [aa-z];   // warning
+	 * B:    [a-fc-m]; // warning
+	 * </pre>
+	 *
+	 * TODO: Does not work with fragment rules.
+	 */
+	CHARACTERS_COLLISION_IN_SET(176, "chars \"<arg>\" declared multiply times in set <arg2>", ErrorSeverity.WARNING),
 
 	/*
 	 * Backward incompatibility errors

@@ -120,7 +120,13 @@ public class CharSupport {
 				// '\u1234'
 				if ( !cstr.startsWith("\\u") ) return -1;
 				String unicodeChars = cstr.substring(2, cstr.length());
-				return Integer.parseInt(unicodeChars, 16);
+				int result = -1;
+				try {
+					result = Integer.parseInt(unicodeChars, 16);
+				}
+				catch (NumberFormatException e) {
+				}
+				return result;
 			default :
 				return -1;
 		}
@@ -140,7 +146,9 @@ public class CharSupport {
 			if ( end>n ) break;
 			String esc = literal.substring(i, end);
 			int c = getCharValueFromCharInGrammarLiteral(esc);
-			if ( c==-1 ) { buf.append(esc); }
+			if ( c==-1 ) {
+				return null; // invalid escape sequence.
+			}
 			else buf.append((char)c);
 			i = end;
 		}

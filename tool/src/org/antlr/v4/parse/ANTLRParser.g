@@ -101,7 +101,7 @@ tokens {
 @header {
 /*
  [The "BSD licence"]
- Copyright (c) 2005-20012 Terence Parr
+ Copyright (c) 2005-2012 Terence Parr
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -319,8 +319,12 @@ actionScopeName
 	;
 
 modeSpec
-    :	MODE id SEMI sync (lexerRule sync)*  -> ^(MODE id lexerRule*)
+    :	MODE id (COMMA modeOption)? SEMI sync (lexerRule sync)* -> ^(MODE id modeOption? lexerRule*)
     ;
+
+modeOption
+	: id
+	;
 
 rules
     :	sync (rule sync)*

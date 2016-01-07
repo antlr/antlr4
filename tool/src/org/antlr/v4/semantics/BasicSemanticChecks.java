@@ -495,7 +495,7 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 	protected void enterTerminal(GrammarAST tree) {
 		String text = tree.getText();
 		if (text.equals("''")) {
-			g.tool.errMgr.grammarError(ErrorType.EMPTY_STRINGS_NOT_ALLOWED, g.fileName, tree.token);
+			g.tool.errMgr.grammarError(ErrorType.STRING_LITERALS_AND_SETS_CANNOT_BE_EMPTY, g.fileName, tree.token, "''");
 		}
 	}
 

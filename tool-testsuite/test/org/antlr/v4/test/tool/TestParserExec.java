@@ -31,6 +31,7 @@
 package org.antlr.v4.test.tool;
 
 import org.antlr.v4.test.runtime.java.BaseTest;
+import org.antlr.v4.tool.Grammar;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -175,6 +176,25 @@ public class TestParserExec extends BaseTest {
 		String input = "2 9 10 3 1 2 3";
 		String found = execParser("Data.g4", grammar, "DataParser", "DataLexer", "file", input, false);
 		assertEquals("6\n", found);
+		assertNull(stderrDuringParse);
+	}
+
+	@Test public void testCaseInsensitiveParser() throws Exception {
+		String grammar =
+				"grammar CaseInsensitiveGrammar;\n" +
+				"options { caseInsensitive = true; }\n" +
+				"e\n" +
+				"    : ID\n" +
+				"    | 'not' e\n" +
+				"    | e 'and' e\n" +
+				"    | 'new' ID '(' e ')'\n" +
+				"    ;\n" +
+				"ID: [a-z_][a-z_0-9]*;\n" +
+				"WS: [ \\t\\n\\r]+ -> skip;";
+
+		String input = "NEW Abc (Not a AND not B)";
+		String found = execParser("CaseInsensitiveGrammar.g4", grammar,
+				"CaseInsensitiveGrammarParser", "CaseInsensitiveGrammarLexer", "e", input, false);
 		assertNull(stderrDuringParse);
 	}
 }

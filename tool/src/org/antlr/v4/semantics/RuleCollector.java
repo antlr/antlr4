@@ -132,6 +132,7 @@ public class RuleCollector extends GrammarTreeVisitor {
 		int numAlts = block.getChildCount();
 		Rule r = new Rule(g, ID.getText(), rule, numAlts);
 		r.mode = currentModeName;
+		r.caseInsensitive = currentCaseInsensitive;
 		if ( !modifiers.isEmpty() ) r.modifiers = modifiers;
 		rules.put(r.name, r);
 	}
