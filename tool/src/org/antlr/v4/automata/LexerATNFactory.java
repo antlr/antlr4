@@ -65,9 +65,8 @@ import org.antlr.v4.tool.Rule;
 import org.antlr.v4.tool.ast.ActionAST;
 import org.antlr.v4.tool.ast.GrammarAST;
 import org.antlr.v4.tool.ast.TerminalAST;
-import org.antlr.v4.tool.ast.AltAST;
-import org.antlr.v4.tool.ast.GrammarASTWithOptions;
 import org.antlr.v4.tool.ast.RangeAST;
+import org.antlr.v4.tool.ast.RuleAST;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 
@@ -281,12 +280,7 @@ public class LexerATNFactory extends ParserATNFactory {
 
 	@Override
 	public Handle set(GrammarAST associatedAST, List<GrammarAST> alts, boolean invert) {
-		CommonTree altAst = associatedAST.parent;
-		while (!(altAst instanceof AltAST)) {
-			altAst = altAst.parent;
-		}
-		Boolean caseInsensitive = ((GrammarASTWithOptions)altAst).getOptionAST("caseInsensitive") != null;
-
+		boolean caseInsensitive = isCaseInsensitive(associatedAST);
 		ATNState left = newState(associatedAST);
 		ATNState right = newState(associatedAST);
 		IntervalSet set = new IntervalSet();
@@ -368,8 +362,7 @@ public class LexerATNFactory extends ParserATNFactory {
 	 *  the DFA.  Machine== o-'f'->o-'o'->o-'g'->o and has n+1 states
 	 *  for n characters.
 	 *  if "caseInsensitive" option enabled, "fog" will be treated as
-	 *  o - o-'f' -> 'o'->'g'- o
-	 *      o-'F'    'o'->'G'
+	 *  o-('f'|'F') -> o-('o'|'O') -> o-('g'|'G')
 	 */
 	@Override
 	public Handle stringLiteral(TerminalAST stringLiteralAST) {
@@ -386,7 +379,7 @@ public class LexerATNFactory extends ParserATNFactory {
 			int n = chars.length();
 			ATNState prev = left;
 			right = null;
-			Boolean caseInsensitive = stringLiteralAST.getOptionAST("caseInsensitive") != null;
+			boolean caseInsensitive = isCaseInsensitive(stringLiteralAST);
 			for (int i = 0; i < n; i++) {
 				right = newState(stringLiteralAST);
 				if (!caseInsensitive) {
@@ -425,15 +418,10 @@ public class LexerATNFactory extends ParserATNFactory {
 
 	public IntervalSet getSetFromCharSetLiteral(GrammarAST charSetAST) {
 		String chars = charSetAST.getText();
-		chars = chars.substring(1, chars.length()-1);
-		String cset = '"'+ chars +'"';
+		chars = chars.substring(1, chars.length() - 1);
+		String cset = '"' + chars + '"';
 		IntervalSet set = new IntervalSet();
-
-		CommonTree altAst = charSetAST.parent;
-		while (!(altAst instanceof AltAST)) {
-			altAst = altAst.parent;
-		}
-		Boolean caseInsensitive = ((GrammarASTWithOptions)altAst).getOptionAST("caseInsensitive") != null;
+		boolean caseInsensitive = isCaseInsensitive(charSetAST);
 
 		if (chars.length() == 0) {
 			g.tool.errMgr.grammarError(ErrorType.STRING_LITERALS_AND_SETS_CANNOT_BE_EMPTY,
@@ -445,8 +433,7 @@ public class LexerATNFactory extends ParserATNFactory {
 			if (chars == null) {
 				g.tool.errMgr.grammarError(ErrorType.INVALID_ESCAPE_SEQUENCE,
 						g.fileName, charSetAST.getToken());
-			}
-			else {
+			} else {
 				int n = chars.length();
 				// now make x-y become set of char
 				for (int i = 0; i < n; i++) {
@@ -479,6 +466,14 @@ public class LexerATNFactory extends ParserATNFactory {
 			}
 		}
 		return set;
+	}
+
+	private boolean isCaseInsensitive(GrammarAST ast) {
+		CommonTree altAst = ast.parent;
+		while (!(altAst.getType() == ANTLRParser.RULE)) {
+			altAst = altAst.parent;
+		}
+		return (g.rules.get(((RuleAST)altAst).getRuleName())).caseInsensitive;
 	}
 
 	// TODO: not all case sensitive featuries may work correctly
