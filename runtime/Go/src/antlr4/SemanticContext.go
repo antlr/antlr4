@@ -314,6 +314,7 @@ type OR struct {
 }
 
 func NewOR(a, b SemanticContext) *OR {
+
 	var operands = NewSet(nil, nil)
 	if aa, ok := a.(*OR); ok {
 		for _, o := range aa.opnds {
@@ -345,6 +346,7 @@ func NewOR(a, b SemanticContext) *OR {
 	}
 
 	vs := operands.values()
+
 	opnds := make([]SemanticContext, len(vs))
 	for i, v := range vs {
 		vs[i] = v.(SemanticContext)

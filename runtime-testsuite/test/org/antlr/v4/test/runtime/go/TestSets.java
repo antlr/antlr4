@@ -54,9 +54,9 @@ public class TestSets extends BaseTest {
 	@Test
 	public void testLexerOptionalSet() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(77);
+		StringBuilder grammarBuilder = new StringBuilder(86);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("a : A {fmt.Println(p.GetInput().GetText())} ;\n");
+		grammarBuilder.append("a : A {fmt.Println(p.GetTokenStream().GetAllText())} ;\n");
 		grammarBuilder.append("A : ('a'|'b')? 'c' ;");
 		String grammar = grammarBuilder.toString();
 		String input ="ac";
@@ -71,9 +71,9 @@ public class TestSets extends BaseTest {
 	@Test
 	public void testLexerPlusSet() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(77);
+		StringBuilder grammarBuilder = new StringBuilder(86);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("a : A {fmt.Println(p.GetInput().GetText())} ;\n");
+		grammarBuilder.append("a : A {fmt.Println(p.GetTokenStream().GetAllText())} ;\n");
 		grammarBuilder.append("A : ('a'|'b')+ 'c' ;");
 		String grammar = grammarBuilder.toString();
 		String input ="abaac";
@@ -88,9 +88,9 @@ public class TestSets extends BaseTest {
 	@Test
 	public void testLexerStarSet() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(77);
+		StringBuilder grammarBuilder = new StringBuilder(86);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("a : A {fmt.Println(p.GetInput().GetText())} ;\n");
+		grammarBuilder.append("a : A {fmt.Println(p.GetTokenStream().GetAllText())} ;\n");
 		grammarBuilder.append("A : ('a'|'b')* 'c' ;");
 		String grammar = grammarBuilder.toString();
 		String input ="abaac";
@@ -175,9 +175,9 @@ public class TestSets extends BaseTest {
 	@Test
 	public void testOptionalLexerSingleElement() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(71);
+		StringBuilder grammarBuilder = new StringBuilder(80);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("a : A {fmt.Println(p.GetInput().GetText())} ;\n");
+		grammarBuilder.append("a : A {fmt.Println(p.GetTokenStream().GetAllText())} ;\n");
 		grammarBuilder.append("A : 'b'? 'c' ;");
 		String grammar = grammarBuilder.toString();
 		String input ="bc";
@@ -192,9 +192,9 @@ public class TestSets extends BaseTest {
 	@Test
 	public void testOptionalSet() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(69);
+		StringBuilder grammarBuilder = new StringBuilder(78);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("a : ('a'|'b')? 'c' {fmt.Println(p.GetInput().GetText())} ;");
+		grammarBuilder.append("a : ('a'|'b')? 'c' {fmt.Println(p.GetTokenStream().GetAllText())} ;");
 		String grammar = grammarBuilder.toString();
 		String input ="ac";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
@@ -208,9 +208,9 @@ public class TestSets extends BaseTest {
 	@Test
 	public void testOptionalSingleElement() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(71);
+		StringBuilder grammarBuilder = new StringBuilder(80);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("a : A? 'c' {fmt.Println(p.GetInput().GetText())} ;\n");
+		grammarBuilder.append("a : A? 'c' {fmt.Println(p.GetTokenStream().GetAllText())} ;\n");
 		grammarBuilder.append("A : 'b' ;");
 		String grammar = grammarBuilder.toString();
 		String input ="bc";
@@ -241,9 +241,9 @@ public class TestSets extends BaseTest {
 	@Test
 	public void testParserNotToken() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(63);
+		StringBuilder grammarBuilder = new StringBuilder(72);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("a : ~'x' 'z' {fmt.Println(p.GetInput().GetText())} ;");
+		grammarBuilder.append("a : ~'x' 'z' {fmt.Println(p.GetTokenStream().GetAllText())} ;");
 		String grammar = grammarBuilder.toString();
 		String input ="zz";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
@@ -289,9 +289,9 @@ public class TestSets extends BaseTest {
 	@Test
 	public void testPlusLexerSingleElement() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(71);
+		StringBuilder grammarBuilder = new StringBuilder(80);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("a : A {fmt.Println(p.GetInput().GetText())} ;\n");
+		grammarBuilder.append("a : A {fmt.Println(p.GetTokenStream().GetAllText())} ;\n");
 		grammarBuilder.append("A : 'b'+ 'c' ;");
 		String grammar = grammarBuilder.toString();
 		String input ="bbbbc";
@@ -306,9 +306,9 @@ public class TestSets extends BaseTest {
 	@Test
 	public void testPlusSet() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(69);
+		StringBuilder grammarBuilder = new StringBuilder(78);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("a : ('a'|'b')+ 'c' {fmt.Println(p.GetInput().GetText())} ;");
+		grammarBuilder.append("a : ('a'|'b')+ 'c' {fmt.Println(p.GetTokenStream().GetAllText())} ;");
 		String grammar = grammarBuilder.toString();
 		String input ="abaac";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
@@ -322,9 +322,9 @@ public class TestSets extends BaseTest {
 	@Test
 	public void testRuleAsSet() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(76);
+		StringBuilder grammarBuilder = new StringBuilder(85);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("a @after {fmt.Println(p.GetInput().GetText())} : 'a' | 'b' |'c' ;");
+		grammarBuilder.append("a @after {fmt.Println(p.GetTokenStream().GetAllText())} : 'a' | 'b' |'c' ;");
 		String grammar = grammarBuilder.toString();
 		String input ="b";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
@@ -338,9 +338,9 @@ public class TestSets extends BaseTest {
 	@Test
 	public void testSeqDoesNotBecomeSet() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(113);
+		StringBuilder grammarBuilder = new StringBuilder(122);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("a : C {fmt.Println(p.GetInput().GetText())} ;\n");
+		grammarBuilder.append("a : C {fmt.Println(p.GetTokenStream().GetAllText())} ;\n");
 		grammarBuilder.append("fragment A : '1' | '2';\n");
 		grammarBuilder.append("fragment B : '3' '4';\n");
 		grammarBuilder.append("C : A | B;");
@@ -357,9 +357,9 @@ public class TestSets extends BaseTest {
 	@Test
 	public void testStarLexerSingleElement_1() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(71);
+		StringBuilder grammarBuilder = new StringBuilder(80);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("a : A {fmt.Println(p.GetInput().GetText())} ;\n");
+		grammarBuilder.append("a : A {fmt.Println(p.GetTokenStream().GetAllText())} ;\n");
 		grammarBuilder.append("A : 'b'* 'c' ;");
 		String grammar = grammarBuilder.toString();
 		String input ="bbbbc";
@@ -374,9 +374,9 @@ public class TestSets extends BaseTest {
 	@Test
 	public void testStarLexerSingleElement_2() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(71);
+		StringBuilder grammarBuilder = new StringBuilder(80);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("a : A {fmt.Println(p.GetInput().GetText())} ;\n");
+		grammarBuilder.append("a : A {fmt.Println(p.GetTokenStream().GetAllText())} ;\n");
 		grammarBuilder.append("A : 'b'* 'c' ;");
 		String grammar = grammarBuilder.toString();
 		String input ="c";
@@ -391,9 +391,9 @@ public class TestSets extends BaseTest {
 	@Test
 	public void testStarSet() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(69);
+		StringBuilder grammarBuilder = new StringBuilder(78);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("a : ('a'|'b')* 'c' {fmt.Println(p.GetInput().GetText())} ;");
+		grammarBuilder.append("a : ('a'|'b')* 'c' {fmt.Println(p.GetTokenStream().GetAllText())} ;");
 		String grammar = grammarBuilder.toString();
 		String input ="abaac";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",

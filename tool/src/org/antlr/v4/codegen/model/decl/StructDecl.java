@@ -57,6 +57,13 @@ public class StructDecl extends Decl {
 	@ModelElement public List<OutputModelObject> interfaces;
 	@ModelElement public List<OutputModelObject> extensionMembers;
 
+	@ModelElement public OrderedHashSet<Decl> tokenDecls = new OrderedHashSet<Decl>();
+	@ModelElement public OrderedHashSet<Decl> tokenTypeDecls = new OrderedHashSet<Decl>();
+	@ModelElement public OrderedHashSet<Decl> tokenListDecls = new OrderedHashSet<Decl>();
+	@ModelElement public OrderedHashSet<Decl> ruleContextDecls = new OrderedHashSet<Decl>();
+	@ModelElement public OrderedHashSet<Decl> ruleContextListDecls = new OrderedHashSet<Decl>();
+	@ModelElement public OrderedHashSet<Decl> attributeDecls = new OrderedHashSet<Decl>();
+
 	public StructDecl(OutputModelFactory factory, Rule r) {
 		super(factory, factory.getGenerator().getTarget().getRuleFunctionContextStructName(r));
 		addDispatchMethods(r);
@@ -80,8 +87,23 @@ public class StructDecl extends Decl {
 
 	public void addDecl(Decl d) {
 		d.ctx = this;
+
 		if ( d instanceof ContextGetterDecl ) getters.add(d);
 		else attrs.add(d);
+
+		if (d instanceof TokenTypeDecl ) {
+			tokenTypeDecls.add(d);
+		} else if (d instanceof TokenListDecl ) {
+			tokenListDecls.add(d);
+		} else if (d instanceof TokenDecl){
+			tokenDecls.add(d);
+		} else if (d instanceof RuleContextListDecl ) {
+			ruleContextListDecls.add(d);
+		} else if (d instanceof RuleContextDecl ) {
+			ruleContextDecls.add(d);
+		} else if (d instanceof AttributeDecl ){
+			attributeDecls.add(d);
+		}
 	}
 
 	public void addDecl(Attribute a) {

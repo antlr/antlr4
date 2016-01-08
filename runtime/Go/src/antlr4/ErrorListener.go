@@ -3,6 +3,7 @@ package antlr4
 import (
 	"fmt"
 	"strconv"
+	"os"
 )
 
 // Provides an empty default implementation of {@link ANTLRErrorListener}. The
@@ -73,7 +74,7 @@ var ConsoleErrorListenerINSTANCE = NewConsoleErrorListener()
 // </pre>
 //
 func (this *ConsoleErrorListener) SyntaxError(recognizer Recognizer, offendingSymbol interface{}, line, column int, msg string, e RecognitionException) {
-	fmt.Println("line " + strconv.Itoa(line) + ":" + strconv.Itoa(column) + " " + msg)
+	fmt.Fprintln(os.Stderr, "line " + strconv.Itoa(line) + ":" + strconv.Itoa(column) + " " + msg)
 }
 
 type ProxyErrorListener struct {

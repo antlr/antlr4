@@ -113,10 +113,10 @@ public class TestSemPredEvalLexer extends BaseTest {
 	public void testIndent() throws Exception {
 		mkdir(parserpkgdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(153);
+		StringBuilder grammarBuilder = new StringBuilder(152);
 		grammarBuilder.append("lexer grammar L;\n");
 		grammarBuilder.append("ID : [a-z]+  ;\n");
-		grammarBuilder.append("INDENT : [ \\t]+ { this._tokenStartCharPositionInLine==0 }?\n");
+		grammarBuilder.append("INDENT : [ \\t]+ { this.TokenStartCharPositionInLine==0 }?\n");
 		grammarBuilder.append("         { fmt.Println(\"INDENT\") }  ;\n");
 		grammarBuilder.append("NL : '\\n';\n");
 		grammarBuilder.append("WS : [ \\t]+ ;");

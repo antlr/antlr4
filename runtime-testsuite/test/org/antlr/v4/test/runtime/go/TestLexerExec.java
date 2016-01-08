@@ -4625,7 +4625,7 @@ public class TestLexerExec extends BaseTest {
 	public void testPositionAdjustingLexer() throws Exception {
 		mkdir(parserpkgdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(3026);
+		StringBuilder grammarBuilder = new StringBuilder(3037);
 		grammarBuilder.append("lexer grammar PositionAdjustingLexer;\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("@members {\n");
@@ -4712,10 +4712,10 @@ public class TestLexerExec extends BaseTest {
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("func (this *NewPositionAdjustingLexerATNSimulator) ResetAcceptPosition(input CharStream, index, line, charPositionInLine int) {\n");
-		grammarBuilder.append("    this.input.seek(index);\n");
-		grammarBuilder.append("    this.line = line;\n");
-		grammarBuilder.append("    this.charPositionInLine = charPositionInLine;\n");
-		grammarBuilder.append("    this.consume(input);\n");
+		grammarBuilder.append("    this.GetInputStream().Seek(index);\n");
+		grammarBuilder.append("    this.Line = line;\n");
+		grammarBuilder.append("    this.CharPositionInLine = charPositionInLine;\n");
+		grammarBuilder.append("    this.Consume(input);\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("}\n");

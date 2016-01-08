@@ -173,9 +173,9 @@ AssertIsList(v) ::= "List\<?> __ttt__ = <v>;" // just use type system
 
 AssignLocal(s,v) ::= "<s> = <v>;"
 
-InitIntMember(n,v) ::= <%var <n> int = <v>; var _ int = <n>; // to disable unused var %>
+InitIntMember(n,v) ::= <%var <n> int = <v>; var _ int = <n>; %>
 
-InitBooleanMember(n,v) ::= <%var <n> bool= <v>; var _ bool = <n>; // to disable unused var %>
+InitBooleanMember(n,v) ::= <%var <n> bool= <v>; var _ bool = <n>; %>
 
 GetMember(n) ::= <%this.<n>%>
 
@@ -213,13 +213,13 @@ TextEquals(a) ::= <%l.GetText() == "<a>"%>
 
 PlusText(a) ::= <%"<a>" + l.GetText()%>
 
-InputText() ::= "p.GetInput().GetText()"
+InputText() ::= "p.GetTokenStream().GetAllText()"
 
 LTEquals(i, v) ::= <%p.GetTokenStream().LT(<i>).GetText() == <v>%>
 
 LANotEquals(i, v) ::= <%p.GetTokenStream().LA(<i>)!=<v>%>
 
-TokenStartColumnEquals(i) ::= <%this._tokenStartCharPositionInLine==<i>%>
+TokenStartColumnEquals(i) ::= <%this.TokenStartCharPositionInLine==<i>%>
 
 ImportListener(X) ::= ""
 
@@ -321,10 +321,10 @@ func NewPositionAdjustingLexerATNSimulator(recog antlr4.Lexer, atn *antlr4.ATN, 
 }
 
 func (this *NewPositionAdjustingLexerATNSimulator) ResetAcceptPosition(input CharStream, index, line, charPositionInLine int) {
-    this.input.seek(index);
-    this.line = line;
-    this.charPositionInLine = charPositionInLine;
-    this.consume(input);
+    this.GetInputStream().Seek(index);
+    this.Line = line;
+    this.CharPositionInLine = charPositionInLine;
+    this.Consume(input);
 }
 
 >>
@@ -447,7 +447,7 @@ func foo() {
 Invoke_foo() ::= "foo()"
 
 Declare_pred() ::= <<
-bool pred(bool v) {
+func pred(v bool) bool {
 	fmt.Println("eval="+fmt.Sprint(v))
 	return v
 }

@@ -6,7 +6,7 @@ import (
 
 //
 // This implementation of {@link ANTLRErrorListener} can be used to identify
-// certain potential correctness and performance problems in grammars. "Reports"
+// certain potential correctness and performance problems in grammars. "reports"
 // are made by calling {@link Parser//NotifyErrorListeners} with the appropriate
 // message.
 //
@@ -42,7 +42,7 @@ func (this *DiagnosticErrorListener) ReportAmbiguity(recognizer Parser, dfa *DFA
 	if this.exactOnly && !exact {
 		return
 	}
-	var msg = "ReportAmbiguity d=" +
+	var msg = "reportAmbiguity d=" +
 		this.getDecisionDescription(recognizer, dfa) +
 		": ambigAlts=" +
 		this.getConflictingAlts(ambigAlts, configs).String() +
@@ -53,7 +53,7 @@ func (this *DiagnosticErrorListener) ReportAmbiguity(recognizer Parser, dfa *DFA
 
 func (this *DiagnosticErrorListener) ReportAttemptingFullContext(recognizer Parser, dfa *DFA, startIndex, stopIndex int, conflictingAlts *BitSet, configs ATNConfigSet) {
 
-	var msg = "ReportAttemptingFullContext d=" +
+	var msg = "reportAttemptingFullContext d=" +
 		this.getDecisionDescription(recognizer, dfa) +
 		", input='" +
 		recognizer.GetTokenStream().GetTextFromInterval(NewInterval(startIndex, stopIndex)) + "'"
@@ -61,7 +61,7 @@ func (this *DiagnosticErrorListener) ReportAttemptingFullContext(recognizer Pars
 }
 
 func (this *DiagnosticErrorListener) ReportContextSensitivity(recognizer Parser, dfa *DFA, startIndex, stopIndex, prediction int, configs ATNConfigSet) {
-	var msg = "ReportContextSensitivity d=" +
+	var msg = "reportContextSensitivity d=" +
 		this.getDecisionDescription(recognizer, dfa) +
 		", input='" +
 		recognizer.GetTokenStream().GetTextFromInterval(NewInterval(startIndex, stopIndex)) + "'"

@@ -538,10 +538,16 @@ func (this *DefaultErrorStrategy) getMissingSymbol(recognizer Parser) Token {
 	var expecting = this.getExpectedTokens(recognizer)
 	var expectedTokenType = expecting.first()
 	var tokenText string
+
 	if expectedTokenType == TokenEOF {
 		tokenText = "<missing EOF>"
 	} else {
-		tokenText = "<missing " + recognizer.GetLiteralNames()[expectedTokenType] + ">"
+		ln := recognizer.GetLiteralNames()
+		if expectedTokenType > 0 && expectedTokenType < len(ln)  {
+			tokenText = "<missing " + recognizer.GetLiteralNames()[expectedTokenType] + ">"
+		} else {
+			tokenText = "<missing undefined>" // TODO matches the JS impl
+		}
 	}
 	var current = currentSymbol
 	var lookback = recognizer.GetTokenStream().LT(-1)

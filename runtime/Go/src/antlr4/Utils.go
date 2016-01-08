@@ -8,6 +8,7 @@ import (
 	//	"regexp"
 	//	"bytes"
 	//	"encoding/gob"
+	"strconv"
 )
 
 func intMin(a, b int) int {
@@ -151,7 +152,7 @@ func (this *Set) contains(value interface{}) bool {
 }
 
 func (this *Set) values() []interface{} {
-	var l = make([]interface{}, len(this.data))
+	var l = make([]interface{}, 0)
 
 	for key, _ := range this.data {
 		if strings.Index(key, "hash_") == 0 {
@@ -252,7 +253,13 @@ func (this *BitSet) length() int {
 }
 
 func (this *BitSet) String() string {
-	return fmt.Sprint(this.data)
+	vals := this.values()
+	valsS := make([]string, len(vals))
+
+	for i,val := range vals {
+		valsS[i] = strconv.Itoa(val)
+	}
+	return "{" + strings.Join(valsS, ", ") + "}";
 }
 
 type AltDict struct {

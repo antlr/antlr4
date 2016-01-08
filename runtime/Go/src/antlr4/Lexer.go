@@ -340,7 +340,7 @@ func (l *BaseLexer) getCharIndex() int {
 
 // Return the text Matched so far for the current token or any text override.
 //Set the complete text of l token it wipes any previous changes to the text.
-func (l *BaseLexer) text() string {
+func (l *BaseLexer) GetText() string {
 	if l._text != "" {
 		return l._text
 	} else {
@@ -348,7 +348,7 @@ func (l *BaseLexer) text() string {
 	}
 }
 
-func (l *BaseLexer) setText(text string) {
+func (l *BaseLexer) SetText(text string) {
 	l._text = text
 }
 

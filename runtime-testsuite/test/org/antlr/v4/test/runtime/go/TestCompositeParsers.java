@@ -379,7 +379,7 @@ public class TestCompositeParsers extends BaseTest {
 		mkdir(parserpkgdir);
 		String slave_S =
 			"parser grammar S;\n" +
-			"a @after {var x int = 0; var _ int = x; // to disable unused var } : B;";
+			"a @after {var x int = 0; var _ int = x; } : B;";
 		writeFile(parserpkgdir, "S.g4", slave_S);
 
 		StringBuilder grammarBuilder = new StringBuilder(62);
