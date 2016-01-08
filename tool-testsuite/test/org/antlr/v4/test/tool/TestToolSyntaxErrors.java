@@ -488,7 +488,7 @@ public class TestToolSyntaxErrors extends BaseTest {
 				"INVALID_RANGE_2:       'F'..'A' | 'Z';\n" +
 				"VALID_STRING_LITERALS: '\\u1234' | '\\t';\n" +
 				"INVALID_CHAR_SET:      [f-az][];\n" +
-				"INVALID_CHAR_SET_2:    [\\u24\\uA2];\n" +  //https://github.com/antlr/antlr4/issues/1077
+				"INVALID_CHAR_SET_2:    [\\u24\\uA2][\\u24];\n" +  //https://github.com/antlr/antlr4/issues/1077
 				"INVALID_CHAR_SET_3:    [\\t\\{];";
 
 		String expected =
@@ -498,6 +498,7 @@ public class TestToolSyntaxErrors extends BaseTest {
 				"error(" + ErrorType.STRING_LITERALS_AND_SETS_CANNOT_BE_EMPTY.code + "): Test.g4:5:23: string literals and sets cannot be empty: [f-a]\n" +
 				"error(" + ErrorType.STRING_LITERALS_AND_SETS_CANNOT_BE_EMPTY.code + "): Test.g4:5:29: string literals and sets cannot be empty: []\n" +
 				"error(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): Test.g4:6:23: invalid escape sequence\n" +
+				"error(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): Test.g4:6:33: invalid escape sequence\n" +
 				"error(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): Test.g4:7:23: invalid escape sequence\n";
 
 		String[] pair = new String[] {

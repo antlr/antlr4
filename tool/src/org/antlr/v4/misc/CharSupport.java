@@ -140,10 +140,10 @@ public class CharSupport {
 			int end = i+1;
 			if ( literal.charAt(i) == '\\' ) {
 				end = i+2;
-				if ( (i+1)>=n ) break; // ignore spurious \ on end
+				if ( (i+1)>=n ) return null; // invalid escape sequence.
 				if ( literal.charAt(i+1) == 'u' ) end = i+6;
 			}
-			if ( end>n ) break;
+			if ( end>n ) return null; // invalid escape sequence.
 			String esc = literal.substring(i, end);
 			int c = getCharValueFromCharInGrammarLiteral(esc);
 			if ( c==-1 ) {
