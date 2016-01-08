@@ -485,6 +485,8 @@ public abstract class BaseTest {
 			XPathExpression exp = XPathFactory.newInstance().newXPath()
 				.compile("/Project/ItemGroup/ProjectReference[@Include='" + runtimeName + "']");
 			Element node = (Element)exp.evaluate(prjXml, XPathConstants.NODE);
+			if (isWindows() && runtimeProjPath.startsWith("/"))
+				runtimeProjPath = runtimeProjPath.substring(1);
 			node.setAttribute("Include", runtimeProjPath.replace("/", "\\"));
 			// update project file list
 			exp = XPathFactory.newInstance().newXPath().compile("/Project/ItemGroup[Compile/@Include='AssemblyInfo.cs']");
@@ -533,7 +535,8 @@ public abstract class BaseTest {
 			String exec = locateExec();
 			String[] args = isWindows() ?
 					new String[] { exec, new File(tmpdir, "input").getAbsolutePath() } :
-					new String[] { "mono", exec, new File(tmpdir, "input").getAbsolutePath() };
+					// inline disabling to avoid "Method is too complex" exception.
+					new String[] { "mono", "-O=-inline", exec, new File(tmpdir, "input").getAbsolutePath() };
 			ProcessBuilder pb = new ProcessBuilder(args);
 			pb.directory(new File(tmpdir));
 			Process process = pb.start();
