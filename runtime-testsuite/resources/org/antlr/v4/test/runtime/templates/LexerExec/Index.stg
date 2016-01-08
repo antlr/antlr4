@@ -31,7 +31,6 @@ TestTemplates ::= [
 	"CharSetWithMissingEndRange": [],
 	"CharSetWithMissingEscapeChar": [],
 	"CharSetWithEscapedChar": [],
-	"CharSetWithReversedRange": [],
 	"CharSetWithQuote1": [],
 	"CharSetWithQuote2": [],
 	"PositionAdjustingLexer": [],
