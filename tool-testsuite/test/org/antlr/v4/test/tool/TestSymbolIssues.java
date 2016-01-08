@@ -256,4 +256,19 @@ public class TestSymbolIssues extends BaseTest {
 
 		testErrors(test, false);
 	}
+
+	@Test public void testIllegalModeOption() throws  Exception {
+		String[] test = {
+			"lexer grammar L;\n" +
+			"options { caseInsensitive = badValue; }\n" +
+			"DEFAULT_TOKEN: [A-F]+;\n" +
+			"mode M1, wrongModeOption;\n" +
+			"TOKEN:  [a-f]+;\n",
+
+			"warning(" + ErrorType.ILLEGAL_OPTION_VALUE.code + "): L.g4:2:28: unsupported option value caseInsensitive=badValue\n" +
+			"warning(" + ErrorType.ILLEGAL_OPTION.code + "): L.g4:4:9: unsupported option wrongModeOption\n"
+		};
+
+		testErrors(test, false);
+	}
 }

@@ -165,6 +165,14 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 	@Override
 	protected void enterMode(GrammarAST tree) {
 		nonFragmentRuleCount = 0;
+		Tree child1 = tree.getChild(1);
+		if (!(child1 instanceof RuleAST)) {
+			String modeOptionText = child1.getText();
+			if (!modeOptionText.equals("caseSensitive") && !modeOptionText.equals("caseInsensitive")) {
+				g.tool.errMgr.grammarError(ErrorType.ILLEGAL_OPTION, g.fileName, ((GrammarAST)child1).getToken(),
+						modeOptionText);
+			}
+		}
 	}
 
 	@Override
@@ -248,6 +256,13 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 	public void grammarOption(GrammarAST ID, GrammarAST valueAST) {
 		boolean ok = checkOptions(g.ast, ID.token, valueAST);
 		//if ( ok ) g.ast.setOption(ID.getText(), value);
+		if (ID.getText().equals("caseInsensitive")) {
+			String valueText = valueAST.getText();
+			if (!valueText.equals("true") && !valueText.equals("false")) {
+				g.tool.errMgr.grammarError(ErrorType.ILLEGAL_OPTION_VALUE, g.fileName, valueAST.getToken(),
+						ID.getText(), valueText);
+			}
+		}
 	}
 
 	@Override

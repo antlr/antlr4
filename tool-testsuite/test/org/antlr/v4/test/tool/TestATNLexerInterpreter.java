@@ -422,7 +422,7 @@ public class TestATNLexerInterpreter extends BaseTest {
 				"[@2,5:4='<EOF>',<-1>,1:5]\n", result);
 	}
 
-	@Test public void testLexerCaseInsensitiveWithDifferentCulturies() throws Exception {
+	@Test public void testLexerCaseInsensitiveWithDifferentCultures() throws Exception {
 		// From here: http://www.periodni.com/unicode_utf-8_encoding.html
 		// TODO: Add tokens on Arabic, Japan, Chinese and other languages.
 		LexerGrammar lg = new LexerGrammar(
