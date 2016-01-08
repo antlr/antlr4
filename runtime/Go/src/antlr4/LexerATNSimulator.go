@@ -52,7 +52,7 @@ type LexerATNSimulator struct {
 
 	recog          Lexer
 	predictionMode int
-	decisionToDFA  []*DFA
+	DecisionToDFA []*DFA
 	mergeCache     DoubleDict
 	startIndex     int
 	line           int
@@ -68,7 +68,7 @@ func NewLexerATNSimulator(recog Lexer, atn *ATN, decisionToDFA []*DFA, sharedCon
 
 	this.BaseATNSimulator = NewBaseATNSimulator(atn, sharedContextCache)
 
-	this.decisionToDFA = decisionToDFA
+	this.DecisionToDFA = decisionToDFA
 	this.recog = recog
 	// The current token's starting index into the character stream.
 	// Shared across DFA to ATN simulation in case the ATN fails and the
@@ -123,7 +123,7 @@ func (this *LexerATNSimulator) Match(input CharStream, mode int) int {
 	this.startIndex = input.Index()
 	this.prevAccept.reset()
 
-	var dfa = this.decisionToDFA[mode]
+	var dfa = this.DecisionToDFA[mode]
 
 	if dfa.s0 == nil {
 		if PortDebug {
@@ -160,13 +160,13 @@ func (this *LexerATNSimulator) MatchATN(input CharStream) int {
 	var next = this.addDFAState(s0_closure.BaseATNConfigSet)
 
 	if !suppressEdge {
-		this.decisionToDFA[this.mode].s0 = next
+		this.DecisionToDFA[this.mode].s0 = next
 	}
 
 	var predict = this.execATN(input, next)
 
 	if LexerATNSimulatorDebug {
-		fmt.Println("DFA after MatchATN: " + this.decisionToDFA[old_mode].ToLexerString())
+		fmt.Println("DFA after MatchATN: " + this.DecisionToDFA[old_mode].ToLexerString())
 	}
 	return predict
 }
@@ -639,7 +639,7 @@ func (this *LexerATNSimulator) addDFAState(configs ATNConfigSet) *DFAState {
 		proposed.setPrediction(this.atn.ruleToTokenType[firstConfigWithRuleStopState.GetState().GetRuleIndex()])
 	}
 	var hash = proposed.Hash()
-	var dfa = this.decisionToDFA[this.mode]
+	var dfa = this.DecisionToDFA[this.mode]
 	var existing = dfa.GetStates()[hash]
 	if existing != nil {
 		return existing
@@ -653,7 +653,7 @@ func (this *LexerATNSimulator) addDFAState(configs ATNConfigSet) *DFAState {
 }
 
 func (this *LexerATNSimulator) getDFA(mode int) *DFA {
-	return this.decisionToDFA[mode]
+	return this.DecisionToDFA[mode]
 }
 
 // Get the text Matched so far for the current token.

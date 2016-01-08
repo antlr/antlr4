@@ -130,6 +130,10 @@ func (l *BaseLexer) reset() {
 	l.Interpreter.reset()
 }
 
+func (l *BaseLexer) GetInterpreter() *LexerATNSimulator {
+	return l.Interpreter
+}
+
 func (l *BaseLexer) GetInputStream() CharStream {
 	return l._input
 }

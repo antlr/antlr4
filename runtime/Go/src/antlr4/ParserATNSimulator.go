@@ -14,7 +14,7 @@ type ParserATNSimulator struct {
 	_input         TokenStream
 	_startIndex    int
 	_dfa           *DFA
-	decisionToDFA  []*DFA
+	DecisionToDFA []*DFA
 	mergeCache     *DoubleDict
 	_outerContext  ParserRuleContext
 }
@@ -26,7 +26,7 @@ func NewParserATNSimulator(parser Parser, atn *ATN, decisionToDFA []*DFA, shared
 	this.BaseATNSimulator = NewBaseATNSimulator(atn, sharedContextCache)
 
 	this.parser = parser
-	this.decisionToDFA = decisionToDFA
+	this.DecisionToDFA = decisionToDFA
 	// SLL, LL, or LL + exact ambig detection?//
 	this.predictionMode = PredictionModeLL
 	// LAME globals to avoid parameters!!!!! I need these down deep in predTransition
@@ -81,7 +81,7 @@ func (this *ParserATNSimulator) AdaptivePredict(input TokenStream, decision int,
 	this._startIndex = input.Index()
 	this._outerContext = outerContext
 
-	var dfa = this.decisionToDFA[decision]
+	var dfa = this.DecisionToDFA[decision]
 	this._dfa = dfa
 	var m = input.Mark()
 	var index = input.Index()

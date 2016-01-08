@@ -114,7 +114,7 @@ func (v *Base<file.grammarName>Visitor) Visit<lname; format="cap">(ctx *<lname; 
 Parser(parser, funcs, atn, sempredFuncs, superClass) ::= <<
 
 <if(superClass)>
-var <superClass> = require('./<superClass>').<superClass> // TODO
+// TODO var <superClass> = require('./<superClass>').<superClass>
 <endif>
 
 var parserATN = <atn>
@@ -138,17 +138,17 @@ func New<parser.name>(input antlr4.TokenStream) *<parser.name> {
         decisionToDFA[index] = antlr4.NewDFA(ds, index)
     }
 
-    parser := new(<parser.name>)
+    this := new(<parser.name>)
 
-    parser.BaseParser = antlr4.NewBaseParser(input)
+    this.BaseParser = antlr4.NewBaseParser(input)
 
-    parser.Interpreter = antlr4.NewParserATNSimulator(parser, deserializedATN, decisionToDFA, sharedContextCache)
-    parser.RuleNames = ruleNames
-    parser.LiteralNames = literalNames
-    parser.SymbolicNames = symbolicNames
-    parser.GrammarFileName = "<parser.grammarFileName; format="java-escape">"
+    this.Interpreter = antlr4.NewParserATNSimulator(this, deserializedATN, decisionToDFA, sharedContextCache)
+    this.RuleNames = ruleNames
+    this.LiteralNames = literalNames
+    this.SymbolicNames = symbolicNames
+    this.GrammarFileName = "<parser.grammarFileName; format="java-escape">"
 
-    return parser
+    return this
 }
 
 <namedActions.members>
@@ -187,13 +187,13 @@ dumpActions(recog, argFuncs, actionFuncs, sempredFuncs) ::= <<
 <if(actionFuncs)>
 func (l *<lexer.name>) Action(localctx antlr4.RuleContext, ruleIndex, actionIndex int) {
 	switch ruleIndex {
-    <recog.actionFuncs.values:{f| case <f.ruleIndex>:
+        <recog.actionFuncs.values:{f|case <f.ruleIndex>:
         <if(!f.isRuleContext)>
         var t *<f.name; format="cap">Context = nil
         if localctx != nil { t = localctx.(*<f.ctxType>) \}
-        return l.<f.name>_Action(t, actionIndex)
+        l.<f.name>_Action(t, actionIndex)
         <else>
-        return l.<f.name>_Action(t, actionIndex)
+        l.<f.name>_Action(localctx, actionIndex)
         <endif>}; separator="\n">
 	default:
 		panic("No registered action for:" + fmt.Sprint(ruleIndex))
@@ -211,7 +211,7 @@ func (l *<lexer.name>) Sempred(localctx antlr4.RuleContext, ruleIndex, predIndex
             if localctx != nil { t = localctx.(*<f.ctxType>) \}
 	        return l.<f.name>_Sempred(t, predIndex);
 	        <else>
-	        return l.<f.name>_Sempred(t, predIndex);
+	        return l.<f.name>_Sempred(localctx, predIndex);
 	        <endif>}; separator="\n">
     	default:
     		panic("No registered predicate for:" + fmt.Sprint(ruleIndex))
@@ -244,7 +244,7 @@ case <index>:
  * overriding implementation impossible to maintain.
  */
 RuleSempredFunction(r, actions) ::= <<
-func (p *<if(parser)><parser.name><else><lexer.name><endif>) <r.name; format="cap">_Sempred(localctx <if(r.isRuleContext)>antlr4.RuleContext<else>*<r.ctxType><endif>, predIndex int) bool {
+func (p *<if(parser)><parser.name><else><lexer.name><endif>) <r.name; format="cap">_Sempred(localctx antlr4.RuleContext, predIndex int) bool {
 	switch predIndex {
 		<actions:{index| case <index>:
 	return <actions.(index)>;}; separator="\n">
@@ -252,10 +252,7 @@ func (p *<if(parser)><parser.name><else><lexer.name><endif>) <r.name; format="ca
 			panic("No predicate with index:" + fmt.Sprint(predIndex))
 	}
 }
-
 >>
-
-
 
 RuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,namedActions,finallyAction,postamble,exceptions) ::= <<
 
@@ -610,7 +607,7 @@ RulePropertyRef_parser(r)	 ::= "p"
 ThisRulePropertyRef_start(r) ::= "localctx.GetStart()"
 ThisRulePropertyRef_stop(r)	 ::= "localctx.GetStop()"
 ThisRulePropertyRef_text(r)	 ::= "p.GetTokenStream().GetTextFromInterval(antlr4.NewInterval(localctx.GetStart().GetTokenIndex(), p.GetTokenStream().LT(-1).GetTokenIndex()))"
-ThisRulePropertyRef_ctx(r)	 ::= "localctx"
+ThisRulePropertyRef_ctx(r)	 ::= "<ctx(r)>"
 ThisRulePropertyRef_parser(r)	 ::= "p"
 
 NonLocalAttrRef(s)		 	 ::= "GetInvokingContext(<s.ruleIndex>).<s.name>"
@@ -620,7 +617,7 @@ AddToLabelList(a) ::= "<ctx(a.label)>.<a.listName> = append(<ctx(a.label)>.<a.li
 
 TokenDecl(t) ::= "<t.name> <TokenLabelType()>"
 TokenTypeDecl(t) ::= "<t.name> int"
-TokenListDecl(t) ::= "<t.name> antlr4.Token[]"
+TokenListDecl(t) ::= "<t.name> []antlr4.Token"
 
 RuleContextDecl(r) ::= "<r.name> I<r.ctxName>"
 RuleContextListDecl(rdecl) ::= "<rdecl.name> []I<rdecl.ctxName>"
@@ -628,47 +625,53 @@ RuleContextListDecl(rdecl) ::= "<rdecl.name> []I<rdecl.ctxName>"
 AttributeDecl(d) ::= "<d.name> <d.type;format={lower}><if(d.initValue)>// TODO = <d.initValue><endif>"
 
 ContextTokenGetterDecl(t)      ::= <<
-<t.name; format="cap">() interface{} {
+<t.name; format="cap">() antlr4.TerminalNode {
     return s.GetToken(<parser.name><t.name>, 0)
 }
 >>
 
 // should never be called
 ContextTokenListGetterDecl(t)  ::= <<
-def <t.name>_list(self):
-    return self.GetTokens(<parser.name><t.name>)
+fail: ContextTokenListGetterDecl should never be called!
 >>
 
 ContextTokenListIndexedGetterDecl(t)  ::= <<
-<t.name; format="cap">(i int) interface{} {
+<t.name; format="cap">(i int) []antlr4.TerminalNode {
     if i \< 0 {
         return s.GetTokens(<parser.name><t.name>)
     } else {
-        return s.GetToken(<parser.name><t.name>, i)
+        return []antlr4.TerminalNode{ s.GetToken(<parser.name><t.name>, i) }
     }
 }
 >>
 
 ContextRuleGetterDecl(r)       ::= <<
-<r.name; format="cap">() interface{} {
-    return s.GetTypedRuleContext(reflect.TypeOf((*<r.ctxName>)(nil)).Elem(),0)
+<r.name; format="cap">() *<r.ctxName> {
+    return s.GetTypedRuleContext(reflect.TypeOf((*<r.ctxName>)(nil)).Elem(),0).(*<r.ctxName>)
 }
 >>
 
 // should never be called
 ContextRuleListGetterDecl(r)   ::= <<
-func <r.name; format="cap">_list(self):
-    return s.GetTypedRuleContexts(reflect.TypeOf((*<r.ctxName>)(nil)).Elem())
-
+fail: ContextRuleListGetterDecl should never be called!
 >>
 
 ContextRuleListIndexedGetterDecl(r)   ::= <<
-<r.name; format="cap">(i int) interface{} {
+<r.name; format="cap">(i int) []*<r.ctxName> {
+    var ts []antlr4.RuleContext;
+
     if i \< 0 {
-        return s.GetTypedRuleContexts(reflect.TypeOf((*<r.ctxName>)(nil)).Elem())
+        ts = s.GetTypedRuleContexts( reflect.PtrTo( reflect.TypeOf((*<r.ctxName>)(nil)).Elem() ))
     } else {
-        return s.GetTypedRuleContext(reflect.TypeOf((*<r.ctxName>)(nil)).Elem(),i)
+        ts = []antlr4.RuleContext { s.GetTypedRuleContext( reflect.PtrTo( reflect.TypeOf((*<r.ctxName>)(nil)).Elem() ),i) }
     }
+
+    var tst []*<r.ctxName> = make([]*<r.ctxName>, len(ts))
+    for i, t := range ts {
+        tst[i] = t.(*<r.ctxName>)
+    }
+
+    return tst
 }
 >>
 
@@ -918,20 +921,20 @@ func New<lexer.name>(input antlr4.CharStream) *<lexer.name> {
         lexerDecisionToDFA[index] = antlr4.NewDFA(ds, index)
     }
 
-	lex := new(<lexer.name>)
+	this := new(<lexer.name>)
 
-	lex.BaseLexer = antlr4.NewBaseLexer(input)
+	this.BaseLexer = antlr4.NewBaseLexer(input)
 
-    lex.Interpreter = antlr4.NewLexerATNSimulator(lex, lexerAtn, lexerDecisionToDFA, antlr4.NewPredictionContextCache())
+    this.Interpreter = antlr4.NewLexerATNSimulator(this, lexerAtn, lexerDecisionToDFA, antlr4.NewPredictionContextCache())
 
-    lex.modeNames = lexerModeNames
-    lex.RuleNames = lexerRuleNames
-    lex.LiteralNames = lexerLiteralNames
-    lex.SymbolicNames = lexerSymbolicNames
-    lex.GrammarFileName = "<lexer.grammarFileName>"
+    this.modeNames = lexerModeNames
+    this.RuleNames = lexerRuleNames
+    this.LiteralNames = lexerLiteralNames
+    this.SymbolicNames = lexerSymbolicNames
+    this.GrammarFileName = "<lexer.grammarFileName>"
     //lex.EOF = antlr4.TokenEOF
 
-    return lex
+    return this
 }
 
 const (
@@ -942,7 +945,6 @@ const (
     <rest(lexer.modes):{m| <lexer.name><m> = <i>}; separator="\n">
 )
 
-<namedActions.members>
 
 <dumpActions(lexer, "", actionFuncs, sempredFuncs)>
 

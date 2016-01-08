@@ -43,7 +43,7 @@ public class TestSemPredEvalLexer extends BaseTest {
 
 		StringBuilder grammarBuilder = new StringBuilder(100);
 		grammarBuilder.append("lexer grammar L;\n");
-		grammarBuilder.append("ENUM : [a-z]+  { l.GetText() == \"enum\" }? ;\n");
+		grammarBuilder.append("ENUM : [a-z]+  { p.GetText() == \"enum\" }? ;\n");
 		grammarBuilder.append("ID : [a-z]+  ;\n");
 		grammarBuilder.append("WS : (' '|'\\n') -> skip;");
 		String grammar = grammarBuilder.toString();
@@ -113,10 +113,10 @@ public class TestSemPredEvalLexer extends BaseTest {
 	public void testIndent() throws Exception {
 		mkdir(parserpkgdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(152);
+		StringBuilder grammarBuilder = new StringBuilder(137);
 		grammarBuilder.append("lexer grammar L;\n");
 		grammarBuilder.append("ID : [a-z]+  ;\n");
-		grammarBuilder.append("INDENT : [ \\t]+ { this.TokenStartCharPositionInLine==0 }?\n");
+		grammarBuilder.append("INDENT : [ \\t]+ { p.TokenStartColumn==0 }?\n");
 		grammarBuilder.append("         { fmt.Println(\"INDENT\") }  ;\n");
 		grammarBuilder.append("NL : '\\n';\n");
 		grammarBuilder.append("WS : [ \\t]+ ;");
@@ -154,8 +154,8 @@ public class TestSemPredEvalLexer extends BaseTest {
 		grammarBuilder.append("lexer grammar L;\n");
 		grammarBuilder.append("WORD1 : ID1+ { fmt.Println(l.GetText()) } ;\n");
 		grammarBuilder.append("WORD2 : ID2+ { fmt.Println(l.GetText()) } ;\n");
-		grammarBuilder.append("fragment ID1 : { l.GetCharPositionInLine() < 2 }? [a-zA-Z];\n");
-		grammarBuilder.append("fragment ID2 : { l.GetCharPositionInLine() >= 2 }? [a-zA-Z];\n");
+		grammarBuilder.append("fragment ID1 : { p.GetCharPositionInLine() < 2 }? [a-zA-Z];\n");
+		grammarBuilder.append("fragment ID2 : { p.GetCharPositionInLine() >= 2 }? [a-zA-Z];\n");
 		grammarBuilder.append("WS : (' '|'\\n') -> skip;");
 		String grammar = grammarBuilder.toString();
 		String input =
@@ -182,7 +182,7 @@ public class TestSemPredEvalLexer extends BaseTest {
 
 		StringBuilder grammarBuilder = new StringBuilder(160);
 		grammarBuilder.append("lexer grammar L;\n");
-		grammarBuilder.append("ENUM : [a-z]+ { l.GetText() == \"enum\" }? { fmt.Println(\"enum!\") } ;\n");
+		grammarBuilder.append("ENUM : [a-z]+ { p.GetText() == \"enum\" }? { fmt.Println(\"enum!\") } ;\n");
 		grammarBuilder.append("ID   : [a-z]+ { fmt.Println(\"ID \" + l.GetText()) } ;\n");
 		grammarBuilder.append("WS   : [ \\n] -> skip ;");
 		String grammar = grammarBuilder.toString();

@@ -74,12 +74,12 @@ public class TestSemPredEvalParser extends BaseTest {
 	@Test
 	public void testActionHidesPreds() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(243);
+		StringBuilder grammarBuilder = new StringBuilder(223);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("@members {var i int = 0; var _ int = i; }\n");
 		grammarBuilder.append("s : a+ ;\n");
-		grammarBuilder.append("a : {this.i = 1;} ID {this.i == 1}? {fmt.Println(\"alt 1\")}\n");
-		grammarBuilder.append("  | {this.i = 2;} ID {this.i == 2}? {fmt.Println(\"alt 2\")}\n");
+		grammarBuilder.append("a : {i = 1;} ID {i == 1}? {fmt.Println(\"alt 1\")}\n");
+		grammarBuilder.append("  | {i = 2;} ID {i == 2}? {fmt.Println(\"alt 2\")}\n");
 		grammarBuilder.append("  ;\n");
 		grammarBuilder.append("ID : 'a'..'z'+ ;\n");
 		grammarBuilder.append("INT : '0'..'9'+;\n");
@@ -100,7 +100,7 @@ public class TestSemPredEvalParser extends BaseTest {
 	@Test
 	public void testActionsHidePredsInGlobalFOLLOW() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(285);
+		StringBuilder grammarBuilder = new StringBuilder(279);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("@members {\n");
 		grammarBuilder.append("func pred(v bool) bool {\n");
@@ -108,8 +108,8 @@ public class TestSemPredEvalParser extends BaseTest {
 		grammarBuilder.append("	return v\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("}\n");
-		grammarBuilder.append("s : e {} {this.pred(true)}? {fmt.Println(\"parse\")} '!' ;\n");
-		grammarBuilder.append("t : e {} {this.pred(false)}? ID ;\n");
+		grammarBuilder.append("s : e {} {p.pred(true)}? {fmt.Println(\"parse\")} '!' ;\n");
+		grammarBuilder.append("t : e {} {p.pred(false)}? ID ;\n");
 		grammarBuilder.append("e : ID | ; // non-LL(1) so we use ATN\n");
 		grammarBuilder.append("ID : 'a'..'z'+ ;\n");
 		grammarBuilder.append("INT : '0'..'9'+;\n");
@@ -148,7 +148,7 @@ public class TestSemPredEvalParser extends BaseTest {
 	@Test
 	public void testDepedentPredsInGlobalFOLLOW() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(308);
+		StringBuilder grammarBuilder = new StringBuilder(302);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("@members {\n");
 		grammarBuilder.append("func pred(v bool) bool {\n");
@@ -157,8 +157,8 @@ public class TestSemPredEvalParser extends BaseTest {
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("s : a[99] ;\n");
-		grammarBuilder.append("a[int i] : e {this.pred($i==99)}? {fmt.Println(\"parse\")} '!' ;\n");
-		grammarBuilder.append("b[int i] : e {this.pred($i==99)}? ID ;\n");
+		grammarBuilder.append("a[int i] : e {p.pred($i==99)}? {fmt.Println(\"parse\")} '!' ;\n");
+		grammarBuilder.append("b[int i] : e {p.pred($i==99)}? ID ;\n");
 		grammarBuilder.append("e : ID | ; // non-LL(1) so we use ATN\n");
 		grammarBuilder.append("ID : 'a'..'z'+ ;\n");
 		grammarBuilder.append("INT : '0'..'9'+;\n");
@@ -352,12 +352,12 @@ public class TestSemPredEvalParser extends BaseTest {
 	@Test
 	public void testPredTestedEvenWhenUnAmbig_1() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(229);
+		StringBuilder grammarBuilder = new StringBuilder(224);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("@members {var enumKeyword bool= true; var _ bool = enumKeyword; }\n");
 		grammarBuilder.append("primary\n");
 		grammarBuilder.append("    :   ID {fmt.Println(\"ID \"+$ID.text)}\n");
-		grammarBuilder.append("    |   {!this.enumKeyword}? 'enum' {fmt.Println(\"enum\")}\n");
+		grammarBuilder.append("    |   {!enumKeyword}? 'enum' {fmt.Println(\"enum\")}\n");
 		grammarBuilder.append("    ;\n");
 		grammarBuilder.append("ID : [a-z]+ ;\n");
 		grammarBuilder.append("WS : [ \\t\\n\\r]+ -> skip ;");
@@ -374,12 +374,12 @@ public class TestSemPredEvalParser extends BaseTest {
 	@Test
 	public void testPredTestedEvenWhenUnAmbig_2() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(229);
+		StringBuilder grammarBuilder = new StringBuilder(224);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("@members {var enumKeyword bool= true; var _ bool = enumKeyword; }\n");
 		grammarBuilder.append("primary\n");
 		grammarBuilder.append("    :   ID {fmt.Println(\"ID \"+$ID.text)}\n");
-		grammarBuilder.append("    |   {!this.enumKeyword}? 'enum' {fmt.Println(\"enum\")}\n");
+		grammarBuilder.append("    |   {!enumKeyword}? 'enum' {fmt.Println(\"enum\")}\n");
 		grammarBuilder.append("    ;\n");
 		grammarBuilder.append("ID : [a-z]+ ;\n");
 		grammarBuilder.append("WS : [ \\t\\n\\r]+ -> skip ;");
@@ -447,7 +447,7 @@ public class TestSemPredEvalParser extends BaseTest {
 	@Test
 	public void testPredsInGlobalFOLLOW() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(279);
+		StringBuilder grammarBuilder = new StringBuilder(273);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("@members {\n");
 		grammarBuilder.append("func pred(v bool) bool {\n");
@@ -455,8 +455,8 @@ public class TestSemPredEvalParser extends BaseTest {
 		grammarBuilder.append("	return v\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("}\n");
-		grammarBuilder.append("s : e {this.pred(true)}? {fmt.Println(\"parse\")} '!' ;\n");
-		grammarBuilder.append("t : e {this.pred(false)}? ID ;\n");
+		grammarBuilder.append("s : e {p.pred(true)}? {fmt.Println(\"parse\")} '!' ;\n");
+		grammarBuilder.append("t : e {p.pred(false)}? ID ;\n");
 		grammarBuilder.append("e : ID | ; // non-LL(1) so we use ATN\n");
 		grammarBuilder.append("ID : 'a'..'z'+ ;\n");
 		grammarBuilder.append("INT : '0'..'9'+;\n");
@@ -599,13 +599,13 @@ public class TestSemPredEvalParser extends BaseTest {
 	@Test
 	public void testToLeftWithVaryingPredicate() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(267);
+		StringBuilder grammarBuilder = new StringBuilder(247);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("@members {var i int = 0; var _ int = i; }\n");
-		grammarBuilder.append("s : ({this.i += 1;\n");
-		grammarBuilder.append("fmt.Println(\"i=\" + this.i)} a)+ ;\n");
-		grammarBuilder.append("a : {this.i % 2 == 0}? ID {fmt.Println(\"alt 1\")}\n");
-		grammarBuilder.append("  | {this.i % 2 != 0}? ID {fmt.Println(\"alt 2\")}\n");
+		grammarBuilder.append("s : ({i += 1;\n");
+		grammarBuilder.append("fmt.Println(\"i=\" + i)} a)+ ;\n");
+		grammarBuilder.append("a : {i % 2 == 0}? ID {fmt.Println(\"alt 1\")}\n");
+		grammarBuilder.append("  | {i % 2 != 0}? ID {fmt.Println(\"alt 2\")}\n");
 		grammarBuilder.append("  ;\n");
 		grammarBuilder.append("ID : 'a'..'z'+ ;\n");
 		grammarBuilder.append("INT : '0'..'9'+;\n");

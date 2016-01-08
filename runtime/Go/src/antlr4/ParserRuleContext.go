@@ -236,25 +236,47 @@ func (prc *BaseParserRuleContext) GetPayload() interface{}{
 	return prc
 }
 
-func (prc *BaseParserRuleContext) GetTypedRuleContext(ctxType reflect.Type, i int) interface{} {
-	panic("GetTypedRuleContexts not implemented")
-	//    return prc.getChild(i, ctxType)
+func (prc *BaseParserRuleContext) getChild(ctxType reflect.Type, i int) RuleContext {
+	if ( prc.children==nil || i < 0 || i >= len(prc.children) ) {
+		return nil
+	}
+
+	var j int = -1 // what element have we found with ctxType?
+	for _,o := range prc.children {
+
+		childType := reflect.TypeOf(o)
+
+		if ( childType.ConvertibleTo(ctxType) ) {
+			j++
+			if ( j == i ) {
+				return o.(RuleContext)
+			}
+		}
+	}
+	return nil
+}
+// Go lacks generics, so it's not possible for us to return the child with the correct type, but we do
+// check for convertibility
+
+func (prc *BaseParserRuleContext) GetTypedRuleContext(ctxType reflect.Type, i int) RuleContext {
+	return prc.getChild(ctxType, i)
 }
 
-func (prc *BaseParserRuleContext) GetTypedRuleContexts(ctxType reflect.Type) []interface{} {
-	panic("GetTypedRuleContexts not implemented")
-	//    if (prc.children== nil) {
-	//        return []
-	//    } else {
-	//		var contexts = []
-	//		for(var j=0 j<len(prc.children) j++) {
-	//			var child = prc.children[j]
-	//			if _, ok := child.(ctxType); ok {
-	//				contexts.push(child)
-	//			}
-	//		}
-	//		return contexts
-	//	}
+func (prc *BaseParserRuleContext) GetTypedRuleContexts(ctxType reflect.Type) []RuleContext {
+	if prc.children == nil {
+		return make([]RuleContext, 0)
+	}
+
+	var contexts = make([]RuleContext, 0)
+
+	for _,child := range prc.children {
+		childType := reflect.TypeOf(child)
+
+		if childType.ConvertibleTo(ctxType) {
+			contexts = append(contexts, child.(RuleContext))
+		}
+	}
+	return contexts
 }
 
 func (prc *BaseParserRuleContext) GetChildCount() int {

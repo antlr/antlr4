@@ -177,19 +177,19 @@ InitIntMember(n,v) ::= <%var <n> int = <v>; var _ int = <n>; %>
 
 InitBooleanMember(n,v) ::= <%var <n> bool= <v>; var _ bool = <n>; %>
 
-GetMember(n) ::= <%this.<n>%>
+GetMember(n) ::= <%<n>%>
 
-SetMember(n,v) ::= <%this.<n> = <v>;%>
+SetMember(n,v) ::= <%<n> = <v>;%>
 
-AddMember(n,v) ::= <%this.<n> += <v>;%>
+AddMember(n,v) ::= <%<n> += <v>;%>
 
-PlusMember(v,n) ::= <%<v> + this.<n>%>
+PlusMember(v,n) ::= <%<v> + <n>%>
 
-MemberEquals(n,v) ::= <%this.<n> == <v>%>
+MemberEquals(n,v) ::= <%<n> == <v>%>
 
-ModMemberEquals(n,m,v) ::= <%this.<n> % <m> == <v>%>
+ModMemberEquals(n,m,v) ::= <%<n> % <m> == <v>%>
 
-ModMemberNotEquals(n,m,v) ::= <%this.<n> % <m> != <v>%>
+ModMemberNotEquals(n,m,v) ::= <%<n> % <m> != <v>%>
 
 DumpDFA() ::= "p.DumpDFA()"
 
@@ -203,13 +203,13 @@ BailErrorStrategy() ::= <%SetErrorHandler(NewBailErrorStrategy())%>
 
 ToStringTree(s) ::= <%<s>.ToStringTree(nil,p)%>
 
-Column() ::= "l.GetCharPositionInLine()"
+Column() ::= "p.GetCharPositionInLine()"
 
 Text() ::= "l.GetText()"
 
 ValEquals(a,b) ::= <%<a>==<b>%>
 
-TextEquals(a) ::= <%l.GetText() == "<a>"%>
+TextEquals(a) ::= <%p.GetText() == "<a>"%>
 
 PlusText(a) ::= <%"<a>" + l.GetText()%>
 
@@ -219,7 +219,7 @@ LTEquals(i, v) ::= <%p.GetTokenStream().LT(<i>).GetText() == <v>%>
 
 LANotEquals(i, v) ::= <%p.GetTokenStream().LA(<i>)!=<v>%>
 
-TokenStartColumnEquals(i) ::= <%this.TokenStartCharPositionInLine==<i>%>
+TokenStartColumnEquals(i) ::= <%p.TokenStartColumn==<i>%>
 
 ImportListener(X) ::= ""
 
@@ -231,8 +231,8 @@ LL_EXACT_AMBIG_DETECTION() ::= <<p.Interpreter.SetPredictionMode(antlr4.Predicti
 
 ParserPropertyMember() ::= <<
 @members {
-bool Property() {
-  return true;
+func Property() bool {
+  return true
 }
 }
 >>
@@ -330,13 +330,13 @@ func (this *NewPositionAdjustingLexerATNSimulator) ResetAcceptPosition(input Cha
 >>
 
 BasicListener(X) ::= <<
-func LeafListener struct {
-	*parser.BaseTListener
+type LeafListener struct {
+	*BaseTListener
 }
 
 func NewLeafListener() *LeafListener {
 	l := new(LeafListener)
-	l.BaseTListener = new(parser.BaseTListener)
+	l.BaseTListener = new(BaseTListener)
 	return l
 }
 
@@ -351,19 +351,19 @@ walker.Walk(NewLeafListener(), <s>);
 >>
 
 TokenGetterListener(X) ::= <<
-func LeafListener struct {
-	*parser.BaseTListener
+type LeafListener struct {
+	*BaseTListener
 }
 
 func NewLeafListener() *LeafListener {
 	l := new(LeafListener)
-	l.BaseTListener = new(parser.BaseTListener)
+	l.BaseTListener = new(BaseTListener)
 	return l
 }
 
-func (this *LeafListener) ExitA(ctx *parser.AContext) {
+func (this *LeafListener) ExitA(ctx *AContext) {
 	if (ctx.GetChildCount()==2){
-		fmt.Printf("%s %s %s",ctx.INT(0).GetSymbol().GetText(), ctx.INT(1).GetSymbol().GetText(),ctx.INT());
+		fmt.Printf("%s %s %s",ctx.INT(0)[0].GetSymbol().GetText(), ctx.INT(1)[0].GetSymbol().GetText(),ctx.INT(0)[0]);
 	} else {
 		fmt.Println(ctx.ID().GetSymbol())
 	}
@@ -371,39 +371,39 @@ func (this *LeafListener) ExitA(ctx *parser.AContext) {
 >>
 
 RuleGetterListener(X) ::= <<
-func LeafListener struct {
-	*parser.BaseTListener
+type LeafListener struct {
+	*BaseTListener
 }
 
 func NewLeafListener() *LeafListener {
 	l := new(LeafListener)
-	l.BaseTListener = new(parser.BaseTListener)
+	l.BaseTListener = new(BaseTListener)
 	return l
 }
 
-func (this *LeafListener) ExitA(ctx parser.AContext) {
+func (this *LeafListener) ExitA(ctx *AContext) {
 	if (ctx.GetChildCount()==2) {
-		fmt.Printf("%s %s %s",ctx.b(0).start.GetText(),ctx.b(1).start.GetText(),ctx.b().Get(0).start.GetText());
-	} else
-		fmt.Println(ctx.b(0).start.GetText());
+		fmt.Printf("%s %s %s",ctx.B(0)[0].GetStart().GetText(),ctx.B(1)[0].GetStart().GetText(),ctx.B(-1)[0].GetStart().GetText());
+	} else {
+		fmt.Println(ctx.B(0)[0].GetStart().GetText());
 	}
 }
 >>
 
 LRListener(X) ::= <<
-func LeafListener struct {
-	*parser.BaseTListener
+type LeafListener struct {
+	*BaseTListener
 }
 
 func NewLeafListener() *LeafListener {
 	l := new(LeafListener)
-	l.BaseTListener = new(parser.BaseTListener)
+	l.BaseTListener = new(BaseTListener)
 	return l
 }
 
-func (this *LeafListener) ExitE(ctx *parser.EContext) {
+func (this *LeafListener) ExitE(ctx *EContext) {
 	if (ctx.GetChildCount()==3) {
-		fmt.Printf("%s %s %s\n",ctx.e(0).GetStart().GetText(), ctx.e(1).GetStart().GetText(), ctx.e().Get(0).GetStart().GetText());
+		fmt.Printf("%s %s %s\n",ctx.E(0)[0].GetStart().GetText(), ctx.E(1)[0].GetStart().GetText(), ctx.E(-1)[0].GetStart().GetText());
 	} else {
 		fmt.Println(ctx.INT().GetSymbol().GetText())
 	}
@@ -411,21 +411,21 @@ func (this *LeafListener) ExitE(ctx *parser.EContext) {
 >>
 
 LRWithLabelsListener(X) ::= <<
-func LeafListener struct {
-	*parser.BaseTListener
+type LeafListener struct {
+	*BaseTListener
 }
 
 func NewLeafListener() *LeafListener {
 	l := new(LeafListener)
-	l.BaseTListener = new(parser.BaseTListener)
-	return l`
+	l.BaseTListener = new(BaseTListener)
+	return l
 }
 
-func (this *LeafListener) ExitCall(ctx *parser.CallContext) {
-	fmt.Printf("%s %s",ctx.e().GetStart().GetText(),ctx.eList());
+func (this *LeafListener) ExitCall(ctx *CallContext) {
+	fmt.Printf("%s %s",ctx.E().GetStart().GetText(),ctx.EList());
 }
 
-func (this *LeafListener) ExitInt(ctx *parser.IntContext) {
+func (this *LeafListener) ExitInt(ctx *IntContext) {
 	fmt.Println(ctx.INT().GetSymbol().GetText());
 }
 >>
@@ -453,7 +453,7 @@ func pred(v bool) bool {
 }
 >>
 
-Invoke_pred(v) ::= <<this.pred(<v>)>>
+Invoke_pred(v) ::= <<p.pred(<v>)>>
 
 IgnoredTests ::= [
 	default: false
