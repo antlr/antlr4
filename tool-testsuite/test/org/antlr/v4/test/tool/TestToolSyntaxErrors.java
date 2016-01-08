@@ -486,7 +486,7 @@ public class TestToolSyntaxErrors extends BaseTest {
 				"lexer grammar Test;\n" +
 				"INVALID_RANGE:         'GH'..'LM';\n" +
 				"INVALID_RANGE_2:       'F'..'A' | 'Z';\n" +
-				"VALID_STRING_LITERALS: '\\u1234' | '\\t';\n" +
+				"VALID_STRING_LITERALS: '\\u1234' | '\\t' | [\\-\\]];\n" +
 				"INVALID_CHAR_SET:      [f-az][];\n" +
 				"INVALID_CHAR_SET_2:    [\\u24\\uA2][\\u24];\n" +  //https://github.com/antlr/antlr4/issues/1077
 				"INVALID_CHAR_SET_3:    [\\t\\{];";

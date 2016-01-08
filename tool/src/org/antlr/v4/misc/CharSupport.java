@@ -52,6 +52,8 @@ public class CharSupport {
 		ANTLRLiteralEscapedCharValue['\\'] = '\\';
 		ANTLRLiteralEscapedCharValue['\''] = '\'';
 		ANTLRLiteralEscapedCharValue['"'] = '"';
+		ANTLRLiteralEscapedCharValue['-'] = '-';
+		ANTLRLiteralEscapedCharValue[']'] = ']';
 		ANTLRLiteralCharValueEscape['\n'] = "\\n";
 		ANTLRLiteralCharValueEscape['\r'] = "\\r";
 		ANTLRLiteralCharValueEscape['\t'] = "\\t";
