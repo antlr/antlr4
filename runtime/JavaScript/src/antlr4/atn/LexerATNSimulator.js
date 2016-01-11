@@ -78,6 +78,7 @@ SimState.prototype.reset = function() {
 
 function LexerATNSimulator(recog, atn, decisionToDFA, sharedContextCache) {
 	ATNSimulator.call(this, atn, sharedContextCache);
+
 	this.decisionToDFA = decisionToDFA;
 	this.recog = recog;
 	// The current token's starting index into the character stream.
@@ -168,6 +169,10 @@ LexerATNSimulator.prototype.matchATN = function(input) {
 	var suppressEdge = s0_closure.hasSemanticContext;
 	s0_closure.hasSemanticContext = false;
 
+	if (PORT_DEBUG) {
+		console.log(s0_closure.toString())
+	}
+
 	var next = this.addDFAState(s0_closure);
 	if (!suppressEdge) {
 		this.decisionToDFA[this.mode].s0 = next;
@@ -216,7 +221,9 @@ LexerATNSimulator.prototype.execATN = function(input, ds0) {
 		// that already has lots of edges out of it. e.g., .* in comments.
 		// print("Target for:" + str(s) + " and:" + str(t))
 		var target = this.getExistingTargetState(s, t);
-		// print("Existing:" + str(target))
+//		if (PORT_DEBUG) {
+//			console.log(target)
+//		}
 		if (target === null) {
 			target = this.computeTargetState(input, s, t);
 			// print("Computed:" + str(target))
@@ -330,6 +337,11 @@ LexerATNSimulator.prototype.getReachableConfigSet = function(input, closure,
 	// this is used to skip processing for configs which have a lower priority
 	// than a config that already reached an accept state for the same rule
 	var skipAlt = ATN.INVALID_ALT_NUMBER;
+
+	if (PORT_DEBUG) {
+		console.log("CLOSURE SIZE" + closure.items.length)
+	}
+
 	for (var i = 0; i < closure.items.length; i++) {
 		var cfg = closure.items[i];
 		var currentAltReachedAcceptState = (cfg.alt === skipAlt);
@@ -383,6 +395,8 @@ LexerATNSimulator.prototype.getReachableTarget = function(trans, t) {
 };
 
 LexerATNSimulator.prototype.computeStartState = function(input, p) {
+
+	if (PORT_DEBUG) console.log("Num transitions", p.transitions.length)
 
 	var initialContext = PredictionContext.EMPTY;
 	var configs = new OrderedATNConfigSet();

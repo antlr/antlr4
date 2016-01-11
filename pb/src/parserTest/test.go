@@ -3,40 +3,38 @@ package main
 import (
 	"antlr4"
 	"parser"
-	//"fmt"
+	"fmt"
 )
 
-/*
 type MyListener struct {
-	*parser.BaseArithmeticListener
+	*parser.BaseJSONListener
 }
 
 func NewMyPrinter() *MyListener {
 	return new(MyListener)
 }
 
-func (k *MyListener) EnterExpression(ctx *parser.ExpressionContext) {
-	fmt.Println("Oh, an expression!")
+func (s *MyListener) EnterValue(ctx *parser.ValueContext) {
+	fmt.Println(ctx.GetStart().GetText())
 }
 
-func (k *MyListener) EnterAtom(ctx *parser.AtomContext) {
-	fmt.Println(ctx)
-}
-*/
 func main() {
 
 	a := antlr4.NewFileStream("foo.txt")
 
-	l := parser.NewExprLexer(a)
+	l := parser.NewJSONLexer(a)
 
 	s := antlr4.NewCommonTokenStream(l, 0)
 
-	p := parser.NewExprParser(s)
+	p := parser.NewJSONParser(s)
 
 	p.BuildParseTrees = true
 
-	//var printer = NewMyPrinter()
-	//antlr4.ParseTreeWalkerDefault.Walk(printer, tree);
+	tree := p.Json()
+
+	var printer = NewMyPrinter()
+
+	antlr4.ParseTreeWalkerDefault.Walk(printer, tree);
 
 	// fmt.Println( tree.GetChildren()[0].GetChildren()[0].GetChildren()[0].GetChildren()[0].GetChildren()[0].GetChildren()[0].GetChildren()[0] );
 

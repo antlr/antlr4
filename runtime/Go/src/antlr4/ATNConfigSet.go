@@ -310,7 +310,7 @@ func (this *BaseATNConfigSet) String() string {
 	for i, c := range this.configs {
 		s += c.String()
 		if i != len(this.configs)-1 {
-			s += ","
+			s += ", "
 		}
 	}
 
@@ -344,7 +344,7 @@ func NewOrderedATNConfigSet() *OrderedATNConfigSet {
 	this := new(OrderedATNConfigSet)
 
 	this.BaseATNConfigSet = NewBaseATNConfigSet(false)
-	//	this.configLookup = NewSet(nil, nil) // TODO not sure why this would be overriden
+	this.configLookup = NewSet(nil, nil)
 
 	return this
 }

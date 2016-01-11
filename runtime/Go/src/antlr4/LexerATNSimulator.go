@@ -157,7 +157,7 @@ func (this *LexerATNSimulator) MatchATN(input CharStream) int {
 	var suppressEdge = s0_closure.hasSemanticContext
 	s0_closure.hasSemanticContext = false
 
-	var next = this.addDFAState(s0_closure.BaseATNConfigSet)
+	var next = this.addDFAState(s0_closure)
 
 	if !suppressEdge {
 		this.DecisionToDFA[this.mode].s0 = next
@@ -207,7 +207,9 @@ func (this *LexerATNSimulator) execATN(input CharStream, ds0 *DFAState) int {
 		// that already has lots of edges out of it. e.g., .* in comments.
 		// print("Target for:" + str(s) + " and:" + str(t))
 		var target = this.getExistingTargetState(s, t)
-		// print("Existing:" + str(target))
+//		if PortDebug {
+//			fmt.Println(target)
+//		}
 		if target == nil {
 			target = this.computeTargetState(input, s, t)
 			// print("Computed:" + str(target))
@@ -274,6 +276,7 @@ func (this *LexerATNSimulator) getExistingTargetState(s *DFAState, t int) *DFASt
 // returns {@link //ERROR}.
 func (this *LexerATNSimulator) computeTargetState(input CharStream, s *DFAState, t int) *DFAState {
 	var reach = NewOrderedATNConfigSet()
+
 	// if we don't find an existing DFA state
 	// Fill reach starting from closure, following t transitions
 	this.getReachableConfigSet(input, s.configs, reach.BaseATNConfigSet, t)
@@ -316,14 +319,22 @@ func (this *LexerATNSimulator) getReachableConfigSet(input CharStream, closure A
 	// this is used to Skip processing for configs which have a lower priority
 	// than a config that already reached an accept state for the same rule
 	var SkipAlt = ATNInvalidAltNumber
+
+	if PortDebug {
+		fmt.Println("CLOSURE SIZE" + strconv.Itoa(len(closure.GetItems())))
+	}
+
 	for _, cfg := range closure.GetItems() {
 		var currentAltReachedAcceptState = (cfg.GetAlt() == SkipAlt)
 		if currentAltReachedAcceptState && cfg.(*LexerATNConfig).passedThroughNonGreedyDecision {
 			continue
 		}
+
 		if LexerATNSimulatorDebug {
+
 			fmt.Printf("testing %s at %s\n", this.GetTokenName(t), cfg.String()) // this.recog, true))
 		}
+
 		for _, trans := range cfg.GetState().GetTransitions() {
 			var target = this.getReachableTarget(trans, t)
 			if target != nil {
@@ -368,18 +379,14 @@ func (this *LexerATNSimulator) getReachableTarget(trans Transition, t int) ATNSt
 func (this *LexerATNSimulator) computeStartState(input CharStream, p ATNState) *OrderedATNConfigSet {
 
 	if PortDebug {
-		fmt.Println("DEBUG" + strconv.Itoa(len(p.GetTransitions())))
+		fmt.Println("Num transitions" + strconv.Itoa(len(p.GetTransitions())))
 	}
 
 	var configs = NewOrderedATNConfigSet()
 	for i := 0; i < len(p.GetTransitions()); i++ {
 		var target = p.GetTransitions()[i].getTarget()
 		var cfg = NewLexerATNConfig6(target, i+1, BasePredictionContextEMPTY)
-		this.closure(input, cfg, configs.BaseATNConfigSet, false, false, false)
-	}
-
-	if PortDebug {
-		fmt.Println("DEBUG" + configs.String())
+		this.closure(input, cfg, configs, false, false, false)
 	}
 
 	return configs
