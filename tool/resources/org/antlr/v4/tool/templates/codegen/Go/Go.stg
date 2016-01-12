@@ -596,7 +596,7 @@ TokenPropertyRef_line(t) ::= "(func() int { if <ctx(t)>.get<t.label; format={cap
 TokenPropertyRef_pos(t) ::= "(func() int { if <ctx(t)>.get<t.label; format={cap}>() == nil { return 0 } else { return <ctx(t)>.get<t.label; format={cap}>().GetColumn() }}())"
 TokenPropertyRef_channel(t) ::= "(func() int { if <ctx(t)>.get<t.label; format={cap}>() == nil { return 0 } else { return <ctx(t)>.get<t.label; format={cap}>().GetChannel() }}())"
 TokenPropertyRef_index(t) ::= "(func() int { if <ctx(t)>.get<t.label; format={cap}>() == nil { return 0 } else { return <ctx(t)>.get<t.label; format={cap}>().GetTokenIndex() }}())"
-TokenPropertyRef_int(t) ::= "(func() int { if <ctx(t)>.get<t.label; format={cap}>() == nil { return 0 } else { return strconv.Atoi(<ctx(t)>.get<t.label; format={cap}>().GetText()) }}())"
+TokenPropertyRef_int(t) ::= "(func() int { if <ctx(t)>.get<t.label; format={cap}>() == nil { return 0 } else { i,_ := strconv.Atoi(<ctx(t)>.get<t.label; format={cap}>().GetText()); return i }}())"
 
 RulePropertyRef_start(r) ::= "(func() antlr4.Token { if <ctx(r)>.get<r.label;format={cap}>() == nil { return nil } else { return <ctx(r)>.get<r.label;format={cap}>().GetStart() }}())"
 RulePropertyRef_stop(r)	 ::= "(func() antlr4.Token { if <ctx(r)>.get<r.label;format={cap}>() == nil { return nil } else { return <ctx(r)>.get<r.label;format={cap}>().GetStop() }}())"
@@ -657,7 +657,7 @@ fail: ContextRuleListGetterDecl should never be called!
 >>
 
 ContextRuleListIndexedGetterDecl(r)   ::= <<
-<r.name; format="cap">(i int) []*<r.ctxName> {
+<r.name>(i int) []*<r.ctxName> {
     var ts []antlr4.RuleContext;
 
     if i \< 0 {

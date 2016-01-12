@@ -159,9 +159,9 @@ True() ::= "true"
 
 Not(v) ::= "!<v>"
 
-Assert(s) ::= <<assert(<s>)>>
+Assert(s) ::= ""
 
-Cast(t,v) ::= "((<t>)<v>)"
+Cast(t,v) ::= "(<v>)"
 
 Append(a,b) ::= "<a> + fmt.Sprint(<b>)"
 
@@ -169,7 +169,7 @@ Concat(a,b) ::= "<a><b>"
 
 DeclareLocal(s,v) ::= "<s> := <v>"
 
-AssertIsList(v) ::= "List\<?> __ttt__ = <v>;" // just use type system
+AssertIsList(v) ::= ""
 
 AssignLocal(s,v) ::= "<s> = <v>;"
 
