@@ -325,6 +325,10 @@ func (bt *CommonTokenStream) GetAllText() string {
 }
 
 func (bt *CommonTokenStream) GetTextFromTokens(start, end Token) string {
+	if start == nil || end == nil {
+		return ""
+	}
+
 	return bt.GetTextFromInterval(NewInterval(start.GetTokenIndex(), end.GetTokenIndex()))
 }
 
@@ -374,6 +378,7 @@ func (ts *CommonTokenStream) adjustSeekIndex(i int) int {
 }
 
 func (ts *CommonTokenStream) LB(k int) Token {
+
 	if k == 0 || ts.index-k < 0 {
 		return nil
 	}

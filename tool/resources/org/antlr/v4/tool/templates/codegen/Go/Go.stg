@@ -578,35 +578,35 @@ ActionTemplate(t) ::= "<t.st>"
 ArgRef(a) ::= "<ctx(a)>.<a.name>"
 LocalRef(a) ::= "<ctx(a)>.<a.name>"
 RetValueRef(a) ::= "<ctx(a)>.<a.name>"
-QRetValueRef(a) ::= "<ctx(a)>.get<a.dict;format={cap}>().get<a.name;format={cap}>()"
+QRetValueRef(a) ::= "<ctx(a)>.Get<a.dict;format={cap}>().Get<a.name;format={cap}>()"
 
 /** How to translate $tokenLabel */
-TokenRef(t) ::= "<ctx(t)>.get<t.name;format={cap}>()"
-LabelRef(t) ::= "<ctx(t)>.get<t.name;format={cap}>()"
-ListLabelRef(t) ::= "<ctx(t)>.get<ListLabelName(t.name);format={cap}>"
+TokenRef(t) ::= "<ctx(t)>.Get<t.name;format={cap}>()"
+LabelRef(t) ::= "<ctx(t)>.Get<t.name;format={cap}>()"
+ListLabelRef(t) ::= "<ctx(t)>.Get<ListLabelName(t.name);format={cap}>"
 
 SetAttr(s,rhsChunks) ::= "<ctx(s)>.set<s.name; format={cap}>(<rhsChunks>)"
 
 TokenLabelType() ::= "<file.TokenLabelType; null={antlr4.Token}>"
 InputSymbolType() ::= "<file.InputSymbolType; null={antlr4.Token}>"
 
-TokenPropertyRef_text(t) ::= "(func() string { if <ctx(t)>.get<t.label; format={cap}>() == nil { return \"\" } else { return <ctx(t)>.get<t.label; format={cap}>().GetText() }}())"
-TokenPropertyRef_type(t) ::=  "(func() int { if <ctx(t)>.get<t.label; format={cap}>() == nil { return 0 } else { return <ctx(t)>.get<t.label; format={cap}>().GetTokenType() }}())"
-TokenPropertyRef_line(t) ::= "(func() int { if <ctx(t)>.get<t.label; format={cap}>() == nil { return 0 } else { return <ctx(t)>.get<t.label; format={cap}>().GetLine() }}())"
-TokenPropertyRef_pos(t) ::= "(func() int { if <ctx(t)>.get<t.label; format={cap}>() == nil { return 0 } else { return <ctx(t)>.get<t.label; format={cap}>().GetColumn() }}())"
-TokenPropertyRef_channel(t) ::= "(func() int { if <ctx(t)>.get<t.label; format={cap}>() == nil { return 0 } else { return <ctx(t)>.get<t.label; format={cap}>().GetChannel() }}())"
-TokenPropertyRef_index(t) ::= "(func() int { if <ctx(t)>.get<t.label; format={cap}>() == nil { return 0 } else { return <ctx(t)>.get<t.label; format={cap}>().GetTokenIndex() }}())"
-TokenPropertyRef_int(t) ::= "(func() int { if <ctx(t)>.get<t.label; format={cap}>() == nil { return 0 } else { i,_ := strconv.Atoi(<ctx(t)>.get<t.label; format={cap}>().GetText()); return i }}())"
+TokenPropertyRef_text(t) ::= "(func() string { if <ctx(t)>.Get<t.label; format={cap}>() == nil { return \"\" } else { return <ctx(t)>.Get<t.label; format={cap}>().GetText() }}())"
+TokenPropertyRef_type(t) ::=  "(func() int { if <ctx(t)>.Get<t.label; format={cap}>() == nil { return 0 } else { return <ctx(t)>.Get<t.label; format={cap}>().GetTokenType() }}())"
+TokenPropertyRef_line(t) ::= "(func() int { if <ctx(t)>.Get<t.label; format={cap}>() == nil { return 0 } else { return <ctx(t)>.Get<t.label; format={cap}>().GetLine() }}())"
+TokenPropertyRef_pos(t) ::= "(func() int { if <ctx(t)>.Get<t.label; format={cap}>() == nil { return 0 } else { return <ctx(t)>.Get<t.label; format={cap}>().GetColumn() }}())"
+TokenPropertyRef_channel(t) ::= "(func() int { if <ctx(t)>.Get<t.label; format={cap}>() == nil { return 0 } else { return <ctx(t)>.Get<t.label; format={cap}>().GetChannel() }}())"
+TokenPropertyRef_index(t) ::= "(func() int { if <ctx(t)>.Get<t.label; format={cap}>() == nil { return 0 } else { return <ctx(t)>.Get<t.label; format={cap}>().GetTokenIndex() }}())"
+TokenPropertyRef_int(t) ::= "(func() int { if <ctx(t)>.Get<t.label; format={cap}>() == nil { return 0 } else { i,_ := strconv.Atoi(<ctx(t)>.Get<t.label; format={cap}>().GetText()); return i }}())"
 
-RulePropertyRef_start(r) ::= "(func() antlr4.Token { if <ctx(r)>.get<r.label;format={cap}>() == nil { return nil } else { return <ctx(r)>.get<r.label;format={cap}>().GetStart() }}())"
-RulePropertyRef_stop(r)	 ::= "(func() antlr4.Token { if <ctx(r)>.get<r.label;format={cap}>() == nil { return nil } else { return <ctx(r)>.get<r.label;format={cap}>().GetStop() }}())"
-RulePropertyRef_text(r)	 ::= "(func() string { if <ctx(r)>.get<r.label;format={cap}>() == nil { return \"\" } else { return p.GetTokenStream().GetTextFromInterval( antlr4.NewInterval( <ctx(r)>.get<r.label;format={cap}>().GetStart().GetTokenIndex(),<ctx(r)>.<r.label>.GetStop().GetTokenIndex())) }}())"
-RulePropertyRef_ctx(r)	 ::= "<ctx(r)>.get<r.label;format={cap}>()"
+RulePropertyRef_start(r) ::= "(func() antlr4.Token { if <ctx(r)>.Get<r.label;format={cap}>() == nil { return nil } else { return <ctx(r)>.Get<r.label;format={cap}>().GetStart() }}())"
+RulePropertyRef_stop(r)	 ::= "(func() antlr4.Token { if <ctx(r)>.Get<r.label;format={cap}>() == nil { return nil } else { return <ctx(r)>.Get<r.label;format={cap}>().GetStop() }}())"
+RulePropertyRef_text(r)	 ::= "(func() string { if <ctx(r)>.Get<r.label;format={cap}>() == nil { return \"\" } else { return p.GetTokenStream().GetTextFromTokens( <ctx(r)>.Get<r.label;format={cap}>().GetStart(),<ctx(r)>.<r.label>.GetStop())) }}())"
+RulePropertyRef_ctx(r)	 ::= "<ctx(r)>.Get<r.label;format={cap}>()"
 RulePropertyRef_parser(r)	 ::= "p"
 
 ThisRulePropertyRef_start(r) ::= "localctx.GetStart()"
 ThisRulePropertyRef_stop(r)	 ::= "localctx.GetStop()"
-ThisRulePropertyRef_text(r)	 ::= "p.GetTokenStream().GetTextFromInterval(antlr4.NewInterval(localctx.GetStart().GetTokenIndex(), p.GetTokenStream().LT(-1).GetTokenIndex()))"
+ThisRulePropertyRef_text(r)	 ::= "p.GetTokenStream().GetTextFromTokens(localctx.GetStart(), p.GetTokenStream().LT(-1))"
 ThisRulePropertyRef_ctx(r)	 ::= "<ctx(r)>"
 ThisRulePropertyRef_parser(r)	 ::= "p"
 
@@ -646,8 +646,14 @@ ContextTokenListIndexedGetterDecl(t)  ::= <<
 >>
 
 ContextRuleGetterDecl(r)       ::= <<
-<r.name; format="cap">() *<r.ctxName> {
-    return s.GetTypedRuleContext(reflect.TypeOf((*<r.ctxName>)(nil)).Elem(),0).(*<r.ctxName>)
+<r.name; format="cap">() I<r.ctxName> {
+    v := s.GetTypedRuleContext( reflect.TypeOf((*I<r.ctxName>)(nil)).Elem(),0);
+
+    if v == nil {
+        return nil
+    }
+
+    return v.(I<r.ctxName>)
 }
 >>
 
@@ -657,18 +663,22 @@ fail: ContextRuleListGetterDecl should never be called!
 >>
 
 ContextRuleListIndexedGetterDecl(r)   ::= <<
-<r.name>(i int) []*<r.ctxName> {
+<r.name; format="cap">(i int) []I<r.ctxName> {
     var ts []antlr4.RuleContext;
 
     if i \< 0 {
-        ts = s.GetTypedRuleContexts( reflect.PtrTo( reflect.TypeOf((*<r.ctxName>)(nil)).Elem() ))
+        ts = s.GetTypedRuleContexts( reflect.TypeOf((*I<r.ctxName>)(nil)).Elem())
     } else {
-        ts = []antlr4.RuleContext { s.GetTypedRuleContext( reflect.PtrTo( reflect.TypeOf((*<r.ctxName>)(nil)).Elem() ),i) }
+        ts = []antlr4.RuleContext { s.GetTypedRuleContext( reflect.TypeOf((*I<r.ctxName>)(nil)).Elem(),i) }
     }
 
-    var tst []*<r.ctxName> = make([]*<r.ctxName>, len(ts))
+    var tst []I<r.ctxName> = make([]I<r.ctxName>, len(ts))
     for i, t := range ts {
-        tst[i] = t.(*<r.ctxName>)
+        if t == nil {
+            tst[i] = nil
+        } else {
+            tst[i] = t.(I<r.ctxName>)
+        }
     }
 
     return tst
@@ -698,20 +708,20 @@ StructDecl(struct,ctorAttrs,attrs,getters,dispatchMethods,interfaces,extensionMe
 type I<struct.name> interface {
     antlr4.ParserRuleContext
 
-    getParser() antlr4.Parser
+    GetParser() antlr4.Parser
 
-    <struct.tokenDecls:{a | get<a.name; format="cap">() <TokenLabelType()> }; separator="\n">
-    <struct.tokenDecls:{a | set<a.name; format="cap">(<TokenLabelType()>) }; separator="\n">
-    <struct.tokenTypeDecls:{a | get<a.name; format="cap">() int }; separator="\n">
-    <struct.tokenTypeDecls:{a | set<a.name; format="cap">(int) }; separator="\n">
-    <struct.tokenListDecls:{a | get<a.name; format="cap">() []<TokenLabelType()>}; separator="\n">
-    <struct.tokenListDecls:{a | set<a.name; format="cap">([]<TokenLabelType()>)}; separator="\n">
-    <struct.ruleContextDecls:{a | get<a.name; format="cap">() I<a.ctxName>}; separator="\n">
-    <struct.ruleContextDecls:{a | set<a.name; format="cap">(I<a.ctxName>)}; separator="\n">
-    <struct.ruleContextListDecls:{a | get<a.name; format="cap">() []I<a.ctxName>}; separator="\n">
-    <struct.ruleContextListDecls:{a | set<a.name; format="cap">([]I<a.ctxName>) }; separator="\n">
-    <struct.attributeDecls:{a | get<a.name; format="cap">() <a.type;format="lower">}; separator="\n">
-    <struct.attributeDecls:{a | set<a.name; format="cap">(<a.type;format="lower">)}; separator="\n">
+    <struct.tokenDecls:{a | Get<a.name; format="cap">() <TokenLabelType()> }; separator="\n">
+    <struct.tokenDecls:{a | Set<a.name; format="cap">(<TokenLabelType()>) }; separator="\n">
+    <struct.tokenTypeDecls:{a | Get<a.name; format="cap">() int }; separator="\n">
+    <struct.tokenTypeDecls:{a | Set<a.name; format="cap">(int) }; separator="\n">
+    <struct.tokenListDecls:{a | Get<a.name; format="cap">() []<TokenLabelType()>}; separator="\n">
+    <struct.tokenListDecls:{a | Set<a.name; format="cap">([]<TokenLabelType()>)}; separator="\n">
+    <struct.ruleContextDecls:{a | Get<a.name; format="cap">() I<a.ctxName>}; separator="\n">
+    <struct.ruleContextDecls:{a | Set<a.name; format="cap">(I<a.ctxName>)}; separator="\n">
+    <struct.ruleContextListDecls:{a | Get<a.name; format="cap">() []I<a.ctxName>}; separator="\n">
+    <struct.ruleContextListDecls:{a | Set<a.name; format="cap">([]I<a.ctxName>) }; separator="\n">
+    <struct.attributeDecls:{a | Get<a.name; format="cap">() <a.type;format="lower">}; separator="\n">
+    <struct.attributeDecls:{a | Set<a.name; format="cap">(<a.type;format="lower">)}; separator="\n">
 }
 
 type <struct.name> struct {
@@ -741,20 +751,20 @@ func New<struct.name>(parser antlr4.Parser, parent antlr4.ParserRuleContext, inv
     return p
 }
 
-func (s *<struct.name>) getParser() antlr4.Parser { return s.parser }
+func (s *<struct.name>) GetParser() antlr4.Parser { return s.parser }
 
-<struct.tokenDecls:{a | func (s *<struct.name>) get<a.name; format="cap">() <TokenLabelType()> { return s.<a.name> \} }; separator="\n">
-<struct.tokenDecls:{a | func (s *<struct.name>) set<a.name; format="cap">(v <TokenLabelType()>) { s.<a.name> = v \} }; separator="\n">
-<struct.tokenTypeDecls:{a | func (s *<struct.name>) get<a.name; format="cap">() int { return s.<a.name> \}  }; separator="\n">
-<struct.tokenTypeDecls:{a | func (s *<struct.name>) set<a.name; format="cap">(v int) { s.<a.name> = v \} }; separator="\n">
-<struct.tokenListDecls:{a | func (s *<struct.name>) get<a.name; format="cap">() []<TokenLabelType()>  { return s.<a.name> \} }; separator="\n">
-<struct.tokenListDecls:{a | func (s *<struct.name>) set<a.name; format="cap">(v []<TokenLabelType()>) { s.<a.name> = v \}}; separator="\n">
-<struct.ruleContextDecls:{a | func (s *<struct.name>) get<a.name; format="cap">() I<a.ctxName>  { return s.<a.name> \} }; separator="\n">
-<struct.ruleContextDecls:{a | func (s *<struct.name>) set<a.name; format="cap">(v I<a.ctxName>) { s.<a.name> = v \}}; separator="\n">
-<struct.ruleContextListDecls:{a | func (s *<struct.name>) get<a.name; format="cap">() []I<a.ctxName>  { return s.<a.name> \} }; separator="\n">
-<struct.ruleContextListDecls:{a | func (s *<struct.name>) set<a.name; format="cap">(v []I<a.ctxName>) { s.<a.name> = v \} }; separator="\n">
-<struct.attributeDecls:{a | func (s *<struct.name>) get<a.name; format="cap">() <a.type;format="lower">  { return s.<a.name> \} }; separator="\n">
-<struct.attributeDecls:{a | func (s *<struct.name>) set<a.name; format="cap">(v <a.type;format="lower">) { s.<a.name> = v \}}; separator="\n">
+<struct.tokenDecls:{a | func (s *<struct.name>) Get<a.name; format="cap">() <TokenLabelType()> { return s.<a.name> \} }; separator="\n">
+<struct.tokenDecls:{a | func (s *<struct.name>) Set<a.name; format="cap">(v <TokenLabelType()>) { s.<a.name> = v \} }; separator="\n">
+<struct.tokenTypeDecls:{a | func (s *<struct.name>) Get<a.name; format="cap">() int { return s.<a.name> \}  }; separator="\n">
+<struct.tokenTypeDecls:{a | func (s *<struct.name>) Set<a.name; format="cap">(v int) { s.<a.name> = v \} }; separator="\n">
+<struct.tokenListDecls:{a | func (s *<struct.name>) Get<a.name; format="cap">() []<TokenLabelType()>  { return s.<a.name> \} }; separator="\n">
+<struct.tokenListDecls:{a | func (s *<struct.name>) Set<a.name; format="cap">(v []<TokenLabelType()>) { s.<a.name> = v \}}; separator="\n">
+<struct.ruleContextDecls:{a | func (s *<struct.name>) Get<a.name; format="cap">() I<a.ctxName>  { return s.<a.name> \} }; separator="\n">
+<struct.ruleContextDecls:{a | func (s *<struct.name>) Set<a.name; format="cap">(v I<a.ctxName>) { s.<a.name> = v \}}; separator="\n">
+<struct.ruleContextListDecls:{a | func (s *<struct.name>) Get<a.name; format="cap">() []I<a.ctxName>  { return s.<a.name> \} }; separator="\n">
+<struct.ruleContextListDecls:{a | func (s *<struct.name>) Set<a.name; format="cap">(v []I<a.ctxName>) { s.<a.name> = v \} }; separator="\n">
+<struct.attributeDecls:{a | func (s *<struct.name>) Get<a.name; format="cap">() <a.type;format="lower">  { return s.<a.name> \} }; separator="\n">
+<struct.attributeDecls:{a | func (s *<struct.name>) Set<a.name; format="cap">(v <a.type;format="lower">) { s.<a.name> = v \}}; separator="\n">
 
 <getters:{g | func (s *<struct.name>) <g>}; separator="\n\n">
 
@@ -793,18 +803,18 @@ func New<struct.name>(parser antlr4.Parser, ctx antlr4.ParserRuleContext) *<stru
     return p
 }
 
-<struct.tokenDecls:{a | func (s *<struct.name>) get<a.name; format="cap">() <TokenLabelType()> { return s.<a.name> \} }; separator="\n">
-<struct.tokenDecls:{a | func (s *<struct.name>) set<a.name; format="cap">(v <TokenLabelType()>) { s.<a.name> = v \} }; separator="\n">
-<struct.tokenTypeDecls:{a | func (s *<struct.name>) get<a.name; format="cap">() int { return s.<a.name> \}  }; separator="\n">
-<struct.tokenTypeDecls:{a | func (s *<struct.name>) set<a.name; format="cap">(v int) { s.<a.name> = v \} }; separator="\n">
-<struct.tokenListDecls:{a | func (s *<struct.name>) get<a.name; format="cap">() []<TokenLabelType()>  { return s.<a.name> \} }; separator="\n">
-<struct.tokenListDecls:{a | func (s *<struct.name>) set<a.name; format="cap">(v []<TokenLabelType()>) { s.<a.name> = v \}}; separator="\n">
-<struct.ruleContextDecls:{a | func (s *<struct.name>) get<a.name; format="cap">() I<a.ctxName>  { return s.<a.name> \} }; separator="\n">
-<struct.ruleContextDecls:{a | func (s *<struct.name>) set<a.name; format="cap">(v I<a.ctxName>) { s.<a.name> = v \}}; separator="\n">
-<struct.ruleContextListDecls:{a | func (s *<struct.name>) get<a.name; format="cap">() []I<a.ctxName>  { return s.<a.name> \} }; separator="\n">
-<struct.ruleContextListDecls:{a | func (s *<struct.name>) set<a.name; format="cap">(v []I<a.ctxName>) { s.<a.name> = v \} }; separator="\n">
-<struct.attributeDecls:{a | func (s *<struct.name>) get<a.name; format="cap">() <a.type;format="lower">  { return s.<a.name> \} }; separator="\n">
-<struct.attributeDecls:{a | func (s *<struct.name>) set<a.name; format="cap">(v <a.type;format="lower">) { s.<a.name> = v \}}; separator="\n">
+<struct.tokenDecls:{a | func (s *<struct.name>) Get<a.name; format="cap">() <TokenLabelType()> { return s.<a.name> \} }; separator="\n">
+<struct.tokenDecls:{a | func (s *<struct.name>) Set<a.name; format="cap">(v <TokenLabelType()>) { s.<a.name> = v \} }; separator="\n">
+<struct.tokenTypeDecls:{a | func (s *<struct.name>) Get<a.name; format="cap">() int { return s.<a.name> \}  }; separator="\n">
+<struct.tokenTypeDecls:{a | func (s *<struct.name>) Set<a.name; format="cap">(v int) { s.<a.name> = v \} }; separator="\n">
+<struct.tokenListDecls:{a | func (s *<struct.name>) Get<a.name; format="cap">() []<TokenLabelType()>  { return s.<a.name> \} }; separator="\n">
+<struct.tokenListDecls:{a | func (s *<struct.name>) Set<a.name; format="cap">(v []<TokenLabelType()>) { s.<a.name> = v \}}; separator="\n">
+<struct.ruleContextDecls:{a | func (s *<struct.name>) Get<a.name; format="cap">() I<a.ctxName>  { return s.<a.name> \} }; separator="\n">
+<struct.ruleContextDecls:{a | func (s *<struct.name>) Set<a.name; format="cap">(v I<a.ctxName>) { s.<a.name> = v \}}; separator="\n">
+<struct.ruleContextListDecls:{a | func (s *<struct.name>) Get<a.name; format="cap">() []I<a.ctxName>  { return s.<a.name> \} }; separator="\n">
+<struct.ruleContextListDecls:{a | func (s *<struct.name>) Set<a.name; format="cap">(v []I<a.ctxName>) { s.<a.name> = v \} }; separator="\n">
+<struct.attributeDecls:{a | func (s *<struct.name>) Get<a.name; format="cap">() <a.type;format="lower">  { return s.<a.name> \} }; separator="\n">
+<struct.attributeDecls:{a | func (s *<struct.name>) Set<a.name; format="cap">(v <a.type;format="lower">) { s.<a.name> = v \}}; separator="\n">
 
 func (s *<struct.name>) GetRuleContext() antlr4.RuleContext { return s }
 

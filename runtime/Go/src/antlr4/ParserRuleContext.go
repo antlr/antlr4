@@ -3,6 +3,7 @@ package antlr4
 import (
 	"reflect"
 	"strconv"
+//	"fmt"
 )
 
 type ParserRuleContext interface {
@@ -246,7 +247,7 @@ func (prc *BaseParserRuleContext) getChild(ctxType reflect.Type, i int) RuleCont
 
 		childType := reflect.TypeOf(o)
 
-		if ( childType.ConvertibleTo(ctxType) ) {
+		if ( childType.Implements(ctxType) ) {
 			j++
 			if ( j == i ) {
 				return o.(RuleContext)

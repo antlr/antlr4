@@ -93,8 +93,20 @@ func (is *InputStream) GetText(start int, stop int) string {
 	}
 }
 
+func (is *InputStream) GetTextFromTokens(start, stop Token) string {
+	if ( start!=nil && stop !=nil ) {
+		return is.GetTextFromInterval(NewInterval(start.GetTokenIndex(), stop.GetTokenIndex()));
+	}
+
+	return "";
+}
+
 func (is *InputStream) GetTextFromInterval(i *Interval) string {
 	return is.GetText(i.start, i.stop)
+}
+
+func (f *InputStream) GetSourceName() string {
+	return "Obtained from string"
 }
 
 func (is *InputStream) String() string {
