@@ -260,9 +260,9 @@ RuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,namedActions,fina
 
 <altLabelCtxs:{l | <altLabelCtxs.(l)>}; separator="\n">
 
-func (p *<parser.name>) <currentRule.name; format="cap">(<currentRule.args:{a | <a.name> <a.type>}; separator=", ">) I<currentRule.ctxType> {
+func (p *<parser.name>) <currentRule.name; format="cap">(<currentRule.args:{a | <a.name> <a.type>}; separator=", ">) (localctx I<currentRule.ctxType>) {
 
-    var localctx I<currentRule.ctxType> = New<currentRule.ctxType>(p, p.GetParserRuleContext(), p.GetState()<currentRule.args:{a | , <a.name>}>)
+    localctx = New<currentRule.ctxType>(p, p.GetParserRuleContext(), p.GetState()<currentRule.args:{a | , <a.name>}>)
     p.EnterRule(localctx, <currentRule.startState>, <parser.name>RULE_<currentRule.name>)
     <namedActions.init>
     <if(locals)>var <locals; separator="\nvar "><endif>
@@ -304,11 +304,11 @@ LeftRecursiveRuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,
 <ruleCtx>
 <altLabelCtxs:{l | <altLabelCtxs.(l)>}; separator="\n">
 
-func (p *<parser.name>) <currentRule.name; format="cap">(_p int<if(currentRule.args)>, <args:{a | , <a.name> <a.type>}><endif>) I<currentRule.ctxType> {
+func (p *<parser.name>) <currentRule.name; format="cap">(_p int<if(currentRule.args)>, <args:{a | , <a.name> <a.type>}><endif>) (localctx I<currentRule.ctxType>) {
 
     var _parentctx antlr4.ParserRuleContext = p.GetParserRuleContext()
     _parentState := p.GetState()
-    var localctx I<currentRule.ctxType> = New<currentRule.ctxType>(p, p.GetParserRuleContext(), _parentState<args:{a | , <a.name>}>)
+    localctx = New<currentRule.ctxType>(p, p.GetParserRuleContext(), _parentState<args:{a | , <a.name>}>)
     var _prevctx I<currentRule.ctxType> = localctx
     var _ antlr4.ParserRuleContext = _prevctx // to prevent unused variable warning
     _startState := <currentRule.startState>
@@ -585,7 +585,7 @@ TokenRef(t) ::= "<ctx(t)>.Get<t.name;format={cap}>()"
 LabelRef(t) ::= "<ctx(t)>.Get<t.name;format={cap}>()"
 ListLabelRef(t) ::= "<ctx(t)>.Get<ListLabelName(t.name);format={cap}>"
 
-SetAttr(s,rhsChunks) ::= "<ctx(s)>.set<s.name; format={cap}>(<rhsChunks>)"
+SetAttr(s,rhsChunks) ::= "<ctx(s)>.Set<s.name; format={cap}>(<rhsChunks>)"
 
 TokenLabelType() ::= "<file.TokenLabelType; null={antlr4.Token}>"
 InputSymbolType() ::= "<file.InputSymbolType; null={antlr4.Token}>"
