@@ -372,6 +372,22 @@ public class Antlr4Mojo extends AbstractMojo {
         scan.addSourceMapping(mapping);
         Set<File> grammarFiles = scan.getIncludedSources(sourceDirectory, null);
 
+        // We don't want the plugin to run for every grammar, regardless of whether
+        // it's changed since the last compilation. Check the mtime of the tokens vs
+        // the grammar file mtime to determine whether we even need to execute.
+        Set<File> grammarFilesToProcess = new HashSet<File>();
+
+        for (File grammarFile : grammarFiles) {
+            String tokensFileName = grammarFile.getName().split("\\.")[0] + ".tokens";
+            File outputFile = new File(outputDirectory, tokensFileName);
+            if ( (! outputFile.exists()) ||
+                 outputFile.lastModified() < grammarFile.lastModified() ) {
+                grammarFilesToProcess.add(grammarFile);
+            }
+        }
+
+        grammarFiles = grammarFilesToProcess;
+
         if (grammarFiles.isEmpty()) {
             getLog().info("No grammars to process");
 			return Collections.emptyList();
