@@ -671,7 +671,14 @@ func (this *BaseParser) GetRuleInvocationStack(p ParserRuleContext) []string {
 		} else {
 			stack = append(stack, this.GetRuleNames()[ruleIndex])
 		}
-		p = p.GetParent().(ParserRuleContext)
+
+		vp := p.GetParent()
+
+		if vp == nil {
+			break
+		}
+
+		p = vp.(ParserRuleContext)
 	}
 	return stack
 }
