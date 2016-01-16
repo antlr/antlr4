@@ -341,14 +341,6 @@ public abstract class BaseTest {
 			boolean defaultListener, String... extraOptions) {
 		ErrorQueue equeue = antlr(grammarFileName, grammarFileName, grammarStr,
 				defaultListener, extraOptions);
-		if (!equeue.errors.isEmpty()) {
-			System.err.println("PRINTING ERROR QUEUE");
-
-			System.err.println("++++++++++++++++++++++++++++++++++++++++++++++");
-			System.err.println(equeue.toString());
-			System.err.println("++++++++++++++++++++++++++++++++++++++++++++++");
-			return false;
-		}
 
 //		List<String> files = new ArrayList<String>();
 //		if (lexerName != null) {

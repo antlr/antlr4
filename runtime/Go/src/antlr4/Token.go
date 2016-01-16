@@ -187,9 +187,9 @@ func (this *CommonToken) SetText(text string) {
 func (this *CommonToken) String() string {
 	var txt = this.GetText()
 	if txt != "" {
-		txt = strings.Replace(txt, "\n", "", -1)
-		txt = strings.Replace(txt, "\r", "", -1)
-		txt = strings.Replace(txt, "\t", "", -1)
+		txt = strings.Replace(txt, "\n", "\\n", -1)
+		txt = strings.Replace(txt, "\r", "\\r", -1)
+		txt = strings.Replace(txt, "\t", "\\t", -1)
 	} else {
 		txt = "<no text>"
 	}

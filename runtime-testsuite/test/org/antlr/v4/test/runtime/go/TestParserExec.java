@@ -441,11 +441,10 @@ public class TestParserExec extends BaseTest {
 	@Test
 	public void testListLabelForClosureContext() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(462);
+		StringBuilder grammarBuilder = new StringBuilder(420);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("ifStatement\n");
 		grammarBuilder.append("@after {\n");
-		grammarBuilder.append("List<?> __ttt__ = $ctx.elseIfStatement();\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("    : 'if' expression\n");
 		grammarBuilder.append("      ( ( 'then'\n");

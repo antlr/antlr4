@@ -9,7 +9,7 @@ type Parser interface {
 	Recognizer
 
 	GetInterpreter() *ParserATNSimulator
-	GetErrorHandler() ErrorStrategy
+
 	GetTokenStream() TokenStream
 	GetTokenFactory() TokenFactory
 	GetParserRuleContext() ParserRuleContext
@@ -17,6 +17,8 @@ type Parser interface {
 	Consume() Token
 	GetParseListeners() []ParseTreeListener
 
+	GetErrorHandler() ErrorStrategy
+	SetErrorHandler(ErrorStrategy)
 	GetInputStream() IntStream
 	GetCurrentToken() Token
 	GetExpectedTokens() *IntervalSet
@@ -106,6 +108,10 @@ func (p *BaseParser) reset() {
 
 func (p *BaseParser) GetErrorHandler() ErrorStrategy {
 	return p._errHandler
+}
+
+func (p *BaseParser) SetErrorHandler(e ErrorStrategy) {
+	p._errHandler = e
 }
 
 // Match current input symbol against {@code ttype}. If the symbol type

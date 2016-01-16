@@ -1769,16 +1769,16 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testMultipleAlternativesWithCommonLabel_1() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(720);
+		StringBuilder grammarBuilder = new StringBuilder(576);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s : e {fmt.Println($e.v)};\n");
 		grammarBuilder.append("e returns [int v]\n");
-		grammarBuilder.append("  : e '*' e     {$v = ((BinaryContext)$ctx).e(0).v * ((BinaryContext)$ctx).e(1).v;}  # binary\n");
-		grammarBuilder.append("  | e '+' e     {$v = ((BinaryContext)$ctx).e(0).v + ((BinaryContext)$ctx).e(1).v;}  # binary\n");
+		grammarBuilder.append("  : e '*' e     {$v = ($ctx).e(0).v * ($ctx).e(1).v;}  # binary\n");
+		grammarBuilder.append("  | e '+' e     {$v = ($ctx).e(0).v + ($ctx).e(1).v;}  # binary\n");
 		grammarBuilder.append("  | INT         {$v = $INT.int;}                   # anInt\n");
 		grammarBuilder.append("  | '(' e ')'   {$v = $e.v;}                       # parens\n");
-		grammarBuilder.append("  | left=e INC  {assert(((UnaryContext)$ctx).INC() != null)$v = $left.v + 1;}      # unary\n");
-		grammarBuilder.append("  | left=e DEC  {assert(((UnaryContext)$ctx).DEC() != null)$v = $left.v - 1;}      # unary\n");
+		grammarBuilder.append("  | left=e INC  {$v = $left.v + 1;}      # unary\n");
+		grammarBuilder.append("  | left=e DEC  {$v = $left.v - 1;}      # unary\n");
 		grammarBuilder.append("  | ID          {$v = 3;}                                                     # anID\n");
 		grammarBuilder.append("  ;\n");
 		grammarBuilder.append("ID : 'a'..'z'+ ;\n");
@@ -1799,16 +1799,16 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testMultipleAlternativesWithCommonLabel_2() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(720);
+		StringBuilder grammarBuilder = new StringBuilder(576);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s : e {fmt.Println($e.v)};\n");
 		grammarBuilder.append("e returns [int v]\n");
-		grammarBuilder.append("  : e '*' e     {$v = ((BinaryContext)$ctx).e(0).v * ((BinaryContext)$ctx).e(1).v;}  # binary\n");
-		grammarBuilder.append("  | e '+' e     {$v = ((BinaryContext)$ctx).e(0).v + ((BinaryContext)$ctx).e(1).v;}  # binary\n");
+		grammarBuilder.append("  : e '*' e     {$v = ($ctx).e(0).v * ($ctx).e(1).v;}  # binary\n");
+		grammarBuilder.append("  | e '+' e     {$v = ($ctx).e(0).v + ($ctx).e(1).v;}  # binary\n");
 		grammarBuilder.append("  | INT         {$v = $INT.int;}                   # anInt\n");
 		grammarBuilder.append("  | '(' e ')'   {$v = $e.v;}                       # parens\n");
-		grammarBuilder.append("  | left=e INC  {assert(((UnaryContext)$ctx).INC() != null)$v = $left.v + 1;}      # unary\n");
-		grammarBuilder.append("  | left=e DEC  {assert(((UnaryContext)$ctx).DEC() != null)$v = $left.v - 1;}      # unary\n");
+		grammarBuilder.append("  | left=e INC  {$v = $left.v + 1;}      # unary\n");
+		grammarBuilder.append("  | left=e DEC  {$v = $left.v - 1;}      # unary\n");
 		grammarBuilder.append("  | ID          {$v = 3;}                                                     # anID\n");
 		grammarBuilder.append("  ;\n");
 		grammarBuilder.append("ID : 'a'..'z'+ ;\n");
@@ -1829,16 +1829,16 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testMultipleAlternativesWithCommonLabel_3() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(720);
+		StringBuilder grammarBuilder = new StringBuilder(576);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s : e {fmt.Println($e.v)};\n");
 		grammarBuilder.append("e returns [int v]\n");
-		grammarBuilder.append("  : e '*' e     {$v = ((BinaryContext)$ctx).e(0).v * ((BinaryContext)$ctx).e(1).v;}  # binary\n");
-		grammarBuilder.append("  | e '+' e     {$v = ((BinaryContext)$ctx).e(0).v + ((BinaryContext)$ctx).e(1).v;}  # binary\n");
+		grammarBuilder.append("  : e '*' e     {$v = ($ctx).e(0).v * ($ctx).e(1).v;}  # binary\n");
+		grammarBuilder.append("  | e '+' e     {$v = ($ctx).e(0).v + ($ctx).e(1).v;}  # binary\n");
 		grammarBuilder.append("  | INT         {$v = $INT.int;}                   # anInt\n");
 		grammarBuilder.append("  | '(' e ')'   {$v = $e.v;}                       # parens\n");
-		grammarBuilder.append("  | left=e INC  {assert(((UnaryContext)$ctx).INC() != null)$v = $left.v + 1;}      # unary\n");
-		grammarBuilder.append("  | left=e DEC  {assert(((UnaryContext)$ctx).DEC() != null)$v = $left.v - 1;}      # unary\n");
+		grammarBuilder.append("  | left=e INC  {$v = $left.v + 1;}      # unary\n");
+		grammarBuilder.append("  | left=e DEC  {$v = $left.v - 1;}      # unary\n");
 		grammarBuilder.append("  | ID          {$v = 3;}                                                     # anID\n");
 		grammarBuilder.append("  ;\n");
 		grammarBuilder.append("ID : 'a'..'z'+ ;\n");
@@ -1859,16 +1859,16 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testMultipleAlternativesWithCommonLabel_4() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(720);
+		StringBuilder grammarBuilder = new StringBuilder(576);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s : e {fmt.Println($e.v)};\n");
 		grammarBuilder.append("e returns [int v]\n");
-		grammarBuilder.append("  : e '*' e     {$v = ((BinaryContext)$ctx).e(0).v * ((BinaryContext)$ctx).e(1).v;}  # binary\n");
-		grammarBuilder.append("  | e '+' e     {$v = ((BinaryContext)$ctx).e(0).v + ((BinaryContext)$ctx).e(1).v;}  # binary\n");
+		grammarBuilder.append("  : e '*' e     {$v = ($ctx).e(0).v * ($ctx).e(1).v;}  # binary\n");
+		grammarBuilder.append("  | e '+' e     {$v = ($ctx).e(0).v + ($ctx).e(1).v;}  # binary\n");
 		grammarBuilder.append("  | INT         {$v = $INT.int;}                   # anInt\n");
 		grammarBuilder.append("  | '(' e ')'   {$v = $e.v;}                       # parens\n");
-		grammarBuilder.append("  | left=e INC  {assert(((UnaryContext)$ctx).INC() != null)$v = $left.v + 1;}      # unary\n");
-		grammarBuilder.append("  | left=e DEC  {assert(((UnaryContext)$ctx).DEC() != null)$v = $left.v - 1;}      # unary\n");
+		grammarBuilder.append("  | left=e INC  {$v = $left.v + 1;}      # unary\n");
+		grammarBuilder.append("  | left=e DEC  {$v = $left.v - 1;}      # unary\n");
 		grammarBuilder.append("  | ID          {$v = 3;}                                                     # anID\n");
 		grammarBuilder.append("  ;\n");
 		grammarBuilder.append("ID : 'a'..'z'+ ;\n");
