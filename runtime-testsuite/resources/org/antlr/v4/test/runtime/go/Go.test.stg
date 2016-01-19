@@ -183,7 +183,7 @@ SetMember(n,v) ::= <%<n> = <v>;%>
 
 AddMember(n,v) ::= <%<n> += <v>;%>
 
-PlusMember(v,n) ::= <%<v> + <n>%>
+PlusMember(v,n) ::= <%<v> + fmt.Sprint(<n>)%>
 
 MemberEquals(n,v) ::= <%<n> == <v>%>
 
@@ -432,9 +432,10 @@ func (this *LeafListener) ExitInt(ctx *IntContext) {
 
 DeclareContextListGettersFunction() ::= <<
 func foo() {
-	SContext s = null;
-	List\<? extends AContext> a = s.a();
-	List\<? extends BContext> b = s.b();
+//TODO
+//SContext s = null;
+//List\<? extends AContext> a = s.A();
+//List\<? extends BContext> b = s.B();
 }
 >>
 
@@ -453,7 +454,7 @@ func pred(v bool) bool {
 }
 >>
 
-Invoke_pred(v) ::= <<p.pred(<v>)>>
+Invoke_pred(v) ::= <<pred(<v>)>>
 
 IgnoredTests ::= [
 	default: false

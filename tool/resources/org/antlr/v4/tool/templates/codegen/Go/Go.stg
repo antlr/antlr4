@@ -600,7 +600,7 @@ TokenPropertyRef_int(t) ::= "(func() int { if <ctx(t)>.Get<t.label; format={cap}
 
 RulePropertyRef_start(r) ::= "(func() antlr4.Token { if <ctx(r)>.Get<r.label;format={cap}>() == nil { return nil } else { return <ctx(r)>.Get<r.label;format={cap}>().GetStart() }}())"
 RulePropertyRef_stop(r)	 ::= "(func() antlr4.Token { if <ctx(r)>.Get<r.label;format={cap}>() == nil { return nil } else { return <ctx(r)>.Get<r.label;format={cap}>().GetStop() }}())"
-RulePropertyRef_text(r)	 ::= "(func() string { if <ctx(r)>.Get<r.label;format={cap}>() == nil { return \"\" } else { return p.GetTokenStream().GetTextFromTokens( <ctx(r)>.Get<r.label;format={cap}>().GetStart(),<ctx(r)>.<r.label>.GetStop())) }}())"
+RulePropertyRef_text(r)	 ::= "(func() string { if <ctx(r)>.Get<r.label;format={cap}>() == nil { return \"\" } else { return p.GetTokenStream().GetTextFromTokens( <ctx(r)>.Get<r.label;format={cap}>().GetStart(),<ctx(r)>.<r.label>.GetStop()) }}())"
 RulePropertyRef_ctx(r)	 ::= "<ctx(r)>.Get<r.label;format={cap}>()"
 RulePropertyRef_parser(r)	 ::= "p"
 

@@ -954,6 +954,7 @@ func (this *ParserATNSimulator) evalSemanticContext(predPredictions []*PredPredi
 			}
 			continue
 		}
+		fmt.Println(predPredictions)
 		var predicateEvaluationResult = pair.pred.evaluate(this.parser, outerContext)
 		if ParserATNSimulatorDebug || ParserATNSimulatorDFADebug {
 			fmt.Println("eval pred " + pair.String() + "=" + fmt.Sprint(predicateEvaluationResult))

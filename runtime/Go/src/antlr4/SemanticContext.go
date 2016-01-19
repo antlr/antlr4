@@ -382,6 +382,7 @@ func (this *OR) Hash() string {
 // unordered.</p>
 //
 func (this *OR) evaluate(parser Recognizer, outerContext RuleContext) bool {
+	fmt.Println("HI")
 	for i := 0; i < len(this.opnds); i++ {
 		if this.opnds[i].evaluate(parser, outerContext) {
 			return true
