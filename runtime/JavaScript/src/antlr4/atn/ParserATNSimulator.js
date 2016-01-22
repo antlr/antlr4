@@ -318,7 +318,6 @@ ParserATNSimulator.prototype.debug_list_atn_decisions = false;
 ParserATNSimulator.prototype.dfa_debug = false;
 ParserATNSimulator.prototype.retry_debug = false;
 
-
 ParserATNSimulator.prototype.reset = function() {
 };
 
@@ -903,6 +902,11 @@ ParserATNSimulator.prototype.removeAllConfigsNotInRuleStopState = function(confi
 };
 
 ParserATNSimulator.prototype.computeStartState = function(p, ctx, fullCtx) {
+
+    if (PORT_DEBUG){
+        console.log("computeStartState")
+    }
+
     // always at least the implicit call to start rule
     var initialContext = predictionContextFromRuleContext(this.atn, ctx);
     var configs = new ATNConfigSet(fullCtx);
@@ -1257,7 +1261,7 @@ ParserATNSimulator.prototype.closureCheckingStopState = function(config, configs
                         // we have no context info, just chase follow links (if greedy)
                         if (this.debug) {
                             if (PORT_DEBUG) {
-                                console.log("DEBUG 1")
+                                console.log("DEBUG B")
                             }
                             console.log("FALLING off rule " + this.getRuleName(config.state.ruleIndex));
                         }
@@ -1312,7 +1316,7 @@ ParserATNSimulator.prototype.closure_ = function(config, configs, closureBusy, c
         var c = this.getEpsilonTarget(config, t, continueCollecting, depth === 0, fullCtx, treatEofAsEpsilon);
         if (c!==null) {
             if (PORT_DEBUG) {
-                console.log("DEBUG 1")
+                console.log("DEBUG 1 ok")
             }
 			if (!t.isEpsilon && closureBusy.add(c)!==c){
 				// avoid infinite recursion for EOF* and EOF+

@@ -72,6 +72,18 @@ func NewSet(hashFunction func(interface{}) string, equalsFunction func(interface
 	return s
 }
 
+func standardEqualsFunction(a interface{}, b interface{}) bool {
+
+	ac, oka := a.(Comparable)
+	bc, okb := b.(Comparable)
+
+	if !oka || !okb {
+		panic("Not Comparable")
+	}
+
+	return ac.equals(bc)
+}
+
 func standardHashFunction(a interface{}) string {
 	h, ok := a.(Hasher)
 
@@ -79,7 +91,7 @@ func standardHashFunction(a interface{}) string {
 		return h.Hash()
 	}
 
-	return fmt.Sprint(a)
+	panic("Not Hasher")
 }
 
 //func getBytes(key interface{}) ([]byte, error) {
@@ -102,9 +114,6 @@ func hashCode(s string) string {
 	return fmt.Sprint(h.Sum32())
 }
 
-func standardEqualsFunction(a interface{}, b interface{}) bool {
-	return standardHashFunction(a) == standardHashFunction(b)
-}
 
 func (this *Set) length() int {
 	return len(this.data)
@@ -141,7 +150,6 @@ func (this *Set) contains(value interface{}) bool {
 	values := this.data[key]
 
 	if this.data[key] != nil {
-
 		for i := 0; i < len(values); i++ {
 			if this.equalsFunction(value, values[i]) {
 				return true

@@ -660,6 +660,10 @@ func (this *ParserATNSimulator) removeAllConfigsNotInRuleStopState(configs ATNCo
 }
 
 func (this *ParserATNSimulator) computeStartState(p ATNState, ctx RuleContext, fullCtx bool) ATNConfigSet {
+
+	if PortDebug {
+		fmt.Println("computeStartState")
+	}
 	// always at least the implicit call to start rule
 	var initialContext = predictionContextFromRuleContext(this.atn, ctx)
 	var configs = NewBaseATNConfigSet(fullCtx)
@@ -954,7 +958,7 @@ func (this *ParserATNSimulator) evalSemanticContext(predPredictions []*PredPredi
 			}
 			continue
 		}
-		fmt.Println(predPredictions)
+
 		var predicateEvaluationResult = pair.pred.evaluate(this.parser, outerContext)
 		if ParserATNSimulatorDebug || ParserATNSimulatorDFADebug {
 			fmt.Println("eval pred " + pair.String() + "=" + fmt.Sprint(predicateEvaluationResult))
@@ -1002,7 +1006,7 @@ func (this *ParserATNSimulator) closureCheckingStopState(config ATNConfig, confi
 						// we have no context info, just chase follow links (if greedy)
 						if ParserATNSimulatorDebug {
 							if PortDebug {
-								fmt.Println("DEBUG 1")
+								fmt.Println("DEBUG B")
 							}
 							fmt.Println("FALLING off rule " + this.getRuleName(config.GetState().GetRuleIndex()))
 						}
@@ -1057,7 +1061,7 @@ func (this *ParserATNSimulator) closure_(config ATNConfig, configs ATNConfigSet,
 		var c = this.getEpsilonTarget(config, t, continueCollecting, depth == 0, fullCtx, treatEofAsEpsilon)
 		if c != nil {
 			if PortDebug {
-				fmt.Println("DEBUG 1")
+				fmt.Println("DEBUG 1 ok")
 			}
 			if !t.getIsEpsilon() && closureBusy.add(c) != c {
 				// avoid infinite recursion for EOF* and EOF+
@@ -1069,6 +1073,7 @@ func (this *ParserATNSimulator) closure_(config ATNConfig, configs ATNConfigSet,
 
 				if PortDebug {
 					fmt.Println("DEBUG 2")
+					fmt.Println(closureBusy)
 				}
 				// target fell off end of rule mark resulting c as having dipped into outer context
 				// We can't get here if incoming config was rule stop and we had context
@@ -1094,7 +1099,7 @@ func (this *ParserATNSimulator) closure_(config ATNConfig, configs ATNConfigSet,
 						fmt.Println("DEBUG 4")
 					}
 					if t.(*EpsilonTransition).outermostPrecedenceReturn == this._dfa.atnStartState.GetRuleIndex() {
-						c.precedenceFilterSuppressed = true
+						c.setPrecedenceFilterSuppressed(true)
 					}
 				}
 
@@ -1123,7 +1128,7 @@ func (this *ParserATNSimulator) getRuleName(index int) string {
 	}
 }
 
-func (this *ParserATNSimulator) getEpsilonTarget(config ATNConfig, t Transition, collectPredicates, inContext, fullCtx, treatEofAsEpsilon bool) *BaseATNConfig {
+func (this *ParserATNSimulator) getEpsilonTarget(config ATNConfig, t Transition, collectPredicates, inContext, fullCtx, treatEofAsEpsilon bool) ATNConfig {
 
 	switch t.getSerializationType() {
 	case TransitionRULE:

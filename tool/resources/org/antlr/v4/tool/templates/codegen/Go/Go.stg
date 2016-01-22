@@ -194,7 +194,8 @@ func (l *<lexer.name>) Action(localctx antlr4.RuleContext, ruleIndex, actionInde
         l.<f.name>_Action(t, actionIndex)
         <else>
         l.<f.name>_Action(localctx, actionIndex)
-        <endif>}; separator="\n">
+        <endif>
+        break}; separator="\n">
 	default:
 		panic("No registered action for:" + fmt.Sprint(ruleIndex))
 	}
@@ -233,7 +234,7 @@ func (l *<lexer.name>) <r.name; format="cap">_Action(localctx <if(r.isRuleContex
 	<actions:{index|
 case <index>:
 	<actions.(index)>
-	}; separator="\n">
+	break}; separator="\n">
 	default:
 		panic("No registered action for:" + fmt.Sprint(actionIndex))
 	}
@@ -361,7 +362,7 @@ p.SetState(<choice.stateNumber>)
 switch p.GetTokenStream().LA(1) {
 <choice.altLook,alts:{look,alt| <cases(ttypes=look)>
     <alt>
-    }; separator="\n">
+    break }; separator="\n">
 default:
     <error>
 }
@@ -372,7 +373,7 @@ p.SetState(<choice.stateNumber>)
 switch p.GetTokenStream().LA(1) {
 <choice.altLook,alts:{look,alt| <cases(ttypes=look)>
 	<alt>
-	}; separator="\n">
+	break }; separator="\n">
 default:
 	<error>
 }
@@ -423,6 +424,7 @@ switch la_ {
 <alts:{alt |
 case <i>:
     <alt>
+    break
 }; separator="\n">
 }
 >>
@@ -463,7 +465,7 @@ for ok := true; ok; ok = _alt!=<choice.exitAlt> && _alt!= antlr4.ATNInvalidAltNu
 	<alts:{alt|
 case <i><if(!choice.ast.greedy)>+1<endif>:
 	<alt>
-	//}; separator="\n">
+	break }; separator="\n">
 	default:
 		<error>
 	}
@@ -510,7 +512,7 @@ bitsetInlineComparison(s, bits) ::= <%
 %>
 
 cases(ttypes) ::= <<
-<ttypes:{t | case <parser.name><t>:}; separator="\n">
+<ttypes:{t | case <parser.name><t>:}; separator="fallthrough \n">
 >>
 
 InvokeRule(r, argExprsChunks) ::= <<
@@ -709,6 +711,7 @@ type I<struct.name> interface {
     antlr4.ParserRuleContext
 
     GetParser() antlr4.Parser
+    get<struct.name>() // to differentiate from other interfaces
 
     <struct.tokenDecls:{a | Get<a.name; format="cap">() <TokenLabelType()> }; separator="\n">
     <struct.tokenDecls:{a | Set<a.name; format="cap">(<TokenLabelType()>) }; separator="\n">
@@ -737,6 +740,8 @@ func NewEmpty<struct.name>() *<struct.name> {
     p.RuleIndex = <parser.name>RULE_<struct.derivedFromName>
     return p
 }
+
+func (*<struct.name>) get<struct.name>() {}
 
 func New<struct.name>(parser antlr4.Parser, parent antlr4.ParserRuleContext, invokingState int<struct.ctorAttrs:{a | , <a.name> <a.type;format="lower">}>) *<struct.name> {
 

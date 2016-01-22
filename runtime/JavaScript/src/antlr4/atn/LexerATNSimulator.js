@@ -169,10 +169,6 @@ LexerATNSimulator.prototype.matchATN = function(input) {
 	var suppressEdge = s0_closure.hasSemanticContext;
 	s0_closure.hasSemanticContext = false;
 
-	if (PORT_DEBUG) {
-		console.log(s0_closure.toString())
-	}
-
 	var next = this.addDFAState(s0_closure);
 	if (!suppressEdge) {
 		this.decisionToDFA[this.mode].s0 = next;
@@ -224,6 +220,7 @@ LexerATNSimulator.prototype.execATN = function(input, ds0) {
 //		if (PORT_DEBUG) {
 //			console.log(target)
 //		}
+
 		if (target === null) {
 			target = this.computeTargetState(input, s, t);
 			// print("Computed:" + str(target))
@@ -316,7 +313,7 @@ LexerATNSimulator.prototype.failOrAccept = function(prevAccept, input, reach, t)
 				prevAccept.index, prevAccept.line, prevAccept.column);
 
 		if (PORT_DEBUG) {
-			console.log("Prevaccept", prevAccept.dfaState.prediction)
+			console.log(prevAccept.dfaState.prediction)
 		}
 
 		return prevAccept.dfaState.prediction;

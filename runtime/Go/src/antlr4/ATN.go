@@ -72,7 +72,7 @@ func (this *ATN) NextTokensInContext(s ATNState, ctx RuleContext) *IntervalSet {
 func (this *ATN) NextTokensNoContext(s ATNState) *IntervalSet {
 	if s.GetNextTokenWithinRule() != nil {
 		if PortDebug {
-			fmt.Println("DEBUG 1")
+			fmt.Println("DEBUG A")
 		}
 		return s.GetNextTokenWithinRule()
 	}

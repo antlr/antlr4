@@ -2,7 +2,7 @@ package antlr4
 
 import (
 	"fmt"
-	"reflect"
+//	"reflect"
 	"strconv"
 )
 
@@ -14,8 +14,13 @@ import (
 //  an ATN state.
 //
 
+type Comparable interface {
+	equals(other interface{}) bool
+}
+
 type ATNConfig interface {
 	Hasher
+	Comparable
 
 	getPrecedenceFilterSuppressed() bool
 	setPrecedenceFilterSuppressed(bool)
@@ -144,14 +149,30 @@ func (this *BaseATNConfig) SetReachesIntoOuterContext(v int) {
 //  the same state, they predict the same alternative, and
 //  syntactic/semantic contexts are the same.
 ///
-func (this *BaseATNConfig) equals(other interface{}) bool {
-	if this == other {
+func (this *BaseATNConfig) equals(o interface{}) bool {
+
+	if this == o {
 		return true
-	} else if _, ok := other.(*BaseATNConfig); !ok {
-		return false
-	} else {
-		return reflect.DeepEqual(this, other)
 	}
+
+	other, ok := o.(*BaseATNConfig)
+
+	if !ok {
+		return false
+	}
+
+	var b bool
+	if this.context==nil {
+		b = other.context==nil
+	} else {
+		b = this.context.equals(other.context)
+	}
+
+	return this.state.GetStateNumber() == other.state.GetStateNumber() &&
+		this.alt==other.alt &&
+		this.semanticContext.equals(other.semanticContext) &&
+		this.precedenceFilterSuppressed==other.precedenceFilterSuppressed &&
+		b;
 }
 
 func (this *BaseATNConfig) shortHash() string {
@@ -295,8 +316,7 @@ func (this *LexerATNConfig) equals(other interface{}) bool {
 	if b {
 		return false
 	} else {
-		panic("Not implemented")
-		//        return ATNConfig.prototype.equals.call(this, other)
+		return this.BaseATNConfig.equals(othert.BaseATNConfig)
 	}
 }
 

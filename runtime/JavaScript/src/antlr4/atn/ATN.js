@@ -76,7 +76,7 @@ ATN.prototype.nextTokensInContext = function(s, ctx) {
 ATN.prototype.nextTokensNoContext = function(s) {
     if (s.nextTokenWithinRule !== null ) {
         if (PORT_DEBUG) {
-            console.log("DEBUG 1")
+            console.log("DEBUG A")
         }
         return s.nextTokenWithinRule;
     }
