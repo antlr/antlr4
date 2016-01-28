@@ -130,6 +130,7 @@ class LexerATNSimulator(ATNSimulator):
         self.startIndex = -1
         self.line = 1
         self.column = 0
+        from antlr4.Lexer import Lexer
         self.mode = Lexer.DEFAULT_MODE
 
     def matchATN(self, input:InputStream):

@@ -84,4 +84,5 @@ YYYY/MM/DD, github id, Full name, email
 2015/10/21, martin-probst, Martin Probst, martin-probst@web.de
 2015/10/21, hkff, Walid Benghabrit, walid.benghabrit@mines-nantes.fr
 2015/11/25, abego, Udo Borkowski, ub@abego.org
-2015/12/17, sebadur, Sebastian Badur, sebadur@users.noreply.github.com
+2015/12/17, sebadur, Sebastian Badur, sebadur@users.noreply.github.com2015/06/29, jvanzyl, Jason van Zyl, jason@takari.io
+2015/11/12, cooperra, Robbie Cooper, cooperra@users.noreply.github.com
