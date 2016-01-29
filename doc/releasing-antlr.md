@@ -89,8 +89,10 @@ The maven deploy lifecycle phased deploys the artifacts and the poms for the ANT
 mvn deploy -DskipTests
 ```
 
+With JDK 1.7 (not 6 or 8), do this:
+
 ```bash
-mvn release:prepare
+mvn release:prepare -Darguments="-DskipTests"
 ```
 
 It will start out by asking you the version number:
@@ -111,7 +113,7 @@ What is the new development version for "ANTLR 4"? (org.antlr:antlr4-master) 4.5
 Maven will go through your pom.xml files to update versions from 4.5.2-SNAPSHOT to 4.5.2 for release and then to 4.5.3-SNAPSHOT after release, which is done with:
 
 ```bash
-mvn release:perform
+mvn release:perform -Darguments="-DskipTests"
 ```
 
 Maven will use git to push pom.xml changes. (big smile)
