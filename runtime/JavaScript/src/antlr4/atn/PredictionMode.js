@@ -38,6 +38,9 @@ var BitSet = require('./../Utils').BitSet;
 var AltDict = require('./../Utils').AltDict;
 var ATN = require('./ATN').ATN;
 var RuleStopState = require('./ATNState').RuleStopState;
+var ATNConfigSet = require('./ATNConfigSet').ATNConfigSet;
+var ATNConfig = require('./ATNConfig').ATNConfig;
+var SemanticContext = require('./SemanticContext').SemanticContext;
 
 function PredictionMode() {
 	return this;
