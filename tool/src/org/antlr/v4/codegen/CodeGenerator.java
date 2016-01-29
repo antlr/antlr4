@@ -32,6 +32,7 @@ package org.antlr.v4.codegen;
 
 import org.antlr.v4.Tool;
 import org.antlr.v4.codegen.model.OutputModelObject;
+import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.Grammar;
@@ -241,6 +242,25 @@ public class CodeGenerator {
 	 */
 	public String getRecognizerFileName() {
 		ST extST = getTemplates().getInstanceOf("codeFileExtension");
+		ST fullST = getTemplates().getInstanceOf("RecognizerFileName");
+		if (fullST != null) {
+			switch (g.getType()) {
+				case ANTLRParser.PARSER:
+					fullST.add("name", g.name.endsWith("Parser") ? g.name.substring(0, g.name.length() - 6) : g.name); // trim off "parser"
+					fullST.add("type", "parser");
+					break;
+				case ANTLRParser.LEXER:
+					fullST.add("name", g.name.endsWith("Lexer") ?g.name.substring(0, g.name.length() - 5) : g.name); // trim off "lexer"
+					fullST.add("type", "lexer");
+					break;
+				case ANTLRParser.COMBINED:
+					System.out.print("combined" + g.name+ "|");
+					fullST.add("name", g.name);
+					fullST.add("type", "parser");
+					break;
+			}
+			return fullST.render() + extST.render();
+		}
 		String recognizerName = g.getRecognizerName();
 		return recognizerName+extST.render();
 	}
@@ -251,6 +271,11 @@ public class CodeGenerator {
 	public String getListenerFileName() {
 		assert g.name != null;
 		ST extST = getTemplates().getInstanceOf("codeFileExtension");
+		ST fullST = getTemplates().getInstanceOf("ListenerFileName");
+		if (fullST != null) {
+			fullST.add("name", g.name);
+			return fullST.render() + extST.render();
+		}
 		String listenerName = g.name + "Listener";
 		return listenerName+extST.render();
 	}
@@ -261,6 +286,11 @@ public class CodeGenerator {
 	public String getVisitorFileName() {
 		assert g.name != null;
 		ST extST = getTemplates().getInstanceOf("codeFileExtension");
+		ST fullST = getTemplates().getInstanceOf("VisitorFileName");
+		if (fullST != null) {
+			fullST.add("name", g.name);
+			return fullST.render() + extST.render();
+		}
 		String listenerName = g.name + "Visitor";
 		return listenerName+extST.render();
 	}
@@ -271,6 +301,11 @@ public class CodeGenerator {
 	public String getBaseListenerFileName() {
 		assert g.name != null;
 		ST extST = getTemplates().getInstanceOf("codeFileExtension");
+		ST fullST = getTemplates().getInstanceOf("BaseListenerFileName");
+		if (fullST != null) {
+			fullST.add("name", g.name);
+			return fullST.render() + extST.render();
+		}
 		String listenerName = g.name + "BaseListener";
 		return listenerName+extST.render();
 	}
@@ -280,7 +315,14 @@ public class CodeGenerator {
  	 */
 	public String getBaseVisitorFileName() {
 		assert g.name != null;
+
 		ST extST = getTemplates().getInstanceOf("codeFileExtension");
+		ST fullST = getTemplates().getInstanceOf("BaseVisitorFileName");
+		if (fullST != null) {
+			fullST.add("name", g.name);
+			return fullST.render() + extST.render();
+		}
+
 		String listenerName = g.name + "BaseVisitor";
 		return listenerName+extST.render();
 	}

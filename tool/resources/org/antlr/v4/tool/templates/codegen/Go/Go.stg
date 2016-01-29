@@ -979,4 +979,10 @@ initValue(typeName) ::= <<
 <javaTypeInitMap.(typeName)>
 >>
 
+RecognizerFileName(name,type) ::= "<name; format={lower}>_<type; format={lower}>"
+ListenerFileName(name) ::= "<name; format={lower}>_listener"
+VisitorFileName(name) ::= "<name; format={lower}>_visitor"
+BaseListenerFileName(name) ::= "<name; format={lower}>_base_listener"
+BaseVisitorFileName(name) ::= "<name; format={lower}>_base_visitor"
+
 codeFileExtension() ::= ".go"
