@@ -4,6 +4,14 @@
 
 Create a pre-release or full release at github; [Example 4.5-rc-1](https://github.com/antlr/antlr4/releases/tag/4.5-rc-1).
 
+Wack any existing tag as mvn will create one and it fails if already there.
+
+```
+$ git tag -d 4.5.2
+$ git push origin :refs/tags/4.5.2
+$ git push upstream :refs/tags/4.5.2
+```
+
 ## Bump version
 
 Edit the repository looking for 4.5 or whatever and update it. Bump version in the following files:
