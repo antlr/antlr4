@@ -254,7 +254,6 @@ public class CodeGenerator {
 					fullST.add("type", "lexer");
 					break;
 				case ANTLRParser.COMBINED:
-					System.out.print("combined" + g.name+ "|");
 					fullST.add("name", g.name);
 					fullST.add("type", "parser");
 					break;
