@@ -536,7 +536,7 @@ func (p *BaseParser) PushNewRecursionContext(localctx ParserRuleContext, state, 
 	var previous = p._ctx
 	previous.SetParent(localctx)
 	previous.SetInvokingState(state)
-	previous.SetStart(p._input.LT(-1))
+	previous.SetStop(p._input.LT(-1))
 
 	p._ctx = localctx
 	p._ctx.SetStart(previous.GetStart())
