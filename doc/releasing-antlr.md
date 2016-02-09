@@ -2,14 +2,15 @@
 
 ## Github
 
-Create a release candidate tag 4.x-rc-1 or full 4.5 tag
-
-```bash
-git tag -a 4.5 -m 'ANTLR final release 4.5'
-git push origin 4.5
-```
-
 Create a pre-release or full release at github; [Example 4.5-rc-1](https://github.com/antlr/antlr4/releases/tag/4.5-rc-1).
+
+Wack any existing tag as mvn will create one and it fails if already there.
+
+```
+$ git tag -d 4.5.2
+$ git push origin :refs/tags/4.5.2
+$ git push upstream :refs/tags/4.5.2
+```
 
 ## Bump version
 
@@ -20,7 +21,7 @@ Edit the repository looking for 4.5 or whatever and update it. Bump version in t
  * runtime/Python2/src/antlr4/Recognizer.py
  * runtime/Python3/setup.py
  * runtime/Python3/src/antlr4/Recognizer.py
- * runtime/CSharp/Antlr4.Runtime/Properties/AssemblyInfo.cs
+ * runtime/CSharp/runtime/CSharp/Antlr4.Runtime/Properties/AssemblyInfo.cs
  * runtime/JavaScript/src/antlr4/package.json
  * runtime/JavaScript/src/antlr4/Recognizer.js
  * tool/src/org/antlr/v4/codegen/target/CSharpTarget.java
