@@ -1258,10 +1258,10 @@ ParserATNSimulator.prototype.closureCheckingStopState = function(config, configs
                     }
                     continue;
                 }
-                returnState = this.atn.states[config.context.getReturnState(i)];
-                newContext = config.context.getParent(i); // "pop" return state
+                var returnState = this.atn.states[config.context.getReturnState(i)];
+                var newContext = config.context.getParent(i); // "pop" return state
                 var parms = {state:returnState, alt:config.alt, context:newContext, semanticContext:config.semanticContext};
-                c = new ATNConfig(parms, null);
+                var c = new ATNConfig(parms, null);
                 // While we have context to pop back from, we may have
                 // gotten that context AFTER having falling off a rule.
                 // Make sure we track that we are now out of context.
