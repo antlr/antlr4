@@ -107,8 +107,8 @@ var visitAtom = function(visitor, ctx) {
 		return;
 	}
 
-	var name = ctx.parser.ruleNames[ctx.ruleIndex];
-	var funcName = "visit" + Utils.titleCase(name);
+	// trim off 'Context' and prepend 'visit'
+	var funcName = 'visit' + ctx.constructor.name.substr(0, ctx.constructor.name.length - 7);
 
 	return visitor[funcName](ctx);
 };
