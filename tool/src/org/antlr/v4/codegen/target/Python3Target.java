@@ -50,7 +50,7 @@ public class Python3Target extends Target {
 		"abs", "all", "any", "apply", "as",
 		"bin", "bool", "buffer", "bytearray",
 		"callable", "chr", "classmethod", "coerce", "compile", "complex",
-		"delattr", "dict", "dir", "divmod",
+		"del", "delattr", "dict", "dir", "divmod",
 		"enumerate", "eval", "execfile",
 		"file", "filter", "float", "format", "frozenset",
 		"getattr", "globals",
