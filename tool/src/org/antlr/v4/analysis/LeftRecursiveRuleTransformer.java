@@ -169,7 +169,6 @@ public class LeftRecursiveRuleTransformer {
 		// track recursive alt info for codegen
 		r.recPrimaryAlts = new ArrayList<LeftRecursiveRuleAltInfo>();
 		r.recPrimaryAlts.addAll(leftRecursiveRuleWalker.prefixAlts);
-		r.recPrimaryAlts.addAll(leftRecursiveRuleWalker.otherAlts);
 		if (r.recPrimaryAlts.isEmpty()) {
 			tool.errMgr.grammarError(ErrorType.NO_NON_LR_ALTS, g.fileName, ((GrammarAST)r.ast.getChild(0)).getToken(), r.name);
 		}
