@@ -59,6 +59,8 @@ TestTemplates ::= [
 	"MultipleAlternativesWithCommonLabel_2": [],
 	"MultipleAlternativesWithCommonLabel_3": [],
 	"MultipleAlternativesWithCommonLabel_4": [],
+	"PrefixAndOtherAlt_1": [],
+	"PrefixAndOtherAlt_2": [],
 	"PrefixOpWithActionAndLabel_1": [],
 	"PrefixOpWithActionAndLabel_2": [],
 	"PrefixOpWithActionAndLabel_3": [],
