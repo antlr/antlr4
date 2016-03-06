@@ -245,7 +245,7 @@ public class CodeGenerator {
 			getTarget().genBaseVisitorHeaderFile(g, headerFileST);
 		}
 	}
-
+/*
 	public void writeHeaderFile() {
 		String fileName = getHeaderFileName();
 		if (fileName == null)
@@ -257,7 +257,7 @@ public class CodeGenerator {
 			getTarget().genRecognizerHeaderFile(g, headerFileST, extST.render(lineWidth));
 		}
 	}
-	
+*/	
 	public void writeVocabFile() {
 		// write out the vocab interchange file; used by antlr,
 		// does not change per target
