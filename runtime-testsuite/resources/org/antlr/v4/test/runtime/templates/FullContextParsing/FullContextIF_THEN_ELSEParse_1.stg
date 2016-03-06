@@ -1,0 +1,10 @@
+import "FullContextIF_THEN_ELSEParse.stg"
+
+Input() ::= "{ if x then return }"
+
+Output() ::= <<
+Decision 1:
+s0-'}'->:s1=>2<\n>
+>>
+
+Errors() ::= ""

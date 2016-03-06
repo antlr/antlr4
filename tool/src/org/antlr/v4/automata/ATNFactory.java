@@ -59,25 +59,34 @@ public interface ATNFactory {
 		}
 	}
 
+
 	ATN createATN();
 
 	void setCurrentRuleName(String name);
 
 	void setCurrentOuterAlt(int alt);
 
+
 	Handle rule(GrammarAST ruleAST, String name, Handle blk);
+
 
 	ATNState newState();
 
+
 	Handle label(Handle t);
+
 
 	Handle listLabel(Handle t);
 
+
 	Handle tokenRef(TerminalAST node);
+
 
 	Handle set(GrammarAST associatedAST, List<GrammarAST> alts, boolean invert);
 
+
 	Handle charSetLiteral(GrammarAST charSetAST);
+
 
 	Handle range(GrammarAST a, GrammarAST b);
 
@@ -87,6 +96,7 @@ public interface ATNFactory {
 	 *  the DFA.  Machine== o-'f'->o-'o'->o-'g'->o and has n+1 states
 	 *  for n characters.
 	 */
+
 	Handle stringLiteral(TerminalAST stringLiteralAST);
 
 	/** For reference to rule r, build
@@ -105,23 +115,29 @@ public interface ATNFactory {
 	 *  TODO add to codegen: collapse alt blks that are sets into single matchSet
 	 * @param node
 	 */
+
 	Handle ruleRef(GrammarAST node);
 
 	/** From an empty alternative build Grip o-e->o */
+
 	Handle epsilon(GrammarAST node);
 
 	/** Build what amounts to an epsilon transition with a semantic
 	 *  predicate action.  The pred is a pointer into the AST of
 	 *  the SEMPRED token.
 	 */
+
 	Handle sempred(PredAST pred);
 
 	/** Build what amounts to an epsilon transition with an action.
 	 *  The action goes into ATN though it is ignored during analysis.
 	 */
+
 	Handle action(ActionAST action);
 
+
 	Handle action(String action);
+
 
 	Handle alt(List<Handle> els);
 
@@ -148,6 +164,7 @@ public interface ATNFactory {
      *
      *  Set alt number (1..n) in the left-Transition ATNState.
      */
+
 	Handle block(BlockAST blockAST, GrammarAST ebnfRoot, List<Handle> alternativeGrips);
 
 //	Handle notBlock(GrammarAST blockAST, Handle set);
@@ -160,6 +177,7 @@ public interface ATNFactory {
 	 *
 	 *  or, if A is a block, just add an empty alt to the end of the block
 	 */
+
 	Handle optional(GrammarAST optAST, Handle blk);
 
 	/** From (A)+ build
@@ -175,6 +193,7 @@ public interface ATNFactory {
 	 *  During analysis we'll call the follow link (transition 1) alt n+1 for
 	 *  an n-alt A block.
 	 */
+
 	Handle plus(GrammarAST plusAST, Handle blk);
 
 	/** From (A)* build
@@ -207,14 +226,19 @@ public interface ATNFactory {
 	 *  is sufficient to let me make an appropriate enter, exit, loop
 	 *  determination.  See codegen.g
 	 */
+
 	Handle star(GrammarAST starAST, Handle blk);
 
 	/** Build an atom with all possible values in its label */
+
 	Handle wildcard(GrammarAST associatedAST);
 
-	Handle lexerAltCommands(ATNFactory.Handle alt, ATNFactory.Handle cmds);
 
-	String lexerCallCommand(GrammarAST ID, GrammarAST arg);
+	Handle lexerAltCommands(Handle alt, Handle cmds);
 
-	String lexerCommand(GrammarAST ID);
+
+	Handle lexerCallCommand(GrammarAST ID, GrammarAST arg);
+
+
+	Handle lexerCommand(GrammarAST ID);
 }

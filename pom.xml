@@ -1,212 +1,125 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.sonatype.oss</groupId>
+    <artifactId>oss-parent</artifactId>
+    <version>9</version>
+  </parent>
+  <groupId>org.antlr</groupId>
+  <artifactId>antlr4-master</artifactId>
+  <version>4.5.3-SNAPSHOT</version>
+  <packaging>pom</packaging>
 
-    <parent>
-        <groupId>org.sonatype.oss</groupId>
-        <artifactId>oss-parent</artifactId>
-        <version>7</version>
-    </parent>
-
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>org.antlr</groupId>
-    <artifactId>antlr4-master</artifactId>
-    <version>4.1.1-SNAPSHOT</version>
-    <packaging>pom</packaging>
-
-    <name>ANTLR 4</name>
-    <description>ANTLR 4 Master Build POM</description>
+  <name>ANTLR 4</name>
+  <description>ANTLR 4 Master Build POM</description>
+  <url>http://www.antlr.org</url>
+  <inceptionYear>1992</inceptionYear>
+  <organization>
+    <name>ANTLR</name>
     <url>http://www.antlr.org</url>
-    <inceptionYear>1992</inceptionYear>
-    <organization>
-        <name>ANTLR</name>
-        <url>http://www.antlr.org</url>
-    </organization>
+  </organization>
 
-    <licenses>
-        <license>
-            <name>The BSD License</name>
-            <url>http://www.antlr.org/license.html</url>
-            <distribution>repo</distribution>
-        </license>
-    </licenses>
+  <licenses>
+    <license>
+      <name>The BSD License</name>
+      <url>http://www.antlr.org/license.html</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
 
-    <developers>
+  <developers>
+    <developer>
+      <name>Terence Parr</name>
+      <url>http://antlr.org/wiki/display/~admin/Home</url>
+      <roles>
+        <role>Project lead - ANTLR</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Sam Harwell</name>
+      <url>http://tunnelvisionlabs.com</url>
+      <roles>
+        <role>Developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Eric Vergnaud</name>
+      <roles>
+        <role>Developer - JavaScript, C#, Python 2, Python 3</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Jim Idle</name>
+      <email>jimi@idle.ws</email>
+      <url>http://www.linkedin.com/in/jimidle</url>
+      <roles>
+        <role>Developer - Maven Plugin</role>
+      </roles>
+    </developer>
+  </developers>
 
-        <developer>
-            <name>Terence Parr</name>
-            <url>http://antlr.org/wiki/display/~admin/Home</url>
-            <roles>
-                <role>Project lead - ANTLR</role>
-            </roles>
-        </developer>
+  <modules>
+    <module>runtime/Java</module>
+    <module>tool</module>
+    <module>antlr4-maven-plugin</module>
+    <module>tool-testsuite</module>
+    <module>runtime-testsuite</module>
+  </modules>
 
-        <developer>
-            <name>Sam Harwell</name>
-            <url>http://tunnelvisionlabs.com</url>
-            <roles>
-                <role>Developer</role>
-            </roles>
-        </developer>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <antlr.testinprocess>true</antlr.testinprocess>
+    <maven.compiler.source>1.6</maven.compiler.source>
+    <maven.compiler.target>1.6</maven.compiler.target>
+  </properties>
 
-        <developer>
-            <name>Jim Idle</name>
-            <email>jimi@idle.ws</email>
-            <url>http://www.linkedin.com/in/jimidle</url>
-            <roles>
-                <role>Developer - Maven Plugin</role>
-            </roles>
-        </developer>
+  <mailingLists>
+    <mailingList>
+      <name>antlr-discussion</name>
+      <archive>https://groups.google.com/forum/?fromgroups#!forum/antlr-discussion</archive>
+    </mailingList>
+  </mailingLists>
 
-    </developers>
+  <issueManagement>
+    <system>GitHub Issues</system>
+    <url>https://github.com/antlr/antlr4/issues</url>
+  </issueManagement>
 
-    <modules>
-        <module>runtime/Java</module>
-        <module>tool</module>
-        <module>antlr4-maven-plugin</module>
-    </modules>
+  <scm>
+    <url>https://github.com/antlr/antlr4/tree/master</url>
+    <connection>scm:git:git://github.com/antlr/antlr4.git</connection>
+    <developerConnection>scm:git:git@github.com:antlr/antlr4.git</developerConnection>
+    <tag>HEAD</tag>
+  </scm>
 
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <java5.home>${env.JAVA5_HOME}</java5.home>
-        <java6.home>${env.JAVA6_HOME}</java6.home>
-        <bootclasspath.java5>${java5.home}/lib/rt.jar</bootclasspath.java5>
-        <bootclasspath.java6>${java6.home}/lib/rt.jar</bootclasspath.java6>
-        <bootclasspath.compile>${bootclasspath.java6}</bootclasspath.compile>
-        <bootclasspath.testCompile>${bootclasspath.java6}</bootclasspath.testCompile>
-        <antlr.testinprocess>true</antlr.testinprocess>
-    </properties>
-
-    <mailingLists>
-        <mailingList>
-            <name>antlr-discussion</name>
-            <archive>https://groups.google.com/forum/?fromgroups#!forum/antlr-discussion</archive>
-        </mailingList>
-    </mailingLists>
-
-    <issueManagement>
-        <system>GitHub Issues</system>
-        <url>https://github.com/antlr/antlr4/issues</url>
-    </issueManagement>
-
-    <scm>
-        <url>https://github.com/antlr/antlr4/tree/master</url>
-        <connection>scm:git:git://github.com/antlr/antlr4.git</connection>
-        <developerConnection>scm:git:git@github.com:antlr/antlr4.git</developerConnection>
-    </scm>
-
-    <profiles>
-        <profile>
-            <id>sonatype-oss-release</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-compiler-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>default-compile</id>
-                                <configuration>
-                                    <compilerArguments>
-                                        <bootclasspath>${bootclasspath.compile}</bootclasspath>
-                                    </compilerArguments>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>default-testCompile</id>
-                                <configuration>
-                                    <compilerArguments>
-                                        <bootclasspath>${bootclasspath.testCompile}</bootclasspath>
-                                    </compilerArguments>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.1</version>
-                <configuration>
-                    <sourceDirectory>src</sourceDirectory>
-                    <showWarnings>true</showWarnings>
-                    <showDeprecation>true</showDeprecation>
-                </configuration>
-
-                <executions>
-                    <execution>
-                        <id>default-compile</id>
-                        <configuration>
-                            <source>1.6</source>
-                            <target>1.6</target>
-                            <compilerArgument>-Xlint:-serial</compilerArgument>
-                            <compilerArguments>
-                                <Xlint/>
-                            </compilerArguments>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>default-testCompile</id>
-                        <configuration>
-                            <source>1.6</source>
-                            <target>1.6</target>
-                            <compilerArgument>-Xlint:-serial</compilerArgument>
-                            <compilerArguments>
-                                <Xlint/>
-                            </compilerArguments>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>2.4</version>
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-                        </manifest>
-                    </archive>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.15</version>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-                <!-- override the version inherited from the parent -->
-                <version>2.2.1</version>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <!-- override the version inherited from the parent -->
-                <version>2.9</version>
-                <configuration>
-                    <quiet>true</quiet>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-gpg-plugin</artifactId>
-                <!-- override the version inherited from the parent -->
-                <version>1.4</version>
-            </plugin>
-        </plugins>
-    </build>
+  <build>
+    <resources>
+      <resource>
+        <directory>resources</directory>
+      </resource>
+    </resources>
+    <testSourceDirectory>test</testSourceDirectory>
+    <testResources>
+      <testResource>
+        <directory>test</directory>
+      </testResource>
+    </testResources>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <configuration>
+            <source>${maven.compiler.source}</source>
+            <target>${maven.compiler.target}</target>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-javadoc-plugin</artifactId>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
 </project>

@@ -99,9 +99,9 @@ alt[boolean outerMost] returns [CodeBlockForAlt altCodeBlock, List<SrcOp> ops]
 		$altCodeBlock.ops = $ops = elems;
 		controller.setCurrentBlock($altCodeBlock);
 		}
-		^( ALT ( element {if ($element.omos!=null) elems.addAll($element.omos);} )+ )
+		^( ALT elementOptions? ( element {if ($element.omos!=null) elems.addAll($element.omos);} )+ )
 
-	|	^(ALT EPSILON)
+	|	^(ALT elementOptions? EPSILON)
         {$altCodeBlock = controller.epsilon(controller.getCurrentOuterMostAlt(), outerMost);}
     ;
 

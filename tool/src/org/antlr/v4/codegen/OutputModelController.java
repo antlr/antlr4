@@ -58,6 +58,7 @@ import org.antlr.v4.misc.Utils;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.parse.GrammarASTAdaptor;
 import org.antlr.v4.tool.Alternative;
+import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LeftRecursiveRule;
 import org.antlr.v4.tool.Rule;
@@ -266,17 +267,26 @@ public class OutputModelController {
 		for (int i = 0; i < opAltsCode.size(); i++) {
 			ST altActionST;
 			LeftRecursiveRuleAltInfo altInfo = r.recOpAlts.getElement(i);
+			String templateName;
 			if ( altInfo.altLabel!=null ) {
-				altActionST = codegenTemplates.getInstanceOf("recRuleLabeledAltStartAction");
+				templateName = "recRuleLabeledAltStartAction";
+				altActionST = codegenTemplates.getInstanceOf(templateName);
 				altActionST.add("currentAltLabel", altInfo.altLabel);
 			}
 			else {
-				altActionST = codegenTemplates.getInstanceOf("recRuleAltStartAction");
+				templateName = "recRuleAltStartAction";
+				altActionST = codegenTemplates.getInstanceOf(templateName);
 				altActionST.add("ctxName", Utils.capitalize(r.name));
 			}
 			altActionST.add("ruleName", r.name);
 			// add label of any lr ref we deleted
 			altActionST.add("label", altInfo.leftRecursiveRuleRefLabel);
+			if (altActionST.impl.formalArguments.containsKey("isListLabel")) {
+				altActionST.add("isListLabel", altInfo.isListLabel);
+			}
+			else if (altInfo.isListLabel) {
+				delegate.getGenerator().tool.errMgr.toolError(ErrorType.CODE_TEMPLATE_ARG_ISSUE, templateName, "isListLabel");
+			}
 			Action altAction =
 				new Action(delegate, function.altLabelCtxs.get(altInfo.altLabel), altActionST);
 			CodeBlockForAlt alt = opAltsCode.get(i);

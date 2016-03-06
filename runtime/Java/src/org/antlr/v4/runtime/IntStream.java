@@ -30,17 +30,15 @@
 
 package org.antlr.v4.runtime;
 
-import org.antlr.v4.runtime.misc.NotNull;
-
 /**
  * A simple stream of symbols whose values are represented as integers. This
  * interface provides <em>marked ranges</em> with support for a minimum level
  * of buffering necessary to implement arbitrary lookahead during prediction.
  * For more information on marked ranges, see {@link #mark}.
- * <p/>
- * <strong>Initializing Methods:</strong> Some methods in this interface have
+ *
+ * <p><strong>Initializing Methods:</strong> Some methods in this interface have
  * unspecified behavior if no call to an initializing method has occurred after
- * the stream was constructed. The following is a list of initializing methods:
+ * the stream was constructed. The following is a list of initializing methods:</p>
  *
  * <ul>
  *   <li>{@link #LA}</li>
@@ -93,8 +91,8 @@ public interface IntStream {
 	 * symbol in the stream. It is not valid to call this method with
 	 * {@code i==0}, but the specific behavior is unspecified because this
 	 * method is frequently called from performance-critical code.
-	 * <p/>
-	 * This method is guaranteed to succeed if any of the following are true:
+	 *
+	 * <p>This method is guaranteed to succeed if any of the following are true:</p>
 	 *
 	 * <ul>
 	 *   <li>{@code i>0}</li>
@@ -109,12 +107,12 @@ public interface IntStream {
 	 *     that has not yet been released.</li>
 	 * </ul>
 	 *
-	 * If {@code i} represents a position at or beyond the end of the stream,
-	 * this method returns {@link #EOF}.
-	 * <p/>
-	 * The return value is unspecified if {@code i<0} and fewer than {@code -i}
+	 * <p>If {@code i} represents a position at or beyond the end of the stream,
+	 * this method returns {@link #EOF}.</p>
+	 *
+	 * <p>The return value is unspecified if {@code i<0} and fewer than {@code -i}
 	 * calls to {@link #consume consume()} have occurred from the beginning of
-	 * the stream before calling this method.
+	 * the stream before calling this method.</p>
 	 *
 	 * @throws UnsupportedOperationException if the stream does not support
 	 * retrieving the value of the specified symbol
@@ -127,8 +125,8 @@ public interface IntStream {
 	 * was called to the current {@link #index index()}. This allows the use of
 	 * streaming input sources by specifying the minimum buffering requirements
 	 * to support arbitrary lookahead during prediction.
-	 * <p/>
-	 * The returned mark is an opaque handle (type {@code int}) which is passed
+	 *
+	 * <p>The returned mark is an opaque handle (type {@code int}) which is passed
 	 * to {@link #release release()} when the guarantees provided by the marked
 	 * range are no longer necessary. When calls to
 	 * {@code mark()}/{@code release()} are nested, the marks must be released
@@ -136,19 +134,19 @@ public interface IntStream {
 	 * used during performance-critical sections of prediction, the specific
 	 * behavior of invalid usage is unspecified (i.e. a mark is not released, or
 	 * a mark is released twice, or marks are not released in reverse order from
-	 * which they were created).
-	 * <p/>
-	 * The behavior of this method is unspecified if no call to an
+	 * which they were created).</p>
+	 *
+	 * <p>The behavior of this method is unspecified if no call to an
 	 * {@link IntStream initializing method} has occurred after this stream was
-	 * constructed.
-	 * <p/>
-	 * This method does not change the current position in the input stream.
-	 * <p/>
-	 * The following example shows the use of {@link #mark mark()},
+	 * constructed.</p>
+	 *
+	 * <p>This method does not change the current position in the input stream.</p>
+	 *
+	 * <p>The following example shows the use of {@link #mark mark()},
 	 * {@link #release release(mark)}, {@link #index index()}, and
 	 * {@link #seek seek(index)} as part of an operation to safely work within a
 	 * marked region, then restore the stream position to its original value and
-	 * release the mark.
+	 * release the mark.</p>
 	 * <pre>
 	 * IntStream stream = ...;
 	 * int index = -1;
@@ -175,8 +173,8 @@ public interface IntStream {
 	 * reverse order of the corresponding calls to {@code mark()}. If a mark is
 	 * released twice, or if marks are not released in reverse order of the
 	 * corresponding calls to {@code mark()}, the behavior is unspecified.
-	 * <p/>
-	 * For more information and an example, see {@link #mark}.
+	 *
+	 * <p>For more information and an example, see {@link #mark}.</p>
 	 *
 	 * @param marker A marker returned by a call to {@code mark()}.
 	 * @see #mark
@@ -186,10 +184,10 @@ public interface IntStream {
 	/**
 	 * Return the index into the stream of the input symbol referred to by
 	 * {@code LA(1)}.
-	 * <p/>
-	 * The behavior of this method is unspecified if no call to an
+	 *
+	 * <p>The behavior of this method is unspecified if no call to an
 	 * {@link IntStream initializing method} has occurred after this stream was
-	 * constructed.
+	 * constructed.</p>
 	 */
 	int index();
 
@@ -197,7 +195,7 @@ public interface IntStream {
 	 * Set the input cursor to the position indicated by {@code index}. If the
 	 * specified index lies past the end of the stream, the operation behaves as
 	 * though {@code index} was the index of the EOF symbol. After this method
-	 * returns without throwing an exception, the at least one of the following
+	 * returns without throwing an exception, then at least one of the following
 	 * will be true.
 	 *
 	 * <ul>
@@ -237,6 +235,6 @@ public interface IntStream {
 	 * non-null, non-empty string. If such a name is not known, this method
 	 * returns {@link #UNKNOWN_SOURCE_NAME}.
 	 */
-	@NotNull
+
 	public String getSourceName();
 }

@@ -1,9 +1,8 @@
 <!--
 
- [The "BSD license"]
-
- ANTLR        - Copyright (c) 2005-2010 Terence Parr
- Maven Plugin - Copyright (c) 2009      Jim Idle
+[The "BSD license"]
+ ANTLR        - Copyright (c) Terence Parr, Sam Harwell
+ Maven Plugin - Copyright (c) Jim Idle
 
  All rights reserved.
 
@@ -30,178 +29,132 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
   -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.antlr</groupId>
+    <artifactId>antlr4-master</artifactId>
+    <version>4.5.3-SNAPSHOT</version>
+  </parent>
+  <artifactId>antlr4-maven-plugin</artifactId>
+  <packaging>maven-plugin</packaging>
+  <name>ANTLR 4 Maven plugin</name>
+  <description>Maven plugin for ANTLR 4 grammars</description>
 
+  <prerequisites>
+    <maven>3.0</maven>
+  </prerequisites>
 
+  <!-- Ancilliary information for completeness -->
+  <inceptionYear>2009</inceptionYear>
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <!-- ============================================================================= -->
 
-    <modelVersion>4.0.0</modelVersion>
+  <!-- What are we depedent on for the Mojos to execute? We need the plugin 
+    API itself and of course we need the ANTLR Tool and runtime and any of their 
+    dependencies, which we inherit. The Tool itself provides us with all the 
+    dependencies, so we need only name it here. -->
+  <dependencies>
 
-    <parent>
-        <groupId>org.antlr</groupId>
-        <artifactId>antlr4-master</artifactId>
-        <version>4.1.1-SNAPSHOT</version>
-    </parent>
+    <!-- The things we need to build the target language recognizer -->
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-plugin-api</artifactId>
+      <version>3.0.5</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-project</artifactId>
+      <version>2.2.1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-compiler-api</artifactId>
+      <version>2.2</version>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.plexus</groupId>
+      <artifactId>plexus-build-api</artifactId>
+      <version>0.0.7</version>
+    </dependency>
+    <!-- The version of ANTLR tool that this version of the plugin controls. 
+      We have decided that this should be in lockstep with ANTLR itself, other 
+      than -1 -2 -3 etc patch releases. -->
+    <dependency>
+      <groupId>org.antlr</groupId>
+      <artifactId>antlr4</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <!-- Testing requirements... -->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.11</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.shared</groupId>
+      <artifactId>maven-plugin-testing-harness</artifactId>
+      <version>1.1</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.plugin-tools</groupId>
+      <artifactId>maven-plugin-annotations</artifactId>
+      <version>3.2</version>
+      <scope>provided</scope>
+    </dependency>
+  </dependencies>
 
-    <artifactId>antlr4-maven-plugin</artifactId>
-    <packaging>maven-plugin</packaging>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-plugin-plugin</artifactId>
+        <version>3.3</version>
+        <configuration>
+          <!-- see http://jira.codehaus.org/browse/MNG-5346 -->
+          <skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>
+        </configuration>
+        <executions>
+          <execution>
+            <id>mojo-descriptor</id>
+            <goals>
+              <goal>descriptor</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>help-goal</id>
+            <goals>
+              <goal>helpmojo</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 
-    <name>ANTLR 4 Maven plugin</name>
-    <description>Maven plugin for ANTLR 4 grammars</description>
-    <url>http://www.antlr.org</url>
-
-    <prerequisites>
-        <maven>3.0</maven>
-    </prerequisites>
-    
-    <!-- Ancilliary information for completeness
-      -->
-    <inceptionYear>2009</inceptionYear>
-
-    <!-- ============================================================================= -->
-
-    <!--
-
-     What are we depedent on for the Mojos to execute? We need the
-     plugin API itself and of course we need the ANTLR Tool and runtime
-     and any of their dependencies, which we inherit. The Tool itself provides
-     us with all the dependencies, so we need only name it here.
-      -->
-    <dependencies>
-
-        <!--
-          The things we need to build the target language recognizer
-          -->
-        <dependency>
-            <groupId>org.apache.maven</groupId>
-            <artifactId>maven-plugin-api</artifactId>
-            <version>3.0.5</version>
-            <scope>compile</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.maven</groupId>
-            <artifactId>maven-project</artifactId>
-            <version>2.2.1</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-compiler-api</artifactId>
-            <version>2.2</version>
-        </dependency>
-
-        <!--
-         The version of ANTLR tool that this version of the plugin controls.
-         We have decided that this should be in lockstep with ANTLR itself, other
-         than -1 -2 -3 etc patch releases.
-          -->
-        <dependency>
-            <groupId>org.antlr</groupId>
-            <artifactId>antlr4</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <!--
-          Testing requirements...
-          -->
-        <dependency>
-
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.11</version>
-            <scope>test</scope>
-
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.maven.shared</groupId>
-            <artifactId>maven-plugin-testing-harness</artifactId>
-            <version>1.1</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.maven.plugin-tools</groupId>
-            <artifactId>maven-plugin-annotations</artifactId>
-            <version>3.2</version>
-            <scope>provided</scope>
-        </dependency>
-
-    </dependencies>
-    
-    <build>
-
-        <defaultGoal>install</defaultGoal>
-
-        <plugins>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-plugin-plugin</artifactId>
-                <version>3.2</version>
-                <configuration>
-                    <!-- see http://jira.codehaus.org/browse/MNG-5346 -->
-                    <skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>mojo-descriptor</id>
-                        <goals>
-                            <goal>descriptor</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>help-goal</id>
-                        <goals>
-                            <goal>helpmojo</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-site-plugin</artifactId>
-                <version>3.3</version>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-project-info-reports-plugin</artifactId>
-                <version>2.7</version>
-                <configuration>
-                    <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
-                </configuration>
-            </plugin>
-
-        </plugins>
-
-    </build>
-
-    <reporting>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-plugin-plugin</artifactId>
-                <version>3.2</version>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.9</version>
-                <configuration>
-                    <quiet>true</quiet>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jxr-plugin</artifactId>
-                <version>2.3</version>
-            </plugin>
-        </plugins>
-    </reporting>
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-plugin-plugin</artifactId>
+        <version>3.3</version>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>2.9</version>
+        <configuration>
+          <quiet>true</quiet>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jxr-plugin</artifactId>
+        <version>2.3</version>
+      </plugin>
+    </plugins>
+  </reporting>
 </project>

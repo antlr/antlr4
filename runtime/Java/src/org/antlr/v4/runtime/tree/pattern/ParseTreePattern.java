@@ -30,7 +30,6 @@
 
 package org.antlr.v4.runtime.tree.pattern;
 
-import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.xpath.XPath;
 
@@ -51,19 +50,19 @@ public class ParseTreePattern {
 	/**
 	 * This is the backing field for {@link #getPattern()}.
 	 */
-	@NotNull
+
 	private final String pattern;
 
 	/**
 	 * This is the backing field for {@link #getPatternTree()}.
 	 */
-	@NotNull
+
 	private final ParseTree patternTree;
 
 	/**
 	 * This is the backing field for {@link #getMatcher()}.
 	 */
-	@NotNull
+
 	private final ParseTreePatternMatcher matcher;
 
 	/**
@@ -76,8 +75,8 @@ public class ParseTreePattern {
 	 * tree pattern.
 	 * @param patternTree The tree pattern in {@link ParseTree} form.
 	 */
-	public ParseTreePattern(@NotNull ParseTreePatternMatcher matcher,
-							@NotNull String pattern, int patternRuleIndex, @NotNull ParseTree patternTree)
+	public ParseTreePattern(ParseTreePatternMatcher matcher,
+							String pattern, int patternRuleIndex, ParseTree patternTree)
 	{
 		this.matcher = matcher;
 		this.patternRuleIndex = patternRuleIndex;
@@ -93,8 +92,8 @@ public class ParseTreePattern {
 	 * match operation. The {@link ParseTreeMatch#succeeded()} method can be
 	 * used to determine whether or not the match was successful.
 	 */
-	@NotNull
-	public ParseTreeMatch match(@NotNull ParseTree tree) {
+
+	public ParseTreeMatch match(ParseTree tree) {
 		return matcher.match(tree, this);
 	}
 
@@ -105,7 +104,7 @@ public class ParseTreePattern {
 	 * @return {@code true} if {@code tree} is a match for the current tree
 	 * pattern; otherwise, {@code false}.
 	 */
-	public boolean matches(@NotNull ParseTree tree) {
+	public boolean matches(ParseTree tree) {
 		return matcher.match(tree, this).succeeded();
 	}
 
@@ -120,8 +119,8 @@ public class ParseTreePattern {
 	 * successful matches. Unsuccessful matches are omitted from the result,
 	 * regardless of the reason for the failure.
 	 */
-	@NotNull
-	public List<ParseTreeMatch> findAll(@NotNull ParseTree tree, @NotNull String xpath) {
+
+	public List<ParseTreeMatch> findAll(ParseTree tree, String xpath) {
 		Collection<ParseTree> subtrees = XPath.findAll(tree, xpath, matcher.getParser());
 		List<ParseTreeMatch> matches = new ArrayList<ParseTreeMatch>();
 		for (ParseTree t : subtrees) {
@@ -139,7 +138,7 @@ public class ParseTreePattern {
 	 * @return The {@link ParseTreePatternMatcher} which created this tree
 	 * pattern.
 	 */
-	@NotNull
+
 	public ParseTreePatternMatcher getMatcher() {
 		return matcher;
 	}
@@ -149,7 +148,7 @@ public class ParseTreePattern {
 	 *
 	 * @return The tree pattern in concrete syntax form.
 	 */
-	@NotNull
+
 	public String getPattern() {
 		return pattern;
 	}
@@ -172,7 +171,7 @@ public class ParseTreePattern {
 	 *
 	 * @return The tree pattern as a {@link ParseTree}.
 	 */
-	@NotNull
+
 	public ParseTree getPatternTree() {
 		return patternTree;
 	}

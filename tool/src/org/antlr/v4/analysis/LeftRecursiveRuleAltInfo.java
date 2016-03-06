@@ -36,24 +36,27 @@ public class LeftRecursiveRuleAltInfo {
 	public int altNum; // original alt index (from 1)
 	public String leftRecursiveRuleRefLabel;
 	public String altLabel;
+	public final boolean isListLabel;
 	public String altText;
 	public AltAST altAST; // transformed ALT
 	public AltAST originalAltAST;
 	public int nextPrec;
 
 	public LeftRecursiveRuleAltInfo(int altNum, String altText) {
-		this(altNum, altText, null, null, null);
+		this(altNum, altText, null, null, false, null);
 	}
 
 	public LeftRecursiveRuleAltInfo(int altNum, String altText,
 									String leftRecursiveRuleRefLabel,
 									String altLabel,
+									boolean isListLabel,
 									AltAST originalAltAST)
 	{
 		this.altNum = altNum;
 		this.altText = altText;
 		this.leftRecursiveRuleRefLabel = leftRecursiveRuleRefLabel;
 		this.altLabel = altLabel;
+		this.isListLabel = isListLabel;
 		this.originalAltAST = originalAltAST;
 	}
 }

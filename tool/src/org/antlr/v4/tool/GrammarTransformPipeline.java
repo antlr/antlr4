@@ -31,14 +31,17 @@
 package org.antlr.v4.tool;
 
 import org.antlr.runtime.CommonToken;
+import org.antlr.runtime.tree.CommonTree;
 import org.antlr.runtime.tree.CommonTreeNodeStream;
 import org.antlr.runtime.tree.Tree;
 import org.antlr.runtime.tree.TreeVisitor;
 import org.antlr.runtime.tree.TreeVisitorAction;
 import org.antlr.v4.Tool;
+import org.antlr.v4.analysis.LeftRecursiveRuleTransformer;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.parse.BlockSetTransformer;
 import org.antlr.v4.parse.GrammarASTAdaptor;
+import org.antlr.v4.parse.GrammarToken;
 import org.antlr.v4.runtime.misc.DoubleKeyMap;
 import org.antlr.v4.runtime.misc.Pair;
 import org.antlr.v4.tool.ast.AltAST;
@@ -53,6 +56,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /** Handle left-recursion and block-set transforms */
@@ -126,6 +130,39 @@ public class GrammarTransformPipeline {
 		});
 	}
 
+	public static void augmentTokensWithOriginalPosition(final Grammar g, GrammarAST tree) {
+		if ( tree==null ) return;
+
+		List<GrammarAST> optionsSubTrees = tree.getNodesWithType(ANTLRParser.ELEMENT_OPTIONS);
+		for (int i = 0; i < optionsSubTrees.size(); i++) {
+			GrammarAST t = optionsSubTrees.get(i);
+			CommonTree elWithOpt = t.parent;
+			if ( elWithOpt instanceof GrammarASTWithOptions ) {
+				Map<String, GrammarAST> options = ((GrammarASTWithOptions) elWithOpt).getOptions();
+				if ( options.containsKey(LeftRecursiveRuleTransformer.TOKENINDEX_OPTION_NAME) ) {
+					GrammarToken newTok = new GrammarToken(g, elWithOpt.getToken());
+					newTok.originalTokenIndex = Integer.valueOf(options.get(LeftRecursiveRuleTransformer.TOKENINDEX_OPTION_NAME).getText());
+					elWithOpt.token = newTok;
+
+					GrammarAST originalNode = g.ast.getNodeWithTokenIndex(newTok.getTokenIndex());
+					if (originalNode != null) {
+						// update the AST node start/stop index to match the values
+						// of the corresponding node in the original parse tree.
+						elWithOpt.setTokenStartIndex(originalNode.getTokenStartIndex());
+						elWithOpt.setTokenStopIndex(originalNode.getTokenStopIndex());
+					}
+					else {
+						// the original AST node could not be located by index;
+						// make sure to assign valid values for the start/stop
+						// index so toTokenString will not throw exceptions.
+						elWithOpt.setTokenStartIndex(newTok.getTokenIndex());
+						elWithOpt.setTokenStopIndex(newTok.getTokenIndex());
+					}
+				}
+			}
+		}
+	}
+
 	/** Merge all the rules, token definitions, and named actions from
 		imported grammars into the root grammar tree.  Perform:
 
@@ -155,16 +192,9 @@ public class GrammarTransformPipeline {
 		// Compute list of rules in root grammar and ensure we have a RULES node
 		GrammarAST RULES = (GrammarAST)root.getFirstChildWithType(ANTLRParser.RULES);
 		Set<String> rootRuleNames = new HashSet<String>();
-		if ( RULES==null ) { // no rules in root, make RULES node, hook in
-			RULES = (GrammarAST)adaptor.create(ANTLRParser.RULES, "RULES");
-			RULES.g = rootGrammar;
-			root.addChild(RULES);
-		}
-		else {
-			// make list of rules we have in root grammar
-			List<GrammarAST> rootRules = RULES.getNodesWithType(ANTLRParser.RULE);
-			for (GrammarAST r : rootRules) rootRuleNames.add(r.getChild(0).getText());
-		}
+		// make list of rules we have in root grammar
+		List<GrammarAST> rootRules = RULES.getNodesWithType(ANTLRParser.RULE);
+		for (GrammarAST r : rootRules) rootRuleNames.add(r.getChild(0).getText());
 
 		for (Grammar imp : imports) {
 			// COPY TOKENS
@@ -252,8 +282,28 @@ public class GrammarTransformPipeline {
 
 			GrammarAST optionsRoot = (GrammarAST)imp.ast.getFirstChildWithType(ANTLRParser.OPTIONS);
 			if ( optionsRoot!=null ) {
-				rootGrammar.tool.errMgr.grammarError(ErrorType.OPTIONS_IN_DELEGATE,
-									optionsRoot.g.fileName, optionsRoot.token, imp.name);
+				// suppress the warning if the options match the options specified
+				// in the root grammar
+				// https://github.com/antlr/antlr4/issues/707
+
+				boolean hasNewOption = false;
+				for (Map.Entry<String, GrammarAST> option : imp.ast.getOptions().entrySet()) {
+					String importOption = imp.ast.getOptionString(option.getKey());
+					if (importOption == null) {
+						continue;
+					}
+
+					String rootOption = rootGrammar.ast.getOptionString(option.getKey());
+					if (!importOption.equals(rootOption)) {
+						hasNewOption = true;
+						break;
+					}
+				}
+
+				if (hasNewOption) {
+					rootGrammar.tool.errMgr.grammarError(ErrorType.OPTIONS_IN_DELEGATE,
+										optionsRoot.g.fileName, optionsRoot.token, imp.name);
+				}
 			}
 		}
 		rootGrammar.tool.log("grammar", "Grammar: "+rootGrammar.ast.toStringTree());
@@ -302,7 +352,9 @@ public class GrammarTransformPipeline {
 				if ( Grammar.lexerOptions.contains(optionName) &&
 					 !Grammar.doNotCopyOptionsToLexer.contains(optionName) )
 				{
-					lexerOptionsRoot.addChild((Tree)adaptor.dupTree(o));
+					GrammarAST optionTree = (GrammarAST)adaptor.dupTree(o);
+					lexerOptionsRoot.addChild(optionTree);
+					lexerAST.setOption(optionName, (GrammarAST)optionTree.getChild(1));
 				}
 			}
 		}
@@ -359,6 +411,7 @@ public class GrammarTransformPipeline {
 		// add strings from combined grammar (and imported grammars) into lexer
 		// put them first as they are keywords; must resolve ambigs to these rules
 //		tool.log("grammar", "strings from parser: "+stringLiterals);
+		int insertIndex = 0;
 		nextLit:
 		for (String lit : stringLiterals) {
 			// if lexer already has a rule for literal, continue
@@ -380,9 +433,12 @@ public class GrammarTransformPipeline {
 			CommonToken idToken = new CommonToken(ANTLRParser.TOKEN_REF, rname);
 			litRule.addChild(new TerminalAST(idToken));
 			litRule.addChild(blk);
-			lexerRulesRoot.insertChild(0, litRule);        // add first
+			lexerRulesRoot.insertChild(insertIndex, litRule);
 //			lexerRulesRoot.getChildren().add(0, litRule);
 			lexerRulesRoot.freshenParentAndChildIndexes(); // reset indexes and set litRule parent
+
+			// next literal will be added after the one just added
+			insertIndex++;
 		}
 
 		// TODO: take out after stable if slow

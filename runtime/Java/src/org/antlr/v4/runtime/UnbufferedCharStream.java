@@ -53,16 +53,16 @@ public class UnbufferedCharStream implements CharStream {
 
 	/**
 	 * The number of characters currently in {@link #data data}.
-	 * <p/>
-	 * This is not the buffer capacity, that's {@code data.length}.
+	 *
+	 * <p>This is not the buffer capacity, that's {@code data.length}.</p>
 	 */
    	protected int n;
 
 	/**
 	 * 0..n-1 index into {@link #data data} of next character.
-	 * <p/>
-	 * The {@code LA(1)} character is {@code data[p]}. If {@code p == n}, we are
-	 * out of buffered characters.
+	 *
+	 * <p>The {@code LA(1)} character is {@code data[p]}. If {@code p == n}, we are
+	 * out of buffered characters.</p>
 	 */
    	protected int p=0;
 
@@ -214,10 +214,10 @@ public class UnbufferedCharStream implements CharStream {
 
 	/**
 	 * Return a marker that we can release later.
-	 * <p/>
-	 * The specific marker value used for this class allows for some level of
+	 *
+	 * <p>The specific marker value used for this class allows for some level of
 	 * protection against misuse where {@code seek()} is called on a mark or
-	 * {@code release()} is called in the wrong order.
+	 * {@code release()} is called in the wrong order.</p>
 	 */
     @Override
     public int mark() {
@@ -297,6 +297,10 @@ public class UnbufferedCharStream implements CharStream {
 
     @Override
     public String getSourceName() {
+		if (name == null || name.isEmpty()) {
+			return UNKNOWN_SOURCE_NAME;
+		}
+
 		return name;
 	}
 

@@ -1,0 +1,32 @@
+TestType() ::= "Parser"
+
+Options ::= [
+	"Debug": false
+]
+
+Grammar ::= [
+	"T": {<grammar("T")>}
+]
+
+Input() ::= "x x y"
+
+Rule() ::= "s"
+
+Output() ::= <<
+alt 2
+alt 2
+alt 2<\n>
+>>
+
+Errors() ::= ""
+
+grammar(grammarName) ::= <<
+grammar <grammarName>;
+	s : a+ ;
+a : {<False()>}? ID {<writeln("\"alt 1\"")>}
+  | {<True()>}?  ID {<writeln("\"alt 2\"")>}
+  ;
+ID : 'a'..'z'+ ;
+INT : '0'..'9'+;
+WS : (' '|'\n') -> skip ;
+>>

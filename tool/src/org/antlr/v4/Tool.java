@@ -41,6 +41,7 @@ import org.antlr.v4.automata.ATNFactory;
 import org.antlr.v4.automata.LexerATNFactory;
 import org.antlr.v4.automata.ParserATNFactory;
 import org.antlr.v4.codegen.CodeGenPipeline;
+import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.misc.Graph;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.parse.GrammarASTAdaptor;
@@ -48,8 +49,8 @@ import org.antlr.v4.parse.GrammarTreeVisitor;
 import org.antlr.v4.parse.ToolANTLRLexer;
 import org.antlr.v4.parse.ToolANTLRParser;
 import org.antlr.v4.parse.v3TreeGrammarException;
+import org.antlr.v4.runtime.RuntimeMetaData;
 import org.antlr.v4.runtime.misc.LogManager;
-import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.semantics.SemanticPipeline;
 import org.antlr.v4.tool.ANTLRMessage;
 import org.antlr.v4.tool.ANTLRToolListener;
@@ -89,8 +90,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class Tool {
 	public static final String VERSION;
 	static {
-		String version = Tool.class.getPackage().getImplementationVersion();
-		VERSION = version != null ? version : "4.x";
+		// Assigned in a static{} block to prevent the field from becoming a
+		// compile-time constant
+		VERSION = RuntimeMetaData.VERSION;
 	}
 
 	public static final String GRAMMAR_EXTENSION = ".g4";
@@ -120,7 +122,7 @@ public class Tool {
 
 	// fields set by option manager
 
-	public File inputDirectory;
+	public File inputDirectory; // used by mvn plugin but not set by tool itself.
 	public String outputDirectory;
 	public String libDirectory;
 	public boolean generate_ATN_dot = false;
@@ -339,7 +341,7 @@ public class Tool {
 				System.out.println(dep.getDependencies().render());
 
 			}
-			else {
+			else if (errMgr.getNumErrors() == 0) {
 				process(g, true);
 			}
 		}
@@ -396,6 +398,12 @@ public class Tool {
 		SemanticPipeline sem = new SemanticPipeline(g);
 		sem.process();
 
+		String language = g.getOptionString("language");
+		if ( !CodeGenerator.targetExists(language) ) {
+			errMgr.toolError(ErrorType.CANNOT_CREATE_TARGET_GENERATOR, language);
+			return;
+		}
+
 		if ( errMgr.getNumErrors()>prevErrors ) return;
 
 		// BUILD ATN FROM AST
@@ -425,7 +433,8 @@ public class Tool {
 	 * Important enough to avoid multiple definitions that we do very early,
 	 * right after AST construction. Also check for undefined rules in
 	 * parser/lexer to avoid exceptions later. Return true if we find multiple
-	 * definitions of the same rule or a reference to an undefined rule.
+	 * definitions of the same rule or a reference to an undefined rule or
+	 * parser rule ref in lexer rule.
 	 */
 	public boolean checkForRuleIssues(final Grammar g) {
 		// check for redefined rules
@@ -457,7 +466,7 @@ public class Tool {
 
 		// check for undefined rules
 		class UndefChecker extends GrammarTreeVisitor {
-			public boolean undefined = false;
+			public boolean badref = false;
 			@Override
 			public void tokenRef(TerminalAST ref) {
 				if ("EOF".equals(ref.getText())) {
@@ -471,18 +480,28 @@ public class Tool {
 			@Override
 			public void ruleRef(GrammarAST ref, ActionAST arg) {
 				RuleAST ruleAST = ruleToAST.get(ref.getText());
-				if ( ruleAST==null ) {
-					undefined = true;
+				String fileName = ref.getToken().getInputStream().getSourceName();
+				if (Character.isUpperCase(currentRuleName.charAt(0)) &&
+					Character.isLowerCase(ref.getText().charAt(0)))
+				{
+					badref = true;
+					errMgr.grammarError(ErrorType.PARSER_RULE_REF_IN_LEXER_RULE,
+										fileName, ref.getToken(), ref.getText(), currentRuleName);
+				}
+				else if ( ruleAST==null ) {
+					badref = true;
 					errMgr.grammarError(ErrorType.UNDEFINED_RULE_REF,
-										g.fileName, ref.token, ref.getText());
+										fileName, ref.token, ref.getText());
 				}
 			}
+			@Override
+			public ErrorManager getErrorManager() { return errMgr; }
 		}
 
 		UndefChecker chk = new UndefChecker();
 		chk.visitGrammar(g.ast);
 
-		return redefinition || chk.undefined;
+		return redefinition || chk.badref;
 	}
 
 	public List<GrammarRootAST> sortGrammarByTokenVocab(List<String> fileNames) {
@@ -490,7 +509,7 @@ public class Tool {
 		Graph<String> g = new Graph<String>();
 		List<GrammarRootAST> roots = new ArrayList<GrammarRootAST>();
 		for (String fileName : fileNames) {
-			GrammarAST t = loadGrammar(fileName);
+			GrammarAST t = parseGrammar(fileName);
 			if ( t==null || t instanceof GrammarASTErrorNode) continue; // came back as error node
 			if ( ((GrammarRootAST)t).hasErrors ) continue;
 			GrammarRootAST root = (GrammarRootAST)t;
@@ -558,7 +577,7 @@ public class Tool {
 		return g;
 	}
 
-	public GrammarRootAST loadGrammar(String fileName) {
+	public GrammarRootAST parseGrammar(String fileName) {
 		try {
 			File file = new File(fileName);
 			if (!file.isAbsolute()) {
@@ -566,7 +585,7 @@ public class Tool {
 			}
 
 			ANTLRFileStream in = new ANTLRFileStream(file.getAbsolutePath(), grammarEncoding);
-			GrammarRootAST t = load(fileName, in);
+			GrammarRootAST t = parse(fileName, in);
 			return t;
 		}
 		catch (IOException ioe) {
@@ -575,38 +594,64 @@ public class Tool {
 		return null;
 	}
 
+	/** Convenience method to load and process an ANTLR grammar. Useful
+	 *  when creating interpreters.  If you need to access to the lexer
+	 *  grammar created while processing a combined grammar, use
+	 *  getImplicitLexer() on returned grammar.
+	 */
+	public Grammar loadGrammar(String fileName) {
+		GrammarRootAST grammarRootAST = parseGrammar(fileName);
+		final Grammar g = createGrammar(grammarRootAST);
+		g.fileName = fileName;
+		process(g, false);
+		return g;
+	}
+
+	private final Map<String, Grammar> importedGrammars = new HashMap<String, Grammar>();
+
 	/**
 	 * Try current dir then dir of g then lib dir
 	 * @param g
-	 * @param name The imported grammar name.
+	 * @param nameNode The node associated with the imported grammar name.
 	 */
-	public Grammar loadImportedGrammar(Grammar g, String name) throws IOException {
-		g.tool.log("grammar", "load " + name + " from " + g.fileName);
-		File importedFile = null;
-		for (String extension : ALL_GRAMMAR_EXTENSIONS) {
-			importedFile = getImportedGrammarFile(g, name + extension);
-			if (importedFile != null) {
-				break;
+	public Grammar loadImportedGrammar(Grammar g, GrammarAST nameNode) throws IOException {
+		String name = nameNode.getText();
+		Grammar imported = importedGrammars.get(name);
+		if (imported == null) {
+			g.tool.log("grammar", "load " + name + " from " + g.fileName);
+			File importedFile = null;
+			for (String extension : ALL_GRAMMAR_EXTENSIONS) {
+				importedFile = getImportedGrammarFile(g, name + extension);
+				if (importedFile != null) {
+					break;
+				}
 			}
+
+			if ( importedFile==null ) {
+				errMgr.grammarError(ErrorType.CANNOT_FIND_IMPORTED_GRAMMAR, g.fileName, nameNode.getToken(), name);
+				return null;
+			}
+
+			String absolutePath = importedFile.getAbsolutePath();
+			ANTLRFileStream in = new ANTLRFileStream(absolutePath, grammarEncoding);
+			GrammarRootAST root = parse(g.fileName, in);
+			if (root == null) {
+				return null;
+			}
+
+			imported = createGrammar(root);
+			imported.fileName = absolutePath;
+			importedGrammars.put(root.getGrammarName(), imported);
 		}
 
-		if ( importedFile==null ) {
-			errMgr.toolError(ErrorType.CANNOT_FIND_IMPORTED_GRAMMAR, name, g.fileName);
-			return null;
-		}
-
-		ANTLRFileStream in = new ANTLRFileStream(importedFile.getAbsolutePath());
-		GrammarRootAST root = load(g.fileName, in);
-		Grammar imported = createGrammar(root);
-		imported.fileName = importedFile.getAbsolutePath();
 		return imported;
 	}
 
-	public GrammarRootAST loadFromString(String grammar) {
-		return load("<string>", new ANTLRStringStream(grammar));
+	public GrammarRootAST parseGrammarFromString(String grammar) {
+		return parse("<string>", new ANTLRStringStream(grammar));
 	}
 
-	public GrammarRootAST load(String fileName, CharStream in) {
+	public GrammarRootAST parse(String fileName, CharStream in) {
 		try {
 			GrammarASTAdaptor adaptor = new GrammarASTAdaptor(in);
 			ToolANTLRLexer lexer = new ToolANTLRLexer(in, this);
@@ -618,7 +663,7 @@ public class Tool {
 				ParserRuleReturnScope r = p.grammarSpec();
 				GrammarAST root = (GrammarAST)r.getTree();
 				if ( root instanceof GrammarRootAST) {
-					((GrammarRootAST)root).hasErrors = p.getNumberOfSyntaxErrors()>0;
+					((GrammarRootAST)root).hasErrors = lexer.getNumberOfSyntaxErrors()>0 || p.getNumberOfSyntaxErrors()>0;
 					assert ((GrammarRootAST)root).tokenStream == tokens;
 					if ( grammarOptions!=null ) {
 						((GrammarRootAST)root).cmdLineOptions = grammarOptions;
@@ -796,7 +841,7 @@ public class Tool {
 		}
 	}
 
-    public void log(@Nullable String component, String msg) { logMgr.log(component, msg); }
+    public void log(String component, String msg) { logMgr.log(component, msg); }
     public void log(String msg) { log(null, msg); }
 
 	public int getNumErrors() { return errMgr.getNumErrors(); }

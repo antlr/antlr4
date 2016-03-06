@@ -62,9 +62,24 @@ public class LexerGrammar extends Grammar {
 	}
 
 	@Override
-	public void defineRule(Rule r) {
-		super.defineRule(r);
+	public boolean defineRule(Rule r) {
+		if (!super.defineRule(r)) {
+			return false;
+		}
+
 		if ( modes==null ) modes = new MultiMap<String, Rule>();
 		modes.map(r.mode, r);
+		return true;
+	}
+
+	@Override
+	public boolean undefineRule(Rule r) {
+		if (!super.undefineRule(r)) {
+			return false;
+		}
+
+		boolean removed = modes.get(r.mode).remove(r);
+		assert removed;
+		return true;
 	}
 }

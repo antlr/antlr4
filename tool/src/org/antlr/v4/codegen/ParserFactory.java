@@ -41,9 +41,7 @@ import org.antlr.v4.codegen.model.InvokeRule;
 import org.antlr.v4.codegen.model.LL1AltBlock;
 import org.antlr.v4.codegen.model.LL1OptionalBlock;
 import org.antlr.v4.codegen.model.LL1OptionalBlockSingleAlt;
-import org.antlr.v4.codegen.model.LL1PlusBlock;
 import org.antlr.v4.codegen.model.LL1PlusBlockSingleAlt;
-import org.antlr.v4.codegen.model.LL1StarBlock;
 import org.antlr.v4.codegen.model.LL1StarBlockSingleAlt;
 import org.antlr.v4.codegen.model.LabeledOp;
 import org.antlr.v4.codegen.model.LeftRecursiveRuleFunction;
@@ -65,7 +63,7 @@ import org.antlr.v4.codegen.model.decl.TokenDecl;
 import org.antlr.v4.codegen.model.decl.TokenListDecl;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.runtime.atn.DecisionState;
-import org.antlr.v4.runtime.atn.PlusBlockStartState;
+import org.antlr.v4.runtime.atn.PlusLoopbackState;
 import org.antlr.v4.runtime.atn.StarLoopEntryState;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.tool.Alternative;
@@ -248,7 +246,7 @@ public class ParserFactory extends DefaultOutputModelFactory {
 		if (!g.tool.force_atn) {
 			int decision;
 			if ( ebnfRoot.getType()==ANTLRParser.POSITIVE_CLOSURE ) {
-				decision = ((PlusBlockStartState)ebnfRoot.atnState).loopBackState.decision;
+				decision = ((PlusLoopbackState)ebnfRoot.atnState).decision;
 			}
 			else if ( ebnfRoot.getType()==ANTLRParser.CLOSURE ) {
 				decision = ((StarLoopEntryState)ebnfRoot.atnState).decision;
@@ -287,11 +285,11 @@ public class ParserFactory extends DefaultOutputModelFactory {
 				break;
 			case ANTLRParser.CLOSURE :
 				if ( alts.size()==1 ) c = new LL1StarBlockSingleAlt(this, ebnfRoot, alts);
-				else c = new LL1StarBlock(this, ebnfRoot, alts);
+				else c = getComplexEBNFBlock(ebnfRoot, alts);
 				break;
 			case ANTLRParser.POSITIVE_CLOSURE :
 				if ( alts.size()==1 ) c = new LL1PlusBlockSingleAlt(this, ebnfRoot, alts);
-				else c = new LL1PlusBlock(this, ebnfRoot, alts);
+				else c = getComplexEBNFBlock(ebnfRoot, alts);
 				break;
 		}
 		return c;
@@ -318,7 +316,7 @@ public class ParserFactory extends DefaultOutputModelFactory {
 
 	@Override
 	public List<SrcOp> getLL1Test(IntervalSet look, GrammarAST blkAST) {
-		return list(new TestSetInline(this, blkAST, look));
+		return list(new TestSetInline(this, blkAST, look, gen.getTarget().getInlineTestSetWordSize()));
 	}
 
 	@Override

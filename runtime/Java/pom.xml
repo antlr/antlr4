@@ -1,77 +1,66 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.antlr</groupId>
+    <artifactId>antlr4-master</artifactId>
+    <version>4.5.3-SNAPSHOT</version>
+    <relativePath>../../pom.xml</relativePath>
+  </parent>
+  <artifactId>antlr4-runtime</artifactId>
+  <name>ANTLR 4 Runtime</name>
+  <description>The ANTLR 4 Runtime</description>
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-
-    <parent>
+  <build>
+    <sourceDirectory>src</sourceDirectory>
+    <plugins>
+      <plugin>
         <groupId>org.antlr</groupId>
-        <artifactId>antlr4-master</artifactId>
-        <version>4.1.1-SNAPSHOT</version>
-        <relativePath>../..</relativePath>
-    </parent>
-
-    <artifactId>antlr4-runtime</artifactId>
-
-    <name>ANTLR 4 Runtime</name>
-    <description>The ANTLR 4 Runtime</description>
-
-    <dependencies>
-        <dependency>
-            <groupId>org.abego.treelayout</groupId>
-            <artifactId>org.abego.treelayout.core</artifactId>
-            <version>1.0.1</version>
-            <scope>compile</scope>
-        </dependency>
-    </dependencies>
-
-    <profiles>
-        <profile>
-            <id>sonatype-oss-release</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>us.bryon</groupId>
-                        <artifactId>graphviz-maven-plugin</artifactId>
-                        <version>1.0</version>
-                        <executions>
-                            <execution>
-                                <goals>
-                                    <goal>dot</goal>
-                                </goals>
-                                <configuration>
-                                    <destdir>${project.build.directory}/apidocs</destdir>
-                                    <output>svg</output>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
-
-    <build>
-
-        <sourceDirectory>src</sourceDirectory>
-        <resources/>
-
-        <plugins>
-            <plugin>
-                <groupId>org.antlr</groupId>
-                <artifactId>antlr4-maven-plugin</artifactId>
-                <version>4.1</version>
-                <configuration>
-                    <sourceDirectory>src</sourceDirectory>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>antlr4</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
-
+        <artifactId>antlr4-maven-plugin</artifactId>
+        <version>4.5</version>
+        <executions>
+          <execution>
+            <id>antlr</id>
+            <configuration>
+              <sourceDirectory>src</sourceDirectory>
+            </configuration>
+            <goals>
+              <goal>antlr4</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <version>2.5.4</version>
+        <executions>
+          <execution>
+            <id>bundle-manifest</id>
+            <phase>process-classes</phase>
+            <configuration>
+              <instructions>
+                <Bundle-SymbolicName>org.antlr.antlr4-runtime-osgi</Bundle-SymbolicName>
+                <Implementation-Title>ANTLR 4 Runtime</Implementation-Title>
+                <Implementation-Vendor>ANTLR</Implementation-Vendor>
+                <Implementation-Vendor-Id>org.antlr</Implementation-Vendor-Id>
+                <Implementation-Version>${project.version}</Implementation-Version>
+              </instructions>
+            </configuration>
+            <goals>
+              <goal>manifest</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>2.4</version>
+        <configuration>
+          <archive>
+            <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
+          </archive>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>

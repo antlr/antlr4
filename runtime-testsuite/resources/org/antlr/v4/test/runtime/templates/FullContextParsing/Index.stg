@@ -1,0 +1,17 @@
+TestTemplates ::= [
+	"AmbigYieldsCtxSensitiveDFA": [],
+	"CtxSensitiveDFA_1": [],
+	"CtxSensitiveDFA_2": [],
+	"CtxSensitiveDFATwoDiffInput": [],
+	"SLLSeesEOFInLLGrammar": [],
+	"FullContextIF_THEN_ELSEParse_1": [],
+	"FullContextIF_THEN_ELSEParse_2": [],
+	"FullContextIF_THEN_ELSEParse_3": [],
+	"FullContextIF_THEN_ELSEParse_4": [],
+	"FullContextIF_THEN_ELSEParse_5": [],
+	"FullContextIF_THEN_ELSEParse_6": [],
+	"LoopsSimulateTailRecursion": [],
+	"AmbiguityNoLoop": [],
+	"ExprAmbiguity_1": [],
+	"ExprAmbiguity_2": []
+]

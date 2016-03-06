@@ -1,0 +1,9 @@
+import "DirectCallToLeftRecursiveRule.stg"
+
+Input() ::= "x y z"
+
+Output() ::= <<
+(a (a (a x) y) z)<\n>
+>>
+
+Errors() ::= ""

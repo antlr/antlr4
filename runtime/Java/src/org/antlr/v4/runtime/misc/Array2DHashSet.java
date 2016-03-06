@@ -42,7 +42,7 @@ public class Array2DHashSet<T> implements Set<T> {
 	public static final int INITAL_BUCKET_CAPACITY = 8;
 	public static final double LOAD_FACTOR = 0.75;
 
-	@NotNull
+
 	protected final AbstractEqualityComparator<? super T> comparator;
 
 	protected T[][] buckets;
@@ -59,11 +59,11 @@ public class Array2DHashSet<T> implements Set<T> {
 		this(null, INITAL_CAPACITY, INITAL_BUCKET_CAPACITY);
 	}
 
-	public Array2DHashSet(@Nullable AbstractEqualityComparator<? super T> comparator) {
+	public Array2DHashSet(AbstractEqualityComparator<? super T> comparator) {
 		this(comparator, INITAL_CAPACITY, INITAL_BUCKET_CAPACITY);
 	}
 
-	public Array2DHashSet(@Nullable AbstractEqualityComparator<? super T> comparator, int initialCapacity, int initialBucketCapacity) {
+	public Array2DHashSet(AbstractEqualityComparator<? super T> comparator, int initialCapacity, int initialBucketCapacity) {
 		if (comparator == null) {
 			comparator = ObjectEqualityComparator.INSTANCE;
 		}
@@ -226,7 +226,7 @@ public class Array2DHashSet<T> implements Set<T> {
 		return containsFast(asElementType(o));
 	}
 
-	public boolean containsFast(@Nullable T obj) {
+	public boolean containsFast(T obj) {
 		if (obj == null) {
 			return false;
 		}
@@ -290,7 +290,7 @@ public class Array2DHashSet<T> implements Set<T> {
 		return removeFast(asElementType(o));
 	}
 
-	public boolean removeFast(@Nullable T obj) {
+	public boolean removeFast(T obj) {
 		if (obj == null) {
 			return false;
 		}

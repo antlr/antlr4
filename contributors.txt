@@ -55,3 +55,36 @@ YYYY/MM/DD, github id, Full name, email
 2013/01/29, metadave, Dave Parfitt, diparfitt@gmail.com
 2013/03/06, bkiers, Bart Kiers, bkiers@gmail.com
 2013/08/20, cayhorstmann, Cay Horstmann, cay@horstmann.com
+2014/03/18, aphyr, Kyle Kingsbury, aphyr@aphyr.com
+2014/06/07, ericvergnaud, Eric Vergnaud, eric.vergnaud@wanadoo.fr
+2014/07/04, jimidle, Jim Idle, jimi@Idle.ws
+2014/09/04. jeduden, Jan-Eric Duden, jeduden@gmail.com
+2014/09/27, petrbel, Petr Bělohlávek, antlr@petrbel.cz
+2014/10/18, sergiusignacius, Sérgio Silva, serge.a.silva@gmail.com
+2014/10/26, bdkearns, Brian Kearns, bdkearns@gmail.com
+2014/10/27, michaelpj, Michael Peyton Jones, michaelpj@gmail.com
+2015/01/29, TomLottermann, Thomas Lottermann, tomlottermann@gmail.com
+2015/02/15, pavlo, Pavlo Lysov, pavlikus@gmail.com
+2015/03/07, RedTailedHawk, Lawrence Parker, larry@answerrocket.com
+2015/04/03, rljacobson, Robert Jacobson, rljacobson@gmail.com
+2015/04/06, ojakubcik, Ondrej Jakubcik, ojakubcik@gmail.com
+2015/04/29, jszheng, Jinshan Zheng, zheng_js@hotmail.com
+2015/05/08, ViceIce, Michael Kriese, michael.kriese@gmx.de
+2015/05/09, lkraz, Luke Krasnoff, luke.krasnoff@gmail.com
+2015/05/12, Pursuit92, Josh Chase, jcjoshuachase@gmail.com
+2015/05/20, peturingi, Pétur Ingi Egilsson, petur@petur.eu
+2015/05/27, jcbrinfo, Jean-Christophe Beaupré, jcbrinfo@users.noreply.github.com
+2015/06/29, jvanzyl, Jason van Zyl, jason@takari.io
+2015/08/18, krzkaczor, Krzysztof Kaczor, krzysztof@kaczor.io
+2015/09/18, worsht, Rajiv Subrahmanyam, rajiv.public@gmail.com
+2015/09/24, HSorensen, Henrik Sorensen, henrik.b.sorensen@gmail.com
+2015/10/06, brwml, Bryan Wilhelm, bryan.wilhelm@microsoft.com
+2015/10/08, fedotovalex, Alex Fedotov, me@alexfedotov.com
+2015/10/12, KvanTTT, Ivan Kochurkin, ivan.kochurkin@gmail.com
+2015/10/21, martin-probst, Martin Probst, martin-probst@web.de
+2015/10/21, hkff, Walid Benghabrit, walid.benghabrit@mines-nantes.fr
+2015/11/12, cooperra, Robbie Cooper, cooperra@users.noreply.github.com
+2015/11/25, abego, Udo Borkowski, ub@abego.org
+2015/12/17, sebadur, Sebastian Badur, sebadur@users.noreply.github.com
+2015/12/23, pboyer, Peter Boyer, peter.b.boyer@gmail.com
+2015/12/24, dtymon, David Tymon, david.tymon@gmail.com

@@ -32,8 +32,6 @@ package org.antlr.v4.runtime;
 
 import org.antlr.v4.runtime.atn.ATNConfigSet;
 import org.antlr.v4.runtime.misc.Interval;
-import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.misc.Utils;
 
 import java.util.Locale;
@@ -43,13 +41,12 @@ public class LexerNoViableAltException extends RecognitionException {
 	private final int startIndex;
 
 	/** Which configurations did we try at input.index() that couldn't match input.LA(1)? */
-	@Nullable
 	private final ATNConfigSet deadEndConfigs;
 
-	public LexerNoViableAltException(@Nullable Lexer lexer,
-									 @NotNull CharStream input,
+	public LexerNoViableAltException(Lexer lexer,
+									 CharStream input,
 									 int startIndex,
-									 @Nullable ATNConfigSet deadEndConfigs) {
+									 ATNConfigSet deadEndConfigs) {
 		super(lexer, input, null);
 		this.startIndex = startIndex;
 		this.deadEndConfigs = deadEndConfigs;
@@ -59,7 +56,7 @@ public class LexerNoViableAltException extends RecognitionException {
 		return startIndex;
 	}
 
-	@Nullable
+
 	public ATNConfigSet getDeadEndConfigs() {
 		return deadEndConfigs;
 	}

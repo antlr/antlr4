@@ -39,25 +39,29 @@ import java.util.List;
 
 /** */
 public class TestSetInline extends SrcOp {
+	public int bitsetWordSize;
 	public String varName;
 	public Bitset[] bitsets;
 
-	public TestSetInline(OutputModelFactory factory, GrammarAST ast, IntervalSet set) {
+	public TestSetInline(OutputModelFactory factory, GrammarAST ast, IntervalSet set, int wordSize) {
 		super(factory, ast);
-
-		Bitset[] withZeroOffset = createBitsets(factory, set, true);
-		Bitset[] withoutZeroOffset = createBitsets(factory, set, false);
+		bitsetWordSize = wordSize;
+		Bitset[] withZeroOffset = createBitsets(factory, set, wordSize, true);
+		Bitset[] withoutZeroOffset = createBitsets(factory, set, wordSize, false);
 		this.bitsets = withZeroOffset.length <= withoutZeroOffset.length ? withZeroOffset : withoutZeroOffset;
 		this.varName = "_la";
 	}
 
-	private static Bitset[] createBitsets(OutputModelFactory factory, IntervalSet set, boolean useZeroOffset) {
+	private static Bitset[] createBitsets(OutputModelFactory factory,
+										  IntervalSet set,
+										  int wordSize,
+										  boolean useZeroOffset) {
 		List<Bitset> bitsetList = new ArrayList<Bitset>();
 		for (int ttype : set.toArray()) {
 			Bitset current = !bitsetList.isEmpty() ? bitsetList.get(bitsetList.size() - 1) : null;
-			if (current == null || ttype > (current.shift + 63)) {
+			if (current == null || ttype > (current.shift + wordSize-1)) {
 				current = new Bitset();
-				if (useZeroOffset && ttype >= 0 && ttype < 63) {
+				if (useZeroOffset && ttype >= 0 && ttype < wordSize-1) {
 					current.shift = 0;
 				}
 				else {

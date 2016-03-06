@@ -1,0 +1,39 @@
+TestType() ::= "CompositeParser"
+
+Grammar ::= [
+	"M": {<masterGrammar("M", ["S", "T"])>}
+]
+
+SlaveGrammars ::= [
+	"S": {<slaveGrammarS("S")>},
+	"T": {<slaveGrammarT("T")>}
+]
+
+Rule() ::= "s"
+
+Input() ::= "b"
+
+Output() ::= <<
+S.a<\n>
+>>
+
+Errors() ::= ""
+
+masterGrammar(grammarName, slaveGrammarName) ::= <<
+grammar M;
+import S,T;
+s : a ;
+B : 'b' ; // defines B from inherited token space
+WS : (' '|'\n') -> skip ;
+>>
+
+slaveGrammarS(grammarName) ::= <<
+parser grammar S;
+a : b {<writeln("\"S.a\"")>};
+b : B;
+>>
+
+slaveGrammarT(grammarName) ::= <<
+parser grammar T;
+a : B {<writeln("\"T.a\"")>};<! hidden by S.a !>
+>>

@@ -1,0 +1,30 @@
+// this must return A not I to the parser; calling a nonfragment rule
+// from a nonfragment rule does not set the overall token.
+
+TestType() ::= "Parser"
+
+Options ::= [
+	"Debug": false
+]
+
+Grammar ::= [
+	"T": {<grammar("T")>}
+]
+
+Input() ::= "34"
+
+Rule() ::= "a"
+
+Output() ::= <<
+34<\n>
+>>
+
+Errors() ::= ""
+
+grammar(grammarName) ::= <<
+grammar <grammarName>;
+a : C {<InputText():writeln()>} ;
+fragment A : '1' | '2';
+fragment B : '3' '4';
+C : A | B;
+>>

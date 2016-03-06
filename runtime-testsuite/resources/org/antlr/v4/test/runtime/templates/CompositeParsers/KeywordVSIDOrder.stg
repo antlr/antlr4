@@ -1,0 +1,37 @@
+// rules in lexer are imported at END so rules in master override
+// *and* get priority over imported rules. So importing ID doesn't
+// mess up keywords in master grammar
+
+TestType() ::= "CompositeParser"
+
+Grammar ::= [
+	"M": {<masterGrammar("M", "S")>}
+]
+
+SlaveGrammars ::= [
+	"S": {<slaveGrammar("S")>}
+]
+
+Rule() ::= "a"
+
+Input() ::= "abc"
+
+Output() ::= <<
+M.A
+M.a: [@0,0:2='abc',\<1>,1:0]<\n>
+>>
+
+Errors() ::= ""
+
+masterGrammar(grammarName, slaveGrammarName) ::= <<
+grammar M;
+import S;
+a : A {<Append("\"M.a: \"","$A"):writeln()>};
+A : 'abc' {<writeln("\"M.A\"")>};
+WS : (' '|'\n') -> skip ;
+>>
+
+slaveGrammar(grammarName) ::= <<
+lexer grammar S;
+ID : 'a'..'z'+;
+>>

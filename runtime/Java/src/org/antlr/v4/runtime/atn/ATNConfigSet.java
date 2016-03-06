@@ -33,8 +33,6 @@ package org.antlr.v4.runtime.atn;
 import org.antlr.v4.runtime.misc.AbstractEqualityComparator;
 import org.antlr.v4.runtime.misc.Array2DHashSet;
 import org.antlr.v4.runtime.misc.DoubleKeyMap;
-import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.misc.Nullable;
 
 import java.util.ArrayList;
 import java.util.BitSet;
@@ -108,6 +106,11 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	// TODO: these fields make me pretty uncomfortable but nice to pack up info together, saves recomputation
 	// TODO: can we track conflicts as they are added to save scanning configs later?
 	public int uniqueAlt;
+	/** Currently this is only used when we detect SLL conflict; this does
+	 *  not necessarily represent the ambiguous alternatives. In fact,
+	 *  I should also point out that this seems to include predicated alternatives
+	 *  that have predicates that evaluate to false. Computed in computeTargetState().
+ 	 */
 	protected BitSet conflictingAlts;
 
 	// Used in parser and lexer. In lexer, it indicates we hit a pred
@@ -139,7 +142,7 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	}
 
 	@Override
-	public boolean add(@NotNull ATNConfig config) {
+	public boolean add(ATNConfig config) {
 		return add(config, null);
 	}
 
@@ -149,19 +152,19 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	 * {@link ATNConfig#state}, {@code i} is the {@link ATNConfig#alt}, and
 	 * {@code pi} is the {@link ATNConfig#semanticContext}. We use
 	 * {@code (s,i,pi)} as key.
-	 * <p/>
-	 * This method updates {@link #dipsIntoOuterContext} and
-	 * {@link #hasSemanticContext} when necessary.
+	 *
+	 * <p>This method updates {@link #dipsIntoOuterContext} and
+	 * {@link #hasSemanticContext} when necessary.</p>
 	 */
 	public boolean add(
-		@NotNull ATNConfig config,
-		@Nullable DoubleKeyMap<PredictionContext,PredictionContext,PredictionContext> mergeCache)
+		ATNConfig config,
+		DoubleKeyMap<PredictionContext,PredictionContext,PredictionContext> mergeCache)
 	{
 		if ( readonly ) throw new IllegalStateException("This set is readonly");
 		if ( config.semanticContext!=SemanticContext.NONE ) {
 			hasSemanticContext = true;
 		}
-		if (config.reachesIntoOuterContext > 0) {
+		if (config.getOuterContextDepth() > 0) {
 			dipsIntoOuterContext = true;
 		}
 		ATNConfig existing = configLookup.getOrAdd(config);
@@ -179,6 +182,12 @@ public class ATNConfigSet implements Set<ATNConfig> {
 		// cache at both places.
 		existing.reachesIntoOuterContext =
 			Math.max(existing.reachesIntoOuterContext, config.reachesIntoOuterContext);
+
+		// make sure to preserve the precedence filter suppression during the merge
+		if (config.isPrecedenceFilterSuppressed()) {
+			existing.setPrecedenceFilterSuppressed(true);
+		}
+
 		existing.context = merged; // replace context; no need to alt mapping
 		return true;
 	}
@@ -192,6 +201,23 @@ public class ATNConfigSet implements Set<ATNConfig> {
 			states.add(c.state);
 		}
 		return states;
+	}
+
+	/**
+	 * Gets the complete set of represented alternatives for the configuration
+	 * set.
+	 *
+	 * @return the set of represented alternatives in this configuration set
+	 *
+	 * @since 4.3
+	 */
+
+	public BitSet getAlts() {
+		BitSet alts = new BitSet();
+		for (ATNConfig config : configs) {
+			alts.set(config.alt);
+		}
+		return alts;
 	}
 
 	public List<SemanticContext> getPredicates() {

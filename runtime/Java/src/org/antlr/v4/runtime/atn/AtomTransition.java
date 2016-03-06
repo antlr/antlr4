@@ -31,14 +31,13 @@
 package org.antlr.v4.runtime.atn;
 
 import org.antlr.v4.runtime.misc.IntervalSet;
-import org.antlr.v4.runtime.misc.NotNull;
 
 /** TODO: make all transitions sets? no, should remove set edges */
 public final class AtomTransition extends Transition {
 	/** The token type or character value; or, signifies special label. */
 	public final int label;
 
-	public AtomTransition(@NotNull ATNState target, int label) {
+	public AtomTransition(ATNState target, int label) {
 		super(target);
 		this.label = label;
 	}
@@ -49,7 +48,7 @@ public final class AtomTransition extends Transition {
 	}
 
 	@Override
-	@NotNull
+
 	public IntervalSet label() { return IntervalSet.of(label); }
 
 	@Override
@@ -58,7 +57,6 @@ public final class AtomTransition extends Transition {
 	}
 
 	@Override
-	@NotNull
 	public String toString() {
 		return String.valueOf(label);
 	}

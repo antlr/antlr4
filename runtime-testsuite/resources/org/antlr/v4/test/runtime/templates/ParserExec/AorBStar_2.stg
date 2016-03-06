@@ -1,0 +1,9 @@
+import "AorBStar.stg"
+
+Input() ::= "a 34 c"
+
+Output() ::= <<
+a34c<\n>
+>>
+
+Errors() ::= ""

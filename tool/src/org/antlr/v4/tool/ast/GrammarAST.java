@@ -67,18 +67,13 @@ public class GrammarAST extends CommonTree {
 	}
     public GrammarAST(int type) { super(new CommonToken(type, ANTLRParser.tokenNames[type])); }
     public GrammarAST(int type, Token t) {
-		this(new CommonToken(type, t.getText()));
-		token.setInputStream(t.getInputStream());
-		token.setLine(t.getLine());
-		token.setCharPositionInLine(t.getCharPositionInLine());
-		token.setTokenIndex(t.getTokenIndex());
+		this(new CommonToken(t));
+		token.setType(type);
 	}
     public GrammarAST(int type, Token t, String text) {
-		this(new CommonToken(type, text));
-		token.setInputStream(t.getInputStream());
-		token.setLine(t.getLine());
-		token.setCharPositionInLine(t.getCharPositionInLine());
-		token.setTokenIndex(t.getTokenIndex());
+		this(new CommonToken(t));
+		token.setType(type);
+		token.setText(text);
     }
 
 	public GrammarAST[] getChildrenAsArray() {
@@ -107,7 +102,7 @@ public class GrammarAST extends CommonTree {
 		GrammarAST t;
 		while ( !work.isEmpty() ) {
 			t = work.remove(0);
-			if ( types.contains(t.getType()) ) nodes.add(t);
+			if ( types==null || types.contains(t.getType()) ) nodes.add(t);
 			if ( t.children!=null ) {
 				work.addAll(Arrays.asList(t.getChildrenAsArray()));
 			}
@@ -128,6 +123,21 @@ public class GrammarAST extends CommonTree {
 			GrammarAST child = (GrammarAST)getChild(i);
 			child.getNodesWithTypePreorderDFS_(nodes, types);
 		}
+	}
+
+	public GrammarAST getNodeWithTokenIndex(int index) {
+		if ( this.getToken()!=null && this.getToken().getTokenIndex()==index ) {
+			return this;
+		}
+		// walk all children of root.
+		for (int i= 0; i < getChildCount(); i++) {
+			GrammarAST child = (GrammarAST)getChild(i);
+			GrammarAST result = child.getNodeWithTokenIndex(index);
+			if ( result!=null ) {
+				return result;
+			}
+		}
+		return null;
 	}
 
 	public AltAST getOutermostAltNode() {

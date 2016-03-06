@@ -30,8 +30,6 @@
 
 package org.antlr.v4.runtime.atn;
 
-import org.antlr.v4.runtime.misc.NotNull;
-
 /**
  *
  * @author Sam Harwell
@@ -57,7 +55,7 @@ public class ATNDeserializationOptions {
 		this.generateRuleBypassTransitions = options.generateRuleBypassTransitions;
 	}
 
-	@NotNull
+
 	public static ATNDeserializationOptions getDefaultOptions() {
 		return defaultOptions;
 	}

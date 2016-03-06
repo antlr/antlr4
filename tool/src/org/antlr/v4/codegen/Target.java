@@ -30,10 +30,12 @@
 
 package org.antlr.v4.codegen;
 
+import org.antlr.v4.Tool;
 import org.antlr.v4.codegen.model.RuleFunction;
 import org.antlr.v4.codegen.model.SerializedATN;
 import org.antlr.v4.misc.Utils;
 import org.antlr.v4.parse.ANTLRParser;
+import org.antlr.v4.runtime.RuntimeMetaData;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.Grammar;
@@ -87,8 +89,25 @@ public abstract class Target {
 		return language;
 	}
 
+	/** ANTLR tool should check output templates / target are compatible with tool code generation.
+	 *  For now, a simple string match used on x.y of x.y.z scheme. We use a method to avoid mismatches
+	 *  between a template called VERSION. This value is checked against Tool.VERSION during load of templates.
+	 *
+	 *  This additional method forces all targets 4.3 and beyond to add this method.
+	 *
+	 * @since 4.3
+	 */
+	public abstract String getVersion();
+
+
 	public STGroup getTemplates() {
 		if (templates == null) {
+			String version = getVersion();
+			if ( version==null ||
+				 !RuntimeMetaData.getMajorMinorVersion(version).equals(RuntimeMetaData.getMajorMinorVersion(Tool.VERSION)))
+			{
+				gen.tool.errMgr.toolError(ErrorType.INCOMPATIBLE_TOOL_AND_TEMPLATES, version, Tool.VERSION, language);
+			}
 			templates = loadTemplates();
 		}
 
@@ -152,11 +171,12 @@ public abstract class Target {
 	 *  to a token type in the generated code.
 	 */
 	public String getTokenTypeAsTargetLabel(Grammar g, int ttype) {
-		String name = g.getTokenDisplayName(ttype);
-		// If name is a literal, return the token type instead
-		if ( name==null || name.charAt(0)=='\'' ) {
+		String name = g.getTokenName(ttype);
+		// If name is not valid, return the token type instead
+		if ( Grammar.INVALID_TOKEN_NAME.equals(name) ) {
 			return String.valueOf(ttype);
 		}
+
 		return name;
 	}
 
@@ -219,15 +239,106 @@ public abstract class Target {
 	}
 
 	/**
-	 * Convert from an ANTLR string literal found in a grammar file to an
+	 * <p>Convert from an ANTLR string literal found in a grammar file to an
 	 * equivalent string literal in the target language.
+	 *</p>
+	 * <p>
+	 * For Java, this is the translation {@code 'a\n"'} &rarr; {@code "a\n\""}.
+	 * Expect single quotes around the incoming literal. Just flip the quotes
+	 * and replace double quotes with {@code \"}.
+	 * </p>
+	 * <p>
+	 * Note that we have decided to allow people to use '\"' without penalty, so
+	 * we must build the target string in a loop as {@link String#replace}
+	 * cannot handle both {@code \"} and {@code "} without a lot of messing
+	 * around.
+	 * </p>
 	 */
-	public abstract String getTargetStringLiteralFromANTLRStringLiteral(
+	public String getTargetStringLiteralFromANTLRStringLiteral(
 		CodeGenerator generator,
-		String literal, boolean addQuotes);
+		String literal,
+		boolean addQuotes)
+	{
+		StringBuilder sb = new StringBuilder();
+		String is = literal;
+
+		if ( addQuotes ) sb.append('"');
+
+		for (int i = 1; i < is.length() -1; i++) {
+			if  (is.charAt(i) == '\\') {
+				// Anything escaped is what it is! We assume that
+				// people know how to escape characters correctly. However
+				// we catch anything that does not need an escape in Java (which
+				// is what the default implementation is dealing with and remove
+				// the escape. The C target does this for instance.
+				//
+				switch (is.charAt(i+1)) {
+					// Pass through any escapes that Java also needs
+					//
+					case    '"':
+					case    'n':
+					case    'r':
+					case    't':
+					case    'b':
+					case    'f':
+					case    '\\':
+						// Pass the escape through
+						sb.append('\\');
+						break;
+
+					case    'u':    // Assume unnnn
+						// Pass the escape through as double \\
+						// so that Java leaves as \u0000 string not char
+						sb.append('\\');
+						sb.append('\\');
+						break;
+
+					default:
+						// Remove the escape by virtue of not adding it here
+						// Thus \' becomes ' and so on
+						break;
+				}
+
+				// Go past the \ character
+				i++;
+			} else {
+				// Characters that don't need \ in ANTLR 'strings' but do in Java
+				if (is.charAt(i) == '"') {
+					// We need to escape " in Java
+					sb.append('\\');
+				}
+			}
+			// Add in the next character, which may have been escaped
+			sb.append(is.charAt(i));
+		}
+
+		if ( addQuotes ) sb.append('"');
+
+		return sb.toString();
+	}
 
 	/** Assume 16-bit char */
-	public abstract String encodeIntAsCharEscape(int v);
+	public String encodeIntAsCharEscape(int v) {
+		if (v < Character.MIN_VALUE || v > Character.MAX_VALUE) {
+			throw new IllegalArgumentException(String.format("Cannot encode the specified value: %d", v));
+		}
+
+		if (v >= 0 && v < targetCharValueEscape.length && targetCharValueEscape[v] != null) {
+			return targetCharValueEscape[v];
+		}
+
+		if (v >= 0x20 && v < 127 && (!Character.isDigit(v) || v == '8' || v == '9')) {
+			return String.valueOf((char)v);
+		}
+
+		if ( v>=0 && v<=127 ) {
+			String oct = Integer.toOctalString(v);
+			return "\\"+ oct;
+		}
+
+		String hex = Integer.toHexString(v|0x10000).substring(1,5);
+		return "\\u"+hex;
+	}
 
 	public String getLoopLabel(GrammarAST ast) {
 		return "loop"+ ast.token.getTokenIndex();
@@ -322,35 +433,43 @@ public abstract class Target {
 		return Integer.MAX_VALUE;
 	}
 
+	/** How many bits should be used to do inline token type tests? Java assumes
+	 *  a 64-bit word for bitsets.  Must be a valid wordsize for your target like
+	 *  8, 16, 32, 64, etc...
+	 *
+	 *  @since 4.5
+	 */
+	public int getInlineTestSetWordSize() { return 64; }
+
 	public boolean grammarSymbolCausesIssueInGeneratedCode(GrammarAST idNode) {
 		switch (idNode.getParent().getType()) {
-		case ANTLRParser.ASSIGN:
-			switch (idNode.getParent().getParent().getType()) {
+			case ANTLRParser.ASSIGN:
+				switch (idNode.getParent().getParent().getType()) {
+					case ANTLRParser.ELEMENT_OPTIONS:
+					case ANTLRParser.OPTIONS:
+						return false;
+
+					default:
+						break;
+				}
+
+				break;
+
+			case ANTLRParser.AT:
 			case ANTLRParser.ELEMENT_OPTIONS:
-			case ANTLRParser.OPTIONS:
 				return false;
+
+			case ANTLRParser.LEXER_ACTION_CALL:
+				if (idNode.getChildIndex() == 0) {
+					// first child is the command name which is part of the ANTLR language
+					return false;
+				}
+
+				// arguments to the command should be checked
+				break;
 
 			default:
 				break;
-			}
-
-			break;
-
-		case ANTLRParser.AT:
-		case ANTLRParser.ELEMENT_OPTIONS:
-			return false;
-
-		case ANTLRParser.LEXER_ACTION_CALL:
-			if (idNode.getChildIndex() == 0) {
-				// first child is the command name which is part of the ANTLR language
-				return false;
-			}
-
-			// arguments to the command should be checked
-			break;
-
-		default:
-			break;
 		}
 
 		return visibleGrammarSymbolCausesIssueInGeneratedCode(idNode);
@@ -358,8 +477,31 @@ public abstract class Target {
 
 	protected abstract boolean visibleGrammarSymbolCausesIssueInGeneratedCode(GrammarAST idNode);
 
+	public boolean templatesExist() {
+		String groupFileName = CodeGenerator.TEMPLATE_ROOT + "/" + getLanguage() + "/" + getLanguage() + STGroup.GROUP_FILE_EXTENSION;
+		STGroup result = null;
+		try {
+			result = new STGroupFile(groupFileName);
+		}
+		catch (IllegalArgumentException iae) {
+			result = null;
+		}
+		return result!=null;
+	}
+
+
 	protected STGroup loadTemplates() {
-		STGroup result = new STGroupFile(CodeGenerator.TEMPLATE_ROOT+"/"+getLanguage()+"/"+getLanguage()+STGroup.GROUP_FILE_EXTENSION);
+		String groupFileName = CodeGenerator.TEMPLATE_ROOT + "/" + getLanguage() + "/" + getLanguage() + STGroup.GROUP_FILE_EXTENSION;
+		STGroup result = null;
+		try {
+			result = new STGroupFile(groupFileName);
+		}
+		catch (IllegalArgumentException iae) {
+			gen.tool.errMgr.toolError(ErrorType.MISSING_CODE_GEN_TEMPLATES,
+						 iae,
+						 language);
+		}
+		if ( result==null ) return null;
 		result.registerRenderer(Integer.class, new NumberRenderer());
 		result.registerRenderer(String.class, new StringRenderer());
 		result.setListener(new STErrorListener() {
@@ -389,5 +531,26 @@ public abstract class Target {
 		});
 
 		return result;
+	}
+
+	/**
+	 * @since 4.3
+	 */
+	public boolean wantsBaseListener() {
+		return true;
+	}
+
+	/**
+	 * @since 4.3
+	 */
+	public boolean wantsBaseVisitor() {
+		return true;
+	}
+
+	/**
+	 * @since 4.3
+	 */
+	public boolean supportsOverloadedMethods() {
+		return true;
 	}
 }

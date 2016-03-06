@@ -41,4 +41,32 @@ public class Triple<A,B,C> {
 		this.c = c;
 	}
 
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == this) {
+			return true;
+		}
+		else if (!(obj instanceof Triple<?, ?, ?>)) {
+			return false;
+		}
+
+		Triple<?, ?, ?> other = (Triple<?, ?, ?>)obj;
+		return ObjectEqualityComparator.INSTANCE.equals(a, other.a)
+			&& ObjectEqualityComparator.INSTANCE.equals(b, other.b)
+			&& ObjectEqualityComparator.INSTANCE.equals(c, other.c);
+	}
+
+	@Override
+	public int hashCode() {
+		int hash = MurmurHash.initialize();
+		hash = MurmurHash.update(hash, a);
+		hash = MurmurHash.update(hash, b);
+		hash = MurmurHash.update(hash, c);
+		return MurmurHash.finish(hash, 3);
+	}
+
+	@Override
+	public String toString() {
+		return String.format("(%s, %s, %s)", a, b, c);
+	}
 }

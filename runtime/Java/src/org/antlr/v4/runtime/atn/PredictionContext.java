@@ -34,8 +34,6 @@ import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.misc.DoubleKeyMap;
 import org.antlr.v4.runtime.misc.MurmurHash;
-import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.misc.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -71,17 +69,17 @@ public abstract class PredictionContext {
 	 *
 	 * <pre>
 	 *  private int referenceHashCode() {
-	 *      int hash = {@link MurmurHash#initialize}({@link #INITIAL_HASH});
+	 *      int hash = {@link MurmurHash#initialize MurmurHash.initialize}({@link #INITIAL_HASH});
 	 *
-	 *      for (int i = 0; i < {@link #size()}; i++) {
-	 *          hash = {@link MurmurHash#update}(hash, {@link #getParent}(i));
+	 *      for (int i = 0; i &lt; {@link #size()}; i++) {
+	 *          hash = {@link MurmurHash#update MurmurHash.update}(hash, {@link #getParent getParent}(i));
 	 *      }
 	 *
-	 *      for (int i = 0; i < {@link #size()}; i++) {
-	 *          hash = {@link MurmurHash#update}(hash, {@link #getReturnState}(i));
+	 *      for (int i = 0; i &lt; {@link #size()}; i++) {
+	 *          hash = {@link MurmurHash#update MurmurHash.update}(hash, {@link #getReturnState getReturnState}(i));
 	 *      }
 	 *
-	 *      hash = {@link MurmurHash#finish}(hash, 2 * {@link #size()});
+	 *      hash = {@link MurmurHash#finish MurmurHash.finish}(hash, 2 * {@link #size()});
 	 *      return hash;
 	 *  }
 	 * </pre>
@@ -95,7 +93,7 @@ public abstract class PredictionContext {
 	/** Convert a {@link RuleContext} tree to a {@link PredictionContext} graph.
 	 *  Return {@link #EMPTY} if {@code outerContext} is empty or null.
 	 */
-	public static PredictionContext fromRuleContext(@NotNull ATN atn, RuleContext outerContext) {
+	public static PredictionContext fromRuleContext(ATN atn, RuleContext outerContext) {
 		if ( outerContext==null ) outerContext = RuleContext.EMPTY;
 
 		// if we are in RuleContext of start rule, s, then PredictionContext
@@ -203,31 +201,23 @@ public abstract class PredictionContext {
 	/**
 	 * Merge two {@link SingletonPredictionContext} instances.
 	 *
-	 * <p/>
+	 * <p>Stack tops equal, parents merge is same; return left graph.<br>
+	 * <embed src="images/SingletonMerge_SameRootSamePar.svg" type="image/svg+xml"/></p>
 	 *
-	 * Stack tops equal, parents merge is same; return left graph.<br/>
-	 * <embed src="images/SingletonMerge_SameRootSamePar.svg" type="image/svg+xml"/>
-	 *
-	 * <p/>
-	 *
-	 * Same stack top, parents differ; merge parents giving array node, then
+	 * <p>Same stack top, parents differ; merge parents giving array node, then
 	 * remainders of those graphs. A new root node is created to point to the
-	 * merged parents.<br/>
-	 * <embed src="images/SingletonMerge_SameRootDiffPar.svg" type="image/svg+xml"/>
+	 * merged parents.<br>
+	 * <embed src="images/SingletonMerge_SameRootDiffPar.svg" type="image/svg+xml"/></p>
 	 *
-	 * <p/>
-	 *
-	 * Different stack tops pointing to same parent. Make array node for the
+	 * <p>Different stack tops pointing to same parent. Make array node for the
 	 * root where both element in the root point to the same (original)
-	 * parent.<br/>
-	 * <embed src="images/SingletonMerge_DiffRootSamePar.svg" type="image/svg+xml"/>
+	 * parent.<br>
+	 * <embed src="images/SingletonMerge_DiffRootSamePar.svg" type="image/svg+xml"/></p>
 	 *
-	 * <p/>
-	 *
-	 * Different stack tops pointing to different parents. Make array node for
+	 * <p>Different stack tops pointing to different parents. Make array node for
 	 * the root where each element points to the corresponding original
-	 * parent.<br/>
-	 * <embed src="images/SingletonMerge_DiffRootDiffPar.svg" type="image/svg+xml"/>
+	 * parent.<br>
+	 * <embed src="images/SingletonMerge_DiffRootDiffPar.svg" type="image/svg+xml"/></p>
 	 *
 	 * @param a the first {@link SingletonPredictionContext}
 	 * @param b the second {@link SingletonPredictionContext}
@@ -308,43 +298,31 @@ public abstract class PredictionContext {
 	 *
 	 * <h2>Local-Context Merges</h2>
 	 *
-	 * These local-context merge operations are used when {@code rootIsWildcard}
-	 * is true.
+	 * <p>These local-context merge operations are used when {@code rootIsWildcard}
+	 * is true.</p>
 	 *
-	 * <p/>
+	 * <p>{@link #EMPTY} is superset of any graph; return {@link #EMPTY}.<br>
+	 * <embed src="images/LocalMerge_EmptyRoot.svg" type="image/svg+xml"/></p>
 	 *
-	 * {@link #EMPTY} is superset of any graph; return {@link #EMPTY}.<br/>
-	 * <embed src="images/LocalMerge_EmptyRoot.svg" type="image/svg+xml"/>
+	 * <p>{@link #EMPTY} and anything is {@code #EMPTY}, so merged parent is
+	 * {@code #EMPTY}; return left graph.<br>
+	 * <embed src="images/LocalMerge_EmptyParent.svg" type="image/svg+xml"/></p>
 	 *
-	 * <p/>
-	 *
-	 * {@link #EMPTY} and anything is {@code #EMPTY}, so merged parent is
-	 * {@code #EMPTY}; return left graph.<br/>
-	 * <embed src="images/LocalMerge_EmptyParent.svg" type="image/svg+xml"/>
-	 *
-	 * <p/>
-	 *
-	 * Special case of last merge if local context.<br/>
-	 * <embed src="images/LocalMerge_DiffRoots.svg" type="image/svg+xml"/>
+	 * <p>Special case of last merge if local context.<br>
+	 * <embed src="images/LocalMerge_DiffRoots.svg" type="image/svg+xml"/></p>
 	 *
 	 * <h2>Full-Context Merges</h2>
 	 *
-	 * These full-context merge operations are used when {@code rootIsWildcard}
-	 * is false.
+	 * <p>These full-context merge operations are used when {@code rootIsWildcard}
+	 * is false.</p>
 	 *
-	 * <p/>
+	 * <p><embed src="images/FullMerge_EmptyRoots.svg" type="image/svg+xml"/></p>
 	 *
-	 * <embed src="images/FullMerge_EmptyRoots.svg" type="image/svg+xml"/>
+	 * <p>Must keep all contexts; {@link #EMPTY} in array is a special value (and
+	 * null parent).<br>
+	 * <embed src="images/FullMerge_EmptyRoot.svg" type="image/svg+xml"/></p>
 	 *
-	 * <p/>
-	 *
-	 * Must keep all contexts; {@link #EMPTY} in array is a special value (and
-	 * null parent).<br/>
-	 * <embed src="images/FullMerge_EmptyRoot.svg" type="image/svg+xml"/>
-	 *
-	 * <p/>
-	 *
-	 * <embed src="images/FullMerge_SameRoot.svg" type="image/svg+xml"/>
+	 * <p><embed src="images/FullMerge_SameRoot.svg" type="image/svg+xml"/></p>
 	 *
 	 * @param a the first {@link SingletonPredictionContext}
 	 * @param b the second {@link SingletonPredictionContext}
@@ -382,31 +360,21 @@ public abstract class PredictionContext {
 	/**
 	 * Merge two {@link ArrayPredictionContext} instances.
 	 *
-	 * <p/>
+	 * <p>Different tops, different parents.<br>
+	 * <embed src="images/ArrayMerge_DiffTopDiffPar.svg" type="image/svg+xml"/></p>
 	 *
-	 * Different tops, different parents.<br/>
-	 * <embed src="images/ArrayMerge_DiffTopDiffPar.svg" type="image/svg+xml"/>
+	 * <p>Shared top, same parents.<br>
+	 * <embed src="images/ArrayMerge_ShareTopSamePar.svg" type="image/svg+xml"/></p>
 	 *
-	 * <p/>
+	 * <p>Shared top, different parents.<br>
+	 * <embed src="images/ArrayMerge_ShareTopDiffPar.svg" type="image/svg+xml"/></p>
 	 *
-	 * Shared top, same parents.<br/>
-	 * <embed src="images/ArrayMerge_ShareTopSamePar.svg" type="image/svg+xml"/>
+	 * <p>Shared top, all shared parents.<br>
+	 * <embed src="images/ArrayMerge_ShareTopSharePar.svg" type="image/svg+xml"/></p>
 	 *
-	 * <p/>
-	 *
-	 * Shared top, different parents.<br/>
-	 * <embed src="images/ArrayMerge_ShareTopDiffPar.svg" type="image/svg+xml"/>
-	 *
-	 * <p/>
-	 *
-	 * Shared top, all shared parents.<br/>
-	 * <embed src="images/ArrayMerge_ShareTopSharePar.svg" type="image/svg+xml"/>
-	 *
-	 * <p/>
-	 *
-	 * Equal tops, merge parents and reduce top to
-	 * {@link SingletonPredictionContext}.<br/>
-	 * <embed src="images/ArrayMerge_EqualTop.svg" type="image/svg+xml"/>
+	 * <p>Equal tops, merge parents and reduce top to
+	 * {@link SingletonPredictionContext}.<br>
+	 * <embed src="images/ArrayMerge_EqualTop.svg" type="image/svg+xml"/></p>
 	 */
 	public static PredictionContext mergeArrays(
 		ArrayPredictionContext a,
@@ -595,9 +563,9 @@ public abstract class PredictionContext {
 
 	// From Sam
 	public static PredictionContext getCachedContext(
-		@NotNull PredictionContext context,
-		@NotNull PredictionContextCache contextCache,
-		@NotNull IdentityHashMap<PredictionContext, PredictionContext> visited)
+		PredictionContext context,
+		PredictionContextCache contextCache,
+		IdentityHashMap<PredictionContext, PredictionContext> visited)
 	{
 		if (context.isEmpty()) {
 			return context;
@@ -700,7 +668,7 @@ public abstract class PredictionContext {
 		}
 	}
 
-	public String toString(@Nullable Recognizer<?,?> recog) {
+	public String toString(Recognizer<?,?> recog) {
 		return toString();
 //		return toString(recog, ParserRuleContext.EMPTY);
 	}

@@ -1,0 +1,30 @@
+TestType() ::= "Parser"
+
+Options ::= [
+	"Debug": false
+]
+
+Grammar ::= [
+	"T": {<grammar("T")>}
+]
+
+Input() ::= "a 34 c"
+
+Rule() ::= "a"
+
+Output() ::= <<
+a34c<\n>
+>>
+
+Errors() ::= ""
+
+grammar(grammarName) ::= <<
+grammar <grammarName>;
+a : (ID|INT{
+})+ {
+<writeln("$text")>
+};
+ID : 'a'..'z'+ ;
+INT : '0'..'9'+;
+WS : (' '|'\\n') -> skip ;
+>>

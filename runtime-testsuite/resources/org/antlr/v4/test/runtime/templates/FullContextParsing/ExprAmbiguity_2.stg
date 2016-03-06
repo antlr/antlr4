@@ -1,0 +1,14 @@
+import "ExprAmbiguity.stg"
+
+Input() ::= "a+b*c"
+
+Output() ::= <<
+(expr a + (expr b * (expr c)))<\n>
+>>
+
+Errors() ::= <<
+line 1:1 reportAttemptingFullContext d=1 (expr), input='+'
+line 1:2 reportContextSensitivity d=1 (expr), input='+b'
+line 1:3 reportAttemptingFullContext d=1 (expr), input='*'
+line 1:5 reportAmbiguity d=1 (expr): ambigAlts={1, 2}, input='*c'<\n>
+>>

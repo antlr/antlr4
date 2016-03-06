@@ -1,0 +1,31 @@
+TestType() ::= "Lexer"
+
+Grammar ::= [
+	"L": {<grammar("L")>}
+]
+
+Input() ::= <%
+ab
+%>
+
+Output() ::= <<
+stuff0: <!required space!>
+stuff1: a
+stuff2: ab
+ab
+[@0,0:1='ab',\<1>,1:0]
+[@1,2:1='\<EOF>',\<-1>,1:2]<\n>
+>>
+
+Errors() ::= ""
+
+grammar(grammarName) ::= <<
+lexer grammar <grammarName>;
+I : ({<PlusText("stuff fail: "):writeln()>} 'a'
+| {<PlusText("stuff0: "):writeln()>}
+		'a' {<PlusText("stuff1: "):writeln()>}
+		'b' {<PlusText("stuff2: "):writeln()>})
+		{<Text():writeln()>} ;
+WS : (' '|'\n') -> skip ;
+J : .;
+>>

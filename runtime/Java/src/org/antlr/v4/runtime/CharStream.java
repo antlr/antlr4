@@ -31,7 +31,6 @@
 package org.antlr.v4.runtime;
 
 import org.antlr.v4.runtime.misc.Interval;
-import org.antlr.v4.runtime.misc.NotNull;
 
 /** A source of characters for an ANTLR lexer. */
 public interface CharStream extends IntStream {
@@ -51,6 +50,5 @@ public interface CharStream extends IntStream {
 	 * @throws UnsupportedOperationException if the stream does not support
 	 * getting the text of the specified interval
 	 */
-	@NotNull
-	public String getText(@NotNull Interval interval);
+	public String getText(Interval interval);
 }

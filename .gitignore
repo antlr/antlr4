@@ -7,24 +7,53 @@ dist/
 lib/
 user.build.properties
 
+# MacOSX files
+.DS_Store
+
+# Python
+*.pyc
+
+# CSharp
+bin/
+obj/
+*.userprefs
+
 # NetBeans user configuration files
 nbactions*.xml
 /nbproject/private/
 */nbproject/private/
 
 # IntelliJ projects
-*.iml
-*.ipr
 *.iws
+*.iml
 .idea/
 
 # Eclipse projects
 .classpath
 .project
 .settings/
+.metadata
 
 # Profiler results
 *.hprof
 
+# parrt's bash prompt data
+.fetch_time_cache
+
 # Playground
 #/tool/playground/
+
+# Generated files
+/out/
+/gen/
+/gen3/
+/gen4/
+/tool/playground/
+tmp/
+
+# Configurable build files
+bilder.py
+bilder.pyc
+bild.log
+
+bild_output.txt

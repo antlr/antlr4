@@ -31,14 +31,25 @@
 package org.antlr.v4.automata;
 
 import org.antlr.runtime.CommonToken;
+import org.antlr.runtime.Token;
 import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.misc.CharSupport;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.runtime.IntStream;
+import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNState;
 import org.antlr.v4.runtime.atn.ActionTransition;
 import org.antlr.v4.runtime.atn.AtomTransition;
+import org.antlr.v4.runtime.atn.LexerAction;
+import org.antlr.v4.runtime.atn.LexerChannelAction;
+import org.antlr.v4.runtime.atn.LexerCustomAction;
+import org.antlr.v4.runtime.atn.LexerModeAction;
+import org.antlr.v4.runtime.atn.LexerMoreAction;
+import org.antlr.v4.runtime.atn.LexerPopModeAction;
+import org.antlr.v4.runtime.atn.LexerPushModeAction;
+import org.antlr.v4.runtime.atn.LexerSkipAction;
+import org.antlr.v4.runtime.atn.LexerTypeAction;
 import org.antlr.v4.runtime.atn.NotSetTransition;
 import org.antlr.v4.runtime.atn.RangeTransition;
 import org.antlr.v4.runtime.atn.RuleStartState;
@@ -56,17 +67,53 @@ import org.antlr.v4.tool.ast.TerminalAST;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class LexerATNFactory extends ParserATNFactory {
 	public STGroup codegenTemplates;
+
+	/**
+	 * Provides a map of names of predefined constants which are likely to
+	 * appear as the argument for lexer commands. These names would be resolved
+	 * by the Java compiler for lexer commands that are translated to embedded
+	 * actions, but are required during code generation for creating
+	 * {@link LexerAction} instances that are usable by a lexer interpreter.
+	 */
+	public static final Map<String, Integer> COMMON_CONSTANTS = new HashMap<String, Integer>();
+	static {
+		COMMON_CONSTANTS.put("HIDDEN", Lexer.HIDDEN);
+		COMMON_CONSTANTS.put("DEFAULT_TOKEN_CHANNEL", Lexer.DEFAULT_TOKEN_CHANNEL);
+		COMMON_CONSTANTS.put("DEFAULT_MODE", Lexer.DEFAULT_MODE);
+		COMMON_CONSTANTS.put("SKIP", Lexer.SKIP);
+		COMMON_CONSTANTS.put("MORE", Lexer.MORE);
+		COMMON_CONSTANTS.put("EOF", Lexer.EOF);
+		COMMON_CONSTANTS.put("MAX_CHAR_VALUE", Lexer.MAX_CHAR_VALUE);
+		COMMON_CONSTANTS.put("MIN_CHAR_VALUE", Lexer.MIN_CHAR_VALUE);
+	}
+
+	/**
+	 * Maps from an action index to a {@link LexerAction} object.
+	 */
+	protected Map<Integer, LexerAction> indexToActionMap = new HashMap<Integer, LexerAction>();
+	/**
+	 * Maps from a {@link LexerAction} object to the action index.
+	 */
+	protected Map<LexerAction, Integer> actionToIndexMap = new HashMap<LexerAction, Integer>();
+
 	public LexerATNFactory(LexerGrammar g) {
 		super(g);
 		// use codegen to get correct language templates for lexer commands
 		String language = g.getOptionString("language");
 		CodeGenerator gen = new CodeGenerator(g.tool, null, language);
 		codegenTemplates = gen.getTemplates();
+	}
+
+	public static Set<String> getCommonConstants() {
+		return COMMON_CONSTANTS.keySet();
 	}
 
 	@Override
@@ -84,14 +131,17 @@ public class LexerATNFactory extends ParserATNFactory {
 
 		// INIT ACTION, RULE->TOKEN_TYPE MAP
 		atn.ruleToTokenType = new int[g.rules.size()];
-		atn.ruleToActionIndex = new int[g.rules.size()];
 		for (Rule r : g.rules.values()) {
 			atn.ruleToTokenType[r.index] = g.getTokenType(r.name);
-			atn.ruleToActionIndex[r.index] = r.actionIndex;
 		}
 
 		// CREATE ATN FOR EACH RULE
 		_createATN(g.rules.values());
+
+		atn.lexerActions = new LexerAction[indexToActionMap.size()];
+		for (Map.Entry<Integer, LexerAction> entry : indexToActionMap.entrySet()) {
+			atn.lexerActions[entry.getKey()] = entry.getValue();
+		}
 
 		// LINK MODE START STATE TO EACH TOKEN RULE
 		for (String modeName : modes) {
@@ -111,24 +161,49 @@ public class LexerATNFactory extends ParserATNFactory {
 
 	@Override
 	public Handle action(ActionAST action) {
-		ATNState left = newState(action);
-		ATNState right = newState(action);
-		boolean isCtxDependent = false;
+		int ruleIndex = currentRule.index;
 		int actionIndex = g.lexerActions.get(action);
-		ActionTransition a =
-			new ActionTransition(right, currentRule.index, actionIndex, isCtxDependent);
-		left.addTransition(a);
-		action.atnState = left;
-		Handle h = new Handle(left, right);
-		return h;
+		LexerCustomAction lexerAction = new LexerCustomAction(ruleIndex, actionIndex);
+		return action(action, lexerAction);
+	}
+
+	protected int getLexerActionIndex(LexerAction lexerAction) {
+		Integer lexerActionIndex = actionToIndexMap.get(lexerAction);
+		if (lexerActionIndex == null) {
+			lexerActionIndex = actionToIndexMap.size();
+			actionToIndexMap.put(lexerAction, lexerActionIndex);
+			indexToActionMap.put(lexerActionIndex, lexerAction);
+		}
+
+		return lexerActionIndex;
 	}
 
 	@Override
 	public Handle action(String action) {
-        // define action AST for this rule as if we had found in grammar
+		if (action.trim().isEmpty()) {
+			ATNState left = newState(null);
+			ATNState right = newState(null);
+			epsilon(left, right);
+			return new Handle(left, right);
+		}
+
+		// define action AST for this rule as if we had found in grammar
         ActionAST ast =	new ActionAST(new CommonToken(ANTLRParser.ACTION, action));
 		currentRule.defineActionInAlt(currentOuterAlt, ast);
 		return action(ast);
+	}
+
+	protected Handle action(GrammarAST node, LexerAction lexerAction) {
+		ATNState left = newState(node);
+		ATNState right = newState(node);
+		boolean isCtxDependent = false;
+		int lexerActionIndex = getLexerActionIndex(lexerAction);
+		ActionTransition a =
+			new ActionTransition(right, currentRule.index, lexerActionIndex, isCtxDependent);
+		left.addTransition(a);
+		node.atnState = left;
+		Handle h = new Handle(left, right);
+		return h;
 	}
 
 	@Override
@@ -139,40 +214,52 @@ public class LexerATNFactory extends ParserATNFactory {
 	}
 
 	@Override
-	public String lexerCallCommand(GrammarAST ID, GrammarAST arg) {
+	public Handle lexerCallCommand(GrammarAST ID, GrammarAST arg) {
+		LexerAction lexerAction = createLexerAction(ID, arg);
+		if (lexerAction != null) {
+			return action(ID, lexerAction);
+		}
+
+		// fall back to standard action generation for the command
 		ST cmdST = codegenTemplates.getInstanceOf("Lexer" +
 												  CharSupport.capitalize(ID.getText())+
 												  "Command");
 		if (cmdST == null) {
 			g.tool.errMgr.grammarError(ErrorType.INVALID_LEXER_COMMAND, g.fileName, ID.token, ID.getText());
-			return "";
+			return epsilon(ID);
 		}
 
 		if (cmdST.impl.formalArguments == null || !cmdST.impl.formalArguments.containsKey("arg")) {
 			g.tool.errMgr.grammarError(ErrorType.UNWANTED_LEXER_COMMAND_ARGUMENT, g.fileName, ID.token, ID.getText());
-			return "";
+			return epsilon(ID);
 		}
 
 		cmdST.add("arg", arg.getText());
-		return cmdST.render();
+		return action(cmdST.render());
 	}
 
 	@Override
-	public String lexerCommand(GrammarAST ID) {
+	public Handle lexerCommand(GrammarAST ID) {
+		LexerAction lexerAction = createLexerAction(ID, null);
+		if (lexerAction != null) {
+			return action(ID, lexerAction);
+		}
+
+		// fall back to standard action generation for the command
 		ST cmdST = codegenTemplates.getInstanceOf("Lexer" +
-												  CharSupport.capitalize(ID.getText())+
-												  "Command");
+				CharSupport.capitalize(ID.getText()) +
+				"Command");
 		if (cmdST == null) {
 			g.tool.errMgr.grammarError(ErrorType.INVALID_LEXER_COMMAND, g.fileName, ID.token, ID.getText());
-			return "";
+			return epsilon(ID);
 		}
 
 		if (cmdST.impl.formalArguments != null && cmdST.impl.formalArguments.containsKey("arg")) {
 			g.tool.errMgr.grammarError(ErrorType.MISSING_LEXER_COMMAND_ARGUMENT, g.fileName, ID.token, ID.getText());
-			return "";
+			return epsilon(ID);
 		}
 
-		return cmdST.render();
+		return action(cmdST.render());
 	}
 
 	@Override
@@ -308,5 +395,114 @@ public class LexerATNFactory extends ParserATNFactory {
 			return new Handle(left, right);
 		}
 		return _ruleRef(node);
+	}
+
+
+	protected LexerAction createLexerAction(GrammarAST ID, GrammarAST arg) {
+		String command = ID.getText();
+		if ("skip".equals(command) && arg == null) {
+			return LexerSkipAction.INSTANCE;
+		}
+		else if ("more".equals(command) && arg == null) {
+			return LexerMoreAction.INSTANCE;
+		}
+		else if ("popMode".equals(command) && arg == null) {
+			return LexerPopModeAction.INSTANCE;
+		}
+		else if ("mode".equals(command) && arg != null) {
+			String modeName = arg.getText();
+			checkMode(modeName, arg.token);
+			Integer mode = getConstantValue(modeName, arg.getToken());
+			if (mode == null) {
+				return null;
+			}
+
+			return new LexerModeAction(mode);
+		}
+		else if ("pushMode".equals(command) && arg != null) {
+			String modeName = arg.getText();
+			checkMode(modeName, arg.token);
+			Integer mode = getConstantValue(modeName, arg.getToken());
+			if (mode == null) {
+				return null;
+			}
+
+			return new LexerPushModeAction(mode);
+		}
+		else if ("type".equals(command) && arg != null) {
+			String typeName = arg.getText();
+			checkToken(typeName, arg.token);
+			Integer type = getConstantValue(typeName, arg.getToken());
+			if (type == null) {
+				return null;
+			}
+
+			return new LexerTypeAction(type);
+		}
+		else if ("channel".equals(command) && arg != null) {
+			String channelName = arg.getText();
+			checkChannel(channelName, arg.token);
+			Integer channel = getConstantValue(channelName, arg.getToken());
+			if (channel == null) {
+				return null;
+			}
+
+			return new LexerChannelAction(channel);
+		}
+		else {
+			return null;
+		}
+	}
+
+	protected void checkMode(String modeName, Token token) {
+		if (!modeName.equals("DEFAULT_MODE") && COMMON_CONSTANTS.containsKey(modeName)) {
+			g.tool.errMgr.grammarError(ErrorType.MODE_CONFLICTS_WITH_COMMON_CONSTANTS, g.fileName, token, token.getText());
+		}
+	}
+
+	protected void checkToken(String tokenName, Token token) {
+		if (!tokenName.equals("EOF") && COMMON_CONSTANTS.containsKey(tokenName)) {
+			g.tool.errMgr.grammarError(ErrorType.TOKEN_CONFLICTS_WITH_COMMON_CONSTANTS, g.fileName, token, token.getText());
+		}
+	}
+
+	protected void checkChannel(String channelName, Token token) {
+		if (!channelName.equals("HIDDEN") && !channelName.equals("DEFAULT_TOKEN_CHANNEL") && COMMON_CONSTANTS.containsKey(channelName)) {
+			g.tool.errMgr.grammarError(ErrorType.CHANNEL_CONFLICTS_WITH_COMMON_CONSTANTS, g.fileName, token, token.getText());
+		}
+	}
+
+	protected Integer getConstantValue(String name, Token token) {
+		if (name == null) {
+			return null;
+		}
+
+		Integer commonConstant = COMMON_CONSTANTS.get(name);
+		if (commonConstant != null) {
+			return commonConstant;
+		}
+
+		int tokenType = g.getTokenType(name);
+		if (tokenType != org.antlr.v4.runtime.Token.INVALID_TYPE) {
+			return tokenType;
+		}
+
+		int channelValue = g.getChannelValue(name);
+		if (channelValue >= org.antlr.v4.runtime.Token.MIN_USER_CHANNEL_VALUE) {
+			return channelValue;
+		}
+
+		List<String> modeNames = new ArrayList<String>(((LexerGrammar)g).modes.keySet());
+		int mode = modeNames.indexOf(name);
+		if (mode >= 0) {
+			return mode;
+		}
+
+		try {
+			return Integer.parseInt(name);
+		} catch (NumberFormatException ex) {
+			g.tool.errMgr.grammarError(ErrorType.UNKNOWN_LEXER_CONSTANT, g.fileName, token, currentRule.name, token != null ? token.getText() : null);
+			return null;
+		}
 	}
 }

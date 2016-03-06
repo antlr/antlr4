@@ -1,0 +1,7 @@
+import "ReferenceToATN.stg"
+
+Input() ::= ""
+
+Output() ::= "<\n>"
+
+Errors() ::= ""

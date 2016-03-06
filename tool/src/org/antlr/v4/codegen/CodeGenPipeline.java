@@ -48,8 +48,9 @@ public class CodeGenPipeline {
 	}
 
 	public void process() {
-		CodeGenerator gen = new CodeGenerator(g);
+		if ( !CodeGenerator.targetExists(g.getOptionString("language")) ) return;
 
+		CodeGenerator gen = new CodeGenerator(g);
 		IntervalSet idTypes = new IntervalSet();
 		idTypes.add(ANTLRParser.ID);
 		idTypes.add(ANTLRParser.RULE_REF);
@@ -63,22 +64,45 @@ public class CodeGenPipeline {
 			}
 		}
 
-		if ( gen.getTemplates()==null ) return;
+		// all templates are generated in memory to report the most complete
+		// error information possible, but actually writing output files stops
+		// after the first error is reported
+		int errorCount = g.tool.errMgr.getNumErrors();
 
 		if ( g.isLexer() ) {
 			ST lexer = gen.generateLexer();
-			writeRecognizer(lexer, gen);
+			if (g.tool.errMgr.getNumErrors() == errorCount) {
+				writeRecognizer(lexer, gen);
+			}
 		}
 		else {
 			ST parser = gen.generateParser();
-			writeRecognizer(parser, gen);
+			if (g.tool.errMgr.getNumErrors() == errorCount) {
+				writeRecognizer(parser, gen);
+			}
 			if ( g.tool.gen_listener ) {
-				gen.writeListener(gen.generateListener());
-				gen.writeBaseListener(gen.generateBaseListener());
+				ST listener = gen.generateListener();
+				if (g.tool.errMgr.getNumErrors() == errorCount) {
+					gen.writeListener(listener);
+				}
+				if (gen.getTarget().wantsBaseListener()) {
+					ST baseListener = gen.generateBaseListener();
+					if (g.tool.errMgr.getNumErrors() == errorCount) {
+						gen.writeBaseListener(baseListener);
+					}
+				}
 			}
 			if ( g.tool.gen_visitor ) {
-				gen.writeVisitor(gen.generateVisitor());
-				gen.writeBaseVisitor(gen.generateBaseVisitor());
+				ST visitor = gen.generateVisitor();
+				if (g.tool.errMgr.getNumErrors() == errorCount) {
+					gen.writeVisitor(visitor);
+				}
+				if (gen.getTarget().wantsBaseVisitor()) {
+					ST baseVisitor = gen.generateBaseVisitor();
+					if (g.tool.errMgr.getNumErrors() == errorCount) {
+						gen.writeBaseVisitor(baseVisitor);
+					}
+				}
 			}
 			gen.writeParserHeaderFile();
 		}
@@ -91,7 +115,9 @@ public class CodeGenPipeline {
 			if (g.tool.ST_inspector_wait_for_close) {
 				try {
 					viz.waitForClose();
-				} catch (InterruptedException ex) {
+				}
+				catch (InterruptedException ex) {
+					g.tool.errMgr.toolError(ErrorType.INTERNAL_ERROR, ex);
 				}
 			}
 		}

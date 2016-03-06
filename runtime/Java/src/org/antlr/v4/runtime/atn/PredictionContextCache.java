@@ -38,7 +38,7 @@ import java.util.Map;
  *  can be used for both lexers and parsers.
  */
 public class PredictionContextCache {
-	protected Map<PredictionContext, PredictionContext> cache =
+	protected final Map<PredictionContext, PredictionContext> cache =
 		new HashMap<PredictionContext, PredictionContext>();
 
 	/** Add a context to the cache and return it. If the context already exists,

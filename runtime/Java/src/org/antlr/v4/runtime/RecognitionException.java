@@ -31,7 +31,6 @@ package org.antlr.v4.runtime;
 
 import org.antlr.v4.runtime.atn.DecisionState;
 import org.antlr.v4.runtime.misc.IntervalSet;
-import org.antlr.v4.runtime.misc.Nullable;
 
 /** The root of the ANTLR exception hierarchy. In general, ANTLR tracks just
  *  3 kinds of errors: prediction errors, failed predicate errors, and
@@ -41,13 +40,10 @@ import org.antlr.v4.runtime.misc.Nullable;
  */
 public class RecognitionException extends RuntimeException {
 	/** The {@link Recognizer} where this exception originated. */
-	@Nullable
 	private final Recognizer<?, ?> recognizer;
 
-	@Nullable
 	private final RuleContext ctx;
 
-	@Nullable
 	private final IntStream input;
 
 	/**
@@ -59,9 +55,9 @@ public class RecognitionException extends RuntimeException {
 
 	private int offendingState = -1;
 
-	public RecognitionException(@Nullable Recognizer<?, ?> recognizer,
-								@Nullable IntStream input,
-								@Nullable ParserRuleContext ctx)
+	public RecognitionException(Recognizer<?, ?> recognizer,
+								IntStream input,
+								ParserRuleContext ctx)
 	{
 		this.recognizer = recognizer;
 		this.input = input;
@@ -70,9 +66,9 @@ public class RecognitionException extends RuntimeException {
 	}
 
 	public RecognitionException(String message,
-								@Nullable Recognizer<?, ?> recognizer,
-								@Nullable IntStream input,
-								@Nullable ParserRuleContext ctx)
+								Recognizer<?, ?> recognizer,
+								IntStream input,
+								ParserRuleContext ctx)
 	{
 		super(message);
 		this.recognizer = recognizer;
@@ -87,8 +83,8 @@ public class RecognitionException extends RuntimeException {
 	 * {@link LexerNoViableAltException} exceptions, this is the
 	 * {@link DecisionState} number. For others, it is the state whose outgoing
 	 * edge we couldn't match.
-	 * <p/>
-	 * If the state number is not known, this method returns -1.
+	 *
+	 * <p>If the state number is not known, this method returns -1.</p>
 	 */
 	public int getOffendingState() {
 		return offendingState;
@@ -101,14 +97,13 @@ public class RecognitionException extends RuntimeException {
 	/**
 	 * Gets the set of input symbols which could potentially follow the
 	 * previously matched symbol at the time this exception was thrown.
-	 * <p/>
-	 * If the set of expected tokens is not known and could not be computed,
-	 * this method returns {@code null}.
+	 *
+	 * <p>If the set of expected tokens is not known and could not be computed,
+	 * this method returns {@code null}.</p>
 	 *
 	 * @return The set of token types that could potentially follow the current
 	 * state in the ATN, or {@code null} if the information is not available.
 	 */
-	@Nullable
 	public IntervalSet getExpectedTokens() {
 		if (recognizer != null) {
 			return recognizer.getATN().getExpectedTokens(offendingState, ctx);
@@ -119,13 +114,12 @@ public class RecognitionException extends RuntimeException {
 
 	/**
 	 * Gets the {@link RuleContext} at the time this exception was thrown.
-	 * <p/>
-	 * If the context is not available, this method returns {@code null}.
+	 *
+	 * <p>If the context is not available, this method returns {@code null}.</p>
 	 *
 	 * @return The {@link RuleContext} at the time this exception was thrown.
 	 * If the context is not available, this method returns {@code null}.
 	 */
-	@Nullable
 	public RuleContext getCtx() {
 		return ctx;
 	}
@@ -133,36 +127,34 @@ public class RecognitionException extends RuntimeException {
 	/**
 	 * Gets the input stream which is the symbol source for the recognizer where
 	 * this exception was thrown.
-	 * <p/>
-	 * If the input stream is not available, this method returns {@code null}.
+	 *
+	 * <p>If the input stream is not available, this method returns {@code null}.</p>
 	 *
 	 * @return The input stream which is the symbol source for the recognizer
 	 * where this exception was thrown, or {@code null} if the stream is not
 	 * available.
 	 */
-	@Nullable
 	public IntStream getInputStream() {
 		return input;
 	}
 
-	@Nullable
+
 	public Token getOffendingToken() {
 		return offendingToken;
 	}
 
-	protected final void setOffendingToken(@Nullable Token offendingToken) {
+	protected final void setOffendingToken(Token offendingToken) {
 		this.offendingToken = offendingToken;
 	}
 
 	/**
 	 * Gets the {@link Recognizer} where this exception occurred.
-	 * <p/>
-	 * If the recognizer is not available, this method returns {@code null}.
+	 *
+	 * <p>If the recognizer is not available, this method returns {@code null}.</p>
 	 *
 	 * @return The recognizer where this exception occurred, or {@code null} if
 	 * the recognizer is not available.
 	 */
-	@Nullable
 	public Recognizer<?, ?> getRecognizer() {
 		return recognizer;
 	}

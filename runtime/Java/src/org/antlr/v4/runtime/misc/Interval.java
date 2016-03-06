@@ -65,7 +65,7 @@ public class Interval {
 	}
 
 	/** return number of elements between a and b inclusively. x..x is length 1.
-	 *  if b < a, then length is 0.  9..10 has length 2.
+	 *  if b &lt; a, then length is 0.  9..10 has length 2.
 	 */
 	public int length() {
 		if ( b<a ) return 0;

@@ -30,8 +30,6 @@
 package org.antlr.v4.runtime;
 
 import org.antlr.v4.runtime.atn.ATNConfigSet;
-import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.misc.Nullable;
 
 /** Indicates that the parser could not decide which of two or more paths
  *  to take based upon the remaining input. It tracks the starting token
@@ -40,7 +38,7 @@ import org.antlr.v4.runtime.misc.Nullable;
  */
 public class NoViableAltException extends RecognitionException {
 	/** Which configurations did we try at input.index() that couldn't match input.LT(1)? */
-	@Nullable
+
 	private final ATNConfigSet deadEndConfigs;
 
 	/** The token object at the start index; the input stream might
@@ -48,10 +46,10 @@ public class NoViableAltException extends RecognitionException {
 	 *  time the error occurred, of course the stream needs to keep a
 	 *  buffer all of the tokens but later we might not have access to those.)
 	 */
-	@NotNull
+
 	private final Token startToken;
 
-	public NoViableAltException(@NotNull Parser recognizer) { // LL(1) error
+	public NoViableAltException(Parser recognizer) { // LL(1) error
 		this(recognizer,
 			 recognizer.getInputStream(),
 			 recognizer.getCurrentToken(),
@@ -60,12 +58,12 @@ public class NoViableAltException extends RecognitionException {
 			 recognizer._ctx);
 	}
 
-	public NoViableAltException(@NotNull Parser recognizer,
-								@NotNull TokenStream input,
-								@NotNull Token startToken,
-								@NotNull Token offendingToken,
-								@Nullable ATNConfigSet deadEndConfigs,
-								@NotNull ParserRuleContext ctx)
+	public NoViableAltException(Parser recognizer,
+								TokenStream input,
+								Token startToken,
+								Token offendingToken,
+								ATNConfigSet deadEndConfigs,
+								ParserRuleContext ctx)
 	{
 		super(recognizer, input, ctx);
 		this.deadEndConfigs = deadEndConfigs;
@@ -73,12 +71,12 @@ public class NoViableAltException extends RecognitionException {
 		this.setOffendingToken(offendingToken);
 	}
 
-	@NotNull
+
 	public Token getStartToken() {
 		return startToken;
 	}
 
-	@Nullable
+
 	public ATNConfigSet getDeadEndConfigs() {
 		return deadEndConfigs;
 	}

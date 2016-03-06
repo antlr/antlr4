@@ -32,9 +32,9 @@ package org.antlr.v4.codegen.model;
 
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.tree.CommonTreeNodeStream;
-import org.antlr.runtime.tree.TreeNodeStream;
 import org.antlr.v4.codegen.OutputModelFactory;
 import org.antlr.v4.codegen.model.decl.AltLabelStructDecl;
+import org.antlr.v4.codegen.model.decl.AttributeDecl;
 import org.antlr.v4.codegen.model.decl.ContextRuleGetterDecl;
 import org.antlr.v4.codegen.model.decl.ContextRuleListGetterDecl;
 import org.antlr.v4.codegen.model.decl.ContextRuleListIndexedGetterDecl;
@@ -44,28 +44,24 @@ import org.antlr.v4.codegen.model.decl.ContextTokenListIndexedGetterDecl;
 import org.antlr.v4.codegen.model.decl.Decl;
 import org.antlr.v4.codegen.model.decl.StructDecl;
 import org.antlr.v4.misc.FrequencySet;
-import org.antlr.v4.misc.MutableInt;
 import org.antlr.v4.misc.Utils;
 import org.antlr.v4.parse.GrammarASTAdaptor;
-import org.antlr.v4.parse.GrammarTreeVisitor;
 import org.antlr.v4.runtime.atn.ATNState;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.OrderedHashSet;
-import org.antlr.v4.runtime.misc.Triple;
+import org.antlr.v4.runtime.misc.Pair;
 import org.antlr.v4.tool.Attribute;
 import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.Rule;
 import org.antlr.v4.tool.ast.ActionAST;
 import org.antlr.v4.tool.ast.AltAST;
 import org.antlr.v4.tool.ast.GrammarAST;
-import org.antlr.v4.tool.ast.TerminalAST;
 
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -82,13 +78,13 @@ public class RuleFunction extends OutputModelObject {
 	public Collection<String> tokenLabels;
 	public ATNState startState;
 	public int index;
-	public Collection<Attribute> args = null;
 	public Rule rule;
 	public AltLabelStructDecl[] altToContext;
 	public boolean hasLookaheadBlock;
 
 	@ModelElement public List<SrcOp> code;
 	@ModelElement public OrderedHashSet<Decl> locals; // TODO: move into ctx?
+	@ModelElement public Collection<AttributeDecl> args = null;
 	@ModelElement public StructDecl ruleCtx;
 	@ModelElement public Map<String,AltLabelStructDecl> altLabelCtxs;
 	@ModelElement public Map<String,Action> namedActions;
@@ -113,9 +109,15 @@ public class RuleFunction extends OutputModelObject {
 		addContextGetters(factory, r);
 
 		if ( r.args!=null ) {
-			ruleCtx.addDecls(r.args.attributes.values());
-			args = r.args.attributes.values();
-			ruleCtx.ctorAttrs = args;
+			Collection<Attribute> decls = r.args.attributes.values();
+			if ( decls.size()>0 ) {
+				args = new ArrayList<AttributeDecl>();
+				ruleCtx.addDecls(decls);
+				for (Attribute a : decls) {
+					args.add(new AttributeDecl(factory, a));
+				}
+				ruleCtx.ctorAttrs = args;
+			}
 		}
 		if ( r.retvals!=null ) {
 			ruleCtx.addDecls(r.retvals.attributes.values());
@@ -149,17 +151,28 @@ public class RuleFunction extends OutputModelObject {
 
 		// make structs for -> labeled alts, define ctx labels for elements
 		altLabelCtxs = new HashMap<String,AltLabelStructDecl>();
-		List<Triple<Integer,AltAST,String>> labels = r.getAltLabels();
+		Map<String, List<Pair<Integer, AltAST>>> labels = r.getAltLabels();
 		if ( labels!=null ) {
-			for (Triple<Integer,AltAST,String> pair : labels) {
-				Integer altNum = pair.a;
-				AltAST altAST = pair.b;
-				String label = pair.c;
-				altToContext[altNum] = new AltLabelStructDecl(factory, r, altNum, label);
-				altLabelCtxs.put(label, altToContext[altNum]);
-				Set<Decl> decls = getDeclsForAltElements(altAST);
-				// we know which ctx to put in, so do it directly
-				for (Decl d : decls) altToContext[altNum].addDecl(d);
+			for (Map.Entry<String, List<Pair<Integer, AltAST>>> entry : labels.entrySet()) {
+				String label = entry.getKey();
+				List<AltAST> alts = new ArrayList<AltAST>();
+				for (Pair<Integer, AltAST> pair : entry.getValue()) {
+					alts.add(pair.b);
+				}
+
+				Set<Decl> decls = getDeclsForAllElements(alts);
+				for (Pair<Integer, AltAST> pair : entry.getValue()) {
+					Integer altNum = pair.a;
+					altToContext[altNum] = new AltLabelStructDecl(factory, r, altNum, label);
+					if (!altLabelCtxs.containsKey(label)) {
+						altLabelCtxs.put(label, altToContext[altNum]);
+					}
+
+					// we know which ctx to put in, so do it directly
+					for (Decl d : decls) {
+						altToContext[altNum].addDecl(d);
+					}
+				}
 			}
 		}
 	}
@@ -195,7 +208,7 @@ public class RuleFunction extends OutputModelObject {
 				}
 			}
 		}
-		Set<Decl> decls = new HashSet<Decl>();
+		Set<Decl> decls = new LinkedHashSet<Decl>();
 		for (GrammarAST t : allRefs) {
 			String refLabelName = t.getText();
 			List<Decl> d = getDeclForAltElement(t,
@@ -217,32 +230,11 @@ public class RuleFunction extends OutputModelObject {
 			}
 
 			return visitor.frequencies.peek();
-		} catch (RecognitionException ex) {
+		}
+		catch (RecognitionException ex) {
 			factory.getGrammar().tool.errMgr.toolError(ErrorType.INTERNAL_ERROR, ex);
 			return new FrequencySet<String>();
 		}
-	}
-
-	/** Get list of decls for token/rule refs.
-	 *  Single ref X becomes X() getter
-	 *  Multiple refs to X becomes List X() method, X(int i) method.
-	 *  Ref X in a loop then we get List X(), X(int i)
-	 *
-	 *  Does not gen labels for literals like '+', 'begin', ';', ...
- 	 */
-	public Set<Decl> getDeclsForAltElements(AltAST altAST) {
-		IntervalSet reftypes = new IntervalSet(RULE_REF,
-											   TOKEN_REF);
-		List<GrammarAST> refs = altAST.getNodesWithType(reftypes);
-		Set<Decl> decls = new HashSet<Decl>();
-		FrequencySet<String> freq = getElementFrequenciesForAlt(altAST);
-		for (GrammarAST t : refs) {
-			String refLabelName = t.getText();
-			boolean needList = freq.count(refLabelName)>1;
-			List<Decl> d = getDeclForAltElement(t, refLabelName, needList);
-			decls.addAll(d);
-		}
-		return decls;
 	}
 
 	public List<Decl> getDeclForAltElement(GrammarAST t, String refLabelName, boolean needList) {
@@ -251,8 +243,9 @@ public class RuleFunction extends OutputModelObject {
 			Rule rref = factory.getGrammar().getRule(t.getText());
 			String ctxName = factory.getGenerator().getTarget()
 							 .getRuleFunctionContextStructName(rref);
-			if ( needList ) {
-				decls.add( new ContextRuleListGetterDecl(factory, refLabelName, ctxName) );
+			if ( needList) {
+				if(factory.getGenerator().getTarget().supportsOverloadedMethods())
+					decls.add( new ContextRuleListGetterDecl(factory, refLabelName, ctxName) );
 				decls.add( new ContextRuleListIndexedGetterDecl(factory, refLabelName, ctxName) );
 			}
 			else {
@@ -261,7 +254,8 @@ public class RuleFunction extends OutputModelObject {
 		}
 		else {
 			if ( needList ) {
-				decls.add( new ContextTokenListGetterDecl(factory, refLabelName) );
+				if(factory.getGenerator().getTarget().supportsOverloadedMethods())
+					decls.add( new ContextTokenListGetterDecl(factory, refLabelName) );
 				decls.add( new ContextTokenListIndexedGetterDecl(factory, refLabelName) );
 			}
 			else {
@@ -292,130 +286,5 @@ public class RuleFunction extends OutputModelObject {
 			}
 		}
 		ruleCtx.addDecl(d); // stick in overall rule's ctx
-	}
-
-	protected static class ElementFrequenciesVisitor extends GrammarTreeVisitor {
-		final Deque<FrequencySet<String>> frequencies;
-
-		public ElementFrequenciesVisitor(TreeNodeStream input) {
-			super(input);
-			frequencies = new ArrayDeque<FrequencySet<String>>();
-			frequencies.push(new FrequencySet<String>());
-		}
-
-		/*
-		 * Common
-		 */
-
-		protected static FrequencySet<String> combineMax(FrequencySet<String> a, FrequencySet<String> b) {
-			FrequencySet<String> result = combineAndClip(a, b, 1);
-			for (Map.Entry<String, MutableInt> entry : a.entrySet()) {
-				result.get(entry.getKey()).v = entry.getValue().v;
-			}
-
-			for (Map.Entry<String, MutableInt> entry : a.entrySet()) {
-				MutableInt slot = result.get(entry.getKey());
-				slot.v = Math.max(slot.v, entry.getValue().v);
-			}
-
-			return result;
-		}
-
-		protected static FrequencySet<String> combineAndClip(FrequencySet<String> a, FrequencySet<String> b, int clip) {
-			FrequencySet<String> result = new FrequencySet<String>();
-			for (Map.Entry<String, MutableInt> entry : a.entrySet()) {
-				for (int i = 0; i < entry.getValue().v; i++) {
-					result.add(entry.getKey());
-				}
-			}
-
-			for (Map.Entry<String, MutableInt> entry : b.entrySet()) {
-				for (int i = 0; i < entry.getValue().v; i++) {
-					result.add(entry.getKey());
-				}
-			}
-
-			for (Map.Entry<String, MutableInt> entry : result.entrySet()) {
-				entry.getValue().v = Math.min(entry.getValue().v, clip);
-			}
-
-			return result;
-		}
-
-		@Override
-		public void tokenRef(TerminalAST ref) {
-			frequencies.peek().add(ref.getText());
-		}
-
-		@Override
-		public void ruleRef(GrammarAST ref, ActionAST arg) {
-			frequencies.peek().add(ref.getText());
-		}
-
-		/*
-		 * Parser rules
-		 */
-
-		@Override
-		protected void enterAlternative(AltAST tree) {
-			frequencies.push(new FrequencySet<String>());
-		}
-
-		@Override
-		protected void exitAlternative(AltAST tree) {
-			frequencies.push(combineMax(frequencies.pop(), frequencies.pop()));
-		}
-
-		@Override
-		protected void enterElement(GrammarAST tree) {
-			frequencies.push(new FrequencySet<String>());
-		}
-
-		@Override
-		protected void exitElement(GrammarAST tree) {
-			frequencies.push(combineAndClip(frequencies.pop(), frequencies.pop(), 2));
-		}
-
-		@Override
-		protected void exitSubrule(GrammarAST tree) {
-			if (tree.getType() == CLOSURE || tree.getType() == POSITIVE_CLOSURE) {
-				for (Map.Entry<String, MutableInt> entry : frequencies.peek().entrySet()) {
-					entry.getValue().v = 2;
-				}
-			}
-		}
-
-		/*
-		 * Lexer rules
-		 */
-
-		@Override
-		protected void enterLexerAlternative(GrammarAST tree) {
-			frequencies.push(new FrequencySet<String>());
-		}
-
-		@Override
-		protected void exitLexerAlternative(GrammarAST tree) {
-			frequencies.push(combineMax(frequencies.pop(), frequencies.pop()));
-		}
-
-		@Override
-		protected void enterLexerElement(GrammarAST tree) {
-			frequencies.push(new FrequencySet<String>());
-		}
-
-		@Override
-		protected void exitLexerElement(GrammarAST tree) {
-			frequencies.push(combineAndClip(frequencies.pop(), frequencies.pop(), 2));
-		}
-
-		@Override
-		protected void exitLexerSubrule(GrammarAST tree) {
-			if (tree.getType() == CLOSURE || tree.getType() == POSITIVE_CLOSURE) {
-				for (Map.Entry<String, MutableInt> entry : frequencies.peek().entrySet()) {
-					entry.getValue().v = 2;
-				}
-			}
-		}
 	}
 }

@@ -30,9 +30,6 @@
 
 package org.antlr.v4.runtime.tree.pattern;
 
-import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.misc.Nullable;
-
 /**
  * Represents a placeholder tag in a tree pattern. A tag can have any of the
  * following forms.
@@ -97,7 +94,7 @@ class TagChunk extends Chunk {
 	 *
 	 * @return The tag for the chunk.
 	 */
-	@NotNull
+
 	public final String getTag() {
 		return tag;
 	}
@@ -108,7 +105,7 @@ class TagChunk extends Chunk {
 	 * @return The label assigned to this chunk, or {@code null} if no label is
 	 * assigned to the chunk.
 	 */
-	@Nullable
+
 	public final String getLabel() {
 		return label;
 	}

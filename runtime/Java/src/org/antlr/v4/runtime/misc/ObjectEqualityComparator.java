@@ -40,9 +40,9 @@ public final class ObjectEqualityComparator extends AbstractEqualityComparator<O
 
 	/**
 	 * {@inheritDoc}
-	 * <p/>
-	 * This implementation returns
-	 * {@code obj.}{@link Object#hashCode hashCode()}.
+	 *
+	 * <p>This implementation returns
+	 * {@code obj.}{@link Object#hashCode hashCode()}.</p>
 	 */
 	@Override
 	public int hashCode(Object obj) {
@@ -55,12 +55,12 @@ public final class ObjectEqualityComparator extends AbstractEqualityComparator<O
 
 	/**
 	 * {@inheritDoc}
-	 * <p/>
-	 * This implementation relies on object equality. If both objects are
+	 *
+	 * <p>This implementation relies on object equality. If both objects are
 	 * {@code null}, this method returns {@code true}. Otherwise if only
 	 * {@code a} is {@code null}, this method returns {@code false}. Otherwise,
 	 * this method returns the result of
-	 * {@code a.}{@link Object#equals equals}{@code (b)}.
+	 * {@code a.}{@link Object#equals equals}{@code (b)}.</p>
 	 */
 	@Override
 	public boolean equals(Object a, Object b) {

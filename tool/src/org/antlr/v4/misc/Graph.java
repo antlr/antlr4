@@ -32,7 +32,7 @@ package org.antlr.v4.misc;
 import org.antlr.v4.runtime.misc.OrderedHashSet;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -59,7 +59,7 @@ public class Graph<T> {
 	}
 
 	/** Map from node payload to node containing it */
-	protected Map<T,Node<T>> nodes = new HashMap<T,Node<T>>();
+	protected Map<T,Node<T>> nodes = new LinkedHashMap<T,Node<T>>();
 
 	public void addEdge(T a, T b) {
 		//System.out.println("add edge "+a+" to "+b);

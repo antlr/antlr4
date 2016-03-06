@@ -1,0 +1,20 @@
+import "FullContextIF_THEN_ELSEParse.stg"
+
+Input() ::= "{ if x then return else foo }"
+
+Output() ::= <<
+Decision 1:
+s0-'else'->:s1^=>1<\n>
+>>
+
+// Technically, this input sequence is not ambiguous because else
+// uniquely predicts going into the optional subrule. else cannot
+// be matched by exiting stat since that would only match '}' or
+// the start of a stat. But, we are using the theory that
+// SLL(1)=LL(1) and so we are avoiding full context parsing
+// by declaring all else clause parsing to be ambiguous.
+
+Errors() ::= <<
+line 1:19 reportAttemptingFullContext d=1 (stat), input='else'
+line 1:19 reportContextSensitivity d=1 (stat), input='else'<\n>
+>>

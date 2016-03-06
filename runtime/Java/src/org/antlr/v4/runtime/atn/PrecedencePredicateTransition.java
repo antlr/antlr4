@@ -30,8 +30,6 @@
 
 package org.antlr.v4.runtime.atn;
 
-import org.antlr.v4.runtime.misc.NotNull;
-
 /**
  *
  * @author Sam Harwell
@@ -39,7 +37,7 @@ import org.antlr.v4.runtime.misc.NotNull;
 public final class PrecedencePredicateTransition extends AbstractPredicateTransition {
 	public final int precedence;
 
-	public PrecedencePredicateTransition(@NotNull ATNState target, int precedence) {
+	public PrecedencePredicateTransition(ATNState target, int precedence) {
 		super(target);
 		this.precedence = precedence;
 	}

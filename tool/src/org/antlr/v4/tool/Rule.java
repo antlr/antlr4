@@ -30,7 +30,7 @@
 
 package org.antlr.v4.tool;
 
-import org.antlr.v4.runtime.misc.Triple;
+import org.antlr.v4.runtime.misc.Pair;
 import org.antlr.v4.tool.ast.ActionAST;
 import org.antlr.v4.tool.ast.AltAST;
 import org.antlr.v4.tool.ast.GrammarAST;
@@ -41,6 +41,7 @@ import org.stringtemplate.v4.misc.MultiMap;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -54,6 +55,7 @@ public class Rule implements AttributeResolver {
 	public static final AttributeDict predefinedRulePropertiesDict =
 		new AttributeDict(AttributeDict.DictType.PREDEFINED_RULE);
 	static {
+		predefinedRulePropertiesDict.add(new Attribute("parser"));
 		predefinedRulePropertiesDict.add(new Attribute("text"));
 		predefinedRulePropertiesDict.add(new Attribute("start"));
 		predefinedRulePropertiesDict.add(new Attribute("stop"));
@@ -205,13 +207,24 @@ public class Rule implements AttributeResolver {
 		return numberOfAlts;
 	}
 
-	/** Get -> labels. */
-	public List<Triple<Integer,AltAST,String>> getAltLabels() {
-		List<Triple<Integer,AltAST,String>> labels = new ArrayList<Triple<Integer,AltAST,String>>();
+	/**
+	 * Get {@code #} labels. The keys of the map are the labels applied to outer
+	 * alternatives of a lexer rule, and the values are collections of pairs
+	 * (alternative number and {@link AltAST}) identifying the alternatives with
+	 * this label. Unlabeled alternatives are not included in the result.
+	 */
+	public Map<String, List<Pair<Integer, AltAST>>> getAltLabels() {
+		Map<String, List<Pair<Integer, AltAST>>> labels = new LinkedHashMap<String, List<Pair<Integer, AltAST>>>();
 		for (int i=1; i<=numberOfAlts; i++) {
 			GrammarAST altLabel = alt[i].ast.altLabel;
 			if ( altLabel!=null ) {
-				labels.add(new Triple<Integer,AltAST,String>(i,alt[i].ast,altLabel.getText()));
+				List<Pair<Integer, AltAST>> list = labels.get(altLabel.getText());
+				if (list == null) {
+					list = new ArrayList<Pair<Integer, AltAST>>();
+					labels.put(altLabel.getText(), list);
+				}
+
+				list.add(new Pair<Integer, AltAST>(i, alt[i].ast));
 			}
 		}
 		if ( labels.isEmpty() ) return null;
@@ -248,9 +261,6 @@ public class Rule implements AttributeResolver {
 	/** $x.y	Attribute: x is surrounding rule, label ref (in any alts) */
 	@Override
 	public Attribute resolveToAttribute(String x, String y, ActionAST node) {
-		if ( this.name.equals(x) ) { // x is this rule?
-			return resolveToAttribute(y, node);
-		}
 		LabelElementPair anyLabelDef = getAnyLabelDef(x);
 		if ( anyLabelDef!=null ) {
 			if ( anyLabelDef.type==LabelType.RULE_LABEL ) {
@@ -295,7 +305,6 @@ public class Rule implements AttributeResolver {
 	@Override
 	public boolean resolvesToAttributeDict(String x, ActionAST node) {
 		if ( resolvesToToken(x, node) ) return true;
-		if ( x.equals(name) ) return true; // $r for action in rule r, $r is a dict
 		return false;
 	}
 

@@ -1,0 +1,70 @@
+TestType() ::= "Lexer"
+
+Grammar ::= [
+	"PositionAdjustingLexer": {<grammar("PositionAdjustingLexer")>}
+]
+
+Input() ::= <<
+tokens
+tokens {
+notLabel
+label1 =
+label2 +=
+notLabel<\n>
+>>
+
+TOKENS() ::= "\<4>"
+LABEL() ::= "\<5>"
+IDENTIFIER() ::= "\<6>"
+
+Output() ::= <<
+[@0,0:5='tokens',<IDENTIFIER()>,1:0]
+[@1,7:12='tokens',<TOKENS()>,2:0]
+[@2,14:14='{',\<3>,2:7]
+[@3,16:23='notLabel',<IDENTIFIER()>,3:0]
+[@4,25:30='label1',<LABEL()>,4:0]
+[@5,32:32='=',\<1>,4:7]
+[@6,34:39='label2',<LABEL()>,5:0]
+[@7,41:42='+=',\<2>,5:7]
+[@8,44:51='notLabel',<IDENTIFIER()>,6:0]
+[@9,53:52='\<EOF>',\<-1>,7:0]<\n>
+>>
+
+Errors() ::= ""
+
+grammar(grammarName) ::= <<
+lexer grammar PositionAdjustingLexer;
+
+@members {
+<PositionAdjustingLexer()>
+}
+
+ASSIGN : '=' ;
+PLUS_ASSIGN : '+=' ;
+LCURLY:	'{';
+
+// 'tokens' followed by '{'
+TOKENS : 'tokens' IGNORED '{';
+
+// IDENTIFIER followed by '+=' or '='
+LABEL
+	:	IDENTIFIER IGNORED '+'? '='
+	;
+
+IDENTIFIER
+	:	[a-zA-Z_] [a-zA-Z0-9_]*
+	;
+
+fragment
+IGNORED
+	:	[ \t\r\n]*
+	;
+
+NEWLINE
+	:	[\r\n]+ -> skip
+	;
+
+WS
+	:	[ \t]+ -> skip
+	;
+>>

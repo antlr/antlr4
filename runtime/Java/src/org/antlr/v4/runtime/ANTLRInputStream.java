@@ -41,8 +41,8 @@ import java.util.Arrays;
  * Vacuum all input from a {@link Reader}/{@link InputStream} and then treat it
  * like a {@code char[]} buffer. Can also pass in a {@link String} or
  * {@code char[]} to use.
- * <p/>
- * If you need encoding, pass in stream/reader with correct encoding.
+ *
+ * <p>If you need encoding, pass in stream/reader with correct encoding.</p>
  */
 public class ANTLRInputStream implements CharStream {
     public static final int READ_BUFFER_SIZE = 1024;
@@ -216,8 +216,9 @@ public class ANTLRInputStream implements CharStream {
 			p = index; // just jump; don't update stream state (line, ...)
 			return;
 		}
-		// seek forward, consume until p hits index
-		while ( p<index && index<n ) {
+		// seek forward, consume until p hits index or n (whichever comes first)
+		index = Math.min(index, n);
+		while ( p<index ) {
 			consume();
 		}
 	}
@@ -237,6 +238,10 @@ public class ANTLRInputStream implements CharStream {
 
 	@Override
 	public String getSourceName() {
+		if (name == null || name.isEmpty()) {
+			return UNKNOWN_SOURCE_NAME;
+		}
+
 		return name;
 	}
 

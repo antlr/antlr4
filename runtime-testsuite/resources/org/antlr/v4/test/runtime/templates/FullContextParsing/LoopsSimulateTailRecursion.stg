@@ -1,0 +1,44 @@
+/*
+ * Tests predictions for the following case involving closures.
+ * http://www.antlr.org/wiki/display/~admin/2011/12/29/Flaw+in+ANTLR+v3+LL(*)+analysis+algorithm
+ */
+TestType() ::= "Parser"
+
+Options ::= [
+	"Debug": true
+]
+
+Grammar ::= [
+	"T": {<grammar("T")>}
+]
+
+Input() ::= "a(i)\<-x"
+
+Rule() ::= "prog"
+
+Output() ::= <<
+pass: a(i)\<-x<\n>
+>>
+
+Errors() ::= <<
+line 1:3 reportAttemptingFullContext d=3 (expr_primary), input='a(i)'
+line 1:7 reportAmbiguity d=3 (expr_primary): ambigAlts={2, 3}, input='a(i)\<-x'<\n>
+>>
+
+grammar(grammarName) ::= <<
+grammar <grammarName>;
+prog
+@init {<LL_EXACT_AMBIG_DETECTION()>}
+	: expr_or_assign*;
+expr_or_assign
+	: expr '++' {<writeln("\"fail.\"")>}
+	|  expr {<writeln("\"pass: \"+$expr.text")>}
+	;
+expr: expr_primary ('\<-' ID)?;
+expr_primary
+	: '(' ID ')'
+	| ID '(' ID ')'
+	| ID
+	;
+ID  : [a-z]+ ;
+>>

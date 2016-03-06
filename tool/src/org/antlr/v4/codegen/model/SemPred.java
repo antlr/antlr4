@@ -34,6 +34,7 @@ import org.antlr.v4.codegen.ActionTranslator;
 import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.codegen.OutputModelFactory;
 import org.antlr.v4.codegen.model.chunk.ActionChunk;
+import org.antlr.v4.runtime.atn.AbstractPredicateTransition;
 import org.antlr.v4.tool.ast.ActionAST;
 import org.antlr.v4.tool.ast.GrammarAST;
 
@@ -41,14 +42,35 @@ import java.util.List;
 
 /** */
 public class SemPred extends Action {
-	public String msg;       // user-specified string in fail grammar option
-	public String predicate; // the predicate string with { }? stripped
+	/**
+	 * The user-specified terminal option {@code fail}, if it was used and the
+	 * value is a string literal. For example:
+	 *
+	 * <p>
+	 * {@code {pred}?<fail='message'>}</p>
+	 */
+	public String msg;
+	/**
+	 * The predicate string with <code>{</code> and <code>}?</code> stripped from the ends.
+	 */
+	public String predicate;
 
-	/** user-specified action in fail grammar option */
+	/**
+	 * The translated chunks of the user-specified terminal option {@code fail},
+	 * if it was used and the value is an action. For example:
+	 *
+	 * <p>
+	 * {@code {pred}?<fail={"Java literal"}>}</p>
+	 */
 	@ModelElement public List<ActionChunk> failChunks;
 
 	public SemPred(OutputModelFactory factory, ActionAST ast) {
 		super(factory,ast);
+
+		assert ast.atnState != null
+			&& ast.atnState.getNumberOfTransitions() == 1
+			&& ast.atnState.transition(0) instanceof AbstractPredicateTransition;
+
 		GrammarAST failNode = ast.getOptionAST("fail");
 		CodeGenerator gen = factory.getGenerator();
 		predicate = ast.getText();

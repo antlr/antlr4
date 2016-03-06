@@ -67,7 +67,7 @@ public class LogManager {
 
 	protected List<Record> records;
 
-	public void log(@Nullable String component, String msg) {
+	public void log(String component, String msg) {
 		Record r = new Record();
 		r.component = component;
 		r.msg = msg;

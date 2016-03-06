@@ -30,7 +30,6 @@
 
 package org.antlr.v4.misc;
 
-import org.antlr.v4.runtime.misc.IntegerList;
 import org.antlr.v4.tool.ast.GrammarAST;
 
 import java.util.ArrayList;

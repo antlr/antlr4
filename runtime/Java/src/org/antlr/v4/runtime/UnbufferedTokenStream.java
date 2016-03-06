@@ -31,7 +31,6 @@
 package org.antlr.v4.runtime;
 
 import org.antlr.v4.runtime.misc.Interval;
-import org.antlr.v4.runtime.misc.NotNull;
 
 import java.util.Arrays;
 
@@ -47,16 +46,16 @@ public class UnbufferedTokenStream<T extends Token> implements TokenStream {
 
 	/**
 	 * The number of tokens currently in {@link #tokens tokens}.
-	 * <p/>
-	 * This is not the buffer capacity, that's {@code tokens.length}.
+	 *
+	 * <p>This is not the buffer capacity, that's {@code tokens.length}.</p>
 	 */
 	protected int n;
 
 	/**
 	 * 0..n-1 index into {@link #tokens tokens} of next token.
-	 * <p/>
-	 * The {@code LT(1)} token is {@code tokens[p]}. If {@code p == n}, we are
-	 * out of buffered tokens.
+	 *
+	 * <p>The {@code LT(1)} token is {@code tokens[p]}. If {@code p == n}, we are
+	 * out of buffered tokens.</p>
 	 */
 	protected int p=0;
 
@@ -83,9 +82,9 @@ public class UnbufferedTokenStream<T extends Token> implements TokenStream {
 	 * Absolute token index. It's the index of the token about to be read via
 	 * {@code LT(1)}. Goes from 0 to the number of tokens in the entire stream,
 	 * although the stream size is unknown before the end is reached.
-	 * <p/>
-	 * This value is used to set the token indexes if the stream provides tokens
-	 * that implement {@link WritableToken}.
+	 *
+	 * <p>This value is used to set the token indexes if the stream provides tokens
+	 * that implement {@link WritableToken}.</p>
 	 */
 	protected int currentTokenIndex = 0;
 
@@ -140,19 +139,19 @@ public class UnbufferedTokenStream<T extends Token> implements TokenStream {
 		return tokenSource;
 	}
 
-	@NotNull
+
 	@Override
 	public String getText() {
 		return "";
 	}
 
-	@NotNull
+
 	@Override
 	public String getText(RuleContext ctx) {
 		return getText(ctx.getSourceInterval());
 	}
 
-	@NotNull
+
 	@Override
 	public String getText(Token start, Token stop) {
 		return getText(Interval.of(start.getTokenIndex(), stop.getTokenIndex()));
@@ -208,7 +207,7 @@ public class UnbufferedTokenStream<T extends Token> implements TokenStream {
 		return n;
 	}
 
-	protected void add(@NotNull Token t) {
+	protected void add(Token t) {
 		if ( n>=tokens.length ) {
 			tokens = Arrays.copyOf(tokens, tokens.length * 2);
 		}
@@ -222,10 +221,10 @@ public class UnbufferedTokenStream<T extends Token> implements TokenStream {
 
 	/**
 	 * Return a marker that we can release later.
-	 * <p/>
-	 * The specific marker value used for this class allows for some level of
+	 *
+	 * <p>The specific marker value used for this class allows for some level of
 	 * protection against misuse where {@code seek()} is called on a mark or
-	 * {@code release()} is called in the wrong order.
+	 * {@code release()} is called in the wrong order.</p>
 	 */
 	@Override
 	public int mark() {
@@ -305,7 +304,7 @@ public class UnbufferedTokenStream<T extends Token> implements TokenStream {
 		return tokenSource.getSourceName();
 	}
 
-	@NotNull
+
 	@Override
 	public String getText(Interval interval) {
 		int bufferStartIndex = getBufferStartIndex();

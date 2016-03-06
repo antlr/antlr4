@@ -30,14 +30,12 @@
 package org.antlr.v4.runtime;
 
 import org.antlr.v4.runtime.misc.Interval;
-import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ErrorNodeImpl;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.antlr.v4.runtime.tree.TerminalNodeImpl;
-import org.antlr.v4.runtime.tree.pattern.RuleTagToken;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -47,9 +45,8 @@ import java.util.List;
  *
  *  Contains all of the information about the current rule not stored in the
  *  RuleContext. It handles parse tree children list, Any ATN state
- *  tracing, and the default values available for rule indications:
- *  start, stop, rule index, current alt number, current
- *  ATN state.
+ *  tracing, and the default values available for rule invocations:
+ *  start, stop, rule index, current alt number.
  *
  *  Subclasses made for each rule and grammar track the parameters,
  *  return values, locals, and labels specific to that rule. These
@@ -105,9 +102,10 @@ public class ParserRuleContext extends RuleContext {
 
 	public ParserRuleContext() { }
 
-	/** COPY a ctx (I'm deliberately not using copy constructor) */
+	/** COPY a ctx (I'm deliberately not using copy constructor) to avoid
+	 *  confusion with creating node with parent. Does not copy children.
+	 */
 	public void copyFrom(ParserRuleContext ctx) {
-		// from RuleContext
 		this.parent = ctx.parent;
 		this.invokingState = ctx.invokingState;
 
@@ -115,7 +113,7 @@ public class ParserRuleContext extends RuleContext {
 		this.stop = ctx.stop;
 	}
 
-	public ParserRuleContext(@Nullable ParserRuleContext parent, int invokingStateNumber) {
+	public ParserRuleContext(ParserRuleContext parent, int invokingStateNumber) {
 		super(parent, invokingStateNumber);
 	}
 
@@ -274,11 +272,26 @@ public class ParserRuleContext extends RuleContext {
 
 	@Override
 	public Interval getSourceInterval() {
-		if ( start==null || stop==null ) return Interval.INVALID;
+		if ( start == null ) {
+			return Interval.INVALID;
+		}
+		if ( stop==null || stop.getTokenIndex()<start.getTokenIndex() ) {
+			return Interval.of(start.getTokenIndex(), start.getTokenIndex()-1); // empty
+		}
 		return Interval.of(start.getTokenIndex(), stop.getTokenIndex());
 	}
 
+	/**
+	 * Get the initial token in this context.
+	 * Note that the range from start to stop is inclusive, so for rules that do not consume anything
+	 * (for example, zero length or error productions) this token may exceed stop.
+	 */
 	public Token getStart() { return start; }
+	/**
+	 * Get the final token in this context.
+	 * Note that the range from start to stop is inclusive, so for rules that do not consume anything
+	 * (for example, zero length or error productions) this token may precede start.
+	 */
 	public Token getStop() { return stop; }
 
     /** Used for rule context info debugging during parse-time, not so much for ATN debugging */

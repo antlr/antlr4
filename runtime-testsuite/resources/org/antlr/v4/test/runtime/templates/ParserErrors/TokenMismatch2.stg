@@ -1,0 +1,32 @@
+TestType() ::= "Parser"
+
+Options ::= [
+	"Debug": false
+]
+
+Grammar ::= [
+	"T": {<grammar("T")>}
+]
+
+Input() ::= "( ~FORCE_ERROR~ "
+
+Rule() ::= "stat"
+
+Output() ::= <<
+>>
+
+Errors() ::= <<
+line 1:2 mismatched input '~FORCE_ERROR~' expecting ')'<\n>
+>>
+
+grammar(grammarName) ::= <<
+grammar <grammarName>;
+
+stat:   ( '(' expr? ')' )? EOF ;
+expr:   ID '=' STR ;
+
+ERR :   '~FORCE_ERROR~' ;
+ID  :   [a-zA-Z]+ ;
+STR :   '"' ~["]* '"' ;
+WS  :   [ \t\r\n]+ -> skip ;
+>>

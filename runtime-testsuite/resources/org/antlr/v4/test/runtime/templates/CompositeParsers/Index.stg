@@ -1,0 +1,22 @@
+TestTemplates ::= [
+	"DelegatorInvokesDelegateRule": [],
+	"BringInLiteralsFromDelegate": [],
+	"DelegatorInvokesDelegateRuleWithArgs": [],
+	"DelegatorInvokesDelegateRuleWithReturnStruct": [],
+	"DelegatorAccessesDelegateMembers": [],
+	"DelegatorInvokesFirstVersionOfDelegateRule": [],
+	"DelegatesSeeSameTokenType": [],
+	"CombinedImportsCombined": [],
+	"DelegatorRuleOverridesDelegate": [],
+	"DelegatorRuleOverridesLookaheadInDelegate": [],
+	"DelegatorRuleOverridesDelegates": [],
+	"KeywordVSIDOrder": [],
+	"ImportedRuleWithAction": [],
+	"ImportedGrammarWithEmptyOptions": [],
+	"ImportLexerWithOnlyFragmentRules": []
+]
+
+Options ::= [
+	"ImportErrorQueue": true,
+	"ImportGrammar": true
+]

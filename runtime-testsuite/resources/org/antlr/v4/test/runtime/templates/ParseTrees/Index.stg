@@ -1,0 +1,10 @@
+TestTemplates ::= [
+	"TokenAndRuleContextString": [],
+	"Token2": [],
+	"2Alts": [],
+	"2AltLoop": [],
+	"RuleRef": [],
+	"ExtraToken": [],
+	"NoViableAlt": [],
+	"Sync": []
+]

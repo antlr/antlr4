@@ -32,12 +32,11 @@ package org.antlr.v4.tool;
 
 import org.antlr.v4.Tool;
 import org.stringtemplate.v4.ST;
-import org.stringtemplate.v4.STErrorListener;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupFile;
 import org.stringtemplate.v4.misc.ErrorBuffer;
-import org.stringtemplate.v4.misc.STMessage;
 
+import java.io.File;
 import java.net.URL;
 import java.util.Collection;
 import java.util.EnumSet;
@@ -63,29 +62,6 @@ public class ErrorManager {
 
     ErrorBuffer initSTListener = new ErrorBuffer();
 
-    STErrorListener theDefaultSTListener =
-        new STErrorListener() {
-            @Override
-            public void compileTimeError(STMessage msg) {
-                ErrorManager.internalError(msg.toString());
-            }
-
-            @Override
-            public void runTimeError(STMessage msg) {
-                ErrorManager.internalError(msg.toString());
-            }
-
-            @Override
-            public void IOError(STMessage msg) {
-                ErrorManager.internalError(msg.toString());
-            }
-
-            @Override
-            public void internalError(STMessage msg) {
-                ErrorManager.internalError(msg.toString());
-            }
-        };
-
 	public ErrorManager(Tool tool) {
 		this.tool = tool;
 	}
@@ -96,29 +72,10 @@ public class ErrorManager {
 	}
 
 	public ST getMessageTemplate(ANTLRMessage msg) {
-		ST messageST = new ST(msg.getErrorType().msg);
+		ST messageST = msg.getMessageTemplate(tool.longMessages);
 		ST locationST = getLocationFormat();
 		ST reportST = getReportFormat(msg.getErrorType().severity);
 		ST messageFormatST = getMessageFormat();
-
-		messageST.add("verbose", tool.longMessages);
-		Object[] args = msg.getArgs();
-		for (int i=0; i<args.length; i++) {
-			String attr = "arg";
-			if ( i>0 ) attr += i + 1;
-			messageST.add(attr, args[i]);
-		}
-		if ( args.length<2 ) messageST.add("arg2", null); // some messages ref arg2
-
-		Throwable cause = msg.getCause();
-		if ( cause!=null ) {
-			messageST.add("exception", cause);
-			messageST.add("stackTrace", cause.getStackTrace());
-		}
-		else {
-			messageST.add("exception", null); // avoid ST error msg
-			messageST.add("stackTrace", null);
-		}
 
 		boolean locationValid = false;
 		if (msg.line != -1) {
@@ -130,7 +87,13 @@ public class ErrorManager {
 			locationValid = true;
 		}
 		if (msg.fileName != null) {
-			locationST.add("file", msg.fileName);
+			File f = new File(msg.fileName);
+			// Don't show path to file in messages; too long.
+			String displayFileName = msg.fileName;
+			if ( f.exists() ) {
+				displayFileName = f.getName();
+			}
+			locationST.add("file", displayFileName);
 			locationValid = true;
 		}
 
@@ -200,8 +163,7 @@ public class ErrorManager {
      * @param args The arguments to pass to the StringTemplate
      */
 	public void toolError(ErrorType errorType, Object... args) {
-		ToolMessage msg = new ToolMessage(errorType, args);
-		emit(errorType, msg);
+		toolError(errorType, null, args);
 	}
 
 	public void toolError(ErrorType errorType, Throwable e, Object... args) {
@@ -336,6 +298,16 @@ public class ErrorManager {
         rawError(msg);
         e.printStackTrace(System.err);
     }
+
+	public void panic(ErrorType errorType, Object... args) {
+		ToolMessage msg = new ToolMessage(errorType, args);
+		ST msgST = getMessageTemplate(msg);
+		String outputMsg = msgST.render();
+		if ( formatWantsSingleLineMessage() ) {
+			outputMsg = outputMsg.replace('\n', ' ');
+		}
+		panic(outputMsg);
+	}
 
 	public static void panic(String msg) {
 		rawError(msg);

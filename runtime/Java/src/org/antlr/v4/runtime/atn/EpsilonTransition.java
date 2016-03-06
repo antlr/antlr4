@@ -30,10 +30,30 @@
 
 package org.antlr.v4.runtime.atn;
 
-import org.antlr.v4.runtime.misc.NotNull;
-
 public final class EpsilonTransition extends Transition {
-	public EpsilonTransition(@NotNull ATNState target) { super(target); }
+
+	private final int outermostPrecedenceReturn;
+
+	public EpsilonTransition(ATNState target) {
+		this(target, -1);
+	}
+
+	public EpsilonTransition(ATNState target, int outermostPrecedenceReturn) {
+		super(target);
+		this.outermostPrecedenceReturn = outermostPrecedenceReturn;
+	}
+
+	/**
+	 * @return the rule index of a precedence rule for which this transition is
+	 * returning from, where the precedence value is 0; otherwise, -1.
+	 *
+	 * @see ATNConfig#isPrecedenceFilterSuppressed()
+	 * @see ParserATNSimulator#applyPrecedenceFilter(ATNConfigSet)
+	 * @since 4.4.1
+	 */
+	public int outermostPrecedenceReturn() {
+		return outermostPrecedenceReturn;
+	}
 
 	@Override
 	public int getSerializationType() {
@@ -49,7 +69,7 @@ public final class EpsilonTransition extends Transition {
 	}
 
 	@Override
-	@NotNull
+
 	public String toString() {
 		return "epsilon";
 	}

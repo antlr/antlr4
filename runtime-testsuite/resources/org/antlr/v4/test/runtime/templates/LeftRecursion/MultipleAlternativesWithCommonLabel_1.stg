@@ -1,0 +1,9 @@
+import "MultipleAlternativesWithCommonLabel.stg"
+
+Input() ::= "4"
+
+Output() ::= <<
+4<\n>
+>>
+
+Errors() ::= ""

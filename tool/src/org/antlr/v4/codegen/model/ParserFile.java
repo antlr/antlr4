@@ -42,7 +42,10 @@ public class ParserFile extends OutputFile {
 	public String genPackage; // from -package cmd-line
 	@ModelElement public Parser parser;
 	@ModelElement public Map<String, Action> namedActions;
-
+	public Boolean genListener = false;
+	public Boolean genVisitor = false;
+	public String grammarName;
+	
 	public ParserFile(OutputModelFactory factory, String fileName) {
 		super(factory, fileName);
 		Grammar g = factory.getGrammar();
@@ -51,6 +54,10 @@ public class ParserFile extends OutputFile {
 			ActionAST ast = g.namedActions.get(name);
 			namedActions.put(name, new Action(factory, ast));
 		}
-		genPackage = factory.getGrammar().tool.genPackage;
+		genPackage = g.tool.genPackage;
+		// need the below members in the ST for Python
+		genListener = g.tool.gen_listener;
+		genVisitor = g.tool.gen_visitor;
+		grammarName = g.name;
 	}
 }

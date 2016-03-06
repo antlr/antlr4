@@ -32,8 +32,6 @@ package org.antlr.v4.runtime.atn;
 
 import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.misc.MurmurHash;
-import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.misc.Nullable;
 
 /** A tuple: (ATN state, predicted alt, syntactic, semantic context).
  *  The syntactic context is a graph-structured stack node whose
@@ -43,8 +41,14 @@ import org.antlr.v4.runtime.misc.Nullable;
  *  an ATN state.
  */
 public class ATNConfig {
+	/**
+	 * This field stores the bit mask for implementing the
+	 * {@link #isPrecedenceFilterSuppressed} property as a bit within the
+	 * existing {@link #reachesIntoOuterContext} field.
+	 */
+	private static final int SUPPRESS_PRECEDENCE_FILTER = 0x40000000;
+
 	/** The ATN state associated with this configuration */
-	@NotNull
 	public final ATNState state;
 
 	/** What alt (or lexer rule) is predicted by this configuration */
@@ -54,7 +58,6 @@ public class ATNConfig {
 	 *  with this config.  We track only those contexts pushed during
 	 *  execution of the ATN simulator.
 	 */
-	@Nullable
 	public PredictionContext context;
 
 	/**
@@ -64,13 +67,25 @@ public class ATNConfig {
 	 * dependent predicates unless we are in the rule that initially
 	 * invokes the ATN simulator.
 	 *
-	 * closure() tracks the depth of how far we dip into the
-	 * outer context: depth > 0.  Note that it may not be totally
-	 * accurate depth since I don't ever decrement. TODO: make it a boolean then
+	 * <p>
+	 * closure() tracks the depth of how far we dip into the outer context:
+	 * depth &gt; 0.  Note that it may not be totally accurate depth since I
+	 * don't ever decrement. TODO: make it a boolean then</p>
+	 *
+	 * <p>
+	 * For memory efficiency, the {@link #isPrecedenceFilterSuppressed} method
+	 * is also backed by this field. Since the field is publicly accessible, the
+	 * highest bit which would not cause the value to become negative is used to
+	 * store this field. This choice minimizes the risk that code which only
+	 * compares this value to 0 would be affected by the new purpose of the
+	 * flag. It also ensures the performance of the existing {@link ATNConfig}
+	 * constructors as well as certain operations like
+	 * {@link ATNConfigSet#add(ATNConfig, DoubleKeyMap)} method are
+	 * <em>completely</em> unaffected by the change.</p>
 	 */
 	public int reachesIntoOuterContext;
 
-    @NotNull
+
     public final SemanticContext semanticContext;
 
 	public ATNConfig(ATNConfig old) { // dup
@@ -81,17 +96,17 @@ public class ATNConfig {
 		this.reachesIntoOuterContext = old.reachesIntoOuterContext;
 	}
 
-	public ATNConfig(@NotNull ATNState state,
+	public ATNConfig(ATNState state,
 					 int alt,
-					 @Nullable PredictionContext context)
+					 PredictionContext context)
 	{
 		this(state, alt, context, SemanticContext.NONE);
 	}
 
-	public ATNConfig(@NotNull ATNState state,
+	public ATNConfig(ATNState state,
 					 int alt,
-					 @Nullable PredictionContext context,
-					 @NotNull SemanticContext semanticContext)
+					 PredictionContext context,
+					 SemanticContext semanticContext)
 	{
 		this.state = state;
 		this.alt = alt;
@@ -99,37 +114,59 @@ public class ATNConfig {
 		this.semanticContext = semanticContext;
 	}
 
-    public ATNConfig(@NotNull ATNConfig c, @NotNull ATNState state) {
+    public ATNConfig(ATNConfig c, ATNState state) {
    		this(c, state, c.context, c.semanticContext);
    	}
 
-	public ATNConfig(@NotNull ATNConfig c, @NotNull ATNState state,
-		 @NotNull SemanticContext semanticContext)
+	public ATNConfig(ATNConfig c, ATNState state,
+		 SemanticContext semanticContext)
 {
 		this(c, state, c.context, semanticContext);
 	}
 
-	public ATNConfig(@NotNull ATNConfig c,
-					 @NotNull SemanticContext semanticContext)
+	public ATNConfig(ATNConfig c,
+					 SemanticContext semanticContext)
 	{
 		this(c, c.state, c.context, semanticContext);
 	}
 
-    public ATNConfig(@NotNull ATNConfig c, @NotNull ATNState state,
-					 @Nullable PredictionContext context)
+    public ATNConfig(ATNConfig c, ATNState state,
+					 PredictionContext context)
 	{
         this(c, state, context, c.semanticContext);
     }
 
-	public ATNConfig(@NotNull ATNConfig c, @NotNull ATNState state,
-					 @Nullable PredictionContext context,
-                     @NotNull SemanticContext semanticContext)
+	public ATNConfig(ATNConfig c, ATNState state,
+					 PredictionContext context,
+                     SemanticContext semanticContext)
     {
 		this.state = state;
 		this.alt = c.alt;
 		this.context = context;
 		this.semanticContext = semanticContext;
 		this.reachesIntoOuterContext = c.reachesIntoOuterContext;
+	}
+
+	/**
+	 * This method gets the value of the {@link #reachesIntoOuterContext} field
+	 * as it existed prior to the introduction of the
+	 * {@link #isPrecedenceFilterSuppressed} method.
+	 */
+	public final int getOuterContextDepth() {
+		return reachesIntoOuterContext & ~SUPPRESS_PRECEDENCE_FILTER;
+	}
+
+	public final boolean isPrecedenceFilterSuppressed() {
+		return (reachesIntoOuterContext & SUPPRESS_PRECEDENCE_FILTER) != 0;
+	}
+
+	public final void setPrecedenceFilterSuppressed(boolean value) {
+		if (value) {
+			this.reachesIntoOuterContext |= 0x40000000;
+		}
+		else {
+			this.reachesIntoOuterContext &= ~SUPPRESS_PRECEDENCE_FILTER;
+		}
 	}
 
 	/** An ATN configuration is equal to another if both have
@@ -155,7 +192,8 @@ public class ATNConfig {
 		return this.state.stateNumber==other.state.stateNumber
 			&& this.alt==other.alt
 			&& (this.context==other.context || (this.context != null && this.context.equals(other.context)))
-			&& this.semanticContext.equals(other.semanticContext);
+			&& this.semanticContext.equals(other.semanticContext)
+			&& this.isPrecedenceFilterSuppressed() == other.isPrecedenceFilterSuppressed();
 	}
 
 	@Override
@@ -174,7 +212,7 @@ public class ATNConfig {
 		return toString(null, true);
 	}
 
-	public String toString(@Nullable Recognizer<?, ?> recog, boolean showAlt) {
+	public String toString(Recognizer<?, ?> recog, boolean showAlt) {
 		StringBuilder buf = new StringBuilder();
 //		if ( state.ruleIndex>=0 ) {
 //			if ( recog!=null ) buf.append(recog.getRuleNames()[state.ruleIndex]+":");
@@ -195,8 +233,8 @@ public class ATNConfig {
             buf.append(",");
             buf.append(semanticContext);
         }
-        if ( reachesIntoOuterContext>0 ) {
-            buf.append(",up=").append(reachesIntoOuterContext);
+        if ( getOuterContextDepth()>0 ) {
+            buf.append(",up=").append(getOuterContextDepth());
         }
 		buf.append(')');
 		return buf.toString();
