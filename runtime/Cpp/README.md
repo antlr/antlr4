@@ -9,26 +9,23 @@ ANTLR 4 is the result of substantial effort of the following people:
 * [Terence Parr](http://www.cs.usfca.edu/~parrt/), parrt@cs.usfca.edu
   ANTLR project lead and supreme dictator for life
   [University of San Francisco](http://www.usfca.edu/)
-
-* [Sam Harwell] (http://tunnelvisionlabs.com/) 
+* [Sam Harwell](http://tunnelvisionlabs.com/) 
   Tool co-author, Java and C# target)
 
 The C++ target has been the work of the following people:
 
-* Dan McLaughlin, dan.mclaughlin@gmail.com
-  C++ Target project leader
-
+* Dan McLaughlin, dan.mclaughlin@gmail.com C++ Target project leader
 * David Sisson, dsisson@google.com
-
+* Mike Lischke, mike@lischke-online.de
 
 Project Status
 --------------------------------------------------------------------------------
 
- o Building on OS X, Windows, and Linux (Ubuntu)
- o No errors and warnings
- o Library linking
- o Simple running (e.g. heap objects initialize properly)
- o Simple testing  (creating significiant objects)
+* Building on OS X, Windows, and Linux (Ubuntu)
+* No errors and warnings
+* Library linking
+* Simple running (e.g. heap objects initialize properly)
+* Simple testing  (creating significiant objects)
 
 
  
