@@ -28,9 +28,12 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.antlr.v4.codegen;
+package org.antlr.v4.codegen.target;
 
+import org.antlr.v4.Tool;
 import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.codegen.CodeGenerator;
+import org.antlr.v4.codegen.Target;
 import org.antlr.v4.tool.ast.GrammarAST;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
