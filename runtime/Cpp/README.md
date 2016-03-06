@@ -16,7 +16,7 @@ The C++ target has been the work of the following people:
 
 * Dan McLaughlin, dan.mclaughlin@gmail.com C++ Target project leader
 * David Sisson, dsisson@google.com
-* Mike Lischke, mike@lischke-online.de
+* [Mike Lischke](www.soft-gems.net), mike@lischke-online.de
 
 Project Status
 --------------------------------------------------------------------------------
