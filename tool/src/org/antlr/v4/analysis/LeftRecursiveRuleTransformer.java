@@ -244,9 +244,9 @@ public class LeftRecursiveRuleTransformer {
 	 * 			(ALT ID))
 	 * 		(* (BLOCK
 	 *			(OPTIONS ...)
-	 * 			(ALT {7 >= $_p}? '*' (= b e) {$v = $a.v * $b.v;})
-	 * 			(ALT {6 >= $_p}? '+' (= b e) {$v = $a.v + $b.v;})
-	 * 			(ALT {3 >= $_p}? '++') (ALT {2 >= $_p}? '--'))))))
+	 * 			(ALT {7 &gt;= $_p}? '*' (= b e) {$v = $a.v * $b.v;})
+	 * 			(ALT {6 &gt;= $_p}? '+' (= b e) {$v = $a.v + $b.v;})
+	 * 			(ALT {3 &gt;= $_p}? '++') (ALT {2 &gt;= $_p}? '--'))))))
 	 * </pre>
 	 */
 	public void setAltASTPointers(LeftRecursiveRule r, RuleAST t) {

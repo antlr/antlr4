@@ -114,14 +114,14 @@ public class Grammar implements AttributeResolver {
 
 	public static final Set<String> LexerBlockOptions = new HashSet<String>();
 
-	/** Legal options for rule refs like id<key=value> */
+	/** Legal options for rule refs like id&lt;key=value&gt; */
 	public static final Set<String> ruleRefOptions = new HashSet<String>();
 	static {
 		ruleRefOptions.add(LeftRecursiveRuleTransformer.PRECEDENCE_OPTION_NAME);
 		ruleRefOptions.add(LeftRecursiveRuleTransformer.TOKENINDEX_OPTION_NAME);
 	}
 
-	/** Legal options for terminal refs like ID<assoc=right> */
+	/** Legal options for terminal refs like ID&lt;assoc=right&gt; */
 	public static final Set<String> tokenOptions = new HashSet<String>();
 	static {
 		tokenOptions.add("assoc");
@@ -552,15 +552,6 @@ public class Grammar implements AttributeResolver {
 	}
 
     public List<Grammar> getImportedGrammars() { return importedGrammars; }
-
-    /** Get delegates below direct delegates of g
-    public List<Grammar> getIndirectDelegates(Grammar g) {
-        List<Grammar> direct = getDirectDelegates(g);
-        List<Grammar> delegates = getDelegates(g);
-        delegates.removeAll(direct);
-        return delegates;
-    }
-*/
 
 	public LexerGrammar getImplicitLexer() {
 		return implicitLexer;

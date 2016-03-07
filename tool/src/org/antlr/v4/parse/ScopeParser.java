@@ -52,11 +52,15 @@ import java.util.List;
 public class ScopeParser {
     /** Given an arg or retval scope definition list like
      *
-     *  Map<String, String>, int[] j3, char *foo32[3]
+     *  <code>
+     *  Map&lt;String, String&gt;, int[] j3, char *foo32[3]
+     *  </code>
      *
      *  or
      *
+     *  <code>
      *  int i=3, j=a[34]+20
+     *  </code>
      *
      *  convert to an attribute scope.
      */

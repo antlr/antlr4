@@ -166,11 +166,11 @@ public class GrammarTransformPipeline {
 	/** Merge all the rules, token definitions, and named actions from
 		imported grammars into the root grammar tree.  Perform:
 
-	 	(tokens { X (= Y 'y')) + (tokens { Z )	->	(tokens { X (= Y 'y') Z)
+	 	(tokens { X (= Y 'y')) + (tokens { Z )	-&gt;	(tokens { X (= Y 'y') Z)
 
-	 	(@ members {foo}) + (@ members {bar})	->	(@ members {foobar})
+	 	(@ members {foo}) + (@ members {bar})	-&gt;	(@ members {foobar})
 
-	 	(RULES (RULE x y)) + (RULES (RULE z))	->	(RULES (RULE x y z))
+	 	(RULES (RULE x y)) + (RULES (RULE z))	-&gt;	(RULES (RULE x y z))
 
 	 	Rules in root prevent same rule from being appended to RULES node.
 
@@ -322,7 +322,7 @@ public class GrammarTransformPipeline {
 	 *  We'll have this Grammar share token symbols later; don't generate
 	 *  tokenVocab or tokens{} section.  Copy over named actions.
 	 *
-	 *  Side-effects: it removes children from GRAMMAR & RULES nodes
+	 *  Side-effects: it removes children from GRAMMAR &amp; RULES nodes
 	 *                in combined AST.  Anything cut out is dup'd before
 	 *                adding to lexer to avoid "who's ur daddy" issues
 	 */
