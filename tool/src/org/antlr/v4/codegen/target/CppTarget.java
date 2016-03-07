@@ -76,7 +76,7 @@ public class CppTarget extends Target {
 	}
 
 	public String getVersion() {
-		return "4.1";
+		return "4.5.2";
 	}
 
 	public Set<String> getBadWords() {
@@ -210,38 +210,38 @@ public class CppTarget extends Target {
 		return result;
 	}
 
-        @Override
-        protected void genParserHeaderFile(Grammar grammar, ST headerFileST) {
+    @Override
+    protected void genParserHeaderFile(Grammar grammar, ST headerFileST) {
  		String fileName = getCodeGenerator().getParserHeaderFileName();
  		getCodeGenerator().write(headerFileST, fileName);
  	}
 
-        @Override
-        protected void genRecognizerHeaderFile(Grammar grammar, ST headerFileST) {
+    @Override
+    protected void genRecognizerHeaderFile(Grammar grammar, ST headerFileST) {
  		String fileName = getCodeGenerator().getRecognizerHeaderFileName();
  		getCodeGenerator().write(headerFileST, fileName);
  	}
 
-        @Override
-        protected void genListenerHeaderFile(Grammar grammar, ST headerFileST) {
+    @Override
+    protected void genListenerHeaderFile(Grammar grammar, ST headerFileST) {
  		String fileName = getCodeGenerator().getListenerHeaderFileName();
  		getCodeGenerator().write(headerFileST, fileName);
  	}
 
-        @Override
-        protected void genBaseListenerHeaderFile(Grammar grammar, ST headerFileST) {
+    @Override
+    protected void genBaseListenerHeaderFile(Grammar grammar, ST headerFileST) {
  		String fileName = getCodeGenerator().getBaseListenerHeaderFileName();
  		getCodeGenerator().write(headerFileST, fileName);
  	}
 
-        @Override
-        protected void genVisitorHeaderFile(Grammar grammar, ST headerFileST) {
+    @Override
+    protected void genVisitorHeaderFile(Grammar grammar, ST headerFileST) {
  		String fileName = getCodeGenerator().getVisitorHeaderFileName();
  		getCodeGenerator().write(headerFileST, fileName);
  	}
 
-        @Override
-        protected void genBaseVisitorHeaderFile(Grammar grammar, ST headerFileST) {
+    @Override
+    protected void genBaseVisitorHeaderFile(Grammar grammar, ST headerFileST) {
  		String fileName = getCodeGenerator().getBaseVisitorHeaderFileName();
  		getCodeGenerator().write(headerFileST, fileName);
  	}

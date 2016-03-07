@@ -60,3 +60,4 @@ antlr4-maven-plugin/target
 runtime/Java/target
 tool/target
 runtime-testsuite/target
+tool-testsuite/target

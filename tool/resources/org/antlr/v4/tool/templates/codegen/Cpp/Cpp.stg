@@ -1,6 +1,6 @@
 /*
  * [The "BSD license"]
- *  Copyright (c) 2015 Dan McLaughlin
+ *  Copyright (c) 2015 Dan McLaughlin, Mike Lischke
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -27,6 +27,8 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import "Files.stg" // All file specific stuff.
+
 cppTypeInitMap ::= [
 	"int":"0",
 	"long":"0",
@@ -42,11 +44,14 @@ cppTypeInitMap ::= [
 
 ParserFile(file, parser, namedActions) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
+
 <if(file.genPackage)>
 <! TODO(dsisson): Deal with the fact that we need to split the package name. !>
 namespace <file.genPackage> {
 <endif>
+
 <namedActions.header>
+
 <! TODO(dsisson): Reduce the list of includes to those absolutely necessary. !>
 #include "atn/ATN.h"
 #include "atn/ATNConfig.h"
@@ -177,101 +182,6 @@ namespace <file.genPackage> {
 <endif>
 >>
 
-ListenerFile(file, header) ::= <<
-<fileHeader(file.grammarFileName, file.ANTLRVersion)>
-<header>
-#include "misc/NotNull.h"
-#include "tree/ParseTreeListener.h"
-#include "<file.parserName>.h"
-
-<if(file.genPackage)>
-namespace <file.genPackage> {
-<endif>
-
-/**
- * This interface defines a complete listener for a parse tree produced by
- * {@link <file.parserName>}.
- */
-class <file.grammarName>Listener : public ParseTreeListener {
-	<file.listenerNames:{lname |
-/**
- * Enter a parse tree produced by {@link <file.parserName>#<lname>\}.
- * @param ctx the parse tree
- */
-void enter<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx);
-/**
- * Exit a parse tree produced by {@link <file.parserName>#<lname>\}.
- * @param ctx the parse tree
- */
-void exit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx);}; separator="\n">
-}
-
-<if(file.genPackage)>
-}  // namespace <file.genPackage>
-<endif>
->>
-
-BaseListenerFile(file, header) ::= <<
-<fileHeader(file.grammarFileName, file.ANTLRVersion)>
-<if(file.genPackage)>
-namespace <file.genPackage> {
-<endif>
-<header>
-
-#include "ParserRuleContext.h"
-#include "tree/ErrorNode.h"
-#include "tree/TerminalNode.h"
-
-/**
- * This class provides an empty implementation of {@link <file.grammarName>Listener},
- * which can be extended to create a listener which only needs to handle a subset
- * of the available methods.
- */
-class <file.grammarName>BaseListener : public <file.grammarName>Listener {
-	<file.listenerNames:{lname |
-/**
- * {@inheritDoc\}
- * \<p/>
- * The default implementation does nothing.
- */
-void enter<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { \}
-/**
- * {@inheritDoc\}
- * \<p/>
- * The default implementation does nothing.
- */
-void exit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { \}}; separator="\n">
-
-	/**
-	 * {@inheritDoc\}
-	 * \<p/>
-	 * The default implementation does nothing.
-	 */
-	void enterEveryRule(ParserRuleContext ctx) { }
-	/**
-	 * {@inheritDoc\}
-	 * \<p/>
-	 * The default implementation does nothing.
-	 */
-	void exitEveryRule(ParserRuleContext ctx) { }
-	/**
-	 * {@inheritDoc\}
-	 * \<p/>
-	 * The default implementation does nothing.
-	 */
-	void visitTerminal(TerminalNode node) { }
-	/**
-	 * {@inheritDoc\}
-	 * \<p/>
-	 * The default implementation does nothing.
-	 */
-	void visitErrorNode(ErrorNode node) { }
-}
-<if(file.genPackage)>
-}  // namespace <file.genPackage>
-<endif>
->>
-
 VisitorFile(file, header) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 <if(file.genPackage)>
@@ -302,40 +212,8 @@ T visit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx)
 <endif>
 >>
 
-BaseVisitorFile(file, header) ::= <<
-<fileHeader(file.grammarFileName, file.ANTLRVersion)>
-<if(file.genPackage)>
-namespace <file.genPackage> {
-<endif>
-<header>
-#include "tree/AbstractParseTreeVisitor"
-
-/**
- * This class provides an empty implementation of {@link <file.grammarName>Visitor},
- * which can be extended to create a visitor which only needs to handle a subset
- * of the available methods.
- *
- * @param \<T> The return type of the visit operation. Use {@link Void} for
- * operations with no return type.
- */
-template T
-class <file.grammarName>BaseVisitor : public <file.grammarName>Visitor\<T> {
-	<file.visitorNames:{lname |
-/**
- * {@inheritDoc\}
- * \<p/>
- * The default implementation returns the result of calling
- * {@link #visitChildren\} on {@code ctx\}.
- */
-T visit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { return visitChildren(ctx); \}}; separator="\n">
-}
-<if(file.genPackage)>
-}  // namespace <file.genPackage>
-<endif>
->>
-
 fileHeader(grammarFileName, ANTLRVersion) ::= <<
-// Generated from <grammarFileName; format="java-escape"> by ANTLR <ANTLRVersion>
+// Generated from <grammarFileName> by ANTLR <ANTLRVersion>
 >>
 
 Parser(parser, funcs, atn, sempredFuncs, superClass) ::= <<
@@ -344,49 +222,58 @@ Parser(parser, funcs, atn, sempredFuncs, superClass) ::= <<
 
 Parser_(parser, funcs, atn, sempredFuncs, ctor, superClass) ::= <<
 class <parser.name> : public <superClass> {
-	static DFA[] _decisionToDFA;
-	static PredictionContextCache _sharedContextCache =
-		new PredictionContextCache();
-	<if(parser.tokens)>
-	static int
-		<parser.tokens:{k | <k>=<parser.tokens.(k)>}; separator=", ", wrap, anchor>;
-	<endif>
-	static const std::vector\<std::wstring>& tokenNames = {
-		<parser.tokenNames:{t | <t>}; null="\"\<INVALID>\"", separator=", ", wrap, anchor>
-	};
-	static int
-		<parser.rules:{r | RULE_<r.name> = <r.index>}; separator=", ", wrap, anchor>;
-	static const std::vector\<std::wstring>& ruleNames = {
-		<parser.ruleNames:{r | "<r>"}; separator=", ", wrap, anchor>
-	};
+protected:
+  static DFA[] _decisionToDFA;
+  static PredictionContextCache _sharedContextCache;
 
-	const std::wstring& getGrammarFileName() { return "<parser.grammarFileName; format="java-escape">"; }
+  <if(parser.tokens)>
+  static int
+    <parser.tokens:{k | <k>=<parser.tokens.(k)>}; separator=", ", wrap, anchor>;
+  <endif>
+  static const std::vector\<std::wstring>& tokenNames = {
+    <parser.tokenNames:{t | <t>}; null="\"\<INVALID>\"", separator=", ", wrap, anchor>
+  };
+  
+  static int
+    <parser.rules:{r | RULE_<r.name> = <r.index>}; separator=", ", wrap, anchor>;
 
-	const std::vector\<std::wstring>& getTokenNames() { return tokenNames; }
+  static const std::vector\<std::wstring>& ruleNames = {
+    <parser.ruleNames:{r | "<r>"}; separator=", ", wrap, anchor>
+  };
 
-	const std::vector\<std::wstring>& getRuleNames() { return ruleNames; }
+public:
+  const std::wstring& getGrammarFileName() const { return "<parser.grammarFileName>"; }
 
-	const std::wstring& getSerializedATN() { return _serializedATN; }
+  const std::vector\<std::wstring>& getTokenNames() const { return tokenNames; }
 
-	const ATN& getATN() { return _ATN; }
+  const std::vector\<std::wstring>& getRuleNames() const { return ruleNames; }
 
-	<namedActions.members>
-	<parser:(ctor)()>
-	<funcs; separator="\n">
+  const std::wstring& getSerializedATN() const { return _serializedATN; }
+
+  const ATN& getATN() const { return _ATN; }
+
+  <if(namedActions.members)><namedActions.members>
+  <endif>
+  <parser:(ctor)()>
+
+  <funcs; separator="\n">
 
 <if(sempredFuncs)>
-	bool sempred(RuleContext _localctx, int ruleIndex, int predIndex) {
-		switch (ruleIndex) {
-		<parser.sempredFuncs.values:{f|
-case <f.ruleIndex>: return <f.name>_sempred((<f.ctxType>)_localctx, predIndex);}; separator="\n">
-		}
-		return true;
-	}
-	<sempredFuncs.values; separator="\n">
+  bool sempred(RuleContext _localctx, int ruleIndex, int predIndex) {
+    switch (ruleIndex) {
+    <parser.sempredFuncs.values:{f|
+    case <f.ruleIndex>: return <f.name>_sempred((<f.ctxType>)_localctx, predIndex);}; separator="\n">
+    }
+    return true;
+  }
+  <sempredFuncs.values; separator="\n">
 <endif>
 
-	<atn>
-}
+  <atn>
+};
+
+static <parser.name>::_sharedContextCache = new PredictionContextCache();
+
 >>
 
 dumpActions(recog, argFuncs, actionFuncs, sempredFuncs) ::= <<
@@ -414,8 +301,8 @@ case <f.ruleIndex>: return <f.name>_sempred((<f.ctxType>)_localctx, predIndex);}
 
 parser_ctor(p) ::= <<
 <p.name>(TokenStream input) {
-	super(input);
-	_interp = new ParserATNSimulator(this,_ATN,_decisionToDFA,_sharedContextCache);
+  super(input);
+  interp = new ParserATNSimulator(this,_ATN,_decisionToDFA,_sharedContextCache);
 }
 >>
 
@@ -453,33 +340,38 @@ RuleFunction(currentRule,code,locals,ruleCtx,altLabelCtxs,namedActions,finallyAc
 <ruleCtx>
 <altLabelCtxs:{l | <altLabelCtxs.(l)>}; separator="\n">
 
-<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else> <endif><currentRule.ctxType> <currentRule.name>(<currentRule.args; separator=",">) {
-	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(_ctx, getState()<currentRule.args:{a | , <a.name>}>);
-	enterRule(_localctx, <currentRule.startState>, RULE_<currentRule.name>);
-	<namedActions.init>
-	<locals; separator="\n">
-	try {
+<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else> <endif><\\>
+std::shared_ptr\<<currentRule.ctxType>\> <currentRule.name>(<currentRule.args; separator=",">) {
+  std::shared_ptr\<<currentRule.ctxType>\> _localctx(new <currentRule.ctxType>(_ctx, getState()<currentRule.args:{a | , <a.name>}>));
+  enterRule(_localctx, <currentRule.startState>, RULE_<currentRule.name>);
+  <namedActions.init>
+  <locals; separator="\n">
+  try {
 <if(currentRule.hasLookaheadBlock)>
-		int _alt;
+    int _alt;
 <endif>
-		<code>
-		<postamble; separator="\n">
-		<namedActions.after>
-	}
-	<if(exceptions)>
-	<exceptions; separator="\n">
-	<else>
-	catch (RecognitionException re) {
-		_localctx.exception = re;
-		_errHandler.reportError(this, re);
-		_errHandler.recover(this, re);
-	}
-	<endif>
-	finally {
-		<finallyAction>
-		exitRule();
-	}
-	return _localctx;
+    <code>
+    <postamble; separator="\n">
+    <namedActions.after>
+    
+    <if(finallyAction)><finallyAction> <! Have to repeat finallyAction and exitRule() as C++ doesn't have finally{}. !>
+    <endif>
+    exitRule();
+  }
+  <if(exceptions)>
+  <exceptions; separator="\n">
+  <else>
+  catch (const RecognitionException &re) {
+    _localctx->exception = re;
+    _errHandler.reportError(this, re);
+    _errHandler.recover(this, re);
+
+    <if(finallyAction)><finallyAction>
+    <endif>
+    exitRule();
+  }
+  <endif>
+  return _localctx;
 }
 >>
 
@@ -833,10 +725,8 @@ TokenListDecl(t) ::= "List\<Token> <t.name> = new ArrayList\<Token>();"
 RuleContextDecl(r) ::= "<r.ctxName> <r.name>;"
 RuleContextListDecl(rdecl) ::= "List\<<rdecl.ctxName>> <rdecl.name> = new ArrayList\<<rdecl.ctxName>>();"
 
-ContextTokenGetterDecl(t)      ::=
-    "TerminalNode <t.name>() { return getToken(<parser.name>.<t.name>, 0); }"
-ContextTokenListGetterDecl(t)  ::=
-    "List\<TerminalNode> <t.name>() { return getTokens(<parser.name>.<t.name>); }"
+ContextTokenGetterDecl(t) ::= "TerminalNode <t.name>() { return getToken(<parser.name>.<t.name>, 0); }"
+ContextTokenListGetterDecl(t) ::= "List\<TerminalNode> <t.name>() { return getTokens(<parser.name>.<t.name>); }"
 ContextTokenListIndexedGetterDecl(t)  ::= <<
 TerminalNode <t.name>(int i) {
 	return getToken(<parser.name>.<t.name>, i);
@@ -893,7 +783,7 @@ class <struct.name> : public <superClass> {
 <endif>
 	<dispatchMethods; separator="\n">
 	<extensionMembers; separator="\n">
-}
+};
 >>
 
 AltLabelStructDecl(struct,attrs,getters,dispatchMethods) ::= <<
@@ -902,7 +792,7 @@ class <struct.name> : public <currentRule.name; format="cap">Context {
 	<getters:{g | <g>}; separator="\n">
 	public <struct.name>(<currentRule.name; format="cap">Context ctx) { copyFrom(ctx); }
 	<dispatchMethods; separator="\n">
-}
+};
 >>
 
 ListenerDispatchMethod(method) ::= <<
@@ -1076,14 +966,6 @@ namespace <file.genPackage> {
 <if(file.genPackage)>
 }  // namespace <file.genPackage>
 <endif>
->>
-
-ListenerHeaderFile(file, parser, namedActions) ::= <<
-FOOM3
->>
-
-BaseListenerHeaderFile(file, parser, namedActions) ::= <<
-FOOM4
 >>
 
 VisitorHeaderFile(file, parser, namedActions) ::= <<
