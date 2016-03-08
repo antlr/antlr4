@@ -128,9 +128,38 @@ public abstract class Target {
 		getCodeGenerator().write(outputFileST, fileName);
 	}
 
+	protected void genParserHeaderFile(Grammar g,
+                                           ST headerFileST)
+	{
+		// no header file by default
+	}
+
 	protected void genRecognizerHeaderFile(Grammar g,
-										   ST headerFileST,
-										   String extName) // e.g., ".h"
+                                               ST headerFileST)
+	{
+		// no header file by default
+	}
+
+	protected void genListenerHeaderFile(Grammar g,
+                                             ST headerFileST)
+	{
+		// no header file by default
+	}
+
+	protected void genBaseListenerHeaderFile(Grammar g,
+                                             ST headerFileST)
+	{
+		// no header file by default
+	}
+
+	protected void genVisitorHeaderFile(Grammar g,
+                                             ST headerFileST)
+	{
+		// no header file by default
+	}
+
+	protected void genBaseVisitorHeaderFile(Grammar g,
+                                             ST headerFileST)
 	{
 		// no header file by default
 	}

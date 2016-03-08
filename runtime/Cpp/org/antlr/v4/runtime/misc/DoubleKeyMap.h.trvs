@@ -1,0 +1,13 @@
+                        std::map<Key2, Value> *data2 = data->get(k1);
+                        Value prev = nullptr;
+                        if (data2 == nullptr) {
+                            data2 = new std::map<Key2, Value>();
+                            data->put(k1, data2);
+                        } else {
+                            auto elem = data2->find(k2);
+                            if (elem != data2.end()) {
+                                prev = *elem;
+                            }
+                        }
+                        data2->put(k2, v);
+                        return prev;
