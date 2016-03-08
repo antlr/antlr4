@@ -83,7 +83,7 @@ public class LexerATNFactory extends ParserATNFactory {
 	 * actions, but are required during code generation for creating
 	 * {@link LexerAction} instances that are usable by a lexer interpreter.
 	 */
-	protected static final Map<String, Integer> COMMON_CONSTANTS = new HashMap<String, Integer>();
+	public static final Map<String, Integer> COMMON_CONSTANTS = new HashMap<String, Integer>();
 	static {
 		COMMON_CONSTANTS.put("HIDDEN", Lexer.HIDDEN);
 		COMMON_CONSTANTS.put("DEFAULT_TOKEN_CHANNEL", Lexer.DEFAULT_TOKEN_CHANNEL);
@@ -110,6 +110,10 @@ public class LexerATNFactory extends ParserATNFactory {
 		String language = g.getOptionString("language");
 		CodeGenerator gen = new CodeGenerator(g.tool, null, language);
 		codegenTemplates = gen.getTemplates();
+	}
+
+	public static Set<String> getCommonConstants() {
+		return COMMON_CONSTANTS.keySet();
 	}
 
 	@Override
@@ -243,8 +247,8 @@ public class LexerATNFactory extends ParserATNFactory {
 
 		// fall back to standard action generation for the command
 		ST cmdST = codegenTemplates.getInstanceOf("Lexer" +
-												  CharSupport.capitalize(ID.getText())+
-												  "Command");
+				CharSupport.capitalize(ID.getText()) +
+				"Command");
 		if (cmdST == null) {
 			g.tool.errMgr.grammarError(ErrorType.INVALID_LEXER_COMMAND, g.fileName, ID.token, ID.getText());
 			return epsilon(ID);
@@ -407,6 +411,7 @@ public class LexerATNFactory extends ParserATNFactory {
 		}
 		else if ("mode".equals(command) && arg != null) {
 			String modeName = arg.getText();
+			checkMode(modeName, arg.token);
 			Integer mode = getConstantValue(modeName, arg.getToken());
 			if (mode == null) {
 				return null;
@@ -416,6 +421,7 @@ public class LexerATNFactory extends ParserATNFactory {
 		}
 		else if ("pushMode".equals(command) && arg != null) {
 			String modeName = arg.getText();
+			checkMode(modeName, arg.token);
 			Integer mode = getConstantValue(modeName, arg.getToken());
 			if (mode == null) {
 				return null;
@@ -425,6 +431,7 @@ public class LexerATNFactory extends ParserATNFactory {
 		}
 		else if ("type".equals(command) && arg != null) {
 			String typeName = arg.getText();
+			checkToken(typeName, arg.token);
 			Integer type = getConstantValue(typeName, arg.getToken());
 			if (type == null) {
 				return null;
@@ -434,6 +441,7 @@ public class LexerATNFactory extends ParserATNFactory {
 		}
 		else if ("channel".equals(command) && arg != null) {
 			String channelName = arg.getText();
+			checkChannel(channelName, arg.token);
 			Integer channel = getConstantValue(channelName, arg.getToken());
 			if (channel == null) {
 				return null;
@@ -446,6 +454,23 @@ public class LexerATNFactory extends ParserATNFactory {
 		}
 	}
 
+	protected void checkMode(String modeName, Token token) {
+		if (!modeName.equals("DEFAULT_MODE") && COMMON_CONSTANTS.containsKey(modeName)) {
+			g.tool.errMgr.grammarError(ErrorType.MODE_CONFLICTS_WITH_COMMON_CONSTANTS, g.fileName, token, token.getText());
+		}
+	}
+
+	protected void checkToken(String tokenName, Token token) {
+		if (!tokenName.equals("EOF") && COMMON_CONSTANTS.containsKey(tokenName)) {
+			g.tool.errMgr.grammarError(ErrorType.TOKEN_CONFLICTS_WITH_COMMON_CONSTANTS, g.fileName, token, token.getText());
+		}
+	}
+
+	protected void checkChannel(String channelName, Token token) {
+		if (!channelName.equals("HIDDEN") && !channelName.equals("DEFAULT_TOKEN_CHANNEL") && COMMON_CONSTANTS.containsKey(channelName)) {
+			g.tool.errMgr.grammarError(ErrorType.CHANNEL_CONFLICTS_WITH_COMMON_CONSTANTS, g.fileName, token, token.getText());
+		}
+	}
 
 	protected Integer getConstantValue(String name, Token token) {
 		if (name == null) {

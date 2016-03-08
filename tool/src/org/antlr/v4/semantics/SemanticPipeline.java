@@ -31,6 +31,7 @@
 package org.antlr.v4.semantics;
 
 import org.antlr.v4.analysis.LeftRecursiveRuleTransformer;
+import org.antlr.v4.automata.LexerATNFactory;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.Pair;
@@ -127,6 +128,8 @@ public class SemanticPipeline {
 			assignTokenTypes(g, collector.tokensDefs,
 							 collector.tokenIDRefs, collector.terminals);
 		}
+
+		symcheck.checkForModeConflicts(g);
 
 		assignChannelTypes(g, collector.channelDefs);
 
@@ -285,6 +288,10 @@ public class SemanticPipeline {
 
 			if (g.getTokenType(channelName) != Token.INVALID_TYPE) {
 				g.tool.errMgr.grammarError(ErrorType.CHANNEL_CONFLICTS_WITH_TOKEN, g.fileName, channel.token, channelName);
+			}
+
+			if (LexerATNFactory.COMMON_CONSTANTS.containsKey(channelName)) {
+				g.tool.errMgr.grammarError(ErrorType.CHANNEL_CONFLICTS_WITH_COMMON_CONSTANTS, g.fileName, channel.token, channelName);
 			}
 
 			if (outermost instanceof LexerGrammar) {

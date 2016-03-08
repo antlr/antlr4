@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.sonatype.oss</groupId>
@@ -8,7 +7,7 @@
   </parent>
   <groupId>org.antlr</groupId>
   <artifactId>antlr4-master</artifactId>
-  <version>4.5.1-SNAPSHOT</version>
+  <version>4.5.3-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>ANTLR 4</name>
@@ -63,14 +62,16 @@
     <module>runtime/Java</module>
     <module>tool</module>
     <module>antlr4-maven-plugin</module>
-    <module>antlr4-testgen-maven-plugin</module>
+    <module>tool-testsuite</module>
+    <module>runtime-testsuite</module>
   </modules>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <antlr.testinprocess>true</antlr.testinprocess>
-    <java.version>1.6</java.version>
+    <maven.compiler.source>1.6</maven.compiler.source>
+    <maven.compiler.target>1.6</maven.compiler.target>
   </properties>
 
   <mailingLists>
@@ -103,28 +104,22 @@
       <testResource>
         <directory>test</directory>
       </testResource>
-    </testResources>    
+    </testResources>
     <pluginManagement>
       <plugins>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
-          <configuration>          
-            <source>${java.version}</source>
-            <target>${java.version}</target>
+          <configuration>
+            <source>${maven.compiler.source}</source>
+            <target>${maven.compiler.target}</target>
           </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-javadoc-plugin</artifactId>
         </plugin>
       </plugins>
     </pluginManagement>
-  </build> 
-  
-  <profiles>
-    <profile>
-      <id>rts</id>
-      <modules>
-        <module>runtime-testsuite</module>
-      </modules>
-    </profile>  
-  </profiles>
-   
+  </build>
 </project>

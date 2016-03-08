@@ -30,7 +30,9 @@
 
 package org.antlr.v4.semantics;
 
+import org.antlr.v4.automata.LexerATNFactory;
 import org.antlr.v4.parse.ANTLRParser;
+import org.antlr.v4.runtime.Token;
 import org.antlr.v4.tool.Alternative;
 import org.antlr.v4.tool.Attribute;
 import org.antlr.v4.tool.AttributeDict;
@@ -38,6 +40,7 @@ import org.antlr.v4.tool.ErrorManager;
 import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LabelElementPair;
+import org.antlr.v4.tool.LexerGrammar;
 import org.antlr.v4.tool.Rule;
 import org.antlr.v4.tool.ast.GrammarAST;
 
@@ -67,7 +70,7 @@ public class SymbolChecks {
 
 	protected final Set<String> reservedNames = new HashSet<String>();
 	{
-		reservedNames.add("EOF");
+		reservedNames.addAll(LexerATNFactory.getCommonConstants());
 	}
 
     public SymbolChecks(Grammar g, SymbolCollector collector) {
@@ -265,6 +268,23 @@ public class SymbolChecks {
 		for (Rule rule : rules) {
 			if (reservedNames.contains(rule.name)) {
 				errMgr.grammarError(ErrorType.RESERVED_RULE_NAME, g.fileName, ((GrammarAST)rule.ast.getChild(0)).getToken(), rule.name);
+			}
+		}
+	}
+
+	public void checkForModeConflicts(Grammar g) {
+		if (g.isLexer()) {
+			LexerGrammar lexerGrammar = (LexerGrammar)g;
+			for (String modeName : lexerGrammar.modes.keySet()) {
+				if (!modeName.equals("DEFAULT_MODE") && reservedNames.contains(modeName)) {
+					Rule rule = lexerGrammar.modes.get(modeName).iterator().next();
+					g.tool.errMgr.grammarError(ErrorType.MODE_CONFLICTS_WITH_COMMON_CONSTANTS, g.fileName, rule.ast.parent.getToken(), modeName);
+				}
+
+				if (g.getTokenType(modeName) != Token.INVALID_TYPE) {
+					Rule rule = lexerGrammar.modes.get(modeName).iterator().next();
+					g.tool.errMgr.grammarError(ErrorType.MODE_CONFLICTS_WITH_TOKEN, g.fileName, rule.ast.parent.getToken(), modeName);
+				}
 			}
 		}
 	}

@@ -2,6 +2,8 @@
 
 **ANTLR** (ANother Tool for Language Recognition) is a powerful parser generator for reading, processing, executing, or translating structured text or binary files. It's widely used to build languages, tools, and frameworks. From a grammar, ANTLR generates a parser that can build parse trees and also generates a listener interface (or visitor) that makes it easy to respond to the recognition of phrases of interest.
 
+*Given day-job constraints, my time working on this project is limited so I'll have to focus first on fixing bugs rather than changing/improving the feature set. Likely I'll do it in bursts every few months. Please do not be offended if your bug or pull request does not yield a response! --parrt*
+
 ## Authors and major contributors
 
 * [Terence Parr](http://www.cs.usfca.edu/~parrt/), parrt@cs.usfca.edu
@@ -13,18 +15,18 @@ ANTLR project lead and supreme dictator for life
 ## Useful information
 
 * [Release notes](https://github.com/antlr/antlr4/releases)
-* [Getting started with v4](https://theantlrguy.atlassian.net/wiki/display/ANTLR4/Getting+Started+with+ANTLR+v4)
+* [Getting started with v4](https://raw.githubusercontent.com/antlr/antlr4/master/doc/getting-started.md)
 * [Official site](http://www.antlr.org/)
-* [Documentation](https://theantlrguy.atlassian.net/wiki/display/ANTLR4/ANTLR+4+Documentation)
-* [FAQ](https://theantlrguy.atlassian.net/wiki/display/ANTLR4/ANTLR+v4+FAQ)
+* [Documentation](https://raw.githubusercontent.com/antlr/antlr4/master/doc/index.md)
+* [FAQ](https://raw.githubusercontent.com/antlr/antlr4/master/doc/faq/index.md)
 * [API](http://www.antlr.org/api/Java/index.html)
 * [ANTLR v3](http://www.antlr3.org/)
-* [v3 to v4 Migration guide, differences](https://theantlrguy.atlassian.net/wiki/pages/viewpage.action?pageId=1900596)
+* [v3 to v4 Migration, differences](https://raw.githubusercontent.com/antlr/antlr4/master/doc/faq/general.md)
 
-You might also find the following wiki pages useful, particularly if you want to mess around with the various target languages.
+You might also find the following pages useful, particularly if you want to mess around with the various target languages.
  
-* [How to build ANTLR itself](https://github.com/antlr/antlr4/wiki/How-to-build-ANTLR-itself)
-* [How we create and deploy an ANTLR release](https://github.com/antlr/antlr4/wiki/Cutting-an-ANTLR-4-release)
+* [How to build ANTLR itself](https://raw.githubusercontent.com/antlr/antlr4/master/doc/building-antlr.md)
+* [How we create and deploy an ANTLR release](https://raw.githubusercontent.com/antlr/antlr4/master/doc/releasing-antlr.md)
 
 ## The Definitive ANTLR 4 Reference
 
@@ -34,8 +36,12 @@ You can buy the book [The Definitive ANTLR 4 Reference](http://amzn.com/19343569
 
 You will find the [Book source code](http://pragprog.com/titles/tpantlr2/source_code) useful.
 
-
 ## Additional grammars
 [This repository](https://github.com/antlr/grammars-v4) is a collection of grammars without actions where the
 root directory name is the all-lowercase name of the language parsed
 by the grammar. For example, java, cpp, csharp, c, etc...
+
+Travis Status
+---------
+
+<a href="https://travis-ci.org/antlr/antlr4"><img src="https://api.travis-ci.org/antlr/antlr4.png"></a>

@@ -84,7 +84,7 @@ public class CodeGenerator {
 	}
 
 	public static boolean targetExists(String language) {
-		String targetName = "org.antlr.v4.codegen."+language+"Target";
+		String targetName = "org.antlr.v4.codegen.target."+language+"Target";
 		try {
 			Class<? extends Target> c = Class.forName(targetName).asSubclass(Target.class);
 			Constructor<? extends Target> ctor = c.getConstructor(CodeGenerator.class);
@@ -112,7 +112,7 @@ public class CodeGenerator {
 	}
 
 	protected void loadLanguageTarget(String language) {
-		String targetName = "org.antlr.v4.codegen."+language+"Target";
+		String targetName = "org.antlr.v4.codegen.target."+language+"Target";
 		try {
 			Class<? extends Target> c = Class.forName(targetName).asSubclass(Target.class);
 			Constructor<? extends Target> ctor = c.getConstructor(CodeGenerator.class);

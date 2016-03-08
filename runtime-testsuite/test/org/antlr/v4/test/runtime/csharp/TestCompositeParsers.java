@@ -2,6 +2,10 @@
 package org.antlr.v4.test.runtime.csharp;
 
 import org.junit.Test;
+import org.junit.Ignore;
+
+import org.antlr.v4.test.runtime.java.ErrorQueue;
+import org.antlr.v4.tool.Grammar;
 
 @SuppressWarnings("unused")
 public class TestCompositeParsers extends BaseTest {

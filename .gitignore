@@ -10,6 +10,14 @@ user.build.properties
 # MacOSX files
 .DS_Store
 
+# Python
+*.pyc
+
+# CSharp
+bin/
+obj/
+*.userprefs
+
 # NetBeans user configuration files
 nbactions*.xml
 /nbproject/private/
@@ -37,7 +45,6 @@ nbactions*.xml
 
 # Generated files
 /out/
-/doc/
 /gen/
 /gen3/
 /gen4/

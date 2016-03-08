@@ -2,6 +2,7 @@
 package org.antlr.v4.test.runtime.csharp;
 
 import org.junit.Test;
+import org.junit.Ignore;
 
 @SuppressWarnings("unused")
 public class TestFullContextParsing extends BaseTest {
