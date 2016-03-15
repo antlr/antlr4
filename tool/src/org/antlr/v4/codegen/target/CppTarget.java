@@ -1,5 +1,6 @@
 /*
  * [The "BSD license"]
+ *  Copyright (c) 2016 David Sisson, Mike Lischke
  *  Copyright (c) 2012 Terence Parr
  *  Copyright (c) 2012 Sam Harwell
  *  All rights reserved.
@@ -30,24 +31,24 @@
 
 package org.antlr.v4.codegen.target;
 
-import org.antlr.v4.Tool;
-import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.codegen.Target;
+import org.antlr.v4.tool.ErrorType;
+import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.ast.GrammarAST;
+import org.stringtemplate.v4.NumberRenderer;
+import org.stringtemplate.v4.STErrorListener;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
+import org.stringtemplate.v4.STGroupFile;
 import org.stringtemplate.v4.StringRenderer;
+import org.stringtemplate.v4.misc.STMessage;
 
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 
-/**
- *
- * @author David Sisson
- */
 public class CppTarget extends Target {
 
 	protected static final String[] cppKeywords = {
@@ -58,14 +59,14 @@ public class CppTarget extends Target {
 		"double", "dynamic_cast", "else", "enum", "explicit", "export",
 		"extern", "false", "float", "for", "friend", "goto", "if",
 		"inline", "int", "long", "mutable", "namespace", "new",
-                "noexcept", "not", "not_eq", "nullptr", "operator", "or",
-                "or_eq", "private", "protected", "public", "register",
-                "reinterpret_cast", "requires", "return", "short", "signed",
-                "sizeof", "static", "static_assert", "static_cast", "struct",
-                "switch", "template", "this", "thread_local", "throw", "true",
-                "try", "typedef", "typeid", "typename", "union", "unsigned",
-                "using", "virtual", "void", "volatile", "wchar_t", "while",
-                "xor", "xor_eq"
+        "noexcept", "not", "not_eq", "nullptr", "operator", "or",
+        "or_eq", "private", "protected", "public", "register",
+        "reinterpret_cast", "requires", "return", "short", "signed",
+        "sizeof", "static", "static_assert", "static_cast", "struct",
+        "switch", "template", "this", "thread_local", "throw", "true",
+        "try", "typedef", "typeid", "typename", "union", "unsigned",
+        "using", "virtual", "void", "volatile", "wchar_t", "while",
+        "xor", "xor_eq"
 	};
 
 	/** Avoid grammar symbols in this set to prevent conflicts in gen'd code. */
@@ -78,6 +79,8 @@ public class CppTarget extends Target {
 	public String getVersion() {
 		return "4.5.2";
 	}
+
+    public boolean needsHeader() { return true; }
 
 	public Set<String> getBadWords() {
 		if (badWords.isEmpty()) {
@@ -178,17 +181,20 @@ public class CppTarget extends Target {
 			return targetCharValueEscape[v];
 		}
 
-		if (v >= 0x20 && v < 127 && (!Character.isDigit(v) || v == '8' || v == '9')) {
+		if (v < 0x20) {
+			return "\\" + Integer.toOctalString(v);
+		}
+
+        // We could simply return the char as string here as we use a wstring on C++ side,
+        // but that would require to store the files in a Unicode encoding, which might not always
+        // be desirable. Instead we only print ASCII chars directly and encode the rest as
+        // Unicode escape sequence.
+		if (v < 127) {
 			return String.valueOf((char)v);
 		}
 
-		if ( v>=0 && v<=127 ) {
-			String oct = Integer.toOctalString(v);
-			return "\\"+ oct;
-		}
-
-		String hex = Integer.toHexString(v|0x10000).substring(1,5);
-		return "\\u"+hex;
+		String hex = Integer.toHexString(v | 0x10000).substring(1, 5);
+		return "\\u" + hex;
 	}
 
 	@Override
@@ -206,43 +212,34 @@ public class CppTarget extends Target {
 	@Override
 	protected STGroup loadTemplates() {
 		STGroup result = super.loadTemplates();
-		result.registerRenderer(String.class, new StringRenderer(), true);
+		result.registerRenderer(Integer.class, new NumberRenderer());
+		result.registerRenderer(String.class, new StringRenderer());
+		result.setListener(new STErrorListener() {
+			@Override
+			public void compileTimeError(STMessage msg) {
+				reportError(msg);
+			}
+
+			@Override
+			public void runTimeError(STMessage msg) {
+				reportError(msg);
+			}
+
+			@Override
+			public void IOError(STMessage msg) {
+				reportError(msg);
+			}
+
+			@Override
+			public void internalError(STMessage msg) {
+				reportError(msg);
+			}
+
+			private void reportError(STMessage msg) {
+				getCodeGenerator().tool.errMgr.toolError(ErrorType.STRING_TEMPLATE_WARNING, msg.cause, msg.toString());
+			}
+		});
+
 		return result;
 	}
-
-    @Override
-    protected void genParserHeaderFile(Grammar grammar, ST headerFileST) {
- 		String fileName = getCodeGenerator().getParserHeaderFileName();
- 		getCodeGenerator().write(headerFileST, fileName);
- 	}
-
-    @Override
-    protected void genRecognizerHeaderFile(Grammar grammar, ST headerFileST) {
- 		String fileName = getCodeGenerator().getRecognizerHeaderFileName();
- 		getCodeGenerator().write(headerFileST, fileName);
- 	}
-
-    @Override
-    protected void genListenerHeaderFile(Grammar grammar, ST headerFileST) {
- 		String fileName = getCodeGenerator().getListenerHeaderFileName();
- 		getCodeGenerator().write(headerFileST, fileName);
- 	}
-
-    @Override
-    protected void genBaseListenerHeaderFile(Grammar grammar, ST headerFileST) {
- 		String fileName = getCodeGenerator().getBaseListenerHeaderFileName();
- 		getCodeGenerator().write(headerFileST, fileName);
- 	}
-
-    @Override
-    protected void genVisitorHeaderFile(Grammar grammar, ST headerFileST) {
- 		String fileName = getCodeGenerator().getVisitorHeaderFileName();
- 		getCodeGenerator().write(headerFileST, fileName);
- 	}
-
-    @Override
-    protected void genBaseVisitorHeaderFile(Grammar grammar, ST headerFileST) {
- 		String fileName = getCodeGenerator().getBaseVisitorHeaderFileName();
- 		getCodeGenerator().write(headerFileST, fileName);
- 	}
 }

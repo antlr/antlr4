@@ -27,18 +27,117 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-BaseListenerHeaderFile(file, parser, namedActions) ::= <<
+codeFileExtension() ::= ".cpp"
+headerFileExtension() ::= ".h"
+
+fileHeader(grammarFileName, ANTLRVersion) ::= <<
+// Generated from <grammarFileName> by ANTLR <ANTLRVersion>
+>>
+
+LexerFileHeader(file, lexer, namedActions) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 
-<if(file.genPackage)>
-namespace <file.genPackage> {
-<endif>
+#pragma once
 
-<!header!>
+#include "Lexer.h"
+
+<if (namedActions.header)><namedActions.header><endif>
+
+// Have to use "using" here, because some code parts which require different namespaces
+// are generated from the same template (e.g. see xxxSempred(.. *context) here and in the parser header.
+using namespace org::antlr::v4::runtime;
+
+<if(file.genPackage)>namespace <file.genPackage> {<endif>
+
+<lexer>
+
+<if (file.genPackage)>
+}  // namespace <file.genPackage>
+<endif>
+>>
+
+LexerFile(file, lexer, namedActions) ::= <<
+<fileHeader(file.grammarFileName, file.ANTLRVersion)>
+
+<if (namedActions.header)><namedActions.header><endif>
+
+#include "ATN.h"
+#include "DFA.h"
+#include "LexerATNSimulator.h"
+#include "PredictionContextCache.h"
+
+#include "<file.factory.grammar.name>.h"
+
+using namespace org::antlr::v4::runtime;
+using namespace antlrcpp;
+<if (file.genPackage)>using namespace <file.genPackage>;<endif>
+
+<lexer>
+
+>>
+
+ParserFileHeader(file, parser, namedActions) ::= <<
+<fileHeader(file.grammarFileName, file.ANTLRVersion)>
+
+#pragma once
+
+#include "Parser.h"
+#include "ParserRuleContext.h"
+//#include "<file.grammarName>Visitor.h"
+
+using namespace org::antlr::v4::runtime;
+
+<if (namedActions.header)><namedActions.header><endif>
+
+<if (file.genPackage)>namespace <file.genPackage> {<endif>
+
+template \<typename T>
+class TParserVisitor;
+  
+<parser>
+
+<if (file.genPackage)>
+}  // namespace <file.genPackage>
+<endif>
+>>
+
+ParserFile(file, parser, namedActions) ::= <<
+<fileHeader(file.grammarFileName, file.ANTLRVersion)>
+
+#include "ATN.h"
+#include "DFA.h"
+#include "ParserATNSimulator.h"
+#include "PredictionContextCache.h"
+#include "ANTLRErrorStrategy.h"
+#include "FailedPredicateException.h"
+#include "NoViableAltException.h"
+
+#include "ParseTreeListener.h"
+#include "<file.grammarName>Listener.h"
+
+#include "<file.factory.grammar.name>.h"
+
+using namespace antlrcpp;
+<if (file.genPackage)>using namespace <file.genPackage>;<endif>
+<if (namedActions.header)><namedActions.header><endif>
+<parser>
+>>
+
+BaseListenerFileHeader(file, header) ::= <<
+<fileHeader(file.grammarFileName, file.ANTLRVersion)>
+
+#pragma once
 
 #include "ParserRuleContext.h"
 #include "tree/ErrorNode.h"
 #include "tree/TerminalNode.h"
+#include "<file.parserName>Listener.h"
+
+<header>
+
+<if(file.genPackage)>
+namespace <file.genPackage> {
+<endif>
 
 /**
  * This class provides an empty implementation of <file.grammarName>Listener,
@@ -47,38 +146,17 @@ namespace <file.genPackage> {
  */
 class <file.grammarName>BaseListener : public <file.grammarName>Listener {
 <file.listenerNames: {lname |
-  /**
-   * The default implementation does nothing.
-   */
-  void enter<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { \}
+  void enter<lname; format="cap">(<file.parserName>::<lname; format = "cap">Context *ctx) { \}
+  void exit<lname; format="cap">(<file.parserName>::<lname; format = "cap">Context *ctx) { \}
+}; separator="\n">
 
-  /**
-   * The default implementation does nothing.
-   */
-  void exit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { \}}; separator="\n">
-
-  /**
-   * The default implementation does nothing.
-   */
   void enterEveryRule(ParserRuleContext ctx) { }
-
-  /**
-   * The default implementation does nothing.
-   */
   void exitEveryRule(ParserRuleContext ctx) { }
-
-  /**
-   * The default implementation does nothing.
-   */
-  void visitTerminal(TerminalNode node) { }
-
-  /**
-   * The default implementation does nothing.
-   */
-  void visitErrorNode(ErrorNode node) { }
+  void visitTerminal(tree::TerminalNode node) { }
+  void visitErrorNode(tree::ErrorNode node) { }
 };
 
-<if(file.genPackage)>
+<if (file.genPackage)>
 }  // namespace <file.genPackage>
 <endif>
 >>
@@ -86,25 +164,21 @@ class <file.grammarName>BaseListener : public <file.grammarName>Listener {
 BaseListenerFile(file, header) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 
+#include "<file.grammarName>BaseListener.h"
+
 <if(file.genPackage)>
 using namespace <file.genPackage>;
 <endif>
-<header>
-
-#include "<file.grammarName>BaseListener.h"
 
 >>
 
-ListenerHeaderFile(file, parser, namedActions) ::= <<
-FOOM3
->>
-
-ListenerFile(file, header) ::= <<
+ListenerFileHeader(file, header) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 
+#pragma once
+
 <header>
 
-#include "misc/NotNull.h"
 #include "tree/ParseTreeListener.h"
 #include "<file.parserName>.h"
 
@@ -113,24 +187,59 @@ namespace <file.genPackage> {
 <endif>
 
 /**
- * This interface defines a complete listener for a parse tree produced by <file.parserName>.
+ * This interface defines an abstract listener for a parse tree produced by <file.parserName>.
  */
-class <file.grammarName>Listener : public ParseTreeListener {
-<file.listenerNames:{lname |
-  /**
-   * Enter a parse tree produced by <file.parserName>#<lname>.
-   * @param ctx the parse tree
-   */
- 
-  void enter<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx);
-  
-  /**
-   * Exit a parse tree produced by <file.parserName>#<lname>.
-   * @param ctx the parse tree
-   */
-  void exit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx);
-}; separator="\n">
-}
+class <file.grammarName>Listener : public tree::ParseTreeListener {
+public:
+<file.listenerNames: {lname |
+  virtual void enter<lname; format = "cap">(<file.parserName>::<lname; format ="cap">Context *ctx) = 0;
+  virtual void exit<lname; format = "cap">(<file.parserName>::<lname; format="cap">Context *ctx) = 0;
+}; separator = "\n">
+};
+
+<if(file.genPackage)>
+}  // namespace <file.genPackage>
+<endif>
+>>
+
+ListenerFile(file, header) ::= <<
+<fileHeader(file.grammarFileName, file.ANTLRVersion)>
+
+#include "<file.grammarName>Listener.h"
+
+<if(file.genPackage)>
+using namespace <file.genPackage>;
+<endif>
+
+>>
+
+BaseVisitorFileHeader(file, header) ::= <<
+<fileHeader(file.grammarFileName, file.ANTLRVersion)>
+
+#pragma once
+
+#include "tree/AbstractParseTreeVisitor.h"
+#include "<file.grammarName>Visitor.h"
+
+<if(file.genPackage)>
+namespace <file.genPackage> {
+<endif>
+<header>
+
+/**
+ * This class provides an empty implementation of <file.grammarName>Visitor, which can be
+ * extended to create a visitor which only needs to handle a subset of the available methods.
+ *
+ * @param \<T> The return type of the visit operation. Use void for operations with no return type.
+ */
+template \<typename T>
+class <file.grammarName>BaseVisitor : public tree::AbstractParseTreeVisitor\<T>, public <file.grammarName>Visitor\<T> {
+public:
+  <file.visitorNames: {
+    lname | virtual T* visit<lname; format = "cap">(<file.parserName>::<lname; format = "cap">Context *ctx) <\\>
+      override { return tree::AbstractParseTreeVisitor\<T>::visitChildren(ctx); \}
+  }; separator="\n">
+};
 
 <if(file.genPackage)>
 }  // namespace <file.genPackage>
@@ -139,31 +248,58 @@ class <file.grammarName>Listener : public ParseTreeListener {
 
 BaseVisitorFile(file, header) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
+
+#include "<file.grammarName>BaseVisitor.h"
+
 <if(file.genPackage)>
-namespace <file.genPackage> {
+using namespace <file.genPackage>;
 <endif>
+
+>>
+
+VisitorFileHeader(file, header) ::= <<
+<fileHeader(file.grammarFileName, file.ANTLRVersion)>
+
+#pragma once
+
+#include "<file.factory.grammar.name>.h"
+#include "tree/ParseTreeVisitor.h"
+
+<if(file.genPackage)>namespace <file.genPackage> {<endif>
+
 <header>
 
-#include "tree/AbstractParseTreeVisitor"
-
 /**
- * This class provides an empty implementation of <file.grammarName>Visitor, which can be
- * extended to create a visitor which only needs to handle a subset of the available methods.
+ * This template class defines an abstract visitor for a parse tree
+ * produced by <file.parserName>.
  *
- * @param \<T> The return type of the visit operation. Use void for operations with no return type.
+ * @param \<T> The return type of the visit operation. Use void for
+ * operations with no return type.
  */
-template T
-class <file.grammarName>BaseVisitor : public <file.grammarName>Visitor\<T> {
-  <file.visitorNames: {lname |
-
+template \<typename T>
+class <file.grammarName>Visitor : public org::antlr::v4::runtime::tree::ParseTreeVisitor\<T> {
+public:
   /**
-   * The default implementation returns the result of calling visitChildren on ctx.
+   * Visit parse trees produced by <file.parserName>.
    */
-  T visit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { return visitChildren(ctx); \}
+  <file.visitorNames: {lname |
+  T* visit<lname; format = "cap">(<file.parserName>::<lname; format = "cap">Context *context) = 0;
   }; separator="\n">
 };
 
 <if(file.genPackage)>
 }  // namespace <file.genPackage>
+<endif>
+>>
+
+VisitorFile(file, header) ::= <<
+<fileHeader(file.grammarFileName, file.ANTLRVersion)>
+
+<header>
+
+#include "<file.grammarName>Visitor.h"
+
+<if(file.genPackage)>
+using namespace <file.genPackage>;
 <endif>
 >>

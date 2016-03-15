@@ -134,17 +134,17 @@ public class CodeGenerator {
 		return controller;
 	}
 
-	private ST walk(OutputModelObject outputModel) {
+	private ST walk(OutputModelObject outputModel, boolean header) {
 		OutputModelWalker walker = new OutputModelWalker(tool, getTemplates());
-		return walker.walk(outputModel);
+		return walker.walk(outputModel, header);
 	}
 
-	public ST generateLexer() { return walk(createController().buildLexerOutputModel()); }
-	public ST generateParser() { return walk(createController().buildParserOutputModel()); }
-	public ST generateListener() { return walk(createController().buildListenerOutputModel()); }
-	public ST generateBaseListener() { return walk(createController().buildBaseListenerOutputModel()); }
-	public ST generateVisitor() { return walk(createController().buildVisitorOutputModel()); }
-	public ST generateBaseVisitor() { return walk(createController().buildBaseVisitorOutputModel()); }
+	public ST generateLexer(boolean header) { return walk(createController().buildLexerOutputModel(header), header); }
+	public ST generateParser(boolean header) { return walk(createController().buildParserOutputModel(header), header); }
+	public ST generateListener(boolean header) { return walk(createController().buildListenerOutputModel(header), header); }
+	public ST generateBaseListener(boolean header) { return walk(createController().buildBaseListenerOutputModel(header), header); }
+	public ST generateVisitor(boolean header) { return walk(createController().buildVisitorOutputModel(header), header); }
+	public ST generateBaseVisitor(boolean header) { return walk(createController().buildBaseVisitorOutputModel(header), header); }
 
 	/** Generate a token vocab file with all the token names/types.  For example:
 	 *  ID=7
@@ -178,86 +178,26 @@ public class CodeGenerator {
 		return vocabFileST;
 	}
 
-	public void writeParserHeaderFile() {
-		if ( getTemplates().isDefined("ParserHeaderFile") ) {
-			String fileName = getBaseVisitorHeaderFileName();
-			if ( fileName==null ) return;
-			ST headerFileST = getTemplates().getInstanceOf("ParserHeaderFile");
-			getTarget().genParserHeaderFile(g,headerFileST);
-		}
+	public void writeRecognizer(ST outputFileST, boolean header) {
+		getTarget().genFile(g, outputFileST, getRecognizerFileName(header));
 	}
 
-	public void writeRecognizer(ST outputFileST) {
-		getTarget().genFile(g, outputFileST, getRecognizerFileName());
-
-		if ( getTemplates().isDefined("RecognizerHeaderFile") ) {
-			String fileName = getRecognizerHeaderFileName();
-			if ( fileName==null ) return;
-			ST headerFileST = getTemplates().getInstanceOf("RecognizerHeaderFile");
-			getTarget().genRecognizerHeaderFile(g,headerFileST);
-		}
+	public void writeListener(ST outputFileST, boolean header) {
+		getTarget().genFile(g, outputFileST, getListenerFileName(header));
 	}
 
-	public void writeListener(ST outputFileST) {
-		getTarget().genFile(g, outputFileST, getListenerFileName());
-
-		if (getTemplates().isDefined("ListenerHeaderFile")) {
-			String fileName = getListenerHeaderFileName();
-			if (fileName == null)
-			  return;
-			ST headerFileST = getTemplates().getInstanceOf("ListenerHeaderFile");
-			getTarget().genListenerHeaderFile(g, headerFileST);
-		}
+	public void writeBaseListener(ST outputFileST, boolean header) {
+		getTarget().genFile(g, outputFileST, getBaseListenerFileName(header));
 	}
 
-	public void writeBaseListener(ST outputFileST) {
-		getTarget().genFile(g, outputFileST, getBaseListenerFileName());
-
-		if (getTemplates().isDefined("BaseListenerHeaderFile")) {
-			String fileName = getBaseListenerHeaderFileName();
-			if (fileName == null)
-			  return;
-			ST headerFileST = getTemplates().getInstanceOf("BaseListenerHeaderFile");
-			getTarget().genBaseListenerHeaderFile(g, headerFileST);
-		}
+	public void writeVisitor(ST outputFileST, boolean header) {
+		getTarget().genFile(g, outputFileST, getVisitorFileName(header));
 	}
 
-	public void writeVisitor(ST outputFileST) {
-		getTarget().genFile(g, outputFileST, getVisitorFileName());
-
-		if (getTemplates().isDefined("VisitorHeaderFile")) {
-			String fileName = getVisitorHeaderFileName();
-			if ( fileName == null )
-			  return;
-			ST headerFileST = getTemplates().getInstanceOf("VisitorHeaderFile");
-			getTarget().genVisitorHeaderFile(g, headerFileST);
-		}
+	public void writeBaseVisitor(ST outputFileST, boolean header) {
+		getTarget().genFile(g, outputFileST, getBaseVisitorFileName(header));
 	}
 
-	public void writeBaseVisitor(ST outputFileST) {
-		getTarget().genFile(g, outputFileST, getBaseVisitorFileName());
-
-		if (getTemplates().isDefined("BaseVisitorHeaderFile")) {
-			String fileName = getBaseVisitorHeaderFileName();
-			if (fileName == null)
-			  return;
-			ST headerFileST = getTemplates().getInstanceOf("BaseVisitorHeaderFile");
-			getTarget().genBaseVisitorHeaderFile(g, headerFileST);
-		}
-	}
-/*
-	public void writeHeaderFile() {
-		String fileName = getHeaderFileName();
-		if (fileName == null)
-		  return;
-		if ( getTemplates().isDefined("headerFile") ) {
-			ST extST = getTemplates().getInstanceOf("headerFileExtension");
-			ST headerFileST = null;
-			// TODO:  don't hide this header file generation here!
-			getTarget().genRecognizerHeaderFile(g, headerFileST, extST.render(lineWidth));
-		}
-	}
-*/	
 	public void writeVocabFile() {
 		// write out the vocab interchange file; used by antlr,
 		// does not change per target
@@ -288,38 +228,46 @@ public class CodeGenerator {
 	/** Generate TParser.java and TLexer.java from T.g4 if combined, else
 	 *  just use T.java as output regardless of type.
 	 */
-	public String getRecognizerFileName() {
-		ST extST = getTemplates().getInstanceOf("codeFileExtension");
+	public String getRecognizerFileName(boolean header) {
+		ST extST = getTemplates().getInstanceOf(header ? "headerFileExtension" : "codeFileExtension");
+		if (extST == null)
+		    return null;
 		String recognizerName = g.getRecognizerName();
-		return recognizerName+extST.render();
+		return recognizerName + extST.render();
 	}
 
 	/** A given grammar T, return the listener name such as
 	 *  TListener.java, if we're using the Java target.
  	 */
-	public String getListenerFileName() {
+	public String getListenerFileName(boolean header) {
 		assert g.name != null;
-		ST extST = getTemplates().getInstanceOf("codeFileExtension");
+		ST extST = getTemplates().getInstanceOf(header ? "headerFileExtension" : "codeFileExtension");
+		if (extST == null)
+		    return null;
 		String listenerName = g.name + "Listener";
-		return listenerName+extST.render();
+		return listenerName + extST.render();
 	}
 
 	/** A given grammar T, return the visitor name such as
 	 *  TVisitor.java, if we're using the Java target.
  	 */
-	public String getVisitorFileName() {
+	public String getVisitorFileName(boolean header) {
 		assert g.name != null;
-		ST extST = getTemplates().getInstanceOf("codeFileExtension");
+		ST extST = getTemplates().getInstanceOf(header ? "headerFileExtension" : "codeFileExtension");
+		if (extST == null)
+		    return null;
 		String listenerName = g.name + "Visitor";
-		return listenerName+extST.render();
+		return listenerName + extST.render();
 	}
 
 	/** A given grammar T, return a blank listener implementation
 	 *  such as TBaseListener.java, if we're using the Java target.
  	 */
-	public String getBaseListenerFileName() {
+	public String getBaseListenerFileName(boolean header) {
 		assert g.name != null;
-		ST extST = getTemplates().getInstanceOf("codeFileExtension");
+		ST extST = getTemplates().getInstanceOf(header ? "headerFileExtension" : "codeFileExtension");
+		if (extST == null)
+		    return null;
 		String listenerName = g.name + "BaseListener";
 		return listenerName+extST.render();
 	}
@@ -327,9 +275,11 @@ public class CodeGenerator {
 	/** A given grammar T, return a blank listener implementation
 	 *  such as TBaseListener.java, if we're using the Java target.
  	 */
-	public String getBaseVisitorFileName() {
+	public String getBaseVisitorFileName(boolean header) {
 		assert g.name != null;
-		ST extST = getTemplates().getInstanceOf("codeFileExtension");
+		ST extST = getTemplates().getInstanceOf(header ? "headerFileExtension" : "codeFileExtension");
+		if (extST == null)
+		    return null;
 		String listenerName = g.name + "BaseVisitor";
 		return listenerName+extST.render();
 	}
@@ -338,49 +288,7 @@ public class CodeGenerator {
 	 *  Returns null if no .tokens file should be generated.
 	 */
 	public String getVocabFileName() {
-		return g.name+VOCAB_FILE_EXTENSION;
-	}
-
-	public String getParserHeaderFileName() {
-		ST extST = getTemplates().getInstanceOf("headerFileExtension");
-		if ( extST==null ) return null;
-		String recognizerName = g.getRecognizerName();
-		return recognizerName+extST.render();
-	}
-
-	public String getRecognizerHeaderFileName() {
-		ST extST = getTemplates().getInstanceOf("headerFileExtension");
-		if ( extST==null ) return null;
-		String recognizerName = g.getRecognizerName();
-		return recognizerName+"Recognizer"+extST.render();
-	}
-
-	public String getListenerHeaderFileName() {
-		ST extST = getTemplates().getInstanceOf("headerFileExtension");
-		if ( extST==null ) return null;
-		String listenerName = g.name + "Listener";
-		return listenerName+extST.render();
-	}
-
-	public String getVisitorHeaderFileName() {
-		ST extST = getTemplates().getInstanceOf("headerFileExtension");
-		if ( extST==null ) return null;
-		String visitorName = g.name + "Visitor";
-		return visitorName+extST.render();
-	}
-
-	public String getBaseListenerHeaderFileName() {
-		assert g.name != null;
-		ST extST = getTemplates().getInstanceOf("headerFileExtension");
-		String visitorName = g.name + "BaseListener";
-		return visitorName+extST.render();
-	}
-
-	public String getBaseVisitorHeaderFileName() {
-		assert g.name != null;
-		ST extST = getTemplates().getInstanceOf("headerFileExtension");
-		String visitorName = g.name + "BaseVisitor";
-		return visitorName+extST.render();
+		return g.name + VOCAB_FILE_EXTENSION;
 	}
 
 }
