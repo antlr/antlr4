@@ -33,7 +33,6 @@ package org.antlr.v4.codegen;
 import org.antlr.v4.Tool;
 import org.antlr.v4.codegen.model.OutputModelObject;
 import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.Grammar;
 import org.stringtemplate.v4.AutoIndentWriter;
@@ -44,8 +43,7 @@ import org.stringtemplate.v4.STWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /** General controller for code gen.  Can instantiate sub generator(s).
@@ -54,73 +52,75 @@ public class CodeGenerator {
 	public static final String TEMPLATE_ROOT = "org/antlr/v4/tool/templates/codegen";
 	public static final String VOCAB_FILE_EXTENSION = ".tokens";
 	public static final String DEFAULT_LANGUAGE = "Java";
-	public final static String vocabFilePattern =
+	public static final String vocabFilePattern =
 		"<tokens.keys:{t | <t>=<tokens.(t)>\n}>" +
 		"<literals.keys:{t | <t>=<literals.(t)>\n}>";
 
-	@NotNull
+
 	public final Grammar g;
-	@NotNull
+
 	public final Tool tool;
-	@NotNull
+
 	public final String language;
 
 	private Target target;
 
 	public int lineWidth = 72;
 
-	public CodeGenerator(@NotNull Grammar g) {
+	private CodeGenerator(String language) {
+		this.g = null;
+		this.tool = null;
+		this.language = language;
+	}
+
+	public CodeGenerator(Grammar g) {
 		this(g.tool, g, g.getOptionString("language"));
 	}
 
-	public CodeGenerator(@NotNull Tool tool, @NotNull Grammar g, String language) {
+	public CodeGenerator(Tool tool, Grammar g, String language) {
 		this.g = g;
 		this.tool = tool;
 		this.language = language != null ? language : DEFAULT_LANGUAGE;
 	}
 
+	public static boolean targetExists(String language) {
+		String targetName = "org.antlr.v4.codegen.target."+language+"Target";
+		try {
+			Class<? extends Target> c = Class.forName(targetName).asSubclass(Target.class);
+			Constructor<? extends Target> ctor = c.getConstructor(CodeGenerator.class);
+			CodeGenerator gen = new CodeGenerator(language);
+			Target target = ctor.newInstance(gen);
+			return target.templatesExist();
+		}
+		catch (Exception e) { // ignore errors; we're detecting presence only
+		}
+		return false;
+	}
+
+
 	public Target getTarget() {
-		if (target == null) {
+		if ( target == null && targetExists(language) ) {
 			loadLanguageTarget(language);
 		}
-
 		return target;
 	}
 
+
 	public STGroup getTemplates() {
-		return getTarget().getTemplates();
+		Target t = getTarget();
+		return t==null ? null : t.getTemplates();
 	}
 
 	protected void loadLanguageTarget(String language) {
-		String targetName = "org.antlr.v4.codegen."+language+"Target";
+		String targetName = "org.antlr.v4.codegen.target."+language+"Target";
 		try {
 			Class<? extends Target> c = Class.forName(targetName).asSubclass(Target.class);
 			Constructor<? extends Target> ctor = c.getConstructor(CodeGenerator.class);
 			target = ctor.newInstance(this);
 		}
-		catch (ClassNotFoundException cnfe) {
+		catch (Exception e) {
 			tool.errMgr.toolError(ErrorType.CANNOT_CREATE_TARGET_GENERATOR,
-						 cnfe,
-						 targetName);
-		}
-		catch (NoSuchMethodException nsme) {
-			tool.errMgr.toolError(ErrorType.CANNOT_CREATE_TARGET_GENERATOR,
-						 nsme,
-						 targetName);
-		}
-		catch (InvocationTargetException ite) {
-			tool.errMgr.toolError(ErrorType.CANNOT_CREATE_TARGET_GENERATOR,
-						 ite,
-						 targetName);
-		}
-		catch (InstantiationException ie) {
-			tool.errMgr.toolError(ErrorType.CANNOT_CREATE_TARGET_GENERATOR,
-						 ie,
-						 targetName);
-		}
-		catch (IllegalAccessException cnfe) {
-			tool.errMgr.toolError(ErrorType.CANNOT_CREATE_TARGET_GENERATOR,
-						 cnfe,
+						 e,
 						 targetName);
 		}
 	}
@@ -134,17 +134,17 @@ public class CodeGenerator {
 		return controller;
 	}
 
-	private ST walk(OutputModelObject outputModel) {
+	private ST walk(OutputModelObject outputModel, boolean header) {
 		OutputModelWalker walker = new OutputModelWalker(tool, getTemplates());
-		return walker.walk(outputModel);
+		return walker.walk(outputModel, header);
 	}
 
-	public ST generateLexer() { return walk(createController().buildLexerOutputModel()); }
-	public ST generateParser() { return walk(createController().buildParserOutputModel()); }
-	public ST generateListener() { return walk(createController().buildListenerOutputModel()); }
-	public ST generateBaseListener() { return walk(createController().buildBaseListenerOutputModel()); }
-	public ST generateVisitor() { return walk(createController().buildVisitorOutputModel()); }
-	public ST generateBaseVisitor() { return walk(createController().buildBaseVisitorOutputModel()); }
+	public ST generateLexer(boolean header) { return walk(createController().buildLexerOutputModel(header), header); }
+	public ST generateParser(boolean header) { return walk(createController().buildParserOutputModel(header), header); }
+	public ST generateListener(boolean header) { return walk(createController().buildListenerOutputModel(header), header); }
+	public ST generateBaseListener(boolean header) { return walk(createController().buildBaseListenerOutputModel(header), header); }
+	public ST generateVisitor(boolean header) { return walk(createController().buildVisitorOutputModel(header), header); }
+	public ST generateBaseVisitor(boolean header) { return walk(createController().buildBaseVisitorOutputModel(header), header); }
 
 	/** Generate a token vocab file with all the token names/types.  For example:
 	 *  ID=7
@@ -155,7 +155,7 @@ public class CodeGenerator {
 	 */
 	ST getTokenVocabOutput() {
 		ST vocabFileST = new ST(vocabFilePattern);
-		Map<String,Integer> tokens = new HashMap<String,Integer>();
+		Map<String,Integer> tokens = new LinkedHashMap<String,Integer>();
 		// make constants for the token names
 		for (String t : g.tokenNameToTypeMap.keySet()) {
 			int tokenType = g.tokenNameToTypeMap.get(t);
@@ -166,7 +166,7 @@ public class CodeGenerator {
 		vocabFileST.add("tokens", tokens);
 
 		// now dump the strings
-		Map<String,Integer> literals = new HashMap<String,Integer>();
+		Map<String,Integer> literals = new LinkedHashMap<String,Integer>();
 		for (String literal : g.stringLiteralToTypeMap.keySet()) {
 			int tokenType = g.stringLiteralToTypeMap.get(literal);
 			if ( tokenType>=Token.MIN_USER_TOKEN_TYPE) {
@@ -178,35 +178,24 @@ public class CodeGenerator {
 		return vocabFileST;
 	}
 
-	public void writeRecognizer(ST outputFileST) {
-		getTarget().genFile(g, outputFileST, getRecognizerFileName());
+	public void writeRecognizer(ST outputFileST, boolean header) {
+		getTarget().genFile(g, outputFileST, getRecognizerFileName(header));
 	}
 
-	public void writeListener(ST outputFileST) {
-		getTarget().genFile(g,outputFileST, getListenerFileName());
+	public void writeListener(ST outputFileST, boolean header) {
+		getTarget().genFile(g, outputFileST, getListenerFileName(header));
 	}
 
-	public void writeBaseListener(ST outputFileST) {
-		getTarget().genFile(g,outputFileST, getBaseListenerFileName());
+	public void writeBaseListener(ST outputFileST, boolean header) {
+		getTarget().genFile(g, outputFileST, getBaseListenerFileName(header));
 	}
 
-	public void writeVisitor(ST outputFileST) {
-		getTarget().genFile(g,outputFileST, getVisitorFileName());
+	public void writeVisitor(ST outputFileST, boolean header) {
+		getTarget().genFile(g, outputFileST, getVisitorFileName(header));
 	}
 
-	public void writeBaseVisitor(ST outputFileST) {
-		getTarget().genFile(g,outputFileST, getBaseVisitorFileName());
-	}
-
-	public void writeHeaderFile() {
-		String fileName = getHeaderFileName();
-		if ( fileName==null ) return;
-		if ( getTemplates().isDefined("headerFile") ) {
-			ST extST = getTemplates().getInstanceOf("headerFileExtension");
-			ST headerFileST = null;
-			// TODO:  don't hide this header file generation here!
-			getTarget().genRecognizerHeaderFile(g,headerFileST,extST.render(lineWidth));
-		}
+	public void writeBaseVisitor(ST outputFileST, boolean header) {
+		getTarget().genFile(g, outputFileST, getBaseVisitorFileName(header));
 	}
 
 	public void writeVocabFile() {
@@ -239,38 +228,46 @@ public class CodeGenerator {
 	/** Generate TParser.java and TLexer.java from T.g4 if combined, else
 	 *  just use T.java as output regardless of type.
 	 */
-	public String getRecognizerFileName() {
-		ST extST = getTemplates().getInstanceOf("codeFileExtension");
+	public String getRecognizerFileName(boolean header) {
+		ST extST = getTemplates().getInstanceOf(header ? "headerFileExtension" : "codeFileExtension");
+		if (extST == null)
+		    return null;
 		String recognizerName = g.getRecognizerName();
-		return recognizerName+extST.render();
+		return recognizerName + extST.render();
 	}
 
 	/** A given grammar T, return the listener name such as
 	 *  TListener.java, if we're using the Java target.
  	 */
-	public String getListenerFileName() {
+	public String getListenerFileName(boolean header) {
 		assert g.name != null;
-		ST extST = getTemplates().getInstanceOf("codeFileExtension");
+		ST extST = getTemplates().getInstanceOf(header ? "headerFileExtension" : "codeFileExtension");
+		if (extST == null)
+		    return null;
 		String listenerName = g.name + "Listener";
-		return listenerName+extST.render();
+		return listenerName + extST.render();
 	}
 
 	/** A given grammar T, return the visitor name such as
 	 *  TVisitor.java, if we're using the Java target.
  	 */
-	public String getVisitorFileName() {
+	public String getVisitorFileName(boolean header) {
 		assert g.name != null;
-		ST extST = getTemplates().getInstanceOf("codeFileExtension");
+		ST extST = getTemplates().getInstanceOf(header ? "headerFileExtension" : "codeFileExtension");
+		if (extST == null)
+		    return null;
 		String listenerName = g.name + "Visitor";
-		return listenerName+extST.render();
+		return listenerName + extST.render();
 	}
 
 	/** A given grammar T, return a blank listener implementation
 	 *  such as TBaseListener.java, if we're using the Java target.
  	 */
-	public String getBaseListenerFileName() {
+	public String getBaseListenerFileName(boolean header) {
 		assert g.name != null;
-		ST extST = getTemplates().getInstanceOf("codeFileExtension");
+		ST extST = getTemplates().getInstanceOf(header ? "headerFileExtension" : "codeFileExtension");
+		if (extST == null)
+		    return null;
 		String listenerName = g.name + "BaseListener";
 		return listenerName+extST.render();
 	}
@@ -278,9 +275,11 @@ public class CodeGenerator {
 	/** A given grammar T, return a blank listener implementation
 	 *  such as TBaseListener.java, if we're using the Java target.
  	 */
-	public String getBaseVisitorFileName() {
+	public String getBaseVisitorFileName(boolean header) {
 		assert g.name != null;
-		ST extST = getTemplates().getInstanceOf("codeFileExtension");
+		ST extST = getTemplates().getInstanceOf(header ? "headerFileExtension" : "codeFileExtension");
+		if (extST == null)
+		    return null;
 		String listenerName = g.name + "BaseVisitor";
 		return listenerName+extST.render();
 	}
@@ -289,13 +288,7 @@ public class CodeGenerator {
 	 *  Returns null if no .tokens file should be generated.
 	 */
 	public String getVocabFileName() {
-		return g.name+VOCAB_FILE_EXTENSION;
+		return g.name + VOCAB_FILE_EXTENSION;
 	}
 
-	public String getHeaderFileName() {
-		ST extST = getTemplates().getInstanceOf("headerFileExtension");
-		if ( extST==null ) return null;
-		String recognizerName = g.getRecognizerName();
-		return recognizerName+extST.render();
-	}
 }

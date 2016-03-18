@@ -58,6 +58,7 @@ import org.antlr.v4.misc.Utils;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.parse.GrammarASTAdaptor;
 import org.antlr.v4.tool.Alternative;
+import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LeftRecursiveRule;
 import org.antlr.v4.tool.Rule;
@@ -106,24 +107,23 @@ public class OutputModelController {
 	 *  controller as factory in SourceGenTriggers so it triggers codegen
 	 *  extensions too, not just the factory functions in this factory.
 	 */
-	public OutputModelObject buildParserOutputModel() {
-		Grammar g = delegate.getGrammar();
+	public OutputModelObject buildParserOutputModel(boolean header) {
 		CodeGenerator gen = delegate.getGenerator();
-		ParserFile file = parserFile(gen.getRecognizerFileName());
+		ParserFile file = parserFile(gen.getRecognizerFileName(header));
 		setRoot(file);
-		Parser parser = parser(file);
-		file.parser = parser;
+		file.parser = parser(file);
 
+		Grammar g = delegate.getGrammar();
 		for (Rule r : g.rules.values()) {
-			buildRuleFunction(parser, r);
+			buildRuleFunction(file.parser, r);
 		}
 
 		return file;
 	}
 
-	public OutputModelObject buildLexerOutputModel() {
+	public OutputModelObject buildLexerOutputModel(boolean header) {
 		CodeGenerator gen = delegate.getGenerator();
-		LexerFile file = lexerFile(gen.getRecognizerFileName());
+		LexerFile file = lexerFile(gen.getRecognizerFileName(header));
 		setRoot(file);
 		file.lexer = lexer(file);
 
@@ -135,24 +135,24 @@ public class OutputModelController {
 		return file;
 	}
 
-	public OutputModelObject buildListenerOutputModel() {
+	public OutputModelObject buildListenerOutputModel(boolean header) {
 		CodeGenerator gen = delegate.getGenerator();
-		return new ListenerFile(delegate, gen.getListenerFileName());
+		return new ListenerFile(delegate, gen.getListenerFileName(header));
 	}
 
-	public OutputModelObject buildBaseListenerOutputModel() {
+	public OutputModelObject buildBaseListenerOutputModel(boolean header) {
 		CodeGenerator gen = delegate.getGenerator();
-		return new BaseListenerFile(delegate, gen.getBaseListenerFileName());
+		return new BaseListenerFile(delegate, gen.getBaseListenerFileName(header));
 	}
 
-	public OutputModelObject buildVisitorOutputModel() {
+	public OutputModelObject buildVisitorOutputModel(boolean header) {
 		CodeGenerator gen = delegate.getGenerator();
-		return new VisitorFile(delegate, gen.getVisitorFileName());
+		return new VisitorFile(delegate, gen.getVisitorFileName(header));
 	}
 
-	public OutputModelObject buildBaseVisitorOutputModel() {
+	public OutputModelObject buildBaseVisitorOutputModel(boolean header) {
 		CodeGenerator gen = delegate.getGenerator();
-		return new BaseVisitorFile(delegate, gen.getBaseVisitorFileName());
+		return new BaseVisitorFile(delegate, gen.getBaseVisitorFileName(header));
 	}
 
 	public ParserFile parserFile(String fileName) {
@@ -266,17 +266,26 @@ public class OutputModelController {
 		for (int i = 0; i < opAltsCode.size(); i++) {
 			ST altActionST;
 			LeftRecursiveRuleAltInfo altInfo = r.recOpAlts.getElement(i);
+			String templateName;
 			if ( altInfo.altLabel!=null ) {
-				altActionST = codegenTemplates.getInstanceOf("recRuleLabeledAltStartAction");
+				templateName = "recRuleLabeledAltStartAction";
+				altActionST = codegenTemplates.getInstanceOf(templateName);
 				altActionST.add("currentAltLabel", altInfo.altLabel);
 			}
 			else {
-				altActionST = codegenTemplates.getInstanceOf("recRuleAltStartAction");
+				templateName = "recRuleAltStartAction";
+				altActionST = codegenTemplates.getInstanceOf(templateName);
 				altActionST.add("ctxName", Utils.capitalize(r.name));
 			}
 			altActionST.add("ruleName", r.name);
 			// add label of any lr ref we deleted
 			altActionST.add("label", altInfo.leftRecursiveRuleRefLabel);
+			if (altActionST.impl.formalArguments.containsKey("isListLabel")) {
+				altActionST.add("isListLabel", altInfo.isListLabel);
+			}
+			else if (altInfo.isListLabel) {
+				delegate.getGenerator().tool.errMgr.toolError(ErrorType.CODE_TEMPLATE_ARG_ISSUE, templateName, "isListLabel");
+			}
 			Action altAction =
 				new Action(delegate, function.altLabelCtxs.get(altInfo.altLabel), altActionST);
 			CodeBlockForAlt alt = opAltsCode.get(i);
