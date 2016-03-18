@@ -41,6 +41,7 @@ cppTypeInitMap ::= [
 ]
 
 // Lexer class templates.
+DefaultLexerSuperClassHeader(s) ::= "Lexer"
 DefaultLexerSuperClass(s) ::= "Lexer"
 
 LexerHeader(lexer, atn, actionFuncs, sempredFuncs, superClass) ::= <<
@@ -228,6 +229,7 @@ bool <r.factory.grammar.name>::<r.name>Sempred(<r.ctxType> *context, int predica
 
 //--------------------------------------------------------------------------------------------------
 
+DefaultParserSuperClassHeader(s) ::= "Parser"
 DefaultParserSuperClass(s) ::= "Parser" // Is that used at all?
 
 ParserHeader(parser, funcs, atn, sempredFuncs, superClass = {Parser}) ::= <<

@@ -113,7 +113,7 @@ ParserFile(file, parser, namedActions) ::= <<
 #include "NoViableAltException.h"
 
 #include "ParseTreeListener.h"
-#include "<file.grammarName>Listener.h"
+#include "<file.factory.grammar.name>Listener.h"
 
 #include "<file.factory.grammar.name>.h"
 
@@ -121,6 +121,7 @@ using namespace antlrcpp;
 <if (file.genPackage)>using namespace <file.genPackage>;<endif>
 <if (namedActions.header)><namedActions.header><endif>
 <parser>
+
 >>
 
 BaseListenerFileHeader(file, header) ::= <<

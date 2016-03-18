@@ -49,9 +49,8 @@ public class CodeGenPipeline {
 	}
 
 	public void process() {
-		if ( !CodeGenerator.targetExists(g.getOptionString("language")) ) return;
-
 		CodeGenerator gen = new CodeGenerator(g);
+
 		IntervalSet idTypes = new IntervalSet();
 		idTypes.add(ANTLRParser.ID);
 		idTypes.add(ANTLRParser.RULE_REF);
@@ -106,18 +105,16 @@ public class CodeGenPipeline {
 					gen.writeListener(listener, false);
 				}
 				
-				if (gen.getTarget().wantsBaseListener()) {
-					if (gen.getTarget().needsHeader()) {
-						ST baseListener = gen.generateBaseListener(true);
-						if (g.tool.errMgr.getNumErrors() == errorCount) {
-							gen.writeBaseListener(baseListener, true);
-						}
-					}
-					ST baseListener = gen.generateBaseListener(false);
-					if (g.tool.errMgr.getNumErrors() == errorCount) {
-						gen.writeBaseListener(baseListener, false);
-					}
-				}
+			  if (gen.getTarget().needsHeader()) {
+				  ST baseListener = gen.generateBaseListener(true);
+				  if (g.tool.errMgr.getNumErrors() == errorCount) {
+					  gen.writeBaseListener(baseListener, true);
+				  }
+			  }
+			  ST baseListener = gen.generateBaseListener(false);
+			  if (g.tool.errMgr.getNumErrors() == errorCount) {
+			  	gen.writeBaseListener(baseListener, false);
+			  }
 			}
 			if ( g.tool.gen_visitor ) {
 				if (gen.getTarget().needsHeader()) {
@@ -131,17 +128,15 @@ public class CodeGenPipeline {
 					gen.writeVisitor(visitor, false);
 				}
 				
-				if (gen.getTarget().wantsBaseVisitor()) {
-					if (gen.getTarget().needsHeader()) {
-						ST baseVisitor = gen.generateBaseVisitor(true);
-						if (g.tool.errMgr.getNumErrors() == errorCount) {
-							gen.writeBaseVisitor(baseVisitor, true);
-						}
-					}
-					ST baseVisitor = gen.generateBaseVisitor(false);
+				if (gen.getTarget().needsHeader()) {
+					ST baseVisitor = gen.generateBaseVisitor(true);
 					if (g.tool.errMgr.getNumErrors() == errorCount) {
-						gen.writeBaseVisitor(baseVisitor, false);
+						gen.writeBaseVisitor(baseVisitor, true);
 					}
+				}
+				ST baseVisitor = gen.generateBaseVisitor(false);
+				if (g.tool.errMgr.getNumErrors() == errorCount) {
+					gen.writeBaseVisitor(baseVisitor, false);
 				}
 			}
 		}
