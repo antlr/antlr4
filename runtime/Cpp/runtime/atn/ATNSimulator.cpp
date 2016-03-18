@@ -88,22 +88,6 @@ namespace org {
                         (new ATNDeserializer())->checkCondition(condition, message);
                     }
 
-                    int ATNSimulator::toInt(wchar_t c) {
-                        return ATNDeserializer::toInt(c);
-                    }
-
-                    int ATNSimulator::toInt32(wchar_t data[], int offset) {
-                        return ATNDeserializer::toInt32(data, offset);
-                    }
-
-                    long long ATNSimulator::toLong(wchar_t data[], int offset) {
-                        return ATNDeserializer::toLong(data, offset);
-                    }
-
-                    antlrcpp::UUID *ATNSimulator::toUUID(wchar_t data[], int offset) {
-                        return ATNDeserializer::toUUID(data, offset);
-                    }
-
                     atn::Transition *ATNSimulator::edgeFactory(ATN *atn, int type, int src, int trg, int arg1, int arg2, int arg3, std::vector<misc::IntervalSet*> &sets) {
                         return (new ATNDeserializer())->edgeFactory(atn, type, src, trg, arg1, arg2, arg3, sets);
                     }

@@ -310,9 +310,10 @@ namespace org {
                 }
 
                 void Parser::setTokenStream(TokenStream *input) {
-                    delete this->_input;
+                    delete _input;
+                  _input = nullptr;
                     reset();
-                    this->_input = input;
+                    _input = input;
                 }
 
                 Token *Parser::getCurrentToken() {
@@ -561,11 +562,11 @@ namespace org {
                 }
 
                 std::vector<std::wstring> Parser::getDFAStrings() {
-					if (!_interp->_decisionToDFA.empty()) {
+					if (!_interpreter->_decisionToDFA.empty()) {
 						std::lock_guard<std::mutex> lck(mtx);
                         std::vector<std::wstring> s = std::vector<std::wstring>();
-                        for (size_t d = 0; d < _interp->_decisionToDFA.size(); d++) {
-                            dfa::DFA *dfa = _interp->_decisionToDFA[d];
+                        for (size_t d = 0; d < _interpreter->_decisionToDFA.size(); d++) {
+                            dfa::DFA *dfa = _interpreter->_decisionToDFA[d];
                             s.push_back(dfa->toString(getTokenNames()));
                         }
                         return s;
@@ -575,11 +576,11 @@ namespace org {
 
                 void Parser::dumpDFA() {
 
-					if (!_interp->_decisionToDFA.empty()) {
+					if (!_interpreter->_decisionToDFA.empty()) {
 						std::lock_guard<std::mutex> lck(mtx);
                         bool seenOne = false;
-                        for (size_t d = 0; d < _interp->_decisionToDFA.size(); d++) {
-                            dfa::DFA *dfa = _interp->_decisionToDFA[d];
+                        for (size_t d = 0; d < _interpreter->_decisionToDFA.size(); d++) {
+                            dfa::DFA *dfa = _interpreter->_decisionToDFA[d];
                             if (!dfa->states->empty()) {
                                 if (seenOne) {
                                     std::cout << std::endl;

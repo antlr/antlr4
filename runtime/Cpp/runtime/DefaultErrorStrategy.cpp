@@ -20,6 +20,7 @@
 
 /*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -371,6 +372,7 @@ namespace org {
                 void DefaultErrorStrategy::InitializeInstanceFields() {
                     errorRecoveryMode = false;
                     lastErrorIndex = -1;
+                  lastErrorStates = nullptr;
                 }
             }
         }

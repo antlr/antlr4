@@ -435,12 +435,6 @@
 		27C668E31C9584FA0021E494 /* Utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 27C668A01C9584FA0021E494 /* Utils.cpp */; };
 		27C668E41C9584FA0021E494 /* Utils.h in Headers */ = {isa = PBXBuildFile; fileRef = 27C668A11C9584FA0021E494 /* Utils.h */; };
 		27C668E51C9584FA0021E494 /* Utils.h in Headers */ = {isa = PBXBuildFile; fileRef = 27C668A11C9584FA0021E494 /* Utils.h */; };
-		27C668F81C9585230021E494 /* antlrcpp.cp in Sources */ = {isa = PBXBuildFile; fileRef = 27C668E71C9585230021E494 /* antlrcpp.cp */; };
-		27C668F91C9585230021E494 /* antlrcpp.cp in Sources */ = {isa = PBXBuildFile; fileRef = 27C668E71C9585230021E494 /* antlrcpp.cp */; };
-		27C668FA1C9585230021E494 /* antlrcpp.h in Headers */ = {isa = PBXBuildFile; fileRef = 27C668E81C9585230021E494 /* antlrcpp.h */; };
-		27C668FB1C9585230021E494 /* antlrcpp.h in Headers */ = {isa = PBXBuildFile; fileRef = 27C668E81C9585230021E494 /* antlrcpp.h */; };
-		27C668FC1C9585230021E494 /* antlrcppPriv.h in Headers */ = {isa = PBXBuildFile; fileRef = 27C668E91C9585230021E494 /* antlrcppPriv.h */; };
-		27C668FD1C9585230021E494 /* antlrcppPriv.h in Headers */ = {isa = PBXBuildFile; fileRef = 27C668E91C9585230021E494 /* antlrcppPriv.h */; };
 		27C668FE1C9585230021E494 /* Arrays.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 27C668EA1C9585230021E494 /* Arrays.cpp */; };
 		27C668FF1C9585230021E494 /* Arrays.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 27C668EA1C9585230021E494 /* Arrays.cpp */; };
 		27C669001C9585230021E494 /* Arrays.h in Headers */ = {isa = PBXBuildFile; fileRef = 27C668EB1C9585230021E494 /* Arrays.h */; };
@@ -463,10 +457,10 @@
 		27C669111C9585230021E494 /* Strings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 27C668F31C9585230021E494 /* Strings.cpp */; };
 		27C669121C9585230021E494 /* Strings.h in Headers */ = {isa = PBXBuildFile; fileRef = 27C668F41C9585230021E494 /* Strings.h */; };
 		27C669131C9585230021E494 /* Strings.h in Headers */ = {isa = PBXBuildFile; fileRef = 27C668F41C9585230021E494 /* Strings.h */; };
-		27C669141C9585230021E494 /* UUID.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 27C668F51C9585230021E494 /* UUID.cpp */; };
-		27C669151C9585230021E494 /* UUID.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 27C668F51C9585230021E494 /* UUID.cpp */; };
-		27C669161C9585230021E494 /* UUID.h in Headers */ = {isa = PBXBuildFile; fileRef = 27C668F61C9585230021E494 /* UUID.h */; };
-		27C669171C9585230021E494 /* UUID.h in Headers */ = {isa = PBXBuildFile; fileRef = 27C668F61C9585230021E494 /* UUID.h */; };
+		27C669141C9585230021E494 /* guid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 27C668F51C9585230021E494 /* guid.cpp */; };
+		27C669151C9585230021E494 /* guid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 27C668F51C9585230021E494 /* guid.cpp */; };
+		27C669161C9585230021E494 /* guid.h in Headers */ = {isa = PBXBuildFile; fileRef = 27C668F61C9585230021E494 /* guid.h */; };
+		27C669171C9585230021E494 /* guid.h in Headers */ = {isa = PBXBuildFile; fileRef = 27C668F61C9585230021E494 /* guid.h */; };
 		27C669181C9585230021E494 /* vectorhelper.h in Headers */ = {isa = PBXBuildFile; fileRef = 27C668F71C9585230021E494 /* vectorhelper.h */; };
 		27C669191C9585230021E494 /* vectorhelper.h in Headers */ = {isa = PBXBuildFile; fileRef = 27C668F71C9585230021E494 /* vectorhelper.h */; };
 		27C6698B1C9585B80021E494 /* AbstractParseTreeVisitor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 27C6696F1C9585B80021E494 /* AbstractParseTreeVisitor.cpp */; };
@@ -729,7 +723,7 @@
 		27C667521C95846E0021E494 /* ATNConfigSet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ATNConfigSet.h; sourceTree = "<group>"; };
 		27C667531C95846E0021E494 /* ATNDeserializationOptions.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ATNDeserializationOptions.cpp; sourceTree = "<group>"; };
 		27C667541C95846E0021E494 /* ATNDeserializationOptions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ATNDeserializationOptions.h; sourceTree = "<group>"; };
-		27C667551C95846E0021E494 /* ATNDeserializer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ATNDeserializer.cpp; sourceTree = "<group>"; };
+		27C667551C95846E0021E494 /* ATNDeserializer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ATNDeserializer.cpp; sourceTree = "<group>"; wrapsLines = 0; };
 		27C667561C95846E0021E494 /* ATNDeserializer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ATNDeserializer.h; sourceTree = "<group>"; };
 		27C667571C95846E0021E494 /* ATNSerializer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ATNSerializer.cpp; sourceTree = "<group>"; };
 		27C667581C95846E0021E494 /* ATNSerializer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ATNSerializer.h; sourceTree = "<group>"; };
@@ -853,9 +847,6 @@
 		27C6689F1C9584FA0021E494 /* TestRig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestRig.h; sourceTree = "<group>"; };
 		27C668A01C9584FA0021E494 /* Utils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Utils.cpp; sourceTree = "<group>"; };
 		27C668A11C9584FA0021E494 /* Utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Utils.h; sourceTree = "<group>"; };
-		27C668E71C9585230021E494 /* antlrcpp.cp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = antlrcpp.cp; sourceTree = "<group>"; };
-		27C668E81C9585230021E494 /* antlrcpp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = antlrcpp.h; sourceTree = "<group>"; };
-		27C668E91C9585230021E494 /* antlrcppPriv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = antlrcppPriv.h; sourceTree = "<group>"; };
 		27C668EA1C9585230021E494 /* Arrays.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Arrays.cpp; sourceTree = "<group>"; };
 		27C668EB1C9585230021E494 /* Arrays.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Arrays.h; sourceTree = "<group>"; };
 		27C668EC1C9585230021E494 /* BitSet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BitSet.h; sourceTree = "<group>"; };
@@ -867,8 +858,8 @@
 		27C668F21C9585230021E494 /* stringconverter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stringconverter.h; sourceTree = "<group>"; };
 		27C668F31C9585230021E494 /* Strings.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Strings.cpp; sourceTree = "<group>"; };
 		27C668F41C9585230021E494 /* Strings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Strings.h; sourceTree = "<group>"; };
-		27C668F51C9585230021E494 /* UUID.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UUID.cpp; sourceTree = "<group>"; };
-		27C668F61C9585230021E494 /* UUID.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UUID.h; sourceTree = "<group>"; };
+		27C668F51C9585230021E494 /* guid.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = guid.cpp; sourceTree = "<group>"; };
+		27C668F61C9585230021E494 /* guid.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = guid.h; sourceTree = "<group>"; };
 		27C668F71C9585230021E494 /* vectorhelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vectorhelper.h; sourceTree = "<group>"; };
 		27C6696F1C9585B80021E494 /* AbstractParseTreeVisitor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AbstractParseTreeVisitor.cpp; sourceTree = "<group>"; };
 		27C669701C9585B80021E494 /* AbstractParseTreeVisitor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AbstractParseTreeVisitor.h; sourceTree = "<group>"; };
@@ -1151,9 +1142,6 @@
 		27C668E61C9585110021E494 /* support */ = {
 			isa = PBXGroup;
 			children = (
-				27C668E71C9585230021E494 /* antlrcpp.cp */,
-				27C668E81C9585230021E494 /* antlrcpp.h */,
-				27C668E91C9585230021E494 /* antlrcppPriv.h */,
 				27C668EA1C9585230021E494 /* Arrays.cpp */,
 				27C668EB1C9585230021E494 /* Arrays.h */,
 				27C668EC1C9585230021E494 /* BitSet.h */,
@@ -1165,8 +1153,8 @@
 				27C668F21C9585230021E494 /* stringconverter.h */,
 				27C668F31C9585230021E494 /* Strings.cpp */,
 				27C668F41C9585230021E494 /* Strings.h */,
-				27C668F51C9585230021E494 /* UUID.cpp */,
-				27C668F61C9585230021E494 /* UUID.h */,
+				27C668F51C9585230021E494 /* guid.cpp */,
+				27C668F61C9585230021E494 /* guid.h */,
 				27C668F71C9585230021E494 /* vectorhelper.h */,
 			);
 			path = support;
@@ -1482,7 +1470,6 @@
 				27C667B11C95846E0021E494 /* ArrayPredictionContext.h in Headers */,
 				27C669AE1C9585B80021E494 /* RuleNode.h in Headers */,
 				27C667211C9584050021E494 /* RecognitionException.h in Headers */,
-				27C668FD1C9585230021E494 /* antlrcppPriv.h in Headers */,
 				27C668A51C9584FA0021E494 /* AbstractEqualityComparator.h in Headers */,
 				27C669091C9585230021E494 /* Declarations.h in Headers */,
 				27C667451C9584050021E494 /* WritableToken.h in Headers */,
@@ -1510,7 +1497,6 @@
 				27C667E11C95846E0021E494 /* BasicState.h in Headers */,
 				27C666B91C9584050021E494 /* ANTLRInputStream.h in Headers */,
 				27C6680F1C95846E0021E494 /* OrderedATNConfigSet.h in Headers */,
-				27C668FB1C9585230021E494 /* antlrcpp.h in Headers */,
 				27C666B11C9584050021E494 /* ANTLRErrorStrategy.h in Headers */,
 				27C667B91C95846E0021E494 /* ATNConfig.h in Headers */,
 				27C6690F1C9585230021E494 /* stringconverter.h in Headers */,
@@ -1570,7 +1556,7 @@
 				27C66A4F1C958AC10021E494 /* XPathLexerErrorListener.h in Headers */,
 				27C669A21C9585B80021E494 /* ParseTreeProperty.h in Headers */,
 				27C667A91C95846E0021E494 /* AbstractPredicateTransition.h in Headers */,
-				27C669171C9585230021E494 /* UUID.h in Headers */,
+				27C669171C9585230021E494 /* guid.h in Headers */,
 				27C66A111C958AB30021E494 /* Chunk.h in Headers */,
 				27C666AD1C9584050021E494 /* ANTLRErrorListener.h in Headers */,
 				27C666EF1C9584050021E494 /* InputMismatchException.h in Headers */,
@@ -1604,7 +1590,7 @@
 				27C6672A1C9584050021E494 /* Token.h in Headers */,
 				27C666B01C9584050021E494 /* ANTLRErrorStrategy.h in Headers */,
 				27C667201C9584050021E494 /* RecognitionException.h in Headers */,
-				27C669161C9585230021E494 /* UUID.h in Headers */,
+				27C669161C9585230021E494 /* guid.h in Headers */,
 				27C6670C1C9584050021E494 /* NoViableAltException.h in Headers */,
 				27C6683A1C95846E0021E494 /* RuleStopState.h in Headers */,
 				27C666BC1C9584050021E494 /* BailErrorStrategy.h in Headers */,
@@ -1622,7 +1608,6 @@
 				27C666FC1C9584050021E494 /* Lexer.h in Headers */,
 				27C668321C95846E0021E494 /* RangeTransition.h in Headers */,
 				27C6686F1C9584B60021E494 /* DFA.h in Headers */,
-				27C668FC1C9585230021E494 /* antlrcppPriv.h in Headers */,
 				27C668521C95846E0021E494 /* StarLoopbackState.h in Headers */,
 				27C666D81C9584050021E494 /* ConsoleErrorListener.h in Headers */,
 				27C6684E1C95846E0021E494 /* StarBlockStartState.h in Headers */,
@@ -1724,7 +1709,6 @@
 				27C6681E1C95846E0021E494 /* PrecedencePredicateTransition.h in Headers */,
 				27C6671C1C9584050021E494 /* ProxyErrorListener.h in Headers */,
 				27C6680E1C95846E0021E494 /* OrderedATNConfigSet.h in Headers */,
-				27C668FA1C9585230021E494 /* antlrcpp.h in Headers */,
 				27C667D41C95846E0021E494 /* ATNType.h in Headers */,
 				27C66A4E1C958AC10021E494 /* XPathLexerErrorListener.h in Headers */,
 				27C668B41C9584FA0021E494 /* Interval.h in Headers */,
@@ -1876,7 +1860,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "pushd ..\n./generate.sh\npopd";
+			shellScript = "pushd ..\nif [ TParser.g4 -nt generated/TParser.cpp  -o  TLexer.g4 -nt generated/TLexer.cpp ]; then\n./generate.sh;\nfi\npopd";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -1940,7 +1924,6 @@
 				27C666ED1C9584050021E494 /* InputMismatchException.cpp in Sources */,
 				27C668031C95846E0021E494 /* LoopEndState.cpp in Sources */,
 				27C666B31C9584050021E494 /* ANTLRFileStream.cpp in Sources */,
-				27C668F91C9585230021E494 /* antlrcpp.cp in Sources */,
 				27C669111C9585230021E494 /* Strings.cpp in Sources */,
 				27C667431C9584050021E494 /* WritableToken.cpp in Sources */,
 				27C66A071C958AB30021E494 /* ParseTreePatternMatcher.cpp in Sources */,
@@ -1953,7 +1936,7 @@
 				27C667FB1C95846E0021E494 /* LexerATNSimulator.cpp in Sources */,
 				27C667EB1C95846E0021E494 /* DecisionState.cpp in Sources */,
 				27C668BB1C9584FA0021E494 /* IntSet.cpp in Sources */,
-				27C669151C9585230021E494 /* UUID.cpp in Sources */,
+				27C669151C9585230021E494 /* guid.cpp in Sources */,
 				27C669941C9585B80021E494 /* ErrorNodeImpl.cpp in Sources */,
 				27C6687A1C9584B60021E494 /* LexerDFASerializer.cpp in Sources */,
 				27C6685D1C95846E0021E494 /* Transition.cpp in Sources */,
@@ -2083,7 +2066,6 @@
 				27C6698F1C9585B80021E494 /* ErrorNode.cpp in Sources */,
 				27C666F01C9584050021E494 /* InterpreterRuleContext.cpp in Sources */,
 				27C668B61C9584FA0021E494 /* IntervalSet.cpp in Sources */,
-				27C668F81C9585230021E494 /* antlrcpp.cp in Sources */,
 				27C667AA1C95846E0021E494 /* ActionTransition.cpp in Sources */,
 				27C668201C95846E0021E494 /* PredicateTransition.cpp in Sources */,
 				27C668FE1C9585230021E494 /* Arrays.cpp in Sources */,
@@ -2180,7 +2162,7 @@
 				27C6690A1C9585230021E494 /* StringBuilder.cpp in Sources */,
 				27C668BE1C9584FA0021E494 /* JFileChooserConfirmOverwrite.cpp in Sources */,
 				27C667341C9584050021E494 /* TokenStream.cpp in Sources */,
-				27C669141C9585230021E494 /* UUID.cpp in Sources */,
+				27C669141C9585230021E494 /* guid.cpp in Sources */,
 				27C668C21C9584FA0021E494 /* LogManager.cpp in Sources */,
 				27C667281C9584050021E494 /* Token.cpp in Sources */,
 				27C668791C9584B60021E494 /* LexerDFASerializer.cpp in Sources */,

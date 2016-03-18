@@ -8,6 +8,7 @@
 
 /*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -102,19 +103,6 @@ namespace org {
                         /// @deprecated Use <seealso cref="ATNDeserializer#checkCondition(boolean, String)"/> instead. 
                         static void checkCondition(bool condition, const std::wstring &message);
 
-                        /// @deprecated Use <seealso cref="ATNDeserializer#toInt"/> instead. 
-                        static int toInt(wchar_t c);
-
-                        /// @deprecated Use <seealso cref="ATNDeserializer#toInt32"/> instead. 
-                        static int toInt32(wchar_t data[], int offset);
-
-                        /// @deprecated Use <seealso cref="ATNDeserializer#toLong"/> instead. 
-                        static long long toLong(wchar_t data[], int offset);
-
-
-                        /// @deprecated Use <seealso cref="ATNDeserializer#toUUID"/> instead. 
-                        static antlrcpp::UUID *toUUID(wchar_t data[], int offset);
-                        
                         /// @deprecated Use <seealso cref="ATNDeserializer#edgeFactory"/> instead. 
                         static Transition *edgeFactory(ATN *atn, int type, int src, int trg, int arg1, int arg2, int arg3, std::vector<misc::IntervalSet*> &sets);
 

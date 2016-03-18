@@ -26,6 +26,7 @@
 
 /*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -53,6 +54,8 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
+using namespace antlrcpp;
 
 namespace org {
 	namespace antlr {
@@ -322,16 +325,20 @@ namespace org {
 						return data;
 					}
 
+          //------------------------------------------------------------------------------------------------------------
+
 					std::wstring ATNSerializer::decode(const std::wstring& inpdata) {
-						std::wstring data = inpdata;
-						// don't adjust the first value since that's the version number
-						for (int i = 1; i < (int)data.size(); i++) {
-							data[i] = static_cast<wchar_t>(data[i] - 2);
+						wchar_t data[inpdata.size()];
+            data[0] = inpdata[0];
+
+						// Don't adjust the first value since that's the version number.
+						for (size_t i = 1; i < inpdata.size(); ++i) {
+							data[i] = inpdata[i] - 2;
 						}
 
 						std::wstring buf;
 						int p = 0;
-						int version = ATNDeserializer::toInt(data[p++]);
+						int version = data[p++];
 						if (version != ATNDeserializer::SERIALIZED_VERSION) {
 							std::wstring reason =
 								L"Could not deserialize ATN with version "
@@ -342,41 +349,41 @@ namespace org {
 							throw UnsupportedOperationException(L"ATN Serializer" + reason);
 						}
 
-						antlrcpp::UUID *uuid = ATNDeserializer::toUUID(data, p);
+						Guid uuid = ATNDeserializer::toUUID(data, p);
 						p += 8;
-						if (!uuid->equals(ATNDeserializer::SERIALIZED_UUID)) {
+						if (uuid != ATNDeserializer::SERIALIZED_UUID) {
 							std::wstring reason =
 								L"Could not deserialize ATN with UUID "
-								+ uuid->toString()
+								+ s2ws(uuid.toString())
 								+ L" (expected "
-								+ ATNDeserializer::SERIALIZED_UUID->toString()
+								+ s2ws(ATNDeserializer::SERIALIZED_UUID.toString())
 								+ L").";
 							throw UnsupportedOperationException(L"ATN Serializer" + reason);
 						}
 
 						p++;  // skip grammarType
-						int maxType = ATNDeserializer::toInt(data[p++]);
+						int maxType = data[p++];
 						buf.append(L"max type ").append(std::to_wstring(maxType)).append(L"\n");
-						int nstates = ATNDeserializer::toInt(data[p++]);
+						int nstates = data[p++];
 						for (int i = 0; i < nstates; i++) {
-							int stype = ATNDeserializer::toInt(data[p++]);
+							int stype = data[p++];
 							if (stype == ATNState::ATN_INVALID_TYPE) {  // ignore bad type of states
 								continue;
 							}
-							int ruleIndex = ATNDeserializer::toInt(data[p++]);
+							int ruleIndex = data[p++];
 							if (ruleIndex == WCHAR_MAX) {
 								ruleIndex = -1;
 							}
 
 							std::wstring arg = L"";
 							if (stype == ATNState::LOOP_END) {
-								int loopBackStateNumber = ATNDeserializer::toInt(data[p++]);
+								int loopBackStateNumber = data[p++];
 								arg = std::wstring(L" ") + std::to_wstring(loopBackStateNumber);
 							}
 							else if (stype == ATNState::PLUS_BLOCK_START ||
 								stype == ATNState::STAR_BLOCK_START ||
 								stype == ATNState::BLOCK_START) {
-								int endStateNumber = ATNDeserializer::toInt(data[p++]);
+								int endStateNumber = data[p++];
 								arg = std::wstring(L" ") + std::to_wstring(endStateNumber);
 							}
 							buf.append(std::to_wstring(i))
@@ -387,20 +394,26 @@ namespace org {
 								.append(arg)
 								.append(L"\n");
 						}
-						int numNonGreedyStates = ATNDeserializer::toInt(data[p++]);
+						int numNonGreedyStates = data[p++];
+            p += numNonGreedyStates; // Instead of that useless loop below.
+            /*
 						for (int i = 0; i < numNonGreedyStates; i++) {
-							//int stateNumber = ATNDeserializer::toInt(data[p++]); // Unused?
+							int stateNumber = data[p++];
 						}
-						int numPrecedenceStates = ATNDeserializer::toInt(data[p++]);
+             */
+						int numPrecedenceStates = data[p++];
+            p += numPrecedenceStates;
+            /*
 						for (int i = 0; i < numPrecedenceStates; i++) {
-							//int stateNumber = ATNDeserializer::toInt(data[p++]); // Unused?
+							int stateNumber = data[p++];
 						}
-						int nrules = ATNDeserializer::toInt(data[p++]);
+             */
+						int nrules = data[p++];
 						for (int i = 0; i < nrules; i++) {
-							int s = ATNDeserializer::toInt(data[p++]);
+							int s = data[p++];
 							if (atn->grammarType == ATNType::LEXER) {
-								int arg1 = ATNDeserializer::toInt(data[p++]);
-								int arg2 = ATNDeserializer::toInt(data[p++]);
+								int arg1 = data[p++];
+								int arg2 = data[p++];
 								if (arg2 == WCHAR_MAX) {
 									arg2 = -1;
 								}
@@ -422,18 +435,18 @@ namespace org {
 									.append(L"\n");
 							}
 						}
-						int nmodes = ATNDeserializer::toInt(data[p++]);
+						int nmodes = data[p++];
 						for (int i = 0; i < nmodes; i++) {
-							int s = ATNDeserializer::toInt(data[p++]);
+							int s = data[p++];
 							buf.append(L"mode ")
 								.append(std::to_wstring(i))
 								.append(L":")
 								.append(std::to_wstring(s))
 								.append(L"\n");
 						}
-						int nsets = ATNDeserializer::toInt(data[p++]);
+						int nsets = data[p++];
 						for (int i = 0; i < nsets; i++) {
-							int nintervals = ATNDeserializer::toInt(data[p++]);
+							int nintervals = data[p++];
 							buf.append(std::to_wstring(i)).append(L":");
 							bool containsEof = data[p++] != 0;
 							if (containsEof) {
@@ -445,21 +458,21 @@ namespace org {
 									buf.append(L", ");
 								}
 
-								buf.append(getTokenName(ATNDeserializer::toInt(data[p])))
+								buf.append(getTokenName(data[p]))
 									.append(L"..")
-									.append(getTokenName(ATNDeserializer::toInt(data[p + 1])));
+									.append(getTokenName(data[p + 1]));
 								p += 2;
 							}
 							buf.append(L"\n");
 						}
-						int nedges = ATNDeserializer::toInt(data[p++]);
+						int nedges = data[p++];
 						for (int i = 0; i < nedges; i++) {
-							int src = ATNDeserializer::toInt(data[p]);
-							int trg = ATNDeserializer::toInt(data[p + 1]);
-							int ttype = ATNDeserializer::toInt(data[p + 2]);
-							int arg1 = ATNDeserializer::toInt(data[p + 3]);
-							int arg2 = ATNDeserializer::toInt(data[p + 4]);
-							int arg3 = ATNDeserializer::toInt(data[p + 5]);
+							int src = data[p];
+							int trg = data[p + 1];
+							int ttype = data[p + 2];
+							int arg1 = data[p + 3];
+							int arg2 = data[p + 4];
+							int arg3 = data[p + 5];
 							buf.append(std::to_wstring(src))
 								.append(L"->")
 								.append(std::to_wstring(trg))
@@ -474,9 +487,9 @@ namespace org {
 								.append(L"\n");
 							p += 6;
 						}
-						int ndecisions = ATNDeserializer::toInt(data[p++]);
+						int ndecisions = data[p++];
 						for (int i = 0; i < ndecisions; i++) {
-							int s = ATNDeserializer::toInt(data[p++]);
+							int s = data[p++];
 							buf.append(std::to_wstring(i)).append(L":").append(std::to_wstring(s)).append(L"\n");
 						}
 						return buf;
@@ -537,8 +550,7 @@ namespace org {
 						return antlrcpp::toCharArray(getSerialized(atn));
 					}
 
-					std::wstring ATNSerializer::getDecoded(ATN *atn,
-						std::vector<std::wstring> &tokenNames) {
+					std::wstring ATNSerializer::getDecoded(ATN *atn, std::vector<std::wstring> &tokenNames) {
 						std::vector<size_t> *serialized = getSerialized(atn);
 						// JAVA TO C++ CONVERTER WARNING: Since the array size is not known in this
 						// declaration, Java to C++ Converter has converted this array to a pointer.
@@ -549,19 +561,9 @@ namespace org {
 						return (new ATNSerializer(atn, tokenNames))->decode(data);
 					}
 
-					void ATNSerializer::serializeUUID(std::vector<size_t> *data, antlrcpp::UUID *uuid) {
-						serializeLong(data, uuid->getLeastSignificantBits());
-						serializeLong(data, uuid->getMostSignificantBits());
-					}
-
-					void ATNSerializer::serializeLong(std::vector<size_t> *data, long long value) {
-						serializeInt(data, static_cast<int>(value));
-						serializeInt(data, static_cast<int>(value >> 32));
-					}
-
-					void ATNSerializer::serializeInt(std::vector<size_t> *data, int value) {
-						data->push_back(static_cast<wchar_t>(value));
-						data->push_back(static_cast<wchar_t>(value >> 16));
+					void ATNSerializer::serializeUUID(std::vector<size_t> *data, Guid uuid) {
+            for (auto &entry : uuid)
+              data->push_back(entry);
 					}
 
 				}  // namespace atn

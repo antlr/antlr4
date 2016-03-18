@@ -1,14 +1,14 @@
 ﻿#pragma once
 
-#include "UUID.h"
 #include "Declarations.h"
+#include "guid.h"
 
 #include <string>
 #include <vector>
 
-
 /*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -56,23 +56,30 @@ namespace org {
                         /// This is the earliest supported serialized UUID.
                         /// </summary>
                     private:
-                        static antlrcpp::UUID *const BASE_SERIALIZED_UUID;
+
+                        static Guid const BASE_SERIALIZED_UUID;
                         /// <summary>
                         /// This UUID indicates an extension of <seealso cref="BASE_SERIALIZED_UUID"/> for the
                         /// addition of precedence predicates.
                         /// </summary>
-                        static antlrcpp::UUID *const ADDED_PRECEDENCE_TRANSITIONS;
+                        static Guid const ADDED_PRECEDENCE_TRANSITIONS;
+                      /**
+                       * This UUID indicates an extension of ADDED_PRECEDENCE_TRANSITIONS
+                       * for the addition of lexer actions encoded as a sequence of
+                       * LexerAction instances.
+                       */
+                      static Guid const ADDED_LEXER_ACTIONS;
                         /// <summary>
                         /// This list contains all of the currently supported UUIDs, ordered by when
                         /// the feature first appeared in this branch.
                         /// </summary>
-                        static const std::vector<antlrcpp::UUID*> SUPPORTED_UUIDS;
+                        static const std::vector<Guid> SUPPORTED_UUIDS;
 
                         /// <summary>
                         /// This is the current serialized UUID.
                         /// </summary>
                     public:
-                        static antlrcpp::UUID *const SERIALIZED_UUID;
+                        static Guid const SERIALIZED_UUID;
 
                     private:
                         ATNDeserializationOptions *const deserializationOptions;
@@ -94,10 +101,10 @@ namespace org {
                         /// serialized ATN at or after the feature identified by {@code feature} was
                         /// introduced; otherwise, {@code false}. </returns>
                     protected:
-                        virtual bool isFeatureSupported(antlrcpp::UUID *feature, antlrcpp::UUID *actualUuid);
+                        virtual bool isFeatureSupported(const Guid &feature, const Guid &actualUuid);
 
                     public:
-                        virtual ATN *deserialize(const std::wstring& data);
+                        virtual ATN *deserialize(const std::wstring& input);
 
                     public:
                         virtual void verifyATN(ATN *atn);
@@ -106,20 +113,14 @@ namespace org {
 
                         virtual void checkCondition(bool condition, const std::wstring &message);
 
-                        static int toInt(wchar_t c);
-
-                        static int toInt32(const std::wstring& data, int offset);
-
-                        static long long toLong(const std::wstring& data, int offset);
-
-                        static antlrcpp::UUID *toUUID(const std::wstring& data, int offset);
+                        static Guid toUUID(const wchar_t *data, int offset);
 
                         virtual Transition *edgeFactory(ATN *atn, int type, int src, int trg, int arg1, int arg2, int arg3, std::vector<misc::IntervalSet*> &sets);
 
                         virtual ATNState *stateFactory(int type, int ruleIndex);
 
                     private:
-                        static std::vector<antlrcpp::UUID*> supportedUUIDsInitializer();
+                        static std::vector<Guid> supportedUUIDsInitializer();
                         ATNDeserializationOptions *deserializationOptionsInitializer(ATNDeserializationOptions *dso);
 
                     };

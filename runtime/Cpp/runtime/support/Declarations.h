@@ -29,6 +29,15 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+// Defines for the Guid class.
+#ifdef _WIN32
+  #define GUID_WINDOWS
+#elseif __APPLE__
+  #define GUID_CFUUID
+#else
+  #define GUID_LIBUUID
+#endif
+
 // This can be regenerated from the command line by using
 // ls *.h | sed "s/\.h\*/;/" | sed 's/^/class /'
 

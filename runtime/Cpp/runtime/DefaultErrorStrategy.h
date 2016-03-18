@@ -45,6 +45,11 @@ namespace org {
                 ///  and tree parsers.
                 /// </summary>
                 class DefaultErrorStrategy : public ANTLRErrorStrategy {
+                public:
+                  DefaultErrorStrategy() {
+                    InitializeInstanceFields();
+                  }
+
                     /// <summary>
                     /// This is true after we see an error and before having successfully
                     ///  matched a token. Prevents generation of more than one error message
@@ -484,10 +489,6 @@ namespace org {
                 private:
                     void InitializeInstanceFields();
 
-                public:
-                    DefaultErrorStrategy() {
-                        InitializeInstanceFields();
-                    }
                 };
 
             }

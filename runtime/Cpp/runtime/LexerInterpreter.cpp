@@ -51,7 +51,7 @@ namespace org {
                     for (int i = 0; i < (int)_decisionToDFA.size(); i++) {
                         _decisionToDFA[i] = new dfa::DFA(atn->getDecisionState(i), i);
                     }
-                    this->_interp = new atn::LexerATNSimulator(atn,_decisionToDFA,_sharedContextCache);
+                    _interpreter = new atn::LexerATNSimulator(atn,_decisionToDFA,_sharedContextCache);
                     if (tokenNames) {
                         _tokenNames = *tokenNames;
                     }
@@ -62,6 +62,12 @@ namespace org {
                         _modeNames = *modeNames;
                     }
                 }
+
+              LexerInterpreter::~LexerInterpreter()
+              {
+                delete _interpreter;
+              }
+
                 atn::ATN *LexerInterpreter::getATN() const {
                     return atn;
                 }

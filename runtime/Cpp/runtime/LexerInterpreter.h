@@ -58,6 +58,7 @@ namespace org {
 
                 public:
                     LexerInterpreter(const std::wstring &grammarFileName, std::vector<std::wstring> *tokenNames, std::vector<std::wstring> *ruleNames, std::vector<std::wstring> *modeNames, atn::ATN *atn, CharStream *input);
+                  ~LexerInterpreter();
 
                     virtual atn::ATN *getATN() const override;
 

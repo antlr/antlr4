@@ -7,10 +7,11 @@
 
 #include "ATN.h"
 #include "stringconverter.h"
-#include "UUID.h"
+#include "guid.h"
 
 /*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -100,11 +101,7 @@ namespace org {
 							std::vector<std::wstring> &tokenNames);
 
 					private:
-						void serializeUUID(std::vector<size_t> *data, antlrcpp::UUID *uuid);
-
-						void serializeLong(std::vector<size_t> *data, long long value);
-
-						void serializeInt(std::vector<size_t> *data, int value);
+						void serializeUUID(std::vector<size_t> *data, Guid uuid);
 					};
 
 				}  // namespace org

@@ -38,6 +38,7 @@
 
 /*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -66,6 +67,8 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using namespace antlrcpp;
+
 namespace org {
     namespace antlr {
         namespace v4 {
@@ -76,10 +79,11 @@ namespace org {
                     /* This value should never change. Updates following this version are
                      * reflected as change in the unique ID SERIALIZED_UUID.
                      */
-                    antlrcpp::UUID *const ATNDeserializer::BASE_SERIALIZED_UUID = antlrcpp::UUID::fromString(L"33761B2D-78BB-4A43-8B0B-4F5BEE8AACF3");
-                    antlrcpp::UUID *const ATNDeserializer::ADDED_PRECEDENCE_TRANSITIONS = antlrcpp::UUID::fromString(L"1DA0C57D-6C06-438A-9B27-10BCB3CE0F61");
-                    const std::vector<antlrcpp::UUID*> ATNDeserializer::SUPPORTED_UUIDS = supportedUUIDsInitializer();
-                    antlrcpp::UUID *const ATNDeserializer::SERIALIZED_UUID = ADDED_PRECEDENCE_TRANSITIONS;
+                    const Guid ATNDeserializer::BASE_SERIALIZED_UUID("33761B2D-78BB-4A43-8B0B-4F5BEE8AACF3");
+                    const Guid ATNDeserializer::ADDED_PRECEDENCE_TRANSITIONS("1DA0C57D-6C06-438A-9B27-10BCB3CE0F61");
+                  const Guid ATNDeserializer::ADDED_LEXER_ACTIONS("AADB8D7E-AEEF-4415-AD2B-8204D6CF042E");
+                    const std::vector<Guid> ATNDeserializer::SUPPORTED_UUIDS = supportedUUIDsInitializer();
+                    const Guid ATNDeserializer::SERIALIZED_UUID = ADDED_LEXER_ACTIONS;
 
                     ATNDeserializer::ATNDeserializer(): deserializationOptions(deserializationOptionsInitializer(nullptr)) {
                     }
@@ -87,38 +91,41 @@ namespace org {
                     ATNDeserializer::ATNDeserializer(ATNDeserializationOptions *dso): deserializationOptions(deserializationOptionsInitializer(dso)) {
                     }
 
-                    bool ATNDeserializer::isFeatureSupported(antlrcpp::UUID *feature, antlrcpp::UUID *actualUuid) {
-                        // TODO: should SUPPORTED_UUIDS be of type std::vector<UUID> instead?
-                        /*int featureIndex = SUPPORTED_UUIDS.find(feature);
-                        if (featureIndex < 0) {
-                            return false;
-                        }
-
-                        return SUPPORTED_UUIDS.find(actualUuid) >= featureIndex;*/
+                    bool ATNDeserializer::isFeatureSupported(const Guid &feature, const Guid &actualUuid) {
+                      auto featureIterator = std::find(SUPPORTED_UUIDS.begin(), SUPPORTED_UUIDS.end(), feature);
+                      if (featureIterator == SUPPORTED_UUIDS.end()) {
                         return false;
+                      }
+                      auto actualIterator = std::find(SUPPORTED_UUIDS.begin(), SUPPORTED_UUIDS.end(), actualUuid);
+                      if (actualIterator == SUPPORTED_UUIDS.end()) {
+                        return false;
+                      }
+
+                      return std::distance(featureIterator, actualIterator) >= 0;
                     }
 
-                    ATN *ATNDeserializer::deserialize(const std::wstring& _data) {
-                        // TODO: data = data->clone();
-                        // don't adjust the first value since that's the version number
-						std::wstring data = _data;
-                        for (size_t i = 1; i < sizeof(data) / sizeof(data[0]); i++) {
-                            data[i] = static_cast<wchar_t>(data[i] - 2);
+                    ATN *ATNDeserializer::deserialize(const std::wstring& input) {
+                        // Don't adjust the first value since that's the version number.
+                      wchar_t data[input.size()];
+                      data[0] = input[0];
+                        for (size_t i = 1; i < input.size(); ++i) {
+                            data[i] = input[i] - 2;
                         }
 
                         int p = 0;
-                        int version = toInt(data[p++]);
+                        int version = data[p++];
                         if (version != SERIALIZED_VERSION) {
                             std::wstring reason = L"Could not deserialize ATN with version" + std::to_wstring(version) + L"(expected " + std::to_wstring(SERIALIZED_VERSION) + L").";
                             
                             throw UnsupportedOperationException(reason);
                         }
 
-                        antlrcpp::UUID *uuid = toUUID(data, p);
+                        Guid uuid = toUUID(data, p);
+                      auto uuidIterator = std::find(SUPPORTED_UUIDS.begin(), SUPPORTED_UUIDS.end(), uuid);
                         p += 8;
-                        if (!uuid->equals(SERIALIZED_UUID) && !uuid->equals(BASE_SERIALIZED_UUID)) {
+                        if (uuidIterator == SUPPORTED_UUIDS.end()) {
                             std::wstring reason = L"Could not deserialize ATN with UUID " +
-                            uuid->toString() + L" (expected " + SERIALIZED_UUID->toString() +
+                            s2ws(uuid.toString()) + L" (expected " + s2ws(SERIALIZED_UUID.toString()) +
                             L" or a legacy UUID).";
                             
                             throw UnsupportedOperationException(reason);
@@ -126,59 +133,59 @@ namespace org {
 
                         bool supportsPrecedencePredicates = isFeatureSupported(ADDED_PRECEDENCE_TRANSITIONS, uuid);
 
-                        ATNType grammarType = (ATNType)toInt(data[p++]);
-                        int maxTokenType = toInt(data[p++]);
+                        ATNType grammarType = (ATNType)data[p++];
+                        int maxTokenType = data[p++];
                         ATN *atn = new ATN(grammarType, maxTokenType);
 
                         //
                         // STATES
                         //
-                        std::vector<std::pair<LoopEndState*, int>*> loopBackStateNumbers = std::vector<std::pair<LoopEndState*, int>*>();
-                        std::vector<std::pair<BlockStartState*, int>*> endStateNumbers = std::vector<std::pair<BlockStartState*, int>*>();
-                        int nstates = toInt(data[p++]);
+                        std::vector<std::pair<LoopEndState*, int>> loopBackStateNumbers;
+                        std::vector<std::pair<BlockStartState*, int>> endStateNumbers;
+                        int nstates = data[p++];
                         for (int i = 0; i < nstates; i++) {
-                            int stype = toInt(data[p++]);
+                            int stype = data[p++];
                             // ignore bad type of states
                             if (stype == ATNState::ATN_INVALID_TYPE) {
                                 atn->addState(nullptr);
                                 continue;
                             }
 
-                            int ruleIndex = toInt(data[p++]);
+                            int ruleIndex = data[p++];
                             if (ruleIndex == WCHAR_MAX) {
                                 ruleIndex = -1;
                             }
 
                             ATNState *s = stateFactory(stype, ruleIndex);
                             if (stype == ATNState::LOOP_END) { // special case
-                                int loopBackStateNumber = toInt(data[p++]);
-                                loopBackStateNumbers.push_back(new std::pair<LoopEndState*, int>((LoopEndState*) s,  loopBackStateNumber));
-                            } else if (/*dynamic_cast<BlockStartState*>(*/s/*)*/ != nullptr) {
-                                int endStateNumber = toInt(data[p++]);
-                                endStateNumbers.push_back(new std::pair<BlockStartState*, int>((BlockStartState*) s, endStateNumber));
+                                int loopBackStateNumber = data[p++];
+                              loopBackStateNumbers.push_back({ (LoopEndState*) s,  loopBackStateNumber });
+                            } else if (s != nullptr) {
+                              int endStateNumber = data[p++];
+                              endStateNumbers.push_back({ (BlockStartState*) s, endStateNumber });
                             }
                             atn->addState(s);
                         }
 
                         // delay the assignment of loop back and end states until we know all the state instances have been initialized
-                        for (auto pair : loopBackStateNumbers) {
-                            pair->first->loopBackState = atn->states.at(pair->second);
+                        for (auto &pair : loopBackStateNumbers) {
+                            pair.first->loopBackState = atn->states.at(pair.second);
                         }
 
-                        for (auto pair : endStateNumbers) {
-                            pair->first->endState = (BlockEndState*)atn->states.at(pair->second);
+                        for (auto &pair : endStateNumbers) {
+                            pair.first->endState = (BlockEndState*)atn->states.at(pair.second);
                         }
 
-                        int numNonGreedyStates = toInt(data[p++]);
+                        int numNonGreedyStates = data[p++];
                         for (int i = 0; i < numNonGreedyStates; i++) {
-                            int stateNumber = toInt(data[p++]);
+                            int stateNumber = data[p++];
                             ((DecisionState*)atn->states.at(stateNumber) /*static_cast<DecisionState*>(atn->states[stateNumber])*/)->nonGreedy = true;
                         }
 
                         if (supportsPrecedencePredicates) {
-                            int numPrecedenceStates = toInt(data[p++]);
+                            int numPrecedenceStates = data[p++];
                             for (int i = 0; i < numPrecedenceStates; i++) {
-                                int stateNumber = toInt(data[p++]);
+                                int stateNumber = data[p++];
                                 (dynamic_cast<RuleStartState*>(atn->states[stateNumber]))->isPrecedenceRule = true;
                             }
                         }
@@ -186,24 +193,24 @@ namespace org {
                         //
                         // RULES
                         //
-                        int nrules = toInt(data[p++]);
+                        int nrules = data[p++];
                         if (atn->grammarType == ATNType::LEXER) {
                             atn->ruleToTokenType = new int[nrules];
                             atn->ruleToActionIndex = new int[nrules];
                         }
 
                         for (int i = 0; i < nrules; i++) {
-                            int s = toInt(data[p++]);
+                            int s = data[p++];
                             RuleStartState *startState = /*static_cast<RuleStartState*>*/(RuleStartState*)atn->states.at(s);
                             atn->ruleToStartState.push_back(startState);
                             if (atn->grammarType == ATNType::LEXER) {
-                                int tokenType = toInt(data[p++]);
+                                int tokenType = data[p++];
                                 if (tokenType == 0xFFFF) {
                                     tokenType = Token::_EOF;
                                 }
 
                                 atn->ruleToTokenType[i] = tokenType;
-                                int actionIndex = toInt(data[p++]);
+                                int actionIndex = data[p++];
                                 if (actionIndex == 0xFFFF) {
                                     actionIndex = -1;
                                 }
@@ -226,10 +233,10 @@ namespace org {
                         //
                         // MODES
                         //
-                        int nmodes = toInt(data[p++]);
+                        int nmodes = data[p++];
                         for (int i = 0; i < nmodes; i++) {
                             // TODO: really?  atn->modeToStartState is const
-                            //int s = toInt(data[p++]);
+                            //int s = data[p++];
                             // atn->modeToStartState.push_back(static_cast<TokensStartState*>(atn->states[s]));
                         }
 
@@ -237,22 +244,22 @@ namespace org {
                         // SETS
                         //
                         std::vector<misc::IntervalSet*> sets = std::vector<misc::IntervalSet*>();
-                        int nsets = toInt(data[p++]);
+                        int nsets = data[p++];
                         for (int i = 0; i < nsets; i++) {
-                            int nintervals = toInt(data[p]);
+                            int nintervals = data[p];
                             p++;
                             // TODO IntervalSet does not have a default constructor
                             //IntervalSet *set = new IntervalSet();
                             misc::IntervalSet *set = nullptr;
                             sets.push_back(set);
 
-                            bool containsEof = toInt(data[p++]) != 0;
+                            bool containsEof = data[p++] != 0;
                             if (containsEof) {
                                 set->add(-1);
                             }
 
                             for (int j = 0; j < nintervals; j++) {
-                                set->add(toInt(data[p]), toInt(data[p + 1]));
+                                set->add(data[p], data[p + 1]);
                                 p += 2;
                             }
                         }
@@ -260,14 +267,14 @@ namespace org {
                         //
                         // EDGES
                         //
-                        int nedges = toInt(data[p++]);
+                        int nedges = data[p++];
                         for (int i = 0; i < nedges; i++) {
-                            int src = toInt(data[p]);
-                            int trg = toInt(data[p + 1]);
-                            int ttype = toInt(data[p + 2]);
-                            int arg1 = toInt(data[p + 3]);
-                            int arg2 = toInt(data[p + 4]);
-                            int arg3 = toInt(data[p + 5]);
+                            int src = data[p];
+                            int trg = data[p + 1];
+                            int ttype = data[p + 2];
+                            int arg1 = data[p + 3];
+                            int arg2 = data[p + 4];
+                            int arg3 = data[p + 5];
                             Transition *trans = edgeFactory(atn, ttype, src, trg, arg1, arg2, arg3, sets);
                                         //			System.out.println("EDGE "+trans.getClass().getSimpleName()+" "+
                                         //							   src+"->"+trg+
@@ -329,9 +336,9 @@ namespace org {
                         //
                         // DECISIONS
                         //
-                        int ndecisions = toInt(data[p++]);
+                        int ndecisions = data[p++];
                         for (int i = 1; i <= ndecisions; i++) {
-                            int s = toInt(data[p++]);
+                            int s = data[p++];
                             DecisionState *decState = static_cast<DecisionState*>(atn->states[s]);
                             // TODO: decisionToState was originally declared as const in ATN
                             atn->decisionToState.push_back(decState);
@@ -506,23 +513,8 @@ namespace org {
                         }
                     }
 
-                    int ATNDeserializer::toInt(wchar_t c) {
-                        return c;
-                    }
-
-                    int ATNDeserializer::toInt32(const std::wstring& data, int offset) {
-                        return static_cast<int>(data[offset]) | (static_cast<int>(data[offset + 1]) << 16);
-                    }
-
-                    long long ATNDeserializer::toLong(const std::wstring& data, int offset) {
-                        long long lowOrder = toInt32(data, offset) & 0x00000000FFFFFFFFLL;
-                        return lowOrder | (static_cast<long long>(toInt32(data, offset + 2)) << 32);
-                    }
-
-                    antlrcpp::UUID *ATNDeserializer::toUUID(const std::wstring& data, int offset) {
-                        long long leastSigBits = toLong(data, offset);
-                        long long mostSigBits = toLong(data, offset + 4);
-                        return new antlrcpp::UUID(mostSigBits, leastSigBits);
+                    Guid ATNDeserializer::toUUID(const wchar_t *data, int offset) {
+                        return Guid((uint32_t *)data + offset, true);
                     }
 
                     Transition *ATNDeserializer::edgeFactory(ATN *atn, int type, int src, int trg, int arg1, int arg2, int arg3, std::vector<misc::IntervalSet*> &sets) {
@@ -612,10 +604,11 @@ namespace org {
                         return s;
                     }
 
-                    std::vector<antlrcpp::UUID*> ATNDeserializer::supportedUUIDsInitializer() {
-                        std::vector<antlrcpp::UUID*> supportedUUIDs;
+                    std::vector<Guid> ATNDeserializer::supportedUUIDsInitializer() {
+                        std::vector<Guid> supportedUUIDs;
                         supportedUUIDs.push_back(BASE_SERIALIZED_UUID);
                         supportedUUIDs.push_back(ADDED_PRECEDENCE_TRANSITIONS);
+                      supportedUUIDs.push_back(ADDED_LEXER_ACTIONS);
 
                         return supportedUUIDs;
                     }

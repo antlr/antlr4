@@ -84,8 +84,6 @@ private:
   static std::vector\<std::wstring> _modeNames;
   <atn>
   
-  atn::LexerATNSimulator *_interpreter;
-  
   <if (namedActions.members)><namedActions.members>
   <endif>
 
@@ -191,6 +189,8 @@ std::vector\<std::wstring> <lexer.name>::_tokenNames = { <! TODO: replace by voc
 <lexer.name>::Initializer::Initializer() {
   <atn>
 }
+
+TLexer::Initializer TLexer::_init;
 >>
 
 RuleActionFunctionHeader(r, actions) ::= <<
@@ -247,6 +247,8 @@ public:
   ~<parser.name>();
 
   virtual std::wstring getGrammarFileName() const override;
+  virtual atn::ATN *getATN() const override { return _atn; };
+  virtual const std::vector\<std::wstring>& getTokenNames() const override { return _tokenNames; }; // TODO: use vocabulary instead.
   virtual const std::vector\<std::wstring>& getRuleNames() const override;
  
   <if(namedActions.members)><namedActions.members><endif>
@@ -263,9 +265,8 @@ private:
   static std::vector\<dfa::DFA*> _decisionToDFA;
   static atn::PredictionContextCache _sharedContextCache;
   static std::vector\<std::wstring> _ruleNames;
+  static std::vector\<std::wstring> _tokenNames;
   <atn>
-  
-  atn::ParserATNSimulator *_interpreter;
   
   struct Initializer {
     Initializer();
@@ -319,9 +320,15 @@ std::vector\<std::wstring> <parser.name>::_ruleNames = {
     <parser.ruleNames: {r | L"<r>"}; separator = ", ", wrap, anchor>
 };
 
+std::vector\<std::wstring> <parser.name>::_tokenNames = {
+    <parser.tokenNames: {t | L<t>}; separator = ", ", wrap, anchor>
+};
+
 <parser.name>::Initializer::Initializer() {
   <atn>
 }
+
+TParser::Initializer TParser::_init;
 >>
 
 SerializedATNHeader(model) ::= <<
@@ -342,7 +349,8 @@ _serializedATN = Utils.join(
 );
 <else>
 <! only one segment, can be inlined !>
-_serializedATN = L"<model.serialized; wrap = {"<\n>  "}>";
+_serializedATN =
+  L"<model.serialized; wrap = {"<\n>  "}>";
 <endif>
 
 atn::ATNDeserializer deserializer;

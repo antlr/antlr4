@@ -343,6 +343,7 @@ namespace org {
                 }
 
                 void Lexer::InitializeInstanceFields() {
+                  _token = nullptr;
                     _factory = CommonTokenFactory::DEFAULT;
                     _tokenStartCharIndex = -1;
                     _tokenStartLine = 0;

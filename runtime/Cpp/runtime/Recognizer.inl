@@ -194,12 +194,13 @@ namespace org {
                 template<typename T1, typename T2>
                 void Recognizer<T1, T2>::InitializeInstanceFields() {
                     _stateNumber = -1;
+                  _interpreter = nullptr;
+                  _listeners = std::vector<ANTLRErrorListener*>();
                 }
                 
                 template<typename T1, typename T2>
                 Recognizer<T1, T2>::Recognizer() {
                     InitializeInstanceFields();
-                    _listeners = std::vector<ANTLRErrorListener*>();
                 }
                 
 #ifdef TODO

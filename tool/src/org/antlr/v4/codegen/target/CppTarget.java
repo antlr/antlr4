@@ -181,16 +181,13 @@ public class CppTarget extends Target {
 			return targetCharValueEscape[v];
 		}
 
-		if (v < 0x20) {
-			return "\\" + Integer.toOctalString(v);
+		if (v >= 0x20 && v < 127 && (!Character.isDigit(v) || v == '8' || v == '9')) {
+			return String.valueOf((char)v);
 		}
 
-        // We could simply return the char as string here as we use a wstring on C++ side,
-        // but that would require to store the files in a Unicode encoding, which might not always
-        // be desirable. Instead we only print ASCII chars directly and encode the rest as
-        // Unicode escape sequence.
-		if (v < 127) {
-			return String.valueOf((char)v);
+		if ( v>=0 && v<=127 ) {
+			String oct = Integer.toOctalString(v);
+			return "\\"+ oct;
 		}
 
 		String hex = Integer.toHexString(v | 0x10000).substring(1, 5);

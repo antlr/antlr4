@@ -57,6 +57,8 @@ namespace org {
                 template<typename Symbol, typename ATNInterpreter>
                 class Recognizer : public IRecognizer<Symbol, ATNInterpreter> {
                 public:
+                  Recognizer();
+                public:
                     static const int _EOF = -1;
 
                 private:
@@ -77,7 +79,7 @@ namespace org {
 #endif
 
                 protected:
-                    ATNInterpreter _interp;
+                  ATNInterpreter _interpreter; // Set and deleted in descentants.
 
                 private:
                     int _stateNumber;
@@ -136,16 +138,17 @@ namespace org {
                     /// </summary>
                     /// <returns> The ATN interpreter used by the recognizer for prediction. </returns>
                     virtual ATNInterpreter getInterpreter() const {
-                        return _interp;
+                        return _interpreter;
                     }
 
+                  // TODO: probably obsolete function. _interpreter is a protected member directly managed by descendants.
                     /// <summary>
                     /// Set the ATN interpreter used by the recognizer for prediction.
                     /// </summary>
                     /// <param name="interpreter"> The ATN interpreter used by the recognizer for
                     /// prediction. </param>
                     virtual void setInterpreter(ATNInterpreter interpreter) {
-                        _interp = interpreter;
+                        _interpreter = interpreter;
                     }
 
                     /// <summary>
@@ -208,8 +211,6 @@ namespace org {
                 private:
                     void InitializeInstanceFields();
 
-                public:
-                    Recognizer();
                 };
 
             }
