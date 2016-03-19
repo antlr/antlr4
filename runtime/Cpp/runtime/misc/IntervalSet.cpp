@@ -50,17 +50,19 @@ namespace org {
                     IntervalSet *const IntervalSet::COMPLETE_CHAR_SET = IntervalSet::of(0, runtime::Lexer::MAX_CHAR_VALUE);
                     IntervalSet *const IntervalSet::EMPTY_SET = new IntervalSet(0);
 
-                    IntervalSet::IntervalSet(std::vector<Interval*> &intervals) {
-                        InitializeInstanceFields();
+                  IntervalSet::IntervalSet() {
+                    InitializeInstanceFields();
+                  }
+
+                  IntervalSet::IntervalSet(std::vector<Interval*> &intervals) : IntervalSet() {
                         this->intervals = intervals;
                     }
 
-                    IntervalSet::IntervalSet(IntervalSet *set) {
+                    IntervalSet::IntervalSet(IntervalSet *set) : IntervalSet() {
                         addAll(set);
                     }
 
-                    IntervalSet::IntervalSet(int n, ...) {
-                        InitializeInstanceFields();
+                    IntervalSet::IntervalSet(int n, ...) : IntervalSet() {
                         va_list vlist;
                         va_start(vlist, n);
                         

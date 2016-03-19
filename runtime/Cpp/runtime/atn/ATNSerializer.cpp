@@ -174,10 +174,10 @@ namespace org {
 							}
 						}
 
-						size_t nmodes = atn->modeToStartState->size();
+						size_t nmodes = atn->modeToStartState.size();
 						data->push_back(nmodes);
 						if (nmodes > 0) {
-							for (const auto& modeStartState : *atn->modeToStartState) {
+							for (const auto &modeStartState : atn->modeToStartState) {
 								data->push_back(modeStartState->stateNumber);
 							}
 						}

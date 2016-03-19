@@ -91,7 +91,7 @@ namespace org {
                             epsilonOnlyTransitions = false;
                         }
                         
-                        transitions[index] = e;
+                        transitions.insert(transitions.begin() + index, e);
                     }
                     
                     atn::Transition *ATNState::transition(int i) {

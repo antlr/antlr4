@@ -52,13 +52,13 @@ namespace org {
                         return static_cast<ATNConfig*>(o);
                     }
 
-                    std::vector<std::vector<ATNConfig*>> *
+                    std::vector<std::vector<ATNConfig*>>
                     ATNConfigSet::AbstractConfigHashSet::createBuckets(int capacity) {
-                        return new std::vector<std::vector<ATNConfig*>>();
+                        return std::vector<std::vector<ATNConfig*>>();
                     }
 
-                    std::vector<ATNConfig*> *ATNConfigSet::AbstractConfigHashSet::createBucket(int capacity) {
-                        return new std::vector<ATNConfig*>();
+                    std::vector<ATNConfig*> ATNConfigSet::AbstractConfigHashSet::createBucket(int capacity) {
+                        return std::vector<ATNConfig*>(capacity);
                     }
 
                     ATNConfigSet::ConfigHashSet::ConfigHashSet() : AbstractConfigHashSet(ConfigEqualityComparator::INSTANCE) {
@@ -295,8 +295,8 @@ namespace org {
                         return buf->toString();
                     }
 
-                    ATNConfig *ATNConfigSet::toArray() {
-                        return (ATNConfig*)configLookup->toArray();
+                  std::vector<ATNConfig *> ATNConfigSet::toArray() {
+                        return configLookup->toArray();
                     }
 
 

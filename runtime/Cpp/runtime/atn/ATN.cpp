@@ -43,7 +43,7 @@ namespace org {
             namespace runtime {
                 namespace atn {
                     //, states(new std::vector<ATNState*>()), decisionToState(new std::vector<DecisionState*>())
-                    ATN::ATN(ATNType grammarType, int maxTokenType) : grammarType(grammarType), maxTokenType(maxTokenType), modeNameToStartState(new std::map<std::wstring, TokensStartState*>()), modeToStartState(new std::vector<TokensStartState*>()) {
+                    ATN::ATN(ATNType grammarType, int maxTokenType) : grammarType(grammarType), maxTokenType(maxTokenType), modeNameToStartState(new std::map<std::wstring, TokensStartState*>()) {
                     }
 
                     org::antlr::v4::runtime::misc::IntervalSet *ATN::nextTokens(ATNState *s, RuleContext *ctx) {

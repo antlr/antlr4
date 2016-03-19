@@ -90,8 +90,7 @@ namespace org {
                         /// <seealso cref="ATNDeserializationOptions#isGenerateRuleBypassTransitions"/>
                         /// deserialization option was specified; otherwise, this is {@code null}.
                         /// </summary>
-                        // TODO: Memory Management
-                        int *ruleToTokenType;
+                      std::vector<int> ruleToTokenType;
 
                         /// <summary>
                         /// For lexer ATNs, this maps the rule index to the action which should be
@@ -99,10 +98,9 @@ namespace org {
                         /// <p/>
                         /// This is {@code null} for parser ATNs.
                         /// </summary>
-                        // TODO: Memory Management
-                        int *ruleToActionIndex;
+                      std::vector<int> ruleToActionIndex;
 
-                        const std::vector<TokensStartState*> * modeToStartState;
+                        std::vector<TokensStartState*> modeToStartState;
 
                         /// <summary>
                         /// Used for runtime deserialization of ATNs from strings </summary>

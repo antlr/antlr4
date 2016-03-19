@@ -54,6 +54,26 @@ namespace org {
                     /// <seealso cref="Set"/> implementation with closed hashing (open addressing). </summary>
                     template<typename T>
                     class Array2DHashSet : public std::set<T> {
+                    public:
+                      static const int INITAL_CAPACITY = 16; // must be power of 2
+                      static const int INITAL_BUCKET_CAPACITY = 8;
+                      static const double LOAD_FACTOR;
+
+                      Array2DHashSet();
+                      Array2DHashSet(AbstractEqualityComparator<T> *comparator);
+                      Array2DHashSet(AbstractEqualityComparator<T> *comparator,
+                                     int initialCapacity, int initialBucketCapacity);
+
+                      /// <summary>
+                      /// Add {@code o} to set if not there; return existing value if already
+                      /// there. This method performs the same operation as <seealso cref="#add"/> aside from
+                      /// the return value.
+                      /// </summary>
+                      T getOrAdd(T o);
+                      virtual T get(T o);
+                      virtual int hashCode();
+                      virtual bool equals(T o);
+
                     protected:
                         // Daughter iterator class
                         class SetIterator : public std::iterator<std::random_access_iterator_tag, T> {
@@ -84,13 +104,8 @@ namespace org {
                             void InitializeInstanceFields();
                         };
                         
-                    public:
-                        static const int INITAL_CAPACITY = 16; // must be power of 2
-                        static const int INITAL_BUCKET_CAPACITY = 8;
-                        static const double LOAD_FACTOR;
 
-                    protected:
-                        AbstractEqualityComparator<T> *const comparator;
+                        AbstractEqualityComparator<T> *const _comparator;
                         
                         std::vector<std::vector<T>> buckets;
 
@@ -102,40 +117,8 @@ namespace org {
 
                         int currentPrime; // jump by 4 primes each expand or whatever
                         int initialBucketCapacity;
-
-                    public:
-                        Array2DHashSet() : comparator(nullptr) {
-                            //this(nullptr, INITAL_CAPACITY, INITAL_BUCKET_CAPACITY);
-                        }
-                        template<typename T1>
-                        Array2DHashSet(AbstractEqualityComparator<T1> *comparator);
-                        
-                        template<typename T1>
-                        Array2DHashSet(AbstractEqualityComparator<T1> *comparator,
-                                       int initialCapacity, int initialBucketCapacity);
-
-                        /// <summary>
-                        /// Add {@code o} to set if not there; return existing value if already
-                        /// there. This method performs the same operation as <seealso cref="#add"/> aside from
-                        /// the return value.
-                        /// </summary>
-                        T getOrAdd(T o);
-
-                    protected:
                         virtual T getOrAddImpl(T o);
-
-                    public:
-                        virtual T get(T o);
-
-                    protected:
                         int getBucket(T o);
-
-                    public:
-                        virtual int hashCode();
-
-                        virtual bool equals(T o);
-
-                    protected:
                         virtual void expand();
 
                     public:
@@ -151,7 +134,7 @@ namespace org {
 
                         virtual std::iterator<std::random_access_iterator_tag, T> *iterator();
 
-                        virtual std::vector<T> *toArray();
+                        virtual std::vector<T> toArray();
 
                         template<typename U>
                         U *toArray(U a[]);
@@ -200,14 +183,14 @@ namespace org {
                         /// </summary>
                         /// <param name="capacity"> the length of the array to return </param>
                         /// <returns> the newly constructed array </returns>
-                        virtual std::vector<std::vector<T>> * createBuckets(int capacity);
+                        virtual std::vector<std::vector<T>> createBuckets(int capacity);
 
                         /// <summary>
                         /// Return an array of {@code T} with length {@code capacity}.
                         /// </summary>
                         /// <param name="capacity"> the length of the array to return </param>
                         /// <returns> the newly constructed array </returns>
-                        virtual std::vector<T> * createBucket(int capacity);
+                        virtual std::vector<T> createBucket(int capacity);
 
 
                     private:

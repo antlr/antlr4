@@ -74,6 +74,7 @@ namespace org {
                         bool readonly;
 
                     public:
+                      IntervalSet();
                         IntervalSet(std::vector<Interval*> &intervals);
 
                         IntervalSet(IntervalSet *set); //this();

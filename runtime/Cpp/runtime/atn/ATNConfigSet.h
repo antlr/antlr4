@@ -70,9 +70,9 @@ namespace org {
                         protected:
                             ATNConfig *asElementType(void *o) override;
 
-                            std::vector<std::vector<ATNConfig*>> *createBuckets(int capacity) override;
+                            std::vector<std::vector<ATNConfig*>> createBuckets(int capacity) override;
 
-                            std::vector<ATNConfig*> *createBucket(int capacity) override;
+                            std::vector<ATNConfig*> createBucket(int capacity) override;
 
                         };
                         /// <summary>
@@ -209,7 +209,7 @@ namespace org {
 
                         // satisfy interface
 
-                        virtual ATNConfig *toArray();
+                      virtual std::vector<ATNConfig*> toArray();
 
                         template<typename T>
                         T *toArray(T a[])  {

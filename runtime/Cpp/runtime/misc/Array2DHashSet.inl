@@ -38,6 +38,26 @@ namespace org {
                     template<typename T>
                     const double Array2DHashSet<T>::LOAD_FACTOR = 0.75;
 
+                  template<typename T>
+                  Array2DHashSet<T>::Array2DHashSet() : Array2DHashSet<T>(nullptr, INITAL_CAPACITY, INITAL_BUCKET_CAPACITY) {
+                  }
+
+                  template<typename T>
+                  Array2DHashSet<T>::Array2DHashSet(AbstractEqualityComparator<T> *comparator) : Array2DHashSet<T>(comparator, INITAL_CAPACITY, INITAL_BUCKET_CAPACITY) {
+                  }
+
+                  template<typename T>
+                  Array2DHashSet<T>::Array2DHashSet(AbstractEqualityComparator<T> *comparator, int initialCapacity, int initialBucketCapacity)
+                  //: _comparator(comparator == nullptr ? ObjectEqualityComparator::INSTANCE : comparator)
+                  : _comparator(nullptr)
+                  {
+                    InitializeInstanceFields();
+
+                    buckets = createBuckets(initialCapacity);
+                    this->initialBucketCapacity = initialBucketCapacity;
+                  }
+
+
                     template<typename T>
                     Array2DHashSet<T>::SetIterator::SetIterator(Array2DHashSet<T*> *const outerInstance, T data[])
                     : data(data), outerInstance(outerInstance) {
@@ -76,23 +96,6 @@ namespace org {
                     }
                     
                     template<typename T>
-                    template<typename T1>
-                    Array2DHashSet<T>::Array2DHashSet(AbstractEqualityComparator<T1> *comparator) { //this(comparator, INITAL_CAPACITY, INITAL_BUCKET_CAPACITY);
-                    }
-                    
-                    template<typename T>
-                    template<typename T1>
-                    Array2DHashSet<T>::Array2DHashSet(AbstractEqualityComparator<T1> *comparator, int initialCapacity, int initialBucketCapacity) : comparator(ObjectEqualityComparator::INSTANCE) {
-                        InitializeInstanceFields();
-                        if (comparator == nullptr) {
-                        }
-                        
-                        this->comparator = comparator;
-                        this->buckets = createBuckets(initialCapacity);
-                        this->initialBucketCapacity = initialBucketCapacity;
-                    }
-                    
-                    template<typename T>
                     T Array2DHashSet<T>::getOrAdd(T o) {
                         if (n > threshold) {
                             expand();
@@ -103,31 +106,31 @@ namespace org {
                     template<typename T>
                     T Array2DHashSet<T>::getOrAddImpl(T o) {
                         int b = getBucket(o);
-                        std::vector<T> * bucket = &buckets[b];
+                        std::vector<T> bucket = buckets[b];
                         
                         // NEW BUCKET
-                        if (bucket->size() == 0) {
+                        if (bucket.size() == 0) {
                             bucket = createBucket(initialBucketCapacity);
-                            (*bucket)[0] = o;
-                            buckets[b] = *bucket;
+                            bucket[0] = o;
+                            buckets[b] = bucket;
                             n++;
                             return o;
                         }
                         
                         // LOOK FOR IT IN BUCKET
-                        for (int i = 0; i < (int)bucket->size(); i++) {
-                            T existing = (*bucket)[i];
+                        for (int i = 0; i < (int)bucket.size(); i++) {
+                            T existing = bucket[i];
                             if (existing == nullptr) { // empty slot; not there, add.
-                                (*bucket)[i] = o;
+                                bucket[i] = o;
                                 n++;
                                 return o;
                             }
-                            if (comparator->equals(existing, o)) { // found existing, quit
+                            if (_comparator->equals(existing, o)) { // found existing, quit
                                 return existing;
                             }
                         }
                         
-                        bucket->insert(bucket->end(), o);
+                        bucket.insert(bucket.end(), o);
                         n++;
                         return o;
                     }
@@ -146,7 +149,7 @@ namespace org {
                             if (e == nullptr) { // empty slot; not there
                                 return nullptr;
                             }
-                            if (comparator->equals(e, o)) {
+                            if (_comparator->equals(e, o)) {
                                 return e;
                             }
                         }
@@ -155,7 +158,7 @@ namespace org {
                     
                     template<typename T>
                     int Array2DHashSet<T>::getBucket(T o) {
-                        int hash = comparator->hashCode(o);
+                        int hash = _comparator->hashCode(o);
                         int b = hash & (buckets.size() - 1); // assumes len is power of 2
                         return b;
                     }
@@ -171,7 +174,7 @@ namespace org {
                                 if (o == nullptr) {
                                     break;
                                 }
-                                hash = MurmurHash::update(hash, comparator->hashCode(o));
+                                hash = MurmurHash::update(hash, _comparator->hashCode(o));
                             }
                         }
                         
@@ -205,9 +208,9 @@ namespace org {
                         std::vector<std::vector<T>> old = buckets;
                         currentPrime += 4;
                         int newCapacity = (int)buckets.size() * 2;
-                        std::vector<std::vector<T>> *newTable = createBuckets(newCapacity);
+                        std::vector<std::vector<T>> newTable = createBuckets(newCapacity);
 						std::vector<int> newBucketLengths;
-                        buckets = *newTable;
+                        buckets = newTable;
                         threshold = static_cast<int>(newCapacity * LOAD_FACTOR);
                         //		System.out.println("new size="+newCapacity+", thres="+threshold);
                         // rehash all existing entries
@@ -224,20 +227,19 @@ namespace org {
                                 
                                 int b = getBucket(o);
                                 int bucketLength = newBucketLengths[b];
-                                std::vector<T> *newBucket;
+                                std::vector<T> newBucket;
                                 if (bucketLength == 0) {
                                     // new bucket
                                     newBucket = createBucket(initialBucketCapacity);
-                                    (*newTable)[b] = *newBucket;
+                                    newTable[b] = newBucket;
                                 } else {
-                                    // TODO, dammit is this right?
-                                    newBucket = &(*newTable)[b];
-                                    if (bucketLength == newBucket->size()) {
-                                        (*newTable)[b] = *newBucket;
+                                    newBucket = newTable[b];
+                                    if (bucketLength == newBucket.size()) {
+                                        newTable[b] = newBucket;
                                     }
                                 }
                                 
-                                (*newBucket)[bucketLength] = o;
+                                newBucket[bucketLength] = o;
                                 newBucketLengths[b]++;
                             }
                         }
@@ -288,8 +290,8 @@ namespace org {
                     }
                     
                     template<typename T>
-                    std::vector<T> *Array2DHashSet<T>::toArray()  {
-                        std::vector<T> *a = createBucket(size());
+                    std::vector<T> Array2DHashSet<T>::toArray()  {
+                        std::vector<T> a = createBucket(size());
                         int i = 0;
                         for (auto bucket : buckets) {
                             if (bucket.size() == 0) {
@@ -301,7 +303,7 @@ namespace org {
                                     break;
                                 }
                                 
-                                (*a)[i++] = o;
+                                a[i++] = o;
                             }
                         }
                         
@@ -358,7 +360,7 @@ namespace org {
                                 return false;
                             }
                             
-                            if (comparator->equals(e, obj)) { // found it
+                            if (_comparator->equals(e, obj)) { // found it
                                 // shift all elements to the right down one
                                 //System::arraycopy(bucket, i + 1, bucket, i, bucket->length - i - 1);
                                 for (int j = i; j < (int)bucket.size() - i - 1; j++) {
@@ -539,8 +541,8 @@ namespace org {
                     /// <param name="capacity"> the length of the array to return </param>
                     /// <returns> the newly constructed array </returns>
                     template<typename T>
-                    std::vector<std::vector<T>> *Array2DHashSet<T>::createBuckets(int capacity) {
-                        return new std::vector<std::vector<T>>();
+                    std::vector<std::vector<T>> Array2DHashSet<T>::createBuckets(int capacity) {
+                        return std::vector<std::vector<T>>(capacity);
                     }
                     
                     /// <summary>
@@ -549,13 +551,13 @@ namespace org {
                     /// <param name="capacity"> the length of the array to return </param>
                     /// <returns> the newly constructed array </returns>
                     template<typename T>
-                    std::vector<T> * Array2DHashSet<T>::createBucket(int capacity) {
-                        return new std::vector<T>();
+                    std::vector<T> Array2DHashSet<T>::createBucket(int capacity) {
+                        return std::vector<T>(capacity);
                     }
                     
                     template<typename T>
                     void Array2DHashSet<T>::clear() {
-                        buckets = *createBuckets(INITAL_CAPACITY);
+                        buckets = createBuckets(INITAL_CAPACITY);
                         n = 0;
                     }
                     

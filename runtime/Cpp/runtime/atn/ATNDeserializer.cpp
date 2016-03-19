@@ -160,7 +160,7 @@ namespace org {
                             if (stype == ATNState::LOOP_END) { // special case
                                 int loopBackStateNumber = data[p++];
                               loopBackStateNumbers.push_back({ (LoopEndState*) s,  loopBackStateNumber });
-                            } else if (s != nullptr) {
+                            } else if (dynamic_cast<BlockStartState*>(s) != nullptr) {
                               int endStateNumber = data[p++];
                               endStateNumbers.push_back({ (BlockStartState*) s, endStateNumber });
                             }
@@ -179,14 +179,16 @@ namespace org {
                         int numNonGreedyStates = data[p++];
                         for (int i = 0; i < numNonGreedyStates; i++) {
                             int stateNumber = data[p++];
-                            ((DecisionState*)atn->states.at(stateNumber) /*static_cast<DecisionState*>(atn->states[stateNumber])*/)->nonGreedy = true;
+                          // The serialized ATN must be specifying the right states, so that the
+                          // cast below is correct.
+                            ((DecisionState *)atn->states.at(stateNumber))->nonGreedy = true;
                         }
 
                         if (supportsPrecedencePredicates) {
                             int numPrecedenceStates = data[p++];
                             for (int i = 0; i < numPrecedenceStates; i++) {
                                 int stateNumber = data[p++];
-                                (dynamic_cast<RuleStartState*>(atn->states[stateNumber]))->isPrecedenceRule = true;
+                                ((RuleStartState *)atn->states.at(stateNumber))->isPrecedenceRule = true;
                             }
                         }
 
@@ -195,13 +197,14 @@ namespace org {
                         //
                         int nrules = data[p++];
                         if (atn->grammarType == ATNType::LEXER) {
-                            atn->ruleToTokenType = new int[nrules];
-                            atn->ruleToActionIndex = new int[nrules];
+                            atn->ruleToTokenType.resize(nrules);
+                            atn->ruleToActionIndex.resize(nrules);
                         }
 
                         for (int i = 0; i < nrules; i++) {
                             int s = data[p++];
-                            RuleStartState *startState = /*static_cast<RuleStartState*>*/(RuleStartState*)atn->states.at(s);
+                          // Also here, the serialized atn must ensure to point to the correct class type.
+                          RuleStartState *startState = (RuleStartState*)atn->states.at(s);
                             atn->ruleToStartState.push_back(startState);
                             if (atn->grammarType == ATNType::LEXER) {
                                 int tokenType = data[p++];
@@ -235,22 +238,19 @@ namespace org {
                         //
                         int nmodes = data[p++];
                         for (int i = 0; i < nmodes; i++) {
-                            // TODO: really?  atn->modeToStartState is const
-                            //int s = data[p++];
-                            // atn->modeToStartState.push_back(static_cast<TokensStartState*>(atn->states[s]));
+                            int s = data[p++];
+                            atn->modeToStartState.push_back(static_cast<TokensStartState*>(atn->states[s]));
                         }
 
                         //
                         // SETS
                         //
-                        std::vector<misc::IntervalSet*> sets = std::vector<misc::IntervalSet*>();
+                        std::vector<misc::IntervalSet*> sets;
                         int nsets = data[p++];
                         for (int i = 0; i < nsets; i++) {
                             int nintervals = data[p];
                             p++;
-                            // TODO IntervalSet does not have a default constructor
-                            //IntervalSet *set = new IntervalSet();
-                            misc::IntervalSet *set = nullptr;
+                            misc::IntervalSet *set = new misc::IntervalSet();
                             sets.push_back(set);
 
                             bool containsEof = data[p++] != 0;
@@ -276,10 +276,6 @@ namespace org {
                             int arg2 = data[p + 4];
                             int arg3 = data[p + 5];
                             Transition *trans = edgeFactory(atn, ttype, src, trg, arg1, arg2, arg3, sets);
-                                        //			System.out.println("EDGE "+trans.getClass().getSimpleName()+" "+
-                                        //							   src+"->"+trg+
-                                        //					   " "+Transition.serializationNames[ttype]+
-                                        //					   " "+arg1+","+arg2+","+arg3);
                             ATNState *srcState = atn->states[src];
                             srcState->addTransition(trans);
                             p += 6;
@@ -350,7 +346,7 @@ namespace org {
                         }
 
                         if (deserializationOptions->isGenerateRuleBypassTransitions() && atn->grammarType == ATNType::PARSER) {
-                            atn->ruleToTokenType = new int[atn->ruleToStartState.size()];
+                            atn->ruleToTokenType.resize(atn->ruleToStartState.size());
                             for (std::vector<RuleStartState*>::size_type i = 0; i < atn->ruleToStartState.size(); i++) {
                                 atn->ruleToTokenType[i] = atn->maxTokenType + (int)i + 1;
                             }

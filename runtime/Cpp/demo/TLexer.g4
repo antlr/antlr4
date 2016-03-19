@@ -23,7 +23,7 @@ void myBarLexerAction() { /* do something*/ };
  // Lexer API functions.
 }
 
-// channels { COMMENTS_CHANNEL, DIRECTIVE }
+//channels { COMMENTS_CHANNEL, DIRECTIVE }
 
 ID: [a-z]+ ;
 LessThan: '<';// -> pushMode(Mode1);
@@ -31,6 +31,7 @@ GreaterThan:  '>';// -> popMode;
 Foo: {canTestFoo()}? 'foo' {isItFoo()}? { myFooLexerAction(); };
 Bar: 'bar' {isItBar()}? { myBarLexerAction(); };
 Any: Foo Dot Bar? DotDot Baz;
+WS: [ \t\n\r]+ -> skip;
 
 fragment Baz: 'Baz';
 
@@ -39,3 +40,4 @@ Dot: '.';
 
 mode Mode2;
 DotDot: '..';
+
