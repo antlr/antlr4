@@ -1,14 +1,6 @@
-﻿#include "LexerNoViableAltException.h"
-#include "RecognitionException.h"
-#include "Interval.h"
-#include "CPPUtils.h"
-#include "CharStream.h"
-
-#include <stdio.h>
-#include <wchar.h>
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -37,37 +29,35 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
+#include "Interval.h"
+#include "CPPUtils.h"
+#include "CharStream.h"
 
+#include "LexerNoViableAltException.h"
 
-				LexerNoViableAltException::LexerNoViableAltException(Lexer *lexer, CharStream *input, int startIndex, atn::ATNConfigSet *deadEndConfigs) : RecognitionException()/*TODO RecognitionException(lexer, input, nullptr)*/, startIndex(startIndex), deadEndConfigs(deadEndConfigs) {
-                }
+using namespace org::antlr::v4::runtime;
 
-                int LexerNoViableAltException::getStartIndex() {
-                    return startIndex;
-                }
+LexerNoViableAltException::LexerNoViableAltException(Lexer *lexer, CharStream *input, int startIndex, atn::ATNConfigSet *deadEndConfigs) : RecognitionException()/*TODO RecognitionException(lexer, input, nullptr)*/, startIndex(startIndex), deadEndConfigs(deadEndConfigs) {
+}
 
-                atn::ATNConfigSet *LexerNoViableAltException::getDeadEndConfigs() {
-                    return deadEndConfigs;
-                }
+int LexerNoViableAltException::getStartIndex() {
+  return startIndex;
+}
 
-                runtime::CharStream *LexerNoViableAltException::getInputStream() {
-                    return (CharStream*)(RecognitionException::getInputStream());
-                }
+atn::ATNConfigSet *LexerNoViableAltException::getDeadEndConfigs() {
+  return deadEndConfigs;
+}
 
-                std::wstring LexerNoViableAltException::toString() {
-                    std::wstring symbol = L"";
-                    if (startIndex >= 0 && startIndex < (int)getInputStream()->size()) {
-                        symbol = getInputStream()->getText(misc::Interval::of(startIndex,startIndex));
-                        symbol = antlrcpp::escapeWhitespace(symbol, false);
-                    }
-                    std::wstring format = L"LexerNoViableAltException('" + symbol + L"')";
-                    return format;
-                }
-            }
-        }
-    }
+CharStream *LexerNoViableAltException::getInputStream() {
+  return (CharStream*)(RecognitionException::getInputStream());
+}
+
+std::wstring LexerNoViableAltException::toString() {
+  std::wstring symbol = L"";
+  if (startIndex >= 0 && startIndex < (int)getInputStream()->size()) {
+    symbol = getInputStream()->getText(misc::Interval::of(startIndex,startIndex));
+    symbol = antlrcpp::escapeWhitespace(symbol, false);
+  }
+  std::wstring format = L"LexerNoViableAltException('" + symbol + L"')";
+  return format;
 }

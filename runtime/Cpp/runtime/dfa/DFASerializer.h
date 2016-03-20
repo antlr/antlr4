@@ -1,13 +1,6 @@
-﻿#pragma once
-
-#include <string>
-#include <vector>
-#include "stringconverter.h"
-
-#include "Declarations.h"
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -36,30 +29,33 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#pragma once
+
 namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace dfa {
-                    /// <summary>
-                    /// A DFA walker that knows how to dump them to serialized strings. </summary>
-                    class DFASerializer {
-                    public:
-                        DFA *const dfa;
-                        const std::vector<std::wstring>& tokenNames_;
+namespace antlr {
+namespace v4 {
+namespace runtime {
+namespace dfa {
 
-                        DFASerializer(DFA *dfa, const std::vector<std::wstring>& tokenNames);
+  /// <summary>
+  /// A DFA walker that knows how to dump them to serialized strings. </summary>
+  class DFASerializer {
+  public:
+    DFA *const dfa;
+    const std::vector<std::wstring>& tokenNames_;
 
-                        virtual std::wstring toString();
+    DFASerializer(DFA *dfa, const std::vector<std::wstring>& tokenNames);
 
-                    protected:
-                        virtual std::wstring getEdgeLabel(int i);
+    virtual std::wstring toString();
 
-                        virtual std::wstring getStateString(DFAState *s);
-                    };
+  protected:
+    virtual std::wstring getEdgeLabel(int i);
 
-                }
-            }
-        }
-    }
-}
+    virtual std::wstring getStateString(DFAState *s);
+  };
+
+} // namespace atn
+} // namespace runtime
+} // namespace v4
+} // namespace antlr
+} // namespace org

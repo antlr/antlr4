@@ -1,11 +1,6 @@
-﻿#pragma once
-
-#include "SetTransition.h"
-#include "Declarations.h"
-#include <string>
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -34,25 +29,29 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#pragma once
+
+#include "SetTransition.h"
+
 namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace atn {
+namespace antlr {
+namespace v4 {
+namespace runtime {
+namespace atn {
 
-                    class NotSetTransition final : public SetTransition {
-                    public:
-                        NotSetTransition(ATNState *target, misc::IntervalSet *set);
+  class NotSetTransition final : public SetTransition {
+  public:
+    NotSetTransition(ATNState *target, misc::IntervalSet *set);
 
-                        virtual int getSerializationType() override;
+    virtual int getSerializationType() override;
 
-                        virtual bool matches(int symbol, int minVocabSymbol, int maxVocabSymbol) override;
+    virtual bool matches(int symbol, int minVocabSymbol, int maxVocabSymbol) override;
 
-                        virtual std::wstring toString() override;
-                    };
+    virtual std::wstring toString() override;
+  };
 
-                }
-            }
-        }
-    }
-}
+} // namespace atn
+} // namespace runtime
+} // namespace v4
+} // namespace antlr
+} // namespace org

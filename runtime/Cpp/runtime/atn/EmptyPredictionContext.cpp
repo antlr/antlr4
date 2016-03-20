@@ -1,7 +1,6 @@
-﻿#include "EmptyPredictionContext.h"
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -30,40 +29,33 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace atn {
+#include "EmptyPredictionContext.h"
 
-                    EmptyPredictionContext::EmptyPredictionContext() : SingletonPredictionContext(nullptr, EMPTY_RETURN_STATE) {
-                    }
+using namespace org::antlr::v4::runtime::atn;
 
-                    bool EmptyPredictionContext::isEmpty() {
-                        return true;
-                    }
+EmptyPredictionContext::EmptyPredictionContext() : SingletonPredictionContext(nullptr, EMPTY_RETURN_STATE) {
+}
 
-                    int EmptyPredictionContext::size() {
-                        return 1;
-                    }
+bool EmptyPredictionContext::isEmpty() {
+  return true;
+}
 
-                    org::antlr::v4::runtime::atn::PredictionContext *EmptyPredictionContext::getParent(int index) {
-                        return nullptr;
-                    }
+int EmptyPredictionContext::size() {
+  return 1;
+}
 
-                    int EmptyPredictionContext::getReturnState(int index) {
-                        return returnState;
-                    }
+org::antlr::v4::runtime::atn::PredictionContext *EmptyPredictionContext::getParent(int index) {
+  return nullptr;
+}
 
-                    bool EmptyPredictionContext::equals(void *o) {
-                        return this == o;
-                    }
+int EmptyPredictionContext::getReturnState(int index) {
+  return returnState;
+}
 
-                    std::wstring EmptyPredictionContext::toString() {
-                        return L"$";
-                    }
-                }
-            }
-        }
-    }
+bool EmptyPredictionContext::equals(void *o) {
+  return this == o;
+}
+
+std::wstring EmptyPredictionContext::toString() {
+  return L"$";
 }

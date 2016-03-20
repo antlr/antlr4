@@ -1,10 +1,6 @@
-﻿#pragma once
-
-#include "Tree.h"
-#include "Declarations.h"
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -33,35 +29,36 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace misc {
-                    class Interval;
-                }
-                
-                namespace tree {
-                    /// <summary>
-                    /// A tree that knows about an interval in a token stream
-                    ///  is some kind of syntax tree. Subinterfaces distinguish
-                    ///  between parse trees and other kinds of syntax trees we might want to create.
-                    /// </summary>
-                    class SyntaxTree : public Tree {
-                        /// <summary>
-                        /// Return an <seealso cref="Interval"/> indicating the index in the
-                        /// <seealso cref="TokenStream"/> of the first and last token associated with this
-                        /// subtree. If this node is a leaf, then the interval represents a single
-                        /// token.
-                        /// <p/>
-                        /// If source interval is unknown, this returns <seealso cref="Interval#INVALID"/>.
-                        /// </summary>
-                    public:
-                        virtual misc::Interval *getSourceInterval() = 0;
-                    };
+#pragma once
 
-                }
-            }
-        }
-    }
-}
+#include "Tree.h"
+
+namespace org {
+namespace antlr {
+namespace v4 {
+namespace runtime {
+namespace tree {
+
+  /// <summary>
+  /// A tree that knows about an interval in a token stream
+  ///  is some kind of syntax tree. Subinterfaces distinguish
+  ///  between parse trees and other kinds of syntax trees we might want to create.
+  /// </summary>
+  class SyntaxTree : public Tree {
+    /// <summary>
+    /// Return an <seealso cref="Interval"/> indicating the index in the
+    /// <seealso cref="TokenStream"/> of the first and last token associated with this
+    /// subtree. If this node is a leaf, then the interval represents a single
+    /// token.
+    /// <p/>
+    /// If source interval is unknown, this returns <seealso cref="Interval#INVALID"/>.
+    /// </summary>
+  public:
+    virtual misc::Interval *getSourceInterval() = 0;
+  };
+
+} // namespace tree
+} // namespace runtime
+} // namespace v4
+} // namespace antlr
+} // namespace org

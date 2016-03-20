@@ -1,10 +1,6 @@
-﻿#pragma once
-
-#include "RecognitionException.h"
-
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -32,46 +28,49 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
+#pragma once
+
+#include "RecognitionException.h"
+
 namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
+namespace antlr {
+namespace v4 {
+namespace runtime {
 
-                using org::antlr::v4::runtime::atn::ATNConfigSet;
-                using org::antlr::v4::runtime::misc::NotNull;
+  /// <summary>
+  /// Indicates that the parser could not decide which of two or more paths
+  ///  to take based upon the remaining input. It tracks the starting token
+  ///  of the offending input and also knows where the parser was
+  ///  in the various paths when the error. Reported by reportNoViableAlternative()
+  /// </summary>
+  class NoViableAltException : public RecognitionException {
+    /// <summary>
+    /// Which configurations did we try at input.index() that couldn't match input.LT(1)? </summary>
+  private:
+    atn::ATNConfigSet *const deadEndConfigs;
 
-                /// <summary>
-                /// Indicates that the parser could not decide which of two or more paths
-                ///  to take based upon the remaining input. It tracks the starting token
-                ///  of the offending input and also knows where the parser was
-                ///  in the various paths when the error. Reported by reportNoViableAlternative()
-                /// </summary>
-                class NoViableAltException : public RecognitionException {
-                    /// <summary>
-                    /// Which configurations did we try at input.index() that couldn't match input.LT(1)? </summary>
-                private:
-                    ATNConfigSet *const deadEndConfigs;
+    /// <summary>
+    /// The token object at the start index; the input stream might
+    /// 	not be buffering tokens so get a reference to it. (At the
+    ///  time the error occurred, of course the stream needs to keep a
+    ///  buffer all of the tokens but later we might not have access to those.)
+    /// </summary>
+    Token *const startToken;
 
-                    /// <summary>
-                    /// The token object at the start index; the input stream might
-                    /// 	not be buffering tokens so get a reference to it. (At the
-                    ///  time the error occurred, of course the stream needs to keep a
-                    ///  buffer all of the tokens but later we might not have access to those.)
-                    /// </summary>
-                    Token *const startToken;
+  public:
+    NoViableAltException(Parser *recognizer); // LL(1) error - this(recognizer, recognizer.getInputStream(), recognizer.getCurrentToken(), recognizer.getCurrentToken(), nullptr, recognizer._ctx);
 
-                public:
-                    NoViableAltException(Parser *recognizer); // LL(1) error - this(recognizer, recognizer.getInputStream(), recognizer.getCurrentToken(), recognizer.getCurrentToken(), nullptr, recognizer._ctx);
+    NoViableAltException(Parser *recognizer, TokenStream *input, Token *startToken, Token *offendingToken,
+                         atn::ATNConfigSet *deadEndConfigs, ParserRuleContext *ctx);
 
-                    NoViableAltException(Parser *recognizer, TokenStream *input, Token *startToken, Token *offendingToken, ATNConfigSet *deadEndConfigs, ParserRuleContext *ctx);
+    virtual Token *getStartToken();
 
-                    virtual Token *getStartToken();
+    virtual atn::ATNConfigSet *getDeadEndConfigs();
 
-                    virtual ATNConfigSet *getDeadEndConfigs();
+  };
 
-                };
-
-            }
-        }
-    }
-}
+} // namespace runtime
+} // namespace v4
+} // namespace antlr
+} // namespace org

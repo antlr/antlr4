@@ -1,7 +1,6 @@
-﻿#include "XPathElement.h"
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -30,30 +29,22 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace tree {
-                    namespace xpath {
-                        using org::antlr::v4::runtime::tree::ParseTree;
+#include "XPathElement.h"
 
-                        XPathElement::XPathElement(const std::wstring &nodeName) {
-                            InitializeInstanceFields();
-                            this->nodeName = nodeName;
-                        }
+using namespace org::antlr::v4::runtime::tree::xpath;
 
-                        std::wstring XPathElement::toString() {
-                            std::wstring inv = invert ? L"!" : L"";
-                            return std::wstring(L"XPathElement") + std::wstring(L"[") + inv + nodeName + std::wstring(L"]");
-                        }
+using org::antlr::v4::runtime::tree::ParseTree;
 
-                        void XPathElement::InitializeInstanceFields() {
-                            invert = false;
-                        }
-                    }
-                }
-            }
-        }
-    }
+XPathElement::XPathElement(const std::wstring &nodeName) {
+  InitializeInstanceFields();
+  this->nodeName = nodeName;
+}
+
+std::wstring XPathElement::toString() {
+  std::wstring inv = invert ? L"!" : L"";
+  return std::wstring(L"XPathElement") + std::wstring(L"[") + inv + nodeName + std::wstring(L"]");
+}
+
+void XPathElement::InitializeInstanceFields() {
+  invert = false;
 }

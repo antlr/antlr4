@@ -1,7 +1,6 @@
-﻿#include "RuleStartState.h"
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -30,21 +29,14 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace atn {
+#include "RuleStartState.h"
 
-                    int RuleStartState::getStateType() {
-                        return RULE_START;
-                    }
+using namespace org::antlr::v4::runtime::atn;
 
-                    void RuleStartState::InitializeInstanceFields() {
-                        isPrecedenceRule = false;
-                    }
-                }
-            }
-        }
-    }
+int RuleStartState::getStateType() {
+  return RULE_START;
+}
+
+void RuleStartState::InitializeInstanceFields() {
+  isPrecedenceRule = false;
 }

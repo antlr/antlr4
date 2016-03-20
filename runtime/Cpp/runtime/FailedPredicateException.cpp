@@ -1,13 +1,6 @@
-﻿#include "FailedPredicateException.h"
-#include "ATNState.h"
-#include "AbstractPredicateTransition.h"
-#include "PredicateTransition.h"
-#include "Parser.h"
-#include "ParserATNSimulator.h"
-#include "ATN.h"
-
-/*
-* [The "BSD license"]
+﻿/*
+ * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
 *  Copyright (c) 2013 Terence Parr
 *  Copyright (c) 2013 Dan McLaughlin
 *  All rights reserved.
@@ -36,54 +29,56 @@
 *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                FailedPredicateException::FailedPredicateException(Parser *recognizer) : RecognitionException() {
-                }
+#include "ParserATNSimulator.h"
+#include "Parser.h"
+#include "PredicateTransition.h"
+#include "ATN.h"
+#include "ATNState.h"
 
-                FailedPredicateException::FailedPredicateException(Parser *recognizer, const std::wstring &predicate): RecognitionException() {
-                }
+#include "FailedPredicateException.h"
 
-                FailedPredicateException::FailedPredicateException(Parser *recognizer, const std::wstring &predicate, const std::wstring &message)
+using namespace org::antlr::v4::runtime;
+
+FailedPredicateException::FailedPredicateException(Parser *recognizer) : RecognitionException() {
+}
+
+FailedPredicateException::FailedPredicateException(Parser *recognizer, const std::wstring &predicate): RecognitionException() {
+}
+
+FailedPredicateException::FailedPredicateException(Parser *recognizer, const std::wstring &predicate, const std::wstring &message)
 #ifdef TODO
-                // Huston, a problem. "trans" isn't defined until below
-                : RecognitionException(formatMessage(predicate, message), recognizer, recognizer->getInputStream(), recognizer->_ctx), ruleIndex((static_cast<atn::PredicateTransition*>(trans))->ruleIndex), predicateIndex((static_cast<atn::PredicateTransition*>(trans))->predIndex), predicate(predicate)
+// Huston, a problem. "trans" isn't defined until below
+: RecognitionException(formatMessage(predicate, message), recognizer, recognizer->getInputStream(), recognizer->_ctx), ruleIndex((static_cast<atn::PredicateTransition*>(trans))->ruleIndex), predicateIndex((static_cast<atn::PredicateTransition*>(trans))->predIndex), predicate(predicate)
 #endif
 
-                {
-                    atn::ATNState *s = recognizer->getInterpreter()->atn->states[recognizer->getState()];
+{
+  atn::ATNState *s = recognizer->getInterpreter()->atn->states[recognizer->getState()];
 
-                    atn::AbstractPredicateTransition *trans = static_cast<atn::AbstractPredicateTransition*>(s->transition(0));
-                    if (dynamic_cast<atn::PredicateTransition*>(trans) != nullptr) {
-                    } else {
-                        this->ruleIndex = 0;
-                        this->predicateIndex = 0;
-                    }
+  atn::AbstractPredicateTransition *trans = static_cast<atn::AbstractPredicateTransition*>(s->transition(0));
+  if (dynamic_cast<atn::PredicateTransition*>(trans) != nullptr) {
+  } else {
+    this->ruleIndex = 0;
+    this->predicateIndex = 0;
+  }
 
-                    this->setOffendingToken(recognizer->getCurrentToken());
-                }
+  this->setOffendingToken(recognizer->getCurrentToken());
+}
 
-                int FailedPredicateException::getRuleIndex() {
-                    return ruleIndex;
-                }
+int FailedPredicateException::getRuleIndex() {
+  return ruleIndex;
+}
 
-                int FailedPredicateException::getPredIndex() {
-                    return predicateIndex;
-                }
+int FailedPredicateException::getPredIndex() {
+  return predicateIndex;
+}
 
-                std::wstring FailedPredicateException::getPredicate() {
-                    return predicate;
-                }
+std::wstring FailedPredicateException::getPredicate() {
+  return predicate;
+}
 
-                std::wstring FailedPredicateException::formatMessage(const std::wstring &predicate, const std::wstring &message) {
-                    if (message != L"") {
-                        return message;
-                    }
-                    return L"failed predicate: " + predicate + L"?";
-                }
-            }
-        }
-    }
+std::wstring FailedPredicateException::formatMessage(const std::wstring &predicate, const std::wstring &message) {
+  if (message != L"") {
+    return message;
+  }
+  return L"failed predicate: " + predicate + L"?";
 }

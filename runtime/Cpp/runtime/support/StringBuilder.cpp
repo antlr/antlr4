@@ -9,6 +9,7 @@
 
 /*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
  *
@@ -36,6 +37,7 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using namespace antlrcpp;
 
 namespace antlrcpp {
     StringBuilder & StringBuilder::append(const std::wstring & str) {

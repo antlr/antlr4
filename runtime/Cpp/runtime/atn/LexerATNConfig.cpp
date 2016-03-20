@@ -1,11 +1,6 @@
-﻿#include "LexerATNConfig.h"
-#include "MurmurHash.h"
-#include "DecisionState.h"
-#include "PredictionContext.h"
-#include "SemanticContext.h"
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -34,75 +29,72 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace atn {
+#include "LexerATNConfig.h"
+#include "MurmurHash.h"
+#include "DecisionState.h"
+#include "PredictionContext.h"
+#include "SemanticContext.h"
 
-                    LexerATNConfig::LexerATNConfig(ATNState *state, int alt, PredictionContext *context) : ATNConfig(state, alt, context, SemanticContext::NONE), passedThroughNonGreedyDecision(false) {
-                        InitializeInstanceFields();
-                    }
+using namespace org::antlr::v4::runtime::atn;
 
-                    LexerATNConfig::LexerATNConfig(ATNState *state, int alt, PredictionContext *context, int actionIndex) : ATNConfig(state, alt, context, SemanticContext::NONE), passedThroughNonGreedyDecision(false) {
-                        InitializeInstanceFields();
-                        this->lexerActionIndex = actionIndex;
-                    }
+LexerATNConfig::LexerATNConfig(ATNState *state, int alt, PredictionContext *context) : ATNConfig(state, alt, context, SemanticContext::NONE), passedThroughNonGreedyDecision(false) {
+  InitializeInstanceFields();
+}
 
-                    LexerATNConfig::LexerATNConfig(LexerATNConfig *c, ATNState *state) : ATNConfig(c, state, c->context, c->semanticContext), passedThroughNonGreedyDecision(checkNonGreedyDecision(c, state)) {
-                        InitializeInstanceFields();
-                        this->lexerActionIndex = c->lexerActionIndex;
-                    }
+LexerATNConfig::LexerATNConfig(ATNState *state, int alt, PredictionContext *context, int actionIndex) : ATNConfig(state, alt, context, SemanticContext::NONE), passedThroughNonGreedyDecision(false) {
+  InitializeInstanceFields();
+  this->lexerActionIndex = actionIndex;
+}
 
-                    LexerATNConfig::LexerATNConfig(LexerATNConfig *c, ATNState *state, int actionIndex) : ATNConfig(c, state, c->context, c->semanticContext), passedThroughNonGreedyDecision(checkNonGreedyDecision(c, state)) {
-                        InitializeInstanceFields();
-                        this->lexerActionIndex = actionIndex;
-                    }
+LexerATNConfig::LexerATNConfig(LexerATNConfig *c, ATNState *state) : ATNConfig(c, state, c->context, c->semanticContext), passedThroughNonGreedyDecision(checkNonGreedyDecision(c, state)) {
+  InitializeInstanceFields();
+  this->lexerActionIndex = c->lexerActionIndex;
+}
 
-                    LexerATNConfig::LexerATNConfig(LexerATNConfig *c, ATNState *state, PredictionContext *context) : ATNConfig(c, state, context, c->semanticContext), passedThroughNonGreedyDecision(checkNonGreedyDecision(c, state)) {
-                        InitializeInstanceFields();
-                        this->lexerActionIndex = c->lexerActionIndex;
-                    }
+LexerATNConfig::LexerATNConfig(LexerATNConfig *c, ATNState *state, int actionIndex) : ATNConfig(c, state, c->context, c->semanticContext), passedThroughNonGreedyDecision(checkNonGreedyDecision(c, state)) {
+  InitializeInstanceFields();
+  this->lexerActionIndex = actionIndex;
+}
 
-                    bool LexerATNConfig::hasPassedThroughNonGreedyDecision() {
-                        return passedThroughNonGreedyDecision;
-                    }
+LexerATNConfig::LexerATNConfig(LexerATNConfig *c, ATNState *state, PredictionContext *context) : ATNConfig(c, state, context, c->semanticContext), passedThroughNonGreedyDecision(checkNonGreedyDecision(c, state)) {
+  InitializeInstanceFields();
+  this->lexerActionIndex = c->lexerActionIndex;
+}
 
-                    size_t LexerATNConfig::hashCode() {
-                        int hashCode = misc::MurmurHash::initialize(7);
-                        hashCode = misc::MurmurHash::update(hashCode, state->stateNumber);
-                        hashCode = misc::MurmurHash::update(hashCode, alt);
-                        hashCode = misc::MurmurHash::update(hashCode, context);
-                        hashCode = misc::MurmurHash::update(hashCode, semanticContext);
-                        hashCode = misc::MurmurHash::update(hashCode, passedThroughNonGreedyDecision ? 1 : 0);
-                        hashCode = misc::MurmurHash::finish(hashCode, 5);
-                        return hashCode;
-                    }
+bool LexerATNConfig::hasPassedThroughNonGreedyDecision() {
+  return passedThroughNonGreedyDecision;
+}
 
-                    bool LexerATNConfig::equals(ATNConfig *other) {
-                        if (this == other) {
-                            return true;
-                        } else if (!(dynamic_cast<LexerATNConfig*>(other) != nullptr)) {
-                            return false;
-                        }
+size_t LexerATNConfig::hashCode() {
+  int hashCode = misc::MurmurHash::initialize(7);
+  hashCode = misc::MurmurHash::update(hashCode, state->stateNumber);
+  hashCode = misc::MurmurHash::update(hashCode, alt);
+  hashCode = misc::MurmurHash::update(hashCode, context);
+  hashCode = misc::MurmurHash::update(hashCode, semanticContext);
+  hashCode = misc::MurmurHash::update(hashCode, passedThroughNonGreedyDecision ? 1 : 0);
+  hashCode = misc::MurmurHash::finish(hashCode, 5);
+  return hashCode;
+}
 
-                        LexerATNConfig *lexerOther = static_cast<LexerATNConfig*>(other);
-                        if (passedThroughNonGreedyDecision != lexerOther->passedThroughNonGreedyDecision) {
-                            return false;
-                        }
+bool LexerATNConfig::equals(ATNConfig *other) {
+  if (this == other) {
+    return true;
+  } else if (!(dynamic_cast<LexerATNConfig*>(other) != nullptr)) {
+    return false;
+  }
 
-                        return ATNConfig::equals(other);
-                    }
+  LexerATNConfig *lexerOther = static_cast<LexerATNConfig*>(other);
+  if (passedThroughNonGreedyDecision != lexerOther->passedThroughNonGreedyDecision) {
+    return false;
+  }
 
-                    bool LexerATNConfig::checkNonGreedyDecision(LexerATNConfig *source, ATNState *target) {
-                        return source->passedThroughNonGreedyDecision || (dynamic_cast<DecisionState*>(target) != nullptr && (static_cast<DecisionState*>(target))->nonGreedy);
-                    }
+  return ATNConfig::equals(other);
+}
 
-                    void LexerATNConfig::InitializeInstanceFields() {
-                        lexerActionIndex = -1;
-                    }
-                }
-            }
-        }
-    }
+bool LexerATNConfig::checkNonGreedyDecision(LexerATNConfig *source, ATNState *target) {
+  return source->passedThroughNonGreedyDecision || (dynamic_cast<DecisionState*>(target) != nullptr && (static_cast<DecisionState*>(target))->nonGreedy);
+}
+
+void LexerATNConfig::InitializeInstanceFields() {
+  lexerActionIndex = -1;
 }

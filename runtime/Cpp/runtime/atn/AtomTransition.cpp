@@ -1,8 +1,6 @@
-﻿#include "AtomTransition.h"
-#include "IntervalSet.h"
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -31,33 +29,30 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace atn {
+#include "stringconverter.h"
+#include "IntervalSet.h"
+#include "Transition.h"
 
+#include "AtomTransition.h"
 
-                    AtomTransition::AtomTransition(ATNState *target, int label) : Transition(target), _label(label) {
-                    }
+using namespace org::antlr::v4::runtime::misc;
+using namespace org::antlr::v4::runtime::atn;
 
-                    int AtomTransition::getSerializationType() {
-                        return ATOM;
-                    }
+AtomTransition::AtomTransition(ATNState *target, int label) : Transition(target), _label(label) {
+}
 
-                    misc::IntervalSet *AtomTransition::label() {
-                        return misc::IntervalSet::of(_label);
-                    }
+int AtomTransition::getSerializationType() {
+  return ATOM;
+}
 
-                    bool AtomTransition::matches(int symbol, int minVocabSymbol, int maxVocabSymbol) {
-                        return _label == symbol;
-                    }
+IntervalSet *AtomTransition::label() {
+  return IntervalSet::of(_label);
+}
 
-                    std::wstring AtomTransition::toString() {
-                        return antlrcpp::StringConverterHelper::toString(_label);
-                    }
-                }
-            }
-        }
-    }
+bool AtomTransition::matches(int symbol, int minVocabSymbol, int maxVocabSymbol) {
+  return _label == symbol;
+}
+
+std::wstring AtomTransition::toString() {
+  return antlrcpp::StringConverterHelper::toString(_label);
 }

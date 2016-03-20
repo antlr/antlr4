@@ -1,13 +1,6 @@
-﻿#include "ATNConfig.h"
-#include "ATNState.h"
-#include "PredictionContext.h"
-#include "SemanticContext.h"
-#include "MurmurHash.h"
-
-#include "StringBuilder.h"
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -36,86 +29,90 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace org {
-	namespace antlr {
-		namespace v4 {
-			namespace runtime {
-				namespace atn {
-					ATNConfig::ATNConfig(ATNConfig *old) : state(old->state), alt(old->alt), semanticContext(old->semanticContext) {
-						InitializeInstanceFields();
-						this->context = old->context;
-						this->reachesIntoOuterContext = old->reachesIntoOuterContext;
-					}
+#include "MurmurHash.h"
+#include "StringBuilder.h"
+#include "PredictionContext.h"
 
-					ATNConfig::ATNConfig(ATNState *state, int alt, PredictionContext *context) : state(state), alt(alt), context(context), semanticContext(nullptr) {
-					}
+#include "ATNConfig.h"
 
-					ATNConfig::ATNConfig(ATNState *state, int alt, PredictionContext *context, SemanticContext *semanticContext) : state(state), alt(alt), semanticContext(semanticContext) {
-						InitializeInstanceFields();
-						this->context = context;
-					}
+using namespace org::antlr::v4::runtime::atn;
 
-					ATNConfig::ATNConfig(ATNConfig *c, ATNState *state) : state(state), alt(0), context(nullptr), semanticContext(nullptr)
-					{
-					}
+ATNConfig::ATNConfig(ATNConfig *old) : state(old->state), alt(old->alt), semanticContext(old->semanticContext) {
+  InitializeInstanceFields();
+  this->context = old->context;
+  this->reachesIntoOuterContext = old->reachesIntoOuterContext;
+}
 
-					ATNConfig::ATNConfig(ATNConfig *c, ATNState *state, SemanticContext *semanticContext) : state(state), alt(0), context(nullptr), semanticContext(semanticContext)
-					{
-					}
+ATNConfig::ATNConfig(ATNState *state, int alt, PredictionContext *context) : state(state), alt(alt), context(context), semanticContext(nullptr) {
+}
 
-					ATNConfig::ATNConfig(ATNConfig *c, SemanticContext *semanticContext) : state(nullptr), alt(0), context(nullptr), semanticContext(semanticContext)
-					{
-					}
+ATNConfig::ATNConfig(ATNState *state, int alt, PredictionContext *context, SemanticContext *semanticContext) : state(state), alt(alt), semanticContext(semanticContext) {
+  InitializeInstanceFields();
+  this->context = context;
+}
 
-					ATNConfig::ATNConfig(ATNConfig *c, ATNState *state, PredictionContext *context) : state(state), alt(0), context(context), semanticContext(nullptr)
-					{
-					}
+ATNConfig::ATNConfig(ATNConfig *c, ATNState *state) : state(state), alt(0), context(nullptr), semanticContext(nullptr)
+{
+}
 
-					ATNConfig::ATNConfig(ATNConfig *c, ATNState *state, PredictionContext *context, SemanticContext *semanticContext) : state(state), alt(c->alt), semanticContext(semanticContext) {
-						InitializeInstanceFields();
-						this->context = context;
-						this->reachesIntoOuterContext = c->reachesIntoOuterContext;
-					}
+ATNConfig::ATNConfig(ATNConfig *c, ATNState *state, SemanticContext *semanticContext) : state(state), alt(0), context(nullptr), semanticContext(semanticContext)
+{
+}
 
-					bool ATNConfig::equals(void *o) {
-						if (!(o != nullptr/*dynamic_cast<ATNConfig*>(o) != nullptr*/)) {
-							return false;
-						}
+ATNConfig::ATNConfig(ATNConfig *c, SemanticContext *semanticContext) : state(nullptr), alt(0), context(nullptr), semanticContext(semanticContext)
+{
+}
 
-						return this->equals(static_cast<ATNConfig*>(o));
-					}
+ATNConfig::ATNConfig(ATNConfig *c, ATNState *state, PredictionContext *context) : state(state), alt(0), context(context), semanticContext(nullptr)
+{
+}
 
-					bool ATNConfig::equals(ATNConfig *other) {
-						if (this == other) {
-							return true;
-						}
-						else if (other == nullptr) {
-							return false;
-						}
+ATNConfig::ATNConfig(ATNConfig *c, ATNState *state, PredictionContext *context, SemanticContext *semanticContext) : state(state), alt(c->alt), semanticContext(semanticContext) {
+  InitializeInstanceFields();
+  this->context = context;
+  this->reachesIntoOuterContext = c->reachesIntoOuterContext;
+}
 
-						return this->state->stateNumber == other->state->stateNumber && this->alt == other->alt && (this->context == other->context || (this->context != nullptr && this->context->equals(other->context))) && this->semanticContext->equals(other->semanticContext);
-					}
+bool ATNConfig::equals(void *o) {
+  if (!(o != nullptr/*dynamic_cast<ATNConfig*>(o) != nullptr*/)) {
+    return false;
+  }
 
-					size_t ATNConfig::hashCode() {
-						int hashCode = misc::MurmurHash::initialize(7);
-						hashCode = misc::MurmurHash::update(hashCode, state->stateNumber);
-						hashCode = misc::MurmurHash::update(hashCode, alt);
-						hashCode = misc::MurmurHash::update(hashCode, context);
-						hashCode = misc::MurmurHash::update(hashCode, semanticContext);
-						hashCode = misc::MurmurHash::finish(hashCode, 4);
-						return hashCode;
-					}
-					
-					std::wstring ATNConfig::toString() {
-						return toString<void*,void*>(nullptr, true);
-					}
+  return this->equals(static_cast<ATNConfig*>(o));
+}
+
+bool ATNConfig::equals(ATNConfig *other) {
+  if (this == other) {
+    return true;
+  }
+  else if (other == nullptr) {
+    return false;
+  }
+
+  return this->state->stateNumber == other->state->stateNumber && this->alt == other->alt && (this->context == other->context || (this->context != nullptr && this->context->equals(other->context))) && this->semanticContext->equals(other->semanticContext);
+}
+
+size_t ATNConfig::hashCode() {
+  int hashCode = misc::MurmurHash::initialize(7);
+  hashCode = misc::MurmurHash::update(hashCode, state->stateNumber);
+  hashCode = misc::MurmurHash::update(hashCode, alt);
+  hashCode = misc::MurmurHash::update(hashCode, context);
+  hashCode = misc::MurmurHash::update(hashCode, semanticContext);
+  hashCode = misc::MurmurHash::finish(hashCode, 4);
+  return hashCode;
+}
+
+bool ATNConfig::operator == (const ATNConfig& other) const
+{
+  return alt == other.alt && state->stateNumber == other.state->stateNumber &&
+  ((context == nullptr && other.context == nullptr) || (context != nullptr && context->equals(other.context))) && semanticContext->equals(other.semanticContext);
+}
+
+std::wstring ATNConfig::toString() {
+  return toString<void*,void*>(nullptr, true);
+}
 
 
-					void ATNConfig::InitializeInstanceFields() {
-						reachesIntoOuterContext = 0;
-					}
-				}
-			}
-		}
-	}
+void ATNConfig::InitializeInstanceFields() {
+  reachesIntoOuterContext = 0;
 }

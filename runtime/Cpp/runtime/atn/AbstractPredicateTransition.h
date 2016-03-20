@@ -1,10 +1,6 @@
-﻿#pragma once
-
-#include "Transition.h"
-#include "ATNState.h"
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -33,25 +29,27 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#pragma once
+
+#include "Transition.h"
+
 namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace atn {
+namespace antlr {
+namespace v4 {
+namespace runtime {
+namespace atn {
 
-                    /// 
-                    /// <summary>
-                    /// @author Sam Harwell
-                    /// </summary>
-                    class AbstractPredicateTransition : public Transition {
+  class ANTState;
+  
+  class AbstractPredicateTransition : public Transition {
 
-                    public:
-                        AbstractPredicateTransition(ATNState *target);
+  public:
+    AbstractPredicateTransition(ATNState *target);
 
-                    };
+  };
 
-                }
-            }
-        }
-    }
-}
+} // namespace atn
+} // namespace runtime
+} // namespace v4
+} // namespace antlr
+} // namespace org

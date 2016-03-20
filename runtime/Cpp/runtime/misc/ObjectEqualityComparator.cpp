@@ -1,9 +1,6 @@
-﻿
-
-#include "ObjectEqualityComparator.h"
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -32,43 +29,33 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace misc {
+#include "ObjectEqualityComparator.h"
 
-                    
+using namespace org::antlr::v4::runtime::misc;
 
-                    ObjectEqualityComparator *const ObjectEqualityComparator::INSTANCE = new ObjectEqualityComparator();
+ObjectEqualityComparator *const ObjectEqualityComparator::INSTANCE = new ObjectEqualityComparator();
 
-                    int ObjectEqualityComparator::hashCode(void *obj) {
-                        if (obj == nullptr) {
-                            return 0;
-                        }
+int ObjectEqualityComparator::hashCode(void *obj) {
+  if (obj == nullptr) {
+    return 0;
+  }
 #ifdef TODO
-                        // This is problematic in C++
-                        return obj->hashCode();
+  // This is problematic in C++
+  return obj->hashCode();
 #else
-                        throw new TODOException(L"ObjectEqualityComparator::hashCode");
+  throw new TODOException(L"ObjectEqualityComparator::hashCode");
 #endif
-                    }
+}
 
-                    bool ObjectEqualityComparator::equals(void *a, void *b) {
-                        if (a == nullptr) {
-                            return b == nullptr;
-                        }
+bool ObjectEqualityComparator::equals(void *a, void *b) {
+  if (a == nullptr) {
+    return b == nullptr;
+  }
 
 #ifdef TODO
-                        return a->equals(b);
+  return a->equals(b);
 
 #else
-                        throw new TODOException(L"ObjectEqualityComparator::equals");
+  throw new TODOException(L"ObjectEqualityComparator::equals");
 #endif
-                    }
-
-                }
-            }
-        }
-    }
 }

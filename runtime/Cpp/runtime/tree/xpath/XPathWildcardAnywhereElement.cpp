@@ -1,9 +1,6 @@
-﻿#include "XPathWildcardAnywhereElement.h"
-#include "Trees.h"
-#include "XPath.h"
-
-/*
-* [The "BSD license"]
+﻿/*
+ * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
 *  Copyright (c) 2013 Terence Parr
 *  Copyright (c) 2013 Dan McLaughlin
 *  All rights reserved.
@@ -32,28 +29,22 @@
 *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include "Trees.h"
+
+#include "XPathWildcardAnywhereElement.h"
+
+using namespace org::antlr::v4::runtime::tree::xpath;
+
 // TODO:  Come back to this after the base runtime works.
 #if 0
-namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace tree {
-                    namespace xpath {
-
-                        XPathWildcardAnywhereElement::XPathWildcardAnywhereElement() : XPathElement(XPath::WILDCARD) {
-                        }
-
-                        std::vector<ParseTree*> *XPathWildcardAnywhereElement::evaluate(ParseTree *t) {
-                            if (invert) { // !* is weird but valid (empty)
-                                return new std::vector<ParseTree*>();
-                            }
-                            return Trees::descendants(t);
-                        }
-                    }
-                }
-            }
-        }
-    }
+XPathWildcardAnywhereElement::XPathWildcardAnywhereElement() : XPathElement(XPath::WILDCARD) {
 }
+
+std::vector<ParseTree*> *XPathWildcardAnywhereElement::evaluate(ParseTree *t) {
+  if (invert) { // !* is weird but valid (empty)
+    return new std::vector<ParseTree*>();
+  }
+  return Trees::descendants(t);
+}
+
 #endif

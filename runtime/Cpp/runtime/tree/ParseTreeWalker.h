@@ -1,11 +1,6 @@
-﻿#pragma once
-
-#include "ParseTree.h"
-#include "ParseTreeListener.h"
-#include "RuleNode.h"
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -34,32 +29,34 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#pragma once
+
 namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace tree {
+namespace antlr {
+namespace v4 {
+namespace runtime {
+namespace tree {
 
-                    class ParseTreeWalker {
-                    public:
-                        static ParseTreeWalker *const DEFAULT;
+  class ParseTreeWalker {
+  public:
+    static ParseTreeWalker *const DEFAULT;
 
-                        virtual void walk(ParseTreeListener *listener, ParseTree *t);
+    virtual void walk(ParseTreeListener *listener, ParseTree *t);
 
-                        /// <summary>
-                        /// The discovery of a rule node, involves sending two events: the generic
-                        /// <seealso cref="ParseTreeListener#enterEveryRule"/> and a
-                        /// <seealso cref="RuleContext"/>-specific event. First we trigger the generic and then
-                        /// the rule specific. We to them in reverse order upon finishing the node.
-                        /// </summary>
-                    protected:
-                        virtual void enterRule(ParseTreeListener *listener, RuleNode *r);
+    /// <summary>
+    /// The discovery of a rule node, involves sending two events: the generic
+    /// <seealso cref="ParseTreeListener#enterEveryRule"/> and a
+    /// <seealso cref="RuleContext"/>-specific event. First we trigger the generic and then
+    /// the rule specific. We to them in reverse order upon finishing the node.
+    /// </summary>
+  protected:
+    virtual void enterRule(ParseTreeListener *listener, RuleNode *r);
 
-                        virtual void exitRule(ParseTreeListener *listener, RuleNode *r);
-                    };
+    virtual void exitRule(ParseTreeListener *listener, RuleNode *r);
+  };
 
-                }
-            }
-        }
-    }
-}
+} // namespace tree
+} // namespace runtime
+} // namespace v4
+} // namespace antlr
+} // namespace org

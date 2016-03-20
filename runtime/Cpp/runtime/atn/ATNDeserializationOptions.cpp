@@ -1,8 +1,6 @@
-﻿
-#include "ATNDeserializationOptions.h"
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Sam Harwell
  *  All rights reserved.
@@ -31,67 +29,60 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace atn {
+#include "ATNDeserializationOptions.h"
 
-                    ATNDeserializationOptions * const ATNDeserializationOptions::defaultOptions = new ATNDeserializationOptions();
+using namespace org::antlr::v4::runtime::atn;
 
-                    ATNDeserializationOptions::ATNDeserializationOptions()
-                    : readOnly(true)  {
-                    }
+ATNDeserializationOptions * const ATNDeserializationOptions::defaultOptions = new ATNDeserializationOptions();
 
-                    ATNDeserializationOptions::ATNDeserializationOptions(ATNDeserializationOptions *options) {
-                        InitializeInstanceFields();
-                        this->verifyATN = options->verifyATN;
-                        this->generateRuleBypassTransitions = options->generateRuleBypassTransitions;
-                    }
+ATNDeserializationOptions::ATNDeserializationOptions()
+: readOnly(true)  {
+}
 
-                    org::antlr::v4::runtime::atn::ATNDeserializationOptions *ATNDeserializationOptions::getDefaultOptions() {
-                        return defaultOptions;
-                    }
+ATNDeserializationOptions::ATNDeserializationOptions(ATNDeserializationOptions *options) {
+  InitializeInstanceFields();
+  this->verifyATN = options->verifyATN;
+  this->generateRuleBypassTransitions = options->generateRuleBypassTransitions;
+}
 
-                    bool ATNDeserializationOptions::isReadOnly() {
-                        return readOnly;
-                    }
+org::antlr::v4::runtime::atn::ATNDeserializationOptions *ATNDeserializationOptions::getDefaultOptions() {
+  return defaultOptions;
+}
 
-                    void ATNDeserializationOptions::makeReadOnly() {
-                        readOnly = true;
-                    }
+bool ATNDeserializationOptions::isReadOnly() {
+  return readOnly;
+}
 
-                    bool ATNDeserializationOptions::isVerifyATN() {
-                        return verifyATN;
-                    }
+void ATNDeserializationOptions::makeReadOnly() {
+  readOnly = true;
+}
 
-                    void ATNDeserializationOptions::setVerifyATN(bool verifyATN) {
-                        throwIfReadOnly();
-                        this->verifyATN = verifyATN;
-                    }
+bool ATNDeserializationOptions::isVerifyATN() {
+  return verifyATN;
+}
 
-                    bool ATNDeserializationOptions::isGenerateRuleBypassTransitions() {
-                        return generateRuleBypassTransitions;
-                    }
+void ATNDeserializationOptions::setVerifyATN(bool verifyATN) {
+  throwIfReadOnly();
+  this->verifyATN = verifyATN;
+}
 
-                    void ATNDeserializationOptions::setGenerateRuleBypassTransitions(bool generateRuleBypassTransitions) {
-                        throwIfReadOnly();
-                        this->generateRuleBypassTransitions = generateRuleBypassTransitions;
-                    }
+bool ATNDeserializationOptions::isGenerateRuleBypassTransitions() {
+  return generateRuleBypassTransitions;
+}
 
-                    void ATNDeserializationOptions::throwIfReadOnly() {
-                        if (isReadOnly()) {
-                            throw L"The object is read only.";
-                        }
-                    }
+void ATNDeserializationOptions::setGenerateRuleBypassTransitions(bool generateRuleBypassTransitions) {
+  throwIfReadOnly();
+  this->generateRuleBypassTransitions = generateRuleBypassTransitions;
+}
 
-                    void ATNDeserializationOptions::InitializeInstanceFields() {
-                        readOnly = false;
-                        verifyATN = false;
-                        generateRuleBypassTransitions = false;
-                    }
-                }
-            }
-        }
-    }
+void ATNDeserializationOptions::throwIfReadOnly() {
+  if (isReadOnly()) {
+    throw L"The object is read only.";
+  }
+}
+
+void ATNDeserializationOptions::InitializeInstanceFields() {
+  readOnly = false;
+  verifyATN = false;
+  generateRuleBypassTransitions = false;
 }

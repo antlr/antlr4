@@ -1,12 +1,6 @@
-﻿#pragma once
-
-#include "Transition.h"
-#include "Declarations.h"
-#include <string>
-
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -35,29 +29,34 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#pragma once
+
+#include "Transition.h"
+
 namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace atn {
-                    /// <summary>
-                    /// A transition containing a set of values. </summary>
-                    class SetTransition : public Transition {
-                    public:
-                        misc::IntervalSet * const set;
+namespace antlr {
+namespace v4 {
+namespace runtime {
+namespace atn {
 
-                        SetTransition(ATNState *target, misc::IntervalSet *set);
+  /// <summary>
+  /// A transition containing a set of values. </summary>
+  class SetTransition : public Transition {
+  public:
+    misc::IntervalSet * const set;
 
-                        virtual int getSerializationType() override;
+    SetTransition(ATNState *target, misc::IntervalSet *set);
 
-                        virtual misc::IntervalSet *label() override;
-                        virtual bool matches(int symbol, int minVocabSymbol, int maxVocabSymbol) override;
+    virtual int getSerializationType() override;
 
-                        virtual std::wstring toString();
-                    };
+    virtual misc::IntervalSet *label() override;
+    virtual bool matches(int symbol, int minVocabSymbol, int maxVocabSymbol) override;
 
-                }
-            }
-        }
-    }
-}
+    virtual std::wstring toString();
+  };
+
+} // namespace atn
+} // namespace runtime
+} // namespace v4
+} // namespace antlr
+} // namespace org

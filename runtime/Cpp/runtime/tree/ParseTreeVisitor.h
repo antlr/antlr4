@@ -1,8 +1,4 @@
-﻿#pragma once
-
-#include "Declarations.h"
-
-/*
+﻿/*
  * [The "BSD license"]
  *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
@@ -33,55 +29,58 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#pragma once
+
 namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace tree {
-                    /// <summary>
-                    /// This interface defines the basic notion of a parse tree visitor. Generated
-                    /// visitors implement this interface and the {@code XVisitor} interface for
-                    /// grammar {@code X}.
-                    /// </summary>
-                    /// @param <T> The return type of the visit operation. Use <seealso cref="Void"/> for
-                    /// operations with no return type. </param>
-                    template<typename T>
-                    class ParseTreeVisitor {
+namespace antlr {
+namespace v4 {
+namespace runtime {
+namespace tree {
 
-                        /// <summary>
-                        /// Visit a parse tree, and return a user-defined result of the operation.
-                        /// </summary>
-                        /// <param name="tree"> The <seealso cref="ParseTree"/> to visit. </param>
-                        /// <returns> The result of visiting the parse tree. </returns>
-                    public:
-                        virtual T* visit(ParseTree *tree) = 0;
+  /// <summary>
+  /// This interface defines the basic notion of a parse tree visitor. Generated
+  /// visitors implement this interface and the {@code XVisitor} interface for
+  /// grammar {@code X}.
+  /// </summary>
+  /// @param <T> The return type of the visit operation. Use <seealso cref="Void"/> for
+  /// operations with no return type. </param>
+  template<typename T>
+  class ParseTreeVisitor {
 
-                        /// <summary>
-                        /// Visit the children of a node, and return a user-defined result of the
-                        /// operation.
-                        /// </summary>
-                        /// <param name="node"> The <seealso cref="RuleNode"/> whose children should be visited. </param>
-                        /// <returns> The result of visiting the children of the node. </returns>
-                        virtual T* visitChildren(RuleNode *node) = 0;
+    /// <summary>
+    /// Visit a parse tree, and return a user-defined result of the operation.
+    /// </summary>
+    /// <param name="tree"> The <seealso cref="ParseTree"/> to visit. </param>
+    /// <returns> The result of visiting the parse tree. </returns>
+  public:
+    virtual T* visit(ParseTree *tree) = 0;
 
-                        /// <summary>
-                        /// Visit a terminal node, and return a user-defined result of the operation.
-                        /// </summary>
-                        /// <param name="node"> The <seealso cref="TerminalNode"/> to visit. </param>
-                        /// <returns> The result of visiting the node. </returns>
-                        virtual T* visitTerminal(TerminalNode *node) = 0;
+    /// <summary>
+    /// Visit the children of a node, and return a user-defined result of the
+    /// operation.
+    /// </summary>
+    /// <param name="node"> The <seealso cref="RuleNode"/> whose children should be visited. </param>
+    /// <returns> The result of visiting the children of the node. </returns>
+    virtual T* visitChildren(RuleNode *node) = 0;
 
-                        /// <summary>
-                        /// Visit an error node, and return a user-defined result of the operation.
-                        /// </summary>
-                        /// <param name="node"> The <seealso cref="ErrorNode"/> to visit. </param>
-                        /// <returns> The result of visiting the node. </returns>
-                        virtual T* visitErrorNode(ErrorNode *node) = 0;
+    /// <summary>
+    /// Visit a terminal node, and return a user-defined result of the operation.
+    /// </summary>
+    /// <param name="node"> The <seealso cref="TerminalNode"/> to visit. </param>
+    /// <returns> The result of visiting the node. </returns>
+    virtual T* visitTerminal(TerminalNode *node) = 0;
 
-                    };
+    /// <summary>
+    /// Visit an error node, and return a user-defined result of the operation.
+    /// </summary>
+    /// <param name="node"> The <seealso cref="ErrorNode"/> to visit. </param>
+    /// <returns> The result of visiting the node. </returns>
+    virtual T* visitErrorNode(ErrorNode *node) = 0;
 
-                }
-            }
-        }
-    }
-}
+  };
+
+} // namespace tree
+} // namespace runtime
+} // namespace v4
+} // namespace antlr
+} // namespace org

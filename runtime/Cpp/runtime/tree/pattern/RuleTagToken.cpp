@@ -1,10 +1,6 @@
-﻿#include "RuleTagToken.h"
-#include "TokenSource.h"
-#include "CharStream.h"
-#include "Exceptions.h"
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  * Copyright (c) 2013 Terence Parr
  * Copyright (c) 2013 Dan McLaughlin
  * All rights reserved.
@@ -33,81 +29,74 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace tree {
-                    namespace pattern {
+#include "Exceptions.h"
 
-                        RuleTagToken::RuleTagToken(const std::wstring &ruleName, int _bypassTokenType) : bypassTokenType(_bypassTokenType) {
-                        }
+#include "RuleTagToken.h"
 
-                        RuleTagToken::RuleTagToken(const std::wstring &ruleName, int bypassTokenType, const std::wstring &label) : ruleName(ruleName), bypassTokenType(bypassTokenType), label(label) {
-                            if (ruleName == L"" || ruleName.length() == 0) {
-                                throw IllegalArgumentException(L"ruleName cannot be null or empty.");
-                            }
+using namespace org::antlr::v4::runtime::tree::pattern;
 
-                        }
+RuleTagToken::RuleTagToken(const std::wstring &ruleName, int _bypassTokenType) : bypassTokenType(_bypassTokenType) {
+}
 
-                        std::wstring RuleTagToken::getRuleName() {
-                            return ruleName;
-                        }
+RuleTagToken::RuleTagToken(const std::wstring &ruleName, int bypassTokenType, const std::wstring &label) : ruleName(ruleName), bypassTokenType(bypassTokenType), label(label) {
+  if (ruleName == L"" || ruleName.length() == 0) {
+    throw IllegalArgumentException(L"ruleName cannot be null or empty.");
+  }
 
-                        std::wstring RuleTagToken::getLabel() {
-                            return label;
-                        }
+}
 
-                        int RuleTagToken::getChannel() {
-                            return DEFAULT_CHANNEL;
-                        }
+std::wstring RuleTagToken::getRuleName() {
+  return ruleName;
+}
 
-                        std::wstring RuleTagToken::getText() {
-                            if (label != L"") {
-                                return std::wstring(L"<") + label + std::wstring(L":") + ruleName + std::wstring(L">");
-                            }
+std::wstring RuleTagToken::getLabel() {
+  return label;
+}
 
-                            return std::wstring(L"<") + ruleName + std::wstring(L">");
-                        }
+int RuleTagToken::getChannel() {
+  return DEFAULT_CHANNEL;
+}
 
-                        int RuleTagToken::getType() {
-                            return bypassTokenType;
-                        }
+std::wstring RuleTagToken::getText() {
+  if (label != L"") {
+    return std::wstring(L"<") + label + std::wstring(L":") + ruleName + std::wstring(L">");
+  }
 
-                        int RuleTagToken::getLine() {
-                            return 0;
-                        }
+  return std::wstring(L"<") + ruleName + std::wstring(L">");
+}
 
-                        int RuleTagToken::getCharPositionInLine() {
-                            return -1;
-                        }
+int RuleTagToken::getType() {
+  return bypassTokenType;
+}
 
-                        int RuleTagToken::getTokenIndex() {
-                            return -1;
-                        }
+int RuleTagToken::getLine() {
+  return 0;
+}
 
-                        int RuleTagToken::getStartIndex() {
-                            return -1;
-                        }
+int RuleTagToken::getCharPositionInLine() {
+  return -1;
+}
 
-                        int RuleTagToken::getStopIndex() {
-                            return -1;
-                        }
+int RuleTagToken::getTokenIndex() {
+  return -1;
+}
 
-                        org::antlr::v4::runtime::TokenSource *RuleTagToken::getTokenSource() {
-                            return nullptr;
-                        }
+int RuleTagToken::getStartIndex() {
+  return -1;
+}
 
-                        org::antlr::v4::runtime::CharStream *RuleTagToken::getInputStream() {
-                            return nullptr;
-                        }
+int RuleTagToken::getStopIndex() {
+  return -1;
+}
 
-                        std::wstring RuleTagToken::toString() {
-                            return ruleName + std::wstring(L":") + std::to_wstring(bypassTokenType);
-                        }
-                    }
-                }
-            }
-        }
-    }
+org::antlr::v4::runtime::TokenSource *RuleTagToken::getTokenSource() {
+  return nullptr;
+}
+
+org::antlr::v4::runtime::CharStream *RuleTagToken::getInputStream() {
+  return nullptr;
+}
+
+std::wstring RuleTagToken::toString() {
+  return ruleName + std::wstring(L":") + std::to_wstring(bypassTokenType);
 }

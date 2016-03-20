@@ -1,13 +1,6 @@
-﻿#pragma once
-
-#include <string>
-#include <set>
-#include <vector>
-
-#include "Declarations.h"
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -36,136 +29,139 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#pragma once
+
 namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace dfa {
-                    /// <summary>
-                    /// A DFA state represents a set of possible ATN configurations.
-                    ///  As Aho, Sethi, Ullman p. 117 says "The DFA uses its state
-                    ///  to keep track of all possible states the ATN can be in after
-                    ///  reading each input symbol.  That is to say, after reading
-                    ///  input a1a2..an, the DFA is in a state that represents the
-                    ///  subset T of the states of the ATN that are reachable from the
-                    ///  ATN's start state along some path labeled a1a2..an."
-                    ///  In conventional NFA->DFA conversion, therefore, the subset T
-                    ///  would be a bitset representing the set of states the
-                    ///  ATN could be in.  We need to track the alt predicted by each
-                    ///  state as well, however.  More importantly, we need to maintain
-                    ///  a stack of states, tracking the closure operations as they
-                    ///  jump from rule to rule, emulating rule invocations (method calls).
-                    ///  I have to add a stack to simulate the proper lookahead sequences for
-                    ///  the underlying LL grammar from which the ATN was derived.
-                    /// <p/>
-                    ///  I use a set of ATNConfig objects not simple states.  An ATNConfig
-                    ///  is both a state (ala normal conversion) and a RuleContext describing
-                    ///  the chain of rules (if any) followed to arrive at that state.
-                    /// <p/>
-                    ///  A DFA state may have multiple references to a particular state,
-                    ///  but with different ATN contexts (with same or different alts)
-                    ///  meaning that state was reached via a different set of rule invocations.
-                    /// </summary>
-                    class DFAState {
-                    public:
-                        class PredPrediction {
-                        public:
-                            atn::SemanticContext *pred; // never null; at least SemanticContext.NONE
-                            int alt;
-                            PredPrediction(atn::SemanticContext *pred, int alt);
-                            virtual std::wstring toString();
+namespace antlr {
+namespace v4 {
+namespace runtime {
+namespace dfa {
 
-                        private:
-                            void InitializeInstanceFields();
-                        };
+  /// <summary>
+  /// A DFA state represents a set of possible ATN configurations.
+  ///  As Aho, Sethi, Ullman p. 117 says "The DFA uses its state
+  ///  to keep track of all possible states the ATN can be in after
+  ///  reading each input symbol.  That is to say, after reading
+  ///  input a1a2..an, the DFA is in a state that represents the
+  ///  subset T of the states of the ATN that are reachable from the
+  ///  ATN's start state along some path labeled a1a2..an."
+  ///  In conventional NFA->DFA conversion, therefore, the subset T
+  ///  would be a bitset representing the set of states the
+  ///  ATN could be in.  We need to track the alt predicted by each
+  ///  state as well, however.  More importantly, we need to maintain
+  ///  a stack of states, tracking the closure operations as they
+  ///  jump from rule to rule, emulating rule invocations (method calls).
+  ///  I have to add a stack to simulate the proper lookahead sequences for
+  ///  the underlying LL grammar from which the ATN was derived.
+  /// <p/>
+  ///  I use a set of ATNConfig objects not simple states.  An ATNConfig
+  ///  is both a state (ala normal conversion) and a RuleContext describing
+  ///  the chain of rules (if any) followed to arrive at that state.
+  /// <p/>
+  ///  A DFA state may have multiple references to a particular state,
+  ///  but with different ATN contexts (with same or different alts)
+  ///  meaning that state was reached via a different set of rule invocations.
+  /// </summary>
+  class DFAState {
+  public:
+    class PredPrediction {
+    public:
+      atn::SemanticContext *pred; // never null; at least SemanticContext.NONE
+      int alt;
+      PredPrediction(atn::SemanticContext *pred, int alt);
+      virtual std::wstring toString();
 
-                    public:
-                        int stateNumber;
+    private:
+      void InitializeInstanceFields();
+    };
 
-                        atn::ATNConfigSet *configs;
+  public:
+    int stateNumber;
 
-                        /// <summary>
-                        /// {@code edges[symbol]} points to target of symbol. Shift up by 1 so (-1)
-                        ///  <seealso cref="Token#EOF"/> maps to {@code edges[0]}.
-                        /// </summary>
-//JAVA TO C++ CONVERTER WARNING: Since the array size is not known in this declaration, Java to C++ Converter has converted this array to a pointer.  You will need to call 'delete[]' where appropriate:
-//ORIGINAL LINE: @Nullable public DFAState[] edges;
-                        std::vector<DFAState*> edges;
+    atn::ATNConfigSet *configs;
 
-                        bool isAcceptState;
+    /// <summary>
+    /// {@code edges[symbol]} points to target of symbol. Shift up by 1 so (-1)
+    ///  <seealso cref="Token#EOF"/> maps to {@code edges[0]}.
+    /// </summary>
+    //JAVA TO C++ CONVERTER WARNING: Since the array size is not known in this declaration, Java to C++ Converter has converted this array to a pointer.  You will need to call 'delete[]' where appropriate:
+    //ORIGINAL LINE: @Nullable public DFAState[] edges;
+    std::vector<DFAState*> edges;
 
-                        /// <summary>
-                        /// if accept state, what ttype do we match or alt do we predict?
-                        ///  This is set to <seealso cref="ATN#INVALID_ALT_NUMBER"/> when <seealso cref="#predicates"/>{@code !=null} or
-                        ///  <seealso cref="#requiresFullContext"/>.
-                        /// </summary>
-                        int prediction;
+    bool isAcceptState;
 
-                        int lexerRuleIndex; // if accept, exec action in what rule?
-                        int lexerActionIndex; // if accept, exec what action?
+    /// <summary>
+    /// if accept state, what ttype do we match or alt do we predict?
+    ///  This is set to <seealso cref="ATN#INVALID_ALT_NUMBER"/> when <seealso cref="#predicates"/>{@code !=null} or
+    ///  <seealso cref="#requiresFullContext"/>.
+    /// </summary>
+    int prediction;
 
-                        /// <summary>
-                        /// Indicates that this state was created during SLL prediction that
-                        /// discovered a conflict between the configurations in the state. Future
-                        /// <seealso cref="ParserATNSimulator#execATN"/> invocations immediately jumped doing
-                        /// full context prediction if this field is true.
-                        /// </summary>
-                        bool requiresFullContext;
+    int lexerRuleIndex; // if accept, exec action in what rule?
+    int lexerActionIndex; // if accept, exec what action?
 
-                        /// <summary>
-                        /// During SLL parsing, this is a list of predicates associated with the
-                        ///  ATN configurations of the DFA state. When we have predicates,
-                        ///  <seealso cref="#requiresFullContext"/> is {@code false} since full context prediction evaluates predicates
-                        ///  on-the-fly. If this is not null, then <seealso cref="#prediction"/> is
-                        ///  <seealso cref="ATN#INVALID_ALT_NUMBER"/>.
-                        /// <p/>
-                        ///  We only use these for non-<seealso cref="#requiresFullContext"/> but conflicting states. That
-                        ///  means we know from the context (it's $ or we don't dip into outer
-                        ///  context) that it's an ambiguity not a conflict.
-                        /// <p/>
-                        ///  This list is computed by <seealso cref="ParserATNSimulator#predicateDFAState"/>.
-                        /// </summary>
-                        std::vector<PredPrediction *> predicates;
+    /// <summary>
+    /// Indicates that this state was created during SLL prediction that
+    /// discovered a conflict between the configurations in the state. Future
+    /// <seealso cref="ParserATNSimulator#execATN"/> invocations immediately jumped doing
+    /// full context prediction if this field is true.
+    /// </summary>
+    bool requiresFullContext;
 
-                        /// <summary>
-                        /// Map a predicate to a predicted alternative. </summary>
-                        DFAState();
+    /// <summary>
+    /// During SLL parsing, this is a list of predicates associated with the
+    ///  ATN configurations of the DFA state. When we have predicates,
+    ///  <seealso cref="#requiresFullContext"/> is {@code false} since full context prediction evaluates predicates
+    ///  on-the-fly. If this is not null, then <seealso cref="#prediction"/> is
+    ///  <seealso cref="ATN#INVALID_ALT_NUMBER"/>.
+    /// <p/>
+    ///  We only use these for non-<seealso cref="#requiresFullContext"/> but conflicting states. That
+    ///  means we know from the context (it's $ or we don't dip into outer
+    ///  context) that it's an ambiguity not a conflict.
+    /// <p/>
+    ///  This list is computed by <seealso cref="ParserATNSimulator#predicateDFAState"/>.
+    /// </summary>
+    std::vector<PredPrediction *> predicates;
 
-                        DFAState(int stateNumber);
+    /// <summary>
+    /// Map a predicate to a predicted alternative. </summary>
+    DFAState();
 
-                        DFAState(atn::ATNConfigSet *configs);
+    DFAState(int stateNumber);
 
-                        /// <summary>
-                        /// Get the set of all alts mentioned by all ATN configurations in this
-                        ///  DFA state.
-                        /// </summary>
-                        virtual std::set<int> *getAltSet();
+    DFAState(atn::ATNConfigSet *configs);
 
-                        virtual int hashCode() ;
+    /// <summary>
+    /// Get the set of all alts mentioned by all ATN configurations in this
+    ///  DFA state.
+    /// </summary>
+    virtual std::set<int> *getAltSet();
 
-                        /// <summary>
-                        /// Two <seealso cref="DFAState"/> instances are equal if their ATN configuration sets
-                        /// are the same. This method is used to see if a state already exists.
-                        /// <p/>
-                        /// Because the number of alternatives and number of ATN configurations are
-                        /// finite, there is a finite number of DFA states that can be processed.
-                        /// This is necessary to show that the algorithm terminates.
-                        /// <p/>
-                        /// Cannot test the DFA state numbers here because in
-                        /// <seealso cref="ParserATNSimulator#addDFAState"/> we need to know if any other state
-                        /// exists that has this exact set of ATN configurations. The
-                        /// <seealso cref="#stateNumber"/> is irrelevant.
-                        /// </summary>
-                        virtual bool equals(void *o);
+    virtual int hashCode() ;
 
-                        virtual std::wstring toString();
+    /// <summary>
+    /// Two <seealso cref="DFAState"/> instances are equal if their ATN configuration sets
+    /// are the same. This method is used to see if a state already exists.
+    /// <p/>
+    /// Because the number of alternatives and number of ATN configurations are
+    /// finite, there is a finite number of DFA states that can be processed.
+    /// This is necessary to show that the algorithm terminates.
+    /// <p/>
+    /// Cannot test the DFA state numbers here because in
+    /// <seealso cref="ParserATNSimulator#addDFAState"/> we need to know if any other state
+    /// exists that has this exact set of ATN configurations. The
+    /// <seealso cref="#stateNumber"/> is irrelevant.
+    /// </summary>
+    virtual bool equals(void *o);
 
-                    private:
-                        void InitializeInstanceFields();
-                    };
+    virtual std::wstring toString();
 
-                }
-            }
-        }
-    }
-}
+  private:
+    void InitializeInstanceFields();
+  };
+
+} // namespace atn
+} // namespace runtime
+} // namespace v4
+} // namespace antlr
+} // namespace org

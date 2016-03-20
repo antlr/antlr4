@@ -1,7 +1,6 @@
-﻿#pragma once
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Sam Harwell
  *  All rights reserved.
@@ -30,33 +29,35 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#pragma once
+
 namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace atn {
+namespace antlr {
+namespace v4 {
+namespace runtime {
+namespace atn {
 
-                    /// <summary>
-                    /// Represents the type of recognizer an ATN applies to.
-                    /// 
-                    /// @author Sam Harwell
-                    /// </summary>
-                    enum class ATNType {
+  /// <summary>
+  /// Represents the type of recognizer an ATN applies to.
+  ///
+  /// @author Sam Harwell
+  /// </summary>
+  enum class ATNType {
 
-                        /// <summary>
-                        /// A lexer grammar.
-                        /// </summary>
-                        LEXER,
+    /// <summary>
+    /// A lexer grammar.
+    /// </summary>
+    LEXER,
 
-                        /// <summary>
-                        /// A parser grammar.
-                        /// </summary>
-                        PARSER,
+    /// <summary>
+    /// A parser grammar.
+    /// </summary>
+    PARSER,
 
-                    };
+  };
 
-                }
-            }
-        }
-    }
-}
+} // namespace atn
+} // namespace runtime
+} // namespace v4
+} // namespace antlr
+} // namespace org

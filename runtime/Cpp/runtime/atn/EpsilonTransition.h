@@ -1,11 +1,6 @@
-﻿#pragma once
-
-#include "Transition.h"
-#include "ATNState.h"
-#include <string>
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -34,28 +29,30 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#pragma once
+
+#include "Transition.h"
+
 namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace atn {
+namespace antlr {
+namespace v4 {
+namespace runtime {
+namespace atn {
 
-                    using org::antlr::v4::runtime::misc::NotNull;
+  class EpsilonTransition final : public Transition {
+  public:
+    EpsilonTransition(ATNState *target);
 
-                    class EpsilonTransition final : public Transition {
-                    public:
-                        EpsilonTransition(ATNState *target);
+    virtual int getSerializationType() override;
 
-                        virtual int getSerializationType() override;
+    virtual bool isEpsilon() override;
+    virtual bool matches(int symbol, int minVocabSymbol, int maxVocabSymbol) override;
 
-                        virtual bool isEpsilon() override;
-                        virtual bool matches(int symbol, int minVocabSymbol, int maxVocabSymbol) override;
+    virtual std::wstring toString();
+  };
 
-                        virtual std::wstring toString();
-                    };
-
-                }
-            }
-        }
-    }
-}
+} // namespace atn
+} // namespace runtime
+} // namespace v4
+} // namespace antlr
+} // namespace org

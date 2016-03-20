@@ -1,12 +1,6 @@
-﻿#pragma once
-
-#include "Exceptions.h"
-
-#include <string>
-#include <vector>
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -35,129 +29,134 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#pragma once
+
+#include "Exceptions.h"
+
 namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace misc {
-                    template <typename T>
-                    class LinkedHashSet {
-                        T remove(T);
-                        bool add(T);
-                    };
+namespace antlr {
+namespace v4 {
+namespace runtime {
+namespace misc {
 
-                    /// <summary>
-                    /// A HashMap that remembers the order that the elements were added.
-                    ///  You can alter the ith element with set(i,value) too :)  Unique list.
-                    ///  I need the replace/set-element-i functionality so I'm subclassing
-                    ///  LinkedHashSet.
-                    /// </summary>
-                    template<typename T>
-                    class OrderedHashSet : public LinkedHashSet<T> {
-                        /// <summary>
-                        /// Track the elements as they are added to the set </summary>
-                    protected:
-//JAVA TO C++ CONVERTER NOTE: The variable elements was renamed since C++ does not allow variables with the same name as methods:
-                        std::vector<T> elements_Renamed;
+  template <typename T>
+  class LinkedHashSet {
+    T remove(T);
+    bool add(T);
+  };
 
-                    public:
-                        virtual T get(int i) {
-                            return elements_Renamed[i];
-                        }
+  /// <summary>
+  /// A HashMap that remembers the order that the elements were added.
+  ///  You can alter the ith element with set(i,value) too :)  Unique list.
+  ///  I need the replace/set-element-i functionality so I'm subclassing
+  ///  LinkedHashSet.
+  /// </summary>
+  template<typename T>
+  class OrderedHashSet : public LinkedHashSet<T> {
+    /// <summary>
+    /// Track the elements as they are added to the set </summary>
+  protected:
+    //JAVA TO C++ CONVERTER NOTE: The variable elements was renamed since C++ does not allow variables with the same name as methods:
+    std::vector<T> elements_Renamed;
 
-                        /// <summary>
-                        /// Replace an existing value with a new value; updates the element
-                        ///  list and the hash table, but not the key as that has not changed.
-                        /// </summary>
-                        virtual T set(int i, T value) {
-                            T oldElement = elements_Renamed[i];
-                            elements_Renamed[i] = value; // update list
-                            remove(oldElement); // now update the set: remove/add
-                            add(value);
-                            return oldElement;
-                        }
-
-                        virtual bool remove(int i) {
-                            T o = elements_Renamed.remove(i);
-                            return remove(o);
-                        }
-
-                        /// <summary>
-                        /// Add a value to list; keep in hashtable for consistency also;
-                        ///  Key is object itself.  Good for say asking if a certain string is in
-                        ///  a list of strings.
-                        /// </summary>
-                        virtual bool add(T value) override {
-                            bool result = add(value);
-                            if (result) { // only track if new element not in set
-                                elements_Renamed.push_back(value);
-                            }
-                            return result;
-                        }
-
-                        virtual bool remove(void *o) override {
-                            throw new UnsupportedOperationException();
-                        }
-
-                        virtual void clear() override {
-                            elements_Renamed.clear();
-                            LinkedHashSet<T>::clear();
-                        }
-
-                        virtual int hashCode() override {
-                            return elements_Renamed.hashCode();
-                        }
-
-                        virtual bool equals(void *o) override {
-                            if (!(dynamic_cast<OrderedHashSet<T>*>(o) != nullptr)) {
-                                return false;
-                            }
-
-                    //		System.out.print("equals " + this + ", " + o+" = ");
-                            bool same = elements_Renamed.size() > 0 && elements_Renamed.equals((static_cast<OrderedHashSet<T>*>(o))->elements_Renamed);
-                    //		System.out.println(same);
-                            return same;
-                        }
-#ifdef TODO
-                        virtual std::iterator<T> *iterator() override {
-                            return elements_Renamed.begin();
-                        }
-#endif
-                        /// <summary>
-                        /// Return the List holding list of table elements.  Note that you are
-                        ///  NOT getting a copy so don't write to the list.
-                        /// </summary>
-                        virtual std::vector<T> elements() {
-                            return elements_Renamed;
-                        }
-
-                        virtual void *clone() override { // safe (result of clone)
-                            OrderedHashSet<T> *dup = static_cast<OrderedHashSet<T>*>(LinkedHashSet<T>::clone());
-                            dup->elements_Renamed = std::vector<T>(this->elements_Renamed);
-                            return dup;
-                        }
-
-                        virtual void *toArray() override {
-                            return elements_Renamed.toArray();
-                        }
-
-                        virtual std::wstring toString() override {
-                            return elements_Renamed.toString();
-                        }
-
-                    private:
-                        void InitializeInstanceFields() {
-                            elements_Renamed = std::vector<T>();
-                        }
-
-public:
-                        OrderedHashSet() {
-                            InitializeInstanceFields();
-                        }
-                    };
-
-                }
-            }
-        }
+  public:
+    virtual T get(int i) {
+      return elements_Renamed[i];
     }
-}
+
+    /// <summary>
+    /// Replace an existing value with a new value; updates the element
+    ///  list and the hash table, but not the key as that has not changed.
+    /// </summary>
+    virtual T set(int i, T value) {
+      T oldElement = elements_Renamed[i];
+      elements_Renamed[i] = value; // update list
+      remove(oldElement); // now update the set: remove/add
+      add(value);
+      return oldElement;
+    }
+
+    virtual bool remove(int i) {
+      T o = elements_Renamed.remove(i);
+      return remove(o);
+    }
+
+    /// <summary>
+    /// Add a value to list; keep in hashtable for consistency also;
+    ///  Key is object itself.  Good for say asking if a certain string is in
+    ///  a list of strings.
+    /// </summary>
+    virtual bool add(T value) override {
+      bool result = add(value);
+      if (result) { // only track if new element not in set
+        elements_Renamed.push_back(value);
+      }
+      return result;
+    }
+
+    virtual bool remove(void *o) override {
+      throw new UnsupportedOperationException();
+    }
+
+    virtual void clear() override {
+      elements_Renamed.clear();
+      LinkedHashSet<T>::clear();
+    }
+
+    virtual int hashCode() override {
+      return elements_Renamed.hashCode();
+    }
+
+    virtual bool equals(void *o) override {
+      if (!(dynamic_cast<OrderedHashSet<T>*>(o) != nullptr)) {
+        return false;
+      }
+
+      //		System.out.print("equals " + this + ", " + o+" = ");
+      bool same = elements_Renamed.size() > 0 && elements_Renamed.equals((static_cast<OrderedHashSet<T>*>(o))->elements_Renamed);
+      //		System.out.println(same);
+      return same;
+    }
+#ifdef TODO
+    virtual std::iterator<T> *iterator() override {
+      return elements_Renamed.begin();
+    }
+#endif
+    /// <summary>
+    /// Return the List holding list of table elements.  Note that you are
+    ///  NOT getting a copy so don't write to the list.
+    /// </summary>
+    virtual std::vector<T> elements() {
+      return elements_Renamed;
+    }
+
+    virtual void *clone() override { // safe (result of clone)
+      OrderedHashSet<T> *dup = static_cast<OrderedHashSet<T>*>(LinkedHashSet<T>::clone());
+      dup->elements_Renamed = std::vector<T>(this->elements_Renamed);
+      return dup;
+    }
+
+    virtual void *toArray() override {
+      return elements_Renamed.toArray();
+    }
+
+    virtual std::wstring toString() override {
+      return elements_Renamed.toString();
+    }
+
+  private:
+    void InitializeInstanceFields() {
+      elements_Renamed = std::vector<T>();
+    }
+
+  public:
+    OrderedHashSet() {
+      InitializeInstanceFields();
+    }
+  };
+
+} // namespace atn
+} // namespace runtime
+} // namespace v4
+} // namespace antlr
+} // namespace org

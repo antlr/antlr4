@@ -1,11 +1,4 @@
-﻿#pragma once
-
-#include "Lexer.h"
-#include "Declarations.h"
-#include <string>
-#include <vector>
-
-/*
+﻿/*
  * [The "BSD license"]
  *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
@@ -36,42 +29,47 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#pragma once
+
+#include "Lexer.h"
+
 namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                class LexerInterpreter : public Lexer {
-                protected:
-                    const std::wstring grammarFileName;
-                    atn::ATN *const atn;
+namespace antlr {
+namespace v4 {
+namespace runtime {
+
+  class LexerInterpreter : public Lexer {
+  protected:
+    const std::wstring grammarFileName;
+    atn::ATN *const atn;
 
 
-                    std::vector<std::wstring> _tokenNames;
+    std::vector<std::wstring> _tokenNames;
 
-                    std::vector<std::wstring> _ruleNames;
+    std::vector<std::wstring> _ruleNames;
 
-                    std::vector<std::wstring> _modeNames;
+    std::vector<std::wstring> _modeNames;
 
-                    std::vector<dfa::DFA*> _decisionToDFA;
-                    
-                    atn::PredictionContextCache *const _sharedContextCache;
+    std::vector<dfa::DFA*> _decisionToDFA;
 
-                public:
-                    LexerInterpreter(const std::wstring &grammarFileName, std::vector<std::wstring> *tokenNames, std::vector<std::wstring> *ruleNames, std::vector<std::wstring> *modeNames, atn::ATN *atn, CharStream *input);
-                  ~LexerInterpreter();
+    atn::PredictionContextCache *const _sharedContextCache;
 
-                    virtual atn::ATN *getATN() const override;
+  public:
+    LexerInterpreter(const std::wstring &grammarFileName, std::vector<std::wstring> *tokenNames, std::vector<std::wstring> *ruleNames, std::vector<std::wstring> *modeNames, atn::ATN *atn, CharStream *input);
+    ~LexerInterpreter();
 
-                    virtual std::wstring getGrammarFileName() const override;
+    virtual atn::ATN *getATN() const override;
 
-                    virtual const std::vector<std::wstring>& getTokenNames() const override;
+    virtual std::wstring getGrammarFileName() const override;
 
-                    virtual const std::vector<std::wstring>& getRuleNames() const override;
+    virtual const std::vector<std::wstring>& getTokenNames() const override;
 
-                    virtual const std::vector<std::wstring>& getModeNames() const override;
-                };
+    virtual const std::vector<std::wstring>& getRuleNames() const override;
 
-            }
-        }
-    }
-}
+    virtual const std::vector<std::wstring>& getModeNames() const override;
+  };
+
+} // namespace runtime
+} // namespace v4
+} // namespace antlr
+} // namespace org

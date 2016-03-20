@@ -1,13 +1,6 @@
-﻿#pragma once
-
-#include <string>
-#include <vector>
-#include <map>
-
-#include "Declarations.h"
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -36,57 +29,57 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#pragma once
+
 namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace dfa {
+namespace antlr {
+namespace v4 {
+namespace runtime {
+namespace dfa {
 
+  class DFA {
+    /// <summary>
+    /// A set of all DFA states. Use <seealso cref="Map"/> so we can get old state back
+    ///  (<seealso cref="Set"/> only allows you to see if it's there).
+    /// </summary>
+  public:
+    /// <summary>
+    /// From which ATN state did we create this DFA? </summary>
+    atn::DecisionState *const atnStartState;
+    std::map<DFAState*, DFAState*> *const states;
+    DFAState *s0;
+    const int decision;
 
+    DFA(atn::DecisionState *atnStartState); //this(atnStartState, 0);
 
-                    class DFA {
-                        /// <summary>
-                        /// A set of all DFA states. Use <seealso cref="Map"/> so we can get old state back
-                        ///  (<seealso cref="Set"/> only allows you to see if it's there).
-                        /// </summary>
-                    public:
-                        /// <summary>
-                        /// From which ATN state did we create this DFA? </summary>
-                        atn::DecisionState *const atnStartState;
-                        std::map<DFAState*, DFAState*> *const states;
-                        DFAState *s0;
-                        const int decision;
+    DFA(atn::DecisionState *atnStartState, int decision);
 
-                        DFA(atn::DecisionState *atnStartState); //this(atnStartState, 0);
+    /// <summary>
+    /// Return a list of all states in this DFA, ordered by state number.
+    /// </summary>
+    virtual std::vector<DFAState*> getStates();
 
-                        DFA(atn::DecisionState *atnStartState, int decision);
+  private:
+    class ComparatorAnonymousInnerClassHelper {
+    private:
+      DFA *const outerInstance;
 
-                        /// <summary>
-                        /// Return a list of all states in this DFA, ordered by state number.
-                        /// </summary>
-                        virtual std::vector<DFAState*> getStates();
+    public:
+      ComparatorAnonymousInnerClassHelper(DFA *outerInstance);
 
-                    private:
-                        class ComparatorAnonymousInnerClassHelper {
-                        private:
-                            DFA *const outerInstance;
+      static int compare(DFAState *o1, DFAState *o2);
+    };
 
-                        public:
-                            ComparatorAnonymousInnerClassHelper(DFA *outerInstance);
+  public:
+    virtual std::wstring toString();
 
-                            static int compare(DFAState *o1, DFAState *o2);
-                        };
+    virtual std::wstring toString(const std::vector<std::wstring>& tokenNames);
+    virtual std::wstring toLexerString();
 
-                    public:
-                        virtual std::wstring toString();
+  };
 
-                        virtual std::wstring toString(const std::vector<std::wstring>& tokenNames);
-                        virtual std::wstring toLexerString();
-
-                    };
-
-                }
-            }
-        }
-    }
-}
+} // namespace atn
+} // namespace runtime
+} // namespace v4
+} // namespace antlr
+} // namespace org

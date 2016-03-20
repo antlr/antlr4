@@ -1,5 +1,6 @@
 /*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
  *
@@ -28,3 +29,5 @@
  */
 
 #include "Exceptions.h"
+
+using namespace org::antlr::v4::runtime;

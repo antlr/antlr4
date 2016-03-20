@@ -1,10 +1,6 @@
-﻿#pragma once
-
-#include <functional>
-#include <vector>
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -33,92 +29,90 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#pragma once
+
 namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace misc {
+namespace antlr {
+namespace v4 {
+namespace runtime {
+namespace misc {
 
-                    /// 
-                    /// <summary>
-                    /// @author Sam Harwell
-                    /// </summary>
-                    class MurmurHash {
+  class MurmurHash {
 
-                    private:
-                        static const int DEFAULT_SEED = 0;
+  private:
+    static const int DEFAULT_SEED = 0;
 
-                        /// <summary>
-                        /// Initialize the hash using the default seed value.
-                        /// </summary>
-                        /// <returns> the intermediate hash value </returns>
-                    public:
-                        static int initialize();
+    /// <summary>
+    /// Initialize the hash using the default seed value.
+    /// </summary>
+    /// <returns> the intermediate hash value </returns>
+  public:
+    static int initialize();
 
-                        /// <summary>
-                        /// Initialize the hash using the specified {@code seed}.
-                        /// </summary>
-                        /// <param name="seed"> the seed </param>
-                        /// <returns> the intermediate hash value </returns>
-                        static int initialize(int seed);
+    /// <summary>
+    /// Initialize the hash using the specified {@code seed}.
+    /// </summary>
+    /// <param name="seed"> the seed </param>
+    /// <returns> the intermediate hash value </returns>
+    static int initialize(int seed);
 
-                        /// <summary>
-                        /// Update the intermediate hash value for the next input {@code value}.
-                        /// </summary>
-                        /// <param name="hash"> the intermediate hash value </param>
-                        /// <param name="value"> the value to add to the current hash </param>
-                        /// <returns> the updated intermediate hash value </returns>
-                        static int update(int hash, int value);
+    /// <summary>
+    /// Update the intermediate hash value for the next input {@code value}.
+    /// </summary>
+    /// <param name="hash"> the intermediate hash value </param>
+    /// <param name="value"> the value to add to the current hash </param>
+    /// <returns> the updated intermediate hash value </returns>
+    static int update(int hash, int value);
 
-                        /// <summary>
-                        /// Update the intermediate hash value for the next input {@code value}.
-                        /// </summary>
-                        /// <param name="hash"> the intermediate hash value </param>
-                        /// <param name="value"> the value to add to the current hash </param>
-                        /// <returns> the updated intermediate hash value </returns>
-                        template<typename T>
-                        static int update(int hash, T *value)  {
-                            std::hash<T> hashFunction;
-                            
-                            return update(hash, value != nullptr ? (int)hashFunction(*value) : 0);
-                        }
+    /// <summary>
+    /// Update the intermediate hash value for the next input {@code value}.
+    /// </summary>
+    /// <param name="hash"> the intermediate hash value </param>
+    /// <param name="value"> the value to add to the current hash </param>
+    /// <returns> the updated intermediate hash value </returns>
+    template<typename T>
+    static int update(int hash, T *value)  {
+      std::hash<T> hashFunction;
 
-                        /// <summary>
-                        /// Apply the final computation steps to the intermediate value {@code hash}
-                        /// to form the final result of the MurmurHash 3 hash function.
-                        /// </summary>
-                        /// <param name="hash"> the intermediate hash value </param>
-                        /// <param name="numberOfWords"> the number of integer values added to the hash </param>
-                        /// <returns> the final hash result </returns>
-                        static int finish(int hash, int numberOfWords);
-
-                        /// <summary>
-                        /// Utility function to compute the hash code of an array using the
-                        /// MurmurHash algorithm.
-                        /// </summary>
-                        /// @param <T> the array element type </param>
-                        /// <param name="data"> the array data </param>
-                        /// <param name="seed"> the seed for the MurmurHash algorithm </param>
-                        /// <returns> the hash code of the data </returns>
-
-                        template<typename T> // where T is C array type
-                        static int hashCode(const T*data, std::size_t size, int seed) {
-                            int hash = initialize(seed);
-                            for(int i = 0; i < (int)size; i++) {
-                                hash = update(hash, data[i]);
-                            }
-                            
-                            hash = finish(hash, (int)size);
-                            return hash;
-                        }
-
-
-                    private:
-                        MurmurHash();
-                    };
-
-                }
-            }
-        }
+      return update(hash, value != nullptr ? (int)hashFunction(*value) : 0);
     }
-}
+
+    /// <summary>
+    /// Apply the final computation steps to the intermediate value {@code hash}
+    /// to form the final result of the MurmurHash 3 hash function.
+    /// </summary>
+    /// <param name="hash"> the intermediate hash value </param>
+    /// <param name="numberOfWords"> the number of integer values added to the hash </param>
+    /// <returns> the final hash result </returns>
+    static int finish(int hash, int numberOfWords);
+
+    /// <summary>
+    /// Utility function to compute the hash code of an array using the
+    /// MurmurHash algorithm.
+    /// </summary>
+    /// @param <T> the array element type </param>
+    /// <param name="data"> the array data </param>
+    /// <param name="seed"> the seed for the MurmurHash algorithm </param>
+    /// <returns> the hash code of the data </returns>
+
+    template<typename T> // where T is C array type
+    static int hashCode(const T*data, std::size_t size, int seed) {
+      int hash = initialize(seed);
+      for(int i = 0; i < (int)size; i++) {
+        hash = update(hash, data[i]);
+      }
+
+      hash = finish(hash, (int)size);
+      return hash;
+    }
+
+
+  private:
+    MurmurHash();
+  };
+
+} // namespace atn
+} // namespace runtime
+} // namespace v4
+} // namespace antlr
+} // namespace org

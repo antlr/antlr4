@@ -1,5 +1,3 @@
-#pragma once
-
 /*
  * [The "BSD license"]
  *  Copyright (c) 2016 Mike Lischke
@@ -30,13 +28,7 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <iostream>
-#include <map>
-#include <string>
-#include <vector>
-#include <cwchar>
-#include <iomanip>
-#include <sstream>
+#pragma once
 
 namespace antlrcpp {
 

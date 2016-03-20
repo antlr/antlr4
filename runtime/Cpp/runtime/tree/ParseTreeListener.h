@@ -1,9 +1,6 @@
-﻿#pragma once
-
-#include "Declarations.h"
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -32,22 +29,24 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                
-                namespace tree {
-                    class ParseTreeListener {
-                    public:
-                        virtual void visitTerminal(TerminalNode *node) = 0;
-                        virtual void visitErrorNode(ErrorNode *node) = 0;
-                        virtual void enterEveryRule(ParserRuleContext *ctx) = 0;
-                        virtual void exitEveryRule(ParserRuleContext *ctx) = 0;
-                    };
+#pragma once
 
-                }
-            }
-        }
-    }
-}
+namespace org {
+namespace antlr {
+namespace v4 {
+namespace runtime {
+namespace tree {
+
+  class ParseTreeListener {
+  public:
+    virtual void visitTerminal(TerminalNode *node) = 0;
+    virtual void visitErrorNode(ErrorNode *node) = 0;
+    virtual void enterEveryRule(ParserRuleContext *ctx) = 0;
+    virtual void exitEveryRule(ParserRuleContext *ctx) = 0;
+  };
+
+} // namespace tree
+} // namespace runtime
+} // namespace v4
+} // namespace antlr
+} // namespace org

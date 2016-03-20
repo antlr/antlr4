@@ -1,13 +1,4 @@
-﻿#pragma once
-
-#include <string>
-#include <deque>
-
-#include "Parser.h"
-#include "Declarations.h"
-
-
-/*
+﻿/*
  * [The "BSD license"]
  * Copyright (c) 2016 Mike Lischke
  * Copyright (c) 2013 Terence Parr
@@ -38,70 +29,72 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#pragma once
+
+#include "Parser.h"
+
 namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
+namespace antlr {
+namespace v4 {
+namespace runtime {
 
-                /// <summary>
-                /// A parser simulator that mimics what ANTLR's generated
-                ///  parser code does. A ParserATNSimulator is used to make
-                ///  predictions via adaptivePredict but this class moves a pointer through the
-                ///  ATN to simulate parsing. ParserATNSimulator just
-                ///  makes us efficient rather than having to backtrack, for example.
-                /// 
-                ///  This properly creates parse trees even for left recursive rules.
-                /// 
-                ///  We rely on the left recursive rule invocation and special predicate
-                ///  transitions to make left recursive rules work.
-                /// 
-                ///  See TestParserInterpreter for examples.
-                /// </summary>
-                class ParserInterpreter : public Parser {
-                protected:
-					//TODO check this
-                    static const int DEFAULT_BITSET_SIZE = 1024; // atn->states.size() ideally
-                    
-                    const std::wstring grammarFileName;
-                    std::vector<std::wstring> _tokenNames;
-                    atn::ATN *const atn;
+  /// <summary>
+  /// A parser simulator that mimics what ANTLR's generated
+  ///  parser code does. A ParserATNSimulator is used to make
+  ///  predictions via adaptivePredict but this class moves a pointer through the
+  ///  ATN to simulate parsing. ParserATNSimulator just
+  ///  makes us efficient rather than having to backtrack, for example.
+  ///
+  ///  This properly creates parse trees even for left recursive rules.
+  ///
+  ///  We rely on the left recursive rule invocation and special predicate
+  ///  transitions to make left recursive rules work.
+  ///
+  ///  See TestParserInterpreter for examples.
+  /// </summary>
+  class ParserInterpreter : public Parser {
+  protected:
+    //TODO check this
+    static const int DEFAULT_BITSET_SIZE = 1024; // atn->states.size() ideally
 
-                    std::vector<std::wstring> _ruleNames;
-                    antlrcpp::BitSet *const pushRecursionContextStates;
+    const std::wstring grammarFileName;
+    std::vector<std::wstring> _tokenNames;
+    atn::ATN *const atn;
 
-                    std::vector<dfa::DFA *> _decisionToDFA; // not shared like it is for generated parsers
-                    atn::PredictionContextCache *const sharedContextCache;
+    std::vector<std::wstring> _ruleNames;
+    antlrcpp::BitSet *const pushRecursionContextStates;
 
+    std::vector<dfa::DFA *> _decisionToDFA; // not shared like it is for generated parsers
+    atn::PredictionContextCache *const sharedContextCache;
 
+    std::deque<std::pair<ParserRuleContext*, int>*> *const _parentContextStack;
 
-                    std::deque<std::pair<ParserRuleContext*, int>*> *const _parentContextStack;
+  public:
+    ParserInterpreter(const std::wstring &grammarFileName, const std::vector<std::wstring>& tokenNames, const std::vector<std::wstring>& ruleNames, atn::ATN *atn, TokenStream *input);
 
-                public:
-                    ParserInterpreter(const std::wstring &grammarFileName, const std::vector<std::wstring>& tokenNames, const std::vector<std::wstring>& ruleNames, atn::ATN *atn, TokenStream *input);
+    virtual atn::ATN *getATN() const override;
 
-                    virtual atn::ATN *getATN() const override;
+    virtual const std::vector<std::wstring>& getTokenNames() const override;
 
-                    virtual const std::vector<std::wstring>& getTokenNames() const override;
+    virtual const std::vector<std::wstring>& getRuleNames() const override;
 
-                    virtual const std::vector<std::wstring>& getRuleNames() const override;
+    virtual std::wstring getGrammarFileName() const override;
 
-                    virtual std::wstring getGrammarFileName() const override;
+    /// <summary>
+    /// Begin parsing at startRuleIndex </summary>
+    virtual ParserRuleContext *parse(int startRuleIndex);
 
-                    /// <summary>
-                    /// Begin parsing at startRuleIndex </summary>
-                    virtual ParserRuleContext *parse(int startRuleIndex);
+    virtual void enterRecursionRule(ParserRuleContext *localctx, int state, int ruleIndex, int precedence) override;
 
-                    virtual void enterRecursionRule(ParserRuleContext *localctx, int state, int ruleIndex, int precedence) override;
+  protected:
+    virtual atn::ATNState *getATNState();
 
-                protected:
-                    virtual atn::ATNState *getATNState();
+    virtual void visitState(atn::ATNState *p);
 
-                    virtual void visitState(atn::ATNState *p);
+    virtual void visitRuleStopState(atn::ATNState *p);
+  };
 
-                    virtual void visitRuleStopState(atn::ATNState *p);
-                };
-
-            }
-        }
-    }
-}
+} // namespace runtime
+} // namespace v4
+} // namespace antlr
+} // namespace org

@@ -1,10 +1,6 @@
-﻿#include "Transition.h"
-#include "Exceptions.h"
-#include <set>
-#include "Arrays.h"
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -33,31 +29,28 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace atn {
-                    
-                    const std::vector<std::wstring> Transition::serializationNames = *new std::vector<std::wstring>(antlrcpp::Arrays::asList(11, L"INVALID", L"EPSILON", L"RANGE", L"RULE", L"PREDICATE", L"ATOM", L"ACTION", L"SET", L"NOT_SET", L"WILDCARD", L"PRECEDENCE"));
-                                        
-                    Transition::Transition(ATNState *target) {
-                        if (target == nullptr) {
-                            throw NullPointerException(L"target cannot be null.");
-                        }
+#include "Exceptions.h"
+#include "Arrays.h"
 
-                        this->target = target;
-                    }
+#include "Transition.h"
 
-                    bool Transition::isEpsilon() {
-                        return false;
-                    }
+using namespace org::antlr::v4::runtime;
+using namespace org::antlr::v4::runtime::atn;
 
-                    misc::IntervalSet *Transition::label() {
-                        return nullptr;
-                    }
-                }
-            }
-        }
-    }
+const std::vector<std::wstring> Transition::serializationNames = *new std::vector<std::wstring>(antlrcpp::Arrays::asList(11, L"INVALID", L"EPSILON", L"RANGE", L"RULE", L"PREDICATE", L"ATOM", L"ACTION", L"SET", L"NOT_SET", L"WILDCARD", L"PRECEDENCE"));
+
+Transition::Transition(ATNState *target) {
+  if (target == nullptr) {
+    throw NullPointerException(L"target cannot be null.");
+  }
+
+  this->target = target;
+}
+
+bool Transition::isEpsilon() {
+  return false;
+}
+
+misc::IntervalSet *Transition::label() {
+  return nullptr;
 }

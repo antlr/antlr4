@@ -1,10 +1,4 @@
-﻿#pragma once
-
-#include "ErrorNode.h"
-#include "TerminalNodeImpl.h"
-#include "Declarations.h"
-
-/*
+﻿/*
  * [The "BSD license"]
  *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
@@ -35,64 +29,68 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#pragma once
+
+#include "ErrorNode.h"
+#include "TerminalNodeImpl.h"
+
 namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace tree {
+namespace antlr {
+namespace v4 {
+namespace runtime {
+namespace tree {
 
+  /// <summary>
+  /// Represents a token that was consumed during resynchronization
+  ///  rather than during a valid match operation. For example,
+  ///  we will create this kind of a node during single token insertion
+  ///  and deletion as well as during "consume until error recovery set"
+  ///  upon no viable alternative exceptions.
+  /// </summary>
+  class ErrorNodeImpl : public virtual TerminalNodeImpl, public virtual ErrorNode {
+  public:
+    ErrorNodeImpl(Token *token);
 
-                    /// <summary>
-                    /// Represents a token that was consumed during resynchronization
-                    ///  rather than during a valid match operation. For example,
-                    ///  we will create this kind of a node during single token insertion
-                    ///  and deletion as well as during "consume until error recovery set"
-                    ///  upon no viable alternative exceptions.
-                    /// </summary>
-                    class ErrorNodeImpl : public virtual TerminalNodeImpl, public virtual ErrorNode {
-                    public:
-                        ErrorNodeImpl(Token *token);
-
-                        template<typename T, typename T1>
-                        T accept(ParseTreeVisitor<T1> *visitor)  {
-                            return visitor->visitErrorNode(this);
-                        }
-                        
-                        // From ErrorNode
-                        
-                        // TerminalNodeImpl->TerminalNode->ParseTree->SyntaxTree->Tree
-                        //        ErrorNode->TerminalNode ...
-
-                        
-                        // From TerminalnodeImpl
-                        
-                        // From Terminal Node
-                    public:
-                        virtual Token *getSymbol() override;
-                        
-                        // From Parse Tree
-                    public:
-                        virtual ParseTree *getParent() override ;
-                        virtual ParseTree *getChild(std::size_t i) override;
-                        virtual std::wstring getText() override;
-                        virtual std::wstring toStringTree(Parser *parser) override;
-                        
-                        // From SyntaxTree
-                    public:
-                        virtual misc::Interval *getSourceInterval() override;
-                        
-                        // From Tree
-                    public:
-//                        Tree *getParent() override;
-                        virtual void *getPayload() override;
-//                        Tree *getChild(int i) override;
-                        
-                      virtual std::size_t getChildCount() override;
-                        virtual std::wstring toStringTree() override;
-                    };
-
-                }
-            }
-        }
+    template<typename T, typename T1>
+    T accept(ParseTreeVisitor<T1> *visitor)  {
+      return visitor->visitErrorNode(this);
     }
-}
+
+    // From ErrorNode
+
+    // TerminalNodeImpl->TerminalNode->ParseTree->SyntaxTree->Tree
+    //        ErrorNode->TerminalNode ...
+
+
+    // From TerminalnodeImpl
+
+    // From Terminal Node
+  public:
+    virtual Token *getSymbol() override;
+
+    // From Parse Tree
+  public:
+    virtual ParseTree *getParent() override ;
+    virtual ParseTree *getChild(std::size_t i) override;
+    virtual std::wstring getText() override;
+    virtual std::wstring toStringTree(Parser *parser) override;
+
+    // From SyntaxTree
+  public:
+    virtual misc::Interval *getSourceInterval() override;
+
+    // From Tree
+  public:
+    //                        Tree *getParent() override;
+    virtual void *getPayload() override;
+    //                        Tree *getChild(int i) override;
+
+    virtual std::size_t getChildCount() override;
+    virtual std::wstring toStringTree() override;
+  };
+
+} // namespace tree
+} // namespace runtime
+} // namespace v4
+} // namespace antlr
+} // namespace org

@@ -1,9 +1,6 @@
-﻿#include "XPathRuleAnywhereElement.h"
-#include "Trees.h"
-#include <vector>
-
-/*
-* [The "BSD license"]
+﻿/*
+ * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
 *  Copyright (c) 2013 Terence Parr
 *  Copyright (c) 2013 Dan McLaughlin
 *  All rights reserved.
@@ -32,29 +29,22 @@
 *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace tree {
-                    namespace xpath {
+#include "Trees.h"
 
+#include "XPathRuleAnywhereElement.h"
 
-                        XPathRuleAnywhereElement::XPathRuleAnywhereElement(const std::wstring &ruleName, int ruleIndex) : XPathElement(ruleName) {
-                            InitializeInstanceFields();
-                            this->ruleIndex = ruleIndex;
-                        }
+using namespace org::antlr::v4::runtime::tree;
+using namespace org::antlr::v4::runtime::tree::xpath;
 
-                        std::vector<ParseTree*> *XPathRuleAnywhereElement::evaluate(ParseTree *t) {
-                            return Trees::findAllRuleNodes(t, ruleIndex);
-                        }
+XPathRuleAnywhereElement::XPathRuleAnywhereElement(const std::wstring &ruleName, int ruleIndex) : XPathElement(ruleName) {
+  InitializeInstanceFields();
+  this->ruleIndex = ruleIndex;
+}
 
-                        void XPathRuleAnywhereElement::InitializeInstanceFields() {
-                            ruleIndex = 0;
-                        }
-                    }
-                }
-            }
-        }
-    }
+std::vector<ParseTree*> *XPathRuleAnywhereElement::evaluate(ParseTree *t) {
+  return Trees::findAllRuleNodes(t, ruleIndex);
+}
+
+void XPathRuleAnywhereElement::InitializeInstanceFields() {
+  ruleIndex = 0;
 }

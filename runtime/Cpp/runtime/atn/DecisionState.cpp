@@ -1,7 +1,6 @@
-﻿#include "DecisionState.h"
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -30,18 +29,11 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace atn {
+#include "DecisionState.h"
 
-                    void DecisionState::InitializeInstanceFields() {
-                        decision = -1;
-                        nonGreedy = false;
-                    }
-                }
-            }
-        }
-    }
+using namespace org::antlr::v4::runtime::atn;
+
+void DecisionState::InitializeInstanceFields() {
+  decision = -1;
+  nonGreedy = false;
 }

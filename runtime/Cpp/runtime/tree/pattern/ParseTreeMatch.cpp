@@ -1,8 +1,6 @@
-﻿#include "ParseTreeMatch.h"
-#include "Exceptions.h"
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  * Copyright (c) 2013 Terence Parr
  * Copyright (c) 2013 Sam Harwell
  * All rights reserved.
@@ -31,76 +29,71 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace tree {
-                    namespace pattern {
+#include "Exceptions.h"
+#include "MultiMap.h"
 
-                        ParseTreeMatch::ParseTreeMatch(ParseTree *tree, ParseTreePattern *pattern, misc::MultiMap<std::wstring, ParseTree*> *labels, ParseTree *mismatchedNode) : tree(tree), pattern(pattern), labels(labels), mismatchedNode(mismatchedNode) {
-                            if (tree == nullptr) {
-                                throw IllegalArgumentException(L"tree cannot be null");
-                            }
+#include "ParseTreeMatch.h"
 
-                            if (pattern == nullptr) {
-                                throw IllegalArgumentException(L"pattern cannot be null");
-                            }
+using namespace org::antlr::v4::runtime::tree;
+using namespace org::antlr::v4::runtime::tree::pattern;
 
-                            if (labels == nullptr) {
-                                throw IllegalArgumentException(L"labels cannot be null");
-                            }
+ParseTreeMatch::ParseTreeMatch(ParseTree *tree, ParseTreePattern *pattern, misc::MultiMap<std::wstring, ParseTree*> *labels, ParseTree *mismatchedNode) : tree(tree), pattern(pattern), labels(labels), mismatchedNode(mismatchedNode) {
+  if (tree == nullptr) {
+    throw IllegalArgumentException(L"tree cannot be null");
+  }
 
-                        }
+  if (pattern == nullptr) {
+    throw IllegalArgumentException(L"pattern cannot be null");
+  }
 
-                        org::antlr::v4::runtime::tree::ParseTree *ParseTreeMatch::get(const std::wstring &label) {
-                            std::vector<ParseTree*> parseTrees = labels->at(label);
-                            if (parseTrees.empty()) {
-                                return nullptr;
-                            }
+  if (labels == nullptr) {
+    throw IllegalArgumentException(L"labels cannot be null");
+  }
 
-                            return parseTrees[parseTrees.size() - 1]; // return last if multiple
-                        }
+}
 
-                        std::vector<ParseTree*> ParseTreeMatch::getAll(const std::wstring &label) {
-                            std::vector<ParseTree*> nodes = labels->at(label);
-                            if (nodes.empty()) {
-                                return std::vector<ParseTree*>();// Collections::emptyList();
-                            }
+org::antlr::v4::runtime::tree::ParseTree *ParseTreeMatch::get(const std::wstring &label) {
+  std::vector<ParseTree*> parseTrees = labels->at(label);
+  if (parseTrees.empty()) {
+    return nullptr;
+  }
 
-                            return nodes;
-                        }
+  return parseTrees[parseTrees.size() - 1]; // return last if multiple
+}
 
-                        org::antlr::v4::runtime::misc::MultiMap<std::wstring, ParseTree*> *ParseTreeMatch::getLabels() {
-                            return labels;
-                        }
+std::vector<ParseTree*> ParseTreeMatch::getAll(const std::wstring &label) {
+  std::vector<ParseTree*> nodes = labels->at(label);
+  if (nodes.empty()) {
+    return std::vector<ParseTree*>();// Collections::emptyList();
+  }
 
-                        org::antlr::v4::runtime::tree::ParseTree *ParseTreeMatch::getMismatchedNode() {
-                            return mismatchedNode;
-                        }
+  return nodes;
+}
 
-                        bool ParseTreeMatch::succeeded() {
-                            return mismatchedNode == nullptr;
-                        }
+org::antlr::v4::runtime::misc::MultiMap<std::wstring, ParseTree*> *ParseTreeMatch::getLabels() {
+  return labels;
+}
 
-                        org::antlr::v4::runtime::tree::pattern::ParseTreePattern *ParseTreeMatch::getPattern() {
-                            return pattern;
-                        }
+org::antlr::v4::runtime::tree::ParseTree *ParseTreeMatch::getMismatchedNode() {
+  return mismatchedNode;
+}
 
-                        org::antlr::v4::runtime::tree::ParseTree *ParseTreeMatch::getTree() {
-                            return tree;
-                        }
+bool ParseTreeMatch::succeeded() {
+  return mismatchedNode == nullptr;
+}
 
-                        std::wstring ParseTreeMatch::toString() {
-                            if (succeeded()) {
-                                return L"Match succeeded; found " + std::to_wstring(getLabels()->size()) + L" labels";
-                            } else {
-                                return L"Match failed; found " + std::to_wstring(getLabels()->size()) + L" labels";
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
+org::antlr::v4::runtime::tree::pattern::ParseTreePattern *ParseTreeMatch::getPattern() {
+  return pattern;
+}
+
+org::antlr::v4::runtime::tree::ParseTree *ParseTreeMatch::getTree() {
+  return tree;
+}
+
+std::wstring ParseTreeMatch::toString() {
+  if (succeeded()) {
+    return L"Match succeeded; found " + std::to_wstring(getLabels()->size()) + L" labels";
+  } else {
+    return L"Match failed; found " + std::to_wstring(getLabels()->size()) + L" labels";
+  }
 }

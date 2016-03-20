@@ -1,10 +1,6 @@
-﻿#pragma once
-
-#include "DecisionState.h"
-#include "StarLoopbackState.h"
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -33,21 +29,25 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#pragma once
+
+#include "DecisionState.h"
+
 namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace atn {
+namespace antlr {
+namespace v4 {
+namespace runtime {
+namespace atn {
 
-                    class StarLoopEntryState final : public DecisionState {
-                    public:
-                        StarLoopbackState *loopBackState;
+  class StarLoopEntryState final : public DecisionState {
+  public:
+    StarLoopbackState *loopBackState;
 
-                        virtual int getStateType() override;
-                    };
+    virtual int getStateType() override;
+  };
 
-                }
-            }
-        }
-    }
-}
+} // namespace atn
+} // namespace runtime
+} // namespace v4
+} // namespace antlr
+} // namespace org

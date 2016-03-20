@@ -1,12 +1,7 @@
-﻿#pragma once
-
-#include "PredictionContext.h"
-#include "SingletonPredictionContext.h"
-#include <string>
-#include <vector>
-
+﻿
 /*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -35,54 +30,60 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#pragma once
+
+#include "PredictionContext.h"
+
 namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace atn {
+namespace antlr {
+namespace v4 {
+namespace runtime {
+namespace atn {
 
+  class SingletonPredictionContext;
+  
+  class ArrayPredictionContext : public PredictionContext {
+    /// <summary>
+    /// Parent can be null only if full ctx mode and we make an array
+    ///  from <seealso cref="#EMPTY"/> and non-empty. We merge <seealso cref="#EMPTY"/> by using null parent and
+    ///  returnState == <seealso cref="#EMPTY_RETURN_STATE"/>.
+    /// </summary>
+  public:
+    const std::vector<PredictionContext*> *parents;
 
-                    class ArrayPredictionContext : public PredictionContext {
-                        /// <summary>
-                        /// Parent can be null only if full ctx mode and we make an array
-                        ///  from <seealso cref="#EMPTY"/> and non-empty. We merge <seealso cref="#EMPTY"/> by using null parent and
-                        ///  returnState == <seealso cref="#EMPTY_RETURN_STATE"/>.
-                        /// </summary>
-                    public:
-                        const std::vector<PredictionContext*> *parents;
+    /// <summary>
+    /// Sorted for merge, no duplicates; if present,
+    ///  <seealso cref="#EMPTY_RETURN_STATE"/> is always last.
+    /// </summary>
+    const std::vector<int> returnStates;
 
-                        /// <summary>
-                        /// Sorted for merge, no duplicates; if present,
-                        ///  <seealso cref="#EMPTY_RETURN_STATE"/> is always last.
-                        /// </summary>
-                        const std::vector<int> returnStates;
+    ArrayPredictionContext(SingletonPredictionContext *a); //this(new PredictionContext[] {a.parent}, new int[] {a.returnState});
 
-                        ArrayPredictionContext(SingletonPredictionContext *a); //this(new PredictionContext[] {a.parent}, new int[] {a.returnState});
+    ArrayPredictionContext(PredictionContext *parents, int returnStates[]);
+    ArrayPredictionContext(std::vector<PredictionContext *>parents,
+                           const std::vector<int> returnStates);
 
-                        ArrayPredictionContext(PredictionContext *parents, int returnStates[]);
-                        ArrayPredictionContext(std::vector<PredictionContext *>parents,
-                                               const std::vector<int> returnStates);
-                        
-                        virtual bool isEmpty() override;
+    virtual bool isEmpty() override;
 
-                        virtual int size() override;
+    virtual int size() override;
 
-                        virtual PredictionContext *getParent(int index) override;
+    virtual PredictionContext *getParent(int index) override;
 
-                        virtual int getReturnState(int index) override;
+    virtual int getReturnState(int index) override;
 
-                    //	@Override
-                    //	public int findReturnState(int returnState) {
-                    //		return Arrays.binarySearch(returnStates, returnState);
-                    //	}
+    //	@Override
+    //	public int findReturnState(int returnState) {
+    //		return Arrays.binarySearch(returnStates, returnState);
+    //	}
 
-                        virtual bool equals(void *o) override;
+    virtual bool equals(void *o) override;
 
-                        virtual std::wstring toString();
-                    };
+    virtual std::wstring toString();
+  };
 
-                }
-            }
-        }
-    }
-}
+} // namespace atn
+} // namespace runtime
+} // namespace v4
+} // namespace antlr
+} // namespace org
+

@@ -1,10 +1,6 @@
-﻿#pragma once
-
-#include "ATNState.h"
-#include "RuleStopState.h"
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -33,30 +29,34 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#pragma once
+
+#include "ATNState.h"
+
 namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace atn {
+namespace antlr {
+namespace v4 {
+namespace runtime {
+namespace atn {
 
-                    class RuleStartState final : public ATNState {
-                    public:
-                        RuleStopState *stopState;
-                        bool isPrecedenceRule;
+  class RuleStartState final : public ATNState {
+  public:
+    RuleStopState *stopState;
+    bool isPrecedenceRule;
 
-                        virtual int getStateType();
+    virtual int getStateType();
 
-                    private:
-                        void InitializeInstanceFields();
+  private:
+    void InitializeInstanceFields();
 
-                    public:
-                        RuleStartState() {
-                            InitializeInstanceFields();
-                        }
-                    };
-
-                }
-            }
-        }
+  public:
+    RuleStartState() {
+      InitializeInstanceFields();
     }
-}
+  };
+
+} // namespace atn
+} // namespace runtime
+} // namespace v4
+} // namespace antlr
+} // namespace org

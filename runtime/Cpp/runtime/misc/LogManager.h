@@ -1,12 +1,6 @@
-﻿#pragma once
-
-#include <string>
-#include <vector>
-#include <iostream>
-#include <stdexcept>
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -35,49 +29,50 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#pragma once
+
 namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace misc {
+namespace antlr {
+namespace v4 {
+namespace runtime {
+namespace misc {
 
+  class LogManager {
+  protected:
+    class Record {
+    public:
+      long long timestamp;
+      // This is used nowhere
+      //StackTraceElement *location;
+      std::wstring component;
+      std::wstring msg;
+      Record();
 
-                    class LogManager {
-                    protected:
-                        class Record {
-                        public:
-                            long long timestamp;
-                            // This is used nowhere
-                            //StackTraceElement *location;
-                            std::wstring component;
-                            std::wstring msg;
-                            Record();
+      virtual std::wstring toString();
 
-                            virtual std::wstring toString();
+    private:
+      void InitializeInstanceFields();
+    };
 
-                        private:
-                            void InitializeInstanceFields();
-                        };
+  protected:
+    std::vector<Record*> records;
 
-                    protected:
-                        std::vector<Record*> records;
+  public:
+    virtual void log(const std::wstring &component, const std::wstring &msg);
 
-                    public:
-                        virtual void log(const std::wstring &component, const std::wstring &msg);
+    virtual void log(const std::wstring &msg);
 
-                        virtual void log(const std::wstring &msg);
+    virtual void save(const std::wstring &filename);
 
-                        virtual void save(const std::wstring &filename);
+    virtual std::wstring save();
 
-                        virtual std::wstring save();
+    virtual std::wstring toString();
 
-                        virtual std::wstring toString();
+    static void main(std::wstring args[]);
+  };
 
-                        static void main(std::wstring args[]);
-                    };
-
-                }
-            }
-        }
-    }
-}
+} // namespace atn
+} // namespace runtime
+} // namespace v4
+} // namespace antlr
+} // namespace org

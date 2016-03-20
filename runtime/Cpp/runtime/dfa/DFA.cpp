@@ -1,13 +1,6 @@
-﻿#include <map>
-#include <algorithm>
-
-#include "DFA.h"
-#include "DFAState.h"
-#include "DFASerializer.h"
-#include "LexerDFASerializer.h"
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -35,69 +28,67 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace dfa {
 
-                    DFA::DFA(atn::DecisionState *atnStartState) : atnStartState(atnStartState),
-                  states(new std::map<DFAState*, DFAState*>()), decision(0), s0(nullptr) {
-                    }
+#include "DFAState.h"
+#include "DFASerializer.h"
+#include "LexerDFASerializer.h"
 
-		    DFA::DFA(atn::DecisionState *atnStartState, int decision) : atnStartState(atnStartState),
-                  states(new std::map<DFAState*, DFAState*>()), decision(decision), s0(nullptr) {
-                    }
+#include "DFA.h"
 
-                    std::vector<DFAState*> DFA::getStates() {
-                        // Get all the keys, which C++ doesn't do natively, ugh
-                        std::map<DFAState*,DFAState*> mapints;
-                        std::vector<DFAState*> vints;
-                        for(auto imap: mapints) {
-                            vints.push_back(imap.first);
-                        }
+using namespace org::antlr::v4::runtime::dfa;
 
-                        // This ComparatorAnonymousInnerClassHelper isn't doing much, it
-                        // could be accomplished simply with a local comparator function
-                        std::vector<DFAState*> result = std::vector<DFAState*>(vints);
-                        ComparatorAnonymousInnerClassHelper tmp(this);
-                        std::sort(result.begin(), result.end(), (tmp.compare));
-                        
-                        return result;
-                    }
+DFA::DFA(atn::DecisionState *atnStartState) : atnStartState(atnStartState),
+states(new std::map<DFAState*, DFAState*>()), decision(0), s0(nullptr) {
+}
+
+DFA::DFA(atn::DecisionState *atnStartState, int decision) : atnStartState(atnStartState),
+states(new std::map<DFAState*, DFAState*>()), decision(decision), s0(nullptr) {
+}
+
+std::vector<DFAState*> DFA::getStates() {
+  // Get all the keys, which C++ doesn't do natively, ugh
+  std::map<DFAState*,DFAState*> mapints;
+  std::vector<DFAState*> vints;
+  for(auto imap: mapints) {
+    vints.push_back(imap.first);
+  }
+
+  // This ComparatorAnonymousInnerClassHelper isn't doing much, it
+  // could be accomplished simply with a local comparator function
+  std::vector<DFAState*> result = std::vector<DFAState*>(vints);
+  ComparatorAnonymousInnerClassHelper tmp(this);
+  std::sort(result.begin(), result.end(), (tmp.compare));
+
+  return result;
+}
 
 
-                    DFA::ComparatorAnonymousInnerClassHelper::ComparatorAnonymousInnerClassHelper(DFA *outerInstance) : outerInstance(outerInstance) {
-                    }
+DFA::ComparatorAnonymousInnerClassHelper::ComparatorAnonymousInnerClassHelper(DFA *outerInstance) : outerInstance(outerInstance) {
+}
 
-                    int DFA::ComparatorAnonymousInnerClassHelper::compare(DFAState *o1, DFAState *o2) {
-                        return o1->stateNumber - o2->stateNumber;
-                    }
+int DFA::ComparatorAnonymousInnerClassHelper::compare(DFAState *o1, DFAState *o2) {
+  return o1->stateNumber - o2->stateNumber;
+}
 
-                    std::wstring DFA::toString() {
-                        std::vector<std::wstring> tokenNames;
-                        return toString(tokenNames);
-                    }
+std::wstring DFA::toString() {
+  std::vector<std::wstring> tokenNames;
+  return toString(tokenNames);
+}
 
-                    std::wstring DFA::toString(const std::vector<std::wstring>& tokenNames) {
-                        if (s0 == nullptr) {
-                            return L"";
-                        }
-                        DFASerializer *serializer = new DFASerializer(this, tokenNames);
+std::wstring DFA::toString(const std::vector<std::wstring>& tokenNames) {
+  if (s0 == nullptr) {
+    return L"";
+  }
+  DFASerializer *serializer = new DFASerializer(this, tokenNames);
 
-                        return serializer->toString();
-                    }
+  return serializer->toString();
+}
 
-                    std::wstring DFA::toLexerString() {
-                        if (s0 == nullptr) {
-                            return L"";
-                        }
-                        DFASerializer *serializer = new LexerDFASerializer(this);
+std::wstring DFA::toLexerString() {
+  if (s0 == nullptr) {
+    return L"";
+  }
+  DFASerializer *serializer = new LexerDFASerializer(this);
 
-                        return serializer->toString();
-                    }
-                }
-            }
-        }
-    }
+  return serializer->toString();
 }

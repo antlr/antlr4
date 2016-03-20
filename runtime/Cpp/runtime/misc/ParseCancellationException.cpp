@@ -1,6 +1,6 @@
-﻿#include "ParseCancellationException.h"
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -29,31 +29,24 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace misc {
+#include "ParseCancellationException.h"
 
-                    ParseCancellationException::ParseCancellationException() {
-                    }
+using namespace org::antlr::v4::runtime::misc;
 
-                    ParseCancellationException::ParseCancellationException(const std::wstring &message)  {
-                    }
+ParseCancellationException::ParseCancellationException() {
+}
 
-                    ParseCancellationException::ParseCancellationException(std::exception cause) {
+ParseCancellationException::ParseCancellationException(const std::wstring &message)  {
+}
+
+ParseCancellationException::ParseCancellationException(std::exception cause) {
 #ifdef TODO
-                        initCause(cause);
+  initCause(cause);
 #endif
-                    }
+}
 
-                    ParseCancellationException::ParseCancellationException(const std::wstring &message, std::exception cause) {
+ParseCancellationException::ParseCancellationException(const std::wstring &message, std::exception cause) {
 #ifdef TODO
-                        initCause(cause);
+  initCause(cause);
 #endif
-                    }
-                }
-            }
-        }
-    }
 }

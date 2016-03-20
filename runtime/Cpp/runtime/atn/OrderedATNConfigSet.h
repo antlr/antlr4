@@ -1,9 +1,6 @@
-﻿#pragma once
-
-#include "ATNConfigSet.h"
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -32,30 +29,30 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#pragma once
+
+#include "ATNConfigSet.h"
+
 namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace atn {
+namespace antlr {
+namespace v4 {
+namespace runtime {
+namespace atn {
 
-                    /// 
-                    /// <summary>
-                    /// @author Sam Harwell
-                    /// </summary>
-                    class OrderedATNConfigSet : public ATNConfigSet {
-                    public:
-                        class LexerConfigHashSet : public AbstractConfigHashSet {
-                        public:
-                            LexerConfigHashSet();
-                        };
+  class OrderedATNConfigSet : public ATNConfigSet {
+  public:
+    class LexerConfigHashSet : public AbstractConfigHashSet {
+    public:
+      LexerConfigHashSet();
+    };
 
-                    public:
-                        OrderedATNConfigSet();
+  public:
+    OrderedATNConfigSet();
 
-                    };
+  };
 
-                }
-            }
-        }
-    }
-}
+} // namespace atn
+} // namespace runtime
+} // namespace v4
+} // namespace antlr
+} // namespace org

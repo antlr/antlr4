@@ -1,9 +1,6 @@
-﻿#include "TextChunk.h"
-#include "Declarations.h"
-#include "Exceptions.h"
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  * Copyright (c) 2013 Terence Parr
  * Copyright (c) 2013 Sam Harwell
  * All rights reserved.
@@ -32,30 +29,23 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace tree {
-                    namespace pattern {
+#include "Exceptions.h"
 
-                        TextChunk::TextChunk(const std::wstring &text) : text(text) {
-                            if (text == L"") {
-                                throw IllegalArgumentException(L"text cannot be null");
-                            }
+#include "TextChunk.h"
 
-                        }
+using namespace org::antlr::v4::runtime::tree::pattern;
 
-                        std::wstring TextChunk::getText() {
-                            return text;
-                        }
+TextChunk::TextChunk(const std::wstring &text) : text(text) {
+  if (text == L"") {
+    throw IllegalArgumentException(L"text cannot be null");
+  }
 
-                        std::wstring TextChunk::toString() {
-                            return std::wstring(L"'") + text + std::wstring(L"'");
-                        }
-                    }
-                }
-            }
-        }
-    }
+}
+
+std::wstring TextChunk::getText() {
+  return text;
+}
+
+std::wstring TextChunk::toString() {
+  return std::wstring(L"'") + text + std::wstring(L"'");
 }

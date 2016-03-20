@@ -1,12 +1,6 @@
-﻿#pragma once
-
-#include <string>
-#include <vector>
-#include <iostream>
-#include <stdexcept>
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -35,60 +29,60 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#pragma once
+
 namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace misc {
+namespace antlr {
+namespace v4 {
+namespace runtime {
+namespace misc {
 
+  /// <summary>
+  /// Run a lexer/parser combo, optionally printing tree string or generating
+  ///  postscript file. Optionally taking input file.
+  ///
+  ///  $ java org.antlr.v4.runtime.misc.TestRig GrammarName startRuleName
+  ///        [-tree]
+  ///        [-tokens] [-gui] [-ps file.ps]
+  ///        [-trace]
+  ///        [-diagnostics]
+  ///        [-SLL]
+  ///        [input-filename(s)]
+  /// </summary>
+  class TestRig {
+  public:
+    static const std::wstring LEXER_START_RULE_NAME;
 
+  protected:
+    std::wstring grammarName;
+    std::wstring startRuleName;
+    const std::vector<std::wstring> inputFiles;
+    bool printTree;
+    bool gui;
+    std::wstring psFile;
+    bool showTokens;
+    bool trace;
+    bool diagnostics;
+    std::wstring encoding;
+    bool SLL;
 
-                    /// <summary>
-                    /// Run a lexer/parser combo, optionally printing tree string or generating
-                    ///  postscript file. Optionally taking input file.
-                    /// 
-                    ///  $ java org.antlr.v4.runtime.misc.TestRig GrammarName startRuleName
-                    ///        [-tree]
-                    ///        [-tokens] [-gui] [-ps file.ps]
-                    ///        [-trace]
-                    ///        [-diagnostics]
-                    ///        [-SLL]
-                    ///        [input-filename(s)]
-                    /// </summary>
-                    class TestRig {
-                    public:
-                        static const std::wstring LEXER_START_RULE_NAME;
+  public:
+    TestRig(std::wstring args[]);
 
-                    protected:
-                        std::wstring grammarName;
-                        std::wstring startRuleName;
-                        const std::vector<std::wstring> inputFiles;
-                        bool printTree;
-                        bool gui;
-                        std::wstring psFile;
-                        bool showTokens;
-                        bool trace;
-                        bool diagnostics;
-                        std::wstring encoding;
-                        bool SLL;
+    static void main(std::wstring args[]);
 
-                    public:
-                        TestRig(std::wstring args[]);
+    virtual void process();
 
-                        static void main(std::wstring args[]);
-
-                        virtual void process();
-
-                    protected:
+  protected:
 #ifdef TODO
-                        virtual void process(Lexer *lexer, Class *parserClass, Parser *parser, InputStream *is, Reader *r) throw(IOException, IllegalAccessException, InvocationTargetException, PrintException);
+    virtual void process(Lexer *lexer, Class *parserClass, Parser *parser, InputStream *is, Reader *r) throw(IOException, IllegalAccessException, InvocationTargetException, PrintException);
 #endif
-                    private:
-                        void InitializeInstanceFields();
-                    };
+  private:
+    void InitializeInstanceFields();
+  };
 
-                }
-            }
-        }
-    }
-}
+} // namespace atn
+} // namespace runtime
+} // namespace v4
+} // namespace antlr
+} // namespace org

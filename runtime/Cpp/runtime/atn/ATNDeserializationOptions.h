@@ -1,7 +1,6 @@
-﻿#pragma once
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Sam Harwell
  *  All rights reserved.
@@ -30,52 +29,50 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#pragma once
+
 namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace atn {
-                    /// 
-                    /// <summary>
-                    /// @author Sam Harwell
-                    /// </summary>
-                    class ATNDeserializationOptions {
-                    private:
-                        static ATNDeserializationOptions *const defaultOptions;
+namespace antlr {
+namespace v4 {
+namespace runtime {
+namespace atn {
 
-                        bool readOnly;
-                        bool verifyATN;
-                        bool generateRuleBypassTransitions;
+  class ATNDeserializationOptions {
+  private:
+    static ATNDeserializationOptions *const defaultOptions;
 
-                    public:
-                        ATNDeserializationOptions();
+    bool readOnly;
+    bool verifyATN;
+    bool generateRuleBypassTransitions;
 
-                        ATNDeserializationOptions(ATNDeserializationOptions *options);
+  public:
+    ATNDeserializationOptions();
 
-                        static ATNDeserializationOptions *getDefaultOptions();
+    ATNDeserializationOptions(ATNDeserializationOptions *options);
 
-                        bool isReadOnly();
+    static ATNDeserializationOptions *getDefaultOptions();
 
-                        void makeReadOnly();
+    bool isReadOnly();
 
-                        bool isVerifyATN();
+    void makeReadOnly();
 
-                        void setVerifyATN(bool verifyATN);
+    bool isVerifyATN();
 
-                        bool isGenerateRuleBypassTransitions();
+    void setVerifyATN(bool verifyATN);
 
-                        void setGenerateRuleBypassTransitions(bool generateRuleBypassTransitions);
+    bool isGenerateRuleBypassTransitions();
 
-                    protected:
-                        virtual void throwIfReadOnly();
+    void setGenerateRuleBypassTransitions(bool generateRuleBypassTransitions);
 
-                    private:
-                        void InitializeInstanceFields();
-                    };
+  protected:
+    virtual void throwIfReadOnly();
 
-                }
-            }
-        }
-    }
-}
+  private:
+    void InitializeInstanceFields();
+  };
 
+} // namespace atn
+} // namespace runtime
+} // namespace v4
+} // namespace antlr
+} // namespace org

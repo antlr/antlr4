@@ -1,7 +1,6 @@
-﻿#include "ActionTransition.h"
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -30,35 +29,28 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace atn {
+#include "ActionTransition.h"
 
-                    ActionTransition::ActionTransition(ATNState *target, int ruleIndex) : Transition(target), ruleIndex(ruleIndex), actionIndex(0), isCtxDependent(false) {
-                    }
+using namespace org::antlr::v4::runtime::atn;
 
-                    ActionTransition::ActionTransition(ATNState *target, int ruleIndex, int actionIndex, bool isCtxDependent) : Transition(target), ruleIndex(ruleIndex), actionIndex(actionIndex), isCtxDependent(isCtxDependent) {
-                    }
+ActionTransition::ActionTransition(ATNState *target, int ruleIndex) : Transition(target), ruleIndex(ruleIndex), actionIndex(0), isCtxDependent(false) {
+}
 
-                    int ActionTransition::getSerializationType() {
-                        return ACTION;
-                    }
+ActionTransition::ActionTransition(ATNState *target, int ruleIndex, int actionIndex, bool isCtxDependent) : Transition(target), ruleIndex(ruleIndex), actionIndex(actionIndex), isCtxDependent(isCtxDependent) {
+}
 
-                    bool ActionTransition::isEpsilon() {
-                        return true; // we are to be ignored by analysis 'cept for predicates
-                    }
+int ActionTransition::getSerializationType() {
+  return ACTION;
+}
 
-                    bool ActionTransition::matches(int symbol, int minVocabSymbol, int maxVocabSymbol) {
-                        return false;
-                    }
+bool ActionTransition::isEpsilon() {
+  return true; // we are to be ignored by analysis 'cept for predicates
+}
 
-                    std::wstring ActionTransition::toString() {
-                        return std::wstring(L"action_") + std::to_wstring(ruleIndex) + std::wstring(L":") + std::to_wstring(actionIndex);
-                    }
-                }
-            }
-        }
-    }
+bool ActionTransition::matches(int symbol, int minVocabSymbol, int maxVocabSymbol) {
+  return false;
+}
+
+std::wstring ActionTransition::toString() {
+  return std::wstring(L"action_") + std::to_wstring(ruleIndex) + std::wstring(L":") + std::to_wstring(actionIndex);
 }

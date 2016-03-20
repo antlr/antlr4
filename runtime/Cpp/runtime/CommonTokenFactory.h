@@ -1,16 +1,6 @@
-﻿#pragma once
-
-#include "CommonToken.h"
-#include "TokenFactory.h"
-#include "CharStream.h"
-#include "TokenSource.h"
-
-#include <string>
-#include <utility>
-
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -39,37 +29,41 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#pragma once
+
+#include "TokenFactory.h"
+
 namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                
-                class CommonTokenFactory : public TokenFactory<CommonToken*> {
-                public:
-                    static TokenFactory<CommonToken*> *const DEFAULT;
+namespace antlr {
+namespace v4 {
+namespace runtime {
 
-                    /// <summary>
-                    /// Copy text for token out of input char stream. Useful when input
-                    ///  stream is unbuffered. </summary>
-                    ///  <seealso cref= UnbufferedCharStream </seealso>
-                protected:
-                    const bool copyText;
+  class CommonTokenFactory : public TokenFactory<CommonToken*> {
+  public:
+    static TokenFactory<CommonToken*> *const DEFAULT;
 
-                    /// <summary>
-                    /// Create factory and indicate whether or not the factory copy
-                    ///  text out of the char stream.
-                    /// </summary>
-                public:
-                    CommonTokenFactory(bool copyText);
+    /// <summary>
+    /// Copy text for token out of input char stream. Useful when input
+    ///  stream is unbuffered. </summary>
+    ///  <seealso cref= UnbufferedCharStream </seealso>
+  protected:
+    const bool copyText;
 
-                    CommonTokenFactory();
+    /// <summary>
+    /// Create factory and indicate whether or not the factory copy
+    ///  text out of the char stream.
+    /// </summary>
+  public:
+    CommonTokenFactory(bool copyText);
 
-                    virtual CommonToken *create(std::pair<TokenSource*, CharStream*> *source, int type, const std::wstring &text, int channel, int start, int stop, int line, int charPositionInLine) override;
+    CommonTokenFactory();
 
-                    virtual CommonToken *create(int type, const std::wstring &text) override;
-                };
+    virtual CommonToken *create(std::pair<TokenSource*, CharStream*> *source, int type, const std::wstring &text, int channel, int start, int stop, int line, int charPositionInLine) override;
 
-            }
-        }
-    }
-}
+    virtual CommonToken *create(int type, const std::wstring &text) override;
+  };
+
+} // namespace runtime
+} // namespace v4
+} // namespace antlr
+} // namespace org

@@ -1,6 +1,6 @@
-﻿#include "LexerDFASerializer.h"
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -29,20 +29,13 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace dfa {
+#include "LexerDFASerializer.h"
 
-                    LexerDFASerializer::LexerDFASerializer(DFA *dfa) : DFASerializer(dfa, lexerTokenNames_) {
-                    }
+using namespace org::antlr::v4::runtime::dfa;
 
-                    std::wstring LexerDFASerializer::getEdgeLabel(int i) {
-                        return std::wstring(L"'") + static_cast<wchar_t>(i) + std::wstring(L"'");
-                    }
-                }
-            }
-        }
-    }
+LexerDFASerializer::LexerDFASerializer(DFA *dfa) : DFASerializer(dfa, lexerTokenNames_) {
+}
+
+std::wstring LexerDFASerializer::getEdgeLabel(int i) {
+  return std::wstring(L"'") + static_cast<wchar_t>(i) + std::wstring(L"'");
 }

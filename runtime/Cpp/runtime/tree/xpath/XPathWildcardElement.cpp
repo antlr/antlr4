@@ -1,9 +1,6 @@
-﻿#include "XPathWildcardElement.h"
-#include "XPath.h"
-#include "Trees.h"
-
-/*
-* [The "BSD license"]
+﻿/*
+ * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
 *  Copyright (c) 2013 Terence Parr
 *  Copyright (c) 2013 Dan McLaughlin
 *  All rights reserved.
@@ -32,32 +29,25 @@
 *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include "Trees.h"
+
+#include "XPathWildcardElement.h"
+
+using namespace org::antlr::v4::runtime::tree::xpath;
+
 // TODO:  Come back to this after the base runtime works.
 #if 0
-namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace tree {
-                    namespace xpath {
+XPathWildcardElement::XPathWildcardElement() : XPathElement(XPath::WILDCARD) {
+}
 
-                        XPathWildcardElement::XPathWildcardElement() : XPathElement(XPath::WILDCARD) {
-                        }
-
-                        std::vector<ParseTree*> *XPathWildcardElement::evaluate(ParseTree *const t) {
-                            if (invert) { // !* is weird but valid (empty)
-                                return new std::vector<ParseTree*>();
-                            }
-                            std::vector<ParseTree*> *kids = new std::vector<ParseTree*>();
-							for (auto c : Trees::getChildren((Tree*)t)) {
-                                kids->push_back((ParseTree*)(c));
-                            }
-                            return kids;
-                        }
-                    }
-                }
-            }
-        }
-    }
+std::vector<ParseTree*> *XPathWildcardElement::evaluate(ParseTree *const t) {
+  if (invert) { // !* is weird but valid (empty)
+    return new std::vector<ParseTree*>();
+  }
+  std::vector<ParseTree*> *kids = new std::vector<ParseTree*>();
+  for (auto c : Trees::getChildren((Tree*)t)) {
+    kids->push_back((ParseTree*)(c));
+  }
+  return kids;
 }
 #endif

@@ -1,6 +1,6 @@
-﻿#include "XPathLexerErrorListener.h"
-/*
-* [The "BSD license"]
+﻿/*
+ * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
 *  Copyright (c) 2013 Terence Parr
 *  Copyright (c) 2013 Dan McLaughlin
 *  All rights reserved.
@@ -29,19 +29,6 @@
 *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-// TODO:  Come back to this after the base runtime works.
-#if 0
-namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace tree {
-                    namespace xpath {
+#include "XPathLexerErrorListener.h"
 
-                    }
-                }
-            }
-        }
-    }
-}
-#endif
+using namespace org::antlr::v4::runtime::tree::xpath;

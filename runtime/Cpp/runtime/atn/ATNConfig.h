@@ -1,14 +1,6 @@
-﻿#pragma once
-
-#include <string>
-
-#include "Declarations.h"
-#include "ATNState.h"
-#include "PredictionContext.h"
-#include "SemanticContext.h"
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -37,148 +29,145 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#pragma once
+
+#include "PredictionContext.h"
+#include "SemanticContext.h"
+
 namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace atn {
+namespace antlr {
+namespace v4 {
+namespace runtime {
+namespace atn {
 
-                    /// <summary>
-                    /// A tuple: (ATN state, predicted alt, syntactic, semantic context).
-                    ///  The syntactic context is a graph-structured stack node whose
-                    ///  path(s) to the root is the rule invocation(s)
-                    ///  chain used to arrive at the state.  The semantic context is
-                    ///  the tree of semantic predicates encountered before reaching
-                    ///  an ATN state.
-                    /// </summary>
-                    class ATNConfig {
-                        /// <summary>
-                        /// The ATN state associated with this configuration </summary>
-                    public:
-                        ATNState * state;
+  /// <summary>
+  /// A tuple: (ATN state, predicted alt, syntactic, semantic context).
+  ///  The syntactic context is a graph-structured stack node whose
+  ///  path(s) to the root is the rule invocation(s)
+  ///  chain used to arrive at the state.  The semantic context is
+  ///  the tree of semantic predicates encountered before reaching
+  ///  an ATN state.
+  /// </summary>
+  class ATNConfig {
+    /// <summary>
+    /// The ATN state associated with this configuration </summary>
+  public:
+    ATNState * state;
 
-                        /// <summary>
-                        /// What alt (or lexer rule) is predicted by this configuration </summary>
-                        const int alt;
+    /// <summary>
+    /// What alt (or lexer rule) is predicted by this configuration </summary>
+    const int alt;
 
-                        /// <summary>
-                        /// The stack of invoking states leading to the rule/states associated
-                        ///  with this config.  We track only those contexts pushed during
-                        ///  execution of the ATN simulator.
-                        /// </summary>
-                        PredictionContext *context;
+    /// <summary>
+    /// The stack of invoking states leading to the rule/states associated
+    ///  with this config.  We track only those contexts pushed during
+    ///  execution of the ATN simulator.
+    /// </summary>
+    PredictionContext *context;
 
-                        /// <summary>
-                        /// We cannot execute predicates dependent upon local context unless
-                        /// we know for sure we are in the correct context. Because there is
-                        /// no way to do this efficiently, we simply cannot evaluate
-                        /// dependent predicates unless we are in the rule that initially
-                        /// invokes the ATN simulator.
-                        /// 
-                        /// closure() tracks the depth of how far we dip into the
-                        /// outer context: depth > 0.  Note that it may not be totally
-                        /// accurate depth since I don't ever decrement. TODO: make it a boolean then
-                        /// </summary>
-                        int reachesIntoOuterContext;
+    /// <summary>
+    /// We cannot execute predicates dependent upon local context unless
+    /// we know for sure we are in the correct context. Because there is
+    /// no way to do this efficiently, we simply cannot evaluate
+    /// dependent predicates unless we are in the rule that initially
+    /// invokes the ATN simulator.
+    ///
+    /// closure() tracks the depth of how far we dip into the
+    /// outer context: depth > 0.  Note that it may not be totally
+    /// accurate depth since I don't ever decrement. TODO: make it a boolean then
+    /// </summary>
+    int reachesIntoOuterContext;
 
-                        SemanticContext *const semanticContext;
+    SemanticContext *const semanticContext;
 
-                        ATNConfig(ATNConfig *old); // dup
+    ATNConfig(ATNConfig *old); // dup
 
-                        ATNConfig(ATNState *state, int alt, PredictionContext *context); //this(state, alt, context, SemanticContext.NONE);
+    ATNConfig(ATNState *state, int alt, PredictionContext *context); //this(state, alt, context, SemanticContext.NONE);
 
-                        ATNConfig(ATNState *state, int alt, PredictionContext *context, SemanticContext *semanticContext);
+    ATNConfig(ATNState *state, int alt, PredictionContext *context, SemanticContext *semanticContext);
 
-                        ATNConfig(ATNConfig *c, ATNState *state); //this(c, state, c.context, c.semanticContext);
+    ATNConfig(ATNConfig *c, ATNState *state); //this(c, state, c.context, c.semanticContext);
 
-                        ATNConfig(ATNConfig *c, ATNState *state, SemanticContext *semanticContext); //this(c, state, c.context, semanticContext);
+    ATNConfig(ATNConfig *c, ATNState *state, SemanticContext *semanticContext); //this(c, state, c.context, semanticContext);
 
-                        ATNConfig(ATNConfig *c, SemanticContext *semanticContext); //this(c, c.state, c.context, semanticContext);
+    ATNConfig(ATNConfig *c, SemanticContext *semanticContext); //this(c, c.state, c.context, semanticContext);
 
-                        ATNConfig(ATNConfig *c, ATNState *state, PredictionContext *context); //this(c, state, context, c.semanticContext);
+    ATNConfig(ATNConfig *c, ATNState *state, PredictionContext *context); //this(c, state, context, c.semanticContext);
 
-                        ATNConfig(ATNConfig *c, ATNState *state, PredictionContext *context, SemanticContext *semanticContext);
+    ATNConfig(ATNConfig *c, ATNState *state, PredictionContext *context, SemanticContext *semanticContext);
 
-                        /// <summary>
-                        /// An ATN configuration is equal to another if both have
-                        ///  the same state, they predict the same alternative, and
-                        ///  syntactic/semantic contexts are the same.
-                        /// </summary>
-                        virtual bool equals(void *o);
+    /// <summary>
+    /// An ATN configuration is equal to another if both have
+    ///  the same state, they predict the same alternative, and
+    ///  syntactic/semantic contexts are the same.
+    /// </summary>
+    virtual bool equals(void *o);
 
-                        virtual bool equals(ATNConfig *other);
+    virtual bool equals(ATNConfig *other);
 
-                        virtual size_t hashCode();
+    virtual size_t hashCode();
 
+    struct ATNConfigHasher
+    {
+      size_t operator()(const ATNConfig &k) const {
+        ATNConfig a = k;
+        return a.hashCode();
+      }
+    };
 
-						struct ATNConfigHasher
-						{
-							size_t operator()(const ATNConfig& k) const
-							{
-								ATNConfig a = k;
-								return a.hashCode();
-							}
-						};
+    bool operator == (const ATNConfig& other) const;
 
-						bool operator==(const ATNConfig& other) const
-						{
-							return alt == other.alt && state->stateNumber == other.state->stateNumber &&
-								((context == nullptr && other.context == nullptr) || (context != nullptr && context->equals(other.context))) && semanticContext->equals(other.semanticContext);
-						}
-					
-                        virtual std::wstring toString();
+    virtual std::wstring toString();
 
-                        template<typename T1, typename T2>
-                        std::wstring toString(Recognizer<T1, T2> *recog, bool showAlt) {
-                            antlrcpp::StringBuilder *buf = new antlrcpp::StringBuilder();
-                            //		if ( state.ruleIndex>=0 ) {
-                            //			if ( recog!=null ) buf.append(recog.getRuleNames()[state.ruleIndex]+":");
-                            //			else buf.append(state.ruleIndex+":");
-                            //		}
-                            buf->append(L'(');
-                            buf->append(state);
-                            if (showAlt) {
-                                buf->append(L",");
-                                buf->append(alt);
-                            }
-                            if (context != nullptr) {
-                                buf->append(L",[");
-                                //                            :
-                                buf->append(context->toString());
-                                buf->append(L"]");
-                            }
-                            if (semanticContext != nullptr && semanticContext != SemanticContext::NONE) {
-                                buf->append(L",");
-                                buf->append(semanticContext);
-                            }
-                            if (reachesIntoOuterContext > 0) {
-                                buf->append(L",up=").append(reachesIntoOuterContext);
-                            }
-                            buf->append(L')');
-                            
-                            return buf->toString();
+    template<typename T1, typename T2>
+    std::wstring toString(Recognizer<T1, T2> *recog, bool showAlt) {
+      antlrcpp::StringBuilder buf;
+      //		if ( state.ruleIndex>=0 ) {
+      //			if ( recog!=null ) buf.append(recog.getRuleNames()[state.ruleIndex]+":");
+      //			else buf.append(state.ruleIndex+":");
+      //		}
+      buf.append(L'(');
+      buf.append(state);
+      if (showAlt) {
+        buf.append(L",");
+        buf.append(alt);
+      }
+      if (context != nullptr) {
+        buf.append(L",[");
+        buf.append(context->toString());
+        buf.append(L"]");
+      }
+      if (semanticContext != nullptr && semanticContext != SemanticContext::NONE) {
+        buf.append(L",");
+        buf.append(semanticContext);
+      }
+      if (reachesIntoOuterContext > 0) {
+        buf.append(L",up=").append(reachesIntoOuterContext);
+      }
+      buf.append(L')');
 
-                        }
-
-                    private:
-                        void InitializeInstanceFields();
-                    };
-
-                }
-
-            }
-        }
+      return buf.toString();
     }
-}
+
+  private:
+    void InitializeInstanceFields();
+  };
+
+} // namespace atn
+} // namespace runtime
+} // namespace v4
+} // namespace antlr
+} // namespace org
+
 
 // Hash function for ATNConfig, used in the MurmurHash::update function
 
 namespace std {
     using org::antlr::v4::runtime::atn::ATNConfig;
-    
+
     template <> struct hash<ATNConfig>
     {
-        size_t operator()( ATNConfig & x) const
+        size_t operator() (ATNConfig & x) const
         {
             return x.hashCode();
         }

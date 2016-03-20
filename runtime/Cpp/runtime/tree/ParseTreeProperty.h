@@ -1,10 +1,6 @@
-﻿#pragma once
-
-#include "ParseTree.h"
-#include <map>
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -33,58 +29,59 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#pragma once
+
 namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace tree {
+namespace antlr {
+namespace v4 {
+namespace runtime {
+namespace tree {
 
+  /// <summary>
+  /// Associate a property with a parse tree node. Useful with parse tree listeners
+  /// that need to associate values with particular tree nodes, kind of like
+  /// specifying a return value for the listener event method that visited a
+  /// particular node. Example:
+  ///
+  /// <pre>
+  /// ParseTreeProperty&lt;Integer&gt; values = new ParseTreeProperty&lt;Integer&gt;();
+  /// values.put(tree, 36);
+  /// int x = values.get(tree);
+  /// values.removeFrom(tree);
+  /// </pre>
+  ///
+  /// You would make one decl (values here) in the listener and use lots of times
+  /// in your event methods.
+  /// </summary>
+  template<typename V>
+  class ParseTreeProperty {
+  protected:
+    std::map<ParseTree*, V> *annotations;
 
-                    /// <summary>
-                    /// Associate a property with a parse tree node. Useful with parse tree listeners
-                    /// that need to associate values with particular tree nodes, kind of like
-                    /// specifying a return value for the listener event method that visited a
-                    /// particular node. Example:
-                    /// 
-                    /// <pre>
-                    /// ParseTreeProperty&lt;Integer&gt; values = new ParseTreeProperty&lt;Integer&gt;();
-                    /// values.put(tree, 36);
-                    /// int x = values.get(tree);
-                    /// values.removeFrom(tree);
-                    /// </pre>
-                    /// 
-                    /// You would make one decl (values here) in the listener and use lots of times
-                    /// in your event methods.
-                    /// </summary>
-                    template<typename V>
-                    class ParseTreeProperty {
-                    protected:
-                        std::map<ParseTree*, V> *annotations;
-
-                    public:
-                        virtual V get(ParseTree *node) {
-                            return annotations->get(node);
-                        }
-                        virtual void put(ParseTree *node, V value) {
-                            annotations->put(node, value);
-                        }
-                        virtual V removeFrom(ParseTree *node) {
-                            return annotations->remove(node);
-                        }
-
-                    private:
-                        void InitializeInstanceFields() {
-                            annotations = new std::map<ParseTree*, V>();
-                        }
-
-                    public:
-                        ParseTreeProperty() {
-                            InitializeInstanceFields();
-                        }
-                    };
-
-                }
-            }
-        }
+  public:
+    virtual V get(ParseTree *node) {
+      return annotations->get(node);
     }
-}
+    virtual void put(ParseTree *node, V value) {
+      annotations->put(node, value);
+    }
+    virtual V removeFrom(ParseTree *node) {
+      return annotations->remove(node);
+    }
+
+  private:
+    void InitializeInstanceFields() {
+      annotations = new std::map<ParseTree*, V>();
+    }
+
+  public:
+    ParseTreeProperty() {
+      InitializeInstanceFields();
+    }
+  };
+
+} // namespace tree
+} // namespace runtime
+} // namespace v4
+} // namespace antlr
+} // namespace org

@@ -1,7 +1,6 @@
-﻿#include "InputMismatchException.h"
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -30,19 +29,13 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
+#include "Parser.h"
 
-                InputMismatchException::InputMismatchException(Parser *recognizer)
-                : RecognitionException(recognizer,
-                                       recognizer->getInputStream(),
-				       recognizer->_ctx) {
-                    this->setOffendingToken(recognizer->getCurrentToken());
-                }
+#include "InputMismatchException.h"
 
-            }
-        }
-    }
+using namespace org::antlr::v4::runtime;
+
+InputMismatchException::InputMismatchException(Parser *recognizer)
+  : RecognitionException(recognizer, recognizer->getInputStream(), recognizer->_ctx) {
+  this->setOffendingToken(recognizer->getCurrentToken());
 }

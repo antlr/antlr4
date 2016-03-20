@@ -1,16 +1,6 @@
-﻿#pragma once
-
-#include "Declarations.h"
-#include "stringconverter.h"
-
-#include <string>
-#include <vector>
-#include <list>
-
-
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -39,158 +29,159 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#pragma once
+
 namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace atn {
+namespace antlr {
+namespace v4 {
+namespace runtime {
+namespace atn {
+
+  /// <summary>
+  /// The following images show the relation of states and
+  /// <seealso cref="ATNState#transitions"/> for various grammar constructs.
+  ///
+  /// <ul>
+  ///
+  /// <li>Solid edges marked with an &#0949; indicate a required
+  /// <seealso cref="EpsilonTransition"/>.</li>
+  ///
+  /// <li>Dashed edges indicate locations where any transition derived from
+  /// <seealso cref="Transition"/> might appear.</li>
+  ///
+  /// <li>Dashed nodes are place holders for either a sequence of linked
+  /// <seealso cref="BasicState"/> states or the inclusion of a block representing a nested
+  /// construct in one of the forms below.</li>
+  ///
+  /// <li>Nodes showing multiple outgoing alternatives with a {@code ...} support
+  /// any number of alternatives (one or more). Nodes without the {@code ...} only
+  /// support the exact number of alternatives shown in the diagram.</li>
+  ///
+  /// </ul>
+  ///
+  /// <h2>Basic Blocks</h2>
+  ///
+  /// <h3>Rule</h3>
+  ///
+  /// <embed src="images/Rule.svg" type="image/svg+xml"/>
+  ///
+  /// <h3>Block of 1 or more alternatives</h3>
+  ///
+  /// <embed src="images/Block.svg" type="image/svg+xml"/>
+  ///
+  /// <h2>Greedy Loops</h2>
+  ///
+  /// <h3>Greedy Closure: {@code (...)*}</h3>
+  ///
+  /// <embed src="images/ClosureGreedy.svg" type="image/svg+xml"/>
+  ///
+  /// <h3>Greedy Positive Closure: {@code (...)+}</h3>
+  ///
+  /// <embed src="images/PositiveClosureGreedy.svg" type="image/svg+xml"/>
+  ///
+  /// <h3>Greedy Optional: {@code (...)?}</h3>
+  ///
+  /// <embed src="images/OptionalGreedy.svg" type="image/svg+xml"/>
+  ///
+  /// <h2>Non-Greedy Loops</h2>
+  ///
+  /// <h3>Non-Greedy Closure: {@code (...)*?}</h3>
+  ///
+  /// <embed src="images/ClosureNonGreedy.svg" type="image/svg+xml"/>
+  ///
+  /// <h3>Non-Greedy Positive Closure: {@code (...)+?}</h3>
+  ///
+  /// <embed src="images/PositiveClosureNonGreedy.svg" type="image/svg+xml"/>
+  ///
+  /// <h3>Non-Greedy Optional: {@code (...)??}</h3>
+  ///
+  /// <embed src="images/OptionalNonGreedy.svg" type="image/svg+xml"/>
+  /// </summary>
+  class ATNState {
+  public:
+    virtual ~ATNState();
+
+    static const int INITIAL_NUM_TRANSITIONS = 4;
+
+    enum {
+      ATN_INVALID_TYPE = 0,
+      BASIC = 1,
+      RULE_START = 2,
+      BLOCK_START = 3,
+      PLUS_BLOCK_START = 4,
+      STAR_BLOCK_START = 5,
+      TOKEN_START = 6,
+      RULE_STOP = 7,
+      BLOCK_END = 8,
+      STAR_LOOP_BACK = 9,
+      STAR_LOOP_ENTRY = 10,
+      PLUS_LOOP_BACK = 11,
+      LOOP_END = 12
+    };
+
+    static const wchar_t * serializationNames[];
+
+    static const int INVALID_STATE_NUMBER = -1;
+
+    /// <summary>
+    /// Which ATN are we in? </summary>
+    ATN *atn = nullptr;
+
+    int stateNumber;
+
+    int ruleIndex; // at runtime, we don't have Rule objects
+
+    bool epsilonOnlyTransitions;
+
+    /// <summary>
+    /// Track the transitions emanating from this ATN state. </summary>
+  protected:
+    std::vector<Transition*> transitions;
+
+    /// <summary>
+    /// Used to cache lookahead during parsing, not used during construction </summary>
+  public:
+    misc::IntervalSet *nextTokenWithinRule;
+
+    virtual int hashCode();
+    virtual bool equals(void *o);
+
+    virtual bool isNonGreedyExitState();
+
+    virtual std::wstring toString() const;
+
+    virtual  std::vector<Transition*> getTransitions();
+
+    virtual int getNumberOfTransitions();
+
+    virtual void addTransition(Transition *e);
+
+    virtual void addTransition(int index, Transition *e);
+
+    virtual Transition *transition(int i);
+
+    virtual void setTransition(int i, Transition *e);
+
+    virtual Transition *removeTransition(int index);
+
+    virtual int getStateType() = 0;
+
+    bool onlyHasEpsilonTransitions();
+
+    virtual void setRuleIndex(int ruleIndex);
 
 
-                    /// <summary>
-                    /// The following images show the relation of states and
-                    /// <seealso cref="ATNState#transitions"/> for various grammar constructs.
-                    /// 
-                    /// <ul>
-                    /// 
-                    /// <li>Solid edges marked with an &#0949; indicate a required
-                    /// <seealso cref="EpsilonTransition"/>.</li>
-                    /// 
-                    /// <li>Dashed edges indicate locations where any transition derived from
-                    /// <seealso cref="Transition"/> might appear.</li>
-                    /// 
-                    /// <li>Dashed nodes are place holders for either a sequence of linked
-                    /// <seealso cref="BasicState"/> states or the inclusion of a block representing a nested
-                    /// construct in one of the forms below.</li>
-                    /// 
-                    /// <li>Nodes showing multiple outgoing alternatives with a {@code ...} support
-                    /// any number of alternatives (one or more). Nodes without the {@code ...} only
-                    /// support the exact number of alternatives shown in the diagram.</li>
-                    /// 
-                    /// </ul>
-                    /// 
-                    /// <h2>Basic Blocks</h2>
-                    /// 
-                    /// <h3>Rule</h3>
-                    /// 
-                    /// <embed src="images/Rule.svg" type="image/svg+xml"/>
-                    /// 
-                    /// <h3>Block of 1 or more alternatives</h3>
-                    /// 
-                    /// <embed src="images/Block.svg" type="image/svg+xml"/>
-                    /// 
-                    /// <h2>Greedy Loops</h2>
-                    /// 
-                    /// <h3>Greedy Closure: {@code (...)*}</h3>
-                    /// 
-                    /// <embed src="images/ClosureGreedy.svg" type="image/svg+xml"/>
-                    /// 
-                    /// <h3>Greedy Positive Closure: {@code (...)+}</h3>
-                    /// 
-                    /// <embed src="images/PositiveClosureGreedy.svg" type="image/svg+xml"/>
-                    /// 
-                    /// <h3>Greedy Optional: {@code (...)?}</h3>
-                    /// 
-                    /// <embed src="images/OptionalGreedy.svg" type="image/svg+xml"/>
-                    /// 
-                    /// <h2>Non-Greedy Loops</h2>
-                    /// 
-                    /// <h3>Non-Greedy Closure: {@code (...)*?}</h3>
-                    /// 
-                    /// <embed src="images/ClosureNonGreedy.svg" type="image/svg+xml"/>
-                    /// 
-                    /// <h3>Non-Greedy Positive Closure: {@code (...)+?}</h3>
-                    /// 
-                    /// <embed src="images/PositiveClosureNonGreedy.svg" type="image/svg+xml"/>
-                    /// 
-                    /// <h3>Non-Greedy Optional: {@code (...)??}</h3>
-                    /// 
-                    /// <embed src="images/OptionalNonGreedy.svg" type="image/svg+xml"/>
-                    /// </summary>
-                    class ATNState {
-                    public:
-                        virtual ~ATNState();
-                        
-                        static const int INITIAL_NUM_TRANSITIONS = 4;
-                        
-                        enum {
-                            ATN_INVALID_TYPE = 0,
-                            BASIC = 1,
-                            RULE_START = 2,
-                            BLOCK_START = 3,
-                            PLUS_BLOCK_START = 4,
-                            STAR_BLOCK_START = 5,
-                            TOKEN_START = 6,
-                            RULE_STOP = 7,
-                            BLOCK_END = 8,
-                            STAR_LOOP_BACK = 9,
-                            STAR_LOOP_ENTRY = 10,
-                            PLUS_LOOP_BACK = 11,
-                            LOOP_END = 12
-                        };
-                        
-                        static const wchar_t * serializationNames[];
-                        
-                        static const int INVALID_STATE_NUMBER = -1;
+  private:
+    void InitializeInstanceFields();
 
-                        /// <summary>
-                        /// Which ATN are we in? </summary>
-                        ATN *atn = nullptr;
+  public:
+    //                        ATNState() : transitions(new std::list<Transition*>()) {
+    //                            InitializeInstanceFields();
+    //                        }
+  };
 
-                        int stateNumber;
-
-                        int ruleIndex; // at runtime, we don't have Rule objects
-
-                        bool epsilonOnlyTransitions;
-
-                        /// <summary>
-                        /// Track the transitions emanating from this ATN state. </summary>
-                    protected:
-                        std::vector<Transition*> transitions;
-
-                        /// <summary>
-                        /// Used to cache lookahead during parsing, not used during construction </summary>
-                    public:
-                        misc::IntervalSet *nextTokenWithinRule;
-
-                        virtual int hashCode();
-                        virtual bool equals(void *o);
-
-                        virtual bool isNonGreedyExitState();
-
-                        virtual std::wstring toString() const;
-
-                        virtual  std::vector<Transition*> getTransitions();
-
-                        virtual int getNumberOfTransitions();
-
-                        virtual void addTransition(Transition *e);
-
-                        virtual void addTransition(int index, Transition *e);
-
-                        virtual Transition *transition(int i);
-
-                        virtual void setTransition(int i, Transition *e);
-
-                        virtual Transition *removeTransition(int index);
-
-                        virtual int getStateType() = 0;
-
-                        bool onlyHasEpsilonTransitions();
-
-                        virtual void setRuleIndex(int ruleIndex);
-                        
-
-                    private:
-                        void InitializeInstanceFields();
-
-public:
-//                        ATNState() : transitions(new std::list<Transition*>()) {
-//                            InitializeInstanceFields();
-//                        }
-                    };
-
-                }
-            }
-        }
-    }
-}
+} // namespace atn
+} // namespace runtime
+} // namespace v4
+} // namespace antlr
+} // namespace org

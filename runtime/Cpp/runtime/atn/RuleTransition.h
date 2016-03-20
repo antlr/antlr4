@@ -1,10 +1,6 @@
-﻿#pragma once
-
-#include "Transition.h"
-#include "Declarations.h"
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -33,38 +29,42 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#pragma once
+
+#include "Transition.h"
+
 namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace atn {
+namespace antlr {
+namespace v4 {
+namespace runtime {
+namespace atn {
 
-                    class RuleTransition final : public Transition {
-                        /// <summary>
-                        /// Ptr to the rule definition object for this rule ref </summary>
-                    public:
-                        const int ruleIndex; // no Rule object at runtime
+  class RuleTransition final : public Transition {
+    /// <summary>
+    /// Ptr to the rule definition object for this rule ref </summary>
+  public:
+    const int ruleIndex; // no Rule object at runtime
 
-                        const int precedence;
+    const int precedence;
 
-                        /// <summary>
-                        /// What node to begin computations following ref to rule </summary>
-                        ATNState *followState;
+    /// <summary>
+    /// What node to begin computations following ref to rule </summary>
+    ATNState *followState;
 
-                        /// @deprecated Use
-                        /// <seealso cref="#RuleTransition(RuleStartState, int, int, ATNState)"/> instead.
-                        RuleTransition(RuleStartState *ruleStart, int ruleIndex, ATNState *followState); 
+    /// @deprecated Use
+    /// <seealso cref="#RuleTransition(RuleStartState, int, int, ATNState)"/> instead.
+    RuleTransition(RuleStartState *ruleStart, int ruleIndex, ATNState *followState);
 
-                        RuleTransition(RuleStartState *ruleStart, int ruleIndex, int precedence, ATNState *followState);
+    RuleTransition(RuleStartState *ruleStart, int ruleIndex, int precedence, ATNState *followState);
 
-                        virtual int getSerializationType() override;
+    virtual int getSerializationType() override;
 
-                        virtual bool isEpsilon() override;
-                        virtual bool matches(int symbol, int minVocabSymbol, int maxVocabSymbol) override;
-                    };
+    virtual bool isEpsilon() override;
+    virtual bool matches(int symbol, int minVocabSymbol, int maxVocabSymbol) override;
+  };
 
-                }
-            }
-        }
-    }
-}
+} // namespace atn
+} // namespace runtime
+} // namespace v4
+} // namespace antlr
+} // namespace org

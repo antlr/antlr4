@@ -1,9 +1,6 @@
-﻿#include "SetTransition.h"
-#include "Token.h"
-#include "IntervalSet.h"
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -32,34 +29,30 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace atn {
+#include "Token.h"
+#include "IntervalSet.h"
 
+#include "SetTransition.h"
 
-                    SetTransition::SetTransition(ATNState *target, misc::IntervalSet *aSet) :
-                    Transition(target), set(aSet==nullptr?misc::IntervalSet::of(Token::INVALID_TYPE):aSet) {
-                    }
+using namespace org::antlr::v4::runtime;
+using namespace org::antlr::v4::runtime::atn;
 
-                    int SetTransition::getSerializationType() {
-                        return SET;
-                    }
+SetTransition::SetTransition(ATNState *target, misc::IntervalSet *aSet) :
+Transition(target), set(aSet==nullptr?misc::IntervalSet::of(Token::INVALID_TYPE):aSet) {
+}
 
-                    misc::IntervalSet *SetTransition::label() {
-                        return set;
-                    }
+int SetTransition::getSerializationType() {
+  return SET;
+}
 
-                    bool SetTransition::matches(int symbol, int minVocabSymbol, int maxVocabSymbol) {
-                        return set->contains(symbol);
-                    }
+misc::IntervalSet *SetTransition::label() {
+  return set;
+}
 
-                    std::wstring SetTransition::toString() {
-                        return set->toString();
-                    }
-                }
-            }
-        }
-    }
+bool SetTransition::matches(int symbol, int minVocabSymbol, int maxVocabSymbol) {
+  return set->contains(symbol);
+}
+
+std::wstring SetTransition::toString() {
+  return set->toString();
 }

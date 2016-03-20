@@ -1,9 +1,6 @@
-﻿#include "RecognitionException.h"
-#include "ATN.h"
-#include "Recognizer.h"
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -32,56 +29,54 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
+#include "ATN.h"
+#include "Recognizer.h"
 
-                int RecognitionException::getOffendingState() {
-                    return offendingState;
-                }
+#include "RecognitionException.h"
 
-                void RecognitionException::setOffendingState(int offendingState) {
-                    this->offendingState = offendingState;
-                }
+using namespace org::antlr::v4::runtime;
 
-                misc::IntervalSet *RecognitionException::getExpectedTokens() {
-                    // Terence and Sam used some fancy Java wildcard generics which
-                    // cause us trouble here. TODO - can a Recognizer<void*, void*>
-                    // substitute for any other type of recognizer?
-                    if (recognizer != nullptr) {
-                        return ((Recognizer<void*, void*>*)recognizer)->getATN()->getExpectedTokens(offendingState, ctx);
-                    }
-                    return nullptr;
-                }
+int RecognitionException::getOffendingState() {
+  return offendingState;
+}
 
-                RuleContext *RecognitionException::getCtx() {
-                    return ctx;
-                }
+void RecognitionException::setOffendingState(int offendingState) {
+  this->offendingState = offendingState;
+}
 
-                IntStream *RecognitionException::getInputStream() {
-                    return input;
-                }
+misc::IntervalSet *RecognitionException::getExpectedTokens() {
+  // Terence and Sam used some fancy Java wildcard generics which
+  // cause us trouble here. TODO - can a Recognizer<void*, void*>
+  // substitute for any other type of recognizer?
+  if (recognizer != nullptr) {
+    return ((Recognizer<void*, void*>*)recognizer)->getATN()->getExpectedTokens(offendingState, ctx);
+  }
+  return nullptr;
+}
 
-                Token *RecognitionException::getOffendingToken() {
-                    return offendingToken;
-                }
+RuleContext *RecognitionException::getCtx() {
+  return ctx;
+}
 
-                void RecognitionException::setOffendingToken(Token *offendingToken) {
-                    this->offendingToken = offendingToken;
-                }
-                
-                IRecognizer<void*, void*> *RecognitionException::getRecognizer() {
-                    // Terence and Sam used some fancy Java wildcard generics which
-                    // cause us trouble here. TODO - can a Recognizer<void*, void*>
-                    // substitute for any other type of recognizer?
-                    return (IRecognizer<void*, void*> *)recognizer;
-                }
+IntStream *RecognitionException::getInputStream() {
+  return input;
+}
 
-                void RecognitionException::InitializeInstanceFields() {
-                    offendingState = -1;
-                }
-            }
-        }
-    }
+Token *RecognitionException::getOffendingToken() {
+  return offendingToken;
+}
+
+void RecognitionException::setOffendingToken(Token *offendingToken) {
+  this->offendingToken = offendingToken;
+}
+
+IRecognizer<void*, void*> *RecognitionException::getRecognizer() {
+  // Terence and Sam used some fancy Java wildcard generics which
+  // cause us trouble here. TODO - can a Recognizer<void*, void*>
+  // substitute for any other type of recognizer?
+  return (IRecognizer<void*, void*> *)recognizer;
+}
+
+void RecognitionException::InitializeInstanceFields() {
+  offendingState = -1;
 }

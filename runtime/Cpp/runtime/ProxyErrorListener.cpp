@@ -1,11 +1,6 @@
-﻿#include "ProxyErrorListener.h"
-#include "RecognitionException.h"
-#include "atn/ATNConfigSet.h"
-#include "dfa/DFA.h"
-#include "Exceptions.h"
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -34,28 +29,24 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                void ProxyErrorListener::reportAmbiguity(Parser *recognizer, dfa::DFA *dfa, int startIndex, int stopIndex, bool exact, antlrcpp::BitSet *ambigAlts, atn::ATNConfigSet *configs) {
-                    for (auto listener : *delegates) {
-                        listener->reportAmbiguity(recognizer, dfa, startIndex, stopIndex, exact, ambigAlts, configs);
-                    }
-                }
+#include "ProxyErrorListener.h"
 
-                void ProxyErrorListener::reportAttemptingFullContext(Parser *recognizer, dfa::DFA *dfa, int startIndex, int stopIndex, antlrcpp::BitSet *conflictingAlts, atn::ATNConfigSet *configs) {
-                    for (auto listener : *delegates) {
-                        listener->reportAttemptingFullContext(recognizer, dfa, startIndex, stopIndex, conflictingAlts, configs);
-                    }
-                }
+using namespace org::antlr::v4::runtime;
 
-                void ProxyErrorListener::reportContextSensitivity(Parser *recognizer, dfa::DFA *dfa, int startIndex, int stopIndex, int prediction, atn::ATNConfigSet *configs) {
-                    for (auto listener : *delegates) {
-                        listener->reportContextSensitivity(recognizer, dfa, startIndex, stopIndex, prediction, configs);
-                    }
-                }
-            }
-        }
-    }
+void ProxyErrorListener::reportAmbiguity(Parser *recognizer, dfa::DFA *dfa, int startIndex, int stopIndex, bool exact, antlrcpp::BitSet *ambigAlts, atn::ATNConfigSet *configs) {
+  for (auto listener : *delegates) {
+    listener->reportAmbiguity(recognizer, dfa, startIndex, stopIndex, exact, ambigAlts, configs);
+  }
+}
+
+void ProxyErrorListener::reportAttemptingFullContext(Parser *recognizer, dfa::DFA *dfa, int startIndex, int stopIndex, antlrcpp::BitSet *conflictingAlts, atn::ATNConfigSet *configs) {
+  for (auto listener : *delegates) {
+    listener->reportAttemptingFullContext(recognizer, dfa, startIndex, stopIndex, conflictingAlts, configs);
+  }
+}
+
+void ProxyErrorListener::reportContextSensitivity(Parser *recognizer, dfa::DFA *dfa, int startIndex, int stopIndex, int prediction, atn::ATNConfigSet *configs) {
+  for (auto listener : *delegates) {
+    listener->reportContextSensitivity(recognizer, dfa, startIndex, stopIndex, prediction, configs);
+  }
 }

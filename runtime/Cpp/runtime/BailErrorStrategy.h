@@ -1,10 +1,6 @@
-﻿#pragma once
-
-#include "DefaultErrorStrategy.h"
-#include "Declarations.h"
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -33,38 +29,42 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#pragma once
+
+#include "DefaultErrorStrategy.h"
+
 namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
+namespace antlr {
+namespace v4 {
+namespace runtime {
 
-                /// <summary>
-                /// Bail out of parser at first syntax error. Do this to use it:
-                ///  <p/>
-                ///  {@code myparser.setErrorHandler(new BailErrorStrategy());}
-                /// </summary>
-                class BailErrorStrategy : public DefaultErrorStrategy {
-                    /// <summary>
-                    /// Instead of recovering from exception {@code e}, re-throw it wrapped
-                    ///  in a <seealso cref="ParseCancellationException"/> so it is not caught by the
-                    ///  rule function catches.  Use <seealso cref="Exception#getCause()"/> to get the
-                    ///  original <seealso cref="RecognitionException"/>.
-                    /// </summary>
-                public:
-                    virtual void recover(Parser *recognizer, RecognitionException *e) override;
+  /// <summary>
+  /// Bail out of parser at first syntax error. Do this to use it:
+  ///  <p/>
+  ///  {@code myparser.setErrorHandler(new BailErrorStrategy());}
+  /// </summary>
+  class BailErrorStrategy : public DefaultErrorStrategy {
+    /// <summary>
+    /// Instead of recovering from exception {@code e}, re-throw it wrapped
+    ///  in a <seealso cref="ParseCancellationException"/> so it is not caught by the
+    ///  rule function catches.  Use <seealso cref="Exception#getCause()"/> to get the
+    ///  original <seealso cref="RecognitionException"/>.
+    /// </summary>
+  public:
+    virtual void recover(Parser *recognizer, RecognitionException *e) override;
 
-                    /// <summary>
-                    /// Make sure we don't attempt to recover inline; if the parser
-                    ///  successfully recovers, it won't throw an exception.
-                    /// </summary>
-                    virtual Token *recoverInline(Parser *recognizer) override;
+    /// <summary>
+    /// Make sure we don't attempt to recover inline; if the parser
+    ///  successfully recovers, it won't throw an exception.
+    /// </summary>
+    virtual Token *recoverInline(Parser *recognizer) override;
 
-                    /// <summary>
-                    /// Make sure we don't attempt to recover from problems in subrules. </summary>
-                    virtual void sync(Parser *recognizer) override;
-                };
+    /// <summary>
+    /// Make sure we don't attempt to recover from problems in subrules. </summary>
+    virtual void sync(Parser *recognizer) override;
+  };
 
-            }
-        }
-    }
-}
+} // namespace runtime
+} // namespace v4
+} // namespace antlr
+} // namespace org

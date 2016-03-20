@@ -1,13 +1,6 @@
-﻿#pragma once
-
-#include <string>
-
-#include "BaseErrorListener.h"
-#include "RecognitionException.h"
-#include "IRecognizer.h"
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -36,28 +29,28 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#pragma once
+
+#include "BaseErrorListener.h"
+
 namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                
-                ///
-                /// <summary>
-                /// @author Sam Harwell
-                /// </summary>
-                class ConsoleErrorListener : public BaseErrorListener {
-                public:
-                    static ConsoleErrorListener *const INSTANCE;
-                    
-                    template <typename T1, typename T2>
-                    void syntaxError(IRecognizer<T1, T2> *recognizer, void *offendingSymbol,
-                                     int line, int charPositionInLine, const std::wstring &msg,
-                                     RecognitionException *e)  {
-                            std::wcerr << L"line " << line << L":" << charPositionInLine << L" " << msg;
-                    }
-                };
-                
-            }  // namespace runtime
-        }  // namespace v4
-    }  // namespace antlr
-}  // namespace org
+namespace antlr {
+namespace v4 {
+namespace runtime {
+
+  class ConsoleErrorListener : public BaseErrorListener {
+  public:
+    static ConsoleErrorListener *const INSTANCE;
+
+    template <typename T1, typename T2>
+    void syntaxError(IRecognizer<T1, T2> *recognizer, void *offendingSymbol,
+                     int line, int charPositionInLine, const std::wstring &msg,
+                     RecognitionException *e)  {
+      std::wcerr << L"line " << line << L":" << charPositionInLine << L" " << msg;
+    }
+  };
+
+} // namespace runtime
+} // namespace v4
+} // namespace antlr
+} // namespace org

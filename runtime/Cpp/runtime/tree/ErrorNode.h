@@ -1,9 +1,6 @@
-﻿#pragma once
-
-#include "TerminalNode.h"
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -32,17 +29,21 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#pragma once
+
+#include "TerminalNode.h"
+
 namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace tree {
+namespace antlr {
+namespace v4 {
+namespace runtime {
+namespace tree {
 
-                    class ErrorNode : public virtual TerminalNode {
-                    };
+  class ErrorNode : public virtual TerminalNode {
+  };
 
-                }
-            }
-        }
-    }
-}
+} // namespace tree
+} // namespace runtime
+} // namespace v4
+} // namespace antlr
+} // namespace org

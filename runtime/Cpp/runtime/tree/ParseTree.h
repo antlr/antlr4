@@ -1,13 +1,6 @@
-﻿#pragma once
-
-#include "SyntaxTree.h"
-#include "ParseTreeVisitor.h"
-#include "Declarations.h"
-
-
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -36,48 +29,51 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#pragma once
+
+#include "SyntaxTree.h"
+
 namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                
-                namespace tree {
+namespace antlr {
+namespace v4 {
+namespace runtime {
+namespace tree {
 
-                    /// <summary>
-                    /// An interface to access the tree of <seealso cref="RuleContext"/> objects created
-                    ///  during a parse that makes the data structure look like a simple parse tree.
-                    ///  This node represents both internal nodes, rule invocations,
-                    ///  and leaf nodes, token matches.
-                    /// <p/>
-                    ///  The payload is either a <seealso cref="Token"/> or a <seealso cref="RuleContext"/> object.
-                    /// </summary>
-                    class ParseTree : public SyntaxTree {
-                        // the following methods narrow the return type; they are not additional methods
-                    public:
-                        virtual ParseTree *getParent() override = 0;
-                      virtual ParseTree *getChild(std::size_t i) override = 0;
+  /// <summary>
+  /// An interface to access the tree of <seealso cref="RuleContext"/> objects created
+  ///  during a parse that makes the data structure look like a simple parse tree.
+  ///  This node represents both internal nodes, rule invocations,
+  ///  and leaf nodes, token matches.
+  /// <p/>
+  ///  The payload is either a <seealso cref="Token"/> or a <seealso cref="RuleContext"/> object.
+  /// </summary>
+  class ParseTree : public SyntaxTree {
+    // the following methods narrow the return type; they are not additional methods
+  public:
+    virtual ParseTree *getParent() override = 0;
+    virtual ParseTree *getChild(std::size_t i) override = 0;
 
-                        /// <summary>
-                        /// The <seealso cref="ParseTreeVisitor"/> needs a double dispatch method. </summary>
-                        template<typename T, typename T1>
-                        T *accept(ParseTreeVisitor<T1> *visitor);
+    /// <summary>
+    /// The <seealso cref="ParseTreeVisitor"/> needs a double dispatch method. </summary>
+    template<typename T, typename T1>
+    T *accept(ParseTreeVisitor<T1> *visitor);
 
-                        /// <summary>
-                        /// Return the combined text of all leaf nodes. Does not get any
-                        ///  off-channel tokens (if any) so won't return whitespace and
-                        ///  comments if they are sent to parser on hidden channel.
-                        /// </summary>
-                        virtual std::wstring getText() = 0;
+    /// <summary>
+    /// Return the combined text of all leaf nodes. Does not get any
+    ///  off-channel tokens (if any) so won't return whitespace and
+    ///  comments if they are sent to parser on hidden channel.
+    /// </summary>
+    virtual std::wstring getText() = 0;
 
-                        /// <summary>
-                        /// Specialize toStringTree so that it can print out more information
-                        /// 	based upon the parser.
-                        /// </summary>
-                        virtual std::wstring toStringTree(Parser *parser) = 0;
-                    };
+    /// <summary>
+    /// Specialize toStringTree so that it can print out more information
+    /// 	based upon the parser.
+    /// </summary>
+    virtual std::wstring toStringTree(Parser *parser) = 0;
+  };
 
-                }
-            }
-        }
-    }
-}
+} // namespace tree
+} // namespace runtime
+} // namespace v4
+} // namespace antlr
+} // namespace org

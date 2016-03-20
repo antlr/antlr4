@@ -1,9 +1,6 @@
-﻿#pragma once
-
-#include "ParserRuleContext.h"
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  * Copyright (c) 2013 Terence Parr
  * Copyright (c) 2013 Dan McLaughlin
  * All rights reserved.
@@ -32,27 +29,31 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#pragma once
+
+#include "ParserRuleContext.h"
+
 namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
+namespace antlr {
+namespace v4 {
+namespace runtime {
 
-                /// <summary>
-                /// This object is used by the ParserInterpreter and is the same as a regular
-                ///  ParserRuleContext except that we need to track the rule index of the
-                ///  current context so that we can build parse trees.
-                /// </summary>
-                class InterpreterRuleContext : public ParserRuleContext {
-                private:
-                    const int ruleIndex;
+  /// <summary>
+  /// This object is used by the ParserInterpreter and is the same as a regular
+  ///  ParserRuleContext except that we need to track the rule index of the
+  ///  current context so that we can build parse trees.
+  /// </summary>
+  class InterpreterRuleContext : public ParserRuleContext {
+  private:
+    const int ruleIndex;
 
-                public:
-                    InterpreterRuleContext(ParserRuleContext *parent, int invokingStateNumber, int ruleIndex);
+  public:
+    InterpreterRuleContext(ParserRuleContext *parent, int invokingStateNumber, int ruleIndex);
 
-                    virtual int getRuleIndex() override;
-                };
+    virtual int getRuleIndex() override;
+  };
 
-            }
-        }
-    }
-}
+} // namespace runtime
+} // namespace v4
+} // namespace antlr
+} // namespace org

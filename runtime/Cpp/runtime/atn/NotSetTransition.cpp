@@ -1,9 +1,6 @@
-﻿#include "NotSetTransition.h"
-#include "ATNState.h"
-#include "IntervalSet.h"
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -32,28 +29,23 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace atn {
+#include "NotSetTransition.h"
+#include "ATNState.h"
+#include "IntervalSet.h"
 
-                    NotSetTransition::NotSetTransition(ATNState *target, misc::IntervalSet *set) : SetTransition(target, set) {
-                    }
+using namespace org::antlr::v4::runtime::atn;
 
-                    int NotSetTransition::getSerializationType() {
-                        return NOT_SET;
-                    }
+NotSetTransition::NotSetTransition(ATNState *target, misc::IntervalSet *set) : SetTransition(target, set) {
+}
 
-                    bool NotSetTransition::matches(int symbol, int minVocabSymbol, int maxVocabSymbol) {
-                        return symbol >= minVocabSymbol && symbol <= maxVocabSymbol && !SetTransition::matches(symbol, minVocabSymbol, maxVocabSymbol);
-                    }
+int NotSetTransition::getSerializationType() {
+  return NOT_SET;
+}
 
-                    std::wstring NotSetTransition::toString() {
-                        return L'~' + SetTransition::toString();
-                    }
-                }
-            }
-        }
-    }
+bool NotSetTransition::matches(int symbol, int minVocabSymbol, int maxVocabSymbol) {
+  return symbol >= minVocabSymbol && symbol <= maxVocabSymbol && !SetTransition::matches(symbol, minVocabSymbol, maxVocabSymbol);
+}
+
+std::wstring NotSetTransition::toString() {
+  return L'~' + SetTransition::toString();
 }

@@ -1,8 +1,6 @@
-﻿#include "TagChunk.h"
-#include "Exceptions.h"
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  * Copyright (c) 2013 Terence Parr
  * Copyright (c) 2013 Sam Harwell
  * All rights reserved.
@@ -31,41 +29,34 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace tree {
-                    namespace pattern {
+#include "Exceptions.h"
 
-                        TagChunk::TagChunk(const std::wstring &tag) {
-                        }
+#include "TagChunk.h"
 
-                        TagChunk::TagChunk(const std::wstring &label, const std::wstring &tag) : tag(tag), label(label) {
-                            if (tag == L"" || tag.length() == 0) {
-                                throw IllegalArgumentException(L"tag cannot be null or empty");
-                            }
+using namespace org::antlr::v4::runtime::tree::pattern;
 
-                        }
+TagChunk::TagChunk(const std::wstring &tag) {
+}
 
-                        std::wstring TagChunk::getTag() {
-                            return tag;
-                        }
+TagChunk::TagChunk(const std::wstring &label, const std::wstring &tag) : tag(tag), label(label) {
+  if (tag == L"" || tag.length() == 0) {
+    throw IllegalArgumentException(L"tag cannot be null or empty");
+  }
 
-                        std::wstring TagChunk::getLabel() {
-                            return label;
-                        }
+}
 
-                        std::wstring TagChunk::toString() {
-                            if (label != L"") {
-                                return label + std::wstring(L":") + tag;
-                            }
+std::wstring TagChunk::getTag() {
+  return tag;
+}
 
-                            return tag;
-                        }
-                    }
-                }
-            }
-        }
-    }
+std::wstring TagChunk::getLabel() {
+  return label;
+}
+
+std::wstring TagChunk::toString() {
+  if (label != L"") {
+    return label + std::wstring(L":") + tag;
+  }
+
+  return tag;
 }

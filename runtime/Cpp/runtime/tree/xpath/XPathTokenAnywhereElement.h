@@ -1,11 +1,6 @@
-﻿#pragma once
-
-#include "XPathElement.h"
-#include <string>
-#include <set>
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -34,32 +29,32 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#pragma once
 
+#include "XPathElement.h"
 
 namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace tree {
-                    class ParseTree;
-                    
-                    namespace xpath {
+namespace antlr {
+namespace v4 {
+namespace runtime {
+namespace tree {
+namespace xpath {
 
-                        class XPathTokenAnywhereElement : public XPathElement {
-                        protected:
-                            int tokenType;
-                        public:
-                            XPathTokenAnywhereElement(const std::wstring &tokenName, int tokenType);
+  class XPathTokenAnywhereElement : public XPathElement {
+  protected:
+    int tokenType;
+  public:
+    XPathTokenAnywhereElement(const std::wstring &tokenName, int tokenType);
 
-                            virtual std::vector<ParseTree*> * evaluate(ParseTree *t) override;
+    virtual std::vector<ParseTree*> * evaluate(ParseTree *t) override;
 
-                        private:
-                            void InitializeInstanceFields();
-                        };
+  private:
+    void InitializeInstanceFields();
+  };
 
-                    }
-                }
-            }
-        }
-    }
-}
+} // namespace xpath
+} // namespace tree
+} // namespace runtime
+} // namespace v4
+} // namespace antlr
+} // namespace org

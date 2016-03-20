@@ -1,8 +1,6 @@
-﻿#include "WildcardTransition.h"
-#include "ATNState.h"
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -31,28 +29,23 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace atn {
+#include "ATNState.h"
 
-                    WildcardTransition::WildcardTransition(ATNState *target) : Transition(target) {
-                    }
+#include "WildcardTransition.h"
 
-                    int WildcardTransition::getSerializationType() {
-                        return WILDCARD;
-                    }
+using namespace org::antlr::v4::runtime::atn;
 
-                    bool WildcardTransition::matches(int symbol, int minVocabSymbol, int maxVocabSymbol) {
-                        return symbol >= minVocabSymbol && symbol <= maxVocabSymbol;
-                    }
+WildcardTransition::WildcardTransition(ATNState *target) : Transition(target) {
+}
 
-                    std::wstring WildcardTransition::toString() {
-                        return L".";
-                    }
-                }
-            }
-        }
-    }
+int WildcardTransition::getSerializationType() {
+  return WILDCARD;
+}
+
+bool WildcardTransition::matches(int symbol, int minVocabSymbol, int maxVocabSymbol) {
+  return symbol >= minVocabSymbol && symbol <= maxVocabSymbol;
+}
+
+std::wstring WildcardTransition::toString() {
+  return L".";
 }

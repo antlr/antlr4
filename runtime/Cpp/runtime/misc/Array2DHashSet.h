@@ -1,20 +1,6 @@
-﻿#pragma once
-
-#include <string>
-#include <set>
-#include <iterator>
-#include <vector>
-
-#include "AbstractEqualityComparator.h"
-#include "ObjectEqualityComparator.h"
-#include "MurmurHash.h"
-#include "Array2DHashSet.h"
-#include "Exceptions.h"
-#include "StringBuilder.h"
-#include "Arrays.h"
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -43,164 +29,166 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#pragma once
+
+#include "AbstractEqualityComparator.h"
+
 namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace misc {
+namespace antlr {
+namespace v4 {
+namespace runtime {
+namespace misc {
 
+  /// <summary>
+  /// <seealso cref="Set"/> implementation with closed hashing (open addressing). </summary>
+  template<typename T>
+  class Array2DHashSet : public std::set<T> {
+  public:
+    static const int INITAL_CAPACITY = 16; // must be power of 2
+    static const int INITAL_BUCKET_CAPACITY = 8;
+    static const double LOAD_FACTOR;
 
-                    /// <summary>
-                    /// <seealso cref="Set"/> implementation with closed hashing (open addressing). </summary>
-                    template<typename T>
-                    class Array2DHashSet : public std::set<T> {
-                    public:
-                      static const int INITAL_CAPACITY = 16; // must be power of 2
-                      static const int INITAL_BUCKET_CAPACITY = 8;
-                      static const double LOAD_FACTOR;
+    Array2DHashSet();
+    Array2DHashSet(AbstractEqualityComparator<T> *comparator);
+    Array2DHashSet(AbstractEqualityComparator<T> *comparator, int initialCapacity, int initialBucketCapacity);
 
-                      Array2DHashSet();
-                      Array2DHashSet(AbstractEqualityComparator<T> *comparator);
-                      Array2DHashSet(AbstractEqualityComparator<T> *comparator,
-                                     int initialCapacity, int initialBucketCapacity);
+    /// <summary>
+    /// Add {@code o} to set if not there; return existing value if already
+    /// there. This method performs the same operation as <seealso cref="#add"/> aside from
+    /// the return value.
+    /// </summary>
+    T getOrAdd(T o);
+    virtual T get(T o);
+    virtual int hashCode();
+    virtual bool equals(T o);
 
-                      /// <summary>
-                      /// Add {@code o} to set if not there; return existing value if already
-                      /// there. This method performs the same operation as <seealso cref="#add"/> aside from
-                      /// the return value.
-                      /// </summary>
-                      T getOrAdd(T o);
-                      virtual T get(T o);
-                      virtual int hashCode();
-                      virtual bool equals(T o);
+  protected:
+    // Daughter iterator class
+    class SetIterator : public std::iterator<std::random_access_iterator_tag, T> {
 
-                    protected:
-                        // Daughter iterator class
-                        class SetIterator : public std::iterator<std::random_access_iterator_tag, T> {
+      Array2DHashSet<T> *const outerInstance;
 
-                            Array2DHashSet<T> *const outerInstance;
-
-                        public:
+    public:
 #ifdef TODO
-                            // JAVA TO C++ CONVERTER WARNING: Since the array size is not known in
-                            // this declaration, Java to C++ Converter has converted this array to
-                            // a pointer.  You will need to call 'delete[]' where appropriate:
-                            ORIGINAL LINE: final T[] data;
+      // JAVA TO C++ CONVERTER WARNING: Since the array size is not known in
+      // this declaration, Java to C++ Converter has converted this array to
+      // a pointer.  You will need to call 'delete[]' where appropriate:
+      ORIGINAL LINE: final T[] data;
 #endif
-                            const T *data;
-                            int nextIndex;
-                            bool removed;
+      const T *data;
+      int nextIndex;
+      bool removed;
 
-                            SetIterator(Array2DHashSet<T*> * const outerInstance, T data[]);
+      SetIterator(Array2DHashSet<T*> * const outerInstance, T data[]);
 
-                            // TODO; these are java overrides probably, not STL
-                            virtual bool hasNext();
+      // TODO; these are java overrides probably, not STL
+      virtual bool hasNext();
 
-                            virtual T *next();
+      virtual T *next();
 
-                            virtual void remove();
+      virtual void remove();
 
-                        private:
-                            void InitializeInstanceFields();
-                        };
-                        
-
-                        AbstractEqualityComparator<T> *const _comparator;
-                        
-                        std::vector<std::vector<T>> buckets;
-
-                        /// <summary>
-                        /// How many elements in set </summary>
-                        int n;
-
-                        int threshold; // when to expand
-
-                        int currentPrime; // jump by 4 primes each expand or whatever
-                        int initialBucketCapacity;
-                        virtual T getOrAddImpl(T o);
-                        int getBucket(T o);
-                        virtual void expand();
-
-                    public:
-                        bool add(T t);
-
-                        int size();
-
-                        bool isEmpty();
-
-                        bool contains(void *o);
-
-                        virtual bool containsFast(T obj);
-
-                        virtual std::iterator<std::random_access_iterator_tag, T> *iterator();
-
-                        virtual std::vector<T> toArray();
-
-                        template<typename U>
-                        U *toArray(U a[]);
-                        
-                        bool remove(void *o);
-
-                        virtual bool removeFast(T obj);
-
-                        template<typename T1>
-                        bool containsAll(std::set<T1> *collection);
-
-                        template<typename T1>
-                        bool addAll(std::set<T1> *c) ;
-
-                        template<typename T1>
-                        bool retainAll(std::set<T1> *c);
-
-                        template<typename T1>
-                        bool removeAll(std::set<T1> *c);
-
-                        virtual void clear();
-
-                    virtual std::wstring toString();
-
-                    virtual std::wstring toTableString();
-
-                        /// <summary>
-                        /// Return {@code o} as an instance of the element type {@code T}. If
-                        /// {@code o} is non-null but known to not be an instance of {@code T}, this
-                        /// method returns {@code null}. The base implementation does not perform any
-                        /// type checks; override this method to provide strong type checks for the
-                        /// <seealso cref="#contains"/> and <seealso cref="#remove"/> methods to ensure the arguments to
-                        /// the <seealso cref="EqualityComparator"/> for the set always have the expected
-                        /// types.
-                        /// </summary>
-                        /// <param name="o"> the object to try and cast to the element type of the set </param>
-                        /// <returns> {@code o} if it could be an instance of {@code T}, otherwise
-                        /// {@code null}. </returns>
-                    protected:
-                        virtual T asElementType(void *o) {
-                            throw new TODOException(L"Array2DHashSet::asElementType");
-                        };
-
-                        /// <summary>
-                        /// Return an array of {@code T[]} with length {@code capacity}.
-                        /// </summary>
-                        /// <param name="capacity"> the length of the array to return </param>
-                        /// <returns> the newly constructed array </returns>
-                        virtual std::vector<std::vector<T>> createBuckets(int capacity);
-
-                        /// <summary>
-                        /// Return an array of {@code T} with length {@code capacity}.
-                        /// </summary>
-                        /// <param name="capacity"> the length of the array to return </param>
-                        /// <returns> the newly constructed array </returns>
-                        virtual std::vector<T> createBucket(int capacity);
+    private:
+      void InitializeInstanceFields();
+    };
 
 
-                    private:
-                        void InitializeInstanceFields();
-                    };
+    AbstractEqualityComparator<T> *const _comparator;
 
-                }
-            }
-        }
-    }
-}
+    std::vector<std::vector<T>> buckets;
+
+    /// <summary>
+    /// How many elements in set </summary>
+    int n;
+
+    int threshold; // when to expand
+
+    int currentPrime; // jump by 4 primes each expand or whatever
+    int initialBucketCapacity;
+    virtual T getOrAddImpl(T o);
+    int getBucket(T o);
+    virtual void expand();
+
+  public:
+    bool add(T t);
+
+    int size();
+
+    bool isEmpty();
+
+    bool contains(void *o);
+
+    virtual bool containsFast(T obj);
+
+    virtual std::iterator<std::random_access_iterator_tag, T> *iterator();
+
+    virtual std::vector<T> toArray();
+
+    template<typename U>
+    U *toArray(U a[]);
+
+    bool remove(void *o);
+
+    virtual bool removeFast(T obj);
+
+    template<typename T1>
+    bool containsAll(std::set<T1> *collection);
+
+    template<typename T1>
+    bool addAll(std::set<T1> *c) ;
+
+    template<typename T1>
+    bool retainAll(std::set<T1> *c);
+
+    template<typename T1>
+    bool removeAll(std::set<T1> *c);
+
+    virtual void clear();
+
+    virtual std::wstring toString();
+
+    virtual std::wstring toTableString();
+
+    /// <summary>
+    /// Return {@code o} as an instance of the element type {@code T}. If
+    /// {@code o} is non-null but known to not be an instance of {@code T}, this
+    /// method returns {@code null}. The base implementation does not perform any
+    /// type checks; override this method to provide strong type checks for the
+    /// <seealso cref="#contains"/> and <seealso cref="#remove"/> methods to ensure the arguments to
+    /// the <seealso cref="EqualityComparator"/> for the set always have the expected
+    /// types.
+    /// </summary>
+    /// <param name="o"> the object to try and cast to the element type of the set </param>
+    /// <returns> {@code o} if it could be an instance of {@code T}, otherwise
+    /// {@code null}. </returns>
+  protected:
+    virtual T asElementType(void *o) {
+      throw new TODOException(L"Array2DHashSet::asElementType");
+    };
+
+    /// <summary>
+    /// Return an array of {@code T[]} with length {@code capacity}.
+    /// </summary>
+    /// <param name="capacity"> the length of the array to return </param>
+    /// <returns> the newly constructed array </returns>
+    virtual std::vector<std::vector<T>> createBuckets(int capacity);
+
+    /// <summary>
+    /// Return an array of {@code T} with length {@code capacity}.
+    /// </summary>
+    /// <param name="capacity"> the length of the array to return </param>
+    /// <returns> the newly constructed array </returns>
+    virtual std::vector<T> createBucket(int capacity);
+
+
+  private:
+    void InitializeInstanceFields();
+  };
+
+} // namespace atn
+} // namespace runtime
+} // namespace v4
+} // namespace antlr
+} // namespace org
 
 #include "Array2DHashSet.inl"

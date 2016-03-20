@@ -1,14 +1,6 @@
-﻿#pragma once
-
-#include "WritableToken.h"
-#include "CharStream.h"
-#include "Declarations.h"
-
-#include <string>
-#include <utility>
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -37,100 +29,103 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#pragma once
+
+#include "WritableToken.h"
+
 namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
+namespace antlr {
+namespace v4 {
+namespace runtime {
 
-                
-                class CommonToken : public WritableToken {
-                protected:
-                    static std::pair<TokenSource*, CharStream*> *const EMPTY_SOURCE;
+  class CommonToken : public WritableToken {
+  protected:
+    static std::pair<TokenSource*, CharStream*> *const EMPTY_SOURCE;
 
-                    int type;
-                    int line;
-                    int charPositionInLine; // set to invalid position
-                    int channel;
-                    std::pair<TokenSource*, CharStream*> *source;
+    int type;
+    int line;
+    int charPositionInLine; // set to invalid position
+    int channel;
+    std::pair<TokenSource*, CharStream*> *source;
 
-                    /// <summary>
-                    /// We need to be able to change the text once in a while.  If
-                    ///  this is non-null, then getText should return this.  Note that
-                    ///  start/stop are not affected by changing this.
-                    /// </summary>
-                    // TODO: can store these in map in token stream rather than as field here
-                    std::wstring text;
+    /// <summary>
+    /// We need to be able to change the text once in a while.  If
+    ///  this is non-null, then getText should return this.  Note that
+    ///  start/stop are not affected by changing this.
+    /// </summary>
+    // TODO: can store these in map in token stream rather than as field here
+    std::wstring text;
 
-                    /// <summary>
-                    /// What token number is this from 0..n-1 tokens; < 0 implies invalid index </summary>
-                    int index;
+    /// <summary>
+    /// What token number is this from 0..n-1 tokens; < 0 implies invalid index </summary>
+    int index;
 
-                    /// <summary>
-                    /// The char position into the input buffer where this token starts </summary>
-                    int start;
+    /// <summary>
+    /// The char position into the input buffer where this token starts </summary>
+    int start;
 
-                    /// <summary>
-                    /// The char position into the input buffer where this token stops </summary>
-                    int stop;
+    /// <summary>
+    /// The char position into the input buffer where this token stops </summary>
+    int stop;
 
-                public:
-                    CommonToken(int type);
+  public:
+    CommonToken(int type);
 
-                    CommonToken(std::pair<TokenSource*, CharStream*> *source, int type, int channel, int start, int stop);
+    CommonToken(std::pair<TokenSource*, CharStream*> *source, int type, int channel, int start, int stop);
 
-                    CommonToken(int type, const std::wstring &text);
+    CommonToken(int type, const std::wstring &text);
 
-                    CommonToken(Token *oldToken);
+    CommonToken(Token *oldToken);
 
-                    virtual int getType() override;
+    virtual int getType() override;
 
-                    virtual void setLine(int line) override;
+    virtual void setLine(int line) override;
 
-                    virtual std::wstring getText() override;
+    virtual std::wstring getText() override;
 
-                    /// <summary>
-                    /// Override the text for this token.  getText() will return this text
-                    ///  rather than pulling from the buffer.  Note that this does not mean
-                    ///  that start/stop indexes are not valid.  It means that that input
-                    ///  was converted to a new string in the token object.
-                    /// </summary>
-                    virtual void setText(const std::wstring &text) override;
+    /// <summary>
+    /// Override the text for this token.  getText() will return this text
+    ///  rather than pulling from the buffer.  Note that this does not mean
+    ///  that start/stop indexes are not valid.  It means that that input
+    ///  was converted to a new string in the token object.
+    /// </summary>
+    virtual void setText(const std::wstring &text) override;
 
-                    virtual int getLine() override;
+    virtual int getLine() override;
 
-                    virtual int getCharPositionInLine() override;
+    virtual int getCharPositionInLine() override;
 
-                    virtual void setCharPositionInLine(int charPositionInLine) override;
+    virtual void setCharPositionInLine(int charPositionInLine) override;
 
-                    virtual int getChannel() override;
+    virtual int getChannel() override;
 
-                    virtual void setChannel(int channel) override;
+    virtual void setChannel(int channel) override;
 
-                    virtual void setType(int type) override;
+    virtual void setType(int type) override;
 
-                    virtual int getStartIndex() override;
+    virtual int getStartIndex() override;
 
-                    virtual void setStartIndex(int start);
+    virtual void setStartIndex(int start);
 
-                    virtual int getStopIndex() override;
+    virtual int getStopIndex() override;
 
-                    virtual void setStopIndex(int stop);
+    virtual void setStopIndex(int stop);
 
-                    virtual int getTokenIndex() override;
+    virtual int getTokenIndex() override;
 
-                    virtual void setTokenIndex(int index) override;
+    virtual void setTokenIndex(int index) override;
 
-                    virtual TokenSource *getTokenSource() override;
+    virtual TokenSource *getTokenSource() override;
 
-                    virtual CharStream *getInputStream() override;
+    virtual CharStream *getInputStream() override;
 
-                    virtual std::wstring toString() ;
+    virtual std::wstring toString() ;
 
-                private:
-                    void InitializeInstanceFields();
-                };
+  private:
+    void InitializeInstanceFields();
+  };
 
-            }
-        }
-    }
-}
+} // namespace runtime
+} // namespace v4
+} // namespace antlr
+} // namespace org

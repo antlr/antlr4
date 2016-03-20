@@ -1,10 +1,6 @@
-﻿#include "ParseTreePattern.h"
-#include "XPath.h"
-#include "ParseTreePatternMatcher.h"
-#include "ParseTreeMatch.h"
-#include "ParseTree.h"
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  * Copyright (c) 2013 Terence Parr
  * Copyright (c) 2013 Sam Harwell
  * All rights reserved.
@@ -33,57 +29,52 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace tree {
-                    namespace pattern {
+#include "ParseTreePatternMatcher.h"
+#include "ParseTreeMatch.h"
 
-                        ParseTreePattern::ParseTreePattern(ParseTreePatternMatcher *matcher, const std::wstring &pattern, int patternRuleIndex, ParseTree *patternTree) : patternRuleIndex(patternRuleIndex), pattern(pattern), patternTree(patternTree), matcher(matcher) {
-                        }
+#include "ParseTreePattern.h"
 
-                        tree::pattern::ParseTreeMatch *ParseTreePattern::match(ParseTree *tree) {
-                            return matcher->match(tree, this);
-                        }
+using namespace org::antlr::v4::runtime::tree;
+using namespace org::antlr::v4::runtime::tree::pattern;
 
-                        bool ParseTreePattern::matches(ParseTree *tree) {
-                            return matcher->match(tree, this)->succeeded();
-                        }
+ParseTreePattern::ParseTreePattern(ParseTreePatternMatcher *matcher, const std::wstring &pattern, int patternRuleIndex, ParseTree *patternTree) : patternRuleIndex(patternRuleIndex), pattern(pattern), patternTree(patternTree), matcher(matcher) {
+}
+
+ParseTreeMatch *ParseTreePattern::match(ParseTree *tree) {
+  return matcher->match(tree, this);
+}
+
+bool ParseTreePattern::matches(ParseTree *tree) {
+  return matcher->match(tree, this)->succeeded();
+}
 
 // TODO:  Come back to this after the base runtime works.
 #if 0
-                        std::vector<ParseTreeMatch*> ParseTreePattern::findAll(ParseTree *tree, const std::wstring &xpath) {
-                            std::vector<ParseTree*> *subtrees = xpath::XPath::findAll(tree, xpath, matcher->getParser());
-                            std::vector<ParseTreeMatch*> matches = std::vector<ParseTreeMatch*>();
-                            for (auto t : *subtrees) {
-                                ParseTreeMatch *aMatch = match(t);
-                                if (aMatch->succeeded()) {
-                                    matches.push_back(aMatch);
-                                }
-                            }
-                            return matches;
-                        }
-#endif
-                        
-                        tree::pattern::ParseTreePatternMatcher *ParseTreePattern::getMatcher() {
-                            return matcher;
-                        }
-
-                        std::wstring ParseTreePattern::getPattern() {
-                            return pattern;
-                        }
-
-                        int ParseTreePattern::getPatternRuleIndex() {
-                            return patternRuleIndex;
-                        }
-
-                        tree::ParseTree *ParseTreePattern::getPatternTree() {
-                            return patternTree;
-                        }
-                    }
-                }
-            }
-        }
+std::vector<ParseTreeMatch*> ParseTreePattern::findAll(ParseTree *tree, const std::wstring &xpath) {
+  std::vector<ParseTree*> *subtrees = xpath::XPath::findAll(tree, xpath, matcher->getParser());
+  std::vector<ParseTreeMatch*> matches = std::vector<ParseTreeMatch*>();
+  for (auto t : *subtrees) {
+    ParseTreeMatch *aMatch = match(t);
+    if (aMatch->succeeded()) {
+      matches.push_back(aMatch);
     }
+  }
+  return matches;
+}
+#endif
+
+ParseTreePatternMatcher *ParseTreePattern::getMatcher() {
+  return matcher;
+}
+
+std::wstring ParseTreePattern::getPattern() {
+  return pattern;
+}
+
+int ParseTreePattern::getPatternRuleIndex() {
+  return patternRuleIndex;
+}
+
+ParseTree *ParseTreePattern::getPatternTree() {
+  return patternTree;
 }

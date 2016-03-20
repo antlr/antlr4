@@ -1,14 +1,6 @@
-﻿#pragma once
-
-#include <string>
-#include <vector>
-
-#include "ANTLRErrorListener.h"
-#include "Declarations.h"
-#include "Exceptions.h"
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -36,45 +28,52 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
+#pragma once
+
+#include "ANTLRErrorListener.h"
+#include "Exceptions.h"
+
 namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                /// <summary>
-                /// This implementation of <seealso cref="ANTLRErrorListener"/> dispatches all calls to a
-                /// collection of delegate listeners. This reduces the effort required to support multiple
-                /// listeners.
-                /// </summary>
-                
-                class ProxyErrorListener : public ANTLRErrorListener {
-                private:
-                    std::vector<ANTLRErrorListener*> *const delegates;
+namespace antlr {
+namespace v4 {
+namespace runtime {
 
-                public:
-                    template<typename T1> //where T1 : ANTLRErrorListener
-                    ProxyErrorListener(std::vector<T1> *delegates) : delegates(delegates) {
-                        if (delegates == nullptr) {
-                            throw new NullPointerException(L"delegates");
-                        }
-                        
-                    }
+  /// <summary>
+  /// This implementation of <seealso cref="ANTLRErrorListener"/> dispatches all calls to a
+  /// collection of delegate listeners. This reduces the effort required to support multiple
+  /// listeners.
+  /// </summary>
 
-                    template<typename T1, typename T2>
-                    void syntaxError(IRecognizer<T1, T2> *recognizer, void *offendingSymbol, int line, int charPositionInLine, const std::wstring &msg, RecognitionException *e) {
-                        
-                        for (auto listener : *delegates) {
-                            listener->syntaxError(recognizer, offendingSymbol, line, charPositionInLine, msg, e);
-                        }
-                    }
+  class ProxyErrorListener : public ANTLRErrorListener {
+  private:
+    std::vector<ANTLRErrorListener*> *const delegates;
 
-                    virtual void reportAmbiguity(Parser *recognizer, dfa::DFA *dfa, int startIndex, int stopIndex, bool exact, antlrcpp::BitSet *ambigAlts, atn::ATNConfigSet *configs) override;
+  public:
+    template<typename T1> //where T1 : ANTLRErrorListener
+    ProxyErrorListener(std::vector<T1> *delegates) : delegates(delegates) {
+      if (delegates == nullptr) {
+        throw new NullPointerException(L"delegates");
+      }
 
-					virtual void reportAttemptingFullContext(Parser *recognizer, dfa::DFA *dfa, int startIndex, int stopIndex, antlrcpp::BitSet *conflictingAlts, atn::ATNConfigSet *configs) override;
-
-                    virtual void reportContextSensitivity(Parser *recognizer, dfa::DFA *dfa, int startIndex, int stopIndex, int prediction, atn::ATNConfigSet *configs) override;
-                };
-
-            }
-        }
     }
-}
+
+    template<typename T1, typename T2>
+    void syntaxError(IRecognizer<T1, T2> *recognizer, void *offendingSymbol, int line, int charPositionInLine, const std::wstring &msg, RecognitionException *e) {
+
+      for (auto listener : *delegates) {
+        listener->syntaxError(recognizer, offendingSymbol, line, charPositionInLine, msg, e);
+      }
+    }
+
+    virtual void reportAmbiguity(Parser *recognizer, dfa::DFA *dfa, int startIndex, int stopIndex, bool exact, antlrcpp::BitSet *ambigAlts, atn::ATNConfigSet *configs) override;
+
+    virtual void reportAttemptingFullContext(Parser *recognizer, dfa::DFA *dfa, int startIndex, int stopIndex, antlrcpp::BitSet *conflictingAlts, atn::ATNConfigSet *configs) override;
+
+    virtual void reportContextSensitivity(Parser *recognizer, dfa::DFA *dfa, int startIndex, int stopIndex, int prediction, atn::ATNConfigSet *configs) override;
+  };
+
+} // namespace runtime
+} // namespace v4
+} // namespace antlr
+} // namespace org

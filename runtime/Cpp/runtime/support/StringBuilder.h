@@ -1,9 +1,6 @@
-#pragma once
-
-#include "Declarations.h"
-
 /*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
  *
@@ -31,42 +28,44 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace antlrcpp {
-    
-    class StringBuilder {
-    private:
-        std::wstring main;
-        std::wstring scratch;
-        
-        const std::wstring::size_type ScratchSize = 1024;  // or some other arbitrary number
-        
-    public:
-        StringBuilder & append(const std::wstring & str);
-        
-        StringBuilder & append(const org::antlr::v4::runtime::atn::ATNState* const state);
-        
-        StringBuilder & append(const org::antlr::v4::runtime::atn::SemanticContext* const state);
-        
-        StringBuilder & append(const wchar_t & str);
-        
-        const std::wstring & str();
-        
-        const std::wstring & toString();
-        
-        std::wstring::size_type length();
-        
-        // Utility function to provide "format" capability
+#pragma once
 
-        static std::wstring format(const std::string fmt_str, ...);
-        
-        static std::wstring stringToWstring( std::string str );
-        
-        static std::string WstringTostring( std::wstring wStr );
-        
-        static std::string string_replace(std::string src,
-                                          std::string const& target,
-                                          std::string const& repl);
-    };
-    
+namespace antlrcpp {
+
+  class StringBuilder {
+  private:
+    std::wstring main;
+    std::wstring scratch;
+
+    const std::wstring::size_type ScratchSize = 1024;  // or some other arbitrary number
+
+  public:
+    StringBuilder & append(const std::wstring & str);
+
+    StringBuilder & append(const org::antlr::v4::runtime::atn::ATNState* const state);
+
+    StringBuilder & append(const org::antlr::v4::runtime::atn::SemanticContext* const state);
+
+    StringBuilder & append(const wchar_t & str);
+
+    const std::wstring & str();
+
+    const std::wstring & toString();
+
+    std::wstring::size_type length();
+
+    // Utility function to provide "format" capability
+
+    static std::wstring format(const std::string fmt_str, ...);
+
+    static std::wstring stringToWstring( std::string str );
+
+    static std::string WstringTostring( std::wstring wStr );
+
+    static std::string string_replace(std::string src,
+                                      std::string const& target,
+                                      std::string const& repl);
+  };
+
 }
 

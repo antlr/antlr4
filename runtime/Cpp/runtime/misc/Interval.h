@@ -1,9 +1,6 @@
-﻿#pragma once
-
-#include <string>
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -32,105 +29,107 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#pragma once
+
 namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace misc {
+namespace antlr {
+namespace v4 {
+namespace runtime {
+namespace misc {
 
-                    /// <summary>
-                    /// An immutable inclusive interval a..b </summary>
-                    class Interval {
-                    public:
-                        static const int INTERVAL_POOL_MAX_VALUE = 1000;
+  /// <summary>
+  /// An immutable inclusive interval a..b </summary>
+  class Interval {
+  public:
+    static const int INTERVAL_POOL_MAX_VALUE = 1000;
 
-                        static Interval *const INVALID;
+    static Interval *const INVALID;
 
-                        static Interval *cache[INTERVAL_POOL_MAX_VALUE+1];
+    static Interval *cache[INTERVAL_POOL_MAX_VALUE+1];
 
-                        int a;
-                        int b;
+    int a;
+    int b;
 
-                        static int creates;
-                        static int misses;
-                        static int hits;
-                        static int outOfRange;
+    static int creates;
+    static int misses;
+    static int hits;
+    static int outOfRange;
 
-                        Interval(int a, int b);
+    Interval(int a, int b);
 
-                        /// <summary>
-                        /// Interval objects are used readonly so share all with the
-                        ///  same single value a==b up to some max size.  Use an array as a perfect hash.
-                        ///  Return shared object for 0..INTERVAL_POOL_MAX_VALUE or a new
-                        ///  Interval object with a..a in it.  On Java.g4, 218623 IntervalSets
-                        ///  have a..a (set with 1 element).
-                        /// </summary>
-                        static Interval *of(int a, int b);
+    /// <summary>
+    /// Interval objects are used readonly so share all with the
+    ///  same single value a==b up to some max size.  Use an array as a perfect hash.
+    ///  Return shared object for 0..INTERVAL_POOL_MAX_VALUE or a new
+    ///  Interval object with a..a in it.  On Java.g4, 218623 IntervalSets
+    ///  have a..a (set with 1 element).
+    /// </summary>
+    static Interval *of(int a, int b);
 
-                        /// <summary>
-                        /// return number of elements between a and b inclusively. x..x is length 1.
-                        ///  if b < a, then length is 0.  9..10 has length 2.
-                        /// </summary>
-                        virtual int length();
+    /// <summary>
+    /// return number of elements between a and b inclusively. x..x is length 1.
+    ///  if b < a, then length is 0.  9..10 has length 2.
+    /// </summary>
+    virtual int length();
 
-                        virtual bool equals(void *o);
+    virtual bool equals(void *o);
 
-                        virtual int hashCode();
+    virtual int hashCode();
 
-                        /// <summary>
-                        /// Does this start completely before other? Disjoint </summary>
-                        virtual bool startsBeforeDisjoint(Interval *other);
+    /// <summary>
+    /// Does this start completely before other? Disjoint </summary>
+    virtual bool startsBeforeDisjoint(Interval *other);
 
-                        /// <summary>
-                        /// Does this start at or before other? Nondisjoint </summary>
-                        virtual bool startsBeforeNonDisjoint(Interval *other);
+    /// <summary>
+    /// Does this start at or before other? Nondisjoint </summary>
+    virtual bool startsBeforeNonDisjoint(Interval *other);
 
-                        /// <summary>
-                        /// Does this.a start after other.b? May or may not be disjoint </summary>
-                        virtual bool startsAfter(Interval *other);
+    /// <summary>
+    /// Does this.a start after other.b? May or may not be disjoint </summary>
+    virtual bool startsAfter(Interval *other);
 
-                        /// <summary>
-                        /// Does this start completely after other? Disjoint </summary>
-                        virtual bool startsAfterDisjoint(Interval *other);
+    /// <summary>
+    /// Does this start completely after other? Disjoint </summary>
+    virtual bool startsAfterDisjoint(Interval *other);
 
-                        /// <summary>
-                        /// Does this start after other? NonDisjoint </summary>
-                        virtual bool startsAfterNonDisjoint(Interval *other);
+    /// <summary>
+    /// Does this start after other? NonDisjoint </summary>
+    virtual bool startsAfterNonDisjoint(Interval *other);
 
-                        /// <summary>
-                        /// Are both ranges disjoint? I.e., no overlap? </summary>
-                        virtual bool disjoint(Interval *other);
+    /// <summary>
+    /// Are both ranges disjoint? I.e., no overlap? </summary>
+    virtual bool disjoint(Interval *other);
 
-                        /// <summary>
-                        /// Are two intervals adjacent such as 0..41 and 42..42? </summary>
-                        virtual bool adjacent(Interval *other);
+    /// <summary>
+    /// Are two intervals adjacent such as 0..41 and 42..42? </summary>
+    virtual bool adjacent(Interval *other);
 
-                        virtual bool properlyContains(Interval *other);
+    virtual bool properlyContains(Interval *other);
 
-                        /// <summary>
-                        /// Return the interval computed from combining this and other </summary>
-                        virtual Interval *union_Renamed(Interval *other);
+    /// <summary>
+    /// Return the interval computed from combining this and other </summary>
+    virtual Interval *union_Renamed(Interval *other);
 
-                        /// <summary>
-                        /// Return the interval in common between this and o </summary>
-                        virtual Interval *intersection(Interval *other);
+    /// <summary>
+    /// Return the interval in common between this and o </summary>
+    virtual Interval *intersection(Interval *other);
 
-                        /// <summary>
-                        /// Return the interval with elements from this not in other;
-                        ///  other must not be totally enclosed (properly contained)
-                        ///  within this, which would result in two disjoint intervals
-                        ///  instead of the single one returned by this method.
-                        /// </summary>
-                        virtual Interval *differenceNotProperlyContained(Interval *other);
+    /// <summary>
+    /// Return the interval with elements from this not in other;
+    ///  other must not be totally enclosed (properly contained)
+    ///  within this, which would result in two disjoint intervals
+    ///  instead of the single one returned by this method.
+    /// </summary>
+    virtual Interval *differenceNotProperlyContained(Interval *other);
 
-                        virtual std::wstring toString();
+    virtual std::wstring toString();
 
-                    private:
-                        void InitializeInstanceFields();
-                    };
+  private:
+    void InitializeInstanceFields();
+  };
 
-                }
-            }
-        }
-    }
-}
+} // namespace atn
+} // namespace runtime
+} // namespace v4
+} // namespace antlr
+} // namespace org

@@ -1,7 +1,6 @@
-﻿#include "MurmurHash.h"
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -30,55 +29,48 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace misc {
+#include "MurmurHash.h"
 
-                    int MurmurHash::initialize() {
-                        return initialize(DEFAULT_SEED);
-                    }
+using namespace org::antlr::v4::runtime::misc;
 
-                    int MurmurHash::initialize(int seed) {
-                        return seed;
-                    }
-                    
-                    int MurmurHash::update(int hash, int value) {
-                        const int c1 = 0xCC9E2D51;
-                        const int c2 = 0x1B873593;
-                        const int r1 = 15;
-                        const int r2 = 13;
-                        const int m = 5;
-                        const int n = 0xE6546B64;
+int MurmurHash::initialize() {
+  return initialize(DEFAULT_SEED);
+}
 
-                        int k = value;
-                        k = k * c1;
-                        k = (k << r1) | (static_cast<int>(static_cast<unsigned int>(k) >> (32 - r1)));
-                        k = k * c2;
+int MurmurHash::initialize(int seed) {
+  return seed;
+}
 
-                        hash = hash ^ k;
-                        hash = (hash << r2) | (static_cast<int>(static_cast<unsigned int>(hash) >> (32 - r2)));
-                        hash = hash * m + n;
+int MurmurHash::update(int hash, int value) {
+  const int c1 = 0xCC9E2D51;
+  const int c2 = 0x1B873593;
+  const int r1 = 15;
+  const int r2 = 13;
+  const int m = 5;
+  const int n = 0xE6546B64;
 
-                        return hash;
-                    }
+  int k = value;
+  k = k * c1;
+  k = (k << r1) | (static_cast<int>(static_cast<unsigned int>(k) >> (32 - r1)));
+  k = k * c2;
+
+  hash = hash ^ k;
+  hash = (hash << r2) | (static_cast<int>(static_cast<unsigned int>(hash) >> (32 - r2)));
+  hash = hash * m + n;
+
+  return hash;
+}
 
 
-                    int MurmurHash::finish(int hash, int numberOfWords) {
-                        hash = hash ^ (numberOfWords * 4);
-                        hash = hash ^ (static_cast<int>(static_cast<unsigned int>(hash) >> 16));
-                        hash = hash * 0x85EBCA6B;
-                        hash = hash ^ (static_cast<int>(static_cast<unsigned int>(hash) >> 13));
-                        hash = hash * 0xC2B2AE35;
-                        hash = hash ^ (static_cast<int>(static_cast<unsigned int>(hash) >> 16));
-                        return hash;
-                    }
+int MurmurHash::finish(int hash, int numberOfWords) {
+  hash = hash ^ (numberOfWords * 4);
+  hash = hash ^ (static_cast<int>(static_cast<unsigned int>(hash) >> 16));
+  hash = hash * 0x85EBCA6B;
+  hash = hash ^ (static_cast<int>(static_cast<unsigned int>(hash) >> 13));
+  hash = hash * 0xC2B2AE35;
+  hash = hash ^ (static_cast<int>(static_cast<unsigned int>(hash) >> 16));
+  return hash;
+}
 
-                    MurmurHash::MurmurHash() {
-                    }
-                }
-            }
-        }
-    }
+MurmurHash::MurmurHash() {
 }

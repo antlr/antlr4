@@ -1,13 +1,6 @@
-﻿#pragma once
-
-#include "TokenStream.h"
-#include "Declarations.h"
-
-#include <string>
-#include <vector>
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -36,139 +29,142 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#pragma once
+
+#include "TokenStream.h"
+
 namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
+namespace antlr {
+namespace v4 {
+namespace runtime {
 
+  template<typename T>
+  class UnbufferedTokenStream : public TokenStream {
+  protected:
+    TokenSource *tokenSource;
 
-                template<typename T>
-                class UnbufferedTokenStream : public TokenStream {
-                protected:
-                    TokenSource *tokenSource;
+    /// <summary>
+    /// A moving window buffer of the data being scanned. While there's a marker,
+    /// we keep adding to buffer. Otherwise, <seealso cref="#consume consume()"/> resets so
+    /// we start filling at index 0 again.
+    /// </summary>
 
-                    /// <summary>
-                    /// A moving window buffer of the data being scanned. While there's a marker,
-                    /// we keep adding to buffer. Otherwise, <seealso cref="#consume consume()"/> resets so
-                    /// we start filling at index 0 again.
-                    /// </summary>
+    std::vector<Token *>tokens;
 
-                    std::vector<Token *>tokens;
+    /// <summary>
+    /// The number of tokens currently in <seealso cref="#tokens tokens"/>.
+    /// <p/>
+    /// This is not the buffer capacity, that's {@code tokens.length}.
+    /// </summary>
+    int n;
 
-                    /// <summary>
-                    /// The number of tokens currently in <seealso cref="#tokens tokens"/>.
-                    /// <p/>
-                    /// This is not the buffer capacity, that's {@code tokens.length}.
-                    /// </summary>
-                    int n;
+    /// <summary>
+    /// 0..n-1 index into <seealso cref="#tokens tokens"/> of next token.
+    /// <p/>
+    /// The {@code LT(1)} token is {@code tokens[p]}. If {@code p == n}, we are
+    /// out of buffered tokens.
+    /// </summary>
+    int p;
 
-                    /// <summary>
-                    /// 0..n-1 index into <seealso cref="#tokens tokens"/> of next token.
-                    /// <p/>
-                    /// The {@code LT(1)} token is {@code tokens[p]}. If {@code p == n}, we are
-                    /// out of buffered tokens.
-                    /// </summary>
-                    int p;
+    /// <summary>
+    /// Count up with <seealso cref="#mark mark()"/> and down with
+    /// <seealso cref="#release release()"/>. When we {@code release()} the last mark,
+    /// {@code numMarkers} reaches 0 and we reset the buffer. Copy
+    /// {@code tokens[p]..tokens[n-1]} to {@code tokens[0]..tokens[(n-1)-p]}.
+    /// </summary>
+    int numMarkers;
 
-                    /// <summary>
-                    /// Count up with <seealso cref="#mark mark()"/> and down with
-                    /// <seealso cref="#release release()"/>. When we {@code release()} the last mark,
-                    /// {@code numMarkers} reaches 0 and we reset the buffer. Copy
-                    /// {@code tokens[p]..tokens[n-1]} to {@code tokens[0]..tokens[(n-1)-p]}.
-                    /// </summary>
-                    int numMarkers;
+    /// <summary>
+    /// This is the {@code LT(-1)} token for the current position.
+    /// </summary>
+    Token *lastToken;
 
-                    /// <summary>
-                    /// This is the {@code LT(-1)} token for the current position.
-                    /// </summary>
-                    Token *lastToken;
+    /// <summary>
+    /// When {@code numMarkers > 0}, this is the {@code LT(-1)} token for the
+    /// first token in <seealso cref="#tokens"/>. Otherwise, this is {@code null}.
+    /// </summary>
+    Token *lastTokenBufferStart;
 
-                    /// <summary>
-                    /// When {@code numMarkers > 0}, this is the {@code LT(-1)} token for the
-                    /// first token in <seealso cref="#tokens"/>. Otherwise, this is {@code null}.
-                    /// </summary>
-                    Token *lastTokenBufferStart;
+    /// <summary>
+    /// Absolute token index. It's the index of the token about to be read via
+    /// {@code LT(1)}. Goes from 0 to the number of tokens in the entire stream,
+    /// although the stream size is unknown before the end is reached.
+    /// <p/>
+    /// This value is used to set the token indexes if the stream provides tokens
+    /// that implement <seealso cref="WritableToken"/>.
+    /// </summary>
+    int currentTokenIndex;
 
-                    /// <summary>
-                    /// Absolute token index. It's the index of the token about to be read via
-                    /// {@code LT(1)}. Goes from 0 to the number of tokens in the entire stream,
-                    /// although the stream size is unknown before the end is reached.
-                    /// <p/>
-                    /// This value is used to set the token indexes if the stream provides tokens
-                    /// that implement <seealso cref="WritableToken"/>.
-                    /// </summary>
-                    int currentTokenIndex;
+  public:
+    UnbufferedTokenStream(TokenSource *tokenSource);
 
-                public:
-                    UnbufferedTokenStream(TokenSource *tokenSource);
+    UnbufferedTokenStream(TokenSource *tokenSource, int bufferSize);
 
-                    UnbufferedTokenStream(TokenSource *tokenSource, int bufferSize);
+    virtual Token *get(int i) override;
 
-                    virtual Token *get(int i) override;
+    virtual Token *LT(int i) override ;
 
-                    virtual Token *LT(int i) override ;
+    virtual int LA(int i) override ;
 
-                    virtual int LA(int i) override ;
+    virtual TokenSource *getTokenSource() override;
 
-                    virtual TokenSource *getTokenSource() override;
+    virtual std::wstring getText() override ;
 
-                    virtual std::wstring getText() override ;
+    virtual std::wstring getText(RuleContext *ctx) override;
 
-                    virtual std::wstring getText(RuleContext *ctx) override;
+    virtual std::wstring getText(Token *start, Token *stop) override;
 
-                    virtual std::wstring getText(Token *start, Token *stop) override;
+    virtual void consume() override;
 
-                    virtual void consume() override;
+    /// <summary>
+    /// Make sure we have 'need' elements from current position <seealso cref="#p p"/>. Last valid
+    ///  {@code p} index is {@code tokens.length-1}.  {@code p+need-1} is the tokens index 'need' elements
+    ///  ahead.  If we need 1 element, {@code (p+1-1)==p} must be less than {@code tokens.length}.
+    /// </summary>
+  protected:
+    virtual void sync(int want);
 
-                    /// <summary>
-                    /// Make sure we have 'need' elements from current position <seealso cref="#p p"/>. Last valid
-                    ///  {@code p} index is {@code tokens.length-1}.  {@code p+need-1} is the tokens index 'need' elements
-                    ///  ahead.  If we need 1 element, {@code (p+1-1)==p} must be less than {@code tokens.length}.
-                    /// </summary>
-                protected:
-                    virtual void sync(int want);
+    /// <summary>
+    /// Add {@code n} elements to the buffer. Returns the number of tokens
+    /// actually added to the buffer. If the return value is less than {@code n},
+    /// then EOF was reached before {@code n} tokens could be added.
+    /// </summary>
+    virtual int fill(int n);
 
-                    /// <summary>
-                    /// Add {@code n} elements to the buffer. Returns the number of tokens
-                    /// actually added to the buffer. If the return value is less than {@code n},
-                    /// then EOF was reached before {@code n} tokens could be added.
-                    /// </summary>
-                    virtual int fill(int n);
+    virtual void add(Token *t);
 
-                    virtual void add(Token *t);
+    /// <summary>
+    /// Return a marker that we can release later.
+    /// <p/>
+    /// The specific marker value used for this class allows for some level of
+    /// protection against misuse where {@code seek()} is called on a mark or
+    /// {@code release()} is called in the wrong order.
+    /// </summary>
+  public:
+    virtual int mark() override;
 
-                    /// <summary>
-                    /// Return a marker that we can release later.
-                    /// <p/>
-                    /// The specific marker value used for this class allows for some level of
-                    /// protection against misuse where {@code seek()} is called on a mark or
-                    /// {@code release()} is called in the wrong order.
-                    /// </summary>
-                public:
-                    virtual int mark() override;
+    virtual void release(int marker) override;
 
-                    virtual void release(int marker) override;
+    virtual int index() override;
 
-                    virtual int index() override;
+    virtual void seek(int index) override;
 
-                    virtual void seek(int index) override;
+    virtual size_t size() override;
 
-                    virtual size_t size() override;
+    virtual std::string getSourceName() override;
 
-                    virtual std::string getSourceName() override;
+    virtual std::wstring getText(misc::Interval *interval) ;
 
-                    virtual std::wstring getText(misc::Interval *interval) ;
+  protected:
+    int getBufferStartIndex();
 
-                protected:
-                    int getBufferStartIndex();
+  private:
+    void InitializeInstanceFields();
+  };
 
-                private:
-                    void InitializeInstanceFields();
-                };
-
-            }
-        }
-    }
-}
+} // namespace runtime
+} // namespace v4
+} // namespace antlr
+} // namespace org
 
 #include "UnbufferedTokenStream.inl"

@@ -1,9 +1,6 @@
-﻿#pragma once
-
-#include "ATNState.h"
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -32,28 +29,32 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#pragma once
+
+#include "ATNState.h"
+
 namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace atn {
+namespace antlr {
+namespace v4 {
+namespace runtime {
+namespace atn {
 
-                    class DecisionState : public ATNState {
-                    public:
-                        int decision;
-                        bool nonGreedy;
+  class DecisionState : public ATNState {
+  public:
+    int decision;
+    bool nonGreedy;
 
-                    private:
-                        void InitializeInstanceFields();
+  private:
+    void InitializeInstanceFields();
 
-                    public:
-                        DecisionState() {
-                            InitializeInstanceFields();
-                        }
-                    };
-
-                }
-            }
-        }
+  public:
+    DecisionState() {
+      InitializeInstanceFields();
     }
-}
+  };
+
+} // namespace atn
+} // namespace runtime
+} // namespace v4
+} // namespace antlr
+} // namespace org

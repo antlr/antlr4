@@ -1,10 +1,6 @@
-﻿#pragma once
-
-#include "SingletonPredictionContext.h"
-#include <string>
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -33,30 +29,34 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#pragma once
+
+#include "SingletonPredictionContext.h"
+
 namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace atn {
+namespace antlr {
+namespace v4 {
+namespace runtime {
+namespace atn {
 
-                    class EmptyPredictionContext : public SingletonPredictionContext {
-                    public:
-                        EmptyPredictionContext();
+  class EmptyPredictionContext : public SingletonPredictionContext {
+  public:
+    EmptyPredictionContext();
 
-                        virtual bool isEmpty() override;
-                        virtual int size() override;
+    virtual bool isEmpty() override;
+    virtual int size() override;
 
-                        virtual PredictionContext *getParent(int index) override;
+    virtual PredictionContext *getParent(int index) override;
 
-                        virtual int getReturnState(int index) override;
+    virtual int getReturnState(int index) override;
 
-                        virtual bool equals(void *o) override;
+    virtual bool equals(void *o) override;
 
-                        virtual std::wstring toString() override;
-                    };
+    virtual std::wstring toString() override;
+  };
 
-                }
-            }
-        }
-    }
-}
+} // namespace atn
+} // namespace runtime
+} // namespace v4
+} // namespace antlr
+} // namespace org

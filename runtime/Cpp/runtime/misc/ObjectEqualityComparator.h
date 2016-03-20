@@ -1,9 +1,6 @@
-﻿#pragma once
-
-#include "AbstractEqualityComparator.h"
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -32,45 +29,49 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#pragma once
+
+#include "AbstractEqualityComparator.h"
+
 namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace misc {
+namespace antlr {
+namespace v4 {
+namespace runtime {
+namespace misc {
 
-                    /// <summary>
-                    /// This default implementation of <seealso cref="EqualityComparator"/> uses object equality
-                    /// for comparisons by calling <seealso cref="Object#hashCode"/> and <seealso cref="Object#equals"/>.
-                    /// 
-                    /// @author Sam Harwell
-                    /// </summary>
-                    class ObjectEqualityComparator : public AbstractEqualityComparator<void *> {
-                    public:
-                        static ObjectEqualityComparator *const INSTANCE;
+  /// <summary>
+  /// This default implementation of <seealso cref="EqualityComparator"/> uses object equality
+  /// for comparisons by calling <seealso cref="Object#hashCode"/> and <seealso cref="Object#equals"/>.
+  ///
+  /// @author Sam Harwell
+  /// </summary>
+  class ObjectEqualityComparator : public AbstractEqualityComparator<void *> {
+  public:
+    static ObjectEqualityComparator *const INSTANCE;
 
-                        /// <summary>
-                        /// {@inheritDoc}
-                        /// <p/>
-                        /// This implementation returns
-                        /// {@code obj.}<seealso cref="Object#hashCode hashCode()"/>.
-                        /// </summary>
-                        virtual int hashCode(void* obj);
+    /// <summary>
+    /// {@inheritDoc}
+    /// <p/>
+    /// This implementation returns
+    /// {@code obj.}<seealso cref="Object#hashCode hashCode()"/>.
+    /// </summary>
+    virtual int hashCode(void* obj);
 
-                        /// <summary>
-                        /// {@inheritDoc}
-                        /// <p/>
-                        /// This implementation relies on object equality. If both objects are
-                        /// {@code null}, this method returns {@code true}. Otherwise if only
-                        /// {@code a} is {@code null}, this method returns {@code false}. Otherwise,
-                        /// this method returns the result of
-                        /// {@code a.}<seealso cref="Object#equals equals"/>{@code (b)}.
-                        /// </summary>
-                        bool equals(void* a, void* b);
+    /// <summary>
+    /// {@inheritDoc}
+    /// <p/>
+    /// This implementation relies on object equality. If both objects are
+    /// {@code null}, this method returns {@code true}. Otherwise if only
+    /// {@code a} is {@code null}, this method returns {@code false}. Otherwise,
+    /// this method returns the result of
+    /// {@code a.}<seealso cref="Object#equals equals"/>{@code (b)}.
+    /// </summary>
+    bool equals(void* a, void* b);
 
-                    };
+  };
 
-                }
-            }
-        }
-    }
-}
+} // namespace atn
+} // namespace runtime
+} // namespace v4
+} // namespace antlr
+} // namespace org

@@ -1,7 +1,6 @@
-﻿#include "EpsilonTransition.h"
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -30,32 +29,25 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace atn {
+#include "EpsilonTransition.h"
 
-                    EpsilonTransition::EpsilonTransition(ATNState *target) : Transition(target) {
-                    }
+using namespace org::antlr::v4::runtime::atn;
 
-                    int EpsilonTransition::getSerializationType() {
-                        return EPSILON;
-                    }
+EpsilonTransition::EpsilonTransition(ATNState *target) : Transition(target) {
+}
 
-                    bool EpsilonTransition::isEpsilon() {
-                        return true;
-                    }
+int EpsilonTransition::getSerializationType() {
+  return EPSILON;
+}
 
-                    bool EpsilonTransition::matches(int symbol, int minVocabSymbol, int maxVocabSymbol) {
-                        return false;
-                    }
+bool EpsilonTransition::isEpsilon() {
+  return true;
+}
 
-                    std::wstring EpsilonTransition::toString() {
-                        return L"epsilon";
-                    }
-                }
-            }
-        }
-    }
+bool EpsilonTransition::matches(int symbol, int minVocabSymbol, int maxVocabSymbol) {
+  return false;
+}
+
+std::wstring EpsilonTransition::toString() {
+  return L"epsilon";
 }

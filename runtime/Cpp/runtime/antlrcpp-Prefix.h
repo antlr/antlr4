@@ -1,8 +1,6 @@
-﻿#include "NotNull.h"
-
 /*
  * [The "BSD license"]
- *  Copyright (c) 2013 Terence Parr
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
  *
@@ -30,13 +28,39 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace misc {
-                }
-            }
-        }
-    }
-}
+// Prefix header
+//
+// Use this as (automatically included) precompiled header file.
+
+#include <algorithm>
+#include <assert.h>
+#include <codecvt>
+#include <deque>
+#include <fstream>
+#include <iostream>
+#include <limits.h>
+#include <list>
+#include <map>
+#include <memory>
+#include <set>
+#include <stdarg.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <sstream>
+#include <string>
+#include <typeinfo>
+#include <unordered_map>
+#include <utility>
+#include <vector>
+
+// Defines for the Guid class.
+#ifdef _WIN32
+  #define GUID_WINDOWS
+#elseif __APPLE__
+  #define GUID_CFUUID
+#else
+  #define GUID_LIBUUID
+#endif
+
+#include "guid.h"
+#include "Declarations.h"

@@ -1,13 +1,6 @@
-﻿#pragma once
-
-
-#include <string>
-#include <fstream>
-#include "CharStream.h"
-#include "Declarations.h"
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -35,111 +28,115 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
+#pragma once
+
+#include "CharStream.h"
+
 namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
+namespace antlr {
+namespace v4 {
+namespace runtime {
 
-            
-                /// <summary>
-                /// Vacuum all input from a <seealso cref="Reader"/>/<seealso cref="InputStream"/> and then treat it
-                /// like a {@code char[]} buffer. Can also pass in a <seealso cref="String"/> or
-                /// {@code char[]} to use.
-                /// <p/>
-                /// If you need encoding, pass in stream/reader with correct encoding.
-                /// </summary>
-                class ANTLRInputStream : public CharStream {
-                public:
-                    static const int READ_BUFFER_SIZE = 1024;
-                    static const int INITIAL_BUFFER_SIZE = 1024;
+  /// <summary>
+  /// Vacuum all input from a <seealso cref="Reader"/>/<seealso cref="InputStream"/> and then treat it
+  /// like a {@code char[]} buffer. Can also pass in a <seealso cref="String"/> or
+  /// {@code char[]} to use.
+  /// <p/>
+  /// If you need encoding, pass in stream/reader with correct encoding.
+  /// </summary>
+  class ANTLRInputStream : public CharStream {
+  public:
+    static const int READ_BUFFER_SIZE = 1024;
+    static const int INITIAL_BUFFER_SIZE = 1024;
 
-                    /// <summary>
-                    /// The data being scanned </summary>
-                protected:
-                    std::wstring data;
+    /// <summary>
+    /// The data being scanned </summary>
+  protected:
+    std::wstring data;
 
-                    /// <summary>
-                    /// How many characters are actually in the buffer </summary>
-                    int n;
+    /// <summary>
+    /// How many characters are actually in the buffer </summary>
+    int n;
 
-                    /// <summary>
-                    /// 0..n-1 index into string of next char </summary>
-                    int p;
+    /// <summary>
+    /// 0..n-1 index into string of next char </summary>
+    int p;
 
-                    /// <summary>
-                    /// What is name or source of this char stream? </summary>
-                public:
-                    std::string name;
+    /// <summary>
+    /// What is name or source of this char stream? </summary>
+  public:
+    std::string name;
 
-                    ANTLRInputStream();
+    ANTLRInputStream();
 
-                    /// <summary>
-                    /// Copy data in string to a local char array </summary>
-                    ANTLRInputStream(const std::wstring &input);
+    /// <summary>
+    /// Copy data in string to a local char array </summary>
+    ANTLRInputStream(const std::wstring &input);
 
-                    /// <summary>
-                    /// This is the preferred constructor for strings as no data is copied </summary>
-                    ANTLRInputStream(wchar_t data[], int numberOfActualCharsInArray);
+    /// <summary>
+    /// This is the preferred constructor for strings as no data is copied </summary>
+    ANTLRInputStream(wchar_t data[], int numberOfActualCharsInArray);
 
-                    ANTLRInputStream(std::wifstream *r) ; //this(r, INITIAL_BUFFER_SIZE, READ_BUFFER_SIZE);
+    ANTLRInputStream(std::wifstream *r) ; //this(r, INITIAL_BUFFER_SIZE, READ_BUFFER_SIZE);
 
-                    ANTLRInputStream(std::wifstream *r, int initialSize) ; //this(r, initialSize, READ_BUFFER_SIZE);
-                    
-                    ANTLRInputStream(std::wifstream *r, int initialSize, int readChunkSize);
+    ANTLRInputStream(std::wifstream *r, int initialSize) ; //this(r, initialSize, READ_BUFFER_SIZE);
 
-                    ANTLRInputStream(std::wiostream *input) ; //this(new InputStreamReader(input), INITIAL_BUFFER_SIZE);
+    ANTLRInputStream(std::wifstream *r, int initialSize, int readChunkSize);
 
-                    ANTLRInputStream(std::wiostream *input, int initialSize); //this(new InputStreamReader(input), initialSize);
+    ANTLRInputStream(std::wiostream *input) ; //this(new InputStreamReader(input), INITIAL_BUFFER_SIZE);
 
-                    ANTLRInputStream(std::wiostream *input, int initialSize, int readChunkSize); //this(new InputStreamReader(input), initialSize, readChunkSize);
+    ANTLRInputStream(std::wiostream *input, int initialSize); //this(new InputStreamReader(input), initialSize);
 
-                    virtual void load(std::wifstream *r, int size, int readChunkSize);
+    ANTLRInputStream(std::wiostream *input, int initialSize, int readChunkSize); //this(new InputStreamReader(input), initialSize, readChunkSize);
 
-                    /// <summary>
-                    /// Reset the stream so that it's in the same state it was
-                    ///  when the object was created *except* the data array is not
-                    ///  touched.
-                    /// </summary>
-                    virtual void reset();
+    virtual void load(std::wifstream *r, int size, int readChunkSize);
 
-                    virtual void consume() override;
+    /// <summary>
+    /// Reset the stream so that it's in the same state it was
+    ///  when the object was created *except* the data array is not
+    ///  touched.
+    /// </summary>
+    virtual void reset();
 
-                    virtual int LA(int i) override;
+    virtual void consume() override;
 
-                    virtual int LT(int i);
+    virtual int LA(int i) override;
 
-                    /// <summary>
-                    /// Return the current input symbol index 0..n where n indicates the
-                    ///  last symbol has been read.  The index is the index of char to
-                    ///  be returned from LA(1).
-                    /// </summary>
-                    virtual int index() override;
+    virtual int LT(int i);
 
-					virtual size_t size() override;
+    /// <summary>
+    /// Return the current input symbol index 0..n where n indicates the
+    ///  last symbol has been read.  The index is the index of char to
+    ///  be returned from LA(1).
+    /// </summary>
+    virtual int index() override;
 
-                    /// <summary>
-                    /// mark/release do nothing; we have entire buffer </summary>
-                    virtual int mark() override;
+    virtual size_t size() override;
 
-                    virtual void release(int marker) override;
+    /// <summary>
+    /// mark/release do nothing; we have entire buffer </summary>
+    virtual int mark() override;
 
-                    /// <summary>
-                    /// consume() ahead until p==index; can't just set p=index as we must
-                    ///  update line and charPositionInLine. If we seek backwards, just set p
-                    /// </summary>
-                    virtual void seek(int index) override;
+    virtual void release(int marker) override;
 
-                    virtual std::wstring getText(misc::Interval *interval) override;
+    /// <summary>
+    /// consume() ahead until p==index; can't just set p=index as we must
+    ///  update line and charPositionInLine. If we seek backwards, just set p
+    /// </summary>
+    virtual void seek(int index) override;
 
-                    virtual std::string getSourceName() override;
+    virtual std::wstring getText(misc::Interval *interval) override;
 
-                    virtual std::wstring toString();
+    virtual std::string getSourceName() override;
 
-                private:
-                    void InitializeInstanceFields();
-                };
+    virtual std::wstring toString();
 
-            }
-        }
-    }
-}
+  private:
+    void InitializeInstanceFields();
+  };
+
+} // namespace runtime
+} // namespace v4
+} // namespace antlr
+} // namespace org

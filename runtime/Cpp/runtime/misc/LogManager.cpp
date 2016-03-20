@@ -1,10 +1,6 @@
-﻿
-#include "Strings.h"
-#include "LogManager.h"
-#include "StringBuilder.h"
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -32,6 +28,12 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
+#include "StringBuilder.h"
+
+#include "LogManager.h"
+
+using namespace org::antlr::v4::runtime::misc;
 
 namespace org {
     namespace antlr {

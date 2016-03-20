@@ -1,8 +1,4 @@
-﻿#include "TerminalNodeImpl.h"
-#include "Interval.h"
-#include "Token.h"
-
-/*
+﻿/*
  * [The "BSD license"]
  *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
@@ -33,66 +29,62 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "Interval.h"
+#include "Token.h"
 
-namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace tree {
+#include "TerminalNodeImpl.h"
 
-                    TerminalNodeImpl::TerminalNodeImpl(Token *symbol) {
-                        this->symbol = symbol;
-                    }
+using namespace org::antlr::v4::runtime;
+using namespace org::antlr::v4::runtime::tree;
 
-                    tree::ParseTree *TerminalNodeImpl::getChild(std::size_t i) {
-                        return nullptr;
-                    }
+TerminalNodeImpl::TerminalNodeImpl(Token *symbol) {
+  this->symbol = symbol;
+}
 
-                    Token *TerminalNodeImpl::getSymbol() {
-                        return symbol;
-                    }
+ParseTree *TerminalNodeImpl::getChild(std::size_t i) {
+  return nullptr;
+}
 
-                    tree::ParseTree *TerminalNodeImpl::getParent() {
-                        return parent;
-                    }
+Token *TerminalNodeImpl::getSymbol() {
+  return symbol;
+}
 
-                    void *TerminalNodeImpl::getPayload() {
-                        return symbol;
-                    }
+ParseTree *TerminalNodeImpl::getParent() {
+  return parent;
+}
 
-                    misc::Interval *TerminalNodeImpl::getSourceInterval() {
-                        if (symbol == nullptr) {
-                            return misc::Interval::INVALID;
-                        }
+void *TerminalNodeImpl::getPayload() {
+  return symbol;
+}
 
-                        int tokenIndex = symbol->getTokenIndex();
-                        return new misc::Interval(tokenIndex, tokenIndex);
-                    }
+misc::Interval *TerminalNodeImpl::getSourceInterval() {
+  if (symbol == nullptr) {
+    return misc::Interval::INVALID;
+  }
 
-                  std::size_t TerminalNodeImpl::getChildCount() {
-                        return 0;
-                    }
+  int tokenIndex = symbol->getTokenIndex();
+  return new misc::Interval(tokenIndex, tokenIndex);
+}
 
-                    std::wstring TerminalNodeImpl::getText() {
-                        return symbol->getText();
-                    }
+std::size_t TerminalNodeImpl::getChildCount() {
+  return 0;
+}
 
-                    std::wstring TerminalNodeImpl::toStringTree(Parser *parser) {
-                        return toString();
-                    }
+std::wstring TerminalNodeImpl::getText() {
+  return symbol->getText();
+}
 
-                    std::wstring TerminalNodeImpl::toString() {
-                            if (symbol->getType() == Token::_EOF) {
-                                return L"<EOF>";
-                            }
-                            return symbol->getText();
-                    }
+std::wstring TerminalNodeImpl::toStringTree(Parser *parser) {
+  return toString();
+}
 
-                    std::wstring TerminalNodeImpl::toStringTree() {
-                        return toString();
-                    }
-                }
-            }
-        }
-    }
+std::wstring TerminalNodeImpl::toString() {
+  if (symbol->getType() == Token::_EOF) {
+    return L"<EOF>";
+  }
+  return symbol->getText();
+}
+
+std::wstring TerminalNodeImpl::toStringTree() {
+  return toString();
 }

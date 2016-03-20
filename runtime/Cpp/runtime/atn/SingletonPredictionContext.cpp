@@ -1,9 +1,6 @@
-﻿#include "SingletonPredictionContext.h"
-#include "ATNState.h"
-#include <assert.h>
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -32,65 +29,60 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace atn {
+#include "stringconverter.h"
 
-                    SingletonPredictionContext::SingletonPredictionContext(PredictionContext *parent, int returnState) : PredictionContext(parent != nullptr ? calculateHashCode(parent, returnState) : calculateEmptyHashCode()), parent(parent), returnState(returnState) {
-                        assert(returnState != ATNState::INVALID_STATE_NUMBER);
-                    }
+#include "SingletonPredictionContext.h"
 
-                    atn::SingletonPredictionContext *SingletonPredictionContext::create(PredictionContext *parent, int returnState) {
-                        if (returnState == EMPTY_RETURN_STATE && parent == nullptr) {
-                            // someone can pass in the bits of an array ctx that mean $
-                            return (atn::SingletonPredictionContext *)EMPTY;
-                        }
-                        return new SingletonPredictionContext(parent, returnState);
-                    }
+using namespace org::antlr::v4::runtime::atn;
 
-                    int SingletonPredictionContext::size() {
-                        return 1;
-                    }
+SingletonPredictionContext::SingletonPredictionContext(PredictionContext *parent, int returnState) : PredictionContext(parent != nullptr ? calculateHashCode(parent, returnState) : calculateEmptyHashCode()), parent(parent), returnState(returnState) {
+  assert(returnState != ATNState::INVALID_STATE_NUMBER);
+}
 
-                    atn::PredictionContext *SingletonPredictionContext::getParent(int index) {
-                        assert(index == 0);
-                        return parent;
-                    }
+SingletonPredictionContext *SingletonPredictionContext::create(PredictionContext *parent, int returnState) {
+  if (returnState == EMPTY_RETURN_STATE && parent == nullptr) {
+    // someone can pass in the bits of an array ctx that mean $
+    return (atn::SingletonPredictionContext *)EMPTY;
+  }
+  return new SingletonPredictionContext(parent, returnState);
+}
 
-                    int SingletonPredictionContext::getReturnState(int index) {
-                        assert(index == 0);
-                        return returnState;
-                    }
+int SingletonPredictionContext::size() {
+  return 1;
+}
 
-                    bool SingletonPredictionContext::equals(void *o) {
-                        if (this == o) {
-                            return true;
-                        } else if (!(/*dynamic_cast<SingletonPredictionContext*>(o)*/o != nullptr)) {
-                            return false;
-                        }
+PredictionContext *SingletonPredictionContext::getParent(int index) {
+  assert(index == 0);
+  return parent;
+}
 
-                        if (this->hashCode() != ((SingletonPredictionContext*)o)->hashCode()) {
-                            return false; // can't be same if hash is different
-                        }
+int SingletonPredictionContext::getReturnState(int index) {
+  assert(index == 0);
+  return returnState;
+}
 
-                        SingletonPredictionContext *s = static_cast<SingletonPredictionContext*>(o);
-                        return returnState == s->returnState && (parent != nullptr && parent->equals(s->parent));
-                    }
+bool SingletonPredictionContext::equals(void *o) {
+  if (this == o) {
+    return true;
+  } else if (!(/*dynamic_cast<SingletonPredictionContext*>(o)*/o != nullptr)) {
+    return false;
+  }
 
-                    std::wstring SingletonPredictionContext::toString() {
-                        std::wstring up = parent != nullptr ? parent->toString() : L"";
-                        if (up.length() == 0) {
-                            if (returnState == EMPTY_RETURN_STATE) {
-                                return L"$";
-                            }
-                            return antlrcpp::StringConverterHelper::toString(returnState);
-                        }
-                        return antlrcpp::StringConverterHelper::toString(returnState) + std::wstring(L" ") + up;
-                    }
-                }
-            }
-        }
+  if (this->hashCode() != ((SingletonPredictionContext*)o)->hashCode()) {
+    return false; // can't be same if hash is different
+  }
+
+  SingletonPredictionContext *s = static_cast<SingletonPredictionContext*>(o);
+  return returnState == s->returnState && (parent != nullptr && parent->equals(s->parent));
+}
+
+std::wstring SingletonPredictionContext::toString() {
+  std::wstring up = parent != nullptr ? parent->toString() : L"";
+  if (up.length() == 0) {
+    if (returnState == EMPTY_RETURN_STATE) {
+      return L"$";
     }
+    return antlrcpp::StringConverterHelper::toString(returnState);
+  }
+  return antlrcpp::StringConverterHelper::toString(returnState) + std::wstring(L" ") + up;
 }

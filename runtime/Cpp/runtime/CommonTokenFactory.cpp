@@ -1,8 +1,6 @@
-﻿#include "CommonTokenFactory.h"
-#include "Interval.h"
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -31,35 +29,35 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                TokenFactory<CommonToken*> *const CommonTokenFactory::DEFAULT = new CommonTokenFactory();
+#include "Interval.h"
+#include "CommonToken.h"
+#include "CharStream.h"
 
-                CommonTokenFactory::CommonTokenFactory(bool copyText) : copyText(copyText) {
-                }
+#include "CommonTokenFactory.h"
 
-                CommonTokenFactory::CommonTokenFactory() : CommonTokenFactory(false) {
-                }
+using namespace org::antlr::v4::runtime;
 
-                CommonToken *CommonTokenFactory::create(std::pair<TokenSource*, CharStream*> *source, int type, const std::wstring &text, int channel, int start, int stop, int line, int charPositionInLine) {
-                    CommonToken *t = new CommonToken(source, type, channel, start, stop);
-                    t->setLine(line);
-                    t->setCharPositionInLine(charPositionInLine);
-                    if (text != L"") {
-                        t->setText(text);
-                    } else if (copyText && source->second != nullptr) {
-                        t->setText(source->second->getText(misc::Interval::of(start,stop)));
-                    }
+TokenFactory<CommonToken*> *const CommonTokenFactory::DEFAULT = new CommonTokenFactory();
 
-                    return t;
-                }
+CommonTokenFactory::CommonTokenFactory(bool copyText) : copyText(copyText) {
+}
 
-                org::antlr::v4::runtime::CommonToken *CommonTokenFactory::create(int type, const std::wstring &text) {
-                    return new CommonToken(type, text);
-                }
-            }
-        }
-    }
+CommonTokenFactory::CommonTokenFactory() : CommonTokenFactory(false) {
+}
+
+CommonToken *CommonTokenFactory::create(std::pair<TokenSource*, CharStream*> *source, int type, const std::wstring &text, int channel, int start, int stop, int line, int charPositionInLine) {
+  CommonToken *t = new CommonToken(source, type, channel, start, stop);
+  t->setLine(line);
+  t->setCharPositionInLine(charPositionInLine);
+  if (text != L"") {
+    t->setText(text);
+  } else if (copyText && source->second != nullptr) {
+    t->setText(source->second->getText(misc::Interval::of(start,stop)));
+  }
+
+  return t;
+}
+
+org::antlr::v4::runtime::CommonToken *CommonTokenFactory::create(int type, const std::wstring &text) {
+  return new CommonToken(type, text);
 }

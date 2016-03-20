@@ -1,11 +1,6 @@
-﻿#pragma once
-
-#include "BufferedTokenStream.h"
-#include "TokenSource.h"
-#include "Token.h"
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -34,56 +29,60 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#pragma once
+
+#include "BufferedTokenStream.h"
+
 namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
+namespace antlr {
+namespace v4 {
+namespace runtime {
 
-                /// <summary>
-                /// The most common stream of tokens where every token is buffered up
-                ///  and tokens are filtered for a certain channel (the parser will only
-                ///  see these tokens).
-                /// 
-                ///  Even though it buffers all of the tokens, this token stream pulls tokens
-                ///  from the tokens source on demand. In other words, until you ask for a
-                ///  token using consume(), LT(), etc. the stream does not pull from the lexer.
-                /// 
-                ///  The only difference between this stream and <seealso cref="BufferedTokenStream"/> superclass
-                ///  is that this stream knows how to ignore off channel tokens. There may be
-                ///  a performance advantage to using the superclass if you don't pass
-                ///  whitespace and comments etc. to the parser on a hidden channel (i.e.,
-                ///  you set {@code $channel} instead of calling {@code skip()} in lexer rules.)
-                /// </summary>
-                ///  <seealso cref= UnbufferedTokenStream </seealso>
-                ///  <seealso cref= BufferedTokenStream </seealso>
-                class CommonTokenStream : public BufferedTokenStream {
-                    /// <summary>
-                    /// Skip tokens on any channel but this one; this is how we skip whitespace... </summary>
-                protected:
-                    int channel;
+  /// <summary>
+  /// The most common stream of tokens where every token is buffered up
+  ///  and tokens are filtered for a certain channel (the parser will only
+  ///  see these tokens).
+  ///
+  ///  Even though it buffers all of the tokens, this token stream pulls tokens
+  ///  from the tokens source on demand. In other words, until you ask for a
+  ///  token using consume(), LT(), etc. the stream does not pull from the lexer.
+  ///
+  ///  The only difference between this stream and <seealso cref="BufferedTokenStream"/> superclass
+  ///  is that this stream knows how to ignore off channel tokens. There may be
+  ///  a performance advantage to using the superclass if you don't pass
+  ///  whitespace and comments etc. to the parser on a hidden channel (i.e.,
+  ///  you set {@code $channel} instead of calling {@code skip()} in lexer rules.)
+  /// </summary>
+  ///  <seealso cref= UnbufferedTokenStream </seealso>
+  ///  <seealso cref= BufferedTokenStream </seealso>
+  class CommonTokenStream : public BufferedTokenStream {
+    /// <summary>
+    /// Skip tokens on any channel but this one; this is how we skip whitespace... </summary>
+  protected:
+    int channel;
 
-                public:
-                    CommonTokenStream(TokenSource *tokenSource);
+  public:
+    CommonTokenStream(TokenSource *tokenSource);
 
-                    CommonTokenStream(TokenSource *tokenSource, int channel); 
+    CommonTokenStream(TokenSource *tokenSource, int channel);
 
-                protected:
-                    virtual int adjustSeekIndex(int i) override;
+  protected:
+    virtual int adjustSeekIndex(int i) override;
 
-                    virtual Token *LB(int k) override;
+    virtual Token *LB(int k) override;
 
-                public:
-                    virtual Token *LT(int k) override;
+  public:
+    virtual Token *LT(int k) override;
 
-                    /// <summary>
-                    /// Count EOF just once. </summary>
-                    virtual int getNumberOfOnChannelTokens();
+    /// <summary>
+    /// Count EOF just once. </summary>
+    virtual int getNumberOfOnChannelTokens();
 
-                private:
-                    void InitializeInstanceFields();
-                };
+  private:
+    void InitializeInstanceFields();
+  };
 
-            }
-        }
-    }
-}
+} // namespace runtime
+} // namespace v4
+} // namespace antlr
+} // namespace org

@@ -1,10 +1,6 @@
-﻿#pragma once
-
-#include <string>
-#include <vector>
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -33,40 +29,40 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#pragma once
 
 namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace tree {
-                    class ParseTree;
-                    
-                    namespace xpath {
-                        class XPathElement {
-                        protected:
-                            std::wstring nodeName;
-                            bool invert;
+namespace antlr {
+namespace v4 {
+namespace runtime {
+namespace tree {
+namespace xpath {
 
-                            /// <summary>
-                            /// Construct element like /ID or or ID or "/*" etc...
-                            ///  op is null if just node
-                            /// </summary>
-                        public:
-                            XPathElement(const std::wstring &nodeName);
+  class XPathElement {
+  protected:
+    std::wstring nodeName;
+    bool invert;
 
-                            /// <summary>
-                            /// Given tree rooted at t return all nodes matched by this path element </summary>
-                            virtual std::vector<ParseTree*> *evaluate(ParseTree *t) = 0;
+    /// <summary>
+    /// Construct element like /ID or or ID or "/*" etc...
+    ///  op is null if just node
+    /// </summary>
+  public:
+    XPathElement(const std::wstring &nodeName);
 
-                            virtual std::wstring toString();
+    /// <summary>
+    /// Given tree rooted at t return all nodes matched by this path element </summary>
+    virtual std::vector<ParseTree*> *evaluate(ParseTree *t) = 0;
 
-                        private:
-                            void InitializeInstanceFields();
-                        };
+    virtual std::wstring toString();
 
-                    }
-                }
-            }
-        }
-    }
-}
+  private:
+    void InitializeInstanceFields();
+  };
+
+} // namespace xpath
+} // namespace tree
+} // namespace runtime
+} // namespace v4
+} // namespace antlr
+} // namespace org

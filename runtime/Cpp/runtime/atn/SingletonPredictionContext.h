@@ -1,12 +1,6 @@
-﻿#pragma once
-
-#include "stringconverter.h"
-#include "PredictionContext.h"
-#include <string>
-
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -35,34 +29,38 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#pragma once
+
+#include "PredictionContext.h"
+
 namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace atn {
+namespace antlr {
+namespace v4 {
+namespace runtime {
+namespace atn {
 
-                    class SingletonPredictionContext : public PredictionContext {
-                    public:
-                        PredictionContext *const parent;
-                        const int returnState;
+  class SingletonPredictionContext : public PredictionContext {
+  public:
+    PredictionContext *const parent;
+    const int returnState;
 
-                        SingletonPredictionContext(PredictionContext *parent, int returnState);
+    SingletonPredictionContext(PredictionContext *parent, int returnState);
 
-                        static SingletonPredictionContext *create(PredictionContext *parent, int returnState);
+    static SingletonPredictionContext *create(PredictionContext *parent, int returnState);
 
-                        virtual int size() override;
+    virtual int size() override;
 
-                        virtual PredictionContext *getParent(int index) override;
+    virtual PredictionContext *getParent(int index) override;
 
-                        virtual int getReturnState(int index) override;
+    virtual int getReturnState(int index) override;
 
-                        virtual bool equals(void *o) override;
+    virtual bool equals(void *o) override;
 
-                        virtual std::wstring toString() ;
-                    };
+    virtual std::wstring toString();
+  };
 
-                }
-            }
-        }
-    }
-}
+} // namespace atn
+} // namespace runtime
+} // namespace v4
+} // namespace antlr
+} // namespace org

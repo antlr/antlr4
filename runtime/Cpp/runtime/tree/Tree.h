@@ -1,7 +1,4 @@
-﻿#pragma once
-#include <string>
-
-/*
+﻿/*
  * [The "BSD license"]
  *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
@@ -32,53 +29,56 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#pragma once
+
 namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace tree {
-                    /// <summary>
-                    /// The basic notion of a tree has a parent, a payload, and a list of children.
-                    ///  It is the most abstract interface for all the trees used by ANTLR.
-                    /// </summary>
-                    class Tree {
-                        /// <summary>
-                        /// The parent of this node. If the return value is null, then this
-                        ///  node is the root of the tree.
-                        /// </summary>
-                    public:
-                        virtual Tree *getParent() = 0;
+namespace antlr {
+namespace v4 {
+namespace runtime {
+namespace tree {
 
-                        /// <summary>
-                        /// This method returns whatever object represents the data at this note. For
-                        /// example, for parse trees, the payload can be a <seealso cref="Token"/> representing
-                        /// a leaf node or a <seealso cref="RuleContext"/> object representing a rule
-                        /// invocation. For abstract syntax trees (ASTs), this is a <seealso cref="Token"/>
-                        /// object.
-                        /// </summary>
-                        virtual void *getPayload() = 0;
+  /// <summary>
+  /// The basic notion of a tree has a parent, a payload, and a list of children.
+  ///  It is the most abstract interface for all the trees used by ANTLR.
+  /// </summary>
+  class Tree {
+    /// <summary>
+    /// The parent of this node. If the return value is null, then this
+    ///  node is the root of the tree.
+    /// </summary>
+  public:
+    virtual Tree *getParent() = 0;
 
-                        /// <summary>
-                        /// If there are children, get the {@code i}th value indexed from 0. </summary>
-                        virtual Tree *getChild(std::size_t i) = 0;
+    /// <summary>
+    /// This method returns whatever object represents the data at this note. For
+    /// example, for parse trees, the payload can be a <seealso cref="Token"/> representing
+    /// a leaf node or a <seealso cref="RuleContext"/> object representing a rule
+    /// invocation. For abstract syntax trees (ASTs), this is a <seealso cref="Token"/>
+    /// object.
+    /// </summary>
+    virtual void *getPayload() = 0;
 
-                        /// <summary>
-                        /// How many children are there? If there is none, then this
-                        ///  node represents a leaf node.
-                        /// </summary>
-                        virtual std::size_t getChildCount() = 0;
+    /// <summary>
+    /// If there are children, get the {@code i}th value indexed from 0. </summary>
+    virtual Tree *getChild(std::size_t i) = 0;
 
-                        /// <summary>
-                        /// Print out a whole tree, not just a node, in LISP format
-                        ///  {@code (root child1 .. childN)}. Print just a node if this is a leaf.
-                        /// </summary>
-                        virtual std::wstring toStringTree() = 0;
+    /// <summary>
+    /// How many children are there? If there is none, then this
+    ///  node represents a leaf node.
+    /// </summary>
+    virtual std::size_t getChildCount() = 0;
 
-                        virtual std::wstring toString() = 0;
-                    };
+    /// <summary>
+    /// Print out a whole tree, not just a node, in LISP format
+    ///  {@code (root child1 .. childN)}. Print just a node if this is a leaf.
+    /// </summary>
+    virtual std::wstring toStringTree() = 0;
 
-                }
-            }
-        }
-    }
-}
+    virtual std::wstring toString() = 0;
+  };
+
+} // namespace tree
+} // namespace runtime
+} // namespace v4
+} // namespace antlr
+} // namespace org

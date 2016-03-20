@@ -1,9 +1,6 @@
-﻿#pragma once
-
-#include "BlockStartState.h"
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -32,22 +29,26 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#pragma once
+
+#include "BlockStartState.h"
+
 namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace atn {
+namespace antlr {
+namespace v4 {
+namespace runtime {
+namespace atn {
 
-                    /// <summary>
-                    /// The block that begins a closure loop. </summary>
-                    class StarBlockStartState final : public BlockStartState {
+  /// <summary>
+  /// The block that begins a closure loop. </summary>
+  class StarBlockStartState final : public BlockStartState {
 
-                    public:
-                        virtual int getStateType() override;
-                    };
+  public:
+    virtual int getStateType() override;
+  };
 
-                }
-            }
-        }
-    }
-}
+} // namespace atn
+} // namespace runtime
+} // namespace v4
+} // namespace antlr
+} // namespace org

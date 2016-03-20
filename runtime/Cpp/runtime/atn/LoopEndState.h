@@ -1,9 +1,6 @@
-﻿#pragma once
-
-#include "ATNState.h"
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -32,23 +29,27 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#pragma once
+
+#include "ATNState.h"
+
 namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace atn {
+namespace antlr {
+namespace v4 {
+namespace runtime {
+namespace atn {
 
-                    /// <summary>
-                    /// Mark the end of a * or + loop. </summary>
-                    class LoopEndState final : public ATNState {
-                    public:
-                        ATNState *loopBackState;
+  /// <summary>
+  /// Mark the end of a * or + loop. </summary>
+  class LoopEndState final : public ATNState {
+  public:
+    ATNState *loopBackState;
 
-                        virtual int getStateType() override;
-                    };
+    virtual int getStateType() override;
+  };
 
-                }
-            }
-        }
-    }
-}
+} // namespace atn
+} // namespace runtime
+} // namespace v4
+} // namespace antlr
+} // namespace org

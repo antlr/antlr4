@@ -1,7 +1,6 @@
-﻿#include "PrecedencePredicateTransition.h"
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -30,37 +29,29 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace atn {
-                    using org::antlr::v4::runtime::misc::NotNull;
+#include "PrecedencePredicateTransition.h"
 
-                    PrecedencePredicateTransition::PrecedencePredicateTransition(ATNState *target, int precedence) : AbstractPredicateTransition(target), precedence(precedence) {
-                    }
+using namespace org::antlr::v4::runtime::atn;
 
-                    int PrecedencePredicateTransition::getSerializationType() {
-                        return PRECEDENCE;
-                    }
+PrecedencePredicateTransition::PrecedencePredicateTransition(ATNState *target, int precedence) : AbstractPredicateTransition(target), precedence(precedence) {
+}
 
-                    bool PrecedencePredicateTransition::isEpsilon() {
-                        return true;
-                    }
+int PrecedencePredicateTransition::getSerializationType() {
+  return PRECEDENCE;
+}
 
-                    bool PrecedencePredicateTransition::matches(int symbol, int minVocabSymbol, int maxVocabSymbol) {
-                        return false;
-                    }
+bool PrecedencePredicateTransition::isEpsilon() {
+  return true;
+}
 
-                    org::antlr::v4::runtime::atn::SemanticContext::PrecedencePredicate *PrecedencePredicateTransition::getPredicate() {
-                        return new SemanticContext::PrecedencePredicate(precedence);
-                    }
+bool PrecedencePredicateTransition::matches(int symbol, int minVocabSymbol, int maxVocabSymbol) {
+  return false;
+}
 
-                    std::wstring PrecedencePredicateTransition::toString() {
-                        return std::to_wstring(precedence) + std::wstring(L" >= _p");
-                    }
-                }
-            }
-        }
-    }
+org::antlr::v4::runtime::atn::SemanticContext::PrecedencePredicate *PrecedencePredicateTransition::getPredicate() {
+  return new SemanticContext::PrecedencePredicate(precedence);
+}
+
+std::wstring PrecedencePredicateTransition::toString() {
+  return std::to_wstring(precedence) + std::wstring(L" >= _p");
 }

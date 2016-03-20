@@ -1,9 +1,6 @@
-﻿#pragma once
-
-#include "DecisionState.h"
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -32,24 +29,28 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#pragma once
+
+#include "DecisionState.h"
+
 namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace atn {
+namespace antlr {
+namespace v4 {
+namespace runtime {
+namespace atn {
 
-                    /// <summary>
-                    /// Decision state for {@code A+} and {@code (A|B)+}.  It has two transitions:
-                    ///  one to the loop back to start of the block and one to exit.
-                    /// </summary>
-                    class PlusLoopbackState final : public DecisionState {
+  /// <summary>
+  /// Decision state for {@code A+} and {@code (A|B)+}.  It has two transitions:
+  ///  one to the loop back to start of the block and one to exit.
+  /// </summary>
+  class PlusLoopbackState final : public DecisionState {
 
-                    public:
-                        virtual int getStateType() override;
-                    };
+  public:
+    virtual int getStateType() override;
+  };
 
-                }
-            }
-        }
-    }
-}
+} // namespace atn
+} // namespace runtime
+} // namespace v4
+} // namespace antlr
+} // namespace org

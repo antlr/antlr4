@@ -1,8 +1,6 @@
-﻿#include "OrderedATNConfigSet.h"
-#include "ObjectEqualityComparator.h"
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -31,21 +29,17 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace atn {
+#include "Array2DHashSet.h"
+#include "ObjectEqualityComparator.h"
 
-                    OrderedATNConfigSet::LexerConfigHashSet::LexerConfigHashSet() :
-                    AbstractConfigHashSet(misc::ObjectEqualityComparator::INSTANCE){
-                    }
+#include "OrderedATNConfigSet.h"
 
-                    OrderedATNConfigSet::OrderedATNConfigSet() {
-                        this->configLookup = new LexerConfigHashSet();
-                    }
-                }
-            }
-        }
-    }
+using namespace org::antlr::v4::runtime::atn;
+
+OrderedATNConfigSet::LexerConfigHashSet::LexerConfigHashSet() :
+AbstractConfigHashSet(misc::ObjectEqualityComparator::INSTANCE){
+}
+
+OrderedATNConfigSet::OrderedATNConfigSet() {
+  this->configLookup = new LexerConfigHashSet();
 }

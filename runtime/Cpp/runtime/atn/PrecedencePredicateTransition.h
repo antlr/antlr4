@@ -1,13 +1,6 @@
-﻿#pragma once
-
-#include <string>
-
-#include "AbstractPredicateTransition.h"
-#include "ATNState.h"
-#include "SemanticContext.h"
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -36,39 +29,41 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#pragma once
+
+#include "AbstractPredicateTransition.h"
+#include "SemanticContext.h"
+
 namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace atn {
+namespace antlr {
+namespace v4 {
+namespace runtime {
+namespace atn {
 
-                    using org::antlr::v4::runtime::misc::NotNull;
+  ///
+  /// <summary>
+  /// @author Sam Harwell
+  /// </summary>
+  class PrecedencePredicateTransition final : public AbstractPredicateTransition {
+  public:
+    const int precedence;
 
-                    /// 
-                    /// <summary>
-                    /// @author Sam Harwell
-                    /// </summary>
-                    class PrecedencePredicateTransition final : public AbstractPredicateTransition {
-                    public:
-                        const int precedence;
+    PrecedencePredicateTransition(ATNState *target, int precedence);
 
-                        PrecedencePredicateTransition(ATNState *target, int precedence);
+    virtual int getSerializationType() override;
 
-                        virtual int getSerializationType() override;
+    virtual bool isEpsilon() override;
 
-                        virtual bool isEpsilon() override;
+    virtual bool matches(int symbol, int minVocabSymbol, int maxVocabSymbol) override;
 
-                        virtual bool matches(int symbol, int minVocabSymbol, int maxVocabSymbol) override;
+    SemanticContext::PrecedencePredicate *getPredicate();
 
-                        SemanticContext::PrecedencePredicate *getPredicate();
+    virtual std::wstring toString();
 
-                        virtual std::wstring toString();
-                        
-                    };
-                    
-                    
-                }
-            }
-        }
-    }
-}
+  };
+
+} // namespace atn
+} // namespace runtime
+} // namespace v4
+} // namespace antlr
+} // namespace org

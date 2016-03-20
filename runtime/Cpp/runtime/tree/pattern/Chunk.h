@@ -1,9 +1,6 @@
-﻿#pragma once
-
-#include <string>
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  * Copyright (c) 2013 Terence Parr
  * Copyright (c) 2013 Sam Harwell
  * All rights reserved.
@@ -32,39 +29,42 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#pragma once
+
 namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace tree {
-                    namespace pattern {
+namespace antlr {
+namespace v4 {
+namespace runtime {
+namespace tree {
+namespace pattern {
 
-                        /// <summary>
-                        /// A chunk is either a token tag, a rule tag, or a span of literal text within a
-                        /// tree pattern.
-                        /// <p/>
-                        /// The method <seealso cref="ParseTreePatternMatcher#split(String)"/> returns a list of
-                        /// chunks in preparation for creating a token stream by
-                        /// <seealso cref="ParseTreePatternMatcher#tokenize(String)"/>. From there, we get a parse
-                        /// tree from with <seealso cref="ParseTreePatternMatcher#compile(String, int)"/>. These
-                        /// chunks are converted to <seealso cref="RuleTagToken"/>, <seealso cref="TokenTagToken"/>, or the
-                        /// regular tokens of the text surrounding the tags.
-                        /// </summary>
-                        class Chunk {
+  /// <summary>
+  /// A chunk is either a token tag, a rule tag, or a span of literal text within a
+  /// tree pattern.
+  /// <p/>
+  /// The method <seealso cref="ParseTreePatternMatcher#split(String)"/> returns a list of
+  /// chunks in preparation for creating a token stream by
+  /// <seealso cref="ParseTreePatternMatcher#tokenize(String)"/>. From there, we get a parse
+  /// tree from with <seealso cref="ParseTreePatternMatcher#compile(String, int)"/>. These
+  /// chunks are converted to <seealso cref="RuleTagToken"/>, <seealso cref="TokenTagToken"/>, or the
+  /// regular tokens of the text surrounding the tags.
+  /// </summary>
+  class Chunk {
 
-                          /// <summary>
-                          /// This method returns a text representation of the tag chunk. Labeled tags
-                          /// are returned in the form {@code label:tag}, and unlabeled tags are
-                          /// returned as just the tag name.
-                          /// </summary>
-                          virtual std::wstring toString() {
-                            std::wstring str;
-                            return str;
-                          }
-                        };
-                    }
-                }
-            }
-        }
+    /// <summary>
+    /// This method returns a text representation of the tag chunk. Labeled tags
+    /// are returned in the form {@code label:tag}, and unlabeled tags are
+    /// returned as just the tag name.
+    /// </summary>
+    virtual std::wstring toString() {
+      std::wstring str;
+      return str;
     }
-}
+  };
+  
+} // namespace pattern
+} // namespace tree
+} // namespace runtime
+} // namespace v4
+} // namespace antlr
+} // namespace org

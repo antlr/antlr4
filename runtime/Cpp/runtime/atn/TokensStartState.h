@@ -1,9 +1,6 @@
-﻿#pragma once
-
-#include "DecisionState.h"
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -32,22 +29,26 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#pragma once
+
+#include "DecisionState.h"
+
 namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace atn {
+namespace antlr {
+namespace v4 {
+namespace runtime {
+namespace atn {
 
-                    /// <summary>
-                    /// The Tokens rule start state linking to each lexer rule start state </summary>
-                    class TokensStartState final : public DecisionState {
+  /// <summary>
+  /// The Tokens rule start state linking to each lexer rule start state </summary>
+  class TokensStartState final : public DecisionState {
 
-                    public:
-                        virtual int getStateType();
-                    };
+  public:
+    virtual int getStateType();
+  };
 
-                }
-            }
-        }
-    }
-}
+} // namespace atn
+} // namespace runtime
+} // namespace v4
+} // namespace antlr
+} // namespace org

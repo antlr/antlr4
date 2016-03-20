@@ -1,13 +1,6 @@
-﻿#pragma once
-
-
-#include <string>
-#include "stringconverter.h"
-#include "Declarations.h"
-#include "BaseErrorListener.h"
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -36,79 +29,81 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#pragma once
+
+#include "BaseErrorListener.h"
+
 namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
+namespace antlr {
+namespace v4 {
+namespace runtime {
 
+  /// <summary>
+  /// This implementation of <seealso cref="ANTLRErrorListener"/> can be used to identify
+  /// certain potential correctness and performance problems in grammars. "Reports"
+  /// are made by calling <seealso cref="Parser#notifyErrorListeners"/> with the appropriate
+  /// message.
+  ///
+  /// <ul>
+  /// <li><b>Ambiguities</b>: These are cases where more than one path through the
+  /// grammar can match the input.</li>
+  /// <li><b>Weak context sensitivity</b>: These are cases where full-context
+  /// prediction resolved an SLL conflict to a unique alternative which equaled the
+  /// minimum alternative of the SLL conflict.</li>
+  /// <li><b>Strong (forced) context sensitivity</b>: These are cases where the
+  /// full-context prediction resolved an SLL conflict to a unique alternative,
+  /// <em>and</em> the minimum alternative of the SLL conflict was found to not be
+  /// a truly viable alternative. Two-stage parsing cannot be used for inputs where
+  /// this situation occurs.</li>
+  /// </ul>
+  ///
+  /// @author Sam Harwell
+  /// </summary>
+  class DiagnosticErrorListener : public BaseErrorListener {
+    /// <summary>
+    /// When {@code true}, only exactly known ambiguities are reported.
+    /// </summary>
+  protected:
+    const bool exactOnly;
 
+    /// <summary>
+    /// Initializes a new instance of <seealso cref="DiagnosticErrorListener"/> which only
+    /// reports exact ambiguities.
+    /// </summary>
+  public:
+    DiagnosticErrorListener(); //this(true);
 
-                /// <summary>
-                /// This implementation of <seealso cref="ANTLRErrorListener"/> can be used to identify
-                /// certain potential correctness and performance problems in grammars. "Reports"
-                /// are made by calling <seealso cref="Parser#notifyErrorListeners"/> with the appropriate
-                /// message.
-                /// 
-                /// <ul>
-                /// <li><b>Ambiguities</b>: These are cases where more than one path through the
-                /// grammar can match the input.</li>
-                /// <li><b>Weak context sensitivity</b>: These are cases where full-context
-                /// prediction resolved an SLL conflict to a unique alternative which equaled the
-                /// minimum alternative of the SLL conflict.</li>
-                /// <li><b>Strong (forced) context sensitivity</b>: These are cases where the
-                /// full-context prediction resolved an SLL conflict to a unique alternative,
-                /// <em>and</em> the minimum alternative of the SLL conflict was found to not be
-                /// a truly viable alternative. Two-stage parsing cannot be used for inputs where
-                /// this situation occurs.</li>
-                /// </ul>
-                /// 
-                /// @author Sam Harwell
-                /// </summary>
-                class DiagnosticErrorListener : public BaseErrorListener {
-                    /// <summary>
-                    /// When {@code true}, only exactly known ambiguities are reported.
-                    /// </summary>
-                protected:
-                    const bool exactOnly;
-                    
-                    /// <summary>
-                    /// Initializes a new instance of <seealso cref="DiagnosticErrorListener"/> which only
-                    /// reports exact ambiguities.
-                    /// </summary>
-                public:
-                    DiagnosticErrorListener(); //this(true);
+    /// <summary>
+    /// Initializes a new instance of <seealso cref="DiagnosticErrorListener"/>, specifying
+    /// whether all ambiguities or only exact ambiguities are reported.
+    /// </summary>
+    /// <param name="exactOnly"> {@code true} to report only exact ambiguities, otherwise
+    /// {@code false} to report all ambiguities. </param>
+    DiagnosticErrorListener(bool exactOnly);
 
-                    /// <summary>
-                    /// Initializes a new instance of <seealso cref="DiagnosticErrorListener"/>, specifying
-                    /// whether all ambiguities or only exact ambiguities are reported.
-                    /// </summary>
-                    /// <param name="exactOnly"> {@code true} to report only exact ambiguities, otherwise
-                    /// {@code false} to report all ambiguities. </param>
-                    DiagnosticErrorListener(bool exactOnly);
+    virtual void reportAmbiguity(Parser *recognizer, dfa::DFA *dfa, int startIndex, int stopIndex, bool exact, antlrcpp::BitSet *ambigAlts, atn::ATNConfigSet *configs) override;
 
-                    virtual void reportAmbiguity(Parser *recognizer, dfa::DFA *dfa, int startIndex, int stopIndex, bool exact, antlrcpp::BitSet *ambigAlts, atn::ATNConfigSet *configs) override;
+    virtual void reportAttemptingFullContext(Parser *recognizer, dfa::DFA *dfa, int startIndex, int stopIndex, antlrcpp::BitSet *conflictingAlts, atn::ATNConfigSet *configs) override;
 
-                    virtual void reportAttemptingFullContext(Parser *recognizer, dfa::DFA *dfa, int startIndex, int stopIndex, antlrcpp::BitSet *conflictingAlts, atn::ATNConfigSet *configs) override;
+    virtual void reportContextSensitivity(Parser *recognizer, dfa::DFA *dfa, int startIndex, int stopIndex, int prediction, atn::ATNConfigSet *configs) override;
 
-                    virtual void reportContextSensitivity(Parser *recognizer, dfa::DFA *dfa, int startIndex, int stopIndex, int prediction, atn::ATNConfigSet *configs) override;
+  protected:
+    virtual std::wstring getDecisionDescription(Parser *recognizer, dfa::DFA *dfa);
 
-                protected:
-                    virtual std::wstring getDecisionDescription(Parser *recognizer, dfa::DFA *dfa);
+    /// <summary>
+    /// Computes the set of conflicting or ambiguous alternatives from a
+    /// configuration set, if that information was not already provided by the
+    /// parser.
+    /// </summary>
+    /// <param name="reportedAlts"> The set of conflicting or ambiguous alternatives, as
+    /// reported by the parser. </param>
+    /// <param name="configs"> The conflicting or ambiguous configuration set. </param>
+    /// <returns> Returns {@code reportedAlts} if it is not {@code null}, otherwise
+    /// returns the set of alternatives represented in {@code configs}. </returns>
+    virtual antlrcpp::BitSet *getConflictingAlts(antlrcpp::BitSet *reportedAlts, atn::ATNConfigSet *configs);
+  };
 
-                    /// <summary>
-                    /// Computes the set of conflicting or ambiguous alternatives from a
-                    /// configuration set, if that information was not already provided by the
-                    /// parser.
-                    /// </summary>
-                    /// <param name="reportedAlts"> The set of conflicting or ambiguous alternatives, as
-                    /// reported by the parser. </param>
-                    /// <param name="configs"> The conflicting or ambiguous configuration set. </param>
-                    /// <returns> Returns {@code reportedAlts} if it is not {@code null}, otherwise
-                    /// returns the set of alternatives represented in {@code configs}. </returns>
-                    virtual antlrcpp::BitSet *getConflictingAlts(antlrcpp::BitSet *reportedAlts, atn::ATNConfigSet *configs);
-                };
-
-            }
-        }
-    }
-}
+} // namespace runtime
+} // namespace v4
+} // namespace antlr
+} // namespace org

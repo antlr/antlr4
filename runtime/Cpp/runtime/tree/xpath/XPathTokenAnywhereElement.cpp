@@ -1,8 +1,6 @@
-﻿#include "XPathTokenAnywhereElement.h"
-#include "Trees.h"
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -31,27 +29,22 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace tree {
-                    namespace xpath {
-                        XPathTokenAnywhereElement::XPathTokenAnywhereElement(const std::wstring &tokenName, int tokenType) : XPathElement(tokenName) {
-                            InitializeInstanceFields();
-                            this->tokenType = tokenType;
-                        }
+#include "Trees.h"
 
-                        std::vector<ParseTree*> * XPathTokenAnywhereElement::evaluate(ParseTree *t) {
-                            return Trees::findAllTokenNodes(t, tokenType);
-                        }
+#include "XPathTokenAnywhereElement.h"
 
-                        void XPathTokenAnywhereElement::InitializeInstanceFields() {
-                            tokenType = 0;
-                        }
-                    }
-                }
-            }
-        }
-    }
+using namespace org::antlr::v4::runtime::tree;
+using namespace org::antlr::v4::runtime::tree::xpath;
+
+XPathTokenAnywhereElement::XPathTokenAnywhereElement(const std::wstring &tokenName, int tokenType) : XPathElement(tokenName) {
+  InitializeInstanceFields();
+  this->tokenType = tokenType;
+}
+
+std::vector<ParseTree*> * XPathTokenAnywhereElement::evaluate(ParseTree *t) {
+  return Trees::findAllTokenNodes(t, tokenType);
+}
+
+void XPathTokenAnywhereElement::InitializeInstanceFields() {
+  tokenType = 0;
 }

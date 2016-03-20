@@ -1,10 +1,6 @@
-﻿#include <algorithm>
-
-#include "Interval.h"
-
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -33,123 +29,116 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace misc {
+#include "Interval.h"
 
-                    Interval *const Interval::INVALID = new Interval(-1,-2);
-                    Interval *      Interval::cache[Interval::INTERVAL_POOL_MAX_VALUE+1];
-                    
-                    int Interval::creates = 0;
-                    int Interval::misses = 0;
-                    int Interval::hits = 0;
-                    int Interval::outOfRange = 0;
+using namespace org::antlr::v4::runtime::misc;
 
-                    Interval::Interval(int a, int b) {
-                        InitializeInstanceFields();
-                        this->a = a;
-                        this->b = b;
-                    }
+Interval *const Interval::INVALID = new Interval(-1,-2);
+Interval *      Interval::cache[Interval::INTERVAL_POOL_MAX_VALUE+1];
 
-                    org::antlr::v4::runtime::misc::Interval *Interval::of(int a, int b) {
-                        // cache just a..a
-                        if (a != b || a < 0 || a>INTERVAL_POOL_MAX_VALUE) {
-                            return new Interval(a,b);
-                        }
-                        if (cache[a] == nullptr) {
-                            cache[a] = new Interval(a,a);
-                        }
-                        return cache[a];
-                    }
+int Interval::creates = 0;
+int Interval::misses = 0;
+int Interval::hits = 0;
+int Interval::outOfRange = 0;
 
-                    int Interval::length() {
-                        if (b < a) {
-                            return 0;
-                        }
-                        return b - a + 1;
-                    }
+Interval::Interval(int a, int b) {
+  InitializeInstanceFields();
+  this->a = a;
+  this->b = b;
+}
 
-                    bool Interval::equals(void *o) {
-                        if (o == nullptr || !( ((Interval*)o) != nullptr)) {
-                            return false;
-                        }
-                        Interval *other = static_cast<Interval*>(o);
-                        return this->a == other->a && this->b == other->b;
-                    }
+org::antlr::v4::runtime::misc::Interval *Interval::of(int a, int b) {
+  // cache just a..a
+  if (a != b || a < 0 || a>INTERVAL_POOL_MAX_VALUE) {
+    return new Interval(a,b);
+  }
+  if (cache[a] == nullptr) {
+    cache[a] = new Interval(a,a);
+  }
+  return cache[a];
+}
 
-                    int Interval::hashCode() {
-                        int hash = 23;
-                        hash = hash * 31 + a;
-                        hash = hash * 31 + b;
-                        return hash;
-                    }
+int Interval::length() {
+  if (b < a) {
+    return 0;
+  }
+  return b - a + 1;
+}
 
-                    bool Interval::startsBeforeDisjoint(Interval *other) {
-                        return this->a < other->a && this->b < other->a;
-                    }
+bool Interval::equals(void *o) {
+  if (o == nullptr || !( ((Interval*)o) != nullptr)) {
+    return false;
+  }
+  Interval *other = static_cast<Interval*>(o);
+  return this->a == other->a && this->b == other->b;
+}
 
-                    bool Interval::startsBeforeNonDisjoint(Interval *other) {
-                        return this->a <= other->a && this->b >= other->a;
-                    }
+int Interval::hashCode() {
+  int hash = 23;
+  hash = hash * 31 + a;
+  hash = hash * 31 + b;
+  return hash;
+}
 
-                    bool Interval::startsAfter(Interval *other) {
-                        return this->a > other->a;
-                    }
+bool Interval::startsBeforeDisjoint(Interval *other) {
+  return this->a < other->a && this->b < other->a;
+}
 
-                    bool Interval::startsAfterDisjoint(Interval *other) {
-                        return this->a > other->b;
-                    }
+bool Interval::startsBeforeNonDisjoint(Interval *other) {
+  return this->a <= other->a && this->b >= other->a;
+}
 
-                    bool Interval::startsAfterNonDisjoint(Interval *other) {
-                        return this->a > other->a && this->a <= other->b; // this.b>=other.b implied
-                    }
+bool Interval::startsAfter(Interval *other) {
+  return this->a > other->a;
+}
 
-                    bool Interval::disjoint(Interval *other) {
-                        return startsBeforeDisjoint(other) || startsAfterDisjoint(other);
-                    }
+bool Interval::startsAfterDisjoint(Interval *other) {
+  return this->a > other->b;
+}
 
-                    bool Interval::adjacent(Interval *other) {
-                        return this->a == other->b + 1 || this->b == other->a - 1;
-                    }
+bool Interval::startsAfterNonDisjoint(Interval *other) {
+  return this->a > other->a && this->a <= other->b; // this.b>=other.b implied
+}
 
-                    bool Interval::properlyContains(Interval *other) {
-                        return other->a >= this->a && other->b <= this->b;
-                    }
+bool Interval::disjoint(Interval *other) {
+  return startsBeforeDisjoint(other) || startsAfterDisjoint(other);
+}
 
-                    org::antlr::v4::runtime::misc::Interval *Interval::union_Renamed(Interval *other) {
-                        return Interval::of(std::min(a, other->a), std::max(b, other->b));
-                    }
+bool Interval::adjacent(Interval *other) {
+  return this->a == other->b + 1 || this->b == other->a - 1;
+}
 
-                    org::antlr::v4::runtime::misc::Interval *Interval::intersection(Interval *other) {
-                        return Interval::of(std::max(a, other->a), std::min(b, other->b));
-                    }
+bool Interval::properlyContains(Interval *other) {
+  return other->a >= this->a && other->b <= this->b;
+}
 
-                    org::antlr::v4::runtime::misc::Interval *Interval::differenceNotProperlyContained(Interval *other) {
-                        Interval *diff = nullptr;
-                        // other.a to left of this.a (or same)
-                        if (other->startsBeforeNonDisjoint(this)) {
-                            diff = Interval::of(std::max(this->a, other->b + 1), this->b);
-                        }
+org::antlr::v4::runtime::misc::Interval *Interval::union_Renamed(Interval *other) {
+  return Interval::of(std::min(a, other->a), std::max(b, other->b));
+}
 
-                        // other.a to right of this.a
-                        else if (other->startsAfterNonDisjoint(this)) {
-                            diff = Interval::of(this->a, other->a - 1);
-                        }
-                        return diff;
-                    }
+org::antlr::v4::runtime::misc::Interval *Interval::intersection(Interval *other) {
+  return Interval::of(std::max(a, other->a), std::min(b, other->b));
+}
 
-                    std::wstring Interval::toString() {
-                        return std::to_wstring(a) + std::wstring(L"..") + std::to_wstring(b);
-                    }
+org::antlr::v4::runtime::misc::Interval *Interval::differenceNotProperlyContained(Interval *other) {
+  Interval *diff = nullptr;
+  // other.a to left of this.a (or same)
+  if (other->startsBeforeNonDisjoint(this)) {
+    diff = Interval::of(std::max(this->a, other->b + 1), this->b);
+  }
 
-                    void Interval::InitializeInstanceFields() {
-                        a = 0;
-                        b = 0;
-                    }
-                }
-            }
-        }
-    }
+  // other.a to right of this.a
+  else if (other->startsAfterNonDisjoint(this)) {
+    diff = Interval::of(this->a, other->a - 1);
+  }
+  return diff;
+}
+
+std::wstring Interval::toString() {
+  return std::to_wstring(a) + std::wstring(L"..") + std::to_wstring(b);
+}
+
+void Interval::InitializeInstanceFields() {
+  a = 0;
+  b = 0;
 }

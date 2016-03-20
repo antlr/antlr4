@@ -1,12 +1,4 @@
-﻿#include "LexerInterpreter.h"
-#include "ATNType.h"
-#include "LexerATNSimulator.h"
-#include "ATN.h"
-#include "DFA.h"
-#include "Exceptions.h"
-#include "PredictionContextCache.h"
-
-/*
+﻿/*
  * [The "BSD license"]
  *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
@@ -37,57 +29,59 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                LexerInterpreter::LexerInterpreter(const std::wstring &grammarFileName, std::vector<std::wstring> *tokenNames, std::vector<std::wstring> *ruleNames, std::vector<std::wstring> *modeNames, atn::ATN *atn, CharStream *input) : Lexer(input), grammarFileName(grammarFileName), atn(atn), _sharedContextCache(new atn::PredictionContextCache()) {
+#include "ATNType.h"
+#include "LexerATNSimulator.h"
+#include "DFA.h"
+#include "PredictionContextCache.h"
+#include "EmptyPredictionContext.h"
 
-                    if (atn->grammarType != atn::ATNType::LEXER) {
-                        throw new IllegalArgumentException(L"The ATN must be a lexer ATN.");
-                    }
+#include "LexerInterpreter.h"
+
+using namespace org::antlr::v4::runtime;
+
+LexerInterpreter::LexerInterpreter(const std::wstring &grammarFileName, std::vector<std::wstring> *tokenNames, std::vector<std::wstring> *ruleNames, std::vector<std::wstring> *modeNames, atn::ATN *atn, CharStream *input) : Lexer(input), grammarFileName(grammarFileName), atn(atn), _sharedContextCache(new atn::PredictionContextCache()) {
+
+  if (atn->grammarType != atn::ATNType::LEXER) {
+    throw new IllegalArgumentException(L"The ATN must be a lexer ATN.");
+  }
 
 
-                    for (int i = 0; i < (int)_decisionToDFA.size(); i++) {
-                        _decisionToDFA[i] = new dfa::DFA(atn->getDecisionState(i), i);
-                    }
-                    _interpreter = new atn::LexerATNSimulator(atn,_decisionToDFA,_sharedContextCache);
-                    if (tokenNames) {
-                        _tokenNames = *tokenNames;
-                    }
-                    if (ruleNames) {
-                        _ruleNames = *ruleNames;
-                    }
-                    if (modeNames) {
-                        _modeNames = *modeNames;
-                    }
-                }
+  for (int i = 0; i < (int)_decisionToDFA.size(); i++) {
+    _decisionToDFA[i] = new dfa::DFA(atn->getDecisionState(i), i);
+  }
+  _interpreter = new atn::LexerATNSimulator(atn,_decisionToDFA,_sharedContextCache);
+  if (tokenNames) {
+    _tokenNames = *tokenNames;
+  }
+  if (ruleNames) {
+    _ruleNames = *ruleNames;
+  }
+  if (modeNames) {
+    _modeNames = *modeNames;
+  }
+}
 
-              LexerInterpreter::~LexerInterpreter()
-              {
-                delete _interpreter;
-              }
+LexerInterpreter::~LexerInterpreter()
+{
+  delete _interpreter;
+}
 
-                atn::ATN *LexerInterpreter::getATN() const {
-                    return atn;
-                }
+atn::ATN *LexerInterpreter::getATN() const {
+  return atn;
+}
 
-                std::wstring LexerInterpreter::getGrammarFileName() const {
-                    return grammarFileName;
-                }
+std::wstring LexerInterpreter::getGrammarFileName() const {
+  return grammarFileName;
+}
 
-                const std::vector<std::wstring>& LexerInterpreter::getTokenNames() const {
-                    return _tokenNames;
-                }
+const std::vector<std::wstring>& LexerInterpreter::getTokenNames() const {
+  return _tokenNames;
+}
 
-                const std::vector<std::wstring>& LexerInterpreter::getRuleNames() const {
-                    return _ruleNames;
-                }
+const std::vector<std::wstring>& LexerInterpreter::getRuleNames() const {
+  return _ruleNames;
+}
 
-                const std::vector<std::wstring>& LexerInterpreter::getModeNames() const {
-                    return _modeNames;
-                }
-            }
-        }
-    }
+const std::vector<std::wstring>& LexerInterpreter::getModeNames() const {
+  return _modeNames;
 }

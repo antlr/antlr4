@@ -1,20 +1,6 @@
-﻿#pragma once
-
-#include <set>
-#include <string>
-#include <algorithm>
-#include <vector>
-
-#include "DoubleKeyMap.h"
-#include "Declarations.h"
-#include "Array2DHashSet.h"
-#include "AbstractEqualityComparator.h"
-#include "BitSet.h"
-#include "Exceptions.h"
-
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -43,201 +29,206 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#pragma once
+
+#include "Array2DHashSet.h"
+#include "BitSet.h"
+
 namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace atn {
-                    /// <summary>
-                    /// Specialized <seealso cref="Set"/>{@code <}<seealso cref="ATNConfig"/>{@code >} that can track
-                    /// info about the set, with support for combining similar configurations using a
-                    /// graph-structured stack.
-                    /// </summary>
-					/// TODO: Consider going from std::set to std::vector
-                    class ATNConfigSet : public std::set<ATNConfig*> {
-                        
-                    public:
-                        class AbstractConfigHashSet : public misc::Array2DHashSet<ATNConfig*> {
+namespace antlr {
+namespace v4 {
+namespace runtime {
+namespace atn {
 
-                        public:
-                            
-                            template<typename T1>
-                            AbstractConfigHashSet(misc::AbstractEqualityComparator<T1> *comparator) {}
+  /// <summary>
+  /// Specialized <seealso cref="Set"/>{@code <}<seealso cref="ATNConfig"/>{@code >} that can track
+  /// info about the set, with support for combining similar configurations using a
+  /// graph-structured stack.
+  /// </summary>
+  /// TODO: Consider going from std::set to std::vector
+  class ATNConfigSet : public std::set<ATNConfig*> {
 
-                            template<typename T1>
-                            AbstractConfigHashSet(misc::AbstractEqualityComparator<T1> *comparator, int initialCapacity, int initialBucketCapacity) {}
+  public:
+    class AbstractConfigHashSet : public misc::Array2DHashSet<ATNConfig*> {
 
-                        protected:
-                            ATNConfig *asElementType(void *o) override;
+    public:
+      template<typename T1>
+      AbstractConfigHashSet(misc::AbstractEqualityComparator<T1> *comparator) {}
 
-                            std::vector<std::vector<ATNConfig*>> createBuckets(int capacity) override;
+      template<typename T1>
+      AbstractConfigHashSet(misc::AbstractEqualityComparator<T1> *comparator, int initialCapacity, int initialBucketCapacity) {}
 
-                            std::vector<ATNConfig*> createBucket(int capacity) override;
+    protected:
+      ATNConfig *asElementType(void *o) override;
 
-                        };
-                        /// <summary>
-                        /// The reason that we need this is because we don't want the hash map to use
-                        /// the standard hash code and equals. We need all configurations with the same
-                        /// {@code (s,i,_,semctx)} to be equal. Unfortunately, this key effectively doubles
-                        /// the number of objects associated with ATNConfigs. The other solution is to
-                        /// use a hash table that lets us specify the equals/hash code operation.
-                        /// </summary>
-                    public:
-                        class ConfigHashSet : public AbstractConfigHashSet {
-                        public:
-                            ConfigHashSet();
-                        };
+      std::vector<std::vector<ATNConfig*>> createBuckets(int capacity) override;
 
-                    public:
-                        class ConfigEqualityComparator : public misc::AbstractEqualityComparator<ATNConfig*> {
-                        public:
-                            static ConfigEqualityComparator *const INSTANCE;
+      std::vector<ATNConfig*> createBucket(int capacity) override;
 
-                        private:
-                            ConfigEqualityComparator();
+    };
+    /// <summary>
+    /// The reason that we need this is because we don't want the hash map to use
+    /// the standard hash code and equals. We need all configurations with the same
+    /// {@code (s,i,_,semctx)} to be equal. Unfortunately, this key effectively doubles
+    /// the number of objects associated with ATNConfigs. The other solution is to
+    /// use a hash table that lets us specify the equals/hash code operation.
+    /// </summary>
+  public:
+    class ConfigHashSet : public AbstractConfigHashSet {
+    public:
+      ConfigHashSet();
+    };
 
-                        public:
-                            int hashCode(ATNConfig *o);
+  public:
+    class ConfigEqualityComparator : public misc::AbstractEqualityComparator<ATNConfig*> {
+    public:
+      static ConfigEqualityComparator *const INSTANCE;
 
-                            bool equals(ATNConfig *a, ATNConfig *b);
-                        };
+    private:
+      ConfigEqualityComparator();
 
-                        /// <summary>
-                        /// Indicates that the set of configurations is read-only. Do not
-                        ///  allow any code to manipulate the set; DFA states will point at
-                        ///  the sets and they must not change. This does not protect the other
-                        ///  fields; in particular, conflictingAlts is set after
-                        ///  we've made this readonly.
-                        /// </summary>
-                    protected:
-                        bool readonly;
+    public:
+      int hashCode(ATNConfig *o);
 
-                        /// <summary>
-                        /// All configs but hashed by (s, i, _, pi) not including context. Wiped out
-                        /// when we go readonly as this set becomes a DFA state.
-                        /// </summary>
-                    public:
-                        AbstractConfigHashSet *configLookup;
+      bool equals(ATNConfig *a, ATNConfig *b);
+    };
 
-                        /// <summary>
-                        /// Track the elements as they are added to the set; supports get(i) </summary>
-                        std::vector<ATNConfig*> configs;
+    /// <summary>
+    /// Indicates that the set of configurations is read-only. Do not
+    ///  allow any code to manipulate the set; DFA states will point at
+    ///  the sets and they must not change. This does not protect the other
+    ///  fields; in particular, conflictingAlts is set after
+    ///  we've made this readonly.
+    /// </summary>
+  protected:
+    bool readonly;
 
-                        // TODO: these fields make me pretty uncomfortable but nice to pack up info together, saves recomputation
-                        // TODO: can we track conflicts as they are added to save scanning configs later?
-                        int uniqueAlt;
-                  
-                        antlrcpp::BitSet *conflictingAlts;
+    /// <summary>
+    /// All configs but hashed by (s, i, _, pi) not including context. Wiped out
+    /// when we go readonly as this set becomes a DFA state.
+    /// </summary>
+  public:
+    AbstractConfigHashSet *configLookup;
 
-                        // Used in parser and lexer. In lexer, it indicates we hit a pred
-                        // while computing a closure operation.  Don't make a DFA state from this.
-                    public:
-                        bool hasSemanticContext;
-                        bool dipsIntoOuterContext;
+    /// <summary>
+    /// Track the elements as they are added to the set; supports get(i) </summary>
+    std::vector<ATNConfig*> configs;
 
-                        /// <summary>
-                        /// Indicates that this configuration set is part of a full context
-                        ///  LL prediction. It will be used to determine how to merge $. With SLL
-                        ///  it's a wildcard whereas it is not for LL context merge.
-                        /// </summary>
-                        const bool fullCtx;
+    // TODO: these fields make me pretty uncomfortable but nice to pack up info together, saves recomputation
+    // TODO: can we track conflicts as they are added to save scanning configs later?
+    int uniqueAlt;
 
-                    private:
-                        int cachedHashCode;
+    antlrcpp::BitSet *conflictingAlts;
 
-                    public:
-                        ATNConfigSet(bool fullCtx);
-                        ATNConfigSet(); //this(true);
+    // Used in parser and lexer. In lexer, it indicates we hit a pred
+    // while computing a closure operation.  Don't make a DFA state from this.
+  public:
+    bool hasSemanticContext;
+    bool dipsIntoOuterContext;
 
-                        ATNConfigSet(ATNConfigSet *old); //this(old.fullCtx);
+    /// <summary>
+    /// Indicates that this configuration set is part of a full context
+    ///  LL prediction. It will be used to determine how to merge $. With SLL
+    ///  it's a wildcard whereas it is not for LL context merge.
+    /// </summary>
+    const bool fullCtx;
 
-                        virtual bool add(ATNConfig *config);
+  private:
+    int cachedHashCode;
 
-                        /// <summary>
-                        /// Adding a new config means merging contexts with existing configs for
-                        /// {@code (s, i, pi, _)}, where {@code s} is the
-                        /// <seealso cref="ATNConfig#state"/>, {@code i} is the <seealso cref="ATNConfig#alt"/>, and
-                        /// {@code pi} is the <seealso cref="ATNConfig#semanticContext"/>. We use
-                        /// {@code (s,i,pi)} as key.
-                        /// <p/>
-                        /// This method updates <seealso cref="#dipsIntoOuterContext"/> and
-                        /// <seealso cref="#hasSemanticContext"/> when necessary.
-                        /// </summary>
-                        virtual bool add(ATNConfig *config, misc::DoubleKeyMap<PredictionContext*, PredictionContext*, PredictionContext*> *mergeCache);
+  public:
+    ATNConfigSet(bool fullCtx);
+    ATNConfigSet(); //this(true);
 
-                        /// <summary>
-                        /// Return a List holding list of configs </summary>
-                        virtual std::vector<ATNConfig*> elements();
+    ATNConfigSet(ATNConfigSet *old); //this(old.fullCtx);
 
-                        virtual std::vector<ATNState*> *getStates();
+    virtual bool add(ATNConfig *config);
 
-                        virtual std::vector<SemanticContext*> getPredicates();
+    /// <summary>
+    /// Adding a new config means merging contexts with existing configs for
+    /// {@code (s, i, pi, _)}, where {@code s} is the
+    /// <seealso cref="ATNConfig#state"/>, {@code i} is the <seealso cref="ATNConfig#alt"/>, and
+    /// {@code pi} is the <seealso cref="ATNConfig#semanticContext"/>. We use
+    /// {@code (s,i,pi)} as key.
+    /// <p/>
+    /// This method updates <seealso cref="#dipsIntoOuterContext"/> and
+    /// <seealso cref="#hasSemanticContext"/> when necessary.
+    /// </summary>
+    virtual bool add(ATNConfig *config, misc::DoubleKeyMap<PredictionContext*, PredictionContext*, PredictionContext*> *mergeCache);
 
-                        virtual ATNConfig *get(int i);
+    /// <summary>
+    /// Return a List holding list of configs </summary>
+    virtual std::vector<ATNConfig*> elements();
 
-                        virtual void optimizeConfigs(ATNSimulator *interpreter);
+    virtual std::vector<ATNState*> *getStates();
 
-                        template<typename T1>// where T1 : ATNConfig
-                        bool addAll(ATNConfigSet *coll) {
-                            for (auto c : *coll) {
-                                add(c);
-                            }
-                            return false;
-                        }
+    virtual std::vector<SemanticContext*> getPredicates();
 
-                        virtual bool equals(void *o);
+    virtual ATNConfig *get(int i);
 
-                        virtual int hashCode();
+    virtual void optimizeConfigs(ATNSimulator *interpreter);
 
-                        virtual size_t size();
-
-                        virtual bool isEmpty();
-
-                        virtual bool contains(void *o);
-
-                        virtual bool containsFast(ATNConfig *obj);
-
-                        virtual std::vector<ATNConfig*>::iterator const iterator();
-
-                        virtual void clear();
-
-                        virtual bool isReadonly();
-
-                        virtual void setReadonly(bool readonly);
-
-                        virtual std::wstring toString();
-
-                        // satisfy interface
-
-                      virtual std::vector<ATNConfig*> toArray();
-
-                        template<typename T>
-                        T *toArray(T a[])  {
-                            return configLookup->toArray(a);
-                        }
-                        virtual bool remove(void *o);
-
-                        template<typename T1>
-                        bool containsAll(std::vector<T1> *c){
-                            throw new UnsupportedOperationException();
-                        }
-                        template<typename T1>
-                        bool retainAll(std::vector<T1> *c)  {
-                            throw new UnsupportedOperationException();
-                        }
-
-                        template<typename T1>
-                        bool removeAll(std::vector<T1> *c)  {
-                            throw new UnsupportedOperationException();
-                        }
-
-
-                    private:
-                        void InitializeInstanceFields();
-                    };
-
-                }
-            }
-        }
+    template<typename T1>// where T1 : ATNConfig
+    bool addAll(ATNConfigSet *coll) {
+      for (auto c : *coll) {
+        add(c);
+      }
+      return false;
     }
-}
+
+    virtual bool equals(void *o);
+
+    virtual int hashCode();
+
+    virtual size_t size();
+
+    virtual bool isEmpty();
+
+    virtual bool contains(void *o);
+
+    virtual bool containsFast(ATNConfig *obj);
+
+    virtual std::vector<ATNConfig*>::iterator const iterator();
+
+    virtual void clear();
+
+    virtual bool isReadonly();
+
+    virtual void setReadonly(bool readonly);
+
+    virtual std::wstring toString();
+
+    // satisfy interface
+
+    virtual std::vector<ATNConfig*> toArray();
+
+    template<typename T>
+    T *toArray(T a[])  {
+      return configLookup->toArray(a);
+    }
+    virtual bool remove(void *o);
+
+    template<typename T1>
+    bool containsAll(std::vector<T1> *c){
+      throw new UnsupportedOperationException();
+    }
+    template<typename T1>
+    bool retainAll(std::vector<T1> *c)  {
+      throw new UnsupportedOperationException();
+    }
+
+    template<typename T1>
+    bool removeAll(std::vector<T1> *c)  {
+      throw new UnsupportedOperationException();
+    }
+
+
+  private:
+    void InitializeInstanceFields();
+  };
+
+} // namespace atn
+} // namespace runtime
+} // namespace v4
+} // namespace antlr
+} // namespace org

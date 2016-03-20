@@ -1,9 +1,6 @@
-﻿#pragma once
-
-#include "ATNState.h"
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -32,27 +29,31 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#pragma once
+
+#include "ATNState.h"
+
 namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace atn {
+namespace antlr {
+namespace v4 {
+namespace runtime {
+namespace atn {
 
-                    /// <summary>
-                    /// The last node in the ATN for a rule, unless that rule is the start symbol.
-                    ///  In that case, there is one transition to EOF. Later, we might encode
-                    ///  references to all calls to this rule to compute FOLLOW sets for
-                    ///  error handling.
-                    /// </summary>
-                    class RuleStopState final : public ATNState {
+  /// <summary>
+  /// The last node in the ATN for a rule, unless that rule is the start symbol.
+  ///  In that case, there is one transition to EOF. Later, we might encode
+  ///  references to all calls to this rule to compute FOLLOW sets for
+  ///  error handling.
+  /// </summary>
+  class RuleStopState final : public ATNState {
 
-                    public:
-                        virtual int getStateType() override;
+  public:
+    virtual int getStateType() override;
 
-                    };
+  };
 
-                }
-            }
-        }
-    }
-}
+} // namespace atn
+} // namespace runtime
+} // namespace v4
+} // namespace antlr
+} // namespace org

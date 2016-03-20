@@ -1,7 +1,6 @@
-﻿#include "CommonTokenStream.h"
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -30,86 +29,83 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
+#include "Token.h"
 
-                CommonTokenStream::CommonTokenStream(TokenSource *tokenSource) : BufferedTokenStream(tokenSource) {
-                    InitializeInstanceFields();
-                }
+#include "CommonTokenStream.h"
 
-                CommonTokenStream::CommonTokenStream(TokenSource *tokenSource, int channel)
-                : BufferedTokenStream(tokenSource)
-                {
-                    this->channel = channel;
-                }
+using namespace org::antlr::v4::runtime;
 
-                int CommonTokenStream::adjustSeekIndex(int i) {
-                    return nextTokenOnChannel(i, channel);
-                }
+CommonTokenStream::CommonTokenStream(TokenSource *tokenSource) : BufferedTokenStream(tokenSource) {
+  InitializeInstanceFields();
+}
 
-                Token *CommonTokenStream::LB(int k) {
-                    if (k == 0 || (p - k) < 0) {
-                        return nullptr;
-                    }
+CommonTokenStream::CommonTokenStream(TokenSource *tokenSource, int channel)
+: BufferedTokenStream(tokenSource)
+{
+  this->channel = channel;
+}
 
-                    int i = p;
-                    int n = 1;
-                    // find k good tokens looking backwards
-                    while (n <= k) {
-                        // skip off-channel tokens
-                        i = previousTokenOnChannel(i - 1, channel);
-                        n++;
-                    }
-                    if (i < 0) {
-                        return nullptr;
-                    }
-                    return tokens[i];
-                }
+int CommonTokenStream::adjustSeekIndex(int i) {
+  return nextTokenOnChannel(i, channel);
+}
 
-                Token *CommonTokenStream::LT(int k) {
-                    //System.out.println("enter LT("+k+")");
-                    lazyInit();
-                    if (k == 0) {
-                        return nullptr;
-                    }
-                    if (k < 0) {
-                        return LB(-k);
-                    }
-                    int i = p;
-                    int n = 1; // we know tokens[p] is a good one
-                    // find k good tokens
-                    while (n < k) {
-                        // skip off-channel tokens, but make sure to not look past EOF
-                        if (sync(i + 1)) {
-                            i = nextTokenOnChannel(i + 1, channel);
-                        }
-                        n++;
-                    }
-                                //		if ( i>range ) range = i;
-                    return tokens[i];
-                }
+Token *CommonTokenStream::LB(int k) {
+  if (k == 0 || (p - k) < 0) {
+    return nullptr;
+  }
 
-                int CommonTokenStream::getNumberOfOnChannelTokens() {
-                    int n = 0;
-                    fill();
-                    for (size_t i = 0; i < tokens.size(); i++) {
-                        Token *t = tokens[i];
-                        if (t->getChannel() == channel) {
-                            n++;
-                        }
-                        if (t->getType() == Token::_EOF) {
-                            break;
-                        }
-                    }
-                    return n;
-                }
+  int i = p;
+  int n = 1;
+  // find k good tokens looking backwards
+  while (n <= k) {
+    // skip off-channel tokens
+    i = previousTokenOnChannel(i - 1, channel);
+    n++;
+  }
+  if (i < 0) {
+    return nullptr;
+  }
+  return tokens[i];
+}
 
-                void CommonTokenStream::InitializeInstanceFields() {
-                    channel = Token::DEFAULT_CHANNEL;
-                }
-            }
-        }
+Token *CommonTokenStream::LT(int k) {
+  //System.out.println("enter LT("+k+")");
+  lazyInit();
+  if (k == 0) {
+    return nullptr;
+  }
+  if (k < 0) {
+    return LB(-k);
+  }
+  int i = p;
+  int n = 1; // we know tokens[p] is a good one
+             // find k good tokens
+  while (n < k) {
+    // skip off-channel tokens, but make sure to not look past EOF
+    if (sync(i + 1)) {
+      i = nextTokenOnChannel(i + 1, channel);
     }
+    n++;
+  }
+  //		if ( i>range ) range = i;
+  return tokens[i];
+}
+
+int CommonTokenStream::getNumberOfOnChannelTokens() {
+  int n = 0;
+  fill();
+  for (size_t i = 0; i < tokens.size(); i++) {
+    Token *t = tokens[i];
+    if (t->getChannel() == channel) {
+      n++;
+    }
+    if (t->getType() == Token::_EOF) {
+      break;
+    }
+  }
+  return n;
+}
+
+void CommonTokenStream::InitializeInstanceFields() {
+  channel = Token::DEFAULT_CHANNEL;
 }

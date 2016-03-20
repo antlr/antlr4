@@ -1,12 +1,6 @@
-﻿#pragma once
-
-#include "Transition.h"
-#include "Declarations.h"
-
-#include <string>
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -35,35 +29,38 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#pragma once
+
+#include "Transition.h"
+
 namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace atn {
+namespace antlr {
+namespace v4 {
+namespace runtime {
+namespace atn {
 
+  class ActionTransition final : public Transition {
+  public:
+    const int ruleIndex;
+    const int actionIndex;
+    const bool isCtxDependent; // e.g., $i ref in action
 
-                    class ActionTransition final : public Transition {
-                    public:
-                        const int ruleIndex;
-                        const int actionIndex;
-                        const bool isCtxDependent; // e.g., $i ref in action
+    ActionTransition(ATNState *target, int ruleIndex); //this(target, ruleIndex, -1, false);
 
+    ActionTransition(ATNState *target, int ruleIndex, int actionIndex, bool isCtxDependent);
 
-                        ActionTransition(ATNState *target, int ruleIndex); //this(target, ruleIndex, -1, false);
+    virtual int getSerializationType() override;
 
-                        ActionTransition(ATNState *target, int ruleIndex, int actionIndex, bool isCtxDependent);
+    virtual bool isEpsilon() override;
 
-                        virtual int getSerializationType() override;
+    virtual bool matches(int symbol, int minVocabSymbol, int maxVocabSymbol) override;
 
-                        virtual bool isEpsilon() override;
+    virtual std::wstring toString();
+  };
 
-                        virtual bool matches(int symbol, int minVocabSymbol, int maxVocabSymbol) override;
+} // namespace atn
+} // namespace runtime
+} // namespace v4
+} // namespace antlr
+} // namespace org
 
-                        virtual std::wstring toString();
-                    };
-
-                }
-            }
-        }
-    }
-}

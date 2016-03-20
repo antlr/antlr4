@@ -1,10 +1,6 @@
-﻿#pragma once
-
-#include "ANTLRInputStream.h"
-#include <string>
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -33,31 +29,34 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#pragma once
+
+#include "ANTLRInputStream.h"
+
 namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
+namespace antlr {
+namespace v4 {
+namespace runtime {
 
+  /// <summary>
+  /// This is an <seealso cref="ANTLRInputStream"/> that is loaded from a file all at once
+  /// when you construct the object.
+  /// </summary>
+  class ANTLRFileStream : public ANTLRInputStream {
+  protected:
+    std::string fileName;
 
-                /// <summary>
-                /// This is an <seealso cref="ANTLRInputStream"/> that is loaded from a file all at once
-                /// when you construct the object.
-                /// </summary>
-                class ANTLRFileStream : public ANTLRInputStream {
-                protected:
-                    std::string fileName;
+  public:
+    ANTLRFileStream(const std::string &fileName); //this(fileName, nullptr);
 
-                public:
-                    ANTLRFileStream(const std::string &fileName); //this(fileName, nullptr);
+    ANTLRFileStream(const std::string &fileName, const std::string &encoding);
 
-                    ANTLRFileStream(const std::string &fileName, const std::string &encoding);
+    virtual void load(const std::string &fileName, const std::string &encoding);
 
-                    virtual void load(const std::string &fileName, const std::string &encoding);
+    virtual std::string getSourceName() override;
+  };
 
-                    virtual std::string getSourceName() override;
-                };
-
-            }
-        }
-    }
-}
+} // namespace runtime
+} // namespace v4
+} // namespace antlr
+} // namespace org

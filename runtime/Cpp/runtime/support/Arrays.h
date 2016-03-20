@@ -1,16 +1,6 @@
-#pragma once
-
-#include <iostream>
-#include <string>
-#include <vector>
-#include <list>
-#include <stdarg.h>
-
-#include "Declarations.h"
-#include "StringBuilder.h"
-
 /*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
  *
@@ -38,50 +28,53 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#pragma once
+
+#include "StringBuilder.h"
 
 namespace antlrcpp {
+  /// <summary>
+  /// Converts List to string with given separator.
+  /// </summary>
+  /// <param name="list">The list.</param>
+  /// <param name="separator">The separator.</param>
+  /// <returns></returns>
+  class Arrays {
+  public:
+
+    static std::wstring ListToString(std::vector<std::wstring> list,std::wstring separator);
+
     /// <summary>
-    /// Converts List to string with given separator.
+    /// Strings to string list.
     /// </summary>
-    /// <param name="list">The list.</param>
+    /// <param name="items">The items.</param>
     /// <param name="separator">The separator.</param>
     /// <returns></returns>
-    class Arrays {
-    public:
-        
-        static std::wstring ListToString(std::vector<std::wstring> list,std::wstring separator);
-        
-        /// <summary>
-        /// Strings to string list.
-        /// </summary>
-        /// <param name="items">The items.</param>
-        /// <param name="separator">The separator.</param>
-        /// <returns></returns>
-        static std::list<std::wstring> StringToStringList(std::wstring items, char separator);
-        
-        
-        static std::vector<char> asList(const std::wstring *items);
-        
-        // Arguments must be of type wchar_t!
-        static std::vector<std::wstring> asList(int nArgs, ...);
+    static std::list<std::wstring> StringToStringList(std::wstring items, char separator);
 
-        static bool equals(std::vector<int> a, std::vector<int> b);
-        
-        
-        static bool equals(void *a, void* b);
-        
-        /// <summary>
-        /// Strings to string list.
-        /// </summary>
-        /// <param name="items">The items.</param>
-        /// <param name="separator">The separator.</param>
-        /// <returns></returns>
-        
-        static std::list<std::wstring> copyOf(void * obj, int num);
-        
-        static std::wstring copyOf(std::wstring obj, int num);
-        
-        static void arraycopy(void * arrayA, void * arrayB, int num);
-    };
-    
+
+    static std::vector<char> asList(const std::wstring *items);
+
+    // Arguments must be of type wchar_t!
+    static std::vector<std::wstring> asList(int nArgs, ...);
+
+    static bool equals(std::vector<int> a, std::vector<int> b);
+
+
+    static bool equals(void *a, void* b);
+
+    /// <summary>
+    /// Strings to string list.
+    /// </summary>
+    /// <param name="items">The items.</param>
+    /// <param name="separator">The separator.</param>
+    /// <returns></returns>
+
+    static std::list<std::wstring> copyOf(void * obj, int num);
+
+    static std::wstring copyOf(std::wstring obj, int num);
+
+    static void arraycopy(void * arrayA, void * arrayB, int num);
+  };
+
 }

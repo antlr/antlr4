@@ -1,13 +1,6 @@
-﻿#pragma once
-
-#include <string>
-
-#include "RecognitionException.h"
-#include "Declarations.h"
-
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -36,37 +29,39 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#pragma once
+
+#include "RecognitionException.h"
 #include "CharStream.h"
 
 namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
+namespace antlr {
+namespace v4 {
+namespace runtime {
 
+  class LexerNoViableAltException : public RecognitionException {
+    /// <summary>
+    /// Matching attempted at what input index? </summary>
+  private:
+    const int startIndex;
 
-                class LexerNoViableAltException : public RecognitionException {
-                    /// <summary>
-                    /// Matching attempted at what input index? </summary>
-                private:
-                    const int startIndex;
+    /// <summary>
+    /// Which configurations did we try at input.index() that couldn't match input.LA(1)? </summary>
+    atn::ATNConfigSet *const deadEndConfigs;
 
-                    /// <summary>
-                    /// Which configurations did we try at input.index() that couldn't match input.LA(1)? </summary>
-                    atn::ATNConfigSet *const deadEndConfigs;
+  public:
+    LexerNoViableAltException(Lexer *lexer, CharStream *input, int startIndex, atn::ATNConfigSet *deadEndConfigs);
 
-                public:
-                    LexerNoViableAltException(Lexer *lexer, CharStream *input, int startIndex, atn::ATNConfigSet *deadEndConfigs);
+    virtual int getStartIndex();
 
-                    virtual int getStartIndex();
+    virtual atn::ATNConfigSet *getDeadEndConfigs();
 
-                    virtual atn::ATNConfigSet *getDeadEndConfigs();
+    virtual CharStream *getInputStream() override;
 
-                    virtual CharStream *getInputStream() override;
+    virtual std::wstring toString();
+  };
 
-                    virtual std::wstring toString();
-                };
-
-            }
-        }
-    }
-}
+} // namespace runtime
+} // namespace v4
+} // namespace antlr
+} // namespace org

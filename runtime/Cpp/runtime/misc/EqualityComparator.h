@@ -1,9 +1,6 @@
-﻿#pragma once
-
-#include "Exceptions.h"
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -32,49 +29,53 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#pragma once
+
+#include "Exceptions.h"
+
 namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace misc {
+namespace antlr {
+namespace v4 {
+namespace runtime {
+namespace misc {
 
-                    /// <summary>
-                    /// This interface provides an abstract concept of object equality independent of
-                    /// <seealso cref="Object#equals"/> (object equality) and the {@code ==} operator
-                    /// (reference equality). It can be used to provide algorithm-specific unordered
-                    /// comparisons without requiring changes to the object itself.
-                    /// 
-                    /// @author Sam Harwell
-                    /// </summary>
-                    template<typename T>
-                    class EqualityComparator {
+  /// <summary>
+  /// This interface provides an abstract concept of object equality independent of
+  /// <seealso cref="Object#equals"/> (object equality) and the {@code ==} operator
+  /// (reference equality). It can be used to provide algorithm-specific unordered
+  /// comparisons without requiring changes to the object itself.
+  ///
+  /// @author Sam Harwell
+  /// </summary>
+  template<typename T>
+  class EqualityComparator {
 
-                        /// <summary>
-                        /// This method returns a hash code for the specified object.
-                        /// </summary>
-                        /// <param name="obj"> The object. </param>
-                        /// <returns> The hash code for {@code obj}. </returns>
-                    public:
-                        virtual int hashCode(T obj) {
-                            throw new TODOException(L"EqualityComparator::hashCode");
-                            return 0;
-                        }
-
-                        /// <summary>
-                        /// This method tests if two objects are equal.
-                        /// </summary>
-                        /// <param name="a"> The first object to compare. </param>
-                        /// <param name="b"> The second object to compare. </param>
-                        /// <returns> {@code true} if {@code a} equals {@code b}, otherwise {@code false}. </returns>
-                        virtual bool equals(T a, T b) {
-                            new TODOException(L"EqualityComparator::equals");
-                            return false;
-                        }
-
-                    };
-
-                }
-            }
-        }
+    /// <summary>
+    /// This method returns a hash code for the specified object.
+    /// </summary>
+    /// <param name="obj"> The object. </param>
+    /// <returns> The hash code for {@code obj}. </returns>
+  public:
+    virtual int hashCode(T obj) {
+      throw new TODOException(L"EqualityComparator::hashCode");
+      return 0;
     }
-}
+
+    /// <summary>
+    /// This method tests if two objects are equal.
+    /// </summary>
+    /// <param name="a"> The first object to compare. </param>
+    /// <param name="b"> The second object to compare. </param>
+    /// <returns> {@code true} if {@code a} equals {@code b}, otherwise {@code false}. </returns>
+    virtual bool equals(T a, T b) {
+      new TODOException(L"EqualityComparator::equals");
+      return false;
+    }
+
+  };
+
+} // namespace atn
+} // namespace runtime
+} // namespace v4
+} // namespace antlr
+} // namespace org

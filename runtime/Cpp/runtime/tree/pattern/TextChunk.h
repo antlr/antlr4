@@ -1,10 +1,6 @@
-﻿#pragma once
-
-#include "Chunk.h"
-#include <string>
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  * Copyright (c) 2013 Terence Parr
  * Copyright (c) 2013 Sam Harwell
  * All rights reserved.
@@ -33,51 +29,54 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#pragma once
+
+#include "Chunk.h"
+
 namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace tree {
-                    namespace pattern {
+namespace antlr {
+namespace v4 {
+namespace runtime {
+namespace tree {
+namespace pattern {
 
+  /// <summary>
+  /// Represents a span of raw text (concrete syntax) between tags in a tree
+  /// pattern string.
+  /// </summary>
+  class TextChunk : public Chunk {
+    /// <summary>
+    /// This is the backing field for <seealso cref="#getText"/>.
+    /// </summary>
+  private:
+    const std::wstring text;
 
-                        /// <summary>
-                        /// Represents a span of raw text (concrete syntax) between tags in a tree
-                        /// pattern string.
-                        /// </summary>
-                        class TextChunk : public Chunk {
-                            /// <summary>
-                            /// This is the backing field for <seealso cref="#getText"/>.
-                            /// </summary>
-                        private:
-                            const std::wstring text;
+    /// <summary>
+    /// Constructs a new instance of <seealso cref="TextChunk"/> with the specified text.
+    /// </summary>
+    /// <param name="text"> The text of this chunk. </param>
+    /// <exception cref="IllegalArgumentException"> if {@code text} is {@code null}. </exception>
+  public:
+    TextChunk(const std::wstring &text);
 
-                            /// <summary>
-                            /// Constructs a new instance of <seealso cref="TextChunk"/> with the specified text.
-                            /// </summary>
-                            /// <param name="text"> The text of this chunk. </param>
-                            /// <exception cref="IllegalArgumentException"> if {@code text} is {@code null}. </exception>
-                        public:
-                            TextChunk(const std::wstring &text);
+    /// <summary>
+    /// Gets the raw text of this chunk.
+    /// </summary>
+    /// <returns> The text of the chunk. </returns>
+    std::wstring getText();
 
-                            /// <summary>
-                            /// Gets the raw text of this chunk.
-                            /// </summary>
-                            /// <returns> The text of the chunk. </returns>
-                            std::wstring getText();
+    /// <summary>
+    /// {@inheritDoc}
+    /// <p/>
+    /// The implementation for <seealso cref="TextChunk"/> returns the result of
+    /// <seealso cref="#getText()"/> in single quotes.
+    /// </summary>
+    virtual std::wstring toString();
+  };
 
-                            /// <summary>
-                            /// {@inheritDoc}
-                            /// <p/>
-                            /// The implementation for <seealso cref="TextChunk"/> returns the result of
-                            /// <seealso cref="#getText()"/> in single quotes.
-                            /// </summary>
-                            virtual std::wstring toString();
-                        };
-
-                    }
-                }
-            }
-        }
-    }
-}
+} // namespace pattern
+} // namespace tree
+} // namespace runtime
+} // namespace v4
+} // namespace antlr
+} // namespace org

@@ -1,10 +1,6 @@
-﻿#pragma once
-
-#include <string>
-#include "Token.h"
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  * Copyright (c) 2013 Terence Parr
  * Copyright (c) 2013 Dan McLaughlin
  * All rights reserved.
@@ -33,159 +29,161 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#pragma once
+
+#include "Token.h"
+
 namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace tree {
-                    namespace pattern {
+namespace antlr {
+namespace v4 {
+namespace runtime {
+namespace tree {
+namespace pattern {
 
+  /// <summary>
+  /// A <seealso cref="Token"/> object representing an entire subtree matched by a parser
+  /// rule; e.g., {@code <expr>}. These tokens are created for <seealso cref="TagChunk"/>
+  /// chunks where the tag corresponds to a parser rule.
+  /// </summary>
+  class RuleTagToken : public Token {
+    /// <summary>
+    /// This is the backing field for <seealso cref="#getRuleName"/>.
+    /// </summary>
+  private:
+    const std::wstring ruleName;
+    /// <summary>
+    /// The token type for the current token. This is the token type assigned to
+    /// the bypass alternative for the rule during ATN deserialization.
+    /// </summary>
+    const int bypassTokenType;
+    /// <summary>
+    /// This is the backing field for <seealso cref="#getLabel"/>.
+    /// </summary>
+    const std::wstring label;
 
+    /// <summary>
+    /// Constructs a new instance of <seealso cref="RuleTagToken"/> with the specified rule
+    /// name and bypass token type and no label.
+    /// </summary>
+    /// <param name="ruleName"> The name of the parser rule this rule tag matches. </param>
+    /// <param name="bypassTokenType"> The bypass token type assigned to the parser rule.
+    /// </param>
+    /// <exception cref="IllegalArgumentException"> if {@code ruleName} is {@code null}
+    /// or empty. </exception>
+  public:
 
-                        /// <summary>
-                        /// A <seealso cref="Token"/> object representing an entire subtree matched by a parser
-                        /// rule; e.g., {@code <expr>}. These tokens are created for <seealso cref="TagChunk"/>
-                        /// chunks where the tag corresponds to a parser rule.
-                        /// </summary>
-                        class RuleTagToken : public Token {
-                            /// <summary>
-                            /// This is the backing field for <seealso cref="#getRuleName"/>.
-                            /// </summary>
-                        private:
-                            const std::wstring ruleName;
-                            /// <summary>
-                            /// The token type for the current token. This is the token type assigned to
-                            /// the bypass alternative for the rule during ATN deserialization.
-                            /// </summary>
-                            const int bypassTokenType;
-                            /// <summary>
-                            /// This is the backing field for <seealso cref="#getLabel"/>.
-                            /// </summary>
-                            const std::wstring label;
+    RuleTagToken(const std::wstring &ruleName, int bypassTokenType); //this(ruleName, bypassTokenType, nullptr);
 
-                            /// <summary>
-                            /// Constructs a new instance of <seealso cref="RuleTagToken"/> with the specified rule
-                            /// name and bypass token type and no label.
-                            /// </summary>
-                            /// <param name="ruleName"> The name of the parser rule this rule tag matches. </param>
-                            /// <param name="bypassTokenType"> The bypass token type assigned to the parser rule.
-                            /// </param>
-                            /// <exception cref="IllegalArgumentException"> if {@code ruleName} is {@code null}
-                            /// or empty. </exception>
-                        public:
+    /// <summary>
+    /// Constructs a new instance of <seealso cref="RuleTagToken"/> with the specified rule
+    /// name, bypass token type, and label.
+    /// </summary>
+    /// <param name="ruleName"> The name of the parser rule this rule tag matches. </param>
+    /// <param name="bypassTokenType"> The bypass token type assigned to the parser rule. </param>
+    /// <param name="label"> The label associated with the rule tag, or {@code null} if
+    /// the rule tag is unlabeled.
+    /// </param>
+    /// <exception cref="IllegalArgumentException"> if {@code ruleName} is {@code null}
+    /// or empty. </exception>
+    RuleTagToken(const std::wstring &ruleName, int bypassTokenType, const std::wstring &label);
 
-                            RuleTagToken(const std::wstring &ruleName, int bypassTokenType); //this(ruleName, bypassTokenType, nullptr);
+    /// <summary>
+    /// Gets the name of the rule associated with this rule tag.
+    /// </summary>
+    /// <returns> The name of the parser rule associated with this rule tag. </returns>
+    std::wstring getRuleName();
 
-                            /// <summary>
-                            /// Constructs a new instance of <seealso cref="RuleTagToken"/> with the specified rule
-                            /// name, bypass token type, and label.
-                            /// </summary>
-                            /// <param name="ruleName"> The name of the parser rule this rule tag matches. </param>
-                            /// <param name="bypassTokenType"> The bypass token type assigned to the parser rule. </param>
-                            /// <param name="label"> The label associated with the rule tag, or {@code null} if
-                            /// the rule tag is unlabeled.
-                            /// </param>
-                            /// <exception cref="IllegalArgumentException"> if {@code ruleName} is {@code null}
-                            /// or empty. </exception>
-                            RuleTagToken(const std::wstring &ruleName, int bypassTokenType, const std::wstring &label);
+    /// <summary>
+    /// Gets the label associated with the rule tag.
+    /// </summary>
+    /// <returns> The name of the label associated with the rule tag, or
+    /// {@code null} if this is an unlabeled rule tag. </returns>
+    std::wstring getLabel();
 
-                            /// <summary>
-                            /// Gets the name of the rule associated with this rule tag.
-                            /// </summary>
-                            /// <returns> The name of the parser rule associated with this rule tag. </returns>
-                            std::wstring getRuleName();
+    /// <summary>
+    /// {@inheritDoc}
+    /// <p/>
+    /// Rule tag tokens are always placed on the <seealso cref="#DEFAULT_CHANNEL"/>.
+    /// </summary>
+    virtual int getChannel() override;
 
-                            /// <summary>
-                            /// Gets the label associated with the rule tag.
-                            /// </summary>
-                            /// <returns> The name of the label associated with the rule tag, or
-                            /// {@code null} if this is an unlabeled rule tag. </returns>
-                            std::wstring getLabel();
+    /// <summary>
+    /// {@inheritDoc}
+    /// <p/>
+    /// This method returns the rule tag formatted with {@code <} and {@code >}
+    /// delimiters.
+    /// </summary>
+    virtual std::wstring getText() override;
 
-                            /// <summary>
-                            /// {@inheritDoc}
-                            /// <p/>
-                            /// Rule tag tokens are always placed on the <seealso cref="#DEFAULT_CHANNEL"/>.
-                            /// </summary>
-                            virtual int getChannel() override;
+    /// <summary>
+    /// {@inheritDoc}
+    /// <p/>
+    /// Rule tag tokens have types assigned according to the rule bypass
+    /// transitions created during ATN deserialization.
+    /// </summary>
+    virtual int getType() override;
 
-                            /// <summary>
-                            /// {@inheritDoc}
-                            /// <p/>
-                            /// This method returns the rule tag formatted with {@code <} and {@code >}
-                            /// delimiters.
-                            /// </summary>
-                            virtual std::wstring getText() override;
+    /// <summary>
+    /// {@inheritDoc}
+    /// <p/>
+    /// The implementation for <seealso cref="RuleTagToken"/> always returns 0.
+    /// </summary>
+    virtual int getLine() override;
 
-                            /// <summary>
-                            /// {@inheritDoc}
-                            /// <p/>
-                            /// Rule tag tokens have types assigned according to the rule bypass
-                            /// transitions created during ATN deserialization.
-                            /// </summary>
-                            virtual int getType() override;
+    /// <summary>
+    /// {@inheritDoc}
+    /// <p/>
+    /// The implementation for <seealso cref="RuleTagToken"/> always returns -1.
+    /// </summary>
+    virtual int getCharPositionInLine() override;
 
-                            /// <summary>
-                            /// {@inheritDoc}
-                            /// <p/>
-                            /// The implementation for <seealso cref="RuleTagToken"/> always returns 0.
-                            /// </summary>
-                            virtual int getLine() override;
+    /// <summary>
+    /// {@inheritDoc}
+    /// <p/>
+    /// The implementation for <seealso cref="RuleTagToken"/> always returns -1.
+    /// </summary>
+    virtual int getTokenIndex() override;
 
-                            /// <summary>
-                            /// {@inheritDoc}
-                            /// <p/>
-                            /// The implementation for <seealso cref="RuleTagToken"/> always returns -1.
-                            /// </summary>
-                            virtual int getCharPositionInLine() override;
+    /// <summary>
+    /// {@inheritDoc}
+    /// <p/>
+    /// The implementation for <seealso cref="RuleTagToken"/> always returns -1.
+    /// </summary>
+    virtual int getStartIndex() override;
 
-                            /// <summary>
-                            /// {@inheritDoc}
-                            /// <p/>
-                            /// The implementation for <seealso cref="RuleTagToken"/> always returns -1.
-                            /// </summary>
-                            virtual int getTokenIndex() override;
+    /// <summary>
+    /// {@inheritDoc}
+    /// <p/>
+    /// The implementation for <seealso cref="RuleTagToken"/> always returns -1.
+    /// </summary>
+    virtual int getStopIndex() override;
 
-                            /// <summary>
-                            /// {@inheritDoc}
-                            /// <p/>
-                            /// The implementation for <seealso cref="RuleTagToken"/> always returns -1.
-                            /// </summary>
-                            virtual int getStartIndex() override;
+    /// <summary>
+    /// {@inheritDoc}
+    /// <p/>
+    /// The implementation for <seealso cref="RuleTagToken"/> always returns {@code null}.
+    /// </summary>
+    virtual TokenSource *getTokenSource() override;
 
-                            /// <summary>
-                            /// {@inheritDoc}
-                            /// <p/>
-                            /// The implementation for <seealso cref="RuleTagToken"/> always returns -1.
-                            /// </summary>
-                            virtual int getStopIndex() override;
+    /// <summary>
+    /// {@inheritDoc}
+    /// <p/>
+    /// The implementation for <seealso cref="RuleTagToken"/> always returns {@code null}.
+    /// </summary>
+    virtual CharStream *getInputStream() override;
 
-                            /// <summary>
-                            /// {@inheritDoc}
-                            /// <p/>
-                            /// The implementation for <seealso cref="RuleTagToken"/> always returns {@code null}.
-                            /// </summary>
-                            virtual TokenSource *getTokenSource() override;
+    /// <summary>
+    /// {@inheritDoc}
+    /// <p/>
+    /// The implementation for <seealso cref="RuleTagToken"/> returns a string of the form
+    /// {@code ruleName:bypassTokenType}.
+    /// </summary>
+    virtual std::wstring toString();
+  };
 
-                            /// <summary>
-                            /// {@inheritDoc}
-                            /// <p/>
-                            /// The implementation for <seealso cref="RuleTagToken"/> always returns {@code null}.
-                            /// </summary>
-                            virtual CharStream *getInputStream() override;
-
-                            /// <summary>
-                            /// {@inheritDoc}
-                            /// <p/>
-                            /// The implementation for <seealso cref="RuleTagToken"/> returns a string of the form
-                            /// {@code ruleName:bypassTokenType}.
-                            /// </summary>
-                            virtual std::wstring toString();
-                        };
-
-                    }
-                }
-            }
-        }
-    }
-}
+} // namespace pattern
+} // namespace tree
+} // namespace runtime
+} // namespace v4
+} // namespace antlr
+} // namespace org

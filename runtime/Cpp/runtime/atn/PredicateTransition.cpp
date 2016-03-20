@@ -1,8 +1,6 @@
-﻿#include "PredicateTransition.h"
-#include "stringconverter.h"
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -31,36 +29,31 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace atn {
-                    PredicateTransition::PredicateTransition(ATNState *target, int ruleIndex, int predIndex, bool isCtxDependent) : AbstractPredicateTransition(target), ruleIndex(ruleIndex), predIndex(predIndex), isCtxDependent(isCtxDependent) {
-                    }
+#include "PredicateTransition.h"
+#include "stringconverter.h"
 
-                    int PredicateTransition::getSerializationType() {
-                        return PREDICATE;
-                    }
+using namespace org::antlr::v4::runtime::atn;
 
-                    bool PredicateTransition::isEpsilon() {
-                        return true;
-                    }
+PredicateTransition::PredicateTransition(ATNState *target, int ruleIndex, int predIndex, bool isCtxDependent) : AbstractPredicateTransition(target), ruleIndex(ruleIndex), predIndex(predIndex), isCtxDependent(isCtxDependent) {
+}
 
-                    bool PredicateTransition::matches(int symbol, int minVocabSymbol, int maxVocabSymbol) {
-                        return false;
-                    }
+int PredicateTransition::getSerializationType() {
+  return PREDICATE;
+}
 
-                    atn::SemanticContext::Predicate *PredicateTransition::getPredicate() {
-                        // TODO: who is responsible for managing this memory?
-                        return new SemanticContext::Predicate(ruleIndex, predIndex, isCtxDependent);
-                    }
+bool PredicateTransition::isEpsilon() {
+  return true;
+}
 
-                    std::wstring PredicateTransition::toString() {
-                        return std::wstring(L"pred_") + antlrcpp::StringConverterHelper::toString(ruleIndex) + std::wstring(L":") + antlrcpp::StringConverterHelper::toString(predIndex);
-                    }
-                }
-            }
-        }
-    }
+bool PredicateTransition::matches(int symbol, int minVocabSymbol, int maxVocabSymbol) {
+  return false;
+}
+
+SemanticContext::Predicate *PredicateTransition::getPredicate() {
+  // TODO: who is responsible for managing this memory?
+  return new SemanticContext::Predicate(ruleIndex, predIndex, isCtxDependent);
+}
+
+std::wstring PredicateTransition::toString() {
+  return std::wstring(L"pred_") + antlrcpp::StringConverterHelper::toString(ruleIndex) + std::wstring(L":") + antlrcpp::StringConverterHelper::toString(predIndex);
 }

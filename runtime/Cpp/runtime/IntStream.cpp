@@ -1,7 +1,6 @@
-﻿#include "IntStream.h"
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -30,12 +29,8 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                const std::wstring IntStream::UNKNOWN_SOURCE_NAME = L"<unknown>";
-            }
-        }
-    }
-}
+#include "IntStream.h"
+
+using namespace org::antlr::v4::runtime;
+
+const std::wstring IntStream::UNKNOWN_SOURCE_NAME = L"<unknown>";

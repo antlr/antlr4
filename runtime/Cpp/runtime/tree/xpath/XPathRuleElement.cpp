@@ -1,10 +1,6 @@
-﻿#include "XPathRuleElement.h"
-#include "ParseTree.h"
-#include "Trees.h"
-#include "ParserRuleContext.h"
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -33,40 +29,33 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace tree {
-                    namespace xpath {
+#include "Trees.h"
 
+#include "XPathRuleElement.h"
 
-                        XPathRuleElement::XPathRuleElement(const std::wstring &ruleName, int ruleIndex) : XPathElement(ruleName) {
-                            InitializeInstanceFields();
-                            this->ruleIndex = ruleIndex;
-                        }
+using namespace org::antlr::v4::runtime::tree;
+using namespace org::antlr::v4::runtime::tree::xpath;
 
-                        std::vector<ParseTree*> *XPathRuleElement::evaluate(ParseTree *t) {
-                                    // return all children of t that match nodeName
-                            std::vector<ParseTree*> *nodes = new std::vector<ParseTree*>();
-                            for (auto c : Trees::getChildren(t)) {
-                                if (dynamic_cast<ParserRuleContext*>(c) != nullptr) {
-                                    ParserRuleContext *ctx = static_cast<ParserRuleContext*>(c);
-                                    if ((((RuleContext*)ctx)->getRuleIndex() == ruleIndex && !invert) || (((RuleContext*)ctx)->getRuleIndex() != ruleIndex && invert)) {
-                                        nodes->push_back((ParseTree*)ctx);
-                                        
-                                    }
-                                }
-                            }
-                            return nodes;
-                        }
+XPathRuleElement::XPathRuleElement(const std::wstring &ruleName, int ruleIndex) : XPathElement(ruleName) {
+  InitializeInstanceFields();
+  this->ruleIndex = ruleIndex;
+}
 
-                        void XPathRuleElement::InitializeInstanceFields() {
-                            ruleIndex = 0;
-                        }
-                    }
-                }
-            }
-        }
+std::vector<ParseTree*> *XPathRuleElement::evaluate(ParseTree *t) {
+  // return all children of t that match nodeName
+  std::vector<ParseTree*> *nodes = new std::vector<ParseTree*>();
+  for (auto c : Trees::getChildren(t)) {
+    if (dynamic_cast<ParserRuleContext*>(c) != nullptr) {
+      ParserRuleContext *ctx = static_cast<ParserRuleContext*>(c);
+      if ((((RuleContext*)ctx)->getRuleIndex() == ruleIndex && !invert) || (((RuleContext*)ctx)->getRuleIndex() != ruleIndex && invert)) {
+        nodes->push_back((ParseTree*)ctx);
+
+      }
     }
+  }
+  return nodes;
+}
+
+void XPathRuleElement::InitializeInstanceFields() {
+  ruleIndex = 0;
 }

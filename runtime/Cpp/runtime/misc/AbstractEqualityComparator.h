@@ -1,9 +1,6 @@
-﻿#pragma once
-
-#include "EqualityComparator.h"
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -32,25 +29,29 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#pragma once
+
+#include "EqualityComparator.h"
+
 namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace misc {
+namespace antlr {
+namespace v4 {
+namespace runtime {
+namespace misc {
 
-                    /// <summary>
-                    /// This abstract base class is provided so performance-critical applications can
-                    /// use virtual- instead of interface-dispatch when calling comparator methods.
-                    /// 
-                    /// @author Sam Harwell
-                    /// </summary>
-                    template<typename T>
-                    class AbstractEqualityComparator : public EqualityComparator<T> {
+  /// <summary>
+  /// This abstract base class is provided so performance-critical applications can
+  /// use virtual- instead of interface-dispatch when calling comparator methods.
+  ///
+  /// @author Sam Harwell
+  /// </summary>
+  template<typename T>
+  class AbstractEqualityComparator : public EqualityComparator<T> {
 
-                    };
+  };
 
-                }
-            }
-        }
-    }
-}
+} // namespace atn
+} // namespace runtime
+} // namespace v4
+} // namespace antlr
+} // namespace org

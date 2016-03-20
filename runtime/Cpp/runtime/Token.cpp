@@ -1,7 +1,6 @@
-﻿#include "Token.h"
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -30,17 +29,13 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                const int Token::INVALID_TYPE;
-                const int Token::EPSILON;
-                const int Token::MIN_USER_TOKEN_TYPE;
-                const int Token::_EOF;
-                const int Token::DEFAULT_CHANNEL;
-                const int Token::HIDDEN_CHANNEL;
-            }
-        }
-    }
-}
+#include "Token.h"
+
+using namespace org::antlr::v4::runtime;
+
+const int Token::INVALID_TYPE;
+const int Token::EPSILON;
+const int Token::MIN_USER_TOKEN_TYPE;
+const int Token::_EOF;
+const int Token::DEFAULT_CHANNEL;
+const int Token::HIDDEN_CHANNEL;

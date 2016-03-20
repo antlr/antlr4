@@ -1,9 +1,6 @@
-﻿#include "RangeTransition.h"
-#include "ATNState.h"
-#include "IntervalSet.h"
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -32,32 +29,28 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace atn {
+#include "IntervalSet.h"
 
-                    RangeTransition::RangeTransition(ATNState *target, int from, int to) : Transition(target), from(from), to(to) {
-                    }
+#include "RangeTransition.h"
 
-                    int RangeTransition::getSerializationType() {
-                        return RANGE;
-                    }
+using namespace org::antlr::v4::runtime;
+using namespace org::antlr::v4::runtime::atn;
 
-                    misc::IntervalSet *RangeTransition::label() {
-                        return misc::IntervalSet::of(from, to);
-                    }
+RangeTransition::RangeTransition(ATNState *target, int from, int to) : Transition(target), from(from), to(to) {
+}
 
-                    bool RangeTransition::matches(int symbol, int minVocabSymbol, int maxVocabSymbol) {
-                        return symbol >= from && symbol <= to;
-                    }
+int RangeTransition::getSerializationType() {
+  return RANGE;
+}
 
-                    std::wstring RangeTransition::toString() {
-                        return std::wstring(L"'") + static_cast<wchar_t>(from) + std::wstring(L"'..'") + static_cast<wchar_t>(to) + std::wstring(L"'");
-                    }
-                }
-            }
-        }
-    }
+misc::IntervalSet *RangeTransition::label() {
+  return misc::IntervalSet::of(from, to);
+}
+
+bool RangeTransition::matches(int symbol, int minVocabSymbol, int maxVocabSymbol) {
+  return symbol >= from && symbol <= to;
+}
+
+std::wstring RangeTransition::toString() {
+  return std::wstring(L"'") + static_cast<wchar_t>(from) + std::wstring(L"'..'") + static_cast<wchar_t>(to) + std::wstring(L"'");
 }

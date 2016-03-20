@@ -1,11 +1,6 @@
-﻿#pragma once
-
-#include <string>
-#include <unordered_map>
-#include <vector>
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -34,66 +29,67 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#pragma once
+
 // TODO:  Come back to this after the base runtime works.
 
 namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace misc {
+namespace antlr {
+namespace v4 {
+namespace runtime {
+namespace misc {
 
+  class Utils {
+    // Seriously: why isn't this built in to java? ugh!
+  public:
+    //                        template<typename T>
+    //                        static std::wstring join(Iterator<T> *iter, const std::wstring &separator);
+    //
+    //                        template<typename T>
+    //                        static std::wstring join(T array_Renamed[], const std::wstring &separator);
 
-                    class Utils {
-                        // Seriously: why isn't this built in to java? ugh!
-                    public:
-//                        template<typename T>
-//                        static std::wstring join(Iterator<T> *iter, const std::wstring &separator);
-//
-//                        template<typename T>
-//                        static std::wstring join(T array_Renamed[], const std::wstring &separator);
+    static std::wstring escapeWhitespace(const std::wstring &s, bool escapeSpaces);
 
-                        static std::wstring escapeWhitespace(const std::wstring &s, bool escapeSpaces);
+    //                        static void writeFile(const std::wstring &fileName, const std::wstring &content) throw(IOException);
+    //
+    //                        static void waitForClose(Window *const window) throw(InterruptedException);
+    //
+    //                    private:
+    //                        class ThreadAnonymousInnerClassHelper : public Thread {
+    //                        private:
+    //                            Window *window;
+    //                            auto lock;
+    //
+    //                        public:
+    //                            ThreadAnonymousInnerClassHelper(Window *window, auto lock);
+    //
+    //                            virtual void run() override;
+    //                        };
+    //
+    //                    private:
+    //                        class WindowAdapterAnonymousInnerClassHelper : public WindowAdapter {
+    //                        private:
+    //                            Window *window;
+    //                            auto lock;
+    //
+    //                        public:
+    //                            WindowAdapterAnonymousInnerClassHelper(Window *window, auto lock);
+    //
+    //                            virtual void windowClosing(WindowEvent *arg0) override;
+    //                        };
+    //
+    //                        /// <summary>
+    //                        /// Convert array of strings to string->index map. Useful for
+    //                        ///  converting rulenames to name->ruleindex map.
+    //                        /// </summary>
+    //                    public:
+    //                        static Map<std::wstring, int> *toMap(std::wstring keys[]);
 
-//                        static void writeFile(const std::wstring &fileName, const std::wstring &content) throw(IOException);
-//
-//                        static void waitForClose(Window *const window) throw(InterruptedException);
-//
-//                    private:
-//                        class ThreadAnonymousInnerClassHelper : public Thread {
-//                        private:
-//                            Window *window;
-//                            auto lock;
-//
-//                        public:
-//                            ThreadAnonymousInnerClassHelper(Window *window, auto lock);
-//
-//                            virtual void run() override;
-//                        };
-//
-//                    private:
-//                        class WindowAdapterAnonymousInnerClassHelper : public WindowAdapter {
-//                        private:
-//                            Window *window;
-//                            auto lock;
-//
-//                        public:
-//                            WindowAdapterAnonymousInnerClassHelper(Window *window, auto lock);
-//
-//                            virtual void windowClosing(WindowEvent *arg0) override;
-//                        };
-//
-//                        /// <summary>
-//                        /// Convert array of strings to string->index map. Useful for
-//                        ///  converting rulenames to name->ruleindex map.
-//                        /// </summary>
-//                    public:
-//                        static Map<std::wstring, int> *toMap(std::wstring keys[]);
-
-                        static wchar_t *toCharArray(const std::vector<int> *data);
-                    };
-
-                }
-            }
-        }
-    }
-}
+    static wchar_t *toCharArray(const std::vector<int> *data);
+  };
+  
+} // namespace atn
+} // namespace runtime
+} // namespace v4
+} // namespace antlr
+} // namespace org

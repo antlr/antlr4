@@ -1,10 +1,6 @@
-﻿#pragma once
-
-#include "ATNState.h"
-#include "BlockStartState.h"
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -33,23 +29,27 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#pragma once
+
+#include "ATNState.h"
+
 namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace atn {
+namespace antlr {
+namespace v4 {
+namespace runtime {
+namespace atn {
 
-                    /// <summary>
-                    /// Terminal node of a simple {@code (a|b|c)} block. </summary>
-                    class BlockEndState final : public ATNState {
-                    public:
-                        BlockStartState *startState;
+  /// <summary>
+  /// Terminal node of a simple {@code (a|b|c)} block. </summary>
+  class BlockEndState final : public ATNState {
+  public:
+    BlockStartState *startState;
 
-                        virtual int getStateType() override;
-                    };
+    virtual int getStateType() override;
+  };
 
-                }
-            }
-        }
-    }
-}
+} // namespace atn
+} // namespace runtime
+} // namespace v4
+} // namespace antlr
+} // namespace org

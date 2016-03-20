@@ -1,10 +1,6 @@
-﻿#pragma once
-
-#include "BlockStartState.h"
-#include "PlusLoopbackState.h"
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -33,27 +29,31 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#pragma once
+
+#include "BlockStartState.h"
+
 namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace atn {
+namespace antlr {
+namespace v4 {
+namespace runtime {
+namespace atn {
 
-                    /// <summary>
-                    /// Start of {@code (A|B|...)+} loop. Technically a decision state, but
-                    ///  we don't use for code generation; somebody might need it, so I'm defining
-                    ///  it for completeness. In reality, the <seealso cref="PlusLoopbackState"/> node is the
-                    ///  real decision-making note for {@code A+}.
-                    /// </summary>
-                    class PlusBlockStartState final : public BlockStartState {
-                    public:
-                        PlusLoopbackState *loopBackState;
+  /// <summary>
+  /// Start of {@code (A|B|...)+} loop. Technically a decision state, but
+  ///  we don't use for code generation; somebody might need it, so I'm defining
+  ///  it for completeness. In reality, the <seealso cref="PlusLoopbackState"/> node is the
+  ///  real decision-making note for {@code A+}.
+  /// </summary>
+  class PlusBlockStartState final : public BlockStartState {
+  public:
+    PlusLoopbackState *loopBackState;
 
-                        virtual int getStateType() override;
-                    };
+    virtual int getStateType() override;
+  };
 
-                }
-            }
-        }
-    }
-}
+} // namespace atn
+} // namespace runtime
+} // namespace v4
+} // namespace antlr
+} // namespace org

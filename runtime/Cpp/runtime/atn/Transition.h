@@ -1,15 +1,6 @@
-﻿#pragma once
-
-#include "ATNState.h"
-#include "Declarations.h"
-
-
-#include <string>
-#include <vector>
-#include <map>
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -38,62 +29,65 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#pragma once
+
 namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace atn {
-                    /// <summary>
-                    /// An ATN transition between any two ATN states.  Subclasses define
-                    ///  atom, set, epsilon, action, predicate, rule transitions.
-                    /// <p/>
-                    ///  This is a one way link.  It emanates from a state (usually via a list of
-                    ///  transitions) and has a target state.
-                    /// <p/>
-                    ///  Since we never have to change the ATN transitions once we construct it,
-                    ///  we can fix these transitions as specific classes. The DFA transitions
-                    ///  on the other hand need to update the labels as it adds transitions to
-                    ///  the states. We'll use the term Edge for the DFA to distinguish them from
-                    ///  ATN transitions.
-                    /// </summary>
-                    class Transition {
-                        // constants for serialization
-                    public:
-                        static const int EPSILON = 1;
-                        static const int RANGE = 2;
-                        static const int RULE = 3;
-                        static const int PREDICATE = 4; // e.g., {isType(input.LT(1))}?
-                        static const int ATOM = 5;
-                        static const int ACTION = 6;
-                        static const int SET = 7; // ~(A|B) or ~atom, wildcard, which convert to next 2
-                        static const int NOT_SET = 8;
-                        static const int WILDCARD = 9;
-                        static const int PRECEDENCE = 10;
+namespace antlr {
+namespace v4 {
+namespace runtime {
+namespace atn {
+
+  /// <summary>
+  /// An ATN transition between any two ATN states.  Subclasses define
+  ///  atom, set, epsilon, action, predicate, rule transitions.
+  /// <p/>
+  ///  This is a one way link.  It emanates from a state (usually via a list of
+  ///  transitions) and has a target state.
+  /// <p/>
+  ///  Since we never have to change the ATN transitions once we construct it,
+  ///  we can fix these transitions as specific classes. The DFA transitions
+  ///  on the other hand need to update the labels as it adds transitions to
+  ///  the states. We'll use the term Edge for the DFA to distinguish them from
+  ///  ATN transitions.
+  /// </summary>
+  class Transition {
+    // constants for serialization
+  public:
+    static const int EPSILON = 1;
+    static const int RANGE = 2;
+    static const int RULE = 3;
+    static const int PREDICATE = 4; // e.g., {isType(input.LT(1))}?
+    static const int ATOM = 5;
+    static const int ACTION = 6;
+    static const int SET = 7; // ~(A|B) or ~atom, wildcard, which convert to next 2
+    static const int NOT_SET = 8;
+    static const int WILDCARD = 9;
+    static const int PRECEDENCE = 10;
 
 
-                        static const std::vector<std::wstring> serializationNames;
+    static const std::vector<std::wstring> serializationNames;
 
-                        /// <summary>
-                        /// The target of this transition. </summary>
-                        ATNState *target;
+    /// <summary>
+    /// The target of this transition. </summary>
+    ATNState *target;
 
-                    protected:
-                        Transition(ATNState *target);
+  protected:
+    Transition(ATNState *target);
 
-                    public:
-                        virtual int getSerializationType() = 0;
+  public:
+    virtual int getSerializationType() = 0;
 
-                        /// <summary>
-                        /// Are we epsilon, action, sempred? </summary>
-                        virtual bool isEpsilon();
+    /// <summary>
+    /// Are we epsilon, action, sempred? </summary>
+    virtual bool isEpsilon();
 
-                        virtual misc::IntervalSet *label();
+    virtual misc::IntervalSet *label();
 
-                        virtual bool matches(int symbol, int minVocabSymbol, int maxVocabSymbol) = 0;
-                    };
+    virtual bool matches(int symbol, int minVocabSymbol, int maxVocabSymbol) = 0;
+  };
 
-                }
-            }
-        }
-    }
-}
+} // namespace atn
+} // namespace runtime
+} // namespace v4
+} // namespace antlr
+} // namespace org

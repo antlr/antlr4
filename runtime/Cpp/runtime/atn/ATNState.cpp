@@ -1,11 +1,6 @@
-﻿#include "ATNState.h"
-#include "ATN.h"
-#include "Transition.h"
-#include "IntervalSet.h"
-#include <iostream>
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -34,95 +29,93 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace atn {
-                    
-                    ATNState::~ATNState() {};
-                    
-                    const int ATNState::INITIAL_NUM_TRANSITIONS;
-                    
+#include "ATN.h"
+#include "Transition.h"
+#include "IntervalSet.h"
+#include "stringconverter.h"
 
-                    const wchar_t * ATNState::serializationNames[] =  {L"INVALID", L"BASIC", L"RULE_START", L"BLOCK_START",
-                        L"PLUS_BLOCK_START", L"STAR_BLOCK_START", L"TOKEN_START", L"RULE_STOP",
-                        L"BLOCK_END", L"STAR_LOOP_BACK", L"STAR_LOOP_ENTRY", L"PLUS_LOOP_BACK", L"LOOP_END"};
-                    
-                    int ATNState::hashCode() {
-                        return stateNumber;
-                    }
-                    
-                    bool ATNState::equals(void *o) {
-                        // are these states same object?
-                        if (o != nullptr) {
-                            return stateNumber == (static_cast<ATNState*>(o))->stateNumber;
-                        }
-                        return false;
-                    }
-                    
-                    bool ATNState::isNonGreedyExitState() {
-                        return false;
-                    }
-                    
-                    std::wstring ATNState::toString() const {
-                        return antlrcpp::StringConverterHelper::toString(stateNumber);
-                    }
-                    
-                    std::vector<Transition*> ATNState::getTransitions() {
-                        std::vector<Transition*> arr(transitions);
+#include "ATNState.h"
 
-                        return arr;
-                    }
-                    
-                    int ATNState::getNumberOfTransitions() {
-                        return (int)transitions.size();
-                    }
-                    
-                    void ATNState::addTransition(Transition *e) {
-                        addTransition((int)transitions.size(), e);
-                    }
-                    
-                    void ATNState::addTransition(int index, Transition *e) {
-                        if (transitions.empty()) {
-                            epsilonOnlyTransitions = e->isEpsilon();
-                        } else if (epsilonOnlyTransitions != e->isEpsilon()) {
-                            std::cerr << L"ATN state %d has both epsilon and non-epsilon transitions.\n" << stateNumber;
-                            epsilonOnlyTransitions = false;
-                        }
-                        
-                        transitions.insert(transitions.begin() + index, e);
-                    }
-                    
-                    atn::Transition *ATNState::transition(int i) {
-                        return transitions[i];
-                    }
-                    
-                    void ATNState::setTransition(int i, Transition *e) {
-                        transitions[i] = e;
-                    }
-                    
-                    atn::Transition *ATNState::removeTransition(int index) {
-                        transitions.erase(transitions.begin() + index);
-                        return nullptr;
-                    }
-                    
-                    bool ATNState::onlyHasEpsilonTransitions() {
-                        return epsilonOnlyTransitions;
-                    }
-                    
-                    void ATNState::setRuleIndex(int ruleIndex) {
-                        this->ruleIndex = ruleIndex;
-                    }
-                    
-                    void ATNState::InitializeInstanceFields() {
-                        atn = 0;
-                        stateNumber = INVALID_STATE_NUMBER;
-                        ruleIndex = 0;
-                        epsilonOnlyTransitions = false;
-                    }
-                }
-            }
-        }
-    }
+using namespace org::antlr::v4::runtime::atn;
+
+ATNState::~ATNState() {};
+
+const int ATNState::INITIAL_NUM_TRANSITIONS;
+
+
+const wchar_t * ATNState::serializationNames[] =  {L"INVALID", L"BASIC", L"RULE_START", L"BLOCK_START",
+  L"PLUS_BLOCK_START", L"STAR_BLOCK_START", L"TOKEN_START", L"RULE_STOP",
+  L"BLOCK_END", L"STAR_LOOP_BACK", L"STAR_LOOP_ENTRY", L"PLUS_LOOP_BACK", L"LOOP_END"};
+
+int ATNState::hashCode() {
+  return stateNumber;
+}
+
+bool ATNState::equals(void *o) {
+  // are these states same object?
+  if (o != nullptr) {
+    return stateNumber == (static_cast<ATNState*>(o))->stateNumber;
+  }
+  return false;
+}
+
+bool ATNState::isNonGreedyExitState() {
+  return false;
+}
+
+std::wstring ATNState::toString() const {
+  return antlrcpp::StringConverterHelper::toString(stateNumber);
+}
+
+std::vector<Transition*> ATNState::getTransitions() {
+  std::vector<Transition*> arr(transitions);
+
+  return arr;
+}
+
+int ATNState::getNumberOfTransitions() {
+  return (int)transitions.size();
+}
+
+void ATNState::addTransition(Transition *e) {
+  addTransition((int)transitions.size(), e);
+}
+
+void ATNState::addTransition(int index, Transition *e) {
+  if (transitions.empty()) {
+    epsilonOnlyTransitions = e->isEpsilon();
+  } else if (epsilonOnlyTransitions != e->isEpsilon()) {
+    std::cerr << L"ATN state %d has both epsilon and non-epsilon transitions.\n" << stateNumber;
+    epsilonOnlyTransitions = false;
+  }
+
+  transitions.insert(transitions.begin() + index, e);
+}
+
+Transition *ATNState::transition(int i) {
+  return transitions[i];
+}
+
+void ATNState::setTransition(int i, Transition *e) {
+  transitions[i] = e;
+}
+
+Transition *ATNState::removeTransition(int index) {
+  transitions.erase(transitions.begin() + index);
+  return nullptr;
+}
+
+bool ATNState::onlyHasEpsilonTransitions() {
+  return epsilonOnlyTransitions;
+}
+
+void ATNState::setRuleIndex(int ruleIndex) {
+  this->ruleIndex = ruleIndex;
+}
+
+void ATNState::InitializeInstanceFields() {
+  atn = 0;
+  stateNumber = INVALID_STATE_NUMBER;
+  ruleIndex = 0;
+  epsilonOnlyTransitions = false;
 }

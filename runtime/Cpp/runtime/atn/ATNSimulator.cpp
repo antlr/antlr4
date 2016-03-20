@@ -1,18 +1,6 @@
-﻿#include <map>
-
-#include "ATNSimulator.h"
-#include "ATNDeserializer.h"
-#include "ATNConfigSet.h"
-#include "DFAState.h"
-#include "limits.h"
-#include "ATNType.h"
-#include "PredictionContextCache.h"
-#include "PredictionContext.h"
-#include "ATN.h"
-
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -41,62 +29,63 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace atn {
+#include "ATNType.h"
+#include "ATNConfigSet.h"
+#include "DFAState.h"
+#include "PredictionContextCache.h"
+#include "ATNDeserializer.h"
+#include "EmptyPredictionContext.h"
 
-                    dfa::DFAState * ATNSimulator::ERROR = new dfa::DFAState();
-                    
-                    ATNSimulator::ATNSimulator() {
-                        ERROR = new dfa::DFAState(new ATNConfigSet());
-                        ERROR->stateNumber = INT32_MAX;
-                        sharedContextCache = new PredictionContextCache();
-                        
-                        atn = new ATN(ATNType::LEXER, 0);
-                    }
+#include "ATNSimulator.h"
 
-                    ATNSimulator::ATNSimulator(ATN *atn, PredictionContextCache *sharedContextCache) : atn(atn), sharedContextCache(sharedContextCache) {
-                    }
+using namespace org::antlr::v4::runtime::dfa;
+using namespace org::antlr::v4::runtime::atn;
 
-                    atn::PredictionContextCache *ATNSimulator::getSharedContextCache() {
-                        return sharedContextCache;
-                    }
+DFAState * ATNSimulator::ERROR = new DFAState();
 
-                    atn::PredictionContext *ATNSimulator::getCachedContext(PredictionContext *context) {
-                        if (sharedContextCache == nullptr) {
-                            return context;
-                        }
+ATNSimulator::ATNSimulator() {
+  ERROR = new dfa::DFAState(new ATNConfigSet());
+  ERROR->stateNumber = INT32_MAX;
+  sharedContextCache = new PredictionContextCache();
 
-						{
-							std::lock_guard<std::mutex> lck(mtx);
-							std::map<PredictionContext*, PredictionContext*> *visited = new std::map<PredictionContext*, PredictionContext*>();
-							return PredictionContext::getCachedContext(context, sharedContextCache, visited);
-						}
-                    }
+  atn = new ATN(ATNType::LEXER, 0);
+}
 
-                    atn::ATN *ATNSimulator::deserialize(wchar_t data[]) {
-                        return (new ATNDeserializer())->deserialize(data);
-                    }
+ATNSimulator::ATNSimulator(ATN *atn, PredictionContextCache *sharedContextCache) : atn(atn), sharedContextCache(sharedContextCache) {
+}
 
-                    void ATNSimulator::checkCondition(bool condition) {
-                        (new ATNDeserializer())->checkCondition(condition);
-                    }
+PredictionContextCache *ATNSimulator::getSharedContextCache() {
+  return sharedContextCache;
+}
 
-                    void ATNSimulator::checkCondition(bool condition, const std::wstring &message) {
-                        (new ATNDeserializer())->checkCondition(condition, message);
-                    }
+PredictionContext *ATNSimulator::getCachedContext(PredictionContext *context) {
+  if (sharedContextCache == nullptr) {
+    return context;
+  }
 
-                    atn::Transition *ATNSimulator::edgeFactory(ATN *atn, int type, int src, int trg, int arg1, int arg2, int arg3, std::vector<misc::IntervalSet*> &sets) {
-                        return (new ATNDeserializer())->edgeFactory(atn, type, src, trg, arg1, arg2, arg3, sets);
-                    }
+  {
+    std::lock_guard<std::mutex> lck(mtx);
+    std::map<PredictionContext*, PredictionContext*> *visited = new std::map<PredictionContext*, PredictionContext*>();
+    return PredictionContext::getCachedContext(context, sharedContextCache, visited);
+  }
+}
 
-                    atn::ATNState *ATNSimulator::stateFactory(int type, int ruleIndex) {
-                        return (new ATNDeserializer())->stateFactory(type, ruleIndex);
-                    }
-                }
-            }
-        }
-    }
+ATN *ATNSimulator::deserialize(wchar_t data[]) {
+  return (new ATNDeserializer())->deserialize(data);
+}
+
+void ATNSimulator::checkCondition(bool condition) {
+  (new ATNDeserializer())->checkCondition(condition);
+}
+
+void ATNSimulator::checkCondition(bool condition, const std::wstring &message) {
+  (new ATNDeserializer())->checkCondition(condition, message);
+}
+
+Transition *ATNSimulator::edgeFactory(ATN *atn, int type, int src, int trg, int arg1, int arg2, int arg3, std::vector<misc::IntervalSet*> &sets) {
+  return (new ATNDeserializer())->edgeFactory(atn, type, src, trg, arg1, arg2, arg3, sets);
+}
+
+ATNState *ATNSimulator::stateFactory(int type, int ruleIndex) {
+  return (new ATNDeserializer())->stateFactory(type, ruleIndex);
 }

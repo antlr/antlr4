@@ -1,7 +1,6 @@
-#pragma once
-
 /*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -30,21 +29,22 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#pragma once
 
 namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                
-                template<typename Symbol, typename ATNInterpreter>
-                class IRecognizer {
-                public:
-                    
-                    virtual int getState() = 0;
-                    
-                };
-                
-            }
-        }
-    }
-}
+namespace antlr {
+namespace v4 {
+namespace runtime {
+
+  template<typename Symbol, typename ATNInterpreter>
+  class IRecognizer {
+  public:
+
+    virtual int getState() = 0;
+
+  };
+
+} // namespace runtime
+} // namespace v4
+} // namespace antlr
+} // namespace org

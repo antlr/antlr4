@@ -1,13 +1,6 @@
-﻿#pragma once
-
-#include "DFASerializer.h"
-#include <string>
-
-#include "Declarations.h"
-
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -36,22 +29,27 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#pragma once
+
+#include "DFASerializer.h"
+
 namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace dfa {
-                    class LexerDFASerializer : public DFASerializer {
-                    public:
-                        LexerDFASerializer(DFA *dfa);
+namespace antlr {
+namespace v4 {
+namespace runtime {
+namespace dfa {
 
-                    protected:
-                        std::vector<std::wstring> lexerTokenNames_;
-                        virtual std::wstring getEdgeLabel(int i) override;
-                    };
+  class LexerDFASerializer : public DFASerializer {
+  public:
+    LexerDFASerializer(DFA *dfa);
 
-                }
-            }
-        }
-    }
-}
+  protected:
+    std::vector<std::wstring> lexerTokenNames_;
+    virtual std::wstring getEdgeLabel(int i) override;
+  };
+
+} // namespace atn
+} // namespace runtime
+} // namespace v4
+} // namespace antlr
+} // namespace org

@@ -1,12 +1,6 @@
-﻿#pragma once
-
-#include "ATNConfig.h"
-#include "ATNState.h"
-#include "Declarations.h"
-
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -35,47 +29,51 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#pragma once
+
+#include "ATNConfig.h"
+
 namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace atn {
+namespace antlr {
+namespace v4 {
+namespace runtime {
+namespace atn {
 
-                    class LexerATNConfig : public ATNConfig {
-                        /// <summary>
-                        /// Capture lexer action we traverse </summary>
-                    public:
-                        int lexerActionIndex;
+  class LexerATNConfig : public ATNConfig {
+    /// <summary>
+    /// Capture lexer action we traverse </summary>
+  public:
+    int lexerActionIndex;
 
-                    private:
-                        const bool passedThroughNonGreedyDecision;
+  private:
+    const bool passedThroughNonGreedyDecision;
 
-                    public:
-                        LexerATNConfig(ATNState *state, int alt, PredictionContext *context);
+  public:
+    LexerATNConfig(ATNState *state, int alt, PredictionContext *context);
 
-                        LexerATNConfig(ATNState *state, int alt, PredictionContext *context, int actionIndex);
+    LexerATNConfig(ATNState *state, int alt, PredictionContext *context, int actionIndex);
 
-                        LexerATNConfig(LexerATNConfig *c, ATNState *state);
+    LexerATNConfig(LexerATNConfig *c, ATNState *state);
 
-                        LexerATNConfig(LexerATNConfig *c, ATNState *state, int actionIndex);
+    LexerATNConfig(LexerATNConfig *c, ATNState *state, int actionIndex);
 
-                        LexerATNConfig(LexerATNConfig *c, ATNState *state, PredictionContext *context);
+    LexerATNConfig(LexerATNConfig *c, ATNState *state, PredictionContext *context);
 
-                        bool hasPassedThroughNonGreedyDecision();
+    bool hasPassedThroughNonGreedyDecision();
 
-                        virtual size_t hashCode() override;
+    virtual size_t hashCode() override;
 
-                        virtual bool equals(ATNConfig *other) override;
+    virtual bool equals(ATNConfig *other) override;
 
-                    private:
-                        static bool checkNonGreedyDecision(LexerATNConfig *source, ATNState *target);
+  private:
+    static bool checkNonGreedyDecision(LexerATNConfig *source, ATNState *target);
 
-                    private:
-                        void InitializeInstanceFields();
-                    };
+  private:
+    void InitializeInstanceFields();
+  };
 
-                }
-            }
-        }
-    }
-}
+} // namespace atn
+} // namespace runtime
+} // namespace v4
+} // namespace antlr
+} // namespace org

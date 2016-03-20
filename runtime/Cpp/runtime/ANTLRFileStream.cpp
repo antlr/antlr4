@@ -1,13 +1,6 @@
-﻿#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <cstring>
-
-#include "ANTLRFileStream.h"
-#include "Exceptions.h"
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -36,53 +29,51 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                ANTLRFileStream::ANTLRFileStream(const std::string &fileName)  {
-                }
+#include "Exceptions.h"
 
-                ANTLRFileStream::ANTLRFileStream(const std::string &fileName, const std::string &encoding) {
-                    this->fileName = fileName;
-                    load(fileName, encoding);
-                }
+#include "ANTLRFileStream.h"
 
-                /*
-                 Issue: is seems that file name in C++ are considered to be not
-                 wide for the reason that not all systems support wchar file
-                 names. Win32 is good about this but not all others. 
-                 TODO: this could be a place to have platform specific build
-                 flags
-                 */
-                void ANTLRFileStream::load(const std::string &fileName, const std::string &encoding) {
-                    if (fileName == "") {
-                        return;
-                    }
-                    
-                    std::stringstream ss;
-                    std::wifstream f;
-                    
-                    // Open as a byte stream
-                    f.open(fileName, std::ios::binary);
-                    ss<<f.rdbuf();
-                    
-                    std::string const &s = ss.str();
-                    if (s.size() % sizeof(wchar_t) != 0)
-                    {
-                        throw new IOException(L"file not the right size");
-                    }
-                    
-                    std::wstring ws;
-                    ws.resize(s.size()/sizeof(wchar_t));
-                    std::memcpy(&ws[0],s.c_str(),s.size()); // copy data into wstring
-                    data=ws;
-                }
+using namespace org::antlr::v4::runtime;
 
-                std::string ANTLRFileStream::getSourceName() {
-                    return fileName;
-                }
-            }
-        }
-    }
+ANTLRFileStream::ANTLRFileStream(const std::string &fileName)  {
+}
+
+ANTLRFileStream::ANTLRFileStream(const std::string &fileName, const std::string &encoding) {
+  this->fileName = fileName;
+  load(fileName, encoding);
+}
+
+/*
+ Issue: is seems that file name in C++ are considered to be not
+ wide for the reason that not all systems support wchar file
+ names. Win32 is good about this but not all others.
+ TODO: this could be a place to have platform specific build
+ flags
+ */
+void ANTLRFileStream::load(const std::string &fileName, const std::string &encoding) {
+  if (fileName == "") {
+    return;
+  }
+
+  std::stringstream ss;
+  std::wifstream f;
+
+  // Open as a byte stream
+  f.open(fileName, std::ios::binary);
+  ss<<f.rdbuf();
+
+  std::string const &s = ss.str();
+  if (s.size() % sizeof(wchar_t) != 0)
+  {
+    throw new IOException(L"file not the right size");
+  }
+
+  std::wstring ws;
+  ws.resize(s.size()/sizeof(wchar_t));
+  std::memcpy(&ws[0],s.c_str(),s.size()); // copy data into wstring
+  data=ws;
+}
+
+std::string ANTLRFileStream::getSourceName() {
+  return fileName;
 }

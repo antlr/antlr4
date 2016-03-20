@@ -1,7 +1,6 @@
-#pragma once
-
 /*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2014 Dan McLaughlin
  *  All rights reserved.
  *
@@ -29,15 +28,15 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <string>
+#pragma once
 
 namespace antlrcpp {
-    void replaceAll(std::wstring& str, const std::wstring& from, const std::wstring& to);
-    
-    std::string ws2s(const std::wstring& wstr);
-    
-    std::wstring s2ws(const std::string & str);
-    
-    std::wstring wchar2wstring(const wchar_t & str);
-    
+  void replaceAll(std::wstring& str, const std::wstring& from, const std::wstring& to);
+
+  std::string ws2s(const std::wstring& wstr);
+
+  std::wstring s2ws(const std::string & str);
+
+  std::wstring wchar2wstring(const wchar_t & str);
+
 }

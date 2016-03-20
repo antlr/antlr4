@@ -1,11 +1,4 @@
-﻿#pragma once
-
-#include <string>
-
-#include "ANTLRErrorListener.h"
-#include "IRecognizer.h"
-
-/*
+﻿/*
  * [The "BSD license"]
  *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
@@ -36,26 +29,32 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                /// <summary>
-                /// @author Sam Harwell
-                /// </summary>
-                class BaseErrorListener : public ANTLRErrorListener {
-                                
-                    template<typename T1, typename T2>
-                    void syntaxError(IRecognizer<T1, T2> *recognizer, void *offendingSymbol, int line, int charPositionInLine, const std::wstring &msg, RecognitionException *e) { }
+#pragma once
 
-                    virtual void reportAmbiguity(Parser *recognizer, dfa::DFA *dfa, int startIndex, int stopIndex, bool exact, antlrcpp::BitSet *ambigAlts, atn::ATNConfigSet *configs) override;
+#include "ANTLRErrorListener.h"
 
-                    virtual void reportAttemptingFullContext(Parser *recognizer, dfa::DFA *dfa, int startIndex, int stopIndex, antlrcpp::BitSet *conflictingAlts, atn::ATNConfigSet *configs) override;
-
-                    virtual void reportContextSensitivity(Parser *recognizer, dfa::DFA *dfa, int startIndex, int stopIndex, int prediction, atn::ATNConfigSet *configs) override;
-                };
-
-            }
-        }
-    }
+namespace antlrcpp {
+  class BitSet;
 }
+
+namespace org {
+namespace antlr {
+namespace v4 {
+namespace runtime {
+
+  class BaseErrorListener : public ANTLRErrorListener {
+
+    template<typename T1, typename T2>
+    void syntaxError(IRecognizer<T1, T2> *recognizer, void *offendingSymbol, int line, int charPositionInLine, const std::wstring &msg, RecognitionException *e) { }
+
+    virtual void reportAmbiguity(Parser *recognizer, dfa::DFA *dfa, int startIndex, int stopIndex, bool exact, antlrcpp::BitSet *ambigAlts, atn::ATNConfigSet *configs) override;
+
+    virtual void reportAttemptingFullContext(Parser *recognizer, dfa::DFA *dfa, int startIndex, int stopIndex, antlrcpp::BitSet *conflictingAlts, atn::ATNConfigSet *configs) override;
+
+    virtual void reportContextSensitivity(Parser *recognizer, dfa::DFA *dfa, int startIndex, int stopIndex, int prediction, atn::ATNConfigSet *configs) override;
+  };
+
+} // namespace runtime
+} // namespace v4
+} // namespace antlr
+} // namespace org

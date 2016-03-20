@@ -1,9 +1,6 @@
-﻿#pragma once
-
-#include "Token.h"
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -32,27 +29,31 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#pragma once
+
+#include "Token.h"
+
 namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
+namespace antlr {
+namespace v4 {
+namespace runtime {
 
-                class WritableToken : public Token {
-                public:
-                    virtual void setText(const std::wstring &text) = 0;
+  class WritableToken : public Token {
+  public:
+    virtual void setText(const std::wstring &text) = 0;
 
-                    virtual void setType(int ttype) = 0;
+    virtual void setType(int ttype) = 0;
 
-                    virtual void setLine(int line) = 0;
+    virtual void setLine(int line) = 0;
 
-                    virtual void setCharPositionInLine(int pos) = 0;
+    virtual void setCharPositionInLine(int pos) = 0;
 
-                    virtual void setChannel(int channel) = 0;
+    virtual void setChannel(int channel) = 0;
 
-                    virtual void setTokenIndex(int index) = 0;
-                };
+    virtual void setTokenIndex(int index) = 0;
+  };
 
-            }
-        }
-    }
-}
+} // namespace runtime
+} // namespace v4
+} // namespace antlr
+} // namespace org

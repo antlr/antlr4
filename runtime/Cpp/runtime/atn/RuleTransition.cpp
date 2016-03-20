@@ -1,7 +1,6 @@
-﻿#include "RuleTransition.h"
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -30,33 +29,26 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace atn {
+#include "RuleTransition.h"
 
-                    // this(ruleStart, ruleIndex, 0, followState);
-                    RuleTransition::RuleTransition(RuleStartState *ruleStart, int ruleIndex, ATNState *followState) : Transition(followState), ruleIndex(ruleIndex), precedence(0) {
-                    }
+using namespace org::antlr::v4::runtime::atn;
 
-                    RuleTransition::RuleTransition(RuleStartState *ruleStart, int ruleIndex, int precedence, ATNState *followState) : Transition(followState), ruleIndex(ruleIndex), precedence(precedence) {
-                        this->followState = followState;
-                    }
+// this(ruleStart, ruleIndex, 0, followState);
+RuleTransition::RuleTransition(RuleStartState *ruleStart, int ruleIndex, ATNState *followState) : Transition(followState), ruleIndex(ruleIndex), precedence(0) {
+}
 
-                    int RuleTransition::getSerializationType() {
-                        return RULE;
-                    }
+RuleTransition::RuleTransition(RuleStartState *ruleStart, int ruleIndex, int precedence, ATNState *followState) : Transition(followState), ruleIndex(ruleIndex), precedence(precedence) {
+  this->followState = followState;
+}
 
-                    bool RuleTransition::isEpsilon() {
-                        return true;
-                    }
+int RuleTransition::getSerializationType() {
+  return RULE;
+}
 
-                    bool RuleTransition::matches(int symbol, int minVocabSymbol, int maxVocabSymbol) {
-                        return false;
-                    }
-                }
-            }
-        }
-    }
+bool RuleTransition::isEpsilon() {
+  return true;
+}
+
+bool RuleTransition::matches(int symbol, int minVocabSymbol, int maxVocabSymbol) {
+  return false;
 }

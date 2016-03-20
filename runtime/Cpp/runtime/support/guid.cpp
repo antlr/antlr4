@@ -124,7 +124,7 @@ Guid::Guid(const string &fromString)
 {
   _bytes.clear();
 
-  char charOne, charTwo;
+  char charOne = 0, charTwo;
   bool lookingForFirstChar = true;
 
   for (const char &ch : fromString)

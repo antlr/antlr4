@@ -1,12 +1,6 @@
-﻿#pragma once
-
-
-#include <string>
-#include "Declarations.h"
-#include "Transition.h"
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -35,32 +29,36 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#pragma once
+
+#include "Transition.h"
+
 namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace atn {
+namespace antlr {
+namespace v4 {
+namespace runtime {
+namespace atn {
 
-                    /// <summary>
-                    /// TODO: make all transitions sets? no, should remove set edges </summary>
-                    class AtomTransition final : public Transition {
-                        /// <summary>
-                        /// The token type or character value; or, signifies special label. </summary>
-                    public:
-                        const int _label;
+  /// <summary>
+  /// TODO: make all transitions sets? no, should remove set edges </summary>
+  class AtomTransition final : public Transition {
+    /// <summary>
+    /// The token type or character value; or, signifies special label. </summary>
+  public:
+    const int _label;
 
-                        AtomTransition(ATNState *target, int label);
+    AtomTransition(ATNState *target, int label);
 
-                        virtual int getSerializationType() override;
+    virtual int getSerializationType() override;
 
-                        virtual misc::IntervalSet *label() override;
-                        virtual bool matches(int symbol, int minVocabSymbol, int maxVocabSymbol) override;
+    virtual misc::IntervalSet *label() override;
+    virtual bool matches(int symbol, int minVocabSymbol, int maxVocabSymbol) override;
 
-                        virtual std::wstring toString();
-                    };
+    virtual std::wstring toString();
+  };
 
-                }
-            }
-        }
-    }
-}
+} // namespace atn
+} // namespace runtime
+} // namespace v4
+} // namespace antlr
+} // namespace org

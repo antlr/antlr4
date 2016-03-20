@@ -1,9 +1,4 @@
-﻿#include "ParseTreeWalker.h"
-#include "TerminalNode.h"
-#include "ErrorNode.h"
-#include "ParserRuleContext.h"
-
-/*
+﻿/*
  * [The "BSD license"]
  *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
@@ -34,45 +29,41 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "ErrorNode.h"
+#include "ParserRuleContext.h"
+#include "ParseTreeListener.h"
 
-namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace tree {
+#include "ParseTreeWalker.h"
 
-                    ParseTreeWalker *const ParseTreeWalker::DEFAULT = new ParseTreeWalker();
+using namespace org::antlr::v4::runtime::tree;
 
-                    void ParseTreeWalker::walk(ParseTreeListener *listener, ParseTree *t) {
-                        if (dynamic_cast<ErrorNode*>(t) != nullptr) {
-                            listener->visitErrorNode(dynamic_cast<ErrorNode*>(t));
-                            return;
-                        } else if (dynamic_cast<TerminalNode*>(t) != nullptr) {
-                            listener->visitTerminal(static_cast<TerminalNode*>(t));
-                            return;
-                        }
-                        RuleNode *r = static_cast<RuleNode*>(t);
-                        enterRule(listener, r);
-                      std::size_t n = r->getChildCount();
-                        for (std::size_t i = 0; i < n; i++) {
-                            walk(listener, r->getChild(i));
-                        }
-                        exitRule(listener, r);
-                    }
+ParseTreeWalker *const ParseTreeWalker::DEFAULT = new ParseTreeWalker();
 
-                    void ParseTreeWalker::enterRule(ParseTreeListener *listener, RuleNode *r) {
-                        ParserRuleContext *ctx = dynamic_cast<ParserRuleContext*>(r->getRuleContext());
-                        listener->enterEveryRule(ctx);
-                        ctx->enterRule(listener);
-                    }
+void ParseTreeWalker::walk(ParseTreeListener *listener, ParseTree *t) {
+  if (dynamic_cast<ErrorNode*>(t) != nullptr) {
+    listener->visitErrorNode(dynamic_cast<ErrorNode*>(t));
+    return;
+  } else if (dynamic_cast<TerminalNode*>(t) != nullptr) {
+    listener->visitTerminal(static_cast<TerminalNode*>(t));
+    return;
+  }
+  RuleNode *r = static_cast<RuleNode*>(t);
+  enterRule(listener, r);
+  std::size_t n = r->getChildCount();
+  for (std::size_t i = 0; i < n; i++) {
+    walk(listener, r->getChild(i));
+  }
+  exitRule(listener, r);
+}
 
-                    void ParseTreeWalker::exitRule(ParseTreeListener *listener, RuleNode *r) {
-                        ParserRuleContext *ctx = dynamic_cast<ParserRuleContext*>(r->getRuleContext());
-                        ctx->exitRule(listener);
-                        listener->exitEveryRule(ctx);
-                    }
-                }
-            }
-        }
-    }
+void ParseTreeWalker::enterRule(ParseTreeListener *listener, RuleNode *r) {
+  ParserRuleContext *ctx = dynamic_cast<ParserRuleContext*>(r->getRuleContext());
+  listener->enterEveryRule(ctx);
+  ctx->enterRule(listener);
+}
+
+void ParseTreeWalker::exitRule(ParseTreeListener *listener, RuleNode *r) {
+  ParserRuleContext *ctx = dynamic_cast<ParserRuleContext*>(r->getRuleContext());
+  ctx->exitRule(listener);
+  listener->exitEveryRule(ctx);
 }

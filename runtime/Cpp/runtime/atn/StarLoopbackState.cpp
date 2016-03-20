@@ -1,8 +1,6 @@
-﻿#include "StarLoopbackState.h"
-#include "Transition.h"
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -31,21 +29,17 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace atn {
+#include "StarLoopEntryState.h"
+#include "Transition.h"
 
-                    atn::StarLoopEntryState *StarLoopbackState::getLoopEntryState() {
-                        return static_cast<StarLoopEntryState*>(transition(0)->target);
-                    }
+#include "StarLoopbackState.h"
 
-                    int StarLoopbackState::getStateType() {
-                        return STAR_LOOP_BACK;
-                    }
-                }
-            }
-        }
-    }
+using namespace org::antlr::v4::runtime::atn;
+
+StarLoopEntryState *StarLoopbackState::getLoopEntryState() {
+  return static_cast<StarLoopEntryState*>(transition(0)->target);
+}
+
+int StarLoopbackState::getStateType() {
+  return STAR_LOOP_BACK;
 }

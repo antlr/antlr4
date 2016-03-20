@@ -1,10 +1,6 @@
-﻿#pragma once
-
-#include <string>
-#include <stdexcept>
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -33,34 +29,37 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#pragma once
+
 namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace misc {
-                    /// <summary>
-                    /// This exception is thrown to cancel a parsing operation. This exception does
-                    /// not extend <seealso cref="RecognitionException"/>, allowing it to bypass the standard
-                    /// error recovery mechanisms. <seealso cref="BailErrorStrategy"/> throws this exception in
-                    /// response to a parse error.
-                    /// 
-                    /// @author Sam Harwell
-                    /// </summary>
-                    class ParseCancellationException : public std::exception {
+namespace antlr {
+namespace v4 {
+namespace runtime {
+namespace misc {
 
-                    public:
-                        ParseCancellationException();
+  /// <summary>
+  /// This exception is thrown to cancel a parsing operation. This exception does
+  /// not extend <seealso cref="RecognitionException"/>, allowing it to bypass the standard
+  /// error recovery mechanisms. <seealso cref="BailErrorStrategy"/> throws this exception in
+  /// response to a parse error.
+  ///
+  /// @author Sam Harwell
+  /// </summary>
+  class ParseCancellationException : public std::exception {
 
-                        ParseCancellationException(const std::wstring &message);
+  public:
+    ParseCancellationException();
 
-                        ParseCancellationException(std::exception cause);
+    ParseCancellationException(const std::wstring &message);
 
-                        ParseCancellationException(const std::wstring &message, std::exception cause);
+    ParseCancellationException(std::exception cause);
 
-                    };
+    ParseCancellationException(const std::wstring &message, std::exception cause);
 
-                }
-            }
-        }
-    }
-}
+  };
+
+} // namespace atn
+} // namespace runtime
+} // namespace v4
+} // namespace antlr
+} // namespace org

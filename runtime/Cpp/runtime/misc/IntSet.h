@@ -1,10 +1,6 @@
-﻿#pragma once
-#include <vector>
-#include <string>
-#include "Exceptions.h"
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -32,67 +28,59 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
+#pragma once
+
 namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace misc {
+namespace antlr {
+namespace v4 {
+namespace runtime {
+namespace misc {
 
+  /// <summary>
+  /// A generic set of ints.
+  /// </summary>
+  ///  <seealso cref= IntervalSet </seealso>
+  class IntSet {
+    /// <summary>
+    /// Add an element to the set </summary>
+  public:
+    virtual void add(int el) = 0;
 
+    /// <summary>
+    /// Add all elements from incoming set to this set.  Can limit
+    ///  to set of its own type. Return "this" so we can chain calls.
+    /// </summary>
+    virtual IntSet *addAll(IntSet *set) = 0;
 
-                    /// <summary>
-                    /// A generic set of ints.
-                    /// </summary>
-                    ///  <seealso cref= IntervalSet </seealso>
-                    class IntSet {
-                        /// <summary>
-                        /// Add an element to the set </summary>
-                    public:
-                        virtual void add(int el) = 0;
+    /// <summary>
+    /// Return the intersection of this set with the argument, creating
+    ///  a new set.
+    /// </summary>
+    virtual IntSet *And(IntSet *a) = 0;
+    virtual IntSet *complement(IntSet *elements) = 0;
+    virtual IntSet *Or(IntSet *a) = 0;
+    virtual IntSet *subtract(IntSet *a) = 0;
 
-                        /// <summary>
-                        /// Add all elements from incoming set to this set.  Can limit
-                        ///  to set of its own type. Return "this" so we can chain calls.
-                        /// </summary>
-                        virtual IntSet *addAll(IntSet *set) = 0;
+    /// <summary>
+    /// Return the size of this set (not the underlying implementation's
+    ///  allocated memory size, for example).
+    /// </summary>
+    virtual int size() = 0;
+    virtual bool isNil() = 0;
+    virtual bool equals(void *obj) = 0;
+    virtual int getSingleElement() = 0;
+    virtual bool contains(int el) = 0;
 
-                        /// <summary>
-                        /// Return the intersection of this set with the argument, creating
-                        ///  a new set.
-                        /// </summary>
-                        virtual IntSet *And(IntSet *a) = 0;
+    /// <summary>
+    /// remove this element from this set </summary>
+    virtual void remove(int el) = 0;
+    virtual std::vector<int> toList() = 0;
+    virtual std::wstring toString() = 0;
+  };
 
-                        virtual IntSet *complement(IntSet *elements) = 0;
-
-                        virtual IntSet *Or(IntSet *a) = 0;
-
-                        virtual IntSet *subtract(IntSet *a) = 0;
-
-                        /// <summary>
-                        /// Return the size of this set (not the underlying implementation's
-                        ///  allocated memory size, for example).
-                        /// </summary>
-                        virtual int size() = 0;
-
-                        virtual bool isNil() = 0;
-
-                        virtual bool equals(void *obj) = 0;
-
-                        virtual int getSingleElement() = 0;
-
-                        virtual bool contains(int el) = 0;
-
-                        /// <summary>
-                        /// remove this element from this set </summary>
-                        virtual void remove(int el) = 0;
-
-                        virtual std::vector<int> toList() = 0;
-
-                        virtual std::wstring toString() = 0;
-                    };
-
-                }
-            }
-        }
-    }
-}
+} // namespace atn
+} // namespace runtime
+} // namespace v4
+} // namespace antlr
+} // namespace org

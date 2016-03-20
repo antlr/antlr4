@@ -1,10 +1,6 @@
-﻿#include "XPathTokenElement.h"
-#include "Trees.h"
-#include "TerminalNode.h"
-#include "TerminalNode.h"
-
-/*
-* [The "BSD license"]
+﻿/*
+ * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
 *  Copyright (c) 2013 Terence Parr
 *  Copyright (c) 2013 Dan McLaughlin
 *  All rights reserved.
@@ -33,39 +29,32 @@
 *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace tree {
-                    namespace xpath {
+#include "Trees.h"
 
+#include "XPathTokenElement.h"
 
-                        XPathTokenElement::XPathTokenElement(const std::wstring &tokenName, int tokenType) : XPathElement(tokenName) {
-                            InitializeInstanceFields();
-                            this->tokenType = tokenType;
-                        }
+using namespace org::antlr::v4::runtime::tree;
+using namespace org::antlr::v4::runtime::tree::xpath;
 
-                        std::vector<ParseTree*> *XPathTokenElement::evaluate(ParseTree *t) {
-                            // return all children of t that match nodeName
-                            std::vector<ParseTree*> *nodes = new std::vector<ParseTree*>();
-                            for (auto c : Trees::getChildren(t)) {
-                                if (dynamic_cast<TerminalNode*>(c) != nullptr) {
-                                    TerminalNode *tnode = static_cast<TerminalNode*>(c);
-                                    if ((tnode->getSymbol()->getType() == tokenType && !invert) || (tnode->getSymbol()->getType() != tokenType && invert)) {
-                                        nodes->push_back(tnode);
-                                    }
-                                }
-                            }
-                            return nodes;
-                        }
+XPathTokenElement::XPathTokenElement(const std::wstring &tokenName, int tokenType) : XPathElement(tokenName) {
+  InitializeInstanceFields();
+  this->tokenType = tokenType;
+}
 
-                        void XPathTokenElement::InitializeInstanceFields() {
-                            tokenType = 0;
-                        }
-                    }
-                }
-            }
-        }
+std::vector<ParseTree*> *XPathTokenElement::evaluate(ParseTree *t) {
+  // return all children of t that match nodeName
+  std::vector<ParseTree*> *nodes = new std::vector<ParseTree*>();
+  for (auto c : Trees::getChildren(t)) {
+    if (dynamic_cast<TerminalNode*>(c) != nullptr) {
+      TerminalNode *tnode = static_cast<TerminalNode*>(c);
+      if ((tnode->getSymbol()->getType() == tokenType && !invert) || (tnode->getSymbol()->getType() != tokenType && invert)) {
+        nodes->push_back(tnode);
+      }
     }
+  }
+  return nodes;
+}
+
+void XPathTokenElement::InitializeInstanceFields() {
+  tokenType = 0;
 }

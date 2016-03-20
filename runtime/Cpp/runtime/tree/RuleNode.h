@@ -1,10 +1,6 @@
-﻿#pragma once
-
-#include "ParseTree.h"
-#include "Declarations.h"
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -33,20 +29,23 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#pragma once
+
+#include "ParseTree.h"
+
 namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                
-                namespace tree {
+namespace antlr {
+namespace v4 {
+namespace runtime {
+namespace tree {
 
-                    class RuleNode : public ParseTree {
-                    public:
-                        virtual runtime::RuleContext *getRuleContext() = 0;
-                    };
+  class RuleNode : public ParseTree {
+  public:
+    virtual runtime::RuleContext *getRuleContext() = 0;
+  };
 
-                }
-            }
-        }
-    }
-}
+} // namespace tree
+} // namespace runtime
+} // namespace v4
+} // namespace antlr
+} // namespace org

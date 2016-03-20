@@ -1,12 +1,6 @@
-﻿#pragma once
-
-#include <string>
-#include <utility>
-#include "Declarations.h"
-
-
-/*
+﻿/*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
@@ -35,33 +29,35 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#pragma once
+
 namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
+namespace antlr {
+namespace v4 {
+namespace runtime {
 
-                /// <summary>
-                /// The default mechanism for creating tokens. It's used by default in Lexer and
-                ///  the error handling strategy (to create missing tokens).  Notifying the parser
-                ///  of a new factory means that it notifies it's token source and error strategy.
-                /// </summary>
+  /// <summary>
+  /// The default mechanism for creating tokens. It's used by default in Lexer and
+  ///  the error handling strategy (to create missing tokens).  Notifying the parser
+  ///  of a new factory means that it notifies it's token source and error strategy.
+  /// </summary>
 
-                template<typename Symbol>
-                class TokenFactory {
-                    /// <summary>
-                    /// This is the method used to create tokens in the lexer and in the
-                    ///  error handling strategy. If text!=null, than the start and stop positions
-                    ///  are wiped to -1 in the text override is set in the CommonToken.
-                    /// </summary>
-                public:
-                    virtual Symbol create(std::pair<TokenSource*, CharStream*> *source, int type, const std::wstring &text, int channel, int start, int stop, int line, int charPositionInLine) = 0;
+  template<typename Symbol>
+  class TokenFactory {
+    /// <summary>
+    /// This is the method used to create tokens in the lexer and in the
+    ///  error handling strategy. If text!=null, than the start and stop positions
+    ///  are wiped to -1 in the text override is set in the CommonToken.
+    /// </summary>
+  public:
+    virtual Symbol create(std::pair<TokenSource*, CharStream*> *source, int type, const std::wstring &text, int channel, int start, int stop, int line, int charPositionInLine) = 0;
 
-                    /// <summary>
-                    /// Generically useful </summary>
-                    virtual Symbol create(int type, const std::wstring &text) = 0;
-                };
+    /// <summary>
+    /// Generically useful </summary>
+    virtual Symbol create(int type, const std::wstring &text) = 0;
+  };
 
-            }
-        }
-    }
-}
+} // namespace runtime
+} // namespace v4
+} // namespace antlr
+} // namespace org

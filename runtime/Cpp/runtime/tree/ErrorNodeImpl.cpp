@@ -1,8 +1,4 @@
-﻿#include "ErrorNodeImpl.h"
-#include "Exceptions.h"
-
-
-/*
+﻿/*
  * [The "BSD license"]
  *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
@@ -32,54 +28,54 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-namespace org {
-    namespace antlr {
-        namespace v4 {
-            namespace runtime {
-                namespace tree {
 
-                    ErrorNodeImpl::ErrorNodeImpl(Token *token) : TerminalNodeImpl(token) {
-                    }
-                    
-                    // From Terminal Node
-                    Token *ErrorNodeImpl::getSymbol() {
-                        throw new TODOException(L"ErrorNodeImpl::getSymbol");
-                    };
-                    
-                    // From Parse Tree
-                    ParseTree *ErrorNodeImpl::getParent(){
-                        throw new TODOException(L"ErrorNodeImpl::getSymbol");
-                    };
-                  ParseTree *ErrorNodeImpl::getChild(std::size_t i){
-                        throw new TODOException(L"ErrorNodeImpl::getChild");
-                    };
-                    std::wstring ErrorNodeImpl::getText() {
-                        throw new TODOException(L"ErrorNodeImpl::getText");
-                    };
-                    std::wstring ErrorNodeImpl::toStringTree(Parser *parser){
-                        throw new TODOException(L"ErrorNodeImpl::toStringTree");
-                    };;
-                    
-                    // From SyntaxTree
-                    misc::Interval *ErrorNodeImpl::getSourceInterval(){
-                        throw new TODOException(L"ErrorNodeImpl::getSourceInterval");
-                    };;
-                    
-                    
-                    void *ErrorNodeImpl::getPayload(){
-                        throw new TODOException(L"ErrorNodeImpl::getPayload");
-                    };
+#include "Exceptions.h"
 
-                  std::size_t ErrorNodeImpl::getChildCount(){
-                        throw new TODOException(L"ErrorNodeImpl::getChildCount");
-                    };;
+#include "ErrorNodeImpl.h"
 
-                    std::wstring ErrorNodeImpl::toStringTree() {
-                        throw new TODOException(L"ErrorNodeImpl::toStringTree");
-                    };
-                    
-                }
-            }
-        }
-    }
+using namespace org::antlr::v4::runtime;
+using namespace org::antlr::v4::runtime::misc;
+using namespace org::antlr::v4::runtime::tree;
+
+ErrorNodeImpl::ErrorNodeImpl(Token *token) : TerminalNodeImpl(token) {
 }
+
+// From Terminal Node
+Token *ErrorNodeImpl::getSymbol() {
+  throw new TODOException(L"ErrorNodeImpl::getSymbol");
+};
+
+// From Parse Tree
+ParseTree *ErrorNodeImpl::getParent(){
+  throw new TODOException(L"ErrorNodeImpl::getSymbol");
+};
+
+ParseTree *ErrorNodeImpl::getChild(std::size_t i){
+  throw new TODOException(L"ErrorNodeImpl::getChild");
+};
+
+std::wstring ErrorNodeImpl::getText() {
+  throw new TODOException(L"ErrorNodeImpl::getText");
+};
+
+std::wstring ErrorNodeImpl::toStringTree(Parser *parser){
+  throw new TODOException(L"ErrorNodeImpl::toStringTree");
+};
+
+// From SyntaxTree
+Interval *ErrorNodeImpl::getSourceInterval(){
+  throw new TODOException(L"ErrorNodeImpl::getSourceInterval");
+};
+
+
+void *ErrorNodeImpl::getPayload(){
+  throw new TODOException(L"ErrorNodeImpl::getPayload");
+};
+
+std::size_t ErrorNodeImpl::getChildCount(){
+  throw new TODOException(L"ErrorNodeImpl::getChildCount");
+};
+
+std::wstring ErrorNodeImpl::toStringTree() {
+  throw new TODOException(L"ErrorNodeImpl::toStringTree");
+};
