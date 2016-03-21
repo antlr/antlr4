@@ -53,22 +53,14 @@ std::vector<DFAState*> DFA::getStates() {
     vints.push_back(imap.first);
   }
 
-  // This ComparatorAnonymousInnerClassHelper isn't doing much, it
-  // could be accomplished simply with a local comparator function
   std::vector<DFAState*> result = std::vector<DFAState*>(vints);
-  ComparatorAnonymousInnerClassHelper tmp(this);
-  std::sort(result.begin(), result.end(), (tmp.compare));
+  std::sort(result.begin(), result.end(), [](DFAState *o1, DFAState *o2) {
+    return o1->stateNumber - o2->stateNumber;
+  });
 
   return result;
 }
 
-
-DFA::ComparatorAnonymousInnerClassHelper::ComparatorAnonymousInnerClassHelper(DFA *outerInstance) : outerInstance(outerInstance) {
-}
-
-int DFA::ComparatorAnonymousInnerClassHelper::compare(DFAState *o1, DFAState *o2) {
-  return o1->stateNumber - o2->stateNumber;
-}
 
 std::wstring DFA::toString() {
   std::vector<std::wstring> tokenNames;

@@ -32,6 +32,7 @@
 #pragma once
 
 #include "AbstractEqualityComparator.h"
+#include "Any.h"
 
 namespace org {
 namespace antlr {
@@ -60,7 +61,7 @@ namespace misc {
     T getOrAdd(T o);
     virtual T get(T o);
     virtual int hashCode();
-    virtual bool equals(T o);
+    virtual bool equals(Any o);
 
   protected:
     // Daughter iterator class
@@ -92,8 +93,7 @@ namespace misc {
       void InitializeInstanceFields();
     };
 
-
-    AbstractEqualityComparator<T> *const _comparator;
+    AbstractEqualityComparator<T> * const _comparator;
 
     std::vector<std::vector<T>> buckets;
 
@@ -106,7 +106,7 @@ namespace misc {
     int currentPrime; // jump by 4 primes each expand or whatever
     int initialBucketCapacity;
     virtual T getOrAddImpl(T o);
-    int getBucket(T o);
+    int getBucket(T o, size_t modulus);
     virtual void expand();
 
   public:
@@ -116,7 +116,7 @@ namespace misc {
 
     bool isEmpty();
 
-    bool contains(void *o);
+    bool contains(T o);
 
     virtual bool containsFast(T obj);
 
@@ -127,7 +127,7 @@ namespace misc {
     template<typename U>
     U *toArray(U a[]);
 
-    bool remove(void *o);
+    bool remove(T o);
 
     virtual bool removeFast(T obj);
 
@@ -162,24 +162,9 @@ namespace misc {
     /// <returns> {@code o} if it could be an instance of {@code T}, otherwise
     /// {@code null}. </returns>
   protected:
-    virtual T asElementType(void *o) {
-      throw new TODOException(L"Array2DHashSet::asElementType");
+    virtual T asElementType(Any o) {
+      return (T)o;
     };
-
-    /// <summary>
-    /// Return an array of {@code T[]} with length {@code capacity}.
-    /// </summary>
-    /// <param name="capacity"> the length of the array to return </param>
-    /// <returns> the newly constructed array </returns>
-    virtual std::vector<std::vector<T>> createBuckets(int capacity);
-
-    /// <summary>
-    /// Return an array of {@code T} with length {@code capacity}.
-    /// </summary>
-    /// <param name="capacity"> the length of the array to return </param>
-    /// <returns> the newly constructed array </returns>
-    virtual std::vector<T> createBucket(int capacity);
-
 
   private:
     void InitializeInstanceFields();

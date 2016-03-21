@@ -31,22 +31,15 @@
 
 #pragma once
 
-#include "Exceptions.h"
-
 namespace org {
 namespace antlr {
 namespace v4 {
 namespace runtime {
 namespace misc {
 
-  /// <summary>
-  /// This interface provides an abstract concept of object equality independent of
-  /// <seealso cref="Object#equals"/> (object equality) and the {@code ==} operator
-  /// (reference equality). It can be used to provide algorithm-specific unordered
-  /// comparisons without requiring changes to the object itself.
-  ///
-  /// @author Sam Harwell
-  /// </summary>
+  /// This abstract class provides the concept of object equality independent of
+  /// equals (object equality) and the == operator (reference equality). It can be used
+  /// to provide algorithm-specific unordered comparisons without requiring changes to the object itself.
   template<typename T>
   class EqualityComparator {
 
@@ -56,22 +49,10 @@ namespace misc {
     /// <param name="obj"> The object. </param>
     /// <returns> The hash code for {@code obj}. </returns>
   public:
-    virtual int hashCode(T obj) {
-      throw new TODOException(L"EqualityComparator::hashCode");
-      return 0;
-    }
+    virtual int hashCode(T obj) = 0;
 
-    /// <summary>
     /// This method tests if two objects are equal.
-    /// </summary>
-    /// <param name="a"> The first object to compare. </param>
-    /// <param name="b"> The second object to compare. </param>
-    /// <returns> {@code true} if {@code a} equals {@code b}, otherwise {@code false}. </returns>
-    virtual bool equals(T a, T b) {
-      new TODOException(L"EqualityComparator::equals");
-      return false;
-    }
-
+    virtual bool equals(T a, T b) = 0;
   };
 
 } // namespace atn

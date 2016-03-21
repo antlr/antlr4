@@ -33,6 +33,8 @@
 
 #include "Arrays.h"
 #include "MurmurHash.h"
+#include "ObjectEqualityComparator.h"
+#include "Exceptions.h"
 
 namespace org {
 namespace antlr {
@@ -44,21 +46,26 @@ namespace misc {
   const double Array2DHashSet<T>::LOAD_FACTOR = 0.75;
 
   template<typename T>
-  Array2DHashSet<T>::Array2DHashSet() : Array2DHashSet<T>(nullptr, INITAL_CAPACITY, INITAL_BUCKET_CAPACITY) {
+  Array2DHashSet<T>::Array2DHashSet()
+    : Array2DHashSet<T>(nullptr, INITAL_CAPACITY, INITAL_BUCKET_CAPACITY) {
   }
 
   template<typename T>
-  Array2DHashSet<T>::Array2DHashSet(AbstractEqualityComparator<T> *comparator) : Array2DHashSet<T>(comparator, INITAL_CAPACITY, INITAL_BUCKET_CAPACITY) {
+  Array2DHashSet<T>::Array2DHashSet(AbstractEqualityComparator<T> *comparator)
+    : Array2DHashSet<T>(comparator, INITAL_CAPACITY, INITAL_BUCKET_CAPACITY) {
   }
 
   template<typename T>
   Array2DHashSet<T>::Array2DHashSet(AbstractEqualityComparator<T> *comparator, int initialCapacity, int initialBucketCapacity)
   //: _comparator(comparator == nullptr ? ObjectEqualityComparator::INSTANCE : comparator)
-  : _comparator(nullptr)
+  : _comparator(comparator)
   {
+    // In opposition to Java we cannot assign AbstractEqualityComparator<Any> to AbstractEqualityComparator<T>,
+    // even though we can assign Any to T (same holds true for any 2 classes, even if they are derived from each other).
+    // Hence we do an extra check, if _comparator is null we explicitly call the ObjectEqualityComparator instead.
     InitializeInstanceFields();
 
-    buckets = createBuckets(initialCapacity);
+    buckets.resize(initialCapacity);
     this->initialBucketCapacity = initialBucketCapacity;
   }
 
@@ -110,12 +117,12 @@ namespace misc {
 
   template<typename T>
   T Array2DHashSet<T>::getOrAddImpl(T o) {
-    int b = getBucket(o);
-    std::vector<T> bucket = buckets[b];
+    int b = getBucket(o, buckets.size() - 1);
+    std::vector<T> &bucket = buckets[b];
 
     // NEW BUCKET
-    if (bucket.size() == 0) {
-      bucket = createBucket(initialBucketCapacity);
+    if (bucket.empty()) {
+      bucket.resize(initialBucketCapacity);
       bucket[0] = o;
       buckets[b] = bucket;
       n++;
@@ -130,12 +137,20 @@ namespace misc {
         n++;
         return o;
       }
-      if (_comparator->equals(existing, o)) { // found existing, quit
-        return existing;
+
+      // If already there stop looking.
+      if (_comparator == nullptr) {
+        if (ObjectEqualityComparator::INSTANCE->equals(existing, o)) {
+          return existing;
+        }
+      } else {
+        if (_comparator->equals(existing, o)) {
+          return existing;
+        }
       }
     }
 
-    bucket.insert(bucket.end(), o);
+    bucket.push_back(o);
     n++;
     return o;
   }
@@ -145,7 +160,7 @@ namespace misc {
     if (o == nullptr) {
       return o;
     }
-    int b = getBucket(o);
+    int b = getBucket(o, buckets.size() - 1);
     std::vector<T> bucket = buckets[b];
     if (bucket.size() == 0) { // no bucket
       return nullptr;
@@ -154,17 +169,30 @@ namespace misc {
       if (e == nullptr) { // empty slot; not there
         return nullptr;
       }
-      if (_comparator->equals(e, o)) {
-        return e;
+
+      if (_comparator == nullptr) {
+        if (ObjectEqualityComparator::INSTANCE->equals(e, o)) {
+          return e;
+        }
+      } else {
+        if (_comparator->equals(e, o)) {
+          return e;
+        }
       }
     }
     return nullptr;
   }
 
   template<typename T>
-  int Array2DHashSet<T>::getBucket(T o) {
-    int hash = _comparator->hashCode(o);
-    int b = hash & (buckets.size() - 1); // assumes len is power of 2
+  int Array2DHashSet<T>::getBucket(T o, size_t modulus) {
+    int hash;
+    if (_comparator == nullptr) {
+      hash = ObjectEqualityComparator::INSTANCE->hashCode(o);
+    } else {
+      hash = _comparator->hashCode(o);
+    }
+
+    int b = hash % modulus;
     return b;
   }
 
@@ -179,7 +207,12 @@ namespace misc {
         if (o == nullptr) {
           break;
         }
-        hash = MurmurHash::update(hash, _comparator->hashCode(o));
+
+        if (_comparator == nullptr) {
+          hash = MurmurHash::update(hash, ObjectEqualityComparator::INSTANCE->hashCode(o));
+        } else {
+          hash = MurmurHash::update(hash, _comparator->hashCode(o));
+        }
       }
     }
 
@@ -188,19 +221,16 @@ namespace misc {
   }
 
   template<typename T>
-  bool Array2DHashSet<T>::equals(T o) {
-#ifdef TODO
-    barf
-    // Not sure what to do with this. Error is bad comparison between distinct
-    // pointer types, do a dynamic cast?
-    if (o == this) {
+  bool Array2DHashSet<T>::equals(Any o) {
+    if (o.equals(this)) {
       return true;
     }
-#endif
-    if (!((Array2DHashSet*)(o) != nullptr)) {
+
+    if (!o.is<Array2DHashSet<T> *>()) {
       return false;
     }
-    Array2DHashSet<void*> *other = (Array2DHashSet<void*>*)(o);
+
+    Array2DHashSet<T> *other = o.as<Array2DHashSet<T>*>();
     if (other->size() != size()) {
       return false;
     }
@@ -210,32 +240,37 @@ namespace misc {
 
   template<typename T>
   void Array2DHashSet<T>::expand() {
-    std::vector<std::vector<T>> old = buckets;
+    std::vector<std::vector<T>> old = std::move(buckets);
     currentPrime += 4;
-    int newCapacity = (int)buckets.size() * 2;
-    std::vector<std::vector<T>> newTable = createBuckets(newCapacity);
+
+    size_t newCapacity = old.size() * 2;
+    std::vector<std::vector<T>> newTable;
+    newTable.resize(newCapacity);
+
     std::vector<int> newBucketLengths;
+    newBucketLengths.resize(newCapacity);
+
     buckets = newTable;
     threshold = static_cast<int>(newCapacity * LOAD_FACTOR);
-    //		System.out.println("new size="+newCapacity+", thres="+threshold);
+
     // rehash all existing entries
     int oldSize = size();
-    for (auto bucket : old) {
+    for (auto &bucket : old) {
       if (bucket.size() == 0) {
         continue;
       }
 
-      for (auto o : bucket) {
+      for (auto &o : bucket) {
         if (o == nullptr) {
           break;
         }
 
-        int b = getBucket(o);
+        int b = getBucket(o, old.size() - 1);
         int bucketLength = newBucketLengths[b];
         std::vector<T> newBucket;
         if (bucketLength == 0) {
           // new bucket
-          newBucket = createBucket(initialBucketCapacity);
+          newBucket.resize(initialBucketCapacity);
           newTable[b] = newBucket;
         } else {
           newBucket = newTable[b];
@@ -249,7 +284,8 @@ namespace misc {
       }
     }
 
-    if (n != oldSize) throw new std::exception();
+    if (n != oldSize)
+      throw new std::exception();
   }
 
   template<typename T>
@@ -269,7 +305,7 @@ namespace misc {
   }
 
   template<typename T>
-  bool Array2DHashSet<T>::contains(void *o) {
+  bool Array2DHashSet<T>::contains(T o) {
     return containsFast(asElementType(o));
   }
 
@@ -296,7 +332,7 @@ namespace misc {
 
   template<typename T>
   std::vector<T> Array2DHashSet<T>::toArray()  {
-    std::vector<T> a = createBucket(size());
+    std::vector<T> a(size());
     int i = 0;
     for (auto bucket : buckets) {
       if (bucket.size() == 0) {
@@ -341,7 +377,7 @@ namespace misc {
   }
 
   template<typename T>
-  bool Array2DHashSet<T>::remove(void *o) {
+  bool Array2DHashSet<T>::remove(T o) {
     return removeFast(asElementType(o));
   }
 
@@ -351,7 +387,7 @@ namespace misc {
       return false;
     }
 
-    int b = getBucket(obj);
+    int b = getBucket(obj, buckets.size() - 1);
     std::vector<T> bucket = buckets[b];
     if (bucket.size() == 0) {
       // no bucket
@@ -365,7 +401,13 @@ namespace misc {
         return false;
       }
 
-      if (_comparator->equals(e, obj)) { // found it
+      bool found = false;
+      if (_comparator == nullptr) {
+        found = ObjectEqualityComparator::INSTANCE->equals(e, obj);
+      } else {
+        found = _comparator->equals(e, obj);
+      }
+      if (found) { // found it
                                          // shift all elements to the right down one
                                          //System::arraycopy(bucket, i + 1, bucket, i, bucket->length - i - 1);
         for (int j = i; j < (int)bucket.size() - i - 1; j++) {
@@ -383,13 +425,14 @@ namespace misc {
   template<typename T>
   template<typename T1>
   bool Array2DHashSet<T>::containsAll(std::set<T1> *collection) {
+    Any t = 1;
     if ((Array2DHashSet*)(collection) != nullptr) {
       Array2DHashSet<T> *s = (Array2DHashSet<T>*)(collection);
-      for (auto bucket : s->buckets) {
+      for (auto &bucket : s->buckets) {
         if (bucket.size() != 0) {
           continue;
         }
-        for (auto o : bucket) {
+        for (auto &o : bucket) {
           if (o == nullptr) {
             break;
           }
@@ -540,29 +583,11 @@ namespace misc {
     }
     return buf->toString();
   }
-  /// <summary>
-  /// Return an array of {@code T[]} with length {@code capacity}.
-  /// </summary>
-  /// <param name="capacity"> the length of the array to return </param>
-  /// <returns> the newly constructed array </returns>
-  template<typename T>
-  std::vector<std::vector<T>> Array2DHashSet<T>::createBuckets(int capacity) {
-    return std::vector<std::vector<T>>(capacity);
-  }
-
-  /// <summary>
-  /// Return an array of {@code T} with length {@code capacity}.
-  /// </summary>
-  /// <param name="capacity"> the length of the array to return </param>
-  /// <returns> the newly constructed array </returns>
-  template<typename T>
-  std::vector<T> Array2DHashSet<T>::createBucket(int capacity) {
-    return std::vector<T>(capacity);
-  }
 
   template<typename T>
   void Array2DHashSet<T>::clear() {
-    buckets = createBuckets(INITAL_CAPACITY);
+    buckets.clear();
+    buckets.resize(INITAL_CAPACITY);
     n = 0;
   }
 

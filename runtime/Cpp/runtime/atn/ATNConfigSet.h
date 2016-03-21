@@ -52,18 +52,18 @@ namespace atn {
     class AbstractConfigHashSet : public misc::Array2DHashSet<ATNConfig*> {
 
     public:
-      template<typename T1>
-      AbstractConfigHashSet(misc::AbstractEqualityComparator<T1> *comparator) {}
+      AbstractConfigHashSet(misc::AbstractEqualityComparator<ATNConfig*> *comparator)
+        : misc::Array2DHashSet<ATNConfig*>(comparator, 16, 2) {
+      }
 
-      template<typename T1>
-      AbstractConfigHashSet(misc::AbstractEqualityComparator<T1> *comparator, int initialCapacity, int initialBucketCapacity) {}
+      AbstractConfigHashSet(misc::AbstractEqualityComparator<ATNConfig*> *comparator, int initialCapacity, int initialBucketCapacity)
+        : misc::Array2DHashSet<ATNConfig*>(comparator, initialCapacity, initialBucketCapacity) {
+      }
 
     protected:
-      ATNConfig *asElementType(void *o) override;
-
-      std::vector<std::vector<ATNConfig*>> createBuckets(int capacity) override;
-
-      std::vector<ATNConfig*> createBucket(int capacity) override;
+      ATNConfig *asElementType(Any o);
+      std::vector<std::vector<ATNConfig*>> createBuckets(int capacity);
+      std::vector<ATNConfig*> createBucket(int capacity);
 
     };
     /// <summary>
@@ -88,9 +88,8 @@ namespace atn {
       ConfigEqualityComparator();
 
     public:
-      int hashCode(ATNConfig *o);
-
-      bool equals(ATNConfig *a, ATNConfig *b);
+      virtual int hashCode(ATNConfig *o) override;
+      virtual bool equals(ATNConfig *a, ATNConfig *b) override;
     };
 
     /// <summary>
@@ -103,11 +102,11 @@ namespace atn {
   protected:
     bool readonly;
 
+  public:
     /// <summary>
     /// All configs but hashed by (s, i, _, pi) not including context. Wiped out
     /// when we go readonly as this set becomes a DFA state.
     /// </summary>
-  public:
     AbstractConfigHashSet *configLookup;
 
     /// <summary>
@@ -122,7 +121,6 @@ namespace atn {
 
     // Used in parser and lexer. In lexer, it indicates we hit a pred
     // while computing a closure operation.  Don't make a DFA state from this.
-  public:
     bool hasSemanticContext;
     bool dipsIntoOuterContext;
 
@@ -176,7 +174,7 @@ namespace atn {
       return false;
     }
 
-    virtual bool equals(void *o);
+    virtual bool equals(Any o);
 
     virtual int hashCode();
 
@@ -184,7 +182,7 @@ namespace atn {
 
     virtual bool isEmpty();
 
-    virtual bool contains(void *o);
+    virtual bool contains(ATNConfig *o);
 
     virtual bool containsFast(ATNConfig *obj);
 

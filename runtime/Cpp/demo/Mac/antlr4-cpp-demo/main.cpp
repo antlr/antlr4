@@ -16,6 +16,7 @@ using namespace antlrcpptest;
 using namespace org::antlr::v4::runtime;
 
 int main(int argc, const char * argv[]) {
+
   ANTLRInputStream input(L"divide and conquer");
   TLexer lexer(&input);
   CommonTokenStream tokens(&lexer);

@@ -85,21 +85,18 @@ int DFAState::hashCode() {
   return hash;
 }
 
-bool DFAState::equals(void *o) {
+bool DFAState::equals(Any o) {
   // compare set of ATN configurations in this set with other
   if (this == o) {
     return true;
   }
 
-  if ((DFAState*)o == nullptr) {
+  if (!o.is<DFAState*>()) {
     return false;
   }
 
-  DFAState *other = static_cast<DFAState*>(o);
-  // TODO (sam): what to do when configs==null?
-  bool sameSet = this->configs->equals(other->configs);
-  //		System.out.println("DFAState.equals: "+configs+(sameSet?"==":"!=")+other.configs);
-  return sameSet;
+  DFAState *other = o.as<DFAState*>();
+  return configs->equals(other->configs);
 }
 
 std::wstring DFAState::toString() {

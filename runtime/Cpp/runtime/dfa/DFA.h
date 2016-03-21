@@ -59,18 +59,6 @@ namespace dfa {
     /// </summary>
     virtual std::vector<DFAState*> getStates();
 
-  private:
-    class ComparatorAnonymousInnerClassHelper {
-    private:
-      DFA *const outerInstance;
-
-    public:
-      ComparatorAnonymousInnerClassHelper(DFA *outerInstance);
-
-      static int compare(DFAState *o1, DFAState *o2);
-    };
-
-  public:
     virtual std::wstring toString();
 
     virtual std::wstring toString(const std::vector<std::wstring>& tokenNames);

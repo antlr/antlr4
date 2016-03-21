@@ -35,27 +35,18 @@ using namespace org::antlr::v4::runtime::misc;
 
 ObjectEqualityComparator *const ObjectEqualityComparator::INSTANCE = new ObjectEqualityComparator();
 
-int ObjectEqualityComparator::hashCode(void *obj) {
-  if (obj == nullptr) {
+int ObjectEqualityComparator::hashCode(Any obj) {
+  if (obj.isNull()) {
     return 0;
   }
-#ifdef TODO
-  // This is problematic in C++
-  return obj->hashCode();
-#else
-  throw new TODOException(L"ObjectEqualityComparator::hashCode");
-#endif
+
+  return obj.hashCode();
 }
 
-bool ObjectEqualityComparator::equals(void *a, void *b) {
-  if (a == nullptr) {
-    return b == nullptr;
+bool ObjectEqualityComparator::equals(Any a, Any b) {
+  if (a.isNull()) {
+    return b.isNull();
   }
 
-#ifdef TODO
-  return a->equals(b);
-
-#else
-  throw new TODOException(L"ObjectEqualityComparator::equals");
-#endif
+  return a.equals(b);
 }

@@ -258,18 +258,6 @@ namespace atn {
   public:
     static std::wstring toDOTString(PredictionContext *context);
 
-  private:
-
-    class ComparatorAnonymousInnerClassHelper : public misc::EqualityComparator<PredictionContext*> {
-
-    public:
-      ComparatorAnonymousInnerClassHelper();
-
-      static int compare(PredictionContext *o1, PredictionContext *o2);
-    };
-
-    // From Sam
-  public:
     static PredictionContext *getCachedContext(PredictionContext *context, PredictionContextCache *contextCache, std::map<PredictionContext*, PredictionContext*> *visited);
 
     //	// extra structures, but cut/paste/morphed works, so leave it.

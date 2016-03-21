@@ -37,12 +37,8 @@
 
 using namespace org::antlr::v4::runtime::atn;
 
-ATNConfig *ATNConfigSet::AbstractConfigHashSet::asElementType(void *o) {
-  if (!(static_cast<ATNConfig*>(o) != nullptr)) {
-    return nullptr;
-  }
-
-  return static_cast<ATNConfig*>(o);
+ATNConfig *ATNConfigSet::AbstractConfigHashSet::asElementType(Any o) {
+  return o.as<ATNConfig *>();
 }
 
 std::vector<std::vector<ATNConfig*>>
@@ -172,16 +168,16 @@ void ATNConfigSet::optimizeConfigs(ATNSimulator *interpreter) {
 }
 
 
-bool ATNConfigSet::equals(void *o) {
+bool ATNConfigSet::equals(Any o) {
   if (o == this) {
     return true;
-  } else if (!(static_cast<ATNConfigSet*>(o) != nullptr)) {
+  }
+
+  if (!o.is<ATNConfigSet*>()) {
     return false;
   }
 
-  //		System.out.print("equals " + this + ", " + o+" = ");
-  ATNConfigSet *other = static_cast<ATNConfigSet*>(o);
-
+  ATNConfigSet *other = o.as<ATNConfigSet*>();
   bool configEquals = true;
 
   if (configs.size() == other->configs.size()) {
@@ -227,7 +223,7 @@ bool ATNConfigSet::isEmpty() {
   return configs.empty();
 }
 
-bool ATNConfigSet::contains(void *o) {
+bool ATNConfigSet::contains(ATNConfig *o) {
   if (configLookup == nullptr) {
     throw UnsupportedOperationException(L"This method is not implemented for readonly sets.");
   }

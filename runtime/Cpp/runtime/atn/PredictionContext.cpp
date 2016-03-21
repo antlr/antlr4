@@ -394,8 +394,9 @@ std::wstring PredictionContext::toDOTString(PredictionContext *context) {
 
   std::vector<PredictionContext*> nodes = getAllContextNodes(context);
 
-  ComparatorAnonymousInnerClassHelper tmp;
-  std::sort(nodes.begin(), nodes.end(), (tmp.compare));
+  std::sort(nodes.begin(), nodes.end(), [](PredictionContext *o1, PredictionContext *o2) {
+    return o1->id - o2->id;
+  });
 
   for (auto current : nodes) {
     if (dynamic_cast<SingletonPredictionContext*>(current) != nullptr) {
@@ -452,14 +453,6 @@ std::wstring PredictionContext::toDOTString(PredictionContext *context) {
   buf->append(L"}\n");
   return buf->toString();
 }
-
-PredictionContext::ComparatorAnonymousInnerClassHelper::ComparatorAnonymousInnerClassHelper() {
-}
-
-int PredictionContext::ComparatorAnonymousInnerClassHelper::compare(PredictionContext *o1, PredictionContext *o2) {
-  return o1->id - o2->id;
-}
-
 
 PredictionContext *PredictionContext::getCachedContext(PredictionContext *context, PredictionContextCache *contextCache,
                                                             std::map<PredictionContext*, PredictionContext*> *visited) {

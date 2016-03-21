@@ -29,17 +29,16 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "Array2DHashSet.h"
 #include "ObjectEqualityComparator.h"
 
 #include "OrderedATNConfigSet.h"
 
 using namespace org::antlr::v4::runtime::atn;
 
-OrderedATNConfigSet::LexerConfigHashSet::LexerConfigHashSet() :
-AbstractConfigHashSet(misc::ObjectEqualityComparator::INSTANCE){
+OrderedATNConfigSet::LexerConfigHashSet::LexerConfigHashSet()
+: AbstractConfigHashSet(nullptr) { // Use default comparator (which is ObjectEqualityComparator).
 }
 
 OrderedATNConfigSet::OrderedATNConfigSet() {
-  this->configLookup = new LexerConfigHashSet();
+  configLookup = new LexerConfigHashSet();
 }
