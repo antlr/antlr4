@@ -47,7 +47,6 @@ RuleContext::RuleContext() {
 RuleContext::RuleContext(RuleContext *parent, int invokingState) {
   InitializeInstanceFields();
   this->parent = parent;
-  //if ( parent!=null ) System.out.println("invoke "+stateNumber+" from "+parent);
   this->invokingState = invokingState;
 }
 

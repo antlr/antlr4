@@ -31,7 +31,6 @@
 
 #include "WritableToken.h"
 #include "Lexer.h"
-#include "vectorhelper.h"
 #include "RuleContext.h"
 #include "Interval.h"
 #include "StringBuilder.h"
@@ -90,7 +89,7 @@ void BufferedTokenStream::consume() {
 bool BufferedTokenStream::sync(int i) {
   assert(i >= 0);
   size_t n = i - tokens.size() + 1; // how many more elements we need?
-                                    //System.out.println("sync("+i+") needs "+n);
+
   if (n > 0) {
     size_t fetched = fetch((int)n);
     return fetched >= n;
@@ -398,7 +397,7 @@ void BufferedTokenStream::fill() {
 }
 
 void BufferedTokenStream::InitializeInstanceFields() {
-  tokens = antlrcpp::VectorHelper::VectorWithReservedSize<Token*>(100);
+  tokens.reserve(100);
   p = -1;
   fetchedEOF = false;
 }

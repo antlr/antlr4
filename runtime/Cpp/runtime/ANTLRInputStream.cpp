@@ -43,28 +43,25 @@ ANTLRInputStream::ANTLRInputStream() {
   InitializeInstanceFields();
 }
 
-ANTLRInputStream::ANTLRInputStream(const std::wstring &input) {
-  InitializeInstanceFields();
+ANTLRInputStream::ANTLRInputStream(const std::wstring &input) : ANTLRInputStream() {
   this->data = input;
   this->n = (int)input.length();
 }
 
-ANTLRInputStream::ANTLRInputStream(wchar_t data[], int numberOfActualCharsInArray) {
-  InitializeInstanceFields();
+ANTLRInputStream::ANTLRInputStream(wchar_t data[], int numberOfActualCharsInArray) : ANTLRInputStream() {
   this->data = data;
   this->n = numberOfActualCharsInArray;
 }
 
 
-ANTLRInputStream::ANTLRInputStream(std::wifstream *r) {
+ANTLRInputStream::ANTLRInputStream(std::wifstream *r) : ANTLRInputStream() {
 }
 
 
-ANTLRInputStream::ANTLRInputStream(std::wifstream *r, int initialSize)  {
+ANTLRInputStream::ANTLRInputStream(std::wifstream *r, int initialSize) : ANTLRInputStream() {
 }
 
-ANTLRInputStream::ANTLRInputStream(std::wifstream *r, int initialSize, int readChunkSize) {
-  InitializeInstanceFields();
+ANTLRInputStream::ANTLRInputStream(std::wifstream *r, int initialSize, int readChunkSize) : ANTLRInputStream() {
   load(r, initialSize, readChunkSize);
 }
 
@@ -73,13 +70,15 @@ void ANTLRInputStream::load(std::wifstream *r, int size, int readChunkSize) {
   if (r == nullptr) {
     return;
   }
+  
   if (size <= 0) {
     size = INITIAL_BUFFER_SIZE;
   }
+
   if (readChunkSize <= 0) {
     readChunkSize = READ_BUFFER_SIZE;
   }
-  // System.out.println("load "+size+" in chunks of "+readChunkSize);
+
   try {
     // alloc initial buffer size.
     data = new wchar_t[size];
@@ -88,20 +87,17 @@ void ANTLRInputStream::load(std::wifstream *r, int size, int readChunkSize) {
     int p = 0;
     do {
       if (p + readChunkSize > (int)data.length()) { // overflow?
-                                                    // System.out.println("### overflow p="+p+", data.length="+data.length);
         data = antlrcpp::Arrays::copyOf(data, (int)data.length() * 2);
       }
       r->read(new wchar_t[100], p);
 
-      // System.out.println("read "+numRead+" chars; p was "+p+" is now "+(p+numRead));
       p += numRead;
     } while (numRead != -1); // while not EOF
                              // set the actual size of the data available;
                              // EOF subtracted one above in p+=numRead; add one back
     n = p + 1;
-    //System.out.println("n="+n);
   }
-  catch (void *){
+  catch (void *) {
     r->close();
   }
 
@@ -117,10 +113,8 @@ void ANTLRInputStream::consume() {
     throw IllegalStateException(L"cannot consume EOF");
   }
 
-  //System.out.println("prev p="+p+", c="+(char)data[p]);
   if (p < n) {
     p++;
-    //System.out.println("p moves to "+p+" (c='"+(char)data[p]+"')");
   }
 }
 
@@ -136,11 +130,9 @@ int ANTLRInputStream::LA(int i) {
   }
 
   if ((p + i - 1) >= n) {
-    //System.out.println("char LA("+i+")=EOF; p="+p);
     return IntStream::_EOF;
   }
-  //System.out.println("char LA("+i+")="+(char)data[p+i-1]+"; p="+p);
-  //System.out.println("LA("+i+"); p="+p+" n="+n+" data.length="+data.length);
+
   return data[p + i - 1];
 }
 
@@ -184,10 +176,8 @@ std::wstring ANTLRInputStream::getText(Interval *interval) {
   if (start >= n) {
     return L"";
   }
-  //		System.err.println("data: "+Arrays.toString(data)+", n="+n+
-  //						   ", start="+start+
-  //						   ", stop="+stop);
-  return std::wstring(data, start, count);
+
+  return data.substr(start, count);
 }
 
 std::string ANTLRInputStream::getSourceName() {
@@ -195,7 +185,7 @@ std::string ANTLRInputStream::getSourceName() {
 }
 
 std::wstring ANTLRInputStream::toString() {
-  return std::wstring(data);
+  return data;
 }
 
 void ANTLRInputStream::InitializeInstanceFields() {

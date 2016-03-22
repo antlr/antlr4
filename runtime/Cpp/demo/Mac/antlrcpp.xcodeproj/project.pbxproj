@@ -451,8 +451,6 @@
 		27C669151C9585230021E494 /* guid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 27C668F51C9585230021E494 /* guid.cpp */; };
 		27C669161C9585230021E494 /* guid.h in Headers */ = {isa = PBXBuildFile; fileRef = 27C668F61C9585230021E494 /* guid.h */; };
 		27C669171C9585230021E494 /* guid.h in Headers */ = {isa = PBXBuildFile; fileRef = 27C668F61C9585230021E494 /* guid.h */; };
-		27C669181C9585230021E494 /* vectorhelper.h in Headers */ = {isa = PBXBuildFile; fileRef = 27C668F71C9585230021E494 /* vectorhelper.h */; };
-		27C669191C9585230021E494 /* vectorhelper.h in Headers */ = {isa = PBXBuildFile; fileRef = 27C668F71C9585230021E494 /* vectorhelper.h */; };
 		27C6698B1C9585B80021E494 /* AbstractParseTreeVisitor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 27C6696F1C9585B80021E494 /* AbstractParseTreeVisitor.cpp */; };
 		27C6698C1C9585B80021E494 /* AbstractParseTreeVisitor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 27C6696F1C9585B80021E494 /* AbstractParseTreeVisitor.cpp */; };
 		27C6698D1C9585B80021E494 /* AbstractParseTreeVisitor.h in Headers */ = {isa = PBXBuildFile; fileRef = 27C669701C9585B80021E494 /* AbstractParseTreeVisitor.h */; };
@@ -692,7 +690,7 @@
 		27C666A11C9584050021E494 /* TokenSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TokenSource.h; path = ../../runtime/TokenSource.h; sourceTree = SOURCE_ROOT; };
 		27C666A21C9584050021E494 /* TokenStream.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TokenStream.cpp; path = ../../runtime/TokenStream.cpp; sourceTree = SOURCE_ROOT; };
 		27C666A31C9584050021E494 /* TokenStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TokenStream.h; path = ../../runtime/TokenStream.h; sourceTree = SOURCE_ROOT; };
-		27C666A41C9584050021E494 /* TokenStreamRewriter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TokenStreamRewriter.cpp; path = ../../runtime/TokenStreamRewriter.cpp; sourceTree = SOURCE_ROOT; };
+		27C666A41C9584050021E494 /* TokenStreamRewriter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TokenStreamRewriter.cpp; path = ../../runtime/TokenStreamRewriter.cpp; sourceTree = SOURCE_ROOT; wrapsLines = 0; };
 		27C666A51C9584050021E494 /* TokenStreamRewriter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TokenStreamRewriter.h; path = ../../runtime/TokenStreamRewriter.h; sourceTree = SOURCE_ROOT; };
 		27C666A61C9584050021E494 /* UnbufferedCharStream.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = UnbufferedCharStream.cpp; path = ../../runtime/UnbufferedCharStream.cpp; sourceTree = SOURCE_ROOT; };
 		27C666A71C9584050021E494 /* UnbufferedCharStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UnbufferedCharStream.h; path = ../../runtime/UnbufferedCharStream.h; sourceTree = SOURCE_ROOT; };
@@ -702,7 +700,7 @@
 		27C666AB1C9584050021E494 /* WritableToken.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = WritableToken.h; path = ../../runtime/WritableToken.h; sourceTree = SOURCE_ROOT; };
 		27C667471C95846E0021E494 /* AbstractPredicateTransition.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AbstractPredicateTransition.cpp; sourceTree = "<group>"; };
 		27C667481C95846E0021E494 /* AbstractPredicateTransition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AbstractPredicateTransition.h; sourceTree = "<group>"; };
-		27C667491C95846E0021E494 /* ActionTransition.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ActionTransition.cpp; sourceTree = "<group>"; };
+		27C667491C95846E0021E494 /* ActionTransition.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ActionTransition.cpp; sourceTree = "<group>"; wrapsLines = 0; };
 		27C6674A1C95846E0021E494 /* ActionTransition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ActionTransition.h; sourceTree = "<group>"; };
 		27C6674B1C95846E0021E494 /* ArrayPredictionContext.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ArrayPredictionContext.cpp; sourceTree = "<group>"; };
 		27C6674C1C95846E0021E494 /* ArrayPredictionContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ArrayPredictionContext.h; sourceTree = "<group>"; };
@@ -740,7 +738,7 @@
 		27C6676C1C95846E0021E494 /* EmptyPredictionContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EmptyPredictionContext.h; sourceTree = "<group>"; };
 		27C6676D1C95846E0021E494 /* EpsilonTransition.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EpsilonTransition.cpp; sourceTree = "<group>"; };
 		27C6676E1C95846E0021E494 /* EpsilonTransition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EpsilonTransition.h; sourceTree = "<group>"; };
-		27C6676F1C95846E0021E494 /* LexerATNConfig.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LexerATNConfig.cpp; sourceTree = "<group>"; };
+		27C6676F1C95846E0021E494 /* LexerATNConfig.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LexerATNConfig.cpp; sourceTree = "<group>"; wrapsLines = 0; };
 		27C667701C95846E0021E494 /* LexerATNConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LexerATNConfig.h; sourceTree = "<group>"; };
 		27C667711C95846E0021E494 /* LexerATNSimulator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LexerATNSimulator.cpp; sourceTree = "<group>"; };
 		27C667721C95846E0021E494 /* LexerATNSimulator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LexerATNSimulator.h; sourceTree = "<group>"; };
@@ -844,7 +842,6 @@
 		27C668F41C9585230021E494 /* Strings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Strings.h; sourceTree = "<group>"; };
 		27C668F51C9585230021E494 /* guid.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = guid.cpp; sourceTree = "<group>"; };
 		27C668F61C9585230021E494 /* guid.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = guid.h; sourceTree = "<group>"; };
-		27C668F71C9585230021E494 /* vectorhelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vectorhelper.h; sourceTree = "<group>"; };
 		27C6696F1C9585B80021E494 /* AbstractParseTreeVisitor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AbstractParseTreeVisitor.cpp; sourceTree = "<group>"; };
 		27C669701C9585B80021E494 /* AbstractParseTreeVisitor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AbstractParseTreeVisitor.h; sourceTree = "<group>"; };
 		27C669711C9585B80021E494 /* ErrorNode.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ErrorNode.cpp; sourceTree = "<group>"; };
@@ -1132,7 +1129,6 @@
 				27C668F41C9585230021E494 /* Strings.h */,
 				27C668F51C9585230021E494 /* guid.cpp */,
 				27C668F61C9585230021E494 /* guid.h */,
-				27C668F71C9585230021E494 /* vectorhelper.h */,
 				27B4CE501C9F417D00E766E7 /* Any.h */,
 			);
 			path = support;
@@ -1496,7 +1492,6 @@
 				27C6683F1C95846E0021E494 /* RuleTransition.h in Headers */,
 				27C667231C9584050021E494 /* Recognizer.h in Headers */,
 				27C6690D1C9585230021E494 /* StringBuilder.h in Headers */,
-				27C669191C9585230021E494 /* vectorhelper.h in Headers */,
 				27C667F11C95846E0021E494 /* EmptyPredictionContext.h in Headers */,
 				27C667331C9584050021E494 /* TokenSource.h in Headers */,
 				27C66A531C958AC10021E494 /* XPathRuleElement.h in Headers */,
@@ -1573,7 +1568,6 @@
 				27C668E41C9584FA0021E494 /* Utils.h in Headers */,
 				27C66A1C1C958AB30021E494 /* TextChunk.h in Headers */,
 				27C667EC1C95846E0021E494 /* DecisionState.h in Headers */,
-				27C669181C9585230021E494 /* vectorhelper.h in Headers */,
 				27C667001C9584050021E494 /* LexerInterpreter.h in Headers */,
 				27C667AC1C95846E0021E494 /* ActionTransition.h in Headers */,
 				27C669911C9585B80021E494 /* ErrorNode.h in Headers */,
@@ -1777,7 +1771,7 @@
 		37D727A21867AF1E007B6D10 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0720;
+				LastUpgradeCheck = 0730;
 				ORGANIZATIONNAME = "Dan McLaughlin";
 				TargetAttributes = {
 					27C66A661C9591280021E494 = {
@@ -2248,7 +2242,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_OBJC_ARC = YES;
@@ -2288,7 +2281,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_OBJC_ARC = YES;

@@ -39,9 +39,7 @@ CommonTokenStream::CommonTokenStream(TokenSource *tokenSource) : BufferedTokenSt
   InitializeInstanceFields();
 }
 
-CommonTokenStream::CommonTokenStream(TokenSource *tokenSource, int channel)
-: BufferedTokenStream(tokenSource)
-{
+CommonTokenStream::CommonTokenStream(TokenSource *tokenSource, int channel) : BufferedTokenStream(tokenSource) {
   this->channel = channel;
 }
 

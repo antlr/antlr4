@@ -38,15 +38,14 @@ namespace antlr {
 namespace v4 {
 namespace runtime {
 
-  /// <summary>
-  /// A source of characters for an ANTLR lexer. </summary>
+  /// A source of characters for an ANTLR lexer.
   class CharStream : public IntStream {
-    /// <summary>
+
     /// This method returns the text for a range of characters within this input
     /// stream. This method is guaranteed to not throw an exception if the
-    /// specified {@code interval} lies entirely within a marked range. For more
-    /// information about marked ranges, see <seealso cref="IntStream#mark"/>.
-    /// </summary>
+    /// specified interval lies entirely within a marked range. For more
+    /// information about marked ranges, see IntStream::mark.
+    ///
     /// <param name="interval"> an interval within the stream </param>
     /// <returns> the text of the specified interval
     /// </returns>

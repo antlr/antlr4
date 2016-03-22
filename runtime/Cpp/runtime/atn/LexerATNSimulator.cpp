@@ -531,8 +531,9 @@ dfa::DFAState *LexerATNSimulator::addDFAState(ATNConfigSet *configs) {
 
   dfa::DFA *dfa = _decisionToDFA[mode];
 
-  if(true) {
+  {
     std::lock_guard<std::mutex> lck(mtx);
+    
     dfa::DFAState *existing = dfa->states->at(proposed);
     if (existing != nullptr) {
       return existing;

@@ -38,10 +38,8 @@ namespace antlr {
 namespace v4 {
 namespace runtime {
 
-  /// <summary>
-  /// Vacuum all input from a <seealso cref="Reader"/>/<seealso cref="InputStream"/> and then treat it
-  /// like a {@code char[]} buffer. Can also pass in a <seealso cref="String"/> or
-  /// {@code char[]} to use.
+  /// Vacuum all input from a Reader/InputStream and then treat it
+  /// like a char[] buffer. Can also pass in a string or char[] to use.
   /// <p/>
   /// If you need encoding, pass in stream/reader with correct encoding.
   /// </summary>

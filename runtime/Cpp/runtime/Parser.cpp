@@ -47,7 +47,7 @@
 
 using namespace org::antlr::v4::runtime;
 
-std::map<std::wstring, atn::ATN*> * Parser::bypassAltsAtnCache = new std::map<std::wstring, atn::ATN*>();
+std::map<std::wstring, atn::ATN *> Parser::bypassAltsAtnCache;
 
 Parser::TraceListener::TraceListener(Parser *outerInstance) : outerInstance(outerInstance) {
 }
@@ -98,11 +98,6 @@ void Parser::TrimToSizeListener::exitEveryRule(ParserRuleContext *ctx) {
 Parser::Parser(TokenStream* input) {
   InitializeInstanceFields();
   setInputStream(input);
-
-  // TODO: Initialize this safely and handle concurrent accesses.
-  // TODO: For now treat this as a member variable but it should be shared across instances for speed.
-  Parser::bypassAltsAtnCache =
-  new std::map<std::wstring, atn::ATN*>();
 }
 
 void Parser::reset() {
@@ -240,18 +235,24 @@ TokenFactory<CommonToken*> *Parser::getTokenFactory() {
 
 atn::ATN *Parser::getATNWithBypassAlts() {
   std::wstring serializedAtn = getSerializedATN();
-  if (serializedAtn == L"") {
+  if (serializedAtn.empty()) {
     throw UnsupportedOperationException(L"The current parser does not support an ATN with bypass alternatives.");
   }
 
-  if (bypassAltsAtnCache != nullptr) {
+  {
     std::lock_guard<std::mutex> lck(mtx);
-    atn::ATN *result = bypassAltsAtnCache->at(serializedAtn);
+
+    // XXX: using the entire serialized ATN as key into the map is a big resource waste.
+    //      How large can that thing become? Not only may the storage become an issue but also
+    //      creating a hash over a large string.
+    atn::ATN *result = bypassAltsAtnCache[serializedAtn];
     if (result == nullptr) {
       atn::ATNDeserializationOptions *deserializationOptions = new atn::ATNDeserializationOptions();
       deserializationOptions->setGenerateRuleBypassTransitions(true);
-      result = (new atn::ATNDeserializer(deserializationOptions))->deserialize(serializedAtn);
-      bypassAltsAtnCache->emplace(serializedAtn, result);
+
+      atn::ATNDeserializer deserializer(deserializationOptions);
+      result = deserializer.deserialize(serializedAtn);
+      bypassAltsAtnCache.emplace(serializedAtn, result);
     }
 
     return result;
@@ -607,3 +608,4 @@ void Parser::InitializeInstanceFields() {
   _buildParseTrees = true;
   _syntaxErrors = 0;
 }
+
