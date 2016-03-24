@@ -67,10 +67,12 @@ void LexerATNSimulator::SimState::InitializeInstanceFields() {
 int LexerATNSimulator::match_calls = 0;
 
 
-LexerATNSimulator::LexerATNSimulator(ATN *atn, std::vector<dfa::DFA*> decisionToDFA, PredictionContextCache *sharedContextCache) : prevAccept(new SimState()), recog(nullptr) {
+LexerATNSimulator::LexerATNSimulator(const ATN &atn, const std::vector<dfa::DFA*> &decisionToDFA, PredictionContextCache *sharedContextCache)
+: LexerATNSimulator(nullptr, atn, decisionToDFA, sharedContextCache) {
 }
 
-LexerATNSimulator::LexerATNSimulator(Lexer *recog, ATN *atn, std::vector<dfa::DFA*> decisionToDFA, PredictionContextCache *sharedContextCache) : ATNSimulator(atn,sharedContextCache), recog(recog), _decisionToDFA(decisionToDFA), prevAccept(new SimState()) {
+LexerATNSimulator::LexerATNSimulator(Lexer *recog, const ATN &atn, const std::vector<dfa::DFA*> &decisionToDFA, PredictionContextCache *sharedContextCache)
+: ATNSimulator(atn, sharedContextCache), recog(recog), _decisionToDFA(decisionToDFA), prevAccept(new SimState()) {
   InitializeInstanceFields();
 }
 
@@ -110,7 +112,7 @@ void LexerATNSimulator::reset() {
 }
 
 int LexerATNSimulator::matchATN(CharStream *input) {
-  ATNState *startState = (ATNState *)atn->modeToStartState.at(mode);
+  ATNState *startState = (ATNState *)atn.modeToStartState.at(mode);
 
   if (debug) {
     std::wcout << L"matchATN mode" << mode << L" start: " << startState << std::endl;
@@ -172,7 +174,7 @@ int LexerATNSimulator::execATN(CharStream *input, dfa::DFAState *ds0) {
       target = computeTargetState(input, s, t);
     }
 
-    if (target == ERROR) {
+    if (target == &ERROR) {
       break;
     }
 
@@ -217,9 +219,9 @@ dfa::DFAState *LexerATNSimulator::computeTargetState(CharStream *input, dfa::DFA
   if (reach->isEmpty()) { // we got nowhere on t from s
                           // we got nowhere on t, don't throw out this knowledge; it'd
                           // cause a failover from DFA later.
-    addDFAEdge(s, t, ERROR);
+    addDFAEdge(s, t, &ERROR);
     // stop when we can't match any more char
-    return ERROR;
+    return &ERROR;
   }
 
   // Add an edge from s to target DFA found/created for reach
@@ -343,7 +345,7 @@ bool LexerATNSimulator::closure(CharStream *input, LexerATNConfig *config, ATNCo
       for (int i = 0; i < config->context->size(); i++) {
         if (config->context->getReturnState(i) != PredictionContext::EMPTY_RETURN_STATE) {
           PredictionContext *newContext = config->context->getParent(i); // "pop" return state
-          ATNState *returnState = atn->states[config->context->getReturnState(i)];
+          ATNState *returnState = atn.states[config->context->getReturnState(i)];
           LexerATNConfig *c = new LexerATNConfig(returnState, config->alt, newContext);
           currentAltReachedAcceptState = closure(input, c, configs, currentAltReachedAcceptState, speculative);
         }
@@ -526,7 +528,7 @@ dfa::DFAState *LexerATNSimulator::addDFAState(ATNConfigSet *configs) {
     proposed->isAcceptState = true;
     proposed->lexerRuleIndex = firstConfigWithRuleStopState->state->ruleIndex;
     proposed->lexerActionIndex = (static_cast<LexerATNConfig*>(firstConfigWithRuleStopState))->lexerActionIndex;
-    proposed->prediction = atn->ruleToTokenType[proposed->lexerRuleIndex];
+    proposed->prediction = atn.ruleToTokenType[proposed->lexerRuleIndex];
   }
 
   dfa::DFA *dfa = _decisionToDFA[mode];

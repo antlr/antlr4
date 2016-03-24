@@ -41,17 +41,14 @@
 using namespace org::antlr::v4::runtime::dfa;
 using namespace org::antlr::v4::runtime::atn;
 
-DFAState * ATNSimulator::ERROR = new DFAState();
+DFAState ATNSimulator::ERROR(INT32_MAX);
 
 ATNSimulator::ATNSimulator() {
-  ERROR = new dfa::DFAState(new ATNConfigSet());
-  ERROR->stateNumber = INT32_MAX;
   sharedContextCache = new PredictionContextCache();
-
-  atn = new ATN(ATNType::LEXER, 0);
 }
 
-ATNSimulator::ATNSimulator(ATN *atn, PredictionContextCache *sharedContextCache) : atn(atn), sharedContextCache(sharedContextCache) {
+ATNSimulator::ATNSimulator(const ATN &atn, PredictionContextCache *sharedContextCache)
+: atn(atn), sharedContextCache(sharedContextCache) {
 }
 
 PredictionContextCache *ATNSimulator::getSharedContextCache() {
@@ -70,8 +67,9 @@ PredictionContext *ATNSimulator::getCachedContext(PredictionContext *context) {
   }
 }
 
-ATN *ATNSimulator::deserialize(wchar_t data[]) {
-  return (new ATNDeserializer())->deserialize(data);
+ATN ATNSimulator::deserialize(const std::wstring &data) {
+  ATNDeserializer deserializer;
+  return deserializer.deserialize(data);
 }
 
 void ATNSimulator::checkCondition(bool condition) {
@@ -82,7 +80,7 @@ void ATNSimulator::checkCondition(bool condition, const std::wstring &message) {
   (new ATNDeserializer())->checkCondition(condition, message);
 }
 
-Transition *ATNSimulator::edgeFactory(ATN *atn, int type, int src, int trg, int arg1, int arg2, int arg3, std::vector<misc::IntervalSet*> &sets) {
+Transition *ATNSimulator::edgeFactory(const ATN &atn, int type, int src, int trg, int arg1, int arg2, int arg3, std::vector<misc::IntervalSet*> &sets) {
   return (new ATNDeserializer())->edgeFactory(atn, type, src, trg, arg1, arg2, arg3, sets);
 }
 

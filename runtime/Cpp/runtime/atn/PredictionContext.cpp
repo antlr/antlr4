@@ -51,7 +51,7 @@ const int PredictionContext::INITIAL_HASH;
 PredictionContext::PredictionContext(int cachedHashCode) : id(globalNodeCount++), cachedHashCode(cachedHashCode)  {
 }
 
-PredictionContext *PredictionContext::fromRuleContext(ATN *atn, RuleContext *outerContext) {
+PredictionContext *PredictionContext::fromRuleContext(const ATN &atn, RuleContext *outerContext) {
   if (outerContext == nullptr) {
     outerContext = (RuleContext*)RuleContext::EMPTY;
   }
@@ -66,7 +66,7 @@ PredictionContext *PredictionContext::fromRuleContext(ATN *atn, RuleContext *out
   PredictionContext *parent = EMPTY;
   parent = PredictionContext::fromRuleContext(atn, outerContext->parent);
 
-  ATNState *state = atn->states[outerContext->invokingState];
+  ATNState *state = atn.states[outerContext->invokingState];
   RuleTransition *transition = (RuleTransition *)state->transition(0);//static_cast<RuleTransition*>(state->transition(0));
   return SingletonPredictionContext::create(parent, transition->followState->stateNumber);
 }

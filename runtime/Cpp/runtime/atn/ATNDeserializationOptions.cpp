@@ -33,7 +33,7 @@
 
 using namespace org::antlr::v4::runtime::atn;
 
-ATNDeserializationOptions * const ATNDeserializationOptions::defaultOptions = new ATNDeserializationOptions();
+ATNDeserializationOptions ATNDeserializationOptions::defaultOptions;
 
 ATNDeserializationOptions::ATNDeserializationOptions()
 : readOnly(true)  {
@@ -45,7 +45,7 @@ ATNDeserializationOptions::ATNDeserializationOptions(ATNDeserializationOptions *
   this->generateRuleBypassTransitions = options->generateRuleBypassTransitions;
 }
 
-org::antlr::v4::runtime::atn::ATNDeserializationOptions *ATNDeserializationOptions::getDefaultOptions() {
+const ATNDeserializationOptions& ATNDeserializationOptions::getDefaultOptions() {
   return defaultOptions;
 }
 

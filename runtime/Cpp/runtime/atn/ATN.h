@@ -41,6 +41,10 @@ namespace atn {
   public:
     static const int INVALID_ALT_NUMBER = 0;
 
+    /// Used for runtime deserialization of ATNs from strings.
+    ATN();
+    ATN(ATNType grammarType, int maxTokenType);
+
     std::vector<ATNState*> states;
 
     /// <summary>
@@ -63,17 +67,15 @@ namespace atn {
     // TODO: Memory Management
     RuleStopState **ruleToStopState;
 
-    std::map<std::wstring, TokensStartState*> *const modeNameToStartState;
-
     /// <summary>
     /// The type of the ATN.
     /// </summary>
-    const ATNType grammarType;
+    ATNType grammarType;
 
     /// <summary>
     /// The maximum value for any symbol recognized by a transition in the ATN.
     /// </summary>
-    const int maxTokenType;
+    int maxTokenType;
 
     /// <summary>
     /// For lexer ATNs, this maps the rule index to the resulting token type.
@@ -95,23 +97,19 @@ namespace atn {
     std::vector<TokensStartState*> modeToStartState;
 
     /// <summary>
-    /// Used for runtime deserialization of ATNs from strings </summary>
-    ATN(ATNType grammarType, int maxTokenType);
-
-    /// <summary>
     /// Compute the set of valid tokens that can occur starting in state {@code s}.
     ///  If {@code ctx} is null, the set of tokens will not include what can follow
     ///  the rule surrounding {@code s}. In other words, the set will be
     ///  restricted to tokens reachable staying within {@code s}'s rule.
     /// </summary>
-    virtual misc::IntervalSet *nextTokens(ATNState *s, RuleContext *ctx);
+    virtual misc::IntervalSet *nextTokens(ATNState *s, RuleContext *ctx) const;
 
     /// <summary>
     /// Compute the set of valid tokens that can occur starting in {@code s} and
     /// staying in same rule. <seealso cref="Token#EPSILON"/> is in set if we reach end of
     /// rule.
     /// </summary>
-    virtual misc::IntervalSet *nextTokens(ATNState *s);
+    virtual misc::IntervalSet *nextTokens(ATNState *s) const;
 
     virtual void addState(ATNState *state);
 
@@ -119,9 +117,9 @@ namespace atn {
 
     virtual int defineDecisionState(DecisionState *s);
 
-    virtual DecisionState *getDecisionState(int decision);
+    virtual DecisionState *getDecisionState(int decision) const;
 
-    virtual int getNumberOfDecisions();
+    virtual int getNumberOfDecisions() const;
 
     /// <summary>
     /// Computes the set of input symbols which could follow ATN state number
@@ -141,7 +139,7 @@ namespace atn {
     /// specified state in the specified context. </returns>
     /// <exception cref="IllegalArgumentException"> if the ATN does not contain a state with
     /// number {@code stateNumber} </exception>
-    virtual misc::IntervalSet *getExpectedTokens(int stateNumber, RuleContext *context);
+    virtual misc::IntervalSet *getExpectedTokens(int stateNumber, RuleContext *context) const;
   };
   
 } // namespace atn

@@ -43,8 +43,9 @@ namespace runtime {
 
   /// <summary>
   /// This is all the parsing support code essentially; most of it is error recovery stuff. </summary>
-  class Parser : public Recognizer<Token*, atn::ParserATNSimulator*> {
+  class Parser : public Recognizer<Token, atn::ParserATNSimulator> {
   public:
+
     class TraceListener : public tree::ParseTreeListener {
     private:
       Parser *const outerInstance;
@@ -54,15 +55,11 @@ namespace runtime {
       virtual ~TraceListener() {};
 
       virtual void enterEveryRule(ParserRuleContext *ctx) override;
-
       virtual void visitTerminal(tree::TerminalNode *node) override;
-
       virtual void visitErrorNode(tree::ErrorNode *node) override;
-
       virtual void exitEveryRule(ParserRuleContext *ctx) override;
     };
 
-  public:
     class TrimToSizeListener : public tree::ParseTreeListener {
     public:
       static TrimToSizeListener *const INSTANCE;
@@ -74,74 +71,11 @@ namespace runtime {
     };
 
     /// <summary>
-    /// This field maps from the serialized ATN string to the deserialized <seealso cref="ATN"/> with
-    /// bypass alternatives.
-    /// </summary>
-    /// <seealso cref= ATNDeserializationOptions#isGenerateRuleBypassTransitions() </seealso>
-  private:
-    static std::map<std::wstring, atn::ATN *> bypassAltsAtnCache;
-
-    /// <summary>
-    /// The error handling strategy for the parser. The default value is a new
-    /// instance of <seealso cref="DefaultErrorStrategy"/>.
-    /// </summary>
-    /// <seealso cref= #getErrorHandler </seealso>
-    /// <seealso cref= #setErrorHandler </seealso>
-  protected:
-    ANTLRErrorStrategy *_errHandler;
-
-    /// <summary>
-    /// The input stream.
-    /// </summary>
-    /// <seealso cref= #getInputStream </seealso>
-    /// <seealso cref= #setInputStream </seealso>
-    TokenStream *_input;
-
-    std::vector<int> _precedenceStack;
-    //Mutex to manage synchronized access for multithreading in the parser
-    std::mutex mtx;
-    /// <summary>
     /// The <seealso cref="ParserRuleContext"/> object for the currently executing rule.
     /// This is always non-null during the parsing process.
     /// </summary>
-  public:
-    ParserRuleContext *_ctx;
+    ParserRuleContext *ctx;
 
-    /// <summary>
-    /// Specifies whether or not the parser should construct a parse tree during
-    /// the parsing process. The default value is {@code true}.
-    /// </summary>
-    /// <seealso cref= #getBuildParseTree </seealso>
-    /// <seealso cref= #setBuildParseTree </seealso>
-  protected:
-    bool _buildParseTrees;
-
-
-    /// <summary>
-    /// When <seealso cref="#setTrace"/>{@code (true)} is called, a reference to the
-    /// <seealso cref="TraceListener"/> is stored here so it can be easily removed in a
-    /// later call to <seealso cref="#setTrace"/>{@code (false)}. The listener itself is
-    /// implemented as a parser listener so this field is not directly used by
-    /// other parser methods.
-    /// </summary>
-  private:
-    TraceListener *_tracer;
-
-    /// <summary>
-    /// The list of <seealso cref="ParseTreeListener"/> listeners registered to receive
-    /// events during the parse.
-    /// </summary>
-    /// <seealso cref= #addParseListener </seealso>
-  protected:
-    std::vector<tree::ParseTreeListener*> _parseListeners;
-
-    /// <summary>
-    /// The number of syntax errors reported during parsing. This value is
-    /// incremented each time <seealso cref="#notifyErrorListeners"/> is called.
-    /// </summary>
-    int _syntaxErrors;
-
-  public:
     Parser(TokenStream *input);
 
     /// <summary>
@@ -270,12 +204,11 @@ namespace runtime {
     /// </summary>
     /// <seealso cref= #addParseListener </seealso>
     virtual void removeParseListeners();
-
+    
     /// <summary>
     /// Notify any parse listeners of an enter rule event.
     /// </summary>
     /// <seealso cref= #addParseListener </seealso>
-  protected:
     virtual void triggerEnterRuleEvent();
 
     /// <summary>
@@ -283,13 +216,12 @@ namespace runtime {
     /// </summary>
     /// <seealso cref= #addParseListener </seealso>
     virtual void triggerExitRuleEvent();
-
+    
     /// <summary>
     /// Gets the number of syntax errors reported during parsing. This value is
     /// incremented each time <seealso cref="#notifyErrorListeners"/> is called.
     /// </summary>
     /// <seealso cref= #notifyErrorListeners </seealso>
-  public:
     virtual int getNumberOfSyntaxErrors();
 
     virtual TokenFactory<CommonToken*> *getTokenFactory() override;
@@ -301,13 +233,9 @@ namespace runtime {
       _input->getTokenSource()->setTokenFactory(factory);
     }
 
-    /// <summary>
     /// The ATN with bypass alternatives is expensive to create so we create it
-    /// lazily.
-    /// </summary>
-    /// <exception cref="UnsupportedOperationException"> if the current parser does not
-    /// implement the <seealso cref="#getSerializedATN()"/> method. </exception>
-    virtual atn::ATN *getATNWithBypassAlts();
+    /// lazily. The ATN is owned by us.
+    virtual const atn::ATN& getATNWithBypassAlts();
 
     /// <summary>
     /// The preferred method of getting a tree pattern. For example, here's a
@@ -373,15 +301,11 @@ namespace runtime {
     /// listeners.
     /// </summary>
     virtual Token *consume();
-
-  protected:
-    virtual void addContextToParseTree();
-
+    
     /// <summary>
     /// Always called by generated parsers upon entry to a rule. Access field
     /// <seealso cref="#_ctx"/> get the current context.
     /// </summary>
-  public:
     virtual void enterRule(ParserRuleContext *localctx, int state, int ruleIndex);
 
     virtual void exitRule();
@@ -469,8 +393,66 @@ namespace runtime {
     ///  events as well as token matches. This is for quick and dirty debugging.
     /// </summary>
     virtual void setTrace(bool trace);
+    
+  protected:
+    /// <summary>
+    /// The error handling strategy for the parser. The default value is a new
+    /// instance of <seealso cref="DefaultErrorStrategy"/>.
+    /// </summary>
+    /// <seealso cref= #getErrorHandler </seealso>
+    ANTLRErrorStrategy *_errHandler;
+
+    /// <summary>
+    /// The input stream.
+    /// </summary>
+    /// <seealso cref= #getInputStream </seealso>
+    /// <seealso cref= #setInputStream </seealso>
+    TokenStream *_input;
+
+    std::vector<int> _precedenceStack;
+    //Mutex to manage synchronized access for multithreading in the parser
+    std::mutex mtx;
+
+    /// <summary>
+    /// Specifies whether or not the parser should construct a parse tree during
+    /// the parsing process. The default value is {@code true}.
+    /// </summary>
+    /// <seealso cref= #getBuildParseTree </seealso>
+    /// <seealso cref= #setBuildParseTree </seealso>
+    bool _buildParseTrees;
+
+    /// <summary>
+    /// The list of <seealso cref="ParseTreeListener"/> listeners registered to receive
+    /// events during the parse.
+    /// </summary>
+    /// <seealso cref= #addParseListener </seealso>
+    std::vector<tree::ParseTreeListener*> _parseListeners;
+
+    /// <summary>
+    /// The number of syntax errors reported during parsing. This value is
+    /// incremented each time <seealso cref="#notifyErrorListeners"/> is called.
+    /// </summary>
+    int _syntaxErrors;
+    
+    virtual void addContextToParseTree();
 
   private:
+    /// <summary>
+    /// This field maps from the serialized ATN string to the deserialized <seealso cref="ATN"/> with
+    /// bypass alternatives.
+    /// </summary>
+    /// <seealso cref= ATNDeserializationOptions#isGenerateRuleBypassTransitions() </seealso>
+    static std::map<std::wstring, atn::ATN> bypassAltsAtnCache;
+
+    /// <summary>
+    /// When <seealso cref="#setTrace"/>{@code (true)} is called, a reference to the
+    /// <seealso cref="TraceListener"/> is stored here so it can be easily removed in a
+    /// later call to <seealso cref="#setTrace"/>{@code (false)}. The listener itself is
+    /// implemented as a parser listener so this field is not directly used by
+    /// other parser methods.
+    /// </summary>
+    TraceListener *_tracer;
+
     void InitializeInstanceFields();
   };
 

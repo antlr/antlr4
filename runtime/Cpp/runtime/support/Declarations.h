@@ -69,7 +69,7 @@ namespace org {
         class InputMismatchException;
         class IntStream;
         class InterpreterRuleContext;
-        template<typename Symbol, typename ATNInterpreter> class IRecognizer;
+        class IRecognizer;
         class Lexer;
         class LexerInterpreter;
         class LexerNoViableAltException;

@@ -32,6 +32,7 @@
 #pragma once
 
 #include "Parser.h"
+#include "ATN.h"
 
 namespace org {
 namespace antlr {
@@ -59,7 +60,7 @@ namespace runtime {
 
     const std::wstring grammarFileName;
     std::vector<std::wstring> _tokenNames;
-    atn::ATN *const atn;
+    const atn::ATN &_atn;
 
     std::vector<std::wstring> _ruleNames;
     antlrcpp::BitSet *const pushRecursionContextStates;
@@ -70,9 +71,11 @@ namespace runtime {
     std::deque<std::pair<ParserRuleContext*, int>*> *const _parentContextStack;
 
   public:
-    ParserInterpreter(const std::wstring &grammarFileName, const std::vector<std::wstring>& tokenNames, const std::vector<std::wstring>& ruleNames, atn::ATN *atn, TokenStream *input);
+    ParserInterpreter(const std::wstring &grammarFileName, const std::vector<std::wstring>& tokenNames,
+      const std::vector<std::wstring>& ruleNames, const atn::ATN &atn, TokenStream *input);
+    ~ParserInterpreter();
 
-    virtual atn::ATN *getATN() const override;
+    virtual const atn::ATN& getATN() const override;
 
     virtual const std::vector<std::wstring>& getTokenNames() const override;
 

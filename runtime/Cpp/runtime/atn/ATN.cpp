@@ -36,23 +36,26 @@
 #include "RuleContext.h"
 #include "DecisionState.h"
 #include "Recognizer.h"
+#include "ATNType.h"
 
 #include "ATN.h"
 
 using namespace org::antlr::v4::runtime;
 using namespace org::antlr::v4::runtime::atn;
 
-//, states(new std::vector<ATNState*>()), decisionToState(new std::vector<DecisionState*>())
-ATN::ATN(ATNType grammarType, int maxTokenType) : grammarType(grammarType), maxTokenType(maxTokenType), modeNameToStartState(new std::map<std::wstring, TokensStartState*>()) {
+ATN::ATN() : ATN(ATNType::LEXER, 0) {
 }
 
-org::antlr::v4::runtime::misc::IntervalSet *ATN::nextTokens(ATNState *s, RuleContext *ctx) {
-  LL1Analyzer *anal = new LL1Analyzer(this);
+ATN::ATN(ATNType grammarType, int maxTokenType) : grammarType(grammarType), maxTokenType(maxTokenType) {
+}
+
+org::antlr::v4::runtime::misc::IntervalSet *ATN::nextTokens(ATNState *s, RuleContext *ctx) const {
+  LL1Analyzer *anal = new LL1Analyzer(*this);
   misc::IntervalSet *next = anal->LOOK(s, ctx);
   return next;
 }
 
-org::antlr::v4::runtime::misc::IntervalSet *ATN::nextTokens(ATNState *s) {
+org::antlr::v4::runtime::misc::IntervalSet *ATN::nextTokens(ATNState *s) const {
   if (s->nextTokenWithinRule != nullptr) {
     return s->nextTokenWithinRule;
   }
@@ -82,18 +85,18 @@ int ATN::defineDecisionState(DecisionState *s) {
   return s->decision;
 }
 
-org::antlr::v4::runtime::atn::DecisionState *ATN::getDecisionState(int decision) {
+org::antlr::v4::runtime::atn::DecisionState *ATN::getDecisionState(int decision) const {
   if (!decisionToState.empty()) {
     return decisionToState.at(decision);
   }
   return nullptr;
 }
 
-int ATN::getNumberOfDecisions() {
+int ATN::getNumberOfDecisions() const {
   return (int)decisionToState.size();
 }
 
-misc::IntervalSet *ATN::getExpectedTokens(int stateNumber, RuleContext *context) {
+misc::IntervalSet *ATN::getExpectedTokens(int stateNumber, RuleContext *context) const {
   if (stateNumber < 0 || stateNumber >= (int)states.size()) {
     throw new IllegalArgumentException(L"Invalid state number.");
   }

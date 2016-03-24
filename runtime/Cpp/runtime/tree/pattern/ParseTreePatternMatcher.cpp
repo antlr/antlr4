@@ -247,7 +247,7 @@ std::vector<Token*> ParseTreePatternMatcher::tokenize(const std::wstring &patter
         if (ruleIndex == -1) {
           throw IllegalArgumentException(std::wstring(L"Unknown rule ") + tagChunk->getTag() + std::wstring(L" in pattern: ") + pattern);
         }
-        int ruleImaginaryTokenType = parser->getATNWithBypassAlts()->ruleToTokenType[ruleIndex];
+        int ruleImaginaryTokenType = parser->getATNWithBypassAlts().ruleToTokenType[ruleIndex];
         tokens.push_back(new RuleTagToken(tagChunk->getTag(), ruleImaginaryTokenType, tagChunk->getLabel()));
       } else {
         throw IllegalArgumentException(std::wstring(L"invalid tag: ") + tagChunk->getTag() + std::wstring(L" in pattern: ") + pattern);

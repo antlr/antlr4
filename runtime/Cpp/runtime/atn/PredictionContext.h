@@ -96,7 +96,7 @@ namespace atn {
     ///  Return <seealso cref="#EMPTY"/> if {@code outerContext} is empty or null.
     /// </summary>
   public:
-    static PredictionContext *fromRuleContext(ATN *atn, RuleContext *outerContext);
+    static PredictionContext *fromRuleContext(const ATN &atn, RuleContext *outerContext);
 
     virtual int size();//= 0;
 

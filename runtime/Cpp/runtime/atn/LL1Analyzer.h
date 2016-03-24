@@ -48,9 +48,9 @@ namespace atn {
   public:
     static const int HIT_PRED = Token::INVALID_TYPE;
 
-    atn::ATN *const atn;
+    const atn::ATN &_atn;
 
-    LL1Analyzer(atn::ATN *atn);
+    LL1Analyzer(const atn::ATN &atn);
 
     /// <summary>
     /// Calculates the SLL(1) expected lookahead set for each outgoing transition

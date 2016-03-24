@@ -31,6 +31,8 @@
 
 #pragma once
 
+#include "ATN.h"
+
 namespace org {
 namespace antlr {
 namespace v4 {
@@ -52,8 +54,8 @@ namespace atn {
 #endif
     /// <summary>
     /// Must distinguish between missing edge and edge we know leads nowhere </summary>
-    static dfa::DFAState * ERROR;
-    ATN * atn;
+    static dfa::DFAState ERROR;
+    ATN atn;
 
     /// <summary>
     /// The context cache maps all PredictionContext objects that are equals()
@@ -81,7 +83,7 @@ namespace atn {
 
 
   public:
-    ATNSimulator(ATN *atn, PredictionContextCache *sharedContextCache);
+    ATNSimulator(const ATN &atn, PredictionContextCache *sharedContextCache);
 
     virtual void reset() = 0;
 
@@ -90,7 +92,7 @@ namespace atn {
     virtual PredictionContext *getCachedContext(PredictionContext *context);
 
     /// @deprecated Use <seealso cref="ATNDeserializer#deserialize"/> instead.
-    static ATN *deserialize(wchar_t data[]);
+    static ATN deserialize(const std::wstring &data);
 
     /// @deprecated Use <seealso cref="ATNDeserializer#checkCondition(boolean)"/> instead.
     static void checkCondition(bool condition);
@@ -99,7 +101,7 @@ namespace atn {
     static void checkCondition(bool condition, const std::wstring &message);
 
     /// @deprecated Use <seealso cref="ATNDeserializer#edgeFactory"/> instead.
-    static Transition *edgeFactory(ATN *atn, int type, int src, int trg, int arg1, int arg2, int arg3, std::vector<misc::IntervalSet*> &sets);
+    static Transition *edgeFactory(const ATN &atn, int type, int src, int trg, int arg1, int arg2, int arg3, std::vector<misc::IntervalSet*> &sets);
 
     /// @deprecated Use <seealso cref="ATNDeserializer#stateFactory"/> instead.
     static ATNState *stateFactory(int type, int ruleIndex);

@@ -77,8 +77,7 @@ namespace runtime {
     ///        the parser was able to recover in line without exiting the
     ///        surrounding rule. </param>
   public:
-    template<typename T1, typename T2>
-    void syntaxError(IRecognizer<T1, T2> *recognizer, void *offendingSymbol,
+    void syntaxError(IRecognizer *recognizer, void *offendingSymbol,
                      int line, int charPositionInLine, const std::wstring &msg,
                      RecognitionException *e) {}
 

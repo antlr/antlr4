@@ -39,7 +39,7 @@ namespace v4 {
 namespace runtime {
 
   template<typename Symbol, typename ATNInterpreter>
-  class Recognizer : public IRecognizer<Symbol, ATNInterpreter> {
+  class Recognizer : public IRecognizer {
   public:
     Recognizer();
   public:
@@ -63,7 +63,7 @@ namespace runtime {
 #endif
 
   protected:
-    ATNInterpreter _interpreter; // Set and deleted in descentants.
+    ATNInterpreter *_interpreter; // Set and deleted in descendants.
 
   private:
     int _stateNumber;
@@ -112,27 +112,11 @@ namespace runtime {
     virtual std::wstring getGrammarFileName() const = 0;
 
     /// <summary>
-    /// Get the <seealso cref="ATN"/> used by the recognizer for prediction.
-    /// </summary>
-    /// <returns> The <seealso cref="ATN"/> used by the recognizer for prediction. </returns>
-    virtual atn::ATN *getATN() const = 0;
-
-    /// <summary>
     /// Get the ATN interpreter used by the recognizer for prediction.
     /// </summary>
     /// <returns> The ATN interpreter used by the recognizer for prediction. </returns>
-    virtual ATNInterpreter getInterpreter() const {
+    virtual ATNInterpreter* getInterpreter() const {
       return _interpreter;
-    }
-
-    // TODO: probably obsolete function. _interpreter is a protected member directly managed by descendants.
-    /// <summary>
-    /// Set the ATN interpreter used by the recognizer for prediction.
-    /// </summary>
-    /// <param name="interpreter"> The ATN interpreter used by the recognizer for
-    /// prediction. </param>
-    virtual void setInterpreter(ATNInterpreter interpreter) {
-      _interpreter = interpreter;
     }
 
     /// <summary>

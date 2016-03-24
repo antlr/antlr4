@@ -37,8 +37,8 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-
 class XPathLexer : public org::antlr::v4::runtime::Lexer {
+
 protected:
     //ORIGINAL LINE: protected static final org.antlr.v4.runtime.dfa.DFA[] _decisionToDFA;
     static const org::antlr::v4::runtime::dfa::DFA *_decisionToDFA;
@@ -57,14 +57,14 @@ public:
     virtual const std::vector<std::wstring>& getTokenNames() const override;
     virtual const std::vector<std::wstring>& getRuleNames() const override;
     virtual const std::vector<std::wstring>& getModeNames() const override;
-    virtual org::antlr::v4::runtime::atn::ATN *getATN() const override;
+    virtual const org::antlr::v4::runtime::atn::ATN& getATN() const override;
     virtual void action(org::antlr::v4::runtime::RuleContext *_localctx, int ruleIndex, int actionIndex) override;
 private:
     void ID_action(org::antlr::v4::runtime::RuleContext *_localctx, int actionIndex);
 
 public:
     static const std::wstring _serializedATN;
-    static org::antlr::v4::runtime::atn::ATN *const _ATN;
+    static org::antlr::v4::runtime::atn::ATN _ATN;
 
     XPathLexer();
 };

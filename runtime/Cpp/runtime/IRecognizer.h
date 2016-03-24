@@ -36,11 +36,13 @@ namespace antlr {
 namespace v4 {
 namespace runtime {
 
-  template<typename Symbol, typename ATNInterpreter>
   class IRecognizer {
   public:
 
     virtual int getState() = 0;
+
+    // Get the ATN used by the recognizer for prediction.
+    virtual const atn::ATN& getATN() const = 0;
 
   };
 

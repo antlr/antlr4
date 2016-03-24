@@ -59,16 +59,15 @@
 using namespace org::antlr::v4::runtime;
 using namespace org::antlr::v4::runtime::atn;
 
-ParserATNSimulator::ParserATNSimulator(ATN *atn, const std::vector<dfa::DFA *>& decisionToDFA, PredictionContextCache *sharedContextCache)
-: ATNSimulator(atn, sharedContextCache), parser(nullptr), _decisionToDFA(decisionToDFA) {
+ParserATNSimulator::ParserATNSimulator(const ATN &atn, const std::vector<dfa::DFA *>& decisionToDFA,
+                                       PredictionContextCache *sharedContextCache)
+: ParserATNSimulator(nullptr, atn, decisionToDFA, sharedContextCache) {
 }
 
-ParserATNSimulator::ParserATNSimulator(Parser *parser, ATN *atn, const std::vector<dfa::DFA *>& decisionToDFA, PredictionContextCache *sharedContextCache)
+ParserATNSimulator::ParserATNSimulator(Parser *parser, const ATN &atn, const std::vector<dfa::DFA *>& decisionToDFA,
+                                       PredictionContextCache *sharedContextCache)
 : ATNSimulator(atn, sharedContextCache), parser(parser), _decisionToDFA(decisionToDFA) {
   InitializeInstanceFields();
-  //		DOTGenerator dot = new DOTGenerator(null);
-  //		System.out.println(dot.getDOT(atn.rules.get(0), parser.getRuleNames()));
-  //		System.out.println(dot.getDOT(atn.rules.get(1), parser.getRuleNames()));
 }
 
 void ParserATNSimulator::reset() {
@@ -140,7 +139,7 @@ int ParserATNSimulator::execATN(dfa::DFA *dfa, dfa::DFAState *s0, TokenStream *i
       D = computeTargetState(dfa, previousD, t);
     }
 
-    if (D == ERROR) {
+    if (D == &ERROR) {
       // if any configs in previous dipped into outer context, that
       // means that input up to t actually finished entry rule
       // at least for SLL decision. Full LL doesn't dip into outer
@@ -240,8 +239,8 @@ dfa::DFAState *ParserATNSimulator::getExistingTargetState(dfa::DFAState *previou
 dfa::DFAState *ParserATNSimulator::computeTargetState(dfa::DFA *dfa, dfa::DFAState *previousD, int t) {
   ATNConfigSet *reach = computeReachSet(previousD->configs, t, false);
   if (reach == nullptr) {
-    addDFAEdge(dfa, previousD, t, ERROR);
-    return ERROR;
+    addDFAEdge(dfa, previousD, t, &ERROR);
+    return &ERROR;
   }
 
   // create new target state; we'll add to DFA after it's complete
@@ -275,7 +274,7 @@ dfa::DFAState *ParserATNSimulator::computeTargetState(dfa::DFA *dfa, dfa::DFASta
   }
 
   if (D->isAcceptState && D->configs->hasSemanticContext) {
-    predicateDFAState(D, atn->getDecisionState(dfa->decision));
+    predicateDFAState(D, atn.getDecisionState(dfa->decision));
     if (D->predicates.size() != 0) {
       D->prediction = ATN::INVALID_ALT_NUMBER;
     }
@@ -576,9 +575,9 @@ atn::ATNConfigSet *ParserATNSimulator::removeAllConfigsNotInRuleStopState(ATNCon
     }
 
     if (lookToEndOfRule && config->state->onlyHasEpsilonTransitions()) {
-      misc::IntervalSet *nextTokens = atn->nextTokens(config->state);
+      misc::IntervalSet *nextTokens = atn.nextTokens(config->state);
       if (nextTokens->contains(Token::EPSILON)) {
-        ATNState *endOfRuleState = atn->ruleToStopState[config->state->ruleIndex];
+        ATNState *endOfRuleState = atn.ruleToStopState[config->state->ruleIndex];
         result->add(new ATNConfig(config, endOfRuleState), mergeCache);
       }
     }
@@ -603,7 +602,7 @@ atn::ATNConfigSet *ParserATNSimulator::computeStartState(ATNState *p, RuleContex
 }
 
 atn::ATNState *ParserATNSimulator::getReachableTarget(Transition *trans, int ttype) {
-  if (trans->matches(ttype, 0, atn->maxTokenType)) {
+  if (trans->matches(ttype, 0, atn.maxTokenType)) {
     return trans->target;
   }
 
@@ -762,7 +761,7 @@ void ParserATNSimulator::closureCheckingStopState(ATNConfig *config, ATNConfigSe
           }
           continue;
         }
-        ATNState *returnState = atn->states[config->context->getReturnState(i)];
+        ATNState *returnState = atn.states[config->context->getReturnState(i)];
         PredictionContext *newContext = config->context->getParent(i); // "pop" return state
         ATNConfig *c = new ATNConfig(returnState, config->alt, newContext, config->semanticContext);
         // While we have context to pop back from, we may have
@@ -1047,7 +1046,7 @@ dfa::DFAState *ParserATNSimulator::addDFAEdge(dfa::DFA *dfa, dfa::DFAState *from
   }
 
   to = addDFAState(dfa, to); // used existing if possible not incoming
-  if (from == nullptr || t < -1 || t > atn->maxTokenType) {
+  if (from == nullptr || t < -1 || t > atn.maxTokenType) {
     return to;
   }
 
@@ -1073,7 +1072,7 @@ dfa::DFAState *ParserATNSimulator::addDFAEdge(dfa::DFA *dfa, dfa::DFAState *from
 }
 
 dfa::DFAState *ParserATNSimulator::addDFAState(dfa::DFA *dfa, dfa::DFAState *D) {
-  if (D == ERROR) {
+  if (D == &ERROR) {
     return D;
   }
 

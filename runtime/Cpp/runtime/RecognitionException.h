@@ -56,40 +56,25 @@ namespace runtime {
     /// The <seealso cref="Recognizer"/> where this exception originated. </summary>
   private:
     // Hairy wildcard generics from Java, attempt to fix with a raw void*
-    // Recognizer<void*, void*> *const recognizer;
-    void * recognizer;
-    IntStream *const input;
-    RuleContext *const ctx;
+    // Recognizer<void, void> *const recognizer;
+    IRecognizer *_recognizer;
+    IntStream * const _input;
+    RuleContext * const _ctx;
+    const std::wstring _message;
 
     /// <summary>
     /// The current <seealso cref="Token"/> when an error occurred. Since not all streams
     /// support accessing symbols by index, we have to track the <seealso cref="Token"/>
     /// instance itself.
     /// </summary>
-    Token *offendingToken;
+    Token *_offendingToken;
 
-    int offendingState;
+    int _offendingState;
 
   public:
-    template<typename T1, typename T2>
-    RecognitionException(IRecognizer<T1, T2> *recognizer, IntStream *input,
-                         ParserRuleContext * const ctx)
-    : recognizer(recognizer), input(input), ctx((RuleContext*)ctx) {
-      InitializeInstanceFields();
-      if (recognizer != nullptr) {
-        this->offendingState = recognizer->getState();
-      }
-    }
-
-    template<typename T1, typename T2>
-    RecognitionException(const std::wstring &message, IRecognizer<T1, T2> *recognizer, IntStream *input, ParserRuleContext *ctx){
-      InitializeInstanceFields();
-      if (recognizer != nullptr) {
-        this->offendingState = recognizer->getState();
-      }
-    }
-
-    RecognitionException() : recognizer(nullptr), input(nullptr), ctx(nullptr), offendingToken(nullptr) {}
+    RecognitionException();
+    RecognitionException(IRecognizer *recognizer, IntStream *input, ParserRuleContext * const ctx);
+    RecognitionException(const std::wstring &message, IRecognizer *recognizer, IntStream *input, ParserRuleContext *ctx);
 
     /// <summary>
     /// Get the ATN state number the parser was in at the time the error
@@ -150,7 +135,7 @@ namespace runtime {
     /// <returns> The recognizer where this exception occurred, or {@code null} if
     /// the recognizer is not available. </returns>
   public:
-    virtual IRecognizer<void*, void*> *getRecognizer();
+    virtual IRecognizer *getRecognizer();
 
   private:
     void InitializeInstanceFields();

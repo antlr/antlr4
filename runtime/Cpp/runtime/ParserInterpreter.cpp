@@ -50,20 +50,22 @@
 
 using namespace org::antlr::v4::runtime;
 
-ParserInterpreter::ParserInterpreter(const std::wstring &grammarFileName, const std::vector<std::wstring>& tokenNames, const std::vector<std::wstring>& ruleNames, atn::ATN *atn, TokenStream *input) : Parser(input), grammarFileName(grammarFileName), _tokenNames(tokenNames), atn(atn), _ruleNames(ruleNames), pushRecursionContextStates(new antlrcpp::BitSet()), sharedContextCache(new atn::PredictionContextCache()), _parentContextStack(new std::deque<std::pair<ParserRuleContext *, int>*>()) {
+ParserInterpreter::ParserInterpreter(const std::wstring &grammarFileName, const std::vector<std::wstring>& tokenNames,
+  const std::vector<std::wstring>& ruleNames, const atn::ATN& atn, TokenStream *input)
+  : Parser(input), grammarFileName(grammarFileName), _tokenNames(tokenNames), _atn(atn), _ruleNames(ruleNames), pushRecursionContextStates(new antlrcpp::BitSet()), sharedContextCache(new atn::PredictionContextCache()), _parentContextStack(new std::deque<std::pair<ParserRuleContext *, int>*>()) {
 
 
-  for (int i = 0; i < atn->getNumberOfDecisions(); i++) {
-    _decisionToDFA.push_back(new dfa::DFA(atn->getDecisionState(i), i));
+  for (int i = 0; i < _atn.getNumberOfDecisions(); i++) {
+    _decisionToDFA.push_back(new dfa::DFA(_atn.getDecisionState(i), i));
   }
 
   // identify the ATN states where pushNewRecursionContext must be called
-  for (auto state : atn->states) {
+  for (auto state : _atn.states) {
     if (!(dynamic_cast<atn::StarLoopEntryState*>(state) != nullptr)) {
       continue;
     }
 
-    atn::RuleStartState *ruleStartState = atn->ruleToStartState[state->ruleIndex];
+    atn::RuleStartState *ruleStartState = _atn.ruleToStartState[state->ruleIndex];
     if (!ruleStartState->isPrecedenceRule) {
       continue;
     }
@@ -79,11 +81,15 @@ ParserInterpreter::ParserInterpreter(const std::wstring &grammarFileName, const 
   }
 
   // get atn simulator that knows how to do predictions
-  setInterpreter(new atn::ParserATNSimulator(this, atn, _decisionToDFA, sharedContextCache));
+  _interpreter = new atn::ParserATNSimulator(this, atn, _decisionToDFA, sharedContextCache);
 }
 
-org::antlr::v4::runtime::atn::ATN *ParserInterpreter::getATN() const {
-  return atn;
+ParserInterpreter::~ParserInterpreter() {
+  delete _interpreter;
+}
+
+const atn::ATN& ParserInterpreter::getATN() const {
+  return _atn;
 }
 
 const std::vector<std::wstring>& ParserInterpreter::getTokenNames() const {
@@ -99,7 +105,7 @@ std::wstring ParserInterpreter::getGrammarFileName() const {
 }
 
 ParserRuleContext *ParserInterpreter::parse(int startRuleIndex) {
-  atn::RuleStartState *startRuleStartState = atn->ruleToStartState[startRuleIndex];
+  atn::RuleStartState *startRuleStartState = _atn.ruleToStartState[startRuleIndex];
 
   InterpreterRuleContext *rootContext = new InterpreterRuleContext(nullptr, atn::ATNState::INVALID_STATE_NUMBER, startRuleIndex);
   if (startRuleStartState->isPrecedenceRule) {
@@ -113,7 +119,7 @@ ParserRuleContext *ParserInterpreter::parse(int startRuleIndex) {
     switch (p->getStateType()) {
       case atn::ATNState::RULE_STOP :
         // pop; return from rule
-        if (_ctx->isEmpty()) {
+        if (ctx->isEmpty()) {
           exitRule();
           return rootContext;
         }
@@ -129,18 +135,18 @@ ParserRuleContext *ParserInterpreter::parse(int startRuleIndex) {
 }
 
 void ParserInterpreter::enterRecursionRule(ParserRuleContext *localctx, int state, int ruleIndex, int precedence) {
-  _parentContextStack->push_back(new std::pair<ParserRuleContext*, int>(_ctx, localctx->invokingState));
+  _parentContextStack->push_back(new std::pair<ParserRuleContext*, int>(ctx, localctx->invokingState));
   Parser::enterRecursionRule(localctx, state, ruleIndex, precedence);
 }
 
 atn::ATNState *ParserInterpreter::getATNState() {
-  return atn->states.at(getState());
+  return _atn.states.at(getState());
 }
 
 void ParserInterpreter::visitState(atn::ATNState *p) {
   int edge;
   if (p->getNumberOfTransitions() > 1) {
-    edge = getInterpreter()->adaptivePredict(_input, ((atn::DecisionState*)p)->decision, _ctx);
+    edge = getInterpreter()->adaptivePredict(_input, ((atn::DecisionState*)p)->decision, ctx);
   } else {
     edge = 1;
   }
@@ -149,8 +155,8 @@ void ParserInterpreter::visitState(atn::ATNState *p) {
   switch (transition->getSerializationType()) {
     case atn::Transition::EPSILON:
       if (pushRecursionContextStates->data[p->stateNumber] == 1 && !(dynamic_cast<atn::LoopEndState*>(transition->target) != nullptr)) {
-        InterpreterRuleContext *ctx = new InterpreterRuleContext(_parentContextStack->front()->first, _parentContextStack->front()->second, _ctx->getRuleIndex());
-        pushNewRecursionContext(ctx, atn->ruleToStartState[p->ruleIndex]->stateNumber, _ctx->getRuleIndex());
+        InterpreterRuleContext *ruleContext = new InterpreterRuleContext(_parentContextStack->front()->first, _parentContextStack->front()->second, ctx->getRuleIndex());
+        pushNewRecursionContext(ruleContext, _atn.ruleToStartState[p->ruleIndex]->stateNumber, ruleContext->getRuleIndex());
       }
       break;
 
@@ -175,9 +181,9 @@ void ParserInterpreter::visitState(atn::ATNState *p) {
     {
       atn::RuleStartState *ruleStartState = (atn::RuleStartState*)(transition->target);
       int ruleIndex = ruleStartState->ruleIndex;
-      InterpreterRuleContext *ctx = new InterpreterRuleContext(_ctx, p->stateNumber, ruleIndex);
+      InterpreterRuleContext *ruleContext = new InterpreterRuleContext(ctx, p->stateNumber, ruleIndex);
       if (ruleStartState->isPrecedenceRule) {
-        enterRecursionRule(ctx, ruleStartState->stateNumber, ruleIndex, ((atn::RuleTransition*)(transition))->precedence);
+        enterRecursionRule(ruleContext, ruleStartState->stateNumber, ruleIndex, ((atn::RuleTransition*)(transition))->precedence);
       } else {
         enterRule(ctx, transition->target->stateNumber, ruleIndex);
       }
@@ -187,7 +193,7 @@ void ParserInterpreter::visitState(atn::ATNState *p) {
     case atn::Transition::PREDICATE:
     {
       atn::PredicateTransition *predicateTransition = (atn::PredicateTransition*)(transition);
-      if (!sempred(_ctx, predicateTransition->ruleIndex, predicateTransition->predIndex)) {
+      if (!sempred(ctx, predicateTransition->ruleIndex, predicateTransition->predIndex)) {
         throw new FailedPredicateException(this);
       }
     }
@@ -196,13 +202,13 @@ void ParserInterpreter::visitState(atn::ATNState *p) {
     case atn::Transition::ACTION:
     {
       atn::ActionTransition *actionTransition = (atn::ActionTransition*)(transition);
-      action(_ctx, actionTransition->ruleIndex, actionTransition->actionIndex);
+      action(ctx, actionTransition->ruleIndex, actionTransition->actionIndex);
     }
       break;
 
     case atn::Transition::PRECEDENCE:
     {
-      if (!precpred(_ctx, ((atn::PrecedencePredicateTransition*)(transition))->precedence)) {
+      if (!precpred(ctx, ((atn::PrecedencePredicateTransition*)(transition))->precedence)) {
         throw new FailedPredicateException(this, L"precpred(_ctx, " + std::to_wstring(((atn::PrecedencePredicateTransition*)(transition))->precedence) +  L")");
       }
     }
@@ -216,9 +222,9 @@ void ParserInterpreter::visitState(atn::ATNState *p) {
 }
 
 void ParserInterpreter::visitRuleStopState(atn::ATNState *p) {
-  atn::RuleStartState *ruleStartState = atn->ruleToStartState[p->ruleIndex];
+  atn::RuleStartState *ruleStartState = _atn.ruleToStartState[p->ruleIndex];
   if (ruleStartState->isPrecedenceRule) {
-    std::pair<ParserRuleContext*, int> *parentContext = _parentContextStack->back(); // Dan - make sure this is equivalent
+    std::pair<ParserRuleContext*, int> *parentContext = _parentContextStack->back(); // TODO: Dan - make sure this is equivalent
     _parentContextStack->pop_back();
     unrollRecursionContexts(parentContext->first);
     setState(parentContext->second);
@@ -226,6 +232,6 @@ void ParserInterpreter::visitRuleStopState(atn::ATNState *p) {
     exitRule();
   }
 
-  atn::RuleTransition *ruleTransition = static_cast<atn::RuleTransition*>(atn->states.at(getState())->transition(0));
+  atn::RuleTransition *ruleTransition = static_cast<atn::RuleTransition*>(_atn.states.at(getState())->transition(0));
   setState(ruleTransition->followState->stateNumber);
 }

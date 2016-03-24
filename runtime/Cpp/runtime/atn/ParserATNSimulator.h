@@ -249,7 +249,7 @@ namespace atn {
     Parser *const parser;
 
   public:
-    std::vector<dfa::DFA *> _decisionToDFA;
+    const std::vector<dfa::DFA *> &_decisionToDFA;
 
     /// <summary>
     /// SLL, LL, or LL + exact ambig detection? </summary>
@@ -278,9 +278,9 @@ namespace atn {
     /// <summary>
     /// Testing only! </summary>
   public:
-    ParserATNSimulator(ATN *atn, const std::vector<dfa::DFA *>& decisionToDFA, PredictionContextCache *sharedContextCache);
+    ParserATNSimulator(const ATN &atn, const std::vector<dfa::DFA *>& decisionToDFA, PredictionContextCache *sharedContextCache);
 
-    ParserATNSimulator(Parser *parser, ATN *atn, const std::vector<dfa::DFA *>& decisionToDFA, PredictionContextCache *sharedContextCache);
+    ParserATNSimulator(Parser *parser, const ATN &atn, const std::vector<dfa::DFA *>& decisionToDFA, PredictionContextCache *sharedContextCache);
 
     virtual void reset() override;
 

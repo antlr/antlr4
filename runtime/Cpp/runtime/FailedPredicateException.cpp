@@ -52,7 +52,7 @@ FailedPredicateException::FailedPredicateException(Parser *recognizer, const std
 #endif
 
 {
-  atn::ATNState *s = recognizer->getInterpreter()->atn->states[recognizer->getState()];
+  atn::ATNState *s = recognizer->getInterpreter()->atn.states[recognizer->getState()];
 
   atn::AbstractPredicateTransition *trans = static_cast<atn::AbstractPredicateTransition*>(s->transition(0));
   if (dynamic_cast<atn::PredicateTransition*>(trans) != nullptr) {

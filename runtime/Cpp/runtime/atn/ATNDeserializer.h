@@ -31,6 +31,8 @@
 
 #pragma once
 
+#include "ATNDeserializationOptions.h"
+
 namespace org {
 namespace antlr {
 namespace v4 {
@@ -72,11 +74,11 @@ namespace atn {
     static Guid const SERIALIZED_UUID;
 
   private:
-    ATNDeserializationOptions *const deserializationOptions;
+    ATNDeserializationOptions deserializationOptions;
 
   public:
     ATNDeserializer();
-    ATNDeserializer(ATNDeserializationOptions *dso);
+    ATNDeserializer(const ATNDeserializationOptions& dso);
 
     /// <summary>
     /// Determines if a particular serialized representation of an ATN supports
@@ -94,10 +96,10 @@ namespace atn {
     virtual bool isFeatureSupported(const Guid &feature, const Guid &actualUuid);
 
   public:
-    virtual ATN *deserialize(const std::wstring& input);
+    virtual ATN deserialize(const std::wstring& input);
 
   public:
-    virtual void verifyATN(ATN *atn);
+    virtual void verifyATN(const ATN &atn);
 
     virtual void checkCondition(bool condition);
 
@@ -105,14 +107,13 @@ namespace atn {
 
     static Guid toUUID(const wchar_t *data, int offset);
 
-    virtual Transition *edgeFactory(ATN *atn, int type, int src, int trg, int arg1, int arg2, int arg3, std::vector<misc::IntervalSet*> &sets);
+    virtual Transition *edgeFactory(const ATN &atn, int type, int src, int trg, int arg1, int arg2, int arg3,
+                                    std::vector<misc::IntervalSet*> &sets);
 
     virtual ATNState *stateFactory(int type, int ruleIndex);
 
   private:
     static std::vector<Guid> supportedUUIDsInitializer();
-    ATNDeserializationOptions *deserializationOptionsInitializer(ATNDeserializationOptions *dso);
-
   };
 
 } // namespace atn

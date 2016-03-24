@@ -41,24 +41,20 @@ namespace runtime {
   class LexerInterpreter : public Lexer {
   protected:
     const std::wstring grammarFileName;
-    atn::ATN *const atn;
-
+    const atn::ATN &_atn;
 
     std::vector<std::wstring> _tokenNames;
-
     std::vector<std::wstring> _ruleNames;
-
     std::vector<std::wstring> _modeNames;
-
     std::vector<dfa::DFA*> _decisionToDFA;
 
     atn::PredictionContextCache *const _sharedContextCache;
 
   public:
-    LexerInterpreter(const std::wstring &grammarFileName, std::vector<std::wstring> *tokenNames, std::vector<std::wstring> *ruleNames, std::vector<std::wstring> *modeNames, atn::ATN *atn, CharStream *input);
+    LexerInterpreter(const std::wstring &grammarFileName, std::vector<std::wstring> *tokenNames, std::vector<std::wstring> *ruleNames, std::vector<std::wstring> *modeNames, const atn::ATN &atn, CharStream *input);
     ~LexerInterpreter();
 
-    virtual atn::ATN *getATN() const override;
+    virtual const atn::ATN& getATN() const override;
 
     virtual std::wstring getGrammarFileName() const override;
 

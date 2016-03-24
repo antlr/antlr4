@@ -125,13 +125,10 @@ namespace dfa {
     /// </summary>
     std::vector<PredPrediction *> predicates;
 
-    /// <summary>
-    /// Map a predicate to a predicted alternative. </summary>
+    /// Map a predicate to a predicted alternative.
     DFAState();
-
     DFAState(int stateNumber);
-
-    DFAState(atn::ATNConfigSet *configs);
+    DFAState(atn::ATNConfigSet *configs, int stateNumber = -1);
 
     /// <summary>
     /// Get the set of all alts mentioned by all ATN configurations in this

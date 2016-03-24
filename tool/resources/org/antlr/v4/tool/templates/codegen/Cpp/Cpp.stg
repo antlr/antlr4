@@ -68,7 +68,7 @@ public:
   virtual const std::vector\<std::wstring>& getTokenNames() const override;
   
   virtual const std::wstring getSerializedATN() const;
-  virtual atn::ATN* getATN() const override;
+  virtual const atn::ATN& getATN() const override;
 
   <if (actionFuncs)>
   virtual void action(RuleContext *context, int ruleIndex, int actionIndex) override;
@@ -134,7 +134,7 @@ const std::wstring <lexer.name>::getSerializedATN() const {
   return _serializedATN;
 }
 
-atn::ATN* <lexer.name>::getATN() const{
+const atn::ATN& <lexer.name>::getATN() const {
   return _atn;
 }
 
@@ -171,7 +171,9 @@ bool <lexer.name>::sempred(RuleContext *context, int ruleIndex, int predicateInd
 // Static vars and initialization.
 std::vector\<dfa::DFA*> <lexer.name>::_decisionToDFA;
 atn::PredictionContextCache <lexer.name>::_sharedContextCache;
-atn::ATN *<lexer.name>::_atn;
+
+// We own the ATN which in turn owns the ATN states.
+atn::ATN <lexer.name>::_atn;
 std::wstring <lexer.name>::_serializedATN;
 
 std::vector\<std::wstring> <lexer.name>::_ruleNames = {
@@ -180,12 +182,9 @@ std::vector\<std::wstring> <lexer.name>::_ruleNames = {
 std::vector\<std::wstring> <lexer.name>::_modeNames = {
     <lexer.modes: {m | L"<m>"}; separator = ", ", wrap, anchor>
 };
-std::vector\<std::wstring> <lexer.name>::_tokenNames;
-/*
 std::vector\<std::wstring> <lexer.name>::_tokenNames = { <! TODO: replace by vocabulary (see Java.stg). !>
-    <lexer.tokenNames: {t | <t>}; separator = ", ", wrap, anchor>
+    <lexer.tokenNames: {t | L<t>}; separator = ", ", wrap, anchor>
 };
-*/
 
 <lexer.name>::Initializer::Initializer() {
   <atn>
@@ -249,7 +248,7 @@ public:
   ~<parser.name>();
 
   virtual std::wstring getGrammarFileName() const override;
-  virtual atn::ATN *getATN() const override { return _atn; };
+  virtual const atn::ATN& getATN() const override { return _atn; };
   virtual const std::vector\<std::wstring>& getTokenNames() const override { return _tokenNames; }; // TODO: use vocabulary instead.
   virtual const std::vector\<std::wstring>& getRuleNames() const override;
  
@@ -315,7 +314,9 @@ bool <parser.name>::sempred(RuleContext *context, int ruleIndex, int predicateIn
 // Static vars and initialization.
 std::vector\<dfa::DFA*> <parser.name>::_decisionToDFA;
 atn::PredictionContextCache <parser.name>::_sharedContextCache;
-atn::ATN *<parser.name>::_atn;
+
+// We own the ATN which in turn owns the ATN states.
+atn::ATN <parser.name>::_atn;
 std::wstring <parser.name>::_serializedATN;
 
 std::vector\<std::wstring> <parser.name>::_ruleNames = {
@@ -334,7 +335,7 @@ TParser::Initializer TParser::_init;
 >>
 
 SerializedATNHeader(model) ::= <<
-static atn::ATN *_atn;
+static atn::ATN _atn;
 static std::wstring _serializedATN;
 >>
 
@@ -358,8 +359,8 @@ _serializedATN =
 atn::ATNDeserializer deserializer;
 _atn = deserializer.deserialize(_serializedATN);
 
-for (int i = 0; i \< _atn->getNumberOfDecisions(); i++) { <! Rework class ATN to allow standard iterations. !>
-  _decisionToDFA.push_back(new dfa::DFA(_atn->getDecisionState(i), i));
+for (int i = 0; i \< _atn.getNumberOfDecisions(); i++) { <! Rework class ATN to allow standard iterations. !>
+  _decisionToDFA.push_back(new dfa::DFA(_atn.getDecisionState(i), i));
 }
 >>
 
@@ -374,7 +375,7 @@ RuleFunction(currentRule, code, locals, ruleCtx, altLabelCtxs, namedActions, fin
 <ruleCtx>
 <! TODO: untested !><altLabelCtxs: {l | <altLabelCtxs.(l)>}; separator = "\n">
 std::shared_ptr\<<parser.name>::<currentRule.ctxType>\> <parser.name>::<currentRule.name>(<currentRule.args; separator = ",">) {
-  std::shared_ptr\<<currentRule.ctxType>\> result(new <currentRule.ctxType>(_ctx, getState()<currentRule.args:{a | , <a.name>}>));
+  std::shared_ptr\<<currentRule.ctxType>\> result(new <currentRule.ctxType>(ctx, getState()<currentRule.args:{a | , <a.name>}>));
   enterRule(result.get(), <currentRule.startState>, (int)<parser.name>Rule::Rule<currentRule.name; format = "cap">);
   <namedActions.init>
 <! TODO: untested !> <locals; separator = "\n">
@@ -421,9 +422,9 @@ std::shared_ptr\<<parser.name>::<currentRule.ctxType>\> <parser.name>::<currentR
 }
 
 std::shared_ptr\<<parser.name>::<currentRule.ctxType>\> <parser.name>::<currentRule.name>(int precedence<currentRule.args:{a | , <a>}>) {
-	ParserRuleContext *parentContext = _ctx;
+	ParserRuleContext *parentContext = ctx;
 	int parentState = getState();
-	std::shared_ptr\<<parser.name>::<currentRule.ctxType>\> result(new <currentRule.ctxType>(_ctx, parentState<currentRule.args: {a | , <a.name>}>));
+	std::shared_ptr\<<parser.name>::<currentRule.ctxType>\> result(new <currentRule.ctxType>(ctx, parentState<currentRule.args: {a | , <a.name>}>));
 	std::shared_ptr\<<parser.name>::<currentRule.ctxType>\> previousContext = result;
 	int startState = <currentRule.startState>;
 	enterRecursionRule(result.get(), <currentRule.startState>, (int)<parser.name>Rule::Rule<currentRule.name; format = "cap">, precedence);
@@ -624,7 +625,7 @@ setState(<choice.stateNumber>);
 _errHandler->sync(this);
 <! TODO: untested !><if (choice.label)><labelref(choice.label)> = _input.LT(1);<endif>
 <! TODO: untested !><preamble; separator = "\n">
-switch (getInterpreter()->adaptivePredict(_input, <choice.decision>, _ctx)) {
+switch (getInterpreter()->adaptivePredict(_input, <choice.decision>, ctx)) {
 <alts: {alt | case <i>:
 	<alt>
 	break;
@@ -639,7 +640,7 @@ OptionalBlock(choice, alts, error) ::= <<
 setState(<choice.stateNumber>);
 _errHandler->sync(this);
 
-switch (getInterpreter()->adaptivePredict(_input, <choice.decision>, _ctx)) {
+switch (getInterpreter()->adaptivePredict(_input, <choice.decision>, ctx)) {
 <alts: {alt | case <i><if (!choice.ast.greedy)>+1<endif>:
 	<alt>
 	break;
@@ -654,7 +655,7 @@ StarBlockHeader
 StarBlock(choice, alts, sync, iteration) ::= <<
 setState(<choice.stateNumber>);
 _errHandler->sync(this);
-alt = getInterpreter()->adaptivePredict(_input, <choice.decision>, _ctx);
+alt = getInterpreter()->adaptivePredict(_input, <choice.decision>, ctx);
 while (alt != <choice.exitAlt> && alt != -1) {
 	if ( alt == 1 <if(!choice.ast.greedy)>+ 1<endif>) {
 		<iteration>
@@ -662,7 +663,7 @@ while (alt != <choice.exitAlt> && alt != -1) {
 	}
 	setState(<choice.loopBackStateNumber>);
 	_errHandler->sync(this);
-	alt = getInterpreter()->adaptivePredict(_input, <choice.decision>, _ctx);
+	alt = getInterpreter()->adaptivePredict(_input, <choice.decision>, ctx);
 }
 >>
 
@@ -673,7 +674,7 @@ PlusBlockHeader(choice, alts, error) ::= <<
 PlusBlock(choice, alts, error) ::= <<
 setState(<choice.blockStartStateNumber>); <! alt block decision !>
 _errHandler->sync(this);
-alt = getInterpreter()->adaptivePredict(_input, <choice.decision>, _ctx);
+alt = getInterpreter()->adaptivePredict(_input, <choice.decision>, ctx);
 do {
 	switch (alt) {
 	<alts: {alt | case <i><if (!choice.ast.greedy)> + 1<endif>:
@@ -685,7 +686,7 @@ do {
 	}
 	setState(<choice.loopBackStateNumber>); <! loopback/exit decision !>
 	_errHandler->sync(this);
-	alt = getInterpreter()->adaptivePredict(_input, <choice.decision>, _ctx);
+	alt = getInterpreter()->adaptivePredict(_input, <choice.decision>, ctx);
 } while (alt != <choice.exitAlt> && alt != -1);
 >>
 
@@ -960,9 +961,9 @@ labelref(x) ::= "<if (!x.isLocal)>((<x.ctx.name>)result).<endif><x.name>"
 ctx(actionChunk) ::= "((<actionChunk.ctx.name>)result)"
 
 // used for left-recursive rules
-recRuleAltPredicate(ruleName,opPrec) ::= "precpred(_ctx, <opPrec>)"
+recRuleAltPredicate(ruleName,opPrec) ::= "precpred(ctx, <opPrec>)"
 recRuleSetReturnAction(src,name) ::= "$<name>=$<src>.<name>;"
-recRuleSetStopToken() ::= "_ctx->stop = _input->LT(-1);"
+recRuleSetStopToken() ::= "ctx->stop = _input->LT(-1);"
 
 recRuleAltStartAction(ruleName, ctxName, label) ::= <<
 result.reset(new <ctxName>Context(parentContext, parentState));
@@ -978,7 +979,7 @@ pushNewRecursionContext(result, _startState, RULE_<ruleName>);
 
 recRuleReplaceContext(ctxName) ::= <<
 result.reset(new <ctxName>Context(_localctx));
-_ctx = result;
+ctx = result;
 previousContext = result;
 >>
 

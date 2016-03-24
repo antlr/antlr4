@@ -44,7 +44,7 @@
 using namespace org::antlr::v4::runtime;
 using namespace org::antlr::v4::runtime::atn;
 
-LL1Analyzer::LL1Analyzer(ATN *atn) : atn(atn) {
+LL1Analyzer::LL1Analyzer(const ATN &atn) : _atn(atn) {
 }
 
 std::vector<misc::IntervalSet*> LL1Analyzer::getDecisionLookahead(ATNState *s) {
@@ -78,7 +78,7 @@ misc::IntervalSet *LL1Analyzer::LOOK(ATNState *s, RuleContext *ctx) {
 misc::IntervalSet *LL1Analyzer::LOOK(ATNState *s, ATNState *stopState, RuleContext *ctx) {
   misc::IntervalSet *r = new misc::IntervalSet(0);
   bool seeThruPreds = true; // ignore preds; get all lookahead
-  PredictionContext *lookContext = ctx != nullptr ? PredictionContext::fromRuleContext(s->atn, ctx) : nullptr;
+  PredictionContext *lookContext = ctx != nullptr ? PredictionContext::fromRuleContext(*s->atn, ctx) : nullptr;
   _LOOK(s, stopState, lookContext, r, new std::set<ATNConfig*>(), new antlrcpp::BitSet(), seeThruPreds, true);
   return r;
 }
@@ -113,7 +113,7 @@ void LL1Analyzer::_LOOK(ATNState *s, ATNState *stopState, PredictionContext *ctx
     if (ctx != (PredictionContext*)PredictionContext::EMPTY) {
       // run thru all possible stack tops in ctx
       for (int i = 0; i < ctx->size(); i++) {
-        ATNState *returnState = atn->states[ctx->getReturnState(i)];
+        ATNState *returnState = _atn.states[ctx->getReturnState(i)];
         //					System.out.println("popping back to "+retState);
 
         bool removed = calledRuleStack->data.test(returnState->ruleIndex);
@@ -162,13 +162,13 @@ void LL1Analyzer::_LOOK(ATNState *s, ATNState *stopState, PredictionContext *ctx
     } else if (t->isEpsilon()) {
       _LOOK(t->target, stopState, ctx, look, lookBusy, calledRuleStack, seeThruPreds, addEOF);
     } else if (typeid(t) == typeid(WildcardTransition)) {
-      look->addAll(misc::IntervalSet::of(Token::MIN_USER_TOKEN_TYPE, atn->maxTokenType));
+      look->addAll(misc::IntervalSet::of(Token::MIN_USER_TOKEN_TYPE, _atn.maxTokenType));
     } else {
       //				System.out.println("adding "+ t);
       misc::IntervalSet *set = t->label();
       if (set != nullptr) {
         if (dynamic_cast<NotSetTransition*>(t) != nullptr) {
-          set = set->complement(misc::IntervalSet::of(Token::MIN_USER_TOKEN_TYPE, atn->maxTokenType));
+          set = set->complement(misc::IntervalSet::of(Token::MIN_USER_TOKEN_TYPE, _atn.maxTokenType));
         }
         look->addAll(set);
       }

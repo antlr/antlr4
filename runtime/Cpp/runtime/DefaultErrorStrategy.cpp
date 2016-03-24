@@ -118,7 +118,7 @@ void DefaultErrorStrategy::recover(Parser *recognizer, RecognitionException *e) 
 }
 
 void DefaultErrorStrategy::sync(Parser *recognizer) {
-  atn::ATNState *s = recognizer->getInterpreter()->atn->states[recognizer->getState()];
+  atn::ATNState *s = recognizer->getInterpreter()->atn.states[recognizer->getState()];
   //		System.err.println("sync @ "+s.stateNumber+"="+s.getClass().getSimpleName());
   // If already recovering, don't try to sync
   if (inErrorRecoveryMode(recognizer)) {
@@ -129,7 +129,7 @@ void DefaultErrorStrategy::sync(Parser *recognizer) {
   int la = tokens->LA(1);
 
   // try cheaper subset first; might get lucky. seems to shave a wee bit off
-  if (recognizer->getATN()->nextTokens(s)->contains(la) || la == Token::_EOF) {
+  if (recognizer->getATN().nextTokens(s)->contains(la) || la == Token::_EOF) {
     return;
   }
 
@@ -188,7 +188,7 @@ void DefaultErrorStrategy::reportInputMismatch(Parser *recognizer, InputMismatch
 }
 
 void DefaultErrorStrategy::reportFailedPredicate(Parser *recognizer, FailedPredicateException *e) {
-  const std::wstring& ruleName = recognizer->getRuleNames()[recognizer->_ctx->getRuleIndex()];
+  const std::wstring& ruleName = recognizer->getRuleNames()[recognizer->ctx->getRuleIndex()];
   std::wstring msg = std::wstring(L"rule ") + ruleName + std::wstring(L" ") + e->getMessage();
   recognizer->notifyErrorListeners(e->getOffendingToken(), msg, e);
 }
@@ -246,11 +246,10 @@ bool DefaultErrorStrategy::singleTokenInsertion(Parser *recognizer) {
   // if current token is consistent with what could come after current
   // ATN state, then we know we're missing a token; error recovery
   // is free to conjure up and insert the missing token
-  atn::ATNState *currentState = recognizer->getInterpreter()->atn->states[recognizer->getState()];
+  atn::ATNState *currentState = recognizer->getInterpreter()->atn.states[recognizer->getState()];
   atn::ATNState *next = currentState->transition(0)->target;
-  atn::ATN *atn = recognizer->getInterpreter()->atn;
-  misc::IntervalSet *expectingAtLL2 = atn->nextTokens(next, recognizer->_ctx);
-  //		System.out.println("LT(2) set="+expectingAtLL2.toString(recognizer.getTokenNames()));
+  const atn::ATN &atn = recognizer->getInterpreter()->atn;
+  misc::IntervalSet *expectingAtLL2 = atn.nextTokens(next, recognizer->ctx);
   if (expectingAtLL2->contains(currentSymbolType)) {
     reportMissingToken(recognizer);
     return true;
@@ -332,14 +331,14 @@ std::wstring DefaultErrorStrategy::escapeWSAndQuote(std::wstring &s) {
 }
 
 misc::IntervalSet *DefaultErrorStrategy::getErrorRecoverySet(Parser *recognizer) {
-  atn::ATN *atn = recognizer->getInterpreter()->atn;
-  RuleContext *ctx = recognizer->_ctx;
+  const atn::ATN &atn = recognizer->getInterpreter()->atn;
+  RuleContext *ctx = recognizer->ctx;
   misc::IntervalSet *recoverSet = new misc::IntervalSet(0);
   while (ctx != nullptr && ctx->invokingState >= 0) {
     // compute what follows who invoked us
-    atn::ATNState *invokingState = atn->states[ctx->invokingState];
+    atn::ATNState *invokingState = atn.states[ctx->invokingState];
     atn::RuleTransition *rt = dynamic_cast<atn::RuleTransition*>(invokingState->transition(0));
-    misc::IntervalSet *follow = atn->nextTokens(rt->followState);
+    misc::IntervalSet *follow = atn.nextTokens(rt->followState);
     recoverSet->addAll(follow);
     ctx = ctx->parent;
   }
@@ -349,11 +348,8 @@ misc::IntervalSet *DefaultErrorStrategy::getErrorRecoverySet(Parser *recognizer)
 }
 
 void DefaultErrorStrategy::consumeUntil(Parser *recognizer, misc::IntervalSet *set) {
-  //		System.err.println("consumeUntil("+set.toString(recognizer.getTokenNames())+")");
   int ttype = recognizer->getInputStream()->LA(1);
   while (ttype != Token::_EOF && !set->contains(ttype)) {
-    //System.out.println("consume during recover LA(1)="+getTokenNames()[input.LA(1)]);
-    //			recognizer.getInputStream().consume();
     recognizer->consume();
     ttype = recognizer->getInputStream()->LA(1);
   }

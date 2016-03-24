@@ -51,18 +51,14 @@ void DFAState::PredPrediction::InitializeInstanceFields() {
   alt = 0;
 }
 
-DFAState::DFAState() {
-  InitializeInstanceFields();
+DFAState::DFAState() : DFAState(-1) {
 }
 
-DFAState::DFAState(int stateNumber) {
-  InitializeInstanceFields();
-  this->stateNumber = stateNumber;
+DFAState::DFAState(int stateNumber) : DFAState(new atn::ATNConfigSet(), stateNumber) {
 }
 
-DFAState::DFAState(atn::ATNConfigSet *configs) {
+DFAState::DFAState(atn::ATNConfigSet *configs, int stateNumber) : configs(configs), stateNumber(stateNumber) {
   InitializeInstanceFields();
-  this->configs = configs;
 }
 
 std::set<int> *DFAState::getAltSet() {
@@ -118,8 +114,6 @@ std::wstring DFAState::toString() {
 }
 
 void DFAState::InitializeInstanceFields() {
-  stateNumber = -1;
-  configs = new org::antlr::v4::runtime::atn::ATNConfigSet();
   isAcceptState = false;
   prediction = 0;
   lexerRuleIndex = -1;

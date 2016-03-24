@@ -39,7 +39,7 @@ namespace atn {
 
   class ATNDeserializationOptions {
   private:
-    static ATNDeserializationOptions *const defaultOptions;
+    static ATNDeserializationOptions defaultOptions;
 
     bool readOnly;
     bool verifyATN;
@@ -50,7 +50,7 @@ namespace atn {
 
     ATNDeserializationOptions(ATNDeserializationOptions *options);
 
-    static ATNDeserializationOptions *getDefaultOptions();
+    static const ATNDeserializationOptions& getDefaultOptions();
 
     bool isReadOnly();
 

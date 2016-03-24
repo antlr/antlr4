@@ -36,47 +36,56 @@
 
 using namespace org::antlr::v4::runtime;
 
+RecognitionException::RecognitionException() : RecognitionException(L"", nullptr, nullptr, nullptr) {
+}
+
+RecognitionException::RecognitionException(IRecognizer *recognizer, IntStream *input, ParserRuleContext * const ctx)
+: RecognitionException(L"", recognizer, input, ctx) {
+}
+
+RecognitionException::RecognitionException(const std::wstring &message, IRecognizer *recognizer, IntStream *input, ParserRuleContext *ctx)
+: _message(message), _recognizer(recognizer), _input(input), _ctx((RuleContext * const)ctx) {
+  InitializeInstanceFields();
+  if (recognizer != nullptr) {
+    _offendingState = recognizer->getState();
+  }
+}
+
 int RecognitionException::getOffendingState() {
-  return offendingState;
+  return _offendingState;
 }
 
 void RecognitionException::setOffendingState(int offendingState) {
-  this->offendingState = offendingState;
+  _offendingState = offendingState;
 }
 
 misc::IntervalSet *RecognitionException::getExpectedTokens() {
-  // Terence and Sam used some fancy Java wildcard generics which
-  // cause us trouble here. TODO - can a Recognizer<void*, void*>
-  // substitute for any other type of recognizer?
-  if (recognizer != nullptr) {
-    return ((Recognizer<void*, void*>*)recognizer)->getATN()->getExpectedTokens(offendingState, ctx);
+  if (_recognizer != nullptr) {
+    return _recognizer->getATN().getExpectedTokens(_offendingState, _ctx);
   }
   return nullptr;
 }
 
 RuleContext *RecognitionException::getCtx() {
-  return ctx;
+  return _ctx;
 }
 
 IntStream *RecognitionException::getInputStream() {
-  return input;
+  return _input;
 }
 
 Token *RecognitionException::getOffendingToken() {
-  return offendingToken;
+  return _offendingToken;
 }
 
 void RecognitionException::setOffendingToken(Token *offendingToken) {
-  this->offendingToken = offendingToken;
+  _offendingToken = offendingToken;
 }
 
-IRecognizer<void*, void*> *RecognitionException::getRecognizer() {
-  // Terence and Sam used some fancy Java wildcard generics which
-  // cause us trouble here. TODO - can a Recognizer<void*, void*>
-  // substitute for any other type of recognizer?
-  return (IRecognizer<void*, void*> *)recognizer;
+IRecognizer *RecognitionException::getRecognizer() {
+  return _recognizer;
 }
 
 void RecognitionException::InitializeInstanceFields() {
-  offendingState = -1;
+  _offendingState = -1;
 }
