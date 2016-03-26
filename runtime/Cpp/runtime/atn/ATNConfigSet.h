@@ -31,8 +31,9 @@
 
 #pragma once
 
-#include "Array2DHashSet.h"
 #include "BitSet.h"
+#include "ATNConfig.h"
+#include "ConfigLookup.h"
 
 namespace org {
 namespace antlr {
@@ -40,78 +41,29 @@ namespace v4 {
 namespace runtime {
 namespace atn {
 
-  /// <summary>
-  /// Specialized <seealso cref="Set"/>{@code <}<seealso cref="ATNConfig"/>{@code >} that can track
-  /// info about the set, with support for combining similar configurations using a
+  // Simpler hasher and comparer variants than those in ATNConfig (less fields, no murmur hash).
+  struct SimpleATNConfigHasher
+  {
+    size_t operator()(const ATNConfig &k) const;
+  };
+
+  struct SimpleATNConfigComparer {
+    bool operator()(const ATNConfig &lhs, const ATNConfig &rhs) const;
+  };
+  
+  /// Specialized set that can track info about the set, with support for combining similar configurations using a
   /// graph-structured stack.
-  /// </summary>
-  /// TODO: Consider going from std::set to std::vector
-  class ATNConfigSet : public std::set<ATNConfig*> {
-
-  public:
-    class AbstractConfigHashSet : public misc::Array2DHashSet<ATNConfig*> {
-
-    public:
-      AbstractConfigHashSet(misc::AbstractEqualityComparator<ATNConfig*> *comparator)
-        : misc::Array2DHashSet<ATNConfig*>(comparator, 16, 2) {
-      }
-
-      AbstractConfigHashSet(misc::AbstractEqualityComparator<ATNConfig*> *comparator, int initialCapacity, int initialBucketCapacity)
-        : misc::Array2DHashSet<ATNConfig*>(comparator, initialCapacity, initialBucketCapacity) {
-      }
-
-    protected:
-      ATNConfig *asElementType(Any o);
-      std::vector<std::vector<ATNConfig*>> createBuckets(int capacity);
-      std::vector<ATNConfig*> createBucket(int capacity);
-
-    };
-    /// <summary>
-    /// The reason that we need this is because we don't want the hash map to use
-    /// the standard hash code and equals. We need all configurations with the same
-    /// {@code (s,i,_,semctx)} to be equal. Unfortunately, this key effectively doubles
-    /// the number of objects associated with ATNConfigs. The other solution is to
-    /// use a hash table that lets us specify the equals/hash code operation.
-    /// </summary>
-  public:
-    class ConfigHashSet : public AbstractConfigHashSet {
-    public:
-      ConfigHashSet();
-    };
-
-  public:
-    class ConfigEqualityComparator : public misc::AbstractEqualityComparator<ATNConfig*> {
-    public:
-      static ConfigEqualityComparator *const INSTANCE;
-
-    private:
-      ConfigEqualityComparator();
-
-    public:
-      virtual int hashCode(ATNConfig *o) override;
-      virtual bool equals(ATNConfig *a, ATNConfig *b) override;
-    };
-
-    /// <summary>
-    /// Indicates that the set of configurations is read-only. Do not
-    ///  allow any code to manipulate the set; DFA states will point at
-    ///  the sets and they must not change. This does not protect the other
-    ///  fields; in particular, conflictingAlts is set after
-    ///  we've made this readonly.
-    /// </summary>
-  protected:
-    bool readonly;
-
+  class ATNConfigSet {
   public:
     /// <summary>
     /// All configs but hashed by (s, i, _, pi) not including context. Wiped out
     /// when we go readonly as this set becomes a DFA state.
     /// </summary>
-    AbstractConfigHashSet *configLookup;
+    ConfigLookup *configLookup;
 
     /// <summary>
     /// Track the elements as they are added to the set; supports get(i) </summary>
-    std::vector<ATNConfig*> configs;
+    std::vector<ATNConfig *> configs;
 
     // TODO: these fields make me pretty uncomfortable but nice to pack up info together, saves recomputation
     // TODO: can we track conflicts as they are added to save scanning configs later?
@@ -131,14 +83,10 @@ namespace atn {
     /// </summary>
     const bool fullCtx;
 
-  private:
-    int cachedHashCode;
+    ATNConfigSet(bool fullCtx = true, ConfigLookup *lookup = nullptr);
+    ATNConfigSet(ATNConfigSet *old);
 
-  public:
-    ATNConfigSet(bool fullCtx);
-    ATNConfigSet(); //this(true);
-
-    ATNConfigSet(ATNConfigSet *old); //this(old.fullCtx);
+    virtual ~ATNConfigSet();
 
     virtual bool add(ATNConfig *config);
 
@@ -166,62 +114,30 @@ namespace atn {
 
     virtual void optimizeConfigs(ATNSimulator *interpreter);
 
-    template<typename T1>// where T1 : ATNConfig
-    bool addAll(ATNConfigSet *coll) {
-      for (auto c : *coll) {
-        add(c);
-      }
-      return false;
-    }
+    bool addAll(ATNConfigSet *other);
 
-    virtual bool equals(Any o);
-
+    virtual bool equals(ATNConfigSet *other);
     virtual int hashCode();
-
     virtual size_t size();
-
     virtual bool isEmpty();
-
     virtual bool contains(ATNConfig *o);
-
-    virtual bool containsFast(ATNConfig *obj);
-
-    virtual std::vector<ATNConfig*>::iterator const iterator();
-
     virtual void clear();
-
     virtual bool isReadonly();
-
     virtual void setReadonly(bool readonly);
-
     virtual std::wstring toString();
-
-    // satisfy interface
-
-    virtual std::vector<ATNConfig*> toArray();
-
-    template<typename T>
-    T *toArray(T a[])  {
-      return configLookup->toArray(a);
-    }
     virtual bool remove(void *o);
 
-    template<typename T1>
-    bool containsAll(std::vector<T1> *c){
-      throw new UnsupportedOperationException();
-    }
-    template<typename T1>
-    bool retainAll(std::vector<T1> *c)  {
-      throw new UnsupportedOperationException();
-    }
-
-    template<typename T1>
-    bool removeAll(std::vector<T1> *c)  {
-      throw new UnsupportedOperationException();
-    }
-
+  protected:
+    /// Indicates that the set of configurations is read-only. Do not
+    ///  allow any code to manipulate the set; DFA states will point at
+    ///  the sets and they must not change. This does not protect the other
+    ///  fields; in particular, conflictingAlts is set after
+    ///  we've made this readonly.
+    bool _readonly;
 
   private:
+    int _cachedHashCode;
+
     void InitializeInstanceFields();
   };
 
@@ -230,3 +146,17 @@ namespace atn {
 } // namespace v4
 } // namespace antlr
 } // namespace org
+
+namespace std {
+  template <> struct hash<std::vector<ATNConfig *>>
+  {
+    size_t operator() (const std::vector<ATNConfig *> &vector) const
+    {
+      std::size_t seed = 0;
+      for (auto &config : vector) {
+        seed ^= config->hashCode() + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+      }
+      return seed;
+    }
+  };
+}

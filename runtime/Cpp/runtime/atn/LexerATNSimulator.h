@@ -162,7 +162,7 @@ namespace atn {
     ///  we can reach upon input {@code t}. Parameter {@code reach} is a return
     ///  parameter.
     /// </summary>
-    virtual void getReachableConfigSet(CharStream *input, ATNConfigSet *closure, ATNConfigSet *reach, int t);
+    void getReachableConfigSet(CharStream *input, ATNConfigSet *closure, ATNConfigSet *reach, int t);
 
     virtual void accept(CharStream *input, int ruleIndex, int actionIndex, int index, int line, int charPos);
 

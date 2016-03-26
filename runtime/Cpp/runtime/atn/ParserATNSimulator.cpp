@@ -54,6 +54,8 @@
 #include "stringconverter.h"
 #include "Interval.h"
 
+#include "Arrays.h"
+
 #include "ParserATNSimulator.h"
 
 using namespace org::antlr::v4::runtime;
@@ -444,7 +446,7 @@ atn::ATNConfigSet *ParserATNSimulator::computeReachSet(ATNConfigSet *closure, in
   std::vector<ATNConfig*> skippedStopStates;
 
   // First figure out where we can reach on input t
-  for (auto c : *closure) {
+  for (auto c : *closure->configLookup) {
     if (debug) {
       std::wcout << L"testing " << getTokenName(t) << L" at " << c->toString() << std::endl;
     }
@@ -510,7 +512,7 @@ atn::ATNConfigSet *ParserATNSimulator::computeReachSet(ATNConfigSet *closure, in
     reach = new ATNConfigSet(fullCtx);
     std::set<ATNConfig*> *closureBusy = new std::set<ATNConfig*>();
 
-    for (auto c : *intermediate) {
+    for (auto c : *intermediate->configLookup) {
       this->closure(c, reach, closureBusy, false, fullCtx);
     }
   }
@@ -568,7 +570,7 @@ atn::ATNConfigSet *ParserATNSimulator::removeAllConfigsNotInRuleStopState(ATNCon
 
   ATNConfigSet *result = new ATNConfigSet(configs->fullCtx);
 
-  for (auto config : *configs) {
+  for (auto config : *configs->configLookup) {
     if (dynamic_cast<RuleStopState*>(config->state) != nullptr) {
       result->add(config, mergeCache);
       continue;
@@ -627,7 +629,7 @@ std::vector<SemanticContext*> ParserATNSimulator::getPredsForAmbigAlts(antlrcpp:
   //SemanticContext *altToPred = new SemanticContext[nalts + 1];
   std::vector<SemanticContext*> altToPred;// = new SemanticContext[nalts + 1];
 
-  for (auto c : *configs) {
+  for (auto c : *configs->configLookup) {
     if (ambigAlts->data.test(c->alt)) {
       altToPred[c->alt] = dynamic_cast<SemanticContext*>( (new SemanticContext::OR(altToPred[c->alt], c->semanticContext)));
     }
@@ -687,7 +689,7 @@ std::vector<dfa::DFAState::PredPrediction *> ParserATNSimulator::getPredicatePre
 
 int ParserATNSimulator::getAltThatFinishedDecisionEntryRule(ATNConfigSet *configs) {
   misc::IntervalSet *alts = nullptr;
-  for (auto c : *configs) {
+  for (auto c : *configs->configLookup) {
     if (c->reachesIntoOuterContext > 0 || (dynamic_cast<RuleStopState*>(c->state) != nullptr && c->context->hasEmptyPath())) {
       alts->add(c->alt);
     }
@@ -1001,7 +1003,7 @@ std::wstring ParserATNSimulator::getLookaheadName(TokenStream *input) {
 
 void ParserATNSimulator::dumpDeadEndConfigs(NoViableAltException *nvae) {
   std::wcerr << L"dead end configs: ";
-  for (auto c : *nvae->getDeadEndConfigs()) {
+  for (auto c : *nvae->getDeadEndConfigs()->configLookup) {
     std::wstring trans = L"no edges";
     if (c->state->getNumberOfTransitions() > 0) {
       Transition *t = c->state->transition(0);
@@ -1026,7 +1028,7 @@ NoViableAltException *ParserATNSimulator::noViableAlt(TokenStream *input, Parser
 
 int ParserATNSimulator::getUniqueAlt(ATNConfigSet *configs) {
   int alt = ATN::INVALID_ALT_NUMBER;
-  for (auto c : *configs) {
+  for (auto c : *configs->configLookup) {
     if (alt == ATN::INVALID_ALT_NUMBER) {
       alt = c->alt; // found first alt
     } else if (c->alt != alt) {

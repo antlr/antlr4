@@ -73,26 +73,7 @@ ATNConfig::ATNConfig(ATNConfig *c, ATNState *state, PredictionContext *context, 
   this->reachesIntoOuterContext = c->reachesIntoOuterContext;
 }
 
-bool ATNConfig::equals(void *o) {
-  if (!(o != nullptr/*dynamic_cast<ATNConfig*>(o) != nullptr*/)) {
-    return false;
-  }
-
-  return this->equals(static_cast<ATNConfig*>(o));
-}
-
-bool ATNConfig::equals(ATNConfig *other) {
-  if (this == other) {
-    return true;
-  }
-  else if (other == nullptr) {
-    return false;
-  }
-
-  return this->state->stateNumber == other->state->stateNumber && this->alt == other->alt && (this->context == other->context || (this->context != nullptr && this->context->equals(other->context))) && this->semanticContext->equals(other->semanticContext);
-}
-
-size_t ATNConfig::hashCode() {
+size_t ATNConfig::hashCode() const {
   int hashCode = misc::MurmurHash::initialize(7);
   hashCode = misc::MurmurHash::update(hashCode, state->stateNumber);
   hashCode = misc::MurmurHash::update(hashCode, alt);
@@ -104,8 +85,9 @@ size_t ATNConfig::hashCode() {
 
 bool ATNConfig::operator == (const ATNConfig& other) const
 {
-  return alt == other.alt && state->stateNumber == other.state->stateNumber &&
-  ((context == nullptr && other.context == nullptr) || (context != nullptr && context->equals(other.context))) && semanticContext->equals(other.semanticContext);
+  return this->state->stateNumber == other.state->stateNumber && this->alt == other.alt &&
+    (this->context == other.context || (this->context != nullptr && this->context->equals(other.context))) &&
+    this->semanticContext->equals(other.semanticContext);
 }
 
 std::wstring ATNConfig::toString() {

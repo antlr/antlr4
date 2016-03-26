@@ -32,6 +32,7 @@
 #include "ATNConfigSet.h"
 #include "SemanticContext.h"
 #include "ATNConfig.h"
+#include "MurmurHash.h"
 
 #include "DFAState.h"
 
@@ -81,18 +82,13 @@ int DFAState::hashCode() {
   return hash;
 }
 
-bool DFAState::equals(Any o) {
+bool DFAState::equals(DFAState *o) {
   // compare set of ATN configurations in this set with other
   if (this == o) {
     return true;
   }
 
-  if (!o.is<DFAState*>()) {
-    return false;
-  }
-
-  DFAState *other = o.as<DFAState*>();
-  return configs->equals(other->configs);
+  return configs->equals(o->configs);
 }
 
 std::wstring DFAState::toString() {

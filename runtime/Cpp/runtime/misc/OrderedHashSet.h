@@ -136,10 +136,6 @@ namespace misc {
       return dup;
     }
 
-    virtual void *toArray() override {
-      return elements_Renamed.toArray();
-    }
-
     virtual std::wstring toString() override {
       return elements_Renamed.toString();
     }

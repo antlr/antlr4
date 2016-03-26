@@ -65,7 +65,7 @@ bool LexerATNConfig::hasPassedThroughNonGreedyDecision() {
   return passedThroughNonGreedyDecision;
 }
 
-size_t LexerATNConfig::hashCode() {
+size_t LexerATNConfig::hashCode() const {
   int hashCode = misc::MurmurHash::initialize(7);
   hashCode = misc::MurmurHash::update(hashCode, state->stateNumber);
   hashCode = misc::MurmurHash::update(hashCode, alt);
@@ -76,19 +76,12 @@ size_t LexerATNConfig::hashCode() {
   return hashCode;
 }
 
-bool LexerATNConfig::equals(ATNConfig *other) {
-  if (this == other) {
-    return true;
-  } else if (!(dynamic_cast<LexerATNConfig*>(other) != nullptr)) {
+bool LexerATNConfig::operator == (const LexerATNConfig& other) const
+{
+  if (passedThroughNonGreedyDecision != other.passedThroughNonGreedyDecision)
     return false;
-  }
 
-  LexerATNConfig *lexerOther = static_cast<LexerATNConfig*>(other);
-  if (passedThroughNonGreedyDecision != lexerOther->passedThroughNonGreedyDecision) {
-    return false;
-  }
-
-  return ATNConfig::equals(other);
+  return ATNConfig::operator==(other);
 }
 
 bool LexerATNConfig::checkNonGreedyDecision(LexerATNConfig *source, ATNState *target) {

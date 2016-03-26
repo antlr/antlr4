@@ -117,7 +117,7 @@ XPathElement *XPath::split(const std::wstring &path) {
         goto loopBreak;
 
       default :
-        throw IllegalArgumentException(std::wstring(L"Unknowth path element ") + el);
+        throw IllegalArgumentException(std::wstring(L"Unknown path element ") + el);
     }
   loopContinue:
   }

@@ -210,7 +210,7 @@ dfa::DFAState *LexerATNSimulator::getExistingTargetState(dfa::DFAState *s, int t
 }
 
 dfa::DFAState *LexerATNSimulator::computeTargetState(CharStream *input, dfa::DFAState *s, int t) {
-  ATNConfigSet *reach = new OrderedATNConfigSet();
+  OrderedATNConfigSet *reach = new OrderedATNConfigSet();
 
   // if we don't find an existing DFA state
   // Fill reach starting from closure, following t transitions
@@ -248,7 +248,7 @@ void LexerATNSimulator::getReachableConfigSet(CharStream *input, ATNConfigSet *c
   // this is used to skip processing for configs which have a lower priority
   // than a config that already reached an accept state for the same rule
   int skipAlt = ATN::INVALID_ALT_NUMBER;
-  for (auto c : *closure) {
+  for (auto c : *closure->configLookup) {
     bool currentAltReachedAcceptState = c->alt == skipAlt;
     if (currentAltReachedAcceptState && (static_cast<LexerATNConfig*>(c))->hasPassedThroughNonGreedyDecision()) {
       continue;
@@ -517,7 +517,7 @@ dfa::DFAState *LexerATNSimulator::addDFAState(ATNConfigSet *configs) {
 
   dfa::DFAState *proposed = new dfa::DFAState(configs);
   ATNConfig *firstConfigWithRuleStopState = nullptr;
-  for (auto c : *configs) {
+  for (auto c : *configs->configLookup) {
     if (dynamic_cast<RuleStopState*>(c->state) != nullptr) {
       firstConfigWithRuleStopState = c;
       break;

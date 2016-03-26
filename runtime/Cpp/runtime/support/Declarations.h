@@ -113,6 +113,7 @@ namespace org {
         namespace atn {
           class ATN;
           class ATNConfig;
+          template <typename Hasher, typename Comparer> class BaseATNConfigSet;
           class ATNConfigSet;
           class ATNDeserializationOptions;
           class ATNDeserializer;
@@ -128,6 +129,7 @@ namespace org {
           class BasicState;
           class BlockEndState;
           class BlockStartState;
+          class ConfigLookup;
           class DecisionState;
           class EmptyPredictionContext;
           class EpsilonTransition;

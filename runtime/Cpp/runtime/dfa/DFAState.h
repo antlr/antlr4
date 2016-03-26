@@ -31,8 +31,6 @@
 
 #pragma once
 
-#include "Any.h"
-
 namespace org {
 namespace antlr {
 namespace v4 {
@@ -151,7 +149,7 @@ namespace dfa {
     /// exists that has this exact set of ATN configurations. The
     /// <seealso cref="#stateNumber"/> is irrelevant.
     /// </summary>
-    virtual bool equals(Any o);
+    virtual bool equals(DFAState *o);
 
     virtual std::wstring toString();
 

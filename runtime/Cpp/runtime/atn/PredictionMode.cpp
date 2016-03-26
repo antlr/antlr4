@@ -32,13 +32,14 @@
 #include "RuleStopState.h"
 #include "ATNConfigSet.h"
 #include "ATNConfig.h"
+#include "MurmurHash.h"
 
 #include "PredictionMode.h"
 
 using namespace org::antlr::v4::runtime;
 using namespace org::antlr::v4::runtime::atn;
 
-class AltAndContextConfigEqualityComparator : misc::AbstractEqualityComparator<ATNConfig> {
+class AltAndContextConfigEqualityComparator : misc::EqualityComparator<ATNConfig> {
 public:
   int hashCode(ATNConfig* o);
   bool equals(ATNConfig* a, ATNConfig* b);
@@ -94,7 +95,7 @@ bool PredictionModeClass::hasSLLConflictTerminatingPrediction(PredictionMode* mo
     if (configs->hasSemanticContext) {
       // dup configs, tossing out semantic predicates
       ATNConfigSet* dup = new ATNConfigSet();
-      for (ATNConfig config : *configs) {
+      for (ATNConfig config : *configs->configLookup) {
         ATNConfig* c = new ATNConfig(&config, SemanticContext::NONE);
         dup->add(c);
       }
@@ -111,7 +112,7 @@ bool PredictionModeClass::hasSLLConflictTerminatingPrediction(PredictionMode* mo
 }
 
 bool PredictionModeClass::hasConfigInRuleStopState(ATNConfigSet* configs) {
-  for (ATNConfig c : *configs) {
+  for (ATNConfig c : *configs->configLookup) {
     if (dynamic_cast<RuleStopState*>(c.state) != NULL) {
       return true;
     }
@@ -121,7 +122,7 @@ bool PredictionModeClass::hasConfigInRuleStopState(ATNConfigSet* configs) {
 }
 
 bool PredictionModeClass::allConfigsInRuleStopStates(ATNConfigSet* configs) {
-  for (ATNConfig config : *configs) {
+  for (ATNConfig config : *configs->configLookup) {
     if (dynamic_cast<RuleStopState*>(config.state) == NULL) {
       return false;
     }
@@ -190,7 +191,7 @@ antlrcpp::BitSet PredictionModeClass::getAlts(const std::vector<antlrcpp::BitSet
 
 std::vector<antlrcpp::BitSet> PredictionModeClass::getConflictingAltSubsets(ATNConfigSet* configs) {
   AltAndContextMap configToAlts;
-  for (const ATNConfig& c : *configs) {
+  for (const ATNConfig& c : *configs->configLookup) {
     configToAlts[c].set(c.alt);
   }
   std::vector<antlrcpp::BitSet> values;
@@ -202,7 +203,7 @@ std::vector<antlrcpp::BitSet> PredictionModeClass::getConflictingAltSubsets(ATNC
 
 std::map<ATNState*, antlrcpp::BitSet> PredictionModeClass::getStateToAltMap(ATNConfigSet* configs) {
   std::map<ATNState*, antlrcpp::BitSet> m;
-  for (ATNConfig c : *configs) {
+  for (ATNConfig c : *configs->configLookup) {
     m[c.state].set(c.alt);
   }
   return m;

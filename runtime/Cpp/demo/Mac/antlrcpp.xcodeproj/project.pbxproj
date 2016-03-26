@@ -7,12 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2747A70A1CA691310030247B /* ConfigLookup.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2747A7081CA691310030247B /* ConfigLookup.cpp */; };
+		2747A70B1CA691310030247B /* ConfigLookup.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2747A7081CA691310030247B /* ConfigLookup.cpp */; };
+		2747A70C1CA691310030247B /* ConfigLookup.h in Headers */ = {isa = PBXBuildFile; fileRef = 2747A7091CA691310030247B /* ConfigLookup.h */; };
+		2747A70D1CA691310030247B /* ConfigLookup.h in Headers */ = {isa = PBXBuildFile; fileRef = 2747A7091CA691310030247B /* ConfigLookup.h */; };
 		276927241C9ED49100E4EBF8 /* antlrcpp-Prefix.h in Headers */ = {isa = PBXBuildFile; fileRef = 276927231C9ED49100E4EBF8 /* antlrcpp-Prefix.h */; };
 		276927251C9ED49100E4EBF8 /* antlrcpp-Prefix.h in Headers */ = {isa = PBXBuildFile; fileRef = 276927231C9ED49100E4EBF8 /* antlrcpp-Prefix.h */; };
 		278A66FB1C95838E002D667E /* ANTLRErrorListener.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 278A66FA1C95838E002D667E /* ANTLRErrorListener.cpp */; };
 		278A66FC1C95838E002D667E /* ANTLRErrorListener.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 278A66FA1C95838E002D667E /* ANTLRErrorListener.cpp */; };
-		27B4CE511C9F417D00E766E7 /* Any.h in Headers */ = {isa = PBXBuildFile; fileRef = 27B4CE501C9F417D00E766E7 /* Any.h */; };
-		27B4CE521C9F417D00E766E7 /* Any.h in Headers */ = {isa = PBXBuildFile; fileRef = 27B4CE501C9F417D00E766E7 /* Any.h */; };
 		27C666AC1C9584050021E494 /* ANTLRErrorListener.h in Headers */ = {isa = PBXBuildFile; fileRef = 27C6665D1C9584050021E494 /* ANTLRErrorListener.h */; };
 		27C666AD1C9584050021E494 /* ANTLRErrorListener.h in Headers */ = {isa = PBXBuildFile; fileRef = 27C6665D1C9584050021E494 /* ANTLRErrorListener.h */; };
 		27C666AE1C9584050021E494 /* ANTLRErrorStrategy.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 27C6665E1C9584050021E494 /* ANTLRErrorStrategy.cpp */; };
@@ -369,12 +371,6 @@
 		27C6687A1C9584B60021E494 /* LexerDFASerializer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 27C6686B1C9584B60021E494 /* LexerDFASerializer.cpp */; };
 		27C6687B1C9584B60021E494 /* LexerDFASerializer.h in Headers */ = {isa = PBXBuildFile; fileRef = 27C6686C1C9584B60021E494 /* LexerDFASerializer.h */; };
 		27C6687C1C9584B60021E494 /* LexerDFASerializer.h in Headers */ = {isa = PBXBuildFile; fileRef = 27C6686C1C9584B60021E494 /* LexerDFASerializer.h */; };
-		27C668A21C9584FA0021E494 /* AbstractEqualityComparator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 27C6687E1C9584FA0021E494 /* AbstractEqualityComparator.cpp */; };
-		27C668A31C9584FA0021E494 /* AbstractEqualityComparator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 27C6687E1C9584FA0021E494 /* AbstractEqualityComparator.cpp */; };
-		27C668A41C9584FA0021E494 /* AbstractEqualityComparator.h in Headers */ = {isa = PBXBuildFile; fileRef = 27C6687F1C9584FA0021E494 /* AbstractEqualityComparator.h */; };
-		27C668A51C9584FA0021E494 /* AbstractEqualityComparator.h in Headers */ = {isa = PBXBuildFile; fileRef = 27C6687F1C9584FA0021E494 /* AbstractEqualityComparator.h */; };
-		27C668A61C9584FA0021E494 /* Array2DHashSet.h in Headers */ = {isa = PBXBuildFile; fileRef = 27C668801C9584FA0021E494 /* Array2DHashSet.h */; };
-		27C668A71C9584FA0021E494 /* Array2DHashSet.h in Headers */ = {isa = PBXBuildFile; fileRef = 27C668801C9584FA0021E494 /* Array2DHashSet.h */; };
 		27C668A81C9584FA0021E494 /* DoubleKeyMap.h in Headers */ = {isa = PBXBuildFile; fileRef = 27C668821C9584FA0021E494 /* DoubleKeyMap.h */; };
 		27C668A91C9584FA0021E494 /* DoubleKeyMap.h in Headers */ = {isa = PBXBuildFile; fileRef = 27C668821C9584FA0021E494 /* DoubleKeyMap.h */; };
 		27C668AA1C9584FA0021E494 /* EqualityComparator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 27C668841C9584FA0021E494 /* EqualityComparator.cpp */; };
@@ -405,10 +401,6 @@
 		27C668CB1C9584FA0021E494 /* MurmurHash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 27C668941C9584FA0021E494 /* MurmurHash.cpp */; };
 		27C668CC1C9584FA0021E494 /* MurmurHash.h in Headers */ = {isa = PBXBuildFile; fileRef = 27C668951C9584FA0021E494 /* MurmurHash.h */; };
 		27C668CD1C9584FA0021E494 /* MurmurHash.h in Headers */ = {isa = PBXBuildFile; fileRef = 27C668951C9584FA0021E494 /* MurmurHash.h */; };
-		27C668D21C9584FA0021E494 /* ObjectEqualityComparator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 27C668981C9584FA0021E494 /* ObjectEqualityComparator.cpp */; };
-		27C668D31C9584FA0021E494 /* ObjectEqualityComparator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 27C668981C9584FA0021E494 /* ObjectEqualityComparator.cpp */; };
-		27C668D41C9584FA0021E494 /* ObjectEqualityComparator.h in Headers */ = {isa = PBXBuildFile; fileRef = 27C668991C9584FA0021E494 /* ObjectEqualityComparator.h */; };
-		27C668D51C9584FA0021E494 /* ObjectEqualityComparator.h in Headers */ = {isa = PBXBuildFile; fileRef = 27C668991C9584FA0021E494 /* ObjectEqualityComparator.h */; };
 		27C668D61C9584FA0021E494 /* OrderedHashSet.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 27C6689A1C9584FA0021E494 /* OrderedHashSet.cpp */; };
 		27C668D71C9584FA0021E494 /* OrderedHashSet.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 27C6689A1C9584FA0021E494 /* OrderedHashSet.cpp */; };
 		27C668D81C9584FA0021E494 /* OrderedHashSet.h in Headers */ = {isa = PBXBuildFile; fileRef = 27C6689B1C9584FA0021E494 /* OrderedHashSet.h */; };
@@ -617,9 +609,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		2747A7081CA691310030247B /* ConfigLookup.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ConfigLookup.cpp; sourceTree = "<group>"; };
+		2747A7091CA691310030247B /* ConfigLookup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ConfigLookup.h; sourceTree = "<group>"; };
 		276927231C9ED49100E4EBF8 /* antlrcpp-Prefix.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; name = "antlrcpp-Prefix.h"; path = "../../runtime/antlrcpp-Prefix.h"; sourceTree = "<group>"; };
 		278A66FA1C95838E002D667E /* ANTLRErrorListener.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ANTLRErrorListener.cpp; path = ../../runtime/ANTLRErrorListener.cpp; sourceTree = SOURCE_ROOT; };
-		27B4CE501C9F417D00E766E7 /* Any.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Any.h; sourceTree = "<group>"; };
 		27C6665D1C9584050021E494 /* ANTLRErrorListener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ANTLRErrorListener.h; path = ../../runtime/ANTLRErrorListener.h; sourceTree = SOURCE_ROOT; };
 		27C6665E1C9584050021E494 /* ANTLRErrorStrategy.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ANTLRErrorStrategy.cpp; path = ../../runtime/ANTLRErrorStrategy.cpp; sourceTree = SOURCE_ROOT; };
 		27C6665F1C9584050021E494 /* ANTLRErrorStrategy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ANTLRErrorStrategy.h; path = ../../runtime/ANTLRErrorStrategy.h; sourceTree = SOURCE_ROOT; };
@@ -706,7 +699,7 @@
 		27C6674C1C95846E0021E494 /* ArrayPredictionContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ArrayPredictionContext.h; sourceTree = "<group>"; };
 		27C6674D1C95846E0021E494 /* ATN.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ATN.cpp; sourceTree = "<group>"; wrapsLines = 0; };
 		27C6674E1C95846E0021E494 /* ATN.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ATN.h; sourceTree = "<group>"; };
-		27C6674F1C95846E0021E494 /* ATNConfig.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ATNConfig.cpp; sourceTree = "<group>"; };
+		27C6674F1C95846E0021E494 /* ATNConfig.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ATNConfig.cpp; sourceTree = "<group>"; wrapsLines = 0; };
 		27C667501C95846E0021E494 /* ATNConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ATNConfig.h; sourceTree = "<group>"; };
 		27C667511C95846E0021E494 /* ATNConfigSet.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ATNConfigSet.cpp; sourceTree = "<group>"; wrapsLines = 0; };
 		27C667521C95846E0021E494 /* ATNConfigSet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ATNConfigSet.h; sourceTree = "<group>"; wrapsLines = 0; };
@@ -748,7 +741,7 @@
 		27C667761C95846E0021E494 /* LoopEndState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoopEndState.h; sourceTree = "<group>"; };
 		27C667781C95846E0021E494 /* NotSetTransition.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NotSetTransition.cpp; sourceTree = "<group>"; };
 		27C667791C95846E0021E494 /* NotSetTransition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NotSetTransition.h; sourceTree = "<group>"; };
-		27C6677A1C95846E0021E494 /* OrderedATNConfigSet.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = OrderedATNConfigSet.cpp; sourceTree = "<group>"; };
+		27C6677A1C95846E0021E494 /* OrderedATNConfigSet.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = OrderedATNConfigSet.cpp; sourceTree = "<group>"; wrapsLines = 0; };
 		27C6677B1C95846E0021E494 /* OrderedATNConfigSet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OrderedATNConfigSet.h; sourceTree = "<group>"; };
 		27C6677C1C95846E0021E494 /* ParserATNSimulator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParserATNSimulator.cpp; sourceTree = "<group>"; wrapsLines = 0; };
 		27C6677D1C95846E0021E494 /* ParserATNSimulator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParserATNSimulator.h; sourceTree = "<group>"; };
@@ -800,10 +793,6 @@
 		27C6686A1C9584B60021E494 /* DFAState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFAState.h; sourceTree = "<group>"; };
 		27C6686B1C9584B60021E494 /* LexerDFASerializer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LexerDFASerializer.cpp; sourceTree = "<group>"; };
 		27C6686C1C9584B60021E494 /* LexerDFASerializer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LexerDFASerializer.h; sourceTree = "<group>"; };
-		27C6687E1C9584FA0021E494 /* AbstractEqualityComparator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AbstractEqualityComparator.cpp; sourceTree = "<group>"; };
-		27C6687F1C9584FA0021E494 /* AbstractEqualityComparator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AbstractEqualityComparator.h; sourceTree = "<group>"; };
-		27C668801C9584FA0021E494 /* Array2DHashSet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Array2DHashSet.h; sourceTree = "<group>"; };
-		27C668811C9584FA0021E494 /* Array2DHashSet.inl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Array2DHashSet.inl; sourceTree = "<group>"; wrapsLines = 0; };
 		27C668821C9584FA0021E494 /* DoubleKeyMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DoubleKeyMap.h; sourceTree = "<group>"; };
 		27C668841C9584FA0021E494 /* EqualityComparator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EqualityComparator.cpp; sourceTree = "<group>"; };
 		27C668851C9584FA0021E494 /* EqualityComparator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EqualityComparator.h; sourceTree = "<group>"; };
@@ -819,8 +808,6 @@
 		27C668931C9584FA0021E494 /* MultiMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MultiMap.h; sourceTree = "<group>"; };
 		27C668941C9584FA0021E494 /* MurmurHash.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MurmurHash.cpp; sourceTree = "<group>"; };
 		27C668951C9584FA0021E494 /* MurmurHash.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MurmurHash.h; sourceTree = "<group>"; };
-		27C668981C9584FA0021E494 /* ObjectEqualityComparator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ObjectEqualityComparator.cpp; sourceTree = "<group>"; };
-		27C668991C9584FA0021E494 /* ObjectEqualityComparator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ObjectEqualityComparator.h; sourceTree = "<group>"; };
 		27C6689A1C9584FA0021E494 /* OrderedHashSet.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = OrderedHashSet.cpp; sourceTree = "<group>"; };
 		27C6689B1C9584FA0021E494 /* OrderedHashSet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OrderedHashSet.h; sourceTree = "<group>"; };
 		27C6689C1C9584FA0021E494 /* ParseCancellationException.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParseCancellationException.cpp; sourceTree = "<group>"; };
@@ -1058,6 +1045,8 @@
 				27C667A31C95846E0021E494 /* Transition.h */,
 				27C667A41C95846E0021E494 /* WildcardTransition.cpp */,
 				27C667A51C95846E0021E494 /* WildcardTransition.h */,
+				2747A7081CA691310030247B /* ConfigLookup.cpp */,
+				2747A7091CA691310030247B /* ConfigLookup.h */,
 			);
 			path = atn;
 			sourceTree = "<group>";
@@ -1080,10 +1069,6 @@
 		27C6687D1C9584E90021E494 /* misc */ = {
 			isa = PBXGroup;
 			children = (
-				27C6687E1C9584FA0021E494 /* AbstractEqualityComparator.cpp */,
-				27C6687F1C9584FA0021E494 /* AbstractEqualityComparator.h */,
-				27C668801C9584FA0021E494 /* Array2DHashSet.h */,
-				27C668811C9584FA0021E494 /* Array2DHashSet.inl */,
 				27C668821C9584FA0021E494 /* DoubleKeyMap.h */,
 				27C668841C9584FA0021E494 /* EqualityComparator.cpp */,
 				27C668851C9584FA0021E494 /* EqualityComparator.h */,
@@ -1099,8 +1084,6 @@
 				27C668931C9584FA0021E494 /* MultiMap.h */,
 				27C668941C9584FA0021E494 /* MurmurHash.cpp */,
 				27C668951C9584FA0021E494 /* MurmurHash.h */,
-				27C668981C9584FA0021E494 /* ObjectEqualityComparator.cpp */,
-				27C668991C9584FA0021E494 /* ObjectEqualityComparator.h */,
 				27C6689A1C9584FA0021E494 /* OrderedHashSet.cpp */,
 				27C6689B1C9584FA0021E494 /* OrderedHashSet.h */,
 				27C6689C1C9584FA0021E494 /* ParseCancellationException.cpp */,
@@ -1129,7 +1112,6 @@
 				27C668F41C9585230021E494 /* Strings.h */,
 				27C668F51C9585230021E494 /* guid.cpp */,
 				27C668F61C9585230021E494 /* guid.h */,
-				27B4CE501C9F417D00E766E7 /* Any.h */,
 			);
 			path = support;
 			sourceTree = "<group>";
@@ -1441,9 +1423,9 @@
 				27C668E51C9584FA0021E494 /* Utils.h in Headers */,
 				27C66A491C958AC10021E494 /* XPath.h in Headers */,
 				27C667B11C95846E0021E494 /* ArrayPredictionContext.h in Headers */,
+				2747A70D1CA691310030247B /* ConfigLookup.h in Headers */,
 				27C669AE1C9585B80021E494 /* RuleNode.h in Headers */,
 				27C667211C9584050021E494 /* RecognitionException.h in Headers */,
-				27C668A51C9584FA0021E494 /* AbstractEqualityComparator.h in Headers */,
 				27C669091C9585230021E494 /* Declarations.h in Headers */,
 				27C667451C9584050021E494 /* WritableToken.h in Headers */,
 				27C669131C9585230021E494 /* Strings.h in Headers */,
@@ -1454,7 +1436,6 @@
 				27C669921C9585B80021E494 /* ErrorNode.h in Headers */,
 				27C668B91C9584FA0021E494 /* IntervalSet.h in Headers */,
 				27C666C51C9584050021E494 /* BufferedTokenStream.h in Headers */,
-				27B4CE521C9F417D00E766E7 /* Any.h in Headers */,
 				27C668BD1C9584FA0021E494 /* IntSet.h in Headers */,
 				27C669AA1C9585B80021E494 /* ParseTreeWalker.h in Headers */,
 				27C6685F1C95846E0021E494 /* Transition.h in Headers */,
@@ -1510,12 +1491,10 @@
 				27C667F51C95846E0021E494 /* EpsilonTransition.h in Headers */,
 				27C667F91C95846E0021E494 /* LexerATNConfig.h in Headers */,
 				27C668AD1C9584FA0021E494 /* EqualityComparator.h in Headers */,
-				27C668A71C9584FA0021E494 /* Array2DHashSet.h in Headers */,
 				27C669031C9585230021E494 /* BitSet.h in Headers */,
 				27C6673B1C9584050021E494 /* TokenStreamRewriter.h in Headers */,
 				27C668171C95846E0021E494 /* PlusBlockStartState.h in Headers */,
 				27C668271C95846E0021E494 /* PredictionContext.h in Headers */,
-				27C668D51C9584FA0021E494 /* ObjectEqualityComparator.h in Headers */,
 				27C667011C9584050021E494 /* LexerInterpreter.h in Headers */,
 				27C66A551C958AC10021E494 /* XPathTokenAnywhereElement.h in Headers */,
 				27C668701C9584B60021E494 /* DFA.h in Headers */,
@@ -1548,7 +1527,6 @@
 				27C669A51C9585B80021E494 /* ParseTreeVisitor.h in Headers */,
 				27C666AC1C9584050021E494 /* ANTLRErrorListener.h in Headers */,
 				27C668C41C9584FA0021E494 /* LogManager.h in Headers */,
-				27C668D41C9584FA0021E494 /* ObjectEqualityComparator.h in Headers */,
 				27C66A501C958AC10021E494 /* XPathRuleAnywhereElement.h in Headers */,
 				27C667DC1C95846E0021E494 /* BasicBlockStartState.h in Headers */,
 				27C666F81C9584050021E494 /* IRecognizer.h in Headers */,
@@ -1596,6 +1574,7 @@
 				27C667F41C95846E0021E494 /* EpsilonTransition.h in Headers */,
 				27C666EE1C9584050021E494 /* InputMismatchException.h in Headers */,
 				27C667C41C95846E0021E494 /* ATNDeserializer.h in Headers */,
+				2747A70C1CA691310030247B /* ConfigLookup.h in Headers */,
 				27C668731C9584B60021E494 /* DFASerializer.h in Headers */,
 				27C667361C9584050021E494 /* TokenStream.h in Headers */,
 				27C6690E1C9585230021E494 /* stringconverter.h in Headers */,
@@ -1607,7 +1586,6 @@
 				27C668C81C9584FA0021E494 /* MultiMap.h in Headers */,
 				27C667D81C95846E0021E494 /* AtomTransition.h in Headers */,
 				27C6687B1C9584B60021E494 /* LexerDFASerializer.h in Headers */,
-				27B4CE511C9F417D00E766E7 /* Any.h in Headers */,
 				27C668001C95846E0021E494 /* LL1Analyzer.h in Headers */,
 				27C667141C9584050021E494 /* ParserInterpreter.h in Headers */,
 				27C6673A1C9584050021E494 /* TokenStreamRewriter.h in Headers */,
@@ -1648,7 +1626,6 @@
 				27C668041C95846E0021E494 /* LoopEndState.h in Headers */,
 				27C6685A1C95846E0021E494 /* TokensStartState.h in Headers */,
 				27C668561C95846E0021E494 /* StarLoopEntryState.h in Headers */,
-				27C668A61C9584FA0021E494 /* Array2DHashSet.h in Headers */,
 				27C6690C1C9585230021E494 /* StringBuilder.h in Headers */,
 				27C66A521C958AC10021E494 /* XPathRuleElement.h in Headers */,
 				27C667B41C95846E0021E494 /* ATN.h in Headers */,
@@ -1666,7 +1643,6 @@
 				27C668161C95846E0021E494 /* PlusBlockStartState.h in Headers */,
 				27C667D01C95846E0021E494 /* ATNState.h in Headers */,
 				27C668DC1C9584FA0021E494 /* ParseCancellationException.h in Headers */,
-				27C668A41C9584FA0021E494 /* AbstractEqualityComparator.h in Headers */,
 				27C667FC1C95846E0021E494 /* LexerATNSimulator.h in Headers */,
 				27C669A11C9585B80021E494 /* ParseTreeProperty.h in Headers */,
 				27C667F01C95846E0021E494 /* EmptyPredictionContext.h in Headers */,
@@ -1934,7 +1910,6 @@
 				27C668AB1C9584FA0021E494 /* EqualityComparator.cpp in Sources */,
 				27C666FF1C9584050021E494 /* LexerInterpreter.cpp in Sources */,
 				27C668C31C9584FA0021E494 /* LogManager.cpp in Sources */,
-				27C668D31C9584FA0021E494 /* ObjectEqualityComparator.cpp in Sources */,
 				27C667FF1C95846E0021E494 /* LL1Analyzer.cpp in Sources */,
 				27C6673D1C9584050021E494 /* UnbufferedCharStream.cpp in Sources */,
 				27C667D31C95846E0021E494 /* ATNType.cpp in Sources */,
@@ -1976,13 +1951,13 @@
 				27C668DF1C9584FA0021E494 /* TestRig.cpp in Sources */,
 				27C668151C95846E0021E494 /* PlusBlockStartState.cpp in Sources */,
 				27C6683D1C95846E0021E494 /* RuleTransition.cpp in Sources */,
-				27C668A31C9584FA0021E494 /* AbstractEqualityComparator.cpp in Sources */,
 				27C6699C1C9585B80021E494 /* ParseTreeListener.cpp in Sources */,
 				27C6686E1C9584B60021E494 /* DFA.cpp in Sources */,
 				27C666AF1C9584050021E494 /* ANTLRErrorStrategy.cpp in Sources */,
 				27C668D71C9584FA0021E494 /* OrderedHashSet.cpp in Sources */,
 				27C667131C9584050021E494 /* ParserInterpreter.cpp in Sources */,
 				27C669A41C9585B80021E494 /* ParseTreeVisitor.cpp in Sources */,
+				2747A70B1CA691310030247B /* ConfigLookup.cpp in Sources */,
 				27C667F31C95846E0021E494 /* EpsilonTransition.cpp in Sources */,
 				27C667171C9584050021E494 /* ParserRuleContext.cpp in Sources */,
 				27C66A471C958AC10021E494 /* XPathWildcardElement.cpp in Sources */,
@@ -2013,7 +1988,6 @@
 				27C666B61C9584050021E494 /* ANTLRInputStream.cpp in Sources */,
 				27C666F41C9584050021E494 /* IntStream.cpp in Sources */,
 				27C667D61C95846E0021E494 /* AtomTransition.cpp in Sources */,
-				27C668D21C9584FA0021E494 /* ObjectEqualityComparator.cpp in Sources */,
 				27C668AA1C9584FA0021E494 /* EqualityComparator.cpp in Sources */,
 				27C667E21C95846E0021E494 /* BlockEndState.cpp in Sources */,
 				27C669BB1C9585B80021E494 /* Tree.cpp in Sources */,
@@ -2070,7 +2044,6 @@
 				27C668541C95846E0021E494 /* StarLoopEntryState.cpp in Sources */,
 				27C6686D1C9584B60021E494 /* DFA.cpp in Sources */,
 				27C668B21C9584FA0021E494 /* Interval.cpp in Sources */,
-				27C668A21C9584FA0021E494 /* AbstractEqualityComparator.cpp in Sources */,
 				27C668E21C9584FA0021E494 /* Utils.cpp in Sources */,
 				27C669B31C9585B80021E494 /* TerminalNode.cpp in Sources */,
 				27C66A0A1C958AB30021E494 /* TagChunk.cpp in Sources */,
@@ -2127,6 +2100,7 @@
 				27C669141C9585230021E494 /* guid.cpp in Sources */,
 				27C668C21C9584FA0021E494 /* LogManager.cpp in Sources */,
 				27C667281C9584050021E494 /* Token.cpp in Sources */,
+				2747A70A1CA691310030247B /* ConfigLookup.cpp in Sources */,
 				27C668791C9584B60021E494 /* LexerDFASerializer.cpp in Sources */,
 				27C668601C95846E0021E494 /* WildcardTransition.cpp in Sources */,
 				27C66A461C958AC10021E494 /* XPathWildcardElement.cpp in Sources */,

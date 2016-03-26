@@ -39,16 +39,27 @@ namespace v4 {
 namespace runtime {
 namespace atn {
 
+  struct OrderedATNConfigHasher
+  {
+    size_t operator()(const ATNConfig &config) const {
+      return std::hash<ATNConfig>()(config);
+    }
+  };
+
+  struct OrderedATNConfigComparer {
+    bool operator()(const ATNConfig &lhs, const ATNConfig &rhs) const
+    {
+      if (&lhs == &rhs) { // Shortcut: same address = same object.
+        return true;
+      }
+
+      return lhs == rhs;
+    }
+  };
+  
   class OrderedATNConfigSet : public ATNConfigSet {
   public:
-    class LexerConfigHashSet : public AbstractConfigHashSet {
-    public:
-      LexerConfigHashSet();
-    };
-
-  public:
     OrderedATNConfigSet();
-
   };
 
 } // namespace atn

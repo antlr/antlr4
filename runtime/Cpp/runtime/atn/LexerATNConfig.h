@@ -61,9 +61,9 @@ namespace atn {
 
     bool hasPassedThroughNonGreedyDecision();
 
-    virtual size_t hashCode() override;
+    virtual size_t hashCode() const override;
 
-    virtual bool equals(ATNConfig *other) override;
+    bool operator == (const LexerATNConfig& other) const;
 
   private:
     static bool checkNonGreedyDecision(LexerATNConfig *source, ATNState *target);

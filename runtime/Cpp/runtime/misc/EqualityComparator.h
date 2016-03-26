@@ -37,22 +37,21 @@ namespace v4 {
 namespace runtime {
 namespace misc {
 
-  /// This abstract class provides the concept of object equality independent of
-  /// equals (object equality) and the == operator (reference equality). It can be used
-  /// to provide algorithm-specific unordered comparisons without requiring changes to the object itself.
   template<typename T>
   class EqualityComparator {
 
-    /// <summary>
-    /// This method returns a hash code for the specified object.
-    /// </summary>
-    /// <param name="obj"> The object. </param>
-    /// <returns> The hash code for {@code obj}. </returns>
   public:
-    virtual int hashCode(T obj) = 0;
+    virtual int hashCode(T obj) {
+      return (int)std::hash<T>()(obj);
+    }
 
-    /// This method tests if two objects are equal.
-    virtual bool equals(T a, T b) = 0;
+    virtual bool equals(const T &a, const T &b) {
+      return a == b;
+    }
+
+    virtual bool equals(T *a, T *b) {
+      return *a == *b;
+    }
   };
 
 } // namespace atn

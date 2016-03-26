@@ -96,26 +96,26 @@ namespace atn {
 
     ATNConfig(ATNConfig *c, ATNState *state, PredictionContext *context, SemanticContext *semanticContext);
 
-    /// <summary>
-    /// An ATN configuration is equal to another if both have
-    ///  the same state, they predict the same alternative, and
-    ///  syntactic/semantic contexts are the same.
-    /// </summary>
-    virtual bool equals(void *o);
-
-    virtual bool equals(ATNConfig *other);
-
-    virtual size_t hashCode();
+    virtual size_t hashCode() const;
 
     struct ATNConfigHasher
     {
       size_t operator()(const ATNConfig &k) const {
-        ATNConfig a = k;
-        return a.hashCode();
+        return k.hashCode();
       }
     };
 
-    bool operator == (const ATNConfig& other) const;
+    struct ATNConfigComparer {
+      bool operator()(const ATNConfig &lhs, const ATNConfig &rhs) const
+      {
+        return lhs == rhs;
+      }
+    };
+
+    /// An ATN configuration is equal to another if both have
+    ///  the same state, they predict the same alternative, and
+    ///  syntactic/semantic contexts are the same.
+    bool operator == (const ATNConfig &other) const;
 
     virtual std::wstring toString();
 
@@ -160,14 +160,14 @@ namespace atn {
 } // namespace org
 
 
-// Hash function for ATNConfig, used in the MurmurHash::update function
+// Hash function for ATNConfig.
 
 namespace std {
     using org::antlr::v4::runtime::atn::ATNConfig;
 
     template <> struct hash<ATNConfig>
     {
-        size_t operator() (ATNConfig & x) const
+        size_t operator() (const ATNConfig &x) const
         {
             return x.hashCode();
         }
