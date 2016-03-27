@@ -39,45 +39,28 @@
 using namespace org::antlr::v4::runtime;
 using namespace org::antlr::v4::runtime::atn;
 
-class AltAndContextConfigEqualityComparator : misc::EqualityComparator<ATNConfig> {
-public:
-  int hashCode(ATNConfig* o);
-  bool equals(ATNConfig* a, ATNConfig* b);
-
-private:
-  AltAndContextConfigEqualityComparator() {}
+struct AltAndContextConfigHasher
+{
+  size_t operator () (const ATNConfig &o) const {
+    size_t hashCode = misc::MurmurHash::initialize(7);
+    hashCode = misc::MurmurHash::update(hashCode, (size_t)o.state->stateNumber);
+    hashCode = misc::MurmurHash::update(hashCode, (size_t)o.context);
+    return misc::MurmurHash::finish(hashCode, 2);
+  }
 };
 
-// TODO -- Determine if we need this hash function.
-int AltAndContextConfigEqualityComparator::hashCode(ATNConfig* o) {
-  int hashCode = misc::MurmurHash::initialize(7);
-  hashCode = misc::MurmurHash::update(hashCode, o->state->stateNumber);
-  hashCode = misc::MurmurHash::update(hashCode, o->context);
-  return misc::MurmurHash::finish(hashCode, 2);
-}
-
-// TODO -- Determine if we need this comparator.
-bool AltAndContextConfigEqualityComparator::equals(ATNConfig* a, ATNConfig* b) {
-  if (a == b) {
-    return true;
+struct AltAndContextConfigComparer {
+  bool operator()(const ATNConfig &a, const ATNConfig &b) const
+  {
+    if (&a == &b) {
+      return true;
+    }
+    return a.state->stateNumber == b.state->stateNumber &&
+    a.context == b.context;
   }
-  if (a == nullptr || b == nullptr) {
-    return false;
-  }
-  return a->state->stateNumber == b->state->stateNumber &&
-  a->context->equals(b->context);
-}
-
-/// <summary>
-/// A Map that uses just the state and the stack context as the key. </summary>
-class AltAndContextMap : public std::unordered_map < ATNConfig, antlrcpp::BitSet, ATNConfig::ATNConfigHasher> {
-public:
-  AltAndContextMap() {}
 };
 
-
-bool PredictionModeClass::hasSLLConflictTerminatingPrediction(PredictionMode* mode,
-                                                              ATNConfigSet* configs) {
+bool PredictionModeClass::hasSLLConflictTerminatingPrediction(PredictionMode* mode, ATNConfigSet* configs) {
   /* Configs in rule stop states indicate reaching the end of the decision
    * rule (local context) or end of start rule (full context). If all
    * configs meet this condition, then none of the configurations is able
@@ -190,7 +173,8 @@ antlrcpp::BitSet PredictionModeClass::getAlts(const std::vector<antlrcpp::BitSet
 }
 
 std::vector<antlrcpp::BitSet> PredictionModeClass::getConflictingAltSubsets(ATNConfigSet* configs) {
-  AltAndContextMap configToAlts;
+  /*
+  std::unordered_map<const ATNConfig&, antlrcpp::BitSet, AltAndContextConfigHasher, AltAndContextConfigComparer> configToAlts;
   for (const ATNConfig& c : *configs->configLookup) {
     configToAlts[c].set(c.alt);
   }
@@ -199,12 +183,14 @@ std::vector<antlrcpp::BitSet> PredictionModeClass::getConflictingAltSubsets(ATNC
     values.push_back(it.second);
   }
   return values;
+   */
+  return std::vector<antlrcpp::BitSet>();
 }
 
 std::map<ATNState*, antlrcpp::BitSet> PredictionModeClass::getStateToAltMap(ATNConfigSet* configs) {
   std::map<ATNState*, antlrcpp::BitSet> m;
   for (ATNConfig c : *configs->configLookup) {
-    m[c.state].set(c.alt);
+    m[c.state].set((size_t)c.alt);
   }
   return m;
 }
@@ -223,7 +209,7 @@ int PredictionModeClass::getSingleViableAlt(const std::vector<antlrcpp::BitSet>&
     int minAlt = alts.nextSetBit(0);
 
     assert(minAlt != -1);  // TODO -- Remove this after verification.
-    viableAlts.set(minAlt);
+    viableAlts.set((size_t)minAlt);
     if (viableAlts.count() > 1)  // more than 1 viable alt
     {
       return ATN::INVALID_ALT_NUMBER;

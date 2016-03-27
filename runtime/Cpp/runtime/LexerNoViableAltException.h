@@ -43,16 +43,16 @@ namespace runtime {
     /// <summary>
     /// Matching attempted at what input index? </summary>
   private:
-    const int startIndex;
+    const size_t startIndex;
 
     /// <summary>
     /// Which configurations did we try at input.index() that couldn't match input.LA(1)? </summary>
     atn::ATNConfigSet *const deadEndConfigs;
 
   public:
-    LexerNoViableAltException(Lexer *lexer, CharStream *input, int startIndex, atn::ATNConfigSet *deadEndConfigs);
+    LexerNoViableAltException(Lexer *lexer, CharStream *input, size_t startIndex, atn::ATNConfigSet *deadEndConfigs);
 
-    virtual int getStartIndex();
+    virtual size_t getStartIndex();
 
     virtual atn::ATNConfigSet *getDeadEndConfigs();
 

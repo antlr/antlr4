@@ -78,7 +78,7 @@ Token *Lexer::nextToken() {
 
   // Mark start location in char stream so unbuffered streams are
   // guaranteed at least have text of current token
-  int tokenStartMarker = _input->mark();
+  ssize_t tokenStartMarker = _input->mark();
   try {
     while (true) {
     outerContinue:
@@ -89,9 +89,9 @@ Token *Lexer::nextToken() {
 
       delete _token;
       _channel = Token::DEFAULT_CHANNEL;
-      _tokenStartCharIndex = _input->index();
+      _tokenStartCharIndex = (int)_input->index();
       _tokenStartCharPositionInLine = getInterpreter()->getCharPositionInLine();
-      _tokenStartLine = getInterpreter()->getLine();
+      _tokenStartLine = (int)getInterpreter()->getLine();
       _text = L"";
       do {
         _type = Token::INVALID_TYPE;
@@ -100,7 +100,7 @@ Token *Lexer::nextToken() {
         //								   " at index "+input.index());
         int ttype;
         try {
-          ttype = getInterpreter()->match(_input, _mode);
+          ttype = getInterpreter()->match(_input, (size_t)_mode);
         } catch (LexerNoViableAltException *e) {
           notifyListeners(e); // report error
           recover(e);
@@ -207,12 +207,13 @@ Token *Lexer::emitEOF() {
     int n = _token->getStopIndex() - _token->getStartIndex() + 1;
     cpos = _token->getCharPositionInLine() + n;
   }
-  Token *eof = (Token*)_factory->create(_tokenFactorySourcePair, Token::_EOF, L"", Token::DEFAULT_CHANNEL, _input->index(), _input->index() - 1, getLine(), cpos);
+  Token *eof = (Token*)_factory->create(_tokenFactorySourcePair, Token::_EOF, L"", Token::DEFAULT_CHANNEL,
+    (int)_input->index(), (int)_input->index() - 1, (int)getLine(), cpos);
   emit(eof);
   return eof;
 }
 
-int Lexer::getLine() {
+size_t Lexer::getLine() const {
   return getInterpreter()->getLine();
 }
 
@@ -220,7 +221,7 @@ int Lexer::getCharPositionInLine() {
   return getInterpreter()->getCharPositionInLine();
 }
 
-void Lexer::setLine(int line) {
+void Lexer::setLine(size_t line) {
   getInterpreter()->setLine(line);
 }
 
@@ -229,7 +230,7 @@ void Lexer::setCharPositionInLine(int charPositionInLine) {
 }
 
 int Lexer::getCharIndex() {
-  return _input->index();
+  return (int)_input->index();
 }
 
 std::wstring Lexer::getText() {
@@ -285,11 +286,11 @@ void Lexer::recover(LexerNoViableAltException *e) {
 }
 
 void Lexer::notifyListeners(LexerNoViableAltException *e) {
-  std::wstring text = _input->getText(misc::Interval::of(_tokenStartCharIndex, _input->index()));
+  std::wstring text = _input->getText(misc::Interval::of(_tokenStartCharIndex, (int)_input->index()));
   std::wstring msg = std::wstring(L"token recognition error at: '") + getErrorDisplay(text) + std::wstring(L"'");
 
   ANTLRErrorListener *listener = getErrorListenerDispatch();
-  listener->syntaxError(this, nullptr, _tokenStartLine, _tokenStartCharPositionInLine, msg, e);
+  listener->syntaxError(this, nullptr, (size_t)_tokenStartLine, _tokenStartCharPositionInLine, msg, e);
 }
 
 std::wstring Lexer::getErrorDisplay(const std::wstring &s) {

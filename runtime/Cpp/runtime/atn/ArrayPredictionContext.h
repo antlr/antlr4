@@ -43,40 +43,23 @@ namespace atn {
   class SingletonPredictionContext;
   
   class ArrayPredictionContext : public PredictionContext {
-    /// <summary>
-    /// Parent can be null only if full ctx mode and we make an array
-    ///  from <seealso cref="#EMPTY"/> and non-empty. We merge <seealso cref="#EMPTY"/> by using null parent and
-    ///  returnState == <seealso cref="#EMPTY_RETURN_STATE"/>.
-    /// </summary>
   public:
-    const std::vector<PredictionContext*> *parents;
+    /// Parent can be empty only if full ctx mode and we make an array
+    /// from EMPTY and non-empty. We merge EMPTY by using null parent and
+    /// returnState == EMPTY_RETURN_STATE.
+    const std::vector<PredictionContext*> &parents;
 
-    /// <summary>
-    /// Sorted for merge, no duplicates; if present,
-    ///  <seealso cref="#EMPTY_RETURN_STATE"/> is always last.
-    /// </summary>
-    const std::vector<int> returnStates;
+    /// Sorted for merge, no duplicates; if present, EMPTY_RETURN_STATE is always last.
+    const std::vector<int> &returnStates;
 
     ArrayPredictionContext(SingletonPredictionContext *a); //this(new PredictionContext[] {a.parent}, new int[] {a.returnState});
+    ArrayPredictionContext(const std::vector<PredictionContext *> &parents, const std::vector<int> &returnStates);
 
-    ArrayPredictionContext(PredictionContext *parents, int returnStates[]);
-    ArrayPredictionContext(std::vector<PredictionContext *>parents,
-                           const std::vector<int> returnStates);
-
-    virtual bool isEmpty() override;
-
-    virtual int size() override;
-
-    virtual PredictionContext *getParent(int index) override;
-
-    virtual int getReturnState(int index) override;
-
-    //	@Override
-    //	public int findReturnState(int returnState) {
-    //		return Arrays.binarySearch(returnStates, returnState);
-    //	}
-
-    virtual bool equals(void *o) override;
+    virtual bool isEmpty() const override;
+    virtual size_t size() const override;
+    virtual PredictionContext *getParent(size_t index) const override;
+    virtual int getReturnState(size_t index) const override;
+    bool operator == (PredictionContext *o) const override;
 
     virtual std::wstring toString();
   };

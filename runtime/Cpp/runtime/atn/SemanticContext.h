@@ -52,7 +52,7 @@ namespace atn {
   public:
     static SemanticContext *const NONE;
 
-    virtual int hashCode() = 0;
+    virtual size_t hashCode() = 0;
 
     class Predicate;
     class PrecedencePredicate;
@@ -131,7 +131,7 @@ namespace atn {
       return parser->sempred(localctx, ruleIndex, predIndex);
     }
 
-    virtual int hashCode() override;
+    virtual size_t hashCode() override;
 
     virtual bool equals(void *obj) override;
 
@@ -155,7 +155,7 @@ namespace atn {
 
     virtual int compareTo(PrecedencePredicate *o);
 
-    virtual int hashCode() override;
+    virtual size_t hashCode() override;
 
     virtual bool equals(void *obj) override;
 
@@ -179,7 +179,7 @@ namespace atn {
 
     virtual bool equals(void *obj) override;
 
-    virtual int hashCode() override;
+    virtual size_t hashCode() override;
 
     template<typename T1, typename T2>
     bool eval(Recognizer<T1, T2> *parser, RuleContext *outerContext) {
@@ -203,7 +203,7 @@ namespace atn {
 
     virtual bool equals(SemanticContext *obj);
 
-    virtual int hashCode() override;
+    virtual size_t hashCode() override;
 
     template<typename T1, typename T2>
     bool eval(Recognizer<T1, T2> *parser, RuleContext *outerContext) {

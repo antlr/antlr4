@@ -41,18 +41,18 @@ using namespace org::antlr::v4::runtime::atn;
 AtomTransition::AtomTransition(ATNState *target, int label) : Transition(target), _label(label) {
 }
 
-int AtomTransition::getSerializationType() {
+int AtomTransition::getSerializationType() const {
   return ATOM;
 }
 
-IntervalSet *AtomTransition::label() {
+IntervalSet AtomTransition::label() const {
   return IntervalSet::of(_label);
 }
 
-bool AtomTransition::matches(int symbol, int minVocabSymbol, int maxVocabSymbol) {
+bool AtomTransition::matches(int symbol, int minVocabSymbol, int maxVocabSymbol) const {
   return _label == symbol;
 }
 
-std::wstring AtomTransition::toString() {
+std::wstring AtomTransition::toString() const {
   return antlrcpp::StringConverterHelper::toString(_label);
 }

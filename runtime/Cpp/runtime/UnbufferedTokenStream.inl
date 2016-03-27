@@ -45,13 +45,10 @@ namespace antlr {
 namespace v4 {
 namespace runtime {
 
-  template <typename T>
-  UnbufferedTokenStream<T>::UnbufferedTokenStream(TokenSource* tokenSource)
-  { //this(tokenSource, 256);
+  UnbufferedTokenStream::UnbufferedTokenStream(TokenSource* tokenSource) : UnbufferedTokenStream(tokenSource, 256) {
   }
 
-  template <typename T>
-  UnbufferedTokenStream<T>::UnbufferedTokenStream(TokenSource* tokenSource, int bufferSize)
+  UnbufferedTokenStream::UnbufferedTokenStream(TokenSource* tokenSource, int bufferSize)
   {
     InitializeInstanceFields();
     this->tokenSource = tokenSource;
@@ -60,8 +57,7 @@ namespace runtime {
     fill(1); // prime the pump
   }
 
-  template <typename T>
-  Token* UnbufferedTokenStream<T>::get(int i)
+  Token* UnbufferedTokenStream::get(int i)
   { // get absolute index
     int bufferStartIndex = getBufferStartIndex();
     if (i < bufferStartIndex || i >= bufferStartIndex + n) {
@@ -70,8 +66,7 @@ namespace runtime {
     return tokens[i - bufferStartIndex];
   }
 
-  template <typename T>
-  Token* UnbufferedTokenStream<T>::LT(int i)
+  Token* UnbufferedTokenStream::LT(int i)
   {
     if (i == -1) {
       return lastToken;
@@ -91,38 +86,32 @@ namespace runtime {
     return tokens[index];
   }
 
-  template <typename T>
-  int UnbufferedTokenStream<T>::LA(int i)
+  int UnbufferedTokenStream::LA(int i)
   {
     return LT(i)->getType();
   }
 
-  template <typename T>
-  TokenSource* UnbufferedTokenStream<T>::getTokenSource()
+  TokenSource* UnbufferedTokenStream::getTokenSource()
   {
     return tokenSource;
   }
 
-  template <typename T>
-  std::wstring UnbufferedTokenStream<T>::getText()
+  std::wstring UnbufferedTokenStream::getText()
   {
     return L"";
   }
 
-  template <typename T>
-  std::wstring UnbufferedTokenStream<T>::getText(RuleContext* ctx)
+  std::wstring UnbufferedTokenStream::getText(RuleContext* ctx)
   {
     return getText(ctx->getSourceInterval());
   }
 
-  template <typename T>
-  std::wstring UnbufferedTokenStream<T>::getText(Token* start, Token* stop)
+  std::wstring UnbufferedTokenStream::getText(Token* start, Token* stop)
   {
     return getText(misc::Interval::of(start->getTokenIndex(), stop->getTokenIndex()));
   }
 
-  template <typename T>
-  void UnbufferedTokenStream<T>::consume()
+  void UnbufferedTokenStream::consume()
   {
     if (LA(1) == Token::_EOF) {
       throw new IllegalStateException(L"cannot consume EOF");
@@ -148,8 +137,7 @@ namespace runtime {
   ///  {@code p} index is {@code tokens.length-1}.  {@code p+need-1} is the tokens index 'need' elements
   ///  ahead.  If we need 1 element, {@code (p+1-1)==p} must be less than {@code tokens.length}.
   /// </summary>
-  template <typename T>
-  void UnbufferedTokenStream<T>::sync(int want)
+  void UnbufferedTokenStream::sync(int want)
   {
     int need = (p + want - 1) - n + 1; // how many more elements we need?
     if (need > 0) {
@@ -162,8 +150,7 @@ namespace runtime {
   /// actually added to the buffer. If the return value is less than {@code n},
   /// then EOF was reached before {@code n} tokens could be added.
   /// </summary>
-  template <typename T>
-  int UnbufferedTokenStream<T>::fill(int n)
+  int UnbufferedTokenStream::fill(int n)
   {
     for (int i = 0; i < n; i++) {
       if (this->n > 0 && tokens[this->n - 1]->getType() == Token::_EOF) {
@@ -176,8 +163,8 @@ namespace runtime {
 
     return n;
   }
-  template <typename T>
-  void UnbufferedTokenStream<T>::add(Token* t)
+
+  void UnbufferedTokenStream::add(Token* t)
   {
     if (n >= tokens.size()) {
       tokens = Arrays::copyOf(tokens, tokens.size() * 2);
@@ -197,8 +184,7 @@ namespace runtime {
   /// protection against misuse where {@code seek()} is called on a mark or
   /// {@code release()} is called in the wrong order.
   /// </summary>
-  template <typename T>
-  int UnbufferedTokenStream<T>::mark()
+  int UnbufferedTokenStream::mark()
   {
     if (numMarkers == 0) {
       lastTokenBufferStart = lastToken;
@@ -210,7 +196,7 @@ namespace runtime {
   }
 
   template <typename T>
-  void UnbufferedTokenStream<T>::release(int marker)
+  void UnbufferedTokenStream::release(int marker)
   {
     int expectedMark = -numMarkers;
     if (marker != expectedMark) {
@@ -230,14 +216,13 @@ namespace runtime {
       lastTokenBufferStart = lastToken;
     }
   }
-  template <typename T>
-  int UnbufferedTokenStream<T>::index()
+
+  int UnbufferedTokenStream::index()
   {
     return currentTokenIndex;
   }
 
-  template <typename T>
-  void UnbufferedTokenStream<T>::seek(int index)
+  void UnbufferedTokenStream::seek(int index)
   { // seek to absolute index
     if (index == currentTokenIndex) {
       return;
@@ -267,20 +252,17 @@ namespace runtime {
     }
   }
 
-  template <typename T>
-  size_t UnbufferedTokenStream<T>::size()
+  size_t UnbufferedTokenStream::size()
   {
     throw new UnsupportedOperationException(L"Unbuffered stream cannot know its size");
   }
 
-  template <typename T>
-  std::string UnbufferedTokenStream<T>::getSourceName()
+  std::string UnbufferedTokenStream::getSourceName()
   {
     return tokenSource->getSourceName();
   }
 
-  template <typename T>
-  std::wstring UnbufferedTokenStream<T>::getText(misc::Interval* interval)
+  std::wstring UnbufferedTokenStream::getText(misc::Interval* interval)
   {
     int bufferStartIndex = getBufferStartIndex();
     int bufferStopIndex = bufferStartIndex + tokens.size() - 1;
@@ -303,14 +285,12 @@ namespace runtime {
     return buf->toString();
   }
 
-  template <typename T>
-  int UnbufferedTokenStream<T>::getBufferStartIndex()
+  int UnbufferedTokenStream::getBufferStartIndex()
   {
     return currentTokenIndex - p;
   }
 
-  template <typename T>
-  void UnbufferedTokenStream<T>::InitializeInstanceFields()
+  void UnbufferedTokenStream::InitializeInstanceFields()
   {
     n = 0;
     p = 0;

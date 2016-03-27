@@ -35,17 +35,17 @@
 
 using namespace org::antlr::v4::runtime::atn;
 
-NotSetTransition::NotSetTransition(ATNState *target, misc::IntervalSet *set) : SetTransition(target, set) {
+NotSetTransition::NotSetTransition(ATNState *target, const misc::IntervalSet &set) : SetTransition(target, set) {
 }
 
-int NotSetTransition::getSerializationType() {
+int NotSetTransition::getSerializationType() const {
   return NOT_SET;
 }
 
-bool NotSetTransition::matches(int symbol, int minVocabSymbol, int maxVocabSymbol) {
+bool NotSetTransition::matches(int symbol, int minVocabSymbol, int maxVocabSymbol) const {
   return symbol >= minVocabSymbol && symbol <= maxVocabSymbol && !SetTransition::matches(symbol, minVocabSymbol, maxVocabSymbol);
 }
 
-std::wstring NotSetTransition::toString() {
+std::wstring NotSetTransition::toString() const {
   return L'~' + SetTransition::toString();
 }

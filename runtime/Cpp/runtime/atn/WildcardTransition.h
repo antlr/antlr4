@@ -43,11 +43,11 @@ namespace atn {
   public:
     WildcardTransition(ATNState *target);
 
-    virtual int getSerializationType() override;
+    virtual int getSerializationType() const override;
 
-    virtual bool matches(int symbol, int minVocabSymbol, int maxVocabSymbol) override;
+    virtual bool matches(int symbol, int minVocabSymbol, int maxVocabSymbol) const override;
 
-    virtual std::wstring toString() ;
+    virtual std::wstring toString() const;
   };
 
 } // namespace atn

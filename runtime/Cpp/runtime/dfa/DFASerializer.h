@@ -49,7 +49,7 @@ namespace dfa {
     virtual std::wstring toString();
 
   protected:
-    virtual std::wstring getEdgeLabel(int i);
+    virtual std::wstring getEdgeLabel(size_t i);
 
     virtual std::wstring getStateString(DFAState *s);
   };

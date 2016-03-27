@@ -46,7 +46,7 @@ std::wstring SemanticContext::toString() const {
   throw new ASSERTException(L"SemanticContext::toString", L"Should never be called, abstract class");
 }
 
-int SemanticContext::hashCode() {
+size_t SemanticContext::hashCode() {
   // This is a pure virtual function, why does it need an impl?
   throw new ASSERTException(L"SemanticContext::hashCode", L"Should never be called, abstract class");
 }
@@ -57,10 +57,10 @@ bool SemanticContext::equals(void *obj) {
 }
 
 
-int SemanticContext::Predicate::hashCode() {
-  int hashCode = misc::MurmurHash::initialize();
-  hashCode = misc::MurmurHash::update(hashCode, ruleIndex);
-  hashCode = misc::MurmurHash::update(hashCode, predIndex);
+size_t SemanticContext::Predicate::hashCode() {
+  size_t hashCode = misc::MurmurHash::initialize();
+  hashCode = misc::MurmurHash::update(hashCode, (size_t)ruleIndex);
+  hashCode = misc::MurmurHash::update(hashCode, (size_t)predIndex);
   hashCode = misc::MurmurHash::update(hashCode, isCtxDependent ? 1 : 0);
   hashCode = misc::MurmurHash::finish(hashCode, 3);
   return hashCode;
@@ -91,9 +91,9 @@ int SemanticContext::PrecedencePredicate::compareTo(PrecedencePredicate *o) {
   return precedence - o->precedence;
 }
 
-int SemanticContext::PrecedencePredicate::hashCode() {
-  int hashCode = 1;
-  hashCode = 31 * hashCode + precedence;
+size_t SemanticContext::PrecedencePredicate::hashCode() {
+  size_t hashCode = 1;
+  hashCode = 31 * hashCode + (size_t)precedence;
   return hashCode;
 }
 
@@ -165,9 +165,8 @@ bool SemanticContext::AND::equals(void *obj) {
 }
 
 
-int SemanticContext::AND::hashCode() {
-  return misc::MurmurHash::hashCode(opnds.data(),
-                                    opnds.size(), (int)typeid(AND).hash_code());
+size_t SemanticContext::AND::hashCode() {
+  return misc::MurmurHash::hashCode(opnds.data(), opnds.size(), typeid(AND).hash_code());
 }
 
 
@@ -229,8 +228,8 @@ bool SemanticContext::OR::equals(SemanticContext *obj) {
   return this->opnds == other->opnds;
 }
 
-int SemanticContext::OR::hashCode() {
-  return misc::MurmurHash::hashCode(opnds.data(), opnds.size(), (int)typeid(OR).hash_code());
+size_t SemanticContext::OR::hashCode() {
+  return misc::MurmurHash::hashCode(opnds.data(), opnds.size(), typeid(OR).hash_code());
 }
 
 

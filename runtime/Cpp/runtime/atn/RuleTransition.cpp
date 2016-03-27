@@ -41,14 +41,14 @@ RuleTransition::RuleTransition(RuleStartState *ruleStart, int ruleIndex, int pre
   this->followState = followState;
 }
 
-int RuleTransition::getSerializationType() {
+int RuleTransition::getSerializationType() const {
   return RULE;
 }
 
-bool RuleTransition::isEpsilon() {
+bool RuleTransition::isEpsilon() const {
   return true;
 }
 
-bool RuleTransition::matches(int symbol, int minVocabSymbol, int maxVocabSymbol) {
+bool RuleTransition::matches(int symbol, int minVocabSymbol, int maxVocabSymbol) const {
   return false;
 }

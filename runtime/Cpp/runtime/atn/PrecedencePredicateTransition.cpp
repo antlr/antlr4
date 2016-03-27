@@ -36,22 +36,22 @@ using namespace org::antlr::v4::runtime::atn;
 PrecedencePredicateTransition::PrecedencePredicateTransition(ATNState *target, int precedence) : AbstractPredicateTransition(target), precedence(precedence) {
 }
 
-int PrecedencePredicateTransition::getSerializationType() {
+int PrecedencePredicateTransition::getSerializationType() const {
   return PRECEDENCE;
 }
 
-bool PrecedencePredicateTransition::isEpsilon() {
+bool PrecedencePredicateTransition::isEpsilon() const {
   return true;
 }
 
-bool PrecedencePredicateTransition::matches(int symbol, int minVocabSymbol, int maxVocabSymbol) {
+bool PrecedencePredicateTransition::matches(int symbol, int minVocabSymbol, int maxVocabSymbol) const {
   return false;
 }
 
-org::antlr::v4::runtime::atn::SemanticContext::PrecedencePredicate *PrecedencePredicateTransition::getPredicate() {
+org::antlr::v4::runtime::atn::SemanticContext::PrecedencePredicate *PrecedencePredicateTransition::getPredicate() const {
   return new SemanticContext::PrecedencePredicate(precedence);
 }
 
-std::wstring PrecedencePredicateTransition::toString() {
+std::wstring PrecedencePredicateTransition::toString() const {
   return std::to_wstring(precedence) + std::wstring(L" >= _p");
 }

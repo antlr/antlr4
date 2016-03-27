@@ -112,7 +112,7 @@ namespace tree {
         }
       }
       // check children
-      for (int i = 0; i < t->getChildCount(); i++) {
+      for (size_t i = 0; i < t->getChildCount(); i++) {
         _findAllNodes(t->getChild(i), index, findTokens, nodes);
       }
     }

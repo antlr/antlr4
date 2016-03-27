@@ -29,78 +29,54 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <algorithm>
 #include "Exceptions.h"
 #include "Interval.h"
 #include "Arrays.h"
+#include "CPPUtils.h"
 
 #include "ANTLRInputStream.h"
 
 using namespace org::antlr::v4::runtime;
+using namespace antlrcpp;
 
 using misc::Interval;
 
-ANTLRInputStream::ANTLRInputStream() {
+ANTLRInputStream::ANTLRInputStream(const std::wstring &input) : data(input) {
   InitializeInstanceFields();
 }
 
-ANTLRInputStream::ANTLRInputStream(const std::wstring &input) : ANTLRInputStream() {
-  this->data = input;
-  this->n = (int)input.length();
+ANTLRInputStream::ANTLRInputStream(const wchar_t data[], size_t numberOfActualCharsInArray)
+  : ANTLRInputStream(std::wstring(data, numberOfActualCharsInArray)) {
 }
 
-ANTLRInputStream::ANTLRInputStream(wchar_t data[], int numberOfActualCharsInArray) : ANTLRInputStream() {
-  this->data = data;
-  this->n = numberOfActualCharsInArray;
+ANTLRInputStream::ANTLRInputStream(std::wiostream &stream) : ANTLRInputStream(stream, READ_BUFFER_SIZE) {
 }
 
-
-ANTLRInputStream::ANTLRInputStream(std::wifstream *r) : ANTLRInputStream() {
+ANTLRInputStream::ANTLRInputStream(std::wiostream &stream, std::streamsize readChunkSize) : ANTLRInputStream() {
+  load(stream, readChunkSize);
 }
 
-
-ANTLRInputStream::ANTLRInputStream(std::wifstream *r, int initialSize) : ANTLRInputStream() {
-}
-
-ANTLRInputStream::ANTLRInputStream(std::wifstream *r, int initialSize, int readChunkSize) : ANTLRInputStream() {
-  load(r, initialSize, readChunkSize);
-}
-
-
-void ANTLRInputStream::load(std::wifstream *r, int size, int readChunkSize) {
-  if (r == nullptr) {
+void ANTLRInputStream::load(std::wiostream &stream, std::streamsize readChunkSize) {
+  stream.seekg(0, stream.beg);
+  if (!stream.good()) // No fail, bad or EOF.
     return;
-  }
-  
-  if (size <= 0) {
-    size = INITIAL_BUFFER_SIZE;
-  }
 
-  if (readChunkSize <= 0) {
+  data.clear();
+
+  if (readChunkSize == 0) {
     readChunkSize = READ_BUFFER_SIZE;
   }
 
-  try {
-    // alloc initial buffer size.
-    data = new wchar_t[size];
-    // read all the data in chunks of readChunkSize
-    int numRead = 0;
-    int p = 0;
-    do {
-      if (p + readChunkSize > (int)data.length()) { // overflow?
-        data = antlrcpp::Arrays::copyOf(data, (int)data.length() * 2);
-      }
-      r->read(new wchar_t[100], p);
+  wchar_t *buffer = new wchar_t[readChunkSize];
+  auto onExit = finally([buffer] {
+    delete[] buffer;
+  });
 
-      p += numRead;
-    } while (numRead != -1); // while not EOF
-                             // set the actual size of the data available;
-                             // EOF subtracted one above in p+=numRead; add one back
-    n = p + 1;
+  while (!stream.eof()) {
+    stream.read(buffer, readChunkSize);
+    data.append(buffer, (size_t)std::min(stream.gcount(), readChunkSize));
   }
-  catch (void *) {
-    r->close();
-  }
-
 }
 
 void ANTLRInputStream::reset() {
@@ -108,72 +84,77 @@ void ANTLRInputStream::reset() {
 }
 
 void ANTLRInputStream::consume() {
-  if (p >= n) {
+  if (p >= data.size()) {
     assert(LA(1) == IntStream::_EOF);
     throw IllegalStateException(L"cannot consume EOF");
   }
 
-  if (p < n) {
+  if (p < data.size()) {
     p++;
   }
 }
 
-int ANTLRInputStream::LA(int i) {
+size_t ANTLRInputStream::LA(ssize_t i) {
   if (i == 0) {
     return 0; // undefined
   }
+
+  ssize_t position = (ssize_t)p;
   if (i < 0) {
     i++; // e.g., translate LA(-1) to use offset i=0; then data[p+0-1]
-    if ((p + i - 1) < 0) {
+    if ((position + i - 1) < 0) {
       return IntStream::_EOF; // invalid; no char before first char
     }
   }
 
-  if ((p + i - 1) >= n) {
+  if ((position + i - 1) >= (ssize_t)data.size()) {
     return IntStream::_EOF;
   }
 
-  return data[p + i - 1];
+  return (size_t)data[(size_t)(position + i - 1)];
 }
 
-int ANTLRInputStream::LT(int i) {
+size_t ANTLRInputStream::LT(ssize_t i) {
   return LA(i);
 }
 
-int ANTLRInputStream::index() {
+size_t ANTLRInputStream::index() {
   return p;
 }
 
 size_t ANTLRInputStream::size() {
-  return n;
+  return data.size();
 }
 
-int ANTLRInputStream::mark() {
+// Mark/release do nothing. We have entire buffer.
+ssize_t ANTLRInputStream::mark() {
   return -1;
 }
 
-void ANTLRInputStream::release(int marker) {
+void ANTLRInputStream::release(ssize_t marker) {
 }
 
-void ANTLRInputStream::seek(int index) {
+void ANTLRInputStream::seek(size_t index) {
   if (index <= p) {
     p = index; // just jump; don't update stream state (line, ...)
     return;
   }
   // seek forward, consume until p hits index
-  while (p < index && index < n) {
+  while (p < index && index < data.size()) {
     consume();
   }
 }
 
-std::wstring ANTLRInputStream::getText(Interval *interval) {
-  int start = interval->a;
-  int stop = interval->b;
-  if (stop >= n) {
-    stop = n - 1;
+std::wstring ANTLRInputStream::getText(const Interval &interval) {
+  size_t start = (size_t)interval.a;
+  size_t stop = (size_t)interval.b;
+
+  if (stop >= data.size()) {
+    stop = data.size() - 1;
   }
-  int count = stop - start + 1;
-  if (start >= n) {
+
+  size_t count = stop - start + 1;
+  if (start >= data.size()) {
     return L"";
   }
 
@@ -189,6 +170,5 @@ std::wstring ANTLRInputStream::toString() {
 }
 
 void ANTLRInputStream::InitializeInstanceFields() {
-  n = 0;
   p = 0;
 }

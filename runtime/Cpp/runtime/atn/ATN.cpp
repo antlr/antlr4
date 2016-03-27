@@ -49,18 +49,17 @@ ATN::ATN() : ATN(ATNType::LEXER, 0) {
 ATN::ATN(ATNType grammarType, int maxTokenType) : grammarType(grammarType), maxTokenType(maxTokenType) {
 }
 
-org::antlr::v4::runtime::misc::IntervalSet *ATN::nextTokens(ATNState *s, RuleContext *ctx) const {
-  LL1Analyzer *anal = new LL1Analyzer(*this);
-  misc::IntervalSet *next = anal->LOOK(s, ctx);
-  return next;
+misc::IntervalSet ATN::nextTokens(ATNState *s, RuleContext *ctx) const {
+  LL1Analyzer analyzer(*this);
+  return analyzer.LOOK(s, ctx);
+
 }
 
-org::antlr::v4::runtime::misc::IntervalSet *ATN::nextTokens(ATNState *s) const {
-  if (s->nextTokenWithinRule != nullptr) {
-    return s->nextTokenWithinRule;
+misc::IntervalSet ATN::nextTokens(ATNState *s) const {
+  if (s->nextTokenWithinRule.isEmpty()) {
+    s->nextTokenWithinRule = nextTokens(s, nullptr);
+    s->nextTokenWithinRule.setReadOnly(true);
   }
-  s->nextTokenWithinRule = nextTokens(s, nullptr);
-  s->nextTokenWithinRule->setReadonly(true);
   return s->nextTokenWithinRule;
 }
 
@@ -71,12 +70,11 @@ void ATN::addState(ATNState *state) {
   }
 
   states.push_back(state);
-
 }
 
 void ATN::removeState(ATNState *state) {
-  delete states.at(state->stateNumber);// just free mem, don't shift states in list
-  states.at(state->stateNumber) = nullptr;
+  delete states.at((size_t)state->stateNumber);// just free mem, don't shift states in list
+  states.at((size_t)state->stateNumber) = nullptr;
 }
 
 int ATN::defineDecisionState(DecisionState *s) {
@@ -85,9 +83,9 @@ int ATN::defineDecisionState(DecisionState *s) {
   return s->decision;
 }
 
-org::antlr::v4::runtime::atn::DecisionState *ATN::getDecisionState(int decision) const {
+DecisionState *ATN::getDecisionState(int decision) const {
   if (!decisionToState.empty()) {
-    return decisionToState.at(decision);
+    return decisionToState.at((size_t)decision);
   }
   return nullptr;
 }
@@ -96,32 +94,32 @@ int ATN::getNumberOfDecisions() const {
   return (int)decisionToState.size();
 }
 
-misc::IntervalSet *ATN::getExpectedTokens(int stateNumber, RuleContext *context) const {
+misc::IntervalSet ATN::getExpectedTokens(int stateNumber, RuleContext *context) const {
   if (stateNumber < 0 || stateNumber >= (int)states.size()) {
     throw new IllegalArgumentException(L"Invalid state number.");
   }
 
   RuleContext *ctx = context;
-  ATNState *s = states.at(stateNumber);
-  misc::IntervalSet *following = nextTokens(s);
-  if (!following->contains(Token::EPSILON)) {
+  ATNState *s = states.at((size_t)stateNumber);
+  misc::IntervalSet following = nextTokens(s);
+  if (!following.contains(Token::EPSILON)) {
     return following;
   }
 
-  misc::IntervalSet *expected = new misc::IntervalSet(0);
-  expected->addAll(following);
-  expected->remove(Token::EPSILON);
-  while (ctx != nullptr && ctx->invokingState >= 0 && following->contains(Token::EPSILON)) {
-    ATNState *invokingState = states.at(ctx->invokingState);
+  misc::IntervalSet expected;
+  expected.addAll(following);
+  expected.remove(Token::EPSILON);
+  while (ctx != nullptr && ctx->invokingState >= 0 && following.contains(Token::EPSILON)) {
+    ATNState *invokingState = states.at((size_t)ctx->invokingState);
     RuleTransition *rt = static_cast<RuleTransition*>(invokingState->transition(0));
     following = nextTokens(rt->followState);
-    expected->addAll(following);
-    expected->remove(Token::EPSILON);
+    expected.addAll(following);
+    expected.remove(Token::EPSILON);
     ctx = ctx->parent;
   }
 
-  if (following->contains(Token::EPSILON)) {
-    expected->add(Token::_EOF);
+  if (following.contains(Token::EPSILON)) {
+    expected.add(Token::_EOF);
   }
 
   return expected;

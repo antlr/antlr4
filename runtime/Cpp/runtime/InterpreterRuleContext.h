@@ -45,12 +45,12 @@ namespace runtime {
   /// </summary>
   class InterpreterRuleContext : public ParserRuleContext {
   private:
-    const int ruleIndex;
+    const ssize_t ruleIndex;
 
   public:
-    InterpreterRuleContext(ParserRuleContext *parent, int invokingStateNumber, int ruleIndex);
+    InterpreterRuleContext(ParserRuleContext *parent, int invokingStateNumber, ssize_t ruleIndex);
 
-    virtual int getRuleIndex() override;
+    virtual ssize_t getRuleIndex() const override;
   };
 
 } // namespace runtime

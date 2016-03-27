@@ -41,7 +41,7 @@ namespace atn {
 
   class ATNDeserializer {
   public:
-    static const int SERIALIZED_VERSION;
+    static const size_t SERIALIZED_VERSION;
     //static ATNDeserializer();
 
     /// <summary>
@@ -108,7 +108,7 @@ namespace atn {
     static Guid toUUID(const wchar_t *data, int offset);
 
     virtual Transition *edgeFactory(const ATN &atn, int type, int src, int trg, int arg1, int arg2, int arg3,
-                                    std::vector<misc::IntervalSet*> &sets);
+                                    const std::vector<misc::IntervalSet> &sets);
 
     virtual ATNState *stateFactory(int type, int ruleIndex);
 

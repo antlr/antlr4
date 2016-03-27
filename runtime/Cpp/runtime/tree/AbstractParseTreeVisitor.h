@@ -67,7 +67,7 @@ namespace tree {
     virtual T* visitChildren(RuleNode *node) override {
       T* result = defaultResult();
       int n = node->getChildCount();
-      for (int i = 0; i < n; i++) {
+      for (size_t i = 0; i < n; i++) {
         if (!shouldVisitNextChild(node, result)) {
           break;
         }

@@ -130,7 +130,7 @@ namespace runtime {
     /// <summary>
     /// @inheritDoc
     /// </summary>
-    virtual int getLine() override;
+    virtual size_t getLine() const override;
 
     /// <summary>
     /// @inheritDoc

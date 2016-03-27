@@ -112,14 +112,13 @@ tree::TerminalNode *ParserRuleContext::getToken(int ttype, std::size_t i) {
     return nullptr;
   }
 
-  int j = -1; // what token with ttype have we found?
+  size_t j = 0; // what token with ttype have we found?
   for (auto &o : _children) {
     if (dynamic_cast<tree::TerminalNode*>(o) != nullptr) {
       tree::TerminalNode *tnode = static_cast<tree::TerminalNode*>(o);
       Token *symbol = tnode->getSymbol();
       if (symbol->getType() == ttype) {
-        j++;
-        if (j == i) {
+        if (j++ == i) {
           return tnode;
         }
       }
@@ -162,7 +161,7 @@ std::size_t ParserRuleContext::getChildCount() {
   return _children.size() > 0 ? _children.size() : 0;
 }
 
-misc::Interval *ParserRuleContext::getSourceInterval() {
+misc::Interval ParserRuleContext::getSourceInterval() {
   if (start == nullptr || stop == nullptr) {
     return misc::Interval::INVALID;
   }

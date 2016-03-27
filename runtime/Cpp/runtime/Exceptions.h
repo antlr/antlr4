@@ -44,7 +44,7 @@ namespace runtime {
     ANTLRException(const std::wstring msg) {
       this->errormsg = msg;
     }
-    std::wstring getMessage() {
+    std::wstring getMessage() const {
       return errormsg;
     }
 

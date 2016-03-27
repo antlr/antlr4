@@ -31,6 +31,8 @@
 
 #pragma once
 
+#include "IntervalSet.h"
+
 namespace org {
 namespace antlr {
 namespace v4 {
@@ -75,15 +77,15 @@ namespace atn {
     Transition(ATNState *target);
 
   public:
-    virtual int getSerializationType() = 0;
+    virtual int getSerializationType() const = 0;
 
     /// <summary>
     /// Are we epsilon, action, sempred? </summary>
-    virtual bool isEpsilon();
+    virtual bool isEpsilon() const;
 
-    virtual misc::IntervalSet *label();
+    virtual misc::IntervalSet label() const;
 
-    virtual bool matches(int symbol, int minVocabSymbol, int maxVocabSymbol) = 0;
+    virtual bool matches(int symbol, int minVocabSymbol, int maxVocabSymbol) const = 0;
   };
 
 } // namespace atn

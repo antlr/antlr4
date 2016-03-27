@@ -63,7 +63,7 @@ std::wstring ErrorNodeImpl::toStringTree(Parser *parser){
 };
 
 // From SyntaxTree
-Interval *ErrorNodeImpl::getSourceInterval(){
+Interval ErrorNodeImpl::getSourceInterval(){
   throw new TODOException(L"ErrorNodeImpl::getSourceInterval");
 };
 

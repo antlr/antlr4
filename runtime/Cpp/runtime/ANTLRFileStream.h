@@ -38,18 +38,17 @@ namespace antlr {
 namespace v4 {
 namespace runtime {
 
-  /// <summary>
-  /// This is an <seealso cref="ANTLRInputStream"/> that is loaded from a file all at once
+  /// This is an ANTLRInputStream that is loaded from a file all at once
   /// when you construct the object.
-  /// </summary>
   class ANTLRFileStream : public ANTLRInputStream {
   protected:
-    std::string fileName;
+    std::string _fileName; // UTF-8 encoded file name.
 
   public:
-    ANTLRFileStream(const std::string &fileName); //this(fileName, nullptr);
-
-    ANTLRFileStream(const std::string &fileName, const std::string &encoding);
+    // Assumes a file name encoded in UTF-8. The file content encoding is detected automatically
+    // but must be one of ANSI, UTF-8 or UTF-16 (LE). A possible Unicode BOM is used to help auto detection. 
+    // The encoding paramater is currently being ignored.
+    ANTLRFileStream(const std::string &fileName, const std::string &encoding = "");
 
     virtual void load(const std::string &fileName, const std::string &encoding);
 

@@ -33,46 +33,25 @@
 #include "StringBuilder.h"
 
 namespace antlrcpp {
-  /// <summary>
-  /// Converts List to string with given separator.
-  /// </summary>
-  /// <param name="list">The list.</param>
-  /// <param name="separator">The separator.</param>
-  /// <returns></returns>
+  
   class Arrays {
   public:
+    static std::wstring listToString(const std::vector<std::wstring> &list, const std::wstring &separator);
 
-    static std::wstring ListToString(std::vector<std::wstring> list,std::wstring separator);
+    template <typename T>
+    static bool equals(const std::vector<T> &a, const std::vector<T> &b) {
+      if (a.size() != b.size())
+        return false;
 
-    /// <summary>
-    /// Strings to string list.
-    /// </summary>
-    /// <param name="items">The items.</param>
-    /// <param name="separator">The separator.</param>
-    /// <returns></returns>
-    static std::list<std::wstring> StringToStringList(std::wstring items, char separator);
+      for (size_t i = 0; i < a.size(); ++i)
+        if (a[i] != b[i]) // Requires that the == operator is supported by the template type.
+          return false;
+      
+      return true;
+    }
 
-
-    static std::vector<char> asList(const std::wstring *items);
-
-    // Arguments must be of type wchar_t!
-    static std::vector<std::wstring> asList(int nArgs, ...);
-
-    static bool equals(std::vector<int> a, std::vector<int> b);
-
-
-    static bool equals(void *a, void* b);
-
-    /// <summary>
-    /// Strings to string list.
-    /// </summary>
-    /// <param name="items">The items.</param>
-    /// <param name="separator">The separator.</param>
-    /// <returns></returns>
-
-    static std::list<std::wstring> copyOf(void * obj, int num);
-
-    static std::wstring copyOf(std::wstring obj, int num);
+    static std::list<std::wstring> copyOf(void * obj, int num); // XXX: rework callers to remove this function.
+    static std::wstring copyOf(std::wstring obj, int num); // XXX: ditto
 
     static void arraycopy(void * arrayA, void * arrayB, int num);
   };

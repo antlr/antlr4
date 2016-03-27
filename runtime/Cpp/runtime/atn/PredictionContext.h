@@ -86,48 +86,33 @@ namespace atn {
     ///  }
     /// </pre>
     /// </summary>
-    const int cachedHashCode;
+    const size_t cachedHashCode;
 
   protected:
-    PredictionContext(int cachedHashCode);
+    PredictionContext(size_t cachedHashCode);
 
-    /// <summary>
-    /// Convert a <seealso cref="RuleContext"/> tree to a <seealso cref="PredictionContext"/> graph.
-    ///  Return <seealso cref="#EMPTY"/> if {@code outerContext} is empty or null.
-    /// </summary>
   public:
+    /// Convert a RuleContext tree to a PredictionContext graph.
+    /// Return EMPTY if outerContext is empty.
     static PredictionContext *fromRuleContext(const ATN &atn, RuleContext *outerContext);
 
-    virtual int size();//= 0;
+    virtual size_t size() const = 0;
+    virtual PredictionContext *getParent(size_t index) const = 0;
+    virtual int getReturnState(size_t index) const = 0;
+    virtual bool operator == (PredictionContext *o) const = 0;
 
-    virtual PredictionContext *getParent(int index);//= 0;
-
-    virtual int getReturnState(int index); //  = 0;
-
-    /// <summary>
-    /// This means only the <seealso cref="#EMPTY"/> context is in set. </summary>
-    virtual bool isEmpty();
-
-    virtual bool hasEmptyPath();
-
-    virtual int hashCode()  final;
-
-    virtual bool equals(void *obj){ // = 0;
-                                    // This should be abstract but we need to create arrays of it, which will point to
-                                    // daughters in reality
-      throw new ASSERTException(L"PredictionContext", L"equal should never be called, abstract class");
-
-    }
+    /// This means only the EMPTY context is in set.
+    virtual bool isEmpty() const;
+    virtual bool hasEmptyPath() const;
+    virtual size_t hashCode() const;
 
   protected:
-    static int calculateEmptyHashCode();
+    static size_t calculateEmptyHashCode();
+    static size_t calculateHashCode(PredictionContext *parent, int returnState);
+    static size_t calculateHashCode(const std::vector<PredictionContext*> &parents, const std::vector<int> &returnStates);
 
-    static int calculateHashCode(PredictionContext *parent, int returnState);
-
-    static int calculateHashCode(std::vector<PredictionContext*> parents, std::vector<int>returnStates);
-
-    // dispatch
   public:
+    // dispatch
     static PredictionContext *merge(PredictionContext *a, PredictionContext *b, bool rootIsWildcard, misc::DoubleKeyMap<PredictionContext*, PredictionContext*, PredictionContext*> *mergeCache);
 
     /// <summary>
@@ -305,22 +290,22 @@ namespace atn {
     std::wstring *toStrings(Recognizer<T1, T2> *recognizer, PredictionContext *stop, int currentState) {
       std::vector<std::wstring> result = std::vector<std::wstring>();
 
-      for (int perm = 0; ; perm++) {
-        int offset = 0;
+      for (size_t perm = 0; ; perm++) {
+        size_t offset = 0;
         bool last = true;
         PredictionContext *p = this;
         int stateNumber = currentState;
         antlrcpp::StringBuilder *localBuffer = new antlrcpp::StringBuilder();
         localBuffer->append(L"[");
         while (!p->isEmpty() && p != stop) {
-          int index = 0;
+          size_t index = 0;
           if (p->size() > 0) {
-            int bits = 1;
+            size_t bits = 1;
             while ((1 << bits) < p->size()) {
               bits++;
             }
 
-            int mask = (1 << bits) - 1;
+            size_t mask = (1 << bits) - 1;
             index = (perm >> offset) & mask;
             last &= index >= p->size() - 1;
             if (index >= p->size()) {
@@ -336,7 +321,7 @@ namespace atn {
             }
 
             ATN *atn = recognizer->getATN();
-            ATNState *s = atn->states[stateNumber];
+            ATNState *s = atn->states[(size_t)stateNumber];
             std::wstring ruleName = recognizer->getRuleNames()[s->ruleIndex];
             localBuffer->append(ruleName);
           } else if (p->getReturnState(index) != EMPTY_RETURN_STATE) {

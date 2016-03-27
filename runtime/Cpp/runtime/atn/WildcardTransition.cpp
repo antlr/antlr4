@@ -38,14 +38,14 @@ using namespace org::antlr::v4::runtime::atn;
 WildcardTransition::WildcardTransition(ATNState *target) : Transition(target) {
 }
 
-int WildcardTransition::getSerializationType() {
+int WildcardTransition::getSerializationType() const {
   return WILDCARD;
 }
 
-bool WildcardTransition::matches(int symbol, int minVocabSymbol, int maxVocabSymbol) {
+bool WildcardTransition::matches(int symbol, int minVocabSymbol, int maxVocabSymbol) const {
   return symbol >= minVocabSymbol && symbol <= maxVocabSymbol;
 }
 
-std::wstring WildcardTransition::toString() {
+std::wstring WildcardTransition::toString() const {
   return L".";
 }

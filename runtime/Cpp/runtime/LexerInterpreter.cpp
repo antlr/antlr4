@@ -47,7 +47,7 @@ LexerInterpreter::LexerInterpreter(const std::wstring &grammarFileName, std::vec
 
 
   for (int i = 0; i < (int)_decisionToDFA.size(); i++) {
-    _decisionToDFA[i] = new dfa::DFA(_atn.getDecisionState(i), i);
+    _decisionToDFA[(size_t)i] = new dfa::DFA(_atn.getDecisionState(i), i);
   }
   _interpreter = new atn::LexerATNSimulator(_atn, _decisionToDFA, _sharedContextCache);
   if (tokenNames) {

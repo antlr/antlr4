@@ -45,7 +45,7 @@ namespace dfa {
 
   protected:
     std::vector<std::wstring> lexerTokenNames_;
-    virtual std::wstring getEdgeLabel(int i) override;
+    virtual std::wstring getEdgeLabel(size_t i) override;
   };
 
 } // namespace atn

@@ -47,36 +47,38 @@ SingletonPredictionContext *SingletonPredictionContext::create(PredictionContext
   return new SingletonPredictionContext(parent, returnState);
 }
 
-int SingletonPredictionContext::size() {
+size_t SingletonPredictionContext::size() const {
   return 1;
 }
 
-PredictionContext *SingletonPredictionContext::getParent(int index) {
+PredictionContext *SingletonPredictionContext::getParent(size_t index) const {
   assert(index == 0);
   return parent;
 }
 
-int SingletonPredictionContext::getReturnState(int index) {
+int SingletonPredictionContext::getReturnState(size_t index) const {
   assert(index == 0);
   return returnState;
 }
 
-bool SingletonPredictionContext::equals(void *o) {
+bool SingletonPredictionContext::operator == (PredictionContext *o) const {
   if (this == o) {
     return true;
-  } else if (!(/*dynamic_cast<SingletonPredictionContext*>(o)*/o != nullptr)) {
+  }
+
+  SingletonPredictionContext *other = dynamic_cast<SingletonPredictionContext*>(o);
+  if (other == nullptr) {
     return false;
   }
 
-  if (this->hashCode() != ((SingletonPredictionContext*)o)->hashCode()) {
+  if (this->hashCode() != other->hashCode()) {
     return false; // can't be same if hash is different
   }
 
-  SingletonPredictionContext *s = static_cast<SingletonPredictionContext*>(o);
-  return returnState == s->returnState && (parent != nullptr && parent->equals(s->parent));
+  return returnState == other->returnState && (parent != nullptr && parent == other->parent);
 }
 
-std::wstring SingletonPredictionContext::toString() {
+std::wstring SingletonPredictionContext::toString() const {
   std::wstring up = parent != nullptr ? parent->toString() : L"";
   if (up.length() == 0) {
     if (returnState == EMPTY_RETURN_STATE) {

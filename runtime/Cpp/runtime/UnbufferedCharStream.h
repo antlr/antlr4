@@ -58,7 +58,7 @@ namespace runtime {
     /// <p/>
     /// This is not the buffer capacity, that's {@code data.length}.
     /// </summary>
-    int n;
+    size_t n;
 
     /// <summary>
     /// 0..n-1 index into <seealso cref="#data data"/> of next character.
@@ -66,7 +66,7 @@ namespace runtime {
     /// The {@code LA(1)} character is {@code data[p]}. If {@code p == n}, we are
     /// out of buffered characters.
     /// </summary>
-    int p;
+    size_t p;
 
     /// <summary>
     /// Count up with <seealso cref="#mark mark()"/> and down with
@@ -74,18 +74,18 @@ namespace runtime {
     /// {@code numMarkers} reaches 0 and we reset the buffer. Copy
     /// {@code data[p]..data[n-1]} to {@code data[0]..data[(n-1)-p]}.
     /// </summary>
-    int numMarkers;
+    size_t numMarkers;
 
     /// <summary>
     /// This is the {@code LA(-1)} character for the current position.
     /// </summary>
-    int lastChar;
+    wchar_t lastChar;
 
     /// <summary>
     /// When {@code numMarkers > 0}, this is the {@code LA(-1)} character for the
     /// first character in <seealso cref="#data data"/>. Otherwise, this is unspecified.
     /// </summary>
-    int lastCharBufferStart;
+    wchar_t lastCharBufferStart;
 
     /// <summary>
     /// Absolute character index. It's the index of the character about to be
@@ -93,7 +93,7 @@ namespace runtime {
     /// entire stream, although the stream size is unknown before the end is
     /// reached.
     /// </summary>
-    int currentCharIndex;
+    size_t currentCharIndex;
 
     std::ifstream *input;
 
@@ -109,7 +109,7 @@ namespace runtime {
 
     /// <summary>
     /// Useful for subclasses that pull char from other than this.input. </summary>
-    UnbufferedCharStream(int bufferSize);
+    UnbufferedCharStream(size_t bufferSize);
 
 
     UnbufferedCharStream(std::ifstream *input); //this(input, 256);
@@ -120,31 +120,31 @@ namespace runtime {
     virtual void consume() override;
 
     /// <summary>
-    /// Make sure we have 'need' elements from current position <seealso cref="#p p"/>.
+    /// Make sure we have 'want' elements from current position <seealso cref="#p p"/>.
     /// Last valid {@code p} index is {@code data.length-1}. {@code p+need-1} is
     /// the char index 'need' elements ahead. If we need 1 element,
     /// {@code (p+1-1)==p} must be less than {@code data.length}.
     /// </summary>
   protected:
-    virtual void sync(int want);
+    virtual void sync(size_t want);
 
     /// <summary>
     /// Add {@code n} characters to the buffer. Returns the number of characters
     /// actually added to the buffer. If the return value is less than {@code n},
     /// then EOF was reached before {@code n} characters could be added.
     /// </summary>
-    virtual int fill(int n);
+    virtual size_t fill(size_t n);
 
     /// <summary>
     /// Override to provide different source of characters than
     /// <seealso cref="#input input"/>.
     /// </summary>
-    virtual int nextChar();
+    virtual size_t nextChar();
 
-    virtual void add(int c);
+    virtual void add(size_t c);
 
   public:
-    virtual int LA(int i) override;
+    virtual size_t LA(ssize_t i) override;
 
     /// <summary>
     /// Return a marker that we can release later.
@@ -153,29 +153,29 @@ namespace runtime {
     /// protection against misuse where {@code seek()} is called on a mark or
     /// {@code release()} is called in the wrong order.
     /// </summary>
-    virtual int mark() override;
+    virtual ssize_t mark() override;
 
     /// <summary>
     /// Decrement number of markers, resetting buffer if we hit 0. </summary>
     /// <param name="marker"> </param>
-    virtual void release(int marker) override;
+    virtual void release(ssize_t marker) override;
 
-    virtual int index() override;
+    virtual size_t index() override;
 
     /// <summary>
     /// Seek to absolute character index, which might not be in the current
     ///  sliding window.  Move {@code p} to {@code index-bufferStartIndex}.
     /// </summary>
-    virtual void seek(int index) override;
+    virtual void seek(size_t index) override;
 
     virtual size_t size() override;
 
     virtual std::string getSourceName() override;
 
-    virtual std::wstring getText(misc::Interval *interval) override;
+    virtual std::wstring getText(const misc::Interval &interval) override;
 
   protected:
-    int getBufferStartIndex();
+    size_t getBufferStartIndex();
 
   private:
     void InitializeInstanceFields();

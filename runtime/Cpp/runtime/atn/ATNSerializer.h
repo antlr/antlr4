@@ -77,7 +77,7 @@ namespace atn {
 
     virtual std::wstring decode(const std::wstring& data);
 
-    virtual std::wstring getTokenName(int t);
+    virtual std::wstring getTokenName(ssize_t t);
 
     /// <summary>
     /// Used by Java target to encode short/int array as chars in string.

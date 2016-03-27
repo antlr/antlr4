@@ -73,13 +73,12 @@ std::vector<size_t>* ATNSerializer::serialize() {
   serializeUUID(data, ATNDeserializer::SERIALIZED_UUID);
 
   // convert grammar type to ATN const to avoid dependence on ANTLRParser
-  data->push_back(static_cast<int>(atn->grammarType));
-  data->push_back(atn->maxTokenType);
-  int nedges = 0;
+  data->push_back((size_t)atn->grammarType);
+  data->push_back((size_t)atn->maxTokenType);
+  size_t nedges = 0;
 
-  std::unordered_map<misc::IntervalSet *, int> *setIndices =
-  new std::unordered_map<misc::IntervalSet *, int>();
-  std::vector<misc::IntervalSet *> sets = std::vector<misc::IntervalSet *>();
+  std::unordered_map<misc::IntervalSet, int> setIndices;
+  std::vector<misc::IntervalSet> sets;
 
   // dump states, count edges and collect sets while doing so
   std::vector<int> nonGreedyStates;
@@ -102,20 +101,20 @@ std::vector<size_t>* ATNSerializer::serialize() {
       precedenceStates.push_back(s->stateNumber);
     }
 
-    data->push_back(stateType);
+    data->push_back((size_t)stateType);
 
     if (s->ruleIndex == -1) {
       data->push_back(WCHAR_MAX);
     }
     else {
-      data->push_back(s->ruleIndex);
+      data->push_back((size_t)s->ruleIndex);
     }
 
     if (s->getStateType() == ATNState::LOOP_END) {
-      data->push_back((static_cast<LoopEndState *>(s))->loopBackState->stateNumber);
+      data->push_back((size_t)(static_cast<LoopEndState *>(s))->loopBackState->stateNumber);
     }
     else if (dynamic_cast<BlockStartState *>(s) != nullptr) {
-      data->push_back((static_cast<BlockStartState *>(s))->endState->stateNumber);
+      data->push_back((size_t)(static_cast<BlockStartState *>(s))->endState->stateNumber);
     }
 
     if (s->getStateType() != ATNState::RULE_STOP) {
@@ -124,14 +123,14 @@ std::vector<size_t>* ATNSerializer::serialize() {
       nedges += s->getNumberOfTransitions();
     }
 
-    for (int i = 0; i < s->getNumberOfTransitions(); i++) {
+    for (size_t i = 0; i < s->getNumberOfTransitions(); i++) {
       Transition *t = s->transition(i);
       int edgeType = t->getSerializationType();
       if (edgeType == Transition::SET || edgeType == Transition::NOT_SET) {
         SetTransition *st = static_cast<SetTransition *>(t);
-        if (setIndices->find(st->set) != setIndices->end()) {
+        if (setIndices.find(st->set) != setIndices.end()) {
 										sets.push_back(st->set);
-										setIndices->insert({ st->set, sets.size() - 1 });
+										setIndices.insert({ st->set, sets.size() - 1 });
         }
       }
     }
@@ -139,34 +138,34 @@ std::vector<size_t>* ATNSerializer::serialize() {
 
   // non-greedy states
   data->push_back(nonGreedyStates.size());
-  for (int i = 0; i < (int)nonGreedyStates.size(); i++) {
-    data->push_back(nonGreedyStates.at(i));
+  for (size_t i = 0; i < nonGreedyStates.size(); i++) {
+    data->push_back((size_t)nonGreedyStates.at(i));
   }
 
   // precedence states
   data->push_back(precedenceStates.size());
-  for (int i = 0; i < (int)precedenceStates.size(); i++) {
-    data->push_back(precedenceStates.at(i));
+  for (size_t i = 0; i < precedenceStates.size(); i++) {
+    data->push_back((size_t)precedenceStates.at(i));
   }
 
   size_t nrules = atn->ruleToStartState.size();
   data->push_back(nrules);
-  for (int r = 0; r < (int)nrules; r++) {
+  for (size_t r = 0; r < nrules; r++) {
     ATNState *ruleStartState = atn->ruleToStartState[r];
-    data->push_back(ruleStartState->stateNumber);
+    data->push_back((size_t)ruleStartState->stateNumber);
     if (atn->grammarType == ATNType::LEXER) {
       if (atn->ruleToTokenType[r] == Token::_EOF) {
         data->push_back(WCHAR_MAX);
       }
       else {
-        data->push_back(atn->ruleToTokenType[r]);
+        data->push_back((size_t)atn->ruleToTokenType[r]);
       }
 
       if (atn->ruleToActionIndex[r] == -1) {
         data->push_back(WCHAR_MAX);
       }
       else {
-        data->push_back(atn->ruleToActionIndex[r]);
+        data->push_back((size_t)atn->ruleToActionIndex[r]);
       }
     }
   }
@@ -175,36 +174,35 @@ std::vector<size_t>* ATNSerializer::serialize() {
   data->push_back(nmodes);
   if (nmodes > 0) {
     for (const auto &modeStartState : atn->modeToStartState) {
-      data->push_back(modeStartState->stateNumber);
+      data->push_back((size_t)modeStartState->stateNumber);
     }
   }
 
   size_t nsets = sets.size();
   data->push_back(nsets);
   for (auto set : sets) {
-    bool containsEof = set->contains(Token::_EOF);
-    if (containsEof && set->getIntervals().at(0)->b == Token::_EOF) {
-      data->push_back(set->getIntervals().size() - 1);
+    bool containsEof = set.contains(Token::_EOF);
+    if (containsEof && set.getIntervals().at(0).b == Token::_EOF) {
+      data->push_back(set.getIntervals().size() - 1);
     }
     else {
-      data->push_back(set->getIntervals().size());
+      data->push_back(set.getIntervals().size());
     }
 
     data->push_back(containsEof ? 1 : 0);
-    for (misc::Interval *I : set->getIntervals()) {
-      if (I->a == Token::_EOF) {
-        if (I->b == Token::_EOF) {
-										continue;
-        }
-        else {
-										data->push_back(0);
+    for (auto &interval : set.getIntervals()) {
+      if (interval.a == Token::_EOF) {
+        if (interval.b == Token::_EOF) {
+          continue;
+        } else {
+          data->push_back(0);
         }
       }
       else {
-        data->push_back(I->a);
+        data->push_back((size_t)interval.a);
       }
 
-      data->push_back(I->b);
+      data->push_back((size_t)interval.b);
     }
   }
 
@@ -219,12 +217,11 @@ std::vector<size_t>* ATNSerializer::serialize() {
       continue;
     }
 
-    for (int i = 0; i < s->getNumberOfTransitions(); i++) {
+    for (size_t i = 0; i < s->getNumberOfTransitions(); i++) {
       Transition *t = s->transition(i);
 
-      if (atn->states[t->target->stateNumber] == nullptr) {
-        throw IllegalStateException(
-                                    L"Cannot serialize a transition to a removed state.");
+      if (atn->states[(size_t)t->target->stateNumber] == nullptr) {
+        throw IllegalStateException(L"Cannot serialize a transition to a removed state.");
       }
 
       int src = s->stateNumber;
@@ -285,37 +282,37 @@ std::vector<size_t>* ATNSerializer::serialize() {
                 }
           break;
 								case Transition::SET:
-          arg1 = (*setIndices)[(static_cast<SetTransition *>(t))->set];
+          arg1 = setIndices[(static_cast<SetTransition *>(t))->set];
           break;
-								case Transition::NOT_SET:
-          arg1 = (*setIndices)[(static_cast<SetTransition *>(t))->set];
+
+        case Transition::NOT_SET:
+          arg1 = setIndices[(static_cast<SetTransition *>(t))->set];
           break;
 								case Transition::WILDCARD:
           break;
       }
 
-      data->push_back(src);
-      data->push_back(trg);
-      data->push_back(edgeType);
-      data->push_back(arg1);
-      data->push_back(arg2);
-      data->push_back(arg3);
+      data->push_back((size_t)src);
+      data->push_back((size_t)trg);
+      data->push_back((size_t)edgeType);
+      data->push_back((size_t)arg1);
+      data->push_back((size_t)arg2);
+      data->push_back((size_t)arg3);
     }
   }
   size_t ndecisions = atn->decisionToState.size();
   data->push_back(ndecisions);
   for (DecisionState *decStartState : atn->decisionToState) {
-    data->push_back(decStartState->stateNumber);
+    data->push_back((size_t)decStartState->stateNumber);
   }
 
   // don't adjust the first value since that's the version number
-  for (int i = 1; i < (int)data->size(); i++) {
-    if (data->at(i) < WCHAR_MIN || data->at(i) > WCHAR_MAX) {
-      throw UnsupportedOperationException(
-                                          L"Serialized ATN data element out of range.");
+  for (size_t i = 1; i < data->size(); i++) {
+    if ((wchar_t)data->at(i) < WCHAR_MIN || data->at(i) > WCHAR_MAX) {
+      throw UnsupportedOperationException(L"Serialized ATN data element out of range.");
     }
 
-    int value = (data->at(i) + 2) & 0xFFFF;
+    size_t value = (data->at(i) + 2) & 0xFFFF;
     data->assign(i, value);
   }
 
@@ -335,7 +332,7 @@ std::wstring ATNSerializer::decode(const std::wstring& inpdata) {
 
   std::wstring buf;
   int p = 0;
-  int version = data[p++];
+  size_t version = (size_t)data[p++];
   if (version != ATNDeserializer::SERIALIZED_VERSION) {
     std::wstring reason =
     L"Could not deserialize ATN with version "
@@ -474,7 +471,7 @@ std::wstring ATNSerializer::decode(const std::wstring& inpdata) {
     .append(L"->")
     .append(std::to_wstring(trg))
     .append(L" ")
-    .append(Transition::serializationNames[ttype])
+    .append(Transition::serializationNames[(size_t)ttype])
     .append(L" ")
     .append(std::to_wstring(arg1))
     .append(L",")
@@ -492,7 +489,7 @@ std::wstring ATNSerializer::decode(const std::wstring& inpdata) {
   return buf;
 }
 
-std::wstring ATNSerializer::getTokenName(int t) {
+std::wstring ATNSerializer::getTokenName(ssize_t t) {
   if (t == -1) {
     return L"EOF";
   }
@@ -515,21 +512,21 @@ std::wstring ATNSerializer::getTokenName(int t) {
       case L'\'':
 								return L"'\\''";
       default:
-								std::wstring s_hex = antlrcpp::toHexString(t);
+								std::wstring s_hex = antlrcpp::toHexString((int)t);
 								if (s_hex >= L"0" && s_hex <= L"7F" &&
-                    !iscntrl(t)) {
+                    !iscntrl((int)t)) {
                   return L"'" + std::to_wstring(t) + L"'";
                 }
 								// turn on the bit above max "\uFFFF" value so that we pad with zeros
                 // then only take last 4 digits
-								std::wstring hex = antlrcpp::toHexString(t | 0x10000).substr(1, 4);
+								std::wstring hex = antlrcpp::toHexString((int)t | 0x10000).substr(1, 4);
 								std::wstring unicodeStr = std::wstring(L"'\\u") + hex + std::wstring(L"'");
 								return unicodeStr;
     }
   }
 
-  if (tokenNames.size() > 0 && t >= 0 && t < (int)tokenNames.size()) {
-    return tokenNames[t];
+  if (tokenNames.size() > 0 && t >= 0 && t < (ssize_t)tokenNames.size()) {
+    return tokenNames[(size_t)t];
   }
 
   return antlrcpp::StringConverterHelper::toString(t);

@@ -37,7 +37,11 @@
 using namespace org::antlr::v4::runtime;
 using namespace org::antlr::v4::runtime::atn;
 
-const std::vector<std::wstring> Transition::serializationNames = *new std::vector<std::wstring>(antlrcpp::Arrays::asList(11, L"INVALID", L"EPSILON", L"RANGE", L"RULE", L"PREDICATE", L"ATOM", L"ACTION", L"SET", L"NOT_SET", L"WILDCARD", L"PRECEDENCE"));
+using namespace antlrcpp;
+
+const std::vector<std::wstring> Transition::serializationNames = {
+  L"INVALID", L"EPSILON", L"RANGE", L"RULE", L"PREDICATE", L"ATOM", L"ACTION", L"SET", L"NOT_SET", L"WILDCARD", L"PRECEDENCE"
+};
 
 Transition::Transition(ATNState *target) {
   if (target == nullptr) {
@@ -47,10 +51,10 @@ Transition::Transition(ATNState *target) {
   this->target = target;
 }
 
-bool Transition::isEpsilon() {
+bool Transition::isEpsilon() const {
   return false;
 }
 
-misc::IntervalSet *Transition::label() {
-  return nullptr;
+misc::IntervalSet Transition::label() const {
+  return misc::IntervalSet::EMPTY_SET;
 }

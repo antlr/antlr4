@@ -134,7 +134,7 @@ namespace dfa {
     /// </summary>
     virtual std::set<int> *getAltSet();
 
-    virtual int hashCode() ;
+    virtual size_t hashCode() ;
 
     /// <summary>
     /// Two <seealso cref="DFAState"/> instances are equal if their ATN configuration sets

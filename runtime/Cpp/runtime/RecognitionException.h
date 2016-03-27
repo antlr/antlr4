@@ -32,6 +32,7 @@
 #pragma once
 
 #include "Exceptions.h"
+#include "IntervalSet.h"
 
 namespace org {
 namespace antlr {
@@ -100,7 +101,7 @@ namespace runtime {
     /// <returns> The set of token types that could potentially follow the current
     /// state in the ATN, or {@code null} if the information is not available. </returns>
   public:
-    virtual misc::IntervalSet *getExpectedTokens();
+    virtual misc::IntervalSet getExpectedTokens();
 
     /// <summary>
     /// Gets the <seealso cref="RuleContext"/> at the time this exception was thrown.

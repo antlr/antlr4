@@ -70,7 +70,7 @@ namespace runtime {
     /// <seealso cref="#LT LT(1)"/> or whatever gets the first token and sets
     /// <seealso cref="#p"/>{@code =0;}.
     /// </summary>
-    int p;
+    size_t p;
 
     /// <summary>
     /// Set to {@code true} when the EOF token is fetched. Do not continue fetching
@@ -84,14 +84,14 @@ namespace runtime {
     BufferedTokenStream(TokenSource *tokenSource);
 
     virtual TokenSource *getTokenSource() override;
-    virtual int index() override;
-    virtual int mark() override;
+    virtual size_t index() override;
+    virtual ssize_t mark() override;
 
-    virtual void release(int marker) override;
+    virtual void release(ssize_t marker) override;
 
     virtual void reset();
 
-    virtual void seek(int index) override;
+    virtual void seek(size_t index) override;
 
     virtual size_t size() override;
     virtual void consume() override;
@@ -103,30 +103,30 @@ namespace runtime {
     ///    {@code false}. </returns>
     /// <seealso cref= #get(int i) </seealso>
   protected:
-    virtual bool sync(int i);
+    virtual bool sync(size_t i);
 
     /// <summary>
     /// Add {@code n} elements to buffer.
     /// </summary>
     /// <returns> The actual number of elements added to the buffer. </returns>
-    virtual int fetch(int n);
+    virtual size_t fetch(size_t n);
 
   public:
-    virtual Token *get(int i) override;
+    virtual Token *get(size_t i) override;
 
     /// <summary>
     /// Get all tokens from start..stop inclusively </summary>
-    virtual std::vector<Token*> get(int start, int stop);
+    virtual std::vector<Token*> get(size_t start, size_t stop);
 
-    virtual int LA(int i) override;
+    virtual size_t LA(ssize_t i) override;
 
   protected:
-    virtual Token *LB(int k);
+    virtual Token *LB(size_t k);
 
   public:
-    virtual Token *LT(int k) override;
+    virtual Token *LT(ssize_t k) override;
 
-    /// <summary>
+  protected:
     /// Allowed derived classes to modify the behavior of operations which change
     /// the current stream position by adjusting the target token index of a seek
     /// operation. The default implementation simply returns {@code i}. If an
@@ -135,23 +135,18 @@ namespace runtime {
     /// <p/>
     /// For example, <seealso cref="CommonTokenStream"/> overrides this method to ensure that
     /// the seek target is always an on-channel token.
-    /// </summary>
+    ///
     /// <param name="i"> The target token index. </param>
     /// <returns> The adjusted target token index. </returns>
-  protected:
-    virtual int adjustSeekIndex(int i);
-
+    virtual size_t adjustSeekIndex(size_t i);
     void lazyInit();
-
     virtual void setup();
 
     /// <summary>
     /// Reset this token stream by setting its token source. </summary>
   public:
     virtual void setTokenSource(TokenSource *tokenSource);
-
     virtual std::vector<Token*> getTokens();
-
     virtual std::vector<Token*> getTokens(int start, int stop);
 
     /// <summary>
@@ -163,20 +158,16 @@ namespace runtime {
 
     virtual std::vector<Token*> getTokens(int start, int stop, int ttype);
 
-    /// <summary>
-    /// Given a starting index, return the index of the next token on channel.
-    ///  Return i if tokens[i] is on channel.  Return -1 if there are no tokens
-    ///  on channel between i and EOF.
-    /// </summary>
   protected:
-    virtual int nextTokenOnChannel(int i, int channel);
+    /// Given a starting index, return the index of the next token on channel.
+    /// Return i if tokens[i] is on channel.  Return -1 if there are no tokens
+    /// on channel between i and EOF.
+    virtual ssize_t nextTokenOnChannel(size_t i, int channel);
 
-    /// <summary>
     /// Given a starting index, return the index of the previous token on channel.
-    ///  Return i if tokens[i] is on channel. Return -1 if there are no tokens
-    ///  on channel between i and 0.
-    /// </summary>
-    virtual int previousTokenOnChannel(int i, int channel);
+    /// Return i if tokens[i] is on channel. Return -1 if there are no tokens
+    /// on channel between i and 0.
+    virtual ssize_t previousTokenOnChannel(size_t i, int channel) const;
 
     /// <summary>
     /// Collect all tokens on specified channel to the right of
@@ -184,36 +175,36 @@ namespace runtime {
     ///  EOF. If channel is -1, find any non default channel token.
     /// </summary>
   public:
-    virtual std::vector<Token*> getHiddenTokensToRight(int tokenIndex, int channel);
+    virtual std::vector<Token*> getHiddenTokensToRight(size_t tokenIndex, int channel);
 
     /// <summary>
     /// Collect all hidden tokens (any off-default channel) to the right of
     ///  the current token up until we see a token on DEFAULT_TOKEN_CHANNEL
     ///  of EOF.
     /// </summary>
-    virtual std::vector<Token*> getHiddenTokensToRight(int tokenIndex);
+    virtual std::vector<Token*> getHiddenTokensToRight(size_t tokenIndex);
 
     /// <summary>
     /// Collect all tokens on specified channel to the left of
     ///  the current token up until we see a token on DEFAULT_TOKEN_CHANNEL.
     ///  If channel is -1, find any non default channel token.
     /// </summary>
-    virtual std::vector<Token*> getHiddenTokensToLeft(int tokenIndex, int channel);
+    virtual std::vector<Token*> getHiddenTokensToLeft(size_t tokenIndex, int channel);
 
     /// <summary>
     /// Collect all hidden tokens (any off-default channel) to the left of
     ///  the current token up until we see a token on DEFAULT_TOKEN_CHANNEL.
     /// </summary>
-    virtual std::vector<Token*> getHiddenTokensToLeft(int tokenIndex);
+    virtual std::vector<Token*> getHiddenTokensToLeft(size_t tokenIndex);
 
   protected:
-    virtual std::vector<Token*> filterForChannel(int from, int to, int channel);
+    virtual std::vector<Token*> filterForChannel(size_t from, size_t to, int channel);
 
   public:
     virtual std::string getSourceName() override;
     virtual std::wstring getText() override;
 
-    virtual std::wstring getText(misc::Interval *interval) override;
+    virtual std::wstring getText(const misc::Interval &interval) override;
 
     virtual std::wstring getText(RuleContext *ctx) override;
 
@@ -224,6 +215,7 @@ namespace runtime {
     virtual void fill();
 
   private:
+    bool _needSetup;
     void InitializeInstanceFields();
   };
 

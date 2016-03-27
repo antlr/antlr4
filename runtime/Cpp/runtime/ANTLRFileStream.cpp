@@ -30,50 +30,61 @@
  */
 
 #include "Exceptions.h"
+#include "Strings.h"
 
 #include "ANTLRFileStream.h"
 
 using namespace org::antlr::v4::runtime;
 
-ANTLRFileStream::ANTLRFileStream(const std::string &fileName)  {
-}
-
 ANTLRFileStream::ANTLRFileStream(const std::string &fileName, const std::string &encoding) {
-  this->fileName = fileName;
+  _fileName = fileName;
   load(fileName, encoding);
 }
 
-/*
- Issue: is seems that file name in C++ are considered to be not
- wide for the reason that not all systems support wchar file
- names. Win32 is good about this but not all others.
- TODO: this could be a place to have platform specific build
- flags
- */
 void ANTLRFileStream::load(const std::string &fileName, const std::string &encoding) {
-  if (fileName == "") {
+  if (_fileName.empty()) {
     return;
   }
 
+  enum Encoding { ANSI, UTF8, UTF16LE } encodingType = ANSI;
+
+#ifdef _WIN32
+  std::ifstream stream(antlrcpp::s2ws(filename).c_str(), std::ios::binary);
+#else
+  std::ifstream stream(_fileName.c_str(), std::ifstream::binary);
+#endif
+
   std::stringstream ss;
-  std::wifstream f;
 
-  // Open as a byte stream
-  f.open(fileName, std::ios::binary);
-  ss<<f.rdbuf();
+  if (!stream.is_open() || stream.eof())
+    return;
 
-  std::string const &s = ss.str();
-  if (s.size() % sizeof(wchar_t) != 0)
+  int ch1 = stream.get();
+  int ch2 = stream.get();
+  if (ch1 == 0xff && ch2 == 0xfe)
+    encodingType = UTF16LE;
+  else
+    if (ch1 == 0xfe && ch2 == 0xff)
+      return; // UTF-16BE not supported;
+    else
+    {
+      int ch3 = stream.get();
+      if (ch1 == 0xef && ch2 == 0xbb && ch3 == 0xbf)
+        encodingType = UTF8;
+      else
+        stream.seekg(0);
+    }
+
+  ss << stream.rdbuf() << '\0';
+  switch (encodingType)
   {
-    throw new IOException(L"file not the right size");
+    case UTF16LE:
+      data = (wchar_t *)ss.str().c_str();
+    default:
+      data = antlrcpp::s2ws(ss.str());
   }
-
-  std::wstring ws;
-  ws.resize(s.size()/sizeof(wchar_t));
-  std::memcpy(&ws[0],s.c_str(),s.size()); // copy data into wstring
-  data=ws;
 }
 
 std::string ANTLRFileStream::getSourceName() {
-  return fileName;
+  return _fileName;
 }

@@ -46,12 +46,12 @@ namespace atn {
 
     RangeTransition(ATNState *target, int from, int to);
 
-    virtual int getSerializationType() override;
+    virtual int getSerializationType() const override;
 
-    virtual misc::IntervalSet *label() override;
-    virtual bool matches(int symbol, int minVocabSymbol, int maxVocabSymbol) override;
+    virtual misc::IntervalSet label() const override;
+    virtual bool matches(int symbol, int minVocabSymbol, int maxVocabSymbol) const override;
 
-    virtual std::wstring toString();
+    virtual std::wstring toString() const;
   };
 
 } // namespace atn

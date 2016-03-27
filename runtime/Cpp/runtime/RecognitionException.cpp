@@ -59,11 +59,11 @@ void RecognitionException::setOffendingState(int offendingState) {
   _offendingState = offendingState;
 }
 
-misc::IntervalSet *RecognitionException::getExpectedTokens() {
+misc::IntervalSet RecognitionException::getExpectedTokens() {
   if (_recognizer != nullptr) {
     return _recognizer->getATN().getExpectedTokens(_offendingState, _ctx);
   }
-  return nullptr;
+  return misc::IntervalSet::EMPTY_SET;
 }
 
 RuleContext *RecognitionException::getCtx() {

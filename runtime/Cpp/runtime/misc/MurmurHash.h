@@ -40,41 +40,31 @@ namespace misc {
   class MurmurHash {
 
   private:
-    static const int DEFAULT_SEED = 0;
+    static const size_t DEFAULT_SEED = 0;
 
-    /// <summary>
     /// Initialize the hash using the default seed value.
-    /// </summary>
-    /// <returns> the intermediate hash value </returns>
+    /// Returns the intermediate hash value.
   public:
-    static int initialize();
+    static size_t initialize();
 
-    /// <summary>
-    /// Initialize the hash using the specified {@code seed}.
-    /// </summary>
-    /// <param name="seed"> the seed </param>
-    /// <returns> the intermediate hash value </returns>
-    static int initialize(int seed);
+    /// Initialize the hash using the specified seed.
+    static size_t initialize(size_t seed);
 
-    /// <summary>
     /// Update the intermediate hash value for the next input {@code value}.
-    /// </summary>
     /// <param name="hash"> the intermediate hash value </param>
     /// <param name="value"> the value to add to the current hash </param>
-    /// <returns> the updated intermediate hash value </returns>
-    static int update(int hash, int value);
+    /// Returns the updated intermediate hash value.
+    static size_t update(size_t hash, size_t value);
 
-    /// <summary>
     /// Update the intermediate hash value for the next input {@code value}.
-    /// </summary>
     /// <param name="hash"> the intermediate hash value </param>
     /// <param name="value"> the value to add to the current hash </param>
-    /// <returns> the updated intermediate hash value </returns>
+    /// Returns the updated intermediate hash value.
     template<typename T>
-    static int update(int hash, T *value)  {
+    static int update(size_t hash, T *value)  {
       std::hash<T> hashFunction;
 
-      return update(hash, value != nullptr ? (int)hashFunction(*value) : 0);
+      return update(hash, value != nullptr ? hashFunction(*value) : 0);
     }
 
     /// <summary>
@@ -84,7 +74,7 @@ namespace misc {
     /// <param name="hash"> the intermediate hash value </param>
     /// <param name="numberOfWords"> the number of integer values added to the hash </param>
     /// <returns> the final hash result </returns>
-    static int finish(int hash, int numberOfWords);
+    static size_t finish(size_t hash, size_t numberOfWords);
 
     /// <summary>
     /// Utility function to compute the hash code of an array using the
@@ -96,14 +86,13 @@ namespace misc {
     /// <returns> the hash code of the data </returns>
 
     template<typename T> // where T is C array type
-    static int hashCode(const T*data, std::size_t size, int seed) {
-      int hash = initialize(seed);
-      for(int i = 0; i < (int)size; i++) {
-        hash = update(hash, data[i]);
+    static size_t hashCode(const T *data, std::size_t size, size_t seed) {
+      size_t hash = initialize(seed);
+      for(size_t i = 0; i < size; i++) {
+        hash = update(hash, (size_t)data[i]);
       }
 
-      hash = finish(hash, (int)size);
-      return hash;
+      return finish(hash, size);
     }
 
 

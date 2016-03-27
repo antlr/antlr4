@@ -97,7 +97,6 @@ namespace org {
           template<typename Key1, typename Key2, typename Value> class DoubleKeyMap;
           template<typename T> class EqualityComparator;
 
-          class IntSet;
           class Interval;
           class IntervalSet;
           class JFileChooserConfirmOverwrite;

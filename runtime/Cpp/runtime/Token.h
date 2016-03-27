@@ -45,17 +45,17 @@ namespace runtime {
   /// </summary>
   class Token {
   public:
-    static const int INVALID_TYPE = 0;
+    static const size_t INVALID_TYPE = 0;
 
     /// <summary>
     /// During lookahead operations, this "token" signifies we hit rule end ATN state
     ///  and did not follow it despite needing to.
     /// </summary>
-    static const int EPSILON = -2;
+    static const ssize_t EPSILON = -2;
 
-    static const int MIN_USER_TOKEN_TYPE = 1;
+    static const size_t MIN_USER_TOKEN_TYPE = 1;
 
-    static const int _EOF = IntStream::_EOF;
+    static const size_t _EOF = IntStream::_EOF;
 
     // This isn't necessary
     virtual ~Token() {};
@@ -65,13 +65,13 @@ namespace runtime {
     ///  on a particular "channel".  The parser tunes to a particular channel
     ///  so that whitespace etc... can go to the parser on a "hidden" channel.
     /// </summary>
-    static const int DEFAULT_CHANNEL = 0;
+    static const size_t DEFAULT_CHANNEL = 0;
 
     /// <summary>
     /// Anything on different channel than DEFAULT_CHANNEL is not parsed
     ///  by parser.
     /// </summary>
-    static const int HIDDEN_CHANNEL = 1;
+    static const size_t HIDDEN_CHANNEL = 1;
 
     /// <summary>
     /// Get the text of the token.

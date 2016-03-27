@@ -32,6 +32,7 @@
 #pragma once
 
 #include "ANTLRErrorStrategy.h"
+#include "IntervalSet.h"
 
 namespace org {
 namespace antlr {
@@ -367,7 +368,7 @@ namespace runtime {
     /// </summary>
     virtual Token *getMissingSymbol(Parser *recognizer);
 
-    virtual misc::IntervalSet *getExpectedTokens(Parser *recognizer);
+    virtual misc::IntervalSet getExpectedTokens(Parser *recognizer);
 
     /// <summary>
     /// How should a token be displayed in an error message? The default
@@ -478,11 +479,11 @@ namespace runtime {
      *  Like Grosch I implement context-sensitive FOLLOW sets that are combined
      *  at run-time upon error to avoid overhead during parsing.
      */
-    virtual misc::IntervalSet *getErrorRecoverySet(Parser *recognizer);
+    virtual misc::IntervalSet getErrorRecoverySet(Parser *recognizer);
 
     /// <summary>
     /// Consume tokens until one matches the given token set. </summary>
-    virtual void consumeUntil(Parser *recognizer, misc::IntervalSet *set);
+    virtual void consumeUntil(Parser *recognizer, const misc::IntervalSet &set);
 
   private:
     void InitializeInstanceFields();

@@ -50,9 +50,7 @@ std::wstring DFASerializer::toString() {
   antlrcpp::StringBuilder *buf = new antlrcpp::StringBuilder();
   std::vector<DFAState*> states = dfa->getStates();
   for (auto s : states) {
-    int n = 0;
-    n = (int)s->edges.size();
-    for (int i = 0; i < n; i++) {
+    for (size_t i = 0; i < s->edges.size(); i++) {
       DFAState *t = s->edges[i];
       if (t != nullptr && t->stateNumber != INT16_MAX) {
         buf->append(getStateString(s));
@@ -70,7 +68,7 @@ std::wstring DFASerializer::toString() {
   return output;
 }
 
-std::wstring DFASerializer::getEdgeLabel(int i) {
+std::wstring DFASerializer::getEdgeLabel(size_t i) {
   std::wstring label;
   if (i == 0) {
     return L"EOF";

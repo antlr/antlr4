@@ -33,109 +33,111 @@
 
 using namespace org::antlr::v4::runtime::misc;
 
-Interval *const Interval::INVALID = new Interval(-1,-2);
-Interval *      Interval::cache[Interval::INTERVAL_POOL_MAX_VALUE+1];
+Interval const Interval::INVALID;
+std::map<int, Interval> Interval::cache;
 
 int Interval::creates = 0;
 int Interval::misses = 0;
 int Interval::hits = 0;
 int Interval::outOfRange = 0;
 
-Interval::Interval(int a, int b) {
+Interval::Interval() : Interval(-1, -2) {
+}
+
+Interval::Interval(int a_, int b_) {
   InitializeInstanceFields();
-  this->a = a;
-  this->b = b;
+  a = a_;
+  b = b_;
 }
 
-org::antlr::v4::runtime::misc::Interval *Interval::of(int a, int b) {
+Interval Interval::of(int a_, int b_) {
   // cache just a..a
-  if (a != b || a < 0 || a>INTERVAL_POOL_MAX_VALUE) {
-    return new Interval(a,b);
+  if (a_ != b_ || a_ < 0) {
+    return Interval(a_, b_);
   }
-  if (cache[a] == nullptr) {
-    cache[a] = new Interval(a,a);
+
+  if (cache.find(a_) == cache.end()) {
+    cache[a_] = Interval(a_, a_);
   }
-  return cache[a];
+  return cache[a_];
 }
 
-int Interval::length() {
+int Interval::length() const {
   if (b < a) {
     return 0;
   }
   return b - a + 1;
 }
 
-bool Interval::equals(void *o) {
-  if (o == nullptr || !( ((Interval*)o) != nullptr)) {
-    return false;
-  }
-  Interval *other = static_cast<Interval*>(o);
-  return this->a == other->a && this->b == other->b;
+bool Interval::operator == (const Interval &other) const {
+  return a == other.a && b == other.b;
 }
 
-int Interval::hashCode() {
-  int hash = 23;
-  hash = hash * 31 + a;
-  hash = hash * 31 + b;
+size_t Interval::hashCode() const {
+  size_t hash = 23;
+  hash = hash * 31 + (size_t)a;
+  hash = hash * 31 + (size_t)b;
   return hash;
 }
 
-bool Interval::startsBeforeDisjoint(Interval *other) {
-  return this->a < other->a && this->b < other->a;
+bool Interval::startsBeforeDisjoint(const Interval &other) const {
+  return a < other.a && b < other.a;
 }
 
-bool Interval::startsBeforeNonDisjoint(Interval *other) {
-  return this->a <= other->a && this->b >= other->a;
+bool Interval::startsBeforeNonDisjoint(const Interval &other) const {
+  return a <= other.a && b >= other.a;
 }
 
-bool Interval::startsAfter(Interval *other) {
-  return this->a > other->a;
+bool Interval::startsAfter(const Interval &other) const {
+  return a > other.a;
 }
 
-bool Interval::startsAfterDisjoint(Interval *other) {
-  return this->a > other->b;
+bool Interval::startsAfterDisjoint(const Interval &other) const {
+  return a > other.b;
 }
 
-bool Interval::startsAfterNonDisjoint(Interval *other) {
-  return this->a > other->a && this->a <= other->b; // this.b>=other.b implied
+bool Interval::startsAfterNonDisjoint(const Interval &other) const {
+  return a > other.a && a <= other.b; // this.b>=other.b implied
 }
 
-bool Interval::disjoint(Interval *other) {
+bool Interval::disjoint(const Interval &other) const {
   return startsBeforeDisjoint(other) || startsAfterDisjoint(other);
 }
 
-bool Interval::adjacent(Interval *other) {
-  return this->a == other->b + 1 || this->b == other->a - 1;
+bool Interval::adjacent(const Interval &other) const {
+  return a == other.b + 1 || b == other.a - 1;
 }
 
-bool Interval::properlyContains(Interval *other) {
-  return other->a >= this->a && other->b <= this->b;
+bool Interval::properlyContains(const Interval &other) const {
+  return other.a >= a && other.b <= b;
 }
 
-org::antlr::v4::runtime::misc::Interval *Interval::union_Renamed(Interval *other) {
-  return Interval::of(std::min(a, other->a), std::max(b, other->b));
+Interval Interval::Union(const Interval &other) const {
+  return Interval::of(std::min(a, other.a), std::max(b, other.b));
 }
 
-org::antlr::v4::runtime::misc::Interval *Interval::intersection(Interval *other) {
-  return Interval::of(std::max(a, other->a), std::min(b, other->b));
+Interval Interval::intersection(const Interval &other) const {
+  return Interval::of(std::max(a, other.a), std::min(b, other.b));
 }
 
-org::antlr::v4::runtime::misc::Interval *Interval::differenceNotProperlyContained(Interval *other) {
-  Interval *diff = nullptr;
+Interval Interval::differenceNotProperlyContained(const Interval &other) const {
+  Interval diff;
+
   // other.a to left of this.a (or same)
-  if (other->startsBeforeNonDisjoint(this)) {
-    diff = Interval::of(std::max(this->a, other->b + 1), this->b);
+  if (other.startsBeforeNonDisjoint(*this)) {
+    diff = Interval::of(std::max(a, other.b + 1), b);
   }
 
   // other.a to right of this.a
-  else if (other->startsAfterNonDisjoint(this)) {
-    diff = Interval::of(this->a, other->a - 1);
+  else if (other.startsAfterNonDisjoint(*this)) {
+    diff = Interval::of(a, other.a - 1);
   }
+  
   return diff;
 }
 
-std::wstring Interval::toString() {
-  return std::to_wstring(a) + std::wstring(L"..") + std::to_wstring(b);
+std::wstring Interval::toString() const {
+  return std::to_wstring(a) + L".." + std::to_wstring(b);
 }
 
 void Interval::InitializeInstanceFields() {

@@ -102,13 +102,13 @@ Guid::Guid(const uint32_t *bytes, bool reverse)
 unsigned char hexDigitToChar(char ch)
 {
   if (ch > 47 && ch < 58)
-    return ch - 48;
+    return (unsigned char)(ch - 48);
 
   if (ch > 96 && ch < 103)
-    return ch - 87;
+    return (unsigned char)(ch - 87);
 
   if (ch > 64 && ch < 71)
-    return ch - 55;
+    return (unsigned char)(ch - 55);
 
   return 0;
 }

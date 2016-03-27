@@ -35,6 +35,7 @@
 #include "ParseTreeListener.h"
 #include "TokenStream.h"
 #include "TokenSource.h"
+#include "Interval.h"
 
 namespace org {
 namespace antlr {
@@ -356,9 +357,9 @@ namespace runtime {
     /// respectively.
     /// </summary>
     /// <seealso cref= ATN#getExpectedTokens(int, RuleContext) </seealso>
-    virtual misc::IntervalSet *getExpectedTokens();
+    virtual misc::IntervalSet getExpectedTokens();
 
-    virtual misc::IntervalSet *getExpectedTokensWithinCurrentRule();
+    virtual misc::IntervalSet getExpectedTokensWithinCurrentRule();
 
     /// <summary>
     /// Get a rule's index (i.e., {@code RULE_ruleName} field) or -1 if not found. </summary>

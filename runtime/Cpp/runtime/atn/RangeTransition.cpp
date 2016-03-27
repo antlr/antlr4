@@ -39,18 +39,18 @@ using namespace org::antlr::v4::runtime::atn;
 RangeTransition::RangeTransition(ATNState *target, int from, int to) : Transition(target), from(from), to(to) {
 }
 
-int RangeTransition::getSerializationType() {
+int RangeTransition::getSerializationType() const {
   return RANGE;
 }
 
-misc::IntervalSet *RangeTransition::label() {
+misc::IntervalSet RangeTransition::label() const {
   return misc::IntervalSet::of(from, to);
 }
 
-bool RangeTransition::matches(int symbol, int minVocabSymbol, int maxVocabSymbol) {
+bool RangeTransition::matches(int symbol, int minVocabSymbol, int maxVocabSymbol) const {
   return symbol >= from && symbol <= to;
 }
 
-std::wstring RangeTransition::toString() {
+std::wstring RangeTransition::toString() const {
   return std::wstring(L"'") + static_cast<wchar_t>(from) + std::wstring(L"'..'") + static_cast<wchar_t>(to) + std::wstring(L"'");
 }

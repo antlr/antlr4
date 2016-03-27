@@ -48,15 +48,11 @@ namespace atn {
 
     static SingletonPredictionContext *create(PredictionContext *parent, int returnState);
 
-    virtual int size() override;
-
-    virtual PredictionContext *getParent(int index) override;
-
-    virtual int getReturnState(int index) override;
-
-    virtual bool equals(void *o) override;
-
-    virtual std::wstring toString();
+    virtual size_t size() const override;
+    virtual PredictionContext *getParent(size_t index) const override;
+    virtual int getReturnState(size_t index) const override;
+    virtual bool operator == (PredictionContext *o) const override;
+    virtual std::wstring toString() const;
   };
 
 } // namespace atn

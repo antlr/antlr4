@@ -40,20 +40,20 @@ using namespace org::antlr::v4::runtime;
 
 using org::antlr::v4::runtime::misc::Interval;
 
-TokenStreamRewriter::RewriteOperation::RewriteOperation(TokenStreamRewriter *outerInstance, int index) : outerInstance(outerInstance) {
+TokenStreamRewriter::RewriteOperation::RewriteOperation(TokenStreamRewriter *outerInstance, size_t index) : outerInstance(outerInstance) {
 
   InitializeInstanceFields();
   this->index = index;
 }
 
-TokenStreamRewriter::RewriteOperation::RewriteOperation(TokenStreamRewriter *outerInstance, int index, const std::wstring& text) : outerInstance(outerInstance) {
+TokenStreamRewriter::RewriteOperation::RewriteOperation(TokenStreamRewriter *outerInstance, size_t index, const std::wstring& text) : outerInstance(outerInstance) {
 
   InitializeInstanceFields();
   this->index = index;
   this->text = text;
 }
 
-int TokenStreamRewriter::RewriteOperation::execute(std::wstring *buf) {
+size_t TokenStreamRewriter::RewriteOperation::execute(std::wstring *buf) {
   return index;
 }
 
@@ -61,7 +61,7 @@ std::wstring TokenStreamRewriter::RewriteOperation::toString() {
   std::wstring opName = L"TokenStreamRewriter";
   size_t index = opName.find(L'$');
   opName = opName.substr(index + 1, opName.length() - (index + 1));
-  return L"<" + opName + L"@" + outerInstance->tokens->get((int)index)->getText() + L":\"" + text + L"\">";
+  return L"<" + opName + L"@" + outerInstance->tokens->get(index)->getText() + L":\"" + text + L"\">";
 }
 
 void TokenStreamRewriter::RewriteOperation::InitializeInstanceFields() {
@@ -69,10 +69,11 @@ void TokenStreamRewriter::RewriteOperation::InitializeInstanceFields() {
   index = 0;
 }
 
-TokenStreamRewriter::InsertBeforeOp::InsertBeforeOp(TokenStreamRewriter *outerInstance, int index, const std::wstring& text) : RewriteOperation(outerInstance, index, text), outerInstance(outerInstance) {
+TokenStreamRewriter::InsertBeforeOp::InsertBeforeOp(TokenStreamRewriter *outerInstance, size_t index, const std::wstring& text)
+  : RewriteOperation(outerInstance, index, text), outerInstance(outerInstance) {
 }
 
-int TokenStreamRewriter::InsertBeforeOp::execute(std::wstring *buf) {
+size_t TokenStreamRewriter::InsertBeforeOp::execute(std::wstring *buf) {
   buf->append(text);
   if (outerInstance->tokens->get(index)->getType() != Token::_EOF) {
     buf->append(outerInstance->tokens->get(index)->getText());
@@ -80,13 +81,13 @@ int TokenStreamRewriter::InsertBeforeOp::execute(std::wstring *buf) {
   return index + 1;
 }
 
-TokenStreamRewriter::ReplaceOp::ReplaceOp(TokenStreamRewriter *outerInstance, int from, int to, const std::wstring& text) : RewriteOperation(outerInstance, from, text), outerInstance(outerInstance) {
+TokenStreamRewriter::ReplaceOp::ReplaceOp(TokenStreamRewriter *outerInstance, size_t from, size_t to, const std::wstring& text) : RewriteOperation(outerInstance, from, text), outerInstance(outerInstance) {
 
   InitializeInstanceFields();
   lastIndex = to;
 }
 
-int TokenStreamRewriter::ReplaceOp::execute(std::wstring *buf) {
+size_t TokenStreamRewriter::ReplaceOp::execute(std::wstring *buf) {
   buf->append(text);
   return lastIndex + 1;
 }
@@ -135,15 +136,15 @@ void TokenStreamRewriter::insertAfter(Token *t, const std::wstring& text) {
   insertAfter(DEFAULT_PROGRAM_NAME, t, text);
 }
 
-void TokenStreamRewriter::insertAfter(int index, const std::wstring& text) {
+void TokenStreamRewriter::insertAfter(size_t index, const std::wstring& text) {
   insertAfter(DEFAULT_PROGRAM_NAME, index, text);
 }
 
 void TokenStreamRewriter::insertAfter(const std::wstring &programName, Token *t, const std::wstring& text) {
-  insertAfter(programName, t->getTokenIndex(), text);
+  insertAfter(programName, (size_t)t->getTokenIndex(), text);
 }
 
-void TokenStreamRewriter::insertAfter(const std::wstring &programName, int index, const std::wstring& text) {
+void TokenStreamRewriter::insertAfter(const std::wstring &programName, size_t index, const std::wstring& text) {
   // to insert after, just insert before next index (even if past end)
   insertBefore(programName, index + 1, text);
 }
@@ -152,26 +153,26 @@ void TokenStreamRewriter::insertBefore(Token *t, const std::wstring& text) {
   insertBefore(DEFAULT_PROGRAM_NAME, t, text);
 }
 
-void TokenStreamRewriter::insertBefore(int index, const std::wstring& text) {
+void TokenStreamRewriter::insertBefore(size_t index, const std::wstring& text) {
   insertBefore(DEFAULT_PROGRAM_NAME, index, text);
 }
 
 void TokenStreamRewriter::insertBefore(const std::wstring &programName, Token *t, const std::wstring& text) {
-  insertBefore(programName, t->getTokenIndex(), text);
+  insertBefore(programName, (size_t)t->getTokenIndex(), text);
 }
 
-void TokenStreamRewriter::insertBefore(const std::wstring &programName, int index, const std::wstring& text) {
+void TokenStreamRewriter::insertBefore(const std::wstring &programName, size_t index, const std::wstring& text) {
   RewriteOperation *op = new InsertBeforeOp(this, index, text);
   std::vector<RewriteOperation*> rewrites = getProgram(programName);
   op->instructionIndex = (int)rewrites.size();
   rewrites.push_back(op);
 }
 
-void TokenStreamRewriter::replace(int index, const std::wstring& text) {
+void TokenStreamRewriter::replace(size_t index, const std::wstring& text) {
   replace(DEFAULT_PROGRAM_NAME, index, index, text);
 }
 
-void TokenStreamRewriter::replace(int from, int to, const std::wstring& text) {
+void TokenStreamRewriter::replace(size_t from, size_t to, const std::wstring& text) {
   replace(DEFAULT_PROGRAM_NAME, from, to, text);
 }
 
@@ -183,9 +184,10 @@ void TokenStreamRewriter::replace(Token *from, Token *to, const std::wstring& te
   replace(DEFAULT_PROGRAM_NAME, from, to, text);
 }
 
-void TokenStreamRewriter::replace(const std::wstring &programName, int from, int to, const std::wstring& text) {
-  if (from > to || from < 0 || to < 0 || to >= (int)tokens->size()) {
-    throw IllegalArgumentException(L"replace: range invalid: " + std::to_wstring(from) + L".." + std::to_wstring(to) + L"(size=" + std::to_wstring(tokens->size()) + L")");
+void TokenStreamRewriter::replace(const std::wstring &programName, size_t from, size_t to, const std::wstring& text) {
+  if (from > to || to >= tokens->size()) {
+    throw IllegalArgumentException(L"replace: range invalid: " + std::to_wstring(from) + L".." + std::to_wstring(to) +
+                                   L"(size=" + std::to_wstring(tokens->size()) + L")");
   }
   RewriteOperation *op = new ReplaceOp(this, from, to, text);
   std::vector<RewriteOperation*> rewrites = getProgram(programName);
@@ -194,30 +196,30 @@ void TokenStreamRewriter::replace(const std::wstring &programName, int from, int
 }
 
 void TokenStreamRewriter::replace(const std::wstring &programName, Token *from, Token *to, const std::wstring& text) {
-  replace(programName, from->getTokenIndex(), to->getTokenIndex(), text);
+  replace(programName, (size_t)from->getTokenIndex(), (size_t)to->getTokenIndex(), text);
 }
 
-void TokenStreamRewriter::delete_Renamed(int index) {
-  delete_Renamed(DEFAULT_PROGRAM_NAME, index, index);
+void TokenStreamRewriter::Delete(size_t index) {
+  Delete(DEFAULT_PROGRAM_NAME, index, index);
 }
 
-void TokenStreamRewriter::delete_Renamed(int from, int to) {
-  delete_Renamed(DEFAULT_PROGRAM_NAME, from, to);
+void TokenStreamRewriter::Delete(size_t from, size_t to) {
+  Delete(DEFAULT_PROGRAM_NAME, from, to);
 }
 
-void TokenStreamRewriter::delete_Renamed(Token *indexT) {
-  delete_Renamed(DEFAULT_PROGRAM_NAME, indexT, indexT);
+void TokenStreamRewriter::Delete(Token *indexT) {
+  Delete(DEFAULT_PROGRAM_NAME, indexT, indexT);
 }
 
-void TokenStreamRewriter::delete_Renamed(Token *from, Token *to) {
-  delete_Renamed(DEFAULT_PROGRAM_NAME, from, to);
+void TokenStreamRewriter::Delete(Token *from, Token *to) {
+  Delete(DEFAULT_PROGRAM_NAME, from, to);
 }
 
-void TokenStreamRewriter::delete_Renamed(const std::wstring &programName, int from, int to) {
+void TokenStreamRewriter::Delete(const std::wstring &programName, size_t from, size_t to) {
   replace(programName, from, to, nullptr);
 }
 
-void TokenStreamRewriter::delete_Renamed(const std::wstring &programName, Token *from, Token *to) {
+void TokenStreamRewriter::Delete(const std::wstring &programName, Token *from, Token *to) {
   replace(programName, from, to, nullptr);
 }
 
@@ -254,14 +256,14 @@ std::wstring TokenStreamRewriter::getText() {
   return getText(DEFAULT_PROGRAM_NAME, Interval::of(0, (int)tokens->size() - 1));
 }
 
-std::wstring TokenStreamRewriter::getText(Interval *interval) {
+std::wstring TokenStreamRewriter::getText(const Interval &interval) {
   return getText(DEFAULT_PROGRAM_NAME, interval);
 }
 
-std::wstring TokenStreamRewriter::getText(const std::wstring &programName, Interval *interval) {
+std::wstring TokenStreamRewriter::getText(const std::wstring &programName, const Interval &interval) {
   std::vector<TokenStreamRewriter::RewriteOperation*> rewrites = programs->at(programName);
-  int start = interval->a;
-  int stop = interval->b;
+  int start = interval.a;
+  int stop = interval.b;
 
   // ensure start/end are in range
   if (stop > (int)tokens->size() - 1) {
@@ -284,7 +286,7 @@ std::wstring TokenStreamRewriter::getText(const std::wstring &programName, Inter
   while (i <= (size_t)stop && i < tokens->size()) {
     RewriteOperation *op = indexToOp->at((int)i);
     indexToOp->erase((int)i); // remove so any left have index size-1
-    Token *t = tokens->get((int)i);
+    Token *t = tokens->get(i);
     if (op == nullptr) {
       // no operation at that index, just dump token
       if (t->getType() != Token::_EOF) {
@@ -304,7 +306,7 @@ std::wstring TokenStreamRewriter::getText(const std::wstring &programName, Inter
     // Scan any remaining operations after last token
     // should be included (they will be inserts).
     for (auto op : *indexToOp) {
-      if (op.second->index >= (int)tokens->size() - 1) {
+      if (op.second->index >= tokens->size() - 1) {
 								buf.append(op.second->text);
       }
     }
@@ -327,29 +329,29 @@ std::unordered_map<int, TokenStreamRewriter::RewriteOperation*> *TokenStreamRewr
     ReplaceOp *rop = static_cast<ReplaceOp*>(op);
     // Wipe prior inserts within range
     InsertBeforeOp* type = nullptr;
-    std::vector<InsertBeforeOp*> inserts = getKindOfOps(rewrites, type, (int)i);
+    std::vector<InsertBeforeOp*> inserts = getKindOfOps(rewrites, type, i);
     for (auto iop : inserts) {
       if (iop->index == rop->index) {
 								// E.g., insert before 2, delete 2..2; update replace
                 // text to include insert before, kill insert
                 //JAVA TO C++ CONVERTER WARNING: Java to C++ Converter converted the original 'null' assignment to a call to 'delete', but you should review memory allocation of all pointer variables in the converted code:
-								delete rewrites[iop->instructionIndex];
+								delete rewrites[(size_t)iop->instructionIndex];
 								rop->text = iop->text + (!rop->text.empty() ? rop->text : L"");
       }
       else if (iop->index > rop->index && iop->index <= rop->lastIndex) {
 								// delete insert as it's a no-op.
                 //JAVA TO C++ CONVERTER WARNING: Java to C++ Converter converted the original 'null' assignment to a call to 'delete', but you should review memory allocation of all pointer variables in the converted code:
-								delete rewrites[iop->instructionIndex];
+								delete rewrites[(size_t)iop->instructionIndex];
       }
     }
     // Drop any prior replaces contained within
     ReplaceOp* type2 = nullptr;
-    std::vector<ReplaceOp*> prevReplaces = getKindOfOps(rewrites, type2, (int)i);
+    std::vector<ReplaceOp*> prevReplaces = getKindOfOps(rewrites, type2, i);
     for (auto prevRop : prevReplaces) {
       if (prevRop->index >= rop->index && prevRop->lastIndex <= rop->lastIndex) {
 								// delete replace as it's a no-op.
                 //JAVA TO C++ CONVERTER WARNING: Java to C++ Converter converted the original 'null' assignment to a call to 'delete', but you should review memory allocation of all pointer variables in the converted code:
-								delete rewrites[prevRop->instructionIndex];
+								delete rewrites[(size_t)prevRop->instructionIndex];
 								continue;
       }
       // throw exception unless disjoint or identical
@@ -360,7 +362,7 @@ std::unordered_map<int, TokenStreamRewriter::RewriteOperation*> *TokenStreamRewr
       if (prevRop->text.empty() && rop->text.empty() && !disjoint) {
 								//System.out.println("overlapping deletes: "+prevRop+", "+rop);
                 //JAVA TO C++ CONVERTER WARNING: Java to C++ Converter converted the original 'null' assignment to a call to 'delete', but you should review memory allocation of all pointer variables in the converted code:
-								delete rewrites[prevRop->instructionIndex]; // kill first delete
+								delete rewrites[(size_t)prevRop->instructionIndex]; // kill first delete
 								rop->index = std::min(prevRop->index, rop->index);
 								rop->lastIndex = std::max(prevRop->lastIndex, rop->lastIndex);
 								std::wcout << L"new rop " << rop << std::endl;
@@ -383,7 +385,7 @@ std::unordered_map<int, TokenStreamRewriter::RewriteOperation*> *TokenStreamRewr
     InsertBeforeOp *iop = static_cast<InsertBeforeOp*>(rewrites[i]);
     // combine current insert with prior if any at same index
 
-    std::vector<InsertBeforeOp*> prevInserts = getKindOfOps(rewrites, iop, (int)i);
+    std::vector<InsertBeforeOp*> prevInserts = getKindOfOps(rewrites, iop, i);
     for (auto prevIop : prevInserts) {
       if (prevIop->index == iop->index) { // combine objects
                                           // convert to strings...we're in process of toString'ing
@@ -391,12 +393,12 @@ std::unordered_map<int, TokenStreamRewriter::RewriteOperation*> *TokenStreamRewr
 								iop->text = catOpText(&iop->text, &prevIop->text);
 								// delete redundant prior insert
                 //JAVA TO C++ CONVERTER WARNING: Java to C++ Converter converted the original 'null' assignment to a call to 'delete', but you should review memory allocation of all pointer variables in the converted code:
-								delete rewrites[prevIop->instructionIndex];
+								delete rewrites[(size_t)prevIop->instructionIndex];
       }
     }
     // look for replaces where iop.index is in range; error
     ReplaceOp *type = nullptr;
-    std::vector<ReplaceOp*> prevReplaces = getKindOfOps(rewrites, type, (int)i);
+    std::vector<ReplaceOp*> prevReplaces = getKindOfOps(rewrites, type, i);
     for (auto rop : prevReplaces) {
       if (iop->index == rop->index) {
 								rop->text = catOpText(&iop->text, &rop->text);
@@ -415,7 +417,7 @@ std::unordered_map<int, TokenStreamRewriter::RewriteOperation*> *TokenStreamRewr
     if (op == nullptr) { // ignore deleted ops
       continue;
     }
-    if (m->at(op->index) != nullptr) {
+    if (m->at((int)op->index) != nullptr) {
       // TODO: use a specific exception rather than a generic type here?
       throw new  ANTLRException(L"should only be one op per index");
     }

@@ -48,7 +48,7 @@ EmptyPredictionContext * PredictionContext::EMPTY;
 const int PredictionContext::EMPTY_RETURN_STATE;
 const int PredictionContext::INITIAL_HASH;
 
-PredictionContext::PredictionContext(int cachedHashCode) : id(globalNodeCount++), cachedHashCode(cachedHashCode)  {
+PredictionContext::PredictionContext(size_t cachedHashCode) : id(globalNodeCount++), cachedHashCode(cachedHashCode)  {
 }
 
 PredictionContext *PredictionContext::fromRuleContext(const ATN &atn, RuleContext *outerContext) {
@@ -66,50 +66,50 @@ PredictionContext *PredictionContext::fromRuleContext(const ATN &atn, RuleContex
   PredictionContext *parent = EMPTY;
   parent = PredictionContext::fromRuleContext(atn, outerContext->parent);
 
-  ATNState *state = atn.states[outerContext->invokingState];
+  ATNState *state = atn.states[(size_t)outerContext->invokingState];
   RuleTransition *transition = (RuleTransition *)state->transition(0);//static_cast<RuleTransition*>(state->transition(0));
   return SingletonPredictionContext::create(parent, transition->followState->stateNumber);
 }
 
-bool PredictionContext::isEmpty() {
+bool PredictionContext::isEmpty() const {
   return this == EMPTY;
 }
 
-bool PredictionContext::hasEmptyPath() {
+bool PredictionContext::hasEmptyPath() const {
   return getReturnState(size() - 1) == EMPTY_RETURN_STATE;
 }
 
-int PredictionContext::hashCode() {
+size_t PredictionContext::hashCode() const {
   return cachedHashCode;
 }
 
-int PredictionContext::calculateEmptyHashCode() {
-  int hash = MurmurHash::initialize(INITIAL_HASH);
+size_t PredictionContext::calculateEmptyHashCode() {
+  size_t hash = MurmurHash::initialize(INITIAL_HASH);
   hash = MurmurHash::finish(hash, 0);
   return hash;
 }
 
-int PredictionContext::calculateHashCode(PredictionContext *parent, int returnState) {
-  int hash = MurmurHash::initialize(INITIAL_HASH);
-  hash = MurmurHash::update(hash, parent);
-  hash = MurmurHash::update(hash, returnState);
+size_t PredictionContext::calculateHashCode(PredictionContext *parent, int returnState) {
+  size_t hash = MurmurHash::initialize(INITIAL_HASH);
+  hash = MurmurHash::update(hash, (size_t)parent);
+  hash = MurmurHash::update(hash, (size_t)returnState);
   hash = MurmurHash::finish(hash, 2);
   return hash;
 }
 
-int PredictionContext::calculateHashCode(std::vector<PredictionContext*> parents, std::vector<int> returnStates) {
-  int hash = MurmurHash::initialize(INITIAL_HASH);
+size_t PredictionContext::calculateHashCode(const std::vector<PredictionContext*> &parents, const std::vector<int> &returnStates) {
+  size_t hash = MurmurHash::initialize(INITIAL_HASH);
 
   for (auto parent : parents) {
-    hash = MurmurHash::update(hash, parent);
+    hash = MurmurHash::update(hash, (size_t)parent);
   }
   for (std::vector<PredictionContext*>::size_type i = 0; i < parents.size() ; i++) {
     PredictionContext * parent = parents[i];
-    hash = MurmurHash::update(hash, parent);
+    hash = MurmurHash::update(hash, (size_t)parent);
   }
 
   for (auto returnState : returnStates) {
-    hash = MurmurHash::update(hash, returnState);
+    hash = MurmurHash::update(hash, (size_t)returnState);
   }
 
   hash = MurmurHash::finish(hash, 2 * sizeof(parents) / sizeof(parents[0]));
@@ -124,7 +124,7 @@ PredictionContext *PredictionContext::merge(PredictionContext *a, PredictionCont
   };
 
   // share same graph if both same
-  if (a == b || a->equals(b)) {
+  if (a == b) {
     return a;
   }
 
@@ -195,17 +195,17 @@ PredictionContext *PredictionContext::mergeSingletons(SingletonPredictionContext
   else { // a != b payloads differ
          // see if we can collapse parents due to $+x parents if local ctx
     PredictionContext *singleParent = nullptr;
-    if (a == b || (a->parent != nullptr && a->parent->equals(b->parent))) { // ax + bx = [a,b]x
+    if (a == b || (a->parent != nullptr && a->parent == b->parent)) { // ax + bx = [a,b]x
       singleParent = a->parent;
     }
     if (singleParent != nullptr) { // parents are same
                                    // sort payloads and use same parent
-      int payloads[2] = {a->returnState, b->returnState};
+      std::vector<int> payloads = { a->returnState, b->returnState };
       if (a->returnState > b->returnState) {
         payloads[0] = b->returnState;
         payloads[1] = a->returnState;
       }
-      PredictionContext parents[2] = {*singleParent, *singleParent};
+      std::vector<PredictionContext *> parents = { singleParent, singleParent };
       PredictionContext *a_ = new ArrayPredictionContext(parents, payloads);
       if (mergeCache != nullptr) {
         mergeCache->put(a, b, a_);
@@ -217,12 +217,12 @@ PredictionContext *PredictionContext::mergeSingletons(SingletonPredictionContext
     // ax + by = [ax,by]
     PredictionContext *a_;
     if (a->returnState > b->returnState) { // sort by payload
-      int payloads[2] = {b->returnState, a->returnState};
-      PredictionContext parents[2] = {*b->parent, *a->parent};
+      std::vector<int> payloads = { b->returnState, a->returnState };
+      std::vector<PredictionContext *> parents = { b->parent, a->parent };
       a_ = new ArrayPredictionContext(parents, payloads);
     } else {
-      int payloads[2] = {a->returnState, b->returnState};
-      PredictionContext parents[2] = {*a->parent, *b->parent};
+      std::vector<int> payloads = {a->returnState, b->returnState};
+      std::vector<PredictionContext *> parents = { a->parent, b->parent };
       a_ = new ArrayPredictionContext(parents, payloads);
     }
 
@@ -246,14 +246,14 @@ PredictionContext *PredictionContext::mergeRoot(SingletonPredictionContext *a, S
       return (PredictionContext *)EMPTY;
     }
     if (a == EMPTY) { // $ + x = [$,x]
-      int payloads[2] = {b->returnState, EMPTY_RETURN_STATE};
-      PredictionContext parents[2] = {*b->parent, *EMPTY};
+      std::vector<int> payloads = { b->returnState, EMPTY_RETURN_STATE };
+      std::vector<PredictionContext *> parents = { b->parent, EMPTY };
       PredictionContext *joined = new ArrayPredictionContext(parents, payloads);
       return joined;
     }
     if (b == EMPTY) { // x + $ = [$,x] ($ is always first if present)
-      int payloads[2] = {a->returnState, EMPTY_RETURN_STATE};
-      PredictionContext parents[2] = {*a->parent, *EMPTY};
+      std::vector<int> payloads = { a->returnState, EMPTY_RETURN_STATE };
+      std::vector<PredictionContext *> parents = { a->parent, EMPTY };
       PredictionContext *joined = new ArrayPredictionContext(parents, payloads);
       return joined;
     }
@@ -283,14 +283,14 @@ PredictionContext *PredictionContext::mergeArrays(ArrayPredictionContext *a, Arr
 
   // walk and merge to yield mergedParents, mergedReturnStates
   while (i < a->returnStates.size() && j < b->returnStates.size()) {
-    PredictionContext *a_parent = a->parents->at(i);// [i];
-    PredictionContext *b_parent = b->parents->at(i);//&b->parents[j];
+    PredictionContext *a_parent = a->parents[i];
+    PredictionContext *b_parent = b->parents[j];
     if (a->returnStates[i] == b->returnStates[j]) {
       // same payload (stack tops are equal), must yield merged singleton
       int payload = a->returnStates[i];
       // $+$ = $
       bool both$ = payload == EMPTY_RETURN_STATE && a_parent == nullptr && b_parent == nullptr;
-      bool ax_ax = (a_parent != nullptr && b_parent != nullptr) && a_parent == b_parent;//->equals(b_parent); // ax+ax -> ax
+      bool ax_ax = (a_parent != nullptr && b_parent != nullptr) && a_parent == b_parent; // ax+ax -> ax
       if (both$ || ax_ax) {
         mergedParents[k] = a_parent; // choose left
         mergedReturnStates[k] = payload;
@@ -318,13 +318,13 @@ PredictionContext *PredictionContext::mergeArrays(ArrayPredictionContext *a, Arr
   // copy over any payloads remaining in either array
   if (i < a->returnStates.size()) {
     for (std::vector<int>::size_type p = i; p < a->returnStates.size(); p++) {
-      mergedParents[k] = a->parents->at(p);//[p];
+      mergedParents[k] = a->parents[p];
       mergedReturnStates[k] = a->returnStates[p];
       k++;
     }
   } else {
     for (std::vector<int>::size_type p = j; p < b->returnStates.size(); p++) {
-      mergedParents[k] = b->parents->at(p);// [p];
+      mergedParents[k] = b->parents[p];
       mergedReturnStates[k] = b->returnStates[p];
       k++;
     }
@@ -348,13 +348,13 @@ PredictionContext *PredictionContext::mergeArrays(ArrayPredictionContext *a, Arr
 
   // if we created same array as a or b, return that instead
   // TODO: track whether this is possible above during merge sort for speed
-  if (M->equals(a)) {
+  if (M == a) {
     if (mergeCache != nullptr) {
       mergeCache->put(a,b,a);
     }
     return a;
   }
-  if (M->equals(b)) {
+  if (M == b) {
     if (mergeCache != nullptr) {
       mergeCache->put(a,b,b);
     }
@@ -433,7 +433,7 @@ std::wstring PredictionContext::toDOTString(PredictionContext *context) {
     if (current == EMPTY) {
       continue;
     }
-    for (int i = 0; i < current->size(); i++) {
+    for (size_t i = 0; i < current->size(); i++) {
       if (current->getParent(i) == nullptr) {
         continue;
       }
@@ -477,12 +477,12 @@ PredictionContext *PredictionContext::getCachedContext(PredictionContext *contex
 
   std::vector<PredictionContext*> parents;
 
-  for (int i = 0; i < sizeof(parents) / sizeof(parents[0]); i++) {
+  for (size_t i = 0; i < sizeof(parents) / sizeof(parents[0]); i++) {
     PredictionContext *parent = getCachedContext(context->getParent(i), contextCache, visited);
     if (changed || parent != context->getParent(i)) {
       if (!changed) {
         parents = std::vector<PredictionContext*>();
-        for (int j = 0; j < context->size(); j++) {
+        for (size_t j = 0; j < context->size(); j++) {
           parents[j] = context->getParent(j);
         }
 
@@ -542,7 +542,7 @@ void PredictionContext::getAllContextNodes_(PredictionContext *context, std::vec
 
   nodes.push_back(context);
 
-  for (int i = 0; i < context->size(); i++) {
+  for (size_t i = 0; i < context->size(); i++) {
     getAllContextNodes_(context->getParent(i), nodes, visited);
   }
 }
@@ -551,16 +551,4 @@ std::wstring PredictionContext::toString() {
   //TODO: what should this return?  (Return empty string
   // for now.)
   return L"TODO PredictionContext::toString()";
-}
-
-int PredictionContext::size() {
-  throw "PredictionContext::size() should not be called";
-}
-
-PredictionContext *PredictionContext::getParent(int index) {
-  throw "PredictionContext::getParent should not be called";
-}
-
-int PredictionContext::getReturnState(int index) {
-  throw "PredictionContext::getReturnState should not be called";
 }

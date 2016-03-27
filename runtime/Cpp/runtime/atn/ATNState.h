@@ -31,6 +31,8 @@
 
 #pragma once
 
+#include "IntervalSet.h"
+
 namespace org {
 namespace antlr {
 namespace v4 {
@@ -141,9 +143,9 @@ namespace atn {
     /// <summary>
     /// Used to cache lookahead during parsing, not used during construction </summary>
   public:
-    misc::IntervalSet *nextTokenWithinRule;
+    misc::IntervalSet nextTokenWithinRule;
 
-    virtual int hashCode();
+    virtual size_t hashCode();
     virtual bool equals(void *o);
 
     virtual bool isNonGreedyExitState();
@@ -152,15 +154,15 @@ namespace atn {
 
     virtual  std::vector<Transition*> getTransitions();
 
-    virtual int getNumberOfTransitions();
+    virtual size_t getNumberOfTransitions();
 
     virtual void addTransition(Transition *e);
 
     virtual void addTransition(int index, Transition *e);
 
-    virtual Transition *transition(int i);
+    virtual Transition *transition(size_t i);
 
-    virtual void setTransition(int i, Transition *e);
+    virtual void setTransition(size_t i, Transition *e);
 
     virtual Transition *removeTransition(int index);
 

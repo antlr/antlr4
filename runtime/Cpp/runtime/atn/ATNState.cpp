@@ -47,8 +47,8 @@ const wchar_t * ATNState::serializationNames[] =  {L"INVALID", L"BASIC", L"RULE_
   L"PLUS_BLOCK_START", L"STAR_BLOCK_START", L"TOKEN_START", L"RULE_STOP",
   L"BLOCK_END", L"STAR_LOOP_BACK", L"STAR_LOOP_ENTRY", L"PLUS_LOOP_BACK", L"LOOP_END"};
 
-int ATNState::hashCode() {
-  return stateNumber;
+size_t ATNState::hashCode() {
+  return (size_t)stateNumber;
 }
 
 bool ATNState::equals(void *o) {
@@ -73,8 +73,8 @@ std::vector<Transition*> ATNState::getTransitions() {
   return arr;
 }
 
-int ATNState::getNumberOfTransitions() {
-  return (int)transitions.size();
+size_t ATNState::getNumberOfTransitions() {
+  return transitions.size();
 }
 
 void ATNState::addTransition(Transition *e) {
@@ -92,11 +92,11 @@ void ATNState::addTransition(int index, Transition *e) {
   transitions.insert(transitions.begin() + index, e);
 }
 
-Transition *ATNState::transition(int i) {
+Transition *ATNState::transition(size_t i) {
   return transitions[i];
 }
 
-void ATNState::setTransition(int i, Transition *e) {
+void ATNState::setTransition(size_t i, Transition *e) {
   transitions[i] = e;
 }
 

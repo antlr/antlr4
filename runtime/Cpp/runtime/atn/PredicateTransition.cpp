@@ -37,23 +37,23 @@ using namespace org::antlr::v4::runtime::atn;
 PredicateTransition::PredicateTransition(ATNState *target, int ruleIndex, int predIndex, bool isCtxDependent) : AbstractPredicateTransition(target), ruleIndex(ruleIndex), predIndex(predIndex), isCtxDependent(isCtxDependent) {
 }
 
-int PredicateTransition::getSerializationType() {
+int PredicateTransition::getSerializationType() const {
   return PREDICATE;
 }
 
-bool PredicateTransition::isEpsilon() {
+bool PredicateTransition::isEpsilon() const {
   return true;
 }
 
-bool PredicateTransition::matches(int symbol, int minVocabSymbol, int maxVocabSymbol) {
+bool PredicateTransition::matches(int symbol, int minVocabSymbol, int maxVocabSymbol) const {
   return false;
 }
 
-SemanticContext::Predicate *PredicateTransition::getPredicate() {
+SemanticContext::Predicate *PredicateTransition::getPredicate() const {
   // TODO: who is responsible for managing this memory?
   return new SemanticContext::Predicate(ruleIndex, predIndex, isCtxDependent);
 }
 
-std::wstring PredicateTransition::toString() {
+std::wstring PredicateTransition::toString() const {
   return std::wstring(L"pred_") + antlrcpp::StringConverterHelper::toString(ruleIndex) + std::wstring(L":") + antlrcpp::StringConverterHelper::toString(predIndex);
 }

@@ -454,14 +454,14 @@ std::shared_ptr\<<parser.name>::<currentRule.ctxType>\> <parser.name>::<currentR
 StructDeclHeader(struct, attrs, getters, dispatchMethods, interfaces, extensionMembers, superClass = {ParserRuleContext}) ::= <<
 class <struct.name> : public <superClass><if (interfaces)><interfaces; separator=", "><endif> {
 public:
+  <if (attrs)><attrs: {a | <a>}; separator = "\n"><endif>
 <! TODO: untested !>  <if (struct.ctorAttrs)><struct.name>(ParserRuleContext *parent, int invokingState);<endif>
 <! TODO: struct.ctorAttrs untested !>  <struct.name>(ParserRuleContext *parent, int invokingState<struct.ctorAttrs: {a | , <a>}>);
   <if (struct.provideCopyFrom)><struct.name>() { } <! don't need copy unless we have subclasses !> <! TODO: untested !>
   void copyFrom(<struct.name> *context);
   <endif>
 
-  virtual int getRuleIndex() override;
-<! TODO: untested !>  <if (attrs)><attrs: {a | <a>}; separator = "\n"><endif>
+  virtual ssize_t getRuleIndex() const override;
   <getters: {g | <g>}; separator = "\n">
 
   <dispatchMethods; separator = "\n">
@@ -486,7 +486,7 @@ StructDecl(struct, attrs, getters, dispatchMethods, interfaces, extensionMembers
 <! TODO: untested!><attrs: {a | <a>}; separator = "\n">
 <getters: {g | <g>}; separator = "\n">
 
-int <parser.name>::<struct.name>::getRuleIndex() {
+ssize_t <parser.name>::<struct.name>::getRuleIndex() const {
   return static_cast\<int>(<parser.name>Rule::Rule<struct.derivedFromName; format = "cap">);
 }
 
@@ -617,7 +617,7 @@ do {
 // LL(*) stuff
 
 AltBlockHeader(choice, preamble, alts, error) ::= <<
-AltBlockHeader
+<! Unused but must be present. !>
 >>
 
 AltBlock(choice, preamble, alts, error) ::= <<
@@ -634,8 +634,9 @@ switch (getInterpreter()->adaptivePredict(_input, <choice.decision>, ctx)) {
 >>
 
 OptionalBlockHeader(choice, alts, error) ::= <<
-OptionalBlockHeader
+<! Unused but must be present. !>
 >>
+
 OptionalBlock(choice, alts, error) ::= <<
 setState(<choice.stateNumber>);
 _errHandler->sync(this);
@@ -649,7 +650,7 @@ switch (getInterpreter()->adaptivePredict(_input, <choice.decision>, ctx)) {
 >>
 
 StarBlockHeader(choice, alts, sync, iteration) ::= <<
-StarBlockHeader
+<! Unused but must be present. !>
 >>
 
 StarBlock(choice, alts, sync, iteration) ::= <<
@@ -692,7 +693,7 @@ do {
 
 Sync(s) ::= "sync(<s.expecting.name>);"
 
-ThrowNoViableAltHeader(t) ::= "ThrowNoViableAltHeader"
+ThrowNoViableAltHeader(t) ::= "<! Unused but must be present. !>"
 ThrowNoViableAlt(t) ::= "throw new NoViableAltException(this);"
 
 TestSetInline(s) ::= <<
@@ -736,7 +737,7 @@ setState(<r.stateNumber>); <if(r.labels)><r.labels: {l | <labelref(l)> = }><endi
 >>
 
 MatchTokenHeader(m) ::= <<
-MatchTokenHeader
+<! Unused but must be present. !>
 >>
 
 MatchToken(m) ::= <<
@@ -769,9 +770,7 @@ Action(a, foo, chunks) ::= "<chunks>"
 
 ArgAction(a, chunks) ::= "<chunks>"
 
-SemPredHeader(p, chunks, failChunks) ::= <<
-SemPredHeader
->>
+SemPredHeader(p, chunks, failChunks) ::= "<! Unused but must be present. !>"
 
 SemPred(p, chunks, failChunks) ::= <<
 setState(<p.stateNumber>);
@@ -780,7 +779,7 @@ setState(<p.stateNumber>);
 if (!(<chunks>)) throw new FailedPredicateException(this, L<p.predicate><if (failChunks)>, <failChunks><elseif (p.msg)>, L<p.msg><endif>);
 >>
 
-ExceptionClauseHeader(e, catchArg, catchAction) ::= "ExceptionClauseHeader"
+ExceptionClauseHeader(e, catchArg, catchAction) ::= "<! Unused but must be present. !>"
 ExceptionClause(e, catchArg, catchAction) ::= <<
 catch (<catchArg>) {
 	<catchAction>
@@ -801,7 +800,7 @@ LexerPushModeCommand(arg)  ::= "pushMode(<arg>);"
 ActionTextHeader(t) ::= "<t.text>"
 ActionText(t) ::= "<t.text>"
 
-ActionTemplateHeader(t) ::= "ActionTemplateHeader"
+ActionTemplateHeader(t) ::= "<! Unused but must be present. !>"
 ActionTemplate(t) ::= "<t.st>"
 
 ArgRef(a) ::= "result.<a.name>"
@@ -866,7 +865,7 @@ std::vector\<tree::TerminalNode *> <parser.name>::<t.ctx.name>::<t.name>() {
 ContextTokenListIndexedGetterDeclHeader(t) ::= "tree::TerminalNode* <t.name>(int i);"
 ContextTokenListIndexedGetterDecl(t)  ::= <<
 tree::TerminalNode* <parser.name>::<t.ctx.name>::<t.name>(int i) {
-  return getToken((int)<parser.name>Token::<t.name>, i);
+  return getToken((int)<parser.name>Token::<t.name>, (size_t)i);
 }
 
 >>
@@ -894,7 +893,7 @@ ContextRuleListIndexedGetterDeclHeader(r) ::= <<
 
 ContextRuleListIndexedGetterDecl(r) ::= <<
 <parser.name>::<r.ctxName>* <parser.name>::<r.ctx.name>::<r.name>(int i) {
-  return getRuleContext\<<parser.name>::<r.ctxName>\>(i);
+  return getRuleContext\<<parser.name>::<r.ctxName>\>((size_t)i);
 }
 
 >>
@@ -943,16 +942,10 @@ T* accept(tree::ParseTreeVisitor\<T> *visitor) {
     return visitor->visitChildren(this);
 }
 >>
+VisitorDispatchMethod(method) ::= "<! Template function, must be implemented in the header. !>"
 
-VisitorDispatchMethod(method) ::= <<
-<! Template function, must be implemented in the header. !>
->>
-
-AttributeDeclHeader(d) ::= "" // Unused
-AttributeDecl(d) ::= <<
-// Ignoring specified rule return value: <d.decl>, defined for parser rule: <d.ctx.derivedFromName>;
-
->>
+AttributeDeclHeader(d) ::= "<d.decl>;"
+AttributeDecl(d) ::= "<! Variable declaration. !>"
 
 /** If we don't know location of label def x, use this template */
 labelref(x) ::= "<if (!x.isLocal)>((<x.ctx.name>)result).<endif><x.name>"

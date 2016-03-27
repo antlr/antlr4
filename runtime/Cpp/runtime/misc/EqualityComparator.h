@@ -41,8 +41,8 @@ namespace misc {
   class EqualityComparator {
 
   public:
-    virtual int hashCode(T obj) {
-      return (int)std::hash<T>()(obj);
+    virtual size_t hashCode(T obj) {
+      return std::hash<T>()(obj);
     }
 
     virtual bool equals(const T &a, const T &b) {

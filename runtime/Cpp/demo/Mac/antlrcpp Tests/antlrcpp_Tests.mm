@@ -29,10 +29,14 @@
 
 #import <Cocoa/Cocoa.h>
 #import <XCTest/XCTest.h>
+
 #include "ParserATNSimulator.h"
 #include "DFA.h"
+#include "ATN.h"
 
 #include <vector>
+
+using namespace org::antlr::v4::runtime;
 
 @interface antlrcpp_Tests : XCTestCase
 
@@ -52,22 +56,16 @@
 
 - (void)testExample {
     try {
-        std::vector<org::antlr::v4::runtime::dfa::DFA> decisionToDFA;
-        
-        org::antlr::v4::runtime::atn::ParserATNSimulator foo(nullptr, decisionToDFA, nullptr);
+      std::vector<dfa::DFA *> decisionToDFA;
+      atn::ATN atn;
+
+      org::antlr::v4::runtime::atn::ParserATNSimulator foo(nullptr, atn, decisionToDFA, nullptr);
     }
     catch (std::exception e) {
         
         XCTAssert(NO, @"Fail");
     }
     XCTAssert(YES, @"Pass");
-}
-
-- (void)testPerformanceExample {
-    // This is an example of a performance test case.
-    [self measureBlock:^{
-        // Put the code you want to measure the time of here.
-    }];
 }
 
 @end

@@ -46,7 +46,7 @@ namespace atn {
     class SimState {
     protected:
       int index;
-      int line;
+      size_t line;
       int charPos;
       dfa::DFAState *dfaState;
       virtual void reset();
@@ -86,7 +86,7 @@ namespace atn {
     ///  can simply return the predicted token type.
     /// </summary>
   protected:
-    Lexer *const recog;
+    Lexer *const _recog;
 
     /// <summary>
     /// The current token's starting index into the character stream.
@@ -94,20 +94,20 @@ namespace atn {
     ///  DFA did not have a previous accept state. In this case, we use the
     ///  ATN-generated exception object.
     /// </summary>
-    int startIndex;
+    int _startIndex;
 
     /// <summary>
     /// line number 1..n within the input </summary>
-    int line;
+    size_t _line;
 
     /// <summary>
     /// The index of the character relative to the beginning of the line 0..n-1 </summary>
-    int charPositionInLine;
+    int _charPositionInLine;
 
   public:
     const std::vector<dfa::DFA*> _decisionToDFA;
   protected:
-    int mode;
+    size_t _mode;
 
     /// <summary>
     /// Used during DFA/ATN exec to record the most recent accept configuration info </summary>
@@ -121,7 +121,7 @@ namespace atn {
 
     virtual void copyState(LexerATNSimulator *simulator);
 
-    virtual int match(CharStream *input, int mode);
+    virtual int match(CharStream *input, size_t mode);
 
     virtual void reset() override;
 
@@ -140,7 +140,7 @@ namespace atn {
     /// <returns> The existing target DFA state for the given input symbol
     /// {@code t}, or {@code null} if the target state for this edge is not
     /// already cached </returns>
-    virtual dfa::DFAState *getExistingTargetState(dfa::DFAState *s, int t);
+    virtual dfa::DFAState *getExistingTargetState(dfa::DFAState *s, size_t t);
 
     /// <summary>
     /// Compute a target state for an edge in the DFA, and attempt to add the
@@ -153,18 +153,18 @@ namespace atn {
     /// <returns> The computed target DFA state for the given input symbol
     /// {@code t}. If {@code t} does not lead to a valid DFA state, this method
     /// returns <seealso cref="#ERROR"/>. </returns>
-    virtual dfa::DFAState *computeTargetState(CharStream *input, dfa::DFAState *s, int t);
+    virtual dfa::DFAState *computeTargetState(CharStream *input, dfa::DFAState *s, size_t t);
 
-    virtual int failOrAccept(SimState *prevAccept, CharStream *input, ATNConfigSet *reach, int t);
+    virtual int failOrAccept(SimState *prevAccept, CharStream *input, ATNConfigSet *reach, size_t t);
 
     /// <summary>
     /// Given a starting configuration set, figure out all ATN configurations
     ///  we can reach upon input {@code t}. Parameter {@code reach} is a return
     ///  parameter.
     /// </summary>
-    void getReachableConfigSet(CharStream *input, ATNConfigSet *closure, ATNConfigSet *reach, int t);
+    void getReachableConfigSet(CharStream *input, ATNConfigSet *closure, ATNConfigSet *reach, size_t t);
 
-    virtual void accept(CharStream *input, int ruleIndex, int actionIndex, int index, int line, int charPos);
+    virtual void accept(CharStream *input, int ruleIndex, int actionIndex, size_t index, size_t line, size_t charPos);
 
     virtual ATNState *getReachableTarget(Transition *trans, int t);
 
@@ -208,9 +208,9 @@ namespace atn {
 
     virtual void captureSimState(SimState *settings, CharStream *input, dfa::DFAState *dfaState);
 
-    virtual dfa::DFAState *addDFAEdge(dfa::DFAState *from, int t, ATNConfigSet *q);
+    virtual dfa::DFAState *addDFAEdge(dfa::DFAState *from, size_t t, ATNConfigSet *q);
 
-    virtual void addDFAEdge(dfa::DFAState *p, int t, dfa::DFAState *q);
+    virtual void addDFAEdge(dfa::DFAState *p, size_t t, dfa::DFAState *q);
 
     /// <summary>
     /// Add a new DFA state if there isn't one with this set of
@@ -221,16 +221,16 @@ namespace atn {
     virtual dfa::DFAState *addDFAState(ATNConfigSet *configs);
 
   public:
-    dfa::DFA *getDFA(int mode);
+    dfa::DFA *getDFA(size_t mode);
 
     /// <summary>
     /// Get the text matched so far for the current token.
     /// </summary>
     virtual std::wstring getText(CharStream *input);
 
-    virtual int getLine();
+    virtual size_t getLine() const;
 
-    virtual void setLine(int line);
+    virtual void setLine(size_t line);
 
     virtual int getCharPositionInLine();
 

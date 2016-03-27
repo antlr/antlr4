@@ -53,7 +53,7 @@ CommonToken::CommonToken(std::pair<TokenSource*, CharStream*> *source, int type,
   this->start = start;
   this->stop = stop;
   if (source->first != nullptr) {
-    this->line = source->first->getLine();
+    this->line = (int)source->first->getLine();
     this->charPositionInLine = source->first->getCharPositionInLine();
   }
 }

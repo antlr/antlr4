@@ -77,9 +77,8 @@ namespace runtime {
     ///        the parser was able to recover in line without exiting the
     ///        surrounding rule. </param>
   public:
-    void syntaxError(IRecognizer *recognizer, void *offendingSymbol,
-                     int line, int charPositionInLine, const std::wstring &msg,
-                     RecognitionException *e) {}
+    void syntaxError(IRecognizer *recognizer, void *offendingSymbol, size_t line, int charPositionInLine,
+                     const std::wstring &msg, RecognitionException *e) {}
 
     /// <summary>
     /// This method is called by the parser when a full-context prediction
@@ -108,7 +107,8 @@ namespace runtime {
     /// <param name="ambigAlts"> the potentially ambiguous alternatives </param>
     /// <param name="configs"> the ATN configuration set where the ambiguity was
     /// determined </param>
-    virtual void reportAmbiguity(Parser *recognizer, dfa::DFA *dfa, int startIndex, int stopIndex, bool exact, antlrcpp::BitSet *ambigAlts, atn::ATNConfigSet *configs) = 0;
+    virtual void reportAmbiguity(Parser *recognizer, dfa::DFA *dfa, size_t startIndex, size_t stopIndex, bool exact,
+                                 antlrcpp::BitSet *ambigAlts, atn::ATNConfigSet *configs) = 0;
 
     /// <summary>
     /// This method is called when an SLL conflict occurs and the parser is about
@@ -130,7 +130,8 @@ namespace runtime {
     /// represented in {@code configs}. </param>
     /// <param name="configs"> the ATN configuration set where the SLL conflict was
     /// detected </param>
-    virtual void reportAttemptingFullContext(Parser *recognizer, dfa::DFA *dfa, int startIndex, int stopIndex, antlrcpp::BitSet *conflictingAlts, atn::ATNConfigSet *configs) = 0;
+    virtual void reportAttemptingFullContext(Parser *recognizer, dfa::DFA *dfa, size_t startIndex, size_t stopIndex,
+                                             antlrcpp::BitSet *conflictingAlts, atn::ATNConfigSet *configs) = 0;
 
     /// <summary>
     /// This method is called by the parser when a full-context prediction has a
@@ -159,7 +160,8 @@ namespace runtime {
     /// <param name="prediction"> the unambiguous result of the full-context prediction </param>
     /// <param name="configs"> the ATN configuration set where the unambiguous prediction
     /// was determined </param>
-    virtual void reportContextSensitivity(Parser *recognizer, dfa::DFA *dfa, int startIndex, int stopIndex, int prediction, atn::ATNConfigSet *configs) = 0;
+    virtual void reportContextSensitivity(Parser *recognizer, dfa::DFA *dfa, size_t startIndex, size_t stopIndex,
+                                          int prediction, atn::ATNConfigSet *configs) = 0;
   };
 
 } // namespace runtime

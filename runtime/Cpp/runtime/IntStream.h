@@ -59,7 +59,7 @@ namespace runtime {
     /// </summary>
   public:
     //                    EOF Conflict with OS X, change to _EOF
-    static const int _EOF = std::ios::eofbit;
+    static const size_t _EOF = std::ios::eofbit;
 
     /// <summary>
     /// The value returned by <seealso cref="#getSourceName"/> when the actual name of the
@@ -123,7 +123,7 @@ namespace runtime {
     /// </summary>
     /// <exception cref="UnsupportedOperationException"> if the stream does not support
     /// retrieving the value of the specified symbol </exception>
-    virtual int LA(int i) = 0;
+    virtual size_t LA(ssize_t i) = 0;
 
     /// <summary>
     /// A mark provides a guarantee that <seealso cref="#seek seek()"/> operations will be
@@ -170,7 +170,7 @@ namespace runtime {
     /// </summary>
     /// <returns> An opaque marker which should be passed to
     /// <seealso cref="#release release()"/> when the marked range is no longer required. </returns>
-    virtual int mark() = 0;
+    virtual ssize_t mark() = 0;
 
     /// <summary>
     /// This method releases a marked range created by a call to
@@ -183,7 +183,7 @@ namespace runtime {
     /// </summary>
     /// <param name="marker"> A marker returned by a call to {@code mark()}. </param>
     /// <seealso cref= #mark </seealso>
-    virtual void release(int marker) = 0;
+    virtual void release(ssize_t marker) = 0;
 
     /// <summary>
     /// Return the index into the stream of the input symbol referred to by
@@ -193,7 +193,7 @@ namespace runtime {
     /// <seealso cref="IntStream initializing method"/> has occurred after this stream was
     /// constructed.
     /// </summary>
-    virtual int index() = 0;
+    virtual size_t index() = 0;
 
     /// <summary>
     /// Set the input cursor to the position indicated by {@code index}. If the
@@ -222,7 +222,7 @@ namespace runtime {
     /// <exception cref="IllegalArgumentException"> if {@code index} is less than 0 </exception>
     /// <exception cref="UnsupportedOperationException"> if the stream does not support
     /// seeking to the specified index </exception>
-    virtual void seek(int index) = 0;
+    virtual void seek(size_t index) = 0;
 
     /// <summary>
     /// Returns the total number of symbols in the stream, including a single EOF

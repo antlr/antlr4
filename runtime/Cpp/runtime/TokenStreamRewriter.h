@@ -1,33 +1,33 @@
 ﻿/*
  * [The "BSD license"]
  *  Copyright (c) 2016 Mike Lischke
-*  Copyright (c) 2013 Terence Parr
-*  Copyright (c) 2013 Dan McLaughlin
-*  All rights reserved.
-*
-*  Redistribution and use in source and binary forms, with or without
-*  modification, are permitted provided that the following conditions
-*  are met:
-*
-*  1. Redistributions of source code must retain the above copyright
-*     notice, this list of conditions and the following disclaimer.
-*  2. Redistributions in binary form must reproduce the above copyright
-*     notice, this list of conditions and the following disclaimer in the
-*     documentation and/or other materials provided with the distribution.
-*  3. The name of the author may not be used to endorse or promote products
-*     derived from this software without specific prior written permission.
-*
-*  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
-*  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-*  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-*  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
-*  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-*  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-*  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-*  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-*  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-*  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*/
+ *  Copyright (c) 2013 Terence Parr
+ *  Copyright (c) 2013 Dan McLaughlin
+ *  All rights reserved.
+ *
+ *  Redistribution and use in source and binary forms, with or without
+ *  modification, are permitted provided that the following conditions
+ *  are met:
+ *
+ *  1. Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ *  2. Redistributions in binary form must reproduce the above copyright
+ *     notice, this list of conditions and the following disclaimer in the
+ *     documentation and/or other materials provided with the distribution.
+ *  3. The name of the author may not be used to endorse or promote products
+ *     derived from this software without specific prior written permission.
+ *
+ *  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+ *  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ *  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+ *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ *  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 
 #pragma once
 
@@ -77,12 +77,12 @@ namespace runtime {
   ///   TokenStreamRewriter rewriter = new TokenStreamRewriter(tokens);
   ///   parser.startRule();
   ///
-  /// 	 Then in the rules, you can execute (assuming rewriter is visible):
+  ///    Then in the rules, you can execute (assuming rewriter is visible):
   ///      Token t,u;
   ///      ...
   ///      rewriter.insertAfter(t, "text to put after t");}
-  /// 		rewriter.insertAfter(u, "text after u");}
-  /// 		System.out.println(tokens.toString());
+  ///       rewriter.insertAfter(u, "text after u");}
+  ///       System.out.println(tokens.toString());
   ///
   ///  You can also have multiple "instruction streams" and get multiple
   ///  rewrites from a single pass over the input.  Just name the instruction
@@ -91,9 +91,9 @@ namespace runtime {
   ///  same buffer:
   ///
   ///      tokens.insertAfter("pass1", t, "text to put after t");}
-  /// 		tokens.insertAfter("pass2", u, "text after u");}
-  /// 		System.out.println(tokens.toString("pass1"));
-  /// 		System.out.println(tokens.toString("pass2"));
+  ///       tokens.insertAfter("pass2", u, "text after u");}
+  ///       System.out.println(tokens.toString("pass1"));
+  ///       System.out.println(tokens.toString("pass2"));
   ///
   ///  If you don't use named rewrite streams, a "default" stream is used as
   ///  the first example shows.
@@ -102,59 +102,59 @@ namespace runtime {
   public:
     class RewriteOperation {
     private:
-						TokenStreamRewriter *const outerInstance;
+      TokenStreamRewriter *const outerInstance;
 
-						/// <summary>
-            /// What index into rewrites List are we? </summary>
     public:
-						virtual ~RewriteOperation() {};
-						/// <summary>
-            /// Token buffer index. </summary>
-						int index;
-						std::wstring text;
+      /// <summary>
+      /// What index into rewrites List are we? </summary>
+      virtual ~RewriteOperation() {};
+      /// <summary>
+      /// Token buffer index. </summary>
+      size_t index;
+      std::wstring text;
 
-						RewriteOperation(TokenStreamRewriter *outerInstance, int index);
+      RewriteOperation(TokenStreamRewriter *outerInstance, size_t index);
 
-						RewriteOperation(TokenStreamRewriter *outerInstance, int index, const std::wstring& text);
-						/// <summary>
-            /// Execute the rewrite operation by possibly adding to the buffer.
-            ///  Return the index of the next token to operate on.
-            /// </summary>
-						int instructionIndex;
+      RewriteOperation(TokenStreamRewriter *outerInstance, size_t index, const std::wstring& text);
+      /// <summary>
+      /// Execute the rewrite operation by possibly adding to the buffer.
+      ///  Return the index of the next token to operate on.
+      /// </summary>
+      int instructionIndex;
 
-						virtual int execute(std::wstring *buf);
+      virtual size_t execute(std::wstring *buf);
 
-						virtual std::wstring toString();
+      virtual std::wstring toString();
 
     private:
-						void InitializeInstanceFields();
+      void InitializeInstanceFields();
     };
 
   public:
     class InsertBeforeOp : public RewriteOperation {
     private:
-						TokenStreamRewriter *const outerInstance;
+      TokenStreamRewriter *const outerInstance;
 
     public:
-						InsertBeforeOp(TokenStreamRewriter *outerInstance, int index, const std::wstring& text);
+      InsertBeforeOp(TokenStreamRewriter *outerInstance, size_t index, const std::wstring& text);
 
-						virtual int execute(std::wstring *buf) override;
+      virtual size_t execute(std::wstring *buf) override;
     };
 
   public:
     class ReplaceOp : public RewriteOperation {
     private:
-						TokenStreamRewriter *const outerInstance;
+      TokenStreamRewriter *const outerInstance;
 
     public:
-						int lastIndex;
+      size_t lastIndex;
 
-						ReplaceOp(TokenStreamRewriter *outerInstance, int from, int to, const std::wstring& text);
-						virtual int execute(std::wstring *buf) override;
-						virtual std::wstring toString() override;
+      ReplaceOp(TokenStreamRewriter *outerInstance, size_t from, size_t to, const std::wstring& text);
+      virtual size_t execute(std::wstring *buf) override;
+      virtual std::wstring toString() override;
 
     private:
-						void InitializeInstanceFields();
+      void InitializeInstanceFields();
     };
 
   public:
@@ -204,46 +204,29 @@ namespace runtime {
     /// <summary>
     /// Reset the program so that no instructions exist </summary>
     virtual void deleteProgram(const std::wstring &programName);
-
     virtual void insertAfter(Token *t, const std::wstring& text);
-
-    virtual void insertAfter(int index, const std::wstring& text);
-
+    virtual void insertAfter(size_t index, const std::wstring& text);
     virtual void insertAfter(const std::wstring &programName, Token *t, const std::wstring& text);
-
-    virtual void insertAfter(const std::wstring &programName, int index, const std::wstring& text);
+    virtual void insertAfter(const std::wstring &programName, size_t index, const std::wstring& text);
 
     virtual void insertBefore(Token *t, const std::wstring& text);
-
-    virtual void insertBefore(int index, const std::wstring& text);
-
+    virtual void insertBefore(size_t index, const std::wstring& text);
     virtual void insertBefore(const std::wstring &programName, Token *t, const std::wstring& text);
+    virtual void insertBefore(const std::wstring &programName, size_t index, const std::wstring& text);
 
-    virtual void insertBefore(const std::wstring &programName, int index, const std::wstring& text);
-
-    virtual void replace(int index, const std::wstring& text);
-
-    virtual void replace(int from, int to, const std::wstring& text);
-
+    virtual void replace(size_t index, const std::wstring& text);
+    virtual void replace(size_t from, size_t to, const std::wstring& text);
     virtual void replace(Token *indexT, const std::wstring& text);
-
     virtual void replace(Token *from, Token *to, const std::wstring& text);
-
-    virtual void replace(const std::wstring &programName, int from, int to, const std::wstring& text);
-
+    virtual void replace(const std::wstring &programName, size_t from, size_t to, const std::wstring& text);
     virtual void replace(const std::wstring &programName, Token *from, Token *to, const std::wstring& text);
 
-    virtual void delete_Renamed(int index);
-
-    virtual void delete_Renamed(int from, int to);
-
-    virtual void delete_Renamed(Token *indexT);
-
-    virtual void delete_Renamed(Token *from, Token *to);
-
-    virtual void delete_Renamed(const std::wstring &programName, int from, int to);
-
-    virtual void delete_Renamed(const std::wstring &programName, Token *from, Token *to);
+    virtual void Delete(size_t index);
+    virtual void Delete(size_t from, size_t to);
+    virtual void Delete(Token *indexT);
+    virtual void Delete(Token *from, Token *to);
+    virtual void Delete(const std::wstring &programName, size_t from, size_t to);
+    virtual void Delete(const std::wstring &programName, Token *from, Token *to);
 
     virtual int getLastRewriteTokenIndex();
 
@@ -274,49 +257,49 @@ namespace runtime {
     ///  insertBefore on the first token, you would get that insertion.
     ///  The same is true if you do an insertAfter the stop token.
     /// </summary>
-    virtual std::wstring getText(misc::Interval *interval);
+    virtual std::wstring getText(const misc::Interval &interval);
 
-    virtual std::wstring getText(const std::wstring &programName, misc::Interval *interval);
+    virtual std::wstring getText(const std::wstring &programName, const misc::Interval &interval);
 
     /// <summary>
     /// We need to combine operations and report invalid operations (like
     ///  overlapping replaces that are not completed nested).  Inserts to
     ///  same index need to be combined etc...   Here are the cases:
     ///
-    ///  I.i.u I.j.v								leave alone, nonoverlapping
-    ///  I.i.u I.i.v								combine: Iivu
+    ///  I.i.u I.j.v                                leave alone, nonoverlapping
+    ///  I.i.u I.i.v                                combine: Iivu
     ///
-    ///  R.i-j.u R.x-y.v	| i-j in x-y			delete first R
-    ///  R.i-j.u R.i-j.v							delete first R
-    ///  R.i-j.u R.x-y.v	| x-y in i-j			ERROR
-    ///  R.i-j.u R.x-y.v	| boundaries overlap	ERROR
+    ///  R.i-j.u R.x-y.v    | i-j in x-y            delete first R
+    ///  R.i-j.u R.i-j.v                            delete first R
+    ///  R.i-j.u R.x-y.v    | x-y in i-j            ERROR
+    ///  R.i-j.u R.x-y.v    | boundaries overlap    ERROR
     ///
     ///  Delete special case of replace (text==null):
-    ///  D.i-j.u D.x-y.v	| boundaries overlap	combine to max(min)..max(right)
+    ///  D.i-j.u D.x-y.v    | boundaries overlap    combine to max(min)..max(right)
     ///
-    ///  I.i.u R.x-y.v | i in (x+1)-y			delete I (since insert before
-    ///											we're not deleting i)
-    ///  I.i.u R.x-y.v | i not in (x+1)-y		leave alone, nonoverlapping
-    ///  R.x-y.v I.i.u | i in x-y				ERROR
-    ///  R.x-y.v I.x.u 							R.x-y.uv (combine, delete I)
-    ///  R.x-y.v I.i.u | i not in x-y			leave alone, nonoverlapping
+    ///  I.i.u R.x-y.v | i in (x+1)-y           delete I (since insert before
+    ///                                         we're not deleting i)
+    ///  I.i.u R.x-y.v | i not in (x+1)-y       leave alone, nonoverlapping
+    ///  R.x-y.v I.i.u | i in x-y               ERROR
+    ///  R.x-y.v I.x.u                          R.x-y.uv (combine, delete I)
+    ///  R.x-y.v I.i.u | i not in x-y           leave alone, nonoverlapping
     ///
     ///  I.i.u = insert u before op @ index i
     ///  R.x-y.u = replace x-y indexed tokens with u
     ///
     ///  First we need to examine replaces.  For any replace op:
     ///
-    /// 		1. wipe out any insertions before op within that range.
-    ///		2. Drop any replace op before that is contained completely within
+    ///         1. wipe out any insertions before op within that range.
+    ///     2. Drop any replace op before that is contained completely within
     ///         that range.
-    ///		3. Throw exception upon boundary overlap with any previous replace.
+    ///     3. Throw exception upon boundary overlap with any previous replace.
     ///
     ///  Then we can deal with inserts:
     ///
-    /// 		1. for any inserts to same index, combine even if not adjacent.
-    /// 		2. for any prior replace with same left boundary, combine this
+    ///         1. for any inserts to same index, combine even if not adjacent.
+    ///         2. for any prior replace with same left boundary, combine this
     ///         insert with replace and delete this replace.
-    /// 		3. throw exception if index in same range as previous replace
+    ///         3. throw exception if index in same range as previous replace
     ///
     ///  Don't actually delete; make op null in list. Easier to walk list.
     ///  Later we can throw as we add to index -> op map.
@@ -336,9 +319,9 @@ namespace runtime {
     /// <summary>
     /// Get all operations before an index of a particular kind </summary>
     template <typename T, typename T1>
-    std::vector<T*> getKindOfOps(std::vector<T1*> rewrites, T *kind, int before) {
+    std::vector<T*> getKindOfOps(std::vector<T1*> rewrites, T *kind, size_t before) {
       std::vector<T*> ops = std::vector<T*>();
-      for (int i = 0; i < before && i < (int)rewrites.size(); i++) {
+      for (size_t i = 0; i < before && i < rewrites.size(); i++) {
         TokenStreamRewriter::RewriteOperation *op = dynamic_cast<RewriteOperation*>(rewrites[i]);
         if (op == nullptr) { // ignore deleted
           continue;

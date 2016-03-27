@@ -110,14 +110,14 @@ namespace atn {
 
     virtual std::vector<SemanticContext*> getPredicates();
 
-    virtual ATNConfig *get(int i);
+    virtual ATNConfig *get(size_t i) const;
 
     virtual void optimizeConfigs(ATNSimulator *interpreter);
 
     bool addAll(ATNConfigSet *other);
 
     virtual bool equals(ATNConfigSet *other);
-    virtual int hashCode();
+    virtual size_t hashCode();
     virtual size_t size();
     virtual bool isEmpty();
     virtual bool contains(ATNConfig *o);
@@ -136,7 +136,7 @@ namespace atn {
     bool _readonly;
 
   private:
-    int _cachedHashCode;
+    size_t _cachedHashCode;
 
     void InitializeInstanceFields();
   };

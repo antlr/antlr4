@@ -37,22 +37,22 @@
 using namespace org::antlr::v4::runtime;
 using namespace org::antlr::v4::runtime::atn;
 
-SetTransition::SetTransition(ATNState *target, misc::IntervalSet *aSet) :
-Transition(target), set(aSet==nullptr?misc::IntervalSet::of(Token::INVALID_TYPE):aSet) {
+SetTransition::SetTransition(ATNState *target, const misc::IntervalSet &aSet)
+  : Transition(target), set(aSet.isEmpty() ? misc::IntervalSet::of(Token::INVALID_TYPE) : aSet) {
 }
 
-int SetTransition::getSerializationType() {
+int SetTransition::getSerializationType() const {
   return SET;
 }
 
-misc::IntervalSet *SetTransition::label() {
+misc::IntervalSet SetTransition::label() const {
   return set;
 }
 
-bool SetTransition::matches(int symbol, int minVocabSymbol, int maxVocabSymbol) {
-  return set->contains(symbol);
+bool SetTransition::matches(int symbol, int minVocabSymbol, int maxVocabSymbol) const {
+  return set.contains(symbol);
 }
 
-std::wstring SetTransition::toString() {
-  return set->toString();
+std::wstring SetTransition::toString() const {
+  return set.toString();
 }

@@ -87,14 +87,14 @@ namespace runtime {
 
     // satisfy the ParseTree / SyntaxTree interface
 
-    virtual misc::Interval *getSourceInterval() override;
+    virtual misc::Interval getSourceInterval() override;
 
     virtual RuleContext *getRuleContext() override;
     virtual RuleContext *getParent() override;
     virtual void *getPayload() override;
     virtual std::wstring getText() override;
 
-    virtual int getRuleIndex();
+    virtual ssize_t getRuleIndex() const;
 
     virtual ParseTree *getChild(std::size_t i) override;
 

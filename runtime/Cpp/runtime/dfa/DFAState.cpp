@@ -66,7 +66,7 @@ std::set<int> *DFAState::getAltSet() {
   std::set<int> *alts = new std::set<int>();
   if (configs != nullptr) {
     for (size_t i = 0; i < configs->size(); i++) {
-      alts->insert(configs->get((int)i)->alt);
+      alts->insert(configs->get(i)->alt);
     }
   }
   if (alts->size() == 0) {
@@ -75,8 +75,8 @@ std::set<int> *DFAState::getAltSet() {
   return alts;
 }
 
-int DFAState::hashCode() {
-  int hash = misc::MurmurHash::initialize(7);
+size_t DFAState::hashCode() {
+  size_t hash = misc::MurmurHash::initialize(7);
   hash = misc::MurmurHash::update(hash, configs->hashCode());
   hash = misc::MurmurHash::finish(hash, 1);
   return hash;

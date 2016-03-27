@@ -139,15 +139,14 @@ namespace runtime {
 
     template<typename T>
     T* getChild(size_t i) {
-      if (_children.empty() || i >= _children.size()) {
+      if (_children.empty()) {
         return nullptr;
       }
 
-      int j = -1; // what element have we found with ctxType?
+      size_t j = 0; // what element have we found with ctxType?
       for (auto &child : _children) {
         if (dynamic_cast<T *>(child) != nullptr) {
-          j++;
-          if (j == i) {
+          if (j++ == i) {
             return dynamic_cast<T *>(child);
           }
         }
@@ -160,7 +159,7 @@ namespace runtime {
     virtual std::vector<tree::TerminalNode *> getTokens(int ttype);
 
     template<typename T>
-    T* getRuleContext(int i) {
+    T* getRuleContext(size_t i) {
       return getChild<T>(i);
     }
 
@@ -189,7 +188,7 @@ namespace runtime {
     }
 
     virtual std::size_t getChildCount() override;
-    virtual misc::Interval *getSourceInterval() override;
+    virtual misc::Interval getSourceInterval() override;
 
     virtual Token *getStart();
     virtual Token *getStop();

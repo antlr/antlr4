@@ -318,7 +318,7 @@ namespace atn {
     ///    conflict + preds
     /// </summary>
   protected:
-    virtual int execATN(dfa::DFA *dfa, dfa::DFAState *s0, TokenStream *input, int startIndex, ParserRuleContext *outerContext);
+    virtual int execATN(dfa::DFA *dfa, dfa::DFAState *s0, TokenStream *input, size_t startIndex, ParserRuleContext *outerContext);
 
     /// <summary>
     /// Get an existing target state for an edge in the DFA. If the target state
@@ -330,7 +330,7 @@ namespace atn {
     /// <returns> The existing target DFA state for the given input symbol
     /// {@code t}, or {@code null} if the target state for this edge is not
     /// already cached </returns>
-    virtual dfa::DFAState *getExistingTargetState(dfa::DFAState *previousD, int t);
+    virtual dfa::DFAState *getExistingTargetState(dfa::DFAState *previousD, size_t t);
 
     /// <summary>
     /// Compute a target state for an edge in the DFA, and attempt to add the
@@ -343,14 +343,14 @@ namespace atn {
     /// <returns> The computed target DFA state for the given input symbol
     /// {@code t}. If {@code t} does not lead to a valid DFA state, this method
     /// returns <seealso cref="#ERROR"/>. </returns>
-    virtual dfa::DFAState *computeTargetState(dfa::DFA *dfa, dfa::DFAState *previousD, int t);
+    virtual dfa::DFAState *computeTargetState(dfa::DFA *dfa, dfa::DFAState *previousD, size_t t);
 
     virtual void predicateDFAState(dfa::DFAState *dfaState, DecisionState *decisionState);
 
     // comes back with reach.uniqueAlt set to a valid alt
-    virtual int execATNWithFullContext(dfa::DFA *dfa, dfa::DFAState *D, ATNConfigSet *s0, TokenStream *input, int startIndex, ParserRuleContext *outerContext); // how far we got before failing over
+    virtual int execATNWithFullContext(dfa::DFA *dfa, dfa::DFAState *D, ATNConfigSet *s0, TokenStream *input, size_t startIndex, ParserRuleContext *outerContext); // how far we got before failing over
 
-    virtual ATNConfigSet *computeReachSet(ATNConfigSet *closure, int t, bool fullCtx);
+    virtual ATNConfigSet *computeReachSet(ATNConfigSet *closure, size_t t, bool fullCtx);
 
     /// <summary>
     /// Return a configuration set containing only the configurations from
@@ -377,7 +377,7 @@ namespace atn {
 
     virtual ATNState *getReachableTarget(Transition *trans, int ttype);
 
-    virtual std::vector<SemanticContext*> getPredsForAmbigAlts(antlrcpp::BitSet *ambigAlts, ATNConfigSet *configs, int nalts);
+    virtual std::vector<SemanticContext*> getPredsForAmbigAlts(antlrcpp::BitSet *ambigAlts, ATNConfigSet *configs, size_t nalts);
 
     virtual std::vector<dfa::DFAState::PredPrediction*> getPredicatePredictions(antlrcpp::BitSet *ambigAlts, std::vector<SemanticContext*> altToPred);
 
@@ -409,7 +409,7 @@ namespace atn {
     virtual void closure_(ATNConfig *config, ATNConfigSet *configs, std::set<ATNConfig*> *closureBusy, bool collectPredicates, bool fullCtx, int depth);
 
   public:
-    virtual std::wstring getRuleName(int index);
+    virtual std::wstring getRuleName(size_t index);
 
   protected:
     virtual ATNConfig *getEpsilonTarget(ATNConfig *config, Transition *t, bool collectPredicates, bool inContext, bool fullCtx);
@@ -466,7 +466,7 @@ namespace atn {
     virtual antlrcpp::BitSet getConflictingAltsOrUniqueAlt(ATNConfigSet *configs);
 
   public:
-    virtual std::wstring getTokenName(int t);
+    virtual std::wstring getTokenName(size_t t);
 
     virtual std::wstring getLookaheadName(TokenStream *input);
 
@@ -478,7 +478,7 @@ namespace atn {
     virtual void dumpDeadEndConfigs(NoViableAltException *nvae);
 
   protected:
-    virtual NoViableAltException *noViableAlt(TokenStream *input, ParserRuleContext *outerContext, ATNConfigSet *configs, int startIndex);
+    virtual NoViableAltException *noViableAlt(TokenStream *input, ParserRuleContext *outerContext, ATNConfigSet *configs, size_t startIndex);
 
     static int getUniqueAlt(ATNConfigSet *configs);
 
@@ -501,7 +501,7 @@ namespace atn {
     /// <returns> If {@code to} is {@code null}, this method returns {@code null};
     /// otherwise this method returns the result of calling <seealso cref="#addDFAState"/>
     /// on {@code to} </returns>
-    virtual dfa::DFAState *addDFAEdge(dfa::DFA *dfa, dfa::DFAState *from, int t, dfa::DFAState *to);
+    virtual dfa::DFAState *addDFAEdge(dfa::DFA *dfa, dfa::DFAState *from, size_t t, dfa::DFAState *to);
 
     /// <summary>
     /// Add state {@code D} to the DFA if it is not already present, and return
@@ -519,13 +519,14 @@ namespace atn {
     /// state was not already present. </returns>
     virtual dfa::DFAState *addDFAState(dfa::DFA *dfa, dfa::DFAState *D);
 
-    virtual void reportAttemptingFullContext(dfa::DFA *dfa, antlrcpp::BitSet *conflictingAlts, ATNConfigSet *configs, int startIndex, int stopIndex);
+    virtual void reportAttemptingFullContext(dfa::DFA *dfa, antlrcpp::BitSet *conflictingAlts, ATNConfigSet *configs,
+                                             size_t startIndex, size_t stopIndex);
 
-    virtual void reportContextSensitivity(dfa::DFA *dfa, int prediction, ATNConfigSet *configs, int startIndex, int stopIndex);
+    virtual void reportContextSensitivity(dfa::DFA *dfa, int prediction, ATNConfigSet *configs, size_t startIndex, size_t stopIndex);
 
     /// <summary>
     /// If context sensitive parsing, we know it's ambiguity not conflict </summary>
-    virtual void reportAmbiguity(dfa::DFA *dfa, dfa::DFAState *D, int startIndex, int stopIndex, bool exact, antlrcpp::BitSet *ambigAlts, ATNConfigSet *configs);
+    virtual void reportAmbiguity(dfa::DFA *dfa, dfa::DFAState *D, size_t startIndex, size_t stopIndex, bool exact, antlrcpp::BitSet *ambigAlts, ATNConfigSet *configs);
 
   public:
     void setPredictionMode(PredictionMode mode);

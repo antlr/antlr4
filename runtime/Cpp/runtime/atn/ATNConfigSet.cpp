@@ -38,9 +38,9 @@
 using namespace org::antlr::v4::runtime::atn;
 
 size_t SimpleATNConfigHasher::operator()(const ATNConfig &k) const {
-  int hashCode = 7;
-  hashCode = 31 * hashCode + k.state->stateNumber;
-  hashCode = 31 * hashCode + k.alt;
+  size_t hashCode = 7;
+  hashCode = 31 * hashCode + (size_t)k.state->stateNumber;
+  hashCode = 31 * hashCode + (size_t)k.alt;
   hashCode = 31 * hashCode + k.semanticContext->hashCode();
   return hashCode;
 }
@@ -90,7 +90,7 @@ bool ATNConfigSet::add(ATNConfig *config, misc::DoubleKeyMap<PredictionContext*,
   
   ATNConfig *existing = configLookup->getOrAdd(config);
   if (existing == config) { // we added this new one
-    _cachedHashCode = -1;
+    _cachedHashCode = 0;
     configs.push_back(config); // track order here
 
     return true;
@@ -135,7 +135,7 @@ std::vector<SemanticContext*> ATNConfigSet::getPredicates() {
   return preds;
 }
 
-ATNConfig* ATNConfigSet::get(int i) {
+ATNConfig* ATNConfigSet::get(size_t i) const {
   return configs[i];
 }
 
@@ -180,16 +180,16 @@ bool ATNConfigSet::equals(ATNConfigSet *other) {
   return same;
 }
 
-int ATNConfigSet::hashCode() {
+size_t ATNConfigSet::hashCode() {
   if (isReadonly()) {
-    if (_cachedHashCode == -1) {
-      _cachedHashCode = (int)std::hash<std::vector<ATNConfig *>>()(configs);
+    if (_cachedHashCode == 0) {
+      _cachedHashCode = std::hash<std::vector<ATNConfig *>>()(configs);
     }
 
     return _cachedHashCode;
   }
 
-  return (int)std::hash<std::vector<ATNConfig *>>()(configs);
+  return std::hash<std::vector<ATNConfig *>>()(configs);
 }
 
 size_t ATNConfigSet::size() {
@@ -213,7 +213,7 @@ void ATNConfigSet::clear() {
     throw new IllegalStateException(L"This set is readonly");
   }
   configs.clear();
-  _cachedHashCode = -1;
+  _cachedHashCode = 0;
   configLookup->clear();
 }
 
@@ -229,7 +229,7 @@ void ATNConfigSet::setReadonly(bool readonly) {
 
 std::wstring ATNConfigSet::toString() {
   antlrcpp::StringBuilder *buf = new antlrcpp::StringBuilder();
-  for (int i = 0; i < (int)elements().size(); i++) {
+  for (size_t i = 0; i < elements().size(); i++) {
     buf->append(elements().at(i)->toString());
   }
 
@@ -259,5 +259,5 @@ void ATNConfigSet::InitializeInstanceFields() {
   dipsIntoOuterContext = false;
 
   _readonly = false;
-  _cachedHashCode = -1;
+  _cachedHashCode = 0;
 }

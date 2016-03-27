@@ -37,10 +37,10 @@
 
 using namespace org::antlr::v4::runtime;
 
-LexerNoViableAltException::LexerNoViableAltException(Lexer *lexer, CharStream *input, int startIndex, atn::ATNConfigSet *deadEndConfigs) : RecognitionException()/*TODO RecognitionException(lexer, input, nullptr)*/, startIndex(startIndex), deadEndConfigs(deadEndConfigs) {
+LexerNoViableAltException::LexerNoViableAltException(Lexer *lexer, CharStream *input, size_t startIndex, atn::ATNConfigSet *deadEndConfigs) : RecognitionException()/*TODO RecognitionException(lexer, input, nullptr)*/, startIndex(startIndex), deadEndConfigs(deadEndConfigs) {
 }
 
-int LexerNoViableAltException::getStartIndex() {
+size_t LexerNoViableAltException::getStartIndex() {
   return startIndex;
 }
 
@@ -54,8 +54,8 @@ CharStream *LexerNoViableAltException::getInputStream() {
 
 std::wstring LexerNoViableAltException::toString() {
   std::wstring symbol = L"";
-  if (startIndex >= 0 && startIndex < (int)getInputStream()->size()) {
-    symbol = getInputStream()->getText(misc::Interval::of(startIndex,startIndex));
+  if (startIndex < getInputStream()->size()) {
+    symbol = getInputStream()->getText(misc::Interval::of((int)startIndex, (int)startIndex));
     symbol = antlrcpp::escapeWhitespace(symbol, false);
   }
   std::wstring format = L"LexerNoViableAltException('" + symbol + L"')";

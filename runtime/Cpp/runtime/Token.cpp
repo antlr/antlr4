@@ -33,9 +33,9 @@
 
 using namespace org::antlr::v4::runtime;
 
-const int Token::INVALID_TYPE;
-const int Token::EPSILON;
-const int Token::MIN_USER_TOKEN_TYPE;
-const int Token::_EOF;
-const int Token::DEFAULT_CHANNEL;
-const int Token::HIDDEN_CHANNEL;
+const size_t Token::INVALID_TYPE;
+const ssize_t Token::EPSILON;
+const size_t Token::MIN_USER_TOKEN_TYPE;
+const size_t Token::_EOF;
+const size_t Token::DEFAULT_CHANNEL;
+const size_t Token::HIDDEN_CHANNEL;

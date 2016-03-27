@@ -58,18 +58,21 @@ namespace runtime {
 
     }
 
-    void syntaxError(IRecognizer *recognizer, void *offendingSymbol, int line, int charPositionInLine, const std::wstring &msg, RecognitionException *e) {
-
+    void syntaxError(IRecognizer *recognizer, void *offendingSymbol, size_t line, int charPositionInLine,
+                     const std::wstring &msg, RecognitionException *e) {
       for (auto listener : *delegates) {
         listener->syntaxError(recognizer, offendingSymbol, line, charPositionInLine, msg, e);
       }
     }
 
-    virtual void reportAmbiguity(Parser *recognizer, dfa::DFA *dfa, int startIndex, int stopIndex, bool exact, antlrcpp::BitSet *ambigAlts, atn::ATNConfigSet *configs) override;
+    virtual void reportAmbiguity(Parser *recognizer, dfa::DFA *dfa, size_t startIndex, size_t stopIndex, bool exact,
+                                 antlrcpp::BitSet *ambigAlts, atn::ATNConfigSet *configs) override;
 
-    virtual void reportAttemptingFullContext(Parser *recognizer, dfa::DFA *dfa, int startIndex, int stopIndex, antlrcpp::BitSet *conflictingAlts, atn::ATNConfigSet *configs) override;
+    virtual void reportAttemptingFullContext(Parser *recognizer, dfa::DFA *dfa, size_t startIndex, size_t stopIndex,
+                                             antlrcpp::BitSet *conflictingAlts, atn::ATNConfigSet *configs) override;
 
-    virtual void reportContextSensitivity(Parser *recognizer, dfa::DFA *dfa, int startIndex, int stopIndex, int prediction, atn::ATNConfigSet *configs) override;
+    virtual void reportContextSensitivity(Parser *recognizer, dfa::DFA *dfa, size_t startIndex, size_t stopIndex,
+                                          int prediction, atn::ATNConfigSet *configs) override;
   };
 
 } // namespace runtime

@@ -48,7 +48,7 @@ namespace antlrcpp {
     }
 
     int nextSetBit(const int & pos) {
-      for (size_t i = pos; i < data.size(); i++){
+      for (size_t i = (size_t)pos; i < data.size(); i++){
         if (data.test(i)) return (int)i;
       }
 

@@ -61,7 +61,7 @@ namespace atn {
     /// </summary>
     /// <param name="s"> the ATN state </param>
     /// <returns> the expected symbols for each outgoing transition of {@code s}. </returns>
-    virtual std::vector<misc::IntervalSet*> getDecisionLookahead(ATNState *s);
+    virtual std::vector<misc::IntervalSet> getDecisionLookahead(ATNState *s) const;
 
     /// <summary>
     /// Compute set of tokens that can follow {@code s} in the ATN in the
@@ -78,7 +78,7 @@ namespace atn {
     /// </param>
     /// <returns> The set of tokens that can follow {@code s} in the ATN in the
     /// specified {@code ctx}. </returns>
-    virtual misc::IntervalSet *LOOK(ATNState *s, RuleContext *ctx);
+    virtual misc::IntervalSet LOOK(ATNState *s, RuleContext *ctx) const;
 
     /// <summary>
     /// Compute set of tokens that can follow {@code s} in the ATN in the
@@ -97,7 +97,7 @@ namespace atn {
     /// </param>
     /// <returns> The set of tokens that can follow {@code s} in the ATN in the
     /// specified {@code ctx}. </returns>
-    virtual misc::IntervalSet *LOOK(ATNState *s, ATNState *stopState, RuleContext *ctx);
+    virtual misc::IntervalSet LOOK(ATNState *s, ATNState *stopState, RuleContext *ctx) const;
 
     /// <summary>
     /// Compute set of tokens that can follow {@code s} in the ATN in the
@@ -129,7 +129,8 @@ namespace atn {
     /// outermost context is reached. This parameter has no effect if {@code ctx}
     /// is {@code null}. </param>
   protected:
-    virtual void _LOOK(ATNState *s, ATNState *stopState, PredictionContext *ctx, misc::IntervalSet *look, std::set<ATNConfig*> *lookBusy, antlrcpp::BitSet *calledRuleStack, bool seeThruPreds, bool addEOF);
+    virtual void _LOOK(ATNState *s, ATNState *stopState, PredictionContext *ctx, misc::IntervalSet &look,
+                       std::set<ATNConfig*> &lookBusy, antlrcpp::BitSet *calledRuleStack, bool seeThruPreds, bool addEOF) const;
   };
 
 } // namespace atn

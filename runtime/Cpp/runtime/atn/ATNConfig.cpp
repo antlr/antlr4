@@ -74,11 +74,11 @@ ATNConfig::ATNConfig(ATNConfig *c, ATNState *state, PredictionContext *context, 
 }
 
 size_t ATNConfig::hashCode() const {
-  int hashCode = misc::MurmurHash::initialize(7);
-  hashCode = misc::MurmurHash::update(hashCode, state->stateNumber);
-  hashCode = misc::MurmurHash::update(hashCode, alt);
-  hashCode = misc::MurmurHash::update(hashCode, context);
-  hashCode = misc::MurmurHash::update(hashCode, semanticContext);
+  size_t hashCode = misc::MurmurHash::initialize(7);
+  hashCode = misc::MurmurHash::update(hashCode, (size_t)state->stateNumber);
+  hashCode = misc::MurmurHash::update(hashCode, (size_t)alt);
+  hashCode = misc::MurmurHash::update(hashCode, (size_t)context);
+  hashCode = misc::MurmurHash::update(hashCode, (size_t)semanticContext);
   hashCode = misc::MurmurHash::finish(hashCode, 4);
   return hashCode;
 }
@@ -86,7 +86,7 @@ size_t ATNConfig::hashCode() const {
 bool ATNConfig::operator == (const ATNConfig& other) const
 {
   return this->state->stateNumber == other.state->stateNumber && this->alt == other.alt &&
-    (this->context == other.context || (this->context != nullptr && this->context->equals(other.context))) &&
+    (this->context == other.context || (this->context != nullptr && this->context == other.context)) &&
     this->semanticContext->equals(other.semanticContext);
 }
 

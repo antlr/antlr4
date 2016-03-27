@@ -247,7 +247,7 @@ std::vector<Token*> ParseTreePatternMatcher::tokenize(const std::wstring &patter
         if (ruleIndex == -1) {
           throw IllegalArgumentException(std::wstring(L"Unknown rule ") + tagChunk->getTag() + std::wstring(L" in pattern: ") + pattern);
         }
-        int ruleImaginaryTokenType = parser->getATNWithBypassAlts().ruleToTokenType[ruleIndex];
+        int ruleImaginaryTokenType = parser->getATNWithBypassAlts().ruleToTokenType[(size_t)ruleIndex];
         tokens.push_back(new RuleTagToken(tagChunk->getTag(), ruleImaginaryTokenType, tagChunk->getLabel()));
       } else {
         throw IllegalArgumentException(std::wstring(L"invalid tag: ") + tagChunk->getTag() + std::wstring(L" in pattern: ") + pattern);
@@ -272,19 +272,20 @@ std::vector<Chunk*> ParseTreePatternMatcher::split(const std::wstring &pattern) 
   size_t p = 0;
   size_t n = pattern.length();
   std::vector<Chunk*> chunks = std::vector<Chunk*>();
+  
   // find all start and stop indexes first, then collect
-  std::vector<int> starts = std::vector<int>();
-  std::vector<int> stops = std::vector<int>();
+  std::vector<size_t> starts;
+  std::vector<size_t> stops;
   while (p < n) {
     if (p == pattern.find(escape + start,p)) {
       p += escape.length() + start.length();
     } else if (p == pattern.find(escape + stop,p)) {
       p += escape.length() + stop.length();
     } else if (p == pattern.find(start,p)) {
-      starts.push_back((int)p);
+      starts.push_back(p);
       p += start.length();
     } else if (p == pattern.find(stop,p)) {
-      stops.push_back((int)p);
+      stops.push_back(p);
       p += stop.length();
     } else {
       p++;

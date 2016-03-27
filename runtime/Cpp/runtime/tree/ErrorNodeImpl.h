@@ -33,6 +33,7 @@
 
 #include "ErrorNode.h"
 #include "TerminalNodeImpl.h"
+#include "Interval.h"
 
 namespace org {
 namespace antlr {
@@ -77,7 +78,7 @@ namespace tree {
 
     // From SyntaxTree
   public:
-    virtual misc::Interval *getSourceInterval() override;
+    virtual misc::Interval getSourceInterval() override;
 
     // From Tree
   public:

@@ -33,44 +33,45 @@
 
 using namespace org::antlr::v4::runtime::misc;
 
-int MurmurHash::initialize() {
+MurmurHash::MurmurHash() {
+}
+
+size_t MurmurHash::initialize() {
   return initialize(DEFAULT_SEED);
 }
 
-int MurmurHash::initialize(int seed) {
+size_t MurmurHash::initialize(size_t seed) {
   return seed;
 }
 
-int MurmurHash::update(int hash, int value) {
-  const int c1 = 0xCC9E2D51;
-  const int c2 = 0x1B873593;
-  const int r1 = 15;
-  const int r2 = 13;
-  const int m = 5;
-  const int n = 0xE6546B64;
+size_t MurmurHash::update(size_t hash, size_t seed) {
+  static const size_t c1 = 0xCC9E2D51;
+  static const size_t c2 = 0x1B873593;
+  static const size_t r1 = 15;
+  static const size_t r2 = 13;
+  static const size_t m = 5;
+  static const size_t n = 0xE6546B64;
 
-  int k = value;
+  size_t k = seed;
   k = k * c1;
-  k = (k << r1) | (static_cast<int>(static_cast<unsigned int>(k) >> (32 - r1)));
+  k = (k << r1) | k >> (32 - r1);
   k = k * c2;
 
   hash = hash ^ k;
-  hash = (hash << r2) | (static_cast<int>(static_cast<unsigned int>(hash) >> (32 - r2)));
+  hash = (hash << r2) | hash >> (32 - r2);
   hash = hash * m + n;
 
   return hash;
 }
 
 
-int MurmurHash::finish(int hash, int numberOfWords) {
+size_t MurmurHash::finish(size_t hash, size_t numberOfWords) {
   hash = hash ^ (numberOfWords * 4);
-  hash = hash ^ (static_cast<int>(static_cast<unsigned int>(hash) >> 16));
+  hash = hash ^ hash >> 16;
   hash = hash * 0x85EBCA6B;
-  hash = hash ^ (static_cast<int>(static_cast<unsigned int>(hash) >> 13));
+  hash = hash ^ hash >> 13;
   hash = hash * 0xC2B2AE35;
-  hash = hash ^ (static_cast<int>(static_cast<unsigned int>(hash) >> 16));
+  hash = hash ^ hash >> 16;
   return hash;
 }
 
-MurmurHash::MurmurHash() {
-}

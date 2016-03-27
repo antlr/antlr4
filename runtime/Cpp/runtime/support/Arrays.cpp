@@ -33,56 +33,19 @@
 
 using namespace antlrcpp;
 
-std::wstring antlrcpp::Arrays::ListToString(std::vector<std::wstring> list,std::wstring separator)
+std::wstring Arrays::listToString(const std::vector<std::wstring> &list, const std::wstring &separator)
 {
-  StringBuilder *sb = new StringBuilder();
-  for (size_t i = 0; i < list.size(); i++)//(std::wstring s in list)
-  {
-    sb->append(list[i]);
-    if (i + 1 < list.size()) sb->append(separator);
+  StringBuilder sb;
+  bool firstEntry = true;
+  
+  for (auto &entry : list) {
+    sb.append(entry);
+    if (!firstEntry)
+      sb.append(separator);
+    firstEntry = false;
   }
 
-  return sb->toString();
-}
-
-std::vector<char> antlrcpp::Arrays::asList(const std::wstring *items)
-{
-  std::vector<char> returnAnswer(items->begin(), items->end());
-
-  return returnAnswer;
-}
-
-std::vector<std::wstring> antlrcpp::Arrays::asList(int nArgs, ...)
-{
-
-  std::vector<std::wstring> returnAnswer;
-  va_list ap;
-  va_start(ap, nArgs);
-
-  for (int i = 0; i < nArgs; i++) {
-    wchar_t * tmp = va_arg(ap, wchar_t*);
-    returnAnswer.insert(returnAnswer.end(), tmp);
-  }
-
-  return returnAnswer;
-}
-
-bool antlrcpp::Arrays::equals(std::vector<int> a, std::vector<int> b)
-{
-
-  if (a.size() != b.size()) return false;
-
-  for (auto var: a) {
-    if (a[var] != b[var]) return false;
-  }
-
-  return true;
-}
-
-bool antlrcpp::Arrays::equals(void *a, void* b)
-{
-  throw new org::antlr::v4::runtime::TODOException(L"antlrcpp::Arrays::equals");
-  return false;
+  return sb.toString();
 }
 
 std::list<std::wstring> antlrcpp::Arrays::copyOf(void * obj, int num)
@@ -104,21 +67,4 @@ std::wstring antlrcpp::Arrays::copyOf(std::wstring obj, int num)
 void antlrcpp::Arrays::arraycopy(void * arrayA, void * arrayB, int num)
 {
   throw new org::antlr::v4::runtime::TODOException(L"antlrcpp::Arrays::arraycopy");
-}
-
-std::list<std::wstring> antlrcpp::Arrays::StringToStringList(std::wstring items, char separator)
-{
-  /*
-   std::list<std::wstring> *list = new std::list<std::wstring>();
-   std::wstring listItmes[] = items.Split(separator);
-   for (std::wstring item : listItmes)
-   {
-   list.Add(item);
-   }
-   if (list.Count > 0) {
-   return list;
-   } else {
-   return null;
-   }*/
-  throw  new org::antlr::v4::runtime::TODOException(L"antlrcpp::Arrays::StringToStringList");
 }

@@ -40,6 +40,8 @@ namespace runtime {
 
   /// A source of characters for an ANTLR lexer.
   class CharStream : public IntStream {
+  public:
+    virtual ~CharStream() = 0;
 
     /// This method returns the text for a range of characters within this input
     /// stream. This method is guaranteed to not throw an exception if the
@@ -55,10 +57,7 @@ namespace runtime {
     /// past the end of the stream </exception>
     /// <exception cref="UnsupportedOperationException"> if the stream does not support
     /// getting the text of the specified interval </exception>
-  public:
-    virtual std::wstring getText(misc::Interval *interval) = 0;
-
-    virtual ~CharStream() = 0;
+    virtual std::wstring getText(const misc::Interval &interval) = 0;
   };
 
 } // namespace runtime

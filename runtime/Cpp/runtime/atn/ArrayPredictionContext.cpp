@@ -30,62 +30,50 @@
  */
 
 #include "Arrays.h"
+#include "SingletonPredictionContext.h"
 
 #include "ArrayPredictionContext.h"
 
 using namespace org::antlr::v4::runtime::atn;
 
-#ifdef TODO
-//the base class hash code is gettings set to 0 here, what do we want?
-stopffds
-#endif
-ArrayPredictionContext::ArrayPredictionContext(SingletonPredictionContext *a) : PredictionContext(0) {
+ArrayPredictionContext::ArrayPredictionContext(SingletonPredictionContext *a)
+  : ArrayPredictionContext({ a->parent }, { a->returnState }) {
 }
 
-ArrayPredictionContext::ArrayPredictionContext(std::PredictionContext *parents, int returnStates[]) : PredictionContext(calculateHashCode(parents, *returnStates))/*, parents(parents)*/, returnStates(*returnStates) {
-#ifdef TODO
-  //                        assert(parents != nullptr && sizeof(parents) / sizeof(parents[0]) > 0);
-  //                        assert(returnStates != nullptr && sizeof(returnStates) / sizeof(returnStates[0]) > 0);
-  // Setup the parents variable correctly since we're not setting it in the constructor line above
-  // std::vector<PredictionContext*>
-#endif
-  //		System.err.println("CREATE ARRAY: "+Arrays.toString(parents)+", "+Arrays.toString(returnStates));
+ArrayPredictionContext::ArrayPredictionContext(const std::vector<PredictionContext *> &parents, const std::vector<int> &returnStates)
+  : PredictionContext(calculateHashCode(parents, returnStates)), parents(parents), returnStates(returnStates) {
+    assert(parents.size() > 0);
+    assert(returnStates.size() > 0);
 }
-ArrayPredictionContext::ArrayPredictionContext(std::vector<PredictionContext *>parents,
-                                               const std::vector<int> returnStates) : PredictionContext(0) {
-  throw new TODOException(L"ArrayPredictionContext::ArrayPredictionContext");
-}
-bool ArrayPredictionContext::isEmpty() {
-  // since EMPTY_RETURN_STATE can only appear in the last position, we
-  // don't need to verify that size==1
+
+bool ArrayPredictionContext::isEmpty() const {
+  // Since EMPTY_RETURN_STATE can only appear in the last position, we don't need to verify that size == 1.
   return returnStates[0] == EMPTY_RETURN_STATE;
 }
 
-int ArrayPredictionContext::size() {
-  return (int)returnStates.size();
+size_t ArrayPredictionContext::size() const {
+  return returnStates.size();
 }
 
-PredictionContext *ArrayPredictionContext::getParent(int index) {
-  return parents->at(index);
+PredictionContext* ArrayPredictionContext::getParent(size_t index) const {
+  return parents[index];
 }
 
-int ArrayPredictionContext::getReturnState(int index) {
+int ArrayPredictionContext::getReturnState(size_t index) const {
   return returnStates[index];
 }
 
-bool ArrayPredictionContext::equals(void *o) {
+bool ArrayPredictionContext::operator == (PredictionContext *o) const {
   if (this == o) {
     return true;
-  } else if (!((ArrayPredictionContext*)o/*dynamic_cast<ArrayPredictionContext*>(o)*/ != nullptr)) {
-    return false;
   }
 
-  if (this->hashCode() != ((ArrayPredictionContext*)o)->hashCode()) {
+  ArrayPredictionContext *other = dynamic_cast<ArrayPredictionContext*>(o);
+  if (other == nullptr || hashCode() != other->hashCode()) {
     return false; // can't be same if hash is different
   }
 
-  ArrayPredictionContext *a = static_cast<ArrayPredictionContext*>(o);
-  return antlrcpp::Arrays::equals(returnStates, a->returnStates) && antlrcpp::Arrays::equals(&parents, &a->parents);
+  return antlrcpp::Arrays::equals(returnStates, other->returnStates) && antlrcpp::Arrays::equals(parents, other->parents);
 }
 
 std::wstring ArrayPredictionContext::toString() {
@@ -103,9 +91,9 @@ std::wstring ArrayPredictionContext::toString() {
       continue;
     }
     buf->append(std::to_wstring(returnStates.at(i)));
-    if (parents->at(i) != nullptr) {
+    if (parents[i] != nullptr) {
       buf->append(L" ");
-      buf->append(parents->at(i)->toString());
+      buf->append(parents[i]->toString());
     } else {
       buf->append(L"null");
     }

@@ -53,7 +53,7 @@ namespace runtime {
   public:
     virtual ~TokenStream();
 
-    virtual Token *LT(int k) = 0;
+    virtual Token *LT(ssize_t k) = 0;
 
     /// <summary>
     /// Gets the <seealso cref="Token"/> at the specified {@code index} in the stream. When
@@ -72,7 +72,7 @@ namespace runtime {
     /// <exception cref="IllegalArgumentException"> if {code index} is less than 0 </exception>
     /// <exception cref="UnsupportedOperationException"> if the stream does not support
     /// retrieving the token at the specified index </exception>
-    virtual Token *get(int index) = 0;
+    virtual Token *get(size_t index) = 0;
 
     /// <summary>
     /// Gets the underlying <seealso cref="TokenSource"/> which provides tokens for this
@@ -100,7 +100,7 @@ namespace runtime {
     /// stream.
     /// </returns>
     /// <exception cref="NullPointerException"> if {@code interval} is {@code null} </exception>
-    virtual std::wstring getText(misc::Interval *interval) = 0;
+    virtual std::wstring getText(const misc::Interval &interval) = 0;
 
     /// <summary>
     /// Return the text of all tokens in the stream. This method behaves like the

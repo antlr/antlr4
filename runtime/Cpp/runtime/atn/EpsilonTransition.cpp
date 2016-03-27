@@ -36,18 +36,18 @@ using namespace org::antlr::v4::runtime::atn;
 EpsilonTransition::EpsilonTransition(ATNState *target) : Transition(target) {
 }
 
-int EpsilonTransition::getSerializationType() {
+int EpsilonTransition::getSerializationType() const {
   return EPSILON;
 }
 
-bool EpsilonTransition::isEpsilon() {
+bool EpsilonTransition::isEpsilon() const {
   return true;
 }
 
-bool EpsilonTransition::matches(int symbol, int minVocabSymbol, int maxVocabSymbol) {
+bool EpsilonTransition::matches(int symbol, int minVocabSymbol, int maxVocabSymbol) const {
   return false;
 }
 
-std::wstring EpsilonTransition::toString() {
+std::wstring EpsilonTransition::toString() const {
   return L"epsilon";
 }

@@ -33,13 +33,13 @@
 namespace antlrcpp {
 
 std::string ws2s(const std::wstring& wstr) {
-  std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+  static std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
   std::string narrow = converter.to_bytes(wstr);
   return narrow;
 }
 
 std::wstring s2ws(const std::string& str) {
-  std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+  static std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
   std::wstring wide = converter.from_bytes(str);
   return wide;
 }

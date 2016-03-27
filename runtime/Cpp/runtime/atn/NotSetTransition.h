@@ -41,13 +41,13 @@ namespace atn {
 
   class NotSetTransition final : public SetTransition {
   public:
-    NotSetTransition(ATNState *target, misc::IntervalSet *set);
+    NotSetTransition(ATNState *target, const misc::IntervalSet &set);
 
-    virtual int getSerializationType() override;
+    virtual int getSerializationType() const override;
 
-    virtual bool matches(int symbol, int minVocabSymbol, int maxVocabSymbol) override;
+    virtual bool matches(int symbol, int minVocabSymbol, int maxVocabSymbol) const override;
 
-    virtual std::wstring toString() override;
+    virtual std::wstring toString() const override;
   };
 
 } // namespace atn

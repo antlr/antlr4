@@ -32,6 +32,7 @@
 #pragma once
 
 #include "ATN.h"
+#include "IntervalSet.h"
 
 namespace org {
 namespace antlr {
@@ -101,7 +102,8 @@ namespace atn {
     static void checkCondition(bool condition, const std::wstring &message);
 
     /// @deprecated Use <seealso cref="ATNDeserializer#edgeFactory"/> instead.
-    static Transition *edgeFactory(const ATN &atn, int type, int src, int trg, int arg1, int arg2, int arg3, std::vector<misc::IntervalSet*> &sets);
+    static Transition *edgeFactory(const ATN &atn, int type, int src, int trg, int arg1, int arg2, int arg3,
+                                   const std::vector<misc::IntervalSet> &sets);
 
     /// @deprecated Use <seealso cref="ATNDeserializer#stateFactory"/> instead.
     static ATNState *stateFactory(int type, int ruleIndex);

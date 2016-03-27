@@ -36,6 +36,6 @@ using namespace org::antlr::v4::runtime::dfa;
 LexerDFASerializer::LexerDFASerializer(DFA *dfa) : DFASerializer(dfa, lexerTokenNames_) {
 }
 
-std::wstring LexerDFASerializer::getEdgeLabel(int i) {
+std::wstring LexerDFASerializer::getEdgeLabel(size_t i) {
   return std::wstring(L"'") + static_cast<wchar_t>(i) + std::wstring(L"'");
 }

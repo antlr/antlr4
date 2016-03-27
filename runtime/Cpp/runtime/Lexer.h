@@ -179,11 +179,11 @@ namespace runtime {
 
     virtual Token *emitEOF();
 
-    virtual int getLine() override;
+    virtual size_t getLine() const override;
 
     virtual int getCharPositionInLine() override;
 
-    virtual void setLine(int line);
+    virtual void setLine(size_t line);
 
     virtual void setCharPositionInLine(int charPositionInLine);
 

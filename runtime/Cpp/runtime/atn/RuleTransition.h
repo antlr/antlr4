@@ -57,10 +57,10 @@ namespace atn {
 
     RuleTransition(RuleStartState *ruleStart, int ruleIndex, int precedence, ATNState *followState);
 
-    virtual int getSerializationType() override;
+    virtual int getSerializationType() const override;
 
-    virtual bool isEpsilon() override;
-    virtual bool matches(int symbol, int minVocabSymbol, int maxVocabSymbol) override;
+    virtual bool isEpsilon() const override;
+    virtual bool matches(int symbol, int minVocabSymbol, int maxVocabSymbol) const override;
   };
 
 } // namespace atn

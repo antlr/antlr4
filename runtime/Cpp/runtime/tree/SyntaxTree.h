@@ -54,7 +54,7 @@ namespace tree {
     /// If source interval is unknown, this returns <seealso cref="Interval#INVALID"/>.
     /// </summary>
   public:
-    virtual misc::Interval *getSourceInterval() = 0;
+    virtual misc::Interval getSourceInterval() = 0;
   };
 
 } // namespace tree

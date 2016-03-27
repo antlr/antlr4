@@ -39,7 +39,7 @@ using namespace org::antlr::v4::runtime;
 UnbufferedCharStream::UnbufferedCharStream() {
 }
 
-UnbufferedCharStream::UnbufferedCharStream(int bufferSize) {
+UnbufferedCharStream::UnbufferedCharStream(size_t bufferSize) {
   InitializeInstanceFields();
   n = 0;
   data = new wchar_t[bufferSize];
@@ -63,30 +63,31 @@ void UnbufferedCharStream::consume() {
 
   if (p == n - 1 && numMarkers == 0) {
     n = 0;
-    p = -1; // p++ will leave this at 0
+    p = 0;
     lastCharBufferStart = lastChar;
+  } else {
+    p++;
   }
 
-  p++;
   currentCharIndex++;
   sync(1);
 }
 
-void UnbufferedCharStream::sync(int want) {
-  int need = (p + want - 1) - n + 1; // how many more elements we need?
+void UnbufferedCharStream::sync(size_t want) {
+  size_t need = (p + want - 1) - n + 1; // how many more elements we need?
   if (need > 0) {
     fill(need);
   }
 }
 
-int UnbufferedCharStream::fill(int n) {
-  for (int i = 0; i < n; i++) {
+size_t UnbufferedCharStream::fill(size_t n) {
+  for (size_t i = 0; i < n; i++) {
     if (this->n > 0 && data[this->n - 1] == static_cast<wchar_t>(IntStream::_EOF)) {
       return i;
     }
 
     try {
-      int c = nextChar();
+      size_t c = nextChar();
       add(c);
     } catch (IOException ioe) {
       throw std::exception(ioe);
@@ -96,48 +97,48 @@ int UnbufferedCharStream::fill(int n) {
   return n;
 }
 
-int UnbufferedCharStream::nextChar()  {
-  return input->get();
+size_t UnbufferedCharStream::nextChar()  {
+  return (size_t)input->get();
 }
 
-void UnbufferedCharStream::add(int c) {
-  if (n >= (int)data.size()) {
+void UnbufferedCharStream::add(size_t c) {
+  if (n >= data.size()) {
     data.reserve(data.size()*2);
   }
   data[n++] = static_cast<wchar_t>(c);
 }
 
-int UnbufferedCharStream::LA(int i) {
+size_t UnbufferedCharStream::LA(ssize_t i) {
   if (i == -1) { // special case
-    return lastChar;
+    return (size_t)lastChar;
   }
-  sync(i);
-  int index = p + i - 1;
+  sync((size_t)i);
+  ssize_t index = (ssize_t)p + i - 1;
   if (index < 0) {
     throw new IndexOutOfBoundsException();
   }
-  if (index >= n) {
+  if ((size_t)index >= n) {
     return IntStream::_EOF;
   }
-  wchar_t c = data[index];
-  if (c == static_cast<wchar_t>(IntStream::_EOF)) {
+  size_t c = (size_t)data[(size_t)index];
+  if (c == IntStream::_EOF) {
     return IntStream::_EOF;
   }
   return c;
 }
 
-int UnbufferedCharStream::mark() {
+ssize_t UnbufferedCharStream::mark() {
   if (numMarkers == 0) {
     lastCharBufferStart = lastChar;
   }
 
-  int mark = -numMarkers - 1;
+  ssize_t mark = -(ssize_t)numMarkers - 1;
   numMarkers++;
   return mark;
 }
 
-void UnbufferedCharStream::release(int marker) {
-  int expectedMark = -numMarkers;
+void UnbufferedCharStream::release(ssize_t marker) {
+  ssize_t expectedMark = -(ssize_t)numMarkers;
   if (marker != expectedMark) {
     throw IllegalStateException(L"release() called with an invalid marker.");
   }
@@ -151,11 +152,11 @@ void UnbufferedCharStream::release(int marker) {
   }
 }
 
-int UnbufferedCharStream::index() {
+size_t UnbufferedCharStream::index() {
   return currentCharIndex;
 }
 
-void UnbufferedCharStream::seek(int index) {
+void UnbufferedCharStream::seek(size_t index) {
   if (index == currentCharIndex) {
     return;
   }
@@ -166,14 +167,14 @@ void UnbufferedCharStream::seek(int index) {
   }
 
   // index == to bufferStartIndex should set p to 0
-  int i = index - getBufferStartIndex();
+  ssize_t i = (ssize_t)index - (ssize_t)getBufferStartIndex();
   if (i < 0) {
     throw IllegalArgumentException(std::wstring(L"cannot seek to negative index ") + std::to_wstring(index));
-  } else if (i >= n) {
+  } else if (i >= (ssize_t)n) {
     throw UnsupportedOperationException(std::wstring(L"seek to index outside buffer: ") + std::to_wstring(index) + std::wstring(L" not in ") + std::to_wstring(getBufferStartIndex()) + std::wstring(L"..") + std::to_wstring(getBufferStartIndex() + n));
   }
 
-  p = i;
+  p = (size_t)i;
   currentCharIndex = index;
   if (p == 0) {
     lastChar = lastCharBufferStart;
@@ -190,27 +191,27 @@ std::string UnbufferedCharStream::getSourceName() {
   return name;
 }
 
-std::wstring UnbufferedCharStream::getText(misc::Interval *interval) {
-  if (interval->a < 0 || interval->b < interval->a - 1) {
+std::wstring UnbufferedCharStream::getText(const misc::Interval &interval) {
+  if (interval.a < 0 || interval.b < interval.a - 1) {
     throw IllegalArgumentException(std::wstring(L"invalid interval"));
   }
 
-  int bufferStartIndex = getBufferStartIndex();
+  size_t bufferStartIndex = getBufferStartIndex();
   if (n > 0 && data[n - 1] == WCHAR_MAX) {
-    if (interval->a + interval->length() > bufferStartIndex + n) {
+    if ((size_t)(interval.a + interval.length()) > bufferStartIndex + n) {
       throw IllegalArgumentException(std::wstring(L"the interval extends past the end of the stream"));
     }
   }
 
-  if (interval->a < bufferStartIndex || interval->b >= bufferStartIndex + n) {
-    throw UnsupportedOperationException(std::wstring(L"interval ") + interval->toString() + std::wstring(L" outside buffer: ") + std::to_wstring(bufferStartIndex) + std::wstring(L"..") + std::to_wstring(bufferStartIndex + n - 1));
+  if ((size_t)interval.a < bufferStartIndex || (size_t)interval.b >= bufferStartIndex + n) {
+    throw UnsupportedOperationException(std::wstring(L"interval ") + interval.toString() + std::wstring(L" outside buffer: ") + std::to_wstring(bufferStartIndex) + std::wstring(L"..") + std::to_wstring(bufferStartIndex + n - 1));
   }
   // convert from absolute to local index
-  int i = interval->a - bufferStartIndex;
-  return std::wstring(data, i, interval->length());
+  size_t i = (size_t)interval.a - bufferStartIndex;
+  return std::wstring(data, i, (size_t)interval.length());
 }
 
-int UnbufferedCharStream::getBufferStartIndex() {
+size_t UnbufferedCharStream::getBufferStartIndex() {
   return currentCharIndex - p;
 }
 

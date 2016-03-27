@@ -103,7 +103,7 @@ namespace misc {
       LinkedHashSet<T>::clear();
     }
 
-    virtual int hashCode() override {
+    virtual size_t hashCode() override {
       return elements_Renamed.hashCode();
     }
 

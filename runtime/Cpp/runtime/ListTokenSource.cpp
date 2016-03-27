@@ -74,7 +74,8 @@ Token *ListTokenSource::nextToken() {
       }
 
       int stop = std::max(-1, start - 1);
-      eofToken = _factory->create(new std::pair<TokenSource*, CharStream*>(this, getInputStream()), Token::_EOF, L"EOF", Token::DEFAULT_CHANNEL, start, stop, getLine(), getCharPositionInLine());
+      eofToken = _factory->create(new std::pair<TokenSource*, CharStream*>(this, getInputStream()), Token::_EOF,
+                                  L"EOF", Token::DEFAULT_CHANNEL, start, stop, (int)getLine(), getCharPositionInLine());
     }
 
     return eofToken;
@@ -89,11 +90,11 @@ Token *ListTokenSource::nextToken() {
   return t;
 }
 
-int ListTokenSource::getLine() {
+size_t ListTokenSource::getLine() const {
   if (i < tokens.size()) {
-    return tokens[i]->getLine();
+    return (size_t)tokens[i]->getLine();
   } else if (eofToken != nullptr) {
-    return eofToken->getLine();
+    return (size_t)eofToken->getLine();
   } else if (tokens.size() > 0) {
     // have to calculate the result from the line/column of the previous
     // token, along with the text of the token.
@@ -110,7 +111,7 @@ int ListTokenSource::getLine() {
     }
 
     // if no text is available, assume the token did not contain any newline characters.
-    return line;
+    return (size_t)line;
   }
 
   // only reach this if tokens is empty, meaning EOF occurs at the first

@@ -64,7 +64,7 @@ bool RuleContext::isEmpty() {
   return invokingState == -1;
 }
 
-misc::Interval *RuleContext::getSourceInterval() {
+misc::Interval RuleContext::getSourceInterval() {
   return misc::Interval::INVALID;
 }
 
@@ -96,14 +96,14 @@ std::wstring RuleContext::getText() {
   }
 
   antlrcpp::StringBuilder *builder = new antlrcpp::StringBuilder();
-  for (int i = 0; i < getChildCount(); i++) {
+  for (size_t i = 0; i < getChildCount(); i++) {
     builder->append(getChild(i)->getText());
   }
 
   return builder->toString();
 }
 
-int RuleContext::getRuleIndex() {
+ssize_t RuleContext::getRuleIndex() const {
   return -1;
 }
 
@@ -173,31 +173,31 @@ std::wstring RuleContext::toString(const std::vector<std::wstring> &ruleNames) {
 
 
 std::wstring RuleContext::toString(const std::vector<std::wstring> &ruleNames, RuleContext *stop) {
-  antlrcpp::StringBuilder *buf = new antlrcpp::StringBuilder();
+  antlrcpp::StringBuilder buffer;
   RuleContext *p = this;
-  buf->append(L"[");
+  buffer.append(L"[");
   while (p != nullptr && p != stop) {
     if (ruleNames.empty()) {
       if (!p->isEmpty()) {
-        buf->append(p->invokingState);
+        buffer.append(p->invokingState);
       }
     } else {
-      int ruleIndex = p->getRuleIndex();
+      ssize_t ruleIndex = p->getRuleIndex();
 
-      std::wstring ruleName = ruleIndex >= 0 && ruleIndex < (int)ruleNames.size() ? ruleNames[ruleIndex] : std::to_wstring(ruleIndex);
-      buf->append(ruleName);
+      std::wstring ruleName = (ruleIndex >= 0 && ruleIndex < (ssize_t)ruleNames.size()) ? ruleNames[(size_t)ruleIndex] : std::to_wstring(ruleIndex);
+      buffer.append(ruleName);
     }
 
     if (p->parent != nullptr && (ruleNames.size() > 0 || !p->parent->isEmpty())) {
-      buf->append(L" ");
+      buffer.append(L" ");
     }
 
     p = p->parent;
   }
 
-  buf->append(L"]");
+  buffer.append(L"]");
 
-  return buf->toString();
+  return buffer.toString();
 }
 
 std::wstring RuleContext::toString() {

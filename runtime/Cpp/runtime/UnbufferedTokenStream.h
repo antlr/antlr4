@@ -38,7 +38,6 @@ namespace antlr {
 namespace v4 {
 namespace runtime {
 
-  template<typename T>
   class UnbufferedTokenStream : public TokenStream {
   protected:
     TokenSource *tokenSource;

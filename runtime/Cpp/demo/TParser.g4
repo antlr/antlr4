@@ -56,7 +56,7 @@ conquer:
 
 // Unused rule to demonstrate some of the special features.
 // Note: returns and throws are ignored in the C++ target.
-unused returns [double i] throws stones, flowers  @init{ doInit(); } @after { doAfter(); } :
+unused returns [double calculated] throws stones, flowers  @init{ doInit(); } @after { doAfter(); } :
 ;
 catch [...] {
   // Replaces the standard exception handling.

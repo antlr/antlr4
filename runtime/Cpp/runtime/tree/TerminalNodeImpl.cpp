@@ -57,13 +57,13 @@ void *TerminalNodeImpl::getPayload() {
   return symbol;
 }
 
-misc::Interval *TerminalNodeImpl::getSourceInterval() {
+misc::Interval TerminalNodeImpl::getSourceInterval() {
   if (symbol == nullptr) {
     return misc::Interval::INVALID;
   }
 
   int tokenIndex = symbol->getTokenIndex();
-  return new misc::Interval(tokenIndex, tokenIndex);
+  return misc::Interval(tokenIndex, tokenIndex);
 }
 
 std::size_t TerminalNodeImpl::getChildCount() {

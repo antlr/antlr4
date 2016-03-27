@@ -81,11 +81,14 @@ namespace runtime {
     /// {@code false} to report all ambiguities. </param>
     DiagnosticErrorListener(bool exactOnly);
 
-    virtual void reportAmbiguity(Parser *recognizer, dfa::DFA *dfa, int startIndex, int stopIndex, bool exact, antlrcpp::BitSet *ambigAlts, atn::ATNConfigSet *configs) override;
+    virtual void reportAmbiguity(Parser *recognizer, dfa::DFA *dfa, size_t startIndex, size_t stopIndex, bool exact,
+                                 antlrcpp::BitSet *ambigAlts, atn::ATNConfigSet *configs) override;
 
-    virtual void reportAttemptingFullContext(Parser *recognizer, dfa::DFA *dfa, int startIndex, int stopIndex, antlrcpp::BitSet *conflictingAlts, atn::ATNConfigSet *configs) override;
+    virtual void reportAttemptingFullContext(Parser *recognizer, dfa::DFA *dfa, size_t startIndex, size_t stopIndex,
+                                             antlrcpp::BitSet *conflictingAlts, atn::ATNConfigSet *configs) override;
 
-    virtual void reportContextSensitivity(Parser *recognizer, dfa::DFA *dfa, int startIndex, int stopIndex, int prediction, atn::ATNConfigSet *configs) override;
+    virtual void reportContextSensitivity(Parser *recognizer, dfa::DFA *dfa, size_t startIndex, size_t stopIndex,
+                                          int prediction, atn::ATNConfigSet *configs) override;
 
   protected:
     virtual std::wstring getDecisionDescription(Parser *recognizer, dfa::DFA *dfa);

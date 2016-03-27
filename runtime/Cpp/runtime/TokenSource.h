@@ -69,7 +69,7 @@ namespace runtime {
     /// </summary>
     /// <returns> The line number for the current position in the input stream, or
     /// 0 if the current token source does not track line numbers. </returns>
-    virtual int getLine() = 0;
+    virtual size_t getLine() const = 0;
 
     /// <summary>
     /// Get the index into the current line for the current position in the input

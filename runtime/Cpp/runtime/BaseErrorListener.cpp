@@ -33,11 +33,14 @@
 
 using namespace org::antlr::v4::runtime;
 
-void BaseErrorListener::reportAmbiguity(Parser *recognizer, dfa::DFA *dfa, int startIndex, int stopIndex, bool exact, antlrcpp::BitSet *ambigAlts, atn::ATNConfigSet *configs) {
+void BaseErrorListener::reportAmbiguity(Parser *recognizer, dfa::DFA *dfa, size_t startIndex, size_t stopIndex,
+                                        bool exact, antlrcpp::BitSet *ambigAlts, atn::ATNConfigSet *configs) {
 }
 
-void BaseErrorListener::reportAttemptingFullContext(Parser *recognizer, dfa::DFA *dfa, int startIndex, int stopIndex, antlrcpp::BitSet *conflictingAlts, atn::ATNConfigSet *configs) {
+void BaseErrorListener::reportAttemptingFullContext(Parser *recognizer, dfa::DFA *dfa, size_t startIndex,
+                                                    size_t stopIndex, antlrcpp::BitSet *conflictingAlts, atn::ATNConfigSet *configs) {
 }
 
-void BaseErrorListener::reportContextSensitivity(Parser *recognizer, dfa::DFA *dfa, int startIndex, int stopIndex, int prediction, atn::ATNConfigSet *configs) {
+void BaseErrorListener::reportContextSensitivity(Parser *recognizer, dfa::DFA *dfa, size_t startIndex, size_t stopIndex,
+                                                 int prediction, atn::ATNConfigSet *configs) {
 }

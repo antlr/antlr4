@@ -39,18 +39,18 @@ ActionTransition::ActionTransition(ATNState *target, int ruleIndex) : Transition
 ActionTransition::ActionTransition(ATNState *target, int ruleIndex, int actionIndex, bool isCtxDependent) : Transition(target), ruleIndex(ruleIndex), actionIndex(actionIndex), isCtxDependent(isCtxDependent) {
 }
 
-int ActionTransition::getSerializationType() {
+int ActionTransition::getSerializationType() const {
   return ACTION;
 }
 
-bool ActionTransition::isEpsilon() {
+bool ActionTransition::isEpsilon() const {
   return true; // we are to be ignored by analysis 'cept for predicates
 }
 
-bool ActionTransition::matches(int symbol, int minVocabSymbol, int maxVocabSymbol) {
+bool ActionTransition::matches(int symbol, int minVocabSymbol, int maxVocabSymbol) const {
   return false;
 }
 
-std::wstring ActionTransition::toString() {
+std::wstring ActionTransition::toString() const {
   return std::wstring(L"action_") + std::to_wstring(ruleIndex) + std::wstring(L":") + std::to_wstring(actionIndex);
 }

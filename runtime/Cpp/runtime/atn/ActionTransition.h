@@ -49,13 +49,13 @@ namespace atn {
 
     ActionTransition(ATNState *target, int ruleIndex, int actionIndex, bool isCtxDependent);
 
-    virtual int getSerializationType() override;
+    virtual int getSerializationType() const override;
 
-    virtual bool isEpsilon() override;
+    virtual bool isEpsilon() const override;
 
-    virtual bool matches(int symbol, int minVocabSymbol, int maxVocabSymbol) override;
+    virtual bool matches(int symbol, int minVocabSymbol, int maxVocabSymbol) const override;
 
-    virtual std::wstring toString();
+    virtual std::wstring toString() const;
   };
 
 } // namespace atn

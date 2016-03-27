@@ -82,7 +82,7 @@ std::wstring Trees::toStringTree(Tree *t, const std::vector<std::wstring> &ruleN
   s = antlrcpp::escapeWhitespace(getNodeText(t, ruleNames), false);
   buf->append(s);
   buf->append(L' ');
-  for (int i = 0; i < t->getChildCount(); i++) {
+  for (size_t i = 0; i < t->getChildCount(); i++) {
     if (i > 0) {
       buf->append(L' ');
     }
@@ -99,8 +99,10 @@ std::wstring Trees::getNodeText(Tree *t, Parser *recog) {
 std::wstring Trees::getNodeText(Tree *t, const std::vector<std::wstring> &ruleNames) {
   if (ruleNames.size() > 0) {
     if (dynamic_cast<RuleNode*>(t) != nullptr) {
-      int ruleIndex = (static_cast<RuleNode*>(t))->getRuleContext()->getRuleIndex();
-      std::wstring ruleName = ruleNames[ruleIndex];
+      ssize_t ruleIndex = (static_cast<RuleNode*>(t))->getRuleContext()->getRuleIndex();
+      if (ruleIndex < 0)
+        return L"Invalid Rule Index";
+      std::wstring ruleName = ruleNames[(size_t)ruleIndex];
       return ruleName;
     } else if (dynamic_cast<ErrorNode*>(t) != nullptr) {
       return t->toString();
@@ -128,8 +130,8 @@ std::wstring Trees::getNodeText(Tree *t, const std::vector<std::wstring> &ruleNa
 }
 
 std::vector<Tree*> Trees::getChildren(Tree *t) {
-  std::vector<Tree*> kids = std::vector<Tree*>();
-  for (int i = 0; i < t->getChildCount(); i++) {
+  std::vector<Tree*> kids;
+  for (size_t i = 0; i < t->getChildCount(); i++) {
     kids.push_back(t->getChild(i));
   }
   return kids;
@@ -166,7 +168,7 @@ std::vector<ParseTree*>* Trees::descendants(ParseTree *t) {
   std::vector<ParseTree*> *nodes = new std::vector<ParseTree*>();
   nodes->insert(nodes->end(), t);
   std::size_t n = t->getChildCount();
-  for (int i = 0 ; i < n ; i++) {
+  for (size_t i = 0 ; i < n ; i++) {
     std::vector<ParseTree*>* tmp = descendants(t->getChild(i));
     for (auto foo:*tmp) {
       nodes->insert(nodes->end(), foo);

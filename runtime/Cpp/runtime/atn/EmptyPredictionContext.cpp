@@ -36,26 +36,26 @@ using namespace org::antlr::v4::runtime::atn;
 EmptyPredictionContext::EmptyPredictionContext() : SingletonPredictionContext(nullptr, EMPTY_RETURN_STATE) {
 }
 
-bool EmptyPredictionContext::isEmpty() {
+bool EmptyPredictionContext::isEmpty() const {
   return true;
 }
 
-int EmptyPredictionContext::size() {
+size_t EmptyPredictionContext::size() const {
   return 1;
 }
 
-org::antlr::v4::runtime::atn::PredictionContext *EmptyPredictionContext::getParent(int index) {
+org::antlr::v4::runtime::atn::PredictionContext *EmptyPredictionContext::getParent(size_t index) const {
   return nullptr;
 }
 
-int EmptyPredictionContext::getReturnState(int index) {
+int EmptyPredictionContext::getReturnState(size_t index) const {
   return returnState;
 }
 
-bool EmptyPredictionContext::equals(void *o) {
+bool EmptyPredictionContext::operator == (PredictionContext *o) const {
   return this == o;
 }
 
-std::wstring EmptyPredictionContext::toString() {
+std::wstring EmptyPredictionContext::toString() const {
   return L"$";
 }

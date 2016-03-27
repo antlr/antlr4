@@ -43,16 +43,16 @@ namespace atn {
   /// A transition containing a set of values. </summary>
   class SetTransition : public Transition {
   public:
-    misc::IntervalSet * const set;
+    const misc::IntervalSet set;
 
-    SetTransition(ATNState *target, misc::IntervalSet *set);
+    SetTransition(ATNState *target, const misc::IntervalSet &set);
 
-    virtual int getSerializationType() override;
+    virtual int getSerializationType() const override;
 
-    virtual misc::IntervalSet *label() override;
-    virtual bool matches(int symbol, int minVocabSymbol, int maxVocabSymbol) override;
+    virtual misc::IntervalSet label() const override;
+    virtual bool matches(int symbol, int minVocabSymbol, int maxVocabSymbol) const override;
 
-    virtual std::wstring toString();
+    virtual std::wstring toString() const;
   };
 
 } // namespace atn

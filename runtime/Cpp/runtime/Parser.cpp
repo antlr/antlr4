@@ -54,7 +54,7 @@ Parser::TraceListener::TraceListener(Parser *outerInstance) : outerInstance(oute
 
 void Parser::TraceListener::enterEveryRule(ParserRuleContext *ctx) {
   std::cout << "enter   "
-  << antlrcpp::ws2s(outerInstance->getRuleNames()[ctx->getRuleIndex()])
+  << antlrcpp::ws2s(outerInstance->getRuleNames()[(size_t)ctx->getRuleIndex()])
   << ", LT(1)=" << antlrcpp::ws2s(outerInstance->_input->LT(1)->getText())
   << std::endl;
 }
@@ -62,7 +62,7 @@ void Parser::TraceListener::enterEveryRule(ParserRuleContext *ctx) {
 void Parser::TraceListener::visitTerminal(tree::TerminalNode *node) {
   std::cout << "consume "
   << node->getSymbol() << " rule "
-  << antlrcpp::ws2s(outerInstance->getRuleNames()[outerInstance->ctx->getRuleIndex()])
+  << antlrcpp::ws2s(outerInstance->getRuleNames()[(size_t)outerInstance->ctx->getRuleIndex()])
   << std::endl;
 }
 
@@ -71,7 +71,7 @@ void Parser::TraceListener::visitErrorNode(tree::ErrorNode *node) {
 
 void Parser::TraceListener::exitEveryRule(ParserRuleContext *ctx) {
   std::cout << "exit    "
-  << antlrcpp::ws2s(outerInstance->getRuleNames()[ctx->getRuleIndex()])
+  << antlrcpp::ws2s(outerInstance->getRuleNames()[(size_t)ctx->getRuleIndex()])
   << ", LT(1)=" << antlrcpp::ws2s(outerInstance->_input->LT(1)->getText())
   << std::endl;
 }
@@ -314,7 +314,7 @@ void Parser::notifyErrorListeners(Token *offendingToken, const std::wstring &msg
   charPositionInLine = offendingToken->getCharPositionInLine();
 
   ANTLRErrorListener *listener = getErrorListenerDispatch();
-  listener->syntaxError(this, offendingToken, line, charPositionInLine, msg, e);
+  listener->syntaxError(this, offendingToken, (size_t)line, charPositionInLine, msg, e);
 }
 
 Token *Parser::consume() {
@@ -387,7 +387,7 @@ void Parser::enterOuterAlt(ParserRuleContext *localctx, int altNum) {
 }
 
 void Parser::enterRecursionRule(ParserRuleContext *localctx, int ruleIndex) {
-  enterRecursionRule(localctx, getATN().ruleToStartState[ruleIndex]->stateNumber, ruleIndex, 0);
+  enterRecursionRule(localctx, getATN().ruleToStartState[(size_t)ruleIndex]->stateNumber, ruleIndex, 0);
 }
 
 void Parser::enterRecursionRule(ParserRuleContext *localctx, int state, int ruleIndex, int precedence) {
@@ -472,42 +472,42 @@ bool Parser::inContext(const std::wstring &context) {
 bool Parser::isExpectedToken(int symbol) {
   const atn::ATN &atn = getInterpreter()->atn;
   ParserRuleContext *ctx = ctx;
-  atn::ATNState *s = atn.states[getState()];
-  misc::IntervalSet *following = atn.nextTokens(s);
+  atn::ATNState *s = atn.states[(size_t)getState()];
+  misc::IntervalSet following = atn.nextTokens(s);
 
-  if (following->contains(symbol)) {
+  if (following.contains(symbol)) {
     return true;
   }
 
-  if (!following->contains(Token::EPSILON)) {
+  if (!following.contains(Token::EPSILON)) {
     return false;
   }
 
-  while (ctx != nullptr && ctx->invokingState >= 0 && following->contains(Token::EPSILON)) {
-    atn::ATNState *invokingState = atn.states[ctx->invokingState];
+  while (ctx != nullptr && ctx->invokingState >= 0 && following.contains(Token::EPSILON)) {
+    atn::ATNState *invokingState = atn.states[(size_t)ctx->invokingState];
     atn::RuleTransition *rt = static_cast<atn::RuleTransition*>(invokingState->transition(0));
     following = atn.nextTokens(rt->followState);
-    if (following->contains(symbol)) {
+    if (following.contains(symbol)) {
       return true;
     }
 
     ctx = static_cast<ParserRuleContext*>(ctx->parent);
   }
 
-  if (following->contains(Token::EPSILON) && symbol == Token::_EOF) {
+  if (following.contains(Token::EPSILON) && symbol == Token::_EOF) {
     return true;
   }
 
   return false;
 }
 
-misc::IntervalSet *Parser::getExpectedTokens() {
+misc::IntervalSet Parser::getExpectedTokens() {
   return getATN().getExpectedTokens(getState(), getContext());
 }
 
-misc::IntervalSet *Parser::getExpectedTokensWithinCurrentRule() {
+misc::IntervalSet Parser::getExpectedTokensWithinCurrentRule() {
   const atn::ATN &atn = getInterpreter()->atn;
-  atn::ATNState *s = atn.states[getState()];
+  atn::ATNState *s = atn.states[(size_t)getState()];
   return atn.nextTokens(s);
 }
 
@@ -532,11 +532,11 @@ std::vector<std::wstring> Parser::getRuleInvocationStack(RuleContext *p) {
   std::vector<std::wstring> stack = std::vector<std::wstring>();
   while (p != nullptr) {
     // compute what follows who invoked us
-    int ruleIndex = p->getRuleIndex();
+    ssize_t ruleIndex = p->getRuleIndex();
     if (ruleIndex < 0) {
       stack.push_back(L"n/a");
     } else {
-      stack.push_back(ruleNames[ruleIndex]);
+      stack.push_back(ruleNames[(size_t)ruleIndex]);
     }
     p = p->parent;
   }

@@ -43,49 +43,48 @@ CommonTokenStream::CommonTokenStream(TokenSource *tokenSource, int channel) : Bu
   this->channel = channel;
 }
 
-int CommonTokenStream::adjustSeekIndex(int i) {
-  return nextTokenOnChannel(i, channel);
+size_t CommonTokenStream::adjustSeekIndex(size_t i) {
+  // XXX ml: that code is questionable. If there is no next token on the given channel we get an invalid stream position (-1).
+  return (size_t)nextTokenOnChannel(i, channel);
 }
 
-Token *CommonTokenStream::LB(int k) {
-  if (k == 0 || (p - k) < 0) {
+Token *CommonTokenStream::LB(size_t k) {
+  if (k == 0 || k > p) {
     return nullptr;
   }
 
-  int i = p;
-  int n = 1;
+  size_t i = p;
+  size_t n = 1;
   // find k good tokens looking backwards
   while (n <= k) {
     // skip off-channel tokens
-    i = previousTokenOnChannel(i - 1, channel);
+    // XXX ml: also here, no error handling for -1
+    i = (size_t)previousTokenOnChannel(i - 1, channel);
     n++;
-  }
-  if (i < 0) {
-    return nullptr;
   }
   return tokens[i];
 }
 
-Token *CommonTokenStream::LT(int k) {
-  //System.out.println("enter LT("+k+")");
+Token *CommonTokenStream::LT(ssize_t k) {
   lazyInit();
   if (k == 0) {
     return nullptr;
   }
   if (k < 0) {
-    return LB(-k);
+    return LB((size_t)-k);
   }
-  int i = p;
-  int n = 1; // we know tokens[p] is a good one
+  size_t i = p;
+  size_t n = 1; // we know tokens[p] is a good one
              // find k good tokens
-  while (n < k) {
+  while (n < (size_t)k) {
     // skip off-channel tokens, but make sure to not look past EOF
     if (sync(i + 1)) {
-      i = nextTokenOnChannel(i + 1, channel);
+      // XXX ml: no error handling either
+      i = (size_t)nextTokenOnChannel(i + 1, channel);
     }
     n++;
   }
-  //		if ( i>range ) range = i;
+
   return tokens[i];
 }
 

@@ -37,15 +37,10 @@ namespace v4 {
 namespace runtime {
 namespace misc {
 
-  /// <summary>
-  /// An immutable inclusive interval a..b </summary>
+  /// An immutable inclusive interval a..b
   class Interval {
   public:
-    static const int INTERVAL_POOL_MAX_VALUE = 1000;
-
-    static Interval *const INVALID;
-
-    static Interval *cache[INTERVAL_POOL_MAX_VALUE+1];
+    static const Interval INVALID;
 
     int a;
     int b;
@@ -55,7 +50,8 @@ namespace misc {
     static int hits;
     static int outOfRange;
 
-    Interval(int a, int b);
+    Interval();
+    Interval(int a_, int b_);
 
     /// <summary>
     /// Interval objects are used readonly so share all with the
@@ -64,55 +60,55 @@ namespace misc {
     ///  Interval object with a..a in it.  On Java.g4, 218623 IntervalSets
     ///  have a..a (set with 1 element).
     /// </summary>
-    static Interval *of(int a, int b);
+    static Interval of(int a_, int b_);
 
     /// <summary>
     /// return number of elements between a and b inclusively. x..x is length 1.
     ///  if b < a, then length is 0.  9..10 has length 2.
     /// </summary>
-    virtual int length();
+    virtual int length() const;
 
-    virtual bool equals(void *o);
+    bool operator == (const Interval &other) const;
 
-    virtual int hashCode();
+    virtual size_t hashCode() const;
 
     /// <summary>
     /// Does this start completely before other? Disjoint </summary>
-    virtual bool startsBeforeDisjoint(Interval *other);
+    virtual bool startsBeforeDisjoint(const Interval &other) const;
 
     /// <summary>
     /// Does this start at or before other? Nondisjoint </summary>
-    virtual bool startsBeforeNonDisjoint(Interval *other);
+    virtual bool startsBeforeNonDisjoint(const Interval &other) const;
 
     /// <summary>
     /// Does this.a start after other.b? May or may not be disjoint </summary>
-    virtual bool startsAfter(Interval *other);
+    virtual bool startsAfter(const Interval &other) const;
 
     /// <summary>
     /// Does this start completely after other? Disjoint </summary>
-    virtual bool startsAfterDisjoint(Interval *other);
+    virtual bool startsAfterDisjoint(const Interval &other) const;
 
     /// <summary>
     /// Does this start after other? NonDisjoint </summary>
-    virtual bool startsAfterNonDisjoint(Interval *other);
+    virtual bool startsAfterNonDisjoint(const Interval &other) const;
 
     /// <summary>
     /// Are both ranges disjoint? I.e., no overlap? </summary>
-    virtual bool disjoint(Interval *other);
+    virtual bool disjoint(const Interval &other) const;
 
     /// <summary>
     /// Are two intervals adjacent such as 0..41 and 42..42? </summary>
-    virtual bool adjacent(Interval *other);
+    virtual bool adjacent(const Interval &other) const;
 
-    virtual bool properlyContains(Interval *other);
+    virtual bool properlyContains(const Interval &other) const;
 
     /// <summary>
     /// Return the interval computed from combining this and other </summary>
-    virtual Interval *union_Renamed(Interval *other);
+    virtual Interval Union(const Interval &other) const;
 
     /// <summary>
     /// Return the interval in common between this and o </summary>
-    virtual Interval *intersection(Interval *other);
+    virtual Interval intersection(const Interval &other) const;
 
     /// <summary>
     /// Return the interval with elements from this not in other;
@@ -120,12 +116,13 @@ namespace misc {
     ///  within this, which would result in two disjoint intervals
     ///  instead of the single one returned by this method.
     /// </summary>
-    virtual Interval *differenceNotProperlyContained(Interval *other);
+    virtual Interval differenceNotProperlyContained(const Interval &other) const;
 
-    virtual std::wstring toString();
+    virtual std::wstring toString() const;
 
   private:
     void InitializeInstanceFields();
+    static std::map<int, Interval> cache;
   };
 
 } // namespace atn

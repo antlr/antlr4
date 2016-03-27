@@ -48,8 +48,8 @@ std::wstring join(std::vector<std::wstring> strings, const std::wstring &separat
 
 std::map<std::wstring, int>* toMap(const std::vector<std::wstring> &keys) {
   std::map<std::wstring, int>* m = new std::map<std::wstring, int>();
-  for (int i = 0; i < (int)keys.size(); ++i) {
-    m->insert(std::pair<std::wstring, int>(keys[i], i));
+  for (size_t i = 0; i < keys.size(); ++i) {
+    m->insert({ keys[i], i });
   }
   return m;
 }
@@ -73,7 +73,7 @@ wchar_t* toCharArray(const std::vector<size_t> *data){
 		if (data == nullptr) return nullptr;
 		wchar_t* cdata = new wchar_t[data->size()];
 
-		for (int i = 0; i < (int)data->size(); i++){
+		for (size_t i = 0; i < data->size(); i++){
       cdata[i] = (char)data->at(i);
     }
 
