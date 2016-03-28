@@ -56,7 +56,7 @@ public abstract class Target {
 	 *  predicates and such that may refer to chars that need to be escaped
 	 *  when represented as strings.  Also, templates need to be escaped so
 	 *  that the target language can hold them as a string.
-	 *  <p/>
+	 *  <p>
 	 *  I have defined (via the constructor) the set of typical escapes,
 	 *  but your {@link Target} subclass is free to alter the translated chars
 	 *  or add more definitions.  This is non-static so each target can have

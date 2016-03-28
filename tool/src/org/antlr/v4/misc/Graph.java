@@ -81,7 +81,7 @@ public class Graph<T> {
 	 *  For sorting, I'm not following convention here since ANTLR
 	 *  needs the opposite.  Here's what I assume for sorting:
 	 *
-	 *    If there exists an edge u -> v then u depends on v and v
+	 *    If there exists an edge u -&gt; v then u depends on v and v
 	 *    must happen before u.
 	 *
 	 *  So if this gives nonreversed postorder traversal, I get the order

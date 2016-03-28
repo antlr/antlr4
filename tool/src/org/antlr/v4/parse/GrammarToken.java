@@ -35,7 +35,7 @@ import org.antlr.runtime.Token;
 import org.antlr.v4.tool.Grammar;
 
 /** A CommonToken that can also track it's original location,
- *  derived from options on the element ref like BEGIN<line=34,...>.
+ *  derived from options on the element ref like BEGIN&lt;line=34,...&gt;.
  */
 public class GrammarToken extends CommonToken {
 	public Grammar g;

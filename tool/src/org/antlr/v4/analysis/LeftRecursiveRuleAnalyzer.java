@@ -330,7 +330,7 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 		return lrlabel;
 	}
 
-	/** Strip last 2 tokens if -> label; alter indexes in altAST */
+	/** Strip last 2 tokens if → label; alter indexes in altAST */
 	public void stripAltLabel(GrammarAST altAST) {
 		int start = altAST.getTokenStartIndex();
 		int stop = altAST.getTokenStopIndex();
