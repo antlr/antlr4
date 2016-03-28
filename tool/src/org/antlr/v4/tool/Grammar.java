@@ -101,6 +101,7 @@ public class Grammar implements AttributeResolver {
 	public static final Set<String> parserOptions = new HashSet<String>();
 	static {
 		parserOptions.add("superClass");
+		parserOptions.add("contextSuperClass");
 		parserOptions.add("TokenLabelType");
 		parserOptions.add("tokenVocab");
 		parserOptions.add("language");

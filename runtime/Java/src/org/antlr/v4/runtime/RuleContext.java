@@ -170,12 +170,22 @@ public class RuleContext implements RuleNode {
 	 *  the outer alternative number used to match the input. Default
 	 *  implementation does not compute nor store this alt num. Create
 	 *  a subclass of ParserRuleContext with backing field and set
-	 *  option treeSuperClass. Then override Parser.enterOuterAlt()
+	 *  option contextSuperClass.
 	 *  to set it.
 	 *
 	 *  @since 4.5.3
 	 */
 	public int getAltNumber() { return ATN.INVALID_ALT_NUMBER; }
+
+	/** Set the outer alternative number for this context node. Default
+	 *  implementation does nothing to avoid backing field overhead for
+	 *  trees that don't need it.  Create
+     *  a subclass of ParserRuleContext with backing field and set
+     *  option contextSuperClass.
+	 *
+	 *  @since 4.5.3
+	 */
+	public void setAltNumber(int altNumber) { }
 
 	@Override
 	public ParseTree getChild(int i) {
