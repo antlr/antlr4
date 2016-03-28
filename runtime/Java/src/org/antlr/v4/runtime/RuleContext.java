@@ -29,20 +29,17 @@
  */
 package org.antlr.v4.runtime;
 
+import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 import org.antlr.v4.runtime.tree.RuleNode;
 import org.antlr.v4.runtime.tree.Trees;
 
-import javax.print.PrintException;
-import javax.swing.*;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.Future;
 
-/** /** A rule context is a record of a single rule invocation.
+/** A rule context is a record of a single rule invocation.
  *
  *  We form a stack of these context objects using the parent
  *  pointer. A parent pointer of null indicates that the current
@@ -168,6 +165,17 @@ public class RuleContext implements RuleNode {
 	}
 
 	public int getRuleIndex() { return -1; }
+
+	/** For rule associated with this parse tree internal node, return
+	 *  the outer alternative number used to match the input. Default
+	 *  implementation does not compute nor store this alt num. Create
+	 *  a subclass of ParserRuleContext with backing field and set
+	 *  option treeSuperClass. Then override Parser.enterOuterAlt()
+	 *  to set it.
+	 *
+	 *  @since 4.5.3
+	 */
+	public int getAltNumber() { return ATN.INVALID_ALT_NUMBER; }
 
 	@Override
 	public ParseTree getChild(int i) {
