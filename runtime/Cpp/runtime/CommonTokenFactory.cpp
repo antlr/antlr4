@@ -52,7 +52,7 @@ CommonToken *CommonTokenFactory::create(std::pair<TokenSource*, CharStream*> *so
   if (text != L"") {
     t->setText(text);
   } else if (copyText && source->second != nullptr) {
-    t->setText(source->second->getText(misc::Interval::of(start,stop)));
+    t->setText(source->second->getText(misc::Interval(start, stop)));
   }
 
   return t;

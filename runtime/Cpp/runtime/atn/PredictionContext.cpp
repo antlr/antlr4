@@ -103,17 +103,12 @@ size_t PredictionContext::calculateHashCode(const std::vector<PredictionContext*
   for (auto parent : parents) {
     hash = MurmurHash::update(hash, (size_t)parent);
   }
-  for (std::vector<PredictionContext*>::size_type i = 0; i < parents.size() ; i++) {
-    PredictionContext * parent = parents[i];
-    hash = MurmurHash::update(hash, (size_t)parent);
-  }
 
   for (auto returnState : returnStates) {
     hash = MurmurHash::update(hash, (size_t)returnState);
   }
 
-  hash = MurmurHash::finish(hash, 2 * sizeof(parents) / sizeof(parents[0]));
-  return hash;
+  return MurmurHash::finish(hash, parents.size() + returnStates.size());
 }
 
 PredictionContext *PredictionContext::merge(PredictionContext *a, PredictionContext *b,

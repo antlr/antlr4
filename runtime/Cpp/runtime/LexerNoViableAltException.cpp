@@ -55,7 +55,7 @@ CharStream *LexerNoViableAltException::getInputStream() {
 std::wstring LexerNoViableAltException::toString() {
   std::wstring symbol = L"";
   if (startIndex < getInputStream()->size()) {
-    symbol = getInputStream()->getText(misc::Interval::of((int)startIndex, (int)startIndex));
+    symbol = getInputStream()->getText(misc::Interval((int)startIndex, (int)startIndex));
     symbol = antlrcpp::escapeWhitespace(symbol, false);
   }
   std::wstring format = L"LexerNoViableAltException('" + symbol + L"')";

@@ -108,7 +108,7 @@ namespace runtime {
 
   std::wstring UnbufferedTokenStream::getText(Token* start, Token* stop)
   {
-    return getText(misc::Interval::of(start->getTokenIndex(), stop->getTokenIndex()));
+    return getText(misc::Interval(start->getTokenIndex(), stop->getTokenIndex()));
   }
 
   void UnbufferedTokenStream::consume()

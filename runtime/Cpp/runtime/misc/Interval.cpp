@@ -34,7 +34,6 @@
 using namespace org::antlr::v4::runtime::misc;
 
 Interval const Interval::INVALID;
-std::map<int, Interval> Interval::cache;
 
 int Interval::creates = 0;
 int Interval::misses = 0;
@@ -45,21 +44,8 @@ Interval::Interval() : Interval(-1, -2) {
 }
 
 Interval::Interval(int a_, int b_) {
-  InitializeInstanceFields();
   a = a_;
   b = b_;
-}
-
-Interval Interval::of(int a_, int b_) {
-  // cache just a..a
-  if (a_ != b_ || a_ < 0) {
-    return Interval(a_, b_);
-  }
-
-  if (cache.find(a_) == cache.end()) {
-    cache[a_] = Interval(a_, a_);
-  }
-  return cache[a_];
 }
 
 int Interval::length() const {
@@ -97,7 +83,7 @@ bool Interval::startsAfterDisjoint(const Interval &other) const {
 }
 
 bool Interval::startsAfterNonDisjoint(const Interval &other) const {
-  return a > other.a && a <= other.b; // this.b>=other.b implied
+  return a > other.a && a <= other.b; // b >= other.b implied
 }
 
 bool Interval::disjoint(const Interval &other) const {
@@ -113,34 +99,13 @@ bool Interval::properlyContains(const Interval &other) const {
 }
 
 Interval Interval::Union(const Interval &other) const {
-  return Interval::of(std::min(a, other.a), std::max(b, other.b));
+  return Interval(std::min(a, other.a), std::max(b, other.b));
 }
 
 Interval Interval::intersection(const Interval &other) const {
-  return Interval::of(std::max(a, other.a), std::min(b, other.b));
-}
-
-Interval Interval::differenceNotProperlyContained(const Interval &other) const {
-  Interval diff;
-
-  // other.a to left of this.a (or same)
-  if (other.startsBeforeNonDisjoint(*this)) {
-    diff = Interval::of(std::max(a, other.b + 1), b);
-  }
-
-  // other.a to right of this.a
-  else if (other.startsAfterNonDisjoint(*this)) {
-    diff = Interval::of(a, other.a - 1);
-  }
-  
-  return diff;
+  return Interval(std::max(a, other.a), std::min(b, other.b));
 }
 
 std::wstring Interval::toString() const {
   return std::to_wstring(a) + L".." + std::to_wstring(b);
-}
-
-void Interval::InitializeInstanceFields() {
-  a = 0;
-  b = 0;
 }

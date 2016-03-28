@@ -165,7 +165,7 @@ misc::Interval ParserRuleContext::getSourceInterval() {
   if (start == nullptr || stop == nullptr) {
     return misc::Interval::INVALID;
   }
-  return misc::Interval::of(start->getTokenIndex(), stop->getTokenIndex());
+  return misc::Interval(start->getTokenIndex(), stop->getTokenIndex());
 }
 
 Token *ParserRuleContext::getStart() {

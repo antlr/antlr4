@@ -103,7 +103,7 @@ std::wstring CommonToken::getText() {
   }
   size_t n = input->size();
   if ((size_t)start < n && (size_t)stop < n) {
-    return input->getText(misc::Interval::of(start,stop));
+    return input->getText(misc::Interval(start,stop));
   } else {
     return L"<EOF>";
   }

@@ -84,7 +84,7 @@ void IntervalSet::add(int el) {
 }
 
 void IntervalSet::add(int a, int b) {
-  add(Interval::of(a, b));
+  add(Interval(a, b));
 }
 
 void IntervalSet::add(const Interval &addition) {

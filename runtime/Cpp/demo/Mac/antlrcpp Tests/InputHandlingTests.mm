@@ -34,6 +34,7 @@
 #include "Interval.h"
 
 using namespace org::antlr::v4::runtime;
+using namespace org::antlr::v4::runtime::misc;
 
 @interface InputHandlingTests : XCTestCase
 
@@ -154,12 +155,6 @@ using namespace org::antlr::v4::runtime;
 
   stream.name = "unit tests"; // Quite useless test, as "name" is a public field.
   XCTAssertEqual(stream.getSourceName(), "unit tests");
-}
-
-- (void)testPerformanceExample {
-  [self measureBlock: ^{
-    // Put the code you want to measure the time of here.
-  }];
 }
 
 @end

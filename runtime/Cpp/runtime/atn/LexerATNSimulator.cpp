@@ -559,7 +559,7 @@ dfa::DFA *LexerATNSimulator::getDFA(size_t mode) {
 
 std::wstring LexerATNSimulator::getText(CharStream *input) {
   // index is first lookahead char, don't include.
-  return input->getText(misc::Interval::of((int)_startIndex, (int)input->index() - 1));
+  return input->getText(misc::Interval((int)_startIndex, (int)input->index() - 1));
 }
 
 size_t LexerATNSimulator::getLine() const {

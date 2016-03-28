@@ -253,7 +253,7 @@ std::vector<TokenStreamRewriter::RewriteOperation*> TokenStreamRewriter::initial
 }
 
 std::wstring TokenStreamRewriter::getText() {
-  return getText(DEFAULT_PROGRAM_NAME, Interval::of(0, (int)tokens->size() - 1));
+  return getText(DEFAULT_PROGRAM_NAME, Interval(0, (int)tokens->size() - 1));
 }
 
 std::wstring TokenStreamRewriter::getText(const Interval &interval) {

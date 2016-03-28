@@ -56,7 +56,7 @@ void DiagnosticErrorListener::reportAmbiguity(Parser *recognizer, dfa::DFA *dfa,
   wchar_t buf[16];
   std::wstring decision = getDecisionDescription(recognizer, dfa);
   antlrcpp::BitSet *conflictingAlts = getConflictingAlts(ambigAlts, configs);
-  std::wstring text = recognizer->getTokenStream()->getText(misc::Interval::of((int)startIndex, (int)stopIndex));
+  std::wstring text = recognizer->getTokenStream()->getText(misc::Interval((int)startIndex, (int)stopIndex));
   std::wstring message = L"reportAmbiguity d=" + decision + L": ambigAlts=" + conflictingAlts->toString() + L", input='" + text + L"'";
   swprintf(buf, sizeof(buf) / sizeof(*buf), L"%d", 5);
   recognizer->notifyErrorListeners(message);
@@ -65,7 +65,7 @@ void DiagnosticErrorListener::reportAmbiguity(Parser *recognizer, dfa::DFA *dfa,
 void DiagnosticErrorListener::reportAttemptingFullContext(Parser *recognizer, dfa::DFA *dfa, size_t startIndex,
                                                           size_t stopIndex, antlrcpp::BitSet *conflictingAlts, atn::ATNConfigSet *configs) {
   std::wstring decision = getDecisionDescription(recognizer, dfa);
-  std::wstring text = recognizer->getTokenStream()->getText(misc::Interval::of((int)startIndex, (int)stopIndex));
+  std::wstring text = recognizer->getTokenStream()->getText(misc::Interval((int)startIndex, (int)stopIndex));
   std::wstring message = L"reportAttemptingFullContext d=" + decision + L", input='" + text + L"'";
   recognizer->notifyErrorListeners(message);
 }
@@ -73,7 +73,7 @@ void DiagnosticErrorListener::reportAttemptingFullContext(Parser *recognizer, df
 void DiagnosticErrorListener::reportContextSensitivity(Parser *recognizer, dfa::DFA *dfa, size_t startIndex,
                                                        size_t stopIndex, int prediction, atn::ATNConfigSet *configs) {
   std::wstring decision = getDecisionDescription(recognizer, dfa);
-  std::wstring text = recognizer->getTokenStream()->getText(misc::Interval::of((int)startIndex, (int)stopIndex));
+  std::wstring text = recognizer->getTokenStream()->getText(misc::Interval((int)startIndex, (int)stopIndex));
   std::wstring message = L"reportContextSensitivity d=" + decision + L", input='" + text + L"'";
   recognizer->notifyErrorListeners(message);
 }

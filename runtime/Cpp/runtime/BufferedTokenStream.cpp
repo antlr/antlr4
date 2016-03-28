@@ -356,7 +356,7 @@ std::string BufferedTokenStream::getSourceName()
 std::wstring BufferedTokenStream::getText() {
   lazyInit();
   fill();
-  return getText(misc::Interval::of(0, (int)size() - 1));
+  return getText(misc::Interval(0, (int)size() - 1));
 }
 
 std::wstring BufferedTokenStream::getText(const misc::Interval &interval) {
@@ -387,7 +387,7 @@ std::wstring BufferedTokenStream::getText(RuleContext *ctx) {
 
 std::wstring BufferedTokenStream::getText(Token *start, Token *stop) {
   if (start != nullptr && stop != nullptr) {
-    return getText(misc::Interval::of(start->getTokenIndex(), stop->getTokenIndex()));
+    return getText(misc::Interval(start->getTokenIndex(), stop->getTokenIndex()));
   }
 
   return L"";

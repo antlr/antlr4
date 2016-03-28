@@ -286,7 +286,7 @@ void Lexer::recover(LexerNoViableAltException *e) {
 }
 
 void Lexer::notifyListeners(LexerNoViableAltException *e) {
-  std::wstring text = _input->getText(misc::Interval::of(_tokenStartCharIndex, (int)_input->index()));
+  std::wstring text = _input->getText(misc::Interval(_tokenStartCharIndex, (int)_input->index()));
   std::wstring msg = std::wstring(L"token recognition error at: '") + getErrorDisplay(text) + std::wstring(L"'");
 
   ANTLRErrorListener *listener = getErrorListenerDispatch();

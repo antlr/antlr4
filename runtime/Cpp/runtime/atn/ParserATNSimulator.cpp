@@ -1105,7 +1105,7 @@ dfa::DFAState *ParserATNSimulator::addDFAState(dfa::DFA *dfa, dfa::DFAState *D) 
 void ParserATNSimulator::reportAttemptingFullContext(dfa::DFA *dfa, BitSet *conflictingAlts, ATNConfigSet *configs,
                                                      size_t startIndex, size_t stopIndex) {
   if (debug || retry_debug) {
-    misc::Interval interval = misc::Interval::of((int)startIndex, (int)stopIndex);
+    misc::Interval interval = misc::Interval((int)startIndex, (int)stopIndex);
     std::wcout << L"reportAttemptingFullContext decision=" << dfa->decision << L":" << configs << L", input=" << parser->getTokenStream()->getText(interval) << std::endl;
   }
   if (parser != nullptr) {
@@ -1116,7 +1116,7 @@ void ParserATNSimulator::reportAttemptingFullContext(dfa::DFA *dfa, BitSet *conf
 void ParserATNSimulator::reportContextSensitivity(dfa::DFA *dfa, int prediction, ATNConfigSet *configs, size_t startIndex,
                                                   size_t stopIndex) {
   if (debug || retry_debug) {
-    misc::Interval interval = misc::Interval::of((int)startIndex, (int)stopIndex);
+    misc::Interval interval = misc::Interval((int)startIndex, (int)stopIndex);
     std::wcout << L"reportContextSensitivity decision=" << dfa->decision << L":" << configs << L", input=" << parser->getTokenStream()->getText(interval) << std::endl;
   }
   if (parser != nullptr) {
@@ -1143,7 +1143,7 @@ void ParserATNSimulator::reportAmbiguity(dfa::DFA *dfa, dfa::DFAState *D, size_t
     //				}
     //				i++;
     //			}
-    misc::Interval interval = misc::Interval::of(startIndex, stopIndex);
+    misc::Interval interval = misc::Interval(startIndex, stopIndex);
     std::wcout << L"reportAmbiguity " << ambigAlts << L":" << configs << L", input=" << parser->getTokenStream()->getText(interval) << std::endl;
   }
   if (parser != nullptr) {
