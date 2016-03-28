@@ -29,7 +29,7 @@ expr: {istype()}? ID '(' expr ')' // ctor-style typecast
  	;
 ```
 
-The parser will only predict an expr from stat when `istype()||isfunc()` evaluates to true. This makes sense because the parser should only choose to match an expression if the upcoming `ID` is a type name or function name. It wouldn't make sense to just test one of the predicates in this case. Note that, when the parser gets to expritself, the parsing decision tests the predicates individually, one for each alternative.
+The parser will only predict an expr from stat when `istype()||isfunc()` evaluates to true. This makes sense because the parser should only choose to match an expression if the upcoming `ID` is a type name or function name. It wouldn't make sense to just test one of the predicates in this case. Note that, when the parser gets to `expr` itself, the parsing decision tests the predicates individually, one for each alternative.
 
 If multiple predicates occur in a sequence, the parser joins them with the `&&` operator. For example, consider changing `stat` to include a predicate before the call `toexpr`:
 
@@ -72,7 +72,7 @@ stat: {System.out.println("goto"); allowgoto=true;} {java5}? 'goto' ID ';'
 
 If we can't execute the action during prediction, we shouldn't evaluate the `{java5}?` predicate because it depends on that action.
 
-The prediction process also can't see through token references. Token references have the side effect of advancing the input one symbol. A predicate that tested the current input symbol would find itself out of sync if the parser shifted it over the token reference. For example, in the following grammar, the predicates expectgetCurrentToken to return an ID token.
+The prediction process also can't see through token references. Token references have the side effect of advancing the input one symbol. A predicate that tested the current input symbol would find itself out of sync if the parser shifted it over the token reference. For example, in the following grammar, the predicates expect `getCurrentToken` to return an `ID` token.
 
 ```
 stat: '{' decl '}'

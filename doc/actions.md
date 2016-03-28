@@ -2,7 +2,7 @@
 
 In Chapter 10, Attributes and Actions, we learned how to embed actions within grammars and looked at the most common token and rule attributes. This section summarizes the important syntax and semantics from that chapter and provides a complete list of all available attributes. (You can learn more about actions in the grammar from the free excerpt on listeners and actions.)
 
-Actions are blocks of text written in the target language and enclosed in curly braces. The recognizer triggers them according to their locations within the grammar. For example, the following rule emits found a decl after the parser has seen a valid declaration:
+Actions are blocks of text written in the target language and enclosed in curly braces. The recognizer triggers them according to their locations within the grammar. For example, the following rule emits "found a decl" after the parser has seen a valid declaration:
 
 ```
 decl: type ID ';' {System.out.println("found a decl");} ;

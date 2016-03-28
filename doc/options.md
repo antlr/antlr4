@@ -25,7 +25,7 @@ options {...}
 
 ## Rule Element Options
 
-Token options have the form `T<name=value>` as we saw in Section 5.4, [Dealing with Precedence, Left Recursion, and Associativity](http://pragprog.com/book/tpantlr2/the-definitive-antlr-4-reference). The only token option is assocand it accepts values left and right. Here’s a sample grammar with a left-recursive expression rule that specifies a token option on the `^` exponent operator token:
+Token options have the form `T<name=value>` as we saw in Section 5.4, [Dealing with Precedence, Left Recursion, and Associativity](http://pragprog.com/book/tpantlr2/the-definitive-antlr-4-reference). The only token option is `assoc`, and it accepts values `left` and `right`. Here’s a sample grammar with a left-recursive expression rule that specifies a token option on the `^` exponent operator token:
 
 ```
 grammar ExprLR;
@@ -40,7 +40,7 @@ INT : '0'..'9'+ ;
 WS : [ \n]+ -> skip ;
 ```
 
-Semantic predicates also accept an option, per [Catching failed semantic predicates](http://pragprog.com/book/tpantlr2/the-definitive-antlr-4-reference). The only valid option is the fail option, which takes either a string literal in double-quotes or an action that evaluates to a string. The string literal or string result from the action should be the message to emit upon predicate failure.
+Semantic predicates also accept an option, per [Catching failed semantic predicates](http://pragprog.com/book/tpantlr2/the-definitive-antlr-4-reference). The only valid option is the `fail` option, which takes either a string literal in double-quotes or an action that evaluates to a string. The string literal or string result from the action should be the message to emit upon predicate failure.
 
 ```
 ints[int max]
