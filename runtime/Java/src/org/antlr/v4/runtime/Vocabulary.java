@@ -37,10 +37,9 @@ package org.antlr.v4.runtime;
  * @author Sam Harwell
  */
 public interface Vocabulary {
-
 	/**
 	 * Returns the highest token type value. It can be used to iterate from
-	 * zero to that number, thus querying all stored entries.
+	 * zero to that number, inclusively, thus querying all stored entries.
 	 * @return the highest token type value
 	 */
 	int getMaxTokenType();

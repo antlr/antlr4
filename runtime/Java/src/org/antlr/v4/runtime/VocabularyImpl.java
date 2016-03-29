@@ -96,8 +96,10 @@ public class VocabularyImpl implements Vocabulary {
 		this.literalNames = literalNames != null ? literalNames : EMPTY_NAMES;
 		this.symbolicNames = symbolicNames != null ? symbolicNames : EMPTY_NAMES;
 		this.displayNames = displayNames != null ? displayNames : EMPTY_NAMES;
-		this.maxTokenType = Math.max(this.displayNames.length,
-			Math.max(this.literalNames.length, this.symbolicNames.length));
+		// See note here on -1 part: https://github.com/antlr/antlr4/pull/1146
+		this.maxTokenType =
+			Math.max(this.displayNames.length,
+					 Math.max(this.literalNames.length, this.symbolicNames.length)) - 1;
 	}
 
 	/**
