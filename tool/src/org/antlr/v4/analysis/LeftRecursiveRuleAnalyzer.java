@@ -68,8 +68,7 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 	public LinkedHashMap<Integer, LeftRecursiveRuleAltInfo> binaryAlts = new LinkedHashMap<Integer, LeftRecursiveRuleAltInfo>();
 	public LinkedHashMap<Integer, LeftRecursiveRuleAltInfo> ternaryAlts = new LinkedHashMap<Integer, LeftRecursiveRuleAltInfo>();
 	public LinkedHashMap<Integer, LeftRecursiveRuleAltInfo> suffixAlts = new LinkedHashMap<Integer, LeftRecursiveRuleAltInfo>();
-	public List<LeftRecursiveRuleAltInfo> prefixAlts = new ArrayList<LeftRecursiveRuleAltInfo>();
-	public List<LeftRecursiveRuleAltInfo> otherAlts = new ArrayList<LeftRecursiveRuleAltInfo>();
+	public List<LeftRecursiveRuleAltInfo> prefixAndOtherAlts = new ArrayList<LeftRecursiveRuleAltInfo>();
 
 	/** Pointer to ID node of ^(= ID element) */
 	public List<Pair<GrammarAST,String>> leftRecursiveRuleRefLabels =
@@ -188,7 +187,7 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 		LeftRecursiveRuleAltInfo a =
 			new LeftRecursiveRuleAltInfo(alt, altText, null, altLabel, false, originalAltTree);
 		a.nextPrec = nextPrec;
-		prefixAlts.add(a);
+		prefixAndOtherAlts.add(a);
 		//System.out.println("prefixAlt " + alt + ": " + altText + ", rewrite=" + rewriteText);
 	}
 
@@ -222,7 +221,9 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 		String altLabel = altTree.altLabel!=null ? altTree.altLabel.getText() : null;
 		LeftRecursiveRuleAltInfo a =
 			new LeftRecursiveRuleAltInfo(alt, altText, null, altLabel, false, originalAltTree);
-		otherAlts.add(a);
+		// We keep other alts with prefix alts since they are all added to the start of the generated rule, and
+		// we want to retain any prior ordering between them
+		prefixAndOtherAlts.add(a);
 //		System.out.println("otherAlt " + alt + ": " + altText);
 	}
 
@@ -254,8 +255,7 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 			ruleST.add("opAlts", altST);
 		}
 
-		ruleST.add("primaryAlts", prefixAlts);
-		ruleST.add("primaryAlts", otherAlts);
+		ruleST.add("primaryAlts", prefixAndOtherAlts);
 
 		tool.log("left-recursion", ruleST.render());
 
@@ -439,8 +439,7 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 			   "binaryAlts=" + binaryAlts +
 			   ", ternaryAlts=" + ternaryAlts +
 			   ", suffixAlts=" + suffixAlts +
-			   ", prefixAlts=" + prefixAlts +
-			   ", otherAlts=" + otherAlts +
+			   ", prefixAndOtherAlts=" +prefixAndOtherAlts+
 			   '}';
 	}
 }
