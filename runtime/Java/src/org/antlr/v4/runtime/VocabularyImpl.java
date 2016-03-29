@@ -57,6 +57,8 @@ public class VocabularyImpl implements Vocabulary {
 
 	private final String[] displayNames;
 
+	private final int maxTokenType;
+
 	/**
 	 * Constructs a new instance of {@link VocabularyImpl} from the specified
 	 * literal and symbolic token names.
@@ -94,6 +96,10 @@ public class VocabularyImpl implements Vocabulary {
 		this.literalNames = literalNames != null ? literalNames : EMPTY_NAMES;
 		this.symbolicNames = symbolicNames != null ? symbolicNames : EMPTY_NAMES;
 		this.displayNames = displayNames != null ? displayNames : EMPTY_NAMES;
+		// See note here on -1 part: https://github.com/antlr/antlr4/pull/1146
+		this.maxTokenType =
+			Math.max(this.displayNames.length,
+					 Math.max(this.literalNames.length, this.symbolicNames.length)) - 1;
 	}
 
 	/**
@@ -141,6 +147,11 @@ public class VocabularyImpl implements Vocabulary {
 		}
 
 		return new VocabularyImpl(literalNames, symbolicNames, tokenNames);
+	}
+
+	@Override
+	public int getMaxTokenType() {
+		return maxTokenType;
 	}
 
 	@Override
