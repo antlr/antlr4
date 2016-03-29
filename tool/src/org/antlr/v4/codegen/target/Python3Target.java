@@ -61,7 +61,7 @@ public class Python3Target extends Target {
 		"memoryview",
 		"object", "oct", "open", "ord",
 		"pow", "print", "property",
-		"range", "raw_input", "reduce", "reload", "repr", "reversed", "round",
+		"range", "raw_input", "reduce", "reload", "repr", "return", "reversed", "round",
 		"set", "setattr", "slice", "sorted", "staticmethod", "str", "sum", "super",
 		"tuple", "type",
 		"unichr", "unicode",
