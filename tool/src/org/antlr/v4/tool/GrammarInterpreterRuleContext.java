@@ -54,4 +54,15 @@ public class GrammarInterpreterRuleContext extends InterpreterRuleContext {
 	public void setOuterAltNum(int outerAltNum) {
 		this.outerAltNum = outerAltNum;
 	}
+
+	@Override
+	public int getAltNumber() {
+		// override here and called old functionality; makes it backward compatible vs changing names
+		return getOuterAltNum();
+	}
+
+	@Override
+	public void setAltNumber(int altNumber) {
+		setOuterAltNum(altNumber);
+	}
 }

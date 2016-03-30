@@ -322,6 +322,20 @@ var walker = new antlr4.tree.ParseTreeWalker();
 walker.walk(new this.LeafListener(), <s>);
 >>
 
+TreeNodeWithAltNumField(X) ::= <<
+
+@parser::header {
+MyRuleNode = function(parent, invokingState) {
+	antlr4.ParserRuleContext.call(this, parent, invokingState);
+	this.altNum = 0;
+	return this;
+};
+
+MyRuleNode.prototype = Object.create(antlr4.ParserRuleContext.prototype);
+MyRuleNode.prototype.constructor = MyRuleNode;
+}
+>>
+
 TokenGetterListener(X) ::= <<
 this.LeafListener = function() {
     this.exitA = function(ctx) {

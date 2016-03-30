@@ -335,6 +335,19 @@ ParseTreeWalker walker = new ParseTreeWalker();
 walker.walk(new LeafListener(), <s>);
 >>
 
+TreeNodeWithAltNumField(X) ::= <<
+@parser::members {
+public static class MyRuleNode extends ParserRuleContext {
+	public int altNum;
+	public MyRuleNode(ParserRuleContext parent, int invokingStateNumber) {
+		super(parent, invokingStateNumber);
+	}
+	@Override public int getAltNumber() { return altNum; }
+	@Override public void setAltNumber(int altNum) { this.altNum = altNum; }
+}
+}
+>>
+
 TokenGetterListener(X) ::= <<
 public static class LeafListener extends TBaseListener {
 	public void exitA(TParser.AContext ctx) {

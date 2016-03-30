@@ -63,8 +63,8 @@ public class ParserFile extends OutputFile {
 		genVisitor = g.tool.gen_visitor;
 		grammarName = g.name;
 
-		if (g.getOptionString("superClass") != null) {
-			contextSuperClass = new ActionText(null, g.getOptionString("superClass"));
+		if (g.getOptionString("contextSuperClass") != null) {
+			contextSuperClass = new ActionText(null, g.getOptionString("contextSuperClass"));
 		}
 	}
 }

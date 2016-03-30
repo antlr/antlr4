@@ -41,7 +41,7 @@ public abstract class BasePython3Test extends BasePythonTest {
 
 	@Override
 	protected String getPythonExecutable() {
-		return "python3.5";
+		return "python3";
 	}
 
 	@Override
