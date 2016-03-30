@@ -30,6 +30,7 @@
 
 package org.antlr.v4.codegen;
 
+import org.antlr.v4.codegen.model.Action;
 import org.antlr.v4.codegen.model.CodeBlockForOuterMostAlt;
 import org.antlr.v4.codegen.model.OutputModelObject;
 import org.antlr.v4.codegen.model.RuleFunction;
@@ -38,6 +39,9 @@ import org.antlr.v4.codegen.model.decl.CodeBlock;
 import org.antlr.v4.codegen.model.decl.Decl;
 import org.antlr.v4.tool.Alternative;
 import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.Rule;
+import org.stringtemplate.v4.ST;
+import org.stringtemplate.v4.STGroup;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -71,6 +75,19 @@ public abstract class DefaultOutputModelFactory extends BlankOutputModelFactory 
 	@Override
 	public OutputModelController getController() {
 		return controller;
+	}
+
+	@Override
+	public List<SrcOp> rulePostamble(RuleFunction function, Rule r) {
+		// See OutputModelController.buildLeftRecursiveRuleFunction
+		// and Parser.exitRule for other places which set stop.
+		CodeGenerator gen = getGenerator();
+		STGroup codegenTemplates = gen.getTemplates();
+		ST setStopTokenAST = codegenTemplates.getInstanceOf("recRuleSetStopToken");
+		Action setStopTokenAction = new Action(this, function.ruleCtx, setStopTokenAST);
+		List<SrcOp> ops = new ArrayList<SrcOp>(1);
+		ops.add(setStopTokenAction);
+		return ops;
 	}
 
 	// Convenience methods
