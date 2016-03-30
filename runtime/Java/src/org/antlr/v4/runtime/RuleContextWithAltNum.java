@@ -1,5 +1,7 @@
 package org.antlr.v4.runtime;
 
+import org.antlr.v4.runtime.atn.ATN;
+
 /** A handy class for use with
  *
  *  options {contextSuperClass=org.antlr.v4.runtime.RuleContextWithAltNum;}
@@ -12,6 +14,8 @@ package org.antlr.v4.runtime;
  */
 public class RuleContextWithAltNum extends ParserRuleContext {
 	public int altNum;
+	public RuleContextWithAltNum() { altNum = ATN.INVALID_ALT_NUMBER; }
+
 	public RuleContextWithAltNum(ParserRuleContext parent, int invokingStateNumber) {
 		super(parent, invokingStateNumber);
 	}
