@@ -141,6 +141,7 @@ Update on site:
 
 *   download.html
 *   index.html
+*   api/index.html
 *   download/index.html
 *   scripts/topnav.js
 
