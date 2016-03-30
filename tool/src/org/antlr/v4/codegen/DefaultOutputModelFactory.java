@@ -79,15 +79,18 @@ public abstract class DefaultOutputModelFactory extends BlankOutputModelFactory 
 
 	@Override
 	public List<SrcOp> rulePostamble(RuleFunction function, Rule r) {
-		// See OutputModelController.buildLeftRecursiveRuleFunction
-		// and Parser.exitRule for other places which set stop.
-		CodeGenerator gen = getGenerator();
-		STGroup codegenTemplates = gen.getTemplates();
-		ST setStopTokenAST = codegenTemplates.getInstanceOf("recRuleSetStopToken");
-		Action setStopTokenAction = new Action(this, function.ruleCtx, setStopTokenAST);
-		List<SrcOp> ops = new ArrayList<SrcOp>(1);
-		ops.add(setStopTokenAction);
-		return ops;
+		if ( r.namedActions.containsKey("after") || r.namedActions.containsKey("finally") ) {
+			// See OutputModelController.buildLeftRecursiveRuleFunction
+			// and Parser.exitRule for other places which set stop.
+			CodeGenerator gen = getGenerator();
+			STGroup codegenTemplates = gen.getTemplates();
+			ST setStopTokenAST = codegenTemplates.getInstanceOf("recRuleSetStopToken");
+			Action setStopTokenAction = new Action(this, function.ruleCtx, setStopTokenAST);
+			List<SrcOp> ops = new ArrayList<SrcOp>(1);
+			ops.add(setStopTokenAction);
+			return ops;
+		}
+		return super.rulePostamble(function, r);
 	}
 
 	// Convenience methods
