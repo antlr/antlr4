@@ -2,6 +2,9 @@ sudo: true
 language: java
 script:
   - mvn install
+python:
+  - 2.7
+  - 3.5
 jdk:
   - openjdk6
   - oraclejdk7
