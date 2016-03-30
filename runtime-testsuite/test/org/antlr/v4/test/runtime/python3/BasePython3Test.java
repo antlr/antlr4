@@ -41,8 +41,8 @@ public abstract class BasePython3Test extends BasePythonTest {
 
 	@Override
 	protected String getPythonExecutable() {
-		return "python3";
-	}
+		return "python3.5";
+	} // force 3.5
 
 	@Override
 	protected void writeLexerTestFile(String lexerName, boolean showDFA) {
