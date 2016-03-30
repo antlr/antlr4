@@ -301,7 +301,7 @@ AND.prototype.evalPrecedence = function(parser, outerContext) {
 	}
 	var result = null;
 	operands.map(function(o) {
-		result = result === null ? o : SemanticPredicate.andContext(result, o);
+		result = result === null ? o : SemanticContext.andContext(result, o);
 	});
 	return result;
 };
