@@ -38,29 +38,21 @@ namespace antlr {
 namespace v4 {
 namespace runtime {
 
-  template<typename Symbol, typename ATNInterpreter>
+  template<typename ATNInterpreter>
   class Recognizer : public IRecognizer {
-  public:
-    Recognizer();
   public:
     static const int _EOF = -1;
 
+    Recognizer();
+
+
   private:
-    static std::map<std::vector<std::wstring>, std::map<std::wstring, int>*> _tokenTypeMapCache;
-    static std::map<std::vector<std::wstring>, std::map<std::wstring, int>*> _ruleIndexMapCache;
+    static std::map<std::vector<std::wstring>, std::map<std::wstring, int>> _tokenTypeMapCache;
+    static std::map<std::vector<std::wstring>, std::map<std::wstring, int>> _ruleIndexMapCache;
 
     std::vector<ANTLRErrorListener*> _listeners;
     //Mutex to manage synchronized access for multithreading
     std::mutex mtx;
-
-#ifdef TODO
-    // Damn code isn't even being used, why is it here?
-  private:
-    class CopyOnWriteArrayListAnonymousInnerClassHelper : public std::vector<ANTLRErrorListener*> {
-    public:
-      CopyOnWriteArrayListAnonymousInnerClassHelper();
-    };
-#endif
 
   protected:
     ATNInterpreter *_interpreter; // Set and deleted in descendants.
@@ -83,14 +75,14 @@ namespace runtime {
     /// <p/>
     /// Used for XPath and tree pattern compilation.
     /// </summary>
-    virtual std::map<std::wstring, int> *getTokenTypeMap();
+    virtual std::map<std::wstring, int> getTokenTypeMap();
 
     /// <summary>
     /// Get a map from rule names to rule indexes.
     /// <p/>
     /// Used for XPath and tree pattern compilation.
     /// </summary>
-    virtual std::map<std::wstring, int> *getRuleIndexMap();
+    virtual std::map<std::wstring, int> getRuleIndexMap();
 
     virtual int getTokenType(const std::wstring &tokenName);
 

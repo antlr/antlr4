@@ -48,12 +48,6 @@ namespace atn {
     ATNSimulator();
 
     /// <summary>
-    /// This is the current serialized UUID. </summary>
-    /// @deprecated Use <seealso cref="ATNDeserializer#checkCondition(boolean)"/> instead.
-#ifdef TODO
-    constexpr static UUID *const SERIALIZED_UUID = ATNDeserializer::SERIALIZED_UUID;
-#endif
-    /// <summary>
     /// Must distinguish between missing edge and edge we know leads nowhere </summary>
     static dfa::DFAState ERROR;
     ATN atn;

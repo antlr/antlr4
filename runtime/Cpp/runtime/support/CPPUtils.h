@@ -32,25 +32,11 @@
 
 namespace antlrcpp {
 
-  template<typename T1>
-  class CopyOnWriteArrayList {
-  public:
-    CopyOnWriteArrayList(){};
-
-  };
-
   std::wstring join(std::vector<std::wstring> strings, const std::wstring &separator);
-
-  std::map<std::wstring, int>* toMap(const std::vector<std::wstring> &keys);
-
-  std::wstring escapeWhitespace(std::wstring str, bool TODO);
-
-  std::wstring stringFormat(const wchar_t* fmt, ...);
-
+  std::map<std::wstring, int> toMap(const std::vector<std::wstring> &keys);
+  std::wstring escapeWhitespace(std::wstring str, bool escapeSpaces);
   wchar_t* toCharArray(const std::vector<size_t> *data);
-
   std::wstring toHexString(const int t);
-
   std::wstring arrayToString(const std::vector<std::wstring> &data);
 
   // Using RAII + a lambda to implement a "finally" relacement.

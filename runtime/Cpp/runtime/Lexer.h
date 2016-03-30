@@ -46,7 +46,7 @@ namespace runtime {
   ///  uses simplified match() and error recovery mechanisms in the interest
   ///  of speed.
   /// </summary>
-  class Lexer : public Recognizer<int, atn::LexerATNSimulator>, public TokenSource {
+  class Lexer : public Recognizer<atn::LexerATNSimulator>, public TokenSource {
   public:
     static const int DEFAULT_MODE = 0;
     static const int MORE = -2;

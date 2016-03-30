@@ -43,7 +43,7 @@ LexerFileHeader(file, lexer, namedActions) ::= <<
 
 <if (namedActions.header)><namedActions.header><endif>
 
-// Have to use "using" here, because some code parts which require different namespaces
+// Have to use "using namespace" here, because some code parts which require different namespaces
 // are generated from the same template (e.g. see xxxSempred(.. *context) here and in the parser header.
 using namespace org::antlr::v4::runtime;
 

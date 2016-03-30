@@ -80,8 +80,8 @@ namespace atn {
     /// </summary>
 
     // Abstract
-    template<typename T1, typename T2>
-    bool eval(Recognizer<T1, T2> *parser, RuleContext *outerContext) {
+    template<typename ATNInterpreter>
+    bool eval(Recognizer<ATNInterpreter> *parser, RuleContext *outerContext) {
       // In the original Java this is abstract, but
       // C++ complains with a link error, and we
       // cannot make a template function abstract
@@ -125,8 +125,8 @@ namespace atn {
   public:
     Predicate(int ruleIndex, int predIndex, bool isCtxDependent);
 
-    template<typename T1, typename T2>
-    bool eval(Recognizer<T1, T2> *parser, RuleContext *outerContext)  {
+    template<typename ATNInterpreter>
+    bool eval(Recognizer<ATNInterpreter> *parser, RuleContext *outerContext)  {
       RuleContext *localctx = isCtxDependent ? outerContext : nullptr;
       return parser->sempred(localctx, ruleIndex, predIndex);
     }
@@ -148,8 +148,8 @@ namespace atn {
   public:
     PrecedencePredicate(int precedence);
 
-    template<typename T1, typename T2>
-    bool eval(Recognizer<T1, T2> *parser, RuleContext *outerContext) {
+    template<typename ATNInterpreter>
+    bool eval(Recognizer<ATNInterpreter> *parser, RuleContext *outerContext) {
       return parser->precpred(outerContext, precedence);
     }
 
@@ -181,8 +181,8 @@ namespace atn {
 
     virtual size_t hashCode() override;
 
-    template<typename T1, typename T2>
-    bool eval(Recognizer<T1, T2> *parser, RuleContext *outerContext) {
+    template<typename ATNInterpreter>
+    bool eval(Recognizer<ATNInterpreter> *parser, RuleContext *outerContext) {
       for (auto opnd : opnds) {
         if (!opnd->eval(parser, outerContext)) {
           return false;
@@ -205,8 +205,8 @@ namespace atn {
 
     virtual size_t hashCode() override;
 
-    template<typename T1, typename T2>
-    bool eval(Recognizer<T1, T2> *parser, RuleContext *outerContext) {
+    template<typename ATNInterpreter>
+    bool eval(Recognizer<ATNInterpreter> *parser, RuleContext *outerContext) {
       for (auto opnd : opnds) {
         if (opnd->eval(parser, outerContext)) {
           return true;

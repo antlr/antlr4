@@ -257,7 +257,7 @@ void LexerATNSimulator::getReachableConfigSet(CharStream *input, ATNConfigSet *c
     }
 
     if (debug) {
-      std::wcout << L"testing " << getTokenName(t) << " at " <<c->toString(_recog, true) << std::endl;
+      std::wcout << L"testing " << getTokenName((int)t) << " at " << c->toString(true) << std::endl;
     }
 
     size_t n = c->state->getNumberOfTransitions();
@@ -321,7 +321,7 @@ atn::ATNConfigSet *LexerATNSimulator::computeStartState(CharStream *input, ATNSt
 
 bool LexerATNSimulator::closure(CharStream *input, LexerATNConfig *config, ATNConfigSet *configs, bool currentAltReachedAcceptState, bool speculative) {
   if (debug) {
-    std::wcout << L"closure(" << config->toString(_recog, true) << L")" << std::endl;
+    std::wcout << L"closure(" << config->toString(true) << L")" << std::endl;
   }
 
   if (dynamic_cast<RuleStopState*>(config->state) != nullptr) {
@@ -501,14 +501,12 @@ void LexerATNSimulator::addDFAEdge(dfa::DFAState *p, size_t t, dfa::DFAState *q)
     std::wcout << std::wstring(L"EDGE ") << p << std::wstring(L" -> ") << q << std::wstring(L" upon ") << (static_cast<wchar_t>(t)) << std::endl;
   }
 
-  if(true) {
-    std::lock_guard<std::mutex> lck(mtx);
-    if (p->edges.empty()) {
-      //  make room for tokens 1..n and -1 masquerading as index 0
-      p->edges = std::vector<dfa::DFAState*>(MAX_DFA_EDGE - MIN_DFA_EDGE + 1);
-    }
-    p->edges[t - MIN_DFA_EDGE] = q; // connect
+  std::lock_guard<std::mutex> lck(mtx);
+  if (p->edges.empty()) {
+    //  make room for tokens 1..n and -1 masquerading as index 0
+    p->edges.resize(MAX_DFA_EDGE - MIN_DFA_EDGE + 1);
   }
+  p->edges[t - MIN_DFA_EDGE] = q; // connect
 }
 
 dfa::DFAState *LexerATNSimulator::addDFAState(ATNConfigSet *configs) {

@@ -55,8 +55,7 @@ conquer:
 ;
 
 // Unused rule to demonstrate some of the special features.
-// Note: returns and throws are ignored in the C++ target.
-unused returns [double calculated] throws stones, flowers  @init{ doInit(); } @after { doAfter(); } :
+unused[double input] returns [double calculated] locals [size_t _a, double _b, int _c] @init{ doInit(); } @after { doAfter(); } :
 ;
 catch [...] {
   // Replaces the standard exception handling.
@@ -64,3 +63,29 @@ catch [...] {
 finally {
   cleanUp();
 }
+
+unused2:
+	(unused[1] .)+ (Colon | Semicolon | Plus)? ~Semicolon
+;
+
+stat: expr Equal expr Semicolon
+    | expr Semicolon
+;
+
+expr: expr Star expr
+    | expr Plus expr
+    | expr OpenPar expr ClosePar
+	| <assoc = right> expr QuestionMark expr Colon expr
+    | <assoc = right> expr Equal expr
+    | identifier = id
+	| flowControl
+;
+
+flowControl:
+	Return expr # Return
+	| Continue # Continue
+;
+
+id: ID;
+array : OpenCurly el += INT (Comma el += INT)* CloseCurly;
+idarray : OpenCurly element += id (Comma element += id)* CloseCurly;

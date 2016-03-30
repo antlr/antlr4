@@ -80,32 +80,28 @@ namespace runtime {
     NullPointerException(const std::wstring msg) : ANTLRException(msg) {};
     NullPointerException(){};
   };
+
   class IndexOutOfBoundsException : public ANTLRException {
   public:
     IndexOutOfBoundsException(const std::wstring msg) : ANTLRException(msg) {};
     IndexOutOfBoundsException(){};
   };
+
   class UnsupportedOperationException : public ANTLRException {
   public:
     UnsupportedOperationException(const std::wstring msg) : ANTLRException(msg) {};
     UnsupportedOperationException(){};
   };
+
   class IOException : public ANTLRException {
   public:
     IOException(const std::wstring msg)  : ANTLRException(msg) {};
     IOException(){};
   };
-  class TODOException : public ANTLRException {
-  public:
-    TODOException(const std::wstring msg)  : ANTLRException(msg) {};
-    TODOException();
-  };
+
   class ASSERTException : public ANTLRException {
   public:
-    ASSERTException(const std::wstring location,
-                    const std::wstring condition)
-    : ANTLRException(location + L" condition= " + condition) {};
-    ASSERTException();
+    ASSERTException(const std::wstring location, const std::wstring condition) : ANTLRException(location + L" condition= " + condition) {};
   };
 
 } // namespace runtime

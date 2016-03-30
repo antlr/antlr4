@@ -50,7 +50,7 @@ namespace runtime {
 
     /// <summary>
     /// We need to be able to change the text once in a while.  If
-    ///  this is non-null, then getText should return this.  Note that
+    ///  this is non-empty, then getText should return this.  Note that
     ///  start/stop are not affected by changing this.
     /// </summary>
     // TODO: can store these in map in token stream rather than as field here

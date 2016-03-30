@@ -36,72 +36,64 @@
 #include "Strings.h"
 #include "ProxyErrorListener.h"
 #include "Token.h"
+#include "CPPUtils.h"
 
 namespace org {
 namespace antlr {
 namespace v4 {
 namespace runtime {
 
-  template<typename T1, typename T2>
-  std::map<std::vector<std::wstring>, std::map<std::wstring, int>*>
-  Recognizer<T1, T2>::_tokenTypeMapCache;
+  template<typename ATNInterpreter>
+  std::map<std::vector<std::wstring>, std::map<std::wstring, int>> Recognizer<ATNInterpreter>::_tokenTypeMapCache;
 
-  template<typename T1, typename T2>
-  std::map<std::vector<std::wstring>, std::map<std::wstring, int>*>
-  Recognizer<T1, T2>::_ruleIndexMapCache;
+  template<typename ATNInterpreter>
+  std::map<std::vector<std::wstring>, std::map<std::wstring, int>> Recognizer<ATNInterpreter>::_ruleIndexMapCache;
 
-  template<typename T1, typename T2>
-  std::map<std::wstring, int> *Recognizer<T1, T2>::getTokenTypeMap() {
-    std::vector<std::wstring> tokenNames = getTokenNames();
+  template<typename ATNInterpreter>
+  std::map<std::wstring, int> Recognizer<ATNInterpreter>::getTokenTypeMap() {
+    const std::vector<std::wstring>& tokenNames = getTokenNames();
     if (tokenNames.empty()) {
       throw L"The current recognizer does not provide a list of token names.";
     }
 
-
-    {   // mutex lock
-      std::lock_guard<std::mutex> lck(mtx);
-      std::map<std::wstring, int> *result = _tokenTypeMapCache.at(tokenNames);
-      if (result == nullptr) {
-        // From Java - why ? result = misc::Utils::toMap(tokenNames);
-        (*result)[L"EOF"] = Token::_EOF;
-
-        // TODO
-        // From Java - why ? result = std::vector::unmodifiableMap(result);
-        _tokenTypeMapCache[tokenNames] = result;
-
-      }
-
-      return result;
+    std::lock_guard<std::mutex> lck(mtx);
+    std::map<std::wstring, int> result;
+    auto iterator = _tokenTypeMapCache.find(tokenNames);
+    if (iterator != _tokenTypeMapCache.end()) {
+      result = iterator->second;
+    } else {
+      result = antlrcpp::toMap(tokenNames);
+      result[L"EOF"] = Token::_EOF;
+      _tokenTypeMapCache[tokenNames] = result;
     }
 
+    return result;
   }
 
-  template<typename T1, typename T2>
-  std::map<std::wstring, int> *Recognizer<T1, T2>::getRuleIndexMap() {
+  template<typename ATNInterpreter>
+  std::map<std::wstring, int> Recognizer<ATNInterpreter>::getRuleIndexMap() {
     const std::vector<std::wstring>& ruleNames = getRuleNames();
     if (ruleNames.empty()) {
       throw L"The current recognizer does not provide a list of rule names.";
     }
 
-    {
-      std::lock_guard<std::mutex> lck(mtx);
-      std::map<std::wstring, int> *result = _ruleIndexMapCache.at(ruleNames);
-
-      if (result == nullptr) {
-        result = antlrcpp::toMap(ruleNames);
-        std::pair<std::vector<std::wstring>, std::map<std::wstring, int>*> tmp (ruleNames, result);
-        _ruleIndexMapCache.insert(_ruleIndexMapCache.begin(), tmp);
-      }
-      return result;
+    std::lock_guard<std::mutex> lck(mtx);
+    std::map<std::wstring, int> result;
+    auto iterator = _ruleIndexMapCache.find(ruleNames);
+    if (iterator != _ruleIndexMapCache.end()) {
+      result = iterator->second;
+    } else {
+      result = antlrcpp::toMap(ruleNames);
+      _ruleIndexMapCache[ruleNames] = result;
     }
-    return nullptr;
+    return result;
   }
 
-  template<typename T1, typename T2>
-  int Recognizer<T1, T2>::getTokenType(const std::wstring &tokenName) {
+  template<typename ATNInterpreter>
+  int Recognizer<ATNInterpreter>::getTokenType(const std::wstring &tokenName) {
 
-    std::map<std::wstring, int> * map = getTokenTypeMap();
-    int ttype = map->at(tokenName);
+    const std::map<std::wstring, int> &map = getTokenTypeMap();
+    int ttype = map.at(tokenName);
 
     if (ttype != Token::INVALID_TYPE) {
       return ttype;
@@ -109,8 +101,8 @@ namespace runtime {
     return Token::INVALID_TYPE;
   }
 
-  template<typename T1, typename T2>
-  std::wstring Recognizer<T1, T2>::getErrorHeader(RecognitionException *e) {
+  template<typename ATNInterpreter>
+  std::wstring Recognizer<ATNInterpreter>::getErrorHeader(RecognitionException *e) {
     // We're having issues with cross header dependencies, these two classes will need to be
     // rewritten to remove that.
     int line = e->getOffendingToken()->getLine();
@@ -119,8 +111,8 @@ namespace runtime {
 
   }
 
-  template<typename T1, typename T2>
-  std::wstring Recognizer<T1, T2>::getTokenErrorDisplay(Token *t) {
+  template<typename ATNInterpreter>
+  std::wstring Recognizer<ATNInterpreter>::getTokenErrorDisplay(Token *t) {
     if (t == nullptr) {
       return L"<no token>";
     }
@@ -134,16 +126,14 @@ namespace runtime {
     }
 
     antlrcpp::replaceAll(s, L"\n", L"\\n");
-
     antlrcpp::replaceAll(s, L"\r",L"\\r");
-
     antlrcpp::replaceAll(s, L"\t", L"\\t");
 
     return std::wstring(L"'") + s + std::wstring(L"'");
   }
 
-  template<typename T1, typename T2>
-  void Recognizer<T1, T2>::addErrorListener(ANTLRErrorListener *listener) {
+  template<typename ATNInterpreter>
+  void Recognizer<ATNInterpreter>::addErrorListener(ANTLRErrorListener *listener) {
     if (listener == nullptr) {
       throw L"listener cannot be null.";
     }
@@ -151,73 +141,63 @@ namespace runtime {
     _listeners.insert(_listeners.end(), listener);
   }
 
-  template<typename T1, typename T2>
-  void Recognizer<T1, T2>::removeErrorListener(ANTLRErrorListener *listener) {
+  template<typename ATNInterpreter>
+  void Recognizer<ATNInterpreter>::removeErrorListener(ANTLRErrorListener *listener) {
     //_listeners.remove(listener); does this work the same way?
     std::vector<ANTLRErrorListener*>::iterator it;
     it = std::find(_listeners.begin(), _listeners.end(), listener);
     _listeners.erase(it);
   }
 
-  template<typename T1, typename T2>
-  void Recognizer<T1, T2>::removeErrorListeners() {
+  template<typename ATNInterpreter>
+  void Recognizer<ATNInterpreter>::removeErrorListeners() {
     _listeners.clear();
   }
 
-  template<typename T1, typename T2>
-  ANTLRErrorListener *Recognizer<T1, T2>::getErrorListenerDispatch() {
+  template<typename ATNInterpreter>
+  ANTLRErrorListener *Recognizer<ATNInterpreter>::getErrorListenerDispatch() {
     return (ANTLRErrorListener *)new ProxyErrorListener(getErrorListeners());
   }
 
-  template<typename T1, typename T2>
-  bool Recognizer<T1, T2>::sempred(RuleContext *_localctx, int ruleIndex, int actionIndex) {
+  template<typename ATNInterpreter>
+  bool Recognizer<ATNInterpreter>::sempred(RuleContext *_localctx, int ruleIndex, int actionIndex) {
     return true;
   }
 
 
-  template<typename T1, typename T2>
-  bool Recognizer<T1, T2>::precpred(RuleContext *localctx, int precedence) {
+  template<typename ATNInterpreter>
+  bool Recognizer<ATNInterpreter>::precpred(RuleContext *localctx, int precedence) {
     return true;
   }
 
 
-  template<typename T1, typename T2>
-  void Recognizer<T1, T2>::action(RuleContext *_localctx, int ruleIndex, int actionIndex) {
+  template<typename ATNInterpreter>
+  void Recognizer<ATNInterpreter>::action(RuleContext *_localctx, int ruleIndex, int actionIndex) {
   }
 
 
-  template<typename T1, typename T2>
-  int Recognizer<T1, T2>::getState() {
+  template<typename ATNInterpreter>
+  int Recognizer<ATNInterpreter>::getState() {
     return _stateNumber;
   }
 
-  template<typename T1, typename T2>
-  void Recognizer<T1, T2>::setState(int atnState) {
-    //		System.err.println("setState "+atnState);
+  template<typename ATNInterpreter>
+  void Recognizer<ATNInterpreter>::setState(int atnState) {
     _stateNumber = atnState;
     //		if ( traceATNStates ) _ctx.trace(atnState);
   }
 
-  template<typename T1, typename T2>
-  void Recognizer<T1, T2>::InitializeInstanceFields() {
+  template<typename ATNInterpreter>
+  void Recognizer<ATNInterpreter>::InitializeInstanceFields() {
     _stateNumber = -1;
     _interpreter = nullptr;
     _listeners = std::vector<ANTLRErrorListener*>();
   }
 
-  template<typename T1, typename T2>
-  Recognizer<T1, T2>::Recognizer() {
+  template<typename ATNInterpreter>
+  Recognizer<ATNInterpreter>::Recognizer() {
     InitializeInstanceFields();
   }
-
-#ifdef TODO
-  template<typename T1, typename T2>
-  Recognizer<T1, T2>::
-  CopyOnWriteArrayListAnonymousInnerClassHelper::CopyOnWriteArrayListAnonymousInnerClassHelper()
-  {
-    add(&ConsoleErrorListener::INSTANCE)
-  }
-#endif
 
 } // namespace runtime
 } // namespace v4

@@ -37,7 +37,6 @@
 #include "DecisionState.h"
 #include "ParserRuleContext.h"
 #include "IntervalSet.h"
-#include "Utils.h"
 #include "Parser.h"
 #include "CommonTokenStream.h"
 #include "EmptyPredictionContext.h"
@@ -581,7 +580,7 @@ atn::ATNConfigSet *ParserATNSimulator::removeAllConfigsNotInRuleStopState(ATNCon
     if (lookToEndOfRule && config->state->onlyHasEpsilonTransitions()) {
       misc::IntervalSet nextTokens = atn.nextTokens(config->state);
       if (nextTokens.contains(Token::EPSILON)) {
-        ATNState *endOfRuleState = atn.ruleToStopState[config->state->ruleIndex];
+        ATNState *endOfRuleState = atn.ruleToStopState[(size_t)config->state->ruleIndex];
         result->add(new ATNConfig(config, endOfRuleState), mergeCache);
       }
     }
@@ -744,7 +743,7 @@ void ParserATNSimulator::closure(ATNConfig *config, ATNConfigSet *configs, std::
 
 void ParserATNSimulator::closureCheckingStopState(ATNConfig *config, ATNConfigSet *configs, std::set<ATNConfig*> *closureBusy, bool collectPredicates, bool fullCtx, int depth) {
   if (debug) {
-    std::wcout << L"closure(" << config->toString(parser,true) << L")" << std::endl;
+    std::wcout << L"closure(" << config->toString(true) << L")" << std::endl;
   }
 
   if (dynamic_cast<RuleStopState*>(config->state) != nullptr) {
@@ -1021,7 +1020,7 @@ void ParserATNSimulator::dumpDeadEndConfigs(NoViableAltException *nvae) {
         trans += st->set.toString();
       }
     }
-    std::wcerr << c->toString(parser, true) + L":" + trans;
+    std::wcerr << c->toString(true) + L":" + trans;
   }
 }
 

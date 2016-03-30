@@ -51,13 +51,6 @@ namespace runtime {
     std::vector<Token *>tokens;
 
     /// <summary>
-    /// The number of tokens currently in <seealso cref="#tokens tokens"/>.
-    /// <p/>
-    /// This is not the buffer capacity, that's {@code tokens.length}.
-    /// </summary>
-    int n;
-
-    /// <summary>
     /// 0..n-1 index into <seealso cref="#tokens tokens"/> of next token.
     /// <p/>
     /// The {@code LT(1)} token is {@code tokens[p]}. If {@code p == n}, we are
@@ -99,20 +92,18 @@ namespace runtime {
 
     UnbufferedTokenStream(TokenSource *tokenSource, int bufferSize);
 
-    virtual Token *get(int i) override;
+    virtual Token *get(size_t i) const override;
 
-    virtual Token *LT(int i) override ;
+    virtual Token *LT(ssize_t i) override;
 
-    virtual int LA(int i) override ;
+    virtual size_t LA(ssize_t i) override;
 
-    virtual TokenSource *getTokenSource() override;
+    virtual TokenSource *getTokenSource() const override;
 
-    virtual std::wstring getText() override ;
-
+    virtual std::wstring getText(const misc::Interval &interval) override;
+    virtual std::wstring getText() override;
     virtual std::wstring getText(RuleContext *ctx) override;
-
     virtual std::wstring getText(Token *start, Token *stop) override;
-
     virtual void consume() override;
 
     /// <summary>
@@ -140,19 +131,17 @@ namespace runtime {
     /// {@code release()} is called in the wrong order.
     /// </summary>
   public:
-    virtual int mark() override;
+    virtual ssize_t mark() override;
 
-    virtual void release(int marker) override;
+    virtual void release(ssize_t marker) override;
 
-    virtual int index() override;
+    virtual size_t index() override;
 
-    virtual void seek(int index) override;
+    virtual void seek(size_t index) override;
 
     virtual size_t size() override;
 
     virtual std::string getSourceName() override;
-
-    virtual std::wstring getText(misc::Interval *interval) ;
 
   protected:
     int getBufferStartIndex();
@@ -165,5 +154,3 @@ namespace runtime {
 } // namespace v4
 } // namespace antlr
 } // namespace org
-
-#include "UnbufferedTokenStream.inl"

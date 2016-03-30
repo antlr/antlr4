@@ -216,14 +216,14 @@ ATN ATNDeserializer::deserialize(const std::wstring& input) {
     }
   }
 
-  atn.ruleToStopState = new RuleStopState*[nrules];
+  atn.ruleToStopState.resize(nrules);
   for (ATNState *state : atn.states) {
     if (!(dynamic_cast<RuleStopState*>(state) != nullptr)) {
       continue;
     }
 
     RuleStopState *stopState = static_cast<RuleStopState*>(state);
-    atn.ruleToStopState[state->ruleIndex] = stopState;
+    atn.ruleToStopState[(size_t)state->ruleIndex] = stopState;
     atn.ruleToStartState[(size_t)state->ruleIndex]->stopState = stopState;
   }
 
@@ -284,7 +284,7 @@ ATN ATNDeserializer::deserialize(const std::wstring& input) {
       }
 
       RuleTransition *ruleTransition = static_cast<RuleTransition*>(t);
-      atn.ruleToStopState[ruleTransition->target->ruleIndex]->addTransition(new EpsilonTransition(ruleTransition->followState));
+      atn.ruleToStopState[(size_t)ruleTransition->target->ruleIndex]->addTransition(new EpsilonTransition(ruleTransition->followState));
     }
   }
 
@@ -330,7 +330,6 @@ ATN ATNDeserializer::deserialize(const std::wstring& input) {
   for (size_t i = 1; i <= ndecisions; i++) {
     size_t s = (size_t)data[p++];
     DecisionState *decState = static_cast<DecisionState*>(atn.states[s]);
-    // TODO: decisionToState was originally declared as const in ATN
     atn.decisionToState.push_back(decState);
     decState->decision = (int)i - 1;
   }
@@ -498,8 +497,7 @@ void ATNDeserializer::checkCondition(bool condition) {
 
 void ATNDeserializer::checkCondition(bool condition, const std::wstring &message) {
   if (!condition) {
-    // TODO: throw IllegalStateException(message);
-    throw std::exception();
+    throw IllegalStateException(message);
   }
 }
 

@@ -139,8 +139,8 @@ namespace runtime {
     virtual std::wstring toString() override;
 
 
-    template<typename T1, typename T2>
-    std::wstring toString(Recognizer<T1, T2> *recog) {
+    template<typename ATNInterpreter>
+    std::wstring toString(Recognizer<ATNInterpreter> *recog) {
       // Circular include issue, TODO
       //return toString(recog, ParserRuleContext::EMPTY);
       return toString(recog, nullptr);
@@ -149,8 +149,8 @@ namespace runtime {
     std::wstring toString(const std::vector<std::wstring> &ruleNames);
 
     // recog null unless ParserRuleContext, in which case we use subclass toString(...)
-    template<typename T1, typename T2>
-    std::wstring toString(Recognizer<T1, T2> *recog, RuleContext *stop) {
+    template<typename ATNInterpreter>
+    std::wstring toString(Recognizer<ATNInterpreter> *recog, RuleContext *stop) {
       return toString(recog->getRuleNames(), stop);
     }
 

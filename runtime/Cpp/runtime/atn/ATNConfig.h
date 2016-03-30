@@ -81,19 +81,12 @@ namespace atn {
     SemanticContext *const semanticContext;
 
     ATNConfig(ATNConfig *old); // dup
-
     ATNConfig(ATNState *state, int alt, PredictionContext *context); //this(state, alt, context, SemanticContext.NONE);
-
     ATNConfig(ATNState *state, int alt, PredictionContext *context, SemanticContext *semanticContext);
-
     ATNConfig(ATNConfig *c, ATNState *state); //this(c, state, c.context, c.semanticContext);
-
     ATNConfig(ATNConfig *c, ATNState *state, SemanticContext *semanticContext); //this(c, state, c.context, semanticContext);
-
     ATNConfig(ATNConfig *c, SemanticContext *semanticContext); //this(c, c.state, c.context, semanticContext);
-
     ATNConfig(ATNConfig *c, ATNState *state, PredictionContext *context); //this(c, state, context, c.semanticContext);
-
     ATNConfig(ATNConfig *c, ATNState *state, PredictionContext *context, SemanticContext *semanticContext);
 
     virtual size_t hashCode() const;
@@ -119,13 +112,9 @@ namespace atn {
 
     virtual std::wstring toString();
 
-    template<typename T1, typename T2>
-    std::wstring toString(Recognizer<T1, T2> *recog, bool showAlt) {
+    std::wstring toString(bool showAlt) {
       antlrcpp::StringBuilder buf;
-      //		if ( state.ruleIndex>=0 ) {
-      //			if ( recog!=null ) buf.append(recog.getRuleNames()[state.ruleIndex]+":");
-      //			else buf.append(state.ruleIndex+":");
-      //		}
+
       buf.append(L'(');
       buf.append(state);
       if (showAlt) {

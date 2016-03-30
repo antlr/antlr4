@@ -72,13 +72,13 @@ namespace runtime {
     /// <exception cref="IllegalArgumentException"> if {code index} is less than 0 </exception>
     /// <exception cref="UnsupportedOperationException"> if the stream does not support
     /// retrieving the token at the specified index </exception>
-    virtual Token *get(size_t index) = 0;
+    virtual Token *get(size_t index) const = 0;
 
     /// <summary>
     /// Gets the underlying <seealso cref="TokenSource"/> which provides tokens for this
     /// stream.
     /// </summary>
-    virtual TokenSource *getTokenSource() = 0;
+    virtual TokenSource *getTokenSource() const = 0;
 
     /// <summary>
     /// Return the text of all tokens within the specified {@code interval}. This

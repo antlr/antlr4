@@ -44,7 +44,7 @@ namespace runtime {
 
   /// <summary>
   /// This is all the parsing support code essentially; most of it is error recovery stuff. </summary>
-  class Parser : public Recognizer<Token, atn::ParserATNSimulator> {
+  class Parser : public Recognizer<atn::ParserATNSimulator> {
   public:
 
     class TraceListener : public tree::ParseTreeListener {

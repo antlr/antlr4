@@ -38,35 +38,51 @@ std::wstring join(std::vector<std::wstring> strings, const std::wstring &separat
   for (std::wstring s : strings) {
     if (!firstItem) {
       str.append(separator);
-    } else {
-      firstItem = false;
     }
+    firstItem = false;
     str.append(s);
   }
   return str;
 }
 
-std::map<std::wstring, int>* toMap(const std::vector<std::wstring> &keys) {
-  std::map<std::wstring, int>* m = new std::map<std::wstring, int>();
+std::map<std::wstring, int> toMap(const std::vector<std::wstring> &keys) {
+  std::map<std::wstring, int> result;
   for (size_t i = 0; i < keys.size(); ++i) {
-    m->insert({ keys[i], i });
+    result.insert({ keys[i], i });
   }
-  return m;
+  return result;
 }
 
-std::wstring escapeWhitespace(std::wstring str, bool TODO) {
-  // TODO - David, what is this boolean for, and what did you want to esacpe
-  // whitespace with?
-  std::wstring returnAnswer = str.replace(str.begin(), str.end(), L' ', L'\\');
-  return returnAnswer;
-}
+std::wstring escapeWhitespace(std::wstring str, bool escapeSpaces) {
+  std::wstring result;
+  for (auto c : str) {
+    switch (c) {
+      case L' ':
+        if (escapeSpaces) {
+          result += '0xB7';
+          break;
+        } else {
+          // fall through
+        }
 
-std::wstring stringFormat(const std::wstring fmt_str, ...)
-{
-  // Not sure this is needed, just use swprintf (into a wchar_t array).
-  // TODO(dsisson): Remove this function in a future change.
-  std::wstring blank;
-  return blank;
+      case L'\n':
+        result += L"\\n";
+        break;
+
+      case L'\r':
+        result += L"\\r";
+        break;
+
+      case L'\t':
+        result += L"\\t";
+        break;
+
+      default:
+        result += c;
+    }
+  }
+
+  return result;
 }
 
 wchar_t* toCharArray(const std::vector<size_t> *data){

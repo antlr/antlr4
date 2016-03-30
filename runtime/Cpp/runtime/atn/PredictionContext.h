@@ -274,20 +274,20 @@ namespace atn {
 
     std::wstring toString();
 
-    template<typename T1, typename T2>
-    std::wstring toString(Recognizer<T1, T2> *recog)  {
+    template<typename ATNInterpreter>
+    std::wstring toString(Recognizer<ATNInterpreter> *recog)  {
       return toString();
       //		return toString(recog, ParserRuleContext.EMPTY);
     }
 
-    template<typename T1, typename T2>
-    std::wstring *toStrings(Recognizer<T1, T2> *recognizer, int currentState) {
+    template<typename ATNInterpreter>
+    std::wstring *toStrings(Recognizer<ATNInterpreter> *recognizer, int currentState) {
       return toStrings(recognizer, EMPTY, currentState);
     }
 
     // FROM SAM
-    template<typename T1, typename T2>
-    std::wstring *toStrings(Recognizer<T1, T2> *recognizer, PredictionContext *stop, int currentState) {
+    template<typename ATNInterpreter>
+    std::wstring *toStrings(Recognizer<ATNInterpreter> *recognizer, PredictionContext *stop, int currentState) {
       std::vector<std::wstring> result = std::vector<std::wstring>();
 
       for (size_t perm = 0; ; perm++) {

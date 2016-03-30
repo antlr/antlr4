@@ -75,9 +75,6 @@ inline uint64_t rotl64 (uint64_t x, int8_t r)
 
 #endif // !defined(_MSC_VER)
 
-MurmurHash::MurmurHash() {
-}
-
 size_t MurmurHash::initialize() {
   return initialize(DEFAULT_SEED);
 }

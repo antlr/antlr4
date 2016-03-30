@@ -512,11 +512,11 @@ misc::IntervalSet Parser::getExpectedTokensWithinCurrentRule() {
 }
 
 int Parser::getRuleIndex(const std::wstring &ruleName) {
-  std::map<std::wstring, int>* m = getRuleIndexMap();
-  if (m->find(ruleName) == m->end()) {
+  const std::map<std::wstring, int> &m = getRuleIndexMap();
+  if (m.find(ruleName) == m.end()) {
     return -1;
   }
-  return m->at(ruleName);
+  return m.at(ruleName);
 }
 
 ParserRuleContext *Parser::getRuleContext() {

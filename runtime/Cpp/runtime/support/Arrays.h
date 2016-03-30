@@ -50,10 +50,14 @@ namespace antlrcpp {
       return true;
     }
 
-    static std::list<std::wstring> copyOf(void * obj, int num); // XXX: rework callers to remove this function.
-    static std::wstring copyOf(std::wstring obj, int num); // XXX: ditto
+    template <typename T>
+    static std::vector<T> copyOf(const std::vector<T> &source, size_t count) {
+      std::vector<T> result;
+      result.resize(std::min(source.size(), count));
+      std::copy(source.begin(), source.end(), result.begin());
+      return result;
+    }
 
-    static void arraycopy(void * arrayA, void * arrayB, int num);
   };
 
 }

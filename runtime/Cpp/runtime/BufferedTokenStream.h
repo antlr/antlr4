@@ -83,7 +83,7 @@ namespace runtime {
   public:
     BufferedTokenStream(TokenSource *tokenSource);
 
-    virtual TokenSource *getTokenSource() override;
+    virtual TokenSource *getTokenSource() const override;
     virtual size_t index() override;
     virtual ssize_t mark() override;
 
@@ -112,7 +112,7 @@ namespace runtime {
     virtual size_t fetch(size_t n);
 
   public:
-    virtual Token *get(size_t i) override;
+    virtual Token *get(size_t i) const override;
 
     /// <summary>
     /// Get all tokens from start..stop inclusively </summary>
@@ -155,7 +155,6 @@ namespace runtime {
     ///  method looks at both on and off channel tokens.
     /// </summary>
     virtual std::vector<Token*> getTokens(int start, int stop, std::vector<int> *types);
-
     virtual std::vector<Token*> getTokens(int start, int stop, int ttype);
 
   protected:
@@ -203,11 +202,8 @@ namespace runtime {
   public:
     virtual std::string getSourceName() override;
     virtual std::wstring getText() override;
-
     virtual std::wstring getText(const misc::Interval &interval) override;
-
     virtual std::wstring getText(RuleContext *ctx) override;
-
     virtual std::wstring getText(Token *start, Token *stop) override;
 
     /// <summary>

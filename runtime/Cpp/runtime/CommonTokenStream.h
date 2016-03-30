@@ -63,7 +63,6 @@ namespace runtime {
 
   public:
     CommonTokenStream(TokenSource *tokenSource);
-
     CommonTokenStream(TokenSource *tokenSource, int channel);
 
   protected:

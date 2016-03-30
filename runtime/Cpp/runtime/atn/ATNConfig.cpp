@@ -91,7 +91,7 @@ bool ATNConfig::operator == (const ATNConfig& other) const
 }
 
 std::wstring ATNConfig::toString() {
-  return toString<void*,void*>(nullptr, true);
+  return toString(true);
 }
 
 

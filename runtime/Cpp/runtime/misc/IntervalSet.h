@@ -98,15 +98,13 @@ namespace misc {
     /// </summary>
     virtual void add(int a, int b);
 
-  protected:
-    // Copy on write so we can cache a..a intervals and sets of that.
-    virtual void add(const Interval &addition);
-
   public:
     /// combine all sets in the array returned the or'd value
     static IntervalSet Or(const std::vector<IntervalSet> &sets);
 
-    virtual IntervalSet addAll(const IntervalSet &set);
+    // Copy on write so we can cache a..a intervals and sets of that.
+    virtual void add(const Interval &addition);
+    virtual IntervalSet& addAll(const IntervalSet &set);
 
     virtual IntervalSet complement(int minElement, int maxElement) const;
 

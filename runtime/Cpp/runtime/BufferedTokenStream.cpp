@@ -47,7 +47,7 @@ BufferedTokenStream::BufferedTokenStream(TokenSource *tokenSource) {
   this->tokenSource = tokenSource;
 }
 
-TokenSource *BufferedTokenStream::getTokenSource() {
+TokenSource *BufferedTokenStream::getTokenSource() const {
   return tokenSource;
 }
 
@@ -117,7 +117,7 @@ size_t BufferedTokenStream::fetch(size_t n) {
   return n;
 }
 
-Token *BufferedTokenStream::get(size_t i) {
+Token *BufferedTokenStream::get(size_t i) const {
   if (i >= tokens.size()) {
     throw IndexOutOfBoundsException(std::wstring(L"token index ") +
                                     std::to_wstring(i) +

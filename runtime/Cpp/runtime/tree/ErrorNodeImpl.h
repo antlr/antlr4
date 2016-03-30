@@ -56,38 +56,6 @@ namespace tree {
     T accept(ParseTreeVisitor<T1> *visitor)  {
       return visitor->visitErrorNode(this);
     }
-
-    // From ErrorNode
-
-    // TerminalNodeImpl->TerminalNode->ParseTree->SyntaxTree->Tree
-    //        ErrorNode->TerminalNode ...
-
-
-    // From TerminalnodeImpl
-
-    // From Terminal Node
-  public:
-    virtual Token *getSymbol() override;
-
-    // From Parse Tree
-  public:
-    virtual ParseTree *getParent() override ;
-    virtual ParseTree *getChild(std::size_t i) override;
-    virtual std::wstring getText() override;
-    virtual std::wstring toStringTree(Parser *parser) override;
-
-    // From SyntaxTree
-  public:
-    virtual misc::Interval getSourceInterval() override;
-
-    // From Tree
-  public:
-    //                        Tree *getParent() override;
-    virtual void *getPayload() override;
-    //                        Tree *getChild(int i) override;
-
-    virtual std::size_t getChildCount() override;
-    virtual std::wstring toStringTree() override;
   };
 
 } // namespace tree

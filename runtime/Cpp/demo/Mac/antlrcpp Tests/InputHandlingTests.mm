@@ -32,6 +32,7 @@
 #include "ANTLRInputStream.h"
 #include "Exceptions.h"
 #include "Interval.h"
+#include "UnbufferedTokenStream.h"
 
 using namespace org::antlr::v4::runtime;
 using namespace org::antlr::v4::runtime::misc;
@@ -155,6 +156,10 @@ using namespace org::antlr::v4::runtime::misc;
 
   stream.name = "unit tests"; // Quite useless test, as "name" is a public field.
   XCTAssertEqual(stream.getSourceName(), "unit tests");
+}
+
+- (void)testUnbufferedTokenSteam {
+  //UnbufferedTokenStream stream;
 }
 
 @end

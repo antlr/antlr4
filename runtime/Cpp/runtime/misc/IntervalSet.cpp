@@ -62,11 +62,11 @@ IntervalSet::IntervalSet(int n, ...) : IntervalSet() {
 }
 
 IntervalSet IntervalSet::of(int a) {
-  return IntervalSet(1, a);
+  return IntervalSet({ Interval(a, a) });
 }
 
 IntervalSet IntervalSet::of(int a, int b) {
-  return IntervalSet(2, a, b);
+  return IntervalSet({ Interval(a, b) });
 }
 
 void IntervalSet::clear() {
@@ -80,7 +80,7 @@ void IntervalSet::add(int el) {
   if (_readonly) {
     throw new IllegalStateException(L"can't alter read only IntervalSet");
   }
-  add(1,el);
+  add(el, el);
 }
 
 void IntervalSet::add(int a, int b) {
@@ -98,7 +98,7 @@ void IntervalSet::add(const Interval &addition) {
 
   // find position in list
   for (auto iterator = _intervals.begin(); iterator != _intervals.end(); ++iterator) {
-    Interval &r = *iterator;
+    Interval r = *iterator;
     if (addition == r) {
       return;
     }
@@ -110,8 +110,8 @@ void IntervalSet::add(const Interval &addition) {
 
       // make sure we didn't just create an interval that
       // should be merged with next interval in list
-      while (iterator != _intervals.end()) {
-        Interval &next = *iterator++;
+      while (iterator + 1 != _intervals.end()) {
+        Interval next = *++iterator;
         if (!bigger.adjacent(next) && bigger.disjoint(next)) {
           break;
         }
@@ -120,14 +120,14 @@ void IntervalSet::add(const Interval &addition) {
         _intervals.erase(iterator);// remove this one
         --iterator; // move backwards to what we just set
         *iterator = bigger.Union(next); // set to 3 merged ones
-        ++iterator; // first call to next after previous duplicates the result
+        // ml: no need to advance iterator, we do that in the next round anyway. ++iterator; // first call to next after previous duplicates the result
       }
       return;
     }
 
     if (addition.startsBeforeDisjoint(r)) {
       // insert before r
-      --iterator;
+      //--iterator;
       _intervals.insert(iterator, addition);
       return;
     }
@@ -148,16 +148,16 @@ IntervalSet IntervalSet::Or(const std::vector<IntervalSet> &sets) {
   return result;
 }
 
-IntervalSet IntervalSet::addAll(const IntervalSet &set) {
+IntervalSet& IntervalSet::addAll(const IntervalSet &set) {
   // walk set and add each interval
   for (auto &interval : set._intervals) {
-    add(interval.a, interval.b);
+    add(interval);
   }
   return *this;
 }
 
 IntervalSet IntervalSet::complement(int minElement, int maxElement) const {
-  return complement(IntervalSet::of(minElement,maxElement));
+  return complement(IntervalSet::of(minElement, maxElement));
 }
 
 IntervalSet IntervalSet::complement(const IntervalSet &vocabulary) const {
@@ -207,7 +207,7 @@ IntervalSet IntervalSet::subtract(const IntervalSet &other) const {
   // will be empty.  The only problem would be when this' set max value
   // goes beyond MAX_CHAR_VALUE, but hopefully the constant MAX_CHAR_VALUE
   // will prevent this.
-  return And(other).complement(COMPLETE_CHAR_SET);
+  return And(other.complement(COMPLETE_CHAR_SET));
 }
 
 IntervalSet IntervalSet::Or(const IntervalSet &a) const {
@@ -288,7 +288,7 @@ int IntervalSet::getSingleElement() const {
     }
   }
 
-  return Token::INVALID_TYPE;
+  return Token::INVALID_TYPE; // XXX: this value is 0, but 0 is a valid interval range, how can that work?
 }
 
 int IntervalSet::getMaxElement() const {
@@ -332,6 +332,12 @@ size_t IntervalSet::hashCode() const {
 }
 
 bool IntervalSet::operator == (const IntervalSet &other) const {
+  if (_intervals.empty() && other._intervals.empty())
+    return true;
+
+  if (_intervals.empty() || other._intervals.empty())
+    return false;
+
   return std::equal(_intervals.begin(), _intervals.end(), other._intervals.begin());
 }
 
@@ -426,15 +432,10 @@ std::wstring IntervalSet::elementName(const std::vector<std::wstring> &tokenName
   } else {
     return tokenNames[(size_t)a];
   }
-
 }
 
 size_t IntervalSet::size() const {
   size_t result = 0;
-  if (_intervals.size() == 1) {
-    return (size_t)(_intervals[0].b - _intervals[0].a + 1);
-  }
-
   for (auto &interval : _intervals) {
     result += (size_t)(interval.b - interval.a + 1);
   }

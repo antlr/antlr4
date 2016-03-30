@@ -80,10 +80,6 @@ namespace misc {
 
       return finish(hash, size);
     }
-
-
-  private:
-    MurmurHash();
   };
 
 } // namespace atn

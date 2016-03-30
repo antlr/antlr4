@@ -47,34 +47,21 @@ namespace atn {
 
     std::vector<ATNState*> states;
 
-    /// <summary>
     /// Each subrule/rule is a decision point and we must track them so we
-    ///  can go back later and build DFA predictors for them.  This includes
-    ///  all the rules, subrules, optional blocks, ()+, ()* etc...
-    /// </summary>
-    // TODO: should this be const?  (It used to be declared as const but was causing problems in ATNDeserializer.)
+    /// can go back later and build DFA predictors for them.  This includes
+    /// all the rules, subrules, optional blocks, ()+, ()* etc...
     std::vector<DecisionState*> decisionToState;
 
-    /// <summary>
     /// Maps from rule index to starting state number.
-    /// </summary>
-
     std::vector<RuleStartState*> ruleToStartState;
 
-    /// <summary>
     /// Maps from rule index to stop state number.
-    /// </summary>
-    // TODO: Memory Management
-    RuleStopState **ruleToStopState;
+    std::vector<RuleStopState*> ruleToStopState;
 
-    /// <summary>
     /// The type of the ATN.
-    /// </summary>
     ATNType grammarType;
 
-    /// <summary>
     /// The maximum value for any symbol recognized by a transition in the ATN.
-    /// </summary>
     int maxTokenType;
 
     /// <summary>

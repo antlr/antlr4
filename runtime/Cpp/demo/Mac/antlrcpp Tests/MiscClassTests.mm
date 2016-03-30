@@ -32,6 +32,9 @@
 #include "MurmurHash.h"
 #include "Interval.h"
 #include "IntervalSet.h"
+#include "Token.h"
+#include "Exceptions.h"
+#include "Lexer.h"
 
 using namespace org::antlr::v4::runtime;
 using namespace org::antlr::v4::runtime::misc;
@@ -228,6 +231,103 @@ using namespace org::antlr::v4::runtime::misc;
   XCTAssert(Interval(10, 10).toString() == L"10..10");
   XCTAssert(Interval(1000, 2000).toString() == L"1000..2000");
   XCTAssert(Interval(500, INT_MAX).toString() == L"500.." + std::to_wstring(INT_MAX));
+}
+
+- (void)testIntervalSet {
+  XCTAssertFalse(IntervalSet().isReadOnly());
+  XCTAssert(IntervalSet().isEmpty());
+
+  IntervalSet set1;
+  set1.setReadOnly(true);
+  XCTAssert(set1.isReadOnly());
+
+  XCTAssert(IntervalSet() == IntervalSet::EMPTY_SET);
+
+  std::vector<Interval> intervals = { Interval(), Interval(10, 20), Interval(20, 100), Interval(1000, 2000) };
+  IntervalSet set2(intervals);
+  XCTAssertFalse(set2.isEmpty());
+  XCTAssertFalse(set2.contains(9));
+  XCTAssert(set2.contains(10));
+  XCTAssert(set2.contains(20));
+  XCTAssertTrue(set2.contains(22));
+  XCTAssert(set2.contains(1111));
+  XCTAssertFalse(set2.contains(10000));
+  XCTAssertEqual(set2.getSingleElement(), Token::INVALID_TYPE);
+  XCTAssertEqual(set2.getMinElement(), 10);
+  XCTAssertEqual(set2.getMaxElement(), 2000);
+
+  IntervalSet set3(set2);
+  XCTAssertFalse(set3.isEmpty());
+  XCTAssertFalse(set3.contains(9));
+  XCTAssert(set3.contains(10));
+  XCTAssert(set3.contains(20));
+  XCTAssertTrue(set3.contains(22));
+  XCTAssert(set3.contains(1111));
+  XCTAssertFalse(set3.contains(10000));
+  XCTAssertEqual(set3.getSingleElement(), Token::INVALID_TYPE);
+  XCTAssertEqual(set3.getMinElement(), 10);
+  XCTAssertEqual(set3.getMaxElement(), 2000);
+
+  set3.add(Interval(100, 1000));
+  XCTAssertEqual(set3.getMinElement(), 10);
+  set3.add(Interval(9, 1000));
+  XCTAssertEqual(set3.getMinElement(), 9);
+  set3.add(Interval(1, 1));
+  XCTAssertEqual(set3.getMinElement(), 1);
+
+  IntervalSet set4;
+  set4.add(10);
+  XCTAssertEqual(set4.getSingleElement(), 10);
+  XCTAssertEqual(set4.getMinElement(), 10);
+  XCTAssertEqual(set4.getMaxElement(), 10);
+
+  set4.clear();
+  XCTAssert(set4.isEmpty());
+  set4.add(Interval(10, 10));
+  XCTAssertEqual(set4.getSingleElement(), 10);
+  XCTAssertEqual(set4.getMinElement(), 10);
+  XCTAssertEqual(set4.getMaxElement(), 10);
+  set4.setReadOnly(true);
+  try {
+    set4.clear();
+    XCTFail(@"Expected exception");
+  }
+  catch ( IllegalStateException *e) {
+  }
+
+  set4.setReadOnly(false);
+  set4 = IntervalSet::of(12345);
+  XCTAssertEqual(set4.getSingleElement(), 12345);
+  XCTAssertEqual(set4.getMinElement(), 12345);
+  XCTAssertEqual(set4.getMaxElement(), 12345);
+
+  IntervalSet set5(10, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50);
+  XCTAssertEqual(set5.getMinElement(), 5);
+  XCTAssertEqual(set5.getMaxElement(), 50);
+  XCTAssertEqual(set5.size(), 10U);
+  set5.add(12, 18);
+  XCTAssertEqual(set5.size(), 16U); // (15, 15) replaced by (12, 18)
+  set5.add(9, 33);
+  XCTAssertEqual(set5.size(), 30U); // (10, 10), (12, 18), (20, 20), (25, 25) and (30, 30) replaced by (9, 33)
+
+  XCTAssert(IntervalSet(3, 1, 2, 10).Or(IntervalSet(3, 1, 2, 5)) == IntervalSet(4, 1, 2, 5, 10));
+  XCTAssert(IntervalSet({ Interval(2, 10) }).Or(IntervalSet({ Interval(5, 8) })) == IntervalSet({ Interval(2, 10) }));
+
+  XCTAssert(IntervalSet::of(1, 10).complement(IntervalSet::of(7, 55)) == IntervalSet::of(11, 55));
+  XCTAssert(IntervalSet::of(1, 10).complement(IntervalSet::of(20, 55)) == IntervalSet::of(20, 55));
+  XCTAssert(IntervalSet::of(1, 10).complement(IntervalSet::of(5, 6)) == IntervalSet::EMPTY_SET);
+  XCTAssert(IntervalSet::of(15, 20).complement(IntervalSet::of(7, 55)) == IntervalSet({ Interval(7, 14), Interval(21, 55) }));
+  XCTAssert(IntervalSet({ Interval(1, 10), Interval(30, 35) }).complement(IntervalSet::of(7, 55)) == IntervalSet({ Interval(11, 29), Interval(36, 55) }));
+
+  XCTAssert(IntervalSet::of(1, 10).And(IntervalSet::of(7, 55)) == IntervalSet::of(7, 10));
+  XCTAssert(IntervalSet::of(1, 10).And(IntervalSet::of(20, 55)) == IntervalSet::EMPTY_SET);
+  XCTAssert(IntervalSet::of(1, 10).And(IntervalSet::of(5, 6)) == IntervalSet::of(5, 6));
+  XCTAssert(IntervalSet::of(15, 20).And(IntervalSet::of(7, 55)) == IntervalSet::of(15, 20));
+
+  XCTAssert(IntervalSet::of(1, 10).subtract(IntervalSet::of(7, 55)) == IntervalSet::of(1, 6));
+  XCTAssert(IntervalSet::of(1, 10).subtract(IntervalSet::of(20, 55)) == IntervalSet::of(1, 10));
+  XCTAssert(IntervalSet::of(1, 10).subtract(IntervalSet::of(5, 6)) == IntervalSet({ Interval(1, 4), Interval(7, 10) }));
+  XCTAssert(IntervalSet::of(15, 20).subtract(IntervalSet::of(7, 55)) == IntervalSet::EMPTY_SET);
 }
 
 @end

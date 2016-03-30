@@ -37,11 +37,14 @@
 #include "stringconverter.h"
 #include "PredictionContextCache.h"
 #include "DoubleKeyMap.h"
+#include "Arrays.h"
 
 #include "PredictionContext.h"
 
 using namespace org::antlr::v4::runtime::misc;
 using namespace org::antlr::v4::runtime::atn;
+
+using namespace antlrcpp;
 
 int PredictionContext::globalNodeCount = 0;
 EmptyPredictionContext * PredictionContext::EMPTY;
@@ -326,7 +329,7 @@ PredictionContext *PredictionContext::mergeArrays(ArrayPredictionContext *a, Arr
   }
 
   // trim merged if we combined a few that had same stack tops
-  if (k < sizeof(mergedParents) / sizeof(mergedParents[0])) { // write index < last position; trim
+  if (k < mergedParents.size()) { // write index < last position; trim
     if (k == 1) { // for just one merged element, return singleton top
       PredictionContext *a_ = SingletonPredictionContext::create(mergedParents[0], mergedReturnStates[0]);
       if (mergeCache != nullptr) {
@@ -334,8 +337,8 @@ PredictionContext *PredictionContext::mergeArrays(ArrayPredictionContext *a, Arr
       }
       return a_;
     }
-    // TODO: mergedParents = Arrays::copyOf(mergedParents, k);
-    // TODO: mergedReturnStates = Arrays::copyOf(mergedReturnStates, k);
+    mergedParents = Arrays::copyOf(mergedParents, k);
+    mergedReturnStates = Arrays::copyOf(mergedReturnStates, k);
   }
 
   PredictionContext *M = nullptr;
@@ -471,8 +474,7 @@ PredictionContext *PredictionContext::getCachedContext(PredictionContext *contex
   bool changed = false;
 
   std::vector<PredictionContext*> parents;
-
-  for (size_t i = 0; i < sizeof(parents) / sizeof(parents[0]); i++) {
+  for (size_t i = 0; i < parents.size(); i++) {
     PredictionContext *parent = getCachedContext(context->getParent(i), contextCache, visited);
     if (changed || parent != context->getParent(i)) {
       if (!changed) {
@@ -497,9 +499,9 @@ PredictionContext *PredictionContext::getCachedContext(PredictionContext *contex
   }
 
   PredictionContext *updated;
-  if (sizeof(parents) / sizeof(parents[0]) == 0) {
+  if (parents.empty()) {
     updated = EMPTY;
-  } else if (sizeof(parents) / sizeof(parents[0]) == 1) {
+  } else if (parents.size() == 1) {
     updated = SingletonPredictionContext::create(parents[0], context->getReturnState(0));
   } else {
     ArrayPredictionContext *arrayPredictionContext = static_cast<ArrayPredictionContext*>(context);

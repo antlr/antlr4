@@ -84,8 +84,6 @@ namespace dfa {
     /// {@code edges[symbol]} points to target of symbol. Shift up by 1 so (-1)
     ///  <seealso cref="Token#EOF"/> maps to {@code edges[0]}.
     /// </summary>
-    //JAVA TO C++ CONVERTER WARNING: Since the array size is not known in this declaration, Java to C++ Converter has converted this array to a pointer.  You will need to call 'delete[]' where appropriate:
-    //ORIGINAL LINE: @Nullable public DFAState[] edges;
     std::vector<DFAState*> edges;
 
     bool isAcceptState;

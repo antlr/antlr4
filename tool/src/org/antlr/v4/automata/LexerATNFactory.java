@@ -154,6 +154,7 @@ public class LexerATNFactory extends ParserATNFactory {
 		}
 
 		cmdST.add("arg", arg.getText());
+		cmdST.add("grammar", arg.g);
 		return cmdST.render();
 	}
 

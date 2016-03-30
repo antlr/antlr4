@@ -333,8 +333,6 @@ std::wstring Lexer::getCharErrorDisplay(int c) {
 }
 
 void Lexer::recover(RecognitionException *re) {
-  //System.out.println("consuming char "+(char)input.LA(1)+" during recovery");
-  //re.printStackTrace();
   // TODO: Do we lose character or line position information?
   _input->consume();
 }

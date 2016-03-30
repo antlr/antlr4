@@ -30,14 +30,14 @@
 import "Files.stg" // All file specific stuff.
 
 cppTypeInitMap ::= [
-	"int":"0",
-	"long":"0",
-	"float":"0.0f",
-	"double":"0.0",
-	"bool":"false",
-	"short":"0",
-	"char":"0",
-	default: "nullptr" // anything other than a primitive type is an object
+    "int":"0",
+    "long":"0",
+    "float":"0.0f",
+    "double":"0.0",
+    "bool":"false",
+    "short":"0",
+    "char":"0",
+    default: "nullptr" // anything other than a primitive type is an object
 ]
 
 // Lexer class templates.
@@ -46,14 +46,20 @@ DefaultLexerSuperClass(s) ::= "Lexer"
 
 LexerHeader(lexer, atn, actionFuncs, sempredFuncs, superClass) ::= <<
 <if (lexer.tokens)>
-enum class <lexer.name>Token {
-  <lexer.tokens: {k | <k> = <lexer.tokens.(k)>}; separator=", ", wrap, anchor>
+class <lexer.name>Token {
+public:
+  enum {
+    <lexer.tokens: {k | <k> = <lexer.tokens.(k)>}; separator=", ", wrap, anchor>
+  };
 };
 <endif>
 
 <if (lexer.modes)>
-enum class <lexer.name>Mode {
-  <rest(lexer.modes): {m | <m> = <i>,}; separator="\n", anchor>
+class <lexer.name>Mode {
+public:
+  enum {
+    <rest(lexer.modes): {m | <m> = <i>,}; separator="\n", anchor>
+  };
 };
 <endif>
 
@@ -204,7 +210,7 @@ void <r.factory.grammar.name>::<r.name>Action(<r.ctxType> *context, int actionIn
   
   default:
     break;
-	}
+    }
 }
 
 >>
@@ -220,8 +226,8 @@ bool <r.factory.grammar.name>::<r.name>Sempred(<r.ctxType> *context, int predica
     
     default:
       break;
-	}
-	return true;
+    }
+    return true;
 }
 
 >>
@@ -233,13 +239,19 @@ DefaultParserSuperClass(s) ::= "Parser" // Is that used at all?
 
 ParserHeader(parser, funcs, atn, sempredFuncs, superClass = {Parser}) ::= <<
 <if (parser.tokens)>
-enum class <parser.name>Token {
-  <parser.tokens: {k | <k> = <parser.tokens.(k)>}; separator=", ", wrap, anchor>
+class <parser.name>Token {
+public:
+  enum {
+    <parser.tokens: {k | <k> = <parser.tokens.(k)>}; separator=", ", wrap, anchor>
+  };
 };
 <endif>
 
-enum class <parser.name>Rule {
-  <parser.rules: {r | Rule<r.name; format="cap"> = <r.index>}; separator=", ", wrap, anchor>
+class <parser.name>Rule {
+public:
+  enum {
+    <parser.rules: {r | Rule<r.name; format="cap"> = <r.index>}; separator=", ", wrap, anchor>
+  };
 };
 
 class <parser.name> : public <superClass> {
@@ -343,13 +355,10 @@ static std::wstring _serializedATN;
 SerializedATN(model) ::= <<
 <if (rest(model.segments))>
 <model.segments: {segment | static std::wstring _serializedATNSegment<i0> =
-  "<segment; wrap={"+<\n><\t>"}>";}; separator="\n">
-_serializedATN = Utils.join(
-  std::wstring {
-    <model.segments: {segment | _serializedATNSegment<i0>}; separator=",\n">
-  },
-  ""
-);
+  L"<segment; wrap={"<\n>   "}>";}; separator="\n">
+_serializedATN =
+  <model.segments: {segment | _serializedATNSegment<i0>}; separator=" +\n">;
+  
 <else>
 <! only one segment, can be inlined !>
 _serializedATN =
@@ -376,7 +385,7 @@ RuleFunction(currentRule, code, locals, ruleCtx, altLabelCtxs, namedActions, fin
 <! TODO: untested !><altLabelCtxs: {l | <altLabelCtxs.(l)>}; separator = "\n">
 std::shared_ptr\<<parser.name>::<currentRule.ctxType>\> <parser.name>::<currentRule.name>(<currentRule.args; separator = ",">) {
   std::shared_ptr\<<currentRule.ctxType>\> result(new <currentRule.ctxType>(ctx, getState()<currentRule.args:{a | , <a.name>}>));
-  enterRule(result.get(), <currentRule.startState>, (int)<parser.name>Rule::Rule<currentRule.name; format = "cap">);
+  enterRule(result.get(), <currentRule.startState>, <parser.name>Rule::Rule<currentRule.name; format = "cap">);
   <namedActions.init>
 <! TODO: untested !> <locals; separator = "\n">
 
@@ -406,35 +415,35 @@ std::shared_ptr\<<parser.name>::<currentRule.ctxType>\> <parser.name>::<currentR
 }
 >>
 
-LeftRecursiveRuleFunctionHeader(currentRule, code, locals, ruleCtx, altLabelCtxs,	namedActions, finallyAction, postamble) ::= <<
+LeftRecursiveRuleFunctionHeader(currentRule, code, locals, ruleCtx, altLabelCtxs,   namedActions, finallyAction, postamble) ::= <<
 <ruleCtx>
 <! TODO: untested !><altLabelCtxs: {l | <altLabelCtxs.(l)>}; separator="\n">
 std::shared_ptr\<<currentRule.ctxType>\> <currentRule.name>(<currentRule.args; separator = ", ">);
 std::shared_ptr\<<currentRule.ctxType>\> <currentRule.name>(int precedence<currentRule.args: {a | , <a>}>);
 >>
 
-LeftRecursiveRuleFunction(currentRule, code, locals, ruleCtx, altLabelCtxs,	namedActions, finallyAction, postamble) ::= <<
+LeftRecursiveRuleFunction(currentRule, code, locals, ruleCtx, altLabelCtxs, namedActions, finallyAction, postamble) ::= <<
 <ruleCtx>
 <altLabelCtxs: {l | <altLabelCtxs.(l)>}; separator="\n">
 
 std::shared_ptr\<<parser.name>::<currentRule.ctxType>\> <parser.name>::<currentRule.name>(<currentRule.args; separator=", ">) {
-<! TODO: currentRule.args untested !>	return <currentRule.name>(0<currentRule.args: {a | , <a.name>}>);
+<! TODO: currentRule.args untested !>   return <currentRule.name>(0<currentRule.args: {a | , <a.name>}>);
 }
 
 std::shared_ptr\<<parser.name>::<currentRule.ctxType>\> <parser.name>::<currentRule.name>(int precedence<currentRule.args:{a | , <a>}>) {
-	ParserRuleContext *parentContext = ctx;
-	int parentState = getState();
-	std::shared_ptr\<<parser.name>::<currentRule.ctxType>\> result(new <currentRule.ctxType>(ctx, parentState<currentRule.args: {a | , <a.name>}>));
-	std::shared_ptr\<<parser.name>::<currentRule.ctxType>\> previousContext = result;
-	int startState = <currentRule.startState>;
-	enterRecursionRule(result.get(), <currentRule.startState>, (int)<parser.name>Rule::Rule<currentRule.name; format = "cap">, precedence);
+    ParserRuleContext *parentContext = ctx;
+    int parentState = getState();
+    std::shared_ptr\<<parser.name>::<currentRule.ctxType>\> result(new <currentRule.ctxType>(ctx, parentState<currentRule.args: {a | , <a.name>}>));
+    std::shared_ptr\<<parser.name>::<currentRule.ctxType>\> previousContext = result;
+    int startState = <currentRule.startState>;
+    enterRecursionRule(result.get(), <currentRule.startState>, <parser.name>Rule::Rule<currentRule.name; format = "cap">, precedence);
   
-	<namedActions.init>
-<! TODO: untested !>	<locals; separator = "\n">
+    <namedActions.init>
+<! TODO: untested !>    <locals; separator = "\n">
   
   auto onExit = finally([this, parentContext] {
 <! TODO: untested !><if (finallyAction)><finallyAction><endif>
-		unrollRecursionContexts(parentContext);
+        unrollRecursionContexts(parentContext);
   });
   try {
     <if (currentRule.hasLookaheadBlock)>int alt;<endif>
@@ -454,313 +463,326 @@ std::shared_ptr\<<parser.name>::<currentRule.ctxType>\> <parser.name>::<currentR
 StructDeclHeader(struct, attrs, getters, dispatchMethods, interfaces, extensionMembers, superClass = {ParserRuleContext}) ::= <<
 class <struct.name> : public <superClass><if (interfaces)><interfaces; separator=", "><endif> {
 public:
-  <if (attrs)><attrs: {a | <a>}; separator = "\n"><endif>
-<! TODO: untested !>  <if (struct.ctorAttrs)><struct.name>(ParserRuleContext *parent, int invokingState);<endif>
-<! TODO: struct.ctorAttrs untested !>  <struct.name>(ParserRuleContext *parent, int invokingState<struct.ctorAttrs: {a | , <a>}>);
-  <if (struct.provideCopyFrom)><struct.name>() { } <! don't need copy unless we have subclasses !> <! TODO: untested !>
+  <if (attrs)><attrs: {a | <if (!a.isLocal)><a><endif>}; separator = "\n"><endif>
+  <if (struct.ctorAttrs)><struct.name>(ParserRuleContext *parent, int invokingState);<endif>
+  <struct.name>(ParserRuleContext *parent, int invokingState<struct.ctorAttrs: {a | , <a>}>);
+<if (struct.provideCopyFrom)> <! don't need copy unless we have subclasses !>
+  <struct.name>() { }
   void copyFrom(<struct.name> *context);
-  <endif>
+<endif>
 
   virtual ssize_t getRuleIndex() const override;
   <getters: {g | <g>}; separator = "\n">
 
   <dispatchMethods; separator = "\n">
-<! TODO: untested !>  <extensionMembers; separator = "\n">
+<! TODO: untested !> <extensionMembers; separator = "\n">
+private:
+  <if (attrs)><attrs: {a | <if (a.isLocal)><a><endif>}; separator = "\n"><endif>
 };
+
 >>
 
 StructDecl(struct, attrs, getters, dispatchMethods, interfaces, extensionMembers, superClass = {ParserRuleContext}) ::= <<
 //----------------- <struct.name> ------------------------------------------------------------------
 
-<! TODO: untested !> <if (struct.ctorAttrs)>
-<parser.name>::<struct.name>::<struct.name>(ParserRuleContext *parent, int invokingState) {
-  : <superClass>(parent, invokingState);
+<if (struct.ctorAttrs)>
+<parser.name>::<struct.name>::<struct.name>(ParserRuleContext *parent, int invokingState)
+  : <superClass>(parent, invokingState) {
 }
 <endif>
 
 <parser.name>::<struct.name>::<struct.name>(ParserRuleContext *parent, int invokingState<struct.ctorAttrs: {a | , <a>}>)
   : <superClass>(parent, invokingState) {
-<! TODO: untested !>  <struct.ctorAttrs: {a | this-\><a.name> = <a.name>;}; separator="\n">
+  <struct.ctorAttrs: {a | this-><a.name> = <a.name>;}; separator="\n">
 }
 
-<! TODO: untested!><attrs: {a | <a>}; separator = "\n">
 <getters: {g | <g>}; separator = "\n">
 
 ssize_t <parser.name>::<struct.name>::getRuleIndex() const {
-  return static_cast\<int>(<parser.name>Rule::Rule<struct.derivedFromName; format = "cap">);
+  return (ssize_t)<parser.name>Rule::Rule<struct.derivedFromName; format = "cap">;
 }
 
-<! TODO: untested !><if(struct.provideCopyFrom)>
-<struct.factory.grammar.name>::<struct.name>() { }
-void copyFrom(<struct.name> *ctx) {
-  <superClass>.copyFrom(ctx);
-  <struct.attrs: {a | this-><a.name> = ctx.<a.name>;}; separator = "\n">
+<if (struct.provideCopyFrom)>
+void <parser.name>::<struct.name>::copyFrom(<struct.name> *ctx) {
+  <superClass>::copyFrom(ctx);
+<! TODO: untested !>  <struct.attrs: {a | this-><a.name> = ctx.<a.name>;}; separator = "\n">
 }
 <endif>
 <dispatchMethods; separator = "\n\n">
 <! TODO: untested !><extensionMembers; separator = "\n\n">
+
 >>
 
-CodeBlockForOuterMostAltHeader(currentOuterMostAltCodeBlock, locals, preamble, ops) ::= <<
-<! Required to exist, but unused. !>
+AltLabelStructDeclHeader(struct, attrs, getters, dispatchMethods) ::= <<
+class <struct.name> : public <currentRule.name; format = "cap">Context {
+public:
+  <struct.name>(<currentRule.name; format = "cap">Context *ctx);
+  
+    <if (attrs)>aaa<attrs: {a | <a>}; separator = "\n">bbb<endif>
+    <getters: {g | <g>}; separator = "\n">
+    <dispatchMethods; separator = "\n">
+};
+
 >>
 
+AltLabelStructDecl(struct, attrs, getters, dispatchMethods) ::= <<
+//----------------- <struct.name> ------------------------------------------------------------------
+
+<! TODO: untested !><if (attrs)><attrs: {a | <a>}; separator = "\n"><endif>
+<getters: {g | <g>}; separator = "\n">
+<struct.factory.grammar.name>::<struct.name>::<struct.name>(<currentRule.name; format = "cap">Context *ctx) { copyFrom(ctx); }
+
+<dispatchMethods; separator="\n">
+>>
+
+
+CodeBlockForOuterMostAltHeader(currentOuterMostAltCodeBlock, locals, preamble, ops) ::= "<! Required to exist, but unused. !>"
 CodeBlockForOuterMostAlt(currentOuterMostAltCodeBlock, locals, preamble, ops) ::= <<
-<! TODO: untested !><if (currentOuterMostAltCodeBlock.altLabel)>result.reset(new <currentOuterMostAltCodeBlock.altLabel; format = "cap">Context(result));<endif>
+<if (currentOuterMostAltCodeBlock.altLabel)>result.reset(new <parser.name>::<currentOuterMostAltCodeBlock.altLabel; format = "cap">Context(result.get()));<endif>
 enterOuterAlt(result.get(), <currentOuterMostAltCodeBlock.alt.altNum>);
 <CodeBlockForAlt(currentAltCodeBlock = currentOuterMostAltCodeBlock, ...)>
 >>
 
-CodeBlockForAltHeader(currentAltCodeBlock, locals, preamble, ops) ::= <<
-<! Required to exist, but unused. !>
->>
-
+CodeBlockForAltHeader(currentAltCodeBlock, locals, preamble, ops) ::= "<! Required to exist, but unused. !>"
 CodeBlockForAlt(currentAltCodeBlock, locals, preamble, ops) ::= <<
 <! TODO: untested !><locals; separator = "\n">
 <! TODO: untested !><preamble; separator = "\n">
 <ops; separator = "\n">
 >>
 
+LL1AltBlockHeader(choice, preamble, alts, error) ::= "<! Required to exist, but unused. !>"
 LL1AltBlock(choice, preamble, alts, error) ::= <<
 setState(<choice.stateNumber>);
 _errHandler->sync(this);
-<if (choice.label)><labelref(choice.label)> = _input.LT(1);<endif>
+<! TODO: untested !><if (choice.label)>LL1AltBlock(choice, preamble, alts, error) <labelref(choice.label)> = _input->LT(1);<endif>
 <preamble; separator="\n">
-switch (_input.LA(1)) {
+switch (_input->LA(1)) {
   <choice.altLook, alts: {look, alt | <cases(ttypes = look)>
-	<alt>
-	break;
+    <alt>
+    break;
 }; separator = "\n">
 default:
-	<error>
+    <error>
 }
 >>
 
-LL1OptionalBlock(choice, alts, error) ::= <<
+LL1OptionalBlock(choice, alts, error) ::= <<LL1OptionalBlock(choice, alts, error)
 setState(<choice.stateNumber>);YYY
-switch (_input.LA(1)) {
+switch (_input->LA(1)) {
 <choice.altLook,alts:{look,alt| <cases(ttypes=look)>
-	<alt>
-	break;}; separator="\n">
+    <alt>
+    break;}; separator="\n">
 default:
-	<error>
+    <error>
 }
 >>
 
+LL1OptionalBlockSingleAltHeader(choice, expr, alts, preamble, error, followExpr) ::= "<! Required to exist, but unused. !>"
 LL1OptionalBlockSingleAlt(choice, expr, alts, preamble, error, followExpr) ::= <<
-setState(<choice.stateNumber>);ZZZ
+setState(<choice.stateNumber>);
 
-<preamble; separator="\n">
+<preamble; separator = "\n">
 if (<expr>) {
-	<alts; separator="\n">
+    <alts; separator = "\n">
 }
 >>
 
-LL1StarBlock(choice, alts) ::= <<
-setState(<choice.stateNumber>);AAA
+LL1StarBlock(choice, alts) ::= <<LL1StarBlock
+setState(<choice.stateNumber>);
 _errHandler.sync(this);
 <choice.loopLabel>:
 while (true) {
-	switch (_input.LA(1)) {
-	<choice.altLook,alts:{look,alt| <cases(look)>
-	<alt>
-	break;}; separator="\n">
-	<cases(choice.exitLook)>
-		break <choice.loopLabel>;
-	}
-	setState(<choice.loopBackStateNumber>);
-	_errHandler.sync(this);
+    switch (_input->LA(1)) {
+    <choice.altLook, alts:{look, alt| <cases(look)>
+    <alt>
+    break;}; separator="\n">
+    <cases(choice.exitLook)>
+        break <choice.loopLabel>;
+    }
+    setState(<choice.loopBackStateNumber>);
+    _errHandler.sync(this);
 }
 >>
 
+LL1StarBlockSingleAltHeader(choice, loopExpr, alts, preamble, iteration) ::= "LL1StarBlockSingleAltHeader"
 LL1StarBlockSingleAlt(choice, loopExpr, alts, preamble, iteration) ::= <<
-setState(<choice.stateNumber>);BBB
-_errHandler.sync(this);
+setState(<choice.stateNumber>);
+_errHandler->sync(this);
 <preamble; separator="\n">
 while (<loopExpr>) {
-	<alts; separator="\n">
-	setState(<choice.loopBackStateNumber>);
-	_errHandler.sync(this);
-	<iteration>
+    <alts; separator="\n">
+    setState(<choice.loopBackStateNumber>);
+    _errHandler->sync(this);
+    <iteration>
 }
 >>
 
-LL1PlusBlock(choice, alts, iteration, loopExpr, error) ::= <<
-setState(<choice.blockStartStateNumber>);CCC <! alt block decision !>
+LL1PlusBlock(choice, alts, iteration, loopExpr, error) ::= <<LL1PlusBlock
+setState(<choice.blockStartStateNumber>); <! alt block decision !>
 _errHandler.sync(this);
 do {
-	switch (_input.LA(1)) {
-	<choice.altLook,alts:{look,alt| <cases(look)>
-	<alt>
-	break;}; separator="\n">
-	default:
-		<error>
-	}
-	setState(<choice.stateNumber>);
-	_errHandler.sync(this);
-	<iteration>
+    switch (_input->LA(1)) {
+    <choice.altLook,alts:{look,alt| <cases(look)>
+    <alt>
+    break;}; separator="\n">
+    default:
+        <error>
+    }
+    setState(<choice.stateNumber>);
+    _errHandler.sync(this);
+    <iteration>
 } while ( <loopExpr> );
 >>
 
-LL1PlusBlockSingleAlt(choice, loopExpr, alts, preamble, iteration) ::= <<
-setState(<choice.blockStartStateNumber>);DDD <! alt block decision !>
-_errHandler.sync(this);
+LL1PlusBlockSingleAltHeader(choice, loopExpr, alts, preamble, iteration) ::= "<! Required but unused. !>"
+LL1PlusBlockSingleAlt(choice, loopExpr, alts, preamble, iteration) ::= <<xxx
+setState(<choice.blockStartStateNumber>); <! alt block decision !>
+_errHandler->sync(this);
 <preamble; separator="\n">
 do {
-	<alts; separator="\n">
-	setState(<choice.stateNumber>); <! loopback/exit decision !>
-	_errHandler.sync(this);
-	<iteration>
-} while ( <loopExpr> );
+    <alts; separator="\n">
+    setState(<choice.stateNumber>); <! loopback/exit decision !>
+    _errHandler->sync(this);
+    <iteration>
+} while (<loopExpr>);
 >>
 
 // LL(*) stuff
 
-AltBlockHeader(choice, preamble, alts, error) ::= <<
-<! Unused but must be present. !>
->>
-
+AltBlockHeader(choice, preamble, alts, error) ::= "<! Unused but must be present. !>"
 AltBlock(choice, preamble, alts, error) ::= <<
 setState(<choice.stateNumber>);
 _errHandler->sync(this);
-<! TODO: untested !><if (choice.label)><labelref(choice.label)> = _input.LT(1);<endif>
+<! TODO: untested !><if (choice.label)><labelref(choice.label)> = _input->LT(1);<endif>
 <! TODO: untested !><preamble; separator = "\n">
 switch (getInterpreter()->adaptivePredict(_input, <choice.decision>, ctx)) {
 <alts: {alt | case <i>:
-	<alt>
-	break;
+    <alt>
+    break;
 }; separator="\n">
 }
 >>
 
-OptionalBlockHeader(choice, alts, error) ::= <<
-<! Unused but must be present. !>
->>
-
+OptionalBlockHeader(choice, alts, error) ::= "<! Unused but must be present. !>"
 OptionalBlock(choice, alts, error) ::= <<
 setState(<choice.stateNumber>);
 _errHandler->sync(this);
 
 switch (getInterpreter()->adaptivePredict(_input, <choice.decision>, ctx)) {
 <alts: {alt | case <i><if (!choice.ast.greedy)>+1<endif>:
-	<alt>
-	break;
+    <alt>
+    break;
 }; separator = "\n">
 }
 >>
 
-StarBlockHeader(choice, alts, sync, iteration) ::= <<
-<! Unused but must be present. !>
->>
-
+StarBlockHeader(choice, alts, sync, iteration) ::= "<! Unused but must be present. !>"
 StarBlock(choice, alts, sync, iteration) ::= <<
 setState(<choice.stateNumber>);
 _errHandler->sync(this);
 alt = getInterpreter()->adaptivePredict(_input, <choice.decision>, ctx);
 while (alt != <choice.exitAlt> && alt != -1) {
-	if ( alt == 1 <if(!choice.ast.greedy)>+ 1<endif>) {
-		<iteration>
-		<alts> <! should only be one !>
-	}
-	setState(<choice.loopBackStateNumber>);
-	_errHandler->sync(this);
-	alt = getInterpreter()->adaptivePredict(_input, <choice.decision>, ctx);
+    if ( alt == 1 <if(!choice.ast.greedy)>+ 1<endif>) {
+        <iteration>
+        <alts> <! should only be one !>
+    }
+    setState(<choice.loopBackStateNumber>);
+    _errHandler->sync(this);
+    alt = getInterpreter()->adaptivePredict(_input, <choice.decision>, ctx);
 }
 >>
 
-PlusBlockHeader(choice, alts, error) ::= <<
-<! Required to exist, but unused. !>
->>
-
+PlusBlockHeader(choice, alts, error) ::= "<! Required to exist, but unused. !>"
 PlusBlock(choice, alts, error) ::= <<
 setState(<choice.blockStartStateNumber>); <! alt block decision !>
 _errHandler->sync(this);
 alt = getInterpreter()->adaptivePredict(_input, <choice.decision>, ctx);
 do {
-	switch (alt) {
-	<alts: {alt | case <i><if (!choice.ast.greedy)> + 1<endif>:
-	<alt>
-	break;
+    switch (alt) {
+    <alts: {alt | case <i><if (!choice.ast.greedy)> + 1<endif>:
+    <alt>
+    break;
   }; separator="\n">
-	default:
-		<error>
-	}
-	setState(<choice.loopBackStateNumber>); <! loopback/exit decision !>
-	_errHandler->sync(this);
-	alt = getInterpreter()->adaptivePredict(_input, <choice.decision>, ctx);
+    default:
+        <error>
+    }
+    setState(<choice.loopBackStateNumber>); <! loopback/exit decision !>
+    _errHandler->sync(this);
+    alt = getInterpreter()->adaptivePredict(_input, <choice.decision>, ctx);
 } while (alt != <choice.exitAlt> && alt != -1);
 >>
 
-Sync(s) ::= "sync(<s.expecting.name>);"
+Sync(s) ::= "Sync(s) sync(<s.expecting.name>);"
 
 ThrowNoViableAltHeader(t) ::= "<! Unused but must be present. !>"
 ThrowNoViableAlt(t) ::= "throw new NoViableAltException(this);"
 
+TestSetInlineHeader(s) ::= "<! Required but unused. !>"
 TestSetInline(s) ::= <<
-<s.bitsets:{bits | <if(rest(rest(bits.ttypes)))><bitsetBitfieldComparison(s, bits)><else><bitsetInlineComparison(s, bits)><endif>}; separator=" || ">
+<s.bitsets: {bits | <if (rest(rest(bits.ttypes)))><bitsetBitfieldComparison(s, bits)><else><bitsetInlineComparison(s, bits)><endif>}; separator=" || ">
 >>
 
 // Java language spec 15.19 - shift operators mask operands rather than overflow to 0... need range test
 testShiftInRange(shiftAmount) ::= <<
-((<shiftAmount>) & ~0x3f) == 0
+((<shiftAmount> & ~(size_t)0x3f) == 0)
 >>
 
 // produces smaller bytecode only when bits.ttypes contains more than two items
-bitsetBitfieldComparison(s, bits) ::= <%
-(<testShiftInRange({<offsetShift(s.varName, bits.shift)>})> && ((1L \<\< <offsetShift(s.varName, bits.shift)>) & (<bits.ttypes:{ttype | (1L \<\< <offsetShift(ttype, bits.shift)>)}; separator=" | ">)) != 0)
-%>
+bitsetBitfieldComparison(s, bits) ::= <<
+(<testShiftInRange({<offsetShift(s.varName, bits.shift)>})> &&
+  ((1L \<\< <offsetShift(s.varName, bits.shift)>) & (<bits.ttypes: {ttype | (1L \<\< <offsetShift(ttype, bits.shift, true)>)}; separator = " | ">)) != 0)
+>>
 
 isZero ::= [
   "0": true,
   default: false
 ]
 
-offsetShift(shiftAmount, offset) ::= <%
-<if(!isZero.(offset))>(<shiftAmount> - <offset>)<else><shiftAmount><endif>
+offsetShift(shiftAmount, offset, prefix = false) ::= <%
+<if (!isZero.(offset))>(<if (prefix)><parser.name>Token::<endif><shiftAmount> - <offset>)<else><if (prefix)><parser.name>Token::<endif><shiftAmount><endif>
 %>
 
 // produces more efficient bytecode when bits.ttypes contains at most two items
 bitsetInlineComparison(s, bits) ::= <%
-<bits.ttypes:{ttype | <s.varName>==<ttype>}; separator=" || ">
+<bits.ttypes: {ttype | <s.varName> == <parser.name>Token::<ttype>}; separator = " || ">
 %>
 
 cases(ttypes) ::= <<
-<ttypes:{t | case <t>:}; separator="\n">
+<ttypes: {t | case <parser.name>Token::<t>:}; separator="\n">
 >>
 
-InvokeRuleHeader(r, argExprsChunks) ::= <<
-InvokeRuleHeader
->>
+InvokeRuleHeader(r, argExprsChunks) ::= "InvokeRuleHeader"
 
 InvokeRule(r, argExprsChunks) ::= <<
 setState(<r.stateNumber>); <if(r.labels)><r.labels: {l | <labelref(l)> = }><endif><r.name>(<if(r.ast.options.p)><r.ast.options.p><if(argExprsChunks)>,<endif><endif><argExprsChunks>);
 >>
 
-MatchTokenHeader(m) ::= <<
-<! Unused but must be present. !>
->>
-
+MatchTokenHeader(m) ::= "<! Required but unused. !>"
 MatchToken(m) ::= <<
-setState(<m.stateNumber>); <if (m.labels)><m.labels: {l | <labelref(l)> = }><endif>match((int)<parser.name>Token::<m.name>);
+setState(<m.stateNumber>); <if (m.labels)><m.labels: {l | <labelref(l)> = }><endif>match(<parser.name>Token::<m.name>);
 >>
 
-MatchSet(m, expr, capture) ::= "<CommonSetStuff(m, expr, capture, false)>"
+MatchSetHeader(m, expr, capture) ::= "<! Required but unused. !>"
+MatchSet(m, expr, capture) ::= "<commonSetStuff(m, expr, capture, false)>"
 
-MatchNotSet(m, expr, capture) ::= "<CommonSetStuff(m, expr, capture, true)>"
+MatchNotSetHeader(m, expr, capture) ::= "<! Required but unused. !>"
+MatchNotSet(m, expr, capture) ::= "<commonSetStuff(m, expr, capture, true)>"
 
-CommonSetStuff(m, expr, capture, invert) ::= <<
+commonSetStuff(m, expr, capture, invert) ::= <<
 setState(<m.stateNumber>);
-<if(m.labels)><m.labels:{l | <labelref(l)> = }>_input.LT(1);<endif>
+<if(m.labels)><m.labels: {l | <labelref(l)> = }>_input->LT(1);<endif>
 <capture>
-if ( <if(invert)><m.varName> \<= 0 || <else>!<endif>(<expr>) ) {
-	<if(m.labels)><m.labels:{l | <labelref(l)> = (Token)}><endif>_errHandler.recoverInline(this);
+if (<if(invert)><m.varName> \<= 0 || <else>!<endif>(<expr>)) {
+    <if(m.labels)><m.labels:{l | <labelref(l)> = (Token)}><endif>_errHandler->recoverInline(this);
 }
 consume();
 >>
 
+WildcardHeader(w) ::= "<! Required but unused. !>"
 Wildcard(w) ::= <<
 setState(<w.stateNumber>);
-<if(w.labels)><w.labels: {l | <labelref(l)> = }><endif>matchWildcard();
+<! TODO: w.lables untested!>
+<if (w.labels)>Wildcard() <w.labels: {l | <labelref(l)> = }><endif>matchWildcard();
 >>
 
 // ACTION STUFF
@@ -768,10 +790,9 @@ setState(<w.stateNumber>);
 ActionHeader(a, foo, chunks) ::= "<chunks>"
 Action(a, foo, chunks) ::= "<chunks>"
 
-ArgAction(a, chunks) ::= "<chunks>"
+ArgAction(a, chunks) ::= "ArgAction(a, chunks) <chunks>"
 
-SemPredHeader(p, chunks, failChunks) ::= "<! Unused but must be present. !>"
-
+SemPredHeader(p, chunks, failChunks) ::= "<! Required but unused. !>"
 SemPred(p, chunks, failChunks) ::= <<
 setState(<p.stateNumber>);
 
@@ -779,10 +800,10 @@ setState(<p.stateNumber>);
 if (!(<chunks>)) throw new FailedPredicateException(this, L<p.predicate><if (failChunks)>, <failChunks><elseif (p.msg)>, L<p.msg><endif>);
 >>
 
-ExceptionClauseHeader(e, catchArg, catchAction) ::= "<! Unused but must be present. !>"
+ExceptionClauseHeader(e, catchArg, catchAction) ::= "<! Required but unused. !>"
 ExceptionClause(e, catchArg, catchAction) ::= <<
 catch (<catchArg>) {
-	<catchAction>
+    <catchAction>
 }
 >>
 
@@ -792,64 +813,78 @@ LexerSkipCommand()  ::= "skip();"
 LexerMoreCommand()  ::= "more();"
 LexerPopModeCommand() ::= "popMode();"
 
-LexerTypeCommand(arg)      ::= "_type = <arg>;"
-LexerChannelCommand(arg)   ::= "_channel = <arg>;"
-LexerModeCommand(arg)      ::= "_mode = <arg>;"
-LexerPushModeCommand(arg)  ::= "pushMode(<arg>);"
+LexerTypeCommand(arg, grammar)      ::= "_type = <grammar.name>Token::<arg>;"
+LexerChannelCommand(arg, grammar)   ::= "_channel = <arg>;"
+LexerModeCommand(arg, grammar)      ::= "_mode = <grammar.name>Mode::<arg>;"
+LexerPushModeCommand(arg, grammar)  ::= "pushMode(<grammar.name>Mode::<arg>);"
 
+// TODO: untested
 ActionTextHeader(t) ::= "<t.text>"
 ActionText(t) ::= "<t.text>"
 
 ActionTemplateHeader(t) ::= "<! Unused but must be present. !>"
 ActionTemplate(t) ::= "<t.st>"
 
-ArgRef(a) ::= "result.<a.name>"
-LocalRef(a) ::= "result.<a.name>"
-RetValueRef(a) ::= "result.<a.name>"
-QRetValueRef(a) ::= "<ctx(a)>.<a.dict>.<a.name>"
+ArgRef(a) ::= "ArgRef(a) result.<a.name>"
+LocalRef(a) ::= "LocalRef(a) result.<a.name>"
+RetValueRef(a) ::= "RetValueRef(a) result.<a.name>"
+QRetValueRef(a) ::= "QRetValueRef(a) <ctx(a)>.<a.dict>.<a.name>"
 /** How to translate $tokenLabel */
-TokenRef(t) ::= "<ctx(t)>.<t.name>"
-LabelRef(t) ::= "<ctx(t)>.<t.name>"
-ListLabelRef(t) ::= "<ctx(t)>.<ListLabelName(t.name)>"
-SetAttr(s,rhsChunks) ::= "<ctx(s)>.<s.name> = <rhsChunks>;"
+TokenRef(t) ::= "TokenRef(t) <ctx(t)>.<t.name>"
+LabelRef(t) ::= "LabelRef(t) <ctx(t)>.<t.name>"
+ListLabelRef(t) ::= "ListLabelRef(t) <ctx(t)>.<ListLabelName(t.name)>"
+SetAttr(s,rhsChunks) ::= "SetAttr(s,rhsChunks) <ctx(s)>.<s.name> = <rhsChunks>;"
 
-TokenLabelType() ::= "<file.TokenLabelType; null = {Token}>"
-InputSymbolType() ::= "<file.InputSymbolType; null = {Token}>"
+InputSymbolType() ::= "<file.InputSymbolType; null = {Token}> *"
 
-TokenPropertyRef_text(t) ::= "(<ctx(t)>.<t.label> != nullptr ? <ctx(t)>.<t.label>.getText() : null)"
-TokenPropertyRef_type(t) ::= "(<ctx(t)>.<t.label> != nullptr ? <ctx(t)>.<t.label>.getType() : 0)"
-TokenPropertyRef_line(t) ::= "(<ctx(t)>.<t.label> != nullptr ? <ctx(t)>.<t.label>.getLine() : 0)"
-TokenPropertyRef_pos(t) ::= "(<ctx(t)>.<t.label> != nullptr ? <ctx(t)>.<t.label>.getCharPositionInLine() : 0)"
-TokenPropertyRef_channel(t) ::= "(<ctx(t)>.<t.label> != nullptr ? <ctx(t)>.<t.label>.getChannel() : 0)"
-TokenPropertyRef_index(t) ::= "(<ctx(t)>.<t.label> != nullptr ? <ctx(t)>.<t.label>.getTokenIndex() : 0)"
-TokenPropertyRef_int(t) ::= "(<ctx(t)>.<t.label> != nullptr ? Integer.valueOf(<ctx(t)>.<t.label>.getText()) : 0)"
+TokenPropertyRef_text(t) ::= "TokenPropertyRef_text(t) (<ctx(t)>.<t.label> != nullptr ? <ctx(t)>.<t.label>.getText() : null)"
+TokenPropertyRef_type(t) ::= "TokenPropertyRef_type(t) (<ctx(t)>.<t.label> != nullptr ? <ctx(t)>.<t.label>.getType() : 0)"
+TokenPropertyRef_line(t) ::= "TokenPropertyRef_line(t) (<ctx(t)>.<t.label> != nullptr ? <ctx(t)>.<t.label>.getLine() : 0)"
+TokenPropertyRef_pos(t) ::= "TokenPropertyRef_pos(t) (<ctx(t)>.<t.label> != nullptr ? <ctx(t)>.<t.label>.getCharPositionInLine() : 0)"
+TokenPropertyRef_channel(t) ::= "TokenPropertyRef_channel(t) (<ctx(t)>.<t.label> != nullptr ? <ctx(t)>.<t.label>.getChannel() : 0)"
+TokenPropertyRef_index(t) ::= "TokenPropertyRef_index(t) (<ctx(t)>.<t.label> != nullptr ? <ctx(t)>.<t.label>.getTokenIndex() : 0)"
+TokenPropertyRef_int(t) ::= "TokenPropertyRef_int(t) (<ctx(t)>.<t.label> != nullptr ? Integer.valueOf(<ctx(t)>.<t.label>.getText()) : 0)"
 
-RulePropertyRef_start(r) ::= "(<ctx(r)>.<r.label> != nullptr ? (<ctx(r)>.<r.label>.start) : null)"
-RulePropertyRef_stop(r)	 ::= "(<ctx(r)>.<r.label> != nullptr ? (<ctx(r)>.<r.label>.stop) : null)"
-RulePropertyRef_text(r)	 ::= "(<ctx(r)>.<r.label> != nullptr ? _input.getText(<ctx(r)>.<r.label>.start,<ctx(r)>.<r.label>.stop) : null)"
-RulePropertyRef_ctx(r)	 ::= "<ctx(r)>.<r.label>"
+RulePropertyRef_start(r) ::= "RulePropertyRef_start(r) (<ctx(r)>.<r.label> != nullptr ? (<ctx(r)>.<r.label>.start) : null)"
+RulePropertyRef_stop(r)  ::= "RulePropertyRef_stop(r)   (<ctx(r)>.<r.label> != nullptr ? (<ctx(r)>.<r.label>.stop) : null)"
+RulePropertyRef_text(r)  ::= "RulePropertyRef_text(r)   (<ctx(r)>.<r.label> != nullptr ? _input->getText(<ctx(r)>.<r.label>.start,<ctx(r)>.<r.label>.stop) : null)"
+RulePropertyRef_ctx(r)   ::= "RulePropertyRef_ctx(r)<ctx(r)>.<r.label>"
 
-ThisRulePropertyRef_start(r) ::= "result->start"
-ThisRulePropertyRef_stop(r)	 ::= "result->stop"
-ThisRulePropertyRef_text(r)	 ::= "_input->getText(result->start, _input->LT(-1))"
-ThisRulePropertyRef_ctx(r)	 ::= "result"
+ThisRulePropertyRef_start(r) ::= "ThisRulePropertyRef_start(r) result->start"
+ThisRulePropertyRef_stop(r)  ::= "ThisRulePropertyRef_stop(r)   result->stop"
+ThisRulePropertyRef_text(r)  ::= "ThisRulePropertyRef_text(r)   input->getText(result->start, _input->LT(-1))"
+ThisRulePropertyRef_ctx(r)   ::= "ThisRulePropertyRef_ctx(r)    result"
 
-NonLocalAttrRef(s) ::= "((<s.ruleName; format=\"cap\">Context)getInvokingContext(<s.ruleIndex>)).<s.name>"
+NonLocalAttrRef(s) ::= "NonLocalAttrRef(s) ((<s.ruleName; format=\"cap\">Context)getInvokingContext(<s.ruleIndex>)).<s.name>"
 SetNonLocalAttr(s, rhsChunks) ::=
-	"((<s.ruleName; format=\"cap\">Context)getInvokingContext(<s.ruleIndex>)).<s.name> = <rhsChunks>;"
+    "SetNonLocalAttr(s, rhsChunks) ((<s.ruleName; format=\"cap\">Context)getInvokingContext(<s.ruleIndex>)).<s.name> = <rhsChunks>;"
 
-AddToLabelList(a) ::= "<ctx(a.label)>.<a.listName>.add(<labelref(a.label)>);"
+AddToLabelListHeader(a) ::= "<! Required but unused. !>"
+AddToLabelList(a) ::= <<
+<ctx(a.label)>-><a.listName>.push_back(<labelref(a.label)>);
+>>
 
-TokenDecl(t) ::= "<TokenLabelType()> <t.name>;"
-TokenTypeDecl(t) ::= "int <t.name>;"
-TokenListDecl(t) ::= "std::vector\<Token *> <t.name>;"
-RuleContextDecl(r) ::= "<r.ctxName> <r.name>;"
-RuleContextListDecl(rdecl) ::= "std::vector\<<rdecl.ctxName> *> <rdecl.name>;"
+TokenLabelType() ::= "<file.TokenLabelType; null = {Token}> *"
+
+TokenDeclHeader(t) ::= "<TokenLabelType()> <t.name>;" 
+TokenDecl(t) ::= "<! Variable Declaration !>"
+
+TokenTypeDeclHeader(t) ::= "<! Local Variable !>"
+TokenTypeDecl(t) ::= "size_t <t.name>;"
+
+TokenListDeclHeader(t) ::= "std::vector\<Token *> <t.name>;"
+TokenListDecl(t) ::= "<! Variable Declaration !>"
+
+RuleContextDeclHeader(r) ::= "std::shared_ptr\<<parser.name>::<r.ctxName>> <r.name>;"
+RuleContextDecl(r) ::= "<! Variable Declaration !>"
+
+RuleContextListDeclHeader(rdecl) ::= "std::vector\<std::shared_ptr\<<rdecl.ctxName>>> <rdecl.name>;"
+RuleContextListDecl(rdecl) ::= "<! Variable Declaration !>"
 
 ContextTokenGetterDeclHeader(t) ::= "tree::TerminalNode* <t.name>();"
 ContextTokenGetterDecl(t) ::= <<
 tree::TerminalNode* <parser.name>::<t.ctx.name>::<t.name>() {
-  return getToken((int)<parser.name>Token::<t.name>, 0);
+  return getToken(<parser.name>Token::<t.name>, 0);
 }
 
 >>
@@ -857,7 +892,7 @@ tree::TerminalNode* <parser.name>::<t.ctx.name>::<t.name>() {
 ContextTokenListGetterDeclHeader(t) ::= "std::vector\<tree::TerminalNode *> <t.name>();"
 ContextTokenListGetterDecl(t) ::= <<
 std::vector\<tree::TerminalNode *> <parser.name>::<t.ctx.name>::<t.name>() {
-  return getTokens((int)<parser.name>Token::<t.name>);
+  return getTokens(<parser.name>Token::<t.name>);
 }
 
 >>
@@ -865,7 +900,7 @@ std::vector\<tree::TerminalNode *> <parser.name>::<t.ctx.name>::<t.name>() {
 ContextTokenListIndexedGetterDeclHeader(t) ::= "tree::TerminalNode* <t.name>(int i);"
 ContextTokenListIndexedGetterDecl(t)  ::= <<
 tree::TerminalNode* <parser.name>::<t.ctx.name>::<t.name>(int i) {
-  return getToken((int)<parser.name>Token::<t.name>, (size_t)i);
+  return getToken(<parser.name>Token::<t.name>, (size_t)i);
 }
 
 >>
@@ -900,30 +935,25 @@ ContextRuleListIndexedGetterDecl(r) ::= <<
 
 LexerRuleContext() ::= "RuleContext"
 
-// The rule context name is the rule followed by a suffix; e.g.	r becomes rContext.
+// The rule context name is the rule followed by a suffix; e.g. r becomes rContext.
 RuleContextNameSuffix() ::= "Context"
 
-ImplicitTokenLabel(tokenName) ::= "<tokenName>"
-ImplicitRuleLabel(ruleName) ::= "<ruleName>"
-ImplicitSetLabel(id) ::= "_tset<id>"
+ImplicitTokenLabel(tokenName) ::= <<
+<tokenName; format = "lower">Token
+>>
+
+ImplicitRuleLabel(ruleName) ::= "<ruleName>Context"
+ImplicitSetLabel(id) ::= "ImplicitSetLabel(id) _tset<id>"
 ListLabelName(label) ::= "<label>"
 
-CaptureNextToken(d) ::= "<d.varName> = _input.LT(1);"
-CaptureNextTokenType(d) ::= "<d.varName> = _input.LA(1);"
+CaptureNextToken(d) ::= "CaptureNextToken(d) <d.varName> = _input->LT(1);"
 
-AltLabelStructDecl(struct,attrs,getters,dispatchMethods) ::= <<
-class <struct.name> : public <currentRule.name; format = "cap">Context {
-	<attrs: {a | <a>}; separator = "\n">
-	<getters: {g | <g>}; separator = "\n">
-	public <struct.name>(<currentRule.name; format = "cap">Context ctx) { copyFrom(ctx); }
-	<dispatchMethods; separator="\n">
-};
->>
+CaptureNextTokenTypeHeader(d) ::= "<! Required but unused. !>"
+CaptureNextTokenType(d) ::= "<d.varName> = _input->LA(1);"
 
 ListenerDispatchMethodHeader(method) ::= <<
 virtual void <if (method.isEnter)>enter<else>exit<endif>Rule(tree::ParseTreeListener *listener) override;
 >>
-
 ListenerDispatchMethod(method) ::= <<
 void <method.factory.grammar.name>::<struct.name>::<if (method.isEnter)>enter<else>exit<endif>Rule(tree::ParseTreeListener *listener) {
   auto parserListener = dynamic_cast\<<parser.grammarName>Listener*>(listener);
@@ -948,29 +978,29 @@ AttributeDeclHeader(d) ::= "<d.decl>;"
 AttributeDecl(d) ::= "<! Variable declaration. !>"
 
 /** If we don't know location of label def x, use this template */
-labelref(x) ::= "<if (!x.isLocal)>((<x.ctx.name>)result).<endif><x.name>"
+labelref(x) ::= "<if (!x.isLocal)>result<endif>-><x.name>"
 
 /** For any action chunk, what is correctly-typed context struct ptr? */
-ctx(actionChunk) ::= "((<actionChunk.ctx.name>)result)"
+ctx(actionChunk) ::= "result"
 
 // used for left-recursive rules
 recRuleAltPredicate(ruleName,opPrec) ::= "precpred(ctx, <opPrec>)"
-recRuleSetReturnAction(src,name) ::= "$<name>=$<src>.<name>;"
+recRuleSetReturnAction(src,name) ::= "recRuleSetReturnAction(src,name) $<name>=$<src>.<name>;"
 recRuleSetStopToken() ::= "ctx->stop = _input->LT(-1);"
 
 recRuleAltStartAction(ruleName, ctxName, label) ::= <<
 result.reset(new <ctxName>Context(parentContext, parentState));
 <if (label)>result-><label> = previousContext;<endif>
-pushNewRecursionContext(result.get(), startState, (int)<parser.name>Rule::Rule<ruleName; format = "cap">);
+pushNewRecursionContext(result.get(), startState, <parser.name>Rule::Rule<ruleName; format = "cap">);
 >>
 
-recRuleLabeledAltStartAction(ruleName, currentAltLabel, label) ::= <<
+recRuleLabeledAltStartAction(ruleName, currentAltLabel, label) ::= <<recRuleLabeledAltStartAction
 result.reset(new <currentAltLabel; format = "cap">Context(new <ruleName; format="cap">Context(_parentctx, _parentState)));
 <if(label)>((<currentAltLabel; format="cap">Context*)result).<label> = previousContext;<endif>
 pushNewRecursionContext(result, _startState, RULE_<ruleName>);
 >>
 
-recRuleReplaceContext(ctxName) ::= <<
+recRuleReplaceContext(ctxName) ::= <<recRuleReplaceContext
 result.reset(new <ctxName>Context(_localctx));
 ctx = result;
 previousContext = result;
@@ -983,7 +1013,7 @@ previousContext = result;
 >>
 
 /** Using a type to init value map, try to init a type; if not in table
- *	must be an object, default value is "null".
+ *  must be an object, default value is "null".
  */
 initValue(typeName) ::= <<
 <cppTypeInitMap.(typeName)>
