@@ -32,6 +32,7 @@
 #include "ErrorNode.h"
 #include "Parser.h"
 #include "StringBuilder.h"
+#include "CPPUtils.h"
 
 #include "Trees.h"
 

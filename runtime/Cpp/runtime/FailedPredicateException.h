@@ -38,33 +38,24 @@ namespace antlr {
 namespace v4 {
 namespace runtime {
 
-  /// <summary>
   /// A semantic predicate failed during validation.  Validation of predicates
-  ///  occurs when normally parsing the alternative just like matching a token.
-  ///  Disambiguating predicate evaluation occurs when we test a predicate during
-  ///  prediction.
-  /// </summary>
+  /// occurs when normally parsing the alternative just like matching a token.
+  /// Disambiguating predicate evaluation occurs when we test a predicate during
+  /// prediction.
   class FailedPredicateException : public RecognitionException {
-  private:
-    int ruleIndex;
-    int predicateIndex;
-    const std::wstring predicate;
-
   public:
-    FailedPredicateException(Parser *recognizer); //this(recognizer, nullptr);
-
-    FailedPredicateException(Parser *recognizer, const std::wstring &predicate); //this(recognizer, predicate, nullptr);
-
-    FailedPredicateException(Parser *recognizer, const std::wstring &predicate, const std::wstring &message);
+    FailedPredicateException(Parser *recognizer);
+    FailedPredicateException(Parser *recognizer, const std::string &predicate);
+    FailedPredicateException(Parser *recognizer, const std::string &predicate, const std::string &message);
 
     virtual int getRuleIndex();
-
     virtual int getPredIndex();
-
-    virtual std::wstring getPredicate();
+    virtual std::string getPredicate();
 
   private:
-    static std::wstring formatMessage(const std::wstring &predicate, const std::wstring &message);
+    int _ruleIndex;
+    int _predicateIndex;
+    std::string _predicate;
   };
 
 } // namespace runtime

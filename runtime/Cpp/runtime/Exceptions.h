@@ -35,73 +35,67 @@ namespace antlr {
 namespace v4 {
 namespace runtime {
 
-  class ANTLRException : public std::exception {
+  // An exception hierarchy modelled loosely after java.lang.* exceptions.
+  class RuntimeException : public std::exception {
   private:
-    std::wstring errormsg;
+    std::string _message;
+    std::shared_ptr<RuntimeException> _cause; // Optionally assigned if this exception is wrapping another one.
 
   public:
-    ANTLRException() {}
-    ANTLRException(const std::wstring msg) {
-      this->errormsg = msg;
-    }
-    std::wstring getMessage() const {
-      return errormsg;
-    }
+    RuntimeException(RuntimeException *cause = nullptr);
+    RuntimeException(const std::string &msg, RuntimeException *cause = nullptr);
 
+    std::string getMessage() const;
+    std::shared_ptr<RuntimeException> getCause() const;
+
+    virtual const char* what() const noexcept override;
   };
 
-  class IllegalClassException : public ANTLRException {
+  class IllegalStateException : public RuntimeException {
   public:
-    IllegalClassException(const std::wstring msg) : ANTLRException(msg) {};
-    IllegalClassException() {};
+    IllegalStateException(RuntimeException *cause = nullptr) : IllegalStateException("", cause) {};
+    IllegalStateException(const std::string &msg, RuntimeException *cause = nullptr) : RuntimeException(msg, cause) {};
   };
 
-  class IllegalStateException : public ANTLRException {
+  class IllegalArgumentException : public RuntimeException {
   public:
-    IllegalStateException(const std::wstring msg) : ANTLRException(msg) {};
-    IllegalStateException(){};
+    IllegalArgumentException(RuntimeException *cause = nullptr) : IllegalArgumentException("", cause) {};
+    IllegalArgumentException(const std::string &msg, RuntimeException *cause = nullptr) : RuntimeException(msg, cause) {};
   };
 
-  class IllegalArgumentException : public ANTLRException {
+  class NullPointerException : public RuntimeException {
   public:
-    IllegalArgumentException(const std::wstring msg)  : ANTLRException(msg) {};
-    IllegalArgumentException(const std::wstring msg, std::exception e);
-    IllegalArgumentException(){};
+    NullPointerException(RuntimeException *cause = nullptr) : NullPointerException("", cause) {};
+    NullPointerException(const std::string &msg, RuntimeException *cause = nullptr) : RuntimeException(msg, cause) {};
   };
 
-  class NoSuchElementException : public ANTLRException {
+  class IndexOutOfBoundsException : public RuntimeException {
   public:
-    NoSuchElementException(const std::wstring msg)  : ANTLRException(msg) {};
-    NoSuchElementException(){};
+    IndexOutOfBoundsException(RuntimeException *cause = nullptr) : IndexOutOfBoundsException("", cause) {};
+    IndexOutOfBoundsException(const std::string &msg, RuntimeException *cause = nullptr) : RuntimeException(msg, cause) {};
   };
 
-  class NullPointerException : public ANTLRException {
+  class UnsupportedOperationException : public RuntimeException {
   public:
-    NullPointerException(const std::wstring msg) : ANTLRException(msg) {};
-    NullPointerException(){};
+    UnsupportedOperationException(RuntimeException *cause = nullptr) : UnsupportedOperationException("", cause) {};
+    UnsupportedOperationException(const std::string &msg, RuntimeException *cause = nullptr) : RuntimeException(msg, cause) {};
   };
 
-  class IndexOutOfBoundsException : public ANTLRException {
-  public:
-    IndexOutOfBoundsException(const std::wstring msg) : ANTLRException(msg) {};
-    IndexOutOfBoundsException(){};
-  };
+  // IOException is not a runtime exception (in the java hierarchy).
+  // Hence we have to duplicate the RuntimeException implementation.
+  class IOException : public std::exception {
+  private:
+    std::string _message;
+    std::shared_ptr<RuntimeException> _cause; // Optionally assigned if this exception is wrapping another one.
 
-  class UnsupportedOperationException : public ANTLRException {
   public:
-    UnsupportedOperationException(const std::wstring msg) : ANTLRException(msg) {};
-    UnsupportedOperationException(){};
-  };
+    IOException(RuntimeException *cause = nullptr);
+    IOException(const std::string &msg, RuntimeException *cause = nullptr);
 
-  class IOException : public ANTLRException {
-  public:
-    IOException(const std::wstring msg)  : ANTLRException(msg) {};
-    IOException(){};
-  };
+    std::string getMessage() const;
+    std::shared_ptr<RuntimeException> getCause() const;
 
-  class ASSERTException : public ANTLRException {
-  public:
-    ASSERTException(const std::wstring location, const std::wstring condition) : ANTLRException(location + L" condition= " + condition) {};
+    virtual const char* what() const noexcept override;
   };
 
 } // namespace runtime

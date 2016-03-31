@@ -32,6 +32,8 @@
 #include "ErrorNodeImpl.h"
 #include "Interval.h"
 #include "Parser.h"
+#include "Token.h"
+#include "CPPUtils.h"
 
 #include "ParserRuleContext.h"
 

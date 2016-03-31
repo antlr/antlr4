@@ -99,7 +99,9 @@ namespace atn {
     virtual size_t size() const = 0;
     virtual PredictionContext *getParent(size_t index) const = 0;
     virtual int getReturnState(size_t index) const = 0;
-    virtual bool operator == (PredictionContext *o) const = 0;
+
+    virtual bool operator == (const PredictionContext &o) const = 0;
+    virtual bool operator != (const PredictionContext &o) const;
 
     /// This means only the EMPTY context is in set.
     virtual bool isEmpty() const;
@@ -273,85 +275,10 @@ namespace atn {
     static void getAllContextNodes_(PredictionContext *context, std::vector<PredictionContext*> &nodes, std::map<PredictionContext*, PredictionContext*> *visited);
 
     std::wstring toString();
+    std::wstring toString(Recognizer *recog);
 
-    template<typename ATNInterpreter>
-    std::wstring toString(Recognizer<ATNInterpreter> *recog)  {
-      return toString();
-      //		return toString(recog, ParserRuleContext.EMPTY);
-    }
-
-    template<typename ATNInterpreter>
-    std::wstring *toStrings(Recognizer<ATNInterpreter> *recognizer, int currentState) {
-      return toStrings(recognizer, EMPTY, currentState);
-    }
-
-    // FROM SAM
-    template<typename ATNInterpreter>
-    std::wstring *toStrings(Recognizer<ATNInterpreter> *recognizer, PredictionContext *stop, int currentState) {
-      std::vector<std::wstring> result = std::vector<std::wstring>();
-
-      for (size_t perm = 0; ; perm++) {
-        size_t offset = 0;
-        bool last = true;
-        PredictionContext *p = this;
-        int stateNumber = currentState;
-        antlrcpp::StringBuilder *localBuffer = new antlrcpp::StringBuilder();
-        localBuffer->append(L"[");
-        while (!p->isEmpty() && p != stop) {
-          size_t index = 0;
-          if (p->size() > 0) {
-            size_t bits = 1;
-            while ((1 << bits) < p->size()) {
-              bits++;
-            }
-
-            size_t mask = (1 << bits) - 1;
-            index = (perm >> offset) & mask;
-            last &= index >= p->size() - 1;
-            if (index >= p->size()) {
-              goto outerContinue;
-            }
-            offset += bits;
-          }
-
-          if (recognizer != nullptr) {
-            if (localBuffer->length() > 1) {
-              // first char is '[', if more than that this isn't the first rule
-              localBuffer->append(L' ');
-            }
-
-            ATN *atn = recognizer->getATN();
-            ATNState *s = atn->states[(size_t)stateNumber];
-            std::wstring ruleName = recognizer->getRuleNames()[s->ruleIndex];
-            localBuffer->append(ruleName);
-          } else if (p->getReturnState(index) != EMPTY_RETURN_STATE) {
-            if (!p->isEmpty()) {
-              if (localBuffer->length() > 1) {
-                // first char is '[', if more than that this isn't the first rule
-                localBuffer->append(L' ');
-              }
-
-              localBuffer->append(p->getReturnState(index));
-            }
-          }
-          stateNumber = p->getReturnState(index);
-          p = p->getParent(index);
-        }
-        localBuffer->append(L"]");
-        result.push_back(localBuffer->toString());
-
-        if (last) {
-          break;
-        }
-      outerContinue:
-        continue;
-      }
-    outerBreak:
-
-      // TODO: return result.toArray(new std::wstring[result.size()]);
-      return nullptr;
-    }
-
+    std::vector<std::wstring> toStrings(Recognizer *recognizer, int currentState);
+    std::vector<std::wstring> toStrings(Recognizer *recognizer, PredictionContext *stop, int currentState);
   };
 
 } // namespace atn

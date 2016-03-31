@@ -32,7 +32,7 @@
 #pragma once
 
 #include "RecognitionException.h"
-#include "CharStream.h"
+#include "ATNConfigSet.h"
 
 namespace org {
 namespace antlr {
@@ -40,25 +40,20 @@ namespace v4 {
 namespace runtime {
 
   class LexerNoViableAltException : public RecognitionException {
-    /// <summary>
-    /// Matching attempted at what input index? </summary>
-  private:
-    const size_t startIndex;
-
-    /// <summary>
-    /// Which configurations did we try at input.index() that couldn't match input.LA(1)? </summary>
-    atn::ATNConfigSet *const deadEndConfigs;
-
   public:
     LexerNoViableAltException(Lexer *lexer, CharStream *input, size_t startIndex, atn::ATNConfigSet *deadEndConfigs);
 
     virtual size_t getStartIndex();
-
-    virtual atn::ATNConfigSet *getDeadEndConfigs();
-
-    virtual CharStream *getInputStream() override;
-
+    virtual std::shared_ptr<atn::ATNConfigSet> getDeadEndConfigs();
     virtual std::wstring toString();
+
+  private:
+    /// Matching attempted at what input index?
+    const size_t _startIndex;
+
+    /// Which configurations did we try at input.index() that couldn't match input.LA(1)?
+    std::shared_ptr<atn::ATNConfigSet> _deadEndConfigs;
+    
   };
 
 } // namespace runtime

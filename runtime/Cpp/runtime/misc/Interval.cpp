@@ -106,6 +106,6 @@ Interval Interval::intersection(const Interval &other) const {
   return Interval(std::max(a, other.a), std::min(b, other.b));
 }
 
-std::wstring Interval::toString() const {
-  return std::to_wstring(a) + L".." + std::to_wstring(b);
+std::string Interval::toString() const {
+  return std::to_string(a) + ".." + std::to_string(b);
 }

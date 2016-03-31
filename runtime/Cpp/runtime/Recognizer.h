@@ -38,7 +38,6 @@ namespace antlr {
 namespace v4 {
 namespace runtime {
 
-  template<typename ATNInterpreter>
   class Recognizer : public IRecognizer {
   public:
     static const int _EOF = -1;
@@ -55,7 +54,7 @@ namespace runtime {
     std::mutex mtx;
 
   protected:
-    ATNInterpreter *_interpreter; // Set and deleted in descendants.
+    atn::ATNSimulator *_interpreter; // Set and deleted in descendants.
 
   private:
     int _stateNumber;
@@ -103,12 +102,11 @@ namespace runtime {
     /// </summary>
     virtual std::wstring getGrammarFileName() const = 0;
 
-    /// <summary>
-    /// Get the ATN interpreter used by the recognizer for prediction.
-    /// </summary>
-    /// <returns> The ATN interpreter used by the recognizer for prediction. </returns>
-    virtual ATNInterpreter* getInterpreter() const {
-      return _interpreter;
+    /// Get the ATN interpreter (in fact one of it's descendants) used by the recognizer for prediction.
+    /// @returns The ATN interpreter used by the recognizer for prediction.
+    template <class T>
+    T* getInterpreter() const {
+      return dynamic_cast<T *>(_interpreter);
     }
 
     /// <summary>
@@ -177,7 +175,3 @@ namespace runtime {
 } // namespace v4
 } // namespace antlr
 } // namespace org
-
-#include "Recognizer.inl"
-
-

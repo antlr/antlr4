@@ -37,7 +37,7 @@ using namespace org::antlr::v4::runtime::tree::pattern;
 
 TextChunk::TextChunk(const std::wstring &text) : text(text) {
   if (text == L"") {
-    throw IllegalArgumentException(L"text cannot be null");
+    throw IllegalArgumentException("text cannot be null");
   }
 
 }

@@ -59,12 +59,13 @@
 #include "SetTransition.h"
 #include "NotSetTransition.h"
 #include "WildcardTransition.h"
+#include "Token.h"
 
 #include "IntervalSet.h"
+#include "Exceptions.h"
 
 #include "ATNDeserializer.h"
 
-using namespace antlrcpp;
 using namespace org::antlr::v4::runtime::atn;
 
 const size_t ATNDeserializer::SERIALIZED_VERSION = 3;
@@ -109,7 +110,7 @@ ATN ATNDeserializer::deserialize(const std::wstring& input) {
   int p = 0;
   int version = data[p++];
   if (version != SERIALIZED_VERSION) {
-    std::wstring reason = L"Could not deserialize ATN with version" + std::to_wstring(version) + L"(expected " + std::to_wstring(SERIALIZED_VERSION) + L").";
+    std::string reason = "Could not deserialize ATN with version" + std::to_string(version) + "(expected " + std::to_string(SERIALIZED_VERSION) + ").";
 
     throw UnsupportedOperationException(reason);
   }
@@ -118,9 +119,8 @@ ATN ATNDeserializer::deserialize(const std::wstring& input) {
   auto uuidIterator = std::find(SUPPORTED_UUIDS.begin(), SUPPORTED_UUIDS.end(), uuid);
   p += 8;
   if (uuidIterator == SUPPORTED_UUIDS.end()) {
-    std::wstring reason = L"Could not deserialize ATN with UUID " +
-    s2ws(uuid.toString()) + L" (expected " + s2ws(SERIALIZED_UUID.toString()) +
-    L" or a legacy UUID).";
+    std::string reason = "Could not deserialize ATN with UUID " + uuid.toString() + " (expected " +
+      SERIALIZED_UUID.toString() + " or a legacy UUID).";
 
     throw UnsupportedOperationException(reason);
   }
@@ -384,7 +384,7 @@ ATN ATNDeserializer::deserialize(const std::wstring& input) {
         }
 
         if (endState == nullptr) {
-          throw UnsupportedOperationException(L"Couldn't identify final state of the precedence rule prefix section.");
+          throw UnsupportedOperationException("Couldn't identify final state of the precedence rule prefix section.");
 
         }
 
@@ -492,10 +492,10 @@ void ATNDeserializer::verifyATN(const ATN &atn) {
 }
 
 void ATNDeserializer::checkCondition(bool condition) {
-  checkCondition(condition, L"");
+  checkCondition(condition, "");
 }
 
-void ATNDeserializer::checkCondition(bool condition, const std::wstring &message) {
+void ATNDeserializer::checkCondition(bool condition, const std::string &message) {
   if (!condition) {
     throw IllegalStateException(message);
   }
@@ -540,7 +540,7 @@ Transition *ATNDeserializer::edgeFactory(const ATN &atn, int type, int src, int 
       return new WildcardTransition(target);
   }
 
-  throw IllegalArgumentException(L"The specified transition type is not valid.");
+  throw IllegalArgumentException("The specified transition type is not valid.");
 }
 
 ATNState *ATNDeserializer::stateFactory(int type, int ruleIndex) {
@@ -585,8 +585,7 @@ ATNState *ATNDeserializer::stateFactory(int type, int ruleIndex) {
       s = new LoopEndState();
       break;
     default :
-      std::wstring message = L"The specified state type " +
-      std::to_wstring(type) + L" is not valid.";
+      std::string message = "The specified state type " + std::to_string(type) + " is not valid.";
       throw IllegalArgumentException(message);
   }
 

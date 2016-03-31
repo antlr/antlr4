@@ -74,6 +74,10 @@ PredictionContext *PredictionContext::fromRuleContext(const ATN &atn, RuleContex
   return SingletonPredictionContext::create(parent, transition->followState->stateNumber);
 }
 
+bool PredictionContext::operator != (const PredictionContext &o) const {
+  return !(*this == o);
+};
+
 bool PredictionContext::isEmpty() const {
   return this == EMPTY;
 }
@@ -116,10 +120,7 @@ size_t PredictionContext::calculateHashCode(const std::vector<PredictionContext*
 
 PredictionContext *PredictionContext::merge(PredictionContext *a, PredictionContext *b,
                                                  bool rootIsWildcard, misc::DoubleKeyMap<PredictionContext*, PredictionContext*, PredictionContext*> *mergeCache) {
-  if (a != nullptr && b != nullptr) {
-    throw new ASSERTException(L"PredictionContext::merge",
-                              L"a != nullptr && b != nullptr");
-  };
+  assert(a != nullptr && b != nullptr);
 
   // share same graph if both same
   if (a == b) {
@@ -548,4 +549,81 @@ std::wstring PredictionContext::toString() {
   //TODO: what should this return?  (Return empty string
   // for now.)
   return L"TODO PredictionContext::toString()";
+}
+
+std::wstring PredictionContext::toString(Recognizer *recog)  {
+  return toString();
+}
+
+std::vector<std::wstring> PredictionContext::toStrings(Recognizer *recognizer, int currentState) {
+  return toStrings(recognizer, EMPTY, currentState);
+}
+
+std::vector<std::wstring> PredictionContext::toStrings(Recognizer *recognizer, PredictionContext *stop, int currentState) {
+
+  std::vector<std::wstring> result;
+
+  for (size_t perm = 0; ; perm++) {
+    size_t offset = 0;
+    bool last = true;
+    PredictionContext *p = this;
+    int stateNumber = currentState;
+    antlrcpp::StringBuilder *localBuffer = new antlrcpp::StringBuilder();
+    localBuffer->append(L"[");
+
+    bool outerContinue = false;
+    while (!p->isEmpty() && p != stop) {
+      size_t index = 0;
+      if (p->size() > 0) {
+        size_t bits = 1;
+        while ((1 << bits) < p->size()) {
+          bits++;
+        }
+
+        size_t mask = (1 << bits) - 1;
+        index = (perm >> offset) & mask;
+        last &= index >= p->size() - 1;
+        if (index >= p->size()) {
+          outerContinue = true;
+          break;
+        }
+        offset += bits;
+      }
+
+      if (recognizer != nullptr) {
+        if (localBuffer->length() > 1) {
+          // first char is '[', if more than that this isn't the first rule
+          localBuffer->append(L' ');
+        }
+
+        const ATN &atn = recognizer->getATN();
+        ATNState *s = atn.states[(size_t)stateNumber];
+        std::wstring ruleName = recognizer->getRuleNames()[(size_t)s->ruleIndex];
+        localBuffer->append(ruleName);
+      } else if (p->getReturnState(index) != EMPTY_RETURN_STATE) {
+        if (!p->isEmpty()) {
+          if (localBuffer->length() > 1) {
+            // first char is '[', if more than that this isn't the first rule
+            localBuffer->append(L' ');
+          }
+
+          localBuffer->append(p->getReturnState(index));
+        }
+      }
+      stateNumber = p->getReturnState(index);
+      p = p->getParent(index);
+    }
+
+    if (outerContinue)
+      continue;
+
+    localBuffer->append(L"]");
+    result.push_back(localBuffer->toString());
+
+    if (last) {
+      break;
+    }
+  }
+
+  return result;
 }

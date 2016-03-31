@@ -61,12 +61,12 @@ int SingletonPredictionContext::getReturnState(size_t index) const {
   return returnState;
 }
 
-bool SingletonPredictionContext::operator == (PredictionContext *o) const {
-  if (this == o) {
+bool SingletonPredictionContext::operator == (const PredictionContext &o) const {
+  if (this == &o) {
     return true;
   }
 
-  SingletonPredictionContext *other = dynamic_cast<SingletonPredictionContext*>(o);
+  const SingletonPredictionContext *other = dynamic_cast<const SingletonPredictionContext*>(&o);
   if (other == nullptr) {
     return false;
   }

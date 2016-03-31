@@ -135,28 +135,13 @@ namespace runtime {
     virtual std::wstring toStringTree(std::vector<std::wstring> &ruleNames);
 
     virtual std::wstring toStringTree() override;
-
     virtual std::wstring toString() override;
-
-
-    template<typename ATNInterpreter>
-    std::wstring toString(Recognizer<ATNInterpreter> *recog) {
-      // Circular include issue, TODO
-      //return toString(recog, ParserRuleContext::EMPTY);
-      return toString(recog, nullptr);
-    }
-
+    std::wstring toString(Recognizer *recog);
     std::wstring toString(const std::vector<std::wstring> &ruleNames);
 
     // recog null unless ParserRuleContext, in which case we use subclass toString(...)
-    template<typename ATNInterpreter>
-    std::wstring toString(Recognizer<ATNInterpreter> *recog, RuleContext *stop) {
-      return toString(recog->getRuleNames(), stop);
-    }
-
-    std::wstring toString(Token *, atn::ParserATNSimulator *) {
-      return L"TODO";
-    }
+    std::wstring toString(Recognizer *recog, RuleContext *stop);
+    std::wstring toString(Token *, atn::ParserATNSimulator *);
 
     virtual std::wstring toString(const std::vector<std::wstring> &ruleNames, RuleContext *stop);
 

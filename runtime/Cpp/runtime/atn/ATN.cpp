@@ -37,6 +37,7 @@
 #include "DecisionState.h"
 #include "Recognizer.h"
 #include "ATNType.h"
+#include "Exceptions.h"
 
 #include "ATN.h"
 
@@ -96,7 +97,7 @@ int ATN::getNumberOfDecisions() const {
 
 misc::IntervalSet ATN::getExpectedTokens(int stateNumber, RuleContext *context) const {
   if (stateNumber < 0 || stateNumber >= (int)states.size()) {
-    throw new IllegalArgumentException(L"Invalid state number.");
+    throw new IllegalArgumentException("Invalid state number.");
   }
 
   RuleContext *ctx = context;

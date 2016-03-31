@@ -55,7 +55,7 @@ UnbufferedCharStream::UnbufferedCharStream(std::ifstream *input, int bufferSize)
 
 void UnbufferedCharStream::consume() {
   if (LA(1) == IntStream::_EOF) {
-    throw IllegalStateException(L"cannot consume EOF");
+    throw IllegalStateException("cannot consume EOF");
   }
 
   // buf always has at least data[p==0] in this method due to ctor
@@ -140,7 +140,7 @@ ssize_t UnbufferedCharStream::mark() {
 void UnbufferedCharStream::release(ssize_t marker) {
   ssize_t expectedMark = -(ssize_t)numMarkers;
   if (marker != expectedMark) {
-    throw IllegalStateException(L"release() called with an invalid marker.");
+    throw IllegalStateException("release() called with an invalid marker.");
   }
 
   numMarkers--;
@@ -169,9 +169,11 @@ void UnbufferedCharStream::seek(size_t index) {
   // index == to bufferStartIndex should set p to 0
   ssize_t i = (ssize_t)index - (ssize_t)getBufferStartIndex();
   if (i < 0) {
-    throw IllegalArgumentException(std::wstring(L"cannot seek to negative index ") + std::to_wstring(index));
+    throw IllegalArgumentException(std::string("cannot seek to negative index ") + std::to_string(index));
   } else if (i >= (ssize_t)n) {
-    throw UnsupportedOperationException(std::wstring(L"seek to index outside buffer: ") + std::to_wstring(index) + std::wstring(L" not in ") + std::to_wstring(getBufferStartIndex()) + std::wstring(L"..") + std::to_wstring(getBufferStartIndex() + n));
+    throw UnsupportedOperationException(std::string("seek to index outside buffer: ") + std::to_string(index) +
+                                        std::string(" not in ") + std::to_string(getBufferStartIndex()) + ".." +
+                                        std::to_string(getBufferStartIndex() + n));
   }
 
   p = (size_t)i;
@@ -184,7 +186,7 @@ void UnbufferedCharStream::seek(size_t index) {
 }
 
 size_t UnbufferedCharStream::size() {
-  throw UnsupportedOperationException(std::wstring(L"Unbuffered stream cannot know its size"));
+  throw UnsupportedOperationException("Unbuffered stream cannot know its size");
 }
 
 std::string UnbufferedCharStream::getSourceName() {
@@ -193,18 +195,19 @@ std::string UnbufferedCharStream::getSourceName() {
 
 std::wstring UnbufferedCharStream::getText(const misc::Interval &interval) {
   if (interval.a < 0 || interval.b < interval.a - 1) {
-    throw IllegalArgumentException(std::wstring(L"invalid interval"));
+    throw IllegalArgumentException("invalid interval");
   }
 
   size_t bufferStartIndex = getBufferStartIndex();
   if (n > 0 && data[n - 1] == WCHAR_MAX) {
     if ((size_t)(interval.a + interval.length()) > bufferStartIndex + n) {
-      throw IllegalArgumentException(std::wstring(L"the interval extends past the end of the stream"));
+      throw IllegalArgumentException("the interval extends past the end of the stream");
     }
   }
 
   if ((size_t)interval.a < bufferStartIndex || (size_t)interval.b >= bufferStartIndex + n) {
-    throw UnsupportedOperationException(std::wstring(L"interval ") + interval.toString() + std::wstring(L" outside buffer: ") + std::to_wstring(bufferStartIndex) + std::wstring(L"..") + std::to_wstring(bufferStartIndex + n - 1));
+    throw UnsupportedOperationException(std::string("interval ") + interval.toString() + " outside buffer: " +
+                                        std::to_string(bufferStartIndex) + ".." + std::to_string(bufferStartIndex + n - 1));
   }
   // convert from absolute to local index
   size_t i = (size_t)interval.a - bufferStartIndex;

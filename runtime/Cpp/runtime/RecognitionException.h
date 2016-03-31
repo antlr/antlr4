@@ -33,73 +33,60 @@
 
 #include "Exceptions.h"
 #include "IntervalSet.h"
+#include "IRecognizer.h"
+#include "IntStream.h"
+#include "RuleContext.h"
+#include "Token.h"
 
 namespace org {
 namespace antlr {
 namespace v4 {
 namespace runtime {
 
-  class RuntimeException : public ANTLRException {
-  public:
-    RuntimeException(const std::wstring msg) : ANTLRException(msg) {}
-    RuntimeException() {};
-  };
-
-  /// <summary>
   /// The root of the ANTLR exception hierarchy. In general, ANTLR tracks just
-  ///  3 kinds of errors: prediction errors, failed predicate errors, and
-  ///  mismatched input errors. In each case, the parser knows where it is
-  ///  in the input, where it is in the ATN, the rule invocation stack,
-  ///  and what kind of problem occurred.
-  /// </summary>
+  /// 3 kinds of errors: prediction errors, failed predicate errors, and
+  /// mismatched input errors. In each case, the parser knows where it is
+  /// in the input, where it is in the ATN, the rule invocation stack,
+  /// and what kind of problem occurred.
   class RecognitionException : public RuntimeException {
-    /// <summary>
-    /// The <seealso cref="Recognizer"/> where this exception originated. </summary>
   private:
-    // Hairy wildcard generics from Java, attempt to fix with a raw void*
-    // Recognizer<void, void> *const recognizer;
-    IRecognizer *_recognizer;
-    IntStream * const _input;
-    RuleContext * const _ctx;
-    const std::wstring _message;
+    /// The Recognizer where this exception originated.
+    std::shared_ptr<IRecognizer> _recognizer;
+    std::shared_ptr<IntStream> _input;
+    std::shared_ptr<RuleContext> _ctx;
 
-    /// <summary>
-    /// The current <seealso cref="Token"/> when an error occurred. Since not all streams
-    /// support accessing symbols by index, we have to track the <seealso cref="Token"/>
+    /// The current Token when an error occurred. Since not all streams
+    /// support accessing symbols by index, we have to track the Token
     /// instance itself.
-    /// </summary>
-    Token *_offendingToken;
+    std::shared_ptr<Token> _offendingToken;
 
     int _offendingState;
 
   public:
-    RecognitionException();
-    RecognitionException(IRecognizer *recognizer, IntStream *input, ParserRuleContext * const ctx);
-    RecognitionException(const std::wstring &message, IRecognizer *recognizer, IntStream *input, ParserRuleContext *ctx);
+    RecognitionException(IRecognizer *recognizer, IntStream *input, ParserRuleContext *ctx, Token *offendingToken = nullptr);
+    RecognitionException(const std::string &message, IRecognizer *recognizer, IntStream *input, ParserRuleContext *ctx,
+                         Token *offendingToken = nullptr);
 
-    /// <summary>
     /// Get the ATN state number the parser was in at the time the error
-    /// occurred. For <seealso cref="NoViableAltException"/> and
-    /// <seealso cref="LexerNoViableAltException"/> exceptions, this is the
-    /// <seealso cref="DecisionState"/> number. For others, it is the state whose outgoing
+    /// occurred. For NoViableAltException and
+    /// LexerNoViableAltException exceptions, this is the
+    /// DecisionState number. For others, it is the state whose outgoing
     /// edge we couldn't match.
-    /// <p/>
+    ///
     /// If the state number is not known, this method returns -1.
-    /// </summary>
     virtual int getOffendingState();
 
   protected:
     void setOffendingState(int offendingState);
 
-    /// <summary>
     /// Gets the set of input symbols which could potentially follow the
     /// previously matched symbol at the time this exception was thrown.
-    /// <p/>
+    ///
     /// If the set of expected tokens is not known and could not be computed,
-    /// this method returns {@code null}.
-    /// </summary>
-    /// <returns> The set of token types that could potentially follow the current
-    /// state in the ATN, or {@code null} if the information is not available. </returns>
+    /// this method returns an empty set.
+    ///
+    /// @returns The set of token types that could potentially follow the current
+    /// state in the ATN, or an empty set if the information is not available.
   public:
     virtual misc::IntervalSet getExpectedTokens();
 
@@ -110,7 +97,7 @@ namespace runtime {
     /// </summary>
     /// <returns> The <seealso cref="RuleContext"/> at the time this exception was thrown.
     /// If the context is not available, this method returns {@code null}. </returns>
-    virtual RuleContext *getCtx();
+    virtual std::shared_ptr<RuleContext> getCtx();
 
     /// <summary>
     /// Gets the input stream which is the symbol source for the recognizer where
@@ -121,12 +108,9 @@ namespace runtime {
     /// <returns> The input stream which is the symbol source for the recognizer
     /// where this exception was thrown, or {@code null} if the stream is not
     /// available. </returns>
-    virtual IntStream *getInputStream();
+    virtual std::shared_ptr<IntStream> getInputStream();
 
-    virtual Token *getOffendingToken();
-
-  protected:
-    void setOffendingToken(Token *offendingToken);
+    virtual std::shared_ptr<Token> getOffendingToken();
 
     /// <summary>
     /// Gets the <seealso cref="Recognizer"/> where this exception occurred.
@@ -135,26 +119,28 @@ namespace runtime {
     /// </summary>
     /// <returns> The recognizer where this exception occurred, or {@code null} if
     /// the recognizer is not available. </returns>
-  public:
-    virtual IRecognizer *getRecognizer();
+    virtual std::shared_ptr<IRecognizer> getRecognizer();
 
   private:
     void InitializeInstanceFields();
   };
 
-  // Recognition exceptions, TODO fill out the code
-
-  class ParseCancellationException : public RecognitionException {
+  /**
+   * This exception is thrown to cancel a parsing operation. This exception does
+   * not extend RecognitionException, allowing it to bypass the standard
+   * error recovery mechanisms. BailErrorStrategy throws this exception in
+   * response to a parse error.
+   */
+  class ParseCancellationException : public IllegalStateException {
   public:
-    ParseCancellationException(const std::wstring msg) {};
-    ParseCancellationException(RecognitionException*) {};
-    ParseCancellationException() {};
+    ParseCancellationException();
+    ParseCancellationException(RecognitionException *cause);
+    ParseCancellationException(const std::string &msg, RecognitionException *cause = nullptr);
   };
 
-  class EmptyStackException : public RecognitionException {
+  class EmptyStackException : public RuntimeException {
   public:
-    EmptyStackException(const std::wstring msg) {}
-    EmptyStackException() {};
+    EmptyStackException() : RuntimeException() {};
   };
 
 } // namespace runtime

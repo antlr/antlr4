@@ -70,7 +70,7 @@ LexerFile(file, lexer, namedActions) ::= <<
 #include "<file.factory.grammar.name>.h"
 
 using namespace org::antlr::v4::runtime;
-using namespace antlrcpp;
+
 <if (file.genPackage)>using namespace <file.genPackage>;<endif>
 
 <lexer>
@@ -84,6 +84,7 @@ ParserFileHeader(file, parser, namedActions) ::= <<
 
 #include "Parser.h"
 #include "ParserRuleContext.h"
+#include "CPPUtils.h"
 //#include "<file.grammarName>Visitor.h"
 
 using namespace org::antlr::v4::runtime;

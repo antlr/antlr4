@@ -39,6 +39,7 @@
 #include "ATN.h"
 #include "ATNState.h"
 #include "Parser.h"
+#include "Strings.h"
 
 #include "DefaultErrorStrategy.h"
 
@@ -84,10 +85,9 @@ void DefaultErrorStrategy::reportError(Parser *recognizer, RecognitionException 
 
     // This is really bush league, I hate libraries that gratuitiously print
     // stuff out
-    std::wcerr <<  std::wstring(L"unknown recognition error type: " +
-                                antlrcpp::s2ws(typeid(e).name()));
+    std::cerr << std::string("unknown recognition error type: ") + typeid(e).name();
 
-    recognizer->notifyErrorListeners(e->getOffendingToken(), antlrcpp::s2ws(e->what()), e);
+    recognizer->notifyErrorListeners(e->getOffendingToken().get(), antlrcpp::s2ws(e->what()), e);
 
   }
 }
@@ -112,7 +112,7 @@ void DefaultErrorStrategy::recover(Parser *recognizer, RecognitionException *e) 
 }
 
 void DefaultErrorStrategy::sync(Parser *recognizer) {
-  atn::ATNState *s = recognizer->getInterpreter()->atn.states[(size_t)recognizer->getState()];
+  atn::ATNState *s = recognizer->getInterpreter<atn::ATNSimulator>()->atn.states[(size_t)recognizer->getState()];
 
   // If already recovering, don't try to sync
   if (inErrorRecoveryMode(recognizer)) {
@@ -167,24 +167,24 @@ void DefaultErrorStrategy::reportNoViableAlternative(Parser *recognizer, NoViabl
     if (e->getStartToken()->getType() == Token::_EOF) {
       input = L"<EOF>";
     } else {
-      input = tokens->getText(e->getStartToken(), e->getOffendingToken());
+      input = tokens->getText(e->getStartToken().get(), e->getOffendingToken().get());
     }
   } else {
     input = L"<unknown input>";
   }
   std::wstring msg = std::wstring(L"no viable alternative at input ") + escapeWSAndQuote(input);
-  recognizer->notifyErrorListeners(e->getOffendingToken(), msg, e);
+  recognizer->notifyErrorListeners(e->getOffendingToken().get(), msg, e);
 }
 
 void DefaultErrorStrategy::reportInputMismatch(Parser *recognizer, InputMismatchException *e) {
-  std::wstring msg = std::wstring(L"mismatched input ") + getTokenErrorDisplay(e->getOffendingToken()) + std::wstring(L" expecting ") + e->getExpectedTokens().toString(recognizer->getTokenNames());
-  recognizer->notifyErrorListeners(e->getOffendingToken(), msg, e);
+  std::wstring msg = std::wstring(L"mismatched input ") + getTokenErrorDisplay(e->getOffendingToken().get()) + std::wstring(L" expecting ") + e->getExpectedTokens().toString(recognizer->getTokenNames());
+  recognizer->notifyErrorListeners(e->getOffendingToken().get(), msg, e);
 }
 
 void DefaultErrorStrategy::reportFailedPredicate(Parser *recognizer, FailedPredicateException *e) {
   const std::wstring& ruleName = recognizer->getRuleNames()[(size_t)recognizer->ctx->getRuleIndex()];
-  std::wstring msg = std::wstring(L"rule ") + ruleName + std::wstring(L" ") + e->getMessage();
-  recognizer->notifyErrorListeners(e->getOffendingToken(), msg, e);
+  std::wstring msg = std::wstring(L"rule ") + ruleName + std::wstring(L" ") + antlrcpp::s2ws(e->getMessage());
+  recognizer->notifyErrorListeners(e->getOffendingToken().get(), msg, e);
 }
 
 void DefaultErrorStrategy::reportUnwantedToken(Parser *recognizer) {
@@ -241,9 +241,9 @@ bool DefaultErrorStrategy::singleTokenInsertion(Parser *recognizer) {
   // if current token is consistent with what could come after current
   // ATN state, then we know we're missing a token; error recovery
   // is free to conjure up and insert the missing token
-  atn::ATNState *currentState = recognizer->getInterpreter()->atn.states[(size_t)recognizer->getState()];
+  atn::ATNState *currentState = recognizer->getInterpreter<atn::ATNSimulator>()->atn.states[(size_t)recognizer->getState()];
   atn::ATNState *next = currentState->transition(0)->target;
-  const atn::ATN &atn = recognizer->getInterpreter()->atn;
+  const atn::ATN &atn = recognizer->getInterpreter<atn::ATNSimulator>()->atn;
   misc::IntervalSet expectingAtLL2 = atn.nextTokens(next, recognizer->ctx);
   if (expectingAtLL2.contains((int)currentSymbolType)) {
     reportMissingToken(recognizer);
@@ -322,7 +322,7 @@ std::wstring DefaultErrorStrategy::escapeWSAndQuote(std::wstring &s) {
 }
 
 misc::IntervalSet DefaultErrorStrategy::getErrorRecoverySet(Parser *recognizer) {
-  const atn::ATN &atn = recognizer->getInterpreter()->atn;
+  const atn::ATN &atn = recognizer->getInterpreter<atn::ATNSimulator>()->atn;
   RuleContext *ctx = recognizer->ctx;
   misc::IntervalSet recoverSet;
   while (ctx != nullptr && ctx->invokingState >= 0) {

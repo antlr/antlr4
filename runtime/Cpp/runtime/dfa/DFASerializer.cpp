@@ -39,8 +39,7 @@
 
 using namespace org::antlr::v4::runtime::dfa;
 
-// TODO -- Make sure this reference doesn't go away prematurely.
-DFASerializer::DFASerializer(DFA *dfa, const std::vector<std::wstring>& tokenNames) : dfa(dfa), tokenNames_(tokenNames) {
+DFASerializer::DFASerializer(DFA *dfa, const std::vector<std::wstring>& tnames) : dfa(dfa), tokenNames(tnames) {
 }
 
 std::wstring DFASerializer::toString() {
@@ -64,7 +63,7 @@ std::wstring DFASerializer::toString() {
   if (output.length() == 0) {
     return L"";
   }
-  //return Utils.sortLinesInString(output);
+
   return output;
 }
 
@@ -73,8 +72,8 @@ std::wstring DFASerializer::getEdgeLabel(size_t i) {
   if (i == 0) {
     return L"EOF";
   }
-  if (!tokenNames_.empty()) {
-    label = tokenNames_[i - 1];
+  if (!tokenNames.empty()) {
+    label = tokenNames[i - 1];
   } else {
     label = antlrcpp::StringConverterHelper::toString(i - 1);
   }
@@ -91,9 +90,9 @@ std::wstring DFASerializer::getStateString(DFAState *s) {
       for (size_t i = 0; i < s->predicates.size(); i++) {
         buf.append(s->predicates[i]->toString());
       }
-      return baseStateStr + std::wstring(L"=>") + buf;
+      return baseStateStr + L" => " + buf;
     } else {
-      return baseStateStr + std::wstring(L"=>") + std::to_wstring(s->prediction);
+      return baseStateStr + L" => " + std::to_wstring(s->prediction);
     }
   } else {
     return baseStateStr;

@@ -35,27 +35,12 @@
 
 using namespace org::antlr::v4::runtime::atn;
 
-SemanticContext::Predicate::Predicate() : ruleIndex(-1), predIndex(-1), isCtxDependent(false) {
+SemanticContext::Predicate::Predicate() : Predicate(-1, -1, false) {
 }
 
-SemanticContext::Predicate::Predicate(int ruleIndex, int predIndex, bool isCtxDependent) : ruleIndex(ruleIndex), predIndex(predIndex), isCtxDependent(isCtxDependent) {
+SemanticContext::Predicate::Predicate(int ruleIndex, int predIndex, bool isCtxDependent)
+  : ruleIndex(ruleIndex), predIndex(predIndex), isCtxDependent(isCtxDependent) {
 }
-
-std::wstring SemanticContext::toString() const {
-  // This is a pure virtual function, why does it need an impl?
-  throw new ASSERTException(L"SemanticContext::toString", L"Should never be called, abstract class");
-}
-
-size_t SemanticContext::hashCode() {
-  // This is a pure virtual function, why does it need an impl?
-  throw new ASSERTException(L"SemanticContext::hashCode", L"Should never be called, abstract class");
-}
-
-bool SemanticContext::equals(void *obj) {
-  // "SemanticContext::equals should have been called on a daughter class"
-  throw new ASSERTException(L"SemanticContext::equals", L"Should never be called, abstract class");
-}
-
 
 size_t SemanticContext::Predicate::hashCode() {
   size_t hashCode = misc::MurmurHash::initialize();
@@ -66,15 +51,16 @@ size_t SemanticContext::Predicate::hashCode() {
   return hashCode;
 }
 
-bool SemanticContext::Predicate::equals(void *obj) {
-  if (!((Predicate*)obj != nullptr)) {
-    return false;
-  }
-  if (this == obj) {
+bool SemanticContext::Predicate::operator == (const SemanticContext &other) const {
+  if (this == &other) {
     return true;
   }
-  Predicate *p = static_cast<Predicate*>(obj);
-  return this->ruleIndex == p->ruleIndex && this->predIndex == p->predIndex && this->isCtxDependent == p->isCtxDependent;
+
+  const Predicate *p = dynamic_cast<const Predicate*>(&other);
+  if (p == nullptr)
+    return false;
+
+  return ruleIndex == p->ruleIndex && predIndex == p->predIndex && isCtxDependent == p->isCtxDependent;
 }
 
 std::wstring SemanticContext::Predicate::toString() const {
@@ -97,22 +83,17 @@ size_t SemanticContext::PrecedencePredicate::hashCode() {
   return hashCode;
 }
 
-bool SemanticContext::PrecedencePredicate::equals(void *obj) {
-  // TODO: this is wrong
-  if (!((Predicate*)obj/*dynamic_cast<PrecedencePredicate*>(obj)*/ != nullptr)) {
-    return false;
-  }
-
-  if (this == obj) {
+bool SemanticContext::PrecedencePredicate::operator == (const SemanticContext &other) const {
+  if (this == &other) {
     return true;
   }
 
-  PrecedencePredicate *other = static_cast<PrecedencePredicate*>(obj);
-  return this->precedence == other->precedence;
+  const PrecedencePredicate *predicate = dynamic_cast<const PrecedencePredicate *>(&other);
+  return precedence == predicate->precedence;
 }
 
 std::wstring SemanticContext::PrecedencePredicate::toString() const {
-  return SemanticContext::toString();
+  return L"Precedence: " + std::to_wstring(precedence);
 }
 
 
@@ -136,8 +117,7 @@ SemanticContext::AND::AND(SemanticContext *a, SemanticContext *b) {
     operands->insert(operands->end(), b);
   }
 
-  std::vector<PrecedencePredicate*> precedencePredicates =
-  filterPrecedencePredicates<SemanticContext*>(operands);
+  std::vector<PrecedencePredicate*> precedencePredicates = filterPrecedencePredicates<SemanticContext*>(operands);
 
   if (!precedencePredicates.empty()) {
     // interested in the transition with the lowest precedence
@@ -153,15 +133,13 @@ SemanticContext::AND::AND(SemanticContext *a, SemanticContext *b) {
 
 }
 
-bool SemanticContext::AND::equals(void *obj) {
-  if (this == obj) {
+bool SemanticContext::AND::operator == (const SemanticContext &other) const {
+  if (this == &other) {
     return true;
   }
-  if (!((AND*)obj != nullptr)) {
-    return false;
-  }
-  AND *other = static_cast<AND*>(obj);
-  return (this->opnds == other->opnds);
+
+  const AND *context = dynamic_cast<const AND *>(&other);
+  return opnds == context->opnds;
 }
 
 
@@ -173,8 +151,8 @@ size_t SemanticContext::AND::hashCode() {
 
 std::wstring SemanticContext::AND::toString() const {
   std::wstring tmp;
-  for(auto var : opnds) {
-    tmp += var->toString() + L"&&";
+  for (auto var : opnds) {
+    tmp += var->toString() + L" && ";
   }
   return tmp;
 }
@@ -214,18 +192,14 @@ SemanticContext::OR::OR(SemanticContext *a, SemanticContext *b){
   }
 }
 
-bool SemanticContext::OR::equals(SemanticContext *obj) {
-  if (this == obj) {
+bool SemanticContext::OR::operator == (const SemanticContext &other) const {
+  if (this == &other) {
     return true;
   }
 
-  if (obj == nullptr || typeid(*obj) != typeid(*this)) {
-    return false;
-  }
+  const OR *context = dynamic_cast<const OR *>(&other);
 
-  OR *other = static_cast<OR*>(obj);
-
-  return this->opnds == other->opnds;
+  return opnds == context->opnds;
 }
 
 size_t SemanticContext::OR::hashCode() {
@@ -236,7 +210,7 @@ size_t SemanticContext::OR::hashCode() {
 std::wstring SemanticContext::OR::toString() const {
   std::wstring tmp;
   for(auto var : opnds) {
-    tmp += var->toString() + L"||";
+    tmp += var->toString() + L" || ";
   }
   return tmp;
 }

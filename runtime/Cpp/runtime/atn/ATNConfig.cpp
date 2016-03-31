@@ -87,7 +87,7 @@ bool ATNConfig::operator == (const ATNConfig& other) const
 {
   return this->state->stateNumber == other.state->stateNumber && this->alt == other.alt &&
     (this->context == other.context || (this->context != nullptr && this->context == other.context)) &&
-    this->semanticContext->equals(other.semanticContext);
+    this->semanticContext == other.semanticContext;
 }
 
 std::wstring ATNConfig::toString() {

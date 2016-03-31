@@ -34,6 +34,7 @@
 #include "DFA.h"
 #include "PredictionContextCache.h"
 #include "EmptyPredictionContext.h"
+#include "Exceptions.h"
 
 #include "LexerInterpreter.h"
 
@@ -42,7 +43,7 @@ using namespace org::antlr::v4::runtime;
 LexerInterpreter::LexerInterpreter(const std::wstring &grammarFileName, std::vector<std::wstring> *tokenNames, std::vector<std::wstring> *ruleNames, std::vector<std::wstring> *modeNames, const atn::ATN &atn, CharStream *input) : Lexer(input), grammarFileName(grammarFileName), _atn(atn), _sharedContextCache(new atn::PredictionContextCache()) {
 
   if (_atn.grammarType != atn::ATNType::LEXER) {
-    throw new IllegalArgumentException(L"The ATN must be a lexer ATN.");
+    throw new IllegalArgumentException("The ATN must be a lexer ATN.");
   }
 
 

@@ -48,22 +48,13 @@ namespace atn {
   ///  <seealso cref="SemanticContext"/> within the scope of this outer class.
   /// </summary>
   class SemanticContext {
-
   public:
+    SemanticContext *parent;
     static SemanticContext *const NONE;
 
     virtual size_t hashCode() = 0;
-
-    class Predicate;
-    class PrecedencePredicate;
-    class AND;
-    class OR;
-
-    SemanticContext *parent;
-
     virtual std::wstring toString() const = 0;
-
-    virtual bool equals(void *obj);
+    virtual bool operator == (const SemanticContext &other) const = 0;
 
     /// <summary>
     /// For context independent predicates, we evaluate them without a local
@@ -78,21 +69,17 @@ namespace atn {
     /// prediction, so we passed in the outer context here in case of context
     /// dependent predicate evaluation.
     /// </summary>
-
-    // Abstract
-    template<typename ATNInterpreter>
-    bool eval(Recognizer<ATNInterpreter> *parser, RuleContext *outerContext) {
-      // In the original Java this is abstract, but
-      // C++ complains with a link error, and we
-      // cannot make a template function abstract
-      throw new ASSERTException(L"SemanticContext::eval", L"Should never be called, abstract class");
-    }
+    virtual bool eval(Recognizer *parser, RuleContext *outerContext) = 0;
 
     static SemanticContext *And(SemanticContext *a, SemanticContext *b);
 
-    ///
-    ///  <seealso cref= ParserATNSimulator#getPredsForAmbigAlts </seealso>
+    /// See also: ParserATNSimulator::getPredsForAmbigAlts.
     static SemanticContext *Or(SemanticContext *a, SemanticContext *b);
+
+    class Predicate;
+    class PrecedencePredicate;
+    class AND;
+    class OR;
 
   private:
     template<typename T1> // where T1 : SemanticContext
@@ -125,16 +112,13 @@ namespace atn {
   public:
     Predicate(int ruleIndex, int predIndex, bool isCtxDependent);
 
-    template<typename ATNInterpreter>
-    bool eval(Recognizer<ATNInterpreter> *parser, RuleContext *outerContext)  {
+    virtual bool eval(Recognizer *parser, RuleContext *outerContext) override {
       RuleContext *localctx = isCtxDependent ? outerContext : nullptr;
       return parser->sempred(localctx, ruleIndex, predIndex);
     }
 
     virtual size_t hashCode() override;
-
-    virtual bool equals(void *obj) override;
-
+    virtual bool operator == (const SemanticContext &other) const override;
     virtual std::wstring toString() const override;
   };
 
@@ -148,21 +132,16 @@ namespace atn {
   public:
     PrecedencePredicate(int precedence);
 
-    template<typename ATNInterpreter>
-    bool eval(Recognizer<ATNInterpreter> *parser, RuleContext *outerContext) {
+    virtual bool eval(Recognizer *parser, RuleContext *outerContext) override {
       return parser->precpred(outerContext, precedence);
     }
 
     virtual int compareTo(PrecedencePredicate *o);
-
     virtual size_t hashCode() override;
-
-    virtual bool equals(void *obj) override;
-
+    virtual bool operator == (const SemanticContext &other) const override;
     virtual std::wstring toString() const override;
 
-    static bool lessThan(const PrecedencePredicate &a,
-                         const PrecedencePredicate &b) {
+    static bool lessThan(const PrecedencePredicate &a, const PrecedencePredicate &b) {
       return a.precedence < b.precedence;
     }
     static bool greaterThan(const PrecedencePredicate &a,
@@ -177,12 +156,10 @@ namespace atn {
 
     AND(SemanticContext *a, SemanticContext *b);
 
-    virtual bool equals(void *obj) override;
-
+    virtual bool operator == (const SemanticContext &other) const override;
     virtual size_t hashCode() override;
 
-    template<typename ATNInterpreter>
-    bool eval(Recognizer<ATNInterpreter> *parser, RuleContext *outerContext) {
+    virtual bool eval(Recognizer *parser, RuleContext *outerContext) override {
       for (auto opnd : opnds) {
         if (!opnd->eval(parser, outerContext)) {
           return false;
@@ -201,12 +178,10 @@ namespace atn {
 
     OR(SemanticContext *a, SemanticContext *b);
 
-    virtual bool equals(SemanticContext *obj);
-
+    virtual bool operator == (const SemanticContext &other) const override;
     virtual size_t hashCode() override;
 
-    template<typename ATNInterpreter>
-    bool eval(Recognizer<ATNInterpreter> *parser, RuleContext *outerContext) {
+    virtual bool eval(Recognizer *parser, RuleContext *outerContext) override {
       for (auto opnd : opnds) {
         if (opnd->eval(parser, outerContext)) {
           return true;

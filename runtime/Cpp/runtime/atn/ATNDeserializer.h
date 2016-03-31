@@ -103,7 +103,7 @@ namespace atn {
 
     virtual void checkCondition(bool condition);
 
-    virtual void checkCondition(bool condition, const std::wstring &message);
+    virtual void checkCondition(bool condition, const std::string &message);
 
     static Guid toUUID(const wchar_t *data, int offset);
 

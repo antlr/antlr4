@@ -32,6 +32,7 @@
 #include "MurmurHash.h"
 #include "Lexer.h"
 #include "StringBuilder.h"
+#include "Exceptions.h"
 
 #include "IntervalSet.h"
 
@@ -71,14 +72,14 @@ IntervalSet IntervalSet::of(int a, int b) {
 
 void IntervalSet::clear() {
   if (_readonly) {
-    throw new IllegalStateException(L"can't alter read only IntervalSet");
+    throw new IllegalStateException("can't alter read only IntervalSet");
   }
   _intervals.clear();
 }
 
 void IntervalSet::add(int el) {
   if (_readonly) {
-    throw new IllegalStateException(L"can't alter read only IntervalSet");
+    throw new IllegalStateException("can't alter read only IntervalSet");
   }
   add(el, el);
 }
@@ -89,7 +90,7 @@ void IntervalSet::add(int a, int b) {
 
 void IntervalSet::add(const Interval &addition) {
   if (_readonly) {
-    throw new IllegalStateException(L"can't alter read only IntervalSet");
+    throw new IllegalStateException("can't alter read only IntervalSet");
   }
 
   if (addition.b < addition.a) {
@@ -483,7 +484,7 @@ int IntervalSet::get(int i) const {
 
 void IntervalSet::remove(int el) {
   if (_readonly) {
-    throw IllegalStateException(L"can't alter read only IntervalSet");
+    throw IllegalStateException("can't alter read only IntervalSet");
   }
 
   for (size_t i = 0; i < _intervals.size(); ++i) {

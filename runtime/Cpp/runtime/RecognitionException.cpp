@@ -31,20 +31,20 @@
 
 #include "ATN.h"
 #include "Recognizer.h"
+#include "Strings.h"
+#include "ParserRuleContext.h"
 
 #include "RecognitionException.h"
 
 using namespace org::antlr::v4::runtime;
 
-RecognitionException::RecognitionException() : RecognitionException(L"", nullptr, nullptr, nullptr) {
+RecognitionException::RecognitionException(IRecognizer *recognizer, IntStream *input, ParserRuleContext *ctx, Token *offendingToken)
+  : RecognitionException("", recognizer, input, ctx, offendingToken) {
 }
 
-RecognitionException::RecognitionException(IRecognizer *recognizer, IntStream *input, ParserRuleContext * const ctx)
-: RecognitionException(L"", recognizer, input, ctx) {
-}
-
-RecognitionException::RecognitionException(const std::wstring &message, IRecognizer *recognizer, IntStream *input, ParserRuleContext *ctx)
-: _message(message), _recognizer(recognizer), _input(input), _ctx((RuleContext * const)ctx) {
+RecognitionException::RecognitionException(const std::string &message, IRecognizer *recognizer, IntStream *input,
+                                           ParserRuleContext *ctx, Token *offendingToken)
+  : RuntimeException(message), _recognizer(recognizer), _input(input), _offendingToken(offendingToken), _ctx(ctx) {
   InitializeInstanceFields();
   if (recognizer != nullptr) {
     _offendingState = recognizer->getState();
@@ -60,32 +60,41 @@ void RecognitionException::setOffendingState(int offendingState) {
 }
 
 misc::IntervalSet RecognitionException::getExpectedTokens() {
-  if (_recognizer != nullptr) {
-    return _recognizer->getATN().getExpectedTokens(_offendingState, _ctx);
+  if (_recognizer) {
+    return _recognizer->getATN().getExpectedTokens(_offendingState, _ctx.get());
   }
   return misc::IntervalSet::EMPTY_SET;
 }
 
-RuleContext *RecognitionException::getCtx() {
+std::shared_ptr<RuleContext> RecognitionException::getCtx() {
   return _ctx;
 }
 
-IntStream *RecognitionException::getInputStream() {
+std::shared_ptr<IntStream> RecognitionException::getInputStream() {
   return _input;
 }
 
-Token *RecognitionException::getOffendingToken() {
+std::shared_ptr<Token> RecognitionException::getOffendingToken() {
   return _offendingToken;
 }
 
-void RecognitionException::setOffendingToken(Token *offendingToken) {
-  _offendingToken = offendingToken;
-}
-
-IRecognizer *RecognitionException::getRecognizer() {
+std::shared_ptr<IRecognizer> RecognitionException::getRecognizer() {
   return _recognizer;
 }
 
 void RecognitionException::InitializeInstanceFields() {
   _offendingState = -1;
+}
+
+//------------------ ParseCancellationException ------------------------------------------------------------------------
+
+ParseCancellationException::ParseCancellationException() : ParseCancellationException("", nullptr) {
+}
+
+ParseCancellationException::ParseCancellationException(RecognitionException *cause)
+  : ParseCancellationException("", cause) {
+}
+
+ParseCancellationException::ParseCancellationException(const std::string &msg, RecognitionException *cause)
+  : IllegalStateException(msg, cause) {
 }

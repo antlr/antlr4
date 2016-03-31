@@ -39,12 +39,9 @@ namespace antlr {
 namespace v4 {
 namespace runtime {
 
-  /// <summary>
-  /// This implementation of <seealso cref="ANTLRErrorListener"/> dispatches all calls to a
+  /// This implementation of ANTLRErrorListener dispatches all calls to a
   /// collection of delegate listeners. This reduces the effort required to support multiple
   /// listeners.
-  /// </summary>
-
   class ProxyErrorListener : public ANTLRErrorListener {
   private:
     std::vector<ANTLRErrorListener*> *const delegates;
@@ -53,9 +50,8 @@ namespace runtime {
     template<typename T1> //where T1 : ANTLRErrorListener
     ProxyErrorListener(std::vector<T1> *delegates) : delegates(delegates) {
       if (delegates == nullptr) {
-        throw new NullPointerException(L"delegates");
+        throw new NullPointerException("delegates");
       }
-
     }
 
     void syntaxError(IRecognizer *recognizer, void *offendingSymbol, size_t line, int charPositionInLine,

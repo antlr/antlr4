@@ -40,10 +40,6 @@ namespace v4 {
 namespace runtime {
 namespace atn {
 
-  ///
-  /// <summary>
-  /// @author Sam Harwell
-  /// </summary>
   class PrecedencePredicateTransition final : public AbstractPredicateTransition {
   public:
     const int precedence;

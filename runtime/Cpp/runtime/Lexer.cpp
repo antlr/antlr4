@@ -36,6 +36,7 @@
 #include "LexerNoViableAltException.h"
 #include "stringconverter.h"
 #include "StringBuilder.h"
+#include "ANTLRErrorListener.h"
 
 #include "Lexer.h"
 
@@ -68,12 +69,12 @@ void Lexer::reset() {
   _mode = Lexer::DEFAULT_MODE;
   _modeStack.clear();
 
-  getInterpreter()->reset();
+  getInterpreter<atn::LexerATNSimulator>()->reset();
 }
 
 Token *Lexer::nextToken() {
   if (_input == nullptr) {
-    throw new IllegalStateException(L"nextToken requires a non-null input stream.");
+    throw new IllegalStateException("nextToken requires a non-null input stream.");
   }
 
   // Mark start location in char stream so unbuffered streams are
@@ -90,17 +91,14 @@ Token *Lexer::nextToken() {
       delete _token;
       _channel = Token::DEFAULT_CHANNEL;
       _tokenStartCharIndex = (int)_input->index();
-      _tokenStartCharPositionInLine = getInterpreter()->getCharPositionInLine();
-      _tokenStartLine = (int)getInterpreter()->getLine();
+      _tokenStartCharPositionInLine = getInterpreter<atn::LexerATNSimulator>()->getCharPositionInLine();
+      _tokenStartLine = (int)getInterpreter<atn::LexerATNSimulator>()->getLine();
       _text = L"";
       do {
         _type = Token::INVALID_TYPE;
-        //				System.out.println("nextToken line "+tokenStartLine+" at "+((char)input.LA(1))+
-        //								   " in mode "+mode+
-        //								   " at index "+input.index());
         int ttype;
         try {
-          ttype = getInterpreter()->match(_input, (size_t)_mode);
+          ttype = getInterpreter<atn::LexerATNSimulator>()->match(_input, (size_t)_mode);
         } catch (LexerNoViableAltException *e) {
           notifyListeners(e); // report error
           recover(e);
@@ -214,19 +212,19 @@ Token *Lexer::emitEOF() {
 }
 
 size_t Lexer::getLine() const {
-  return getInterpreter()->getLine();
+  return getInterpreter<atn::LexerATNSimulator>()->getLine();
 }
 
 int Lexer::getCharPositionInLine() {
-  return getInterpreter()->getCharPositionInLine();
+  return getInterpreter<atn::LexerATNSimulator>()->getCharPositionInLine();
 }
 
 void Lexer::setLine(size_t line) {
-  getInterpreter()->setLine(line);
+  getInterpreter<atn::LexerATNSimulator>()->setLine(line);
 }
 
 void Lexer::setCharPositionInLine(int charPositionInLine) {
-  getInterpreter()->setCharPositionInLine(charPositionInLine);
+  getInterpreter<atn::LexerATNSimulator>()->setCharPositionInLine(charPositionInLine);
 }
 
 int Lexer::getCharIndex() {
@@ -237,7 +235,7 @@ std::wstring Lexer::getText() {
   if (_text != L"") {
     return _text;
   }
-  return getInterpreter()->getText(_input);
+  return getInterpreter<atn::LexerATNSimulator>()->getText(_input);
 }
 
 void Lexer::setText(const std::wstring &text) {
@@ -281,7 +279,7 @@ std::vector<Token*> Lexer::getAllTokens() {
 void Lexer::recover(LexerNoViableAltException *e) {
   if (_input->LA(1) != IntStream::_EOF) {
     // skip a char and try again
-    getInterpreter()->consume(_input);
+    getInterpreter<atn::LexerATNSimulator>()->consume(_input);
   }
 }
 

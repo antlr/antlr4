@@ -59,11 +59,11 @@ namespace pattern {
     /// This is the backing field for <seealso cref="#getTag"/>.
     /// </summary>
   private:
-    const std::wstring tag;
+    const std::wstring _tag;
     /// <summary>
     /// This is the backing field for <seealso cref="#getLabel"/>.
     /// </summary>
-    const std::wstring label;
+    const std::wstring _label;
 
     /// <summary>
     /// Construct a new instance of <seealso cref="TagChunk"/> using the specified tag and

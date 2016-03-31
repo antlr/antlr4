@@ -59,7 +59,7 @@ namespace atn {
     virtual size_t size() const override;
     virtual PredictionContext *getParent(size_t index) const override;
     virtual int getReturnState(size_t index) const override;
-    bool operator == (PredictionContext *o) const override;
+    bool operator == (const PredictionContext &o) const override;
 
     virtual std::wstring toString();
   };

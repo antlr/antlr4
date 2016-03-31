@@ -45,6 +45,7 @@
 #include "ActionTransition.h"
 #include "ATN.h"
 #include "RuleStopState.h"
+#include "Token.h"
 
 #include "ParserInterpreter.h"
 
@@ -52,8 +53,8 @@ using namespace org::antlr::v4::runtime;
 
 ParserInterpreter::ParserInterpreter(const std::wstring &grammarFileName, const std::vector<std::wstring>& tokenNames,
   const std::vector<std::wstring>& ruleNames, const atn::ATN& atn, TokenStream *input)
-  : Parser(input), grammarFileName(grammarFileName), _tokenNames(tokenNames), _atn(atn), _ruleNames(ruleNames), pushRecursionContextStates(new antlrcpp::BitSet()), sharedContextCache(new atn::PredictionContextCache()), _parentContextStack(new std::deque<std::pair<ParserRuleContext *, int>*>()) {
-
+  : Parser(input), grammarFileName(grammarFileName),
+    _tokenNames(tokenNames), _atn(atn), _ruleNames(ruleNames), sharedContextCache(new atn::PredictionContextCache()), _parentContextStack(new std::deque<std::pair<ParserRuleContext *, int>*>()) {
 
   for (int i = 0; i < _atn.getNumberOfDecisions(); i++) {
     _decisionToDFA.push_back(new dfa::DFA(_atn.getDecisionState(i), i));
@@ -76,7 +77,7 @@ ParserInterpreter::ParserInterpreter(const std::wstring &grammarFileName, const 
     }
 
     if (maybeLoopEndState->epsilonOnlyTransitions && dynamic_cast<atn::RuleStopState*>(maybeLoopEndState->transition(0)->target) != nullptr) {
-      this->pushRecursionContextStates->set((size_t)state->stateNumber);
+      _pushRecursionContextStates.set((size_t)state->stateNumber);
     }
   }
 
@@ -146,7 +147,7 @@ atn::ATNState *ParserInterpreter::getATNState() {
 void ParserInterpreter::visitState(atn::ATNState *p) {
   int edge;
   if (p->getNumberOfTransitions() > 1) {
-    edge = getInterpreter()->adaptivePredict(_input, ((atn::DecisionState*)p)->decision, ctx);
+    edge = getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, ((atn::DecisionState*)p)->decision, ctx);
   } else {
     edge = 1;
   }
@@ -154,7 +155,7 @@ void ParserInterpreter::visitState(atn::ATNState *p) {
   atn::Transition *transition = p->transition((size_t)edge - 1);
   switch (transition->getSerializationType()) {
     case atn::Transition::EPSILON:
-      if (pushRecursionContextStates->data[(size_t)p->stateNumber] == 1 && !(dynamic_cast<atn::LoopEndState*>(transition->target) != nullptr)) {
+      if (_pushRecursionContextStates.data[(size_t)p->stateNumber] == 1 && !(dynamic_cast<atn::LoopEndState*>(transition->target) != nullptr)) {
         InterpreterRuleContext *ruleContext = new InterpreterRuleContext(_parentContextStack->front()->first, _parentContextStack->front()->second, ctx->getRuleIndex());
         pushNewRecursionContext(ruleContext, _atn.ruleToStartState[(size_t)p->ruleIndex]->stateNumber, (int)ruleContext->getRuleIndex());
       }
@@ -209,13 +210,13 @@ void ParserInterpreter::visitState(atn::ATNState *p) {
     case atn::Transition::PRECEDENCE:
     {
       if (!precpred(ctx, ((atn::PrecedencePredicateTransition*)(transition))->precedence)) {
-        throw new FailedPredicateException(this, L"precpred(_ctx, " + std::to_wstring(((atn::PrecedencePredicateTransition*)(transition))->precedence) +  L")");
+        throw new FailedPredicateException(this, "precpred(_ctx, " + std::to_string(((atn::PrecedencePredicateTransition*)(transition))->precedence) +  ")");
       }
     }
       break;
 
     default:
-      throw UnsupportedOperationException(L"Unrecognized ATN transition type.");
+      throw UnsupportedOperationException("Unrecognized ATN transition type.");
   }
 
   setState(transition->target->stateNumber);

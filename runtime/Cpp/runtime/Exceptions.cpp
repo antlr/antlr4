@@ -31,3 +31,40 @@
 #include "Exceptions.h"
 
 using namespace org::antlr::v4::runtime;
+
+RuntimeException::RuntimeException(RuntimeException *cause) : RuntimeException("", cause) {
+}
+
+RuntimeException::RuntimeException(const std::string &msg, RuntimeException *cause)
+  : std::exception(), _message(msg), _cause(cause) {
+}
+
+std::string RuntimeException::getMessage() const {
+  return _message;
+}
+std::shared_ptr<RuntimeException> RuntimeException::getCause() const {
+  return _cause;
+}
+
+const char* RuntimeException::what() const noexcept {
+  return _message.c_str();
+}
+
+//------------------ IOException ---------------------------------------------------------------------------------------
+
+IOException::IOException(RuntimeException *cause) : IOException("", cause) {
+}
+
+IOException::IOException(const std::string &msg, RuntimeException *cause) : std::exception(), _message(msg), _cause(cause) {
+}
+
+std::string IOException::getMessage() const {
+  return _message;
+}
+std::shared_ptr<RuntimeException> IOException::getCause() const {
+  return _cause;
+}
+
+const char* IOException::what() const noexcept {
+  return _message.c_str();
+}

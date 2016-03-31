@@ -388,7 +388,7 @@ atn::LexerATNConfig *LexerATNSimulator::getEpsilonTarget(CharStream *input, Lexe
 
     case Transition::PRECEDENCE:
       //{
-      throw new UnsupportedOperationException(L"Precedence predicates are not supported in lexers.");
+      throw new UnsupportedOperationException("Precedence predicates are not supported in lexers.");
       //}
       break;
 

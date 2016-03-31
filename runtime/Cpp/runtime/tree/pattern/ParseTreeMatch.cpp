@@ -39,15 +39,15 @@ using namespace org::antlr::v4::runtime::tree::pattern;
 
 ParseTreeMatch::ParseTreeMatch(ParseTree *tree, ParseTreePattern *pattern, misc::MultiMap<std::wstring, ParseTree*> *labels, ParseTree *mismatchedNode) : tree(tree), pattern(pattern), labels(labels), mismatchedNode(mismatchedNode) {
   if (tree == nullptr) {
-    throw IllegalArgumentException(L"tree cannot be null");
+    throw IllegalArgumentException("tree cannot be null");
   }
 
   if (pattern == nullptr) {
-    throw IllegalArgumentException(L"pattern cannot be null");
+    throw IllegalArgumentException("pattern cannot be null");
   }
 
   if (labels == nullptr) {
-    throw IllegalArgumentException(L"labels cannot be null");
+    throw IllegalArgumentException("labels cannot be null");
   }
 
 }

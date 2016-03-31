@@ -45,7 +45,7 @@ const std::vector<std::wstring> Transition::serializationNames = {
 
 Transition::Transition(ATNState *target) {
   if (target == nullptr) {
-    throw NullPointerException(L"target cannot be null.");
+    throw NullPointerException("target cannot be null.");
   }
 
   this->target = target;

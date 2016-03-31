@@ -39,8 +39,8 @@ RuleTagToken::RuleTagToken(const std::wstring &ruleName, int _bypassTokenType) :
 }
 
 RuleTagToken::RuleTagToken(const std::wstring &ruleName, int bypassTokenType, const std::wstring &label) : ruleName(ruleName), bypassTokenType(bypassTokenType), label(label) {
-  if (ruleName == L"" || ruleName.length() == 0) {
-    throw IllegalArgumentException(L"ruleName cannot be null or empty.");
+  if (ruleName.empty()) {
+    throw IllegalArgumentException("ruleName cannot be null or empty.");
   }
 
 }

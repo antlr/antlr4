@@ -52,8 +52,8 @@ int EmptyPredictionContext::getReturnState(size_t index) const {
   return returnState;
 }
 
-bool EmptyPredictionContext::operator == (PredictionContext *o) const {
-  return this == o;
+bool EmptyPredictionContext::operator == (const PredictionContext &o) const {
+  return this == &o;
 }
 
 std::wstring EmptyPredictionContext::toString() const {

@@ -42,6 +42,9 @@
 #include "ATNDeserializer.h"
 #include "RuleTransition.h"
 #include "ATN.h"
+#include "Strings.h"
+#include "Exceptions.h"
+#include "ANTLRErrorListener.h"
 
 #include "Parser.h"
 
@@ -111,7 +114,7 @@ void Parser::reset() {
   setTrace(false);
   _precedenceStack.clear();
   _precedenceStack.push_back(0);
-  atn::ATNSimulator *interpreter = getInterpreter();
+  atn::ATNSimulator *interpreter = getInterpreter<atn::ParserATNSimulator>();
   if (interpreter != nullptr) {
     interpreter->reset();
   }
@@ -185,7 +188,7 @@ std::vector<tree::ParseTreeListener*> Parser::getParseListeners() {
 
 void Parser::addParseListener(tree::ParseTreeListener *listener) {
   if (listener == nullptr) {
-    throw NullPointerException(L"listener");
+    throw NullPointerException("listener");
   }
 
   if (_parseListeners.empty()) {
@@ -236,7 +239,7 @@ TokenFactory<CommonToken*> *Parser::getTokenFactory() {
 const atn::ATN& Parser::getATNWithBypassAlts() {
   std::wstring serializedAtn = getSerializedATN();
   if (serializedAtn.empty()) {
-    throw UnsupportedOperationException(L"The current parser does not support an ATN with bypass alternatives.");
+    throw UnsupportedOperationException("The current parser does not support an ATN with bypass alternatives.");
   }
 
   std::lock_guard<std::mutex> lck(mtx);
@@ -263,7 +266,7 @@ tree::pattern::ParseTreePattern *Parser::compileParseTreePattern(const std::wstr
       return compileParseTreePattern(pattern, patternRuleIndex, lexer);
     }
   }
-  throw UnsupportedOperationException(L"Parser can't discover a lexer to use");
+  throw UnsupportedOperationException("Parser can't discover a lexer to use");
 }
 
 tree::pattern::ParseTreePattern *Parser::compileParseTreePattern(const std::wstring &pattern, int patternRuleIndex, Lexer *lexer) {
@@ -470,7 +473,7 @@ bool Parser::inContext(const std::wstring &context) {
 }
 
 bool Parser::isExpectedToken(int symbol) {
-  const atn::ATN &atn = getInterpreter()->atn;
+  const atn::ATN &atn = getInterpreter<atn::ParserATNSimulator>()->atn;
   ParserRuleContext *ctx = ctx;
   atn::ATNState *s = atn.states[(size_t)getState()];
   misc::IntervalSet following = atn.nextTokens(s);
@@ -506,7 +509,7 @@ misc::IntervalSet Parser::getExpectedTokens() {
 }
 
 misc::IntervalSet Parser::getExpectedTokensWithinCurrentRule() {
-  const atn::ATN &atn = getInterpreter()->atn;
+  const atn::ATN &atn = getInterpreter<atn::ParserATNSimulator>()->atn;
   atn::ATNState *s = atn.states[(size_t)getState()];
   return atn.nextTokens(s);
 }
@@ -544,11 +547,13 @@ std::vector<std::wstring> Parser::getRuleInvocationStack(RuleContext *p) {
 }
 
 std::vector<std::wstring> Parser::getDFAStrings() {
-  if (!_interpreter->_decisionToDFA.empty()) {
+  atn::ParserATNSimulator *simulator = getInterpreter<atn::ParserATNSimulator>();
+  if (!simulator->_decisionToDFA.empty()) {
     std::lock_guard<std::mutex> lck(mtx);
-    std::vector<std::wstring> s = std::vector<std::wstring>();
-    for (size_t d = 0; d < _interpreter->_decisionToDFA.size(); d++) {
-      dfa::DFA *dfa = _interpreter->_decisionToDFA[d];
+
+    std::vector<std::wstring> s;
+    for (size_t d = 0; d < simulator->_decisionToDFA.size(); d++) {
+      dfa::DFA *dfa = simulator->_decisionToDFA[d];
       s.push_back(dfa->toString(getTokenNames()));
     }
     return s;
@@ -557,12 +562,12 @@ std::vector<std::wstring> Parser::getDFAStrings() {
 }
 
 void Parser::dumpDFA() {
-
-  if (!_interpreter->_decisionToDFA.empty()) {
+  atn::ParserATNSimulator *simulator = getInterpreter<atn::ParserATNSimulator>();
+  if (!simulator->_decisionToDFA.empty()) {
     std::lock_guard<std::mutex> lck(mtx);
     bool seenOne = false;
-    for (size_t d = 0; d < _interpreter->_decisionToDFA.size(); d++) {
-      dfa::DFA *dfa = _interpreter->_decisionToDFA[d];
+    for (size_t d = 0; d < simulator->_decisionToDFA.size(); d++) {
+      dfa::DFA *dfa = simulator->_decisionToDFA[d];
       if (!dfa->states->empty()) {
         if (seenOne) {
           std::cout << std::endl;

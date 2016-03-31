@@ -101,7 +101,7 @@ namespace misc {
     /// Return the interval in common between this and o </summary>
     virtual Interval intersection(const Interval &other) const;
 
-    virtual std::wstring toString() const;
+    virtual std::string toString() const;
 
   private:
   };

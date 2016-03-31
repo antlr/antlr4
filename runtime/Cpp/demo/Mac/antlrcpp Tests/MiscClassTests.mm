@@ -227,10 +227,10 @@ using namespace org::antlr::v4::runtime::misc;
   XCTAssert(Interval(1000, 2000).intersection(Interval(10, 100)) == Interval(1000, 100));
   XCTAssert(Interval(500, 2000).intersection(Interval(10, 1000)) == Interval(500, 1000));
 
-  XCTAssert(Interval().toString() == L"-1..-2");
-  XCTAssert(Interval(10, 10).toString() == L"10..10");
-  XCTAssert(Interval(1000, 2000).toString() == L"1000..2000");
-  XCTAssert(Interval(500, INT_MAX).toString() == L"500.." + std::to_wstring(INT_MAX));
+  XCTAssert(Interval().toString() == "-1..-2");
+  XCTAssert(Interval(10, 10).toString() == "10..10");
+  XCTAssert(Interval(1000, 2000).toString() == "1000..2000");
+  XCTAssert(Interval(500, INT_MAX).toString() == "500.." + std::to_string(INT_MAX));
 }
 
 - (void)testIntervalSet {

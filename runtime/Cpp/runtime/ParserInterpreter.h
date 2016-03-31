@@ -33,6 +33,7 @@
 
 #include "Parser.h"
 #include "ATN.h"
+#include "BitSet.h"
 
 namespace org {
 namespace antlr {
@@ -63,7 +64,7 @@ namespace runtime {
     const atn::ATN &_atn;
 
     std::vector<std::wstring> _ruleNames;
-    antlrcpp::BitSet *const pushRecursionContextStates;
+    antlrcpp::BitSet _pushRecursionContextStates;
 
     std::vector<dfa::DFA *> _decisionToDFA; // not shared like it is for generated parsers
     atn::PredictionContextCache *const sharedContextCache;
@@ -83,18 +84,16 @@ namespace runtime {
 
     virtual std::wstring getGrammarFileName() const override;
 
-    /// <summary>
-    /// Begin parsing at startRuleIndex </summary>
+    /// Begin parsing at startRuleIndex
     virtual ParserRuleContext *parse(int startRuleIndex);
 
     virtual void enterRecursionRule(ParserRuleContext *localctx, int state, int ruleIndex, int precedence) override;
 
   protected:
     virtual atn::ATNState *getATNState();
-
     virtual void visitState(atn::ATNState *p);
-
     virtual void visitRuleStopState(atn::ATNState *p);
+
   };
 
 } // namespace runtime

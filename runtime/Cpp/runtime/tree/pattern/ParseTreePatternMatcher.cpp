@@ -46,6 +46,8 @@
 #include "ANTLRInputStream.h"
 #include "Arrays.h"
 #include "MultiMap.h"
+#include "Exceptions.h"
+#include "Strings.h"
 
 #include "ParseTreePatternMatcher.h"
 
@@ -62,11 +64,11 @@ ParseTreePatternMatcher::ParseTreePatternMatcher(Lexer *lexer, Parser *parser) :
 
 void ParseTreePatternMatcher::setDelimiters(const std::wstring &start, const std::wstring &stop, const std::wstring &escapeLeft) {
   if (start == L"" || start.length() == 0) {
-    throw new IllegalArgumentException(L"start cannot be null or empty");
+    throw new IllegalArgumentException("start cannot be null or empty");
   }
 
   if (stop == L"" || stop.length() == 0) {
-    throw new IllegalArgumentException(L"stop cannot be null or empty");
+    throw new IllegalArgumentException("stop cannot be null or empty");
   }
 
   this->start = start;
@@ -126,11 +128,11 @@ Parser *ParseTreePatternMatcher::getParser() {
 
 tree::ParseTree *ParseTreePatternMatcher::matchImpl(ParseTree *tree, ParseTree *patternTree, misc::MultiMap<std::wstring, ParseTree*> *labels) {
   if (tree == nullptr) {
-    throw new IllegalArgumentException(L"tree cannot be null");
+    throw new IllegalArgumentException("tree cannot be null");
   }
 
   if (patternTree == nullptr) {
-    throw IllegalArgumentException(L"patternTree cannot be null");
+    throw IllegalArgumentException("patternTree cannot be null");
   }
 
   // x and <ID>, x and y, or x and x; or could be mismatched types
@@ -238,19 +240,19 @@ std::vector<Token*> ParseTreePatternMatcher::tokenize(const std::wstring &patter
       if (isupper(tagChunk->getTag()[0])) {
         int ttype = parser->getTokenType(tagChunk->getTag());
         if (ttype == Token::INVALID_TYPE) {
-          throw IllegalArgumentException(std::wstring(L"Unknown token ") + tagChunk->getTag() + std::wstring(L" in pattern: ") + pattern);
+          throw IllegalArgumentException(std::string("Unknown token ") + antlrcpp::ws2s(tagChunk->getTag()) + std::string(" in pattern: ") + antlrcpp::ws2s(pattern));
         }
         TokenTagToken *t = new TokenTagToken(tagChunk->getTag(), ttype, tagChunk->getLabel());
         tokens.push_back(t);
       } else if (islower(tagChunk->getTag()[0])) {
         int ruleIndex = parser->getRuleIndex(tagChunk->getTag());
         if (ruleIndex == -1) {
-          throw IllegalArgumentException(std::wstring(L"Unknown rule ") + tagChunk->getTag() + std::wstring(L" in pattern: ") + pattern);
+          throw IllegalArgumentException(std::string("Unknown rule ") + antlrcpp::ws2s(tagChunk->getTag()) + " in pattern: " + antlrcpp::ws2s(pattern));
         }
         int ruleImaginaryTokenType = parser->getATNWithBypassAlts().ruleToTokenType[(size_t)ruleIndex];
         tokens.push_back(new RuleTagToken(tagChunk->getTag(), ruleImaginaryTokenType, tagChunk->getLabel()));
       } else {
-        throw IllegalArgumentException(std::wstring(L"invalid tag: ") + tagChunk->getTag() + std::wstring(L" in pattern: ") + pattern);
+        throw IllegalArgumentException(std::string("invalid tag: ") + antlrcpp::ws2s(tagChunk->getTag()) + " in pattern: " + antlrcpp::ws2s(pattern));
       }
     } else {
       TextChunk *textChunk = static_cast<TextChunk*>(chunk);
@@ -292,21 +294,18 @@ std::vector<Chunk*> ParseTreePatternMatcher::split(const std::wstring &pattern) 
     }
   }
 
-  //		System.out.println("");
-  //		System.out.println(starts);
-  //		System.out.println(stops);
   if (starts.size() > stops.size()) {
-    throw IllegalArgumentException(std::wstring(L"unterminated tag in pattern: ") + pattern);
+    throw IllegalArgumentException(std::string("unterminated tag in pattern: ") + antlrcpp::ws2s(pattern));
   }
 
   if (starts.size() < stops.size()) {
-    throw IllegalArgumentException(std::wstring(L"missing start tag in pattern: ") + pattern);
+    throw IllegalArgumentException(std::string("missing start tag in pattern: ") + antlrcpp::ws2s(pattern));
   }
 
   size_t ntags = starts.size();
   for (size_t i = 0; i < ntags; i++) {
     if (starts[i] >= stops[i]) {
-      throw IllegalArgumentException(std::wstring(L"tag delimiters out of order in pattern: ") + pattern);
+      throw IllegalArgumentException(std::string("tag delimiters out of order in pattern: ") + antlrcpp::ws2s(pattern));
     }
   }
 

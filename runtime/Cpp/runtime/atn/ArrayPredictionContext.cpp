@@ -63,12 +63,12 @@ int ArrayPredictionContext::getReturnState(size_t index) const {
   return returnStates[index];
 }
 
-bool ArrayPredictionContext::operator == (PredictionContext *o) const {
-  if (this == o) {
+bool ArrayPredictionContext::operator == (const PredictionContext &o) const {
+  if (this == &o) {
     return true;
   }
 
-  ArrayPredictionContext *other = dynamic_cast<ArrayPredictionContext*>(o);
+  const ArrayPredictionContext *other = dynamic_cast<const ArrayPredictionContext*>(&o);
   if (other == nullptr || hashCode() != other->hashCode()) {
     return false; // can't be same if hash is different
   }

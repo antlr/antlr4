@@ -32,30 +32,28 @@
 #include "Interval.h"
 #include "CPPUtils.h"
 #include "CharStream.h"
+#include "Lexer.h"
 
 #include "LexerNoViableAltException.h"
 
 using namespace org::antlr::v4::runtime;
 
-LexerNoViableAltException::LexerNoViableAltException(Lexer *lexer, CharStream *input, size_t startIndex, atn::ATNConfigSet *deadEndConfigs) : RecognitionException()/*TODO RecognitionException(lexer, input, nullptr)*/, startIndex(startIndex), deadEndConfigs(deadEndConfigs) {
+LexerNoViableAltException::LexerNoViableAltException(Lexer *lexer, CharStream *input, size_t startIndex, atn::ATNConfigSet *deadEndConfigs)
+  : RecognitionException(lexer, input, nullptr, nullptr), _startIndex(startIndex), _deadEndConfigs(deadEndConfigs) {
 }
 
 size_t LexerNoViableAltException::getStartIndex() {
-  return startIndex;
+  return _startIndex;
 }
 
-atn::ATNConfigSet *LexerNoViableAltException::getDeadEndConfigs() {
-  return deadEndConfigs;
-}
-
-CharStream *LexerNoViableAltException::getInputStream() {
-  return (CharStream*)(RecognitionException::getInputStream());
+std::shared_ptr<atn::ATNConfigSet> LexerNoViableAltException::getDeadEndConfigs() {
+  return _deadEndConfigs;
 }
 
 std::wstring LexerNoViableAltException::toString() {
-  std::wstring symbol = L"";
-  if (startIndex < getInputStream()->size()) {
-    symbol = getInputStream()->getText(misc::Interval((int)startIndex, (int)startIndex));
+  std::wstring symbol;
+  if (_startIndex < getInputStream()->size()) {
+    symbol = ((CharStream *)getInputStream().get())->getText(misc::Interval((int)_startIndex, (int)_startIndex));
     symbol = antlrcpp::escapeWhitespace(symbol, false);
   }
   std::wstring format = L"LexerNoViableAltException('" + symbol + L"')";

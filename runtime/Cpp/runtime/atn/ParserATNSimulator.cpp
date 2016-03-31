@@ -52,6 +52,7 @@
 #include "ATNConfig.h"
 #include "stringconverter.h"
 #include "Interval.h"
+#include "ANTLRErrorListener.h"
 
 #include "Arrays.h"
 
@@ -453,11 +454,8 @@ atn::ATNConfigSet *ParserATNSimulator::computeReachSet(ATNConfigSet *closure, si
     }
 
     if (dynamic_cast<RuleStopState*>(c->state) != nullptr) {
-      if (c->context->isEmpty()) {
-        // Converted assert, shouldn't happen
-        throw new ASSERTException(L"ParserATNSimulator::computeReachSet",
-                                  L"c->context->isEmpty()");
-      }
+      assert(c->context->isEmpty());
+
       if (fullCtx || t == IntStream::_EOF) {
         if (skippedStopStates.empty()) {
           skippedStopStates = std::vector<ATNConfig*>();
@@ -548,11 +546,8 @@ atn::ATNConfigSet *ParserATNSimulator::computeReachSet(ATNConfigSet *closure, si
    * multiple alternatives are viable.
    */
   if (skippedStopStates.size() > 0 && (!fullCtx || !PredictionModeClass::hasConfigInRuleStopState(reach))) {
-    if (!skippedStopStates.empty()) {
-      // Shouldn't happen, converted assert
-      throw new ASSERTException(L"ParserATNSimulator::computeReachSet",
-                                L"skippedStopStates.size() > 0 && (!fullCtx || !PredictionModeClass::hasConfigInRuleStopState(reach)))");
-    }
+    assert(!skippedStopStates.empty());
+
     for (auto c : skippedStopStates) {
       reach->add(c, mergeCache);
     }
@@ -667,11 +662,7 @@ std::vector<dfa::DFAState::PredPrediction *> ParserATNSimulator::getPredicatePre
     SemanticContext *pred = altToPred[i];
 
     // unpredicted is indicated by SemanticContext.NONE
-    if(pred != nullptr) {
-      // Converted assert, shouldn't happen
-      throw new ASSERTException(L"arserATNSimulator::getPredicatePredictions",
-                                L"pred != nullptr");
-    }
+    assert(pred != nullptr);
 
     if (ambigAlts != nullptr && ambigAlts->data.test(i)) {
       pairs.push_back(new dfa::DFAState::PredPrediction(pred, (int)i));
@@ -734,11 +725,8 @@ BitSet *ParserATNSimulator::evalSemanticContext(std::vector<dfa::DFAState::PredP
 void ParserATNSimulator::closure(ATNConfig *config, ATNConfigSet *configs, std::set<ATNConfig*> *closureBusy, bool collectPredicates, bool fullCtx) {
   const int initialDepth = 0;
   closureCheckingStopState(config, configs, closureBusy, collectPredicates, fullCtx, initialDepth);
-  if (!fullCtx || !configs->dipsIntoOuterContext) {
-    // Converted assert, shouldn't happen
-    throw new ASSERTException(L"ParserATNSimulator::closure",
-                              L"!fullCtx || !configs->dipsIntoOuterContext");
-  }
+
+  assert(!fullCtx || !configs->dipsIntoOuterContext);
 }
 
 void ParserATNSimulator::closureCheckingStopState(ATNConfig *config, ATNConfigSet *configs, std::set<ATNConfig*> *closureBusy, bool collectPredicates, bool fullCtx, int depth) {
@@ -771,11 +759,8 @@ void ParserATNSimulator::closureCheckingStopState(ATNConfig *config, ATNConfigSe
         // gotten that context AFTER having falling off a rule.
         // Make sure we track that we are now out of context.
         c->reachesIntoOuterContext = config->reachesIntoOuterContext;
-        if (depth > INT_MIN) {
-          // Converted assert, shouldn't happen
-          throw new ASSERTException(L"ParserATNSimulator::closureCheckingStopState",
-                                    L"depth > INT_MIN");
-        }
+        assert(depth > INT_MIN);
+
         closureCheckingStopState(c, configs, closureBusy, collectPredicates, fullCtx, depth - 1);
       }
       return;
@@ -809,11 +794,8 @@ void ParserATNSimulator::closure_(ATNConfig *config, ATNConfigSet *configs, std:
     if (c != nullptr) {
       int newDepth = depth;
       if (dynamic_cast<RuleStopState*>(config->state) != nullptr) {
-        if(!fullCtx) {
-          // Converted assert, shouldn't happen
-          throw new ASSERTException(L"ParserATNSimulator::closure_",
-                                    L"!fullCtx");
-        }
+        assert(!fullCtx);
+
         // target fell off end of rule; mark resulting c as having dipped into outer context
         // We can't get here if incoming config was rule stop and we had context
         // track how far we dip into outer context.  Might
@@ -827,11 +809,8 @@ void ParserATNSimulator::closure_(ATNConfig *config, ATNConfigSet *configs, std:
 
         c->reachesIntoOuterContext++;
         configs->dipsIntoOuterContext = true; // TODO: can remove? only care when we add to set per middle of this method
-        if(newDepth > INT_MIN) {
-          // Converted assert, shouldn't happen
-          throw new ASSERTException(L"ParserATNSimulator::closure_",
-                                    L"newDepth > INT_MIN");
-        }
+        assert(newDepth > INT_MIN);
+        
         newDepth--;
         if (debug) {
           std::wcout << L"dips into outer ctx: " << c << std::endl;

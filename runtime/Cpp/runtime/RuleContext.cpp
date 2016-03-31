@@ -206,6 +206,18 @@ std::wstring RuleContext::toString() {
   return L"TODO";
 };
 
+std::wstring RuleContext::toString(Recognizer *recog) {
+  return toString(recog, ParserRuleContext::EMPTY);
+}
+
+std::wstring RuleContext::toString(Recognizer *recog, RuleContext *stop) {
+  return toString(recog->getRuleNames(), stop);
+}
+
+std::wstring RuleContext::toString(Token *, atn::ParserATNSimulator *) {
+  return L"TODO";
+}
+
 void RuleContext::InitializeInstanceFields() {
   invokingState = -1;
 }

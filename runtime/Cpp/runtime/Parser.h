@@ -42,15 +42,11 @@ namespace antlr {
 namespace v4 {
 namespace runtime {
 
-  /// <summary>
-  /// This is all the parsing support code essentially; most of it is error recovery stuff. </summary>
-  class Parser : public Recognizer<atn::ParserATNSimulator> {
+  /// This is all the parsing support code essentially; most of it is error recovery stuff.
+  class Parser : public Recognizer {
   public:
 
     class TraceListener : public tree::ParseTreeListener {
-    private:
-      Parser *const outerInstance;
-
     public:
       TraceListener(Parser *outerInstance);
       virtual ~TraceListener() {};
@@ -59,6 +55,9 @@ namespace runtime {
       virtual void visitTerminal(tree::TerminalNode *node) override;
       virtual void visitErrorNode(tree::ErrorNode *node) override;
       virtual void exitEveryRule(ParserRuleContext *ctx) override;
+
+    private:
+      Parser *const outerInstance;
     };
 
     class TrimToSizeListener : public tree::ParseTreeListener {

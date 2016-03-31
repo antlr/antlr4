@@ -54,6 +54,8 @@
 #include "stringconverter.h"
 
 #include "TokensStartState.h"
+#include "Exceptions.h"
+#include "CPPUtils.h"
 
 #include "ATNSerializer.h"
 
@@ -92,12 +94,12 @@ std::vector<size_t>* ATNSerializer::serialize() {
 
     int stateType = s->getStateType();
     if (dynamic_cast<DecisionState *>(s) != nullptr &&
-								(static_cast<DecisionState *>(s))->nonGreedy) {
+        (static_cast<DecisionState *>(s))->nonGreedy) {
       nonGreedyStates.push_back(s->stateNumber);
     }
 
     if (dynamic_cast<RuleStartState *>(s) != nullptr &&
-								(static_cast<RuleStartState *>(s))->isPrecedenceRule) {
+        (static_cast<RuleStartState *>(s))->isPrecedenceRule) {
       precedenceStates.push_back(s->stateNumber);
     }
 
@@ -129,8 +131,8 @@ std::vector<size_t>* ATNSerializer::serialize() {
       if (edgeType == Transition::SET || edgeType == Transition::NOT_SET) {
         SetTransition *st = static_cast<SetTransition *>(t);
         if (setIndices.find(st->set) != setIndices.end()) {
-										sets.push_back(st->set);
-										setIndices.insert({ st->set, sets.size() - 1 });
+          sets.push_back(st->set);
+          setIndices.insert({ st->set, sets.size() - 1 });
         }
       }
     }
@@ -221,7 +223,7 @@ std::vector<size_t>* ATNSerializer::serialize() {
       Transition *t = s->transition(i);
 
       if (atn->states[(size_t)t->target->stateNumber] == nullptr) {
-        throw IllegalStateException(L"Cannot serialize a transition to a removed state.");
+        throw IllegalStateException("Cannot serialize a transition to a removed state.");
       }
 
       int src = s->stateNumber;
@@ -231,28 +233,28 @@ std::vector<size_t>* ATNSerializer::serialize() {
       int arg2 = 0;
       int arg3 = 0;
       switch (edgeType) {
-								case Transition::RULE:
+        case Transition::RULE:
           trg = (static_cast<RuleTransition *>(t))->followState->stateNumber;
           arg1 = (static_cast<RuleTransition *>(t))->target->stateNumber;
           arg2 = (static_cast<RuleTransition *>(t))->ruleIndex;
           arg3 = (static_cast<RuleTransition *>(t))->precedence;
           break;
-								case Transition::PRECEDENCE:
-								{
-                  PrecedencePredicateTransition *ppt =
-                  static_cast<PrecedencePredicateTransition *>(t);
-                  arg1 = ppt->precedence;
-                }
+        case Transition::PRECEDENCE:
+        {
+          PrecedencePredicateTransition *ppt =
+          static_cast<PrecedencePredicateTransition *>(t);
+          arg1 = ppt->precedence;
+        }
           break;
-								case Transition::PREDICATE:
-								{
-                  PredicateTransition *pt = static_cast<PredicateTransition *>(t);
-                  arg1 = pt->ruleIndex;
-                  arg2 = pt->predIndex;
-                  arg3 = pt->isCtxDependent ? 1 : 0;
-                }
+        case Transition::PREDICATE:
+        {
+          PredicateTransition *pt = static_cast<PredicateTransition *>(t);
+          arg1 = pt->ruleIndex;
+          arg2 = pt->predIndex;
+          arg3 = pt->isCtxDependent ? 1 : 0;
+        }
           break;
-								case Transition::RANGE:
+        case Transition::RANGE:
           arg1 = (static_cast<RangeTransition *>(t))->from;
           arg2 = (static_cast<RangeTransition *>(t))->to;
           if (arg1 == Token::_EOF) {
@@ -261,7 +263,7 @@ std::vector<size_t>* ATNSerializer::serialize() {
           }
 
           break;
-								case Transition::ATOM:
+        case Transition::ATOM:
           arg1 = (static_cast<AtomTransition *>(t))->_label;
           if (arg1 == Token::_EOF) {
             arg1 = 0;
@@ -269,26 +271,26 @@ std::vector<size_t>* ATNSerializer::serialize() {
           }
 
           break;
-								case Transition::ACTION:
-								{
-                  ActionTransition *at = static_cast<ActionTransition *>(t);
-                  arg1 = at->ruleIndex;
-                  arg2 = at->actionIndex;
-                  if (arg2 == -1) {
-                    arg2 = 0xFFFF;
-                  }
+        case Transition::ACTION:
+        {
+          ActionTransition *at = static_cast<ActionTransition *>(t);
+          arg1 = at->ruleIndex;
+          arg2 = at->actionIndex;
+          if (arg2 == -1) {
+            arg2 = 0xFFFF;
+          }
 
-                  arg3 = at->isCtxDependent ? 1 : 0;
-                }
+          arg3 = at->isCtxDependent ? 1 : 0;
+        }
           break;
-								case Transition::SET:
+        case Transition::SET:
           arg1 = setIndices[(static_cast<SetTransition *>(t))->set];
           break;
 
         case Transition::NOT_SET:
           arg1 = setIndices[(static_cast<SetTransition *>(t))->set];
           break;
-								case Transition::WILDCARD:
+        case Transition::WILDCARD:
           break;
       }
 
@@ -309,7 +311,7 @@ std::vector<size_t>* ATNSerializer::serialize() {
   // don't adjust the first value since that's the version number
   for (size_t i = 1; i < data->size(); i++) {
     if ((wchar_t)data->at(i) < WCHAR_MIN || data->at(i) > WCHAR_MAX) {
-      throw UnsupportedOperationException(L"Serialized ATN data element out of range.");
+      throw UnsupportedOperationException("Serialized ATN data element out of range.");
     }
 
     size_t value = (data->at(i) + 2) & 0xFFFF;
@@ -334,25 +336,17 @@ std::wstring ATNSerializer::decode(const std::wstring& inpdata) {
   int p = 0;
   size_t version = (size_t)data[p++];
   if (version != ATNDeserializer::SERIALIZED_VERSION) {
-    std::wstring reason =
-    L"Could not deserialize ATN with version "
-    + std::to_wstring(version)
-    + L"(expected "
-    + std::to_wstring(ATNDeserializer::SERIALIZED_VERSION)
-    + L").";
-    throw UnsupportedOperationException(L"ATN Serializer" + reason);
+    std::string reason = "Could not deserialize ATN with version " + std::to_string(version) + "(expected " +
+    std::to_string(ATNDeserializer::SERIALIZED_VERSION) + ").";
+    throw UnsupportedOperationException("ATN Serializer" + reason);
   }
 
   Guid uuid = ATNDeserializer::toUUID(data, p);
   p += 8;
   if (uuid != ATNDeserializer::SERIALIZED_UUID) {
-    std::wstring reason =
-    L"Could not deserialize ATN with UUID "
-    + s2ws(uuid.toString())
-    + L" (expected "
-    + s2ws(ATNDeserializer::SERIALIZED_UUID.toString())
-    + L").";
-    throw UnsupportedOperationException(L"ATN Serializer" + reason);
+    std::string reason = "Could not deserialize ATN with UUID " + uuid.toString() + " (expected " +
+    ATNDeserializer::SERIALIZED_UUID.toString() + ").";
+    throw UnsupportedOperationException("ATN Serializer" + reason);
   }
 
   p++;  // skip grammarType
@@ -498,30 +492,30 @@ std::wstring ATNSerializer::getTokenName(ssize_t t) {
       t <= WCHAR_MAX) {
     switch (t) {
       case L'\n':
-								return L"'\\n'";
+        return L"'\\n'";
       case L'\r':
-								return L"'\\r'";
+        return L"'\\r'";
       case L'\t':
-								return L"'\\t'";
+        return L"'\\t'";
       case L'\b':
-								return L"'\\b'";
+        return L"'\\b'";
       case L'\f':
-								return L"'\\f'";
+        return L"'\\f'";
       case L'\\':
-								return L"'\\\\'";
+        return L"'\\\\'";
       case L'\'':
-								return L"'\\''";
+        return L"'\\''";
       default:
-								std::wstring s_hex = antlrcpp::toHexString((int)t);
-								if (s_hex >= L"0" && s_hex <= L"7F" &&
-                    !iscntrl((int)t)) {
-                  return L"'" + std::to_wstring(t) + L"'";
-                }
-								// turn on the bit above max "\uFFFF" value so that we pad with zeros
-                // then only take last 4 digits
-								std::wstring hex = antlrcpp::toHexString((int)t | 0x10000).substr(1, 4);
-								std::wstring unicodeStr = std::wstring(L"'\\u") + hex + std::wstring(L"'");
-								return unicodeStr;
+        std::wstring s_hex = antlrcpp::toHexString((int)t);
+        if (s_hex >= L"0" && s_hex <= L"7F" &&
+            !iscntrl((int)t)) {
+          return L"'" + std::to_wstring(t) + L"'";
+        }
+        // turn on the bit above max "\uFFFF" value so that we pad with zeros
+        // then only take last 4 digits
+        std::wstring hex = antlrcpp::toHexString((int)t | 0x10000).substr(1, 4);
+        std::wstring unicodeStr = std::wstring(L"'\\u") + hex + std::wstring(L"'");
+        return unicodeStr;
     }
   }
 

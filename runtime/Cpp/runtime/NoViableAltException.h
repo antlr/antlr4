@@ -32,41 +32,36 @@
 #pragma once
 
 #include "RecognitionException.h"
+#include "Token.h"
+#include "ATNConfigSet.h"
 
 namespace org {
 namespace antlr {
 namespace v4 {
 namespace runtime {
 
-  /// <summary>
   /// Indicates that the parser could not decide which of two or more paths
-  ///  to take based upon the remaining input. It tracks the starting token
-  ///  of the offending input and also knows where the parser was
-  ///  in the various paths when the error. Reported by reportNoViableAlternative()
-  /// </summary>
+  /// to take based upon the remaining input. It tracks the starting token
+  /// of the offending input and also knows where the parser was
+  /// in the various paths when the error. Reported by reportNoViableAlternative()
   class NoViableAltException : public RecognitionException {
-    /// <summary>
-    /// Which configurations did we try at input.index() that couldn't match input.LT(1)? </summary>
   private:
-    atn::ATNConfigSet *const deadEndConfigs;
+    /// Which configurations did we try at input.index() that couldn't match input.LT(1)?
+    std::shared_ptr<atn::ATNConfigSet> deadEndConfigs;
 
-    /// <summary>
     /// The token object at the start index; the input stream might
-    /// 	not be buffering tokens so get a reference to it. (At the
-    ///  time the error occurred, of course the stream needs to keep a
-    ///  buffer all of the tokens but later we might not have access to those.)
-    /// </summary>
-    Token *const startToken;
+    /// not be buffering tokens so get a reference to it. (At the
+    /// time the error occurred, of course the stream needs to keep a
+    /// buffer all of the tokens but later we might not have access to those.)
+    std::shared_ptr<Token> startToken;
 
   public:
-    NoViableAltException(Parser *recognizer); // LL(1) error - this(recognizer, recognizer.getInputStream(), recognizer.getCurrentToken(), recognizer.getCurrentToken(), nullptr, recognizer._ctx);
-
+    NoViableAltException(Parser *recognizer); // LL(1) error
     NoViableAltException(Parser *recognizer, TokenStream *input, Token *startToken, Token *offendingToken,
                          atn::ATNConfigSet *deadEndConfigs, ParserRuleContext *ctx);
 
-    virtual Token *getStartToken();
-
-    virtual atn::ATNConfigSet *getDeadEndConfigs();
+    virtual std::shared_ptr<Token> getStartToken();
+    virtual std::shared_ptr<atn::ATNConfigSet> getDeadEndConfigs();
 
   };
 

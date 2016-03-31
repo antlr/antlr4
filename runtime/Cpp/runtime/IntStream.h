@@ -58,7 +58,7 @@ namespace runtime {
     /// reached.
     /// </summary>
   public:
-    //                    EOF Conflict with OS X, change to _EOF
+    // EOF Conflict with OS X, change to _EOF
     static const size_t _EOF = std::ios::eofbit;
 
     /// <summary>

@@ -37,20 +37,18 @@ namespace v4 {
 namespace runtime {
 namespace dfa {
 
-  /// <summary>
-  /// A DFA walker that knows how to dump them to serialized strings. </summary>
+  /// A DFA walker that knows how to dump them to serialized strings.
   class DFASerializer {
   public:
     DFA *const dfa;
-    const std::vector<std::wstring>& tokenNames_;
+    const std::vector<std::wstring>& tokenNames;
 
-    DFASerializer(DFA *dfa, const std::vector<std::wstring>& tokenNames);
+    DFASerializer(DFA *dfa, const std::vector<std::wstring>& tnames);
 
     virtual std::wstring toString();
 
   protected:
     virtual std::wstring getEdgeLabel(size_t i);
-
     virtual std::wstring getStateString(DFAState *s);
   };
 

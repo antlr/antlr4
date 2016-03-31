@@ -32,6 +32,7 @@
 #include "PredictionContext.h"
 #include "ATNConfig.h"
 #include "ATNSimulator.h"
+#include "Exceptions.h"
 
 #include "ATNConfigSet.h"
 
@@ -45,13 +46,13 @@ size_t SimpleATNConfigHasher::operator()(const ATNConfig &k) const {
   return hashCode;
 }
 
-bool SimpleATNConfigComparer::operator()(const ATNConfig &lhs, const ATNConfig &rhs) const {
+bool SimpleATNConfigComparer::operator () (const ATNConfig &lhs, const ATNConfig &rhs) const {
   if (&lhs == &rhs) { // Shortcut: same address = same object.
     return true;
   }
 
   return lhs.state->stateNumber == rhs.state->stateNumber && lhs.alt == rhs.alt &&
-    lhs.semanticContext->equals(rhs.semanticContext);
+    lhs.semanticContext == rhs.semanticContext;
 }
 
 //------------------ ATNConfigSet --------------------------------------------------------------------------------------
@@ -79,7 +80,7 @@ bool ATNConfigSet::add(ATNConfig *config) {
 
 bool ATNConfigSet::add(ATNConfig *config, misc::DoubleKeyMap<PredictionContext*, PredictionContext*, PredictionContext*> *mergeCache) {
   if (_readonly) {
-    throw new IllegalStateException(L"This set is readonly");
+    throw new IllegalStateException("This set is readonly");
   }
   if (config->semanticContext != SemanticContext::NONE) {
     hasSemanticContext = true;
@@ -141,7 +142,7 @@ ATNConfig* ATNConfigSet::get(size_t i) const {
 
 void ATNConfigSet::optimizeConfigs(ATNSimulator *interpreter) {
   if (_readonly) {
-    throw IllegalStateException(L"This set is readonly");
+    throw IllegalStateException("This set is readonly");
   }
   if (configLookup->isEmpty()) {
     return;
@@ -202,7 +203,7 @@ bool ATNConfigSet::isEmpty() {
 
 bool ATNConfigSet::contains(ATNConfig *o) {
   if (configLookup == nullptr) {
-    throw UnsupportedOperationException(L"This method is not implemented for readonly sets.");
+    throw UnsupportedOperationException("This method is not implemented for readonly sets.");
   }
 
   return configLookup->contains(o);
@@ -210,7 +211,7 @@ bool ATNConfigSet::contains(ATNConfig *o) {
 
 void ATNConfigSet::clear() {
   if (_readonly) {
-    throw new IllegalStateException(L"This set is readonly");
+    throw new IllegalStateException("This set is readonly");
   }
   configs.clear();
   _cachedHashCode = 0;

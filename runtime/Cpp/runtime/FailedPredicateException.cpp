@@ -39,46 +39,38 @@
 
 using namespace org::antlr::v4::runtime;
 
-FailedPredicateException::FailedPredicateException(Parser *recognizer) : RecognitionException() {
+FailedPredicateException::FailedPredicateException(Parser *recognizer) : FailedPredicateException(recognizer, "", "") {
 }
 
-FailedPredicateException::FailedPredicateException(Parser *recognizer, const std::wstring &predicate): RecognitionException() {
+FailedPredicateException::FailedPredicateException(Parser *recognizer, const std::string &predicate): FailedPredicateException(recognizer, predicate, "") {
 }
 
-FailedPredicateException::FailedPredicateException(Parser *recognizer, const std::wstring &predicate, const std::wstring &message)
-#ifdef TODO
-// Huston, a problem. "trans" isn't defined until below
-: RecognitionException(formatMessage(predicate, message), recognizer, recognizer->getInputStream(), recognizer->_ctx), ruleIndex((static_cast<atn::PredicateTransition*>(trans))->ruleIndex), predicateIndex((static_cast<atn::PredicateTransition*>(trans))->predIndex), predicate(predicate)
-#endif
+FailedPredicateException::FailedPredicateException(Parser *recognizer, const std::string &predicate, const std::string &message)
+  : RecognitionException(!message.empty() ? message : "failed predicate: " + predicate + "?", recognizer,
+                         recognizer->getInputStream(), recognizer->ctx, recognizer->getCurrentToken()) {
 
-{
-  atn::ATNState *s = recognizer->getInterpreter()->atn.states[(size_t)recognizer->getState()];
-
-  atn::AbstractPredicateTransition *trans = static_cast<atn::AbstractPredicateTransition*>(s->transition(0));
-  if (dynamic_cast<atn::PredicateTransition*>(trans) != nullptr) {
-  } else {
-    this->ruleIndex = 0;
-    this->predicateIndex = 0;
+  atn::ATNState *s = recognizer->getInterpreter<atn::ATNSimulator>()->atn.states[(size_t)recognizer->getState()];
+  atn::Transition *transition = s->transition(0);
+  if (dynamic_cast<atn::PredicateTransition*>(transition) != nullptr) {
+    _ruleIndex = ((atn::PredicateTransition *)transition)->ruleIndex;
+    _predicateIndex = ((atn::PredicateTransition *)transition)->predIndex;
+  }
+  else {
+    _ruleIndex = 0;
+    _predicateIndex = 0;
   }
 
-  this->setOffendingToken(recognizer->getCurrentToken());
+  _predicate = predicate;
 }
 
 int FailedPredicateException::getRuleIndex() {
-  return ruleIndex;
+  return _ruleIndex;
 }
 
 int FailedPredicateException::getPredIndex() {
-  return predicateIndex;
+  return _predicateIndex;
 }
 
-std::wstring FailedPredicateException::getPredicate() {
-  return predicate;
-}
-
-std::wstring FailedPredicateException::formatMessage(const std::wstring &predicate, const std::wstring &message) {
-  if (message != L"") {
-    return message;
-  }
-  return L"failed predicate: " + predicate + L"?";
+std::string FailedPredicateException::getPredicate() {
+  return _predicate;
 }

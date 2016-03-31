@@ -655,7 +655,7 @@ setState(<choice.stateNumber>);
 _errHandler->sync(this);
 <! TODO: untested !><if (choice.label)><labelref(choice.label)> = _input->LT(1);<endif>
 <! TODO: untested !><preamble; separator = "\n">
-switch (getInterpreter()->adaptivePredict(_input, <choice.decision>, ctx)) {
+switch (getInterpreter\<atn::ParserATNSimulator>()->adaptivePredict(_input, <choice.decision>, ctx)) {
 <alts: {alt | case <i>:
     <alt>
     break;
@@ -668,7 +668,7 @@ OptionalBlock(choice, alts, error) ::= <<
 setState(<choice.stateNumber>);
 _errHandler->sync(this);
 
-switch (getInterpreter()->adaptivePredict(_input, <choice.decision>, ctx)) {
+switch (getInterpreter\<atn::ParserATNSimulator>()->adaptivePredict(_input, <choice.decision>, ctx)) {
 <alts: {alt | case <i><if (!choice.ast.greedy)>+1<endif>:
     <alt>
     break;
@@ -680,7 +680,7 @@ StarBlockHeader(choice, alts, sync, iteration) ::= "<! Unused but must be presen
 StarBlock(choice, alts, sync, iteration) ::= <<
 setState(<choice.stateNumber>);
 _errHandler->sync(this);
-alt = getInterpreter()->adaptivePredict(_input, <choice.decision>, ctx);
+alt = getInterpreter\<atn::ParserATNSimulator>()->adaptivePredict(_input, <choice.decision>, ctx);
 while (alt != <choice.exitAlt> && alt != -1) {
     if ( alt == 1 <if(!choice.ast.greedy)>+ 1<endif>) {
         <iteration>
@@ -688,7 +688,7 @@ while (alt != <choice.exitAlt> && alt != -1) {
     }
     setState(<choice.loopBackStateNumber>);
     _errHandler->sync(this);
-    alt = getInterpreter()->adaptivePredict(_input, <choice.decision>, ctx);
+    alt = getInterpreter\<atn::ParserATNSimulator>()->adaptivePredict(_input, <choice.decision>, ctx);
 }
 >>
 
@@ -696,7 +696,7 @@ PlusBlockHeader(choice, alts, error) ::= "<! Required to exist, but unused. !>"
 PlusBlock(choice, alts, error) ::= <<
 setState(<choice.blockStartStateNumber>); <! alt block decision !>
 _errHandler->sync(this);
-alt = getInterpreter()->adaptivePredict(_input, <choice.decision>, ctx);
+alt = getInterpreter\<atn::ParserATNSimulator>()->adaptivePredict(_input, <choice.decision>, ctx);
 do {
     switch (alt) {
     <alts: {alt | case <i><if (!choice.ast.greedy)> + 1<endif>:
@@ -708,7 +708,7 @@ do {
     }
     setState(<choice.loopBackStateNumber>); <! loopback/exit decision !>
     _errHandler->sync(this);
-    alt = getInterpreter()->adaptivePredict(_input, <choice.decision>, ctx);
+    alt = getInterpreter\<atn::ParserATNSimulator>()->adaptivePredict(_input, <choice.decision>, ctx);
 } while (alt != <choice.exitAlt> && alt != -1);
 >>
 
@@ -797,7 +797,7 @@ SemPred(p, chunks, failChunks) ::= <<
 setState(<p.stateNumber>);
 
 <! TODO: failChunks + p.msg untested !>
-if (!(<chunks>)) throw new FailedPredicateException(this, L<p.predicate><if (failChunks)>, <failChunks><elseif (p.msg)>, L<p.msg><endif>);
+if (!(<chunks>)) throw new FailedPredicateException(this, <p.predicate><if (failChunks)>, <failChunks><elseif (p.msg)>, L<p.msg><endif>);
 >>
 
 ExceptionClauseHeader(e, catchArg, catchAction) ::= "<! Required but unused. !>"

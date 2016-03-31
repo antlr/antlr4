@@ -33,6 +33,7 @@
 #include "Interval.h"
 #include "Token.h"
 #include "TokenStream.h"
+#include "Strings.h"
 
 #include "TokenStreamRewriter.h"
 
@@ -186,8 +187,8 @@ void TokenStreamRewriter::replace(Token *from, Token *to, const std::wstring& te
 
 void TokenStreamRewriter::replace(const std::wstring &programName, size_t from, size_t to, const std::wstring& text) {
   if (from > to || to >= tokens->size()) {
-    throw IllegalArgumentException(L"replace: range invalid: " + std::to_wstring(from) + L".." + std::to_wstring(to) +
-                                   L"(size=" + std::to_wstring(tokens->size()) + L")");
+    throw IllegalArgumentException("replace: range invalid: " + std::to_string(from) + ".." + std::to_string(to) +
+                                   "(size = " + std::to_string(tokens->size()) + ")");
   }
   RewriteOperation *op = new ReplaceOp(this, from, to, text);
   std::vector<RewriteOperation*> rewrites = getProgram(programName);
@@ -368,7 +369,8 @@ std::unordered_map<int, TokenStreamRewriter::RewriteOperation*> *TokenStreamRewr
 								std::wcout << L"new rop " << rop << std::endl;
       }
       else if (!disjoint && !same) {
-								throw IllegalArgumentException(L"replace op boundaries of " + rop->toString() + L" overlap with previous " + prevRop->toString());
+        throw IllegalArgumentException("replace op boundaries of " + antlrcpp::ws2s(rop->toString()) +
+                                       " overlap with previous " + antlrcpp::ws2s(prevRop->toString()));
       }
     }
   }
@@ -407,11 +409,11 @@ std::unordered_map<int, TokenStreamRewriter::RewriteOperation*> *TokenStreamRewr
 								continue;
       }
       if (iop->index >= rop->index && iop->index <= rop->lastIndex) {
-								throw IllegalArgumentException(L"insert op " + iop->toString() + L" within boundaries of previous " + rop->toString());
+								throw IllegalArgumentException("insert op " + antlrcpp::ws2s(iop->toString()) + " within boundaries of previous " + antlrcpp::ws2s(rop->toString()));
       }
     }
   }
-  // System.out.println("rewrites after="+rewrites);
+
   std::unordered_map<int, TokenStreamRewriter::RewriteOperation*> *m = new std::unordered_map<int, TokenStreamRewriter::RewriteOperation*>();
   for (TokenStreamRewriter::RewriteOperation *op : rewrites) {
     if (op == nullptr) { // ignore deleted ops
@@ -419,11 +421,11 @@ std::unordered_map<int, TokenStreamRewriter::RewriteOperation*> *TokenStreamRewr
     }
     if (m->at((int)op->index) != nullptr) {
       // TODO: use a specific exception rather than a generic type here?
-      throw new  ANTLRException(L"should only be one op per index");
+      throw new RuntimeException("should only be one op per index");
     }
     m->emplace(op->index, op);
   }
-  //System.out.println("index to op: "+m);
+
   return m;
 }
 

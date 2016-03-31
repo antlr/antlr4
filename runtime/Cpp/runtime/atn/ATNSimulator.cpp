@@ -76,8 +76,8 @@ void ATNSimulator::checkCondition(bool condition) {
   (new ATNDeserializer())->checkCondition(condition);
 }
 
-void ATNSimulator::checkCondition(bool condition, const std::wstring &message) {
-  (new ATNDeserializer())->checkCondition(condition, message);
+void ATNSimulator::checkCondition(bool condition, const std::string &message) {
+  ATNDeserializer().checkCondition(condition, message);
 }
 
 Transition *ATNSimulator::edgeFactory(const ATN &atn, int type, int src, int trg, int arg1, int arg2, int arg3,

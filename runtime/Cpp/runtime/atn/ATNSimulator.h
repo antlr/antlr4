@@ -42,15 +42,41 @@ namespace atn {
 
   class ATNSimulator {
   public:
+    virtual ~ATNSimulator() {};
 
-    //Mutex to manage synchronized access for multithreading
-    std::mutex mtx;
     ATNSimulator();
 
-    /// <summary>
-    /// Must distinguish between missing edge and edge we know leads nowhere </summary>
+    /// Must distinguish between missing edge and edge we know leads nowhere.
     static dfa::DFAState ERROR;
     ATN atn;
+
+    ATNSimulator(const ATN &atn, PredictionContextCache *sharedContextCache);
+
+    virtual void reset() = 0;
+
+    virtual PredictionContextCache *getSharedContextCache();
+
+    virtual PredictionContext *getCachedContext(PredictionContext *context);
+
+    /// @deprecated Use <seealso cref="ATNDeserializer#deserialize"/> instead.
+    static ATN deserialize(const std::wstring &data);
+
+    /// @deprecated Use <seealso cref="ATNDeserializer#checkCondition(boolean)"/> instead.
+    static void checkCondition(bool condition);
+
+    /// @deprecated Use <seealso cref="ATNDeserializer#checkCondition(boolean, String)"/> instead.
+    static void checkCondition(bool condition, const std::string &message);
+
+    /// @deprecated Use <seealso cref="ATNDeserializer#edgeFactory"/> instead.
+    static Transition *edgeFactory(const ATN &atn, int type, int src, int trg, int arg1, int arg2, int arg3,
+                                   const std::vector<misc::IntervalSet> &sets);
+
+    /// @deprecated Use <seealso cref="ATNDeserializer#stateFactory"/> instead.
+    static ATNState *stateFactory(int type, int ruleIndex);
+
+  protected:
+    // Mutex to manage synchronized access for multithreading
+    std::mutex mtx;
 
     /// <summary>
     /// The context cache maps all PredictionContext objects that are equals()
@@ -73,46 +99,8 @@ namespace atn {
     ///  more time I think and doesn't save on the overall footprint
     ///  so it's not worth the complexity.
     /// </summary>
-  protected:
     PredictionContextCache * sharedContextCache;
-
-
-  public:
-    ATNSimulator(const ATN &atn, PredictionContextCache *sharedContextCache);
-
-    virtual void reset() = 0;
-
-    virtual PredictionContextCache *getSharedContextCache();
-
-    virtual PredictionContext *getCachedContext(PredictionContext *context);
-
-    /// @deprecated Use <seealso cref="ATNDeserializer#deserialize"/> instead.
-    static ATN deserialize(const std::wstring &data);
-
-    /// @deprecated Use <seealso cref="ATNDeserializer#checkCondition(boolean)"/> instead.
-    static void checkCondition(bool condition);
-
-    /// @deprecated Use <seealso cref="ATNDeserializer#checkCondition(boolean, String)"/> instead.
-    static void checkCondition(bool condition, const std::wstring &message);
-
-    /// @deprecated Use <seealso cref="ATNDeserializer#edgeFactory"/> instead.
-    static Transition *edgeFactory(const ATN &atn, int type, int src, int trg, int arg1, int arg2, int arg3,
-                                   const std::vector<misc::IntervalSet> &sets);
-
-    /// @deprecated Use <seealso cref="ATNDeserializer#stateFactory"/> instead.
-    static ATNState *stateFactory(int type, int ruleIndex);
-
-    /*
-     public static void dump(DFA dfa, Grammar g) {
-     DOTGenerator dot = new DOTGenerator(g);
-     String output = dot.getDOT(dfa, false);
-     System.out.println(output);
-     }
-
-     public static void dump(DFA dfa) {
-     dump(dfa, null);
-     }
-     */
+    
   };
 
 } // namespace atn

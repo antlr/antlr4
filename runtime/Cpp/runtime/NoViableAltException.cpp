@@ -35,19 +35,20 @@
 
 using namespace org::antlr::v4::runtime;
 
-NoViableAltException::NoViableAltException(Parser *recognizer) :deadEndConfigs(nullptr), startToken(nullptr) {
+NoViableAltException::NoViableAltException(Parser *recognizer)
+  : NoViableAltException(recognizer, recognizer->getInputStream(), recognizer->getCurrentToken(), recognizer->getCurrentToken(),
+                         nullptr, recognizer->ctx) {
 }
 
 NoViableAltException::NoViableAltException(Parser *recognizer, TokenStream *input, Token *startToken,
   Token *offendingToken, atn::ATNConfigSet *deadEndConfigs, ParserRuleContext *ctx)
-  : RecognitionException(recognizer, input, ctx), deadEndConfigs(deadEndConfigs), startToken(startToken) {
-  this->setOffendingToken(offendingToken);
+  : RecognitionException(recognizer, input, ctx, offendingToken), deadEndConfigs(deadEndConfigs), startToken(startToken) {
 }
 
-Token *NoViableAltException::getStartToken() {
+std::shared_ptr<Token> NoViableAltException::getStartToken() {
   return startToken;
 }
 
-atn::ATNConfigSet *NoViableAltException::getDeadEndConfigs() {
+std::shared_ptr<atn::ATNConfigSet> NoViableAltException::getDeadEndConfigs() {
   return deadEndConfigs;
 }

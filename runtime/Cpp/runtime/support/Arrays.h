@@ -36,6 +36,7 @@ namespace antlrcpp {
   
   class Arrays {
   public:
+
     static std::wstring listToString(const std::vector<std::wstring> &list, const std::wstring &separator);
 
     template <typename T>
@@ -44,12 +45,24 @@ namespace antlrcpp {
         return false;
 
       for (size_t i = 0; i < a.size(); ++i)
-        if (a[i] != b[i]) // Requires that the == operator is supported by the template type.
+        if (a[i] != b[i]) // Requires that the != operator is supported by the template type.
           return false;
       
       return true;
     }
 
+    template <typename T>
+    static bool equals(const std::vector<T *> &a, const std::vector<T *> &b) {
+      if (a.size() != b.size())
+        return false;
+
+      for (size_t i = 0; i < a.size(); ++i)
+        if (*a[i] != *b[i]) // Requires that the != operator is supported by the template type.
+          return false;
+
+      return true;
+    }
+    
     template <typename T>
     static std::vector<T> copyOf(const std::vector<T> &source, size_t count) {
       std::vector<T> result;

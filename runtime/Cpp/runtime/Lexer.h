@@ -34,19 +34,18 @@
 #include "Recognizer.h"
 #include "TokenSource.h"
 #include "CharStream.h"
+#include "Token.h"
 
 namespace org {
 namespace antlr {
 namespace v4 {
 namespace runtime {
 
-  /// <summary>
   /// A lexer is recognizer that draws input symbols from a character stream.
   ///  lexer grammars result in a subclass of this object. A Lexer object
   ///  uses simplified match() and error recovery mechanisms in the interest
   ///  of speed.
-  /// </summary>
-  class Lexer : public Recognizer<atn::LexerATNSimulator>, public TokenSource {
+  class Lexer : public Recognizer, public TokenSource {
   public:
     static const int DEFAULT_MODE = 0;
     static const int MORE = -2;
@@ -110,10 +109,8 @@ namespace runtime {
     std::vector<int> _modeStack;
     int _mode;
 
-    /// <summary>
     /// You can set the text for the current token to override what is in
-    ///  the input char buffer.  Use setText() or can set this instance var.
-    /// </summary>
+    /// the input char buffer. Use setText() or can set this instance var.
     std::wstring _text;
 
     Lexer();
@@ -122,19 +119,14 @@ namespace runtime {
 
     virtual void reset();
 
-    /// <summary>
-    /// Return a token from this source; i.e., match a token on the char
-    ///  stream.
-    /// </summary>
+    /// Return a token from this source; i.e., match a token on the char stream.
     virtual Token *nextToken() override;
 
-    /// <summary>
     /// Instruct the lexer to skip creating a token for current lexer rule
-    ///  and look for another token.  nextToken() knows to keep looking when
-    ///  a lexer rule finishes with token set to SKIP_TOKEN.  Recall that
-    ///  if token==null at end of any token rule, it creates one for you
-    ///  and emits it.
-    /// </summary>
+    /// and look for another token.  nextToken() knows to keep looking when
+    /// a lexer rule finishes with token set to SKIP_TOKEN.  Recall that
+    /// if token == null at end of any token rule, it creates one for you
+    /// and emits it.
     virtual void skip();
 
     virtual void more();

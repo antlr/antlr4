@@ -34,6 +34,7 @@
 #include "TerminalNode.h"
 #include "ParserRuleContext.h"
 #include "Recognizer.h"
+#include "Token.h"
 
 namespace org {
 namespace antlr {

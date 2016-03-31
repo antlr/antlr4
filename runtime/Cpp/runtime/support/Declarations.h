@@ -80,7 +80,7 @@ namespace org {
         class ParserRuleContext;
         class ProxyErrorListener;
         class RecognitionException;
-        template<typename ATNInterpreter> class Recognizer;
+        class Recognizer;
         class RuleContext;
         class Token;
         template<typename Symbol> class TokenFactory;

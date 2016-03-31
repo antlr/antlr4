@@ -101,7 +101,7 @@ using namespace org::antlr::v4::runtime::misc;
     XCTFail();
   } catch (const IllegalStateException &e) {
     // Expected.
-    XCTAssertEqual(e.getMessage(), L"cannot consume EOF");
+    XCTAssertEqual(e.getMessage(), "cannot consume EOF");
   }
 
   XCTAssertEqual(stream.index(), text.size());
