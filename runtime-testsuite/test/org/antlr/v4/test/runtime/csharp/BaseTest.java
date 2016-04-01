@@ -440,10 +440,25 @@ public abstract class BaseTest {
 	}
 
 	private String locateMSBuild() {
+		String propName = "antlr-csharp-msbuild";
+		String prop = System.getProperty(propName);
+		if (prop != null && prop.length() != 0)
+			return prop;
 		if(isWindows())
 			return "\"C:\\Program Files (x86)\\MSBuild\\12.0\\Bin\\MSBuild.exe\"";
 		else
-			return locateTool("xbuild");
+			return "xbuild";
+	}
+
+	private String locateMono() {
+		String propName = "antlr-csharp-mono";
+		String prop = System.getProperty(propName);
+		if (prop != null && prop.length() != 0)
+			return prop;
+		if(isWindows())
+			return null;
+		else
+			return "mono";
 	}
 
 	private boolean isWindows() {
@@ -452,15 +467,6 @@ public abstract class BaseTest {
 
 	private String locateExec() {
 		return new File(tmpdir, "bin/Release/Test.exe").getAbsolutePath();
-	}
-
-	private String locateTool(String tool) {
-		String[] roots = { "/usr/bin/", "/usr/local/bin/" };
-		for(String root : roots) {
-			if(new File(root + tool).exists())
-				return root + tool;
-		}
-		throw new RuntimeException("Could not locate " + tool);
 	}
 
 	public boolean createProject() {
@@ -531,9 +537,11 @@ public abstract class BaseTest {
 	public String execTest() {
 		try {
 			String exec = locateExec();
-			String[] args = isWindows() ?
-					new String[] { exec, new File(tmpdir, "input").getAbsolutePath() } :
-					new String[] { "mono", exec, new File(tmpdir, "input").getAbsolutePath() };
+			String mono = locateMono();
+			String input = new File(tmpdir, "input").getAbsolutePath();
+			String[] args = mono == null ?
+					new String[] { exec,  input} :
+					new String[] { mono, exec, input };
 			ProcessBuilder pb = new ProcessBuilder(args);
 			pb.directory(new File(tmpdir));
 			Process process = pb.start();
