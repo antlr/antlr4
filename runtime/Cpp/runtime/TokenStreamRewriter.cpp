@@ -76,7 +76,7 @@ TokenStreamRewriter::InsertBeforeOp::InsertBeforeOp(TokenStreamRewriter *outerIn
 
 size_t TokenStreamRewriter::InsertBeforeOp::execute(std::wstring *buf) {
   buf->append(text);
-  if (outerInstance->tokens->get(index)->getType() != Token::_EOF) {
+  if (outerInstance->tokens->get(index)->getType() != EOF) {
     buf->append(outerInstance->tokens->get(index)->getText());
   }
   return index + 1;
@@ -290,7 +290,7 @@ std::wstring TokenStreamRewriter::getText(const std::wstring &programName, const
     Token *t = tokens->get(i);
     if (op == nullptr) {
       // no operation at that index, just dump token
-      if (t->getType() != Token::_EOF) {
+      if (t->getType() != EOF) {
 								buf.append(t->getText());
       }
       i++; // move to next token
@@ -421,7 +421,7 @@ std::unordered_map<int, TokenStreamRewriter::RewriteOperation*> *TokenStreamRewr
     }
     if (m->at((int)op->index) != nullptr) {
       // TODO: use a specific exception rather than a generic type here?
-      throw new RuntimeException("should only be one op per index");
+      throw RuntimeException("should only be one op per index");
     }
     m->emplace(op->index, op);
   }

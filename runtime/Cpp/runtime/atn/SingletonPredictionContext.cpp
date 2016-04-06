@@ -29,29 +29,32 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "EmptyPredictionContext.h"
 #include "stringconverter.h"
 
 #include "SingletonPredictionContext.h"
 
 using namespace org::antlr::v4::runtime::atn;
 
-SingletonPredictionContext::SingletonPredictionContext(PredictionContext *parent, int returnState) : PredictionContext(parent != nullptr ? calculateHashCode(parent, returnState) : calculateEmptyHashCode()), parent(parent), returnState(returnState) {
+SingletonPredictionContext::SingletonPredictionContext(std::weak_ptr<PredictionContext> parent, int returnState)
+  : PredictionContext(!parent.expired() ? calculateHashCode(parent, returnState) : calculateEmptyHashCode()),
+    parent(parent), returnState(returnState) {
   assert(returnState != ATNState::INVALID_STATE_NUMBER);
 }
 
-SingletonPredictionContext *SingletonPredictionContext::create(PredictionContext *parent, int returnState) {
-  if (returnState == EMPTY_RETURN_STATE && parent == nullptr) {
+SingletonPredictionContextRef SingletonPredictionContext::create(std::weak_ptr<PredictionContext> parent, int returnState) {
+  if (returnState == EMPTY_RETURN_STATE && parent.expired()) {
     // someone can pass in the bits of an array ctx that mean $
-    return (atn::SingletonPredictionContext *)EMPTY;
+    return EMPTY;
   }
-  return new SingletonPredictionContext(parent, returnState);
+  return std::make_shared<SingletonPredictionContext>(parent, returnState);
 }
 
 size_t SingletonPredictionContext::size() const {
   return 1;
 }
 
-PredictionContext *SingletonPredictionContext::getParent(size_t index) const {
+std::weak_ptr<PredictionContext> SingletonPredictionContext::getParent(size_t index) const {
   assert(index == 0);
   return parent;
 }
@@ -75,11 +78,11 @@ bool SingletonPredictionContext::operator == (const PredictionContext &o) const 
     return false; // can't be same if hash is different
   }
 
-  return returnState == other->returnState && (parent != nullptr && parent == other->parent);
+  return returnState == other->returnState && (!parent.expired() && parent.lock() == other->parent.lock());
 }
 
 std::wstring SingletonPredictionContext::toString() const {
-  std::wstring up = parent != nullptr ? parent->toString() : L"";
+  std::wstring up = !parent.expired() ? parent.lock()->toString() : L"";
   if (up.length() == 0) {
     if (returnState == EMPTY_RETURN_STATE) {
       return L"$";

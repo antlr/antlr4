@@ -85,16 +85,3 @@ std::shared_ptr<IRecognizer> RecognitionException::getRecognizer() {
 void RecognitionException::InitializeInstanceFields() {
   _offendingState = -1;
 }
-
-//------------------ ParseCancellationException ------------------------------------------------------------------------
-
-ParseCancellationException::ParseCancellationException() : ParseCancellationException("", nullptr) {
-}
-
-ParseCancellationException::ParseCancellationException(RecognitionException *cause)
-  : ParseCancellationException("", cause) {
-}
-
-ParseCancellationException::ParseCancellationException(const std::string &msg, RecognitionException *cause)
-  : IllegalStateException(msg, cause) {
-}

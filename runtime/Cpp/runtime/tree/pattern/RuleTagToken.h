@@ -178,7 +178,7 @@ namespace pattern {
     /// The implementation for <seealso cref="RuleTagToken"/> returns a string of the form
     /// {@code ruleName:bypassTokenType}.
     /// </summary>
-    virtual std::wstring toString();
+    virtual std::wstring toString() override;
   };
 
 } // namespace pattern

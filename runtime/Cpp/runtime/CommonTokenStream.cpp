@@ -96,7 +96,7 @@ int CommonTokenStream::getNumberOfOnChannelTokens() {
     if (t->getChannel() == channel) {
       n++;
     }
-    if (t->getType() == Token::_EOF) {
+    if (t->getType() == EOF) {
       break;
     }
   }

@@ -47,17 +47,18 @@ namespace atn {
     /// Parent can be empty only if full ctx mode and we make an array
     /// from EMPTY and non-empty. We merge EMPTY by using null parent and
     /// returnState == EMPTY_RETURN_STATE.
-    const std::vector<PredictionContext*> &parents;
+    const std::vector<std::weak_ptr<PredictionContext>> parents;
 
     /// Sorted for merge, no duplicates; if present, EMPTY_RETURN_STATE is always last.
-    const std::vector<int> &returnStates;
+    const std::vector<int> returnStates;
 
-    ArrayPredictionContext(SingletonPredictionContext *a); //this(new PredictionContext[] {a.parent}, new int[] {a.returnState});
-    ArrayPredictionContext(const std::vector<PredictionContext *> &parents, const std::vector<int> &returnStates);
+    ArrayPredictionContext(SingletonPredictionContextRef a);
+    ArrayPredictionContext(const std::vector<std::weak_ptr<PredictionContext>> &parents,
+                           const std::vector<int> &returnStates);
 
     virtual bool isEmpty() const override;
     virtual size_t size() const override;
-    virtual PredictionContext *getParent(size_t index) const override;
+    virtual std::weak_ptr<PredictionContext> getParent(size_t index) const override;
     virtual int getReturnState(size_t index) const override;
     bool operator == (const PredictionContext &o) const override;
 

@@ -77,15 +77,12 @@ RuleContext *RuleContext::getParent() {
 }
 
 void *RuleContext::getPayload()
-/// <summary>
 /// Return the combined text of all child nodes. This method only considers
-///  tokens which have been added to the parse tree.
-///  <para>
-///  Since tokens on hidden channels (e.g. whitespace or comments) are not
-///  added to the parse trees, they will not appear in the output of this
-///  method.
-/// </para>
-/// </summary>
+/// tokens which have been added to the parse tree.
+/// <para>
+/// Since tokens on hidden channels (e.g. whitespace or comments) are not
+/// added to the parse trees, they will not appear in the output of this
+/// method.
 {
   return this;
 }
@@ -95,12 +92,12 @@ std::wstring RuleContext::getText() {
     return L"";
   }
 
-  antlrcpp::StringBuilder *builder = new antlrcpp::StringBuilder();
+  antlrcpp::StringBuilder builder;
   for (size_t i = 0; i < getChildCount(); i++) {
-    builder->append(getChild(i)->getText());
+    builder.append(getChild(i)->getText());
   }
 
-  return builder->toString();
+  return builder.toString();
 }
 
 ssize_t RuleContext::getRuleIndex() const {
@@ -115,17 +112,6 @@ std::size_t RuleContext::getChildCount() {
   return 0;
 }
 
-#ifdef TODO
-Future<JDialog*> *RuleContext::inspect(Parser *parser) {
-  return inspect(parser->getRuleNames());
-}
-
-
-Future<JDialog*> *RuleContext::inspect(const std::vector<std::wstring> &ruleNames) {
-  TreeViewer *viewer = new TreeViewer(ruleNames, this);
-  return viewer->open();
-}
-#endif
 void RuleContext::save(Parser *parser, const std::wstring &fileName) {
   std::vector<std::wstring> ruleNames;
   if (parser != nullptr) {

@@ -59,14 +59,14 @@ namespace atn {
     /// All configs but hashed by (s, i, _, pi) not including context. Wiped out
     /// when we go readonly as this set becomes a DFA state.
     /// </summary>
-    ConfigLookup *configLookup;
+    std::shared_ptr<ConfigLookup> configLookup;
 
     /// <summary>
     /// Track the elements as they are added to the set; supports get(i) </summary>
     std::vector<ATNConfig *> configs;
 
-    // TODO: these fields make me pretty uncomfortable but nice to pack up info together, saves recomputation
-    // TODO: can we track conflicts as they are added to save scanning configs later?
+    // TO_DO: these fields make me pretty uncomfortable but nice to pack up info together, saves recomputation
+    // TO_DO: can we track conflicts as they are added to save scanning configs later?
     int uniqueAlt;
 
     antlrcpp::BitSet *conflictingAlts;
@@ -83,7 +83,7 @@ namespace atn {
     /// </summary>
     const bool fullCtx;
 
-    ATNConfigSet(bool fullCtx = true, ConfigLookup *lookup = nullptr);
+    ATNConfigSet(bool fullCtx, std::shared_ptr<ConfigLookup> lookup);
     ATNConfigSet(ATNConfigSet *old);
 
     virtual ~ATNConfigSet();
@@ -100,7 +100,7 @@ namespace atn {
     /// This method updates <seealso cref="#dipsIntoOuterContext"/> and
     /// <seealso cref="#hasSemanticContext"/> when necessary.
     /// </summary>
-    virtual bool add(ATNConfig *config, misc::DoubleKeyMap<PredictionContext*, PredictionContext*, PredictionContext*> *mergeCache);
+    virtual bool add(ATNConfig *config, PredictionContextMergeCache *mergeCache);
 
     /// <summary>
     /// Return a List holding list of configs </summary>
@@ -108,7 +108,7 @@ namespace atn {
 
     virtual std::vector<ATNState*> *getStates();
 
-    virtual std::vector<SemanticContext*> getPredicates();
+    virtual std::vector<SemanticContextRef> getPredicates();
 
     virtual ATNConfig *get(size_t i) const;
 

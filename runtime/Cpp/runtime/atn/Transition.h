@@ -53,8 +53,8 @@ namespace atn {
   ///  ATN transitions.
   /// </summary>
   class Transition {
-    // constants for serialization
   public:
+    // constants for serialization
     static const int EPSILON = 1;
     static const int RANGE = 2;
     static const int RULE = 3;
@@ -82,9 +82,7 @@ namespace atn {
     /// <summary>
     /// Are we epsilon, action, sempred? </summary>
     virtual bool isEpsilon() const;
-
     virtual misc::IntervalSet label() const;
-
     virtual bool matches(int symbol, int minVocabSymbol, int maxVocabSymbol) const = 0;
   };
 

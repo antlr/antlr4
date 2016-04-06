@@ -35,9 +35,11 @@
 #include "Token.h"
 #include "Exceptions.h"
 #include "Lexer.h"
+#include "CPPUtils.h"
 
 using namespace org::antlr::v4::runtime;
 using namespace org::antlr::v4::runtime::misc;
+using namespace antlrcpp;
 
 @interface MiscClassTests : XCTestCase
 
@@ -55,39 +57,91 @@ using namespace org::antlr::v4::runtime::misc;
   [super tearDown];
 }
 
-- (void)testMurmurHash {
-  XCTAssertEqual(MurmurHash::initialize(), (size_t)0);
-  XCTAssertEqual(MurmurHash::initialize(31), (size_t)31);
+- (void)testCPPUtils {
 
-  XCTAssertEqual(MurmurHash::hashCode<size_t>({}, 0, 0), (size_t)0);
+  class A { public: virtual ~A() {}; };
+  class B : public A { public: virtual ~B() {}; };
+  class C : public A { public: virtual ~C() {}; };
+  class D : public C { public: virtual ~D() {}; };
+
+  {
+    A a; B b; C c; D d;
+    XCTAssert(is<A>(b));
+    XCTAssertFalse(is<B>(a));
+    XCTAssert(is<A>(c));
+    XCTAssertFalse(is<B>(c));
+    XCTAssert(is<A>(d));
+    XCTAssert(is<C>(d));
+    XCTAssertFalse(is<B>(d));
+  }
+  {
+    A *a = new A(); B *b = new B(); C *c = new C(); D *d = new D();
+    XCTAssert(is<A*>(b));
+    XCTAssertFalse(is<B*>(a));
+    XCTAssert(is<A*>(c));
+    XCTAssertFalse(is<B*>(c));
+    XCTAssert(is<A*>(d));
+    XCTAssert(is<C*>(d));
+    XCTAssertFalse(is<B*>(d));
+    delete a; delete b; delete c; delete d;
+  }
+  {
+    std::shared_ptr<A> a(new A());
+    std::shared_ptr<B> b(new B());
+    std::shared_ptr<C> c(new C());
+    std::shared_ptr<D> d(new D());
+    XCTAssert(is<A>(b));
+    XCTAssertFalse(is<B>(a));
+    XCTAssert(is<A>(c));
+    XCTAssertFalse(is<B>(c));
+    XCTAssert(is<A>(d));
+    XCTAssert(is<C>(d));
+    XCTAssertFalse(is<B>(d));
+  }
+}
+
+- (void)testMurmurHash {
+  XCTAssertEqual(MurmurHash::initialize(), 0U);
+  XCTAssertEqual(MurmurHash::initialize(31), 31U);
+
+  XCTAssertEqual(MurmurHash::hashCode<size_t>({}, 0), 0U);
 
   // In absence of real test vectors (64bit) for murmurhash I instead check if I can find duplicate hash values
   // in a deterministic and a random sequence of 100K values each.
   std::set<size_t> hashs;
   for (size_t i = 0; i < 100000; ++i) {
-    size_t data[] = { i, (size_t)(i * M_PI),  arc4random()};
-    size_t hash = MurmurHash::hashCode(data, 3, 0);
+    std::vector<size_t> data = { i, (size_t)(i * M_PI),  arc4random()};
+    size_t hash = 0;
+    for (auto value : data)
+      hash = MurmurHash::update(hash, value);
+    hash = MurmurHash::finish(hash, data.size());
     hashs.insert(hash);
   }
-  XCTAssertEqual(hashs.size(), (size_t)100000, @"At least one duplicat hash found.");
+  XCTAssertEqual(hashs.size(), 100000U, @"At least one duplicat hash found.");
 
   hashs.clear();
   for (size_t i = 0; i < 100000; ++i) {
-    size_t data[] = { i, (size_t)(i * M_PI)};
-    size_t hash = MurmurHash::hashCode(data, 2, 0);
+    std::vector<size_t> data = { i, (size_t)(i * M_PI)};
+    size_t hash = 0;
+    for (auto value : data)
+      hash = MurmurHash::update(hash, value);
+    hash = MurmurHash::finish(hash, data.size());
     hashs.insert(hash);
   }
-  XCTAssertEqual(hashs.size(), (size_t)100000, @"At least one duplicat hash found.");
+  XCTAssertEqual(hashs.size(), 100000U, @"At least one duplicat hash found.");
 
   // Another test with fixed input but varying seeds.
   // Note: the higher the seed the less LSDs are in the result (for small input data).
   hashs.clear();
+  std::vector<size_t> data = { L'µ', 'a', '@', '1' };
   for (size_t i = 0; i < 100000; ++i) {
-    size_t data[] = { L'µ', 'a', '@', '1' };
-    size_t hash = MurmurHash::hashCode(data, 4, i);
+    size_t hash = i;
+    for (auto value : data)
+      hash = MurmurHash::update(hash, value);
+    hash = MurmurHash::finish(hash, data.size());
     hashs.insert(hash);
   }
-  XCTAssertEqual(hashs.size(), (size_t)100000, @"At least one duplicat hash found.");
+  XCTAssertEqual(hashs.size(), 100000U, @"At least one duplicat hash found.");
 }
 
 - (void)testInterval {
@@ -104,9 +158,9 @@ using namespace org::antlr::v4::runtime::misc;
   XCTAssert(Interval(0, 0) == Interval(0, 0));
   XCTAssertFalse(Interval(0, 1) == Interval(1, 2));
 
-  XCTAssertEqual(Interval().hashCode(), (size_t)22070);
-  XCTAssertEqual(Interval(0, 0).hashCode(), (size_t)22103);
-  XCTAssertEqual(Interval(10, 2000).hashCode(), (size_t)24413);
+  XCTAssertEqual(Interval().hashCode(), 22070U);
+  XCTAssertEqual(Interval(0, 0).hashCode(), 22103U);
+  XCTAssertEqual(Interval(10, 2000).hashCode(), 24413U);
 
   // Results for the interval test functions in this order:
   // startsBeforeDisjoint
@@ -292,7 +346,7 @@ using namespace org::antlr::v4::runtime::misc;
     set4.clear();
     XCTFail(@"Expected exception");
   }
-  catch ( IllegalStateException *e) {
+  catch (IllegalStateException &e) {
   }
 
   set4.setReadOnly(false);

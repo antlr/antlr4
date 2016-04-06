@@ -58,7 +58,7 @@ public:
 class <lexer.name>Mode {
 public:
   enum {
-    <rest(lexer.modes): {m | <m> = <i>,}; separator="\n", anchor>
+    <lexer.modes: {m | <m> = <i>,}; separator="\n", anchor>
   };
 };
 <endif>
@@ -85,7 +85,7 @@ public:
   
 private:
   static std::vector\<dfa::DFA*> _decisionToDFA;
-  static atn::PredictionContextCache _sharedContextCache;
+  static std::shared_ptr\<atn::PredictionContextCache> _sharedContextCache;
   static std::vector\<std::wstring> _ruleNames;
   static std::vector\<std::wstring> _tokenNames;
   static std::vector\<std::wstring> _modeNames;
@@ -113,7 +113,7 @@ private:
 
 Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass) ::= <<
 <lexer.name>::<lexer.name>(CharStream *input) : <if (superClass)><superClass><else>Lexer<endif>(input) {
-  _interpreter = new atn::LexerATNSimulator(this, _atn, _decisionToDFA, &_sharedContextCache);
+  _interpreter = new atn::LexerATNSimulator(this, _atn, _decisionToDFA, _sharedContextCache);
 }
 
 <lexer.name>::~<lexer.name>() {
@@ -176,7 +176,7 @@ bool <lexer.name>::sempred(RuleContext *context, int ruleIndex, int predicateInd
 
 // Static vars and initialization.
 std::vector\<dfa::DFA*> <lexer.name>::_decisionToDFA;
-atn::PredictionContextCache <lexer.name>::_sharedContextCache;
+std::shared_ptr\<atn::PredictionContextCache> <lexer.name>::_sharedContextCache = std::make_shared\<atn::PredictionContextCache>();
 
 // We own the ATN which in turn owns the ATN states.
 atn::ATN <lexer.name>::_atn;
@@ -196,7 +196,7 @@ std::vector\<std::wstring> <lexer.name>::_tokenNames = { <! TODO: replace by voc
   <atn>
 }
 
-TLexer::Initializer TLexer::_init;
+<lexer.name>::Initializer <lexer.name>::_init;
 >>
 
 RuleActionFunctionHeader(r, actions) ::= <<
@@ -276,7 +276,7 @@ public:
 
 private:
   static std::vector\<dfa::DFA*> _decisionToDFA;
-  static atn::PredictionContextCache _sharedContextCache;
+  static std::shared_ptr\<atn::PredictionContextCache> _sharedContextCache;
   static std::vector\<std::wstring> _ruleNames;
   static std::vector\<std::wstring> _tokenNames;
   <atn>
@@ -292,7 +292,7 @@ Parser(parser, funcs, atn, sempredFuncs, superClass = {Parser}) ::= <<
 using namespace org::antlr::v4::runtime;
 
 <parser.name>::<parser.name>(TokenStream *input) : <superClass>(input) {
-  _interpreter = new atn::ParserATNSimulator(this, _atn, _decisionToDFA, &_sharedContextCache);
+  _interpreter = new atn::ParserATNSimulator(this, _atn, _decisionToDFA, _sharedContextCache);
 }
 
 <parser.name>::~<parser.name>() {
@@ -325,7 +325,7 @@ bool <parser.name>::sempred(RuleContext *context, int ruleIndex, int predicateIn
 
 // Static vars and initialization.
 std::vector\<dfa::DFA*> <parser.name>::_decisionToDFA;
-atn::PredictionContextCache <parser.name>::_sharedContextCache;
+std::shared_ptr\<atn::PredictionContextCache> <parser.name>::_sharedContextCache = std::make_shared\<atn::PredictionContextCache>();
 
 // We own the ATN which in turn owns the ATN states.
 atn::ATN <parser.name>::_atn;
@@ -343,7 +343,7 @@ std::vector\<std::wstring> <parser.name>::_tokenNames = {
   <atn>
 }
 
-TParser::Initializer TParser::_init;
+<parser.name>Parser::Initializer <parser.name>Parser::_init;
 >>
 
 SerializedATNHeader(model) ::= <<
@@ -715,7 +715,7 @@ do {
 Sync(s) ::= "Sync(s) sync(<s.expecting.name>);"
 
 ThrowNoViableAltHeader(t) ::= "<! Unused but must be present. !>"
-ThrowNoViableAlt(t) ::= "throw new NoViableAltException(this);"
+ThrowNoViableAlt(t) ::= "throw NoViableAltException(this);"
 
 TestSetInlineHeader(s) ::= "<! Required but unused. !>"
 TestSetInline(s) ::= <<
@@ -724,7 +724,7 @@ TestSetInline(s) ::= <<
 
 // Java language spec 15.19 - shift operators mask operands rather than overflow to 0... need range test
 testShiftInRange(shiftAmount) ::= <<
-((<shiftAmount> & ~(size_t)0x3f) == 0)
+((<shiftAmount> & ~(ssize_t)0x3f) == 0)
 >>
 
 // produces smaller bytecode only when bits.ttypes contains more than two items
@@ -797,7 +797,7 @@ SemPred(p, chunks, failChunks) ::= <<
 setState(<p.stateNumber>);
 
 <! TODO: failChunks + p.msg untested !>
-if (!(<chunks>)) throw new FailedPredicateException(this, <p.predicate><if (failChunks)>, <failChunks><elseif (p.msg)>, L<p.msg><endif>);
+if (!(<chunks>)) throw FailedPredicateException(this, <p.predicate><if (failChunks)>, <failChunks><elseif (p.msg)>, L<p.msg><endif>);
 >>
 
 ExceptionClauseHeader(e, catchArg, catchAction) ::= "<! Required but unused. !>"
@@ -870,7 +870,7 @@ TokenDeclHeader(t) ::= "<TokenLabelType()> <t.name>;"
 TokenDecl(t) ::= "<! Variable Declaration !>"
 
 TokenTypeDeclHeader(t) ::= "<! Local Variable !>"
-TokenTypeDecl(t) ::= "size_t <t.name>;"
+TokenTypeDecl(t) ::= "ssize_t <t.name>;"
 
 TokenListDeclHeader(t) ::= "std::vector\<Token *> <t.name>;"
 TokenListDecl(t) ::= "<! Variable Declaration !>"

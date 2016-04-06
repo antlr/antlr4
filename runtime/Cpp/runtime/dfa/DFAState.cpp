@@ -37,11 +37,11 @@
 #include "DFAState.h"
 
 using namespace org::antlr::v4::runtime::dfa;
+using namespace org::antlr::v4::runtime::atn;
 
-DFAState::PredPrediction::PredPrediction(atn::SemanticContext *pred, int alt) {
+DFAState::PredPrediction::PredPrediction(SemanticContextRef pred, int alt) : pred(pred) {
   InitializeInstanceFields();
   this->alt = alt;
-  this->pred = pred;
 }
 
 std::wstring DFAState::PredPrediction::toString() {
@@ -55,7 +55,7 @@ void DFAState::PredPrediction::InitializeInstanceFields() {
 DFAState::DFAState() : DFAState(-1) {
 }
 
-DFAState::DFAState(int stateNumber) : DFAState(new atn::ATNConfigSet(), stateNumber) {
+DFAState::DFAState(int stateNumber) : DFAState(new atn::ATNConfigSet(true, std::shared_ptr<ConfigLookup>()), stateNumber) {
 }
 
 DFAState::DFAState(atn::ATNConfigSet *configs, int stateNumber) : configs(configs), stateNumber(stateNumber) {

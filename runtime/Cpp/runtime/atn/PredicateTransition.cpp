@@ -49,9 +49,8 @@ bool PredicateTransition::matches(int symbol, int minVocabSymbol, int maxVocabSy
   return false;
 }
 
-SemanticContext::Predicate *PredicateTransition::getPredicate() const {
-  // TODO: who is responsible for managing this memory?
-  return new SemanticContext::Predicate(ruleIndex, predIndex, isCtxDependent);
+std::shared_ptr<SemanticContext::Predicate> PredicateTransition::getPredicate() const {
+  return std::make_shared<SemanticContext::Predicate>(ruleIndex, predIndex, isCtxDependent);
 }
 
 std::wstring PredicateTransition::toString() const {

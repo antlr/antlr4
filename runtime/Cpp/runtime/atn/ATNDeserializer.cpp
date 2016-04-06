@@ -203,7 +203,7 @@ ATN ATNDeserializer::deserialize(const std::wstring& input) {
     if (atn.grammarType == ATNType::LEXER) {
       int tokenType = data[p++];
       if (tokenType == 0xFFFF) {
-        tokenType = Token::_EOF;
+        tokenType = EOF;
       }
 
       atn.ruleToTokenType[i] = tokenType;
@@ -292,12 +292,12 @@ ATN ATNDeserializer::deserialize(const std::wstring& input) {
     if (dynamic_cast<BlockStartState*>(state) != nullptr) {
       // we need to know the end state to set its start state
       if ((static_cast<BlockStartState*>(state))->endState == nullptr) {
-        throw new IllegalStateException();
+        throw IllegalStateException();
       }
 
       // block end states can only be associated to a single block start state
       if ((static_cast<BlockStartState*>(state))->endState->startState != nullptr) {
-        throw new IllegalStateException();
+        throw IllegalStateException();
 
       }
 
@@ -456,7 +456,7 @@ void ATNDeserializer::verifyATN(const ATN &atn) {
         checkCondition(dynamic_cast<StarBlockStartState*>(starLoopEntryState->transition(1)->target) != nullptr);
         checkCondition(starLoopEntryState->nonGreedy);
       } else {
-        throw new IllegalStateException();
+        throw IllegalStateException();
 
       }
     }
@@ -514,7 +514,7 @@ Transition *ATNDeserializer::edgeFactory(const ATN &atn, int type, int src, int 
       return new EpsilonTransition(target);
     case Transition::RANGE :
       if (arg3 != 0) {
-        return new RangeTransition(target, Token::_EOF, arg2);
+        return new RangeTransition(target, EOF, arg2);
       } else {
         return new RangeTransition(target, arg1, arg2);
       }
@@ -526,7 +526,7 @@ Transition *ATNDeserializer::edgeFactory(const ATN &atn, int type, int src, int 
       return new PrecedencePredicateTransition(target, arg1);
     case Transition::ATOM :
       if (arg3 != 0) {
-        return new AtomTransition(target, Token::_EOF);
+        return new AtomTransition(target, EOF);
       } else {
         return new AtomTransition(target, arg1);
       }

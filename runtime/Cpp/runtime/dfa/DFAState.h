@@ -66,9 +66,9 @@ namespace dfa {
   public:
     class PredPrediction {
     public:
-      atn::SemanticContext *pred; // never null; at least SemanticContext.NONE
+      std::shared_ptr<atn::SemanticContext> pred; // never null; at least SemanticContext.NONE
       int alt;
-      PredPrediction(atn::SemanticContext *pred, int alt);
+      PredPrediction(std::shared_ptr<atn::SemanticContext> pred, int alt);
       virtual std::wstring toString();
 
     private:

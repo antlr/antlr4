@@ -193,17 +193,15 @@ namespace pattern {
     /// was successful. The specific node returned depends on the matching
     /// algorithm used by the implementation, and may be overridden. </returns>
   protected:
-    // I don't know why this is failing to compile
-    virtual ParseTree *matchImpl(ParseTree *tree, ParseTree *patternTree, misc::MultiMap<std::wstring, ParseTree*> *labels);
-    /// <summary>
-    /// Is {@code t} {@code (expr <expr>)} subtree? </summary>
+    virtual ParseTree* matchImpl(ParseTree *tree, ParseTree *patternTree, std::map<std::wstring, std::vector<ParseTree*>> &labels);
+
+    /// Is t <expr> subtree?
     virtual RuleTagToken *getRuleTagToken(ParseTree *t);
 
   public:
     virtual std::vector<Token*> tokenize(const std::wstring &pattern);
 
-    /// <summary>
-    /// Split {@code <ID> = <e:expr> ;} into 4 chunks for tokenizing by <seealso cref="#tokenize"/>. </summary>
+    /// Split "<ID> = <e:expr>;" into 4 chunks for tokenizing by tokenize().
     virtual std::vector<Chunk*> split(const std::wstring &pattern);
 
   private:

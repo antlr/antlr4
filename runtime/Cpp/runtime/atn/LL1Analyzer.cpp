@@ -38,6 +38,7 @@
 #include "NotSetTransition.h"
 #include "IntervalSet.h"
 #include "ATNConfig.h"
+#include "EmptyPredictionContext.h"
 
 #include "LL1Analyzer.h"
 
@@ -56,9 +57,12 @@ std::vector<misc::IntervalSet> LL1Analyzer::getDecisionLookahead(ATNState *s) co
 
   look.resize(s->getNumberOfTransitions()); // Fills all interval sets with defaults.
   for (size_t alt = 0; alt < s->getNumberOfTransitions(); alt++) {
-    std::set<ATNConfig*> lookBusy;
     bool seeThruPreds = false; // fail to get lookahead upon pred
-    _LOOK(s->transition(alt)->target, nullptr, (PredictionContext*)PredictionContext::EMPTY, look[alt], lookBusy, new antlrcpp::BitSet(), seeThruPreds, false);
+
+    std::set<ATNConfig*> lookBusy;
+    antlrcpp::BitSet callRuleStack;
+    _LOOK(s->transition(alt)->target, nullptr, std::dynamic_pointer_cast<PredictionContext>(PredictionContext::EMPTY),
+          look[alt], lookBusy, callRuleStack, seeThruPreds, false);
     
     // Wipe out lookahead for this alternative if we found nothing
     // or we had a predicate when we !seeThruPreds
@@ -76,15 +80,17 @@ misc::IntervalSet LL1Analyzer::LOOK(ATNState *s, RuleContext *ctx) const {
 misc::IntervalSet LL1Analyzer::LOOK(ATNState *s, ATNState *stopState, RuleContext *ctx) const {
   misc::IntervalSet r;
   bool seeThruPreds = true; // ignore preds; get all lookahead
-  PredictionContext *lookContext = ctx != nullptr ? PredictionContext::fromRuleContext(*s->atn, ctx) : nullptr;
+  PredictionContextRef lookContext = ctx != nullptr ? PredictionContext::fromRuleContext(*s->atn, ctx) : nullptr;
+
   std::set<ATNConfig*> lookBusy;
-  _LOOK(s, stopState, lookContext, r, lookBusy, new antlrcpp::BitSet(), seeThruPreds, true);
+  antlrcpp::BitSet callRuleStack;
+  _LOOK(s, stopState, lookContext, r, lookBusy, callRuleStack, seeThruPreds, true);
 
   return r;
 }
 
-void LL1Analyzer::_LOOK(ATNState *s, ATNState *stopState, PredictionContext *ctx, misc::IntervalSet &look,
-                        std::set<ATNConfig*> &lookBusy,  antlrcpp::BitSet *calledRuleStack, bool seeThruPreds, bool addEOF) const {
+void LL1Analyzer::_LOOK(ATNState *s, ATNState *stopState, PredictionContextRef ctx, misc::IntervalSet &look,
+                        std::set<ATNConfig*> &lookBusy,  antlrcpp::BitSet &calledRuleStack, bool seeThruPreds, bool addEOF) const {
   ATNConfig *c = new ATNConfig(s, 0, ctx);
 
   if (!lookBusy.insert(c).second) {
@@ -96,7 +102,7 @@ void LL1Analyzer::_LOOK(ATNState *s, ATNState *stopState, PredictionContext *ctx
       look.add(Token::EPSILON);
       return;
     } else if (ctx->isEmpty() && addEOF) {
-      look.add(Token::_EOF);
+      look.add(EOF);
       return;
     }
   }
@@ -106,26 +112,25 @@ void LL1Analyzer::_LOOK(ATNState *s, ATNState *stopState, PredictionContext *ctx
       look.add(Token::EPSILON);
       return;
     } else if (ctx->isEmpty() && addEOF) {
-      look.add(Token::_EOF);
+      look.add(EOF);
       return;
     }
 
-    if (ctx != (PredictionContext*)PredictionContext::EMPTY) {
+    if (ctx != PredictionContext::EMPTY) {
       // run thru all possible stack tops in ctx
       for (size_t i = 0; i < ctx->size(); i++) {
         ATNState *returnState = _atn.states[(size_t)ctx->getReturnState(i)];
-        //					System.out.println("popping back to "+retState);
 
-        bool removed = calledRuleStack->data.test((size_t)returnState->ruleIndex);
+        bool removed = calledRuleStack.data.test((size_t)returnState->ruleIndex);
         try {
-          calledRuleStack->data[(size_t)returnState->ruleIndex] = false;
-          _LOOK(returnState, stopState, ctx->getParent(i), look, lookBusy, calledRuleStack, seeThruPreds, addEOF);
+          calledRuleStack.data[(size_t)returnState->ruleIndex] = false;
+          _LOOK(returnState, stopState, ctx->getParent(i).lock(), look, lookBusy, calledRuleStack, seeThruPreds, addEOF);
         }
         catch(...) {
           // Just move to the next steps as a "finally" clause
         }
         if (removed) {
-          calledRuleStack->set((size_t)returnState->ruleIndex);
+          calledRuleStack.set((size_t)returnState->ruleIndex);
 
         }
       }
@@ -138,20 +143,20 @@ void LL1Analyzer::_LOOK(ATNState *s, ATNState *stopState, PredictionContext *ctx
     Transition *t = s->transition(i);
 
     if (typeid(t) == typeid(RuleTransition)) {
-      if ( (*calledRuleStack).data[(size_t)(static_cast<RuleTransition*>(t))->target->ruleIndex]) {
+      if (calledRuleStack.data[(size_t)(static_cast<RuleTransition*>(t))->target->ruleIndex]) {
         continue;
       }
 
-      PredictionContext *newContext = SingletonPredictionContext::create(ctx, (static_cast<RuleTransition*>(t))->followState->stateNumber);
+      PredictionContextRef newContext = SingletonPredictionContext::create(ctx, (static_cast<RuleTransition*>(t))->followState->stateNumber);
 
       try {
-        calledRuleStack->set((size_t)(static_cast<RuleTransition*>(t))->target->ruleIndex);
+        calledRuleStack.set((size_t)(static_cast<RuleTransition*>(t))->target->ruleIndex);
         _LOOK(t->target, stopState, newContext, look, lookBusy, calledRuleStack, seeThruPreds, addEOF);
       }
       catch(...) {
         // Just move to the next steps as a "finally" clause
       }
-      calledRuleStack->data[(size_t)((static_cast<RuleTransition*>(t))->target->ruleIndex)] = false;
+      calledRuleStack.data[(size_t)((static_cast<RuleTransition*>(t))->target->ruleIndex)] = false;
 
     } else if (dynamic_cast<AbstractPredicateTransition*>(t) != nullptr) {
       if (seeThruPreds) {

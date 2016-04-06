@@ -34,6 +34,7 @@
 #include "Parser.h"
 #include "ATN.h"
 #include "BitSet.h"
+#include "PredictionContext.h"
 
 namespace org {
 namespace antlr {
@@ -55,33 +56,14 @@ namespace runtime {
   ///  See TestParserInterpreter for examples.
   /// </summary>
   class ParserInterpreter : public Parser {
-  protected:
-    //TODO check this
-    static const int DEFAULT_BITSET_SIZE = 1024; // atn->states.size() ideally
-
-    const std::wstring grammarFileName;
-    std::vector<std::wstring> _tokenNames;
-    const atn::ATN &_atn;
-
-    std::vector<std::wstring> _ruleNames;
-    antlrcpp::BitSet _pushRecursionContextStates;
-
-    std::vector<dfa::DFA *> _decisionToDFA; // not shared like it is for generated parsers
-    atn::PredictionContextCache *const sharedContextCache;
-
-    std::deque<std::pair<ParserRuleContext*, int>*> *const _parentContextStack;
-
   public:
     ParserInterpreter(const std::wstring &grammarFileName, const std::vector<std::wstring>& tokenNames,
       const std::vector<std::wstring>& ruleNames, const atn::ATN &atn, TokenStream *input);
     ~ParserInterpreter();
 
     virtual const atn::ATN& getATN() const override;
-
     virtual const std::vector<std::wstring>& getTokenNames() const override;
-
     virtual const std::vector<std::wstring>& getRuleNames() const override;
-
     virtual std::wstring getGrammarFileName() const override;
 
     /// Begin parsing at startRuleIndex
@@ -90,6 +72,18 @@ namespace runtime {
     virtual void enterRecursionRule(ParserRuleContext *localctx, int state, int ruleIndex, int precedence) override;
 
   protected:
+    const std::wstring _grammarFileName;
+    std::vector<std::wstring> _tokenNames;
+    const atn::ATN &_atn;
+
+    std::vector<std::wstring> _ruleNames;
+    antlrcpp::BitSet _pushRecursionContextStates;
+
+    std::vector<dfa::DFA *> _decisionToDFA; // not shared like it is for generated parsers
+    std::shared_ptr<atn::PredictionContextCache> _sharedContextCache;
+
+    std::stack<std::pair<ParserRuleContext*, int>> _parentContextStack;
+    
     virtual atn::ATNState *getATNState();
     virtual void visitState(atn::ATNState *p);
     virtual void visitRuleStopState(atn::ATNState *p);

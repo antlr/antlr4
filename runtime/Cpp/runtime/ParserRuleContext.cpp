@@ -61,24 +61,21 @@ void ParserRuleContext::exitRule(tree::ParseTreeListener *listener) {
 }
 
 tree::TerminalNode *ParserRuleContext::addChild(tree::TerminalNode *t) {
-  if (_children.empty()) {
-    _children = std::vector<ParseTree*>();
+  if (children.empty()) {
+    children = std::vector<ParseTree*>();
   }
-  _children.push_back(t);
+  children.push_back(t);
   return t;
 }
 
 RuleContext *ParserRuleContext::addChild(RuleContext *ruleInvocation) {
-  if (_children.empty()) {
-    _children = std::vector<ParseTree*>();
-  }
-  _children.push_back(ruleInvocation);
+  children.push_back(ruleInvocation);
   return ruleInvocation;
 }
 
 void ParserRuleContext::removeLastChild() {
-  if (_children.size() > 0) {
-    _children.pop_back();
+  if (!children.empty()) {
+    children.pop_back();
   }
 }
 
@@ -96,26 +93,23 @@ tree::ErrorNode *ParserRuleContext::addErrorNode(Token *badToken) {
   return t;
 }
 
-/// <summary>
-/// Override to make type more specific </summary>
+/// Override to make type more specific
 ParserRuleContext *ParserRuleContext::getParent()
 {
   return static_cast<ParserRuleContext*>(RuleContext::getParent());
 }
 
 tree::ParseTree *ParserRuleContext::getChild(std::size_t i) {
-  return _children.size() > 0 && i < _children.size() ? _children[i] : nullptr;
+  return children[i];
 }
 
-
-
 tree::TerminalNode *ParserRuleContext::getToken(int ttype, std::size_t i) {
-  if (_children.empty() || i >= _children.size()) {
+  if (i >= children.size()) {
     return nullptr;
   }
 
   size_t j = 0; // what token with ttype have we found?
-  for (auto &o : _children) {
+  for (auto &o : children) {
     if (dynamic_cast<tree::TerminalNode*>(o) != nullptr) {
       tree::TerminalNode *tnode = static_cast<tree::TerminalNode*>(o);
       Token *symbol = tnode->getSymbol();
@@ -130,14 +124,9 @@ tree::TerminalNode *ParserRuleContext::getToken(int ttype, std::size_t i) {
   return nullptr;
 }
 
-// I think this should be changed to a pointer?
 std::vector<tree::TerminalNode*> ParserRuleContext::getTokens(int ttype) {
-  if (_children.empty()) {
-    return std::vector<tree::TerminalNode*>();
-  }
-
   std::vector<tree::TerminalNode*> tokens;
-  for (auto &o : _children) {
+  for (auto &o : children) {
     if (dynamic_cast<tree::TerminalNode*>(o) != nullptr) {
       tree::TerminalNode *tnode = static_cast<tree::TerminalNode*>(o);
       Token *symbol = tnode->getSymbol();
@@ -150,17 +139,13 @@ std::vector<tree::TerminalNode*> ParserRuleContext::getTokens(int ttype) {
     }
   }
 
-  if (tokens.empty()) {
-    return std::vector<tree::TerminalNode*>();
-  }
-
   return tokens;
 }
 
 
 
 std::size_t ParserRuleContext::getChildCount() {
-  return _children.size() > 0 ? _children.size() : 0;
+  return children.size();
 }
 
 misc::Interval ParserRuleContext::getSourceInterval() {

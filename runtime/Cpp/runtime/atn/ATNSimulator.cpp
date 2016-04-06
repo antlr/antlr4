@@ -32,7 +32,6 @@
 #include "ATNType.h"
 #include "ATNConfigSet.h"
 #include "DFAState.h"
-#include "PredictionContextCache.h"
 #include "ATNDeserializer.h"
 #include "EmptyPredictionContext.h"
 
@@ -44,27 +43,20 @@ using namespace org::antlr::v4::runtime::atn;
 DFAState ATNSimulator::ERROR(INT32_MAX);
 
 ATNSimulator::ATNSimulator() {
-  sharedContextCache = new PredictionContextCache();
 }
 
-ATNSimulator::ATNSimulator(const ATN &atn, PredictionContextCache *sharedContextCache)
-: atn(atn), sharedContextCache(sharedContextCache) {
+ATNSimulator::ATNSimulator(const ATN &atn, std::shared_ptr<PredictionContextCache> sharedContextCache)
+: atn(atn), _sharedContextCache(sharedContextCache) {
 }
 
-PredictionContextCache *ATNSimulator::getSharedContextCache() {
-  return sharedContextCache;
+std::shared_ptr<PredictionContextCache> ATNSimulator::getSharedContextCache() {
+  return _sharedContextCache;
 }
 
-PredictionContext *ATNSimulator::getCachedContext(PredictionContext *context) {
-  if (sharedContextCache == nullptr) {
-    return context;
-  }
-
-  {
-    std::lock_guard<std::mutex> lck(mtx);
-    std::map<PredictionContext*, PredictionContext*> *visited = new std::map<PredictionContext*, PredictionContext*>();
-    return PredictionContext::getCachedContext(context, sharedContextCache, visited);
-  }
+PredictionContextRef ATNSimulator::getCachedContext(PredictionContextRef context) {
+  std::lock_guard<std::mutex> lck(mtx);
+  std::map<PredictionContextRef, PredictionContextRef> visited;
+  return PredictionContext::getCachedContext(context, _sharedContextCache, visited);
 }
 
 ATN ATNSimulator::deserialize(const std::wstring &data) {

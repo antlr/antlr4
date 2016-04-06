@@ -81,6 +81,12 @@ namespace runtime {
     UnsupportedOperationException(const std::string &msg, RuntimeException *cause = nullptr) : RuntimeException(msg, cause) {};
   };
 
+  class EmptyStackException : public RuntimeException {
+  public:
+    EmptyStackException(RuntimeException *cause = nullptr) : EmptyStackException("", cause) {};
+    EmptyStackException(const std::string &msg, RuntimeException *cause = nullptr) : RuntimeException(msg, cause) {};
+  };
+
   // IOException is not a runtime exception (in the java hierarchy).
   // Hence we have to duplicate the RuntimeException implementation.
   class IOException : public std::exception {
@@ -96,6 +102,18 @@ namespace runtime {
     std::shared_ptr<RuntimeException> getCause() const;
 
     virtual const char* what() const noexcept override;
+  };
+
+  class CancellationException : public IllegalStateException {
+  public:
+    CancellationException(RuntimeException *cause = nullptr) : CancellationException("", cause) {};
+    CancellationException(const std::string &msg, RuntimeException *cause = nullptr) : IllegalStateException(msg, cause) {};
+  };
+
+  class ParseCancellationException : public CancellationException {
+  public:
+    ParseCancellationException(RuntimeException *cause = nullptr) : ParseCancellationException("", cause) {};
+    ParseCancellationException(const std::string &msg, RuntimeException *cause = nullptr) : CancellationException(msg, cause) {};
   };
 
 } // namespace runtime

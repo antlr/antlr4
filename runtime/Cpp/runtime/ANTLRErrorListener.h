@@ -40,8 +40,7 @@ namespace antlr {
 namespace v4 {
 namespace runtime {
 
-  /// <summary>
-  /// How to emit recognition errors. </summary>
+  /// How to emit recognition errors (an interface in Java).
   class ANTLRErrorListener {
 
     /// <summary>
@@ -77,8 +76,8 @@ namespace runtime {
     ///        the parser was able to recover in line without exiting the
     ///        surrounding rule. </param>
   public:
-    void syntaxError(IRecognizer *recognizer, void *offendingSymbol, size_t line, int charPositionInLine,
-                     const std::wstring &msg, RecognitionException *e) {}
+    virtual void syntaxError(IRecognizer *recognizer, Token *offendingSymbol, size_t line, int charPositionInLine,
+                             const std::wstring &msg, RecognitionException *e) = 0;
 
     /// <summary>
     /// This method is called by the parser when a full-context prediction

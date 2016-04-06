@@ -72,14 +72,14 @@ IntervalSet IntervalSet::of(int a, int b) {
 
 void IntervalSet::clear() {
   if (_readonly) {
-    throw new IllegalStateException("can't alter read only IntervalSet");
+    throw IllegalStateException("can't alter read only IntervalSet");
   }
   _intervals.clear();
 }
 
 void IntervalSet::add(int el) {
   if (_readonly) {
-    throw new IllegalStateException("can't alter read only IntervalSet");
+    throw IllegalStateException("can't alter read only IntervalSet");
   }
   add(el, el);
 }
@@ -90,7 +90,7 @@ void IntervalSet::add(int a, int b) {
 
 void IntervalSet::add(const Interval &addition) {
   if (_readonly) {
-    throw new IllegalStateException("can't alter read only IntervalSet");
+    throw IllegalStateException("can't alter read only IntervalSet");
   }
 
   if (addition.b < addition.a) {
@@ -426,7 +426,7 @@ std::wstring IntervalSet::toString(const std::vector<std::wstring> &tokenNames) 
 }
 
 std::wstring IntervalSet::elementName(const std::vector<std::wstring> &tokenNames, ssize_t a) const {
-  if (a == Token::_EOF) {
+  if (a == EOF) {
     return L"<EOF>";
   } else if (a == Token::EPSILON) {
     return L"<EPSILON>";

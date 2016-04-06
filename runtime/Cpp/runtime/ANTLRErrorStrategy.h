@@ -51,13 +51,16 @@ namespace runtime {
   /// Implementations of this interface report syntax errors by calling
   /// <seealso cref="Parser#notifyErrorListeners"/>.
   /// <p/>
-  /// TODO: what to do about lexers
+  /// TO_DO: what to do about lexers
   /// </summary>
   class ANTLRErrorStrategy {
+  public:
+
     /// <summary>
     /// Reset the error handler state for the specified {@code recognizer}. </summary>
     /// <param name="recognizer"> the parser instance </param>
-  public:
+    virtual ~ANTLRErrorStrategy() {};
+
     virtual void reset(Parser *recognizer) = 0;
 
     /// <summary>

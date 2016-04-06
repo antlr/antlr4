@@ -77,6 +77,7 @@ namespace runtime {
     ParserRuleContext *ctx;
 
     Parser(TokenStream *input);
+    virtual ~Parser();
 
     /// <summary>
     /// reset the parser's state </summary>
@@ -256,9 +257,8 @@ namespace runtime {
     /// </summary>
     virtual tree::pattern::ParseTreePattern *compileParseTreePattern(const std::wstring &pattern, int patternRuleIndex, Lexer *lexer);
 
-    virtual ANTLRErrorStrategy *getErrorHandler();
-
-    virtual void setErrorHandler(ANTLRErrorStrategy *handler);
+    virtual std::shared_ptr<ANTLRErrorStrategy> getErrorHandler();
+    virtual void setErrorHandler(std::shared_ptr<ANTLRErrorStrategy> handler);
 
     virtual TokenStream *getInputStream() override;
     void setInputStream(IntStream *input) override;
@@ -395,12 +395,9 @@ namespace runtime {
     virtual void setTrace(bool trace);
     
   protected:
-    /// <summary>
-    /// The error handling strategy for the parser. The default value is a new
-    /// instance of <seealso cref="DefaultErrorStrategy"/>.
-    /// </summary>
-    /// <seealso cref= #getErrorHandler </seealso>
-    ANTLRErrorStrategy *_errHandler;
+    /// The error handling strategy for the parser. The default is DefaultErrorStrategy.
+    /// See also getErrorHandler.
+    std::shared_ptr<ANTLRErrorStrategy> _errHandler;
 
     /// <summary>
     /// The input stream.
@@ -444,14 +441,12 @@ namespace runtime {
     /// <seealso cref= ATNDeserializationOptions#isGenerateRuleBypassTransitions() </seealso>
     static std::map<std::wstring, atn::ATN> bypassAltsAtnCache;
 
-    /// <summary>
-    /// When <seealso cref="#setTrace"/>{@code (true)} is called, a reference to the
-    /// <seealso cref="TraceListener"/> is stored here so it can be easily removed in a
-    /// later call to <seealso cref="#setTrace"/>{@code (false)}. The listener itself is
+    /// When setTrace(true) is called, a reference to the
+    /// TraceListener is stored here so it can be easily removed in a
+    /// later call to setTrace(false). The listener itself is
     /// implemented as a parser listener so this field is not directly used by
     /// other parser methods.
-    /// </summary>
-    TraceListener *_tracer;
+    TraceListener _tracer;
 
     void InitializeInstanceFields();
   };

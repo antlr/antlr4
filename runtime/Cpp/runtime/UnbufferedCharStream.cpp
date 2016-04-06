@@ -54,7 +54,7 @@ UnbufferedCharStream::UnbufferedCharStream(std::ifstream *input, int bufferSize)
 }
 
 void UnbufferedCharStream::consume() {
-  if (LA(1) == IntStream::_EOF) {
+  if (LA(1) == EOF) {
     throw IllegalStateException("cannot consume EOF");
   }
 
@@ -82,7 +82,7 @@ void UnbufferedCharStream::sync(size_t want) {
 
 size_t UnbufferedCharStream::fill(size_t n) {
   for (size_t i = 0; i < n; i++) {
-    if (this->n > 0 && data[this->n - 1] == static_cast<wchar_t>(IntStream::_EOF)) {
+    if (this->n > 0 && data[this->n - 1] == static_cast<wchar_t>(EOF)) {
       return i;
     }
 
@@ -108,21 +108,23 @@ void UnbufferedCharStream::add(size_t c) {
   data[n++] = static_cast<wchar_t>(c);
 }
 
-size_t UnbufferedCharStream::LA(ssize_t i) {
+ssize_t UnbufferedCharStream::LA(ssize_t i) {
   if (i == -1) { // special case
-    return (size_t)lastChar;
+    return lastChar;
   }
   sync((size_t)i);
   ssize_t index = (ssize_t)p + i - 1;
   if (index < 0) {
-    throw new IndexOutOfBoundsException();
+    throw IndexOutOfBoundsException();
   }
+
   if ((size_t)index >= n) {
-    return IntStream::_EOF;
+    return EOF;
   }
-  size_t c = (size_t)data[(size_t)index];
-  if (c == IntStream::_EOF) {
-    return IntStream::_EOF;
+
+  ssize_t c = data[(size_t)index];
+  if (c == EOF) {
+    return EOF;
   }
   return c;
 }

@@ -57,12 +57,12 @@ bool SimpleATNConfigComparer::operator () (const ATNConfig &lhs, const ATNConfig
 
 //------------------ ATNConfigSet --------------------------------------------------------------------------------------
 
-ATNConfigSet::ATNConfigSet(bool fullCtx, ConfigLookup *lookup) : fullCtx(fullCtx) {
-  configLookup = (lookup == nullptr) ? new ConfigLookupImpl<SimpleATNConfigHasher, SimpleATNConfigComparer>() : lookup;
+ATNConfigSet::ATNConfigSet(bool fullCtx, std::shared_ptr<ConfigLookup> lookup) : fullCtx(fullCtx) {
+  configLookup = !lookup ? std::shared_ptr<ConfigLookup>(new ConfigLookupImpl<SimpleATNConfigHasher, SimpleATNConfigComparer>()) : lookup;
   InitializeInstanceFields();
 }
 
-ATNConfigSet::ATNConfigSet(ATNConfigSet *old) : ATNConfigSet(old->fullCtx) {
+ATNConfigSet::ATNConfigSet(ATNConfigSet *old) : ATNConfigSet(old->fullCtx, std::shared_ptr<ConfigLookup>()) {
   addAll(old);
   uniqueAlt = old->uniqueAlt;
   conflictingAlts = old->conflictingAlts;
@@ -71,16 +71,15 @@ ATNConfigSet::ATNConfigSet(ATNConfigSet *old) : ATNConfigSet(old->fullCtx) {
 }
 
 ATNConfigSet::~ATNConfigSet() {
-  delete configLookup;
 }
 
 bool ATNConfigSet::add(ATNConfig *config) {
   return add(config, nullptr);
 }
 
-bool ATNConfigSet::add(ATNConfig *config, misc::DoubleKeyMap<PredictionContext*, PredictionContext*, PredictionContext*> *mergeCache) {
+bool ATNConfigSet::add(ATNConfig *config, PredictionContextMergeCache *mergeCache) {
   if (_readonly) {
-    throw new IllegalStateException("This set is readonly");
+    throw IllegalStateException("This set is readonly");
   }
   if (config->semanticContext != SemanticContext::NONE) {
     hasSemanticContext = true;
@@ -98,7 +97,7 @@ bool ATNConfigSet::add(ATNConfig *config, misc::DoubleKeyMap<PredictionContext*,
   }
   // a previous (s,i,pi,_), merge with it and save result
   bool rootIsWildcard = !fullCtx;
-  PredictionContext *merged = PredictionContext::merge(existing->context, config->context, rootIsWildcard, mergeCache);
+  PredictionContextRef merged = PredictionContext::merge(existing->context, config->context, rootIsWildcard, mergeCache);
   // no need to check for existing.context, config.context in cache
   // since only way to create new graphs is "call rule" and here. We
   // cache at both places.
@@ -126,8 +125,8 @@ std::vector<ATNState*>* ATNConfigSet::getStates() {
   return states;
 }
 
-std::vector<SemanticContext*> ATNConfigSet::getPredicates() {
-  std::vector<SemanticContext*> preds = std::vector<SemanticContext*>();
+std::vector<SemanticContextRef> ATNConfigSet::getPredicates() {
+  std::vector<SemanticContextRef> preds;
   for (auto c : configs) {
     if (c->semanticContext != SemanticContext::NONE) {
       preds.push_back(c->semanticContext);
@@ -211,7 +210,7 @@ bool ATNConfigSet::contains(ATNConfig *o) {
 
 void ATNConfigSet::clear() {
   if (_readonly) {
-    throw new IllegalStateException("This set is readonly");
+    throw IllegalStateException("This set is readonly");
   }
   configs.clear();
   _cachedHashCode = 0;
@@ -224,8 +223,7 @@ bool ATNConfigSet::isReadonly() {
 
 void ATNConfigSet::setReadonly(bool readonly) {
   _readonly = readonly;
-  delete configLookup;
-  configLookup = nullptr; // can't mod, no need for lookup cache
+  configLookup.reset();
 }
 
 std::wstring ATNConfigSet::toString() {

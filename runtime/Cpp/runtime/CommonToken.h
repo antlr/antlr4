@@ -53,7 +53,7 @@ namespace runtime {
     ///  this is non-empty, then getText should return this.  Note that
     ///  start/stop are not affected by changing this.
     /// </summary>
-    // TODO: can store these in map in token stream rather than as field here
+    // TO_DO: can store these in map in token stream rather than as field here
     std::wstring text;
 
     /// <summary>
@@ -118,8 +118,6 @@ namespace runtime {
     virtual TokenSource *getTokenSource() override;
 
     virtual CharStream *getInputStream() override;
-
-    virtual std::wstring toString() ;
 
   private:
     void InitializeInstanceFields();

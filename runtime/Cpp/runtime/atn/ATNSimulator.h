@@ -33,6 +33,7 @@
 
 #include "ATN.h"
 #include "IntervalSet.h"
+#include "PredictionContext.h"
 
 namespace org {
 namespace antlr {
@@ -50,13 +51,12 @@ namespace atn {
     static dfa::DFAState ERROR;
     ATN atn;
 
-    ATNSimulator(const ATN &atn, PredictionContextCache *sharedContextCache);
+    ATNSimulator(const ATN &atn, std::shared_ptr<PredictionContextCache> sharedContextCache);
 
     virtual void reset() = 0;
 
-    virtual PredictionContextCache *getSharedContextCache();
-
-    virtual PredictionContext *getCachedContext(PredictionContext *context);
+    virtual std::shared_ptr<PredictionContextCache> getSharedContextCache();
+    virtual PredictionContextRef getCachedContext(PredictionContextRef context);
 
     /// @deprecated Use <seealso cref="ATNDeserializer#deserialize"/> instead.
     static ATN deserialize(const std::wstring &data);
@@ -99,7 +99,7 @@ namespace atn {
     ///  more time I think and doesn't save on the overall footprint
     ///  so it's not worth the complexity.
     /// </summary>
-    PredictionContextCache * sharedContextCache;
+    std::shared_ptr<PredictionContextCache> _sharedContextCache;
     
   };
 

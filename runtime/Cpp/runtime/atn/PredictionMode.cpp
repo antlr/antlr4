@@ -44,7 +44,7 @@ struct AltAndContextConfigHasher
   size_t operator () (const ATNConfig &o) const {
     size_t hashCode = misc::MurmurHash::initialize(7);
     hashCode = misc::MurmurHash::update(hashCode, (size_t)o.state->stateNumber);
-    hashCode = misc::MurmurHash::update(hashCode, (size_t)o.context);
+    hashCode = misc::MurmurHash::update(hashCode, (size_t)o.context.get());
     return misc::MurmurHash::finish(hashCode, 2);
   }
 };
@@ -77,7 +77,7 @@ bool PredictionModeClass::hasSLLConflictTerminatingPrediction(PredictionMode* mo
     // since we'll often fail over anyway.
     if (configs->hasSemanticContext) {
       // dup configs, tossing out semantic predicates
-      ATNConfigSet* dup = new ATNConfigSet();
+      ATNConfigSet* dup = new ATNConfigSet(true, std::shared_ptr<ConfigLookup>());
       for (ATNConfig config : *configs->configLookup) {
         ATNConfig* c = new ATNConfig(&config, SemanticContext::NONE);
         dup->add(c);

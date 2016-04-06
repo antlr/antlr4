@@ -34,6 +34,8 @@
 #include "PredictionMode.h"
 #include "DFAState.h"
 #include "ATNSimulator.h"
+#include "PredictionContext.h"
+#include "SemanticContext.h"
 
 namespace org {
 namespace antlr {
@@ -238,6 +240,7 @@ namespace atn {
   /// passes over the input.
   ///
   /// </summary>
+
   class ParserATNSimulator : public ATNSimulator {
   public:
     static const bool debug = false;
@@ -260,7 +263,7 @@ namespace atn {
 
     /// <summary>
     /// Each prediction operation uses a cache for merge of prediction contexts.
-    ///  Don't keep around as it wastes huge amounts of memory. DoubleKeyMap
+    ///  Don't keep around as it wastes huge amounts of memory. The merge cache
     ///  isn't synchronized but we're ok since two threads shouldn't reuse same
     ///  parser/atnsim object because it can only handle one input at a time.
     ///  This maps graphs a and b to merged result c. (a,b)->c. We can avoid
@@ -268,7 +271,7 @@ namespace atn {
     ///  also be examined during cache lookup.
     /// </summary>
   protected:
-    misc::DoubleKeyMap<PredictionContext*, PredictionContext*, PredictionContext*> *mergeCache;
+    PredictionContextMergeCache mergeCache;
 
     // LAME globals to avoid parameters!!!!! I need these down deep in predTransition
     TokenStream *_input;
@@ -278,9 +281,11 @@ namespace atn {
     /// <summary>
     /// Testing only! </summary>
   public:
-    ParserATNSimulator(const ATN &atn, const std::vector<dfa::DFA *>& decisionToDFA, PredictionContextCache *sharedContextCache);
+    ParserATNSimulator(const ATN &atn, const std::vector<dfa::DFA *>& decisionToDFA,
+                       std::shared_ptr<PredictionContextCache> sharedContextCache);
 
-    ParserATNSimulator(Parser *parser, const ATN &atn, const std::vector<dfa::DFA *>& decisionToDFA, PredictionContextCache *sharedContextCache);
+    ParserATNSimulator(Parser *parser, const ATN &atn, const std::vector<dfa::DFA *> &decisionToDFA,
+                       std::shared_ptr<PredictionContextCache> sharedContextCache);
 
     virtual void reset() override;
 
@@ -330,7 +335,7 @@ namespace atn {
     /// <returns> The existing target DFA state for the given input symbol
     /// {@code t}, or {@code null} if the target state for this edge is not
     /// already cached </returns>
-    virtual dfa::DFAState *getExistingTargetState(dfa::DFAState *previousD, size_t t);
+    virtual dfa::DFAState* getExistingTargetState(dfa::DFAState *previousD, ssize_t t);
 
     /// <summary>
     /// Compute a target state for an edge in the DFA, and attempt to add the
@@ -343,14 +348,14 @@ namespace atn {
     /// <returns> The computed target DFA state for the given input symbol
     /// {@code t}. If {@code t} does not lead to a valid DFA state, this method
     /// returns <seealso cref="#ERROR"/>. </returns>
-    virtual dfa::DFAState *computeTargetState(dfa::DFA *dfa, dfa::DFAState *previousD, size_t t);
+    virtual dfa::DFAState *computeTargetState(dfa::DFA *dfa, dfa::DFAState *previousD, ssize_t t);
 
     virtual void predicateDFAState(dfa::DFAState *dfaState, DecisionState *decisionState);
 
     // comes back with reach.uniqueAlt set to a valid alt
     virtual int execATNWithFullContext(dfa::DFA *dfa, dfa::DFAState *D, ATNConfigSet *s0, TokenStream *input, size_t startIndex, ParserRuleContext *outerContext); // how far we got before failing over
 
-    virtual ATNConfigSet *computeReachSet(ATNConfigSet *closure, size_t t, bool fullCtx);
+    virtual ATNConfigSet *computeReachSet(ATNConfigSet *closure, ssize_t t, bool fullCtx);
 
     /// <summary>
     /// Return a configuration set containing only the configurations from
@@ -377,9 +382,11 @@ namespace atn {
 
     virtual ATNState *getReachableTarget(Transition *trans, int ttype);
 
-    virtual std::vector<SemanticContext*> getPredsForAmbigAlts(antlrcpp::BitSet *ambigAlts, ATNConfigSet *configs, size_t nalts);
+    virtual std::vector<SemanticContextRef> getPredsForAmbigAlts(antlrcpp::BitSet *ambigAlts,
+      ATNConfigSet *configs, size_t nalts);
 
-    virtual std::vector<dfa::DFAState::PredPrediction*> getPredicatePredictions(antlrcpp::BitSet *ambigAlts, std::vector<SemanticContext*> altToPred);
+    virtual std::vector<dfa::DFAState::PredPrediction*> getPredicatePredictions(antlrcpp::BitSet *ambigAlts,
+      std::vector<SemanticContextRef> altToPred);
 
     virtual int getAltThatFinishedDecisionEntryRule(ATNConfigSet *configs);
 
@@ -393,27 +400,28 @@ namespace atn {
     virtual antlrcpp::BitSet *evalSemanticContext(std::vector<dfa::DFAState::PredPrediction*> predPredictions, ParserRuleContext *outerContext, bool complete);
 
 
-    /* TODO: If we are doing predicates, there is no point in pursuing
+    /* TO_DO: If we are doing predicates, there is no point in pursuing
      closure operations if we reach a DFA state that uniquely predicts
      alternative. We will not be caching that DFA state and it is a
      waste to pursue the closure. Might have to advance when we do
      ambig detection thought :(
      */
 
-    virtual void closure(ATNConfig *config, ATNConfigSet *configs, std::set<ATNConfig*> *closureBusy, bool collectPredicates, bool fullCtx);
+    virtual void closure(ATNConfig *config, ATNConfigSet *configs, std::set<ATNConfig*> &closureBusy,
+                         bool collectPredicates, bool fullCtx);
 
-    virtual void closureCheckingStopState(ATNConfig *config, ATNConfigSet *configs, std::set<ATNConfig*> *closureBusy, bool collectPredicates, bool fullCtx, int depth);
+    virtual void closureCheckingStopState(ATNConfig *config, ATNConfigSet *configs, std::set<ATNConfig*> &closureBusy,
+                                          bool collectPredicates, bool fullCtx, int depth);
 
-    /// <summary>
-    /// Do the actual work of walking epsilon edges </summary>
-    virtual void closure_(ATNConfig *config, ATNConfigSet *configs, std::set<ATNConfig*> *closureBusy, bool collectPredicates, bool fullCtx, int depth);
+    /// Do the actual work of walking epsilon edges.
+    virtual void closure_(ATNConfig *config, ATNConfigSet *configs, std::set<ATNConfig*> &closureBusy,
+                          bool collectPredicates, bool fullCtx, int depth);
 
   public:
     virtual std::wstring getRuleName(size_t index);
 
   protected:
     virtual ATNConfig *getEpsilonTarget(ATNConfig *config, Transition *t, bool collectPredicates, bool inContext, bool fullCtx);
-
     virtual ATNConfig *actionTransition(ATNConfig *config, ActionTransition *t);
 
   public:
@@ -466,7 +474,7 @@ namespace atn {
     virtual antlrcpp::BitSet getConflictingAltsOrUniqueAlt(ATNConfigSet *configs);
 
   public:
-    virtual std::wstring getTokenName(size_t t);
+    virtual std::wstring getTokenName(ssize_t t);
 
     virtual std::wstring getLookaheadName(TokenStream *input);
 
@@ -501,7 +509,7 @@ namespace atn {
     /// <returns> If {@code to} is {@code null}, this method returns {@code null};
     /// otherwise this method returns the result of calling <seealso cref="#addDFAState"/>
     /// on {@code to} </returns>
-    virtual dfa::DFAState *addDFAEdge(dfa::DFA *dfa, dfa::DFAState *from, size_t t, dfa::DFAState *to);
+    virtual dfa::DFAState *addDFAEdge(dfa::DFA *dfa, dfa::DFAState *from, ssize_t t, dfa::DFAState *to);
 
     /// <summary>
     /// Add state {@code D} to the DFA if it is not already present, and return

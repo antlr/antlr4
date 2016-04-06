@@ -40,24 +40,16 @@ namespace runtime {
 namespace atn {
 
   class LexerATNConfig : public ATNConfig {
-    /// <summary>
-    /// Capture lexer action we traverse </summary>
   public:
-    int lexerActionIndex;
+    /// Capture lexer action we traverse.
+    int lexerActionIndex = -1;
 
-  private:
-    const bool passedThroughNonGreedyDecision;
-
-  public:
-    LexerATNConfig(ATNState *state, int alt, PredictionContext *context);
-
-    LexerATNConfig(ATNState *state, int alt, PredictionContext *context, int actionIndex);
+    LexerATNConfig(ATNState *state, int alt, PredictionContextRef context);
+    LexerATNConfig(ATNState *state, int alt, PredictionContextRef context, int actionIndex);
 
     LexerATNConfig(LexerATNConfig *c, ATNState *state);
-
     LexerATNConfig(LexerATNConfig *c, ATNState *state, int actionIndex);
-
-    LexerATNConfig(LexerATNConfig *c, ATNState *state, PredictionContext *context);
+    LexerATNConfig(LexerATNConfig *c, ATNState *state, PredictionContextRef context);
 
     bool hasPassedThroughNonGreedyDecision();
 
@@ -66,10 +58,9 @@ namespace atn {
     bool operator == (const LexerATNConfig& other) const;
 
   private:
-    static bool checkNonGreedyDecision(LexerATNConfig *source, ATNState *target);
+    const bool passedThroughNonGreedyDecision;
 
-  private:
-    void InitializeInstanceFields();
+    static bool checkNonGreedyDecision(LexerATNConfig *source, ATNState *target);
   };
 
 } // namespace atn

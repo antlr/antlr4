@@ -53,5 +53,45 @@ namespace antlrcpp {
   template <typename F>
   FinalAction<F> finally(F f) { return FinalAction<F>(f); }
 
+  // Convenience functions to avoid lengthy dynamic_cast() != nullptr checks in many places.
+  template <typename T1, typename T2>
+  bool is(T2 obj) { // For value types.
+    return dynamic_cast<T1 *>(&obj) != nullptr;
+  }
+
+  template <typename T1, typename T2>
+  bool is(T2 *obj) { // For pointer types.
+    return dynamic_cast<T1>(obj) != nullptr;
+  }
+
+  template <typename T1, typename T2>
+  bool is(std::shared_ptr<T2> obj) { // For shared pointers.
+    return dynamic_cast<T1*>(obj.get()) != nullptr;
+  }
+
 } // namespace antlrcpp
 
+namespace std {
+  // Comparing weak and shared pointers.
+  template <typename T>
+  bool operator == (const std::weak_ptr<T> &lhs, const std::weak_ptr<T> &rhs) {
+    if (lhs.expired() && rhs.expired())
+      return true;
+
+    if (lhs.expired() || rhs.expired())
+      return false;
+
+    return (lhs.lock() == rhs.lock());
+  }
+
+  template <typename T>
+  bool operator == (const std::shared_ptr<T> &lhs, const std::shared_ptr<T> &rhs) {
+    if (!lhs && !rhs)
+      return true;
+
+    if (!lhs || !rhs)
+      return false;
+
+    return (*lhs == *rhs);
+  }
+} // namespace std

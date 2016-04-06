@@ -57,18 +57,18 @@ namespace runtime {
 
     ANTLRInputStream(const std::wstring &input = L"");
     ANTLRInputStream(const wchar_t data[], size_t numberOfActualCharsInArray);
-    ANTLRInputStream(std::wiostream &stream) ;
-    ANTLRInputStream(std::wiostream &stream, std::streamsize readChunkSize);
+    ANTLRInputStream(std::wistream &stream);
+    ANTLRInputStream(std::wistream &stream, std::streamsize readChunkSize);
 
-    virtual void load(std::wiostream &stream, std::streamsize readChunkSize);
+    virtual void load(std::wistream &stream, std::streamsize readChunkSize);
 
     /// Reset the stream so that it's in the same state it was
     /// when the object was created *except* the data array is not
     /// touched.
     virtual void reset();
     virtual void consume() override;
-    virtual size_t LA(ssize_t i) override;
-    virtual size_t LT(ssize_t i);
+    virtual ssize_t LA(ssize_t i) override;
+    virtual ssize_t LT(ssize_t i);
 
     /// <summary>
     /// Return the current input symbol index 0..n where n indicates the

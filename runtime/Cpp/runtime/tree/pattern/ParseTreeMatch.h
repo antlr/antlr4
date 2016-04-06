@@ -38,30 +38,20 @@ namespace runtime {
 namespace tree {
 namespace pattern {
 
-  /// <summary>
-  /// Represents the result of matching a <seealso cref="ParseTree"/> against a tree pattern.
-  /// </summary>
+  /// Represents the result of matching a ParseTree against a tree pattern.
   class ParseTreeMatch {
-    /// <summary>
-    /// This is the backing field for <seealso cref="#getTree()"/>.
-    /// </summary>
   private:
-    ParseTree *const tree;
+    /// This is the backing field for getTree().
+    ParseTree *_tree;
 
-    /// <summary>
-    /// This is the backing field for <seealso cref="#getPattern()"/>.
-    /// </summary>
-    ParseTreePattern *const pattern;
+    /// This is the backing field for getPattern().
+    ParseTreePattern *_pattern;
 
-    /// <summary>
-    /// This is the backing field for <seealso cref="#getLabels()"/>.
-    /// </summary>
-    misc::MultiMap<std::wstring, ParseTree*> *const labels;
+    /// This is the backing field for getLabels().
+    std::map<std::wstring, std::vector<ParseTree*>> _labels;
 
-    /// <summary>
-    /// This is the backing field for <seealso cref="#getMismatchedNode()"/>.
-    /// </summary>
-    ParseTree *const mismatchedNode;
+    /// This is the backing field for getMismatchedNode().
+    ParseTree *_mismatchedNode;
 
     /// <summary>
     /// Constructs a new instance of <seealso cref="ParseTreeMatch"/> from the specified
@@ -78,7 +68,8 @@ namespace pattern {
     /// <exception cref="IllegalArgumentException"> if {@code pattern} is {@code null} </exception>
     /// <exception cref="IllegalArgumentException"> if {@code labels} is {@code null} </exception>
   public:
-    ParseTreeMatch(ParseTree *tree, ParseTreePattern *pattern, misc::MultiMap<std::wstring, ParseTree*> *labels, ParseTree *mismatchedNode);
+    ParseTreeMatch(ParseTree *tree, ParseTreePattern *pattern, const std::map<std::wstring, std::vector<ParseTree*>> &labels,
+                   ParseTree *mismatchedNode);
 
     /// <summary>
     /// Get the last node associated with a specific {@code label}.
@@ -130,7 +121,7 @@ namespace pattern {
     /// </summary>
     /// <returns> A mapping from labels to parse tree nodes. If the parse tree
     /// pattern did not contain any rule or token tags, this map will be empty. </returns>
-    virtual misc::MultiMap<std::wstring, ParseTree*> *getLabels();
+    virtual std::map<std::wstring, std::vector<ParseTree*>>& getLabels();
 
     /// <summary>
     /// Get the node at which we first detected a mismatch.

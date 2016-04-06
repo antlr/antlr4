@@ -40,10 +40,9 @@ namespace runtime {
 
   class Recognizer : public IRecognizer {
   public:
-    static const int _EOF = -1;
+    //static const int _EOF = -1; ml: we don't need it IntStream, nor in Token, nor here
 
     Recognizer();
-
 
   private:
     static std::map<std::vector<std::wstring>, std::map<std::wstring, int>> _tokenTypeMapCache;

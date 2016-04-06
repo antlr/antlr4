@@ -118,7 +118,7 @@ namespace runtime {
     /// Get all tokens from start..stop inclusively </summary>
     virtual std::vector<Token*> get(size_t start, size_t stop);
 
-    virtual size_t LA(ssize_t i) override;
+    virtual ssize_t LA(ssize_t i) override;
 
   protected:
     virtual Token *LB(size_t k);

@@ -104,7 +104,7 @@ namespace atn {
     }
 
     size_t size () const override {
-      return std::unordered_set<ATNConfig*, Hasher, Comparer>::size();
+      return Set::size();
     }
 
     ConfigLookupIterator begin() override {

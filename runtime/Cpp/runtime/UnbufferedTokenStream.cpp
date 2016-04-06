@@ -58,7 +58,7 @@ Token* UnbufferedTokenStream::get(int i)
 { // get absolute index
   int bufferStartIndex = getBufferStartIndex();
   if (i < bufferStartIndex || i >= bufferStartIndex + n) {
-    throw new IndexOutOfBoundsException(std::wstring(L"get(") + std::to_wstring(i) + std::wstring(L") outside buffer: ") + std::to_wstring(bufferStartIndex) + std::wstring(L"..") + std::to_wstring(bufferStartIndex + n));
+    throw IndexOutOfBoundsException(std::wstring(L"get(") + std::to_wstring(i) + std::wstring(L") outside buffer: ") + std::to_wstring(bufferStartIndex) + std::wstring(L"..") + std::to_wstring(bufferStartIndex + n));
   }
   return tokens[i - bufferStartIndex];
 }
@@ -72,11 +72,11 @@ Token* UnbufferedTokenStream::LT(ssize_t i)
   sync(i);
   int index = p + i - 1;
   if (index < 0) {
-    throw new IndexOutOfBoundsException(std::wstring(L"LT(") + std::to_wstring(i) + std::wstring(L") gives negative index"));
+    throw IndexOutOfBoundsException(std::wstring(L"LT(") + std::to_wstring(i) + std::wstring(L") gives negative index"));
   }
 
   if (index >= tokens.size()) {
-    assert(n > 0 && tokens[n - 1]->getType() == Token::_EOF);
+    assert(n > 0 && tokens[n - 1]->getType() == EOF);
     return tokens[n - 1];
   }
 
@@ -110,8 +110,8 @@ std::wstring UnbufferedTokenStream::getText(Token* start, Token* stop)
 
 void UnbufferedTokenStream::consume()
 {
-  if (LA(1) == Token::_EOF) {
-    throw new IllegalStateException(L"cannot consume EOF");
+  if (LA(1) == EOF) {
+    throw IllegalStateException(L"cannot consume EOF");
   }
 
   // buf always has at least tokens[p==0] in this method due to ctor
@@ -150,7 +150,7 @@ void UnbufferedTokenStream::sync(int want)
 int UnbufferedTokenStream::fill(int n)
 {
   for (int i = 0; i < n; i++) {
-    if (this->n > 0 && tokens[this->n - 1]->getType() == Token::_EOF) {
+    if (this->n > 0 && tokens[this->n - 1]->getType() == EOF) {
       return i;
     }
 
@@ -231,10 +231,10 @@ void UnbufferedTokenStream::seek(size_t index)
   int bufferStartIndex = getBufferStartIndex();
   int i = index - bufferStartIndex;
   if (i < 0) {
-    throw new IllegalArgumentException(std::wstring(L"cannot seek to negative index ") + std::to_wstring(index));
+    throw IllegalArgumentException(std::wstring(L"cannot seek to negative index ") + std::to_wstring(index));
   }
   else if (i >= n) {
-    throw new UnsupportedOperationException(std::wstring(L"seek to index outside buffer: ") + std::to_wstring(index) + std::wstring(L" not in ") + std::to_wstring(bufferStartIndex) + std::wstring(L"..") + std::to_wstring(bufferStartIndex + n));
+    throw UnsupportedOperationException(std::wstring(L"seek to index outside buffer: ") + std::to_wstring(index) + std::wstring(L" not in ") + std::to_wstring(bufferStartIndex) + std::wstring(L"..") + std::to_wstring(bufferStartIndex + n));
   }
 
   p = i;
@@ -249,7 +249,7 @@ void UnbufferedTokenStream::seek(size_t index)
 
 size_t UnbufferedTokenStream::size()
 {
-  throw new UnsupportedOperationException(L"Unbuffered stream cannot know its size");
+  throw UnsupportedOperationException(L"Unbuffered stream cannot know its size");
 }
 
 std::string UnbufferedTokenStream::getSourceName()
@@ -265,7 +265,7 @@ std::wstring UnbufferedTokenStream::getText(const misc::Interval &interval)
   int start = interval->a;
   int stop = interval->b;
   if (start < bufferStartIndex || stop > bufferStopIndex) {
-    throw new UnsupportedOperationException(std::wstring(L"interval ") + interval->toString() + std::wstring(L" not in token buffer window: ") + std::to_wstring(bufferStartIndex) + std::wstring(L"..") + std::to_wstring(bufferStopIndex));
+    throw UnsupportedOperationException(std::wstring(L"interval ") + interval->toString() + std::wstring(L" not in token buffer window: ") + std::to_wstring(bufferStartIndex) + std::wstring(L"..") + std::to_wstring(bufferStopIndex));
   }
 
   int a = start - bufferStartIndex;

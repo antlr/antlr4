@@ -42,64 +42,38 @@ namespace v4 {
 namespace runtime {
 namespace tree {
 
-  /// <summary>
-  /// A set of utility routines useful for all kinds of ANTLR trees. </summary>
+  /// A set of utility routines useful for all kinds of ANTLR trees.
   class Trees {
-
   public:
-#ifdef TODO
-    static std::wstring getPS(Tree *t, std::vector<std::wstring> &ruleNames, const std::wstring &fontName, int fontSize);
-
-    static std::wstring getPS(Tree *t, std::vector<std::wstring> &ruleNames);
-
-    static void writePS(Tree *t, std::vector<std::wstring> &ruleNames, const std::wstring &fileName, const std::wstring &fontName, int fontSize); //throw(IOException);
-
-    static void writePS(Tree *t, std::vector<std::wstring> &ruleNames, const std::wstring &fileName);// throw(IOException);
-#endif
-    /// <summary>
-    /// Print out a whole tree in LISP form. <seealso cref="#getNodeText"/> is used on the
-    ///  node payloads to get the text for the nodes.  Detect
-    ///  parse trees and extract data appropriately.
-    /// </summary>
+    /// Print out a whole tree in LISP form. getNodeText is used on the
+    /// node payloads to get the text for the nodes.  Detect
+    /// parse trees and extract data appropriately.
     static std::wstring toStringTree(Tree *t);
 
-    /// <summary>
-    /// Print out a whole tree in LISP form. <seealso cref="#getNodeText"/> is used on the
+    /// Print out a whole tree in LISP form. getNodeText is used on the
     ///  node payloads to get the text for the nodes.  Detect
     ///  parse trees and extract data appropriately.
-    /// </summary>
     static std::wstring toStringTree(Tree *t, Parser *recog);
 
-    /// <summary>
-    /// Print out a whole tree in LISP form. <seealso cref="#getNodeText"/> is used on the
-    ///  node payloads to get the text for the nodes.  Detect
-    ///  parse trees and extract data appropriately.
-    /// </summary>
+    /// Print out a whole tree in LISP form. getNodeText is used on the
+    /// node payloads to get the text for the nodes.  Detect
+    /// parse trees and extract data appropriately.
     static std::wstring toStringTree(Tree *t, const std::vector<std::wstring> &ruleNames);
-
     static std::wstring getNodeText(Tree *t, Parser *recog);
-
     static std::wstring getNodeText(Tree *t, const std::vector<std::wstring> &ruleNames);
 
-
-    /// <summary>
-    /// Return ordered list of all children of this node </summary>
+    /// Return ordered list of all children of this node.
     static std::vector<Tree*> getChildren(Tree *t);
 
-    /// <summary>
     /// Return a list of all ancestors of this node.  The first node of
     ///  list is the root and the last is the parent of this node.
-    /// </summary>
     static std::vector<Tree*> getAncestors(Tree *t);
-
-    static std::vector<ParseTree*> *findAllTokenNodes(ParseTree *t, int ttype);
-
-    static std::vector<ParseTree*> *findAllRuleNodes(ParseTree *t, int ruleIndex);
-
-    static std::vector<ParseTree*> *findAllNodes(ParseTree *t, int index, bool findTokens);
+    static std::vector<ParseTree*> findAllTokenNodes(ParseTree *t, int ttype);
+    static std::vector<ParseTree*> findAllRuleNodes(ParseTree *t, int ruleIndex);
+    static std::vector<ParseTree*> findAllNodes(ParseTree *t, int index, bool findTokens);
 
     template<typename T1>
-    static void _findAllNodes(ParseTree *t, int index, bool findTokens, std::vector<T1> nodes) {
+    static void _findAllNodes(ParseTree *t, int index, bool findTokens, std::vector<T1> &nodes) {
       // check this node (the root) first
       if (findTokens && (TerminalNode*)(t) != nullptr) {
         TerminalNode *tnode = (TerminalNode*)(t);
@@ -118,7 +92,7 @@ namespace tree {
       }
     }
 
-    static std::vector<ParseTree*>* descendants(ParseTree *t);
+    static std::vector<ParseTree*> descendants(ParseTree *t);
 
   private:
     Trees();

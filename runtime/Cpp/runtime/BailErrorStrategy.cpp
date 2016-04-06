@@ -43,7 +43,7 @@ void BailErrorStrategy::recover(Parser *recognizer, RecognitionException *e) {
     context->exception = e;
   }
 
-  throw new ParseCancellationException(e);
+  throw ParseCancellationException(e);
 }
 
 Token *BailErrorStrategy::recoverInline(Parser *recognizer)  {
@@ -55,7 +55,7 @@ Token *BailErrorStrategy::recoverInline(Parser *recognizer)  {
     context->exception = e;
   }
 
-  throw new ParseCancellationException(e);
+  throw ParseCancellationException(e);
 
 }
 

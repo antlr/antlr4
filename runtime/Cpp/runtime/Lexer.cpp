@@ -37,9 +37,11 @@
 #include "stringconverter.h"
 #include "StringBuilder.h"
 #include "ANTLRErrorListener.h"
+#include "CPPUtils.h"
 
 #include "Lexer.h"
 
+using namespace antlrcpp;
 using namespace org::antlr::v4::runtime;
 
 Lexer::Lexer() {
@@ -74,63 +76,58 @@ void Lexer::reset() {
 
 Token *Lexer::nextToken() {
   if (_input == nullptr) {
-    throw new IllegalStateException("nextToken requires a non-null input stream.");
+    throw IllegalStateException("nextToken requires a non-null input stream.");
   }
 
   // Mark start location in char stream so unbuffered streams are
   // guaranteed at least have text of current token
   ssize_t tokenStartMarker = _input->mark();
-  try {
-    while (true) {
-    outerContinue:
-      if (_hitEOF) {
-        emitEOF();
-        return _token;
-      }
 
-      delete _token;
-      _channel = Token::DEFAULT_CHANNEL;
-      _tokenStartCharIndex = (int)_input->index();
-      _tokenStartCharPositionInLine = getInterpreter<atn::LexerATNSimulator>()->getCharPositionInLine();
-      _tokenStartLine = (int)getInterpreter<atn::LexerATNSimulator>()->getLine();
-      _text = L"";
-      do {
-        _type = Token::INVALID_TYPE;
-        int ttype;
-        try {
-          ttype = getInterpreter<atn::LexerATNSimulator>()->match(_input, (size_t)_mode);
-        } catch (LexerNoViableAltException *e) {
-          notifyListeners(e); // report error
-          recover(e);
-          ttype = SKIP;
-        }
-        if (_input->LA(1) == IntStream::_EOF) {
-          _hitEOF = true;
-        }
-        if (_type == Token::INVALID_TYPE) {
-          _type = ttype;
-        }
-        if (_type == SKIP) {
-          goto outerContinue;
-        }
-      } while (_type == MORE);
-      if (_token == nullptr) {
-        emit();
-      }
+  auto onExit = finally([this, tokenStartMarker]{
+    // make sure we release marker after match or
+    // unbuffered char stream will keep buffering
+    _input->release(tokenStartMarker);
+  });
+
+  while (true) {
+  outerContinue:
+    if (_hitEOF) {
+      emitEOF();
       return _token;
     }
 
+    delete _token;
+    _token = nullptr;
+    _channel = Token::DEFAULT_CHANNEL;
+    _tokenStartCharIndex = (int)_input->index();
+    _tokenStartCharPositionInLine = getInterpreter<atn::LexerATNSimulator>()->getCharPositionInLine();
+    _tokenStartLine = (int)getInterpreter<atn::LexerATNSimulator>()->getLine();
+    _text = L"";
+    do {
+      _type = Token::INVALID_TYPE;
+      int ttype;
+      try {
+        ttype = getInterpreter<atn::LexerATNSimulator>()->match(_input, (size_t)_mode);
+      } catch (LexerNoViableAltException *e) {
+        notifyListeners(e); // report error
+        recover(e);
+        ttype = SKIP;
+      }
+      if (_input->LA(1) == EOF) {
+        _hitEOF = true;
+      }
+      if (_type == Token::INVALID_TYPE) {
+        _type = ttype;
+      }
+      if (_type == SKIP) {
+        goto outerContinue;
+      }
+    } while (_type == MORE);
+    if (_token == nullptr) {
+      emit();
+    }
+    return _token;
   }
-  catch(...) {
-#ifdef TODO
-    // Do something intelligent here for once
-#endif
-  }
-
-  // make sure we release marker after match or
-  // unbuffered char stream will keep buffering
-  _input->release(tokenStartMarker);
-  return nullptr;
 }
 
 void Lexer::skip() {
@@ -205,7 +202,7 @@ Token *Lexer::emitEOF() {
     int n = _token->getStopIndex() - _token->getStartIndex() + 1;
     cpos = _token->getCharPositionInLine() + n;
   }
-  Token *eof = (Token*)_factory->create(_tokenFactorySourcePair, Token::_EOF, L"", Token::DEFAULT_CHANNEL,
+  Token *eof = (Token*)_factory->create(_tokenFactorySourcePair, EOF, L"", Token::DEFAULT_CHANNEL,
     (int)_input->index(), (int)_input->index() - 1, (int)getLine(), cpos);
   emit(eof);
   return eof;
@@ -269,7 +266,7 @@ int Lexer::getChannel() {
 std::vector<Token*> Lexer::getAllTokens() {
   std::vector<Token*> tokens = std::vector<Token*>();
   Token *t = nextToken();
-  while (t->getType() != Token::_EOF) {
+  while (t->getType() != EOF) {
     tokens.push_back(t);
     t = nextToken();
   }
@@ -277,7 +274,7 @@ std::vector<Token*> Lexer::getAllTokens() {
 }
 
 void Lexer::recover(LexerNoViableAltException *e) {
-  if (_input->LA(1) != IntStream::_EOF) {
+  if (_input->LA(1) != EOF) {
     // skip a char and try again
     getInterpreter<atn::LexerATNSimulator>()->consume(_input);
   }
@@ -309,7 +306,7 @@ std::wstring Lexer::getErrorDisplay(const std::wstring &s) {
 std::wstring Lexer::getErrorDisplay(int c) {
   std::wstring s = antlrcpp::StringConverterHelper::toString(static_cast<wchar_t>(c));
   switch (c) {
-    case Token::_EOF :
+    case EOF :
       s = L"<EOF>";
       break;
     case L'\n' :
@@ -331,7 +328,7 @@ std::wstring Lexer::getCharErrorDisplay(int c) {
 }
 
 void Lexer::recover(RecognitionException *re) {
-  // TODO: Do we lose character or line position information?
+  // TO_DO: Do we lose character or line position information?
   _input->consume();
 }
 

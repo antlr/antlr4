@@ -47,3 +47,17 @@ std::wstring Arrays::listToString(const std::vector<std::wstring> &list, const s
 
   return sb.toString();
 }
+
+template <>
+std::wstring Arrays::toString(const std::vector<org::antlr::v4::runtime::tree::Tree*> &source) {
+  std::wstring result = L"[";
+  bool firstEntry = true;
+  for (auto value : source) {
+    result += value->toStringTree();
+    if (firstEntry) {
+      result += L", ";
+      firstEntry = false;
+    }
+  }
+  return result + L"]";
+}

@@ -41,15 +41,15 @@ namespace atn {
 
   class SingletonPredictionContext : public PredictionContext {
   public:
-    PredictionContext *const parent;
+    const std::weak_ptr<PredictionContext> parent;
     const int returnState;
 
-    SingletonPredictionContext(PredictionContext *parent, int returnState);
+    SingletonPredictionContext(std::weak_ptr<PredictionContext> parent, int returnState);
 
-    static SingletonPredictionContext *create(PredictionContext *parent, int returnState);
+    static SingletonPredictionContextRef create(std::weak_ptr<PredictionContext> parent, int returnState);
 
     virtual size_t size() const override;
-    virtual PredictionContext *getParent(size_t index) const override;
+    virtual std::weak_ptr<PredictionContext> getParent(size_t index) const override;
     virtual int getReturnState(size_t index) const override;
     virtual bool operator == (const PredictionContext &o) const override;
     virtual std::wstring toString() const;

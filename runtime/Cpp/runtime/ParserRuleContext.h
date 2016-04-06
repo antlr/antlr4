@@ -71,7 +71,7 @@ namespace runtime {
     ///  how we parse this rule.
     /// </summary>
   public:
-    std::vector<ParseTree*> _children;
+    std::vector<ParseTree*> children;
 
     /// <summary>
     /// For debugging/tracing purposes, we want to track all of the nodes in
@@ -139,12 +139,12 @@ namespace runtime {
 
     template<typename T>
     T* getChild(size_t i) {
-      if (_children.empty()) {
+      if (children.empty()) {
         return nullptr;
       }
 
       size_t j = 0; // what element have we found with ctxType?
-      for (auto &child : _children) {
+      for (auto &child : children) {
         if (dynamic_cast<T *>(child) != nullptr) {
           if (j++ == i) {
             return dynamic_cast<T *>(child);
@@ -165,12 +165,12 @@ namespace runtime {
 
     template<typename T>
     std::vector<T*> getRuleContexts() {
-      if (_children.empty()) {
+      if (children.empty()) {
         return std::vector<T *>();
       }
 
       std::vector<T *> contexts;
-      for (auto &child : _children) {
+      for (auto &child : children) {
         if (dynamic_cast<T *>(child)) {
           if (contexts.empty()) {
             contexts = std::vector<T *>();

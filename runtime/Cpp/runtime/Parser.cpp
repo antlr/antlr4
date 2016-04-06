@@ -91,16 +91,15 @@ void Parser::TrimToSizeListener::visitErrorNode(tree::ErrorNode *node) {
 }
 
 void Parser::TrimToSizeListener::exitEveryRule(ParserRuleContext *ctx) {
-  // TODO: Need to figure out what type this is going to be.  In Java we expect it to be set by the generator.
-  std::vector<tree::ParseTree*>* tmp = dynamic_cast<std::vector<tree::ParseTree*>*>(&ctx->_children);
-  if (tmp != nullptr) {
-    tmp->shrink_to_fit();
-  }
+  ctx->children.shrink_to_fit();
 }
 
-Parser::Parser(TokenStream* input) {
+Parser::Parser(TokenStream* input) : _tracer(this) {
   InitializeInstanceFields();
   setInputStream(input);
+}
+
+Parser::~Parser() {
 }
 
 void Parser::reset() {
@@ -274,12 +273,12 @@ tree::pattern::ParseTreePattern *Parser::compileParseTreePattern(const std::wstr
   return m->compile(pattern, patternRuleIndex);
 }
 
-ANTLRErrorStrategy *Parser::getErrorHandler() {
+std::shared_ptr<ANTLRErrorStrategy> Parser::getErrorHandler() {
   return _errHandler;
 }
 
-void Parser::setErrorHandler(ANTLRErrorStrategy *handler) {
-  this->_errHandler = handler;
+void Parser::setErrorHandler(std::shared_ptr<ANTLRErrorStrategy> handler) {
+  _errHandler = handler;
 }
 
 TokenStream *Parser::getInputStream() {
@@ -468,7 +467,7 @@ bool Parser::precpred(RuleContext *localctx, int precedence) {
 }
 
 bool Parser::inContext(const std::wstring &context) {
-  // TODO: useful in parser?
+  // TO_DO: useful in parser?
   return false;
 }
 
@@ -497,7 +496,7 @@ bool Parser::isExpectedToken(int symbol) {
     ctx = static_cast<ParserRuleContext*>(ctx->parent);
   }
 
-  if (following.contains(Token::EPSILON) && symbol == Token::_EOF) {
+  if (following.contains(Token::EPSILON) && symbol == EOF) {
     return true;
   }
 
@@ -587,22 +586,15 @@ std::string Parser::getSourceName() {
 
 void Parser::setTrace(bool trace) {
   if (!trace) {
-    removeParseListener(_tracer);
-    // TODO
-    //JAVA TO C++ CONVERTER WARNING: Java to C++ Converter converted the original 'null' assignment to a call to 'delete', but you should review memory allocation of all pointer variables in the converted code:
-    delete _tracer;
+    removeParseListener(&_tracer);
   } else {
-    if (_tracer != nullptr) {
-      removeParseListener(_tracer);
-    } else {
-      _tracer = new TraceListener(this);
-    }
-    addParseListener(_tracer);
+    removeParseListener(&_tracer); // Just in case this is triggered multiple times.
+    addParseListener(&_tracer);
   }
 }
 
 void Parser::InitializeInstanceFields() {
-  _errHandler = new DefaultErrorStrategy();
+  _errHandler.reset(new DefaultErrorStrategy());
   _precedenceStack.clear();
   _precedenceStack.push_back(0);
   _buildParseTrees = true;

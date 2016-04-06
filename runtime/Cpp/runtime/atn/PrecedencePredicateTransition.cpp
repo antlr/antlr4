@@ -48,8 +48,8 @@ bool PrecedencePredicateTransition::matches(int symbol, int minVocabSymbol, int 
   return false;
 }
 
-org::antlr::v4::runtime::atn::SemanticContext::PrecedencePredicate *PrecedencePredicateTransition::getPredicate() const {
-  return new SemanticContext::PrecedencePredicate(precedence);
+std::shared_ptr<SemanticContext::PrecedencePredicate> PrecedencePredicateTransition::getPredicate() const {
+  return std::make_shared<SemanticContext::PrecedencePredicate>(precedence);
 }
 
 std::wstring PrecedencePredicateTransition::toString() const {

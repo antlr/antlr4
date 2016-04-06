@@ -38,32 +38,6 @@
 
 using namespace org::antlr::v4::runtime::tree;
 
-#ifdef TODO
-// Postscript output to be supported (maybe)
-std::wstring Trees::getPS(Tree *t, std::vector<std::wstring> &ruleNames, const std::wstring &fontName, int fontSize) {
-  TreePostScriptGenerator *psgen = new TreePostScriptGenerator(ruleNames, t, fontName, fontSize);
-  return psgen->getPS();
-}
-
-std::wstring Trees::getPS(Tree *t, std::vector<std::wstring> &ruleNames) {
-  return getPS(t, ruleNames, L"Helvetica", 11);
-}
-
-void Trees::writePS(Tree *t, std::vector<std::wstring> &ruleNames, const std::wstring &fileName, const std::wstring &fontName, int fontSize) throw(IOException) {
-  std::wstring ps = getPS(t, ruleNames, fontName, fontSize);
-  FileWriter *f = new FileWriter(fileName);
-  BufferedWriter *bw = new BufferedWriter(f);
-  try {
-    bw->write(ps);
-  } finally {
-    bw->close();
-  }
-}
-void Trees::writePS(Tree *t, std::vector<std::wstring> &ruleNames, const std::wstring &fileName) {
-  writePS(t, ruleNames, fileName, L"Helvetica", 11);
-}
-#endif
-
 std::wstring Trees::toStringTree(Tree *t) {
   return toStringTree(t, nullptr);//static_cast<std::vector<std::wstring>>(nullptr));
 }
@@ -151,28 +125,28 @@ std::vector<Tree*> Trees::getAncestors(Tree *t) {
   return ancestors;
 }
 
-std::vector<ParseTree*> *Trees::findAllTokenNodes(ParseTree *t, int ttype) {
+std::vector<ParseTree*> Trees::findAllTokenNodes(ParseTree *t, int ttype) {
   return findAllNodes(t, ttype, true);
 }
 
-std::vector<ParseTree*> *Trees::findAllRuleNodes(ParseTree *t, int ruleIndex) {
+std::vector<ParseTree*> Trees::findAllRuleNodes(ParseTree *t, int ruleIndex) {
   return findAllNodes(t, ruleIndex, false);
 }
 
-std::vector<ParseTree*> *Trees::findAllNodes(ParseTree *t, int index, bool findTokens) {
-  std::vector<ParseTree*> *nodes = new std::vector<ParseTree*>();
-  _findAllNodes<ParseTree*>(t, index, findTokens, *nodes);
+std::vector<ParseTree*> Trees::findAllNodes(ParseTree *t, int index, bool findTokens) {
+  std::vector<ParseTree*> nodes;
+  _findAllNodes<ParseTree*>(t, index, findTokens, nodes);
   return nodes;
 }
 
-std::vector<ParseTree*>* Trees::descendants(ParseTree *t) {
-  std::vector<ParseTree*> *nodes = new std::vector<ParseTree*>();
-  nodes->insert(nodes->end(), t);
+std::vector<ParseTree*> Trees::descendants(ParseTree *t) {
+  std::vector<ParseTree*> nodes;
+  nodes.push_back(t);
   std::size_t n = t->getChildCount();
   for (size_t i = 0 ; i < n ; i++) {
-    std::vector<ParseTree*>* tmp = descendants(t->getChild(i));
-    for (auto foo:*tmp) {
-      nodes->insert(nodes->end(), foo);
+    std::vector<ParseTree*> tmp = descendants(t->getChild(i));
+    for (auto foo: tmp) {
+      nodes.push_back(foo);
     }
   }
   return nodes;

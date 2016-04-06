@@ -48,7 +48,7 @@ namespace runtime {
     std::vector<std::wstring> _modeNames;
     std::vector<dfa::DFA*> _decisionToDFA;
 
-    atn::PredictionContextCache *const _sharedContextCache;
+    std::shared_ptr<atn::PredictionContextCache> _sharedContextCache;
 
   public:
     LexerInterpreter(const std::wstring &grammarFileName, std::vector<std::wstring> *tokenNames, std::vector<std::wstring> *ruleNames, std::vector<std::wstring> *modeNames, const atn::ATN &atn, CharStream *input);

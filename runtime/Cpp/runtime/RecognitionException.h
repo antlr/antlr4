@@ -125,24 +125,6 @@ namespace runtime {
     void InitializeInstanceFields();
   };
 
-  /**
-   * This exception is thrown to cancel a parsing operation. This exception does
-   * not extend RecognitionException, allowing it to bypass the standard
-   * error recovery mechanisms. BailErrorStrategy throws this exception in
-   * response to a parse error.
-   */
-  class ParseCancellationException : public IllegalStateException {
-  public:
-    ParseCancellationException();
-    ParseCancellationException(RecognitionException *cause);
-    ParseCancellationException(const std::string &msg, RecognitionException *cause = nullptr);
-  };
-
-  class EmptyStackException : public RuntimeException {
-  public:
-    EmptyStackException() : RuntimeException() {};
-  };
-
 } // namespace runtime
 } // namespace v4
 } // namespace antlr

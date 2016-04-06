@@ -144,7 +144,7 @@ namespace runtime {
     virtual void add(size_t c);
 
   public:
-    virtual size_t LA(ssize_t i) override;
+    virtual ssize_t LA(ssize_t i) override;
 
     /// <summary>
     /// Return a marker that we can release later.

@@ -43,7 +43,7 @@ using namespace org::antlr::v4::runtime;
 BufferedTokenStream::BufferedTokenStream(TokenSource *tokenSource) {
   InitializeInstanceFields();
   if (tokenSource == nullptr) {
-    throw new NullPointerException("tokenSource cannot be null");
+    throw NullPointerException("tokenSource cannot be null");
   }
   this->tokenSource = tokenSource;
 }
@@ -78,8 +78,8 @@ size_t BufferedTokenStream::size() {
 }
 
 void BufferedTokenStream::consume() {
-  if (LA(1) == _EOF) {
-    throw new IllegalStateException("cannot consume EOF");
+  if (LA(1) == EOF) {
+    throw IllegalStateException("cannot consume EOF");
   }
 
   if (sync(p + 1)) {
@@ -109,7 +109,7 @@ size_t BufferedTokenStream::fetch(size_t n) {
       (static_cast<WritableToken*>(t))->setTokenIndex((int)tokens.size());
     }
     tokens.push_back(t);
-    if (t->getType() == Token::_EOF) {
+    if (t->getType() == EOF) {
       fetchedEOF = true;
       return i + 1;
     }
@@ -142,7 +142,7 @@ std::vector<Token*> BufferedTokenStream::get(size_t start, size_t stop) {
   }
   for (size_t i = start; i <= stop; i++) {
     Token *t = tokens[i];
-    if (t->getType() == Token::_EOF) {
+    if (t->getType() == EOF) {
       break;
     }
     subset.push_back(t);
@@ -150,8 +150,8 @@ std::vector<Token*> BufferedTokenStream::get(size_t start, size_t stop) {
   return subset;
 }
 
-size_t BufferedTokenStream::LA(ssize_t i) {
-  return (size_t)LT(i)->getType();
+ssize_t BufferedTokenStream::LA(ssize_t i) {
+  return LT(i)->getType();
 }
 
 Token *BufferedTokenStream::LB(size_t k) {
@@ -213,12 +213,12 @@ std::vector<Token*> BufferedTokenStream::getTokens(int start, int stop) {
 std::vector<Token*> BufferedTokenStream::getTokens(int start, int stop, std::vector<int> *types) {
   lazyInit();
   if (start < 0 || stop >= (int)tokens.size() || stop < 0 || (int)start >= (int)tokens.size()) {
-    throw new IndexOutOfBoundsException(std::string("start ") +
-                                        std::to_string(start) +
-                                        std::string(" or stop ") +
-                                        std::to_string(stop) +
-                                        std::string(" not in 0..") +
-                                        std::to_string(tokens.size() - 1));
+    throw IndexOutOfBoundsException(std::string("start ") +
+                                    std::to_string(start) +
+                                    std::string(" or stop ") +
+                                    std::to_string(stop) +
+                                    std::string(" not in 0..") +
+                                    std::to_string(tokens.size() - 1));
   }
   if (start > stop) {
     return std::vector<Token*>();
@@ -257,7 +257,7 @@ ssize_t BufferedTokenStream::nextTokenOnChannel(size_t i, int channel) {
 
   Token *token = tokens[i];
   while (token->getChannel() != channel) {
-    if (token->getType() == Token::_EOF) {
+    if (token->getType() == EOF) {
       return -1;
     }
     i++;
@@ -281,9 +281,7 @@ ssize_t BufferedTokenStream::previousTokenOnChannel(size_t i, int channel) const
 std::vector<Token*> BufferedTokenStream::getHiddenTokensToRight(size_t tokenIndex, int channel) {
   lazyInit();
   if (tokenIndex >= tokens.size()) {
-    throw new IndexOutOfBoundsException(std::to_string(tokenIndex) +
-                                        std::string(" not in 0..") +
-                                        std::to_string(tokens.size() - 1));
+    throw IndexOutOfBoundsException(std::to_string(tokenIndex) + " not in 0.." + std::to_string(tokens.size() - 1));
   }
 
   ssize_t nextOnChannel = nextTokenOnChannel(tokenIndex + 1, Lexer::DEFAULT_TOKEN_CHANNEL);
@@ -306,9 +304,7 @@ std::vector<Token*> BufferedTokenStream::getHiddenTokensToRight(size_t tokenInde
 std::vector<Token*> BufferedTokenStream::getHiddenTokensToLeft(size_t tokenIndex, int channel) {
   lazyInit();
   if (tokenIndex >= tokens.size()) {
-    throw new IndexOutOfBoundsException(std::to_string(tokenIndex) +
-                                        std::string(" not in 0..") +
-                                        std::to_string(tokens.size() - 1));
+    throw IndexOutOfBoundsException(std::to_string(tokenIndex) + " not in 0.." + std::to_string(tokens.size() - 1));
   }
 
   ssize_t prevOnChannel = previousTokenOnChannel(tokenIndex - 1, Lexer::DEFAULT_TOKEN_CHANNEL);
@@ -374,7 +370,7 @@ std::wstring BufferedTokenStream::getText(const misc::Interval &interval) {
   antlrcpp::StringBuilder *buf = new antlrcpp::StringBuilder();
   for (size_t i = (size_t)start; i <= (size_t)stop; i++) {
     Token *t = tokens[i];
-    if (t->getType() == Token::_EOF) {
+    if (t->getType() == EOF) {
       break;
     }
     buf->append(t->getText());

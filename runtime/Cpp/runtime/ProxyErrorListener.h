@@ -50,12 +50,12 @@ namespace runtime {
     template<typename T1> //where T1 : ANTLRErrorListener
     ProxyErrorListener(std::vector<T1> *delegates) : delegates(delegates) {
       if (delegates == nullptr) {
-        throw new NullPointerException("delegates");
+        throw NullPointerException("delegates");
       }
     }
 
-    void syntaxError(IRecognizer *recognizer, void *offendingSymbol, size_t line, int charPositionInLine,
-                     const std::wstring &msg, RecognitionException *e) {
+    void syntaxError(IRecognizer *recognizer, Token *offendingSymbol, size_t line, int charPositionInLine,
+                     const std::wstring &msg, RecognitionException *e) override {
       for (auto listener : *delegates) {
         listener->syntaxError(recognizer, offendingSymbol, line, charPositionInLine, msg, e);
       }

@@ -33,6 +33,10 @@
 
 using namespace org::antlr::v4::runtime;
 
+void BaseErrorListener::syntaxError(IRecognizer *recognizer, Token *offendingSymbol, size_t line, int charPositionInLine,
+                                    const std::wstring &msg, RecognitionException *e) {
+}
+
 void BaseErrorListener::reportAmbiguity(Parser *recognizer, dfa::DFA *dfa, size_t startIndex, size_t stopIndex,
                                         bool exact, antlrcpp::BitSet *ambigAlts, atn::ATNConfigSet *configs) {
 }

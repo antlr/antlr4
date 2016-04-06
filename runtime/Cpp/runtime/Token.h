@@ -55,7 +55,7 @@ namespace runtime {
 
     static const size_t MIN_USER_TOKEN_TYPE = 1;
 
-    static const size_t _EOF = IntStream::_EOF;
+    //static const size_t _EOF = IntStream::_EOF; no need to define another EOF.
 
     // This isn't necessary
     virtual ~Token() {};
@@ -132,6 +132,8 @@ namespace runtime {
     /// Gets the <seealso cref="CharStream"/> from which this token was derived.
     /// </summary>
     virtual CharStream *getInputStream() = 0;
+
+    virtual std::wstring toString();
   };
 
 } // namespace runtime

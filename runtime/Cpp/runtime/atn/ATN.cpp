@@ -97,7 +97,7 @@ int ATN::getNumberOfDecisions() const {
 
 misc::IntervalSet ATN::getExpectedTokens(int stateNumber, RuleContext *context) const {
   if (stateNumber < 0 || stateNumber >= (int)states.size()) {
-    throw new IllegalArgumentException("Invalid state number.");
+    throw IllegalArgumentException("Invalid state number.");
   }
 
   RuleContext *ctx = context;
@@ -120,7 +120,7 @@ misc::IntervalSet ATN::getExpectedTokens(int stateNumber, RuleContext *context) 
   }
 
   if (following.contains(Token::EPSILON)) {
-    expected.add(Token::_EOF);
+    expected.add(EOF);
   }
 
   return expected;

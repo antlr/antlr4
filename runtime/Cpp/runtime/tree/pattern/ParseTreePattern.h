@@ -93,20 +93,18 @@ namespace pattern {
     /// pattern; otherwise, {@code false}. </returns>
     virtual bool matches(ParseTree *tree);
 
-    // TODO:  Come back to this after the base runtime works.
-#if 0
-    /// <summary>
     /// Find all nodes using XPath and then try to match those subtrees against
     /// this tree pattern.
-    /// </summary>
-    /// <param name="tree"> The <seealso cref="ParseTree"/> to match against this pattern. </param>
-    /// <param name="xpath"> An expression matching the nodes
-    /// </param>
-    /// <returns> A collection of <seealso cref="ParseTreeMatch"/> objects describing the
+    /// @param tree The ParseTree to match against this pattern.
+    /// @param xpath An expression matching the nodes
+    ///
+    /// @returns A collection of ParseTreeMatch objects describing the
     /// successful matches. Unsuccessful matches are omitted from the result,
-    /// regardless of the reason for the failure. </returns>
-    virtual std::vector<ParseTreeMatch*> findAll(ParseTree *tree, const std::wstring &xpath);
-#endif
+    /// regardless of the reason for the failure.
+
+    // A full blown XPath implementation just for this single function which is nowhere used?
+    // Readd the XPath stuff from ANTLR if you really need that.
+    //virtual std::vector<ParseTreeMatch*> findAll(ParseTree *tree, const std::wstring &xpath);
 
     /// <summary>
     /// Get the <seealso cref="ParseTreePatternMatcher"/> which created this tree pattern.

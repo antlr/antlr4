@@ -37,48 +37,43 @@
 
 using namespace org::antlr::v4::runtime::atn;
 
-ATNConfig::ATNConfig(ATNConfig *old) : state(old->state), alt(old->alt), semanticContext(old->semanticContext) {
-  InitializeInstanceFields();
-  this->context = old->context;
-  this->reachesIntoOuterContext = old->reachesIntoOuterContext;
+ATNConfig::ATNConfig(ATNState *state, int alt, PredictionContextRef context)
+  : ATNConfig(state, alt, context, SemanticContext::NONE) {
 }
 
-ATNConfig::ATNConfig(ATNState *state, int alt, PredictionContext *context) : state(state), alt(alt), context(context), semanticContext(nullptr) {
+ATNConfig::ATNConfig(ATNState *state, int alt, PredictionContextRef context, SemanticContextRef semanticContext)
+  : state(state), alt(alt), context(context), semanticContext(semanticContext) {
+  reachesIntoOuterContext = 0;
 }
 
-ATNConfig::ATNConfig(ATNState *state, int alt, PredictionContext *context, SemanticContext *semanticContext) : state(state), alt(alt), semanticContext(semanticContext) {
-  InitializeInstanceFields();
-  this->context = context;
+ATNConfig::ATNConfig(ATNConfig *c) : ATNConfig(c, c->state, c->context, c->semanticContext) {
 }
 
-ATNConfig::ATNConfig(ATNConfig *c, ATNState *state) : state(state), alt(0), context(nullptr), semanticContext(nullptr)
-{
+ATNConfig::ATNConfig(ATNConfig *c, ATNState *state) : ATNConfig(c, state, c->context, c->semanticContext) {
 }
 
-ATNConfig::ATNConfig(ATNConfig *c, ATNState *state, SemanticContext *semanticContext) : state(state), alt(0), context(nullptr), semanticContext(semanticContext)
-{
+ATNConfig::ATNConfig(ATNConfig *c, ATNState *state, SemanticContextRef semanticContext)
+  : ATNConfig(c, state, c->context, semanticContext) {
 }
 
-ATNConfig::ATNConfig(ATNConfig *c, SemanticContext *semanticContext) : state(nullptr), alt(0), context(nullptr), semanticContext(semanticContext)
-{
+ATNConfig::ATNConfig(ATNConfig *c, SemanticContextRef semanticContext)
+  : ATNConfig(c, c->state, c->context, semanticContext) {
 }
 
-ATNConfig::ATNConfig(ATNConfig *c, ATNState *state, PredictionContext *context) : state(state), alt(0), context(context), semanticContext(nullptr)
-{
+ATNConfig::ATNConfig(ATNConfig *c, ATNState *state, PredictionContextRef context)
+  : ATNConfig(c, state, context, c->semanticContext) {
 }
 
-ATNConfig::ATNConfig(ATNConfig *c, ATNState *state, PredictionContext *context, SemanticContext *semanticContext) : state(state), alt(c->alt), semanticContext(semanticContext) {
-  InitializeInstanceFields();
-  this->context = context;
-  this->reachesIntoOuterContext = c->reachesIntoOuterContext;
+ATNConfig::ATNConfig(ATNConfig *c, ATNState *state, PredictionContextRef context, SemanticContextRef semanticContext)
+  : state(state), alt(c->alt), context(context), semanticContext(semanticContext), reachesIntoOuterContext(c->reachesIntoOuterContext) {
 }
 
 size_t ATNConfig::hashCode() const {
   size_t hashCode = misc::MurmurHash::initialize(7);
   hashCode = misc::MurmurHash::update(hashCode, (size_t)state->stateNumber);
   hashCode = misc::MurmurHash::update(hashCode, (size_t)alt);
-  hashCode = misc::MurmurHash::update(hashCode, (size_t)context);
-  hashCode = misc::MurmurHash::update(hashCode, (size_t)semanticContext);
+  hashCode = misc::MurmurHash::update(hashCode, (size_t)context.get());
+  hashCode = misc::MurmurHash::update(hashCode, (size_t)semanticContext.get());
   hashCode = misc::MurmurHash::finish(hashCode, 4);
   return hashCode;
 }
@@ -92,9 +87,4 @@ bool ATNConfig::operator == (const ATNConfig& other) const
 
 std::wstring ATNConfig::toString() {
   return toString(true);
-}
-
-
-void ATNConfig::InitializeInstanceFields() {
-  reachesIntoOuterContext = 0;
 }

@@ -40,7 +40,7 @@ namespace runtime {
 namespace atn {
 
   /// <summary>
-  /// TODO: make all transitions sets? no, should remove set edges </summary>
+  /// TO_DO: make all transitions sets? no, should remove set edges </summary>
   class AtomTransition final : public Transition {
     /// <summary>
     /// The token type or character value; or, signifies special label. </summary>

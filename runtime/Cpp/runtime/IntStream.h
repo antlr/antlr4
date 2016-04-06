@@ -53,13 +53,11 @@ namespace runtime {
   /// </ul>
   /// </summary>
   class IntStream {
-    /// <summary>
+  public:
     /// The value returned by <seealso cref="#LA LA()"/> when the end of the stream is
     /// reached.
-    /// </summary>
-  public:
-    // EOF Conflict with OS X, change to _EOF
-    static const size_t _EOF = std::ios::eofbit;
+    /// No explicit EOF definition. We got EOF on all platforms.
+    //static const size_t _EOF = std::ios::eofbit;
 
     /// <summary>
     /// The value returned by <seealso cref="#getSourceName"/> when the actual name of the
@@ -123,7 +121,7 @@ namespace runtime {
     /// </summary>
     /// <exception cref="UnsupportedOperationException"> if the stream does not support
     /// retrieving the value of the specified symbol </exception>
-    virtual size_t LA(ssize_t i) = 0;
+    virtual ssize_t LA(ssize_t i) = 0;
 
     /// <summary>
     /// A mark provides a guarantee that <seealso cref="#seek seek()"/> operations will be

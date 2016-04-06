@@ -37,28 +37,28 @@
 
 using namespace org::antlr::v4::runtime::atn;
 
-LexerATNConfig::LexerATNConfig(ATNState *state, int alt, PredictionContext *context) : ATNConfig(state, alt, context, SemanticContext::NONE), passedThroughNonGreedyDecision(false) {
-  InitializeInstanceFields();
+LexerATNConfig::LexerATNConfig(ATNState *state, int alt, PredictionContextRef context)
+  : ATNConfig(state, alt, context, SemanticContext::NONE), passedThroughNonGreedyDecision(false) {
 }
 
-LexerATNConfig::LexerATNConfig(ATNState *state, int alt, PredictionContext *context, int actionIndex) : ATNConfig(state, alt, context, SemanticContext::NONE), passedThroughNonGreedyDecision(false) {
-  InitializeInstanceFields();
-  this->lexerActionIndex = actionIndex;
+LexerATNConfig::LexerATNConfig(ATNState *state, int alt, PredictionContextRef context, int actionIndex)
+  : ATNConfig(state, alt, context, SemanticContext::NONE), passedThroughNonGreedyDecision(false) {
+  lexerActionIndex = actionIndex;
 }
 
-LexerATNConfig::LexerATNConfig(LexerATNConfig *c, ATNState *state) : ATNConfig(c, state, c->context, c->semanticContext), passedThroughNonGreedyDecision(checkNonGreedyDecision(c, state)) {
-  InitializeInstanceFields();
-  this->lexerActionIndex = c->lexerActionIndex;
+LexerATNConfig::LexerATNConfig(LexerATNConfig *c, ATNState *state)
+  : ATNConfig(c, state, c->context, c->semanticContext), passedThroughNonGreedyDecision(checkNonGreedyDecision(c, state)) {
+  lexerActionIndex = c->lexerActionIndex;
 }
 
-LexerATNConfig::LexerATNConfig(LexerATNConfig *c, ATNState *state, int actionIndex) : ATNConfig(c, state, c->context, c->semanticContext), passedThroughNonGreedyDecision(checkNonGreedyDecision(c, state)) {
-  InitializeInstanceFields();
-  this->lexerActionIndex = actionIndex;
+LexerATNConfig::LexerATNConfig(LexerATNConfig *c, ATNState *state, int actionIndex)
+  : ATNConfig(c, state, c->context, c->semanticContext), passedThroughNonGreedyDecision(checkNonGreedyDecision(c, state)) {
+  lexerActionIndex = actionIndex;
 }
 
-LexerATNConfig::LexerATNConfig(LexerATNConfig *c, ATNState *state, PredictionContext *context) : ATNConfig(c, state, context, c->semanticContext), passedThroughNonGreedyDecision(checkNonGreedyDecision(c, state)) {
-  InitializeInstanceFields();
-  this->lexerActionIndex = c->lexerActionIndex;
+LexerATNConfig::LexerATNConfig(LexerATNConfig *c, ATNState *state, PredictionContextRef context)
+  : ATNConfig(c, state, context, c->semanticContext), passedThroughNonGreedyDecision(checkNonGreedyDecision(c, state)) {
+  lexerActionIndex = c->lexerActionIndex;
 }
 
 bool LexerATNConfig::hasPassedThroughNonGreedyDecision() {
@@ -69,8 +69,8 @@ size_t LexerATNConfig::hashCode() const {
   size_t hashCode = misc::MurmurHash::initialize(7);
   hashCode = misc::MurmurHash::update(hashCode, (size_t)state->stateNumber);
   hashCode = misc::MurmurHash::update(hashCode, (size_t)alt);
-  hashCode = misc::MurmurHash::update(hashCode, (size_t)context);
-  hashCode = misc::MurmurHash::update(hashCode, (size_t)semanticContext);
+  hashCode = misc::MurmurHash::update(hashCode, (size_t)context.get());
+  hashCode = misc::MurmurHash::update(hashCode, (size_t)semanticContext.get());
   hashCode = misc::MurmurHash::update(hashCode, passedThroughNonGreedyDecision ? 1 : 0);
   hashCode = misc::MurmurHash::finish(hashCode, 5);
   return hashCode;
@@ -81,13 +81,10 @@ bool LexerATNConfig::operator == (const LexerATNConfig& other) const
   if (passedThroughNonGreedyDecision != other.passedThroughNonGreedyDecision)
     return false;
 
-  return ATNConfig::operator==(other);
+  return ATNConfig::operator == (other);
 }
 
 bool LexerATNConfig::checkNonGreedyDecision(LexerATNConfig *source, ATNState *target) {
-  return source->passedThroughNonGreedyDecision || (dynamic_cast<DecisionState*>(target) != nullptr && (static_cast<DecisionState*>(target))->nonGreedy);
-}
-
-void LexerATNConfig::InitializeInstanceFields() {
-  lexerActionIndex = -1;
+  return source->passedThroughNonGreedyDecision ||
+    (dynamic_cast<DecisionState*>(target) != nullptr && (static_cast<DecisionState*>(target))->nonGreedy);
 }

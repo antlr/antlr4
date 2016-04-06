@@ -40,6 +40,7 @@ LexerFileHeader(file, lexer, namedActions) ::= <<
 #pragma once
 
 #include "Lexer.h"
+#include "PredictionContext.h"
 
 <if (namedActions.header)><namedActions.header><endif>
 
@@ -64,10 +65,9 @@ LexerFile(file, lexer, namedActions) ::= <<
 #include "ATN.h"
 #include "DFA.h"
 #include "LexerATNSimulator.h"
-#include "PredictionContextCache.h"
 #include "ATNDeserializer.h"
 
-#include "<file.factory.grammar.name>.h"
+#include "<lexer.name>.h"
 
 using namespace org::antlr::v4::runtime;
 
@@ -84,6 +84,7 @@ ParserFileHeader(file, parser, namedActions) ::= <<
 
 #include "Parser.h"
 #include "ParserRuleContext.h"
+#include "PredictionContext.h"
 #include "CPPUtils.h"
 //#include "<file.grammarName>Visitor.h"
 
@@ -94,7 +95,7 @@ using namespace org::antlr::v4::runtime;
 <if (file.genPackage)>namespace <file.genPackage> {<endif>
 
 template \<typename T>
-class TParserVisitor;
+class <parser.name>Visitor;
   
 <parser>
 
@@ -109,7 +110,6 @@ ParserFile(file, parser, namedActions) ::= <<
 #include "ATN.h"
 #include "DFA.h"
 #include "ParserATNSimulator.h"
-#include "PredictionContextCache.h"
 #include "ANTLRErrorStrategy.h"
 #include "FailedPredicateException.h"
 #include "NoViableAltException.h"
@@ -118,7 +118,7 @@ ParserFile(file, parser, namedActions) ::= <<
 #include "ParseTreeListener.h"
 #include "<file.factory.grammar.name>Listener.h"
 
-#include "<file.factory.grammar.name>.h"
+#include "<parser.name>.h"
 
 using namespace antlrcpp;
 <if (file.genPackage)>using namespace <file.genPackage>;<endif>

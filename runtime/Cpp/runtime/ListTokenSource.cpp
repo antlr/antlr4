@@ -74,7 +74,7 @@ Token *ListTokenSource::nextToken() {
       }
 
       int stop = std::max(-1, start - 1);
-      eofToken = _factory->create(new std::pair<TokenSource*, CharStream*>(this, getInputStream()), Token::_EOF,
+      eofToken = _factory->create(new std::pair<TokenSource*, CharStream*>(this, getInputStream()), EOF,
                                   L"EOF", Token::DEFAULT_CHANNEL, start, stop, (int)getLine(), getCharPositionInLine());
     }
 
@@ -82,7 +82,7 @@ Token *ListTokenSource::nextToken() {
   }
 
   Token *t = tokens[i];
-  if (i == tokens.size() - 1 && t->getType() == Token::_EOF) {
+  if (i == tokens.size() - 1 && t->getType() == EOF) {
     eofToken = t;
   }
 

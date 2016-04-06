@@ -31,6 +31,7 @@
 #pragma once
 
 #include "StringBuilder.h"
+#include "Tree.h"
 
 namespace antlrcpp {
   
@@ -57,7 +58,19 @@ namespace antlrcpp {
         return false;
 
       for (size_t i = 0; i < a.size(); ++i)
-        if (*a[i] != *b[i]) // Requires that the != operator is supported by the template type.
+        if (*a[i] != *b[i])
+          return false;
+
+      return true;
+    }
+    
+    template <typename T>
+    static bool equals(const std::vector<std::weak_ptr<T>> &a, const std::vector<std::weak_ptr<T>> &b) {
+      if (a.size() != b.size())
+        return false;
+
+      for (size_t i = 0; i < a.size(); ++i)
+        if (*a[i].lock() != *b[i].lock())
           return false;
 
       return true;
@@ -71,6 +84,50 @@ namespace antlrcpp {
       return result;
     }
 
+    template <typename T>
+    static std::wstring toString(const std::vector<T> &source) {
+      std::wstring result = L"[";
+      bool firstEntry = true;
+      for (auto &value : source) {
+        result += value.toString();
+        if (firstEntry) {
+          result += L", ";
+          firstEntry = false;
+        }
+      }
+      return result + L"]";
+    }
+
+    template <typename T>
+    static std::wstring toString(const std::vector<std::shared_ptr<T>> &source) {
+      std::wstring result = L"[";
+      bool firstEntry = true;
+      for (auto &value : source) {
+        result += value->toString();
+        if (firstEntry) {
+          result += L", ";
+          firstEntry = false;
+        }
+      }
+      return result + L"]";
+    }
+
+    template <typename T>
+    static std::wstring toString(const std::vector<T*> &source) {
+      std::wstring result = L"[";
+      bool firstEntry = true;
+      for (auto value : source) {
+        result += value->toString();
+        if (firstEntry) {
+          result += L", ";
+          firstEntry = false;
+        }
+      }
+      return result + L"]";
+    }
+
   };
 
+  template <>
+  std::wstring Arrays::toString(const std::vector<org::antlr::v4::runtime::tree::Tree*> &source);
 }

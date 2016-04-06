@@ -156,7 +156,7 @@ std::vector<size_t>* ATNSerializer::serialize() {
     ATNState *ruleStartState = atn->ruleToStartState[r];
     data->push_back((size_t)ruleStartState->stateNumber);
     if (atn->grammarType == ATNType::LEXER) {
-      if (atn->ruleToTokenType[r] == Token::_EOF) {
+      if (atn->ruleToTokenType[r] == EOF) {
         data->push_back(WCHAR_MAX);
       }
       else {
@@ -183,8 +183,8 @@ std::vector<size_t>* ATNSerializer::serialize() {
   size_t nsets = sets.size();
   data->push_back(nsets);
   for (auto set : sets) {
-    bool containsEof = set.contains(Token::_EOF);
-    if (containsEof && set.getIntervals().at(0).b == Token::_EOF) {
+    bool containsEof = set.contains(EOF);
+    if (containsEof && set.getIntervals().at(0).b == EOF) {
       data->push_back(set.getIntervals().size() - 1);
     }
     else {
@@ -193,8 +193,8 @@ std::vector<size_t>* ATNSerializer::serialize() {
 
     data->push_back(containsEof ? 1 : 0);
     for (auto &interval : set.getIntervals()) {
-      if (interval.a == Token::_EOF) {
-        if (interval.b == Token::_EOF) {
+      if (interval.a == EOF) {
+        if (interval.b == EOF) {
           continue;
         } else {
           data->push_back(0);
@@ -257,7 +257,7 @@ std::vector<size_t>* ATNSerializer::serialize() {
         case Transition::RANGE:
           arg1 = (static_cast<RangeTransition *>(t))->from;
           arg2 = (static_cast<RangeTransition *>(t))->to;
-          if (arg1 == Token::_EOF) {
+          if (arg1 == EOF) {
             arg1 = 0;
             arg3 = 1;
           }
@@ -265,7 +265,7 @@ std::vector<size_t>* ATNSerializer::serialize() {
           break;
         case Transition::ATOM:
           arg1 = (static_cast<AtomTransition *>(t))->_label;
-          if (arg1 == Token::_EOF) {
+          if (arg1 == EOF) {
             arg1 = 0;
             arg3 = 1;
           }
@@ -438,7 +438,7 @@ std::wstring ATNSerializer::decode(const std::wstring& inpdata) {
     buf.append(std::to_wstring(i)).append(L":");
     bool containsEof = data[p++] != 0;
     if (containsEof) {
-      buf.append(getTokenName(Token::_EOF));
+      buf.append(getTokenName(EOF));
     }
 
     for (int j = 0; j < nintervals; j++) {

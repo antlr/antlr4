@@ -58,14 +58,13 @@ namespace atn {
     /// What alt (or lexer rule) is predicted by this configuration </summary>
     const int alt;
 
-    /// <summary>
     /// The stack of invoking states leading to the rule/states associated
-    ///  with this config.  We track only those contexts pushed during
-    ///  execution of the ATN simulator.
-    /// </summary>
-    PredictionContext *context;
+    /// with this config.  We track only those contexts pushed during
+    /// execution of the ATN simulator.
+    ///
+    /// Can be shared between multiple ANTConfig instances.
+    PredictionContextRef context;
 
-    /// <summary>
     /// We cannot execute predicates dependent upon local context unless
     /// we know for sure we are in the correct context. Because there is
     /// no way to do this efficiently, we simply cannot evaluate
@@ -74,20 +73,21 @@ namespace atn {
     ///
     /// closure() tracks the depth of how far we dip into the
     /// outer context: depth > 0.  Note that it may not be totally
-    /// accurate depth since I don't ever decrement. TODO: make it a boolean then
-    /// </summary>
+    /// accurate depth since I don't ever decrement. TO_DO: make it a boolean then
     int reachesIntoOuterContext;
 
-    SemanticContext *const semanticContext;
+    /// Can be shared between multiple ATNConfig instances.
+    SemanticContextRef semanticContext;
 
-    ATNConfig(ATNConfig *old); // dup
-    ATNConfig(ATNState *state, int alt, PredictionContext *context); //this(state, alt, context, SemanticContext.NONE);
-    ATNConfig(ATNState *state, int alt, PredictionContext *context, SemanticContext *semanticContext);
-    ATNConfig(ATNConfig *c, ATNState *state); //this(c, state, c.context, c.semanticContext);
-    ATNConfig(ATNConfig *c, ATNState *state, SemanticContext *semanticContext); //this(c, state, c.context, semanticContext);
-    ATNConfig(ATNConfig *c, SemanticContext *semanticContext); //this(c, c.state, c.context, semanticContext);
-    ATNConfig(ATNConfig *c, ATNState *state, PredictionContext *context); //this(c, state, context, c.semanticContext);
-    ATNConfig(ATNConfig *c, ATNState *state, PredictionContext *context, SemanticContext *semanticContext);
+    ATNConfig(ATNState *state, int alt, PredictionContextRef context);
+    ATNConfig(ATNState *state, int alt, PredictionContextRef context, SemanticContextRef semanticContext);
+
+    ATNConfig(ATNConfig *c); // dup
+    ATNConfig(ATNConfig *c, ATNState *state);
+    ATNConfig(ATNConfig *c, ATNState *state, SemanticContextRef semanticContext);
+    ATNConfig(ATNConfig *c, SemanticContextRef semanticContext);
+    ATNConfig(ATNConfig *c, ATNState *state, PredictionContextRef context);
+    ATNConfig(ATNConfig *c, ATNState *state, PredictionContextRef context, SemanticContextRef semanticContext);
 
     virtual size_t hashCode() const;
 
@@ -128,7 +128,7 @@ namespace atn {
       }
       if (semanticContext != nullptr && semanticContext != SemanticContext::NONE) {
         buf.append(L",");
-        buf.append(semanticContext);
+        buf.append(semanticContext.get());
       }
       if (reachesIntoOuterContext > 0) {
         buf.append(L",up=").append(reachesIntoOuterContext);
@@ -138,8 +138,6 @@ namespace atn {
       return buf.toString();
     }
 
-  private:
-    void InitializeInstanceFields();
   };
 
 } // namespace atn

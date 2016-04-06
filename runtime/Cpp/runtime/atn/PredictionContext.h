@@ -43,19 +43,20 @@ namespace v4 {
 namespace runtime {
 namespace atn {
 
-  class PredictionContext {
-    /// <summary>
-    /// Represents {@code $} in local context prediction, which means wildcard.
-    /// {@code *+x = *}.
-    /// </summary>
-  public:
-    static EmptyPredictionContext * EMPTY;
+  typedef std::set<PredictionContextRef> PredictionContextCache;
 
-    /// <summary>
-    /// Represents {@code $} in an array in full context mode, when {@code $}
-    /// doesn't mean wildcard: {@code $ + x = [$,x]}. Here,
-    /// {@code $} = <seealso cref="#EMPTY_RETURN_STATE"/>.
-    /// </summary>
+  // For the keys we use raw pointers, as we don't need to access them.
+  typedef std::map<std::pair<PredictionContext *, PredictionContext *>, PredictionContextRef> PredictionContextMergeCache;
+
+  class PredictionContext {
+  public:
+    /// Represents $ in local context prediction, which means wildcard.
+    /// *+x = *.
+    static const std::shared_ptr<EmptyPredictionContext> EMPTY;
+
+    /// Represents $ in an array in full context mode, when $
+    /// doesn't mean wildcard: $ + x = [$,x]. Here,
+    /// $ = EMPTY_RETURN_STATE.
     static const int EMPTY_RETURN_STATE = INT16_MAX;
 
   private:
@@ -94,10 +95,10 @@ namespace atn {
   public:
     /// Convert a RuleContext tree to a PredictionContext graph.
     /// Return EMPTY if outerContext is empty.
-    static PredictionContext *fromRuleContext(const ATN &atn, RuleContext *outerContext);
+    static PredictionContextRef fromRuleContext(const ATN &atn, RuleContext *outerContext);
 
     virtual size_t size() const = 0;
-    virtual PredictionContext *getParent(size_t index) const = 0;
+    virtual std::weak_ptr<PredictionContext> getParent(size_t index) const = 0;
     virtual int getReturnState(size_t index) const = 0;
 
     virtual bool operator == (const PredictionContext &o) const = 0;
@@ -110,12 +111,13 @@ namespace atn {
 
   protected:
     static size_t calculateEmptyHashCode();
-    static size_t calculateHashCode(PredictionContext *parent, int returnState);
-    static size_t calculateHashCode(const std::vector<PredictionContext*> &parents, const std::vector<int> &returnStates);
+    static size_t calculateHashCode(std::weak_ptr<PredictionContext> parent, int returnState);
+    static size_t calculateHashCode(const std::vector<std::weak_ptr<PredictionContext>> &parents, const std::vector<int> &returnStates);
 
   public:
     // dispatch
-    static PredictionContext *merge(PredictionContext *a, PredictionContext *b, bool rootIsWildcard, misc::DoubleKeyMap<PredictionContext*, PredictionContext*, PredictionContext*> *mergeCache);
+    static PredictionContextRef merge(PredictionContextRef a,
+      PredictionContextRef b, bool rootIsWildcard, PredictionContextMergeCache *mergeCache);
 
     /// <summary>
     /// Merge two <seealso cref="SingletonPredictionContext"/> instances.
@@ -151,7 +153,8 @@ namespace atn {
     /// <param name="rootIsWildcard"> {@code true} if this is a local-context merge,
     /// otherwise false to indicate a full-context merge </param>
     /// <param name="mergeCache"> </param>
-    static PredictionContext *mergeSingletons(SingletonPredictionContext *a, SingletonPredictionContext *b, bool rootIsWildcard, misc::DoubleKeyMap<PredictionContext*, PredictionContext*, PredictionContext*> *mergeCache);
+    static PredictionContextRef mergeSingletons(SingletonPredictionContextRef a, SingletonPredictionContextRef b,
+                                                bool rootIsWildcard, PredictionContextMergeCache *mergeCache);
 
     /// <summary>
     /// Handle case where at least one of {@code a} or {@code b} is
@@ -202,7 +205,8 @@ namespace atn {
     /// <param name="b"> the second <seealso cref="SingletonPredictionContext"/> </param>
     /// <param name="rootIsWildcard"> {@code true} if this is a local-context merge,
     /// otherwise false to indicate a full-context merge </param>
-    static PredictionContext *mergeRoot(SingletonPredictionContext *a, SingletonPredictionContext *b, bool rootIsWildcard);
+    static PredictionContextRef mergeRoot(SingletonPredictionContextRef a, SingletonPredictionContextRef b,
+                                          bool rootIsWildcard);
 
     /// <summary>
     /// Merge two <seealso cref="ArrayPredictionContext"/> instances.
@@ -233,52 +237,31 @@ namespace atn {
     /// <seealso cref="SingletonPredictionContext"/>.<br/>
     /// <embed src="images/ArrayMerge_EqualTop.svg" type="image/svg+xml"/>
     /// </summary>
-    static PredictionContext *mergeArrays(ArrayPredictionContext *a, ArrayPredictionContext *b, bool rootIsWildcard, misc::DoubleKeyMap<PredictionContext*, PredictionContext*, PredictionContext*> *mergeCache);
+    static PredictionContextRef mergeArrays(std::shared_ptr<ArrayPredictionContext> a,
+      std::shared_ptr<ArrayPredictionContext> b, bool rootIsWildcard, PredictionContextMergeCache *mergeCache);
 
-    /// <summary>
-    /// Make pass over all <em>M</em> {@code parents}; merge any {@code ()}
-    /// ones.
-    /// </summary>
   protected:
-    static void combineCommonParents(std::vector<PredictionContext*>parents);
+    /// Make pass over all M parents; merge any equal() ones.
+    /// @returns true if the list has been changed (i.e. duplicates where found).
+    static bool combineCommonParents(std::vector<std::weak_ptr<PredictionContext>> &parents);
 
   public:
-    static std::wstring toDOTString(PredictionContext *context);
+    static std::wstring toDOTString(PredictionContextRef context);
 
-    static PredictionContext *getCachedContext(PredictionContext *context, PredictionContextCache *contextCache, std::map<PredictionContext*, PredictionContext*> *visited);
-
-    //	// extra structures, but cut/paste/morphed works, so leave it.
-    //	// seems to do a breadth-first walk
-    //	public static List<PredictionContext> getAllNodes(PredictionContext context) {
-    //		Map<PredictionContext, PredictionContext> visited =
-    //			new IdentityHashMap<PredictionContext, PredictionContext>();
-    //		Deque<PredictionContext> workList = new ArrayDeque<PredictionContext>();
-    //		workList.add(context);
-    //		visited.put(context, context);
-    //		List<PredictionContext> nodes = new ArrayList<PredictionContext>();
-    //		while (!workList.isEmpty()) {
-    //			PredictionContext current = workList.pop();
-    //			nodes.add(current);
-    //			for (int i = 0; i < current.size(); i++) {
-    //				PredictionContext parent = current.getParent(i);
-    //				if ( parent!=null && visited.put(parent, parent) == null) {
-    //					workList.push(parent);
-    //				}
-    //			}
-    //		}
-    //		return nodes;
-    //	}
+    static PredictionContextRef getCachedContext(PredictionContextRef context,
+      std::shared_ptr<PredictionContextCache> contextCache,
+      std::map<PredictionContextRef, PredictionContextRef> &visited);
 
     // ter's recursive version of Sam's getAllNodes()
-    static std::vector<PredictionContext*> getAllContextNodes(PredictionContext *context);
-
-    static void getAllContextNodes_(PredictionContext *context, std::vector<PredictionContext*> &nodes, std::map<PredictionContext*, PredictionContext*> *visited);
+    static std::vector<PredictionContextRef> getAllContextNodes(PredictionContextRef context);
+    static void getAllContextNodes_(PredictionContextRef context,
+      std::vector<PredictionContextRef> &nodes, std::map<PredictionContextRef, PredictionContextRef> &visited);
 
     std::wstring toString();
     std::wstring toString(Recognizer *recog);
 
     std::vector<std::wstring> toStrings(Recognizer *recognizer, int currentState);
-    std::vector<std::wstring> toStrings(Recognizer *recognizer, PredictionContext *stop, int currentState);
+    std::vector<std::wstring> toStrings(Recognizer *recognizer, PredictionContextRef stop, int currentState);
   };
 
 } // namespace atn
@@ -294,7 +277,7 @@ namespace std {
 
   template <> struct hash<PredictionContext>
   {
-    size_t operator () (PredictionContext &x) const
+    size_t operator () (const PredictionContext &x) const
     {
       return x.hashCode();
     }

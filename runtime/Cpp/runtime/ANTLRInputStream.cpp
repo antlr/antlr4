@@ -50,14 +50,14 @@ ANTLRInputStream::ANTLRInputStream(const wchar_t data[], size_t numberOfActualCh
   : ANTLRInputStream(std::wstring(data, numberOfActualCharsInArray)) {
 }
 
-ANTLRInputStream::ANTLRInputStream(std::wiostream &stream) : ANTLRInputStream(stream, READ_BUFFER_SIZE) {
+ANTLRInputStream::ANTLRInputStream(std::wistream &stream) : ANTLRInputStream(stream, READ_BUFFER_SIZE) {
 }
 
-ANTLRInputStream::ANTLRInputStream(std::wiostream &stream, std::streamsize readChunkSize) : ANTLRInputStream() {
+ANTLRInputStream::ANTLRInputStream(std::wistream &stream, std::streamsize readChunkSize) : ANTLRInputStream() {
   load(stream, readChunkSize);
 }
 
-void ANTLRInputStream::load(std::wiostream &stream, std::streamsize readChunkSize) {
+void ANTLRInputStream::load(std::wistream &stream, std::streamsize readChunkSize) {
   stream.seekg(0, stream.beg);
   if (!stream.good()) // No fail, bad or EOF.
     return;
@@ -85,7 +85,7 @@ void ANTLRInputStream::reset() {
 
 void ANTLRInputStream::consume() {
   if (p >= data.size()) {
-    assert(LA(1) == IntStream::_EOF);
+    assert(LA(1) == EOF);
     throw IllegalStateException("cannot consume EOF");
   }
 
@@ -94,7 +94,7 @@ void ANTLRInputStream::consume() {
   }
 }
 
-size_t ANTLRInputStream::LA(ssize_t i) {
+ssize_t ANTLRInputStream::LA(ssize_t i) {
   if (i == 0) {
     return 0; // undefined
   }
@@ -103,18 +103,18 @@ size_t ANTLRInputStream::LA(ssize_t i) {
   if (i < 0) {
     i++; // e.g., translate LA(-1) to use offset i=0; then data[p+0-1]
     if ((position + i - 1) < 0) {
-      return IntStream::_EOF; // invalid; no char before first char
+      return EOF; // invalid; no char before first char
     }
   }
 
   if ((position + i - 1) >= (ssize_t)data.size()) {
-    return IntStream::_EOF;
+    return EOF;
   }
 
-  return (size_t)data[(size_t)(position + i - 1)];
+  return data[(size_t)(position + i - 1)];
 }
 
-size_t ANTLRInputStream::LT(ssize_t i) {
+ssize_t ANTLRInputStream::LT(ssize_t i) {
   return LA(i);
 }
 

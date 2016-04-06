@@ -45,7 +45,6 @@
 #include "TextChunk.h"
 #include "ANTLRInputStream.h"
 #include "Arrays.h"
-#include "MultiMap.h"
 #include "Exceptions.h"
 #include "Strings.h"
 
@@ -64,11 +63,11 @@ ParseTreePatternMatcher::ParseTreePatternMatcher(Lexer *lexer, Parser *parser) :
 
 void ParseTreePatternMatcher::setDelimiters(const std::wstring &start, const std::wstring &stop, const std::wstring &escapeLeft) {
   if (start == L"" || start.length() == 0) {
-    throw new IllegalArgumentException("start cannot be null or empty");
+    throw IllegalArgumentException("start cannot be null or empty");
   }
 
   if (stop == L"" || stop.length() == 0) {
-    throw new IllegalArgumentException("stop cannot be null or empty");
+    throw IllegalArgumentException("stop cannot be null or empty");
   }
 
   this->start = start;
@@ -82,7 +81,7 @@ bool ParseTreePatternMatcher::matches(ParseTree *tree, const std::wstring &patte
 }
 
 bool ParseTreePatternMatcher::matches(ParseTree *tree, ParseTreePattern *pattern) {
-  misc::MultiMap<std::wstring, ParseTree*> *labels = new misc::MultiMap<std::wstring, ParseTree*>();
+  std::map<std::wstring, std::vector<ParseTree*>> labels;
   ParseTree *mismatchedNode = matchImpl(tree, pattern->getPatternTree(), labels);
   return mismatchedNode == nullptr;
 }
@@ -93,7 +92,7 @@ ParseTreeMatch *ParseTreePatternMatcher::match(ParseTree *tree, const std::wstri
 }
 
 ParseTreeMatch *ParseTreePatternMatcher::match(ParseTree *tree, ParseTreePattern *pattern) {
-  misc::MultiMap<std::wstring, ParseTree*> *labels = new misc::MultiMap<std::wstring, ParseTree*>();
+  std::map<std::wstring, std::vector<ParseTree*>> labels;
   ParseTree *mismatchedNode = matchImpl(tree, pattern->getPatternTree(), labels);
   return new ParseTreeMatch(tree, pattern, labels, mismatchedNode);
 }
@@ -126,9 +125,9 @@ Parser *ParseTreePatternMatcher::getParser() {
   return parser;
 }
 
-tree::ParseTree *ParseTreePatternMatcher::matchImpl(ParseTree *tree, ParseTree *patternTree, misc::MultiMap<std::wstring, ParseTree*> *labels) {
+tree::ParseTree *ParseTreePatternMatcher::matchImpl(ParseTree *tree, ParseTree *patternTree, std::map<std::wstring, std::vector<ParseTree*>> &labels) {
   if (tree == nullptr) {
-    throw new IllegalArgumentException("tree cannot be null");
+    throw IllegalArgumentException("tree cannot be null");
   }
 
   if (patternTree == nullptr) {
@@ -145,9 +144,9 @@ tree::ParseTree *ParseTreePatternMatcher::matchImpl(ParseTree *tree, ParseTree *
       if (dynamic_cast<TokenTagToken*>(t2->getSymbol()) != nullptr) { // x and <ID>
         TokenTagToken *tokenTagToken = static_cast<TokenTagToken*>(t2->getSymbol());
         // track label->list-of-nodes for both token name and label (if any)
-        labels->map(tokenTagToken->getTokenName(), tree);
+        labels[tokenTagToken->getTokenName()].push_back(tree);
         if (tokenTagToken->getLabel() != L"") {
-          labels->map(tokenTagToken->getLabel(), tree);
+          labels[tokenTagToken->getLabel()].push_back(tree);
         }
       } else if (t1->getText() == t2->getText()) {
         // x and x
@@ -176,9 +175,9 @@ tree::ParseTree *ParseTreePatternMatcher::matchImpl(ParseTree *tree, ParseTree *
       //ParseTreeMatch *m = nullptr; // unused?
       if (r1->RuleContext::getRuleContext()->getRuleIndex() == r2->RuleContext::getRuleContext()->getRuleIndex()) {
         // track label->list-of-nodes for both rule name and label (if any)
-        labels->map(ruleTagToken->getRuleName(), tree);
+        labels[ruleTagToken->getRuleName()].push_back(tree);
         if (ruleTagToken->getLabel() != L"") {
-          labels->map(ruleTagToken->getLabel(), tree);
+          labels[ruleTagToken->getLabel()].push_back(tree);
         }
       } else {
         if (mismatchedNode == nullptr) {
@@ -256,17 +255,16 @@ std::vector<Token*> ParseTreePatternMatcher::tokenize(const std::wstring &patter
       }
     } else {
       TextChunk *textChunk = static_cast<TextChunk*>(chunk);
-      ANTLRInputStream *in_Renamed = new ANTLRInputStream(textChunk->getText());
-      lexer->setInputStream(in_Renamed);
+      ANTLRInputStream input(textChunk->getText());
+      lexer->setInputStream(&input);
       Token *t = lexer->nextToken();
-      while (t->getType() != Token::_EOF) {
+      while (t->getType() != EOF) {
         tokens.push_back(t);
         t = lexer->nextToken();
       }
     }
   }
 
-  //		System.out.println("tokens="+tokens);
   return tokens;
 }
 

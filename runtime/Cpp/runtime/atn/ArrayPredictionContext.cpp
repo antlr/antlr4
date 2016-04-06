@@ -36,11 +36,12 @@
 
 using namespace org::antlr::v4::runtime::atn;
 
-ArrayPredictionContext::ArrayPredictionContext(SingletonPredictionContext *a)
+ArrayPredictionContext::ArrayPredictionContext(SingletonPredictionContextRef a)
   : ArrayPredictionContext({ a->parent }, { a->returnState }) {
 }
 
-ArrayPredictionContext::ArrayPredictionContext(const std::vector<PredictionContext *> &parents, const std::vector<int> &returnStates)
+ArrayPredictionContext::ArrayPredictionContext(const std::vector<std::weak_ptr<PredictionContext> > &parents,
+                                               const std::vector<int> &returnStates)
   : PredictionContext(calculateHashCode(parents, returnStates)), parents(parents), returnStates(returnStates) {
     assert(parents.size() > 0);
     assert(returnStates.size() > 0);
@@ -55,7 +56,7 @@ size_t ArrayPredictionContext::size() const {
   return returnStates.size();
 }
 
-PredictionContext* ArrayPredictionContext::getParent(size_t index) const {
+std::weak_ptr<PredictionContext> ArrayPredictionContext::getParent(size_t index) const {
   return parents[index];
 }
 
@@ -80,24 +81,24 @@ std::wstring ArrayPredictionContext::toString() {
   if (isEmpty()) {
     return L"[]";
   }
-  antlrcpp::StringBuilder *buf = new antlrcpp::StringBuilder();
-  buf->append(L"[");
+  antlrcpp::StringBuilder buf;
+  buf.append(L"[");
   for (std::vector<int>::size_type i = 0; i < returnStates.size(); i++) {
     if (i > 0) {
-      buf->append(L", ");
+      buf.append(L", ");
     }
     if (returnStates[i] == EMPTY_RETURN_STATE) {
-      buf->append(L"$");
+      buf.append(L"$");
       continue;
     }
-    buf->append(std::to_wstring(returnStates.at(i)));
-    if (parents[i] != nullptr) {
-      buf->append(L" ");
-      buf->append(parents[i]->toString());
+    buf.append(std::to_wstring(returnStates.at(i)));
+    if (!parents[i].expired()) {
+      buf.append(L" ");
+      buf.append(parents[i].lock()->toString());
     } else {
-      buf->append(L"null");
+      buf.append(L"null");
     }
   }
-  buf->append(L"]");
-  return buf->toString();
+  buf.append(L"]");
+  return buf.toString();
 }

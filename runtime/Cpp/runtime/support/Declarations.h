@@ -93,18 +93,13 @@ namespace org {
 
         namespace misc {
           template<typename T> class AbstractEqualityComparator;
-          template<typename T> class Array2DHashSet;
-          template<typename Key1, typename Key2, typename Value> class DoubleKeyMap;
           template<typename T> class EqualityComparator;
 
           class Interval;
           class IntervalSet;
           class JFileChooserConfirmOverwrite;
-          class LogManager;
-          template<typename K, typename V> class MultiMap;
           class MurmurHash;
           class ObjectEqualityComparator;
-          template<typename T> class OrderedHashSet;
           class ParseCancellationException;
           class TestRig;
           class Utils;
@@ -143,17 +138,16 @@ namespace org {
           class PlusLoopbackState;
           class PrecedencePredicateTransition;
           class PredicateTransition;
-          class PredictionContext;
-          class PredictionContextCache;
+          class PredictionContext; typedef std::shared_ptr<PredictionContext> PredictionContextRef;
           enum class PredictionMode;
           class PredictionModeClass;
           class RangeTransition;
           class RuleStartState;
           class RuleStopState;
           class RuleTransition;
-          class SemanticContext;
+          class SemanticContext; typedef std::shared_ptr<SemanticContext> SemanticContextRef;
           class SetTransition;
-          class SingletonPredictionContext;
+          class SingletonPredictionContext; typedef std::shared_ptr<SingletonPredictionContext> SingletonPredictionContextRef;
           class StarBlockStartState;
           class StarLoopEntryState;
           class StarLoopbackState;
@@ -194,18 +188,6 @@ namespace org {
             class TokenTagToken;
           }
 
-          namespace xpath {
-            class XPath;
-            class XPathElement;
-            class XPathLexerErrorListener;
-            class XPathRuleAnywhereElement;
-            class XPathRuleElement;
-            class XPathTokenAnywhereElement;
-            class XPathTokenElement;
-            class XPathWildcardAnywhereElement;
-            class XPathWildcardElement;
-
-          }
         }
       }
     }

@@ -29,6 +29,8 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "Strings.h"
+
 #include "Token.h"
 
 using namespace org::antlr::v4::runtime;
@@ -36,6 +38,25 @@ using namespace org::antlr::v4::runtime;
 const size_t Token::INVALID_TYPE;
 const ssize_t Token::EPSILON;
 const size_t Token::MIN_USER_TOKEN_TYPE;
-const size_t Token::_EOF;
 const size_t Token::DEFAULT_CHANNEL;
 const size_t Token::HIDDEN_CHANNEL;
+
+std::wstring Token::toString() {
+  std::wstringstream ss;
+
+  std::wstring txt = getText();
+  if (!txt.empty()) {
+
+    antlrcpp::replaceAll(txt, L"\n", L"\\n");
+    antlrcpp::replaceAll(txt, L"\r", L"\\r");
+    antlrcpp::replaceAll(txt, L"\t", L"\\t");
+  } else {
+    txt = L"<no text>";
+  }
+
+  ss << L"{Token: " << txt << L", channel: " << getChannel() << L", type: " << getType() << L", start: " << getStartIndex() <<
+    L", stop: " << getStopIndex() << L", index: " << getTokenIndex() << L", line: " << getLine() << L", offset: " <<
+  getCharPositionInLine() << L"}";
+
+  return ss.str();
+}

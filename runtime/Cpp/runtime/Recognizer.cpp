@@ -56,7 +56,7 @@ std::map<std::wstring, int> Recognizer::getTokenTypeMap() {
     result = iterator->second;
   } else {
     result = antlrcpp::toMap(tokenNames);
-    result[L"EOF"] = Token::_EOF;
+    result[L"EOF"] = EOF;
     _tokenTypeMapCache[tokenNames] = result;
   }
 
@@ -105,7 +105,7 @@ std::wstring Recognizer::getTokenErrorDisplay(Token *t) {
   }
   std::wstring s = t->getText();
   if (s == L"") {
-    if (t->getType() == Token::_EOF) {
+    if (t->getType() == EOF) {
       s = L"<EOF>";
     } else {
       s = std::wstring(L"<") + std::to_wstring(t->getType()) + std::wstring(L">");
@@ -124,7 +124,7 @@ void Recognizer::addErrorListener(ANTLRErrorListener *listener) {
     throw L"listener cannot be null.";
   }
 
-  _listeners.insert(_listeners.end(), listener);
+  _listeners.push_back(listener);
 }
 
 void Recognizer::removeErrorListener(ANTLRErrorListener *listener) {

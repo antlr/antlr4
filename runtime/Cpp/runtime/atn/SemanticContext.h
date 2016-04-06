@@ -32,6 +32,7 @@
 #pragma once
 
 #include "Recognizer.h"
+#include "CPPUtils.h"
 
 namespace org {
 namespace antlr {
@@ -39,18 +40,16 @@ namespace v4 {
 namespace runtime {
 namespace atn {
 
-  /// <summary>
   /// A tree structure used to record the semantic context in which
   ///  an ATN configuration is valid.  It's either a single predicate,
-  ///  a conjunction {@code p1&&p2}, or a sum of products {@code p1||p2}.
-  /// <p/>
-  ///  I have scoped the <seealso cref="AND"/>, <seealso cref="OR"/>, and <seealso cref="Predicate"/> subclasses of
-  ///  <seealso cref="SemanticContext"/> within the scope of this outer class.
-  /// </summary>
+  ///  a conjunction "p1 && p2", or a sum of products "p1||p2".
+  ///
+  ///  I have scoped the AND, OR, and Predicate subclasses of
+  ///  SemanticContext within the scope of this outer class.
   class SemanticContext {
   public:
-    SemanticContext *parent;
-    static SemanticContext *const NONE;
+    //SemanticContext *parent;
+    static const SemanticContextRef NONE;
 
     virtual size_t hashCode() = 0;
     virtual std::wstring toString() const = 0;
@@ -71,10 +70,10 @@ namespace atn {
     /// </summary>
     virtual bool eval(Recognizer *parser, RuleContext *outerContext) = 0;
 
-    static SemanticContext *And(SemanticContext *a, SemanticContext *b);
+    static SemanticContextRef And(SemanticContextRef a, SemanticContextRef b);
 
     /// See also: ParserATNSimulator::getPredsForAmbigAlts.
-    static SemanticContext *Or(SemanticContext *a, SemanticContext *b);
+    static SemanticContextRef Or(SemanticContextRef a, SemanticContextRef b);
 
     class Predicate;
     class PrecedencePredicate;
@@ -82,13 +81,12 @@ namespace atn {
     class OR;
 
   private:
-    template<typename T1> // where T1 : SemanticContext
-    static std::vector<PrecedencePredicate*> filterPrecedencePredicates(std::vector<T1> *collection) {
-      std::vector<PrecedencePredicate*> result;
-      for (std::vector<SemanticContext*>::const_iterator iterator = collection->begin(); iterator != collection->end(); ++iterator) {
-        SemanticContext *context = *iterator;
-        if ((PrecedencePredicate*)(context) != nullptr) {
-          result.push_back((PrecedencePredicate*)context);
+    template<typename T1> // where T1 : SemanticContextRef
+    static std::vector<std::shared_ptr<PrecedencePredicate>> filterPrecedencePredicates(const std::vector<T1> &collection) {
+      std::vector<std::shared_ptr<PrecedencePredicate>> result;
+      for (auto context : collection) {
+        if (antlrcpp::is<PrecedencePredicate>(context)) {
+          result.push_back(std::dynamic_pointer_cast<PrecedencePredicate>(context));
         }
       }
 
@@ -140,21 +138,13 @@ namespace atn {
     virtual size_t hashCode() override;
     virtual bool operator == (const SemanticContext &other) const override;
     virtual std::wstring toString() const override;
-
-    static bool lessThan(const PrecedencePredicate &a, const PrecedencePredicate &b) {
-      return a.precedence < b.precedence;
-    }
-    static bool greaterThan(const PrecedencePredicate &a,
-                            const PrecedencePredicate &b) {
-      return a.precedence > b.precedence;
-    }
   };
 
   class SemanticContext::AND : public SemanticContext {
   public:
-    std::vector<SemanticContext*> opnds;
+    std::vector<SemanticContextRef> opnds;
 
-    AND(SemanticContext *a, SemanticContext *b);
+    AND(SemanticContextRef a, SemanticContextRef b);
 
     virtual bool operator == (const SemanticContext &other) const override;
     virtual size_t hashCode() override;
@@ -174,9 +164,9 @@ namespace atn {
 
   class SemanticContext::OR : public SemanticContext {
   public:
-    std::vector<SemanticContext*> opnds;
+    std::vector<SemanticContextRef> opnds;
 
-    OR(SemanticContext *a, SemanticContext *b);
+    OR(SemanticContextRef a, SemanticContextRef b);
 
     virtual bool operator == (const SemanticContext &other) const override;
     virtual size_t hashCode() override;

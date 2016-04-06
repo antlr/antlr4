@@ -31,6 +31,7 @@
 
 #include "ParseTreePatternMatcher.h"
 #include "ParseTreeMatch.h"
+//#include "XPath.h"
 
 #include "ParseTreePattern.h"
 
@@ -48,12 +49,11 @@ bool ParseTreePattern::matches(ParseTree *tree) {
   return matcher->match(tree, this)->succeeded();
 }
 
-// TODO:  Come back to this after the base runtime works.
-#if 0
+/*
 std::vector<ParseTreeMatch*> ParseTreePattern::findAll(ParseTree *tree, const std::wstring &xpath) {
-  std::vector<ParseTree*> *subtrees = xpath::XPath::findAll(tree, xpath, matcher->getParser());
+  std::vector<ParseTree*> subtrees = xpath::XPath::findAll(tree, xpath, matcher->getParser());
   std::vector<ParseTreeMatch*> matches = std::vector<ParseTreeMatch*>();
-  for (auto t : *subtrees) {
+  for (auto t : subtrees) {
     ParseTreeMatch *aMatch = match(t);
     if (aMatch->succeeded()) {
       matches.push_back(aMatch);
@@ -61,7 +61,7 @@ std::vector<ParseTreeMatch*> ParseTreePattern::findAll(ParseTree *tree, const st
   }
   return matches;
 }
-#endif
+*/
 
 ParseTreePatternMatcher *ParseTreePattern::getMatcher() {
   return matcher;

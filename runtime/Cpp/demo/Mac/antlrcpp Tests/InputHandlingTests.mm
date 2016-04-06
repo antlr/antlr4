@@ -56,39 +56,39 @@ using namespace org::antlr::v4::runtime::misc;
 - (void)testANTLRInputStreamCreation {
   ANTLRInputStream stream1;
   XCTAssert(stream1.toString().empty());
-  XCTAssertEqual(stream1.index(), (size_t)0);
+  XCTAssertEqual(stream1.index(), 0U);
 
   ANTLRInputStream stream2(L"To be or not to be");
   XCTAssert(stream2.toString() == L"To be or not to be");
-  XCTAssertEqual(stream2.index(), (size_t)0);
-  XCTAssertEqual(stream2.size(), (size_t)18);
+  XCTAssertEqual(stream2.index(), 0U);
+  XCTAssertEqual(stream2.size(), 18U);
 
   wchar_t data[] = L"Lorem ipsum dolor sit amet";
   ANTLRInputStream stream3(data, sizeof(data) / sizeof(data[0]));
   XCTAssert(stream3.toString() == std::wstring(L"Lorem ipsum dolor sit amet\0", 27));
-  XCTAssertEqual(stream3.index(), (size_t)0);
-  XCTAssertEqual(stream3.size(), (size_t)27);
+  XCTAssertEqual(stream3.index(), 0U);
+  XCTAssertEqual(stream3.size(), 27U);
 
   std::wstringstream input(data, sizeof(data) / sizeof(data[0]));
   ANTLRInputStream stream4(input);
-  XCTAssertEqual(stream4.index(), (size_t)0);
-  XCTAssertEqual(stream4.size(), (size_t)26);
+  XCTAssertEqual(stream4.index(), 0U);
+  XCTAssertEqual(stream4.size(), 26U);
 
   std::wstring longString(33333, L'a');
   input.str(longString);
   stream4.load(input, 0);
-  XCTAssertEqual(stream4.index(), (size_t)0);
-  XCTAssertEqual(stream4.size(), (size_t)26); // Nothing changed as the stream is still at eof.
+  XCTAssertEqual(stream4.index(), 0U);
+  XCTAssertEqual(stream4.size(), 26U); // Nothing changed as the stream is still at eof.
 
   input.clear();
   stream4.load(input, 0);
-  XCTAssertEqual(stream4.size(), (size_t)33333);
+  XCTAssertEqual(stream4.size(), 33333U);
 }
 
 - (void)testANTLRInputStreamUse {
   std::wstring text(L"🚧Lorem ipsum dolor sit amet🕶");
   ANTLRInputStream stream(text);
-  XCTAssertEqual(stream.index(), (size_t)0);
+  XCTAssertEqual(stream.index(), 0U);
   XCTAssertEqual(stream.size(), text.size());
 
   for (size_t i = 0; i < stream.size(); ++i) {
@@ -106,13 +106,13 @@ using namespace org::antlr::v4::runtime::misc;
 
   XCTAssertEqual(stream.index(), text.size());
   stream.reset();
-  XCTAssertEqual(stream.index(), (size_t)0);
+  XCTAssertEqual(stream.index(), 0U);
 
-  XCTAssertEqual(stream.LA(0), (size_t)0);
+  XCTAssertEqual(stream.LA(0), 0);
   for (size_t i = 1; i < text.size(); ++i) {
-    XCTAssertEqual(stream.LA((int)i), (size_t)text[i - 1]); // LA(1) means: current char.
-    XCTAssertEqual(stream.LT((int)i), (size_t)text[i - 1]); // LT is mapped to LA.
-    XCTAssertEqual(stream.index(), (size_t)0); // No consumption when looking ahead.
+    XCTAssertEqual(stream.LA((ssize_t)i), text[i - 1]); // LA(1) means: current char.
+    XCTAssertEqual(stream.LT((ssize_t)i), text[i - 1]); // LT is mapped to LA.
+    XCTAssertEqual(stream.index(), 0U); // No consumption when looking ahead.
   }
 
   stream.seek(text.size() - 1);
@@ -123,24 +123,24 @@ using namespace org::antlr::v4::runtime::misc;
 
   stream.seek(text.size() - 1);
   for (size_t i = 1; i < text.size() - 1; ++i) {
-    XCTAssertEqual(stream.LA((ssize_t)-i), (size_t)text[text.size() - i - 1]); // LA(-1) means: previous char.
-    XCTAssertEqual(stream.LT((ssize_t)-i), (size_t)text[text.size() - i - 1]); // LT is mapped to LA.
+    XCTAssertEqual(stream.LA((ssize_t)-i), text[text.size() - i - 1]); // LA(-1) means: previous char.
+    XCTAssertEqual(stream.LT((ssize_t)-i), text[text.size() - i - 1]); // LT is mapped to LA.
     XCTAssertEqual(stream.index(), text.size() - 1); // No consumption when looking ahead.
   }
 
-  XCTAssertEqual((int)stream.LA(-10000), IntStream::_EOF);
+  XCTAssertEqual((int)stream.LA(-10000), EOF);
 
   // Mark and release do nothing.
   stream.reset();
-  XCTAssertEqual(stream.index(), (size_t)0);
+  XCTAssertEqual(stream.index(), 0U);
   ssize_t marker = stream.mark();
   XCTAssertEqual(marker, -1);
   stream.seek(10);
-  XCTAssertEqual(stream.index(), (size_t)10);
+  XCTAssertEqual(stream.index(), 10U);
   XCTAssertEqual(stream.mark(), -1);
 
   stream.release(marker);
-  XCTAssertEqual(stream.index(), (size_t)10);
+  XCTAssertEqual(stream.index(), 10U);
 
   misc::Interval interval1(2, 10); // From - to, inclusive.
   std::wstring output = stream.getText(interval1);

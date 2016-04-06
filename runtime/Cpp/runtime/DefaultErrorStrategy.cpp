@@ -120,10 +120,10 @@ void DefaultErrorStrategy::sync(Parser *recognizer) {
   }
 
   TokenStream *tokens = recognizer->getInputStream();
-  size_t la = tokens->LA(1);
+  ssize_t la = tokens->LA(1);
 
   // try cheaper subset first; might get lucky. seems to shave a wee bit off
-  if (recognizer->getATN().nextTokens(s).contains((int)la) || la == Token::_EOF) {
+  if (recognizer->getATN().nextTokens(s).contains((int)la) || la == EOF) {
     return;
   }
 
@@ -142,7 +142,7 @@ void DefaultErrorStrategy::sync(Parser *recognizer) {
         return;
       }
 
-      throw new InputMismatchException(recognizer);
+      throw InputMismatchException(recognizer);
 
     case atn::ATNState::PLUS_LOOP_BACK:
     case atn::ATNState::STAR_LOOP_BACK: {
@@ -164,7 +164,7 @@ void DefaultErrorStrategy::reportNoViableAlternative(Parser *recognizer, NoViabl
   TokenStream *tokens = recognizer->getInputStream();
   std::wstring input;
   if (tokens != nullptr) {
-    if (e->getStartToken()->getType() == Token::_EOF) {
+    if (e->getStartToken()->getType() == EOF) {
       input = L"<EOF>";
     } else {
       input = tokens->getText(e->getStartToken().get(), e->getOffendingToken().get());
@@ -236,7 +236,7 @@ Token *DefaultErrorStrategy::recoverInline(Parser *recognizer) {
 }
 
 bool DefaultErrorStrategy::singleTokenInsertion(Parser *recognizer) {
-  size_t currentSymbolType = recognizer->getInputStream()->LA(1);
+  ssize_t currentSymbolType = recognizer->getInputStream()->LA(1);
 
   // if current token is consistent with what could come after current
   // ATN state, then we know we're missing a token; error recovery
@@ -253,7 +253,7 @@ bool DefaultErrorStrategy::singleTokenInsertion(Parser *recognizer) {
 }
 
 Token *DefaultErrorStrategy::singleTokenDeletion(Parser *recognizer) {
-  size_t nextTokenType = recognizer->getInputStream()->LA(2);
+  ssize_t nextTokenType = recognizer->getInputStream()->LA(2);
   misc::IntervalSet expecting = getExpectedTokens(recognizer);
   if (expecting.contains((int)nextTokenType)) {
     reportUnwantedToken(recognizer);
@@ -269,16 +269,16 @@ Token *DefaultErrorStrategy::singleTokenDeletion(Parser *recognizer) {
 Token *DefaultErrorStrategy::getMissingSymbol(Parser *recognizer) {
   Token *currentSymbol = recognizer->getCurrentToken();
   misc::IntervalSet expecting = getExpectedTokens(recognizer);
-  size_t expectedTokenType = (size_t)expecting.getMinElement(); // get any element
+  ssize_t expectedTokenType = expecting.getMinElement(); // get any element
   std::wstring tokenText;
-  if (expectedTokenType == Token::_EOF) {
+  if (expectedTokenType == EOF) {
     tokenText = L"<missing EOF>";
   } else {
-    tokenText = std::wstring(L"<missing ") + recognizer->getTokenNames()[expectedTokenType][expectedTokenType] + std::wstring(L">");
+    tokenText = std::wstring(L"<missing ") + recognizer->getTokenNames()[(size_t)expectedTokenType] + std::wstring(L">");
   }
   Token *current = currentSymbol;
   Token *lookback = recognizer->getInputStream()->LT(-1);
-  if (current->getType() == Token::_EOF && lookback != nullptr) {
+  if (current->getType() == EOF && lookback != nullptr) {
     current = lookback;
   }
   return (Token*)recognizer->getTokenFactory()->create(new std::pair<TokenSource*, CharStream*>(current->getTokenSource(),
@@ -296,7 +296,7 @@ std::wstring DefaultErrorStrategy::getTokenErrorDisplay(Token *t) {
   }
   std::wstring s = getSymbolText(t);
   if (s == L"") {
-    if (getSymbolType(t) == Token::_EOF) {
+    if (getSymbolType(t) == EOF) {
       s = L"<EOF>";
     } else {
       s = std::wstring(L"<") + std::to_wstring(getSymbolType(t)) + std::wstring(L">");
@@ -339,8 +339,8 @@ misc::IntervalSet DefaultErrorStrategy::getErrorRecoverySet(Parser *recognizer) 
 }
 
 void DefaultErrorStrategy::consumeUntil(Parser *recognizer, const misc::IntervalSet &set) {
-  size_t ttype = recognizer->getInputStream()->LA(1);
-  while (ttype != Token::_EOF && !set.contains((int)ttype)) {
+  ssize_t ttype = recognizer->getInputStream()->LA(1);
+  while (ttype != EOF && !set.contains((int)ttype)) {
     recognizer->consume();
     ttype = recognizer->getInputStream()->LA(1);
   }

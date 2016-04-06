@@ -169,25 +169,6 @@ org::antlr::v4::runtime::CharStream *CommonToken::getInputStream() {
   return source->second;
 }
 
-std::wstring CommonToken::toString() {
-  std::wstring channelStr = L"";
-  if (channel > 0) {
-    channelStr = std::wstring(L",channel=") + std::to_wstring(channel);
-  }
-  std::wstring txt = getText();
-  if (txt != L"") {
-
-    antlrcpp::replaceAll(txt, L"\n",L"\\n");
-
-    antlrcpp::replaceAll(txt, L"\r",L"\\r");
-
-    antlrcpp::replaceAll(txt, L"\t",L"\\t");
-  } else {
-    txt = L"<no text>";
-  }
-  return std::wstring(L"[@") + std::to_wstring(getTokenIndex()) + std::wstring(L",") + std::to_wstring(start) + std::wstring(L":") + std::to_wstring(stop) + std::wstring(L"='") + txt + std::wstring(L"',<") + std::to_wstring(type) + std::wstring(L">") + channelStr + std::wstring(L",") + std::to_wstring(line) + std::wstring(L":") + std::to_wstring(getCharPositionInLine()) + std::wstring(L"]");
-}
-
 void CommonToken::InitializeInstanceFields() {
   type = 0;
   line = 0;
