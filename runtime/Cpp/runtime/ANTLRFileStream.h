@@ -52,7 +52,7 @@ namespace runtime {
 
     virtual void load(const std::string &fileName, const std::string &encoding);
 
-    virtual std::string getSourceName() override;
+    virtual std::string getSourceName() const override;
   };
 
 } // namespace runtime

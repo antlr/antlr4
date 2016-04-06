@@ -32,7 +32,6 @@
 #include "ATN.h"
 #include "Transition.h"
 #include "IntervalSet.h"
-#include "stringconverter.h"
 
 #include "ATNState.h"
 
@@ -64,7 +63,7 @@ bool ATNState::isNonGreedyExitState() {
 }
 
 std::wstring ATNState::toString() const {
-  return antlrcpp::StringConverterHelper::toString(stateNumber);
+  return std::to_wstring(stateNumber);
 }
 
 std::vector<Transition*> ATNState::getTransitions() {

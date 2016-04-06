@@ -92,21 +92,19 @@ bool DFAState::equals(DFAState *o) {
 }
 
 std::wstring DFAState::toString() {
-  antlrcpp::StringBuilder *buf = new antlrcpp::StringBuilder();
-  buf->append(std::to_wstring(stateNumber)); buf->append(L":"); buf->append(configs->toString());
+  std::wstringstream ss;
+  ss << stateNumber << L":" << configs->toString();
   if (isAcceptState) {
-    buf->append(L"=>");
+    ss << L" => ";
     if (predicates.size() != 0) {
-      std::wstring tmp;
       for (size_t i = 0; i < predicates.size(); i++) {
-        tmp.append(predicates[i]->toString());
+        ss << predicates[i]->toString();
       }
-      buf->append(tmp);
     } else {
-      buf->append(std::to_wstring(prediction));
+      ss << prediction;
     }
   }
-  return buf->toString();
+  return ss.str();
 }
 
 void DFAState::InitializeInstanceFields() {

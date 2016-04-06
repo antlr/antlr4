@@ -200,7 +200,7 @@ namespace runtime {
     virtual std::vector<Token*> filterForChannel(size_t from, size_t to, int channel);
 
   public:
-    virtual std::string getSourceName() override;
+    virtual std::string getSourceName() const override;
     virtual std::wstring getText() override;
     virtual std::wstring getText(const misc::Interval &interval) override;
     virtual std::wstring getText(RuleContext *ctx) override;

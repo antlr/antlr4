@@ -161,7 +161,7 @@ std::wstring ANTLRInputStream::getText(const Interval &interval) {
   return data.substr(start, count);
 }
 
-std::string ANTLRInputStream::getSourceName() {
+std::string ANTLRInputStream::getSourceName() const {
   return name;
 }
 

@@ -29,7 +29,6 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "stringconverter.h"
 #include "IntervalSet.h"
 #include "Transition.h"
 
@@ -54,5 +53,5 @@ bool AtomTransition::matches(int symbol, int minVocabSymbol, int maxVocabSymbol)
 }
 
 std::wstring AtomTransition::toString() const {
-  return antlrcpp::StringConverterHelper::toString(_label);
+  return std::to_wstring(_label);
 }

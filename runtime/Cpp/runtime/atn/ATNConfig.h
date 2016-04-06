@@ -113,29 +113,24 @@ namespace atn {
     virtual std::wstring toString();
 
     std::wstring toString(bool showAlt) {
-      antlrcpp::StringBuilder buf;
+      std::wstringstream ss(L" (");
 
-      buf.append(L'(');
-      buf.append(state);
+      ss << state;
       if (showAlt) {
-        buf.append(L",");
-        buf.append(alt);
+        ss << L"," << alt;
       }
       if (context != nullptr) {
-        buf.append(L",[");
-        buf.append(context->toString());
-        buf.append(L"]");
+        ss << L",[" << context->toString() << L"]";
       }
       if (semanticContext != nullptr && semanticContext != SemanticContext::NONE) {
-        buf.append(L",");
-        buf.append(semanticContext.get());
+        ss << L"," << semanticContext.get();
       }
       if (reachesIntoOuterContext > 0) {
-        buf.append(L",up=").append(reachesIntoOuterContext);
+        ss << L",up=" << reachesIntoOuterContext;
       }
-      buf.append(L')');
+      ss << L')';
 
-      return buf.toString();
+      return ss.str();
     }
 
   };

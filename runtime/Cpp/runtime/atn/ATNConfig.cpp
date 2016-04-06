@@ -30,7 +30,6 @@
  */
 
 #include "MurmurHash.h"
-#include "StringBuilder.h"
 #include "PredictionContext.h"
 
 #include "ATNConfig.h"

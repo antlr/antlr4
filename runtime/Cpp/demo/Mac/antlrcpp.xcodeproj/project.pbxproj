@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		272415E41CB54C08007E056A /* UnbufferedTokenStream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 27C666A91C9584050021E494 /* UnbufferedTokenStream.cpp */; };
+		272415E51CB54C09007E056A /* UnbufferedTokenStream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 27C666A91C9584050021E494 /* UnbufferedTokenStream.cpp */; };
 		2747A70A1CA691310030247B /* ConfigLookup.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2747A7081CA691310030247B /* ConfigLookup.cpp */; };
 		2747A70B1CA691310030247B /* ConfigLookup.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2747A7081CA691310030247B /* ConfigLookup.cpp */; };
 		2747A70C1CA691310030247B /* ConfigLookup.h in Headers */ = {isa = PBXBuildFile; fileRef = 2747A7091CA691310030247B /* ConfigLookup.h */; };
@@ -405,12 +407,6 @@
 		27C669071C9585230021E494 /* CPPUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = 27C668EE1C9585230021E494 /* CPPUtils.h */; };
 		27C669081C9585230021E494 /* Declarations.h in Headers */ = {isa = PBXBuildFile; fileRef = 27C668EF1C9585230021E494 /* Declarations.h */; };
 		27C669091C9585230021E494 /* Declarations.h in Headers */ = {isa = PBXBuildFile; fileRef = 27C668EF1C9585230021E494 /* Declarations.h */; };
-		27C6690A1C9585230021E494 /* StringBuilder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 27C668F01C9585230021E494 /* StringBuilder.cpp */; };
-		27C6690B1C9585230021E494 /* StringBuilder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 27C668F01C9585230021E494 /* StringBuilder.cpp */; };
-		27C6690C1C9585230021E494 /* StringBuilder.h in Headers */ = {isa = PBXBuildFile; fileRef = 27C668F11C9585230021E494 /* StringBuilder.h */; };
-		27C6690D1C9585230021E494 /* StringBuilder.h in Headers */ = {isa = PBXBuildFile; fileRef = 27C668F11C9585230021E494 /* StringBuilder.h */; };
-		27C6690E1C9585230021E494 /* stringconverter.h in Headers */ = {isa = PBXBuildFile; fileRef = 27C668F21C9585230021E494 /* stringconverter.h */; };
-		27C6690F1C9585230021E494 /* stringconverter.h in Headers */ = {isa = PBXBuildFile; fileRef = 27C668F21C9585230021E494 /* stringconverter.h */; };
 		27C669101C9585230021E494 /* Strings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 27C668F31C9585230021E494 /* Strings.cpp */; };
 		27C669111C9585230021E494 /* Strings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 27C668F31C9585230021E494 /* Strings.cpp */; };
 		27C669121C9585230021E494 /* Strings.h in Headers */ = {isa = PBXBuildFile; fileRef = 27C668F41C9585230021E494 /* Strings.h */; };
@@ -753,9 +749,6 @@
 		27C668ED1C9585230021E494 /* CPPUtils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CPPUtils.cpp; sourceTree = "<group>"; };
 		27C668EE1C9585230021E494 /* CPPUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CPPUtils.h; sourceTree = "<group>"; };
 		27C668EF1C9585230021E494 /* Declarations.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Declarations.h; sourceTree = "<group>"; };
-		27C668F01C9585230021E494 /* StringBuilder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = StringBuilder.cpp; sourceTree = "<group>"; };
-		27C668F11C9585230021E494 /* StringBuilder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StringBuilder.h; sourceTree = "<group>"; };
-		27C668F21C9585230021E494 /* stringconverter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stringconverter.h; sourceTree = "<group>"; };
 		27C668F31C9585230021E494 /* Strings.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Strings.cpp; sourceTree = "<group>"; };
 		27C668F41C9585230021E494 /* Strings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Strings.h; sourceTree = "<group>"; };
 		27C668F51C9585230021E494 /* guid.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = guid.cpp; sourceTree = "<group>"; };
@@ -1033,9 +1026,6 @@
 				27C668ED1C9585230021E494 /* CPPUtils.cpp */,
 				27C668EE1C9585230021E494 /* CPPUtils.h */,
 				27C668EF1C9585230021E494 /* Declarations.h */,
-				27C668F01C9585230021E494 /* StringBuilder.cpp */,
-				27C668F11C9585230021E494 /* StringBuilder.h */,
-				27C668F21C9585230021E494 /* stringconverter.h */,
 				27C668F31C9585230021E494 /* Strings.cpp */,
 				27C668F41C9585230021E494 /* Strings.h */,
 				27C668F51C9585230021E494 /* guid.cpp */,
@@ -1340,7 +1330,6 @@
 				27C6680F1C95846E0021E494 /* OrderedATNConfigSet.h in Headers */,
 				27C666B11C9584050021E494 /* ANTLRErrorStrategy.h in Headers */,
 				27C667B91C95846E0021E494 /* ATNConfig.h in Headers */,
-				27C6690F1C9585230021E494 /* stringconverter.h in Headers */,
 				27C6670D1C9584050021E494 /* NoViableAltException.h in Headers */,
 				27C6699E1C9585B80021E494 /* ParseTreeListener.h in Headers */,
 				27C6681B1C95846E0021E494 /* PlusLoopbackState.h in Headers */,
@@ -1354,7 +1343,6 @@
 				27C668571C95846E0021E494 /* StarLoopEntryState.h in Headers */,
 				27C6683F1C95846E0021E494 /* RuleTransition.h in Headers */,
 				27C667231C9584050021E494 /* Recognizer.h in Headers */,
-				27C6690D1C9585230021E494 /* StringBuilder.h in Headers */,
 				27C667F11C95846E0021E494 /* EmptyPredictionContext.h in Headers */,
 				27C667331C9584050021E494 /* TokenSource.h in Headers */,
 				27C6684F1C95846E0021E494 /* StarBlockStartState.h in Headers */,
@@ -1447,7 +1435,6 @@
 				2747A70C1CA691310030247B /* ConfigLookup.h in Headers */,
 				27C668731C9584B60021E494 /* DFASerializer.h in Headers */,
 				27C667361C9584050021E494 /* TokenStream.h in Headers */,
-				27C6690E1C9585230021E494 /* stringconverter.h in Headers */,
 				27C666E41C9584050021E494 /* Exceptions.h in Headers */,
 				27C667321C9584050021E494 /* TokenSource.h in Headers */,
 				27C66A1A1C958AB30021E494 /* TagChunk.h in Headers */,
@@ -1491,7 +1478,6 @@
 				27C668041C95846E0021E494 /* LoopEndState.h in Headers */,
 				27C6685A1C95846E0021E494 /* TokensStartState.h in Headers */,
 				27C668561C95846E0021E494 /* StarLoopEntryState.h in Headers */,
-				27C6690C1C9585230021E494 /* StringBuilder.h in Headers */,
 				27C667B41C95846E0021E494 /* ATN.h in Headers */,
 				27C668AC1C9584FA0021E494 /* EqualityComparator.h in Headers */,
 				27C669AD1C9585B80021E494 /* RuleNode.h in Headers */,
@@ -1762,6 +1748,7 @@
 				27C666FB1C9584050021E494 /* Lexer.cpp in Sources */,
 				27C668351C95846E0021E494 /* RuleStartState.cpp in Sources */,
 				27C66A0B1C958AB30021E494 /* TagChunk.cpp in Sources */,
+				272415E51CB54C09007E056A /* UnbufferedTokenStream.cpp in Sources */,
 				27C668AB1C9584FA0021E494 /* EqualityComparator.cpp in Sources */,
 				27C666FF1C9584050021E494 /* LexerInterpreter.cpp in Sources */,
 				27C667FF1C95846E0021E494 /* LL1Analyzer.cpp in Sources */,
@@ -1778,7 +1765,6 @@
 				27C667C71C95846E0021E494 /* ATNSerializer.cpp in Sources */,
 				27C6680D1C95846E0021E494 /* OrderedATNConfigSet.cpp in Sources */,
 				27C666DB1C9584050021E494 /* DefaultErrorStrategy.cpp in Sources */,
-				27C6690B1C9585230021E494 /* StringBuilder.cpp in Sources */,
 				27C666F11C9584050021E494 /* InterpreterRuleContext.cpp in Sources */,
 				27C6672D1C9584050021E494 /* TokenFactory.cpp in Sources */,
 				27C66A091C958AB30021E494 /* RuleTagToken.cpp in Sources */,
@@ -1890,6 +1876,7 @@
 				27C667A61C95846E0021E494 /* AbstractPredicateTransition.cpp in Sources */,
 				27C667AE1C95846E0021E494 /* ArrayPredictionContext.cpp in Sources */,
 				27C669041C9585230021E494 /* CPPUtils.cpp in Sources */,
+				272415E41CB54C08007E056A /* UnbufferedTokenStream.cpp in Sources */,
 				27C667021C9584050021E494 /* LexerNoViableAltException.cpp in Sources */,
 				27C667EE1C95846E0021E494 /* EmptyPredictionContext.cpp in Sources */,
 				27C666C61C9584050021E494 /* CharStream.cpp in Sources */,
@@ -1930,7 +1917,6 @@
 				27C6670E1C9584050021E494 /* Parser.cpp in Sources */,
 				27C667F61C95846E0021E494 /* LexerATNConfig.cpp in Sources */,
 				27C6683C1C95846E0021E494 /* RuleTransition.cpp in Sources */,
-				27C6690A1C9585230021E494 /* StringBuilder.cpp in Sources */,
 				27C667341C9584050021E494 /* TokenStream.cpp in Sources */,
 				27C669141C9585230021E494 /* guid.cpp in Sources */,
 				27C667281C9584050021E494 /* Token.cpp in Sources */,

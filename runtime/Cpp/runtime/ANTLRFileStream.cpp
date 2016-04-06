@@ -85,6 +85,6 @@ void ANTLRFileStream::load(const std::string &fileName, const std::string &encod
   }
 }
 
-std::string ANTLRFileStream::getSourceName() {
+std::string ANTLRFileStream::getSourceName() const {
   return _fileName;
 }

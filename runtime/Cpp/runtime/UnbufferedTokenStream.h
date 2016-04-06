@@ -48,7 +48,7 @@ namespace runtime {
     /// we start filling at index 0 again.
     /// </summary>
 
-    std::vector<Token *>tokens;
+    std::vector<Token *> tokens;
 
     /// <summary>
     /// 0..n-1 index into <seealso cref="#tokens tokens"/> of next token.
@@ -56,7 +56,7 @@ namespace runtime {
     /// The {@code LT(1)} token is {@code tokens[p]}. If {@code p == n}, we are
     /// out of buffered tokens.
     /// </summary>
-    int p;
+    size_t p;
 
     /// <summary>
     /// Count up with <seealso cref="#mark mark()"/> and down with
@@ -85,17 +85,14 @@ namespace runtime {
     /// This value is used to set the token indexes if the stream provides tokens
     /// that implement <seealso cref="WritableToken"/>.
     /// </summary>
-    int currentTokenIndex;
+    size_t currentTokenIndex;
 
   public:
     UnbufferedTokenStream(TokenSource *tokenSource);
-
     UnbufferedTokenStream(TokenSource *tokenSource, int bufferSize);
 
     virtual Token *get(size_t i) const override;
-
     virtual Token *LT(ssize_t i) override;
-
     virtual ssize_t LA(ssize_t i) override;
 
     virtual TokenSource *getTokenSource() const override;
@@ -104,6 +101,7 @@ namespace runtime {
     virtual std::wstring getText() override;
     virtual std::wstring getText(RuleContext *ctx) override;
     virtual std::wstring getText(Token *start, Token *stop) override;
+
     virtual void consume() override;
 
     /// <summary>
@@ -112,15 +110,14 @@ namespace runtime {
     ///  ahead.  If we need 1 element, {@code (p+1-1)==p} must be less than {@code tokens.length}.
     /// </summary>
   protected:
-    virtual void sync(int want);
+    virtual void sync(ssize_t want);
 
     /// <summary>
     /// Add {@code n} elements to the buffer. Returns the number of tokens
     /// actually added to the buffer. If the return value is less than {@code n},
     /// then EOF was reached before {@code n} tokens could be added.
     /// </summary>
-    virtual int fill(int n);
-
+    virtual size_t fill(size_t n);
     virtual void add(Token *t);
 
     /// <summary>
@@ -132,19 +129,14 @@ namespace runtime {
     /// </summary>
   public:
     virtual ssize_t mark() override;
-
     virtual void release(ssize_t marker) override;
-
     virtual size_t index() override;
-
     virtual void seek(size_t index) override;
-
     virtual size_t size() override;
-
-    virtual std::string getSourceName() override;
+    virtual std::string getSourceName() const override;
 
   protected:
-    int getBufferStartIndex();
+    size_t getBufferStartIndex() const;
 
   private:
     void InitializeInstanceFields();

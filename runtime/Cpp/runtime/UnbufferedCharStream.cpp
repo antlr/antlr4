@@ -191,7 +191,7 @@ size_t UnbufferedCharStream::size() {
   throw UnsupportedOperationException("Unbuffered stream cannot know its size");
 }
 
-std::string UnbufferedCharStream::getSourceName() {
+std::string UnbufferedCharStream::getSourceName() const {
   return name;
 }
 
@@ -216,7 +216,7 @@ std::wstring UnbufferedCharStream::getText(const misc::Interval &interval) {
   return std::wstring(data, i, (size_t)interval.length());
 }
 
-size_t UnbufferedCharStream::getBufferStartIndex() {
+size_t UnbufferedCharStream::getBufferStartIndex() const {
   return currentCharIndex - p;
 }
 

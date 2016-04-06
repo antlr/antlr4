@@ -30,10 +30,7 @@
  */
 
 #include "DFA.h"
-#include "StringBuilder.h"
 #include "DFAState.h"
-
-#include "stringconverter.h"
 
 #include "DFASerializer.h"
 
@@ -46,25 +43,21 @@ std::wstring DFASerializer::toString() {
   if (dfa->s0 == nullptr) {
     return L"";
   }
-  antlrcpp::StringBuilder *buf = new antlrcpp::StringBuilder();
+
+  std::wstringstream ss;
   std::vector<DFAState*> states = dfa->getStates();
   for (auto s : states) {
     for (size_t i = 0; i < s->edges.size(); i++) {
       DFAState *t = s->edges[i];
       if (t != nullptr && t->stateNumber != INT16_MAX) {
-        buf->append(getStateString(s));
+        ss << getStateString(s);
         std::wstring label = getEdgeLabel(i);
-        buf->append(L"-"); buf->append(label); buf->append(L"->"); buf->append(getStateString(t)); buf->append(L"\n");
+        ss << L"-" << label << L"->" << getStateString(t) << L"\n";
       }
     }
   }
 
-  std::wstring output = buf->toString();
-  if (output.length() == 0) {
-    return L"";
-  }
-
-  return output;
+  return ss.str();
 }
 
 std::wstring DFASerializer::getEdgeLabel(size_t i) {
@@ -75,7 +68,7 @@ std::wstring DFASerializer::getEdgeLabel(size_t i) {
   if (!tokenNames.empty()) {
     label = tokenNames[i - 1];
   } else {
-    label = antlrcpp::StringConverterHelper::toString(i - 1);
+    label = std::to_wstring(i - 1);
   }
   return label;
 }

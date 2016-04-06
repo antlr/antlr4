@@ -30,7 +30,6 @@
 
 #pragma once
 
-#include "StringBuilder.h"
 #include "Tree.h"
 
 namespace antlrcpp {

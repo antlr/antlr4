@@ -227,25 +227,25 @@ void ATNConfigSet::setReadonly(bool readonly) {
 }
 
 std::wstring ATNConfigSet::toString() {
-  antlrcpp::StringBuilder *buf = new antlrcpp::StringBuilder();
+  std::wstringstream ss;
   for (size_t i = 0; i < elements().size(); i++) {
-    buf->append(elements().at(i)->toString());
+    ss << elements().at(i)->toString();
   }
 
   if (hasSemanticContext) {
-    buf->append(L",hasSemanticContext=").append(hasSemanticContext);
+    ss << L",hasSemanticContext = " <<  hasSemanticContext;
   }
   if (uniqueAlt != ATN::INVALID_ALT_NUMBER) {
-    buf->append(L",uniqueAlt=").append(uniqueAlt);
+    ss << L",uniqueAlt = " << uniqueAlt;
   }
   if (conflictingAlts != nullptr) {
-    buf->append(L",conflictingAlts=");
-    buf->append(conflictingAlts->toString());
+    ss << L",conflictingAlts = ";
+    ss << conflictingAlts->toString();
   }
   if (dipsIntoOuterContext) {
-    buf->append(L",dipsIntoOuterContext");
+    ss << L", dipsIntoOuterContext";
   }
-  return buf->toString();
+  return ss.str();
 }
 
 bool ATNConfigSet::remove(void *o) {

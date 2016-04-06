@@ -33,7 +33,6 @@
 #include "Lexer.h"
 #include "RuleContext.h"
 #include "Interval.h"
-#include "StringBuilder.h"
 #include "Exceptions.h"
 
 #include "BufferedTokenStream.h"
@@ -345,7 +344,7 @@ std::vector<Token*> BufferedTokenStream::filterForChannel(size_t from, size_t to
 /**
  * Get the text of all tokens in this buffer.
  */
-std::string BufferedTokenStream::getSourceName()
+std::string BufferedTokenStream::getSourceName() const
 {
   return tokenSource->getSourceName();
 }
@@ -367,15 +366,15 @@ std::wstring BufferedTokenStream::getText(const misc::Interval &interval) {
     stop = (int)tokens.size() - 1;
   }
 
-  antlrcpp::StringBuilder *buf = new antlrcpp::StringBuilder();
+  std::wstringstream ss;
   for (size_t i = (size_t)start; i <= (size_t)stop; i++) {
     Token *t = tokens[i];
     if (t->getType() == EOF) {
       break;
     }
-    buf->append(t->getText());
+    ss << t->getText();
   }
-  return buf->toString();
+  return ss.str();
 }
 
 std::wstring BufferedTokenStream::getText(RuleContext *ctx) {

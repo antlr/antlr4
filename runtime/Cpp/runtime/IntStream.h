@@ -235,7 +235,7 @@ namespace runtime {
     /// non-null, non-empty string. If such a name is not known, this method
     /// returns <seealso cref="#UNKNOWN_SOURCE_NAME"/>.
     /// </summary>
-    virtual std::string getSourceName() = 0;
+    virtual std::string getSourceName() const = 0;
   };
 
 } // namespace runtime

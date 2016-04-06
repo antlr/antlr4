@@ -35,17 +35,17 @@ using namespace antlrcpp;
 
 std::wstring Arrays::listToString(const std::vector<std::wstring> &list, const std::wstring &separator)
 {
-  StringBuilder sb;
+  std::wstringstream ss;
   bool firstEntry = true;
   
   for (auto &entry : list) {
-    sb.append(entry);
+    ss << entry;
     if (!firstEntry)
-      sb.append(separator);
+      ss << separator;
     firstEntry = false;
   }
 
-  return sb.toString();
+  return ss.str();
 }
 
 template <>

@@ -49,7 +49,6 @@
 #include "RuleStopState.h"
 #include "ATNConfigSet.h"
 #include "ATNConfig.h"
-#include "stringconverter.h"
 #include "Interval.h"
 #include "ANTLRErrorListener.h"
 
@@ -969,7 +968,7 @@ std::wstring ParserATNSimulator::getTokenName(ssize_t t) {
       return tokensNames[(size_t)t] + L"<" + std::to_wstring(t) + L">";
     }
   }
-  return StringConverterHelper::toString(t);
+  return std::to_wstring(t);
 }
 
 std::wstring ParserATNSimulator::getLookaheadName(TokenStream *input) {

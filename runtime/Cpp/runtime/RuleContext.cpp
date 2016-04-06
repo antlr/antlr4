@@ -32,7 +32,6 @@
 #include "Trees.h"
 #include "Interval.h"
 #include "Parser.h"
-#include "StringBuilder.h"
 
 #include "RuleContext.h"
 
@@ -92,12 +91,14 @@ std::wstring RuleContext::getText() {
     return L"";
   }
 
-  antlrcpp::StringBuilder builder;
+  std::wstringstream ss;
   for (size_t i = 0; i < getChildCount(); i++) {
-    builder.append(getChild(i)->getText());
+    if (i > 0)
+      ss << L", ";
+    ss << getChild(i)->getText();
   }
 
-  return builder.toString();
+  return ss.str();
 }
 
 ssize_t RuleContext::getRuleIndex() const {
@@ -159,31 +160,32 @@ std::wstring RuleContext::toString(const std::vector<std::wstring> &ruleNames) {
 
 
 std::wstring RuleContext::toString(const std::vector<std::wstring> &ruleNames, RuleContext *stop) {
-  antlrcpp::StringBuilder buffer;
+  std::wstringstream ss;
+
   RuleContext *p = this;
-  buffer.append(L"[");
+  ss << L"[";
   while (p != nullptr && p != stop) {
     if (ruleNames.empty()) {
       if (!p->isEmpty()) {
-        buffer.append(p->invokingState);
+        ss << p->invokingState;
       }
     } else {
       ssize_t ruleIndex = p->getRuleIndex();
 
       std::wstring ruleName = (ruleIndex >= 0 && ruleIndex < (ssize_t)ruleNames.size()) ? ruleNames[(size_t)ruleIndex] : std::to_wstring(ruleIndex);
-      buffer.append(ruleName);
+      ss << ruleName;
     }
 
     if (p->parent != nullptr && (ruleNames.size() > 0 || !p->parent->isEmpty())) {
-      buffer.append(L" ");
+      ss << L" ";
     }
 
     p = p->parent;
   }
 
-  buffer.append(L"]");
+  ss << L"]";
 
-  return buffer.toString();
+  return ss.str();
 }
 
 std::wstring RuleContext::toString() {

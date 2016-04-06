@@ -35,7 +35,6 @@
 #include "Parser.h"
 #include "Interval.h"
 #include "DFA.h"
-#include "stringconverter.h"
 
 #include "DiagnosticErrorListener.h"
 
@@ -83,12 +82,12 @@ std::wstring DiagnosticErrorListener::getDecisionDescription(Parser *recognizer,
 
   const std::vector<std::wstring>& ruleNames = recognizer->getRuleNames();
   if (ruleIndex < 0 || ruleIndex >= (int)ruleNames.size()) {
-    return antlrcpp::StringConverterHelper::toString(decision);
+    return std::to_wstring(decision);
   }
 
   std::wstring ruleName = ruleNames[(size_t)ruleIndex];
   if (ruleName == L"" || ruleName.empty())  {
-    return antlrcpp::StringConverterHelper::toString(decision);
+    return std::to_wstring(decision);
   }
 
   return std::to_wstring(decision) + L"(" + ruleName + L")";

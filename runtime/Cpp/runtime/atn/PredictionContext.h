@@ -35,7 +35,6 @@
 #include "EqualityComparator.h"
 #include "ATN.h"
 #include "ATNState.h"
-#include "StringBuilder.h"
 
 namespace org {
 namespace antlr {

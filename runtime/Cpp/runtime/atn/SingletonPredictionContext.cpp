@@ -30,7 +30,6 @@
  */
 
 #include "EmptyPredictionContext.h"
-#include "stringconverter.h"
 
 #include "SingletonPredictionContext.h"
 
@@ -87,7 +86,7 @@ std::wstring SingletonPredictionContext::toString() const {
     if (returnState == EMPTY_RETURN_STATE) {
       return L"$";
     }
-    return antlrcpp::StringConverterHelper::toString(returnState);
+    return std::to_wstring(returnState);
   }
-  return antlrcpp::StringConverterHelper::toString(returnState) + std::wstring(L" ") + up;
+  return std::to_wstring(returnState) + L" " + up;
 }

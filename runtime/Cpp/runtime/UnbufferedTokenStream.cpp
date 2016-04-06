@@ -29,8 +29,6 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
-
 #include "Token.h"
 #include "Exceptions.h"
 #include "assert.h"
@@ -39,6 +37,8 @@
 #include "Interval.h"
 #include "RuleContext.h"
 #include "WritableToken.h"
+
+#include "UnbufferedTokenStream.h"
 
 using namespace org::antlr::v4::runtime;
 
@@ -49,16 +49,15 @@ UnbufferedTokenStream::UnbufferedTokenStream(TokenSource* tokenSource, int buffe
 {
   InitializeInstanceFields();
   this->tokenSource = tokenSource;
-  tokens = new std::vector<Token*>(); // TODO do we need to actually new this?
-  n = 0;
   fill(1); // prime the pump
 }
 
-Token* UnbufferedTokenStream::get(int i)
+Token* UnbufferedTokenStream::get(size_t i) const
 { // get absolute index
-  int bufferStartIndex = getBufferStartIndex();
-  if (i < bufferStartIndex || i >= bufferStartIndex + n) {
-    throw IndexOutOfBoundsException(std::wstring(L"get(") + std::to_wstring(i) + std::wstring(L") outside buffer: ") + std::to_wstring(bufferStartIndex) + std::wstring(L"..") + std::to_wstring(bufferStartIndex + n));
+  size_t bufferStartIndex = getBufferStartIndex();
+  if (i < bufferStartIndex || i >= bufferStartIndex + tokens.size()) {
+    throw IndexOutOfBoundsException(std::string("get(") + std::to_string(i) + std::string(") outside buffer: ")
+      + std::to_string(bufferStartIndex) + std::string("..") + std::to_string(bufferStartIndex + tokens.size()));
   }
   return tokens[i - bufferStartIndex];
 }
@@ -70,25 +69,25 @@ Token* UnbufferedTokenStream::LT(ssize_t i)
   }
 
   sync(i);
-  int index = p + i - 1;
+  ssize_t index = (ssize_t)p + i - 1;
   if (index < 0) {
-    throw IndexOutOfBoundsException(std::wstring(L"LT(") + std::to_wstring(i) + std::wstring(L") gives negative index"));
+    throw IndexOutOfBoundsException(std::string("LT(") + std::to_string(i) + std::string(") gives negative index"));
   }
 
-  if (index >= tokens.size()) {
-    assert(n > 0 && tokens[n - 1]->getType() == EOF);
-    return tokens[n - 1];
+  if (index >= (ssize_t)tokens.size()) {
+    assert(tokens.size() > 0 && tokens.back()->getType() == EOF);
+    return tokens.back();
   }
 
-  return tokens[index];
+  return tokens[(size_t)index];
 }
 
-int UnbufferedTokenStream::LA(ssize_t i)
+ssize_t UnbufferedTokenStream::LA(ssize_t i)
 {
   return LT(i)->getType();
 }
 
-TokenSource* UnbufferedTokenStream::getTokenSource()
+TokenSource* UnbufferedTokenStream::getTokenSource() const
 {
   return tokenSource;
 }
@@ -111,21 +110,22 @@ std::wstring UnbufferedTokenStream::getText(Token* start, Token* stop)
 void UnbufferedTokenStream::consume()
 {
   if (LA(1) == EOF) {
-    throw IllegalStateException(L"cannot consume EOF");
+    throw IllegalStateException("cannot consume EOF");
   }
 
   // buf always has at least tokens[p==0] in this method due to ctor
   lastToken = tokens[p]; // track last token for LT(-1)
 
   // if we're at last token and no markers, opportunity to flush buffer
-  if (p == n - 1 && numMarkers == 0) {
-    n = 0;
-    p = -1; // p++ will leave this at 0
+  if (p == tokens.size() - 1 && numMarkers == 0) {
+    tokens.clear();
+    p = 0;
     lastTokenBufferStart = lastToken;
+  } else {
+    ++p;
   }
 
-  p++;
-  currentTokenIndex++;
+  ++currentTokenIndex;
   sync(1);
 }
 
@@ -134,11 +134,11 @@ void UnbufferedTokenStream::consume()
 ///  {@code p} index is {@code tokens.length-1}.  {@code p+need-1} is the tokens index 'need' elements
 ///  ahead.  If we need 1 element, {@code (p+1-1)==p} must be less than {@code tokens.length}.
 /// </summary>
-void UnbufferedTokenStream::sync(int want)
+void UnbufferedTokenStream::sync(ssize_t want)
 {
-  int need = (p + want - 1) - n + 1; // how many more elements we need?
+  ssize_t need = ((ssize_t)p + want - 1) - (ssize_t)tokens.size() + 1; // how many more elements we need?
   if (need > 0) {
-    fill(need);
+    fill((size_t)need);
   }
 }
 
@@ -147,10 +147,10 @@ void UnbufferedTokenStream::sync(int want)
 /// actually added to the buffer. If the return value is less than {@code n},
 /// then EOF was reached before {@code n} tokens could be added.
 /// </summary>
-int UnbufferedTokenStream::fill(int n)
+size_t UnbufferedTokenStream::fill(size_t n)
 {
-  for (int i = 0; i < n; i++) {
-    if (this->n > 0 && tokens[this->n - 1]->getType() == EOF) {
+  for (size_t i = 0; i < n; i++) {
+    if (tokens.size() > 0 && tokens.back()->getType() == EOF) {
       return i;
     }
 
@@ -164,12 +164,11 @@ int UnbufferedTokenStream::fill(int n)
 void UnbufferedTokenStream::add(Token* t)
 {
   WritableToken *writable = dynamic_cast<WritableToken *>(t);
-  if (t != nullptr) {
-    t->setTokenIndex(getBufferStartIndex() + n);
+  if (writable != nullptr) {
+    writable->setTokenIndex(int(getBufferStartIndex() + tokens.size()));
   }
 
   tokens.push_back(t);
-  n++
 }
 
 /// <summary>
@@ -179,7 +178,7 @@ void UnbufferedTokenStream::add(Token* t)
 /// protection against misuse where {@code seek()} is called on a mark or
 /// {@code release()} is called in the wrong order.
 /// </summary>
-int UnbufferedTokenStream::mark()
+ssize_t UnbufferedTokenStream::mark()
 {
   if (numMarkers == 0) {
     lastTokenBufferStart = lastToken;
@@ -190,12 +189,11 @@ int UnbufferedTokenStream::mark()
   return mark;
 }
 
-template <typename T>
-void UnbufferedTokenStream::release(int marker)
+void UnbufferedTokenStream::release(ssize_t marker)
 {
-  int expectedMark = -numMarkers;
+  ssize_t expectedMark = -numMarkers;
   if (marker != expectedMark) {
-    throw IllegalStateException(L"release() called with an invalid marker.");
+    throw IllegalStateException("release() called with an invalid marker.");
   }
 
   numMarkers--;
@@ -203,8 +201,7 @@ void UnbufferedTokenStream::release(int marker)
     if (p > 0) {
       // Copy tokens[p]..tokens[n-1] to tokens[0]..tokens[(n-1)-p], reset ptrs
       // p is last valid token; move nothing if p==n as we have no valid char
-      arraycopy(tokens, p, tokens, 0, n - p); // shift n-p tokens from p to 0
-      n = n - p;
+      std::vector<Token *>(tokens.begin() + (ssize_t)p, tokens.end()).swap(tokens);
       p = 0;
     }
 
@@ -212,7 +209,7 @@ void UnbufferedTokenStream::release(int marker)
   }
 }
 
-int UnbufferedTokenStream::index()
+size_t UnbufferedTokenStream::index()
 {
   return currentTokenIndex;
 }
@@ -224,70 +221,73 @@ void UnbufferedTokenStream::seek(size_t index)
   }
 
   if (index > currentTokenIndex) {
-    sync(index - currentTokenIndex);
-    index = std::min(index, getBufferStartIndex() + n - 1);
+    sync(ssize_t(index - currentTokenIndex));
+    index = std::min(index, getBufferStartIndex() + tokens.size() - 1);
   }
 
-  int bufferStartIndex = getBufferStartIndex();
-  int i = index - bufferStartIndex;
-  if (i < 0) {
-    throw IllegalArgumentException(std::wstring(L"cannot seek to negative index ") + std::to_wstring(index));
+  size_t bufferStartIndex = getBufferStartIndex();
+  if (bufferStartIndex > index) {
+    throw IllegalArgumentException(std::string("cannot seek to negative index ") + std::to_string(index));
   }
-  else if (i >= n) {
-    throw UnsupportedOperationException(std::wstring(L"seek to index outside buffer: ") + std::to_wstring(index) + std::wstring(L" not in ") + std::to_wstring(bufferStartIndex) + std::wstring(L"..") + std::to_wstring(bufferStartIndex + n));
+
+  size_t i = index - bufferStartIndex;
+  if (i >= tokens.size()) {
+    throw UnsupportedOperationException(std::string("seek to index outside buffer: ") + std::to_string(index) +
+      " not in " + std::to_string(bufferStartIndex) + ".." + std::to_string(bufferStartIndex + tokens.size()));
   }
 
   p = i;
   currentTokenIndex = index;
   if (p == 0) {
     lastToken = lastTokenBufferStart;
-  }
-  else {
+  } else {
     lastToken = tokens[p - 1];
   }
 }
 
 size_t UnbufferedTokenStream::size()
 {
-  throw UnsupportedOperationException(L"Unbuffered stream cannot know its size");
+  throw UnsupportedOperationException("Unbuffered stream cannot know its size");
 }
 
-std::string UnbufferedTokenStream::getSourceName()
+std::string UnbufferedTokenStream::getSourceName() const
 {
   return tokenSource->getSourceName();
 }
 
 std::wstring UnbufferedTokenStream::getText(const misc::Interval &interval)
 {
-  int bufferStartIndex = getBufferStartIndex();
-  int bufferStopIndex = bufferStartIndex + tokens.size() - 1;
+  size_t bufferStartIndex = getBufferStartIndex();
+  size_t bufferStopIndex = bufferStartIndex + tokens.size() - 1;
 
-  int start = interval->a;
-  int stop = interval->b;
+  size_t start = (size_t)interval.a;
+  size_t stop = (size_t)interval.b;
   if (start < bufferStartIndex || stop > bufferStopIndex) {
-    throw UnsupportedOperationException(std::wstring(L"interval ") + interval->toString() + std::wstring(L" not in token buffer window: ") + std::to_wstring(bufferStartIndex) + std::wstring(L"..") + std::to_wstring(bufferStopIndex));
+    throw UnsupportedOperationException(std::string("interval ") + interval.toString() +
+      " not in token buffer window: " + std::to_string(bufferStartIndex) + ".." + std::to_string(bufferStopIndex));
   }
 
-  int a = start - bufferStartIndex;
-  int b = stop - bufferStartIndex;
+  size_t a = start - bufferStartIndex;
+  size_t b = stop - bufferStartIndex;
 
-  StringBuilder* buf = new StringBuilder();
-  for (int i = a; i <= b; i++) {
-    Token* t = tokens[i];
-    buf->append(t->getText());
+  std::wstringstream ss;
+  for (size_t i = a; i <= b; i++) {
+    Token *t = tokens[i];
+    if (i > 0)
+      ss << L", ";
+    ss << t->getText();
   }
 
-  return buf->toString();
+  return ss.str();
 }
 
-int UnbufferedTokenStream::getBufferStartIndex()
+size_t UnbufferedTokenStream::getBufferStartIndex() const
 {
   return currentTokenIndex - p;
 }
 
 void UnbufferedTokenStream::InitializeInstanceFields()
 {
-  n = 0;
   p = 0;
   numMarkers = 0;
   currentTokenIndex = 0;

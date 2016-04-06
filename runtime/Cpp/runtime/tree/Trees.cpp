@@ -31,7 +31,6 @@
 
 #include "ErrorNode.h"
 #include "Parser.h"
-#include "StringBuilder.h"
 #include "CPPUtils.h"
 
 #include "Trees.h"
@@ -52,19 +51,17 @@ std::wstring Trees::toStringTree(Tree *t, const std::vector<std::wstring> &ruleN
   if (t->getChildCount() == 0) {
     return s;
   }
-  antlrcpp::StringBuilder *buf = new antlrcpp::StringBuilder();
-  buf->append(L"(");
-  s = antlrcpp::escapeWhitespace(getNodeText(t, ruleNames), false);
-  buf->append(s);
-  buf->append(L' ');
+
+  std::wstringstream ss;
+  ss << L"(" << antlrcpp::escapeWhitespace(getNodeText(t, ruleNames), false) << L' ';
   for (size_t i = 0; i < t->getChildCount(); i++) {
     if (i > 0) {
-      buf->append(L' ');
+      ss << L' ';
     }
-    buf->append(toStringTree(t->getChild(i), ruleNames));
+    ss << toStringTree(t->getChild(i), ruleNames);
   }
-  buf->append(L")");
-  return buf->toString();
+  ss << L")";
+  return ss.str();
 }
 
 std::wstring Trees::getNodeText(Tree *t, Parser *recog) {

@@ -34,8 +34,6 @@
 #include "Interval.h"
 #include "CommonTokenFactory.h"
 #include "LexerNoViableAltException.h"
-#include "stringconverter.h"
-#include "StringBuilder.h"
 #include "ANTLRErrorListener.h"
 #include "CPPUtils.h"
 
@@ -289,22 +287,16 @@ void Lexer::notifyListeners(LexerNoViableAltException *e) {
 }
 
 std::wstring Lexer::getErrorDisplay(const std::wstring &s) {
-  antlrcpp::StringBuilder *buf = new antlrcpp::StringBuilder();
-
+  std::wstringstream ss;
   for (size_t i = 0; i < s.length(); i++) {
     char c = ((char*)s.c_str())[i];
-    buf->append(getErrorDisplay(c));
+    ss << getErrorDisplay(c);
   }
-  /*
-   for (auto c : s.toCharArray()) {
-   buf->append(getErrorDisplay(c));
-   }*/
-
-  return buf->toString();
+  return ss.str();
 }
 
 std::wstring Lexer::getErrorDisplay(int c) {
-  std::wstring s = antlrcpp::StringConverterHelper::toString(static_cast<wchar_t>(c));
+  std::wstring s;
   switch (c) {
     case EOF :
       s = L"<EOF>";
@@ -317,6 +309,9 @@ std::wstring Lexer::getErrorDisplay(int c) {
       break;
     case L'\r' :
       s = L"\\r";
+      break;
+    default:
+      s = std::to_wstring(c);
       break;
   }
   return s;

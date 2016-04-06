@@ -51,7 +51,6 @@
 #include "AtomTransition.h"
 #include "ActionTransition.h"
 #include "ATNDeserializer.h"
-#include "stringconverter.h"
 
 #include "TokensStartState.h"
 #include "Exceptions.h"
@@ -523,7 +522,7 @@ std::wstring ATNSerializer::getTokenName(ssize_t t) {
     return tokenNames[(size_t)t];
   }
 
-  return antlrcpp::StringConverterHelper::toString(t);
+  return std::to_wstring(t);
 }
 
 std::wstring ATNSerializer::getSerializedAsString(ATN *atn) {

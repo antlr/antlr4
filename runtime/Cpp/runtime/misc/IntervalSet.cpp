@@ -31,7 +31,6 @@
 
 #include "MurmurHash.h"
 #include "Lexer.h"
-#include "StringBuilder.h"
 #include "Exceptions.h"
 
 #include "IntervalSet.h"
@@ -347,82 +346,82 @@ std::wstring IntervalSet::toString() const {
 }
 
 std::wstring IntervalSet::toString(bool elemAreChar) const {
-  antlrcpp::StringBuilder buffer;
   if (_intervals.empty()) {
     return L"{}";
   }
 
+  std::wstringstream ss;
   size_t effectiveSize = size();
   if (effectiveSize > 1) {
-    buffer.append(L"{");
+    ss << L"{";
   }
 
   bool firstEntry = true;
   for (auto &interval : _intervals) {
     if (!firstEntry)
-      buffer.append(L", ");
+      ss << L", ";
     firstEntry = false;
 
     int a = interval.a;
     int b = interval.b;
     if (a == b) {
       if (a == -1) {
-        buffer.append(L"<EOF>");
+        ss << L"<EOF>";
       } else if (elemAreChar) {
-        buffer.append(L"'").append(static_cast<wchar_t>(a)).append(L"'");
+        ss << L"'" << static_cast<wchar_t>(a) << L"'";
       } else {
-        buffer.append(a);
+        ss << a;
       }
     } else {
       if (elemAreChar) {
-        buffer.append(L"'").append(static_cast<wchar_t>(a)).append(L"'..'").append(static_cast<wchar_t>(b)).append(L"'");
+        ss << L"'" << static_cast<wchar_t>(a) << L"'..'" << static_cast<wchar_t>(b) << L"'";
       } else {
-        buffer.append(a).append(L"..").append(b);
+        ss << a << L".." << b;
       }
     }
   }
   if (effectiveSize > 1) {
-    buffer.append(L"}");
+    ss << L"}";
   }
 
-  return buffer.toString();
+  return ss.str();
 }
 
 std::wstring IntervalSet::toString(const std::vector<std::wstring> &tokenNames) const {
-  antlrcpp::StringBuilder buffer;
   if (_intervals.empty()) {
     return L"{}";
   }
 
+  std::wstringstream ss;
   size_t effectiveSize = size();
   if (effectiveSize > 1) {
-    buffer.append(L"{");
+    ss << L"{";
   }
 
   bool firstEntry = true;
   for (auto &interval : _intervals) {
     if (!firstEntry)
-      buffer.append(L", ");
+      ss << L", ";
     firstEntry = false;
 
     ssize_t a = (ssize_t)interval.a;
     ssize_t b = (ssize_t)interval.b;
     if (a == b) {
-      buffer.append(elementName(tokenNames, a));
+      ss << elementName(tokenNames, a);
     } else {
       for (ssize_t i = a; i <= b; i++) {
         if (i > a) {
-          buffer.append(L", ");
+          ss << L", ";
         }
-        buffer.append(elementName(tokenNames, i));
+        ss << elementName(tokenNames, i);
       }
     }
   }
   if (effectiveSize > 1) {
-    buffer.append(L"}");
+    ss << L"}";
   }
 
-  return buffer.toString();
+  return ss.str();
 }
 
 std::wstring IntervalSet::elementName(const std::vector<std::wstring> &tokenNames, ssize_t a) const {

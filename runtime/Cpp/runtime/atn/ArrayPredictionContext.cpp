@@ -81,24 +81,23 @@ std::wstring ArrayPredictionContext::toString() {
   if (isEmpty()) {
     return L"[]";
   }
-  antlrcpp::StringBuilder buf;
-  buf.append(L"[");
-  for (std::vector<int>::size_type i = 0; i < returnStates.size(); i++) {
+
+  std::wstringstream ss(L"[");
+  for (size_t i = 0; i < returnStates.size(); i++) {
     if (i > 0) {
-      buf.append(L", ");
+      ss << L", ";
     }
     if (returnStates[i] == EMPTY_RETURN_STATE) {
-      buf.append(L"$");
+      ss << L"$";
       continue;
     }
-    buf.append(std::to_wstring(returnStates.at(i)));
+    ss << returnStates[i];
     if (!parents[i].expired()) {
-      buf.append(L" ");
-      buf.append(parents[i].lock()->toString());
+      ss << L" " << parents[i].lock()->toString();
     } else {
-      buf.append(L"null");
+      ss << L"null";
     }
   }
-  buf.append(L"]");
-  return buf.toString();
+  ss << L"]";
+  return ss.str();
 }

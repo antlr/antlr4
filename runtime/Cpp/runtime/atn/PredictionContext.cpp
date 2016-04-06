@@ -34,7 +34,6 @@
 #include "ArrayPredictionContext.h"
 #include "RuleContext.h"
 #include "RuleTransition.h"
-#include "stringconverter.h"
 #include "Arrays.h"
 #include "CPPUtils.h"
 
@@ -404,9 +403,9 @@ std::wstring PredictionContext::toDOTString(PredictionContextRef context) {
   if (context == nullptr) {
     return L"";
   }
-  antlrcpp::StringBuilder *buf = new antlrcpp::StringBuilder();
-  buf->append(L"digraph G {\n");
-  buf->append(L"rankdir=LR;\n");
+
+  std::wstringstream ss;
+  ss << L"digraph G {\n" << L"rankdir=LR;\n";
 
   std::vector<PredictionContextRef> nodes = getAllContextNodes(context);
   std::sort(nodes.begin(), nodes.end(), [](PredictionContextRef o1, PredictionContextRef o2) {
@@ -415,33 +414,31 @@ std::wstring PredictionContext::toDOTString(PredictionContextRef context) {
 
   for (auto current : nodes) {
     if (is<SingletonPredictionContext>(current)) {
-      std::wstring s = antlrcpp::StringConverterHelper::toString(current->id);
-      buf->append(L"  s").append(s);
-      std::wstring returnState = antlrcpp::StringConverterHelper::toString(current->getReturnState(0));
+      std::wstring s = std::to_wstring(current->id);
+      ss << L"  s" << s;
+      std::wstring returnState = std::to_wstring(current->getReturnState(0));
       if (is<EmptyPredictionContext>(current)) {
         returnState = L"$";
       }
-      buf->append(L" [label=\"").append(returnState).append(L"\"];\n");
+      ss << L" [label=\"" << returnState << L"\"];\n";
       continue;
     }
     std::shared_ptr<ArrayPredictionContext> arr = std::static_pointer_cast<ArrayPredictionContext>(current);
-    buf->append(L"  s").append(arr->id);
-    buf->append(L" [shape=box, label=\"");
-    buf->append(L"[");
+    ss << L"  s" << arr->id << L" [shape=box, label=\"" << L"[";
     bool first = true;
     for (auto inv : arr->returnStates) {
       if (!first) {
-        buf->append(L", ");
+       ss << L", ";
       }
       if (inv == EMPTY_RETURN_STATE) {
-        buf->append(L"$");
+        ss << L"$";
       } else {
-        buf->append(inv);
+        ss << inv;
       }
       first = false;
     }
-    buf->append(L"]");
-    buf->append(L"\"];\n");
+    ss << L"]";
+    ss << L"\"];\n";
   }
 
   for (auto current : nodes) {
@@ -452,21 +449,17 @@ std::wstring PredictionContext::toDOTString(PredictionContextRef context) {
       if (current->getParent(i).expired()) {
         continue;
       }
-      std::wstring s = antlrcpp::StringConverterHelper::toString(current->id);
-      buf->append(L"  s").append(s);
-      buf->append(L"->");
-      buf->append(L"s");
-      buf->append(current->getParent(i).lock()->id);
+      ss << L"  s" << current->id << L"->" << L"s" << current->getParent(i).lock()->id;
       if (current->size() > 1) {
-        buf->append(std::wstring(L" [label=\"parent[") + antlrcpp::StringConverterHelper::toString(i) + std::wstring(L"]\"];\n"));
+        ss << L" [label=\"parent[" << i << L"]\"];\n";
       } else {
-        buf->append(L";\n");
+        ss << L";\n";
       }
     }
   }
 
-  buf->append(L"}\n");
-  return buf->toString();
+  ss << L"}\n";
+  return ss.str();
 }
 
 // The "visited" map is just a temporary structure to control the retrieval process (which is recursive).
@@ -579,9 +572,8 @@ std::vector<std::wstring> PredictionContext::toStrings(Recognizer *recognizer, P
     bool last = true;
     PredictionContext *p = this;
     int stateNumber = currentState;
-    antlrcpp::StringBuilder localBuffer;
-    localBuffer.append(L"[");
 
+    std::wstringstream ss(L"[");
     bool outerContinue = false;
     while (!p->isEmpty() && p != stop.get()) {
       size_t index = 0;
@@ -602,23 +594,23 @@ std::vector<std::wstring> PredictionContext::toStrings(Recognizer *recognizer, P
       }
 
       if (recognizer != nullptr) {
-        if (localBuffer.length() > 1) {
+        if (ss.tellp() > 1) {
           // first char is '[', if more than that this isn't the first rule
-          localBuffer.append(L' ');
+          ss << L' ';
         }
 
         const ATN &atn = recognizer->getATN();
         ATNState *s = atn.states[(size_t)stateNumber];
         std::wstring ruleName = recognizer->getRuleNames()[(size_t)s->ruleIndex];
-        localBuffer.append(ruleName);
+        ss << ruleName;
       } else if (p->getReturnState(index) != EMPTY_RETURN_STATE) {
         if (!p->isEmpty()) {
-          if (localBuffer.length() > 1) {
+          if (ss.tellp() > 1) {
             // first char is '[', if more than that this isn't the first rule
-            localBuffer.append(L' ');
+            ss << L' ';
           }
 
-          localBuffer.append(p->getReturnState(index));
+          ss << p->getReturnState(index);
         }
       }
       stateNumber = p->getReturnState(index);
@@ -628,8 +620,8 @@ std::vector<std::wstring> PredictionContext::toStrings(Recognizer *recognizer, P
     if (outerContinue)
       continue;
 
-    localBuffer.append(L"]");
-    result.push_back(localBuffer.toString());
+    ss << L"]";
+    result.push_back(ss.str());
 
     if (last) {
       break;

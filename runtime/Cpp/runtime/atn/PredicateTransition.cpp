@@ -30,7 +30,6 @@
  */
 
 #include "PredicateTransition.h"
-#include "stringconverter.h"
 
 using namespace org::antlr::v4::runtime::atn;
 
@@ -54,5 +53,5 @@ std::shared_ptr<SemanticContext::Predicate> PredicateTransition::getPredicate() 
 }
 
 std::wstring PredicateTransition::toString() const {
-  return std::wstring(L"pred_") + antlrcpp::StringConverterHelper::toString(ruleIndex) + std::wstring(L":") + antlrcpp::StringConverterHelper::toString(predIndex);
+  return std::wstring(L"pred_") + std::to_wstring(ruleIndex) + std::wstring(L":") + std::to_wstring(predIndex);
 }
