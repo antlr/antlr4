@@ -75,17 +75,6 @@ RuleContext *RuleContext::getParent() {
   return parent;
 }
 
-void *RuleContext::getPayload()
-/// Return the combined text of all child nodes. This method only considers
-/// tokens which have been added to the parse tree.
-/// <para>
-/// Since tokens on hidden channels (e.g. whitespace or comments) are not
-/// added to the parse trees, they will not appear in the output of this
-/// method.
-{
-  return this;
-}
-
 std::wstring RuleContext::getText() {
   if (getChildCount() == 0) {
     return L"";
@@ -189,9 +178,7 @@ std::wstring RuleContext::toString(const std::vector<std::wstring> &ruleNames, R
 }
 
 std::wstring RuleContext::toString() {
-#ifdef TODO
-#endif
-  return L"TODO";
+  return toString(nullptr);
 };
 
 std::wstring RuleContext::toString(Recognizer *recog) {
@@ -200,10 +187,6 @@ std::wstring RuleContext::toString(Recognizer *recog) {
 
 std::wstring RuleContext::toString(Recognizer *recog, RuleContext *stop) {
   return toString(recog->getRuleNames(), stop);
-}
-
-std::wstring RuleContext::toString(Token *, atn::ParserATNSimulator *) {
-  return L"TODO";
 }
 
 void RuleContext::InitializeInstanceFields() {

@@ -312,7 +312,7 @@ namespace runtime {
     ///  Return a map from token index to operation.
     /// </summary>
   protected:
-    virtual std::unordered_map<int, RewriteOperation*> *reduceToSingleOperationPerIndex(std::vector<RewriteOperation*> &rewrites);
+    virtual std::unordered_map<size_t, RewriteOperation*> reduceToSingleOperationPerIndex(std::vector<RewriteOperation*> rewrites);
 
     virtual std::wstring catOpText(std::wstring *a, std::wstring *b);
 

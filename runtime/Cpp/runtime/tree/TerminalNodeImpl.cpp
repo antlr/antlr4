@@ -53,10 +53,6 @@ ParseTree *TerminalNodeImpl::getParent() {
   return parent;
 }
 
-void *TerminalNodeImpl::getPayload() {
-  return symbol;
-}
-
 misc::Interval TerminalNodeImpl::getSourceInterval() {
   if (symbol == nullptr) {
     return misc::Interval::INVALID;

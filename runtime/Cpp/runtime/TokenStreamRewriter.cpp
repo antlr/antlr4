@@ -71,7 +71,7 @@ void TokenStreamRewriter::RewriteOperation::InitializeInstanceFields() {
 }
 
 TokenStreamRewriter::InsertBeforeOp::InsertBeforeOp(TokenStreamRewriter *outerInstance, size_t index, const std::wstring& text)
-  : RewriteOperation(outerInstance, index, text), outerInstance(outerInstance) {
+: RewriteOperation(outerInstance, index, text), outerInstance(outerInstance) {
 }
 
 size_t TokenStreamRewriter::InsertBeforeOp::execute(std::wstring *buf) {
@@ -280,18 +280,18 @@ std::wstring TokenStreamRewriter::getText(const std::wstring &programName, const
   std::wstring buf;
 
   // First, optimize instruction stream
-  std::unordered_map<int, TokenStreamRewriter::RewriteOperation*> *indexToOp = reduceToSingleOperationPerIndex(rewrites);
+  std::unordered_map<size_t, TokenStreamRewriter::RewriteOperation*> indexToOp = reduceToSingleOperationPerIndex(rewrites);
 
   // Walk buffer, executing instructions and emitting tokens
   size_t i = (size_t)start;
   while (i <= (size_t)stop && i < tokens->size()) {
-    RewriteOperation *op = indexToOp->at((int)i);
-    indexToOp->erase((int)i); // remove so any left have index size-1
+    RewriteOperation *op = indexToOp[i];
+    indexToOp.erase(i); // remove so any left have index size-1
     Token *t = tokens->get(i);
     if (op == nullptr) {
       // no operation at that index, just dump token
       if (t->getType() != EOF) {
-								buf.append(t->getText());
+        buf.append(t->getText());
       }
       i++; // move to next token
     }
@@ -306,17 +306,17 @@ std::wstring TokenStreamRewriter::getText(const std::wstring &programName, const
   if (stop == (int)tokens->size() - 1) {
     // Scan any remaining operations after last token
     // should be included (they will be inserts).
-    for (auto op : *indexToOp) {
+    for (auto op : indexToOp) {
       if (op.second->index >= tokens->size() - 1) {
-								buf.append(op.second->text);
+        buf.append(op.second->text);
       }
     }
   }
   return buf;
 }
 
-std::unordered_map<int, TokenStreamRewriter::RewriteOperation*> *TokenStreamRewriter::reduceToSingleOperationPerIndex(std::vector<TokenStreamRewriter::RewriteOperation*> &rewrites) {
-  //		System.out.println("rewrites="+rewrites);
+std::unordered_map<size_t, TokenStreamRewriter::RewriteOperation*> TokenStreamRewriter::reduceToSingleOperationPerIndex(
+  std::vector<TokenStreamRewriter::RewriteOperation*> rewrites) {
 
   // WALK REPLACES
   for (size_t i = 0; i < rewrites.size(); ++i) {
@@ -333,16 +333,14 @@ std::unordered_map<int, TokenStreamRewriter::RewriteOperation*> *TokenStreamRewr
     std::vector<InsertBeforeOp*> inserts = getKindOfOps(rewrites, type, i);
     for (auto iop : inserts) {
       if (iop->index == rop->index) {
-								// E.g., insert before 2, delete 2..2; update replace
-                // text to include insert before, kill insert
-                //JAVA TO C++ CONVERTER WARNING: Java to C++ Converter converted the original 'null' assignment to a call to 'delete', but you should review memory allocation of all pointer variables in the converted code:
-								delete rewrites[(size_t)iop->instructionIndex];
-								rop->text = iop->text + (!rop->text.empty() ? rop->text : L"");
+        // E.g., insert before 2, delete 2..2; update replace
+        // text to include insert before, kill insert
+        rewrites[(size_t)iop->instructionIndex] = nullptr;
+        rop->text = iop->text + (!rop->text.empty() ? rop->text : L"");
       }
       else if (iop->index > rop->index && iop->index <= rop->lastIndex) {
-								// delete insert as it's a no-op.
-                //JAVA TO C++ CONVERTER WARNING: Java to C++ Converter converted the original 'null' assignment to a call to 'delete', but you should review memory allocation of all pointer variables in the converted code:
-								delete rewrites[(size_t)iop->instructionIndex];
+        // delete insert as it's a no-op.
+        rewrites[(size_t)iop->instructionIndex] = nullptr;
       }
     }
     // Drop any prior replaces contained within
@@ -350,23 +348,21 @@ std::unordered_map<int, TokenStreamRewriter::RewriteOperation*> *TokenStreamRewr
     std::vector<ReplaceOp*> prevReplaces = getKindOfOps(rewrites, type2, i);
     for (auto prevRop : prevReplaces) {
       if (prevRop->index >= rop->index && prevRop->lastIndex <= rop->lastIndex) {
-								// delete replace as it's a no-op.
-                //JAVA TO C++ CONVERTER WARNING: Java to C++ Converter converted the original 'null' assignment to a call to 'delete', but you should review memory allocation of all pointer variables in the converted code:
-								delete rewrites[(size_t)prevRop->instructionIndex];
-								continue;
+        // delete replace as it's a no-op.
+        rewrites[(size_t)prevRop->instructionIndex] = nullptr;
+        continue;
       }
       // throw exception unless disjoint or identical
       bool disjoint = prevRop->lastIndex < rop->index || prevRop->index > rop->lastIndex;
       bool same = prevRop->index == rop->index && prevRop->lastIndex == rop->lastIndex;
       // Delete special case of replace (text==null):
-      // D.i-j.u D.x-y.v	| boundaries overlap	combine to max(min)..max(right)
+      // D.i-j.u D.x-y.v    | boundaries overlap    combine to max(min)..max(right)
       if (prevRop->text.empty() && rop->text.empty() && !disjoint) {
-								//System.out.println("overlapping deletes: "+prevRop+", "+rop);
-                //JAVA TO C++ CONVERTER WARNING: Java to C++ Converter converted the original 'null' assignment to a call to 'delete', but you should review memory allocation of all pointer variables in the converted code:
-								delete rewrites[(size_t)prevRop->instructionIndex]; // kill first delete
-								rop->index = std::min(prevRop->index, rop->index);
-								rop->lastIndex = std::max(prevRop->lastIndex, rop->lastIndex);
-								std::wcout << L"new rop " << rop << std::endl;
+        //System.out.println("overlapping deletes: "+prevRop+", "+rop);
+        rewrites[(size_t)prevRop->instructionIndex] = nullptr; // kill first delete
+        rop->index = std::min(prevRop->index, rop->index);
+        rop->lastIndex = std::max(prevRop->lastIndex, rop->lastIndex);
+        std::wcout << L"new rop " << rop << std::endl;
       }
       else if (!disjoint && !same) {
         throw IllegalArgumentException("replace op boundaries of " + antlrcpp::ws2s(rop->toString()) +
@@ -392,10 +388,9 @@ std::unordered_map<int, TokenStreamRewriter::RewriteOperation*> *TokenStreamRewr
       if (prevIop->index == iop->index) { // combine objects
                                           // convert to strings...we're in process of toString'ing
                                           // whole token buffer so no lazy eval issue with any templates
-								iop->text = catOpText(&iop->text, &prevIop->text);
-								// delete redundant prior insert
-                //JAVA TO C++ CONVERTER WARNING: Java to C++ Converter converted the original 'null' assignment to a call to 'delete', but you should review memory allocation of all pointer variables in the converted code:
-								delete rewrites[(size_t)prevIop->instructionIndex];
+        iop->text = catOpText(&iop->text, &prevIop->text);
+        // delete redundant prior insert
+        rewrites[(size_t)prevIop->instructionIndex] = nullptr;
       }
     }
     // look for replaces where iop.index is in range; error
@@ -403,27 +398,25 @@ std::unordered_map<int, TokenStreamRewriter::RewriteOperation*> *TokenStreamRewr
     std::vector<ReplaceOp*> prevReplaces = getKindOfOps(rewrites, type, i);
     for (auto rop : prevReplaces) {
       if (iop->index == rop->index) {
-								rop->text = catOpText(&iop->text, &rop->text);
-								//JAVA TO C++ CONVERTER WARNING: Java to C++ Converter converted the original 'null' assignment to a call to 'delete', but you should review memory allocation of all pointer variables in the converted code:
-								delete rewrites[i]; // delete current insert
-								continue;
+        rop->text = catOpText(&iop->text, &rop->text);
+        rewrites[i] = nullptr; // delete current insert
+        continue;
       }
       if (iop->index >= rop->index && iop->index <= rop->lastIndex) {
-								throw IllegalArgumentException("insert op " + antlrcpp::ws2s(iop->toString()) + " within boundaries of previous " + antlrcpp::ws2s(rop->toString()));
+        throw IllegalArgumentException("insert op " + antlrcpp::ws2s(iop->toString()) + " within boundaries of previous " + antlrcpp::ws2s(rop->toString()));
       }
     }
   }
 
-  std::unordered_map<int, TokenStreamRewriter::RewriteOperation*> *m = new std::unordered_map<int, TokenStreamRewriter::RewriteOperation*>();
+  std::unordered_map<size_t, TokenStreamRewriter::RewriteOperation*> m;
   for (TokenStreamRewriter::RewriteOperation *op : rewrites) {
     if (op == nullptr) { // ignore deleted ops
       continue;
     }
-    if (m->at((int)op->index) != nullptr) {
-      // TODO: use a specific exception rather than a generic type here?
+    if (m.count(op->index) > 0) {
       throw RuntimeException("should only be one op per index");
     }
-    m->emplace(op->index, op);
+    m[op->index] = op;
   }
 
   return m;

@@ -49,7 +49,6 @@ namespace tree {
     virtual ParseTree *getChild(std::size_t i) override;
     virtual Token *getSymbol() override;
     virtual ParseTree *getParent() override;
-    virtual void *getPayload() override; // returns "Token *"
     virtual misc::Interval getSourceInterval() override;
 
     virtual std::size_t getChildCount() override;

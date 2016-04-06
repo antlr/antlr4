@@ -35,7 +35,6 @@ namespace antlrcpp {
   std::wstring join(std::vector<std::wstring> strings, const std::wstring &separator);
   std::map<std::wstring, int> toMap(const std::vector<std::wstring> &keys);
   std::wstring escapeWhitespace(std::wstring str, bool escapeSpaces);
-  wchar_t* toCharArray(const std::vector<size_t> *data);
   std::wstring toHexString(const int t);
   std::wstring arrayToString(const std::vector<std::wstring> &data);
 

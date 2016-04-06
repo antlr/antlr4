@@ -72,26 +72,6 @@ namespace tree {
     static std::vector<ParseTree*> findAllRuleNodes(ParseTree *t, int ruleIndex);
     static std::vector<ParseTree*> findAllNodes(ParseTree *t, int index, bool findTokens);
 
-    template<typename T1>
-    static void _findAllNodes(ParseTree *t, int index, bool findTokens, std::vector<T1> &nodes) {
-      // check this node (the root) first
-      if (findTokens && (TerminalNode*)(t) != nullptr) {
-        TerminalNode *tnode = (TerminalNode*)(t);
-        if (tnode->getSymbol()->getType() == index) {
-          nodes.push_back(t);
-        }
-      } else if (!findTokens && (ParserRuleContext*)(t) != nullptr) {
-        ParserRuleContext *ctx = (ParserRuleContext*)(t);
-        if (ctx->getRuleIndex() == index) {
-          nodes.push_back(t);
-        }
-      }
-      // check children
-      for (size_t i = 0; i < t->getChildCount(); i++) {
-        _findAllNodes(t->getChild(i), index, findTokens, nodes);
-      }
-    }
-
     static std::vector<ParseTree*> descendants(ParseTree *t);
 
   private:

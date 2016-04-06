@@ -550,9 +550,7 @@ void PredictionContext::getAllContextNodes_(PredictionContextRef context,
 }
 
 std::wstring PredictionContext::toString() {
-  //TODO: what should this return?  (Return empty string
-  // for now.)
-  return L"TODO PredictionContext::toString()";
+  return L"PredictionContext (" + std::to_wstring((size_t)this) + L")";
 }
 
 std::wstring PredictionContext::toString(Recognizer *recog)  {

@@ -46,7 +46,6 @@ namespace atn {
 
   public:
     ATNSerializer(ATN *atn);
-
     ATNSerializer(ATN *atn, const std::vector<std::wstring> &tokenNames);
 
     /// <summary>
@@ -73,26 +72,20 @@ namespace atn {
     ///
     ///  Convenient to pack into unsigned shorts to make as Java string.
     /// </summary>
-    virtual std::vector<size_t> *serialize();
+    virtual std::vector<size_t> serialize();
 
     virtual std::wstring decode(const std::wstring& data);
 
     virtual std::wstring getTokenName(ssize_t t);
 
-    /// <summary>
     /// Used by Java target to encode short/int array as chars in string.
-    /// </summary>
     static std::wstring getSerializedAsString(ATN *atn);
+    static std::vector<size_t> getSerialized(ATN *atn);
 
-    static std::vector<size_t> *getSerialized(ATN *atn);
-
-    static wchar_t *getSerializedAsChars(ATN *atn);
-
-    static std::wstring getDecoded(ATN *atn,
-                                   std::vector<std::wstring> &tokenNames);
+    static std::wstring getDecoded(ATN *atn, std::vector<std::wstring> &tokenNames);
 
   private:
-    void serializeUUID(std::vector<size_t> *data, Guid uuid);
+    void serializeUUID(std::vector<size_t> &data, Guid uuid);
   };
 
 } // namespace atn

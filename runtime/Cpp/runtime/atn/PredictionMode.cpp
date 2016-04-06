@@ -55,8 +55,7 @@ struct AltAndContextConfigComparer {
     if (&a == &b) {
       return true;
     }
-    return a.state->stateNumber == b.state->stateNumber &&
-    a.context == b.context;
+    return a.state->stateNumber == b.state->stateNumber && a.context == b.context;
   }
 };
 
@@ -141,11 +140,10 @@ bool PredictionModeClass::hasConflictingAltSet(const std::vector<antlrcpp::BitSe
 }
 
 bool PredictionModeClass::allSubsetsEqual(const std::vector<antlrcpp::BitSet>& altsets) {
-  if (altsets.size() == 0) {
-    // TODO -- Determine if this should return true or false when there are no
-    // sets available based on the original code.
+  if (altsets.empty()) {
     return true;
   }
+
   const antlrcpp::BitSet& first = *altsets.begin();
   for (const antlrcpp::BitSet& alts : altsets) {
     if (alts.data != first.data) {
@@ -173,18 +171,15 @@ antlrcpp::BitSet PredictionModeClass::getAlts(const std::vector<antlrcpp::BitSet
 }
 
 std::vector<antlrcpp::BitSet> PredictionModeClass::getConflictingAltSubsets(ATNConfigSet* configs) {
-  /*
-  std::unordered_map<const ATNConfig&, antlrcpp::BitSet, AltAndContextConfigHasher, AltAndContextConfigComparer> configToAlts;
-  for (const ATNConfig& c : *configs->configLookup) {
-    configToAlts[c].set(c.alt);
+  std::unordered_map<ATNConfig *, antlrcpp::BitSet, AltAndContextConfigHasher, AltAndContextConfigComparer> configToAlts;
+  for (auto config : *configs->configLookup) {
+    configToAlts[config].set((size_t)config->alt);
   }
   std::vector<antlrcpp::BitSet> values;
   for (auto it : configToAlts) {
     values.push_back(it.second);
   }
   return values;
-   */
-  return std::vector<antlrcpp::BitSet>();
 }
 
 std::map<ATNState*, antlrcpp::BitSet> PredictionModeClass::getStateToAltMap(ATNConfigSet* configs) {
@@ -208,7 +203,6 @@ int PredictionModeClass::getSingleViableAlt(const std::vector<antlrcpp::BitSet>&
   for (antlrcpp::BitSet alts : altsets) {
     int minAlt = alts.nextSetBit(0);
 
-    assert(minAlt != -1);  // TODO -- Remove this after verification.
     viableAlts.set((size_t)minAlt);
     if (viableAlts.count() > 1)  // more than 1 viable alt
     {

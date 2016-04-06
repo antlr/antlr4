@@ -499,10 +499,8 @@ namespace atn {
     /// </summary>
     static std::map<ATNState*, antlrcpp::BitSet> getStateToAltMap(ATNConfigSet *configs);
 
-    // TODO -- Add docs.
     static bool hasStateAssociatedWithOneAlt(ATNConfigSet *configs);
 
-    // TODO -- Add docs.
     static int getSingleViableAlt(const std::vector<antlrcpp::BitSet> &altsets);
   };
 

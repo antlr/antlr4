@@ -54,13 +54,6 @@ namespace runtime {
     std::wstring data;
 
     /// <summary>
-    /// The number of characters currently in <seealso cref="#data data"/>.
-    /// <p/>
-    /// This is not the buffer capacity, that's {@code data.length}.
-    /// </summary>
-    size_t n;
-
-    /// <summary>
     /// 0..n-1 index into <seealso cref="#data data"/> of next character.
     /// <p/>
     /// The {@code LA(1)} character is {@code data[p]}. If {@code p == n}, we are
@@ -95,27 +88,14 @@ namespace runtime {
     /// </summary>
     size_t currentCharIndex;
 
-    std::ifstream *input;
+    std::wistream &input;
 
     /// <summary>
     /// The name or source of this char stream. </summary>
   public:
     std::string name;
 
-    /// <summary>
-    /// Useful for subclasses that pull char from other than this.input. </summary>
-
-    UnbufferedCharStream(); //this(256);
-
-    /// <summary>
-    /// Useful for subclasses that pull char from other than this.input. </summary>
-    UnbufferedCharStream(size_t bufferSize);
-
-
-    UnbufferedCharStream(std::ifstream *input); //this(input, 256);
-
-    //JAVA TO C++ CONVERTER TODO TASK: Calls to same-class constructors are not supported in C++ prior to C++11:
-    UnbufferedCharStream(std::ifstream *input, int bufferSize); //this(bufferSize);
+    UnbufferedCharStream(std::wistream &input, size_t bufferSize = 256);
 
     virtual void consume() override;
 

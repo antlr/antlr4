@@ -85,17 +85,6 @@ std::wstring escapeWhitespace(std::wstring str, bool escapeSpaces) {
   return result;
 }
 
-wchar_t* toCharArray(const std::vector<size_t> *data){
-		if (data == nullptr) return nullptr;
-		wchar_t* cdata = new wchar_t[data->size()];
-
-		for (size_t i = 0; i < data->size(); i++){
-      cdata[i] = (char)data->at(i);
-    }
-
-		return cdata;
-}
-
 std::wstring toHexString(const int t){
 		std::wstringstream stream;
 		stream << std::uppercase << std::hex << t;

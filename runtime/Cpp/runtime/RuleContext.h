@@ -91,7 +91,6 @@ namespace runtime {
 
     virtual RuleContext *getRuleContext() override;
     virtual RuleContext *getParent() override;
-    virtual void *getPayload() override;
     virtual std::wstring getText() override;
 
     virtual ssize_t getRuleIndex() const;
@@ -141,7 +140,6 @@ namespace runtime {
 
     // recog null unless ParserRuleContext, in which case we use subclass toString(...)
     std::wstring toString(Recognizer *recog, RuleContext *stop);
-    std::wstring toString(Token *, atn::ParserATNSimulator *);
 
     virtual std::wstring toString(const std::vector<std::wstring> &ruleNames, RuleContext *stop);
 

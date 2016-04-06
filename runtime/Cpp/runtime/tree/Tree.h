@@ -56,7 +56,9 @@ namespace tree {
     /// invocation. For abstract syntax trees (ASTs), this is a <seealso cref="Token"/>
     /// object.
     /// </summary>
-    virtual void *getPayload() = 0;
+
+    // ml: there are actually only 2 occurences where this method was implemented. We use direct access instead.
+    //virtual void *getPayload() = 0;
 
     /// <summary>
     /// If there are children, get the {@code i}th value indexed from 0. </summary>

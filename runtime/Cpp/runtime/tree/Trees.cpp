@@ -31,14 +31,19 @@
 
 #include "ErrorNode.h"
 #include "Parser.h"
+#include "ParserRuleContext.h"
 #include "CPPUtils.h"
+#include "TerminalNodeImpl.h"
 
 #include "Trees.h"
 
+using namespace org::antlr::v4::runtime;
 using namespace org::antlr::v4::runtime::tree;
 
+using namespace antlrcpp;
+
 std::wstring Trees::toStringTree(Tree *t) {
-  return toStringTree(t, nullptr);//static_cast<std::vector<std::wstring>>(nullptr));
+  return toStringTree(t, nullptr);
 }
 
 std::wstring Trees::toStringTree(Tree *t, Parser *recog) {
@@ -87,18 +92,15 @@ std::wstring Trees::getNodeText(Tree *t, const std::vector<std::wstring> &ruleNa
     }
   }
   // no recog for rule names
-  auto payload = t->getPayload();
-  if ((Token*)(payload) != nullptr) {
-    return (static_cast<Token*>(payload))->getText();
+  if (is<RuleContext*>(t)) {
+    return ((RuleContext*)t)->getText();
   }
-#ifdef TODO
-  // The Java boys depended on the universal toString function
-  // to work for essentially void (Object) pointers. We don't
-  // have that luxury
-  return t->getPayload()->toString();
-#else
-  return L"TODO";
-#endif
+
+  if (is<TerminalNodeImpl*>(t)) {
+    return dynamic_cast<TerminalNodeImpl*>(t)->getSymbol()->getText();
+  }
+
+  return L"";
 }
 
 std::vector<Tree*> Trees::getChildren(Tree *t) {
@@ -110,16 +112,33 @@ std::vector<Tree*> Trees::getChildren(Tree *t) {
 }
 
 std::vector<Tree*> Trees::getAncestors(Tree *t) {
-  if (t->getParent() == nullptr) {
-    return std::vector<Tree*>();// ::emptyList();
-  }
-  std::vector<Tree*> ancestors = std::vector<Tree*>();
+  std::vector<Tree*> ancestors;
   t = t->getParent();
   while (t != nullptr) {
     ancestors.insert(ancestors.begin(), t); // insert at start
     t = t->getParent();
   }
   return ancestors;
+}
+
+template<typename T>
+static void _findAllNodes(ParseTree *t, int index, bool findTokens, std::vector<T> &nodes) {
+  // check this node (the root) first
+  if (findTokens && is<TerminalNode*>(t)) {
+    TerminalNode *tnode = (TerminalNode*)(t);
+    if (tnode->getSymbol()->getType() == index) {
+      nodes.push_back(t);
+    }
+  } else if (!findTokens && is<ParserRuleContext*>(t)) {
+    ParserRuleContext *ctx = (ParserRuleContext*)(t);
+    if (ctx->getRuleIndex() == index) {
+      nodes.push_back(t);
+    }
+  }
+  // check children
+  for (size_t i = 0; i < t->getChildCount(); i++) {
+    _findAllNodes(t->getChild(i), index, findTokens, nodes);
+  }
 }
 
 std::vector<ParseTree*> Trees::findAllTokenNodes(ParseTree *t, int ttype) {
