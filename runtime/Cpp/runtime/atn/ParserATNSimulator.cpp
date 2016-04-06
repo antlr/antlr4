@@ -882,7 +882,7 @@ atn::ATNConfig *ParserATNSimulator::precedenceTransition(ATNConfig *config, Prec
       }
     } else {
       std::shared_ptr<SemanticContext::AND> newSemCtx = std::make_shared<SemanticContext::AND>(config->semanticContext, predicate);
-      c = new ATNConfig(config, pt->target, std::dynamic_pointer_cast<SemanticContext>(newSemCtx));
+      c = new ATNConfig(config, pt->target, newSemCtx);
     }
   } else {
     c = new ATNConfig(config, pt->target);
@@ -919,7 +919,7 @@ atn::ATNConfig *ParserATNSimulator::predTransition(ATNConfig *config, PredicateT
       }
     } else {
       std::shared_ptr<SemanticContext::AND> newSemCtx = std::make_shared<SemanticContext::AND>(config->semanticContext, predicate);
-      c = new ATNConfig(config, pt->target, std::dynamic_pointer_cast<SemanticContext>(newSemCtx));
+      c = new ATNConfig(config, pt->target, newSemCtx);
     }
   } else {
     c = new ATNConfig(config, pt->target);

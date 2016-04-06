@@ -316,7 +316,7 @@ atn::ATNConfigSet *LexerATNSimulator::computeStartState(CharStream *input, ATNSt
   ATNConfigSet *configs = new OrderedATNConfigSet();
   for (size_t i = 0; i < p->getNumberOfTransitions(); i++) {
     ATNState *target = p->transition(i)->target;
-    LexerATNConfig *c = new LexerATNConfig(target, (int)(i + 1), std::dynamic_pointer_cast<PredictionContext>(initialContext));
+    LexerATNConfig *c = new LexerATNConfig(target, (int)(i + 1), initialContext);
     closure(input, c, configs, false, false);
   }
   return configs;
@@ -342,7 +342,7 @@ bool LexerATNSimulator::closure(CharStream *input, LexerATNConfig *config, ATNCo
         configs->add(config);
         return true;
       } else {
-        configs->add(new LexerATNConfig(config, config->state, std::dynamic_pointer_cast<PredictionContext>(PredictionContext::EMPTY)));
+        configs->add(new LexerATNConfig(config, config->state, PredictionContext::EMPTY));
         currentAltReachedAcceptState = true;
       }
     }

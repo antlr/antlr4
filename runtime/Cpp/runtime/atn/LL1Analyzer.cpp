@@ -61,7 +61,7 @@ std::vector<misc::IntervalSet> LL1Analyzer::getDecisionLookahead(ATNState *s) co
 
     std::set<ATNConfig*> lookBusy;
     antlrcpp::BitSet callRuleStack;
-    _LOOK(s->transition(alt)->target, nullptr, std::dynamic_pointer_cast<PredictionContext>(PredictionContext::EMPTY),
+    _LOOK(s->transition(alt)->target, nullptr, PredictionContext::EMPTY,
           look[alt], lookBusy, callRuleStack, seeThruPreds, false);
     
     // Wipe out lookahead for this alternative if we found nothing
