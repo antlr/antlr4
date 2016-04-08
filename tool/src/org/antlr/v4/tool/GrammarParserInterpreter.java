@@ -320,7 +320,11 @@ public class GrammarParserInterpreter extends ParserInterpreter {
 			if ( Trees.isAncestorOf(parser.getOverrideDecisionRoot(), ambigSubTree) ) {
 				ambigSubTree = (GrammarInterpreterRuleContext)parser.getOverrideDecisionRoot();
 			}
-			trees.add(ambigSubTree);
+			if (ambigSubTree!=null) {
+				trees.add(ambigSubTree);
+			} else {
+				// TODO: should we do something about this?
+			}
 			alt = alts.nextSetBit(alt + 1);
 		}
 
