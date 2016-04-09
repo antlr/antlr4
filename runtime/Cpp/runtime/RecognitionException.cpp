@@ -51,7 +51,7 @@ RecognitionException::RecognitionException(const std::string &message, IRecogniz
   }
 }
 
-int RecognitionException::getOffendingState() {
+int RecognitionException::getOffendingState() const {
   return _offendingState;
 }
 
@@ -59,26 +59,26 @@ void RecognitionException::setOffendingState(int offendingState) {
   _offendingState = offendingState;
 }
 
-misc::IntervalSet RecognitionException::getExpectedTokens() {
+misc::IntervalSet RecognitionException::getExpectedTokens() const {
   if (_recognizer) {
-    return _recognizer->getATN().getExpectedTokens(_offendingState, _ctx.get());
+    return _recognizer->getATN().getExpectedTokens(_offendingState, _ctx);
   }
   return misc::IntervalSet::EMPTY_SET;
 }
 
-std::shared_ptr<RuleContext> RecognitionException::getCtx() {
+RuleContext* RecognitionException::getCtx() const {
   return _ctx;
 }
 
-std::shared_ptr<IntStream> RecognitionException::getInputStream() {
+IntStream* RecognitionException::getInputStream() const {
   return _input;
 }
 
-std::shared_ptr<Token> RecognitionException::getOffendingToken() {
+Token* RecognitionException::getOffendingToken() const {
   return _offendingToken;
 }
 
-std::shared_ptr<IRecognizer> RecognitionException::getRecognizer() {
+IRecognizer* RecognitionException::getRecognizer() const {
   return _recognizer;
 }
 

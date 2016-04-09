@@ -96,11 +96,9 @@ namespace runtime {
 
     Token *start, *stop;
 
-    /// <summary>
     /// The exception that forced this rule to return. If the rule successfully
-    /// completed, this is {@code null}.
-    /// </summary>
-    RecognitionException *exception;
+    /// completed, this is "null exception pointer".
+    std::exception_ptr exception;
 
     ParserRuleContext();
     virtual ~ParserRuleContext() {}

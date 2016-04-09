@@ -67,7 +67,7 @@ LexerFile(file, lexer, namedActions) ::= <<
 #include "LexerATNSimulator.h"
 #include "ATNDeserializer.h"
 
-#include "<lexer.name>.h"
+#include "<file.lexer.name>.h"
 
 using namespace org::antlr::v4::runtime;
 
@@ -86,7 +86,6 @@ ParserFileHeader(file, parser, namedActions) ::= <<
 #include "ParserRuleContext.h"
 #include "PredictionContext.h"
 #include "CPPUtils.h"
-//#include "<file.grammarName>Visitor.h"
 
 using namespace org::antlr::v4::runtime;
 
@@ -95,7 +94,7 @@ using namespace org::antlr::v4::runtime;
 <if (file.genPackage)>namespace <file.genPackage> {<endif>
 
 template \<typename T>
-class <parser.name>Visitor;
+class <file.parser.name>Visitor;
   
 <parser>
 
@@ -116,9 +115,9 @@ ParserFile(file, parser, namedActions) ::= <<
 #include "ATNDeserializer.h"
 
 #include "ParseTreeListener.h"
-#include "<file.factory.grammar.name>Listener.h"
+<if (file.genListener)>#include "<file.parser.name>Listener.h"<endif>
 
-#include "<parser.name>.h"
+#include "<file.parser.name>.h"
 
 using namespace antlrcpp;
 <if (file.genPackage)>using namespace <file.genPackage>;<endif>

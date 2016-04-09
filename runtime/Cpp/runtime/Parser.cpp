@@ -308,7 +308,7 @@ void Parser::notifyErrorListeners(const std::wstring &msg) {
   notifyErrorListeners(getCurrentToken(), msg, nullptr);
 }
 
-void Parser::notifyErrorListeners(Token *offendingToken, const std::wstring &msg, RecognitionException *e) {
+void Parser::notifyErrorListeners(Token *offendingToken, const std::wstring &msg, std::exception_ptr e) {
   _syntaxErrors++;
   int line = -1;
   int charPositionInLine = -1;
@@ -599,5 +599,6 @@ void Parser::InitializeInstanceFields() {
   _precedenceStack.push_back(0);
   _buildParseTrees = true;
   _syntaxErrors = 0;
+  _input = nullptr;
 }
 

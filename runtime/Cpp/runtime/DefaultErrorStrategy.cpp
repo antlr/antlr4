@@ -44,6 +44,7 @@
 #include "DefaultErrorStrategy.h"
 
 using namespace org::antlr::v4::runtime;
+using namespace antlrcpp;
 
 void DefaultErrorStrategy::reset(Parser *recognizer) {
   endErrorCondition(recognizer);
@@ -67,32 +68,30 @@ void DefaultErrorStrategy::reportMatch(Parser *recognizer) {
   endErrorCondition(recognizer);
 }
 
-void DefaultErrorStrategy::reportError(Parser *recognizer, RecognitionException *e) {
+void DefaultErrorStrategy::reportError(Parser *recognizer, const RecognitionException &e) {
   // if we've already reported an error and have not matched a token
   // yet successfully, don't report any errors.
   if (inErrorRecoveryMode(recognizer)) {
-    //			System.err.print("[SPURIOUS] ");
     return; // don't report spurious errors
   }
+
   beginErrorCondition(recognizer);
-  if (dynamic_cast<NoViableAltException*>(e) != nullptr) {
-    reportNoViableAlternative(recognizer, static_cast<NoViableAltException*>(e));
-  } else if (dynamic_cast<InputMismatchException*>(e) != nullptr) {
-    reportInputMismatch(recognizer, static_cast<InputMismatchException*>(e));
-  } else if (dynamic_cast<FailedPredicateException*>(e) != nullptr) {
-    reportFailedPredicate(recognizer, dynamic_cast<FailedPredicateException*>(e));
+  if (is<NoViableAltException>(e)) {
+    reportNoViableAlternative(recognizer, (NoViableAltException&)e);
+  } else if (is<const InputMismatchException>(e)) {
+    reportInputMismatch(recognizer, (InputMismatchException&)e);
+  } else if (is<const FailedPredicateException>(e)) {
+    reportFailedPredicate(recognizer, (FailedPredicateException&)e);
   } else {
 
-    // This is really bush league, I hate libraries that gratuitiously print
-    // stuff out
-    std::cerr << std::string("unknown recognition error type: ") + typeid(e).name();
+    // This is really bush league, I hate libraries that gratuitiously print stuff out.
+    std::cerr << std::string("unknown recognition error type: ") << typeid(e).name() << std::endl;
 
-    recognizer->notifyErrorListeners(e->getOffendingToken().get(), antlrcpp::s2ws(e->what()), e);
-
+    recognizer->notifyErrorListeners(e.getOffendingToken(), antlrcpp::s2ws(e.what()), std::make_exception_ptr(e));
   }
 }
 
-void DefaultErrorStrategy::recover(Parser *recognizer, RecognitionException *e) {
+void DefaultErrorStrategy::recover(Parser *recognizer, const RecognitionException &e) {
   if (lastErrorIndex == (int)recognizer->getInputStream()->index() && lastErrorStates != nullptr &&
       lastErrorStates->contains(recognizer->getState())) {
 
@@ -160,31 +159,32 @@ void DefaultErrorStrategy::sync(Parser *recognizer) {
   }
 }
 
-void DefaultErrorStrategy::reportNoViableAlternative(Parser *recognizer, NoViableAltException *e) {
+void DefaultErrorStrategy::reportNoViableAlternative(Parser *recognizer, const NoViableAltException &e) {
   TokenStream *tokens = recognizer->getInputStream();
   std::wstring input;
   if (tokens != nullptr) {
-    if (e->getStartToken()->getType() == EOF) {
+    if (e.getStartToken()->getType() == EOF) {
       input = L"<EOF>";
     } else {
-      input = tokens->getText(e->getStartToken().get(), e->getOffendingToken().get());
+      input = tokens->getText(e.getStartToken(), e.getOffendingToken());
     }
   } else {
     input = L"<unknown input>";
   }
   std::wstring msg = std::wstring(L"no viable alternative at input ") + escapeWSAndQuote(input);
-  recognizer->notifyErrorListeners(e->getOffendingToken().get(), msg, e);
+  recognizer->notifyErrorListeners(e.getOffendingToken(), msg, std::make_exception_ptr(e));
 }
 
-void DefaultErrorStrategy::reportInputMismatch(Parser *recognizer, InputMismatchException *e) {
-  std::wstring msg = std::wstring(L"mismatched input ") + getTokenErrorDisplay(e->getOffendingToken().get()) + std::wstring(L" expecting ") + e->getExpectedTokens().toString(recognizer->getTokenNames());
-  recognizer->notifyErrorListeners(e->getOffendingToken().get(), msg, e);
+void DefaultErrorStrategy::reportInputMismatch(Parser *recognizer, const InputMismatchException &e) {
+  std::wstring msg = std::wstring(L"mismatched input ") + getTokenErrorDisplay(e.getOffendingToken()) +
+  std::wstring(L" expecting ") + e.getExpectedTokens().toString(recognizer->getTokenNames());
+  recognizer->notifyErrorListeners(e.getOffendingToken(), msg, std::make_exception_ptr(e));
 }
 
-void DefaultErrorStrategy::reportFailedPredicate(Parser *recognizer, FailedPredicateException *e) {
+void DefaultErrorStrategy::reportFailedPredicate(Parser *recognizer, const FailedPredicateException &e) {
   const std::wstring& ruleName = recognizer->getRuleNames()[(size_t)recognizer->ctx->getRuleIndex()];
-  std::wstring msg = std::wstring(L"rule ") + ruleName + std::wstring(L" ") + antlrcpp::s2ws(e->getMessage());
-  recognizer->notifyErrorListeners(e->getOffendingToken().get(), msg, e);
+  std::wstring msg = std::wstring(L"rule ") + ruleName + std::wstring(L" ") + antlrcpp::s2ws(e.what());
+  recognizer->notifyErrorListeners(e.getOffendingToken(), msg, std::make_exception_ptr(e));
 }
 
 void DefaultErrorStrategy::reportUnwantedToken(Parser *recognizer) {

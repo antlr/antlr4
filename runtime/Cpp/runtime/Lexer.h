@@ -217,9 +217,9 @@ namespace runtime {
     /// </summary>
     virtual std::vector<Token*> getAllTokens();
 
-    virtual void recover(LexerNoViableAltException *e);
+    virtual void recover(const LexerNoViableAltException &e);
 
-    virtual void notifyListeners(LexerNoViableAltException *e);
+    virtual void notifyListeners(const LexerNoViableAltException &e);
 
     virtual std::wstring getErrorDisplay(const std::wstring &s);
 

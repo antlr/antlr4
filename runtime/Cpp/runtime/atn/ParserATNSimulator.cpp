@@ -111,7 +111,7 @@ int ParserATNSimulator::adaptivePredict(TokenStream *input, int decision, Parser
     }
     return alt;
   }
-  catch (std::exception e) {
+  catch (std::exception &e) {
     // Do nothing, failed predict
   }
 

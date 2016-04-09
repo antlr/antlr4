@@ -80,7 +80,7 @@ namespace runtime {
 
     /// <summary>
     /// Get the token type of the token </summary>
-    virtual int getType() = 0;
+    virtual int getType() const = 0;
 
     /// <summary>
     /// The line number on which the 1st character of this token was matched,

@@ -45,7 +45,7 @@ namespace runtime {
   class BaseErrorListener : public ANTLRErrorListener {
 
     virtual void syntaxError(IRecognizer *recognizer, Token *offendingSymbol, size_t line, int charPositionInLine,
-                             const std::wstring &msg, RecognitionException *e) override;
+                             const std::wstring &msg, std::exception_ptr e) override;
 
     virtual void reportAmbiguity(Parser *recognizer, dfa::DFA *dfa, size_t startIndex, size_t stopIndex, bool exact,
                                  antlrcpp::BitSet *ambigAlts, atn::ATNConfigSet *configs) override;

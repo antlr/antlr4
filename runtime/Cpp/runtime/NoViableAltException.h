@@ -45,24 +45,24 @@ namespace runtime {
   /// of the offending input and also knows where the parser was
   /// in the various paths when the error. Reported by reportNoViableAlternative()
   class NoViableAltException : public RecognitionException {
-  private:
-    /// Which configurations did we try at input.index() that couldn't match input.LT(1)?
-    std::shared_ptr<atn::ATNConfigSet> deadEndConfigs;
-
-    /// The token object at the start index; the input stream might
-    /// not be buffering tokens so get a reference to it. (At the
-    /// time the error occurred, of course the stream needs to keep a
-    /// buffer all of the tokens but later we might not have access to those.)
-    std::shared_ptr<Token> startToken;
-
   public:
     NoViableAltException(Parser *recognizer); // LL(1) error
     NoViableAltException(Parser *recognizer, TokenStream *input, Token *startToken, Token *offendingToken,
                          atn::ATNConfigSet *deadEndConfigs, ParserRuleContext *ctx);
 
-    virtual std::shared_ptr<Token> getStartToken();
-    virtual std::shared_ptr<atn::ATNConfigSet> getDeadEndConfigs();
+    virtual Token* getStartToken() const;
+    virtual atn::ATNConfigSet* getDeadEndConfigs() const;
 
+  private:
+    /// Which configurations did we try at input.index() that couldn't match input.LT(1)?
+    atn::ATNConfigSet* _deadEndConfigs;
+
+    /// The token object at the start index; the input stream might
+    /// not be buffering tokens so get a reference to it. (At the
+    /// time the error occurred, of course the stream needs to keep a
+    /// buffer all of the tokens but later we might not have access to those.)
+    Token* _startToken;
+   
   };
 
 } // namespace runtime

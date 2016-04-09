@@ -51,14 +51,14 @@ namespace runtime {
   class RecognitionException : public RuntimeException {
   private:
     /// The Recognizer where this exception originated.
-    std::shared_ptr<IRecognizer> _recognizer;
-    std::shared_ptr<IntStream> _input;
-    std::shared_ptr<RuleContext> _ctx;
+    IRecognizer *_recognizer;
+    IntStream *_input;
+    RuleContext *_ctx;
 
     /// The current Token when an error occurred. Since not all streams
     /// support accessing symbols by index, we have to track the Token
     /// instance itself.
-    std::shared_ptr<Token> _offendingToken;
+    Token *_offendingToken;
 
     int _offendingState;
 
@@ -74,7 +74,7 @@ namespace runtime {
     /// edge we couldn't match.
     ///
     /// If the state number is not known, this method returns -1.
-    virtual int getOffendingState();
+    virtual int getOffendingState() const;
 
   protected:
     void setOffendingState(int offendingState);
@@ -88,7 +88,7 @@ namespace runtime {
     /// @returns The set of token types that could potentially follow the current
     /// state in the ATN, or an empty set if the information is not available.
   public:
-    virtual misc::IntervalSet getExpectedTokens();
+    virtual misc::IntervalSet getExpectedTokens() const;
 
     /// <summary>
     /// Gets the <seealso cref="RuleContext"/> at the time this exception was thrown.
@@ -97,7 +97,7 @@ namespace runtime {
     /// </summary>
     /// <returns> The <seealso cref="RuleContext"/> at the time this exception was thrown.
     /// If the context is not available, this method returns {@code null}. </returns>
-    virtual std::shared_ptr<RuleContext> getCtx();
+    virtual RuleContext* getCtx() const;
 
     /// <summary>
     /// Gets the input stream which is the symbol source for the recognizer where
@@ -108,9 +108,9 @@ namespace runtime {
     /// <returns> The input stream which is the symbol source for the recognizer
     /// where this exception was thrown, or {@code null} if the stream is not
     /// available. </returns>
-    virtual std::shared_ptr<IntStream> getInputStream();
+    virtual IntStream* getInputStream() const;
 
-    virtual std::shared_ptr<Token> getOffendingToken();
+    virtual Token* getOffendingToken() const;
 
     /// <summary>
     /// Gets the <seealso cref="Recognizer"/> where this exception occurred.
@@ -119,7 +119,7 @@ namespace runtime {
     /// </summary>
     /// <returns> The recognizer where this exception occurred, or {@code null} if
     /// the recognizer is not available. </returns>
-    virtual std::shared_ptr<IRecognizer> getRecognizer();
+    virtual IRecognizer* getRecognizer() const;
 
   private:
     void InitializeInstanceFields();

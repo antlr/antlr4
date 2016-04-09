@@ -61,7 +61,7 @@ using namespace org::antlr::v4::runtime;
 
       org::antlr::v4::runtime::atn::ParserATNSimulator foo(nullptr, atn, decisionToDFA, nullptr);
     }
-    catch (std::exception e) {
+    catch (std::exception &e) {
         
         XCTAssert(NO, @"Fail");
     }

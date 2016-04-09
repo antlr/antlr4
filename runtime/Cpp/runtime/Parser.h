@@ -277,7 +277,7 @@ namespace runtime {
 
     void notifyErrorListeners(const std::wstring &msg);
 
-    virtual void notifyErrorListeners(Token *offendingToken, const std::wstring &msg, RecognitionException *e);
+    virtual void notifyErrorListeners(Token *offendingToken, const std::wstring &msg, std::exception_ptr e);
 
     /// <summary>
     /// Consume and return the <seealso cref="#getCurrentToken current symbol"/>.

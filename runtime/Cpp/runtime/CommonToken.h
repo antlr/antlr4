@@ -77,7 +77,7 @@ namespace runtime {
 
     CommonToken(Token *oldToken);
 
-    virtual int getType() override;
+    virtual int getType() const override;
 
     virtual void setLine(int line) override;
 

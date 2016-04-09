@@ -39,52 +39,40 @@ namespace runtime {
   class RuntimeException : public std::exception {
   private:
     std::string _message;
-    std::shared_ptr<RuntimeException> _cause; // Optionally assigned if this exception is wrapping another one.
-
   public:
-    RuntimeException(RuntimeException *cause = nullptr);
-    RuntimeException(const std::string &msg, RuntimeException *cause = nullptr);
-
-    std::string getMessage() const;
-    std::shared_ptr<RuntimeException> getCause() const;
+    RuntimeException(const std::string &msg = "");
 
     virtual const char* what() const noexcept override;
   };
 
   class IllegalStateException : public RuntimeException {
   public:
-    IllegalStateException(RuntimeException *cause = nullptr) : IllegalStateException("", cause) {};
-    IllegalStateException(const std::string &msg, RuntimeException *cause = nullptr) : RuntimeException(msg, cause) {};
+    IllegalStateException(const std::string &msg = "") : RuntimeException(msg) {};
   };
 
   class IllegalArgumentException : public RuntimeException {
   public:
-    IllegalArgumentException(RuntimeException *cause = nullptr) : IllegalArgumentException("", cause) {};
-    IllegalArgumentException(const std::string &msg, RuntimeException *cause = nullptr) : RuntimeException(msg, cause) {};
+    IllegalArgumentException(const std::string &msg = "") : RuntimeException(msg) {};
   };
 
   class NullPointerException : public RuntimeException {
   public:
-    NullPointerException(RuntimeException *cause = nullptr) : NullPointerException("", cause) {};
-    NullPointerException(const std::string &msg, RuntimeException *cause = nullptr) : RuntimeException(msg, cause) {};
+    NullPointerException(const std::string &msg = "") : RuntimeException(msg) {};
   };
 
   class IndexOutOfBoundsException : public RuntimeException {
   public:
-    IndexOutOfBoundsException(RuntimeException *cause = nullptr) : IndexOutOfBoundsException("", cause) {};
-    IndexOutOfBoundsException(const std::string &msg, RuntimeException *cause = nullptr) : RuntimeException(msg, cause) {};
+    IndexOutOfBoundsException(const std::string &msg = "") : RuntimeException(msg) {};
   };
 
   class UnsupportedOperationException : public RuntimeException {
   public:
-    UnsupportedOperationException(RuntimeException *cause = nullptr) : UnsupportedOperationException("", cause) {};
-    UnsupportedOperationException(const std::string &msg, RuntimeException *cause = nullptr) : RuntimeException(msg, cause) {};
+    UnsupportedOperationException(const std::string &msg = "") : RuntimeException(msg) {};
   };
 
   class EmptyStackException : public RuntimeException {
   public:
-    EmptyStackException(RuntimeException *cause = nullptr) : EmptyStackException("", cause) {};
-    EmptyStackException(const std::string &msg, RuntimeException *cause = nullptr) : RuntimeException(msg, cause) {};
+    EmptyStackException(const std::string &msg = "") : RuntimeException(msg) {};
   };
 
   // IOException is not a runtime exception (in the java hierarchy).
@@ -92,28 +80,21 @@ namespace runtime {
   class IOException : public std::exception {
   private:
     std::string _message;
-    std::shared_ptr<RuntimeException> _cause; // Optionally assigned if this exception is wrapping another one.
 
   public:
-    IOException(RuntimeException *cause = nullptr);
-    IOException(const std::string &msg, RuntimeException *cause = nullptr);
-
-    std::string getMessage() const;
-    std::shared_ptr<RuntimeException> getCause() const;
+    IOException(const std::string &msg = "");
 
     virtual const char* what() const noexcept override;
   };
 
   class CancellationException : public IllegalStateException {
   public:
-    CancellationException(RuntimeException *cause = nullptr) : CancellationException("", cause) {};
-    CancellationException(const std::string &msg, RuntimeException *cause = nullptr) : IllegalStateException(msg, cause) {};
+    CancellationException(const std::string &msg = "") : IllegalStateException(msg) {};
   };
 
   class ParseCancellationException : public CancellationException {
   public:
-    ParseCancellationException(RuntimeException *cause = nullptr) : ParseCancellationException("", cause) {};
-    ParseCancellationException(const std::string &msg, RuntimeException *cause = nullptr) : CancellationException(msg, cause) {};
+    ParseCancellationException(const std::string &msg = "") : CancellationException(msg) {};
   };
 
 } // namespace runtime

@@ -66,6 +66,7 @@ using namespace antlrcpp;
 
   {
     A a; B b; C c; D d;
+    const A &cc = d;
     XCTAssert(is<A>(b));
     XCTAssertFalse(is<B>(a));
     XCTAssert(is<A>(c));
@@ -73,6 +74,24 @@ using namespace antlrcpp;
     XCTAssert(is<A>(d));
     XCTAssert(is<C>(d));
     XCTAssertFalse(is<B>(d));
+    XCTAssert(is<C>(cc));
+
+    auto isA = [&](const A &aa) { XCTAssert(is<A>(aa)); };
+    isA(a);
+    isA(b);
+    isA(c);
+    isA(d);
+
+    auto isC = [&](const A &aa, bool mustBeTrue) {
+      if (mustBeTrue)
+        XCTAssert(is<C>(aa));
+      else
+        XCTAssertFalse(is<C>(aa));
+    };
+    isC(a, false);
+    isC(b, false);
+    isC(c, true);
+    isC(d, true);
   }
   {
     A *a = new A(); B *b = new B(); C *c = new C(); D *d = new D();

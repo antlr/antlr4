@@ -44,6 +44,7 @@
 
 using namespace org::antlr::v4::runtime;
 using namespace org::antlr::v4::runtime::atn;
+using namespace antlrcpp;
 
 LL1Analyzer::LL1Analyzer(const ATN &atn) : _atn(atn) {
 }
@@ -122,17 +123,14 @@ void LL1Analyzer::_LOOK(ATNState *s, ATNState *stopState, PredictionContextRef c
         ATNState *returnState = _atn.states[(size_t)ctx->getReturnState(i)];
 
         bool removed = calledRuleStack.data.test((size_t)returnState->ruleIndex);
-        try {
-          calledRuleStack.data[(size_t)returnState->ruleIndex] = false;
-          _LOOK(returnState, stopState, ctx->getParent(i).lock(), look, lookBusy, calledRuleStack, seeThruPreds, addEOF);
-        }
-        catch(...) {
-          // Just move to the next steps as a "finally" clause
-        }
-        if (removed) {
-          calledRuleStack.set((size_t)returnState->ruleIndex);
+        auto onExit = finally([&] {
+          if (removed) {
+            calledRuleStack.set((size_t)returnState->ruleIndex);
+          }
+        });
 
-        }
+        calledRuleStack.data[(size_t)returnState->ruleIndex] = false;
+        _LOOK(returnState, stopState, ctx->getParent(i).lock(), look, lookBusy, calledRuleStack, seeThruPreds, addEOF);
       }
       return;
     }
@@ -148,15 +146,12 @@ void LL1Analyzer::_LOOK(ATNState *s, ATNState *stopState, PredictionContextRef c
       }
 
       PredictionContextRef newContext = SingletonPredictionContext::create(ctx, (static_cast<RuleTransition*>(t))->followState->stateNumber);
+      auto onExit = finally([&] {
+        calledRuleStack.data[(size_t)((static_cast<RuleTransition*>(t))->target->ruleIndex)] = false;
+      });
 
-      try {
-        calledRuleStack.set((size_t)(static_cast<RuleTransition*>(t))->target->ruleIndex);
-        _LOOK(t->target, stopState, newContext, look, lookBusy, calledRuleStack, seeThruPreds, addEOF);
-      }
-      catch(...) {
-        // Just move to the next steps as a "finally" clause
-      }
-      calledRuleStack.data[(size_t)((static_cast<RuleTransition*>(t))->target->ruleIndex)] = false;
+      calledRuleStack.set((size_t)(static_cast<RuleTransition*>(t))->target->ruleIndex);
+      _LOOK(t->target, stopState, newContext, look, lookBusy, calledRuleStack, seeThruPreds, addEOF);
 
     } else if (dynamic_cast<AbstractPredicateTransition*>(t) != nullptr) {
       if (seeThruPreds) {

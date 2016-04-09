@@ -121,7 +121,7 @@ namespace pattern {
     /// Rule tag tokens have types assigned according to the rule bypass
     /// transitions created during ATN deserialization.
     /// </summary>
-    virtual int getType() override;
+    virtual int getType() const override;
 
     /// <summary>
     /// {@inheritDoc}

@@ -343,7 +343,7 @@ std::vector\<std::wstring> <parser.name>::_tokenNames = {
   <atn>
 }
 
-<parser.name>Parser::Initializer <parser.name>Parser::_init;
+<parser.name>::Initializer <parser.name>::_init;
 >>
 
 SerializedATNHeader(model) ::= <<
@@ -384,7 +384,7 @@ RuleFunction(currentRule, code, locals, ruleCtx, altLabelCtxs, namedActions, fin
 <ruleCtx>
 <! TODO: untested !><altLabelCtxs: {l | <altLabelCtxs.(l)>}; separator = "\n">
 std::shared_ptr\<<parser.name>::<currentRule.ctxType>\> <parser.name>::<currentRule.name>(<currentRule.args; separator = ",">) {
-  std::shared_ptr\<<currentRule.ctxType>\> result(new <currentRule.ctxType>(ctx, getState()<currentRule.args:{a | , <a.name>}>));
+  std::shared_ptr\<<currentRule.ctxType>\> result = std::make_shared\<<currentRule.ctxType>\>(ctx, getState()<currentRule.args:{a | , <a.name>}>);
   enterRule(result.get(), <currentRule.startState>, <parser.name>Rule::Rule<currentRule.name; format = "cap">);
   <namedActions.init>
 <! TODO: untested !> <locals; separator = "\n">
@@ -404,10 +404,10 @@ std::shared_ptr\<<parser.name>::<currentRule.ctxType>\> <parser.name>::<currentR
   <if (exceptions)>
   <exceptions; separator="\n">
   <else>
-  catch (RecognitionException *re) {
-    result->exception = re;
-    _errHandler->reportError(this, re);
-    _errHandler->recover(this, re);
+  catch (RecognitionException &e) {
+    result->exception = std::make_exception_ptr(e);
+    _errHandler->reportError(this, e);
+    _errHandler->recover(this, e);
   }
   <endif>
 
@@ -433,7 +433,7 @@ std::shared_ptr\<<parser.name>::<currentRule.ctxType>\> <parser.name>::<currentR
 std::shared_ptr\<<parser.name>::<currentRule.ctxType>\> <parser.name>::<currentRule.name>(int precedence<currentRule.args:{a | , <a>}>) {
     ParserRuleContext *parentContext = ctx;
     int parentState = getState();
-    std::shared_ptr\<<parser.name>::<currentRule.ctxType>\> result(new <currentRule.ctxType>(ctx, parentState<currentRule.args: {a | , <a.name>}>));
+    std::shared_ptr\<<parser.name>::<currentRule.ctxType>\> result = std::make_shared\<<currentRule.ctxType>\>(ctx, parentState<currentRule.args: {a | , <a.name>}>);
     std::shared_ptr\<<parser.name>::<currentRule.ctxType>\> previousContext = result;
     int startState = <currentRule.startState>;
     enterRecursionRule(result.get(), <currentRule.startState>, <parser.name>Rule::Rule<currentRule.name; format = "cap">, precedence);
@@ -451,10 +451,10 @@ std::shared_ptr\<<parser.name>::<currentRule.ctxType>\> <parser.name>::<currentR
 <! TODO: untested !><postamble; separator = "\n">
     <namedActions.after>
   }
-  catch (RecognitionException *re) {
-    result->exception = re;
-    _errHandler->reportError(this, re);
-    _errHandler->recover(this, re);
+  catch (RecognitionException &e) {
+    result->exception = std::make_exception_ptr(e);
+    _errHandler->reportError(this, e);
+    _errHandler->recover(this, e);
   }
   return result;
 }
@@ -538,7 +538,7 @@ AltLabelStructDecl(struct, attrs, getters, dispatchMethods) ::= <<
 
 CodeBlockForOuterMostAltHeader(currentOuterMostAltCodeBlock, locals, preamble, ops) ::= "<! Required to exist, but unused. !>"
 CodeBlockForOuterMostAlt(currentOuterMostAltCodeBlock, locals, preamble, ops) ::= <<
-<if (currentOuterMostAltCodeBlock.altLabel)>result.reset(new <parser.name>::<currentOuterMostAltCodeBlock.altLabel; format = "cap">Context(result.get()));<endif>
+<if (currentOuterMostAltCodeBlock.altLabel)>result = std::make_shared\<<parser.name>::<currentOuterMostAltCodeBlock.altLabel; format = "cap">Context>(result.get());<endif>
 enterOuterAlt(result.get(), <currentOuterMostAltCodeBlock.alt.altNum>);
 <CodeBlockForAlt(currentAltCodeBlock = currentOuterMostAltCodeBlock, ...)>
 >>
@@ -989,19 +989,19 @@ recRuleSetReturnAction(src,name) ::= "recRuleSetReturnAction(src,name) $<name>=$
 recRuleSetStopToken() ::= "ctx->stop = _input->LT(-1);"
 
 recRuleAltStartAction(ruleName, ctxName, label) ::= <<
-result.reset(new <ctxName>Context(parentContext, parentState));
+result = std::make_shared\<<ctxName>Context>(parentContext, parentState);
 <if (label)>result-><label> = previousContext;<endif>
 pushNewRecursionContext(result.get(), startState, <parser.name>Rule::Rule<ruleName; format = "cap">);
 >>
 
 recRuleLabeledAltStartAction(ruleName, currentAltLabel, label) ::= <<recRuleLabeledAltStartAction
-result.reset(new <currentAltLabel; format = "cap">Context(new <ruleName; format="cap">Context(_parentctx, _parentState)));
+result = std::make_shared\<<currentAltLabel; format = "cap">Context>(new <ruleName; format="cap">Context(_parentctx, _parentState));
 <if(label)>((<currentAltLabel; format="cap">Context*)result).<label> = previousContext;<endif>
 pushNewRecursionContext(result, _startState, RULE_<ruleName>);
 >>
 
 recRuleReplaceContext(ctxName) ::= <<recRuleReplaceContext
-result.reset(new <ctxName>Context(_localctx));
+result = std::make_shared\<<ctxName>Context>(_localctx);
 ctx = result;
 previousContext = result;
 >>

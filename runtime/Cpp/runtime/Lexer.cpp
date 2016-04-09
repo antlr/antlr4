@@ -106,7 +106,7 @@ Token *Lexer::nextToken() {
       int ttype;
       try {
         ttype = getInterpreter<atn::LexerATNSimulator>()->match(_input, (size_t)_mode);
-      } catch (LexerNoViableAltException *e) {
+      } catch (LexerNoViableAltException &e) {
         notifyListeners(e); // report error
         recover(e);
         ttype = SKIP;
@@ -271,19 +271,19 @@ std::vector<Token*> Lexer::getAllTokens() {
   return tokens;
 }
 
-void Lexer::recover(LexerNoViableAltException *e) {
+void Lexer::recover(const LexerNoViableAltException &e) {
   if (_input->LA(1) != EOF) {
     // skip a char and try again
     getInterpreter<atn::LexerATNSimulator>()->consume(_input);
   }
 }
 
-void Lexer::notifyListeners(LexerNoViableAltException *e) {
+void Lexer::notifyListeners(const LexerNoViableAltException &e) {
   std::wstring text = _input->getText(misc::Interval(_tokenStartCharIndex, (int)_input->index()));
   std::wstring msg = std::wstring(L"token recognition error at: '") + getErrorDisplay(text) + std::wstring(L"'");
 
   ANTLRErrorListener *listener = getErrorListenerDispatch();
-  listener->syntaxError(this, nullptr, (size_t)_tokenStartLine, _tokenStartCharPositionInLine, msg, e);
+  listener->syntaxError(this, nullptr, (size_t)_tokenStartLine, _tokenStartCharPositionInLine, msg, std::make_exception_ptr(e));
 }
 
 std::wstring Lexer::getErrorDisplay(const std::wstring &s) {

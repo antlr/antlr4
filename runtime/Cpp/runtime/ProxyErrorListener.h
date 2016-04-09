@@ -55,7 +55,7 @@ namespace runtime {
     }
 
     void syntaxError(IRecognizer *recognizer, Token *offendingSymbol, size_t line, int charPositionInLine,
-                     const std::wstring &msg, RecognitionException *e) override {
+                     const std::wstring &msg, std::exception_ptr e) override {
       for (auto listener : *delegates) {
         listener->syntaxError(recognizer, offendingSymbol, line, charPositionInLine, msg, e);
       }

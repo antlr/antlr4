@@ -51,7 +51,7 @@ namespace runtime {
     ///  original <seealso cref="RecognitionException"/>.
     /// </summary>
   public:
-    virtual void recover(Parser *recognizer, RecognitionException *e) override;
+    virtual void recover(Parser *recognizer, const RecognitionException &e) override;
 
     /// <summary>
     /// Make sure we don't attempt to recover inline; if the parser

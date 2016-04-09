@@ -31,6 +31,8 @@
 
 #pragma once
 
+#include "RecognitionException.h"
+
 namespace antlrcpp {
   class BitSet;
 }
@@ -42,7 +44,7 @@ namespace runtime {
 
   /// How to emit recognition errors (an interface in Java).
   class ANTLRErrorListener {
-
+  public:
     /// <summary>
     /// Upon syntax error, notify any interested parties. This is not how to
     /// recover from errors or compute error messages. <seealso cref="ANTLRErrorStrategy"/>
@@ -75,9 +77,8 @@ namespace runtime {
     ///        the reporting of an error. It is null in the case where
     ///        the parser was able to recover in line without exiting the
     ///        surrounding rule. </param>
-  public:
     virtual void syntaxError(IRecognizer *recognizer, Token *offendingSymbol, size_t line, int charPositionInLine,
-                             const std::wstring &msg, RecognitionException *e) = 0;
+                             const std::wstring &msg, std::exception_ptr e) = 0;
 
     /// <summary>
     /// This method is called by the parser when a full-context prediction

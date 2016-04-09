@@ -30,11 +30,12 @@
  */
 
 #include "BaseErrorListener.h"
+#include "RecognitionException.h"
 
 using namespace org::antlr::v4::runtime;
 
 void BaseErrorListener::syntaxError(IRecognizer *recognizer, Token *offendingSymbol, size_t line, int charPositionInLine,
-                                    const std::wstring &msg, RecognitionException *e) {
+                                    const std::wstring &msg, std::exception_ptr e) {
 }
 
 void BaseErrorListener::reportAmbiguity(Parser *recognizer, dfa::DFA *dfa, size_t startIndex, size_t stopIndex,

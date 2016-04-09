@@ -54,8 +54,8 @@ namespace antlrcpp {
 
   // Convenience functions to avoid lengthy dynamic_cast() != nullptr checks in many places.
   template <typename T1, typename T2>
-  bool is(T2 obj) { // For value types.
-    return dynamic_cast<T1 *>(&obj) != nullptr;
+  bool is(T2 &obj) { // For value types.
+    return dynamic_cast<typename std::add_const<T1>::type *>(&obj) != nullptr;
   }
 
   template <typename T1, typename T2>

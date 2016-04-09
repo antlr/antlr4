@@ -127,7 +127,7 @@ namespace runtime {
     /// the exception</li>
     /// </ul>
     /// </summary>
-    virtual void reportError(Parser *recognizer, RecognitionException *e) override;
+    virtual void reportError(Parser *recognizer, const RecognitionException &e) override;
 
     /// <summary>
     /// {@inheritDoc}
@@ -136,7 +136,7 @@ namespace runtime {
     /// until we find one in the resynchronization set--loosely the set of tokens
     /// that can follow the current rule.
     /// </summary>
-    virtual void recover(Parser *recognizer, RecognitionException *e) override;
+    virtual void recover(Parser *recognizer, const RecognitionException &e) override;
 
     /// <summary>
     /// The default implementation of <seealso cref="ANTLRErrorStrategy#sync"/> makes sure
@@ -195,7 +195,7 @@ namespace runtime {
     /// <param name="recognizer"> the parser instance </param>
     /// <param name="e"> the recognition exception </param>
   protected:
-    virtual void reportNoViableAlternative(Parser *recognizer, NoViableAltException *e);
+    virtual void reportNoViableAlternative(Parser *recognizer, const NoViableAltException &e);
 
     /// <summary>
     /// This is called by <seealso cref="#reportError"/> when the exception is an
@@ -205,7 +205,7 @@ namespace runtime {
     /// </seealso>
     /// <param name="recognizer"> the parser instance </param>
     /// <param name="e"> the recognition exception </param>
-    virtual void reportInputMismatch(Parser *recognizer, InputMismatchException *e);
+    virtual void reportInputMismatch(Parser *recognizer, const InputMismatchException &e);
 
     /// <summary>
     /// This is called by <seealso cref="#reportError"/> when the exception is a
@@ -215,7 +215,7 @@ namespace runtime {
     /// </seealso>
     /// <param name="recognizer"> the parser instance </param>
     /// <param name="e"> the recognition exception </param>
-    virtual void reportFailedPredicate(Parser *recognizer, FailedPredicateException *e);
+    virtual void reportFailedPredicate(Parser *recognizer, const FailedPredicateException &e);
 
     /// <summary>
     /// This method is called to report a syntax error which requires the removal

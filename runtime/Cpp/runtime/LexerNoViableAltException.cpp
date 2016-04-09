@@ -46,14 +46,14 @@ size_t LexerNoViableAltException::getStartIndex() {
   return _startIndex;
 }
 
-std::shared_ptr<atn::ATNConfigSet> LexerNoViableAltException::getDeadEndConfigs() {
+atn::ATNConfigSet* LexerNoViableAltException::getDeadEndConfigs() {
   return _deadEndConfigs;
 }
 
 std::wstring LexerNoViableAltException::toString() {
   std::wstring symbol;
   if (_startIndex < getInputStream()->size()) {
-    symbol = ((CharStream *)getInputStream().get())->getText(misc::Interval((int)_startIndex, (int)_startIndex));
+    symbol = ((CharStream *)getInputStream())->getText(misc::Interval((int)_startIndex, (int)_startIndex));
     symbol = antlrcpp::escapeWhitespace(symbol, false);
   }
   std::wstring format = L"LexerNoViableAltException('" + symbol + L"')";

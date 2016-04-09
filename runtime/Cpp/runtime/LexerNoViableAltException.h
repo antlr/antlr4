@@ -44,7 +44,7 @@ namespace runtime {
     LexerNoViableAltException(Lexer *lexer, CharStream *input, size_t startIndex, atn::ATNConfigSet *deadEndConfigs);
 
     virtual size_t getStartIndex();
-    virtual std::shared_ptr<atn::ATNConfigSet> getDeadEndConfigs();
+    virtual atn::ATNConfigSet* getDeadEndConfigs();
     virtual std::wstring toString();
 
   private:
@@ -52,7 +52,7 @@ namespace runtime {
     const size_t _startIndex;
 
     /// Which configurations did we try at input.index() that couldn't match input.LA(1)?
-    std::shared_ptr<atn::ATNConfigSet> _deadEndConfigs;
+    atn::ATNConfigSet* _deadEndConfigs;
     
   };
 

@@ -84,7 +84,7 @@ CommonToken::CommonToken(Token *oldToken) {
   }
 }
 
-int CommonToken::getType() {
+int CommonToken::getType() const {
   return type;
 }
 

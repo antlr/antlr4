@@ -65,7 +65,7 @@ std::wstring RuleTagToken::getText() {
   return std::wstring(L"<") + ruleName + std::wstring(L">");
 }
 
-int RuleTagToken::getType() {
+int RuleTagToken::getType() const {
   return bypassTokenType;
 }
 

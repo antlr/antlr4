@@ -50,6 +50,7 @@
 
 using namespace org::antlr::v4::runtime;
 using namespace org::antlr::v4::runtime::atn;
+using namespace antlrcpp;
 
 void LexerATNSimulator::SimState::reset() {
   index = -1;
@@ -89,19 +90,20 @@ int LexerATNSimulator::match(CharStream *input, size_t mode) {
   match_calls++;
   _mode = mode;
   ssize_t mark = input->mark();
-  try {
-    _startIndex = (int)input->index();
-    prevAccept->reset();
-    dfa::DFA *dfa = _decisionToDFA[mode];
-    if (dfa->s0 == nullptr) {
-      return matchATN(input);
-    } else {
-      return execATN(input, dfa->s0);
-    }
-  }
-  catch(...) {
+
+  auto onExit = finally([=] {
     input->release(mark);
+  });
+
+  _startIndex = (int)input->index();
+  prevAccept->reset();
+  dfa::DFA *dfa = _decisionToDFA[mode];
+  if (dfa->s0 == nullptr) {
+    return matchATN(input);
+  } else {
+    return execATN(input, dfa->s0);
   }
+
   return -1;
 }
 
@@ -448,16 +450,16 @@ bool LexerATNSimulator::evaluatePredicate(CharStream *input, int ruleIndex, int 
   size_t savedLine = _line;
   size_t index = input->index();
   ssize_t marker = input->mark();
-  try {
-    consume(input);
-    return _recog->sempred(nullptr, ruleIndex, predIndex);
-  } catch(...) {
+
+  auto onExit = finally([&] {
     _charPositionInLine = savedCharPositionInLine;
     _line = savedLine;
     input->seek(index);
     input->release(marker);
-  }
-  return false;
+  });
+
+  consume(input);
+  return _recog->sempred(nullptr, ruleIndex, predIndex);
 }
 
 void LexerATNSimulator::captureSimState(SimState *settings, CharStream *input, dfa::DFAState *dfaState) {

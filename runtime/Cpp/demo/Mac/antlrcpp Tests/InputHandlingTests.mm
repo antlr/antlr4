@@ -99,9 +99,10 @@ using namespace org::antlr::v4::runtime::misc;
   try {
     stream.consume();
     XCTFail();
-  } catch (const IllegalStateException &e) {
+  } catch (IllegalStateException &e) {
     // Expected.
-    XCTAssertEqual(e.getMessage(), "cannot consume EOF");
+    std::string message = e.what();
+    XCTAssertEqual(message, "cannot consume EOF");
   }
 
   XCTAssertEqual(stream.index(), text.size());

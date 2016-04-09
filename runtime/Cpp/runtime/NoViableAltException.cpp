@@ -42,13 +42,13 @@ NoViableAltException::NoViableAltException(Parser *recognizer)
 
 NoViableAltException::NoViableAltException(Parser *recognizer, TokenStream *input, Token *startToken,
   Token *offendingToken, atn::ATNConfigSet *deadEndConfigs, ParserRuleContext *ctx)
-  : RecognitionException(recognizer, input, ctx, offendingToken), deadEndConfigs(deadEndConfigs), startToken(startToken) {
+  : RecognitionException(recognizer, input, ctx, offendingToken), _deadEndConfigs(deadEndConfigs), _startToken(startToken) {
 }
 
-std::shared_ptr<Token> NoViableAltException::getStartToken() {
-  return startToken;
+Token* NoViableAltException::getStartToken() const {
+  return _startToken;
 }
 
-std::shared_ptr<atn::ATNConfigSet> NoViableAltException::getDeadEndConfigs() {
-  return deadEndConfigs;
+atn::ATNConfigSet* NoViableAltException::getDeadEndConfigs() const {
+  return _deadEndConfigs;
 }
