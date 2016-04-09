@@ -62,7 +62,7 @@ ATNConfigSet::ATNConfigSet(bool fullCtx, std::shared_ptr<ConfigLookup> lookup) :
   InitializeInstanceFields();
 }
 
-ATNConfigSet::ATNConfigSet(ATNConfigSet *old) : ATNConfigSet(old->fullCtx, std::shared_ptr<ConfigLookup>()) {
+ATNConfigSet::ATNConfigSet(std::shared_ptr<ATNConfigSet> old) : ATNConfigSet(old->fullCtx, std::shared_ptr<ConfigLookup>()) {
   addAll(old);
   uniqueAlt = old->uniqueAlt;
   conflictingAlts = old->conflictingAlts;
@@ -106,7 +106,7 @@ bool ATNConfigSet::add(ATNConfig *config, PredictionContextMergeCache *mergeCach
   return true;
 }
 
-bool ATNConfigSet::addAll(ATNConfigSet *other) {
+bool ATNConfigSet::addAll(std::shared_ptr<ATNConfigSet> other) {
   for (auto &c : other->configs) {
     add(c);
   }
@@ -152,19 +152,19 @@ void ATNConfigSet::optimizeConfigs(ATNSimulator *interpreter) {
   }
 }
 
-bool ATNConfigSet::equals(ATNConfigSet *other) {
-  if (other == this) {
+bool ATNConfigSet::operator == (const ATNConfigSet &other) {
+  if (&other == this) {
     return true;
   }
 
   bool configEquals = true;
-  if (configs.size() == other->configs.size()) {
+  if (configs.size() == other.configs.size()) {
     for (size_t i = 0; i < configs.size(); i++) {
-      if (other->configs.size() < i) {
+      if (other.configs.size() < i) {
         configEquals = false;
         break;
       }
-      if (configs[i] != other->configs[i]) {
+      if (configs[i] != other.configs[i]) {
         configEquals = false;
         break;
       }
@@ -173,9 +173,9 @@ bool ATNConfigSet::equals(ATNConfigSet *other) {
     configEquals = false;
   }
 
-  bool same = configs.size() > 0 && configEquals && this->fullCtx == other->fullCtx && this->uniqueAlt == other->uniqueAlt &&
-    this->conflictingAlts == other->conflictingAlts && this->hasSemanticContext == other->hasSemanticContext &&
-    this->dipsIntoOuterContext == other->dipsIntoOuterContext; // includes stack context
+  bool same = configs.size() > 0 && configEquals && fullCtx == other.fullCtx && uniqueAlt == other.uniqueAlt &&
+    conflictingAlts == other.conflictingAlts && hasSemanticContext == other.hasSemanticContext &&
+    dipsIntoOuterContext == other.dipsIntoOuterContext; // includes stack context
 
   return same;
 }

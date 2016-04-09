@@ -48,7 +48,7 @@ namespace atn {
     ATNSimulator();
 
     /// Must distinguish between missing edge and edge we know leads nowhere.
-    static dfa::DFAState ERROR;
+    static const std::shared_ptr<dfa::DFAState> ERROR;
     ATN atn;
 
     ATNSimulator(const ATN &atn, std::shared_ptr<PredictionContextCache> sharedContextCache);

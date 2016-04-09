@@ -108,7 +108,7 @@ namespace runtime {
     /// <param name="configs"> the ATN configuration set where the ambiguity was
     /// determined </param>
     virtual void reportAmbiguity(Parser *recognizer, dfa::DFA *dfa, size_t startIndex, size_t stopIndex, bool exact,
-                                 antlrcpp::BitSet *ambigAlts, atn::ATNConfigSet *configs) = 0;
+      antlrcpp::BitSet *ambigAlts, std::shared_ptr<atn::ATNConfigSet> configs) = 0;
 
     /// <summary>
     /// This method is called when an SLL conflict occurs and the parser is about
@@ -131,7 +131,7 @@ namespace runtime {
     /// <param name="configs"> the ATN configuration set where the SLL conflict was
     /// detected </param>
     virtual void reportAttemptingFullContext(Parser *recognizer, dfa::DFA *dfa, size_t startIndex, size_t stopIndex,
-                                             antlrcpp::BitSet *conflictingAlts, atn::ATNConfigSet *configs) = 0;
+      antlrcpp::BitSet *conflictingAlts, std::shared_ptr<atn::ATNConfigSet> configs) = 0;
 
     /// <summary>
     /// This method is called by the parser when a full-context prediction has a
@@ -161,7 +161,7 @@ namespace runtime {
     /// <param name="configs"> the ATN configuration set where the unambiguous prediction
     /// was determined </param>
     virtual void reportContextSensitivity(Parser *recognizer, dfa::DFA *dfa, size_t startIndex, size_t stopIndex,
-                                          int prediction, atn::ATNConfigSet *configs) = 0;
+      int prediction, std::shared_ptr<atn::ATNConfigSet> configs) = 0;
   };
 
 } // namespace runtime

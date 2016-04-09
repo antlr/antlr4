@@ -47,7 +47,7 @@ DiagnosticErrorListener::DiagnosticErrorListener(bool exactOnly) : exactOnly(exa
 }
 
 void DiagnosticErrorListener::reportAmbiguity(Parser *recognizer, dfa::DFA *dfa, size_t startIndex, size_t stopIndex,
-                                              bool exact, antlrcpp::BitSet *ambigAlts, atn::ATNConfigSet *configs) {
+   bool exact, antlrcpp::BitSet *ambigAlts, std::shared_ptr<atn::ATNConfigSet> configs) {
   if (exactOnly && !exact) {
     return;
   }
@@ -61,7 +61,7 @@ void DiagnosticErrorListener::reportAmbiguity(Parser *recognizer, dfa::DFA *dfa,
 }
 
 void DiagnosticErrorListener::reportAttemptingFullContext(Parser *recognizer, dfa::DFA *dfa, size_t startIndex,
-                                                          size_t stopIndex, antlrcpp::BitSet *conflictingAlts, atn::ATNConfigSet *configs) {
+  size_t stopIndex, antlrcpp::BitSet *conflictingAlts, std::shared_ptr<atn::ATNConfigSet> configs) {
   std::wstring decision = getDecisionDescription(recognizer, dfa);
   std::wstring text = recognizer->getTokenStream()->getText(misc::Interval((int)startIndex, (int)stopIndex));
   std::wstring message = L"reportAttemptingFullContext d = " + decision + L", input = '" + text + L"'";
@@ -69,7 +69,7 @@ void DiagnosticErrorListener::reportAttemptingFullContext(Parser *recognizer, df
 }
 
 void DiagnosticErrorListener::reportContextSensitivity(Parser *recognizer, dfa::DFA *dfa, size_t startIndex,
-                                                       size_t stopIndex, int prediction, atn::ATNConfigSet *configs) {
+  size_t stopIndex, int prediction, std::shared_ptr<atn::ATNConfigSet> configs) {
   std::wstring decision = getDecisionDescription(recognizer, dfa);
   std::wstring text = recognizer->getTokenStream()->getText(misc::Interval((int)startIndex, (int)stopIndex));
   std::wstring message = L"reportContextSensitivity d = " + decision + L", input = '" + text + L"'";
@@ -93,7 +93,8 @@ std::wstring DiagnosticErrorListener::getDecisionDescription(Parser *recognizer,
   return std::to_wstring(decision) + L"(" + ruleName + L")";
 }
 
-antlrcpp::BitSet *DiagnosticErrorListener::getConflictingAlts(antlrcpp::BitSet *reportedAlts, atn::ATNConfigSet *configs) {
+antlrcpp::BitSet *DiagnosticErrorListener::getConflictingAlts(antlrcpp::BitSet *reportedAlts,
+                                                              std::shared_ptr<atn::ATNConfigSet> configs) {
   if (reportedAlts != nullptr) {
     return reportedAlts;
   }

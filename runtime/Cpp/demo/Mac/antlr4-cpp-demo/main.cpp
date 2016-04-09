@@ -33,6 +33,9 @@ int main(int argc, const char * argv[]) {
   ANTLRInputStream input(L"ab");
   TestLexer lexer(&input);
   CommonTokenStream tokens(&lexer);
+  for (auto token : tokens.getTokens()) {
+    std::cout << token << std::endl;
+  }
 
   TestParser parser(&tokens);
   std::shared_ptr<tree::ParseTree> tree = parser.main();

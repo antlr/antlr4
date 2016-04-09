@@ -353,9 +353,9 @@ namespace atn {
     virtual void predicateDFAState(dfa::DFAState *dfaState, DecisionState *decisionState);
 
     // comes back with reach.uniqueAlt set to a valid alt
-    virtual int execATNWithFullContext(dfa::DFA *dfa, dfa::DFAState *D, ATNConfigSet *s0, TokenStream *input, size_t startIndex, ParserRuleContext *outerContext); // how far we got before failing over
+    virtual int execATNWithFullContext(dfa::DFA *dfa, dfa::DFAState *D, std::shared_ptr<ATNConfigSet> s0, TokenStream *input, size_t startIndex, ParserRuleContext *outerContext); // how far we got before failing over
 
-    virtual ATNConfigSet *computeReachSet(ATNConfigSet *closure, ssize_t t, bool fullCtx);
+    virtual std::shared_ptr<ATNConfigSet> computeReachSet(std::shared_ptr<ATNConfigSet> closure, ssize_t t, bool fullCtx);
 
     /// <summary>
     /// Return a configuration set containing only the configurations from
@@ -376,19 +376,19 @@ namespace atn {
     /// <returns> {@code configs} if all configurations in {@code configs} are in a
     /// rule stop state, otherwise return a new configuration set containing only
     /// the configurations from {@code configs} which are in a rule stop state </returns>
-    virtual ATNConfigSet *removeAllConfigsNotInRuleStopState(ATNConfigSet *configs, bool lookToEndOfRule);
+    virtual std::shared_ptr<ATNConfigSet> removeAllConfigsNotInRuleStopState(std::shared_ptr<ATNConfigSet> configs, bool lookToEndOfRule);
 
-    virtual ATNConfigSet *computeStartState(ATNState *p, RuleContext *ctx, bool fullCtx);
+    virtual std::shared_ptr<ATNConfigSet> computeStartState(ATNState *p, RuleContext *ctx, bool fullCtx);
 
     virtual ATNState *getReachableTarget(Transition *trans, int ttype);
 
     virtual std::vector<SemanticContextRef> getPredsForAmbigAlts(antlrcpp::BitSet *ambigAlts,
-      ATNConfigSet *configs, size_t nalts);
+      std::shared_ptr<ATNConfigSet> configs, size_t nalts);
 
     virtual std::vector<dfa::DFAState::PredPrediction*> getPredicatePredictions(antlrcpp::BitSet *ambigAlts,
       std::vector<SemanticContextRef> altToPred);
 
-    virtual int getAltThatFinishedDecisionEntryRule(ATNConfigSet *configs);
+    virtual int getAltThatFinishedDecisionEntryRule(std::shared_ptr<ATNConfigSet> configs);
 
     /// <summary>
     /// Look through a list of predicate/alt pairs, returning alts for the
@@ -407,14 +407,14 @@ namespace atn {
      ambig detection thought :(
      */
 
-    virtual void closure(ATNConfig *config, ATNConfigSet *configs, std::set<ATNConfig*> &closureBusy,
+    virtual void closure(ATNConfig *config, std::shared_ptr<ATNConfigSet> configs, std::set<ATNConfig*> &closureBusy,
                          bool collectPredicates, bool fullCtx);
 
-    virtual void closureCheckingStopState(ATNConfig *config, ATNConfigSet *configs, std::set<ATNConfig*> &closureBusy,
-                                          bool collectPredicates, bool fullCtx, int depth);
+    virtual void closureCheckingStopState(ATNConfig *config, std::shared_ptr<ATNConfigSet> configs,
+      std::set<ATNConfig*> &closureBusy, bool collectPredicates, bool fullCtx, int depth);
 
     /// Do the actual work of walking epsilon edges.
-    virtual void closure_(ATNConfig *config, ATNConfigSet *configs, std::set<ATNConfig*> &closureBusy,
+    virtual void closure_(ATNConfig *config, std::shared_ptr<ATNConfigSet> configs, std::set<ATNConfig*> &closureBusy,
                           bool collectPredicates, bool fullCtx, int depth);
 
   public:
@@ -432,7 +432,7 @@ namespace atn {
 
     virtual ATNConfig *ruleTransition(ATNConfig *config, RuleTransition *t);
 
-    virtual antlrcpp::BitSet getConflictingAlts(ATNConfigSet *configs);
+    virtual antlrcpp::BitSet getConflictingAlts(std::shared_ptr<ATNConfigSet> configs);
 
     /// <summary>
     /// Sam pointed out a problem with the previous definition, v3, of
@@ -471,7 +471,7 @@ namespace atn {
     /// that we still need to pursue.
     /// </summary>
 
-    virtual antlrcpp::BitSet getConflictingAltsOrUniqueAlt(ATNConfigSet *configs);
+    virtual antlrcpp::BitSet getConflictingAltsOrUniqueAlt(std::shared_ptr<ATNConfigSet> configs);
 
   public:
     virtual std::wstring getTokenName(ssize_t t);
@@ -486,9 +486,10 @@ namespace atn {
     virtual void dumpDeadEndConfigs(NoViableAltException *nvae);
 
   protected:
-    virtual NoViableAltException *noViableAlt(TokenStream *input, ParserRuleContext *outerContext, ATNConfigSet *configs, size_t startIndex);
+    virtual NoViableAltException *noViableAlt(TokenStream *input, ParserRuleContext *outerContext,
+                                              std::shared_ptr<ATNConfigSet> configs, size_t startIndex);
 
-    static int getUniqueAlt(ATNConfigSet *configs);
+    static int getUniqueAlt(std::shared_ptr<ATNConfigSet> configs);
 
     /// <summary>
     /// Add an edge to the DFA, if possible. This method calls
@@ -527,14 +528,16 @@ namespace atn {
     /// state was not already present. </returns>
     virtual dfa::DFAState *addDFAState(dfa::DFA *dfa, dfa::DFAState *D);
 
-    virtual void reportAttemptingFullContext(dfa::DFA *dfa, antlrcpp::BitSet *conflictingAlts, ATNConfigSet *configs,
-                                             size_t startIndex, size_t stopIndex);
+    virtual void reportAttemptingFullContext(dfa::DFA *dfa, antlrcpp::BitSet *conflictingAlts,
+      std::shared_ptr<ATNConfigSet> configs, size_t startIndex, size_t stopIndex);
 
-    virtual void reportContextSensitivity(dfa::DFA *dfa, int prediction, ATNConfigSet *configs, size_t startIndex, size_t stopIndex);
+    virtual void reportContextSensitivity(dfa::DFA *dfa, int prediction, std::shared_ptr<ATNConfigSet> configs,
+                                          size_t startIndex, size_t stopIndex);
 
     /// <summary>
     /// If context sensitive parsing, we know it's ambiguity not conflict </summary>
-    virtual void reportAmbiguity(dfa::DFA *dfa, dfa::DFAState *D, size_t startIndex, size_t stopIndex, bool exact, antlrcpp::BitSet *ambigAlts, ATNConfigSet *configs);
+    virtual void reportAmbiguity(dfa::DFA *dfa, dfa::DFAState *D, size_t startIndex, size_t stopIndex, bool exact,
+                                 antlrcpp::BitSet *ambigAlts, std::shared_ptr<ATNConfigSet> configs);
 
   public:
     void setPredictionMode(PredictionMode mode);

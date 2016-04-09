@@ -41,10 +41,11 @@ namespace runtime {
 
   class LexerNoViableAltException : public RecognitionException {
   public:
-    LexerNoViableAltException(Lexer *lexer, CharStream *input, size_t startIndex, atn::ATNConfigSet *deadEndConfigs);
+    LexerNoViableAltException(Lexer *lexer, CharStream *input, size_t startIndex,
+                              std::shared_ptr<atn::ATNConfigSet> deadEndConfigs);
 
     virtual size_t getStartIndex();
-    virtual atn::ATNConfigSet* getDeadEndConfigs();
+    virtual std::shared_ptr<atn::ATNConfigSet> getDeadEndConfigs();
     virtual std::wstring toString();
 
   private:
@@ -52,7 +53,7 @@ namespace runtime {
     const size_t _startIndex;
 
     /// Which configurations did we try at input.index() that couldn't match input.LA(1)?
-    atn::ATNConfigSet* _deadEndConfigs;
+    std::shared_ptr<atn::ATNConfigSet> _deadEndConfigs;
     
   };
 

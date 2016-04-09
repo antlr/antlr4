@@ -84,7 +84,7 @@ namespace atn {
     const bool fullCtx;
 
     ATNConfigSet(bool fullCtx, std::shared_ptr<ConfigLookup> lookup);
-    ATNConfigSet(ATNConfigSet *old);
+    ATNConfigSet(std::shared_ptr<ATNConfigSet> old);
 
     virtual ~ATNConfigSet();
 
@@ -114,9 +114,9 @@ namespace atn {
 
     virtual void optimizeConfigs(ATNSimulator *interpreter);
 
-    bool addAll(ATNConfigSet *other);
+    bool addAll(std::shared_ptr<ATNConfigSet> other);
 
-    virtual bool equals(ATNConfigSet *other);
+    bool operator == (const ATNConfigSet &other);
     virtual size_t hashCode();
     virtual size_t size();
     virtual bool isEmpty();

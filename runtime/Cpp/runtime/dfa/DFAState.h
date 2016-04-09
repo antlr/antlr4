@@ -78,7 +78,7 @@ namespace dfa {
   public:
     int stateNumber;
 
-    atn::ATNConfigSet *configs;
+    std::shared_ptr<atn::ATNConfigSet> configs;
 
     /// <summary>
     /// {@code edges[symbol]} points to target of symbol. Shift up by 1 so (-1)
@@ -124,7 +124,7 @@ namespace dfa {
     /// Map a predicate to a predicted alternative.
     DFAState();
     DFAState(int stateNumber);
-    DFAState(atn::ATNConfigSet *configs, int stateNumber = -1);
+    DFAState(std::shared_ptr<atn::ATNConfigSet> configs, int stateNumber = -1);
 
     /// <summary>
     /// Get the set of all alts mentioned by all ATN configurations in this
@@ -147,7 +147,7 @@ namespace dfa {
     /// exists that has this exact set of ATN configurations. The
     /// <seealso cref="#stateNumber"/> is irrelevant.
     /// </summary>
-    virtual bool equals(DFAState *o);
+    bool operator == (const DFAState &o);
 
     virtual std::wstring toString();
 

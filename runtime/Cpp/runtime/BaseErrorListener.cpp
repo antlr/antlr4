@@ -39,13 +39,13 @@ void BaseErrorListener::syntaxError(IRecognizer *recognizer, Token *offendingSym
 }
 
 void BaseErrorListener::reportAmbiguity(Parser *recognizer, dfa::DFA *dfa, size_t startIndex, size_t stopIndex,
-                                        bool exact, antlrcpp::BitSet *ambigAlts, atn::ATNConfigSet *configs) {
+  bool exact, antlrcpp::BitSet *ambigAlts, std::shared_ptr<atn::ATNConfigSet> configs) {
 }
 
 void BaseErrorListener::reportAttemptingFullContext(Parser *recognizer, dfa::DFA *dfa, size_t startIndex,
-                                                    size_t stopIndex, antlrcpp::BitSet *conflictingAlts, atn::ATNConfigSet *configs) {
+  size_t stopIndex, antlrcpp::BitSet *conflictingAlts, std::shared_ptr<atn::ATNConfigSet> configs) {
 }
 
 void BaseErrorListener::reportContextSensitivity(Parser *recognizer, dfa::DFA *dfa, size_t startIndex, size_t stopIndex,
-                                                 int prediction, atn::ATNConfigSet *configs) {
+  int prediction, std::shared_ptr<atn::ATNConfigSet> configs) {
 }

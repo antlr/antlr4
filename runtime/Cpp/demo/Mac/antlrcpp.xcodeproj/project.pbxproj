@@ -598,7 +598,7 @@
 		27C666861C9584050021E494 /* LexerInterpreter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = LexerInterpreter.cpp; path = ../../runtime/LexerInterpreter.cpp; sourceTree = SOURCE_ROOT; };
 		27C666871C9584050021E494 /* LexerInterpreter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LexerInterpreter.h; path = ../../runtime/LexerInterpreter.h; sourceTree = SOURCE_ROOT; };
 		27C666881C9584050021E494 /* LexerNoViableAltException.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = LexerNoViableAltException.cpp; path = ../../runtime/LexerNoViableAltException.cpp; sourceTree = SOURCE_ROOT; wrapsLines = 0; };
-		27C666891C9584050021E494 /* LexerNoViableAltException.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LexerNoViableAltException.h; path = ../../runtime/LexerNoViableAltException.h; sourceTree = SOURCE_ROOT; };
+		27C666891C9584050021E494 /* LexerNoViableAltException.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LexerNoViableAltException.h; path = ../../runtime/LexerNoViableAltException.h; sourceTree = SOURCE_ROOT; wrapsLines = 0; };
 		27C6668A1C9584050021E494 /* ListTokenSource.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ListTokenSource.cpp; path = ../../runtime/ListTokenSource.cpp; sourceTree = SOURCE_ROOT; wrapsLines = 0; };
 		27C6668B1C9584050021E494 /* ListTokenSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ListTokenSource.h; path = ../../runtime/ListTokenSource.h; sourceTree = SOURCE_ROOT; };
 		27C6668C1C9584050021E494 /* NoViableAltException.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = NoViableAltException.cpp; path = ../../runtime/NoViableAltException.cpp; sourceTree = SOURCE_ROOT; wrapsLines = 0; };
@@ -729,7 +729,7 @@
 		27C668661C9584B60021E494 /* DFA.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFA.h; sourceTree = "<group>"; };
 		27C668671C9584B60021E494 /* DFASerializer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DFASerializer.cpp; sourceTree = "<group>"; wrapsLines = 0; };
 		27C668681C9584B60021E494 /* DFASerializer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFASerializer.h; sourceTree = "<group>"; };
-		27C668691C9584B60021E494 /* DFAState.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DFAState.cpp; sourceTree = "<group>"; };
+		27C668691C9584B60021E494 /* DFAState.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DFAState.cpp; sourceTree = "<group>"; wrapsLines = 0; };
 		27C6686A1C9584B60021E494 /* DFAState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFAState.h; sourceTree = "<group>"; };
 		27C6686B1C9584B60021E494 /* LexerDFASerializer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LexerDFASerializer.cpp; sourceTree = "<group>"; };
 		27C6686C1C9584B60021E494 /* LexerDFASerializer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LexerDFASerializer.h; sourceTree = "<group>"; };

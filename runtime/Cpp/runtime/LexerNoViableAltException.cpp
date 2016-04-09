@@ -38,7 +38,8 @@
 
 using namespace org::antlr::v4::runtime;
 
-LexerNoViableAltException::LexerNoViableAltException(Lexer *lexer, CharStream *input, size_t startIndex, atn::ATNConfigSet *deadEndConfigs)
+LexerNoViableAltException::LexerNoViableAltException(Lexer *lexer, CharStream *input, size_t startIndex,
+                                                     std::shared_ptr<atn::ATNConfigSet> deadEndConfigs)
   : RecognitionException(lexer, input, nullptr, nullptr), _startIndex(startIndex), _deadEndConfigs(deadEndConfigs) {
 }
 
@@ -46,7 +47,7 @@ size_t LexerNoViableAltException::getStartIndex() {
   return _startIndex;
 }
 
-atn::ATNConfigSet* LexerNoViableAltException::getDeadEndConfigs() {
+std::shared_ptr<atn::ATNConfigSet> LexerNoViableAltException::getDeadEndConfigs() {
   return _deadEndConfigs;
 }
 

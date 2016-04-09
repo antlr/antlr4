@@ -55,10 +55,11 @@ void DFAState::PredPrediction::InitializeInstanceFields() {
 DFAState::DFAState() : DFAState(-1) {
 }
 
-DFAState::DFAState(int stateNumber) : DFAState(new atn::ATNConfigSet(true, std::shared_ptr<ConfigLookup>()), stateNumber) {
+DFAState::DFAState(int stateNumber) : DFAState(std::make_shared<ATNConfigSet>(true, std::shared_ptr<ConfigLookup>()),
+  stateNumber) {
 }
 
-DFAState::DFAState(atn::ATNConfigSet *configs, int stateNumber) : configs(configs), stateNumber(stateNumber) {
+DFAState::DFAState(std::shared_ptr<ATNConfigSet> configs, int stateNumber) : configs(configs), stateNumber(stateNumber) {
   InitializeInstanceFields();
 }
 
@@ -82,13 +83,13 @@ size_t DFAState::hashCode() {
   return hash;
 }
 
-bool DFAState::equals(DFAState *o) {
+bool DFAState::operator == (const DFAState &o) {
   // compare set of ATN configurations in this set with other
-  if (this == o) {
+  if (this == &o) {
     return true;
   }
 
-  return configs->equals(o->configs);
+  return configs == o.configs;
 }
 
 std::wstring DFAState::toString() {

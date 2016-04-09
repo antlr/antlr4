@@ -40,7 +40,7 @@
 using namespace org::antlr::v4::runtime::dfa;
 using namespace org::antlr::v4::runtime::atn;
 
-DFAState ATNSimulator::ERROR(INT32_MAX);
+const std::shared_ptr<DFAState> ATNSimulator::ERROR = std::make_shared<DFAState>(INT32_MAX);
 
 ATNSimulator::ATNSimulator() {
 }

@@ -62,13 +62,13 @@ namespace runtime {
     }
 
     virtual void reportAmbiguity(Parser *recognizer, dfa::DFA *dfa, size_t startIndex, size_t stopIndex, bool exact,
-                                 antlrcpp::BitSet *ambigAlts, atn::ATNConfigSet *configs) override;
+                                 antlrcpp::BitSet *ambigAlts, std::shared_ptr<atn::ATNConfigSet> configs) override;
 
     virtual void reportAttemptingFullContext(Parser *recognizer, dfa::DFA *dfa, size_t startIndex, size_t stopIndex,
-                                             antlrcpp::BitSet *conflictingAlts, atn::ATNConfigSet *configs) override;
+                                             antlrcpp::BitSet *conflictingAlts, std::shared_ptr<atn::ATNConfigSet> configs) override;
 
     virtual void reportContextSensitivity(Parser *recognizer, dfa::DFA *dfa, size_t startIndex, size_t stopIndex,
-                                          int prediction, atn::ATNConfigSet *configs) override;
+                                          int prediction, std::shared_ptr<atn::ATNConfigSet> configs) override;
   };
 
 } // namespace runtime
