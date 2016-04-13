@@ -319,7 +319,7 @@ self.state = <choice.stateNumber>
 token = self._input.LA(1)
 <choice.altLook,alts:{look,alt| <cases(ttypes=look)>
     <alt>
-	}; separator="\nel">
+    pass}; separator="\nel">
 else:
     <error>
 
