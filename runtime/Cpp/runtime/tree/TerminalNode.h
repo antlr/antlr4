@@ -41,7 +41,7 @@ namespace tree {
 
   class TerminalNode : public ParseTree {
   public:
-    virtual Token *getSymbol() = 0;
+    virtual TokenRef getSymbol() = 0;
   };
 
 } // namespace tree

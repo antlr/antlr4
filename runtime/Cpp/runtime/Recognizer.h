@@ -138,11 +138,11 @@ namespace runtime {
 
     // subclass needs to override these if there are sempreds or actions
     // that the ATN interp needs to execute
-    virtual bool sempred(RuleContext *_localctx, int ruleIndex, int actionIndex);
+    virtual bool sempred(RuleContextRef localctx, int ruleIndex, int actionIndex);
 
-    virtual bool precpred(RuleContext *localctx, int precedence);
+    virtual bool precpred(RuleContextRef localctx, int precedence);
 
-    virtual void action(RuleContext *_localctx, int ruleIndex, int actionIndex);
+    virtual void action(RuleContextRef localctx, int ruleIndex, int actionIndex);
 
     int getState();
 
@@ -156,11 +156,11 @@ namespace runtime {
     /// </summary>
     void setState(int atnState);
 
-    virtual IntStream *getInputStream() = 0;
+    virtual IntStream* getInputStream() = 0;
 
     virtual void setInputStream(IntStream *input) = 0;
 
-    virtual TokenFactory<CommonToken *> *getTokenFactory() = 0;
+    virtual std::shared_ptr<TokenFactory<CommonToken>> getTokenFactory() = 0;
 
     template<typename T1>
     void setTokenFactory(TokenFactory<T1> *input);

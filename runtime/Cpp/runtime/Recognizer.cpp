@@ -142,15 +142,15 @@ ANTLRErrorListener *Recognizer::getErrorListenerDispatch() {
   return (ANTLRErrorListener *)new ProxyErrorListener(getErrorListeners());
 }
 
-bool Recognizer::sempred(RuleContext *_localctx, int ruleIndex, int actionIndex) {
+bool Recognizer::sempred(RuleContextRef localctx, int ruleIndex, int actionIndex) {
   return true;
 }
 
-bool Recognizer::precpred(RuleContext *localctx, int precedence) {
+bool Recognizer::precpred(RuleContextRef localctx, int precedence) {
   return true;
 }
 
-void Recognizer::action(RuleContext *_localctx, int ruleIndex, int actionIndex) {
+void Recognizer::action(RuleContextRef localctx, int ruleIndex, int actionIndex) {
 }
 
 int Recognizer::getState() {

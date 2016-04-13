@@ -47,21 +47,22 @@ DiagnosticErrorListener::DiagnosticErrorListener(bool exactOnly) : exactOnly(exa
 }
 
 void DiagnosticErrorListener::reportAmbiguity(Parser *recognizer, dfa::DFA *dfa, size_t startIndex, size_t stopIndex,
-   bool exact, antlrcpp::BitSet *ambigAlts, std::shared_ptr<atn::ATNConfigSet> configs) {
+   bool exact, const antlrcpp::BitSet &ambigAlts, std::shared_ptr<atn::ATNConfigSet> configs) {
   if (exactOnly && !exact) {
     return;
   }
 
   std::wstring decision = getDecisionDescription(recognizer, dfa);
-  antlrcpp::BitSet *conflictingAlts = getConflictingAlts(ambigAlts, configs);
+  antlrcpp::BitSet conflictingAlts = getConflictingAlts(ambigAlts, configs);
   std::wstring text = recognizer->getTokenStream()->getText(misc::Interval((int)startIndex, (int)stopIndex));
-  std::wstring message = L"reportAmbiguity d = " + decision + L": ambigAlts = " + conflictingAlts->toString() + L", input = '" + text + L"'";
+  std::wstring message = L"reportAmbiguity d = " + decision + L": ambigAlts = " + conflictingAlts.toString() +
+    L", input = '" + text + L"'";
 
   recognizer->notifyErrorListeners(message);
 }
 
 void DiagnosticErrorListener::reportAttemptingFullContext(Parser *recognizer, dfa::DFA *dfa, size_t startIndex,
-  size_t stopIndex, antlrcpp::BitSet *conflictingAlts, std::shared_ptr<atn::ATNConfigSet> configs) {
+  size_t stopIndex, const antlrcpp::BitSet &conflictingAlts, std::shared_ptr<atn::ATNConfigSet> configs) {
   std::wstring decision = getDecisionDescription(recognizer, dfa);
   std::wstring text = recognizer->getTokenStream()->getText(misc::Interval((int)startIndex, (int)stopIndex));
   std::wstring message = L"reportAttemptingFullContext d = " + decision + L", input = '" + text + L"'";
@@ -93,16 +94,17 @@ std::wstring DiagnosticErrorListener::getDecisionDescription(Parser *recognizer,
   return std::to_wstring(decision) + L"(" + ruleName + L")";
 }
 
-antlrcpp::BitSet *DiagnosticErrorListener::getConflictingAlts(antlrcpp::BitSet *reportedAlts,
-                                                              std::shared_ptr<atn::ATNConfigSet> configs) {
-  if (reportedAlts != nullptr) {
+antlrcpp::BitSet DiagnosticErrorListener::getConflictingAlts(const antlrcpp::BitSet &reportedAlts,
+                                                             std::shared_ptr<atn::ATNConfigSet> configs) {
+  if (reportedAlts.count() > 0) { // Not exactly like the original Java code, but this listener is only used
+                                  // in the TestRig (where it never provides a good alt set), so it's probably ok so.
     return reportedAlts;
   }
 
-  antlrcpp::BitSet *result = new antlrcpp::BitSet();
+  antlrcpp::BitSet result;
   for (size_t i = 0; i < configs->size(); i++) {
     atn::ATNConfig *config = configs->get(i);
-    result->set((size_t)config->alt);
+    result.set((size_t)config->alt);
   }
 
   return result;

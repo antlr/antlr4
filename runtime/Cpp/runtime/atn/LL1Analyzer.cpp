@@ -74,11 +74,11 @@ std::vector<misc::IntervalSet> LL1Analyzer::getDecisionLookahead(ATNState *s) co
   return look;
 }
 
-misc::IntervalSet LL1Analyzer::LOOK(ATNState *s, RuleContext *ctx) const {
+misc::IntervalSet LL1Analyzer::LOOK(ATNState *s, RuleContextRef ctx) const {
   return LOOK(s, nullptr, ctx);
 }
 
-misc::IntervalSet LL1Analyzer::LOOK(ATNState *s, ATNState *stopState, RuleContext *ctx) const {
+misc::IntervalSet LL1Analyzer::LOOK(ATNState *s, ATNState *stopState, RuleContextRef ctx) const {
   misc::IntervalSet r;
   bool seeThruPreds = true; // ignore preds; get all lookahead
   PredictionContextRef lookContext = ctx != nullptr ? PredictionContext::fromRuleContext(*s->atn, ctx) : nullptr;
@@ -122,14 +122,14 @@ void LL1Analyzer::_LOOK(ATNState *s, ATNState *stopState, PredictionContextRef c
       for (size_t i = 0; i < ctx->size(); i++) {
         ATNState *returnState = _atn.states[(size_t)ctx->getReturnState(i)];
 
-        bool removed = calledRuleStack.data.test((size_t)returnState->ruleIndex);
+        bool removed = calledRuleStack.test((size_t)returnState->ruleIndex);
         auto onExit = finally([&] {
           if (removed) {
             calledRuleStack.set((size_t)returnState->ruleIndex);
           }
         });
 
-        calledRuleStack.data[(size_t)returnState->ruleIndex] = false;
+        calledRuleStack[(size_t)returnState->ruleIndex] = false;
         _LOOK(returnState, stopState, ctx->getParent(i).lock(), look, lookBusy, calledRuleStack, seeThruPreds, addEOF);
       }
       return;
@@ -141,13 +141,13 @@ void LL1Analyzer::_LOOK(ATNState *s, ATNState *stopState, PredictionContextRef c
     Transition *t = s->transition(i);
 
     if (typeid(t) == typeid(RuleTransition)) {
-      if (calledRuleStack.data[(size_t)(static_cast<RuleTransition*>(t))->target->ruleIndex]) {
+      if (calledRuleStack[(size_t)(static_cast<RuleTransition*>(t))->target->ruleIndex]) {
         continue;
       }
 
       PredictionContextRef newContext = SingletonPredictionContext::create(ctx, (static_cast<RuleTransition*>(t))->followState->stateNumber);
       auto onExit = finally([&] {
-        calledRuleStack.data[(size_t)((static_cast<RuleTransition*>(t))->target->ruleIndex)] = false;
+        calledRuleStack[(size_t)((static_cast<RuleTransition*>(t))->target->ruleIndex)] = false;
       });
 
       calledRuleStack.set((size_t)(static_cast<RuleTransition*>(t))->target->ruleIndex);

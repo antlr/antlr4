@@ -47,7 +47,7 @@ namespace tree {
     ///  node is the root of the tree.
     /// </summary>
   public:
-    virtual Tree *getParent() = 0;
+    std::weak_ptr<Tree> getParent() { return getParentReference(); };
 
     /// <summary>
     /// This method returns whatever object represents the data at this note. For
@@ -62,7 +62,7 @@ namespace tree {
 
     /// <summary>
     /// If there are children, get the {@code i}th value indexed from 0. </summary>
-    virtual Tree *getChild(std::size_t i) = 0;
+    std::shared_ptr<Tree> getChild(size_t i)  { return getChildReference(i); };
 
     /// <summary>
     /// How many children are there? If there is none, then this
@@ -77,6 +77,10 @@ namespace tree {
     virtual std::wstring toStringTree() = 0;
 
     virtual std::wstring toString() = 0;
+
+  protected:
+    virtual std::weak_ptr<Tree> getParentReference() = 0;
+    virtual std::shared_ptr<Tree> getChildReference(size_t i) = 0;
   };
 
 } // namespace tree

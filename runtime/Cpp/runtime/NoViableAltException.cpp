@@ -36,16 +36,16 @@
 using namespace org::antlr::v4::runtime;
 
 NoViableAltException::NoViableAltException(Parser *recognizer)
-  : NoViableAltException(recognizer, recognizer->getInputStream(), recognizer->getCurrentToken(),
-                         recognizer->getCurrentToken(), nullptr, recognizer->ctx) {
+  : NoViableAltException(recognizer, recognizer->getTokenStream(), recognizer->getCurrentToken(),
+                         recognizer->getCurrentToken(), nullptr, recognizer->getContext()) {
 }
 
-NoViableAltException::NoViableAltException(Parser *recognizer, TokenStream *input, Token *startToken,
-  Token *offendingToken, std::shared_ptr<atn::ATNConfigSet> deadEndConfigs, ParserRuleContext *ctx)
+NoViableAltException::NoViableAltException(Parser *recognizer, TokenStream *input, TokenRef startToken,
+  TokenRef offendingToken, std::shared_ptr<atn::ATNConfigSet> deadEndConfigs, ParserRuleContextRef ctx)
   : RecognitionException(recognizer, input, ctx, offendingToken), _deadEndConfigs(deadEndConfigs), _startToken(startToken) {
 }
 
-Token* NoViableAltException::getStartToken() const {
+TokenRef NoViableAltException::getStartToken() const {
   return _startToken;
 }
 

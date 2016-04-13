@@ -42,15 +42,15 @@ using namespace org::antlr::v4::runtime::tree;
 
 using namespace antlrcpp;
 
-std::wstring Trees::toStringTree(Tree *t) {
+std::wstring Trees::toStringTree(std::shared_ptr<Tree> t) {
   return toStringTree(t, nullptr);
 }
 
-std::wstring Trees::toStringTree(Tree *t, Parser *recog) {
+std::wstring Trees::toStringTree(std::shared_ptr<Tree> t, Parser *recog) {
   return toStringTree(t, recog->getRuleNames());
 }
 
-std::wstring Trees::toStringTree(Tree *t, const std::vector<std::wstring> &ruleNames) {
+std::wstring Trees::toStringTree(std::shared_ptr<Tree> t, const std::vector<std::wstring> &ruleNames) {
   std::wstring tmp = Trees::getNodeText(t, ruleNames);
   std::wstring s = antlrcpp::escapeWhitespace(tmp, false);
   if (t->getChildCount() == 0) {
@@ -69,22 +69,22 @@ std::wstring Trees::toStringTree(Tree *t, const std::vector<std::wstring> &ruleN
   return ss.str();
 }
 
-std::wstring Trees::getNodeText(Tree *t, Parser *recog) {
+std::wstring Trees::getNodeText(std::shared_ptr<Tree> t, Parser *recog) {
   return getNodeText(t, recog->getRuleNames());
 }
 
-std::wstring Trees::getNodeText(Tree *t, const std::vector<std::wstring> &ruleNames) {
+std::wstring Trees::getNodeText(std::shared_ptr<Tree> t, const std::vector<std::wstring> &ruleNames) {
   if (ruleNames.size() > 0) {
-    if (dynamic_cast<RuleNode*>(t) != nullptr) {
-      ssize_t ruleIndex = (static_cast<RuleNode*>(t))->getRuleContext()->getRuleIndex();
+    if (is<RuleNode>(t)) {
+      ssize_t ruleIndex = (std::static_pointer_cast<RuleNode>(t))->getRuleContext()->getRuleIndex();
       if (ruleIndex < 0)
         return L"Invalid Rule Index";
       std::wstring ruleName = ruleNames[(size_t)ruleIndex];
       return ruleName;
-    } else if (dynamic_cast<ErrorNode*>(t) != nullptr) {
+    } else if (is<ErrorNode>(t)) {
       return t->toString();
-    } else if (dynamic_cast<TerminalNode*>(t) != nullptr) {
-      Token *symbol = (static_cast<TerminalNode*>(t))->getSymbol();
+    } else if (is<TerminalNode>(t)) {
+      TokenRef symbol = (std::static_pointer_cast<TerminalNode>(t))->getSymbol();
       if (symbol != nullptr) {
         std::wstring s = symbol->getText();
         return s;
@@ -92,45 +92,44 @@ std::wstring Trees::getNodeText(Tree *t, const std::vector<std::wstring> &ruleNa
     }
   }
   // no recog for rule names
-  if (is<RuleContext*>(t)) {
-    return ((RuleContext*)t)->getText();
+  if (is<RuleContext>(t)) {
+    return std::static_pointer_cast<RuleContext>(t)->getText();
   }
 
-  if (is<TerminalNodeImpl*>(t)) {
-    return dynamic_cast<TerminalNodeImpl*>(t)->getSymbol()->getText();
+  if (is<TerminalNodeImpl>(t)) {
+    return std::dynamic_pointer_cast<TerminalNodeImpl>(t)->getSymbol()->getText();
   }
 
   return L"";
 }
 
-std::vector<Tree*> Trees::getChildren(Tree *t) {
-  std::vector<Tree*> kids;
+std::vector<std::shared_ptr<Tree>> Trees::getChildren(std::shared_ptr<Tree> t) {
+  std::vector<std::shared_ptr<Tree>> kids;
   for (size_t i = 0; i < t->getChildCount(); i++) {
     kids.push_back(t->getChild(i));
   }
   return kids;
 }
 
-std::vector<Tree*> Trees::getAncestors(Tree *t) {
-  std::vector<Tree*> ancestors;
-  t = t->getParent();
-  while (t != nullptr) {
+std::vector<std::weak_ptr<Tree>> Trees::getAncestors(std::shared_ptr<Tree> t) {
+  std::vector<std::weak_ptr<Tree>> ancestors;
+  while (!t->getParent().expired()) {
+    t = t->getParent().lock();
     ancestors.insert(ancestors.begin(), t); // insert at start
-    t = t->getParent();
   }
   return ancestors;
 }
 
 template<typename T>
-static void _findAllNodes(ParseTree *t, int index, bool findTokens, std::vector<T> &nodes) {
+static void _findAllNodes(std::shared_ptr<ParseTree> t, int index, bool findTokens, std::vector<T> &nodes) {
   // check this node (the root) first
-  if (findTokens && is<TerminalNode*>(t)) {
-    TerminalNode *tnode = (TerminalNode*)(t);
+  if (findTokens && is<TerminalNode>(t)) {
+    std::shared_ptr<TerminalNode> tnode = std::dynamic_pointer_cast<TerminalNode>(t);
     if (tnode->getSymbol()->getType() == index) {
       nodes.push_back(t);
     }
-  } else if (!findTokens && is<ParserRuleContext*>(t)) {
-    ParserRuleContext *ctx = (ParserRuleContext*)(t);
+  } else if (!findTokens && is<ParserRuleContext>(t)) {
+    ParserRuleContextRef ctx = std::dynamic_pointer_cast<ParserRuleContext>(t);
     if (ctx->getRuleIndex() == index) {
       nodes.push_back(t);
     }
@@ -141,28 +140,28 @@ static void _findAllNodes(ParseTree *t, int index, bool findTokens, std::vector<
   }
 }
 
-std::vector<ParseTree*> Trees::findAllTokenNodes(ParseTree *t, int ttype) {
+std::vector<std::shared_ptr<ParseTree>> Trees::findAllTokenNodes(std::shared_ptr<ParseTree> t, int ttype) {
   return findAllNodes(t, ttype, true);
 }
 
-std::vector<ParseTree*> Trees::findAllRuleNodes(ParseTree *t, int ruleIndex) {
+std::vector<std::shared_ptr<ParseTree>> Trees::findAllRuleNodes(std::shared_ptr<ParseTree> t, int ruleIndex) {
   return findAllNodes(t, ruleIndex, false);
 }
 
-std::vector<ParseTree*> Trees::findAllNodes(ParseTree *t, int index, bool findTokens) {
-  std::vector<ParseTree*> nodes;
-  _findAllNodes<ParseTree*>(t, index, findTokens, nodes);
+std::vector<std::shared_ptr<ParseTree>> Trees::findAllNodes(std::shared_ptr<ParseTree> t, int index, bool findTokens) {
+  std::vector<std::shared_ptr<ParseTree>> nodes;
+  _findAllNodes<std::shared_ptr<ParseTree>>(t, index, findTokens, nodes);
   return nodes;
 }
 
-std::vector<ParseTree*> Trees::descendants(ParseTree *t) {
-  std::vector<ParseTree*> nodes;
+std::vector<std::shared_ptr<ParseTree>> Trees::descendants(std::shared_ptr<ParseTree> t) {
+  std::vector<std::shared_ptr<ParseTree>> nodes;
   nodes.push_back(t);
   std::size_t n = t->getChildCount();
   for (size_t i = 0 ; i < n ; i++) {
-    std::vector<ParseTree*> tmp = descendants(t->getChild(i));
-    for (auto foo: tmp) {
-      nodes.push_back(foo);
+    auto descentants = descendants(t->getChild(i));
+    for (auto entry: descentants) {
+      nodes.push_back(entry);
     }
   }
   return nodes;

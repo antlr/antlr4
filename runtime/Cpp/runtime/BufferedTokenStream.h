@@ -38,29 +38,95 @@ namespace antlr {
 namespace v4 {
 namespace runtime {
 
-  /// <summary>
   /// Buffer all input tokens but do on-demand fetching of new tokens from lexer.
   /// Useful when the parser or lexer has to set context/mode info before proper
   /// lexing of future tokens. The ST template parser needs this, for example,
   /// because it has to constantly flip back and forth between inside/output
-  /// templates. E.g., {@code <names:{hi, <it>}>} has to parse names as part of an
-  /// expression but {@code "hi, <it>"} as a nested template.
-  /// <p/>
+  /// templates. E.g., <names:{hi, <it>}> has to parse names as part of an
+  /// expression but "hi, <it>" as a nested template.
+  ///
   /// You can't use this stream if you pass whitespace or other off-channel tokens
   /// to the parser. The stream can't ignore off-channel tokens.
-  /// (<seealso cref="UnbufferedTokenStream"/> is the same way.) Use
-  /// <seealso cref="CommonTokenStream"/>.
-  /// </summary>
+  /// (UnbufferedTokenStream is the same way.) Use CommonTokenStream.
   class BufferedTokenStream : public TokenStream {
-  protected:
-    TokenSource *tokenSource;
+  public:
+    BufferedTokenStream(TokenSource *tokenSource);
+
+    virtual TokenSource* getTokenSource() const override;
+    virtual size_t index() override;
+    virtual ssize_t mark() override;
+
+    virtual void release(ssize_t marker) override;
+    virtual void reset();
+    virtual void seek(size_t index) override;
+
+    virtual size_t size() override;
+    virtual void consume() override;
+
+    virtual TokenRef get(size_t i) const override;
+
+    /// Get all tokens from start..stop inclusively.
+    virtual std::vector<TokenRef> get(size_t start, size_t stop);
+
+    virtual ssize_t LA(ssize_t i) override;
+    virtual TokenRef LT(ssize_t k) override;
+
+    /// Reset this token stream by setting its token source.
+    virtual void setTokenSource(TokenSource *tokenSource);
+    virtual std::vector<TokenRef> getTokens();
+    virtual std::vector<TokenRef> getTokens(int start, int stop);
 
     /// <summary>
+    /// Given a start and stop index, return a List of all tokens in
+    ///  the token type BitSet.  Return null if no tokens were found.  This
+    ///  method looks at both on and off channel tokens.
+    /// </summary>
+    virtual std::vector<TokenRef> getTokens(int start, int stop, const std::vector<int> &types);
+    virtual std::vector<TokenRef> getTokens(int start, int stop, int ttype);
+
+    /// Collect all tokens on specified channel to the right of
+    ///  the current token up until we see a token on DEFAULT_TOKEN_CHANNEL or
+    ///  EOF. If channel is -1, find any non default channel token.
+    virtual std::vector<TokenRef> getHiddenTokensToRight(size_t tokenIndex, int channel);
+
+    /// <summary>
+    /// Collect all hidden tokens (any off-default channel) to the right of
+    ///  the current token up until we see a token on DEFAULT_TOKEN_CHANNEL
+    ///  of EOF.
+    /// </summary>
+    virtual std::vector<TokenRef> getHiddenTokensToRight(size_t tokenIndex);
+
+    /// <summary>
+    /// Collect all tokens on specified channel to the left of
+    ///  the current token up until we see a token on DEFAULT_TOKEN_CHANNEL.
+    ///  If channel is -1, find any non default channel token.
+    /// </summary>
+    virtual std::vector<TokenRef> getHiddenTokensToLeft(size_t tokenIndex, int channel);
+
+    /// <summary>
+    /// Collect all hidden tokens (any off-default channel) to the left of
+    ///  the current token up until we see a token on DEFAULT_TOKEN_CHANNEL.
+    /// </summary>
+    virtual std::vector<TokenRef> getHiddenTokensToLeft(size_t tokenIndex);
+
+    virtual std::string getSourceName() const override;
+    virtual std::wstring getText() override;
+    virtual std::wstring getText(const misc::Interval &interval) override;
+    virtual std::wstring getText(RuleContext *ctx) override;
+    virtual std::wstring getText(TokenRef start, TokenRef stop) override;
+
+    /// <summary>
+    /// Get all tokens from lexer until EOF </summary>
+    virtual void fill();
+
+  protected:
+    TokenSource *_tokenSource;
+
     /// Record every single token pulled from the source so we can reproduce
     /// chunks of it later. This list captures everything so we can access
     /// complete input text.
-    /// </summary>
-    std::vector<Token*> tokens;
+    // ml: we own the tokens produced by the token factory.
+    std::vector<TokenRef> _tokens;
 
     /// <summary>
     /// The index into <seealso cref="#tokens"/> of the current token (next token to
@@ -70,7 +136,7 @@ namespace runtime {
     /// <seealso cref="#LT LT(1)"/> or whatever gets the first token and sets
     /// <seealso cref="#p"/>{@code =0;}.
     /// </summary>
-    size_t p;
+    size_t _p;
 
     /// <summary>
     /// Set to {@code true} when the EOF token is fetched. Do not continue fetching
@@ -78,31 +144,14 @@ namespace runtime {
     /// <seealso cref="#tokens"/> array.
     /// </summary>
     /// <seealso cref= #fetch </seealso>
-    bool fetchedEOF;
-
-  public:
-    BufferedTokenStream(TokenSource *tokenSource);
-
-    virtual TokenSource *getTokenSource() const override;
-    virtual size_t index() override;
-    virtual ssize_t mark() override;
-
-    virtual void release(ssize_t marker) override;
-
-    virtual void reset();
-
-    virtual void seek(size_t index) override;
-
-    virtual size_t size() override;
-    virtual void consume() override;
-
+    bool _fetchedEOF;
+    
     /// <summary>
     /// Make sure index {@code i} in tokens has a token.
     /// </summary>
     /// <returns> {@code true} if a token is located at index {@code i}, otherwise
     ///    {@code false}. </returns>
     /// <seealso cref= #get(int i) </seealso>
-  protected:
     virtual bool sync(size_t i);
 
     /// <summary>
@@ -110,23 +159,9 @@ namespace runtime {
     /// </summary>
     /// <returns> The actual number of elements added to the buffer. </returns>
     virtual size_t fetch(size_t n);
+    
+    virtual TokenRef LB(size_t k);
 
-  public:
-    virtual Token *get(size_t i) const override;
-
-    /// <summary>
-    /// Get all tokens from start..stop inclusively </summary>
-    virtual std::vector<Token*> get(size_t start, size_t stop);
-
-    virtual ssize_t LA(ssize_t i) override;
-
-  protected:
-    virtual Token *LB(size_t k);
-
-  public:
-    virtual Token *LT(ssize_t k) override;
-
-  protected:
     /// Allowed derived classes to modify the behavior of operations which change
     /// the current stream position by adjusting the target token index of a seek
     /// operation. The default implementation simply returns {@code i}. If an
@@ -142,22 +177,6 @@ namespace runtime {
     void lazyInit();
     virtual void setup();
 
-    /// <summary>
-    /// Reset this token stream by setting its token source. </summary>
-  public:
-    virtual void setTokenSource(TokenSource *tokenSource);
-    virtual std::vector<Token*> getTokens();
-    virtual std::vector<Token*> getTokens(int start, int stop);
-
-    /// <summary>
-    /// Given a start and stop index, return a List of all tokens in
-    ///  the token type BitSet.  Return null if no tokens were found.  This
-    ///  method looks at both on and off channel tokens.
-    /// </summary>
-    virtual std::vector<Token*> getTokens(int start, int stop, std::vector<int> *types);
-    virtual std::vector<Token*> getTokens(int start, int stop, int ttype);
-
-  protected:
     /// Given a starting index, return the index of the next token on channel.
     /// Return i if tokens[i] is on channel.  Return -1 if there are no tokens
     /// on channel between i and EOF.
@@ -167,49 +186,8 @@ namespace runtime {
     /// Return i if tokens[i] is on channel. Return -1 if there are no tokens
     /// on channel between i and 0.
     virtual ssize_t previousTokenOnChannel(size_t i, int channel) const;
-
-    /// <summary>
-    /// Collect all tokens on specified channel to the right of
-    ///  the current token up until we see a token on DEFAULT_TOKEN_CHANNEL or
-    ///  EOF. If channel is -1, find any non default channel token.
-    /// </summary>
-  public:
-    virtual std::vector<Token*> getHiddenTokensToRight(size_t tokenIndex, int channel);
-
-    /// <summary>
-    /// Collect all hidden tokens (any off-default channel) to the right of
-    ///  the current token up until we see a token on DEFAULT_TOKEN_CHANNEL
-    ///  of EOF.
-    /// </summary>
-    virtual std::vector<Token*> getHiddenTokensToRight(size_t tokenIndex);
-
-    /// <summary>
-    /// Collect all tokens on specified channel to the left of
-    ///  the current token up until we see a token on DEFAULT_TOKEN_CHANNEL.
-    ///  If channel is -1, find any non default channel token.
-    /// </summary>
-    virtual std::vector<Token*> getHiddenTokensToLeft(size_t tokenIndex, int channel);
-
-    /// <summary>
-    /// Collect all hidden tokens (any off-default channel) to the left of
-    ///  the current token up until we see a token on DEFAULT_TOKEN_CHANNEL.
-    /// </summary>
-    virtual std::vector<Token*> getHiddenTokensToLeft(size_t tokenIndex);
-
-  protected:
-    virtual std::vector<Token*> filterForChannel(size_t from, size_t to, int channel);
-
-  public:
-    virtual std::string getSourceName() const override;
-    virtual std::wstring getText() override;
-    virtual std::wstring getText(const misc::Interval &interval) override;
-    virtual std::wstring getText(RuleContext *ctx) override;
-    virtual std::wstring getText(Token *start, Token *stop) override;
-
-    /// <summary>
-    /// Get all tokens from lexer until EOF </summary>
-    virtual void fill();
-
+    
+    virtual std::vector<TokenRef> filterForChannel(size_t from, size_t to, int channel);
   private:
     bool _needSetup;
     void InitializeInstanceFields();

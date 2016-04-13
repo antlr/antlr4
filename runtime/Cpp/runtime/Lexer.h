@@ -42,9 +42,9 @@ namespace v4 {
 namespace runtime {
 
   /// A lexer is recognizer that draws input symbols from a character stream.
-  ///  lexer grammars result in a subclass of this object. A Lexer object
-  ///  uses simplified match() and error recovery mechanisms in the interest
-  ///  of speed.
+  /// lexer grammars result in a subclass of this object. A Lexer object
+  /// uses simplified match() and error recovery mechanisms in the interest
+  /// of speed.
   class Lexer : public Recognizer, public TokenSource {
   public:
     static const int DEFAULT_MODE = 0;
@@ -56,15 +56,13 @@ namespace runtime {
     static const wchar_t MIN_CHAR_VALUE = L'\0';
     static const wchar_t MAX_CHAR_VALUE = L'\uFFFE';
 
-    CharStream *_input;
+    CharStream *_input; // Pure reference, usually from statically allocated instance.
   protected:
-    std::pair<TokenSource*, CharStream*> *_tokenFactorySourcePair;
-
-    /// <summary>
+     /// <summary>
     /// How to create token objects </summary>
-    TokenFactory<CommonToken*> *_factory;
+    std::shared_ptr<TokenFactory<CommonToken>> _factory;
 
-    /// <summary>
+  public:
     /// The goal of all lexer rules/methods is to create a token object.
     ///  This is an instance variable as multiple rules may collaborate to
     ///  create a single token.  nextToken will return this object after
@@ -72,9 +70,7 @@ namespace runtime {
     ///  emissions, then set this to the last token to be matched or
     ///  something nonnull so that the auto token emit mechanism will not
     ///  emit another token.
-    /// </summary>
-  public:
-    Token *_token;
+    TokenRef _token;
 
     /// <summary>
     /// What character index in the stream did the current token start at?
@@ -113,14 +109,12 @@ namespace runtime {
     /// the input char buffer. Use setText() or can set this instance var.
     std::wstring _text;
 
-    Lexer();
-
     Lexer(CharStream *input);
 
     virtual void reset();
 
     /// Return a token from this source; i.e., match a token on the char stream.
-    virtual Token *nextToken() override;
+    virtual TokenRef nextToken() override;
 
     /// Instruct the lexer to skip creating a token for current lexer rule
     /// and look for another token.  nextToken() knows to keep looking when
@@ -142,7 +136,7 @@ namespace runtime {
       this->_factory = factory;
     }
 
-    virtual TokenFactory<CommonToken*> *getTokenFactory() override;
+    virtual std::shared_ptr<TokenFactory<CommonToken>> getTokenFactory() override;
 
     /// <summary>
     /// Set the char stream and reset the lexer </summary>
@@ -150,7 +144,7 @@ namespace runtime {
 
     virtual std::string getSourceName() override;
 
-    virtual CharStream *getInputStream() override;
+    virtual CharStream* getInputStream() override;
 
     /// <summary>
     /// By default does not support multiple emits per nextToken invocation
@@ -158,7 +152,7 @@ namespace runtime {
     ///  and getToken (to push tokens into a list and pull from that list
     ///  rather than a single variable as this implementation does).
     /// </summary>
-    virtual void emit(Token *token);
+    virtual void emit(TokenRef token);
 
     /// <summary>
     /// The standard method called to automatically emit a token at the
@@ -167,9 +161,9 @@ namespace runtime {
     ///  use that to set the token's text.  Override this method to emit
     ///  custom Token objects or provide a new factory.
     /// </summary>
-    virtual Token *emit();
+    virtual TokenRef emit();
 
-    virtual Token *emitEOF();
+    virtual TokenRef emitEOF();
 
     virtual size_t getLine() const override;
 
@@ -197,9 +191,9 @@ namespace runtime {
 
     /// <summary>
     /// Override if emitting multiple tokens. </summary>
-    virtual Token *getToken();
+    virtual TokenRef getToken();
 
-    virtual void setToken(Token *_token);
+    virtual void setToken(TokenRef token);
 
     virtual void setType(int ttype);
 
@@ -211,11 +205,9 @@ namespace runtime {
 
     virtual const std::vector<std::wstring>& getModeNames() const = 0;
 
-    /// <summary>
     /// Return a list of all Token objects in input char stream.
-    ///  Forces load of all tokens. Does not include EOF token.
-    /// </summary>
-    virtual std::vector<Token*> getAllTokens();
+    /// Forces load of all tokens. Does not include EOF token.
+    virtual std::vector<TokenRef> getAllTokens();
 
     virtual void recover(const LexerNoViableAltException &e);
 

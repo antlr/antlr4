@@ -89,7 +89,7 @@ namespace atn {
     ///  the rule surrounding {@code s}. In other words, the set will be
     ///  restricted to tokens reachable staying within {@code s}'s rule.
     /// </summary>
-    virtual misc::IntervalSet nextTokens(ATNState *s, RuleContext *ctx) const;
+    virtual misc::IntervalSet nextTokens(ATNState *s, RuleContextRef ctx) const;
 
     /// <summary>
     /// Compute the set of valid tokens that can occur starting in {@code s} and
@@ -126,7 +126,7 @@ namespace atn {
     /// specified state in the specified context. </returns>
     /// <exception cref="IllegalArgumentException"> if the ATN does not contain a state with
     /// number {@code stateNumber} </exception>
-    virtual misc::IntervalSet getExpectedTokens(int stateNumber, RuleContext *context) const;
+    virtual misc::IntervalSet getExpectedTokens(int stateNumber, RuleContextRef context) const;
   };
   
 } // namespace atn

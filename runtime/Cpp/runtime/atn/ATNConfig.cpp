@@ -87,3 +87,25 @@ bool ATNConfig::operator == (const ATNConfig& other) const
 std::wstring ATNConfig::toString() {
   return toString(true);
 }
+
+std::wstring ATNConfig::toString(bool showAlt) {
+  std::wstringstream ss;
+  ss << L"(";
+
+  ss << state->toString();
+  if (showAlt) {
+    ss << L"," << alt;
+  }
+  if (context) {
+    ss << L",[" << context->toString() << L"]";
+  }
+  if (semanticContext != nullptr && semanticContext != SemanticContext::NONE) {
+    ss << L"," << semanticContext.get();
+  }
+  if (reachesIntoOuterContext > 0) {
+    ss << L",up=" << reachesIntoOuterContext;
+  }
+  ss << L')';
+
+  return ss.str();
+}

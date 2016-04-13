@@ -32,6 +32,7 @@
 #pragma once
 
 #include "RuleContext.h"
+#include "CPPUtils.h"
 
 namespace org {
 namespace antlr {
@@ -71,7 +72,7 @@ namespace runtime {
     ///  how we parse this rule.
     /// </summary>
   public:
-    std::vector<ParseTree*> children;
+    std::vector<std::shared_ptr<ParseTree>> children;
 
     /// <summary>
     /// For debugging/tracing purposes, we want to track all of the nodes in
@@ -94,7 +95,7 @@ namespace runtime {
     /// </summary>
     //	public List<Integer> states;
 
-    Token *start, *stop;
+    TokenRef start, stop;
 
     /// The exception that forced this rule to return. If the rule successfully
     /// completed, this is "null exception pointer".
@@ -105,81 +106,58 @@ namespace runtime {
 
     /// <summary>
     /// COPY a ctx (I'm deliberately not copy constructor) </summary>
-    virtual void copyFrom(ParserRuleContext *ctx);
+    virtual void copyFrom(std::shared_ptr<ParserRuleContext> ctx);
 
-    ParserRuleContext(ParserRuleContext *parent, int invokingStateNumber);
+    ParserRuleContext(std::weak_ptr<ParserRuleContext> parent, int invokingStateNumber);
 
     // Double dispatch methods for listeners
 
-    virtual void enterRule(tree::ParseTreeListener *listener);
-    virtual void exitRule(tree::ParseTreeListener *listener);
+    virtual void enterRule(std::shared_ptr<tree::ParseTreeListener> listener);
+    virtual void exitRule(std::shared_ptr<tree::ParseTreeListener> listener);
 
-    /// <summary>
-    /// Does not set parent link; other add methods do that </summary>
-    virtual tree::TerminalNode* addChild(tree::TerminalNode *t);
+    /// Does not set parent link; other add methods do that.
+    virtual std::shared_ptr<tree::TerminalNode> addChild(std::shared_ptr<tree::TerminalNode> t);
+    virtual RuleContextRef addChild(RuleContextRef ruleInvocation);
 
-    virtual RuleContext* addChild(RuleContext *ruleInvocation);
-
-    /// <summary>
     /// Used by enterOuterAlt to toss out a RuleContext previously added as
-    ///  we entered a rule. If we have # label, we will need to remove
-    ///  generic ruleContext object.
-    /// </summary>
+    /// we entered a rule. If we have # label, we will need to remove
+    /// generic ruleContext object.
     virtual void removeLastChild();
 
-    virtual tree::TerminalNode* addChild(Token *matchedToken);
+    virtual std::shared_ptr<tree::TerminalNode> addChild(TokenRef matchedToken);
 
-    virtual tree::ErrorNode* addErrorNode(Token *badToken);
+    virtual std::shared_ptr<tree::ErrorNode> addErrorNode(TokenRef badToken);
 
-    virtual ParserRuleContext* getParent() override;
+    std::weak_ptr<ParserRuleContext> getParent() { return std::dynamic_pointer_cast<ParserRuleContext>(getParentReference().lock()); };
 
-    virtual ParseTree* getChild(std::size_t i) override;
+    virtual std::shared_ptr<tree::TerminalNode> getToken(int ttype, std::size_t i);
+
+    virtual std::vector<std::shared_ptr<tree::TerminalNode>> getTokens(int ttype);
 
     template<typename T>
-    T* getChild(size_t i) {
+    std::shared_ptr<T> getRuleContext(size_t i) {
       if (children.empty()) {
         return nullptr;
       }
 
       size_t j = 0; // what element have we found with ctxType?
       for (auto &child : children) {
-        if (dynamic_cast<T *>(child) != nullptr) {
+        if (antlrcpp::is<T>(child)) {
           if (j++ == i) {
-            return dynamic_cast<T *>(child);
+            return std::dynamic_pointer_cast<T>(child);
           }
         }
       }
       return nullptr;
     }
 
-    virtual tree::TerminalNode* getToken(int ttype, std::size_t i);
-
-    virtual std::vector<tree::TerminalNode *> getTokens(int ttype);
-
     template<typename T>
-    T* getRuleContext(size_t i) {
-      return getChild<T>(i);
-    }
-
-    template<typename T>
-    std::vector<T*> getRuleContexts() {
-      if (children.empty()) {
-        return std::vector<T *>();
-      }
-
-      std::vector<T *> contexts;
+    std::vector<std::shared_ptr<T>> getRuleContexts() {
+      std::vector<std::shared_ptr<T>> contexts;
       for (auto &child : children) {
-        if (dynamic_cast<T *>(child)) {
-          if (contexts.empty()) {
-            contexts = std::vector<T *>();
-          }
-
-          contexts.push_back((T *)(child));
+        if (antlrcpp::is<T>(child)) {
+          contexts.push_back(std::dynamic_pointer_cast<T>(child));
         }
-      }
-
-      if (contexts.empty()) {
-        return std::vector<T *>();
       }
 
       return contexts;
@@ -188,12 +166,15 @@ namespace runtime {
     virtual std::size_t getChildCount() override;
     virtual misc::Interval getSourceInterval() override;
 
-    virtual Token *getStart();
-    virtual Token *getStop();
+    virtual TokenRef getStart();
+    virtual TokenRef getStop();
 
     /// <summary>
     /// Used for rule context info debugging during parse-time, not so much for ATN debugging </summary>
     virtual std::wstring toInfoString(Parser *recognizer);
+
+  protected:
+    virtual std::shared_ptr<Tree> getChildReference(size_t i) override;
   };
 
 } // namespace runtime

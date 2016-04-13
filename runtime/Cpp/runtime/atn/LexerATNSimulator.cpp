@@ -91,7 +91,7 @@ int LexerATNSimulator::match(CharStream *input, size_t mode) {
   _mode = mode;
   ssize_t mark = input->mark();
 
-  auto onExit = finally([=] {
+  auto onExit = finally([&] {
     input->release(mark);
   });
 
@@ -179,6 +179,7 @@ int LexerATNSimulator::execATN(CharStream *input, dfa::DFAState *ds0) {
       target = computeTargetState(input, s, t);
     }
 
+    std::wstring temp = target->toString();
     if (target == ERROR.get()) {
       break;
     }
@@ -254,28 +255,27 @@ void LexerATNSimulator::getReachableConfigSet(CharStream *input, std::shared_ptr
   // this is used to skip processing for configs which have a lower priority
   // than a config that already reached an accept state for the same rule
   int skipAlt = ATN::INVALID_ALT_NUMBER;
-  if (closure->configLookup) {
-    for (auto c : *closure->configLookup) {
-      bool currentAltReachedAcceptState = c->alt == skipAlt;
-      if (currentAltReachedAcceptState && (static_cast<LexerATNConfig*>(c))->hasPassedThroughNonGreedyDecision()) {
-        continue;
-      }
 
-      if (debug) {
-        std::wcout << L"testing " << getTokenName((int)t) << " at " << c->toString(true) << std::endl;
-      }
+  for (auto c : closure->configs) {
+    bool currentAltReachedAcceptState = c->alt == skipAlt;
+    if (currentAltReachedAcceptState && (static_cast<LexerATNConfig*>(c))->hasPassedThroughNonGreedyDecision()) {
+      continue;
+    }
 
-      size_t n = c->state->getNumberOfTransitions();
-      for (size_t ti = 0; ti < n; ti++) { // for each transition
-        Transition *trans = c->state->transition(ti);
-        ATNState *target = getReachableTarget(trans, (int)t);
-        if (target != nullptr) {
-          if (this->closure(input, new LexerATNConfig(static_cast<LexerATNConfig*>(c), target), reach, currentAltReachedAcceptState, true)) {
-            // any remaining configs for this alt have a lower priority than
-            // the one that just reached an accept state.
-            skipAlt = c->alt;
-            break;
-          }
+    if (debug) {
+      std::wcout << L"testing " << getTokenName((int)t) << " at " << c->toString(true) << std::endl;
+    }
+
+    size_t n = c->state->getNumberOfTransitions();
+    for (size_t ti = 0; ti < n; ti++) { // for each transition
+      Transition *trans = c->state->transition(ti);
+      ATNState *target = getReachableTarget(trans, (int)t);
+      if (target != nullptr) {
+        if (this->closure(input, new LexerATNConfig(static_cast<LexerATNConfig*>(c), target), reach, currentAltReachedAcceptState, true)) {
+          // any remaining configs for this alt have a lower priority than
+          // the one that just reached an accept state.
+          skipAlt = c->alt;
+          break;
         }
       }
     }
@@ -522,7 +522,7 @@ dfa::DFAState *LexerATNSimulator::addDFAState(std::shared_ptr<ATNConfigSet> conf
 
   dfa::DFAState *proposed = new dfa::DFAState(configs);
   ATNConfig *firstConfigWithRuleStopState = nullptr;
-  for (auto c : *configs->configLookup) {
+  for (auto c : configs->configs) {
     if (dynamic_cast<RuleStopState*>(c->state) != nullptr) {
       firstConfigWithRuleStopState = c;
       break;

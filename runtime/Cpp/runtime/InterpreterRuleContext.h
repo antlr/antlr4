@@ -48,7 +48,7 @@ namespace runtime {
     const ssize_t ruleIndex;
 
   public:
-    InterpreterRuleContext(ParserRuleContext *parent, int invokingStateNumber, ssize_t ruleIndex);
+    InterpreterRuleContext(std::weak_ptr<ParserRuleContext> parent, int invokingStateNumber, ssize_t ruleIndex);
 
     virtual ssize_t getRuleIndex() const override;
   };

@@ -39,9 +39,9 @@ namespace tree {
 
   class ParseTreeWalker {
   public:
-    static ParseTreeWalker *const DEFAULT;
+    static const std::shared_ptr<ParseTreeWalker> DEFAULT;
 
-    virtual void walk(ParseTreeListener *listener, ParseTree *t);
+    virtual void walk(std::shared_ptr<ParseTreeListener> listener, std::shared_ptr<ParseTree> t);
 
     /// <summary>
     /// The discovery of a rule node, involves sending two events: the generic
@@ -50,9 +50,9 @@ namespace tree {
     /// the rule specific. We to them in reverse order upon finishing the node.
     /// </summary>
   protected:
-    virtual void enterRule(ParseTreeListener *listener, RuleNode *r);
+    virtual void enterRule(std::shared_ptr<ParseTreeListener> listener, std::shared_ptr<RuleNode> r);
 
-    virtual void exitRule(ParseTreeListener *listener, RuleNode *r);
+    virtual void exitRule(std::shared_ptr<ParseTreeListener> listener, std::shared_ptr<RuleNode> r);
   };
 
 } // namespace tree

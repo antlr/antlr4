@@ -52,15 +52,16 @@ void DFAState::PredPrediction::InitializeInstanceFields() {
   alt = 0;
 }
 
-DFAState::DFAState() : DFAState(-1) {
-}
-
-DFAState::DFAState(int stateNumber) : DFAState(std::make_shared<ATNConfigSet>(true, std::shared_ptr<ConfigLookup>()),
-  stateNumber) {
-}
-
-DFAState::DFAState(std::shared_ptr<ATNConfigSet> configs, int stateNumber) : configs(configs), stateNumber(stateNumber) {
+DFAState::DFAState() {
   InitializeInstanceFields();
+}
+
+DFAState::DFAState(int state) : DFAState() {
+  stateNumber = state;
+}
+
+DFAState::DFAState(std::shared_ptr<ATNConfigSet> configs) : DFAState() {
+  this->configs = configs;
 }
 
 std::set<int> *DFAState::getAltSet() {
@@ -94,10 +95,13 @@ bool DFAState::operator == (const DFAState &o) {
 
 std::wstring DFAState::toString() {
   std::wstringstream ss;
-  ss << stateNumber << L":" << configs->toString();
+  ss << stateNumber;
+  if (configs) {
+    ss << L":" << configs->toString();
+  }
   if (isAcceptState) {
     ss << L" => ";
-    if (predicates.size() != 0) {
+    if (!predicates.empty()) {
       for (size_t i = 0; i < predicates.size(); i++) {
         ss << predicates[i]->toString();
       }
@@ -109,6 +113,7 @@ std::wstring DFAState::toString() {
 }
 
 void DFAState::InitializeInstanceFields() {
+  stateNumber = -1;
   isAcceptState = false;
   prediction = 0;
   lexerRuleIndex = -1;

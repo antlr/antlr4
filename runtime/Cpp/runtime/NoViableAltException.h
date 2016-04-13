@@ -47,21 +47,21 @@ namespace runtime {
   class NoViableAltException : public RecognitionException {
   public:
     NoViableAltException(Parser *recognizer); // LL(1) error
-    NoViableAltException(Parser *recognizer, TokenStream *input, Token *startToken, Token *offendingToken,
-                         std::shared_ptr<atn::ATNConfigSet> deadEndConfigs, ParserRuleContext *ctx);
+    NoViableAltException(Parser *recognizer, TokenStream *input, TokenRef startToken, TokenRef offendingToken,
+                         std::shared_ptr<atn::ATNConfigSet> deadEndConfigs, ParserRuleContextRef ctx);
 
-    virtual Token* getStartToken() const;
+    virtual TokenRef getStartToken() const;
     virtual std::shared_ptr<atn::ATNConfigSet> getDeadEndConfigs() const;
 
   private:
     /// Which configurations did we try at input.index() that couldn't match input.LT(1)?
-    std::shared_ptr<atn::ATNConfigSet>  _deadEndConfigs;
+    std::shared_ptr<atn::ATNConfigSet> _deadEndConfigs;
 
     /// The token object at the start index; the input stream might
     /// not be buffering tokens so get a reference to it. (At the
     /// time the error occurred, of course the stream needs to keep a
     /// buffer all of the tokens but later we might not have access to those.)
-    Token* _startToken;
+    TokenRef _startToken;
    
   };
 

@@ -40,9 +40,13 @@ using namespace org::antlr::v4::runtime;
 
 void BailErrorStrategy::recover(Parser *recognizer, const RecognitionException &e) {
   std::exception_ptr exception = std::make_exception_ptr(e);
-  for (ParserRuleContext *context = recognizer->getContext(); context != nullptr; context = context->getParent()) {
+  ParserRuleContextRef context = recognizer->getContext();
+  do {
     context->exception = exception;
-  }
+    if (context->getParent().expired())
+      break;
+    context = context->getParent().lock();
+  } while (true);
 
   try {
     std::rethrow_exception(exception); // Throw the exception to be able to catch and rethrow nested.
@@ -51,14 +55,17 @@ void BailErrorStrategy::recover(Parser *recognizer, const RecognitionException &
   }
 }
 
-Token *BailErrorStrategy::recoverInline(Parser *recognizer)  {
-
+TokenRef BailErrorStrategy::recoverInline(Parser *recognizer)  {
   InputMismatchException e(recognizer);
-  for (ParserRuleContext *context = recognizer->getContext();
-       context != nullptr;
-       context = context->getParent()) {
-    context->exception = std::make_exception_ptr(e);
-  }
+  std::exception_ptr exception = std::make_exception_ptr(e);
+
+  ParserRuleContextRef context = recognizer->getContext();
+  do {
+    context->exception = exception;
+    if (context->getParent().expired())
+      break;
+    context = context->getParent().lock();
+  } while (true);
 
   try {
     throw e;

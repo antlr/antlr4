@@ -36,20 +36,16 @@
 using namespace org::antlr::v4::runtime::tree;
 using namespace org::antlr::v4::runtime::tree::pattern;
 
-ParseTreeMatch::ParseTreeMatch(ParseTree *tree, ParseTreePattern *pattern,
-                               const std::map<std::wstring, std::vector<ParseTree*>> &labels,
-                               ParseTree *mismatchedNode)
+ParseTreeMatch::ParseTreeMatch(std::shared_ptr<ParseTree> tree, const ParseTreePattern &pattern,
+                               const std::map<std::wstring, std::vector<std::shared_ptr<ParseTree>>> &labels,
+                               std::shared_ptr<ParseTree> mismatchedNode)
   : _tree(tree), _pattern(pattern), _labels(labels), _mismatchedNode(mismatchedNode) {
   if (tree == nullptr) {
     throw IllegalArgumentException("tree cannot be null");
   }
-
-  if (pattern == nullptr) {
-    throw IllegalArgumentException("pattern cannot be null");
-  }
 }
 
-ParseTree* ParseTreeMatch::get(const std::wstring &label) {
+std::shared_ptr<ParseTree> ParseTreeMatch::get(const std::wstring &label) {
   auto iterator = _labels.find(label);
   if (iterator == _labels.end()) {
     return nullptr;
@@ -58,20 +54,20 @@ ParseTree* ParseTreeMatch::get(const std::wstring &label) {
   return iterator->second.back(); // return last if multiple
 }
 
-std::vector<ParseTree*> ParseTreeMatch::getAll(const std::wstring &label) {
+std::vector<std::shared_ptr<ParseTree>> ParseTreeMatch::getAll(const std::wstring &label) {
   auto iterator = _labels.find(label);
   if (iterator == _labels.end()) {
-    return std::vector<ParseTree*>();
+    return std::vector<std::shared_ptr<ParseTree>>();
   }
 
   return iterator->second;
 }
 
-std::map<std::wstring, std::vector<ParseTree*>>& ParseTreeMatch::getLabels() {
+std::map<std::wstring, std::vector<std::shared_ptr<ParseTree>>>& ParseTreeMatch::getLabels() {
   return _labels;
 }
 
-ParseTree *ParseTreeMatch::getMismatchedNode() {
+std::shared_ptr<ParseTree> ParseTreeMatch::getMismatchedNode() {
   return _mismatchedNode;
 }
 
@@ -79,11 +75,11 @@ bool ParseTreeMatch::succeeded() {
   return _mismatchedNode == nullptr;
 }
 
-ParseTreePattern *ParseTreeMatch::getPattern() {
+const ParseTreePattern& ParseTreeMatch::getPattern() {
   return _pattern;
 }
 
-ParseTree *ParseTreeMatch::getTree() {
+std::shared_ptr<ParseTree>  ParseTreeMatch::getTree() {
   return _tree;
 }
 

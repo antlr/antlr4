@@ -48,12 +48,12 @@ size_t CommonTokenStream::adjustSeekIndex(size_t i) {
   return (size_t)nextTokenOnChannel(i, channel);
 }
 
-Token *CommonTokenStream::LB(size_t k) {
-  if (k == 0 || k > p) {
-    return nullptr;
+TokenRef CommonTokenStream::LB(size_t k) {
+  if (k == 0 || k > _p) {
+    return TokenRef();
   }
 
-  size_t i = p;
+  size_t i = _p;
   size_t n = 1;
   // find k good tokens looking backwards
   while (n <= k) {
@@ -62,10 +62,10 @@ Token *CommonTokenStream::LB(size_t k) {
     i = (size_t)previousTokenOnChannel(i - 1, channel);
     n++;
   }
-  return tokens[i];
+  return _tokens[i];
 }
 
-Token *CommonTokenStream::LT(ssize_t k) {
+TokenRef CommonTokenStream::LT(ssize_t k) {
   lazyInit();
   if (k == 0) {
     return nullptr;
@@ -73,7 +73,7 @@ Token *CommonTokenStream::LT(ssize_t k) {
   if (k < 0) {
     return LB((size_t)-k);
   }
-  size_t i = p;
+  size_t i = _p;
   size_t n = 1; // we know tokens[p] is a good one
              // find k good tokens
   while (n < (size_t)k) {
@@ -85,14 +85,14 @@ Token *CommonTokenStream::LT(ssize_t k) {
     n++;
   }
 
-  return tokens[i];
+  return _tokens[i];
 }
 
 int CommonTokenStream::getNumberOfOnChannelTokens() {
   int n = 0;
   fill();
-  for (size_t i = 0; i < tokens.size(); i++) {
-    Token *t = tokens[i];
+  for (size_t i = 0; i < _tokens.size(); i++) {
+    TokenRef t = _tokens[i];
     if (t->getChannel() == channel) {
       n++;
     }

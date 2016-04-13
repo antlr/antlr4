@@ -68,7 +68,7 @@ namespace atn {
     /// prediction, so we passed in the outer context here in case of context
     /// dependent predicate evaluation.
     /// </summary>
-    virtual bool eval(Recognizer *parser, RuleContext *outerContext) = 0;
+    virtual bool eval(Recognizer *parser, RuleContextRef outerContext) = 0;
 
     static SemanticContextRef And(SemanticContextRef a, SemanticContextRef b);
 
@@ -110,8 +110,10 @@ namespace atn {
   public:
     Predicate(int ruleIndex, int predIndex, bool isCtxDependent);
 
-    virtual bool eval(Recognizer *parser, RuleContext *outerContext) override {
-      RuleContext *localctx = isCtxDependent ? outerContext : nullptr;
+    virtual bool eval(Recognizer *parser, RuleContextRef outerContext) override {
+      RuleContextRef localctx;
+      if (isCtxDependent)
+        localctx = outerContext;
       return parser->sempred(localctx, ruleIndex, predIndex);
     }
 
@@ -130,7 +132,7 @@ namespace atn {
   public:
     PrecedencePredicate(int precedence);
 
-    virtual bool eval(Recognizer *parser, RuleContext *outerContext) override {
+    virtual bool eval(Recognizer *parser, RuleContextRef outerContext) override {
       return parser->precpred(outerContext, precedence);
     }
 
@@ -149,7 +151,7 @@ namespace atn {
     virtual bool operator == (const SemanticContext &other) const override;
     virtual size_t hashCode() override;
 
-    virtual bool eval(Recognizer *parser, RuleContext *outerContext) override {
+    virtual bool eval(Recognizer *parser, RuleContextRef outerContext) override {
       for (auto opnd : opnds) {
         if (!opnd->eval(parser, outerContext)) {
           return false;
@@ -171,7 +173,7 @@ namespace atn {
     virtual bool operator == (const SemanticContext &other) const override;
     virtual size_t hashCode() override;
 
-    virtual bool eval(Recognizer *parser, RuleContext *outerContext) override {
+    virtual bool eval(Recognizer *parser, RuleContextRef outerContext) override {
       for (auto opnd : opnds) {
         if (opnd->eval(parser, outerContext)) {
           return true;

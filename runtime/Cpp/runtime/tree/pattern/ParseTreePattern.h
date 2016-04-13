@@ -43,27 +43,7 @@ namespace pattern {
   /// <seealso cref="ParseTreePatternMatcher#compile(String, int)"/>.
   /// </summary>
   class ParseTreePattern {
-    /// <summary>
-    /// This is the backing field for <seealso cref="#getPatternRuleIndex()"/>.
-    /// </summary>
-  private:
-    const int patternRuleIndex;
-
-    /// <summary>
-    /// This is the backing field for <seealso cref="#getPattern()"/>.
-    /// </summary>
-    const std::wstring pattern;
-
-    /// <summary>
-    /// This is the backing field for <seealso cref="#getPatternTree()"/>.
-    /// </summary>
-    ParseTree *const patternTree;
-
-    /// <summary>
-    /// This is the backing field for <seealso cref="#getMatcher()"/>.
-    /// </summary>
-    ParseTreePatternMatcher *const matcher;
-
+  public:
     /// <summary>
     /// Construct a new instance of the <seealso cref="ParseTreePattern"/> class.
     /// </summary>
@@ -73,8 +53,8 @@ namespace pattern {
     /// <param name="patternRuleIndex"> The parser rule which serves as the root of the
     /// tree pattern. </param>
     /// <param name="patternTree"> The tree pattern in <seealso cref="ParseTree"/> form. </param>
-  public:
-    ParseTreePattern(ParseTreePatternMatcher *matcher, const std::wstring &pattern, int patternRuleIndex, ParseTree *patternTree);
+    ParseTreePattern(ParseTreePatternMatcher *matcher, const std::wstring &pattern, int patternRuleIndex,
+                     std::shared_ptr<ParseTree> patternTree);
 
     /// <summary>
     /// Match a specific parse tree against this tree pattern.
@@ -83,7 +63,7 @@ namespace pattern {
     /// <returns> A <seealso cref="ParseTreeMatch"/> object describing the result of the
     /// match operation. The <seealso cref="ParseTreeMatch#succeeded()"/> method can be
     /// used to determine whether or not the match was successful. </returns>
-    virtual ParseTreeMatch *match(ParseTree *tree);
+    virtual ParseTreeMatch match(std::shared_ptr<ParseTree> tree);
 
     /// <summary>
     /// Determine whether or not a parse tree matches this tree pattern.
@@ -91,7 +71,7 @@ namespace pattern {
     /// <param name="tree"> The parse tree to match against this tree pattern. </param>
     /// <returns> {@code true} if {@code tree} is a match for the current tree
     /// pattern; otherwise, {@code false}. </returns>
-    virtual bool matches(ParseTree *tree);
+    virtual bool matches(std::shared_ptr<ParseTree> tree);
 
     /// Find all nodes using XPath and then try to match those subtrees against
     /// this tree pattern.
@@ -111,13 +91,13 @@ namespace pattern {
     /// </summary>
     /// <returns> The <seealso cref="ParseTreePatternMatcher"/> which created this tree
     /// pattern. </returns>
-    virtual ParseTreePatternMatcher *getMatcher();
+    virtual ParseTreePatternMatcher *getMatcher() const;
 
     /// <summary>
     /// Get the tree pattern in concrete syntax form.
     /// </summary>
     /// <returns> The tree pattern in concrete syntax form. </returns>
-    virtual std::wstring getPattern();
+    virtual std::wstring getPattern() const;
 
     /// <summary>
     /// Get the parser rule which serves as the outermost rule for the tree
@@ -125,7 +105,7 @@ namespace pattern {
     /// </summary>
     /// <returns> The parser rule which serves as the outermost rule for the tree
     /// pattern. </returns>
-    virtual int getPatternRuleIndex();
+    virtual int getPatternRuleIndex() const;
 
     /// <summary>
     /// Get the tree pattern as a <seealso cref="ParseTree"/>. The rule and token tags from
@@ -133,7 +113,23 @@ namespace pattern {
     /// of type <seealso cref="RuleTagToken"/> or <seealso cref="TokenTagToken"/>.
     /// </summary>
     /// <returns> The tree pattern as a <seealso cref="ParseTree"/>. </returns>
-    virtual ParseTree *getPatternTree();
+    virtual std::shared_ptr<ParseTree> getPatternTree() const;
+
+  private:
+    const int patternRuleIndex;
+
+    /// <summary>
+    /// This is the backing field for <seealso cref="#getPattern()"/>.
+    /// </summary>
+    const std::wstring pattern;
+
+    /// This is the backing field for <seealso cref="#getPatternTree()"/>.
+    std::shared_ptr<ParseTree> patternTree;
+
+    /// <summary>
+    /// This is the backing field for <seealso cref="#getMatcher()"/>.
+    /// </summary>
+    ParseTreePatternMatcher *const matcher;
   };
 
 } // namespace pattern

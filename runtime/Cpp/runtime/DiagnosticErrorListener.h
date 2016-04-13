@@ -82,10 +82,10 @@ namespace runtime {
     DiagnosticErrorListener(bool exactOnly);
 
     virtual void reportAmbiguity(Parser *recognizer, dfa::DFA *dfa, size_t startIndex, size_t stopIndex, bool exact,
-      antlrcpp::BitSet *ambigAlts, std::shared_ptr<atn::ATNConfigSet> configs) override;
+      const antlrcpp::BitSet &ambigAlts, std::shared_ptr<atn::ATNConfigSet> configs) override;
 
     virtual void reportAttemptingFullContext(Parser *recognizer, dfa::DFA *dfa, size_t startIndex, size_t stopIndex,
-      antlrcpp::BitSet *conflictingAlts, std::shared_ptr<atn::ATNConfigSet> configs) override;
+      const antlrcpp::BitSet &conflictingAlts, std::shared_ptr<atn::ATNConfigSet> configs) override;
 
     virtual void reportContextSensitivity(Parser *recognizer, dfa::DFA *dfa, size_t startIndex, size_t stopIndex,
       int prediction, std::shared_ptr<atn::ATNConfigSet> configs) override;
@@ -103,7 +103,7 @@ namespace runtime {
     /// <param name="configs"> The conflicting or ambiguous configuration set. </param>
     /// <returns> Returns {@code reportedAlts} if it is not {@code null}, otherwise
     /// returns the set of alternatives represented in {@code configs}. </returns>
-    virtual antlrcpp::BitSet *getConflictingAlts(antlrcpp::BitSet *reportedAlts, std::shared_ptr<atn::ATNConfigSet> configs);
+    virtual antlrcpp::BitSet getConflictingAlts(const antlrcpp::BitSet &reportedAlts, std::shared_ptr<atn::ATNConfigSet> configs);
   };
 
 } // namespace runtime

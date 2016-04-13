@@ -1,5 +1,5 @@
 grammar Test;
 
-main: ID;
+main: ID ID;
 
-ID: [a..z]+;
+ID: [a-z]+;

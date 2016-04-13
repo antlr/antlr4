@@ -58,5 +58,5 @@ std::wstring TokenTagToken::getText() {
 }
 
 std::wstring TokenTagToken::toString() {
-  return tokenName + std::wstring(L":") + std::to_wstring(type);
+  return tokenName + std::wstring(L":") + std::to_wstring(_type);
 }

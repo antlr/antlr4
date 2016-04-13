@@ -42,16 +42,16 @@ namespace pattern {
   class ParseTreeMatch {
   private:
     /// This is the backing field for getTree().
-    ParseTree *_tree;
+    std::shared_ptr<ParseTree> _tree;
 
     /// This is the backing field for getPattern().
-    ParseTreePattern *_pattern;
+    const ParseTreePattern &_pattern;
 
     /// This is the backing field for getLabels().
-    std::map<std::wstring, std::vector<ParseTree*>> _labels;
+    std::map<std::wstring, std::vector<std::shared_ptr<ParseTree>>> _labels;
 
     /// This is the backing field for getMismatchedNode().
-    ParseTree *_mismatchedNode;
+    std::shared_ptr<ParseTree> _mismatchedNode;
 
     /// <summary>
     /// Constructs a new instance of <seealso cref="ParseTreeMatch"/> from the specified
@@ -68,8 +68,9 @@ namespace pattern {
     /// <exception cref="IllegalArgumentException"> if {@code pattern} is {@code null} </exception>
     /// <exception cref="IllegalArgumentException"> if {@code labels} is {@code null} </exception>
   public:
-    ParseTreeMatch(ParseTree *tree, ParseTreePattern *pattern, const std::map<std::wstring, std::vector<ParseTree*>> &labels,
-                   ParseTree *mismatchedNode);
+    ParseTreeMatch(std::shared_ptr<ParseTree> tree, const ParseTreePattern &pattern,
+                   const std::map<std::wstring, std::vector<std::shared_ptr<ParseTree>>> &labels,
+                   std::shared_ptr<ParseTree> mismatchedNode);
 
     /// <summary>
     /// Get the last node associated with a specific {@code label}.
@@ -86,7 +87,7 @@ namespace pattern {
     /// </param>
     /// <returns> The last <seealso cref="ParseTree"/> to match a tag with the specified
     /// label, or {@code null} if no parse tree matched a tag with the label. </returns>
-    virtual ParseTree *get(const std::wstring &label);
+    virtual std::shared_ptr<ParseTree> get(const std::wstring &label);
 
     /// <summary>
     /// Return all nodes matching a rule or token tag with the specified label.
@@ -110,7 +111,7 @@ namespace pattern {
     /// <returns> A collection of all <seealso cref="ParseTree"/> nodes matching tags with
     /// the specified {@code label}. If no nodes matched the label, an empty list
     /// is returned. </returns>
-    virtual std::vector<ParseTree*> getAll(const std::wstring &label);
+    virtual std::vector<std::shared_ptr<ParseTree>> getAll(const std::wstring &label);
 
     /// <summary>
     /// Return a mapping from label &rarr; [list of nodes].
@@ -121,14 +122,14 @@ namespace pattern {
     /// </summary>
     /// <returns> A mapping from labels to parse tree nodes. If the parse tree
     /// pattern did not contain any rule or token tags, this map will be empty. </returns>
-    virtual std::map<std::wstring, std::vector<ParseTree*>>& getLabels();
+    virtual std::map<std::wstring, std::vector<std::shared_ptr<ParseTree>>>& getLabels();
 
     /// <summary>
     /// Get the node at which we first detected a mismatch.
     /// </summary>
     /// <returns> the node at which we first detected a mismatch, or {@code null}
     /// if the match was successful. </returns>
-    virtual ParseTree *getMismatchedNode();
+    virtual std::shared_ptr<ParseTree> getMismatchedNode();
 
     /// <summary>
     /// Gets a value indicating whether the match operation succeeded.
@@ -141,13 +142,13 @@ namespace pattern {
     /// Get the tree pattern we are matching against.
     /// </summary>
     /// <returns> The tree pattern we are matching against. </returns>
-    virtual ParseTreePattern *getPattern();
+    virtual const ParseTreePattern& getPattern();
 
     /// <summary>
     /// Get the parse tree we are trying to match to a pattern.
     /// </summary>
     /// <returns> The <seealso cref="ParseTree"/> we are trying to match to a pattern. </returns>
-    virtual ParseTree *getTree();
+    virtual std::shared_ptr<ParseTree> getTree();
 
     /// <summary>
     /// {@inheritDoc}

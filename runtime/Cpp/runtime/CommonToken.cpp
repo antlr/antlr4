@@ -33,68 +33,70 @@
 #include "TokenSource.h"
 #include "Strings.h"
 #include "CharStream.h"
+#include "CPPUtils.h"
 
 #include "CommonToken.h"
 
 using namespace org::antlr::v4::runtime;
+using namespace antlrcpp;
 
-std::pair<TokenSource*, CharStream*> *const CommonToken::EMPTY_SOURCE = new std::pair<TokenSource*, CharStream*>(nullptr, nullptr);
+const std::pair<TokenSource*, CharStream*> CommonToken::EMPTY_SOURCE;
 
 CommonToken::CommonToken(int type) {
   InitializeInstanceFields();
-  this->type = type;
+  _type = type;
 }
 
-CommonToken::CommonToken(std::pair<TokenSource*, CharStream*> *source, int type, int channel, int start, int stop) {
+CommonToken::CommonToken(std::pair<TokenSource*, CharStream*> source, int type, int channel, int start, int stop) {
   InitializeInstanceFields();
-  this->source = source;
-  this->type = type;
-  this->channel = channel;
-  this->start = start;
-  this->stop = stop;
-  if (source->first != nullptr) {
-    this->line = (int)source->first->getLine();
-    this->charPositionInLine = source->first->getCharPositionInLine();
+  _source = source;
+  _type = type;
+  _channel = channel;
+  _start = start;
+  _stop = stop;
+  if (_source.first != nullptr) {
+    _line = (int)source.first->getLine();
+    _charPositionInLine = source.first->getCharPositionInLine();
   }
 }
 
 CommonToken::CommonToken(int type, const std::wstring &text) {
   InitializeInstanceFields();
-  this->type = type;
-  this->channel = DEFAULT_CHANNEL;
-  this->text = text;
-  this->source = EMPTY_SOURCE;
+  _type = type;
+  _channel = DEFAULT_CHANNEL;
+  _text = text;
+  _source = EMPTY_SOURCE;
 }
 
 CommonToken::CommonToken(Token *oldToken) {
   InitializeInstanceFields();
-  text = oldToken->getText();
-  type = oldToken->getType();
-  line = oldToken->getLine();
-  index = oldToken->getTokenIndex();
-  charPositionInLine = oldToken->getCharPositionInLine();
-  channel = oldToken->getChannel();
-  start = oldToken->getStartIndex();
-  stop = oldToken->getStopIndex();
+  _text = oldToken->getText();
+  _type = oldToken->getType();
+  _line = oldToken->getLine();
+  _index = oldToken->getTokenIndex();
+  _charPositionInLine = oldToken->getCharPositionInLine();
+  _channel = oldToken->getChannel();
+  _start = oldToken->getStartIndex();
+  _stop = oldToken->getStopIndex();
 
-  if (dynamic_cast<CommonToken*>(oldToken) != nullptr) {
-    source = (static_cast<CommonToken*>(oldToken))->source;
+  if (is<CommonToken*>(oldToken)) {
+    _source = (static_cast<CommonToken*>(oldToken))->_source;
   } else {
-    source = new std::pair<TokenSource*, CharStream*>(oldToken->getTokenSource(), oldToken->getInputStream());
+    _source = { oldToken->getTokenSource(), oldToken->getInputStream() };
   }
 }
 
 int CommonToken::getType() const {
-  return type;
+  return _type;
 }
 
 void CommonToken::setLine(int line) {
-  this->line = line;
+  _line = line;
 }
 
 std::wstring CommonToken::getText() {
-  if (text != L"") {
-    return text;
+  if (!_text.empty()) {
+    return _text;
   }
 
   CharStream *input = getInputStream();
@@ -102,79 +104,79 @@ std::wstring CommonToken::getText() {
     return L"";
   }
   size_t n = input->size();
-  if ((size_t)start < n && (size_t)stop < n) {
-    return input->getText(misc::Interval(start,stop));
+  if ((size_t)_start < n && (size_t)_stop < n) {
+    return input->getText(misc::Interval(_start, _stop));
   } else {
     return L"<EOF>";
   }
 }
 
 void CommonToken::setText(const std::wstring &text) {
-  this->text = text;
+  _text = text;
 }
 
 int CommonToken::getLine() {
-  return line;
+  return _line;
 }
 
 int CommonToken::getCharPositionInLine() {
-  return charPositionInLine;
+  return _charPositionInLine;
 }
 
 void CommonToken::setCharPositionInLine(int charPositionInLine) {
-  this->charPositionInLine = charPositionInLine;
+  _charPositionInLine = charPositionInLine;
 }
 
 int CommonToken::getChannel() {
-  return channel;
+  return _channel;
 }
 
 void CommonToken::setChannel(int channel) {
-  this->channel = channel;
+  _channel = channel;
 }
 
 void CommonToken::setType(int type) {
-  this->type = type;
+  _type = type;
 }
 
 int CommonToken::getStartIndex() {
-  return start;
+  return _start;
 }
 
 void CommonToken::setStartIndex(int start) {
-  this->start = start;
+  _start = start;
 }
 
 int CommonToken::getStopIndex() {
-  return stop;
+  return _stop;
 }
 
 void CommonToken::setStopIndex(int stop) {
-  this->stop = stop;
+  _stop = stop;
 }
 
 int CommonToken::getTokenIndex() {
-  return index;
+  return _index;
 }
 
 void CommonToken::setTokenIndex(int index) {
-  this->index = index;
+  _index = index;
 }
 
 org::antlr::v4::runtime::TokenSource *CommonToken::getTokenSource() {
-  return source->first;
+  return _source.first;
 }
 
 org::antlr::v4::runtime::CharStream *CommonToken::getInputStream() {
-  return source->second;
+  return _source.second;
 }
 
 void CommonToken::InitializeInstanceFields() {
-  type = 0;
-  line = 0;
-  charPositionInLine = -1;
-  channel = DEFAULT_CHANNEL;
-  index = -1;
-  start = 0;
-  stop = 0;
+  _type = 0;
+  _line = 0;
+  _charPositionInLine = -1;
+  _channel = DEFAULT_CHANNEL;
+  _index = -1;
+  _start = 0;
+  _stop = 0;
 }

@@ -111,28 +111,7 @@ namespace atn {
     bool operator == (const ATNConfig &other) const;
 
     virtual std::wstring toString();
-
-    std::wstring toString(bool showAlt) {
-      std::wstringstream ss(L" (");
-
-      ss << state;
-      if (showAlt) {
-        ss << L"," << alt;
-      }
-      if (context != nullptr) {
-        ss << L",[" << context->toString() << L"]";
-      }
-      if (semanticContext != nullptr && semanticContext != SemanticContext::NONE) {
-        ss << L"," << semanticContext.get();
-      }
-      if (reachesIntoOuterContext > 0) {
-        ss << L",up=" << reachesIntoOuterContext;
-      }
-      ss << L')';
-
-      return ss.str();
-    }
-
+    std::wstring toString(bool showAlt);
   };
 
 } // namespace atn

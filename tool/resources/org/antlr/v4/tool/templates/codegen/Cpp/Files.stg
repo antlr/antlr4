@@ -66,6 +66,7 @@ LexerFile(file, lexer, namedActions) ::= <<
 #include "DFA.h"
 #include "LexerATNSimulator.h"
 #include "ATNDeserializer.h"
+#include "RuleContext.h"
 
 #include "<file.lexer.name>.h"
 

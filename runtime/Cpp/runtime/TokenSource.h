@@ -61,7 +61,7 @@ namespace runtime {
     /// to the parser.
     /// </summary>
   public:
-    virtual Token *nextToken() = 0;
+    virtual TokenRef nextToken() = 0;
 
     /// <summary>
     /// Get the line number for the current position in the input stream. The
@@ -86,7 +86,7 @@ namespace runtime {
     /// <returns> The <seealso cref="CharStream"/> associated with the current position in
     /// the input, or {@code null} if no input stream is available for the token
     /// source. </returns>
-    virtual CharStream *getInputStream() = 0;
+    virtual CharStream* getInputStream() = 0;
 
     /// <summary>
     /// Gets the name of the underlying input source. This method returns a
@@ -108,7 +108,7 @@ namespace runtime {
     /// creating <seealso cref="Token"/> objects from the input.
     /// </summary>
     /// <returns> The <seealso cref="TokenFactory"/> currently used by this token source. </returns>
-    virtual TokenFactory<CommonToken *> *getTokenFactory() = 0;
+    virtual std::shared_ptr<TokenFactory<CommonToken>> getTokenFactory() = 0;
   };
 
 } // namespace runtime

@@ -36,28 +36,22 @@
 #include "LexerNoViableAltException.h"
 #include "ANTLRErrorListener.h"
 #include "CPPUtils.h"
+#include "CommonToken.h"
 
 #include "Lexer.h"
 
 using namespace antlrcpp;
 using namespace org::antlr::v4::runtime;
 
-Lexer::Lexer() {
+Lexer::Lexer(CharStream *input) : _input(input) {
   InitializeInstanceFields();
-}
-
-Lexer::Lexer(CharStream *input) {
-  InitializeInstanceFields();
-  this->_input = input;
-  this->_tokenFactorySourcePair = new std::pair<TokenSource*, CharStream*>(this, input);
 }
 
 void Lexer::reset() {
   // wack Lexer state variables
-  if (_input != nullptr) {
-    _input->seek(0); // rewind the input
-  }
-  delete _token;
+  _input->seek(0); // rewind the input
+
+  _token.reset();
   _type = Token::INVALID_TYPE;
   _channel = Token::DEFAULT_CHANNEL;
   _tokenStartCharIndex = -1;
@@ -72,11 +66,7 @@ void Lexer::reset() {
   getInterpreter<atn::LexerATNSimulator>()->reset();
 }
 
-Token *Lexer::nextToken() {
-  if (_input == nullptr) {
-    throw IllegalStateException("nextToken requires a non-null input stream.");
-  }
-
+TokenRef Lexer::nextToken() {
   // Mark start location in char stream so unbuffered streams are
   // guaranteed at least have text of current token
   ssize_t tokenStartMarker = _input->mark();
@@ -94,8 +84,7 @@ Token *Lexer::nextToken() {
       return _token;
     }
 
-    delete _token;
-    _token = nullptr;
+    _token.reset();
     _channel = Token::DEFAULT_CHANNEL;
     _tokenStartCharIndex = (int)_input->index();
     _tokenStartCharPositionInLine = getInterpreter<atn::LexerATNSimulator>()->getCharPositionInLine();
@@ -161,38 +150,35 @@ int Lexer::popMode() {
 }
 
 
-TokenFactory<CommonToken*> *Lexer::getTokenFactory() {
+std::shared_ptr<TokenFactory<CommonToken>> Lexer::getTokenFactory() {
   return _factory;
 }
 
 void Lexer::setInputStream(IntStream *input) {
-  delete this->_input;
-  this->_tokenFactorySourcePair = new std::pair<TokenSource*, CharStream*>(this, _input);
   reset();
-  this->_input = static_cast<CharStream*>(input);
-  this->_tokenFactorySourcePair = new std::pair<TokenSource*, CharStream*>(this, _input);
+  _input = dynamic_cast<CharStream*>(input);
 }
 
 std::string Lexer::getSourceName() {
   return _input->getSourceName();
 }
 
-CharStream *Lexer::getInputStream() {
+CharStream* Lexer::getInputStream() {
   return _input;
 }
 
-void Lexer::emit(Token *token) {
-  //System.err.println("emit "+token);
-  this->_token = token;
+void Lexer::emit(TokenRef token) {
+  _token = token;
 }
 
-Token *Lexer::emit() {
-  Token *t = (Token*)_factory->create(_tokenFactorySourcePair, _type, _text, _channel, _tokenStartCharIndex, getCharIndex() - 1, _tokenStartLine, _tokenStartCharPositionInLine);
+TokenRef Lexer::emit() {
+  TokenRef t = std::dynamic_pointer_cast<Token>(_factory->create({ this, _input }, _type, _text, _channel,
+    _tokenStartCharIndex, getCharIndex() - 1, _tokenStartLine, _tokenStartCharPositionInLine));
   emit(t);
   return t;
 }
 
-Token *Lexer::emitEOF() {
+TokenRef Lexer::emitEOF() {
   int cpos = getCharPositionInLine();
   // The character position for EOF is one beyond the position of
   // the previous token's last character
@@ -200,8 +186,8 @@ Token *Lexer::emitEOF() {
     int n = _token->getStopIndex() - _token->getStartIndex() + 1;
     cpos = _token->getCharPositionInLine() + n;
   }
-  Token *eof = (Token*)_factory->create(_tokenFactorySourcePair, EOF, L"", Token::DEFAULT_CHANNEL,
-    (int)_input->index(), (int)_input->index() - 1, (int)getLine(), cpos);
+  TokenRef eof = std::dynamic_pointer_cast<Token>(_factory->create({ this, _input }, EOF, L"", Token::DEFAULT_CHANNEL,
+    (int)_input->index(), (int)_input->index() - 1, (int)getLine(), cpos));
   emit(eof);
   return eof;
 }
@@ -237,12 +223,12 @@ void Lexer::setText(const std::wstring &text) {
   this->_text = text;
 }
 
-Token *Lexer::getToken() {
+TokenRef Lexer::getToken() {
   return _token;
 }
 
-void Lexer::setToken(Token *_token) {
-  this->_token = _token;
+void Lexer::setToken(TokenRef token) {
+  _token = token;
 }
 
 void Lexer::setType(int ttype) {
@@ -261,9 +247,9 @@ int Lexer::getChannel() {
   return _channel;
 }
 
-std::vector<Token*> Lexer::getAllTokens() {
-  std::vector<Token*> tokens = std::vector<Token*>();
-  Token *t = nextToken();
+std::vector<TokenRef> Lexer::getAllTokens() {
+  std::vector<TokenRef> tokens;
+  TokenRef t = nextToken();
   while (t->getType() != EOF) {
     tokens.push_back(t);
     t = nextToken();

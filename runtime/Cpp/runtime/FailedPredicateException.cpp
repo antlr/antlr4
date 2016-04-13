@@ -47,7 +47,7 @@ FailedPredicateException::FailedPredicateException(Parser *recognizer, const std
 
 FailedPredicateException::FailedPredicateException(Parser *recognizer, const std::string &predicate, const std::string &message)
   : RecognitionException(!message.empty() ? message : "failed predicate: " + predicate + "?", recognizer,
-                         recognizer->getInputStream(), recognizer->ctx, recognizer->getCurrentToken()) {
+                         recognizer->getInputStream(), recognizer->getContext(), recognizer->getCurrentToken()) {
 
   atn::ATNState *s = recognizer->getInterpreter<atn::ATNSimulator>()->atn.states[(size_t)recognizer->getState()];
   atn::Transition *transition = s->transition(0);

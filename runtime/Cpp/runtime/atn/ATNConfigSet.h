@@ -55,10 +55,8 @@ namespace atn {
   /// graph-structured stack.
   class ATNConfigSet {
   public:
-    /// <summary>
     /// All configs but hashed by (s, i, _, pi) not including context. Wiped out
     /// when we go readonly as this set becomes a DFA state.
-    /// </summary>
     std::shared_ptr<ConfigLookup> configLookup;
 
     /// <summary>
@@ -69,7 +67,7 @@ namespace atn {
     // TO_DO: can we track conflicts as they are added to save scanning configs later?
     int uniqueAlt;
 
-    antlrcpp::BitSet *conflictingAlts;
+    antlrcpp::BitSet conflictingAlts;
 
     // Used in parser and lexer. In lexer, it indicates we hit a pred
     // while computing a closure operation.  Don't make a DFA state from this.
@@ -83,7 +81,7 @@ namespace atn {
     /// </summary>
     const bool fullCtx;
 
-    ATNConfigSet(bool fullCtx, std::shared_ptr<ConfigLookup> lookup);
+    ATNConfigSet(bool fullCtx = true);
     ATNConfigSet(std::shared_ptr<ATNConfigSet> old);
 
     virtual ~ATNConfigSet();

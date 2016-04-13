@@ -45,13 +45,13 @@ void doAfter() {
 }
 
 main: divide and_? conquer;
-divide : LessThan and_ GreaterThan {doesItBlend()}?; 
-and_ @init{ doInit(); } @after { doAfter(); } : ID ;
+divide : ID (and_ GreaterThan)? {doesItBlend()}?; 
+and_ @init{ doInit(); } @after { doAfter(); } : And ;
 
 conquer:
 	divide+
 	| {doesItBlend()}? and_ { myAction(); }
-	| conquer LessThan* divide
+	| ID (LessThan* divide)??
 ;
 
 // Unused rule to demonstrate some of the special features.

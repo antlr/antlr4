@@ -37,10 +37,11 @@
 
 using namespace org::antlr::v4::runtime::atn;
 
-ATNState::~ATNState() {};
-
 const int ATNState::INITIAL_NUM_TRANSITIONS;
+const int ATNState::INVALID_STATE_NUMBER;
 
+ATNState::~ATNState() {
+};
 
 const wchar_t * ATNState::serializationNames[] =  {L"INVALID", L"BASIC", L"RULE_START", L"BLOCK_START",
   L"PLUS_BLOCK_START", L"STAR_BLOCK_START", L"TOKEN_START", L"RULE_STOP",
@@ -50,12 +51,8 @@ size_t ATNState::hashCode() {
   return (size_t)stateNumber;
 }
 
-bool ATNState::equals(void *o) {
-  // are these states same object?
-  if (o != nullptr) {
-    return stateNumber == (static_cast<ATNState*>(o))->stateNumber;
-  }
-  return false;
+bool ATNState::operator == (const ATNState &other) {
+  return stateNumber == other.stateNumber;
 }
 
 bool ATNState::isNonGreedyExitState() {

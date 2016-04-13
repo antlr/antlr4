@@ -102,29 +102,10 @@ namespace pattern {
       CannotInvokeStartRule(std::exception e);
     };
 
-    /// <summary>
-    /// This is the backing field for <seealso cref="#getLexer()"/>.
-    /// </summary>
-  private:
-    Lexer *const lexer;
-
-    /// <summary>
-    /// This is the backing field for <seealso cref="#getParser()"/>.
-    /// </summary>
-    Parser *const parser;
-
-  protected:
-    std::wstring start;
-    std::wstring stop;
-    std::wstring escape; // e.g., \< and \> must escape BOTH!
-
-    /// <summary>
     /// Constructs a <seealso cref="ParseTreePatternMatcher"/> or from a <seealso cref="Lexer"/> and
     /// <seealso cref="Parser"/> object. The lexer input stream is altered for tokenizing
     /// the tree patterns. The parser is used as a convenient mechanism to get
     /// the grammar name, plus token, rule names.
-    /// </summary>
-  public:
     ParseTreePatternMatcher(Lexer *lexer, Parser *parser);
 
     /// <summary>
@@ -141,20 +122,20 @@ namespace pattern {
 
     /// <summary>
     /// Does {@code pattern} matched as rule {@code patternRuleIndex} match {@code tree}? </summary>
-    virtual bool matches(ParseTree *tree, const std::wstring &pattern, int patternRuleIndex);
+    virtual bool matches(std::shared_ptr<ParseTree> tree, const std::wstring &pattern, int patternRuleIndex);
 
     /// <summary>
     /// Does {@code pattern} matched as rule patternRuleIndex match tree? Pass in a
     ///  compiled pattern instead of a string representation of a tree pattern.
     /// </summary>
-    virtual bool matches(ParseTree *tree, ParseTreePattern *pattern);
+    virtual bool matches(std::shared_ptr<ParseTree> tree, const ParseTreePattern &pattern);
 
     /// <summary>
     /// Compare {@code pattern} matched as rule {@code patternRuleIndex} against
     /// {@code tree} and return a <seealso cref="ParseTreeMatch"/> object that contains the
     /// matched elements, or the node at which the match failed.
     /// </summary>
-    virtual ParseTreeMatch *match(ParseTree *tree, const std::wstring &pattern, int patternRuleIndex);
+    virtual ParseTreeMatch match(std::shared_ptr<ParseTree> tree, const std::wstring &pattern, int patternRuleIndex);
 
     /// <summary>
     /// Compare {@code pattern} matched against {@code tree} and return a
@@ -162,49 +143,55 @@ namespace pattern {
     /// node at which the match failed. Pass in a compiled pattern instead of a
     /// string representation of a tree pattern.
     /// </summary>
-    virtual ParseTreeMatch *match(ParseTree *tree, ParseTreePattern *pattern);
+    virtual ParseTreeMatch match(std::shared_ptr<ParseTree> tree, const ParseTreePattern &pattern);
 
     /// <summary>
     /// For repeated use of a tree pattern, compile it to a
     /// <seealso cref="ParseTreePattern"/> using this method.
     /// </summary>
-    virtual ParseTreePattern *compile(const std::wstring &pattern, int patternRuleIndex);
+    virtual ParseTreePattern compile(const std::wstring &pattern, int patternRuleIndex);
 
     /// <summary>
     /// Used to convert the tree pattern string into a series of tokens. The
     /// input stream is reset.
     /// </summary>
-    virtual Lexer *getLexer();
+    virtual Lexer* getLexer();
 
     /// <summary>
     /// Used to collect to the grammar file name, token names, rule names for
     /// used to parse the pattern into a parse tree.
     /// </summary>
-    virtual Parser *getParser();
+    virtual Parser* getParser();
 
     // ---- SUPPORT CODE ----
 
-    /// <summary>
+    virtual std::vector<TokenRef> tokenize(const std::wstring &pattern);
+
+    /// Split "<ID> = <e:expr>;" into 4 chunks for tokenizing by tokenize().
+    virtual std::vector<Chunk*> split(const std::wstring &pattern);
+    
+  protected:
+    std::wstring _start;
+    std::wstring _stop;
+    std::wstring _escape; // e.g., \< and \> must escape BOTH!
+
     /// Recursively walk {@code tree} against {@code patternTree}, filling
     /// {@code match.}<seealso cref="ParseTreeMatch#labels labels"/>.
-    /// </summary>
+    ///
     /// <returns> the first node encountered in {@code tree} which does not match
     /// a corresponding node in {@code patternTree}, or {@code null} if the match
     /// was successful. The specific node returned depends on the matching
     /// algorithm used by the implementation, and may be overridden. </returns>
-  protected:
-    virtual ParseTree* matchImpl(ParseTree *tree, ParseTree *patternTree, std::map<std::wstring, std::vector<ParseTree*>> &labels);
+    virtual std::shared_ptr<tree::ParseTree> matchImpl(std::shared_ptr<ParseTree> tree,
+      std::shared_ptr<ParseTree> patternTree, std::map<std::wstring, std::vector<std::shared_ptr<ParseTree>>> &labels);
 
     /// Is t <expr> subtree?
-    virtual RuleTagToken *getRuleTagToken(ParseTree *t);
-
-  public:
-    virtual std::vector<Token*> tokenize(const std::wstring &pattern);
-
-    /// Split "<ID> = <e:expr>;" into 4 chunks for tokenizing by tokenize().
-    virtual std::vector<Chunk*> split(const std::wstring &pattern);
+    virtual std::shared_ptr<RuleTagToken> getRuleTagToken(std::shared_ptr<ParseTree> t);
 
   private:
+    Lexer *_lexer;
+    Parser *_parser;
+    
     void InitializeInstanceFields();
   };
 

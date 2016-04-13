@@ -36,5 +36,6 @@
 using namespace org::antlr::v4::runtime;
 
 InputMismatchException::InputMismatchException(Parser *recognizer)
-  : RecognitionException(recognizer, recognizer->getInputStream(), recognizer->ctx, recognizer->getCurrentToken()) {
+  : RecognitionException(recognizer, recognizer->getInputStream(), recognizer->getContext(),
+                         recognizer->getCurrentToken()) {
 }

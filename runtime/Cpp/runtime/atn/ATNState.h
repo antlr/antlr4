@@ -104,6 +104,7 @@ namespace atn {
     virtual ~ATNState();
 
     static const int INITIAL_NUM_TRANSITIONS = 4;
+    static const int INVALID_STATE_NUMBER = -1;
 
     enum {
       ATN_INVALID_TYPE = 0,
@@ -122,8 +123,6 @@ namespace atn {
     };
 
     static const wchar_t * serializationNames[];
-
-    static const int INVALID_STATE_NUMBER = -1;
 
     /// <summary>
     /// Which ATN are we in? </summary>
@@ -146,7 +145,7 @@ namespace atn {
     misc::IntervalSet nextTokenWithinRule;
 
     virtual size_t hashCode();
-    virtual bool equals(void *o);
+    bool operator == (const ATNState &other);
 
     virtual bool isNonGreedyExitState();
 

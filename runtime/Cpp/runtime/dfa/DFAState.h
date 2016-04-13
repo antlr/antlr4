@@ -123,8 +123,8 @@ namespace dfa {
 
     /// Map a predicate to a predicted alternative.
     DFAState();
-    DFAState(int stateNumber);
-    DFAState(std::shared_ptr<atn::ATNConfigSet> configs, int stateNumber = -1);
+    DFAState(int state);
+    DFAState(std::shared_ptr<atn::ATNConfigSet> configs);
 
     /// <summary>
     /// Get the set of all alts mentioned by all ATN configurations in this

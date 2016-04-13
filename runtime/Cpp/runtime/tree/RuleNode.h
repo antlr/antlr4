@@ -41,7 +41,7 @@ namespace tree {
 
   class RuleNode : public ParseTree {
   public:
-    virtual runtime::RuleContext *getRuleContext() = 0;
+    virtual runtime::RuleContextRef getRuleContext() = 0;
   };
 
 } // namespace tree

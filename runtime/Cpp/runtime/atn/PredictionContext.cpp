@@ -33,6 +33,7 @@
 #include "MurmurHash.h"
 #include "ArrayPredictionContext.h"
 #include "RuleContext.h"
+#include "ParserRuleContext.h"
 #include "RuleTransition.h"
 #include "Arrays.h"
 #include "CPPUtils.h"
@@ -45,26 +46,26 @@ using namespace org::antlr::v4::runtime::atn;
 using namespace antlrcpp;
 
 int PredictionContext::globalNodeCount = 0;
-const std::shared_ptr<EmptyPredictionContext> PredictionContext::EMPTY;
+const std::shared_ptr<EmptyPredictionContext> PredictionContext::EMPTY = std::make_shared<EmptyPredictionContext>();
 const int PredictionContext::EMPTY_RETURN_STATE;
 const int PredictionContext::INITIAL_HASH;
 
 PredictionContext::PredictionContext(size_t cachedHashCode) : id(globalNodeCount++), cachedHashCode(cachedHashCode)  {
 }
 
-PredictionContextRef PredictionContext::fromRuleContext(const ATN &atn, RuleContext *outerContext) {
-  if (outerContext == nullptr) {
-    outerContext = (RuleContext*)RuleContext::EMPTY;
+PredictionContextRef PredictionContext::fromRuleContext(const ATN &atn, RuleContextRef outerContext) {
+  if (!outerContext) {
+    outerContext = std::dynamic_pointer_cast<RuleContext>(RuleContext::EMPTY);
   }
 
   // if we are in RuleContext of start rule, s, then PredictionContext
   // is EMPTY. Nobody called us. (if we are empty, return empty)
-  if (outerContext->parent == nullptr || outerContext == (RuleContext*)RuleContext::EMPTY) {
+  if (outerContext->parent.expired() || outerContext == RuleContext::EMPTY) {
     return PredictionContext::EMPTY;
   }
 
   // If we have a parent, convert it to a PredictionContext graph
-  PredictionContextRef parent = PredictionContext::fromRuleContext(atn, outerContext->parent);
+  PredictionContextRef parent = PredictionContext::fromRuleContext(atn, outerContext->parent.lock());
 
   ATNState *state = atn.states[(size_t)outerContext->invokingState];
   RuleTransition *transition = (RuleTransition *)state->transition(0);
@@ -549,11 +550,12 @@ void PredictionContext::getAllContextNodes_(PredictionContextRef context,
   }
 }
 
-std::wstring PredictionContext::toString() {
-  return L"PredictionContext (" + std::to_wstring((size_t)this) + L")";
+std::wstring PredictionContext::toString() const {
+  
+  return antlrcpp::toString(this);
 }
 
-std::wstring PredictionContext::toString(Recognizer *recog)  {
+std::wstring PredictionContext::toString(Recognizer *recog) const {
   return toString();
 }
 
@@ -571,7 +573,8 @@ std::vector<std::wstring> PredictionContext::toStrings(Recognizer *recognizer, P
     PredictionContext *p = this;
     int stateNumber = currentState;
 
-    std::wstringstream ss(L"[");
+    std::wstringstream ss;
+    ss << L"[";
     bool outerContinue = false;
     while (!p->isEmpty() && p != stop.get()) {
       size_t index = 0;

@@ -32,53 +32,25 @@
 
 namespace antlrcpp {
 
-  class BitSet {
+  class BitSet : public std::bitset<1024> {
   public:
-    BitSet() {}
-
-    BitSet(const BitSet &other) {
-      data = other.data;
-    }
-
-    static const int BITSET_SIZE = 1024;
-    std::bitset<BITSET_SIZE> data;
-
-    void assign(size_t count, const BitSet & value ) {
-
-    }
-
     int nextSetBit(size_t pos) {
-      for (size_t i = pos; i < data.size(); i++){
-        if (data.test(i)) return (int)i;
+      for (size_t i = pos; i < size(); i++){
+        if (test(i)) {
+          return (int)i;
+        }
       }
 
       return -1;
     }
 
-    void set(size_t pos){
-      data.set(pos);
-    }
-
-    void set(){
-      data.set();
-    }
-
-    size_t count(){
-      return data.count();
-    }
-
-    size_t size(){
-      return data.size();
-    }
-
     // Prints a list of every index for which the bitset contains a bit in true.
     friend std::wostream& operator << (std::wostream& os, const BitSet& obj)
     {
-
       os << L"{";
-      size_t total = obj.data.count();
-      for (size_t i = 0; i < obj.data.size(); i++){
-        if (obj.data.test(i)){
+      size_t total = obj.count();
+      for (size_t i = 0; i < obj.size(); i++){
+        if (obj.test(i)){
           os << i;
           --total;
           if (total > 1){
@@ -104,12 +76,13 @@ namespace antlrcpp {
 
       return result;
     }
+
     std::wstring toString(){
       std::wstringstream stream;
       stream << L"{";
-      size_t total = data.count();
-      for (size_t i = 0; i < data.size(); i++){
-        if (data.test(i)){
+      size_t total = count();
+      for (size_t i = 0; i < size(); i++){
+        if (test(i)){
           stream << i;
           --total;
           if (total > 1){

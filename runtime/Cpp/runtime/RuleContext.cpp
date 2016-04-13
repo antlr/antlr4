@@ -37,23 +37,25 @@
 
 using namespace org::antlr::v4::runtime;
 
-ParserRuleContext *const RuleContext::EMPTY = new ParserRuleContext();
+const ParserRuleContextRef RuleContext::EMPTY = std::make_shared<ParserRuleContext>();
 
 RuleContext::RuleContext() {
   InitializeInstanceFields();
 }
 
-RuleContext::RuleContext(RuleContext *parent, int invokingState) {
+RuleContext::RuleContext(std::weak_ptr<RuleContext> parent, int invokingState) {
   InitializeInstanceFields();
   this->parent = parent;
   this->invokingState = invokingState;
 }
 
 int RuleContext::depth() {
-  int n = 0;
-  RuleContext *p = this;
-  while (p != nullptr) {
-    p = p->parent;
+  int n = 1;
+  RuleContextRef p = shared_from_this();
+  while (true) {
+    if (p->parent.expired())
+      break;
+    p = p->parent.lock();
     n++;
   }
   return n;
@@ -67,12 +69,13 @@ misc::Interval RuleContext::getSourceInterval() {
   return misc::Interval::INVALID;
 }
 
-RuleContext *RuleContext::getRuleContext() {
-  return this;
+RuleContextRef RuleContext::getRuleContext() {
+  return shared_from_this();
 }
 
-RuleContext *RuleContext::getParent() {
-  return parent;
+std::weak_ptr<tree::Tree> RuleContext::getParentReference()
+{
+  return std::dynamic_pointer_cast<tree::Tree>(parent.lock());
 }
 
 std::wstring RuleContext::getText() {
@@ -94,9 +97,10 @@ ssize_t RuleContext::getRuleIndex() const {
   return -1;
 }
 
-tree::ParseTree *RuleContext::getChild(std::size_t i) {
-  return nullptr;
+std::shared_ptr<tree::Tree> RuleContext::getChildReference(size_t i) {
+  return std::shared_ptr<tree::Tree>();
 }
+
 
 std::size_t RuleContext::getChildCount() {
   return 0;
@@ -131,11 +135,11 @@ void RuleContext::save(std::vector<std::wstring> &ruleNames, const std::wstring 
 }
 
 std::wstring RuleContext::toStringTree(Parser *recog) {
-  return tree::Trees::toStringTree(this, recog);
+  return tree::Trees::toStringTree(shared_from_this(), recog);
 }
 
 std::wstring RuleContext::toStringTree(std::vector<std::wstring> &ruleNames) {
-  return tree::Trees::toStringTree(this, ruleNames);
+  return tree::Trees::toStringTree(shared_from_this(), ruleNames);
 }
 
 std::wstring RuleContext::toStringTree() {
@@ -144,32 +148,33 @@ std::wstring RuleContext::toStringTree() {
 
 
 std::wstring RuleContext::toString(const std::vector<std::wstring> &ruleNames) {
-  return toString(ruleNames, static_cast<RuleContext*>(nullptr));
+  return toString(ruleNames, RuleContextRef());
 }
 
 
-std::wstring RuleContext::toString(const std::vector<std::wstring> &ruleNames, RuleContext *stop) {
+std::wstring RuleContext::toString(const std::vector<std::wstring> &ruleNames, RuleContextRef stop) {
   std::wstringstream ss;
 
-  RuleContext *p = this;
+  RuleContextRef parent = shared_from_this();
   ss << L"[";
-  while (p != nullptr && p != stop) {
+  while (parent != stop) {
     if (ruleNames.empty()) {
-      if (!p->isEmpty()) {
-        ss << p->invokingState;
+      if (!parent->isEmpty()) {
+        ss << parent->invokingState;
       }
     } else {
-      ssize_t ruleIndex = p->getRuleIndex();
+      ssize_t ruleIndex = parent->getRuleIndex();
 
       std::wstring ruleName = (ruleIndex >= 0 && ruleIndex < (ssize_t)ruleNames.size()) ? ruleNames[(size_t)ruleIndex] : std::to_wstring(ruleIndex);
       ss << ruleName;
     }
 
-    if (p->parent != nullptr && (ruleNames.size() > 0 || !p->parent->isEmpty())) {
+    if (parent->parent.expired()) // No parent anymore.
+      break;
+    parent = parent->parent.lock();
+    if (!ruleNames.empty() || !parent->isEmpty()) {
       ss << L" ";
     }
-
-    p = p->parent;
   }
 
   ss << L"]";
@@ -185,7 +190,7 @@ std::wstring RuleContext::toString(Recognizer *recog) {
   return toString(recog, ParserRuleContext::EMPTY);
 }
 
-std::wstring RuleContext::toString(Recognizer *recog, RuleContext *stop) {
+std::wstring RuleContext::toString(Recognizer *recog, RuleContextRef stop) {
   return toString(recog->getRuleNames(), stop);
 }
 

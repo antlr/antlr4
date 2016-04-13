@@ -32,7 +32,6 @@
 #pragma once
 
 #include "Recognizer.h"
-#include "EqualityComparator.h"
 #include "ATN.h"
 #include "ATNState.h"
 
@@ -94,7 +93,7 @@ namespace atn {
   public:
     /// Convert a RuleContext tree to a PredictionContext graph.
     /// Return EMPTY if outerContext is empty.
-    static PredictionContextRef fromRuleContext(const ATN &atn, RuleContext *outerContext);
+    static PredictionContextRef fromRuleContext(const ATN &atn,RuleContextRef outerContext);
 
     virtual size_t size() const = 0;
     virtual std::weak_ptr<PredictionContext> getParent(size_t index) const = 0;
@@ -256,8 +255,8 @@ namespace atn {
     static void getAllContextNodes_(PredictionContextRef context,
       std::vector<PredictionContextRef> &nodes, std::map<PredictionContextRef, PredictionContextRef> &visited);
 
-    std::wstring toString();
-    std::wstring toString(Recognizer *recog);
+    virtual std::wstring toString() const;
+    virtual std::wstring toString(Recognizer *recog) const;
 
     std::vector<std::wstring> toStrings(Recognizer *recognizer, int currentState);
     std::vector<std::wstring> toStrings(Recognizer *recognizer, PredictionContextRef stop, int currentState);

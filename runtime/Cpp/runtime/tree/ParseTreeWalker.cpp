@@ -32,22 +32,24 @@
 #include "ErrorNode.h"
 #include "ParserRuleContext.h"
 #include "ParseTreeListener.h"
+#include "CPPUtils.h"
 
 #include "ParseTreeWalker.h"
 
 using namespace org::antlr::v4::runtime::tree;
+using namespace antlrcpp;
 
-ParseTreeWalker *const ParseTreeWalker::DEFAULT = new ParseTreeWalker();
+const std::shared_ptr<ParseTreeWalker> ParseTreeWalker::DEFAULT = std::make_shared<ParseTreeWalker>();
 
-void ParseTreeWalker::walk(ParseTreeListener *listener, ParseTree *t) {
-  if (dynamic_cast<ErrorNode*>(t) != nullptr) {
-    listener->visitErrorNode(dynamic_cast<ErrorNode*>(t));
+void ParseTreeWalker::walk(std::shared_ptr<ParseTreeListener> listener, std::shared_ptr<ParseTree> t) {
+  if (is<ErrorNode>(t)) {
+    listener->visitErrorNode(std::dynamic_pointer_cast<ErrorNode>(t));
     return;
-  } else if (dynamic_cast<TerminalNode*>(t) != nullptr) {
-    listener->visitTerminal(static_cast<TerminalNode*>(t));
+  } else if (is<TerminalNode>(t)) {
+    listener->visitTerminal(std::dynamic_pointer_cast<TerminalNode>(t));
     return;
   }
-  RuleNode *r = static_cast<RuleNode*>(t);
+  std::shared_ptr<RuleNode> r = std::dynamic_pointer_cast<RuleNode>(t);
   enterRule(listener, r);
   std::size_t n = r->getChildCount();
   for (std::size_t i = 0; i < n; i++) {
@@ -56,14 +58,14 @@ void ParseTreeWalker::walk(ParseTreeListener *listener, ParseTree *t) {
   exitRule(listener, r);
 }
 
-void ParseTreeWalker::enterRule(ParseTreeListener *listener, RuleNode *r) {
-  ParserRuleContext *ctx = dynamic_cast<ParserRuleContext*>(r->getRuleContext());
+void ParseTreeWalker::enterRule(std::shared_ptr<ParseTreeListener> listener, std::shared_ptr<RuleNode> r) {
+  ParserRuleContextRef ctx = std::dynamic_pointer_cast<ParserRuleContext>(r->getRuleContext());
   listener->enterEveryRule(ctx);
   ctx->enterRule(listener);
 }
 
-void ParseTreeWalker::exitRule(ParseTreeListener *listener, RuleNode *r) {
-  ParserRuleContext *ctx = dynamic_cast<ParserRuleContext*>(r->getRuleContext());
+void ParseTreeWalker::exitRule(std::shared_ptr<ParseTreeListener> listener, std::shared_ptr<RuleNode> r) {
+  ParserRuleContextRef ctx = std::dynamic_pointer_cast<ParserRuleContext>(r->getRuleContext());
   ctx->exitRule(listener);
   listener->exitEveryRule(ctx);
 }

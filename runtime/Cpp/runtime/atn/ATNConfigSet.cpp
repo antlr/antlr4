@@ -57,12 +57,11 @@ bool SimpleATNConfigComparer::operator () (const ATNConfig &lhs, const ATNConfig
 
 //------------------ ATNConfigSet --------------------------------------------------------------------------------------
 
-ATNConfigSet::ATNConfigSet(bool fullCtx, std::shared_ptr<ConfigLookup> lookup) : fullCtx(fullCtx) {
-  configLookup = !lookup ? std::shared_ptr<ConfigLookup>(new ConfigLookupImpl<SimpleATNConfigHasher, SimpleATNConfigComparer>()) : lookup;
+ATNConfigSet::ATNConfigSet(bool fullCtx) : fullCtx(fullCtx) {
   InitializeInstanceFields();
 }
 
-ATNConfigSet::ATNConfigSet(std::shared_ptr<ATNConfigSet> old) : ATNConfigSet(old->fullCtx, std::shared_ptr<ConfigLookup>()) {
+ATNConfigSet::ATNConfigSet(std::shared_ptr<ATNConfigSet> old) : ATNConfigSet(old->fullCtx) {
   addAll(old);
   uniqueAlt = old->uniqueAlt;
   conflictingAlts = old->conflictingAlts;
@@ -228,9 +227,11 @@ void ATNConfigSet::setReadonly(bool readonly) {
 
 std::wstring ATNConfigSet::toString() {
   std::wstringstream ss;
+  ss << L"[";
   for (size_t i = 0; i < elements().size(); i++) {
-    ss << elements().at(i)->toString();
+    ss << configs[i]->toString();
   }
+  ss << L"]";
 
   if (hasSemanticContext) {
     ss << L",hasSemanticContext = " <<  hasSemanticContext;
@@ -238,10 +239,12 @@ std::wstring ATNConfigSet::toString() {
   if (uniqueAlt != ATN::INVALID_ALT_NUMBER) {
     ss << L",uniqueAlt = " << uniqueAlt;
   }
-  if (conflictingAlts != nullptr) {
+
+  if (conflictingAlts.size() > 0) {
     ss << L",conflictingAlts = ";
-    ss << conflictingAlts->toString();
+    ss << conflictingAlts.toString();
   }
+
   if (dipsIntoOuterContext) {
     ss << L", dipsIntoOuterContext";
   }
@@ -253,6 +256,7 @@ bool ATNConfigSet::remove(void *o) {
 }
 
 void ATNConfigSet::InitializeInstanceFields() {
+  configLookup = std::shared_ptr<ConfigLookup>(new ConfigLookupImpl<SimpleATNConfigHasher, SimpleATNConfigComparer>());
   uniqueAlt = 0;
   hasSemanticContext = false;
   dipsIntoOuterContext = false;

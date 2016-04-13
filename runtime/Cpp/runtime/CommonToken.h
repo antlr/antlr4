@@ -40,47 +40,41 @@ namespace runtime {
 
   class CommonToken : public WritableToken {
   protected:
-    static std::pair<TokenSource*, CharStream*> *const EMPTY_SOURCE;
+    static const std::pair<TokenSource*, CharStream*> EMPTY_SOURCE;
 
-    int type;
-    int line;
-    int charPositionInLine; // set to invalid position
-    int channel;
-    std::pair<TokenSource*, CharStream*> *source;
+    int _type;
+    int _line;
+    int _charPositionInLine; // set to invalid position
+    int _channel;
+    std::pair<TokenSource*, CharStream*> _source; // Pure references, usually from statically allocated classes.
 
-    /// <summary>
     /// We need to be able to change the text once in a while.  If
     ///  this is non-empty, then getText should return this.  Note that
     ///  start/stop are not affected by changing this.
-    /// </summary>
+    ///
     // TO_DO: can store these in map in token stream rather than as field here
-    std::wstring text;
+    std::wstring _text;
 
     /// <summary>
     /// What token number is this from 0..n-1 tokens; < 0 implies invalid index </summary>
-    int index;
+    int _index;
 
     /// <summary>
     /// The char position into the input buffer where this token starts </summary>
-    int start;
+    int _start;
 
     /// <summary>
     /// The char position into the input buffer where this token stops </summary>
-    int stop;
+    int _stop;
 
   public:
     CommonToken(int type);
-
-    CommonToken(std::pair<TokenSource*, CharStream*> *source, int type, int channel, int start, int stop);
-
+    CommonToken(std::pair<TokenSource*, CharStream*> source, int type, int channel, int start, int stop);
     CommonToken(int type, const std::wstring &text);
-
     CommonToken(Token *oldToken);
 
     virtual int getType() const override;
-
     virtual void setLine(int line) override;
-
     virtual std::wstring getText() override;
 
     /// <summary>
@@ -90,33 +84,26 @@ namespace runtime {
     ///  was converted to a new string in the token object.
     /// </summary>
     virtual void setText(const std::wstring &text) override;
-
     virtual int getLine() override;
 
     virtual int getCharPositionInLine() override;
-
     virtual void setCharPositionInLine(int charPositionInLine) override;
 
     virtual int getChannel() override;
-
     virtual void setChannel(int channel) override;
 
     virtual void setType(int type) override;
 
     virtual int getStartIndex() override;
-
     virtual void setStartIndex(int start);
 
     virtual int getStopIndex() override;
-
     virtual void setStopIndex(int stop);
 
     virtual int getTokenIndex() override;
-
     virtual void setTokenIndex(int index) override;
 
     virtual TokenSource *getTokenSource() override;
-
     virtual CharStream *getInputStream() override;
 
   private:

@@ -41,6 +41,7 @@ fragment LETTER : [a-zA-Z\u0080-\u00FF_] ;
 LessThan: '<' -> pushMode(Mode1);
 GreaterThan:  '>' -> popMode;
 Equal: '=';
+And: 'and';
 
 Colon: ':';
 Semicolon: ';';

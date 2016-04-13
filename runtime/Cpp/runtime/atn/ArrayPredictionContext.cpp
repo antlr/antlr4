@@ -82,7 +82,8 @@ std::wstring ArrayPredictionContext::toString() {
     return L"[]";
   }
 
-  std::wstringstream ss(L"[");
+  std::wstringstream ss;
+  ss << L"[";
   for (size_t i = 0; i < returnStates.size(); i++) {
     if (i > 0) {
       ss << L", ";

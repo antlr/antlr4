@@ -37,20 +37,12 @@
 using namespace org::antlr::v4::runtime;
 using namespace org::antlr::v4::runtime::tree;
 
-TerminalNodeImpl::TerminalNodeImpl(Token *symbol) {
+TerminalNodeImpl::TerminalNodeImpl(TokenRef symbol) {
   this->symbol = symbol;
 }
 
-ParseTree *TerminalNodeImpl::getChild(std::size_t i) {
-  return nullptr;
-}
-
-Token *TerminalNodeImpl::getSymbol() {
+TokenRef TerminalNodeImpl::getSymbol() {
   return symbol;
-}
-
-ParseTree *TerminalNodeImpl::getParent() {
-  return parent;
 }
 
 misc::Interval TerminalNodeImpl::getSourceInterval() {
@@ -83,4 +75,12 @@ std::wstring TerminalNodeImpl::toString() {
 
 std::wstring TerminalNodeImpl::toStringTree() {
   return toString();
+}
+
+std::weak_ptr<Tree> TerminalNodeImpl::getParentReference() {
+  return parent;
+}
+
+std::shared_ptr<Tree> TerminalNodeImpl::getChildReference(size_t i) {
+  return std::shared_ptr<Tree>();
 }

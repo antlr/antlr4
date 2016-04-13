@@ -58,7 +58,7 @@ namespace org {
         class BailErrorStrategy;
         class BaseErrorListener;
         class BufferedTokenStream;
-        class CharStream;
+        class CharStream; typedef std::shared_ptr<CharStream> CharStreamRef;
         class CommonToken;
         class CommonTokenFactory;
         class CommonTokenStream;
@@ -67,7 +67,7 @@ namespace org {
         class DiagnosticErrorListener;
         class FailedPredicateException;
         class InputMismatchException;
-        class IntStream;
+        class IntStream; typedef std::shared_ptr<IntStream> IntStreamRef;
         class InterpreterRuleContext;
         class IRecognizer;
         class Lexer;
@@ -77,24 +77,21 @@ namespace org {
         class NoViableAltException;
         class Parser;
         class ParserInterpreter;
-        class ParserRuleContext;
+        class ParserRuleContext; typedef std::shared_ptr<ParserRuleContext> ParserRuleContextRef;
         class ProxyErrorListener;
         class RecognitionException;
         class Recognizer;
-        class RuleContext;
-        class Token;
+        class RuleContext; typedef std::shared_ptr<RuleContext> RuleContextRef;
+        class Token; typedef std::shared_ptr<Token> TokenRef;
         template<typename Symbol> class TokenFactory;
         class TokenSource;
-        class TokenStream;
+        class TokenStream; typedef std::shared_ptr<TokenStream> TokenStreamRef;
         class TokenStreamRewriter;
         class UnbufferedCharStream;
         class UnbufferedTokenStream;
-        class WritableToken;
+        class WritableToken; typedef std::shared_ptr<WritableToken> WritableTokenRef;
 
         namespace misc {
-          template<typename T> class AbstractEqualityComparator;
-          template<typename T> class EqualityComparator;
-
           class Interval;
           class IntervalSet;
           class JFileChooserConfirmOverwrite;

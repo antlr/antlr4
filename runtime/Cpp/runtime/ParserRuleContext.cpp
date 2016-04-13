@@ -38,11 +38,12 @@
 #include "ParserRuleContext.h"
 
 using namespace org::antlr::v4::runtime;
+using namespace antlrcpp;
 
 ParserRuleContext::ParserRuleContext() {
 }
 
-void ParserRuleContext::copyFrom(ParserRuleContext *ctx) {
+void ParserRuleContext::copyFrom(std::shared_ptr<ParserRuleContext> ctx) {
   // from RuleContext
   this->parent = ctx->parent;
   this->invokingState = ctx->invokingState;
@@ -51,24 +52,22 @@ void ParserRuleContext::copyFrom(ParserRuleContext *ctx) {
   this->stop = ctx->stop;
 }
 
-ParserRuleContext::ParserRuleContext(ParserRuleContext *parent, int invokingStateNumber) : RuleContext(parent, invokingStateNumber) {
+ParserRuleContext::ParserRuleContext(std::weak_ptr<ParserRuleContext> parent, int invokingStateNumber)
+  : RuleContext(parent, invokingStateNumber) {
 }
 
-void ParserRuleContext::enterRule(tree::ParseTreeListener *listener) {
+void ParserRuleContext::enterRule(std::shared_ptr<tree::ParseTreeListener> listener) {
 }
 
-void ParserRuleContext::exitRule(tree::ParseTreeListener *listener) {
+void ParserRuleContext::exitRule(std::shared_ptr<tree::ParseTreeListener> listener) {
 }
 
-tree::TerminalNode *ParserRuleContext::addChild(tree::TerminalNode *t) {
-  if (children.empty()) {
-    children = std::vector<ParseTree*>();
-  }
+std::shared_ptr<tree::TerminalNode> ParserRuleContext::addChild(std::shared_ptr<tree::TerminalNode> t) {
   children.push_back(t);
   return t;
 }
 
-RuleContext *ParserRuleContext::addChild(RuleContext *ruleInvocation) {
+RuleContextRef ParserRuleContext::addChild(RuleContextRef ruleInvocation) {
   children.push_back(ruleInvocation);
   return ruleInvocation;
 }
@@ -79,40 +78,34 @@ void ParserRuleContext::removeLastChild() {
   }
 }
 
-tree::TerminalNode *ParserRuleContext::addChild(Token *matchedToken) {
-  tree::TerminalNodeImpl *t = new tree::TerminalNodeImpl(matchedToken);
+std::shared_ptr<tree::TerminalNode> ParserRuleContext::addChild(TokenRef matchedToken) {
+  std::shared_ptr<tree::TerminalNodeImpl> t = std::make_shared<tree::TerminalNodeImpl>(matchedToken);
   addChild(t);
-  t->parent = this;
+  t->parent = shared_from_this();
   return t;
 }
 
-tree::ErrorNode *ParserRuleContext::addErrorNode(Token *badToken) {
-  tree::ErrorNodeImpl *t = new tree::ErrorNodeImpl(badToken);
+std::shared_ptr<tree::ErrorNode> ParserRuleContext::addErrorNode(TokenRef badToken) {
+  std::shared_ptr<tree::ErrorNodeImpl> t = std::make_shared<tree::ErrorNodeImpl>(badToken);
   addChild(t);
-  t->parent = this;
+  t->parent = shared_from_this();
   return t;
 }
 
-/// Override to make type more specific
-ParserRuleContext *ParserRuleContext::getParent()
-{
-  return static_cast<ParserRuleContext*>(RuleContext::getParent());
-}
-
-tree::ParseTree *ParserRuleContext::getChild(std::size_t i) {
+std::shared_ptr<tree::Tree> ParserRuleContext::getChildReference(std::size_t i) {
   return children[i];
 }
 
-tree::TerminalNode *ParserRuleContext::getToken(int ttype, std::size_t i) {
+std::shared_ptr<tree::TerminalNode> ParserRuleContext::getToken(int ttype, std::size_t i) {
   if (i >= children.size()) {
     return nullptr;
   }
 
   size_t j = 0; // what token with ttype have we found?
-  for (auto &o : children) {
-    if (dynamic_cast<tree::TerminalNode*>(o) != nullptr) {
-      tree::TerminalNode *tnode = static_cast<tree::TerminalNode*>(o);
-      Token *symbol = tnode->getSymbol();
+  for (auto o : children) {
+    if (is<tree::TerminalNode>(o)) {
+      std::shared_ptr<tree::TerminalNode> tnode = std::dynamic_pointer_cast<tree::TerminalNode>(o);
+      TokenRef symbol = tnode->getSymbol();
       if (symbol->getType() == ttype) {
         if (j++ == i) {
           return tnode;
@@ -124,16 +117,13 @@ tree::TerminalNode *ParserRuleContext::getToken(int ttype, std::size_t i) {
   return nullptr;
 }
 
-std::vector<tree::TerminalNode*> ParserRuleContext::getTokens(int ttype) {
-  std::vector<tree::TerminalNode*> tokens;
+std::vector<std::shared_ptr<tree::TerminalNode>> ParserRuleContext::getTokens(int ttype) {
+  std::vector<std::shared_ptr<tree::TerminalNode>> tokens;
   for (auto &o : children) {
-    if (dynamic_cast<tree::TerminalNode*>(o) != nullptr) {
-      tree::TerminalNode *tnode = static_cast<tree::TerminalNode*>(o);
-      Token *symbol = tnode->getSymbol();
+    if (is<tree::TerminalNode>(o)) {
+      std::shared_ptr<tree::TerminalNode> tnode = std::dynamic_pointer_cast<tree::TerminalNode>(o);
+      TokenRef symbol = tnode->getSymbol();
       if (symbol->getType() == ttype) {
-        if (tokens.empty()) {
-          tokens = std::vector<tree::TerminalNode*>();
-        }
         tokens.push_back(tnode);
       }
     }
@@ -155,17 +145,20 @@ misc::Interval ParserRuleContext::getSourceInterval() {
   return misc::Interval(start->getTokenIndex(), stop->getTokenIndex());
 }
 
-Token *ParserRuleContext::getStart() {
+TokenRef ParserRuleContext::getStart() {
   return start;
 }
 
-Token *ParserRuleContext::getStop() {
+TokenRef ParserRuleContext::getStop() {
   return stop;
 }
 
 std::wstring ParserRuleContext::toInfoString(Parser *recognizer) {
-  std::vector<std::wstring> rules = recognizer->getRuleInvocationStack(this);
+  std::vector<std::wstring> rules = recognizer->getRuleInvocationStack(shared_from_this());
   std::reverse(rules.begin(), rules.end());
   std::wstring rulesStr = antlrcpp::arrayToString(rules);
-  return std::wstring(L"ParserRuleContext") + rulesStr + std::wstring(L"{") + std::wstring(L"start=") + std::to_wstring(start->getTokenIndex())  + std::wstring(L", stop=") + std::to_wstring(stop->getTokenIndex()) + L'}';
+  return std::wstring(L"ParserRuleContext") + rulesStr + std::wstring(L"{") + std::wstring(L"start=") +
+    std::to_wstring(start->getTokenIndex())  + std::wstring(L", stop=") +
+    std::to_wstring(stop->getTokenIndex()) + L'}';
 }
+

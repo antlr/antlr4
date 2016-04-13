@@ -50,7 +50,7 @@ ATN::ATN() : ATN(ATNType::LEXER, 0) {
 ATN::ATN(ATNType grammarType, int maxTokenType) : grammarType(grammarType), maxTokenType(maxTokenType) {
 }
 
-misc::IntervalSet ATN::nextTokens(ATNState *s, RuleContext *ctx) const {
+misc::IntervalSet ATN::nextTokens(ATNState *s, RuleContextRef ctx) const {
   LL1Analyzer analyzer(*this);
   return analyzer.LOOK(s, ctx);
 
@@ -95,12 +95,12 @@ int ATN::getNumberOfDecisions() const {
   return (int)decisionToState.size();
 }
 
-misc::IntervalSet ATN::getExpectedTokens(int stateNumber, RuleContext *context) const {
+misc::IntervalSet ATN::getExpectedTokens(int stateNumber, RuleContextRef context) const {
   if (stateNumber < 0 || stateNumber >= (int)states.size()) {
     throw IllegalArgumentException("Invalid state number.");
   }
 
-  RuleContext *ctx = context;
+  RuleContextRef ctx = context;
   ATNState *s = states.at((size_t)stateNumber);
   misc::IntervalSet following = nextTokens(s);
   if (!following.contains(Token::EPSILON)) {
@@ -110,13 +110,17 @@ misc::IntervalSet ATN::getExpectedTokens(int stateNumber, RuleContext *context) 
   misc::IntervalSet expected;
   expected.addAll(following);
   expected.remove(Token::EPSILON);
-  while (ctx != nullptr && ctx->invokingState >= 0 && following.contains(Token::EPSILON)) {
+  while (ctx && ctx->invokingState >= 0 && following.contains(Token::EPSILON)) {
     ATNState *invokingState = states.at((size_t)ctx->invokingState);
     RuleTransition *rt = static_cast<RuleTransition*>(invokingState->transition(0));
     following = nextTokens(rt->followState);
     expected.addAll(following);
     expected.remove(Token::EPSILON);
-    ctx = ctx->parent;
+
+    if (ctx->parent.expired()) {
+      break;
+    }
+    ctx = ctx->parent.lock();
   }
 
   if (following.contains(Token::EPSILON)) {

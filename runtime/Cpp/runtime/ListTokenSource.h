@@ -48,11 +48,8 @@ namespace runtime {
   /// list is reached. Otherwise, an EOF token will be created.
   /// </summary>
   class ListTokenSource : public TokenSource {
-    /// <summary>
-    /// The wrapped collection of <seealso cref="Token"/> objects to return.
-    /// </summary>
   protected:
-    const std::vector<Token *> tokens;
+    const std::vector<TokenRef> tokens;
 
     /// <summary>
     /// The name of the input source. If this value is {@code null}, a call to
@@ -74,14 +71,14 @@ namespace runtime {
     /// <summary>
     /// This field caches the EOF token for the token source.
     /// </summary>
-    Token *eofToken;
+    TokenRef eofToken;
 
     /// <summary>
     /// This is the backing field for <seealso cref="#getTokenFactory"/> and
     /// <seealso cref="setTokenFactory"/>.
     /// </summary>
   private:
-    TokenFactory<CommonToken *> *_factory = CommonTokenFactory::DEFAULT;
+    std::shared_ptr<TokenFactory<CommonToken>> _factory = CommonTokenFactory::DEFAULT;
 
     /// <summary>
     /// Constructs a new <seealso cref="ListTokenSource"/> instance from the specified
@@ -117,43 +114,18 @@ namespace runtime {
 
     }
 
-    /// <summary>
-    /// @inheritDoc
-    /// </summary>
     virtual int getCharPositionInLine() override;
-
-    /// <summary>
-    /// @inheritDoc
-    /// </summary>
-    virtual Token *nextToken() override;
-
-    /// <summary>
-    /// @inheritDoc
-    /// </summary>
+    virtual TokenRef nextToken() override;
     virtual size_t getLine() const override;
-
-    /// <summary>
-    /// @inheritDoc
-    /// </summary>
-    virtual CharStream *getInputStream() override;
-
-    /// <summary>
-    /// @inheritDoc
-    /// </summary>
+    virtual CharStream* getInputStream() override;
     virtual std::string getSourceName() override;
 
-    /// <summary>
-    /// @inheritDoc
-    /// </summary>
     template<typename T1>
     void setTokenFactory(TokenFactory<T1> *factory) {
       this->_factory = factory;
     }
 
-    /// <summary>
-    /// @inheritDoc
-    /// </summary>
-    virtual TokenFactory<CommonToken *> *getTokenFactory() override;
+    virtual std::shared_ptr<TokenFactory<CommonToken>> getTokenFactory() override;
 
   private:
     void InitializeInstanceFields();

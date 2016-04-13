@@ -39,13 +39,13 @@ using namespace org::antlr::v4::runtime;
 
 int ListTokenSource::getCharPositionInLine() {
   if (i < tokens.size()) {
-    return ((Token*)tokens[i])->getCharPositionInLine();
+    return tokens[i]->getCharPositionInLine();
   } else if (eofToken != nullptr) {
     return eofToken->getCharPositionInLine();
   } else if (tokens.size() > 0) {
     // have to calculate the result from the line/column of the previous
     // token, along with the text of the token.
-    Token *lastToken = tokens[tokens.size() - 1];
+    TokenRef lastToken = tokens.back();
     std::wstring tokenText = lastToken->getText();
     if (tokenText != L"") {
       int lastNewLine = (int)tokenText.rfind(L'\n');
@@ -62,26 +62,26 @@ int ListTokenSource::getCharPositionInLine() {
   return 0;
 }
 
-Token *ListTokenSource::nextToken() {
+TokenRef ListTokenSource::nextToken() {
   if (i >= tokens.size()) {
     if (eofToken == nullptr) {
       int start = -1;
       if (tokens.size() > 0) {
-        int previousStop = ((Token*)tokens[tokens.size() - 1])->getStopIndex();
+        int previousStop = tokens.back()->getStopIndex();
         if (previousStop != -1) {
           start = previousStop + 1;
         }
       }
 
       int stop = std::max(-1, start - 1);
-      eofToken = _factory->create(new std::pair<TokenSource*, CharStream*>(this, getInputStream()), EOF,
-                                  L"EOF", Token::DEFAULT_CHANNEL, start, stop, (int)getLine(), getCharPositionInLine());
+      eofToken = std::dynamic_pointer_cast<Token>(_factory->create({ this, getInputStream() }, EOF, L"EOF",
+        Token::DEFAULT_CHANNEL, start, stop, (int)getLine(), getCharPositionInLine()));
     }
 
     return eofToken;
   }
 
-  Token *t = tokens[i];
+  TokenRef t = tokens[i];
   if (i == tokens.size() - 1 && t->getType() == EOF) {
     eofToken = t;
   }
@@ -98,7 +98,7 @@ size_t ListTokenSource::getLine() const {
   } else if (tokens.size() > 0) {
     // have to calculate the result from the line/column of the previous
     // token, along with the text of the token.
-    Token *lastToken = tokens[tokens.size() - 1];
+    TokenRef lastToken = tokens.back();
     int line = lastToken->getLine();
 
     std::wstring tokenText = lastToken->getText();
@@ -145,7 +145,7 @@ std::string ListTokenSource::getSourceName() {
   return "List";
 }
 
-TokenFactory<CommonToken*> *ListTokenSource::getTokenFactory() {
+std::shared_ptr<TokenFactory<CommonToken>> ListTokenSource::getTokenFactory() {
   return _factory;
 }
 

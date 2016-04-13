@@ -68,6 +68,15 @@ namespace antlrcpp {
     return dynamic_cast<T1*>(obj.get()) != nullptr;
   }
 
+  template <typename T>
+  std::wstring toString(const T &o) {
+    std::wstringstream ss;
+    // typeid gives the mangled class name, but that's all what's possible
+    // in a portable way.
+    ss << typeid(o).name() << "@" << std::hex << (size_t)&o;
+    return ss.str();
+  }
+  
 } // namespace antlrcpp
 
 namespace std {

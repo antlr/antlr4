@@ -39,8 +39,43 @@ namespace v4 {
 namespace runtime {
 
   class UnbufferedTokenStream : public TokenStream {
+  public:
+    UnbufferedTokenStream(TokenSource *tokenSource);
+    UnbufferedTokenStream(TokenSource *tokenSource, int bufferSize);
+    virtual ~UnbufferedTokenStream();
+
+    virtual TokenRef get(size_t i) const override;
+    virtual TokenRef LT(ssize_t i) override;
+    virtual ssize_t LA(ssize_t i) override;
+
+    virtual TokenSource* getTokenSource() const override;
+
+    virtual std::wstring getText(const misc::Interval &interval) override;
+    virtual std::wstring getText() override;
+    virtual std::wstring getText(RuleContext *ctx) override;
+    virtual std::wstring getText(TokenRef start, TokenRef stop) override;
+
+    virtual void consume() override;
+
+    /// <summary>
+    /// Return a marker that we can release later.
+    /// <p/>
+    /// The specific marker value used for this class allows for some level of
+    /// protection against misuse where {@code seek()} is called on a mark or
+    /// {@code release()} is called in the wrong order.
+    /// </summary>
+    virtual ssize_t mark() override;
+    virtual void release(ssize_t marker) override;
+    virtual size_t index() override;
+    virtual void seek(size_t index) override;
+    virtual size_t size() override;
+    virtual std::string getSourceName() const override;
+
   protected:
-    TokenSource *tokenSource;
+    /// Make sure we have 'need' elements from current position p. Last valid
+    /// p index is tokens.length - 1.  p + need - 1 is the tokens index 'need' elements
+    /// ahead.  If we need 1 element, (p+1-1)==p must be less than tokens.length.
+    TokenSource *_tokenSource;
 
     /// <summary>
     /// A moving window buffer of the data being scanned. While there's a marker,
@@ -48,7 +83,7 @@ namespace runtime {
     /// we start filling at index 0 again.
     /// </summary>
 
-    std::vector<Token *> tokens;
+    std::vector<TokenRef> _tokens;
 
     /// <summary>
     /// 0..n-1 index into <seealso cref="#tokens tokens"/> of next token.
@@ -56,7 +91,7 @@ namespace runtime {
     /// The {@code LT(1)} token is {@code tokens[p]}. If {@code p == n}, we are
     /// out of buffered tokens.
     /// </summary>
-    size_t p;
+    size_t _p;
 
     /// <summary>
     /// Count up with <seealso cref="#mark mark()"/> and down with
@@ -64,18 +99,18 @@ namespace runtime {
     /// {@code numMarkers} reaches 0 and we reset the buffer. Copy
     /// {@code tokens[p]..tokens[n-1]} to {@code tokens[0]..tokens[(n-1)-p]}.
     /// </summary>
-    int numMarkers;
+    int _numMarkers;
 
     /// <summary>
     /// This is the {@code LT(-1)} token for the current position.
     /// </summary>
-    Token *lastToken;
+    TokenRef _lastToken;
 
     /// <summary>
     /// When {@code numMarkers > 0}, this is the {@code LT(-1)} token for the
     /// first token in <seealso cref="#tokens"/>. Otherwise, this is {@code null}.
     /// </summary>
-    Token *lastTokenBufferStart;
+    TokenRef _lastTokenBufferStart;
 
     /// <summary>
     /// Absolute token index. It's the index of the token about to be read via
@@ -85,31 +120,8 @@ namespace runtime {
     /// This value is used to set the token indexes if the stream provides tokens
     /// that implement <seealso cref="WritableToken"/>.
     /// </summary>
-    size_t currentTokenIndex;
-
-  public:
-    UnbufferedTokenStream(TokenSource *tokenSource);
-    UnbufferedTokenStream(TokenSource *tokenSource, int bufferSize);
-
-    virtual Token *get(size_t i) const override;
-    virtual Token *LT(ssize_t i) override;
-    virtual ssize_t LA(ssize_t i) override;
-
-    virtual TokenSource *getTokenSource() const override;
-
-    virtual std::wstring getText(const misc::Interval &interval) override;
-    virtual std::wstring getText() override;
-    virtual std::wstring getText(RuleContext *ctx) override;
-    virtual std::wstring getText(Token *start, Token *stop) override;
-
-    virtual void consume() override;
-
-    /// <summary>
-    /// Make sure we have 'need' elements from current position <seealso cref="#p p"/>. Last valid
-    ///  {@code p} index is {@code tokens.length-1}.  {@code p+need-1} is the tokens index 'need' elements
-    ///  ahead.  If we need 1 element, {@code (p+1-1)==p} must be less than {@code tokens.length}.
-    /// </summary>
-  protected:
+    size_t _currentTokenIndex;
+    
     virtual void sync(ssize_t want);
 
     /// <summary>
@@ -118,24 +130,8 @@ namespace runtime {
     /// then EOF was reached before {@code n} tokens could be added.
     /// </summary>
     virtual size_t fill(size_t n);
-    virtual void add(Token *t);
+    virtual void add(TokenRef t);
 
-    /// <summary>
-    /// Return a marker that we can release later.
-    /// <p/>
-    /// The specific marker value used for this class allows for some level of
-    /// protection against misuse where {@code seek()} is called on a mark or
-    /// {@code release()} is called in the wrong order.
-    /// </summary>
-  public:
-    virtual ssize_t mark() override;
-    virtual void release(ssize_t marker) override;
-    virtual size_t index() override;
-    virtual void seek(size_t index) override;
-    virtual size_t size() override;
-    virtual std::string getSourceName() const override;
-
-  protected:
     size_t getBufferStartIndex() const;
 
   private:

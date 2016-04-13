@@ -53,19 +53,20 @@ namespace runtime {
     /// The Recognizer where this exception originated.
     IRecognizer *_recognizer;
     IntStream *_input;
-    RuleContext *_ctx;
+    RuleContextRef _ctx;
 
     /// The current Token when an error occurred. Since not all streams
     /// support accessing symbols by index, we have to track the Token
     /// instance itself.
-    Token *_offendingToken;
+    TokenRef _offendingToken;
 
     int _offendingState;
 
   public:
-    RecognitionException(IRecognizer *recognizer, IntStream *input, ParserRuleContext *ctx, Token *offendingToken = nullptr);
-    RecognitionException(const std::string &message, IRecognizer *recognizer, IntStream *input, ParserRuleContext *ctx,
-                         Token *offendingToken = nullptr);
+    RecognitionException(IRecognizer *recognizer, IntStream *input, ParserRuleContextRef ctx,
+                         TokenRef offendingToken = TokenRef());
+    RecognitionException(const std::string &message, IRecognizer *recognizer, IntStream *input,
+                         ParserRuleContextRef ctx, TokenRef offendingToken = TokenRef());
 
     /// Get the ATN state number the parser was in at the time the error
     /// occurred. For NoViableAltException and
@@ -97,7 +98,7 @@ namespace runtime {
     /// </summary>
     /// <returns> The <seealso cref="RuleContext"/> at the time this exception was thrown.
     /// If the context is not available, this method returns {@code null}. </returns>
-    virtual RuleContext* getCtx() const;
+    virtual RuleContextRef getCtx() const;
 
     /// <summary>
     /// Gets the input stream which is the symbol source for the recognizer where
@@ -110,7 +111,7 @@ namespace runtime {
     /// available. </returns>
     virtual IntStream* getInputStream() const;
 
-    virtual Token* getOffendingToken() const;
+    virtual TokenRef getOffendingToken() const;
 
     /// <summary>
     /// Gets the <seealso cref="Recognizer"/> where this exception occurred.

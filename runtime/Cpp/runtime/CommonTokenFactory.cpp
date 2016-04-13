@@ -37,7 +37,7 @@
 
 using namespace org::antlr::v4::runtime;
 
-TokenFactory<CommonToken*> *const CommonTokenFactory::DEFAULT = new CommonTokenFactory();
+const std::shared_ptr<TokenFactory<CommonToken>> CommonTokenFactory::DEFAULT = std::make_shared<CommonTokenFactory>();
 
 CommonTokenFactory::CommonTokenFactory(bool copyText) : copyText(copyText) {
 }
@@ -45,19 +45,21 @@ CommonTokenFactory::CommonTokenFactory(bool copyText) : copyText(copyText) {
 CommonTokenFactory::CommonTokenFactory() : CommonTokenFactory(false) {
 }
 
-CommonToken *CommonTokenFactory::create(std::pair<TokenSource*, CharStream*> *source, int type, const std::wstring &text, int channel, int start, int stop, int line, int charPositionInLine) {
-  CommonToken *t = new CommonToken(source, type, channel, start, stop);
+std::shared_ptr<CommonToken> CommonTokenFactory::create(std::pair<TokenSource*, CharStream*> source, int type,
+  const std::wstring &text, int channel, int start, int stop, int line, int charPositionInLine) {
+
+  std::shared_ptr<CommonToken> t = std::make_shared<CommonToken>(source, type, channel, start, stop);
   t->setLine(line);
   t->setCharPositionInLine(charPositionInLine);
   if (text != L"") {
     t->setText(text);
-  } else if (copyText && source->second != nullptr) {
-    t->setText(source->second->getText(misc::Interval(start, stop)));
+  } else if (copyText && source.second != nullptr) {
+    t->setText(source.second->getText(misc::Interval(start, stop)));
   }
 
   return t;
 }
 
-org::antlr::v4::runtime::CommonToken *CommonTokenFactory::create(int type, const std::wstring &text) {
-  return new CommonToken(type, text);
+std::shared_ptr<CommonToken> CommonTokenFactory::create(int type, const std::wstring &text) {
+  return std::make_shared<CommonToken>(type, text);
 }

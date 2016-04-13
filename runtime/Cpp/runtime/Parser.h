@@ -51,10 +51,10 @@ namespace runtime {
       TraceListener(Parser *outerInstance);
       virtual ~TraceListener() {};
 
-      virtual void enterEveryRule(ParserRuleContext *ctx) override;
-      virtual void visitTerminal(tree::TerminalNode *node) override;
-      virtual void visitErrorNode(tree::ErrorNode *node) override;
-      virtual void exitEveryRule(ParserRuleContext *ctx) override;
+      virtual void enterEveryRule(ParserRuleContextRef ctx) override;
+      virtual void visitTerminal(std::shared_ptr<tree::TerminalNode> node) override;
+      virtual void visitErrorNode(std::shared_ptr<tree::ErrorNode> node) override;
+      virtual void exitEveryRule(ParserRuleContextRef ctx) override;
 
     private:
       Parser *const outerInstance;
@@ -62,19 +62,13 @@ namespace runtime {
 
     class TrimToSizeListener : public tree::ParseTreeListener {
     public:
-      static TrimToSizeListener *const INSTANCE;
+      static const std::shared_ptr<TrimToSizeListener> INSTANCE;
 
-      virtual void enterEveryRule(ParserRuleContext *ctx) override;
-      virtual void visitTerminal(tree::TerminalNode *node) override;
-      virtual void visitErrorNode(tree::ErrorNode *node) override;
-      virtual void exitEveryRule(ParserRuleContext *ctx) override;
+      virtual void enterEveryRule(ParserRuleContextRef ctx) override;
+      virtual void visitTerminal(std::shared_ptr<tree::TerminalNode> node) override;
+      virtual void visitErrorNode(std::shared_ptr<tree::ErrorNode> node) override;
+      virtual void exitEveryRule(ParserRuleContextRef ctx) override;
     };
-
-    /// <summary>
-    /// The <seealso cref="ParserRuleContext"/> object for the currently executing rule.
-    /// This is always non-null during the parsing process.
-    /// </summary>
-    ParserRuleContext *ctx;
 
     Parser(TokenStream *input);
     virtual ~Parser();
@@ -100,7 +94,7 @@ namespace runtime {
     /// <exception cref="RecognitionException"> if the current input symbol did not match
     /// {@code ttype} and the error strategy could not recover from the
     /// mismatched symbol </exception>
-    virtual Token *match(int ttype);
+    virtual TokenRef match(int ttype);
 
     /// <summary>
     /// Match current input symbol as a wildcard. If the symbol type matches
@@ -118,7 +112,7 @@ namespace runtime {
     /// <exception cref="RecognitionException"> if the current input symbol did not match
     /// a wildcard and the error strategy could not recover from the mismatched
     /// symbol </exception>
-    virtual Token *matchWildcard();
+    virtual TokenRef matchWildcard();
 
     /// <summary>
     /// Track the <seealso cref="ParserRuleContext"/> objects during the parse and hook
@@ -157,7 +151,7 @@ namespace runtime {
     /// using the default <seealso cref="Parser.TrimToSizeListener"/> during the parse process. </returns>
     virtual bool getTrimParseTree();
 
-    virtual std::vector<tree::ParseTreeListener*> getParseListeners();
+    virtual std::vector<std::shared_ptr<tree::ParseTreeListener>> getParseListeners();
 
     /// <summary>
     /// Registers {@code listener} to receive events during the parsing process.
@@ -187,7 +181,7 @@ namespace runtime {
     /// <param name="listener"> the listener to add
     /// </param>
     /// <exception cref="NullPointerException"> if {@code} listener is {@code null} </exception>
-    virtual void addParseListener(tree::ParseTreeListener *listener);
+    virtual void addParseListener(std::shared_ptr<tree::ParseTreeListener> listener);
 
     /// <summary>
     /// Remove {@code listener} from the list of parse listeners.
@@ -198,7 +192,7 @@ namespace runtime {
     /// <seealso cref= #addParseListener
     /// </seealso>
     /// <param name="listener"> the listener to remove </param>
-    virtual void removeParseListener(tree::ParseTreeListener *listener);
+    virtual void removeParseListener(std::shared_ptr<tree::ParseTreeListener> listener);
 
     /// <summary>
     /// Remove all parse listeners.
@@ -225,7 +219,7 @@ namespace runtime {
     /// <seealso cref= #notifyErrorListeners </seealso>
     virtual int getNumberOfSyntaxErrors();
 
-    virtual TokenFactory<CommonToken*> *getTokenFactory() override;
+    virtual std::shared_ptr<TokenFactory<CommonToken>> getTokenFactory() override;
 
     /// <summary>
     /// Tell our token source and error strategy about a new way to create tokens. </summary>
@@ -249,35 +243,35 @@ namespace runtime {
     /// String id = m.get("ID");
     /// </pre>
     /// </summary>
-    virtual tree::pattern::ParseTreePattern *compileParseTreePattern(const std::wstring &pattern, int patternRuleIndex);
+    virtual tree::pattern::ParseTreePattern compileParseTreePattern(const std::wstring &pattern, int patternRuleIndex);
 
     /// <summary>
     /// The same as <seealso cref="#compileParseTreePattern(String, int)"/> but specify a
     /// <seealso cref="Lexer"/> rather than trying to deduce it from this parser.
     /// </summary>
-    virtual tree::pattern::ParseTreePattern *compileParseTreePattern(const std::wstring &pattern, int patternRuleIndex, Lexer *lexer);
+    virtual tree::pattern::ParseTreePattern compileParseTreePattern(const std::wstring &pattern, int patternRuleIndex,
+                                                                    Lexer *lexer);
 
     virtual std::shared_ptr<ANTLRErrorStrategy> getErrorHandler();
     virtual void setErrorHandler(std::shared_ptr<ANTLRErrorStrategy> handler);
 
-    virtual TokenStream *getInputStream() override;
+    virtual IntStream* getInputStream() override;
     void setInputStream(IntStream *input) override;
 
-    virtual TokenStream *getTokenStream();
+    virtual TokenStream* getTokenStream();
 
-    /// <summary>
-    /// Set the token stream and reset the parser. </summary>
+    /// Set the token stream and reset the parser.
     virtual void setTokenStream(TokenStream *input);
 
     /// <summary>
     /// Match needs to return the current input symbol, which gets put
     ///  into the label for the associated token ref; e.g., x=ID.
     /// </summary>
-    virtual Token *getCurrentToken();
+    virtual TokenRef getCurrentToken();
 
     void notifyErrorListeners(const std::wstring &msg);
 
-    virtual void notifyErrorListeners(Token *offendingToken, const std::wstring &msg, std::exception_ptr e);
+    virtual void notifyErrorListeners(TokenRef offendingToken, const std::wstring &msg, std::exception_ptr e);
 
     /// <summary>
     /// Consume and return the <seealso cref="#getCurrentToken current symbol"/>.
@@ -300,38 +294,37 @@ namespace runtime {
     /// <seealso cref="ParseTreeListener#visitErrorNode"/> is called on any parse
     /// listeners.
     /// </summary>
-    virtual Token *consume();
+    virtual TokenRef consume();
     
     /// <summary>
     /// Always called by generated parsers upon entry to a rule. Access field
     /// <seealso cref="#_ctx"/> get the current context.
     /// </summary>
-    virtual void enterRule(ParserRuleContext *localctx, int state, int ruleIndex);
+    virtual void enterRule(ParserRuleContextRef localctx, int state, int ruleIndex);
 
     virtual void exitRule();
 
-    virtual void enterOuterAlt(ParserRuleContext *localctx, int altNum);
+    virtual void enterOuterAlt(ParserRuleContextRef localctx, int altNum);
 
     /// @deprecated Use
     /// <seealso cref="#enterRecursionRule(ParserRuleContext, int, int, int)"/> instead.
-    virtual void enterRecursionRule(ParserRuleContext *localctx, int ruleIndex);
-
-    virtual void enterRecursionRule(ParserRuleContext *localctx, int state, int ruleIndex, int precedence);
+    virtual void enterRecursionRule(ParserRuleContextRef localctx, int ruleIndex);
+    virtual void enterRecursionRule(ParserRuleContextRef localctx, int state, int ruleIndex, int precedence);
 
     /// <summary>
     /// Like <seealso cref="#enterRule"/> but for recursive rules.
     /// </summary>
-    virtual void pushNewRecursionContext(ParserRuleContext *localctx, int state, int ruleIndex);
+    virtual void pushNewRecursionContext(ParserRuleContextRef localctx, int state, int ruleIndex);
 
-    virtual void unrollRecursionContexts(ParserRuleContext *_parentctx);
+    virtual void unrollRecursionContexts(ParserRuleContextRef parentctx);
 
-    virtual ParserRuleContext *getInvokingContext(int ruleIndex);
+    virtual ParserRuleContextRef getInvokingContext(int ruleIndex);
 
-    virtual ParserRuleContext *getContext();
+    virtual std::shared_ptr<ParserRuleContext> getContext();
 
-    virtual void setContext(ParserRuleContext *ctx);
+    virtual void setContext(ParserRuleContextRef ctx);
 
-    virtual bool precpred(RuleContext *localctx, int precedence) override;
+    virtual bool precpred(RuleContextRef localctx, int precedence) override;
 
     virtual bool inContext(const std::wstring &context);
 
@@ -364,7 +357,7 @@ namespace runtime {
     /// Get a rule's index (i.e., {@code RULE_ruleName} field) or -1 if not found. </summary>
     virtual int getRuleIndex(const std::wstring &ruleName);
 
-    virtual ParserRuleContext *getRuleContext();
+    virtual ParserRuleContextRef getRuleContext();
 
     /// <summary>
     /// Return List&lt;String&gt; of the rule names in your parser instance
@@ -376,7 +369,7 @@ namespace runtime {
     /// </summary>
     virtual std::vector<std::wstring> getRuleInvocationStack();
 
-    virtual std::vector<std::wstring> getRuleInvocationStack(RuleContext *p);
+    virtual std::vector<std::wstring> getRuleInvocationStack(RuleContextRef p);
 
     /// <summary>
     /// For debugging and other purposes. </summary>
@@ -395,6 +388,10 @@ namespace runtime {
     virtual void setTrace(bool trace);
     
   protected:
+    /// The ParserRuleContext object for the currently executing rule.
+    /// This is always non-null during the parsing process.
+    ParserRuleContextRef _ctx;
+
     /// The error handling strategy for the parser. The default is DefaultErrorStrategy.
     /// See also getErrorHandler.
     std::shared_ptr<ANTLRErrorStrategy> _errHandler;
@@ -423,7 +420,7 @@ namespace runtime {
     /// events during the parse.
     /// </summary>
     /// <seealso cref= #addParseListener </seealso>
-    std::vector<tree::ParseTreeListener*> _parseListeners;
+    std::vector<std::shared_ptr<tree::ParseTreeListener>> _parseListeners;
 
     /// <summary>
     /// The number of syntax errors reported during parsing. This value is
@@ -434,10 +431,9 @@ namespace runtime {
     virtual void addContextToParseTree();
 
   private:
-    /// <summary>
     /// This field maps from the serialized ATN string to the deserialized <seealso cref="ATN"/> with
     /// bypass alternatives.
-    /// </summary>
+    ///
     /// <seealso cref= ATNDeserializationOptions#isGenerateRuleBypassTransitions() </seealso>
     static std::map<std::wstring, atn::ATN> bypassAltsAtnCache;
 
@@ -446,7 +442,7 @@ namespace runtime {
     /// later call to setTrace(false). The listener itself is
     /// implemented as a parser listener so this field is not directly used by
     /// other parser methods.
-    TraceListener _tracer;
+    std::shared_ptr<TraceListener> _tracer;
 
     void InitializeInstanceFields();
   };

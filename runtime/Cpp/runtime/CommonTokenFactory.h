@@ -38,9 +38,9 @@ namespace antlr {
 namespace v4 {
 namespace runtime {
 
-  class CommonTokenFactory : public TokenFactory<CommonToken*> {
+  class CommonTokenFactory : public TokenFactory<CommonToken> {
   public:
-    static TokenFactory<CommonToken*> *const DEFAULT;
+    static const std::shared_ptr<TokenFactory<CommonToken>> DEFAULT;
 
     /// <summary>
     /// Copy text for token out of input char stream. Useful when input
@@ -49,18 +49,17 @@ namespace runtime {
   protected:
     const bool copyText;
 
-    /// <summary>
+  public:
     /// Create factory and indicate whether or not the factory copy
     ///  text out of the char stream.
-    /// </summary>
-  public:
     CommonTokenFactory(bool copyText);
 
     CommonTokenFactory();
 
-    virtual CommonToken *create(std::pair<TokenSource*, CharStream*> *source, int type, const std::wstring &text, int channel, int start, int stop, int line, int charPositionInLine) override;
+    virtual std::shared_ptr<CommonToken> create(std::pair<TokenSource*, CharStream*> source, int type,
+      const std::wstring &text, int channel, int start, int stop, int line, int charPositionInLine) override;
 
-    virtual CommonToken *create(int type, const std::wstring &text) override;
+    virtual std::shared_ptr<CommonToken> create(int type, const std::wstring &text) override;
   };
 
 } // namespace runtime

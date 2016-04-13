@@ -38,12 +38,13 @@
 
 using namespace org::antlr::v4::runtime;
 
-RecognitionException::RecognitionException(IRecognizer *recognizer, IntStream *input, ParserRuleContext *ctx, Token *offendingToken)
+RecognitionException::RecognitionException(IRecognizer *recognizer, IntStream *input,
+  ParserRuleContextRef ctx, TokenRef offendingToken)
   : RecognitionException("", recognizer, input, ctx, offendingToken) {
 }
 
 RecognitionException::RecognitionException(const std::string &message, IRecognizer *recognizer, IntStream *input,
-                                           ParserRuleContext *ctx, Token *offendingToken)
+                                           ParserRuleContextRef ctx, TokenRef offendingToken)
   : RuntimeException(message), _recognizer(recognizer), _input(input), _offendingToken(offendingToken), _ctx(ctx) {
   InitializeInstanceFields();
   if (recognizer != nullptr) {
@@ -66,7 +67,7 @@ misc::IntervalSet RecognitionException::getExpectedTokens() const {
   return misc::IntervalSet::EMPTY_SET;
 }
 
-RuleContext* RecognitionException::getCtx() const {
+RuleContextRef RecognitionException::getCtx() const {
   return _ctx;
 }
 
@@ -74,7 +75,7 @@ IntStream* RecognitionException::getInputStream() const {
   return _input;
 }
 
-Token* RecognitionException::getOffendingToken() const {
+TokenRef RecognitionException::getOffendingToken() const {
   return _offendingToken;
 }
 

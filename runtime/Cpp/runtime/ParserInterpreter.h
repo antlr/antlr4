@@ -67,9 +67,9 @@ namespace runtime {
     virtual std::wstring getGrammarFileName() const override;
 
     /// Begin parsing at startRuleIndex
-    virtual ParserRuleContext *parse(int startRuleIndex);
+    virtual ParserRuleContextRef parse(int startRuleIndex);
 
-    virtual void enterRecursionRule(ParserRuleContext *localctx, int state, int ruleIndex, int precedence) override;
+    virtual void enterRecursionRule(ParserRuleContextRef localctx, int state, int ruleIndex, int precedence) override;
 
   protected:
     const std::wstring _grammarFileName;
@@ -82,7 +82,7 @@ namespace runtime {
     std::vector<dfa::DFA *> _decisionToDFA; // not shared like it is for generated parsers
     std::shared_ptr<atn::PredictionContextCache> _sharedContextCache;
 
-    std::stack<std::pair<ParserRuleContext*, int>> _parentContextStack;
+    std::stack<std::pair<ParserRuleContextRef, int>> _parentContextStack;
     
     virtual atn::ATNState *getATNState();
     virtual void visitState(atn::ATNState *p);

@@ -66,13 +66,13 @@ namespace tree {
     /// </summary>
     virtual T* visitChildren(RuleNode *node) override {
       T* result = defaultResult();
-      int n = node->getChildCount();
+      size_t n = node->getChildCount();
       for (size_t i = 0; i < n; i++) {
         if (!shouldVisitNextChild(node, result)) {
           break;
         }
 
-        ParseTree *c = node->getChild(i);
+        std::shared_ptr<ParseTree> c = node->getChild(i);
         T childResult = c->accept(this);
         result = aggregateResult(result, childResult);
       }

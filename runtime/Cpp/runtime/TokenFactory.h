@@ -36,12 +36,9 @@ namespace antlr {
 namespace v4 {
 namespace runtime {
 
-  /// <summary>
   /// The default mechanism for creating tokens. It's used by default in Lexer and
   ///  the error handling strategy (to create missing tokens).  Notifying the parser
   ///  of a new factory means that it notifies it's token source and error strategy.
-  /// </summary>
-
   template<typename Symbol>
   class TokenFactory {
     /// <summary>
@@ -50,11 +47,10 @@ namespace runtime {
     ///  are wiped to -1 in the text override is set in the CommonToken.
     /// </summary>
   public:
-    virtual Symbol create(std::pair<TokenSource*, CharStream*> *source, int type, const std::wstring &text, int channel, int start, int stop, int line, int charPositionInLine) = 0;
+    virtual std::shared_ptr<Symbol> create(std::pair<TokenSource*, CharStream*> source, int type, const std::wstring &text, int channel, int start, int stop, int line, int charPositionInLine) = 0;
 
-    /// <summary>
-    /// Generically useful </summary>
-    virtual Symbol create(int type, const std::wstring &text) = 0;
+    /// Generically useful
+    virtual std::shared_ptr<Symbol> create(int type, const std::wstring &text) = 0;
   };
 
 } // namespace runtime

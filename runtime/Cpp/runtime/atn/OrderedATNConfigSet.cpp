@@ -33,6 +33,6 @@
 
 using namespace org::antlr::v4::runtime::atn;
 
-OrderedATNConfigSet::OrderedATNConfigSet()
-: ATNConfigSet(true, std::shared_ptr<ConfigLookup>(new ConfigLookupImpl<OrderedATNConfigHasher, OrderedATNConfigComparer>())) {
+OrderedATNConfigSet::OrderedATNConfigSet() : ATNConfigSet() {
+  configLookup = std::shared_ptr<ConfigLookup>(new ConfigLookupImpl<OrderedATNConfigHasher, OrderedATNConfigComparer>());
 }

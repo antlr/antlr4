@@ -58,13 +58,13 @@ namespace runtime {
   ///  ParserRuleContext.
   /// </summary>
   ///  <seealso cref= ParserRuleContext </seealso>
-  class RuleContext : public tree::RuleNode {
+  class RuleContext : public tree::RuleNode, public std::enable_shared_from_this<RuleContext> {
   public:
-    static ParserRuleContext *const EMPTY;
+    static const ParserRuleContextRef EMPTY;
 
     /// <summary>
     /// What context invoked this rule? </summary>
-    RuleContext *parent;
+    std::weak_ptr<RuleContext> parent;
 
     /// <summary>
     /// What state invoked the rule associated with this context?
@@ -75,27 +75,21 @@ namespace runtime {
 
     RuleContext();
 
-    RuleContext(RuleContext *parent, int invokingState);
+    RuleContext(std::weak_ptr<RuleContext> parent, int invokingState);
 
     virtual int depth();
 
-    /// <summary>
-    /// A context is empty if there is no invoking state; meaning nobody call
-    ///  current context.
-    /// </summary>
+    /// A context is empty if there is no invoking state; meaning nobody call current context.
     virtual bool isEmpty();
 
     // satisfy the ParseTree / SyntaxTree interface
 
     virtual misc::Interval getSourceInterval() override;
 
-    virtual RuleContext *getRuleContext() override;
-    virtual RuleContext *getParent() override;
+    virtual RuleContextRef getRuleContext() override;
     virtual std::wstring getText() override;
 
     virtual ssize_t getRuleIndex() const;
-
-    virtual ParseTree *getChild(std::size_t i) override;
 
     virtual std::size_t getChildCount() override;
 
@@ -139,9 +133,15 @@ namespace runtime {
     std::wstring toString(const std::vector<std::wstring> &ruleNames);
 
     // recog null unless ParserRuleContext, in which case we use subclass toString(...)
-    std::wstring toString(Recognizer *recog, RuleContext *stop);
+    std::wstring toString(Recognizer *recog, RuleContextRef stop);
 
-    virtual std::wstring toString(const std::vector<std::wstring> &ruleNames, RuleContext *stop);
+    virtual std::wstring toString(const std::vector<std::wstring> &ruleNames, RuleContextRef stop);
+
+    bool operator == (const RuleContext &other) { return this == &other; } // Simple address comparison.
+    
+  protected:
+    virtual std::weak_ptr<Tree> getParentReference() override;
+    virtual std::shared_ptr<Tree> getChildReference(size_t i) override;
 
   private:
     void InitializeInstanceFields();

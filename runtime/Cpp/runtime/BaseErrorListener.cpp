@@ -34,16 +34,16 @@
 
 using namespace org::antlr::v4::runtime;
 
-void BaseErrorListener::syntaxError(IRecognizer *recognizer, Token *offendingSymbol, size_t line, int charPositionInLine,
+void BaseErrorListener::syntaxError(IRecognizer *recognizer, TokenRef offendingSymbol, size_t line, int charPositionInLine,
                                     const std::wstring &msg, std::exception_ptr e) {
 }
 
 void BaseErrorListener::reportAmbiguity(Parser *recognizer, dfa::DFA *dfa, size_t startIndex, size_t stopIndex,
-  bool exact, antlrcpp::BitSet *ambigAlts, std::shared_ptr<atn::ATNConfigSet> configs) {
+  bool exact, const antlrcpp::BitSet &ambigAlts, std::shared_ptr<atn::ATNConfigSet> configs) {
 }
 
 void BaseErrorListener::reportAttemptingFullContext(Parser *recognizer, dfa::DFA *dfa, size_t startIndex,
-  size_t stopIndex, antlrcpp::BitSet *conflictingAlts, std::shared_ptr<atn::ATNConfigSet> configs) {
+  size_t stopIndex, const antlrcpp::BitSet &conflictingAlts, std::shared_ptr<atn::ATNConfigSet> configs) {
 }
 
 void BaseErrorListener::reportContextSensitivity(Parser *recognizer, dfa::DFA *dfa, size_t startIndex, size_t stopIndex,

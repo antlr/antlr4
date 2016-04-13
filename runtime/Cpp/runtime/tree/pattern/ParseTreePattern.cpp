@@ -38,15 +38,17 @@
 using namespace org::antlr::v4::runtime::tree;
 using namespace org::antlr::v4::runtime::tree::pattern;
 
-ParseTreePattern::ParseTreePattern(ParseTreePatternMatcher *matcher, const std::wstring &pattern, int patternRuleIndex, ParseTree *patternTree) : patternRuleIndex(patternRuleIndex), pattern(pattern), patternTree(patternTree), matcher(matcher) {
+ParseTreePattern::ParseTreePattern(ParseTreePatternMatcher *matcher, const std::wstring &pattern, int patternRuleIndex,
+  std::shared_ptr<ParseTree> patternTree)
+  : patternRuleIndex(patternRuleIndex), pattern(pattern), patternTree(patternTree), matcher(matcher) {
 }
 
-ParseTreeMatch *ParseTreePattern::match(ParseTree *tree) {
-  return matcher->match(tree, this);
+ParseTreeMatch ParseTreePattern::match(std::shared_ptr<ParseTree> tree) {
+  return matcher->match(tree, *this);
 }
 
-bool ParseTreePattern::matches(ParseTree *tree) {
-  return matcher->match(tree, this)->succeeded();
+bool ParseTreePattern::matches(std::shared_ptr<ParseTree> tree) {
+  return matcher->match(tree, *this).succeeded();
 }
 
 /*
@@ -63,18 +65,18 @@ std::vector<ParseTreeMatch*> ParseTreePattern::findAll(ParseTree *tree, const st
 }
 */
 
-ParseTreePatternMatcher *ParseTreePattern::getMatcher() {
+ParseTreePatternMatcher *ParseTreePattern::getMatcher() const {
   return matcher;
 }
 
-std::wstring ParseTreePattern::getPattern() {
+std::wstring ParseTreePattern::getPattern() const {
   return pattern;
 }
 
-int ParseTreePattern::getPatternRuleIndex() {
+int ParseTreePattern::getPatternRuleIndex() const {
   return patternRuleIndex;
 }
 
-ParseTree *ParseTreePattern::getPatternTree() {
+std::shared_ptr<ParseTree> ParseTreePattern::getPatternTree() const {
   return patternTree;
 }
