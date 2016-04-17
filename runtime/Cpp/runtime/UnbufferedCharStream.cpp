@@ -85,7 +85,7 @@ size_t UnbufferedCharStream::fill(size_t n) {
       size_t c = nextChar();
       add(c);
     } catch (IOException &ioe) {
-      throw std::exception(ioe);
+      std::throw_with_nested(RuntimeException());
     }
   }
 

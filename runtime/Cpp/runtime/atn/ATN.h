@@ -31,6 +31,8 @@
 
 #pragma once
 
+#include "RuleContext.h"
+
 namespace org {
 namespace antlr {
 namespace v4 {
@@ -43,7 +45,7 @@ namespace atn {
 
     /// Used for runtime deserialization of ATNs from strings.
     ATN();
-    ATN(ATNType grammarType, int maxTokenType);
+    ATN(ATNType grammarType, size_t maxTokenType);
 
     std::vector<ATNState*> states;
 
@@ -62,7 +64,7 @@ namespace atn {
     ATNType grammarType;
 
     /// The maximum value for any symbol recognized by a transition in the ATN.
-    int maxTokenType;
+    size_t maxTokenType;
 
     /// <summary>
     /// For lexer ATNs, this maps the rule index to the resulting token type.
@@ -89,7 +91,7 @@ namespace atn {
     ///  the rule surrounding {@code s}. In other words, the set will be
     ///  restricted to tokens reachable staying within {@code s}'s rule.
     /// </summary>
-    virtual misc::IntervalSet nextTokens(ATNState *s, RuleContextRef ctx) const;
+    virtual misc::IntervalSet nextTokens(ATNState *s, RuleContext::Ref ctx) const;
 
     /// <summary>
     /// Compute the set of valid tokens that can occur starting in {@code s} and
@@ -126,7 +128,9 @@ namespace atn {
     /// specified state in the specified context. </returns>
     /// <exception cref="IllegalArgumentException"> if the ATN does not contain a state with
     /// number {@code stateNumber} </exception>
-    virtual misc::IntervalSet getExpectedTokens(int stateNumber, RuleContextRef context) const;
+    virtual misc::IntervalSet getExpectedTokens(int stateNumber, RuleContext::Ref context) const;
+
+    std::wstring toString() const;
   };
   
 } // namespace atn

@@ -49,5 +49,5 @@ bool EpsilonTransition::matches(int symbol, int minVocabSymbol, int maxVocabSymb
 }
 
 std::wstring EpsilonTransition::toString() const {
-  return L"epsilon";
+  return L"EPSILON " + Transition::toString() + L" {}";
 }

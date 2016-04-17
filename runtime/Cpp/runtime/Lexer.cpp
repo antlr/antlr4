@@ -66,7 +66,7 @@ void Lexer::reset() {
   getInterpreter<atn::LexerATNSimulator>()->reset();
 }
 
-TokenRef Lexer::nextToken() {
+Token::Ref Lexer::nextToken() {
   // Mark start location in char stream so unbuffered streams are
   // guaranteed at least have text of current token
   ssize_t tokenStartMarker = _input->mark();
@@ -167,18 +167,18 @@ CharStream* Lexer::getInputStream() {
   return _input;
 }
 
-void Lexer::emit(TokenRef token) {
+void Lexer::emit(Token::Ref token) {
   _token = token;
 }
 
-TokenRef Lexer::emit() {
-  TokenRef t = std::dynamic_pointer_cast<Token>(_factory->create({ this, _input }, _type, _text, _channel,
+Token::Ref Lexer::emit() {
+  Token::Ref t = std::dynamic_pointer_cast<Token>(_factory->create({ this, _input }, _type, _text, _channel,
     _tokenStartCharIndex, getCharIndex() - 1, _tokenStartLine, _tokenStartCharPositionInLine));
   emit(t);
   return t;
 }
 
-TokenRef Lexer::emitEOF() {
+Token::Ref Lexer::emitEOF() {
   int cpos = getCharPositionInLine();
   // The character position for EOF is one beyond the position of
   // the previous token's last character
@@ -186,7 +186,7 @@ TokenRef Lexer::emitEOF() {
     int n = _token->getStopIndex() - _token->getStartIndex() + 1;
     cpos = _token->getCharPositionInLine() + n;
   }
-  TokenRef eof = std::dynamic_pointer_cast<Token>(_factory->create({ this, _input }, EOF, L"", Token::DEFAULT_CHANNEL,
+  Token::Ref eof = std::dynamic_pointer_cast<Token>(_factory->create({ this, _input }, EOF, L"", Token::DEFAULT_CHANNEL,
     (int)_input->index(), (int)_input->index() - 1, (int)getLine(), cpos));
   emit(eof);
   return eof;
@@ -223,11 +223,11 @@ void Lexer::setText(const std::wstring &text) {
   this->_text = text;
 }
 
-TokenRef Lexer::getToken() {
+Token::Ref Lexer::getToken() {
   return _token;
 }
 
-void Lexer::setToken(TokenRef token) {
+void Lexer::setToken(Token::Ref token) {
   _token = token;
 }
 
@@ -247,9 +247,9 @@ int Lexer::getChannel() {
   return _channel;
 }
 
-std::vector<TokenRef> Lexer::getAllTokens() {
-  std::vector<TokenRef> tokens;
-  TokenRef t = nextToken();
+std::vector<Token::Ref> Lexer::getAllTokens() {
+  std::vector<Token::Ref> tokens;
+  Token::Ref t = nextToken();
   while (t->getType() != EOF) {
     tokens.push_back(t);
     t = nextToken();
@@ -268,14 +268,13 @@ void Lexer::notifyListeners(const LexerNoViableAltException &e) {
   std::wstring text = _input->getText(misc::Interval(_tokenStartCharIndex, (int)_input->index()));
   std::wstring msg = std::wstring(L"token recognition error at: '") + getErrorDisplay(text) + std::wstring(L"'");
 
-  ANTLRErrorListener *listener = getErrorListenerDispatch();
-  listener->syntaxError(this, nullptr, (size_t)_tokenStartLine, _tokenStartCharPositionInLine, msg, std::make_exception_ptr(e));
+  ProxyErrorListener &listener = getErrorListenerDispatch();
+  listener.syntaxError(this, nullptr, (size_t)_tokenStartLine, _tokenStartCharPositionInLine, msg, std::make_exception_ptr(e));
 }
 
 std::wstring Lexer::getErrorDisplay(const std::wstring &s) {
   std::wstringstream ss;
-  for (size_t i = 0; i < s.length(); i++) {
-    char c = ((char*)s.c_str())[i];
+  for (auto c : s) {
     ss << getErrorDisplay(c);
   }
   return ss.str();
@@ -297,7 +296,7 @@ std::wstring Lexer::getErrorDisplay(int c) {
       s = L"\\r";
       break;
     default:
-      s = std::to_wstring(c);
+      s = c;
       break;
   }
   return s;

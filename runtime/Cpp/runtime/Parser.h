@@ -51,10 +51,10 @@ namespace runtime {
       TraceListener(Parser *outerInstance);
       virtual ~TraceListener() {};
 
-      virtual void enterEveryRule(ParserRuleContextRef ctx) override;
+      virtual void enterEveryRule(ParserRuleContext::Ref ctx) override;
       virtual void visitTerminal(std::shared_ptr<tree::TerminalNode> node) override;
       virtual void visitErrorNode(std::shared_ptr<tree::ErrorNode> node) override;
-      virtual void exitEveryRule(ParserRuleContextRef ctx) override;
+      virtual void exitEveryRule(ParserRuleContext::Ref ctx) override;
 
     private:
       Parser *const outerInstance;
@@ -64,10 +64,10 @@ namespace runtime {
     public:
       static const std::shared_ptr<TrimToSizeListener> INSTANCE;
 
-      virtual void enterEveryRule(ParserRuleContextRef ctx) override;
+      virtual void enterEveryRule(ParserRuleContext::Ref ctx) override;
       virtual void visitTerminal(std::shared_ptr<tree::TerminalNode> node) override;
       virtual void visitErrorNode(std::shared_ptr<tree::ErrorNode> node) override;
-      virtual void exitEveryRule(ParserRuleContextRef ctx) override;
+      virtual void exitEveryRule(ParserRuleContext::Ref ctx) override;
     };
 
     Parser(TokenStream *input);
@@ -94,7 +94,7 @@ namespace runtime {
     /// <exception cref="RecognitionException"> if the current input symbol did not match
     /// {@code ttype} and the error strategy could not recover from the
     /// mismatched symbol </exception>
-    virtual TokenRef match(int ttype);
+    virtual Token::Ref match(int ttype);
 
     /// <summary>
     /// Match current input symbol as a wildcard. If the symbol type matches
@@ -112,7 +112,7 @@ namespace runtime {
     /// <exception cref="RecognitionException"> if the current input symbol did not match
     /// a wildcard and the error strategy could not recover from the mismatched
     /// symbol </exception>
-    virtual TokenRef matchWildcard();
+    virtual Token::Ref matchWildcard();
 
     /// <summary>
     /// Track the <seealso cref="ParserRuleContext"/> objects during the parse and hook
@@ -267,11 +267,11 @@ namespace runtime {
     /// Match needs to return the current input symbol, which gets put
     ///  into the label for the associated token ref; e.g., x=ID.
     /// </summary>
-    virtual TokenRef getCurrentToken();
+    virtual Token::Ref getCurrentToken();
 
     void notifyErrorListeners(const std::wstring &msg);
 
-    virtual void notifyErrorListeners(TokenRef offendingToken, const std::wstring &msg, std::exception_ptr e);
+    virtual void notifyErrorListeners(Token::Ref offendingToken, const std::wstring &msg, std::exception_ptr e);
 
     /// <summary>
     /// Consume and return the <seealso cref="#getCurrentToken current symbol"/>.
@@ -294,37 +294,37 @@ namespace runtime {
     /// <seealso cref="ParseTreeListener#visitErrorNode"/> is called on any parse
     /// listeners.
     /// </summary>
-    virtual TokenRef consume();
+    virtual Token::Ref consume();
     
     /// <summary>
     /// Always called by generated parsers upon entry to a rule. Access field
     /// <seealso cref="#_ctx"/> get the current context.
     /// </summary>
-    virtual void enterRule(ParserRuleContextRef localctx, int state, int ruleIndex);
+    virtual void enterRule(ParserRuleContext::Ref localctx, int state, int ruleIndex);
 
     virtual void exitRule();
 
-    virtual void enterOuterAlt(ParserRuleContextRef localctx, int altNum);
+    virtual void enterOuterAlt(ParserRuleContext::Ref localctx, int altNum);
 
     /// @deprecated Use
     /// <seealso cref="#enterRecursionRule(ParserRuleContext, int, int, int)"/> instead.
-    virtual void enterRecursionRule(ParserRuleContextRef localctx, int ruleIndex);
-    virtual void enterRecursionRule(ParserRuleContextRef localctx, int state, int ruleIndex, int precedence);
+    virtual void enterRecursionRule(ParserRuleContext::Ref localctx, int ruleIndex);
+    virtual void enterRecursionRule(ParserRuleContext::Ref localctx, int state, int ruleIndex, int precedence);
 
     /// <summary>
     /// Like <seealso cref="#enterRule"/> but for recursive rules.
     /// </summary>
-    virtual void pushNewRecursionContext(ParserRuleContextRef localctx, int state, int ruleIndex);
+    virtual void pushNewRecursionContext(ParserRuleContext::Ref localctx, int state, int ruleIndex);
 
-    virtual void unrollRecursionContexts(ParserRuleContextRef parentctx);
+    virtual void unrollRecursionContexts(ParserRuleContext::Ref parentctx);
 
-    virtual ParserRuleContextRef getInvokingContext(int ruleIndex);
+    virtual ParserRuleContext::Ref getInvokingContext(int ruleIndex);
 
-    virtual std::shared_ptr<ParserRuleContext> getContext();
+    virtual ParserRuleContext::Ref getContext();
 
-    virtual void setContext(ParserRuleContextRef ctx);
+    virtual void setContext(ParserRuleContext::Ref ctx);
 
-    virtual bool precpred(RuleContextRef localctx, int precedence) override;
+    virtual bool precpred(RuleContext::Ref localctx, int precedence) override;
 
     virtual bool inContext(const std::wstring &context);
 
@@ -357,7 +357,7 @@ namespace runtime {
     /// Get a rule's index (i.e., {@code RULE_ruleName} field) or -1 if not found. </summary>
     virtual int getRuleIndex(const std::wstring &ruleName);
 
-    virtual ParserRuleContextRef getRuleContext();
+    virtual ParserRuleContext::Ref getRuleContext();
 
     /// <summary>
     /// Return List&lt;String&gt; of the rule names in your parser instance
@@ -369,7 +369,7 @@ namespace runtime {
     /// </summary>
     virtual std::vector<std::wstring> getRuleInvocationStack();
 
-    virtual std::vector<std::wstring> getRuleInvocationStack(RuleContextRef p);
+    virtual std::vector<std::wstring> getRuleInvocationStack(RuleContext::Ref p);
 
     /// <summary>
     /// For debugging and other purposes. </summary>
@@ -390,7 +390,7 @@ namespace runtime {
   protected:
     /// The ParserRuleContext object for the currently executing rule.
     /// This is always non-null during the parsing process.
-    ParserRuleContextRef _ctx;
+    ParserRuleContext::Ref _ctx;
 
     /// The error handling strategy for the parser. The default is DefaultErrorStrategy.
     /// See also getErrorHandler.

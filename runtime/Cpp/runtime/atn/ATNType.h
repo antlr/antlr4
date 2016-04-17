@@ -37,23 +37,10 @@ namespace v4 {
 namespace runtime {
 namespace atn {
 
-  /// <summary>
   /// Represents the type of recognizer an ATN applies to.
-  ///
-  /// @author Sam Harwell
-  /// </summary>
   enum class ATNType {
-
-    /// <summary>
-    /// A lexer grammar.
-    /// </summary>
-    LEXER,
-
-    /// <summary>
-    /// A parser grammar.
-    /// </summary>
-    PARSER,
-
+    LEXER = 0,
+    PARSER = 1,
   };
 
 } // namespace atn

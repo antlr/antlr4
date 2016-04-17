@@ -31,6 +31,7 @@
 
 #pragma once
 
+#include "Token.h"
 #include "IntStream.h"
 
 namespace org {
@@ -53,7 +54,7 @@ namespace runtime {
   public:
     virtual ~TokenStream();
 
-    virtual TokenRef LT(ssize_t k) = 0;
+    virtual Token::Ref LT(ssize_t k) = 0;
 
     /// <summary>
     /// Gets the <seealso cref="Token"/> at the specified {@code index} in the stream. When
@@ -72,7 +73,7 @@ namespace runtime {
     /// <exception cref="IllegalArgumentException"> if {code index} is less than 0 </exception>
     /// <exception cref="UnsupportedOperationException"> if the stream does not support
     /// retrieving the token at the specified index </exception>
-    virtual TokenRef get(size_t index) const = 0;
+    virtual Token::Ref get(size_t index) const = 0;
 
     /// Gets the underlying TokenSource which provides tokens for this stream.
     virtual TokenSource* getTokenSource() const = 0;
@@ -160,7 +161,7 @@ namespace runtime {
     /// </returns>
     /// <exception cref="UnsupportedOperationException"> if this stream does not support
     /// this method for the specified tokens </exception>
-    virtual std::wstring getText(TokenRef start, TokenRef stop) = 0;
+    virtual std::wstring getText(Token::Ref start, Token::Ref stop) = 0;
   };
 
 } // namespace runtime

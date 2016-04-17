@@ -66,12 +66,12 @@ namespace runtime {
     CommonTokenStream(TokenSource *tokenSource, int channel);
 
   protected:
-    virtual size_t adjustSeekIndex(size_t i) override;
+    virtual ssize_t adjustSeekIndex(size_t i) override;
 
-    virtual TokenRef LB(size_t k) override;
+    virtual Token::Ref LB(size_t k) override;
 
   public:
-    virtual TokenRef LT(ssize_t k) override;
+    virtual Token::Ref LT(ssize_t k) override;
 
     /// Count EOF just once.
     virtual int getNumberOfOnChannelTokens();

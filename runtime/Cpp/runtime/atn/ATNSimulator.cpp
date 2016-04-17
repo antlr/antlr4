@@ -42,9 +42,6 @@ using namespace org::antlr::v4::runtime::atn;
 
 const std::shared_ptr<DFAState> ATNSimulator::ERROR = std::make_shared<DFAState>(INT32_MAX);
 
-ATNSimulator::ATNSimulator() {
-}
-
 ATNSimulator::ATNSimulator(const ATN &atn, std::shared_ptr<PredictionContextCache> sharedContextCache)
 : atn(atn), _sharedContextCache(sharedContextCache) {
 }
@@ -53,9 +50,9 @@ std::shared_ptr<PredictionContextCache> ATNSimulator::getSharedContextCache() {
   return _sharedContextCache;
 }
 
-PredictionContextRef ATNSimulator::getCachedContext(PredictionContextRef context) {
+PredictionContext::Ref ATNSimulator::getCachedContext(PredictionContext::Ref context) {
   std::lock_guard<std::mutex> lck(mtx);
-  std::map<PredictionContextRef, PredictionContextRef> visited;
+  std::map<PredictionContext::Ref, PredictionContext::Ref> visited;
   return PredictionContext::getCachedContext(context, _sharedContextCache, visited);
 }
 

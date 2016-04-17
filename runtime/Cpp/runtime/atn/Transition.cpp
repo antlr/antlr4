@@ -58,3 +58,10 @@ bool Transition::isEpsilon() const {
 misc::IntervalSet Transition::label() const {
   return misc::IntervalSet::EMPTY_SET;
 }
+
+std::wstring Transition::toString() const {
+  std::wstringstream ss;
+  ss << "(Transition " << std::hex << this << ", target: " << std::hex << target << ')';
+
+  return ss.str();
+}

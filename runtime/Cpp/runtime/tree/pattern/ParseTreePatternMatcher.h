@@ -31,6 +31,8 @@
 
 #pragma once
 
+#include "Token.h"
+
 namespace org {
 namespace antlr {
 namespace v4 {
@@ -165,7 +167,7 @@ namespace pattern {
 
     // ---- SUPPORT CODE ----
 
-    virtual std::vector<TokenRef> tokenize(const std::wstring &pattern);
+    virtual std::vector<Token::Ref> tokenize(const std::wstring &pattern);
 
     /// Split "<ID> = <e:expr>;" into 4 chunks for tokenizing by tokenize().
     virtual std::vector<Chunk*> split(const std::wstring &pattern);

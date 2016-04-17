@@ -323,7 +323,7 @@ std::vector<size_t> ATNSerializer::serialize() {
 //------------------------------------------------------------------------------------------------------------
 
 std::wstring ATNSerializer::decode(const std::wstring &inpdata) {
-  wchar_t data[inpdata.size()];
+  uint16_t data[inpdata.size()];
   data[0] = inpdata[0];
 
   // Don't adjust the first value since that's the version number.
@@ -375,7 +375,7 @@ std::wstring ATNSerializer::decode(const std::wstring &inpdata) {
     }
     buf.append(std::to_wstring(i))
     .append(L":")
-    .append(ATNState::serializationNames[stype])
+    .append(ATNState::serializationNames[(size_t)stype])
     .append(L" ")
     .append(std::to_wstring(ruleIndex))
     .append(arg)

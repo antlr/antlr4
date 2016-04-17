@@ -70,7 +70,7 @@ namespace runtime {
     ///  emissions, then set this to the last token to be matched or
     ///  something nonnull so that the auto token emit mechanism will not
     ///  emit another token.
-    TokenRef _token;
+    Token::Ref _token;
 
     /// <summary>
     /// What character index in the stream did the current token start at?
@@ -114,7 +114,7 @@ namespace runtime {
     virtual void reset();
 
     /// Return a token from this source; i.e., match a token on the char stream.
-    virtual TokenRef nextToken() override;
+    virtual Token::Ref nextToken() override;
 
     /// Instruct the lexer to skip creating a token for current lexer rule
     /// and look for another token.  nextToken() knows to keep looking when
@@ -152,7 +152,7 @@ namespace runtime {
     ///  and getToken (to push tokens into a list and pull from that list
     ///  rather than a single variable as this implementation does).
     /// </summary>
-    virtual void emit(TokenRef token);
+    virtual void emit(Token::Ref token);
 
     /// <summary>
     /// The standard method called to automatically emit a token at the
@@ -161,9 +161,9 @@ namespace runtime {
     ///  use that to set the token's text.  Override this method to emit
     ///  custom Token objects or provide a new factory.
     /// </summary>
-    virtual TokenRef emit();
+    virtual Token::Ref emit();
 
-    virtual TokenRef emitEOF();
+    virtual Token::Ref emitEOF();
 
     virtual size_t getLine() const override;
 
@@ -191,9 +191,9 @@ namespace runtime {
 
     /// <summary>
     /// Override if emitting multiple tokens. </summary>
-    virtual TokenRef getToken();
+    virtual Token::Ref getToken();
 
-    virtual void setToken(TokenRef token);
+    virtual void setToken(Token::Ref token);
 
     virtual void setType(int ttype);
 
@@ -207,7 +207,7 @@ namespace runtime {
 
     /// Return a list of all Token objects in input char stream.
     /// Forces load of all tokens. Does not include EOF token.
-    virtual std::vector<TokenRef> getAllTokens();
+    virtual std::vector<Token::Ref> getAllTokens();
 
     virtual void recover(const LexerNoViableAltException &e);
 

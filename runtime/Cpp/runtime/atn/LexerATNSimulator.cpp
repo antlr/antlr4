@@ -68,12 +68,12 @@ void LexerATNSimulator::SimState::InitializeInstanceFields() {
 int LexerATNSimulator::match_calls = 0;
 
 
-LexerATNSimulator::LexerATNSimulator(const ATN &atn, const std::vector<dfa::DFA*> &decisionToDFA,
+LexerATNSimulator::LexerATNSimulator(const ATN &atn, std::vector<dfa::DFA> &decisionToDFA,
                                      std::shared_ptr<PredictionContextCache> sharedContextCache)
 : LexerATNSimulator(nullptr, atn, decisionToDFA, sharedContextCache) {
 }
 
-LexerATNSimulator::LexerATNSimulator(Lexer *recog, const ATN &atn, const std::vector<dfa::DFA*> &decisionToDFA,
+LexerATNSimulator::LexerATNSimulator(Lexer *recog, const ATN &atn, std::vector<dfa::DFA> &decisionToDFA,
                                      std::shared_ptr<PredictionContextCache> sharedContextCache)
   : ATNSimulator(atn, sharedContextCache), _recog(recog), _decisionToDFA(decisionToDFA), prevAccept(new SimState()) {
   InitializeInstanceFields();
@@ -97,11 +97,11 @@ int LexerATNSimulator::match(CharStream *input, size_t mode) {
 
   _startIndex = (int)input->index();
   prevAccept->reset();
-  dfa::DFA *dfa = _decisionToDFA[mode];
-  if (dfa->s0 == nullptr) {
+  const dfa::DFA &dfa = _decisionToDFA[mode];
+  if (dfa.s0 == nullptr) {
     return matchATN(input);
   } else {
-    return execATN(input, dfa->s0);
+    return execATN(input, dfa.s0);
   }
 
   return -1;
@@ -117,7 +117,7 @@ void LexerATNSimulator::reset() {
 }
 
 int LexerATNSimulator::matchATN(CharStream *input) {
-  ATNState *startState = (ATNState *)atn.modeToStartState.at(_mode);
+  ATNState *startState = (ATNState *)atn.modeToStartState[_mode];
 
   if (debug) {
     std::wcout << L"matchATN mode" << _mode << L" start: " << startState << std::endl;
@@ -131,13 +131,13 @@ int LexerATNSimulator::matchATN(CharStream *input) {
 
   dfa::DFAState *next = addDFAState(s0_closure);
   if (!suppressEdge) {
-    _decisionToDFA[_mode]->s0 = next;
+    _decisionToDFA[_mode].s0 = next;
   }
 
   int predict = execATN(input, next);
 
   if (debug) {
-    std::wcout << L"DFA after matchATN: " << _decisionToDFA[old_mode]->toLexerString() << std::endl;
+    std::wcout << L"DFA after matchATN: " << _decisionToDFA[old_mode].toLexerString() << std::endl;
   }
 
   return predict;
@@ -179,7 +179,6 @@ int LexerATNSimulator::execATN(CharStream *input, dfa::DFAState *ds0) {
       target = computeTargetState(input, s, t);
     }
 
-    std::wstring temp = target->toString();
     if (target == ERROR.get()) {
       break;
     }
@@ -331,7 +330,7 @@ bool LexerATNSimulator::closure(CharStream *input, LexerATNConfig *config, std::
     std::wcout << L"closure(" << config->toString(true) << L")" << std::endl;
   }
 
-  if (dynamic_cast<RuleStopState*>(config->state) != nullptr) {
+  if (is<RuleStopState *>(config->state)) {
     if (debug) {
       if (_recog != nullptr) {
         std::wcout << L"closure at " << _recog->getRuleNames()[(size_t)config->state->ruleIndex] << L" rule stop " << config << std::endl;
@@ -389,7 +388,7 @@ atn::LexerATNConfig *LexerATNSimulator::getEpsilonTarget(CharStream *input, Lexe
   switch (t->getSerializationType()) {
     case Transition::RULE: {
       RuleTransition *ruleTransition = static_cast<RuleTransition*>(t);
-      PredictionContextRef newContext = SingletonPredictionContext::create(config->context, ruleTransition->followState->stateNumber);
+      PredictionContext::Ref newContext = SingletonPredictionContext::create(config->context, ruleTransition->followState->stateNumber);
       c = new LexerATNConfig(config, t->target, newContext);
     }
       break;
@@ -523,7 +522,7 @@ dfa::DFAState *LexerATNSimulator::addDFAState(std::shared_ptr<ATNConfigSet> conf
   dfa::DFAState *proposed = new dfa::DFAState(configs);
   ATNConfig *firstConfigWithRuleStopState = nullptr;
   for (auto c : configs->configs) {
-    if (dynamic_cast<RuleStopState*>(c->state) != nullptr) {
+    if (is<RuleStopState*>(c->state)) {
       firstConfigWithRuleStopState = c;
       break;
     }
@@ -536,27 +535,27 @@ dfa::DFAState *LexerATNSimulator::addDFAState(std::shared_ptr<ATNConfigSet> conf
     proposed->prediction = atn.ruleToTokenType[(size_t)proposed->lexerRuleIndex];
   }
 
-  dfa::DFA *dfa = _decisionToDFA[_mode];
+  dfa::DFA &dfa = _decisionToDFA[_mode];
 
   {
     std::lock_guard<std::mutex> lck(mtx);
     
-    auto iterator = dfa->states->find(proposed);
-    if (iterator != dfa->states->end()) {
+    auto iterator = dfa.states.find(proposed);
+    if (iterator != dfa.states.end()) {
       return iterator->second;
     }
 
     dfa::DFAState *newState = proposed;
 
-    newState->stateNumber = (int)dfa->states->size();
+    newState->stateNumber = (int)dfa.states.size();
     configs->setReadonly(true);
     newState->configs = configs;
-    (*dfa->states)[newState] = newState;
+    dfa.states[newState] = newState;
     return newState;
   }
 }
 
-dfa::DFA *LexerATNSimulator::getDFA(size_t mode) {
+dfa::DFA& LexerATNSimulator::getDFA(size_t mode) {
   return _decisionToDFA[mode];
 }
 

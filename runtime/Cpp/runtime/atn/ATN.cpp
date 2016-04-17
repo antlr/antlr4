@@ -38,19 +38,21 @@
 #include "Recognizer.h"
 #include "ATNType.h"
 #include "Exceptions.h"
+#include "CPPUtils.h"
 
 #include "ATN.h"
 
 using namespace org::antlr::v4::runtime;
 using namespace org::antlr::v4::runtime::atn;
+using namespace antlrcpp;
 
 ATN::ATN() : ATN(ATNType::LEXER, 0) {
 }
 
-ATN::ATN(ATNType grammarType, int maxTokenType) : grammarType(grammarType), maxTokenType(maxTokenType) {
+ATN::ATN(ATNType grammarType, size_t maxTokenType) : grammarType(grammarType), maxTokenType(maxTokenType) {
 }
 
-misc::IntervalSet ATN::nextTokens(ATNState *s, RuleContextRef ctx) const {
+misc::IntervalSet ATN::nextTokens(ATNState *s, RuleContext::Ref ctx) const {
   LL1Analyzer analyzer(*this);
   return analyzer.LOOK(s, ctx);
 
@@ -66,7 +68,7 @@ misc::IntervalSet ATN::nextTokens(ATNState *s) const {
 
 void ATN::addState(ATNState *state) {
   if (state != nullptr) {
-    state->atn = this;
+    //state->atn = this;
     state->stateNumber = (int)states.size();
   }
 
@@ -95,12 +97,12 @@ int ATN::getNumberOfDecisions() const {
   return (int)decisionToState.size();
 }
 
-misc::IntervalSet ATN::getExpectedTokens(int stateNumber, RuleContextRef context) const {
+misc::IntervalSet ATN::getExpectedTokens(int stateNumber, RuleContext::Ref context) const {
   if (stateNumber < 0 || stateNumber >= (int)states.size()) {
     throw IllegalArgumentException("Invalid state number.");
   }
 
-  RuleContextRef ctx = context;
+  RuleContext::Ref ctx = context;
   ATNState *s = states.at((size_t)stateNumber);
   misc::IntervalSet following = nextTokens(s);
   if (!following.contains(Token::EPSILON)) {
@@ -129,3 +131,47 @@ misc::IntervalSet ATN::getExpectedTokens(int stateNumber, RuleContextRef context
 
   return expected;
 }
+
+std::wstring ATN::toString() const {
+  std::wstringstream ss;
+  std::wstring type;
+  switch (grammarType) {
+    case ATNType::LEXER:
+      type = L"LEXER ";
+      break;
+
+    case ATNType::PARSER:
+      type = L"PARSER ";
+      break;
+
+    default:
+      break;
+  }
+  ss << "(" << type << "ATN " << std::hex << this << std::dec << ") maxTokenType: " << maxTokenType << std::endl;
+  ss << "states (" << states.size() << ") {" << std::endl;
+
+  size_t index = 0;
+  for (auto state : states) {
+    if (state == nullptr) {
+      ss << "  " << index++ << ": null" << std::endl;
+    } else {
+      std::wstring text = state->toString();
+      ss << "  " << index++ << ": " << indent(text, L"  ", false) << std::endl;
+    }
+  }
+
+  index = 0;
+  for (auto state : decisionToState) {
+    if (state == nullptr) {
+      ss << "  " << index++ << ": null" << std::endl;
+    } else {
+      std::wstring text = state->toString();
+      ss << "  " << index++ << ": " << indent(text, L"  ", false) << std::endl;
+    }
+  }
+
+  ss << "}";
+
+  return ss.str();
+}
+

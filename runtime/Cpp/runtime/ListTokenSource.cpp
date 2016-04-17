@@ -45,7 +45,7 @@ int ListTokenSource::getCharPositionInLine() {
   } else if (tokens.size() > 0) {
     // have to calculate the result from the line/column of the previous
     // token, along with the text of the token.
-    TokenRef lastToken = tokens.back();
+    Token::Ref lastToken = tokens.back();
     std::wstring tokenText = lastToken->getText();
     if (tokenText != L"") {
       int lastNewLine = (int)tokenText.rfind(L'\n');
@@ -62,7 +62,7 @@ int ListTokenSource::getCharPositionInLine() {
   return 0;
 }
 
-TokenRef ListTokenSource::nextToken() {
+Token::Ref ListTokenSource::nextToken() {
   if (i >= tokens.size()) {
     if (eofToken == nullptr) {
       int start = -1;
@@ -81,7 +81,7 @@ TokenRef ListTokenSource::nextToken() {
     return eofToken;
   }
 
-  TokenRef t = tokens[i];
+  Token::Ref t = tokens[i];
   if (i == tokens.size() - 1 && t->getType() == EOF) {
     eofToken = t;
   }
@@ -98,7 +98,7 @@ size_t ListTokenSource::getLine() const {
   } else if (tokens.size() > 0) {
     // have to calculate the result from the line/column of the previous
     // token, along with the text of the token.
-    TokenRef lastToken = tokens.back();
+    Token::Ref lastToken = tokens.back();
     int line = lastToken->getLine();
 
     std::wstring tokenText = lastToken->getText();

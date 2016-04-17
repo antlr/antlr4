@@ -59,13 +59,13 @@ void ParseTreeWalker::walk(std::shared_ptr<ParseTreeListener> listener, std::sha
 }
 
 void ParseTreeWalker::enterRule(std::shared_ptr<ParseTreeListener> listener, std::shared_ptr<RuleNode> r) {
-  ParserRuleContextRef ctx = std::dynamic_pointer_cast<ParserRuleContext>(r->getRuleContext());
+  ParserRuleContext::Ref ctx = std::dynamic_pointer_cast<ParserRuleContext>(r->getRuleContext());
   listener->enterEveryRule(ctx);
   ctx->enterRule(listener);
 }
 
 void ParseTreeWalker::exitRule(std::shared_ptr<ParseTreeListener> listener, std::shared_ptr<RuleNode> r) {
-  ParserRuleContextRef ctx = std::dynamic_pointer_cast<ParserRuleContext>(r->getRuleContext());
+  ParserRuleContext::Ref ctx = std::dynamic_pointer_cast<ParserRuleContext>(r->getRuleContext());
   ctx->exitRule(listener);
   listener->exitEveryRule(ctx);
 }

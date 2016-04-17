@@ -60,7 +60,9 @@ namespace runtime {
   ///  <seealso cref= ParserRuleContext </seealso>
   class RuleContext : public tree::RuleNode, public std::enable_shared_from_this<RuleContext> {
   public:
-    static const ParserRuleContextRef EMPTY;
+    typedef std::shared_ptr<RuleContext> Ref;
+    
+    static const RuleContext::Ref EMPTY;
 
     /// <summary>
     /// What context invoked this rule? </summary>
@@ -86,7 +88,7 @@ namespace runtime {
 
     virtual misc::Interval getSourceInterval() override;
 
-    virtual RuleContextRef getRuleContext() override;
+    virtual RuleContext::Ref getRuleContext() override;
     virtual std::wstring getText() override;
 
     virtual ssize_t getRuleIndex() const;
@@ -133,9 +135,9 @@ namespace runtime {
     std::wstring toString(const std::vector<std::wstring> &ruleNames);
 
     // recog null unless ParserRuleContext, in which case we use subclass toString(...)
-    std::wstring toString(Recognizer *recog, RuleContextRef stop);
+    std::wstring toString(Recognizer *recog, RuleContext::Ref stop);
 
-    virtual std::wstring toString(const std::vector<std::wstring> &ruleNames, RuleContextRef stop);
+    virtual std::wstring toString(const std::vector<std::wstring> &ruleNames, RuleContext::Ref stop);
 
     bool operator == (const RuleContext &other) { return this == &other; } // Simple address comparison.
     

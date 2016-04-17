@@ -106,7 +106,7 @@ namespace atn {
 
     virtual std::vector<ATNState*> *getStates();
 
-    virtual std::vector<SemanticContextRef> getPredicates();
+    virtual std::vector<SemanticContext::Ref> getPredicates();
 
     virtual ATNConfig *get(size_t i) const;
 

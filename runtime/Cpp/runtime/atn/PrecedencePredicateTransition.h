@@ -50,7 +50,7 @@ namespace atn {
     virtual bool isEpsilon() const override;
     virtual bool matches(int symbol, int minVocabSymbol, int maxVocabSymbol) const override;
     std::shared_ptr<SemanticContext::PrecedencePredicate> getPredicate() const;
-    virtual std::wstring toString() const;
+    virtual std::wstring toString() const override;
 
   };
 

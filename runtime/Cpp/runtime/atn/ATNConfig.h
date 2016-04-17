@@ -63,7 +63,7 @@ namespace atn {
     /// execution of the ATN simulator.
     ///
     /// Can be shared between multiple ANTConfig instances.
-    PredictionContextRef context;
+    PredictionContext::Ref context;
 
     /// We cannot execute predicates dependent upon local context unless
     /// we know for sure we are in the correct context. Because there is
@@ -77,17 +77,17 @@ namespace atn {
     int reachesIntoOuterContext;
 
     /// Can be shared between multiple ATNConfig instances.
-    SemanticContextRef semanticContext;
+    SemanticContext::Ref semanticContext;
 
-    ATNConfig(ATNState *state, int alt, PredictionContextRef context);
-    ATNConfig(ATNState *state, int alt, PredictionContextRef context, SemanticContextRef semanticContext);
+    ATNConfig(ATNState *state, int alt, PredictionContext::Ref context);
+    ATNConfig(ATNState *state, int alt, PredictionContext::Ref context, SemanticContext::Ref semanticContext);
 
     ATNConfig(ATNConfig *c); // dup
     ATNConfig(ATNConfig *c, ATNState *state);
-    ATNConfig(ATNConfig *c, ATNState *state, SemanticContextRef semanticContext);
-    ATNConfig(ATNConfig *c, SemanticContextRef semanticContext);
-    ATNConfig(ATNConfig *c, ATNState *state, PredictionContextRef context);
-    ATNConfig(ATNConfig *c, ATNState *state, PredictionContextRef context, SemanticContextRef semanticContext);
+    ATNConfig(ATNConfig *c, ATNState *state, SemanticContext::Ref semanticContext);
+    ATNConfig(ATNConfig *c, SemanticContext::Ref semanticContext);
+    ATNConfig(ATNConfig *c, ATNState *state, PredictionContext::Ref context);
+    ATNConfig(ATNConfig *c, ATNState *state, PredictionContext::Ref context, SemanticContext::Ref semanticContext);
 
     virtual size_t hashCode() const;
 

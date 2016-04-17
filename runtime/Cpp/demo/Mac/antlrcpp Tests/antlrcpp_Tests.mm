@@ -56,7 +56,7 @@ using namespace org::antlr::v4::runtime;
 
 - (void)testExample {
     try {
-      std::vector<dfa::DFA *> decisionToDFA;
+      std::vector<dfa::DFA> decisionToDFA;
       atn::ATN atn;
 
       org::antlr::v4::runtime::atn::ParserATNSimulator foo(nullptr, atn, decisionToDFA, nullptr);

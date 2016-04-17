@@ -48,8 +48,9 @@ namespace atn {
   ///  SemanticContext within the scope of this outer class.
   class SemanticContext {
   public:
-    //SemanticContext *parent;
-    static const SemanticContextRef NONE;
+    typedef std::shared_ptr<SemanticContext> Ref;
+
+    static const SemanticContext::Ref NONE;
 
     virtual size_t hashCode() = 0;
     virtual std::wstring toString() const = 0;
@@ -68,12 +69,12 @@ namespace atn {
     /// prediction, so we passed in the outer context here in case of context
     /// dependent predicate evaluation.
     /// </summary>
-    virtual bool eval(Recognizer *parser, RuleContextRef outerContext) = 0;
+    virtual bool eval(Recognizer *parser, RuleContext::Ref outerContext) = 0;
 
-    static SemanticContextRef And(SemanticContextRef a, SemanticContextRef b);
+    static SemanticContext::Ref And(SemanticContext::Ref a, SemanticContext::Ref b);
 
     /// See also: ParserATNSimulator::getPredsForAmbigAlts.
-    static SemanticContextRef Or(SemanticContextRef a, SemanticContextRef b);
+    static SemanticContext::Ref Or(SemanticContext::Ref a, SemanticContext::Ref b);
 
     class Predicate;
     class PrecedencePredicate;
@@ -81,7 +82,7 @@ namespace atn {
     class OR;
 
   private:
-    template<typename T1> // where T1 : SemanticContextRef
+    template<typename T1> // where T1 : SemanticContext::Ref
     static std::vector<std::shared_ptr<PrecedencePredicate>> filterPrecedencePredicates(const std::vector<T1> &collection) {
       std::vector<std::shared_ptr<PrecedencePredicate>> result;
       for (auto context : collection) {
@@ -110,8 +111,8 @@ namespace atn {
   public:
     Predicate(int ruleIndex, int predIndex, bool isCtxDependent);
 
-    virtual bool eval(Recognizer *parser, RuleContextRef outerContext) override {
-      RuleContextRef localctx;
+    virtual bool eval(Recognizer *parser, RuleContext::Ref outerContext) override {
+      RuleContext::Ref localctx;
       if (isCtxDependent)
         localctx = outerContext;
       return parser->sempred(localctx, ruleIndex, predIndex);
@@ -132,7 +133,7 @@ namespace atn {
   public:
     PrecedencePredicate(int precedence);
 
-    virtual bool eval(Recognizer *parser, RuleContextRef outerContext) override {
+    virtual bool eval(Recognizer *parser, RuleContext::Ref outerContext) override {
       return parser->precpred(outerContext, precedence);
     }
 
@@ -144,14 +145,14 @@ namespace atn {
 
   class SemanticContext::AND : public SemanticContext {
   public:
-    std::vector<SemanticContextRef> opnds;
+    std::vector<SemanticContext::Ref> opnds;
 
-    AND(SemanticContextRef a, SemanticContextRef b);
+    AND(SemanticContext::Ref a, SemanticContext::Ref b);
 
     virtual bool operator == (const SemanticContext &other) const override;
     virtual size_t hashCode() override;
 
-    virtual bool eval(Recognizer *parser, RuleContextRef outerContext) override {
+    virtual bool eval(Recognizer *parser, RuleContext::Ref outerContext) override {
       for (auto opnd : opnds) {
         if (!opnd->eval(parser, outerContext)) {
           return false;
@@ -166,22 +167,13 @@ namespace atn {
 
   class SemanticContext::OR : public SemanticContext {
   public:
-    std::vector<SemanticContextRef> opnds;
+    std::vector<SemanticContext::Ref> opnds;
 
-    OR(SemanticContextRef a, SemanticContextRef b);
+    OR(SemanticContext::Ref a, SemanticContext::Ref b);
 
     virtual bool operator == (const SemanticContext &other) const override;
     virtual size_t hashCode() override;
-
-    virtual bool eval(Recognizer *parser, RuleContextRef outerContext) override {
-      for (auto opnd : opnds) {
-        if (opnd->eval(parser, outerContext)) {
-          return true;
-        }
-      }
-      return false;
-    }
-
+    virtual bool eval(Recognizer *parser, RuleContext::Ref outerContext) override;
     virtual std::wstring toString() const override;
   };
 

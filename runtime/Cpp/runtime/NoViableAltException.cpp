@@ -40,12 +40,12 @@ NoViableAltException::NoViableAltException(Parser *recognizer)
                          recognizer->getCurrentToken(), nullptr, recognizer->getContext()) {
 }
 
-NoViableAltException::NoViableAltException(Parser *recognizer, TokenStream *input, TokenRef startToken,
-  TokenRef offendingToken, std::shared_ptr<atn::ATNConfigSet> deadEndConfigs, ParserRuleContextRef ctx)
+NoViableAltException::NoViableAltException(Parser *recognizer, TokenStream *input, Token::Ref startToken,
+  Token::Ref offendingToken, std::shared_ptr<atn::ATNConfigSet> deadEndConfigs, ParserRuleContext::Ref ctx)
   : RecognitionException(recognizer, input, ctx, offendingToken), _deadEndConfigs(deadEndConfigs), _startToken(startToken) {
 }
 
-TokenRef NoViableAltException::getStartToken() const {
+Token::Ref NoViableAltException::getStartToken() const {
   return _startToken;
 }
 

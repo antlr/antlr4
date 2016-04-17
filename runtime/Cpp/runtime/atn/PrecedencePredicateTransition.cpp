@@ -53,5 +53,5 @@ std::shared_ptr<SemanticContext::PrecedencePredicate> PrecedencePredicateTransit
 }
 
 std::wstring PrecedencePredicateTransition::toString() const {
-  return std::to_wstring(precedence) + std::wstring(L" >= _p");
+  return L"PRECEDENCE " + Transition::toString() + L" { precedence: " + std::to_wstring(precedence) + L" }";
 }

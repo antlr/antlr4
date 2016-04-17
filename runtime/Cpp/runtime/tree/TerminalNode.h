@@ -31,6 +31,7 @@
 
 #pragma once
 
+#include "Token.h"
 #include "ParseTree.h"
 
 namespace org {
@@ -41,7 +42,7 @@ namespace tree {
 
   class TerminalNode : public ParseTree {
   public:
-    virtual TokenRef getSymbol() = 0;
+    virtual Token::Ref getSymbol() = 0;
   };
 
 } // namespace tree

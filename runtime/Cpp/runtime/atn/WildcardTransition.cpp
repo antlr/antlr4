@@ -47,5 +47,5 @@ bool WildcardTransition::matches(int symbol, int minVocabSymbol, int maxVocabSym
 }
 
 std::wstring WildcardTransition::toString() const {
-  return L".";
+  return L"WILDCARD " + Transition::toString() + L" {}";
 }

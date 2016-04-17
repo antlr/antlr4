@@ -104,7 +104,7 @@ namespace atn {
     int _charPositionInLine;
 
   public:
-    const std::vector<dfa::DFA*> _decisionToDFA;
+    std::vector<dfa::DFA> &_decisionToDFA;
   protected:
     size_t _mode;
 
@@ -115,19 +115,17 @@ namespace atn {
   public:
     static int match_calls;
 
-    LexerATNSimulator(const ATN &atn, const std::vector<dfa::DFA*> &decisionToDFA, std::shared_ptr<PredictionContextCache> sharedContextCache);
-    LexerATNSimulator(Lexer *recog, const ATN &atn, const std::vector<dfa::DFA*> &decisionToDFA,
+    LexerATNSimulator(const ATN &atn, std::vector<dfa::DFA> &decisionToDFA,
+                      std::shared_ptr<PredictionContextCache> sharedContextCache);
+    LexerATNSimulator(Lexer *recog, const ATN &atn, std::vector<dfa::DFA> &decisionToDFA,
                       std::shared_ptr<PredictionContextCache> sharedContextCache);
 
     virtual void copyState(LexerATNSimulator *simulator);
-
     virtual int match(CharStream *input, size_t mode);
-
     virtual void reset() override;
 
   protected:
     virtual int matchATN(CharStream *input);
-
     virtual int execATN(CharStream *input, dfa::DFAState *ds0);
 
     /// <summary>
@@ -221,23 +219,15 @@ namespace atn {
     virtual dfa::DFAState *addDFAState(std::shared_ptr<ATNConfigSet> configs);
 
   public:
-    dfa::DFA *getDFA(size_t mode);
+    dfa::DFA& getDFA(size_t mode);
 
-    /// <summary>
     /// Get the text matched so far for the current token.
-    /// </summary>
     virtual std::wstring getText(CharStream *input);
-
     virtual size_t getLine() const;
-
     virtual void setLine(size_t line);
-
     virtual int getCharPositionInLine();
-
     virtual void setCharPositionInLine(int charPositionInLine);
-
     virtual void consume(CharStream *input);
-
     virtual std::wstring getTokenName(int t);
 
   private:

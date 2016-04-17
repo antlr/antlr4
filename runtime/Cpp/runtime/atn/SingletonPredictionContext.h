@@ -41,12 +41,14 @@ namespace atn {
 
   class SingletonPredictionContext : public PredictionContext {
   public:
+    typedef std::shared_ptr<SingletonPredictionContext> Ref;
+
     const std::weak_ptr<PredictionContext> parent;
     const int returnState;
 
     SingletonPredictionContext(std::weak_ptr<PredictionContext> parent, int returnState);
 
-    static SingletonPredictionContextRef create(std::weak_ptr<PredictionContext> parent, int returnState);
+    static SingletonPredictionContext::Ref create(std::weak_ptr<PredictionContext> parent, int returnState);
 
     virtual size_t size() const override;
     virtual std::weak_ptr<PredictionContext> getParent(size_t index) const override;

@@ -31,6 +31,8 @@
 
 #pragma once
 
+#include "Token.h"
+
 namespace org {
 namespace antlr {
 namespace v4 {
@@ -77,7 +79,7 @@ namespace runtime {
     /// <param name="recognizer"> the parser instance </param>
     /// <exception cref="RecognitionException"> if the error strategy was not able to
     /// recover from the unexpected input symbol </exception>
-    virtual TokenRef recoverInline(Parser *recognizer) = 0;
+    virtual Token::Ref recoverInline(Parser *recognizer) = 0;
 
     /// <summary>
     /// This method is called to recover from exception {@code e}. This method is

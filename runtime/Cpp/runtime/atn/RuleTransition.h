@@ -39,7 +39,7 @@ namespace v4 {
 namespace runtime {
 namespace atn {
 
-  class RuleTransition final : public Transition {
+  class RuleTransition : public Transition {
     /// <summary>
     /// Ptr to the rule definition object for this rule ref </summary>
   public:
@@ -61,6 +61,8 @@ namespace atn {
 
     virtual bool isEpsilon() const override;
     virtual bool matches(int symbol, int minVocabSymbol, int maxVocabSymbol) const override;
+
+    virtual std::wstring toString() const override;
   };
 
 } // namespace atn

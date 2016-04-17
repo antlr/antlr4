@@ -31,6 +31,7 @@
 
 #pragma once
 
+#include "Token.h"
 #include "TokenFactory.h"
 
 namespace org {
@@ -61,7 +62,7 @@ namespace runtime {
     /// to the parser.
     /// </summary>
   public:
-    virtual TokenRef nextToken() = 0;
+    virtual Token::Ref nextToken() = 0;
 
     /// <summary>
     /// Get the line number for the current position in the input stream. The

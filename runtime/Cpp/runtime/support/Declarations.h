@@ -58,7 +58,7 @@ namespace org {
         class BailErrorStrategy;
         class BaseErrorListener;
         class BufferedTokenStream;
-        class CharStream; typedef std::shared_ptr<CharStream> CharStreamRef;
+        class CharStream;
         class CommonToken;
         class CommonTokenFactory;
         class CommonTokenStream;
@@ -67,7 +67,7 @@ namespace org {
         class DiagnosticErrorListener;
         class FailedPredicateException;
         class InputMismatchException;
-        class IntStream; typedef std::shared_ptr<IntStream> IntStreamRef;
+        class IntStream;
         class InterpreterRuleContext;
         class IRecognizer;
         class Lexer;
@@ -77,28 +77,25 @@ namespace org {
         class NoViableAltException;
         class Parser;
         class ParserInterpreter;
-        class ParserRuleContext; typedef std::shared_ptr<ParserRuleContext> ParserRuleContextRef;
+        class ParserRuleContext;
         class ProxyErrorListener;
         class RecognitionException;
         class Recognizer;
-        class RuleContext; typedef std::shared_ptr<RuleContext> RuleContextRef;
-        class Token; typedef std::shared_ptr<Token> TokenRef;
+        class RuleContext;
+        class Token;
         template<typename Symbol> class TokenFactory;
         class TokenSource;
-        class TokenStream; typedef std::shared_ptr<TokenStream> TokenStreamRef;
+        class TokenStream;
         class TokenStreamRewriter;
         class UnbufferedCharStream;
         class UnbufferedTokenStream;
-        class WritableToken; typedef std::shared_ptr<WritableToken> WritableTokenRef;
+        class WritableToken;
 
         namespace misc {
           class Interval;
           class IntervalSet;
-          class JFileChooserConfirmOverwrite;
           class MurmurHash;
-          class ObjectEqualityComparator;
           class ParseCancellationException;
-          class TestRig;
           class Utils;
         }
         namespace atn {
@@ -135,16 +132,16 @@ namespace org {
           class PlusLoopbackState;
           class PrecedencePredicateTransition;
           class PredicateTransition;
-          class PredictionContext; typedef std::shared_ptr<PredictionContext> PredictionContextRef;
+          class PredictionContext;
           enum class PredictionMode;
           class PredictionModeClass;
           class RangeTransition;
           class RuleStartState;
           class RuleStopState;
           class RuleTransition;
-          class SemanticContext; typedef std::shared_ptr<SemanticContext> SemanticContextRef;
+          class SemanticContext;
           class SetTransition;
-          class SingletonPredictionContext; typedef std::shared_ptr<SingletonPredictionContext> SingletonPredictionContextRef;
+          class SingletonPredictionContext;
           class StarBlockStartState;
           class StarLoopEntryState;
           class StarLoopbackState;

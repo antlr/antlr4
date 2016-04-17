@@ -45,6 +45,8 @@ namespace runtime {
   /// </summary>
   class Token {
   public:
+    typedef std::shared_ptr<Token> Ref;
+
     static const size_t INVALID_TYPE = 0;
 
     /// <summary>

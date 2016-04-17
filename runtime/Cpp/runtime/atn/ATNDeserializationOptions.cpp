@@ -35,12 +35,11 @@ using namespace org::antlr::v4::runtime::atn;
 
 ATNDeserializationOptions ATNDeserializationOptions::defaultOptions;
 
-ATNDeserializationOptions::ATNDeserializationOptions()
-: readOnly(true)  {
+ATNDeserializationOptions::ATNDeserializationOptions() {
+  InitializeInstanceFields();
 }
 
-ATNDeserializationOptions::ATNDeserializationOptions(ATNDeserializationOptions *options) {
-  InitializeInstanceFields();
+ATNDeserializationOptions::ATNDeserializationOptions(ATNDeserializationOptions *options) : ATNDeserializationOptions() {
   this->verifyATN = options->verifyATN;
   this->generateRuleBypassTransitions = options->generateRuleBypassTransitions;
 }
@@ -83,6 +82,6 @@ void ATNDeserializationOptions::throwIfReadOnly() {
 
 void ATNDeserializationOptions::InitializeInstanceFields() {
   readOnly = false;
-  verifyATN = false;
+  verifyATN = true;
   generateRuleBypassTransitions = false;
 }

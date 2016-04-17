@@ -41,50 +41,31 @@ namespace atn {
 
   class ATNDeserializer {
   public:
-    static const size_t SERIALIZED_VERSION;
-    //static ATNDeserializer();
+    static const size_t SERIALIZED_VERSION = 3;
 
-    /// <summary>
-    /// This is the earliest supported serialized UUID.
-    /// </summary>
-  private:
-
-    static Guid const BASE_SERIALIZED_UUID;
-    /// <summary>
-    /// This UUID indicates an extension of <seealso cref="BASE_SERIALIZED_UUID"/> for the
-    /// addition of precedence predicates.
-    /// </summary>
-    static Guid const ADDED_PRECEDENCE_TRANSITIONS;
-    /**
-     * This UUID indicates an extension of ADDED_PRECEDENCE_TRANSITIONS
-     * for the addition of lexer actions encoded as a sequence of
-     * LexerAction instances.
-     */
-    static Guid const ADDED_LEXER_ACTIONS;
-    /// <summary>
-    /// This list contains all of the currently supported UUIDs, ordered by when
-    /// the feature first appeared in this branch.
-    /// </summary>
-    static const std::vector<Guid> SUPPORTED_UUIDS;
-
-    /// <summary>
     /// This is the current serialized UUID.
-    /// </summary>
-  public:
-    static Guid const SERIALIZED_UUID;
+    static Guid SERIALIZED_UUID;
 
-  private:
-    ATNDeserializationOptions deserializationOptions;
-
-  public:
     ATNDeserializer();
     ATNDeserializer(const ATNDeserializationOptions& dso);
 
-    /// <summary>
+    static Guid toUUID(const unsigned short *data, int offset);
+
+    virtual ATN deserialize(const std::wstring &input);
+    virtual void verifyATN(const ATN &atn);
+    virtual void checkCondition(bool condition);
+    virtual void checkCondition(bool condition, const std::string &message);
+
+    virtual Transition *edgeFactory(const ATN &atn, int type, int src, int trg, int arg1, int arg2, int arg3,
+                                    const std::vector<misc::IntervalSet> &sets);
+
+    virtual ATNState *stateFactory(int type, int ruleIndex);
+
+  protected:
     /// Determines if a particular serialized representation of an ATN supports
     /// a particular feature, identified by the <seealso cref="UUID"/> used for serializing
     /// the ATN at the time the feature was first introduced.
-    /// </summary>
+    ///
     /// <param name="feature"> The <seealso cref="UUID"/> marking the first time the feature was
     /// supported in the serialized ATN. </param>
     /// <param name="actualUuid"> The <seealso cref="UUID"/> of the actual serialized ATN which is
@@ -92,27 +73,29 @@ namespace atn {
     /// <returns> {@code true} if the {@code actualUuid} value represents a
     /// serialized ATN at or after the feature identified by {@code feature} was
     /// introduced; otherwise, {@code false}. </returns>
-  protected:
     virtual bool isFeatureSupported(const Guid &feature, const Guid &actualUuid);
 
-  public:
-    virtual ATN deserialize(const std::wstring& input);
-
-  public:
-    virtual void verifyATN(const ATN &atn);
-
-    virtual void checkCondition(bool condition);
-
-    virtual void checkCondition(bool condition, const std::string &message);
-
-    static Guid toUUID(const wchar_t *data, int offset);
-
-    virtual Transition *edgeFactory(const ATN &atn, int type, int src, int trg, int arg1, int arg2, int arg3,
-                                    const std::vector<misc::IntervalSet> &sets);
-
-    virtual ATNState *stateFactory(int type, int ruleIndex);
-
   private:
+    /// This is the earliest supported serialized UUID.
+    static Guid BASE_SERIALIZED_UUID;
+
+    /// This UUID indicates an extension of <seealso cref="BASE_SERIALIZED_UUID"/> for the
+    /// addition of precedence predicates.
+    static Guid ADDED_PRECEDENCE_TRANSITIONS;
+
+    /**
+     * This UUID indicates an extension of ADDED_PRECEDENCE_TRANSITIONS
+     * for the addition of lexer actions encoded as a sequence of
+     * LexerAction instances.
+     */
+    static Guid ADDED_LEXER_ACTIONS;
+
+    /// This list contains all of the currently supported UUIDs, ordered by when
+    /// the feature first appeared in this branch.
+    static std::vector<Guid> SUPPORTED_UUIDS;
+    
+    ATNDeserializationOptions deserializationOptions;
+
     static std::vector<Guid> supportedUUIDsInitializer();
   };
 

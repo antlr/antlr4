@@ -37,6 +37,9 @@ namespace antlrcpp {
   std::wstring escapeWhitespace(std::wstring str, bool escapeSpaces);
   std::wstring toHexString(const int t);
   std::wstring arrayToString(const std::vector<std::wstring> &data);
+  std::wstring replaceString(const std::wstring &s, const std::wstring &from, const std::wstring &to);
+  std::vector<std::wstring> split(const std::wstring &s, const std::wstring &sep, int count);
+  std::wstring indent(const std::wstring &s, const std::wstring &indentation, bool includingFirst = true);
 
   // Using RAII + a lambda to implement a "finally" relacement.
   template <typename F>

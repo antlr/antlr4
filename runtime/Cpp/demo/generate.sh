@@ -26,11 +26,6 @@ set -o errexit
 #    antlr jar over and over again.
 CLASSPATH=../../../tool/resources/:ST-4.0.8.jar:../../../tool/target/classes:../../../runtime/Java/target/classes:../../../../antlr3/runtime/Java/target/classes
 
-# Minimal lexer + parser.
-java -cp $CLASSPATH org.antlr.v4.Tool -Dlanguage=Cpp -no-listener -no-visitor -o generated/ -package antlrcpptest Test.g4
-java -cp $CLASSPATH org.antlr.v4.Tool -Dlanguage=Java -listener -visitor -o generated/ Test.g4
-
-# A more complete lexer/parser set + listeners.
 java -cp $CLASSPATH org.antlr.v4.Tool -Dlanguage=Cpp -listener -visitor -o generated/ -package antlrcpptest TLexer.g4 TParser.g4
 #java -cp $CLASSPATH org.antlr.v4.Tool -Dlanguage=Cpp -listener -visitor -o generated/ -package antlrcpptest -XdbgST TLexer.g4 TParser.g4
 #java -cp $CLASSPATH org.antlr.v4.Tool -Dlanguage=Java -listener -visitor -o generated/ TLexer.g4 TParser.g4

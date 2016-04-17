@@ -54,5 +54,5 @@ bool SetTransition::matches(int symbol, int minVocabSymbol, int maxVocabSymbol) 
 }
 
 std::wstring SetTransition::toString() const {
-  return set.toString();
+  return L"SET " + Transition::toString() + L" { set: " + set.toString() + L"}";
 }

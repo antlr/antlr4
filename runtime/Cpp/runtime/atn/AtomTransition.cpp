@@ -53,5 +53,5 @@ bool AtomTransition::matches(int symbol, int minVocabSymbol, int maxVocabSymbol)
 }
 
 std::wstring AtomTransition::toString() const {
-  return std::to_wstring(_label);
+  return L"ATOM " + Transition::toString() + L" { label: " + std::to_wstring(_label) + L" }";
 }

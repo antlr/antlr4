@@ -31,6 +31,7 @@
 
 #pragma once
 
+#include "ProxyErrorListener.h"
 #include "IRecognizer.h"
 
 namespace org {
@@ -40,16 +41,15 @@ namespace runtime {
 
   class Recognizer : public IRecognizer {
   public:
-    //static const int _EOF = -1; ml: we don't need it IntStream, nor in Token, nor here
-
     Recognizer();
 
   private:
     static std::map<std::vector<std::wstring>, std::map<std::wstring, int>> _tokenTypeMapCache;
     static std::map<std::vector<std::wstring>, std::map<std::wstring, int>> _ruleIndexMapCache;
 
-    std::vector<ANTLRErrorListener*> _listeners;
-    //Mutex to manage synchronized access for multithreading
+    ProxyErrorListener _proxListener; // Manages a collection of listeners.
+
+    // Mutex to manage synchronized access for multithreading.
     std::mutex mtx;
 
   protected:
@@ -130,19 +130,15 @@ namespace runtime {
 
     virtual void removeErrorListeners();
 
-    virtual std::vector<ANTLRErrorListener *> *getErrorListeners() {
-      return &_listeners;
-    }
-
-    virtual ANTLRErrorListener *getErrorListenerDispatch();
+    virtual ProxyErrorListener& getErrorListenerDispatch();
 
     // subclass needs to override these if there are sempreds or actions
     // that the ATN interp needs to execute
-    virtual bool sempred(RuleContextRef localctx, int ruleIndex, int actionIndex);
+    virtual bool sempred(RuleContext::Ref localctx, int ruleIndex, int actionIndex);
 
-    virtual bool precpred(RuleContextRef localctx, int precedence);
+    virtual bool precpred(RuleContext::Ref localctx, int precedence);
 
-    virtual void action(RuleContextRef localctx, int ruleIndex, int actionIndex);
+    virtual void action(RuleContext::Ref localctx, int ruleIndex, int actionIndex);
 
     int getState();
 

@@ -84,7 +84,7 @@ std::wstring Trees::getNodeText(std::shared_ptr<Tree> t, const std::vector<std::
     } else if (is<ErrorNode>(t)) {
       return t->toString();
     } else if (is<TerminalNode>(t)) {
-      TokenRef symbol = (std::static_pointer_cast<TerminalNode>(t))->getSymbol();
+      Token::Ref symbol = (std::static_pointer_cast<TerminalNode>(t))->getSymbol();
       if (symbol != nullptr) {
         std::wstring s = symbol->getText();
         return s;
@@ -129,7 +129,7 @@ static void _findAllNodes(std::shared_ptr<ParseTree> t, int index, bool findToke
       nodes.push_back(t);
     }
   } else if (!findTokens && is<ParserRuleContext>(t)) {
-    ParserRuleContextRef ctx = std::dynamic_pointer_cast<ParserRuleContext>(t);
+    ParserRuleContext::Ref ctx = std::dynamic_pointer_cast<ParserRuleContext>(t);
     if (ctx->getRuleIndex() == index) {
       nodes.push_back(t);
     }

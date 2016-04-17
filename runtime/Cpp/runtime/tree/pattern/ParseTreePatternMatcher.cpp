@@ -100,7 +100,7 @@ ParseTreeMatch ParseTreePatternMatcher::match(std::shared_ptr<ParseTree> tree, c
 }
 
 ParseTreePattern ParseTreePatternMatcher::compile(const std::wstring &pattern, int patternRuleIndex) {
-  std::vector<TokenRef> tokenList = tokenize(pattern);
+  std::vector<Token::Ref> tokenList = tokenize(pattern);
   ListTokenSource *tokenSrc = new ListTokenSource(tokenList); // XXX: mem leak
   CommonTokenStream *tokens = new CommonTokenStream(tokenSrc);
 
@@ -108,7 +108,7 @@ ParseTreePattern ParseTreePatternMatcher::compile(const std::wstring &pattern, i
                                  _parser->getRuleNames(), _parser->getATNWithBypassAlts(), tokens);
 
   try {
-    ParserRuleContextRef context = parserInterp.parse(patternRuleIndex);
+    ParserRuleContext::Ref context = parserInterp.parse(patternRuleIndex);
     return ParseTreePattern(this, pattern, patternRuleIndex, context);
   } catch (std::exception &e) {
     std::throw_with_nested("Cannot invoke start rule");
@@ -168,8 +168,8 @@ std::shared_ptr<ParseTree> ParseTreePatternMatcher::matchImpl(std::shared_ptr<Pa
   }
 
   if (is<ParserRuleContext>(tree) && is<ParserRuleContext>(patternTree)) {
-    ParserRuleContextRef r1 = std::dynamic_pointer_cast<ParserRuleContext>(tree);
-    ParserRuleContextRef r2 = std::dynamic_pointer_cast<ParserRuleContext>(patternTree);
+    ParserRuleContext::Ref r1 = std::dynamic_pointer_cast<ParserRuleContext>(tree);
+    ParserRuleContext::Ref r2 = std::dynamic_pointer_cast<ParserRuleContext>(patternTree);
     std::shared_ptr<ParseTree> mismatchedNode;
 
     // (expr ...) and <expr>
@@ -228,12 +228,12 @@ std::shared_ptr<RuleTagToken> ParseTreePatternMatcher::getRuleTagToken(std::shar
   return nullptr;
 }
 
-std::vector<TokenRef> ParseTreePatternMatcher::tokenize(const std::wstring &pattern) {
+std::vector<Token::Ref> ParseTreePatternMatcher::tokenize(const std::wstring &pattern) {
   // split pattern into chunks: sea (raw input) and islands (<ID>, <expr>)
   std::vector<Chunk*> chunks = split(pattern);
 
   // create token stream from text and tags
-  std::vector<TokenRef> tokens;
+  std::vector<Token::Ref> tokens;
   for (auto chunk : chunks) {
     if (dynamic_cast<TagChunk*>(chunk) != nullptr) {
       TagChunk *tagChunk = static_cast<TagChunk*>(chunk);
@@ -259,7 +259,7 @@ std::vector<TokenRef> ParseTreePatternMatcher::tokenize(const std::wstring &patt
       TextChunk *textChunk = static_cast<TextChunk*>(chunk);
       ANTLRInputStream input(textChunk->getText());
       _lexer->setInputStream(&input);
-      TokenRef t = _lexer->nextToken();
+      Token::Ref t = _lexer->nextToken();
       while (t->getType() != EOF) {
         tokens.push_back(t);
         t = _lexer->nextToken();

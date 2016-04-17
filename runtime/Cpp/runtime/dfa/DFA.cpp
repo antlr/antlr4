@@ -37,23 +37,18 @@
 
 using namespace org::antlr::v4::runtime::dfa;
 
-DFA::DFA(atn::DecisionState *atnStartState) : atnStartState(atnStartState),
-states(new std::map<DFAState*, DFAState*>()), decision(0), s0(nullptr) {
+DFA::DFA(atn::DecisionState *atnStartState) : DFA(atnStartState, 0) {
 }
 
-DFA::DFA(atn::DecisionState *atnStartState, int decision) : atnStartState(atnStartState),
-states(new std::map<DFAState*, DFAState*>()), decision(decision), s0(nullptr) {
+DFA::DFA(atn::DecisionState *atnStartState, int decision)
+  : atnStartState(atnStartState), decision(decision), s0(nullptr) {
 }
 
-std::vector<DFAState*> DFA::getStates() {
-  // Get all the keys, which C++ doesn't do natively, ugh
-  std::map<DFAState*,DFAState*> mapints;
-  std::vector<DFAState*> vints;
-  for(auto imap: mapints) {
-    vints.push_back(imap.first);
-  }
+std::vector<DFAState *> DFA::getStates() {
+  std::vector<DFAState *> result;
+  for (auto state : states)
+    result.push_back(state.first);
 
-  std::vector<DFAState*> result = std::vector<DFAState*>(vints);
   std::sort(result.begin(), result.end(), [](DFAState *o1, DFAState *o2) {
     return o1->stateNumber - o2->stateNumber;
   });
@@ -61,26 +56,25 @@ std::vector<DFAState*> DFA::getStates() {
   return result;
 }
 
-
 std::wstring DFA::toString() {
   std::vector<std::wstring> tokenNames;
   return toString(tokenNames);
 }
 
-std::wstring DFA::toString(const std::vector<std::wstring>& tokenNames) {
+std::wstring DFA::toString(const std::vector<std::wstring> &tokenNames) {
   if (s0 == nullptr) {
     return L"";
   }
-  DFASerializer *serializer = new DFASerializer(this, tokenNames);
+  DFASerializer serializer(this, tokenNames);
 
-  return serializer->toString();
+  return serializer.toString();
 }
 
 std::wstring DFA::toLexerString() {
   if (s0 == nullptr) {
     return L"";
   }
-  DFASerializer *serializer = new LexerDFASerializer(this);
+  LexerDFASerializer serializer(this);
 
-  return serializer->toString();
+  return serializer.toString();
 }

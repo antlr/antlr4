@@ -39,30 +39,28 @@ namespace v4 {
 namespace runtime {
 
   class LexerInterpreter : public Lexer {
+  public:
+    LexerInterpreter(const std::wstring &grammarFileName, const std::vector<std::wstring> &tokenNames,
+                     const std::vector<std::wstring> &ruleNames, const std::vector<std::wstring> &modeNames,
+                     const atn::ATN &atn, CharStream *input);
+    ~LexerInterpreter();
+
+    virtual const atn::ATN& getATN() const override;
+    virtual std::wstring getGrammarFileName() const override;
+    virtual const std::vector<std::wstring>& getTokenNames() const override;
+    virtual const std::vector<std::wstring>& getRuleNames() const override;
+    virtual const std::vector<std::wstring>& getModeNames() const override;
+    
   protected:
     const std::wstring grammarFileName;
     const atn::ATN &_atn;
 
-    std::vector<std::wstring> _tokenNames;
-    std::vector<std::wstring> _ruleNames;
-    std::vector<std::wstring> _modeNames;
-    std::vector<dfa::DFA*> _decisionToDFA;
+    const std::vector<std::wstring> &_tokenNames;
+    const std::vector<std::wstring> &_ruleNames;
+    const std::vector<std::wstring> &_modeNames;
+    std::vector<dfa::DFA> _decisionToDFA;
 
     std::shared_ptr<atn::PredictionContextCache> _sharedContextCache;
-
-  public:
-    LexerInterpreter(const std::wstring &grammarFileName, std::vector<std::wstring> *tokenNames, std::vector<std::wstring> *ruleNames, std::vector<std::wstring> *modeNames, const atn::ATN &atn, CharStream *input);
-    ~LexerInterpreter();
-
-    virtual const atn::ATN& getATN() const override;
-
-    virtual std::wstring getGrammarFileName() const override;
-
-    virtual const std::vector<std::wstring>& getTokenNames() const override;
-
-    virtual const std::vector<std::wstring>& getRuleNames() const override;
-
-    virtual const std::vector<std::wstring>& getModeNames() const override;
   };
 
 } // namespace runtime

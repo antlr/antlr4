@@ -43,29 +43,31 @@ CommonTokenStream::CommonTokenStream(TokenSource *tokenSource, int channel) : Bu
   this->channel = channel;
 }
 
-size_t CommonTokenStream::adjustSeekIndex(size_t i) {
-  // XXX ml: that code is questionable. If there is no next token on the given channel we get an invalid stream position (-1).
-  return (size_t)nextTokenOnChannel(i, channel);
+ssize_t CommonTokenStream::adjustSeekIndex(size_t i) {
+  return nextTokenOnChannel(i, channel);
 }
 
-TokenRef CommonTokenStream::LB(size_t k) {
+Token::Ref CommonTokenStream::LB(size_t k) {
   if (k == 0 || k > _p) {
-    return TokenRef();
+    return Token::Ref();
   }
 
-  size_t i = _p;
+  ssize_t i = (ssize_t)_p;
   size_t n = 1;
   // find k good tokens looking backwards
   while (n <= k) {
     // skip off-channel tokens
-    // XXX ml: also here, no error handling for -1
-    i = (size_t)previousTokenOnChannel(i - 1, channel);
+    i = previousTokenOnChannel(i - 1, channel);
     n++;
   }
+  if (i < 0) {
+    return nullptr;
+  }
+
   return _tokens[i];
 }
 
-TokenRef CommonTokenStream::LT(ssize_t k) {
+Token::Ref CommonTokenStream::LT(ssize_t k) {
   lazyInit();
   if (k == 0) {
     return nullptr;
@@ -74,13 +76,12 @@ TokenRef CommonTokenStream::LT(ssize_t k) {
     return LB((size_t)-k);
   }
   size_t i = _p;
-  size_t n = 1; // we know tokens[p] is a good one
-             // find k good tokens
-  while (n < (size_t)k) {
+  ssize_t n = 1; // we know tokens[p] is a good one
+                 // find k good tokens
+  while (n < k) {
     // skip off-channel tokens, but make sure to not look past EOF
     if (sync(i + 1)) {
-      // XXX ml: no error handling either
-      i = (size_t)nextTokenOnChannel(i + 1, channel);
+      i = nextTokenOnChannel(i + 1, channel);
     }
     n++;
   }
@@ -92,7 +93,7 @@ int CommonTokenStream::getNumberOfOnChannelTokens() {
   int n = 0;
   fill();
   for (size_t i = 0; i < _tokens.size(); i++) {
-    TokenRef t = _tokens[i];
+    Token::Ref t = _tokens[i];
     if (t->getChannel() == channel) {
       n++;
     }

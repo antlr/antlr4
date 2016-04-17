@@ -40,7 +40,7 @@ using namespace org::antlr::v4::runtime;
 
 void BailErrorStrategy::recover(Parser *recognizer, const RecognitionException &e) {
   std::exception_ptr exception = std::make_exception_ptr(e);
-  ParserRuleContextRef context = recognizer->getContext();
+  ParserRuleContext::Ref context = recognizer->getContext();
   do {
     context->exception = exception;
     if (context->getParent().expired())
@@ -55,11 +55,11 @@ void BailErrorStrategy::recover(Parser *recognizer, const RecognitionException &
   }
 }
 
-TokenRef BailErrorStrategy::recoverInline(Parser *recognizer)  {
+Token::Ref BailErrorStrategy::recoverInline(Parser *recognizer)  {
   InputMismatchException e(recognizer);
   std::exception_ptr exception = std::make_exception_ptr(e);
 
-  ParserRuleContextRef context = recognizer->getContext();
+  ParserRuleContext::Ref context = recognizer->getContext();
   do {
     context->exception = exception;
     if (context->getParent().expired())

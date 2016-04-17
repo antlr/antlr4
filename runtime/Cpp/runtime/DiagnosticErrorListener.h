@@ -81,17 +81,17 @@ namespace runtime {
     /// {@code false} to report all ambiguities. </param>
     DiagnosticErrorListener(bool exactOnly);
 
-    virtual void reportAmbiguity(Parser *recognizer, dfa::DFA *dfa, size_t startIndex, size_t stopIndex, bool exact,
+    virtual void reportAmbiguity(Parser *recognizer, const dfa::DFA &dfa, size_t startIndex, size_t stopIndex, bool exact,
       const antlrcpp::BitSet &ambigAlts, std::shared_ptr<atn::ATNConfigSet> configs) override;
 
-    virtual void reportAttemptingFullContext(Parser *recognizer, dfa::DFA *dfa, size_t startIndex, size_t stopIndex,
+    virtual void reportAttemptingFullContext(Parser *recognizer, const dfa::DFA &dfa, size_t startIndex, size_t stopIndex,
       const antlrcpp::BitSet &conflictingAlts, std::shared_ptr<atn::ATNConfigSet> configs) override;
 
-    virtual void reportContextSensitivity(Parser *recognizer, dfa::DFA *dfa, size_t startIndex, size_t stopIndex,
+    virtual void reportContextSensitivity(Parser *recognizer, const dfa::DFA &dfa, size_t startIndex, size_t stopIndex,
       int prediction, std::shared_ptr<atn::ATNConfigSet> configs) override;
 
   protected:
-    virtual std::wstring getDecisionDescription(Parser *recognizer, dfa::DFA *dfa);
+    virtual std::wstring getDecisionDescription(Parser *recognizer, const dfa::DFA &dfa);
 
     /// <summary>
     /// Computes the set of conflicting or ambiguous alternatives from a

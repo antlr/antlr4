@@ -96,7 +96,7 @@ bool ATNConfigSet::add(ATNConfig *config, PredictionContextMergeCache *mergeCach
   }
   // a previous (s,i,pi,_), merge with it and save result
   bool rootIsWildcard = !fullCtx;
-  PredictionContextRef merged = PredictionContext::merge(existing->context, config->context, rootIsWildcard, mergeCache);
+  PredictionContext::Ref merged = PredictionContext::merge(existing->context, config->context, rootIsWildcard, mergeCache);
   // no need to check for existing.context, config.context in cache
   // since only way to create new graphs is "call rule" and here. We
   // cache at both places.
@@ -124,8 +124,8 @@ std::vector<ATNState*>* ATNConfigSet::getStates() {
   return states;
 }
 
-std::vector<SemanticContextRef> ATNConfigSet::getPredicates() {
-  std::vector<SemanticContextRef> preds;
+std::vector<SemanticContext::Ref> ATNConfigSet::getPredicates() {
+  std::vector<SemanticContext::Ref> preds;
   for (auto c : configs) {
     if (c->semanticContext != SemanticContext::NONE) {
       preds.push_back(c->semanticContext);

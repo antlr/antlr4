@@ -52,5 +52,6 @@ bool ActionTransition::matches(int symbol, int minVocabSymbol, int maxVocabSymbo
 }
 
 std::wstring ActionTransition::toString() const {
-  return std::wstring(L"action_") + std::to_wstring(ruleIndex) + std::wstring(L":") + std::to_wstring(actionIndex);
+  return L" ACTION " + Transition::toString() + L" { ruleIndex: " + std::to_wstring(ruleIndex) + L", actionIndex: " +
+  std::to_wstring(actionIndex) + L", isCtxDependent: " + std::to_wstring(isCtxDependent) + L" }";
 }

@@ -37,11 +37,11 @@
 using namespace org::antlr::v4::runtime;
 using namespace org::antlr::v4::runtime::tree;
 
-TerminalNodeImpl::TerminalNodeImpl(TokenRef symbol) {
+TerminalNodeImpl::TerminalNodeImpl(Token::Ref symbol) {
   this->symbol = symbol;
 }
 
-TokenRef TerminalNodeImpl::getSymbol() {
+Token::Ref TerminalNodeImpl::getSymbol() {
   return symbol;
 }
 

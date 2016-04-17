@@ -58,6 +58,8 @@ namespace runtime {
     /// <exception cref="UnsupportedOperationException"> if the stream does not support
     /// getting the text of the specified interval </exception>
     virtual std::wstring getText(const misc::Interval &interval) = 0;
+
+    virtual std::wstring toString() const = 0;
   };
 
 } // namespace runtime

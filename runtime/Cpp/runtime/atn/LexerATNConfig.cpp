@@ -37,11 +37,11 @@
 
 using namespace org::antlr::v4::runtime::atn;
 
-LexerATNConfig::LexerATNConfig(ATNState *state, int alt, PredictionContextRef context)
+LexerATNConfig::LexerATNConfig(ATNState *state, int alt, PredictionContext::Ref context)
   : ATNConfig(state, alt, context, SemanticContext::NONE), passedThroughNonGreedyDecision(false) {
 }
 
-LexerATNConfig::LexerATNConfig(ATNState *state, int alt, PredictionContextRef context, int actionIndex)
+LexerATNConfig::LexerATNConfig(ATNState *state, int alt, PredictionContext::Ref context, int actionIndex)
   : ATNConfig(state, alt, context, SemanticContext::NONE), passedThroughNonGreedyDecision(false) {
   lexerActionIndex = actionIndex;
 }
@@ -56,7 +56,7 @@ LexerATNConfig::LexerATNConfig(LexerATNConfig *c, ATNState *state, int actionInd
   lexerActionIndex = actionIndex;
 }
 
-LexerATNConfig::LexerATNConfig(LexerATNConfig *c, ATNState *state, PredictionContextRef context)
+LexerATNConfig::LexerATNConfig(LexerATNConfig *c, ATNState *state, PredictionContext::Ref context)
   : ATNConfig(c, state, context, c->semanticContext), passedThroughNonGreedyDecision(checkNonGreedyDecision(c, state)) {
   lexerActionIndex = c->lexerActionIndex;
 }

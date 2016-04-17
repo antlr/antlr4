@@ -47,5 +47,5 @@ bool NotSetTransition::matches(int symbol, int minVocabSymbol, int maxVocabSymbo
 }
 
 std::wstring NotSetTransition::toString() const {
-  return L'~' + SetTransition::toString();
+  return L"NOT_SET " + Transition::toString() + L" { " + SetTransition::toString() + L" }";
 }

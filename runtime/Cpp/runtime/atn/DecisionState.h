@@ -51,6 +51,8 @@ namespace atn {
     DecisionState() {
       InitializeInstanceFields();
     }
+
+    virtual std::wstring toString() const override;
   };
 
 } // namespace atn

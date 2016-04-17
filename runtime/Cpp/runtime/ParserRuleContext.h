@@ -31,6 +31,7 @@
 
 #pragma once
 
+#include "Token.h"
 #include "RuleContext.h"
 #include "CPPUtils.h"
 
@@ -64,14 +65,14 @@ namespace runtime {
   ///  satisfy the superclass interface.
   /// </summary>
   class ParserRuleContext : public RuleContext {
-    /// <summary>
+  public:
+    typedef std::shared_ptr<ParserRuleContext> Ref;
+
     /// If we are debugging or building a parse tree for a visitor,
     ///  we need to track all of the tokens and rule invocations associated
     ///  with this rule's context. This is empty for parsing w/o tree constr.
     ///  operation because we don't the need to track the details about
     ///  how we parse this rule.
-    /// </summary>
-  public:
     std::vector<std::shared_ptr<ParseTree>> children;
 
     /// <summary>
@@ -95,7 +96,7 @@ namespace runtime {
     /// </summary>
     //	public List<Integer> states;
 
-    TokenRef start, stop;
+    Token::Ref start, stop;
 
     /// The exception that forced this rule to return. If the rule successfully
     /// completed, this is "null exception pointer".
@@ -117,16 +118,16 @@ namespace runtime {
 
     /// Does not set parent link; other add methods do that.
     virtual std::shared_ptr<tree::TerminalNode> addChild(std::shared_ptr<tree::TerminalNode> t);
-    virtual RuleContextRef addChild(RuleContextRef ruleInvocation);
+    virtual RuleContext::Ref addChild(RuleContext::Ref ruleInvocation);
 
     /// Used by enterOuterAlt to toss out a RuleContext previously added as
     /// we entered a rule. If we have # label, we will need to remove
     /// generic ruleContext object.
     virtual void removeLastChild();
 
-    virtual std::shared_ptr<tree::TerminalNode> addChild(TokenRef matchedToken);
+    virtual std::shared_ptr<tree::TerminalNode> addChild(Token::Ref matchedToken);
 
-    virtual std::shared_ptr<tree::ErrorNode> addErrorNode(TokenRef badToken);
+    virtual std::shared_ptr<tree::ErrorNode> addErrorNode(Token::Ref badToken);
 
     std::weak_ptr<ParserRuleContext> getParent() { return std::dynamic_pointer_cast<ParserRuleContext>(getParentReference().lock()); };
 
@@ -166,8 +167,8 @@ namespace runtime {
     virtual std::size_t getChildCount() override;
     virtual misc::Interval getSourceInterval() override;
 
-    virtual TokenRef getStart();
-    virtual TokenRef getStop();
+    virtual Token::Ref getStart();
+    virtual Token::Ref getStop();
 
     /// <summary>
     /// Used for rule context info debugging during parse-time, not so much for ATN debugging </summary>

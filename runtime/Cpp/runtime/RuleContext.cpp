@@ -37,7 +37,7 @@
 
 using namespace org::antlr::v4::runtime;
 
-const ParserRuleContextRef RuleContext::EMPTY = std::make_shared<ParserRuleContext>();
+const RuleContext::Ref RuleContext::EMPTY = std::make_shared<ParserRuleContext>();
 
 RuleContext::RuleContext() {
   InitializeInstanceFields();
@@ -51,7 +51,7 @@ RuleContext::RuleContext(std::weak_ptr<RuleContext> parent, int invokingState) {
 
 int RuleContext::depth() {
   int n = 1;
-  RuleContextRef p = shared_from_this();
+  RuleContext::Ref p = shared_from_this();
   while (true) {
     if (p->parent.expired())
       break;
@@ -69,7 +69,7 @@ misc::Interval RuleContext::getSourceInterval() {
   return misc::Interval::INVALID;
 }
 
-RuleContextRef RuleContext::getRuleContext() {
+RuleContext::Ref RuleContext::getRuleContext() {
   return shared_from_this();
 }
 
@@ -148,14 +148,14 @@ std::wstring RuleContext::toStringTree() {
 
 
 std::wstring RuleContext::toString(const std::vector<std::wstring> &ruleNames) {
-  return toString(ruleNames, RuleContextRef());
+  return toString(ruleNames, RuleContext::Ref());
 }
 
 
-std::wstring RuleContext::toString(const std::vector<std::wstring> &ruleNames, RuleContextRef stop) {
+std::wstring RuleContext::toString(const std::vector<std::wstring> &ruleNames, RuleContext::Ref stop) {
   std::wstringstream ss;
 
-  RuleContextRef parent = shared_from_this();
+  RuleContext::Ref parent = shared_from_this();
   ss << L"[";
   while (parent != stop) {
     if (ruleNames.empty()) {
@@ -190,7 +190,7 @@ std::wstring RuleContext::toString(Recognizer *recog) {
   return toString(recog, ParserRuleContext::EMPTY);
 }
 
-std::wstring RuleContext::toString(Recognizer *recog, RuleContextRef stop) {
+std::wstring RuleContext::toString(Recognizer *recog, RuleContext::Ref stop) {
   return toString(recog->getRuleNames(), stop);
 }
 

@@ -84,7 +84,7 @@ public:
   <endif>
   
 private:
-  static std::vector\<dfa::DFA*> _decisionToDFA;
+  static std::vector\<dfa::DFA> _decisionToDFA;
   static std::shared_ptr\<atn::PredictionContextCache> _sharedContextCache;
   static std::vector\<std::wstring> _ruleNames;
   static std::vector\<std::wstring> _tokenNames;
@@ -175,7 +175,7 @@ bool <lexer.name>::sempred(std::shared_ptr\<RuleContext> context, int ruleIndex,
 <endif>
 
 // Static vars and initialization.
-std::vector\<dfa::DFA*> <lexer.name>::_decisionToDFA;
+std::vector\<dfa::DFA> <lexer.name>::_decisionToDFA;
 std::shared_ptr\<atn::PredictionContextCache> <lexer.name>::_sharedContextCache = std::make_shared\<atn::PredictionContextCache>();
 
 // We own the ATN which in turn owns the ATN states.
@@ -275,7 +275,7 @@ public:
   <endif>
 
 private:
-  static std::vector\<dfa::DFA*> _decisionToDFA;
+  static std::vector\<dfa::DFA> _decisionToDFA;
   static std::shared_ptr\<atn::PredictionContextCache> _sharedContextCache;
   static std::vector\<std::wstring> _ruleNames;
   static std::vector\<std::wstring> _tokenNames;
@@ -324,7 +324,7 @@ bool <parser.name>::sempred(std::shared_ptr\<RuleContext> context, int ruleIndex
 <sempredFuncs.values; separator="\n"><endif>
 
 // Static vars and initialization.
-std::vector\<dfa::DFA*> <parser.name>::_decisionToDFA;
+std::vector\<dfa::DFA> <parser.name>::_decisionToDFA;
 std::shared_ptr\<atn::PredictionContextCache> <parser.name>::_sharedContextCache = std::make_shared\<atn::PredictionContextCache>();
 
 // We own the ATN which in turn owns the ATN states.
@@ -369,7 +369,7 @@ atn::ATNDeserializer deserializer;
 _atn = deserializer.deserialize(_serializedATN);
 
 for (int i = 0; i \< _atn.getNumberOfDecisions(); i++) { <! Rework class ATN to allow standard iterations. !>
-  _decisionToDFA.push_back(new dfa::DFA(_atn.getDecisionState(i), i));
+  _decisionToDFA.push_back(dfa::DFA(_atn.getDecisionState(i), i));
 }
 >>
 
@@ -866,7 +866,7 @@ AddToLabelList(a) ::= <<
 <ctx(a.label)>-><a.listName>.push_back(<labelref(a.label)>);
 >>
 
-TokenLabelType() ::= "<file.TokenLabelType; null = {Token}>Ref"
+TokenLabelType() ::= "<file.TokenLabelType; null = {Token}>::Ref"
 
 TokenDeclHeader(t) ::= "<TokenLabelType()> <t.name>;" 
 TokenDecl(t) ::= "<! Variable Declaration !>"
@@ -874,7 +874,7 @@ TokenDecl(t) ::= "<! Variable Declaration !>"
 TokenTypeDeclHeader(t) ::= "<! Local Variable !>"
 TokenTypeDecl(t) ::= "ssize_t <t.name>;"
 
-TokenListDeclHeader(t) ::= "std::vector\<TokenRef> <t.name>;"
+TokenListDeclHeader(t) ::= "std::vector\<Token::Ref> <t.name>;"
 TokenListDecl(t) ::= "<! Variable Declaration !>"
 
 RuleContextDeclHeader(r) ::= "std::shared_ptr\<<parser.name>::<r.ctxName>> <r.name>;"

@@ -44,30 +44,23 @@ namespace runtime {
   /// listeners.
   class ProxyErrorListener : public ANTLRErrorListener {
   private:
-    std::vector<ANTLRErrorListener*> *const delegates;
+    std::set<ANTLRErrorListener *> _delegates; // Not owned.
 
   public:
-    template<typename T1> //where T1 : ANTLRErrorListener
-    ProxyErrorListener(std::vector<T1> *delegates) : delegates(delegates) {
-      if (delegates == nullptr) {
-        throw NullPointerException("delegates");
-      }
-    }
+    void addErrorListener(ANTLRErrorListener *listener);
+    void removeErrorListener(ANTLRErrorListener *listener);    
+    void removeErrorListeners();
 
-    void syntaxError(IRecognizer *recognizer, TokenRef offendingSymbol, size_t line, int charPositionInLine,
-                     const std::wstring &msg, std::exception_ptr e) override {
-      for (auto listener : *delegates) {
-        listener->syntaxError(recognizer, offendingSymbol, line, charPositionInLine, msg, e);
-      }
-    }
+    void syntaxError(IRecognizer *recognizer, Token::Ref offendingSymbol, size_t line, int charPositionInLine,
+                     const std::wstring &msg, std::exception_ptr e) override;
 
-    virtual void reportAmbiguity(Parser *recognizer, dfa::DFA *dfa, size_t startIndex, size_t stopIndex, bool exact,
+    virtual void reportAmbiguity(Parser *recognizer, const dfa::DFA &dfa, size_t startIndex, size_t stopIndex, bool exact,
                                  const antlrcpp::BitSet &ambigAlts, std::shared_ptr<atn::ATNConfigSet> configs) override;
 
-    virtual void reportAttemptingFullContext(Parser *recognizer, dfa::DFA *dfa, size_t startIndex, size_t stopIndex,
+    virtual void reportAttemptingFullContext(Parser *recognizer, const dfa::DFA &dfa, size_t startIndex, size_t stopIndex,
       const antlrcpp::BitSet &conflictingAlts, std::shared_ptr<atn::ATNConfigSet> configs) override;
 
-    virtual void reportContextSensitivity(Parser *recognizer, dfa::DFA *dfa, size_t startIndex, size_t stopIndex,
+    virtual void reportContextSensitivity(Parser *recognizer, const dfa::DFA &dfa, size_t startIndex, size_t stopIndex,
                                           int prediction, std::shared_ptr<atn::ATNConfigSet> configs) override;
   };
 

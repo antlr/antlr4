@@ -40,13 +40,9 @@ namespace runtime {
 
   class ConsoleErrorListener : public BaseErrorListener {
   public:
-    static ConsoleErrorListener *const INSTANCE;
+    static ConsoleErrorListener INSTANCE;
 
-    void syntaxError(IRecognizer *recognizer, void *offendingSymbol,
-                     int line, int charPositionInLine, const std::wstring &msg,
-                     RecognitionException *e)  {
-      std::wcerr << L"line " << line << L":" << charPositionInLine << L" " << msg;
-    }
+    virtual void syntaxError(IRecognizer *recognizer, Token::Ref offendingSymbol, size_t line, int charPositionInLine, const std::wstring &msg, std::exception_ptr e) override;
   };
 
 } // namespace runtime

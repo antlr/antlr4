@@ -29,15 +29,17 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "RuleStartState.h"
 #include "RuleTransition.h"
 
 using namespace org::antlr::v4::runtime::atn;
 
-// this(ruleStart, ruleIndex, 0, followState);
-RuleTransition::RuleTransition(RuleStartState *ruleStart, int ruleIndex, ATNState *followState) : Transition(followState), ruleIndex(ruleIndex), precedence(0) {
+RuleTransition::RuleTransition(RuleStartState *ruleStart, int ruleIndex, ATNState *followState)
+  : RuleTransition(ruleStart, ruleIndex, 0, followState) {
 }
 
-RuleTransition::RuleTransition(RuleStartState *ruleStart, int ruleIndex, int precedence, ATNState *followState) : Transition(followState), ruleIndex(ruleIndex), precedence(precedence) {
+RuleTransition::RuleTransition(RuleStartState *ruleStart, int ruleIndex, int precedence, ATNState *followState)
+  : Transition(ruleStart), ruleIndex(ruleIndex), precedence(precedence) {
   this->followState = followState;
 }
 
@@ -51,4 +53,11 @@ bool RuleTransition::isEpsilon() const {
 
 bool RuleTransition::matches(int symbol, int minVocabSymbol, int maxVocabSymbol) const {
   return false;
+}
+
+std::wstring RuleTransition::toString() const {
+  std::wstringstream ss;
+  ss << "RULE " << Transition::toString() << " { ruleIndex: " << ruleIndex << ", precedence: " << precedence <<
+    ", followState: " << std::hex << followState << " }";
+  return ss.str();
 }

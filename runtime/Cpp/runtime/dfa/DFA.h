@@ -38,15 +38,13 @@ namespace runtime {
 namespace dfa {
 
   class DFA {
-    /// <summary>
-    /// A set of all DFA states. Use <seealso cref="Map"/> so we can get old state back
-    ///  (<seealso cref="Set"/> only allows you to see if it's there).
-    /// </summary>
   public:
-    /// <summary>
-    /// From which ATN state did we create this DFA? </summary>
+    /// A set of all DFA states. Use a map so we can get old state back.
+    /// Set only allows you to see if it's there.
+
+    /// From which ATN state did we create this DFA?
     atn::DecisionState *const atnStartState;
-    std::map<DFAState*, DFAState*> *const states;
+    std::unordered_map<DFAState *, DFAState *> states;
     DFAState *s0;
     const int decision;
 

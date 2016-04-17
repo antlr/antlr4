@@ -32,18 +32,23 @@
 #include "ATN.h"
 #include "Transition.h"
 #include "IntervalSet.h"
+#include "CPPUtils.h"
 
 #include "ATNState.h"
 
 using namespace org::antlr::v4::runtime::atn;
+using namespace antlrcpp;
 
 const int ATNState::INITIAL_NUM_TRANSITIONS;
 const int ATNState::INVALID_STATE_NUMBER;
 
 ATNState::~ATNState() {
+  for (auto transition : transitions) {
+    delete transition;
+  }
 };
 
-const wchar_t * ATNState::serializationNames[] =  {L"INVALID", L"BASIC", L"RULE_START", L"BLOCK_START",
+const std::vector<std::wstring> ATNState::serializationNames =  {L"INVALID", L"BASIC", L"RULE_START", L"BLOCK_START",
   L"PLUS_BLOCK_START", L"STAR_BLOCK_START", L"TOKEN_START", L"RULE_STOP",
   L"BLOCK_END", L"STAR_LOOP_BACK", L"STAR_LOOP_ENTRY", L"PLUS_LOOP_BACK", L"LOOP_END"};
 
@@ -60,13 +65,26 @@ bool ATNState::isNonGreedyExitState() {
 }
 
 std::wstring ATNState::toString() const {
-  return std::to_wstring(stateNumber);
+  std::wstringstream ss;
+  ss << "(ATNState " << std::hex << this << std::dec << ") {" << std::endl;
+  if (stateNumber < 0 || stateNumber >= (int)serializationNames.size())
+    ss << "  state: INVALID ";
+  else
+    ss << "  state: " << serializationNames[(size_t)stateNumber];
+  ss << " (" << stateNumber << ")" << std::endl;
+  ss << "  ruleIndex: " << ruleIndex << std::endl << "  epsilonOnlyTransitions: " << epsilonOnlyTransitions << std::endl;
+  ss << "  transistions (" << transitions.size() << "):" << std::endl;
+
+  for (auto transition : transitions) {
+    ss << indent(transition->toString(), L"    ") << std::endl;
+  }
+  ss << "}";
+
+  return ss.str();
 }
 
 std::vector<Transition*> ATNState::getTransitions() {
-  std::vector<Transition*> arr(transitions);
-
-  return arr;
+  return transitions;
 }
 
 size_t ATNState::getNumberOfTransitions() {
@@ -107,11 +125,4 @@ bool ATNState::onlyHasEpsilonTransitions() {
 
 void ATNState::setRuleIndex(int ruleIndex) {
   this->ruleIndex = ruleIndex;
-}
-
-void ATNState::InitializeInstanceFields() {
-  atn = 0;
-  stateNumber = INVALID_STATE_NUMBER;
-  ruleIndex = 0;
-  epsilonOnlyTransitions = false;
 }

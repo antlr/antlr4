@@ -52,5 +52,6 @@ bool RangeTransition::matches(int symbol, int minVocabSymbol, int maxVocabSymbol
 }
 
 std::wstring RangeTransition::toString() const {
-  return std::wstring(L"'") + static_cast<wchar_t>(from) + std::wstring(L"'..'") + static_cast<wchar_t>(to) + std::wstring(L"'");
+  return L"RANGE " + Transition::toString() + L" { from: " + std::to_wstring(from) + L", to: " + std::to_wstring(to) +
+    L" }";
 }

@@ -39,7 +39,7 @@
 using namespace org::antlr::v4::runtime::dfa;
 using namespace org::antlr::v4::runtime::atn;
 
-DFAState::PredPrediction::PredPrediction(SemanticContextRef pred, int alt) : pred(pred) {
+DFAState::PredPrediction::PredPrediction(SemanticContext::Ref pred, int alt) : pred(pred) {
   InitializeInstanceFields();
   this->alt = alt;
 }

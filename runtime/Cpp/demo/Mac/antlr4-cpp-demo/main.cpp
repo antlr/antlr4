@@ -12,39 +12,18 @@
 #include "TLexer.h"
 #include "TParser.h"
 
-#include "TestLexer.h"
-#include "TestParser.h"
-
 using namespace antlrcpptest;
 using namespace org::antlr::v4::runtime;
 
 int main(int argc, const char * argv[]) {
-
-  ANTLRInputStream input(L"a");
+  ANTLRInputStream input(L"divide and conquer");
   TLexer lexer(&input);
   CommonTokenStream tokens(&lexer);
 
   TParser parser(&tokens);
   std::shared_ptr<tree::ParseTree> tree = parser.main();
-
-  for (auto token : tokens.getTokens()) {
-    std::wcout << token->toString() << std::endl;
-  }
-  std::wcout << tree->toStringTree(&parser);
-
-/*
-  ANTLRInputStream input(L"1");
-  TLexer lexer(&input);
-  CommonTokenStream tokens(&lexer);
-
-  TParser parser(&tokens);
-  std::shared_ptr<tree::ParseTree> tree = parser.main();
-
-  for (auto token : tokens.getTokens()) {
-    std::wcout << token->toString() << std::endl;
-  }
 
   std::wcout << tree->toStringTree(&parser) << std::endl;
-*/
+
   return 0;
 }

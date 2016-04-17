@@ -54,11 +54,14 @@ size_t SemanticContext::Predicate::hashCode() {
 }
 
 bool SemanticContext::Predicate::operator == (const SemanticContext &other) const {
-  if (this == &other) {
+  const Predicate *p = dynamic_cast<const Predicate*>(&other);
+  if (p == nullptr)
+    return false;
+
+  if (this == p) {
     return true;
   }
 
-  const Predicate *p = dynamic_cast<const Predicate*>(&other);
   if (p == nullptr)
     return false;
 
@@ -86,11 +89,14 @@ size_t SemanticContext::PrecedencePredicate::hashCode() {
 }
 
 bool SemanticContext::PrecedencePredicate::operator == (const SemanticContext &other) const {
-  if (this == &other) {
+  const PrecedencePredicate *predicate = dynamic_cast<const PrecedencePredicate *>(&other);
+  if (predicate == nullptr)
+    return false;
+
+  if (this == predicate) {
     return true;
   }
 
-  const PrecedencePredicate *predicate = dynamic_cast<const PrecedencePredicate *>(&other);
   return precedence == predicate->precedence;
 }
 
@@ -99,10 +105,10 @@ std::wstring SemanticContext::PrecedencePredicate::toString() const {
 }
 
 
-SemanticContext::AND::AND(SemanticContextRef a, SemanticContextRef b) {
+SemanticContext::AND::AND(SemanticContext::Ref a, SemanticContext::Ref b) {
 
   if (is<AND>(a)) {
-    const std::vector<SemanticContextRef> op = ((AND*)a.get())->opnds;
+    const std::vector<SemanticContext::Ref> op = ((AND*)a.get())->opnds;
     for (auto var : op) {
       opnds.push_back(var);
     }
@@ -111,7 +117,7 @@ SemanticContext::AND::AND(SemanticContextRef a, SemanticContextRef b) {
   }
 
   if (is<AND>(b)) {
-    const std::vector<SemanticContextRef> op = ((AND*)b.get())->opnds;
+    const std::vector<SemanticContext::Ref> op = ((AND*)b.get())->opnds;
     for (auto var : op) {
       opnds.push_back(var);
     }
@@ -133,11 +139,14 @@ SemanticContext::AND::AND(SemanticContextRef a, SemanticContextRef b) {
 }
 
 bool SemanticContext::AND::operator == (const SemanticContext &other) const {
-  if (this == &other) {
+  const AND *context = dynamic_cast<const AND *>(&other);
+  if (context == nullptr)
+    return false;
+
+  if (this == context) {
     return true;
   }
 
-  const AND *context = dynamic_cast<const AND *>(&other);
   return opnds == context->opnds;
 }
 
@@ -156,10 +165,10 @@ std::wstring SemanticContext::AND::toString() const {
   return tmp;
 }
 
-SemanticContext::OR::OR(SemanticContextRef a, SemanticContextRef b){
+SemanticContext::OR::OR(SemanticContext::Ref a, SemanticContext::Ref b){
 
   if (is<OR>(a)) {
-    const std::vector<SemanticContextRef> op = ((OR*)a.get())->opnds;
+    const std::vector<SemanticContext::Ref> op = ((OR*)a.get())->opnds;
     for (auto var : op) {
       opnds.push_back(var);
     }
@@ -168,7 +177,7 @@ SemanticContext::OR::OR(SemanticContextRef a, SemanticContextRef b){
   }
 
   if (is<OR>(b)) {
-    const std::vector<SemanticContextRef> op = ((OR*)b.get())->opnds;
+    const std::vector<SemanticContext::Ref> op = ((OR*)b.get())->opnds;
     for (auto var : op) {
       opnds.push_back(var);
     }
@@ -188,11 +197,13 @@ SemanticContext::OR::OR(SemanticContextRef a, SemanticContextRef b){
 }
 
 bool SemanticContext::OR::operator == (const SemanticContext &other) const {
-  if (this == &other) {
+  const OR *context = dynamic_cast<const OR *>(&other);
+  if (context == nullptr)
+    return false;
+
+  if (this == context) {
     return true;
   }
-
-  const OR *context = dynamic_cast<const OR *>(&other);
 
   return opnds == context->opnds;
 }
@@ -201,6 +212,14 @@ size_t SemanticContext::OR::hashCode() {
   return misc::MurmurHash::hashCode(opnds, typeid(OR).hash_code());
 }
 
+bool SemanticContext::OR::eval(Recognizer *parser, RuleContext::Ref outerContext) {
+  for (auto opnd : opnds) {
+    if (opnd->eval(parser, outerContext)) {
+      return true;
+    }
+  }
+  return false;
+}
 
 std::wstring SemanticContext::OR::toString() const {
   std::wstring tmp;
@@ -210,9 +229,9 @@ std::wstring SemanticContext::OR::toString() const {
   return tmp;
 }
 
-const SemanticContextRef SemanticContext::NONE = std::make_shared<SemanticContext::Predicate>(-1, -1, false);
+const SemanticContext::Ref SemanticContext::NONE = std::make_shared<SemanticContext::Predicate>(-1, -1, false);
 
-SemanticContextRef SemanticContext::And(SemanticContextRef a, SemanticContextRef b) {
+SemanticContext::Ref SemanticContext::And(SemanticContext::Ref a, SemanticContext::Ref b) {
   if (!a || a == NONE) {
     return b;
   }
@@ -229,7 +248,7 @@ SemanticContextRef SemanticContext::And(SemanticContextRef a, SemanticContextRef
   return result;
 }
 
-SemanticContextRef SemanticContext::Or(SemanticContextRef a, SemanticContextRef b) {
+SemanticContext::Ref SemanticContext::Or(SemanticContext::Ref a, SemanticContext::Ref b) {
   if (!a) {
     return b;
   }

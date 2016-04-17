@@ -36,11 +36,11 @@
 
 using namespace org::antlr::v4::runtime::atn;
 
-ATNConfig::ATNConfig(ATNState *state, int alt, PredictionContextRef context)
+ATNConfig::ATNConfig(ATNState *state, int alt, PredictionContext::Ref context)
   : ATNConfig(state, alt, context, SemanticContext::NONE) {
 }
 
-ATNConfig::ATNConfig(ATNState *state, int alt, PredictionContextRef context, SemanticContextRef semanticContext)
+ATNConfig::ATNConfig(ATNState *state, int alt, PredictionContext::Ref context, SemanticContext::Ref semanticContext)
   : state(state), alt(alt), context(context), semanticContext(semanticContext) {
   reachesIntoOuterContext = 0;
 }
@@ -51,19 +51,19 @@ ATNConfig::ATNConfig(ATNConfig *c) : ATNConfig(c, c->state, c->context, c->seman
 ATNConfig::ATNConfig(ATNConfig *c, ATNState *state) : ATNConfig(c, state, c->context, c->semanticContext) {
 }
 
-ATNConfig::ATNConfig(ATNConfig *c, ATNState *state, SemanticContextRef semanticContext)
+ATNConfig::ATNConfig(ATNConfig *c, ATNState *state, SemanticContext::Ref semanticContext)
   : ATNConfig(c, state, c->context, semanticContext) {
 }
 
-ATNConfig::ATNConfig(ATNConfig *c, SemanticContextRef semanticContext)
+ATNConfig::ATNConfig(ATNConfig *c, SemanticContext::Ref semanticContext)
   : ATNConfig(c, c->state, c->context, semanticContext) {
 }
 
-ATNConfig::ATNConfig(ATNConfig *c, ATNState *state, PredictionContextRef context)
+ATNConfig::ATNConfig(ATNConfig *c, ATNState *state, PredictionContext::Ref context)
   : ATNConfig(c, state, context, c->semanticContext) {
 }
 
-ATNConfig::ATNConfig(ATNConfig *c, ATNState *state, PredictionContextRef context, SemanticContextRef semanticContext)
+ATNConfig::ATNConfig(ATNConfig *c, ATNState *state, PredictionContext::Ref context, SemanticContext::Ref semanticContext)
   : state(state), alt(c->alt), context(context), semanticContext(semanticContext), reachesIntoOuterContext(c->reachesIntoOuterContext) {
 }
 

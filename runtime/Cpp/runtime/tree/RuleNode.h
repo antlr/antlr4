@@ -41,7 +41,8 @@ namespace tree {
 
   class RuleNode : public ParseTree {
   public:
-    virtual runtime::RuleContextRef getRuleContext() = 0;
+    // Because of cross references (RuleNode <-> RuleContext) we cannot use RuleContext::Ref here.
+    virtual std::shared_ptr<runtime::RuleContext> getRuleContext() = 0;
   };
 
 } // namespace tree

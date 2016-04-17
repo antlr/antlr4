@@ -49,7 +49,7 @@ namespace runtime {
   /// </summary>
   class ListTokenSource : public TokenSource {
   protected:
-    const std::vector<TokenRef> tokens;
+    const std::vector<Token::Ref> tokens;
 
     /// <summary>
     /// The name of the input source. If this value is {@code null}, a call to
@@ -71,7 +71,7 @@ namespace runtime {
     /// <summary>
     /// This field caches the EOF token for the token source.
     /// </summary>
-    TokenRef eofToken;
+    Token::Ref eofToken;
 
     /// <summary>
     /// This is the backing field for <seealso cref="#getTokenFactory"/> and
@@ -115,7 +115,7 @@ namespace runtime {
     }
 
     virtual int getCharPositionInLine() override;
-    virtual TokenRef nextToken() override;
+    virtual Token::Ref nextToken() override;
     virtual size_t getLine() const override;
     virtual CharStream* getInputStream() override;
     virtual std::string getSourceName() override;

@@ -69,10 +69,12 @@ namespace atn {
 
     static const std::vector<std::wstring> serializationNames;
 
-    /// <summary>
-    /// The target of this transition. </summary>
+    /// The target of this transition.
+    // ml: this is a reference into the ATN.
     ATNState *target;
 
+    virtual ~Transition() {};
+    
   protected:
     Transition(ATNState *target);
 
@@ -84,6 +86,8 @@ namespace atn {
     virtual bool isEpsilon() const;
     virtual misc::IntervalSet label() const;
     virtual bool matches(int symbol, int minVocabSymbol, int maxVocabSymbol) const = 0;
+
+    virtual std::wstring toString() const;
   };
 
 } // namespace atn

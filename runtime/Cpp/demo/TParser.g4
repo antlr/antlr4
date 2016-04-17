@@ -56,6 +56,7 @@ conquer:
 
 // Unused rule to demonstrate some of the special features.
 unused[double input] returns [double calculated] locals [size_t _a, double _b, int _c] @init{ doInit(); } @after { doAfter(); } :
+	stat
 ;
 catch [...] {
   // Replaces the standard exception handling.

@@ -55,7 +55,7 @@ ParserInterpreter::ParserInterpreter(const std::wstring &grammarFileName, const 
   : Parser(input), _grammarFileName(grammarFileName), _tokenNames(tokenNames), _atn(atn), _ruleNames(ruleNames) {
 
   for (int i = 0; i < _atn.getNumberOfDecisions(); i++) {
-    _decisionToDFA.push_back(new dfa::DFA(_atn.getDecisionState(i), i));
+    _decisionToDFA.push_back(dfa::DFA(_atn.getDecisionState(i), i));
   }
 
   // identify the ATN states where pushNewRecursionContext must be called
@@ -103,7 +103,7 @@ std::wstring ParserInterpreter::getGrammarFileName() const {
   return _grammarFileName;
 }
 
-ParserRuleContextRef ParserInterpreter::parse(int startRuleIndex) {
+ParserRuleContext::Ref ParserInterpreter::parse(int startRuleIndex) {
   atn::RuleStartState *startRuleStartState = _atn.ruleToStartState[(size_t)startRuleIndex];
 
   std::shared_ptr<InterpreterRuleContext> rootContext =
@@ -135,7 +135,7 @@ ParserRuleContextRef ParserInterpreter::parse(int startRuleIndex) {
   }
 }
 
-void ParserInterpreter::enterRecursionRule(ParserRuleContextRef localctx, int state, int ruleIndex, int precedence) {
+void ParserInterpreter::enterRecursionRule(ParserRuleContext::Ref localctx, int state, int ruleIndex, int precedence) {
   _parentContextStack.push({ _ctx, localctx->invokingState });
   Parser::enterRecursionRule(localctx, state, ruleIndex, precedence);
 }
@@ -227,7 +227,7 @@ void ParserInterpreter::visitState(atn::ATNState *p) {
 void ParserInterpreter::visitRuleStopState(atn::ATNState *p) {
   atn::RuleStartState *ruleStartState = _atn.ruleToStartState[(size_t)p->ruleIndex];
   if (ruleStartState->isPrecedenceRule) {
-    std::pair<ParserRuleContextRef, int> parentContext = _parentContextStack.top();
+    std::pair<ParserRuleContext::Ref, int> parentContext = _parentContextStack.top();
     _parentContextStack.pop();
 
     unrollRecursionContexts(parentContext.first);

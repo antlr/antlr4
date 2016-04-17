@@ -81,7 +81,7 @@ Guid::Guid(const unsigned char *bytes)
 }
 
 // create a guid from array of words
-Guid::Guid(const uint32_t *bytes, bool reverse)
+Guid::Guid(const uint16_t *bytes, bool reverse)
 {
   if (reverse) {
     for (size_t i = 8; i > 0; --i)
@@ -182,7 +182,7 @@ bool Guid::operator!=(const Guid &other) const
 const std::string Guid::toString() const
 {
   std::stringstream os;
-  os << this;
+  os << *this;
   return os.str();
 }
 

@@ -46,7 +46,7 @@ DiagnosticErrorListener::DiagnosticErrorListener() : exactOnly(true) {
 DiagnosticErrorListener::DiagnosticErrorListener(bool exactOnly) : exactOnly(exactOnly) {
 }
 
-void DiagnosticErrorListener::reportAmbiguity(Parser *recognizer, dfa::DFA *dfa, size_t startIndex, size_t stopIndex,
+void DiagnosticErrorListener::reportAmbiguity(Parser *recognizer, const dfa::DFA &dfa, size_t startIndex, size_t stopIndex,
    bool exact, const antlrcpp::BitSet &ambigAlts, std::shared_ptr<atn::ATNConfigSet> configs) {
   if (exactOnly && !exact) {
     return;
@@ -61,7 +61,7 @@ void DiagnosticErrorListener::reportAmbiguity(Parser *recognizer, dfa::DFA *dfa,
   recognizer->notifyErrorListeners(message);
 }
 
-void DiagnosticErrorListener::reportAttemptingFullContext(Parser *recognizer, dfa::DFA *dfa, size_t startIndex,
+void DiagnosticErrorListener::reportAttemptingFullContext(Parser *recognizer, const dfa::DFA &dfa, size_t startIndex,
   size_t stopIndex, const antlrcpp::BitSet &conflictingAlts, std::shared_ptr<atn::ATNConfigSet> configs) {
   std::wstring decision = getDecisionDescription(recognizer, dfa);
   std::wstring text = recognizer->getTokenStream()->getText(misc::Interval((int)startIndex, (int)stopIndex));
@@ -69,7 +69,7 @@ void DiagnosticErrorListener::reportAttemptingFullContext(Parser *recognizer, df
   recognizer->notifyErrorListeners(message);
 }
 
-void DiagnosticErrorListener::reportContextSensitivity(Parser *recognizer, dfa::DFA *dfa, size_t startIndex,
+void DiagnosticErrorListener::reportContextSensitivity(Parser *recognizer, const dfa::DFA &dfa, size_t startIndex,
   size_t stopIndex, int prediction, std::shared_ptr<atn::ATNConfigSet> configs) {
   std::wstring decision = getDecisionDescription(recognizer, dfa);
   std::wstring text = recognizer->getTokenStream()->getText(misc::Interval((int)startIndex, (int)stopIndex));
@@ -77,9 +77,9 @@ void DiagnosticErrorListener::reportContextSensitivity(Parser *recognizer, dfa::
   recognizer->notifyErrorListeners(message);
 }
 
-std::wstring DiagnosticErrorListener::getDecisionDescription(Parser *recognizer, dfa::DFA *dfa) {
-  int decision = dfa->decision;
-  int ruleIndex = ((atn::ATNState*)dfa->atnStartState)->ruleIndex;
+std::wstring DiagnosticErrorListener::getDecisionDescription(Parser *recognizer, const dfa::DFA &dfa) {
+  int decision = dfa.decision;
+  int ruleIndex = ((atn::ATNState*)dfa.atnStartState)->ruleIndex;
 
   const std::vector<std::wstring>& ruleNames = recognizer->getRuleNames();
   if (ruleIndex < 0 || ruleIndex >= (int)ruleNames.size()) {

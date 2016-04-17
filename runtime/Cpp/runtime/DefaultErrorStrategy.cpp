@@ -195,7 +195,7 @@ void DefaultErrorStrategy::reportUnwantedToken(Parser *recognizer) {
 
   beginErrorCondition(recognizer);
 
-  TokenRef t = recognizer->getCurrentToken();
+  Token::Ref t = recognizer->getCurrentToken();
   std::wstring tokenName = getTokenErrorDisplay(t);
   misc::IntervalSet expecting = getExpectedTokens(recognizer);
 
@@ -210,16 +210,16 @@ void DefaultErrorStrategy::reportMissingToken(Parser *recognizer) {
 
   beginErrorCondition(recognizer);
 
-  TokenRef t = recognizer->getCurrentToken();
+  Token::Ref t = recognizer->getCurrentToken();
   misc::IntervalSet expecting = getExpectedTokens(recognizer);
   std::wstring msg = std::wstring(L"missing ") + expecting.toString(recognizer->getTokenNames()) + std::wstring(L" at ") + getTokenErrorDisplay(t);
 
   recognizer->notifyErrorListeners(t, msg, nullptr);
 }
 
-TokenRef DefaultErrorStrategy::recoverInline(Parser *recognizer) {
+Token::Ref DefaultErrorStrategy::recoverInline(Parser *recognizer) {
   // SINGLE TOKEN DELETION
-  TokenRef matchedSymbol = singleTokenDeletion(recognizer);
+  Token::Ref matchedSymbol = singleTokenDeletion(recognizer);
   if (matchedSymbol) {
     // we have deleted the extra token.
     // now, move past ttype token as if all were ok
@@ -253,22 +253,22 @@ bool DefaultErrorStrategy::singleTokenInsertion(Parser *recognizer) {
   return false;
 }
 
-TokenRef DefaultErrorStrategy::singleTokenDeletion(Parser *recognizer) {
+Token::Ref DefaultErrorStrategy::singleTokenDeletion(Parser *recognizer) {
   ssize_t nextTokenType = recognizer->getInputStream()->LA(2);
   misc::IntervalSet expecting = getExpectedTokens(recognizer);
   if (expecting.contains((int)nextTokenType)) {
     reportUnwantedToken(recognizer);
     recognizer->consume(); // simply delete extra token
                            // we want to return the token we're actually matching
-    TokenRef matchedSymbol = recognizer->getCurrentToken();
+    Token::Ref matchedSymbol = recognizer->getCurrentToken();
     reportMatch(recognizer); // we know current token is correct
     return matchedSymbol;
   }
   return nullptr;
 }
 
-TokenRef DefaultErrorStrategy::getMissingSymbol(Parser *recognizer) {
-  TokenRef currentSymbol = recognizer->getCurrentToken();
+Token::Ref DefaultErrorStrategy::getMissingSymbol(Parser *recognizer) {
+  Token::Ref currentSymbol = recognizer->getCurrentToken();
   misc::IntervalSet expecting = getExpectedTokens(recognizer);
   ssize_t expectedTokenType = expecting.getMinElement(); // get any element
   std::wstring tokenText;
@@ -277,8 +277,8 @@ TokenRef DefaultErrorStrategy::getMissingSymbol(Parser *recognizer) {
   } else {
     tokenText = std::wstring(L"<missing ") + recognizer->getTokenNames()[(size_t)expectedTokenType] + std::wstring(L">");
   }
-  TokenRef current = currentSymbol;
-  TokenRef lookback = recognizer->getTokenStream()->LT(-1);
+  Token::Ref current = currentSymbol;
+  Token::Ref lookback = recognizer->getTokenStream()->LT(-1);
   if (current->getType() == EOF && lookback != nullptr) {
     current = lookback;
   }
@@ -291,7 +291,7 @@ misc::IntervalSet DefaultErrorStrategy::getExpectedTokens(Parser *recognizer) {
   return recognizer->getExpectedTokens();
 }
 
-std::wstring DefaultErrorStrategy::getTokenErrorDisplay(TokenRef t) {
+std::wstring DefaultErrorStrategy::getTokenErrorDisplay(Token::Ref t) {
   if (t == nullptr) {
     return L"<no token>";
   }
@@ -306,11 +306,11 @@ std::wstring DefaultErrorStrategy::getTokenErrorDisplay(TokenRef t) {
   return escapeWSAndQuote(s);
 }
 
-std::wstring DefaultErrorStrategy::getSymbolText(TokenRef symbol) {
+std::wstring DefaultErrorStrategy::getSymbolText(Token::Ref symbol) {
   return symbol->getText();
 }
 
-int DefaultErrorStrategy::getSymbolType(TokenRef symbol) {
+int DefaultErrorStrategy::getSymbolType(Token::Ref symbol) {
   return symbol->getType();
 }
 
@@ -324,7 +324,7 @@ std::wstring DefaultErrorStrategy::escapeWSAndQuote(std::wstring &s) {
 
 misc::IntervalSet DefaultErrorStrategy::getErrorRecoverySet(Parser *recognizer) {
   const atn::ATN &atn = recognizer->getInterpreter<atn::ATNSimulator>()->atn;
-  RuleContextRef ctx = recognizer->getContext();
+  RuleContext::Ref ctx = recognizer->getContext();
   misc::IntervalSet recoverSet;
   while (ctx->invokingState >= 0) {
     // compute what follows who invoked us

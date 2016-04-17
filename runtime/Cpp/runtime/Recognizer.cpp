@@ -29,10 +29,10 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "ConsoleErrorListener.h"
 #include "RecognitionException.h"
 #include "CPPUtils.h"
 #include "Strings.h"
-#include "ProxyErrorListener.h"
 #include "Token.h"
 #include "CPPUtils.h"
 
@@ -42,6 +42,11 @@ using namespace org::antlr::v4::runtime;
 
 std::map<std::vector<std::wstring>, std::map<std::wstring, int>> Recognizer::_tokenTypeMapCache;
 std::map<std::vector<std::wstring>, std::map<std::wstring, int>> Recognizer::_ruleIndexMapCache;
+
+Recognizer::Recognizer() {
+  InitializeInstanceFields();
+  _proxListener.addErrorListener(&ConsoleErrorListener::INSTANCE);
+}
 
 std::map<std::wstring, int> Recognizer::getTokenTypeMap() {
   const std::vector<std::wstring>& tokenNames = getTokenNames();
@@ -120,37 +125,30 @@ std::wstring Recognizer::getTokenErrorDisplay(Token *t) {
 }
 
 void Recognizer::addErrorListener(ANTLRErrorListener *listener) {
-  if (listener == nullptr) {
-    throw L"listener cannot be null.";
-  }
-
-  _listeners.push_back(listener);
+  _proxListener.addErrorListener(listener);
 }
 
 void Recognizer::removeErrorListener(ANTLRErrorListener *listener) {
-  //_listeners.remove(listener); does this work the same way?
-  std::vector<ANTLRErrorListener*>::iterator it;
-  it = std::find(_listeners.begin(), _listeners.end(), listener);
-  _listeners.erase(it);
+  _proxListener.removeErrorListener(listener);
 }
 
 void Recognizer::removeErrorListeners() {
-  _listeners.clear();
+  _proxListener.removeErrorListeners();
 }
 
-ANTLRErrorListener *Recognizer::getErrorListenerDispatch() {
-  return (ANTLRErrorListener *)new ProxyErrorListener(getErrorListeners());
+ProxyErrorListener& Recognizer::getErrorListenerDispatch() {
+  return _proxListener;
 }
 
-bool Recognizer::sempred(RuleContextRef localctx, int ruleIndex, int actionIndex) {
+bool Recognizer::sempred(RuleContext::Ref localctx, int ruleIndex, int actionIndex) {
   return true;
 }
 
-bool Recognizer::precpred(RuleContextRef localctx, int precedence) {
+bool Recognizer::precpred(RuleContext::Ref localctx, int precedence) {
   return true;
 }
 
-void Recognizer::action(RuleContextRef localctx, int ruleIndex, int actionIndex) {
+void Recognizer::action(RuleContext::Ref localctx, int ruleIndex, int actionIndex) {
 }
 
 int Recognizer::getState() {
@@ -165,9 +163,5 @@ void Recognizer::setState(int atnState) {
 void Recognizer::InitializeInstanceFields() {
   _stateNumber = -1;
   _interpreter = nullptr;
-  _listeners = std::vector<ANTLRErrorListener*>();
 }
 
-Recognizer::Recognizer() {
-  InitializeInstanceFields();
-}

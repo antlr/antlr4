@@ -36,6 +36,7 @@
 #include "IRecognizer.h"
 #include "IntStream.h"
 #include "RuleContext.h"
+#include "ParserRuleContext.h"
 #include "Token.h"
 
 namespace org {
@@ -53,20 +54,20 @@ namespace runtime {
     /// The Recognizer where this exception originated.
     IRecognizer *_recognizer;
     IntStream *_input;
-    RuleContextRef _ctx;
+    ParserRuleContext::Ref _ctx;
 
     /// The current Token when an error occurred. Since not all streams
     /// support accessing symbols by index, we have to track the Token
     /// instance itself.
-    TokenRef _offendingToken;
+    Token::Ref _offendingToken;
 
     int _offendingState;
 
   public:
-    RecognitionException(IRecognizer *recognizer, IntStream *input, ParserRuleContextRef ctx,
-                         TokenRef offendingToken = TokenRef());
+    RecognitionException(IRecognizer *recognizer, IntStream *input, ParserRuleContext::Ref ctx,
+                         Token::Ref offendingToken = Token::Ref());
     RecognitionException(const std::string &message, IRecognizer *recognizer, IntStream *input,
-                         ParserRuleContextRef ctx, TokenRef offendingToken = TokenRef());
+                         ParserRuleContext::Ref ctx, Token::Ref offendingToken = Token::Ref());
 
     /// Get the ATN state number the parser was in at the time the error
     /// occurred. For NoViableAltException and
@@ -98,7 +99,7 @@ namespace runtime {
     /// </summary>
     /// <returns> The <seealso cref="RuleContext"/> at the time this exception was thrown.
     /// If the context is not available, this method returns {@code null}. </returns>
-    virtual RuleContextRef getCtx() const;
+    virtual RuleContext::Ref getCtx() const;
 
     /// <summary>
     /// Gets the input stream which is the symbol source for the recognizer where
@@ -111,7 +112,7 @@ namespace runtime {
     /// available. </returns>
     virtual IntStream* getInputStream() const;
 
-    virtual TokenRef getOffendingToken() const;
+    virtual Token::Ref getOffendingToken() const;
 
     /// <summary>
     /// Gets the <seealso cref="Recognizer"/> where this exception occurred.

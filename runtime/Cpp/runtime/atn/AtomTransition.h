@@ -54,7 +54,7 @@ namespace atn {
     virtual misc::IntervalSet label() const override;
     virtual bool matches(int symbol, int minVocabSymbol, int maxVocabSymbol) const override;
 
-    virtual std::wstring toString() const;
+    virtual std::wstring toString() const override;
   };
 
 } // namespace atn

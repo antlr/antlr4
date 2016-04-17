@@ -67,7 +67,7 @@ std::shared_ptr<tree::TerminalNode> ParserRuleContext::addChild(std::shared_ptr<
   return t;
 }
 
-RuleContextRef ParserRuleContext::addChild(RuleContextRef ruleInvocation) {
+RuleContext::Ref ParserRuleContext::addChild(RuleContext::Ref ruleInvocation) {
   children.push_back(ruleInvocation);
   return ruleInvocation;
 }
@@ -78,14 +78,14 @@ void ParserRuleContext::removeLastChild() {
   }
 }
 
-std::shared_ptr<tree::TerminalNode> ParserRuleContext::addChild(TokenRef matchedToken) {
+std::shared_ptr<tree::TerminalNode> ParserRuleContext::addChild(Token::Ref matchedToken) {
   std::shared_ptr<tree::TerminalNodeImpl> t = std::make_shared<tree::TerminalNodeImpl>(matchedToken);
   addChild(t);
   t->parent = shared_from_this();
   return t;
 }
 
-std::shared_ptr<tree::ErrorNode> ParserRuleContext::addErrorNode(TokenRef badToken) {
+std::shared_ptr<tree::ErrorNode> ParserRuleContext::addErrorNode(Token::Ref badToken) {
   std::shared_ptr<tree::ErrorNodeImpl> t = std::make_shared<tree::ErrorNodeImpl>(badToken);
   addChild(t);
   t->parent = shared_from_this();
@@ -105,7 +105,7 @@ std::shared_ptr<tree::TerminalNode> ParserRuleContext::getToken(int ttype, std::
   for (auto o : children) {
     if (is<tree::TerminalNode>(o)) {
       std::shared_ptr<tree::TerminalNode> tnode = std::dynamic_pointer_cast<tree::TerminalNode>(o);
-      TokenRef symbol = tnode->getSymbol();
+      Token::Ref symbol = tnode->getSymbol();
       if (symbol->getType() == ttype) {
         if (j++ == i) {
           return tnode;
@@ -122,7 +122,7 @@ std::vector<std::shared_ptr<tree::TerminalNode>> ParserRuleContext::getTokens(in
   for (auto &o : children) {
     if (is<tree::TerminalNode>(o)) {
       std::shared_ptr<tree::TerminalNode> tnode = std::dynamic_pointer_cast<tree::TerminalNode>(o);
-      TokenRef symbol = tnode->getSymbol();
+      Token::Ref symbol = tnode->getSymbol();
       if (symbol->getType() == ttype) {
         tokens.push_back(tnode);
       }
@@ -145,11 +145,11 @@ misc::Interval ParserRuleContext::getSourceInterval() {
   return misc::Interval(start->getTokenIndex(), stop->getTokenIndex());
 }
 
-TokenRef ParserRuleContext::getStart() {
+Token::Ref ParserRuleContext::getStart() {
   return start;
 }
 
-TokenRef ParserRuleContext::getStop() {
+Token::Ref ParserRuleContext::getStop() {
   return stop;
 }
 

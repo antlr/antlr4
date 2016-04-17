@@ -41,7 +41,7 @@ SingletonPredictionContext::SingletonPredictionContext(std::weak_ptr<PredictionC
   assert(returnState != ATNState::INVALID_STATE_NUMBER);
 }
 
-SingletonPredictionContextRef SingletonPredictionContext::create(std::weak_ptr<PredictionContext> parent, int returnState) {
+SingletonPredictionContext::Ref SingletonPredictionContext::create(std::weak_ptr<PredictionContext> parent, int returnState) {
   if (returnState == EMPTY_RETURN_STATE && parent.expired()) {
     // someone can pass in the bits of an array ctx that mean $
     return EMPTY;

@@ -60,7 +60,7 @@ namespace atn {
 
     std::shared_ptr<SemanticContext::Predicate> getPredicate() const;
 
-    virtual std::wstring toString() const;
+    virtual std::wstring toString() const override;
 
   };
 

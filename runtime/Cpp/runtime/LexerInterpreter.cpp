@@ -39,26 +39,20 @@
 
 using namespace org::antlr::v4::runtime;
 
-LexerInterpreter::LexerInterpreter(const std::wstring &grammarFileName, std::vector<std::wstring> *tokenNames, std::vector<std::wstring> *ruleNames, std::vector<std::wstring> *modeNames, const atn::ATN &atn, CharStream *input) : Lexer(input), grammarFileName(grammarFileName), _atn(atn), _sharedContextCache(new atn::PredictionContextCache()) {
+LexerInterpreter::LexerInterpreter(const std::wstring &grammarFileName, const std::vector<std::wstring> &tokenNames,
+  const std::vector<std::wstring> &ruleNames, const std::vector<std::wstring> &modeNames, const atn::ATN &atn,
+  CharStream *input)
+  : Lexer(input), grammarFileName(grammarFileName), _tokenNames(tokenNames), _ruleNames(ruleNames), _modeNames(modeNames),
+    _atn(atn), _sharedContextCache(new atn::PredictionContextCache()) {
 
   if (_atn.grammarType != atn::ATNType::LEXER) {
     throw IllegalArgumentException("The ATN must be a lexer ATN.");
   }
 
-
-  for (int i = 0; i < (int)_decisionToDFA.size(); i++) {
-    _decisionToDFA[(size_t)i] = new dfa::DFA(_atn.getDecisionState(i), i);
+  for (size_t i = 0; i < (size_t)atn.getNumberOfDecisions(); ++i) {
+    _decisionToDFA.push_back(dfa::DFA(_atn.getDecisionState((int)i), (int)i));
   }
   _interpreter = new atn::LexerATNSimulator(_atn, _decisionToDFA, _sharedContextCache);
-  if (tokenNames) {
-    _tokenNames = *tokenNames;
-  }
-  if (ruleNames) {
-    _ruleNames = *ruleNames;
-  }
-  if (modeNames) {
-    _modeNames = *modeNames;
-  }
 }
 
 LexerInterpreter::~LexerInterpreter()

@@ -37,3 +37,7 @@ void DecisionState::InitializeInstanceFields() {
   decision = -1;
   nonGreedy = false;
 }
+
+std::wstring DecisionState::toString() const {
+  return L"DECISION " + ATNState::toString();
+}

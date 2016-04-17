@@ -90,7 +90,7 @@ namespace runtime {
     virtual void seek(size_t index) override;
     virtual std::wstring getText(const misc::Interval &interval) override;
     virtual std::string getSourceName() const override;
-    virtual std::wstring toString();
+    virtual std::wstring toString() const override;
 
   private:
     void InitializeInstanceFields();

@@ -134,19 +134,17 @@ namespace dfa {
 
     virtual size_t hashCode() ;
 
-    /// <summary>
-    /// Two <seealso cref="DFAState"/> instances are equal if their ATN configuration sets
+    /// Two DFAState instances are equal if their ATN configuration sets
     /// are the same. This method is used to see if a state already exists.
-    /// <p/>
+    ///
     /// Because the number of alternatives and number of ATN configurations are
     /// finite, there is a finite number of DFA states that can be processed.
     /// This is necessary to show that the algorithm terminates.
-    /// <p/>
+    ///
     /// Cannot test the DFA state numbers here because in
-    /// <seealso cref="ParserATNSimulator#addDFAState"/> we need to know if any other state
+    /// ParserATNSimulator#addDFAState we need to know if any other state
     /// exists that has this exact set of ATN configurations. The
-    /// <seealso cref="#stateNumber"/> is irrelevant.
-    /// </summary>
+    /// stateNumber is irrelevant.
     bool operator == (const DFAState &o);
 
     virtual std::wstring toString();

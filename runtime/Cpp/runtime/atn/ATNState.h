@@ -122,63 +122,39 @@ namespace atn {
       LOOP_END = 12
     };
 
-    static const wchar_t * serializationNames[];
+    static const std::vector<std::wstring> serializationNames;
 
-    /// <summary>
-    /// Which ATN are we in? </summary>
-    ATN *atn = nullptr;
+    /// Which ATN are we in?
+    // ml: just a reference to the owner. Set when the state gets added to an ATN.
+    //const ATN *atn = nullptr;
+    int stateNumber = INVALID_STATE_NUMBER;
+    int ruleIndex = 0; // at runtime, we don't have Rule objects
+    bool epsilonOnlyTransitions = false;
 
-    int stateNumber;
-
-    int ruleIndex; // at runtime, we don't have Rule objects
-
-    bool epsilonOnlyTransitions;
-
-    /// <summary>
-    /// Track the transitions emanating from this ATN state. </summary>
   protected:
+    /// Track the transitions emanating from this ATN state.
     std::vector<Transition*> transitions;
 
-    /// <summary>
-    /// Used to cache lookahead during parsing, not used during construction </summary>
   public:
+    /// Used to cache lookahead during parsing, not used during construction.
     misc::IntervalSet nextTokenWithinRule;
 
     virtual size_t hashCode();
     bool operator == (const ATNState &other);
 
     virtual bool isNonGreedyExitState();
-
     virtual std::wstring toString() const;
-
     virtual  std::vector<Transition*> getTransitions();
-
     virtual size_t getNumberOfTransitions();
-
     virtual void addTransition(Transition *e);
-
     virtual void addTransition(int index, Transition *e);
-
     virtual Transition *transition(size_t i);
-
     virtual void setTransition(size_t i, Transition *e);
-
     virtual Transition *removeTransition(int index);
-
     virtual int getStateType() = 0;
-
     bool onlyHasEpsilonTransitions();
-
     virtual void setRuleIndex(int ruleIndex);
 
-
-  private:
-    void InitializeInstanceFields();
-
-  public:
-    //                        ATNState() : transitions(new std::list<Transition*>()) {
-    //                            InitializeInstanceFields();
-    //                        }
   };
 
 } // namespace atn

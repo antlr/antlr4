@@ -165,7 +165,7 @@ std::string ANTLRInputStream::getSourceName() const {
   return name;
 }
 
-std::wstring ANTLRInputStream::toString() {
+std::wstring ANTLRInputStream::toString() const {
   return data;
 }
 

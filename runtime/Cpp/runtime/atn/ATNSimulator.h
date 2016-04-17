@@ -45,18 +45,16 @@ namespace atn {
   public:
     virtual ~ATNSimulator() {};
 
-    ATNSimulator();
-
     /// Must distinguish between missing edge and edge we know leads nowhere.
     static const std::shared_ptr<dfa::DFAState> ERROR;
-    ATN atn;
+    const ATN &atn;
 
     ATNSimulator(const ATN &atn, std::shared_ptr<PredictionContextCache> sharedContextCache);
 
     virtual void reset() = 0;
 
     virtual std::shared_ptr<PredictionContextCache> getSharedContextCache();
-    virtual PredictionContextRef getCachedContext(PredictionContextRef context);
+    virtual PredictionContext::Ref getCachedContext(PredictionContext::Ref context);
 
     /// @deprecated Use <seealso cref="ATNDeserializer#deserialize"/> instead.
     static ATN deserialize(const std::wstring &data);

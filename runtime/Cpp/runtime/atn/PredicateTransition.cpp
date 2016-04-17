@@ -53,5 +53,8 @@ std::shared_ptr<SemanticContext::Predicate> PredicateTransition::getPredicate() 
 }
 
 std::wstring PredicateTransition::toString() const {
-  return std::wstring(L"pred_") + std::to_wstring(ruleIndex) + std::wstring(L":") + std::to_wstring(predIndex);
+  return L"PREDICATE " + Transition::toString() + L" { ruleIndex: " + std::to_wstring(ruleIndex) +
+    L", predIndex: " + std::to_wstring(predIndex) + L", isCtxDependent: " + std::to_wstring(isCtxDependent) + L" }";
+
+  // Generate and add a predicate context here?
 }

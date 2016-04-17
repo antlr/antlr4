@@ -48,7 +48,7 @@ public:
   Guid(const unsigned char *bytes);
 
   // Create a guid from array of words.
-  Guid(const uint32_t *bytes, bool reverse);
+  Guid(const uint16_t *bytes, bool reverse);
 
   // create a guid from string
   Guid(const std::string &fromString);
