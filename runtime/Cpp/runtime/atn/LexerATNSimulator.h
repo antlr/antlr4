@@ -32,6 +32,7 @@
 #pragma once
 
 #include "ATNSimulator.h"
+#include "LexerATNConfig.h"
 
 namespace org {
 namespace antlr {
@@ -110,7 +111,7 @@ namespace atn {
 
     /// <summary>
     /// Used during DFA/ATN exec to record the most recent accept configuration info </summary>
-    SimState *const prevAccept;
+    SimState prevAccept;
 
   public:
     static int match_calls;
@@ -153,7 +154,7 @@ namespace atn {
     /// returns <seealso cref="#ERROR"/>. </returns>
     virtual dfa::DFAState *computeTargetState(CharStream *input, dfa::DFAState *s, ssize_t t);
 
-    virtual int failOrAccept(SimState *prevAccept, CharStream *input, std::shared_ptr<ATNConfigSet> reach, ssize_t t);
+    virtual int failOrAccept(CharStream *input, std::shared_ptr<ATNConfigSet> reach, ssize_t t);
 
     /// <summary>
     /// Given a starting configuration set, figure out all ATN configurations
@@ -177,12 +178,12 @@ namespace atn {
     /// </summary>
     /// <returns> {@code true} if an accept state is reached, otherwise
     /// {@code false}. </returns>
-    virtual bool closure(CharStream *input, LexerATNConfig *config, std::shared_ptr<ATNConfigSet> configs,
+    virtual bool closure(CharStream *input, LexerATNConfig::Ref config, std::shared_ptr<ATNConfigSet> configs,
                          bool currentAltReachedAcceptState, bool speculative);
 
     // side-effect: can alter configs.hasSemanticContext
-    virtual LexerATNConfig *getEpsilonTarget(CharStream *input, LexerATNConfig *config, Transition *t,
-                                             std::shared_ptr<ATNConfigSet> configs, bool speculative);
+    virtual LexerATNConfig::Ref getEpsilonTarget(CharStream *input, LexerATNConfig::Ref config, Transition *t,
+                                                 std::shared_ptr<ATNConfigSet> configs, bool speculative);
 
     /// <summary>
     /// Evaluate a predicate specified in the lexer.
@@ -206,7 +207,7 @@ namespace atn {
     /// {@code true}. </returns>
     virtual bool evaluatePredicate(CharStream *input, int ruleIndex, int predIndex, bool speculative);
 
-    virtual void captureSimState(SimState *settings, CharStream *input, dfa::DFAState *dfaState);
+    virtual void captureSimState(CharStream *input, dfa::DFAState *dfaState);
     virtual dfa::DFAState *addDFAEdge(dfa::DFAState *from, ssize_t t, std::shared_ptr<ATNConfigSet> q);
     virtual void addDFAEdge(dfa::DFAState *p, ssize_t t, dfa::DFAState *q);
 

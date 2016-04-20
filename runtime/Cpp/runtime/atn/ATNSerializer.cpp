@@ -92,13 +92,11 @@ std::vector<size_t> ATNSerializer::serialize() {
     }
 
     int stateType = s->getStateType();
-    if (dynamic_cast<DecisionState *>(s) != nullptr &&
-        (static_cast<DecisionState *>(s))->nonGreedy) {
+    if (is<DecisionState *>(s) && (static_cast<DecisionState *>(s))->nonGreedy) {
       nonGreedyStates.push_back(s->stateNumber);
     }
 
-    if (dynamic_cast<RuleStartState *>(s) != nullptr &&
-        (static_cast<RuleStartState *>(s))->isPrecedenceRule) {
+    if (is<RuleStartState *>(s) && (static_cast<RuleStartState *>(s))->isPrecedenceRule) {
       precedenceStates.push_back(s->stateNumber);
     }
 
@@ -114,7 +112,7 @@ std::vector<size_t> ATNSerializer::serialize() {
     if (s->getStateType() == ATNState::LOOP_END) {
       data.push_back((size_t)(static_cast<LoopEndState *>(s))->loopBackState->stateNumber);
     }
-    else if (dynamic_cast<BlockStartState *>(s) != nullptr) {
+    else if (is<BlockStartState *>(s)) {
       data.push_back((size_t)(static_cast<BlockStartState *>(s))->endState->stateNumber);
     }
 
@@ -323,6 +321,9 @@ std::vector<size_t> ATNSerializer::serialize() {
 //------------------------------------------------------------------------------------------------------------
 
 std::wstring ATNSerializer::decode(const std::wstring &inpdata) {
+  if (inpdata.size() < 10)
+    throw IllegalArgumentException("Not enough data to decode");
+
   uint16_t data[inpdata.size()];
   data[0] = inpdata[0];
 

@@ -44,6 +44,12 @@ DFA::DFA(atn::DecisionState *atnStartState, int decision)
   : atnStartState(atnStartState), decision(decision), s0(nullptr) {
 }
 
+DFA::~DFA() {
+  for (auto state : states) {
+    delete state.second;
+  }
+}
+
 std::vector<DFAState *> DFA::getStates() {
   std::vector<DFAState *> result;
   for (auto state : states)

@@ -92,6 +92,7 @@ namespace atn {
 
   protected:
     PredictionContext(size_t cachedHashCode);
+    ~PredictionContext();
 
   public:
     /// Convert a RuleContext tree to a PredictionContext graph.

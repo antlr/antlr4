@@ -43,16 +43,17 @@ LexerInterpreter::LexerInterpreter(const std::wstring &grammarFileName, const st
   const std::vector<std::wstring> &ruleNames, const std::vector<std::wstring> &modeNames, const atn::ATN &atn,
   CharStream *input)
   : Lexer(input), grammarFileName(grammarFileName), _tokenNames(tokenNames), _ruleNames(ruleNames), _modeNames(modeNames),
-    _atn(atn), _sharedContextCache(new atn::PredictionContextCache()) {
+    _atn(atn) {
 
   if (_atn.grammarType != atn::ATNType::LEXER) {
     throw IllegalArgumentException("The ATN must be a lexer ATN.");
   }
 
+  _sharedContextCache = std::make_shared<atn::PredictionContextCache>();
   for (size_t i = 0; i < (size_t)atn.getNumberOfDecisions(); ++i) {
     _decisionToDFA.push_back(dfa::DFA(_atn.getDecisionState((int)i), (int)i));
   }
-  _interpreter = new atn::LexerATNSimulator(_atn, _decisionToDFA, _sharedContextCache);
+  _interpreter = new atn::LexerATNSimulator(_atn, _decisionToDFA, _sharedContextCache); /* mem-check: deleted in d-tor */
 }
 
 LexerInterpreter::~LexerInterpreter()

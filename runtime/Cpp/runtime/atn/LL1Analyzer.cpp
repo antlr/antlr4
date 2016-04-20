@@ -60,7 +60,7 @@ std::vector<misc::IntervalSet> LL1Analyzer::getDecisionLookahead(ATNState *s) co
   for (size_t alt = 0; alt < s->getNumberOfTransitions(); alt++) {
     bool seeThruPreds = false; // fail to get lookahead upon pred
 
-    std::set<ATNConfig*> lookBusy;
+    std::unordered_set<ATNConfig::Ref> lookBusy;
     antlrcpp::BitSet callRuleStack;
     _LOOK(s->transition(alt)->target, nullptr, PredictionContext::EMPTY,
           look[alt], lookBusy, callRuleStack, seeThruPreds, false);
@@ -83,7 +83,7 @@ misc::IntervalSet LL1Analyzer::LOOK(ATNState *s, ATNState *stopState, RuleContex
   bool seeThruPreds = true; // ignore preds; get all lookahead
   PredictionContext::Ref lookContext = ctx != nullptr ? PredictionContext::fromRuleContext(_atn, ctx) : nullptr;
 
-  std::set<ATNConfig*> lookBusy;
+  std::unordered_set<ATNConfig::Ref> lookBusy;
   antlrcpp::BitSet callRuleStack;
   _LOOK(s, stopState, lookContext, r, lookBusy, callRuleStack, seeThruPreds, true);
 
@@ -91,12 +91,13 @@ misc::IntervalSet LL1Analyzer::LOOK(ATNState *s, ATNState *stopState, RuleContex
 }
 
 void LL1Analyzer::_LOOK(ATNState *s, ATNState *stopState, PredictionContext::Ref ctx, misc::IntervalSet &look,
-                        std::set<ATNConfig*> &lookBusy,  antlrcpp::BitSet &calledRuleStack, bool seeThruPreds, bool addEOF) const {
-  ATNConfig *c = new ATNConfig(s, 0, ctx);
+                        std::unordered_set<ATNConfig::Ref> &lookBusy,  antlrcpp::BitSet &calledRuleStack, bool seeThruPreds, bool addEOF) const {
+  ATNConfig::Ref c = std::make_shared<ATNConfig>(s, 0, ctx);
 
-  if (!lookBusy.insert(c).second) {
+  if (lookBusy.count(c) > 0) // Keep in mind comparison is based on members of the class, not the actual instance.
     return;
-  }
+
+  lookBusy.insert(c);
 
   if (s == stopState) {
     if (ctx == nullptr) {
@@ -108,7 +109,7 @@ void LL1Analyzer::_LOOK(ATNState *s, ATNState *stopState, PredictionContext::Ref
     }
   }
 
-  if (dynamic_cast<RuleStopState*>(s) != nullptr) {
+  if (is<RuleStopState*>(s)) {
     if (ctx == nullptr) {
       look.add(Token::EPSILON);
       return;

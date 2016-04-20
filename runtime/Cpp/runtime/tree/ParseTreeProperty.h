@@ -55,29 +55,28 @@ namespace tree {
   /// </summary>
   template<typename V>
   class ParseTreeProperty {
-  protected:
-    std::map<ParseTree*, V> *annotations;
-
-  public:
-    virtual V get(ParseTree *node) {
-      return annotations->get(node);
-    }
-    virtual void put(ParseTree *node, V value) {
-      annotations->put(node, value);
-    }
-    virtual V removeFrom(ParseTree *node) {
-      return annotations->remove(node);
-    }
-
-  private:
-    void InitializeInstanceFields() {
-      annotations = new std::map<ParseTree*, V>();
-    }
-
   public:
     ParseTreeProperty() {
       InitializeInstanceFields();
     }
+
+    virtual V get(ParseTree *node) {
+      return _annotations.get(node);
+    }
+    virtual void put(ParseTree *node, V value) {
+      _annotations.put(node, value);
+    }
+    virtual V removeFrom(ParseTree *node) {
+      return _annotations->remove(node);
+    }
+
+  protected:
+    std::map<ParseTree*, V> _annotations;
+
+  private:
+    void InitializeInstanceFields() {
+    }
+
   };
 
 } // namespace tree

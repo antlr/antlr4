@@ -47,18 +47,19 @@ std::wstring Trees::toStringTree(std::shared_ptr<Tree> t) {
 }
 
 std::wstring Trees::toStringTree(std::shared_ptr<Tree> t, Parser *recog) {
+  if (recog == nullptr)
+    return toStringTree(t, {});
   return toStringTree(t, recog->getRuleNames());
 }
 
 std::wstring Trees::toStringTree(std::shared_ptr<Tree> t, const std::vector<std::wstring> &ruleNames) {
-  std::wstring tmp = Trees::getNodeText(t, ruleNames);
-  std::wstring s = antlrcpp::escapeWhitespace(tmp, false);
+  std::wstring temp = antlrcpp::escapeWhitespace(Trees::getNodeText(t, ruleNames), false);
   if (t->getChildCount() == 0) {
-    return s;
+    return temp;
   }
 
   std::wstringstream ss;
-  ss << L"(" << antlrcpp::escapeWhitespace(getNodeText(t, ruleNames), false) << L' ';
+  ss << L"(" << temp << L' ';
   for (size_t i = 0; i < t->getChildCount(); i++) {
     if (i > 0) {
       ss << L' ';

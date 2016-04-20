@@ -29,13 +29,16 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "LexerATNConfig.h"
 #include "MurmurHash.h"
 #include "DecisionState.h"
 #include "PredictionContext.h"
 #include "SemanticContext.h"
+#include "CPPUtils.h"
+
+#include "LexerATNConfig.h"
 
 using namespace org::antlr::v4::runtime::atn;
+using namespace antlrcpp;
 
 LexerATNConfig::LexerATNConfig(ATNState *state, int alt, PredictionContext::Ref context)
   : ATNConfig(state, alt, context, SemanticContext::NONE), passedThroughNonGreedyDecision(false) {
@@ -46,17 +49,17 @@ LexerATNConfig::LexerATNConfig(ATNState *state, int alt, PredictionContext::Ref 
   lexerActionIndex = actionIndex;
 }
 
-LexerATNConfig::LexerATNConfig(LexerATNConfig *c, ATNState *state)
+LexerATNConfig::LexerATNConfig(LexerATNConfig::Ref c, ATNState *state)
   : ATNConfig(c, state, c->context, c->semanticContext), passedThroughNonGreedyDecision(checkNonGreedyDecision(c, state)) {
   lexerActionIndex = c->lexerActionIndex;
 }
 
-LexerATNConfig::LexerATNConfig(LexerATNConfig *c, ATNState *state, int actionIndex)
+LexerATNConfig::LexerATNConfig(LexerATNConfig::Ref c, ATNState *state, int actionIndex)
   : ATNConfig(c, state, c->context, c->semanticContext), passedThroughNonGreedyDecision(checkNonGreedyDecision(c, state)) {
   lexerActionIndex = actionIndex;
 }
 
-LexerATNConfig::LexerATNConfig(LexerATNConfig *c, ATNState *state, PredictionContext::Ref context)
+LexerATNConfig::LexerATNConfig(LexerATNConfig::Ref c, ATNState *state, PredictionContext::Ref context)
   : ATNConfig(c, state, context, c->semanticContext), passedThroughNonGreedyDecision(checkNonGreedyDecision(c, state)) {
   lexerActionIndex = c->lexerActionIndex;
 }
@@ -84,7 +87,7 @@ bool LexerATNConfig::operator == (const LexerATNConfig& other) const
   return ATNConfig::operator == (other);
 }
 
-bool LexerATNConfig::checkNonGreedyDecision(LexerATNConfig *source, ATNState *target) {
+bool LexerATNConfig::checkNonGreedyDecision(LexerATNConfig::Ref source, ATNState *target) {
   return source->passedThroughNonGreedyDecision ||
-    (dynamic_cast<DecisionState*>(target) != nullptr && (static_cast<DecisionState*>(target))->nonGreedy);
+    (is<DecisionState*>(target) && (static_cast<DecisionState*>(target))->nonGreedy);
 }

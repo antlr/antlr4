@@ -38,11 +38,7 @@ namespace antlr {
 namespace v4 {
 namespace runtime {
 
-  /// <summary>
-  /// Bail out of parser at first syntax error. Do this to use it:
-  ///  <p/>
-  ///  {@code myparser.setErrorHandler(new BailErrorStrategy());}
-  /// </summary>
+  /// Bail out of parser at first syntax error. Use myparser.setErrorHandler(..) to set a different strategy.
   class BailErrorStrategy : public DefaultErrorStrategy {
     /// <summary>
     /// Instead of recovering from exception {@code e}, re-throw it wrapped

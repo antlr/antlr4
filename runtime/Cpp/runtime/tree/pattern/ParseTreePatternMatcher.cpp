@@ -101,8 +101,13 @@ ParseTreeMatch ParseTreePatternMatcher::match(std::shared_ptr<ParseTree> tree, c
 
 ParseTreePattern ParseTreePatternMatcher::compile(const std::wstring &pattern, int patternRuleIndex) {
   std::vector<Token::Ref> tokenList = tokenize(pattern);
-  ListTokenSource *tokenSrc = new ListTokenSource(tokenList); // XXX: mem leak
-  CommonTokenStream *tokens = new CommonTokenStream(tokenSrc);
+
+  ListTokenSource *tokenSrc = new ListTokenSource(tokenList); /* mem-check: deleted in finally block */
+  CommonTokenStream *tokens = new CommonTokenStream(tokenSrc); /* mem-check: deleted in finally block */
+  auto onExit = finally([tokenSrc, tokens]() {
+    delete tokenSrc;
+    delete tokens;
+  });
 
   ParserInterpreter parserInterp(_parser->getGrammarFileName(), _parser->getTokenNames(),
                                  _parser->getRuleNames(), _parser->getATNWithBypassAlts(), tokens);
@@ -230,34 +235,35 @@ std::shared_ptr<RuleTagToken> ParseTreePatternMatcher::getRuleTagToken(std::shar
 
 std::vector<Token::Ref> ParseTreePatternMatcher::tokenize(const std::wstring &pattern) {
   // split pattern into chunks: sea (raw input) and islands (<ID>, <expr>)
-  std::vector<Chunk*> chunks = split(pattern);
+  std::vector<Chunk> chunks = split(pattern);
 
   // create token stream from text and tags
   std::vector<Token::Ref> tokens;
   for (auto chunk : chunks) {
-    if (dynamic_cast<TagChunk*>(chunk) != nullptr) {
-      TagChunk *tagChunk = static_cast<TagChunk*>(chunk);
+    if (is<TagChunk>(chunk)) {
+      TagChunk &tagChunk = (TagChunk&)chunk;
       // add special rule token or conjure up new token from name
-      if (isupper(tagChunk->getTag()[0])) {
-        int ttype = _parser->getTokenType(tagChunk->getTag());
+      if (isupper(tagChunk.getTag()[0])) {
+        int ttype = _parser->getTokenType(tagChunk.getTag());
         if (ttype == Token::INVALID_TYPE) {
-          throw IllegalArgumentException(std::string("Unknown token ") + antlrcpp::ws2s(tagChunk->getTag()) + std::string(" in pattern: ") + antlrcpp::ws2s(pattern));
+          throw IllegalArgumentException("Unknown token " + antlrcpp::ws2s(tagChunk.getTag()) +
+                                         " in pattern: " + antlrcpp::ws2s(pattern));
         }
-        std::shared_ptr<TokenTagToken> t = std::make_shared<TokenTagToken>(tagChunk->getTag(), ttype, tagChunk->getLabel());
+        std::shared_ptr<TokenTagToken> t = std::make_shared<TokenTagToken>(tagChunk.getTag(), ttype, tagChunk.getLabel());
         tokens.push_back(t);
-      } else if (islower(tagChunk->getTag()[0])) {
-        int ruleIndex = _parser->getRuleIndex(tagChunk->getTag());
+      } else if (islower(tagChunk.getTag()[0])) {
+        int ruleIndex = _parser->getRuleIndex(tagChunk.getTag());
         if (ruleIndex == -1) {
-          throw IllegalArgumentException(std::string("Unknown rule ") + antlrcpp::ws2s(tagChunk->getTag()) + " in pattern: " + antlrcpp::ws2s(pattern));
+          throw IllegalArgumentException(std::string("Unknown rule ") + antlrcpp::ws2s(tagChunk.getTag()) + " in pattern: " + antlrcpp::ws2s(pattern));
         }
         int ruleImaginaryTokenType = _parser->getATNWithBypassAlts().ruleToTokenType[(size_t)ruleIndex];
-        tokens.push_back(std::make_shared<RuleTagToken>(tagChunk->getTag(), ruleImaginaryTokenType, tagChunk->getLabel()));
+        tokens.push_back(std::make_shared<RuleTagToken>(tagChunk.getTag(), ruleImaginaryTokenType, tagChunk.getLabel()));
       } else {
-        throw IllegalArgumentException(std::string("invalid tag: ") + antlrcpp::ws2s(tagChunk->getTag()) + " in pattern: " + antlrcpp::ws2s(pattern));
+        throw IllegalArgumentException(std::string("invalid tag: ") + antlrcpp::ws2s(tagChunk.getTag()) + " in pattern: " + antlrcpp::ws2s(pattern));
       }
     } else {
-      TextChunk *textChunk = static_cast<TextChunk*>(chunk);
-      ANTLRInputStream input(textChunk->getText());
+      TextChunk &textChunk = (TextChunk&)chunk;
+      ANTLRInputStream input(textChunk.getText());
       _lexer->setInputStream(&input);
       Token::Ref t = _lexer->nextToken();
       while (t->getType() != EOF) {
@@ -271,10 +277,10 @@ std::vector<Token::Ref> ParseTreePatternMatcher::tokenize(const std::wstring &pa
   return tokens;
 }
 
-std::vector<Chunk*> ParseTreePatternMatcher::split(const std::wstring &pattern) {
+std::vector<Chunk> ParseTreePatternMatcher::split(const std::wstring &pattern) {
   size_t p = 0;
   size_t n = pattern.length();
-  std::vector<Chunk*> chunks = std::vector<Chunk*>();
+  std::vector<Chunk> chunks;
   
   // find all start and stop indexes first, then collect
   std::vector<size_t> starts;
@@ -313,12 +319,12 @@ std::vector<Chunk*> ParseTreePatternMatcher::split(const std::wstring &pattern) 
   // collect into chunks now
   if (ntags == 0) {
     std::wstring text = pattern.substr(0, n);
-    chunks.push_back(new TextChunk(text));
+    chunks.push_back(TextChunk(text));
   }
 
   if (ntags > 0 && starts[0] > 0) { // copy text up to first tag into chunks
     std::wstring text = pattern.substr(0, starts[0]);
-    chunks.push_back(new TextChunk(text));
+    chunks.push_back(TextChunk(text));
   }
   for (size_t i = 0; i < ntags; i++) {
     // copy inside of <tag>
@@ -330,30 +336,30 @@ std::vector<Chunk*> ParseTreePatternMatcher::split(const std::wstring &pattern) 
       label = tag.substr(0,colon);
       ruleOrToken = tag.substr(colon + 1, tag.length() - (colon + 1));
     }
-    chunks.push_back(new TagChunk(label, ruleOrToken));
+    chunks.push_back(TagChunk(label, ruleOrToken));
     if (i + 1 < ntags) {
       // copy from end of <tag> to start of next
       std::wstring text = pattern.substr(stops[i] + _stop.length(), starts[i + 1] - (stops[i] + _stop.length()));
-      chunks.push_back(new TextChunk(text));
+      chunks.push_back(TextChunk(text));
     }
   }
   if (ntags > 0) {
     size_t afterLastTag = stops[ntags - 1] + _stop.length();
     if (afterLastTag < n) { // copy text from end of last tag to end
       std::wstring text = pattern.substr(afterLastTag, n - afterLastTag);
-      chunks.push_back(new TextChunk(text));
+      chunks.push_back(TextChunk(text));
     }
   }
 
   // strip out all backslashes from text chunks but not tags
   for (size_t i = 0; i < chunks.size(); i++) {
-    Chunk *c = chunks[i];
-    if (dynamic_cast<TextChunk*>(c) != nullptr) {
-      TextChunk *tc = static_cast<TextChunk*>(c);
-      std::wstring unescaped = tc->getText();
+    Chunk &c = chunks[i];
+    if (is<TextChunk>(c)) {
+      TextChunk &tc = (TextChunk&)c;
+      std::wstring unescaped = tc.getText();
       unescaped.erase(std::remove(unescaped.begin(), unescaped.end(), L'\\'), unescaped.end());
-      if (unescaped.length() < tc->getText().length()) {
-        chunks[i] = new TextChunk(unescaped);
+      if (unescaped.length() < tc.getText().length()) {
+        chunks[i] = TextChunk(unescaped);
       }
     }
   }

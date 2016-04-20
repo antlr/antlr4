@@ -45,10 +45,12 @@
 #include "ATN.h"
 #include "RuleStopState.h"
 #include "Token.h"
+#include "CPPUtils.h"
 
 #include "ParserInterpreter.h"
 
 using namespace org::antlr::v4::runtime;
+using namespace antlrcpp;
 
 ParserInterpreter::ParserInterpreter(const std::wstring &grammarFileName, const std::vector<std::wstring>& tokenNames,
   const std::vector<std::wstring>& ruleNames, const atn::ATN &atn, TokenStream *input)
@@ -60,7 +62,7 @@ ParserInterpreter::ParserInterpreter(const std::wstring &grammarFileName, const 
 
   // identify the ATN states where pushNewRecursionContext must be called
   for (auto state : _atn.states) {
-    if (!(dynamic_cast<atn::StarLoopEntryState*>(state) != nullptr)) {
+    if (!is<atn::StarLoopEntryState*>(state)) {
       continue;
     }
 
@@ -70,17 +72,17 @@ ParserInterpreter::ParserInterpreter(const std::wstring &grammarFileName, const 
     }
 
     atn::ATNState *maybeLoopEndState = state->transition(state->getNumberOfTransitions() - 1)->target;
-    if (!(dynamic_cast<atn::LoopEndState*>(maybeLoopEndState) != nullptr)) {
+    if (!is<atn::LoopEndState*>(maybeLoopEndState)) {
       continue;
     }
 
-    if (maybeLoopEndState->epsilonOnlyTransitions && dynamic_cast<atn::RuleStopState*>(maybeLoopEndState->transition(0)->target) != nullptr) {
+    if (maybeLoopEndState->epsilonOnlyTransitions && is<atn::RuleStopState*>(maybeLoopEndState->transition(0)->target)) {
       _pushRecursionContextStates.set((size_t)state->stateNumber);
     }
   }
 
   // get atn simulator that knows how to do predictions
-  _interpreter = new atn::ParserATNSimulator(this, atn, _decisionToDFA, _sharedContextCache);
+  _interpreter = new atn::ParserATNSimulator(this, atn, _decisionToDFA, _sharedContextCache); /* mem-check: deleted in d-tor */
 }
 
 ParserInterpreter::~ParserInterpreter() {
@@ -155,7 +157,7 @@ void ParserInterpreter::visitState(atn::ATNState *p) {
   atn::Transition *transition = p->transition((size_t)edge - 1);
   switch (transition->getSerializationType()) {
     case atn::Transition::EPSILON:
-      if (_pushRecursionContextStates[(size_t)p->stateNumber] == 1 && !(dynamic_cast<atn::LoopEndState*>(transition->target) != nullptr)) {
+      if (_pushRecursionContextStates[(size_t)p->stateNumber] == 1 && is<atn::LoopEndState*>(transition->target)) {
         std::shared_ptr<InterpreterRuleContext> ruleContext = std::make_shared<InterpreterRuleContext>(_parentContextStack.top().first,
           _parentContextStack.top().second, _ctx->getRuleIndex());
         pushNewRecursionContext(ruleContext, _atn.ruleToStartState[(size_t)p->ruleIndex]->stateNumber,

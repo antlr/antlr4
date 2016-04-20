@@ -44,21 +44,18 @@ namespace dfa {
 
     /// From which ATN state did we create this DFA?
     atn::DecisionState *const atnStartState;
-    std::unordered_map<DFAState *, DFAState *> states;
+    std::unordered_map<DFAState *, DFAState *> states; // States are owned by this class.
     DFAState *s0;
     const int decision;
 
-    DFA(atn::DecisionState *atnStartState); //this(atnStartState, 0);
-
+    DFA(atn::DecisionState *atnStartState);
     DFA(atn::DecisionState *atnStartState, int decision);
+    ~DFA();
 
-    /// <summary>
     /// Return a list of all states in this DFA, ordered by state number.
-    /// </summary>
     virtual std::vector<DFAState*> getStates();
 
     virtual std::wstring toString();
-
     virtual std::wstring toString(const std::vector<std::wstring>& tokenNames);
     virtual std::wstring toLexerString();
 

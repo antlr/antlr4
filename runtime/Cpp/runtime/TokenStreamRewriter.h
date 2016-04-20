@@ -100,93 +100,12 @@ namespace runtime {
   /// </summary>
   class TokenStreamRewriter {
   public:
-    class RewriteOperation {
-    private:
-      TokenStreamRewriter *const outerInstance;
-
-    public:
-      /// <summary>
-      /// What index into rewrites List are we? </summary>
-      virtual ~RewriteOperation() {};
-      /// <summary>
-      /// Token buffer index. </summary>
-      size_t index;
-      std::wstring text;
-
-      RewriteOperation(TokenStreamRewriter *outerInstance, size_t index);
-
-      RewriteOperation(TokenStreamRewriter *outerInstance, size_t index, const std::wstring& text);
-      /// <summary>
-      /// Execute the rewrite operation by possibly adding to the buffer.
-      ///  Return the index of the next token to operate on.
-      /// </summary>
-      int instructionIndex;
-
-      virtual size_t execute(std::wstring *buf);
-
-      virtual std::wstring toString();
-
-    private:
-      void InitializeInstanceFields();
-    };
-
-  public:
-    class InsertBeforeOp : public RewriteOperation {
-    private:
-      TokenStreamRewriter *const outerInstance;
-
-    public:
-      InsertBeforeOp(TokenStreamRewriter *outerInstance, size_t index, const std::wstring& text);
-
-      virtual size_t execute(std::wstring *buf) override;
-    };
-
-  public:
-    class ReplaceOp : public RewriteOperation {
-    private:
-      TokenStreamRewriter *const outerInstance;
-
-    public:
-      size_t lastIndex;
-
-      ReplaceOp(TokenStreamRewriter *outerInstance, size_t from, size_t to, const std::wstring& text);
-      virtual size_t execute(std::wstring *buf) override;
-      virtual std::wstring toString() override;
-
-    private:
-      void InitializeInstanceFields();
-    };
-
-  public:
     static const std::wstring DEFAULT_PROGRAM_NAME;
     static const int PROGRAM_INIT_SIZE = 100;
     static const int MIN_TOKEN_INDEX = 0;
 
-    // Define the rewrite operation hierarchy
-
-    /// <summary>
-    /// I'm going to try replacing range from x..y with (y-x)+1 ReplaceOp
-    ///  instructions.
-    /// </summary>
-    /// <summary>
-    /// Our source stream </summary>
-  protected:
-    TokenStream *const tokens;
-
-    /// <summary>
-    /// You may have multiple, named streams of rewrite operations.
-    ///  I'm calling these things "programs."
-    ///  Maps String (name) -> rewrite (List)
-    /// </summary>
-    std::map<std::wstring, std::vector<RewriteOperation*>> * programs;
-
-    /// <summary>
-    /// Map String (program name) -> Integer index </summary>
-    std::map<std::wstring, int> * lastRewriteTokenIndexes;
-
-  public:
     TokenStreamRewriter(TokenStream *tokens);
-    virtual ~TokenStreamRewriter() {};
+    virtual ~TokenStreamRewriter();
 
     TokenStream *getTokenStream();
 
@@ -229,22 +148,9 @@ namespace runtime {
     virtual void Delete(const std::wstring &programName, Token *from, Token *to);
 
     virtual int getLastRewriteTokenIndex();
-
-  protected:
-    virtual int getLastRewriteTokenIndex(const std::wstring &programName);
-
-    virtual void setLastRewriteTokenIndex(const std::wstring &programName, int i);
-
-    virtual std::vector<RewriteOperation*> getProgram(const std::wstring &name);
-
-  private:
-    std::vector<RewriteOperation*> initializeProgram(const std::wstring &name);
-
-    /// <summary>
+    
     /// Return the text from the original tokens altered per the
     ///  instructions given to this rewriter.
-    /// </summary>
-  public:
     virtual std::wstring getText();
 
     /// <summary>
@@ -260,6 +166,77 @@ namespace runtime {
     virtual std::wstring getText(const misc::Interval &interval);
 
     virtual std::wstring getText(const std::wstring &programName, const misc::Interval &interval);
+
+  protected:
+    class RewriteOperation {
+    private:
+      TokenStreamRewriter *const outerInstance;
+
+    public:
+      /// <summary>
+      /// What index into rewrites List are we? </summary>
+      virtual ~RewriteOperation() {};
+      /// <summary>
+      /// Token buffer index. </summary>
+      size_t index;
+      std::wstring text;
+
+      RewriteOperation(TokenStreamRewriter *outerInstance, size_t index);
+
+      RewriteOperation(TokenStreamRewriter *outerInstance, size_t index, const std::wstring& text);
+      /// <summary>
+      /// Execute the rewrite operation by possibly adding to the buffer.
+      ///  Return the index of the next token to operate on.
+      /// </summary>
+      int instructionIndex;
+
+      virtual size_t execute(std::wstring *buf);
+
+      virtual std::wstring toString();
+
+    private:
+      void InitializeInstanceFields();
+    };
+
+    class InsertBeforeOp : public RewriteOperation {
+    private:
+      TokenStreamRewriter *const outerInstance;
+
+    public:
+      InsertBeforeOp(TokenStreamRewriter *outerInstance, size_t index, const std::wstring& text);
+
+      virtual size_t execute(std::wstring *buf) override;
+    };
+
+    class ReplaceOp : public RewriteOperation {
+    private:
+      TokenStreamRewriter *const outerInstance;
+
+    public:
+      size_t lastIndex;
+
+      ReplaceOp(TokenStreamRewriter *outerInstance, size_t from, size_t to, const std::wstring& text);
+      virtual size_t execute(std::wstring *buf) override;
+      virtual std::wstring toString() override;
+
+    private:
+      void InitializeInstanceFields();
+    };
+
+    /// Our source stream
+    TokenStream *const tokens;
+
+    /// You may have multiple, named streams of rewrite operations.
+    /// I'm calling these things "programs."
+    /// Maps String (name) -> rewrite (List)
+    std::map<std::wstring, std::vector<RewriteOperation*>> _programs;
+
+    /// <summary>
+    /// Map String (program name) -> Integer index </summary>
+    std::map<std::wstring, int> _lastRewriteTokenIndexes;
+    virtual int getLastRewriteTokenIndex(const std::wstring &programName);
+    virtual void setLastRewriteTokenIndex(const std::wstring &programName, int i);
+    virtual std::vector<RewriteOperation*>& getProgram(const std::wstring &name);
 
     /// <summary>
     /// We need to combine operations and report invalid operations (like
@@ -311,7 +288,6 @@ namespace runtime {
     ///
     ///  Return a map from token index to operation.
     /// </summary>
-  protected:
     virtual std::unordered_map<size_t, RewriteOperation*> reduceToSingleOperationPerIndex(std::vector<RewriteOperation*> rewrites);
 
     virtual std::wstring catOpText(std::wstring *a, std::wstring *b);
@@ -332,6 +308,9 @@ namespace runtime {
       }
       return ops;
     }
+
+  private:
+    std::vector<RewriteOperation*> initializeProgram(const std::wstring &name);
 
   };
 

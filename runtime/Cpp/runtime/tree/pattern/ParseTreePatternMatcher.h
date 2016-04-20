@@ -170,7 +170,7 @@ namespace pattern {
     virtual std::vector<Token::Ref> tokenize(const std::wstring &pattern);
 
     /// Split "<ID> = <e:expr>;" into 4 chunks for tokenizing by tokenize().
-    virtual std::vector<Chunk*> split(const std::wstring &pattern);
+    virtual std::vector<Chunk> split(const std::wstring &pattern);
     
   protected:
     std::wstring _start;

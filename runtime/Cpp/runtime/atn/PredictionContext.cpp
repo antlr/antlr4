@@ -53,6 +53,9 @@ const int PredictionContext::INITIAL_HASH;
 PredictionContext::PredictionContext(size_t cachedHashCode) : id(globalNodeCount++), cachedHashCode(cachedHashCode)  {
 }
 
+PredictionContext::~PredictionContext() {
+}
+
 PredictionContext::Ref PredictionContext::fromRuleContext(const ATN &atn, RuleContext::Ref outerContext) {
   if (!outerContext) {
     outerContext = RuleContext::EMPTY;
@@ -145,10 +148,10 @@ PredictionContext::Ref PredictionContext::merge(PredictionContext::Ref a,
 
   // convert singleton so both are arrays to normalize
   if (is<SingletonPredictionContext>(a)) {
-    a.reset(new ArrayPredictionContext(std::dynamic_pointer_cast<SingletonPredictionContext>(a)));
+    a = std::make_shared<ArrayPredictionContext>(std::dynamic_pointer_cast<SingletonPredictionContext>(a));
   }
   if (is<SingletonPredictionContext>(b)) {
-    b.reset(new ArrayPredictionContext(std::dynamic_pointer_cast<SingletonPredictionContext>(b)));
+    b = std::make_shared<ArrayPredictionContext>(std::dynamic_pointer_cast<SingletonPredictionContext>(b));
   }
   return mergeArrays(std::dynamic_pointer_cast<ArrayPredictionContext>(a),
                      std::dynamic_pointer_cast<ArrayPredictionContext>(b), rootIsWildcard, mergeCache);
@@ -212,7 +215,7 @@ PredictionContext::Ref PredictionContext::mergeSingletons(SingletonPredictionCon
         payloads[1] = a->returnState;
       }
       std::vector<std::weak_ptr<PredictionContext>> parents = { singleParent, singleParent };
-      PredictionContext::Ref a_(new ArrayPredictionContext(parents, payloads));
+      PredictionContext::Ref a_ = std::make_shared<ArrayPredictionContext>(parents, payloads);
       if (mergeCache != nullptr) {
         (*mergeCache)[{ a.get(), b.get() }] = a_;
       }
@@ -226,11 +229,11 @@ PredictionContext::Ref PredictionContext::mergeSingletons(SingletonPredictionCon
     if (a->returnState > b->returnState) { // sort by payload
       std::vector<int> payloads = { b->returnState, a->returnState };
       std::vector<std::weak_ptr<PredictionContext>> parents = { b->parent, a->parent };
-      a_.reset(new ArrayPredictionContext(parents, payloads));
+      a_ = std::make_shared<ArrayPredictionContext>(parents, payloads);
     } else {
       std::vector<int> payloads = {a->returnState, b->returnState};
       std::vector<std::weak_ptr<PredictionContext>> parents = { a->parent, b->parent };
-      a_.reset(new ArrayPredictionContext(parents, payloads));
+      a_ = std::make_shared<ArrayPredictionContext>(parents, payloads);
     }
 
     if (mergeCache != nullptr) {
@@ -256,13 +259,13 @@ PredictionContext::Ref PredictionContext::mergeRoot(SingletonPredictionContext::
     if (a == EMPTY) { // $ + x = [$,x]
       std::vector<int> payloads = { b->returnState, EMPTY_RETURN_STATE };
       std::vector<std::weak_ptr<PredictionContext>> parents = { b->parent, EMPTY };
-      PredictionContext::Ref joined(new ArrayPredictionContext(parents, payloads));
+      PredictionContext::Ref joined = std::make_shared<ArrayPredictionContext>(parents, payloads);
       return joined;
     }
     if (b == EMPTY) { // x + $ = [$,x] ($ is always first if present)
       std::vector<int> payloads = { a->returnState, EMPTY_RETURN_STATE };
       std::vector<std::weak_ptr<PredictionContext>> parents = { a->parent, EMPTY };
-      PredictionContext::Ref joined(new ArrayPredictionContext(parents, payloads));
+      PredictionContext::Ref joined = std::make_shared<ArrayPredictionContext>(parents, payloads);
       return joined;
     }
   }
@@ -288,10 +291,8 @@ PredictionContext::Ref PredictionContext::mergeArrays(std::shared_ptr<ArrayPredi
   size_t j = 0; // walks b
   size_t k = 0; // walks target M array
 
-  std::vector<int> mergedReturnStates;
-  mergedReturnStates.resize(a->returnStates.size() + b->returnStates.size());
-  std::vector<std::weak_ptr<PredictionContext>> mergedParents;
-  mergedParents.resize(a->returnStates.size() + b->returnStates.size());
+  std::vector<int> mergedReturnStates(a->returnStates.size() + b->returnStates.size());
+  std::vector<std::weak_ptr<PredictionContext>> mergedParents(a->returnStates.size() + b->returnStates.size());
 
   // walk and merge to yield mergedParents, mergedReturnStates
   while (i < a->returnStates.size() && j < b->returnStates.size()) {
@@ -355,7 +356,7 @@ PredictionContext::Ref PredictionContext::mergeArrays(std::shared_ptr<ArrayPredi
     mergedReturnStates = Arrays::copyOf(mergedReturnStates, k);
   }
 
-  std::shared_ptr<ArrayPredictionContext> M(new ArrayPredictionContext(mergedParents, mergedReturnStates));
+  std::shared_ptr<ArrayPredictionContext> M = std::make_shared<ArrayPredictionContext>(mergedParents, mergedReturnStates);
 
   // if we created same array as a or b, return that instead
   // TO_DO: track whether this is possible above during merge sort for speed
@@ -373,7 +374,7 @@ PredictionContext::Ref PredictionContext::mergeArrays(std::shared_ptr<ArrayPredi
   }
 
   if (combineCommonParents(mergedParents)) // Need to recreate the context as the parents array is copied on creation.
-    M.reset(new ArrayPredictionContext(mergedParents, mergedReturnStates));
+    M = std::make_shared<ArrayPredictionContext>(mergedParents, mergedReturnStates);
 
   if (mergeCache != nullptr) {
     (*mergeCache)[{ a.get(), b.get() }] = M;
@@ -485,8 +486,7 @@ PredictionContext::Ref PredictionContext::getCachedContext(PredictionContext::Re
 
   bool changed = false;
 
-  std::vector<std::weak_ptr<PredictionContext>> parents;
-  parents.resize(context->size());
+  std::vector<std::weak_ptr<PredictionContext>> parents(context->size());
   for (size_t i = 0; i < parents.size(); i++) {
     std::weak_ptr<PredictionContext> parent = getCachedContext(context->getParent(i).lock(), contextCache, visited);
     if (changed || parent.lock() != context->getParent(i).lock()) {

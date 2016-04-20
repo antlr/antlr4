@@ -191,6 +191,8 @@ std::wstring RuleContext::toString(Recognizer *recog) {
 }
 
 std::wstring RuleContext::toString(Recognizer *recog, RuleContext::Ref stop) {
+  if (recog == nullptr)
+    return toString({}, stop);
   return toString(recog->getRuleNames(), stop);
 }
 

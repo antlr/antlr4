@@ -34,10 +34,12 @@
 #include "PredicateTransition.h"
 #include "ATN.h"
 #include "ATNState.h"
+#include "CPPUtils.h"
 
 #include "FailedPredicateException.h"
 
 using namespace org::antlr::v4::runtime;
+using namespace antlrcpp;
 
 FailedPredicateException::FailedPredicateException(Parser *recognizer) : FailedPredicateException(recognizer, "", "") {
 }
@@ -51,7 +53,7 @@ FailedPredicateException::FailedPredicateException(Parser *recognizer, const std
 
   atn::ATNState *s = recognizer->getInterpreter<atn::ATNSimulator>()->atn.states[(size_t)recognizer->getState()];
   atn::Transition *transition = s->transition(0);
-  if (dynamic_cast<atn::PredicateTransition*>(transition) != nullptr) {
+  if (is<atn::PredicateTransition*>(transition)) {
     _ruleIndex = ((atn::PredicateTransition *)transition)->ruleIndex;
     _predicateIndex = ((atn::PredicateTransition *)transition)->predIndex;
   }

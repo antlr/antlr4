@@ -53,13 +53,14 @@ namespace atn {
 
     virtual ATN deserialize(const std::wstring &input);
     virtual void verifyATN(const ATN &atn);
-    virtual void checkCondition(bool condition);
-    virtual void checkCondition(bool condition, const std::string &message);
 
-    virtual Transition *edgeFactory(const ATN &atn, int type, int src, int trg, int arg1, int arg2, int arg3,
-                                    const std::vector<misc::IntervalSet> &sets);
+    static void checkCondition(bool condition);
+    static void checkCondition(bool condition, const std::string &message);
 
-    virtual ATNState *stateFactory(int type, int ruleIndex);
+    static Transition *edgeFactory(const ATN &atn, int type, int src, int trg, int arg1, int arg2, int arg3,
+                                   const std::vector<misc::IntervalSet> &sets);
+
+    static ATNState *stateFactory(int type, int ruleIndex);
 
   protected:
     /// Determines if a particular serialized representation of an ATN supports

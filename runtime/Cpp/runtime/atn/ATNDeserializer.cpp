@@ -294,7 +294,8 @@ ATN ATNDeserializer::deserialize(const std::wstring& input) {
       }
 
       RuleTransition *ruleTransition = static_cast<RuleTransition*>(t);
-      atn.ruleToStopState[(size_t)ruleTransition->target->ruleIndex]->addTransition(new EpsilonTransition(ruleTransition->followState));
+      atn.ruleToStopState[(size_t)ruleTransition->target->ruleIndex]->
+        addTransition(new EpsilonTransition(ruleTransition->followState)); /* mem check: freed in ANTState d-tor */
     }
   }
 
@@ -310,7 +311,6 @@ ATN ATNDeserializer::deserialize(const std::wstring& input) {
       // block end states can only be associated to a single block start state
       if (startState->endState->startState != nullptr) {
         throw IllegalStateException();
-
       }
 
       startState->endState->startState = static_cast<BlockStartState*>(state);
@@ -360,11 +360,11 @@ ATN ATNDeserializer::deserialize(const std::wstring& input) {
     }
 
     for (std::vector<RuleStartState*>::size_type i = 0; i < atn.ruleToStartState.size(); i++) {
-      BasicBlockStartState *bypassStart = new BasicBlockStartState();
+      BasicBlockStartState *bypassStart = new BasicBlockStartState(); /* mem check: freed in ATN d-tor */
       bypassStart->ruleIndex = (int)i;
       atn.addState(bypassStart);
 
-      BlockEndState *bypassStop = new BlockEndState();
+      BlockEndState *bypassStop = new BlockEndState(); /* mem check: freed in ATN d-tor */
       bypassStop->ruleIndex = (int)i;
       atn.addState(bypassStop);
 
@@ -383,16 +383,16 @@ ATN ATNDeserializer::deserialize(const std::wstring& input) {
             continue;
           }
 
-          if (!(dynamic_cast<StarLoopEntryState*>(state) != nullptr)) {
+          if (!is<StarLoopEntryState*>(state)) {
             continue;
           }
 
           ATNState *maybeLoopEndState = state->transition(state->getNumberOfTransitions() - 1)->target;
-          if (!(dynamic_cast<LoopEndState*>(maybeLoopEndState) != nullptr)) {
+          if (!is<LoopEndState*>(maybeLoopEndState)) {
             continue;
           }
 
-          if (maybeLoopEndState->epsilonOnlyTransitions && dynamic_cast<RuleStopState*>(maybeLoopEndState->transition(0)->target) != nullptr) {
+          if (maybeLoopEndState->epsilonOnlyTransitions && is<RuleStopState*>(maybeLoopEndState->transition(0)->target)) {
             endState = state;
             break;
           }
@@ -428,13 +428,13 @@ ATN ATNDeserializer::deserialize(const std::wstring& input) {
       }
 
       // link the new states
-      atn.ruleToStartState[i]->addTransition(new EpsilonTransition(bypassStart));
-      bypassStop->addTransition(new EpsilonTransition(endState));
+      atn.ruleToStartState[i]->addTransition(new EpsilonTransition(bypassStart));  /* mem check: freed in ATNState d-tor */
+      bypassStop->addTransition(new EpsilonTransition(endState)); /* mem check: freed in ATNState d-tor */
 
-      ATNState *matchState = new BasicState();
+      ATNState *matchState = new BasicState(); /* mem check: freed in ATN d-tor */
       atn.addState(matchState);
-      matchState->addTransition(new AtomTransition(bypassStop, atn.ruleToTokenType[i]));
-      bypassStart->addTransition(new EpsilonTransition(matchState));
+      matchState->addTransition(new AtomTransition(bypassStop, atn.ruleToTokenType[i])); /* mem check: freed in ATNState d-tor */
+      bypassStart->addTransition(new EpsilonTransition(matchState)); /* mem check: freed in ATNState d-tor */
     }
 
     if (deserializationOptions.isVerifyATN()) {
@@ -520,6 +520,7 @@ Guid ATNDeserializer::toUUID(const unsigned short *data, int offset) {
   return Guid((uint16_t *)data + offset, true);
 }
 
+/* mem check: all created instances are freed in the d-tor of the ATNState they are added to. */
 Transition *ATNDeserializer::edgeFactory(const ATN &atn, int type, int src, int trg, int arg1, int arg2, int arg3,
   const std::vector<misc::IntervalSet> &sets) {
   
@@ -558,6 +559,7 @@ Transition *ATNDeserializer::edgeFactory(const ATN &atn, int type, int src, int 
   throw IllegalArgumentException("The specified transition type is not valid.");
 }
 
+/* mem check: all created instances are freed in the d-tor of the ATN. */
 ATNState *ATNDeserializer::stateFactory(int type, int ruleIndex) {
   ATNState *s;
   switch (type) {

@@ -77,8 +77,7 @@ namespace antlrcpp {
     
     template <typename T>
     static std::vector<T> copyOf(const std::vector<T> &source, size_t count) {
-      std::vector<T> result;
-      result.resize(std::min(source.size(), count));
+      std::vector<T> result(std::min(source.size(), count));
       std::copy(source.begin(), source.end(), result.begin());
       return result;
     }

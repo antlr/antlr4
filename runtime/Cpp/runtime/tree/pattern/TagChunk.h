@@ -65,6 +65,7 @@ namespace pattern {
     /// </summary>
     const std::wstring _label;
 
+  public:
     /// <summary>
     /// Construct a new instance of <seealso cref="TagChunk"/> using the specified tag and
     /// no label.
@@ -74,8 +75,7 @@ namespace pattern {
     /// </param>
     /// <exception cref="IllegalArgumentException"> if {@code tag} is {@code null} or
     /// empty. </exception>
-  public:
-    TagChunk(const std::wstring &tag); //this(nullptr, tag);
+    TagChunk(const std::wstring &tag);
 
     /// <summary>
     /// Construct a new instance of <seealso cref="TagChunk"/> using the specified label

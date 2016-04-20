@@ -34,6 +34,7 @@
 #include "Token.h"
 #include "BitSet.h"
 #include "PredictionContext.h"
+#include "ATNConfig.h"
 
 namespace org {
 namespace antlr {
@@ -131,7 +132,7 @@ namespace atn {
     /// is {@code null}. </param>
   protected:
     virtual void _LOOK(ATNState *s, ATNState *stopState, PredictionContext::Ref ctx, misc::IntervalSet &look,
-                       std::set<ATNConfig*> &lookBusy, antlrcpp::BitSet &calledRuleStack, bool seeThruPreds, bool addEOF) const;
+      std::unordered_set<ATNConfig::Ref> &lookBusy, antlrcpp::BitSet &calledRuleStack, bool seeThruPreds, bool addEOF) const;
   };
 
 } // namespace atn

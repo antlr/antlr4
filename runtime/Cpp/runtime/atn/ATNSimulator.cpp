@@ -62,18 +62,18 @@ ATN ATNSimulator::deserialize(const std::wstring &data) {
 }
 
 void ATNSimulator::checkCondition(bool condition) {
-  (new ATNDeserializer())->checkCondition(condition);
+  ATNDeserializer::checkCondition(condition);
 }
 
 void ATNSimulator::checkCondition(bool condition, const std::string &message) {
-  ATNDeserializer().checkCondition(condition, message);
+  ATNDeserializer::checkCondition(condition, message);
 }
 
 Transition *ATNSimulator::edgeFactory(const ATN &atn, int type, int src, int trg, int arg1, int arg2, int arg3,
                                       const std::vector<misc::IntervalSet> &sets) {
-  return (new ATNDeserializer())->edgeFactory(atn, type, src, trg, arg1, arg2, arg3, sets);
+  return ATNDeserializer::edgeFactory(atn, type, src, trg, arg1, arg2, arg3, sets);
 }
 
 ATNState *ATNSimulator::stateFactory(int type, int ruleIndex) {
-  return (new ATNDeserializer())->stateFactory(type, ruleIndex);
+  return ATNDeserializer::stateFactory(type, ruleIndex);
 }

@@ -61,7 +61,6 @@ bool DefaultErrorStrategy::inErrorRecoveryMode(Parser *recognizer) {
 
 void DefaultErrorStrategy::endErrorCondition(Parser *recognizer) {
   errorRecoveryMode = false;
-  delete lastErrorStates;
   lastErrorIndex = -1;
 }
 
@@ -93,8 +92,8 @@ void DefaultErrorStrategy::reportError(Parser *recognizer, const RecognitionExce
 }
 
 void DefaultErrorStrategy::recover(Parser *recognizer, const RecognitionException &e) {
-  if (lastErrorIndex == (int)recognizer->getInputStream()->index() && lastErrorStates != nullptr &&
-      lastErrorStates->contains(recognizer->getState())) {
+  if (lastErrorIndex == (int)recognizer->getInputStream()->index() &&
+      lastErrorStates.contains(recognizer->getState())) {
 
     // uh oh, another error at same token index and previously-visited
     // state in ATN; must be a case where LT(1) is in the recovery
@@ -103,10 +102,7 @@ void DefaultErrorStrategy::recover(Parser *recognizer, const RecognitionExceptio
     recognizer->consume();
   }
   lastErrorIndex = (int)recognizer->getInputStream()->index();
-  if (lastErrorStates == nullptr) {
-    lastErrorStates = new misc::IntervalSet(0);
-  }
-  lastErrorStates->add(recognizer->getState());
+  lastErrorStates.add(recognizer->getState());
   misc::IntervalSet followSet = getErrorRecoverySet(recognizer);
   consumeUntil(recognizer, followSet);
 }
@@ -353,5 +349,4 @@ void DefaultErrorStrategy::consumeUntil(Parser *recognizer, const misc::Interval
 void DefaultErrorStrategy::InitializeInstanceFields() {
   errorRecoveryMode = false;
   lastErrorIndex = -1;
-  lastErrorStates = nullptr;
 }

@@ -44,11 +44,11 @@ namespace atn {
   // Simpler hasher and comparer variants than those in ATNConfig (less fields, no murmur hash).
   struct SimpleATNConfigHasher
   {
-    size_t operator()(const ATNConfig &k) const;
+    size_t operator()(const ATNConfig::Ref &k) const;
   };
 
   struct SimpleATNConfigComparer {
-    bool operator()(const ATNConfig &lhs, const ATNConfig &rhs) const;
+    bool operator()(const ATNConfig::Ref &lhs, const ATNConfig::Ref &rhs) const;
   };
   
   /// Specialized set that can track info about the set, with support for combining similar configurations using a
@@ -61,7 +61,7 @@ namespace atn {
 
     /// <summary>
     /// Track the elements as they are added to the set; supports get(i) </summary>
-    std::vector<ATNConfig *> configs;
+    std::vector<ATNConfig::Ref> configs;
 
     // TO_DO: these fields make me pretty uncomfortable but nice to pack up info together, saves recomputation
     // TO_DO: can we track conflicts as they are added to save scanning configs later?
@@ -86,7 +86,7 @@ namespace atn {
 
     virtual ~ATNConfigSet();
 
-    virtual bool add(ATNConfig *config);
+    virtual bool add(ATNConfig::Ref config);
 
     /// <summary>
     /// Adding a new config means merging contexts with existing configs for
@@ -98,17 +98,17 @@ namespace atn {
     /// This method updates <seealso cref="#dipsIntoOuterContext"/> and
     /// <seealso cref="#hasSemanticContext"/> when necessary.
     /// </summary>
-    virtual bool add(ATNConfig *config, PredictionContextMergeCache *mergeCache);
+    virtual bool add(ATNConfig::Ref config, PredictionContextMergeCache *mergeCache);
 
     /// <summary>
     /// Return a List holding list of configs </summary>
-    virtual std::vector<ATNConfig*> elements();
+    virtual std::vector<ATNConfig::Ref> elements();
 
-    virtual std::vector<ATNState*> *getStates();
+    virtual std::vector<ATNState*> getStates();
 
     virtual std::vector<SemanticContext::Ref> getPredicates();
 
-    virtual ATNConfig *get(size_t i) const;
+    virtual ATNConfig::Ref get(size_t i) const;
 
     virtual void optimizeConfigs(ATNSimulator *interpreter);
 
@@ -118,7 +118,7 @@ namespace atn {
     virtual size_t hashCode();
     virtual size_t size();
     virtual bool isEmpty();
-    virtual bool contains(ATNConfig *o);
+    virtual bool contains(ATNConfig::Ref o);
     virtual void clear();
     virtual bool isReadonly();
     virtual void setReadonly(bool readonly);
@@ -146,9 +146,9 @@ namespace atn {
 } // namespace org
 
 namespace std {
-  template <> struct hash<std::vector<ATNConfig *>>
+  template <> struct hash<std::vector<ATNConfig::Ref>>
   {
-    size_t operator() (const std::vector<ATNConfig *> &vector) const
+    size_t operator() (const std::vector<ATNConfig::Ref > &vector) const
     {
       std::size_t seed = 0;
       for (auto &config : vector) {

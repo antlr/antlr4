@@ -41,18 +41,14 @@ namespace atn {
 
   struct OrderedATNConfigHasher
   {
-    size_t operator()(const ATNConfig &config) const {
-      return std::hash<ATNConfig>()(config);
+    size_t operator()(const ATNConfig::Ref &config) const {
+      return std::hash<ATNConfig::Ref>()(config);
     }
   };
 
   struct OrderedATNConfigComparer {
-    bool operator()(const ATNConfig &lhs, const ATNConfig &rhs) const
+    bool operator()(const ATNConfig::Ref &lhs, const ATNConfig::Ref &rhs) const
     {
-      if (&lhs == &rhs) { // Shortcut: same address = same object.
-        return true;
-      }
-
       return lhs == rhs;
     }
   };

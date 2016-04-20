@@ -49,7 +49,63 @@ using namespace antlrcpp;
 ATN::ATN() : ATN(ATNType::LEXER, 0) {
 }
 
+/**
+ * Required to be defined (even though not used) as we have an explicit move assignment operator.
+ */
+ATN::ATN(const ATN& other) {
+  states = other.states;
+  decisionToState = other.decisionToState;
+  ruleToStartState = other.ruleToStartState;
+  ruleToStopState = other.ruleToStopState;
+  grammarType = other.grammarType;
+  maxTokenType = other.maxTokenType;
+  ruleToTokenType = other.ruleToTokenType;
+  ruleToActionIndex = other.ruleToActionIndex;
+  modeToStartState = other.modeToStartState;
+}
+
 ATN::ATN(ATNType grammarType, size_t maxTokenType) : grammarType(grammarType), maxTokenType(maxTokenType) {
+}
+
+ATN::~ATN() {
+  for (ATNState *state : states) {
+    delete state;
+  }
+}
+
+/**
+ * Required to be defined (even though not used) as we have an explicit move assignment operator.
+ */
+ATN& ATN::operator = (ATN& other) noexcept {
+  states = other.states;
+  decisionToState = other.decisionToState;
+  ruleToStartState = other.ruleToStartState;
+  ruleToStopState = other.ruleToStopState;
+  grammarType = other.grammarType;
+  maxTokenType = other.maxTokenType;
+  ruleToTokenType = other.ruleToTokenType;
+  ruleToActionIndex = other.ruleToActionIndex;
+  modeToStartState = other.modeToStartState;
+
+  return *this;
+}
+
+/**
+ * Explicit move assignment operator to make this the preferred assignment. With implicit copy/move assignment
+ * operators it seems the copy operator is preferred causing trouble when releasing the allocated ATNState instances.
+ */
+ATN& ATN::operator = (ATN&& other) noexcept {
+  states = std::move(other.states);
+  decisionToState = std::move(other.decisionToState);
+  ruleToStartState = std::move(other.ruleToStartState);
+  ruleToStopState = std::move(other.ruleToStopState);
+  grammarType = std::move(other.grammarType);
+  maxTokenType = std::move(other.maxTokenType);
+  ruleToTokenType = std::move(other.ruleToTokenType);
+  ruleToActionIndex = std::move(other.ruleToActionIndex);
+  modeToStartState = std::move(other.modeToStartState);
+
+  return *this;
 }
 
 misc::IntervalSet ATN::nextTokens(ATNState *s, RuleContext::Ref ctx) const {

@@ -594,7 +594,7 @@ void Parser::setTrace(bool trace) {
 }
 
 void Parser::InitializeInstanceFields() {
-  _errHandler.reset(new DefaultErrorStrategy());
+  _errHandler = std::make_shared<DefaultErrorStrategy>();
   _precedenceStack.clear();
   _precedenceStack.push_back(0);
   _buildParseTrees = true;

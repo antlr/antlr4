@@ -38,21 +38,17 @@
 
 using namespace org::antlr::v4::runtime::atn;
 
-size_t SimpleATNConfigHasher::operator()(const ATNConfig &k) const {
+size_t SimpleATNConfigHasher::operator()(const ATNConfig::Ref &k) const {
   size_t hashCode = 7;
-  hashCode = 31 * hashCode + (size_t)k.state->stateNumber;
-  hashCode = 31 * hashCode + (size_t)k.alt;
-  hashCode = 31 * hashCode + k.semanticContext->hashCode();
+  hashCode = 31 * hashCode + (size_t)k->state->stateNumber;
+  hashCode = 31 * hashCode + (size_t)k->alt;
+  hashCode = 31 * hashCode + k->semanticContext->hashCode();
   return hashCode;
 }
 
-bool SimpleATNConfigComparer::operator () (const ATNConfig &lhs, const ATNConfig &rhs) const {
-  if (&lhs == &rhs) { // Shortcut: same address = same object.
-    return true;
-  }
-
-  return lhs.state->stateNumber == rhs.state->stateNumber && lhs.alt == rhs.alt &&
-    lhs.semanticContext == rhs.semanticContext;
+bool SimpleATNConfigComparer::operator () (const ATNConfig::Ref &lhs, const ATNConfig::Ref &rhs) const {
+  return lhs->state->stateNumber == rhs->state->stateNumber && lhs->alt == rhs->alt &&
+    lhs->semanticContext == rhs->semanticContext;
 }
 
 //------------------ ATNConfigSet --------------------------------------------------------------------------------------
@@ -72,11 +68,11 @@ ATNConfigSet::ATNConfigSet(std::shared_ptr<ATNConfigSet> old) : ATNConfigSet(old
 ATNConfigSet::~ATNConfigSet() {
 }
 
-bool ATNConfigSet::add(ATNConfig *config) {
+bool ATNConfigSet::add(ATNConfig::Ref config) {
   return add(config, nullptr);
 }
 
-bool ATNConfigSet::add(ATNConfig *config, PredictionContextMergeCache *mergeCache) {
+bool ATNConfigSet::add(ATNConfig::Ref config, PredictionContextMergeCache *mergeCache) {
   if (_readonly) {
     throw IllegalStateException("This set is readonly");
   }
@@ -87,7 +83,7 @@ bool ATNConfigSet::add(ATNConfig *config, PredictionContextMergeCache *mergeCach
     dipsIntoOuterContext = true;
   }
   
-  ATNConfig *existing = configLookup->getOrAdd(config);
+  ATNConfig::Ref existing = configLookup->getOrAdd(config);
   if (existing == config) { // we added this new one
     _cachedHashCode = 0;
     configs.push_back(config); // track order here
@@ -112,14 +108,14 @@ bool ATNConfigSet::addAll(std::shared_ptr<ATNConfigSet> other) {
   return false;
 }
 
-std::vector<ATNConfig*> ATNConfigSet::elements() {
+std::vector<ATNConfig::Ref> ATNConfigSet::elements() {
   return configs;
 }
 
-std::vector<ATNState*>* ATNConfigSet::getStates() {
-  std::vector<ATNState*> *states = new std::vector<ATNState*>();
+std::vector<ATNState*> ATNConfigSet::getStates() {
+  std::vector<ATNState*> states;
   for (auto c : configs) {
-    states->push_back(c->state);
+    states.push_back(c->state);
   }
   return states;
 }
@@ -134,7 +130,7 @@ std::vector<SemanticContext::Ref> ATNConfigSet::getPredicates() {
   return preds;
 }
 
-ATNConfig* ATNConfigSet::get(size_t i) const {
+ATNConfig::Ref ATNConfigSet::get(size_t i) const {
   return configs[i];
 }
 
@@ -182,13 +178,13 @@ bool ATNConfigSet::operator == (const ATNConfigSet &other) {
 size_t ATNConfigSet::hashCode() {
   if (isReadonly()) {
     if (_cachedHashCode == 0) {
-      _cachedHashCode = std::hash<std::vector<ATNConfig *>>()(configs);
+      _cachedHashCode = std::hash<std::vector<ATNConfig::Ref>>()(configs);
     }
 
     return _cachedHashCode;
   }
 
-  return std::hash<std::vector<ATNConfig *>>()(configs);
+  return std::hash<std::vector<ATNConfig::Ref>>()(configs);
 }
 
 size_t ATNConfigSet::size() {
@@ -199,7 +195,7 @@ bool ATNConfigSet::isEmpty() {
   return configs.empty();
 }
 
-bool ATNConfigSet::contains(ATNConfig *o) {
+bool ATNConfigSet::contains(ATNConfig::Ref o) {
   if (configLookup == nullptr) {
     throw UnsupportedOperationException("This method is not implemented for readonly sets.");
   }

@@ -45,7 +45,9 @@ namespace atn {
 
     /// Used for runtime deserialization of ATNs from strings.
     ATN();
+    ATN(const ATN &other);
     ATN(ATNType grammarType, size_t maxTokenType);
+    ~ATN();
 
     std::vector<ATNState*> states;
 
@@ -84,6 +86,9 @@ namespace atn {
     std::vector<int> ruleToActionIndex;
 
     std::vector<TokensStartState*> modeToStartState;
+
+    ATN& operator = (ATN &other) noexcept;
+    ATN& operator = (ATN &&other) noexcept;
 
     /// <summary>
     /// Compute the set of valid tokens that can occur starting in state {@code s}.

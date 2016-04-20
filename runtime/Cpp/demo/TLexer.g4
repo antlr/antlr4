@@ -38,7 +38,7 @@ Digit: [0..9];
 ID: LETTER (LETTER | '0'..'9')*;
 fragment LETTER : [a-zA-Z\u0080-\uFFFD] ;
 
-LessThan: '<' -> pushMode(Mode1);
+LessThan: '<';// -> pushMode(Mode1);
 GreaterThan:  '>';// -> popMode;
 Equal: '=';
 And: 'and';

@@ -49,9 +49,10 @@ namespace atn {
   ///  an ATN state.
   /// </summary>
   class ATNConfig {
-    /// <summary>
-    /// The ATN state associated with this configuration </summary>
   public:
+    typedef std::shared_ptr<ATNConfig> Ref;
+    
+    /// The ATN state associated with this configuration.
     ATNState * state;
 
     /// <summary>
@@ -82,12 +83,12 @@ namespace atn {
     ATNConfig(ATNState *state, int alt, PredictionContext::Ref context);
     ATNConfig(ATNState *state, int alt, PredictionContext::Ref context, SemanticContext::Ref semanticContext);
 
-    ATNConfig(ATNConfig *c); // dup
-    ATNConfig(ATNConfig *c, ATNState *state);
-    ATNConfig(ATNConfig *c, ATNState *state, SemanticContext::Ref semanticContext);
-    ATNConfig(ATNConfig *c, SemanticContext::Ref semanticContext);
-    ATNConfig(ATNConfig *c, ATNState *state, PredictionContext::Ref context);
-    ATNConfig(ATNConfig *c, ATNState *state, PredictionContext::Ref context, SemanticContext::Ref semanticContext);
+    ATNConfig(ATNConfig::Ref c); // dup
+    ATNConfig(ATNConfig::Ref c, ATNState *state);
+    ATNConfig(ATNConfig::Ref c, ATNState *state, SemanticContext::Ref semanticContext);
+    ATNConfig(ATNConfig::Ref c, SemanticContext::Ref semanticContext);
+    ATNConfig(ATNConfig::Ref c, ATNState *state, PredictionContext::Ref context);
+    ATNConfig(ATNConfig::Ref c, ATNState *state, PredictionContext::Ref context, SemanticContext::Ref semanticContext);
 
     virtual size_t hashCode() const;
 

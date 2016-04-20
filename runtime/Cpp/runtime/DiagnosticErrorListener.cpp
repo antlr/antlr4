@@ -103,7 +103,7 @@ antlrcpp::BitSet DiagnosticErrorListener::getConflictingAlts(const antlrcpp::Bit
 
   antlrcpp::BitSet result;
   for (size_t i = 0; i < configs->size(); i++) {
-    atn::ATNConfig *config = configs->get(i);
+    atn::ATNConfig::Ref config = configs->get(i);
     result.set((size_t)config->alt);
   }
 

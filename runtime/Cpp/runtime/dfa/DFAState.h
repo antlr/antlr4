@@ -125,12 +125,13 @@ namespace dfa {
     DFAState();
     DFAState(int state);
     DFAState(std::shared_ptr<atn::ATNConfigSet> configs);
+    ~DFAState();
 
     /// <summary>
     /// Get the set of all alts mentioned by all ATN configurations in this
     ///  DFA state.
     /// </summary>
-    virtual std::set<int> *getAltSet();
+    virtual std::set<int> getAltSet();
 
     virtual size_t hashCode() ;
 

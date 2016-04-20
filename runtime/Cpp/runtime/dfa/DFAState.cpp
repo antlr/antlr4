@@ -64,15 +64,18 @@ DFAState::DFAState(std::shared_ptr<ATNConfigSet> configs) : DFAState() {
   this->configs = configs;
 }
 
-std::set<int> *DFAState::getAltSet() {
-  std::set<int> *alts = new std::set<int>();
+DFAState::~DFAState() {
+  for (auto predicate : predicates) {
+    delete predicate;
+  }
+}
+
+std::set<int> DFAState::getAltSet() {
+  std::set<int> alts;
   if (configs != nullptr) {
     for (size_t i = 0; i < configs->size(); i++) {
-      alts->insert(configs->get(i)->alt);
+      alts.insert(configs->get(i)->alt);
     }
-  }
-  if (alts->size() == 0) {
-    return nullptr;
   }
   return alts;
 }

@@ -36,6 +36,7 @@
 #include "ATNSimulator.h"
 #include "PredictionContext.h"
 #include "SemanticContext.h"
+#include "ATNConfig.h"
 
 namespace org {
 namespace antlr {
@@ -410,30 +411,30 @@ namespace atn {
      ambig detection thought :(
      */
 
-    virtual void closure(ATNConfig *config, std::shared_ptr<ATNConfigSet> configs, std::set<ATNConfig*> &closureBusy,
+    virtual void closure(ATNConfig::Ref config, std::shared_ptr<ATNConfigSet> configs, std::set<ATNConfig::Ref> &closureBusy,
                          bool collectPredicates, bool fullCtx);
 
-    virtual void closureCheckingStopState(ATNConfig *config, std::shared_ptr<ATNConfigSet> configs,
-      std::set<ATNConfig*> &closureBusy, bool collectPredicates, bool fullCtx, int depth);
+    virtual void closureCheckingStopState(ATNConfig::Ref config, std::shared_ptr<ATNConfigSet> configs,
+      std::set<ATNConfig::Ref> &closureBusy, bool collectPredicates, bool fullCtx, int depth);
 
     /// Do the actual work of walking epsilon edges.
-    virtual void closure_(ATNConfig *config, std::shared_ptr<ATNConfigSet> configs, std::set<ATNConfig*> &closureBusy,
+    virtual void closure_(ATNConfig::Ref config, std::shared_ptr<ATNConfigSet> configs, std::set<ATNConfig::Ref> &closureBusy,
                           bool collectPredicates, bool fullCtx, int depth);
 
   public:
     virtual std::wstring getRuleName(size_t index);
 
   protected:
-    virtual ATNConfig *getEpsilonTarget(ATNConfig *config, Transition *t, bool collectPredicates, bool inContext, bool fullCtx);
-    virtual ATNConfig *actionTransition(ATNConfig *config, ActionTransition *t);
+    virtual ATNConfig::Ref getEpsilonTarget(ATNConfig::Ref config, Transition *t, bool collectPredicates, bool inContext, bool fullCtx);
+    virtual ATNConfig::Ref actionTransition(ATNConfig::Ref config, ActionTransition *t);
 
   public:
-    virtual ATNConfig *precedenceTransition(ATNConfig *config, PrecedencePredicateTransition *pt, bool collectPredicates, bool inContext, bool fullCtx);
+    virtual ATNConfig::Ref precedenceTransition(ATNConfig::Ref config, PrecedencePredicateTransition *pt, bool collectPredicates, bool inContext, bool fullCtx);
 
   protected:
-    virtual ATNConfig *predTransition(ATNConfig *config, PredicateTransition *pt, bool collectPredicates, bool inContext, bool fullCtx);
+    virtual ATNConfig::Ref predTransition(ATNConfig::Ref config, PredicateTransition *pt, bool collectPredicates, bool inContext, bool fullCtx);
 
-    virtual ATNConfig *ruleTransition(ATNConfig *config, RuleTransition *t);
+    virtual ATNConfig::Ref ruleTransition(ATNConfig::Ref config, RuleTransition *t);
 
     virtual antlrcpp::BitSet getConflictingAlts(std::shared_ptr<ATNConfigSet> configs);
 

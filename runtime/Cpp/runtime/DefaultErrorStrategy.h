@@ -67,7 +67,7 @@ namespace runtime {
     /// </summary>
     int lastErrorIndex;
 
-    misc::IntervalSet *lastErrorStates;
+    misc::IntervalSet lastErrorStates;
 
     /// <summary>
     /// {@inheritDoc}
@@ -377,7 +377,7 @@ namespace runtime {
     ///  to use t.toString() (which, for CommonToken, dumps everything about
     ///  the token). This is better than forcing you to override a method in
     ///  your token objects because you don't have to go modify your lexer
-    ///  so that it creates a new Java type.
+    ///  so that it creates a new class.
     /// </summary>
     virtual std::wstring getTokenErrorDisplay(Token::Ref t);
 

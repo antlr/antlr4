@@ -68,7 +68,7 @@ void ANTLRInputStream::load(std::wistream &stream, std::streamsize readChunkSize
     readChunkSize = READ_BUFFER_SIZE;
   }
 
-  wchar_t *buffer = new wchar_t[readChunkSize];
+  wchar_t *buffer = new wchar_t[readChunkSize]; /* mem check: freed in finally block */
   auto onExit = finally([buffer] {
     delete[] buffer;
   });

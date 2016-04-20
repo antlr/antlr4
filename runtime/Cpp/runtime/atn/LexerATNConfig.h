@@ -41,15 +41,17 @@ namespace atn {
 
   class LexerATNConfig : public ATNConfig {
   public:
+    typedef std::shared_ptr<LexerATNConfig> Ref;
+    
     /// Capture lexer action we traverse.
     int lexerActionIndex = -1;
 
     LexerATNConfig(ATNState *state, int alt, PredictionContext::Ref context);
     LexerATNConfig(ATNState *state, int alt, PredictionContext::Ref context, int actionIndex);
 
-    LexerATNConfig(LexerATNConfig *c, ATNState *state);
-    LexerATNConfig(LexerATNConfig *c, ATNState *state, int actionIndex);
-    LexerATNConfig(LexerATNConfig *c, ATNState *state, PredictionContext::Ref context);
+    LexerATNConfig(LexerATNConfig::Ref c, ATNState *state);
+    LexerATNConfig(LexerATNConfig::Ref c, ATNState *state, int actionIndex);
+    LexerATNConfig(LexerATNConfig::Ref c, ATNState *state, PredictionContext::Ref context);
 
     bool hasPassedThroughNonGreedyDecision();
 
@@ -60,7 +62,7 @@ namespace atn {
   private:
     const bool passedThroughNonGreedyDecision;
 
-    static bool checkNonGreedyDecision(LexerATNConfig *source, ATNState *target);
+    static bool checkNonGreedyDecision(LexerATNConfig::Ref source, ATNState *target);
   };
 
 } // namespace atn
