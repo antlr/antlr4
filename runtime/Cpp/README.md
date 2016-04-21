@@ -26,6 +26,7 @@ Project Status
 * Library linking
 * Simple running (e.g. heap objects initialize properly)
 * Simple testing  (creating significiant objects)
-
+* All memory allocations checked
+* Simple demo application on OS X, Windows and Linux
 
  
