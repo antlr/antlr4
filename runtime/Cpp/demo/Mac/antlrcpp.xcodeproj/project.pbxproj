@@ -19,6 +19,8 @@
 		276901AA1CAD7E67005CEC6A /* Recognizer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 27C666991C9584050021E494 /* Recognizer.cpp */; };
 		276927241C9ED49100E4EBF8 /* antlrcpp-Prefix.h in Headers */ = {isa = PBXBuildFile; fileRef = 276927231C9ED49100E4EBF8 /* antlrcpp-Prefix.h */; };
 		276927251C9ED49100E4EBF8 /* antlrcpp-Prefix.h in Headers */ = {isa = PBXBuildFile; fileRef = 276927231C9ED49100E4EBF8 /* antlrcpp-Prefix.h */; };
+		27874F1E1CCB7A0700AF1C53 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 27874F1D1CCB7A0700AF1C53 /* CoreFoundation.framework */; };
+		27874F211CCB7B1700AF1C53 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 27874F1D1CCB7A0700AF1C53 /* CoreFoundation.framework */; };
 		278A66FB1C95838E002D667E /* ANTLRErrorListener.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 278A66FA1C95838E002D667E /* ANTLRErrorListener.cpp */; };
 		278A66FC1C95838E002D667E /* ANTLRErrorListener.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 278A66FA1C95838E002D667E /* ANTLRErrorListener.cpp */; };
 		27A23EA31CC2A8D60036D8A3 /* TLexer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 27A23EA11CC2A8D60036D8A3 /* TLexer.cpp */; };
@@ -545,6 +547,7 @@
 		2747A7121CA6C46C0030247B /* InputHandlingTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = InputHandlingTests.mm; sourceTree = "<group>"; wrapsLines = 0; };
 		274FC6D81CA96B6C008D4374 /* MiscClassTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MiscClassTests.mm; sourceTree = "<group>"; wrapsLines = 0; };
 		276927231C9ED49100E4EBF8 /* antlrcpp-Prefix.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; name = "antlrcpp-Prefix.h"; path = "../../runtime/antlrcpp-Prefix.h"; sourceTree = "<group>"; };
+		27874F1D1CCB7A0700AF1C53 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
 		278A66FA1C95838E002D667E /* ANTLRErrorListener.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ANTLRErrorListener.cpp; path = ../../runtime/ANTLRErrorListener.cpp; sourceTree = SOURCE_ROOT; };
 		27A23EA11CC2A8D60036D8A3 /* TLexer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TLexer.cpp; path = ../generated/TLexer.cpp; sourceTree = "<group>"; wrapsLines = 0; };
 		27A23EA21CC2A8D60036D8A3 /* TLexer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TLexer.h; path = ../generated/TLexer.h; sourceTree = "<group>"; };
@@ -822,6 +825,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				27874F1E1CCB7A0700AF1C53 /* CoreFoundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -829,6 +833,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				27874F211CCB7B1700AF1C53 /* CoreFoundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -843,6 +848,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		27874F221CCBB34200AF1C53 /* Linked Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				27874F1D1CCB7A0700AF1C53 /* CoreFoundation.framework */,
+			);
+			name = "Linked Frameworks";
+			sourceTree = "<group>";
+		};
 		27C667461C9584570021E494 /* atn */ = {
 			isa = PBXGroup;
 			children = (
@@ -1174,12 +1187,13 @@
 		37D727A11867AF1E007B6D10 = {
 			isa = PBXGroup;
 			children = (
+				27C66A681C9591280021E494 /* antlr4-cpp-demo */,
+				37F135691B4AC02800E0CACF /* antlrcpp Tests */,
 				276927231C9ED49100E4EBF8 /* antlrcpp-Prefix.h */,
 				27C66A5C1C958EB50021E494 /* generated */,
-				37D1C2C5186A31130041671A /* runtime */,
-				37F135691B4AC02800E0CACF /* antlrcpp Tests */,
-				27C66A681C9591280021E494 /* antlr4-cpp-demo */,
+				27874F221CCBB34200AF1C53 /* Linked Frameworks */,
 				37D727AB1867AF1E007B6D10 /* Products */,
+				37D1C2C5186A31130041671A /* runtime */,
 			);
 			sourceTree = "<group>";
 		};

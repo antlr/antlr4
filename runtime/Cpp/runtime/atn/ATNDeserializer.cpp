@@ -85,11 +85,11 @@ ATNDeserializer::ATNDeserializer(const ATNDeserializationOptions& dso): deserial
  * reflected as change in the unique ID SERIALIZED_UUID.
  */
 Guid ATNDeserializer::ADDED_PRECEDENCE_TRANSITIONS() {
-  return "1DA0C57D-6C06-438A-9B27-10BCB3CE0F61";
+  return Guid("1DA0C57D-6C06-438A-9B27-10BCB3CE0F61");
 }
 
 Guid ATNDeserializer::ADDED_LEXER_ACTIONS() {
-  return "AADB8D7E-AEEF-4415-AD2B-8204D6CF042E";
+  return Guid("AADB8D7E-AEEF-4415-AD2B-8204D6CF042E");
 }
 
 Guid ATNDeserializer::SERIALIZED_UUID() {
@@ -97,7 +97,7 @@ Guid ATNDeserializer::SERIALIZED_UUID() {
 }
 
 Guid ATNDeserializer::BASE_SERIALIZED_UUID() {
-  return "33761B2D-78BB-4A43-8B0B-4F5BEE8AACF3";
+  return Guid("33761B2D-78BB-4A43-8B0B-4F5BEE8AACF3");
 }
 
 std::vector<Guid>& ATNDeserializer::SUPPORTED_UUIDS() {
