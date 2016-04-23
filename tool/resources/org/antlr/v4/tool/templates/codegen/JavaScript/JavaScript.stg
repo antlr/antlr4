@@ -46,7 +46,7 @@ pythonTypeInitMap ::= [
 
 // args must be <object-model-object>, <fields-resulting-in-STs>
 
-ParserFile(file, parser, namedActions) ::= <<
+ParserFile(file, parser, namedActions, contextSuperClass) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 var antlr4 = require('antlr4/index');
 <if(file.genListener)>
@@ -671,8 +671,7 @@ ListLabelName(label)		  ::= "<label>"
 CaptureNextToken(d) ::= "<d.varName> = self._input.LT(1)"
 CaptureNextTokenType(d) ::= "<d.varName> = this._input.LA(1);"
 
-StructDecl(struct,ctorAttrs,attrs,getters,dispatchMethods,interfaces,extensionMembers,
-           superClass={antlr4.ParserRuleContext}) ::= <<
+StructDecl(struct,ctorAttrs,attrs,getters,dispatchMethods,interfaces,extensionMembers) ::= <<
 function <struct.name>(parser, parent, invokingState<struct.ctorAttrs:{a | , <a.name>}>) {
 	if(parent===undefined) {
 	    parent = null;
@@ -680,7 +679,7 @@ function <struct.name>(parser, parent, invokingState<struct.ctorAttrs:{a | , <a.
 	if(invokingState===undefined || invokingState===null) {
 		invokingState = -1;
 	}
-	<superClass>.call(this, parent, invokingState);
+	<if(contextSuperClass)><contextSuperClass><else>antlr4.ParserRuleContext<endif>.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = <parser.name>.RULE_<struct.derivedFromName>;
     <attrs:{a | <a>}; separator="\n">
@@ -688,14 +687,14 @@ function <struct.name>(parser, parent, invokingState<struct.ctorAttrs:{a | , <a.
     return this;
 }
 
-<struct.name>.prototype = Object.create(<superClass>.prototype);
+<struct.name>.prototype = Object.create(<if(contextSuperClass)><contextSuperClass><else>antlr4.ParserRuleContext<endif>.prototype);
 <struct.name>.prototype.constructor = <struct.name>;
 
 <getters:{g | <struct.name>.prototype.<g>}; separator="\n\n">
 
 <if(struct.provideCopyFrom)> <! don't need copy unless we have subclasses !>
 <struct.name>.prototype.copyFrom = function(ctx) {
-    <superClass>.prototype.copyFrom.call(this, ctx);
+    <if(contextSuperClass)><contextSuperClass><else>antlr4.ParserRuleContext<endif>.prototype.copyFrom.call(this, ctx);
     <struct.attrs:{a | this.<a.name> = ctx.<a.name>;}; separator="\n">
 };
 <endif>

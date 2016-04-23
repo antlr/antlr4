@@ -168,8 +168,7 @@ public class LeftRecursiveRuleTransformer {
 
 		// track recursive alt info for codegen
 		r.recPrimaryAlts = new ArrayList<LeftRecursiveRuleAltInfo>();
-		r.recPrimaryAlts.addAll(leftRecursiveRuleWalker.prefixAlts);
-		r.recPrimaryAlts.addAll(leftRecursiveRuleWalker.otherAlts);
+		r.recPrimaryAlts.addAll(leftRecursiveRuleWalker.prefixAndOtherAlts);
 		if (r.recPrimaryAlts.isEmpty()) {
 			tool.errMgr.grammarError(ErrorType.NO_NON_LR_ALTS, g.fileName, ((GrammarAST)r.ast.getChild(0)).getToken(), r.name);
 		}
@@ -244,9 +243,9 @@ public class LeftRecursiveRuleTransformer {
 	 * 			(ALT ID))
 	 * 		(* (BLOCK
 	 *			(OPTIONS ...)
-	 * 			(ALT {7 >= $_p}? '*' (= b e) {$v = $a.v * $b.v;})
-	 * 			(ALT {6 >= $_p}? '+' (= b e) {$v = $a.v + $b.v;})
-	 * 			(ALT {3 >= $_p}? '++') (ALT {2 >= $_p}? '--'))))))
+	 * 			(ALT {7 &gt;= $_p}? '*' (= b e) {$v = $a.v * $b.v;})
+	 * 			(ALT {6 &gt;= $_p}? '+' (= b e) {$v = $a.v + $b.v;})
+	 * 			(ALT {3 &gt;= $_p}? '++') (ALT {2 &gt;= $_p}? '--'))))))
 	 * </pre>
 	 */
 	public void setAltASTPointers(LeftRecursiveRule r, RuleAST t) {

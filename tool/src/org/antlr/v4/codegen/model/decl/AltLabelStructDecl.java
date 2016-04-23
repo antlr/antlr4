@@ -38,7 +38,7 @@ import org.antlr.v4.tool.Rule;
 
 import java.util.ArrayList;
 
-/** A StructDecl to handle a -> label on alt */
+/** A StructDecl to handle a -&gt; label on alt */
 public class AltLabelStructDecl extends StructDecl {
 	public int altNum;
 	public AltLabelStructDecl(OutputModelFactory factory, Rule r,

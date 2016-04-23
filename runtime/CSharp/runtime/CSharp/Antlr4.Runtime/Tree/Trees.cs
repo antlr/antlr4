@@ -30,6 +30,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Antlr4.Runtime;
+using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Sharpen;
 using Antlr4.Runtime.Tree;
@@ -111,10 +112,14 @@ namespace Antlr4.Runtime.Tree
         {
             if (ruleNames != null)
             {
-                if (t is IRuleNode)
+                if (t is RuleContext)
                 {
-                    int ruleIndex = ((IRuleNode)t).RuleContext.RuleIndex;
+                    int ruleIndex = ((RuleContext)t).RuleIndex;
                     string ruleName = ruleNames[ruleIndex];
+					int altNumber = ((RuleContext)t).getAltNumber();
+					if ( altNumber!=Atn.ATN.InvalidAltNumber ) {
+						return ruleName+":"+altNumber;
+					}
                     return ruleName;
                 }
                 else

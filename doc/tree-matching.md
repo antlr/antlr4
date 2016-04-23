@@ -29,7 +29,7 @@ ParseTreeMatch m = p.match(t);
 if ( m.succeeded() ) {...}
 ```
 
-We can also test for specific expressions or token values. For example, the following checks to see if t is an expression consisting of an identifier added to 0:
+We can also test for specific expressions or token values. For example, the following checks to see if `t` is an expression consisting of an identifier added to 0:
 
 ```java
 ParseTree t = ...; // assume t is an expression

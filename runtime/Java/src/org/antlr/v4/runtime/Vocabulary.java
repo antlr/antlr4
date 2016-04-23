@@ -38,6 +38,13 @@ package org.antlr.v4.runtime;
  */
 public interface Vocabulary {
 	/**
+	 * Returns the highest token type value. It can be used to iterate from
+	 * zero to that number, inclusively, thus querying all stored entries.
+	 * @return the highest token type value
+	 */
+	int getMaxTokenType();
+
+	/**
 	 * Gets the string literal associated with a token type. The string returned
 	 * by this method, when not {@code null}, can be used unaltered in a parser
 	 * grammar to represent this token type.
@@ -85,7 +92,7 @@ public interface Vocabulary {
 	 *
 	 * <ul>
 	 *  <li>Tokens created by lexer rules.</li>
-	 *  <li>Tokens defined in a {@code tokens{}} block in a lexer or parser
+	 *  <li>Tokens defined in a <code>tokens{}</code> block in a lexer or parser
 	 *  grammar.</li>
 	 *  <li>The implicitly defined {@code EOF} token, which has the token type
 	 *  {@link Token#EOF}.</li>

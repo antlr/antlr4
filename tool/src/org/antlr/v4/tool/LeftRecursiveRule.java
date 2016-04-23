@@ -136,7 +136,7 @@ public class LeftRecursiveRule extends Rule {
 		return alts;
 	}
 
-	/** Get -> labels from those alts we deleted for left-recursive rules. */
+	/** Get -&gt; labels from those alts we deleted for left-recursive rules. */
 	@Override
 	public Map<String, List<Pair<Integer, AltAST>>> getAltLabels() {
 		Map<String, List<Pair<Integer, AltAST>>> labels = new HashMap<String, List<Pair<Integer, AltAST>>>();
