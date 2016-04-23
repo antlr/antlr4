@@ -1,0 +1,25 @@
+/** Loopback doesn't eval predicate at start of alt */
+
+TestType() ::= "Parser"
+
+Options ::= [
+	"Debug": true
+]
+
+Grammar ::= [
+	"T": {<grammar("T")>}
+]
+
+Rule() ::= "file_"
+
+grammar(grammarName) ::= <<
+grammar <grammarName>;
+file_
+@after {<ToStringTree("$ctx"):writeln()>}
+  : para para EOF ;
+para: paraContent NL NL ;
+paraContent : ('s'|'x'|{<LANotEquals("2",{<grammarName>Parser.NL})>}? NL)+ ;
+NL : '\n' ;
+s : 's' ;
+X : 'x' ;
+>>

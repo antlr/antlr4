@@ -32,7 +32,7 @@ package org.antlr.v4.misc;
 import org.antlr.v4.runtime.misc.OrderedHashSet;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -59,7 +59,7 @@ public class Graph<T> {
 	}
 
 	/** Map from node payload to node containing it */
-	protected Map<T,Node<T>> nodes = new HashMap<T,Node<T>>();
+	protected Map<T,Node<T>> nodes = new LinkedHashMap<T,Node<T>>();
 
 	public void addEdge(T a, T b) {
 		//System.out.println("add edge "+a+" to "+b);
@@ -81,7 +81,7 @@ public class Graph<T> {
 	 *  For sorting, I'm not following convention here since ANTLR
 	 *  needs the opposite.  Here's what I assume for sorting:
 	 *
-	 *    If there exists an edge u -> v then u depends on v and v
+	 *    If there exists an edge u -&gt; v then u depends on v and v
 	 *    must happen before u.
 	 *
 	 *  So if this gives nonreversed postorder traversal, I get the order

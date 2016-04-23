@@ -1,0 +1,12 @@
+import "ExprAmbiguity.stg"
+
+Input() ::= "a+b"
+
+Output() ::= <<
+(expr a + (expr b))<\n>
+>>
+
+Errors() ::= <<
+line 1:1 reportAttemptingFullContext d=1 (expr), input='+'
+line 1:2 reportContextSensitivity d=1 (expr), input='+b'<\n>
+>>

@@ -31,8 +31,6 @@
 package org.antlr.v4.runtime.tree.pattern;
 
 import org.antlr.v4.runtime.misc.MultiMap;
-import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.tree.ParseTree;
 
 import java.util.Collections;
@@ -77,7 +75,7 @@ public class ParseTreeMatch {
 	 * @exception IllegalArgumentException if {@code pattern} is {@code null}
 	 * @exception IllegalArgumentException if {@code labels} is {@code null}
 	 */
-	public ParseTreeMatch(@NotNull ParseTree tree, @NotNull ParseTreePattern pattern, @NotNull MultiMap<String, ParseTree> labels, @Nullable ParseTree mismatchedNode) {
+	public ParseTreeMatch(ParseTree tree, ParseTreePattern pattern, MultiMap<String, ParseTree> labels, ParseTree mismatchedNode) {
 		if (tree == null) {
 			throw new IllegalArgumentException("tree cannot be null");
 		}
@@ -98,24 +96,24 @@ public class ParseTreeMatch {
 
 	/**
 	 * Get the last node associated with a specific {@code label}.
-	 * <p/>
-	 * For example, for pattern {@code <id:ID>}, {@code get("id")} returns the
+	 *
+	 * <p>For example, for pattern {@code <id:ID>}, {@code get("id")} returns the
 	 * node matched for that {@code ID}. If more than one node
 	 * matched the specified label, only the last is returned. If there is
-	 * no node associated with the label, this returns {@code null}.
-	 * <p/>
-	 * Pattern tags like {@code <ID>} and {@code <expr>} without labels are
-	 * considered to be labeled with {@code ID} and {@code expr}, respectively.
+	 * no node associated with the label, this returns {@code null}.</p>
+	 *
+	 * <p>Pattern tags like {@code <ID>} and {@code <expr>} without labels are
+	 * considered to be labeled with {@code ID} and {@code expr}, respectively.</p>
 	 *
 	 * @param label The label to check.
 	 *
 	 * @return The last {@link ParseTree} to match a tag with the specified
 	 * label, or {@code null} if no parse tree matched a tag with the label.
 	 */
-	@Nullable
+
 	public ParseTree get(String label) {
 		List<ParseTree> parseTrees = labels.get(label);
-		if ( parseTrees==null ) {
+		if ( parseTrees==null || parseTrees.size()==0 ) {
 			return null;
 		}
 
@@ -124,13 +122,13 @@ public class ParseTreeMatch {
 
 	/**
 	 * Return all nodes matching a rule or token tag with the specified label.
-	 * <p/>
-	 * If the {@code label} is the name of a parser rule or token in the
+	 *
+	 * <p>If the {@code label} is the name of a parser rule or token in the
 	 * grammar, the resulting list will contain both the parse trees matching
 	 * rule or tags explicitly labeled with the label and the complete set of
 	 * parse trees matching the labeled and unlabeled tags in the pattern for
 	 * the parser rule or token. For example, if {@code label} is {@code "foo"},
-	 * the result will contain <em>all</em> of the following.
+	 * the result will contain <em>all</em> of the following.</p>
 	 *
 	 * <ul>
 	 * <li>Parse tree nodes matching tags of the form {@code <foo:anyRuleName>} and
@@ -145,8 +143,8 @@ public class ParseTreeMatch {
 	 * the specified {@code label}. If no nodes matched the label, an empty list
 	 * is returned.
 	 */
-	@NotNull
-	public List<ParseTree> getAll(@NotNull String label) {
+
+	public List<ParseTree> getAll(String label) {
 		List<ParseTree> nodes = labels.get(label);
 		if ( nodes==null ) {
 			return Collections.emptyList();
@@ -157,15 +155,15 @@ public class ParseTreeMatch {
 
 	/**
 	 * Return a mapping from label &rarr; [list of nodes].
-	 * <p/>
-	 * The map includes special entries corresponding to the names of rules and
+	 *
+	 * <p>The map includes special entries corresponding to the names of rules and
 	 * tokens referenced in tags in the original pattern. For additional
-	 * information, see the description of {@link #getAll(String)}.
+	 * information, see the description of {@link #getAll(String)}.</p>
 	 *
 	 * @return A mapping from labels to parse tree nodes. If the parse tree
 	 * pattern did not contain any rule or token tags, this map will be empty.
 	 */
-	@NotNull
+
 	public MultiMap<String, ParseTree> getLabels() {
 		return labels;
 	}
@@ -176,7 +174,7 @@ public class ParseTreeMatch {
 	 * @return the node at which we first detected a mismatch, or {@code null}
 	 * if the match was successful.
 	 */
-	@Nullable
+
 	public ParseTree getMismatchedNode() {
 		return mismatchedNode;
 	}
@@ -196,7 +194,7 @@ public class ParseTreeMatch {
 	 *
 	 * @return The tree pattern we are matching against.
 	 */
-	@NotNull
+
 	public ParseTreePattern getPattern() {
 		return pattern;
 	}
@@ -206,7 +204,7 @@ public class ParseTreeMatch {
 	 *
 	 * @return The {@link ParseTree} we are trying to match to a pattern.
 	 */
-	@NotNull
+
 	public ParseTree getTree() {
 		return tree;
 	}

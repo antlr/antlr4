@@ -41,7 +41,7 @@ public class AltAST extends GrammarASTWithOptions {
 	/** If we transformed this alt from a left-recursive one, need info on it */
 	public LeftRecursiveRuleAltInfo leftRecursiveAltInfo;
 
-	/** If someone specified an outermost alternative label with -> foo.
+	/** If someone specified an outermost alternative label with #foo.
 	 *  Token type will be ID.
 	 */
 	public GrammarAST altLabel;

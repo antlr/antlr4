@@ -43,7 +43,8 @@ public class MatchSet extends MatchToken {
 	public MatchSet(OutputModelFactory factory, GrammarAST ast) {
 		super(factory, ast);
 		SetTransition st = (SetTransition)ast.atnState.transition(0);
-		expr = new TestSetInline(factory, null, st.set);
+		int wordSize = factory.getGenerator().getTarget().getInlineTestSetWordSize();
+		expr = new TestSetInline(factory, null, st.set, wordSize);
 		Decl d = new TokenTypeDecl(factory, expr.varName);
 		factory.getCurrentRuleFunction().addLocalDecl(d);
 		capture = new CaptureNextTokenType(factory,expr.varName);

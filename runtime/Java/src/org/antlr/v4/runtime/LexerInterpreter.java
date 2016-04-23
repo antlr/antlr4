@@ -30,8 +30,6 @@
 
 package org.antlr.v4.runtime;
 
-import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNType;
 import org.antlr.v4.runtime.atn.LexerATNSimulator;
@@ -44,15 +42,24 @@ public class LexerInterpreter extends Lexer {
 	protected final String grammarFileName;
 	protected final ATN atn;
 
+	@Deprecated
 	protected final String[] tokenNames;
 	protected final String[] ruleNames;
 	protected final String[] modeNames;
+
+
+	private final Vocabulary vocabulary;
 
 	protected final DFA[] _decisionToDFA;
 	protected final PredictionContextCache _sharedContextCache =
 		new PredictionContextCache();
 
+	@Deprecated
 	public LexerInterpreter(String grammarFileName, Collection<String> tokenNames, Collection<String> ruleNames, Collection<String> modeNames, ATN atn, CharStream input) {
+		this(grammarFileName, VocabularyImpl.fromTokenNames(tokenNames.toArray(new String[tokenNames.size()])), ruleNames, modeNames, atn, input);
+	}
+
+	public LexerInterpreter(String grammarFileName, Vocabulary vocabulary, Collection<String> ruleNames, Collection<String> modeNames, ATN atn, CharStream input) {
 		super(input);
 
 		if (atn.grammarType != ATNType.LEXER) {
@@ -61,15 +68,20 @@ public class LexerInterpreter extends Lexer {
 
 		this.grammarFileName = grammarFileName;
 		this.atn = atn;
-		this.tokenNames = tokenNames.toArray(new String[tokenNames.size()]);
+		this.tokenNames = new String[atn.maxTokenType];
+		for (int i = 0; i < tokenNames.length; i++) {
+			tokenNames[i] = vocabulary.getDisplayName(i);
+		}
+
 		this.ruleNames = ruleNames.toArray(new String[ruleNames.size()]);
 		this.modeNames = modeNames.toArray(new String[modeNames.size()]);
+		this.vocabulary = vocabulary;
 
 		this._decisionToDFA = new DFA[atn.getNumberOfDecisions()];
 		for (int i = 0; i < _decisionToDFA.length; i++) {
 			_decisionToDFA[i] = new DFA(atn.getDecisionState(i), i);
 		}
-		this._interp = new LexerATNSimulator(atn,_decisionToDFA,_sharedContextCache);
+		this._interp = new LexerATNSimulator(this,atn,_decisionToDFA,_sharedContextCache);
 	}
 
 	@Override
@@ -83,6 +95,7 @@ public class LexerInterpreter extends Lexer {
 	}
 
 	@Override
+	@Deprecated
 	public String[] getTokenNames() {
 		return tokenNames;
 	}
@@ -95,5 +108,14 @@ public class LexerInterpreter extends Lexer {
 	@Override
 	public String[] getModeNames() {
 		return modeNames;
+	}
+
+	@Override
+	public Vocabulary getVocabulary() {
+		if (vocabulary != null) {
+			return vocabulary;
+		}
+
+		return super.getVocabulary();
 	}
 }

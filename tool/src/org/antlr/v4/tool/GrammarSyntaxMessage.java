@@ -37,17 +37,13 @@ import org.antlr.runtime.Token;
  *  "The '{' came as a complete surprise to me at this point in your program"
  */
 public class GrammarSyntaxMessage extends ANTLRMessage {
-	public Grammar g;
-	/** Most of the time, we'll have a token and so this will be set. */
-	public Token offendingToken;
-
 	public GrammarSyntaxMessage(ErrorType etype,
 								String fileName,
 								Token offendingToken,
 								RecognitionException antlrException,
 								Object... args)
 	{
-		super(etype, antlrException, args);
+		super(etype, antlrException, offendingToken, args);
 		this.fileName = fileName;
 		this.offendingToken = offendingToken;
 		if ( offendingToken!=null ) {

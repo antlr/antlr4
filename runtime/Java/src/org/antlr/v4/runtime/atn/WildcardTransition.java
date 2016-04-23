@@ -30,10 +30,8 @@
 
 package org.antlr.v4.runtime.atn;
 
-import org.antlr.v4.runtime.misc.NotNull;
-
 public final class WildcardTransition extends Transition {
-	public WildcardTransition(@NotNull ATNState target) { super(target); }
+	public WildcardTransition(ATNState target) { super(target); }
 
 	@Override
 	public int getSerializationType() {
@@ -46,7 +44,6 @@ public final class WildcardTransition extends Transition {
 	}
 
 	@Override
-	@NotNull
 	public String toString() {
 		return ".";
 	}

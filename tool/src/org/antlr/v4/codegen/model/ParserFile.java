@@ -31,6 +31,8 @@
 package org.antlr.v4.codegen.model;
 
 import org.antlr.v4.codegen.OutputModelFactory;
+import org.antlr.v4.codegen.model.chunk.ActionChunk;
+import org.antlr.v4.codegen.model.chunk.ActionText;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.ast.ActionAST;
 
@@ -44,6 +46,10 @@ public class ParserFile extends OutputFile {
 	public boolean genVisitor; // from -visitor cmd-line
 	@ModelElement public Parser parser;
 	@ModelElement public Map<String, Action> namedActions;
+	@ModelElement public ActionChunk contextSuperClass;
+	public Boolean genListener = false;
+	public Boolean genVisitor = false;
+	public String grammarName;
 
 	public ParserFile(OutputModelFactory factory, String fileName) {
 		super(factory, fileName);
@@ -53,8 +59,14 @@ public class ParserFile extends OutputFile {
 			ActionAST ast = g.namedActions.get(name);
 			namedActions.put(name, new Action(factory, ast));
 		}
-		genPackage = factory.getGrammar().tool.genPackage;
-		genListener = factory.getGrammar().tool.gen_listener;
-		genVisitor = factory.getGrammar().tool.gen_visitor;
+		genPackage = g.tool.genPackage;
+		// need the below members in the ST for Python, C++
+		genListener = g.tool.gen_listener;
+		genVisitor = g.tool.gen_visitor;
+		grammarName = g.name;
+
+		if (g.getOptionString("contextSuperClass") != null) {
+			contextSuperClass = new ActionText(null, g.getOptionString("contextSuperClass"));
+		}
 	}
 }

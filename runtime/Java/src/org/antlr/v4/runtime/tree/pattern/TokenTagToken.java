@@ -32,8 +32,6 @@ package org.antlr.v4.runtime.tree.pattern;
 
 import org.antlr.v4.runtime.CommonToken;
 import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.misc.Nullable;
 
 /**
  * A {@link Token} object representing a token of a particular type; e.g.,
@@ -44,12 +42,12 @@ public class TokenTagToken extends CommonToken {
 	/**
 	 * This is the backing field for {@link #getTokenName}.
 	 */
-	@NotNull
+
 	private final String tokenName;
 	/**
 	 * This is the backing field for {@link #getLabel}.
 	 */
-	@Nullable
+
 	private final String label;
 
 	/**
@@ -59,7 +57,7 @@ public class TokenTagToken extends CommonToken {
 	 * @param tokenName The token name.
 	 * @param type The token type.
 	 */
-	public TokenTagToken(@NotNull String tokenName, int type) {
+	public TokenTagToken(String tokenName, int type) {
 		this(tokenName, type, null);
 	}
 
@@ -72,7 +70,7 @@ public class TokenTagToken extends CommonToken {
 	 * @param label The label associated with the token tag, or {@code null} if
 	 * the token tag is unlabeled.
 	 */
-	public TokenTagToken(@NotNull String tokenName, int type, @Nullable String label) {
+	public TokenTagToken(String tokenName, int type, String label) {
 		super(type);
 		this.tokenName = tokenName;
 		this.label = label;
@@ -82,7 +80,7 @@ public class TokenTagToken extends CommonToken {
 	 * Gets the token name.
 	 * @return The token name.
 	 */
-	@NotNull
+
 	public final String getTokenName() {
 		return tokenName;
 	}
@@ -93,16 +91,16 @@ public class TokenTagToken extends CommonToken {
 	 * @return The name of the label associated with the rule tag, or
 	 * {@code null} if this is an unlabeled rule tag.
 	 */
-	@Nullable
+
 	public final String getLabel() {
 		return label;
 	}
 
 	/**
 	 * {@inheritDoc}
-	 * <p/>
-	 * The implementation for {@link TokenTagToken} returns the token tag
-	 * formatted with {@code <} and {@code >} delimiters.
+	 *
+	 * <p>The implementation for {@link TokenTagToken} returns the token tag
+	 * formatted with {@code <} and {@code >} delimiters.</p>
 	 */
 	@Override
 	public String getText() {
@@ -115,9 +113,9 @@ public class TokenTagToken extends CommonToken {
 
 	/**
 	 * {@inheritDoc}
-	 * <p/>
-	 * The implementation for {@link TokenTagToken} returns a string of the form
-	 * {@code tokenName:type}.
+	 *
+	 * <p>The implementation for {@link TokenTagToken} returns a string of the form
+	 * {@code tokenName:type}.</p>
 	 */
 	@Override
 	public String toString() {

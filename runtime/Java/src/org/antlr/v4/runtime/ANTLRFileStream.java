@@ -29,11 +29,9 @@
  */
 package org.antlr.v4.runtime;
 
-import java.io.File;
-import java.io.FileInputStream;
+import org.antlr.v4.runtime.misc.Utils;
+
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.Arrays;
 
 /**
  * This is an {@link ANTLRInputStream} that is loaded from a file all at once
@@ -54,29 +52,8 @@ public class ANTLRFileStream extends ANTLRInputStream {
 	public void load(String fileName, String encoding)
 		throws IOException
 	{
-		if ( fileName==null ) {
-			return;
-		}
-		File f = new File(fileName);
-		int size = (int)f.length();
-		InputStreamReader isr;
-		FileInputStream fis = new FileInputStream(fileName);
-		if ( encoding!=null ) {
-			isr = new InputStreamReader(fis, encoding);
-		}
-		else {
-			isr = new InputStreamReader(fis);
-		}
-		try {
-			data = new char[size];
-			n = isr.read(data);
-			if (n < data.length) {
-				data = Arrays.copyOf(data, n);
-			}
-		}
-		finally {
-			isr.close();
-		}
+		data = Utils.readFile(fileName, encoding);
+		this.n = data.length;
 	}
 
 	@Override

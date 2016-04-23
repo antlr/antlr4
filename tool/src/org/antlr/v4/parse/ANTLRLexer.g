@@ -150,6 +150,8 @@ import org.antlr.v4.tool.*;
 
 
 @members {
+	public static final int COMMENTS_CHANNEL = 2;
+
     public CommonTokenStream tokens; // track stream we push to; need for context info
     public boolean isLexerRule = false;
 
@@ -261,15 +263,11 @@ COMMENT
            }
        )
        {
-         // Unless we had a documentation comment, then we do not wish to
-         // pass the comments in to the parser. If you are writing a formatter
-         // then you will want to preserve the comments off channel, but could
-         // just skip and save token space if not.
+         // We do not wish to pass the comments in to the parser. If you are
+         // writing a formatter then you will want to preserve the comments off
+         // channel, but could just skip and save token space if not.
          //
-         if ($type != DOC_COMMENT) {
-
-             $channel=2;  // Comments are on channel 2
-         }
+         $channel=COMMENTS_CHANNEL;
        }
     ;
 
@@ -434,12 +432,13 @@ NESTED_ACTION
 // keywords used to specify ANTLR v3 grammars. Keywords may not be used as
 // labels for rules or in any other context where they would be ambiguous
 // with the keyword vs some other identifier
-// OPTIONS and TOKENS must also consume the opening brace that captures
-// their option block, as this is teh easiest way to parse it separate
-// to an ACTION block, despite it usingthe same {} delimiters.
+// OPTIONS, TOKENS, and CHANNELS must also consume the opening brace that captures
+// their option block, as this is the easiest way to parse it separate
+// to an ACTION block, despite it using the same {} delimiters.
 //
-OPTIONS      : 'options' WSNLCHARS* '{'  ;
-TOKENS_SPEC  : 'tokens'  WSNLCHARS* '{'  ;
+OPTIONS      : 'options'  WSNLCHARS* '{'  ;
+TOKENS_SPEC  : 'tokens'   WSNLCHARS* '{'  ;
+CHANNELS     : 'channels' WSNLCHARS* '{'  ;
 
 IMPORT       : 'import'               ;
 FRAGMENT     : 'fragment'             ;
@@ -541,7 +540,8 @@ NameStartChar
             |   '\u2C00'..'\u2FEF'
             |   '\u3001'..'\uD7FF'
             |   '\uF900'..'\uFDCF'
-            |   '\uFDF0'..'\uFFFD'
+            |   '\uFDF0'..'\uFEFE'
+            |   '\uFF00'..'\uFFFD'
             ; // ignores | ['\u10000-'\uEFFFF] ;
 
 // ----------------------------
@@ -655,8 +655,11 @@ ESC_SEQ
     	    | // An illegal escape seqeunce
     	      //
     	      {
-    	      	// TODO: Issue error message
-    	      	//
+                Token t = new CommonToken(input, state.type, state.channel, getCharIndex()-1, getCharIndex());
+                t.setText(t.getText());
+                t.setLine(input.getLine());
+                t.setCharPositionInLine(input.getCharPositionInLine()-1);
+                grammarError(ErrorType.INVALID_ESCAPE_SEQUENCE, t);
     	      }
         )
     ;
@@ -707,9 +710,12 @@ UNICODE_ESC
     	// Now check the digit count and issue an error if we need to
     	//
     	{
-    		if	(hCount != 4) {
-
-    			// TODO: Issue error message
+    		if (hCount != 4) {
+                Token t = new CommonToken(input, state.type, state.channel, getCharIndex()-3-hCount, getCharIndex()-1);
+                t.setText(t.getText());
+                t.setLine(input.getLine());
+                t.setCharPositionInLine(input.getCharPositionInLine()-hCount-2);
+                grammarError(ErrorType.INVALID_ESCAPE_SEQUENCE, t);
     		}
     	}
     ;
@@ -757,6 +763,15 @@ WSNLCHARS
     : ' ' | '\t' | '\f' | '\n' | '\r'
     ;
 
+// This rule allows ANTLR 4 to parse grammars using the UTF-8 encoding with a
+// byte order mark. Since this Unicode character doesn't appear as a token
+// anywhere else in the grammar, we can simply skip all instances of it without
+// problem. This rule will not break usage of \uFEFF inside a LEXER_CHAR_SET or
+// STRING_LITERAL.
+UnicodeBOM
+    :   '\uFEFF' {skip();}
+    ;
+
 // -----------------
 // Illegal Character
 //
@@ -777,6 +792,7 @@ ERRCHAR
          t.setCharPositionInLine(state.tokenStartCharPositionInLine);
          String msg = getTokenErrorDisplay(t) + " came as a complete surprise to me";
          grammarError(ErrorType.SYNTAX_ERROR, t, msg);
+         state.syntaxErrors++;
          skip();
       }
     ;

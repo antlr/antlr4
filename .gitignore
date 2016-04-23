@@ -62,5 +62,4 @@ tool/target
 runtime-testsuite/target
 tool-testsuite/target
 runtime/Cpp/demo/generated
-runtime/Cpp/demo/Mac/antlrcpp.xcodeproj/xcuserdata
-runtime/Cpp/demo/Mac/antlrcpp.xcodeproj/project.xcworkspace/xcuserdata
+xcuserdata

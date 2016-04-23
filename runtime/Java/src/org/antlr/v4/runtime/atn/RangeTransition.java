@@ -31,13 +31,12 @@
 package org.antlr.v4.runtime.atn;
 
 import org.antlr.v4.runtime.misc.IntervalSet;
-import org.antlr.v4.runtime.misc.NotNull;
 
 public final class RangeTransition extends Transition {
 	public final int from;
 	public final int to;
 
-	public RangeTransition(@NotNull ATNState target, int from, int to) {
+	public RangeTransition(ATNState target, int from, int to) {
 		super(target);
 		this.from = from;
 		this.to = to;
@@ -49,7 +48,7 @@ public final class RangeTransition extends Transition {
 	}
 
 	@Override
-	@NotNull
+
 	public IntervalSet label() { return IntervalSet.of(from, to); }
 
 	@Override
@@ -58,7 +57,6 @@ public final class RangeTransition extends Transition {
 	}
 
 	@Override
-	@NotNull
 	public String toString() {
 		return "'"+(char)from+"'..'"+(char)to+"'";
 	}

@@ -1,0 +1,26 @@
+/*
+ * This is a regression test for "Support direct calls to left-recursive
+ * rules".
+ * https://github.com/antlr/antlr4/issues/161
+ */
+
+TestType() ::= "Parser"
+
+Options ::= [
+	"Debug": false
+]
+
+Grammar ::= [
+	"T": {<grammar("T")>}
+]
+
+Rule() ::= "a"
+
+grammar(grammarName) ::= <<
+grammar <grammarName>;
+a @after {<ToStringTree("$ctx"):writeln()>} : a ID
+  | ID
+  ;
+ID : 'a'..'z'+ ;
+WS : (' '|'\n') -> skip ;
+>>

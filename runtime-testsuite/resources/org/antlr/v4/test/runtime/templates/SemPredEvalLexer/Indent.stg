@@ -1,0 +1,48 @@
+TestType() ::= "Lexer"
+
+Options ::= [
+	"ShowDFA": true
+]
+
+Grammar ::= [
+	"L": {<grammar("L")>}
+]
+
+Input() ::= "abc<\n>  def  <\n>"
+
+ID() ::= "\<1>"
+INDENT() ::= "\<2>"
+NL() ::= "\<3>"
+WS() ::= "\<4>"
+
+Output() ::= <<
+<! action output !>
+INDENT
+<! tokens !>
+[@0,0:2='abc',<ID()>,1:0]
+[@1,3:3='\\n',<NL()>,1:3]
+[@2,4:5='  ',<INDENT()>,2:0]
+[@3,6:8='def',<ID()>,2:2]
+[@4,9:10='  ',<WS()>,2:5]
+[@5,11:11='\\n',<NL()>,2:7]
+[@6,12:11='\<EOF>',\<-1>,3:0]
+s0-'
+'->:s2=>3
+s0-'a'->:s1=>1
+s0-'d'->:s1=>1
+:s1=>1-'b'->:s1=>1
+:s1=>1-'c'->:s1=>1
+:s1=>1-'e'->:s1=>1
+:s1=>1-'f'->:s1=>1<\n>
+>>
+
+Errors() ::= ""
+
+grammar(grammarName) ::= <<
+lexer grammar <grammarName>;
+ID : [a-z]+  ;
+INDENT : [ \t]+ { <TokenStartColumnEquals("0")> }?
+         { <writeln("\"INDENT\"")> }  ;
+NL : '\n';
+WS : [ \t]+ ;
+>>

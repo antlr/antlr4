@@ -150,13 +150,7 @@ if ( options!=null ) {
 	Grammar.setNodeOptions($tree, options);
 }
 }
-    :
-      // The grammar itself can have a documenation comment, which is the
-      // first terminal in the file.
-      //
-      DOC_COMMENT?
-
-      // Next we should see the type and name of the grammar file that
+    : // First we should see the type and name of the grammar file that
       // we are about to parse.
       //
       grammarType id SEMI
@@ -195,7 +189,6 @@ if ( options!=null ) {
 
       -> ^(grammarType       // The grammar type is our root AST node
              id              // We need to identify the grammar of course
-             DOC_COMMENT?    // We may or may not have a global documentation comment for the file
              prequelConstruct* // The set of declarations we accumulated
              rules           // And of course, we need the set of rules we discovered
              modeSpec*
@@ -236,6 +229,9 @@ prequelConstruct
       // tree parser adds further imaginary tokens to ones defined in a prior
       // {tree} parser.
       tokensSpec
+
+	| // A list of custom channels used by the grammar
+	  channelsSpec
 
     | // A declaration of language target implemented constructs. All such
       // action sections start with '@' and are given to the language target's
@@ -301,6 +297,10 @@ v3tokenSpec
 		SEMI
 	;
 
+channelsSpec
+	:	CHANNELS^ id (COMMA! id)* RBRACE!
+	;
+
 // A declaration of a language target specifc section,
 // such as @header, @includes and so on. We do not verify these
 // sections, they are just passed on to the language target.
@@ -364,10 +364,7 @@ parserRule
 		Grammar.setNodeOptions($tree, options);
 	}
 }
-    : // A rule may start with an optional documentation comment
-      DOC_COMMENT?
-
-	  // Next comes the rule name. Here we do not distinguish between
+    : // Start with the rule name. Here we do not distinguish between
 	  // parser or lexer rules, the semantic verification phase will
 	  // reject any rules that make no sense, such as lexer rules in
 	  // a pure parser or tree parser.
@@ -412,7 +409,7 @@ parserRule
 
       exceptionGroup
 
-      -> ^( RULE<RuleAST> RULE_REF DOC_COMMENT? ARG_ACTION<ActionAST>?
+      -> ^( RULE<RuleAST> RULE_REF ARG_ACTION<ActionAST>?
       		ruleReturns? throwsSpec? localsSpec? rulePrequels? ruleBlock exceptionGroup*
       	  )
     ;
@@ -522,9 +519,9 @@ lexerRule
 @after {
 	paraphrases.pop();
 }
-    : DOC_COMMENT? FRAGMENT?
+    : FRAGMENT?
 	  TOKEN_REF COLON lexerRuleBlock SEMI
-      -> ^( RULE<RuleAST> TOKEN_REF DOC_COMMENT?
+      -> ^( RULE<RuleAST> TOKEN_REF
       		^(RULEMODIFIERS FRAGMENT)? lexerRuleBlock
       	  )
 	;
@@ -547,11 +544,11 @@ lexerAlt
 		(	lexerCommands	-> ^(LEXER_ALT_ACTION<AltAST> lexerElements lexerCommands)
 		|					-> lexerElements
 		)
-	|						-> ^(ALT<AltAST> EPSILON) // empty alt
 	;
 
 lexerElements
-    :	lexerElement+ -> ^(ALT<AltAST> lexerElement+)
+    :	lexerElement+	-> ^(ALT<AltAST> lexerElement+)
+	|					-> ^(ALT<AltAST> EPSILON) // empty alt
     ;
 
 lexerElement
@@ -658,10 +655,11 @@ alternative
     paraphrases.pop();
     Grammar.setNodeOptions($tree, $o.tree);
 }
-    :	o=elementOptions?
-        e+=element+                     -> ^(ALT<AltAST> elementOptions? $e+)
-    |                                   -> ^(ALT<AltAST> EPSILON) // empty alt
-    ;
+	:	o=elementOptions?
+		(	e+=element+                     -> ^(ALT<AltAST> elementOptions? $e+)
+		|                                   -> ^(ALT<AltAST> elementOptions? EPSILON) // empty alt
+		)
+	;
 
 element
 @init {
@@ -818,8 +816,8 @@ blockSet
     ;
 
 setElement
-	:	TOKEN_REF<TerminalAST>
-	|	STRING_LITERAL<TerminalAST>
+	:	TOKEN_REF<TerminalAST>^ elementOptions?
+	|	STRING_LITERAL<TerminalAST>^ elementOptions?
 	|	range
     |   LEXER_CHAR_SET
 	;

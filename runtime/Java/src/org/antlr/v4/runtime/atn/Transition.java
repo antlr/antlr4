@@ -31,8 +31,6 @@
 package org.antlr.v4.runtime.atn;
 
 import org.antlr.v4.runtime.misc.IntervalSet;
-import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.misc.Nullable;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -42,15 +40,15 @@ import java.util.Map;
 
 /** An ATN transition between any two ATN states.  Subclasses define
  *  atom, set, epsilon, action, predicate, rule transitions.
- * <p/>
- *  This is a one way link.  It emanates from a state (usually via a list of
- *  transitions) and has a target state.
- * <p/>
- *  Since we never have to change the ATN transitions once we construct it,
+ *
+ *  <p>This is a one way link.  It emanates from a state (usually via a list of
+ *  transitions) and has a target state.</p>
+ *
+ *  <p>Since we never have to change the ATN transitions once we construct it,
  *  we can fix these transitions as specific classes. The DFA transitions
  *  on the other hand need to update the labels as it adds transitions to
  *  the states. We'll use the term Edge for the DFA to distinguish them from
- *  ATN transitions.
+ *  ATN transitions.</p>
  */
 public abstract class Transition {
 	// constants for serialization
@@ -96,10 +94,10 @@ public abstract class Transition {
 		}});
 
 	/** The target of this transition. */
-	@NotNull
+
 	public ATNState target;
 
-	protected Transition(@NotNull ATNState target) {
+	protected Transition(ATNState target) {
 		if (target == null) {
 			throw new NullPointerException("target cannot be null.");
 		}
@@ -109,10 +107,20 @@ public abstract class Transition {
 
 	public abstract int getSerializationType();
 
-	/** Are we epsilon, action, sempred? */
-	public boolean isEpsilon() { return false; }
+	/**
+	 * Determines if the transition is an "epsilon" transition.
+	 *
+	 * <p>The default implementation returns {@code false}.</p>
+	 *
+	 * @return {@code true} if traversing this transition in the ATN does not
+	 * consume an input symbol; otherwise, {@code false} if traversing this
+	 * transition consumes (matches) an input symbol.
+	 */
+	public boolean isEpsilon() {
+		return false;
+	}
 
-	@Nullable
+
 	public IntervalSet label() { return null; }
 
 	public abstract boolean matches(int symbol, int minVocabSymbol, int maxVocabSymbol);

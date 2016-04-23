@@ -67,7 +67,7 @@ rec_rule returns [boolean isLeftRec]
 	currentOuterAltNumber = 1;
 }
 	:	^(	r=RULE id=RULE_REF {ruleName=$id.getText();}
-			DOC_COMMENT? ruleModifier?
+			ruleModifier?
 //			(ARG_ACTION)? shouldn't allow args, right?
 			(^(RETURNS a=ARG_ACTION {setReturnValues($a);}))?
 //      		( ^(THROWS .+) )? don't allow
@@ -121,14 +121,14 @@ outerAlternative returns [boolean isLeftRec]
     ;
 
 binary
-	:	^( ALT elementOptions? recurse element+ recurse ACTION? )
+	:	^( ALT elementOptions? recurse element* recurse epsilonElement* )
         {setAltAssoc((AltAST)$ALT,currentOuterAltNumber);}
 	;
 
 prefix
 	:	^(	ALT elementOptions?
 			({!((CommonTree)input.LT(1)).getText().equals(ruleName)}? element)+
-			recurse ACTION?
+			recurse epsilonElement*
 		 )
          {setAltAssoc((AltAST)$ALT,currentOuterAltNumber);}
 	;
@@ -139,11 +139,12 @@ suffix
     ;
 
 nonLeftRecur
-    :   ^(ALT element+)  // no assoc for these; ignore if <assoc=...> present
+    :   ^(ALT elementOptions? element+)
     ;
 
 recurse
 	:	^(ASSIGN ID recurseNoLabel)
+	|	^(PLUS_ASSIGN ID recurseNoLabel)
 	|	recurseNoLabel
 	;
 
@@ -179,13 +180,21 @@ element
     |	^(SET setElement+)
     |   RULE_REF
 	|	ebnf
-	|	ACTION
+	|	epsilonElement
+	;
+
+epsilonElement
+	:	ACTION
 	|	SEMPRED
 	|	EPSILON
+	|	^(ACTION elementOptions)
+	|	^(SEMPRED elementOptions)
 	;
 
 setElement
-	:	STRING_LITERAL
+	:	^(STRING_LITERAL elementOptions)
+	|	^(TOKEN_REF elementOptions)
+	|	STRING_LITERAL
 	|	TOKEN_REF
 	;
 

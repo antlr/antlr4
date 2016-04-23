@@ -32,13 +32,11 @@ package org.antlr.v4.parse;
 
 import org.antlr.runtime.BaseRecognizer;
 import org.antlr.runtime.CommonToken;
-import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.misc.Pair;
 import org.antlr.v4.tool.Attribute;
 import org.antlr.v4.tool.AttributeDict;
-import org.antlr.v4.tool.ErrorManager;
 import org.antlr.v4.tool.ErrorType;
+import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.ast.ActionAST;
 
 import java.util.ArrayList;
@@ -54,25 +52,29 @@ import java.util.List;
 public class ScopeParser {
     /** Given an arg or retval scope definition list like
      *
-     *  Map<String, String>, int[] j3, char *foo32[3]
+     *  <code>
+     *  Map&lt;String, String&gt;, int[] j3, char *foo32[3]
+     *  </code>
      *
      *  or
      *
+     *  <code>
      *  int i=3, j=a[34]+20
+     *  </code>
      *
      *  convert to an attribute scope.
      */
-	public static AttributeDict parseTypedArgList(@Nullable ActionAST action, String s, ErrorManager errMgr) {
-		return parse(action, s, ',', errMgr);
+	public static AttributeDict parseTypedArgList(ActionAST action, String s, Grammar g) {
+		return parse(action, s, ',', g);
 	}
 
-    public static AttributeDict parse(@Nullable ActionAST action, String s, char separator, ErrorManager errMgr) {
+    public static AttributeDict parse(ActionAST action, String s, char separator, Grammar g) {
         AttributeDict dict = new AttributeDict();
 		List<Pair<String, Integer>> decls = splitDecls(s, separator);
 		for (Pair<String, Integer> decl : decls) {
 //            System.out.println("decl="+decl);
             if ( decl.a.trim().length()>0 ) {
-                Attribute a = parseAttributeDef(action, decl, errMgr);
+                Attribute a = parseAttributeDef(action, decl, g);
                 dict.add(a);
             }
 		}
@@ -84,7 +86,7 @@ public class ScopeParser {
      *  but if the separator is ',' you cannot use ',' in the initvalue
      *  unless you escape use "\," escape.
      */
-    public static Attribute parseAttributeDef(@Nullable ActionAST action, @NotNull Pair<String, Integer> decl, ErrorManager errMgr) {
+    public static Attribute parseAttributeDef(ActionAST action, Pair<String, Integer> decl, Grammar g) {
         if ( decl.a==null ) return null;
         Attribute attr = new Attribute();
         boolean inID = false;
@@ -113,7 +115,7 @@ public class ScopeParser {
             start = 0;
         }
         if ( start<0 ) {
-            errMgr.toolError(ErrorType.CANNOT_FIND_ATTRIBUTE_NAME_IN_DECL,decl);
+            g.tool.errMgr.grammarError(ErrorType.CANNOT_FIND_ATTRIBUTE_NAME_IN_DECL, g.fileName, action.token, decl);
         }
         // walk forwards looking for end of an ID
         int stop=-1;

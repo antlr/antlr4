@@ -43,6 +43,7 @@ import org.antlr.v4.runtime.atn.NotSetTransition;
 import org.antlr.v4.runtime.atn.PlusBlockStartState;
 import org.antlr.v4.runtime.atn.PlusLoopbackState;
 import org.antlr.v4.runtime.atn.RangeTransition;
+import org.antlr.v4.runtime.atn.RuleStartState;
 import org.antlr.v4.runtime.atn.RuleStopState;
 import org.antlr.v4.runtime.atn.RuleTransition;
 import org.antlr.v4.runtime.atn.SetTransition;
@@ -243,7 +244,14 @@ public class DOTGenerator {
 					RuleTransition rr = ((RuleTransition)edge);
 					// don't jump to other rules, but display edge to follow node
 					edgeST = stlib.getInstanceOf("edge");
-					edgeST.add("label", "<"+ruleNames[rr.ruleIndex]+">");
+
+					String label = "<" + ruleNames[rr.ruleIndex];
+					if (((RuleStartState)rr.target).isLeftRecursiveRule) {
+						label += "[" + rr.precedence + "]";
+					}
+					label += ">";
+
+					edgeST.add("label", label);
 					edgeST.add("src", "s"+s.stateNumber);
 					edgeST.add("target", "s"+rr.followState.stateNumber);
 					edgeST.add("arrowhead", arrowhead);
@@ -284,7 +292,7 @@ public class DOTGenerator {
 					SetTransition set = (SetTransition)edge;
 					String label = set.label().toString();
 					if ( isLexer ) label = set.label().toString(true);
-					else if ( grammar!=null ) label = set.label().toString(grammar.getTokenNames());
+					else if ( grammar!=null ) label = set.label().toString(grammar.getVocabulary());
 					if ( edge instanceof NotSetTransition ) label = "~"+label;
 					edgeST.add("label", getEdgeLabel(label));
 				}
@@ -293,7 +301,7 @@ public class DOTGenerator {
 					RangeTransition range = (RangeTransition)edge;
 					String label = range.label().toString();
 					if ( isLexer ) label = range.toString();
-					else if ( grammar!=null ) label = range.label().toString(grammar.getTokenNames());
+					else if ( grammar!=null ) label = range.label().toString(grammar.getVocabulary());
 					edgeST.add("label", getEdgeLabel(label));
 				}
 				else {

@@ -32,7 +32,6 @@ package org.antlr.v4.tool.ast;
 
 import org.antlr.runtime.Token;
 import org.antlr.v4.misc.CharSupport;
-import org.antlr.v4.runtime.misc.NotNull;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -86,7 +85,7 @@ public abstract class GrammarASTWithOptions extends GrammarAST {
 	@Override
 	public abstract GrammarASTWithOptions dupNode();
 
-	@NotNull
+
 	public Map<String, GrammarAST> getOptions() {
 		if (options == null) {
 			return Collections.emptyMap();

@@ -31,6 +31,7 @@
 package org.antlr.v4.semantics;
 
 import org.antlr.v4.parse.GrammarTreeVisitor;
+import org.antlr.v4.tool.ErrorManager;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LabelElementPair;
 import org.antlr.v4.tool.Rule;
@@ -64,14 +65,23 @@ public class SymbolCollector extends GrammarTreeVisitor {
 	public List<GrammarAST> tokenIDRefs = new ArrayList<GrammarAST>();
 	public Set<String> strings = new HashSet<String>();
 	public List<GrammarAST> tokensDefs = new ArrayList<GrammarAST>();
+	public List<GrammarAST> channelDefs = new ArrayList<GrammarAST>();
 
 	/** Track action name node in @parser::members {...} or @members {...} */
 	List<GrammarAST> namedActions = new ArrayList<GrammarAST>();
 
+	public ErrorManager errMgr;
+
 	// context
 	public Rule currentRule;
 
-	public SymbolCollector(Grammar g) { this.g = g; }
+	public SymbolCollector(Grammar g) {
+		this.g = g;
+		this.errMgr = g.tool.errMgr;
+	}
+
+	@Override
+	public ErrorManager getErrorManager() { return errMgr; }
 
 	public void process(GrammarAST ast) { visitGrammar(ast); }
 
@@ -86,6 +96,11 @@ public class SymbolCollector extends GrammarTreeVisitor {
 		terminals.add(ID);
 		tokenIDRefs.add(ID);
 		tokensDefs.add(ID);
+	}
+
+	@Override
+	public void defineChannel(GrammarAST ID) {
+		channelDefs.add(ID);
 	}
 
 	@Override

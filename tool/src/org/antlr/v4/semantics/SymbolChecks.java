@@ -30,9 +30,9 @@
 
 package org.antlr.v4.semantics;
 
+import org.antlr.v4.automata.LexerATNFactory;
 import org.antlr.v4.parse.ANTLRParser;
-import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.misc.Nullable;
+import org.antlr.v4.runtime.Token;
 import org.antlr.v4.tool.Alternative;
 import org.antlr.v4.tool.Attribute;
 import org.antlr.v4.tool.AttributeDict;
@@ -40,6 +40,7 @@ import org.antlr.v4.tool.ErrorManager;
 import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LabelElementPair;
+import org.antlr.v4.tool.LexerGrammar;
 import org.antlr.v4.tool.Rule;
 import org.antlr.v4.tool.ast.GrammarAST;
 
@@ -66,6 +67,11 @@ public class SymbolChecks {
 //		new DoubleKeyMap<String, String, GrammarAST>();
 
 	public ErrorManager errMgr;
+
+	protected final Set<String> reservedNames = new HashSet<String>();
+	{
+		reservedNames.addAll(LexerATNFactory.getCommonConstants());
+	}
 
     public SymbolChecks(Grammar g, SymbolCollector collector) {
         this.g = g;
@@ -94,6 +100,7 @@ public class SymbolChecks {
 		if ( g.rules!=null ) {
 			for (Rule r : g.rules.values()) nameToRuleMap.put(r.name, r);
 		}
+		checkReservedNames(g.rules.values());
 		checkActionRedefinitions(collector.namedActions);
 		checkForTokenConflicts(collector.tokenIDRefs);  // sets tokenIDs
 		checkForLabelConflicts(g.rules.values());
@@ -224,7 +231,7 @@ public class SymbolChecks {
 		checkLocalConflictingDeclarations(r, r.locals, r.retvals, ErrorType.LOCAL_CONFLICTS_WITH_RETVAL);
 	}
 
-	protected void checkDeclarationRuleConflicts(@NotNull Rule r, @Nullable AttributeDict attributes, @NotNull Set<String> ruleNames, @NotNull ErrorType errorType) {
+	protected void checkDeclarationRuleConflicts(Rule r, AttributeDict attributes, Set<String> ruleNames, ErrorType errorType) {
 		if (attributes == null) {
 			return;
 		}
@@ -241,7 +248,7 @@ public class SymbolChecks {
 		}
 	}
 
-	protected void checkLocalConflictingDeclarations(@NotNull Rule r, @Nullable AttributeDict attributes, @Nullable AttributeDict referenceAttributes, @NotNull ErrorType errorType) {
+	protected void checkLocalConflictingDeclarations(Rule r, AttributeDict attributes, AttributeDict referenceAttributes, ErrorType errorType) {
 		if (attributes == null || referenceAttributes == null) {
 			return;
 		}
@@ -254,6 +261,31 @@ public class SymbolChecks {
 				attributes.get(key).token != null ? attributes.get(key).token : ((GrammarAST) r.ast.getChild(0)).token,
 				key,
 				r.name);
+		}
+	}
+
+	protected void checkReservedNames(Collection<Rule> rules) {
+		for (Rule rule : rules) {
+			if (reservedNames.contains(rule.name)) {
+				errMgr.grammarError(ErrorType.RESERVED_RULE_NAME, g.fileName, ((GrammarAST)rule.ast.getChild(0)).getToken(), rule.name);
+			}
+		}
+	}
+
+	public void checkForModeConflicts(Grammar g) {
+		if (g.isLexer()) {
+			LexerGrammar lexerGrammar = (LexerGrammar)g;
+			for (String modeName : lexerGrammar.modes.keySet()) {
+				if (!modeName.equals("DEFAULT_MODE") && reservedNames.contains(modeName)) {
+					Rule rule = lexerGrammar.modes.get(modeName).iterator().next();
+					g.tool.errMgr.grammarError(ErrorType.MODE_CONFLICTS_WITH_COMMON_CONSTANTS, g.fileName, rule.ast.parent.getToken(), modeName);
+				}
+
+				if (g.getTokenType(modeName) != Token.INVALID_TYPE) {
+					Rule rule = lexerGrammar.modes.get(modeName).iterator().next();
+					g.tool.errMgr.grammarError(ErrorType.MODE_CONFLICTS_WITH_TOKEN, g.fileName, rule.ast.parent.getToken(), modeName);
+				}
+			}
 		}
 	}
 

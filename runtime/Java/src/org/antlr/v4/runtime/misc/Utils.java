@@ -30,13 +30,14 @@
 
 package org.antlr.v4.runtime.misc;
 
-import java.awt.*;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.Writer;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.util.Arrays;
+import java.util.BitSet;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -94,50 +95,61 @@ public class Utils {
 	}
 
 	public static void writeFile(String fileName, String content) throws IOException {
-		FileWriter fw = new FileWriter(fileName);
-		Writer w = new BufferedWriter(fw);
+		writeFile(fileName, content, null);
+	}
+
+	public static void writeFile(String fileName, String content, String encoding) throws IOException {
+		File f = new File(fileName);
+		FileOutputStream fos = new FileOutputStream(f);
+		OutputStreamWriter osw;
+		if (encoding != null) {
+			osw = new OutputStreamWriter(fos, encoding);
+		}
+		else {
+			osw = new OutputStreamWriter(fos);
+		}
+
 		try {
-			w.write(content);
+			osw.write(content);
 		}
 		finally {
-			w.close();
+			osw.close();
 		}
 	}
 
-	public static void waitForClose(final Window window) throws InterruptedException {
-		final Object lock = new Object();
 
-		Thread t = new Thread() {
-			@Override
-			public void run() {
-				synchronized (lock) {
-					while (window.isVisible()) {
-						try {
-							lock.wait(500);
-						} catch (InterruptedException e) {
-						}
-					}
-				}
-			}
-		};
-
-		t.start();
-
-		window.addWindowListener(new WindowAdapter() {
-			@Override
-			public void windowClosing(WindowEvent arg0) {
-				synchronized (lock) {
-					window.setVisible(false);
-					lock.notify();
-				}
-			}
-		});
-
-		t.join();
+	public static char[] readFile(String fileName) throws IOException {
+		return readFile(fileName, null);
 	}
 
-	/** Convert array of strings to string->index map. Useful for
-	 *  converting rulenames to name->ruleindex map.
+
+	public static char[] readFile(String fileName, String encoding) throws IOException {
+		File f = new File(fileName);
+		int size = (int)f.length();
+		InputStreamReader isr;
+		FileInputStream fis = new FileInputStream(fileName);
+		if ( encoding!=null ) {
+			isr = new InputStreamReader(fis, encoding);
+		}
+		else {
+			isr = new InputStreamReader(fis);
+		}
+		char[] data = null;
+		try {
+			data = new char[size];
+			int n = isr.read(data);
+			if (n < data.length) {
+				data = Arrays.copyOf(data, n);
+			}
+		}
+		finally {
+			isr.close();
+		}
+		return data;
+	}
+
+	/** Convert array of strings to string&rarr;index map. Useful for
+	 *  converting rulenames to name&rarr;ruleindex map.
 	 */
 	public static Map<String, Integer> toMap(String[] keys) {
 		Map<String, Integer> m = new HashMap<String, Integer>();
@@ -154,5 +166,15 @@ public class Utils {
 			cdata[i] = (char)data.get(i);
 		}
 		return cdata;
+	}
+
+	public static IntervalSet toSet(BitSet bits) {
+		IntervalSet s = new IntervalSet();
+		int i = bits.nextSetBit(0);
+		while ( i >= 0 ) {
+			s.add(i);
+			i = bits.nextSetBit(i+1);
+		}
+		return s;
 	}
 }

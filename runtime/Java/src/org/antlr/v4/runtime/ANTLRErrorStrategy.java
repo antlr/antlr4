@@ -30,8 +30,6 @@
 
 package org.antlr.v4.runtime;
 
-import org.antlr.v4.runtime.misc.NotNull;
-
 /**
  * The interface for defining strategies to deal with syntax errors encountered
  * during a parse by ANTLR-generated parsers. We distinguish between three
@@ -46,15 +44,15 @@ import org.antlr.v4.runtime.misc.NotNull;
  *
  * Implementations of this interface report syntax errors by calling
  * {@link Parser#notifyErrorListeners}.
- * <p/>
- * TODO: what to do about lexers
+ *
+ * <p>TODO: what to do about lexers</p>
  */
 public interface ANTLRErrorStrategy {
 	/**
 	 * Reset the error handler state for the specified {@code recognizer}.
 	 * @param recognizer the parser instance
 	 */
-	void reset(@NotNull Parser recognizer);
+	void reset(Parser recognizer);
 
 	/**
 	 * This method is called when an unexpected symbol is encountered during an
@@ -62,18 +60,19 @@ public interface ANTLRErrorStrategy {
 	 * strategy successfully recovers from the match failure, this method
 	 * returns the {@link Token} instance which should be treated as the
 	 * successful result of the match.
-	 * <p/>
-	 * Note that the calling code will not report an error if this method
+	 *
+   * <p>This method handles the consumption of any tokens - the caller should
+	 * <b>not</b> call {@link Parser#consume} after a successful recovery.</p>
+	 *
+	 * <p>Note that the calling code will not report an error if this method
 	 * returns successfully. The error strategy implementation is responsible
-	 * for calling {@link Parser#notifyErrorListeners} as appropriate.
+	 * for calling {@link Parser#notifyErrorListeners} as appropriate.</p>
 	 *
 	 * @param recognizer the parser instance
 	 * @throws RecognitionException if the error strategy was not able to
 	 * recover from the unexpected input symbol
 	 */
-	@NotNull
-	Token recoverInline(@NotNull Parser recognizer)
-		throws RecognitionException;
+	Token recoverInline(Parser recognizer) throws RecognitionException;
 
 	/**
 	 * This method is called to recover from exception {@code e}. This method is
@@ -87,21 +86,19 @@ public interface ANTLRErrorStrategy {
 	 * @throws RecognitionException if the error strategy could not recover from
 	 * the recognition exception
 	 */
-	void recover(@NotNull Parser recognizer,
-				 @NotNull RecognitionException e)
-		throws RecognitionException;
+	void recover(Parser recognizer, RecognitionException e) throws RecognitionException;
 
 	/**
 	 * This method provides the error handler with an opportunity to handle
 	 * syntactic or semantic errors in the input stream before they result in a
 	 * {@link RecognitionException}.
-	 * <p/>
-	 * The generated code currently contains calls to {@link #sync} after
+	 *
+	 * <p>The generated code currently contains calls to {@link #sync} after
 	 * entering the decision state of a closure block ({@code (...)*} or
-	 * {@code (...)+}).
-	 * <p/>
-	 * For an implementation based on Jim Idle's "magic sync" mechanism, see
-	 * {@link DefaultErrorStrategy#sync}.
+	 * {@code (...)+}).</p>
+	 *
+	 * <p>For an implementation based on Jim Idle's "magic sync" mechanism, see
+	 * {@link DefaultErrorStrategy#sync}.</p>
 	 *
 	 * @see DefaultErrorStrategy#sync
 	 *
@@ -110,8 +107,7 @@ public interface ANTLRErrorStrategy {
 	 * strategy but cannot be automatically recovered at the current state in
 	 * the parsing process
 	 */
-	void sync(@NotNull Parser recognizer)
-		throws RecognitionException;
+	void sync(Parser recognizer) throws RecognitionException;
 
 	/**
 	 * Tests whether or not {@code recognizer} is in the process of recovering
@@ -124,7 +120,7 @@ public interface ANTLRErrorStrategy {
 	 * @return {@code true} if the parser is currently recovering from a parse
 	 * error, otherwise {@code false}
 	 */
-	boolean inErrorRecoveryMode(@NotNull Parser recognizer);
+	boolean inErrorRecoveryMode(Parser recognizer);
 
 	/**
 	 * This method is called by when the parser successfully matches an input
@@ -132,7 +128,7 @@ public interface ANTLRErrorStrategy {
 	 *
 	 * @param recognizer the parser instance
 	 */
-	void reportMatch(@NotNull Parser recognizer);
+	void reportMatch(Parser recognizer);
 
 	/**
 	 * Report any kind of {@link RecognitionException}. This method is called by
@@ -141,6 +137,5 @@ public interface ANTLRErrorStrategy {
 	 * @param recognizer the parser instance
 	 * @param e the recognition exception to report
 	 */
-	void reportError(@NotNull Parser recognizer,
-					 @NotNull RecognitionException e);
+	void reportError(Parser recognizer, RecognitionException e);
 }

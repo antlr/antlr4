@@ -32,7 +32,6 @@ package org.antlr.v4.runtime.atn;
 
 import org.antlr.v4.runtime.dfa.DFAState;
 import org.antlr.v4.runtime.misc.IntervalSet;
-import org.antlr.v4.runtime.misc.NotNull;
 
 import java.util.IdentityHashMap;
 import java.util.List;
@@ -59,9 +58,9 @@ public abstract class ATNSimulator {
 	}
 
 	/** Must distinguish between missing edge and edge we know leads nowhere */
-	@NotNull
+
 	public static final DFAState ERROR;
-	@NotNull
+
 	public final ATN atn;
 
 	/** The context cache maps all PredictionContext objects that are equals()
@@ -70,19 +69,19 @@ public abstract class ATNSimulator {
 	 *  to use only cached nodes/graphs in addDFAState(). We don't want to
 	 *  fill this during closure() since there are lots of contexts that
 	 *  pop up but are not used ever again. It also greatly slows down closure().
-	 *  <p/>
-	 *  This cache makes a huge difference in memory and a little bit in speed.
+	 *
+	 *  <p>This cache makes a huge difference in memory and a little bit in speed.
 	 *  For the Java grammar on java.*, it dropped the memory requirements
 	 *  at the end from 25M to 16M. We don't store any of the full context
 	 *  graphs in the DFA because they are limited to local context only,
 	 *  but apparently there's a lot of repetition there as well. We optimize
 	 *  the config contexts before storing the config set in the DFA states
-	 *  by literally rebuilding them with cached subgraphs only.
-	 *  <p/>
-	 *  I tried a cache for use during closure operations, that was
+	 *  by literally rebuilding them with cached subgraphs only.</p>
+	 *
+	 *  <p>I tried a cache for use during closure operations, that was
 	 *  whacked after each adaptivePredict(). It cost a little bit
 	 *  more time I think and doesn't save on the overall footprint
-	 *  so it's not worth the complexity.
+	 *  so it's not worth the complexity.</p>
  	 */
 	protected final PredictionContextCache sharedContextCache;
 
@@ -91,14 +90,29 @@ public abstract class ATNSimulator {
 		ERROR.stateNumber = Integer.MAX_VALUE;
 	}
 
-	public ATNSimulator(@NotNull ATN atn,
-						@NotNull PredictionContextCache sharedContextCache)
+	public ATNSimulator(ATN atn,
+						PredictionContextCache sharedContextCache)
 	{
 		this.atn = atn;
 		this.sharedContextCache = sharedContextCache;
 	}
 
 	public abstract void reset();
+
+	/**
+	 * Clear the DFA cache used by the current instance. Since the DFA cache may
+	 * be shared by multiple ATN simulators, this method may affect the
+	 * performance (but not accuracy) of other parsers which are being used
+	 * concurrently.
+	 *
+	 * @throws UnsupportedOperationException if the current instance does not
+	 * support clearing the DFA.
+	 *
+	 * @since 4.3
+	 */
+	public void clearDFA() {
+		throw new UnsupportedOperationException("This ATN simulator does not support clearing the DFA.");
+	}
 
 	public PredictionContextCache getSharedContextCache() {
 		return sharedContextCache;
@@ -120,7 +134,7 @@ public abstract class ATNSimulator {
 	 * @deprecated Use {@link ATNDeserializer#deserialize} instead.
 	 */
 	@Deprecated
-	public static ATN deserialize(@NotNull char[] data) {
+	public static ATN deserialize(char[] data) {
 		return new ATNDeserializer().deserialize(data);
 	}
 
@@ -176,8 +190,8 @@ public abstract class ATNSimulator {
 	 * @deprecated Use {@link ATNDeserializer#edgeFactory} instead.
 	 */
 	@Deprecated
-	@NotNull
-	public static Transition edgeFactory(@NotNull ATN atn,
+
+	public static Transition edgeFactory(ATN atn,
 										 int type, int src, int trg,
 										 int arg1, int arg2, int arg3,
 										 List<IntervalSet> sets)
@@ -193,15 +207,4 @@ public abstract class ATNSimulator {
 		return new ATNDeserializer().stateFactory(type, ruleIndex);
 	}
 
-/*
-	public static void dump(DFA dfa, Grammar g) {
-		DOTGenerator dot = new DOTGenerator(g);
-		String output = dot.getDOT(dfa, false);
-		System.out.println(output);
-	}
-
-	public static void dump(DFA dfa) {
-		dump(dfa, null);
-	}
-	 */
 }

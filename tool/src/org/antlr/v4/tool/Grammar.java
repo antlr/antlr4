@@ -32,6 +32,7 @@ package org.antlr.v4.tool;
 
 import org.antlr.v4.Tool;
 import org.antlr.v4.analysis.LeftRecursiveRuleTransformer;
+import org.antlr.v4.automata.ParserATNFactory;
 import org.antlr.v4.misc.CharSupport;
 import org.antlr.v4.misc.OrderedHashMap;
 import org.antlr.v4.misc.Utils;
@@ -45,19 +46,23 @@ import org.antlr.v4.runtime.LexerInterpreter;
 import org.antlr.v4.runtime.ParserInterpreter;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenStream;
+import org.antlr.v4.runtime.Vocabulary;
+import org.antlr.v4.runtime.VocabularyImpl;
 import org.antlr.v4.runtime.atn.ATN;
+import org.antlr.v4.runtime.atn.ATNDeserializer;
+import org.antlr.v4.runtime.atn.ATNSerializer;
+import org.antlr.v4.runtime.atn.SemanticContext;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.IntSet;
-import org.antlr.v4.runtime.misc.IntegerList;
+import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.IntervalSet;
-import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.misc.Pair;
 import org.antlr.v4.tool.ast.ActionAST;
 import org.antlr.v4.tool.ast.GrammarAST;
 import org.antlr.v4.tool.ast.GrammarASTWithOptions;
 import org.antlr.v4.tool.ast.GrammarRootAST;
 import org.antlr.v4.tool.ast.PredAST;
+import org.antlr.v4.tool.ast.RuleAST;
 import org.antlr.v4.tool.ast.TerminalAST;
 
 import java.io.IOException;
@@ -66,16 +71,37 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 public class Grammar implements AttributeResolver {
 	public static final String GRAMMAR_FROM_STRING_NAME = "<string>";
+	/**
+	 * This value is used in the following situations to indicate that a token
+	 * type does not have an associated name which can be directly referenced in
+	 * a grammar.
+	 *
+	 * <ul>
+	 * <li>This value is the name and display name for the token with type
+	 * {@link Token#INVALID_TYPE}.</li>
+	 * <li>This value is the name for tokens with a type not represented by a
+	 * named token. The display name for these tokens is simply the string
+	 * representation of the token type as an integer.</li>
+	 * </ul>
+	 */
+	public static final String INVALID_TOKEN_NAME = "<INVALID>";
+	/**
+	 * This value is used as the name for elements in the array returned by
+	 * {@link #getRuleNames} for indexes not associated with a rule.
+	 */
+	public static final String INVALID_RULE_NAME = "<invalid>";
 
 	public static final Set<String> parserOptions = new HashSet<String>();
 	static {
 		parserOptions.add("superClass");
+		parserOptions.add("contextSuperClass");
 		parserOptions.add("TokenLabelType");
 		parserOptions.add("tokenVocab");
 		parserOptions.add("language");
@@ -89,16 +115,18 @@ public class Grammar implements AttributeResolver {
 
 	public static final Set<String> LexerBlockOptions = new HashSet<String>();
 
-	/** Legal options for rule refs like id<key=value> */
+	/** Legal options for rule refs like id&lt;key=value&gt; */
 	public static final Set<String> ruleRefOptions = new HashSet<String>();
 	static {
 		ruleRefOptions.add(LeftRecursiveRuleTransformer.PRECEDENCE_OPTION_NAME);
+		ruleRefOptions.add(LeftRecursiveRuleTransformer.TOKENINDEX_OPTION_NAME);
 	}
 
-	/** Legal options for terminal refs like ID<assoc=right> */
+	/** Legal options for terminal refs like ID&lt;assoc=right&gt; */
 	public static final Set<String> tokenOptions = new HashSet<String>();
 	static {
 		tokenOptions.add("assoc");
+		tokenOptions.add(LeftRecursiveRuleTransformer.TOKENINDEX_OPTION_NAME);
 	}
 
 	public static final Set<String> actionOptions = new HashSet<String>();
@@ -127,9 +155,21 @@ public class Grammar implements AttributeResolver {
 
 	public String name;
     public GrammarRootAST ast;
-	/** Track stream used to create this grammar */
-	@NotNull
+
+	/** Track token stream used to create this grammar */
+
 	public final org.antlr.runtime.TokenStream tokenStream;
+
+	/** If we transform grammar, track original unaltered token stream.
+	 *  This is set to the same value as tokenStream when tokenStream is
+	 *  initially set.
+	 *
+	 *  If this field differs from tokenStream, then we have transformed
+	 *  the grammar.
+	 */
+
+	public org.antlr.runtime.TokenStream originalTokenStream;
+
     public String text; // testing only
     public String fileName;
 
@@ -159,11 +199,12 @@ public class Grammar implements AttributeResolver {
 	 */
 	public ATN atn;
 
+	public Map<Integer, Interval> stateToGrammarRegionMap;
+
 	public Map<Integer, DFA> decisionDFAs = new HashMap<Integer, DFA>();
 
 	public List<IntervalSet[]> decisionLOOK;
 
-	@NotNull
 	public final Tool tool;
 
 	/** Token names and literal tokens like "void" are uniquely indexed.
@@ -176,23 +217,50 @@ public class Grammar implements AttributeResolver {
 	 */
 	int maxTokenType = Token.MIN_USER_TOKEN_TYPE -1;
 
-	/** Map token like ID (but not literals like "while") to its token type */
-	public Map<String, Integer> tokenNameToTypeMap = new LinkedHashMap<String, Integer>();
-
-	/** Map token literals like "while" to its token type.  It may be that
-	 *  WHILE="while"=35, in which case both tokenIDToTypeMap and this
-	 *  field will have entries both mapped to 35.
+	/**
+	 * Map token like {@code ID} (but not literals like {@code 'while'}) to its
+	 * token type.
 	 */
-	public Map<String, Integer> stringLiteralToTypeMap = new LinkedHashMap<String, Integer>();
+	public final Map<String, Integer> tokenNameToTypeMap = new LinkedHashMap<String, Integer>();
 
-	/** Reverse index for stringLiteralToTypeMap.  Indexed with raw token type.
-	 *  0 is invalid. */
-	public List<String> typeToStringLiteralList = new ArrayList<String>();
-
-	/** Map a token type to its token name. Indexed with raw token type.
-	 *  0 is invalid.
+	/**
+	 * Map token literals like {@code 'while'} to its token type. It may be that
+	 * {@code WHILE="while"=35}, in which case both {@link #tokenNameToTypeMap}
+	 * and this field will have entries both mapped to 35.
 	 */
-	public List<String> typeToTokenList = new ArrayList<String>();
+	public final Map<String, Integer> stringLiteralToTypeMap = new LinkedHashMap<String, Integer>();
+
+	/**
+	 * Reverse index for {@link #stringLiteralToTypeMap}. Indexed with raw token
+	 * type. 0 is invalid.
+	 */
+	public final List<String> typeToStringLiteralList = new ArrayList<String>();
+
+	/**
+	 * Map a token type to its token name. Indexed with raw token type. 0 is
+	 * invalid.
+	 */
+	public final List<String> typeToTokenList = new ArrayList<String>();
+
+	/**
+	 * The maximum channel value which is assigned by this grammar. Values below
+	 * {@link Token#MIN_USER_CHANNEL_VALUE} are assumed to be predefined.
+	 */
+	int maxChannelType = Token.MIN_USER_CHANNEL_VALUE - 1;
+
+	/**
+	 * Map channel like {@code COMMENTS_CHANNEL} to its constant channel value.
+	 * Only user-defined channels are defined in this map.
+	 */
+	public final Map<String, Integer> channelNameToValueMap = new LinkedHashMap<String, Integer>();
+
+	/**
+	 * Map a constant channel value to its name. Indexed with raw channel value.
+	 * The predefined channels {@link Token#DEFAULT_CHANNEL} and
+	 * {@link Token#HIDDEN_CHANNEL} are not stored in this list, so the values
+	 * at the corresponding indexes is {@code null}.
+	 */
+	public final List<String> channelValueToNameList = new ArrayList<String>();
 
     /** Map a name to an action.
      *  The code generator will use this to fill holes in the output files.
@@ -210,10 +278,12 @@ public class Grammar implements AttributeResolver {
 	 *  sempred index is 0..n-1
 	 */
 	public LinkedHashMap<PredAST, Integer> sempreds = new LinkedHashMap<PredAST, Integer>();
+	/** Map the other direction upon demand */
+	public LinkedHashMap<Integer, PredAST> indexToPredMap;
 
 	public static final String AUTO_GENERATED_TOKEN_NAME_PREFIX = "T__";
 
-	public Grammar(Tool tool, @NotNull GrammarRootAST ast) {
+	public Grammar(Tool tool, GrammarRootAST ast) {
 		if ( ast==null ) {
 			throw new NullPointerException("ast");
 		}
@@ -226,6 +296,7 @@ public class Grammar implements AttributeResolver {
         this.ast = ast;
         this.name = (ast.getChild(0)).getText();
 		this.tokenStream = ast.tokenStream;
+		this.originalTokenStream = this.tokenStream;
 
 		initTokenSymbolTables();
     }
@@ -254,14 +325,14 @@ public class Grammar implements AttributeResolver {
 	}
 
 	/** For testing; builds trees, does sem anal */
-	public Grammar(String fileName, String grammarText, @Nullable ANTLRToolListener listener)
+	public Grammar(String fileName, String grammarText, ANTLRToolListener listener)
 		throws org.antlr.runtime.RecognitionException
 	{
 		this(fileName, grammarText, null, listener);
 	}
 
 	/** For testing; builds trees, does sem anal */
-	public Grammar(String fileName, String grammarText, Grammar tokenVocabSource, @Nullable ANTLRToolListener listener)
+	public Grammar(String fileName, String grammarText, Grammar tokenVocabSource, ANTLRToolListener listener)
 		throws org.antlr.runtime.RecognitionException
 	{
         this.text = grammarText;
@@ -271,7 +342,7 @@ public class Grammar implements AttributeResolver {
 		org.antlr.runtime.ANTLRStringStream in = new org.antlr.runtime.ANTLRStringStream(grammarText);
 		in.name = fileName;
 
-		this.ast = tool.load(fileName, in);
+		this.ast = tool.parse(fileName, in);
 		if ( ast==null ) {
 			throw new UnsupportedOperationException();
 		}
@@ -281,6 +352,7 @@ public class Grammar implements AttributeResolver {
 		}
 
 		this.tokenStream = ast.tokenStream;
+		this.originalTokenStream = this.tokenStream;
 
 		// ensure each node has pointer to surrounding grammar
 		final Grammar thiz = this;
@@ -316,20 +388,22 @@ public class Grammar implements AttributeResolver {
             GrammarAST t = (GrammarAST)c;
             String importedGrammarName = null;
             if ( t.getType()==ANTLRParser.ASSIGN ) {
-                importedGrammarName = t.getChild(1).getText();
-                tool.log("grammar", "import "+ importedGrammarName);
+				t = (GrammarAST)t.getChild(1);
+				importedGrammarName = t.getText();
             }
             else if ( t.getType()==ANTLRParser.ID ) {
                 importedGrammarName = t.getText();
-                tool.log("grammar", "import " + t.getText());
 			}
 			Grammar g;
 			try {
-				g = tool.loadImportedGrammar(this, importedGrammarName);
+				g = tool.loadImportedGrammar(this, t);
 			}
 			catch (IOException ioe) {
-				tool.errMgr.toolError(ErrorType.CANNOT_FIND_IMPORTED_GRAMMAR, ioe,
-									  importedGrammarName);
+				tool.errMgr.grammarError(ErrorType.ERROR_READING_IMPORTED_GRAMMAR,
+										 importedGrammarName,
+										 t.getToken(),
+										 importedGrammarName,
+										 name);
 				continue;
 			}
 			// did it come back as error node or missing?
@@ -355,11 +429,59 @@ public class Grammar implements AttributeResolver {
         }
     }
 
-    public void defineRule(Rule r) {
-		if ( rules.get(r.name)!=null ) return;
+	/**
+	 * Define the specified rule in the grammar. This method assigns the rule's
+	 * {@link Rule#index} according to the {@link #ruleNumber} field, and adds
+	 * the {@link Rule} instance to {@link #rules} and {@link #indexToRule}.
+	 *
+	 * @param r The rule to define in the grammar.
+	 * @return {@code true} if the rule was added to the {@link Grammar}
+	 * instance; otherwise, {@code false} if a rule with this name already
+	 * existed in the grammar instance.
+	 */
+	public boolean defineRule(Rule r) {
+		if ( rules.get(r.name)!=null ) {
+			return false;
+		}
+
 		rules.put(r.name, r);
 		r.index = ruleNumber++;
 		indexToRule.add(r);
+		return true;
+	}
+
+	/**
+	 * Undefine the specified rule from this {@link Grammar} instance. The
+	 * instance {@code r} is removed from {@link #rules} and
+	 * {@link #indexToRule}. This method updates the {@link Rule#index} field
+	 * for all rules defined after {@code r}, and decrements {@link #ruleNumber}
+	 * in preparation for adding new rules.
+	 * <p>
+	 * This method does nothing if the current {@link Grammar} does not contain
+	 * the instance {@code r} at index {@code r.index} in {@link #indexToRule}.
+	 * </p>
+	 *
+	 * @param r
+	 * @return {@code true} if the rule was removed from the {@link Grammar}
+	 * instance; otherwise, {@code false} if the specified rule was not defined
+	 * in the grammar.
+	 */
+	public boolean undefineRule(Rule r) {
+		if (r.index < 0 || r.index >= indexToRule.size() || indexToRule.get(r.index) != r) {
+			return false;
+		}
+
+		assert rules.get(r.name) == r;
+
+		rules.remove(r.name);
+		indexToRule.remove(r.index);
+		for (int i = r.index; i < indexToRule.size(); i++) {
+			assert indexToRule.get(i).index == i + 1;
+			indexToRule.get(i).index--;
+		}
+
+		ruleNumber--;
+		return true;
 	}
 
 //	public int getNumRules() {
@@ -386,6 +508,14 @@ public class Grammar implements AttributeResolver {
 		*/
 	}
 
+	public ATN getATN() {
+		if ( atn==null ) {
+			ParserATNFactory factory = new ParserATNFactory(this);
+			atn = factory.createATN();
+		}
+		return atn;
+	}
+
 	public Rule getRule(int index) { return indexToRule.get(index); }
 
 	public Rule getRule(String grammarName, String ruleName) {
@@ -403,29 +533,38 @@ public class Grammar implements AttributeResolver {
      *  The grammars are in import tree preorder.  Don't include ourselves
      *  in list as we're not a delegate of ourselves.
      */
-    public List<Grammar> getAllImportedGrammars() {
-        if ( importedGrammars==null ) return null;
-        List<Grammar> delegates = new ArrayList<Grammar>();
-		for (Grammar d : importedGrammars) {
-			delegates.add(d);
-			List<Grammar> ds = d.getAllImportedGrammars();
-			if (ds != null) delegates.addAll(ds);
+	public List<Grammar> getAllImportedGrammars() {
+		if (importedGrammars == null) {
+			return null;
 		}
-        return delegates;
-    }
+
+		LinkedHashMap<String, Grammar> delegates = new LinkedHashMap<String, Grammar>();
+		for (Grammar d : importedGrammars) {
+			delegates.put(d.fileName, d);
+			List<Grammar> ds = d.getAllImportedGrammars();
+			if (ds != null) {
+				for (Grammar imported : ds) {
+					delegates.put(imported.fileName, imported);
+				}
+			}
+		}
+
+		return new ArrayList<Grammar>(delegates.values());
+	}
 
     public List<Grammar> getImportedGrammars() { return importedGrammars; }
 
-    /** Get delegates below direct delegates of g
-    public List<Grammar> getIndirectDelegates(Grammar g) {
-        List<Grammar> direct = getDirectDelegates(g);
-        List<Grammar> delegates = getDelegates(g);
-        delegates.removeAll(direct);
-        return delegates;
-    }
-*/
+	public LexerGrammar getImplicitLexer() {
+		return implicitLexer;
+	}
 
-    /** Return list of imported grammars from root down to our parent.
+	/** convenience method for Tool.loadGrammar() */
+	public static Grammar load(String fileName) {
+		Tool antlr = new Tool();
+		return antlr.loadGrammar(fileName);
+	}
+
+	/** Return list of imported grammars from root down to our parent.
      *  Order is [root, ..., this.parent].  (us not included).
      */
     public List<Grammar> getGrammarAncestors() {
@@ -505,37 +644,98 @@ public class Grammar implements AttributeResolver {
 	 *  char vocabulary, compute an ANTLR-valid (possibly escaped) char literal.
 	 */
 	public String getTokenDisplayName(int ttype) {
-		String tokenName;
 		// inside any target's char range and is lexer grammar?
 		if ( isLexer() &&
 			 ttype >= Lexer.MIN_CHAR_VALUE && ttype <= Lexer.MAX_CHAR_VALUE )
 		{
 			return CharSupport.getANTLRCharLiteralForChar(ttype);
 		}
-		else if ( ttype==Token.EOF ) {
-			tokenName = "EOF";
+
+		if ( ttype==Token.EOF ) {
+			return "EOF";
 		}
-		else {
-			if ( ttype>0 && ttype<typeToTokenList.size() ) {
-				tokenName = typeToTokenList.get(ttype);
-				if ( tokenName!=null &&
-					 tokenName.startsWith(AUTO_GENERATED_TOKEN_NAME_PREFIX) &&
-					 ttype < typeToStringLiteralList.size() &&
-				     typeToStringLiteralList.get(ttype)!=null)
-				{
-					tokenName = typeToStringLiteralList.get(ttype);
-				}
-			}
-			else {
-				tokenName = String.valueOf(ttype);
-			}
+
+		if ( ttype==Token.INVALID_TYPE ) {
+			return INVALID_TOKEN_NAME;
 		}
-//		tool.log("grammar", "getTokenDisplayName ttype="+ttype+", name="+tokenName);
-		return tokenName;
+
+		if (ttype >= 0 && ttype < typeToStringLiteralList.size() && typeToStringLiteralList.get(ttype) != null) {
+			return typeToStringLiteralList.get(ttype);
+		}
+
+		if (ttype >= 0 && ttype < typeToTokenList.size() && typeToTokenList.get(ttype) != null) {
+			return typeToTokenList.get(ttype);
+		}
+
+		return String.valueOf(ttype);
 	}
 
+	/**
+	 * Gets the name by which a token can be referenced in the generated code.
+	 * For tokens defined in a {@code tokens{}} block or via a lexer rule, this
+	 * is the declared name of the token. For token types generated by the use
+	 * of a string literal within a parser rule of a combined grammar, this is
+	 * the automatically generated token type which includes the
+	 * {@link #AUTO_GENERATED_TOKEN_NAME_PREFIX} prefix. For types which are not
+	 * associated with a defined token, this method returns
+	 * {@link #INVALID_TOKEN_NAME}.
+	 *
+	 * @param ttype The token type.
+	 * @return The name of the token with the specified type.
+	 */
+
+	public String getTokenName(int ttype) {
+		// inside any target's char range and is lexer grammar?
+		if ( isLexer() &&
+			 ttype >= Lexer.MIN_CHAR_VALUE && ttype <= Lexer.MAX_CHAR_VALUE )
+		{
+			return CharSupport.getANTLRCharLiteralForChar(ttype);
+		}
+
+		if ( ttype==Token.EOF ) {
+			return "EOF";
+		}
+
+		if (ttype >= 0 && ttype < typeToTokenList.size() && typeToTokenList.get(ttype) != null) {
+			return typeToTokenList.get(ttype);
+		}
+
+		return INVALID_TOKEN_NAME;
+	}
+
+	/**
+	 * Gets the constant channel value for a user-defined channel.
+	 *
+	 * <p>
+	 * This method only returns channel values for user-defined channels. All
+	 * other channels, including the predefined channels
+	 * {@link Token#DEFAULT_CHANNEL} and {@link Token#HIDDEN_CHANNEL} along with
+	 * any channel defined in code (e.g. in a {@code @members{}} block), are
+	 * ignored.</p>
+	 *
+	 * @param channel The channel name.
+	 * @return The channel value, if {@code channel} is the name of a known
+	 * user-defined token channel; otherwise, -1.
+	 */
+	public int getChannelValue(String channel) {
+		Integer I = channelNameToValueMap.get(channel);
+		int i = (I != null) ? I : -1;
+		return i;
+	}
+
+	/**
+	 * Gets an array of rule names for rules defined or imported by the
+	 * grammar. The array index is the rule index, and the value is the name of
+	 * the rule with the corresponding {@link Rule#index}.
+	 *
+	 * <p>If no rule is defined with an index for an element of the resulting
+	 * array, the value of that element is {@link #INVALID_RULE_NAME}.</p>
+	 *
+	 * @return The names of all rules defined in the grammar.
+	 */
 	public String[] getRuleNames() {
 		String[] result = new String[rules.size()];
+		Arrays.fill(result, INVALID_RULE_NAME);
 		for (Rule rule : rules.values()) {
 			result[rule.index] = rule.name;
 		}
@@ -543,37 +743,139 @@ public class Grammar implements AttributeResolver {
 		return result;
 	}
 
-	public List<String> getTokenDisplayNames(IntegerList types) {
-		List<String> names = new ArrayList<String>();
-		for (int t : types.toArray()) names.add(getTokenDisplayName(t));
-		return names;
-	}
-
+	/**
+	 * Gets an array of token names for tokens defined or imported by the
+	 * grammar. The array index is the token type, and the value is the result
+	 * of {@link #getTokenName} for the corresponding token type.
+	 *
+	 * @see #getTokenName
+	 * @return The token names of all tokens defined in the grammar.
+	 */
 	public String[] getTokenNames() {
 		int numTokens = getMaxTokenType();
 		String[] tokenNames = new String[numTokens+1];
-		for (String tokenName : tokenNameToTypeMap.keySet()) {
-			Integer ttype = tokenNameToTypeMap.get(tokenName);
-			if ( tokenName!=null && tokenName.startsWith(AUTO_GENERATED_TOKEN_NAME_PREFIX) ) {
-				tokenName = typeToStringLiteralList.get(ttype);
-			}
-			if ( ttype>0 ) tokenNames[ttype] = tokenName;
+		for (int i = 0; i < tokenNames.length; i++) {
+			tokenNames[i] = getTokenName(i);
 		}
+
 		return tokenNames;
 	}
 
+	/**
+	 * Gets an array of display names for tokens defined or imported by the
+	 * grammar. The array index is the token type, and the value is the result
+	 * of {@link #getTokenDisplayName} for the corresponding token type.
+	 *
+	 * @see #getTokenDisplayName
+	 * @return The display names of all tokens defined in the grammar.
+	 */
 	public String[] getTokenDisplayNames() {
 		int numTokens = getMaxTokenType();
 		String[] tokenNames = new String[numTokens+1];
-		for (String t : tokenNameToTypeMap.keySet()) {
-			Integer ttype = tokenNameToTypeMap.get(t);
-			if ( ttype>0 ) tokenNames[ttype] = t;
+		for (int i = 0; i < tokenNames.length; i++) {
+			tokenNames[i] = getTokenDisplayName(i);
 		}
-		for (String t : stringLiteralToTypeMap.keySet()) {
-			Integer ttype = stringLiteralToTypeMap.get(t);
-			if ( ttype>0 ) tokenNames[ttype] = t;
-		}
+
 		return tokenNames;
+	}
+
+	/**
+	 * Gets the literal names assigned to tokens in the grammar.
+	 */
+
+	public String[] getTokenLiteralNames() {
+		int numTokens = getMaxTokenType();
+		String[] literalNames = new String[numTokens+1];
+		for (int i = 0; i < Math.min(literalNames.length, typeToStringLiteralList.size()); i++) {
+			literalNames[i] = typeToStringLiteralList.get(i);
+		}
+
+		for (Map.Entry<String, Integer> entry : stringLiteralToTypeMap.entrySet()) {
+			if (entry.getValue() >= 0 && entry.getValue() < literalNames.length && literalNames[entry.getValue()] == null) {
+				literalNames[entry.getValue()] = entry.getKey();
+			}
+		}
+
+		return literalNames;
+	}
+
+	/**
+	 * Gets the symbolic names assigned to tokens in the grammar.
+	 */
+
+	public String[] getTokenSymbolicNames() {
+		int numTokens = getMaxTokenType();
+		String[] symbolicNames = new String[numTokens+1];
+		for (int i = 0; i < Math.min(symbolicNames.length, typeToTokenList.size()); i++) {
+			if (typeToTokenList.get(i) == null || typeToTokenList.get(i).startsWith(AUTO_GENERATED_TOKEN_NAME_PREFIX)) {
+				continue;
+			}
+
+			symbolicNames[i] = typeToTokenList.get(i);
+		}
+
+		return symbolicNames;
+	}
+
+	/**
+	 * Gets a {@link Vocabulary} instance describing the vocabulary used by the
+	 * grammar.
+	 */
+
+	public Vocabulary getVocabulary() {
+		return new VocabularyImpl(getTokenLiteralNames(), getTokenSymbolicNames());
+	}
+
+	/** Given an arbitrarily complex SemanticContext, walk the "tree" and get display string.
+	 *  Pull predicates from grammar text.
+	 */
+	public String getSemanticContextDisplayString(SemanticContext semctx) {
+		if ( semctx instanceof SemanticContext.Predicate ) {
+			return getPredicateDisplayString((SemanticContext.Predicate)semctx);
+		}
+		if ( semctx instanceof SemanticContext.AND ) {
+			SemanticContext.AND and = (SemanticContext.AND)semctx;
+			return joinPredicateOperands(and, " and ");
+		}
+		if ( semctx instanceof SemanticContext.OR ) {
+			SemanticContext.OR or = (SemanticContext.OR)semctx;
+			return joinPredicateOperands(or, " or ");
+		}
+		return semctx.toString();
+	}
+
+	public String joinPredicateOperands(SemanticContext.Operator op, String separator) {
+		StringBuilder buf = new StringBuilder();
+		for (SemanticContext operand : op.getOperands()) {
+			if (buf.length() > 0) {
+				buf.append(separator);
+			}
+
+			buf.append(getSemanticContextDisplayString(operand));
+		}
+
+		return buf.toString();
+	}
+
+	public LinkedHashMap<Integer, PredAST> getIndexToPredicateMap() {
+		LinkedHashMap<Integer, PredAST> indexToPredMap = new LinkedHashMap<Integer, PredAST>();
+		for (Rule r : rules.values()) {
+			for (ActionAST a : r.actions) {
+				if (a instanceof PredAST) {
+					PredAST p = (PredAST) a;
+					indexToPredMap.put(sempreds.get(p), p);
+				}
+			}
+		}
+		return indexToPredMap;
+	}
+
+	public String getPredicateDisplayString(SemanticContext.Predicate pred) {
+		if ( indexToPredMap==null ) {
+			indexToPredMap = getIndexToPredicateMap();
+		}
+		ActionAST actionAST = indexToPredMap.get(pred.predIndex);
+		return actionAST.getText();
 	}
 
 	/** What is the max char value possible for this grammar's target?  Use
@@ -615,10 +917,16 @@ public class Grammar implements AttributeResolver {
 		return maxTokenType;
 	}
 
+	/** Return a new unique integer in the channel value space. */
+	public int getNewChannelNumber() {
+		maxChannelType++;
+		return maxChannelType;
+	}
+
 	public void importTokensFromTokensFile() {
 		String vocab = getOptionString("tokenVocab");
 		if ( vocab!=null ) {
-			TokenVocabParser vparser = new TokenVocabParser(tool, vocab);
+			TokenVocabParser vparser = new TokenVocabParser(this);
 			Map<String,Integer> tokens = vparser.load();
 			tool.log("grammar", "tokens=" + tokens);
 			for (String t : tokens.keySet()) {
@@ -635,6 +943,9 @@ public class Grammar implements AttributeResolver {
 		for (String tokenName: importG.stringLiteralToTypeMap.keySet()) {
 			defineStringLiteral(tokenName, importG.stringLiteralToTypeMap.get(tokenName));
 		}
+		for (Map.Entry<String, Integer> channel : importG.channelNameToValueMap.entrySet()) {
+			defineChannelName(channel.getKey(), channel.getValue());
+		}
 //		this.tokenNameToTypeMap.putAll( importG.tokenNameToTypeMap );
 //		this.stringLiteralToTypeMap.putAll( importG.stringLiteralToTypeMap );
 		int max = Math.max(this.typeToTokenList.size(), importG.typeToTokenList.size());
@@ -642,6 +953,13 @@ public class Grammar implements AttributeResolver {
 		for (int ttype=0; ttype<importG.typeToTokenList.size(); ttype++) {
 			maxTokenType = Math.max(maxTokenType, ttype);
 			this.typeToTokenList.set(ttype, importG.typeToTokenList.get(ttype));
+		}
+
+		max = Math.max(this.channelValueToNameList.size(), importG.channelValueToNameList.size());
+		Utils.setSize(channelValueToNameList, max);
+		for (int channelValue = 0; channelValue < importG.channelValueToNameList.size(); channelValue++) {
+			maxChannelType = Math.max(maxChannelType, channelValue);
+			this.channelValueToNameList.set(channelValue, importG.channelValueToNameList.get(channelValue));
 		}
 	}
 
@@ -691,6 +1009,11 @@ public class Grammar implements AttributeResolver {
 	}
 
 	public void setTokenForType(int ttype, String text) {
+		if (ttype == Token.EOF) {
+			// ignore EOF, it will be reported as an error separately
+			return;
+		}
+
 		if ( ttype>=typeToTokenList.size() ) {
 			Utils.setSize(typeToTokenList, ttype+1);
 		}
@@ -698,6 +1021,68 @@ public class Grammar implements AttributeResolver {
 		if ( prevToken==null || prevToken.charAt(0)=='\'' ) {
 			// only record if nothing there before or if thing before was a literal
 			typeToTokenList.set(ttype, text);
+		}
+	}
+
+	/**
+	 * Define a token channel with a specified name.
+	 *
+	 * <p>
+	 * If a channel with the specified name already exists, the previously
+	 * assigned channel value is returned.</p>
+	 *
+	 * @param name The channel name.
+	 * @return The constant channel value assigned to the channel.
+	 */
+	public int defineChannelName(String name) {
+		Integer prev = channelNameToValueMap.get(name);
+		if (prev == null) {
+			return defineChannelName(name, getNewChannelNumber());
+		}
+
+		return prev;
+	}
+
+	/**
+	 * Define a token channel with a specified name.
+	 *
+	 * <p>
+	 * If a channel with the specified name already exists, the previously
+	 * assigned channel value is not altered.</p>
+	 *
+	 * @param name The channel name.
+	 * @return The constant channel value assigned to the channel.
+	 */
+	public int defineChannelName(String name, int value) {
+		Integer prev = channelNameToValueMap.get(name);
+		if (prev != null) {
+			return prev;
+		}
+
+		channelNameToValueMap.put(name, value);
+		setChannelNameForValue(value, name);
+		maxChannelType = Math.max(maxChannelType, value);
+		return value;
+	}
+
+	/**
+	 * Sets the channel name associated with a particular channel value.
+	 *
+	 * <p>
+	 * If a name has already been assigned to the channel with constant value
+	 * {@code channelValue}, this method does nothing.</p>
+	 *
+	 * @param channelValue The constant value for the channel.
+	 * @param name The channel name.
+	 */
+	public void setChannelNameForValue(int channelValue, String name) {
+		if (channelValue >= channelValueToNameList.size()) {
+			Utils.setSize(channelValueToNameList, channelValue + 1);
+		}
+
+		String prevChannel = channelValueToNameList.get(channelValue);
+		if (prevChannel == null) {
+			channelValueToNameList.set(channelValue, name);
 		}
 	}
 
@@ -854,12 +1239,14 @@ public class Grammar implements AttributeResolver {
 	}
 
 	public Set<String> getStringLiterals() {
-		final Set<String> strings = new HashSet<String>();
+		final Set<String> strings = new LinkedHashSet<String>();
 		GrammarTreeVisitor collector = new GrammarTreeVisitor() {
 			@Override
 			public void stringRef(TerminalAST ref) {
 				strings.add(ref.getText());
 			}
+			@Override
+			public ErrorManager getErrorManager() { return tool.errMgr; }
 		};
 		collector.visitGrammar(ast);
 		return strings;
@@ -867,6 +1254,49 @@ public class Grammar implements AttributeResolver {
 
 	public void setLookaheadDFA(int decision, DFA lookaheadDFA) {
 		decisionDFAs.put(decision, lookaheadDFA);
+	}
+
+	public static Map<Integer, Interval> getStateToGrammarRegionMap(GrammarRootAST ast, IntervalSet grammarTokenTypes) {
+		Map<Integer, Interval> stateToGrammarRegionMap = new HashMap<Integer, Interval>();
+		if ( ast==null ) return stateToGrammarRegionMap;
+
+		List<GrammarAST> nodes = ast.getNodesWithType(grammarTokenTypes);
+		for (GrammarAST n : nodes) {
+			if (n.atnState != null) {
+				Interval tokenRegion = Interval.of(n.getTokenStartIndex(), n.getTokenStopIndex());
+				org.antlr.runtime.tree.Tree ruleNode = null;
+				// RULEs, BLOCKs of transformed recursive rules point to original token interval
+				switch ( n.getType() ) {
+					case ANTLRParser.RULE :
+						ruleNode = n;
+						break;
+					case ANTLRParser.BLOCK :
+					case ANTLRParser.CLOSURE :
+						ruleNode = n.getAncestor(ANTLRParser.RULE);
+						break;
+				}
+				if ( ruleNode instanceof RuleAST ) {
+					String ruleName = ((RuleAST) ruleNode).getRuleName();
+					Rule r = ast.g.getRule(ruleName);
+					if ( r instanceof LeftRecursiveRule ) {
+						RuleAST originalAST = ((LeftRecursiveRule) r).getOriginalAST();
+						tokenRegion = Interval.of(originalAST.getTokenStartIndex(), originalAST.getTokenStopIndex());
+					}
+				}
+				stateToGrammarRegionMap.put(n.atnState.stateNumber, tokenRegion);
+			}
+		}
+		return stateToGrammarRegionMap;
+	}
+
+	/** Given an ATN state number, return the token index range within the grammar from which that ATN state was derived. */
+	public Interval getStateToGrammarRegion(int atnStateNumber) {
+		if ( stateToGrammarRegionMap==null ) {
+			stateToGrammarRegionMap = getStateToGrammarRegionMap(ast, null); // map all nodes with non-null atn state ptr
+		}
+		if ( stateToGrammarRegionMap==null ) return Interval.INVALID;
+
+		return stateToGrammarRegionMap.get(atnStateNumber);
 	}
 
 	public LexerInterpreter createLexerInterpreter(CharStream input) {
@@ -878,7 +1308,19 @@ public class Grammar implements AttributeResolver {
 			return implicitLexer.createLexerInterpreter(input);
 		}
 
-		return new LexerInterpreter(fileName, Arrays.asList(getTokenNames()), Arrays.asList(getRuleNames()), ((LexerGrammar)this).modes.keySet(), atn, input);
+		char[] serializedAtn = ATNSerializer.getSerializedAsChars(atn);
+		ATN deserialized = new ATNDeserializer().deserialize(serializedAtn);
+		return new LexerInterpreter(fileName, getVocabulary(), Arrays.asList(getRuleNames()), ((LexerGrammar)this).modes.keySet(), deserialized, input);
+	}
+
+	/** @since 4.5.1 */
+	public GrammarParserInterpreter createGrammarParserInterpreter(TokenStream tokenStream) {
+		if (this.isLexer()) {
+			throw new IllegalStateException("A parser interpreter can only be created for a parser or combined grammar.");
+		}
+		char[] serializedAtn = ATNSerializer.getSerializedAsChars(atn);
+		ATN deserialized = new ATNDeserializer().deserialize(serializedAtn);
+		return new GrammarParserInterpreter(this, deserialized, tokenStream);
 	}
 
 	public ParserInterpreter createParserInterpreter(TokenStream tokenStream) {
@@ -886,6 +1328,8 @@ public class Grammar implements AttributeResolver {
 			throw new IllegalStateException("A parser interpreter can only be created for a parser or combined grammar.");
 		}
 
-		return new ParserInterpreter(fileName, Arrays.asList(getTokenNames()), Arrays.asList(getRuleNames()), atn, tokenStream);
+		char[] serializedAtn = ATNSerializer.getSerializedAsChars(atn);
+		ATN deserialized = new ATNDeserializer().deserialize(serializedAtn);
+		return new ParserInterpreter(fileName, getVocabulary(), Arrays.asList(getRuleNames()), deserialized, tokenStream);
 	}
 }

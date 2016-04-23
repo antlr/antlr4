@@ -29,31 +29,56 @@
  */
 package org.antlr.v4.runtime;
 
+import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.misc.Interval;
-import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 import org.antlr.v4.runtime.tree.RuleNode;
 import org.antlr.v4.runtime.tree.Trees;
-import org.antlr.v4.runtime.tree.gui.TreeViewer;
 
-import javax.print.PrintException;
-import javax.swing.*;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.Future;
 
-/** A rule context is a record of a single rule invocation. It knows
- *  which context invoked it, if any. If there is no parent context, then
- *  naturally the invoking state is not valid.  The parent link
- *  provides a chain upwards from the current rule invocation to the root
- *  of the invocation tree, forming a stack. We actually carry no
- *  information about the rule associated with this context (except
- *  when parsing). We keep only the state number of the invoking state from
- *  the ATN submachine that invoked this. Contrast this with the s
- *  pointer inside ParserRuleContext that tracks the current state
- *  being "executed" for the current rule.
+/** A rule context is a record of a single rule invocation.
+ *
+ *  We form a stack of these context objects using the parent
+ *  pointer. A parent pointer of null indicates that the current
+ *  context is the bottom of the stack. The ParserRuleContext subclass
+ *  as a children list so that we can turn this data structure into a
+ *  tree.
+ *
+ *  The root node always has a null pointer and invokingState of -1.
+ *
+ *  Upon entry to parsing, the first invoked rule function creates a
+ *  context object (asubclass specialized for that rule such as
+ *  SContext) and makes it the root of a parse tree, recorded by field
+ *  Parser._ctx.
+ *
+ *  public final SContext s() throws RecognitionException {
+ *      SContext _localctx = new SContext(_ctx, getState()); <-- create new node
+ *      enterRule(_localctx, 0, RULE_s);                     <-- push it
+ *      ...
+ *      exitRule();                                          <-- pop back to _localctx
+ *      return _localctx;
+ *  }
+ *
+ *  A subsequent rule invocation of r from the start rule s pushes a
+ *  new context object for r whose parent points at s and use invoking
+ *  state is the state with r emanating as edge label.
+ *
+ *  The invokingState fields from a context object to the root
+ *  together form a stack of rule indication states where the root
+ *  (bottom of the stack) has a -1 sentinel value. If we invoke start
+ *  symbol s then call r1, which calls r2, the  would look like
+ *  this:
+ *
+ *     SContext[-1]   <- root node (bottom of the stack)
+ *     R1Context[p]   <- p in rule s called r1
+ *     R2Context[q]   <- q in rule r1 called r2
+ *
+ *  So the top of the stack, _ctx, represents a call to the current
+ *  rule and it holds the return address from another rule that invoke
+ *  to this rule. To invoke a rule, we must always have a current context.
  *
  *  The parent contexts are useful for computing lookahead sets and
  *  getting error information.
@@ -72,7 +97,8 @@ public class RuleContext implements RuleNode {
 
 	/** What state invoked the rule associated with this context?
 	 *  The "return address" is the followState of invokingState
-	 *  If parent is null, this should be -1.
+	 *  If parent is null, this should be -1 this context object represents
+	 *  the start rule.
 	 */
 	public int invokingState = -1;
 
@@ -94,7 +120,7 @@ public class RuleContext implements RuleNode {
 		return n;
 	}
 
-	/** A context is empty if there is no invoking state; meaning nobody call
+	/** A context is empty if there is no invoking state; meaning nobody called
 	 *  current context.
 	 */
 	public boolean isEmpty() {
@@ -140,6 +166,27 @@ public class RuleContext implements RuleNode {
 
 	public int getRuleIndex() { return -1; }
 
+	/** For rule associated with this parse tree internal node, return
+	 *  the outer alternative number used to match the input. Default
+	 *  implementation does not compute nor store this alt num. Create
+	 *  a subclass of ParserRuleContext with backing field and set
+	 *  option contextSuperClass.
+	 *  to set it.
+	 *
+	 *  @since 4.5.3
+	 */
+	public int getAltNumber() { return ATN.INVALID_ALT_NUMBER; }
+
+	/** Set the outer alternative number for this context node. Default
+	 *  implementation does nothing to avoid backing field overhead for
+	 *  trees that don't need it.  Create
+     *  a subclass of ParserRuleContext with backing field and set
+     *  option contextSuperClass.
+	 *
+	 *  @since 4.5.3
+	 */
+	public void setAltNumber(int altNumber) { }
+
 	@Override
 	public ParseTree getChild(int i) {
 		return null;
@@ -153,62 +200,19 @@ public class RuleContext implements RuleNode {
 	@Override
 	public <T> T accept(ParseTreeVisitor<? extends T> visitor) { return visitor.visitChildren(this); }
 
-	/** Call this method to view a parse tree in a dialog box visually. */
-	public Future<JDialog> inspect(@Nullable Parser parser) {
-		List<String> ruleNames = parser != null ? Arrays.asList(parser.getRuleNames()) : null;
-		return inspect(ruleNames);
-	}
-
-	public Future<JDialog> inspect(@Nullable List<String> ruleNames) {
-		TreeViewer viewer = new TreeViewer(ruleNames, this);
-		return viewer.open();
-	}
-
-	/** Save this tree in a postscript file */
-	public void save(@Nullable Parser parser, String fileName)
-		throws IOException, PrintException
-	{
-		List<String> ruleNames = parser != null ? Arrays.asList(parser.getRuleNames()) : null;
-		save(ruleNames, fileName);
-	}
-
-	/** Save this tree in a postscript file using a particular font name and size */
-	public void save(@Nullable Parser parser, String fileName,
-					 String fontName, int fontSize)
-		throws IOException
-	{
-		List<String> ruleNames = parser != null ? Arrays.asList(parser.getRuleNames()) : null;
-		save(ruleNames, fileName, fontName, fontSize);
-	}
-
-	/** Save this tree in a postscript file */
-	public void save(@Nullable List<String> ruleNames, String fileName)
-		throws IOException, PrintException
-	{
-		Trees.writePS(this, ruleNames, fileName);
-	}
-
-	/** Save this tree in a postscript file using a particular font name and size */
-	public void save(@Nullable List<String> ruleNames, String fileName,
-					 String fontName, int fontSize)
-		throws IOException
-	{
-		Trees.writePS(this, ruleNames, fileName, fontName, fontSize);
-	}
-
 	/** Print out a whole tree, not just a node, in LISP format
 	 *  (root child1 .. childN). Print just a node if this is a leaf.
 	 *  We have to know the recognizer so we can get rule names.
 	 */
 	@Override
-	public String toStringTree(@Nullable Parser recog) {
+	public String toStringTree(Parser recog) {
 		return Trees.toStringTree(this, recog);
 	}
 
 	/** Print out a whole tree, not just a node, in LISP format
 	 *  (root child1 .. childN). Print just a node if this is a leaf.
 	 */
-	public String toStringTree(@Nullable List<String> ruleNames) {
+	public String toStringTree(List<String> ruleNames) {
 		return Trees.toStringTree(this, ruleNames);
 	}
 
@@ -222,22 +226,22 @@ public class RuleContext implements RuleNode {
 		return toString((List<String>)null, (RuleContext)null);
 	}
 
-	public final String toString(@Nullable Recognizer<?,?> recog) {
+	public final String toString(Recognizer<?,?> recog) {
 		return toString(recog, ParserRuleContext.EMPTY);
 	}
 
-	public final String toString(@Nullable List<String> ruleNames) {
+	public final String toString(List<String> ruleNames) {
 		return toString(ruleNames, null);
 	}
 
 	// recog null unless ParserRuleContext, in which case we use subclass toString(...)
-	public String toString(@Nullable Recognizer<?,?> recog, @Nullable RuleContext stop) {
+	public String toString(Recognizer<?,?> recog, RuleContext stop) {
 		String[] ruleNames = recog != null ? recog.getRuleNames() : null;
 		List<String> ruleNamesList = ruleNames != null ? Arrays.asList(ruleNames) : null;
 		return toString(ruleNamesList, stop);
 	}
 
-	public String toString(@Nullable List<String> ruleNames, @Nullable RuleContext stop) {
+	public String toString(List<String> ruleNames, RuleContext stop) {
 		StringBuilder buf = new StringBuilder();
 		RuleContext p = this;
 		buf.append("[");

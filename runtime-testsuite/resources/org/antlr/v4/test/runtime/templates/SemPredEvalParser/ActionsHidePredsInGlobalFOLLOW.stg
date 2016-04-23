@@ -1,0 +1,39 @@
+/** Regular non-forced actions can create side effects used by semantic
+ *  predicates and so we cannot evaluate any semantic predicate
+ *  encountered after having seen a regular action. This includes
+ *  during global follow operations.
+ */
+
+TestType() ::= "Parser"
+
+Options ::= [
+	"Debug": false
+]
+
+Grammar ::= [
+	"T": {<grammar("T")>}
+]
+
+Input() ::= "a!"
+
+Rule() ::= "s"
+
+Output() ::= <<
+eval=true
+parse<\n>
+>>
+
+Errors() ::= ""
+
+grammar(grammarName) ::= <<
+grammar <grammarName>;
+@members {
+<Declare_pred()>
+}
+s : e {} {<True():Invoke_pred()>}? {<writeln("\"parse\"")>} '!' ;
+t : e {} {<False():Invoke_pred()>}? ID ;
+e : ID | ; // non-LL(1) so we use ATN
+ID : 'a'..'z'+ ;
+INT : '0'..'9'+;
+WS : (' '|'\n') -> skip ;
+>>

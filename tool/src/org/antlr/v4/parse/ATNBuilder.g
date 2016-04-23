@@ -104,19 +104,19 @@ alternative returns [ATNFactory.Handle p]
 @init {List<ATNFactory.Handle> els = new ArrayList<ATNFactory.Handle>();}
     :	^(LEXER_ALT_ACTION a=alternative lexerCommands)
         {$p = factory.lexerAltCommands($a.p,$lexerCommands.p);}
-    |	^(ALT EPSILON)							{$p = factory.epsilon($EPSILON);}
-    |   ^(ALT (e=element {els.add($e.p);})+)	{$p = factory.alt(els);}
+    |	^(ALT elementOptions? EPSILON)							{$p = factory.epsilon($EPSILON);}
+    |   ^(ALT elementOptions? (e=element {els.add($e.p);})+)	{$p = factory.alt(els);}
     ;
 
 lexerCommands returns [ATNFactory.Handle p]
-@init {StringBuilder cmds = new StringBuilder();}
-    :   (c=lexerCommand {cmds.append($c.cmd).append(' ');})+
+@init {List<ATNFactory.Handle> cmds = new ArrayList<ATNFactory.Handle>();}
+    :   (c=lexerCommand {if ($c.cmd != null) cmds.add($c.cmd);})+
         {
-        $p = factory.action(cmds.toString());
+        $p = factory.alt(cmds);
         }
     ;
 
-lexerCommand returns [String cmd]
+lexerCommand returns [ATNFactory.Handle cmd]
 	:	^(LEXER_ACTION_CALL ID lexerCommandExpr)
         {$cmd = factory.lexerCallCommand($ID, $lexerCommandExpr.start);}
 	|	ID
@@ -164,7 +164,9 @@ blockSet[boolean invert] returns [ATNFactory.Handle p]
 
 /** Don't combine with atom otherwise it will build spurious ATN nodes */
 setElement
-	:	STRING_LITERAL
+	:	^(STRING_LITERAL .)
+	|	^(TOKEN_REF .)
+	|	STRING_LITERAL
 	|	TOKEN_REF
 	|	^(RANGE a=STRING_LITERAL b=STRING_LITERAL)
     |   LEXER_CHAR_SET
@@ -198,3 +200,15 @@ terminal returns [ATNFactory.Handle p]
     |	^(TOKEN_REF .)				{$p = factory.tokenRef((TerminalAST)$start);}
     |	TOKEN_REF					{$p = factory.tokenRef((TerminalAST)$start);}
     ;
+
+elementOptions
+	:	^(ELEMENT_OPTIONS elementOption*)
+	;
+
+elementOption
+	:	ID
+	|	^(ASSIGN ID ID)
+	|	^(ASSIGN ID STRING_LITERAL)
+	|	^(ASSIGN ID ACTION)
+	|	^(ASSIGN ID INT)
+	;

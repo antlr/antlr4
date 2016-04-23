@@ -42,7 +42,6 @@ import org.antlr.v4.runtime.atn.SetTransition;
 import org.antlr.v4.runtime.atn.Transition;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.IntervalSet;
-import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.Rule;
 
@@ -55,7 +54,7 @@ import java.util.List;
  */
 public class ATNOptimizer {
 
-	public static void optimize(@NotNull Grammar g, @NotNull ATN atn) {
+	public static void optimize(Grammar g, ATN atn) {
 		optimizeSets(g, atn);
 		optimizeStates(atn);
 	}

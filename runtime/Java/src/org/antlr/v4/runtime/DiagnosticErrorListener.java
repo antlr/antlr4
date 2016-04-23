@@ -34,8 +34,6 @@ import org.antlr.v4.runtime.atn.ATNConfig;
 import org.antlr.v4.runtime.atn.ATNConfigSet;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.Interval;
-import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.misc.Nullable;
 
 import java.util.BitSet;
 
@@ -86,13 +84,13 @@ public class DiagnosticErrorListener extends BaseErrorListener {
 	}
 
 	@Override
-	public void reportAmbiguity(@NotNull Parser recognizer,
+	public void reportAmbiguity(Parser recognizer,
 								DFA dfa,
 								int startIndex,
 								int stopIndex,
 								boolean exact,
-								@Nullable BitSet ambigAlts,
-								@NotNull ATNConfigSet configs)
+								BitSet ambigAlts,
+								ATNConfigSet configs)
 	{
 		if (exactOnly && !exact) {
 			return;
@@ -107,12 +105,12 @@ public class DiagnosticErrorListener extends BaseErrorListener {
 	}
 
 	@Override
-	public void reportAttemptingFullContext(@NotNull Parser recognizer,
-											@NotNull DFA dfa,
+	public void reportAttemptingFullContext(Parser recognizer,
+											DFA dfa,
 											int startIndex,
 											int stopIndex,
-											@Nullable BitSet conflictingAlts,
-											@NotNull ATNConfigSet configs)
+											BitSet conflictingAlts,
+											ATNConfigSet configs)
 	{
 		String format = "reportAttemptingFullContext d=%s, input='%s'";
 		String decision = getDecisionDescription(recognizer, dfa);
@@ -122,12 +120,12 @@ public class DiagnosticErrorListener extends BaseErrorListener {
 	}
 
 	@Override
-	public void reportContextSensitivity(@NotNull Parser recognizer,
-										 @NotNull DFA dfa,
+	public void reportContextSensitivity(Parser recognizer,
+										 DFA dfa,
 										 int startIndex,
 										 int stopIndex,
 										 int prediction,
-										 @NotNull ATNConfigSet configs)
+										 ATNConfigSet configs)
 	{
 		String format = "reportContextSensitivity d=%s, input='%s'";
 		String decision = getDecisionDescription(recognizer, dfa);
@@ -136,7 +134,7 @@ public class DiagnosticErrorListener extends BaseErrorListener {
 		recognizer.notifyErrorListeners(message);
 	}
 
-	protected String getDecisionDescription(@NotNull Parser recognizer, @NotNull DFA dfa) {
+	protected String getDecisionDescription(Parser recognizer, DFA dfa) {
 		int decision = dfa.decision;
 		int ruleIndex = dfa.atnStartState.ruleIndex;
 
@@ -164,8 +162,7 @@ public class DiagnosticErrorListener extends BaseErrorListener {
 	 * @return Returns {@code reportedAlts} if it is not {@code null}, otherwise
 	 * returns the set of alternatives represented in {@code configs}.
 	 */
-	@NotNull
-	protected BitSet getConflictingAlts(@Nullable BitSet reportedAlts, @NotNull ATNConfigSet configs) {
+	protected BitSet getConflictingAlts(BitSet reportedAlts, ATNConfigSet configs) {
 		if (reportedAlts != null) {
 			return reportedAlts;
 		}

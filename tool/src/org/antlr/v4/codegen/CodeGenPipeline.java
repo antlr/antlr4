@@ -49,8 +49,9 @@ public class CodeGenPipeline {
 	}
 
 	public void process() {
-		CodeGenerator gen = new CodeGenerator(g);
+		if ( !CodeGenerator.targetExists(g.getOptionString("language")) ) return;
 
+		CodeGenerator gen = new CodeGenerator(g);
 		IntervalSet idTypes = new IntervalSet();
 		idTypes.add(ANTLRParser.ID);
 		idTypes.add(ANTLRParser.RULE_REF);

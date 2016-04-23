@@ -32,16 +32,13 @@ package org.antlr.v4.runtime.atn;
 
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.IntervalSet;
-import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.misc.Nullable;
 
 /** A transition containing a set of values. */
 public class SetTransition extends Transition {
-	@NotNull
 	public final IntervalSet set;
 
 	// TODO (sam): should we really allow null here?
-	public SetTransition(@NotNull ATNState target, @Nullable IntervalSet set) {
+	public SetTransition(ATNState target, IntervalSet set) {
 		super(target);
 		if ( set == null ) set = IntervalSet.of(Token.INVALID_TYPE);
 		this.set = set;
@@ -53,7 +50,7 @@ public class SetTransition extends Transition {
 	}
 
 	@Override
-	@NotNull
+
 	public IntervalSet label() { return set; }
 
 	@Override
@@ -62,7 +59,7 @@ public class SetTransition extends Transition {
 	}
 
 	@Override
-	@NotNull
+
 	public String toString() {
 		return set.toString();
 	}

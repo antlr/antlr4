@@ -30,16 +30,18 @@
 
 package org.antlr.v4.codegen;
 
+import org.antlr.v4.codegen.model.Action;
 import org.antlr.v4.codegen.model.CodeBlockForOuterMostAlt;
 import org.antlr.v4.codegen.model.OutputModelObject;
 import org.antlr.v4.codegen.model.RuleFunction;
 import org.antlr.v4.codegen.model.SrcOp;
 import org.antlr.v4.codegen.model.decl.CodeBlock;
 import org.antlr.v4.codegen.model.decl.Decl;
-import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.tool.Alternative;
 import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.Rule;
+import org.stringtemplate.v4.ST;
+import org.stringtemplate.v4.STGroup;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -53,14 +55,14 @@ import java.util.List;
  */
 public abstract class DefaultOutputModelFactory extends BlankOutputModelFactory {
 	// Interface to outside world
-	@NotNull
+
 	public final Grammar g;
-	@NotNull
+
 	public final CodeGenerator gen;
 
 	public OutputModelController controller;
 
-	protected DefaultOutputModelFactory(@NotNull CodeGenerator gen) {
+	protected DefaultOutputModelFactory(CodeGenerator gen) {
 		this.gen = gen;
 		this.g = gen.g;
 	}
@@ -75,9 +77,25 @@ public abstract class DefaultOutputModelFactory extends BlankOutputModelFactory 
 		return controller;
 	}
 
+	@Override
+	public List<SrcOp> rulePostamble(RuleFunction function, Rule r) {
+		if ( r.namedActions.containsKey("after") || r.namedActions.containsKey("finally") ) {
+			// See OutputModelController.buildLeftRecursiveRuleFunction
+			// and Parser.exitRule for other places which set stop.
+			CodeGenerator gen = getGenerator();
+			STGroup codegenTemplates = gen.getTemplates();
+			ST setStopTokenAST = codegenTemplates.getInstanceOf("recRuleSetStopToken");
+			Action setStopTokenAction = new Action(this, function.ruleCtx, setStopTokenAST);
+			List<SrcOp> ops = new ArrayList<SrcOp>(1);
+			ops.add(setStopTokenAction);
+			return ops;
+		}
+		return super.rulePostamble(function, r);
+	}
+
 	// Convenience methods
 
-	@NotNull
+
 	@Override
 	public Grammar getGrammar() { return g; }
 
@@ -107,17 +125,17 @@ public abstract class DefaultOutputModelFactory extends BlankOutputModelFactory 
 
 	// MISC
 
-	@NotNull
+
 	public static List<SrcOp> list(SrcOp... values) {
 		return new ArrayList<SrcOp>(Arrays.asList(values));
 	}
 
-	@NotNull
+
 	public static List<SrcOp> list(Collection<? extends SrcOp> values) {
 		return new ArrayList<SrcOp>(values);
 	}
 
-	@Nullable
+
 	public Decl getCurrentDeclForName(String name) {
 		if ( getCurrentBlock().locals==null ) return null;
 		for (Decl d : getCurrentBlock().locals.elements()) {

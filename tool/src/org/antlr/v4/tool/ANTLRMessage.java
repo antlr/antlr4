@@ -30,18 +30,19 @@
 
 package org.antlr.v4.tool;
 
-import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.misc.Nullable;
+import org.antlr.runtime.Token;
+import org.stringtemplate.v4.ST;
+
 import java.util.Arrays;
 
 public class ANTLRMessage {
 	private static final Object[] EMPTY_ARGS = new Object[0];
 
-	@NotNull
+
     private final ErrorType errorType;
-	@Nullable
+
     private final Object[] args;
-	@Nullable
+
     private final Throwable e;
 
     // used for location template
@@ -49,26 +50,33 @@ public class ANTLRMessage {
     public int line = -1;
     public int charPosition = -1;
 
-    public ANTLRMessage(@NotNull ErrorType errorType) {
-        this(errorType, (Throwable)null);
+	public Grammar g;
+	/** Most of the time, we'll have a token such as an undefined rule ref
+     *  and so this will be set.
+     */
+    public Token offendingToken;
+
+	public ANTLRMessage(ErrorType errorType) {
+        this(errorType, (Throwable)null, Token.INVALID_TOKEN);
     }
 
-    public ANTLRMessage(@NotNull ErrorType errorType, Object... args) {
-        this(errorType, null, args);
-    }
+    public ANTLRMessage(ErrorType errorType, Token offendingToken, Object... args) {
+        this(errorType, null, offendingToken, args);
+	}
 
-    public ANTLRMessage(@NotNull ErrorType errorType, @Nullable Throwable e, Object... args) {
+    public ANTLRMessage(ErrorType errorType, Throwable e, Token offendingToken, Object... args) {
         this.errorType = errorType;
         this.e = e;
         this.args = args;
+		this.offendingToken = offendingToken;
     }
 
-	@NotNull
+
     public ErrorType getErrorType() {
         return errorType;
     }
 
-	@NotNull
+
     public Object[] getArgs() {
 		if (args == null) {
 			return EMPTY_ARGS;
@@ -77,7 +85,33 @@ public class ANTLRMessage {
 		return args;
     }
 
-	@Nullable
+	public ST getMessageTemplate(boolean verbose) {
+		ST messageST = new ST(getErrorType().msg);
+		messageST.impl.name = errorType.name();
+
+		messageST.add("verbose", verbose);
+		Object[] args = getArgs();
+		for (int i=0; i<args.length; i++) {
+			String attr = "arg";
+			if ( i>0 ) attr += i + 1;
+			messageST.add(attr, args[i]);
+		}
+		if ( args.length<2 ) messageST.add("arg2", null); // some messages ref arg2
+
+		Throwable cause = getCause();
+		if ( cause!=null ) {
+			messageST.add("exception", cause);
+			messageST.add("stackTrace", cause.getStackTrace());
+		}
+		else {
+			messageST.add("exception", null); // avoid ST error msg
+			messageST.add("stackTrace", null);
+		}
+
+		return messageST;
+	}
+
+
     public Throwable getCause() {
         return e;
     }

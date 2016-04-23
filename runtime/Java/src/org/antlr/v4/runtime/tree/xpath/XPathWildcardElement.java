@@ -6,7 +6,6 @@ import org.antlr.v4.runtime.tree.Trees;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 public class XPathWildcardElement extends XPathElement {

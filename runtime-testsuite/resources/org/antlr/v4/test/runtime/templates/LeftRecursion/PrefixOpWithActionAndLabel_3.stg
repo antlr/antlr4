@@ -1,0 +1,9 @@
+import "PrefixOpWithActionAndLabel.stg"
+
+Input() ::= "a=b+c"
+
+Output() ::= <<
+((a=b)+c)<\n>
+>>
+
+Errors() ::= ""

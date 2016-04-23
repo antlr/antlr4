@@ -1,0 +1,9 @@
+import "MultipleActions.stg"
+
+Input() ::= "4"
+
+Output() ::= <<
+(s (e 4))<\n>
+>>
+
+Errors() ::= ""

@@ -1,0 +1,29 @@
+/**
+ * This test ensures that {@link ParserATNSimulator} does not produce a
+ * {@link StackOverflowError} when it encounters an {@code EOF} transition
+ * inside a closure.
+ */
+
+TestType() ::= "Parser"
+
+Options ::= [
+	"Debug": false
+]
+
+Grammar ::= [
+	"T": {<grammar("T")>}
+]
+
+Input() ::= "x"
+
+Rule() ::= "prog"
+
+Output() ::= ""
+
+Errors() ::= ""
+
+grammar(grammarName) ::= <<
+grammar <grammarName>;
+prog : stat EOF;
+stat : 'x' ('y' | EOF)*?;
+>>

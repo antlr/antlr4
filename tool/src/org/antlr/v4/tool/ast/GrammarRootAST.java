@@ -33,7 +33,6 @@ package org.antlr.v4.tool.ast;
 import org.antlr.runtime.Token;
 import org.antlr.runtime.TokenStream;
 import org.antlr.runtime.tree.Tree;
-import org.antlr.v4.runtime.misc.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -47,7 +46,7 @@ public class GrammarRootAST extends GrammarASTWithOptions {
     public int grammarType; // LEXER, PARSER, GRAMMAR (combined)
 	public boolean hasErrors;
 	/** Track stream used to create this tree */
-	@NotNull
+
 	public final TokenStream tokenStream;
 	public Map<String, String> cmdLineOptions; // -DsuperClass=T on command line
 	public String fileName;

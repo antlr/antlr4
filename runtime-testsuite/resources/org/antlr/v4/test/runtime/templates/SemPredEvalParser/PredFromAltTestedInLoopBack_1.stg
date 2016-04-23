@@ -1,0 +1,12 @@
+import "PredFromAltTestedInLoopBack.stg"
+
+Input() ::= "s<\n><\n><\n>x<\n>"
+
+Output() ::= <<
+(file_ (para (paraContent s) \n \n) (para (paraContent \n x \n)) \<EOF>)<\n>
+>>
+
+Errors() ::= <<
+line 5:0 mismatched input '\<EOF>' expecting '
+'<\n>
+>>

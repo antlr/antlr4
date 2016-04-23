@@ -29,23 +29,20 @@
  */
 package org.antlr.v4.runtime;
 
-import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.misc.Nullable;
-
 /**
  * A source of tokens must provide a sequence of tokens via {@link #nextToken()}
  * and also must reveal it's source of characters; {@link CommonToken}'s text is
  * computed from a {@link CharStream}; it only store indices into the char
  * stream.
- * <p/>
- * Errors from the lexer are never passed to the parser. Either you want to keep
+ *
+ * <p>Errors from the lexer are never passed to the parser. Either you want to keep
  * going or you do not upon token recognition error. If you do not want to
  * continue lexing then you do not want to continue parsing. Just throw an
  * exception not under {@link RecognitionException} and Java will naturally toss
  * you all the way out of the recognizers. If you want to continue lexing then
  * you should not throw an exception to the parser--it has already requested a
  * token. Keep lexing until you get a valid one. Just report errors and keep
- * going, looking for a valid token.
+ * going, looking for a valid token.</p>
  */
 public interface TokenSource {
 	/**
@@ -54,7 +51,6 @@ public interface TokenSource {
 	 * on the characters until you get a good one; errors are not passed through
 	 * to the parser.
 	 */
-	@NotNull
 	public Token nextToken();
 
 	/**
@@ -83,7 +79,6 @@ public interface TokenSource {
 	 * the input, or {@code null} if no input stream is available for the token
 	 * source.
 	 */
-	@Nullable
 	public CharStream getInputStream();
 
 	/**
@@ -99,7 +94,7 @@ public interface TokenSource {
 	 *
 	 * @param factory The {@link TokenFactory} to use for creating tokens.
 	 */
-	public void setTokenFactory(@NotNull TokenFactory<?> factory);
+	public void setTokenFactory(TokenFactory<?> factory);
 
 	/**
 	 * Gets the {@link TokenFactory} this token source is currently using for
@@ -107,6 +102,5 @@ public interface TokenSource {
 	 *
 	 * @return The {@link TokenFactory} currently used by this token source.
 	 */
-	@NotNull
 	public TokenFactory<?> getTokenFactory();
 }

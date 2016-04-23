@@ -53,7 +53,7 @@ import java.util.Set;
  *  We identify those nested objects by the list of arguments in the template
  *  definition. For example, here is the definition of the parser template:
  *
- *  Parser(parser, scopes, funcs) ::= <<...>>
+ *  Parser(parser, scopes, funcs) ::= &lt;&lt;...&gt;&gt;
  *
  *  The first template argument is always the output model object from which
  *  this walker will create the template. Any other arguments identify

@@ -31,6 +31,8 @@ package org.antlr.v4.runtime.misc;
 
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.Vocabulary;
+import org.antlr.v4.runtime.VocabularyImpl;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -39,23 +41,28 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
 
-/** A set of integers that relies on ranges being common to do
- *  "run-length-encoded" like compression (if you view an IntSet like
- *  a BitSet with runs of 0s and 1s).  Only ranges are recorded so that
- *  a few ints up near value 1000 don't cause massive bitsets, just two
- *  integer intervals.
+/**
+ * This class implements the {@link IntSet} backed by a sorted array of
+ * non-overlapping intervals. It is particularly efficient for representing
+ * large collections of numbers, where the majority of elements appear as part
+ * of a sequential range of numbers that are all part of the set. For example,
+ * the set { 1, 2, 3, 4, 7, 8 } may be represented as { [1, 4], [7, 8] }.
  *
- *  element values may be negative.  Useful for sets of EPSILON and EOF.
- *
- *  0..9 char range is index pair ['\u0030','\u0039'].
- *  Multiple ranges are encoded with multiple index pairs.  Isolated
- *  elements are encoded with an index pair where both intervals are the same.
- *
- *  The ranges are ordered and disjoint so that 2..6 appears before 101..103.
+ * <p>
+ * This class is able to represent sets containing any combination of values in
+ * the range {@link Integer#MIN_VALUE} to {@link Integer#MAX_VALUE}
+ * (inclusive).</p>
  */
 public class IntervalSet implements IntSet {
-	public static final IntervalSet COMPLETE_CHAR_SET = IntervalSet.of(0, Lexer.MAX_CHAR_VALUE);
+	public static final IntervalSet COMPLETE_CHAR_SET = IntervalSet.of(Lexer.MIN_CHAR_VALUE, Lexer.MAX_CHAR_VALUE);
+	static {
+		COMPLETE_CHAR_SET.setReadonly(true);
+	}
+
 	public static final IntervalSet EMPTY_SET = new IntervalSet();
+	static {
+		EMPTY_SET.setReadonly(true);
+	}
 
 	/** The list of sorted, disjoint intervals. */
     protected List<Interval> intervals;
@@ -82,7 +89,7 @@ public class IntervalSet implements IntSet {
 	}
 
 	/** Create a set with a single element, el. */
-    @NotNull
+
     public static IntervalSet of(int a) {
 		IntervalSet s = new IntervalSet();
         s.add(a);
@@ -111,7 +118,7 @@ public class IntervalSet implements IntSet {
     }
 
     /** Add interval; i.e., add all integers from a to b to set.
-     *  If b<a, do nothing.
+     *  If b&lt;a, do nothing.
      *  Keep list in sorted order (by left range value).
      *  If overlap, combine ranges.  For example,
      *  If this is {1..5, 10..20}, adding 6..7 yields
@@ -180,18 +187,22 @@ public class IntervalSet implements IntSet {
 		if ( set==null ) {
 			return this;
 		}
-        if ( !(set instanceof IntervalSet) ) {
-            throw new IllegalArgumentException("can't add non IntSet ("+
-											   set.getClass().getName()+
-											   ") to IntervalSet");
-        }
-        IntervalSet other = (IntervalSet)set;
-        // walk set and add each interval
-		int n = other.intervals.size();
-		for (int i = 0; i < n; i++) {
-			Interval I = other.intervals.get(i);
-			this.add(I.a,I.b);
+
+		if (set instanceof IntervalSet) {
+			IntervalSet other = (IntervalSet)set;
+			// walk set and add each interval
+			int n = other.intervals.size();
+			for (int i = 0; i < n; i++) {
+				Interval I = other.intervals.get(i);
+				this.add(I.a,I.b);
+			}
 		}
+		else {
+			for (int value : set.toList()) {
+				add(value);
+			}
+		}
+
 		return this;
     }
 
@@ -199,67 +210,120 @@ public class IntervalSet implements IntSet {
         return this.complement(IntervalSet.of(minElement,maxElement));
     }
 
-    /** Given the set of possible values (rather than, say UNICODE or MAXINT),
-     *  return a new set containing all elements in vocabulary, but not in
-     *  this.  The computation is (vocabulary - this).
-     *
-     *  'this' is assumed to be either a subset or equal to vocabulary.
-     */
+    /** {@inheritDoc} */
     @Override
     public IntervalSet complement(IntSet vocabulary) {
-        if ( vocabulary==null ) {
-            return null; // nothing in common with null set
-        }
-		if ( !(vocabulary instanceof IntervalSet ) ) {
-			throw new IllegalArgumentException("can't complement with non IntervalSet ("+
-											   vocabulary.getClass().getName()+")");
+		if ( vocabulary==null || vocabulary.isNil() ) {
+			return null; // nothing in common with null set
 		}
-		IntervalSet vocabularyIS = ((IntervalSet)vocabulary);
-		int maxElement = vocabularyIS.getMaxElement();
 
-		IntervalSet compl = new IntervalSet();
-		int n = intervals.size();
-		if ( n ==0 ) {
-			return compl;
+		IntervalSet vocabularyIS;
+		if (vocabulary instanceof IntervalSet) {
+			vocabularyIS = (IntervalSet)vocabulary;
 		}
-		Interval first = intervals.get(0);
-		// add a range from 0 to first.a constrained to vocab
-		if ( first.a > 0 ) {
-			IntervalSet s = IntervalSet.of(0, first.a-1);
-			IntervalSet a = s.and(vocabularyIS);
-			compl.addAll(a);
+		else {
+			vocabularyIS = new IntervalSet();
+			vocabularyIS.addAll(vocabulary);
 		}
-		for (int i=1; i<n; i++) { // from 2nd interval .. nth
-			Interval previous = intervals.get(i-1);
-			Interval current = intervals.get(i);
-			IntervalSet s = IntervalSet.of(previous.b+1, current.a-1);
-			IntervalSet a = s.and(vocabularyIS);
-			compl.addAll(a);
-		}
-		Interval last = intervals.get(n -1);
-		// add a range from last.b to maxElement constrained to vocab
-		if ( last.b < maxElement ) {
-			IntervalSet s = IntervalSet.of(last.b+1, maxElement);
-			IntervalSet a = s.and(vocabularyIS);
-			compl.addAll(a);
-		}
-		return compl;
+
+		return vocabularyIS.subtract(this);
     }
 
-	/** Compute this-other via this&~other.
-	 *  Return a new set containing all elements in this but not in other.
-	 *  other is assumed to be a subset of this;
-     *  anything that is in other but not in this will be ignored.
-	 */
 	@Override
-	public IntervalSet subtract(IntSet other) {
-		// assume the whole unicode range here for the complement
-		// because it doesn't matter.  Anything beyond the max of this' set
-		// will be ignored since we are doing this & ~other.  The intersection
-		// will be empty.  The only problem would be when this' set max value
-		// goes beyond MAX_CHAR_VALUE, but hopefully the constant MAX_CHAR_VALUE
-		// will prevent this.
-		return this.and(((IntervalSet)other).complement(COMPLETE_CHAR_SET));
+	public IntervalSet subtract(IntSet a) {
+		if (a == null || a.isNil()) {
+			return new IntervalSet(this);
+		}
+
+		if (a instanceof IntervalSet) {
+			return subtract(this, (IntervalSet)a);
+		}
+
+		IntervalSet other = new IntervalSet();
+		other.addAll(a);
+		return subtract(this, other);
+	}
+
+	/**
+	 * Compute the set difference between two interval sets. The specific
+	 * operation is {@code left - right}. If either of the input sets is
+	 * {@code null}, it is treated as though it was an empty set.
+	 */
+
+	public static IntervalSet subtract(IntervalSet left, IntervalSet right) {
+		if (left == null || left.isNil()) {
+			return new IntervalSet();
+		}
+
+		IntervalSet result = new IntervalSet(left);
+		if (right == null || right.isNil()) {
+			// right set has no elements; just return the copy of the current set
+			return result;
+		}
+
+		int resultI = 0;
+		int rightI = 0;
+		while (resultI < result.intervals.size() && rightI < right.intervals.size()) {
+			Interval resultInterval = result.intervals.get(resultI);
+			Interval rightInterval = right.intervals.get(rightI);
+
+			// operation: (resultInterval - rightInterval) and update indexes
+
+			if (rightInterval.b < resultInterval.a) {
+				rightI++;
+				continue;
+			}
+
+			if (rightInterval.a > resultInterval.b) {
+				resultI++;
+				continue;
+			}
+
+			Interval beforeCurrent = null;
+			Interval afterCurrent = null;
+			if (rightInterval.a > resultInterval.a) {
+				beforeCurrent = new Interval(resultInterval.a, rightInterval.a - 1);
+			}
+
+			if (rightInterval.b < resultInterval.b) {
+				afterCurrent = new Interval(rightInterval.b + 1, resultInterval.b);
+			}
+
+			if (beforeCurrent != null) {
+				if (afterCurrent != null) {
+					// split the current interval into two
+					result.intervals.set(resultI, beforeCurrent);
+					result.intervals.add(resultI + 1, afterCurrent);
+					resultI++;
+					rightI++;
+					continue;
+				}
+				else {
+					// replace the current interval
+					result.intervals.set(resultI, beforeCurrent);
+					resultI++;
+					continue;
+				}
+			}
+			else {
+				if (afterCurrent != null) {
+					// replace the current interval
+					result.intervals.set(resultI, afterCurrent);
+					rightI++;
+					continue;
+				}
+				else {
+					// remove the current interval (thus no need to increment resultI)
+					result.intervals.remove(resultI);
+					continue;
+				}
+			}
+		}
+
+		// If rightI reached right.intervals.size(), no more intervals to subtract from result.
+		// If resultI reached result.intervals.size(), we would be subtracting from an empty set.
+		// Either way, we are done.
+		return result;
 	}
 
 	@Override
@@ -270,11 +334,7 @@ public class IntervalSet implements IntSet {
 		return o;
 	}
 
-    /** Return a new set with the intersection of this set with other.  Because
-     *  the intervals are sorted, we can use an iterator for each list and
-     *  just walk them together.  This is roughly O(min(n,m)) for interval
-     *  list lengths n and m.
-     */
+    /** {@inheritDoc} */
 	@Override
 	public IntervalSet and(IntSet other) {
 		if ( other==null ) { //|| !(other instanceof IntervalSet) ) {
@@ -344,7 +404,7 @@ public class IntervalSet implements IntSet {
 		return intersection;
 	}
 
-    /** Is el in any range of this set? */
+    /** {@inheritDoc} */
     @Override
     public boolean contains(int el) {
 		int n = intervals.size();
@@ -374,13 +434,13 @@ public class IntervalSet implements IntSet {
         */
     }
 
-    /** return true if this set has no members */
+    /** {@inheritDoc} */
     @Override
     public boolean isNil() {
         return intervals==null || intervals.isEmpty();
     }
 
-    /** If this set is a single integer, return it otherwise Token.INVALID_TYPE */
+    /** {@inheritDoc} */
     @Override
     public int getSingleElement() {
         if ( intervals!=null && intervals.size()==1 ) {
@@ -392,6 +452,12 @@ public class IntervalSet implements IntSet {
         return Token.INVALID_TYPE;
     }
 
+	/**
+	 * Returns the maximum value contained in the set.
+	 *
+	 * @return the maximum value contained in the set. If the set is empty, this
+	 * method returns {@link Token#INVALID_TYPE}.
+	 */
 	public int getMaxElement() {
 		if ( isNil() ) {
 			return Token.INVALID_TYPE;
@@ -400,21 +466,18 @@ public class IntervalSet implements IntSet {
 		return last.b;
 	}
 
-	/** Return minimum element >= 0 */
+	/**
+	 * Returns the minimum value contained in the set.
+	 *
+	 * @return the minimum value contained in the set. If the set is empty, this
+	 * method returns {@link Token#INVALID_TYPE}.
+	 */
 	public int getMinElement() {
 		if ( isNil() ) {
 			return Token.INVALID_TYPE;
 		}
-		int n = intervals.size();
-		for (int i = 0; i < n; i++) {
-			Interval I = intervals.get(i);
-			int a = I.a;
-			int b = I.b;
-			for (int v=a; v<=b; v++) {
-				if ( v>=0 ) return v;
-			}
-		}
-		return Token.INVALID_TYPE;
+
+		return intervals.get(0).a;
 	}
 
     /** Return a list of Interval objects. */
@@ -465,7 +528,7 @@ public class IntervalSet implements IntSet {
 			int a = I.a;
 			int b = I.b;
 			if ( a==b ) {
-				if ( a==-1 ) buf.append("<EOF>");
+				if ( a==Token.EOF ) buf.append("<EOF>");
 				else if ( elemAreChar ) buf.append("'").append((char)a).append("'");
 				else buf.append(a);
 			}
@@ -483,7 +546,15 @@ public class IntervalSet implements IntSet {
 		return buf.toString();
 	}
 
+	/**
+	 * @deprecated Use {@link #toString(Vocabulary)} instead.
+	 */
+	@Deprecated
 	public String toString(String[] tokenNames) {
+		return toString(VocabularyImpl.fromTokenNames(tokenNames));
+	}
+
+	public String toString(Vocabulary vocabulary) {
 		StringBuilder buf = new StringBuilder();
 		if ( this.intervals==null || this.intervals.isEmpty() ) {
 			return "{}";
@@ -497,12 +568,12 @@ public class IntervalSet implements IntSet {
 			int a = I.a;
 			int b = I.b;
 			if ( a==b ) {
-				buf.append(elementName(tokenNames, a));
+				buf.append(elementName(vocabulary, a));
 			}
 			else {
 				for (int i=a; i<=b; i++) {
 					if ( i>a ) buf.append(", ");
-                    buf.append(elementName(tokenNames, i));
+                    buf.append(elementName(vocabulary, i));
 				}
 			}
 			if ( iter.hasNext() ) {
@@ -515,12 +586,26 @@ public class IntervalSet implements IntSet {
         return buf.toString();
     }
 
-    protected String elementName(String[] tokenNames, int a) {
-        if ( a==Token.EOF ) return "<EOF>";
-        else if ( a==Token.EPSILON ) return "<EPSILON>";
-        else return tokenNames[a];
+	/**
+	 * @deprecated Use {@link #elementName(Vocabulary, int)} instead.
+	 */
+	@Deprecated
+	protected String elementName(String[] tokenNames, int a) {
+		return elementName(VocabularyImpl.fromTokenNames(tokenNames), a);
+	}
 
-    }
+
+	protected String elementName(Vocabulary vocabulary, int a) {
+		if (a == Token.EOF) {
+			return "<EOF>";
+		}
+		else if (a == Token.EPSILON) {
+			return "<EPSILON>";
+		}
+		else {
+			return vocabulary.getDisplayName(a);
+		}
+	}
 
     @Override
     public int size() {
@@ -643,6 +728,7 @@ public class IntervalSet implements IntSet {
     }
 
     public void setReadonly(boolean readonly) {
+        if ( this.readonly && !readonly ) throw new IllegalStateException("can't alter readonly IntervalSet");
         this.readonly = readonly;
     }
 }

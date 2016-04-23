@@ -1,6 +1,5 @@
 package org.antlr.v4.runtime;
 
-import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Pair;
 
 import java.util.List;
@@ -8,10 +7,10 @@ import java.util.List;
 /**
  * Provides an implementation of {@link TokenSource} as a wrapper around a list
  * of {@link Token} objects.
- * <p/>
- * If the final token in the list is an {@link Token#EOF} token, it will be used
+ *
+ * <p>If the final token in the list is an {@link Token#EOF} token, it will be used
  * as the EOF token for every call to {@link #nextToken} after the end of the
- * list is reached. Otherwise, an EOF token will be created.
+ * list is reached. Otherwise, an EOF token will be created.</p>
  */
 public class ListTokenSource implements TokenSource {
 	/**
@@ -53,7 +52,7 @@ public class ListTokenSource implements TokenSource {
 	 * {@link TokenSource}.
 	 * @exception NullPointerException if {@code tokens} is {@code null}
 	 */
-	public ListTokenSource(@NotNull List<? extends Token> tokens) {
+	public ListTokenSource(List<? extends Token> tokens) {
 		this(tokens, null);
 	}
 
@@ -70,7 +69,7 @@ public class ListTokenSource implements TokenSource {
 	 *
 	 * @exception NullPointerException if {@code tokens} is {@code null}
 	 */
-	public ListTokenSource(@NotNull List<? extends Token> tokens, String sourceName) {
+	public ListTokenSource(List<? extends Token> tokens, String sourceName) {
 		if (tokens == null) {
 			throw new NullPointerException("tokens cannot be null");
 		}
@@ -80,7 +79,7 @@ public class ListTokenSource implements TokenSource {
 	}
 
 	/**
-	 * @inheritDoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public int getCharPositionInLine() {
@@ -111,7 +110,7 @@ public class ListTokenSource implements TokenSource {
 	}
 
 	/**
-	 * @inheritDoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public Token nextToken() {
@@ -142,7 +141,7 @@ public class ListTokenSource implements TokenSource {
 	}
 
 	/**
-	 * @inheritDoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public int getLine() {
@@ -177,7 +176,7 @@ public class ListTokenSource implements TokenSource {
 	}
 
 	/**
-	 * @inheritDoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public CharStream getInputStream() {
@@ -196,7 +195,7 @@ public class ListTokenSource implements TokenSource {
 	}
 
 	/**
-	 * @inheritDoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public String getSourceName() {
@@ -213,18 +212,17 @@ public class ListTokenSource implements TokenSource {
 	}
 
 	/**
-	 * @inheritDoc
+	 * {@inheritDoc}
 	 */
 	@Override
-	public void setTokenFactory(@NotNull TokenFactory<?> factory) {
+	public void setTokenFactory(TokenFactory<?> factory) {
 		this._factory = factory;
 	}
 
 	/**
-	 * @inheritDoc
+	 * {@inheritDoc}
 	 */
 	@Override
-	@NotNull
 	public TokenFactory<?> getTokenFactory() {
 		return _factory;
 	}

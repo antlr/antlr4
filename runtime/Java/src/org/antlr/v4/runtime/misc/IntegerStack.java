@@ -42,7 +42,7 @@ public class IntegerStack extends IntegerList {
 		super(capacity);
 	}
 
-	public IntegerStack(@NotNull IntegerStack list) {
+	public IntegerStack(IntegerStack list) {
 		super(list);
 	}
 

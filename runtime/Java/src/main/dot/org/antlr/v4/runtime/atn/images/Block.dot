@@ -1,7 +1,7 @@
 digraph "" {
-    graph[fontname="Courier New";rankdir="LR";pad="0.25"];
-    node[fontname="Courier New";target="_parent"];
-    edge[fontname="Courier New"];
+    graph[fontname="CourierNew";rankdir="LR";pad="0.25"];
+    node[fontname="CourierNew";target="_parent"];
+    edge[fontname="CourierNew"];
     subgraph clusterA {
         color="invis";
         {   node[shape="record"];

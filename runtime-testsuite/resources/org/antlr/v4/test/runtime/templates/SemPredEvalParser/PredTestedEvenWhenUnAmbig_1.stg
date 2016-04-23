@@ -1,0 +1,9 @@
+import "PredTestedEvenWhenUnAmbig.stg"
+
+Input() ::= "abc"
+
+Output() ::= <<
+ID abc<\n>
+>>
+
+Errors() ::= ""

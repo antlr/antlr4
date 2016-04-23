@@ -1,4 +1,44 @@
+****************************************************************************
+As of ANTLR 4.2.1, March 25 2014, we are no longer updating this file. Instead,
+we are using the github release mechanism. For example, here is
+4.2.1 release notes:
+
+https://github.com/antlr/antlr4/releases/tag/4.2.1
+****************************************************************************
+
 ANTLR v4 Honey Badger
+
+January 15, 2014
+
+* Unit tests for lexer actions from yesterday.
+* Refactored TreeView so we can refresh tree externally w/o creating new one.
+  Needed for intellij plugin.
+
+January 14, 2014
+
+* Updated serialized ATN representation of lexer actions, allowing the lexer
+  interpreter to execute the majority of lexer commands (#408)
+
+January 12, 2014
+
+* Support executing precedence predicates during the SLL phase of
+  adaptivePredict (#401). The result is a massive performance boost for grammars
+  containing direct left-recursion (improvements of 5% to 1000+% have been
+  observed, depending on the grammar and input).
+
+December 29, 2013
+
+* Internal change: Tool.loadGrammar() -> parseGrammar(). Tool.load()->parse()
+
+* Added Tool.loadGrammar(fileName) that completely parses, extracts implicit lexer,
+  and processes into Grammar object. Does not geneate code.  Use
+  Grammar.getImplicitLexer() to get the lexer created during processing of
+  combined grammar.
+
+* Added Grammar.load(fileName) that creates Tool object for you. loadGrammar()
+  lets you create your own Tool for setting error handlers etc...
+
+	final Grammar g = Grammar.load("/tmp/MyGrammar.g4");
 
 December 19, 2013
 
@@ -14,19 +54,19 @@ November 24, 2013
 
 * Ter adds tree pattern matching.  Preferred interface:
 
-	   ParseTree t = parser.expr();
-	   ParseTreePattern p = parser.compileParseTreePattern("<ID>+0", MyParser.RULE_expr);
-	   ParseTreeMatch m = p.match(t);
-	   String id = m.get("ID");
+	ParseTree t = parser.expr();
+	ParseTreePattern p = parser.compileParseTreePattern("<ID>+0", MyParser.RULE_expr);
+	ParseTreeMatch m = p.match(t);
+	String id = m.get("ID");
 
   or
 
-		String xpath = "//blockStatement/*";
-		String treePattern = "int <Identifier> = <expression>;";
-		ParseTreePattern p =
-			parser.compileParseTreePattern(treePattern,
-										   JavaParser.RULE_localVariableDeclarationStatement);
-		List<ParseTreeMatch> matches = p.findAll(tree, xpath);
+	String xpath = "//blockStatement/*";
+	String treePattern = "int <Identifier> = <expression>;";
+	ParseTreePattern p =
+		parser.compileParseTreePattern(treePattern,
+									   JavaParser.RULE_localVariableDeclarationStatement);
+	List<ParseTreeMatch> matches = p.findAll(tree, xpath);
 
 November 20, 2013
 

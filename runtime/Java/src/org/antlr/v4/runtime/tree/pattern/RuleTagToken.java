@@ -33,8 +33,6 @@ package org.antlr.v4.runtime.tree.pattern;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenSource;
-import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.misc.Nullable;
 
 /**
  * A {@link Token} object representing an entire subtree matched by a parser
@@ -66,7 +64,7 @@ public class RuleTagToken implements Token {
 	 * @exception IllegalArgumentException if {@code ruleName} is {@code null}
 	 * or empty.
 	 */
-	public RuleTagToken(@NotNull String ruleName, int bypassTokenType) {
+	public RuleTagToken(String ruleName, int bypassTokenType) {
 		this(ruleName, bypassTokenType, null);
 	}
 
@@ -82,7 +80,7 @@ public class RuleTagToken implements Token {
 	 * @exception IllegalArgumentException if {@code ruleName} is {@code null}
 	 * or empty.
 	 */
-	public RuleTagToken(@NotNull String ruleName, int bypassTokenType, @Nullable String label) {
+	public RuleTagToken(String ruleName, int bypassTokenType, String label) {
 		if (ruleName == null || ruleName.isEmpty()) {
 			throw new IllegalArgumentException("ruleName cannot be null or empty.");
 		}
@@ -97,7 +95,7 @@ public class RuleTagToken implements Token {
 	 *
 	 * @return The name of the parser rule associated with this rule tag.
 	 */
-	@NotNull
+
 	public final String getRuleName() {
 		return ruleName;
 	}
@@ -108,15 +106,15 @@ public class RuleTagToken implements Token {
 	 * @return The name of the label associated with the rule tag, or
 	 * {@code null} if this is an unlabeled rule tag.
 	 */
-	@Nullable
+
 	public final String getLabel() {
 		return label;
 	}
 
 	/**
 	 * {@inheritDoc}
-	 * <p/>
-	 * Rule tag tokens are always placed on the {@link #DEFAULT_CHANNEL}.
+	 *
+	 * <p>Rule tag tokens are always placed on the {@link #DEFAULT_CHANNEL}.</p>
 	 */
 	@Override
 	public int getChannel() {
@@ -125,9 +123,9 @@ public class RuleTagToken implements Token {
 
 	/**
 	 * {@inheritDoc}
-	 * <p/>
-	 * This method returns the rule tag formatted with {@code <} and {@code >}
-	 * delimiters.
+	 *
+	 * <p>This method returns the rule tag formatted with {@code <} and {@code >}
+	 * delimiters.</p>
 	 */
 	@Override
 	public String getText() {
@@ -140,9 +138,9 @@ public class RuleTagToken implements Token {
 
 	/**
 	 * {@inheritDoc}
-	 * <p/>
-	 * Rule tag tokens have types assigned according to the rule bypass
-	 * transitions created during ATN deserialization.
+	 *
+	 * <p>Rule tag tokens have types assigned according to the rule bypass
+	 * transitions created during ATN deserialization.</p>
 	 */
 	@Override
 	public int getType() {
@@ -151,8 +149,8 @@ public class RuleTagToken implements Token {
 
 	/**
 	 * {@inheritDoc}
-	 * <p/>
-	 * The implementation for {@link RuleTagToken} always returns 0.
+	 *
+	 * <p>The implementation for {@link RuleTagToken} always returns 0.</p>
 	 */
 	@Override
 	public int getLine() {
@@ -161,8 +159,8 @@ public class RuleTagToken implements Token {
 
 	/**
 	 * {@inheritDoc}
-	 * <p/>
-	 * The implementation for {@link RuleTagToken} always returns -1.
+	 *
+	 * <p>The implementation for {@link RuleTagToken} always returns -1.</p>
 	 */
 	@Override
 	public int getCharPositionInLine() {
@@ -171,8 +169,8 @@ public class RuleTagToken implements Token {
 
 	/**
 	 * {@inheritDoc}
-	 * <p/>
-	 * The implementation for {@link RuleTagToken} always returns -1.
+	 *
+	 * <p>The implementation for {@link RuleTagToken} always returns -1.</p>
 	 */
 	@Override
 	public int getTokenIndex() {
@@ -181,8 +179,8 @@ public class RuleTagToken implements Token {
 
 	/**
 	 * {@inheritDoc}
-	 * <p/>
-	 * The implementation for {@link RuleTagToken} always returns -1.
+	 *
+	 * <p>The implementation for {@link RuleTagToken} always returns -1.</p>
 	 */
 	@Override
 	public int getStartIndex() {
@@ -191,8 +189,8 @@ public class RuleTagToken implements Token {
 
 	/**
 	 * {@inheritDoc}
-	 * <p/>
-	 * The implementation for {@link RuleTagToken} always returns -1.
+	 *
+	 * <p>The implementation for {@link RuleTagToken} always returns -1.</p>
 	 */
 	@Override
 	public int getStopIndex() {
@@ -201,8 +199,8 @@ public class RuleTagToken implements Token {
 
 	/**
 	 * {@inheritDoc}
-	 * <p/>
-	 * The implementation for {@link RuleTagToken} always returns {@code null}.
+	 *
+	 * <p>The implementation for {@link RuleTagToken} always returns {@code null}.</p>
 	 */
 	@Override
 	public TokenSource getTokenSource() {
@@ -211,8 +209,8 @@ public class RuleTagToken implements Token {
 
 	/**
 	 * {@inheritDoc}
-	 * <p/>
-	 * The implementation for {@link RuleTagToken} always returns {@code null}.
+	 *
+	 * <p>The implementation for {@link RuleTagToken} always returns {@code null}.</p>
 	 */
 	@Override
 	public CharStream getInputStream() {
@@ -221,9 +219,9 @@ public class RuleTagToken implements Token {
 
 	/**
 	 * {@inheritDoc}
-	 * <p/>
-	 * The implementation for {@link RuleTagToken} returns a string of the form
-	 * {@code ruleName:bypassTokenType}.
+	 *
+	 * <p>The implementation for {@link RuleTagToken} returns a string of the form
+	 * {@code ruleName:bypassTokenType}.</p>
 	 */
 	@Override
 	public String toString() {

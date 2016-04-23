@@ -31,10 +31,10 @@
 package org.antlr.v4.analysis;
 
 import org.antlr.runtime.ANTLRStringStream;
-import org.antlr.runtime.CommonToken;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.ParserRuleReturnScope;
 import org.antlr.runtime.RecognitionException;
+import org.antlr.runtime.Token;
 import org.antlr.v4.Tool;
 import org.antlr.v4.misc.OrderedHashMap;
 import org.antlr.v4.parse.ANTLRLexer;
@@ -71,6 +71,7 @@ import java.util.List;
  */
 public class LeftRecursiveRuleTransformer {
 	public static final String PRECEDENCE_OPTION_NAME = "p";
+	public static final String TOKENINDEX_OPTION_NAME = "tokenIndex";
 
 	public GrammarRootAST ast;
 	public Collection<Rule> rules;
@@ -92,7 +93,12 @@ public class LeftRecursiveRuleTransformer {
 			if ( !Grammar.isTokenName(r.name) ) {
 				if ( LeftRecursiveRuleAnalyzer.hasImmediateRecursiveRuleRefs(r.ast, r.name) ) {
 					boolean fitsPattern = translateLeftRecursiveRule(ast, (LeftRecursiveRule)r, language);
-					if ( fitsPattern ) leftRecursiveRuleNames.add(r.name);
+					if ( fitsPattern ) {
+						leftRecursiveRuleNames.add(r.name);
+					}
+					else { // better given an error that non-conforming left-recursion exists
+						tool.errMgr.grammarError(ErrorType.NONCONFORMING_LR_RULE, g.fileName, ((GrammarAST)r.ast.getChild(0)).token, r.name);
+					}
 				}
 			}
 		}
@@ -114,7 +120,6 @@ public class LeftRecursiveRuleTransformer {
 											  String language)
 	{
 		//tool.log("grammar", ruleAST.toStringTree());
-		Grammar g = r.ast.g;
 		GrammarAST prevRuleAST = r.ast;
 		String ruleName = prevRuleAST.getChild(0).getText();
 		LeftRecursiveRuleAnalyzer leftRecursiveRuleWalker =
@@ -130,11 +135,15 @@ public class LeftRecursiveRuleTransformer {
 		}
 		if ( !isLeftRec ) return false;
 
-		// replace old rule's AST
+		// replace old rule's AST; first create text of altered rule
 		GrammarAST RULES = (GrammarAST)ast.getFirstChildWithType(ANTLRParser.RULES);
 		String newRuleText = leftRecursiveRuleWalker.getArtificialOpPrecRule();
 //		System.out.println("created: "+newRuleText);
-		RuleAST t = parseArtificialRule(g, newRuleText);
+		// now parse within the context of the grammar that originally created
+		// the AST we are transforming. This could be an imported grammar so
+		// we cannot just reference this.g because the role might come from
+		// the imported grammar and not the root grammar (this.g)
+		RuleAST t = parseArtificialRule(prevRuleAST.g, newRuleText);
 
 		// reuse the name token from the original AST since it refers to the proper source location in the original grammar
 		((GrammarAST)t.getChild(0)).token = ((GrammarAST)prevRuleAST.getChild(0)).getToken();
@@ -152,12 +161,14 @@ public class LeftRecursiveRuleTransformer {
 		RuleCollector ruleCollector = new RuleCollector(g);
 		ruleCollector.visit(t, "rule");
 		BasicSemanticChecks basics = new BasicSemanticChecks(g, ruleCollector);
+		// disable the assoc element option checks because they are already
+		// handled for the pre-transformed rule.
+		basics.checkAssocElementOption = false;
 		basics.visit(t, "rule");
 
 		// track recursive alt info for codegen
 		r.recPrimaryAlts = new ArrayList<LeftRecursiveRuleAltInfo>();
-		r.recPrimaryAlts.addAll(leftRecursiveRuleWalker.prefixAlts);
-		r.recPrimaryAlts.addAll(leftRecursiveRuleWalker.otherAlts);
+		r.recPrimaryAlts.addAll(leftRecursiveRuleWalker.prefixAndOtherAlts);
 		if (r.recPrimaryAlts.isEmpty()) {
 			tool.errMgr.grammarError(ErrorType.NO_NON_LR_ALTS, g.fileName, ((GrammarAST)r.ast.getChild(0)).getToken(), r.name);
 		}
@@ -174,7 +185,7 @@ public class LeftRecursiveRuleTransformer {
 		// update Rule to just one alt and add prec alt
 		ActionAST arg = (ActionAST)r.ast.getFirstChildWithType(ANTLRParser.ARG_ACTION);
 		if ( arg!=null ) {
-			r.args = ScopeParser.parseTypedArgList(arg, arg.getText(), g.tool.errMgr);
+			r.args = ScopeParser.parseTypedArgList(arg, arg.getText(), g);
 			r.args.type = AttributeDict.DictType.ARG;
 			r.args.ast = arg;
 			arg.resolver = r.alt[1]; // todo: isn't this Rule or something?
@@ -203,16 +214,20 @@ public class LeftRecursiveRuleTransformer {
 		lexer.tokens = tokens;
 		ToolANTLRParser p = new ToolANTLRParser(tokens, tool);
 		p.setTreeAdaptor(adaptor);
+		Token ruleStart = null;
 		try {
 			ParserRuleReturnScope r = p.rule();
 			RuleAST tree = (RuleAST)r.getTree();
+			ruleStart = (Token)r.getStart();
 			GrammarTransformPipeline.setGrammarPtr(g, tree);
+			GrammarTransformPipeline.augmentTokensWithOriginalPosition(g, tree);
 			return tree;
 		}
 		catch (Exception e) {
 			tool.errMgr.toolError(ErrorType.INTERNAL_ERROR,
-								  "error parsing rule created during left-recursion detection: "+ruleText,
-								  e);
+								  e,
+								  ruleStart,
+								  "error parsing rule created during left-recursion detection: "+ruleText);
 		}
 		return null;
 	}
@@ -228,9 +243,9 @@ public class LeftRecursiveRuleTransformer {
 	 * 			(ALT ID))
 	 * 		(* (BLOCK
 	 *			(OPTIONS ...)
-	 * 			(ALT {7 >= $_p}? '*' (= b e) {$v = $a.v * $b.v;})
-	 * 			(ALT {6 >= $_p}? '+' (= b e) {$v = $a.v + $b.v;})
-	 * 			(ALT {3 >= $_p}? '++') (ALT {2 >= $_p}? '--'))))))
+	 * 			(ALT {7 &gt;= $_p}? '*' (= b e) {$v = $a.v * $b.v;})
+	 * 			(ALT {6 &gt;= $_p}? '+' (= b e) {$v = $a.v + $b.v;})
+	 * 			(ALT {3 &gt;= $_p}? '++') (ALT {2 &gt;= $_p}? '--'))))))
 	 * </pre>
 	 */
 	public void setAltASTPointers(LeftRecursiveRule r, RuleAST t) {

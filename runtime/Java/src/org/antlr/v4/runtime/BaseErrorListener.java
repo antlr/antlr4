@@ -35,6 +35,10 @@ import org.antlr.v4.runtime.dfa.DFA;
 import java.util.BitSet;
 
 /**
+ * Provides an empty default implementation of {@link ANTLRErrorListener}. The
+ * default implementation of each method does nothing, but can be overridden as
+ * necessary.
+ *
  * @author Sam Harwell
  */
 public class BaseErrorListener implements ANTLRErrorListener {

@@ -1,0 +1,9 @@
+import "Declarations.stg"
+
+Input() ::= "(a)"
+
+Output() ::= <<
+(s (declarator ( (declarator a) )) \<EOF>)<\n>
+>>
+
+Errors() ::= ""

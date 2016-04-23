@@ -1,0 +1,12 @@
+TestType() ::= "Lexer"
+
+Grammar ::= [
+	"L": {<grammar("L")>}
+]
+
+grammar(grammarName) ::= <<
+lexer grammar <grammarName>;
+ACTION2 : '[' (STRING | ~'"')*? ']';
+STRING : '"' ('\\"' | .)*? '"';
+WS : [ \t\r\n]+ -> skip;
+>>

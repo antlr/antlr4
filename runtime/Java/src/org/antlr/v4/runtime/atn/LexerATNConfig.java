@@ -31,52 +31,62 @@
 package org.antlr.v4.runtime.atn;
 
 import org.antlr.v4.runtime.misc.MurmurHash;
-import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.misc.Nullable;
+import org.antlr.v4.runtime.misc.ObjectEqualityComparator;
 
 public class LexerATNConfig extends ATNConfig {
-	/** Capture lexer action we traverse */
-	public int lexerActionIndex = -1;
+	/**
+	 * This is the backing field for {@link #getLexerActionExecutor}.
+	 */
+	private final LexerActionExecutor lexerActionExecutor;
 
 	private final boolean passedThroughNonGreedyDecision;
 
-	public LexerATNConfig(@NotNull ATNState state,
+	public LexerATNConfig(ATNState state,
 						  int alt,
-						  @Nullable PredictionContext context)
+						  PredictionContext context)
 	{
 		super(state, alt, context, SemanticContext.NONE);
 		this.passedThroughNonGreedyDecision = false;
+		this.lexerActionExecutor = null;
 	}
 
-	public LexerATNConfig(@NotNull ATNState state,
+	public LexerATNConfig(ATNState state,
 						  int alt,
-						  @Nullable PredictionContext context,
-						  int actionIndex)
+						  PredictionContext context,
+						  LexerActionExecutor lexerActionExecutor)
 	{
 		super(state, alt, context, SemanticContext.NONE);
-		this.lexerActionIndex = actionIndex;
+		this.lexerActionExecutor = lexerActionExecutor;
 		this.passedThroughNonGreedyDecision = false;
 	}
 
-	public LexerATNConfig(@NotNull LexerATNConfig c, @NotNull ATNState state) {
+	public LexerATNConfig(LexerATNConfig c, ATNState state) {
 		super(c, state, c.context, c.semanticContext);
-		this.lexerActionIndex = c.lexerActionIndex;
+		this.lexerActionExecutor = c.lexerActionExecutor;
 		this.passedThroughNonGreedyDecision = checkNonGreedyDecision(c, state);
 	}
 
-	public LexerATNConfig(@NotNull LexerATNConfig c, @NotNull ATNState state,
-						  int actionIndex)
+	public LexerATNConfig(LexerATNConfig c, ATNState state,
+						  LexerActionExecutor lexerActionExecutor)
 	{
 		super(c, state, c.context, c.semanticContext);
-		this.lexerActionIndex = actionIndex;
+		this.lexerActionExecutor = lexerActionExecutor;
 		this.passedThroughNonGreedyDecision = checkNonGreedyDecision(c, state);
 	}
 
-	public LexerATNConfig(@NotNull LexerATNConfig c, @NotNull ATNState state,
-						  @Nullable PredictionContext context) {
+	public LexerATNConfig(LexerATNConfig c, ATNState state,
+						  PredictionContext context) {
 		super(c, state, context, c.semanticContext);
-		this.lexerActionIndex = c.lexerActionIndex;
+		this.lexerActionExecutor = c.lexerActionExecutor;
 		this.passedThroughNonGreedyDecision = checkNonGreedyDecision(c, state);
+	}
+
+	/**
+	 * Gets the {@link LexerActionExecutor} capable of executing the embedded
+	 * action(s) for the current configuration.
+	 */
+	public final LexerActionExecutor getLexerActionExecutor() {
+		return lexerActionExecutor;
 	}
 
 	public final boolean hasPassedThroughNonGreedyDecision() {
@@ -91,7 +101,8 @@ public class LexerATNConfig extends ATNConfig {
 		hashCode = MurmurHash.update(hashCode, context);
 		hashCode = MurmurHash.update(hashCode, semanticContext);
 		hashCode = MurmurHash.update(hashCode, passedThroughNonGreedyDecision ? 1 : 0);
-		hashCode = MurmurHash.finish(hashCode, 5);
+		hashCode = MurmurHash.update(hashCode, lexerActionExecutor);
+		hashCode = MurmurHash.finish(hashCode, 6);
 		return hashCode;
 	}
 
@@ -106,6 +117,10 @@ public class LexerATNConfig extends ATNConfig {
 
 		LexerATNConfig lexerOther = (LexerATNConfig)other;
 		if (passedThroughNonGreedyDecision != lexerOther.passedThroughNonGreedyDecision) {
+			return false;
+		}
+
+		if (!ObjectEqualityComparator.INSTANCE.equals(lexerActionExecutor, lexerOther.lexerActionExecutor)) {
 			return false;
 		}
 

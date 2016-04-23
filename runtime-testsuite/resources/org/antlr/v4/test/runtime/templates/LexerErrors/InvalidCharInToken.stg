@@ -1,0 +1,20 @@
+TestType() ::= "Lexer"
+
+Grammar ::= [
+	"L": {<grammar("L")>}
+]
+
+Input() ::= "ax"
+
+Output() ::= <<
+[@0,2:1='\<EOF>',\<-1>,1:2]<\n>
+>>
+
+Errors() ::= <<
+line 1:0 token recognition error at: 'ax'<\n>
+>>
+
+grammar(grammarName) ::= <<
+lexer grammar <grammarName>;
+A : 'a' 'b' ;
+>>

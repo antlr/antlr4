@@ -1,0 +1,9 @@
+import "JavaExpressions.stg"
+
+Input() ::= "new T[((n-1) * x) + 1]"
+
+Output() ::= <<
+(s (e new (typespec T) [ (e (e ( (e (e ( (e (e n) - (e 1)) )) * (e x)) )) + (e 1)) ]) \<EOF>)<\n>
+>>
+
+Errors() ::= ""

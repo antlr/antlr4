@@ -32,13 +32,13 @@ package org.antlr.mojo.antlr4;
 import org.antlr.v4.Tool;
 import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.runtime.misc.MultiMap;
-import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Utils;
 import org.antlr.v4.tool.Grammar;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
+import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -49,11 +49,13 @@ import org.codehaus.plexus.compiler.util.scan.SimpleSourceInclusionScanner;
 import org.codehaus.plexus.compiler.util.scan.SourceInclusionScanner;
 import org.codehaus.plexus.compiler.util.scan.mapping.SourceMapping;
 import org.codehaus.plexus.compiler.util.scan.mapping.SuffixMapping;
+import org.sonatype.plexus.build.incremental.BuildContext;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.net.URI;
@@ -143,10 +145,11 @@ public class Antlr4Mojo extends AbstractMojo {
 	 * the generate phase of the plugin. Note that the plugin is smart enough to
 	 * realize that imported grammars should be included but not acted upon
 	 * directly by the ANTLR Tool.
-	 * <p/>
+	 * <p>
 	 * A set of Ant-like inclusion patterns used to select files from the source
 	 * directory for processing. By default, the pattern
 	 * <code>**&#47;*.g4</code> is used to select grammar files.
+	 * </p>
 	 */
     @Parameter
     protected Set<String> includes = new HashSet<String>();
@@ -181,6 +184,9 @@ public class Antlr4Mojo extends AbstractMojo {
 	@Parameter(defaultValue = "${basedir}/src/main/antlr4/imports")
     private File libDirectory;
 
+	@Component
+	private BuildContext buildContext;
+
     public File getSourceDirectory() {
         return sourceDirectory;
     }
@@ -206,9 +212,9 @@ public class Antlr4Mojo extends AbstractMojo {
      * The main entry point for this Mojo, it is responsible for converting
      * ANTLR 4.x grammars into the target language specified by the grammar.
      *
-     * @throws MojoExecutionException if a configuration or grammar error causes
+     * @exception MojoExecutionException if a configuration or grammar error causes
      * the code generation process to fail
-     * @throws MojoFailureException if an instance of the ANTLR 4 {@link Tool}
+     * @exception MojoFailureException if an instance of the ANTLR 4 {@link Tool}
      * cannot be created
      */
     @Override
@@ -347,9 +353,9 @@ public class Antlr4Mojo extends AbstractMojo {
     /**
      *
      * @param sourceDirectory
-     * @throws InclusionScanException
+     * @exception InclusionScanException
      */
-    @NotNull
+
     private List<List<String>> processGrammarFiles(List<String> args, File sourceDirectory) throws InclusionScanException {
         // Which files under the source set should we be looking for as grammar files
         SourceMapping mapping = new SuffixMapping("g4", Collections.<String>emptySet());
@@ -366,6 +372,22 @@ public class Antlr4Mojo extends AbstractMojo {
         scan.addSourceMapping(mapping);
         Set<File> grammarFiles = scan.getIncludedSources(sourceDirectory, null);
 
+        // We don't want the plugin to run for every grammar, regardless of whether
+        // it's changed since the last compilation. Check the mtime of the tokens vs
+        // the grammar file mtime to determine whether we even need to execute.
+        Set<File> grammarFilesToProcess = new HashSet<File>();
+
+        for (File grammarFile : grammarFiles) {
+            String tokensFileName = grammarFile.getName().split("\\.")[0] + ".tokens";
+            File outputFile = new File(outputDirectory, tokensFileName);
+            if ( (! outputFile.exists()) ||
+                 outputFile.lastModified() < grammarFile.lastModified() ) {
+                grammarFilesToProcess.add(grammarFile);
+            }
+        }
+
+        grammarFiles = grammarFilesToProcess;
+
         if (grammarFiles.isEmpty()) {
             getLog().info("No grammars to process");
 			return Collections.emptyList();
@@ -375,6 +397,12 @@ public class Antlr4Mojo extends AbstractMojo {
 		// Iterate each grammar file we were given and add it into the tool's list of
 		// grammars to process.
 		for (File grammarFile : grammarFiles) {
+			if (!buildContext.hasDelta(grammarFile)) {
+				continue;
+			}
+
+			buildContext.removeMessages(grammarFile);
+
 			getLog().debug("Grammar file '" + grammarFile.getPath() + "' detected.");
 
 			String relPathBase = findSourceSubdir(sourceDirectory, grammarFile.getPath());
@@ -452,7 +480,7 @@ public class Antlr4Mojo extends AbstractMojo {
 
 		public CustomTool(String[] args) {
 			super(args);
-			addListener(new Antlr4ErrorLog(getLog()));
+			addListener(new Antlr4ErrorLog(this, buildContext, getLog()));
 		}
 
 		@Override
@@ -486,8 +514,8 @@ public class Antlr4Mojo extends AbstractMojo {
 
 			URI relativePath = project.getBasedir().toURI().relativize(outputFile.toURI());
 			getLog().debug("  Writing file: " + relativePath);
-			FileWriter fw = new FileWriter(outputFile);
-			return new BufferedWriter(fw);
+			OutputStream outputStream = buildContext.newFileOutputStream(outputFile);
+			return new BufferedWriter(new OutputStreamWriter(outputStream));
 		}
 	}
 }

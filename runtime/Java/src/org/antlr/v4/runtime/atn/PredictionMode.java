@@ -33,7 +33,6 @@ package org.antlr.v4.runtime.atn;
 import org.antlr.v4.runtime.misc.AbstractEqualityComparator;
 import org.antlr.v4.runtime.misc.FlexibleHashMap;
 import org.antlr.v4.runtime.misc.MurmurHash;
-import org.antlr.v4.runtime.misc.NotNull;
 
 import java.util.BitSet;
 import java.util.Collection;
@@ -41,26 +40,69 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+/**
+ * This enumeration defines the prediction modes available in ANTLR 4 along with
+ * utility methods for analyzing configuration sets for conflicts and/or
+ * ambiguities.
+ */
 public enum PredictionMode {
-	/** Do only local context prediction (SLL style) and using
-	 *  heuristic which almost always works but is much faster
-	 *  than precise answer.
+	/**
+	 * The SLL(*) prediction mode. This prediction mode ignores the current
+	 * parser context when making predictions. This is the fastest prediction
+	 * mode, and provides correct results for many grammars. This prediction
+	 * mode is more powerful than the prediction mode provided by ANTLR 3, but
+	 * may result in syntax errors for grammar and input combinations which are
+	 * not SLL.
+	 *
+	 * <p>
+	 * When using this prediction mode, the parser will either return a correct
+	 * parse tree (i.e. the same parse tree that would be returned with the
+	 * {@link #LL} prediction mode), or it will report a syntax error. If a
+	 * syntax error is encountered when using the {@link #SLL} prediction mode,
+	 * it may be due to either an actual syntax error in the input or indicate
+	 * that the particular combination of grammar and input requires the more
+	 * powerful {@link #LL} prediction abilities to complete successfully.</p>
+	 *
+	 * <p>
+	 * This prediction mode does not provide any guarantees for prediction
+	 * behavior for syntactically-incorrect inputs.</p>
 	 */
 	SLL,
-
-	/** Full LL(*) that always gets right answer. For speed
-	 *  reasons, we terminate the prediction process when we know for
-	 *  sure which alt to predict. We don't always know what
-	 *  the ambiguity is in this mode.
+	/**
+	 * The LL(*) prediction mode. This prediction mode allows the current parser
+	 * context to be used for resolving SLL conflicts that occur during
+	 * prediction. This is the fastest prediction mode that guarantees correct
+	 * parse results for all combinations of grammars with syntactically correct
+	 * inputs.
+	 *
+	 * <p>
+	 * When using this prediction mode, the parser will make correct decisions
+	 * for all syntactically-correct grammar and input combinations. However, in
+	 * cases where the grammar is truly ambiguous this prediction mode might not
+	 * report a precise answer for <em>exactly which</em> alternatives are
+	 * ambiguous.</p>
+	 *
+	 * <p>
+	 * This prediction mode does not provide any guarantees for prediction
+	 * behavior for syntactically-incorrect inputs.</p>
 	 */
 	LL,
-
-	/** Tell the full LL prediction algorithm to pursue lookahead until
-	 *  it has uniquely predicted an alternative without conflict or it's
-	 *  certain that it's found an ambiguous input sequence.  when this
-	 *  variable is false. When true, the prediction process will
-	 *  continue looking for the exact ambiguous sequence even if
-	 *  it has already figured out which alternative to predict.
+	/**
+	 * The LL(*) prediction mode with exact ambiguity detection. In addition to
+	 * the correctness guarantees provided by the {@link #LL} prediction mode,
+	 * this prediction mode instructs the prediction algorithm to determine the
+	 * complete and exact set of ambiguous alternatives for every ambiguous
+	 * decision encountered while parsing.
+	 *
+	 * <p>
+	 * This prediction mode may be used for diagnosing ambiguities during
+	 * grammar development. Due to the performance overhead of calculating sets
+	 * of ambiguous alternatives, this prediction mode should be avoided when
+	 * the exact results are not necessary.</p>
+	 *
+	 * <p>
+	 * This prediction mode does not provide any guarantees for prediction
+	 * behavior for syntactically-incorrect inputs.</p>
 	 */
 	LL_EXACT_AMBIG_DETECTION;
 
@@ -77,7 +119,10 @@ public enum PredictionMode {
 		private AltAndContextConfigEqualityComparator() {
 		}
 
-		/** Code is function of (s, _, ctx, _) */
+		/**
+		 * The hash code is only a function of the {@link ATNState#stateNumber}
+		 * and {@link ATNConfig#context}.
+		 */
 		@Override
 		public int hashCode(ATNConfig o) {
 			int hashCode = MurmurHash.initialize(7);
@@ -99,137 +144,96 @@ public enum PredictionMode {
 	/**
 	 * Computes the SLL prediction termination condition.
 	 *
-	 * <p/>
-	 *
+	 * <p>
 	 * This method computes the SLL prediction termination condition for both of
-	 * the following cases.
+	 * the following cases.</p>
 	 *
 	 * <ul>
 	 * <li>The usual SLL+LL fallback upon SLL conflict</li>
 	 * <li>Pure SLL without LL fallback</li>
 	 * </ul>
 	 *
-	 * <p/>
+	 * <p><strong>COMBINED SLL+LL PARSING</strong></p>
 	 *
-	 * <strong>COMBINED SLL+LL PARSING</strong>
-	 *
-	 * <p/>
-	 *
-	 * When LL-fallback is enabled upon SLL conflict, correct predictions are
+	 * <p>When LL-fallback is enabled upon SLL conflict, correct predictions are
 	 * ensured regardless of how the termination condition is computed by this
 	 * method. Due to the substantially higher cost of LL prediction, the
 	 * prediction should only fall back to LL when the additional lookahead
-	 * cannot lead to a unique SLL prediction.
+	 * cannot lead to a unique SLL prediction.</p>
 	 *
-	 * <p/>
-	 *
-	 * Assuming combined SLL+LL parsing, an SLL configuration set with only
+	 * <p>Assuming combined SLL+LL parsing, an SLL configuration set with only
 	 * conflicting subsets should fall back to full LL, even if the
 	 * configuration sets don't resolve to the same alternative (e.g.
 	 * {@code {1,2}} and {@code {3,4}}. If there is at least one non-conflicting
 	 * configuration, SLL could continue with the hopes that more lookahead will
-	 * resolve via one of those non-conflicting configurations.
+	 * resolve via one of those non-conflicting configurations.</p>
 	 *
-	 * <p/>
-	 *
-	 * Here's the prediction termination rule them: SLL (for SLL+LL parsing)
+	 * <p>Here's the prediction termination rule them: SLL (for SLL+LL parsing)
 	 * stops when it sees only conflicting configuration subsets. In contrast,
-	 * full LL keeps going when there is uncertainty.
+	 * full LL keeps going when there is uncertainty.</p>
 	 *
-	 * <p/>
+	 * <p><strong>HEURISTIC</strong></p>
 	 *
-	 * <strong>HEURISTIC</strong>
-	 *
-	 * <p/>
-	 *
-	 * As a heuristic, we stop prediction when we see any conflicting subset
+	 * <p>As a heuristic, we stop prediction when we see any conflicting subset
 	 * unless we see a state that only has one alternative associated with it.
 	 * The single-alt-state thing lets prediction continue upon rules like
-	 * (otherwise, it would admit defeat too soon):
+	 * (otherwise, it would admit defeat too soon):</p>
 	 *
-	 * <p/>
+	 * <p>{@code [12|1|[], 6|2|[], 12|2|[]]. s : (ID | ID ID?) ';' ;}</p>
 	 *
-	 * {@code [12|1|[], 6|2|[], 12|2|[]]. s : (ID | ID ID?) ';' ;}
-	 *
-	 * <p/>
-	 *
-	 * When the ATN simulation reaches the state before {@code ';'}, it has a
+	 * <p>When the ATN simulation reaches the state before {@code ';'}, it has a
 	 * DFA state that looks like: {@code [12|1|[], 6|2|[], 12|2|[]]}. Naturally
 	 * {@code 12|1|[]} and {@code 12|2|[]} conflict, but we cannot stop
 	 * processing this node because alternative to has another way to continue,
-	 * via {@code [6|2|[]]}.
+	 * via {@code [6|2|[]]}.</p>
 	 *
-	 * <p/>
+	 * <p>It also let's us continue for this rule:</p>
 	 *
-	 * It also let's us continue for this rule:
+	 * <p>{@code [1|1|[], 1|2|[], 8|3|[]] a : A | A | A B ;}</p>
 	 *
-	 * <p/>
-	 *
-	 * {@code [1|1|[], 1|2|[], 8|3|[]] a : A | A | A B ;}
-	 *
-	 * <p/>
-	 *
-	 * After matching input A, we reach the stop state for rule A, state 1.
+	 * <p>After matching input A, we reach the stop state for rule A, state 1.
 	 * State 8 is the state right before B. Clearly alternatives 1 and 2
 	 * conflict and no amount of further lookahead will separate the two.
 	 * However, alternative 3 will be able to continue and so we do not stop
 	 * working on this state. In the previous example, we're concerned with
 	 * states associated with the conflicting alternatives. Here alt 3 is not
 	 * associated with the conflicting configs, but since we can continue
-	 * looking for input reasonably, don't declare the state done.
+	 * looking for input reasonably, don't declare the state done.</p>
 	 *
-	 * <p/>
+	 * <p><strong>PURE SLL PARSING</strong></p>
 	 *
-	 * <strong>PURE SLL PARSING</strong>
-	 *
-	 * <p/>
-	 *
-	 * To handle pure SLL parsing, all we have to do is make sure that we
+	 * <p>To handle pure SLL parsing, all we have to do is make sure that we
 	 * combine stack contexts for configurations that differ only by semantic
-	 * predicate. From there, we can do the usual SLL termination heuristic.
+	 * predicate. From there, we can do the usual SLL termination heuristic.</p>
 	 *
-	 * <p/>
+	 * <p><strong>PREDICATES IN SLL+LL PARSING</strong></p>
 	 *
-	 * <strong>PREDICATES IN SLL+LL PARSING</strong>
-	 *
-	 * <p/>
-	 *
-	 * SLL decisions don't evaluate predicates until after they reach DFA stop
+	 * <p>SLL decisions don't evaluate predicates until after they reach DFA stop
 	 * states because they need to create the DFA cache that works in all
 	 * semantic situations. In contrast, full LL evaluates predicates collected
 	 * during start state computation so it can ignore predicates thereafter.
 	 * This means that SLL termination detection can totally ignore semantic
-	 * predicates.
+	 * predicates.</p>
 	 *
-	 * <p/>
-	 *
-	 * Implementation-wise, {@link ATNConfigSet} combines stack contexts but not
+	 * <p>Implementation-wise, {@link ATNConfigSet} combines stack contexts but not
 	 * semantic predicate contexts so we might see two configurations like the
-	 * following.
+	 * following.</p>
 	 *
-	 * <p/>
+	 * <p>{@code (s, 1, x, {}), (s, 1, x', {p})}</p>
 	 *
-	 * {@code (s, 1, x, {}), (s, 1, x', {p})}
-	 *
-	 * <p/>
-	 *
-	 * Before testing these configurations against others, we have to merge
+	 * <p>Before testing these configurations against others, we have to merge
 	 * {@code x} and {@code x'} (without modifying the existing configurations).
 	 * For example, we test {@code (x+x')==x''} when looking for conflicts in
-	 * the following configurations.
+	 * the following configurations.</p>
 	 *
-	 * <p/>
+	 * <p>{@code (s, 1, x, {}), (s, 1, x', {p}), (s, 2, x'', {})}</p>
 	 *
-	 * {@code (s, 1, x, {}), (s, 1, x', {p}), (s, 2, x'', {})}
-	 *
-	 * <p/>
-	 *
-	 * If the configuration set has predicates (as indicated by
+	 * <p>If the configuration set has predicates (as indicated by
 	 * {@link ATNConfigSet#hasSemanticContext}), this algorithm makes a copy of
 	 * the configurations to strip out all of the predicates so that a standard
-	 * {@link ATNConfigSet} will merge everything ignoring predicates.
+	 * {@link ATNConfigSet} will merge everything ignoring predicates.</p>
 	 */
-	public static boolean hasSLLConflictTerminatingPrediction(PredictionMode mode, @NotNull ATNConfigSet configs) {
+	public static boolean hasSLLConflictTerminatingPrediction(PredictionMode mode, ATNConfigSet configs) {
 		/* Configs in rule stop states indicate reaching the end of the decision
 		 * rule (local context) or end of start rule (full context). If all
 		 * configs meet this condition, then none of the configurations is able
@@ -294,7 +298,7 @@ public enum PredictionMode {
 	 * @return {@code true} if all configurations in {@code configs} are in a
 	 * {@link RuleStopState}, otherwise {@code false}
 	 */
-	public static boolean allConfigsInRuleStopStates(@NotNull ATNConfigSet configs) {
+	public static boolean allConfigsInRuleStopStates(ATNConfigSet configs) {
 		for (ATNConfig config : configs) {
 			if (!(config.state instanceof RuleStopState)) {
 				return false;
@@ -307,86 +311,62 @@ public enum PredictionMode {
 	/**
 	 * Full LL prediction termination.
 	 *
-	 * <p/>
-	 *
-	 * Can we stop looking ahead during ATN simulation or is there some
+	 * <p>Can we stop looking ahead during ATN simulation or is there some
 	 * uncertainty as to which alternative we will ultimately pick, after
 	 * consuming more input? Even if there are partial conflicts, we might know
 	 * that everything is going to resolve to the same minimum alternative. That
 	 * means we can stop since no more lookahead will change that fact. On the
 	 * other hand, there might be multiple conflicts that resolve to different
 	 * minimums. That means we need more look ahead to decide which of those
-	 * alternatives we should predict.
+	 * alternatives we should predict.</p>
 	 *
-	 * <p/>
-	 *
-	 * The basic idea is to split the set of configurations {@code C}, into
+	 * <p>The basic idea is to split the set of configurations {@code C}, into
 	 * conflicting subsets {@code (s, _, ctx, _)} and singleton subsets with
 	 * non-conflicting configurations. Two configurations conflict if they have
 	 * identical {@link ATNConfig#state} and {@link ATNConfig#context} values
 	 * but different {@link ATNConfig#alt} value, e.g. {@code (s, i, ctx, _)}
-	 * and {@code (s, j, ctx, _)} for {@code i!=j}.
+	 * and {@code (s, j, ctx, _)} for {@code i!=j}.</p>
 	 *
-	 * <p/>
+	 * <p>Reduce these configuration subsets to the set of possible alternatives.
+	 * You can compute the alternative subsets in one pass as follows:</p>
 	 *
-	 * Reduce these configuration subsets to the set of possible alternatives.
-	 * You can compute the alternative subsets in one pass as follows:
+	 * <p>{@code A_s,ctx = {i | (s, i, ctx, _)}} for each configuration in
+	 * {@code C} holding {@code s} and {@code ctx} fixed.</p>
 	 *
-	 * <p/>
-	 *
-	 * {@code A_s,ctx = {i | (s, i, ctx, _)}} for each configuration in
-	 * {@code C} holding {@code s} and {@code ctx} fixed.
-	 *
-	 * <p/>
-	 *
-	 * Or in pseudo-code, for each configuration {@code c} in {@code C}:
+	 * <p>Or in pseudo-code, for each configuration {@code c} in {@code C}:</p>
 	 *
 	 * <pre>
 	 * map[c] U= c.{@link ATNConfig#alt alt} # map hash/equals uses s and x, not
 	 * alt and not pred
 	 * </pre>
 	 *
-	 * <p/>
+	 * <p>The values in {@code map} are the set of {@code A_s,ctx} sets.</p>
 	 *
-	 * The values in {@code map} are the set of {@code A_s,ctx} sets.
+	 * <p>If {@code |A_s,ctx|=1} then there is no conflict associated with
+	 * {@code s} and {@code ctx}.</p>
 	 *
-	 * <p/>
-	 *
-	 * If {@code |A_s,ctx|=1} then there is no conflict associated with
-	 * {@code s} and {@code ctx}.
-	 *
-	 * <p/>
-	 *
-	 * Reduce the subsets to singletons by choosing a minimum of each subset. If
+	 * <p>Reduce the subsets to singletons by choosing a minimum of each subset. If
 	 * the union of these alternative subsets is a singleton, then no amount of
 	 * more lookahead will help us. We will always pick that alternative. If,
 	 * however, there is more than one alternative, then we are uncertain which
 	 * alternative to predict and must continue looking for resolution. We may
 	 * or may not discover an ambiguity in the future, even if there are no
-	 * conflicting subsets this round.
+	 * conflicting subsets this round.</p>
 	 *
-	 * <p/>
-	 *
-	 * The biggest sin is to terminate early because it means we've made a
+	 * <p>The biggest sin is to terminate early because it means we've made a
 	 * decision but were uncertain as to the eventual outcome. We haven't used
 	 * enough lookahead. On the other hand, announcing a conflict too late is no
 	 * big deal; you will still have the conflict. It's just inefficient. It
-	 * might even look until the end of file.
+	 * might even look until the end of file.</p>
 	 *
-	 * <p/>
-	 *
-	 * No special consideration for semantic predicates is required because
+	 * <p>No special consideration for semantic predicates is required because
 	 * predicates are evaluated on-the-fly for full LL prediction, ensuring that
 	 * no configuration contains a semantic context during the termination
-	 * check.
+	 * check.</p>
 	 *
-	 * <p/>
+	 * <p><strong>CONFLICTING CONFIGS</strong></p>
 	 *
-	 * <strong>CONFLICTING CONFIGS</strong>
-	 *
-	 * <p/>
-	 *
-	 * Two configurations {@code (s, i, x)} and {@code (s, j, x')}, conflict
+	 * <p>Two configurations {@code (s, i, x)} and {@code (s, j, x')}, conflict
 	 * when {@code i!=j} but {@code x=x'}. Because we merge all
 	 * {@code (s, i, _)} configurations together, that means that there are at
 	 * most {@code n} configurations associated with state {@code s} for
@@ -399,38 +379,28 @@ public enum PredictionMode {
 	 * others resolve to {@code min(i)} as well. However, if {@code x} is
 	 * associated with {@code j>i} then at least one stack configuration for
 	 * {@code j} is not in conflict with alternative {@code i}. The algorithm
-	 * should keep going, looking for more lookahead due to the uncertainty.
+	 * should keep going, looking for more lookahead due to the uncertainty.</p>
 	 *
-	 * <p/>
-	 *
-	 * For simplicity, I'm doing a equality check between {@code x} and
+	 * <p>For simplicity, I'm doing a equality check between {@code x} and
 	 * {@code x'} that lets the algorithm continue to consume lookahead longer
 	 * than necessary. The reason I like the equality is of course the
 	 * simplicity but also because that is the test you need to detect the
-	 * alternatives that are actually in conflict.
+	 * alternatives that are actually in conflict.</p>
 	 *
-	 * <p/>
+	 * <p><strong>CONTINUE/STOP RULE</strong></p>
 	 *
-	 * <strong>CONTINUE/STOP RULE</strong>
-	 *
-	 * <p/>
-	 *
-	 * Continue if union of resolved alternative sets from non-conflicting and
+	 * <p>Continue if union of resolved alternative sets from non-conflicting and
 	 * conflicting alternative subsets has more than one alternative. We are
-	 * uncertain about which alternative to predict.
+	 * uncertain about which alternative to predict.</p>
 	 *
-	 * <p/>
-	 *
-	 * The complete set of alternatives, {@code [i for (_,i,_)]}, tells us which
+	 * <p>The complete set of alternatives, {@code [i for (_,i,_)]}, tells us which
 	 * alternatives are still in the running for the amount of input we've
 	 * consumed at this point. The conflicting sets let us to strip away
 	 * configurations that won't lead to more states because we resolve
 	 * conflicts to the configuration with a minimum alternate for the
-	 * conflicting set.
+	 * conflicting set.</p>
 	 *
-	 * <p/>
-	 *
-	 * <strong>CASES</strong>
+	 * <p><strong>CASES</strong></p>
 	 *
 	 * <ul>
 	 *
@@ -462,30 +432,24 @@ public enum PredictionMode {
 	 *
 	 * </ul>
 	 *
-	 * <strong>EXACT AMBIGUITY DETECTION</strong>
+	 * <p><strong>EXACT AMBIGUITY DETECTION</strong></p>
 	 *
-	 * <p/>
+	 * <p>If all states report the same conflicting set of alternatives, then we
+	 * know we have the exact ambiguity set.</p>
 	 *
-	 * If all states report the same conflicting set of alternatives, then we
-	 * know we have the exact ambiguity set.
+	 * <p><code>|A_<em>i</em>|&gt;1</code> and
+	 * <code>A_<em>i</em> = A_<em>j</em></code> for all <em>i</em>, <em>j</em>.</p>
 	 *
-	 * <p/>
-	 *
-	 * <code>|A_<em>i</em>|&gt;1</code> and
-	 * <code>A_<em>i</em> = A_<em>j</em></code> for all <em>i</em>, <em>j</em>.
-	 *
-	 * <p/>
-	 *
-	 * In other words, we continue examining lookahead until all {@code A_i}
+	 * <p>In other words, we continue examining lookahead until all {@code A_i}
 	 * have more than one alternative and all {@code A_i} are the same. If
 	 * {@code A={{1,2}, {1,3}}}, then regular LL prediction would terminate
 	 * because the resolved set is {@code {1}}. To determine what the real
 	 * ambiguity is, we have to know whether the ambiguity is between one and
 	 * two or one and three so we keep going. We can only stop prediction when
 	 * we need exact ambiguity detection when the sets look like
-	 * {@code A={{1,2}}} or {@code {{1,2},{1,2}}}, etc...
+	 * {@code A={{1,2}}} or {@code {{1,2},{1,2}}}, etc...</p>
 	 */
-	public static int resolvesToJustOneViableAlt(@NotNull Collection<BitSet> altsets) {
+	public static int resolvesToJustOneViableAlt(Collection<BitSet> altsets) {
 		return getSingleViableAlt(altsets);
 	}
 
@@ -497,7 +461,7 @@ public enum PredictionMode {
 	 * @return {@code true} if every {@link BitSet} in {@code altsets} has
 	 * {@link BitSet#cardinality cardinality} &gt; 1, otherwise {@code false}
 	 */
-	public static boolean allSubsetsConflict(@NotNull Collection<BitSet> altsets) {
+	public static boolean allSubsetsConflict(Collection<BitSet> altsets) {
 		return !hasNonConflictingAltSet(altsets);
 	}
 
@@ -509,7 +473,7 @@ public enum PredictionMode {
 	 * @return {@code true} if {@code altsets} contains a {@link BitSet} with
 	 * {@link BitSet#cardinality cardinality} 1, otherwise {@code false}
 	 */
-	public static boolean hasNonConflictingAltSet(@NotNull Collection<BitSet> altsets) {
+	public static boolean hasNonConflictingAltSet(Collection<BitSet> altsets) {
 		for (BitSet alts : altsets) {
 			if ( alts.cardinality()==1 ) {
 				return true;
@@ -526,7 +490,7 @@ public enum PredictionMode {
 	 * @return {@code true} if {@code altsets} contains a {@link BitSet} with
 	 * {@link BitSet#cardinality cardinality} &gt; 1, otherwise {@code false}
 	 */
-	public static boolean hasConflictingAltSet(@NotNull Collection<BitSet> altsets) {
+	public static boolean hasConflictingAltSet(Collection<BitSet> altsets) {
 		for (BitSet alts : altsets) {
 			if ( alts.cardinality()>1 ) {
 				return true;
@@ -542,7 +506,7 @@ public enum PredictionMode {
 	 * @return {@code true} if every member of {@code altsets} is equal to the
 	 * others, otherwise {@code false}
 	 */
-	public static boolean allSubsetsEqual(@NotNull Collection<BitSet> altsets) {
+	public static boolean allSubsetsEqual(Collection<BitSet> altsets) {
 		Iterator<BitSet> it = altsets.iterator();
 		BitSet first = it.next();
 		while ( it.hasNext() ) {
@@ -559,7 +523,7 @@ public enum PredictionMode {
 	 *
 	 * @param altsets a collection of alternative subsets
 	 */
-	public static int getUniqueAlt(@NotNull Collection<BitSet> altsets) {
+	public static int getUniqueAlt(Collection<BitSet> altsets) {
 		BitSet all = getAlts(altsets);
 		if ( all.cardinality()==1 ) return all.nextSetBit(0);
 		return ATN.INVALID_ALT_NUMBER;
@@ -573,12 +537,21 @@ public enum PredictionMode {
 	 * @param altsets a collection of alternative subsets
 	 * @return the set of represented alternatives in {@code altsets}
 	 */
-	public static BitSet getAlts(@NotNull Collection<BitSet> altsets) {
+	public static BitSet getAlts(Collection<BitSet> altsets) {
 		BitSet all = new BitSet();
 		for (BitSet alts : altsets) {
 			all.or(alts);
 		}
 		return all;
+	}
+
+	/** Get union of all alts from configs. @since 4.5.1 */
+	public static BitSet getAlts(ATNConfigSet configs) {
+		BitSet alts = new BitSet();
+		for (ATNConfig config : configs) {
+			alts.set(config.alt);
+		}
+		return alts;
 	}
 
 	/**
@@ -590,7 +563,6 @@ public enum PredictionMode {
 	 * alt and not pred
 	 * </pre>
 	 */
-	@NotNull
 	public static Collection<BitSet> getConflictingAltSubsets(ATNConfigSet configs) {
 		AltAndContextMap configToAlts = new AltAndContextMap();
 		for (ATNConfig c : configs) {
@@ -612,8 +584,7 @@ public enum PredictionMode {
 	 * map[c.{@link ATNConfig#state state}] U= c.{@link ATNConfig#alt alt}
 	 * </pre>
 	 */
-	@NotNull
-	public static Map<ATNState, BitSet> getStateToAltMap(@NotNull ATNConfigSet configs) {
+	public static Map<ATNState, BitSet> getStateToAltMap(ATNConfigSet configs) {
 		Map<ATNState, BitSet> m = new HashMap<ATNState, BitSet>();
 		for (ATNConfig c : configs) {
 			BitSet alts = m.get(c.state);
@@ -626,7 +597,7 @@ public enum PredictionMode {
 		return m;
 	}
 
-	public static boolean hasStateAssociatedWithOneAlt(@NotNull ATNConfigSet configs) {
+	public static boolean hasStateAssociatedWithOneAlt(ATNConfigSet configs) {
 		Map<ATNState, BitSet> x = getStateToAltMap(configs);
 		for (BitSet alts : x.values()) {
 			if ( alts.cardinality()==1 ) return true;
@@ -634,7 +605,7 @@ public enum PredictionMode {
 		return false;
 	}
 
-	public static int getSingleViableAlt(@NotNull Collection<BitSet> altsets) {
+	public static int getSingleViableAlt(Collection<BitSet> altsets) {
 		BitSet viableAlts = new BitSet();
 		for (BitSet alts : altsets) {
 			int minAlt = alts.nextSetBit(0);

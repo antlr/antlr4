@@ -32,7 +32,6 @@ package org.antlr.v4.automata;
 
 import org.antlr.v4.runtime.atn.ATNState;
 import org.antlr.v4.runtime.atn.Transition;
-import org.antlr.v4.runtime.misc.NotNull;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -42,11 +41,11 @@ import java.util.Set;
  *  visitState() to provide functionality.
  */
 public class ATNVisitor {
-	public void visit(@NotNull ATNState s) {
+	public void visit(ATNState s) {
 		visit_(s, new HashSet<Integer>());
 	}
 
-	public void visit_(@NotNull ATNState s, @NotNull Set<Integer> visited) {
+	public void visit_(ATNState s, Set<Integer> visited) {
 		if ( !visited.add(s.stateNumber) ) return;
 		visited.add(s.stateNumber);
 
@@ -58,5 +57,5 @@ public class ATNVisitor {
 		}
 	}
 
-	public void visitState(@NotNull ATNState s) { }
+	public void visitState(ATNState s) { }
 }
