@@ -354,15 +354,17 @@ static std::wstring _serializedATN;
 // Constructs the serialized ATN and writes init code for static member vars.
 SerializedATN(model) ::= <<
 <if (rest(model.segments))>
-<model.segments: {segment | static std::wstring _serializedATNSegment<i0> =
-  L"<segment; wrap={"<\n>   "}>";}; separator="\n">
+<model.segments: {segment | static std::wstring _serializedATNSegment<i0> = {
+  <segment; wrap={<\n>   }>
+\};}; separator="\n">
 _serializedATN =
   <model.segments: {segment | _serializedATNSegment<i0>}; separator=" +\n">;
   
 <else>
 <! only one segment, can be inlined !>
-_serializedATN =
-  L"<model.serialized; wrap = {"<\n>  "}>";
+_serializedATN = {
+  <model.serialized; wrap = {<\n>  }>
+};
 <endif>
 
 atn::ATNDeserializer deserializer;

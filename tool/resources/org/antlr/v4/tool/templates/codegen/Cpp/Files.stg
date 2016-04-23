@@ -154,10 +154,10 @@ class <file.grammarName>BaseListener : public <file.grammarName>Listener {
   void exit<lname; format="cap">(<file.parserName>::<lname; format = "cap">Context *ctx) { \}
 }; separator="\n">
 
-  void enterEveryRule(ParserRuleContext ctx) { }
-  void exitEveryRule(ParserRuleContext ctx) { }
-  void visitTerminal(tree::TerminalNode node) { }
-  void visitErrorNode(tree::ErrorNode node) { }
+  void enterEveryRule(ParserRuleContext::Ref ctx) { }
+  void exitEveryRule(ParserRuleContext::Ref ctx) { }
+  void visitTerminal(std::shared_ptr\<tree::TerminalNode> node) { }
+  void visitErrorNode(std::shared_ptr\<tree::ErrorNode> node) { }
 };
 
 <if (file.genPackage)>
@@ -239,10 +239,11 @@ namespace <file.genPackage> {
 template \<typename T>
 class <file.grammarName>BaseVisitor : public tree::AbstractParseTreeVisitor\<T>, public <file.grammarName>Visitor\<T> {
 public:
-  <file.visitorNames: {
-    lname | virtual T* visit<lname; format = "cap">(<file.parserName>::<lname; format = "cap">Context *ctx) <\\>
-      override { return tree::AbstractParseTreeVisitor\<T>::visitChildren(ctx); \}
-  }; separator="\n">
+<file.visitorNames: { lname |
+  virtual T* visit<lname; format = "cap">(<file.parserName>::<lname; format = "cap">Context *ctx) override {
+    return tree::AbstractParseTreeVisitor\<T>::visitChildren(ctx);
+  \}
+}; separator="\n">
 };
 
 <if(file.genPackage)>
