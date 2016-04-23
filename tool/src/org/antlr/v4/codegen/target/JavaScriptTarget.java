@@ -74,7 +74,7 @@ public class JavaScriptTarget extends Target {
 
     @Override
     public String getVersion() {
-        return "4.5.2";
+        return "4.5.3";
     }
 
     public Set<String> getBadWords() {
@@ -93,11 +93,11 @@ public class JavaScriptTarget extends Target {
 
 	/**
 	 * {@inheritDoc}
-	 * <p/>
+	 * <p>
 	 * For Java, this is the translation {@code 'a\n"'} &rarr; {@code "a\n\""}.
 	 * Expect single quotes around the incoming literal. Just flip the quotes
 	 * and replace double quotes with {@code \"}.
-	 * <p/>
+	 * <p>
 	 * Note that we have decided to allow people to use '\"' without penalty, so
 	 * we must build the target string in a loop as {@link String#replace}
 	 * cannot handle both {@code \"} and {@code "} without a lot of messing

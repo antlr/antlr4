@@ -50,7 +50,7 @@ function checkParams(params, isCfg) {
 	} else {
 		var props = {};
 		props.state = params.state || null;
-		props.alt = params.alt || null;
+		props.alt = (params.alt === undefined) ? null : params.alt;
 		props.context = params.context || null;
 		props.semanticContext = params.semanticContext || null;
 		if(isCfg) {

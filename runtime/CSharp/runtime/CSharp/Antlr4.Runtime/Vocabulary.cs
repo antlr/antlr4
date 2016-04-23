@@ -67,6 +67,8 @@ namespace Antlr4.Runtime
         [NotNull]
         private readonly string[] displayNames;
 
+        private readonly int maxTokenType;
+
         /// <summary>
         /// Constructs a new instance of
         /// <see cref="Vocabulary"/>
@@ -126,6 +128,19 @@ namespace Antlr4.Runtime
             this.literalNames = literalNames != null ? literalNames : EmptyNames;
             this.symbolicNames = symbolicNames != null ? symbolicNames : EmptyNames;
             this.displayNames = displayNames != null ? displayNames : EmptyNames;
+			this.maxTokenType =
+				System.Math.Max(this.displayNames.Length,
+						 System.Math.Max(this.literalNames.Length, this.symbolicNames.Length)) - 1;
+
+        }
+
+		/// <summary>
+		/// Returns the highest token type value. It can be used to iterate from
+		/// zero to that number, inclusively, thus querying all stored entries.
+		/// </summary>
+        public virtual int getMaxTokenType()
+        {
+        	return maxTokenType;
         }
 
         [return: Nullable]

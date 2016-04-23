@@ -166,9 +166,18 @@ LexerActionExecutor.prototype.equals = function(other) {
 		return true;
 	} else if (!(other instanceof LexerActionExecutor)) {
 		return false;
+	} else if (this._hashString != other._hashString) {
+		return false;
+	} else if (this.lexerActions.length != other.lexerActions.length) {
+		return false;
 	} else {
-		return this._hashString === other._hashString &&
-				this.lexerActions === other.lexerActions;
+		var numActions = this.lexerActions.length
+		for (var idx = 0; idx < numActions; ++idx) {
+			if (!this.lexerActions[idx].equals(other.lexerActions[idx])) {
+				return false;
+			}
+		}
+		return true;
 	}
 };
 

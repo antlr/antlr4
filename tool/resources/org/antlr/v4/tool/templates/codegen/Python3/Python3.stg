@@ -46,7 +46,7 @@ pythonTypeInitMap ::= [
 
 // args must be <object-model-object>, <fields-resulting-in-STs>
 
-ParserFile(file, parser, namedActions) ::= <<
+ParserFile(file, parser, namedActions, contextSuperClass) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 # encoding: utf-8
 from antlr4 import *
@@ -638,9 +638,8 @@ ListLabelName(label)		  ::= "<label>"
 CaptureNextToken(d) ::= "<d.varName> = self._input.LT(1)"
 CaptureNextTokenType(d) ::= "<d.varName> = self._input.LA(1)"
 
-StructDecl(struct,ctorAttrs,attrs,getters,dispatchMethods,interfaces,extensionMembers,
-           superClass={ParserRuleContext}) ::= <<
-class <struct.name>(<superClass>):
+StructDecl(struct,ctorAttrs,attrs,getters,dispatchMethods,interfaces,extensionMembers) ::= <<
+class <struct.name>(<if(contextSuperClass)><contextSuperClass><else>ParserRuleContext<endif>):
 
     def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1<struct.ctorAttrs:{a | , <a.name><if(a.type)>:<a.type><endif>=None}>):
         super().__init__(parent, invokingState)

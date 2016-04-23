@@ -135,15 +135,20 @@ cp ~/.m2/repository/org/antlr/antlr4/4.5.2/antlr4-4.5.2.jar ~/antlr/sites/websit
 cd ~/antlr/sites/website-antlr4/download
 git add antlr-4.5.2-complete.jar
 git add antlr-runtime-4.5.2.jar 
-git commit -a -m 'add 4.5.2 jars'
-git push origin gh-pages
 ```
 
 Update on site:
 
 *   download.html
 *   index.html
+*   api/index.html
+*   download/index.html
 *   scripts/topnav.js
+
+```
+git commit -a -m 'add 4.5.2 jars'
+git push origin gh-pages
+```
 
 ## Deploying Targets
 

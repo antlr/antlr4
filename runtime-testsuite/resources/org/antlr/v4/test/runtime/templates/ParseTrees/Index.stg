@@ -6,5 +6,6 @@ TestTemplates ::= [
 	"RuleRef": [],
 	"ExtraToken": [],
 	"NoViableAlt": [],
-	"Sync": []
+	"Sync": [],
+	"AltNum": []
 ]

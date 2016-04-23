@@ -286,7 +286,7 @@ public class ParserATNFactory implements ATNFactory {
 	 * For reference to rule {@code r}, build
 	 *
 	 * <pre>
-	 *  o->(r)  o
+	 *  o-&gt;(r)  o
 	 * </pre>
 	 *
 	 * where {@code (r)} is the start of rule {@code r} and the trailing
@@ -391,24 +391,24 @@ public class ParserATNFactory implements ATNFactory {
 	 * From {@code A|B|..|Z} alternative block build
 	 *
 	 * <pre>
-	 *  o->o-A->o->o (last ATNState is BlockEndState pointed to by all alts)
+	 *  o-&gt;o-A-&gt;o-&gt;o (last ATNState is BlockEndState pointed to by all alts)
 	 *  |          ^
-	 *  |->o-B->o--|
+	 *  |-&gt;o-B-&gt;o--|
 	 *  |          |
 	 *  ...        |
 	 *  |          |
-	 *  |->o-Z->o--|
+	 *  |-&gt;o-Z-&gt;o--|
 	 * </pre>
 	 *
 	 * So start node points at every alternative with epsilon transition and
 	 * every alt right side points at a block end ATNState.
-	 * <p/>
+	 * <p>
 	 * Special case: only one alternative: don't make a block with alt
 	 * begin/end.
-	 * <p/>
+	 * <p>
 	 * Special case: if just a list of tokens/chars/sets, then collapse to a
-	 * single edged o-set->o graph.
-	 * <p/>
+	 * single edged o-set-&gt;o graph.
+	 * <p>
 	 * TODO: Set alt number (1..n) in the states?
 	 */
 
@@ -506,9 +506,9 @@ public class ParserATNFactory implements ATNFactory {
 	 * From {@code (A)?} build either:
 	 *
 	 * <pre>
-	 *  o--A->o
+	 *  o--A-&gt;o
 	 *  |     ^
-	 *  o---->|
+	 *  o----&gt;|
 	 * </pre>
 	 *
 	 * or, if {@code A} is a block, just add an empty alt to the end of the
@@ -535,7 +535,7 @@ public class ParserATNFactory implements ATNFactory {
 	 * <pre>
 	 *   |---------|
 	 *   v         |
-	 *  [o-blk-o]->o->o
+	 *  [o-blk-o]-&gt;o-&gt;o
 	 * </pre>
 	 *
 	 * We add a decision for loop back node to the existing one at {@code blk}
@@ -583,7 +583,7 @@ public class ParserATNFactory implements ATNFactory {
 	 * <pre>
 	 *   |-------------|
 	 *   v             |
-	 *   o--[o-blk-o]->o  o
+	 *   o--[o-blk-o]-&gt;o  o
 	 *   |                ^
 	 *   -----------------|
 	 * </pre>

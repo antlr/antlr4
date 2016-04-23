@@ -138,7 +138,7 @@ public class ActionTranslator implements ActionSplitterListener {
 													ActionAST node)
 	{
 		String action = tokenWithinAction.getText();
-		if ( action.charAt(0)=='{' ) {
+		if ( action!=null && action.length()>0 && action.charAt(0)=='{' ) {
 			int firstCurly = action.indexOf('{');
 			int lastCurly = action.lastIndexOf('}');
 			if ( firstCurly>=0 && lastCurly>=0 ) {
@@ -158,7 +158,7 @@ public class ActionTranslator implements ActionSplitterListener {
 		translator.rf = rf;
         factory.getGrammar().tool.log("action-translator", "translate " + action);
 		String altLabel = node.getAltLabel();
-		if ( rf!=null ) { 
+		if ( rf!=null ) {
 		    translator.nodeContext = rf.ruleCtx;
 	        if ( altLabel!=null ) translator.nodeContext = rf.altLabelCtxs.get(altLabel);
 		}
