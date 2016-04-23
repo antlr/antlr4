@@ -14,6 +14,8 @@
 
 #include "Strings.h"
 
+#include <Windows.h>
+
 using namespace antlrcpptest;
 using namespace org::antlr::v4::runtime;
 
@@ -25,7 +27,8 @@ int main(int argc, const char * argv[]) {
   TParser parser(&tokens);
   std::shared_ptr<tree::ParseTree> tree = parser.main();
 
-  std::cout << antlrcpp::ws2s(tree->toStringTree(&parser)) << std::endl;
+  std::wstring s = tree->toStringTree(&parser);
+  OutputDebugString(s.data());
 
   return 0;
 }

@@ -45,6 +45,8 @@ namespace atn {
   public:
     BlockStartState *startState;
 
+    BlockEndState();
+
     virtual int getStateType() override;
   };
 

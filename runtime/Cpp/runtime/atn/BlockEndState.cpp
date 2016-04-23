@@ -33,6 +33,9 @@
 
 using namespace org::antlr::v4::runtime::atn;
 
+BlockEndState::BlockEndState() : startState(nullptr) {
+}
+
 int BlockEndState::getStateType() {
   return BLOCK_END;
 }

@@ -52,7 +52,7 @@ ATN::ATN() : ATN(ATNType::LEXER, 0) {
 /**
  * Required to be defined (even though not used) as we have an explicit move assignment operator.
  */
-ATN::ATN(const ATN& other) {
+ATN::ATN(const ATN &other) {
   states = other.states;
   decisionToState = other.decisionToState;
   ruleToStartState = other.ruleToStartState;
@@ -69,7 +69,7 @@ ATN::ATN(ATNType grammarType, size_t maxTokenType) : grammarType(grammarType), m
 
 ATN::~ATN() {
   for (ATNState *state : states) {
-    delete state;
+    //delete state;
   }
 }
 

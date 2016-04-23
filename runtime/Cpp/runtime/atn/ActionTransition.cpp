@@ -33,10 +33,12 @@
 
 using namespace org::antlr::v4::runtime::atn;
 
-ActionTransition::ActionTransition(ATNState *target, int ruleIndex) : Transition(target), ruleIndex(ruleIndex), actionIndex(0), isCtxDependent(false) {
+ActionTransition::ActionTransition(ATNState *target, int ruleIndex)
+  : Transition(target), ruleIndex(ruleIndex), actionIndex(0), isCtxDependent(false) {
 }
 
-ActionTransition::ActionTransition(ATNState *target, int ruleIndex, int actionIndex, bool isCtxDependent) : Transition(target), ruleIndex(ruleIndex), actionIndex(actionIndex), isCtxDependent(isCtxDependent) {
+ActionTransition::ActionTransition(ATNState *target, int ruleIndex, int actionIndex, bool isCtxDependent)
+  : Transition(target), ruleIndex(ruleIndex), actionIndex(actionIndex), isCtxDependent(isCtxDependent) {
 }
 
 int ActionTransition::getSerializationType() const {
