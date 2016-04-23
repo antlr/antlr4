@@ -103,8 +103,8 @@ namespace atn {
   public:
     virtual ~ATNState();
 
-    static const int INITIAL_NUM_TRANSITIONS = 4;
-    static const int INVALID_STATE_NUMBER = -1;
+    static const int INITIAL_NUM_TRANSITIONS;
+    static const int INVALID_STATE_NUMBER;
 
     enum {
       ATN_INVALID_TYPE = 0,

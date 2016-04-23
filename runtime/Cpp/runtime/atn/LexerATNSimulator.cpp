@@ -315,7 +315,7 @@ atn::ATNState *LexerATNSimulator::getReachableTarget(Transition *trans, ssize_t 
 }
 
 std::shared_ptr<ATNConfigSet> LexerATNSimulator::computeStartState(CharStream *input, ATNState *p) {
-  std::shared_ptr<EmptyPredictionContext> initialContext  = PredictionContext::EMPTY; // ml: the purpose of this assignment is unclear
+  std::shared_ptr<PredictionContext> initialContext  = PredictionContext::EMPTY; // ml: the purpose of this assignment is unclear
   std::shared_ptr<ATNConfigSet> configs = std::make_shared<OrderedATNConfigSet>();
   for (size_t i = 0; i < p->getNumberOfTransitions(); i++) {
     ATNState *target = p->transition(i)->target;

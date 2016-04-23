@@ -68,42 +68,50 @@
 
 #include "ATNDeserializer.h"
 
+using namespace org::antlr::v4::runtime;
 using namespace org::antlr::v4::runtime::atn;
 using namespace antlrcpp;
 
-const size_t ATNDeserializer::SERIALIZED_VERSION;
-
-/**
- * This value should never change. Updates following this version are
- * reflected as change in the unique ID SERIALIZED_UUID.
- */
-Guid ATNDeserializer::BASE_SERIALIZED_UUID("33761B2D-78BB-4A43-8B0B-4F5BEE8AACF3");
-Guid ATNDeserializer::ADDED_PRECEDENCE_TRANSITIONS("1DA0C57D-6C06-438A-9B27-10BCB3CE0F61");
-Guid ATNDeserializer::ADDED_LEXER_ACTIONS("AADB8D7E-AEEF-4415-AD2B-8204D6CF042E");
-std::vector<Guid> ATNDeserializer::SUPPORTED_UUIDS = { BASE_SERIALIZED_UUID, ADDED_PRECEDENCE_TRANSITIONS };
-Guid ATNDeserializer::SERIALIZED_UUID = ADDED_PRECEDENCE_TRANSITIONS; //ADDED_LEXER_ACTIONS;
+const size_t ATNDeserializer::SERIALIZED_VERSION = 3;
 
 ATNDeserializer::ATNDeserializer(): ATNDeserializer(ATNDeserializationOptions::getDefaultOptions()) {
 }
 
 ATNDeserializer::ATNDeserializer(const ATNDeserializationOptions& dso): deserializationOptions(dso) {
-  // XXX: wery weird, from one moment to the next static initialization stopped working. Find out why.
-  if (SUPPORTED_UUIDS.empty()) {
-    BASE_SERIALIZED_UUID = Guid("33761B2D-78BB-4A43-8B0B-4F5BEE8AACF3");
-    ADDED_PRECEDENCE_TRANSITIONS = Guid("1DA0C57D-6C06-438A-9B27-10BCB3CE0F61");
-    ADDED_LEXER_ACTIONS = Guid("AADB8D7E-AEEF-4415-AD2B-8204D6CF042E");
-    SUPPORTED_UUIDS = { BASE_SERIALIZED_UUID, ADDED_PRECEDENCE_TRANSITIONS };
-    SERIALIZED_UUID = ADDED_PRECEDENCE_TRANSITIONS;
-  }
+}
+
+/**
+ * This value should never change. Updates following this version are
+ * reflected as change in the unique ID SERIALIZED_UUID.
+ */
+Guid ATNDeserializer::ADDED_PRECEDENCE_TRANSITIONS() {
+  return "1DA0C57D-6C06-438A-9B27-10BCB3CE0F61";
+}
+
+Guid ATNDeserializer::ADDED_LEXER_ACTIONS() {
+  return "AADB8D7E-AEEF-4415-AD2B-8204D6CF042E";
+}
+
+Guid ATNDeserializer::SERIALIZED_UUID() {
+  return ADDED_PRECEDENCE_TRANSITIONS(); //ADDED_LEXER_ACTIONS;
+}
+
+Guid ATNDeserializer::BASE_SERIALIZED_UUID() {
+  return "33761B2D-78BB-4A43-8B0B-4F5BEE8AACF3";
+}
+
+std::vector<Guid>& ATNDeserializer::SUPPORTED_UUIDS() {
+  static std::vector<Guid> singleton = { BASE_SERIALIZED_UUID(), ADDED_PRECEDENCE_TRANSITIONS() };
+  return singleton;
 }
 
 bool ATNDeserializer::isFeatureSupported(const Guid &feature, const Guid &actualUuid) {
-  auto featureIterator = std::find(SUPPORTED_UUIDS.begin(), SUPPORTED_UUIDS.end(), feature);
-  if (featureIterator == SUPPORTED_UUIDS.end()) {
+  auto featureIterator = std::find(SUPPORTED_UUIDS().begin(), SUPPORTED_UUIDS().end(), feature);
+  if (featureIterator == SUPPORTED_UUIDS().end()) {
     return false;
   }
-  auto actualIterator = std::find(SUPPORTED_UUIDS.begin(), SUPPORTED_UUIDS.end(), actualUuid);
-  if (actualIterator == SUPPORTED_UUIDS.end()) {
+  auto actualIterator = std::find(SUPPORTED_UUIDS().begin(), SUPPORTED_UUIDS().end(), actualUuid);
+  if (actualIterator == SUPPORTED_UUIDS().end()) {
     return false;
   }
 
@@ -112,7 +120,7 @@ bool ATNDeserializer::isFeatureSupported(const Guid &feature, const Guid &actual
 
 ATN ATNDeserializer::deserialize(const std::wstring& input) {
   // Don't adjust the first value since that's the version number.
-  uint16_t data[input.size()];
+  std::vector<uint16_t> data(input.size());
   data[0] = input[0];
   for (size_t i = 1; i < input.size(); ++i) {
     data[i] = input[i] - 2;
@@ -126,17 +134,17 @@ ATN ATNDeserializer::deserialize(const std::wstring& input) {
     throw UnsupportedOperationException(reason);
   }
 
-  Guid uuid = toUUID(data, p);
+  Guid uuid = toUUID(data.data(), p);
   p += 8;
-  auto uuidIterator = std::find(SUPPORTED_UUIDS.begin(), SUPPORTED_UUIDS.end(), uuid);
-  if (uuidIterator == SUPPORTED_UUIDS.end()) {
+  auto uuidIterator = std::find(SUPPORTED_UUIDS().begin(), SUPPORTED_UUIDS().end(), uuid);
+  if (uuidIterator == SUPPORTED_UUIDS().end()) {
     std::string reason = "Could not deserialize ATN with UUID " + uuid.toString() + " (expected " +
-      SERIALIZED_UUID.toString() + " or a legacy UUID).";
+      SERIALIZED_UUID().toString() + " or a legacy UUID).";
 
     throw UnsupportedOperationException(reason);
   }
 
-  bool supportsPrecedencePredicates = isFeatureSupported(ADDED_PRECEDENCE_TRANSITIONS, uuid);
+  bool supportsPrecedencePredicates = isFeatureSupported(ADDED_PRECEDENCE_TRANSITIONS(), uuid);
 
   ATNType grammarType = (ATNType)data[p++];
   size_t maxTokenType = data[p++];

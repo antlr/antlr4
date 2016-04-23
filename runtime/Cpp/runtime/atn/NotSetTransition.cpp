@@ -33,6 +33,7 @@
 #include "ATNState.h"
 #include "IntervalSet.h"
 
+using namespace org::antlr::v4::runtime;
 using namespace org::antlr::v4::runtime::atn;
 
 NotSetTransition::NotSetTransition(ATNState *target, const misc::IntervalSet &set) : SetTransition(target, set) {

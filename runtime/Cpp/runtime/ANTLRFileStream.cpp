@@ -49,7 +49,7 @@ void ANTLRFileStream::load(const std::string &fileName, const std::string &encod
   enum Encoding { ANSI, UTF8, UTF16LE } encodingType = ANSI;
 
 #ifdef _WIN32
-  std::ifstream stream(antlrcpp::s2ws(filename).c_str(), std::ios::binary);
+  std::ifstream stream(antlrcpp::s2ws(fileName).c_str(), std::ios::binary);
 #else
   std::ifstream stream(_fileName.c_str(), std::ifstream::binary);
 #endif

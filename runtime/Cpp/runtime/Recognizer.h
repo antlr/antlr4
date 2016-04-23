@@ -44,8 +44,8 @@ namespace runtime {
     Recognizer();
 
   private:
-    static std::map<std::vector<std::wstring>, std::map<std::wstring, int>> _tokenTypeMapCache;
-    static std::map<std::vector<std::wstring>, std::map<std::wstring, int>> _ruleIndexMapCache;
+    static std::map<std::vector<std::wstring>, std::map<std::wstring, size_t>> _tokenTypeMapCache;
+    static std::map<std::vector<std::wstring>, std::map<std::wstring, size_t>> _ruleIndexMapCache;
 
     ProxyErrorListener _proxListener; // Manages a collection of listeners.
 
@@ -73,16 +73,16 @@ namespace runtime {
     /// <p/>
     /// Used for XPath and tree pattern compilation.
     /// </summary>
-    virtual std::map<std::wstring, int> getTokenTypeMap();
+    virtual std::map<std::wstring, size_t> getTokenTypeMap();
 
     /// <summary>
     /// Get a map from rule names to rule indexes.
     /// <p/>
     /// Used for XPath and tree pattern compilation.
     /// </summary>
-    virtual std::map<std::wstring, int> getRuleIndexMap();
+    virtual std::map<std::wstring, size_t> getRuleIndexMap();
 
-    virtual int getTokenType(const std::wstring &tokenName);
+    virtual size_t getTokenType(const std::wstring &tokenName);
 
     /// <summary>
     /// If this recognizer was generated, it will have a serialized ATN

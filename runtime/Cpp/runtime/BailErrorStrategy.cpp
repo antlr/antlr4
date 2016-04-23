@@ -48,11 +48,16 @@ void BailErrorStrategy::recover(Parser *recognizer, const RecognitionException &
     context = context->getParent().lock();
   } while (true);
 
+#if defined(_MSC_FULL_VER) && _MSC_FULL_VER < 190023026
+  // throw_with_nested is not available before VS 2015.
+  std::rethrow_exception(exception);
+#else
   try {
     std::rethrow_exception(exception); // Throw the exception to be able to catch and rethrow nested.
   } catch (RecognitionException &inner) {
     std::throw_with_nested(ParseCancellationException());
   }
+#endif
 }
 
 Token::Ref BailErrorStrategy::recoverInline(Parser *recognizer)  {
@@ -67,11 +72,15 @@ Token::Ref BailErrorStrategy::recoverInline(Parser *recognizer)  {
     context = context->getParent().lock();
   } while (true);
 
+#if defined(_MSC_FULL_VER) && _MSC_FULL_VER < 190023026
+  throw e;
+#else
   try {
     throw e;
   } catch (InputMismatchException &inner) {
     std::throw_with_nested(ParseCancellationException());
   }
+#endif
 }
 
 void BailErrorStrategy::sync(Parser *recognizer) {

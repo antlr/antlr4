@@ -116,7 +116,12 @@ ParseTreePattern ParseTreePatternMatcher::compile(const std::wstring &pattern, i
     ParserRuleContext::Ref context = parserInterp.parse(patternRuleIndex);
     return ParseTreePattern(this, pattern, patternRuleIndex, context);
   } catch (std::exception &e) {
+#if defined(_MSC_FULL_VER) && _MSC_FULL_VER < 190023026
+    // throw_with_nested is not available before VS 2015.
+    throw e;
+#else
     std::throw_with_nested("Cannot invoke start rule");
+#endif
   }
 
 }
@@ -244,15 +249,15 @@ std::vector<Token::Ref> ParseTreePatternMatcher::tokenize(const std::wstring &pa
       TagChunk &tagChunk = (TagChunk&)chunk;
       // add special rule token or conjure up new token from name
       if (isupper(tagChunk.getTag()[0])) {
-        int ttype = _parser->getTokenType(tagChunk.getTag());
+        size_t ttype = _parser->getTokenType(tagChunk.getTag());
         if (ttype == Token::INVALID_TYPE) {
           throw IllegalArgumentException("Unknown token " + antlrcpp::ws2s(tagChunk.getTag()) +
                                          " in pattern: " + antlrcpp::ws2s(pattern));
         }
-        std::shared_ptr<TokenTagToken> t = std::make_shared<TokenTagToken>(tagChunk.getTag(), ttype, tagChunk.getLabel());
+        std::shared_ptr<TokenTagToken> t = std::make_shared<TokenTagToken>(tagChunk.getTag(), (int)ttype, tagChunk.getLabel());
         tokens.push_back(t);
       } else if (islower(tagChunk.getTag()[0])) {
-        int ruleIndex = _parser->getRuleIndex(tagChunk.getTag());
+        ssize_t ruleIndex = _parser->getRuleIndex(tagChunk.getTag());
         if (ruleIndex == -1) {
           throw IllegalArgumentException(std::string("Unknown rule ") + antlrcpp::ws2s(tagChunk.getTag()) + " in pattern: " + antlrcpp::ws2s(pattern));
         }

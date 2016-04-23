@@ -42,7 +42,7 @@ namespace runtime {
   public:
     RuntimeException(const std::string &msg = "");
 
-    virtual const char* what() const noexcept override;
+    virtual const char* what() const NOEXCEPT override;
   };
 
   class IllegalStateException : public RuntimeException {
@@ -84,7 +84,7 @@ namespace runtime {
   public:
     IOException(const std::string &msg = "");
 
-    virtual const char* what() const noexcept override;
+    virtual const char* what() const NOEXCEPT override;
   };
 
   class CancellationException : public IllegalStateException {

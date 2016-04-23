@@ -355,7 +355,7 @@ namespace runtime {
 
     /// <summary>
     /// Get a rule's index (i.e., {@code RULE_ruleName} field) or -1 if not found. </summary>
-    virtual int getRuleIndex(const std::wstring &ruleName);
+    virtual ssize_t getRuleIndex(const std::wstring &ruleName);
 
     virtual ParserRuleContext::Ref getRuleContext();
 

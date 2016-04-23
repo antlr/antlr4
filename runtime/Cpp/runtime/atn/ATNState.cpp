@@ -39,8 +39,8 @@
 using namespace org::antlr::v4::runtime::atn;
 using namespace antlrcpp;
 
-const int ATNState::INITIAL_NUM_TRANSITIONS;
-const int ATNState::INVALID_STATE_NUMBER;
+const int ATNState::INITIAL_NUM_TRANSITIONS = 4;
+const int ATNState::INVALID_STATE_NUMBER = -1;
 
 ATNState::~ATNState() {
   for (auto transition : transitions) {
@@ -48,9 +48,9 @@ ATNState::~ATNState() {
   }
 };
 
-const std::vector<std::wstring> ATNState::serializationNames =  {L"INVALID", L"BASIC", L"RULE_START", L"BLOCK_START",
+const std::vector<std::wstring> ATNState::serializationNames = { L"INVALID", L"BASIC", L"RULE_START", L"BLOCK_START",
   L"PLUS_BLOCK_START", L"STAR_BLOCK_START", L"TOKEN_START", L"RULE_STOP",
-  L"BLOCK_END", L"STAR_LOOP_BACK", L"STAR_LOOP_ENTRY", L"PLUS_LOOP_BACK", L"LOOP_END"};
+  L"BLOCK_END", L"STAR_LOOP_BACK", L"STAR_LOOP_ENTRY", L"PLUS_LOOP_BACK", L"LOOP_END" };
 
 size_t ATNState::hashCode() {
   return (size_t)stateNumber;

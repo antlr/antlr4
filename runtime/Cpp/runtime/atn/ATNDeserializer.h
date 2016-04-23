@@ -41,10 +41,11 @@ namespace atn {
 
   class ATNDeserializer {
   public:
-    static const size_t SERIALIZED_VERSION = 3;
+    static const size_t SERIALIZED_VERSION;
 
     /// This is the current serialized UUID.
-    static Guid SERIALIZED_UUID;
+    // ml: defined as function to avoid the “static initialization order fiasco”.
+    static Guid SERIALIZED_UUID();
 
     ATNDeserializer();
     ATNDeserializer(const ATNDeserializationOptions& dso);
@@ -78,26 +79,24 @@ namespace atn {
 
   private:
     /// This is the earliest supported serialized UUID.
-    static Guid BASE_SERIALIZED_UUID;
+    static Guid BASE_SERIALIZED_UUID();
 
     /// This UUID indicates an extension of <seealso cref="BASE_SERIALIZED_UUID"/> for the
     /// addition of precedence predicates.
-    static Guid ADDED_PRECEDENCE_TRANSITIONS;
+    static Guid ADDED_PRECEDENCE_TRANSITIONS();
 
     /**
      * This UUID indicates an extension of ADDED_PRECEDENCE_TRANSITIONS
      * for the addition of lexer actions encoded as a sequence of
      * LexerAction instances.
      */
-    static Guid ADDED_LEXER_ACTIONS;
+    static Guid ADDED_LEXER_ACTIONS();
 
     /// This list contains all of the currently supported UUIDs, ordered by when
     /// the feature first appeared in this branch.
-    static std::vector<Guid> SUPPORTED_UUIDS;
+    static std::vector<Guid>& SUPPORTED_UUIDS();
     
     ATNDeserializationOptions deserializationOptions;
-
-    static std::vector<Guid> supportedUUIDsInitializer();
   };
 
 } // namespace atn

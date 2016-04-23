@@ -71,7 +71,7 @@ ATNSerializer::ATNSerializer(ATN *atn, const std::vector<std::wstring> &tokenNam
 std::vector<size_t> ATNSerializer::serialize() {
   std::vector<size_t> data;
   data.push_back(ATNDeserializer::SERIALIZED_VERSION);
-  serializeUUID(data, ATNDeserializer::SERIALIZED_UUID);
+  serializeUUID(data, ATNDeserializer::SERIALIZED_UUID());
 
   // convert grammar type to ATN const to avoid dependence on ANTLRParser
   data.push_back((size_t)atn->grammarType);
@@ -129,7 +129,7 @@ std::vector<size_t> ATNSerializer::serialize() {
         SetTransition *st = static_cast<SetTransition *>(t);
         if (setIndices.find(st->set) != setIndices.end()) {
           sets.push_back(st->set);
-          setIndices.insert({ st->set, sets.size() - 1 });
+          setIndices.insert({ st->set, (int)sets.size() - 1 });
         }
       }
     }
@@ -324,7 +324,7 @@ std::wstring ATNSerializer::decode(const std::wstring &inpdata) {
   if (inpdata.size() < 10)
     throw IllegalArgumentException("Not enough data to decode");
 
-  uint16_t data[inpdata.size()];
+  std::vector<uint16_t> data(inpdata.size());
   data[0] = inpdata[0];
 
   // Don't adjust the first value since that's the version number.
@@ -341,11 +341,11 @@ std::wstring ATNSerializer::decode(const std::wstring &inpdata) {
     throw UnsupportedOperationException("ATN Serializer" + reason);
   }
 
-  Guid uuid = ATNDeserializer::toUUID(data, p);
+  Guid uuid = ATNDeserializer::toUUID(data.data(), p);
   p += 8;
-  if (uuid != ATNDeserializer::SERIALIZED_UUID) {
+  if (uuid != ATNDeserializer::SERIALIZED_UUID()) {
     std::string reason = "Could not deserialize ATN with UUID " + uuid.toString() + " (expected " +
-    ATNDeserializer::SERIALIZED_UUID.toString() + ").";
+    ATNDeserializer::SERIALIZED_UUID().toString() + ").";
     throw UnsupportedOperationException("ATN Serializer" + reason);
   }
 
@@ -529,8 +529,8 @@ std::wstring ATNSerializer::getTokenName(ssize_t t) {
 std::wstring ATNSerializer::getSerializedAsString(ATN *atn) {
   std::vector<size_t> data = getSerialized(atn);
   std::wstring result;
-  result.resize(data.size());
-  std::copy(data.begin(), data.end(), result.begin());
+  for (size_t entry : data)
+    result.push_back((wchar_t)entry);
 
   return result;
 }

@@ -40,13 +40,14 @@
 
 #include "PredictionContext.h"
 
+using namespace org::antlr::v4::runtime;
 using namespace org::antlr::v4::runtime::misc;
 using namespace org::antlr::v4::runtime::atn;
 
 using namespace antlrcpp;
 
 int PredictionContext::globalNodeCount = 0;
-const std::shared_ptr<EmptyPredictionContext> PredictionContext::EMPTY = std::make_shared<EmptyPredictionContext>();
+const PredictionContext::Ref PredictionContext::EMPTY = std::make_shared<EmptyPredictionContext>();
 const int PredictionContext::EMPTY_RETURN_STATE;
 const int PredictionContext::INITIAL_HASH;
 
@@ -580,7 +581,7 @@ std::vector<std::wstring> PredictionContext::toStrings(Recognizer *recognizer, P
       size_t index = 0;
       if (p->size() > 0) {
         size_t bits = 1;
-        while ((1 << bits) < p->size()) {
+        while ((1ULL << bits) < p->size()) {
           bits++;
         }
 

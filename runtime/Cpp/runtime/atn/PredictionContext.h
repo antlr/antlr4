@@ -53,7 +53,7 @@ namespace atn {
 
     /// Represents $ in local context prediction, which means wildcard.
     /// *+x = *.
-    static const std::shared_ptr<EmptyPredictionContext> EMPTY;
+    static const Ref EMPTY;
 
     /// Represents $ in an array in full context mode, when $
     /// doesn't mean wildcard: $ + x = [$,x]. Here,

@@ -85,7 +85,12 @@ size_t UnbufferedCharStream::fill(size_t n) {
       size_t c = nextChar();
       add(c);
     } catch (IOException &ioe) {
+#if defined(_MSC_FULL_VER) && _MSC_FULL_VER < 190023026
+      // throw_with_nested is not available before VS 2015.
+      throw ioe;
+#else
       std::throw_with_nested(RuntimeException());
+#endif
     }
   }
 

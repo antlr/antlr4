@@ -46,12 +46,12 @@ namespace atn {
     /// Capture lexer action we traverse.
     int lexerActionIndex = -1;
 
-    LexerATNConfig(ATNState *state, int alt, PredictionContext::Ref context);
-    LexerATNConfig(ATNState *state, int alt, PredictionContext::Ref context, int actionIndex);
+    explicit LexerATNConfig(ATNState *state, int alt, PredictionContext::Ref context);
+    explicit LexerATNConfig(ATNState *state, int alt, PredictionContext::Ref context, int actionIndex);
 
-    LexerATNConfig(LexerATNConfig::Ref c, ATNState *state);
-    LexerATNConfig(LexerATNConfig::Ref c, ATNState *state, int actionIndex);
-    LexerATNConfig(LexerATNConfig::Ref c, ATNState *state, PredictionContext::Ref context);
+    explicit LexerATNConfig(LexerATNConfig::Ref c, ATNState *state);
+    explicit LexerATNConfig(LexerATNConfig::Ref c, ATNState *state, int actionIndex);
+    explicit LexerATNConfig(LexerATNConfig::Ref c, ATNState *state, PredictionContext::Ref context);
 
     bool hasPassedThroughNonGreedyDecision();
 

@@ -36,7 +36,7 @@ RuntimeException::RuntimeException(const std::string &msg)
   : std::exception(), _message(msg) {
 }
 
-const char* RuntimeException::what() const noexcept {
+const char* RuntimeException::what() const NOEXCEPT {
   return _message.c_str();
 }
 
@@ -45,6 +45,6 @@ const char* RuntimeException::what() const noexcept {
 IOException::IOException(const std::string &msg) : std::exception(), _message(msg) {
 }
 
-const char* IOException::what() const noexcept {
+const char* IOException::what() const NOEXCEPT {
   return _message.c_str();
 }

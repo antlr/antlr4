@@ -45,8 +45,8 @@ namespace antlrcpp {
     return str;
   }
 
-  std::map<std::wstring, int> toMap(const std::vector<std::wstring> &keys) {
-    std::map<std::wstring, int> result;
+  std::map<std::wstring, size_t> toMap(const std::vector<std::wstring> &keys) {
+    std::map<std::wstring, size_t> result;
     for (size_t i = 0; i < keys.size(); ++i) {
       result.insert({ keys[i], i });
     }
@@ -59,7 +59,7 @@ namespace antlrcpp {
       switch (c) {
         case L' ':
           if (escapeSpaces) {
-            result += '0xB7';
+            result += (wchar_t)'0xB7';
             break;
           } else {
             // fall through

@@ -32,6 +32,7 @@
 #pragma once
 
 #include "IntStream.h"
+#include "Interval.h"
 
 namespace org {
 namespace antlr {

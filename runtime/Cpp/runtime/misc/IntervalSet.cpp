@@ -35,6 +35,7 @@
 
 #include "IntervalSet.h"
 
+using namespace org::antlr::v4::runtime;
 using namespace org::antlr::v4::runtime::misc;
 
 IntervalSet const IntervalSet::COMPLETE_CHAR_SET = IntervalSet::of(0, Lexer::MAX_CHAR_VALUE);

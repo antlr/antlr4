@@ -40,22 +40,22 @@
 
 using namespace org::antlr::v4::runtime;
 
-std::map<std::vector<std::wstring>, std::map<std::wstring, int>> Recognizer::_tokenTypeMapCache;
-std::map<std::vector<std::wstring>, std::map<std::wstring, int>> Recognizer::_ruleIndexMapCache;
+std::map<std::vector<std::wstring>, std::map<std::wstring, size_t>> Recognizer::_tokenTypeMapCache;
+std::map<std::vector<std::wstring>, std::map<std::wstring, size_t>> Recognizer::_ruleIndexMapCache;
 
 Recognizer::Recognizer() {
   InitializeInstanceFields();
   _proxListener.addErrorListener(&ConsoleErrorListener::INSTANCE);
 }
 
-std::map<std::wstring, int> Recognizer::getTokenTypeMap() {
+std::map<std::wstring, size_t> Recognizer::getTokenTypeMap() {
   const std::vector<std::wstring>& tokenNames = getTokenNames();
   if (tokenNames.empty()) {
     throw L"The current recognizer does not provide a list of token names.";
   }
 
   std::lock_guard<std::mutex> lck(mtx);
-  std::map<std::wstring, int> result;
+  std::map<std::wstring, size_t> result;
   auto iterator = _tokenTypeMapCache.find(tokenNames);
   if (iterator != _tokenTypeMapCache.end()) {
     result = iterator->second;
@@ -68,14 +68,14 @@ std::map<std::wstring, int> Recognizer::getTokenTypeMap() {
   return result;
 }
 
-std::map<std::wstring, int> Recognizer::getRuleIndexMap() {
+std::map<std::wstring, size_t> Recognizer::getRuleIndexMap() {
   const std::vector<std::wstring>& ruleNames = getRuleNames();
   if (ruleNames.empty()) {
     throw L"The current recognizer does not provide a list of rule names.";
   }
 
   std::lock_guard<std::mutex> lck(mtx);
-  std::map<std::wstring, int> result;
+  std::map<std::wstring, size_t> result;
   auto iterator = _ruleIndexMapCache.find(ruleNames);
   if (iterator != _ruleIndexMapCache.end()) {
     result = iterator->second;
@@ -86,8 +86,8 @@ std::map<std::wstring, int> Recognizer::getRuleIndexMap() {
   return result;
 }
 
-int Recognizer::getTokenType(const std::wstring &tokenName) {
-  const std::map<std::wstring, int> &map = getTokenTypeMap();
+size_t Recognizer::getTokenType(const std::wstring &tokenName) {
+  const std::map<std::wstring, size_t> &map = getTokenTypeMap();
   auto iterator = map.find(tokenName);
   if (iterator == map.end())
     return Token::INVALID_TYPE;

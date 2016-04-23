@@ -507,12 +507,13 @@ misc::IntervalSet Parser::getExpectedTokensWithinCurrentRule() {
   return atn.nextTokens(s);
 }
 
-int Parser::getRuleIndex(const std::wstring &ruleName) {
-  const std::map<std::wstring, int> &m = getRuleIndexMap();
-  if (m.find(ruleName) == m.end()) {
+ssize_t Parser::getRuleIndex(const std::wstring &ruleName) {
+  const std::map<std::wstring, size_t> &m = getRuleIndexMap();
+  auto iterator = m.find(ruleName);
+  if (iterator == m.end()) {
     return -1;
   }
-  return m.at(ruleName);
+  return iterator->second;
 }
 
 ParserRuleContext::Ref Parser::getRuleContext() {

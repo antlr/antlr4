@@ -44,7 +44,7 @@ SingletonPredictionContext::SingletonPredictionContext(std::weak_ptr<PredictionC
 SingletonPredictionContext::Ref SingletonPredictionContext::create(std::weak_ptr<PredictionContext> parent, int returnState) {
   if (returnState == EMPTY_RETURN_STATE && parent.expired()) {
     // someone can pass in the bits of an array ctx that mean $
-    return EMPTY;
+    return std::dynamic_pointer_cast<SingletonPredictionContext>(EMPTY);
   }
   return std::make_shared<SingletonPredictionContext>(parent, returnState);
 }

@@ -35,6 +35,7 @@
 
 #include "DFA.h"
 
+using namespace org::antlr::v4::runtime;
 using namespace org::antlr::v4::runtime::dfa;
 
 DFA::DFA(atn::DecisionState *atnStartState) : DFA(atnStartState, 0) {
