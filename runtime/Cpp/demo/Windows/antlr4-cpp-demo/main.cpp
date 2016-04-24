@@ -20,6 +20,7 @@ using namespace antlrcpptest;
 using namespace org::antlr::v4::runtime;
 
 int main(int argc, const char * argv[]) {
+
   ANTLRInputStream input(L"divideŴ and conquer");
   TLexer lexer(&input);
   CommonTokenStream tokens(&lexer);
@@ -27,7 +28,7 @@ int main(int argc, const char * argv[]) {
   TParser parser(&tokens);
   std::shared_ptr<tree::ParseTree> tree = parser.main();
 
-  std::wstring s = tree->toStringTree(&parser);
+  std::wstring s = tree->toStringTree(&parser) + L"\n";
   OutputDebugString(s.data());
 
   return 0;

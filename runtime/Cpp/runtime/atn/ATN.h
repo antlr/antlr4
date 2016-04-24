@@ -45,7 +45,7 @@ namespace atn {
 
     /// Used for runtime deserialization of ATNs from strings.
     ATN();
-    ATN(const ATN &other);
+    ATN(ATN &&other);
     ATN(ATNType grammarType, size_t maxTokenType);
     ~ATN();
 
