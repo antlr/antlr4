@@ -1,8 +1,8 @@
-﻿/*
+/*
  * [The "BSD license"]
  *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
- *  Copyright (c) 2013 Dan McLaughlin
+ *  Copyright (c) 2013 Sam Harwell
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -31,23 +31,51 @@
 
 #pragma once
 
-#include "ATNState.h"
-
 namespace org {
 namespace antlr {
 namespace v4 {
 namespace runtime {
 namespace atn {
 
-  class RuleStartState final : public ATNState {
-  public:
-    RuleStartState();
-
-    RuleStopState *stopState;
-    bool isLeftRecursiveRule;
-
-    virtual int getStateType();
-
+  /// <summary>
+  /// Represents the serialization type of a <seealso cref="LexerAction"/>.
+  ///
+  /// @author Sam Harwell
+  /// @since 4.2
+  /// </summary>
+  enum class LexerActionType : size_t {
+    /// <summary>
+    /// The type of a <seealso cref="LexerChannelAction"/> action.
+    /// </summary>
+    CHANNEL,
+    /// <summary>
+    /// The type of a <seealso cref="LexerCustomAction"/> action.
+    /// </summary>
+    CUSTOM,
+    /// <summary>
+    /// The type of a <seealso cref="LexerModeAction"/> action.
+    /// </summary>
+    MODE,
+    /// <summary>
+    /// The type of a <seealso cref="LexerMoreAction"/> action.
+    /// </summary>
+    MORE,
+    /// <summary>
+    /// The type of a <seealso cref="LexerPopModeAction"/> action.
+    /// </summary>
+    POP_MODE,
+    /// <summary>
+    /// The type of a <seealso cref="LexerPushModeAction"/> action.
+    /// </summary>
+    PUSH_MODE,
+    /// <summary>
+    /// The type of a <seealso cref="LexerSkipAction"/> action.
+    /// </summary>
+    SKIP,
+    /// <summary>
+    /// The type of a <seealso cref="LexerTypeAction"/> action.
+    /// </summary>
+    TYPE,
   };
 
 } // namespace atn

@@ -15,6 +15,30 @@
 		2747A70D1CA691310030247B /* ConfigLookup.h in Headers */ = {isa = PBXBuildFile; fileRef = 2747A7091CA691310030247B /* ConfigLookup.h */; };
 		2747A7131CA6C46C0030247B /* InputHandlingTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2747A7121CA6C46C0030247B /* InputHandlingTests.mm */; };
 		274FC6D91CA96B6C008D4374 /* MiscClassTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 274FC6D81CA96B6C008D4374 /* MiscClassTests.mm */; };
+		275DB3E41CCD23C000D8C543 /* LexerChannelAction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 275DB3D41CCD23C000D8C543 /* LexerChannelAction.cpp */; };
+		275DB3E51CCD23C000D8C543 /* LexerChannelAction.h in Headers */ = {isa = PBXBuildFile; fileRef = 275DB3D51CCD23C000D8C543 /* LexerChannelAction.h */; };
+		275DB3E61CCD23C000D8C543 /* LexerCustomAction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 275DB3D61CCD23C000D8C543 /* LexerCustomAction.cpp */; };
+		275DB3E71CCD23C000D8C543 /* LexerCustomAction.h in Headers */ = {isa = PBXBuildFile; fileRef = 275DB3D71CCD23C000D8C543 /* LexerCustomAction.h */; };
+		275DB3E81CCD23C000D8C543 /* LexerModeAction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 275DB3D81CCD23C000D8C543 /* LexerModeAction.cpp */; };
+		275DB3E91CCD23C000D8C543 /* LexerModeAction.h in Headers */ = {isa = PBXBuildFile; fileRef = 275DB3D91CCD23C000D8C543 /* LexerModeAction.h */; };
+		275DB3EA1CCD23C000D8C543 /* LexerMoreAction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 275DB3DA1CCD23C000D8C543 /* LexerMoreAction.cpp */; };
+		275DB3EB1CCD23C000D8C543 /* LexerMoreAction.h in Headers */ = {isa = PBXBuildFile; fileRef = 275DB3DB1CCD23C000D8C543 /* LexerMoreAction.h */; };
+		275DB3EC1CCD23C000D8C543 /* LexerPopModeAction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 275DB3DC1CCD23C000D8C543 /* LexerPopModeAction.cpp */; };
+		275DB3ED1CCD23C000D8C543 /* LexerPopModeAction.h in Headers */ = {isa = PBXBuildFile; fileRef = 275DB3DD1CCD23C000D8C543 /* LexerPopModeAction.h */; };
+		275DB3EE1CCD23C000D8C543 /* LexerPushModeAction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 275DB3DE1CCD23C000D8C543 /* LexerPushModeAction.cpp */; };
+		275DB3EF1CCD23C000D8C543 /* LexerPushModeAction.h in Headers */ = {isa = PBXBuildFile; fileRef = 275DB3DF1CCD23C000D8C543 /* LexerPushModeAction.h */; };
+		275DB3F01CCD23C000D8C543 /* LexerSkipAction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 275DB3E01CCD23C000D8C543 /* LexerSkipAction.cpp */; };
+		275DB3F11CCD23C000D8C543 /* LexerSkipAction.h in Headers */ = {isa = PBXBuildFile; fileRef = 275DB3E11CCD23C000D8C543 /* LexerSkipAction.h */; };
+		275DB3F21CCD23C000D8C543 /* LexerTypeAction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 275DB3E21CCD23C000D8C543 /* LexerTypeAction.cpp */; };
+		275DB3F31CCD23C000D8C543 /* LexerTypeAction.h in Headers */ = {isa = PBXBuildFile; fileRef = 275DB3E31CCD23C000D8C543 /* LexerTypeAction.h */; };
+		275ECC4C1CCCD95B00E79E2A /* LexerAction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 275ECC4A1CCCD95B00E79E2A /* LexerAction.cpp */; };
+		275ECC4D1CCCD95B00E79E2A /* LexerAction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 275ECC4A1CCCD95B00E79E2A /* LexerAction.cpp */; };
+		275ECC4E1CCCD95B00E79E2A /* LexerAction.h in Headers */ = {isa = PBXBuildFile; fileRef = 275ECC4B1CCCD95B00E79E2A /* LexerAction.h */; };
+		275ECC4F1CCCD95B00E79E2A /* LexerAction.h in Headers */ = {isa = PBXBuildFile; fileRef = 275ECC4B1CCCD95B00E79E2A /* LexerAction.h */; };
+		275ECC521CCCD9FB00E79E2A /* LexerActionType.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 275ECC501CCCD9FB00E79E2A /* LexerActionType.cpp */; };
+		275ECC531CCCD9FB00E79E2A /* LexerActionType.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 275ECC501CCCD9FB00E79E2A /* LexerActionType.cpp */; };
+		275ECC541CCCD9FB00E79E2A /* LexerActionType.h in Headers */ = {isa = PBXBuildFile; fileRef = 275ECC511CCCD9FB00E79E2A /* LexerActionType.h */; };
+		275ECC551CCCD9FB00E79E2A /* LexerActionType.h in Headers */ = {isa = PBXBuildFile; fileRef = 275ECC511CCCD9FB00E79E2A /* LexerActionType.h */; };
 		276901A91CAD7E66005CEC6A /* Recognizer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 27C666991C9584050021E494 /* Recognizer.cpp */; };
 		276901AA1CAD7E67005CEC6A /* Recognizer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 27C666991C9584050021E494 /* Recognizer.cpp */; };
 		276927241C9ED49100E4EBF8 /* antlrcpp-Prefix.h in Headers */ = {isa = PBXBuildFile; fileRef = 276927231C9ED49100E4EBF8 /* antlrcpp-Prefix.h */; };
@@ -546,6 +570,26 @@
 		2747A7091CA691310030247B /* ConfigLookup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ConfigLookup.h; sourceTree = "<group>"; wrapsLines = 0; };
 		2747A7121CA6C46C0030247B /* InputHandlingTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = InputHandlingTests.mm; sourceTree = "<group>"; wrapsLines = 0; };
 		274FC6D81CA96B6C008D4374 /* MiscClassTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MiscClassTests.mm; sourceTree = "<group>"; wrapsLines = 0; };
+		275DB3D41CCD23C000D8C543 /* LexerChannelAction.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LexerChannelAction.cpp; sourceTree = "<group>"; };
+		275DB3D51CCD23C000D8C543 /* LexerChannelAction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LexerChannelAction.h; sourceTree = "<group>"; };
+		275DB3D61CCD23C000D8C543 /* LexerCustomAction.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LexerCustomAction.cpp; sourceTree = "<group>"; };
+		275DB3D71CCD23C000D8C543 /* LexerCustomAction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LexerCustomAction.h; sourceTree = "<group>"; };
+		275DB3D81CCD23C000D8C543 /* LexerModeAction.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LexerModeAction.cpp; sourceTree = "<group>"; };
+		275DB3D91CCD23C000D8C543 /* LexerModeAction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LexerModeAction.h; sourceTree = "<group>"; };
+		275DB3DA1CCD23C000D8C543 /* LexerMoreAction.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LexerMoreAction.cpp; sourceTree = "<group>"; };
+		275DB3DB1CCD23C000D8C543 /* LexerMoreAction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LexerMoreAction.h; sourceTree = "<group>"; };
+		275DB3DC1CCD23C000D8C543 /* LexerPopModeAction.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LexerPopModeAction.cpp; sourceTree = "<group>"; };
+		275DB3DD1CCD23C000D8C543 /* LexerPopModeAction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LexerPopModeAction.h; sourceTree = "<group>"; };
+		275DB3DE1CCD23C000D8C543 /* LexerPushModeAction.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LexerPushModeAction.cpp; sourceTree = "<group>"; };
+		275DB3DF1CCD23C000D8C543 /* LexerPushModeAction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LexerPushModeAction.h; sourceTree = "<group>"; };
+		275DB3E01CCD23C000D8C543 /* LexerSkipAction.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LexerSkipAction.cpp; sourceTree = "<group>"; };
+		275DB3E11CCD23C000D8C543 /* LexerSkipAction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LexerSkipAction.h; sourceTree = "<group>"; };
+		275DB3E21CCD23C000D8C543 /* LexerTypeAction.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LexerTypeAction.cpp; sourceTree = "<group>"; };
+		275DB3E31CCD23C000D8C543 /* LexerTypeAction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LexerTypeAction.h; sourceTree = "<group>"; };
+		275ECC4A1CCCD95B00E79E2A /* LexerAction.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LexerAction.cpp; sourceTree = "<group>"; };
+		275ECC4B1CCCD95B00E79E2A /* LexerAction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LexerAction.h; sourceTree = "<group>"; };
+		275ECC501CCCD9FB00E79E2A /* LexerActionType.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LexerActionType.cpp; sourceTree = "<group>"; };
+		275ECC511CCCD9FB00E79E2A /* LexerActionType.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LexerActionType.h; sourceTree = "<group>"; };
 		276927231C9ED49100E4EBF8 /* antlrcpp-Prefix.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; name = "antlrcpp-Prefix.h"; path = "../../runtime/antlrcpp-Prefix.h"; sourceTree = "<group>"; };
 		27874F1D1CCB7A0700AF1C53 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
 		278A66FA1C95838E002D667E /* ANTLRErrorListener.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ANTLRErrorListener.cpp; path = ../../runtime/ANTLRErrorListener.cpp; sourceTree = SOURCE_ROOT; };
@@ -667,7 +711,7 @@
 		27C6676A1C95846E0021E494 /* DecisionState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DecisionState.h; sourceTree = "<group>"; };
 		27C6676B1C95846E0021E494 /* EmptyPredictionContext.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EmptyPredictionContext.cpp; sourceTree = "<group>"; wrapsLines = 0; };
 		27C6676C1C95846E0021E494 /* EmptyPredictionContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EmptyPredictionContext.h; sourceTree = "<group>"; wrapsLines = 0; };
-		27C6676D1C95846E0021E494 /* EpsilonTransition.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EpsilonTransition.cpp; sourceTree = "<group>"; };
+		27C6676D1C95846E0021E494 /* EpsilonTransition.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EpsilonTransition.cpp; sourceTree = "<group>"; wrapsLines = 0; };
 		27C6676E1C95846E0021E494 /* EpsilonTransition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EpsilonTransition.h; sourceTree = "<group>"; };
 		27C6676F1C95846E0021E494 /* LexerATNConfig.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LexerATNConfig.cpp; sourceTree = "<group>"; wrapsLines = 0; };
 		27C667701C95846E0021E494 /* LexerATNConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LexerATNConfig.h; sourceTree = "<group>"; };
@@ -893,16 +937,38 @@
 				27C667661C95846E0021E494 /* BlockEndState.h */,
 				27C667671C95846E0021E494 /* BlockStartState.cpp */,
 				27C667681C95846E0021E494 /* BlockStartState.h */,
+				2747A7081CA691310030247B /* ConfigLookup.cpp */,
+				2747A7091CA691310030247B /* ConfigLookup.h */,
 				27C667691C95846E0021E494 /* DecisionState.cpp */,
 				27C6676A1C95846E0021E494 /* DecisionState.h */,
 				27C6676B1C95846E0021E494 /* EmptyPredictionContext.cpp */,
 				27C6676C1C95846E0021E494 /* EmptyPredictionContext.h */,
 				27C6676D1C95846E0021E494 /* EpsilonTransition.cpp */,
 				27C6676E1C95846E0021E494 /* EpsilonTransition.h */,
+				275ECC4A1CCCD95B00E79E2A /* LexerAction.cpp */,
+				275ECC4B1CCCD95B00E79E2A /* LexerAction.h */,
+				275ECC501CCCD9FB00E79E2A /* LexerActionType.cpp */,
+				275ECC511CCCD9FB00E79E2A /* LexerActionType.h */,
 				27C6676F1C95846E0021E494 /* LexerATNConfig.cpp */,
 				27C667701C95846E0021E494 /* LexerATNConfig.h */,
 				27C667711C95846E0021E494 /* LexerATNSimulator.cpp */,
 				27C667721C95846E0021E494 /* LexerATNSimulator.h */,
+				275DB3D41CCD23C000D8C543 /* LexerChannelAction.cpp */,
+				275DB3D51CCD23C000D8C543 /* LexerChannelAction.h */,
+				275DB3D61CCD23C000D8C543 /* LexerCustomAction.cpp */,
+				275DB3D71CCD23C000D8C543 /* LexerCustomAction.h */,
+				275DB3D81CCD23C000D8C543 /* LexerModeAction.cpp */,
+				275DB3D91CCD23C000D8C543 /* LexerModeAction.h */,
+				275DB3DA1CCD23C000D8C543 /* LexerMoreAction.cpp */,
+				275DB3DB1CCD23C000D8C543 /* LexerMoreAction.h */,
+				275DB3DC1CCD23C000D8C543 /* LexerPopModeAction.cpp */,
+				275DB3DD1CCD23C000D8C543 /* LexerPopModeAction.h */,
+				275DB3DE1CCD23C000D8C543 /* LexerPushModeAction.cpp */,
+				275DB3DF1CCD23C000D8C543 /* LexerPushModeAction.h */,
+				275DB3E01CCD23C000D8C543 /* LexerSkipAction.cpp */,
+				275DB3E11CCD23C000D8C543 /* LexerSkipAction.h */,
+				275DB3E21CCD23C000D8C543 /* LexerTypeAction.cpp */,
+				275DB3E31CCD23C000D8C543 /* LexerTypeAction.h */,
 				27C667731C95846E0021E494 /* LL1Analyzer.cpp */,
 				27C667741C95846E0021E494 /* LL1Analyzer.h */,
 				27C667751C95846E0021E494 /* LoopEndState.cpp */,
@@ -951,8 +1017,6 @@
 				27C667A31C95846E0021E494 /* Transition.h */,
 				27C667A41C95846E0021E494 /* WildcardTransition.cpp */,
 				27C667A51C95846E0021E494 /* WildcardTransition.h */,
-				2747A7081CA691310030247B /* ConfigLookup.cpp */,
-				2747A7091CA691310030247B /* ConfigLookup.h */,
 			);
 			path = atn;
 			sourceTree = "<group>";
@@ -1304,6 +1368,7 @@
 				27C669B21C9585B80021E494 /* SyntaxTree.h in Headers */,
 				27C666C91C9584050021E494 /* CharStream.h in Headers */,
 				27C6671D1C9584050021E494 /* ProxyErrorListener.h in Headers */,
+				275ECC4F1CCCD95B00E79E2A /* LexerAction.h in Headers */,
 				27C666E51C9584050021E494 /* Exceptions.h in Headers */,
 				27C668B51C9584FA0021E494 /* Interval.h in Headers */,
 				27C667E11C95846E0021E494 /* BasicState.h in Headers */,
@@ -1322,6 +1387,7 @@
 				27C667ED1C95846E0021E494 /* DecisionState.h in Headers */,
 				27C667FD1C95846E0021E494 /* LexerATNSimulator.h in Headers */,
 				27C668571C95846E0021E494 /* StarLoopEntryState.h in Headers */,
+				275ECC551CCCD9FB00E79E2A /* LexerActionType.h in Headers */,
 				27C6683F1C95846E0021E494 /* RuleTransition.h in Headers */,
 				27C667231C9584050021E494 /* Recognizer.h in Headers */,
 				27C667F11C95846E0021E494 /* EmptyPredictionContext.h in Headers */,
@@ -1387,6 +1453,7 @@
 				27C66A1C1C958AB30021E494 /* TextChunk.h in Headers */,
 				27C667EC1C95846E0021E494 /* DecisionState.h in Headers */,
 				27C667001C9584050021E494 /* LexerInterpreter.h in Headers */,
+				275DB3EB1CCD23C000D8C543 /* LexerMoreAction.h in Headers */,
 				27C667AC1C95846E0021E494 /* ActionTransition.h in Headers */,
 				27C669911C9585B80021E494 /* ErrorNode.h in Headers */,
 				27C667C01C95846E0021E494 /* ATNDeserializationOptions.h in Headers */,
@@ -1405,9 +1472,12 @@
 				27C668B81C9584FA0021E494 /* IntervalSet.h in Headers */,
 				27C668261C95846E0021E494 /* PredictionContext.h in Headers */,
 				27C669B11C9585B80021E494 /* SyntaxTree.h in Headers */,
+				275DB3F31CCD23C000D8C543 /* LexerTypeAction.h in Headers */,
 				27C666D01C9584050021E494 /* CommonTokenFactory.h in Headers */,
 				27C6683E1C95846E0021E494 /* RuleTransition.h in Headers */,
 				27C667BC1C95846E0021E494 /* ATNConfigSet.h in Headers */,
+				275ECC4E1CCCD95B00E79E2A /* LexerAction.h in Headers */,
+				275DB3E91CCD23C000D8C543 /* LexerModeAction.h in Headers */,
 				27C666F21C9584050021E494 /* InterpreterRuleContext.h in Headers */,
 				27C667F41C95846E0021E494 /* EpsilonTransition.h in Headers */,
 				27C666EE1C9584050021E494 /* InputMismatchException.h in Headers */,
@@ -1429,9 +1499,11 @@
 				27C6684A1C95846E0021E494 /* SingletonPredictionContext.h in Headers */,
 				27C667041C9584050021E494 /* LexerNoViableAltException.h in Headers */,
 				27C669121C9585230021E494 /* Strings.h in Headers */,
+				275DB3E51CCD23C000D8C543 /* LexerChannelAction.h in Headers */,
 				27C667E41C95846E0021E494 /* BlockEndState.h in Headers */,
 				27C666B41C9584050021E494 /* ANTLRFileStream.h in Headers */,
 				27C6685E1C95846E0021E494 /* Transition.h in Headers */,
+				275ECC541CCCD9FB00E79E2A /* LexerActionType.h in Headers */,
 				27C666CC1C9584050021E494 /* CommonToken.h in Headers */,
 				27C6699D1C9585B80021E494 /* ParseTreeListener.h in Headers */,
 				27C666F61C9584050021E494 /* IntStream.h in Headers */,
@@ -1450,6 +1522,7 @@
 				27C669991C9585B80021E494 /* ParseTree.h in Headers */,
 				27C669061C9585230021E494 /* CPPUtils.h in Headers */,
 				27C6673E1C9584050021E494 /* UnbufferedCharStream.h in Headers */,
+				275DB3EF1CCD23C000D8C543 /* LexerPushModeAction.h in Headers */,
 				27C66A121C958AB30021E494 /* ParseTreeMatch.h in Headers */,
 				27C667F81C95846E0021E494 /* LexerATNConfig.h in Headers */,
 				27C66A141C958AB30021E494 /* ParseTreePattern.h in Headers */,
@@ -1460,6 +1533,7 @@
 				27C6685A1C95846E0021E494 /* TokensStartState.h in Headers */,
 				27C668561C95846E0021E494 /* StarLoopEntryState.h in Headers */,
 				27C667B41C95846E0021E494 /* ATN.h in Headers */,
+				275DB3ED1CCD23C000D8C543 /* LexerPopModeAction.h in Headers */,
 				27C669AD1C9585B80021E494 /* RuleNode.h in Headers */,
 				27C668771C9584B60021E494 /* DFAState.h in Headers */,
 				27C6680A1C95846E0021E494 /* NotSetTransition.h in Headers */,
@@ -1475,6 +1549,8 @@
 				27C667FC1C95846E0021E494 /* LexerATNSimulator.h in Headers */,
 				27C669A11C9585B80021E494 /* ParseTreeProperty.h in Headers */,
 				27C667F01C95846E0021E494 /* EmptyPredictionContext.h in Headers */,
+				275DB3E71CCD23C000D8C543 /* LexerCustomAction.h in Headers */,
+				275DB3F11CCD23C000D8C543 /* LexerSkipAction.h in Headers */,
 				27C667CC1C95846E0021E494 /* ATNSimulator.h in Headers */,
 				27C669B91C9585B80021E494 /* TerminalNodeImpl.h in Headers */,
 				27C6681E1C95846E0021E494 /* PrecedencePredicateTransition.h in Headers */,
@@ -1665,6 +1741,7 @@
 				278A66FC1C95838E002D667E /* ANTLRErrorListener.cpp in Sources */,
 				27C668391C95846E0021E494 /* RuleStopState.cpp in Sources */,
 				27C669AC1C9585B80021E494 /* RuleNode.cpp in Sources */,
+				275ECC531CCCD9FB00E79E2A /* LexerActionType.cpp in Sources */,
 				27C667251C9584050021E494 /* RuleContext.cpp in Sources */,
 				27C668551C95846E0021E494 /* StarLoopEntryState.cpp in Sources */,
 				27C668761C9584B60021E494 /* DFAState.cpp in Sources */,
@@ -1766,6 +1843,7 @@
 				27C6686E1C9584B60021E494 /* DFA.cpp in Sources */,
 				27C666AF1C9584050021E494 /* ANTLRErrorStrategy.cpp in Sources */,
 				27C667131C9584050021E494 /* ParserInterpreter.cpp in Sources */,
+				275ECC4D1CCCD95B00E79E2A /* LexerAction.cpp in Sources */,
 				27C669A41C9585B80021E494 /* ParseTreeVisitor.cpp in Sources */,
 				2747A70B1CA691310030247B /* ConfigLookup.cpp in Sources */,
 				27C667F31C95846E0021E494 /* EpsilonTransition.cpp in Sources */,
@@ -1782,6 +1860,8 @@
 			files = (
 				27C668241C95846E0021E494 /* PredictionContext.cpp in Sources */,
 				27C666E61C9584050021E494 /* FailedPredicateException.cpp in Sources */,
+				275DB3EE1CCD23C000D8C543 /* LexerPushModeAction.cpp in Sources */,
+				275ECC521CCCD9FB00E79E2A /* LexerActionType.cpp in Sources */,
 				27C668021C95846E0021E494 /* LoopEndState.cpp in Sources */,
 				27C6681C1C95846E0021E494 /* PrecedencePredicateTransition.cpp in Sources */,
 				27C667421C9584050021E494 /* WritableToken.cpp in Sources */,
@@ -1789,6 +1869,7 @@
 				27C667241C9584050021E494 /* RuleContext.cpp in Sources */,
 				27C667FA1C95846E0021E494 /* LexerATNSimulator.cpp in Sources */,
 				27C669AB1C9585B80021E494 /* RuleNode.cpp in Sources */,
+				275DB3F01CCD23C000D8C543 /* LexerSkipAction.cpp in Sources */,
 				27C6670A1C9584050021E494 /* NoViableAltException.cpp in Sources */,
 				27C667161C9584050021E494 /* ParserRuleContext.cpp in Sources */,
 				27C669BF1C9585B80021E494 /* Trees.cpp in Sources */,
@@ -1802,7 +1883,10 @@
 				27C666D61C9584050021E494 /* ConsoleErrorListener.cpp in Sources */,
 				27C668381C95846E0021E494 /* RuleStopState.cpp in Sources */,
 				27C6680C1C95846E0021E494 /* OrderedATNConfigSet.cpp in Sources */,
+				275ECC4C1CCCD95B00E79E2A /* LexerAction.cpp in Sources */,
+				275DB3F21CCD23C000D8C543 /* LexerTypeAction.cpp in Sources */,
 				27C667BA1C95846E0021E494 /* ATNConfigSet.cpp in Sources */,
+				275DB3EC1CCD23C000D8C543 /* LexerPopModeAction.cpp in Sources */,
 				27C669971C9585B80021E494 /* ParseTree.cpp in Sources */,
 				27C6684C1C95846E0021E494 /* StarBlockStartState.cpp in Sources */,
 				27C6698F1C9585B80021E494 /* ErrorNode.cpp in Sources */,
@@ -1818,6 +1902,7 @@
 				27C66A061C958AB30021E494 /* ParseTreePatternMatcher.cpp in Sources */,
 				27C667301C9584050021E494 /* TokenSource.cpp in Sources */,
 				27C669A31C9585B80021E494 /* ParseTreeVisitor.cpp in Sources */,
+				275DB3EA1CCD23C000D8C543 /* LexerMoreAction.cpp in Sources */,
 				27C667D21C95846E0021E494 /* ATNType.cpp in Sources */,
 				27C666FA1C9584050021E494 /* Lexer.cpp in Sources */,
 				27C667CA1C95846E0021E494 /* ATNSimulator.cpp in Sources */,
@@ -1841,6 +1926,7 @@
 				27C667EA1C95846E0021E494 /* DecisionState.cpp in Sources */,
 				27C666FE1C9584050021E494 /* LexerInterpreter.cpp in Sources */,
 				27C666CE1C9584050021E494 /* CommonTokenFactory.cpp in Sources */,
+				275DB3E81CCD23C000D8C543 /* LexerModeAction.cpp in Sources */,
 				27C667381C9584050021E494 /* TokenStreamRewriter.cpp in Sources */,
 				27C66A001C958AB30021E494 /* Chunk.cpp in Sources */,
 				27C668541C95846E0021E494 /* StarLoopEntryState.cpp in Sources */,
@@ -1880,6 +1966,7 @@
 				27C66A041C958AB30021E494 /* ParseTreePattern.cpp in Sources */,
 				27C6685C1C95846E0021E494 /* Transition.cpp in Sources */,
 				27C66A021C958AB30021E494 /* ParseTreeMatch.cpp in Sources */,
+				275DB3E41CCD23C000D8C543 /* LexerChannelAction.cpp in Sources */,
 				27C668441C95846E0021E494 /* SetTransition.cpp in Sources */,
 				27C668501C95846E0021E494 /* StarLoopbackState.cpp in Sources */,
 				27C666EC1C9584050021E494 /* InputMismatchException.cpp in Sources */,
@@ -1901,6 +1988,7 @@
 				27C668601C95846E0021E494 /* WildcardTransition.cpp in Sources */,
 				27C666E21C9584050021E494 /* Exceptions.cpp in Sources */,
 				27C668711C9584B60021E494 /* DFASerializer.cpp in Sources */,
+				275DB3E61CCD23C000D8C543 /* LexerCustomAction.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

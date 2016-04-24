@@ -1,8 +1,8 @@
-﻿/*
+/*
  * [The "BSD license"]
  *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
- *  Copyright (c) 2013 Dan McLaughlin
+ *  Copyright (c) 2013 Sam Harwell
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -29,29 +29,52 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
+#include "MurmurHash.h"
 
-#include "ATNState.h"
+#include "LexerPushModeAction.h"
 
-namespace org {
-namespace antlr {
-namespace v4 {
-namespace runtime {
-namespace atn {
+using namespace org::antlr::v4::runtime::atn;
+using namespace org::antlr::v4::runtime::misc;
 
-  class RuleStartState final : public ATNState {
-  public:
-    RuleStartState();
+LexerPushModeAction::LexerPushModeAction(int mode) : _mode(mode) {
+}
 
-    RuleStopState *stopState;
-    bool isLeftRecursiveRule;
+int LexerPushModeAction::getMode() const {
+  return _mode;
+}
 
-    virtual int getStateType();
+LexerActionType LexerPushModeAction::getActionType() const {
+  return LexerActionType::PUSH_MODE;
+}
 
-  };
+bool LexerPushModeAction::isPositionDependent() const {
+  return false;
+}
 
-} // namespace atn
-} // namespace runtime
-} // namespace v4
-} // namespace antlr
-} // namespace org
+void LexerPushModeAction::execute(Lexer::Ref lexer) {
+  lexer->pushMode(_mode);
+}
+
+size_t LexerPushModeAction::hashCode() const {
+  size_t hash = MurmurHash::initialize();
+  hash = MurmurHash::update(hash, (size_t)getActionType());
+  hash = MurmurHash::update(hash, _mode);
+  return MurmurHash::finish(hash, 2);
+}
+
+bool LexerPushModeAction::operator == (const LexerAction &obj) const {
+  if (&obj == this) {
+    return true;
+  }
+
+  const LexerPushModeAction *action = dynamic_cast<const LexerPushModeAction *>(&obj);
+  if (action == nullptr) {
+    return false;
+  }
+
+  return _mode == action->_mode;
+}
+
+std::wstring LexerPushModeAction::toString() const {
+  return L"pushMode(" + std::to_wstring(_mode) + L")";
+}

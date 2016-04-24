@@ -1,8 +1,8 @@
-﻿/*
+/*
  * [The "BSD license"]
  *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
- *  Copyright (c) 2013 Dan McLaughlin
+ *  Copyright (c) 2013 Sam Harwell
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -31,7 +31,9 @@
 
 #pragma once
 
-#include "ATNState.h"
+#include "LexerActionType.h"
+#include "LexerAction.h"
+#include "Lexer.h"
 
 namespace org {
 namespace antlr {
@@ -39,15 +41,44 @@ namespace v4 {
 namespace runtime {
 namespace atn {
 
-  class RuleStartState final : public ATNState {
+  /// Implements the {@code type} lexer action by calling <seealso cref="Lexer#setType"/>
+  /// with the assigned type.
+  class LexerTypeAction : public LexerAction {
   public:
-    RuleStartState();
+    /// <summary>
+    /// Constructs a new {@code type} action with the specified token type value. </summary>
+    /// <param name="type"> The type to assign to the token using <seealso cref="Lexer#setType"/>. </param>
+    LexerTypeAction(int type);
 
-    RuleStopState *stopState;
-    bool isLeftRecursiveRule;
+    /// <summary>
+    /// Gets the type to assign to a token created by the lexer. </summary>
+    /// <returns> The type to assign to a token created by the lexer. </returns>
+    virtual int getType() const;
 
-    virtual int getStateType();
+    /// <summary>
+    /// {@inheritDoc} </summary>
+    /// <returns> This method returns <seealso cref="LexerActionType#TYPE"/>. </returns>
+    virtual LexerActionType getActionType() const override;
 
+    /// <summary>
+    /// {@inheritDoc} </summary>
+    /// <returns> This method returns {@code false}. </returns>
+    virtual bool isPositionDependent() const override;
+
+    /// <summary>
+    /// {@inheritDoc}
+    ///
+    /// <para>This action is implemented by calling <seealso cref="Lexer#setType"/> with the
+    /// value provided by <seealso cref="#getType"/>.</para>
+    /// </summary>
+    virtual void execute(Lexer::Ref lexer) override;
+
+    virtual size_t hashCode() const override;
+    virtual bool operator == (const LexerAction &obj) const override;
+    virtual std::wstring toString() const override;
+
+  private:
+    const int _type;
   };
 
 } // namespace atn

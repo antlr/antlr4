@@ -1,8 +1,8 @@
-﻿/*
+/*
  * [The "BSD license"]
  *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
- *  Copyright (c) 2013 Dan McLaughlin
+ *  Copyright (c) 2013 Sam Harwell
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -29,29 +29,58 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
+#include "MurmurHash.h"
+#include "CPPUtils.h"
 
-#include "ATNState.h"
+#include "LexerCustomAction.h"
 
-namespace org {
-namespace antlr {
-namespace v4 {
-namespace runtime {
-namespace atn {
+using namespace org::antlr::v4::runtime::atn;
+using namespace org::antlr::v4::runtime::misc;
 
-  class RuleStartState final : public ATNState {
-  public:
-    RuleStartState();
+LexerCustomAction::LexerCustomAction(int ruleIndex, int actionIndex) : _ruleIndex(ruleIndex), _actionIndex(actionIndex) {
+}
 
-    RuleStopState *stopState;
-    bool isLeftRecursiveRule;
+int LexerCustomAction::getRuleIndex() const {
+  return _ruleIndex;
+}
 
-    virtual int getStateType();
+int LexerCustomAction::getActionIndex() const {
+  return _actionIndex;
+}
 
-  };
+LexerActionType LexerCustomAction::getActionType() const {
+  return LexerActionType::CUSTOM;
+}
 
-} // namespace atn
-} // namespace runtime
-} // namespace v4
-} // namespace antlr
-} // namespace org
+bool LexerCustomAction::isPositionDependent() const {
+  return true;
+}
+
+void LexerCustomAction::execute(Lexer::Ref lexer) {
+  lexer->action(nullptr, _ruleIndex, _actionIndex);
+}
+
+size_t LexerCustomAction::hashCode() const {
+  size_t hash = MurmurHash::initialize();
+  hash = MurmurHash::update(hash, (size_t)getActionType());
+  hash = MurmurHash::update(hash, _ruleIndex);
+  hash = MurmurHash::update(hash, _actionIndex);
+  return MurmurHash::finish(hash, 3);
+}
+
+bool LexerCustomAction::operator == (const LexerAction &obj) const {
+  if (&obj == this) {
+    return true;
+  }
+
+  const LexerCustomAction *action = dynamic_cast<const LexerCustomAction *>(&obj);
+  if (action == nullptr) {
+    return false;
+  }
+
+  return _ruleIndex == action->_ruleIndex && _actionIndex == action->_actionIndex;
+}
+
+std::wstring LexerCustomAction::toString() const {
+  return antlrcpp::toString(this);
+}

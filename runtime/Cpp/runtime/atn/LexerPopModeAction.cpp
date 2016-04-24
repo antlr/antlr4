@@ -1,8 +1,8 @@
-﻿/*
+/*
  * [The "BSD license"]
  *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
- *  Copyright (c) 2013 Dan McLaughlin
+ *  Copyright (c) 2013 Sam Harwell
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -29,29 +29,39 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
+#include "MurmurHash.h"
+#include "LexerPopModeAction.h"
 
-#include "ATNState.h"
+using namespace org::antlr::v4::runtime::atn;
+using namespace org::antlr::v4::runtime::misc;
 
-namespace org {
-namespace antlr {
-namespace v4 {
-namespace runtime {
-namespace atn {
+const std::shared_ptr<LexerPopModeAction> LexerPopModeAction::INSTANCE { new LexerPopModeAction() };
 
-  class RuleStartState final : public ATNState {
-  public:
-    RuleStartState();
+LexerPopModeAction::LexerPopModeAction() {
+}
 
-    RuleStopState *stopState;
-    bool isLeftRecursiveRule;
+LexerActionType LexerPopModeAction::getActionType() const {
+  return LexerActionType::POP_MODE;
+}
 
-    virtual int getStateType();
+bool LexerPopModeAction::isPositionDependent() const {
+  return false;
+}
 
-  };
+void LexerPopModeAction::execute(Lexer::Ref lexer) {
+  lexer->popMode();
+}
 
-} // namespace atn
-} // namespace runtime
-} // namespace v4
-} // namespace antlr
-} // namespace org
+size_t LexerPopModeAction::hashCode() const {
+  size_t hash = MurmurHash::initialize();
+  hash = MurmurHash::update(hash, (size_t)getActionType());
+  return MurmurHash::finish(hash, 1);
+}
+
+bool LexerPopModeAction::operator == (const LexerAction &obj) const {
+  return &obj == this;
+}
+
+std::wstring LexerPopModeAction::toString() const {
+  return L"popMode";
+}

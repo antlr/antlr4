@@ -67,7 +67,7 @@ ParserInterpreter::ParserInterpreter(const std::wstring &grammarFileName, const 
     }
 
     atn::RuleStartState *ruleStartState = _atn.ruleToStartState[(size_t)state->ruleIndex];
-    if (!ruleStartState->isPrecedenceRule) {
+    if (!ruleStartState->isLeftRecursiveRule) {
       continue;
     }
 
@@ -111,7 +111,7 @@ ParserRuleContext::Ref ParserInterpreter::parse(int startRuleIndex) {
   std::shared_ptr<InterpreterRuleContext> rootContext =
     std::make_shared<InterpreterRuleContext>(std::weak_ptr<ParserRuleContext>(), atn::ATNState::INVALID_STATE_NUMBER, startRuleIndex);
   
-  if (startRuleStartState->isPrecedenceRule) {
+  if (startRuleStartState->isLeftRecursiveRule) {
     enterRecursionRule(rootContext, startRuleStartState->stateNumber, startRuleIndex, 0);
   } else {
     enterRule(rootContext, startRuleStartState->stateNumber, startRuleIndex);
@@ -187,7 +187,7 @@ void ParserInterpreter::visitState(atn::ATNState *p) {
       atn::RuleStartState *ruleStartState = (atn::RuleStartState*)(transition->target);
       int ruleIndex = ruleStartState->ruleIndex;
       std::shared_ptr<InterpreterRuleContext> ruleContext = std::make_shared<InterpreterRuleContext>(_ctx, p->stateNumber, ruleIndex);
-      if (ruleStartState->isPrecedenceRule) {
+      if (ruleStartState->isLeftRecursiveRule) {
         enterRecursionRule(ruleContext, ruleStartState->stateNumber, ruleIndex, ((atn::RuleTransition*)(transition))->precedence);
       } else {
         enterRule(_ctx, transition->target->stateNumber, ruleIndex);
@@ -228,7 +228,7 @@ void ParserInterpreter::visitState(atn::ATNState *p) {
 
 void ParserInterpreter::visitRuleStopState(atn::ATNState *p) {
   atn::RuleStartState *ruleStartState = _atn.ruleToStartState[(size_t)p->ruleIndex];
-  if (ruleStartState->isPrecedenceRule) {
+  if (ruleStartState->isLeftRecursiveRule) {
     std::pair<ParserRuleContext::Ref, int> parentContext = _parentContextStack.top();
     _parentContextStack.pop();
 

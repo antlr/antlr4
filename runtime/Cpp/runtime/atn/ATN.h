@@ -32,6 +32,7 @@
 #pragma once
 
 #include "RuleContext.h"
+#include "LexerAction.h"
 
 namespace org {
 namespace antlr {
@@ -49,18 +50,18 @@ namespace atn {
     ATN(ATNType grammarType, size_t maxTokenType);
     ~ATN();
 
-    std::vector<ATNState*> states;
+    std::vector<ATNState *> states;
 
     /// Each subrule/rule is a decision point and we must track them so we
     /// can go back later and build DFA predictors for them.  This includes
     /// all the rules, subrules, optional blocks, ()+, ()* etc...
-    std::vector<DecisionState*> decisionToState;
+    std::vector<DecisionState *> decisionToState;
 
     /// Maps from rule index to starting state number.
-    std::vector<RuleStartState*> ruleToStartState;
+    std::vector<RuleStartState *> ruleToStartState;
 
     /// Maps from rule index to stop state number.
-    std::vector<RuleStopState*> ruleToStopState;
+    std::vector<RuleStopState *> ruleToStopState;
 
     /// The type of the ATN.
     ATNType grammarType;
@@ -77,13 +78,9 @@ namespace atn {
     /// </summary>
     std::vector<int> ruleToTokenType;
 
-    /// <summary>
-    /// For lexer ATNs, this maps the rule index to the action which should be
-    /// executed following a match.
-    /// <p/>
-    /// This is {@code null} for parser ATNs.
-    /// </summary>
-    std::vector<int> ruleToActionIndex;
+    /// For lexer ATNs, this is an array of {@link LexerAction} objects which may
+    /// be referenced by action transitions in the ATN.
+    std::vector<LexerAction::Ref> lexerActions;
 
     std::vector<TokensStartState*> modeToStartState;
 

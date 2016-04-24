@@ -66,6 +66,15 @@
 #include "CPPUtils.h"
 #include "Strings.h"
 
+#include "LexerCustomAction.h"
+#include "LexerChannelAction.h"
+#include "LexerModeAction.h"
+#include "LexerMoreAction.h"
+#include "LexerPopModeAction.h"
+#include "LexerPushModeAction.h"
+#include "LexerSkipAction.h"
+#include "LexerTypeAction.h"
+
 #include "ATNDeserializer.h"
 
 using namespace org::antlr::v4::runtime;
@@ -93,7 +102,7 @@ Guid ATNDeserializer::ADDED_LEXER_ACTIONS() {
 }
 
 Guid ATNDeserializer::SERIALIZED_UUID() {
-  return ADDED_PRECEDENCE_TRANSITIONS(); //ADDED_LEXER_ACTIONS;
+  return ADDED_LEXER_ACTIONS();
 }
 
 Guid ATNDeserializer::BASE_SERIALIZED_UUID() {
@@ -101,7 +110,7 @@ Guid ATNDeserializer::BASE_SERIALIZED_UUID() {
 }
 
 std::vector<Guid>& ATNDeserializer::SUPPORTED_UUIDS() {
-  static std::vector<Guid> singleton = { BASE_SERIALIZED_UUID(), ADDED_PRECEDENCE_TRANSITIONS() };
+  static std::vector<Guid> singleton = { BASE_SERIALIZED_UUID(), ADDED_PRECEDENCE_TRANSITIONS(), ADDED_LEXER_ACTIONS() };
   return singleton;
 }
 
@@ -145,6 +154,7 @@ ATN ATNDeserializer::deserialize(const std::wstring& input) {
   }
 
   bool supportsPrecedencePredicates = isFeatureSupported(ADDED_PRECEDENCE_TRANSITIONS(), uuid);
+  bool supportsLexerActions = isFeatureSupported(ADDED_LEXER_ACTIONS(), uuid);
 
   ATNType grammarType = (ATNType)data[p++];
   size_t maxTokenType = data[p++];
@@ -201,7 +211,7 @@ ATN ATNDeserializer::deserialize(const std::wstring& input) {
     int numPrecedenceStates = data[p++];
     for (int i = 0; i < numPrecedenceStates; i++) {
       int stateNumber = data[p++];
-      ((RuleStartState *)atn.states[(size_t)stateNumber])->isPrecedenceRule = true;
+      ((RuleStartState *)atn.states[(size_t)stateNumber])->isLeftRecursiveRule = true;
     }
   }
 
@@ -211,7 +221,6 @@ ATN ATNDeserializer::deserialize(const std::wstring& input) {
   size_t nrules = (size_t)data[p++];
   if (atn.grammarType == ATNType::LEXER) {
     atn.ruleToTokenType.resize(nrules);
-    atn.ruleToActionIndex.resize(nrules);
   }
 
   for (size_t i = 0; i < nrules; i++) {
@@ -226,12 +235,13 @@ ATN ATNDeserializer::deserialize(const std::wstring& input) {
       }
 
       atn.ruleToTokenType[i] = tokenType;
-      int actionIndex = data[p++];
-      if (actionIndex == 0xFFFF) {
-        actionIndex = -1;
-      }
 
-      atn.ruleToActionIndex[i] = actionIndex;
+      if (!isFeatureSupported(ADDED_LEXER_ACTIONS(), uuid)) {
+        // this piece of unused metadata was serialized prior to the
+        // addition of LexerAction
+        //int actionIndexIgnored = data[p++];
+        p++;
+      }
     }
   }
 
@@ -302,8 +312,15 @@ ATN ATNDeserializer::deserialize(const std::wstring& input) {
       }
 
       RuleTransition *ruleTransition = static_cast<RuleTransition*>(t);
-      atn.ruleToStopState[(size_t)ruleTransition->target->ruleIndex]->
-        addTransition(new EpsilonTransition(ruleTransition->followState)); /* mem check: freed in ANTState d-tor */
+      int outermostPrecedenceReturn = -1;
+      if (atn.ruleToStartState[ruleTransition->target->ruleIndex]->isLeftRecursiveRule) {
+        if (ruleTransition->precedence == 0) {
+          outermostPrecedenceReturn = ruleTransition->target->ruleIndex;
+        }
+      }
+
+      EpsilonTransition *returnTransition = new EpsilonTransition(ruleTransition->followState, outermostPrecedenceReturn); /* mem check: freed in ANTState d-tor */
+      atn.ruleToStopState[ruleTransition->target->ruleIndex]->addTransition(returnTransition);
     }
   }
 
@@ -357,6 +374,49 @@ ATN ATNDeserializer::deserialize(const std::wstring& input) {
     decState->decision = (int)i - 1;
   }
 
+  //
+  // LEXER ACTIONS
+  //
+  if (atn.grammarType == ATNType::LEXER) {
+    if (supportsLexerActions) {
+      atn.lexerActions.resize(data[p++]);
+      for (size_t i = 0; i < atn.lexerActions.size(); i++) {
+        LexerActionType actionType = (LexerActionType)data[p++];
+        int data1 = data[p++];
+        if (data1 == 0xFFFF) {
+          data1 = -1;
+        }
+
+        int data2 = data[p++];
+        if (data2 == 0xFFFF) {
+          data2 = -1;
+        }
+
+        atn.lexerActions[i] = lexerActionFactory(actionType, data1, data2);
+      }
+    } else {
+      // for compatibility with older serialized ATNs, convert the old
+      // serialized action index for action transitions to the new
+      // form, which is the index of a LexerCustomAction
+      for (ATNState *state : atn.states) {
+        for (size_t i = 0; i < state->getNumberOfTransitions(); i++) {
+          Transition *transition = state->transition(i);
+          if (!is<ActionTransition *>(transition)) {
+            continue;
+          }
+
+          int ruleIndex = static_cast<ActionTransition *>(transition)->ruleIndex;
+          int actionIndex = static_cast<ActionTransition *>(transition)->actionIndex;
+          std::shared_ptr<LexerCustomAction> lexerAction = std::make_shared<LexerCustomAction>(ruleIndex, actionIndex);
+          state->setTransition(i, new ActionTransition(transition->target, ruleIndex, (int)atn.lexerActions.size(), false)); /* mem-check freed in ATNState d-tor */
+          atn.lexerActions.push_back(lexerAction);
+        }
+      }
+    }
+  }
+
+  markPrecedenceDecisions(atn);
+
   if (deserializationOptions.isVerifyATN()) {
     verifyATN(atn);
   }
@@ -383,7 +443,7 @@ ATN ATNDeserializer::deserialize(const std::wstring& input) {
 
       ATNState *endState;
       Transition *excludeTransition = nullptr;
-      if (atn.ruleToStartState[i]->isPrecedenceRule) {
+      if (atn.ruleToStartState[i]->isLeftRecursiveRule) {
         // wrap from the beginning of the rule to the StarLoopEntryState
         endState = nullptr;
         for (ATNState *state : atn.states) {
@@ -452,6 +512,34 @@ ATN ATNDeserializer::deserialize(const std::wstring& input) {
   }
 
   return atn;
+}
+
+/**
+ * Analyze the {@link StarLoopEntryState} states in the specified ATN to set
+ * the {@link StarLoopEntryState#isPrecedenceDecision} field to the
+ * correct value.
+ *
+ * @param atn The ATN.
+ */
+void ATNDeserializer::markPrecedenceDecisions(const ATN &atn) {
+  for (ATNState *state : atn.states) {
+    if (!is<StarLoopEntryState *>(state)) {
+      continue;
+    }
+
+    /* We analyze the ATN to determine if this ATN decision state is the
+     * decision for the closure block that determines whether a
+     * precedence rule should continue or complete.
+     */
+    if (atn.ruleToStartState[state->ruleIndex]->isLeftRecursiveRule) {
+      ATNState *maybeLoopEndState = state->transition(state->getNumberOfTransitions() - 1)->target;
+      if (is<LoopEndState *>(maybeLoopEndState)) {
+        if (maybeLoopEndState->epsilonOnlyTransitions && is<RuleStopState *>(maybeLoopEndState->transition(0)->target)) {
+          static_cast<StarLoopEntryState *>(state)->isPrecedenceDecision = true;
+        }
+      }
+    }
+  }
 }
 
 void ATNDeserializer::verifyATN(const ATN &atn) {
@@ -568,7 +656,7 @@ Transition *ATNDeserializer::edgeFactory(const ATN &atn, int type, int src, int 
 }
 
 /* mem check: all created instances are freed in the d-tor of the ATN. */
-ATNState *ATNDeserializer::stateFactory(int type, int ruleIndex) {
+ATNState* ATNDeserializer::stateFactory(int type, int ruleIndex) {
   ATNState *s;
   switch (type) {
     case ATNState::ATN_INVALID_TYPE:
@@ -616,4 +704,35 @@ ATNState *ATNDeserializer::stateFactory(int type, int ruleIndex) {
 
   s->ruleIndex = ruleIndex;
   return s;
+}
+
+LexerAction::Ref ATNDeserializer::lexerActionFactory(LexerActionType type, int data1, int data2) {
+  switch (type) {
+    case LexerActionType::CHANNEL:
+      return std::make_shared<LexerChannelAction>(data1);
+
+    case LexerActionType::CUSTOM:
+      return std::make_shared<LexerCustomAction>(data1, data2);
+
+    case LexerActionType::MODE:
+      return std::make_shared< LexerModeAction>(data1);
+
+    case LexerActionType::MORE:
+      return LexerMoreAction::INSTANCE;
+
+    case LexerActionType::POP_MODE:
+      return LexerPopModeAction::INSTANCE;
+
+    case LexerActionType::PUSH_MODE:
+      return std::make_shared<LexerPushModeAction>(data1);
+
+    case LexerActionType::SKIP:
+      return LexerSkipAction::INSTANCE;
+
+    case LexerActionType::TYPE:
+      return std::make_shared<LexerTypeAction>(data1);
+
+    default:
+      throw IllegalArgumentException("The specified lexer action type " + std::to_string((size_t)type) + " is not valid.");
+  }
 }

@@ -42,7 +42,7 @@
 #include "SetTransition.h"
 #include "Token.h"
 #include "Interval.h"
-#include "ATN.h"
+#include "atn.h"
 
 #include "RuleTransition.h"
 #include "PrecedencePredicateTransition.h"
@@ -55,6 +55,14 @@
 #include "TokensStartState.h"
 #include "Exceptions.h"
 #include "CPPUtils.h"
+
+#include "LexerChannelAction.h"
+#include "LexerCustomAction.h"
+#include "LexerModeAction.h"
+#include "LexerPushModeAction.h"
+#include "LexerTypeAction.h"
+
+#include "Exceptions.h"
 
 #include "ATNSerializer.h"
 
@@ -96,7 +104,7 @@ std::vector<size_t> ATNSerializer::serialize() {
       nonGreedyStates.push_back(s->stateNumber);
     }
 
-    if (is<RuleStartState *>(s) && (static_cast<RuleStartState *>(s))->isPrecedenceRule) {
+    if (is<RuleStartState *>(s) && (static_cast<RuleStartState *>(s))->isLeftRecursiveRule) {
       precedenceStates.push_back(s->stateNumber);
     }
 
@@ -158,13 +166,6 @@ std::vector<size_t> ATNSerializer::serialize() {
       }
       else {
         data.push_back((size_t)atn->ruleToTokenType[r]);
-      }
-
-      if (atn->ruleToActionIndex[r] == -1) {
-        data.push_back(WCHAR_MAX);
-      }
-      else {
-        data.push_back((size_t)atn->ruleToActionIndex[r]);
       }
     }
   }
@@ -299,10 +300,80 @@ std::vector<size_t> ATNSerializer::serialize() {
       data.push_back((size_t)arg3);
     }
   }
+
   size_t ndecisions = atn->decisionToState.size();
   data.push_back(ndecisions);
   for (DecisionState *decStartState : atn->decisionToState) {
     data.push_back((size_t)decStartState->stateNumber);
+  }
+
+  // LEXER ACTIONS
+  if (atn->grammarType == ATNType::LEXER) {
+    data.push_back(atn->lexerActions.size());
+    for (LexerAction::Ref action : atn->lexerActions) {
+      data.push_back((size_t)action->getActionType());
+      switch (action->getActionType()) {
+        case LexerActionType::CHANNEL:
+        {
+          int channel = std::dynamic_pointer_cast<LexerChannelAction>(action)->getChannel();
+          data.push_back(channel != -1 ? channel : 0xFFFF);
+          data.push_back(0);
+          break;
+        }
+
+        case LexerActionType::CUSTOM:
+        {
+          int ruleIndex = std::dynamic_pointer_cast<LexerCustomAction>(action)->getRuleIndex();
+          int actionIndex = std::dynamic_pointer_cast<LexerCustomAction>(action)->getActionIndex();
+          data.push_back(ruleIndex != -1 ? ruleIndex : 0xFFFF);
+          data.push_back(actionIndex != -1 ? actionIndex : 0xFFFF);
+          break;
+        }
+
+        case LexerActionType::MODE:
+        {
+          int mode = std::dynamic_pointer_cast<LexerModeAction>(action)->getMode();
+          data.push_back(mode != -1 ? mode : 0xFFFF);
+          data.push_back(0);
+          break;
+        }
+
+        case LexerActionType::MORE:
+          data.push_back(0);
+          data.push_back(0);
+          break;
+
+        case LexerActionType::POP_MODE:
+          data.push_back(0);
+          data.push_back(0);
+          break;
+
+        case LexerActionType::PUSH_MODE:
+        {
+          int mode = std::dynamic_pointer_cast<LexerPushModeAction>(action)->getMode();
+          data.push_back(mode != -1 ? mode : 0xFFFF);
+          data.push_back(0);
+          break;
+        }
+
+        case LexerActionType::SKIP:
+          data.push_back(0);
+          data.push_back(0);
+          break;
+
+        case LexerActionType::TYPE:
+        {
+          int type = std::dynamic_pointer_cast<LexerTypeAction>(action)->getType();
+          data.push_back(type != -1 ? type : 0xFFFF);
+          data.push_back(0);
+          break;
+        }
+
+        default:
+          throw IllegalArgumentException("The specified lexer action type " +
+                                         std::to_string((size_t)action->getActionType()) + " is not valid.");
+      }
+    }
   }
 
   // don't adjust the first value since that's the version number
@@ -389,6 +460,7 @@ std::wstring ATNSerializer::decode(const std::wstring &inpdata) {
    int stateNumber = data[p++];
    }
    */
+
   int numPrecedenceStates = data[p++];
   p += numPrecedenceStates;
   /*
@@ -396,23 +468,18 @@ std::wstring ATNSerializer::decode(const std::wstring &inpdata) {
    int stateNumber = data[p++];
    }
    */
+
   int nrules = data[p++];
   for (int i = 0; i < nrules; i++) {
     int s = data[p++];
     if (atn->grammarType == ATNType::LEXER) {
       int arg1 = data[p++];
-      int arg2 = data[p++];
-      if (arg2 == WCHAR_MAX) {
-        arg2 = -1;
-      }
       buf.append(L"rule ")
       .append(std::to_wstring(i))
       .append(L":")
       .append(std::to_wstring(s))
       .append(L" ")
       .append(std::to_wstring(arg1))
-      .append(L",")
-      .append(std::to_wstring(arg2))
       .append(L"\n");
     }
     else {
@@ -480,6 +547,20 @@ std::wstring ATNSerializer::decode(const std::wstring &inpdata) {
     int s = data[p++];
     buf.append(std::to_wstring(i)).append(L":").append(std::to_wstring(s)).append(L"\n");
   }
+
+  if (atn->grammarType == ATNType::LEXER) {
+    int lexerActionCount = data[p++];
+
+    p += lexerActionCount * 3; // Instead of useless loop below.
+    /*
+    for (int i = 0; i < lexerActionCount; i++) {
+      LexerActionType actionType = (LexerActionType)data[p++];
+      int data1 = data[p++];
+      int data2 = data[p++];
+    }
+     */
+  }
+
   return buf;
 }
 

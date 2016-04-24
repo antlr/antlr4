@@ -36,6 +36,8 @@
 
 using namespace org::antlr::v4::runtime::atn;
 
+const size_t ATNConfig::SUPPRESS_PRECEDENCE_FILTER = 0x40000000;
+
 ATNConfig::ATNConfig(ATNState *state, int alt, PredictionContext::Ref context)
   : ATNConfig(state, alt, context, SemanticContext::NONE) {
 }
@@ -77,11 +79,29 @@ size_t ATNConfig::hashCode() const {
   return hashCode;
 }
 
+int ATNConfig::getOuterContextDepth() const {
+  return reachesIntoOuterContext & ~SUPPRESS_PRECEDENCE_FILTER;
+}
+
+bool ATNConfig::isPrecedenceFilterSuppressed() const {
+  return (reachesIntoOuterContext & SUPPRESS_PRECEDENCE_FILTER) != 0;
+}
+
+void ATNConfig::setPrecedenceFilterSuppressed(bool value) {
+  if (value) {
+    reachesIntoOuterContext |= 0x40000000;
+  }
+  else {
+    reachesIntoOuterContext &= ~SUPPRESS_PRECEDENCE_FILTER;
+  }
+}
+
 bool ATNConfig::operator == (const ATNConfig& other) const
 {
-  return this->state->stateNumber == other.state->stateNumber && this->alt == other.alt &&
-    (this->context == other.context || (this->context != nullptr && this->context == other.context)) &&
-    this->semanticContext == other.semanticContext;
+  return state->stateNumber == other.state->stateNumber && alt == other.alt &&
+    (context == other.context || (context != nullptr && context == other.context)) &&
+    semanticContext == other.semanticContext &&
+    isPrecedenceFilterSuppressed() == other.isPrecedenceFilterSuppressed();
 }
 
 std::wstring ATNConfig::toString() {
@@ -102,8 +122,8 @@ std::wstring ATNConfig::toString(bool showAlt) {
   if (semanticContext != nullptr && semanticContext != SemanticContext::NONE) {
     ss << L"," << semanticContext.get();
   }
-  if (reachesIntoOuterContext > 0) {
-    ss << L",up=" << reachesIntoOuterContext;
+  if (getOuterContextDepth() > 0) {
+    ss << L",up=" << getOuterContextDepth();
   }
   ss << L')';
 

@@ -47,6 +47,8 @@ namespace runtime {
   /// of speed.
   class Lexer : public Recognizer, public TokenSource {
   public:
+    typedef std::shared_ptr<Lexer> Ref;
+    
     static const int DEFAULT_MODE = 0;
     static const int MORE = -2;
     static const int SKIP = -3;

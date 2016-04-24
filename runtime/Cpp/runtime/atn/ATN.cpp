@@ -57,7 +57,7 @@ ATN::ATN(ATN &&other) {
   grammarType = std::move(other.grammarType);
   maxTokenType = std::move(other.maxTokenType);
   ruleToTokenType = std::move(other.ruleToTokenType);
-  ruleToActionIndex = std::move(other.ruleToActionIndex);
+  lexerActions = std::move(other.lexerActions);
   modeToStartState = std::move(other.modeToStartState);
 }
 
@@ -81,7 +81,7 @@ ATN& ATN::operator = (ATN &other) NOEXCEPT {
   grammarType = other.grammarType;
   maxTokenType = other.maxTokenType;
   ruleToTokenType = other.ruleToTokenType;
-  ruleToActionIndex = other.ruleToActionIndex;
+  lexerActions = other.lexerActions;
   modeToStartState = other.modeToStartState;
 
   return *this;
@@ -99,7 +99,7 @@ ATN& ATN::operator = (ATN &&other) NOEXCEPT {
   grammarType = std::move(other.grammarType);
   maxTokenType = std::move(other.maxTokenType);
   ruleToTokenType = std::move(other.ruleToTokenType);
-  ruleToActionIndex = std::move(other.ruleToActionIndex);
+  lexerActions = std::move(other.lexerActions);
   modeToStartState = std::move(other.modeToStartState);
 
   return *this;

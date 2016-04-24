@@ -31,6 +31,7 @@
 
 #pragma once
 
+#include "LexerAction.h"
 #include "ATNDeserializationOptions.h"
 
 namespace org {
@@ -76,6 +77,8 @@ namespace atn {
     /// serialized ATN at or after the feature identified by {@code feature} was
     /// introduced; otherwise, {@code false}. </returns>
     virtual bool isFeatureSupported(const Guid &feature, const Guid &actualUuid);
+    void markPrecedenceDecisions(const ATN &atn);
+    LexerAction::Ref lexerActionFactory(LexerActionType type, int data1, int data2);
 
   private:
     /// This is the earliest supported serialized UUID.

@@ -66,15 +66,29 @@ namespace atn {
     /// Can be shared between multiple ANTConfig instances.
     PredictionContext::Ref context;
 
-    /// We cannot execute predicates dependent upon local context unless
-    /// we know for sure we are in the correct context. Because there is
-    /// no way to do this efficiently, we simply cannot evaluate
-    /// dependent predicates unless we are in the rule that initially
-    /// invokes the ATN simulator.
-    ///
-    /// closure() tracks the depth of how far we dip into the
-    /// outer context: depth > 0.  Note that it may not be totally
-    /// accurate depth since I don't ever decrement. TO_DO: make it a boolean then
+    /**
+     * We cannot execute predicates dependent upon local context unless
+     * we know for sure we are in the correct context. Because there is
+     * no way to do this efficiently, we simply cannot evaluate
+     * dependent predicates unless we are in the rule that initially
+     * invokes the ATN simulator.
+     *
+     * <p>
+     * closure() tracks the depth of how far we dip into the outer context:
+     * depth &gt; 0.  Note that it may not be totally accurate depth since I
+     * don't ever decrement. TODO: make it a boolean then</p>
+     *
+     * <p>
+     * For memory efficiency, the {@link #isPrecedenceFilterSuppressed} method
+     * is also backed by this field. Since the field is publicly accessible, the
+     * highest bit which would not cause the value to become negative is used to
+     * store this field. This choice minimizes the risk that code which only
+     * compares this value to 0 would be affected by the new purpose of the
+     * flag. It also ensures the performance of the existing {@link ATNConfig}
+     * constructors as well as certain operations like
+     * {@link ATNConfigSet#add(ATNConfig, DoubleKeyMap)} method are
+     * <em>completely</em> unaffected by the change.</p>
+     */
     int reachesIntoOuterContext;
 
     /// Can be shared between multiple ATNConfig instances.
@@ -106,6 +120,15 @@ namespace atn {
       }
     };
 
+    /**
+     * This method gets the value of the {@link #reachesIntoOuterContext} field
+     * as it existed prior to the introduction of the
+     * {@link #isPrecedenceFilterSuppressed} method.
+     */
+    int getOuterContextDepth() const ;
+    bool isPrecedenceFilterSuppressed() const;
+    void setPrecedenceFilterSuppressed(bool value);
+
     /// An ATN configuration is equal to another if both have
     /// the same state, they predict the same alternative, and
     /// syntactic/semantic contexts are the same.
@@ -113,6 +136,14 @@ namespace atn {
 
     virtual std::wstring toString();
     std::wstring toString(bool showAlt);
+
+  private:
+    /**
+     * This field stores the bit mask for implementing the
+     * {@link #isPrecedenceFilterSuppressed} property as a bit within the
+     * existing {@link #reachesIntoOuterContext} field.
+     */
+    static const size_t SUPPRESS_PRECEDENCE_FILTER;
   };
 
 } // namespace atn

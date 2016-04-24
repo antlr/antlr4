@@ -1,8 +1,8 @@
-﻿/*
+/*
  * [The "BSD license"]
  *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
- *  Copyright (c) 2013 Dan McLaughlin
+ *  Copyright (c) 2013 Sam Harwell
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -29,29 +29,7 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
+#include "LexerAction.h"
 
-#include "ATNState.h"
+using namespace org::antlr::v4::runtime::atn;
 
-namespace org {
-namespace antlr {
-namespace v4 {
-namespace runtime {
-namespace atn {
-
-  class RuleStartState final : public ATNState {
-  public:
-    RuleStartState();
-
-    RuleStopState *stopState;
-    bool isLeftRecursiveRule;
-
-    virtual int getStateType();
-
-  };
-
-} // namespace atn
-} // namespace runtime
-} // namespace v4
-} // namespace antlr
-} // namespace org

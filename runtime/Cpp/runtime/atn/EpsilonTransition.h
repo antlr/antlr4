@@ -42,13 +42,26 @@ namespace atn {
   class EpsilonTransition final : public Transition {
   public:
     EpsilonTransition(ATNState *target);
+    EpsilonTransition(ATNState *target, int outermostPrecedenceReturn);
 
+    /**
+     * @return the rule index of a precedence rule for which this transition is
+     * returning from, where the precedence value is 0; otherwise, -1.
+     *
+     * @see ATNConfig#isPrecedenceFilterSuppressed()
+     * @see ParserATNSimulator#applyPrecedenceFilter(ATNConfigSet)
+     * @since 4.4.1
+     */
+    int outermostPrecedenceReturn();
     virtual int getSerializationType() const override;
 
     virtual bool isEpsilon() const override;
     virtual bool matches(int symbol, int minVocabSymbol, int maxVocabSymbol) const override;
 
     virtual std::wstring toString() const override;
+
+  private:
+    const int _outermostPrecedenceReturn;
   };
 
 } // namespace atn

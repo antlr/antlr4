@@ -67,6 +67,11 @@ namespace atn {
     // TO_DO: can we track conflicts as they are added to save scanning configs later?
     int uniqueAlt;
 
+    /** Currently this is only used when we detect SLL conflict; this does
+     *  not necessarily represent the ambiguous alternatives. In fact,
+     *  I should also point out that this seems to include predicated alternatives
+     *  that have predicates that evaluate to false. Computed in computeTargetState().
+     */
     antlrcpp::BitSet conflictingAlts;
 
     // Used in parser and lexer. In lexer, it indicates we hit a pred
@@ -106,6 +111,15 @@ namespace atn {
 
     virtual std::vector<ATNState*> getStates();
 
+    /**
+     * Gets the complete set of represented alternatives for the configuration
+     * set.
+     *
+     * @return the set of represented alternatives in this configuration set
+     *
+     * @since 4.3
+     */
+    antlrcpp::BitSet getAlts();
     virtual std::vector<SemanticContext::Ref> getPredicates();
 
     virtual ATNConfig::Ref get(size_t i) const;

@@ -33,7 +33,15 @@
 
 using namespace org::antlr::v4::runtime::atn;
 
-EpsilonTransition::EpsilonTransition(ATNState *target) : Transition(target) {
+EpsilonTransition::EpsilonTransition(ATNState *target) : EpsilonTransition(target, -1) {
+}
+
+EpsilonTransition::EpsilonTransition(ATNState *target, int outermostPrecedenceReturn)
+  : Transition(target), _outermostPrecedenceReturn(outermostPrecedenceReturn) {
+}
+
+int EpsilonTransition::outermostPrecedenceReturn() {
+  return _outermostPrecedenceReturn;
 }
 
 int EpsilonTransition::getSerializationType() const {

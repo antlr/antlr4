@@ -1,8 +1,8 @@
-﻿/*
+/*
  * [The "BSD license"]
  *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
- *  Copyright (c) 2013 Dan McLaughlin
+ *  Copyright (c) 2013 Sam Harwell
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -31,7 +31,9 @@
 
 #pragma once
 
-#include "ATNState.h"
+#include "LexerAction.h"
+#include "LexerActionType.h"
+#include "Lexer.h"
 
 namespace org {
 namespace antlr {
@@ -39,15 +41,44 @@ namespace v4 {
 namespace runtime {
 namespace atn {
 
-  class RuleStartState final : public ATNState {
+  /// <summary>
+  /// Implements the {@code skip} lexer action by calling <seealso cref="Lexer#skip"/>.
+  ///
+  /// <para>The {@code skip} command does not have any parameters, so this action is
+  /// implemented as a singleton instance exposed by <seealso cref="#INSTANCE"/>.</para>
+  ///
+  /// @author Sam Harwell
+  /// @since 4.2
+  /// </summary>
+  class LexerSkipAction final : public LexerAction {
   public:
-    RuleStartState();
+    /// Provides a singleton instance of this parameterless lexer action.
+    static const std::shared_ptr<LexerSkipAction> INSTANCE;
 
-    RuleStopState *stopState;
-    bool isLeftRecursiveRule;
+    /// <summary>
+    /// {@inheritDoc} </summary>
+    /// <returns> This method returns <seealso cref="LexerActionType#SKIP"/>. </returns>
+    virtual LexerActionType getActionType() const override;
 
-    virtual int getStateType();
+    /// <summary>
+    /// {@inheritDoc} </summary>
+    /// <returns> This method returns {@code false}. </returns>
+    virtual bool isPositionDependent() const override;
 
+    /// <summary>
+    /// {@inheritDoc}
+    ///
+    /// <para>This action is implemented by calling <seealso cref="Lexer#skip"/>.</para>
+    /// </summary>
+    virtual void execute(Lexer::Ref lexer) override;
+
+    virtual size_t hashCode() const override;
+    virtual bool operator == (const LexerAction &obj) const override;
+    virtual std::wstring toString() const override;
+
+  private:
+    /// Constructs the singleton instance of the lexer {@code skip} command.
+    LexerSkipAction();
   };
 
 } // namespace atn

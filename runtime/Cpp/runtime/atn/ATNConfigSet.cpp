@@ -37,6 +37,7 @@
 #include "ATNConfigSet.h"
 
 using namespace org::antlr::v4::runtime::atn;
+using namespace antlrcpp;
 
 size_t SimpleATNConfigHasher::operator()(const ATNConfig::Ref &k) const {
   size_t hashCode = 7;
@@ -79,7 +80,7 @@ bool ATNConfigSet::add(ATNConfig::Ref config, PredictionContextMergeCache *merge
   if (config->semanticContext != SemanticContext::NONE) {
     hasSemanticContext = true;
   }
-  if (config->reachesIntoOuterContext > 0) {
+  if (config->getOuterContextDepth() > 0) {
     dipsIntoOuterContext = true;
   }
   
@@ -97,6 +98,12 @@ bool ATNConfigSet::add(ATNConfig::Ref config, PredictionContextMergeCache *merge
   // since only way to create new graphs is "call rule" and here. We
   // cache at both places.
   existing->reachesIntoOuterContext = std::max(existing->reachesIntoOuterContext, config->reachesIntoOuterContext);
+
+  // make sure to preserve the precedence filter suppression during the merge
+  if (config->isPrecedenceFilterSuppressed()) {
+    existing->setPrecedenceFilterSuppressed(true);
+  }
+  
   existing->context = merged; // replace context; no need to alt mapping
   return true;
 }
@@ -118,6 +125,23 @@ std::vector<ATNState*> ATNConfigSet::getStates() {
     states.push_back(c->state);
   }
   return states;
+}
+
+/**
+ * Gets the complete set of represented alternatives for the configuration
+ * set.
+ *
+ * @return the set of represented alternatives in this configuration set
+ *
+ * @since 4.3
+ */
+
+BitSet ATNConfigSet::getAlts() {
+  BitSet alts;
+  for (ATNConfig config : configs) {
+    alts.set(config.alt);
+  }
+  return alts;
 }
 
 std::vector<SemanticContext::Ref> ATNConfigSet::getPredicates() {

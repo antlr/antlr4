@@ -1,8 +1,8 @@
-﻿/*
+/*
  * [The "BSD license"]
  *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
- *  Copyright (c) 2013 Dan McLaughlin
+ *  Copyright (c) 2013 Sam Harwell
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -31,7 +31,9 @@
 
 #pragma once
 
-#include "ATNState.h"
+#include "LexerAction.h"
+#include "LexerActionType.h"
+#include "Lexer.h"
 
 namespace org {
 namespace antlr {
@@ -39,15 +41,50 @@ namespace v4 {
 namespace runtime {
 namespace atn {
 
-  class RuleStartState final : public ATNState {
+  /// <summary>
+  /// Implements the {@code pushMode} lexer action by calling
+  /// <seealso cref="Lexer#pushMode"/> with the assigned mode.
+  ///
+  /// @author Sam Harwell
+  /// @since 4.2
+  /// </summary>
+  class LexerPushModeAction final : public LexerAction {
   public:
-    RuleStartState();
+    /// <summary>
+    /// Constructs a new {@code pushMode} action with the specified mode value. </summary>
+    /// <param name="mode"> The mode value to pass to <seealso cref="Lexer#pushMode"/>. </param>
+    LexerPushModeAction(int mode);
 
-    RuleStopState *stopState;
-    bool isLeftRecursiveRule;
+    /// <summary>
+    /// Get the lexer mode this action should transition the lexer to.
+    /// </summary>
+    /// <returns> The lexer mode for this {@code pushMode} command. </returns>
+    int getMode() const;
 
-    virtual int getStateType();
+    /// <summary>
+    /// {@inheritDoc} </summary>
+    /// <returns> This method returns <seealso cref="LexerActionType#PUSH_MODE"/>. </returns>
+    virtual LexerActionType getActionType() const override;
 
+    /// <summary>
+    /// {@inheritDoc} </summary>
+    /// <returns> This method returns {@code false}. </returns>
+    virtual bool isPositionDependent() const override;
+
+    /// <summary>
+    /// {@inheritDoc}
+    ///
+    /// <para>This action is implemented by calling <seealso cref="Lexer#pushMode"/> with the
+    /// value provided by <seealso cref="#getMode"/>.</para>
+    /// </summary>
+    virtual void execute(Lexer::Ref lexer) override;
+
+    virtual size_t hashCode() const override;
+    virtual bool operator == (const LexerAction &obj) const override;
+    virtual std::wstring toString() const override;
+
+  private:
+    const int _mode;
   };
 
 } // namespace atn

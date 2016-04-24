@@ -33,10 +33,10 @@
 
 using namespace org::antlr::v4::runtime::atn;
 
-int RuleStartState::getStateType() {
-  return RULE_START;
+RuleStartState::RuleStartState() {
+  isLeftRecursiveRule = false;
 }
 
-void RuleStartState::InitializeInstanceFields() {
-  isPrecedenceRule = false;
+int RuleStartState::getStateType() {
+  return RULE_START;
 }

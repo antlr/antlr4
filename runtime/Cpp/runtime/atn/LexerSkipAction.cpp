@@ -1,8 +1,8 @@
-﻿/*
+/*
  * [The "BSD license"]
  *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2013 Terence Parr
- *  Copyright (c) 2013 Dan McLaughlin
+ *  Copyright (c) 2013 Sam Harwell
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -29,29 +29,40 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
+#include "MurmurHash.h"
 
-#include "ATNState.h"
+#include "LexerSkipAction.h"
 
-namespace org {
-namespace antlr {
-namespace v4 {
-namespace runtime {
-namespace atn {
+using namespace org::antlr::v4::runtime::atn;
+using namespace org::antlr::v4::runtime::misc;
 
-  class RuleStartState final : public ATNState {
-  public:
-    RuleStartState();
+const std::shared_ptr<LexerSkipAction> LexerSkipAction::INSTANCE { new LexerSkipAction() };
 
-    RuleStopState *stopState;
-    bool isLeftRecursiveRule;
+LexerSkipAction::LexerSkipAction() {
+}
 
-    virtual int getStateType();
+LexerActionType LexerSkipAction::getActionType() const {
+  return LexerActionType::SKIP;
+}
 
-  };
+bool LexerSkipAction::isPositionDependent() const {
+  return false;
+}
 
-} // namespace atn
-} // namespace runtime
-} // namespace v4
-} // namespace antlr
-} // namespace org
+void LexerSkipAction::execute(Lexer::Ref lexer) {
+  lexer->skip();
+}
+
+size_t LexerSkipAction::hashCode() const {
+  size_t hash = MurmurHash::initialize();
+  hash = MurmurHash::update(hash, (size_t)getActionType());
+  return MurmurHash::finish(hash, 1);
+}
+
+bool LexerSkipAction::operator == (const LexerAction &obj) const {
+  return &obj == this;
+}
+
+std::wstring LexerSkipAction::toString() const {
+  return L"skip";
+}
