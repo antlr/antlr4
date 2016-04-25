@@ -424,6 +424,12 @@ public class ATNSerializer {
 				.append(ATNState.serializationNames.get(stype)).append(" ")
 				.append(ruleIndex).append(arg).append("\n");
 		}
+		// this code is meant to model the form of ATNDeserializer.deserialize,
+		// since both need to be updated together whenever a change is made to
+		// the serialization format. The "dead" code is only used in debugging
+		// and testing scenarios, so the form you see here was kept for
+		// improved maintainability.
+		// start
 		int numNonGreedyStates = ATNDeserializer.toInt(data[p++]);
 		for (int i = 0; i < numNonGreedyStates; i++) {
 			int stateNumber = ATNDeserializer.toInt(data[p++]);
@@ -432,6 +438,7 @@ public class ATNSerializer {
 		for (int i = 0; i < numPrecedenceStates; i++) {
 			int stateNumber = ATNDeserializer.toInt(data[p++]);
 		}
+		// finish
 		int nrules = ATNDeserializer.toInt(data[p++]);
 		for (int i=0; i<nrules; i++) {
 			int s = ATNDeserializer.toInt(data[p++]);
@@ -487,12 +494,17 @@ public class ATNSerializer {
 			buf.append(i).append(":").append(s).append("\n");
 		}
 		if (atn.grammarType == ATNType.LEXER) {
-				int lexerActionCount = ATNDeserializer.toInt(data[p++]);
-				for (int i = 0; i < lexerActionCount; i++) {
-					LexerActionType actionType = LexerActionType.values()[ATNDeserializer.toInt(data[p++])];
-					int data1 = ATNDeserializer.toInt(data[p++]);
-					int data2 = ATNDeserializer.toInt(data[p++]);
-				}
+			// this code is meant to model the form of ATNDeserializer.deserialize,
+			// since both need to be updated together whenever a change is made to
+			// the serialization format. The "dead" code is only used in debugging
+			// and testing scenarios, so the form you see here was kept for
+			// improved maintainability.
+			int lexerActionCount = ATNDeserializer.toInt(data[p++]);
+			for (int i = 0; i < lexerActionCount; i++) {
+				LexerActionType actionType = LexerActionType.values()[ATNDeserializer.toInt(data[p++])];
+				int data1 = ATNDeserializer.toInt(data[p++]);
+				int data2 = ATNDeserializer.toInt(data[p++]);
+			}
 		}
 		return buf.toString();
 	}
