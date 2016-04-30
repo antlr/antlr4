@@ -181,7 +181,7 @@ namespace runtime {
     ProxyErrorListener _proxListener; // Manages a collection of listeners.
 
     // Mutex to manage synchronized access for multithreading.
-    std::mutex mtx;
+    std::recursive_mutex mtx;
 
     int _stateNumber;
     

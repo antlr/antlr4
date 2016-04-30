@@ -1205,7 +1205,7 @@ dfa::DFAState *ParserATNSimulator::addDFAEdge(dfa::DFA &dfa, dfa::DFAState *from
   }
 
   {
-    std::lock_guard<std::mutex> lck(mtx);
+    std::lock_guard<std::recursive_mutex> lck(mtx);
     if (from->edges.empty())
       from->edges.resize(atn.maxTokenType + 1 + 1);
     from->edges[(size_t)(t + 1)] = to; // connect
@@ -1228,7 +1228,7 @@ dfa::DFAState *ParserATNSimulator::addDFAState(dfa::DFA &dfa, dfa::DFAState *D) 
   }
 
   {
-    std::lock_guard<std::mutex> lck(mtx);
+    std::lock_guard<std::recursive_mutex> lck(mtx);
 
     auto existing = dfa.states.find(D);
     if (existing != dfa.states.end()) {

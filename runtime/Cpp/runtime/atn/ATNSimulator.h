@@ -85,7 +85,7 @@ namespace atn {
 
   protected:
     // Mutex to manage synchronized access for multithreading
-    std::mutex mtx;
+    std::recursive_mutex mtx;
 
     /// <summary>
     /// The context cache maps all PredictionContext objects that are equals()

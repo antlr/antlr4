@@ -29,11 +29,13 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "VocabularyImpl.h"
+
 #include "LexerDFASerializer.h"
 
 using namespace org::antlr::v4::runtime::dfa;
 
-LexerDFASerializer::LexerDFASerializer(DFA *dfa) : DFASerializer(dfa, lexerTokenNames_) {
+LexerDFASerializer::LexerDFASerializer(DFA *dfa) : DFASerializer(dfa, VocabularyImpl::EMPTY_VOCABULARY) {
 }
 
 std::wstring LexerDFASerializer::getEdgeLabel(size_t i) const {

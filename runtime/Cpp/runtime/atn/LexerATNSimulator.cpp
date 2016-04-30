@@ -563,7 +563,7 @@ void LexerATNSimulator::addDFAEdge(dfa::DFAState *p, ssize_t t, dfa::DFAState *q
     std::wcout << std::wstring(L"EDGE ") << p << std::wstring(L" -> ") << q << std::wstring(L" upon ") << (static_cast<wchar_t>(t)) << std::endl;
   }
 
-  std::lock_guard<std::mutex> lck(mtx);
+  std::lock_guard<std::recursive_mutex> lck(mtx);
   if (p->edges.empty()) {
     //  make room for tokens 1..n and -1 masquerading as index 0
     p->edges.resize(MAX_DFA_EDGE - MIN_DFA_EDGE + 1);
@@ -595,7 +595,7 @@ dfa::DFAState *LexerATNSimulator::addDFAState(Ref<ATNConfigSet> configs) {
   dfa::DFA &dfa = _decisionToDFA[_mode];
 
   {
-    std::lock_guard<std::mutex> lck(mtx);
+    std::lock_guard<std::recursive_mutex> lck(mtx);
     
     auto iterator = dfa.states.find(proposed);
     if (iterator != dfa.states.end()) {

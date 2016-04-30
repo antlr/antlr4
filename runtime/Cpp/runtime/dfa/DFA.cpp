@@ -106,7 +106,7 @@ void DFA::setPrecedenceStartState(int precedence, DFAState *startState) {
 
   // synchronization on s0 here is ok. when the DFA is turned into a
   // precedence DFA, s0 will be initialized once and not updated again
-  std::unique_lock<std::mutex> lock(_lock);
+  std::unique_lock<std::recursive_mutex> lock(_lock);
   {
     // s0.edges is never null for a precedence DFA
     if (precedence >= (int)s0->edges.size()) {

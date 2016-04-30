@@ -109,7 +109,7 @@ namespace dfa {
      */
     bool _precedenceDfa;
 
-    std::mutex _lock; // To synchronize access to s0.
+    std::recursive_mutex _lock; // To synchronize access to s0.
   };
 
 } // namespace atn

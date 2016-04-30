@@ -290,7 +290,7 @@ namespace atn {
     PredictionMode mode;
 
     // Mutex to manage synchronized access for multithreading in the parser atn simulator.
-    std::mutex _lock;
+    std::recursive_mutex _lock;
 
     /// <summary>
     /// Each prediction operation uses a cache for merge of prediction contexts.

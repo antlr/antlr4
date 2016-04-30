@@ -425,7 +425,7 @@ namespace runtime {
     std::vector<int> _precedenceStack;
     
     //Mutex to manage synchronized access for multithreading in the parser
-    std::mutex mtx;
+    std::recursive_mutex mtx;
 
     /// <summary>
     /// Specifies whether or not the parser should construct a parse tree during
