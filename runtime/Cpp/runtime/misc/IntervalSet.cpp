@@ -32,14 +32,24 @@
 #include "MurmurHash.h"
 #include "Lexer.h"
 #include "Exceptions.h"
+#include "VocabularyImpl.h"
 
 #include "IntervalSet.h"
 
 using namespace org::antlr::v4::runtime;
 using namespace org::antlr::v4::runtime::misc;
 
-IntervalSet const IntervalSet::COMPLETE_CHAR_SET = IntervalSet::of(0, Lexer::MAX_CHAR_VALUE);
-IntervalSet const IntervalSet::EMPTY_SET;
+IntervalSet const IntervalSet::COMPLETE_CHAR_SET = []() {
+  IntervalSet complete = IntervalSet::of(Lexer::MIN_CHAR_VALUE, Lexer::MAX_CHAR_VALUE);
+  complete.setReadOnly(true);
+  return complete;
+}();
+
+IntervalSet const IntervalSet::EMPTY_SET = []() {
+  IntervalSet empty;
+  empty.setReadOnly(true);
+  return empty;
+}();
 
 IntervalSet::IntervalSet() {
   InitializeInstanceFields();
@@ -50,6 +60,7 @@ IntervalSet::IntervalSet(const std::vector<Interval> &intervals) : IntervalSet()
 }
 
 IntervalSet::IntervalSet(const IntervalSet &set) : IntervalSet() {
+  _intervals.clear();
   addAll(set);
 }
 
@@ -162,53 +173,80 @@ IntervalSet IntervalSet::complement(int minElement, int maxElement) const {
 }
 
 IntervalSet IntervalSet::complement(const IntervalSet &vocabulary) const {
-  if (vocabulary == IntervalSet::EMPTY_SET) {
-    return IntervalSet::EMPTY_SET; // nothing in common with null set
-  }
-
-  int maxElement = vocabulary.getMaxElement();
-
-  IntervalSet compliment;
-  if (_intervals.empty()) {
-    return compliment;
-  }
-  Interval first = _intervals[0];
-
-  // Add a range from 0 to first.a constrained to vocab.
-  if (first.a > 0) {
-    IntervalSet s = IntervalSet::of(0, first.a - 1);
-    IntervalSet a = s.And(vocabulary);
-    compliment.addAll(a);
-  }
-
-  for (size_t i = 1; i < _intervals.size(); i++) { // from 2nd interval .. nth
-    const Interval &previous = _intervals[i - 1];
-    const Interval &current = _intervals[i];
-    IntervalSet s = IntervalSet::of(previous.b + 1, current.a - 1);
-    IntervalSet a = s.And(vocabulary);
-    compliment.addAll(a);
-  }
-
-  const Interval &last = _intervals.back();
-
-  // Add a range from last.b to maxElement constrained to vocab
-  if (last.b < maxElement) {
-    IntervalSet s = IntervalSet::of(last.b + 1, maxElement);
-    IntervalSet a = s.And(vocabulary);
-    compliment.addAll(a);
-  }
-
-  return compliment;
+  return vocabulary.subtract(*this);
 }
 
 IntervalSet IntervalSet::subtract(const IntervalSet &other) const {
-  // assume the whole unicode range here for the complement
-  // because it doesn't matter.  Anything beyond the max of this' set
-  // will be ignored since we are doing this & ~other.  The intersection
-  // will be empty.  The only problem would be when this' set max value
-  // goes beyond MAX_CHAR_VALUE, but hopefully the constant MAX_CHAR_VALUE
-  // will prevent this.
-  return And(other.complement(COMPLETE_CHAR_SET));
+  return subtract(*this, other);
+}
+
+IntervalSet IntervalSet::subtract(const IntervalSet &left, const IntervalSet &right) {
+  if (left.isEmpty()) {
+    return IntervalSet();
+  }
+
+  if (right.isEmpty()) {
+    // right set has no elements; just return the copy of the current set
+    return left;
+  }
+
+  IntervalSet result(left);
+  size_t resultI = 0;
+  size_t rightI = 0;
+  while (resultI < result._intervals.size() && rightI < right._intervals.size()) {
+    Interval &resultInterval = result._intervals[resultI];
+    const Interval &rightInterval = right._intervals[rightI];
+
+    // operation: (resultInterval - rightInterval) and update indexes
+
+    if (rightInterval.b < resultInterval.a) {
+      rightI++;
+      continue;
+    }
+
+    if (rightInterval.a > resultInterval.b) {
+      resultI++;
+      continue;
+    }
+
+    Interval beforeCurrent;
+    Interval afterCurrent;
+    if (rightInterval.a > resultInterval.a) {
+      beforeCurrent = Interval(resultInterval.a, rightInterval.a - 1);
+    }
+
+    if (rightInterval.b < resultInterval.b) {
+      afterCurrent = Interval(rightInterval.b + 1, resultInterval.b);
+    }
+
+    if (beforeCurrent.a > -1) { // -1 is the default value
+      if (afterCurrent.a > -1) {
+        // split the current interval into two
+        result._intervals[resultI] = beforeCurrent;
+        result._intervals.insert(result._intervals.begin() + resultI + 1, afterCurrent);
+        resultI++;
+        rightI++;
+      } else {
+        // replace the current interval
+        result._intervals[resultI] = beforeCurrent;
+        resultI++;
+      }
+    } else {
+      if (afterCurrent.a > -1) {
+        // replace the current interval
+        result._intervals[resultI] = afterCurrent;
+        rightI++;
+      } else {
+        // remove the current interval (thus no need to increment resultI)
+        result._intervals.erase(result._intervals.begin() + resultI);
+      }
+    }
+  }
+
+  // If rightI reached right.intervals.size(), no more intervals to subtract from result.
+  // If resultI reached result.intervals.size(), we would be subtracting from an empty set.
+  // Either way, we are done.
+  return result;
 }
 
 IntervalSet IntervalSet::Or(const IntervalSet &a) const {
@@ -305,17 +343,7 @@ int IntervalSet::getMinElement() const {
     return Token::INVALID_TYPE;
   }
 
-  for (auto &interval : _intervals) {
-    int a = interval.a;
-    int b = interval.b;
-    for (int v = a; v <= b; v++) {
-      if (v >= 0) {
-        return v;
-      }
-    }
-  }
-
-  return Token::INVALID_TYPE;
+  return _intervals[0].a;
 }
 
 std::vector<Interval> IntervalSet::getIntervals() const {
@@ -366,7 +394,7 @@ std::wstring IntervalSet::toString(bool elemAreChar) const {
     int a = interval.a;
     int b = interval.b;
     if (a == b) {
-      if (a == -1) {
+      if (a == EOF) {
         ss << L"<EOF>";
       } else if (elemAreChar) {
         ss << L"'" << static_cast<wchar_t>(a) << L"'";
@@ -389,6 +417,10 @@ std::wstring IntervalSet::toString(bool elemAreChar) const {
 }
 
 std::wstring IntervalSet::toString(const std::vector<std::wstring> &tokenNames) const {
+  return toString(dfa::VocabularyImpl::fromTokenNames(tokenNames));
+}
+
+std::wstring IntervalSet::toString(Ref<dfa::Vocabulary> vocabulary) const {
   if (_intervals.empty()) {
     return L"{}";
   }
@@ -408,13 +440,13 @@ std::wstring IntervalSet::toString(const std::vector<std::wstring> &tokenNames) 
     ssize_t a = (ssize_t)interval.a;
     ssize_t b = (ssize_t)interval.b;
     if (a == b) {
-      ss << elementName(tokenNames, a);
+      ss << elementName(vocabulary, a);
     } else {
       for (ssize_t i = a; i <= b; i++) {
         if (i > a) {
           ss << L", ";
         }
-        ss << elementName(tokenNames, i);
+        ss << elementName(vocabulary, i);
       }
     }
   }
@@ -426,12 +458,16 @@ std::wstring IntervalSet::toString(const std::vector<std::wstring> &tokenNames) 
 }
 
 std::wstring IntervalSet::elementName(const std::vector<std::wstring> &tokenNames, ssize_t a) const {
+  return elementName(dfa::VocabularyImpl::fromTokenNames(tokenNames), a);
+}
+
+std::wstring IntervalSet::elementName(Ref<dfa::Vocabulary> vocabulary, ssize_t a) const {
   if (a == EOF) {
     return L"<EOF>";
   } else if (a == Token::EPSILON) {
     return L"<EPSILON>";
   } else {
-    return tokenNames[(size_t)a];
+    return vocabulary->getDisplayName(a);
   }
 }
 
@@ -526,6 +562,8 @@ bool IntervalSet::isReadOnly() const {
 }
 
 void IntervalSet::setReadOnly(bool readonly) {
+  if (_readonly && !readonly)
+    throw IllegalStateException("Can't alter readonly IntervalSet");
   _readonly = readonly;
 }
 

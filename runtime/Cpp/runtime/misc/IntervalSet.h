@@ -39,21 +39,18 @@ namespace v4 {
 namespace runtime {
 namespace misc {
 
-  /// <summary>
-  /// A set of integers that relies on ranges being common to do
-  ///  "run-length-encoded" like compression (if you view an IntSet like
-  ///  a BitSet with runs of 0s and 1s).  Only ranges are recorded so that
-  ///  a few ints up near value 1000 don't cause massive bitsets, just two
-  ///  integer intervals.
-  ///
-  ///  element values may be negative.  Useful for sets of EPSILON and EOF.
-  ///
-  ///  0..9 char range is index pair ['\u0030','\u0039'].
-  ///  Multiple ranges are encoded with multiple index pairs.  Isolated
-  ///  elements are encoded with an index pair where both intervals are the same.
-  ///
-  ///  The ranges are ordered and disjoint so that 2..6 appears before 101..103.
-  /// </summary>
+  /**
+   * This class implements the {@link IntSet} backed by a sorted array of
+   * non-overlapping intervals. It is particularly efficient for representing
+   * large collections of numbers, where the majority of elements appear as part
+   * of a sequential range of numbers that are all part of the set. For example,
+   * the set { 1, 2, 3, 4, 7, 8 } may be represented as { [1, 4], [7, 8] }.
+   *
+   * <p>
+   * This class is able to represent sets containing any combination of values in
+   * the range {@link Integer#MIN_VALUE} to {@link Integer#MAX_VALUE}
+   * (inclusive).</p>
+   */
   class IntervalSet {
   public:
     static IntervalSet const COMPLETE_CHAR_SET;
@@ -121,6 +118,13 @@ namespace misc {
     /// anything that is in other but not in this will be ignored.
     virtual IntervalSet subtract(const IntervalSet &other) const;
 
+    /**
+     * Compute the set difference between two interval sets. The specific
+     * operation is {@code left - right}. If either of the input sets is
+     * {@code null}, it is treated as though it was an empty set.
+     */
+    static IntervalSet subtract(const IntervalSet &left, const IntervalSet &right);
+
     virtual IntervalSet Or(const IntervalSet &a) const;
 
     /// <summary>
@@ -142,10 +146,20 @@ namespace misc {
     /// If this set is a single integer, return it otherwise Token.INVALID_TYPE </summary>
     virtual int getSingleElement() const;
 
+    /**
+     * Returns the maximum value contained in the set.
+     *
+     * @return the maximum value contained in the set. If the set is empty, this
+     * method returns {@link Token#INVALID_TYPE}.
+     */
     virtual int getMaxElement() const;
 
-    /// <summary>
-    /// Return minimum element >= 0 </summary>
+    /**
+     * Returns the minimum value contained in the set.
+     *
+     * @return the minimum value contained in the set. If the set is empty, this
+     * method returns {@link Token#INVALID_TYPE}.
+     */
     virtual int getMinElement() const;
 
     /// <summary>
@@ -160,10 +174,19 @@ namespace misc {
     bool operator == (const IntervalSet &other) const;
     virtual std::wstring toString() const;
     virtual std::wstring toString(bool elemAreChar) const;
+
+    /**
+     * @deprecated Use {@link #toString(Vocabulary)} instead.
+     */
     virtual std::wstring toString(const std::vector<std::wstring> &tokenNames) const;
+    virtual std::wstring toString(Ref<dfa::Vocabulary> vocabulary) const;
 
   protected:
+    /**
+     * @deprecated Use {@link #elementName(Vocabulary, int)} instead.
+     */
     virtual std::wstring elementName(const std::vector<std::wstring> &tokenNames, ssize_t a) const;
+    virtual std::wstring elementName(Ref<dfa::Vocabulary> vocabulary, ssize_t a) const;
 
   public:
     virtual size_t size() const;

@@ -81,8 +81,15 @@ namespace atn {
   public:
     virtual int getSerializationType() const = 0;
 
-    /// <summary>
-    /// Are we epsilon, action, sempred? </summary>
+    /**
+     * Determines if the transition is an "epsilon" transition.
+     *
+     * <p>The default implementation returns {@code false}.</p>
+     *
+     * @return {@code true} if traversing this transition in the ATN does not
+     * consume an input symbol; otherwise, {@code false} if traversing this
+     * transition consumes (matches) an input symbol.
+     */
     virtual bool isEpsilon() const;
     virtual misc::IntervalSet label() const;
     virtual bool matches(int symbol, int minVocabSymbol, int maxVocabSymbol) const = 0;

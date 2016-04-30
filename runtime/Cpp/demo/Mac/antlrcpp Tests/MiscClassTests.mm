@@ -326,7 +326,7 @@ using namespace antlrcpp;
   XCTAssert(set2.contains(1111));
   XCTAssertFalse(set2.contains(10000));
   XCTAssertEqual(set2.getSingleElement(), Token::INVALID_TYPE);
-  XCTAssertEqual(set2.getMinElement(), 10);
+  XCTAssertEqual(set2.getMinElement(), -1);
   XCTAssertEqual(set2.getMaxElement(), 2000);
 
   IntervalSet set3(set2);
@@ -368,7 +368,13 @@ using namespace antlrcpp;
   catch (IllegalStateException &e) {
   }
 
-  set4.setReadOnly(false);
+  try {
+    set4.setReadOnly(false);
+    XCTFail(@"Expected exception");
+  }
+  catch (IllegalStateException &e) {
+  }
+  
   set4 = IntervalSet::of(12345);
   XCTAssertEqual(set4.getSingleElement(), 12345);
   XCTAssertEqual(set4.getMinElement(), 12345);

@@ -156,87 +156,66 @@ namespace atn {
     static Ref<PredictionContext> mergeSingletons(Ref<SingletonPredictionContext> a,
       Ref<SingletonPredictionContext> b, bool rootIsWildcard, PredictionContextMergeCache *mergeCache);
 
-    /// <summary>
-    /// Handle case where at least one of {@code a} or {@code b} is
-    /// <seealso cref="#EMPTY"/>. In the following diagrams, the symbol {@code $} is used
-    /// to represent <seealso cref="#EMPTY"/>.
-    ///
-    /// <h2>Local-Context Merges</h2>
-    ///
-    /// These local-context merge operations are used when {@code rootIsWildcard}
-    /// is true.
-    ///
-    /// <p/>
-    ///
-    /// <seealso cref="#EMPTY"/> is superset of any graph; return <seealso cref="#EMPTY"/>.<br/>
-    /// <embed src="images/LocalMerge_EmptyRoot.svg" type="image/svg+xml"/>
-    ///
-    /// <p/>
-    ///
-    /// <seealso cref="#EMPTY"/> and anything is {@code #EMPTY}, so merged parent is
-    /// {@code #EMPTY}; return left graph.<br/>
-    /// <embed src="images/LocalMerge_EmptyParent.svg" type="image/svg+xml"/>
-    ///
-    /// <p/>
-    ///
-    /// Special case of last merge if local context.<br/>
-    /// <embed src="images/LocalMerge_DiffRoots.svg" type="image/svg+xml"/>
-    ///
-    /// <h2>Full-Context Merges</h2>
-    ///
-    /// These full-context merge operations are used when {@code rootIsWildcard}
-    /// is false.
-    ///
-    /// <p/>
-    ///
-    /// <embed src="images/FullMerge_EmptyRoots.svg" type="image/svg+xml"/>
-    ///
-    /// <p/>
-    ///
-    /// Must keep all contexts; <seealso cref="#EMPTY"/> in array is a special value (and
-    /// null parent).<br/>
-    /// <embed src="images/FullMerge_EmptyRoot.svg" type="image/svg+xml"/>
-    ///
-    /// <p/>
-    ///
-    /// <embed src="images/FullMerge_SameRoot.svg" type="image/svg+xml"/>
-    /// </summary>
-    /// <param name="a"> the first <seealso cref="SingletonPredictionContext"/> </param>
-    /// <param name="b"> the second <seealso cref="SingletonPredictionContext"/> </param>
-    /// <param name="rootIsWildcard"> {@code true} if this is a local-context merge,
-    /// otherwise false to indicate a full-context merge </param>
+    /**
+     * Handle case where at least one of {@code a} or {@code b} is
+     * {@link #EMPTY}. In the following diagrams, the symbol {@code $} is used
+     * to represent {@link #EMPTY}.
+     *
+     * <h2>Local-Context Merges</h2>
+     *
+     * <p>These local-context merge operations are used when {@code rootIsWildcard}
+     * is true.</p>
+     *
+     * <p>{@link #EMPTY} is superset of any graph; return {@link #EMPTY}.<br>
+     * <embed src="images/LocalMerge_EmptyRoot.svg" type="image/svg+xml"/></p>
+     *
+     * <p>{@link #EMPTY} and anything is {@code #EMPTY}, so merged parent is
+     * {@code #EMPTY}; return left graph.<br>
+     * <embed src="images/LocalMerge_EmptyParent.svg" type="image/svg+xml"/></p>
+     *
+     * <p>Special case of last merge if local context.<br>
+     * <embed src="images/LocalMerge_DiffRoots.svg" type="image/svg+xml"/></p>
+     *
+     * <h2>Full-Context Merges</h2>
+     *
+     * <p>These full-context merge operations are used when {@code rootIsWildcard}
+     * is false.</p>
+     *
+     * <p><embed src="images/FullMerge_EmptyRoots.svg" type="image/svg+xml"/></p>
+     *
+     * <p>Must keep all contexts; {@link #EMPTY} in array is a special value (and
+     * null parent).<br>
+     * <embed src="images/FullMerge_EmptyRoot.svg" type="image/svg+xml"/></p>
+     *
+     * <p><embed src="images/FullMerge_SameRoot.svg" type="image/svg+xml"/></p>
+     *
+     * @param a the first {@link SingletonPredictionContext}
+     * @param b the second {@link SingletonPredictionContext}
+     * @param rootIsWildcard {@code true} if this is a local-context merge,
+     * otherwise false to indicate a full-context merge
+     */
     static Ref<PredictionContext> mergeRoot(Ref<SingletonPredictionContext> a,
       Ref<SingletonPredictionContext> b, bool rootIsWildcard);
 
-    /// <summary>
-    /// Merge two <seealso cref="ArrayPredictionContext"/> instances.
-    ///
-    /// <p/>
-    ///
-    /// Different tops, different parents.<br/>
-    /// <embed src="images/ArrayMerge_DiffTopDiffPar.svg" type="image/svg+xml"/>
-    ///
-    /// <p/>
-    ///
-    /// Shared top, same parents.<br/>
-    /// <embed src="images/ArrayMerge_ShareTopSamePar.svg" type="image/svg+xml"/>
-    ///
-    /// <p/>
-    ///
-    /// Shared top, different parents.<br/>
-    /// <embed src="images/ArrayMerge_ShareTopDiffPar.svg" type="image/svg+xml"/>
-    ///
-    /// <p/>
-    ///
-    /// Shared top, all shared parents.<br/>
-    /// <embed src="images/ArrayMerge_ShareTopSharePar.svg" type="image/svg+xml"/>
-    ///
-    /// <p/>
-    ///
-    /// Equal tops, merge parents and reduce top to
-    /// <seealso cref="SingletonPredictionContext"/>.<br/>
-    /// <embed src="images/ArrayMerge_EqualTop.svg" type="image/svg+xml"/>
-    /// </summary>
+    /**
+     * Merge two {@link ArrayPredictionContext} instances.
+     *
+     * <p>Different tops, different parents.<br>
+     * <embed src="images/ArrayMerge_DiffTopDiffPar.svg" type="image/svg+xml"/></p>
+     *
+     * <p>Shared top, same parents.<br>
+     * <embed src="images/ArrayMerge_ShareTopSamePar.svg" type="image/svg+xml"/></p>
+     *
+     * <p>Shared top, different parents.<br>
+     * <embed src="images/ArrayMerge_ShareTopDiffPar.svg" type="image/svg+xml"/></p>
+     *
+     * <p>Shared top, all shared parents.<br>
+     * <embed src="images/ArrayMerge_ShareTopSharePar.svg" type="image/svg+xml"/></p>
+     *
+     * <p>Equal tops, merge parents and reduce top to
+     * {@link SingletonPredictionContext}.<br>
+     * <embed src="images/ArrayMerge_EqualTop.svg" type="image/svg+xml"/></p>
+     */
     static Ref<PredictionContext> mergeArrays(Ref<ArrayPredictionContext> a,
       Ref<ArrayPredictionContext> b, bool rootIsWildcard, PredictionContextMergeCache *mergeCache);
 

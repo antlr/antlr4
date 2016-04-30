@@ -43,6 +43,10 @@ using namespace antlrcpp;
 
 struct AltAndContextConfigHasher
 {
+  /**
+   * The hash code is only a function of the {@link ATNState#stateNumber}
+   * and {@link ATNConfig#context}.
+   */
   size_t operator () (const ATNConfig &o) const {
     size_t hashCode = misc::MurmurHash::initialize(7);
     hashCode = misc::MurmurHash::update(hashCode, (size_t)o.state->stateNumber);
@@ -170,6 +174,14 @@ antlrcpp::BitSet PredictionModeClass::getAlts(const std::vector<antlrcpp::BitSet
   }
 
   return all;
+}
+
+antlrcpp::BitSet PredictionModeClass::getAlts(Ref<ATNConfigSet> configs) {
+  antlrcpp::BitSet alts;
+  for (auto config : configs->configs) {
+    alts.set(config->alt);
+  }
+  return alts;
 }
 
 std::vector<antlrcpp::BitSet> PredictionModeClass::getConflictingAltSubsets(Ref<ATNConfigSet> configs) {
