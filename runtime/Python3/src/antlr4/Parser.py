@@ -371,7 +371,7 @@ class Parser (Recognizer):
     # Always called by generated parsers upon entry to a rule. Access field
     # {@link #_ctx} get the current context.
     #
-    def enterRule(self, localctx:ParserRuleContext , state:int , ruleIndexint ):
+    def enterRule(self, localctx:ParserRuleContext , state:int , ruleIndex:int):
         self.state = state
         self._ctx = localctx
         self._ctx.start = self._input.LT(1)
