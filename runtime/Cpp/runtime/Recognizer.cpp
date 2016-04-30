@@ -34,13 +34,18 @@
 #include "CPPUtils.h"
 #include "Strings.h"
 #include "Token.h"
+#include "ATN.h"
+#include "ATNSimulator.h"
 #include "CPPUtils.h"
+
+#include "Vocabulary.h"
+#include "VocabularyImpl.h"
 
 #include "Recognizer.h"
 
 using namespace org::antlr::v4::runtime;
 
-std::map<std::vector<std::wstring>, std::map<std::wstring, size_t>> Recognizer::_tokenTypeMapCache;
+std::map<Ref<dfa::Vocabulary>, std::map<std::wstring, size_t>> Recognizer::_tokenTypeMapCache;
 std::map<std::vector<std::wstring>, std::map<std::wstring, size_t>> Recognizer::_ruleIndexMapCache;
 
 Recognizer::Recognizer() {
@@ -48,21 +53,32 @@ Recognizer::Recognizer() {
   _proxListener.addErrorListener(&ConsoleErrorListener::INSTANCE);
 }
 
+Ref<dfa::Vocabulary> Recognizer::getVocabulary() const {
+  return dfa::VocabularyImpl::fromTokenNames(getTokenNames());
+}
+
 std::map<std::wstring, size_t> Recognizer::getTokenTypeMap() {
-  const std::vector<std::wstring>& tokenNames = getTokenNames();
-  if (tokenNames.empty()) {
-    throw L"The current recognizer does not provide a list of token names.";
-  }
+  Ref<dfa::Vocabulary> vocabulary = getVocabulary();
 
   std::lock_guard<std::mutex> lck(mtx);
   std::map<std::wstring, size_t> result;
-  auto iterator = _tokenTypeMapCache.find(tokenNames);
+  auto iterator = _tokenTypeMapCache.find(vocabulary);
   if (iterator != _tokenTypeMapCache.end()) {
     result = iterator->second;
   } else {
-    result = antlrcpp::toMap(tokenNames);
+    for (size_t i = 0; i < getATN().maxTokenType; ++i) {
+      std::wstring literalName = vocabulary->getLiteralName(i);
+      if (!literalName.empty()) {
+        result[literalName] = i;
+      }
+
+      std::wstring symbolicName = vocabulary->getSymbolicName(i);
+      if (!symbolicName.empty()) {
+        result[symbolicName] = i;
+      }
+				}
     result[L"EOF"] = EOF;
-    _tokenTypeMapCache[tokenNames] = result;
+    _tokenTypeMapCache[vocabulary] = result;
   }
 
   return result;
@@ -95,6 +111,17 @@ size_t Recognizer::getTokenType(const std::wstring &tokenName) {
   return iterator->second;
 }
 
+Ref<atn::ParseInfo> Recognizer::getParseInfo() const {
+  return nullptr;
+}
+
+void Recognizer::setInterpreter(atn::ATNSimulator *interpreter) {
+  // Usually the interpreter is set by the descendant (lexer or parser (simulator), but can also be exchanged
+  // by the profiling ATN simulator.
+  delete _interpreter;
+  _interpreter = interpreter;
+}
+
 std::wstring Recognizer::getErrorHeader(RecognitionException *e) {
   // We're having issues with cross header dependencies, these two classes will need to be
   // rewritten to remove that.
@@ -106,7 +133,7 @@ std::wstring Recognizer::getErrorHeader(RecognitionException *e) {
 
 std::wstring Recognizer::getTokenErrorDisplay(Token *t) {
   if (t == nullptr) {
-    return L"<no token>";
+    return L"<no Token>";
   }
   std::wstring s = t->getText();
   if (s == L"") {
@@ -140,15 +167,15 @@ ProxyErrorListener& Recognizer::getErrorListenerDispatch() {
   return _proxListener;
 }
 
-bool Recognizer::sempred(RuleContext::Ref localctx, int ruleIndex, int actionIndex) {
+bool Recognizer::sempred(Ref<RuleContext> localctx, int ruleIndex, int actionIndex) {
   return true;
 }
 
-bool Recognizer::precpred(RuleContext::Ref localctx, int precedence) {
+bool Recognizer::precpred(Ref<RuleContext> localctx, int precedence) {
   return true;
 }
 
-void Recognizer::action(RuleContext::Ref localctx, int ruleIndex, int actionIndex) {
+void Recognizer::action(Ref<RuleContext> localctx, int ruleIndex, int actionIndex) {
 }
 
 int Recognizer::getState() {

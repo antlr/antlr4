@@ -305,7 +305,7 @@ namespace runtime {
     /// in rule {@code atom}. It can assume that you forgot the {@code ')'}.
     /// </summary>
   public:
-    virtual Token::Ref recoverInline(Parser *recognizer) override;
+    virtual Ref<Token> recoverInline(Parser *recognizer) override;
 
     /// <summary>
     /// This method implements the single-token insertion inline error recovery
@@ -344,7 +344,7 @@ namespace runtime {
     /// <returns> the successfully matched <seealso cref="Token"/> instance if single-token
     /// deletion successfully recovers from the mismatched input, otherwise
     /// {@code null} </returns>
-    virtual Token::Ref singleTokenDeletion(Parser *recognizer);
+    virtual Ref<Token> singleTokenDeletion(Parser *recognizer);
 
     /// <summary>
     /// Conjure up a missing token during error recovery.
@@ -366,7 +366,7 @@ namespace runtime {
     ///  If you change what tokens must be created by the lexer,
     ///  override this method to create the appropriate tokens.
     /// </summary>
-    virtual Token::Ref getMissingSymbol(Parser *recognizer);
+    virtual Ref<Token> getMissingSymbol(Parser *recognizer);
 
     virtual misc::IntervalSet getExpectedTokens(Parser *recognizer);
 
@@ -379,11 +379,11 @@ namespace runtime {
     ///  your token objects because you don't have to go modify your lexer
     ///  so that it creates a new class.
     /// </summary>
-    virtual std::wstring getTokenErrorDisplay(Token::Ref t);
+    virtual std::wstring getTokenErrorDisplay(Ref<Token> t);
 
-    virtual std::wstring getSymbolText(Token::Ref symbol);
+    virtual std::wstring getSymbolText(Ref<Token> symbol);
 
-    virtual int getSymbolType(Token::Ref symbol);
+    virtual int getSymbolType(Ref<Token> symbol);
 
     virtual std::wstring escapeWSAndQuote(std::wstring &s);
 

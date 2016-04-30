@@ -78,7 +78,7 @@ namespace atn {
     /// introduced; otherwise, {@code false}. </returns>
     virtual bool isFeatureSupported(const Guid &feature, const Guid &actualUuid);
     void markPrecedenceDecisions(const ATN &atn);
-    LexerAction::Ref lexerActionFactory(LexerActionType type, int data1, int data2);
+    Ref<LexerAction> lexerActionFactory(LexerActionType type, int data1, int data2);
 
   private:
     /// This is the earliest supported serialized UUID.

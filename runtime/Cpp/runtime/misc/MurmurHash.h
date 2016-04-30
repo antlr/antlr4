@@ -72,7 +72,7 @@ namespace misc {
     /// <param name="seed"> the seed for the MurmurHash algorithm </param>
     /// <returns> the hash code of the data </returns>
     template<typename T> // where T is C array type
-    static size_t hashCode(const std::vector<std::shared_ptr<T>> &data, size_t seed) {
+    static size_t hashCode(const std::vector<Ref<T>> &data, size_t seed) {
       size_t hash = initialize(seed);
       for (auto entry : data) {
         hash = update(hash, (size_t)entry.get());

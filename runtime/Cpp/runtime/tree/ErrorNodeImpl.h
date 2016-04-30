@@ -50,7 +50,7 @@ namespace tree {
   /// </summary>
   class ErrorNodeImpl : public virtual TerminalNodeImpl, public virtual ErrorNode {
   public:
-    ErrorNodeImpl(Token::Ref token);
+    ErrorNodeImpl(Ref<Token> token);
 
     template<typename T, typename T1>
     T accept(ParseTreeVisitor<T1> *visitor)  {

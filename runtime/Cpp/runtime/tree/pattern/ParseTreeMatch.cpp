@@ -36,16 +36,16 @@
 using namespace org::antlr::v4::runtime::tree;
 using namespace org::antlr::v4::runtime::tree::pattern;
 
-ParseTreeMatch::ParseTreeMatch(std::shared_ptr<ParseTree> tree, const ParseTreePattern &pattern,
-                               const std::map<std::wstring, std::vector<std::shared_ptr<ParseTree>>> &labels,
-                               std::shared_ptr<ParseTree> mismatchedNode)
+ParseTreeMatch::ParseTreeMatch(Ref<ParseTree> tree, const ParseTreePattern &pattern,
+                               const std::map<std::wstring, std::vector<Ref<ParseTree>>> &labels,
+                               Ref<ParseTree> mismatchedNode)
   : _tree(tree), _pattern(pattern), _labels(labels), _mismatchedNode(mismatchedNode) {
   if (tree == nullptr) {
     throw IllegalArgumentException("tree cannot be null");
   }
 }
 
-std::shared_ptr<ParseTree> ParseTreeMatch::get(const std::wstring &label) {
+Ref<ParseTree> ParseTreeMatch::get(const std::wstring &label) {
   auto iterator = _labels.find(label);
   if (iterator == _labels.end()) {
     return nullptr;
@@ -54,20 +54,20 @@ std::shared_ptr<ParseTree> ParseTreeMatch::get(const std::wstring &label) {
   return iterator->second.back(); // return last if multiple
 }
 
-std::vector<std::shared_ptr<ParseTree>> ParseTreeMatch::getAll(const std::wstring &label) {
+std::vector<Ref<ParseTree>> ParseTreeMatch::getAll(const std::wstring &label) {
   auto iterator = _labels.find(label);
   if (iterator == _labels.end()) {
-    return std::vector<std::shared_ptr<ParseTree>>();
+    return std::vector<Ref<ParseTree>>();
   }
 
   return iterator->second;
 }
 
-std::map<std::wstring, std::vector<std::shared_ptr<ParseTree>>>& ParseTreeMatch::getLabels() {
+std::map<std::wstring, std::vector<Ref<ParseTree>>>& ParseTreeMatch::getLabels() {
   return _labels;
 }
 
-std::shared_ptr<ParseTree> ParseTreeMatch::getMismatchedNode() {
+Ref<ParseTree> ParseTreeMatch::getMismatchedNode() {
   return _mismatchedNode;
 }
 
@@ -79,7 +79,7 @@ const ParseTreePattern& ParseTreeMatch::getPattern() {
   return _pattern;
 }
 
-std::shared_ptr<ParseTree>  ParseTreeMatch::getTree() {
+Ref<ParseTree>  ParseTreeMatch::getTree() {
   return _tree;
 }
 

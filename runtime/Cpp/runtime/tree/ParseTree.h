@@ -51,7 +51,7 @@ namespace tree {
     // the following methods narrow the return type; they are not additional methods
   public:
     std::weak_ptr<ParseTree> getParent() { return std::dynamic_pointer_cast<ParseTree>(getParentReference().lock()); };
-    virtual std::shared_ptr<ParseTree> getChild(size_t i) { return std::dynamic_pointer_cast<ParseTree>(getChildReference(i)); };
+    virtual Ref<ParseTree> getChild(size_t i) { return std::dynamic_pointer_cast<ParseTree>(getChildReference(i)); };
 
     /// <summary>
     /// The <seealso cref="ParseTreeVisitor"/> needs a double dispatch method. </summary>

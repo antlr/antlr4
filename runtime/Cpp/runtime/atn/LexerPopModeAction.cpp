@@ -30,12 +30,14 @@
  */
 
 #include "MurmurHash.h"
+#include "Lexer.h"
+
 #include "LexerPopModeAction.h"
 
 using namespace org::antlr::v4::runtime::atn;
 using namespace org::antlr::v4::runtime::misc;
 
-const std::shared_ptr<LexerPopModeAction> LexerPopModeAction::INSTANCE { new LexerPopModeAction() };
+const Ref<LexerPopModeAction> LexerPopModeAction::INSTANCE { new LexerPopModeAction() };
 
 LexerPopModeAction::LexerPopModeAction() {
 }
@@ -48,7 +50,7 @@ bool LexerPopModeAction::isPositionDependent() const {
   return false;
 }
 
-void LexerPopModeAction::execute(Lexer::Ref lexer) {
+void LexerPopModeAction::execute(Lexer *lexer) {
   lexer->popMode();
 }
 

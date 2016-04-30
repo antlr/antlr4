@@ -98,3 +98,6 @@
     #define NOEXCEPT
   #endif
 #endif
+
+template<class T> using Ref = std::shared_ptr<T>;
+

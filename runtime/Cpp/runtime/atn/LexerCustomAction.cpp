@@ -31,6 +31,7 @@
 
 #include "MurmurHash.h"
 #include "CPPUtils.h"
+#include "Lexer.h"
 
 #include "LexerCustomAction.h"
 
@@ -56,7 +57,7 @@ bool LexerCustomAction::isPositionDependent() const {
   return true;
 }
 
-void LexerCustomAction::execute(Lexer::Ref lexer) {
+void LexerCustomAction::execute(Lexer *lexer) {
   lexer->action(nullptr, _ruleIndex, _actionIndex);
 }
 

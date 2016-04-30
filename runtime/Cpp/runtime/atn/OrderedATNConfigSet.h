@@ -41,13 +41,13 @@ namespace atn {
 
   struct OrderedATNConfigHasher
   {
-    size_t operator()(const ATNConfig::Ref &config) const {
-      return std::hash<ATNConfig::Ref>()(config);
+    size_t operator()(const Ref<ATNConfig> &config) const {
+      return std::hash<Ref<ATNConfig>>()(config);
     }
   };
 
   struct OrderedATNConfigComparer {
-    bool operator()(const ATNConfig::Ref &lhs, const ATNConfig::Ref &rhs) const
+    bool operator()(const Ref<ATNConfig> &lhs, const Ref<ATNConfig> &rhs) const
     {
       return lhs == rhs;
     }

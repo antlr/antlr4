@@ -50,15 +50,66 @@ namespace dfa {
 
     DFA(atn::DecisionState *atnStartState);
     DFA(atn::DecisionState *atnStartState, int decision);
+    DFA(const DFA &other);
+    DFA(DFA &&other);
     ~DFA();
 
+    /**
+     * Gets whether this DFA is a precedence DFA. Precedence DFAs use a special
+     * start state {@link #s0} which is not stored in {@link #states}. The
+     * {@link DFAState#edges} array for this start state contains outgoing edges
+     * supplying individual start states corresponding to specific precedence
+     * values.
+     *
+     * @return {@code true} if this is a precedence DFA; otherwise,
+     * {@code false}.
+     * @see Parser#getPrecedence()
+     */
+    bool isPrecedenceDfa() const;
+    
+    /**
+     * Get the start state for a specific precedence value.
+     *
+     * @param precedence The current precedence.
+     * @return The start state corresponding to the specified precedence, or
+     * {@code null} if no start state exists for the specified precedence.
+     *
+     * @throws IllegalStateException if this is not a precedence DFA.
+     * @see #isPrecedenceDfa()
+     */
+    DFAState* getPrecedenceStartState(int precedence) const;
+    
+    /**
+     * Set the start state for a specific precedence value.
+     *
+     * @param precedence The current precedence.
+     * @param startState The start state corresponding to the specified
+     * precedence.
+     *
+     * @throws IllegalStateException if this is not a precedence DFA.
+     * @see #isPrecedenceDfa()
+     */
+    void setPrecedenceStartState(int precedence, DFAState *startState);
+    
     /// Return a list of all states in this DFA, ordered by state number.
-    virtual std::vector<DFAState*> getStates();
+    virtual std::vector<DFAState *> getStates() const;
 
-    virtual std::wstring toString();
+    /**
+     * @deprecated Use {@link #toString(Vocabulary)} instead.
+     */
     virtual std::wstring toString(const std::vector<std::wstring>& tokenNames);
+    std::wstring toString(Ref<Vocabulary> vocabulary) const;
+
     virtual std::wstring toLexerString();
 
+  private:
+    /**
+     * {@code true} if this DFA is for a precedence decision; otherwise,
+     * {@code false}. This is the backing field for {@link #isPrecedenceDfa}.
+     */
+    bool _precedenceDfa;
+
+    std::mutex _lock; // To synchronize access to s0.
   };
 
 } // namespace atn

@@ -30,6 +30,7 @@
  */
 
 #include "MurmurHash.h"
+#include "Lexer.h"
 
 #include "LexerModeAction.h"
 
@@ -51,7 +52,7 @@ bool LexerModeAction::isPositionDependent() const {
   return false;
 }
 
-void LexerModeAction::execute(Lexer::Ref lexer) {
+void LexerModeAction::execute(Lexer *lexer) {
   lexer->mode(_mode);
 }
 

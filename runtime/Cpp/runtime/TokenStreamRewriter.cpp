@@ -299,7 +299,7 @@ std::wstring TokenStreamRewriter::getText(const std::wstring &programName, const
   while (i <= (size_t)stop && i < tokens->size()) {
     RewriteOperation *op = indexToOp[i];
     indexToOp.erase(i); // remove so any left have index size-1
-    Token::Ref t = tokens->get(i);
+    Ref<Token> t = tokens->get(i);
     if (op == nullptr) {
       // no operation at that index, just dump token
       if (t->getType() != EOF) {

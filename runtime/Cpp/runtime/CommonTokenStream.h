@@ -68,10 +68,10 @@ namespace runtime {
   protected:
     virtual ssize_t adjustSeekIndex(size_t i) override;
 
-    virtual Token::Ref LB(size_t k) override;
+    virtual Ref<Token> LB(size_t k) override;
 
   public:
-    virtual Token::Ref LT(ssize_t k) override;
+    virtual Ref<Token> LT(ssize_t k) override;
 
     /// Count EOF just once.
     virtual int getNumberOfOnChannelTokens();

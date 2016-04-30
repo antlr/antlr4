@@ -66,9 +66,9 @@ namespace dfa {
   public:
     class PredPrediction {
     public:
-      std::shared_ptr<atn::SemanticContext> pred; // never null; at least SemanticContext.NONE
+      Ref<atn::SemanticContext> pred; // never null; at least SemanticContext.NONE
       int alt;
-      PredPrediction(std::shared_ptr<atn::SemanticContext> pred, int alt);
+      PredPrediction(Ref<atn::SemanticContext> pred, int alt);
       virtual std::wstring toString();
 
     private:
@@ -78,7 +78,7 @@ namespace dfa {
   public:
     int stateNumber;
 
-    std::shared_ptr<atn::ATNConfigSet> configs;
+    Ref<atn::ATNConfigSet> configs;
 
     /// <summary>
     /// {@code edges[symbol]} points to target of symbol. Shift up by 1 so (-1)
@@ -95,8 +95,7 @@ namespace dfa {
     /// </summary>
     int prediction;
 
-    int lexerRuleIndex; // if accept, exec action in what rule?
-    int lexerActionIndex; // if accept, exec what action?
+    Ref<atn::LexerActionExecutor> lexerActionExecutor;
 
     /// <summary>
     /// Indicates that this state was created during SLL prediction that
@@ -124,7 +123,7 @@ namespace dfa {
     /// Map a predicate to a predicted alternative.
     DFAState();
     DFAState(int state);
-    DFAState(std::shared_ptr<atn::ATNConfigSet> configs);
+    DFAState(Ref<atn::ATNConfigSet> configs);
     ~DFAState();
 
     /// <summary>
@@ -133,7 +132,7 @@ namespace dfa {
     /// </summary>
     virtual std::set<int> getAltSet();
 
-    virtual size_t hashCode() ;
+    virtual size_t hashCode();
 
     /// Two DFAState instances are equal if their ATN configuration sets
     /// are the same. This method is used to see if a state already exists.

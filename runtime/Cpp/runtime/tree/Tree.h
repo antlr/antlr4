@@ -62,7 +62,7 @@ namespace tree {
 
     /// <summary>
     /// If there are children, get the {@code i}th value indexed from 0. </summary>
-    std::shared_ptr<Tree> getChild(size_t i)  { return getChildReference(i); };
+    Ref<Tree> getChild(size_t i)  { return getChildReference(i); };
 
     /// <summary>
     /// How many children are there? If there is none, then this
@@ -80,7 +80,7 @@ namespace tree {
 
   protected:
     virtual std::weak_ptr<Tree> getParentReference() = 0;
-    virtual std::shared_ptr<Tree> getChildReference(size_t i) = 0;
+    virtual Ref<Tree> getChildReference(size_t i) = 0;
   };
 
 } // namespace tree

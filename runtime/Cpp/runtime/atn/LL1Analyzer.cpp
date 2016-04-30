@@ -40,6 +40,8 @@
 #include "ATNConfig.h"
 #include "EmptyPredictionContext.h"
 
+#include "CPPUtils.h"
+
 #include "LL1Analyzer.h"
 
 using namespace org::antlr::v4::runtime;
@@ -60,7 +62,7 @@ std::vector<misc::IntervalSet> LL1Analyzer::getDecisionLookahead(ATNState *s) co
   for (size_t alt = 0; alt < s->getNumberOfTransitions(); alt++) {
     bool seeThruPreds = false; // fail to get lookahead upon pred
 
-    std::unordered_set<ATNConfig::Ref> lookBusy;
+    std::unordered_set<Ref<ATNConfig>> lookBusy;
     antlrcpp::BitSet callRuleStack;
     _LOOK(s->transition(alt)->target, nullptr, PredictionContext::EMPTY,
           look[alt], lookBusy, callRuleStack, seeThruPreds, false);
@@ -74,25 +76,25 @@ std::vector<misc::IntervalSet> LL1Analyzer::getDecisionLookahead(ATNState *s) co
   return look;
 }
 
-misc::IntervalSet LL1Analyzer::LOOK(ATNState *s, RuleContext::Ref ctx) const {
+misc::IntervalSet LL1Analyzer::LOOK(ATNState *s, Ref<RuleContext> ctx) const {
   return LOOK(s, nullptr, ctx);
 }
 
-misc::IntervalSet LL1Analyzer::LOOK(ATNState *s, ATNState *stopState, RuleContext::Ref ctx) const {
+misc::IntervalSet LL1Analyzer::LOOK(ATNState *s, ATNState *stopState, Ref<RuleContext> ctx) const {
   misc::IntervalSet r;
   bool seeThruPreds = true; // ignore preds; get all lookahead
-  PredictionContext::Ref lookContext = ctx != nullptr ? PredictionContext::fromRuleContext(_atn, ctx) : nullptr;
+  Ref<PredictionContext> lookContext = ctx != nullptr ? PredictionContext::fromRuleContext(_atn, ctx) : nullptr;
 
-  std::unordered_set<ATNConfig::Ref> lookBusy;
+  std::unordered_set<Ref<ATNConfig>> lookBusy;
   antlrcpp::BitSet callRuleStack;
   _LOOK(s, stopState, lookContext, r, lookBusy, callRuleStack, seeThruPreds, true);
 
   return r;
 }
 
-void LL1Analyzer::_LOOK(ATNState *s, ATNState *stopState, PredictionContext::Ref ctx, misc::IntervalSet &look,
-                        std::unordered_set<ATNConfig::Ref> &lookBusy,  antlrcpp::BitSet &calledRuleStack, bool seeThruPreds, bool addEOF) const {
-  ATNConfig::Ref c = std::make_shared<ATNConfig>(s, 0, ctx);
+void LL1Analyzer::_LOOK(ATNState *s, ATNState *stopState, Ref<PredictionContext> ctx, misc::IntervalSet &look,
+                        std::unordered_set<Ref<ATNConfig>> &lookBusy,  antlrcpp::BitSet &calledRuleStack, bool seeThruPreds, bool addEOF) const {
+  Ref<ATNConfig> c = std::make_shared<ATNConfig>(s, 0, ctx);
 
   if (lookBusy.count(c) > 0) // Keep in mind comparison is based on members of the class, not the actual instance.
     return;
@@ -109,7 +111,7 @@ void LL1Analyzer::_LOOK(ATNState *s, ATNState *stopState, PredictionContext::Ref
     }
   }
 
-  if (is<RuleStopState*>(s)) {
+  if (is<RuleStopState *>(s)) {
     if (ctx == nullptr) {
       look.add(Token::EPSILON);
       return;
@@ -146,7 +148,7 @@ void LL1Analyzer::_LOOK(ATNState *s, ATNState *stopState, PredictionContext::Ref
         continue;
       }
 
-      PredictionContext::Ref newContext = SingletonPredictionContext::create(ctx, (static_cast<RuleTransition*>(t))->followState->stateNumber);
+      Ref<PredictionContext> newContext = SingletonPredictionContext::create(ctx, (static_cast<RuleTransition*>(t))->followState->stateNumber);
       auto onExit = finally([&] {
         calledRuleStack[(size_t)((static_cast<RuleTransition*>(t))->target->ruleIndex)] = false;
       });

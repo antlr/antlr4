@@ -33,6 +33,7 @@
 #include "ATNConfigSet.h"
 #include "ATNConfig.h"
 #include "MurmurHash.h"
+#include "SemanticContext.h"
 
 #include "PredictionMode.h"
 
@@ -60,7 +61,7 @@ struct AltAndContextConfigComparer {
   }
 };
 
-bool PredictionModeClass::hasSLLConflictTerminatingPrediction(PredictionMode* mode, std::shared_ptr<ATNConfigSet> configs) {
+bool PredictionModeClass::hasSLLConflictTerminatingPrediction(PredictionMode* mode, Ref<ATNConfigSet> configs) {
   /* Configs in rule stop states indicate reaching the end of the decision
    * rule (local context) or end of start rule (full context). If all
    * configs meet this condition, then none of the configurations is able
@@ -77,9 +78,9 @@ bool PredictionModeClass::hasSLLConflictTerminatingPrediction(PredictionMode* mo
     // since we'll often fail over anyway.
     if (configs->hasSemanticContext) {
       // dup configs, tossing out semantic predicates
-      std::shared_ptr<ATNConfigSet> dup = std::make_shared<ATNConfigSet>(true);
+      Ref<ATNConfigSet> dup = std::make_shared<ATNConfigSet>(true);
       for (auto config : configs->configs) {
-        ATNConfig::Ref c = std::make_shared<ATNConfig>(config, SemanticContext::NONE);
+        Ref<ATNConfig> c = std::make_shared<ATNConfig>(config, SemanticContext::NONE);
         dup->add(c);
       }
       configs = dup;
@@ -94,9 +95,9 @@ bool PredictionModeClass::hasSLLConflictTerminatingPrediction(PredictionMode* mo
   return heuristic;
 }
 
-bool PredictionModeClass::hasConfigInRuleStopState(std::shared_ptr<ATNConfigSet> configs) {
+bool PredictionModeClass::hasConfigInRuleStopState(Ref<ATNConfigSet> configs) {
   for (auto c : configs->configs) {
-    if (is<RuleStopState*>(c->state)) {
+    if (is<RuleStopState *>(c->state)) {
       return true;
     }
   }
@@ -104,7 +105,7 @@ bool PredictionModeClass::hasConfigInRuleStopState(std::shared_ptr<ATNConfigSet>
   return false;
 }
 
-bool PredictionModeClass::allConfigsInRuleStopStates(std::shared_ptr<ATNConfigSet> configs) {
+bool PredictionModeClass::allConfigsInRuleStopStates(Ref<ATNConfigSet> configs) {
   for (auto config : configs->configs) {
     if (!is<RuleStopState*>(config->state)) {
       return false;
@@ -171,8 +172,8 @@ antlrcpp::BitSet PredictionModeClass::getAlts(const std::vector<antlrcpp::BitSet
   return all;
 }
 
-std::vector<antlrcpp::BitSet> PredictionModeClass::getConflictingAltSubsets(std::shared_ptr<ATNConfigSet> configs) {
-  std::unordered_map<ATNConfig::Ref, antlrcpp::BitSet, AltAndContextConfigHasher, AltAndContextConfigComparer> configToAlts;
+std::vector<antlrcpp::BitSet> PredictionModeClass::getConflictingAltSubsets(Ref<ATNConfigSet> configs) {
+  std::unordered_map<Ref<ATNConfig>, antlrcpp::BitSet, AltAndContextConfigHasher, AltAndContextConfigComparer> configToAlts;
   for (auto config : configs->configs) {
     configToAlts[config].set((size_t)config->alt);
   }
@@ -183,7 +184,7 @@ std::vector<antlrcpp::BitSet> PredictionModeClass::getConflictingAltSubsets(std:
   return values;
 }
 
-std::map<ATNState*, antlrcpp::BitSet> PredictionModeClass::getStateToAltMap(std::shared_ptr<ATNConfigSet> configs) {
+std::map<ATNState*, antlrcpp::BitSet> PredictionModeClass::getStateToAltMap(Ref<ATNConfigSet> configs) {
   std::map<ATNState*, antlrcpp::BitSet> m;
   for (auto c : configs->configs) {
     m[c->state].set((size_t)c->alt);
@@ -191,7 +192,7 @@ std::map<ATNState*, antlrcpp::BitSet> PredictionModeClass::getStateToAltMap(std:
   return m;
 }
 
-bool PredictionModeClass::hasStateAssociatedWithOneAlt(std::shared_ptr<ATNConfigSet> configs) {
+bool PredictionModeClass::hasStateAssociatedWithOneAlt(Ref<ATNConfigSet> configs) {
   std::map<ATNState*, antlrcpp::BitSet> x = getStateToAltMap(configs);
   for (std::map<ATNState*, antlrcpp::BitSet>::iterator it = x.begin(); it != x.end(); it++){
     if (it->second.count() == 1) return true;

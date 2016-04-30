@@ -47,10 +47,10 @@ namespace runtime {
     ///  are wiped to -1 in the text override is set in the CommonToken.
     /// </summary>
   public:
-    virtual std::shared_ptr<Symbol> create(std::pair<TokenSource*, CharStream*> source, int type, const std::wstring &text, int channel, int start, int stop, int line, int charPositionInLine) = 0;
+    virtual Ref<Symbol> create(std::pair<TokenSource*, CharStream*> source, int type, const std::wstring &text, int channel, int start, int stop, int line, int charPositionInLine) = 0;
 
     /// Generically useful
-    virtual std::shared_ptr<Symbol> create(int type, const std::wstring &text) = 0;
+    virtual Ref<Symbol> create(int type, const std::wstring &text) = 0;
   };
 
 } // namespace runtime

@@ -60,7 +60,7 @@ namespace runtime {
     const std::vector<std::wstring> &_modeNames;
     std::vector<dfa::DFA> _decisionToDFA;
 
-    std::shared_ptr<atn::PredictionContextCache> _sharedContextCache;
+    Ref<atn::PredictionContextCache> _sharedContextCache;
   };
 
 } // namespace runtime

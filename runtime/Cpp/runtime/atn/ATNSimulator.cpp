@@ -41,19 +41,23 @@ using namespace org::antlr::v4::runtime;
 using namespace org::antlr::v4::runtime::dfa;
 using namespace org::antlr::v4::runtime::atn;
 
-const std::shared_ptr<DFAState> ATNSimulator::ERROR = std::make_shared<DFAState>(INT32_MAX);
+const Ref<DFAState> ATNSimulator::ERROR = std::make_shared<DFAState>(INT32_MAX);
 
-ATNSimulator::ATNSimulator(const ATN &atn, std::shared_ptr<PredictionContextCache> sharedContextCache)
+ATNSimulator::ATNSimulator(const ATN &atn, Ref<PredictionContextCache> sharedContextCache)
 : atn(atn), _sharedContextCache(sharedContextCache) {
 }
 
-std::shared_ptr<PredictionContextCache> ATNSimulator::getSharedContextCache() {
+void ATNSimulator::clearDFA() {
+  throw UnsupportedOperationException("This ATN simulator does not support clearing the DFA.");
+}
+
+Ref<PredictionContextCache> ATNSimulator::getSharedContextCache() {
   return _sharedContextCache;
 }
 
-PredictionContext::Ref ATNSimulator::getCachedContext(PredictionContext::Ref context) {
+Ref<PredictionContext> ATNSimulator::getCachedContext(Ref<PredictionContext> context) {
   std::lock_guard<std::mutex> lck(mtx);
-  std::map<PredictionContext::Ref, PredictionContext::Ref> visited;
+  std::map<Ref<PredictionContext>, Ref<PredictionContext>> visited;
   return PredictionContext::getCachedContext(context, _sharedContextCache, visited);
 }
 

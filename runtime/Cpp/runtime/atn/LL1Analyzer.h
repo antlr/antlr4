@@ -80,7 +80,7 @@ namespace atn {
     /// </param>
     /// <returns> The set of tokens that can follow {@code s} in the ATN in the
     /// specified {@code ctx}. </returns>
-    virtual misc::IntervalSet LOOK(ATNState *s, RuleContext::Ref ctx) const;
+    virtual misc::IntervalSet LOOK(ATNState *s, Ref<RuleContext> ctx) const;
 
     /// <summary>
     /// Compute set of tokens that can follow {@code s} in the ATN in the
@@ -99,7 +99,7 @@ namespace atn {
     /// </param>
     /// <returns> The set of tokens that can follow {@code s} in the ATN in the
     /// specified {@code ctx}. </returns>
-    virtual misc::IntervalSet LOOK(ATNState *s, ATNState *stopState, RuleContext::Ref ctx) const;
+    virtual misc::IntervalSet LOOK(ATNState *s, ATNState *stopState, Ref<RuleContext> ctx) const;
 
     /// <summary>
     /// Compute set of tokens that can follow {@code s} in the ATN in the
@@ -131,8 +131,8 @@ namespace atn {
     /// outermost context is reached. This parameter has no effect if {@code ctx}
     /// is {@code null}. </param>
   protected:
-    virtual void _LOOK(ATNState *s, ATNState *stopState, PredictionContext::Ref ctx, misc::IntervalSet &look,
-      std::unordered_set<ATNConfig::Ref> &lookBusy, antlrcpp::BitSet &calledRuleStack, bool seeThruPreds, bool addEOF) const;
+    virtual void _LOOK(ATNState *s, ATNState *stopState, Ref<PredictionContext> ctx, misc::IntervalSet &look,
+      std::unordered_set<Ref<ATNConfig>> &lookBusy, antlrcpp::BitSet &calledRuleStack, bool seeThruPreds, bool addEOF) const;
   };
 
 } // namespace atn

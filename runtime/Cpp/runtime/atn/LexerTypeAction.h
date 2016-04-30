@@ -33,7 +33,6 @@
 
 #include "LexerActionType.h"
 #include "LexerAction.h"
-#include "Lexer.h"
 
 namespace org {
 namespace antlr {
@@ -71,7 +70,7 @@ namespace atn {
     /// <para>This action is implemented by calling <seealso cref="Lexer#setType"/> with the
     /// value provided by <seealso cref="#getType"/>.</para>
     /// </summary>
-    virtual void execute(Lexer::Ref lexer) override;
+    virtual void execute(Lexer *lexer) override;
 
     virtual size_t hashCode() const override;
     virtual bool operator == (const LexerAction &obj) const override;

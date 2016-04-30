@@ -31,9 +31,6 @@
 
 #pragma once
 
-#include "PredictionContext.h"
-#include "SemanticContext.h"
-
 namespace org {
 namespace antlr {
 namespace v4 {
@@ -50,8 +47,6 @@ namespace atn {
   /// </summary>
   class ATNConfig {
   public:
-    typedef std::shared_ptr<ATNConfig> Ref;
-    
     /// The ATN state associated with this configuration.
     ATNState * state;
 
@@ -64,7 +59,7 @@ namespace atn {
     /// execution of the ATN simulator.
     ///
     /// Can be shared between multiple ANTConfig instances.
-    PredictionContext::Ref context;
+    Ref<PredictionContext> context;
 
     /**
      * We cannot execute predicates dependent upon local context unless
@@ -92,17 +87,17 @@ namespace atn {
     int reachesIntoOuterContext;
 
     /// Can be shared between multiple ATNConfig instances.
-    SemanticContext::Ref semanticContext;
+    Ref<SemanticContext> semanticContext;
 
-    ATNConfig(ATNState *state, int alt, PredictionContext::Ref context);
-    ATNConfig(ATNState *state, int alt, PredictionContext::Ref context, SemanticContext::Ref semanticContext);
+    ATNConfig(ATNState *state, int alt, Ref<PredictionContext> context);
+    ATNConfig(ATNState *state, int alt, Ref<PredictionContext> context, Ref<SemanticContext> semanticContext);
 
-    ATNConfig(ATNConfig::Ref c); // dup
-    ATNConfig(ATNConfig::Ref c, ATNState *state);
-    ATNConfig(ATNConfig::Ref c, ATNState *state, SemanticContext::Ref semanticContext);
-    ATNConfig(ATNConfig::Ref c, SemanticContext::Ref semanticContext);
-    ATNConfig(ATNConfig::Ref c, ATNState *state, PredictionContext::Ref context);
-    ATNConfig(ATNConfig::Ref c, ATNState *state, PredictionContext::Ref context, SemanticContext::Ref semanticContext);
+    ATNConfig(Ref<ATNConfig> c); // dup
+    ATNConfig(Ref<ATNConfig> c, ATNState *state);
+    ATNConfig(Ref<ATNConfig> c, ATNState *state, Ref<SemanticContext> semanticContext);
+    ATNConfig(Ref<ATNConfig> c, Ref<SemanticContext> semanticContext);
+    ATNConfig(Ref<ATNConfig> c, ATNState *state, Ref<PredictionContext> context);
+    ATNConfig(Ref<ATNConfig> c, ATNState *state, Ref<PredictionContext> context, Ref<SemanticContext> semanticContext);
 
     virtual size_t hashCode() const;
 
@@ -156,13 +151,25 @@ namespace atn {
 // Hash function for ATNConfig.
 
 namespace std {
-    using org::antlr::v4::runtime::atn::ATNConfig;
+  using org::antlr::v4::runtime::atn::ATNConfig;
 
-    template <> struct hash<ATNConfig>
+  template <> struct hash<ATNConfig>
+  {
+    size_t operator() (const ATNConfig &x) const
     {
-        size_t operator() (const ATNConfig &x) const
-        {
-            return x.hashCode();
-        }
-    };
+      return x.hashCode();
+    }
+  };
+
+  template <> struct hash<std::vector<Ref<ATNConfig>>>
+  {
+    size_t operator() (const std::vector<Ref<ATNConfig>> &vector) const
+    {
+      std::size_t seed = 0;
+      for (auto &config : vector) {
+        seed ^= config->hashCode() + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+      }
+      return seed;
+    }
+  };
 }

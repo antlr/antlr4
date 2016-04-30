@@ -47,8 +47,6 @@ namespace runtime {
   /// of speed.
   class Lexer : public Recognizer, public TokenSource {
   public:
-    typedef std::shared_ptr<Lexer> Ref;
-    
     static const int DEFAULT_MODE = 0;
     static const int MORE = -2;
     static const int SKIP = -3;
@@ -62,7 +60,7 @@ namespace runtime {
   protected:
      /// <summary>
     /// How to create token objects </summary>
-    std::shared_ptr<TokenFactory<CommonToken>> _factory;
+    Ref<TokenFactory<CommonToken>> _factory;
 
   public:
     /// The goal of all lexer rules/methods is to create a token object.
@@ -72,7 +70,7 @@ namespace runtime {
     ///  emissions, then set this to the last token to be matched or
     ///  something nonnull so that the auto token emit mechanism will not
     ///  emit another token.
-    Token::Ref _token;
+    Ref<Token> _token;
 
     /// <summary>
     /// What character index in the stream did the current token start at?
@@ -116,7 +114,7 @@ namespace runtime {
     virtual void reset();
 
     /// Return a token from this source; i.e., match a token on the char stream.
-    virtual Token::Ref nextToken() override;
+    virtual Ref<Token> nextToken() override;
 
     /// Instruct the lexer to skip creating a token for current lexer rule
     /// and look for another token.  nextToken() knows to keep looking when
@@ -124,13 +122,9 @@ namespace runtime {
     /// if token == null at end of any token rule, it creates one for you
     /// and emits it.
     virtual void skip();
-
     virtual void more();
-
     virtual void mode(int m);
-
     virtual void pushMode(int m);
-
     virtual int popMode();
 
     template<typename T1>
@@ -138,7 +132,7 @@ namespace runtime {
       this->_factory = factory;
     }
 
-    virtual std::shared_ptr<TokenFactory<CommonToken>> getTokenFactory() override;
+    virtual Ref<TokenFactory<CommonToken>> getTokenFactory() override;
 
     /// <summary>
     /// Set the char stream and reset the lexer </summary>
@@ -154,7 +148,7 @@ namespace runtime {
     ///  and getToken (to push tokens into a list and pull from that list
     ///  rather than a single variable as this implementation does).
     /// </summary>
-    virtual void emit(Token::Ref token);
+    virtual void emit(Ref<Token> token);
 
     /// <summary>
     /// The standard method called to automatically emit a token at the
@@ -163,9 +157,9 @@ namespace runtime {
     ///  use that to set the token's text.  Override this method to emit
     ///  custom Token objects or provide a new factory.
     /// </summary>
-    virtual Token::Ref emit();
+    virtual Ref<Token> emit();
 
-    virtual Token::Ref emitEOF();
+    virtual Ref<Token> emitEOF();
 
     virtual size_t getLine() const override;
 
@@ -193,9 +187,9 @@ namespace runtime {
 
     /// <summary>
     /// Override if emitting multiple tokens. </summary>
-    virtual Token::Ref getToken();
+    virtual Ref<Token> getToken();
 
-    virtual void setToken(Token::Ref token);
+    virtual void setToken(Ref<Token> token);
 
     virtual void setType(int ttype);
 
@@ -209,7 +203,7 @@ namespace runtime {
 
     /// Return a list of all Token objects in input char stream.
     /// Forces load of all tokens. Does not include EOF token.
-    virtual std::vector<Token::Ref> getAllTokens();
+    virtual std::vector<Ref<Token>> getAllTokens();
 
     virtual void recover(const LexerNoViableAltException &e);
 

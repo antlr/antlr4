@@ -40,7 +40,7 @@ namespace runtime {
 
   class CommonTokenFactory : public TokenFactory<CommonToken> {
   public:
-    static const std::shared_ptr<TokenFactory<CommonToken>> DEFAULT;
+    static const Ref<TokenFactory<CommonToken>> DEFAULT;
 
     /// <summary>
     /// Copy text for token out of input char stream. Useful when input
@@ -56,10 +56,10 @@ namespace runtime {
 
     CommonTokenFactory();
 
-    virtual std::shared_ptr<CommonToken> create(std::pair<TokenSource*, CharStream*> source, int type,
+    virtual Ref<CommonToken> create(std::pair<TokenSource*, CharStream*> source, int type,
       const std::wstring &text, int channel, int start, int stop, int line, int charPositionInLine) override;
 
-    virtual std::shared_ptr<CommonToken> create(int type, const std::wstring &text) override;
+    virtual Ref<CommonToken> create(int type, const std::wstring &text) override;
   };
 
 } // namespace runtime

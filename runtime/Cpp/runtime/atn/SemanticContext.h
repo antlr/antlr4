@@ -46,13 +46,15 @@ namespace atn {
   ///
   ///  I have scoped the AND, OR, and Predicate subclasses of
   ///  SemanticContext within the scope of this outer class.
-  class SemanticContext {
+  class SemanticContext : public std::enable_shared_from_this<SemanticContext> {
   public:
-    typedef std::shared_ptr<SemanticContext> Ref;
+    /**
+     * The default {@link SemanticContext}, which is semantically equivalent to
+     * a predicate of the form {@code {true}?}.
+     */
+    static const Ref<SemanticContext> NONE;
 
-    static const SemanticContext::Ref NONE;
-
-    virtual size_t hashCode() = 0;
+    virtual size_t hashCode() const = 0;
     virtual std::wstring toString() const = 0;
     virtual bool operator == (const SemanticContext &other) const = 0;
 
@@ -69,22 +71,43 @@ namespace atn {
     /// prediction, so we passed in the outer context here in case of context
     /// dependent predicate evaluation.
     /// </summary>
-    virtual bool eval(Recognizer *parser, RuleContext::Ref outerContext) = 0;
+    virtual bool eval(Recognizer *parser, Ref<RuleContext> parserCallStack) = 0;
 
-    static SemanticContext::Ref And(SemanticContext::Ref a, SemanticContext::Ref b);
+    /**
+     * Evaluate the precedence predicates for the context and reduce the result.
+     *
+     * @param parser The parser instance.
+     * @param parserCallStack
+     * @return The simplified semantic context after precedence predicates are
+     * evaluated, which will be one of the following values.
+     * <ul>
+     * <li>{@link #NONE}: if the predicate simplifies to {@code true} after
+     * precedence predicates are evaluated.</li>
+     * <li>{@code null}: if the predicate simplifies to {@code false} after
+     * precedence predicates are evaluated.</li>
+     * <li>{@code this}: if the semantic context is not changed as a result of
+     * precedence predicate evaluation.</li>
+     * <li>A non-{@code null} {@link SemanticContext}: the new simplified
+     * semantic context after precedence predicates are evaluated.</li>
+     * </ul>
+     */
+    virtual Ref<SemanticContext> evalPrecedence(Recognizer *parser, Ref<RuleContext> parserCallStack);
+
+    static Ref<SemanticContext> And(Ref<SemanticContext> a, Ref<SemanticContext> b);
 
     /// See also: ParserATNSimulator::getPredsForAmbigAlts.
-    static SemanticContext::Ref Or(SemanticContext::Ref a, SemanticContext::Ref b);
+    static Ref<SemanticContext> Or(Ref<SemanticContext> a, Ref<SemanticContext> b);
 
     class Predicate;
     class PrecedencePredicate;
+    class Operator;
     class AND;
     class OR;
 
   private:
-    template<typename T1> // where T1 : SemanticContext::Ref
-    static std::vector<std::shared_ptr<PrecedencePredicate>> filterPrecedencePredicates(const std::vector<T1> &collection) {
-      std::vector<std::shared_ptr<PrecedencePredicate>> result;
+    template<typename T1> // where T1 : SemanticContext>
+    static std::vector<Ref<PrecedencePredicate>> filterPrecedencePredicates(const std::vector<T1> &collection) {
+      std::vector<Ref<PrecedencePredicate>> result;
       for (auto context : collection) {
         if (antlrcpp::is<PrecedencePredicate>(context)) {
           result.push_back(std::dynamic_pointer_cast<PrecedencePredicate>(context));
@@ -96,10 +119,7 @@ namespace atn {
 
   };
 
-
   class SemanticContext::Predicate : public SemanticContext {
-    friend class SemanticContext;
-
   public:
     const int ruleIndex;
     const int predIndex;
@@ -111,18 +131,12 @@ namespace atn {
   public:
     Predicate(int ruleIndex, int predIndex, bool isCtxDependent);
 
-    virtual bool eval(Recognizer *parser, RuleContext::Ref outerContext) override {
-      RuleContext::Ref localctx;
-      if (isCtxDependent)
-        localctx = outerContext;
-      return parser->sempred(localctx, ruleIndex, predIndex);
-    }
-
-    virtual size_t hashCode() override;
+    virtual bool eval(Recognizer *parser, Ref<RuleContext> parserCallStack) override;
+    virtual size_t hashCode() const override;
     virtual bool operator == (const SemanticContext &other) const override;
     virtual std::wstring toString() const override;
   };
-
+  
   class SemanticContext::PrecedencePredicate : public SemanticContext {
   public:
     const int precedence;
@@ -133,50 +147,80 @@ namespace atn {
   public:
     PrecedencePredicate(int precedence);
 
-    virtual bool eval(Recognizer *parser, RuleContext::Ref outerContext) override {
-      return parser->precpred(outerContext, precedence);
-    }
-
+    virtual bool eval(Recognizer *parser, Ref<RuleContext> parserCallStack) override;
+    virtual Ref<SemanticContext> evalPrecedence(Recognizer *parser, Ref<RuleContext> parserCallStack) override;
     virtual int compareTo(PrecedencePredicate *o);
-    virtual size_t hashCode() override;
+    virtual size_t hashCode() const override;
     virtual bool operator == (const SemanticContext &other) const override;
     virtual std::wstring toString() const override;
   };
 
-  class SemanticContext::AND : public SemanticContext {
+  /**
+   * This is the base class for semantic context "operators", which operate on
+   * a collection of semantic context "operands".
+   *
+   * @since 4.3
+   */
+  class SemanticContext::Operator : public SemanticContext {
   public:
-    std::vector<SemanticContext::Ref> opnds;
+    /**
+     * Gets the operands for the semantic context operator.
+     *
+     * @return a collection of {@link SemanticContext} operands for the
+     * operator.
+     *
+     * @since 4.3
+     */
 
-    AND(SemanticContext::Ref a, SemanticContext::Ref b);
-
-    virtual bool operator == (const SemanticContext &other) const override;
-    virtual size_t hashCode() override;
-
-    virtual bool eval(Recognizer *parser, RuleContext::Ref outerContext) override {
-      for (auto opnd : opnds) {
-        if (!opnd->eval(parser, outerContext)) {
-          return false;
-        }
-      }
-      return true;
-    }
-
-
-    virtual std::wstring toString()  const override;
+    virtual std::vector<Ref<SemanticContext>> getOperands() const = 0;
   };
-
-  class SemanticContext::OR : public SemanticContext {
+  
+  /**
+   * A semantic context which is true whenever none of the contained contexts
+   * is false.
+   */
+  class SemanticContext::AND : public SemanticContext::Operator {
   public:
-    std::vector<SemanticContext::Ref> opnds;
+    std::vector<Ref<SemanticContext>> opnds;
 
-    OR(SemanticContext::Ref a, SemanticContext::Ref b);
+    AND(Ref<SemanticContext> a, Ref<SemanticContext> b) ;
 
+    virtual std::vector<Ref<SemanticContext>> getOperands() const override;
     virtual bool operator == (const SemanticContext &other) const override;
-    virtual size_t hashCode() override;
-    virtual bool eval(Recognizer *parser, RuleContext::Ref outerContext) override;
+    virtual size_t hashCode() const override;
+
+    /**
+     * The evaluation of predicates by this context is short-circuiting, but
+     * unordered.</p>
+     */
+    virtual bool eval(Recognizer *parser, Ref<RuleContext> parserCallStack) override;
+    virtual Ref<SemanticContext> evalPrecedence(Recognizer *parser, Ref<RuleContext> parserCallStack) override;
     virtual std::wstring toString() const override;
   };
 
+  /**
+   * A semantic context which is true whenever at least one of the contained
+   * contexts is true.
+   */
+  class SemanticContext::OR : public SemanticContext::Operator {
+  public:
+    std::vector<Ref<SemanticContext>> opnds;
+
+    OR(Ref<SemanticContext> a, Ref<SemanticContext> b);
+
+    virtual std::vector<Ref<SemanticContext>> getOperands() const override;
+    virtual bool operator == (const SemanticContext &other) const override;
+    virtual size_t hashCode() const override;
+
+    /**
+     * The evaluation of predicates by this context is short-circuiting, but
+     * unordered.
+     */
+    virtual bool eval(Recognizer *parser, Ref<RuleContext> parserCallStack) override;
+    virtual Ref<SemanticContext> evalPrecedence(Recognizer *parser, Ref<RuleContext> parserCallStack) override;
+    virtual std::wstring toString() const override;
+  };
+  
 } // namespace atn
 } // namespace runtime
 } // namespace v4

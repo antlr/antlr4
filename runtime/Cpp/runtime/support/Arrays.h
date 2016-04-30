@@ -97,7 +97,7 @@ namespace antlrcpp {
     }
 
     template <typename T>
-    static std::wstring toString(const std::vector<std::shared_ptr<T>> &source) {
+    static std::wstring toString(const std::vector<Ref<T>> &source) {
       std::wstring result = L"[";
       bool firstEntry = true;
       for (auto &value : source) {

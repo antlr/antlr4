@@ -204,7 +204,7 @@ namespace atn {
     /// the configurations to strip out all of the predicates so that a standard
     /// <seealso cref="ATNConfigSet"/> will merge everything ignoring predicates.
     /// </summary>
-    static bool hasSLLConflictTerminatingPrediction(PredictionMode *mode, std::shared_ptr<ATNConfigSet> configs);
+    static bool hasSLLConflictTerminatingPrediction(PredictionMode *mode, Ref<ATNConfigSet> configs);
 
     /// <summary>
     /// Checks if any configuration in {@code configs} is in a
@@ -216,7 +216,7 @@ namespace atn {
     /// <param name="configs"> the configuration set to test </param>
     /// <returns> {@code true} if any configuration in {@code configs} is in a
     /// <seealso cref="RuleStopState"/>, otherwise {@code false} </returns>
-    static bool hasConfigInRuleStopState(std::shared_ptr<ATNConfigSet> configs);
+    static bool hasConfigInRuleStopState(Ref<ATNConfigSet> configs);
 
     /// <summary>
     /// Checks if all configurations in {@code configs} are in a
@@ -228,7 +228,7 @@ namespace atn {
     /// <param name="configs"> the configuration set to test </param>
     /// <returns> {@code true} if all configurations in {@code configs} are in a
     /// <seealso cref="RuleStopState"/>, otherwise {@code false} </returns>
-    static bool allConfigsInRuleStopStates(std::shared_ptr<ATNConfigSet> configs);
+    static bool allConfigsInRuleStopStates(Ref<ATNConfigSet> configs);
 
     /// <summary>
     /// Full LL prediction termination.
@@ -485,7 +485,7 @@ namespace atn {
     /// alt and not pred
     /// </pre>
     /// </summary>
-    static std::vector<antlrcpp::BitSet> getConflictingAltSubsets(std::shared_ptr<ATNConfigSet> configs);
+    static std::vector<antlrcpp::BitSet> getConflictingAltSubsets(Ref<ATNConfigSet> configs);
 
     /// <summary>
     /// Get a map from state to alt subset from a configuration set. For each
@@ -496,9 +496,9 @@ namespace atn {
     /// cref="ATNConfig#alt alt"/>
     /// </pre>
     /// </summary>
-    static std::map<ATNState*, antlrcpp::BitSet> getStateToAltMap(std::shared_ptr<ATNConfigSet> configs);
+    static std::map<ATNState*, antlrcpp::BitSet> getStateToAltMap(Ref<ATNConfigSet> configs);
 
-    static bool hasStateAssociatedWithOneAlt(std::shared_ptr<ATNConfigSet> configs);
+    static bool hasStateAssociatedWithOneAlt(Ref<ATNConfigSet> configs);
 
     static int getSingleViableAlt(const std::vector<antlrcpp::BitSet> &altsets);
   };

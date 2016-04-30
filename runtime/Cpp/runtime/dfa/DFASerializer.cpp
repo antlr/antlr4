@@ -1,8 +1,9 @@
 ﻿/*
  * [The "BSD license"]
  *  Copyright (c) 2016 Mike Lischke
- *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
+ *  Copyright (c) 2013 Terence Parr
+ *  Copyright (c) 2012 Sam Harwell
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -31,21 +32,26 @@
 
 #include "DFA.h"
 #include "DFAState.h"
+#include "VocabularyImpl.h"
 
 #include "DFASerializer.h"
 
 using namespace org::antlr::v4::runtime::dfa;
 
-DFASerializer::DFASerializer(DFA *dfa, const std::vector<std::wstring>& tnames) : dfa(dfa), tokenNames(tnames) {
+DFASerializer::DFASerializer(const DFA *dfa, const std::vector<std::wstring>& tokenNames)
+  : DFASerializer(dfa, VocabularyImpl::fromTokenNames(tokenNames)) {
 }
 
-std::wstring DFASerializer::toString() {
-  if (dfa->s0 == nullptr) {
+DFASerializer::DFASerializer(const DFA *dfa, Ref<Vocabulary> vocabulary) : _dfa(dfa), _vocabulary(vocabulary) {
+}
+
+std::wstring DFASerializer::toString() const {
+  if (_dfa->s0 == nullptr) {
     return L"";
   }
 
   std::wstringstream ss;
-  std::vector<DFAState*> states = dfa->getStates();
+  std::vector<DFAState *> states = _dfa->getStates();
   for (auto s : states) {
     for (size_t i = 0; i < s->edges.size(); i++) {
       DFAState *t = s->edges[i];
@@ -60,20 +66,11 @@ std::wstring DFASerializer::toString() {
   return ss.str();
 }
 
-std::wstring DFASerializer::getEdgeLabel(size_t i) {
-  std::wstring label;
-  if (i == 0) {
-    return L"EOF";
-  }
-  if (!tokenNames.empty()) {
-    label = tokenNames[i - 1];
-  } else {
-    label = std::to_wstring(i - 1);
-  }
-  return label;
+std::wstring DFASerializer::getEdgeLabel(size_t i) const {
+  return _vocabulary->getDisplayName((int)i - 1);
 }
 
-std::wstring DFASerializer::getStateString(DFAState *s) {
+std::wstring DFASerializer::getStateString(DFAState *s) const {
   size_t n = (size_t)s->stateNumber;
 
   const std::wstring baseStateStr = (s->isAcceptState ? L":" : L"") + std::wstring(L"s") + std::to_wstring(n) + (s->requiresFullContext ? L"^" : L"");

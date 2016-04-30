@@ -77,30 +77,30 @@ void ParseTreePatternMatcher::setDelimiters(const std::wstring &start, const std
   _escape = escapeLeft;
 }
 
-bool ParseTreePatternMatcher::matches(std::shared_ptr<ParseTree> tree, const std::wstring &pattern, int patternRuleIndex) {
+bool ParseTreePatternMatcher::matches(Ref<ParseTree> tree, const std::wstring &pattern, int patternRuleIndex) {
   ParseTreePattern p = compile(pattern, patternRuleIndex);
   return matches(tree, p);
 }
 
-bool ParseTreePatternMatcher::matches(std::shared_ptr<ParseTree> tree, const ParseTreePattern &pattern) {
-  std::map<std::wstring, std::vector<std::shared_ptr<ParseTree>>> labels;
-  std::shared_ptr<ParseTree> mismatchedNode = matchImpl(tree, pattern.getPatternTree(), labels);
+bool ParseTreePatternMatcher::matches(Ref<ParseTree> tree, const ParseTreePattern &pattern) {
+  std::map<std::wstring, std::vector<Ref<ParseTree>>> labels;
+  Ref<ParseTree> mismatchedNode = matchImpl(tree, pattern.getPatternTree(), labels);
   return mismatchedNode == nullptr;
 }
 
-ParseTreeMatch ParseTreePatternMatcher::match(std::shared_ptr<ParseTree> tree, const std::wstring &pattern, int patternRuleIndex) {
+ParseTreeMatch ParseTreePatternMatcher::match(Ref<ParseTree> tree, const std::wstring &pattern, int patternRuleIndex) {
   ParseTreePattern p = compile(pattern, patternRuleIndex);
   return match(tree, p);
 }
 
-ParseTreeMatch ParseTreePatternMatcher::match(std::shared_ptr<ParseTree> tree, const ParseTreePattern &pattern) {
-  std::map<std::wstring, std::vector<std::shared_ptr<ParseTree>>> labels;
-  std::shared_ptr<tree::ParseTree> mismatchedNode = matchImpl(tree, pattern.getPatternTree(), labels);
+ParseTreeMatch ParseTreePatternMatcher::match(Ref<ParseTree> tree, const ParseTreePattern &pattern) {
+  std::map<std::wstring, std::vector<Ref<ParseTree>>> labels;
+  Ref<tree::ParseTree> mismatchedNode = matchImpl(tree, pattern.getPatternTree(), labels);
   return ParseTreeMatch(tree, pattern, labels, mismatchedNode);
 }
 
 ParseTreePattern ParseTreePatternMatcher::compile(const std::wstring &pattern, int patternRuleIndex) {
-  std::vector<Token::Ref> tokenList = tokenize(pattern);
+  std::vector<Ref<Token>> tokenList = tokenize(pattern);
 
   ListTokenSource *tokenSrc = new ListTokenSource(tokenList); /* mem-check: deleted in finally block */
   CommonTokenStream *tokens = new CommonTokenStream(tokenSrc); /* mem-check: deleted in finally block */
@@ -113,7 +113,7 @@ ParseTreePattern ParseTreePatternMatcher::compile(const std::wstring &pattern, i
                                  _parser->getRuleNames(), _parser->getATNWithBypassAlts(), tokens);
 
   try {
-    ParserRuleContext::Ref context = parserInterp.parse(patternRuleIndex);
+    Ref<ParserRuleContext> context = parserInterp.parse(patternRuleIndex);
     return ParseTreePattern(this, pattern, patternRuleIndex, context);
   } catch (std::exception &e) {
 #if defined(_MSC_FULL_VER) && _MSC_FULL_VER < 190023026
@@ -134,8 +134,8 @@ Parser* ParseTreePatternMatcher::getParser() {
   return _parser;
 }
 
-std::shared_ptr<ParseTree> ParseTreePatternMatcher::matchImpl(std::shared_ptr<ParseTree> tree,
-  std::shared_ptr<ParseTree> patternTree, std::map<std::wstring, std::vector<std::shared_ptr<ParseTree>>> &labels) {
+Ref<ParseTree> ParseTreePatternMatcher::matchImpl(Ref<ParseTree> tree,
+  Ref<ParseTree> patternTree, std::map<std::wstring, std::vector<Ref<ParseTree>>> &labels) {
   if (tree == nullptr) {
     throw IllegalArgumentException("tree cannot be null");
   }
@@ -146,14 +146,14 @@ std::shared_ptr<ParseTree> ParseTreePatternMatcher::matchImpl(std::shared_ptr<Pa
 
   // x and <ID>, x and y, or x and x; or could be mismatched types
   if (is<TerminalNode>(tree) && is<TerminalNode>(patternTree)) {
-    std::shared_ptr<TerminalNode> t1 = std::static_pointer_cast<TerminalNode>(tree);
-    std::shared_ptr<TerminalNode> t2 = std::static_pointer_cast<TerminalNode>(patternTree);
+    Ref<TerminalNode> t1 = std::static_pointer_cast<TerminalNode>(tree);
+    Ref<TerminalNode> t2 = std::static_pointer_cast<TerminalNode>(patternTree);
 
-    std::shared_ptr<ParseTree> mismatchedNode;
+    Ref<ParseTree> mismatchedNode;
     // both are tokens and they have same type
     if (t1->getSymbol()->getType() == t2->getSymbol()->getType()) {
       if (is<TokenTagToken>(t2->getSymbol())) { // x and <ID>
-        std::shared_ptr<TokenTagToken> tokenTagToken = std::dynamic_pointer_cast<TokenTagToken>(t2->getSymbol());
+        Ref<TokenTagToken> tokenTagToken = std::dynamic_pointer_cast<TokenTagToken>(t2->getSymbol());
 
         // track label->list-of-nodes for both token name and label (if any)
         labels[tokenTagToken->getTokenName()].push_back(tree);
@@ -178,12 +178,12 @@ std::shared_ptr<ParseTree> ParseTreePatternMatcher::matchImpl(std::shared_ptr<Pa
   }
 
   if (is<ParserRuleContext>(tree) && is<ParserRuleContext>(patternTree)) {
-    ParserRuleContext::Ref r1 = std::dynamic_pointer_cast<ParserRuleContext>(tree);
-    ParserRuleContext::Ref r2 = std::dynamic_pointer_cast<ParserRuleContext>(patternTree);
-    std::shared_ptr<ParseTree> mismatchedNode;
+    Ref<ParserRuleContext> r1 = std::dynamic_pointer_cast<ParserRuleContext>(tree);
+    Ref<ParserRuleContext> r2 = std::dynamic_pointer_cast<ParserRuleContext>(patternTree);
+    Ref<ParseTree> mismatchedNode;
 
     // (expr ...) and <expr>
-    std::shared_ptr<RuleTagToken> ruleTagToken = getRuleTagToken(r2);
+    Ref<RuleTagToken> ruleTagToken = getRuleTagToken(r2);
     if (ruleTagToken != nullptr) {
       //ParseTreeMatch *m = nullptr; // unused?
       if (r1->RuleContext::getRuleContext()->getRuleIndex() == r2->RuleContext::getRuleContext()->getRuleIndex()) {
@@ -212,7 +212,7 @@ std::shared_ptr<ParseTree> ParseTreePatternMatcher::matchImpl(std::shared_ptr<Pa
 
     std::size_t n = r1->getChildCount();
     for (size_t i = 0; i < n; i++) {
-      std::shared_ptr<ParseTree> childMatch = matchImpl(r1->getChild(i), patternTree->getChild(i), labels);
+      Ref<ParseTree> childMatch = matchImpl(r1->getChild(i), patternTree->getChild(i), labels);
       if (childMatch) {
         return childMatch;
       }
@@ -225,11 +225,11 @@ std::shared_ptr<ParseTree> ParseTreePatternMatcher::matchImpl(std::shared_ptr<Pa
   return tree;
 }
 
-std::shared_ptr<RuleTagToken> ParseTreePatternMatcher::getRuleTagToken(std::shared_ptr<ParseTree> t) {
+Ref<RuleTagToken> ParseTreePatternMatcher::getRuleTagToken(Ref<ParseTree> t) {
   if (is<RuleNode>(t)) {
-    std::shared_ptr<RuleNode> r = std::dynamic_pointer_cast<RuleNode>(t);
+    Ref<RuleNode> r = std::dynamic_pointer_cast<RuleNode>(t);
     if (r->getChildCount() == 1 && is<TerminalNode>(r->getChild(0))) {
-      std::shared_ptr<TerminalNode> c = std::dynamic_pointer_cast<TerminalNode>(r->getChild(0));
+      Ref<TerminalNode> c = std::dynamic_pointer_cast<TerminalNode>(r->getChild(0));
       if (is<RuleTagToken>(c->getSymbol())) {
         return std::dynamic_pointer_cast<RuleTagToken>(c->getSymbol());
       }
@@ -238,12 +238,12 @@ std::shared_ptr<RuleTagToken> ParseTreePatternMatcher::getRuleTagToken(std::shar
   return nullptr;
 }
 
-std::vector<Token::Ref> ParseTreePatternMatcher::tokenize(const std::wstring &pattern) {
+std::vector<Ref<Token>> ParseTreePatternMatcher::tokenize(const std::wstring &pattern) {
   // split pattern into chunks: sea (raw input) and islands (<ID>, <expr>)
   std::vector<Chunk> chunks = split(pattern);
 
   // create token stream from text and tags
-  std::vector<Token::Ref> tokens;
+  std::vector<Ref<Token>> tokens;
   for (auto chunk : chunks) {
     if (is<TagChunk>(chunk)) {
       TagChunk &tagChunk = (TagChunk&)chunk;
@@ -254,7 +254,7 @@ std::vector<Token::Ref> ParseTreePatternMatcher::tokenize(const std::wstring &pa
           throw IllegalArgumentException("Unknown token " + antlrcpp::ws2s(tagChunk.getTag()) +
                                          " in pattern: " + antlrcpp::ws2s(pattern));
         }
-        std::shared_ptr<TokenTagToken> t = std::make_shared<TokenTagToken>(tagChunk.getTag(), (int)ttype, tagChunk.getLabel());
+        Ref<TokenTagToken> t = std::make_shared<TokenTagToken>(tagChunk.getTag(), (int)ttype, tagChunk.getLabel());
         tokens.push_back(t);
       } else if (islower(tagChunk.getTag()[0])) {
         ssize_t ruleIndex = _parser->getRuleIndex(tagChunk.getTag());
@@ -270,7 +270,7 @@ std::vector<Token::Ref> ParseTreePatternMatcher::tokenize(const std::wstring &pa
       TextChunk &textChunk = (TextChunk&)chunk;
       ANTLRInputStream input(textChunk.getText());
       _lexer->setInputStream(&input);
-      Token::Ref t = _lexer->nextToken();
+      Ref<Token> t = _lexer->nextToken();
       while (t->getType() != EOF) {
         tokens.push_back(t);
         t = _lexer->nextToken();

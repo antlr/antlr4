@@ -103,7 +103,7 @@ size_t BufferedTokenStream::fetch(size_t n) {
   }
 
   for (size_t i = 0; i < n; i++) {
-    Token::Ref t = _tokenSource->nextToken();
+    Ref<Token> t = _tokenSource->nextToken();
     if (is<WritableToken>(t)) {
       (std::dynamic_pointer_cast<WritableToken>(t))->setTokenIndex((int)_tokens.size());
     }
@@ -117,7 +117,7 @@ size_t BufferedTokenStream::fetch(size_t n) {
   return n;
 }
 
-Token::Ref BufferedTokenStream::get(size_t i) const {
+Ref<Token> BufferedTokenStream::get(size_t i) const {
   if (i >= _tokens.size()) {
     throw IndexOutOfBoundsException(std::string("token index ") +
                                     std::to_string(i) +
@@ -127,8 +127,8 @@ Token::Ref BufferedTokenStream::get(size_t i) const {
   return _tokens[i];
 }
 
-std::vector<Token::Ref> BufferedTokenStream::get(size_t start, size_t stop) {
-  std::vector<Token::Ref> subset;
+std::vector<Ref<Token>> BufferedTokenStream::get(size_t start, size_t stop) {
+  std::vector<Ref<Token>> subset;
 
   lazyInit();
 
@@ -140,7 +140,7 @@ std::vector<Token::Ref> BufferedTokenStream::get(size_t start, size_t stop) {
     stop = _tokens.size() - 1;
   }
   for (size_t i = start; i <= stop; i++) {
-    Token::Ref t = _tokens[i];
+    Ref<Token> t = _tokens[i];
     if (t->getType() == EOF) {
       break;
     }
@@ -153,14 +153,14 @@ ssize_t BufferedTokenStream::LA(ssize_t i) {
   return LT(i)->getType();
 }
 
-Token::Ref BufferedTokenStream::LB(size_t k) {
+Ref<Token> BufferedTokenStream::LB(size_t k) {
   if (k > _p) {
     return nullptr;
   }
   return _tokens[(size_t)(_p - k)];
 }
 
-Token::Ref BufferedTokenStream::LT(ssize_t k) {
+Ref<Token> BufferedTokenStream::LT(ssize_t k) {
   lazyInit();
   if (k == 0) {
     return nullptr;
@@ -201,15 +201,15 @@ void BufferedTokenStream::setTokenSource(TokenSource *tokenSource) {
   _needSetup = true;
 }
 
-std::vector<Token::Ref> BufferedTokenStream::getTokens() {
+std::vector<Ref<Token>> BufferedTokenStream::getTokens() {
   return _tokens;
 }
 
-std::vector<Token::Ref> BufferedTokenStream::getTokens(int start, int stop) {
+std::vector<Ref<Token>> BufferedTokenStream::getTokens(int start, int stop) {
   return getTokens(start, stop, std::vector<int>());
 }
 
-std::vector<Token::Ref> BufferedTokenStream::getTokens(int start, int stop, const std::vector<int> &types) {
+std::vector<Ref<Token>> BufferedTokenStream::getTokens(int start, int stop, const std::vector<int> &types) {
   lazyInit();
   if (start < 0 || stop >= (int)_tokens.size() || stop < 0 || start >= (int)_tokens.size()) {
     throw IndexOutOfBoundsException(std::string("start ") +
@@ -220,7 +220,7 @@ std::vector<Token::Ref> BufferedTokenStream::getTokens(int start, int stop, cons
                                     std::to_string(_tokens.size() - 1));
   }
 
-  std::vector<Token::Ref> filteredTokens;
+  std::vector<Ref<Token>> filteredTokens;
 
   if (start > stop) {
     return filteredTokens;
@@ -228,7 +228,7 @@ std::vector<Token::Ref> BufferedTokenStream::getTokens(int start, int stop, cons
 
   // list = tokens[start:stop]:{T t, t.getType() in types}
   for (size_t i = (size_t)start; i <= (size_t)stop; i++) {
-    Token::Ref tok = _tokens[i];
+    Ref<Token> tok = _tokens[i];
 
     if (types.empty() || std::find(types.begin(), types.end(), tok->getType()) != types.end()) {
       filteredTokens.push_back(tok);
@@ -237,7 +237,7 @@ std::vector<Token::Ref> BufferedTokenStream::getTokens(int start, int stop, cons
   return filteredTokens;
 }
 
-std::vector<Token::Ref> BufferedTokenStream::getTokens(int start, int stop, int ttype) {
+std::vector<Ref<Token>> BufferedTokenStream::getTokens(int start, int stop, int ttype) {
   std::vector<int> s;
   s.push_back(ttype);
   return getTokens(start, stop, s);
@@ -249,7 +249,7 @@ ssize_t BufferedTokenStream::nextTokenOnChannel(size_t i, int channel) {
     return -1;
   }
 
-  Token::Ref token = _tokens[i];
+  Ref<Token> token = _tokens[i];
   while (token->getChannel() != channel) {
     if (token->getType() == EOF) {
       return -1;
@@ -272,7 +272,7 @@ ssize_t BufferedTokenStream::previousTokenOnChannel(ssize_t i, int channel) cons
   return -1;
 }
 
-std::vector<Token::Ref> BufferedTokenStream::getHiddenTokensToRight(size_t tokenIndex, int channel) {
+std::vector<Ref<Token>> BufferedTokenStream::getHiddenTokensToRight(size_t tokenIndex, int channel) {
   lazyInit();
   if (tokenIndex >= _tokens.size()) {
     throw IndexOutOfBoundsException(std::to_string(tokenIndex) + " not in 0.." + std::to_string(_tokens.size() - 1));
@@ -291,11 +291,11 @@ std::vector<Token::Ref> BufferedTokenStream::getHiddenTokensToRight(size_t token
   return filterForChannel(from, (size_t)to, channel);
 }
 
-std::vector<Token::Ref> BufferedTokenStream::getHiddenTokensToRight(size_t tokenIndex) {
+std::vector<Ref<Token>> BufferedTokenStream::getHiddenTokensToRight(size_t tokenIndex) {
   return getHiddenTokensToRight(tokenIndex, -1);
 }
 
-std::vector<Token::Ref> BufferedTokenStream::getHiddenTokensToLeft(size_t tokenIndex, int channel) {
+std::vector<Ref<Token>> BufferedTokenStream::getHiddenTokensToLeft(size_t tokenIndex, int channel) {
   lazyInit();
   if (tokenIndex >= _tokens.size()) {
     throw IndexOutOfBoundsException(std::to_string(tokenIndex) + " not in 0.." + std::to_string(_tokens.size() - 1));
@@ -303,7 +303,7 @@ std::vector<Token::Ref> BufferedTokenStream::getHiddenTokensToLeft(size_t tokenI
 
   ssize_t prevOnChannel = previousTokenOnChannel((ssize_t)tokenIndex - 1, Lexer::DEFAULT_TOKEN_CHANNEL);
   if (prevOnChannel == (ssize_t)tokenIndex - 1) {
-    return std::vector<Token::Ref>();
+    return { };
   }
   // if none onchannel to left, prevOnChannel=-1 then from=0
   size_t from = (size_t)(prevOnChannel + 1);
@@ -312,14 +312,14 @@ std::vector<Token::Ref> BufferedTokenStream::getHiddenTokensToLeft(size_t tokenI
   return filterForChannel(from, to, channel);
 }
 
-std::vector<Token::Ref> BufferedTokenStream::getHiddenTokensToLeft(size_t tokenIndex) {
+std::vector<Ref<Token>> BufferedTokenStream::getHiddenTokensToLeft(size_t tokenIndex) {
   return getHiddenTokensToLeft(tokenIndex, -1);
 }
 
-std::vector<Token::Ref> BufferedTokenStream::filterForChannel(size_t from, size_t to, int channel) {
-  std::vector<Token::Ref> hidden;
+std::vector<Ref<Token>> BufferedTokenStream::filterForChannel(size_t from, size_t to, int channel) {
+  std::vector<Ref<Token>> hidden;
   for (size_t i = from; i <= to; i++) {
-    Token::Ref t = _tokens[i];
+    Ref<Token> t = _tokens[i];
     if (channel == -1) {
       if (t->getChannel() != Lexer::DEFAULT_TOKEN_CHANNEL) {
         hidden.push_back(t);
@@ -361,7 +361,7 @@ std::wstring BufferedTokenStream::getText(const misc::Interval &interval) {
 
   std::wstringstream ss;
   for (size_t i = (size_t)start; i <= (size_t)stop; i++) {
-    Token::Ref t = _tokens[i];
+    Ref<Token> t = _tokens[i];
     if (t->getType() == EOF) {
       break;
     }
@@ -374,7 +374,7 @@ std::wstring BufferedTokenStream::getText(RuleContext *ctx) {
   return getText(ctx->getSourceInterval());
 }
 
-std::wstring BufferedTokenStream::getText(Token::Ref start, Token::Ref stop) {
+std::wstring BufferedTokenStream::getText(Ref<Token> start, Ref<Token> stop) {
   if (start != nullptr && stop != nullptr) {
     return getText(misc::Interval(start->getTokenIndex(), stop->getTokenIndex()));
   }

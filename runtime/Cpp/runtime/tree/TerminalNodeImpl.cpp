@@ -37,11 +37,11 @@
 using namespace org::antlr::v4::runtime;
 using namespace org::antlr::v4::runtime::tree;
 
-TerminalNodeImpl::TerminalNodeImpl(Token::Ref symbol) {
+TerminalNodeImpl::TerminalNodeImpl(Ref<Token> symbol) {
   this->symbol = symbol;
 }
 
-Token::Ref TerminalNodeImpl::getSymbol() {
+Ref<Token> TerminalNodeImpl::getSymbol() {
   return symbol;
 }
 
@@ -81,6 +81,6 @@ std::weak_ptr<Tree> TerminalNodeImpl::getParentReference() {
   return parent;
 }
 
-std::shared_ptr<Tree> TerminalNodeImpl::getChildReference(size_t i) {
-  return std::shared_ptr<Tree>();
+Ref<Tree> TerminalNodeImpl::getChildReference(size_t i) {
+  return Ref<Tree>();
 }

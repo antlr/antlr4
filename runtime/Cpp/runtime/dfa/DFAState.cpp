@@ -39,7 +39,7 @@
 using namespace org::antlr::v4::runtime::dfa;
 using namespace org::antlr::v4::runtime::atn;
 
-DFAState::PredPrediction::PredPrediction(SemanticContext::Ref pred, int alt) : pred(pred) {
+DFAState::PredPrediction::PredPrediction(Ref<SemanticContext> pred, int alt) : pred(pred) {
   InitializeInstanceFields();
   this->alt = alt;
 }
@@ -60,7 +60,7 @@ DFAState::DFAState(int state) : DFAState() {
   stateNumber = state;
 }
 
-DFAState::DFAState(std::shared_ptr<ATNConfigSet> configs) : DFAState() {
+DFAState::DFAState(Ref<ATNConfigSet> configs) : DFAState() {
   this->configs = configs;
 }
 
@@ -119,7 +119,5 @@ void DFAState::InitializeInstanceFields() {
   stateNumber = -1;
   isAcceptState = false;
   prediction = 0;
-  lexerRuleIndex = -1;
-  lexerActionIndex = -1;
   requiresFullContext = false;
 }

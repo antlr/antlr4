@@ -77,7 +77,7 @@ namespace runtime {
     ///        the reporting of an error. It is null in the case where
     ///        the parser was able to recover in line without exiting the
     ///        surrounding rule. </param>
-    virtual void syntaxError(IRecognizer *recognizer, Token::Ref offendingSymbol, size_t line, int charPositionInLine,
+    virtual void syntaxError(IRecognizer *recognizer, Ref<Token> offendingSymbol, size_t line, int charPositionInLine,
                              const std::wstring &msg, std::exception_ptr e) = 0;
 
     /// <summary>
@@ -108,7 +108,7 @@ namespace runtime {
     /// <param name="configs"> the ATN configuration set where the ambiguity was
     /// determined </param>
     virtual void reportAmbiguity(Parser *recognizer, const dfa::DFA &dfa, size_t startIndex, size_t stopIndex, bool exact,
-      const antlrcpp::BitSet &ambigAlts, std::shared_ptr<atn::ATNConfigSet> configs) = 0;
+      const antlrcpp::BitSet &ambigAlts, Ref<atn::ATNConfigSet> configs) = 0;
 
     /// <summary>
     /// This method is called when an SLL conflict occurs and the parser is about
@@ -131,7 +131,7 @@ namespace runtime {
     /// <param name="configs"> the ATN configuration set where the SLL conflict was
     /// detected </param>
     virtual void reportAttemptingFullContext(Parser *recognizer, const dfa::DFA &dfa, size_t startIndex, size_t stopIndex,
-      const antlrcpp::BitSet &conflictingAlts, std::shared_ptr<atn::ATNConfigSet> configs) = 0;
+      const antlrcpp::BitSet &conflictingAlts, Ref<atn::ATNConfigSet> configs) = 0;
 
     /// <summary>
     /// This method is called by the parser when a full-context prediction has a
@@ -161,7 +161,7 @@ namespace runtime {
     /// <param name="configs"> the ATN configuration set where the unambiguous prediction
     /// was determined </param>
     virtual void reportContextSensitivity(Parser *recognizer, const dfa::DFA &dfa, size_t startIndex, size_t stopIndex,
-      int prediction, std::shared_ptr<atn::ATNConfigSet> configs) = 0;
+      int prediction, Ref<atn::ATNConfigSet> configs) = 0;
   };
 
 } // namespace runtime

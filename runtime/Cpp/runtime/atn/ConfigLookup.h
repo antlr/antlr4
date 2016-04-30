@@ -29,8 +29,6 @@
 
 #pragma once
 
-#include "ATNConfig.h"
-
 namespace org {
 namespace antlr {
 namespace v4 {
@@ -48,17 +46,17 @@ namespace atn {
 
       ConfigLookupIterator& operator++ () { ++*_iterator; return *this; };
       bool operator != (const ConfigLookupIterator& rhs) const { return *_iterator != *rhs._iterator; };
-      ATNConfig::Ref operator * () const { return **_iterator; };
+      Ref<ATNConfig> operator * () const { return **_iterator; };
     private:
-      std::shared_ptr<ConfigLookupIteratorImpl> _iterator;
+      Ref<ConfigLookupIteratorImpl> _iterator;
     };
 
     virtual ~ConfigLookup() {}
 
     // Java iterator interface.
-    virtual ATNConfig::Ref getOrAdd(ATNConfig::Ref config) = 0;
+    virtual Ref<ATNConfig> getOrAdd(Ref<ATNConfig> config) = 0;
     virtual bool isEmpty() const = 0;
-    virtual bool contains(ATNConfig::Ref config) const = 0;
+    virtual bool contains(Ref<ATNConfig> config) const = 0;
     virtual void clear() = 0;
 
     // STL iterator interface.
@@ -71,18 +69,18 @@ namespace atn {
     public:
       virtual ConfigLookupIteratorImpl& operator ++ () = 0;
       virtual bool operator != (const ConfigLookupIteratorImpl&) const = 0;
-      virtual ATNConfig::Ref operator * () const = 0;
+      virtual Ref<ATNConfig> operator * () const = 0;
       virtual void* underlyingIterator () = 0;
       virtual const void* underlyingIterator () const = 0;
     };
   };
 
   template <typename Hasher, typename Comparer>
-  class ConfigLookupImpl: public ConfigLookup, std::unordered_set<ATNConfig::Ref, Hasher, Comparer> {
+  class ConfigLookupImpl: public ConfigLookup, std::unordered_set<Ref<ATNConfig>, Hasher, Comparer> {
   public:
-    using Set = std::unordered_set<ATNConfig::Ref, Hasher, Comparer>;
+    using Set = std::unordered_set<Ref<ATNConfig>, Hasher, Comparer>;
 
-    virtual ATNConfig::Ref getOrAdd(ATNConfig::Ref config) override {
+    virtual Ref<ATNConfig> getOrAdd(Ref<ATNConfig> config) override {
       auto result = Set::find(config);
       if (result != Set::end())
         // Can potentially be a different config instance which however is considered equal to the given config
@@ -97,7 +95,7 @@ namespace atn {
       return Set::empty();
     }
 
-    virtual bool contains(ATNConfig::Ref config) const override {
+    virtual bool contains(Ref<ATNConfig> config) const override {
       return Set::count(config) > 0;
     }
 
@@ -112,19 +110,19 @@ namespace atn {
     ConfigLookupIterator begin() override {
       return ConfigLookupIterator(
         new ConfigLookupImpl<Hasher, Comparer>::ConfigLookupIteratorImpl(
-          std::unordered_set<ATNConfig::Ref, Hasher, Comparer>::begin())); /* mem check: managed by shared_ptr in the iterator */
+          std::unordered_set<Ref<ATNConfig>, Hasher, Comparer>::begin())); /* mem check: managed by shared_ptr in the iterator */
     }
 
     ConfigLookupIterator end() override {
       return ConfigLookupIterator(
         new ConfigLookupImpl<Hasher, Comparer>::ConfigLookupIteratorImpl(
-          std::unordered_set<ATNConfig::Ref, Hasher, Comparer>::end()));  /* mem check: managed by shared_ptr in the iterator */
+          std::unordered_set<Ref<ATNConfig>, Hasher, Comparer>::end()));  /* mem check: managed by shared_ptr in the iterator */
     }
 
   protected:
     class ConfigLookupIteratorImpl : public ConfigLookup::ConfigLookupIteratorImpl {
     public:
-      using UnderlyingIterator = typename std::unordered_set<ATNConfig::Ref, Hasher, Comparer>::iterator;
+      using UnderlyingIterator = typename std::unordered_set<Ref<ATNConfig>, Hasher, Comparer>::iterator;
 
       ConfigLookupIteratorImpl(UnderlyingIterator&& iterator) : _iterator(std::move(iterator)) {
       }
@@ -137,7 +135,7 @@ namespace atn {
         return *reinterpret_cast<const UnderlyingIterator*>(underlyingIterator()) != *reinterpret_cast<const UnderlyingIterator*>(rhs.underlyingIterator());
       }
 
-      ATNConfig::Ref operator * () const override {
+      Ref<ATNConfig> operator * () const override {
         return *_iterator;
       }
       

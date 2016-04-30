@@ -42,7 +42,8 @@ namespace runtime {
   public:
     static ConsoleErrorListener INSTANCE;
 
-    virtual void syntaxError(IRecognizer *recognizer, Token::Ref offendingSymbol, size_t line, int charPositionInLine, const std::wstring &msg, std::exception_ptr e) override;
+    virtual void syntaxError(IRecognizer *recognizer, Ref<Token> offendingSymbol, size_t line, int charPositionInLine,
+                             const std::wstring &msg, std::exception_ptr e) override;
   };
 
 } // namespace runtime

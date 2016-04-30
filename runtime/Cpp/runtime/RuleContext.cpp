@@ -32,12 +32,13 @@
 #include "Trees.h"
 #include "Interval.h"
 #include "Parser.h"
+#include "ATN.h"
 
 #include "RuleContext.h"
 
 using namespace org::antlr::v4::runtime;
 
-const RuleContext::Ref RuleContext::EMPTY = std::make_shared<ParserRuleContext>();
+const Ref<RuleContext> RuleContext::EMPTY = std::make_shared<ParserRuleContext>();
 
 RuleContext::RuleContext() {
   InitializeInstanceFields();
@@ -51,7 +52,7 @@ RuleContext::RuleContext(std::weak_ptr<RuleContext> parent, int invokingState) {
 
 int RuleContext::depth() {
   int n = 1;
-  RuleContext::Ref p = shared_from_this();
+  Ref<RuleContext> p = shared_from_this();
   while (true) {
     if (p->parent.expired())
       break;
@@ -69,7 +70,7 @@ misc::Interval RuleContext::getSourceInterval() {
   return misc::Interval::INVALID;
 }
 
-RuleContext::Ref RuleContext::getRuleContext() {
+Ref<RuleContext> RuleContext::getRuleContext() {
   return shared_from_this();
 }
 
@@ -97,41 +98,20 @@ ssize_t RuleContext::getRuleIndex() const {
   return -1;
 }
 
-std::shared_ptr<tree::Tree> RuleContext::getChildReference(size_t i) {
-  return std::shared_ptr<tree::Tree>();
+Ref<tree::Tree> RuleContext::getChildReference(size_t i) {
+  return Ref<tree::Tree>();
 }
 
+
+int RuleContext::getAltNumber() const {
+  return atn::ATN::INVALID_ALT_NUMBER;
+}
+
+void RuleContext::setAltNumber(int altNumber) {
+}
 
 std::size_t RuleContext::getChildCount() {
   return 0;
-}
-
-void RuleContext::save(Parser *parser, const std::wstring &fileName) {
-  std::vector<std::wstring> ruleNames;
-  if (parser != nullptr) {
-    ruleNames = parser->getRuleNames();
-  }
-  save(ruleNames, fileName);
-}
-
-void RuleContext::save(Parser *parser, const std::wstring &fileName, const std::wstring &fontName, int fontSize) {
-  std::vector<std::wstring> ruleNames;
-  if (parser != nullptr) {
-    ruleNames = parser->getRuleNames();
-  }
-  save(ruleNames, fileName, fontName, fontSize);
-}
-
-void RuleContext::save(std::vector<std::wstring> &ruleNames, const std::wstring &fileName) {
-#ifdef TODO
-  tree::Trees::writePS(this, ruleNames, fileName);
-#endif
-}
-
-void RuleContext::save(std::vector<std::wstring> &ruleNames, const std::wstring &fileName, const std::wstring &fontName, int fontSize) {
-#ifdef TODO
-  tree::Trees::writePS(this, ruleNames, fileName, fontName, fontSize);
-#endif
 }
 
 std::wstring RuleContext::toStringTree(Parser *recog) {
@@ -148,14 +128,14 @@ std::wstring RuleContext::toStringTree() {
 
 
 std::wstring RuleContext::toString(const std::vector<std::wstring> &ruleNames) {
-  return toString(ruleNames, RuleContext::Ref());
+  return toString(ruleNames, Ref<RuleContext>());
 }
 
 
-std::wstring RuleContext::toString(const std::vector<std::wstring> &ruleNames, RuleContext::Ref stop) {
+std::wstring RuleContext::toString(const std::vector<std::wstring> &ruleNames, Ref<RuleContext> stop) {
   std::wstringstream ss;
 
-  RuleContext::Ref parent = shared_from_this();
+  Ref<RuleContext> parent = shared_from_this();
   ss << L"[";
   while (parent != stop) {
     if (ruleNames.empty()) {
@@ -190,7 +170,7 @@ std::wstring RuleContext::toString(Recognizer *recog) {
   return toString(recog, ParserRuleContext::EMPTY);
 }
 
-std::wstring RuleContext::toString(Recognizer *recog, RuleContext::Ref stop) {
+std::wstring RuleContext::toString(Recognizer *recog, Ref<RuleContext> stop) {
   if (recog == nullptr)
     return toString({}, stop);
   return toString(recog->getRuleNames(), stop);

@@ -48,31 +48,31 @@ namespace tree {
     /// Print out a whole tree in LISP form. getNodeText is used on the
     /// node payloads to get the text for the nodes.  Detect
     /// parse trees and extract data appropriately.
-    static std::wstring toStringTree(std::shared_ptr<Tree> t);
+    static std::wstring toStringTree(Ref<Tree> t);
 
     /// Print out a whole tree in LISP form. getNodeText is used on the
     ///  node payloads to get the text for the nodes.  Detect
     ///  parse trees and extract data appropriately.
-    static std::wstring toStringTree(std::shared_ptr<Tree> t, Parser *recog);
+    static std::wstring toStringTree(Ref<Tree> t, Parser *recog);
 
     /// Print out a whole tree in LISP form. getNodeText is used on the
     /// node payloads to get the text for the nodes.  Detect
     /// parse trees and extract data appropriately.
-    static std::wstring toStringTree(std::shared_ptr<Tree> t, const std::vector<std::wstring> &ruleNames);
-    static std::wstring getNodeText(std::shared_ptr<Tree> t, Parser *recog);
-    static std::wstring getNodeText(std::shared_ptr<Tree> t, const std::vector<std::wstring> &ruleNames);
+    static std::wstring toStringTree(Ref<Tree> t, const std::vector<std::wstring> &ruleNames);
+    static std::wstring getNodeText(Ref<Tree> t, Parser *recog);
+    static std::wstring getNodeText(Ref<Tree> t, const std::vector<std::wstring> &ruleNames);
 
     /// Return ordered list of all children of this node.
-    static std::vector<std::shared_ptr<Tree>> getChildren(std::shared_ptr<Tree> t);
+    static std::vector<Ref<Tree>> getChildren(Ref<Tree> t);
 
     /// Return a list of all ancestors of this node.  The first node of
     ///  list is the root and the last is the parent of this node.
-    static std::vector<std::weak_ptr<Tree>> getAncestors(std::shared_ptr<Tree> t);
-    static std::vector<std::shared_ptr<ParseTree>> findAllTokenNodes(std::shared_ptr<ParseTree> t, int ttype);
-    static std::vector<std::shared_ptr<ParseTree>> findAllRuleNodes(std::shared_ptr<ParseTree> t, int ruleIndex);
-    static std::vector<std::shared_ptr<ParseTree>> findAllNodes(std::shared_ptr<ParseTree> t, int index, bool findTokens);
+    static std::vector<std::weak_ptr<Tree>> getAncestors(Ref<Tree> t);
+    static std::vector<Ref<ParseTree>> findAllTokenNodes(Ref<ParseTree> t, int ttype);
+    static std::vector<Ref<ParseTree>> findAllRuleNodes(Ref<ParseTree> t, int ruleIndex);
+    static std::vector<Ref<ParseTree>> findAllNodes(Ref<ParseTree> t, int index, bool findTokens);
 
-    static std::vector<std::shared_ptr<ParseTree>> descendants(std::shared_ptr<ParseTree> t);
+    static std::vector<Ref<ParseTree>> descendants(Ref<ParseTree> t);
 
   private:
     Trees();

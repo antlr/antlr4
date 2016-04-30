@@ -30,6 +30,7 @@
  */
 
 #include "MurmurHash.h"
+#include "Lexer.h"
 
 #include "LexerChannelAction.h"
 
@@ -51,7 +52,7 @@ bool LexerChannelAction::isPositionDependent() const {
   return false;
 }
 
-void LexerChannelAction::execute(Lexer::Ref lexer) {
+void LexerChannelAction::execute(Lexer *lexer) {
   lexer->setChannel(_channel);
 }
 

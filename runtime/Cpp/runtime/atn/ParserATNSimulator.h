@@ -44,204 +44,233 @@ namespace v4 {
 namespace runtime {
 namespace atn {
 
-  /// <summary>
-  /// The embodiment of the adaptive LL(*), ALL(*), parsing strategy.
-  ///
-  /// The basic complexity of the adaptive strategy makes it harder to
-  /// understand. We begin with ATN simulation to build paths in a
-  /// DFA. Subsequent prediction requests go through the DFA first. If
-  /// they reach a state without an edge for the current symbol, the
-  /// algorithm fails over to the ATN simulation to complete the DFA
-  /// path for the current input (until it finds a conflict state or
-  /// uniquely predicting state).
-  ///
-  /// All of that is done without using the outer context because we
-  /// want to create a DFA that is not dependent upon the rule
-  /// invocation stack when we do a prediction.  One DFA works in all
-  /// contexts. We avoid using context not necessarily because it's
-  /// slower, although it can be, but because of the DFA caching
-  /// problem.  The closure routine only considers the rule invocation
-  /// stack created during prediction beginning in the decision rule.  For
-  /// example, if prediction occurs without invoking another rule's
-  /// ATN, there are no context stacks in the configurations.
-  /// When lack of context leads to a conflict, we don't know if it's
-  /// an ambiguity or a weakness in the strong LL(*) parsing strategy
-  /// (versus full LL(*)).
-  ///
-  /// When SLL yields a configuration set with conflict, we rewind the
-  /// input and retry the ATN simulation, this time using
-  /// full outer context without adding to the DFA. Configuration context
-  /// stacks will be the full invocation stacks from the start rule. If
-  /// we get a conflict using full context, then we can definitively
-  /// say we have a true ambiguity for that input sequence. If we don't
-  /// get a conflict, it implies that the decision is sensitive to the
-  /// outer context. (It is not context-sensitive in the sense of
-  /// context-sensitive grammars.)
-  ///
-  /// The next time we reach this DFA state with an SLL conflict, through
-  /// DFA simulation, we will again retry the ATN simulation using full
-  /// context mode. This is slow because we can't save the results and have
-  /// to "interpret" the ATN each time we get that input.
-  ///
-  /// CACHING FULL CONTEXT PREDICTIONS
-  ///
-  /// We could cache results from full context to predicted
-  /// alternative easily and that saves a lot of time but doesn't work
-  /// in presence of predicates. The set of visible predicates from
-  /// the ATN start state changes depending on the context, because
-  /// closure can fall off the end of a rule. I tried to cache
-  /// tuples (stack context, semantic context, predicted alt) but it
-  /// was slower than interpreting and much more complicated. Also
-  /// required a huge amount of memory. The goal is not to create the
-  /// world's fastest parser anyway. I'd like to keep this algorithm
-  /// simple. By launching multiple threads, we can improve the speed
-  /// of parsing across a large number of files.
-  ///
-  /// There is no strict ordering between the amount of input used by
-  /// SLL vs LL, which makes it really hard to build a cache for full
-  /// context. Let's say that we have input A B C that leads to an SLL
-  /// conflict with full context X.  That implies that using X we
-  /// might only use A B but we could also use A B C D to resolve
-  /// conflict.  Input A B C D could predict alternative 1 in one
-  /// position in the input and A B C E could predict alternative 2 in
-  /// another position in input.  The conflicting SLL configurations
-  /// could still be non-unique in the full context prediction, which
-  /// would lead us to requiring more input than the original A B C.	To
-  /// make a	prediction cache work, we have to track	the exact input	used
-  /// during the previous prediction. That amounts to a cache that maps X
-  /// to a specific DFA for that context.
-  ///
-  /// Something should be done for left-recursive expression predictions.
-  /// They are likely LL(1) + pred eval. Easier to do the whole SLL unless
-  /// error and retry with full LL thing Sam does.
-  ///
-  /// AVOIDING FULL CONTEXT PREDICTION
-  ///
-  /// We avoid doing full context retry when the outer context is empty,
-  /// we did not dip into the outer context by falling off the end of the
-  /// decision state rule, or when we force SLL mode.
-  ///
-  /// As an example of the not dip into outer context case, consider
-  /// as super constructor calls versus function calls. One grammar
-  /// might look like this:
-  ///
-  /// ctorBody : '{' superCall? stat* '}' ;
-  ///
-  /// Or, you might see something like
-  ///
-  /// stat : superCall ';' | expression ';' | ... ;
-  ///
-  /// In both cases I believe that no closure operations will dip into the
-  /// outer context. In the first case ctorBody in the worst case will stop
-  /// at the '}'. In the 2nd case it should stop at the ';'. Both cases
-  /// should stay within the entry rule and not dip into the outer context.
-  ///
-  /// PREDICATES
-  ///
-  /// Predicates are always evaluated if present in either SLL or LL both.
-  /// SLL and LL simulation deals with predicates differently. SLL collects
-  /// predicates as it performs closure operations like ANTLR v3 did. It
-  /// delays predicate evaluation until it reaches and accept state. This
-  /// allows us to cache the SLL ATN simulation whereas, if we had evaluated
-  /// predicates on-the-fly during closure, the DFA state configuration sets
-  /// would be different and we couldn't build up a suitable DFA.
-  ///
-  /// When building a DFA accept state during ATN simulation, we evaluate
-  /// any predicates and return the sole semantically valid alternative. If
-  /// there is more than 1 alternative, we report an ambiguity. If there are
-  /// 0 alternatives, we throw an exception. Alternatives without predicates
-  /// act like they have true predicates. The simple way to think about it
-  /// is to strip away all alternatives with false predicates and choose the
-  /// minimum alternative that remains.
-  ///
-  /// When we start in the DFA and reach an accept state that's predicated,
-  /// we test those and return the minimum semantically viable
-  /// alternative. If no alternatives are viable, we throw an exception.
-  ///
-  /// During full LL ATN simulation, closure always evaluates predicates and
-  /// on-the-fly. This is crucial to reducing the configuration set size
-  /// during closure. It hits a landmine when parsing with the Java grammar,
-  /// for example, without this on-the-fly evaluation.
-  ///
-  /// SHARING DFA
-  ///
-  /// All instances of the same parser share the same decision DFAs through
-  /// a static field. Each instance gets its own ATN simulator but they
-  /// share the same decisionToDFA field. They also share a
-  /// PredictionContextCache object that makes sure that all
-  /// PredictionContext objects are shared among the DFA states. This makes
-  /// a big size difference.
-  ///
-  /// THREAD SAFETY
-  ///
-  /// The parser ATN simulator locks on the decisionDFA field when it adds a
-  /// new DFA object to that array. addDFAEdge locks on the DFA for the
-  /// current decision when setting the edges[] field.  addDFAState locks on
-  /// the DFA for the current decision when looking up a DFA state to see if
-  /// it already exists.  We must make sure that all requests to add DFA
-  /// states that are equivalent result in the same shared DFA object. This
-  /// is because lots of threads will be trying to update the DFA at
-  /// once. The addDFAState method also locks inside the DFA lock but this
-  /// time on the shared context cache when it rebuilds the configurations'
-  /// PredictionContext objects using cached subgraphs/nodes. No other
-  /// locking occurs, even during DFA simulation. This is safe as long as we
-  /// can guarantee that all threads referencing s.edge[t] get the same
-  /// physical target DFA state, or none.  Once into the DFA, the DFA
-  /// simulation does not reference the dfa.state map. It follows the
-  /// edges[] field to new targets.  The DFA simulator will either find
-  /// dfa.edges to be null, to be non-null and dfa.edges[t] null, or
-  /// dfa.edges[t] to be non-null. The addDFAEdge method could be racing to
-  /// set the field but in either case the DFA simulator works; if null, and
-  /// requests ATN simulation.  It could also race trying to get
-  /// dfa.edges[t], but either way it will work because it's not doing a
-  /// test and set operation.
-  ///
-  /// Starting with SLL then failing to combined SLL/LL
-  ///
-  /// Sam pointed out that if SLL does not give a syntax error, then there
-  /// is no point in doing full LL, which is slower. We only have to try LL
-  /// if we get a syntax error.  For maximum speed, Sam starts the parser
-  /// with pure SLL mode:
-  ///
-  ///     parser.getInterpreter().setSLL(true);
-  ///
-  /// and with the bail error strategy:
-  ///
-  ///     parser.setErrorHandler(new BailErrorStrategy());
-  ///
-  /// If it does not get a syntax error, then we're done. If it does get a
-  /// syntax error, we need to retry with the combined SLL/LL strategy.
-  ///
-  /// The reason this works is as follows.  If there are no SLL
-  /// conflicts then the grammar is SLL for sure, at least for that
-  /// input set. If there is an SLL conflict, the full LL analysis
-  /// must yield a set of ambiguous alternatives that is no larger
-  /// than the SLL set. If the LL set is a singleton, then the grammar
-  /// is LL but not SLL. If the LL set is the same size as the SLL
-  /// set, the decision is SLL. If the LL set has size > 1, then that
-  /// decision is truly ambiguous on the current input. If the LL set
-  /// is smaller, then the SLL conflict resolution might choose an
-  /// alternative that the full LL would rule out as a possibility
-  /// based upon better context information. If that's the case, then
-  /// the SLL parse will definitely get an error because the full LL
-  /// analysis says it's not viable. If SLL conflict resolution
-  /// chooses an alternative within the LL set, them both SLL and LL
-  /// would choose the same alternative because they both choose the
-  /// minimum of multiple conflicting alternatives.
-  ///
-  /// Let's say we have a set of SLL conflicting alternatives {1, 2, 3} and
-  /// a smaller LL set called s. If s is {2, 3}, then SLL parsing will get
-  /// an error because SLL will pursue alternative 1. If s is {1, 2} or {1,
-  /// 3} then both SLL and LL will choose the same alternative because
-  /// alternative one is the minimum of either set. If s is {2} or {3} then
-  /// SLL will get a syntax error. If s is {1} then SLL will succeed.
-  ///
-  /// Of course, if the input is invalid, then we will get an error for sure
-  /// in both SLL and LL parsing. Erroneous input will therefore require 2
-  /// passes over the input.
-  ///
-  /// </summary>
-
+  /**
+   * The embodiment of the adaptive LL(*), ALL(*), parsing strategy.
+   *
+   * <p>
+   * The basic complexity of the adaptive strategy makes it harder to understand.
+   * We begin with ATN simulation to build paths in a DFA. Subsequent prediction
+   * requests go through the DFA first. If they reach a state without an edge for
+   * the current symbol, the algorithm fails over to the ATN simulation to
+   * complete the DFA path for the current input (until it finds a conflict state
+   * or uniquely predicting state).</p>
+   *
+   * <p>
+   * All of that is done without using the outer context because we want to create
+   * a DFA that is not dependent upon the rule invocation stack when we do a
+   * prediction. One DFA works in all contexts. We avoid using context not
+   * necessarily because it's slower, although it can be, but because of the DFA
+   * caching problem. The closure routine only considers the rule invocation stack
+   * created during prediction beginning in the decision rule. For example, if
+   * prediction occurs without invoking another rule's ATN, there are no context
+   * stacks in the configurations. When lack of context leads to a conflict, we
+   * don't know if it's an ambiguity or a weakness in the strong LL(*) parsing
+   * strategy (versus full LL(*)).</p>
+   *
+   * <p>
+   * When SLL yields a configuration set with conflict, we rewind the input and
+   * retry the ATN simulation, this time using full outer context without adding
+   * to the DFA. Configuration context stacks will be the full invocation stacks
+   * from the start rule. If we get a conflict using full context, then we can
+   * definitively say we have a true ambiguity for that input sequence. If we
+   * don't get a conflict, it implies that the decision is sensitive to the outer
+   * context. (It is not context-sensitive in the sense of context-sensitive
+   * grammars.)</p>
+   *
+   * <p>
+   * The next time we reach this DFA state with an SLL conflict, through DFA
+   * simulation, we will again retry the ATN simulation using full context mode.
+   * This is slow because we can't save the results and have to "interpret" the
+   * ATN each time we get that input.</p>
+   *
+   * <p>
+   * <strong>CACHING FULL CONTEXT PREDICTIONS</strong></p>
+   *
+   * <p>
+   * We could cache results from full context to predicted alternative easily and
+   * that saves a lot of time but doesn't work in presence of predicates. The set
+   * of visible predicates from the ATN start state changes depending on the
+   * context, because closure can fall off the end of a rule. I tried to cache
+   * tuples (stack context, semantic context, predicted alt) but it was slower
+   * than interpreting and much more complicated. Also required a huge amount of
+   * memory. The goal is not to create the world's fastest parser anyway. I'd like
+   * to keep this algorithm simple. By launching multiple threads, we can improve
+   * the speed of parsing across a large number of files.</p>
+   *
+   * <p>
+   * There is no strict ordering between the amount of input used by SLL vs LL,
+   * which makes it really hard to build a cache for full context. Let's say that
+   * we have input A B C that leads to an SLL conflict with full context X. That
+   * implies that using X we might only use A B but we could also use A B C D to
+   * resolve conflict. Input A B C D could predict alternative 1 in one position
+   * in the input and A B C E could predict alternative 2 in another position in
+   * input. The conflicting SLL configurations could still be non-unique in the
+   * full context prediction, which would lead us to requiring more input than the
+   * original A B C.	To make a	prediction cache work, we have to track	the exact
+   * input	used during the previous prediction. That amounts to a cache that maps
+   * X to a specific DFA for that context.</p>
+   *
+   * <p>
+   * Something should be done for left-recursive expression predictions. They are
+   * likely LL(1) + pred eval. Easier to do the whole SLL unless error and retry
+   * with full LL thing Sam does.</p>
+   *
+   * <p>
+   * <strong>AVOIDING FULL CONTEXT PREDICTION</strong></p>
+   *
+   * <p>
+   * We avoid doing full context retry when the outer context is empty, we did not
+   * dip into the outer context by falling off the end of the decision state rule,
+   * or when we force SLL mode.</p>
+   *
+   * <p>
+   * As an example of the not dip into outer context case, consider as super
+   * constructor calls versus function calls. One grammar might look like
+   * this:</p>
+   *
+   * <pre>
+   * ctorBody
+   *   : '{' superCall? stat* '}'
+   *   ;
+   * </pre>
+   *
+   * <p>
+   * Or, you might see something like</p>
+   *
+   * <pre>
+   * stat
+   *   : superCall ';'
+   *   | expression ';'
+   *   | ...
+   *   ;
+   * </pre>
+   *
+   * <p>
+   * In both cases I believe that no closure operations will dip into the outer
+   * context. In the first case ctorBody in the worst case will stop at the '}'.
+   * In the 2nd case it should stop at the ';'. Both cases should stay within the
+   * entry rule and not dip into the outer context.</p>
+   *
+   * <p>
+   * <strong>PREDICATES</strong></p>
+   *
+   * <p>
+   * Predicates are always evaluated if present in either SLL or LL both. SLL and
+   * LL simulation deals with predicates differently. SLL collects predicates as
+   * it performs closure operations like ANTLR v3 did. It delays predicate
+   * evaluation until it reaches and accept state. This allows us to cache the SLL
+   * ATN simulation whereas, if we had evaluated predicates on-the-fly during
+   * closure, the DFA state configuration sets would be different and we couldn't
+   * build up a suitable DFA.</p>
+   *
+   * <p>
+   * When building a DFA accept state during ATN simulation, we evaluate any
+   * predicates and return the sole semantically valid alternative. If there is
+   * more than 1 alternative, we report an ambiguity. If there are 0 alternatives,
+   * we throw an exception. Alternatives without predicates act like they have
+   * true predicates. The simple way to think about it is to strip away all
+   * alternatives with false predicates and choose the minimum alternative that
+   * remains.</p>
+   *
+   * <p>
+   * When we start in the DFA and reach an accept state that's predicated, we test
+   * those and return the minimum semantically viable alternative. If no
+   * alternatives are viable, we throw an exception.</p>
+   *
+   * <p>
+   * During full LL ATN simulation, closure always evaluates predicates and
+   * on-the-fly. This is crucial to reducing the configuration set size during
+   * closure. It hits a landmine when parsing with the Java grammar, for example,
+   * without this on-the-fly evaluation.</p>
+   *
+   * <p>
+   * <strong>SHARING DFA</strong></p>
+   *
+   * <p>
+   * All instances of the same parser share the same decision DFAs through a
+   * static field. Each instance gets its own ATN simulator but they share the
+   * same {@link #decisionToDFA} field. They also share a
+   * {@link PredictionContextCache} object that makes sure that all
+   * {@link PredictionContext} objects are shared among the DFA states. This makes
+   * a big size difference.</p>
+   *
+   * <p>
+   * <strong>THREAD SAFETY</strong></p>
+   *
+   * <p>
+   * The {@link ParserATNSimulator} locks on the {@link #decisionToDFA} field when
+   * it adds a new DFA object to that array. {@link #addDFAEdge}
+   * locks on the DFA for the current decision when setting the
+   * {@link DFAState#edges} field. {@link #addDFAState} locks on
+   * the DFA for the current decision when looking up a DFA state to see if it
+   * already exists. We must make sure that all requests to add DFA states that
+   * are equivalent result in the same shared DFA object. This is because lots of
+   * threads will be trying to update the DFA at once. The
+   * {@link #addDFAState} method also locks inside the DFA lock
+   * but this time on the shared context cache when it rebuilds the
+   * configurations' {@link PredictionContext} objects using cached
+   * subgraphs/nodes. No other locking occurs, even during DFA simulation. This is
+   * safe as long as we can guarantee that all threads referencing
+   * {@code s.edge[t]} get the same physical target {@link DFAState}, or
+   * {@code null}. Once into the DFA, the DFA simulation does not reference the
+   * {@link DFA#states} map. It follows the {@link DFAState#edges} field to new
+   * targets. The DFA simulator will either find {@link DFAState#edges} to be
+   * {@code null}, to be non-{@code null} and {@code dfa.edges[t]} null, or
+   * {@code dfa.edges[t]} to be non-null. The
+   * {@link #addDFAEdge} method could be racing to set the field
+   * but in either case the DFA simulator works; if {@code null}, and requests ATN
+   * simulation. It could also race trying to get {@code dfa.edges[t]}, but either
+   * way it will work because it's not doing a test and set operation.</p>
+   *
+   * <p>
+   * <strong>Starting with SLL then failing to combined SLL/LL (Two-Stage
+   * Parsing)</strong></p>
+   *
+   * <p>
+   * Sam pointed out that if SLL does not give a syntax error, then there is no
+   * point in doing full LL, which is slower. We only have to try LL if we get a
+   * syntax error. For maximum speed, Sam starts the parser set to pure SLL
+   * mode with the {@link BailErrorStrategy}:</p>
+   *
+   * <pre>
+   * parser.{@link Parser#getInterpreter() getInterpreter()}.{@link #setPredictionMode setPredictionMode}{@code (}{@link PredictionMode#SLL}{@code )};
+   * parser.{@link Parser#setErrorHandler setErrorHandler}(new {@link BailErrorStrategy}());
+   * </pre>
+   *
+   * <p>
+   * If it does not get a syntax error, then we're done. If it does get a syntax
+   * error, we need to retry with the combined SLL/LL strategy.</p>
+   *
+   * <p>
+   * The reason this works is as follows. If there are no SLL conflicts, then the
+   * grammar is SLL (at least for that input set). If there is an SLL conflict,
+   * the full LL analysis must yield a set of viable alternatives which is a
+   * subset of the alternatives reported by SLL. If the LL set is a singleton,
+   * then the grammar is LL but not SLL. If the LL set is the same size as the SLL
+   * set, the decision is SLL. If the LL set has size &gt; 1, then that decision
+   * is truly ambiguous on the current input. If the LL set is smaller, then the
+   * SLL conflict resolution might choose an alternative that the full LL would
+   * rule out as a possibility based upon better context information. If that's
+   * the case, then the SLL parse will definitely get an error because the full LL
+   * analysis says it's not viable. If SLL conflict resolution chooses an
+   * alternative within the LL set, them both SLL and LL would choose the same
+   * alternative because they both choose the minimum of multiple conflicting
+   * alternatives.</p>
+   *
+   * <p>
+   * Let's say we have a set of SLL conflicting alternatives {@code {1, 2, 3}} and
+   * a smaller LL set called <em>s</em>. If <em>s</em> is {@code {2, 3}}, then SLL
+   * parsing will get an error because SLL will pursue alternative 1. If
+   * <em>s</em> is {@code {1, 2}} or {@code {1, 3}} then both SLL and LL will
+   * choose the same alternative because alternative one is the minimum of either
+   * set. If <em>s</em> is {@code {2}} or {@code {3}} then SLL will get a syntax
+   * error. If <em>s</em> is {@code {1}} then SLL will succeed.</p>
+   *
+   * <p>
+   * Of course, if the input is invalid, then we will get an error for sure in
+   * both SLL and LL parsing. Erroneous input will therefore require 2 passes over
+   * the input.</p>
+   */
   class ParserATNSimulator : public ATNSimulator {
   public:
     static const bool debug = false;
@@ -253,14 +282,15 @@ namespace atn {
     Parser *const parser;
 
   public:
-    std::vector<dfa::DFA> &_decisionToDFA;
+    std::vector<dfa::DFA> &decisionToDFA;
 
     /// <summary>
     /// SLL, LL, or LL + exact ambig detection? </summary>
   private:
     PredictionMode mode;
-    //Mutex to manage synchronized access for multithreading in the parser atn simulator
-    std::mutex mtx;
+
+    // Mutex to manage synchronized access for multithreading in the parser atn simulator.
+    std::mutex _lock;
 
     /// <summary>
     /// Each prediction operation uses a cache for merge of prediction contexts.
@@ -277,20 +307,20 @@ namespace atn {
     // LAME globals to avoid parameters!!!!! I need these down deep in predTransition
     TokenStream *_input;
     int _startIndex;
-    ParserRuleContext::Ref _outerContext;
+    Ref<ParserRuleContext> _outerContext;
+    dfa::DFA *_dfa; // Reference into the decisionToDFA vector.
 
-    /// <summary>
-    /// Testing only! </summary>
   public:
-    ParserATNSimulator(const ATN &atn, std::vector<dfa::DFA>& decisionToDFA,
-                       std::shared_ptr<PredictionContextCache> sharedContextCache);
+    /// Testing only!
+    ParserATNSimulator(const ATN &atn, std::vector<dfa::DFA> &decisionToDFA,
+                       Ref<PredictionContextCache> sharedContextCache);
 
     ParserATNSimulator(Parser *parser, const ATN &atn, std::vector<dfa::DFA> &decisionToDFA,
-                       std::shared_ptr<PredictionContextCache> sharedContextCache);
+                       Ref<PredictionContextCache> sharedContextCache);
 
     virtual void reset() override;
-
-    virtual int adaptivePredict(TokenStream *input, int decision, ParserRuleContext::Ref outerContext);
+    virtual void clearDFA() override;
+    virtual int adaptivePredict(TokenStream *input, int decision, Ref<ParserRuleContext> outerContext);
 
     /// <summary>
     /// Performs ATN simulation to compute a predicted alternative based
@@ -325,7 +355,7 @@ namespace atn {
     /// </summary>
   protected:
     virtual int execATN(dfa::DFA &dfa, dfa::DFAState *s0, TokenStream *input, size_t startIndex,
-                        ParserRuleContext::Ref outerContext);
+                        Ref<ParserRuleContext> outerContext);
 
     /// <summary>
     /// Get an existing target state for an edge in the DFA. If the target state
@@ -355,10 +385,10 @@ namespace atn {
     virtual void predicateDFAState(dfa::DFAState *dfaState, DecisionState *decisionState);
 
     // comes back with reach.uniqueAlt set to a valid alt
-    virtual int execATNWithFullContext(dfa::DFA &dfa, dfa::DFAState *D, std::shared_ptr<ATNConfigSet> s0,
-                                       TokenStream *input, size_t startIndex, ParserRuleContext::Ref outerContext); // how far we got before failing over
+    virtual int execATNWithFullContext(dfa::DFA &dfa, dfa::DFAState *D, Ref<ATNConfigSet> s0,
+                                       TokenStream *input, size_t startIndex, Ref<ParserRuleContext> outerContext); // how far we got before failing over
 
-    virtual std::shared_ptr<ATNConfigSet> computeReachSet(std::shared_ptr<ATNConfigSet> closure, ssize_t t, bool fullCtx);
+    virtual Ref<ATNConfigSet> computeReachSet(Ref<ATNConfigSet> closure, ssize_t t, bool fullCtx);
 
     /// <summary>
     /// Return a configuration set containing only the configurations from
@@ -379,19 +409,248 @@ namespace atn {
     /// <returns> {@code configs} if all configurations in {@code configs} are in a
     /// rule stop state, otherwise return a new configuration set containing only
     /// the configurations from {@code configs} which are in a rule stop state </returns>
-    virtual std::shared_ptr<ATNConfigSet> removeAllConfigsNotInRuleStopState(std::shared_ptr<ATNConfigSet> configs, bool lookToEndOfRule);
+    virtual Ref<ATNConfigSet> removeAllConfigsNotInRuleStopState(Ref<ATNConfigSet> configs, bool lookToEndOfRule);
 
-    virtual std::shared_ptr<ATNConfigSet> computeStartState(ATNState *p, RuleContext::Ref ctx, bool fullCtx);
+    virtual Ref<ATNConfigSet> computeStartState(ATNState *p, Ref<RuleContext> ctx, bool fullCtx);
 
+    /* parrt internal source braindump that doesn't mess up
+     * external API spec.
+
+     applyPrecedenceFilter is an optimization to avoid highly
+     nonlinear prediction of expressions and other left recursive
+     rules. The precedence predicates such as {3>=prec}? Are highly
+     context-sensitive in that they can only be properly evaluated
+     in the context of the proper prec argument. Without pruning,
+     these predicates are normal predicates evaluated when we reach
+     conflict state (or unique prediction). As we cannot evaluate
+     these predicates out of context, the resulting conflict leads
+     to full LL evaluation and nonlinear prediction which shows up
+     very clearly with fairly large expressions.
+
+     Example grammar:
+
+     e : e '*' e
+     | e '+' e
+     | INT
+     ;
+
+     We convert that to the following:
+
+     e[int prec]
+     :   INT
+     ( {3>=prec}? '*' e[4]
+     | {2>=prec}? '+' e[3]
+     )*
+     ;
+
+     The (..)* loop has a decision for the inner block as well as
+     an enter or exit decision, which is what concerns us here. At
+     the 1st + of input 1+2+3, the loop entry sees both predicates
+     and the loop exit also sees both predicates by falling off the
+     edge of e.  This is because we have no stack information with
+     SLL and find the follow of e, which will hit the return states
+     inside the loop after e[4] and e[3], which brings it back to
+     the enter or exit decision. In this case, we know that we
+     cannot evaluate those predicates because we have fallen off
+     the edge of the stack and will in general not know which prec
+     parameter is the right one to use in the predicate.
+
+     Because we have special information, that these are precedence
+     predicates, we can resolve them without failing over to full
+     LL despite their context sensitive nature. We make an
+     assumption that prec[-1] <= prec[0], meaning that the current
+     precedence level is greater than or equal to the precedence
+     level of recursive invocations above us in the stack. For
+     example, if predicate {3>=prec}? is true of the current prec,
+     then one option is to enter the loop to match it now. The
+     other option is to exit the loop and the left recursive rule
+     to match the current operator in rule invocation further up
+     the stack. But, we know that all of those prec are lower or
+     the same value and so we can decide to enter the loop instead
+     of matching it later. That means we can strip out the other
+     configuration for the exit branch.
+
+     So imagine we have (14,1,$,{2>=prec}?) and then
+     (14,2,$-dipsIntoOuterContext,{2>=prec}?). The optimization
+     allows us to collapse these two configurations. We know that
+     if {2>=prec}? is true for the current prec parameter, it will
+     also be true for any prec from an invoking e call, indicated
+     by dipsIntoOuterContext. As the predicates are both true, we
+     have the option to evaluate them early in the decision start
+     state. We do this by stripping both predicates and choosing to
+     enter the loop as it is consistent with the notion of operator
+     precedence. It's also how the full LL conflict resolution
+     would work.
+
+     The solution requires a different DFA start state for each
+     precedence level.
+
+     The basic filter mechanism is to remove configurations of the
+     form (p, 2, pi) if (p, 1, pi) exists for the same p and pi. In
+     other words, for the same ATN state and predicate context,
+     remove any configuration associated with an exit branch if
+     there is a configuration associated with the enter branch.
+
+     It's also the case that the filter evaluates precedence
+     predicates and resolves conflicts according to precedence
+     levels. For example, for input 1+2+3 at the first +, we see
+     prediction filtering
+
+     [(11,1,[$],{3>=prec}?), (14,1,[$],{2>=prec}?), (5,2,[$],up=1),
+     (11,2,[$],up=1), (14,2,[$],up=1)],hasSemanticContext=true,dipsIntoOuterContext
+
+     to
+
+     [(11,1,[$]), (14,1,[$]), (5,2,[$],up=1)],dipsIntoOuterContext
+
+     This filters because {3>=prec}? evals to true and collapses
+     (11,1,[$],{3>=prec}?) and (11,2,[$],up=1) since early conflict
+     resolution based upon rules of operator precedence fits with
+     our usual match first alt upon conflict.
+
+     We noticed a problem where a recursive call resets precedence
+     to 0. Sam's fix: each config has flag indicating if it has
+     returned from an expr[0] call. then just don't filter any
+     config with that flag set. flag is carried along in
+     closure(). so to avoid adding field, set bit just under sign
+     bit of dipsIntoOuterContext (SUPPRESS_PRECEDENCE_FILTER).
+     With the change you filter "unless (p, 2, pi) was reached
+     after leaving the rule stop state of the LR rule containing
+     state p, corresponding to a rule invocation with precedence
+     level 0"
+     */
+
+    /**
+     * This method transforms the start state computed by
+     * {@link #computeStartState} to the special start state used by a
+     * precedence DFA for a particular precedence value. The transformation
+     * process applies the following changes to the start state's configuration
+     * set.
+     *
+     * <ol>
+     * <li>Evaluate the precedence predicates for each configuration using
+     * {@link SemanticContext#evalPrecedence}.</li>
+     * <li>When {@link ATNConfig#isPrecedenceFilterSuppressed} is {@code false},
+     * remove all configurations which predict an alternative greater than 1,
+     * for which another configuration that predicts alternative 1 is in the
+     * same ATN state with the same prediction context. This transformation is
+     * valid for the following reasons:
+     * <ul>
+     * <li>The closure block cannot contain any epsilon transitions which bypass
+     * the body of the closure, so all states reachable via alternative 1 are
+     * part of the precedence alternatives of the transformed left-recursive
+     * rule.</li>
+     * <li>The "primary" portion of a left recursive rule cannot contain an
+     * epsilon transition, so the only way an alternative other than 1 can exist
+     * in a state that is also reachable via alternative 1 is by nesting calls
+     * to the left-recursive rule, with the outer calls not being at the
+     * preferred precedence level. The
+     * {@link ATNConfig#isPrecedenceFilterSuppressed} property marks ATN
+     * configurations which do not meet this condition, and therefore are not
+     * eligible for elimination during the filtering process.</li>
+     * </ul>
+     * </li>
+     * </ol>
+     *
+     * <p>
+     * The prediction context must be considered by this filter to address
+     * situations like the following.
+     * </p>
+     * <code>
+     * <pre>
+     * grammar TA;
+     * prog: statement* EOF;
+     * statement: letterA | statement letterA 'b' ;
+     * letterA: 'a';
+     * </pre>
+     * </code>
+     * <p>
+     * If the above grammar, the ATN state immediately before the token
+     * reference {@code 'a'} in {@code letterA} is reachable from the left edge
+     * of both the primary and closure blocks of the left-recursive rule
+     * {@code statement}. The prediction context associated with each of these
+     * configurations distinguishes between them, and prevents the alternative
+     * which stepped out to {@code prog} (and then back in to {@code statement}
+     * from being eliminated by the filter.
+     * </p>
+     *
+     * @param configs The configuration set computed by
+     * {@link #computeStartState} as the start state for the DFA.
+     * @return The transformed configuration set representing the start state
+     * for a precedence DFA at a particular precedence level (determined by
+     * calling {@link Parser#getPrecedence}).
+     */
+    Ref<ATNConfigSet> applyPrecedenceFilter(Ref<ATNConfigSet> configs);
+    
     virtual ATNState *getReachableTarget(Transition *trans, int ttype);
 
-    virtual std::vector<SemanticContext::Ref> getPredsForAmbigAlts(const antlrcpp::BitSet &ambigAlts,
-      std::shared_ptr<ATNConfigSet> configs, size_t nalts);
+    virtual std::vector<Ref<SemanticContext>> getPredsForAmbigAlts(const antlrcpp::BitSet &ambigAlts,
+      Ref<ATNConfigSet> configs, size_t nalts);
 
     virtual std::vector<dfa::DFAState::PredPrediction*> getPredicatePredictions(const antlrcpp::BitSet &ambigAlts,
-      std::vector<SemanticContext::Ref> altToPred);
+      std::vector<Ref<SemanticContext>> altToPred);
 
-    virtual int getAltThatFinishedDecisionEntryRule(std::shared_ptr<ATNConfigSet> configs);
+    /**
+     * This method is used to improve the localization of error messages by
+     * choosing an alternative rather than throwing a
+     * {@link NoViableAltException} in particular prediction scenarios where the
+     * {@link #ERROR} state was reached during ATN simulation.
+     *
+     * <p>
+     * The default implementation of this method uses the following
+     * algorithm to identify an ATN configuration which successfully parsed the
+     * decision entry rule. Choosing such an alternative ensures that the
+     * {@link ParserRuleContext} returned by the calling rule will be complete
+     * and valid, and the syntax error will be reported later at a more
+     * localized location.</p>
+     *
+     * <ul>
+     * <li>If a syntactically valid path or paths reach the end of the decision rule and
+     * they are semantically valid if predicated, return the min associated alt.</li>
+     * <li>Else, if a semantically invalid but syntactically valid path exist
+     * or paths exist, return the minimum associated alt.
+     * </li>
+     * <li>Otherwise, return {@link ATN#INVALID_ALT_NUMBER}.</li>
+     * </ul>
+     *
+     * <p>
+     * In some scenarios, the algorithm described above could predict an
+     * alternative which will result in a {@link FailedPredicateException} in
+     * the parser. Specifically, this could occur if the <em>only</em> configuration
+     * capable of successfully parsing to the end of the decision rule is
+     * blocked by a semantic predicate. By choosing this alternative within
+     * {@link #adaptivePredict} instead of throwing a
+     * {@link NoViableAltException}, the resulting
+     * {@link FailedPredicateException} in the parser will identify the specific
+     * predicate which is preventing the parser from successfully parsing the
+     * decision rule, which helps developers identify and correct logic errors
+     * in semantic predicates.
+     * </p>
+     *
+     * @param configs The ATN configurations which were valid immediately before
+     * the {@link #ERROR} state was reached
+     * @param outerContext The is the \gamma_0 initial parser context from the paper
+     * or the parser stack at the instant before prediction commences.
+     *
+     * @return The value to return from {@link #adaptivePredict}, or
+     * {@link ATN#INVALID_ALT_NUMBER} if a suitable alternative was not
+     * identified and {@link #adaptivePredict} should report an error instead.
+     */
+    int getSynValidOrSemInvalidAltThatFinishedDecisionEntryRule(Ref<ATNConfigSet> configs, Ref<ParserRuleContext> outerContext);
+
+    virtual int getAltThatFinishedDecisionEntryRule(Ref<ATNConfigSet> configs);
+
+    /** Walk the list of configurations and split them according to
+     *  those that have preds evaluating to true/false.  If no pred, assume
+     *  true pred and include in succeeded set.  Returns Pair of sets.
+     *
+     *  Create a new set so as not to alter the incoming parameter.
+     *
+     *  Assumption: the input stream has been restored to the starting point
+     *  prediction, which is where predicates need to evaluate.
+     */
+    std::pair<Ref<ATNConfigSet>, Ref<ATNConfigSet>> splitAccordingToSemanticValidity(Ref<ATNConfigSet> configs,
+      Ref<ParserRuleContext> outerContext);
 
     /// <summary>
     /// Look through a list of predicate/alt pairs, returning alts for the
@@ -401,8 +660,40 @@ namespace atn {
     ///  includes pairs with null predicates.
     /// </summary>
     virtual antlrcpp::BitSet evalSemanticContext(std::vector<dfa::DFAState::PredPrediction*> predPredictions,
-                                                 ParserRuleContext::Ref outerContext, bool complete);
+                                                 Ref<ParserRuleContext> outerContext, bool complete);
 
+
+    /**
+     * Evaluate a semantic context within a specific parser context.
+     *
+     * <p>
+     * This method might not be called for every semantic context evaluated
+     * during the prediction process. In particular, we currently do not
+     * evaluate the following but it may change in the future:</p>
+     *
+     * <ul>
+     * <li>Precedence predicates (represented by
+     * {@link SemanticContext.PrecedencePredicate}) are not currently evaluated
+     * through this method.</li>
+     * <li>Operator predicates (represented by {@link SemanticContext.AND} and
+     * {@link SemanticContext.OR}) are evaluated as a single semantic
+     * context, rather than evaluating the operands individually.
+     * Implementations which require evaluation results from individual
+     * predicates should override this method to explicitly handle evaluation of
+     * the operands within operator predicates.</li>
+     * </ul>
+     *
+     * @param pred The semantic context to evaluate
+     * @param parserCallStack The parser context in which to evaluate the
+     * semantic context
+     * @param alt The alternative which is guarded by {@code pred}
+     * @param fullCtx {@code true} if the evaluation is occurring during LL
+     * prediction; otherwise, {@code false} if the evaluation is occurring
+     * during SLL prediction
+     *
+     * @since 4.3
+     */
+    virtual bool evalSemanticContext(Ref<SemanticContext> pred, Ref<ParserRuleContext> parserCallStack, int alt, bool fullCtx);
 
     /* TO_DO: If we are doing predicates, there is no point in pursuing
      closure operations if we reach a DFA state that uniquely predicts
@@ -410,33 +701,44 @@ namespace atn {
      waste to pursue the closure. Might have to advance when we do
      ambig detection thought :(
      */
+    virtual void closure(Ref<ATNConfig> config, Ref<ATNConfigSet> configs, std::set<Ref<ATNConfig>> &closureBusy,
+                         bool collectPredicates, bool fullCtx, bool treatEofAsEpsilon);
 
-    virtual void closure(ATNConfig::Ref config, std::shared_ptr<ATNConfigSet> configs, std::set<ATNConfig::Ref> &closureBusy,
-                         bool collectPredicates, bool fullCtx);
-
-    virtual void closureCheckingStopState(ATNConfig::Ref config, std::shared_ptr<ATNConfigSet> configs,
-      std::set<ATNConfig::Ref> &closureBusy, bool collectPredicates, bool fullCtx, int depth);
+    virtual void closureCheckingStopState(Ref<ATNConfig> config, Ref<ATNConfigSet> configs,
+      std::set<Ref<ATNConfig>> &closureBusy, bool collectPredicates, bool fullCtx, int depth, bool treatEofAsEpsilon);
 
     /// Do the actual work of walking epsilon edges.
-    virtual void closure_(ATNConfig::Ref config, std::shared_ptr<ATNConfigSet> configs, std::set<ATNConfig::Ref> &closureBusy,
-                          bool collectPredicates, bool fullCtx, int depth);
+    virtual void closure_(Ref<ATNConfig> config, Ref<ATNConfigSet> configs, std::set<Ref<ATNConfig>> &closureBusy,
+                          bool collectPredicates, bool fullCtx, int depth, bool treatEofAsEpsilon);
 
   public:
     virtual std::wstring getRuleName(size_t index);
 
   protected:
-    virtual ATNConfig::Ref getEpsilonTarget(ATNConfig::Ref config, Transition *t, bool collectPredicates, bool inContext, bool fullCtx);
-    virtual ATNConfig::Ref actionTransition(ATNConfig::Ref config, ActionTransition *t);
+    virtual Ref<ATNConfig> getEpsilonTarget(Ref<ATNConfig> config, Transition *t, bool collectPredicates,
+                                            bool inContext, bool fullCtx, bool treatEofAsEpsilon);
+    virtual Ref<ATNConfig> actionTransition(Ref<ATNConfig> config, ActionTransition *t);
 
   public:
-    virtual ATNConfig::Ref precedenceTransition(ATNConfig::Ref config, PrecedencePredicateTransition *pt, bool collectPredicates, bool inContext, bool fullCtx);
+    virtual Ref<ATNConfig> precedenceTransition(Ref<ATNConfig> config, PrecedencePredicateTransition *pt,
+                                                bool collectPredicates, bool inContext, bool fullCtx);
 
   protected:
-    virtual ATNConfig::Ref predTransition(ATNConfig::Ref config, PredicateTransition *pt, bool collectPredicates, bool inContext, bool fullCtx);
+    virtual Ref<ATNConfig> predTransition(Ref<ATNConfig> config, PredicateTransition *pt, bool collectPredicates,
+                                          bool inContext, bool fullCtx);
 
-    virtual ATNConfig::Ref ruleTransition(ATNConfig::Ref config, RuleTransition *t);
+    virtual Ref<ATNConfig> ruleTransition(Ref<ATNConfig> config, RuleTransition *t);
 
-    virtual antlrcpp::BitSet getConflictingAlts(std::shared_ptr<ATNConfigSet> configs);
+    /**
+     * Gets a {@link BitSet} containing the alternatives in {@code configs}
+     * which are part of one or more conflicting alternative subsets.
+     *
+     * @param configs The {@link ATNConfigSet} to analyze.
+     * @return The alternatives in {@code configs} which are part of one or more
+     * conflicting alternative subsets. If {@code configs} does not contain any
+     * conflicting subsets, this method returns an empty {@link BitSet}.
+     */
+    virtual antlrcpp::BitSet getConflictingAlts(Ref<ATNConfigSet> configs);
 
     /// <summary>
     /// Sam pointed out a problem with the previous definition, v3, of
@@ -475,7 +777,7 @@ namespace atn {
     /// that we still need to pursue.
     /// </summary>
 
-    virtual antlrcpp::BitSet getConflictingAltsOrUniqueAlt(std::shared_ptr<ATNConfigSet> configs);
+    virtual antlrcpp::BitSet getConflictingAltsOrUniqueAlt(Ref<ATNConfigSet> configs);
 
   public:
     virtual std::wstring getTokenName(ssize_t t);
@@ -490,10 +792,10 @@ namespace atn {
     virtual void dumpDeadEndConfigs(NoViableAltException &nvae);
 
   protected:
-    virtual NoViableAltException noViableAlt(TokenStream *input, ParserRuleContext::Ref outerContext,
-                                              std::shared_ptr<ATNConfigSet> configs, size_t startIndex);
+    virtual NoViableAltException noViableAlt(TokenStream *input, Ref<ParserRuleContext> outerContext,
+                                              Ref<ATNConfigSet> configs, size_t startIndex);
 
-    static int getUniqueAlt(std::shared_ptr<ATNConfigSet> configs);
+    static int getUniqueAlt(Ref<ATNConfigSet> configs);
 
     /// <summary>
     /// Add an edge to the DFA, if possible. This method calls
@@ -533,20 +835,24 @@ namespace atn {
     virtual dfa::DFAState *addDFAState(dfa::DFA &dfa, dfa::DFAState *D);
 
     virtual void reportAttemptingFullContext(dfa::DFA &dfa, const antlrcpp::BitSet &conflictingAlts,
-      std::shared_ptr<ATNConfigSet> configs, size_t startIndex, size_t stopIndex);
+      Ref<ATNConfigSet> configs, size_t startIndex, size_t stopIndex);
 
-    virtual void reportContextSensitivity(dfa::DFA &dfa, int prediction, std::shared_ptr<ATNConfigSet> configs,
+    virtual void reportContextSensitivity(dfa::DFA &dfa, int prediction, Ref<ATNConfigSet> configs,
                                           size_t startIndex, size_t stopIndex);
 
-    /// <summary>
-    /// If context sensitive parsing, we know it's ambiguity not conflict </summary>
-    virtual void reportAmbiguity(dfa::DFA &dfa, dfa::DFAState *D, size_t startIndex, size_t stopIndex, bool exact,
-                                 const antlrcpp::BitSet &ambigAlts, std::shared_ptr<ATNConfigSet> configs);
+    /// If context sensitive parsing, we know it's ambiguity not conflict.
+    virtual void reportAmbiguity(dfa::DFA &dfa,
+                                 dfa::DFAState *D, // the DFA state from execATN() that had SLL conflicts
+                                 size_t startIndex, size_t stopIndex,
+                                 bool exact,
+                                 const antlrcpp::BitSet &ambigAlts,
+                                 Ref<ATNConfigSet> configs); // configs that LL not SLL considered conflicting
 
   public:
     void setPredictionMode(PredictionMode mode);
-
     PredictionMode getPredictionMode();
+
+    Parser* getParser();
 
   private:
     void InitializeInstanceFields();

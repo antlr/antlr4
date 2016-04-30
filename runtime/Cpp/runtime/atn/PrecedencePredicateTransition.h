@@ -49,7 +49,7 @@ namespace atn {
     virtual int getSerializationType() const override;
     virtual bool isEpsilon() const override;
     virtual bool matches(int symbol, int minVocabSymbol, int maxVocabSymbol) const override;
-    std::shared_ptr<SemanticContext::PrecedencePredicate> getPredicate() const;
+    Ref<SemanticContext::PrecedencePredicate> getPredicate() const;
     virtual std::wstring toString() const override;
 
   };

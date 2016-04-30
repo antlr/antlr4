@@ -32,17 +32,44 @@
 #include "DFAState.h"
 #include "DFASerializer.h"
 #include "LexerDFASerializer.h"
+#include "CPPUtils.h"
+#include "StarLoopEntryState.h"
+#include "ATNConfigSet.h"
 
 #include "DFA.h"
 
 using namespace org::antlr::v4::runtime;
 using namespace org::antlr::v4::runtime::dfa;
+using namespace antlrcpp;
 
 DFA::DFA(atn::DecisionState *atnStartState) : DFA(atnStartState, 0) {
 }
 
 DFA::DFA(atn::DecisionState *atnStartState, int decision)
   : atnStartState(atnStartState), decision(decision), s0(nullptr) {
+
+  _precedenceDfa = false;
+  if (is<atn::StarLoopEntryState *>(atnStartState)) {
+    if (static_cast<atn::StarLoopEntryState *>(atnStartState)->isPrecedenceDecision) {
+      _precedenceDfa = true;
+      DFAState *precedenceState = new DFAState(std::make_shared<atn::ATNConfigSet>()); // TODO: mem leak
+      precedenceState->isAcceptState = false;
+      precedenceState->requiresFullContext = false;
+      s0 = precedenceState;
+    }
+  }
+}
+
+DFA::DFA(DFA &&other) : atnStartState(std::move(other.atnStartState)), decision(std::move(other.decision)) {
+  states = std::move(other.states);
+  s0 = std::move(other.s0);
+  _precedenceDfa = std::move(other._precedenceDfa);
+}
+
+DFA::DFA(const DFA &other) : atnStartState(other.atnStartState), decision(other.decision) {
+  states = other.states;
+  s0 = other.s0;
+  _precedenceDfa = other._precedenceDfa;
 }
 
 DFA::~DFA() {
@@ -51,7 +78,46 @@ DFA::~DFA() {
   }
 }
 
-std::vector<DFAState *> DFA::getStates() {
+bool DFA::isPrecedenceDfa() const {
+  return _precedenceDfa;
+}
+
+DFAState* DFA::getPrecedenceStartState(int precedence) const {
+  if (!isPrecedenceDfa()) {
+    throw IllegalStateException("Only precedence DFAs may contain a precedence start state.");
+  }
+
+  // s0.edges is never null for a precedence DFA
+  if (precedence < 0 || precedence >= (int)s0->edges.size()) {
+    return nullptr;
+  }
+
+  return s0->edges[precedence];
+}
+
+void DFA::setPrecedenceStartState(int precedence, DFAState *startState) {
+  if (!isPrecedenceDfa()) {
+    throw IllegalStateException("Only precedence DFAs may contain a precedence start state.");
+  }
+
+  if (precedence < 0) {
+    return;
+  }
+
+  // synchronization on s0 here is ok. when the DFA is turned into a
+  // precedence DFA, s0 will be initialized once and not updated again
+  std::unique_lock<std::mutex> lock(_lock);
+  {
+    // s0.edges is never null for a precedence DFA
+    if (precedence >= (int)s0->edges.size()) {
+      s0->edges.resize(precedence + 1);
+    }
+
+    s0->edges[precedence] = startState;
+  }
+}
+
+std::vector<DFAState *> DFA::getStates() const {
   std::vector<DFAState *> result;
   for (auto state : states)
     result.push_back(state.first);
@@ -63,17 +129,21 @@ std::vector<DFAState *> DFA::getStates() {
   return result;
 }
 
-std::wstring DFA::toString() {
-  std::vector<std::wstring> tokenNames;
-  return toString(tokenNames);
-}
-
 std::wstring DFA::toString(const std::vector<std::wstring> &tokenNames) {
   if (s0 == nullptr) {
     return L"";
   }
   DFASerializer serializer(this, tokenNames);
 
+  return serializer.toString();
+}
+
+std::wstring DFA::toString(Ref<Vocabulary> vocabulary) const {
+  if (s0 == nullptr) {
+    return L"";
+  }
+
+  DFASerializer serializer(this, vocabulary);
   return serializer.toString();
 }
 
@@ -85,3 +155,4 @@ std::wstring DFA::toLexerString() {
 
   return serializer.toString();
 }
+

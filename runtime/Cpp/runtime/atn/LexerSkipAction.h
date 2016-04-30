@@ -33,7 +33,6 @@
 
 #include "LexerAction.h"
 #include "LexerActionType.h"
-#include "Lexer.h"
 
 namespace org {
 namespace antlr {
@@ -53,7 +52,7 @@ namespace atn {
   class LexerSkipAction final : public LexerAction {
   public:
     /// Provides a singleton instance of this parameterless lexer action.
-    static const std::shared_ptr<LexerSkipAction> INSTANCE;
+    static const Ref<LexerSkipAction> INSTANCE;
 
     /// <summary>
     /// {@inheritDoc} </summary>
@@ -70,7 +69,7 @@ namespace atn {
     ///
     /// <para>This action is implemented by calling <seealso cref="Lexer#skip"/>.</para>
     /// </summary>
-    virtual void execute(Lexer::Ref lexer) override;
+    virtual void execute(Lexer *lexer) override;
 
     virtual size_t hashCode() const override;
     virtual bool operator == (const LexerAction &obj) const override;

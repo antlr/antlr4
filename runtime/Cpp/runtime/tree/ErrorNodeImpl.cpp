@@ -37,5 +37,5 @@ using namespace org::antlr::v4::runtime;
 using namespace org::antlr::v4::runtime::misc;
 using namespace org::antlr::v4::runtime::tree;
 
-ErrorNodeImpl::ErrorNodeImpl(Token::Ref token) : TerminalNodeImpl(token) {
+ErrorNodeImpl::ErrorNodeImpl(Ref<Token> token) : TerminalNodeImpl(token) {
 }

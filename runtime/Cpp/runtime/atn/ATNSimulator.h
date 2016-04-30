@@ -43,18 +43,29 @@ namespace atn {
 
   class ATNSimulator {
   public:
-    virtual ~ATNSimulator() {};
-
     /// Must distinguish between missing edge and edge we know leads nowhere.
-    static const std::shared_ptr<dfa::DFAState> ERROR;
+    static const Ref<dfa::DFAState> ERROR;
     const ATN &atn;
 
-    ATNSimulator(const ATN &atn, std::shared_ptr<PredictionContextCache> sharedContextCache);
+    ATNSimulator(const ATN &atn, Ref<PredictionContextCache> sharedContextCache);
+    virtual ~ATNSimulator() {};
 
     virtual void reset() = 0;
 
-    virtual std::shared_ptr<PredictionContextCache> getSharedContextCache();
-    virtual PredictionContext::Ref getCachedContext(PredictionContext::Ref context);
+    /**
+     * Clear the DFA cache used by the current instance. Since the DFA cache may
+     * be shared by multiple ATN simulators, this method may affect the
+     * performance (but not accuracy) of other parsers which are being used
+     * concurrently.
+     *
+     * @throws UnsupportedOperationException if the current instance does not
+     * support clearing the DFA.
+     *
+     * @since 4.3
+     */
+    virtual void clearDFA();
+    virtual Ref<PredictionContextCache> getSharedContextCache();
+    virtual Ref<PredictionContext> getCachedContext(Ref<PredictionContext> context);
 
     /// @deprecated Use <seealso cref="ATNDeserializer#deserialize"/> instead.
     static ATN deserialize(const std::wstring &data);
@@ -97,7 +108,7 @@ namespace atn {
     ///  more time I think and doesn't save on the overall footprint
     ///  so it's not worth the complexity.
     /// </summary>
-    std::shared_ptr<PredictionContextCache> _sharedContextCache;
+    Ref<PredictionContextCache> _sharedContextCache;
     
   };
 

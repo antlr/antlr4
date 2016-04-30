@@ -66,7 +66,7 @@ void Lexer::reset() {
   getInterpreter<atn::LexerATNSimulator>()->reset();
 }
 
-Token::Ref Lexer::nextToken() {
+Ref<Token> Lexer::nextToken() {
   // Mark start location in char stream so unbuffered streams are
   // guaranteed at least have text of current token
   ssize_t tokenStartMarker = _input->mark();
@@ -150,7 +150,7 @@ int Lexer::popMode() {
 }
 
 
-std::shared_ptr<TokenFactory<CommonToken>> Lexer::getTokenFactory() {
+Ref<TokenFactory<CommonToken>> Lexer::getTokenFactory() {
   return _factory;
 }
 
@@ -167,27 +167,22 @@ CharStream* Lexer::getInputStream() {
   return _input;
 }
 
-void Lexer::emit(Token::Ref token) {
+void Lexer::emit(Ref<Token> token) {
   _token = token;
 }
 
-Token::Ref Lexer::emit() {
-  Token::Ref t = std::dynamic_pointer_cast<Token>(_factory->create({ this, _input }, _type, _text, _channel,
+Ref<Token> Lexer::emit() {
+  Ref<Token> t = std::dynamic_pointer_cast<Token>(_factory->create({ this, _input }, _type, _text, _channel,
     _tokenStartCharIndex, getCharIndex() - 1, _tokenStartLine, _tokenStartCharPositionInLine));
   emit(t);
   return t;
 }
 
-Token::Ref Lexer::emitEOF() {
+Ref<Token> Lexer::emitEOF() {
   int cpos = getCharPositionInLine();
-  // The character position for EOF is one beyond the position of
-  // the previous token's last character
-  if (_token != nullptr) {
-    int n = _token->getStopIndex() - _token->getStartIndex() + 1;
-    cpos = _token->getCharPositionInLine() + n;
-  }
-  Token::Ref eof = std::dynamic_pointer_cast<Token>(_factory->create({ this, _input }, EOF, L"", Token::DEFAULT_CHANNEL,
-    (int)_input->index(), (int)_input->index() - 1, (int)getLine(), cpos));
+  size_t line = getLine();
+  Ref<Token> eof = std::dynamic_pointer_cast<Token>(_factory->create({ this, _input }, EOF, L"", Token::DEFAULT_CHANNEL,
+    (int)_input->index(), (int)_input->index() - 1, (int)line, cpos));
   emit(eof);
   return eof;
 }
@@ -223,11 +218,11 @@ void Lexer::setText(const std::wstring &text) {
   this->_text = text;
 }
 
-Token::Ref Lexer::getToken() {
+Ref<Token> Lexer::getToken() {
   return _token;
 }
 
-void Lexer::setToken(Token::Ref token) {
+void Lexer::setToken(Ref<Token> token) {
   _token = token;
 }
 
@@ -247,9 +242,9 @@ int Lexer::getChannel() {
   return _channel;
 }
 
-std::vector<Token::Ref> Lexer::getAllTokens() {
-  std::vector<Token::Ref> tokens;
-  Token::Ref t = nextToken();
+std::vector<Ref<Token>> Lexer::getAllTokens() {
+  std::vector<Ref<Token>> tokens;
+  Ref<Token> t = nextToken();
   while (t->getType() != EOF) {
     tokens.push_back(t);
     t = nextToken();

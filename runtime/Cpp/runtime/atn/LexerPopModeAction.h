@@ -33,7 +33,6 @@
 
 #include "LexerAction.h"
 #include "LexerActionType.h"
-#include "Lexer.h"
 
 namespace org {
 namespace antlr {
@@ -55,7 +54,7 @@ namespace atn {
     /// <summary>
     /// Provides a singleton instance of this parameterless lexer action.
     /// </summary>
-    static const std::shared_ptr<LexerPopModeAction> INSTANCE;
+    static const Ref<LexerPopModeAction> INSTANCE;
 
     /// <summary>
     /// {@inheritDoc} </summary>
@@ -72,7 +71,7 @@ namespace atn {
     ///
     /// <para>This action is implemented by calling <seealso cref="Lexer#popMode"/>.</para>
     /// </summary>
-    virtual void execute(Lexer::Ref lexer) override;
+    virtual void execute(Lexer *lexer) override;
 
     virtual size_t hashCode() const override;
     virtual bool operator == (const LexerAction &obj) const override;

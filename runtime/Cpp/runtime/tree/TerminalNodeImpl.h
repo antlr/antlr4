@@ -41,12 +41,12 @@ namespace tree {
 
   class TerminalNodeImpl : public virtual TerminalNode {
   public:
-    Token::Ref symbol;
+    Ref<Token> symbol;
     std::weak_ptr<ParseTree> parent;
 
-    TerminalNodeImpl(Token::Ref symbol);
+    TerminalNodeImpl(Ref<Token> symbol);
 
-    virtual Token::Ref getSymbol() override;
+    virtual Ref<Token> getSymbol() override;
     virtual misc::Interval getSourceInterval() override;
 
     virtual std::size_t getChildCount() override;
@@ -63,7 +63,7 @@ namespace tree {
 
   protected:
     virtual std::weak_ptr<Tree> getParentReference() override;
-    virtual std::shared_ptr<Tree> getChildReference(size_t i) override;
+    virtual Ref<Tree> getChildReference(size_t i) override;
   };
 
 } // namespace tree

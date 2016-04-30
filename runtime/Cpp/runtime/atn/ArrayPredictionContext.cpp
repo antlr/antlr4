@@ -36,7 +36,7 @@
 
 using namespace org::antlr::v4::runtime::atn;
 
-ArrayPredictionContext::ArrayPredictionContext(SingletonPredictionContext::Ref a)
+ArrayPredictionContext::ArrayPredictionContext(Ref<SingletonPredictionContext> a)
   : ArrayPredictionContext({ a->parent }, { a->returnState }) {
 }
 

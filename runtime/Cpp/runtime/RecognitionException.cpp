@@ -33,18 +33,19 @@
 #include "Recognizer.h"
 #include "Strings.h"
 #include "ParserRuleContext.h"
+#include "IntervalSet.h"
 
 #include "RecognitionException.h"
 
 using namespace org::antlr::v4::runtime;
 
 RecognitionException::RecognitionException(IRecognizer *recognizer, IntStream *input,
-  ParserRuleContext::Ref ctx, Token::Ref offendingToken)
+  Ref<ParserRuleContext> ctx, Ref<Token> offendingToken)
   : RecognitionException("", recognizer, input, ctx, offendingToken) {
 }
 
 RecognitionException::RecognitionException(const std::string &message, IRecognizer *recognizer, IntStream *input,
-                                           ParserRuleContext::Ref ctx, Token::Ref offendingToken)
+                                           Ref<ParserRuleContext> ctx, Ref<Token> offendingToken)
   : RuntimeException(message), _recognizer(recognizer), _input(input), _offendingToken(offendingToken), _ctx(ctx) {
   InitializeInstanceFields();
   if (recognizer != nullptr) {
@@ -67,7 +68,7 @@ misc::IntervalSet RecognitionException::getExpectedTokens() const {
   return misc::IntervalSet::EMPTY_SET;
 }
 
-RuleContext::Ref RecognitionException::getCtx() const {
+Ref<RuleContext> RecognitionException::getCtx() const {
   return _ctx;
 }
 
@@ -75,7 +76,7 @@ IntStream* RecognitionException::getInputStream() const {
   return _input;
 }
 
-Token::Ref RecognitionException::getOffendingToken() const {
+Ref<Token> RecognitionException::getOffendingToken() const {
   return _offendingToken;
 }
 

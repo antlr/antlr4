@@ -33,7 +33,6 @@
 
 #include "LexerAction.h"
 #include "LexerActionType.h"
-#include "Lexer.h"
 
 namespace org {
 namespace antlr {
@@ -102,7 +101,7 @@ namespace atn {
     /// <para>Custom actions are implemented by calling <seealso cref="Lexer#action"/> with the
     /// appropriate rule and action indexes.</para>
     /// </summary>
-    virtual void execute(Lexer::Ref lexer) override;
+    virtual void execute(Lexer *lexer) override;
 
     virtual size_t hashCode() const override;
     virtual bool operator == (const LexerAction &obj) const override;

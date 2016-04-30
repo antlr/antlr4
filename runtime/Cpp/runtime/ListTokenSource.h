@@ -49,7 +49,7 @@ namespace runtime {
   /// </summary>
   class ListTokenSource : public TokenSource {
   protected:
-    const std::vector<Token::Ref> tokens;
+    const std::vector<Ref<Token>> tokens;
 
     /// <summary>
     /// The name of the input source. If this value is {@code null}, a call to
@@ -71,14 +71,14 @@ namespace runtime {
     /// <summary>
     /// This field caches the EOF token for the token source.
     /// </summary>
-    Token::Ref eofToken;
+    Ref<Token> eofToken;
 
     /// <summary>
     /// This is the backing field for <seealso cref="#getTokenFactory"/> and
     /// <seealso cref="setTokenFactory"/>.
     /// </summary>
   private:
-    std::shared_ptr<TokenFactory<CommonToken>> _factory = CommonTokenFactory::DEFAULT;
+    Ref<TokenFactory<CommonToken>> _factory = CommonTokenFactory::DEFAULT;
 
     /// <summary>
     /// Constructs a new <seealso cref="ListTokenSource"/> instance from the specified
@@ -115,7 +115,7 @@ namespace runtime {
     }
 
     virtual int getCharPositionInLine() override;
-    virtual Token::Ref nextToken() override;
+    virtual Ref<Token> nextToken() override;
     virtual size_t getLine() const override;
     virtual CharStream* getInputStream() override;
     virtual std::string getSourceName() override;
@@ -125,7 +125,7 @@ namespace runtime {
       this->_factory = factory;
     }
 
-    virtual std::shared_ptr<TokenFactory<CommonToken>> getTokenFactory() override;
+    virtual Ref<TokenFactory<CommonToken>> getTokenFactory() override;
 
   private:
     void InitializeInstanceFields();

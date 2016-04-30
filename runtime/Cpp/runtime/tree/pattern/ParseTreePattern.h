@@ -54,7 +54,7 @@ namespace pattern {
     /// tree pattern. </param>
     /// <param name="patternTree"> The tree pattern in <seealso cref="ParseTree"/> form. </param>
     ParseTreePattern(ParseTreePatternMatcher *matcher, const std::wstring &pattern, int patternRuleIndex,
-                     std::shared_ptr<ParseTree> patternTree);
+                     Ref<ParseTree> patternTree);
 
     /// <summary>
     /// Match a specific parse tree against this tree pattern.
@@ -63,7 +63,7 @@ namespace pattern {
     /// <returns> A <seealso cref="ParseTreeMatch"/> object describing the result of the
     /// match operation. The <seealso cref="ParseTreeMatch#succeeded()"/> method can be
     /// used to determine whether or not the match was successful. </returns>
-    virtual ParseTreeMatch match(std::shared_ptr<ParseTree> tree);
+    virtual ParseTreeMatch match(Ref<ParseTree> tree);
 
     /// <summary>
     /// Determine whether or not a parse tree matches this tree pattern.
@@ -71,7 +71,7 @@ namespace pattern {
     /// <param name="tree"> The parse tree to match against this tree pattern. </param>
     /// <returns> {@code true} if {@code tree} is a match for the current tree
     /// pattern; otherwise, {@code false}. </returns>
-    virtual bool matches(std::shared_ptr<ParseTree> tree);
+    virtual bool matches(Ref<ParseTree> tree);
 
     /// Find all nodes using XPath and then try to match those subtrees against
     /// this tree pattern.
@@ -113,7 +113,7 @@ namespace pattern {
     /// of type <seealso cref="RuleTagToken"/> or <seealso cref="TokenTagToken"/>.
     /// </summary>
     /// <returns> The tree pattern as a <seealso cref="ParseTree"/>. </returns>
-    virtual std::shared_ptr<ParseTree> getPatternTree() const;
+    virtual Ref<ParseTree> getPatternTree() const;
 
   private:
     const int patternRuleIndex;
@@ -124,7 +124,7 @@ namespace pattern {
     const std::wstring pattern;
 
     /// This is the backing field for <seealso cref="#getPatternTree()"/>.
-    std::shared_ptr<ParseTree> patternTree;
+    Ref<ParseTree> patternTree;
 
     /// <summary>
     /// This is the backing field for <seealso cref="#getMatcher()"/>.

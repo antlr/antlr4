@@ -30,13 +30,14 @@
  */
 
 #include "MurmurHash.h"
+#include "Lexer.h"
 
 #include "LexerMoreAction.h"
 
 using namespace org::antlr::v4::runtime::atn;
 using namespace org::antlr::v4::runtime::misc;
 
-const std::shared_ptr<LexerMoreAction> LexerMoreAction::INSTANCE { new LexerMoreAction() };
+const Ref<LexerMoreAction> LexerMoreAction::INSTANCE { new LexerMoreAction() };
 
 LexerMoreAction::LexerMoreAction() {
 }
@@ -49,7 +50,7 @@ bool LexerMoreAction::isPositionDependent() const {
   return false;
 }
 
-void LexerMoreAction::execute(Lexer::Ref lexer) {
+void LexerMoreAction::execute(Lexer *lexer) {
   lexer->more();
 }
 

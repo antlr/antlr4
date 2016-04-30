@@ -72,7 +72,7 @@ namespace tree {
           break;
         }
 
-        std::shared_ptr<ParseTree> c = node->getChild(i);
+        Ref<ParseTree> c = node->getChild(i);
         T childResult = c->accept(this);
         result = aggregateResult(result, childResult);
       }

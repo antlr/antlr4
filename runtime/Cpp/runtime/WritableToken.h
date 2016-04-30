@@ -40,18 +40,11 @@ namespace runtime {
 
   class WritableToken : public Token {
   public:
-    typedef std::shared_ptr<WritableToken> Ref;
-    
     virtual void setText(const std::wstring &text) = 0;
-
     virtual void setType(int ttype) = 0;
-
     virtual void setLine(int line) = 0;
-
     virtual void setCharPositionInLine(int pos) = 0;
-
     virtual void setChannel(int channel) = 0;
-
     virtual void setTokenIndex(int index) = 0;
   };
 

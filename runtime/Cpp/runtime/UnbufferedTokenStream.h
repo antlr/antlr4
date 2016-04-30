@@ -44,8 +44,8 @@ namespace runtime {
     UnbufferedTokenStream(TokenSource *tokenSource, int bufferSize);
     virtual ~UnbufferedTokenStream();
 
-    virtual Token::Ref get(size_t i) const override;
-    virtual Token::Ref LT(ssize_t i) override;
+    virtual Ref<Token> get(size_t i) const override;
+    virtual Ref<Token> LT(ssize_t i) override;
     virtual ssize_t LA(ssize_t i) override;
 
     virtual TokenSource* getTokenSource() const override;
@@ -53,7 +53,7 @@ namespace runtime {
     virtual std::wstring getText(const misc::Interval &interval) override;
     virtual std::wstring getText() override;
     virtual std::wstring getText(RuleContext *ctx) override;
-    virtual std::wstring getText(Token::Ref start, Token::Ref stop) override;
+    virtual std::wstring getText(Ref<Token> start, Ref<Token> stop) override;
 
     virtual void consume() override;
 
@@ -83,7 +83,7 @@ namespace runtime {
     /// we start filling at index 0 again.
     /// </summary>
 
-    std::vector<Token::Ref> _tokens;
+    std::vector<Ref<Token>> _tokens;
 
     /// <summary>
     /// 0..n-1 index into <seealso cref="#tokens tokens"/> of next token.
@@ -104,13 +104,13 @@ namespace runtime {
     /// <summary>
     /// This is the {@code LT(-1)} token for the current position.
     /// </summary>
-    Token::Ref _lastToken;
+    Ref<Token> _lastToken;
 
     /// <summary>
     /// When {@code numMarkers > 0}, this is the {@code LT(-1)} token for the
     /// first token in <seealso cref="#tokens"/>. Otherwise, this is {@code null}.
     /// </summary>
-    Token::Ref _lastTokenBufferStart;
+    Ref<Token> _lastTokenBufferStart;
 
     /// <summary>
     /// Absolute token index. It's the index of the token about to be read via
@@ -130,7 +130,7 @@ namespace runtime {
     /// then EOF was reached before {@code n} tokens could be added.
     /// </summary>
     virtual size_t fill(size_t n);
-    virtual void add(Token::Ref t);
+    virtual void add(Ref<Token> t);
 
     size_t getBufferStartIndex() const;
 

@@ -407,7 +407,7 @@ ATN ATNDeserializer::deserialize(const std::wstring& input) {
 
           int ruleIndex = static_cast<ActionTransition *>(transition)->ruleIndex;
           int actionIndex = static_cast<ActionTransition *>(transition)->actionIndex;
-          std::shared_ptr<LexerCustomAction> lexerAction = std::make_shared<LexerCustomAction>(ruleIndex, actionIndex);
+          Ref<LexerCustomAction> lexerAction = std::make_shared<LexerCustomAction>(ruleIndex, actionIndex);
           state->setTransition(i, new ActionTransition(transition->target, ruleIndex, (int)atn.lexerActions.size(), false)); /* mem-check freed in ATNState d-tor */
           atn.lexerActions.push_back(lexerAction);
         }
@@ -706,7 +706,7 @@ ATNState* ATNDeserializer::stateFactory(int type, int ruleIndex) {
   return s;
 }
 
-LexerAction::Ref ATNDeserializer::lexerActionFactory(LexerActionType type, int data1, int data2) {
+Ref<LexerAction> ATNDeserializer::lexerActionFactory(LexerActionType type, int data1, int data2) {
   switch (type) {
     case LexerActionType::CHANNEL:
       return std::make_shared<LexerChannelAction>(data1);

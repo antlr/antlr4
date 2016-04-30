@@ -1,8 +1,9 @@
 ﻿/*
  * [The "BSD license"]
  *  Copyright (c) 2016 Mike Lischke
- *  Copyright (c) 2013 Terence Parr
  *  Copyright (c) 2013 Dan McLaughlin
+ *  Copyright (c) 2012 Terence Parr
+ *  Copyright (c) 2012 Sam Harwell
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -31,6 +32,8 @@
 
 #pragma once
 
+#include "Vocabulary.h"
+
 namespace org {
 namespace antlr {
 namespace v4 {
@@ -40,16 +43,18 @@ namespace dfa {
   /// A DFA walker that knows how to dump them to serialized strings.
   class DFASerializer {
   public:
-    DFA *const dfa;
-    const std::vector<std::wstring>& tokenNames;
+    DFASerializer(const DFA *dfa, const std::vector<std::wstring>& tnames);
+    DFASerializer(const DFA *dfa, Ref<Vocabulary> vocabulary);
 
-    DFASerializer(DFA *dfa, const std::vector<std::wstring>& tnames);
-
-    virtual std::wstring toString();
+    virtual std::wstring toString() const;
 
   protected:
-    virtual std::wstring getEdgeLabel(size_t i);
-    virtual std::wstring getStateString(DFAState *s);
+    virtual std::wstring getEdgeLabel(size_t i) const;
+    virtual std::wstring getStateString(DFAState *s) const;
+
+  private:
+    const DFA *_dfa;
+    Ref<Vocabulary> const _vocabulary;
   };
 
 } // namespace atn

@@ -53,7 +53,7 @@ namespace runtime {
     /// Make sure we don't attempt to recover inline; if the parser
     ///  successfully recovers, it won't throw an exception.
     /// </summary>
-    virtual Token::Ref recoverInline(Parser *recognizer) override;
+    virtual Ref<Token> recoverInline(Parser *recognizer) override;
 
     /// <summary>
     /// Make sure we don't attempt to recover from problems in subrules. </summary>

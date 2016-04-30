@@ -39,15 +39,15 @@ using namespace org::antlr::v4::runtime::tree;
 using namespace org::antlr::v4::runtime::tree::pattern;
 
 ParseTreePattern::ParseTreePattern(ParseTreePatternMatcher *matcher, const std::wstring &pattern, int patternRuleIndex,
-  std::shared_ptr<ParseTree> patternTree)
+  Ref<ParseTree> patternTree)
   : patternRuleIndex(patternRuleIndex), pattern(pattern), patternTree(patternTree), matcher(matcher) {
 }
 
-ParseTreeMatch ParseTreePattern::match(std::shared_ptr<ParseTree> tree) {
+ParseTreeMatch ParseTreePattern::match(Ref<ParseTree> tree) {
   return matcher->match(tree, *this);
 }
 
-bool ParseTreePattern::matches(std::shared_ptr<ParseTree> tree) {
+bool ParseTreePattern::matches(Ref<ParseTree> tree) {
   return matcher->match(tree, *this).succeeded();
 }
 
@@ -77,6 +77,6 @@ int ParseTreePattern::getPatternRuleIndex() const {
   return patternRuleIndex;
 }
 
-std::shared_ptr<ParseTree> ParseTreePattern::getPatternTree() const {
+Ref<ParseTree> ParseTreePattern::getPatternTree() const {
   return patternTree;
 }

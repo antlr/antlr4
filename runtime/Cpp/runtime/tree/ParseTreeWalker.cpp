@@ -39,9 +39,9 @@
 using namespace org::antlr::v4::runtime::tree;
 using namespace antlrcpp;
 
-const std::shared_ptr<ParseTreeWalker> ParseTreeWalker::DEFAULT = std::make_shared<ParseTreeWalker>();
+const Ref<ParseTreeWalker> ParseTreeWalker::DEFAULT = std::make_shared<ParseTreeWalker>();
 
-void ParseTreeWalker::walk(std::shared_ptr<ParseTreeListener> listener, std::shared_ptr<ParseTree> t) {
+void ParseTreeWalker::walk(Ref<ParseTreeListener> listener, Ref<ParseTree> t) {
   if (is<ErrorNode>(t)) {
     listener->visitErrorNode(std::dynamic_pointer_cast<ErrorNode>(t));
     return;
@@ -49,7 +49,7 @@ void ParseTreeWalker::walk(std::shared_ptr<ParseTreeListener> listener, std::sha
     listener->visitTerminal(std::dynamic_pointer_cast<TerminalNode>(t));
     return;
   }
-  std::shared_ptr<RuleNode> r = std::dynamic_pointer_cast<RuleNode>(t);
+  Ref<RuleNode> r = std::dynamic_pointer_cast<RuleNode>(t);
   enterRule(listener, r);
   std::size_t n = r->getChildCount();
   for (std::size_t i = 0; i < n; i++) {
@@ -58,14 +58,14 @@ void ParseTreeWalker::walk(std::shared_ptr<ParseTreeListener> listener, std::sha
   exitRule(listener, r);
 }
 
-void ParseTreeWalker::enterRule(std::shared_ptr<ParseTreeListener> listener, std::shared_ptr<RuleNode> r) {
-  ParserRuleContext::Ref ctx = std::dynamic_pointer_cast<ParserRuleContext>(r->getRuleContext());
+void ParseTreeWalker::enterRule(Ref<ParseTreeListener> listener, Ref<RuleNode> r) {
+  Ref<ParserRuleContext> ctx = std::dynamic_pointer_cast<ParserRuleContext>(r->getRuleContext());
   listener->enterEveryRule(ctx);
   ctx->enterRule(listener);
 }
 
-void ParseTreeWalker::exitRule(std::shared_ptr<ParseTreeListener> listener, std::shared_ptr<RuleNode> r) {
-  ParserRuleContext::Ref ctx = std::dynamic_pointer_cast<ParserRuleContext>(r->getRuleContext());
+void ParseTreeWalker::exitRule(Ref<ParseTreeListener> listener, Ref<RuleNode> r) {
+  Ref<ParserRuleContext> ctx = std::dynamic_pointer_cast<ParserRuleContext>(r->getRuleContext());
   ctx->exitRule(listener);
   listener->exitEveryRule(ctx);
 }

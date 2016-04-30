@@ -39,10 +39,10 @@ namespace tree {
 
   class ParseTreeListener {
   public:
-    virtual void visitTerminal(std::shared_ptr<TerminalNode> node) = 0;
-    virtual void visitErrorNode(std::shared_ptr<ErrorNode> node) = 0;
-    virtual void enterEveryRule(std::shared_ptr<ParserRuleContext> ctx) = 0;
-    virtual void exitEveryRule(std::shared_ptr<ParserRuleContext> ctx) = 0;
+    virtual void visitTerminal(Ref<TerminalNode> node) = 0;
+    virtual void visitErrorNode(Ref<ErrorNode> node) = 0;
+    virtual void enterEveryRule(Ref<ParserRuleContext> ctx) = 0;
+    virtual void exitEveryRule(Ref<ParserRuleContext> ctx) = 0;
 
     bool operator == (const ParseTreeListener &other) {
       return this == &other;

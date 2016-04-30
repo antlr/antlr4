@@ -51,17 +51,17 @@ namespace runtime {
     void removeErrorListener(ANTLRErrorListener *listener);    
     void removeErrorListeners();
 
-    void syntaxError(IRecognizer *recognizer, Token::Ref offendingSymbol, size_t line, int charPositionInLine,
+    void syntaxError(IRecognizer *recognizer, Ref<Token> offendingSymbol, size_t line, int charPositionInLine,
                      const std::wstring &msg, std::exception_ptr e) override;
 
     virtual void reportAmbiguity(Parser *recognizer, const dfa::DFA &dfa, size_t startIndex, size_t stopIndex, bool exact,
-                                 const antlrcpp::BitSet &ambigAlts, std::shared_ptr<atn::ATNConfigSet> configs) override;
+                                 const antlrcpp::BitSet &ambigAlts, Ref<atn::ATNConfigSet> configs) override;
 
     virtual void reportAttemptingFullContext(Parser *recognizer, const dfa::DFA &dfa, size_t startIndex, size_t stopIndex,
-      const antlrcpp::BitSet &conflictingAlts, std::shared_ptr<atn::ATNConfigSet> configs) override;
+      const antlrcpp::BitSet &conflictingAlts, Ref<atn::ATNConfigSet> configs) override;
 
     virtual void reportContextSensitivity(Parser *recognizer, const dfa::DFA &dfa, size_t startIndex, size_t stopIndex,
-                                          int prediction, std::shared_ptr<atn::ATNConfigSet> configs) override;
+                                          int prediction, Ref<atn::ATNConfigSet> configs) override;
   };
 
 } // namespace runtime

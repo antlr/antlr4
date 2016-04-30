@@ -30,13 +30,14 @@
  */
 
 #include "MurmurHash.h"
+#include "Lexer.h"
 
 #include "LexerSkipAction.h"
 
 using namespace org::antlr::v4::runtime::atn;
 using namespace org::antlr::v4::runtime::misc;
 
-const std::shared_ptr<LexerSkipAction> LexerSkipAction::INSTANCE { new LexerSkipAction() };
+const Ref<LexerSkipAction> LexerSkipAction::INSTANCE { new LexerSkipAction() };
 
 LexerSkipAction::LexerSkipAction() {
 }
@@ -49,7 +50,7 @@ bool LexerSkipAction::isPositionDependent() const {
   return false;
 }
 
-void LexerSkipAction::execute(Lexer::Ref lexer) {
+void LexerSkipAction::execute(Lexer *lexer) {
   lexer->skip();
 }
 

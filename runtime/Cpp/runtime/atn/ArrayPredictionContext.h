@@ -52,7 +52,7 @@ namespace atn {
     /// Sorted for merge, no duplicates; if present, EMPTY_RETURN_STATE is always last.
     const std::vector<int> returnStates;
 
-    ArrayPredictionContext(SingletonPredictionContext::Ref a);
+    ArrayPredictionContext(Ref<SingletonPredictionContext> a);
     ArrayPredictionContext(const std::vector<std::weak_ptr<PredictionContext>> &parents,
                            const std::vector<int> &returnStates);
 

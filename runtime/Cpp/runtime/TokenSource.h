@@ -31,7 +31,6 @@
 
 #pragma once
 
-#include "Token.h"
 #include "TokenFactory.h"
 
 namespace org {
@@ -62,7 +61,7 @@ namespace runtime {
     /// to the parser.
     /// </summary>
   public:
-    virtual Token::Ref nextToken() = 0;
+    virtual Ref<Token> nextToken() = 0;
 
     /// <summary>
     /// Get the line number for the current position in the input stream. The
@@ -109,7 +108,7 @@ namespace runtime {
     /// creating <seealso cref="Token"/> objects from the input.
     /// </summary>
     /// <returns> The <seealso cref="TokenFactory"/> currently used by this token source. </returns>
-    virtual std::shared_ptr<TokenFactory<CommonToken>> getTokenFactory() = 0;
+    virtual Ref<TokenFactory<CommonToken>> getTokenFactory() = 0;
   };
 
 } // namespace runtime

@@ -32,7 +32,6 @@
 #pragma once
 
 #include "RuleContext.h"
-#include "LexerAction.h"
 
 namespace org {
 namespace antlr {
@@ -80,7 +79,7 @@ namespace atn {
 
     /// For lexer ATNs, this is an array of {@link LexerAction} objects which may
     /// be referenced by action transitions in the ATN.
-    std::vector<LexerAction::Ref> lexerActions;
+    std::vector<Ref<LexerAction>> lexerActions;
 
     std::vector<TokensStartState*> modeToStartState;
 
@@ -93,7 +92,7 @@ namespace atn {
     ///  the rule surrounding {@code s}. In other words, the set will be
     ///  restricted to tokens reachable staying within {@code s}'s rule.
     /// </summary>
-    virtual misc::IntervalSet nextTokens(ATNState *s, RuleContext::Ref ctx) const;
+    virtual misc::IntervalSet nextTokens(ATNState *s, Ref<RuleContext> ctx) const;
 
     /// <summary>
     /// Compute the set of valid tokens that can occur starting in {@code s} and
@@ -130,7 +129,7 @@ namespace atn {
     /// specified state in the specified context. </returns>
     /// <exception cref="IllegalArgumentException"> if the ATN does not contain a state with
     /// number {@code stateNumber} </exception>
-    virtual misc::IntervalSet getExpectedTokens(int stateNumber, RuleContext::Ref context) const;
+    virtual misc::IntervalSet getExpectedTokens(int stateNumber, Ref<RuleContext> context) const;
 
     std::wstring toString() const;
   };

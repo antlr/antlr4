@@ -32,8 +32,8 @@
 #pragma once
 
 #include "BitSet.h"
-#include "ATNConfig.h"
 #include "ConfigLookup.h"
+#include "PredictionContext.h"
 
 namespace org {
 namespace antlr {
@@ -44,11 +44,11 @@ namespace atn {
   // Simpler hasher and comparer variants than those in ATNConfig (less fields, no murmur hash).
   struct SimpleATNConfigHasher
   {
-    size_t operator()(const ATNConfig::Ref &k) const;
+    size_t operator()(const Ref<ATNConfig> &k) const;
   };
 
   struct SimpleATNConfigComparer {
-    bool operator()(const ATNConfig::Ref &lhs, const ATNConfig::Ref &rhs) const;
+    bool operator()(const Ref<ATNConfig> &lhs, const Ref<ATNConfig> &rhs) const;
   };
   
   /// Specialized set that can track info about the set, with support for combining similar configurations using a
@@ -57,11 +57,11 @@ namespace atn {
   public:
     /// All configs but hashed by (s, i, _, pi) not including context. Wiped out
     /// when we go readonly as this set becomes a DFA state.
-    std::shared_ptr<ConfigLookup> configLookup;
+    Ref<ConfigLookup> configLookup;
 
     /// <summary>
     /// Track the elements as they are added to the set; supports get(i) </summary>
-    std::vector<ATNConfig::Ref> configs;
+    std::vector<Ref<ATNConfig>> configs;
 
     // TO_DO: these fields make me pretty uncomfortable but nice to pack up info together, saves recomputation
     // TO_DO: can we track conflicts as they are added to save scanning configs later?
@@ -87,11 +87,11 @@ namespace atn {
     const bool fullCtx;
 
     ATNConfigSet(bool fullCtx = true);
-    ATNConfigSet(std::shared_ptr<ATNConfigSet> old);
+    ATNConfigSet(Ref<ATNConfigSet> old);
 
     virtual ~ATNConfigSet();
 
-    virtual bool add(ATNConfig::Ref config);
+    virtual bool add(Ref<ATNConfig> config);
 
     /// <summary>
     /// Adding a new config means merging contexts with existing configs for
@@ -103,13 +103,13 @@ namespace atn {
     /// This method updates <seealso cref="#dipsIntoOuterContext"/> and
     /// <seealso cref="#hasSemanticContext"/> when necessary.
     /// </summary>
-    virtual bool add(ATNConfig::Ref config, PredictionContextMergeCache *mergeCache);
+    virtual bool add(Ref<ATNConfig> config, PredictionContextMergeCache *mergeCache);
 
     /// <summary>
     /// Return a List holding list of configs </summary>
-    virtual std::vector<ATNConfig::Ref> elements();
+    virtual std::vector<Ref<ATNConfig>> elements();
 
-    virtual std::vector<ATNState*> getStates();
+    virtual std::vector<ATNState *> getStates();
 
     /**
      * Gets the complete set of represented alternatives for the configuration
@@ -120,19 +120,19 @@ namespace atn {
      * @since 4.3
      */
     antlrcpp::BitSet getAlts();
-    virtual std::vector<SemanticContext::Ref> getPredicates();
+    virtual std::vector<Ref<SemanticContext>> getPredicates();
 
-    virtual ATNConfig::Ref get(size_t i) const;
+    virtual Ref<ATNConfig> get(size_t i) const;
 
     virtual void optimizeConfigs(ATNSimulator *interpreter);
 
-    bool addAll(std::shared_ptr<ATNConfigSet> other);
+    bool addAll(Ref<ATNConfigSet> other);
 
     bool operator == (const ATNConfigSet &other);
     virtual size_t hashCode();
     virtual size_t size();
     virtual bool isEmpty();
-    virtual bool contains(ATNConfig::Ref o);
+    virtual bool contains(Ref<ATNConfig> o);
     virtual void clear();
     virtual bool isReadonly();
     virtual void setReadonly(bool readonly);
@@ -158,17 +158,3 @@ namespace atn {
 } // namespace v4
 } // namespace antlr
 } // namespace org
-
-namespace std {
-  template <> struct hash<std::vector<ATNConfig::Ref>>
-  {
-    size_t operator() (const std::vector<ATNConfig::Ref > &vector) const
-    {
-      std::size_t seed = 0;
-      for (auto &config : vector) {
-        seed ^= config->hashCode() + 0x9e3779b9 + (seed << 6) + (seed >> 2);
-      }
-      return seed;
-    }
-  };
-}

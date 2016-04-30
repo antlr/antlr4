@@ -47,9 +47,9 @@ ssize_t CommonTokenStream::adjustSeekIndex(size_t i) {
   return nextTokenOnChannel(i, channel);
 }
 
-Token::Ref CommonTokenStream::LB(size_t k) {
+Ref<Token> CommonTokenStream::LB(size_t k) {
   if (k == 0 || k > _p) {
-    return Token::Ref();
+    return Ref<Token>();
   }
 
   ssize_t i = (ssize_t)_p;
@@ -67,7 +67,7 @@ Token::Ref CommonTokenStream::LB(size_t k) {
   return _tokens[i];
 }
 
-Token::Ref CommonTokenStream::LT(ssize_t k) {
+Ref<Token> CommonTokenStream::LT(ssize_t k) {
   lazyInit();
   if (k == 0) {
     return nullptr;
@@ -93,7 +93,7 @@ int CommonTokenStream::getNumberOfOnChannelTokens() {
   int n = 0;
   fill();
   for (size_t i = 0; i < _tokens.size(); i++) {
-    Token::Ref t = _tokens[i];
+    Ref<Token> t = _tokens[i];
     if (t->getChannel() == channel) {
       n++;
     }

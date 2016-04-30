@@ -37,7 +37,7 @@
 
 using namespace org::antlr::v4::runtime;
 
-const std::shared_ptr<TokenFactory<CommonToken>> CommonTokenFactory::DEFAULT = std::make_shared<CommonTokenFactory>();
+const Ref<TokenFactory<CommonToken>> CommonTokenFactory::DEFAULT = std::make_shared<CommonTokenFactory>();
 
 CommonTokenFactory::CommonTokenFactory(bool copyText) : copyText(copyText) {
 }
@@ -45,10 +45,10 @@ CommonTokenFactory::CommonTokenFactory(bool copyText) : copyText(copyText) {
 CommonTokenFactory::CommonTokenFactory() : CommonTokenFactory(false) {
 }
 
-std::shared_ptr<CommonToken> CommonTokenFactory::create(std::pair<TokenSource*, CharStream*> source, int type,
+Ref<CommonToken> CommonTokenFactory::create(std::pair<TokenSource*, CharStream*> source, int type,
   const std::wstring &text, int channel, int start, int stop, int line, int charPositionInLine) {
 
-  std::shared_ptr<CommonToken> t = std::make_shared<CommonToken>(source, type, channel, start, stop);
+  Ref<CommonToken> t = std::make_shared<CommonToken>(source, type, channel, start, stop);
   t->setLine(line);
   t->setCharPositionInLine(charPositionInLine);
   if (text != L"") {
@@ -60,6 +60,6 @@ std::shared_ptr<CommonToken> CommonTokenFactory::create(std::pair<TokenSource*, 
   return t;
 }
 
-std::shared_ptr<CommonToken> CommonTokenFactory::create(int type, const std::wstring &text) {
+Ref<CommonToken> CommonTokenFactory::create(int type, const std::wstring &text) {
   return std::make_shared<CommonToken>(type, text);
 }

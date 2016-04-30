@@ -33,6 +33,7 @@
 
 #include "ATNSimulator.h"
 #include "LexerATNConfig.h"
+#include "ATNConfigSet.h"
 
 namespace org {
 namespace antlr {
@@ -109,22 +110,23 @@ namespace atn {
   protected:
     size_t _mode;
 
-    /// <summary>
-    /// Used during DFA/ATN exec to record the most recent accept configuration info </summary>
-    SimState prevAccept;
+    /// Used during DFA/ATN exec to record the most recent accept configuration info.
+    SimState _prevAccept;
 
   public:
     static int match_calls;
 
     LexerATNSimulator(const ATN &atn, std::vector<dfa::DFA> &decisionToDFA,
-                      std::shared_ptr<PredictionContextCache> sharedContextCache);
+                      Ref<PredictionContextCache> sharedContextCache);
     LexerATNSimulator(Lexer *recog, const ATN &atn, std::vector<dfa::DFA> &decisionToDFA,
-                      std::shared_ptr<PredictionContextCache> sharedContextCache);
+                      Ref<PredictionContextCache> sharedContextCache);
 
     virtual void copyState(LexerATNSimulator *simulator);
     virtual int match(CharStream *input, size_t mode);
     virtual void reset() override;
 
+    virtual void clearDFA() override;
+    
   protected:
     virtual int matchATN(CharStream *input);
     virtual int execATN(CharStream *input, dfa::DFAState *ds0);
@@ -154,20 +156,22 @@ namespace atn {
     /// returns <seealso cref="#ERROR"/>. </returns>
     virtual dfa::DFAState *computeTargetState(CharStream *input, dfa::DFAState *s, ssize_t t);
 
-    virtual int failOrAccept(CharStream *input, std::shared_ptr<ATNConfigSet> reach, ssize_t t);
+    virtual int failOrAccept(CharStream *input, Ref<ATNConfigSet> reach, ssize_t t);
 
     /// <summary>
     /// Given a starting configuration set, figure out all ATN configurations
     ///  we can reach upon input {@code t}. Parameter {@code reach} is a return
     ///  parameter.
     /// </summary>
-    void getReachableConfigSet(CharStream *input, std::shared_ptr<ATNConfigSet> closure, std::shared_ptr<ATNConfigSet> reach, ssize_t t);
+    void getReachableConfigSet(CharStream *input, Ref<ATNConfigSet> closure_, // closure_ as we have a closure() already
+                               Ref<ATNConfigSet> reach, ssize_t t);
 
-    virtual void accept(CharStream *input, int ruleIndex, int actionIndex, size_t index, size_t line, size_t charPos);
+    virtual void accept(CharStream *input, Ref<LexerActionExecutor> lexerActionExecutor, int startIndex, size_t index,
+                        size_t line, size_t charPos);
 
     virtual ATNState *getReachableTarget(Transition *trans, ssize_t t);
 
-    virtual std::shared_ptr<ATNConfigSet> computeStartState(CharStream *input, ATNState *p);
+    virtual Ref<ATNConfigSet> computeStartState(CharStream *input, ATNState *p);
 
     /// <summary>
     /// Since the alternatives within any lexer decision are ordered by
@@ -178,12 +182,12 @@ namespace atn {
     /// </summary>
     /// <returns> {@code true} if an accept state is reached, otherwise
     /// {@code false}. </returns>
-    virtual bool closure(CharStream *input, LexerATNConfig::Ref config, std::shared_ptr<ATNConfigSet> configs,
-                         bool currentAltReachedAcceptState, bool speculative);
+    virtual bool closure(CharStream *input, Ref<LexerATNConfig> config, Ref<ATNConfigSet> configs,
+                         bool currentAltReachedAcceptState, bool speculative, bool treatEofAsEpsilon);
 
     // side-effect: can alter configs.hasSemanticContext
-    virtual LexerATNConfig::Ref getEpsilonTarget(CharStream *input, LexerATNConfig::Ref config, Transition *t,
-                                                 std::shared_ptr<ATNConfigSet> configs, bool speculative);
+    virtual Ref<LexerATNConfig> getEpsilonTarget(CharStream *input, Ref<LexerATNConfig> config, Transition *t,
+      Ref<ATNConfigSet> configs, bool speculative, bool treatEofAsEpsilon);
 
     /// <summary>
     /// Evaluate a predicate specified in the lexer.
@@ -208,7 +212,7 @@ namespace atn {
     virtual bool evaluatePredicate(CharStream *input, int ruleIndex, int predIndex, bool speculative);
 
     virtual void captureSimState(CharStream *input, dfa::DFAState *dfaState);
-    virtual dfa::DFAState *addDFAEdge(dfa::DFAState *from, ssize_t t, std::shared_ptr<ATNConfigSet> q);
+    virtual dfa::DFAState* addDFAEdge(dfa::DFAState *from, ssize_t t, Ref<ATNConfigSet> q);
     virtual void addDFAEdge(dfa::DFAState *p, ssize_t t, dfa::DFAState *q);
 
     /// <summary>
@@ -217,7 +221,7 @@ namespace atn {
     /// configuration containing an ATN rule stop state. Later, when
     /// traversing the DFA, we will know which rule to accept.
     /// </summary>
-    virtual dfa::DFAState *addDFAState(std::shared_ptr<ATNConfigSet> configs);
+    virtual dfa::DFAState *addDFAState(Ref<ATNConfigSet> configs);
 
   public:
     dfa::DFA& getDFA(size_t mode);

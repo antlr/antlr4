@@ -105,10 +105,10 @@ using namespace antlrcpp;
     delete a; delete b; delete c; delete d;
   }
   {
-    std::shared_ptr<A> a(new A());
-    std::shared_ptr<B> b(new B());
-    std::shared_ptr<C> c(new C());
-    std::shared_ptr<D> d(new D());
+    Ref<A> a(new A());
+    Ref<B> b(new B());
+    Ref<C> c(new C());
+    Ref<D> d(new D());
     XCTAssert(is<A>(b));
     XCTAssertFalse(is<B>(a));
     XCTAssert(is<A>(c));
@@ -136,7 +136,7 @@ using namespace antlrcpp;
     hash = MurmurHash::finish(hash, data.size());
     hashs.insert(hash);
   }
-  XCTAssertEqual(hashs.size(), 100000U, @"At least one duplicat hash found.");
+  XCTAssertEqual(hashs.size(), 100000U, @"At least one duplicate hash found.");
 
   hashs.clear();
   for (size_t i = 0; i < 100000; ++i) {
@@ -147,7 +147,7 @@ using namespace antlrcpp;
     hash = MurmurHash::finish(hash, data.size());
     hashs.insert(hash);
   }
-  XCTAssertEqual(hashs.size(), 100000U, @"At least one duplicat hash found.");
+  XCTAssertEqual(hashs.size(), 100000U, @"At least one duplicate hash found.");
 
   // Another test with fixed input but varying seeds.
   // Note: the higher the seed the less LSDs are in the result (for small input data).
@@ -160,7 +160,7 @@ using namespace antlrcpp;
     hash = MurmurHash::finish(hash, data.size());
     hashs.insert(hash);
   }
-  XCTAssertEqual(hashs.size(), 100000U, @"At least one duplicat hash found.");
+  XCTAssertEqual(hashs.size(), 100000U, @"At least one duplicate hash found.");
 }
 
 - (void)testInterval {

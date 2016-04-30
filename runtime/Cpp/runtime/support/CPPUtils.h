@@ -67,7 +67,7 @@ namespace antlrcpp {
   }
 
   template <typename T1, typename T2>
-  bool is(std::shared_ptr<T2> obj) { // For shared pointers.
+  bool is(Ref<T2> obj) { // For shared pointers.
     return dynamic_cast<T1*>(obj.get()) != nullptr;
   }
 
@@ -79,7 +79,7 @@ namespace antlrcpp {
     ss << typeid(o).name() << "@" << std::hex << (size_t)&o;
     return ss.str();
   }
-  
+
 } // namespace antlrcpp
 
 namespace std {
@@ -96,7 +96,7 @@ namespace std {
   }
 
   template <typename T>
-  bool operator == (const std::shared_ptr<T> &lhs, const std::shared_ptr<T> &rhs) {
+  bool operator == (const Ref<T> &lhs, const Ref<T> &rhs) {
     if (!lhs && !rhs)
       return true;
 

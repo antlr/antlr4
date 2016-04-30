@@ -32,7 +32,6 @@
 #pragma once
 
 #include "LexerActionType.h"
-#include "Lexer.h"
 
 namespace org {
 namespace antlr {
@@ -50,8 +49,6 @@ namespace atn {
   /// </summary>
   class LexerAction {
   public:
-    typedef std::shared_ptr<LexerAction> Ref;
-    
     virtual ~LexerAction() {};
     
     /// <summary>
@@ -82,7 +79,7 @@ namespace atn {
     /// positioned correctly prior to calling this method.</para>
     /// </summary>
     /// <param name="lexer"> The lexer instance. </param>
-    virtual void execute(Lexer::Ref lexer) = 0;
+    virtual void execute(Lexer *lexer) = 0;
 
     virtual size_t hashCode() const = 0;
     virtual bool operator == (const LexerAction &obj) const = 0;

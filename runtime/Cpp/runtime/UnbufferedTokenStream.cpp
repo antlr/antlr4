@@ -54,7 +54,7 @@ UnbufferedTokenStream::UnbufferedTokenStream(TokenSource *tokenSource, int buffe
 UnbufferedTokenStream::~UnbufferedTokenStream() {
 }
 
-Token::Ref UnbufferedTokenStream::get(size_t i) const
+Ref<Token> UnbufferedTokenStream::get(size_t i) const
 { // get absolute index
   size_t bufferStartIndex = getBufferStartIndex();
   if (i < bufferStartIndex || i >= bufferStartIndex + _tokens.size()) {
@@ -64,7 +64,7 @@ Token::Ref UnbufferedTokenStream::get(size_t i) const
   return _tokens[i - bufferStartIndex];
 }
 
-Token::Ref UnbufferedTokenStream::LT(ssize_t i)
+Ref<Token> UnbufferedTokenStream::LT(ssize_t i)
 {
   if (i == -1) {
     return _lastToken;
@@ -104,7 +104,7 @@ std::wstring UnbufferedTokenStream::getText(RuleContext* ctx)
   return getText(ctx->getSourceInterval());
 }
 
-std::wstring UnbufferedTokenStream::getText(Token::Ref start, Token::Ref stop)
+std::wstring UnbufferedTokenStream::getText(Ref<Token> start, Ref<Token> stop)
 {
   return getText(misc::Interval(start->getTokenIndex(), stop->getTokenIndex()));
 }
@@ -156,16 +156,16 @@ size_t UnbufferedTokenStream::fill(size_t n)
       return i;
     }
 
-    Token::Ref t = _tokenSource->nextToken();
+    Ref<Token> t = _tokenSource->nextToken();
     add(t);
   }
 
   return n;
 }
 
-void UnbufferedTokenStream::add(Token::Ref t)
+void UnbufferedTokenStream::add(Ref<Token> t)
 {
-  WritableToken::Ref writable = std::dynamic_pointer_cast<WritableToken>(t);
+  Ref<WritableToken> writable = std::dynamic_pointer_cast<WritableToken>(t);
   if (writable) {
     writable->setTokenIndex(int(getBufferStartIndex() + _tokens.size()));
   }
@@ -203,7 +203,7 @@ void UnbufferedTokenStream::release(ssize_t marker)
     if (_p > 0) {
       // Copy tokens[p]..tokens[n-1] to tokens[0]..tokens[(n-1)-p], reset ptrs
       // p is last valid token; move nothing if p==n as we have no valid char
-      std::vector<Token::Ref>(_tokens.begin() + (ssize_t)_p, _tokens.end()).swap(_tokens);
+      std::vector<Ref<Token>>(_tokens.begin() + (ssize_t)_p, _tokens.end()).swap(_tokens);
       _p = 0;
     }
 
@@ -274,7 +274,7 @@ std::wstring UnbufferedTokenStream::getText(const misc::Interval &interval)
 
   std::wstringstream ss;
   for (size_t i = a; i <= b; i++) {
-    Token::Ref t = _tokens[i];
+    Ref<Token> t = _tokens[i];
     if (i > 0)
       ss << L", ";
     ss << t->getText();

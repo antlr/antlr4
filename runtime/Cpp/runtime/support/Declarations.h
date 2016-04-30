@@ -122,11 +122,14 @@ namespace org {
           class EmptyPredictionContext;
           class EpsilonTransition;
           class LL1Analyzer;
+          class LexerAction;
+          class LexerActionExecutor;
           class LexerATNConfig;
           class LexerATNSimulator;
           class LoopEndState;
           class NotSetTransition;
           class OrderedATNConfigSet;
+          class ParseInfo;
           class ParserATNSimulator;
           class PlusBlockStartState;
           class PlusLoopbackState;
@@ -154,6 +157,7 @@ namespace org {
           class DFASerializer;
           class DFAState;
           class LexerDFASerializer;
+          class Vocabulary;
         }
         namespace tree {
           template <typename t> class AbstractParseTreeVisitor;

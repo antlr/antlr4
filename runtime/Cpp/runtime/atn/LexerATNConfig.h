@@ -41,18 +41,18 @@ namespace atn {
 
   class LexerATNConfig : public ATNConfig {
   public:
-    typedef std::shared_ptr<LexerATNConfig> Ref;
-    
-    /// Capture lexer action we traverse.
-    int lexerActionIndex = -1;
+    LexerATNConfig(ATNState *state, int alt, Ref<PredictionContext> context);
+    LexerATNConfig(ATNState *state, int alt, Ref<PredictionContext> context, Ref<LexerActionExecutor> lexerActionExecutor);
 
-    explicit LexerATNConfig(ATNState *state, int alt, PredictionContext::Ref context);
-    explicit LexerATNConfig(ATNState *state, int alt, PredictionContext::Ref context, int actionIndex);
+    LexerATNConfig(Ref<LexerATNConfig> c, ATNState *state);
+    LexerATNConfig(Ref<LexerATNConfig> c, ATNState *state, Ref<LexerActionExecutor> lexerActionExecutor);
+    LexerATNConfig(Ref<LexerATNConfig> c, ATNState *state, Ref<PredictionContext> context);
 
-    explicit LexerATNConfig(LexerATNConfig::Ref c, ATNState *state);
-    explicit LexerATNConfig(LexerATNConfig::Ref c, ATNState *state, int actionIndex);
-    explicit LexerATNConfig(LexerATNConfig::Ref c, ATNState *state, PredictionContext::Ref context);
-
+    /**
+     * Gets the {@link LexerActionExecutor} capable of executing the embedded
+     * action(s) for the current configuration.
+     */
+    Ref<LexerActionExecutor> getLexerActionExecutor() const;
     bool hasPassedThroughNonGreedyDecision();
 
     virtual size_t hashCode() const override;
@@ -60,9 +60,13 @@ namespace atn {
     bool operator == (const LexerATNConfig& other) const;
 
   private:
-    const bool passedThroughNonGreedyDecision;
+    /**
+     * This is the backing field for {@link #getLexerActionExecutor}.
+     */
+    const Ref<LexerActionExecutor> _lexerActionExecutor;
+    const bool _passedThroughNonGreedyDecision;
 
-    static bool checkNonGreedyDecision(LexerATNConfig::Ref source, ATNState *target);
+    static bool checkNonGreedyDecision(Ref<LexerATNConfig> source, ATNState *target);
   };
 
 } // namespace atn

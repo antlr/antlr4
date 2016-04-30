@@ -48,7 +48,7 @@ bool PredicateTransition::matches(int symbol, int minVocabSymbol, int maxVocabSy
   return false;
 }
 
-std::shared_ptr<SemanticContext::Predicate> PredicateTransition::getPredicate() const {
+Ref<SemanticContext::Predicate> PredicateTransition::getPredicate() const {
   return std::make_shared<SemanticContext::Predicate>(ruleIndex, predIndex, isCtxDependent);
 }
 

@@ -43,30 +43,22 @@ namespace runtime {
   public:
     Recognizer();
 
-  private:
-    static std::map<std::vector<std::wstring>, std::map<std::wstring, size_t>> _tokenTypeMapCache;
-    static std::map<std::vector<std::wstring>, std::map<std::wstring, size_t>> _ruleIndexMapCache;
-
-    ProxyErrorListener _proxListener; // Manages a collection of listeners.
-
-    // Mutex to manage synchronized access for multithreading.
-    std::mutex mtx;
-
-  protected:
-    atn::ATNSimulator *_interpreter; // Set and deleted in descendants.
-
-  private:
-    int _stateNumber;
-
-    /// <summary>
-    /// Used to print out token names like ID during debugging and
-    ///  error reporting.  The generated parsers implement a method
-    ///  that overrides this to point to their generated token names list.
-    /// </summary>
-  public:
+    /** Used to print out token names like ID during debugging and
+     *  error reporting.  The generated parsers implement a method
+     *  that overrides this to point to their String[] tokenNames.
+     *
+     * @deprecated Use {@link #getVocabulary()} instead.
+     */
     virtual const std::vector<std::wstring>& getTokenNames() const = 0;
-
     virtual const std::vector<std::wstring>& getRuleNames() const = 0;
+
+    /**
+     * Get the vocabulary used by the recognizer.
+     *
+     * @return A {@link Vocabulary} instance providing information about the
+     * vocabulary used by the grammar.
+     */
+    Ref<dfa::Vocabulary> getVocabulary() const;
 
     /// <summary>
     /// Get a map from token names to token types.
@@ -108,19 +100,37 @@ namespace runtime {
       return dynamic_cast<T *>(_interpreter);
     }
 
-    /// <summary>
-    /// What is the error header, normally line/character position information? </summary>
+    /** If profiling during the parse/lex, this will return DecisionInfo records
+     *  for each decision in recognizer in a ParseInfo object.
+     *
+     * @since 4.3
+     */
+    virtual Ref<atn::ParseInfo> getParseInfo() const;
+    
+    /**
+     * Set the ATN interpreter used by the recognizer for prediction.
+     *
+     * @param interpreter The ATN interpreter used by the recognizer for
+     * prediction.
+     */
+    void setInterpreter(atn::ATNSimulator *interpreter);
+    
+    /// What is the error header, normally line/character position information?
     virtual std::wstring getErrorHeader(RecognitionException *e);
 
-    /// <summary>
-    /// How should a token be displayed in an error message? The default
-    ///  is to display just the text, but during development you might
-    ///  want to have a lot of information spit out.  Override in that case
-    ///  to use t.toString() (which, for CommonToken, dumps everything about
-    ///  the token). This is better than forcing you to override a method in
-    ///  your token objects because you don't have to go modify your lexer
-    ///  so that it creates a new Java type.
-    /// </summary>
+    /** How should a token be displayed in an error message? The default
+     *  is to display just the text, but during development you might
+     *  want to have a lot of information spit out.  Override in that case
+     *  to use t.toString() (which, for CommonToken, dumps everything about
+     *  the token). This is better than forcing you to override a method in
+     *  your token objects because you don't have to go modify your lexer
+     *  so that it creates a new Java type.
+     *
+     * @deprecated This method is not called by the ANTLR 4 Runtime. Specific
+     * implementations of {@link ANTLRErrorStrategy} may provide a similar
+     * feature when necessary. For example, see
+     * {@link DefaultErrorStrategy#getTokenErrorDisplay}.
+     */
     virtual std::wstring getTokenErrorDisplay(Token *t);
 
     /// <exception cref="NullPointerException"> if {@code listener} is {@code null}. </exception>
@@ -134,11 +144,11 @@ namespace runtime {
 
     // subclass needs to override these if there are sempreds or actions
     // that the ATN interp needs to execute
-    virtual bool sempred(RuleContext::Ref localctx, int ruleIndex, int actionIndex);
+    virtual bool sempred(Ref<RuleContext> localctx, int ruleIndex, int actionIndex);
 
-    virtual bool precpred(RuleContext::Ref localctx, int precedence);
+    virtual bool precpred(Ref<RuleContext> localctx, int precedence);
 
-    virtual void action(RuleContext::Ref localctx, int ruleIndex, int actionIndex);
+    virtual void action(Ref<RuleContext> localctx, int ruleIndex, int actionIndex);
 
     int getState();
 
@@ -156,12 +166,25 @@ namespace runtime {
 
     virtual void setInputStream(IntStream *input) = 0;
 
-    virtual std::shared_ptr<TokenFactory<CommonToken>> getTokenFactory() = 0;
+    virtual Ref<TokenFactory<CommonToken>> getTokenFactory() = 0;
 
     template<typename T1>
     void setTokenFactory(TokenFactory<T1> *input);
 
+  protected:
+    atn::ATNSimulator *_interpreter; // Set and deleted in descendants (or the profiler).
+
   private:
+    static std::map<Ref<dfa::Vocabulary>, std::map<std::wstring, size_t>> _tokenTypeMapCache;
+    static std::map<std::vector<std::wstring>, std::map<std::wstring, size_t>> _ruleIndexMapCache;
+
+    ProxyErrorListener _proxListener; // Manages a collection of listeners.
+
+    // Mutex to manage synchronized access for multithreading.
+    std::mutex mtx;
+
+    int _stateNumber;
+    
     void InitializeInstanceFields();
 
   };

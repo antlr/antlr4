@@ -23,7 +23,7 @@ int main(int argc, const char * argv[]) {
   CommonTokenStream tokens(&lexer);
 
   TParser parser(&tokens);
-  std::shared_ptr<tree::ParseTree> tree = parser.main();
+  Ref<tree::ParseTree> tree = parser.main();
 
   std::cout << antlrcpp::ws2s(tree->toStringTree(&parser)) << std::endl;
 

@@ -33,13 +33,14 @@
 #include "ATNConfig.h"
 #include "ATNSimulator.h"
 #include "Exceptions.h"
+#include "SemanticContext.h"
 
 #include "ATNConfigSet.h"
 
 using namespace org::antlr::v4::runtime::atn;
 using namespace antlrcpp;
 
-size_t SimpleATNConfigHasher::operator()(const ATNConfig::Ref &k) const {
+size_t SimpleATNConfigHasher::operator()(const Ref<ATNConfig> &k) const {
   size_t hashCode = 7;
   hashCode = 31 * hashCode + (size_t)k->state->stateNumber;
   hashCode = 31 * hashCode + (size_t)k->alt;
@@ -47,7 +48,7 @@ size_t SimpleATNConfigHasher::operator()(const ATNConfig::Ref &k) const {
   return hashCode;
 }
 
-bool SimpleATNConfigComparer::operator () (const ATNConfig::Ref &lhs, const ATNConfig::Ref &rhs) const {
+bool SimpleATNConfigComparer::operator () (const Ref<ATNConfig> &lhs, const Ref<ATNConfig> &rhs) const {
   return lhs->state->stateNumber == rhs->state->stateNumber && lhs->alt == rhs->alt &&
     lhs->semanticContext == rhs->semanticContext;
 }
@@ -58,7 +59,7 @@ ATNConfigSet::ATNConfigSet(bool fullCtx) : fullCtx(fullCtx) {
   InitializeInstanceFields();
 }
 
-ATNConfigSet::ATNConfigSet(std::shared_ptr<ATNConfigSet> old) : ATNConfigSet(old->fullCtx) {
+ATNConfigSet::ATNConfigSet(Ref<ATNConfigSet> old) : ATNConfigSet(old->fullCtx) {
   addAll(old);
   uniqueAlt = old->uniqueAlt;
   conflictingAlts = old->conflictingAlts;
@@ -69,11 +70,11 @@ ATNConfigSet::ATNConfigSet(std::shared_ptr<ATNConfigSet> old) : ATNConfigSet(old
 ATNConfigSet::~ATNConfigSet() {
 }
 
-bool ATNConfigSet::add(ATNConfig::Ref config) {
+bool ATNConfigSet::add(Ref<ATNConfig> config) {
   return add(config, nullptr);
 }
 
-bool ATNConfigSet::add(ATNConfig::Ref config, PredictionContextMergeCache *mergeCache) {
+bool ATNConfigSet::add(Ref<ATNConfig> config, PredictionContextMergeCache *mergeCache) {
   if (_readonly) {
     throw IllegalStateException("This set is readonly");
   }
@@ -84,7 +85,7 @@ bool ATNConfigSet::add(ATNConfig::Ref config, PredictionContextMergeCache *merge
     dipsIntoOuterContext = true;
   }
   
-  ATNConfig::Ref existing = configLookup->getOrAdd(config);
+  Ref<ATNConfig> existing = configLookup->getOrAdd(config);
   if (existing == config) { // we added this new one
     _cachedHashCode = 0;
     configs.push_back(config); // track order here
@@ -93,7 +94,7 @@ bool ATNConfigSet::add(ATNConfig::Ref config, PredictionContextMergeCache *merge
   }
   // a previous (s,i,pi,_), merge with it and save result
   bool rootIsWildcard = !fullCtx;
-  PredictionContext::Ref merged = PredictionContext::merge(existing->context, config->context, rootIsWildcard, mergeCache);
+  Ref<PredictionContext> merged = PredictionContext::merge(existing->context, config->context, rootIsWildcard, mergeCache);
   // no need to check for existing.context, config.context in cache
   // since only way to create new graphs is "call rule" and here. We
   // cache at both places.
@@ -108,14 +109,14 @@ bool ATNConfigSet::add(ATNConfig::Ref config, PredictionContextMergeCache *merge
   return true;
 }
 
-bool ATNConfigSet::addAll(std::shared_ptr<ATNConfigSet> other) {
+bool ATNConfigSet::addAll(Ref<ATNConfigSet> other) {
   for (auto &c : other->configs) {
     add(c);
   }
   return false;
 }
 
-std::vector<ATNConfig::Ref> ATNConfigSet::elements() {
+std::vector<Ref<ATNConfig>> ATNConfigSet::elements() {
   return configs;
 }
 
@@ -144,8 +145,8 @@ BitSet ATNConfigSet::getAlts() {
   return alts;
 }
 
-std::vector<SemanticContext::Ref> ATNConfigSet::getPredicates() {
-  std::vector<SemanticContext::Ref> preds;
+std::vector<Ref<SemanticContext>> ATNConfigSet::getPredicates() {
+  std::vector<Ref<SemanticContext>> preds;
   for (auto c : configs) {
     if (c->semanticContext != SemanticContext::NONE) {
       preds.push_back(c->semanticContext);
@@ -154,7 +155,7 @@ std::vector<SemanticContext::Ref> ATNConfigSet::getPredicates() {
   return preds;
 }
 
-ATNConfig::Ref ATNConfigSet::get(size_t i) const {
+Ref<ATNConfig> ATNConfigSet::get(size_t i) const {
   return configs[i];
 }
 
@@ -202,13 +203,13 @@ bool ATNConfigSet::operator == (const ATNConfigSet &other) {
 size_t ATNConfigSet::hashCode() {
   if (isReadonly()) {
     if (_cachedHashCode == 0) {
-      _cachedHashCode = std::hash<std::vector<ATNConfig::Ref>>()(configs);
+      _cachedHashCode = std::hash<std::vector<Ref<ATNConfig>>>()(configs);
     }
 
     return _cachedHashCode;
   }
 
-  return std::hash<std::vector<ATNConfig::Ref>>()(configs);
+  return std::hash<std::vector<Ref<ATNConfig>>>()(configs);
 }
 
 size_t ATNConfigSet::size() {
@@ -219,7 +220,7 @@ bool ATNConfigSet::isEmpty() {
   return configs.empty();
 }
 
-bool ATNConfigSet::contains(ATNConfig::Ref o) {
+bool ATNConfigSet::contains(Ref<ATNConfig> o) {
   if (configLookup == nullptr) {
     throw UnsupportedOperationException("This method is not implemented for readonly sets.");
   }
@@ -276,7 +277,7 @@ bool ATNConfigSet::remove(void *o) {
 }
 
 void ATNConfigSet::InitializeInstanceFields() {
-  configLookup = std::shared_ptr<ConfigLookup>(new ConfigLookupImpl<SimpleATNConfigHasher, SimpleATNConfigComparer>());
+  configLookup = Ref<ConfigLookup>(new ConfigLookupImpl<SimpleATNConfigHasher, SimpleATNConfigComparer>());
   uniqueAlt = 0;
   hasSemanticContext = false;
   dipsIntoOuterContext = false;
