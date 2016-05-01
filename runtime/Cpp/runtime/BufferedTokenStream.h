@@ -38,16 +38,18 @@ namespace antlr {
 namespace v4 {
 namespace runtime {
 
-  /// Buffer all input tokens but do on-demand fetching of new tokens from lexer.
-  /// Useful when the parser or lexer has to set context/mode info before proper
-  /// lexing of future tokens. The ST template parser needs this, for example,
-  /// because it has to constantly flip back and forth between inside/output
-  /// templates. E.g., <names:{hi, <it>}> has to parse names as part of an
-  /// expression but "hi, <it>" as a nested template.
-  ///
-  /// You can't use this stream if you pass whitespace or other off-channel tokens
-  /// to the parser. The stream can't ignore off-channel tokens.
-  /// (UnbufferedTokenStream is the same way.) Use CommonTokenStream.
+  /**
+   * This implementation of {@link TokenStream} loads tokens from a
+   * {@link TokenSource} on-demand, and places the tokens in a buffer to provide
+   * access to any previous token by index.
+   *
+   * <p>
+   * This token stream ignores the value of {@link Token#getChannel}. If your
+   * parser requires the token stream filter tokens to only those on a particular
+   * channel, such as {@link Token#DEFAULT_CHANNEL} or
+   * {@link Token#HIDDEN_CHANNEL}, use a filtering token stream such a
+   * {@link CommonTokenStream}.</p>
+   */
   class BufferedTokenStream : public TokenStream {
   public:
     BufferedTokenStream(TokenSource *tokenSource);
@@ -120,30 +122,46 @@ namespace runtime {
     virtual void fill();
 
   protected:
+    /**
+     * The {@link TokenSource} from which tokens for this stream are fetched.
+     */
     TokenSource *_tokenSource;
 
-    /// Record every single token pulled from the source so we can reproduce
-    /// chunks of it later. This list captures everything so we can access
-    /// complete input text.
-    // ml: we own the tokens produced by the token factory.
+    /**
+     * A collection of all tokens fetched from the token source. The list is
+     * considered a complete view of the input once {@link #fetchedEOF} is set
+     * to {@code true}.
+     */
     std::vector<Ref<Token>> _tokens;
 
-    /// <summary>
-    /// The index into <seealso cref="#tokens"/> of the current token (next token to
-    /// consume). <seealso cref="#tokens"/>{@code [}<seealso cref="#p"/>{@code ]} should be
-    /// <seealso cref="#LT LT(1)"/>. <seealso cref="#p"/>{@code =-1} indicates need to initialize
-    /// with first token. The constructor doesn't get a token. First call to
-    /// <seealso cref="#LT LT(1)"/> or whatever gets the first token and sets
-    /// <seealso cref="#p"/>{@code =0;}.
-    /// </summary>
+    /**
+     * The index into {@link #tokens} of the current token (next token to
+     * {@link #consume}). {@link #tokens}{@code [}{@link #p}{@code ]} should be
+     * {@link #LT LT(1)}.
+     *
+     * <p>This field is set to -1 when the stream is first constructed or when
+     * {@link #setTokenSource} is called, indicating that the first token has
+     * not yet been fetched from the token source. For additional information,
+     * see the documentation of {@link IntStream} for a description of
+     * Initializing Methods.</p>
+     */
+    // ml: since -1 requires to make this member signed for just this single aspect we use a member _needSetup instead.
+    //     Use bool isInitialized() to find out if this stream has started reading.
     size_t _p;
 
-    /// <summary>
-    /// Set to {@code true} when the EOF token is fetched. Do not continue fetching
-    /// tokens after that point, or multiple EOF tokens could end up in the
-    /// <seealso cref="#tokens"/> array.
-    /// </summary>
-    /// <seealso cref= #fetch </seealso>
+    /**
+     * Indicates whether the {@link Token#EOF} token has been fetched from
+     * {@link #tokenSource} and added to {@link #tokens}. This field improves
+     * performance for the following cases:
+     *
+     * <ul>
+     * <li>{@link #consume}: The lookahead check in {@link #consume} to prevent
+     * consuming the EOF symbol is optimized by checking the values of
+     * {@link #fetchedEOF} and {@link #p} instead of calling {@link #LA}.</li>
+     * <li>{@link #fetch}: The check to prevent adding multiple EOF symbols into
+     * {@link #tokens} is trivial with this field.</li>
+     * <ul>
+     */
     bool _fetchedEOF;
     
     /// <summary>
@@ -177,17 +195,30 @@ namespace runtime {
     void lazyInit();
     virtual void setup();
 
-    /// Given a starting index, return the index of the next token on channel.
-    /// Return i if tokens[i] is on channel.  Return -1 if there are no tokens
-    /// on channel between i and EOF.
+    /**
+     * Given a starting index, return the index of the next token on channel.
+     * Return {@code i} if {@code tokens[i]} is on channel. Return the index of
+     * the EOF token if there are no tokens on channel between {@code i} and
+     * EOF.
+     */
     virtual ssize_t nextTokenOnChannel(size_t i, int channel);
 
-    /// Given a starting index, return the index of the previous token on channel.
-    /// Return i if tokens[i] is on channel. Return -1 if there are no tokens
-    /// on channel between i and 0.
-    virtual ssize_t previousTokenOnChannel(ssize_t i, int channel) const;
+    /**
+     * Given a starting index, return the index of the previous token on
+     * channel. Return {@code i} if {@code tokens[i]} is on channel. Return -1
+     * if there are no tokens on channel between {@code i} and 0.
+     *
+     * <p>
+     * If {@code i} specifies an index at or after the EOF token, the EOF token
+     * index is returned. This is due to the fact that the EOF token is treated
+     * as though it were on every channel.</p>
+     */
+    virtual ssize_t previousTokenOnChannel(size_t i, int channel);
     
     virtual std::vector<Ref<Token>> filterForChannel(size_t from, size_t to, int channel);
+
+    bool isInitialized() const;
+
   private:
     bool _needSetup;
     void InitializeInstanceFields();

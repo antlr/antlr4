@@ -141,7 +141,7 @@ int ATN::defineDecisionState(DecisionState *s) {
 
 DecisionState *ATN::getDecisionState(int decision) const {
   if (!decisionToState.empty()) {
-    return decisionToState.at((size_t)decision);
+    return decisionToState[(size_t)decision];
   }
   return nullptr;
 }

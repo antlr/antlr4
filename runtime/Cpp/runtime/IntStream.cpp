@@ -33,4 +33,4 @@
 
 using namespace org::antlr::v4::runtime;
 
-const std::wstring IntStream::UNKNOWN_SOURCE_NAME = L"<unknown>";
+const std::string IntStream::UNKNOWN_SOURCE_NAME = "<unknown>";

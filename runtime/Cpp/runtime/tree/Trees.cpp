@@ -34,13 +34,21 @@
 #include "ParserRuleContext.h"
 #include "CPPUtils.h"
 #include "TerminalNodeImpl.h"
+#include "ATN.h"
+#include "Interval.h"
+#include "CommonToken.h"
+#include "Predicate.h"
 
 #include "Trees.h"
 
 using namespace org::antlr::v4::runtime;
+using namespace org::antlr::v4::runtime::misc;
 using namespace org::antlr::v4::runtime::tree;
 
 using namespace antlrcpp;
+
+Trees::Trees() {
+}
 
 std::wstring Trees::toStringTree(Ref<Tree> t) {
   return toStringTree(t, nullptr);
@@ -76,11 +84,15 @@ std::wstring Trees::getNodeText(Ref<Tree> t, Parser *recog) {
 
 std::wstring Trees::getNodeText(Ref<Tree> t, const std::vector<std::wstring> &ruleNames) {
   if (ruleNames.size() > 0) {
-    if (is<RuleNode>(t)) {
-      ssize_t ruleIndex = (std::static_pointer_cast<RuleNode>(t))->getRuleContext()->getRuleIndex();
+    if (is<RuleContext>(t)) {
+      ssize_t ruleIndex = std::static_pointer_cast<RuleContext>(t)->getRuleContext()->getRuleIndex();
       if (ruleIndex < 0)
         return L"Invalid Rule Index";
       std::wstring ruleName = ruleNames[(size_t)ruleIndex];
+      int altNumber = std::static_pointer_cast<RuleContext>(t)->getAltNumber();
+      if (altNumber != atn::ATN::INVALID_ALT_NUMBER) {
+        return ruleName + L":" + std::to_wstring(altNumber);
+      }
       return ruleName;
     } else if (is<ErrorNode>(t)) {
       return t->toString();
@@ -141,6 +153,21 @@ static void _findAllNodes(Ref<ParseTree> t, int index, bool findTokens, std::vec
   }
 }
 
+bool Trees::isAncestorOf(Ref<Tree> t, Ref<Tree> u) {
+  if (t == nullptr || u == nullptr || t->getParent().expired()) {
+    return false;
+  }
+
+  Ref<Tree> p = u->getParent().lock();
+  while (p != nullptr) {
+    if (t == p) {
+      return true;
+    }
+    p = p->getParent().lock();
+  }
+  return false;
+}
+
 std::vector<Ref<ParseTree>> Trees::findAllTokenNodes(Ref<ParseTree> t, int ttype) {
   return findAllNodes(t, ttype, true);
 }
@@ -155,12 +182,12 @@ std::vector<Ref<ParseTree>> Trees::findAllNodes(Ref<ParseTree> t, int index, boo
   return nodes;
 }
 
-std::vector<Ref<ParseTree>> Trees::descendants(Ref<ParseTree> t) {
+std::vector<Ref<ParseTree>> Trees::getDescendants(Ref<ParseTree> t) {
   std::vector<Ref<ParseTree>> nodes;
   nodes.push_back(t);
   std::size_t n = t->getChildCount();
   for (size_t i = 0 ; i < n ; i++) {
-    auto descentants = descendants(t->getChild(i));
+    auto descentants = getDescendants(t->getChild(i));
     for (auto entry: descentants) {
       nodes.push_back(entry);
     }
@@ -168,5 +195,62 @@ std::vector<Ref<ParseTree>> Trees::descendants(Ref<ParseTree> t) {
   return nodes;
 }
 
-Trees::Trees() {
+std::vector<Ref<ParseTree>> Trees::descendants(Ref<ParseTree> t) {
+  return getDescendants(t);
 }
+
+Ref<ParserRuleContext> Trees::getRootOfSubtreeEnclosingRegion(Ref<ParseTree> t, size_t startTokenIndex,
+                                                              size_t stopTokenIndex) {
+  size_t n = t->getChildCount();
+  for (size_t i = 0; i<n; i++) {
+    Ref<ParseTree> child = t->getChild(i);
+    Ref<ParserRuleContext> r = getRootOfSubtreeEnclosingRegion(child, startTokenIndex, stopTokenIndex);
+    if (r != nullptr) {
+      return r;
+    }
+  }
+
+  if (is<ParserRuleContext>(t)) {
+    Ref<ParserRuleContext> r = std::static_pointer_cast<ParserRuleContext>(t);
+    if ((int)startTokenIndex >= r->getStart()->getTokenIndex() && // is range fully contained in t?
+        (r->getStop() == nullptr || (int)stopTokenIndex <= r->getStop()->getTokenIndex())) {
+      // note: r.getStop()==null likely implies that we bailed out of parser and there's nothing to the right
+      return r;
+    }
+  }
+  return nullptr;
+}
+
+void Trees::stripChildrenOutOfRange(Ref<ParserRuleContext> t, Ref<ParserRuleContext> root, size_t startIndex, size_t stopIndex) {
+  if (t == nullptr) {
+    return;
+  }
+
+  for (size_t i = 0; i < t->getChildCount(); ++i) {
+    Ref<ParseTree> child = t->getChild(i);
+    Interval range = child->getSourceInterval();
+    if (is<ParserRuleContext>(child) && (range.b < (int)startIndex || range.a > (int)stopIndex)) {
+      if (isAncestorOf(child, root)) { // replace only if subtree doesn't have displayed root
+        Ref<CommonToken> abbrev = std::make_shared<CommonToken>(Token::INVALID_TYPE, L"...");
+        t->children[i] = std::make_shared<TerminalNodeImpl>(abbrev);
+      }
+    }
+  }
+}
+
+Ref<Tree> Trees::findNodeSuchThat(Ref<Tree> t, Ref<Predicate<Tree>> pred) {
+  if (pred->test(t)) {
+    return t;
+  }
+
+  size_t n = t->getChildCount();
+  for (size_t i = 0 ; i < n ; ++i) {
+    Ref<Tree> u = findNodeSuchThat(t->getChild(i), pred);
+    if (u != nullptr) {
+      return u;
+    }
+  }
+
+  return nullptr;
+}
+

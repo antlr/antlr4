@@ -188,6 +188,10 @@ size_t UnbufferedCharStream::size() {
 }
 
 std::string UnbufferedCharStream::getSourceName() const {
+  if (name.empty()) {
+    return UNKNOWN_SOURCE_NAME;
+  }
+  
   return name;
 }
 

@@ -38,22 +38,60 @@ namespace antlr {
 namespace v4 {
 namespace runtime {
 
+  /**
+   * This default implementation of {@link TokenFactory} creates
+   * {@link CommonToken} objects.
+   */
   class CommonTokenFactory : public TokenFactory<CommonToken> {
   public:
+    /**
+     * The default {@link CommonTokenFactory} instance.
+     *
+     * <p>
+     * This token factory does not explicitly copy token text when constructing
+     * tokens.</p>
+     */
     static const Ref<TokenFactory<CommonToken>> DEFAULT;
 
-    /// <summary>
-    /// Copy text for token out of input char stream. Useful when input
-    ///  stream is unbuffered. </summary>
-    ///  <seealso cref= UnbufferedCharStream </seealso>
   protected:
+    /**
+     * Indicates whether {@link CommonToken#setText} should be called after
+     * constructing tokens to explicitly set the text. This is useful for cases
+     * where the input stream might not be able to provide arbitrary substrings
+     * of text from the input after the lexer creates a token (e.g. the
+     * implementation of {@link CharStream#getText} in
+     * {@link UnbufferedCharStream} throws an
+     * {@link UnsupportedOperationException}). Explicitly setting the token text
+     * allows {@link Token#getText} to be called at any time regardless of the
+     * input stream implementation.
+     *
+     * <p>
+     * The default value is {@code false} to avoid the performance and memory
+     * overhead of copying text for every token unless explicitly requested.</p>
+     */
     const bool copyText;
 
   public:
-    /// Create factory and indicate whether or not the factory copy
-    ///  text out of the char stream.
+    /**
+     * Constructs a {@link CommonTokenFactory} with the specified value for
+     * {@link #copyText}.
+     *
+     * <p>
+     * When {@code copyText} is {@code false}, the {@link #DEFAULT} instance
+     * should be used instead of constructing a new instance.</p>
+     *
+     * @param copyText The value for {@link #copyText}.
+     */
     CommonTokenFactory(bool copyText);
 
+    /**
+     * Constructs a {@link CommonTokenFactory} with {@link #copyText} set to
+     * {@code false}.
+     *
+     * <p>
+     * The {@link #DEFAULT} instance should be used instead of calling this
+     * directly.</p>
+     */
     CommonTokenFactory();
 
     virtual Ref<CommonToken> create(std::pair<TokenSource*, CharStream*> source, int type,

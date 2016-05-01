@@ -34,6 +34,7 @@
 #include "DFA.h"
 #include "EmptyPredictionContext.h"
 #include "Exceptions.h"
+#include "VocabularyImpl.h"
 
 #include "LexerInterpreter.h"
 
@@ -42,11 +43,21 @@ using namespace org::antlr::v4::runtime;
 LexerInterpreter::LexerInterpreter(const std::wstring &grammarFileName, const std::vector<std::wstring> &tokenNames,
   const std::vector<std::wstring> &ruleNames, const std::vector<std::wstring> &modeNames, const atn::ATN &atn,
   CharStream *input)
-  : Lexer(input), grammarFileName(grammarFileName), _tokenNames(tokenNames), _ruleNames(ruleNames), _modeNames(modeNames),
-    _atn(atn) {
+: LexerInterpreter(grammarFileName, dfa::VocabularyImpl::fromTokenNames(tokenNames), ruleNames, modeNames, atn, input) {
+}
+
+LexerInterpreter::LexerInterpreter(const std::wstring &grammarFileName, Ref<dfa::Vocabulary> vocabulary,
+  const std::vector<std::wstring> &ruleNames, const std::vector<std::wstring> &modeNames, const atn::ATN &atn,
+  CharStream *input)
+  : Lexer(input), _grammarFileName(grammarFileName), _atn(atn), _ruleNames(ruleNames), _modeNames(modeNames),
+                  _vocabulary(vocabulary) {
 
   if (_atn.grammarType != atn::ATNType::LEXER) {
     throw IllegalArgumentException("The ATN must be a lexer ATN.");
+  }
+
+  for (size_t i = 0; i < atn.maxTokenType; i++) {
+    _tokenNames.push_back(vocabulary->getDisplayName(i));
   }
 
   _sharedContextCache = std::make_shared<atn::PredictionContextCache>();
@@ -66,7 +77,7 @@ const atn::ATN& LexerInterpreter::getATN() const {
 }
 
 std::wstring LexerInterpreter::getGrammarFileName() const {
-  return grammarFileName;
+  return _grammarFileName;
 }
 
 const std::vector<std::wstring>& LexerInterpreter::getTokenNames() const {
@@ -79,4 +90,12 @@ const std::vector<std::wstring>& LexerInterpreter::getRuleNames() const {
 
 const std::vector<std::wstring>& LexerInterpreter::getModeNames() const {
   return _modeNames;
+}
+
+Ref<dfa::Vocabulary> LexerInterpreter::getVocabulary() const {
+  if (_vocabulary != nullptr) {
+    return _vocabulary;
+  }
+
+  return Lexer::getVocabulary();
 }

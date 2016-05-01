@@ -53,17 +53,19 @@ namespace tree {
       return tree->accept(this);
     }
 
-    /// <summary>
-    /// {@inheritDoc}
-    /// <p/>
-    /// The default implementation initializes the aggregate result to
-    /// <seealso cref="#defaultResult defaultResult()"/>. Before visiting each child, it
-    /// calls <seealso cref="#shouldVisitNextChild shouldVisitNextChild"/>; if the result
-    /// is {@code false} no more children are visited and the current aggregate
-    /// result is returned. After visiting a child, the aggregate result is
-    /// updated by calling <seealso cref="#aggregateResult aggregateResult"/> with the
-    /// previous aggregate result and the result of visiting the child.
-    /// </summary>
+    /**
+     * <p>The default implementation initializes the aggregate result to
+     * {@link #defaultResult defaultResult()}. Before visiting each child, it
+     * calls {@link #shouldVisitNextChild shouldVisitNextChild}; if the result
+     * is {@code false} no more children are visited and the current aggregate
+     * result is returned. After visiting a child, the aggregate result is
+     * updated by calling {@link #aggregateResult aggregateResult} with the
+     * previous aggregate result and the result of visiting the child.</p>
+     *
+     * <p>The default implementation is not safe for use in visitors that modify
+     * the tree structure. Visitors that modify the tree should override this
+     * method to behave properly in respect to the specific algorithm in use.</p>
+     */
     virtual T* visitChildren(RuleNode *node) override {
       T* result = defaultResult();
       size_t n = node->getChildCount();

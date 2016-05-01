@@ -29,9 +29,10 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <algorithm>
 #include "Exceptions.h"
 #include "Interval.h"
+#include "IntStream.h"
+
 #include "Arrays.h"
 #include "CPPUtils.h"
 
@@ -139,8 +140,9 @@ void ANTLRInputStream::seek(size_t index) {
     p = index; // just jump; don't update stream state (line, ...)
     return;
   }
-  // seek forward, consume until p hits index
-  while (p < index && index < data.size()) {
+  // seek forward, consume until p hits index or n (whichever comes first)
+  index = std::min(index, data.size());
+  while (p < index) {
     consume();
   }
 }
@@ -162,6 +164,9 @@ std::wstring ANTLRInputStream::getText(const Interval &interval) {
 }
 
 std::string ANTLRInputStream::getSourceName() const {
+  if (name.empty()) {
+    return IntStream::UNKNOWN_SOURCE_NAME;
+  }
   return name;
 }
 

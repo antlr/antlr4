@@ -39,32 +39,32 @@ namespace antlr {
 namespace v4 {
 namespace runtime {
 
-  /// <summary>
-  /// This is the default error handling mechanism for ANTLR parsers
-  ///  and tree parsers.
-  /// </summary>
+  /**
+   * This is the default implementation of {@link ANTLRErrorStrategy} used for
+   * error reporting and recovery in ANTLR parsers.
+   */
   class DefaultErrorStrategy : public ANTLRErrorStrategy {
   public:
     DefaultErrorStrategy() {
       InitializeInstanceFields();
     }
 
-    /// <summary>
-    /// This is true after we see an error and before having successfully
-    ///  matched a token. Prevents generation of more than one error message
-    ///  per error.
-    /// </summary>
-    /// <seealso cref= #inErrorRecoveryMode </seealso>
   protected:
+    /**
+     * Indicates whether the error strategy is currently "recovering from an
+     * error". This is used to suppress reporting multiple error messages while
+     * attempting to recover from a detected syntax error.
+     *
+     * @see #inErrorRecoveryMode
+     */
     bool errorRecoveryMode;
 
-    /// <summary>
-    /// The index into the input stream where the last error occurred.
-    /// 	This is used to prevent infinite loops where an error is found
-    ///  but no token is consumed during recovery...another error is found,
-    ///  ad nauseum.  This is a failsafe mechanism to guarantee that at least
-    ///  one token/tree node is consumed for two errors.
-    /// </summary>
+    /** The index into the input stream where the last error occurred.
+     * 	This is used to prevent infinite loops where an error is found
+     *  but no token is consumed during recovery...another error is found,
+     *  ad nauseum.  This is a failsafe mechanism to guarantee that at least
+     *  one token/tree node is consumed for two errors.
+     */
     int lastErrorIndex;
 
     misc::IntervalSet lastErrorStates;
@@ -138,52 +138,52 @@ namespace runtime {
     /// </summary>
     virtual void recover(Parser *recognizer, const RecognitionException &e) override;
 
-    /// <summary>
-    /// The default implementation of <seealso cref="ANTLRErrorStrategy#sync"/> makes sure
-    /// that the current lookahead symbol is consistent with what were expecting
-    /// at this point in the ATN. You can call this anytime but ANTLR only
-    /// generates code to check before subrules/loops and each iteration.
-    /// <p/>
-    /// Implements Jim Idle's magic sync mechanism in closures and optional
-    /// subrules. E.g.,
-    ///
-    /// <pre>
-    /// a : sync ( stuff sync )* ;
-    /// sync : {consume to what can follow sync} ;
-    /// </pre>
-    ///
-    /// At the start of a sub rule upon error, <seealso cref="#sync"/> performs single
-    /// token deletion, if possible. If it can't do that, it bails on the current
-    /// rule and uses the default error recovery, which consumes until the
-    /// resynchronization set of the current rule.
-    /// <p/>
-    /// If the sub rule is optional ({@code (...)?}, {@code (...)*}, or block
-    /// with an empty alternative), then the expected set includes what follows
-    /// the subrule.
-    /// <p/>
-    /// During loop iteration, it consumes until it sees a token that can start a
-    /// sub rule or what follows loop. Yes, that is pretty aggressive. We opt to
-    /// stay in the loop as long as possible.
-    /// <p/>
-    /// <strong>ORIGINS</strong>
-    /// <p/>
-    /// Previous versions of ANTLR did a poor job of their recovery within loops.
-    /// A single mismatch token or missing token would force the parser to bail
-    /// out of the entire rules surrounding the loop. So, for rule
-    ///
-    /// <pre>
-    /// classDef : 'class' ID '{' member* '}'
-    /// </pre>
-    ///
-    /// input with an extra token between members would force the parser to
-    /// consume until it found the next class definition rather than the next
-    /// member definition of the current class.
-    /// <p/>
-    /// This functionality cost a little bit of effort because the parser has to
-    /// compare token set at the start of the loop and at each iteration. If for
-    /// some reason speed is suffering for you, you can turn off this
-    /// functionality by simply overriding this method as a blank { }.
-    /// </summary>
+    /**
+     * The default implementation of {@link ANTLRErrorStrategy#sync} makes sure
+     * that the current lookahead symbol is consistent with what were expecting
+     * at this point in the ATN. You can call this anytime but ANTLR only
+     * generates code to check before subrules/loops and each iteration.
+     *
+     * <p>Implements Jim Idle's magic sync mechanism in closures and optional
+     * subrules. E.g.,</p>
+     *
+     * <pre>
+     * a : sync ( stuff sync )* ;
+     * sync : {consume to what can follow sync} ;
+     * </pre>
+     *
+     * At the start of a sub rule upon error, {@link #sync} performs single
+     * token deletion, if possible. If it can't do that, it bails on the current
+     * rule and uses the default error recovery, which consumes until the
+     * resynchronization set of the current rule.
+     *
+     * <p>If the sub rule is optional ({@code (...)?}, {@code (...)*}, or block
+     * with an empty alternative), then the expected set includes what follows
+     * the subrule.</p>
+     *
+     * <p>During loop iteration, it consumes until it sees a token that can start a
+     * sub rule or what follows loop. Yes, that is pretty aggressive. We opt to
+     * stay in the loop as long as possible.</p>
+     *
+     * <p><strong>ORIGINS</strong></p>
+     *
+     * <p>Previous versions of ANTLR did a poor job of their recovery within loops.
+     * A single mismatch token or missing token would force the parser to bail
+     * out of the entire rules surrounding the loop. So, for rule</p>
+     *
+     * <pre>
+     * classDef : 'class' ID '{' member* '}'
+     * </pre>
+     *
+     * input with an extra token between members would force the parser to
+     * consume until it found the next class definition rather than the next
+     * member definition of the current class.
+     *
+     * <p>This functionality cost a little bit of effort because the parser has to
+     * compare token set at the start of the loop and at each iteration. If for
+     * some reason speed is suffering for you, you can turn off this
+     * functionality by simply overriding this method as a blank { }.</p>
+     */
     virtual void sync(Parser *recognizer) override;
 
     /// <summary>
@@ -217,94 +217,96 @@ namespace runtime {
     /// <param name="e"> the recognition exception </param>
     virtual void reportFailedPredicate(Parser *recognizer, const FailedPredicateException &e);
 
-    /// <summary>
-    /// This method is called to report a syntax error which requires the removal
-    /// of a token from the input stream. At the time this method is called, the
-    /// erroneous symbol is current {@code LT(1)} symbol and has not yet been
-    /// removed from the input stream. When this method returns,
-    /// {@code recognizer} is in error recovery mode.
-    /// <p/>
-    /// This method is called when <seealso cref="#singleTokenDeletion"/> identifies
-    /// single-token deletion as a viable recovery strategy for a mismatched
-    /// input error.
-    /// <p/>
-    /// The default implementation simply returns if the handler is already in
-    /// error recovery mode. Otherwise, it calls <seealso cref="#beginErrorCondition"/> to
-    /// enter error recovery mode, followed by calling
-    /// <seealso cref="Parser#notifyErrorListeners"/>.
-    /// </summary>
-    /// <param name="recognizer"> the parser instance </param>
+    /**
+     * This method is called to report a syntax error which requires the removal
+     * of a token from the input stream. At the time this method is called, the
+     * erroneous symbol is current {@code LT(1)} symbol and has not yet been
+     * removed from the input stream. When this method returns,
+     * {@code recognizer} is in error recovery mode.
+     *
+     * <p>This method is called when {@link #singleTokenDeletion} identifies
+     * single-token deletion as a viable recovery strategy for a mismatched
+     * input error.</p>
+     *
+     * <p>The default implementation simply returns if the handler is already in
+     * error recovery mode. Otherwise, it calls {@link #beginErrorCondition} to
+     * enter error recovery mode, followed by calling
+     * {@link Parser#notifyErrorListeners}.</p>
+     *
+     * @param recognizer the parser instance
+     */
     virtual void reportUnwantedToken(Parser *recognizer);
 
-    /// <summary>
-    /// This method is called to report a syntax error which requires the
-    /// insertion of a missing token into the input stream. At the time this
-    /// method is called, the missing token has not yet been inserted. When this
-    /// method returns, {@code recognizer} is in error recovery mode.
-    /// <p/>
-    /// This method is called when <seealso cref="#singleTokenInsertion"/> identifies
-    /// single-token insertion as a viable recovery strategy for a mismatched
-    /// input error.
-    /// <p/>
-    /// The default implementation simply returns if the handler is already in
-    /// error recovery mode. Otherwise, it calls <seealso cref="#beginErrorCondition"/> to
-    /// enter error recovery mode, followed by calling
-    /// <seealso cref="Parser#notifyErrorListeners"/>.
-    /// </summary>
-    /// <param name="recognizer"> the parser instance </param>
+    /**
+     * This method is called to report a syntax error which requires the
+     * insertion of a missing token into the input stream. At the time this
+     * method is called, the missing token has not yet been inserted. When this
+     * method returns, {@code recognizer} is in error recovery mode.
+     *
+     * <p>This method is called when {@link #singleTokenInsertion} identifies
+     * single-token insertion as a viable recovery strategy for a mismatched
+     * input error.</p>
+     *
+     * <p>The default implementation simply returns if the handler is already in
+     * error recovery mode. Otherwise, it calls {@link #beginErrorCondition} to
+     * enter error recovery mode, followed by calling
+     * {@link Parser#notifyErrorListeners}.</p>
+     *
+     * @param recognizer the parser instance
+     */
     virtual void reportMissingToken(Parser *recognizer);
 
-    /// <summary>
-    /// {@inheritDoc}
-    /// <p/>
-    /// The default implementation attempts to recover from the mismatched input
-    /// by using single token insertion and deletion as described below. If the
-    /// recovery attempt fails, this method throws an
-    /// <seealso cref="InputMismatchException"/>.
-    /// <p/>
-    /// <strong>EXTRA TOKEN</strong> (single token deletion)
-    /// <p/>
-    /// {@code LA(1)} is not what we are looking for. If {@code LA(2)} has the
-    /// right token, however, then assume {@code LA(1)} is some extra spurious
-    /// token and delete it. Then consume and return the next token (which was
-    /// the {@code LA(2)} token) as the successful result of the match operation.
-    /// <p/>
-    /// This recovery strategy is implemented by <seealso cref="#singleTokenDeletion"/>.
-    /// <p/>
-    /// <strong>MISSING TOKEN</strong> (single token insertion)
-    /// <p/>
-    /// If current token (at {@code LA(1)}) is consistent with what could come
-    /// after the expected {@code LA(1)} token, then assume the token is missing
-    /// and use the parser's <seealso cref="TokenFactory"/> to create it on the fly. The
-    /// "insertion" is performed by returning the created token as the successful
-    /// result of the match operation.
-    /// <p/>
-    /// This recovery strategy is implemented by <seealso cref="#singleTokenInsertion"/>.
-    /// <p/>
-    /// <strong>EXAMPLE</strong>
-    /// <p/>
-    /// For example, Input {@code i=(3;} is clearly missing the {@code ')'}. When
-    /// the parser returns from the nested call to {@code expr}, it will have
-    /// call chain:
-    ///
-    /// <pre>
-    /// stat -> expr -> atom
-    /// </pre>
-    ///
-    /// and it will be trying to match the {@code ')'} at this point in the
-    /// derivation:
-    ///
-    /// <pre>
-    /// => ID '=' '(' INT ')' ('+' atom)* ';'
-    ///                    ^
-    /// </pre>
-    ///
-    /// The attempt to match {@code ')'} will fail when it sees {@code ';'} and
-    /// call <seealso cref="#recoverInline"/>. To recover, it sees that {@code LA(1)==';'}
-    /// is in the set of tokens that can follow the {@code ')'} token reference
-    /// in rule {@code atom}. It can assume that you forgot the {@code ')'}.
-    /// </summary>
   public:
+    /**
+     * {@inheritDoc}
+     *
+     * <p>The default implementation attempts to recover from the mismatched input
+     * by using single token insertion and deletion as described below. If the
+     * recovery attempt fails, this method throws an
+     * {@link InputMismatchException}.</p>
+     *
+     * <p><strong>EXTRA TOKEN</strong> (single token deletion)</p>
+     *
+     * <p>{@code LA(1)} is not what we are looking for. If {@code LA(2)} has the
+     * right token, however, then assume {@code LA(1)} is some extra spurious
+     * token and delete it. Then consume and return the next token (which was
+     * the {@code LA(2)} token) as the successful result of the match operation.</p>
+     *
+     * <p>This recovery strategy is implemented by {@link #singleTokenDeletion}.</p>
+     *
+     * <p><strong>MISSING TOKEN</strong> (single token insertion)</p>
+     *
+     * <p>If current token (at {@code LA(1)}) is consistent with what could come
+     * after the expected {@code LA(1)} token, then assume the token is missing
+     * and use the parser's {@link TokenFactory} to create it on the fly. The
+     * "insertion" is performed by returning the created token as the successful
+     * result of the match operation.</p>
+     *
+     * <p>This recovery strategy is implemented by {@link #singleTokenInsertion}.</p>
+     *
+     * <p><strong>EXAMPLE</strong></p>
+     *
+     * <p>For example, Input {@code i=(3;} is clearly missing the {@code ')'}. When
+     * the parser returns from the nested call to {@code expr}, it will have
+     * call chain:</p>
+     *
+     * <pre>
+     * stat &rarr; expr &rarr; atom
+     * </pre>
+     *
+     * and it will be trying to match the {@code ')'} at this point in the
+     * derivation:
+     *
+     * <pre>
+     * =&gt; ID '=' '(' INT ')' ('+' atom)* ';'
+     *                    ^
+     * </pre>
+     *
+     * The attempt to match {@code ')'} will fail when it sees {@code ';'} and
+     * call {@link #recoverInline}. To recover, it sees that {@code LA(1)==';'}
+     * is in the set of tokens that can follow the {@code ')'} token reference
+     * in rule {@code atom}. It can assume that you forgot the {@code ')'}.
+     */
     virtual Ref<Token> recoverInline(Parser *recognizer) override;
 
     /// <summary>

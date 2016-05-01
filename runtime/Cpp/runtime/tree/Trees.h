@@ -68,12 +68,52 @@ namespace tree {
     /// Return a list of all ancestors of this node.  The first node of
     ///  list is the root and the last is the parent of this node.
     static std::vector<std::weak_ptr<Tree>> getAncestors(Ref<Tree> t);
+
+    /** Return true if t is u's parent or a node on path to root from u.
+     *  Use == not equals().
+     *
+     *  @since 4.5.1
+     */
+    static bool isAncestorOf(Ref<Tree> t, Ref<Tree> u);    
     static std::vector<Ref<ParseTree>> findAllTokenNodes(Ref<ParseTree> t, int ttype);
     static std::vector<Ref<ParseTree>> findAllRuleNodes(Ref<ParseTree> t, int ruleIndex);
     static std::vector<Ref<ParseTree>> findAllNodes(Ref<ParseTree> t, int index, bool findTokens);
 
-    static std::vector<Ref<ParseTree>> descendants(Ref<ParseTree> t);
+    /** Get all descendents; includes t itself.
+     *
+     * @since 4.5.1
+     */
+    static std::vector<Ref<ParseTree>> getDescendants(Ref<ParseTree> t);
 
+    /** @deprecated */
+    static std::vector<Ref<ParseTree>> descendants(Ref<ParseTree> t);
+    
+    /** Find smallest subtree of t enclosing range startTokenIndex..stopTokenIndex
+     *  inclusively using postorder traversal.  Recursive depth-first-search.
+     *
+     *  @since 4.5.1
+     */
+    static Ref<ParserRuleContext> getRootOfSubtreeEnclosingRegion(Ref<ParseTree> t,
+                                                                  size_t startTokenIndex, // inclusive
+                                                                  size_t stopTokenIndex); // inclusive
+   
+    /** Replace any subtree siblings of root that are completely to left
+     *  or right of lookahead range with a CommonToken(Token.INVALID_TYPE,"...")
+     *  node. The source interval for t is not altered to suit smaller range!
+     *
+     *  WARNING: destructive to t.
+     *
+     *  @since 4.5.1
+     */
+    static void stripChildrenOutOfRange(Ref<ParserRuleContext> t, Ref<ParserRuleContext> root, size_t startIndex,
+                                        size_t stopIndex);
+    
+    /** Return first node satisfying the pred
+     *
+     *  @since 4.5.1
+     */
+    static Ref<Tree> findNodeSuchThat(Ref<Tree> t, Ref<misc::Predicate<Tree>> pred);
+    
   private:
     Trees();
   };

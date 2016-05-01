@@ -65,20 +65,24 @@ namespace runtime {
 
     virtual void reset(Parser *recognizer) = 0;
 
-    /// <summary>
-    /// This method is called when an unexpected symbol is encountered during an
-    /// inline match operation, such as <seealso cref="Parser#match"/>. If the error
-    /// strategy successfully recovers from the match failure, this method
-    /// returns the <seealso cref="Token"/> instance which should be treated as the
-    /// successful result of the match.
-    /// <p/>
-    /// Note that the calling code will not report an error if this method
-    /// returns successfully. The error strategy implementation is responsible
-    /// for calling <seealso cref="Parser#notifyErrorListeners"/> as appropriate.
-    /// </summary>
-    /// <param name="recognizer"> the parser instance </param>
-    /// <exception cref="RecognitionException"> if the error strategy was not able to
-    /// recover from the unexpected input symbol </exception>
+    /**
+     * This method is called when an unexpected symbol is encountered during an
+     * inline match operation, such as {@link Parser#match}. If the error
+     * strategy successfully recovers from the match failure, this method
+     * returns the {@link Token} instance which should be treated as the
+     * successful result of the match.
+     *
+     * <p>This method handles the consumption of any tokens - the caller should
+     * <b>not</b> call {@link Parser#consume} after a successful recovery.</p>
+     *
+     * <p>Note that the calling code will not report an error if this method
+     * returns successfully. The error strategy implementation is responsible
+     * for calling {@link Parser#notifyErrorListeners} as appropriate.</p>
+     *
+     * @param recognizer the parser instance
+     * @throws RecognitionException if the error strategy was not able to
+     * recover from the unexpected input symbol
+     */
     virtual Ref<Token> recoverInline(Parser *recognizer) = 0;
 
     /// <summary>

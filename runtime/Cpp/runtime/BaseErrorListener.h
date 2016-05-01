@@ -42,6 +42,11 @@ namespace antlr {
 namespace v4 {
 namespace runtime {
 
+  /**
+   * Provides an empty default implementation of {@link ANTLRErrorListener}. The
+   * default implementation of each method does nothing, but can be overridden as
+   * necessary.
+   */
   class BaseErrorListener : public ANTLRErrorListener {
 
     virtual void syntaxError(IRecognizer *recognizer, Ref<Token> offendingSymbol, size_t line, int charPositionInLine,

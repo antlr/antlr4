@@ -75,7 +75,22 @@ size_t BufferedTokenStream::size() {
 }
 
 void BufferedTokenStream::consume() {
-  if (LA(1) == EOF) {
+  bool skipEofCheck = false;
+  if (!_needSetup) {
+    if (_fetchedEOF) {
+      // the last token in tokens is EOF. skip check if p indexes any
+      // fetched token except the last.
+      skipEofCheck = _p < _tokens.size() - 1;
+    } else {
+      // no EOF token in tokens. skip check if p indexes a fetched token.
+      skipEofCheck = _p < _tokens.size();
+    }
+  } else {
+    // not yet initialized
+    skipEofCheck = false;
+  }
+
+  if (!skipEofCheck && LA(1) == EOF) {
     throw IllegalStateException("cannot consume EOF");
   }
 
@@ -246,13 +261,13 @@ std::vector<Ref<Token>> BufferedTokenStream::getTokens(int start, int stop, int 
 ssize_t BufferedTokenStream::nextTokenOnChannel(size_t i, int channel) {
   sync(i);
   if (i >= size()) {
-    return -1;
+    return size() - 1;
   }
 
   Ref<Token> token = _tokens[i];
   while (token->getChannel() != channel) {
     if (token->getType() == EOF) {
-      return -1;
+      return i;
     }
     i++;
     sync(i);
@@ -261,15 +276,24 @@ ssize_t BufferedTokenStream::nextTokenOnChannel(size_t i, int channel) {
   return i;
 }
 
-ssize_t BufferedTokenStream::previousTokenOnChannel(ssize_t i, int channel) const {
-  do {
-    if (_tokens[(size_t)i]->getChannel() == channel)
+ssize_t BufferedTokenStream::previousTokenOnChannel(size_t i, int channel) {
+  sync(i);
+  if (i >= size()) {
+    // the EOF token is on every channel
+    return size() - 1;
+  }
+
+  while (true) {
+    Ref<Token> token = _tokens[i];
+    if (token->getType() == EOF || token->getChannel() == channel) {
       return i;
+    }
+
     if (i == 0)
-      return -1;
+      return i;
     i--;
-  } while (true);
-  return -1;
+  }
+  return i;
 }
 
 std::vector<Ref<Token>> BufferedTokenStream::getHiddenTokensToRight(size_t tokenIndex, int channel) {
@@ -301,7 +325,12 @@ std::vector<Ref<Token>> BufferedTokenStream::getHiddenTokensToLeft(size_t tokenI
     throw IndexOutOfBoundsException(std::to_string(tokenIndex) + " not in 0.." + std::to_string(_tokens.size() - 1));
   }
 
-  ssize_t prevOnChannel = previousTokenOnChannel((ssize_t)tokenIndex - 1, Lexer::DEFAULT_TOKEN_CHANNEL);
+  if (tokenIndex == 0) {
+    // Obviously no tokens can appear before the first token.
+    return { };
+  }
+
+  ssize_t prevOnChannel = previousTokenOnChannel(tokenIndex - 1, Lexer::DEFAULT_TOKEN_CHANNEL);
   if (prevOnChannel == (ssize_t)tokenIndex - 1) {
     return { };
   }
@@ -332,6 +361,10 @@ std::vector<Ref<Token>> BufferedTokenStream::filterForChannel(size_t from, size_
   }
 
   return hidden;
+}
+
+bool BufferedTokenStream::isInitialized() const {
+  return !_needSetup;
 }
 
 /**

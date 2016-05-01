@@ -269,12 +269,16 @@ std::wstring TokenStreamRewriter::getText() {
   return getText(DEFAULT_PROGRAM_NAME, Interval(0, (int)tokens->size() - 1));
 }
 
+std::wstring TokenStreamRewriter::getText(std::wstring programName) {
+  return getText(programName, Interval(0, (int)tokens->size() - 1));
+}
+
 std::wstring TokenStreamRewriter::getText(const Interval &interval) {
   return getText(DEFAULT_PROGRAM_NAME, interval);
 }
 
 std::wstring TokenStreamRewriter::getText(const std::wstring &programName, const Interval &interval) {
-  std::vector<TokenStreamRewriter::RewriteOperation*> rewrites = _programs.at(programName);
+  std::vector<TokenStreamRewriter::RewriteOperation*> rewrites = _programs[programName];
   int start = interval.a;
   int stop = interval.b;
 

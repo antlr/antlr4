@@ -70,7 +70,6 @@ CommonToken::CommonToken(int type, const std::wstring &text) {
 
 CommonToken::CommonToken(Token *oldToken) {
   InitializeInstanceFields();
-  _text = oldToken->getText();
   _type = oldToken->getType();
   _line = oldToken->getLine();
   _index = oldToken->getTokenIndex();
@@ -79,9 +78,11 @@ CommonToken::CommonToken(Token *oldToken) {
   _start = oldToken->getStartIndex();
   _stop = oldToken->getStopIndex();
 
-  if (is<CommonToken*>(oldToken)) {
-    _source = (static_cast<CommonToken*>(oldToken))->_source;
+  if (is<CommonToken *>(oldToken)) {
+    _text = (static_cast<CommonToken *>(oldToken))->_text;
+    _source = (static_cast<CommonToken *>(oldToken))->_source;
   } else {
+    _text = oldToken->getText();
     _source = { oldToken->getTokenSource(), oldToken->getInputStream() };
   }
 }
@@ -179,4 +180,5 @@ void CommonToken::InitializeInstanceFields() {
   _index = -1;
   _start = 0;
   _stop = 0;
+  _source = EMPTY_SOURCE;
 }

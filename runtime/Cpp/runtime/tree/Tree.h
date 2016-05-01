@@ -78,6 +78,8 @@ namespace tree {
 
     virtual std::wstring toString() = 0;
 
+    virtual bool operator == (const Tree &other) const;
+    
   protected:
     virtual std::weak_ptr<Tree> getParentReference() = 0;
     virtual Ref<Tree> getChildReference(size_t i) = 0;

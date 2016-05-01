@@ -31,7 +31,7 @@
 
 #pragma once
 
-#include "Token.h"
+#include "Exceptions.h"
 
 namespace org {
 namespace antlr {
@@ -99,9 +99,14 @@ namespace pattern {
   /// </summary>
   class ParseTreePatternMatcher {
   public:
-    class CannotInvokeStartRule : public std::exception {
+    class CannotInvokeStartRule : public RuntimeException {
     public:
-      CannotInvokeStartRule(std::exception e);
+      CannotInvokeStartRule(const RuntimeException &e);
+    };
+
+    // Fixes https://github.com/antlr/antlr4/issues/413
+    // "Tree pattern compilation doesn't check for a complete parse"
+    class StartRuleDoesNotConsumeFullPattern : public RuntimeException {
     };
 
     /// Constructs a <seealso cref="ParseTreePatternMatcher"/> or from a <seealso cref="Lexer"/> and

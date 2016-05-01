@@ -36,68 +36,82 @@ namespace antlr {
 namespace v4 {
 namespace runtime {
 
-  /// <summary>
-  /// Useful for rewriting out a buffered input token stream after doing some
-  ///  augmentation or other manipulations on it.
-  ///
-  ///  You can insert stuff, replace, and delete chunks.  Note that the
-  ///  operations are done lazily--only if you convert the buffer to a
-  ///  String with getText(). This is very efficient because you are not moving
-  ///  data around all the time.  As the buffer of tokens is converted to strings,
-  ///  the getText() method(s) scan the input token stream and check
-  ///  to see if there is an operation at the current index.
-  ///  If so, the operation is done and then normal String
-  ///  rendering continues on the buffer.  This is like having multiple Turing
-  ///  machine instruction streams (programs) operating on a single input tape. :)
-  ///
-  ///  This rewriter makes no modifications to the token stream. It does not
-  ///  ask the stream to fill itself up nor does it advance the input cursor.
-  ///  The token stream index() will return the same value before and after
-  ///  any getText() call.
-  ///
-  ///  The rewriter only works on tokens that you have in the buffer and
-  ///  ignores the current input cursor. If you are buffering tokens on-demand,
-  ///  calling getText() halfway through the input will only do rewrites
-  ///  for those tokens in the first half of the file.
-  ///
-  ///  Since the operations are done lazily at getText-time, operations do not
-  ///  screw up the token index values.  That is, an insert operation at token
-  ///  index i does not change the index values for tokens i+1..n-1.
-  ///
-  ///  Because operations never actually alter the buffer, you may always get
-  ///  the original token stream back without undoing anything.  Since
-  ///  the instructions are queued up, you can easily simulate transactions and
-  ///  roll back any changes if there is an error just by removing instructions.
-  ///  For example,
-  ///
-  ///   CharStream input = new ANTLRFileStream("input");
-  ///   TLexer lex = new TLexer(input);
-  ///   CommonTokenStream tokens = new CommonTokenStream(lex);
-  ///   T parser = new T(tokens);
-  ///   TokenStreamRewriter rewriter = new TokenStreamRewriter(tokens);
-  ///   parser.startRule();
-  ///
-  ///    Then in the rules, you can execute (assuming rewriter is visible):
-  ///      Token t,u;
-  ///      ...
-  ///      rewriter.insertAfter(t, "text to put after t");}
-  ///       rewriter.insertAfter(u, "text after u");}
-  ///       System.out.println(tokens.toString());
-  ///
-  ///  You can also have multiple "instruction streams" and get multiple
-  ///  rewrites from a single pass over the input.  Just name the instruction
-  ///  streams and use that name again when printing the buffer.  This could be
-  ///  useful for generating a C file and also its header file--all from the
-  ///  same buffer:
-  ///
-  ///      tokens.insertAfter("pass1", t, "text to put after t");}
-  ///       tokens.insertAfter("pass2", u, "text after u");}
-  ///       System.out.println(tokens.toString("pass1"));
-  ///       System.out.println(tokens.toString("pass2"));
-  ///
-  ///  If you don't use named rewrite streams, a "default" stream is used as
-  ///  the first example shows.
-  /// </summary>
+  /**
+   * Useful for rewriting out a buffered input token stream after doing some
+   * augmentation or other manipulations on it.
+   *
+   * <p>
+   * You can insert stuff, replace, and delete chunks. Note that the operations
+   * are done lazily--only if you convert the buffer to a {@link String} with
+   * {@link TokenStream#getText()}. This is very efficient because you are not
+   * moving data around all the time. As the buffer of tokens is converted to
+   * strings, the {@link #getText()} method(s) scan the input token stream and
+   * check to see if there is an operation at the current index. If so, the
+   * operation is done and then normal {@link String} rendering continues on the
+   * buffer. This is like having multiple Turing machine instruction streams
+   * (programs) operating on a single input tape. :)</p>
+   *
+   * <p>
+   * This rewriter makes no modifications to the token stream. It does not ask the
+   * stream to fill itself up nor does it advance the input cursor. The token
+   * stream {@link TokenStream#index()} will return the same value before and
+   * after any {@link #getText()} call.</p>
+   *
+   * <p>
+   * The rewriter only works on tokens that you have in the buffer and ignores the
+   * current input cursor. If you are buffering tokens on-demand, calling
+   * {@link #getText()} halfway through the input will only do rewrites for those
+   * tokens in the first half of the file.</p>
+   *
+   * <p>
+   * Since the operations are done lazily at {@link #getText}-time, operations do
+   * not screw up the token index values. That is, an insert operation at token
+   * index {@code i} does not change the index values for tokens
+   * {@code i}+1..n-1.</p>
+   *
+   * <p>
+   * Because operations never actually alter the buffer, you may always get the
+   * original token stream back without undoing anything. Since the instructions
+   * are queued up, you can easily simulate transactions and roll back any changes
+   * if there is an error just by removing instructions. For example,</p>
+   *
+   * <pre>
+   * CharStream input = new ANTLRFileStream("input");
+   * TLexer lex = new TLexer(input);
+   * CommonTokenStream tokens = new CommonTokenStream(lex);
+   * T parser = new T(tokens);
+   * TokenStreamRewriter rewriter = new TokenStreamRewriter(tokens);
+   * parser.startRule();
+   * </pre>
+   *
+   * <p>
+   * Then in the rules, you can execute (assuming rewriter is visible):</p>
+   *
+   * <pre>
+   * Token t,u;
+   * ...
+   * rewriter.insertAfter(t, "text to put after t");}
+   * rewriter.insertAfter(u, "text after u");}
+   * System.out.println(rewriter.getText());
+   * </pre>
+   *
+   * <p>
+   * You can also have multiple "instruction streams" and get multiple rewrites
+   * from a single pass over the input. Just name the instruction streams and use
+   * that name again when printing the buffer. This could be useful for generating
+   * a C file and also its header file--all from the same buffer:</p>
+   *
+   * <pre>
+   * rewriter.insertAfter("pass1", t, "text to put after t");}
+   * rewriter.insertAfter("pass2", u, "text after u");}
+   * System.out.println(rewriter.getText("pass1"));
+   * System.out.println(rewriter.getText("pass2"));
+   * </pre>
+   *
+   * <p>
+   * If you don't use named rewrite streams, a "default" stream is used as the
+   * first example shows.</p>
+   */
   class TokenStreamRewriter {
   public:
     static const std::wstring DEFAULT_PROGRAM_NAME;
@@ -153,6 +167,11 @@ namespace runtime {
     ///  instructions given to this rewriter.
     virtual std::wstring getText();
 
+    /** Return the text from the original tokens altered per the
+     *  instructions given to this rewriter in programName.
+     */
+    std::wstring getText(std::wstring programName);
+    
     /// <summary>
     /// Return the text associated with the tokens in the interval from the
     ///  original token stream but with the alterations given to this rewriter.

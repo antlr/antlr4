@@ -38,31 +38,60 @@ namespace antlr {
 namespace v4 {
 namespace runtime {
 
-  /// <summary>
-  /// The most common stream of tokens where every token is buffered up
-  ///  and tokens are filtered for a certain channel (the parser will only
-  ///  see these tokens).
-  ///
-  ///  Even though it buffers all of the tokens, this token stream pulls tokens
-  ///  from the tokens source on demand. In other words, until you ask for a
-  ///  token using consume(), LT(), etc. the stream does not pull from the lexer.
-  ///
-  ///  The only difference between this stream and <seealso cref="BufferedTokenStream"/> superclass
-  ///  is that this stream knows how to ignore off channel tokens. There may be
-  ///  a performance advantage to using the superclass if you don't pass
-  ///  whitespace and comments etc. to the parser on a hidden channel (i.e.,
-  ///  you set {@code $channel} instead of calling {@code skip()} in lexer rules.)
-  /// </summary>
-  ///  <seealso cref= UnbufferedTokenStream </seealso>
-  ///  <seealso cref= BufferedTokenStream </seealso>
+  /**
+   * This class extends {@link BufferedTokenStream} with functionality to filter
+   * token streams to tokens on a particular channel (tokens where
+   * {@link Token#getChannel} returns a particular value).
+   *
+   * <p>
+   * This token stream provides access to all tokens by index or when calling
+   * methods like {@link #getText}. The channel filtering is only used for code
+   * accessing tokens via the lookahead methods {@link #LA}, {@link #LT}, and
+   * {@link #LB}.</p>
+   *
+   * <p>
+   * By default, tokens are placed on the default channel
+   * ({@link Token#DEFAULT_CHANNEL}), but may be reassigned by using the
+   * {@code ->channel(HIDDEN)} lexer command, or by using an embedded action to
+   * call {@link Lexer#setChannel}.
+   * </p>
+   *
+   * <p>
+   * Note: lexer rules which use the {@code ->skip} lexer command or call
+   * {@link Lexer#skip} do not produce tokens at all, so input text matched by
+   * such a rule will not be available as part of the token stream, regardless of
+   * channel.</p>
+   */
   class CommonTokenStream : public BufferedTokenStream {
-    /// <summary>
-    /// Skip tokens on any channel but this one; this is how we skip whitespace... </summary>
   protected:
+    /**
+     * Specifies the channel to use for filtering tokens.
+     *
+     * <p>
+     * The default value is {@link Token#DEFAULT_CHANNEL}, which matches the
+     * default channel assigned to tokens created by the lexer.</p>
+     */
     int channel;
 
   public:
+    /**
+     * Constructs a new {@link CommonTokenStream} using the specified token
+     * source and the default token channel ({@link Token#DEFAULT_CHANNEL}).
+     *
+     * @param tokenSource The token source.
+     */
     CommonTokenStream(TokenSource *tokenSource);
+
+    /**
+     * Constructs a new {@link CommonTokenStream} using the specified token
+     * source and filtering tokens to the specified channel. Only tokens whose
+     * {@link Token#getChannel} matches {@code channel} or have the
+     * {@link Token#getType} equal to {@link Token#EOF} will be returned by the
+     * token stream lookahead methods.
+     *
+     * @param tokenSource The token source.
+     * @param channel The channel to use for filtering tokens.
+     */
     CommonTokenStream(TokenSource *tokenSource, int channel);
 
   protected:

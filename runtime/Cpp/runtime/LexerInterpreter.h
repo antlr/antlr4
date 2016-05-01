@@ -40,9 +40,14 @@ namespace runtime {
 
   class LexerInterpreter : public Lexer {
   public:
+    // @deprecated
     LexerInterpreter(const std::wstring &grammarFileName, const std::vector<std::wstring> &tokenNames,
                      const std::vector<std::wstring> &ruleNames, const std::vector<std::wstring> &modeNames,
                      const atn::ATN &atn, CharStream *input);
+    LexerInterpreter(const std::wstring &grammarFileName, Ref<dfa::Vocabulary> vocabulary,
+                     const std::vector<std::wstring> &ruleNames, const std::vector<std::wstring> &modeNames,
+                     const atn::ATN &atn, CharStream *input);
+
     ~LexerInterpreter();
 
     virtual const atn::ATN& getATN() const override;
@@ -51,16 +56,22 @@ namespace runtime {
     virtual const std::vector<std::wstring>& getRuleNames() const override;
     virtual const std::vector<std::wstring>& getModeNames() const override;
     
+    Ref<dfa::Vocabulary> getVocabulary() const;
+
   protected:
-    const std::wstring grammarFileName;
+    const std::wstring _grammarFileName;
     const atn::ATN &_atn;
 
-    const std::vector<std::wstring> &_tokenNames;
+    // @deprecated
+    std::vector<std::wstring> _tokenNames;
     const std::vector<std::wstring> &_ruleNames;
     const std::vector<std::wstring> &_modeNames;
     std::vector<dfa::DFA> _decisionToDFA;
 
     Ref<atn::PredictionContextCache> _sharedContextCache;
+
+  private:
+    Ref<dfa::Vocabulary> _vocabulary;
   };
 
 } // namespace runtime

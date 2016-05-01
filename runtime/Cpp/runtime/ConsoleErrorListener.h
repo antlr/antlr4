@@ -40,8 +40,23 @@ namespace runtime {
 
   class ConsoleErrorListener : public BaseErrorListener {
   public:
+    /**
+     * Provides a default instance of {@link ConsoleErrorListener}.
+     */
     static ConsoleErrorListener INSTANCE;
 
+    /**
+     * {@inheritDoc}
+     *
+     * <p>
+     * This implementation prints messages to {@link System#err} containing the
+     * values of {@code line}, {@code charPositionInLine}, and {@code msg} using
+     * the following format.</p>
+     *
+     * <pre>
+     * line <em>line</em>:<em>charPositionInLine</em> <em>msg</em>
+     * </pre>
+     */
     virtual void syntaxError(IRecognizer *recognizer, Ref<Token> offendingSymbol, size_t line, int charPositionInLine,
                              const std::wstring &msg, std::exception_ptr e) override;
   };

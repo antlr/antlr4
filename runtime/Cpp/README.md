@@ -1,6 +1,6 @@
 # C++ target for ANTLR 4
 
-This fork provides C++ runtime support for C++.  See [the canonical antlr4 repository](https://github.com/antlr/antlr4) for in depth detail about how to use Antlr4.
+This folder contains the C++ runtime support for ANTLR.  See [the canonical antlr4 repository](https://github.com/antlr/antlr4) for in depth detail about how to use ANTLR 4.
 
 ## Authors and major contributors
 

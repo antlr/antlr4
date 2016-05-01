@@ -1,8 +1,8 @@
-﻿/*
+/*
  * [The "BSD license"]
  *  Copyright (c) 2016 Mike Lischke
- *  Copyright (c) 2013 Terence Parr
- *  Copyright (c) 2013 Dan McLaughlin
+ *  Copyright (c) 2014 Terence Parr
+ *  Copyright (c) 2014 Dan McLaughlin
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -29,39 +29,4 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
-
-namespace org {
-namespace antlr {
-namespace v4 {
-namespace runtime {
-namespace tree {
-
-  /** This interface describes the minimal core of methods triggered
-   *  by {@link ParseTreeWalker}. E.g.,
-   *
-   *  	ParseTreeWalker walker = new ParseTreeWalker();
-   *		walker.walk(myParseTreeListener, myParseTree); <-- triggers events in your listener
-   *
-   *  If you want to trigger events in multiple listeners during a single
-   *  tree walk, you can use the ParseTreeDispatcher object available at
-   *
-   * 		https://github.com/antlr/antlr4/issues/841
-   */
-  class ParseTreeListener {
-  public:
-    virtual void visitTerminal(Ref<TerminalNode> node) = 0;
-    virtual void visitErrorNode(Ref<ErrorNode> node) = 0;
-    virtual void enterEveryRule(Ref<ParserRuleContext> ctx) = 0;
-    virtual void exitEveryRule(Ref<ParserRuleContext> ctx) = 0;
-
-    bool operator == (const ParseTreeListener &other) {
-      return this == &other;
-    }
-  };
-
-} // namespace tree
-} // namespace runtime
-} // namespace v4
-} // namespace antlr
-} // namespace org
+#include "Predicate.h"

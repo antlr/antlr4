@@ -32,8 +32,7 @@
 
 using namespace org::antlr::v4::runtime;
 
-RuntimeException::RuntimeException(const std::string &msg)
-  : std::exception(), _message(msg) {
+RuntimeException::RuntimeException(const std::string &msg) : std::exception(), _message(msg) {
 }
 
 const char* RuntimeException::what() const NOEXCEPT {

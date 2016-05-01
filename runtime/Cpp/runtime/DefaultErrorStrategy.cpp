@@ -41,6 +41,7 @@
 #include "Parser.h"
 #include "Strings.h"
 #include "CommonToken.h"
+#include "Vocabulary.h"
 
 #include "DefaultErrorStrategy.h"
 
@@ -174,7 +175,7 @@ void DefaultErrorStrategy::reportNoViableAlternative(Parser *recognizer, const N
 
 void DefaultErrorStrategy::reportInputMismatch(Parser *recognizer, const InputMismatchException &e) {
   std::wstring msg = std::wstring(L"mismatched input ") + getTokenErrorDisplay(e.getOffendingToken()) +
-  std::wstring(L" expecting ") + e.getExpectedTokens().toString(recognizer->getTokenNames());
+  std::wstring(L" expecting ") + e.getExpectedTokens().toString(recognizer->getVocabulary());
   recognizer->notifyErrorListeners(e.getOffendingToken(), msg, std::make_exception_ptr(e));
 }
 
@@ -195,7 +196,8 @@ void DefaultErrorStrategy::reportUnwantedToken(Parser *recognizer) {
   std::wstring tokenName = getTokenErrorDisplay(t);
   misc::IntervalSet expecting = getExpectedTokens(recognizer);
 
-  std::wstring msg = std::wstring(L"extraneous input ") + tokenName + std::wstring(L" expecting ") + expecting.toString(recognizer->getTokenNames());
+  std::wstring msg = std::wstring(L"extraneous input ") + tokenName + std::wstring(L" expecting ") +
+    expecting.toString(recognizer->getVocabulary());
   recognizer->notifyErrorListeners(t, msg, nullptr);
 }
 
@@ -208,7 +210,7 @@ void DefaultErrorStrategy::reportMissingToken(Parser *recognizer) {
 
   Ref<Token> t = recognizer->getCurrentToken();
   misc::IntervalSet expecting = getExpectedTokens(recognizer);
-  std::wstring msg = std::wstring(L"missing ") + expecting.toString(recognizer->getTokenNames()) + std::wstring(L" at ") + getTokenErrorDisplay(t);
+  std::wstring msg = L"missing " + expecting.toString(recognizer->getVocabulary()) + L" at " + getTokenErrorDisplay(t);
 
   recognizer->notifyErrorListeners(t, msg, nullptr);
 }
@@ -271,7 +273,7 @@ Ref<Token> DefaultErrorStrategy::getMissingSymbol(Parser *recognizer) {
   if (expectedTokenType == EOF) {
     tokenText = L"<missing EOF>";
   } else {
-    tokenText = std::wstring(L"<missing ") + recognizer->getTokenNames()[(size_t)expectedTokenType] + std::wstring(L">");
+    tokenText = L"<missing " + recognizer->getVocabulary()->getDisplayName(expectedTokenType) + L">";
   }
   Ref<Token> current = currentSymbol;
   Ref<Token> lookback = recognizer->getTokenStream()->LT(-1);

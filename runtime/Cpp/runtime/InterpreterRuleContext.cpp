@@ -33,10 +33,13 @@
 
 using namespace org::antlr::v4::runtime;
 
+InterpreterRuleContext::InterpreterRuleContext() {
+}
+
 InterpreterRuleContext::InterpreterRuleContext(std::weak_ptr<ParserRuleContext> parent, int invokingStateNumber, ssize_t ruleIndex)
-  : ParserRuleContext(parent, invokingStateNumber), ruleIndex(ruleIndex) {
+  : ParserRuleContext(parent, invokingStateNumber), _ruleIndex(ruleIndex) {
 }
 
 ssize_t InterpreterRuleContext::getRuleIndex() const {
-  return ruleIndex;
+  return _ruleIndex;
 }

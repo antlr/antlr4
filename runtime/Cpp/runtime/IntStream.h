@@ -63,7 +63,7 @@ namespace runtime {
     /// The value returned by <seealso cref="#getSourceName"/> when the actual name of the
     /// underlying source is not known.
     /// </summary>
-    static const std::wstring UNKNOWN_SOURCE_NAME;
+    static const std::string UNKNOWN_SOURCE_NAME;
 
     /// <summary>
     /// Consumes the current symbol in the stream. This method has the following

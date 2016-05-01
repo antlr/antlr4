@@ -47,7 +47,7 @@ ParseTreeMatch::ParseTreeMatch(Ref<ParseTree> tree, const ParseTreePattern &patt
 
 Ref<ParseTree> ParseTreeMatch::get(const std::wstring &label) {
   auto iterator = _labels.find(label);
-  if (iterator == _labels.end()) {
+  if (iterator == _labels.end() || iterator->second.empty()) {
     return nullptr;
   }
 

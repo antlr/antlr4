@@ -97,6 +97,7 @@ namespace org {
           class MurmurHash;
           class ParseCancellationException;
           class Utils;
+          template <typename T> class Predicate;
         }
         namespace atn {
           class ATN;

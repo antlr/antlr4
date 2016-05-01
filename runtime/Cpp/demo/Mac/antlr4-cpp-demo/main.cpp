@@ -17,14 +17,6 @@
 using namespace antlrcpptest;
 using namespace org::antlr::v4::runtime;
 
-class A {
-public:
-  static void doit(const A &a) {
-    size_t i = a.counter;
-  }
-private:
-  size_t counter;
-};
 int main(int argc, const char * argv[]) {
 
   ANTLRInputStream input(L"divideŴ and conquer");

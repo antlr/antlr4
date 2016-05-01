@@ -40,6 +40,7 @@
 #include "TagChunk.h"
 #include "ATN.h"
 #include "Lexer.h"
+#include "BailErrorStrategy.h"
 
 #include "ListTokenSource.h"
 #include "TextChunk.h"
@@ -56,7 +57,7 @@ using namespace org::antlr::v4::runtime::tree;
 using namespace org::antlr::v4::runtime::tree::pattern;
 using namespace antlrcpp;
 
-ParseTreePatternMatcher::CannotInvokeStartRule::CannotInvokeStartRule(std::exception e) {
+ParseTreePatternMatcher::CannotInvokeStartRule::CannotInvokeStartRule(const RuntimeException &e) : RuntimeException(e.what()) {
 }
 
 ParseTreePatternMatcher::ParseTreePatternMatcher(Lexer *lexer, Parser *parser) : _lexer(lexer), _parser(parser) {
@@ -109,12 +110,17 @@ ParseTreePattern ParseTreePatternMatcher::compile(const std::wstring &pattern, i
     delete tokens;
   });
 
-  ParserInterpreter parserInterp(_parser->getGrammarFileName(), _parser->getTokenNames(),
+  ParserInterpreter parserInterp(_parser->getGrammarFileName(), _parser->getVocabulary(),
                                  _parser->getRuleNames(), _parser->getATNWithBypassAlts(), tokens);
 
+  Ref<ParserRuleContext> tree;
   try {
-    Ref<ParserRuleContext> context = parserInterp.parse(patternRuleIndex);
-    return ParseTreePattern(this, pattern, patternRuleIndex, context);
+    parserInterp.setErrorHandler(std::make_shared<BailErrorStrategy>());
+    tree = parserInterp.parse(patternRuleIndex);
+  } catch (ParseCancellationException &e) {
+    std::rethrow_if_nested(e);
+  } catch (RecognitionException &re) {
+    throw re;
   } catch (std::exception &e) {
 #if defined(_MSC_FULL_VER) && _MSC_FULL_VER < 190023026
     // throw_with_nested is not available before VS 2015.
@@ -124,6 +130,12 @@ ParseTreePattern ParseTreePatternMatcher::compile(const std::wstring &pattern, i
 #endif
   }
 
+  // Make sure tree pattern compilation checks for a complete parse
+  if (tokens->LA(1) != EOF) {
+    throw StartRuleDoesNotConsumeFullPattern();
+  }
+  
+  return ParseTreePattern(this, pattern, patternRuleIndex, tree);
 }
 
 Lexer* ParseTreePatternMatcher::getLexer() {
