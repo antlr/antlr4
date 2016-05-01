@@ -40,11 +40,7 @@ cppTypeInitMap ::= [
     default: "nullptr" // anything other than a primitive type is an object
 ]
 
-// Lexer class templates.
-DefaultLexerSuperClassHeader(s) ::= "Lexer"
-DefaultLexerSuperClass(s) ::= "Lexer"
-
-LexerHeader(lexer, atn, actionFuncs, sempredFuncs, superClass) ::= <<
+LexerHeader(lexer, atn, actionFuncs, sempredFuncs, superClass = {Lexer}) ::= <<
 <if (lexer.tokens)>
 class <lexer.name>Token {
 public:
@@ -70,25 +66,31 @@ public:
 
   virtual std::wstring getGrammarFileName() const override;
   virtual const std::vector\<std::wstring>& getRuleNames() const override;
+  
   virtual const std::vector\<std::wstring>& getModeNames() const override;
-  virtual const std::vector\<std::wstring>& getTokenNames() const override;
+  virtual const std::vector\<std::wstring>& getTokenNames() const override; // deprecated, use vocabulary instead
+  virtual Ref\<dfa::Vocabulary> getVocabulary() const override;
   
   virtual const std::wstring getSerializedATN() const;
   virtual const atn::ATN& getATN() const override;
 
   <if (actionFuncs)>
-  virtual void action(std::shared_ptr\<RuleContext> context, int ruleIndex, int actionIndex) override;
+  virtual void action(Ref\<RuleContext> context, int ruleIndex, int actionIndex) override;
   <endif>
   <if (sempredFuncs)>
-  virtual bool sempred(std::shared_ptr\<RuleContext> context, int ruleIndex, int predicateIndex) override;  
+  virtual bool sempred(Ref\<RuleContext> context, int ruleIndex, int predicateIndex) override;  
   <endif>
   
 private:
   static std::vector\<dfa::DFA> _decisionToDFA;
-  static std::shared_ptr\<atn::PredictionContextCache> _sharedContextCache;
+  static Ref\<atn::PredictionContextCache> _sharedContextCache;
   static std::vector\<std::wstring> _ruleNames;
   static std::vector\<std::wstring> _tokenNames;
   static std::vector\<std::wstring> _modeNames;
+  
+  static std::vector\<std::wstring> _literalNames;
+  static std::vector\<std::wstring> _symbolicNames;
+  static Ref\<dfa::Vocabulary> _vocabulary;
   <atn>
   
   <if (namedActions.members)><namedActions.members>
@@ -111,7 +113,7 @@ private:
 };
 >>
 
-Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass) ::= <<
+Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass = {Lexer}) ::= <<
 <lexer.name>::<lexer.name>(CharStream *input) : <if (superClass)><superClass><else>Lexer<endif>(input) {
   _interpreter = new atn::LexerATNSimulator(this, _atn, _decisionToDFA, _sharedContextCache);
 }
@@ -136,6 +138,10 @@ const std::vector\<std::wstring>& <lexer.name>::getTokenNames() const {
   return _tokenNames;
 }
   
+Ref\<dfa::Vocabulary> <lexer.name>::getVocabulary() const {
+  return _vocabulary;
+}
+
 const std::wstring <lexer.name>::getSerializedATN() const {
   return _serializedATN;
 }
@@ -145,7 +151,7 @@ const atn::ATN& <lexer.name>::getATN() const {
 }
 
 <if (actionFuncs)>
-void <lexer.name>::action(std::shared_ptr\<RuleContext> context, int ruleIndex, int actionIndex) {
+void <lexer.name>::action(Ref\<RuleContext> context, int ruleIndex, int actionIndex) {
   switch (ruleIndex) {
     <lexer.actionFuncs.values: {f | case <f.ruleIndex>: <f.name>Action(std::dynamic_pointer_cast\<<f.ctxType>\>(context), actionIndex); break;}; separator="\n">
 
@@ -156,7 +162,7 @@ void <lexer.name>::action(std::shared_ptr\<RuleContext> context, int ruleIndex, 
 <endif>
 
 <if (sempredFuncs)>
-bool <lexer.name>::sempred(std::shared_ptr\<RuleContext> context, int ruleIndex, int predicateIndex) {
+bool <lexer.name>::sempred(Ref\<RuleContext> context, int ruleIndex, int predicateIndex) {
   switch (ruleIndex) {
     <lexer.sempredFuncs.values: {f | case <f.ruleIndex>: return <f.name>Sempred(std::dynamic_pointer_cast\<<f.ctxType>\>(context), predicateIndex);}; separator="\n">
 
@@ -176,21 +182,46 @@ bool <lexer.name>::sempred(std::shared_ptr\<RuleContext> context, int ruleIndex,
 
 // Static vars and initialization.
 std::vector\<dfa::DFA> <lexer.name>::_decisionToDFA;
-std::shared_ptr\<atn::PredictionContextCache> <lexer.name>::_sharedContextCache = std::make_shared\<atn::PredictionContextCache>();
+Ref\<atn::PredictionContextCache> <lexer.name>::_sharedContextCache = std::make_shared\<atn::PredictionContextCache>();
 
 // We own the ATN which in turn owns the ATN states.
 atn::ATN <lexer.name>::_atn;
 std::wstring <lexer.name>::_serializedATN;
 
 std::vector\<std::wstring> <lexer.name>::_ruleNames = {
-    <lexer.ruleNames: {r | L"<r>"}; separator = ", ", wrap, anchor>
+  <lexer.ruleNames: {r | L"<r>"}; separator = ", ", wrap, anchor>
 };
+
 std::vector\<std::wstring> <lexer.name>::_modeNames = {
-    <lexer.modes: {m | L"<m>"}; separator = ", ", wrap, anchor>
+  <lexer.modes: {m | L"<m>"}; separator = ", ", wrap, anchor>
 };
-std::vector\<std::wstring> <lexer.name>::_tokenNames = { <! TODO: replace by vocabulary (see Java.stg). !>
-    <lexer.tokenNames: {t | L<t>}; separator = ", ", wrap, anchor>
+
+std::vector\<std::wstring> <lexer.name>::_literalNames = {
+  <lexer.literalNames: {t | L<t>}; null = "L\"\"", separator = ", ", wrap, anchor>
 };
+
+std::vector\<std::wstring> <lexer.name>::_symbolicNames = {
+  <lexer.symbolicNames: {t | L<t>}; null = "L\"\"", separator = ", ", wrap, anchor>
+};
+
+Ref\<dfa::Vocabulary> <lexer.name>::_vocabulary = std::make_shared\<dfa::VocabularyImpl>(_literalNames, _symbolicNames);
+
+std::vector\<std::wstring> <lexer.name>::_tokenNames = []() {
+  std::vector\<std::wstring> result;
+	for (size_t i = 0; i \< _symbolicNames.size(); ++i) {
+		std::wstring name = _vocabulary->getLiteralName(i);
+		if (name.empty()) {
+			name = _vocabulary->getSymbolicName(i);
+		}
+
+		if (name.empty()) {
+			_tokenNames.push_back(L"\<INVALID>");
+		} else {
+      _tokenNames.push_back(name);
+    }
+	}
+  return result;
+}();
 
 <lexer.name>::Initializer::Initializer() {
   <atn>
@@ -200,11 +231,11 @@ std::vector\<std::wstring> <lexer.name>::_tokenNames = { <! TODO: replace by voc
 >>
 
 RuleActionFunctionHeader(r, actions) ::= <<
-void <r.name>Action(std::shared_ptr\<<r.ctxType>\> context, int actionIndex);
+void <r.name>Action(Ref\<<r.ctxType>\> context, int actionIndex);
 >>
 
 RuleActionFunction(r, actions) ::= <<
-void <r.factory.grammar.name>::<r.name>Action(std::shared_ptr\<<r.ctxType>\> context, int actionIndex) {
+void <r.factory.grammar.name>::<r.name>Action(Ref\<<r.ctxType>\> context, int actionIndex) {
   switch (actionIndex) {
     <actions: {index | case <index>: <actions.(index)> break;}; separator="\n">
   
@@ -216,11 +247,11 @@ void <r.factory.grammar.name>::<r.name>Action(std::shared_ptr\<<r.ctxType>\> con
 >>
 
 RuleSempredFunctionHeader(r, actions) ::= <<
-bool <r.name>Sempred(std::shared_ptr\<<r.ctxType>\> context, int predicateIndex);
+bool <r.name>Sempred(Ref\<<r.ctxType>\> context, int predicateIndex);
 >>
 
 RuleSempredFunction(r, actions) ::= <<
-bool <r.factory.grammar.name>::<r.name>Sempred(std::shared_ptr\<<r.ctxType>\> context, int predicateIndex) {
+bool <r.factory.grammar.name>::<r.name>Sempred(Ref\<<r.ctxType>\> context, int predicateIndex) {
   switch (predicateIndex) {
     <actions: {index | case <index>: return <actions.(index)>;}; separator="\n">
     
@@ -233,9 +264,6 @@ bool <r.factory.grammar.name>::<r.name>Sempred(std::shared_ptr\<<r.ctxType>\> co
 >>
 
 //--------------------------------------------------------------------------------------------------
-
-DefaultParserSuperClassHeader(s) ::= "Parser"
-DefaultParserSuperClass(s) ::= "Parser" // Is that used at all?
 
 ParserHeader(parser, funcs, atn, sempredFuncs, superClass = {Parser}) ::= <<
 <if (parser.tokens)>
@@ -261,8 +289,9 @@ public:
 
   virtual std::wstring getGrammarFileName() const override;
   virtual const atn::ATN& getATN() const override { return _atn; };
-  virtual const std::vector\<std::wstring>& getTokenNames() const override { return _tokenNames; }; // TODO: use vocabulary instead.
+  virtual const std::vector\<std::wstring>& getTokenNames() const override { return _tokenNames; }; // deprecated: use vocabulary instead.
   virtual const std::vector\<std::wstring>& getRuleNames() const override;
+  virtual Ref\<dfa::Vocabulary> getVocabulary() const override;
  
   <if(namedActions.members)><namedActions.members><endif>
   <parser.funcs: {f | class <f.name; format = "cap">Context;};  separator = "\n"> <! Forward declare context classes. !>
@@ -270,15 +299,19 @@ public:
   <funcs; separator = "\n">
 
   <if (sempredFuncs)>
-  virtual bool sempred(std::shared_ptr\<RuleContext> context, int ruleIndex, int predicateIndex) override;
+  virtual bool sempred(Ref\<RuleContext> context, int ruleIndex, int predicateIndex) override;
   <sempredFuncs.values; separator = "\n">
   <endif>
 
 private:
   static std::vector\<dfa::DFA> _decisionToDFA;
-  static std::shared_ptr\<atn::PredictionContextCache> _sharedContextCache;
+  static Ref\<atn::PredictionContextCache> _sharedContextCache;
   static std::vector\<std::wstring> _ruleNames;
   static std::vector\<std::wstring> _tokenNames;
+  
+  static std::vector\<std::wstring> _literalNames;
+  static std::vector\<std::wstring> _symbolicNames;
+  static Ref\<dfa::Vocabulary> _vocabulary;
   <atn>
   
   struct Initializer {
@@ -307,10 +340,14 @@ const std::vector\<std::wstring>& <parser.name>::getRuleNames() const {
   return _ruleNames;
 }
 
+Ref\<dfa::Vocabulary> <parser.name>::getVocabulary() const {
+  return _vocabulary;
+}
+
 <funcs; separator = "\n\n">
 
 <if (sempredFuncs)>
-bool <parser.name>::sempred(std::shared_ptr\<RuleContext> context, int ruleIndex, int predicateIndex) {
+bool <parser.name>::sempred(Ref\<RuleContext> context, int ruleIndex, int predicateIndex) {
   switch (ruleIndex) {
   <parser.sempredFuncs.values: {f |
   case <f.ruleIndex>: return <f.name>Sempred(std::dynamic_pointer_cast\<<f.ctxType>\>(context), predicateIndex);}; separator="\n">
@@ -325,7 +362,7 @@ bool <parser.name>::sempred(std::shared_ptr\<RuleContext> context, int ruleIndex
 
 // Static vars and initialization.
 std::vector\<dfa::DFA> <parser.name>::_decisionToDFA;
-std::shared_ptr\<atn::PredictionContextCache> <parser.name>::_sharedContextCache = std::make_shared\<atn::PredictionContextCache>();
+Ref\<atn::PredictionContextCache> <parser.name>::_sharedContextCache = std::make_shared\<atn::PredictionContextCache>();
 
 // We own the ATN which in turn owns the ATN states.
 atn::ATN <parser.name>::_atn;
@@ -335,9 +372,32 @@ std::vector\<std::wstring> <parser.name>::_ruleNames = {
     <parser.ruleNames: {r | L"<r>"}; separator = ", ", wrap, anchor>
 };
 
-std::vector\<std::wstring> <parser.name>::_tokenNames = {
-    <parser.tokenNames: {t | L<t>}; separator = ", ", wrap, anchor>
+std::vector\<std::wstring> <parser.name>::_literalNames = {
+  <parser.literalNames: {t | L<t>}; null = "L\"\"", separator = ", ", wrap, anchor>
 };
+
+std::vector\<std::wstring> <parser.name>::_symbolicNames = {
+  <parser.symbolicNames: {t | L<t>}; null = "L\"\"", separator = ", ", wrap, anchor>
+};
+
+Ref\<dfa::Vocabulary> <parser.name>::_vocabulary = std::make_shared\<dfa::VocabularyImpl>(_literalNames, _symbolicNames);
+
+std::vector\<std::wstring> <parser.name>::_tokenNames = []() {
+  std::vector\<std::wstring> result;
+	for (size_t i = 0; i \< <parser.name>::_symbolicNames.size(); ++i) {
+		std::wstring name = <parser.name>::_vocabulary->getLiteralName(i);
+		if (name.empty()) {
+			name = <parser.name>::_vocabulary->getSymbolicName(i);
+		}
+
+		if (name.empty()) {
+			result.push_back(L"\<INVALID>");
+		} else {
+      result.push_back(name);
+    }
+	}
+  return result;
+}();
 
 <parser.name>::Initializer::Initializer() {
   <atn>
@@ -354,16 +414,16 @@ static std::wstring _serializedATN;
 // Constructs the serialized ATN and writes init code for static member vars.
 SerializedATN(model) ::= <<
 <if (rest(model.segments))>
-<model.segments: {segment | static std::wstring _serializedATNSegment<i0> = {
+<model.segments: {segment | static std::wstring serializedATNSegment<i0> = {
   <segment; wrap={<\n>   }>
 \};}; separator="\n">
 _serializedATN =
-  <model.segments: {segment | _serializedATNSegment<i0>}; separator=" +\n">;
+  <model.segments: {segment | serializedATNSegment<i0>}; separator=" +\n">;
   
 <else>
 <! only one segment, can be inlined !>
 _serializedATN = {
-  <model.serialized; wrap = {<\n>  }>
+  <model.serialized; wrap = {<\n>}>
 };
 <endif>
 
@@ -375,18 +435,18 @@ for (int i = 0; i \< _atn.getNumberOfDecisions(); i++) { <! Rework class ATN to 
 }
 >>
 
-RuleFunctionHeader(currentRule, code, locals, ruleCtx, altLabelCtxs, namedActions, finallyAction, postamble, exceptions) ::= <<
+RuleFunctionHeader(currentRule, args, code, locals, ruleCtx, altLabelCtxs, namedActions, finallyAction, postamble, exceptions) ::= <<
 <ruleCtx>
 <! TODO: untested !><if (altLabelCtxs)><altLabelCtxs: {l | <altLabelCtxs.(l)>}; separator="\n"><endif>
-std::shared_ptr\<<currentRule.ctxType>\> <currentRule.name>(<currentRule.args; separator = ",">);
+Ref\<<currentRule.ctxType>\> <currentRule.name>(<args; separator=",">);
 
 >>
 
-RuleFunction(currentRule, code, locals, ruleCtx, altLabelCtxs, namedActions, finallyAction, postamble, exceptions) ::= <<
+RuleFunction(currentRule, args, code, locals, ruleCtx, altLabelCtxs, namedActions, finallyAction, postamble, exceptions) ::= <<
 <ruleCtx>
 <! TODO: untested !><altLabelCtxs: {l | <altLabelCtxs.(l)>}; separator = "\n">
-std::shared_ptr\<<parser.name>::<currentRule.ctxType>\> <parser.name>::<currentRule.name>(<currentRule.args; separator = ",">) {
-  std::shared_ptr\<<currentRule.ctxType>\> result = std::make_shared\<<currentRule.ctxType>\>(_ctx, getState()<currentRule.args:{a | , <a.name>}>);
+Ref\<<parser.name>::<currentRule.ctxType>\> <parser.name>::<currentRule.name>(<args; separator=",">) {
+  Ref\<<currentRule.ctxType>\> result = std::make_shared\<<currentRule.ctxType>\>(_ctx, getState()<currentRule.args:{a | , <a.name>}>);
   enterRule(result, <currentRule.startState>, <parser.name>Rule::Rule<currentRule.name; format = "cap">);
   <namedActions.init>
 <! TODO: untested !> <locals; separator = "\n">
@@ -417,26 +477,26 @@ std::shared_ptr\<<parser.name>::<currentRule.ctxType>\> <parser.name>::<currentR
 }
 >>
 
-LeftRecursiveRuleFunctionHeader(currentRule, code, locals, ruleCtx, altLabelCtxs,   namedActions, finallyAction, postamble) ::= <<
+LeftRecursiveRuleFunctionHeader(currentRule, args, code, locals, ruleCtx, altLabelCtxs, namedActions, finallyAction, postamble) ::= <<
 <ruleCtx>
 <! TODO: untested !><altLabelCtxs: {l | <altLabelCtxs.(l)>}; separator="\n">
-std::shared_ptr\<<currentRule.ctxType>\> <currentRule.name>(<currentRule.args; separator = ", ">);
-std::shared_ptr\<<currentRule.ctxType>\> <currentRule.name>(int precedence<currentRule.args: {a | , <a>}>);
+Ref\<<currentRule.ctxType>\> <currentRule.name>(<currentRule.args; separator = ", ">);
+Ref\<<currentRule.ctxType>\> <currentRule.name>(int precedence<currentRule.args: {a | , <a>}>);
 >>
 
-LeftRecursiveRuleFunction(currentRule, code, locals, ruleCtx, altLabelCtxs, namedActions, finallyAction, postamble) ::= <<
+LeftRecursiveRuleFunction(currentRule, args, code, locals, ruleCtx, altLabelCtxs, namedActions, finallyAction, postamble) ::= <<
 <ruleCtx>
 <altLabelCtxs: {l | <altLabelCtxs.(l)>}; separator="\n">
 
-std::shared_ptr\<<parser.name>::<currentRule.ctxType>\> <parser.name>::<currentRule.name>(<currentRule.args; separator=", ">) {
+Ref\<<parser.name>::<currentRule.ctxType>\> <parser.name>::<currentRule.name>(<currentRule.args; separator=", ">) {
 <! TODO: currentRule.args untested !>   return <currentRule.name>(0<currentRule.args: {a | , <a.name>}>);
 }
 
-std::shared_ptr\<<parser.name>::<currentRule.ctxType>\> <parser.name>::<currentRule.name>(int precedence<currentRule.args:{a | , <a>}>) {
-    std::shared_ptr\<ParserRuleContext> parentContext = _ctx;
+Ref\<<parser.name>::<currentRule.ctxType>\> <parser.name>::<currentRule.name>(int precedence<currentRule.args:{a | , <a>}>) {
+    Ref\<ParserRuleContext> parentContext = _ctx;
     int parentState = getState();
-    std::shared_ptr\<<parser.name>::<currentRule.ctxType>\> result = std::make_shared\<<currentRule.ctxType>\>(_ctx, parentState<currentRule.args: {a | , <a.name>}>);
-    std::shared_ptr\<<parser.name>::<currentRule.ctxType>\> previousContext = result;
+    Ref\<<parser.name>::<currentRule.ctxType>\> result = std::make_shared\<<currentRule.ctxType>\>(_ctx, parentState<currentRule.args: {a | , <a.name>}>);
+    Ref\<<parser.name>::<currentRule.ctxType>\> previousContext = result;
     int startState = <currentRule.startState>;
     enterRecursionRule(result, <currentRule.startState>, <parser.name>Rule::Rule<currentRule.name; format = "cap">, precedence);
   
@@ -462,15 +522,15 @@ std::shared_ptr\<<parser.name>::<currentRule.ctxType>\> <parser.name>::<currentR
 }
 >>
 
-StructDeclHeader(struct, attrs, getters, dispatchMethods, interfaces, extensionMembers, superClass = {ParserRuleContext}) ::= <<
-class <struct.name> : public <superClass><if (interfaces)><interfaces; separator=", "><endif> {
+StructDeclHeader(struct, ctorAttrs, attrs, getters, dispatchMethods, interfaces, extensionMembers) ::= <<
+class <struct.name> : public <if (contextSuperClass)><contextSuperClass><else>ParserRuleContext<endif><if(interfaces)>, <interfaces; separator=", "><endif> {
 public:
-  <if (attrs)><attrs: {a | <if (!a.isLocal)><a><endif>}; separator = "\n"><endif>
-  <if (struct.ctorAttrs)><struct.name>(std::weak_ptr\<ParserRuleContext> parent, int invokingState);<endif>
-  <struct.name>(std::weak_ptr\<ParserRuleContext> parent, int invokingState<struct.ctorAttrs: {a | , <a>}>);
+  <if (attrs)><attrs:{a | <if (!a.isLocal)><a>;<endif>}; separator="\n"><endif>
+  <if (ctorAttrs)><struct.name>(std::weak_ptr\<ParserRuleContext> parent, int invokingState);<endif>
+  <struct.name>(std::weak_ptr\<ParserRuleContext> parent, int invokingState<ctorAttrs: {a | , <a>}>);
 <if (struct.provideCopyFrom)> <! don't need copy unless we have subclasses !>
   <struct.name>() { }
-  void copyFrom(std::shared_ptr\<<struct.name>\> context);
+  void copyFrom(Ref\<<struct.name>\> context);
 <endif>
 
   virtual ssize_t getRuleIndex() const override;
@@ -484,17 +544,17 @@ private:
 
 >>
 
-StructDecl(struct, attrs, getters, dispatchMethods, interfaces, extensionMembers, superClass = {ParserRuleContext}) ::= <<
+StructDecl(struct, ctorAttrs, attrs, getters, dispatchMethods, interfaces, extensionMembers) ::= <<
 //----------------- <struct.name> ------------------------------------------------------------------
 
-<if (struct.ctorAttrs)>
+<if (ctorAttrs)>
 <parser.name>::<struct.name>::<struct.name>(std::weak_ptr\<ParserRuleContext> parent, int invokingState)
-  : <superClass>(parent, invokingState) {
+  : <if (contextSuperClass)><contextSuperClass><else>ParserRuleContext<endif>(parent, invokingState) {
 }
 <endif>
 
-<parser.name>::<struct.name>::<struct.name>(std::weak_ptr\<ParserRuleContext> parent, int invokingState<struct.ctorAttrs: {a | , <a>}>)
-  : <superClass>(parent, invokingState) {
+<parser.name>::<struct.name>::<struct.name>(std::weak_ptr\<ParserRuleContext> parent, int invokingState<ctorAttrs: {a | , <a>}>)
+  : <if (contextSuperClass)><contextSuperClass><else>ParserRuleContext<endif>(parent, invokingState) {
   <struct.ctorAttrs: {a | this-><a.name> = <a.name>;}; separator="\n">
 }
 
@@ -505,8 +565,8 @@ ssize_t <parser.name>::<struct.name>::getRuleIndex() const {
 }
 
 <if (struct.provideCopyFrom)>
-void <parser.name>::<struct.name>::copyFrom(std::shared_ptr\<<struct.name>\> ctx) {
-  <superClass>::copyFrom(ctx);
+void <parser.name>::<struct.name>::copyFrom(Ref\<<struct.name>\> ctx) {
+  <if (contextSuperClass)><contextSuperClass><else>ParserRuleContext<endif>::copyFrom(ctx);
 <! TODO: untested !>  <struct.attrs: {a | this-><a.name> = ctx.<a.name>;}; separator = "\n">
 }
 <endif>
@@ -518,7 +578,7 @@ void <parser.name>::<struct.name>::copyFrom(std::shared_ptr\<<struct.name>\> ctx
 AltLabelStructDeclHeader(struct, attrs, getters, dispatchMethods) ::= <<
 class <struct.name> : public <currentRule.name; format = "cap">Context {
 public:
-  <struct.name>(std::shared_ptr\<<currentRule.name; format = "cap">Context> ctx);
+  <struct.name>(Ref\<<currentRule.name; format = "cap">Context> ctx);
   
 <! TODO: untested!>  <if (attrs)><attrs: {a | <a>}; separator = "\n">bbb<endif>
   <getters: {g | <g>}; separator = "\n">
@@ -532,7 +592,7 @@ AltLabelStructDecl(struct, attrs, getters, dispatchMethods) ::= <<
 
 <! TODO: untested !><if (attrs)><attrs: {a | <a>}; separator = "\n"><endif>
 <getters: {g | <g>}; separator = "\n">
-<struct.factory.grammar.name>::<struct.name>::<struct.name>(std::shared_ptr\<<currentRule.name; format = "cap">Context> ctx) { copyFrom(ctx); }
+<struct.factory.grammar.name>::<struct.name>::<struct.name>(Ref\<<currentRule.name; format = "cap">Context> ctx) { copyFrom(ctx); }
 
 <dispatchMethods; separator="\n">
 >>
@@ -591,23 +651,6 @@ if (<expr>) {
 }
 >>
 
-LL1StarBlock(choice, alts) ::= <<LL1StarBlock
-setState(<choice.stateNumber>);
-_errHandler.sync(this);
-<choice.loopLabel>:
-while (true) {
-    switch (_input->LA(1)) {
-    <choice.altLook, alts:{look, alt| <cases(look)>
-    <alt>
-    break;}; separator="\n">
-    <cases(choice.exitLook)>
-        break <choice.loopLabel>;
-    }
-    setState(<choice.loopBackStateNumber>);
-    _errHandler.sync(this);
-}
->>
-
 LL1StarBlockSingleAltHeader(choice, loopExpr, alts, preamble, iteration) ::= "LL1StarBlockSingleAltHeader"
 LL1StarBlockSingleAlt(choice, loopExpr, alts, preamble, iteration) ::= <<
 setState(<choice.stateNumber>);
@@ -619,23 +662,6 @@ while (<loopExpr>) {
     _errHandler->sync(this);
     <iteration>
 }
->>
-
-LL1PlusBlock(choice, alts, iteration, loopExpr, error) ::= <<LL1PlusBlock
-setState(<choice.blockStartStateNumber>); <! alt block decision !>
-_errHandler.sync(this);
-do {
-    switch (_input->LA(1)) {
-    <choice.altLook,alts:{look,alt| <cases(look)>
-    <alt>
-    break;}; separator="\n">
-    default:
-        <error>
-    }
-    setState(<choice.stateNumber>);
-    _errHandler.sync(this);
-    <iteration>
-} while ( <loopExpr> );
 >>
 
 LL1PlusBlockSingleAltHeader(choice, loopExpr, alts, preamble, iteration) ::= "<! Required but unused. !>"
@@ -767,12 +793,12 @@ setState(<m.stateNumber>); <if (m.labels)><m.labels: {l | <labelref(l)> = }><end
 >>
 
 MatchSetHeader(m, expr, capture) ::= "<! Required but unused. !>"
-MatchSet(m, expr, capture) ::= "<commonSetStuff(m, expr, capture, false)>"
+MatchSet(m, expr, capture) ::= "<CommonSetStuff(m, expr, capture, false)>"
 
 MatchNotSetHeader(m, expr, capture) ::= "<! Required but unused. !>"
-MatchNotSet(m, expr, capture) ::= "<commonSetStuff(m, expr, capture, true)>"
+MatchNotSet(m, expr, capture) ::= "<CommonSetStuff(m, expr, capture, true)>"
 
-commonSetStuff(m, expr, capture, invert) ::= <<
+CommonSetStuff(m, expr, capture, invert) ::= <<
 setState(<m.stateNumber>);
 <if(m.labels)><m.labels: {l | <labelref(l)> = }>_input->LT(1);<endif>
 <capture>
@@ -868,67 +894,67 @@ AddToLabelList(a) ::= <<
 <ctx(a.label)>-><a.listName>.push_back(<labelref(a.label)>);
 >>
 
-TokenLabelType() ::= "<file.TokenLabelType; null = {Token}>::Ref"
+TokenLabelType() ::= "Ref\<<file.TokenLabelType; null = {Token}>>"
 
-TokenDeclHeader(t) ::= "<TokenLabelType()> <t.name>;" 
+TokenDeclHeader(t) ::= "<TokenLabelType()> <t.name>" 
 TokenDecl(t) ::= "<! Variable Declaration !>"
 
 TokenTypeDeclHeader(t) ::= "<! Local Variable !>"
 TokenTypeDecl(t) ::= "ssize_t <t.name>;"
 
-TokenListDeclHeader(t) ::= "std::vector\<Token::Ref> <t.name>;"
+TokenListDeclHeader(t) ::= "std::vector\<Ref\<Token>> <t.name>;"
 TokenListDecl(t) ::= "<! Variable Declaration !>"
 
-RuleContextDeclHeader(r) ::= "std::shared_ptr\<<parser.name>::<r.ctxName>> <r.name>;"
+RuleContextDeclHeader(r) ::= "Ref\<<parser.name>::<r.ctxName>> <r.name>;"
 RuleContextDecl(r) ::= "<! Variable Declaration !>"
 
-RuleContextListDeclHeader(rdecl) ::= "std::vector\<std::shared_ptr\<<rdecl.ctxName>>> <rdecl.name>;"
+RuleContextListDeclHeader(rdecl) ::= "std::vector\<Ref\<<rdecl.ctxName>>> <rdecl.name>;"
 RuleContextListDecl(rdecl) ::= "<! Variable Declaration !>"
 
-ContextTokenGetterDeclHeader(t) ::= "std::shared_ptr\<tree::TerminalNode> <t.name>();"
+ContextTokenGetterDeclHeader(t) ::= "Ref\<tree::TerminalNode> <t.name>();"
 ContextTokenGetterDecl(t) ::= <<
-std::shared_ptr\<tree::TerminalNode> <parser.name>::<t.ctx.name>::<t.name>() {
+Ref\<tree::TerminalNode> <parser.name>::<t.ctx.name>::<t.name>() {
   return getToken(<parser.name>Token::<t.name>, 0);
 }
 
 >>
 
-ContextTokenListGetterDeclHeader(t) ::= "std::vector\<std::shared_ptr\<tree::TerminalNode>> <t.name>();"
+ContextTokenListGetterDeclHeader(t) ::= "std::vector\<Ref\<tree::TerminalNode>> <t.name>();"
 ContextTokenListGetterDecl(t) ::= <<
-std::vector\<std::shared_ptr\<tree::TerminalNode>\> <parser.name>::<t.ctx.name>::<t.name>() {
+std::vector\<Ref\<tree::TerminalNode>\> <parser.name>::<t.ctx.name>::<t.name>() {
   return getTokens(<parser.name>Token::<t.name>);
 }
 
 >>
 
-ContextTokenListIndexedGetterDeclHeader(t) ::= "std::shared_ptr\<tree::TerminalNode> <t.name>(int i);"
+ContextTokenListIndexedGetterDeclHeader(t) ::= "Ref\<tree::TerminalNode> <t.name>(int i);"
 ContextTokenListIndexedGetterDecl(t)  ::= <<
-std::shared_ptr\<tree::TerminalNode> <parser.name>::<t.ctx.name>::<t.name>(int i) {
+Ref\<tree::TerminalNode> <parser.name>::<t.ctx.name>::<t.name>(int i) {
   return getToken(<parser.name>Token::<t.name>, (size_t)i);
 }
 
 >>
 
-ContextRuleGetterDeclHeader(r) ::= "std::shared_ptr\<<r.ctxName>> <r.name>();"
+ContextRuleGetterDeclHeader(r) ::= "Ref\<<r.ctxName>> <r.name>();"
 ContextRuleGetterDecl(r) ::= <<
 <! Note: ctxName is the name of the context to return, while ctx is the owning context. !>
-std::shared_ptr\<<parser.name>::<r.ctxName>\> <parser.name>::<r.ctx.name>::<r.name>() {
+Ref\<<parser.name>::<r.ctxName>\> <parser.name>::<r.ctx.name>::<r.name>() {
   return getRuleContext\<<parser.name>::<r.ctxName>\>(0);
 }
 
 >>
 
-ContextRuleListGetterDeclHeader(r) ::= "std::vector\<std::shared_ptr\<<r.ctxName>>> <r.name>();"
+ContextRuleListGetterDeclHeader(r) ::= "std::vector\<Ref\<<r.ctxName>>> <r.name>();"
 ContextRuleListGetterDecl(r) ::= <<
-std::vector\<std::shared_ptr\<<parser.name>::<r.ctxName>\>> <parser.name>::<r.ctx.name>::<r.name>() {
+std::vector\<Ref\<<parser.name>::<r.ctxName>\>> <parser.name>::<r.ctx.name>::<r.name>() {
   return getRuleContexts\<<parser.name>::<r.ctxName>\>();
 }
 
 >>
 
-ContextRuleListIndexedGetterDeclHeader(r) ::= "std::shared_ptr\<<r.ctxName>> <r.name>(int i);"
+ContextRuleListIndexedGetterDeclHeader(r) ::= "Ref\<<r.ctxName>> <r.name>(int i);"
 ContextRuleListIndexedGetterDecl(r) ::= <<
-std::shared_ptr\<<parser.name>::<r.ctxName>\> <parser.name>::<r.ctx.name>::<r.name>(int i) {
+Ref\<<parser.name>::<r.ctxName>\> <parser.name>::<r.ctx.name>::<r.name>(int i) {
   return getRuleContext\<<parser.name>::<r.ctxName>\>((size_t)i);
 }
 
@@ -953,10 +979,10 @@ CaptureNextTokenTypeHeader(d) ::= "<! Required but unused. !>"
 CaptureNextTokenType(d) ::= "<d.varName> = _input->LA(1);"
 
 ListenerDispatchMethodHeader(method) ::= <<
-virtual void <if (method.isEnter)>enter<else>exit<endif>Rule(std::shared_ptr\<tree::ParseTreeListener> listener) override;
+virtual void <if (method.isEnter)>enter<else>exit<endif>Rule(Ref\<tree::ParseTreeListener> listener) override;
 >>
 ListenerDispatchMethod(method) ::= <<
-void <method.factory.grammar.name>::<struct.name>::<if (method.isEnter)>enter<else>exit<endif>Rule(std::shared_ptr\<tree::ParseTreeListener> listener) {
+void <method.factory.grammar.name>::<struct.name>::<if (method.isEnter)>enter<else>exit<endif>Rule(Ref\<tree::ParseTreeListener> listener) {
   auto parserListener = std::dynamic_pointer_cast\<<parser.grammarName>Listener>(listener);
   if (parserListener)
     parserListener-><if(method.isEnter)>enter<else>exit<endif><struct.derivedFromName; format="cap">(this);
@@ -975,8 +1001,8 @@ T* accept(tree::ParseTreeVisitor\<T> *visitor) {
 >>
 VisitorDispatchMethod(method) ::= "<! Template function, must be implemented in the header. !>"
 
-AttributeDeclHeader(d) ::= "<d.decl>;"
-AttributeDecl(d) ::= "<! Variable declaration. !>"
+AttributeDeclHeader(d) ::= "<d.type> <d.name><if(d.initValue)> = <d.initValue><endif>"
+AttributeDecl(d) ::= "<d.type> <d.name>"
 
 /** If we don't know location of label def x, use this template */
 labelref(x) ::= "<if (!x.isLocal)>result<endif>-><x.name>"

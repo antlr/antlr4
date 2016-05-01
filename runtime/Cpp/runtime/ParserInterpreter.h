@@ -71,7 +71,7 @@ namespace runtime {
     // @deprecated
     virtual const std::vector<std::wstring>& getTokenNames() const override;
 
-    Ref<dfa::Vocabulary> getVocabulary() const;
+    virtual Ref<dfa::Vocabulary> getVocabulary() const override;
     
     virtual const std::vector<std::wstring>& getRuleNames() const override;
     virtual std::wstring getGrammarFileName() const override;

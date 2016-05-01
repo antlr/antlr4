@@ -41,6 +41,7 @@ LexerFileHeader(file, lexer, namedActions) ::= <<
 
 #include "Lexer.h"
 #include "PredictionContext.h"
+#include "VocabularyImpl.h"
 
 <if (namedActions.header)><namedActions.header><endif>
 
@@ -78,7 +79,7 @@ using namespace org::antlr::v4::runtime;
 
 >>
 
-ParserFileHeader(file, parser, namedActions) ::= <<
+ParserFileHeader(file, parser, namedActions, contextSuperClass) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 
 #pragma once
@@ -86,6 +87,8 @@ ParserFileHeader(file, parser, namedActions) ::= <<
 #include "Parser.h"
 #include "ParserRuleContext.h"
 #include "PredictionContext.h"
+#include "VocabularyImpl.h"
+
 #include "CPPUtils.h"
 
 using namespace org::antlr::v4::runtime;
@@ -104,7 +107,7 @@ class <file.parser.name>Visitor;
 <endif>
 >>
 
-ParserFile(file, parser, namedActions) ::= <<
+ParserFile(file, parser, namedActions, contextSuperClass) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 
 #include "ATN.h"
@@ -154,10 +157,10 @@ class <file.grammarName>BaseListener : public <file.grammarName>Listener {
   void exit<lname; format="cap">(<file.parserName>::<lname; format = "cap">Context *ctx) { \}
 }; separator="\n">
 
-  void enterEveryRule(ParserRuleContext::Ref ctx) { }
-  void exitEveryRule(ParserRuleContext::Ref ctx) { }
-  void visitTerminal(std::shared_ptr\<tree::TerminalNode> node) { }
-  void visitErrorNode(std::shared_ptr\<tree::ErrorNode> node) { }
+  void enterEveryRule(Ref\<ParserRuleContext> ctx) { }
+  void exitEveryRule(Ref\<ParserRuleContext> ctx) { }
+  void visitTerminal(Ref\<tree::TerminalNode> node) { }
+  void visitErrorNode(Ref\<tree::ErrorNode> node) { }
 };
 
 <if (file.genPackage)>

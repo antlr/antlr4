@@ -58,7 +58,7 @@ namespace runtime {
      * @return A {@link Vocabulary} instance providing information about the
      * vocabulary used by the grammar.
      */
-    Ref<dfa::Vocabulary> getVocabulary() const;
+    virtual Ref<dfa::Vocabulary> getVocabulary() const;
 
     /// <summary>
     /// Get a map from token names to token types.

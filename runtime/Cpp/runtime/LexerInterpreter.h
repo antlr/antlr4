@@ -56,7 +56,7 @@ namespace runtime {
     virtual const std::vector<std::wstring>& getRuleNames() const override;
     virtual const std::vector<std::wstring>& getModeNames() const override;
     
-    Ref<dfa::Vocabulary> getVocabulary() const;
+    virtual Ref<dfa::Vocabulary> getVocabulary() const override;
 
   protected:
     const std::wstring _grammarFileName;
