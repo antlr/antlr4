@@ -47,8 +47,6 @@ public class ParserFile extends OutputFile {
 	@ModelElement public Parser parser;
 	@ModelElement public Map<String, Action> namedActions;
 	@ModelElement public ActionChunk contextSuperClass;
-	public Boolean genListener = false;
-	public Boolean genVisitor = false;
 	public String grammarName;
 
 	public ParserFile(OutputModelFactory factory, String fileName) {

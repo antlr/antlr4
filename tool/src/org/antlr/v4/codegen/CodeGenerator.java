@@ -139,11 +139,22 @@ public class CodeGenerator {
 		return walker.walk(outputModel, header);
 	}
 
+	public ST generateLexer() { return generateLexer(false); }
 	public ST generateLexer(boolean header) { return walk(createController().buildLexerOutputModel(header), header); }
+
+	public ST generateParser() { return generateParser(false); }
 	public ST generateParser(boolean header) { return walk(createController().buildParserOutputModel(header), header); }
+
+	public ST generateListener() { return generateListener(false); }
 	public ST generateListener(boolean header) { return walk(createController().buildListenerOutputModel(header), header); }
+
+	public ST generateBaseListener() { return generateBaseListener(false); }
 	public ST generateBaseListener(boolean header) { return walk(createController().buildBaseListenerOutputModel(header), header); }
+
+	public ST generateVisitor() { return generateVisitor(false); }
 	public ST generateVisitor(boolean header) { return walk(createController().buildVisitorOutputModel(header), header); }
+
+	public ST generateBaseVisitor() { return generateBaseVisitor(false); }
 	public ST generateBaseVisitor(boolean header) { return walk(createController().buildBaseVisitorOutputModel(header), header); }
 
 	/** Generate a token vocab file with all the token names/types.  For example:
