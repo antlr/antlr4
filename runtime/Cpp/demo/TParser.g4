@@ -44,7 +44,7 @@ void doAfter() {
   // Visitor members.
 }
 
-main: divide and_? conquer;
+main: stat+;
 divide : ID (and_ GreaterThan)? {doesItBlend()}?; 
 and_ @init{ doInit(); } @after { doAfter(); } : And ;
 
@@ -55,7 +55,7 @@ conquer:
 ;
 
 // Unused rule to demonstrate some of the special features.
-unused[double input] returns [double calculated] locals [size_t _a, double _b, int _c] @init{ doInit(); } @after { doAfter(); } :
+unused[double input = 111] returns [double calculated] locals [int _a, double _b, int _c] @init{ doInit(); } @after { doAfter(); } :
 	stat
 ;
 catch [...] {

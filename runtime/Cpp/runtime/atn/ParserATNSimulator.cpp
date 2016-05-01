@@ -930,13 +930,13 @@ void ParserATNSimulator::closure_(Ref<ATNConfig> config, Ref<ATNConfigSet> confi
     bool continueCollecting = !is<ActionTransition*>(t) && collectPredicates;
     Ref<ATNConfig> c = getEpsilonTarget(config, t, continueCollecting, depth == 0, fullCtx, treatEofAsEpsilon);
     if (c != nullptr) {
-      bool alreadyInSet = closureBusy.count(c) > 0;
-      if (!alreadyInSet) {
-        closureBusy.insert(c);
-      }
-      if (!t->isEpsilon() && alreadyInSet) {
+      if (!t->isEpsilon()) {
         // avoid infinite recursion for EOF* and EOF+
-        continue;
+        if (closureBusy.count(c) == 0) {
+          closureBusy.insert(c);
+        } else {
+          continue;
+        }
       }
 
       int newDepth = depth;

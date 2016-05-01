@@ -23,7 +23,7 @@ void myBarLexerAction() { /* do something*/ };
  // Lexer API functions.
 }
 
-//channels { COMMENTS_CHANNEL, DIRECTIVE }
+channels { COMMENTS_CHANNEL, DIRECTIVE }
 
 tokens {
 	DUMMY	
@@ -38,8 +38,8 @@ Digit: [0..9];
 ID: LETTER (LETTER | '0'..'9')*;
 fragment LETTER : [a-zA-Z\u0080-\uFFFD] ;
 
-LessThan: '<';// -> pushMode(Mode1);
-GreaterThan:  '>';// -> popMode;
+LessThan: '<';
+GreaterThan:  '>';
 Equal: '=';
 And: 'and';
 
@@ -50,8 +50,8 @@ Minus: '-';
 Star: '*';
 OpenPar: '(';
 ClosePar: ')';
-OpenCurly: '{';
-CloseCurly: '}';
+OpenCurly: '{' -> pushMode(Mode1);
+CloseCurly: '}' -> popMode;
 QuestionMark: '?';
 Comma: ',';
 Dollar: '$' -> more, mode(Mode1), type(DUMMY);
