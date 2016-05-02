@@ -111,13 +111,13 @@ namespace atn {
     /// Gets the total number of DFA states stored in the DFA cache for all
     /// decisions in the ATN.
     /// </summary>
-    virtual int getDFASize();
+    virtual size_t getDFASize();
 
     /// <summary>
     /// Gets the total number of DFA states stored in the DFA cache for a
     /// particular decision.
     /// </summary>
-    virtual size_t getDFASize(int decision);
+    virtual size_t getDFASize(size_t decision);
 
   protected:
     const ProfilingATNSimulator *_atnSimulator; // non-owning, we are created by this simulator.

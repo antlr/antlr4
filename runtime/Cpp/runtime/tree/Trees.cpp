@@ -36,6 +36,7 @@
 #include "TerminalNodeImpl.h"
 #include "ATN.h"
 #include "Interval.h"
+#include "Token.h"
 #include "CommonToken.h"
 #include "Predicate.h"
 
@@ -231,7 +232,7 @@ void Trees::stripChildrenOutOfRange(Ref<ParserRuleContext> t, Ref<ParserRuleCont
     Interval range = child->getSourceInterval();
     if (is<ParserRuleContext>(child) && (range.b < (int)startIndex || range.a > (int)stopIndex)) {
       if (isAncestorOf(child, root)) { // replace only if subtree doesn't have displayed root
-        Ref<CommonToken> abbrev = std::make_shared<CommonToken>(Token::INVALID_TYPE, L"...");
+        Ref<CommonToken> abbrev = std::make_shared<CommonToken>((int)Token::INVALID_TYPE, L"...");
         t->children[i] = std::make_shared<TerminalNodeImpl>(abbrev);
       }
     }

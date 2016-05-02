@@ -37,6 +37,7 @@
 
 #include "ProfilingATNSimulator.h"
 
+using namespace org::antlr::v4::runtime;
 using namespace org::antlr::v4::runtime::atn;
 using namespace org::antlr::v4::runtime::dfa;
 using namespace antlrcpp;

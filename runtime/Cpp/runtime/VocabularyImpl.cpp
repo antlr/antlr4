@@ -56,6 +56,7 @@ Ref<Vocabulary> VocabularyImpl::fromTokenNames(const std::vector<std::wstring> &
 
   std::vector<std::wstring> literalNames = tokenNames;
   std::vector<std::wstring> symbolicNames = tokenNames;
+  std::locale locale;
   for (size_t i = 0; i < tokenNames.size(); i++) {
     std::wstring tokenName = tokenNames[i];
     if (tokenName == L"") {
@@ -67,7 +68,7 @@ Ref<Vocabulary> VocabularyImpl::fromTokenNames(const std::vector<std::wstring> &
       if (firstChar == L'\'') {
         symbolicNames[i] = L"";
         continue;
-      } else if (std::isupper(firstChar)) {
+      } else if (std::isupper(firstChar, locale)) {
         literalNames[i] = L"";
         continue;
       }

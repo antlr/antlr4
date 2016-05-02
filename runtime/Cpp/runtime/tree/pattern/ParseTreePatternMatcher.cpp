@@ -118,7 +118,12 @@ ParseTreePattern ParseTreePatternMatcher::compile(const std::wstring &pattern, i
     parserInterp.setErrorHandler(std::make_shared<BailErrorStrategy>());
     tree = parserInterp.parse(patternRuleIndex);
   } catch (ParseCancellationException &e) {
-    std::rethrow_if_nested(e);
+#if defined(_MSC_FULL_VER) && _MSC_FULL_VER < 190023026
+    // rethrow_if_nested is not available before VS 2015.
+    throw e;
+#else
+    std::rethrow_if_nested(e); // Unwrap the nested exception.
+#endif
   } catch (RecognitionException &re) {
     throw re;
   } catch (std::exception &e) {
@@ -126,7 +131,7 @@ ParseTreePattern ParseTreePatternMatcher::compile(const std::wstring &pattern, i
     // throw_with_nested is not available before VS 2015.
     throw e;
 #else
-    std::throw_with_nested("Cannot invoke start rule");
+    std::throw_with_nested("Cannot invoke start rule"); // Wrap any other exception. We should however probably use one of the ANTLR exceptions here.
 #endif
   }
 
