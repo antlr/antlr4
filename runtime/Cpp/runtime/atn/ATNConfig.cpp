@@ -70,6 +70,9 @@ ATNConfig::ATNConfig(Ref<ATNConfig> c, ATNState *state, Ref<PredictionContext> c
   : state(state), alt(c->alt), context(context), semanticContext(semanticContext), reachesIntoOuterContext(c->reachesIntoOuterContext) {
 }
 
+ATNConfig::~ATNConfig() {
+}
+
 size_t ATNConfig::hashCode() const {
   size_t hashCode = misc::MurmurHash::initialize(7);
   hashCode = misc::MurmurHash::update(hashCode, (size_t)state->stateNumber);

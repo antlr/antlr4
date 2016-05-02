@@ -206,8 +206,10 @@ std::vector\<std::wstring> <lexer.name>::_symbolicNames = {
 
 Ref\<dfa::Vocabulary> <lexer.name>::_vocabulary = std::make_shared\<dfa::VocabularyImpl>(_literalNames, _symbolicNames);
 
-std::vector\<std::wstring> <lexer.name>::_tokenNames = []() {
-  std::vector\<std::wstring> result;
+std::vector\<std::wstring> <lexer.name>::_tokenNames;
+
+<lexer.name>::Initializer::Initializer() {
+  // This code could be in a static initializer lambda, but VS doesn't allow access to private class members from there. 
 	for (size_t i = 0; i \< _symbolicNames.size(); ++i) {
 		std::wstring name = _vocabulary->getLiteralName(i);
 		if (name.empty()) {
@@ -220,10 +222,7 @@ std::vector\<std::wstring> <lexer.name>::_tokenNames = []() {
       _tokenNames.push_back(name);
     }
 	}
-  return result;
-}();
-
-<lexer.name>::Initializer::Initializer() {
+  
   <atn>
 }
 
@@ -382,24 +381,23 @@ std::vector\<std::wstring> <parser.name>::_symbolicNames = {
 
 Ref\<dfa::Vocabulary> <parser.name>::_vocabulary = std::make_shared\<dfa::VocabularyImpl>(_literalNames, _symbolicNames);
 
-std::vector\<std::wstring> <parser.name>::_tokenNames = []() {
-  std::vector\<std::wstring> result;
-	for (size_t i = 0; i \< <parser.name>::_symbolicNames.size(); ++i) {
-		std::wstring name = <parser.name>::_vocabulary->getLiteralName(i);
+std::vector\<std::wstring> <parser.name>::_tokenNames;
+
+<parser.name>::Initializer::Initializer() {
+  // This code could be in a static initializer lambda, but VS doesn't allow access to private class members from there. 
+	for (size_t i = 0; i \< _symbolicNames.size(); ++i) {
+		std::wstring name = _vocabulary->getLiteralName(i);
 		if (name.empty()) {
-			name = <parser.name>::_vocabulary->getSymbolicName(i);
+			name = _vocabulary->getSymbolicName(i);
 		}
 
 		if (name.empty()) {
-			result.push_back(L"\<INVALID>");
+			_tokenNames.push_back(L"\<INVALID>");
 		} else {
-      result.push_back(name);
+      _tokenNames.push_back(name);
     }
 	}
-  return result;
-}();
 
-<parser.name>::Initializer::Initializer() {
   <atn>
 }
 

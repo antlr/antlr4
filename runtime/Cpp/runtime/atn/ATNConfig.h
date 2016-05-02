@@ -99,6 +99,8 @@ namespace atn {
     ATNConfig(Ref<ATNConfig> c, ATNState *state, Ref<PredictionContext> context);
     ATNConfig(Ref<ATNConfig> c, ATNState *state, Ref<PredictionContext> context, Ref<SemanticContext> semanticContext);
 
+    virtual ~ATNConfig();
+
     virtual size_t hashCode() const;
 
     struct ATNConfigHasher

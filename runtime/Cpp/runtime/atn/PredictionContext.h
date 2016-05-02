@@ -56,7 +56,7 @@ namespace atn {
     /// Represents $ in an array in full context mode, when $
     /// doesn't mean wildcard: $ + x = [$,x]. Here,
     /// $ = EMPTY_RETURN_STATE.
-    static const int EMPTY_RETURN_STATE = INT16_MAX;
+    static const int EMPTY_RETURN_STATE = INT_MAX;
 
   private:
     static const int INITIAL_HASH = 1;

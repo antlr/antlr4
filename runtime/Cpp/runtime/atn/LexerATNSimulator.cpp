@@ -414,8 +414,8 @@ Ref<LexerATNConfig> LexerATNSimulator::getEpsilonTarget(CharStream *input, Ref<L
       RuleTransition *ruleTransition = static_cast<RuleTransition*>(t);
       Ref<PredictionContext> newContext = SingletonPredictionContext::create(config->context, ruleTransition->followState->stateNumber);
       c = std::make_shared<LexerATNConfig>(config, t->target, newContext);
-    }
       break;
+    }
 
     case Transition::PRECEDENCE:
       throw UnsupportedOperationException("Precedence predicates are not supported in lexers.");
@@ -447,8 +447,8 @@ Ref<LexerATNConfig> LexerATNSimulator::getEpsilonTarget(CharStream *input, Ref<L
       if (evaluatePredicate(input, pt->ruleIndex, pt->predIndex, speculative)) {
         c = std::make_shared<LexerATNConfig>(config, t->target);
       }
-    }
       break;
+    }
 
     case Transition::ACTION:
       if (config->context == nullptr|| config->context->hasEmptyPath()) {
