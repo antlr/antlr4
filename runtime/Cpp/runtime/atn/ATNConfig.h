@@ -47,6 +47,11 @@ namespace atn {
   /// </summary>
   class ATNConfig {
   public:
+    struct ATNConfigHasher;
+    struct ATNConfigComparer;
+
+    using Set = std::unordered_set<Ref<ATNConfig>, ATNConfigHasher, ATNConfigComparer>;
+    
     /// The ATN state associated with this configuration.
     ATNState * state;
 

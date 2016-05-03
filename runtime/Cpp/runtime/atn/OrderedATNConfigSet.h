@@ -32,6 +32,7 @@
 #pragma once
 
 #include "ATNConfigSet.h"
+#include "ATNConfig.h"
 
 namespace org {
 namespace antlr {
@@ -42,7 +43,7 @@ namespace atn {
   struct OrderedATNConfigHasher
   {
     size_t operator()(const Ref<ATNConfig> &config) const {
-      return std::hash<Ref<ATNConfig>>()(config);
+      return config->hashCode();
     }
   };
 

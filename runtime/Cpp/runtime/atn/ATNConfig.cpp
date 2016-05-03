@@ -77,8 +77,8 @@ size_t ATNConfig::hashCode() const {
   size_t hashCode = misc::MurmurHash::initialize(7);
   hashCode = misc::MurmurHash::update(hashCode, (size_t)state->stateNumber);
   hashCode = misc::MurmurHash::update(hashCode, (size_t)alt);
-  hashCode = misc::MurmurHash::update(hashCode, (size_t)context.get());
-  hashCode = misc::MurmurHash::update(hashCode, (size_t)semanticContext.get());
+  hashCode = misc::MurmurHash::update(hashCode, context ? context->hashCode() : 0);
+  hashCode = misc::MurmurHash::update(hashCode, semanticContext->hashCode());
   hashCode = misc::MurmurHash::finish(hashCode, 4);
   return hashCode;
 }
@@ -99,7 +99,7 @@ void ATNConfig::setPrecedenceFilterSuppressed(bool value) {
   }
 }
 
-bool ATNConfig::operator == (const ATNConfig& other) const
+bool ATNConfig::operator == (const ATNConfig &other) const
 {
   return state->stateNumber == other.state->stateNumber && alt == other.alt &&
     (context == other.context || (context != nullptr && context == other.context)) &&

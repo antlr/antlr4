@@ -100,7 +100,7 @@ size_t PredictionContext::calculateEmptyHashCode() {
 
 size_t PredictionContext::calculateHashCode(std::weak_ptr<PredictionContext> parent, int returnState) {
   size_t hash = MurmurHash::initialize(INITIAL_HASH);
-  hash = MurmurHash::update(hash, (size_t)parent.lock().get());
+  hash = MurmurHash::update(hash, parent.lock()->hashCode());
   hash = MurmurHash::update(hash, (size_t)returnState);
   hash = MurmurHash::finish(hash, 2);
   return hash;
@@ -111,7 +111,7 @@ size_t PredictionContext::calculateHashCode(const std::vector<std::weak_ptr<Pred
   size_t hash = MurmurHash::initialize(INITIAL_HASH);
 
   for (auto parent : parents) {
-    hash = MurmurHash::update(hash, (size_t)parent.lock().get());
+    hash = MurmurHash::update(hash, parent.lock()->hashCode());
   }
 
   for (auto returnState : returnStates) {

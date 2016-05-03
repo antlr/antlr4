@@ -75,11 +75,12 @@ stat: expr Equal expr Semicolon
 
 expr: expr Star expr
     | expr Plus expr
-    | expr OpenPar expr ClosePar
+    | OpenPar expr ClosePar
 	| <assoc = right> expr QuestionMark expr Colon expr
     | <assoc = right> expr Equal expr
     | identifier = id
 	| flowControl
+	| INT
 ;
 
 flowControl:

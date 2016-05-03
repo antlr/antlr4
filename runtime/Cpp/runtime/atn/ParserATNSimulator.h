@@ -701,14 +701,14 @@ namespace atn {
      waste to pursue the closure. Might have to advance when we do
      ambig detection thought :(
      */
-    virtual void closure(Ref<ATNConfig> config, Ref<ATNConfigSet> configs, std::set<Ref<ATNConfig>> &closureBusy,
+    virtual void closure(Ref<ATNConfig> config, Ref<ATNConfigSet> configs, ATNConfig::Set &closureBusy,
                          bool collectPredicates, bool fullCtx, bool treatEofAsEpsilon);
 
-    virtual void closureCheckingStopState(Ref<ATNConfig> config, Ref<ATNConfigSet> configs,
-      std::set<Ref<ATNConfig>> &closureBusy, bool collectPredicates, bool fullCtx, int depth, bool treatEofAsEpsilon);
+    virtual void closureCheckingStopState(Ref<ATNConfig> config, Ref<ATNConfigSet> configs, ATNConfig::Set &closureBusy,
+                                          bool collectPredicates, bool fullCtx, int depth, bool treatEofAsEpsilon);
 
     /// Do the actual work of walking epsilon edges.
-    virtual void closure_(Ref<ATNConfig> config, Ref<ATNConfigSet> configs, std::set<Ref<ATNConfig>> &closureBusy,
+    virtual void closure_(Ref<ATNConfig> config, Ref<ATNConfigSet> configs, ATNConfig::Set &closureBusy,
                           bool collectPredicates, bool fullCtx, int depth, bool treatEofAsEpsilon);
 
   public:

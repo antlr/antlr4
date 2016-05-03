@@ -132,7 +132,7 @@ namespace atn {
     /// is {@code null}. </param>
   protected:
     virtual void _LOOK(ATNState *s, ATNState *stopState, Ref<PredictionContext> ctx, misc::IntervalSet &look,
-      std::unordered_set<Ref<ATNConfig>> &lookBusy, antlrcpp::BitSet &calledRuleStack, bool seeThruPreds, bool addEOF) const;
+      ATNConfig::Set &lookBusy, antlrcpp::BitSet &calledRuleStack, bool seeThruPreds, bool addEOF) const;
   };
 
 } // namespace atn

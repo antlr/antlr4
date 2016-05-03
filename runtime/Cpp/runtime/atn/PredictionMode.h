@@ -202,7 +202,7 @@ namespace atn {
      * the configurations to strip out all of the predicates so that a standard
      * {@link ATNConfigSet} will merge everything ignoring predicates.</p>
      */
-    static bool hasSLLConflictTerminatingPrediction(PredictionMode *mode, Ref<ATNConfigSet> configs);
+    static bool hasSLLConflictTerminatingPrediction(PredictionMode mode, Ref<ATNConfigSet> configs);
 
     /// <summary>
     /// Checks if any configuration in {@code configs} is in a

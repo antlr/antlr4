@@ -86,10 +86,11 @@ bool ATNConfigSet::add(Ref<ATNConfig> config, PredictionContextMergeCache *merge
   }
   
   Ref<ATNConfig> existing = configLookup->getOrAdd(config);
-  if (existing == config) { // we added this new one
+  if (existing.get() == config.get()) { // Compare mem addresses, not content (which would happen when we compare the refs).
     _cachedHashCode = 0;
     configs.push_back(config); // track order here
 
+    assert(configLookup->size() == configs.size());
     return true;
   }
   // a previous (s,i,pi,_), merge with it and save result
@@ -106,6 +107,8 @@ bool ATNConfigSet::add(Ref<ATNConfig> config, PredictionContextMergeCache *merge
   }
   
   existing->context = merged; // replace context; no need to alt mapping
+
+  assert(configLookup->size() == configs.size());
   return true;
 }
 

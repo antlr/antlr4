@@ -66,7 +66,7 @@ void LexerIndexedCustomAction::execute(Lexer *lexer) {
 size_t LexerIndexedCustomAction::hashCode() const {
   size_t hash = MurmurHash::initialize();
   hash = MurmurHash::update(hash, _offset);
-  hash = MurmurHash::update(hash, (size_t)_action.get());
+  hash = MurmurHash::update(hash, _action->hashCode());
   return MurmurHash::finish(hash, 2);
 }
 

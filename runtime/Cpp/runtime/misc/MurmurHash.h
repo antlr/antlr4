@@ -75,7 +75,7 @@ namespace misc {
     static size_t hashCode(const std::vector<Ref<T>> &data, size_t seed) {
       size_t hash = initialize(seed);
       for (auto entry : data) {
-        hash = update(hash, (size_t)entry.get());
+        hash = update(hash, entry->hashCode());
       }
 
       return finish(hash, data.size());

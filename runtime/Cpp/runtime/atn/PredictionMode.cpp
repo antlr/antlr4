@@ -50,7 +50,7 @@ struct AltAndContextConfigHasher
   size_t operator () (const ATNConfig &o) const {
     size_t hashCode = misc::MurmurHash::initialize(7);
     hashCode = misc::MurmurHash::update(hashCode, (size_t)o.state->stateNumber);
-    hashCode = misc::MurmurHash::update(hashCode, (size_t)o.context.get());
+    hashCode = misc::MurmurHash::update(hashCode, o.context->hashCode());
     return misc::MurmurHash::finish(hashCode, 2);
   }
 };
@@ -65,7 +65,7 @@ struct AltAndContextConfigComparer {
   }
 };
 
-bool PredictionModeClass::hasSLLConflictTerminatingPrediction(PredictionMode* mode, Ref<ATNConfigSet> configs) {
+bool PredictionModeClass::hasSLLConflictTerminatingPrediction(PredictionMode mode, Ref<ATNConfigSet> configs) {
   /* Configs in rule stop states indicate reaching the end of the decision
    * rule (local context) or end of start rule (full context). If all
    * configs meet this condition, then none of the configurations is able
@@ -76,7 +76,7 @@ bool PredictionModeClass::hasSLLConflictTerminatingPrediction(PredictionMode* mo
   }
 
   // pure SLL mode parsing
-  if (*mode == PredictionMode::SLL) {
+  if (mode == PredictionMode::SLL) {
     // Don't bother with combining configs from different semantic
     // contexts if we can fail over to full LL; costs more time
     // since we'll often fail over anyway.
@@ -94,8 +94,7 @@ bool PredictionModeClass::hasSLLConflictTerminatingPrediction(PredictionMode* mo
 
   // pure SLL or combined SLL+LL mode parsing
   std::vector<antlrcpp::BitSet> altsets = getConflictingAltSubsets(configs);
-  bool heuristic =
-  hasConflictingAltSet(altsets) && !hasStateAssociatedWithOneAlt(configs);
+  bool heuristic = hasConflictingAltSet(altsets) && !hasStateAssociatedWithOneAlt(configs);
   return heuristic;
 }
 
@@ -187,7 +186,7 @@ antlrcpp::BitSet PredictionModeClass::getAlts(Ref<ATNConfigSet> configs) {
 std::vector<antlrcpp::BitSet> PredictionModeClass::getConflictingAltSubsets(Ref<ATNConfigSet> configs) {
   std::unordered_map<Ref<ATNConfig>, antlrcpp::BitSet, AltAndContextConfigHasher, AltAndContextConfigComparer> configToAlts;
   for (auto config : configs->configs) {
-    configToAlts[config].set((size_t)config->alt);
+    configToAlts[config].set(config->alt);
   }
   std::vector<antlrcpp::BitSet> values;
   for (auto it : configToAlts) {

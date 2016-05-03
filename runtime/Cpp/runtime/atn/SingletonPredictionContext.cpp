@@ -79,7 +79,7 @@ bool SingletonPredictionContext::operator == (const PredictionContext &o) const 
   }
 
   //return returnState == other->returnState && (!parent.expired() && parent.lock() == other->parent.lock());
-  return returnState == other->returnState && (parent == other->parent);
+  return returnState == other->returnState && (parent != nullptr && *parent == *other->parent);
 }
 
 std::wstring SingletonPredictionContext::toString() const {
