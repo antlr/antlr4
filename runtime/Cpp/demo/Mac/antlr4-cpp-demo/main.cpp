@@ -19,7 +19,7 @@ using namespace org::antlr::v4::runtime;
 
 int main(int argc, const char * argv[]) {
 
-  ANTLRInputStream input(L"x * y + z");
+  ANTLRInputStream input(L"x * y + z;");
   TLexer lexer(&input);
   CommonTokenStream tokens(&lexer);
 

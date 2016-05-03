@@ -782,12 +782,14 @@ cases(ttypes) ::= <<
 InvokeRuleHeader(r, argExprsChunks) ::= "InvokeRuleHeader"
 
 InvokeRule(r, argExprsChunks) ::= <<
-setState(<r.stateNumber>); <if(r.labels)><r.labels: {l | <labelref(l)> = }><endif><r.name>(<if(r.ast.options.p)><r.ast.options.p><if(argExprsChunks)>,<endif><endif><argExprsChunks>);
+setState(<r.stateNumber>);
+<if(r.labels)><r.labels: {l | <labelref(l)> = }><endif><r.name>(<if(r.ast.options.p)><r.ast.options.p><if(argExprsChunks)>,<endif><endif><argExprsChunks>);
 >>
 
 MatchTokenHeader(m) ::= "<! Required but unused. !>"
 MatchToken(m) ::= <<
-setState(<m.stateNumber>); <if (m.labels)><m.labels: {l | <labelref(l)> = }><endif>match(<parser.name>Token::<m.name>);
+setState(<m.stateNumber>);
+<if (m.labels)><m.labels: {l | <labelref(l)> = }><endif>match(<parser.name>Token::<m.name>);
 >>
 
 MatchSetHeader(m, expr, capture) ::= "<! Required but unused. !>"

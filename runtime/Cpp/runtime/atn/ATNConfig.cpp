@@ -93,9 +93,8 @@ bool ATNConfig::isPrecedenceFilterSuppressed() const {
 
 void ATNConfig::setPrecedenceFilterSuppressed(bool value) {
   if (value) {
-    reachesIntoOuterContext |= 0x40000000;
-  }
-  else {
+    reachesIntoOuterContext |= SUPPRESS_PRECEDENCE_FILTER;
+  } else {
     reachesIntoOuterContext &= ~SUPPRESS_PRECEDENCE_FILTER;
   }
 }

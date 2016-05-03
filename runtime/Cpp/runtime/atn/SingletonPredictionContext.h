@@ -41,7 +41,12 @@ namespace atn {
 
   class SingletonPredictionContext : public PredictionContext {
   public:
-    const std::weak_ptr<PredictionContext> parent;
+    // Usually a parent is linked via a weak ptr. Not so here as we have kinda reverse reference chain.
+    // There are no child contexts stored here and often the parent context is left dangling when it's
+    // owning ATNState is released. In order to avoid having this context released as well (leaving all other contexts
+    // which got this one as parent with a null reference) we use a shared_ptr here instead, to keep those left alone
+    // parent contexts alive.
+    const Ref<PredictionContext> parent;
     const int returnState;
 
     SingletonPredictionContext(std::weak_ptr<PredictionContext> parent, int returnState);

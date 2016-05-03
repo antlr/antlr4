@@ -180,8 +180,8 @@ Ref<PredictionContext> PredictionContext::mergeSingletons(Ref<SingletonPredictio
     return rootMerge;
   }
 
-  Ref<PredictionContext> parentA = a->parent.lock();
-  Ref<PredictionContext> parentB = b->parent.lock();
+  Ref<PredictionContext> parentA = a->parent;//.lock();
+  Ref<PredictionContext> parentB = b->parent;//.lock();
   if (a->returnState == b->returnState) { // a == b
     Ref<PredictionContext> parent = merge(parentA, parentB, rootIsWildcard, mergeCache);
 
@@ -353,8 +353,10 @@ Ref<PredictionContext> PredictionContext::mergeArrays(Ref<ArrayPredictionContext
       }
       return a_;
     }
-    mergedParents = Arrays::copyOf(mergedParents, k);
-    mergedReturnStates = Arrays::copyOf(mergedReturnStates, k);
+    //mergedParents = Arrays::copyOf(mergedParents, k);
+    mergedParents.resize(k);
+    //mergedReturnStates = Arrays::copyOf(mergedReturnStates, k);
+    mergedReturnStates.resize(k);
   }
 
   Ref<ArrayPredictionContext> M = std::make_shared<ArrayPredictionContext>(mergedParents, mergedReturnStates);

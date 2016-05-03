@@ -93,7 +93,8 @@ misc::IntervalSet LL1Analyzer::LOOK(ATNState *s, ATNState *stopState, Ref<RuleCo
 }
 
 void LL1Analyzer::_LOOK(ATNState *s, ATNState *stopState, Ref<PredictionContext> ctx, misc::IntervalSet &look,
-                        std::unordered_set<Ref<ATNConfig>> &lookBusy,  antlrcpp::BitSet &calledRuleStack, bool seeThruPreds, bool addEOF) const {
+                        std::unordered_set<Ref<ATNConfig>> &lookBusy,  antlrcpp::BitSet &calledRuleStack,
+                        bool seeThruPreds, bool addEOF) const {
   Ref<ATNConfig> c = std::make_shared<ATNConfig>(s, 0, ctx);
 
   if (lookBusy.count(c) > 0) // Keep in mind comparison is based on members of the class, not the actual instance.

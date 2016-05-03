@@ -37,12 +37,12 @@ using namespace org::antlr::v4::runtime::atn;
 
 SingletonPredictionContext::SingletonPredictionContext(std::weak_ptr<PredictionContext> parent, int returnState)
   : PredictionContext(!parent.expired() ? calculateHashCode(parent, returnState) : calculateEmptyHashCode()),
-    parent(parent), returnState(returnState) {
+    parent(parent.lock()), returnState(returnState) {
   assert(returnState != ATNState::INVALID_STATE_NUMBER);
 }
 
 Ref<SingletonPredictionContext> SingletonPredictionContext::create(std::weak_ptr<PredictionContext> parent,
-                                                                              int returnState) {
+                                                                   int returnState) {
   if (returnState == EMPTY_RETURN_STATE && parent.expired()) {
     // someone can pass in the bits of an array ctx that mean $
     return std::dynamic_pointer_cast<SingletonPredictionContext>(EMPTY);
@@ -78,11 +78,13 @@ bool SingletonPredictionContext::operator == (const PredictionContext &o) const 
     return false; // can't be same if hash is different
   }
 
-  return returnState == other->returnState && (!parent.expired() && parent.lock() == other->parent.lock());
+  //return returnState == other->returnState && (!parent.expired() && parent.lock() == other->parent.lock());
+  return returnState == other->returnState && (parent == other->parent);
 }
 
 std::wstring SingletonPredictionContext::toString() const {
-  std::wstring up = !parent.expired() ? parent.lock()->toString() : L"";
+  //std::wstring up = !parent.expired() ? parent.lock()->toString() : L"";
+  std::wstring up = parent != nullptr ? parent->toString() : L"";
   if (up.length() == 0) {
     if (returnState == EMPTY_RETURN_STATE) {
       return L"$";

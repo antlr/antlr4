@@ -70,7 +70,7 @@ namespace atn {
      *
      * <p>
      * closure() tracks the depth of how far we dip into the outer context:
-     * depth &gt; 0.  Note that it may not be totally accurate depth since I
+     * depth > 0.  Note that it may not be totally accurate depth since I
      * don't ever decrement. TODO: make it a boolean then</p>
      *
      * <p>
