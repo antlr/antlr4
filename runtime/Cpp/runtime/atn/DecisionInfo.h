@@ -57,7 +57,7 @@ namespace atn {
   ///
   /// @since 4.3
   /// </summary>
-  class DecisionInfo {
+  class ANTLR4CPP_PUBLIC DecisionInfo {
   public:
     /// <summary>
     /// The decision number, which is an index into <seealso cref="ATN#decisionToState"/>.

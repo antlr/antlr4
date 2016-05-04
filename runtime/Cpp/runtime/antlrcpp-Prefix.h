@@ -60,7 +60,7 @@
 
 // Defines for the Guid class and other platform dependent stuff.
 #ifdef _WIN32
-#pragma warning (disable: 4250) // Class inherits by dominance.
+  #pragma warning (disable: 4250) // Class inherits by dominance.
 
   #define GUID_WINDOWS
 
@@ -68,6 +68,19 @@
     typedef __int64 ssize_t;
   #else
     typedef int ssize_t;
+  #endif
+
+  #ifdef _DLL
+    #ifdef ANTLR4CPP_EXPORTS
+      #define ANTLR4CPP_PUBLIC __declspec(dllexport)
+      #define EXPIMP_TEMPLATE
+    #else
+      #define ANTLR4CPP_PUBLIC __declspec(dllimport)
+      #define EXPIMP_TEMPLATE extern
+    #endif
+  #else
+    #define ANTLR4CPP_PUBLIC
+    #define EXPIMP_TEMPLATE
   #endif
 
 #elif __APPLE__
@@ -78,7 +91,6 @@
 
 #include "guid.h"
 #include "Declarations.h"
-
 
 #if !defined(HAS_NOEXCEPT)
   #if defined(__clang__)
@@ -100,4 +112,3 @@
 #endif
 
 template<class T> using Ref = std::shared_ptr<T>;
-

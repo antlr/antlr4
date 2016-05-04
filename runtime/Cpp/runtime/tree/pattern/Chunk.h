@@ -49,7 +49,7 @@ namespace pattern {
   /// chunks are converted to <seealso cref="RuleTagToken"/>, <seealso cref="TokenTagToken"/>, or the
   /// regular tokens of the text surrounding the tags.
   /// </summary>
-  class Chunk {
+  class ANTLR4CPP_PUBLIC Chunk {
 
     /// <summary>
     /// This method returns a text representation of the tag chunk. Labeled tags

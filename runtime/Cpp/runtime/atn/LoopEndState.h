@@ -41,7 +41,7 @@ namespace atn {
 
   /// <summary>
   /// Mark the end of a * or + loop. </summary>
-  class LoopEndState final : public ATNState {
+  class ANTLR4CPP_PUBLIC LoopEndState final : public ATNState {
   public:
     ATNState *loopBackState;
 

@@ -88,7 +88,7 @@ namespace runtime {
    *
    *  @see ParserRuleContext
    */
-  class RuleContext : public tree::RuleNode, public std::enable_shared_from_this<RuleContext> {
+  class ANTLR4CPP_PUBLIC RuleContext : public tree::RuleNode, public std::enable_shared_from_this<RuleContext> {
   public:
     static const Ref<RuleContext> EMPTY;
 

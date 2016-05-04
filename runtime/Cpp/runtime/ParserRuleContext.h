@@ -62,7 +62,7 @@ namespace runtime {
   ///  group values such as this aggregate.  The getters/setters are there to
   ///  satisfy the superclass interface.
   /// </summary>
-  class ParserRuleContext : public RuleContext {
+  class ANTLR4CPP_PUBLIC ParserRuleContext : public RuleContext {
   public:
     /// If we are debugging or building a parse tree for a visitor,
     ///  we need to track all of the tokens and rule invocations associated

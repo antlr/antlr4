@@ -37,7 +37,7 @@ namespace v4 {
 namespace runtime {
 namespace dfa {
 
-  class DFA {
+  class ANTLR4CPP_PUBLIC DFA {
   public:
     /// A set of all DFA states. Use a map so we can get old state back.
     /// Set only allows you to see if it's there.

@@ -38,13 +38,13 @@ namespace antlr {
 namespace v4 {
 namespace runtime {
 
-  class CommonToken : public WritableToken {
+  class ANTLR4CPP_PUBLIC CommonToken : public WritableToken {
   protected:
     /**
      * An empty {@link Pair} which is used as the default value of
      * {@link #source} for tokens that do not have a source.
      */
-    static const std::pair<TokenSource*, CharStream*> EMPTY_SOURCE;
+    static const std::pair<TokenSource *, CharStream *> EMPTY_SOURCE;
 
     /**
      * This is the backing field for {@link #getType} and {@link #setType}.
@@ -66,7 +66,7 @@ namespace runtime {
      * This is the backing field for {@link #getChannel} and
      * {@link #setChannel}.
      */
-    int _channel;
+    size_t _channel;
 
     /**
      * This is the backing field for {@link #getTokenSource} and
@@ -79,7 +79,7 @@ namespace runtime {
      * {@link Pair} containing these values.</p>
      */
     
-    std::pair<TokenSource*, CharStream*> _source; // ml: pure references, usually from statically allocated classes.
+    std::pair<TokenSource *, CharStream *> _source; // ml: pure references, usually from statically allocated classes.
 
     /**
      * This is the backing field for {@link #getText} when the token text is
@@ -160,7 +160,7 @@ namespace runtime {
     virtual int getCharPositionInLine() override;
     virtual void setCharPositionInLine(int charPositionInLine) override;
 
-    virtual int getChannel() override;
+    virtual size_t getChannel() override;
     virtual void setChannel(int channel) override;
 
     virtual void setType(int type) override;

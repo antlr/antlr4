@@ -54,7 +54,7 @@ namespace atn {
     }
   };
   
-  class OrderedATNConfigSet : public ATNConfigSet {
+  class ANTLR4CPP_PUBLIC OrderedATNConfigSet : public ATNConfigSet {
   public:
     OrderedATNConfigSet();
   };

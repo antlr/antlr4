@@ -40,7 +40,7 @@ namespace runtime {
 
   /// Vacuum all input from a stream and then treat it
   /// like a string. Can also pass in a string or char[] to use.
-  class ANTLRInputStream : public CharStream {
+  class ANTLR4CPP_PUBLIC ANTLRInputStream : public CharStream {
   public:
     static const int READ_BUFFER_SIZE = 1024;
 

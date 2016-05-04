@@ -45,7 +45,7 @@ namespace atn {
   ///  references to all calls to this rule to compute FOLLOW sets for
   ///  error handling.
   /// </summary>
-  class RuleStopState final : public ATNState {
+  class ANTLR4CPP_PUBLIC RuleStopState final : public ATNState {
 
   public:
     virtual int getStateType() override;

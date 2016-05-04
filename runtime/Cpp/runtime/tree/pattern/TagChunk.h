@@ -54,7 +54,7 @@ namespace pattern {
   /// This class does not perform any validation on the tag or label names aside
   /// from ensuring that the tag is a non-null, non-empty string.
   /// </summary>
-  class TagChunk : public Chunk {
+  class ANTLR4CPP_PUBLIC TagChunk : public Chunk {
     /// <summary>
     /// This is the backing field for <seealso cref="#getTag"/>.
     /// </summary>

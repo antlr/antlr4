@@ -39,7 +39,7 @@ namespace antlr {
 namespace v4 {
 namespace runtime {
 
-  class Recognizer : public IRecognizer {
+  class ANTLR4CPP_PUBLIC Recognizer : public IRecognizer {
   public:
     Recognizer();
 

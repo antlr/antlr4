@@ -46,7 +46,7 @@ namespace atn {
   /// <seealso cref= ParserATNSimulator#evalSemanticContext
   ///
   /// @since 4.3 </seealso>
-  class PredicateEvalInfo : public DecisionEventInfo {
+  class ANTLR4CPP_PUBLIC PredicateEvalInfo : public DecisionEventInfo {
   public:
     /// The semantic context which was evaluated.
     const Ref<SemanticContext> semctx;

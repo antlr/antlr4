@@ -39,7 +39,7 @@ namespace v4 {
 namespace runtime {
 namespace atn {
 
-  class StarLoopEntryState final : public DecisionState {
+  class ANTLR4CPP_PUBLIC StarLoopEntryState final : public DecisionState {
   public:
     StarLoopEntryState();
     

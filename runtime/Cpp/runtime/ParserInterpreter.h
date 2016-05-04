@@ -55,7 +55,7 @@ namespace runtime {
   ///
   ///  See TestParserInterpreter for examples.
   /// </summary>
-  class ParserInterpreter : public Parser {
+  class ANTLR4CPP_PUBLIC ParserInterpreter : public Parser {
   public:
     // @deprecated
     ParserInterpreter(const std::wstring &grammarFileName, const std::vector<std::wstring>& tokenNames,

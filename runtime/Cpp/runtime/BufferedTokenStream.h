@@ -50,7 +50,7 @@ namespace runtime {
    * {@link Token#HIDDEN_CHANNEL}, use a filtering token stream such a
    * {@link CommonTokenStream}.</p>
    */
-  class BufferedTokenStream : public TokenStream {
+  class ANTLR4CPP_PUBLIC BufferedTokenStream : public TokenStream {
   public:
     BufferedTokenStream(TokenSource *tokenSource);
 

@@ -25,26 +25,26 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
     <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
     <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
     <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
@@ -95,6 +95,7 @@
       <AdditionalIncludeDirectories>$(SolutionDir)..\..\runtime;$(SolutionDir)..\..\runtime\atn;$(SolutionDir)..\..\runtime\dfa;$(SolutionDir)..\..\runtime\misc;$(SolutionDir)..\..\runtime\support;$(SolutionDir)..\..\runtime\tree;$(SolutionDir)..\..\runtime\tree\xpath;$(SolutionDir)..\..\runtime\tree\pattern;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>antlrcpp-Prefix.h</PrecompiledHeaderFile>
       <ForcedIncludeFiles>antlrcpp-Prefix.h</ForcedIncludeFiles>
+      <DisableSpecificWarnings>4251</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -110,6 +111,7 @@
       <AdditionalIncludeDirectories>$(SolutionDir)..\..\runtime;$(SolutionDir)..\..\runtime\atn;$(SolutionDir)..\..\runtime\dfa;$(SolutionDir)..\..\runtime\misc;$(SolutionDir)..\..\runtime\support;$(SolutionDir)..\..\runtime\tree;$(SolutionDir)..\..\runtime\tree\xpath;$(SolutionDir)..\..\runtime\tree\pattern;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>antlrcpp-Prefix.h</PrecompiledHeaderFile>
       <ForcedIncludeFiles>antlrcpp-Prefix.h</ForcedIncludeFiles>
+      <DisableSpecificWarnings>4251</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -127,6 +129,7 @@
       <AdditionalIncludeDirectories>$(SolutionDir)..\..\runtime;$(SolutionDir)..\..\runtime\atn;$(SolutionDir)..\..\runtime\dfa;$(SolutionDir)..\..\runtime\misc;$(SolutionDir)..\..\runtime\support;$(SolutionDir)..\..\runtime\tree;$(SolutionDir)..\..\runtime\tree\xpath;$(SolutionDir)..\..\runtime\tree\pattern;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>antlrcpp-Prefix.h</PrecompiledHeaderFile>
       <ForcedIncludeFiles>antlrcpp-Prefix.h</ForcedIncludeFiles>
+      <DisableSpecificWarnings>4251</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -146,6 +149,7 @@
       <AdditionalIncludeDirectories>$(SolutionDir)..\..\runtime;$(SolutionDir)..\..\runtime\atn;$(SolutionDir)..\..\runtime\dfa;$(SolutionDir)..\..\runtime\misc;$(SolutionDir)..\..\runtime\support;$(SolutionDir)..\..\runtime\tree;$(SolutionDir)..\..\runtime\tree\xpath;$(SolutionDir)..\..\runtime\tree\pattern;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>antlrcpp-Prefix.h</PrecompiledHeaderFile>
       <ForcedIncludeFiles>antlrcpp-Prefix.h</ForcedIncludeFiles>
+      <DisableSpecificWarnings>4251</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -155,8 +159,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\runtime\ANTLRErrorListener.cpp" />
-    <ClCompile Include="..\..\runtime\ANTLRErrorStrategy.cpp" />
     <ClCompile Include="..\..\runtime\ANTLRFileStream.cpp" />
     <ClCompile Include="..\..\runtime\ANTLRInputStream.cpp" />
     <ClCompile Include="..\..\runtime\atn\AbstractPredicateTransition.cpp" />
@@ -176,8 +178,6 @@
     <ClCompile Include="..\..\runtime\atn\BasicBlockStartState.cpp" />
     <ClCompile Include="..\..\runtime\atn\BasicState.cpp" />
     <ClCompile Include="..\..\runtime\atn\BlockEndState.cpp" />
-    <ClCompile Include="..\..\runtime\atn\BlockStartState.cpp" />
-    <ClCompile Include="..\..\runtime\atn\ConfigLookup.cpp" />
     <ClCompile Include="..\..\runtime\atn\ContextSensitivityInfo.cpp" />
     <ClCompile Include="..\..\runtime\atn\DecisionEventInfo.cpp" />
     <ClCompile Include="..\..\runtime\atn\DecisionInfo.cpp" />
@@ -185,7 +185,6 @@
     <ClCompile Include="..\..\runtime\atn\EmptyPredictionContext.cpp" />
     <ClCompile Include="..\..\runtime\atn\EpsilonTransition.cpp" />
     <ClCompile Include="..\..\runtime\atn\ErrorInfo.cpp" />
-    <ClCompile Include="..\..\runtime\atn\LexerAction.cpp" />
     <ClCompile Include="..\..\runtime\atn\LexerActionExecutor.cpp" />
     <ClCompile Include="..\..\runtime\atn\LexerActionType.cpp" />
     <ClCompile Include="..\..\runtime\atn\LexerATNConfig.cpp" />
@@ -268,18 +267,11 @@
     <ClCompile Include="..\..\runtime\support\Strings.cpp" />
     <ClCompile Include="..\..\runtime\Token.cpp" />
     <ClCompile Include="..\..\runtime\TokenFactory.cpp" />
-    <ClCompile Include="..\..\runtime\TokenSource.cpp" />
     <ClCompile Include="..\..\runtime\TokenStream.cpp" />
     <ClCompile Include="..\..\runtime\TokenStreamRewriter.cpp" />
-    <ClCompile Include="..\..\runtime\tree\AbstractParseTreeVisitor.cpp" />
-    <ClCompile Include="..\..\runtime\tree\ErrorNode.cpp" />
     <ClCompile Include="..\..\runtime\tree\ErrorNodeImpl.cpp" />
-    <ClCompile Include="..\..\runtime\tree\ParseTree.cpp" />
-    <ClCompile Include="..\..\runtime\tree\ParseTreeListener.cpp" />
     <ClCompile Include="..\..\runtime\tree\ParseTreeProperty.cpp" />
-    <ClCompile Include="..\..\runtime\tree\ParseTreeVisitor.cpp" />
     <ClCompile Include="..\..\runtime\tree\ParseTreeWalker.cpp" />
-    <ClCompile Include="..\..\runtime\tree\pattern\Chunk.cpp" />
     <ClCompile Include="..\..\runtime\tree\pattern\ParseTreeMatch.cpp" />
     <ClCompile Include="..\..\runtime\tree\pattern\ParseTreePattern.cpp" />
     <ClCompile Include="..\..\runtime\tree\pattern\ParseTreePatternMatcher.cpp" />
@@ -287,9 +279,6 @@
     <ClCompile Include="..\..\runtime\tree\pattern\TagChunk.cpp" />
     <ClCompile Include="..\..\runtime\tree\pattern\TextChunk.cpp" />
     <ClCompile Include="..\..\runtime\tree\pattern\TokenTagToken.cpp" />
-    <ClCompile Include="..\..\runtime\tree\RuleNode.cpp" />
-    <ClCompile Include="..\..\runtime\tree\SyntaxTree.cpp" />
-    <ClCompile Include="..\..\runtime\tree\TerminalNode.cpp" />
     <ClCompile Include="..\..\runtime\tree\TerminalNodeImpl.cpp" />
     <ClCompile Include="..\..\runtime\tree\Tree.cpp" />
     <ClCompile Include="..\..\runtime\tree\Trees.cpp" />

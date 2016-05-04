@@ -39,7 +39,7 @@ namespace v4 {
 namespace runtime {
 namespace atn {
 
-  class RangeTransition final : public Transition {
+  class ANTLR4CPP_PUBLIC RangeTransition final : public Transition {
   public:
     const int from;
     const int to;

@@ -112,7 +112,7 @@ namespace runtime {
    * If you don't use named rewrite streams, a "default" stream is used as the
    * first example shows.</p>
    */
-  class TokenStreamRewriter {
+  class ANTLR4CPP_PUBLIC TokenStreamRewriter {
   public:
     static const std::wstring DEFAULT_PROGRAM_NAME;
     static const int PROGRAM_INIT_SIZE = 100;

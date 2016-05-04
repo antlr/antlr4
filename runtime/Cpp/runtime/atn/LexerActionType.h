@@ -43,7 +43,7 @@ namespace atn {
   /// @author Sam Harwell
   /// @since 4.2
   /// </summary>
-  enum class LexerActionType : size_t {
+  enum class ANTLR4CPP_PUBLIC LexerActionType : size_t {
     /// <summary>
     /// The type of a <seealso cref="LexerChannelAction"/> action.
     /// </summary>

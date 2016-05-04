@@ -39,7 +39,7 @@ namespace v4 {
 namespace runtime {
 namespace atn {
 
-  class BasicState final : public ATNState {
+  class ANTLR4CPP_PUBLIC BasicState final : public ATNState {
 
   public:
     virtual int getStateType() override;

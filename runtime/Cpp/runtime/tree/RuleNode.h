@@ -39,7 +39,7 @@ namespace v4 {
 namespace runtime {
 namespace tree {
 
-  class RuleNode : public ParseTree {
+  class ANTLR4CPP_PUBLIC RuleNode : public ParseTree {
   public:
     // Because of cross references (RuleNode <-> RuleContext) we cannot use RuleContext> here.
     virtual Ref<runtime::RuleContext> getRuleContext() = 0;

@@ -40,7 +40,7 @@ namespace v4 {
 namespace runtime {
 
   /// A source of characters for an ANTLR lexer.
-  class CharStream : public IntStream {
+  class ANTLR4CPP_PUBLIC CharStream : public IntStream {
   public:
     virtual ~CharStream() = 0;
 

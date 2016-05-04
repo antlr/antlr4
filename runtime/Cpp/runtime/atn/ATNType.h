@@ -38,7 +38,7 @@ namespace runtime {
 namespace atn {
 
   /// Represents the type of recognizer an ATN applies to.
-  enum class ATNType {
+  ANTLR4CPP_PUBLIC enum class ATNType {
     LEXER = 0,
     PARSER = 1,
   };

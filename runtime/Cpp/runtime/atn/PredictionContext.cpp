@@ -48,8 +48,6 @@ using namespace antlrcpp;
 
 int PredictionContext::globalNodeCount = 0;
 const Ref<PredictionContext> PredictionContext::EMPTY = std::make_shared<EmptyPredictionContext>();
-const int PredictionContext::EMPTY_RETURN_STATE;
-const int PredictionContext::INITIAL_HASH;
 
 PredictionContext::PredictionContext(size_t cachedHashCode) : id(globalNodeCount++), cachedHashCode(cachedHashCode)  {
 }

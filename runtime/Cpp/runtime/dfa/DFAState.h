@@ -62,7 +62,7 @@ namespace dfa {
   ///  but with different ATN contexts (with same or different alts)
   ///  meaning that state was reached via a different set of rule invocations.
   /// </summary>
-  class DFAState {
+  class ANTLR4CPP_PUBLIC DFAState {
   public:
     class PredPrediction {
     public:
@@ -75,7 +75,6 @@ namespace dfa {
       void InitializeInstanceFields();
     };
 
-  public:
     int stateNumber;
 
     Ref<atn::ATNConfigSet> configs;
@@ -84,7 +83,7 @@ namespace dfa {
     /// {@code edges[symbol]} points to target of symbol. Shift up by 1 so (-1)
     ///  <seealso cref="Token#EOF"/> maps to {@code edges[0]}.
     /// </summary>
-    std::vector<DFAState*> edges;
+    std::vector<DFAState *> edges;
 
     bool isAcceptState;
 

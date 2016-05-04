@@ -168,11 +168,6 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\antlr4cpp.vcxproj">
-      <Project>{a9762991-1b57-4dce-90c0-ee42b96947be}</Project>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="..\..\..\runtime\antlrcpp-Prefix.h" />
     <ClInclude Include="..\..\generated\TLexer.h" />
     <ClInclude Include="..\..\generated\TParser.h" />
@@ -180,6 +175,11 @@
     <ClInclude Include="..\..\generated\TParserBaseVisitor.h" />
     <ClInclude Include="..\..\generated\TParserListener.h" />
     <ClInclude Include="..\..\generated\TParserVisitor.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\antlr4cpp.vcxproj">
+      <Project>{a9762991-1b57-4dce-90c0-ee42b96947be}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

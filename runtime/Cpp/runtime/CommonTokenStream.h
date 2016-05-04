@@ -62,7 +62,7 @@ namespace runtime {
    * such a rule will not be available as part of the token stream, regardless of
    * channel.</p>
    */
-  class CommonTokenStream : public BufferedTokenStream {
+  class ANTLR4CPP_PUBLIC CommonTokenStream : public BufferedTokenStream {
   protected:
     /**
      * Specifies the channel to use for filtering tokens.

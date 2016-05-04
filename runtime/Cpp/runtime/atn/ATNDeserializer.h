@@ -40,7 +40,7 @@ namespace v4 {
 namespace runtime {
 namespace atn {
 
-  class ATNDeserializer {
+  class ANTLR4CPP_PUBLIC ATNDeserializer {
   public:
     static const size_t SERIALIZED_VERSION;
 

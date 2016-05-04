@@ -41,7 +41,7 @@ namespace atn {
 
   /// <summary>
   /// Terminal node of a simple {@code (a|b|c)} block. </summary>
-  class BlockEndState final : public ATNState {
+  class ANTLR4CPP_PUBLIC BlockEndState final : public ATNState {
   public:
     BlockStartState *startState;
 

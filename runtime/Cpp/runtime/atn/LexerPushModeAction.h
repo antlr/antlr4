@@ -47,7 +47,7 @@ namespace atn {
   /// @author Sam Harwell
   /// @since 4.2
   /// </summary>
-  class LexerPushModeAction final : public LexerAction {
+  class ANTLR4CPP_PUBLIC LexerPushModeAction final : public LexerAction {
   public:
     /// <summary>
     /// Constructs a new {@code pushMode} action with the specified mode value. </summary>

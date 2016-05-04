@@ -41,7 +41,7 @@ namespace dfa {
 
   /// This class provides a default implementation of the <seealso cref="Vocabulary"/>
   /// interface.
-  class VocabularyImpl : public Vocabulary {
+  class ANTLR4CPP_PUBLIC VocabularyImpl : public Vocabulary {
   public:
     /// Gets an empty <seealso cref="Vocabulary"/> instance.
     ///

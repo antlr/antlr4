@@ -39,7 +39,7 @@ namespace v4 {
 namespace runtime {
 namespace atn {
 
-  class RuleTransition : public Transition {
+  class ANTLR4CPP_PUBLIC RuleTransition : public Transition {
     /// <summary>
     /// Ptr to the rule definition object for this rule ref </summary>
   public:

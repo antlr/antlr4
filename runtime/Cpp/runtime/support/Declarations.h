@@ -127,6 +127,10 @@ namespace org {
           class LexerActionExecutor;
           class LexerATNConfig;
           class LexerATNSimulator;
+          class LexerMoreAction;
+          class LexerPopModeAction;
+          class LexerSkipAction;
+          class LookaheadEventInfo;
           class LoopEndState;
           class NotSetTransition;
           class OrderedATNConfigSet;

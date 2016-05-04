@@ -99,7 +99,7 @@ namespace atn {
   ///
   /// <embed src="images/OptionalNonGreedy.svg" type="image/svg+xml"/>
   /// </summary>
-  class ATNState {
+  class ANTLR4CPP_PUBLIC ATNState {
   public:
     virtual ~ATNState();
 

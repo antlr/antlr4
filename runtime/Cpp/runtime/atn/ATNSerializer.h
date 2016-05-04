@@ -37,7 +37,7 @@ namespace v4 {
 namespace runtime {
 namespace atn {
 
-  class ATNSerializer {
+  class ANTLR4CPP_PUBLIC ATNSerializer {
   public:
     ATN *atn;
 

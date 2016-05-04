@@ -39,7 +39,7 @@ namespace v4 {
 namespace runtime {
 namespace dfa {
 
-  class LexerDFASerializer : public DFASerializer {
+  class ANTLR4CPP_PUBLIC LexerDFASerializer : public DFASerializer {
   public:
     LexerDFASerializer(DFA *dfa);
 

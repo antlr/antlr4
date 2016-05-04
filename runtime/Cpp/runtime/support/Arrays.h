@@ -34,7 +34,7 @@
 
 namespace antlrcpp {
   
-  class Arrays {
+  class ANTLR4CPP_PUBLIC Arrays {
   public:
 
     static std::wstring listToString(const std::vector<std::wstring> &list, const std::wstring &separator);

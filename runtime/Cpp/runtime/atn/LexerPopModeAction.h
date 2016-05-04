@@ -49,7 +49,7 @@ namespace atn {
   /// @author Sam Harwell
   /// @since 4.2
   /// </summary>
-  class LexerPopModeAction final : public LexerAction {
+  class ANTLR4CPP_PUBLIC LexerPopModeAction final : public LexerAction {
   public:
     /// <summary>
     /// Provides a singleton instance of this parameterless lexer action.

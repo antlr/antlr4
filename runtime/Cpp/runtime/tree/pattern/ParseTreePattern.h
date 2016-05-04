@@ -42,7 +42,7 @@ namespace pattern {
   /// A pattern like {@code <ID> = <expr>;} converted to a <seealso cref="ParseTree"/> by
   /// <seealso cref="ParseTreePatternMatcher#compile(String, int)"/>.
   /// </summary>
-  class ParseTreePattern {
+  class ANTLR4CPP_PUBLIC ParseTreePattern {
   public:
     /// <summary>
     /// Construct a new instance of the <seealso cref="ParseTreePattern"/> class.

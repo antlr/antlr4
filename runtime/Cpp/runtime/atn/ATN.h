@@ -39,7 +39,7 @@ namespace v4 {
 namespace runtime {
 namespace atn {
 
-  class ATN {
+  class ANTLR4CPP_PUBLIC ATN {
   public:
     static const int INVALID_ALT_NUMBER = 0;
 
@@ -81,7 +81,7 @@ namespace atn {
     /// be referenced by action transitions in the ATN.
     std::vector<Ref<LexerAction>> lexerActions;
 
-    std::vector<TokensStartState*> modeToStartState;
+    std::vector<TokensStartState *> modeToStartState;
 
     ATN& operator = (ATN &other) NOEXCEPT;
     ATN& operator = (ATN &&other) NOEXCEPT;
@@ -139,4 +139,3 @@ namespace atn {
 } // namespace v4
 } // namespace antlr
 } // namespace org
-

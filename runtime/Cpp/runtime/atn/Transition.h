@@ -52,7 +52,7 @@ namespace atn {
   ///  the states. We'll use the term Edge for the DFA to distinguish them from
   ///  ATN transitions.
   /// </summary>
-  class Transition {
+  class ANTLR4CPP_PUBLIC Transition {
   public:
     // constants for serialization
     static const int EPSILON = 1;

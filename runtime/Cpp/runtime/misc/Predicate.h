@@ -38,7 +38,7 @@ namespace runtime {
 namespace misc {
 
   template<typename T>
-  class Predicate {
+  class ANTLR4CPP_PUBLIC Predicate {
   public:
     virtual bool test(Ref<T> t) = 0;
   };

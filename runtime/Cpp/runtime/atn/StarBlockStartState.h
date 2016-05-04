@@ -41,7 +41,7 @@ namespace atn {
 
   /// <summary>
   /// The block that begins a closure loop. </summary>
-  class StarBlockStartState final : public BlockStartState {
+  class ANTLR4CPP_PUBLIC StarBlockStartState final : public BlockStartState {
 
   public:
     virtual int getStateType() override;

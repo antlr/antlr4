@@ -38,7 +38,7 @@ namespace antlr {
 namespace v4 {
 namespace runtime {
 
-  class LexerInterpreter : public Lexer {
+  class ANTLR4CPP_PUBLIC LexerInterpreter : public Lexer {
   public:
     // @deprecated
     LexerInterpreter(const std::wstring &grammarFileName, const std::vector<std::wstring> &tokenNames,

@@ -36,7 +36,7 @@ namespace antlr {
 namespace v4 {
 namespace runtime {
 
-  class IRecognizer {
+  class ANTLR4CPP_PUBLIC IRecognizer {
   public:
 
     virtual int getState() = 0;

@@ -39,7 +39,7 @@ namespace v4 {
 namespace runtime {
 namespace atn {
 
-  class EpsilonTransition final : public Transition {
+  class ANTLR4CPP_PUBLIC EpsilonTransition final : public Transition {
   public:
     EpsilonTransition(ATNState *target);
     EpsilonTransition(ATNState *target, int outermostPrecedenceReturn);

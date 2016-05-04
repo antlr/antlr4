@@ -41,7 +41,7 @@ namespace v4 {
 namespace runtime {
 namespace atn {
 
-  class ATNSimulator {
+  class ANTLR4CPP_PUBLIC ATNSimulator {
   public:
     /// Must distinguish between missing edge and edge we know leads nowhere.
     static const Ref<dfa::DFAState> ERROR;

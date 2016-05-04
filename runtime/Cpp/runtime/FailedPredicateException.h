@@ -42,7 +42,7 @@ namespace runtime {
   /// occurs when normally parsing the alternative just like matching a token.
   /// Disambiguating predicate evaluation occurs when we test a predicate during
   /// prediction.
-  class FailedPredicateException : public RecognitionException {
+  class ANTLR4CPP_PUBLIC FailedPredicateException : public RecognitionException {
   public:
     FailedPredicateException(Parser *recognizer);
     FailedPredicateException(Parser *recognizer, const std::string &predicate);

@@ -46,7 +46,7 @@ namespace atn {
   ///
   ///  I have scoped the AND, OR, and Predicate subclasses of
   ///  SemanticContext within the scope of this outer class.
-  class SemanticContext : public std::enable_shared_from_this<SemanticContext> {
+  class ANTLR4CPP_PUBLIC SemanticContext : public std::enable_shared_from_this<SemanticContext> {
   public:
     /**
      * The default {@link SemanticContext}, which is semantically equivalent to
@@ -119,7 +119,7 @@ namespace atn {
 
   };
 
-  class SemanticContext::Predicate : public SemanticContext {
+  class ANTLR4CPP_PUBLIC SemanticContext::Predicate : public SemanticContext {
   public:
     const int ruleIndex;
     const int predIndex;
@@ -137,7 +137,7 @@ namespace atn {
     virtual std::wstring toString() const override;
   };
   
-  class SemanticContext::PrecedencePredicate : public SemanticContext {
+  class ANTLR4CPP_PUBLIC SemanticContext::PrecedencePredicate : public SemanticContext {
   public:
     const int precedence;
 
@@ -161,7 +161,7 @@ namespace atn {
    *
    * @since 4.3
    */
-  class SemanticContext::Operator : public SemanticContext {
+  class ANTLR4CPP_PUBLIC SemanticContext::Operator : public SemanticContext {
   public:
     /**
      * Gets the operands for the semantic context operator.
@@ -179,7 +179,7 @@ namespace atn {
    * A semantic context which is true whenever none of the contained contexts
    * is false.
    */
-  class SemanticContext::AND : public SemanticContext::Operator {
+  class ANTLR4CPP_PUBLIC SemanticContext::AND : public SemanticContext::Operator {
   public:
     std::vector<Ref<SemanticContext>> opnds;
 
@@ -202,7 +202,7 @@ namespace atn {
    * A semantic context which is true whenever at least one of the contained
    * contexts is true.
    */
-  class SemanticContext::OR : public SemanticContext::Operator {
+  class ANTLR4CPP_PUBLIC SemanticContext::OR : public SemanticContext::Operator {
   public:
     std::vector<Ref<SemanticContext>> opnds;
 

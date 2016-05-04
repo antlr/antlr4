@@ -46,7 +46,7 @@ namespace atn {
   /// <para>The executor tracks position information for position-dependent lexer actions
   /// efficiently, ensuring that actions appearing only at the end of the rule do
   /// not cause bloating of the <seealso cref="DFA"/> created for the lexer.</para>
-  class LexerActionExecutor : public std::enable_shared_from_this<LexerActionExecutor> {
+  class ANTLR4CPP_PUBLIC LexerActionExecutor : public std::enable_shared_from_this<LexerActionExecutor> {
   public:
     /// <summary>
     /// Constructs an executor for a sequence of <seealso cref="LexerAction"/> actions. </summary>

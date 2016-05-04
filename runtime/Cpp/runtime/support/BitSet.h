@@ -32,7 +32,7 @@
 
 namespace antlrcpp {
 
-  class BitSet : public std::bitset<1024> {
+  class ANTLR4CPP_PUBLIC BitSet : public std::bitset<1024> {
   public:
     int nextSetBit(size_t pos) const {
       for (size_t i = pos; i < size(); i++){

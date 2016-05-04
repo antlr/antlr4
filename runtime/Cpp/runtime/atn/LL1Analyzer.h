@@ -42,7 +42,7 @@ namespace v4 {
 namespace runtime {
 namespace atn {
 
-  class LL1Analyzer {
+  class ANTLR4CPP_PUBLIC LL1Analyzer {
     /// <summary>
     /// Special value added to the lookahead sets to indicate that we hit
     ///  a predicate during analysis if {@code seeThruPreds==false}.

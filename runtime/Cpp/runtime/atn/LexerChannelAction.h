@@ -49,7 +49,7 @@ namespace atn {
   /// @author Sam Harwell
   /// @since 4.2
   /// </summary>
-  class LexerChannelAction final : public LexerAction {
+  class ANTLR4CPP_PUBLIC LexerChannelAction final : public LexerAction {
   public:
     /// <summary>
     /// Constructs a new {@code channel} action with the specified channel value. </summary>

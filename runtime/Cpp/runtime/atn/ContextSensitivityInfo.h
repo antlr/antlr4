@@ -56,7 +56,7 @@ namespace atn {
   /// <seealso cref= ANTLRErrorListener#reportContextSensitivity
   ///
   /// @since 4.3 </seealso>
-  class ContextSensitivityInfo : public DecisionEventInfo {
+  class ANTLR4CPP_PUBLIC ContextSensitivityInfo : public DecisionEventInfo {
   public:
     /// <summary>
     /// Constructs a new instance of the <seealso cref="ContextSensitivityInfo"/> class

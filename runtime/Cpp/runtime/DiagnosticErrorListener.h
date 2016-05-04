@@ -59,7 +59,7 @@ namespace runtime {
   ///
   /// @author Sam Harwell
   /// </summary>
-  class DiagnosticErrorListener : public BaseErrorListener {
+  class ANTLR4CPP_PUBLIC DiagnosticErrorListener : public BaseErrorListener {
     /// <summary>
     /// When {@code true}, only exactly known ambiguities are reported.
     /// </summary>

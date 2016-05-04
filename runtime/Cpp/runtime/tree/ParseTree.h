@@ -47,7 +47,7 @@ namespace tree {
   /// <p/>
   ///  The payload is either a <seealso cref="Token"/> or a <seealso cref="RuleContext"/> object.
   /// </summary>
-  class ParseTree : public SyntaxTree {
+  class ANTLR4CPP_PUBLIC ParseTree : public SyntaxTree {
     // the following methods narrow the return type; they are not additional methods
   public:
     std::weak_ptr<ParseTree> getParent() { return std::dynamic_pointer_cast<ParseTree>(getParentReference().lock()); };

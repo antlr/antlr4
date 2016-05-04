@@ -42,7 +42,7 @@ namespace runtime {
   /// This implementation of ANTLRErrorListener dispatches all calls to a
   /// collection of delegate listeners. This reduces the effort required to support multiple
   /// listeners.
-  class ProxyErrorListener : public ANTLRErrorListener {
+  class ANTLR4CPP_PUBLIC ProxyErrorListener : public ANTLRErrorListener {
   private:
     std::set<ANTLRErrorListener *> _delegates; // Not owned.
 

@@ -68,7 +68,7 @@ namespace atn {
   /// <seealso cref= ANTLRErrorListener#reportAmbiguity
   ///
   /// @since 4.3 </seealso>
-  class AmbiguityInfo : public DecisionEventInfo {
+  class ANTLR4CPP_PUBLIC AmbiguityInfo : public DecisionEventInfo {
   public:
     /// The set of alternative numbers for this decision event that lead to a valid parse.
     antlrcpp::BitSet ambigAlts;

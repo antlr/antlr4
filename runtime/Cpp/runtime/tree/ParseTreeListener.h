@@ -48,7 +48,7 @@ namespace tree {
    *
    * 		https://github.com/antlr/antlr4/issues/841
    */
-  class ParseTreeListener {
+  class ANTLR4CPP_PUBLIC ParseTreeListener {
   public:
     virtual void visitTerminal(Ref<TerminalNode> node) = 0;
     virtual void visitErrorNode(Ref<ErrorNode> node) = 0;

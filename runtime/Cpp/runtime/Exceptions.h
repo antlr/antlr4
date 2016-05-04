@@ -36,7 +36,7 @@ namespace v4 {
 namespace runtime {
 
   // An exception hierarchy modelled loosely after java.lang.* exceptions.
-  class RuntimeException : public std::exception {
+  class ANTLR4CPP_PUBLIC RuntimeException : public std::exception {
   private:
     std::string _message;
   public:
@@ -45,39 +45,39 @@ namespace runtime {
     virtual const char* what() const NOEXCEPT override;
   };
 
-  class IllegalStateException : public RuntimeException {
+  class ANTLR4CPP_PUBLIC IllegalStateException : public RuntimeException {
   public:
     IllegalStateException(const std::string &msg = "") : RuntimeException(msg) {};
   };
 
-  class IllegalArgumentException : public RuntimeException {
+  class ANTLR4CPP_PUBLIC IllegalArgumentException : public RuntimeException {
   public:
     IllegalArgumentException(const std::string &msg = "") : RuntimeException(msg) {};
   };
 
-  class NullPointerException : public RuntimeException {
+  class ANTLR4CPP_PUBLIC NullPointerException : public RuntimeException {
   public:
     NullPointerException(const std::string &msg = "") : RuntimeException(msg) {};
   };
 
-  class IndexOutOfBoundsException : public RuntimeException {
+  class ANTLR4CPP_PUBLIC IndexOutOfBoundsException : public RuntimeException {
   public:
     IndexOutOfBoundsException(const std::string &msg = "") : RuntimeException(msg) {};
   };
 
-  class UnsupportedOperationException : public RuntimeException {
+  class ANTLR4CPP_PUBLIC UnsupportedOperationException : public RuntimeException {
   public:
     UnsupportedOperationException(const std::string &msg = "") : RuntimeException(msg) {};
   };
 
-  class EmptyStackException : public RuntimeException {
+  class ANTLR4CPP_PUBLIC EmptyStackException : public RuntimeException {
   public:
     EmptyStackException(const std::string &msg = "") : RuntimeException(msg) {};
   };
 
   // IOException is not a runtime exception (in the java hierarchy).
   // Hence we have to duplicate the RuntimeException implementation.
-  class IOException : public std::exception {
+  class ANTLR4CPP_PUBLIC IOException : public std::exception {
   private:
     std::string _message;
 
@@ -87,12 +87,12 @@ namespace runtime {
     virtual const char* what() const NOEXCEPT override;
   };
 
-  class CancellationException : public IllegalStateException {
+  class ANTLR4CPP_PUBLIC CancellationException : public IllegalStateException {
   public:
     CancellationException(const std::string &msg = "") : IllegalStateException(msg) {};
   };
 
-  class ParseCancellationException : public CancellationException {
+  class ANTLR4CPP_PUBLIC ParseCancellationException : public CancellationException {
   public:
     ParseCancellationException(const std::string &msg = "") : CancellationException(msg) {};
   };

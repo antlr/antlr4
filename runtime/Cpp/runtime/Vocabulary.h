@@ -42,7 +42,7 @@ namespace dfa {
   ///
   /// <seealso cref= Recognizer#getVocabulary()
   /// @author Sam Harwell </seealso>
-  class Vocabulary {
+  class ANTLR4CPP_PUBLIC Vocabulary {
   public:
     /// <summary>
     /// Returns the highest token type value. It can be used to iterate from

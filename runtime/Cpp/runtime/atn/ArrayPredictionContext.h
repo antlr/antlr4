@@ -42,7 +42,7 @@ namespace atn {
 
   class SingletonPredictionContext;
   
-  class ArrayPredictionContext : public PredictionContext {
+  class ANTLR4CPP_PUBLIC ArrayPredictionContext : public PredictionContext {
   public:
     /// Parent can be empty only if full ctx mode and we make an array
     /// from EMPTY and non-empty. We merge EMPTY by using null parent and

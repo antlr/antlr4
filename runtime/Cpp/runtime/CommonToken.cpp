@@ -128,7 +128,7 @@ void CommonToken::setCharPositionInLine(int charPositionInLine) {
   _charPositionInLine = charPositionInLine;
 }
 
-int CommonToken::getChannel() {
+size_t CommonToken::getChannel() {
   return _channel;
 }
 

@@ -42,7 +42,7 @@ namespace runtime {
    * This default implementation of {@link TokenFactory} creates
    * {@link CommonToken} objects.
    */
-  class CommonTokenFactory : public TokenFactory<CommonToken> {
+  class ANTLR4CPP_PUBLIC CommonTokenFactory : public TokenFactory<CommonToken> {
   public:
     /**
      * The default {@link CommonTokenFactory} instance.

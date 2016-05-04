@@ -39,7 +39,7 @@ namespace v4 {
 namespace runtime {
 namespace atn {
 
-  class StarLoopbackState final : public ATNState {
+  class ANTLR4CPP_PUBLIC StarLoopbackState final : public ATNState {
   public:
     StarLoopEntryState *getLoopEntryState();
 

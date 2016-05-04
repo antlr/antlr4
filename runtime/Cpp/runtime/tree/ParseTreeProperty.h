@@ -54,7 +54,7 @@ namespace tree {
   /// in your event methods.
   /// </summary>
   template<typename V>
-  class ParseTreeProperty {
+  class ANTLR4CPP_PUBLIC ParseTreeProperty {
   public:
     ParseTreeProperty() {
       InitializeInstanceFields();

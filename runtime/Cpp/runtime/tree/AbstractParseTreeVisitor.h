@@ -41,7 +41,7 @@ namespace runtime {
 namespace tree {
 
   template<typename T>
-  class AbstractParseTreeVisitor : public ParseTreeVisitor<T> {
+  class ANTLR4CPP_PUBLIC AbstractParseTreeVisitor : public ParseTreeVisitor<T> {
     /// <summary>
     /// {@inheritDoc}
     /// <p/>

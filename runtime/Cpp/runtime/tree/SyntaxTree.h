@@ -44,7 +44,7 @@ namespace tree {
   ///  is some kind of syntax tree. Subinterfaces distinguish
   ///  between parse trees and other kinds of syntax trees we might want to create.
   /// </summary>
-  class SyntaxTree : public Tree {
+  class ANTLR4CPP_PUBLIC SyntaxTree : public Tree {
   public:
     /**
      * Return an {@link Interval} indicating the index in the

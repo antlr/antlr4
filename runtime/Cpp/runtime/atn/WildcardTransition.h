@@ -39,7 +39,7 @@ namespace v4 {
 namespace runtime {
 namespace atn {
 
-  class WildcardTransition final : public Transition {
+  class ANTLR4CPP_PUBLIC WildcardTransition final : public Transition {
   public:
     WildcardTransition(ATNState *target);
 

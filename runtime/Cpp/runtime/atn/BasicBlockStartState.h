@@ -37,7 +37,7 @@ namespace v4 {
 namespace runtime {
 namespace atn {
 
-  class BasicBlockStartState final : public BlockStartState {
+  class ANTLR4CPP_PUBLIC BasicBlockStartState final : public BlockStartState {
 
   public:
     virtual int getStateType() override;

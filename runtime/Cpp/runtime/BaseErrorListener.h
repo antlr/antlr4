@@ -47,7 +47,7 @@ namespace runtime {
    * default implementation of each method does nothing, but can be overridden as
    * necessary.
    */
-  class BaseErrorListener : public ANTLRErrorListener {
+  class ANTLR4CPP_PUBLIC BaseErrorListener : public ANTLRErrorListener {
 
     virtual void syntaxError(IRecognizer *recognizer, Ref<Token> offendingSymbol, size_t line, int charPositionInLine,
       const std::wstring &msg, std::exception_ptr e) override;

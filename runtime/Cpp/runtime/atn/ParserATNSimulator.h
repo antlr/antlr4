@@ -271,7 +271,7 @@ namespace atn {
    * both SLL and LL parsing. Erroneous input will therefore require 2 passes over
    * the input.</p>
    */
-  class ParserATNSimulator : public ATNSimulator {
+  class ANTLR4CPP_PUBLIC ParserATNSimulator : public ATNSimulator {
   public:
     static const bool debug = false;
     static const bool debug_list_atn_decisions = false;

@@ -44,7 +44,7 @@ namespace atn {
    * utility methods for analyzing configuration sets for conflicts and/or
    * ambiguities.
    */
-  enum class PredictionMode {
+  enum class ANTLR4CPP_PUBLIC PredictionMode {
     /**
      * The SLL(*) prediction mode. This prediction mode ignores the current
      * parser context when making predictions. This is the fastest prediction
@@ -108,7 +108,7 @@ namespace atn {
     LL_EXACT_AMBIG_DETECTION
   };
 
-  class PredictionModeClass {
+  class ANTLR4CPP_PUBLIC PredictionModeClass {
   public:
     /**
      * Computes the SLL prediction termination condition.

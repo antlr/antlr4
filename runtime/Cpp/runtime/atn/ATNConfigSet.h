@@ -53,7 +53,7 @@ namespace atn {
   
   /// Specialized set that can track info about the set, with support for combining similar configurations using a
   /// graph-structured stack.
-  class ATNConfigSet {
+  class ANTLR4CPP_PUBLIC ATNConfigSet {
   public:
     /// All configs but hashed by (s, i, _, pi) not including context. Wiped out
     /// when we go readonly as this set becomes a DFA state.

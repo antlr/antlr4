@@ -27,3 +27,4 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+// Only used to generate the precompiled header (using the implicitly imported antlrcpp-Prefix.h file)

@@ -49,7 +49,7 @@ namespace misc {
   ///        [-SLL]
   ///        [input-filename(s)]
   /// </summary>
-  class TestRig {
+  class ANTLR4CPP_PUBLIC TestRig {
   public:
     static const std::wstring LEXER_START_RULE_NAME;
 

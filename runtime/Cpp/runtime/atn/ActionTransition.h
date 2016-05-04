@@ -39,7 +39,7 @@ namespace v4 {
 namespace runtime {
 namespace atn {
 
-  class ActionTransition final : public Transition {
+  class ANTLR4CPP_PUBLIC ActionTransition final : public Transition {
   public:
     const int ruleIndex;
     const int actionIndex;

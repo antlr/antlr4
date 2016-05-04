@@ -41,7 +41,7 @@ namespace atn {
 
   /// <summary>
   /// The Tokens rule start state linking to each lexer rule start state </summary>
-  class TokensStartState final : public DecisionState {
+  class ANTLR4CPP_PUBLIC TokensStartState final : public DecisionState {
 
   public:
     virtual int getStateType();

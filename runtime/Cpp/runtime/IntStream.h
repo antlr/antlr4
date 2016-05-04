@@ -52,7 +52,7 @@ namespace runtime {
   ///   <li><seealso cref="#size"/></li>
   /// </ul>
   /// </summary>
-  class IntStream {
+  class ANTLR4CPP_PUBLIC IntStream {
   public:
     /// The value returned by <seealso cref="#LA LA()"/> when the end of the stream is
     /// reached.

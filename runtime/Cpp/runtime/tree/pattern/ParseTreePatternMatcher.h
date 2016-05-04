@@ -97,7 +97,7 @@ namespace pattern {
   /// <seealso cref="#setDelimiters"/>. You must escape both start and stop strings
   /// {@code \<} and {@code \>}.
   /// </summary>
-  class ParseTreePatternMatcher {
+  class ANTLR4CPP_PUBLIC ParseTreePatternMatcher {
   public:
     class CannotInvokeStartRule : public RuntimeException {
     public:

@@ -55,7 +55,7 @@ namespace runtime {
   /// <p/>
   /// TO_DO: what to do about lexers
   /// </summary>
-  class ANTLRErrorStrategy {
+  class ANTLR4CPP_PUBLIC ANTLRErrorStrategy {
   public:
 
     /// <summary>

@@ -39,7 +39,7 @@ namespace v4 {
 namespace runtime {
 namespace atn {
 
-  class SingletonPredictionContext : public PredictionContext {
+  class ANTLR4CPP_PUBLIC SingletonPredictionContext : public PredictionContext {
   public:
     // Usually a parent is linked via a weak ptr. Not so here as we have kinda reverse reference chain.
     // There are no child contexts stored here and often the parent context is left dangling when it's

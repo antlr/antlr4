@@ -39,7 +39,7 @@ namespace v4 {
 namespace runtime {
 namespace tree {
 
-  class TerminalNodeImpl : public virtual TerminalNode {
+  class ANTLR4CPP_PUBLIC TerminalNodeImpl : public virtual TerminalNode {
   public:
     Ref<Token> symbol;
     std::weak_ptr<ParseTree> parent;

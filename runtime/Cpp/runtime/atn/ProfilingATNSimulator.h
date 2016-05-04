@@ -40,7 +40,7 @@ namespace v4 {
 namespace runtime {
 namespace atn {
 
-  class ProfilingATNSimulator : public ParserATNSimulator {
+  class ANTLR4CPP_PUBLIC ProfilingATNSimulator : public ParserATNSimulator {
   public:
     ProfilingATNSimulator(Parser *parser);
 

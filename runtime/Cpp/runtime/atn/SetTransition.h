@@ -41,7 +41,7 @@ namespace atn {
 
   /// <summary>
   /// A transition containing a set of values. </summary>
-  class SetTransition : public Transition {
+  class ANTLR4CPP_PUBLIC SetTransition : public Transition {
   public:
     const misc::IntervalSet set;
 

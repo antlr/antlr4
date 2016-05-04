@@ -45,7 +45,7 @@ namespace atn {
   ///  the tree of semantic predicates encountered before reaching
   ///  an ATN state.
   /// </summary>
-  class ATNConfig {
+  class ANTLR4CPP_PUBLIC ATNConfig {
   public:
     struct ATNConfigHasher;
     struct ATNConfigComparer;

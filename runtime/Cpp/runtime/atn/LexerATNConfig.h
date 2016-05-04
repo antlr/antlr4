@@ -39,7 +39,7 @@ namespace v4 {
 namespace runtime {
 namespace atn {
 
-  class LexerATNConfig : public ATNConfig {
+  class ANTLR4CPP_PUBLIC LexerATNConfig : public ATNConfig {
   public:
     LexerATNConfig(ATNState *state, int alt, Ref<PredictionContext> context);
     LexerATNConfig(ATNState *state, int alt, Ref<PredictionContext> context, Ref<LexerActionExecutor> lexerActionExecutor);

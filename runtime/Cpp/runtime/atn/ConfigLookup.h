@@ -35,7 +35,7 @@ namespace v4 {
 namespace runtime {
 namespace atn {
 
-  class ConfigLookup {
+  class ANTLR4CPP_PUBLIC ConfigLookup {
   protected:
     class ConfigLookupIteratorImpl;
 

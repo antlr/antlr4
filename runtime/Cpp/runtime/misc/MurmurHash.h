@@ -37,7 +37,7 @@ namespace v4 {
 namespace runtime {
 namespace misc {
 
-  class MurmurHash {
+  class ANTLR4CPP_PUBLIC MurmurHash {
 
   private:
     static const size_t DEFAULT_SEED = 0;

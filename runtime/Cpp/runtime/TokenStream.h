@@ -41,7 +41,7 @@ namespace runtime {
   /// <summary>
   /// An <seealso cref="IntStream"/> whose symbols are <seealso cref="Token"/> instances.
   /// </summary>
-  class TokenStream : public IntStream {
+  class ANTLR4CPP_PUBLIC TokenStream : public IntStream {
     /// <summary>
     /// Get the <seealso cref="Token"/> instance associated with the value returned by
     /// <seealso cref="#LA LA(k)"/>. This method has the same pre- and post-conditions as

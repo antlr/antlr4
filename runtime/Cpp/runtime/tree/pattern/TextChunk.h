@@ -44,7 +44,7 @@ namespace pattern {
   /// Represents a span of raw text (concrete syntax) between tags in a tree
   /// pattern string.
   /// </summary>
-  class TextChunk : public Chunk {
+  class ANTLR4CPP_PUBLIC TextChunk : public Chunk {
     /// <summary>
     /// This is the backing field for <seealso cref="#getText"/>.
     /// </summary>

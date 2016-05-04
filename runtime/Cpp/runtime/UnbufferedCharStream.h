@@ -44,7 +44,7 @@ namespace runtime {
   ///  lookahead prediction in parser). "Unbuffered" here refers to fact
   ///  that it doesn't buffer all data, not that's it's on demand loading of char.
   /// </summary>
-  class UnbufferedCharStream : public CharStream {
+  class ANTLR4CPP_PUBLIC UnbufferedCharStream : public CharStream {
   protected:
     /// <summary>
     /// A moving window buffer of the data being scanned. While there's a marker,

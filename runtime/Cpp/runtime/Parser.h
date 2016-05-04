@@ -43,7 +43,7 @@ namespace v4 {
 namespace runtime {
 
   /// This is all the parsing support code essentially; most of it is error recovery stuff.
-  class Parser : public Recognizer {
+  class ANTLR4CPP_PUBLIC Parser : public Recognizer {
   public:
 
     class TraceListener : public tree::ParseTreeListener {

@@ -39,7 +39,7 @@ namespace v4 {
 namespace runtime {
 namespace atn {
 
-  class EmptyPredictionContext : public SingletonPredictionContext {
+  class ANTLR4CPP_PUBLIC EmptyPredictionContext : public SingletonPredictionContext {
   public:
     EmptyPredictionContext();
 

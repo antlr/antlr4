@@ -53,7 +53,7 @@ namespace runtime {
   /// token. Keep lexing until you get a valid one. Just report errors and keep
   /// going, looking for a valid token.
   /// </summary>
-  class TokenSource {
+  class ANTLR4CPP_PUBLIC TokenSource {
     /// <summary>
     /// Return a <seealso cref="Token"/> object from your input stream (usually a
     /// <seealso cref="CharStream"/>). Do not fail/return upon lexing error; keep chewing

@@ -37,7 +37,7 @@ namespace v4 {
 namespace runtime {
 namespace atn {
 
-  class ATNDeserializationOptions {
+  class ANTLR4CPP_PUBLIC ATNDeserializationOptions {
   private:
     static ATNDeserializationOptions defaultOptions;
 

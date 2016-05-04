@@ -39,7 +39,7 @@ namespace v4 {
 namespace runtime {
 namespace atn {
 
-  class RuleStartState final : public ATNState {
+  class ANTLR4CPP_PUBLIC RuleStartState final : public ATNState {
   public:
     RuleStartState();
 

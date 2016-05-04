@@ -47,7 +47,7 @@ namespace atn {
   // For the keys we use raw pointers, as we don't need to access them.
   typedef std::map<std::pair<PredictionContext *, PredictionContext *>, Ref<PredictionContext>> PredictionContextMergeCache;
 
-  class PredictionContext {
+  class ANTLR4CPP_PUBLIC PredictionContext {
   public:
     /// Represents $ in local context prediction, which means wildcard.
     /// *+x = *.

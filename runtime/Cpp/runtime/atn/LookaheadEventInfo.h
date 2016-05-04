@@ -41,7 +41,7 @@ namespace atn {
 
   /// This class represents profiling event information for tracking the lookahead
   /// depth required in order to make a prediction.
-  class LookaheadEventInfo : public DecisionEventInfo {
+  class ANTLR4CPP_PUBLIC LookaheadEventInfo : public DecisionEventInfo {
   public:
     /// The alternative chosen by adaptivePredict(), not necessarily
     ///  the outermost alt shown for a rule; left-recursive rules have

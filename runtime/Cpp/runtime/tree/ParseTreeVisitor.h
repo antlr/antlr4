@@ -45,7 +45,7 @@ namespace tree {
   /// @param <T> The return type of the visit operation. Use <seealso cref="Void"/> for
   /// operations with no return type. </param>
   template<typename T>
-  class ParseTreeVisitor {
+  class ANTLR4CPP_PUBLIC ParseTreeVisitor {
 
     /// <summary>
     /// Visit a parse tree, and return a user-defined result of the operation.

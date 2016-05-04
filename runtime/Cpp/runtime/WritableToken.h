@@ -38,7 +38,7 @@ namespace antlr {
 namespace v4 {
 namespace runtime {
 
-  class WritableToken : public Token {
+  class ANTLR4CPP_PUBLIC WritableToken : public Token {
   public:
     virtual void setText(const std::wstring &text) = 0;
     virtual void setType(int ttype) = 0;

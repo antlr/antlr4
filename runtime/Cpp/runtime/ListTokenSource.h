@@ -47,7 +47,7 @@ namespace runtime {
   /// as the EOF token for every call to <seealso cref="#nextToken"/> after the end of the
   /// list is reached. Otherwise, an EOF token will be created.
   /// </summary>
-  class ListTokenSource : public TokenSource {
+  class ANTLR4CPP_PUBLIC ListTokenSource : public TokenSource {
   protected:
     const std::vector<Ref<Token>> tokens;
 

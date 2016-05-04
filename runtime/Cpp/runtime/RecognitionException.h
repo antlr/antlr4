@@ -43,7 +43,7 @@ namespace runtime {
   /// mismatched input errors. In each case, the parser knows where it is
   /// in the input, where it is in the ATN, the rule invocation stack,
   /// and what kind of problem occurred.
-  class RecognitionException : public RuntimeException {
+  class ANTLR4CPP_PUBLIC RecognitionException : public RuntimeException {
   private:
     /// The Recognizer where this exception originated.
     IRecognizer *_recognizer;

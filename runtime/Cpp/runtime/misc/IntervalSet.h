@@ -51,7 +51,7 @@ namespace misc {
    * the range {@link Integer#MIN_VALUE} to {@link Integer#MAX_VALUE}
    * (inclusive).</p>
    */
-  class IntervalSet {
+  class ANTLR4CPP_PUBLIC IntervalSet {
   public:
     static IntervalSet const COMPLETE_CHAR_SET;
     static IntervalSet const EMPTY_SET;

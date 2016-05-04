@@ -43,7 +43,7 @@ namespace runtime {
   ///  (so we can ignore tabs), token channel, index, and source from which
   ///  we obtained this token.
   /// </summary>
-  class Token {
+  class ANTLR4CPP_PUBLIC Token {
   public:
     static const size_t INVALID_TYPE = 0;
 
@@ -112,7 +112,7 @@ namespace runtime {
     ///  on a different channel, but the parser only "tunes" to a single channel.
     ///  The parser ignores everything not on DEFAULT_CHANNEL.
     /// </summary>
-    virtual int getChannel() = 0;
+    virtual size_t getChannel() = 0;
 
     /// <summary>
     /// An index from 0..n-1 of the token object in the input stream.

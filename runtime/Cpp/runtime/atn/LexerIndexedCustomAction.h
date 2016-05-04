@@ -53,7 +53,7 @@ namespace atn {
   /// @author Sam Harwell
   /// @since 4.2
   /// </summary>
-  class LexerIndexedCustomAction final : public LexerAction {
+  class ANTLR4CPP_PUBLIC LexerIndexedCustomAction final : public LexerAction {
   public:
     /// <summary>
     /// Constructs a new indexed custom action by associating a character offset

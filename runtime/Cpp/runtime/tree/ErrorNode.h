@@ -39,7 +39,7 @@ namespace v4 {
 namespace runtime {
 namespace tree {
 
-  class ErrorNode : public virtual TerminalNode {
+  class ANTLR4CPP_PUBLIC ErrorNode : public virtual TerminalNode {
   };
 
 } // namespace tree

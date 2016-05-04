@@ -43,7 +43,7 @@ namespace v4 {
 namespace runtime {
 
   /// How to emit recognition errors (an interface in Java).
-  class ANTLRErrorListener {
+  class ANTLR4CPP_PUBLIC ANTLRErrorListener {
   public:
     /// <summary>
     /// Upon syntax error, notify any interested parties. This is not how to

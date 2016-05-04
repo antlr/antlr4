@@ -53,7 +53,7 @@ std::wstring RuleTagToken::getLabel() {
   return label;
 }
 
-int RuleTagToken::getChannel() {
+size_t RuleTagToken::getChannel() {
   return DEFAULT_CHANNEL;
 }
 

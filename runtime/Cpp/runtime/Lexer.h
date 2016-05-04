@@ -45,7 +45,7 @@ namespace runtime {
   /// lexer grammars result in a subclass of this object. A Lexer object
   /// uses simplified match() and error recovery mechanisms in the interest
   /// of speed.
-  class Lexer : public Recognizer, public TokenSource {
+  class ANTLR4CPP_PUBLIC Lexer : public Recognizer, public TokenSource {
   public:
     static const int DEFAULT_MODE = 0;
     static const int MORE = -2;

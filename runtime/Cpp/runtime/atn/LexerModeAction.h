@@ -47,7 +47,7 @@ namespace atn {
   /// @author Sam Harwell
   /// @since 4.2
   /// </summary>
-  class LexerModeAction final : public LexerAction {
+  class ANTLR4CPP_PUBLIC LexerModeAction final : public LexerAction {
   public:
     /// <summary>
     /// Constructs a new {@code mode} action with the specified mode value. </summary>

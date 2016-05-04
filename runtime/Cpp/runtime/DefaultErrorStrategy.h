@@ -43,7 +43,7 @@ namespace runtime {
    * This is the default implementation of {@link ANTLRErrorStrategy} used for
    * error reporting and recovery in ANTLR parsers.
    */
-  class DefaultErrorStrategy : public ANTLRErrorStrategy {
+  class ANTLR4CPP_PUBLIC DefaultErrorStrategy : public ANTLRErrorStrategy {
   public:
     DefaultErrorStrategy() {
       InitializeInstanceFields();

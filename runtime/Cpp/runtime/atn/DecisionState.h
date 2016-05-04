@@ -39,7 +39,7 @@ namespace v4 {
 namespace runtime {
 namespace atn {
 
-  class DecisionState : public ATNState {
+  class ANTLR4CPP_PUBLIC DecisionState : public ATNState {
   public:
     int decision;
     bool nonGreedy;

@@ -39,7 +39,7 @@ namespace antlr {
 namespace v4 {
 namespace runtime {
 
-  class LexerNoViableAltException : public RecognitionException {
+  class ANTLR4CPP_PUBLIC LexerNoViableAltException : public RecognitionException {
   public:
     LexerNoViableAltException(Lexer *lexer, CharStream *input, size_t startIndex,
                               Ref<atn::ATNConfigSet> deadEndConfigs);

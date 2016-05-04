@@ -39,7 +39,7 @@ namespace v4 {
 namespace runtime {
 namespace tree {
 
-  class TerminalNode : public ParseTree {
+  class ANTLR4CPP_PUBLIC TerminalNode : public ParseTree {
   public:
     virtual Ref<Token> getSymbol() = 0;
   };

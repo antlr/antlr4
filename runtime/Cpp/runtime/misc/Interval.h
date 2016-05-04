@@ -38,7 +38,7 @@ namespace runtime {
 namespace misc {
 
   /// An immutable inclusive interval a..b
-  class Interval {
+  class ANTLR4CPP_PUBLIC Interval {
   public:
     static const Interval INVALID;
 

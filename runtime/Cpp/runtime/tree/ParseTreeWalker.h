@@ -37,7 +37,7 @@ namespace v4 {
 namespace runtime {
 namespace tree {
 
-  class ParseTreeWalker {
+  class ANTLR4CPP_PUBLIC ParseTreeWalker {
   public:
     static const Ref<ParseTreeWalker> DEFAULT;
 

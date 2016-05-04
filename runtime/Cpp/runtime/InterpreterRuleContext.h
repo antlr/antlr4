@@ -50,7 +50,7 @@ namespace runtime {
    * parser, this class (with slightly more memory overhead per node) is used to
    * provide equivalent functionality.</p>
    */
-  class InterpreterRuleContext : public ParserRuleContext {
+  class ANTLR4CPP_PUBLIC InterpreterRuleContext : public ParserRuleContext {
   public:
     InterpreterRuleContext();
 

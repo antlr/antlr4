@@ -42,7 +42,7 @@ namespace runtime {
 namespace atn {
 
   /// "dup" of ParserInterpreter
-  class LexerATNSimulator : public ATNSimulator {
+  class ANTLR4CPP_PUBLIC LexerATNSimulator : public ATNSimulator {
   protected:
     class SimState {
     protected:

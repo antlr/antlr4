@@ -35,12 +35,6 @@
 
 using namespace org::antlr::v4::runtime;
 
-const size_t Token::INVALID_TYPE;
-const ssize_t Token::EPSILON;
-const size_t Token::MIN_USER_TOKEN_TYPE;
-const size_t Token::DEFAULT_CHANNEL;
-const size_t Token::HIDDEN_CHANNEL;
-
 std::wstring Token::toString() {
   std::wstringstream ss;
 

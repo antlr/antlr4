@@ -41,7 +41,7 @@ namespace atn {
 
   /// <summary>
   ///  The start of a regular {@code (...)} block. </summary>
-  class BlockStartState : public DecisionState {
+  class ANTLR4CPP_PUBLIC BlockStartState : public DecisionState {
   public:
     BlockEndState *endState;
   };

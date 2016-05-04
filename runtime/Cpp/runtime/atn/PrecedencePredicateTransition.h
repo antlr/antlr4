@@ -40,7 +40,7 @@ namespace v4 {
 namespace runtime {
 namespace atn {
 
-  class PrecedencePredicateTransition final : public AbstractPredicateTransition {
+  class ANTLR4CPP_PUBLIC PrecedencePredicateTransition final : public AbstractPredicateTransition {
   public:
     const int precedence;
 

@@ -38,7 +38,7 @@ namespace antlr {
 namespace v4 {
 namespace runtime {
 
-  class UnbufferedTokenStream : public TokenStream {
+  class ANTLR4CPP_PUBLIC UnbufferedTokenStream : public TokenStream {
   public:
     UnbufferedTokenStream(TokenSource *tokenSource);
     UnbufferedTokenStream(TokenSource *tokenSource, int bufferSize);
