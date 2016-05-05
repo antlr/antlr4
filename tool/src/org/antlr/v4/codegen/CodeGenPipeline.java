@@ -104,7 +104,7 @@ public class CodeGenPipeline {
 					}
 				}
 			}
-			gen.writeHeaderFile();
+			gen.writeParserHeaderFile();
 		}
 		gen.writeVocabFile();
 	}

@@ -1,0 +1,169 @@
+/*
+ * [The "BSD license"]
+ *  Copyright (c) 2016, Mike Lischke
+ *  All rights reserved.
+ *
+ *  Redistribution and use in source and binary forms, with or without
+ *  modification, are permitted provided that the following conditions
+ *  are met:
+ *
+ *  1. Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ *  2. Redistributions in binary form must reproduce the above copyright
+ *     notice, this list of conditions and the following disclaimer in the
+ *     documentation and/or other materials provided with the distribution.
+ *  3. The name of the author may not be used to endorse or promote products
+ *     derived from this software without specific prior written permission.
+ *
+ *  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+ *  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ *  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+ *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ *  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+BaseListenerHeaderFile(file, parser, namedActions) ::= <<
+<fileHeader(file.grammarFileName, file.ANTLRVersion)>
+
+<if(file.genPackage)>
+namespace <file.genPackage> {
+<endif>
+
+<!header!>
+
+#include "ParserRuleContext.h"
+#include "tree/ErrorNode.h"
+#include "tree/TerminalNode.h"
+
+/**
+ * This class provides an empty implementation of <file.grammarName>Listener,
+ * which can be extended to create a listener which only needs to handle a subset
+ * of the available methods.
+ */
+class <file.grammarName>BaseListener : public <file.grammarName>Listener {
+<file.listenerNames: {lname |
+  /**
+   * The default implementation does nothing.
+   */
+  void enter<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { \}
+
+  /**
+   * The default implementation does nothing.
+   */
+  void exit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { \}}; separator="\n">
+
+  /**
+   * The default implementation does nothing.
+   */
+  void enterEveryRule(ParserRuleContext ctx) { }
+
+  /**
+   * The default implementation does nothing.
+   */
+  void exitEveryRule(ParserRuleContext ctx) { }
+
+  /**
+   * The default implementation does nothing.
+   */
+  void visitTerminal(TerminalNode node) { }
+
+  /**
+   * The default implementation does nothing.
+   */
+  void visitErrorNode(ErrorNode node) { }
+};
+
+<if(file.genPackage)>
+}  // namespace <file.genPackage>
+<endif>
+>>
+
+BaseListenerFile(file, header) ::= <<
+<fileHeader(file.grammarFileName, file.ANTLRVersion)>
+
+<if(file.genPackage)>
+using namespace <file.genPackage>;
+<endif>
+<header>
+
+#include "<file.grammarName>BaseListener.h"
+
+>>
+
+ListenerHeaderFile(file, parser, namedActions) ::= <<
+FOOM3
+>>
+
+ListenerFile(file, header) ::= <<
+<fileHeader(file.grammarFileName, file.ANTLRVersion)>
+
+<header>
+
+#include "misc/NotNull.h"
+#include "tree/ParseTreeListener.h"
+#include "<file.parserName>.h"
+
+<if(file.genPackage)>
+namespace <file.genPackage> {
+<endif>
+
+/**
+ * This interface defines a complete listener for a parse tree produced by <file.parserName>.
+ */
+class <file.grammarName>Listener : public ParseTreeListener {
+<file.listenerNames:{lname |
+  /**
+   * Enter a parse tree produced by <file.parserName>#<lname>.
+   * @param ctx the parse tree
+   */
+ 
+  void enter<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx);
+  
+  /**
+   * Exit a parse tree produced by <file.parserName>#<lname>.
+   * @param ctx the parse tree
+   */
+  void exit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx);
+}; separator="\n">
+}
+
+<if(file.genPackage)>
+}  // namespace <file.genPackage>
+<endif>
+>>
+
+BaseVisitorFile(file, header) ::= <<
+<fileHeader(file.grammarFileName, file.ANTLRVersion)>
+<if(file.genPackage)>
+namespace <file.genPackage> {
+<endif>
+<header>
+
+#include "tree/AbstractParseTreeVisitor"
+
+/**
+ * This class provides an empty implementation of <file.grammarName>Visitor, which can be
+ * extended to create a visitor which only needs to handle a subset of the available methods.
+ *
+ * @param \<T> The return type of the visit operation. Use void for operations with no return type.
+ */
+template T
+class <file.grammarName>BaseVisitor : public <file.grammarName>Visitor\<T> {
+  <file.visitorNames: {lname |
+
+  /**
+   * The default implementation returns the result of calling visitChildren on ctx.
+   */
+  T visit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { return visitChildren(ctx); \}
+  }; separator="\n">
+};
+
+<if(file.genPackage)>
+}  // namespace <file.genPackage>
+<endif>
+>>
