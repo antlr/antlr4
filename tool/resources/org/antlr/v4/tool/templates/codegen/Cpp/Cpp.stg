@@ -491,19 +491,19 @@ Ref\<<parser.name>::<currentRule.ctxType>\> <parser.name>::<currentRule.name>(<c
 }
 
 Ref\<<parser.name>::<currentRule.ctxType>\> <parser.name>::<currentRule.name>(int precedence<currentRule.args:{a | , <a>}>) {
-    Ref\<ParserRuleContext> parentContext = _ctx;
-    int parentState = getState();
-    Ref\<<parser.name>::<currentRule.ctxType>\> result = std::make_shared\<<currentRule.ctxType>\>(_ctx, parentState<currentRule.args: {a | , <a.name>}>);
-    Ref\<<parser.name>::<currentRule.ctxType>\> previousContext = result;
-    int startState = <currentRule.startState>;
-    enterRecursionRule(result, <currentRule.startState>, <parser.name>Rule::Rule<currentRule.name; format = "cap">, precedence);
+  Ref\<ParserRuleContext> parentContext = _ctx;
+  int parentState = getState();
+  Ref\<<parser.name>::<currentRule.ctxType>\> result = std::make_shared\<<currentRule.ctxType>\>(_ctx, parentState<currentRule.args: {a | , <a.name>}>);
+  Ref\<<parser.name>::<currentRule.ctxType>\> previousContext = result;
+  int startState = <currentRule.startState>;
+  enterRecursionRule(result, <currentRule.startState>, <parser.name>Rule::Rule<currentRule.name; format = "cap">, precedence);
   
     <namedActions.init>
 <! TODO: untested !>    <locals; separator = "\n">
   
-  auto onExit = finally([this, parentContext] {
+  auto onExit = finally([&] {
 <! TODO: untested !><if (finallyAction)><finallyAction><endif>
-        unrollRecursionContexts(parentContext);
+    unrollRecursionContexts(parentContext);
   });
   try {
     <if (currentRule.hasLookaheadBlock)>int alt;<endif>
