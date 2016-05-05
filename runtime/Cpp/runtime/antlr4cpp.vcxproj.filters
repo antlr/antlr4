@@ -57,833 +57,833 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\runtime\antlrcpp-Prefix.h" />
-    <ClInclude Include="..\..\runtime\ANTLRErrorListener.h">
+    <ClInclude Include="src\ANTLRErrorListener.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\ANTLRErrorStrategy.h">
+    <ClInclude Include="src\ANTLRErrorStrategy.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\ANTLRFileStream.h">
+    <ClInclude Include="src\ANTLRFileStream.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\ANTLRInputStream.h">
+    <ClInclude Include="src\ANTLRInputStream.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\BailErrorStrategy.h">
+    <ClInclude Include="src\BailErrorStrategy.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\BaseErrorListener.h">
+    <ClInclude Include="src\BaseErrorListener.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\BufferedTokenStream.h">
+    <ClInclude Include="src\BufferedTokenStream.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\CharStream.h">
+    <ClInclude Include="src\CharStream.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\CommonToken.h">
+    <ClInclude Include="src\CommonToken.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\CommonTokenFactory.h">
+    <ClInclude Include="src\CommonTokenFactory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\CommonTokenStream.h">
+    <ClInclude Include="src\CommonTokenStream.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\ConsoleErrorListener.h">
+    <ClInclude Include="src\ConsoleErrorListener.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\DefaultErrorStrategy.h">
+    <ClInclude Include="src\DefaultErrorStrategy.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\DiagnosticErrorListener.h">
+    <ClInclude Include="src\DiagnosticErrorListener.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\Exceptions.h">
+    <ClInclude Include="src\Exceptions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\FailedPredicateException.h">
+    <ClInclude Include="src\FailedPredicateException.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\InputMismatchException.h">
+    <ClInclude Include="src\InputMismatchException.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\InterpreterRuleContext.h">
+    <ClInclude Include="src\InterpreterRuleContext.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\IntStream.h">
+    <ClInclude Include="src\IntStream.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\IRecognizer.h">
+    <ClInclude Include="src\IRecognizer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\Lexer.h">
+    <ClInclude Include="src\Lexer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\LexerInterpreter.h">
+    <ClInclude Include="src\LexerInterpreter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\LexerNoViableAltException.h">
+    <ClInclude Include="src\LexerNoViableAltException.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\ListTokenSource.h">
+    <ClInclude Include="src\ListTokenSource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\NoViableAltException.h">
+    <ClInclude Include="src\NoViableAltException.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\Parser.h">
+    <ClInclude Include="src\Parser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\ParserInterpreter.h">
+    <ClInclude Include="src\ParserInterpreter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\ParserRuleContext.h">
+    <ClInclude Include="src\ParserRuleContext.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\ProxyErrorListener.h">
+    <ClInclude Include="src\ProxyErrorListener.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\RecognitionException.h">
+    <ClInclude Include="src\RecognitionException.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\Recognizer.h">
+    <ClInclude Include="src\Recognizer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\RuleContext.h">
+    <ClInclude Include="src\RuleContext.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\Token.h">
+    <ClInclude Include="src\Token.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\TokenFactory.h">
+    <ClInclude Include="src\TokenFactory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\TokenSource.h">
+    <ClInclude Include="src\TokenSource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\TokenStream.h">
+    <ClInclude Include="src\TokenStream.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\TokenStreamRewriter.h">
+    <ClInclude Include="src\TokenStreamRewriter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\UnbufferedCharStream.h">
+    <ClInclude Include="src\UnbufferedCharStream.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\UnbufferedTokenStream.h">
+    <ClInclude Include="src\UnbufferedTokenStream.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\WritableToken.h">
+    <ClInclude Include="src\WritableToken.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\atn\DecisionState.h">
+    <ClInclude Include="src\atn\DecisionState.h">
       <Filter>Header Files\atn</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\atn\EmptyPredictionContext.h">
+    <ClInclude Include="src\atn\EmptyPredictionContext.h">
       <Filter>Header Files\atn</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\atn\EpsilonTransition.h">
+    <ClInclude Include="src\atn\EpsilonTransition.h">
       <Filter>Header Files\atn</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\atn\LexerATNConfig.h">
+    <ClInclude Include="src\atn\LexerATNConfig.h">
       <Filter>Header Files\atn</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\atn\LexerATNSimulator.h">
+    <ClInclude Include="src\atn\LexerATNSimulator.h">
       <Filter>Header Files\atn</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\atn\LL1Analyzer.h">
+    <ClInclude Include="src\atn\LL1Analyzer.h">
       <Filter>Header Files\atn</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\atn\LoopEndState.h">
+    <ClInclude Include="src\atn\LoopEndState.h">
       <Filter>Header Files\atn</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\atn\NotSetTransition.h">
+    <ClInclude Include="src\atn\NotSetTransition.h">
       <Filter>Header Files\atn</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\atn\OrderedATNConfigSet.h">
+    <ClInclude Include="src\atn\OrderedATNConfigSet.h">
       <Filter>Header Files\atn</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\atn\ParserATNSimulator.h">
+    <ClInclude Include="src\atn\ParserATNSimulator.h">
       <Filter>Header Files\atn</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\atn\PlusBlockStartState.h">
+    <ClInclude Include="src\atn\PlusBlockStartState.h">
       <Filter>Header Files\atn</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\atn\PlusLoopbackState.h">
+    <ClInclude Include="src\atn\PlusLoopbackState.h">
       <Filter>Header Files\atn</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\atn\PrecedencePredicateTransition.h">
+    <ClInclude Include="src\atn\PrecedencePredicateTransition.h">
       <Filter>Header Files\atn</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\atn\PredicateTransition.h">
+    <ClInclude Include="src\atn\PredicateTransition.h">
       <Filter>Header Files\atn</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\atn\PredictionContext.h">
+    <ClInclude Include="src\atn\PredictionContext.h">
       <Filter>Header Files\atn</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\atn\PredictionMode.h">
+    <ClInclude Include="src\atn\PredictionMode.h">
       <Filter>Header Files\atn</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\atn\RangeTransition.h">
+    <ClInclude Include="src\atn\RangeTransition.h">
       <Filter>Header Files\atn</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\atn\RuleStartState.h">
+    <ClInclude Include="src\atn\RuleStartState.h">
       <Filter>Header Files\atn</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\atn\RuleStopState.h">
+    <ClInclude Include="src\atn\RuleStopState.h">
       <Filter>Header Files\atn</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\atn\RuleTransition.h">
+    <ClInclude Include="src\atn\RuleTransition.h">
       <Filter>Header Files\atn</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\atn\SemanticContext.h">
+    <ClInclude Include="src\atn\SemanticContext.h">
       <Filter>Header Files\atn</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\atn\SetTransition.h">
+    <ClInclude Include="src\atn\SetTransition.h">
       <Filter>Header Files\atn</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\atn\SingletonPredictionContext.h">
+    <ClInclude Include="src\atn\SingletonPredictionContext.h">
       <Filter>Header Files\atn</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\atn\StarBlockStartState.h">
+    <ClInclude Include="src\atn\StarBlockStartState.h">
       <Filter>Header Files\atn</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\atn\StarLoopbackState.h">
+    <ClInclude Include="src\atn\StarLoopbackState.h">
       <Filter>Header Files\atn</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\atn\StarLoopEntryState.h">
+    <ClInclude Include="src\atn\StarLoopEntryState.h">
       <Filter>Header Files\atn</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\atn\TokensStartState.h">
+    <ClInclude Include="src\atn\TokensStartState.h">
       <Filter>Header Files\atn</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\atn\Transition.h">
+    <ClInclude Include="src\atn\Transition.h">
       <Filter>Header Files\atn</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\atn\WildcardTransition.h">
+    <ClInclude Include="src\atn\WildcardTransition.h">
       <Filter>Header Files\atn</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\atn\AbstractPredicateTransition.h">
+    <ClInclude Include="src\atn\AbstractPredicateTransition.h">
       <Filter>Header Files\atn</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\atn\ActionTransition.h">
+    <ClInclude Include="src\atn\ActionTransition.h">
       <Filter>Header Files\atn</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\atn\ArrayPredictionContext.h">
+    <ClInclude Include="src\atn\ArrayPredictionContext.h">
       <Filter>Header Files\atn</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\atn\ATN.h">
+    <ClInclude Include="src\atn\ATN.h">
       <Filter>Header Files\atn</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\atn\ATNConfig.h">
+    <ClInclude Include="src\atn\ATNConfig.h">
       <Filter>Header Files\atn</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\atn\ATNConfigSet.h">
+    <ClInclude Include="src\atn\ATNConfigSet.h">
       <Filter>Header Files\atn</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\atn\ATNDeserializationOptions.h">
+    <ClInclude Include="src\atn\ATNDeserializationOptions.h">
       <Filter>Header Files\atn</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\atn\ATNDeserializer.h">
+    <ClInclude Include="src\atn\ATNDeserializer.h">
       <Filter>Header Files\atn</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\atn\ATNSerializer.h">
+    <ClInclude Include="src\atn\ATNSerializer.h">
       <Filter>Header Files\atn</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\atn\ATNSimulator.h">
+    <ClInclude Include="src\atn\ATNSimulator.h">
       <Filter>Header Files\atn</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\atn\ATNState.h">
+    <ClInclude Include="src\atn\ATNState.h">
       <Filter>Header Files\atn</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\atn\ATNType.h">
+    <ClInclude Include="src\atn\ATNType.h">
       <Filter>Header Files\atn</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\atn\AtomTransition.h">
+    <ClInclude Include="src\atn\AtomTransition.h">
       <Filter>Header Files\atn</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\atn\BasicBlockStartState.h">
+    <ClInclude Include="src\atn\BasicBlockStartState.h">
       <Filter>Header Files\atn</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\atn\BasicState.h">
+    <ClInclude Include="src\atn\BasicState.h">
       <Filter>Header Files\atn</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\atn\BlockEndState.h">
+    <ClInclude Include="src\atn\BlockEndState.h">
       <Filter>Header Files\atn</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\atn\BlockStartState.h">
+    <ClInclude Include="src\atn\BlockStartState.h">
       <Filter>Header Files\atn</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\atn\ConfigLookup.h">
+    <ClInclude Include="src\atn\ConfigLookup.h">
       <Filter>Header Files\atn</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\dfa\LexerDFASerializer.h">
+    <ClInclude Include="src\dfa\LexerDFASerializer.h">
       <Filter>Header Files\dfa</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\dfa\DFA.h">
+    <ClInclude Include="src\dfa\DFA.h">
       <Filter>Header Files\dfa</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\dfa\DFASerializer.h">
+    <ClInclude Include="src\dfa\DFASerializer.h">
       <Filter>Header Files\dfa</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\dfa\DFAState.h">
+    <ClInclude Include="src\dfa\DFAState.h">
       <Filter>Header Files\dfa</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\misc\Interval.h">
+    <ClInclude Include="src\misc\Interval.h">
       <Filter>Header Files\misc</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\misc\IntervalSet.h">
+    <ClInclude Include="src\misc\IntervalSet.h">
       <Filter>Header Files\misc</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\misc\MurmurHash.h">
+    <ClInclude Include="src\misc\MurmurHash.h">
       <Filter>Header Files\misc</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\misc\TestRig.h">
+    <ClInclude Include="src\misc\TestRig.h">
       <Filter>Header Files\misc</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\support\Arrays.h">
+    <ClInclude Include="src\support\Arrays.h">
       <Filter>Header Files\support</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\support\BitSet.h">
+    <ClInclude Include="src\support\BitSet.h">
       <Filter>Header Files\support</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\support\CPPUtils.h">
+    <ClInclude Include="src\support\CPPUtils.h">
       <Filter>Header Files\support</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\support\Declarations.h">
+    <ClInclude Include="src\support\Declarations.h">
       <Filter>Header Files\support</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\support\guid.h">
+    <ClInclude Include="src\support\guid.h">
       <Filter>Header Files\support</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\support\Strings.h">
+    <ClInclude Include="src\support\Strings.h">
       <Filter>Header Files\support</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\tree\AbstractParseTreeVisitor.h">
+    <ClInclude Include="src\tree\AbstractParseTreeVisitor.h">
       <Filter>Header Files\tree</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\tree\ErrorNode.h">
+    <ClInclude Include="src\tree\ErrorNode.h">
       <Filter>Header Files\tree</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\tree\ErrorNodeImpl.h">
+    <ClInclude Include="src\tree\ErrorNodeImpl.h">
       <Filter>Header Files\tree</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\tree\ParseTree.h">
+    <ClInclude Include="src\tree\ParseTree.h">
       <Filter>Header Files\tree</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\tree\ParseTreeListener.h">
+    <ClInclude Include="src\tree\ParseTreeListener.h">
       <Filter>Header Files\tree</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\tree\ParseTreeProperty.h">
+    <ClInclude Include="src\tree\ParseTreeProperty.h">
       <Filter>Header Files\tree</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\tree\ParseTreeVisitor.h">
+    <ClInclude Include="src\tree\ParseTreeVisitor.h">
       <Filter>Header Files\tree</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\tree\ParseTreeWalker.h">
+    <ClInclude Include="src\tree\ParseTreeWalker.h">
       <Filter>Header Files\tree</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\tree\RuleNode.h">
+    <ClInclude Include="src\tree\RuleNode.h">
       <Filter>Header Files\tree</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\tree\SyntaxTree.h">
+    <ClInclude Include="src\tree\SyntaxTree.h">
       <Filter>Header Files\tree</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\tree\TerminalNode.h">
+    <ClInclude Include="src\tree\TerminalNode.h">
       <Filter>Header Files\tree</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\tree\TerminalNodeImpl.h">
+    <ClInclude Include="src\tree\TerminalNodeImpl.h">
       <Filter>Header Files\tree</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\tree\Tree.h">
+    <ClInclude Include="src\tree\Tree.h">
       <Filter>Header Files\tree</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\tree\Trees.h">
+    <ClInclude Include="src\tree\Trees.h">
       <Filter>Header Files\tree</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\tree\pattern\Chunk.h">
+    <ClInclude Include="src\tree\pattern\Chunk.h">
       <Filter>Header Files\tree\pattern</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\tree\pattern\ParseTreeMatch.h">
+    <ClInclude Include="src\tree\pattern\ParseTreeMatch.h">
       <Filter>Header Files\tree\pattern</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\tree\pattern\ParseTreePattern.h">
+    <ClInclude Include="src\tree\pattern\ParseTreePattern.h">
       <Filter>Header Files\tree\pattern</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\tree\pattern\ParseTreePatternMatcher.h">
+    <ClInclude Include="src\tree\pattern\ParseTreePatternMatcher.h">
       <Filter>Header Files\tree\pattern</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\tree\pattern\RuleTagToken.h">
+    <ClInclude Include="src\tree\pattern\RuleTagToken.h">
       <Filter>Header Files\tree\pattern</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\tree\pattern\TagChunk.h">
+    <ClInclude Include="src\tree\pattern\TagChunk.h">
       <Filter>Header Files\tree\pattern</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\tree\pattern\TextChunk.h">
+    <ClInclude Include="src\tree\pattern\TextChunk.h">
       <Filter>Header Files\tree\pattern</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\tree\pattern\TokenTagToken.h">
+    <ClInclude Include="src\tree\pattern\TokenTagToken.h">
       <Filter>Header Files\tree\pattern</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\tree\xpath\XPathLexer.h">
+    <ClInclude Include="src\tree\xpath\XPathLexer.h">
       <Filter>Header Files\tree\xpath</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\Vocabulary.h">
+    <ClInclude Include="src\Vocabulary.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\VocabularyImpl.h">
+    <ClInclude Include="src\VocabularyImpl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\atn\AmbiguityInfo.h">
+    <ClInclude Include="src\atn\AmbiguityInfo.h">
       <Filter>Header Files\atn</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\atn\ContextSensitivityInfo.h">
+    <ClInclude Include="src\atn\ContextSensitivityInfo.h">
       <Filter>Header Files\atn</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\atn\DecisionEventInfo.h">
+    <ClInclude Include="src\atn\DecisionEventInfo.h">
       <Filter>Header Files\atn</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\atn\DecisionInfo.h">
+    <ClInclude Include="src\atn\DecisionInfo.h">
       <Filter>Header Files\atn</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\atn\ErrorInfo.h">
+    <ClInclude Include="src\atn\ErrorInfo.h">
       <Filter>Header Files\atn</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\atn\LexerAction.h">
+    <ClInclude Include="src\atn\LexerAction.h">
       <Filter>Header Files\atn</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\atn\LexerActionExecutor.h">
+    <ClInclude Include="src\atn\LexerActionExecutor.h">
       <Filter>Header Files\atn</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\atn\LexerActionType.h">
+    <ClInclude Include="src\atn\LexerActionType.h">
       <Filter>Header Files\atn</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\atn\LexerChannelAction.h">
+    <ClInclude Include="src\atn\LexerChannelAction.h">
       <Filter>Header Files\atn</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\atn\LexerCustomAction.h">
+    <ClInclude Include="src\atn\LexerCustomAction.h">
       <Filter>Header Files\atn</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\atn\LexerIndexedCustomAction.h">
+    <ClInclude Include="src\atn\LexerIndexedCustomAction.h">
       <Filter>Header Files\atn</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\atn\LexerModeAction.h">
+    <ClInclude Include="src\atn\LexerModeAction.h">
       <Filter>Header Files\atn</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\atn\LexerMoreAction.h">
+    <ClInclude Include="src\atn\LexerMoreAction.h">
       <Filter>Header Files\atn</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\atn\LexerPopModeAction.h">
+    <ClInclude Include="src\atn\LexerPopModeAction.h">
       <Filter>Header Files\atn</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\atn\LexerPushModeAction.h">
+    <ClInclude Include="src\atn\LexerPushModeAction.h">
       <Filter>Header Files\atn</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\atn\LexerSkipAction.h">
+    <ClInclude Include="src\atn\LexerSkipAction.h">
       <Filter>Header Files\atn</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\atn\LexerTypeAction.h">
+    <ClInclude Include="src\atn\LexerTypeAction.h">
       <Filter>Header Files\atn</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\atn\LookaheadEventInfo.h">
+    <ClInclude Include="src\atn\LookaheadEventInfo.h">
       <Filter>Header Files\atn</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\atn\ParseInfo.h">
+    <ClInclude Include="src\atn\ParseInfo.h">
       <Filter>Header Files\atn</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\atn\PredicateEvalInfo.h">
+    <ClInclude Include="src\atn\PredicateEvalInfo.h">
       <Filter>Header Files\atn</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\atn\ProfilingATNSimulator.h">
+    <ClInclude Include="src\atn\ProfilingATNSimulator.h">
       <Filter>Header Files\atn</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\runtime\misc\Predicate.h">
+    <ClInclude Include="src\misc\Predicate.h">
       <Filter>Header Files\misc</Filter>
     </ClInclude>
+    <ClInclude Include="src\antlrcpp-Prefix.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="antlrcpp-Prefix.cpp" />
-    <ClCompile Include="..\..\runtime\ANTLRFileStream.cpp">
+    <ClCompile Include="src\ANTLRFileStream.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\ANTLRInputStream.cpp">
+    <ClCompile Include="src\ANTLRInputStream.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\BailErrorStrategy.cpp">
+    <ClCompile Include="src\BailErrorStrategy.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\BaseErrorListener.cpp">
+    <ClCompile Include="src\BaseErrorListener.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\BufferedTokenStream.cpp">
+    <ClCompile Include="src\BufferedTokenStream.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\CharStream.cpp">
+    <ClCompile Include="src\CharStream.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\CommonToken.cpp">
+    <ClCompile Include="src\CommonToken.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\CommonTokenFactory.cpp">
+    <ClCompile Include="src\CommonTokenFactory.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\CommonTokenStream.cpp">
+    <ClCompile Include="src\CommonTokenStream.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\ConsoleErrorListener.cpp">
+    <ClCompile Include="src\ConsoleErrorListener.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\DefaultErrorStrategy.cpp">
+    <ClCompile Include="src\DefaultErrorStrategy.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\DiagnosticErrorListener.cpp">
+    <ClCompile Include="src\DiagnosticErrorListener.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\Exceptions.cpp">
+    <ClCompile Include="src\Exceptions.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\FailedPredicateException.cpp">
+    <ClCompile Include="src\FailedPredicateException.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\InputMismatchException.cpp">
+    <ClCompile Include="src\InputMismatchException.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\InterpreterRuleContext.cpp">
+    <ClCompile Include="src\InterpreterRuleContext.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\IntStream.cpp">
+    <ClCompile Include="src\IntStream.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\Lexer.cpp">
+    <ClCompile Include="src\Lexer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\LexerInterpreter.cpp">
+    <ClCompile Include="src\LexerInterpreter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\LexerNoViableAltException.cpp">
+    <ClCompile Include="src\LexerNoViableAltException.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\ListTokenSource.cpp">
+    <ClCompile Include="src\ListTokenSource.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\NoViableAltException.cpp">
+    <ClCompile Include="src\NoViableAltException.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\Parser.cpp">
+    <ClCompile Include="src\Parser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\ParserInterpreter.cpp">
+    <ClCompile Include="src\ParserInterpreter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\ParserRuleContext.cpp">
+    <ClCompile Include="src\ParserRuleContext.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\ProxyErrorListener.cpp">
+    <ClCompile Include="src\ProxyErrorListener.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\RecognitionException.cpp">
+    <ClCompile Include="src\RecognitionException.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\Recognizer.cpp">
+    <ClCompile Include="src\Recognizer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\RuleContext.cpp">
+    <ClCompile Include="src\RuleContext.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\Token.cpp">
+    <ClCompile Include="src\Token.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\TokenFactory.cpp">
+    <ClCompile Include="src\TokenFactory.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\TokenStream.cpp">
+    <ClCompile Include="src\TokenStream.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\TokenStreamRewriter.cpp">
+    <ClCompile Include="src\TokenStreamRewriter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\UnbufferedCharStream.cpp">
+    <ClCompile Include="src\UnbufferedCharStream.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\UnbufferedTokenStream.cpp">
+    <ClCompile Include="src\UnbufferedTokenStream.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\WritableToken.cpp">
+    <ClCompile Include="src\WritableToken.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\atn\AbstractPredicateTransition.cpp">
+    <ClCompile Include="src\atn\AbstractPredicateTransition.cpp">
       <Filter>Source Files\atn</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\atn\ActionTransition.cpp">
+    <ClCompile Include="src\atn\ActionTransition.cpp">
       <Filter>Source Files\atn</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\atn\ArrayPredictionContext.cpp">
+    <ClCompile Include="src\atn\ArrayPredictionContext.cpp">
       <Filter>Source Files\atn</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\atn\ATN.cpp">
+    <ClCompile Include="src\atn\ATN.cpp">
       <Filter>Source Files\atn</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\atn\ATNConfig.cpp">
+    <ClCompile Include="src\atn\ATNConfig.cpp">
       <Filter>Source Files\atn</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\atn\ATNConfigSet.cpp">
+    <ClCompile Include="src\atn\ATNConfigSet.cpp">
       <Filter>Source Files\atn</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\atn\ATNDeserializationOptions.cpp">
+    <ClCompile Include="src\atn\ATNDeserializationOptions.cpp">
       <Filter>Source Files\atn</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\atn\ATNDeserializer.cpp">
+    <ClCompile Include="src\atn\ATNDeserializer.cpp">
       <Filter>Source Files\atn</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\atn\ATNSerializer.cpp">
+    <ClCompile Include="src\atn\ATNSerializer.cpp">
       <Filter>Source Files\atn</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\atn\ATNSimulator.cpp">
+    <ClCompile Include="src\atn\ATNSimulator.cpp">
       <Filter>Source Files\atn</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\atn\ATNState.cpp">
+    <ClCompile Include="src\atn\ATNState.cpp">
       <Filter>Source Files\atn</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\atn\ATNType.cpp">
+    <ClCompile Include="src\atn\ATNType.cpp">
       <Filter>Source Files\atn</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\atn\AtomTransition.cpp">
+    <ClCompile Include="src\atn\AtomTransition.cpp">
       <Filter>Source Files\atn</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\atn\BasicBlockStartState.cpp">
+    <ClCompile Include="src\atn\BasicBlockStartState.cpp">
       <Filter>Source Files\atn</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\atn\BasicState.cpp">
+    <ClCompile Include="src\atn\BasicState.cpp">
       <Filter>Source Files\atn</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\atn\BlockEndState.cpp">
+    <ClCompile Include="src\atn\BlockEndState.cpp">
       <Filter>Source Files\atn</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\atn\DecisionState.cpp">
+    <ClCompile Include="src\atn\DecisionState.cpp">
       <Filter>Source Files\atn</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\atn\EmptyPredictionContext.cpp">
+    <ClCompile Include="src\atn\EmptyPredictionContext.cpp">
       <Filter>Source Files\atn</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\atn\EpsilonTransition.cpp">
+    <ClCompile Include="src\atn\EpsilonTransition.cpp">
       <Filter>Source Files\atn</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\atn\LexerATNConfig.cpp">
+    <ClCompile Include="src\atn\LexerATNConfig.cpp">
       <Filter>Source Files\atn</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\atn\LexerATNSimulator.cpp">
+    <ClCompile Include="src\atn\LexerATNSimulator.cpp">
       <Filter>Source Files\atn</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\atn\LL1Analyzer.cpp">
+    <ClCompile Include="src\atn\LL1Analyzer.cpp">
       <Filter>Source Files\atn</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\atn\LoopEndState.cpp">
+    <ClCompile Include="src\atn\LoopEndState.cpp">
       <Filter>Source Files\atn</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\atn\NotSetTransition.cpp">
+    <ClCompile Include="src\atn\NotSetTransition.cpp">
       <Filter>Source Files\atn</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\atn\OrderedATNConfigSet.cpp">
+    <ClCompile Include="src\atn\OrderedATNConfigSet.cpp">
       <Filter>Source Files\atn</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\atn\ParserATNSimulator.cpp">
+    <ClCompile Include="src\atn\ParserATNSimulator.cpp">
       <Filter>Source Files\atn</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\atn\PlusBlockStartState.cpp">
+    <ClCompile Include="src\atn\PlusBlockStartState.cpp">
       <Filter>Source Files\atn</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\atn\PlusLoopbackState.cpp">
+    <ClCompile Include="src\atn\PlusLoopbackState.cpp">
       <Filter>Source Files\atn</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\atn\PrecedencePredicateTransition.cpp">
+    <ClCompile Include="src\atn\PrecedencePredicateTransition.cpp">
       <Filter>Source Files\atn</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\atn\PredicateTransition.cpp">
+    <ClCompile Include="src\atn\PredicateTransition.cpp">
       <Filter>Source Files\atn</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\atn\PredictionContext.cpp">
+    <ClCompile Include="src\atn\PredictionContext.cpp">
       <Filter>Source Files\atn</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\atn\PredictionMode.cpp">
+    <ClCompile Include="src\atn\PredictionMode.cpp">
       <Filter>Source Files\atn</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\atn\RangeTransition.cpp">
+    <ClCompile Include="src\atn\RangeTransition.cpp">
       <Filter>Source Files\atn</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\atn\RuleStartState.cpp">
+    <ClCompile Include="src\atn\RuleStartState.cpp">
       <Filter>Source Files\atn</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\atn\RuleStopState.cpp">
+    <ClCompile Include="src\atn\RuleStopState.cpp">
       <Filter>Source Files\atn</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\atn\RuleTransition.cpp">
+    <ClCompile Include="src\atn\RuleTransition.cpp">
       <Filter>Source Files\atn</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\atn\SemanticContext.cpp">
+    <ClCompile Include="src\atn\SemanticContext.cpp">
       <Filter>Source Files\atn</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\atn\SetTransition.cpp">
+    <ClCompile Include="src\atn\SetTransition.cpp">
       <Filter>Source Files\atn</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\atn\SingletonPredictionContext.cpp">
+    <ClCompile Include="src\atn\SingletonPredictionContext.cpp">
       <Filter>Source Files\atn</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\atn\StarBlockStartState.cpp">
+    <ClCompile Include="src\atn\StarBlockStartState.cpp">
       <Filter>Source Files\atn</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\atn\StarLoopbackState.cpp">
+    <ClCompile Include="src\atn\StarLoopbackState.cpp">
       <Filter>Source Files\atn</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\atn\StarLoopEntryState.cpp">
+    <ClCompile Include="src\atn\StarLoopEntryState.cpp">
       <Filter>Source Files\atn</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\atn\TokensStartState.cpp">
+    <ClCompile Include="src\atn\TokensStartState.cpp">
       <Filter>Source Files\atn</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\atn\Transition.cpp">
+    <ClCompile Include="src\atn\Transition.cpp">
       <Filter>Source Files\atn</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\atn\WildcardTransition.cpp">
+    <ClCompile Include="src\atn\WildcardTransition.cpp">
       <Filter>Source Files\atn</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\dfa\DFA.cpp">
+    <ClCompile Include="src\dfa\DFA.cpp">
       <Filter>Source Files\dfa</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\dfa\DFASerializer.cpp">
+    <ClCompile Include="src\dfa\DFASerializer.cpp">
       <Filter>Source Files\dfa</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\dfa\DFAState.cpp">
+    <ClCompile Include="src\dfa\DFAState.cpp">
       <Filter>Source Files\dfa</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\dfa\LexerDFASerializer.cpp">
+    <ClCompile Include="src\dfa\LexerDFASerializer.cpp">
       <Filter>Source Files\dfa</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\misc\Interval.cpp">
+    <ClCompile Include="src\misc\Interval.cpp">
       <Filter>Source Files\misc</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\misc\IntervalSet.cpp">
+    <ClCompile Include="src\misc\IntervalSet.cpp">
       <Filter>Source Files\misc</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\misc\MurmurHash.cpp">
+    <ClCompile Include="src\misc\MurmurHash.cpp">
       <Filter>Source Files\misc</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\support\Arrays.cpp">
+    <ClCompile Include="src\support\Arrays.cpp">
       <Filter>Source Files\support</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\support\CPPUtils.cpp">
+    <ClCompile Include="src\support\CPPUtils.cpp">
       <Filter>Source Files\support</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\support\guid.cpp">
+    <ClCompile Include="src\support\guid.cpp">
       <Filter>Source Files\support</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\support\Strings.cpp">
+    <ClCompile Include="src\support\Strings.cpp">
       <Filter>Source Files\support</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\tree\ErrorNodeImpl.cpp">
+    <ClCompile Include="src\tree\ErrorNodeImpl.cpp">
       <Filter>Source Files\tree</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\tree\ParseTreeProperty.cpp">
+    <ClCompile Include="src\tree\ParseTreeProperty.cpp">
       <Filter>Source Files\tree</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\tree\ParseTreeWalker.cpp">
+    <ClCompile Include="src\tree\ParseTreeWalker.cpp">
       <Filter>Source Files\tree</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\tree\TerminalNodeImpl.cpp">
+    <ClCompile Include="src\tree\TerminalNodeImpl.cpp">
       <Filter>Source Files\tree</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\tree\Tree.cpp">
+    <ClCompile Include="src\tree\Tree.cpp">
       <Filter>Source Files\tree</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\tree\Trees.cpp">
+    <ClCompile Include="src\tree\Trees.cpp">
       <Filter>Source Files\tree</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\tree\pattern\ParseTreeMatch.cpp">
+    <ClCompile Include="src\tree\pattern\ParseTreeMatch.cpp">
       <Filter>Source Files\tree\pattern</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\tree\pattern\ParseTreePattern.cpp">
+    <ClCompile Include="src\tree\pattern\ParseTreePattern.cpp">
       <Filter>Source Files\tree\pattern</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\tree\pattern\ParseTreePatternMatcher.cpp">
+    <ClCompile Include="src\tree\pattern\ParseTreePatternMatcher.cpp">
       <Filter>Source Files\tree\pattern</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\tree\pattern\RuleTagToken.cpp">
+    <ClCompile Include="src\tree\pattern\RuleTagToken.cpp">
       <Filter>Source Files\tree\pattern</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\tree\pattern\TagChunk.cpp">
+    <ClCompile Include="src\tree\pattern\TagChunk.cpp">
       <Filter>Source Files\tree\pattern</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\tree\pattern\TextChunk.cpp">
+    <ClCompile Include="src\tree\pattern\TextChunk.cpp">
       <Filter>Source Files\tree\pattern</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\tree\pattern\TokenTagToken.cpp">
+    <ClCompile Include="src\tree\pattern\TokenTagToken.cpp">
       <Filter>Source Files\tree\pattern</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\VocabularyImpl.cpp">
+    <ClCompile Include="src\VocabularyImpl.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\atn\AmbiguityInfo.cpp">
+    <ClCompile Include="src\atn\AmbiguityInfo.cpp">
       <Filter>Source Files\atn</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\atn\ContextSensitivityInfo.cpp">
+    <ClCompile Include="src\atn\ContextSensitivityInfo.cpp">
       <Filter>Source Files\atn</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\atn\DecisionEventInfo.cpp">
+    <ClCompile Include="src\atn\DecisionEventInfo.cpp">
       <Filter>Source Files\atn</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\atn\DecisionInfo.cpp">
+    <ClCompile Include="src\atn\DecisionInfo.cpp">
       <Filter>Source Files\atn</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\atn\ErrorInfo.cpp">
+    <ClCompile Include="src\atn\ErrorInfo.cpp">
       <Filter>Source Files\atn</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\atn\LexerActionExecutor.cpp">
+    <ClCompile Include="src\atn\LexerActionExecutor.cpp">
       <Filter>Source Files\atn</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\atn\LexerActionType.cpp">
+    <ClCompile Include="src\atn\LexerActionType.cpp">
       <Filter>Source Files\atn</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\atn\LexerChannelAction.cpp">
+    <ClCompile Include="src\atn\LexerChannelAction.cpp">
       <Filter>Source Files\atn</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\atn\LexerCustomAction.cpp">
+    <ClCompile Include="src\atn\LexerCustomAction.cpp">
       <Filter>Source Files\atn</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\atn\LexerIndexedCustomAction.cpp">
+    <ClCompile Include="src\atn\LexerIndexedCustomAction.cpp">
       <Filter>Source Files\atn</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\atn\LexerModeAction.cpp">
+    <ClCompile Include="src\atn\LexerModeAction.cpp">
       <Filter>Source Files\atn</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\atn\LexerMoreAction.cpp">
+    <ClCompile Include="src\atn\LexerMoreAction.cpp">
       <Filter>Source Files\atn</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\atn\LexerPopModeAction.cpp">
+    <ClCompile Include="src\atn\LexerPopModeAction.cpp">
       <Filter>Source Files\atn</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\atn\LexerPushModeAction.cpp">
+    <ClCompile Include="src\atn\LexerPushModeAction.cpp">
       <Filter>Source Files\atn</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\atn\LexerSkipAction.cpp">
+    <ClCompile Include="src\atn\LexerSkipAction.cpp">
       <Filter>Source Files\atn</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\atn\LexerTypeAction.cpp">
+    <ClCompile Include="src\atn\LexerTypeAction.cpp">
       <Filter>Source Files\atn</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\atn\LookaheadEventInfo.cpp">
+    <ClCompile Include="src\atn\LookaheadEventInfo.cpp">
       <Filter>Source Files\atn</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\atn\ParseInfo.cpp">
+    <ClCompile Include="src\atn\ParseInfo.cpp">
       <Filter>Source Files\atn</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\atn\PredicateEvalInfo.cpp">
+    <ClCompile Include="src\atn\PredicateEvalInfo.cpp">
       <Filter>Source Files\atn</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\atn\ProfilingATNSimulator.cpp">
+    <ClCompile Include="src\atn\ProfilingATNSimulator.cpp">
       <Filter>Source Files\atn</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\runtime\misc\Predicate.cpp">
+    <ClCompile Include="src\misc\Predicate.cpp">
       <Filter>Source Files\misc</Filter>
     </ClCompile>
   </ItemGroup>

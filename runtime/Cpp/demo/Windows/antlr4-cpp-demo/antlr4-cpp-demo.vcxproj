@@ -22,6 +22,7 @@
     <ProjectGuid>{24EC5104-7402-4C76-B66B-27ADBE062D68}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>antlr4cppdemo</RootNamespace>
+    <ProjectName>antlr4cpp-demo</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -94,8 +95,9 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\generated;$(SolutionDir)..\..\runtime;$(SolutionDir)..\..\runtime\atn;$(SolutionDir)..\..\runtime\dfa;$(SolutionDir)..\..\runtime\misc;$(SolutionDir)..\..\runtime\support;$(SolutionDir)..\..\runtime\tree;$(SolutionDir)..\..\runtime\tree\xpath;$(SolutionDir)..\..\runtime\tree\pattern;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\generated;$(SolutionDir)..\..\runtime\src;$(SolutionDir)..\..\runtime\src\atn;$(SolutionDir)..\..\runtime\src\dfa;$(SolutionDir)..\..\runtime\src\misc;$(SolutionDir)..\..\runtime\src\support;$(SolutionDir)..\..\runtime\src\tree;$(SolutionDir)..\..\runtime\src\tree\xpath;$(SolutionDir)..\..\runtime\src\tree\pattern;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ForcedIncludeFiles>antlrcpp-Prefix.h</ForcedIncludeFiles>
+      <DisableSpecificWarnings>4251</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -110,8 +112,9 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\generated;$(SolutionDir)..\..\runtime;$(SolutionDir)..\..\runtime\atn;$(SolutionDir)..\..\runtime\dfa;$(SolutionDir)..\..\runtime\misc;$(SolutionDir)..\..\runtime\support;$(SolutionDir)..\..\runtime\tree;$(SolutionDir)..\..\runtime\tree\xpath;$(SolutionDir)..\..\runtime\tree\pattern;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\generated;$(SolutionDir)..\..\runtime\src;$(SolutionDir)..\..\runtime\src\atn;$(SolutionDir)..\..\runtime\src\dfa;$(SolutionDir)..\..\runtime\src\misc;$(SolutionDir)..\..\runtime\src\support;$(SolutionDir)..\..\runtime\src\tree;$(SolutionDir)..\..\runtime\src\tree\xpath;$(SolutionDir)..\..\runtime\src\tree\pattern;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ForcedIncludeFiles>antlrcpp-Prefix.h</ForcedIncludeFiles>
+      <DisableSpecificWarnings>4251</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -128,8 +131,9 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\generated;$(SolutionDir)..\..\runtime;$(SolutionDir)..\..\runtime\atn;$(SolutionDir)..\..\runtime\dfa;$(SolutionDir)..\..\runtime\misc;$(SolutionDir)..\..\runtime\support;$(SolutionDir)..\..\runtime\tree;$(SolutionDir)..\..\runtime\tree\xpath;$(SolutionDir)..\..\runtime\tree\pattern;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\generated;$(SolutionDir)..\..\runtime\src;$(SolutionDir)..\..\runtime\src\atn;$(SolutionDir)..\..\runtime\src\dfa;$(SolutionDir)..\..\runtime\src\misc;$(SolutionDir)..\..\runtime\src\support;$(SolutionDir)..\..\runtime\src\tree;$(SolutionDir)..\..\runtime\src\tree\xpath;$(SolutionDir)..\..\runtime\src\tree\pattern;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ForcedIncludeFiles>antlrcpp-Prefix.h</ForcedIncludeFiles>
+      <DisableSpecificWarnings>4251</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -148,8 +152,9 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\generated;$(SolutionDir)..\..\runtime;$(SolutionDir)..\..\runtime\atn;$(SolutionDir)..\..\runtime\dfa;$(SolutionDir)..\..\runtime\misc;$(SolutionDir)..\..\runtime\support;$(SolutionDir)..\..\runtime\tree;$(SolutionDir)..\..\runtime\tree\xpath;$(SolutionDir)..\..\runtime\tree\pattern;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\generated;$(SolutionDir)..\..\runtime\src;$(SolutionDir)..\..\runtime\src\atn;$(SolutionDir)..\..\runtime\src\dfa;$(SolutionDir)..\..\runtime\src\misc;$(SolutionDir)..\..\runtime\src\support;$(SolutionDir)..\..\runtime\src\tree;$(SolutionDir)..\..\runtime\src\tree\xpath;$(SolutionDir)..\..\runtime\src\tree\pattern;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ForcedIncludeFiles>antlrcpp-Prefix.h</ForcedIncludeFiles>
+      <DisableSpecificWarnings>4251</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -168,7 +173,7 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\runtime\antlrcpp-Prefix.h" />
+    <ClInclude Include="..\..\..\runtime\src\antlrcpp-Prefix.h" />
     <ClInclude Include="..\..\generated\TLexer.h" />
     <ClInclude Include="..\..\generated\TParser.h" />
     <ClInclude Include="..\..\generated\TParserBaseListener.h" />
@@ -177,7 +182,7 @@
     <ClInclude Include="..\..\generated\TParserVisitor.h" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\antlr4cpp.vcxproj">
+    <ProjectReference Include="..\..\..\runtime\antlr4cpp.vcxproj">
       <Project>{a9762991-1b57-4dce-90c0-ee42b96947be}</Project>
     </ProjectReference>
   </ItemGroup>

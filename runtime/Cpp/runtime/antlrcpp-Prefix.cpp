@@ -28,3 +28,4 @@
  */
 
 // Only used to generate the precompiled header (using the implicitly imported antlrcpp-Prefix.h file)
+// in Visual Studio. Not needed for the other platforms.

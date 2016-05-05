@@ -41,9 +41,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\runtime\antlrcpp-Prefix.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\generated\TLexer.h">
       <Filter>generated</Filter>
     </ClInclude>
@@ -61,6 +58,9 @@
     </ClInclude>
     <ClInclude Include="..\..\generated\TParserVisitor.h">
       <Filter>generated</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\runtime\src\antlrcpp-Prefix.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
