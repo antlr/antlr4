@@ -51,7 +51,7 @@ namespace runtime {
     static const int MORE = -2;
     static const int SKIP = -3;
 
-    static const int DEFAULT_TOKEN_CHANNEL = Token::DEFAULT_CHANNEL;
+    static const size_t DEFAULT_TOKEN_CHANNEL = Token::DEFAULT_CHANNEL;
     static const int HIDDEN = Token::HIDDEN_CHANNEL;
     static const wchar_t MIN_CHAR_VALUE = L'\0';
     static const wchar_t MAX_CHAR_VALUE = L'\uFFFE';

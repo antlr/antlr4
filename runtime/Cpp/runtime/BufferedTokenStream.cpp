@@ -258,7 +258,7 @@ std::vector<Ref<Token>> BufferedTokenStream::getTokens(int start, int stop, int 
   return getTokens(start, stop, s);
 }
 
-ssize_t BufferedTokenStream::nextTokenOnChannel(size_t i, int channel) {
+ssize_t BufferedTokenStream::nextTokenOnChannel(size_t i, size_t channel) {
   sync(i);
   if (i >= size()) {
     return size() - 1;
@@ -276,7 +276,7 @@ ssize_t BufferedTokenStream::nextTokenOnChannel(size_t i, int channel) {
   return i;
 }
 
-ssize_t BufferedTokenStream::previousTokenOnChannel(size_t i, int channel) {
+ssize_t BufferedTokenStream::previousTokenOnChannel(size_t i, size_t channel) {
   sync(i);
   if (i >= size()) {
     // the EOF token is on every channel
@@ -296,7 +296,7 @@ ssize_t BufferedTokenStream::previousTokenOnChannel(size_t i, int channel) {
   return i;
 }
 
-std::vector<Ref<Token>> BufferedTokenStream::getHiddenTokensToRight(size_t tokenIndex, int channel) {
+std::vector<Ref<Token>> BufferedTokenStream::getHiddenTokensToRight(size_t tokenIndex, size_t channel) {
   lazyInit();
   if (tokenIndex >= _tokens.size()) {
     throw IndexOutOfBoundsException(std::to_string(tokenIndex) + " not in 0.." + std::to_string(_tokens.size() - 1));
@@ -319,7 +319,7 @@ std::vector<Ref<Token>> BufferedTokenStream::getHiddenTokensToRight(size_t token
   return getHiddenTokensToRight(tokenIndex, -1);
 }
 
-std::vector<Ref<Token>> BufferedTokenStream::getHiddenTokensToLeft(size_t tokenIndex, int channel) {
+std::vector<Ref<Token>> BufferedTokenStream::getHiddenTokensToLeft(size_t tokenIndex, size_t channel) {
   lazyInit();
   if (tokenIndex >= _tokens.size()) {
     throw IndexOutOfBoundsException(std::to_string(tokenIndex) + " not in 0.." + std::to_string(_tokens.size() - 1));
@@ -345,7 +345,7 @@ std::vector<Ref<Token>> BufferedTokenStream::getHiddenTokensToLeft(size_t tokenI
   return getHiddenTokensToLeft(tokenIndex, -1);
 }
 
-std::vector<Ref<Token>> BufferedTokenStream::filterForChannel(size_t from, size_t to, int channel) {
+std::vector<Ref<Token>> BufferedTokenStream::filterForChannel(size_t from, size_t to, ssize_t channel) {
   std::vector<Ref<Token>> hidden;
   for (size_t i = from; i <= to; i++) {
     Ref<Token> t = _tokens[i];
@@ -354,7 +354,7 @@ std::vector<Ref<Token>> BufferedTokenStream::filterForChannel(size_t from, size_
         hidden.push_back(t);
       }
     } else {
-      if (t->getChannel() == channel) {
+      if (t->getChannel() == (size_t)channel) {
         hidden.push_back(t);
       }
     }

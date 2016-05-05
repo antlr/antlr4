@@ -71,7 +71,7 @@ namespace runtime {
      * The default value is {@link Token#DEFAULT_CHANNEL}, which matches the
      * default channel assigned to tokens created by the lexer.</p>
      */
-    int channel;
+    size_t channel;
 
   public:
     /**

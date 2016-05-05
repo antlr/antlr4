@@ -89,7 +89,7 @@ namespace runtime {
     /// Collect all tokens on specified channel to the right of
     ///  the current token up until we see a token on DEFAULT_TOKEN_CHANNEL or
     ///  EOF. If channel is -1, find any non default channel token.
-    virtual std::vector<Ref<Token>> getHiddenTokensToRight(size_t tokenIndex, int channel);
+    virtual std::vector<Ref<Token>> getHiddenTokensToRight(size_t tokenIndex, size_t channel);
 
     /// <summary>
     /// Collect all hidden tokens (any off-default channel) to the right of
@@ -103,7 +103,7 @@ namespace runtime {
     ///  the current token up until we see a token on DEFAULT_TOKEN_CHANNEL.
     ///  If channel is -1, find any non default channel token.
     /// </summary>
-    virtual std::vector<Ref<Token>> getHiddenTokensToLeft(size_t tokenIndex, int channel);
+    virtual std::vector<Ref<Token>> getHiddenTokensToLeft(size_t tokenIndex, size_t channel);
 
     /// <summary>
     /// Collect all hidden tokens (any off-default channel) to the left of
@@ -201,7 +201,7 @@ namespace runtime {
      * the EOF token if there are no tokens on channel between {@code i} and
      * EOF.
      */
-    virtual ssize_t nextTokenOnChannel(size_t i, int channel);
+    virtual ssize_t nextTokenOnChannel(size_t i, size_t channel);
 
     /**
      * Given a starting index, return the index of the previous token on
@@ -213,9 +213,9 @@ namespace runtime {
      * index is returned. This is due to the fact that the EOF token is treated
      * as though it were on every channel.</p>
      */
-    virtual ssize_t previousTokenOnChannel(size_t i, int channel);
+    virtual ssize_t previousTokenOnChannel(size_t i, size_t channel);
     
-    virtual std::vector<Ref<Token>> filterForChannel(size_t from, size_t to, int channel);
+    virtual std::vector<Ref<Token>> filterForChannel(size_t from, size_t to, ssize_t channel);
 
     bool isInitialized() const;
 

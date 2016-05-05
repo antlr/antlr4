@@ -123,8 +123,6 @@ using namespace antlrcpp;
   XCTAssertEqual(MurmurHash::initialize(), 0U);
   XCTAssertEqual(MurmurHash::initialize(31), 31U);
 
-  XCTAssertEqual(MurmurHash::hashCode<size_t>({}, 0), 0U);
-
   // In absence of real test vectors (64bit) for murmurhash I instead check if I can find duplicate hash values
   // in a deterministic and a random sequence of 100K values each.
   std::set<size_t> hashs;

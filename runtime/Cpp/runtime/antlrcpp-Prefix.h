@@ -85,8 +85,12 @@
 
 #elif __APPLE__
   #define GUID_CFUUID
+  #define ANTLR4CPP_PUBLIC
+  #define EXPIMP_TEMPLATE
 #else
   #define GUID_LIBUUID
+  #define ANTLR4CPP_PUBLIC
+  #define EXPIMP_TEMPLATE
 #endif
 
 #include "guid.h"
