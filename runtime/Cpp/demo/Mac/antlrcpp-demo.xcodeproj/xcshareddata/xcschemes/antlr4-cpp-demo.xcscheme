@@ -17,7 +17,7 @@
                BlueprintIdentifier = "27C66A661C9591280021E494"
                BuildableName = "antlr4-cpp-demo"
                BlueprintName = "antlr4-cpp-demo"
-               ReferencedContainer = "container:antlrcpp.xcodeproj">
+               ReferencedContainer = "container:antlrcpp-demo.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -36,7 +36,7 @@
                BlueprintIdentifier = "37F135671B4AC02800E0CACF"
                BuildableName = "antlrcpp Tests.xctest"
                BlueprintName = "antlrcpp Tests"
-               ReferencedContainer = "container:antlrcpp.xcodeproj">
+               ReferencedContainer = "container:antlrcpp-demo.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -46,7 +46,7 @@
             BlueprintIdentifier = "27C66A661C9591280021E494"
             BuildableName = "antlr4-cpp-demo"
             BlueprintName = "antlr4-cpp-demo"
-            ReferencedContainer = "container:antlrcpp.xcodeproj">
+            ReferencedContainer = "container:antlrcpp-demo.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
       <AdditionalOptions>
@@ -69,7 +69,7 @@
             BlueprintIdentifier = "27C66A661C9591280021E494"
             BuildableName = "antlr4-cpp-demo"
             BlueprintName = "antlr4-cpp-demo"
-            ReferencedContainer = "container:antlrcpp.xcodeproj">
+            ReferencedContainer = "container:antlrcpp-demo.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <AdditionalOptions>
@@ -88,7 +88,7 @@
             BlueprintIdentifier = "27C66A661C9591280021E494"
             BuildableName = "antlr4-cpp-demo"
             BlueprintName = "antlr4-cpp-demo"
-            ReferencedContainer = "container:antlrcpp.xcodeproj">
+            ReferencedContainer = "container:antlrcpp-demo.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

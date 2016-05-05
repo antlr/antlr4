@@ -19,7 +19,7 @@
                BlueprintIdentifier = "37F135671B4AC02800E0CACF"
                BuildableName = "antlrcpp Tests.xctest"
                BlueprintName = "antlrcpp Tests"
-               ReferencedContainer = "container:antlrcpp.xcodeproj">
+               ReferencedContainer = "container:antlrcpp-demo.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
