@@ -1,10 +1,18 @@
 lexer grammar TLexer;
 
-@lexer::header {
-// Lexer header
-}
+// These are all supported lexer sections:
 
-@lexer::members {
+// Lexer file header. Appears at the top of h + cpp files. Use e.g. for copyrights.
+@lexer::header {/* lexer header section */}
+
+// Appears before any #include in h + cpp files.
+@lexer::preinclude {/* lexer precinclude section */}
+
+// Follows directly after the standard #includes in h + cpp files.
+@lexer::postinclude {/* lexer postinclude section */}
+
+// Appears in the public part of the lexer in the h file.
+@lexer::declarations {/* public lexer declarations section */
 bool canTestFoo() { return true; }
 bool isItFoo() { return true; }
 bool isItBar() { return true; }
@@ -13,15 +21,11 @@ void myFooLexerAction() { /* do something*/ };
 void myBarLexerAction() { /* do something*/ };
 }
 
-@lexer::context
-{
- // Lexer context.
-}
+// Appears in the private part of the lexer in the h file.
+@lexer::members {/* private lexer declarations/members section */}
 
-@lexer::apifuncs
-{
- // Lexer API functions.
-}
+// Appears in line with the other class member definitions in the cpp file.
+@lexer::definitions {/* lexer definitions section */}
 
 channels { COMMENTS_CHANNEL, DIRECTIVE }
 

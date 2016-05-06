@@ -60,7 +60,7 @@ import java.util.ArrayList;
 <parser>
 >>
 
-ListenerFile(file, header) ::= <<
+ListenerFile(file, header, namedActions) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 <if(file.genPackage)>
 package <file.genPackage>;
@@ -97,7 +97,7 @@ void exit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ct
 }
 >>
 
-BaseListenerFile(file, header) ::= <<
+BaseListenerFile(file, header, namedActions) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 <if(file.genPackage)>
 package <file.genPackage>;
@@ -155,7 +155,7 @@ public class <file.grammarName>BaseListener implements <file.grammarName>Listene
 }
 >>
 
-VisitorFile(file, header) ::= <<
+VisitorFile(file, header, namedActions) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 <if(file.genPackage)>
 package <file.genPackage>;
@@ -186,7 +186,7 @@ T visit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx)
 }
 >>
 
-BaseVisitorFile(file, header) ::= <<
+BaseVisitorFile(file, header, namedActions) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 <if(file.genPackage)>
 package <file.genPackage>;
