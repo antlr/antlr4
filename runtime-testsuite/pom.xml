@@ -70,11 +70,17 @@
         <version>2.12.4</version>
         <configuration>
           <includes>
+<!-- MEGAHACK - Don't forget to reinstate. -->
+<!--
             <include>**/csharp/Test*.java</include>
+-->
+            <include>**/cpp/Test*.cpp</include>
+<!--
             <include>**/java/Test*.java</include>
             <include>**/javascript/node/Test*.java</include>
             <include>**/python2/Test*.java</include> 
             <include>**/python3/Test*.java</include>
+-->
           </includes>
         </configuration>
       </plugin>    
