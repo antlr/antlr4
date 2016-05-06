@@ -36,6 +36,7 @@ import org.antlr.v4.tool.Rule;
 import org.antlr.v4.tool.ast.ActionAST;
 import org.antlr.v4.tool.ast.AltAST;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -61,12 +62,18 @@ public class ListenerFile extends OutputFile {
 	public Map<String, String> listenerLabelRuleNames = new LinkedHashMap<String, String>();
 
 	@ModelElement public Action header;
+	@ModelElement public Map<String, Action> namedActions;
 
 	public ListenerFile(OutputModelFactory factory, String fileName) {
 		super(factory, fileName);
 		Grammar g = factory.getGrammar();
 		parserName = g.getRecognizerName();
 		grammarName = g.name;
+		namedActions = new HashMap<String, Action>();
+		for (String name : g.namedActions.keySet()) {
+			ActionAST ast = g.namedActions.get(name);
+			namedActions.put(name, new Action(factory, ast));
+		}
 		for (Rule r : g.rules.values()) {
 			Map<String, List<Pair<Integer,AltAST>>> labels = r.getAltLabels();
 			if ( labels!=null ) {

@@ -1,0 +1,108 @@
+/*
+ * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
+ *  Copyright (c) 2014 Dan McLaughlin
+ *  All rights reserved.
+ *
+ *  Redistribution and use in source and binary forms, with or without
+ *  modification, are permitted provided that the following conditions
+ *  are met:
+ *
+ *  1. Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ *  2. Redistributions in binary form must reproduce the above copyright
+ *     notice, this list of conditions and the following disclaimer in the
+ *     documentation and/or other materials provided with the distribution.
+ *  3. The name of the author may not be used to endorse or promote products
+ *     derived from this software without specific prior written permission.
+ *
+ *  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+ *  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ *  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+ *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ *  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+#pragma once
+
+namespace antlrcpp {
+
+  std::wstring join(std::vector<std::wstring> strings, const std::wstring &separator);
+  std::map<std::wstring, size_t> toMap(const std::vector<std::wstring> &keys);
+  std::wstring escapeWhitespace(std::wstring str, bool escapeSpaces);
+  std::wstring toHexString(const int t);
+  std::wstring arrayToString(const std::vector<std::wstring> &data);
+  std::wstring replaceString(const std::wstring &s, const std::wstring &from, const std::wstring &to);
+  std::vector<std::wstring> split(const std::wstring &s, const std::wstring &sep, int count);
+  std::wstring indent(const std::wstring &s, const std::wstring &indentation, bool includingFirst = true);
+
+  // Using RAII + a lambda to implement a "finally" relacement.
+  template <typename F>
+  struct FinalAction {
+    FinalAction(F f) : _cleanUp { f } {}
+    ~FinalAction() { if (_enabled) _cleanUp(); }
+    void disable() { _enabled = false; };
+  private:
+    F _cleanUp;
+    bool _enabled {true};
+  };
+
+  template <typename F>
+  FinalAction<F> finally(F f) { return FinalAction<F>(f); }
+
+  // Convenience functions to avoid lengthy dynamic_cast() != nullptr checks in many places.
+  template <typename T1, typename T2>
+  bool is(T2 &obj) { // For value types.
+    return dynamic_cast<typename std::add_const<T1>::type *>(&obj) != nullptr;
+  }
+
+  template <typename T1, typename T2>
+  bool is(T2 *obj) { // For pointer types.
+    return dynamic_cast<T1>(obj) != nullptr;
+  }
+
+  template <typename T1, typename T2>
+  bool is(Ref<T2> obj) { // For shared pointers.
+    return dynamic_cast<T1*>(obj.get()) != nullptr;
+  }
+
+  template <typename T>
+  std::wstring toString(const T &o) {
+    std::wstringstream ss;
+    // typeid gives the mangled class name, but that's all what's possible
+    // in a portable way.
+    ss << typeid(o).name() << "@" << std::hex << (size_t)&o;
+    return ss.str();
+  }
+
+} // namespace antlrcpp
+
+namespace std {
+  // Comparing weak and shared pointers.
+  template <typename T>
+  bool operator == (const std::weak_ptr<T> &lhs, const std::weak_ptr<T> &rhs) {
+    if (lhs.expired() && rhs.expired())
+      return true;
+
+    if (lhs.expired() || rhs.expired())
+      return false;
+
+    return (lhs.lock() == rhs.lock());
+  }
+
+  template <typename T>
+  bool operator == (const Ref<T> &lhs, const Ref<T> &rhs) {
+    if (!lhs && !rhs)
+      return true;
+
+    if (!lhs || !rhs)
+      return false;
+
+    return (*lhs == *rhs);
+  }
+} // namespace std

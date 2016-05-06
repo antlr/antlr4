@@ -1,5 +1,3 @@
-# Maven build folders
-target/
 
 # Ant build folders
 build/
@@ -57,3 +55,12 @@ bilder.pyc
 bild.log
 
 bild_output.txt
+antlr4cpp.suo
+antlr4-maven-plugin/target
+runtime/Java/target
+tool/target
+runtime-testsuite/target
+tool-testsuite/target
+runtime/Cpp/demo/generated
+xcuserdata
+*.jar

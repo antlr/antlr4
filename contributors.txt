@@ -89,6 +89,7 @@ YYYY/MM/DD, github id, Full name, email
 2015/12/23, pboyer, Peter Boyer, peter.b.boyer@gmail.com
 2015/12/24, dtymon, David Tymon, david.tymon@gmail.com
 2016/02/18, reitzig, Raphael Reitzig, reitzig[at]cs.uni-kl.de
+2016/03/10, mike-lischke, Mike Lischke, mike@lischke-online.de
 2016/03/27, beardlybread, Bradley Steinbacher, bradley.j.steinbacher@gmail.com
 2016/03/29, msteiger, Martin Steiger, antlr@martin-steiger.de
 2016/03/28, gagern, Martin von Gagern, gagern@ma.tum.de
