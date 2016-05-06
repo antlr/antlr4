@@ -216,7 +216,7 @@ class PredictionMode(Enum):
                 # dup configs, tossing out semantic predicates
                 dup = ATNConfigSet()
                 for c in configs:
-                    c = ATNConfig(c,SemanticContext.NONE)
+                    c = ATNConfig(config=c, semantic=SemanticContext.NONE)
                     dup.add(c)
                 configs = dup
             # now we have combined contexts for configs with dissimilar preds
