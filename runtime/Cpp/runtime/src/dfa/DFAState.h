@@ -68,7 +68,10 @@ namespace dfa {
     public:
       Ref<atn::SemanticContext> pred; // never null; at least SemanticContext.NONE
       int alt;
+
       PredPrediction(Ref<atn::SemanticContext> pred, int alt);
+      virtual ~PredPrediction() {};
+
       virtual std::wstring toString();
 
     private:
@@ -123,7 +126,7 @@ namespace dfa {
     DFAState();
     DFAState(int state);
     DFAState(Ref<atn::ATNConfigSet> configs);
-    ~DFAState();
+    virtual ~DFAState();
 
     /// <summary>
     /// Get the set of all alts mentioned by all ATN configurations in this

@@ -51,7 +51,7 @@ bool RuleTransition::isEpsilon() const {
   return true;
 }
 
-bool RuleTransition::matches(int symbol, int minVocabSymbol, int maxVocabSymbol) const {
+bool RuleTransition::matches(int /*symbol*/, int /*minVocabSymbol*/, int /*maxVocabSymbol*/) const {
   return false;
 }
 

@@ -89,9 +89,10 @@ namespace runtime {
     /// <exception cref="NullPointerException"> if {@code tokens} is {@code null} </exception>
   public:
 
-    template<typename T1> //where T1 : Token
-    ListTokenSource(std::vector<T1> tokens) //this(tokens, nullptr);
-    {}
+    template<typename T1>
+    ListTokenSource(std::vector<T1> tokens) : ListTokenSource(tokens, "") {
+    }
+
     /// <summary>
     /// Constructs a new <seealso cref="ListTokenSource"/> instance from the specified
     /// collection of <seealso cref="Token"/> objects and source name.
@@ -104,9 +105,8 @@ namespace runtime {
     /// been reached).
     /// </param>
     /// <exception cref="NullPointerException"> if {@code tokens} is {@code null} </exception>
-
-    template<typename T1> //where T1 : Token
-    ListTokenSource(std::vector<T1> tokens, const std::string &sourceName) {
+    template<typename T1>
+    ListTokenSource(std::vector<T1> tokens, const std::string &/*sourceName*/) {
       InitializeInstanceFields();
       if (tokens.empty()) {
         throw L"tokens cannot be null";

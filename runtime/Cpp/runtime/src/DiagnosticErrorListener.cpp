@@ -62,7 +62,7 @@ void DiagnosticErrorListener::reportAmbiguity(Parser *recognizer, const dfa::DFA
 }
 
 void DiagnosticErrorListener::reportAttemptingFullContext(Parser *recognizer, const dfa::DFA &dfa, size_t startIndex,
-  size_t stopIndex, const antlrcpp::BitSet &conflictingAlts, Ref<atn::ATNConfigSet> configs) {
+  size_t stopIndex, const antlrcpp::BitSet &/*conflictingAlts*/, Ref<atn::ATNConfigSet> /*configs*/) {
   std::wstring decision = getDecisionDescription(recognizer, dfa);
   std::wstring text = recognizer->getTokenStream()->getText(misc::Interval((int)startIndex, (int)stopIndex));
   std::wstring message = L"reportAttemptingFullContext d = " + decision + L", input = '" + text + L"'";
@@ -70,7 +70,7 @@ void DiagnosticErrorListener::reportAttemptingFullContext(Parser *recognizer, co
 }
 
 void DiagnosticErrorListener::reportContextSensitivity(Parser *recognizer, const dfa::DFA &dfa, size_t startIndex,
-  size_t stopIndex, int prediction, Ref<atn::ATNConfigSet> configs) {
+  size_t stopIndex, int /*prediction*/, Ref<atn::ATNConfigSet> /*configs*/) {
   std::wstring decision = getDecisionDescription(recognizer, dfa);
   std::wstring text = recognizer->getTokenStream()->getText(misc::Interval((int)startIndex, (int)stopIndex));
   std::wstring message = L"reportContextSensitivity d = " + decision + L", input = '" + text + L"'";

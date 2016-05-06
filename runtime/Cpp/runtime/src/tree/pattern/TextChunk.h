@@ -45,10 +45,10 @@ namespace pattern {
   /// pattern string.
   /// </summary>
   class ANTLR4CPP_PUBLIC TextChunk : public Chunk {
+  private:
     /// <summary>
     /// This is the backing field for <seealso cref="#getText"/>.
     /// </summary>
-  private:
     const std::wstring text;
 
     /// <summary>
@@ -58,6 +58,7 @@ namespace pattern {
     /// <exception cref="IllegalArgumentException"> if {@code text} is {@code null}. </exception>
   public:
     TextChunk(const std::wstring &text);
+    virtual ~TextChunk() {};
 
     /// <summary>
     /// Gets the raw text of this chunk.

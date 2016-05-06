@@ -44,11 +44,11 @@ size_t EmptyPredictionContext::size() const {
   return 1;
 }
 
-std::weak_ptr<PredictionContext> EmptyPredictionContext::getParent(size_t index) const {
+std::weak_ptr<PredictionContext> EmptyPredictionContext::getParent(size_t /*index*/) const {
   return std::weak_ptr<PredictionContext>();
 }
 
-int EmptyPredictionContext::getReturnState(size_t index) const {
+int EmptyPredictionContext::getReturnState(size_t /*index*/) const {
   return returnState;
 }
 

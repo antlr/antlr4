@@ -43,6 +43,8 @@ namespace dfa {
   /// interface.
   class ANTLR4CPP_PUBLIC VocabularyImpl : public Vocabulary {
   public:
+    virtual ~VocabularyImpl() {};
+    
     /// Gets an empty <seealso cref="Vocabulary"/> instance.
     ///
     /// <para>

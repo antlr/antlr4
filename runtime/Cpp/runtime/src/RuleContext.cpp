@@ -98,7 +98,7 @@ ssize_t RuleContext::getRuleIndex() const {
   return -1;
 }
 
-Ref<tree::Tree> RuleContext::getChildReference(size_t i) {
+Ref<tree::Tree> RuleContext::getChildReference(size_t /*i*/) {
   return Ref<tree::Tree>();
 }
 
@@ -107,7 +107,7 @@ int RuleContext::getAltNumber() const {
   return atn::ATN::INVALID_ALT_NUMBER;
 }
 
-void RuleContext::setAltNumber(int altNumber) {
+void RuleContext::setAltNumber(int /*altNumber*/) {
 }
 
 std::size_t RuleContext::getChildCount() {

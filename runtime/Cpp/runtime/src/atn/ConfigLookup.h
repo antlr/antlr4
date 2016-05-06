@@ -67,6 +67,8 @@ namespace atn {
   protected:
     class ConfigLookupIteratorImpl {
     public:
+      virtual ~ConfigLookupIteratorImpl () {};
+      
       virtual ConfigLookupIteratorImpl& operator ++ () = 0;
       virtual bool operator != (const ConfigLookupIteratorImpl&) const = 0;
       virtual Ref<ATNConfig> operator * () const = 0;

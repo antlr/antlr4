@@ -47,8 +47,8 @@ namespace atn {
 
   public:
     ATNDeserializationOptions();
-
     ATNDeserializationOptions(ATNDeserializationOptions *options);
+    virtual ~ATNDeserializationOptions() {};
 
     static const ATNDeserializationOptions& getDefaultOptions();
 

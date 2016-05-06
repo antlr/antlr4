@@ -45,7 +45,7 @@ using namespace org::antlr::v4::runtime;
 UnbufferedTokenStream::UnbufferedTokenStream(TokenSource *tokenSource) : UnbufferedTokenStream(tokenSource, 256) {
 }
 
-UnbufferedTokenStream::UnbufferedTokenStream(TokenSource *tokenSource, int bufferSize) : _tokenSource(tokenSource)
+UnbufferedTokenStream::UnbufferedTokenStream(TokenSource *tokenSource, int /*bufferSize*/) : _tokenSource(tokenSource)
 {
   InitializeInstanceFields();
   fill(1); // prime the pump

@@ -38,6 +38,7 @@ namespace runtime {
 
   class ANTLR4CPP_PUBLIC IRecognizer {
   public:
+    virtual ~IRecognizer() {};
 
     virtual int getState() = 0;
 

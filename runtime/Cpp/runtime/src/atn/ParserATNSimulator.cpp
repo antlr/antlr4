@@ -846,8 +846,8 @@ BitSet ParserATNSimulator::evalSemanticContext(std::vector<dfa::DFAState::PredPr
   return predictions;
 }
 
-bool ParserATNSimulator::evalSemanticContext(Ref<SemanticContext> pred, Ref<ParserRuleContext> parserCallStack, int alt,
-  bool fullCtx) {
+bool ParserATNSimulator::evalSemanticContext(Ref<SemanticContext> pred, Ref<ParserRuleContext> parserCallStack,
+                                             int /*alt*/, bool /*fullCtx*/) {
   return pred->eval(parser, parserCallStack);
 }
 
@@ -1270,7 +1270,7 @@ void ParserATNSimulator::reportContextSensitivity(dfa::DFA &dfa, int prediction,
   }
 }
 
-void ParserATNSimulator::reportAmbiguity(dfa::DFA &dfa, dfa::DFAState *D, size_t startIndex, size_t stopIndex,
+void ParserATNSimulator::reportAmbiguity(dfa::DFA &dfa, dfa::DFAState */*D*/, size_t startIndex, size_t stopIndex,
                                          bool exact, const antlrcpp::BitSet &ambigAlts, Ref<ATNConfigSet> configs) {
   if (debug || retry_debug) {
     misc::Interval interval = misc::Interval((int)startIndex, (int)stopIndex);

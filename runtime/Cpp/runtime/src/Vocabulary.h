@@ -44,6 +44,8 @@ namespace dfa {
   /// @author Sam Harwell </seealso>
   class ANTLR4CPP_PUBLIC Vocabulary {
   public:
+    virtual ~Vocabulary() {};
+    
     /// <summary>
     /// Returns the highest token type value. It can be used to iterate from
     /// zero to that number, inclusively, thus querying all stored entries. </summary>

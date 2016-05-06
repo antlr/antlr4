@@ -47,7 +47,7 @@ misc::IntervalSet RangeTransition::label() const {
   return misc::IntervalSet::of(from, to);
 }
 
-bool RangeTransition::matches(int symbol, int minVocabSymbol, int maxVocabSymbol) const {
+bool RangeTransition::matches(int symbol, int /*minVocabSymbol*/, int /*maxVocabSymbol*/) const {
   return symbol >= from && symbol <= to;
 }
 

@@ -55,16 +55,6 @@ namespace pattern {
   /// from ensuring that the tag is a non-null, non-empty string.
   /// </summary>
   class ANTLR4CPP_PUBLIC TagChunk : public Chunk {
-    /// <summary>
-    /// This is the backing field for <seealso cref="#getTag"/>.
-    /// </summary>
-  private:
-    const std::wstring _tag;
-    /// <summary>
-    /// This is the backing field for <seealso cref="#getLabel"/>.
-    /// </summary>
-    const std::wstring _label;
-
   public:
     /// <summary>
     /// Construct a new instance of <seealso cref="TagChunk"/> using the specified tag and
@@ -76,6 +66,7 @@ namespace pattern {
     /// <exception cref="IllegalArgumentException"> if {@code tag} is {@code null} or
     /// empty. </exception>
     TagChunk(const std::wstring &tag);
+    virtual ~TagChunk() {};
 
     /// <summary>
     /// Construct a new instance of <seealso cref="TagChunk"/> using the specified label
@@ -109,6 +100,14 @@ namespace pattern {
     /// returned as just the tag name.
     /// </summary>
     virtual std::wstring toString();
+
+  private:
+    /// This is the backing field for <seealso cref="#getTag"/>.
+    const std::wstring _tag;
+    /// <summary>
+    /// This is the backing field for <seealso cref="#getLabel"/>.
+    /// </summary>
+    const std::wstring _label;
   };
 
 } // namespace pattern

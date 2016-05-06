@@ -50,6 +50,7 @@ namespace atn {
     const int returnState;
 
     SingletonPredictionContext(std::weak_ptr<PredictionContext> parent, int returnState);
+    virtual ~SingletonPredictionContext() {};
 
     static Ref<SingletonPredictionContext> create(std::weak_ptr<PredictionContext> parent, int returnState);
 

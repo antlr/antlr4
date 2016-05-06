@@ -902,13 +902,13 @@ TokenDecl(t) ::= "<! Variable Declaration !>"
 TokenTypeDeclHeader(t) ::= "<! Local Variable !>"
 TokenTypeDecl(t) ::= "ssize_t <t.name>;"
 
-TokenListDeclHeader(t) ::= "std::vector\<Ref\<Token>> <t.name>;"
+TokenListDeclHeader(t) ::= "std::vector\<Ref\<Token>> <t.name>"
 TokenListDecl(t) ::= "<! Variable Declaration !>"
 
-RuleContextDeclHeader(r) ::= "Ref\<<parser.name>::<r.ctxName>> <r.name>;"
+RuleContextDeclHeader(r) ::= "Ref\<<parser.name>::<r.ctxName>> <r.name>"
 RuleContextDecl(r) ::= "<! Variable Declaration !>"
 
-RuleContextListDeclHeader(rdecl) ::= "std::vector\<Ref\<<rdecl.ctxName>>> <rdecl.name>;"
+RuleContextListDeclHeader(rdecl) ::= "std::vector\<Ref\<<rdecl.ctxName>>> <rdecl.name>"
 RuleContextListDecl(rdecl) ::= "<! Variable Declaration !>"
 
 ContextTokenGetterDeclHeader(t) ::= "Ref\<tree::TerminalNode> <t.name>();"

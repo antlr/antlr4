@@ -252,7 +252,7 @@ std::vector<Ref<Token>> Lexer::getAllTokens() {
   return tokens;
 }
 
-void Lexer::recover(const LexerNoViableAltException &e) {
+void Lexer::recover(const LexerNoViableAltException &/*e*/) {
   if (_input->LA(1) != EOF) {
     // skip a char and try again
     getInterpreter<atn::LexerATNSimulator>()->consume(_input);
@@ -264,7 +264,8 @@ void Lexer::notifyListeners(const LexerNoViableAltException &e) {
   std::wstring msg = std::wstring(L"token recognition error at: '") + getErrorDisplay(text) + std::wstring(L"'");
 
   ProxyErrorListener &listener = getErrorListenerDispatch();
-  listener.syntaxError(this, nullptr, (size_t)_tokenStartLine, _tokenStartCharPositionInLine, msg, std::make_exception_ptr(e));
+  listener.syntaxError(this, nullptr, (size_t)_tokenStartLine, _tokenStartCharPositionInLine, msg,
+                       std::make_exception_ptr(e));
 }
 
 std::wstring Lexer::getErrorDisplay(const std::wstring &s) {
@@ -302,7 +303,7 @@ std::wstring Lexer::getCharErrorDisplay(int c) {
   return std::wstring(L"'") + s + std::wstring(L"'");
 }
 
-void Lexer::recover(RecognitionException *re) {
+void Lexer::recover(RecognitionException */*re*/) {
   // TO_DO: Do we lose character or line position information?
   _input->consume();
 }

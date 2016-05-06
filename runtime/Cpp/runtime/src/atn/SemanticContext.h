@@ -54,6 +54,8 @@ namespace atn {
      */
     static const Ref<SemanticContext> NONE;
 
+    virtual ~SemanticContext() {};
+    
     virtual size_t hashCode() const = 0;
     virtual std::wstring toString() const = 0;
     virtual bool operator == (const SemanticContext &other) const = 0;

@@ -50,6 +50,8 @@ namespace tree {
    */
   class ANTLR4CPP_PUBLIC ParseTreeListener {
   public:
+    virtual ~ParseTreeListener() {};
+    
     virtual void visitTerminal(Ref<TerminalNode> node) = 0;
     virtual void visitErrorNode(Ref<ErrorNode> node) = 0;
     virtual void enterEveryRule(Ref<ParserRuleContext> ctx) = 0;

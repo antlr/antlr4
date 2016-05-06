@@ -167,15 +167,15 @@ ProxyErrorListener& Recognizer::getErrorListenerDispatch() {
   return _proxListener;
 }
 
-bool Recognizer::sempred(Ref<RuleContext> localctx, int ruleIndex, int actionIndex) {
+bool Recognizer::sempred(Ref<RuleContext> /*localctx*/, int /*ruleIndex*/, int /*actionIndex*/) {
   return true;
 }
 
-bool Recognizer::precpred(Ref<RuleContext> localctx, int precedence) {
+bool Recognizer::precpred(Ref<RuleContext> /*localctx*/, int /*precedence*/) {
   return true;
 }
 
-void Recognizer::action(Ref<RuleContext> localctx, int ruleIndex, int actionIndex) {
+void Recognizer::action(Ref<RuleContext> /*localctx*/, int /*ruleIndex*/, int /*actionIndex*/) {
 }
 
 int Recognizer::getState() {

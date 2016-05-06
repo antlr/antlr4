@@ -53,6 +53,8 @@ namespace misc {
   public:
     static const std::wstring LEXER_START_RULE_NAME;
 
+    virtual ~TestRig() {};
+
   protected:
     std::wstring grammarName;
     std::wstring startRuleName;

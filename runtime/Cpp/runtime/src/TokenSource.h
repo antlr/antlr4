@@ -54,13 +54,13 @@ namespace runtime {
   /// going, looking for a valid token.
   /// </summary>
   class ANTLR4CPP_PUBLIC TokenSource {
-    /// <summary>
+  public:
+    virtual ~TokenSource() {};
+
     /// Return a <seealso cref="Token"/> object from your input stream (usually a
     /// <seealso cref="CharStream"/>). Do not fail/return upon lexing error; keep chewing
     /// on the characters until you get a good one; errors are not passed through
     /// to the parser.
-    /// </summary>
-  public:
     virtual Ref<Token> nextToken() = 0;
 
     /// <summary>
@@ -101,7 +101,7 @@ namespace runtime {
     /// </summary>
     /// <param name="factory"> The <seealso cref="TokenFactory"/> to use for creating tokens. </param>
     template<typename T1>
-    void setTokenFactory(TokenFactory<T1> *factory) {};
+    void setTokenFactory(TokenFactory<T1> */*factory*/) {};
 
     /// <summary>
     /// Gets the <seealso cref="TokenFactory"/> this token source is currently using for

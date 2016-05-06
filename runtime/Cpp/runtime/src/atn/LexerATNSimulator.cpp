@@ -311,7 +311,7 @@ void LexerATNSimulator::getReachableConfigSet(CharStream *input, Ref<ATNConfigSe
   }
 }
 
-void LexerATNSimulator::accept(CharStream *input, Ref<LexerActionExecutor> lexerActionExecutor, int startIndex,
+void LexerATNSimulator::accept(CharStream *input, Ref<LexerActionExecutor> lexerActionExecutor, int /*startIndex*/,
                                size_t index, size_t line, size_t charPos) {
   if (debug) {
     std::wcout << L"ACTION ";

@@ -56,10 +56,10 @@ ParserRuleContext::ParserRuleContext(std::weak_ptr<ParserRuleContext> parent, in
   : RuleContext(parent, invokingStateNumber) {
 }
 
-void ParserRuleContext::enterRule(Ref<tree::ParseTreeListener> listener) {
+void ParserRuleContext::enterRule(Ref<tree::ParseTreeListener> /*listener*/) {
 }
 
-void ParserRuleContext::exitRule(Ref<tree::ParseTreeListener> listener) {
+void ParserRuleContext::exitRule(Ref<tree::ParseTreeListener> /*listener*/) {
 }
 
 Ref<tree::TerminalNode> ParserRuleContext::addChild(Ref<tree::TerminalNode> t) {

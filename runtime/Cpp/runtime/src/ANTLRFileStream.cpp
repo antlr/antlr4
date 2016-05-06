@@ -41,7 +41,8 @@ ANTLRFileStream::ANTLRFileStream(const std::string &fileName, const std::string 
   load(fileName, encoding);
 }
 
-void ANTLRFileStream::load(const std::string &fileName, const std::string &encoding) {
+void ANTLRFileStream::load(const std::string &fileName, const std::string &/*encoding*/) {
+  _fileName = fileName;
   if (_fileName.empty()) {
     return;
   }

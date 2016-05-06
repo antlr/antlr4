@@ -57,7 +57,7 @@ ssize_t BufferedTokenStream::mark() {
   return 0;
 }
 
-void BufferedTokenStream::release(ssize_t marker) {
+void BufferedTokenStream::release(ssize_t /*marker*/) {
   // no resources to release
 }
 

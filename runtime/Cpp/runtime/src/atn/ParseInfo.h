@@ -46,6 +46,7 @@ namespace atn {
   class ANTLR4CPP_PUBLIC ParseInfo {
   public:
     ParseInfo(ProfilingATNSimulator *atnSimulator);
+    virtual ~ParseInfo() {};
 
     /// <summary>
     /// Gets an array of <seealso cref="DecisionInfo"/> instances containing the profiling

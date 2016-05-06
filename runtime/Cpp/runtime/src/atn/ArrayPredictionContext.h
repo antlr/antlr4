@@ -55,6 +55,7 @@ namespace atn {
     ArrayPredictionContext(Ref<SingletonPredictionContext> a);
     ArrayPredictionContext(const std::vector<std::weak_ptr<PredictionContext>> &parents,
                            const std::vector<int> &returnStates);
+    virtual ~ArrayPredictionContext() {};
 
     virtual bool isEmpty() const override;
     virtual size_t size() const override;

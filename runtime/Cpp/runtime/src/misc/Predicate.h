@@ -40,6 +40,8 @@ namespace misc {
   template<typename T>
   class ANTLR4CPP_PUBLIC Predicate {
   public:
+    virtual ~Predicate() {};
+    
     virtual bool test(Ref<T> t) = 0;
   };
 

@@ -74,7 +74,7 @@ void Parser::TraceListener::visitTerminal(Ref<tree::TerminalNode> node) {
   << std::endl;
 }
 
-void Parser::TraceListener::visitErrorNode(Ref<tree::ErrorNode> node) {
+void Parser::TraceListener::visitErrorNode(Ref<tree::ErrorNode> /*node*/) {
 }
 
 void Parser::TraceListener::exitEveryRule(Ref<ParserRuleContext> ctx) {
@@ -87,13 +87,13 @@ void Parser::TraceListener::exitEveryRule(Ref<ParserRuleContext> ctx) {
 const Ref<Parser::TrimToSizeListener> Parser::TrimToSizeListener::INSTANCE =
   std::make_shared<Parser::TrimToSizeListener>();
 
-void Parser::TrimToSizeListener::enterEveryRule(Ref<ParserRuleContext> ctx) {
+void Parser::TrimToSizeListener::enterEveryRule(Ref<ParserRuleContext> /*ctx*/) {
 }
 
-void Parser::TrimToSizeListener::visitTerminal(Ref<tree::TerminalNode> node) {
+void Parser::TrimToSizeListener::visitTerminal(Ref<tree::TerminalNode> /*node*/) {
 }
 
-void Parser::TrimToSizeListener::visitErrorNode(Ref<tree::ErrorNode> node) {
+void Parser::TrimToSizeListener::visitErrorNode(Ref<tree::ErrorNode> /*node*/) {
 }
 
 void Parser::TrimToSizeListener::exitEveryRule(Ref<ParserRuleContext> ctx) {
@@ -351,7 +351,7 @@ void Parser::addContextToParseTree() {
   parent->addChild(_ctx);
 }
 
-void Parser::enterRule(Ref<ParserRuleContext> localctx, int state, int ruleIndex) {
+void Parser::enterRule(Ref<ParserRuleContext> localctx, int state, int /*ruleIndex*/) {
   setState(state);
   _ctx = localctx;
   _ctx->start = _input->LT(1);
@@ -407,7 +407,7 @@ void Parser::enterRecursionRule(Ref<ParserRuleContext> localctx, int ruleIndex) 
   enterRecursionRule(localctx, getATN().ruleToStartState[(size_t)ruleIndex]->stateNumber, ruleIndex, 0);
 }
 
-void Parser::enterRecursionRule(Ref<ParserRuleContext> localctx, int state, int ruleIndex, int precedence) {
+void Parser::enterRecursionRule(Ref<ParserRuleContext> localctx, int state, int /*ruleIndex*/, int precedence) {
   setState(state);
   _precedenceStack.push_back(precedence);
   _ctx = localctx;
@@ -417,7 +417,7 @@ void Parser::enterRecursionRule(Ref<ParserRuleContext> localctx, int state, int 
   }
 }
 
-void Parser::pushNewRecursionContext(Ref<ParserRuleContext> localctx, int state, int ruleIndex) {
+void Parser::pushNewRecursionContext(Ref<ParserRuleContext> localctx, int state, int /*ruleIndex*/) {
   Ref<ParserRuleContext> previous = _ctx;
   previous->parent = localctx;
   previous->invokingState = state;
@@ -479,11 +479,11 @@ void Parser::setContext(Ref<ParserRuleContext> ctx) {
   _ctx = ctx;
 }
 
-bool Parser::precpred(Ref<RuleContext> localctx, int precedence) {
+bool Parser::precpred(Ref<RuleContext> /*localctx*/, int precedence) {
   return precedence >= _precedenceStack.back();
 }
 
-bool Parser::inContext(const std::wstring &context) {
+bool Parser::inContext(const std::wstring &/*context*/) {
   // TO_DO: useful in parser?
   return false;
 }

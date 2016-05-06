@@ -45,6 +45,9 @@ namespace atn {
   class ANTLR4CPP_PUBLIC LexerATNSimulator : public ATNSimulator {
   protected:
     class SimState {
+    public:
+      virtual ~SimState() {};
+      
     protected:
       int index;
       size_t line;

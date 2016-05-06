@@ -52,6 +52,7 @@ namespace misc {
 
     Interval();
     Interval(int a_, int b_);
+    virtual ~Interval() {};
 
     /// <summary>
     /// return number of elements between a and b inclusively. x..x is length 1.
