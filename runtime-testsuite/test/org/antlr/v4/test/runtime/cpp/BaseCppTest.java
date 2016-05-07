@@ -525,7 +525,7 @@ public abstract class BaseCppTest {
 	}
 
 	public String execModule(String fileName) {
-		String pythonPath = locatePython();
+		String pythonPath = locateCompiler();
 		String runtimePath = locateRuntime();
 		String modulePath = new File(new File(tmpdir), fileName).getAbsolutePath();
 		String inputPath = new File(new File(tmpdir), "input").getAbsolutePath();
@@ -564,11 +564,11 @@ public abstract class BaseCppTest {
 		throw new RuntimeException("Could not locate " + tool);
 	}
 
-	protected String locatePython() {
+	protected String locateCompiler() {
 		String propName = getPropertyPrefix() + "-python";
-    	String prop = System.getProperty(propName);
-    	if(prop==null || prop.length()==0)
-    		prop = locateTool(getCompilerExecutable());
+    		String prop = System.getProperty(propName);
+    		if(prop==null || prop.length()==0)
+    			prop = locateTool(getCompilerExecutable());
 		File file = new File(prop);
 		if(!file.exists())
 			throw new RuntimeException("Missing system property:" + propName);
@@ -579,13 +579,11 @@ public abstract class BaseCppTest {
 		return "cpp";
 	}
 
-	protected String locateRuntime() { return locateRuntime(getLanguage()); }
-
-	protected String locateRuntime(String targetName) {
+	protected String locateRuntime() {
 		final ClassLoader loader = Thread.currentThread().getContextClassLoader();
-		final URL runtimeSrc = loader.getResource(targetName+"/src");
+		final URL runtimeSrc = loader.getResource("Cpp/runtime/src");
 		if ( runtimeSrc==null ) {
-			throw new RuntimeException("Cannot find "+targetName+" runtime");
+			throw new RuntimeException("Cannot find runtime");
 		}
 		return runtimeSrc.getPath();
 	}
