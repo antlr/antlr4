@@ -74,7 +74,7 @@
 <!--
             <include>**/csharp/Test*.java</include>
 -->
-            <include>**/cpp/Test*.cpp</include>
+            <include>**/cpp/Test*.java</include>
 <!--
             <include>**/java/Test*.java</include>
             <include>**/javascript/node/Test*.java</include>
