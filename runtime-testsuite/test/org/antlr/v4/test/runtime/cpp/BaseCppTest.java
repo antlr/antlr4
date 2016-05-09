@@ -119,7 +119,6 @@ public abstract class BaseCppTest {
 		@Override
 		protected void succeeded(Description description) {
 			// remove tmpdir if no error.
-			eraseTempPyCache();
 			eraseTempDir();
 		}
 
@@ -565,10 +564,10 @@ public abstract class BaseCppTest {
 	}
 
 	protected String locateCompiler() {
-		String propName = getPropertyPrefix() + "-python";
-    		String prop = System.getProperty(propName);
-    		if(prop==null || prop.length()==0)
-    			prop = locateTool(getCompilerExecutable());
+		String propName = getPropertyPrefix() + "-cpp";
+   		String prop = System.getProperty(propName);
+   		if(prop==null || prop.length()==0)
+   			prop = locateTool(getCompilerExecutable());
 		File file = new File(prop);
 		if(!file.exists())
 			throw new RuntimeException("Missing system property:" + propName);
@@ -620,41 +619,6 @@ public abstract class BaseCppTest {
 		if ( fileName.length()==Tool.GRAMMAR_EXTENSION.length() ) fileName = "A" + Tool.GRAMMAR_EXTENSION;
 		return fileName;
 	}
-
-//	void ambig(List<Message> msgs, int[] expectedAmbigAlts, String expectedAmbigInput)
-//		throws Exception
-//	{
-//		ambig(msgs, 0, expectedAmbigAlts, expectedAmbigInput);
-//	}
-
-//	void ambig(List<Message> msgs, int i, int[] expectedAmbigAlts, String expectedAmbigInput)
-//		throws Exception
-//	{
-//		List<Message> amsgs = getMessagesOfType(msgs, AmbiguityMessage.class);
-//		AmbiguityMessage a = (AmbiguityMessage)amsgs.get(i);
-//		if ( a==null ) assertNull(expectedAmbigAlts);
-//		else {
-//			assertEquals(a.conflictingAlts.toString(), Arrays.toString(expectedAmbigAlts));
-//		}
-//		assertEquals(expectedAmbigInput, a.input);
-//	}
-
-//	void unreachable(List<Message> msgs, int[] expectedUnreachableAlts)
-//		throws Exception
-//	{
-//		unreachable(msgs, 0, expectedUnreachableAlts);
-//	}
-
-//	void unreachable(List<Message> msgs, int i, int[] expectedUnreachableAlts)
-//		throws Exception
-//	{
-//		List<Message> amsgs = getMessagesOfType(msgs, UnreachableAltsMessage.class);
-//		UnreachableAltsMessage u = (UnreachableAltsMessage)amsgs.get(i);
-//		if ( u==null ) assertNull(expectedUnreachableAlts);
-//		else {
-//			assertEquals(u.conflictingAlts.toString(), Arrays.toString(expectedUnreachableAlts));
-//		}
-//	}
 
 	List<ANTLRMessage> getMessagesOfType(List<ANTLRMessage> msgs, Class<? extends ANTLRMessage> c) {
 		List<ANTLRMessage> filtered = new ArrayList<ANTLRMessage>();
@@ -976,14 +940,6 @@ public abstract class BaseCppTest {
         }
     }
 
-    protected void eraseTempPyCache() {
-        File tmpdirF = new File(tmpdir+"/__pycache__");
-        if ( tmpdirF.exists() ) {
-            eraseFiles(tmpdirF);
-            tmpdirF.delete();
-        }
-    }
-
     public String getFirstLineOfException() {
 		if ( this.stderrDuringParse ==null ) {
 			return null;
@@ -996,7 +952,7 @@ public abstract class BaseCppTest {
     /**
      * When looking at a result set that consists of a Map/HashTable
      * we cannot rely on the output order, as the hashing algorithm or other aspects
-     * of the implementation may be different on differnt JDKs or platforms. Hence
+     * of the implementation may be different on different JDKs or platforms. Hence
      * we take the Map, convert the keys to a List, sort them and Stringify the Map, which is a
      * bit of a hack, but guarantees that we get the same order on all systems. We assume that
      * the keys are strings.
