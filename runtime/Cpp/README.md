@@ -17,10 +17,12 @@ The C++ target has been the work of the following people:
 * Dan McLaughlin, dan.mclaughlin@gmail.com C++ Target project leader
 * David Sisson, dsisson@google.com
 * [Mike Lischke](www.soft-gems.net), mike@lischke-online.de
+
+## Other contributors
+
 * Marcin Szalowicz, mszalowicz@mailplus.pl (cmake build setup)
 
-Project Status
---------------------------------------------------------------------------------
+## Project Status
 
 * Building on OS X, Windows, and Linux (Ubuntu)
 * No errors and warnings
