@@ -9,7 +9,12 @@ lexer grammar TLexer;
 @lexer::preinclude {/* lexer precinclude section */}
 
 // Follows directly after the standard #includes in h + cpp files.
-@lexer::postinclude {/* lexer postinclude section */}
+@lexer::postinclude {
+/* lexer postinclude section */
+#ifndef _WIN32
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+#endif
+}
 
 // Directly preceds the lexer class declaration in the h file (e.g. for additional types etc.).
 @lexer::context {/* lexer context section */}

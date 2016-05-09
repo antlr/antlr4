@@ -241,7 +241,7 @@ bool <r.name>Sempred(Ref\<<r.ctxType>\> context, int predicateIndex);
 >>
 
 RuleSempredFunction(r, actions) ::= <<
-bool <r.factory.grammar.name>::<r.name>Sempred(Ref\<<r.ctxType>\> context, int predicateIndex) {
+bool <r.factory.grammar.name>::<r.name>Sempred(Ref\<<r.ctxType>\> /*context*/, int predicateIndex) {
   switch (predicateIndex) {
     <actions: {index | case <index>: return <actions.(index)>;}; separator="\n">
     

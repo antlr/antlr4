@@ -13,7 +13,12 @@ options {
 @parser::preinclude {/* parser precinclude section */}
 
 // Follows directly after the standard #includes in h + cpp files.
-@parser::postinclude {/* parser postinclude section */}
+@parser::postinclude {
+/* parser postinclude section */
+#ifndef _WIN32
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+#endif
+}
 
 // Directly preceeds the parser class declaration in the h file (e.g. for additional types etc.).
 @parser::context {/* parser context section */}
