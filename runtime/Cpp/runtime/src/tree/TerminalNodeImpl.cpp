@@ -62,7 +62,7 @@ std::wstring TerminalNodeImpl::getText() {
   return symbol->getText();
 }
 
-std::wstring TerminalNodeImpl::toStringTree(Parser */*parser*/) {
+std::wstring TerminalNodeImpl::toStringTree(Parser * /*parser*/) {
   return toString();
 }
 

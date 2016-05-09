@@ -52,15 +52,15 @@ void DefaultErrorStrategy::reset(Parser *recognizer) {
   endErrorCondition(recognizer);
 }
 
-void DefaultErrorStrategy::beginErrorCondition(Parser */*recognizer*/) {
+void DefaultErrorStrategy::beginErrorCondition(Parser * /*recognizer*/) {
   errorRecoveryMode = true;
 }
 
-bool DefaultErrorStrategy::inErrorRecoveryMode(Parser */*recognizer*/) {
+bool DefaultErrorStrategy::inErrorRecoveryMode(Parser * /*recognizer*/) {
   return errorRecoveryMode;
 }
 
-void DefaultErrorStrategy::endErrorCondition(Parser */*recognizer*/) {
+void DefaultErrorStrategy::endErrorCondition(Parser * /*recognizer*/) {
   errorRecoveryMode = false;
   lastErrorIndex = -1;
 }

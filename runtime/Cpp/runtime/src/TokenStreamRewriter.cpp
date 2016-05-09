@@ -56,7 +56,7 @@ TokenStreamRewriter::RewriteOperation::RewriteOperation(TokenStreamRewriter *out
   this->text = text;
 }
 
-size_t TokenStreamRewriter::RewriteOperation::execute(std::wstring */*buf*/) {
+size_t TokenStreamRewriter::RewriteOperation::execute(std::wstring * /*buf*/) {
   return index;
 }
 

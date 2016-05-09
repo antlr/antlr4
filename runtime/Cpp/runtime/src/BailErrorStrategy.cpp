@@ -83,5 +83,5 @@ Ref<Token> BailErrorStrategy::recoverInline(Parser *recognizer)  {
 #endif
 }
 
-void BailErrorStrategy::sync(Parser */*recognizer*/) {
+void BailErrorStrategy::sync(Parser * /*recognizer*/) {
 }

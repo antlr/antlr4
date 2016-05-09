@@ -303,7 +303,7 @@ std::wstring Lexer::getCharErrorDisplay(int c) {
   return std::wstring(L"'") + s + std::wstring(L"'");
 }
 
-void Lexer::recover(RecognitionException */*re*/) {
+void Lexer::recover(RecognitionException * /*re*/) {
   // TO_DO: Do we lose character or line position information?
   _input->consume();
 }
