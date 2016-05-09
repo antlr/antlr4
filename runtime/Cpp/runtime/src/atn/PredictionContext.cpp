@@ -76,7 +76,7 @@ Ref<PredictionContext> PredictionContext::fromRuleContext(const ATN &atn, Ref<Ru
 
 bool PredictionContext::operator != (const PredictionContext &o) const {
   return !(*this == o);
-};
+}
 
 bool PredictionContext::isEmpty() const {
   return this == EMPTY.get();

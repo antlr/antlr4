@@ -101,7 +101,7 @@ namespace runtime {
     /// </summary>
     /// <param name="factory"> The <seealso cref="TokenFactory"/> to use for creating tokens. </param>
     template<typename T1>
-    void setTokenFactory(TokenFactory<T1> * /*factory*/) {};
+    void setTokenFactory(TokenFactory<T1> */*factory*/) {}
 
     /// <summary>
     /// Gets the <seealso cref="TokenFactory"/> this token source is currently using for

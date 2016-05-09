@@ -46,7 +46,7 @@ ATNState::~ATNState() {
   for (auto transition : transitions) {
     delete transition;
   }
-};
+}
 
 const std::vector<std::wstring> ATNState::serializationNames = {
   L"INVALID", L"BASIC", L"RULE_START", L"BLOCK_START",
