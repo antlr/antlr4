@@ -231,7 +231,7 @@ ATN ATNDeserializer::deserialize(const std::wstring& input) {
     if (atn.grammarType == ATNType::LEXER) {
       int tokenType = data[p++];
       if (tokenType == 0xFFFF) {
-        tokenType = EOF;
+        tokenType = Token::EOF;
       }
 
       atn.ruleToTokenType[i] = tokenType;
@@ -626,7 +626,7 @@ Transition *ATNDeserializer::edgeFactory(const ATN &atn, int type, int /*src*/, 
       return new EpsilonTransition(target);
     case Transition::RANGE :
       if (arg3 != 0) {
-        return new RangeTransition(target, EOF, arg2);
+        return new RangeTransition(target, Token::EOF, arg2);
       } else {
         return new RangeTransition(target, arg1, arg2);
       }
@@ -638,7 +638,7 @@ Transition *ATNDeserializer::edgeFactory(const ATN &atn, int type, int /*src*/, 
       return new PrecedencePredicateTransition(target, arg1);
     case Transition::ATOM :
       if (arg3 != 0) {
-        return new AtomTransition(target, EOF);
+        return new AtomTransition(target, Token::EOF);
       } else {
         return new AtomTransition(target, arg1);
       }

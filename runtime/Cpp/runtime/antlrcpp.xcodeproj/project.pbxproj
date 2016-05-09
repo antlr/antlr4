@@ -960,7 +960,7 @@
 		276E5C761CDB57AA003FF4B4 /* PredicateEvalInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PredicateEvalInfo.h; sourceTree = "<group>"; };
 		276E5C771CDB57AA003FF4B4 /* PredicateTransition.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PredicateTransition.cpp; sourceTree = "<group>"; };
 		276E5C781CDB57AA003FF4B4 /* PredicateTransition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PredicateTransition.h; sourceTree = "<group>"; };
-		276E5C791CDB57AA003FF4B4 /* PredictionContext.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PredictionContext.cpp; sourceTree = "<group>"; };
+		276E5C791CDB57AA003FF4B4 /* PredictionContext.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PredictionContext.cpp; sourceTree = "<group>"; wrapsLines = 0; };
 		276E5C7A1CDB57AA003FF4B4 /* PredictionContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PredictionContext.h; sourceTree = "<group>"; };
 		276E5C7B1CDB57AA003FF4B4 /* PredictionMode.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PredictionMode.cpp; sourceTree = "<group>"; };
 		276E5C7C1CDB57AA003FF4B4 /* PredictionMode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PredictionMode.h; sourceTree = "<group>"; };
@@ -1037,7 +1037,7 @@
 		276E5CC41CDB57AA003FF4B4 /* LexerInterpreter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LexerInterpreter.h; sourceTree = "<group>"; };
 		276E5CC51CDB57AA003FF4B4 /* LexerNoViableAltException.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LexerNoViableAltException.cpp; sourceTree = "<group>"; };
 		276E5CC61CDB57AA003FF4B4 /* LexerNoViableAltException.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LexerNoViableAltException.h; sourceTree = "<group>"; };
-		276E5CC71CDB57AA003FF4B4 /* ListTokenSource.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ListTokenSource.cpp; sourceTree = "<group>"; };
+		276E5CC71CDB57AA003FF4B4 /* ListTokenSource.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ListTokenSource.cpp; sourceTree = "<group>"; wrapsLines = 0; };
 		276E5CC81CDB57AA003FF4B4 /* ListTokenSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ListTokenSource.h; sourceTree = "<group>"; };
 		276E5CCA1CDB57AA003FF4B4 /* Interval.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Interval.cpp; sourceTree = "<group>"; };
 		276E5CCB1CDB57AA003FF4B4 /* Interval.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Interval.h; sourceTree = "<group>"; };

@@ -90,7 +90,7 @@ void BufferedTokenStream::consume() {
     skipEofCheck = false;
   }
 
-  if (!skipEofCheck && LA(1) == EOF) {
+  if (!skipEofCheck && LA(1) == Token::EOF) {
     throw IllegalStateException("cannot consume EOF");
   }
 
@@ -123,7 +123,7 @@ size_t BufferedTokenStream::fetch(size_t n) {
       (std::dynamic_pointer_cast<WritableToken>(t))->setTokenIndex((int)_tokens.size());
     }
     _tokens.push_back(t);
-    if (t->getType() == EOF) {
+    if (t->getType() == Token::EOF) {
       _fetchedEOF = true;
       return i + 1;
     }
@@ -156,7 +156,7 @@ std::vector<Ref<Token>> BufferedTokenStream::get(size_t start, size_t stop) {
   }
   for (size_t i = start; i <= stop; i++) {
     Ref<Token> t = _tokens[i];
-    if (t->getType() == EOF) {
+    if (t->getType() == Token::EOF) {
       break;
     }
     subset.push_back(t);
@@ -266,7 +266,7 @@ ssize_t BufferedTokenStream::nextTokenOnChannel(size_t i, size_t channel) {
 
   Ref<Token> token = _tokens[i];
   while (token->getChannel() != channel) {
-    if (token->getType() == EOF) {
+    if (token->getType() == Token::EOF) {
       return i;
     }
     i++;
@@ -285,7 +285,7 @@ ssize_t BufferedTokenStream::previousTokenOnChannel(size_t i, size_t channel) {
 
   while (true) {
     Ref<Token> token = _tokens[i];
-    if (token->getType() == EOF || token->getChannel() == channel) {
+    if (token->getType() == Token::EOF || token->getChannel() == channel) {
       return i;
     }
 
@@ -395,7 +395,7 @@ std::wstring BufferedTokenStream::getText(const misc::Interval &interval) {
   std::wstringstream ss;
   for (size_t i = (size_t)start; i <= (size_t)stop; i++) {
     Ref<Token> t = _tokens[i];
-    if (t->getType() == EOF) {
+    if (t->getType() == Token::EOF) {
       break;
     }
     ss << t->getText();

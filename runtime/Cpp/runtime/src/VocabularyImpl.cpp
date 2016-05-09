@@ -29,6 +29,8 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "Token.h"
+
 #include "VocabularyImpl.h"
 
 using namespace org::antlr::v4::runtime::dfa;
@@ -99,7 +101,7 @@ std::wstring VocabularyImpl::getSymbolicName(ssize_t tokenType) const {
     return _symbolicNames[tokenType];
   }
 
-  if (tokenType == EOF) {
+  if (tokenType == Token::EOF) {
     return L"EOF";
   }
 

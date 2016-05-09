@@ -179,7 +179,7 @@ misc::IntervalSet ATN::getExpectedTokens(int stateNumber, Ref<RuleContext> conte
   }
 
   if (following.contains(Token::EPSILON)) {
-    expected.add(EOF);
+    expected.add(Token::EOF);
   }
 
   return expected;

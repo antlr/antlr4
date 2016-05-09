@@ -70,44 +70,44 @@ namespace runtime {
     ///  emissions, then set this to the last token to be matched or
     ///  something nonnull so that the auto token emit mechanism will not
     ///  emit another token.
-    Ref<Token> _token;
+    Ref<Token> token;
 
     /// <summary>
     /// What character index in the stream did the current token start at?
     ///  Needed, for example, to get the text for current token.  Set at
     ///  the start of nextToken.
     /// </summary>
-    int _tokenStartCharIndex;
+    int tokenStartCharIndex;
 
     /// <summary>
     /// The line on which the first character of the token resides </summary>
-    int _tokenStartLine;
+    size_t tokenStartLine;
 
     /// <summary>
     /// The character position of first character within the line </summary>
-    int _tokenStartCharPositionInLine;
+    int tokenStartCharPositionInLine;
 
     /// <summary>
     /// Once we see EOF on char stream, next token will be EOF.
     ///  If you have DONE : EOF ; then you see DONE EOF.
     /// </summary>
-    bool _hitEOF;
+    bool hitEOF;
 
     /// <summary>
     /// The channel number for the current token </summary>
-    int _channel;
+    int channel;
 
     /// <summary>
     /// The token type for the current token </summary>
-    int _type;
+    ssize_t type;
 
     // Use the vector as a stack.
-    std::vector<int> _modeStack;
-    int _mode;
+    std::vector<size_t> modeStack;
+    size_t mode;
 
     /// You can set the text for the current token to override what is in
     /// the input char buffer. Use setText() or can set this instance var.
-    std::wstring _text;
+    std::wstring text;
 
     Lexer(CharStream *input);
 
@@ -123,9 +123,9 @@ namespace runtime {
     /// and emits it.
     virtual void skip();
     virtual void more();
-    virtual void mode(int m);
-    virtual void pushMode(int m);
-    virtual int popMode();
+    virtual void setMode(size_t m);
+    virtual void pushMode(size_t m);
+    virtual size_t popMode();
 
     template<typename T1>
     void setTokenFactory(TokenFactory<T1> *factory)  {
@@ -191,9 +191,9 @@ namespace runtime {
 
     virtual void setToken(Ref<Token> token);
 
-    virtual void setType(int ttype);
+    virtual void setType(ssize_t ttype);
 
-    virtual int getType();
+    virtual ssize_t getType();
 
     virtual void setChannel(int channel);
 

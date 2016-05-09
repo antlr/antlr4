@@ -115,4 +115,10 @@
   #endif
 #endif
 
+// We have to undefine this symbol as ANTLR will use this name for own members and even
+// generated functions. Because EOF is a global macro we cannot use e.g. a namespace scope to disambiguate.
+#ifdef EOF
+#undef EOF
+#endif
+
 template<class T> using Ref = std::shared_ptr<T>;

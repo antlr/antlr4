@@ -49,8 +49,6 @@ LexerFileHeader(file, lexer, namedActions) ::= <<
 
 <namedActions.postinclude>
 
-// Have to use "using namespace" here, because some code parts which require different namespaces
-// are generated from the same template (e.g. see xxxSempred(.. *context) here and in the parser header.
 using namespace org::antlr::v4::runtime;
 
 <if(file.genPackage)>namespace <file.genPackage> {<endif>

@@ -15,6 +15,9 @@ options {
 // Follows directly after the standard #includes in h + cpp files.
 @parser::postinclude {/* parser postinclude section */}
 
+// Directly preceeds the parser class declaration in the h file (e.g. for additional types etc.).
+@parser::context {/* parser context section */}
+
 // Appears in the public part of the parser in the h file.
 @parser::declarations {/* public parser declarations section */}
 
@@ -76,7 +79,7 @@ void TParser::doAfter() {
 @parser::basevisitordefinitions {/* base visitor definitions section */}
 
 // Actual grammar start.
-main: stat+;
+main: stat+ EOF;
 divide : ID (and_ GreaterThan)? {doesItBlend()}?; 
 and_ @init{ doInit(); } @after { doAfter(); } : And ;
 

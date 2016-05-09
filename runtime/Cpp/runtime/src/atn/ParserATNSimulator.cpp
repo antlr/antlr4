@@ -104,7 +104,7 @@ int ParserATNSimulator::adaptivePredict(TokenStream *input, int decision, Ref<Pa
 
   // Now we are certain to have a specific decision's DFA
   // But, do we still need an initial state?
-  auto onExit = finally([&] {
+  auto onExit = finally([this, input, index, m] {
     mergeCache.clear(); // wack cache after each prediction
     _dfa = nullptr;
     input->seek(index);
@@ -268,7 +268,7 @@ int ParserATNSimulator::execATN(dfa::DFA &dfa, dfa::DFAState *s0, TokenStream *i
 
     previousD = D;
 
-    if (t != EOF) {
+    if (t != Token::EOF) {
       input->consume();
       t = input->LA(1);
     }
@@ -424,7 +424,7 @@ int ParserATNSimulator::execATNWithFullContext(dfa::DFA &dfa, dfa::DFAState *D, 
     }
 
     previous = reach;
-    if (t != EOF) {
+    if (t != Token::EOF) {
       input->consume();
       t = input->LA(1);
     }
@@ -498,7 +498,7 @@ Ref<ATNConfigSet> ParserATNSimulator::computeReachSet(Ref<ATNConfigSet> closure_
     if (is<RuleStopState *>(c->state)) {
       assert(c->context->isEmpty());
 
-      if (fullCtx || t == EOF) {
+      if (fullCtx || t == Token::EOF) {
         skippedStopStates.push_back(c);
       }
 
@@ -527,7 +527,7 @@ Ref<ATNConfigSet> ParserATNSimulator::computeReachSet(Ref<ATNConfigSet> closure_
    * condition is not true when one or more configurations have been
    * withheld in skippedStopStates, or when the current symbol is EOF.
    */
-  if (skippedStopStates.empty() && t != EOF) {
+  if (skippedStopStates.empty() && t != Token::EOF) {
     if (intermediate->size() == 1) {
       // Don't pursue the closure if there is just one state.
       // It can only have one alternative; just add to result
@@ -548,13 +548,13 @@ Ref<ATNConfigSet> ParserATNSimulator::computeReachSet(Ref<ATNConfigSet> closure_
     reach = std::make_shared<ATNConfigSet>(fullCtx);
     ATNConfig::Set closureBusy;
 
-    bool treatEofAsEpsilon = t == EOF;
+    bool treatEofAsEpsilon = t == Token::EOF;
     for (auto c : intermediate->configs) {
       closure(c, reach, closureBusy, false, fullCtx, treatEofAsEpsilon);
     }
   }
 
-  if (t == EOF) {
+  if (t == Token::EOF) {
     /* After consuming EOF no additional input is possible, so we are
      * only interested in configurations which reached the end of the
      * decision rule (local context) or end of the start rule (full
@@ -1013,7 +1013,7 @@ Ref<ATNConfig> ParserATNSimulator::getEpsilonTarget(Ref<ATNConfig> config, Trans
       // EOF transitions act like epsilon transitions after the first EOF
       // transition is traversed
       if (treatEofAsEpsilon) {
-        if (t->matches(EOF, 0, 1)) {
+        if (t->matches(Token::EOF, 0, 1)) {
           return std::make_shared<ATNConfig>(config, t->target);
         }
       }
@@ -1135,7 +1135,7 @@ BitSet ParserATNSimulator::getConflictingAltsOrUniqueAlt(Ref<ATNConfigSet> confi
 }
 
 std::wstring ParserATNSimulator::getTokenName(ssize_t t) {
-  if (t == EOF) {
+  if (t == Token::EOF) {
     return L"EOF";
   }
 

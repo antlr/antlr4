@@ -11,6 +11,9 @@ lexer grammar TLexer;
 // Follows directly after the standard #includes in h + cpp files.
 @lexer::postinclude {/* lexer postinclude section */}
 
+// Directly preceds the lexer class declaration in the h file (e.g. for additional types etc.).
+@lexer::context {/* lexer context section */}
+
 // Appears in the public part of the lexer in the h file.
 @lexer::declarations {/* public lexer declarations section */
 bool canTestFoo() { return true; }

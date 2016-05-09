@@ -67,7 +67,7 @@ std::wstring TerminalNodeImpl::toStringTree(Parser */*parser*/) {
 }
 
 std::wstring TerminalNodeImpl::toString() {
-  if (symbol->getType() == EOF) {
+  if (symbol->getType() == Token::EOF) {
     return L"<EOF>";
   }
   return symbol->getText();

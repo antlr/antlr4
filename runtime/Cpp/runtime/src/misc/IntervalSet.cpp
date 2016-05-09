@@ -394,7 +394,7 @@ std::wstring IntervalSet::toString(bool elemAreChar) const {
     int a = interval.a;
     int b = interval.b;
     if (a == b) {
-      if (a == EOF) {
+      if (a == Token::EOF) {
         ss << L"<EOF>";
       } else if (elemAreChar) {
         ss << L"'" << static_cast<wchar_t>(a) << L"'";
@@ -462,7 +462,7 @@ std::wstring IntervalSet::elementName(const std::vector<std::wstring> &tokenName
 }
 
 std::wstring IntervalSet::elementName(Ref<dfa::Vocabulary> vocabulary, ssize_t a) const {
-  if (a == EOF) {
+  if (a == Token::EOF) {
     return L"<EOF>";
   } else if (a == Token::EPSILON) {
     return L"<EPSILON>";

@@ -120,7 +120,7 @@ void DefaultErrorStrategy::sync(Parser *recognizer) {
   ssize_t la = tokens->LA(1);
 
   // try cheaper subset first; might get lucky. seems to shave a wee bit off
-  if (recognizer->getATN().nextTokens(s).contains((int)la) || la == EOF) {
+  if (recognizer->getATN().nextTokens(s).contains((int)la) || la == Token::EOF) {
     return;
   }
 
@@ -161,7 +161,7 @@ void DefaultErrorStrategy::reportNoViableAlternative(Parser *recognizer, const N
   TokenStream *tokens = recognizer->getTokenStream();
   std::wstring input;
   if (tokens != nullptr) {
-    if (e.getStartToken()->getType() == EOF) {
+    if (e.getStartToken()->getType() == Token::EOF) {
       input = L"<EOF>";
     } else {
       input = tokens->getText(e.getStartToken(), e.getOffendingToken());
@@ -270,14 +270,14 @@ Ref<Token> DefaultErrorStrategy::getMissingSymbol(Parser *recognizer) {
   misc::IntervalSet expecting = getExpectedTokens(recognizer);
   ssize_t expectedTokenType = expecting.getMinElement(); // get any element
   std::wstring tokenText;
-  if (expectedTokenType == EOF) {
+  if (expectedTokenType == Token::EOF) {
     tokenText = L"<missing EOF>";
   } else {
     tokenText = L"<missing " + recognizer->getVocabulary()->getDisplayName(expectedTokenType) + L">";
   }
   Ref<Token> current = currentSymbol;
   Ref<Token> lookback = recognizer->getTokenStream()->LT(-1);
-  if (current->getType() == EOF && lookback != nullptr) {
+  if (current->getType() == Token::EOF && lookback != nullptr) {
     current = lookback;
   }
   return std::dynamic_pointer_cast<Token>(recognizer->getTokenFactory()->create({ current->getTokenSource(),
@@ -295,7 +295,7 @@ std::wstring DefaultErrorStrategy::getTokenErrorDisplay(Ref<Token> t) {
   }
   std::wstring s = getSymbolText(t);
   if (s == L"") {
-    if (getSymbolType(t) == EOF) {
+    if (getSymbolType(t) == Token::EOF) {
       s = L"<EOF>";
     } else {
       s = std::wstring(L"<") + std::to_wstring(getSymbolType(t)) + std::wstring(L">");
@@ -342,7 +342,7 @@ misc::IntervalSet DefaultErrorStrategy::getErrorRecoverySet(Parser *recognizer) 
 
 void DefaultErrorStrategy::consumeUntil(Parser *recognizer, const misc::IntervalSet &set) {
   ssize_t ttype = recognizer->getInputStream()->LA(1);
-  while (ttype != EOF && !set.contains((int)ttype)) {
+  while (ttype != Token::EOF && !set.contains((int)ttype)) {
     recognizer->consume();
     ttype = recognizer->getInputStream()->LA(1);
   }

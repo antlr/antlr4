@@ -86,7 +86,7 @@ void ANTLRInputStream::reset() {
 
 void ANTLRInputStream::consume() {
   if (p >= data.size()) {
-    assert(LA(1) == EOF);
+    assert(LA(1) == IntStream::EOF);
     throw IllegalStateException("cannot consume EOF");
   }
 
@@ -104,12 +104,12 @@ ssize_t ANTLRInputStream::LA(ssize_t i) {
   if (i < 0) {
     i++; // e.g., translate LA(-1) to use offset i=0; then data[p+0-1]
     if ((position + i - 1) < 0) {
-      return EOF; // invalid; no char before first char
+      return IntStream::EOF; // invalid; no char before first char
     }
   }
 
   if ((position + i - 1) >= (ssize_t)data.size()) {
-    return EOF;
+    return IntStream::EOF;
   }
 
   return data[(size_t)(position + i - 1)];

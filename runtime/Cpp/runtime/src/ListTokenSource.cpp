@@ -74,7 +74,7 @@ Ref<Token> ListTokenSource::nextToken() {
       }
 
       int stop = std::max(-1, start - 1);
-      eofToken = std::dynamic_pointer_cast<Token>(_factory->create({ this, getInputStream() }, EOF, L"EOF",
+      eofToken = std::dynamic_pointer_cast<Token>(_factory->create({ this, getInputStream() }, Token::EOF, L"EOF",
         Token::DEFAULT_CHANNEL, start, stop, (int)getLine(), getCharPositionInLine()));
     }
 
@@ -82,7 +82,7 @@ Ref<Token> ListTokenSource::nextToken() {
   }
 
   Ref<Token> t = tokens[i];
-  if (i == tokens.size() - 1 && t->getType() == EOF) {
+  if (i == tokens.size() - 1 && t->getType() == Token::EOF) {
     eofToken = t;
   }
 

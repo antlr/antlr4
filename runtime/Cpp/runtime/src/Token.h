@@ -47,17 +47,12 @@ namespace runtime {
   public:
     static const size_t INVALID_TYPE = 0;
 
-    /// <summary>
     /// During lookahead operations, this "token" signifies we hit rule end ATN state
     ///  and did not follow it despite needing to.
-    /// </summary>
     static const ssize_t EPSILON = -2;
-
     static const size_t MIN_USER_TOKEN_TYPE = 1;
+    static const ssize_t EOF = IntStream::EOF;
 
-    //static const size_t _EOF = IntStream::_EOF; no need to define another EOF.
-
-    // This isn't necessary
     virtual ~Token() {};
 
     /// <summary>

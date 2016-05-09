@@ -109,7 +109,10 @@ size_t PredictionContext::calculateHashCode(const std::vector<std::weak_ptr<Pred
   size_t hash = MurmurHash::initialize(INITIAL_HASH);
 
   for (auto parent : parents) {
-    hash = MurmurHash::update(hash, parent.lock()->hashCode());
+    if (parent.expired())
+      hash = MurmurHash::update(hash, 0);
+    else
+      hash = MurmurHash::update(hash, parent.lock()->hashCode());
   }
 
   for (auto returnState : returnStates) {

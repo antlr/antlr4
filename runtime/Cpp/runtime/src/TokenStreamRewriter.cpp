@@ -78,7 +78,7 @@ TokenStreamRewriter::InsertBeforeOp::InsertBeforeOp(TokenStreamRewriter *outerIn
 
 size_t TokenStreamRewriter::InsertBeforeOp::execute(std::wstring *buf) {
   buf->append(text);
-  if (outerInstance->tokens->get(index)->getType() != EOF) {
+  if (outerInstance->tokens->get(index)->getType() != Token::EOF) {
     buf->append(outerInstance->tokens->get(index)->getText());
   }
   return index + 1;
@@ -306,7 +306,7 @@ std::wstring TokenStreamRewriter::getText(const std::wstring &programName, const
     Ref<Token> t = tokens->get(i);
     if (op == nullptr) {
       // no operation at that index, just dump token
-      if (t->getType() != EOF) {
+      if (t->getType() != Token::EOF) {
         buf.append(t->getText());
       }
       i++; // move to next token
