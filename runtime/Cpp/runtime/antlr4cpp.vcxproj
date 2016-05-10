@@ -173,7 +173,6 @@
     <ClCompile Include="src\atn\ATNSerializer.cpp" />
     <ClCompile Include="src\atn\ATNSimulator.cpp" />
     <ClCompile Include="src\atn\ATNState.cpp" />
-    <ClCompile Include="src\atn\ATNType.cpp" />
     <ClCompile Include="src\atn\AtomTransition.cpp" />
     <ClCompile Include="src\atn\BasicBlockStartState.cpp" />
     <ClCompile Include="src\atn\BasicState.cpp" />
@@ -186,7 +185,6 @@
     <ClCompile Include="src\atn\EpsilonTransition.cpp" />
     <ClCompile Include="src\atn\ErrorInfo.cpp" />
     <ClCompile Include="src\atn\LexerActionExecutor.cpp" />
-    <ClCompile Include="src\atn\LexerActionType.cpp" />
     <ClCompile Include="src\atn\LexerATNConfig.cpp" />
     <ClCompile Include="src\atn\LexerATNSimulator.cpp" />
     <ClCompile Include="src\atn\LexerChannelAction.cpp" />
@@ -252,7 +250,6 @@
     <ClCompile Include="src\misc\Interval.cpp" />
     <ClCompile Include="src\misc\IntervalSet.cpp" />
     <ClCompile Include="src\misc\MurmurHash.cpp" />
-    <ClCompile Include="src\misc\Predicate.cpp" />
     <ClCompile Include="src\NoViableAltException.cpp" />
     <ClCompile Include="src\Parser.cpp" />
     <ClCompile Include="src\ParserInterpreter.cpp" />
@@ -266,11 +263,9 @@
     <ClCompile Include="src\support\guid.cpp" />
     <ClCompile Include="src\support\Strings.cpp" />
     <ClCompile Include="src\Token.cpp" />
-    <ClCompile Include="src\TokenFactory.cpp" />
     <ClCompile Include="src\TokenStream.cpp" />
     <ClCompile Include="src\TokenStreamRewriter.cpp" />
     <ClCompile Include="src\tree\ErrorNodeImpl.cpp" />
-    <ClCompile Include="src\tree\ParseTreeProperty.cpp" />
     <ClCompile Include="src\tree\ParseTreeWalker.cpp" />
     <ClCompile Include="src\tree\pattern\ParseTreeMatch.cpp" />
     <ClCompile Include="src\tree\pattern\ParseTreePattern.cpp" />
@@ -285,7 +280,6 @@
     <ClCompile Include="src\UnbufferedCharStream.cpp" />
     <ClCompile Include="src\UnbufferedTokenStream.cpp" />
     <ClCompile Include="src\VocabularyImpl.cpp" />
-    <ClCompile Include="src\WritableToken.cpp" />
     <ClCompile Include="antlrcpp-Prefix.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
