@@ -65,6 +65,8 @@ namespace runtime {
     /// </summary>
     static const std::string UNKNOWN_SOURCE_NAME;
 
+    virtual ~IntStream() {};
+    
     /// <summary>
     /// Consumes the current symbol in the stream. This method has the following
     /// effects:

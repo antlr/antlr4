@@ -57,7 +57,7 @@ from io import StringIO
 
 >>
 
-ListenerFile(file, header) ::= <<
+ListenerFile(file, header, namedActions) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 from antlr4 import *
 if __name__ is not None and "." in __name__:
@@ -83,7 +83,7 @@ def exit<lname; format="cap">(self, ctx:<file.parserName>.<lname; format="cap">C
 >>
 
 
-VisitorFile(file, header) ::= <<
+VisitorFile(file, header, namedActions) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 from antlr4 import *
 if __name__ is not None and "." in __name__:

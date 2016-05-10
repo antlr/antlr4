@@ -48,7 +48,7 @@ IntervalSet AtomTransition::label() const {
   return IntervalSet::of(_label);
 }
 
-bool AtomTransition::matches(int symbol, int minVocabSymbol, int maxVocabSymbol) const {
+bool AtomTransition::matches(int symbol, int /*minVocabSymbol*/, int /*maxVocabSymbol*/) const {
   return _label == symbol;
 }
 

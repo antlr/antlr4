@@ -41,6 +41,8 @@ namespace tree {
   public:
     static const Ref<ParseTreeWalker> DEFAULT;
 
+    virtual ~ParseTreeWalker() {};
+    
     virtual void walk(Ref<ParseTreeListener> listener, Ref<ParseTree> t);
 
     /// <summary>

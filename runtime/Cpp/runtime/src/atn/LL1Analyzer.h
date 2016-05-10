@@ -43,16 +43,15 @@ namespace runtime {
 namespace atn {
 
   class ANTLR4CPP_PUBLIC LL1Analyzer {
-    /// <summary>
+  public:
     /// Special value added to the lookahead sets to indicate that we hit
     ///  a predicate during analysis if {@code seeThruPreds==false}.
-    /// </summary>
-  public:
     static const int HIT_PRED = Token::INVALID_TYPE;
 
     const atn::ATN &_atn;
 
     LL1Analyzer(const atn::ATN &atn);
+    virtual ~LL1Analyzer() {};
 
     /// <summary>
     /// Calculates the SLL(1) expected lookahead set for each outgoing transition

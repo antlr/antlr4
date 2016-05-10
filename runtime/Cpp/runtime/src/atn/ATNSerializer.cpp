@@ -42,7 +42,7 @@
 #include "SetTransition.h"
 #include "Token.h"
 #include "Interval.h"
-#include "atn.h"
+#include "ATN.h"
 
 #include "RuleTransition.h"
 #include "PrecedencePredicateTransition.h"
@@ -73,7 +73,7 @@ ATNSerializer::ATNSerializer(ATN *atn) { this->atn = atn; }
 
 ATNSerializer::ATNSerializer(ATN *atn, const std::vector<std::wstring> &tokenNames) {
   this->atn = atn;
-  this->tokenNames = tokenNames;
+  _tokenNames = tokenNames;
 }
 
 std::vector<size_t> ATNSerializer::serialize() {
@@ -396,11 +396,11 @@ std::wstring ATNSerializer::decode(const std::wstring &inpdata) {
     throw IllegalArgumentException("Not enough data to decode");
 
   std::vector<uint16_t> data(inpdata.size());
-  data[0] = inpdata[0];
+  data[0] = (uint16_t)inpdata[0];
 
   // Don't adjust the first value since that's the version number.
   for (size_t i = 1; i < inpdata.size(); ++i) {
-    data[i] = inpdata[i] - 2;
+    data[i] = (uint16_t)inpdata[i] - 2;
   }
 
   std::wstring buf;
@@ -600,8 +600,8 @@ std::wstring ATNSerializer::getTokenName(ssize_t t) {
     }
   }
 
-  if (tokenNames.size() > 0 && t >= 0 && t < (ssize_t)tokenNames.size()) {
-    return tokenNames[(size_t)t];
+  if (_tokenNames.size() > 0 && t >= 0 && t < (ssize_t)_tokenNames.size()) {
+    return _tokenNames[(size_t)t];
   }
 
   return std::to_wstring(t);

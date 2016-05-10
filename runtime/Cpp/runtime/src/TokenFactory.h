@@ -41,12 +41,12 @@ namespace runtime {
   ///  of a new factory means that it notifies it's token source and error strategy.
   template<typename Symbol>
   class ANTLR4CPP_PUBLIC TokenFactory {
-    /// <summary>
+  public:
+    virtual ~TokenFactory() {};
+    
     /// This is the method used to create tokens in the lexer and in the
     ///  error handling strategy. If text!=null, than the start and stop positions
     ///  are wiped to -1 in the text override is set in the CommonToken.
-    /// </summary>
-  public:
     virtual Ref<Symbol> create(std::pair<TokenSource*, CharStream*> source, int type, const std::wstring &text,
       int channel, int start, int stop, int line, int charPositionInLine) = 0;
 

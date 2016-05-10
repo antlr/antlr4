@@ -314,7 +314,7 @@ namespace runtime {
     /// <summary>
     /// Get all operations before an index of a particular kind </summary>
     template <typename T, typename T1>
-    std::vector<T*> getKindOfOps(std::vector<T1*> rewrites, T *kind, size_t before) {
+    std::vector<T*> getKindOfOps(std::vector<T1*> rewrites, T */*kind*/, size_t before) {
       std::vector<T*> ops = std::vector<T*>();
       for (size_t i = 0; i < before && i < rewrites.size(); i++) {
         TokenStreamRewriter::RewriteOperation *op = dynamic_cast<RewriteOperation*>(rewrites[i]);

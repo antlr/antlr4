@@ -114,6 +114,7 @@ namespace pattern {
     /// the tree patterns. The parser is used as a convenient mechanism to get
     /// the grammar name, plus token, rule names.
     ParseTreePatternMatcher(Lexer *lexer, Parser *parser);
+    virtual ~ParseTreePatternMatcher() {};
 
     /// <summary>
     /// Set the delimiters used for marking rule and token tags within concrete

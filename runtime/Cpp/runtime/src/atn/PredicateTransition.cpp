@@ -44,7 +44,7 @@ bool PredicateTransition::isEpsilon() const {
   return true;
 }
 
-bool PredicateTransition::matches(int symbol, int minVocabSymbol, int maxVocabSymbol) const {
+bool PredicateTransition::matches(int /*symbol*/, int /*minVocabSymbol*/, int /*maxVocabSymbol*/) const {
   return false;
 }
 

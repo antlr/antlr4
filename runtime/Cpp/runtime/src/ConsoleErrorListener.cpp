@@ -35,7 +35,7 @@ using namespace org::antlr::v4::runtime;
 
 ConsoleErrorListener ConsoleErrorListener::INSTANCE;
 
-void ConsoleErrorListener::syntaxError(IRecognizer *recognizer, Ref<Token> offendingSymbol,
-  size_t line, int charPositionInLine, const std::wstring &msg, std::exception_ptr e)  {
+void ConsoleErrorListener::syntaxError(IRecognizer */*recognizer*/, Ref<Token> /*offendingSymbol*/,
+  size_t line, int charPositionInLine, const std::wstring &msg, std::exception_ptr /*e*/)  {
   std::wcerr << L"line " << line << L":" << charPositionInLine << L" " << msg << std::endl;
 }

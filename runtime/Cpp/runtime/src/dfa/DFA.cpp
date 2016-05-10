@@ -46,7 +46,7 @@ DFA::DFA(atn::DecisionState *atnStartState) : DFA(atnStartState, 0) {
 }
 
 DFA::DFA(atn::DecisionState *atnStartState, int decision)
-  : atnStartState(atnStartState), decision(decision), s0(nullptr) {
+  : atnStartState(atnStartState), s0(nullptr), decision(decision) {
 
   _precedenceDfa = false;
   if (is<atn::StarLoopEntryState *>(atnStartState)) {

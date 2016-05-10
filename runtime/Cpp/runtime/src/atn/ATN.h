@@ -47,7 +47,7 @@ namespace atn {
     ATN();
     ATN(ATN &&other);
     ATN(ATNType grammarType, size_t maxTokenType);
-    ~ATN();
+    virtual ~ATN();
 
     std::vector<ATNState *> states;
 

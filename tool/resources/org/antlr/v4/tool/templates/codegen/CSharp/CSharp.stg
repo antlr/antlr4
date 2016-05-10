@@ -52,7 +52,7 @@ using DFA = Antlr4.Runtime.Dfa.DFA;
 <endif>
 >>
 
-ListenerFile(file, header) ::= <<
+ListenerFile(file, header, namedActions) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 <if(file.genPackage)>
 namespace <file.genPackage> {
@@ -96,7 +96,7 @@ void Exit<lname; format="cap">([NotNull] <csIdentifier.(file.parserName)>.<lname
 <endif>
 >>
 
-BaseListenerFile(file, header) ::= <<
+BaseListenerFile(file, header, namedActions) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 <if(file.genPackage)>
 namespace <file.genPackage> {
@@ -159,7 +159,7 @@ public virtual void Exit<lname; format="cap">([NotNull] <csIdentifier.(file.pars
 <endif>
 >>
 
-VisitorFile(file, header) ::= <<
+VisitorFile(file, header, namedActions) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 <if(file.genPackage)>
 namespace <file.genPackage> {
@@ -195,7 +195,7 @@ Result Visit<lname; format="cap">([NotNull] <csIdentifier.(file.parserName)>.<ln
 <endif>
 >>
 
-BaseVisitorFile(file, header) ::= <<
+BaseVisitorFile(file, header, namedActions) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 <if(file.genPackage)>
 namespace <file.genPackage> {

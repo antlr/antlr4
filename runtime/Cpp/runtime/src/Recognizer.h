@@ -42,6 +42,7 @@ namespace runtime {
   class ANTLR4CPP_PUBLIC Recognizer : public IRecognizer {
   public:
     Recognizer();
+    virtual ~Recognizer() {};
 
     /** Used to print out token names like ID during debugging and
      *  error reporting.  The generated parsers implement a method

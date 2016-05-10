@@ -41,12 +41,9 @@ namespace atn {
   public:
     ATN *atn;
 
-  private:
-    std::vector<std::wstring> tokenNames;
-
-  public:
     ATNSerializer(ATN *atn);
     ATNSerializer(ATN *atn, const std::vector<std::wstring> &tokenNames);
+    virtual ~ATNSerializer() {};
 
     /// <summary>
     /// Serialize state descriptors, edge descriptors, and decision->state map
@@ -85,6 +82,8 @@ namespace atn {
     static std::wstring getDecoded(ATN *atn, std::vector<std::wstring> &tokenNames);
 
   private:
+    std::vector<std::wstring> _tokenNames;
+
     void serializeUUID(std::vector<size_t> &data, Guid uuid);
   };
 

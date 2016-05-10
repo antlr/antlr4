@@ -45,6 +45,7 @@ namespace dfa {
   public:
     DFASerializer(const DFA *dfa, const std::vector<std::wstring>& tnames);
     DFASerializer(const DFA *dfa, Ref<Vocabulary> vocabulary);
+    virtual ~DFASerializer() {};
 
     virtual std::wstring toString() const;
 

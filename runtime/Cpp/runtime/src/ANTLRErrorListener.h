@@ -45,6 +45,8 @@ namespace runtime {
   /// How to emit recognition errors (an interface in Java).
   class ANTLR4CPP_PUBLIC ANTLRErrorListener {
   public:
+    virtual ~ANTLRErrorListener() {};
+
     /// <summary>
     /// Upon syntax error, notify any interested parties. This is not how to
     /// recover from errors or compute error messages. <seealso cref="ANTLRErrorStrategy"/>

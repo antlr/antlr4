@@ -46,7 +46,7 @@ RecognitionException::RecognitionException(IRecognizer *recognizer, IntStream *i
 
 RecognitionException::RecognitionException(const std::string &message, IRecognizer *recognizer, IntStream *input,
                                            Ref<ParserRuleContext> ctx, Ref<Token> offendingToken)
-  : RuntimeException(message), _recognizer(recognizer), _input(input), _offendingToken(offendingToken), _ctx(ctx) {
+  : RuntimeException(message), _recognizer(recognizer), _input(input), _ctx(ctx), _offendingToken(offendingToken) {
   InitializeInstanceFields();
   if (recognizer != nullptr) {
     _offendingState = recognizer->getState();

@@ -35,10 +35,11 @@
 
 using namespace org::antlr::v4::runtime::tree::pattern;
 
-RuleTagToken::RuleTagToken(const std::wstring &ruleName, int _bypassTokenType) : bypassTokenType(_bypassTokenType) {
+RuleTagToken::RuleTagToken(const std::wstring &/*ruleName*/, int _bypassTokenType) : bypassTokenType(_bypassTokenType) {
 }
 
-RuleTagToken::RuleTagToken(const std::wstring &ruleName, int bypassTokenType, const std::wstring &label) : ruleName(ruleName), bypassTokenType(bypassTokenType), label(label) {
+RuleTagToken::RuleTagToken(const std::wstring &ruleName, int bypassTokenType, const std::wstring &label)
+  : ruleName(ruleName), bypassTokenType(bypassTokenType), label(label) {
   if (ruleName.empty()) {
     throw IllegalArgumentException("ruleName cannot be null or empty.");
   }

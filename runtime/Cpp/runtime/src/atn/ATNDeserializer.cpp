@@ -130,9 +130,9 @@ bool ATNDeserializer::isFeatureSupported(const Guid &feature, const Guid &actual
 ATN ATNDeserializer::deserialize(const std::wstring& input) {
   // Don't adjust the first value since that's the version number.
   std::vector<uint16_t> data(input.size());
-  data[0] = input[0];
+  data[0] = (uint16_t)input[0];
   for (size_t i = 1; i < input.size(); ++i) {
-    data[i] = input[i] - 2;
+    data[i] = (uint16_t)input[i] - 2;
   }
 
   int p = 0;
@@ -617,7 +617,7 @@ Guid ATNDeserializer::toUUID(const unsigned short *data, int offset) {
 }
 
 /* mem check: all created instances are freed in the d-tor of the ATNState they are added to. */
-Transition *ATNDeserializer::edgeFactory(const ATN &atn, int type, int src, int trg, int arg1, int arg2, int arg3,
+Transition *ATNDeserializer::edgeFactory(const ATN &atn, int type, int /*src*/, int trg, int arg1, int arg2, int arg3,
   const std::vector<misc::IntervalSet> &sets) {
   
   ATNState *target = atn.states[(size_t)trg];

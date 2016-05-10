@@ -64,6 +64,8 @@ namespace runtime {
     public:
       static const Ref<TrimToSizeListener> INSTANCE;
 
+      virtual ~TrimToSizeListener() {};
+
       virtual void enterEveryRule(Ref<ParserRuleContext> ctx) override;
       virtual void visitTerminal(Ref<tree::TerminalNode> node) override;
       virtual void visitErrorNode(Ref<tree::ErrorNode> node) override;

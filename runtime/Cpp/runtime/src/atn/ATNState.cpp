@@ -48,9 +48,11 @@ ATNState::~ATNState() {
   }
 };
 
-const std::vector<std::wstring> ATNState::serializationNames = { L"INVALID", L"BASIC", L"RULE_START", L"BLOCK_START",
+const std::vector<std::wstring> ATNState::serializationNames = {
+  L"INVALID", L"BASIC", L"RULE_START", L"BLOCK_START",
   L"PLUS_BLOCK_START", L"STAR_BLOCK_START", L"TOKEN_START", L"RULE_STOP",
-  L"BLOCK_END", L"STAR_LOOP_BACK", L"STAR_LOOP_ENTRY", L"PLUS_LOOP_BACK", L"LOOP_END" };
+  L"BLOCK_END", L"STAR_LOOP_BACK", L"STAR_LOOP_ENTRY", L"PLUS_LOOP_BACK", L"LOOP_END"
+};
 
 size_t ATNState::hashCode() {
   return (size_t)stateNumber;

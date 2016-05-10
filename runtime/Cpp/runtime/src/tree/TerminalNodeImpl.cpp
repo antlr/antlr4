@@ -62,7 +62,7 @@ std::wstring TerminalNodeImpl::getText() {
   return symbol->getText();
 }
 
-std::wstring TerminalNodeImpl::toStringTree(Parser *parser) {
+std::wstring TerminalNodeImpl::toStringTree(Parser */*parser*/) {
   return toString();
 }
 
@@ -81,6 +81,6 @@ std::weak_ptr<Tree> TerminalNodeImpl::getParentReference() {
   return parent;
 }
 
-Ref<Tree> TerminalNodeImpl::getChildReference(size_t i) {
+Ref<Tree> TerminalNodeImpl::getChildReference(size_t /*i*/) {
   return Ref<Tree>();
 }

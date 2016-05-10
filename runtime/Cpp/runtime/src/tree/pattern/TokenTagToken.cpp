@@ -33,12 +33,12 @@
 
 using namespace org::antlr::v4::runtime::tree::pattern;
 
-TokenTagToken::TokenTagToken(const std::wstring &tokenName, int type) :
-CommonToken(type), tokenName(L""), label(L"") {
+TokenTagToken::TokenTagToken(const std::wstring &/*tokenName*/, int type)
+  : CommonToken(type), tokenName(L""), label(L"") {
 }
 
-TokenTagToken::TokenTagToken(const std::wstring &tokenName, int type, const std::wstring &label) :
-CommonToken(type), tokenName(tokenName), label(label) {
+TokenTagToken::TokenTagToken(const std::wstring &tokenName, int type, const std::wstring &label)
+  : CommonToken(type), tokenName(tokenName), label(label) {
 }
 
 std::wstring TokenTagToken::getTokenName() {

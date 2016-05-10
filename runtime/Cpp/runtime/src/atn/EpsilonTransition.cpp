@@ -52,7 +52,7 @@ bool EpsilonTransition::isEpsilon() const {
   return true;
 }
 
-bool EpsilonTransition::matches(int symbol, int minVocabSymbol, int maxVocabSymbol) const {
+bool EpsilonTransition::matches(int /*symbol*/, int /*minVocabSymbol*/, int /*maxVocabSymbol*/) const {
   return false;
 }
 

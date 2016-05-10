@@ -52,7 +52,7 @@ namespace dfa {
     DFA(atn::DecisionState *atnStartState, int decision);
     DFA(const DFA &other);
     DFA(DFA &&other);
-    ~DFA();
+    virtual ~DFA();
 
     /**
      * Gets whether this DFA is a precedence DFA. Precedence DFAs use a special

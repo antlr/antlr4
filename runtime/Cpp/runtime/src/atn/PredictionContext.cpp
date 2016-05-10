@@ -555,7 +555,7 @@ std::wstring PredictionContext::toString() const {
   return antlrcpp::toString(this);
 }
 
-std::wstring PredictionContext::toString(Recognizer *recog) const {
+std::wstring PredictionContext::toString(Recognizer */*recog*/) const {
   return toString();
 }
 

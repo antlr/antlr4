@@ -71,7 +71,8 @@ namespace pattern {
     ParseTreeMatch(Ref<ParseTree> tree, const ParseTreePattern &pattern,
                    const std::map<std::wstring, std::vector<Ref<ParseTree>>> &labels,
                    Ref<ParseTree> mismatchedNode);
-
+    virtual ~ParseTreeMatch() {};
+    
     /// <summary>
     /// Get the last node associated with a specific {@code label}.
     /// <p/>

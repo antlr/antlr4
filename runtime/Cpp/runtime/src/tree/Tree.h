@@ -42,11 +42,11 @@ namespace tree {
   ///  It is the most abstract interface for all the trees used by ANTLR.
   /// </summary>
   class ANTLR4CPP_PUBLIC Tree {
-    /// <summary>
+  public:
+    virtual ~Tree() {};
+    
     /// The parent of this node. If the return value is null, then this
     ///  node is the root of the tree.
-    /// </summary>
-  public:
     std::weak_ptr<Tree> getParent() { return getParentReference(); };
 
     /// <summary>

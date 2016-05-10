@@ -132,7 +132,7 @@ ssize_t ANTLRInputStream::mark() {
   return -1;
 }
 
-void ANTLRInputStream::release(ssize_t marker) {
+void ANTLRInputStream::release(ssize_t /* marker */) {
 }
 
 void ANTLRInputStream::seek(size_t index) {

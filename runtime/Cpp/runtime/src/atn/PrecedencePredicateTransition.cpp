@@ -44,7 +44,7 @@ bool PrecedencePredicateTransition::isEpsilon() const {
   return true;
 }
 
-bool PrecedencePredicateTransition::matches(int symbol, int minVocabSymbol, int maxVocabSymbol) const {
+bool PrecedencePredicateTransition::matches(int /*symbol*/, int /*minVocabSymbol*/, int /*maxVocabSymbol*/) const {
   return false;
 }
 

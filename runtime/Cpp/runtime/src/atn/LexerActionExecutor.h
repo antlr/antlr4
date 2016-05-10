@@ -52,6 +52,7 @@ namespace atn {
     /// Constructs an executor for a sequence of <seealso cref="LexerAction"/> actions. </summary>
     /// <param name="lexerActions"> The lexer actions to execute. </param>
     LexerActionExecutor(const std::vector<Ref<LexerAction>> &lexerActions);
+    virtual ~LexerActionExecutor() {};
 
     /// <summary>
     /// Creates a <seealso cref="LexerActionExecutor"/> which executes the actions for
