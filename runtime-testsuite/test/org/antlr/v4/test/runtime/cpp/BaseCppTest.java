@@ -389,7 +389,7 @@ public abstract class BaseCppTest {
 		assertTrue(success);
 		writeFile(tmpdir, "input", input);
 		writeLexerTestFile(lexerName, showDFA);
-		String output = execModule("Test.py");
+		String output = execModule("Test.out");
 		if ( stderrDuringParse!=null && stderrDuringParse.length()>0 ) {
 			System.err.println(stderrDuringParse);
 		}
@@ -482,16 +482,20 @@ public abstract class BaseCppTest {
 
 		List<String> files = new ArrayList<String>();
 		if ( lexerName!=null ) {
-			files.add(lexerName+".py");
+			files.add(lexerName+".cpp");
+			files.add(lexerName+".h");
 		}
 		if ( parserName!=null ) {
-			files.add(parserName+".py");
+			files.add(parserName+".cpp");
+			files.add(parserName+".h");
 			Set<String> optionsSet = new HashSet<String>(Arrays.asList(extraOptions));
 			if (!optionsSet.contains("-no-listener")) {
-				files.add(grammarFileName.substring(0, grammarFileName.lastIndexOf('.'))+"Listener.py");
+				files.add(grammarFileName.substring(0, grammarFileName.lastIndexOf('.'))+"Listener.cpp");
+				files.add(grammarFileName.substring(0, grammarFileName.lastIndexOf('.'))+"Listener.h");
 			}
 			if (optionsSet.contains("-visitor")) {
-				files.add(grammarFileName.substring(0, grammarFileName.lastIndexOf('.'))+"Visitor.py");
+				files.add(grammarFileName.substring(0, grammarFileName.lastIndexOf('.'))+"Visitor.cpp");
+				files.add(grammarFileName.substring(0, grammarFileName.lastIndexOf('.'))+"Visitor.h");
 			}
 		}
 		return true; // allIsWell: no compile
@@ -520,7 +524,7 @@ public abstract class BaseCppTest {
 	}
 
 	public String execRecognizer() {
-		return execModule("Test.py");
+		return execModule("Test.out");
 	}
 
 	public String execModule(String fileName) {
@@ -877,7 +881,7 @@ System.err.println("exec errput: " + output);
 		outputFileST.add("listenerName", listenerName);
 		outputFileST.add("visitorName", visitorName);
 		outputFileST.add("parserStartRuleName", parserStartRuleName);
-		writeFile(tmpdir, "Test.py", outputFileST.render());
+		writeFile(tmpdir, "Test.out", outputFileST.render());
 	}
 
 	protected void writeLexerTestFile(String lexerName, boolean showDFA) {
@@ -897,7 +901,7 @@ System.err.println("exec errput: " + output);
 								: "") + "\n" + "if __name__ == '__main__':\n"
 						+ "    main(sys.argv)\n" + "\n");
 		outputFileST.add("lexerName", lexerName);
-		writeFile(tmpdir, "Test.py", outputFileST.render());
+		writeFile(tmpdir, "Test.out", outputFileST.render());
 	}
 
 	public void writeRecognizer(String parserName, String lexerName,
