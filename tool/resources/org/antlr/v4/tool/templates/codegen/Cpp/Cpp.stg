@@ -60,7 +60,7 @@ public:
   <lexer.name>(CharStream *input);
   ~<lexer.name>();
 
-  <namedActions.declarations>
+  <namedActions.members>
   virtual std::wstring getGrammarFileName() const override;
   virtual const std::vector\<std::wstring>& getRuleNames() const override;
   
@@ -90,7 +90,7 @@ private:
   static Ref\<dfa::Vocabulary> _vocabulary;
   <atn>
   
-  <namedActions.members>
+  <namedActions.declarations>
 
   // Individual action functions triggered by action() above.
   <actionFuncs.values; separator="\n">
@@ -281,7 +281,7 @@ public:
   virtual const std::vector\<std::wstring>& getRuleNames() const override;
   virtual Ref\<dfa::Vocabulary> getVocabulary() const override;
  
-  <namedActions.declarations>
+  <namedActions.members>
   
   <parser.funcs: {f | class <f.name; format = "cap">Context;};  separator = "\n"> <! Forward declare context classes. !>
   
@@ -303,7 +303,7 @@ private:
   static Ref\<dfa::Vocabulary> _vocabulary;
   <atn>
   
-  <namedActions.members>
+  <namedActions.declarations>
   
   struct Initializer {
     Initializer();
@@ -437,8 +437,8 @@ RuleFunction(currentRule, args, code, locals, ruleCtx, altLabelCtxs, namedAction
 <ruleCtx>
 <! TODO: untested !><altLabelCtxs: {l | <altLabelCtxs.(l)>}; separator = "\n">
 Ref\<<parser.name>::<currentRule.ctxType>\> <parser.name>::<currentRule.name>(<args; separator=",">) {
-  Ref\<<currentRule.ctxType>\> result = std::make_shared\<<currentRule.ctxType>\>(_ctx, getState()<currentRule.args:{a | , <a.name>}>);
-  enterRule(result, <currentRule.startState>, <parser.name>::Rule<currentRule.name; format = "cap">);
+  Ref\<<currentRule.ctxType>\> _localctx = std::make_shared\<<currentRule.ctxType>\>(_ctx, getState()<currentRule.args:{a | , <a.name>}>);
+  enterRule(_localctx, <currentRule.startState>, <parser.name>::Rule<currentRule.name; format = "cap">);
   <namedActions.init>
   <locals; separator = "\n">
 
@@ -458,13 +458,13 @@ Ref\<<parser.name>::<currentRule.ctxType>\> <parser.name>::<currentRule.name>(<a
   <exceptions; separator="\n">
   <else>
   catch (RecognitionException &e) {
-    result->exception = std::make_exception_ptr(e);
+    _localctx->exception = std::make_exception_ptr(e);
     _errHandler->reportError(this, e);
     _errHandler->recover(this, e);
   }
   <endif>
 
-  return result;
+  return _localctx;
 }
 >>
 
@@ -486,10 +486,10 @@ Ref\<<parser.name>::<currentRule.ctxType>\> <parser.name>::<currentRule.name>(<c
 Ref\<<parser.name>::<currentRule.ctxType>\> <parser.name>::<currentRule.name>(int precedence<currentRule.args:{a | , <a>}>) {
   Ref\<ParserRuleContext> parentContext = _ctx;
   int parentState = getState();
-  Ref\<<parser.name>::<currentRule.ctxType>\> result = std::make_shared\<<currentRule.ctxType>\>(_ctx, parentState<currentRule.args: {a | , <a.name>}>);
-  Ref\<<parser.name>::<currentRule.ctxType>\> previousContext = result;
+  Ref\<<parser.name>::<currentRule.ctxType>\> _localctx = std::make_shared\<<currentRule.ctxType>\>(_ctx, parentState<currentRule.args: {a | , <a.name>}>);
+  Ref\<<parser.name>::<currentRule.ctxType>\> previousContext = _localctx;
   int startState = <currentRule.startState>;
-  enterRecursionRule(result, <currentRule.startState>, <parser.name>::Rule<currentRule.name; format = "cap">, precedence);
+  enterRecursionRule(_localctx, <currentRule.startState>, <parser.name>::Rule<currentRule.name; format = "cap">, precedence);
   
     <namedActions.init>
 <! TODO: untested !>    <locals; separator = "\n">
@@ -505,11 +505,11 @@ Ref\<<parser.name>::<currentRule.ctxType>\> <parser.name>::<currentRule.name>(in
     <namedActions.after>
   }
   catch (RecognitionException &e) {
-    result->exception = std::make_exception_ptr(e);
+    _localctx->exception = std::make_exception_ptr(e);
     _errHandler->reportError(this, e);
     _errHandler->recover(this, e);
   }
-  return result;
+  return _localctx;
 }
 >>
 
@@ -592,9 +592,9 @@ AltLabelStructDecl(struct, attrs, getters, dispatchMethods) ::= <<
 CodeBlockForOuterMostAltHeader(currentOuterMostAltCodeBlock, locals, preamble, ops) ::= "<! Required to exist, but unused. !>"
 CodeBlockForOuterMostAlt(currentOuterMostAltCodeBlock, locals, preamble, ops) ::= <<
 <if (currentOuterMostAltCodeBlock.altLabel)>
-result = std::dynamic_pointer_cast\<<currentRule.ctxType>\>(std::make_shared\<<parser.name>::<currentOuterMostAltCodeBlock.altLabel; format = "cap">Context>(result));
+_localctx = std::dynamic_pointer_cast\<<currentRule.ctxType>\>(std::make_shared\<<parser.name>::<currentOuterMostAltCodeBlock.altLabel; format = "cap">Context>(_localctx));
 <endif>
-enterOuterAlt(result, <currentOuterMostAltCodeBlock.alt.altNum>);
+enterOuterAlt(_localctx, <currentOuterMostAltCodeBlock.alt.altNum>);
 <CodeBlockForAlt(currentAltCodeBlock = currentOuterMostAltCodeBlock, ...)>
 >>
 
@@ -849,9 +849,9 @@ ActionText(t) ::= "<t.text>"
 ActionTemplateHeader(t) ::= "<! Unused but must be present. !>"
 ActionTemplate(t) ::= "<t.st>"
 
-ArgRef(a) ::= "ArgRef(a) result.<a.name>"
-LocalRef(a) ::= "LocalRef(a) result.<a.name>"
-RetValueRef(a) ::= "RetValueRef(a) result.<a.name>"
+ArgRef(a) ::= "ArgRef(a) _localctx.<a.name>"
+LocalRef(a) ::= "LocalRef(a) _localctx.<a.name>"
+RetValueRef(a) ::= "RetValueRef(a) _localctx.<a.name>"
 QRetValueRef(a) ::= "QRetValueRef(a) <ctx(a)>.<a.dict>.<a.name>"
 /** How to translate $tokenLabel */
 TokenRef(t) ::= "TokenRef(t) <ctx(t)>.<t.name>"
@@ -861,7 +861,9 @@ SetAttr(s,rhsChunks) ::= "SetAttr(s,rhsChunks) <ctx(s)>.<s.name> = <rhsChunks>;"
 
 InputSymbolType() ::= "<file.InputSymbolType; null = {Token}> *"
 
-TokenPropertyRef_text(t) ::= "TokenPropertyRef_text(t) (<ctx(t)>.<t.label> != nullptr ? <ctx(t)>.<t.label>.getText() : null)"
+TokenPropertyRef_textHeader(t) ::= "<! Required but unused. !>"
+TokenPropertyRef_text(t) ::= "(<ctx(t)>-><t.label> != nullptr ? <ctx(t)>-><t.label>->getText() : nullptr)"
+
 TokenPropertyRef_type(t) ::= "TokenPropertyRef_type(t) (<ctx(t)>.<t.label> != nullptr ? <ctx(t)>.<t.label>.getType() : 0)"
 TokenPropertyRef_line(t) ::= "TokenPropertyRef_line(t) (<ctx(t)>.<t.label> != nullptr ? <ctx(t)>.<t.label>.getLine() : 0)"
 TokenPropertyRef_pos(t) ::= "TokenPropertyRef_pos(t) (<ctx(t)>.<t.label> != nullptr ? <ctx(t)>.<t.label>.getCharPositionInLine() : 0)"
@@ -874,10 +876,10 @@ RulePropertyRef_stop(r)  ::= "RulePropertyRef_stop(r)   (<ctx(r)>.<r.label> != n
 RulePropertyRef_text(r)  ::= "RulePropertyRef_text(r)   (<ctx(r)>.<r.label> != nullptr ? _input->getText(<ctx(r)>.<r.label>.start,<ctx(r)>.<r.label>.stop) : null)"
 RulePropertyRef_ctx(r)   ::= "RulePropertyRef_ctx(r)<ctx(r)>.<r.label>"
 
-ThisRulePropertyRef_start(r) ::= "ThisRulePropertyRef_start(r) result->start"
-ThisRulePropertyRef_stop(r)  ::= "ThisRulePropertyRef_stop(r)   result->stop"
-ThisRulePropertyRef_text(r)  ::= "ThisRulePropertyRef_text(r)   input->getText(result->start, _input->LT(-1))"
-ThisRulePropertyRef_ctx(r)   ::= "ThisRulePropertyRef_ctx(r)    result"
+ThisRulePropertyRef_start(r) ::= "ThisRulePropertyRef_start(r) _localctx->start"
+ThisRulePropertyRef_stop(r)  ::= "ThisRulePropertyRef_stop(r)   _localctx->stop"
+ThisRulePropertyRef_text(r)  ::= "ThisRulePropertyRef_text(r)   input->getText(_localctx->start, _input->LT(-1))"
+ThisRulePropertyRef_ctx(r)   ::= "ThisRulePropertyRef_ctx(r)    _localctx"
 
 NonLocalAttrRef(s) ::= "NonLocalAttrRef(s) ((<s.ruleName; format=\"cap\">Context)getInvokingContext(<s.ruleIndex>)).<s.name>"
 SetNonLocalAttr(s, rhsChunks) ::=
@@ -999,10 +1001,10 @@ AttributeDeclHeader(d) ::= "<d.type> <d.name><if(d.initValue)> = <d.initValue><e
 AttributeDecl(d) ::= "<d.type> <d.name>"
 
 /** If we don't know location of label def x, use this template */
-labelref(x) ::= "<if (!x.isLocal)>result<endif>-><x.name>"
+labelref(x) ::= "<if (!x.isLocal)>_localctx<endif>-><x.name>"
 
 /** For any action chunk, what is correctly-typed context struct ptr? */
-ctx(actionChunk) ::= "result"
+ctx(actionChunk) ::= "_localctx"
 
 // used for left-recursive rules
 recRuleAltPredicate(ruleName,opPrec) ::= "precpred(_ctx, <opPrec>)"
@@ -1010,27 +1012,27 @@ recRuleSetReturnAction(src,name) ::= "recRuleSetReturnAction(src,name) $<name>=$
 recRuleSetStopToken() ::= "_ctx->stop = _input->LT(-1);"
 
 recRuleAltStartAction(ruleName, ctxName, label) ::= <<
-result = std::make_shared\<<ctxName>Context>(parentContext, parentState);
-<if (label)>result-><label> = previousContext;<endif>
-pushNewRecursionContext(result, startState, <parser.name>::Rule<ruleName; format = "cap">);
+_localctx = std::make_shared\<<ctxName>Context>(parentContext, parentState);
+<if (label)>_localctx-><label> = previousContext;<endif>
+pushNewRecursionContext(_localctx, startState, <parser.name>::Rule<ruleName; format = "cap">);
 >>
 
 recRuleLabeledAltStartAction(ruleName, currentAltLabel, label) ::= <<recRuleLabeledAltStartAction
-result = std::make_shared\<<currentAltLabel; format = "cap">Context>(new <ruleName; format="cap">Context(_parentctx, _parentState));
-<if(label)>((<currentAltLabel; format="cap">Context*)result).<label> = previousContext;<endif>
-pushNewRecursionContext(result, _startState, RULE_<ruleName>);
+_localctx = std::make_shared\<<currentAltLabel; format = "cap">Context>(new <ruleName; format="cap">Context(_parentctx, _parentState));
+<if(label)>((<currentAltLabel; format="cap">Context*)_localctx).<label> = previousContext;<endif>
+pushNewRecursionContext(_localctx, _startState, RULE_<ruleName>);
 >>
 
 recRuleReplaceContext(ctxName) ::= <<recRuleReplaceContext
-result = std::make_shared\<<ctxName>Context>(_localctx);
-ctx = result;
-previousContext = result;
+_localctx = std::make_shared\<<ctxName>Context>(_localctx);
+ctx = _localctx;
+previousContext = _localctx;
 >>
 
 recRuleSetPrevCtx() ::= <<
 if (!_parseListeners.empty())
   triggerExitRuleEvent();
-previousContext = result;
+previousContext = _localctx;
 >>
 
 /** Using a type to init value map, try to init a type; if not in table
