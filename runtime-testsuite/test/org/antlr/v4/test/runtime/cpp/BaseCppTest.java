@@ -524,13 +524,14 @@ public abstract class BaseCppTest {
 	}
 
 	public String execModule(String fileName) {
-		String pythonPath = locateCompiler();
+		String compilerPath = locateCompiler();
+		String linkerPath = locateLinker();
 		String runtimePath = locateRuntime();
 		String modulePath = new File(new File(tmpdir), fileName).getAbsolutePath();
 		String inputPath = new File(new File(tmpdir), "input").getAbsolutePath();
 		try {
-			ProcessBuilder builder = new ProcessBuilder( pythonPath, modulePath, inputPath );
-			builder.environment().put("PYTHONPATH",runtimePath);
+			ProcessBuilder builder = new ProcessBuilder( compilerPath, modulePath, inputPath );
+			builder.environment().put("CPPPATH", runtimePath);
 			builder.directory(new File(tmpdir));
 			Process process = builder.start();
 			StreamVacuum stdoutVacuum = new StreamVacuum(process.getInputStream());
@@ -541,6 +542,8 @@ public abstract class BaseCppTest {
 			stdoutVacuum.join();
 			stderrVacuum.join();
 			String output = stdoutVacuum.toString();
+System.out.println("exec output: " + output);
+System.err.println("exec errput: " + output);
 			if ( stderrVacuum.toString().length()>0 ) {
 				this.stderrDuringParse = stderrVacuum.toString();
 				System.err.println("exec stderrVacuum: "+ stderrVacuum);
@@ -564,18 +567,25 @@ public abstract class BaseCppTest {
 	}
 
 	protected String locateCompiler() {
-		String propName = getPropertyPrefix() + "-cpp";
+		String propName = getPropertyPrefix() + "-compiler";
    		String prop = System.getProperty(propName);
    		if(prop==null || prop.length()==0)
-   			prop = locateTool(getCompilerExecutable());
+   			prop = locateTool("cpp");
 		File file = new File(prop);
 		if(!file.exists())
 			throw new RuntimeException("Missing system property:" + propName);
 		return file.getAbsolutePath();
 	}
 
-	protected String getCompilerExecutable() {
-		return "cpp";
+	protected String locateLinker() {
+		String propName = getPropertyPrefix() + "-linker";
+   		String prop = System.getProperty(propName);
+   		if(prop==null || prop.length()==0)
+   			prop = locateTool("ld");
+		File file = new File(prop);
+		if(!file.exists())
+			throw new RuntimeException("Missing system property:" + propName);
+		return file.getAbsolutePath();
 	}
 
 	protected String locateRuntime() {
