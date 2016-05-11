@@ -54,7 +54,7 @@ bool LexerModeAction::isPositionDependent() const {
 }
 
 void LexerModeAction::execute(Lexer *lexer) {
-  lexer->mode(_mode);
+  lexer->setMode(_mode);
 }
 
 size_t LexerModeAction::hashCode() const {

@@ -164,7 +164,7 @@ std::wstring RuleContext::toString(const std::vector<std::wstring> &ruleNames, R
 
 std::wstring RuleContext::toString() {
   return toString(nullptr);
-};
+}
 
 std::wstring RuleContext::toString(Recognizer *recog) {
   return toString(recog, ParserRuleContext::EMPTY);

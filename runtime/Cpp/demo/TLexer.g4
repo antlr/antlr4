@@ -9,10 +9,18 @@ lexer grammar TLexer;
 @lexer::preinclude {/* lexer precinclude section */}
 
 // Follows directly after the standard #includes in h + cpp files.
-@lexer::postinclude {/* lexer postinclude section */}
+@lexer::postinclude {
+/* lexer postinclude section */
+#ifndef _WIN32
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+#endif
+}
+
+// Directly preceds the lexer class declaration in the h file (e.g. for additional types etc.).
+@lexer::context {/* lexer context section */}
 
 // Appears in the public part of the lexer in the h file.
-@lexer::declarations {/* public lexer declarations section */
+@lexer::members {/* public lexer declarations section */
 bool canTestFoo() { return true; }
 bool isItFoo() { return true; }
 bool isItBar() { return true; }
@@ -22,7 +30,7 @@ void myBarLexerAction() { /* do something*/ };
 }
 
 // Appears in the private part of the lexer in the h file.
-@lexer::members {/* private lexer declarations/members section */}
+@lexer::declarations {/* private lexer declarations/members section */}
 
 // Appears in line with the other class member definitions in the cpp file.
 @lexer::definitions {/* lexer definitions section */}

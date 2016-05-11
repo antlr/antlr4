@@ -76,7 +76,7 @@ Ref<PredictionContext> PredictionContext::fromRuleContext(const ATN &atn, Ref<Ru
 
 bool PredictionContext::operator != (const PredictionContext &o) const {
   return !(*this == o);
-};
+}
 
 bool PredictionContext::isEmpty() const {
   return this == EMPTY.get();
@@ -109,7 +109,10 @@ size_t PredictionContext::calculateHashCode(const std::vector<std::weak_ptr<Pred
   size_t hash = MurmurHash::initialize(INITIAL_HASH);
 
   for (auto parent : parents) {
-    hash = MurmurHash::update(hash, parent.lock()->hashCode());
+    if (parent.expired())
+      hash = MurmurHash::update(hash, 0);
+    else
+      hash = MurmurHash::update(hash, parent.lock()->hashCode());
   }
 
   for (auto returnState : returnStates) {
@@ -555,7 +558,7 @@ std::wstring PredictionContext::toString() const {
   return antlrcpp::toString(this);
 }
 
-std::wstring PredictionContext::toString(Recognizer */*recog*/) const {
+std::wstring PredictionContext::toString(Recognizer * /*recog*/) const {
   return toString();
 }
 

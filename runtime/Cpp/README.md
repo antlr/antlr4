@@ -18,8 +18,11 @@ The C++ target has been the work of the following people:
 * David Sisson, dsisson@google.com
 * [Mike Lischke](www.soft-gems.net), mike@lischke-online.de
 
-Project Status
---------------------------------------------------------------------------------
+## Other contributors
+
+* Marcin Szalowicz, mszalowicz@mailplus.pl (cmake build setup)
+
+## Project Status
 
 * Building on OS X, Windows, and Linux (Ubuntu)
 * No errors and warnings

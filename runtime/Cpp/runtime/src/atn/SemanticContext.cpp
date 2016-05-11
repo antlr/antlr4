@@ -338,7 +338,7 @@ std::wstring SemanticContext::OR::toString() const {
 
 const Ref<SemanticContext> SemanticContext::NONE = std::make_shared<Predicate>(-1, -1, false);
 
-Ref<SemanticContext> SemanticContext::evalPrecedence(Recognizer */*parser*/, Ref<RuleContext> /*parserCallStack*/) {
+Ref<SemanticContext> SemanticContext::evalPrecedence(Recognizer * /*parser*/, Ref<RuleContext> /*parserCallStack*/) {
   return shared_from_this();
 }
 

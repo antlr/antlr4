@@ -275,7 +275,7 @@ std::wstring ATNConfigSet::toString() {
   return ss.str();
 }
 
-bool ATNConfigSet::remove(void */*o*/) {
+bool ATNConfigSet::remove(void * /*o*/) {
   throw UnsupportedOperationException();
 }
 

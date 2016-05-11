@@ -107,7 +107,7 @@ void LL1Analyzer::_LOOK(ATNState *s, ATNState *stopState, Ref<PredictionContext>
       look.add(Token::EPSILON);
       return;
     } else if (ctx->isEmpty() && addEOF) {
-      look.add(EOF);
+      look.add(Token::EOF);
       return;
     }
   }
@@ -117,7 +117,7 @@ void LL1Analyzer::_LOOK(ATNState *s, ATNState *stopState, Ref<PredictionContext>
       look.add(Token::EPSILON);
       return;
     } else if (ctx->isEmpty() && addEOF) {
-      look.add(EOF);
+      look.add(Token::EOF);
       return;
     }
 
@@ -127,7 +127,7 @@ void LL1Analyzer::_LOOK(ATNState *s, ATNState *stopState, Ref<PredictionContext>
         ATNState *returnState = _atn.states[(size_t)ctx->getReturnState(i)];
 
         bool removed = calledRuleStack.test((size_t)returnState->ruleIndex);
-        auto onExit = finally([&] {
+        auto onExit = finally([removed, &calledRuleStack, returnState] {
           if (removed) {
             calledRuleStack.set((size_t)returnState->ruleIndex);
           }
@@ -150,7 +150,7 @@ void LL1Analyzer::_LOOK(ATNState *s, ATNState *stopState, Ref<PredictionContext>
       }
 
       Ref<PredictionContext> newContext = SingletonPredictionContext::create(ctx, (static_cast<RuleTransition*>(t))->followState->stateNumber);
-      auto onExit = finally([&] {
+      auto onExit = finally([t, &calledRuleStack] {
         calledRuleStack[(size_t)((static_cast<RuleTransition*>(t))->target->ruleIndex)] = false;
       });
 

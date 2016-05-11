@@ -20,30 +20,42 @@ file(GLOB libantlrcpp_SRC
   "${PROJECT_SOURCE_DIR}/runtime/src/tree/pattern/*.cpp"
 )
 
+list(REMOVE_ITEM libantlrcpp_SRC ${PROJECT_SOURCE_DIR}/runtime/src/misc/TestRig.cpp)
+
 add_library(antlr4_shared SHARED ${libantlrcpp_SRC})
 add_library(antlr4_static STATIC ${libantlrcpp_SRC})
-add_precompiled_header(antlr4_shared ${PROJECT_SOURCE_DIR}/runtime/src/antlrcpp-Prefix.h)
-add_precompiled_header(antlr4_static ${PROJECT_SOURCE_DIR}/runtime/src/antlrcpp-Prefix.h)
+
 
 if(CMAKE_SYSTEM_NAME MATCHES "Linux")
   target_link_libraries(antlr4_shared ${UUID_LIBRARIES})
   target_link_libraries(antlr4_static ${UUID_LIBRARIES})
 elseif(APPLE)
-#  target_link_libraries(antlr4 "-framework CoreFoundation")
   target_link_libraries(antlr4_shared ${COREFOUNDATION_LIBRARY})
   target_link_libraries(antlr4_static ${COREFOUNDATION_LIBRARY})
-
 endif()
 
+set(disabled_compile_warnings "-Wno-overloaded-virtual")
+if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
+  set(disabled_compile_warnings "${disabled_compile_warnings} -Wno-dollar-in-identifier-extension -Wno-four-char-constants")
+elseif("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
+  set(disabled_compile_warnings "${disabled_compile_warnings} -Wno-multichar")
+endif()
+
+  
 set_target_properties(antlr4_shared
                       PROPERTIES VERSION   ${ANTLR_VERSION}
                                  SOVERSION ${ANTLR_VERSION}
-                                 OUTPUT_NAME antlr4)
+                                 OUTPUT_NAME antlr4
+                                 COMPILE_FLAGS "${disabled_compile_warnings}")
 
 set_target_properties(antlr4_static
                       PROPERTIES VERSION   ${ANTLR_VERSION}
                                  SOVERSION ${ANTLR_VERSION}
-                                 OUTPUT_NAME antlr4)
+                                 OUTPUT_NAME antlr4
+                                 COMPILE_FLAGS "${disabled_compile_warnings}")
+
+add_precompiled_header(antlr4_shared ${PROJECT_SOURCE_DIR}/runtime/src/antlrcpp-Prefix.h)
+add_precompiled_header(antlr4_static ${PROJECT_SOURCE_DIR}/runtime/src/antlrcpp-Prefix.h)
 
 install(TARGETS antlr4_shared
         DESTINATION lib)

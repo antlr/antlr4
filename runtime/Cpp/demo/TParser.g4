@@ -13,42 +13,34 @@ options {
 @parser::preinclude {/* parser precinclude section */}
 
 // Follows directly after the standard #includes in h + cpp files.
-@parser::postinclude {/* parser postinclude section */}
+@parser::postinclude {
+/* parser postinclude section */
+#ifndef _WIN32
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+#endif
+}
 
-// Appears in the public part of the parser in the h file.
-@parser::declarations {/* public parser declarations section */}
+// Directly preceeds the parser class declaration in the h file (e.g. for additional types etc.).
+@parser::context {/* parser context section */}
 
 // Appears in the private part of the parser in the h file.
+// The function bodies could also appear in the definitions section, but I want to maximize
+// Java compatibility, so we can also create a Java parser from this grammar.
+// Still, some tweaking is necessary after the Java file generation (e.g. bool -> boolean).
 @parser::members {
-/* private parser declarations/members section */
-bool myAction();
-bool doesItBlend();
-void cleanUp();
-void doInit();
-void doAfter();
+/* public parser declarations/members section */
+bool myAction() { return true; }
+bool doesItBlend() { return true; }
+void cleanUp() {}
+void doInit() {}
+void doAfter() {}
 }
+
+// Appears in the public part of the parser in the h file.
+@parser::declarations {/* private parser declarations section */}
 
 // Appears in line with the other class member definitions in the cpp file.
-@parser::definitions {
-/* parser definitions section */
-bool TParser::myAction() {
-  return true;
-}
-
-bool TParser::doesItBlend() {
-  return true;
-}
-
-void TParser::cleanUp() {
-}
-
-void TParser::doInit() {
-}
-
-void TParser::doAfter() {
-}
-
-}
+@parser::definitions {/* parser definitions section */}
 
 // Additionally there are similar sections for (base)listener and (base)visitor files.
 @parser::listenerpreinclude {/* listener preinclude section */}
@@ -76,14 +68,14 @@ void TParser::doAfter() {
 @parser::basevisitordefinitions {/* base visitor definitions section */}
 
 // Actual grammar start.
-main: stat+;
+main: stat+ EOF;
 divide : ID (and_ GreaterThan)? {doesItBlend()}?; 
 and_ @init{ doInit(); } @after { doAfter(); } : And ;
 
 conquer:
 	divide+
 	| {doesItBlend()}? and_ { myAction(); }
-	| ID (LessThan* divide)??
+	| ID (LessThan* divide)?? { $ID.text; }
 ;
 
 // Unused rule to demonstrate some of the special features.

@@ -92,7 +92,7 @@ int LexerATNSimulator::match(CharStream *input, size_t mode) {
   _mode = mode;
   ssize_t mark = input->mark();
 
-  auto onExit = finally([&] {
+  auto onExit = finally([input, mark] {
     input->release(mark);
   });
 
@@ -202,13 +202,13 @@ int LexerATNSimulator::execATN(CharStream *input, dfa::DFAState *ds0) {
     // capturing the accept state so the input index, line, and char
     // position accurately reflect the state of the interpreter at the
     // end of the token.
-    if (t != EOF) {
+    if (t != Token::EOF) {
       consume(input);
     }
     
     if (target->isAcceptState) {
       captureSimState(input, target);
-      if (t == EOF) {
+      if (t == Token::EOF) {
         break;
       }
     }
@@ -262,8 +262,8 @@ int LexerATNSimulator::failOrAccept(CharStream *input, Ref<ATNConfigSet> reach, 
     return _prevAccept.dfaState->prediction;
   } else {
     // if no accept and EOF is first char, return EOF
-    if (t == EOF && input->index() == (size_t)_startIndex) {
-      return EOF;
+    if (t == Token::EOF && input->index() == (size_t)_startIndex) {
+      return Token::EOF;
     }
 
     throw LexerNoViableAltException(_recog, input, (size_t)_startIndex, reach);
@@ -296,7 +296,7 @@ void LexerATNSimulator::getReachableConfigSet(CharStream *input, Ref<ATNConfigSe
           lexerActionExecutor = lexerActionExecutor->fixOffsetBeforeMatch((int)input->index() - _startIndex);
         }
 
-        bool treatEofAsEpsilon = t == EOF;
+        bool treatEofAsEpsilon = t == Token::EOF;
         Ref<LexerATNConfig> config = std::make_shared<LexerATNConfig>(std::static_pointer_cast<LexerATNConfig>(c),
           target, lexerActionExecutor);
 
@@ -483,7 +483,7 @@ Ref<LexerATNConfig> LexerATNSimulator::getEpsilonTarget(CharStream *input, Ref<L
     case Transition::RANGE:
     case Transition::SET:
       if (treatEofAsEpsilon) {
-        if (t->matches(EOF, Lexer::MIN_CHAR_VALUE, Lexer::MAX_CHAR_VALUE)) {
+        if (t->matches(Token::EOF, Lexer::MIN_CHAR_VALUE, Lexer::MAX_CHAR_VALUE)) {
           c = std::make_shared<LexerATNConfig>(config, t->target);
           break;
         }
@@ -510,7 +510,7 @@ bool LexerATNSimulator::evaluatePredicate(CharStream *input, int ruleIndex, int 
   size_t index = input->index();
   ssize_t marker = input->mark();
 
-  auto onExit = finally([&] {
+  auto onExit = finally([this, input, savedCharPositionInLine, savedLine, index, marker] {
     _charPositionInLine = savedCharPositionInLine;
     _line = savedLine;
     input->seek(index);

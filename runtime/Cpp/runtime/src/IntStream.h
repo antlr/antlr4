@@ -54,6 +54,8 @@ namespace runtime {
   /// </summary>
   class ANTLR4CPP_PUBLIC IntStream {
   public:
+    static const ssize_t EOF = -1;
+    
     /// The value returned by <seealso cref="#LA LA()"/> when the end of the stream is
     /// reached.
     /// No explicit EOF definition. We got EOF on all platforms.

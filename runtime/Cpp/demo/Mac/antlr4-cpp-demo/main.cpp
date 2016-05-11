@@ -17,7 +17,7 @@
 using namespace antlrcpptest;
 using namespace org::antlr::v4::runtime;
 
-int main(int argc, const char * argv[]) {
+int main(int , const char **) {
 
   ANTLRInputStream input(L"(((x))) * y + z; a + (x * (y ? 0 : 1) + z);");
   TLexer lexer(&input);

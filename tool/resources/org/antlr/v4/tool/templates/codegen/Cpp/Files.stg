@@ -49,8 +49,6 @@ LexerFileHeader(file, lexer, namedActions) ::= <<
 
 <namedActions.postinclude>
 
-// Have to use "using namespace" here, because some code parts which require different namespaces
-// are generated from the same template (e.g. see xxxSempred(.. *context) here and in the parser header.
 using namespace org::antlr::v4::runtime;
 
 <if(file.genPackage)>namespace <file.genPackage> {<endif>
@@ -169,14 +167,14 @@ public:
 <namedActions.baselistenerdeclarations>
 
 <file.listenerNames: {lname |
-  void enter<lname; format="cap">(<file.parserName>::<lname; format = "cap">Context *ctx) { \}
-  void exit<lname; format="cap">(<file.parserName>::<lname; format = "cap">Context *ctx) { \}
+  void enter<lname; format="cap">(<file.parserName>::<lname; format = "cap">Context * /*ctx*/) { \}
+  void exit<lname; format="cap">(<file.parserName>::<lname; format = "cap">Context * /*ctx*/) { \}
 }; separator="\n">
 
-  void enterEveryRule(Ref\<ParserRuleContext> ctx) { }
-  void exitEveryRule(Ref\<ParserRuleContext> ctx) { }
-  void visitTerminal(Ref\<tree::TerminalNode> node) { }
-  void visitErrorNode(Ref\<tree::ErrorNode> node) { }
+  void enterEveryRule(Ref\<ParserRuleContext> /*ctx*/) { }
+  void exitEveryRule(Ref\<ParserRuleContext> /*ctx*/) { }
+  void visitTerminal(Ref\<tree::TerminalNode> /*node*/) { }
+  void visitErrorNode(Ref\<tree::ErrorNode> /*node*/) { }
   
 <if (namedActions.baselistenermembers)>
 private:  

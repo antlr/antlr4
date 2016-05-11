@@ -56,11 +56,13 @@ size_t SingletonPredictionContext::size() const {
 
 std::weak_ptr<PredictionContext> SingletonPredictionContext::getParent(size_t index) const {
   assert(index == 0);
+  ((void)(index)); // Make Release build happy
   return parent;
 }
 
 int SingletonPredictionContext::getReturnState(size_t index) const {
   assert(index == 0);
+  ((void)(index)); // Make Release build happy
   return returnState;
 }
 

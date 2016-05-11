@@ -136,7 +136,7 @@ ParseTreePattern ParseTreePatternMatcher::compile(const std::wstring &pattern, i
   }
 
   // Make sure tree pattern compilation checks for a complete parse
-  if (tokens->LA(1) != EOF) {
+  if (tokens->LA(1) != Token::EOF) {
     throw StartRuleDoesNotConsumeFullPattern();
   }
   
@@ -288,7 +288,7 @@ std::vector<Ref<Token>> ParseTreePatternMatcher::tokenize(const std::wstring &pa
       ANTLRInputStream input(textChunk.getText());
       _lexer->setInputStream(&input);
       Ref<Token> t = _lexer->nextToken();
-      while (t->getType() != EOF) {
+      while (t->getType() != Token::EOF) {
         tokens.push_back(t);
         t = _lexer->nextToken();
       }

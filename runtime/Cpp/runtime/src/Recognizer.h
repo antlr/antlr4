@@ -41,6 +41,8 @@ namespace runtime {
 
   class ANTLR4CPP_PUBLIC Recognizer : public IRecognizer {
   public:
+    static const ssize_t EOF = -1;
+
     Recognizer();
     virtual ~Recognizer() {};
 

@@ -26,7 +26,7 @@ include_directories(
 
 #file(GLOB antlr4-demo_SRC "${PROJECT_SOURCE_DIR}/demo/generated/*")
 set(antlr4-demo_SRC 
-  Linux/main.cpp 
+  ${PROJECT_SOURCE_DIR}/demo/Linux/main.cpp
   ${PROJECT_SOURCE_DIR}/demo/generated/TLexer.cpp
   ${PROJECT_SOURCE_DIR}/demo/generated/TParser.cpp
   ${PROJECT_SOURCE_DIR}/demo/generated/TParserBaseListener.cpp
@@ -34,6 +34,14 @@ set(antlr4-demo_SRC
   ${PROJECT_SOURCE_DIR}/demo/generated/TParserListener.cpp
   ${PROJECT_SOURCE_DIR}/demo/generated/TParserVisitor.cpp
   )
+
+foreach( src_file ${antlr4-demo_SRC} )
+      set_source_files_properties(
+          ${src_file}
+          PROPERTIES
+          COMPILE_FLAGS -Wno-overloaded-virtual
+          )
+endforeach( src_file ${antlr4-demo_SRC} )
 
 add_executable(antlr4-demo
   ${antlr4-demo_SRC}
@@ -43,15 +51,6 @@ add_precompiled_header(antlr4-demo ${PROJECT_SOURCE_DIR}/runtime/src/antlrcpp-Pr
 add_dependencies(antlr4-demo GenerateParser)
 
 target_link_libraries(antlr4-demo antlr4_static)
-
-#foreach(src ${antlr4-demo_SRC})
-#  get_source_file_property(old_compile_flags ${src} COMPILE_FLAGS)
-#  if(old_compile_flags STREQUAL "NOTFOUND")
-#    set(old_compile_flags "")
-#  endif()
-#    set_source_files_properties(${src} PROPERTIES COMPILE_FLAGS
-#                      "${old_compile_flags} -include \"${PROJECT_SOURCE_DIR}/runtime/src/antlrcpp-Prefix.h\"")
-#endforeach()
 
 install(TARGETS antlr4-demo 
         DESTINATION "share" 

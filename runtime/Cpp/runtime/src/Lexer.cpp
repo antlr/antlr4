@@ -51,17 +51,17 @@ void Lexer::reset() {
   // wack Lexer state variables
   _input->seek(0); // rewind the input
 
-  _token.reset();
-  _type = Token::INVALID_TYPE;
-  _channel = Token::DEFAULT_CHANNEL;
-  _tokenStartCharIndex = -1;
-  _tokenStartCharPositionInLine = -1;
-  _tokenStartLine = -1;
-  _text = L"";
+  token.reset();
+  type = Token::INVALID_TYPE;
+  channel = Token::DEFAULT_CHANNEL;
+  tokenStartCharIndex = -1;
+  tokenStartCharPositionInLine = -1;
+  tokenStartLine = -1;
+  text = L"";
 
-  _hitEOF = false;
-  _mode = Lexer::DEFAULT_MODE;
-  _modeStack.clear();
+  hitEOF = false;
+  mode = Lexer::DEFAULT_MODE;
+  modeStack.clear();
 
   getInterpreter<atn::LexerATNSimulator>()->reset();
 }
@@ -79,74 +79,74 @@ Ref<Token> Lexer::nextToken() {
 
   while (true) {
   outerContinue:
-    if (_hitEOF) {
+    if (hitEOF) {
       emitEOF();
-      return _token;
+      return token;
     }
 
-    _token.reset();
-    _channel = Token::DEFAULT_CHANNEL;
-    _tokenStartCharIndex = (int)_input->index();
-    _tokenStartCharPositionInLine = getInterpreter<atn::LexerATNSimulator>()->getCharPositionInLine();
-    _tokenStartLine = (int)getInterpreter<atn::LexerATNSimulator>()->getLine();
-    _text = L"";
+    token.reset();
+    channel = Token::DEFAULT_CHANNEL;
+    tokenStartCharIndex = (int)_input->index();
+    tokenStartCharPositionInLine = getInterpreter<atn::LexerATNSimulator>()->getCharPositionInLine();
+    tokenStartLine = (int)getInterpreter<atn::LexerATNSimulator>()->getLine();
+    text = L"";
     do {
-      _type = Token::INVALID_TYPE;
+      type = Token::INVALID_TYPE;
       int ttype;
       try {
-        ttype = getInterpreter<atn::LexerATNSimulator>()->match(_input, (size_t)_mode);
+        ttype = getInterpreter<atn::LexerATNSimulator>()->match(_input, mode);
       } catch (LexerNoViableAltException &e) {
         notifyListeners(e); // report error
         recover(e);
         ttype = SKIP;
       }
       if (_input->LA(1) == EOF) {
-        _hitEOF = true;
+        hitEOF = true;
       }
-      if (_type == Token::INVALID_TYPE) {
-        _type = ttype;
+      if (type == Token::INVALID_TYPE) {
+        type = ttype;
       }
-      if (_type == SKIP) {
+      if (type == SKIP) {
         goto outerContinue;
       }
-    } while (_type == MORE);
-    if (_token == nullptr) {
+    } while (type == MORE);
+    if (token == nullptr) {
       emit();
     }
-    return _token;
+    return token;
   }
 }
 
 void Lexer::skip() {
-  _type = SKIP;
+  type = SKIP;
 }
 
 void Lexer::more() {
-  _type = MORE;
+  type = MORE;
 }
 
-void Lexer::mode(int m) {
-  _mode = m;
+void Lexer::setMode(size_t m) {
+  mode = m;
 }
 
-void Lexer::pushMode(int m) {
+void Lexer::pushMode(size_t m) {
   if (atn::LexerATNSimulator::debug) {
     std::wcout << std::wstring(L"pushMode ") << m << std::endl;
   }
-  _modeStack.push_back(_mode);
-  mode(m);
+  modeStack.push_back(mode);
+  setMode(m);
 }
 
-int Lexer::popMode() {
-  if (_modeStack.empty()) {
+size_t Lexer::popMode() {
+  if (modeStack.empty()) {
     throw EmptyStackException();
   }
   if (atn::LexerATNSimulator::debug) {
-    std::wcout << std::wstring(L"popMode back to ") << _modeStack.back() << std::endl;
+    std::wcout << std::wstring(L"popMode back to ") << modeStack.back() << std::endl;
   }
-  mode(_modeStack.back());
-  _modeStack.pop_back();
-  return _mode;
+  setMode(modeStack.back());
+  modeStack.pop_back();
+  return mode;
 }
 
 
@@ -168,12 +168,12 @@ CharStream* Lexer::getInputStream() {
 }
 
 void Lexer::emit(Ref<Token> token) {
-  _token = token;
+  this->token = token;
 }
 
 Ref<Token> Lexer::emit() {
-  Ref<Token> t = std::dynamic_pointer_cast<Token>(_factory->create({ this, _input }, _type, _text, _channel,
-    _tokenStartCharIndex, getCharIndex() - 1, _tokenStartLine, _tokenStartCharPositionInLine));
+  Ref<Token> t = std::dynamic_pointer_cast<Token>(_factory->create({ this, _input }, (int)type, text, channel,
+    tokenStartCharIndex, getCharIndex() - 1, (int)tokenStartLine, tokenStartCharPositionInLine));
   emit(t);
   return t;
 }
@@ -208,38 +208,38 @@ int Lexer::getCharIndex() {
 }
 
 std::wstring Lexer::getText() {
-  if (_text != L"") {
-    return _text;
+  if (!text.empty()) {
+    return text;
   }
   return getInterpreter<atn::LexerATNSimulator>()->getText(_input);
 }
 
 void Lexer::setText(const std::wstring &text) {
-  this->_text = text;
+  this->text = text;
 }
 
 Ref<Token> Lexer::getToken() {
-  return _token;
+  return token;
 }
 
 void Lexer::setToken(Ref<Token> token) {
-  _token = token;
+  this->token = token;
 }
 
-void Lexer::setType(int ttype) {
-  _type = ttype;
+void Lexer::setType(ssize_t ttype) {
+  type = ttype;
 }
 
-int Lexer::getType() {
-  return _type;
+ssize_t Lexer::getType() {
+  return type;
 }
 
 void Lexer::setChannel(int channel) {
-  _channel = channel;
+  this->channel = channel;
 }
 
 int Lexer::getChannel() {
-  return _channel;
+  return channel;
 }
 
 std::vector<Ref<Token>> Lexer::getAllTokens() {
@@ -260,11 +260,11 @@ void Lexer::recover(const LexerNoViableAltException &/*e*/) {
 }
 
 void Lexer::notifyListeners(const LexerNoViableAltException &e) {
-  std::wstring text = _input->getText(misc::Interval(_tokenStartCharIndex, (int)_input->index()));
+  std::wstring text = _input->getText(misc::Interval(tokenStartCharIndex, (int)_input->index()));
   std::wstring msg = std::wstring(L"token recognition error at: '") + getErrorDisplay(text) + std::wstring(L"'");
 
   ProxyErrorListener &listener = getErrorListenerDispatch();
-  listener.syntaxError(this, nullptr, (size_t)_tokenStartLine, _tokenStartCharPositionInLine, msg,
+  listener.syntaxError(this, nullptr, tokenStartLine, tokenStartCharPositionInLine, msg,
                        std::make_exception_ptr(e));
 }
 
@@ -303,19 +303,19 @@ std::wstring Lexer::getCharErrorDisplay(int c) {
   return std::wstring(L"'") + s + std::wstring(L"'");
 }
 
-void Lexer::recover(RecognitionException */*re*/) {
+void Lexer::recover(RecognitionException * /*re*/) {
   // TO_DO: Do we lose character or line position information?
   _input->consume();
 }
 
 void Lexer::InitializeInstanceFields() {
-  _token = nullptr;
+  token = nullptr;
   _factory = CommonTokenFactory::DEFAULT;
-  _tokenStartCharIndex = -1;
-  _tokenStartLine = 0;
-  _tokenStartCharPositionInLine = 0;
-  _hitEOF = false;
-  _channel = 0;
-  _type = 0;
-  _mode = Lexer::DEFAULT_MODE;
+  tokenStartCharIndex = -1;
+  tokenStartLine = 0;
+  tokenStartCharPositionInLine = 0;
+  hitEOF = false;
+  channel = 0;
+  type = 0;
+  mode = Lexer::DEFAULT_MODE;
 }

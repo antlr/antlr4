@@ -595,9 +595,6 @@
     <ClCompile Include="src\Token.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\TokenFactory.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\TokenStream.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -608,9 +605,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\UnbufferedTokenStream.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\WritableToken.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\atn\AbstractPredicateTransition.cpp">
@@ -644,9 +638,6 @@
       <Filter>Source Files\atn</Filter>
     </ClCompile>
     <ClCompile Include="src\atn\ATNState.cpp">
-      <Filter>Source Files\atn</Filter>
-    </ClCompile>
-    <ClCompile Include="src\atn\ATNType.cpp">
       <Filter>Source Files\atn</Filter>
     </ClCompile>
     <ClCompile Include="src\atn\AtomTransition.cpp">
@@ -784,9 +775,6 @@
     <ClCompile Include="src\tree\ErrorNodeImpl.cpp">
       <Filter>Source Files\tree</Filter>
     </ClCompile>
-    <ClCompile Include="src\tree\ParseTreeProperty.cpp">
-      <Filter>Source Files\tree</Filter>
-    </ClCompile>
     <ClCompile Include="src\tree\ParseTreeWalker.cpp">
       <Filter>Source Files\tree</Filter>
     </ClCompile>
@@ -841,9 +829,6 @@
     <ClCompile Include="src\atn\LexerActionExecutor.cpp">
       <Filter>Source Files\atn</Filter>
     </ClCompile>
-    <ClCompile Include="src\atn\LexerActionType.cpp">
-      <Filter>Source Files\atn</Filter>
-    </ClCompile>
     <ClCompile Include="src\atn\LexerChannelAction.cpp">
       <Filter>Source Files\atn</Filter>
     </ClCompile>
@@ -882,9 +867,6 @@
     </ClCompile>
     <ClCompile Include="src\atn\ProfilingATNSimulator.cpp">
       <Filter>Source Files\atn</Filter>
-    </ClCompile>
-    <ClCompile Include="src\misc\Predicate.cpp">
-      <Filter>Source Files\misc</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

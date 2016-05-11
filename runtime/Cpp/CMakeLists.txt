@@ -89,7 +89,6 @@ MACRO(ADD_PRECOMPILED_HEADER _targetName _input )
     SET(_output "${_outdir}/${CMAKE_BUILD_TYPE}.c++")
     STRING(TOUPPER "CMAKE_CXX_FLAGS_${CMAKE_BUILD_TYPE}" _flags_var_name)
     SET(_compiler_FLAGS ${${_flags_var_name}})
-    
     GET_DIRECTORY_PROPERTY(_directory_flags INCLUDE_DIRECTORIES)
     FOREACH(item ${_directory_flags})
     LIST(APPEND _compiler_FLAGS "-I${item}")
@@ -110,8 +109,14 @@ MACRO(ADD_PRECOMPILED_HEADER _targetName _input )
     ADD_DEPENDENCIES(${_targetName} ${_targetName}_gch)
     #SET(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-include ${_name} -Winvalid-pch -H")
     #SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -include ${_name} -Winvalid-pch")
+    GET_TARGET_PROPERTY(old_compile_flags ${_targetName} COMPILE_FLAGS)
+    IF(old_compile_flags STREQUAL "old_compile_flags-NOTFOUND")
+      SET(old_compile_flags "-include ${_name} -Winvalid-pch")
+    ELSE()
+      SET(old_compile_flags "${old_compile_flags} -include ${_name} -Winvalid-pch")
+    ENDIF()
     SET_TARGET_PROPERTIES(${_targetName} PROPERTIES
-      COMPILE_FLAGS "-include ${_name} -Winvalid-pch"
+      COMPILE_FLAGS "${old_compile_flags}"
     )
   
 ENDMACRO(ADD_PRECOMPILED_HEADER)

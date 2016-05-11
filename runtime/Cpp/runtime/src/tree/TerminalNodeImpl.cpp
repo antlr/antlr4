@@ -62,12 +62,12 @@ std::wstring TerminalNodeImpl::getText() {
   return symbol->getText();
 }
 
-std::wstring TerminalNodeImpl::toStringTree(Parser */*parser*/) {
+std::wstring TerminalNodeImpl::toStringTree(Parser * /*parser*/) {
   return toString();
 }
 
 std::wstring TerminalNodeImpl::toString() {
-  if (symbol->getType() == EOF) {
+  if (symbol->getType() == Token::EOF) {
     return L"<EOF>";
   }
   return symbol->getText();
