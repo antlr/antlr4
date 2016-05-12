@@ -40,9 +40,9 @@ ArrayPredictionContext::ArrayPredictionContext(Ref<SingletonPredictionContext> a
   : ArrayPredictionContext({ a->parent }, { a->returnState }) {
 }
 
-ArrayPredictionContext::ArrayPredictionContext(const std::vector<std::weak_ptr<PredictionContext> > &parents,
+ArrayPredictionContext::ArrayPredictionContext(const std::vector<std::weak_ptr<PredictionContext> > &parents_,
                                                const std::vector<int> &returnStates)
-  : PredictionContext(calculateHashCode(parents, returnStates)), parents(parents), returnStates(returnStates) {
+  : PredictionContext(calculateHashCode(parents_, returnStates)), parents(makeRef(parents_)), returnStates(returnStates) {
     assert(parents.size() > 0);
     assert(returnStates.size() > 0);
 }
@@ -74,7 +74,8 @@ bool ArrayPredictionContext::operator == (const PredictionContext &o) const {
     return false; // can't be same if hash is different
   }
 
-  return antlrcpp::Arrays::equals(returnStates, other->returnStates) && antlrcpp::Arrays::equals(parents, other->parents);
+  return antlrcpp::Arrays::equals(returnStates, other->returnStates) &&
+    antlrcpp::Arrays::equals(parents, other->parents);
 }
 
 std::wstring ArrayPredictionContext::toString() {
@@ -93,12 +94,20 @@ std::wstring ArrayPredictionContext::toString() {
       continue;
     }
     ss << returnStates[i];
-    if (!parents[i].expired()) {
-      ss << L" " << parents[i].lock()->toString();
+    if (parents[i] != nullptr) {
+      ss << L" " << parents[i]->toString();
     } else {
       ss << L"null";
     }
   }
   ss << L"]";
   return ss.str();
+}
+
+std::vector<Ref<PredictionContext>> ArrayPredictionContext::makeRef(const std::vector<std::weak_ptr<PredictionContext> > &input) {
+  std::vector<Ref<PredictionContext>> result;
+  for (auto element : input) {
+    result.push_back(element.lock());
+  }
+  return result;
 }

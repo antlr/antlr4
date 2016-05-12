@@ -47,13 +47,15 @@ namespace atn {
     /// Parent can be empty only if full ctx mode and we make an array
     /// from EMPTY and non-empty. We merge EMPTY by using null parent and
     /// returnState == EMPTY_RETURN_STATE.
-    const std::vector<std::weak_ptr<PredictionContext>> parents;
+    // Also here: we use a strong reference to our parents to avoid having them freed prematurely.
+    //            See also SinglePredictionContext.
+    const std::vector<Ref<PredictionContext>> parents;
 
     /// Sorted for merge, no duplicates; if present, EMPTY_RETURN_STATE is always last.
     const std::vector<int> returnStates;
 
     ArrayPredictionContext(Ref<SingletonPredictionContext> a);
-    ArrayPredictionContext(const std::vector<std::weak_ptr<PredictionContext>> &parents,
+    ArrayPredictionContext(const std::vector<std::weak_ptr<PredictionContext>> &parents_,
                            const std::vector<int> &returnStates);
     virtual ~ArrayPredictionContext() {};
 
@@ -64,6 +66,8 @@ namespace atn {
     bool operator == (const PredictionContext &o) const override;
 
     virtual std::wstring toString();
+  private:
+    std::vector<Ref<PredictionContext>> makeRef(const std::vector<std::weak_ptr<PredictionContext> > &input);
   };
 
 } // namespace atn

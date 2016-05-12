@@ -55,8 +55,8 @@ void Lexer::reset() {
   type = Token::INVALID_TYPE;
   channel = Token::DEFAULT_CHANNEL;
   tokenStartCharIndex = -1;
-  tokenStartCharPositionInLine = -1;
-  tokenStartLine = -1;
+  tokenStartCharPositionInLine = 0;
+  tokenStartLine = 0;
   text = L"";
 
   hitEOF = false;

@@ -378,7 +378,7 @@ std::vector<size_t> ATNSerializer::serialize() {
 
   // don't adjust the first value since that's the version number
   for (size_t i = 1; i < data.size(); i++) {
-    if ((wchar_t)data.at(i) < WCHAR_MIN || data.at(i) > WCHAR_MAX) {
+    if ((wchar_t)data.at(i) < 0 || data.at(i) > WCHAR_MAX) {
       throw UnsupportedOperationException("Serialized ATN data element out of range.");
     }
 
@@ -569,7 +569,7 @@ std::wstring ATNSerializer::getTokenName(ssize_t t) {
     return L"EOF";
   }
 
-  if (atn->grammarType == ATNType::LEXER && t >= WCHAR_MIN &&
+  if (atn->grammarType == ATNType::LEXER && t >= 0 &&
       t <= WCHAR_MAX) {
     switch (t) {
       case L'\n':

@@ -298,8 +298,8 @@ Ref<PredictionContext> PredictionContext::mergeArrays(Ref<ArrayPredictionContext
 
   // walk and merge to yield mergedParents, mergedReturnStates
   while (i < a->returnStates.size() && j < b->returnStates.size()) {
-    Ref<PredictionContext> a_parent = a->parents[i].lock();
-    Ref<PredictionContext> b_parent = b->parents[j].lock();
+    Ref<PredictionContext> a_parent = a->parents[i];
+    Ref<PredictionContext> b_parent = b->parents[j];
     if (a->returnStates[i] == b->returnStates[j]) {
       // same payload (stack tops are equal), must yield merged singleton
       int payload = a->returnStates[i];
@@ -377,7 +377,8 @@ Ref<PredictionContext> PredictionContext::mergeArrays(Ref<ArrayPredictionContext
     return b;
   }
 
-  if (combineCommonParents(mergedParents)) // Need to recreate the context as the parents array is copied on creation.
+  // This part differs from Java code. We have to recreate the context as the parents array is copied on creation.
+  if (combineCommonParents(mergedParents))
     M = std::make_shared<ArrayPredictionContext>(mergedParents, mergedReturnStates);
 
   if (mergeCache != nullptr) {
@@ -387,9 +388,9 @@ Ref<PredictionContext> PredictionContext::mergeArrays(Ref<ArrayPredictionContext
 }
 
 bool PredictionContext::combineCommonParents(std::vector<std::weak_ptr<PredictionContext>> &parents) {
-  std::set<Ref<PredictionContext>> uniqueParents;
+  std::unordered_set<Ref<PredictionContext>, PredictionContextHasher, PredictionContextComparer> uniqueParents;
 
-  for (size_t p = 0; p < parents.size(); p++) {
+  for (size_t p = 0; p < parents.size(); ++p) {
     Ref<PredictionContext> parent = parents[p].lock();
     // ml: it's assumed that the == operator of PredictionContext kicks in here.
     if (uniqueParents.find(parent) == uniqueParents.end()) { // don't replace
@@ -400,8 +401,10 @@ bool PredictionContext::combineCommonParents(std::vector<std::weak_ptr<Predictio
   if (uniqueParents.size() == parents.size())
     return false;
 
-  parents.clear();
-  std::copy(uniqueParents.begin(), uniqueParents.end(), parents.begin());
+  // Don't resize the parents array, just update the content.
+  for (size_t p = 0; p < parents.size(); ++p) {
+    parents[p] = *uniqueParents.find(parents[p].lock());
+  }
   return true;
 }
 

@@ -88,7 +88,7 @@ namespace tree {
     /// The default implementation returns the result of
     /// <seealso cref="#defaultResult defaultResult"/>.
     /// </summary>
-    virtual T* visitTerminal(/* TerminalNode *node */) override {
+    virtual T* visitTerminal(TerminalNode * /*node*/) override {
       return defaultResult();
     }
 
@@ -98,7 +98,7 @@ namespace tree {
     /// The default implementation returns the result of
     /// <seealso cref="#defaultResult defaultResult"/>.
     /// </summary>
-    virtual T* visitErrorNode(/* ErrorNode *node */) override {
+    virtual T* visitErrorNode(ErrorNode * /*node*/) override {
       return defaultResult();
     }
 
@@ -135,7 +135,7 @@ namespace tree {
     /// a child node.
     /// </param>
     /// <returns> The updated aggregate result. </returns>
-    virtual T* aggregateResult(/* T* aggregate, */ T* nextResult) {
+    virtual T* aggregateResult(T* /*aggregate*/, T* nextResult) {
       return nextResult;
     }
 
@@ -162,7 +162,7 @@ namespace tree {
     /// <returns> {@code true} to continue visiting children. Otherwise return
     /// {@code false} to stop visiting children and immediately return the
     /// current aggregate result from <seealso cref="#visitChildren"/>. </returns>
-    virtual bool shouldVisitNextChild(/*RuleNode *node, T currentResult*/) {
+    virtual bool shouldVisitNextChild(RuleNode * /*node*/, T /*currentResult*/) {
       return true;
     }
 
