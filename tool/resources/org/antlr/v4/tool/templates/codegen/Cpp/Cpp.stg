@@ -51,9 +51,9 @@ public:
   };
 <endif>
 
-<if (lexer.modes)>
+<if (rest(lexer.modes))>
   enum {
-    <lexer.modes: {m | <m> = <i>,}; separator="\n", anchor>
+    <rest(lexer.modes): {m | <m> = <i>,}; separator="\n", anchor>
   };
 <endif>
 
@@ -149,8 +149,8 @@ void <lexer.name>::action(Ref\<RuleContext> context, int ruleIndex, int actionIn
   switch (ruleIndex) {
     <lexer.actionFuncs.values: {f | case <f.ruleIndex>: <f.name>Action(std::dynamic_pointer_cast\<<f.ctxType>\>(context), actionIndex); break;}; separator="\n">
 
-    default:
-      break;
+  default:
+    break;
   }
 }
 <endif>
@@ -160,8 +160,8 @@ bool <lexer.name>::sempred(Ref\<RuleContext> context, int ruleIndex, int predica
   switch (ruleIndex) {
     <lexer.sempredFuncs.values: {f | case <f.ruleIndex>: return <f.name>Sempred(std::dynamic_pointer_cast\<<f.ctxType>\>(context), predicateIndex);}; separator="\n">
 
-    default:
-      break;
+  default:
+    break;
   }
   return true;
 }
@@ -231,7 +231,7 @@ void <r.factory.grammar.name>::<r.name>Action(Ref\<<r.ctxType>\> context, int ac
   
   default:
     break;
-    }
+  }
 }
 
 >>
@@ -245,10 +245,10 @@ bool <r.factory.grammar.name>::<r.name>Sempred(Ref\<<r.ctxType>\> /*context*/, i
   switch (predicateIndex) {
     <actions: {index | case <index>: return <actions.(index)>;}; separator="\n">
     
-    default:
-      break;
-    }
-    return true;
+  default:
+    break;
+  }
+  return true;
 }
 
 >>
@@ -345,8 +345,8 @@ bool <parser.name>::sempred(Ref\<RuleContext> context, int ruleIndex, int predic
   <parser.sempredFuncs.values: {f |
   case <f.ruleIndex>: return <f.name>Sempred(std::dynamic_pointer_cast\<<f.ctxType>\>(context), predicateIndex);}; separator="\n">
   
-    default:
-      break;
+  default:
+    break;
   }
   return true;
 }
@@ -362,7 +362,7 @@ atn::ATN <parser.name>::_atn;
 std::wstring <parser.name>::_serializedATN;
 
 std::vector\<std::wstring> <parser.name>::_ruleNames = {
-    <parser.ruleNames: {r | L"<r>"}; separator = ", ", wrap, anchor>
+  <parser.ruleNames: {r | L"<r>"}; separator = ", ", wrap, anchor>
 };
 
 std::vector\<std::wstring> <parser.name>::_literalNames = {
@@ -529,8 +529,10 @@ public:
 
   <dispatchMethods; separator = "\n">
 <! TODO: untested !> <extensionMembers; separator = "\n">
+<if (attrs)>
 private:
-  <if (attrs)><attrs: {a | <if (a.isLocal)><a><endif>}; separator = "\n"><endif>
+  <attrs: {a | <if (a.isLocal)><a><endif>}; separator = "\n">
+<endif>
 };
 
 >>
@@ -721,9 +723,9 @@ _errHandler->sync(this);
 alt = getInterpreter\<atn::ParserATNSimulator>()->adaptivePredict(_input, <choice.decision>, _ctx);
 do {
   switch (alt) {
-  <alts: {alt | case <i><if (!choice.ast.greedy)> + 1<endif>:
-  <alt>
-  break;
+    <alts: {alt | case <i><if (!choice.ast.greedy)> + 1<endif>:
+    <alt>
+    break;
 }; separator="\n">
   default:
     <error>
@@ -794,10 +796,10 @@ MatchNotSet(m, expr, capture) ::= "<CommonSetStuff(m, expr, capture, true)>"
 
 CommonSetStuff(m, expr, capture, invert) ::= <<
 setState(<m.stateNumber>);
-<if(m.labels)><m.labels: {l | <labelref(l)> = }>_input->LT(1);<endif>
+<if (m.labels)><m.labels: {l | <labelref(l)> = }>_input->LT(1);<endif>
 <capture>
-if (<if(invert)><m.varName> \<= 0 || <else>!<endif>(<expr>)) {
-    <if(m.labels)><m.labels:{l | <labelref(l)> = (Token)}><endif>_errHandler->recoverInline(this);
+if (<if (invert)><m.varName> \<= 0 || <else>!<endif>(<expr>)) {
+    <if (m.labels)><m.labels:{l | <labelref(l)> = }><endif>_errHandler->recoverInline(this);
 }
 consume();
 >>
@@ -842,34 +844,60 @@ LexerChannelCommand(arg, grammar)   ::= "channel = <arg>;"
 LexerModeCommand(arg, grammar)      ::= "mode = <grammar.name>Mode::<arg>;"
 LexerPushModeCommand(arg, grammar)  ::= "pushMode(<grammar.name>Mode::<arg>);"
 
-// TODO: untested
 ActionTextHeader(t) ::= "<t.text>"
 ActionText(t) ::= "<t.text>"
 
-ActionTemplateHeader(t) ::= "<! Unused but must be present. !>"
+ActionTemplateHeader(t) ::= "<! Required but unused. !>"
 ActionTemplate(t) ::= "<t.st>"
 
-ArgRef(a) ::= "ArgRef(a) _localctx.<a.name>"
-LocalRef(a) ::= "LocalRef(a) _localctx.<a.name>"
-RetValueRef(a) ::= "RetValueRef(a) _localctx.<a.name>"
-QRetValueRef(a) ::= "QRetValueRef(a) <ctx(a)>.<a.dict>.<a.name>"
+ArgRefHeader(t) ::= "<! Required but unused. !>"
+ArgRef(a) ::= "_localctx-><a.name>"
+
+LocalRefHeader(t) ::= "<! Required but unused. !>"
+LocalRef(a) ::= "_localctx-><a.name>"
+
+RetValueRefHeader(t) ::= "<! Required but unused. !>"
+RetValueRef(a) ::= "_localctx-><a.name>"
+
+QRetValueRefHeader(t) ::= "<! Required but unused. !>"
+QRetValueRef(a) ::= "<ctx(a)>-><a.dict>.<a.name>"
 /** How to translate $tokenLabel */
-TokenRef(t) ::= "TokenRef(t) <ctx(t)>.<t.name>"
-LabelRef(t) ::= "LabelRef(t) <ctx(t)>.<t.name>"
-ListLabelRef(t) ::= "ListLabelRef(t) <ctx(t)>.<ListLabelName(t.name)>"
-SetAttr(s,rhsChunks) ::= "SetAttr(s,rhsChunks) <ctx(s)>.<s.name> = <rhsChunks>;"
+
+TokenRefHeader(t) ::= "<! Required but unused. !>"
+TokenRef(t) ::= "<ctx(t)>-><t.name>"
+
+LabelRefHeader(t) ::= "<! Required but unused. !>"
+LabelRef(t) ::= "<ctx(t)>-><t.name>"
+
+ListLabelRefHeader(t) ::= "<! Required but unused. !>"
+ListLabelRef(t) ::= "<ctx(t)>-><ListLabelName(t.name)>"
+
+SetAttrHeader(t) ::= "<! Required but unused. !>"
+SetAttr(s,rhsChunks) ::= "<ctx(s)>-><s.name> = <rhsChunks>;"
 
 InputSymbolType() ::= "<file.InputSymbolType; null = {Token}> *"
 
 TokenPropertyRef_textHeader(t) ::= "<! Required but unused. !>"
-TokenPropertyRef_text(t) ::= "(<ctx(t)>-><t.label> != nullptr ? <ctx(t)>-><t.label>->getText() : nullptr)"
+TokenPropertyRef_text(t) ::= <<(<ctx(t)>-><t.label> != nullptr ? <ctx(t)>-><t.label>->getText() : L"")>>
 
-TokenPropertyRef_type(t) ::= "TokenPropertyRef_type(t) (<ctx(t)>.<t.label> != nullptr ? <ctx(t)>.<t.label>.getType() : 0)"
-TokenPropertyRef_line(t) ::= "TokenPropertyRef_line(t) (<ctx(t)>.<t.label> != nullptr ? <ctx(t)>.<t.label>.getLine() : 0)"
-TokenPropertyRef_pos(t) ::= "TokenPropertyRef_pos(t) (<ctx(t)>.<t.label> != nullptr ? <ctx(t)>.<t.label>.getCharPositionInLine() : 0)"
-TokenPropertyRef_channel(t) ::= "TokenPropertyRef_channel(t) (<ctx(t)>.<t.label> != nullptr ? <ctx(t)>.<t.label>.getChannel() : 0)"
-TokenPropertyRef_index(t) ::= "TokenPropertyRef_index(t) (<ctx(t)>.<t.label> != nullptr ? <ctx(t)>.<t.label>.getTokenIndex() : 0)"
-TokenPropertyRef_int(t) ::= "TokenPropertyRef_int(t) (<ctx(t)>.<t.label> != nullptr ? Integer.valueOf(<ctx(t)>.<t.label>.getText()) : 0)"
+TokenPropertyRef_typeHeader(t) ::= "<! Required but unused. !>"
+TokenPropertyRef_type(t) ::= "(<ctx(t)>-><t.label> != nullptr ? <ctx(t)>-><t.label>->getType() : 0)"
+
+TokenPropertyRef_lineHeader(t) ::= "<! Required but unused. !>"
+TokenPropertyRef_line(t) ::= "(<ctx(t)>-><t.label> != nullptr ? <ctx(t)>-><t.label>->getLine() : 0)"
+
+TokenPropertyRef_posHeader(t) ::= "<! Required but unused. !>"
+TokenPropertyRef_pos(t) ::= "(<ctx(t)>-><t.label> != nullptr ? <ctx(t)>-><t.label>->getCharPositionInLine() : 0)"
+
+TokenPropertyRef_channelHeader(t) ::= "<! Required but unused. !>"
+TokenPropertyRef_channel(t) ::= "(<ctx(t)>-><t.label> != nullptr ? <ctx(t)>-><t.label>->getChannel() : 0)"
+
+TokenPropertyRef_indexHeader(t) ::= "<! Required but unused. !>"
+TokenPropertyRef_index(t) ::= "(<ctx(t)>-><t.label> != nullptr ? <ctx(t)>-><t.label>->getTokenIndex() : 0)"
+
+TokenPropertyRef_intHeader(t) ::= "<! Required but unused. !>"
+TokenPropertyRef_int(t) ::= "(<ctx(t)>-><t.label> != nullptr ? std::stol(<ctx(t)>-><t.label>->getText()) : 0)"
+
 
 RulePropertyRef_start(r) ::= "RulePropertyRef_start(r) (<ctx(r)>.<r.label> != nullptr ? (<ctx(r)>.<r.label>.start) : null)"
 RulePropertyRef_stop(r)  ::= "RulePropertyRef_stop(r)   (<ctx(r)>.<r.label> != nullptr ? (<ctx(r)>.<r.label>.stop) : null)"

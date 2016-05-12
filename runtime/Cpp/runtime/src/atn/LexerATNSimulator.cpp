@@ -329,7 +329,7 @@ void LexerATNSimulator::accept(CharStream *input, Ref<LexerActionExecutor> lexer
 }
 
 atn::ATNState *LexerATNSimulator::getReachableTarget(Transition *trans, ssize_t t) {
-  if (trans->matches((int)t, WCHAR_MIN, WCHAR_MAX)) {
+  if (trans->matches((int)t, 0, 65535)) {
     return trans->target;
   }
 
