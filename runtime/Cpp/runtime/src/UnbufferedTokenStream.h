@@ -50,10 +50,10 @@ namespace runtime {
 
     virtual TokenSource* getTokenSource() const override;
 
-    virtual std::wstring getText(const misc::Interval &interval) override;
-    virtual std::wstring getText() override;
-    virtual std::wstring getText(RuleContext *ctx) override;
-    virtual std::wstring getText(Ref<Token> start, Ref<Token> stop) override;
+    virtual std::string getText(const misc::Interval &interval) override;
+    virtual std::string getText() override;
+    virtual std::string getText(RuleContext *ctx) override;
+    virtual std::string getText(Ref<Token> start, Ref<Token> stop) override;
 
     virtual void consume() override;
 

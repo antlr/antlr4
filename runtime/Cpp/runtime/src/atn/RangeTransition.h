@@ -41,17 +41,17 @@ namespace atn {
 
   class ANTLR4CPP_PUBLIC RangeTransition final : public Transition {
   public:
-    const int from;
-    const int to;
+    const size_t from;
+    const size_t to;
 
-    RangeTransition(ATNState *target, int from, int to);
+    RangeTransition(ATNState *target, size_t from, size_t to);
 
     virtual int getSerializationType() const override;
 
     virtual misc::IntervalSet label() const override;
-    virtual bool matches(int symbol, int minVocabSymbol, int maxVocabSymbol) const override;
+    virtual bool matches(size_t symbol, size_t minVocabSymbol, size_t maxVocabSymbol) const override;
 
-    virtual std::wstring toString() const override;
+    virtual std::string toString() const override;
   };
 
 } // namespace atn

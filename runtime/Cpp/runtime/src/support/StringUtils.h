@@ -31,12 +31,8 @@
 #pragma once
 
 namespace antlrcpp {
-  void replaceAll(std::wstring& str, const std::wstring& from, const std::wstring& to);
-
-  std::string ws2s(const std::wstring& wstr);
-
-  std::wstring s2ws(const std::string & str);
-
-  std::wstring wchar2wstring(const wchar_t & str);
-
+  // For all conversions utf8 <-> utf32.
+  static std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> utfConverter;
+  
+  void replaceAll(std::string& str, const std::string& from, const std::string& to);
 }

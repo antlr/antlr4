@@ -53,8 +53,8 @@ namespace runtime {
 
     static const size_t DEFAULT_TOKEN_CHANNEL = Token::DEFAULT_CHANNEL;
     static const int HIDDEN = Token::HIDDEN_CHANNEL;
-    static const wchar_t MIN_CHAR_VALUE = L'\0';
-    static const wchar_t MAX_CHAR_VALUE = L'\uFFFE';
+    static const size_t MIN_CHAR_VALUE = 0;
+    static const size_t MAX_CHAR_VALUE = 0x1FFFE;
 
     CharStream *_input; // Pure reference, usually from statically allocated instance.
   protected:
@@ -107,7 +107,7 @@ namespace runtime {
 
     /// You can set the text for the current token to override what is in
     /// the input char buffer. Use setText() or can set this instance var.
-    std::wstring text;
+    std::string text;
 
     Lexer(CharStream *input);
 
@@ -177,13 +177,13 @@ namespace runtime {
     /// Return the text matched so far for the current token or any
     ///  text override.
     /// </summary>
-    virtual std::wstring getText();
+    virtual std::string getText();
 
     /// <summary>
     /// Set the complete text of this token; it wipes any previous
     ///  changes to the text.
     /// </summary>
-    virtual void setText(const std::wstring &text);
+    virtual void setText(const std::string &text);
 
     /// <summary>
     /// Override if emitting multiple tokens. </summary>
@@ -199,7 +199,7 @@ namespace runtime {
 
     virtual int getChannel();
 
-    virtual const std::vector<std::wstring>& getModeNames() const = 0;
+    virtual const std::vector<std::string>& getModeNames() const = 0;
 
     /// Return a list of all Token objects in input char stream.
     /// Forces load of all tokens. Does not include EOF token.
@@ -209,11 +209,11 @@ namespace runtime {
 
     virtual void notifyListeners(const LexerNoViableAltException &e);
 
-    virtual std::wstring getErrorDisplay(const std::wstring &s);
+    virtual std::string getErrorDisplay(const std::string &s);
 
-    virtual std::wstring getErrorDisplay(int c);
+    virtual std::string getErrorDisplay(int c);
 
-    virtual std::wstring getCharErrorDisplay(int c);
+    virtual std::string getCharErrorDisplay(int c);
 
     /// <summary>
     /// Lexers can normally match any char in it's vocabulary after matching

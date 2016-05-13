@@ -53,7 +53,7 @@ namespace pattern {
     /// <param name="patternRuleIndex"> The parser rule which serves as the root of the
     /// tree pattern. </param>
     /// <param name="patternTree"> The tree pattern in <seealso cref="ParseTree"/> form. </param>
-    ParseTreePattern(ParseTreePatternMatcher *matcher, const std::wstring &pattern, int patternRuleIndex,
+    ParseTreePattern(ParseTreePatternMatcher *matcher, const std::string &pattern, int patternRuleIndex,
                      Ref<ParseTree> patternTree);
     virtual ~ParseTreePattern() {};
 
@@ -85,7 +85,7 @@ namespace pattern {
 
     // A full blown XPath implementation just for this single function which is nowhere used?
     // Readd the XPath stuff from ANTLR if you really need that.
-    //virtual std::vector<ParseTreeMatch*> findAll(ParseTree *tree, const std::wstring &xpath);
+    //virtual std::vector<ParseTreeMatch*> findAll(ParseTree *tree, const std::string &xpath);
 
     /// <summary>
     /// Get the <seealso cref="ParseTreePatternMatcher"/> which created this tree pattern.
@@ -98,7 +98,7 @@ namespace pattern {
     /// Get the tree pattern in concrete syntax form.
     /// </summary>
     /// <returns> The tree pattern in concrete syntax form. </returns>
-    virtual std::wstring getPattern() const;
+    virtual std::string getPattern() const;
 
     /// <summary>
     /// Get the parser rule which serves as the outermost rule for the tree
@@ -122,7 +122,7 @@ namespace pattern {
     /// <summary>
     /// This is the backing field for <seealso cref="#getPattern()"/>.
     /// </summary>
-    const std::wstring pattern;
+    const std::string pattern;
 
     /// This is the backing field for <seealso cref="#getPatternTree()"/>.
     Ref<ParseTree> patternTree;

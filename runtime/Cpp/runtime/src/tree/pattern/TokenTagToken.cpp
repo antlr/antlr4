@@ -33,30 +33,30 @@
 
 using namespace org::antlr::v4::runtime::tree::pattern;
 
-TokenTagToken::TokenTagToken(const std::wstring &/*tokenName*/, int type)
-  : CommonToken(type), tokenName(L""), label(L"") {
+TokenTagToken::TokenTagToken(const std::string &/*tokenName*/, int type)
+  : CommonToken(type), tokenName(""), label("") {
 }
 
-TokenTagToken::TokenTagToken(const std::wstring &tokenName, int type, const std::wstring &label)
+TokenTagToken::TokenTagToken(const std::string &tokenName, int type, const std::string &label)
   : CommonToken(type), tokenName(tokenName), label(label) {
 }
 
-std::wstring TokenTagToken::getTokenName() {
+std::string TokenTagToken::getTokenName() {
   return tokenName;
 }
 
-std::wstring TokenTagToken::getLabel() {
+std::string TokenTagToken::getLabel() {
   return label;
 }
 
-std::wstring TokenTagToken::getText() {
-  if (label != L"") {
-    return std::wstring(L"<") + label + std::wstring(L":") + tokenName + std::wstring(L">");
+std::string TokenTagToken::getText() {
+  if (label != "") {
+    return std::string("<") + label + std::string(":") + tokenName + std::string(">");
   }
 
-  return std::wstring(L"<") + tokenName + std::wstring(L">");
+  return std::string("<") + tokenName + std::string(">");
 }
 
-std::wstring TokenTagToken::toString() {
-  return tokenName + std::wstring(L":") + std::to_wstring(_type);
+std::string TokenTagToken::toString() {
+  return tokenName + std::string(":") + std::to_string(_type);
 }

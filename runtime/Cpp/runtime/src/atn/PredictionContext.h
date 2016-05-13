@@ -239,7 +239,7 @@ namespace atn {
     static bool combineCommonParents(std::vector<std::weak_ptr<PredictionContext>> &parents);
 
   public:
-    static std::wstring toDOTString(Ref<PredictionContext> context);
+    static std::string toDOTString(Ref<PredictionContext> context);
 
     static Ref<PredictionContext> getCachedContext(Ref<PredictionContext> context,
       Ref<PredictionContextCache> contextCache,
@@ -250,11 +250,11 @@ namespace atn {
     static void getAllContextNodes_(Ref<PredictionContext> context,
       std::vector<Ref<PredictionContext>> &nodes, std::map<Ref<PredictionContext>, Ref<PredictionContext>> &visited);
 
-    virtual std::wstring toString() const;
-    virtual std::wstring toString(Recognizer *recog) const;
+    virtual std::string toString() const;
+    virtual std::string toString(Recognizer *recog) const;
 
-    std::vector<std::wstring> toStrings(Recognizer *recognizer, int currentState);
-    std::vector<std::wstring> toStrings(Recognizer *recognizer, Ref<PredictionContext> stop, int currentState);
+    std::vector<std::string> toStrings(Recognizer *recognizer, int currentState);
+    std::vector<std::string> toStrings(Recognizer *recognizer, Ref<PredictionContext> stop, int currentState);
   };
 
 } // namespace atn

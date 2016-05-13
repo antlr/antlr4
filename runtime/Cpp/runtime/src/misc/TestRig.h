@@ -51,27 +51,27 @@ namespace misc {
   /// </summary>
   class ANTLR4CPP_PUBLIC TestRig {
   public:
-    static const std::wstring LEXER_START_RULE_NAME;
+    static const std::string LEXER_START_RULE_NAME;
 
     virtual ~TestRig() {};
 
   protected:
-    std::wstring grammarName;
-    std::wstring startRuleName;
-    const std::vector<std::wstring> inputFiles;
+    std::string grammarName;
+    std::string startRuleName;
+    const std::vector<std::string> inputFiles;
     bool printTree;
     bool gui;
-    std::wstring psFile;
+    std::string psFile;
     bool showTokens;
     bool trace;
     bool diagnostics;
-    std::wstring encoding;
+    std::string encoding;
     bool SLL;
 
   public:
-    TestRig(std::wstring args[]);
+    TestRig(std::string args[]);
 
-    static void main(std::wstring args[]);
+    static void main(std::string args[]);
 
     virtual void process();
 

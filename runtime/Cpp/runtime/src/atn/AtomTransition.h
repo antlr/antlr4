@@ -39,22 +39,20 @@ namespace v4 {
 namespace runtime {
 namespace atn {
 
-  /// <summary>
-  /// TO_DO: make all transitions sets? no, should remove set edges </summary>
+  /// TO_DO: make all transitions sets? no, should remove set edges.
   class ANTLR4CPP_PUBLIC AtomTransition final : public Transition {
-    /// <summary>
-    /// The token type or character value; or, signifies special label. </summary>
   public:
-    const int _label;
+    /// The token type or character value; or, signifies special label.
+    const size_t _label;
 
-    AtomTransition(ATNState *target, int label);
+    AtomTransition(ATNState *target, size_t label);
 
     virtual int getSerializationType() const override;
 
     virtual misc::IntervalSet label() const override;
-    virtual bool matches(int symbol, int minVocabSymbol, int maxVocabSymbol) const override;
+    virtual bool matches(size_t symbol, size_t minVocabSymbol, size_t maxVocabSymbol) const override;
 
-    virtual std::wstring toString() const override;
+    virtual std::string toString() const override;
   };
 
 } // namespace atn

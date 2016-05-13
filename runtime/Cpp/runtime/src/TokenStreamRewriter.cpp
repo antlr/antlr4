@@ -33,7 +33,6 @@
 #include "Interval.h"
 #include "Token.h"
 #include "TokenStream.h"
-#include "Strings.h"
 #include "CPPUtils.h"
 
 #include "TokenStreamRewriter.h"
@@ -49,22 +48,22 @@ TokenStreamRewriter::RewriteOperation::RewriteOperation(TokenStreamRewriter *out
   this->index = index;
 }
 
-TokenStreamRewriter::RewriteOperation::RewriteOperation(TokenStreamRewriter *outerInstance, size_t index, const std::wstring& text) : outerInstance(outerInstance) {
+TokenStreamRewriter::RewriteOperation::RewriteOperation(TokenStreamRewriter *outerInstance, size_t index, const std::string& text) : outerInstance(outerInstance) {
 
   InitializeInstanceFields();
   this->index = index;
   this->text = text;
 }
 
-size_t TokenStreamRewriter::RewriteOperation::execute(std::wstring * /*buf*/) {
+size_t TokenStreamRewriter::RewriteOperation::execute(std::string * /*buf*/) {
   return index;
 }
 
-std::wstring TokenStreamRewriter::RewriteOperation::toString() {
-  std::wstring opName = L"TokenStreamRewriter";
-  size_t index = opName.find(L'$');
+std::string TokenStreamRewriter::RewriteOperation::toString() {
+  std::string opName = "TokenStreamRewriter";
+  size_t index = opName.find('$');
   opName = opName.substr(index + 1, opName.length() - (index + 1));
-  return L"<" + opName + L"@" + outerInstance->tokens->get(index)->getText() + L":\"" + text + L"\">";
+  return "<" + opName + "@" + outerInstance->tokens->get(index)->getText() + ":\"" + text + "\">";
 }
 
 void TokenStreamRewriter::RewriteOperation::InitializeInstanceFields() {
@@ -72,11 +71,11 @@ void TokenStreamRewriter::RewriteOperation::InitializeInstanceFields() {
   index = 0;
 }
 
-TokenStreamRewriter::InsertBeforeOp::InsertBeforeOp(TokenStreamRewriter *outerInstance, size_t index, const std::wstring& text)
+TokenStreamRewriter::InsertBeforeOp::InsertBeforeOp(TokenStreamRewriter *outerInstance, size_t index, const std::string& text)
 : RewriteOperation(outerInstance, index, text), outerInstance(outerInstance) {
 }
 
-size_t TokenStreamRewriter::InsertBeforeOp::execute(std::wstring *buf) {
+size_t TokenStreamRewriter::InsertBeforeOp::execute(std::string *buf) {
   buf->append(text);
   if (outerInstance->tokens->get(index)->getType() != Token::EOF) {
     buf->append(outerInstance->tokens->get(index)->getText());
@@ -84,22 +83,22 @@ size_t TokenStreamRewriter::InsertBeforeOp::execute(std::wstring *buf) {
   return index + 1;
 }
 
-TokenStreamRewriter::ReplaceOp::ReplaceOp(TokenStreamRewriter *outerInstance, size_t from, size_t to, const std::wstring& text) : RewriteOperation(outerInstance, from, text), outerInstance(outerInstance) {
+TokenStreamRewriter::ReplaceOp::ReplaceOp(TokenStreamRewriter *outerInstance, size_t from, size_t to, const std::string& text) : RewriteOperation(outerInstance, from, text), outerInstance(outerInstance) {
 
   InitializeInstanceFields();
   lastIndex = to;
 }
 
-size_t TokenStreamRewriter::ReplaceOp::execute(std::wstring *buf) {
+size_t TokenStreamRewriter::ReplaceOp::execute(std::string *buf) {
   buf->append(text);
   return lastIndex + 1;
 }
 
-std::wstring TokenStreamRewriter::ReplaceOp::toString() {
+std::string TokenStreamRewriter::ReplaceOp::toString() {
   if (text.empty()) {
-    return L"<DeleteOp@" + outerInstance->tokens->get(index)->getText() + L".." + outerInstance->tokens->get(lastIndex)->getText() + L">";
+    return "<DeleteOp@" + outerInstance->tokens->get(index)->getText() + ".." + outerInstance->tokens->get(lastIndex)->getText() + ">";
   }
-  return L"<ReplaceOp@" + outerInstance->tokens->get(index)->getText() + L".." + outerInstance->tokens->get(lastIndex)->getText() + L":\"" + text + L"\">";
+  return "<ReplaceOp@" + outerInstance->tokens->get(index)->getText() + ".." + outerInstance->tokens->get(lastIndex)->getText() + ":\"" + text + "\">";
 }
 
 void TokenStreamRewriter::ReplaceOp::InitializeInstanceFields() {
@@ -108,7 +107,7 @@ void TokenStreamRewriter::ReplaceOp::InitializeInstanceFields() {
 
 //------------------ TokenStreamRewriter -------------------------------------------------------------------------------
 
-const std::wstring TokenStreamRewriter::DEFAULT_PROGRAM_NAME = L"default";
+const std::string TokenStreamRewriter::DEFAULT_PROGRAM_NAME = "default";
 
 TokenStreamRewriter::TokenStreamRewriter(TokenStream *tokens) : tokens(tokens) {
   _programs.insert({ DEFAULT_PROGRAM_NAME, std::vector<RewriteOperation*>(PROGRAM_INIT_SIZE) });
@@ -130,7 +129,7 @@ void TokenStreamRewriter::rollback(int instructionIndex) {
   rollback(DEFAULT_PROGRAM_NAME, instructionIndex);
 }
 
-void TokenStreamRewriter::rollback(const std::wstring &programName, int instructionIndex) {
+void TokenStreamRewriter::rollback(const std::string &programName, int instructionIndex) {
   std::vector<RewriteOperation*> is = _programs[programName];
   if (is.size() > 0) {
     _programs.insert({ programName, std::vector<RewriteOperation*>(is.begin() + MIN_TOKEN_INDEX, is.begin() + instructionIndex) });
@@ -141,63 +140,63 @@ void TokenStreamRewriter::deleteProgram() {
   deleteProgram(DEFAULT_PROGRAM_NAME);
 }
 
-void TokenStreamRewriter::deleteProgram(const std::wstring &programName) {
+void TokenStreamRewriter::deleteProgram(const std::string &programName) {
   rollback(programName, MIN_TOKEN_INDEX);
 }
 
-void TokenStreamRewriter::insertAfter(Token *t, const std::wstring& text) {
+void TokenStreamRewriter::insertAfter(Token *t, const std::string& text) {
   insertAfter(DEFAULT_PROGRAM_NAME, t, text);
 }
 
-void TokenStreamRewriter::insertAfter(size_t index, const std::wstring& text) {
+void TokenStreamRewriter::insertAfter(size_t index, const std::string& text) {
   insertAfter(DEFAULT_PROGRAM_NAME, index, text);
 }
 
-void TokenStreamRewriter::insertAfter(const std::wstring &programName, Token *t, const std::wstring& text) {
+void TokenStreamRewriter::insertAfter(const std::string &programName, Token *t, const std::string& text) {
   insertAfter(programName, (size_t)t->getTokenIndex(), text);
 }
 
-void TokenStreamRewriter::insertAfter(const std::wstring &programName, size_t index, const std::wstring& text) {
+void TokenStreamRewriter::insertAfter(const std::string &programName, size_t index, const std::string& text) {
   // to insert after, just insert before next index (even if past end)
   insertBefore(programName, index + 1, text);
 }
 
-void TokenStreamRewriter::insertBefore(Token *t, const std::wstring& text) {
+void TokenStreamRewriter::insertBefore(Token *t, const std::string& text) {
   insertBefore(DEFAULT_PROGRAM_NAME, t, text);
 }
 
-void TokenStreamRewriter::insertBefore(size_t index, const std::wstring& text) {
+void TokenStreamRewriter::insertBefore(size_t index, const std::string& text) {
   insertBefore(DEFAULT_PROGRAM_NAME, index, text);
 }
 
-void TokenStreamRewriter::insertBefore(const std::wstring &programName, Token *t, const std::wstring& text) {
+void TokenStreamRewriter::insertBefore(const std::string &programName, Token *t, const std::string& text) {
   insertBefore(programName, (size_t)t->getTokenIndex(), text);
 }
 
-void TokenStreamRewriter::insertBefore(const std::wstring &programName, size_t index, const std::wstring& text) {
+void TokenStreamRewriter::insertBefore(const std::string &programName, size_t index, const std::string& text) {
   RewriteOperation *op = new InsertBeforeOp(this, index, text); /* mem-check: deleted in d-tor */
   std::vector<RewriteOperation*> &rewrites = getProgram(programName);
   op->instructionIndex = (int)rewrites.size();
   rewrites.push_back(op);
 }
 
-void TokenStreamRewriter::replace(size_t index, const std::wstring& text) {
+void TokenStreamRewriter::replace(size_t index, const std::string& text) {
   replace(DEFAULT_PROGRAM_NAME, index, index, text);
 }
 
-void TokenStreamRewriter::replace(size_t from, size_t to, const std::wstring& text) {
+void TokenStreamRewriter::replace(size_t from, size_t to, const std::string& text) {
   replace(DEFAULT_PROGRAM_NAME, from, to, text);
 }
 
-void TokenStreamRewriter::replace(Token *indexT, const std::wstring& text) {
+void TokenStreamRewriter::replace(Token *indexT, const std::string& text) {
   replace(DEFAULT_PROGRAM_NAME, indexT, indexT, text);
 }
 
-void TokenStreamRewriter::replace(Token *from, Token *to, const std::wstring& text) {
+void TokenStreamRewriter::replace(Token *from, Token *to, const std::string& text) {
   replace(DEFAULT_PROGRAM_NAME, from, to, text);
 }
 
-void TokenStreamRewriter::replace(const std::wstring &programName, size_t from, size_t to, const std::wstring& text) {
+void TokenStreamRewriter::replace(const std::string &programName, size_t from, size_t to, const std::string& text) {
   if (from > to || to >= tokens->size()) {
     throw IllegalArgumentException("replace: range invalid: " + std::to_string(from) + ".." + std::to_string(to) +
                                    "(size = " + std::to_string(tokens->size()) + ")");
@@ -208,7 +207,7 @@ void TokenStreamRewriter::replace(const std::wstring &programName, size_t from, 
   rewrites.push_back(op);
 }
 
-void TokenStreamRewriter::replace(const std::wstring &programName, Token *from, Token *to, const std::wstring& text) {
+void TokenStreamRewriter::replace(const std::string &programName, Token *from, Token *to, const std::string& text) {
   replace(programName, (size_t)from->getTokenIndex(), (size_t)to->getTokenIndex(), text);
 }
 
@@ -228,11 +227,11 @@ void TokenStreamRewriter::Delete(Token *from, Token *to) {
   Delete(DEFAULT_PROGRAM_NAME, from, to);
 }
 
-void TokenStreamRewriter::Delete(const std::wstring &programName, size_t from, size_t to) {
+void TokenStreamRewriter::Delete(const std::string &programName, size_t from, size_t to) {
   replace(programName, from, to, nullptr);
 }
 
-void TokenStreamRewriter::Delete(const std::wstring &programName, Token *from, Token *to) {
+void TokenStreamRewriter::Delete(const std::string &programName, Token *from, Token *to) {
   replace(programName, from, to, nullptr);
 }
 
@@ -240,18 +239,18 @@ int TokenStreamRewriter::getLastRewriteTokenIndex() {
   return getLastRewriteTokenIndex(DEFAULT_PROGRAM_NAME);
 }
 
-int TokenStreamRewriter::getLastRewriteTokenIndex(const std::wstring &programName) {
+int TokenStreamRewriter::getLastRewriteTokenIndex(const std::string &programName) {
   if (_lastRewriteTokenIndexes.find(programName) == _lastRewriteTokenIndexes.end()) {
     return -1;
   }
   return _lastRewriteTokenIndexes[programName];
 }
 
-void TokenStreamRewriter::setLastRewriteTokenIndex(const std::wstring &programName, int i) {
+void TokenStreamRewriter::setLastRewriteTokenIndex(const std::string &programName, int i) {
   _lastRewriteTokenIndexes.insert({ programName, i });
 }
 
-std::vector<TokenStreamRewriter::RewriteOperation*>& TokenStreamRewriter::getProgram(const std::wstring &name) {
+std::vector<TokenStreamRewriter::RewriteOperation*>& TokenStreamRewriter::getProgram(const std::string &name) {
   std::vector<TokenStreamRewriter::RewriteOperation*> &is = _programs[name];
   if (is.empty()) {
     is = initializeProgram(name);
@@ -259,25 +258,25 @@ std::vector<TokenStreamRewriter::RewriteOperation*>& TokenStreamRewriter::getPro
   return is;
 }
 
-std::vector<TokenStreamRewriter::RewriteOperation*> TokenStreamRewriter::initializeProgram(const std::wstring &name) {
+std::vector<TokenStreamRewriter::RewriteOperation*> TokenStreamRewriter::initializeProgram(const std::string &name) {
   std::vector<TokenStreamRewriter::RewriteOperation*> is(PROGRAM_INIT_SIZE);
   _programs.insert({ name, is });
   return is;
 }
 
-std::wstring TokenStreamRewriter::getText() {
+std::string TokenStreamRewriter::getText() {
   return getText(DEFAULT_PROGRAM_NAME, Interval(0, (int)tokens->size() - 1));
 }
 
-std::wstring TokenStreamRewriter::getText(std::wstring programName) {
+std::string TokenStreamRewriter::getText(std::string programName) {
   return getText(programName, Interval(0, (int)tokens->size() - 1));
 }
 
-std::wstring TokenStreamRewriter::getText(const Interval &interval) {
+std::string TokenStreamRewriter::getText(const Interval &interval) {
   return getText(DEFAULT_PROGRAM_NAME, interval);
 }
 
-std::wstring TokenStreamRewriter::getText(const std::wstring &programName, const Interval &interval) {
+std::string TokenStreamRewriter::getText(const std::string &programName, const Interval &interval) {
   std::vector<TokenStreamRewriter::RewriteOperation*> rewrites = _programs[programName];
   int start = interval.a;
   int stop = interval.b;
@@ -293,7 +292,7 @@ std::wstring TokenStreamRewriter::getText(const std::wstring &programName, const
   if (rewrites.empty() || rewrites.empty()) {
     return tokens->getText(interval); // no instructions to execute
   }
-  std::wstring buf;
+  std::string buf;
 
   // First, optimize instruction stream
   std::unordered_map<size_t, TokenStreamRewriter::RewriteOperation*> indexToOp = reduceToSingleOperationPerIndex(rewrites);
@@ -352,7 +351,7 @@ std::unordered_map<size_t, TokenStreamRewriter::RewriteOperation*> TokenStreamRe
         // E.g., insert before 2, delete 2..2; update replace
         // text to include insert before, kill insert
         rewrites[(size_t)iop->instructionIndex] = nullptr;
-        rop->text = iop->text + (!rop->text.empty() ? rop->text : L"");
+        rop->text = iop->text + (!rop->text.empty() ? rop->text : "");
       }
       else if (iop->index > rop->index && iop->index <= rop->lastIndex) {
         // delete insert as it's a no-op.
@@ -378,11 +377,11 @@ std::unordered_map<size_t, TokenStreamRewriter::RewriteOperation*> TokenStreamRe
         rewrites[(size_t)prevRop->instructionIndex] = nullptr; // kill first delete
         rop->index = std::min(prevRop->index, rop->index);
         rop->lastIndex = std::max(prevRop->lastIndex, rop->lastIndex);
-        std::wcout << L"new rop " << rop << std::endl;
+        std::cout << "new rop " << rop << std::endl;
       }
       else if (!disjoint && !same) {
-        throw IllegalArgumentException("replace op boundaries of " + antlrcpp::ws2s(rop->toString()) +
-                                       " overlap with previous " + antlrcpp::ws2s(prevRop->toString()));
+        throw IllegalArgumentException("replace op boundaries of " + rop->toString() +
+                                       " overlap with previous " + prevRop->toString());
       }
     }
   }
@@ -419,7 +418,7 @@ std::unordered_map<size_t, TokenStreamRewriter::RewriteOperation*> TokenStreamRe
         continue;
       }
       if (iop->index >= rop->index && iop->index <= rop->lastIndex) {
-        throw IllegalArgumentException("insert op " + antlrcpp::ws2s(iop->toString()) + " within boundaries of previous " + antlrcpp::ws2s(rop->toString()));
+        throw IllegalArgumentException("insert op " + iop->toString() + " within boundaries of previous " + rop->toString());
       }
     }
   }
@@ -438,14 +437,14 @@ std::unordered_map<size_t, TokenStreamRewriter::RewriteOperation*> TokenStreamRe
   return m;
 }
 
-std::wstring TokenStreamRewriter::catOpText(std::wstring *a, std::wstring *b) {
-  std::wstring x = L"";
-  std::wstring y = L"";
+std::string TokenStreamRewriter::catOpText(std::string *a, std::string *b) {
+  std::string x = "";
+  std::string y = "";
   if (a != nullptr) {
-    x = std::wstring(*a);
+    x = std::string(*a);
   }
   if (b != nullptr) {
-    y = std::wstring(*b);
+    y = std::string(*b);
   }
   return x + y;
 }

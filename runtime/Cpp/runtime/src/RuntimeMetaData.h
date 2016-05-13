@@ -96,7 +96,7 @@ namespace runtime {
     /// omitted, the {@code -} (hyphen-minus) appearing before it is also
     /// omitted.</li>
     /// </ul>
-    static const std::wstring VERSION;
+    static const std::string VERSION;
 
     /// <summary>
     /// Gets the currently executing version of the ANTLR 4 runtime library.
@@ -107,7 +107,7 @@ namespace runtime {
     /// </summary>
     /// <returns> The currently executing version of the ANTLR 4 library </returns>
 
-    static std::wstring getRuntimeVersion();
+    static std::string getRuntimeVersion();
 
     /// <summary>
     /// This method provides the ability to detect mismatches between the version
@@ -166,7 +166,7 @@ namespace runtime {
     /// <param name="compileTimeVersion"> The version of the runtime the parser was
     /// compiled against. This should always be passed using a direct reference
     /// to <seealso cref="#VERSION"/>. </param>
-    static void checkVersion(const std::wstring &generatingToolVersion, const std::wstring &compileTimeVersion);
+    static void checkVersion(const std::string &generatingToolVersion, const std::string &compileTimeVersion);
 
     /// <summary>
     /// Gets the major and minor version numbers from a version string. For
@@ -176,7 +176,7 @@ namespace runtime {
     /// <param name="version"> The complete version string. </param>
     /// <returns> A string of the form <em>major</em>.<em>minor</em> containing
     /// only the major and minor components of the version string. </returns>
-    static std::wstring getMajorMinorVersion(const std::wstring &version);
+    static std::string getMajorMinorVersion(const std::string &version);
   };
 
 } // namespace runtime

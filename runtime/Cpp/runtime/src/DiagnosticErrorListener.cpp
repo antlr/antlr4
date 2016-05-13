@@ -52,46 +52,46 @@ void DiagnosticErrorListener::reportAmbiguity(Parser *recognizer, const dfa::DFA
     return;
   }
 
-  std::wstring decision = getDecisionDescription(recognizer, dfa);
+  std::string decision = getDecisionDescription(recognizer, dfa);
   antlrcpp::BitSet conflictingAlts = getConflictingAlts(ambigAlts, configs);
-  std::wstring text = recognizer->getTokenStream()->getText(misc::Interval((int)startIndex, (int)stopIndex));
-  std::wstring message = L"reportAmbiguity d = " + decision + L": ambigAlts = " + conflictingAlts.toString() +
-    L", input = '" + text + L"'";
+  std::string text = recognizer->getTokenStream()->getText(misc::Interval((int)startIndex, (int)stopIndex));
+  std::string message = "reportAmbiguity d = " + decision + ": ambigAlts = " + conflictingAlts.toString() +
+    ", input = '" + text + "'";
 
   recognizer->notifyErrorListeners(message);
 }
 
 void DiagnosticErrorListener::reportAttemptingFullContext(Parser *recognizer, const dfa::DFA &dfa, size_t startIndex,
   size_t stopIndex, const antlrcpp::BitSet &/*conflictingAlts*/, Ref<atn::ATNConfigSet> /*configs*/) {
-  std::wstring decision = getDecisionDescription(recognizer, dfa);
-  std::wstring text = recognizer->getTokenStream()->getText(misc::Interval((int)startIndex, (int)stopIndex));
-  std::wstring message = L"reportAttemptingFullContext d = " + decision + L", input = '" + text + L"'";
+  std::string decision = getDecisionDescription(recognizer, dfa);
+  std::string text = recognizer->getTokenStream()->getText(misc::Interval((int)startIndex, (int)stopIndex));
+  std::string message = "reportAttemptingFullContext d = " + decision + ", input = '" + text + "'";
   recognizer->notifyErrorListeners(message);
 }
 
 void DiagnosticErrorListener::reportContextSensitivity(Parser *recognizer, const dfa::DFA &dfa, size_t startIndex,
   size_t stopIndex, int /*prediction*/, Ref<atn::ATNConfigSet> /*configs*/) {
-  std::wstring decision = getDecisionDescription(recognizer, dfa);
-  std::wstring text = recognizer->getTokenStream()->getText(misc::Interval((int)startIndex, (int)stopIndex));
-  std::wstring message = L"reportContextSensitivity d = " + decision + L", input = '" + text + L"'";
+  std::string decision = getDecisionDescription(recognizer, dfa);
+  std::string text = recognizer->getTokenStream()->getText(misc::Interval((int)startIndex, (int)stopIndex));
+  std::string message = "reportContextSensitivity d = " + decision + ", input = '" + text + "'";
   recognizer->notifyErrorListeners(message);
 }
 
-std::wstring DiagnosticErrorListener::getDecisionDescription(Parser *recognizer, const dfa::DFA &dfa) {
+std::string DiagnosticErrorListener::getDecisionDescription(Parser *recognizer, const dfa::DFA &dfa) {
   int decision = dfa.decision;
   int ruleIndex = ((atn::ATNState*)dfa.atnStartState)->ruleIndex;
 
-  const std::vector<std::wstring>& ruleNames = recognizer->getRuleNames();
+  const std::vector<std::string>& ruleNames = recognizer->getRuleNames();
   if (ruleIndex < 0 || ruleIndex >= (int)ruleNames.size()) {
-    return std::to_wstring(decision);
+    return std::to_string(decision);
   }
 
-  std::wstring ruleName = ruleNames[(size_t)ruleIndex];
-  if (ruleName == L"" || ruleName.empty())  {
-    return std::to_wstring(decision);
+  std::string ruleName = ruleNames[(size_t)ruleIndex];
+  if (ruleName == "" || ruleName.empty())  {
+    return std::to_string(decision);
   }
 
-  return std::to_wstring(decision) + L"(" + ruleName + L")";
+  return std::to_string(decision) + "(" + ruleName + ")";
 }
 
 antlrcpp::BitSet DiagnosticErrorListener::getConflictingAlts(const antlrcpp::BitSet &reportedAlts,

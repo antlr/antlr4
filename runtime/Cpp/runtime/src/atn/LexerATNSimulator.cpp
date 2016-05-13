@@ -129,7 +129,7 @@ int LexerATNSimulator::matchATN(CharStream *input) {
   ATNState *startState = (ATNState *)atn.modeToStartState[_mode];
 
   if (debug) {
-    std::wcout << L"matchATN mode" << _mode << L" start: " << startState << std::endl;
+    std::cout << "matchATN mode" << _mode << " start: " << startState << std::endl;
   }
 
   size_t old_mode = _mode;
@@ -146,7 +146,7 @@ int LexerATNSimulator::matchATN(CharStream *input) {
   int predict = execATN(input, next);
 
   if (debug) {
-    std::wcout << L"DFA after matchATN: " << _decisionToDFA[old_mode].toLexerString() << std::endl;
+    std::cout << "DFA after matchATN: " << _decisionToDFA[old_mode].toLexerString() << std::endl;
   }
 
   return predict;
@@ -155,7 +155,7 @@ int LexerATNSimulator::matchATN(CharStream *input) {
 int LexerATNSimulator::execATN(CharStream *input, dfa::DFAState *ds0) {
   //System.out.println("enter exec index "+input.index()+" from "+ds0.configs);
   if (debug) {
-    std::wcout << L"start state closure=" << ds0->configs << std::endl;
+    std::cout << "start state closure=" << ds0->configs << std::endl;
   }
 
   if (ds0->isAcceptState) {
@@ -169,7 +169,7 @@ int LexerATNSimulator::execATN(CharStream *input, dfa::DFAState *ds0) {
 
   while (true) { // while more work
     if (debug) {
-      std::wcout << L"execATN loop starting closure: " << s->configs << std::endl;
+      std::cout << "execATN loop starting closure: " << s->configs << std::endl;
     }
 
     // As we move src->trg, src->trg, we keep track of the previous trg to
@@ -227,7 +227,7 @@ dfa::DFAState *LexerATNSimulator::getExistingTargetState(dfa::DFAState *s, ssize
 
   dfa::DFAState *target = s->edges[(size_t)(t - MIN_DFA_EDGE)];
   if (debug && target != nullptr) {
-    std::wcout << std::wstring(L"reuse state ") << s->stateNumber << std::wstring(L" edge to ") << target->stateNumber << std::endl;
+    std::cout << std::string("reuse state ") << s->stateNumber << std::string(" edge to ") << target->stateNumber << std::endl;
   }
 
   return target;
@@ -283,7 +283,7 @@ void LexerATNSimulator::getReachableConfigSet(CharStream *input, Ref<ATNConfigSe
     }
 
     if (debug) {
-      std::wcout << L"testing " << getTokenName((int)t) << " at " << c->toString(true) << std::endl;
+      std::cout << "testing " << getTokenName((int)t) << " at " << c->toString(true) << std::endl;
     }
 
     size_t n = c->state->getNumberOfTransitions();
@@ -314,8 +314,8 @@ void LexerATNSimulator::getReachableConfigSet(CharStream *input, Ref<ATNConfigSe
 void LexerATNSimulator::accept(CharStream *input, Ref<LexerActionExecutor> lexerActionExecutor, int /*startIndex*/,
                                size_t index, size_t line, size_t charPos) {
   if (debug) {
-    std::wcout << L"ACTION ";
-    std::wcout << toString(lexerActionExecutor) << std::endl;
+    std::cout << "ACTION ";
+    std::cout << toString(lexerActionExecutor) << std::endl;
   }
 
   // seek to after last char in token
@@ -350,15 +350,15 @@ Ref<ATNConfigSet> LexerATNSimulator::computeStartState(CharStream *input, ATNSta
 bool LexerATNSimulator::closure(CharStream *input, Ref<LexerATNConfig> config, Ref<ATNConfigSet> configs,
                                 bool currentAltReachedAcceptState, bool speculative, bool treatEofAsEpsilon) {
   if (debug) {
-    std::wcout << L"closure(" << config->toString(true) << L")" << std::endl;
+    std::cout << "closure(" << config->toString(true) << ")" << std::endl;
   }
 
   if (is<RuleStopState *>(config->state)) {
     if (debug) {
       if (_recog != nullptr) {
-        std::wcout << L"closure at " << _recog->getRuleNames()[(size_t)config->state->ruleIndex] << L" rule stop " << config << std::endl;
+        std::cout << "closure at " << _recog->getRuleNames()[(size_t)config->state->ruleIndex] << " rule stop " << config << std::endl;
       } else {
-        std::wcout << L"closure at rule stop " << config << std::endl;
+        std::cout << "closure at rule stop " << config << std::endl;
       }
     }
 
@@ -441,7 +441,7 @@ Ref<LexerATNConfig> LexerATNSimulator::getEpsilonTarget(CharStream *input, Ref<L
        */
       PredicateTransition *pt = static_cast<PredicateTransition*>(t);
       if (debug) {
-        std::wcout << L"EVAL rule " << pt->ruleIndex << L":" << pt->predIndex << std::endl;
+        std::cout << "EVAL rule " << pt->ruleIndex << ":" << pt->predIndex << std::endl;
       }
       configs->hasSemanticContext = true;
       if (evaluatePredicate(input, pt->ruleIndex, pt->predIndex, speculative)) {
@@ -560,7 +560,7 @@ void LexerATNSimulator::addDFAEdge(dfa::DFAState *p, ssize_t t, dfa::DFAState *q
   }
 
   if (debug) {
-    std::wcout << std::wstring(L"EDGE ") << p << std::wstring(L" -> ") << q << std::wstring(L" upon ") << (static_cast<wchar_t>(t)) << std::endl;
+    std::cerr << std::string("EDGE ") << p << std::string(" -> ") << q << std::string(" upon ") << (static_cast<char>(t)) << std::endl;
   }
 
   std::lock_guard<std::recursive_mutex> lck(mtx);
@@ -617,7 +617,7 @@ dfa::DFA& LexerATNSimulator::getDFA(size_t mode) {
   return _decisionToDFA[mode];
 }
 
-std::wstring LexerATNSimulator::getText(CharStream *input) {
+std::string LexerATNSimulator::getText(CharStream *input) {
   // index is first lookahead char, don't include.
   return input->getText(misc::Interval((int)_startIndex, (int)input->index() - 1));
 }
@@ -640,7 +640,7 @@ void LexerATNSimulator::setCharPositionInLine(int charPositionInLine) {
 
 void LexerATNSimulator::consume(CharStream *input) {
   ssize_t curChar = input->LA(1);
-  if (curChar == L'\n') {
+  if (curChar == '\n') {
     _line++;
     _charPositionInLine = 0;
   } else {
@@ -649,12 +649,12 @@ void LexerATNSimulator::consume(CharStream *input) {
   input->consume();
 }
 
-std::wstring LexerATNSimulator::getTokenName(int t) {
+std::string LexerATNSimulator::getTokenName(int t) {
   if (t == -1) {
-    return L"EOF";
+    return "EOF";
   }
   //if ( atn.g!=null ) return atn.g.getTokenDisplayName(t);
-  return std::wstring(L"'") + static_cast<wchar_t>(t) + std::wstring(L"'");
+  return std::string("'") + static_cast<char>(t) + std::string("'");
 }
 
 void LexerATNSimulator::InitializeInstanceFields() {

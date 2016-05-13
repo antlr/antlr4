@@ -35,15 +35,15 @@
 
 using namespace org::antlr::v4::runtime::dfa;
 
-const std::vector<std::wstring> VocabularyImpl::EMPTY_NAMES;
+const std::vector<std::string> VocabularyImpl::EMPTY_NAMES;
 const Ref<Vocabulary> VocabularyImpl::EMPTY_VOCABULARY = std::make_shared<VocabularyImpl>(EMPTY_NAMES, EMPTY_NAMES, EMPTY_NAMES);
 
-VocabularyImpl::VocabularyImpl(const std::vector<std::wstring> &literalNames, const std::vector<std::wstring> &symbolicNames)
+VocabularyImpl::VocabularyImpl(const std::vector<std::string> &literalNames, const std::vector<std::string> &symbolicNames)
 : VocabularyImpl(literalNames, symbolicNames, {}) {
 }
 
-VocabularyImpl::VocabularyImpl(const std::vector<std::wstring> &literalNames,
-  const std::vector<std::wstring> &symbolicNames, const std::vector<std::wstring> &displayNames)
+VocabularyImpl::VocabularyImpl(const std::vector<std::string> &literalNames,
+  const std::vector<std::string> &symbolicNames, const std::vector<std::string> &displayNames)
   : _literalNames(!literalNames.empty() ? literalNames : EMPTY_NAMES),
     _symbolicNames(!symbolicNames.empty() ? symbolicNames : EMPTY_NAMES),
     _displayNames(!displayNames.empty() ? displayNames : EMPTY_NAMES),
@@ -51,34 +51,34 @@ VocabularyImpl::VocabularyImpl(const std::vector<std::wstring> &literalNames,
   // See note here on -1 part: https://github.com/antlr/antlr4/pull/1146
 }
 
-Ref<Vocabulary> VocabularyImpl::fromTokenNames(const std::vector<std::wstring> &tokenNames) {
+Ref<Vocabulary> VocabularyImpl::fromTokenNames(const std::vector<std::string> &tokenNames) {
   if (tokenNames.empty()) {
     return EMPTY_VOCABULARY;
   }
 
-  std::vector<std::wstring> literalNames = tokenNames;
-  std::vector<std::wstring> symbolicNames = tokenNames;
+  std::vector<std::string> literalNames = tokenNames;
+  std::vector<std::string> symbolicNames = tokenNames;
   std::locale locale;
   for (size_t i = 0; i < tokenNames.size(); i++) {
-    std::wstring tokenName = tokenNames[i];
-    if (tokenName == L"") {
+    std::string tokenName = tokenNames[i];
+    if (tokenName == "") {
       continue;
     }
 
     if (!tokenName.empty()) {
-      wchar_t firstChar = tokenName[0];
-      if (firstChar == L'\'') {
-        symbolicNames[i] = L"";
+      char firstChar = tokenName[0];
+      if (firstChar == '\'') {
+        symbolicNames[i] = "";
         continue;
       } else if (std::isupper(firstChar, locale)) {
-        literalNames[i] = L"";
+        literalNames[i] = "";
         continue;
       }
     }
 
     // wasn't a literal or symbolic name
-    literalNames[i] = L"";
-    symbolicNames[i] = L"";
+    literalNames[i] = "";
+    symbolicNames[i] = "";
   }
 
   return std::make_shared<VocabularyImpl>(literalNames, symbolicNames, tokenNames);
@@ -88,43 +88,43 @@ int VocabularyImpl::getMaxTokenType() const {
   return _maxTokenType;
 }
 
-std::wstring VocabularyImpl::getLiteralName(ssize_t tokenType) const {
+std::string VocabularyImpl::getLiteralName(ssize_t tokenType) const {
   if (tokenType >= 0 && tokenType < (int)_literalNames.size()) {
     return _literalNames[tokenType];
   }
 
-  return L"";
+  return "";
 }
 
-std::wstring VocabularyImpl::getSymbolicName(ssize_t tokenType) const {
+std::string VocabularyImpl::getSymbolicName(ssize_t tokenType) const {
   if (tokenType >= 0 && tokenType < (int)_symbolicNames.size()) {
     return _symbolicNames[tokenType];
   }
 
   if (tokenType == Token::EOF) {
-    return L"EOF";
+    return "EOF";
   }
 
-  return L"";
+  return "";
 }
 
-std::wstring VocabularyImpl::getDisplayName(ssize_t tokenType) const {
+std::string VocabularyImpl::getDisplayName(ssize_t tokenType) const {
   if (tokenType >= 0 && tokenType < (int)_displayNames.size()) {
-    std::wstring displayName = _displayNames[tokenType];
+    std::string displayName = _displayNames[tokenType];
     if (!displayName.empty()) {
       return displayName;
     }
   }
 
-  std::wstring literalName = getLiteralName(tokenType);
+  std::string literalName = getLiteralName(tokenType);
   if (!literalName.empty()) {
     return literalName;
   }
 
-  std::wstring symbolicName = getSymbolicName(tokenType);
+  std::string symbolicName = getSymbolicName(tokenType);
   if (!symbolicName.empty()) {
     return symbolicName;
   }
 
-  return std::to_wstring(tokenType);
+  return std::to_string(tokenType);
 }

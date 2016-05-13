@@ -136,7 +136,7 @@ namespace atn {
     virtual void clear();
     virtual bool isReadonly();
     virtual void setReadonly(bool readonly);
-    virtual std::wstring toString();
+    virtual std::string toString();
     virtual bool remove(void *o);
 
   protected:

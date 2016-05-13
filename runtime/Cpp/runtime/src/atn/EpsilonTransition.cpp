@@ -52,10 +52,10 @@ bool EpsilonTransition::isEpsilon() const {
   return true;
 }
 
-bool EpsilonTransition::matches(int /*symbol*/, int /*minVocabSymbol*/, int /*maxVocabSymbol*/) const {
+bool EpsilonTransition::matches(size_t /*symbol*/, size_t /*minVocabSymbol*/, size_t /*maxVocabSymbol*/) const {
   return false;
 }
 
-std::wstring EpsilonTransition::toString() const {
-  return L"EPSILON " + Transition::toString() + L" {}";
+std::string EpsilonTransition::toString() const {
+  return "EPSILON " + Transition::toString() + " {}";
 }

@@ -84,14 +84,14 @@ bool SingletonPredictionContext::operator == (const PredictionContext &o) const 
   return returnState == other->returnState && (parent != nullptr && *parent == *other->parent);
 }
 
-std::wstring SingletonPredictionContext::toString() const {
-  //std::wstring up = !parent.expired() ? parent.lock()->toString() : L"";
-  std::wstring up = parent != nullptr ? parent->toString() : L"";
+std::string SingletonPredictionContext::toString() const {
+  //std::string up = !parent.expired() ? parent.lock()->toString() : "";
+  std::string up = parent != nullptr ? parent->toString() : "";
   if (up.length() == 0) {
     if (returnState == EMPTY_RETURN_STATE) {
-      return L"$";
+      return "$";
     }
-    return std::to_wstring(returnState);
+    return std::to_string(returnState);
   }
-  return std::to_wstring(returnState) + L" " + up;
+  return std::to_string(returnState) + " " + up;
 }

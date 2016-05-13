@@ -94,17 +94,17 @@ TokenSource* UnbufferedTokenStream::getTokenSource() const
   return _tokenSource;
 }
 
-std::wstring UnbufferedTokenStream::getText()
+std::string UnbufferedTokenStream::getText()
 {
-  return L"";
+  return "";
 }
 
-std::wstring UnbufferedTokenStream::getText(RuleContext* ctx)
+std::string UnbufferedTokenStream::getText(RuleContext* ctx)
 {
   return getText(ctx->getSourceInterval());
 }
 
-std::wstring UnbufferedTokenStream::getText(Ref<Token> start, Ref<Token> stop)
+std::string UnbufferedTokenStream::getText(Ref<Token> start, Ref<Token> stop)
 {
   return getText(misc::Interval(start->getTokenIndex(), stop->getTokenIndex()));
 }
@@ -257,7 +257,7 @@ std::string UnbufferedTokenStream::getSourceName() const
   return _tokenSource->getSourceName();
 }
 
-std::wstring UnbufferedTokenStream::getText(const misc::Interval &interval)
+std::string UnbufferedTokenStream::getText(const misc::Interval &interval)
 {
   size_t bufferStartIndex = getBufferStartIndex();
   size_t bufferStopIndex = bufferStartIndex + _tokens.size() - 1;
@@ -272,11 +272,11 @@ std::wstring UnbufferedTokenStream::getText(const misc::Interval &interval)
   size_t a = start - bufferStartIndex;
   size_t b = stop - bufferStartIndex;
 
-  std::wstringstream ss;
+  std::stringstream ss;
   for (size_t i = a; i <= b; i++) {
     Ref<Token> t = _tokens[i];
     if (i > 0)
-      ss << L", ";
+      ss << ", ";
     ss << t->getText();
   }
 

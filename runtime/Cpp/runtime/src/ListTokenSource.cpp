@@ -46,9 +46,9 @@ int ListTokenSource::getCharPositionInLine() {
     // have to calculate the result from the line/column of the previous
     // token, along with the text of the token.
     Ref<Token> lastToken = tokens.back();
-    std::wstring tokenText = lastToken->getText();
-    if (tokenText != L"") {
-      int lastNewLine = (int)tokenText.rfind(L'\n');
+    std::string tokenText = lastToken->getText();
+    if (tokenText != "") {
+      int lastNewLine = (int)tokenText.rfind('\n');
       if (lastNewLine >= 0) {
         return (int)tokenText.length() - lastNewLine - 1;
       }
@@ -74,7 +74,7 @@ Ref<Token> ListTokenSource::nextToken() {
       }
 
       int stop = std::max(-1, start - 1);
-      eofToken = std::dynamic_pointer_cast<Token>(_factory->create({ this, getInputStream() }, Token::EOF, L"EOF",
+      eofToken = std::dynamic_pointer_cast<Token>(_factory->create({ this, getInputStream() }, Token::EOF, "EOF",
         Token::DEFAULT_CHANNEL, start, stop, (int)getLine(), getCharPositionInLine()));
     }
 
@@ -101,10 +101,10 @@ size_t ListTokenSource::getLine() const {
     Ref<Token> lastToken = tokens.back();
     int line = lastToken->getLine();
 
-    std::wstring tokenText = lastToken->getText();
-    if (tokenText != L"") {
+    std::string tokenText = lastToken->getText();
+    if (tokenText != "") {
       for (size_t i = 0; i < tokenText.length(); i++) {
-        if (tokenText[i] == L'\n') {
+        if (tokenText[i] == '\n') {
           line++;
         }
       }

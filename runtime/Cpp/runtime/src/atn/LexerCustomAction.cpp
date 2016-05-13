@@ -83,6 +83,6 @@ bool LexerCustomAction::operator == (const LexerAction &obj) const {
   return _ruleIndex == action->_ruleIndex && _actionIndex == action->_actionIndex;
 }
 
-std::wstring LexerCustomAction::toString() const {
+std::string LexerCustomAction::toString() const {
   return antlrcpp::toString(this);
 }

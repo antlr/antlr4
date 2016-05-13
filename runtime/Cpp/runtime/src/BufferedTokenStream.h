@@ -112,10 +112,10 @@ namespace runtime {
     virtual std::vector<Ref<Token>> getHiddenTokensToLeft(size_t tokenIndex);
 
     virtual std::string getSourceName() const override;
-    virtual std::wstring getText() override;
-    virtual std::wstring getText(const misc::Interval &interval) override;
-    virtual std::wstring getText(RuleContext *ctx) override;
-    virtual std::wstring getText(Ref<Token> start, Ref<Token> stop) override;
+    virtual std::string getText() override;
+    virtual std::string getText(const misc::Interval &interval) override;
+    virtual std::string getText(RuleContext *ctx) override;
+    virtual std::string getText(Ref<Token> start, Ref<Token> stop) override;
 
     /// <summary>
     /// Get all tokens from lexer until EOF </summary>

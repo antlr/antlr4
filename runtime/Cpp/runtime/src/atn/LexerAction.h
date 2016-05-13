@@ -83,7 +83,7 @@ namespace atn {
 
     virtual size_t hashCode() const = 0;
     virtual bool operator == (const LexerAction &obj) const = 0;
-    virtual std::wstring toString() const = 0;
+    virtual std::string toString() const = 0;
   };
 
 } // namespace atn

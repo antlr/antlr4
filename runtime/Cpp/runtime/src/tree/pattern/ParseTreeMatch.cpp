@@ -37,15 +37,15 @@ using namespace org::antlr::v4::runtime::tree;
 using namespace org::antlr::v4::runtime::tree::pattern;
 
 ParseTreeMatch::ParseTreeMatch(Ref<ParseTree> tree, const ParseTreePattern &pattern,
-                               const std::map<std::wstring, std::vector<Ref<ParseTree>>> &labels,
+                               const std::map<std::string, std::vector<Ref<ParseTree>>> &labels,
                                Ref<ParseTree> mismatchedNode)
   : _tree(tree), _pattern(pattern), _labels(labels), _mismatchedNode(mismatchedNode) {
   if (tree == nullptr) {
-    throw IllegalArgumentException("tree cannot be null");
+    throw IllegalArgumentException("tree cannot be nul");
   }
 }
 
-Ref<ParseTree> ParseTreeMatch::get(const std::wstring &label) {
+Ref<ParseTree> ParseTreeMatch::get(const std::string &label) {
   auto iterator = _labels.find(label);
   if (iterator == _labels.end() || iterator->second.empty()) {
     return nullptr;
@@ -54,7 +54,7 @@ Ref<ParseTree> ParseTreeMatch::get(const std::wstring &label) {
   return iterator->second.back(); // return last if multiple
 }
 
-std::vector<Ref<ParseTree>> ParseTreeMatch::getAll(const std::wstring &label) {
+std::vector<Ref<ParseTree>> ParseTreeMatch::getAll(const std::string &label) {
   auto iterator = _labels.find(label);
   if (iterator == _labels.end()) {
     return std::vector<Ref<ParseTree>>();
@@ -63,7 +63,7 @@ std::vector<Ref<ParseTree>> ParseTreeMatch::getAll(const std::wstring &label) {
   return iterator->second;
 }
 
-std::map<std::wstring, std::vector<Ref<ParseTree>>>& ParseTreeMatch::getLabels() {
+std::map<std::string, std::vector<Ref<ParseTree>>>& ParseTreeMatch::getLabels() {
   return _labels;
 }
 
@@ -83,10 +83,10 @@ Ref<ParseTree>  ParseTreeMatch::getTree() {
   return _tree;
 }
 
-std::wstring ParseTreeMatch::toString() {
+std::string ParseTreeMatch::toString() {
   if (succeeded()) {
-    return L"Match succeeded; found " + std::to_wstring(_labels.size()) + L" labels";
+    return "Match succeeded; found " + std::to_string(_labels.size()) + " labels";
   } else {
-    return L"Match failed; found " + std::to_wstring(_labels.size()) + L" labels";
+    return "Match failed; found " + std::to_string(_labels.size()) + " labels";
   }
 }

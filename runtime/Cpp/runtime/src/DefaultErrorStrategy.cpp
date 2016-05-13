@@ -39,9 +39,9 @@
 #include "ATN.h"
 #include "ATNState.h"
 #include "Parser.h"
-#include "Strings.h"
 #include "CommonToken.h"
 #include "Vocabulary.h"
+#include "StringUtils.h"
 
 #include "DefaultErrorStrategy.h"
 
@@ -88,7 +88,7 @@ void DefaultErrorStrategy::reportError(Parser *recognizer, const RecognitionExce
     // This is really bush league, I hate libraries that gratuitiously print stuff out.
     std::cerr << std::string("unknown recognition error type: ") << typeid(e).name() << std::endl;
 
-    recognizer->notifyErrorListeners(e.getOffendingToken(), antlrcpp::s2ws(e.what()), std::make_exception_ptr(e));
+    recognizer->notifyErrorListeners(e.getOffendingToken(), e.what(), std::make_exception_ptr(e));
   }
 }
 
@@ -159,29 +159,29 @@ void DefaultErrorStrategy::sync(Parser *recognizer) {
 
 void DefaultErrorStrategy::reportNoViableAlternative(Parser *recognizer, const NoViableAltException &e) {
   TokenStream *tokens = recognizer->getTokenStream();
-  std::wstring input;
+  std::string input;
   if (tokens != nullptr) {
     if (e.getStartToken()->getType() == Token::EOF) {
-      input = L"<EOF>";
+      input = "<EOF>";
     } else {
       input = tokens->getText(e.getStartToken(), e.getOffendingToken());
     }
   } else {
-    input = L"<unknown input>";
+    input = "<unknown input>";
   }
-  std::wstring msg = std::wstring(L"no viable alternative at input ") + escapeWSAndQuote(input);
+  std::string msg = std::string("no viable alternative at input ") + escapeWSAndQuote(input);
   recognizer->notifyErrorListeners(e.getOffendingToken(), msg, std::make_exception_ptr(e));
 }
 
 void DefaultErrorStrategy::reportInputMismatch(Parser *recognizer, const InputMismatchException &e) {
-  std::wstring msg = std::wstring(L"mismatched input ") + getTokenErrorDisplay(e.getOffendingToken()) +
-  std::wstring(L" expecting ") + e.getExpectedTokens().toString(recognizer->getVocabulary());
+  std::string msg = std::string("mismatched input ") + getTokenErrorDisplay(e.getOffendingToken()) +
+  std::string(" expecting ") + e.getExpectedTokens().toString(recognizer->getVocabulary());
   recognizer->notifyErrorListeners(e.getOffendingToken(), msg, std::make_exception_ptr(e));
 }
 
 void DefaultErrorStrategy::reportFailedPredicate(Parser *recognizer, const FailedPredicateException &e) {
-  const std::wstring& ruleName = recognizer->getRuleNames()[(size_t)recognizer->getContext()->getRuleIndex()];
-  std::wstring msg = std::wstring(L"rule ") + ruleName + std::wstring(L" ") + antlrcpp::s2ws(e.what());
+  const std::string& ruleName = recognizer->getRuleNames()[(size_t)recognizer->getContext()->getRuleIndex()];
+  std::string msg = "rule " + ruleName + " " + e.what();
   recognizer->notifyErrorListeners(e.getOffendingToken(), msg, std::make_exception_ptr(e));
 }
 
@@ -193,10 +193,10 @@ void DefaultErrorStrategy::reportUnwantedToken(Parser *recognizer) {
   beginErrorCondition(recognizer);
 
   Ref<Token> t = recognizer->getCurrentToken();
-  std::wstring tokenName = getTokenErrorDisplay(t);
+  std::string tokenName = getTokenErrorDisplay(t);
   misc::IntervalSet expecting = getExpectedTokens(recognizer);
 
-  std::wstring msg = std::wstring(L"extraneous input ") + tokenName + std::wstring(L" expecting ") +
+  std::string msg = std::string("extraneous input ") + tokenName + std::string(" expecting ") +
     expecting.toString(recognizer->getVocabulary());
   recognizer->notifyErrorListeners(t, msg, nullptr);
 }
@@ -210,7 +210,7 @@ void DefaultErrorStrategy::reportMissingToken(Parser *recognizer) {
 
   Ref<Token> t = recognizer->getCurrentToken();
   misc::IntervalSet expecting = getExpectedTokens(recognizer);
-  std::wstring msg = L"missing " + expecting.toString(recognizer->getVocabulary()) + L" at " + getTokenErrorDisplay(t);
+  std::string msg = "missing " + expecting.toString(recognizer->getVocabulary()) + " at " + getTokenErrorDisplay(t);
 
   recognizer->notifyErrorListeners(t, msg, nullptr);
 }
@@ -269,11 +269,11 @@ Ref<Token> DefaultErrorStrategy::getMissingSymbol(Parser *recognizer) {
   Ref<Token> currentSymbol = recognizer->getCurrentToken();
   misc::IntervalSet expecting = getExpectedTokens(recognizer);
   ssize_t expectedTokenType = expecting.getMinElement(); // get any element
-  std::wstring tokenText;
+  std::string tokenText;
   if (expectedTokenType == Token::EOF) {
-    tokenText = L"<missing EOF>";
+    tokenText = "<missing EOF>";
   } else {
-    tokenText = L"<missing " + recognizer->getVocabulary()->getDisplayName(expectedTokenType) + L">";
+    tokenText = "<missing " + recognizer->getVocabulary()->getDisplayName(expectedTokenType) + ">";
   }
   Ref<Token> current = currentSymbol;
   Ref<Token> lookback = recognizer->getTokenStream()->LT(-1);
@@ -289,22 +289,22 @@ misc::IntervalSet DefaultErrorStrategy::getExpectedTokens(Parser *recognizer) {
   return recognizer->getExpectedTokens();
 }
 
-std::wstring DefaultErrorStrategy::getTokenErrorDisplay(Ref<Token> t) {
+std::string DefaultErrorStrategy::getTokenErrorDisplay(Ref<Token> t) {
   if (t == nullptr) {
-    return L"<no Token>";
+    return "<no Token>";
   }
-  std::wstring s = getSymbolText(t);
-  if (s == L"") {
+  std::string s = getSymbolText(t);
+  if (s == "") {
     if (getSymbolType(t) == Token::EOF) {
-      s = L"<EOF>";
+      s = "<EOF>";
     } else {
-      s = std::wstring(L"<") + std::to_wstring(getSymbolType(t)) + std::wstring(L">");
+      s = std::string("<") + std::to_string(getSymbolType(t)) + std::string(">");
     }
   }
   return escapeWSAndQuote(s);
 }
 
-std::wstring DefaultErrorStrategy::getSymbolText(Ref<Token> symbol) {
+std::string DefaultErrorStrategy::getSymbolText(Ref<Token> symbol) {
   return symbol->getText();
 }
 
@@ -312,12 +312,12 @@ int DefaultErrorStrategy::getSymbolType(Ref<Token> symbol) {
   return symbol->getType();
 }
 
-std::wstring DefaultErrorStrategy::escapeWSAndQuote(std::wstring &s) {
+std::string DefaultErrorStrategy::escapeWSAndQuote(std::string &s) {
   //		if ( s==null ) return s;
-  antlrcpp::replaceAll(s, L"\n", L"\\n");
-  antlrcpp::replaceAll(s, L"\r",L"\\r");
-  antlrcpp::replaceAll(s, L"\t",L"\\t");
-  return std::wstring(L"'") + s + std::wstring(L"'");
+  antlrcpp::replaceAll(s, "\n", "\\n");
+  antlrcpp::replaceAll(s, "\r","\\r");
+  antlrcpp::replaceAll(s, "\t","\\t");
+  return std::string("'") + s + std::string("'");
 }
 
 misc::IntervalSet DefaultErrorStrategy::getErrorRecoverySet(Parser *recognizer) {

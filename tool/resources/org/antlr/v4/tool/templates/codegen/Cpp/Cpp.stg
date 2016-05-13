@@ -61,14 +61,14 @@ public:
   ~<lexer.name>();
 
   <namedActions.members>
-  virtual std::wstring getGrammarFileName() const override;
-  virtual const std::vector\<std::wstring>& getRuleNames() const override;
+  virtual std::string getGrammarFileName() const override;
+  virtual const std::vector\<std::string>& getRuleNames() const override;
   
-  virtual const std::vector\<std::wstring>& getModeNames() const override;
-  virtual const std::vector\<std::wstring>& getTokenNames() const override; // deprecated, use vocabulary instead
+  virtual const std::vector\<std::string>& getModeNames() const override;
+  virtual const std::vector\<std::string>& getTokenNames() const override; // deprecated, use vocabulary instead
   virtual Ref\<dfa::Vocabulary> getVocabulary() const override;
   
-  virtual const std::wstring getSerializedATN() const;
+  virtual const std::vector\<uint16_t> getSerializedATN() const;
   virtual const atn::ATN& getATN() const override;
 
   <if (actionFuncs)>
@@ -81,12 +81,12 @@ public:
 private:
   static std::vector\<dfa::DFA> _decisionToDFA;
   static Ref\<atn::PredictionContextCache> _sharedContextCache;
-  static std::vector\<std::wstring> _ruleNames;
-  static std::vector\<std::wstring> _tokenNames;
-  static std::vector\<std::wstring> _modeNames;
+  static std::vector\<std::string> _ruleNames;
+  static std::vector\<std::string> _tokenNames;
+  static std::vector\<std::string> _modeNames;
   
-  static std::vector\<std::wstring> _literalNames;
-  static std::vector\<std::wstring> _symbolicNames;
+  static std::vector\<std::string> _literalNames;
+  static std::vector\<std::string> _symbolicNames;
   static Ref\<dfa::Vocabulary> _vocabulary;
   <atn>
   
@@ -114,19 +114,19 @@ Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass = {Lexer}) ::= <<
   delete _interpreter;
 }
 
-std::wstring <lexer.name>::getGrammarFileName() const {
-  return L"<lexer.grammarFileName>";
+std::string <lexer.name>::getGrammarFileName() const {
+  return "<lexer.grammarFileName>";
 }
 
-const std::vector\<std::wstring>& <lexer.name>::getRuleNames() const {
+const std::vector\<std::string>& <lexer.name>::getRuleNames() const {
   return _ruleNames;
 }
   
-const std::vector\<std::wstring>& <lexer.name>::getModeNames() const {
+const std::vector\<std::string>& <lexer.name>::getModeNames() const {
   return _modeNames;
 }
   
-const std::vector\<std::wstring>& <lexer.name>::getTokenNames() const {
+const std::vector\<std::string>& <lexer.name>::getTokenNames() const {
   return _tokenNames;
 }
   
@@ -134,7 +134,7 @@ Ref\<dfa::Vocabulary> <lexer.name>::getVocabulary() const {
   return _vocabulary;
 }
 
-const std::wstring <lexer.name>::getSerializedATN() const {
+const std::vector\<uint16_t> <lexer.name>::getSerializedATN() const {
   return _serializedATN;
 }
 
@@ -177,38 +177,38 @@ Ref\<atn::PredictionContextCache> <lexer.name>::_sharedContextCache = std::make_
 
 // We own the ATN which in turn owns the ATN states.
 atn::ATN <lexer.name>::_atn;
-std::wstring <lexer.name>::_serializedATN;
+std::vector\<uint16_t> <lexer.name>::_serializedATN;
 
-std::vector\<std::wstring> <lexer.name>::_ruleNames = {
-  <lexer.ruleNames: {r | L"<r>"}; separator = ", ", wrap, anchor>
+std::vector\<std::string> <lexer.name>::_ruleNames = {
+  <lexer.ruleNames: {r | "<r>"}; separator = ", ", wrap, anchor>
 };
 
-std::vector\<std::wstring> <lexer.name>::_modeNames = {
-  <lexer.modes: {m | L"<m>"}; separator = ", ", wrap, anchor>
+std::vector\<std::string> <lexer.name>::_modeNames = {
+  <lexer.modes: {m | "<m>"}; separator = ", ", wrap, anchor>
 };
 
-std::vector\<std::wstring> <lexer.name>::_literalNames = {
-  <lexer.literalNames: {t | L<t>}; null = "L\"\"", separator = ", ", wrap, anchor>
+std::vector\<std::string> <lexer.name>::_literalNames = {
+  <lexer.literalNames: {t | <t>}; null = "\"\"", separator = ", ", wrap, anchor>
 };
 
-std::vector\<std::wstring> <lexer.name>::_symbolicNames = {
-  <lexer.symbolicNames: {t | L<t>}; null = "L\"\"", separator = ", ", wrap, anchor>
+std::vector\<std::string> <lexer.name>::_symbolicNames = {
+  <lexer.symbolicNames: {t | <t>}; null = "\"\"", separator = ", ", wrap, anchor>
 };
 
 Ref\<dfa::Vocabulary> <lexer.name>::_vocabulary = std::make_shared\<dfa::VocabularyImpl>(_literalNames, _symbolicNames);
 
-std::vector\<std::wstring> <lexer.name>::_tokenNames;
+std::vector\<std::string> <lexer.name>::_tokenNames;
 
 <lexer.name>::Initializer::Initializer() {
   // This code could be in a static initializer lambda, but VS doesn't allow access to private class members from there. 
 	for (size_t i = 0; i \< _symbolicNames.size(); ++i) {
-		std::wstring name = _vocabulary->getLiteralName(i);
+		std::string name = _vocabulary->getLiteralName(i);
 		if (name.empty()) {
 			name = _vocabulary->getSymbolicName(i);
 		}
 
 		if (name.empty()) {
-			_tokenNames.push_back(L"\<INVALID>");
+			_tokenNames.push_back("\<INVALID>");
 		} else {
       _tokenNames.push_back(name);
     }
@@ -241,7 +241,7 @@ bool <r.name>Sempred(Ref\<<r.ctxType>\> context, int predicateIndex);
 >>
 
 RuleSempredFunction(r, actions) ::= <<
-bool <r.factory.grammar.name>::<r.name>Sempred(Ref\<<r.ctxType>\> /*context*/, int predicateIndex) {
+bool <r.factory.grammar.name>::<r.name>Sempred(Ref\<<r.ctxType>\> context, int predicateIndex) {
   switch (predicateIndex) {
     <actions: {index | case <index>: return <actions.(index)>;}; separator="\n">
     
@@ -275,10 +275,10 @@ public:
   <parser.name>(TokenStream *input);
   ~<parser.name>();
 
-  virtual std::wstring getGrammarFileName() const override;
+  virtual std::string getGrammarFileName() const override;
   virtual const atn::ATN& getATN() const override { return _atn; };
-  virtual const std::vector\<std::wstring>& getTokenNames() const override { return _tokenNames; }; // deprecated: use vocabulary instead.
-  virtual const std::vector\<std::wstring>& getRuleNames() const override;
+  virtual const std::vector\<std::string>& getTokenNames() const override { return _tokenNames; }; // deprecated: use vocabulary instead.
+  virtual const std::vector\<std::string>& getRuleNames() const override;
   virtual Ref\<dfa::Vocabulary> getVocabulary() const override;
  
   <namedActions.members>
@@ -295,11 +295,11 @@ public:
 private:
   static std::vector\<dfa::DFA> _decisionToDFA;
   static Ref\<atn::PredictionContextCache> _sharedContextCache;
-  static std::vector\<std::wstring> _ruleNames;
-  static std::vector\<std::wstring> _tokenNames;
+  static std::vector\<std::string> _ruleNames;
+  static std::vector\<std::string> _tokenNames;
   
-  static std::vector\<std::wstring> _literalNames;
-  static std::vector\<std::wstring> _symbolicNames;
+  static std::vector\<std::string> _literalNames;
+  static std::vector\<std::string> _symbolicNames;
   static Ref\<dfa::Vocabulary> _vocabulary;
   <atn>
   
@@ -323,11 +323,11 @@ using namespace org::antlr::v4::runtime;
   delete _interpreter;
 }
 
-std::wstring <parser.name>::getGrammarFileName() const {
-  return L"<parser.grammarFileName>";
+std::string <parser.name>::getGrammarFileName() const {
+  return "<parser.grammarFileName>";
 }
 
-const std::vector\<std::wstring>& <parser.name>::getRuleNames() const {
+const std::vector\<std::string>& <parser.name>::getRuleNames() const {
   return _ruleNames;
 }
 
@@ -359,33 +359,33 @@ Ref\<atn::PredictionContextCache> <parser.name>::_sharedContextCache = std::make
 
 // We own the ATN which in turn owns the ATN states.
 atn::ATN <parser.name>::_atn;
-std::wstring <parser.name>::_serializedATN;
+std::vector\<uint16_t> <parser.name>::_serializedATN;
 
-std::vector\<std::wstring> <parser.name>::_ruleNames = {
-  <parser.ruleNames: {r | L"<r>"}; separator = ", ", wrap, anchor>
+std::vector\<std::string> <parser.name>::_ruleNames = {
+  <parser.ruleNames: {r | "<r>"}; separator = ", ", wrap, anchor>
 };
 
-std::vector\<std::wstring> <parser.name>::_literalNames = {
-  <parser.literalNames: {t | L<t>}; null = "L\"\"", separator = ", ", wrap, anchor>
+std::vector\<std::string> <parser.name>::_literalNames = {
+  <parser.literalNames: {t | <t>}; null = "\"\"", separator = ", ", wrap, anchor>
 };
 
-std::vector\<std::wstring> <parser.name>::_symbolicNames = {
-  <parser.symbolicNames: {t | L<t>}; null = "L\"\"", separator = ", ", wrap, anchor>
+std::vector\<std::string> <parser.name>::_symbolicNames = {
+  <parser.symbolicNames: {t | <t>}; null = "\"\"", separator = ", ", wrap, anchor>
 };
 
 Ref\<dfa::Vocabulary> <parser.name>::_vocabulary = std::make_shared\<dfa::VocabularyImpl>(_literalNames, _symbolicNames);
 
-std::vector\<std::wstring> <parser.name>::_tokenNames;
+std::vector\<std::string> <parser.name>::_tokenNames;
 
 <parser.name>::Initializer::Initializer() {
 	for (size_t i = 0; i \< _symbolicNames.size(); ++i) {
-		std::wstring name = _vocabulary->getLiteralName(i);
+		std::string name = _vocabulary->getLiteralName(i);
 		if (name.empty()) {
 			name = _vocabulary->getSymbolicName(i);
 		}
 
 		if (name.empty()) {
-			_tokenNames.push_back(L"\<INVALID>");
+			_tokenNames.push_back("\<INVALID>");
 		} else {
       _tokenNames.push_back(name);
     }
@@ -399,17 +399,18 @@ std::vector\<std::wstring> <parser.name>::_tokenNames;
 
 SerializedATNHeader(model) ::= <<
 static atn::ATN _atn;
-static std::wstring _serializedATN;
+static std::vector\<uint16_t> _serializedATN;
 >>
 
 // Constructs the serialized ATN and writes init code for static member vars.
 SerializedATN(model) ::= <<
 <if (rest(model.segments))>
-<model.segments: {segment | static std::wstring serializedATNSegment<i0> = {
+<model.segments: {segment | static \<uint16_t> serializedATNSegment<i0>[] = {
   <segment; wrap={<\n>   }>
 \};}; separator="\n">
-_serializedATN =
-  <model.segments: {segment | serializedATNSegment<i0>}; separator=" +\n">;
+
+<model.segments: {segment | _serializedATN.insert(_serializedATN.end(), serializedATNSegment<i0>, serializedATNSegment<i0> + sizeof(serializedATNSegment<i0>) / sizeof(serializedATNSegment<i0>[0])
+}; separator=" +\n">;
   
 <else>
 <! only one segment, can be inlined !>
@@ -823,7 +824,7 @@ SemPred(p, chunks, failChunks) ::= <<
 setState(<p.stateNumber>);
 
 <! TODO: failChunks + p.msg untested !>
-if (!(<chunks>)) throw FailedPredicateException(this, <p.predicate><if (failChunks)>, <failChunks><elseif (p.msg)>, L<p.msg><endif>);
+if (!(<chunks>)) throw FailedPredicateException(this, <p.predicate><if (failChunks)>, <failChunks><elseif (p.msg)>, <p.msg><endif>);
 >>
 
 ExceptionClauseHeader(e, catchArg, catchAction) ::= "<! Required but unused. !>"
@@ -878,7 +879,7 @@ SetAttr(s,rhsChunks) ::= "<ctx(s)>-><s.name> = <rhsChunks>;"
 InputSymbolType() ::= "<file.InputSymbolType; null = {Token}> *"
 
 TokenPropertyRef_textHeader(t) ::= "<! Required but unused. !>"
-TokenPropertyRef_text(t) ::= <<(<ctx(t)>-><t.label> != nullptr ? <ctx(t)>-><t.label>->getText() : L"")>>
+TokenPropertyRef_text(t) ::= <<(<ctx(t)>-><t.label> != nullptr ? <ctx(t)>-><t.label>->getText() : "")>>
 
 TokenPropertyRef_typeHeader(t) ::= "<! Required but unused. !>"
 TokenPropertyRef_type(t) ::= "(<ctx(t)>-><t.label> != nullptr ? <ctx(t)>-><t.label>->getType() : 0)"

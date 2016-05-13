@@ -51,12 +51,12 @@ Ref<atn::ATNConfigSet> LexerNoViableAltException::getDeadEndConfigs() {
   return _deadEndConfigs;
 }
 
-std::wstring LexerNoViableAltException::toString() {
-  std::wstring symbol;
+std::string LexerNoViableAltException::toString() {
+  std::string symbol;
   if (_startIndex < getInputStream()->size()) {
     symbol = ((CharStream *)getInputStream())->getText(misc::Interval((int)_startIndex, (int)_startIndex));
     symbol = antlrcpp::escapeWhitespace(symbol, false);
   }
-  std::wstring format = L"LexerNoViableAltException('" + symbol + L"')";
+  std::string format = "LexerNoViableAltException('" + symbol + "')";
   return format;
 }

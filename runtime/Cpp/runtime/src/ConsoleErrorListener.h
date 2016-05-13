@@ -58,7 +58,7 @@ namespace runtime {
      * </pre>
      */
     virtual void syntaxError(IRecognizer *recognizer, Ref<Token> offendingSymbol, size_t line, int charPositionInLine,
-                             const std::wstring &msg, std::exception_ptr e) override;
+                             const std::string &msg, std::exception_ptr e) override;
   };
 
 } // namespace runtime

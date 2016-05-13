@@ -61,7 +61,7 @@ Ref<PredictionContext> ATNSimulator::getCachedContext(Ref<PredictionContext> con
   return PredictionContext::getCachedContext(context, _sharedContextCache, visited);
 }
 
-ATN ATNSimulator::deserialize(const std::wstring &data) {
+ATN ATNSimulator::deserialize(const std::vector<uint16_t> &data) {
   ATNDeserializer deserializer;
   return deserializer.deserialize(data);
 }

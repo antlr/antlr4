@@ -65,6 +65,6 @@ bool LexerMoreAction::operator == (const LexerAction &obj) const {
   return &obj == this;
 }
 
-std::wstring LexerMoreAction::toString() const {
-  return L"more";
+std::string LexerMoreAction::toString() const {
+  return "more";
 }

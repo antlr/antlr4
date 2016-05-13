@@ -38,15 +38,13 @@ namespace antlr {
 namespace v4 {
 namespace runtime {
 
-  /// Vacuum all input from a stream and then treat it
-  /// like a string. Can also pass in a string or char[] to use.
+  // Vacuum all input from a stream and then treat it
+  // like a string. Can also pass in a string or char[] to use.
+  // Input is expected to be encoded in UTF-8 and converted to UTF-32 internally.
   class ANTLR4CPP_PUBLIC ANTLRInputStream : public CharStream {
-  public:
-    static const int READ_BUFFER_SIZE = 1024;
-
   protected:
     /// The data being scanned.
-    std::wstring data; // XXX: move to std::string and UTF-8 to support input beyond the Unicode BMP.
+    std::u32string data; // UTF-32
 
     /// 0..n-1 index into string of next char </summary>
     size_t p;
@@ -55,12 +53,11 @@ namespace runtime {
     /// What is name or source of this char stream?
     std::string name;
 
-    ANTLRInputStream(const std::wstring &input = L"");
-    ANTLRInputStream(const wchar_t data[], size_t numberOfActualCharsInArray);
+    ANTLRInputStream(const std::string &input = "");
+    ANTLRInputStream(const char data[], size_t numberOfActualCharsInArray);
     ANTLRInputStream(std::wistream &stream);
-    ANTLRInputStream(std::wistream &stream, std::streamsize readChunkSize);
 
-    virtual void load(std::wistream &stream, std::streamsize readChunkSize);
+    virtual void load(std::wistream &stream);
 
     /// Reset the stream so that it's in the same state it was
     /// when the object was created *except* the data array is not
@@ -88,9 +85,9 @@ namespace runtime {
     ///  update line and charPositionInLine. If we seek backwards, just set p
     /// </summary>
     virtual void seek(size_t index) override;
-    virtual std::wstring getText(const misc::Interval &interval) override;
+    virtual std::string getText(const misc::Interval &interval) override;
     virtual std::string getSourceName() const override;
-    virtual std::wstring toString() const override;
+    virtual std::string toString() const override;
 
   private:
     void InitializeInstanceFields();

@@ -42,10 +42,10 @@ int WildcardTransition::getSerializationType() const {
   return WILDCARD;
 }
 
-bool WildcardTransition::matches(int symbol, int minVocabSymbol, int maxVocabSymbol) const {
+bool WildcardTransition::matches(size_t symbol, size_t minVocabSymbol, size_t maxVocabSymbol) const {
   return symbol >= minVocabSymbol && symbol <= maxVocabSymbol;
 }
 
-std::wstring WildcardTransition::toString() const {
-  return L"WILDCARD " + Transition::toString() + L" {}";
+std::string WildcardTransition::toString() const {
+  return "WILDCARD " + Transition::toString() + " {}";
 }

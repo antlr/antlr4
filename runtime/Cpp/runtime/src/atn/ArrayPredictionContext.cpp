@@ -78,29 +78,29 @@ bool ArrayPredictionContext::operator == (const PredictionContext &o) const {
     antlrcpp::Arrays::equals(parents, other->parents);
 }
 
-std::wstring ArrayPredictionContext::toString() {
+std::string ArrayPredictionContext::toString() {
   if (isEmpty()) {
-    return L"[]";
+    return "[]";
   }
 
-  std::wstringstream ss;
-  ss << L"[";
+  std::stringstream ss;
+  ss << "[";
   for (size_t i = 0; i < returnStates.size(); i++) {
     if (i > 0) {
-      ss << L", ";
+      ss << ", ";
     }
     if (returnStates[i] == EMPTY_RETURN_STATE) {
-      ss << L"$";
+      ss << "$";
       continue;
     }
     ss << returnStates[i];
     if (parents[i] != nullptr) {
-      ss << L" " << parents[i]->toString();
+      ss << " " << parents[i]->toString();
     } else {
-      ss << L"null";
+      ss << "nul";
     }
   }
-  ss << L"]";
+  ss << "]";
   return ss.str();
 }
 

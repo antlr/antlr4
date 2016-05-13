@@ -49,11 +49,11 @@ bool ActionTransition::isEpsilon() const {
   return true; // we are to be ignored by analysis 'cept for predicates
 }
 
-bool ActionTransition::matches(int /*symbol*/, int /*minVocabSymbol*/, int /*maxVocabSymbol*/) const {
+bool ActionTransition::matches(size_t /*symbol*/, size_t /*minVocabSymbol*/, size_t /*maxVocabSymbol*/) const {
   return false;
 }
 
-std::wstring ActionTransition::toString() const {
-  return L" ACTION " + Transition::toString() + L" { ruleIndex: " + std::to_wstring(ruleIndex) + L", actionIndex: " +
-  std::to_wstring(actionIndex) + L", isCtxDependent: " + std::to_wstring(isCtxDependent) + L" }";
+std::string ActionTransition::toString() const {
+  return " ACTION " + Transition::toString() + " { ruleIndex: " + std::to_string(ruleIndex) + ", actionIndex: " +
+  std::to_string(actionIndex) + ", isCtxDependent: " + std::to_string(isCtxDependent) + " }";
 }

@@ -38,7 +38,7 @@
 using namespace org::antlr::v4::runtime::tree;
 using namespace org::antlr::v4::runtime::tree::pattern;
 
-ParseTreePattern::ParseTreePattern(ParseTreePatternMatcher *matcher, const std::wstring &pattern, int patternRuleIndex,
+ParseTreePattern::ParseTreePattern(ParseTreePatternMatcher *matcher, const std::string &pattern, int patternRuleIndex,
   Ref<ParseTree> patternTree)
   : patternRuleIndex(patternRuleIndex), pattern(pattern), patternTree(patternTree), matcher(matcher) {
 }
@@ -52,7 +52,7 @@ bool ParseTreePattern::matches(Ref<ParseTree> tree) {
 }
 
 /*
-std::vector<ParseTreeMatch*> ParseTreePattern::findAll(ParseTree *tree, const std::wstring &xpath) {
+std::vector<ParseTreeMatch*> ParseTreePattern::findAll(ParseTree *tree, const std::string &xpath) {
   std::vector<ParseTree*> subtrees = xpath::XPath::findAll(tree, xpath, matcher->getParser());
   std::vector<ParseTreeMatch*> matches = std::vector<ParseTreeMatch*>();
   for (auto t : subtrees) {
@@ -69,7 +69,7 @@ ParseTreePatternMatcher *ParseTreePattern::getMatcher() const {
   return matcher;
 }
 
-std::wstring ParseTreePattern::getPattern() const {
+std::string ParseTreePattern::getPattern() const {
   return pattern;
 }
 

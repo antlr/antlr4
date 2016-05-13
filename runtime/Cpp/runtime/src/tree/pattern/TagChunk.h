@@ -65,7 +65,7 @@ namespace pattern {
     /// </param>
     /// <exception cref="IllegalArgumentException"> if {@code tag} is {@code null} or
     /// empty. </exception>
-    TagChunk(const std::wstring &tag);
+    TagChunk(const std::string &tag);
     virtual ~TagChunk() {};
 
     /// <summary>
@@ -79,35 +79,35 @@ namespace pattern {
     /// </param>
     /// <exception cref="IllegalArgumentException"> if {@code tag} is {@code null} or
     /// empty. </exception>
-    TagChunk(const std::wstring &label, const std::wstring &tag);
+    TagChunk(const std::string &label, const std::string &tag);
 
     /// <summary>
     /// Get the tag for this chunk.
     /// </summary>
     /// <returns> The tag for the chunk. </returns>
-    std::wstring getTag();
+    std::string getTag();
 
     /// <summary>
     /// Get the label, if any, assigned to this chunk.
     /// </summary>
     /// <returns> The label assigned to this chunk, or {@code null} if no label is
     /// assigned to the chunk. </returns>
-    std::wstring getLabel();
+    std::string getLabel();
 
     /// <summary>
     /// This method returns a text representation of the tag chunk. Labeled tags
     /// are returned in the form {@code label:tag}, and unlabeled tags are
     /// returned as just the tag name.
     /// </summary>
-    virtual std::wstring toString();
+    virtual std::string toString();
 
   private:
     /// This is the backing field for <seealso cref="#getTag"/>.
-    const std::wstring _tag;
+    const std::string _tag;
     /// <summary>
-    /// This is the backing field for <seealso cref="#getLabel"/>.
+    /// This is the backing field for <seealso cref="#getLabe"/>.
     /// </summary>
-    const std::wstring _label;
+    const std::string _label;
   };
 
 } // namespace pattern

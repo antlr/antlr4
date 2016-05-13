@@ -57,13 +57,13 @@ using namespace org::antlr::v4::runtime;
 using namespace org::antlr::v4::runtime::atn;
 using namespace antlrcpp;
 
-ParserInterpreter::ParserInterpreter(const std::wstring &grammarFileName, const std::vector<std::wstring>& tokenNames,
-  const std::vector<std::wstring>& ruleNames, const atn::ATN &atn, TokenStream *input)
+ParserInterpreter::ParserInterpreter(const std::string &grammarFileName, const std::vector<std::string>& tokenNames,
+  const std::vector<std::string>& ruleNames, const atn::ATN &atn, TokenStream *input)
   : ParserInterpreter(grammarFileName, dfa::VocabularyImpl::fromTokenNames(tokenNames), ruleNames, atn, input) {
 }
 
-ParserInterpreter::ParserInterpreter(const std::wstring &grammarFileName, Ref<dfa::Vocabulary> vocabulary,
-  const std::vector<std::wstring> &ruleNames, const atn::ATN &atn, TokenStream *input)
+ParserInterpreter::ParserInterpreter(const std::string &grammarFileName, Ref<dfa::Vocabulary> vocabulary,
+  const std::vector<std::string> &ruleNames, const atn::ATN &atn, TokenStream *input)
   : Parser(input), _grammarFileName(grammarFileName), _atn(atn), _ruleNames(ruleNames), _vocabulary(vocabulary) {
 
   _sharedContextCache = std::make_shared<atn::PredictionContextCache>();
@@ -95,7 +95,7 @@ const atn::ATN& ParserInterpreter::getATN() const {
   return _atn;
 }
 
-const std::vector<std::wstring>& ParserInterpreter::getTokenNames() const {
+const std::vector<std::string>& ParserInterpreter::getTokenNames() const {
   return _tokenNames;
 }
 
@@ -103,11 +103,11 @@ Ref<dfa::Vocabulary> ParserInterpreter::getVocabulary() const {
   return _vocabulary;
 }
 
-const std::vector<std::wstring>& ParserInterpreter::getRuleNames() const {
+const std::vector<std::string>& ParserInterpreter::getRuleNames() const {
   return _ruleNames;
 }
 
-std::wstring ParserInterpreter::getGrammarFileName() const {
+std::string ParserInterpreter::getGrammarFileName() const {
   return _grammarFileName;
 }
 
@@ -203,7 +203,7 @@ void ParserInterpreter::visitState(atn::ATNState *p) {
       break;
 
     case atn::Transition::ATOM:
-      match(((atn::AtomTransition*)(transition))->_label);
+      match((int)((atn::AtomTransition*)(transition))->_label);
       break;
 
     case atn::Transition::RANGE:

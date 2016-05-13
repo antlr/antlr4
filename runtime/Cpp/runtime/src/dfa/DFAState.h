@@ -72,7 +72,7 @@ namespace dfa {
       PredPrediction(Ref<atn::SemanticContext> pred, int alt);
       virtual ~PredPrediction() {};
 
-      virtual std::wstring toString();
+      virtual std::string toString();
 
     private:
       void InitializeInstanceFields();
@@ -149,7 +149,7 @@ namespace dfa {
     /// stateNumber is irrelevant.
     bool operator == (const DFAState &o);
 
-    virtual std::wstring toString();
+    virtual std::string toString();
 
   private:
     void InitializeInstanceFields();

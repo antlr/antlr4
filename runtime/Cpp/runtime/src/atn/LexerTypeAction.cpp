@@ -77,6 +77,6 @@ bool LexerTypeAction::operator == (const LexerAction &obj) const {
   return _type == action->_type;
 }
 
-std::wstring LexerTypeAction::toString() const {
-  return L"type(" + std::to_wstring(_type) + L")";
+std::string LexerTypeAction::toString() const {
+  return "type(" + std::to_string(_type) + ")";
 }

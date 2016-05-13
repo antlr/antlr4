@@ -76,6 +76,6 @@ bool LexerChannelAction::operator == (const LexerAction &obj) const {
   return _channel == action->_channel;
 }
 
-std::wstring LexerChannelAction::toString() const {
-  return L"channel(" + std::to_wstring(_channel) + L")";
+std::string LexerChannelAction::toString() const {
+  return "channel(" + std::to_string(_channel) + ")";
 }

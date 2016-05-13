@@ -80,7 +80,7 @@ namespace runtime {
     ///        the parser was able to recover in line without exiting the
     ///        surrounding rule. </param>
     virtual void syntaxError(IRecognizer *recognizer, Ref<Token> offendingSymbol, size_t line, int charPositionInLine,
-                             const std::wstring &msg, std::exception_ptr e) = 0;
+                             const std::string &msg, std::exception_ptr e) = 0;
 
     /**
      * This method is called by the parser when a full-context prediction

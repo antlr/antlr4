@@ -40,14 +40,14 @@
 
 using namespace org::antlr::v4::runtime;
 
-LexerInterpreter::LexerInterpreter(const std::wstring &grammarFileName, const std::vector<std::wstring> &tokenNames,
-  const std::vector<std::wstring> &ruleNames, const std::vector<std::wstring> &modeNames, const atn::ATN &atn,
+LexerInterpreter::LexerInterpreter(const std::string &grammarFileName, const std::vector<std::string> &tokenNames,
+  const std::vector<std::string> &ruleNames, const std::vector<std::string> &modeNames, const atn::ATN &atn,
   CharStream *input)
 : LexerInterpreter(grammarFileName, dfa::VocabularyImpl::fromTokenNames(tokenNames), ruleNames, modeNames, atn, input) {
 }
 
-LexerInterpreter::LexerInterpreter(const std::wstring &grammarFileName, Ref<dfa::Vocabulary> vocabulary,
-  const std::vector<std::wstring> &ruleNames, const std::vector<std::wstring> &modeNames, const atn::ATN &atn,
+LexerInterpreter::LexerInterpreter(const std::string &grammarFileName, Ref<dfa::Vocabulary> vocabulary,
+  const std::vector<std::string> &ruleNames, const std::vector<std::string> &modeNames, const atn::ATN &atn,
   CharStream *input)
   : Lexer(input), _grammarFileName(grammarFileName), _atn(atn), _ruleNames(ruleNames), _modeNames(modeNames),
                   _vocabulary(vocabulary) {
@@ -76,19 +76,19 @@ const atn::ATN& LexerInterpreter::getATN() const {
   return _atn;
 }
 
-std::wstring LexerInterpreter::getGrammarFileName() const {
+std::string LexerInterpreter::getGrammarFileName() const {
   return _grammarFileName;
 }
 
-const std::vector<std::wstring>& LexerInterpreter::getTokenNames() const {
+const std::vector<std::string>& LexerInterpreter::getTokenNames() const {
   return _tokenNames;
 }
 
-const std::vector<std::wstring>& LexerInterpreter::getRuleNames() const {
+const std::vector<std::string>& LexerInterpreter::getRuleNames() const {
   return _ruleNames;
 }
 
-const std::vector<std::wstring>& LexerInterpreter::getModeNames() const {
+const std::vector<std::string>& LexerInterpreter::getModeNames() const {
   return _modeNames;
 }
 

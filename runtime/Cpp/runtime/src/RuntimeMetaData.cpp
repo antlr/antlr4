@@ -33,18 +33,18 @@
 
 using namespace org::antlr::v4::runtime;
 
-const std::wstring RuntimeMetaData::VERSION = L"4.5.3";
+const std::string RuntimeMetaData::VERSION = "4.5.3";
 
-std::wstring RuntimeMetaData::getRuntimeVersion() {
+std::string RuntimeMetaData::getRuntimeVersion() {
   return VERSION;
 }
 
-void RuntimeMetaData::checkVersion(const std::wstring &generatingToolVersion, const std::wstring &compileTimeVersion) {
-  std::wstring runtimeVersion = VERSION;
+void RuntimeMetaData::checkVersion(const std::string &generatingToolVersion, const std::string &compileTimeVersion) {
+  std::string runtimeVersion = VERSION;
   bool runtimeConflictsWithGeneratingTool = false;
   bool runtimeConflictsWithCompileTimeTool = false;
 
-  if (generatingToolVersion != L"") {
+  if (generatingToolVersion != "") {
     runtimeConflictsWithGeneratingTool = runtimeVersion != generatingToolVersion
       && getMajorMinorVersion(runtimeVersion) != getMajorMinorVersion(generatingToolVersion);
   }
@@ -53,25 +53,25 @@ void RuntimeMetaData::checkVersion(const std::wstring &generatingToolVersion, co
     && getMajorMinorVersion(runtimeVersion) != getMajorMinorVersion(compileTimeVersion);
 
   if (runtimeConflictsWithGeneratingTool) {
-    std::wcerr << "ANTLR Tool version " << generatingToolVersion << " used for code generation does not match "
+    std::cerr << "ANTLR Tool version " << generatingToolVersion << " used for code generation does not match "
       "the current runtime version " << runtimeVersion << std::endl;
   }
   if (runtimeConflictsWithCompileTimeTool) {
-    std::wcerr << "ANTLR Runtime version " << compileTimeVersion << " used for parser compilation does not match "
+    std::cerr << "ANTLR Runtime version " << compileTimeVersion << " used for parser compilation does not match "
       "the current runtime version " << runtimeVersion << std::endl;
   }
 }
 
-std::wstring RuntimeMetaData::getMajorMinorVersion(const std::wstring &version) {
-  size_t firstDot = version.find(L'.');
-  size_t secondDot = firstDot != std::wstring::npos ? version.find(L'.', firstDot + 1) : std::wstring::npos;
-  size_t firstDash = version.find(L'-');
+std::string RuntimeMetaData::getMajorMinorVersion(const std::string &version) {
+  size_t firstDot = version.find('.');
+  size_t secondDot = firstDot != std::string::npos ? version.find('.', firstDot + 1) : std::string::npos;
+  size_t firstDash = version.find('-');
   size_t referenceLength = version.size();
-  if (secondDot != std::wstring::npos) {
+  if (secondDot != std::string::npos) {
     referenceLength = std::min(referenceLength, secondDot);
   }
 
-  if (firstDash != std::wstring::npos) {
+  if (firstDash != std::string::npos) {
     referenceLength = std::min(referenceLength, firstDash);
   }
 

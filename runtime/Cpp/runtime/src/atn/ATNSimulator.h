@@ -68,7 +68,7 @@ namespace atn {
     virtual Ref<PredictionContext> getCachedContext(Ref<PredictionContext> context);
 
     /// @deprecated Use <seealso cref="ATNDeserializer#deserialize"/> instead.
-    static ATN deserialize(const std::wstring &data);
+    static ATN deserialize(const std::vector<uint16_t> &data);
 
     /// @deprecated Use <seealso cref="ATNDeserializer#checkCondition(boolean)"/> instead.
     static void checkCondition(bool condition);

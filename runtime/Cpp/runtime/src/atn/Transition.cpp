@@ -39,8 +39,8 @@ using namespace org::antlr::v4::runtime::atn;
 
 using namespace antlrcpp;
 
-const std::vector<std::wstring> Transition::serializationNames = {
-  L"INVALID", L"EPSILON", L"RANGE", L"RULE", L"PREDICATE", L"ATOM", L"ACTION", L"SET", L"NOT_SET", L"WILDCARD", L"PRECEDENCE"
+const std::vector<std::string> Transition::serializationNames = {
+  "INVALID", "EPSILON", "RANGE", "RULE", "PREDICATE", "ATOM", "ACTION", "SET", "NOT_SET", "WILDCARD", "PRECEDENCE"
 };
 
 Transition::Transition(ATNState *target) {
@@ -59,8 +59,8 @@ misc::IntervalSet Transition::label() const {
   return misc::IntervalSet::EMPTY_SET;
 }
 
-std::wstring Transition::toString() const {
-  std::wstringstream ss;
+std::string Transition::toString() const {
+  std::stringstream ss;
   ss << "(Transition " << std::hex << this << ", target: " << std::hex << target << ')';
 
   return ss.str();

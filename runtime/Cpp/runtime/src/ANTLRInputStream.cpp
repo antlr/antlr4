@@ -33,7 +33,7 @@
 #include "Interval.h"
 #include "IntStream.h"
 
-#include "Arrays.h"
+#include "StringUtils.h"
 #include "CPPUtils.h"
 
 #include "ANTLRInputStream.h"
@@ -43,41 +43,39 @@ using namespace antlrcpp;
 
 using misc::Interval;
 
-ANTLRInputStream::ANTLRInputStream(const std::wstring &input) : data(input) {
+ANTLRInputStream::ANTLRInputStream(const std::string &input) {
   InitializeInstanceFields();
+
+  data = utfConverter.from_bytes(input);
 }
 
-ANTLRInputStream::ANTLRInputStream(const wchar_t data[], size_t numberOfActualCharsInArray)
-  : ANTLRInputStream(std::wstring(data, numberOfActualCharsInArray)) {
+ANTLRInputStream::ANTLRInputStream(const char data[], size_t numberOfActualCharsInArray)
+  : ANTLRInputStream(std::string(data, numberOfActualCharsInArray)) {
 }
 
-ANTLRInputStream::ANTLRInputStream(std::wistream &stream) : ANTLRInputStream(stream, READ_BUFFER_SIZE) {
+ANTLRInputStream::ANTLRInputStream(std::wistream &stream) {
+  load(stream);
 }
 
-ANTLRInputStream::ANTLRInputStream(std::wistream &stream, std::streamsize readChunkSize) : ANTLRInputStream() {
-  load(stream, readChunkSize);
-}
-
-void ANTLRInputStream::load(std::wistream &stream, std::streamsize readChunkSize) {
-  stream.seekg(0, stream.beg);
-  if (!stream.good()) // No fail, bad or EOF.
+void ANTLRInputStream::load(std::wistream &stream) {
+  if (!stream.good() || stream.eof()) // No fail, bad or EOF.
     return;
 
   data.clear();
+  p = 0;
+  std::streampos startPosition = stream.tellg();
+  stream.seekg(0, std::ios::end);
+  data.reserve(stream.tellg() - startPosition);
+  stream.seekg(startPosition, std::ios::beg);
+  
+  stream.imbue(std::locale(stream.getloc(), new std::codecvt_utf8<char32_t>));
+  wchar_t c;
+  stream >> std::noskipws >> c;
+  if (c != 0xFFFE) // Ignore BOM if theres one.
+    data += c;
 
-  if (readChunkSize == 0) {
-    readChunkSize = READ_BUFFER_SIZE;
-  }
-
-  wchar_t *buffer = new wchar_t[readChunkSize]; /* mem check: freed in finally block */
-  auto onExit = finally([buffer] {
-    delete[] buffer;
-  });
-
-  while (!stream.eof()) {
-    stream.read(buffer, readChunkSize);
-    data.append(buffer, (size_t)std::min(stream.gcount(), readChunkSize));
-  }
+  for ( ; stream >> c; )
+    data += c;
 }
 
 void ANTLRInputStream::reset() {
@@ -147,7 +145,7 @@ void ANTLRInputStream::seek(size_t index) {
   }
 }
 
-std::wstring ANTLRInputStream::getText(const Interval &interval) {
+std::string ANTLRInputStream::getText(const Interval &interval) {
   size_t start = (size_t)interval.a;
   size_t stop = (size_t)interval.b;
 
@@ -157,10 +155,10 @@ std::wstring ANTLRInputStream::getText(const Interval &interval) {
 
   size_t count = stop - start + 1;
   if (start >= data.size()) {
-    return L"";
+    return "";
   }
 
-  return data.substr(start, count);
+  return utfConverter.to_bytes(data.substr(start, count));
 }
 
 std::string ANTLRInputStream::getSourceName() const {
@@ -170,8 +168,8 @@ std::string ANTLRInputStream::getSourceName() const {
   return name;
 }
 
-std::wstring ANTLRInputStream::toString() const {
-  return data;
+std::string ANTLRInputStream::toString() const {
+  return utfConverter.to_bytes(data);
 }
 
 void ANTLRInputStream::InitializeInstanceFields() {

@@ -91,7 +91,7 @@ namespace runtime {
       int prediction, Ref<atn::ATNConfigSet> configs) override;
 
   protected:
-    virtual std::wstring getDecisionDescription(Parser *recognizer, const dfa::DFA &dfa);
+    virtual std::string getDecisionDescription(Parser *recognizer, const dfa::DFA &dfa);
 
     /// <summary>
     /// Computes the set of conflicting or ambiguous alternatives from a

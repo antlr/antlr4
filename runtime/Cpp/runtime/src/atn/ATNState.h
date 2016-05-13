@@ -122,7 +122,7 @@ namespace atn {
       LOOP_END = 12
     };
 
-    static const std::vector<std::wstring> serializationNames;
+    static const std::vector<std::string> serializationNames;
 
     /// Which ATN are we in?
     // ml: just a reference to the owner. Set when the state gets added to an ATN.
@@ -143,7 +143,7 @@ namespace atn {
     bool operator == (const ATNState &other);
 
     virtual bool isNonGreedyExitState();
-    virtual std::wstring toString() const;
+    virtual std::string toString() const;
     virtual  std::vector<Transition*> getTransitions();
     virtual size_t getNumberOfTransitions();
     virtual void addTransition(Transition *e);

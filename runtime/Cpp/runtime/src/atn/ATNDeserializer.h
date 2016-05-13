@@ -54,7 +54,7 @@ namespace atn {
 
     static Guid toUUID(const unsigned short *data, int offset);
 
-    virtual ATN deserialize(const std::wstring &input);
+    virtual ATN deserialize(const std::vector<uint16_t> &input);
     virtual void verifyATN(const ATN &atn);
 
     static void checkCondition(bool condition);

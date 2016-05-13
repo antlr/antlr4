@@ -58,7 +58,7 @@ namespace atn {
     virtual std::weak_ptr<PredictionContext> getParent(size_t index) const override;
     virtual int getReturnState(size_t index) const override;
     virtual bool operator == (const PredictionContext &o) const override;
-    virtual std::wstring toString() const override;
+    virtual std::string toString() const override;
   };
 
 } // namespace atn

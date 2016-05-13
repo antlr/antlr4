@@ -35,7 +35,7 @@ using namespace org::antlr::v4::runtime;
 
 void ProxyErrorListener::addErrorListener(ANTLRErrorListener *listener) {
   if (listener == nullptr) {
-    throw L"listener cannot be null.";
+    throw "listener cannot be null.";
   }
 
   _delegates.insert(listener);
@@ -50,7 +50,7 @@ void ProxyErrorListener::removeErrorListeners() {
 }
 
 void ProxyErrorListener::syntaxError(IRecognizer *recognizer, Ref<Token> offendingSymbol, size_t line,
-  int charPositionInLine, const std::wstring &msg, std::exception_ptr e) {
+  int charPositionInLine, const std::string &msg, std::exception_ptr e) {
 
   for (auto listener : _delegates) {
     listener->syntaxError(recognizer, offendingSymbol, line, charPositionInLine, msg, e);

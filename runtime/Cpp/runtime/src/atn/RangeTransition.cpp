@@ -36,7 +36,7 @@
 using namespace org::antlr::v4::runtime;
 using namespace org::antlr::v4::runtime::atn;
 
-RangeTransition::RangeTransition(ATNState *target, int from, int to) : Transition(target), from(from), to(to) {
+RangeTransition::RangeTransition(ATNState *target, size_t from, size_t to) : Transition(target), from(from), to(to) {
 }
 
 int RangeTransition::getSerializationType() const {
@@ -44,14 +44,13 @@ int RangeTransition::getSerializationType() const {
 }
 
 misc::IntervalSet RangeTransition::label() const {
-  return misc::IntervalSet::of(from, to);
+  return misc::IntervalSet::of((int)from, (int)to);
 }
 
-bool RangeTransition::matches(int symbol, int /*minVocabSymbol*/, int /*maxVocabSymbol*/) const {
+bool RangeTransition::matches(size_t symbol, size_t /*minVocabSymbol*/, size_t /*maxVocabSymbol*/) const {
   return symbol >= from && symbol <= to;
 }
 
-std::wstring RangeTransition::toString() const {
-  return L"RANGE " + Transition::toString() + L" { from: " + std::to_wstring(from) + L", to: " + std::to_wstring(to) +
-    L" }";
+std::string RangeTransition::toString() const {
+  return "RANGE " + Transition::toString() + " { from: " + std::to_string(from) + ", to: " + std::to_string(to) + " }";
 }

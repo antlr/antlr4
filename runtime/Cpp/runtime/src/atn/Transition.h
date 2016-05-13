@@ -67,7 +67,7 @@ namespace atn {
     static const int PRECEDENCE = 10;
 
 
-    static const std::vector<std::wstring> serializationNames;
+    static const std::vector<std::string> serializationNames;
 
     /// The target of this transition.
     // ml: this is a reference into the ATN.
@@ -92,9 +92,9 @@ namespace atn {
      */
     virtual bool isEpsilon() const;
     virtual misc::IntervalSet label() const;
-    virtual bool matches(int symbol, int minVocabSymbol, int maxVocabSymbol) const = 0;
+    virtual bool matches(size_t symbol, size_t minVocabSymbol, size_t maxVocabSymbol) const = 0;
 
-    virtual std::wstring toString() const;
+    virtual std::string toString() const;
   };
 
 } // namespace atn

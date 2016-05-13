@@ -38,92 +38,18 @@ namespace antlr {
 namespace v4 {
 namespace runtime {
 
-  /// <summary>
   /// Do not buffer up the entire char stream. It does keep a small buffer
-  ///  for efficiency and also buffers while a mark exists (set by the
-  ///  lookahead prediction in parser). "Unbuffered" here refers to fact
-  ///  that it doesn't buffer all data, not that's it's on demand loading of char.
-  /// </summary>
+  /// for efficiency and also buffers while a mark exists (set by the
+  /// lookahead prediction in parser). "Unbuffered" here refers to fact
+  /// that it doesn't buffer all data, not that's it's on demand loading of char.
   class ANTLR4CPP_PUBLIC UnbufferedCharStream : public CharStream {
-  protected:
-    /// <summary>
-    /// A moving window buffer of the data being scanned. While there's a marker,
-    /// we keep adding to buffer. Otherwise, <seealso cref="#consume consume()"/> resets so
-    /// we start filling at index 0 again.
-    /// </summary>
-    std::wstring data;
-
-    /// <summary>
-    /// 0..n-1 index into <seealso cref="#data data"/> of next character.
-    /// <p/>
-    /// The {@code LA(1)} character is {@code data[p]}. If {@code p == n}, we are
-    /// out of buffered characters.
-    /// </summary>
-    size_t p;
-
-    /// <summary>
-    /// Count up with <seealso cref="#mark mark()"/> and down with
-    /// <seealso cref="#release release()"/>. When we {@code release()} the last mark,
-    /// {@code numMarkers} reaches 0 and we reset the buffer. Copy
-    /// {@code data[p]..data[n-1]} to {@code data[0]..data[(n-1)-p]}.
-    /// </summary>
-    size_t numMarkers;
-
-    /// <summary>
-    /// This is the {@code LA(-1)} character for the current position.
-    /// </summary>
-    wchar_t lastChar;
-
-    /// <summary>
-    /// When {@code numMarkers > 0}, this is the {@code LA(-1)} character for the
-    /// first character in <seealso cref="#data data"/>. Otherwise, this is unspecified.
-    /// </summary>
-    wchar_t lastCharBufferStart;
-
-    /// <summary>
-    /// Absolute character index. It's the index of the character about to be
-    /// read via {@code LA(1)}. Goes from 0 to the number of characters in the
-    /// entire stream, although the stream size is unknown before the end is
-    /// reached.
-    /// </summary>
-    size_t currentCharIndex;
-
-    std::wistream &input;
-
-    /// <summary>
-    /// The name or source of this char stream. </summary>
   public:
+    /// The name or source of this char stream.
     std::string name;
 
-    UnbufferedCharStream(std::wistream &input, size_t bufferSize = 256);
+    UnbufferedCharStream(std::wistream &input);
 
     virtual void consume() override;
-
-    /// <summary>
-    /// Make sure we have 'want' elements from current position <seealso cref="#p p"/>.
-    /// Last valid {@code p} index is {@code data.length-1}. {@code p+need-1} is
-    /// the char index 'need' elements ahead. If we need 1 element,
-    /// {@code (p+1-1)==p} must be less than {@code data.length}.
-    /// </summary>
-  protected:
-    virtual void sync(size_t want);
-
-    /// <summary>
-    /// Add {@code n} characters to the buffer. Returns the number of characters
-    /// actually added to the buffer. If the return value is less than {@code n},
-    /// then EOF was reached before {@code n} characters could be added.
-    /// </summary>
-    virtual size_t fill(size_t n);
-
-    /// <summary>
-    /// Override to provide different source of characters than
-    /// <seealso cref="#input input"/>.
-    /// </summary>
-    virtual size_t nextChar();
-
-    virtual void add(size_t c);
-
-  public:
     virtual ssize_t LA(ssize_t i) override;
 
     /// <summary>
@@ -139,7 +65,6 @@ namespace runtime {
     /// Decrement number of markers, resetting buffer if we hit 0. </summary>
     /// <param name="marker"> </param>
     virtual void release(ssize_t marker) override;
-
     virtual size_t index() override;
 
     /// <summary>
@@ -149,9 +74,68 @@ namespace runtime {
     virtual void seek(size_t index) override;
     virtual size_t size() override;
     virtual std::string getSourceName() const override;
-    virtual std::wstring getText(const misc::Interval &interval) override;
+    virtual std::string getText(const misc::Interval &interval) override;
 
   protected:
+    /// A moving window buffer of the data being scanned. While there's a marker,
+    /// we keep adding to buffer. Otherwise, <seealso cref="#consume consume()"/> resets so
+    /// we start filling at index 0 again.
+    std::u32string _data; // UTF-32 encoded.
+
+    /// <summary>
+    /// 0..n-1 index into <seealso cref="#data data"/> of next character.
+    /// <p/>
+    /// The {@code LA(1)} character is {@code data[p]}. If {@code p == n}, we are
+    /// out of buffered characters.
+    /// </summary>
+    size_t _p;
+
+    /// <summary>
+    /// Count up with <seealso cref="#mark mark()"/> and down with
+    /// <seealso cref="#release release()"/>. When we {@code release()} the last mark,
+    /// {@code numMarkers} reaches 0 and we reset the buffer. Copy
+    /// {@code data[p]..data[n-1]} to {@code data[0]..data[(n-1)-p]}.
+    /// </summary>
+    size_t _numMarkers;
+
+    /// This is the {@code LA(-1)} character for the current position.
+    size_t _lastChar; // UTF-32
+
+    /// <summary>
+    /// When {@code numMarkers > 0}, this is the {@code LA(-1)} character for the
+    /// first character in <seealso cref="#data data"/>. Otherwise, this is unspecified.
+    /// </summary>
+    size_t _lastCharBufferStart; // UTF-32
+
+    /// <summary>
+    /// Absolute character index. It's the index of the character about to be
+    /// read via {@code LA(1)}. Goes from 0 to the number of characters in the
+    /// entire stream, although the stream size is unknown before the end is
+    /// reached.
+    /// </summary>
+    size_t _currentCharIndex;
+
+    std::wistream &_input;
+    
+    /// <summary>
+    /// Make sure we have 'want' elements from current position <seealso cref="#p p"/>.
+    /// Last valid {@code p} index is {@code data.length-1}. {@code p+need-1} is
+    /// the char index 'need' elements ahead. If we need 1 element,
+    /// {@code (p+1-1)==p} must be less than {@code data.length}.
+    /// </summary>
+    virtual void sync(size_t want);
+
+    /// <summary>
+    /// Add {@code n} characters to the buffer. Returns the number of characters
+    /// actually added to the buffer. If the return value is less than {@code n},
+    /// then EOF was reached before {@code n} characters could be added.
+    /// </summary>
+    virtual size_t fill(size_t n);
+
+    /// Override to provide different source of characters than
+    /// <seealso cref="#input input"/>.
+    virtual char32_t nextChar();
+    virtual void add(char32_t c);
     size_t getBufferStartIndex() const;
 
   private:

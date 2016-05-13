@@ -33,7 +33,9 @@
 #include "Exceptions.h"
 #include "Interval.h"
 #include "UnbufferedTokenStream.h"
+#include "StringUtils.h"
 
+using namespace antlrcpp;
 using namespace org::antlr::v4::runtime;
 using namespace org::antlr::v4::runtime::misc;
 
@@ -58,38 +60,41 @@ using namespace org::antlr::v4::runtime::misc;
   XCTAssert(stream1.toString().empty());
   XCTAssertEqual(stream1.index(), 0U);
 
-  ANTLRInputStream stream2(L"To be or not to be");
-  XCTAssert(stream2.toString() == L"To be or not to be");
+  ANTLRInputStream stream2("To be or not to be");
+  XCTAssert(stream2.toString() == "To be or not to be");
   XCTAssertEqual(stream2.index(), 0U);
   XCTAssertEqual(stream2.size(), 18U);
 
-  wchar_t data[] = L"Lorem ipsum dolor sit amet";
+  char data[] = "Lorem ipsum dolor sit amet";
   ANTLRInputStream stream3(data, sizeof(data) / sizeof(data[0]));
-  XCTAssert(stream3.toString() == std::wstring(L"Lorem ipsum dolor sit amet\0", 27));
+  XCTAssert(stream3.toString() == std::string("Lorem ipsum dolor sit amet\0", 27));
   XCTAssertEqual(stream3.index(), 0U);
   XCTAssertEqual(stream3.size(), 27U);
 
-  std::wstringstream input(data, sizeof(data) / sizeof(data[0]));
+  std::wstringstream input(L"Lorem ipsum dolor sit amet");
   ANTLRInputStream stream4(input);
+  std::string content = stream4.toString();
+  XCTAssertEqual(content, "Lorem ipsum dolor sit amet"); // Now as utf-8 string.
   XCTAssertEqual(stream4.index(), 0U);
   XCTAssertEqual(stream4.size(), 26U);
 
-  std::wstring longString(33333, L'a');
+  std::wstring longString(33333, 'a');
   input.str(longString);
-  stream4.load(input, 0);
+  stream4.load(input);
   XCTAssertEqual(stream4.index(), 0U);
   XCTAssertEqual(stream4.size(), 26U); // Nothing changed as the stream is still at eof.
 
   input.clear();
-  stream4.load(input, 0);
+  stream4.load(input);
   XCTAssertEqual(stream4.size(), 33333U);
 }
 
 - (void)testANTLRInputStreamUse {
-  std::wstring text(L"🚧Lorem ipsum dolor sit amet🕶");
+  std::string text(u8"🚧Lorem ipsum dolor sit amet🕶");
+  std::u32string wtext = utfConverter.from_bytes(text); // Convert to UTF-32.
   ANTLRInputStream stream(text);
   XCTAssertEqual(stream.index(), 0U);
-  XCTAssertEqual(stream.size(), text.size());
+  XCTAssertEqual(stream.size(), wtext.size());
 
   for (size_t i = 0; i < stream.size(); ++i) {
     stream.consume();
@@ -105,31 +110,31 @@ using namespace org::antlr::v4::runtime::misc;
     XCTAssertEqual(message, "cannot consume EOF");
   }
 
-  XCTAssertEqual(stream.index(), text.size());
+  XCTAssertEqual(stream.index(), wtext.size());
   stream.reset();
   XCTAssertEqual(stream.index(), 0U);
 
   XCTAssertEqual(stream.LA(0), 0);
-  for (size_t i = 1; i < text.size(); ++i) {
-    XCTAssertEqual(stream.LA((ssize_t)i), text[i - 1]); // LA(1) means: current char.
-    XCTAssertEqual(stream.LT((ssize_t)i), text[i - 1]); // LT is mapped to LA.
+  for (size_t i = 1; i < wtext.size(); ++i) {
+    XCTAssertEqual(stream.LA((ssize_t)i), wtext[i - 1]); // LA(1) means: current char.
+    XCTAssertEqual(stream.LT((ssize_t)i), wtext[i - 1]); // LT is mapped to LA.
     XCTAssertEqual(stream.index(), 0U); // No consumption when looking ahead.
   }
 
-  stream.seek(text.size() - 1);
-  XCTAssertEqual(stream.index(), text.size() - 1);
+  stream.seek(wtext.size() - 1);
+  XCTAssertEqual(stream.index(), wtext.size() - 1);
 
-  stream.seek(text.size() / 2);
-  XCTAssertEqual(stream.index(), text.size() / 2);
+  stream.seek(wtext.size() / 2);
+  XCTAssertEqual(stream.index(), wtext.size() / 2);
 
-  stream.seek(text.size() - 1);
-  for (size_t i = 1; i < text.size() - 1; ++i) {
-    XCTAssertEqual(stream.LA((ssize_t)-i), text[text.size() - i - 1]); // LA(-1) means: previous char.
-    XCTAssertEqual(stream.LT((ssize_t)-i), text[text.size() - i - 1]); // LT is mapped to LA.
-    XCTAssertEqual(stream.index(), text.size() - 1); // No consumption when looking ahead.
+  stream.seek(wtext.size() - 1);
+  for (ssize_t i = 1; i < (ssize_t)wtext.size() - 1; ++i) {
+    XCTAssertEqual(stream.LA(-i), wtext[wtext.size() - i - 1]); // LA(-1) means: previous char.
+    XCTAssertEqual(stream.LT(-i), wtext[wtext.size() - i - 1]); // LT is mapped to LA.
+    XCTAssertEqual(stream.index(), wtext.size() - 1); // No consumption when looking ahead.
   }
 
-  XCTAssertEqual((int)stream.LA(-10000), EOF);
+  XCTAssertEqual((int)stream.LA(-10000), IntStream::EOF);
 
   // Mark and release do nothing.
   stream.reset();
@@ -144,8 +149,9 @@ using namespace org::antlr::v4::runtime::misc;
   XCTAssertEqual(stream.index(), 10U);
 
   misc::Interval interval1(2, 10); // From - to, inclusive.
-  std::wstring output = stream.getText(interval1);
-  XCTAssertEqual(output, text.substr(2, 9));
+  std::string output = stream.getText(interval1);
+  std::string sub = utfConverter.to_bytes(wtext.substr(2, 9));
+  XCTAssertEqual(output, sub);
 
   misc::Interval interval2(200, 10); // Start beyond bounds.
   output = stream.getText(interval2);

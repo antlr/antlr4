@@ -35,7 +35,7 @@
 using namespace org::antlr::v4::runtime;
 
 void BaseErrorListener::syntaxError(IRecognizer * /*recognizer*/, Ref<Token> /*offendingSymbol*/, size_t /*line*/,
-  int /*charPositionInLine*/, const std::wstring &/*msg*/, std::exception_ptr /*e*/) {
+  int /*charPositionInLine*/, const std::string &/*msg*/, std::exception_ptr /*e*/) {
 }
 
 void BaseErrorListener::reportAmbiguity(Parser * /*recognizer*/, const dfa::DFA &/*dfa*/, size_t /*startIndex*/,

@@ -45,7 +45,7 @@ namespace dfa {
     virtual ~LexerDFASerializer() {};
 
   protected:
-    virtual std::wstring getEdgeLabel(size_t i) const override;
+    virtual std::string getEdgeLabel(size_t i) const override;
   };
 
 } // namespace atn

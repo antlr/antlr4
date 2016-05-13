@@ -44,8 +44,8 @@ DFAState::PredPrediction::PredPrediction(Ref<SemanticContext> pred, int alt) : p
   this->alt = alt;
 }
 
-std::wstring DFAState::PredPrediction::toString() {
-  return std::wstring(L"(") + pred->toString() + std::wstring(L", ") + std::to_wstring(alt) + std::wstring(L")");
+std::string DFAState::PredPrediction::toString() {
+  return std::string("(") + pred->toString() + std::string(", ") + std::to_string(alt) + std::string(")");
 }
 
 void DFAState::PredPrediction::InitializeInstanceFields() {
@@ -96,14 +96,14 @@ bool DFAState::operator == (const DFAState &o) {
   return configs == o.configs;
 }
 
-std::wstring DFAState::toString() {
-  std::wstringstream ss;
+std::string DFAState::toString() {
+  std::stringstream ss;
   ss << stateNumber;
   if (configs) {
-    ss << L":" << configs->toString();
+    ss << ":" << configs->toString();
   }
   if (isAcceptState) {
-    ss << L" => ";
+    ss << " => ";
     if (!predicates.empty()) {
       for (size_t i = 0; i < predicates.size(); i++) {
         ss << predicates[i]->toString();

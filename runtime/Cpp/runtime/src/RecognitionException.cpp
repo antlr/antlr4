@@ -31,7 +31,7 @@
 
 #include "ATN.h"
 #include "Recognizer.h"
-#include "Strings.h"
+#include "StringUtils.h"
 #include "ParserRuleContext.h"
 #include "IntervalSet.h"
 

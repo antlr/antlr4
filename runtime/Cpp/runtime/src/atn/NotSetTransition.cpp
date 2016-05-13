@@ -43,10 +43,11 @@ int NotSetTransition::getSerializationType() const {
   return NOT_SET;
 }
 
-bool NotSetTransition::matches(int symbol, int minVocabSymbol, int maxVocabSymbol) const {
-  return symbol >= minVocabSymbol && symbol <= maxVocabSymbol && !SetTransition::matches(symbol, minVocabSymbol, maxVocabSymbol);
+bool NotSetTransition::matches(size_t symbol, size_t minVocabSymbol, size_t maxVocabSymbol) const {
+  return symbol >= minVocabSymbol && symbol <= maxVocabSymbol
+    && !SetTransition::matches(symbol, minVocabSymbol, maxVocabSymbol);
 }
 
-std::wstring NotSetTransition::toString() const {
-  return L"NOT_SET " + Transition::toString() + L" { " + SetTransition::toString() + L" }";
+std::string NotSetTransition::toString() const {
+  return "NOT_SET " + Transition::toString() + " { " + SetTransition::toString() + " }";
 }

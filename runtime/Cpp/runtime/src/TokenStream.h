@@ -97,7 +97,7 @@ namespace runtime {
     /// stream.
     /// </returns>
     /// <exception cref="NullPointerException"> if {@code interval} is {@code null} </exception>
-    virtual std::wstring getText(const misc::Interval &interval) = 0;
+    virtual std::string getText(const misc::Interval &interval) = 0;
 
     /// <summary>
     /// Return the text of all tokens in the stream. This method behaves like the
@@ -111,7 +111,7 @@ namespace runtime {
     /// </pre>
     /// </summary>
     /// <returns> The text of all tokens in the stream. </returns>
-    virtual std::wstring getText() = 0;
+    virtual std::string getText() = 0;
 
     /// <summary>
     /// Return the text of all tokens in the source interval of the specified
@@ -130,7 +130,7 @@ namespace runtime {
     /// <param name="ctx"> The context providing the source interval of tokens to get
     /// text for. </param>
     /// <returns> The text of all tokens within the source interval of {@code ctx}. </returns>
-    virtual std::wstring getText(RuleContext *ctx) = 0;
+    virtual std::string getText(RuleContext *ctx) = 0;
 
     /// <summary>
     /// Return the text of all tokens in this stream between {@code start} and
@@ -160,7 +160,7 @@ namespace runtime {
     /// </returns>
     /// <exception cref="UnsupportedOperationException"> if this stream does not support
     /// this method for the specified tokens </exception>
-    virtual std::wstring getText(Ref<Token> start, Ref<Token> stop) = 0;
+    virtual std::string getText(Ref<Token> start, Ref<Token> stop) = 0;
   };
 
 } // namespace runtime

@@ -65,6 +65,6 @@ bool LexerPopModeAction::operator == (const LexerAction &obj) const {
   return &obj == this;
 }
 
-std::wstring LexerPopModeAction::toString() const {
-  return L"popMode";
+std::string LexerPopModeAction::toString() const {
+  return "popMode";
 }

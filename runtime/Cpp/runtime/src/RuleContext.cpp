@@ -79,15 +79,15 @@ std::weak_ptr<tree::Tree> RuleContext::getParentReference()
   return std::dynamic_pointer_cast<tree::Tree>(parent.lock());
 }
 
-std::wstring RuleContext::getText() {
+std::string RuleContext::getText() {
   if (getChildCount() == 0) {
-    return L"";
+    return "";
   }
 
-  std::wstringstream ss;
+  std::stringstream ss;
   for (size_t i = 0; i < getChildCount(); i++) {
     if (i > 0)
-      ss << L", ";
+      ss << ", ";
     ss << getChild(i)->getText();
   }
 
@@ -114,29 +114,29 @@ std::size_t RuleContext::getChildCount() {
   return 0;
 }
 
-std::wstring RuleContext::toStringTree(Parser *recog) {
+std::string RuleContext::toStringTree(Parser *recog) {
   return tree::Trees::toStringTree(shared_from_this(), recog);
 }
 
-std::wstring RuleContext::toStringTree(std::vector<std::wstring> &ruleNames) {
+std::string RuleContext::toStringTree(std::vector<std::string> &ruleNames) {
   return tree::Trees::toStringTree(shared_from_this(), ruleNames);
 }
 
-std::wstring RuleContext::toStringTree() {
+std::string RuleContext::toStringTree() {
   return toStringTree(nullptr);
 }
 
 
-std::wstring RuleContext::toString(const std::vector<std::wstring> &ruleNames) {
+std::string RuleContext::toString(const std::vector<std::string> &ruleNames) {
   return toString(ruleNames, Ref<RuleContext>());
 }
 
 
-std::wstring RuleContext::toString(const std::vector<std::wstring> &ruleNames, Ref<RuleContext> stop) {
-  std::wstringstream ss;
+std::string RuleContext::toString(const std::vector<std::string> &ruleNames, Ref<RuleContext> stop) {
+  std::stringstream ss;
 
   Ref<RuleContext> parent = shared_from_this();
-  ss << L"[";
+  ss << "[";
   while (parent != stop) {
     if (ruleNames.empty()) {
       if (!parent->isEmpty()) {
@@ -145,7 +145,7 @@ std::wstring RuleContext::toString(const std::vector<std::wstring> &ruleNames, R
     } else {
       ssize_t ruleIndex = parent->getRuleIndex();
 
-      std::wstring ruleName = (ruleIndex >= 0 && ruleIndex < (ssize_t)ruleNames.size()) ? ruleNames[(size_t)ruleIndex] : std::to_wstring(ruleIndex);
+      std::string ruleName = (ruleIndex >= 0 && ruleIndex < (ssize_t)ruleNames.size()) ? ruleNames[(size_t)ruleIndex] : std::to_string(ruleIndex);
       ss << ruleName;
     }
 
@@ -153,24 +153,24 @@ std::wstring RuleContext::toString(const std::vector<std::wstring> &ruleNames, R
       break;
     parent = parent->parent.lock();
     if (!ruleNames.empty() || !parent->isEmpty()) {
-      ss << L" ";
+      ss << " ";
     }
   }
 
-  ss << L"]";
+  ss << "]";
 
   return ss.str();
 }
 
-std::wstring RuleContext::toString() {
+std::string RuleContext::toString() {
   return toString(nullptr);
 }
 
-std::wstring RuleContext::toString(Recognizer *recog) {
+std::string RuleContext::toString(Recognizer *recog) {
   return toString(recog, ParserRuleContext::EMPTY);
 }
 
-std::wstring RuleContext::toString(Recognizer *recog, Ref<RuleContext> stop) {
+std::string RuleContext::toString(Recognizer *recog, Ref<RuleContext> stop) {
   if (recog == nullptr)
     return toString({}, stop);
   return toString(recog->getRuleNames(), stop);

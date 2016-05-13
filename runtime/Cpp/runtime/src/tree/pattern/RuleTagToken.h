@@ -50,16 +50,16 @@ namespace pattern {
     /// This is the backing field for <seealso cref="#getRuleName"/>.
     /// </summary>
   private:
-    const std::wstring ruleName;
+    const std::string ruleName;
     /// <summary>
     /// The token type for the current token. This is the token type assigned to
     /// the bypass alternative for the rule during ATN deserialization.
     /// </summary>
     const int bypassTokenType;
     /// <summary>
-    /// This is the backing field for <seealso cref="#getLabel"/>.
+    /// This is the backing field for <seealso cref="#getLabe"/>.
     /// </summary>
-    const std::wstring label;
+    const std::string label;
 
     /// <summary>
     /// Constructs a new instance of <seealso cref="RuleTagToken"/> with the specified rule
@@ -72,7 +72,7 @@ namespace pattern {
     /// or empty. </exception>
   public:
 
-    RuleTagToken(const std::wstring &ruleName, int bypassTokenType); //this(ruleName, bypassTokenType, nullptr);
+    RuleTagToken(const std::string &ruleName, int bypassTokenType); //this(ruleName, bypassTokenType, nullptr);
 
     /// <summary>
     /// Constructs a new instance of <seealso cref="RuleTagToken"/> with the specified rule
@@ -85,25 +85,25 @@ namespace pattern {
     /// </param>
     /// <exception cref="IllegalArgumentException"> if {@code ruleName} is {@code null}
     /// or empty. </exception>
-    RuleTagToken(const std::wstring &ruleName, int bypassTokenType, const std::wstring &label);
+    RuleTagToken(const std::string &ruleName, int bypassTokenType, const std::string &label);
 
     /// <summary>
     /// Gets the name of the rule associated with this rule tag.
     /// </summary>
     /// <returns> The name of the parser rule associated with this rule tag. </returns>
-    std::wstring getRuleName();
+    std::string getRuleName();
 
     /// <summary>
     /// Gets the label associated with the rule tag.
     /// </summary>
     /// <returns> The name of the label associated with the rule tag, or
     /// {@code null} if this is an unlabeled rule tag. </returns>
-    std::wstring getLabel();
+    std::string getLabel();
 
     /// <summary>
     /// {@inheritDoc}
     /// <p/>
-    /// Rule tag tokens are always placed on the <seealso cref="#DEFAULT_CHANNEL"/>.
+    /// Rule tag tokens are always placed on the <seealso cref="#DEFAULT_CHANNE"/>.
     /// </summary>
     virtual size_t getChannel() override;
 
@@ -113,7 +113,7 @@ namespace pattern {
     /// This method returns the rule tag formatted with {@code <} and {@code >}
     /// delimiters.
     /// </summary>
-    virtual std::wstring getText() override;
+    virtual std::string getText() override;
 
     /// <summary>
     /// {@inheritDoc}
@@ -178,7 +178,7 @@ namespace pattern {
     /// The implementation for <seealso cref="RuleTagToken"/> returns a string of the form
     /// {@code ruleName:bypassTokenType}.
     /// </summary>
-    virtual std::wstring toString() override;
+    virtual std::string toString() override;
   };
 
 } // namespace pattern

@@ -64,7 +64,7 @@ namespace dfa {
     /// </param>
     /// <seealso cref= #getLiteralName(int) </seealso>
     /// <seealso cref= #getSymbolicName(int) </seealso>
-    VocabularyImpl(const std::vector<std::wstring> &literalNames, const std::vector<std::wstring> &symbolicNames);
+    VocabularyImpl(const std::vector<std::string> &literalNames, const std::vector<std::string> &symbolicNames);
 
     /// <summary>
     /// Constructs a new instance of <seealso cref="VocabularyImpl"/> from the specified
@@ -82,8 +82,8 @@ namespace dfa {
     /// <seealso cref= #getLiteralName(int) </seealso>
     /// <seealso cref= #getSymbolicName(int) </seealso>
     /// <seealso cref= #getDisplayName(int) </seealso>
-    VocabularyImpl(const std::vector<std::wstring> &literalNames, const std::vector<std::wstring> &symbolicNames,
-                   const std::vector<std::wstring> &displayNames);
+    VocabularyImpl(const std::vector<std::string> &literalNames, const std::vector<std::string> &symbolicNames,
+                   const std::vector<std::string> &displayNames);
 
     /// <summary>
     /// Returns a <seealso cref="VocabularyImpl"/> instance from the specified set of token
@@ -98,19 +98,19 @@ namespace dfa {
     /// available. </param>
     /// <returns> A <seealso cref="Vocabulary"/> instance which uses {@code tokenNames} for
     /// the display names of tokens. </returns>
-    static Ref<Vocabulary> fromTokenNames(const std::vector<std::wstring> &tokenNames);
+    static Ref<Vocabulary> fromTokenNames(const std::vector<std::string> &tokenNames);
 
     virtual int getMaxTokenType() const override;
-    virtual std::wstring getLiteralName(ssize_t tokenType) const override;
-    virtual std::wstring getSymbolicName(ssize_t tokenType) const override;
-    virtual std::wstring getDisplayName(ssize_t tokenType) const override;
+    virtual std::string getLiteralName(ssize_t tokenType) const override;
+    virtual std::string getSymbolicName(ssize_t tokenType) const override;
+    virtual std::string getDisplayName(ssize_t tokenType) const override;
 
   private:
-    static std::vector<std::wstring> const EMPTY_NAMES;
+    static std::vector<std::string> const EMPTY_NAMES;
 
-    std::vector<std::wstring> const _literalNames;
-    std::vector<std::wstring> const _symbolicNames;
-    std::vector<std::wstring> const _displayNames;
+    std::vector<std::string> const _literalNames;
+    std::vector<std::string> const _symbolicNames;
+    std::vector<std::string> const _displayNames;
     const int _maxTokenType;
   };
   

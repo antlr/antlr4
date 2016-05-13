@@ -33,9 +33,9 @@
 
 using namespace antlrcpp;
 
-std::wstring Arrays::listToString(const std::vector<std::wstring> &list, const std::wstring &separator)
+std::string Arrays::listToString(const std::vector<std::string> &list, const std::string &separator)
 {
-  std::wstringstream ss;
+  std::stringstream ss;
   bool firstEntry = true;
   
   for (auto &entry : list) {
@@ -49,15 +49,15 @@ std::wstring Arrays::listToString(const std::vector<std::wstring> &list, const s
 }
 
 template <>
-std::wstring Arrays::toString(const std::vector<org::antlr::v4::runtime::tree::Tree*> &source) {
-  std::wstring result = L"[";
+std::string Arrays::toString(const std::vector<org::antlr::v4::runtime::tree::Tree*> &source) {
+  std::string result = "[";
   bool firstEntry = true;
   for (auto value : source) {
     result += value->toStringTree();
     if (firstEntry) {
-      result += L", ";
+      result += ", ";
       firstEntry = false;
     }
   }
-  return result + L"]";
+  return result + "]";
 }

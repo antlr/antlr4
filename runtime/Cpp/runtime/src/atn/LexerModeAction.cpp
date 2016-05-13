@@ -77,6 +77,6 @@ bool LexerModeAction::operator == (const LexerAction &obj) const {
   return _mode == action->_mode;
 }
 
-std::wstring LexerModeAction::toString() const {
-  return L"mode(" + std::to_wstring(_mode) + L")";
+std::string LexerModeAction::toString() const {
+  return "mode(" + std::to_string(_mode) + ")";
 }

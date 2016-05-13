@@ -49,10 +49,10 @@ misc::IntervalSet SetTransition::label() const {
   return set;
 }
 
-bool SetTransition::matches(int symbol, int /*minVocabSymbol*/, int /*maxVocabSymbol*/) const {
-  return set.contains(symbol);
+bool SetTransition::matches(size_t symbol, size_t /*minVocabSymbol*/, size_t /*maxVocabSymbol*/) const {
+  return set.contains((int)symbol);
 }
 
-std::wstring SetTransition::toString() const {
-  return L"SET " + Transition::toString() + L" { set: " + set.toString() + L"}";
+std::string SetTransition::toString() const {
+  return "SET " + Transition::toString() + " { set: " + set.toString() + "}";
 }

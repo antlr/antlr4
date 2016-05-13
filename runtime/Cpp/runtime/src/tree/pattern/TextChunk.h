@@ -49,7 +49,7 @@ namespace pattern {
     /// <summary>
     /// This is the backing field for <seealso cref="#getText"/>.
     /// </summary>
-    const std::wstring text;
+    const std::string text;
 
     /// <summary>
     /// Constructs a new instance of <seealso cref="TextChunk"/> with the specified text.
@@ -57,14 +57,14 @@ namespace pattern {
     /// <param name="text"> The text of this chunk. </param>
     /// <exception cref="IllegalArgumentException"> if {@code text} is {@code null}. </exception>
   public:
-    TextChunk(const std::wstring &text);
+    TextChunk(const std::string &text);
     virtual ~TextChunk() {};
 
     /// <summary>
     /// Gets the raw text of this chunk.
     /// </summary>
     /// <returns> The text of the chunk. </returns>
-    std::wstring getText();
+    std::string getText();
 
     /// <summary>
     /// {@inheritDoc}
@@ -72,7 +72,7 @@ namespace pattern {
     /// The implementation for <seealso cref="TextChunk"/> returns the result of
     /// <seealso cref="#getText()"/> in single quotes.
     /// </summary>
-    virtual std::wstring toString();
+    virtual std::string toString();
   };
 
 } // namespace pattern

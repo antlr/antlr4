@@ -58,10 +58,10 @@ namespace runtime {
   class ANTLR4CPP_PUBLIC ParserInterpreter : public Parser {
   public:
     // @deprecated
-    ParserInterpreter(const std::wstring &grammarFileName, const std::vector<std::wstring>& tokenNames,
-      const std::vector<std::wstring>& ruleNames, const atn::ATN &atn, TokenStream *input);
-    ParserInterpreter(const std::wstring &grammarFileName, Ref<dfa::Vocabulary> vocabulary,
-                      const std::vector<std::wstring> &ruleNames, const atn::ATN &atn, TokenStream *input);
+    ParserInterpreter(const std::string &grammarFileName, const std::vector<std::string>& tokenNames,
+      const std::vector<std::string>& ruleNames, const atn::ATN &atn, TokenStream *input);
+    ParserInterpreter(const std::string &grammarFileName, Ref<dfa::Vocabulary> vocabulary,
+                      const std::vector<std::string> &ruleNames, const atn::ATN &atn, TokenStream *input);
     ~ParserInterpreter();
 
     virtual void reset() override;
@@ -69,12 +69,12 @@ namespace runtime {
     virtual const atn::ATN& getATN() const override;
 
     // @deprecated
-    virtual const std::vector<std::wstring>& getTokenNames() const override;
+    virtual const std::vector<std::string>& getTokenNames() const override;
 
     virtual Ref<dfa::Vocabulary> getVocabulary() const override;
     
-    virtual const std::vector<std::wstring>& getRuleNames() const override;
-    virtual std::wstring getGrammarFileName() const override;
+    virtual const std::vector<std::string>& getRuleNames() const override;
+    virtual std::string getGrammarFileName() const override;
 
     /// Begin parsing at startRuleIndex
     virtual Ref<ParserRuleContext> parse(int startRuleIndex);
@@ -137,11 +137,11 @@ namespace runtime {
     Ref<InterpreterRuleContext> getRootContext();
 
   protected:
-    const std::wstring _grammarFileName;
-    std::vector<std::wstring> _tokenNames;
+    const std::string _grammarFileName;
+    std::vector<std::string> _tokenNames;
     const atn::ATN &_atn;
 
-    std::vector<std::wstring> _ruleNames;
+    std::vector<std::string> _ruleNames;
 
     std::vector<dfa::DFA> _decisionToDFA; // not shared like it is for generated parsers
     Ref<atn::PredictionContextCache> _sharedContextCache;

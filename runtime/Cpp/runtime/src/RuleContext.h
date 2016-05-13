@@ -114,7 +114,7 @@ namespace runtime {
     virtual misc::Interval getSourceInterval() override;
 
     virtual Ref<RuleContext> getRuleContext() override;
-    virtual std::wstring getText() override;
+    virtual std::string getText() override;
 
     virtual ssize_t getRuleIndex() const;
 
@@ -151,23 +151,23 @@ namespace runtime {
     ///  (root child1 .. childN). Print just a node if this is a leaf.
     ///  We have to know the recognizer so we can get rule names.
     /// </summary>
-    virtual std::wstring toStringTree(Parser *recog) override;
+    virtual std::string toStringTree(Parser *recog) override;
 
     /// <summary>
     /// Print out a whole tree, not just a node, in LISP format
     ///  (root child1 .. childN). Print just a node if this is a leaf.
     /// </summary>
-    virtual std::wstring toStringTree(std::vector<std::wstring> &ruleNames);
+    virtual std::string toStringTree(std::vector<std::string> &ruleNames);
 
-    virtual std::wstring toStringTree() override;
-    virtual std::wstring toString() override;
-    std::wstring toString(Recognizer *recog);
-    std::wstring toString(const std::vector<std::wstring> &ruleNames);
+    virtual std::string toStringTree() override;
+    virtual std::string toString() override;
+    std::string toString(Recognizer *recog);
+    std::string toString(const std::vector<std::string> &ruleNames);
 
     // recog null unless ParserRuleContext, in which case we use subclass toString(...)
-    std::wstring toString(Recognizer *recog, Ref<RuleContext> stop);
+    std::string toString(Recognizer *recog, Ref<RuleContext> stop);
 
-    virtual std::wstring toString(const std::vector<std::wstring> &ruleNames, Ref<RuleContext> stop);
+    virtual std::string toString(const std::vector<std::string> &ruleNames, Ref<RuleContext> stop);
 
     bool operator == (const RuleContext &other) { return this == &other; } // Simple address comparison.
     

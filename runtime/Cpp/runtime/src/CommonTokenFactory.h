@@ -95,9 +95,9 @@ namespace runtime {
     CommonTokenFactory();
 
     virtual Ref<CommonToken> create(std::pair<TokenSource*, CharStream*> source, int type,
-      const std::wstring &text, int channel, int start, int stop, int line, int charPositionInLine) override;
+      const std::string &text, int channel, int start, int stop, int line, int charPositionInLine) override;
 
-    virtual Ref<CommonToken> create(int type, const std::wstring &text) override;
+    virtual Ref<CommonToken> create(int type, const std::string &text) override;
   };
 
 } // namespace runtime

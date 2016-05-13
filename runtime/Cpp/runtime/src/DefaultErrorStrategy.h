@@ -381,13 +381,13 @@ namespace runtime {
     ///  your token objects because you don't have to go modify your lexer
     ///  so that it creates a new class.
     /// </summary>
-    virtual std::wstring getTokenErrorDisplay(Ref<Token> t);
+    virtual std::string getTokenErrorDisplay(Ref<Token> t);
 
-    virtual std::wstring getSymbolText(Ref<Token> symbol);
+    virtual std::string getSymbolText(Ref<Token> symbol);
 
     virtual int getSymbolType(Ref<Token> symbol);
 
-    virtual std::wstring escapeWSAndQuote(std::wstring &s);
+    virtual std::string escapeWSAndQuote(std::string &s);
 
     /*  Compute the error recovery set for the current rule.  During
      *  rule invocation, the parser pushes the set of tokens that can

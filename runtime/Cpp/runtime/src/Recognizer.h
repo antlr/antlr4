@@ -52,8 +52,8 @@ namespace runtime {
      *
      * @deprecated Use {@link #getVocabulary()} instead.
      */
-    virtual const std::vector<std::wstring>& getTokenNames() const = 0;
-    virtual const std::vector<std::wstring>& getRuleNames() const = 0;
+    virtual const std::vector<std::string>& getTokenNames() const = 0;
+    virtual const std::vector<std::string>& getRuleNames() const = 0;
 
     /**
      * Get the vocabulary used by the recognizer.
@@ -68,16 +68,16 @@ namespace runtime {
     /// <p/>
     /// Used for XPath and tree pattern compilation.
     /// </summary>
-    virtual std::map<std::wstring, size_t> getTokenTypeMap();
+    virtual std::map<std::string, size_t> getTokenTypeMap();
 
     /// <summary>
     /// Get a map from rule names to rule indexes.
     /// <p/>
     /// Used for XPath and tree pattern compilation.
     /// </summary>
-    virtual std::map<std::wstring, size_t> getRuleIndexMap();
+    virtual std::map<std::string, size_t> getRuleIndexMap();
 
-    virtual size_t getTokenType(const std::wstring &tokenName);
+    virtual size_t getTokenType(const std::string &tokenName);
 
     /// <summary>
     /// If this recognizer was generated, it will have a serialized ATN
@@ -86,15 +86,15 @@ namespace runtime {
     /// For interpreters, we don't know their serialized ATN despite having
     /// created the interpreter from it.
     /// </summary>
-    virtual std::wstring getSerializedATN() {
-      throw L"there is no serialized ATN";
+    virtual std::vector<uint16_t> getSerializedATN() {
+      throw "there is no serialized ATN";
     }
 
     /// <summary>
     /// For debugging and other purposes, might want the grammar name.
     ///  Have ANTLR generate an implementation for this method.
     /// </summary>
-    virtual std::wstring getGrammarFileName() const = 0;
+    virtual std::string getGrammarFileName() const = 0;
 
     /// Get the ATN interpreter (in fact one of it's descendants) used by the recognizer for prediction.
     /// @returns The ATN interpreter used by the recognizer for prediction.
@@ -119,7 +119,7 @@ namespace runtime {
     void setInterpreter(atn::ATNSimulator *interpreter);
     
     /// What is the error header, normally line/character position information?
-    virtual std::wstring getErrorHeader(RecognitionException *e);
+    virtual std::string getErrorHeader(RecognitionException *e);
 
     /** How should a token be displayed in an error message? The default
      *  is to display just the text, but during development you might
@@ -134,7 +134,7 @@ namespace runtime {
      * feature when necessary. For example, see
      * {@link DefaultErrorStrategy#getTokenErrorDisplay}.
      */
-    virtual std::wstring getTokenErrorDisplay(Token *t);
+    virtual std::string getTokenErrorDisplay(Token *t);
 
     /// <exception cref="NullPointerException"> if {@code listener} is {@code null}. </exception>
     virtual void addErrorListener(ANTLRErrorListener *listener);
@@ -178,8 +178,8 @@ namespace runtime {
     atn::ATNSimulator *_interpreter; // Set and deleted in descendants (or the profiler).
 
   private:
-    static std::map<Ref<dfa::Vocabulary>, std::map<std::wstring, size_t>> _tokenTypeMapCache;
-    static std::map<std::vector<std::wstring>, std::map<std::wstring, size_t>> _ruleIndexMapCache;
+    static std::map<Ref<dfa::Vocabulary>, std::map<std::string, size_t>> _tokenTypeMapCache;
+    static std::map<std::vector<std::string>, std::map<std::string, size_t>> _ruleIndexMapCache;
 
     ProxyErrorListener _proxListener; // Manages a collection of listeners.
 

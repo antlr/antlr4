@@ -28,23 +28,11 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "Strings.h"
+#include "StringUtils.h"
 
 namespace antlrcpp {
 
-std::string ws2s(const std::wstring& wstr) {
-  static std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-  std::string narrow = converter.to_bytes(wstr);
-  return narrow;
-}
-
-std::wstring s2ws(const std::string& str) {
-  static std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-  std::wstring wide = converter.from_bytes(str);
-  return wide;
-}
-
-void replaceAll(std::wstring& str, const std::wstring& from, const std::wstring& to)
+void replaceAll(std::string& str, const std::string& from, const std::string& to)
 {
   if(from.empty()) {
     return;
@@ -56,11 +44,16 @@ void replaceAll(std::wstring& str, const std::wstring& from, const std::wstring&
   }
 }
 
+std::string ws2s(const std::wstring &wstr) {
+  static std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+  std::string narrow = converter.to_bytes(wstr);
+  return narrow;
+}
 
-std::wstring wchar2wstring(const wchar_t & str) {
-  std::wstring returnAnswer(&str);
-
-  return returnAnswer;
+std::wstring s2ws(const std::string &str) {
+  static std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+  std::wstring wide = converter.from_bytes(str);
+  return wide;
 }
 
 } // namespace antrlcpp

@@ -185,16 +185,16 @@ misc::IntervalSet ATN::getExpectedTokens(int stateNumber, Ref<RuleContext> conte
   return expected;
 }
 
-std::wstring ATN::toString() const {
-  std::wstringstream ss;
-  std::wstring type;
+std::string ATN::toString() const {
+  std::stringstream ss;
+  std::string type;
   switch (grammarType) {
     case ATNType::LEXER:
-      type = L"LEXER ";
+      type = "LEXER ";
       break;
 
     case ATNType::PARSER:
-      type = L"PARSER ";
+      type = "PARSER ";
       break;
 
     default:
@@ -206,20 +206,20 @@ std::wstring ATN::toString() const {
   size_t index = 0;
   for (auto state : states) {
     if (state == nullptr) {
-      ss << "  " << index++ << ": null" << std::endl;
+      ss << "  " << index++ << ": nul" << std::endl;
     } else {
-      std::wstring text = state->toString();
-      ss << "  " << index++ << ": " << indent(text, L"  ", false) << std::endl;
+      std::string text = state->toString();
+      ss << "  " << index++ << ": " << indent(text, "  ", false) << std::endl;
     }
   }
 
   index = 0;
   for (auto state : decisionToState) {
     if (state == nullptr) {
-      ss << "  " << index++ << ": null" << std::endl;
+      ss << "  " << index++ << ": nul" << std::endl;
     } else {
-      std::wstring text = state->toString();
-      ss << "  " << index++ << ": " << indent(text, L"  ", false) << std::endl;
+      std::string text = state->toString();
+      ss << "  " << index++ << ": " << indent(text, "  ", false) << std::endl;
     }
   }
 

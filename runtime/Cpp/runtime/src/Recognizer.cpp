@@ -32,7 +32,7 @@
 #include "ConsoleErrorListener.h"
 #include "RecognitionException.h"
 #include "CPPUtils.h"
-#include "Strings.h"
+#include "StringUtils.h"
 #include "Token.h"
 #include "ATN.h"
 #include "ATNSimulator.h"
@@ -45,8 +45,8 @@
 
 using namespace org::antlr::v4::runtime;
 
-std::map<Ref<dfa::Vocabulary>, std::map<std::wstring, size_t>> Recognizer::_tokenTypeMapCache;
-std::map<std::vector<std::wstring>, std::map<std::wstring, size_t>> Recognizer::_ruleIndexMapCache;
+std::map<Ref<dfa::Vocabulary>, std::map<std::string, size_t>> Recognizer::_tokenTypeMapCache;
+std::map<std::vector<std::string>, std::map<std::string, size_t>> Recognizer::_ruleIndexMapCache;
 
 Recognizer::Recognizer() {
   InitializeInstanceFields();
@@ -57,41 +57,41 @@ Ref<dfa::Vocabulary> Recognizer::getVocabulary() const {
   return dfa::VocabularyImpl::fromTokenNames(getTokenNames());
 }
 
-std::map<std::wstring, size_t> Recognizer::getTokenTypeMap() {
+std::map<std::string, size_t> Recognizer::getTokenTypeMap() {
   Ref<dfa::Vocabulary> vocabulary = getVocabulary();
 
   std::lock_guard<std::recursive_mutex> lck(mtx);
-  std::map<std::wstring, size_t> result;
+  std::map<std::string, size_t> result;
   auto iterator = _tokenTypeMapCache.find(vocabulary);
   if (iterator != _tokenTypeMapCache.end()) {
     result = iterator->second;
   } else {
     for (size_t i = 0; i < getATN().maxTokenType; ++i) {
-      std::wstring literalName = vocabulary->getLiteralName(i);
+      std::string literalName = vocabulary->getLiteralName(i);
       if (!literalName.empty()) {
         result[literalName] = i;
       }
 
-      std::wstring symbolicName = vocabulary->getSymbolicName(i);
+      std::string symbolicName = vocabulary->getSymbolicName(i);
       if (!symbolicName.empty()) {
         result[symbolicName] = i;
       }
 				}
-    result[L"EOF"] = EOF;
+    result["EOF"] = EOF;
     _tokenTypeMapCache[vocabulary] = result;
   }
 
   return result;
 }
 
-std::map<std::wstring, size_t> Recognizer::getRuleIndexMap() {
-  const std::vector<std::wstring>& ruleNames = getRuleNames();
+std::map<std::string, size_t> Recognizer::getRuleIndexMap() {
+  const std::vector<std::string>& ruleNames = getRuleNames();
   if (ruleNames.empty()) {
-    throw L"The current recognizer does not provide a list of rule names.";
+    throw "The current recognizer does not provide a list of rule names.";
   }
 
   std::lock_guard<std::recursive_mutex> lck(mtx);
-  std::map<std::wstring, size_t> result;
+  std::map<std::string, size_t> result;
   auto iterator = _ruleIndexMapCache.find(ruleNames);
   if (iterator != _ruleIndexMapCache.end()) {
     result = iterator->second;
@@ -102,8 +102,8 @@ std::map<std::wstring, size_t> Recognizer::getRuleIndexMap() {
   return result;
 }
 
-size_t Recognizer::getTokenType(const std::wstring &tokenName) {
-  const std::map<std::wstring, size_t> &map = getTokenTypeMap();
+size_t Recognizer::getTokenType(const std::string &tokenName) {
+  const std::map<std::string, size_t> &map = getTokenTypeMap();
   auto iterator = map.find(tokenName);
   if (iterator == map.end())
     return Token::INVALID_TYPE;
@@ -122,33 +122,33 @@ void Recognizer::setInterpreter(atn::ATNSimulator *interpreter) {
   _interpreter = interpreter;
 }
 
-std::wstring Recognizer::getErrorHeader(RecognitionException *e) {
+std::string Recognizer::getErrorHeader(RecognitionException *e) {
   // We're having issues with cross header dependencies, these two classes will need to be
   // rewritten to remove that.
   int line = e->getOffendingToken()->getLine();
   int charPositionInLine = e->getOffendingToken()->getCharPositionInLine();
-  return std::wstring(L"line ") + std::to_wstring(line) + std::wstring(L":") + std::to_wstring(charPositionInLine);
+  return std::string("line ") + std::to_string(line) + std::string(":") + std::to_string(charPositionInLine);
 
 }
 
-std::wstring Recognizer::getTokenErrorDisplay(Token *t) {
+std::string Recognizer::getTokenErrorDisplay(Token *t) {
   if (t == nullptr) {
-    return L"<no Token>";
+    return "<no Token>";
   }
-  std::wstring s = t->getText();
-  if (s == L"") {
+  std::string s = t->getText();
+  if (s == "") {
     if (t->getType() == EOF) {
-      s = L"<EOF>";
+      s = "<EOF>";
     } else {
-      s = std::wstring(L"<") + std::to_wstring(t->getType()) + std::wstring(L">");
+      s = std::string("<") + std::to_string(t->getType()) + std::string(">");
     }
   }
 
-  antlrcpp::replaceAll(s, L"\n", L"\\n");
-  antlrcpp::replaceAll(s, L"\r",L"\\r");
-  antlrcpp::replaceAll(s, L"\t", L"\\t");
+  antlrcpp::replaceAll(s, "\n", "\\n");
+  antlrcpp::replaceAll(s, "\r","\\r");
+  antlrcpp::replaceAll(s, "\t", "\\t");
 
-  return std::wstring(L"'") + s + std::wstring(L"'");
+  return std::string("'") + s + std::string("'");
 }
 
 void Recognizer::addErrorListener(ANTLRErrorListener *listener) {

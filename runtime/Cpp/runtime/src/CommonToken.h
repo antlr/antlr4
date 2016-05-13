@@ -87,7 +87,7 @@ namespace runtime {
      *
      * @see #getText()
      */
-    std::wstring _text;
+    std::string _text;
 
     /**
      * This is the backing field for {@link #getTokenIndex} and
@@ -123,7 +123,7 @@ namespace runtime {
      * @param type The token type.
      * @param text The text of the token.
      */
-    CommonToken(int type, const std::wstring &text);
+    CommonToken(int type, const std::string &text);
 
     /**
      * Constructs a new {@link CommonToken} as a copy of another {@link Token}.
@@ -151,8 +151,8 @@ namespace runtime {
      * should be obtained from the input along with the start and stop indexes
      * of the token.
      */
-    virtual void setText(const std::wstring &text) override;
-    virtual std::wstring getText() override;
+    virtual void setText(const std::string &text) override;
+    virtual std::string getText() override;
 
     virtual void setLine(int line) override;
     virtual int getLine() override;

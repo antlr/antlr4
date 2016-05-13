@@ -47,25 +47,25 @@ namespace antlrcpp {
     // Prints a list of every index for which the bitset contains a bit in true.
     friend std::wostream& operator << (std::wostream& os, const BitSet& obj)
     {
-      os << L"{";
+      os << "{";
       size_t total = obj.count();
       for (size_t i = 0; i < obj.size(); i++){
         if (obj.test(i)){
           os << i;
           --total;
           if (total > 1){
-            os << L", ";
+            os << ", ";
           }
         }
       }
 
-      os << L"}";
+      os << "}";
       return os;
     }
 
-    static std::wstring subStringRepresentation(const std::vector<BitSet>::iterator &begin,
+    static std::string subStringRepresentation(const std::vector<BitSet>::iterator &begin,
                                                 const std::vector<BitSet>::iterator &end) {
-      std::wstring result;
+      std::string result;
       std::vector<BitSet>::iterator vectorIterator;
 
       for (vectorIterator = begin; vectorIterator != end; vectorIterator++) {
@@ -77,21 +77,21 @@ namespace antlrcpp {
       return result;
     }
 
-    std::wstring toString(){
-      std::wstringstream stream;
-      stream << L"{";
+    std::string toString(){
+      std::stringstream stream;
+      stream << "{";
       size_t total = count();
       for (size_t i = 0; i < size(); i++){
         if (test(i)){
           stream << i;
           --total;
           if (total > 1){
-            stream << L", ";
+            stream << ", ";
           }
         }
       }
 
-      stream << L"}";
+      stream << "}";
       return stream.str();
     }
 

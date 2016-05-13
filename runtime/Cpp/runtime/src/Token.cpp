@@ -29,28 +29,28 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "Strings.h"
+#include "StringUtils.h"
 
 #include "Token.h"
 
 using namespace org::antlr::v4::runtime;
 
-std::wstring Token::toString() {
-  std::wstringstream ss;
+std::string Token::toString() {
+  std::stringstream ss;
 
-  std::wstring txt = getText();
+  std::string txt = getText();
   if (!txt.empty()) {
 
-    antlrcpp::replaceAll(txt, L"\n", L"\\n");
-    antlrcpp::replaceAll(txt, L"\r", L"\\r");
-    antlrcpp::replaceAll(txt, L"\t", L"\\t");
+    antlrcpp::replaceAll(txt, "\n", "\\n");
+    antlrcpp::replaceAll(txt, "\r", "\\r");
+    antlrcpp::replaceAll(txt, "\t", "\\t");
   } else {
-    txt = L"<no text>";
+    txt = "<no text>";
   }
 
-  ss << L"{Token: " << txt << L", channel: " << getChannel() << L", type: " << getType() << L", start: " << getStartIndex() <<
-    L", stop: " << getStopIndex() << L", index: " << getTokenIndex() << L", line: " << getLine() << L", offset: " <<
-  getCharPositionInLine() << L"}";
+  ss << "{Token: " << txt << ", channel: " << getChannel() << ", type: " << getType() << ", start: " << getStartIndex() <<
+    ", stop: " << getStopIndex() << ", index: " << getTokenIndex() << ", line: " << getLine() << ", offset: " <<
+  getCharPositionInLine() << "}";
 
   return ss.str();
 }

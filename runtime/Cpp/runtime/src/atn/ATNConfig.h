@@ -136,8 +136,8 @@ namespace atn {
     /// syntactic/semantic contexts are the same.
     bool operator == (const ATNConfig &other) const;
 
-    virtual std::wstring toString();
-    std::wstring toString(bool showAlt);
+    virtual std::string toString();
+    std::string toString(bool showAlt);
 
   private:
     /**

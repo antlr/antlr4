@@ -84,7 +84,7 @@ namespace runtime {
     /// <summary>
     /// Get the text of the token.
     /// </summary>
-    virtual std::wstring getText() = 0;
+    virtual std::string getText() = 0;
 
     /// <summary>
     /// Get the token type of the token </summary>
@@ -141,7 +141,7 @@ namespace runtime {
     /// </summary>
     virtual CharStream *getInputStream() = 0;
 
-    virtual std::wstring toString();
+    virtual std::string toString();
   };
 
 } // namespace runtime

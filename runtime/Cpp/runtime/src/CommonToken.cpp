@@ -31,7 +31,7 @@
 
 #include "Interval.h"
 #include "TokenSource.h"
-#include "Strings.h"
+#include "StringUtils.h"
 #include "CharStream.h"
 #include "CPPUtils.h"
 
@@ -60,7 +60,7 @@ CommonToken::CommonToken(std::pair<TokenSource*, CharStream*> source, int type, 
   }
 }
 
-CommonToken::CommonToken(int type, const std::wstring &text) {
+CommonToken::CommonToken(int type, const std::string &text) {
   InitializeInstanceFields();
   _type = type;
   _channel = DEFAULT_CHANNEL;
@@ -95,24 +95,24 @@ void CommonToken::setLine(int line) {
   _line = line;
 }
 
-std::wstring CommonToken::getText() {
+std::string CommonToken::getText() {
   if (!_text.empty()) {
     return _text;
   }
 
   CharStream *input = getInputStream();
   if (input == nullptr) {
-    return L"";
+    return "";
   }
   size_t n = input->size();
   if ((size_t)_start < n && (size_t)_stop < n) {
     return input->getText(misc::Interval(_start, _stop));
   } else {
-    return L"<EOF>";
+    return "<EOF>";
   }
 }
 
-void CommonToken::setText(const std::wstring &text) {
+void CommonToken::setText(const std::string &text) {
   _text = text;
 }
 

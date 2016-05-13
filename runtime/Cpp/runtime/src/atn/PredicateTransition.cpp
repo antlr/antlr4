@@ -44,7 +44,7 @@ bool PredicateTransition::isEpsilon() const {
   return true;
 }
 
-bool PredicateTransition::matches(int /*symbol*/, int /*minVocabSymbol*/, int /*maxVocabSymbol*/) const {
+bool PredicateTransition::matches(size_t /*symbol*/, size_t /*minVocabSymbol*/, size_t /*maxVocabSymbol*/) const {
   return false;
 }
 
@@ -52,9 +52,9 @@ Ref<SemanticContext::Predicate> PredicateTransition::getPredicate() const {
   return std::make_shared<SemanticContext::Predicate>(ruleIndex, predIndex, isCtxDependent);
 }
 
-std::wstring PredicateTransition::toString() const {
-  return L"PREDICATE " + Transition::toString() + L" { ruleIndex: " + std::to_wstring(ruleIndex) +
-    L", predIndex: " + std::to_wstring(predIndex) + L", isCtxDependent: " + std::to_wstring(isCtxDependent) + L" }";
+std::string PredicateTransition::toString() const {
+  return "PREDICATE " + Transition::toString() + " { ruleIndex: " + std::to_string(ruleIndex) +
+    ", predIndex: " + std::to_string(predIndex) + ", isCtxDependent: " + std::to_string(isCtxDependent) + " }";
 
   // Generate and add a predicate context here?
 }

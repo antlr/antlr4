@@ -46,7 +46,7 @@ namespace runtime {
 
     virtual size_t getStartIndex();
     virtual Ref<atn::ATNConfigSet> getDeadEndConfigs();
-    virtual std::wstring toString();
+    virtual std::string toString();
 
   private:
     /// Matching attempted at what input index?

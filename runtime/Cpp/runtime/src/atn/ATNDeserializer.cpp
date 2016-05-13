@@ -64,7 +64,7 @@
 #include "IntervalSet.h"
 #include "Exceptions.h"
 #include "CPPUtils.h"
-#include "Strings.h"
+#include "StringUtils.h"
 
 #include "LexerCustomAction.h"
 #include "LexerChannelAction.h"
@@ -127,12 +127,12 @@ bool ATNDeserializer::isFeatureSupported(const Guid &feature, const Guid &actual
   return std::distance(featureIterator, actualIterator) >= 0;
 }
 
-ATN ATNDeserializer::deserialize(const std::wstring& input) {
+ATN ATNDeserializer::deserialize(const std::vector<uint16_t>& input) {
   // Don't adjust the first value since that's the version number.
   std::vector<uint16_t> data(input.size());
-  data[0] = (uint16_t)input[0];
+  data[0] = input[0];
   for (size_t i = 1; i < input.size(); ++i) {
-    data[i] = (uint16_t)input[i] - 2;
+    data[i] = input[i] - 2;
   }
 
   int p = 0;
@@ -175,7 +175,7 @@ ATN ATNDeserializer::deserialize(const std::wstring& input) {
     }
 
     int ruleIndex = data[p++];
-    if (ruleIndex == 0xFFFF) { // Not WCHAR_MAX as this can take a different value.
+    if (ruleIndex == 0xFFFF) { // Max Unicode char limit imposed by ANTLR.
       ruleIndex = -1;
     }
 

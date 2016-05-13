@@ -109,7 +109,7 @@ namespace runtime {
     ListTokenSource(std::vector<T1> tokens, const std::string &/*sourceName*/) {
       InitializeInstanceFields();
       if (tokens.empty()) {
-        throw L"tokens cannot be null";
+        throw "tokens cannot be nul";
       }
 
     }

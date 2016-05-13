@@ -43,15 +43,15 @@ namespace dfa {
   /// A DFA walker that knows how to dump them to serialized strings.
   class ANTLR4CPP_PUBLIC DFASerializer {
   public:
-    DFASerializer(const DFA *dfa, const std::vector<std::wstring>& tnames);
+    DFASerializer(const DFA *dfa, const std::vector<std::string>& tnames);
     DFASerializer(const DFA *dfa, Ref<Vocabulary> vocabulary);
     virtual ~DFASerializer() {};
 
-    virtual std::wstring toString() const;
+    virtual std::string toString() const;
 
   protected:
-    virtual std::wstring getEdgeLabel(size_t i) const;
-    virtual std::wstring getStateString(DFAState *s) const;
+    virtual std::string getEdgeLabel(size_t i) const;
+    virtual std::string getStateString(DFAState *s) const;
 
   private:
     const DFA *_dfa;

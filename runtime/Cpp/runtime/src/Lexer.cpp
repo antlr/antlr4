@@ -37,6 +37,7 @@
 #include "ANTLRErrorListener.h"
 #include "CPPUtils.h"
 #include "CommonToken.h"
+#include "StringUtils.h"
 
 #include "Lexer.h"
 
@@ -57,7 +58,7 @@ void Lexer::reset() {
   tokenStartCharIndex = -1;
   tokenStartCharPositionInLine = 0;
   tokenStartLine = 0;
-  text = L"";
+  text = "";
 
   hitEOF = false;
   mode = Lexer::DEFAULT_MODE;
@@ -89,7 +90,7 @@ Ref<Token> Lexer::nextToken() {
     tokenStartCharIndex = (int)_input->index();
     tokenStartCharPositionInLine = getInterpreter<atn::LexerATNSimulator>()->getCharPositionInLine();
     tokenStartLine = (int)getInterpreter<atn::LexerATNSimulator>()->getLine();
-    text = L"";
+    text = "";
     do {
       type = Token::INVALID_TYPE;
       int ttype;
@@ -131,7 +132,7 @@ void Lexer::setMode(size_t m) {
 
 void Lexer::pushMode(size_t m) {
   if (atn::LexerATNSimulator::debug) {
-    std::wcout << std::wstring(L"pushMode ") << m << std::endl;
+    std::cout << "pushMode " << m << std::endl;
   }
   modeStack.push_back(mode);
   setMode(m);
@@ -142,7 +143,7 @@ size_t Lexer::popMode() {
     throw EmptyStackException();
   }
   if (atn::LexerATNSimulator::debug) {
-    std::wcout << std::wstring(L"popMode back to ") << modeStack.back() << std::endl;
+    std::cout << std::string("popMode back to ") << modeStack.back() << std::endl;
   }
   setMode(modeStack.back());
   modeStack.pop_back();
@@ -181,7 +182,7 @@ Ref<Token> Lexer::emit() {
 Ref<Token> Lexer::emitEOF() {
   int cpos = getCharPositionInLine();
   size_t line = getLine();
-  Ref<Token> eof = std::dynamic_pointer_cast<Token>(_factory->create({ this, _input }, EOF, L"", Token::DEFAULT_CHANNEL,
+  Ref<Token> eof = std::dynamic_pointer_cast<Token>(_factory->create({ this, _input }, EOF, "", Token::DEFAULT_CHANNEL,
     (int)_input->index(), (int)_input->index() - 1, (int)line, cpos));
   emit(eof);
   return eof;
@@ -207,14 +208,14 @@ int Lexer::getCharIndex() {
   return (int)_input->index();
 }
 
-std::wstring Lexer::getText() {
+std::string Lexer::getText() {
   if (!text.empty()) {
     return text;
   }
   return getInterpreter<atn::LexerATNSimulator>()->getText(_input);
 }
 
-void Lexer::setText(const std::wstring &text) {
+void Lexer::setText(const std::string &text) {
   this->text = text;
 }
 
@@ -260,47 +261,47 @@ void Lexer::recover(const LexerNoViableAltException &/*e*/) {
 }
 
 void Lexer::notifyListeners(const LexerNoViableAltException &e) {
-  std::wstring text = _input->getText(misc::Interval(tokenStartCharIndex, (int)_input->index()));
-  std::wstring msg = std::wstring(L"token recognition error at: '") + getErrorDisplay(text) + std::wstring(L"'");
+  std::string text = _input->getText(misc::Interval(tokenStartCharIndex, (int)_input->index()));
+  std::string msg = std::string("token recognition error at: '") + getErrorDisplay(text) + std::string("'");
 
   ProxyErrorListener &listener = getErrorListenerDispatch();
   listener.syntaxError(this, nullptr, tokenStartLine, tokenStartCharPositionInLine, msg,
                        std::make_exception_ptr(e));
 }
 
-std::wstring Lexer::getErrorDisplay(const std::wstring &s) {
-  std::wstringstream ss;
+std::string Lexer::getErrorDisplay(const std::string &s) {
+  std::stringstream ss;
   for (auto c : s) {
     ss << getErrorDisplay(c);
   }
   return ss.str();
 }
 
-std::wstring Lexer::getErrorDisplay(int c) {
-  std::wstring s;
+std::string Lexer::getErrorDisplay(int c) {
+  std::string s;
   switch (c) {
     case EOF :
-      s = L"<EOF>";
+      s = "<EOF>";
       break;
-    case L'\n' :
-      s = L"\\n";
+    case '\n' :
+      s = "\\n";
       break;
-    case L'\t' :
-      s = L"\\t";
+    case '\t' :
+      s = "\\t";
       break;
-    case L'\r' :
-      s = L"\\r";
+    case '\r' :
+      s = "\\r";
       break;
     default:
-      s = c;
+      s = utfConverter.to_bytes(c);
       break;
   }
   return s;
 }
 
-std::wstring Lexer::getCharErrorDisplay(int c) {
-  std::wstring s = getErrorDisplay(c);
-  return std::wstring(L"'") + s + std::wstring(L"'");
+std::string Lexer::getCharErrorDisplay(int c) {
+  std::string s = getErrorDisplay(c);
+  return "'" + s + "'";
 }
 
 void Lexer::recover(RecognitionException * /*re*/) {

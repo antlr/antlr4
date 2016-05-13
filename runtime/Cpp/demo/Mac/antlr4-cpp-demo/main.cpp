@@ -12,21 +12,20 @@
 #include "TLexer.h"
 #include "TParser.h"
 
-#include "Strings.h"
-
 using namespace antlrcpptest;
 using namespace org::antlr::v4::runtime;
 
 int main(int , const char **) {
 
-  ANTLRInputStream input(L"(((x))) * y + z; a + (x * (y ? 0 : 1) + z);");
+  ANTLRInputStream input(u8"(((x * π))) * µ + ∰; a + (x * (y ? 0 : 1) + z);");
   TLexer lexer(&input);
   CommonTokenStream tokens(&lexer);
 
   TParser parser(&tokens);
   Ref<tree::ParseTree> tree = parser.main();
 
-  std::cout << antlrcpp::ws2s(tree->toStringTree(&parser)) << std::endl;
+  std::cout << tree->toStringTree(&parser) << std::endl;
+  std::fstream("test.txt") << tree->toStringTree(&parser);
 
   return 0;
 }

@@ -32,6 +32,8 @@
 //
 // Use this as (automatically included) precompiled header file.
 
+#ifdef __cplusplus
+
 #include <algorithm>
 #include <assert.h>
 #include <codecvt>
@@ -122,3 +124,5 @@
 #endif
 
 template<class T> using Ref = std::shared_ptr<T>;
+
+#endif

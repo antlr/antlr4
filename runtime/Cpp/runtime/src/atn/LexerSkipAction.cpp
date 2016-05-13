@@ -65,6 +65,6 @@ bool LexerSkipAction::operator == (const LexerAction &obj) const {
   return &obj == this;
 }
 
-std::wstring LexerSkipAction::toString() const {
-  return L"skip";
+std::string LexerSkipAction::toString() const {
+  return "skip";
 }

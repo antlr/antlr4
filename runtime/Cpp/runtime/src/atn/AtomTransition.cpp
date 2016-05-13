@@ -37,7 +37,7 @@
 using namespace org::antlr::v4::runtime::misc;
 using namespace org::antlr::v4::runtime::atn;
 
-AtomTransition::AtomTransition(ATNState *target, int label) : Transition(target), _label(label) {
+AtomTransition::AtomTransition(ATNState *target, size_t label) : Transition(target), _label(label) {
 }
 
 int AtomTransition::getSerializationType() const {
@@ -45,13 +45,13 @@ int AtomTransition::getSerializationType() const {
 }
 
 IntervalSet AtomTransition::label() const {
-  return IntervalSet::of(_label);
+  return IntervalSet::of((int)_label);
 }
 
-bool AtomTransition::matches(int symbol, int /*minVocabSymbol*/, int /*maxVocabSymbol*/) const {
+bool AtomTransition::matches(size_t symbol, size_t /*minVocabSymbol*/, size_t /*maxVocabSymbol*/) const {
   return _label == symbol;
 }
 
-std::wstring AtomTransition::toString() const {
-  return L"ATOM " + Transition::toString() + L" { label: " + std::to_wstring(_label) + L" }";
+std::string AtomTransition::toString() const {
+  return "ATOM " + Transition::toString() + " { label: " + std::to_string(_label) + " }";
 }
