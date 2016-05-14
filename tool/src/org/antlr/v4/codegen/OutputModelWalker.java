@@ -75,7 +75,7 @@ public class OutputModelWalker {
 		this.templates = templates;
 	}
 
-	public ST walk(OutputModelObject omo) {
+	public ST walk(OutputModelObject omo, boolean header) {
 		// CREATE TEMPLATE FOR THIS OUTPUT OBJECT
 		Class<? extends OutputModelObject> cl = omo.getClass();
 		String templateName = cl.getSimpleName();
@@ -83,6 +83,8 @@ public class OutputModelWalker {
 			tool.errMgr.toolError(ErrorType.NO_MODEL_TO_TEMPLATE_MAPPING, cl.getSimpleName());
 			return new ST("["+templateName+" invalid]");
 		}
+		if (header)
+		    templateName += "Header";
 		ST st = templates.getInstanceOf(templateName);
 		if ( st == null ) {
 			tool.errMgr.toolError(ErrorType.CODE_GEN_TEMPLATES_INCOMPLETE, templateName);
@@ -124,7 +126,7 @@ public class OutputModelWalker {
 				Object o = fi.get(omo);
 				if ( o instanceof OutputModelObject ) {  // SINGLE MODEL OBJECT?
 					OutputModelObject nestedOmo = (OutputModelObject)o;
-					ST nestedST = walk(nestedOmo);
+					ST nestedST = walk(nestedOmo, header);
 //					System.out.println("set ModelElement "+fieldName+"="+nestedST+" in "+templateName);
 					st.add(fieldName, nestedST);
 				}
@@ -136,7 +138,7 @@ public class OutputModelWalker {
 					Collection<?> nestedOmos = (Collection<?>)o;
 					for (Object nestedOmo : nestedOmos) {
 						if ( nestedOmo==null ) continue;
-						ST nestedST = walk((OutputModelObject)nestedOmo);
+						ST nestedST = walk((OutputModelObject)nestedOmo, header);
 //						System.out.println("set ModelElement "+fieldName+"="+nestedST+" in "+templateName);
 						st.add(fieldName, nestedST);
 					}
@@ -145,7 +147,7 @@ public class OutputModelWalker {
 					Map<?, ?> nestedOmoMap = (Map<?, ?>)o;
 					Map<Object, ST> m = new LinkedHashMap<Object, ST>();
 					for (Map.Entry<?, ?> entry : nestedOmoMap.entrySet()) {
-						ST nestedST = walk((OutputModelObject)entry.getValue());
+						ST nestedST = walk((OutputModelObject)entry.getValue(), header);
 //						System.out.println("set ModelElement "+fieldName+"="+nestedST+" in "+templateName);
 						m.put(entry.getKey(), nestedST);
 					}

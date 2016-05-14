@@ -1,5 +1,6 @@
 /*
  * [The "BSD license"]
+ *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2012 Terence Parr
  *  Copyright (c) 2012 Sam Harwell
  *  All rights reserved.
@@ -99,6 +100,7 @@ public abstract class Target {
 	 */
 	public abstract String getVersion();
 
+    public boolean needsHeader() { return false; }; // Override in targets which need header files.
 
 	public STGroup getTemplates() {
 		if (templates == null) {
@@ -114,54 +116,9 @@ public abstract class Target {
 		return templates;
 	}
 
-	protected void genFile(Grammar g,
-						   ST outputFileST,
-						   String fileName)
+	protected void genFile(Grammar g, ST outputFileST, String fileName)
 	{
 		getCodeGenerator().write(outputFileST, fileName);
-	}
-
-	protected void genListenerFile(Grammar g,
-								   ST outputFileST)
-	{
-		String fileName = getCodeGenerator().getListenerFileName();
-		getCodeGenerator().write(outputFileST, fileName);
-	}
-
-	protected void genParserHeaderFile(Grammar g,
-                                           ST headerFileST)
-	{
-		// no header file by default
-	}
-
-	protected void genRecognizerHeaderFile(Grammar g,
-                                               ST headerFileST)
-	{
-		// no header file by default
-	}
-
-	protected void genListenerHeaderFile(Grammar g,
-                                             ST headerFileST)
-	{
-		// no header file by default
-	}
-
-	protected void genBaseListenerHeaderFile(Grammar g,
-                                             ST headerFileST)
-	{
-		// no header file by default
-	}
-
-	protected void genVisitorHeaderFile(Grammar g,
-                                             ST headerFileST)
-	{
-		// no header file by default
-	}
-
-	protected void genBaseVisitorHeaderFile(Grammar g,
-                                             ST headerFileST)
-	{
-		// no header file by default
 	}
 
 	/** Get a meaningful name for a token type useful during code generation.

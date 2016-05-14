@@ -61,3 +61,6 @@ runtime/Java/target
 tool/target
 runtime-testsuite/target
 tool-testsuite/target
+runtime/Cpp/demo/generated
+xcuserdata
+*.jar

@@ -30,951 +30,1044 @@
 import "Files.stg" // All file specific stuff.
 
 cppTypeInitMap ::= [
-	"int":"0",
-	"long":"0",
-	"float":"0.0f",
-	"double":"0.0",
-	"bool":"false",
-	"short":"0",
-	"char":"0",
-	default:"nullptr" // anything other than a primitive type is an object
+    "int":"0",
+    "long":"0",
+    "float":"0.0f",
+    "double":"0.0",
+    "bool":"false",
+    "short":"0",
+    "char":"0",
+    default: "nullptr" // anything other than a primitive type is an object
 ]
 
-// args must be <object-model-object>, <fields-resulting-in-STs>
+LexerHeader(lexer, atn, actionFuncs, sempredFuncs, superClass = {Lexer}) ::= <<
+<namedActions.context>
 
-ParserFile(file, parser, namedActions) ::= <<
-<fileHeader(file.grammarFileName, file.ANTLRVersion)>
-
-<if(file.genPackage)>
-<! TODO(dsisson): Deal with the fact that we need to split the package name. !>
-namespace <file.genPackage> {
-<endif>
-
-<namedActions.header>
-
-<! TODO(dsisson): Reduce the list of includes to those absolutely necessary. !>
-#include "atn/ATN.h"
-#include "atn/ATNConfig.h"
-#include "atn/ATNConfigSet.h"
-#include "atn/ATNDeserializationOptions.h"
-#include "atn/ATNDeserializer.h"
-#include "atn/ATNSerializer.h"
-#include "atn/ATNSimulator.h"
-#include "atn/ATNState.h"
-#include "atn/ATNType.h"
-#include "atn/AbstractPredicateTransition.h"
-#include "atn/ActionTransition.h"
-#include "atn/ArrayPredictionContext.h"
-#include "atn/AtomTransition.h"
-#include "atn/BasicBlockStartState.h"
-#include "atn/BasicState.h"
-#include "atn/BlockEndState.h"
-#include "atn/BlockStartState.h"
-#include "atn/DecisionState.h"
-#include "atn/EmptyPredictionContext.h"
-#include "atn/EpsilonTransition.h"
-#include "atn/LL1Analyzer.h"
-#include "atn/LexerATNConfig.h"
-#include "atn/LexerATNSimulator.h"
-#include "atn/LoopEndState.h"
-#include "atn/NotSetTransition.h"
-#include "atn/OrderedATNConfigSet.h"
-#include "atn/ParserATNSimulator.h"
-#include "atn/PlusBlockStartState.h"
-#include "atn/PlusLoopbackState.h"
-#include "atn/PrecedencePredicateTransition.h"
-#include "atn/PredicateTransition.h"
-#include "atn/PredictionContext.h"
-#include "atn/PredictionContextCache.h"
-#include "atn/PredictionMode.h"
-#include "atn/RangeTransition.h"
-#include "atn/RuleStartState.h"
-#include "atn/RuleStopState.h"
-#include "atn/RuleTransition.h"
-#include "atn/SemanticContext.h"
-#include "atn/SetTransition.h"
-#include "atn/SingletonPredictionContext.h"
-#include "atn/StarBlockStartState.h"
-#include "atn/StarLoopEntryState.h"
-#include "atn/StarLoopbackState.h"
-#include "atn/TokensStartState.h"
-#include "atn/Transition.h"
-#include "atn/WildcardTransition.h"
-#include "dfa/DFA.h"
-
-#include "ANTLRErrorListener.h"
-#include "ANTLRErrorStrategy.h"
-#include "ANTLRFileStream.h"
-#include "ANTLRInputStream.h"
-#include "BailErrorStrategy.h"
-#include "BaseErrorListener.h"
-#include "BufferedTokenStream.h"
-#include "CharStream.h"
-#include "CommonToken.h"
-#include "CommonTokenFactory.h"
-#include "CommonTokenStream.h"
-#include "ConsoleErrorListener.h"
-#include "DefaultErrorStrategy.h"
-#include "DiagnosticErrorListener.h"
-#include "Exceptions.h"
-#include "FailedPredicateException.h"
-#include "InputMismatchException.h"
-#include "IntStream.h"
-#include "InterpreterRuleContext.h"
-#include "Lexer.h"
-#include "LexerInterpreter.h"
-#include "LexerNoViableAltException.h"
-#include "ListTokenSource.h"
-#include "NoViableAltException.h"
-#include "Parser.h"
-#include "ParserInterpreter.h"
-#include "ParserRuleContext.h"
-#include "ProxyErrorListener.h"
-#include "RecognitionException.h"
-#include "Recognizer.h"
-#include "RuleContext.h"
-#include "Token.h"
-#include "TokenFactory.h"
-#include "TokenSource.h"
-#include "TokenStream.h"
-#include "TokenStreamRewriter.h"
-#include "UnbufferedCharStream.h"
-#include "UnbufferedTokenStream.h"
-#include "WritableToken.h"
-
-#include "misc/AbstractEqualityComparator.h"
-#include "misc/Array2DHashSet.h"
-#include "misc/DoubleKeyMap.h"
-#include "misc/EqualityComparator.h"
-#include "misc/GraphicsSupport.h"
-#include "misc/IntSet.h"
-#include "misc/Interval.h"
-#include "misc/IntervalSet.h"
-#include "misc/JFileChooserConfirmOverwrite.h"
-#include "misc/LogManager.h"
-#include "misc/MultiMap.h"
-#include "misc/MurmurHash.h"
-#include "misc/NotNull.h"
-#include "misc/ObjectEqualityComparator.h"
-#include "misc/OrderedHashSet.h"
-#include "misc/ParseCancellationException.h"
-#include "misc/TestRig.h"
-#include "misc/Utils.h"
-
-#include "tree/AbstractParseTreeVisitor.h"
-#include "tree/ErrorNode.h"
-#include "tree/ErrorNodeImpl.h"
-#include "tree/ParseTree.h"
-#include "tree/ParseTreeListener.h"
-#include "tree/ParseTreeProperty.h"
-#include "tree/ParseTreeVisitor.h"
-#include "tree/ParseTreeWalker.h"
-#include "tree/RuleNode.h"
-#include "tree/SyntaxTree.h"
-#include "tree/TerminalNode.h"
-#include "tree/TerminalNodeImpl.h"
-#include "tree/Tree.h"
-#include "tree/Trees.h"
-
-<parser>
-<if(file.genPackage)>
-}  // namespace <file.genPackage>
-<endif>
->>
-
-VisitorFile(file, header) ::= <<
-<fileHeader(file.grammarFileName, file.ANTLRVersion)>
-<if(file.genPackage)>
-namespace <file.genPackage> {
-<endif>
-<header>
-#include "tree/ParseTreeVisitor.h"
-
-/**
- * This template class defines a complete generic visitor for a parse tree
- * produced by {@link <file.parserName>}.
- *
- * @param \<T> The return type of the visit operation. Use {@link Void} for
- * operations with no return type.
- */
-template T
-class <file.grammarName>Visitor : public ParseTreeVisitor {
-	<file.visitorNames:{lname |
-/**
- * Visit a parse tree produced by {@link <file.parserName>#<lname>\}.
- * @param ctx the parse tree
- * @return the visitor result
- */
-T visit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx);}; separator="\n">
-}
-<if(file.genPackage)>
-}  // namespace <file.genPackage>
-<endif>
->>
-
-fileHeader(grammarFileName, ANTLRVersion) ::= <<
-// Generated from <grammarFileName> by ANTLR <ANTLRVersion>
->>
-
-Parser(parser, funcs, atn, sempredFuncs, superClass) ::= <<
-<Parser_(ctor="parser_ctor", ...)>
->>
-
-Parser_(parser, funcs, atn, sempredFuncs, ctor, superClass) ::= <<
-class <parser.name> : public <superClass> {
-protected:
-  static DFA[] _decisionToDFA;
-  static PredictionContextCache _sharedContextCache;
-
-  <if(parser.tokens)>
-  static int
-    <parser.tokens:{k | <k>=<parser.tokens.(k)>}; separator=", ", wrap, anchor>;
-  <endif>
-  static const std::vector\<std::wstring>& tokenNames = {
-    <parser.tokenNames:{t | <t>}; null="\"\<INVALID>\"", separator=", ", wrap, anchor>
-  };
-  
-  static int
-    <parser.rules:{r | RULE_<r.name> = <r.index>}; separator=", ", wrap, anchor>;
-
-  static const std::vector\<std::wstring>& ruleNames = {
-    <parser.ruleNames:{r | "<r>"}; separator=", ", wrap, anchor>
-  };
-
+class <lexer.name> : public <superClass> {
 public:
-  const std::wstring& getGrammarFileName() const { return "<parser.grammarFileName>"; }
-
-  const std::vector\<std::wstring>& getTokenNames() const { return tokenNames; }
-
-  const std::vector\<std::wstring>& getRuleNames() const { return ruleNames; }
-
-  const std::wstring& getSerializedATN() const { return _serializedATN; }
-
-  const ATN& getATN() const { return _ATN; }
-
-  <if(namedActions.members)><namedActions.members>
-  <endif>
-  <parser:(ctor)()>
-
-  <funcs; separator="\n">
-
-<if(sempredFuncs)>
-  bool sempred(RuleContext _localctx, int ruleIndex, int predIndex) {
-    switch (ruleIndex) {
-    <parser.sempredFuncs.values:{f|
-    case <f.ruleIndex>: return <f.name>_sempred((<f.ctxType>)_localctx, predIndex);}; separator="\n">
-    }
-    return true;
-  }
-  <sempredFuncs.values; separator="\n">
+<if (lexer.tokens)>
+  enum {
+    <lexer.tokens: {k | <k> = <lexer.tokens.(k)>}; separator=", ", wrap, anchor>
+  };
 <endif>
 
+<if (rest(lexer.modes))>
+  enum {
+    <rest(lexer.modes): {m | <m> = <i>,}; separator="\n", anchor>
+  };
+<endif>
+
+  <lexer.name>(CharStream *input);
+  ~<lexer.name>();
+
+  <namedActions.members>
+  virtual std::string getGrammarFileName() const override;
+  virtual const std::vector\<std::string>& getRuleNames() const override;
+  
+  virtual const std::vector\<std::string>& getModeNames() const override;
+  virtual const std::vector\<std::string>& getTokenNames() const override; // deprecated, use vocabulary instead
+  virtual Ref\<dfa::Vocabulary> getVocabulary() const override;
+  
+  virtual const std::vector\<uint16_t> getSerializedATN() const;
+  virtual const atn::ATN& getATN() const override;
+
+  <if (actionFuncs)>
+  virtual void action(Ref\<RuleContext> context, int ruleIndex, int actionIndex) override;
+  <endif>
+  <if (sempredFuncs)>
+  virtual bool sempred(Ref\<RuleContext> context, int ruleIndex, int predicateIndex) override;  
+  <endif>
+  
+private:
+  static std::vector\<dfa::DFA> _decisionToDFA;
+  static Ref\<atn::PredictionContextCache> _sharedContextCache;
+  static std::vector\<std::string> _ruleNames;
+  static std::vector\<std::string> _tokenNames;
+  static std::vector\<std::string> _modeNames;
+  
+  static std::vector\<std::string> _literalNames;
+  static std::vector\<std::string> _symbolicNames;
+  static Ref\<dfa::Vocabulary> _vocabulary;
   <atn>
+  
+  <namedActions.declarations>
+
+  // Individual action functions triggered by action() above.
+  <actionFuncs.values; separator="\n">
+  
+  // Individual semantic predicate functions triggered by sempred() above.
+  <sempredFuncs.values; separator="\n">
+  
+  struct Initializer {
+    Initializer();
+  };
+  static Initializer _init;
+};
+>>
+
+Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass = {Lexer}) ::= <<
+<lexer.name>::<lexer.name>(CharStream *input) : <superClass>(input) {
+  _interpreter = new atn::LexerATNSimulator(this, _atn, _decisionToDFA, _sharedContextCache);
+}
+
+<lexer.name>::~<lexer.name>() {
+  delete _interpreter;
+}
+
+std::string <lexer.name>::getGrammarFileName() const {
+  return "<lexer.grammarFileName>";
+}
+
+const std::vector\<std::string>& <lexer.name>::getRuleNames() const {
+  return _ruleNames;
+}
+  
+const std::vector\<std::string>& <lexer.name>::getModeNames() const {
+  return _modeNames;
+}
+  
+const std::vector\<std::string>& <lexer.name>::getTokenNames() const {
+  return _tokenNames;
+}
+  
+Ref\<dfa::Vocabulary> <lexer.name>::getVocabulary() const {
+  return _vocabulary;
+}
+
+const std::vector\<uint16_t> <lexer.name>::getSerializedATN() const {
+  return _serializedATN;
+}
+
+const atn::ATN& <lexer.name>::getATN() const {
+  return _atn;
+}
+
+<namedActions.definitions>
+
+<if (actionFuncs)>
+void <lexer.name>::action(Ref\<RuleContext> context, int ruleIndex, int actionIndex) {
+  switch (ruleIndex) {
+    <lexer.actionFuncs.values: {f | case <f.ruleIndex>: <f.name>Action(std::dynamic_pointer_cast\<<f.ctxType>\>(context), actionIndex); break;}; separator="\n">
+
+  default:
+    break;
+  }
+}
+<endif>
+
+<if (sempredFuncs)>
+bool <lexer.name>::sempred(Ref\<RuleContext> context, int ruleIndex, int predicateIndex) {
+  switch (ruleIndex) {
+    <lexer.sempredFuncs.values: {f | case <f.ruleIndex>: return <f.name>Sempred(std::dynamic_pointer_cast\<<f.ctxType>\>(context), predicateIndex);}; separator="\n">
+
+  default:
+    break;
+  }
+  return true;
+}
+<endif>
+
+<actionFuncs.values; separator="\n">
+
+<sempredFuncs.values; separator="\n">
+
+// Static vars and initialization.
+std::vector\<dfa::DFA> <lexer.name>::_decisionToDFA;
+Ref\<atn::PredictionContextCache> <lexer.name>::_sharedContextCache = std::make_shared\<atn::PredictionContextCache>();
+
+// We own the ATN which in turn owns the ATN states.
+atn::ATN <lexer.name>::_atn;
+std::vector\<uint16_t> <lexer.name>::_serializedATN;
+
+std::vector\<std::string> <lexer.name>::_ruleNames = {
+  <lexer.ruleNames: {r | "<r>"}; separator = ", ", wrap, anchor>
 };
 
-static <parser.name>::_sharedContextCache = new PredictionContextCache();
+std::vector\<std::string> <lexer.name>::_modeNames = {
+  <lexer.modes: {m | "<m>"}; separator = ", ", wrap, anchor>
+};
 
->>
+std::vector\<std::string> <lexer.name>::_literalNames = {
+  <lexer.literalNames: {t | <t>}; null = "\"\"", separator = ", ", wrap, anchor>
+};
 
-dumpActions(recog, argFuncs, actionFuncs, sempredFuncs) ::= <<
-<if(actionFuncs)>
-@Override
-void action(RuleContext _localctx, int ruleIndex, int actionIndex) {
-	switch (ruleIndex) {
-	<recog.actionFuncs.values:{f|
-case <f.ruleIndex>: <f.name>_action((<f.ctxType>)_localctx, actionIndex); break;}; separator="\n">
+std::vector\<std::string> <lexer.name>::_symbolicNames = {
+  <lexer.symbolicNames: {t | <t>}; null = "\"\"", separator = ", ", wrap, anchor>
+};
+
+Ref\<dfa::Vocabulary> <lexer.name>::_vocabulary = std::make_shared\<dfa::VocabularyImpl>(_literalNames, _symbolicNames);
+
+std::vector\<std::string> <lexer.name>::_tokenNames;
+
+<lexer.name>::Initializer::Initializer() {
+  // This code could be in a static initializer lambda, but VS doesn't allow access to private class members from there. 
+	for (size_t i = 0; i \< _symbolicNames.size(); ++i) {
+		std::string name = _vocabulary->getLiteralName(i);
+		if (name.empty()) {
+			name = _vocabulary->getSymbolicName(i);
+		}
+
+		if (name.empty()) {
+			_tokenNames.push_back("\<INVALID>");
+		} else {
+      _tokenNames.push_back(name);
+    }
 	}
+  
+  <atn>
 }
-<actionFuncs.values; separator="\n">
-<endif>
-<if(sempredFuncs)>
-bool sempred(RuleContext _localctx, int ruleIndex, int predIndex) {
-	switch (ruleIndex) {
-	<recog.sempredFuncs.values:{f|
-case <f.ruleIndex>: return <f.name>_sempred((<f.ctxType>)_localctx, predIndex);}; separator="\n">
-	}
-	return true;
-}
-<sempredFuncs.values; separator="\n">
-<endif>
+
+<lexer.name>::Initializer <lexer.name>::_init;
 >>
 
-parser_ctor(p) ::= <<
-<p.name>(TokenStream input) {
-  super(input);
-  interp = new ParserATNSimulator(this,_ATN,_decisionToDFA,_sharedContextCache);
-}
+RuleActionFunctionHeader(r, actions) ::= <<
+void <r.name>Action(Ref\<<r.ctxType>\> context, int actionIndex);
 >>
 
-/* This generates a private method since the actionIndex is generated, making an
- * overriding implementation impossible to maintain.
- */
 RuleActionFunction(r, actions) ::= <<
-private:
-void <r.name>_action(<r.ctxType> _localctx, int actionIndex) {
-	switch (actionIndex) {
-	<actions:{index|
-case <index>: <actions.(index)> break;}; separator="\n">
-	}
-}
-public:
->>
-
-/* This generates a private method since the predIndex is generated, making an
- * overriding implementation impossible to maintain.
- */
-RuleSempredFunction(r, actions) ::= <<
-private:
-bool <r.name>_sempred(<r.ctxType> _localctx, int predIndex) {
-	switch (predIndex) {
-	<actions:{index|
-case <index>: return <actions.(index)>;}; separator="\n">
-	}
-	return true;
-}
-public:
->>
-
-RuleFunction(currentRule,code,locals,ruleCtx,altLabelCtxs,namedActions,finallyAction,postamble,exceptions) ::= <<
-
-<ruleCtx>
-<altLabelCtxs:{l | <altLabelCtxs.(l)>}; separator="\n">
-
-<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else> <endif><\\>
-std::shared_ptr\<<currentRule.ctxType>\> <currentRule.name>(<currentRule.args; separator=",">) {
-  std::shared_ptr\<<currentRule.ctxType>\> _localctx(new <currentRule.ctxType>(_ctx, getState()<currentRule.args:{a | , <a.name>}>));
-  enterRule(_localctx, <currentRule.startState>, RULE_<currentRule.name>);
-  <namedActions.init>
-  <locals; separator="\n">
-  try {
-<if(currentRule.hasLookaheadBlock)>
-    int _alt;
-<endif>
-    <code>
-    <postamble; separator="\n">
-    <namedActions.after>
-    
-    <if(finallyAction)><finallyAction> <! Have to repeat finallyAction and exitRule() as C++ doesn't have finally{}. !>
-    <endif>
-    exitRule();
+void <r.factory.grammar.name>::<r.name>Action(Ref\<<r.ctxType>\> context, int actionIndex) {
+  switch (actionIndex) {
+    <actions: {index | case <index>: <actions.(index)> break;}; separator="\n">
+  
+  default:
+    break;
   }
-  <if(exceptions)>
+}
+
+>>
+
+RuleSempredFunctionHeader(r, actions) ::= <<
+bool <r.name>Sempred(Ref\<<r.ctxType>\> context, int predicateIndex);
+>>
+
+RuleSempredFunction(r, actions) ::= <<
+bool <r.factory.grammar.name>::<r.name>Sempred(Ref\<<r.ctxType>\> context, int predicateIndex) {
+  switch (predicateIndex) {
+    <actions: {index | case <index>: return <actions.(index)>;}; separator="\n">
+    
+  default:
+    break;
+  }
+  return true;
+}
+
+>>
+
+//--------------------------------------------------------------------------------------------------
+
+ParserHeader(parser, funcs, atn, sempredFuncs, superClass = {Parser}) ::= <<
+<namedActions.context>
+
+class <parser.name> : public <superClass> {
+public:
+<if (parser.tokens)>
+  enum {
+    <parser.tokens: {k | <k> = <parser.tokens.(k)>}; separator=", ", wrap, anchor>
+  };
+<endif>
+
+<if (parser.tokens)>
+  enum {
+    <parser.rules: {r | Rule<r.name; format="cap"> = <r.index>}; separator=", ", wrap, anchor>
+  };
+<endif>
+
+  <parser.name>(TokenStream *input);
+  ~<parser.name>();
+
+  virtual std::string getGrammarFileName() const override;
+  virtual const atn::ATN& getATN() const override { return _atn; };
+  virtual const std::vector\<std::string>& getTokenNames() const override { return _tokenNames; }; // deprecated: use vocabulary instead.
+  virtual const std::vector\<std::string>& getRuleNames() const override;
+  virtual Ref\<dfa::Vocabulary> getVocabulary() const override;
+ 
+  <namedActions.members>
+  
+  <parser.funcs: {f | class <f.name; format = "cap">Context;};  separator = "\n"> <! Forward declare context classes. !>
+  
+  <funcs; separator = "\n">
+
+  <if (sempredFuncs)>
+  virtual bool sempred(Ref\<RuleContext> context, int ruleIndex, int predicateIndex) override;
+  <sempredFuncs.values; separator = "\n">
+  <endif>
+
+private:
+  static std::vector\<dfa::DFA> _decisionToDFA;
+  static Ref\<atn::PredictionContextCache> _sharedContextCache;
+  static std::vector\<std::string> _ruleNames;
+  static std::vector\<std::string> _tokenNames;
+  
+  static std::vector\<std::string> _literalNames;
+  static std::vector\<std::string> _symbolicNames;
+  static Ref\<dfa::Vocabulary> _vocabulary;
+  <atn>
+  
+  <namedActions.declarations>
+  
+  struct Initializer {
+    Initializer();
+  };
+  static Initializer _init;
+};
+>>
+
+Parser(parser, funcs, atn, sempredFuncs, superClass = {Parser}) ::= <<
+using namespace org::antlr::v4::runtime;
+
+<parser.name>::<parser.name>(TokenStream *input) : <superClass>(input) {
+  _interpreter = new atn::ParserATNSimulator(this, _atn, _decisionToDFA, _sharedContextCache);
+}
+
+<parser.name>::~<parser.name>() {
+  delete _interpreter;
+}
+
+std::string <parser.name>::getGrammarFileName() const {
+  return "<parser.grammarFileName>";
+}
+
+const std::vector\<std::string>& <parser.name>::getRuleNames() const {
+  return _ruleNames;
+}
+
+Ref\<dfa::Vocabulary> <parser.name>::getVocabulary() const {
+  return _vocabulary;
+}
+
+<namedActions.definitions>
+  
+<funcs; separator = "\n\n">
+
+<if (sempredFuncs)>
+bool <parser.name>::sempred(Ref\<RuleContext> context, int ruleIndex, int predicateIndex) {
+  switch (ruleIndex) {
+  <parser.sempredFuncs.values: {f |
+  case <f.ruleIndex>: return <f.name>Sempred(std::dynamic_pointer_cast\<<f.ctxType>\>(context), predicateIndex);}; separator="\n">
+  
+  default:
+    break;
+  }
+  return true;
+}
+
+<sempredFuncs.values; separator="\n"><endif>
+
+// Static vars and initialization.
+std::vector\<dfa::DFA> <parser.name>::_decisionToDFA;
+Ref\<atn::PredictionContextCache> <parser.name>::_sharedContextCache = std::make_shared\<atn::PredictionContextCache>();
+
+// We own the ATN which in turn owns the ATN states.
+atn::ATN <parser.name>::_atn;
+std::vector\<uint16_t> <parser.name>::_serializedATN;
+
+std::vector\<std::string> <parser.name>::_ruleNames = {
+  <parser.ruleNames: {r | "<r>"}; separator = ", ", wrap, anchor>
+};
+
+std::vector\<std::string> <parser.name>::_literalNames = {
+  <parser.literalNames: {t | <t>}; null = "\"\"", separator = ", ", wrap, anchor>
+};
+
+std::vector\<std::string> <parser.name>::_symbolicNames = {
+  <parser.symbolicNames: {t | <t>}; null = "\"\"", separator = ", ", wrap, anchor>
+};
+
+Ref\<dfa::Vocabulary> <parser.name>::_vocabulary = std::make_shared\<dfa::VocabularyImpl>(_literalNames, _symbolicNames);
+
+std::vector\<std::string> <parser.name>::_tokenNames;
+
+<parser.name>::Initializer::Initializer() {
+	for (size_t i = 0; i \< _symbolicNames.size(); ++i) {
+		std::string name = _vocabulary->getLiteralName(i);
+		if (name.empty()) {
+			name = _vocabulary->getSymbolicName(i);
+		}
+
+		if (name.empty()) {
+			_tokenNames.push_back("\<INVALID>");
+		} else {
+      _tokenNames.push_back(name);
+    }
+	}
+
+  <atn>
+}
+
+<parser.name>::Initializer <parser.name>::_init;
+>>
+
+SerializedATNHeader(model) ::= <<
+static atn::ATN _atn;
+static std::vector\<uint16_t> _serializedATN;
+>>
+
+// Constructs the serialized ATN and writes init code for static member vars.
+SerializedATN(model) ::= <<
+<if (rest(model.segments))>
+<model.segments: {segment | static \<uint16_t> serializedATNSegment<i0>[] = {
+  <segment; wrap={<\n>   }>
+\};}; separator="\n">
+
+<model.segments: {segment | _serializedATN.insert(_serializedATN.end(), serializedATNSegment<i0>, serializedATNSegment<i0> + sizeof(serializedATNSegment<i0>) / sizeof(serializedATNSegment<i0>[0])
+}; separator=" +\n">;
+  
+<else>
+<! only one segment, can be inlined !>
+_serializedATN = {
+  <model.serialized; wrap = {<\n>}>
+};
+<endif>
+
+atn::ATNDeserializer deserializer;
+_atn = deserializer.deserialize(_serializedATN);
+
+for (int i = 0; i \< _atn.getNumberOfDecisions(); i++) { <! Rework class ATN to allow standard iterations. !>
+  _decisionToDFA.push_back(dfa::DFA(_atn.getDecisionState(i), i));
+}
+>>
+
+RuleFunctionHeader(currentRule, args, code, locals, ruleCtx, altLabelCtxs, namedActions, finallyAction, postamble, exceptions) ::= <<
+<ruleCtx>
+<! TODO: untested !><if (altLabelCtxs)><altLabelCtxs: {l | <altLabelCtxs.(l)>}; separator="\n"><endif>
+Ref\<<currentRule.ctxType>\> <currentRule.name>(<args; separator=",">);
+
+>>
+
+RuleFunction(currentRule, args, code, locals, ruleCtx, altLabelCtxs, namedActions, finallyAction, postamble, exceptions) ::= <<
+<ruleCtx>
+<! TODO: untested !><altLabelCtxs: {l | <altLabelCtxs.(l)>}; separator = "\n">
+Ref\<<parser.name>::<currentRule.ctxType>\> <parser.name>::<currentRule.name>(<args; separator=",">) {
+  Ref\<<currentRule.ctxType>\> _localctx = std::make_shared\<<currentRule.ctxType>\>(_ctx, getState()<currentRule.args:{a | , <a.name>}>);
+  enterRule(_localctx, <currentRule.startState>, <parser.name>::Rule<currentRule.name; format = "cap">);
+  <namedActions.init>
+  <locals; separator = "\n">
+
+  auto onExit = finally([=] {
+  <finallyAction>
+    exitRule();
+  });
+  try {
+<! TODO: untested !><if (currentRule.hasLookaheadBlock)>
+    int alt;
+    <endif>
+    <code>
+<! TODO: untested !>   <postamble; separator = "\n">
+    <namedActions.after>
+  }
+  <if (exceptions)>
   <exceptions; separator="\n">
   <else>
-  catch (const RecognitionException &re) {
-    _localctx->exception = re;
-    _errHandler.reportError(this, re);
-    _errHandler.recover(this, re);
-
-    <if(finallyAction)><finallyAction>
-    <endif>
-    exitRule();
+  catch (RecognitionException &e) {
+    _localctx->exception = std::make_exception_ptr(e);
+    _errHandler->reportError(this, e);
+    _errHandler->recover(this, e);
   }
   <endif>
+
   return _localctx;
 }
 >>
 
-LeftRecursiveRuleFunction(currentRule,code,locals,ruleCtx,altLabelCtxs,
-	namedActions,finallyAction,postamble) ::=
-<<
-
+LeftRecursiveRuleFunctionHeader(currentRule, args, code, locals, ruleCtx, altLabelCtxs, namedActions, finallyAction, postamble) ::= <<
 <ruleCtx>
-<altLabelCtxs:{l | <altLabelCtxs.(l)>}; separator="\n">
+<! TODO: untested !><altLabelCtxs: {l | <altLabelCtxs.(l)>}; separator="\n">
+Ref\<<currentRule.ctxType>\> <currentRule.name>(<currentRule.args; separator = ", ">);
+Ref\<<currentRule.ctxType>\> <currentRule.name>(int precedence<currentRule.args: {a | , <a>}>);
+>>
 
-<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public final <endif><currentRule.ctxType> <currentRule.name>(<currentRule.args; separator=", ">) throws RecognitionException {
-	return <currentRule.name>(0<currentRule.args:{a | , <a.name>}>);
+LeftRecursiveRuleFunction(currentRule, args, code, locals, ruleCtx, altLabelCtxs, namedActions, finallyAction, postamble) ::= <<
+<ruleCtx>
+<altLabelCtxs: {l | <altLabelCtxs.(l)>}; separator="\n">
+
+Ref\<<parser.name>::<currentRule.ctxType>\> <parser.name>::<currentRule.name>(<currentRule.args; separator=", ">) {
+<! TODO: currentRule.args untested !>   return <currentRule.name>(0<currentRule.args: {a | , <a.name>}>);
 }
 
-private:
-<currentRule.ctxType> <currentRule.name>(int _p<currentRule.args:{a | , <a>}>) {
-	ParserRuleContext _parentctx = _ctx;
-	int _parentState = getState();
-	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(_ctx, _parentState<currentRule.args:{a | , <a.name>}>);
-	<currentRule.ctxType> _prevctx = _localctx;
-	int _startState = <currentRule.startState>;
-	enterRecursionRule(_localctx, <currentRule.startState>, RULE_<currentRule.name>, _p);
-	<namedActions.init>
-	<locals; separator="\n">
-	try {
-<if(currentRule.hasLookaheadBlock)>
-		int _alt;
-<endif>
-		<code>
-		<postamble; separator="\n">
-		<namedActions.after>
-	}
-	catch (RecognitionException re) {
-		_localctx.exception = re;
-		_errHandler.reportError(this, re);
-		_errHandler.recover(this, re);
-	}
-	finally {
-		<finallyAction>
-		unrollRecursionContexts(_parentctx);
-	}
-	return _localctx;
+Ref\<<parser.name>::<currentRule.ctxType>\> <parser.name>::<currentRule.name>(int precedence<currentRule.args:{a | , <a>}>) {
+  Ref\<ParserRuleContext> parentContext = _ctx;
+  int parentState = getState();
+  Ref\<<parser.name>::<currentRule.ctxType>\> _localctx = std::make_shared\<<currentRule.ctxType>\>(_ctx, parentState<currentRule.args: {a | , <a.name>}>);
+  Ref\<<parser.name>::<currentRule.ctxType>\> previousContext = _localctx;
+  int startState = <currentRule.startState>;
+  enterRecursionRule(_localctx, <currentRule.startState>, <parser.name>::Rule<currentRule.name; format = "cap">, precedence);
+  
+    <namedActions.init>
+<! TODO: untested !>    <locals; separator = "\n">
+  
+  auto onExit = finally([=] {
+<! TODO: untested !><if (finallyAction)><finallyAction><endif>
+    unrollRecursionContexts(parentContext);
+  });
+  try {
+    <if (currentRule.hasLookaheadBlock)>int alt;<endif>
+    <code>
+<! TODO: untested !><postamble; separator = "\n">
+    <namedActions.after>
+  }
+  catch (RecognitionException &e) {
+    _localctx->exception = std::make_exception_ptr(e);
+    _errHandler->reportError(this, e);
+    _errHandler->recover(this, e);
+  }
+  return _localctx;
 }
+>>
+
+StructDeclHeader(struct, ctorAttrs, attrs, getters, dispatchMethods, interfaces, extensionMembers) ::= <<
+class <struct.name> : public <if (contextSuperClass)><contextSuperClass><else>ParserRuleContext<endif><if(interfaces)>, <interfaces; separator=", "><endif> {
 public:
+  <if (attrs)><attrs:{a | <if (!a.isLocal)><a>;<endif>}; separator="\n"><endif>
+  <if (ctorAttrs)><struct.name>(std::weak_ptr\<ParserRuleContext> parent, int invokingState);<endif>
+  <struct.name>(std::weak_ptr\<ParserRuleContext> parent, int invokingState<ctorAttrs: {a | , <a>}>);
+<if (struct.provideCopyFrom)> <! don't need copy unless we have subclasses !>
+  <struct.name>() { }
+  void copyFrom(Ref\<<struct.name>\> context);
+<endif>
+
+  virtual ssize_t getRuleIndex() const override;
+  <getters: {g | <g>}; separator = "\n">
+
+  <dispatchMethods; separator = "\n">
+<! TODO: untested !> <extensionMembers; separator = "\n">
+<if (attrs)>
+private:
+  <attrs: {a | <if (a.isLocal)><a><endif>}; separator = "\n">
+<endif>
+};
+
 >>
 
-CodeBlockForOuterMostAlt(currentOuterMostAltCodeBlock, locals, preamble, ops) ::= <<
-<if(currentOuterMostAltCodeBlock.altLabel)>_localctx = new <currentOuterMostAltCodeBlock.altLabel; format="cap">Context(_localctx);<endif>
-enterOuterAlt(_localctx, <currentOuterMostAltCodeBlock.alt.altNum>);
-<CodeBlockForAlt(currentAltCodeBlock=currentOuterMostAltCodeBlock, ...)>
->>
+StructDecl(struct, ctorAttrs, attrs, getters, dispatchMethods, interfaces, extensionMembers) ::= <<
+//----------------- <struct.name> ------------------------------------------------------------------
 
-CodeBlockForAlt(currentAltCodeBlock, locals, preamble, ops) ::= <<
-{
-<locals; separator="\n">
-<preamble; separator="\n">
-<ops; separator="\n">
+<if (ctorAttrs)>
+<parser.name>::<struct.name>::<struct.name>(std::weak_ptr\<ParserRuleContext> parent, int invokingState)
+  : <if (contextSuperClass)><contextSuperClass><else>ParserRuleContext<endif>(parent, invokingState) {
 }
+<endif>
+
+<parser.name>::<struct.name>::<struct.name>(std::weak_ptr\<ParserRuleContext> parent, int invokingState<ctorAttrs: {a | , <a>}>)
+  : <if (contextSuperClass)><contextSuperClass><else>ParserRuleContext<endif>(parent, invokingState) {
+  <struct.ctorAttrs: {a | this-><a.name> = <a.name>;}; separator="\n">
+}
+
+<getters: {g | <g>}; separator = "\n">
+
+ssize_t <parser.name>::<struct.name>::getRuleIndex() const {
+  return <parser.name>::Rule<struct.derivedFromName; format = "cap">;
+}
+
+<if (struct.provideCopyFrom)>
+void <parser.name>::<struct.name>::copyFrom(Ref\<<struct.name>\> ctx) {
+  <if (contextSuperClass)><contextSuperClass><else>ParserRuleContext<endif>::copyFrom(ctx);
+<! TODO: untested !>  <struct.attrs: {a | this-><a.name> = ctx.<a.name>;}; separator = "\n">
+}
+<endif>
+<dispatchMethods; separator = "\n\n">
+<! TODO: untested !><extensionMembers; separator = "\n\n">
+
 >>
 
+AltLabelStructDeclHeader(struct, attrs, getters, dispatchMethods) ::= <<
+class <struct.name> : public <currentRule.name; format = "cap">Context {
+public:
+  <struct.name>(Ref\<<currentRule.name; format = "cap">Context> ctx);
+  
+<! TODO: untested!>  <if (attrs)><attrs: {a | <a>}; separator = "\n">bbb<endif>
+  <getters: {g | <g>}; separator = "\n">
+  <dispatchMethods; separator = "\n">
+};
+
+>>
+
+AltLabelStructDecl(struct, attrs, getters, dispatchMethods) ::= <<
+//----------------- <struct.name> ------------------------------------------------------------------
+
+<! TODO: untested !><if (attrs)><attrs: {a | <a>}; separator = "\n"><endif>
+<getters: {g | <g>}; separator = "\n">
+<struct.factory.grammar.name>::<struct.name>::<struct.name>(Ref\<<currentRule.name; format = "cap">Context> ctx) { copyFrom(ctx); }
+
+<dispatchMethods; separator="\n">
+>>
+
+
+CodeBlockForOuterMostAltHeader(currentOuterMostAltCodeBlock, locals, preamble, ops) ::= "<! Required to exist, but unused. !>"
+CodeBlockForOuterMostAlt(currentOuterMostAltCodeBlock, locals, preamble, ops) ::= <<
+<if (currentOuterMostAltCodeBlock.altLabel)>
+_localctx = std::dynamic_pointer_cast\<<currentRule.ctxType>\>(std::make_shared\<<parser.name>::<currentOuterMostAltCodeBlock.altLabel; format = "cap">Context>(_localctx));
+<endif>
+enterOuterAlt(_localctx, <currentOuterMostAltCodeBlock.alt.altNum>);
+<CodeBlockForAlt(currentAltCodeBlock = currentOuterMostAltCodeBlock, ...)>
+>>
+
+CodeBlockForAltHeader(currentAltCodeBlock, locals, preamble, ops) ::= "<! Required to exist, but unused. !>"
+CodeBlockForAlt(currentAltCodeBlock, locals, preamble, ops) ::= <<
+<! TODO: untested !><locals; separator = "\n">
+<! TODO: untested !><preamble; separator = "\n">
+<ops; separator = "\n">
+>>
+
+LL1AltBlockHeader(choice, preamble, alts, error) ::= "<! Required to exist, but unused. !>"
 LL1AltBlock(choice, preamble, alts, error) ::= <<
 setState(<choice.stateNumber>);
-<!_errHandler.sync(this);!>
-<if(choice.label)><labelref(choice.label)> = _input.LT(1);<endif>
+_errHandler->sync(this);
+<! TODO: untested !><if (choice.label)>LL1AltBlock(choice, preamble, alts, error) <labelref(choice.label)> = _input->LT(1);<endif>
 <preamble; separator="\n">
-switch (_input.LA(1)) {
-<choice.altLook,alts:{look,alt| <cases(ttypes=look)>
-	<alt>
-	break;}; separator="\n">
+switch (_input->LA(1)) {
+  <choice.altLook, alts: {look, alt | <cases(ttypes = look)>
+  <alt>
+  break;
+}; separator = "\n">
 default:
-	<error>
+  <error>
 }
 >>
 
+LL1OptionalBlockHeader(choice, alts, error) ::= "<! Required but unused. !>"
 LL1OptionalBlock(choice, alts, error) ::= <<
 setState(<choice.stateNumber>);
-<!_errHandler.sync(this);!>
-switch (_input.LA(1)) {
-<choice.altLook,alts:{look,alt| <cases(ttypes=look)>
-	<alt>
-	break;}; separator="\n">
+switch (_input->LA(1)) {
+<choice.altLook, alts: {look, alt | <cases(ttypes = look)>
+  <alt>
+  break;}; separator="\n">
 default:
-	<error>
+  <error>
 }
 >>
 
+LL1OptionalBlockSingleAltHeader(choice, expr, alts, preamble, error, followExpr) ::= "<! Required but unused. !>"
 LL1OptionalBlockSingleAlt(choice, expr, alts, preamble, error, followExpr) ::= <<
 setState(<choice.stateNumber>);
-<!_errHandler.sync(this);!>
-<preamble; separator="\n">
+
+<preamble; separator = "\n">
 if (<expr>) {
-	<alts; separator="\n">
-}
-<!else if ( !(<followExpr>) ) <error>!>
->>
-
-LL1StarBlock(choice, alts) ::= <<
-setState(<choice.stateNumber>);
-_errHandler.sync(this);
-<choice.loopLabel>:
-while (true) {
-	switch (_input.LA(1)) {
-	<choice.altLook,alts:{look,alt| <cases(look)>
-	<alt>
-	break;}; separator="\n">
-	<cases(choice.exitLook)>
-		break <choice.loopLabel>;
-	}
-	setState(<choice.loopBackStateNumber>);
-	_errHandler.sync(this);
+  <alts; separator = "\n">
 }
 >>
 
+LL1StarBlockSingleAltHeader(choice, loopExpr, alts, preamble, iteration) ::= "<! Required but unused. !>"
 LL1StarBlockSingleAlt(choice, loopExpr, alts, preamble, iteration) ::= <<
 setState(<choice.stateNumber>);
-_errHandler.sync(this);
+_errHandler->sync(this);
 <preamble; separator="\n">
 while (<loopExpr>) {
-	<alts; separator="\n">
-	setState(<choice.loopBackStateNumber>);
-	_errHandler.sync(this);
-	<iteration>
+  <alts; separator="\n">
+  setState(<choice.loopBackStateNumber>);
+  _errHandler->sync(this);
+  <iteration>
 }
 >>
 
-LL1PlusBlock(choice, alts, iteration, loopExpr, error) ::= <<
-setState(<choice.blockStartStateNumber>); <! alt block decision !>
-_errHandler.sync(this);
-do {
-	switch (_input.LA(1)) {
-	<choice.altLook,alts:{look,alt| <cases(look)>
-	<alt>
-	break;}; separator="\n">
-	default:
-		<error>
-	}
-	setState(<choice.stateNumber>);
-	_errHandler.sync(this);
-	<iteration>
-} while ( <loopExpr> );
->>
-
+LL1PlusBlockSingleAltHeader(choice, loopExpr, alts, preamble, iteration) ::= "<! Required but unused. !>"
 LL1PlusBlockSingleAlt(choice, loopExpr, alts, preamble, iteration) ::= <<
 setState(<choice.blockStartStateNumber>); <! alt block decision !>
-_errHandler.sync(this);
+_errHandler->sync(this);
 <preamble; separator="\n">
 do {
-	<alts; separator="\n">
-	setState(<choice.stateNumber>); <! loopback/exit decision !>
-	_errHandler.sync(this);
-	<iteration>
-} while ( <loopExpr> );
+  <alts; separator="\n">
+  setState(<choice.stateNumber>); <! loopback/exit decision !>
+  _errHandler->sync(this);
+  <iteration>
+} while (<loopExpr>);
 >>
 
 // LL(*) stuff
 
+AltBlockHeader(choice, preamble, alts, error) ::= "<! Unused but must be present. !>"
 AltBlock(choice, preamble, alts, error) ::= <<
 setState(<choice.stateNumber>);
-<!_errHandler.sync(this);!>
-<if(choice.label)><labelref(choice.label)> = _input.LT(1);<endif>
-<preamble; separator="\n">
-switch ( getInterpreter().adaptivePredict(_input,<choice.decision>,_ctx) ) {
-<alts:{alt |
-case <i>:
-	<alt>
-	break;}; separator="\n">
+_errHandler->sync(this);
+<! TODO: untested !><if (choice.label)><labelref(choice.label)> = _input->LT(1);<endif>
+<! TODO: untested !><preamble; separator = "\n">
+switch (getInterpreter\<atn::ParserATNSimulator>()->adaptivePredict(_input, <choice.decision>, _ctx)) {
+<alts: {alt | case <i>:
+  <alt>
+  break;
+}; separator="\n">
 }
 >>
 
+OptionalBlockHeader(choice, alts, error) ::= "<! Unused but must be present. !>"
 OptionalBlock(choice, alts, error) ::= <<
 setState(<choice.stateNumber>);
-<!_errHandler.sync(this);!>
-switch ( getInterpreter().adaptivePredict(_input,<choice.decision>,_ctx) ) {
-<alts:{alt |
-case <i><if(!choice.ast.greedy)>+1<endif>:
-	<alt>
-	break;}; separator="\n">
+_errHandler->sync(this);
+
+switch (getInterpreter\<atn::ParserATNSimulator>()->adaptivePredict(_input, <choice.decision>, _ctx)) {
+<alts: {alt | case <i><if (!choice.ast.greedy)>+1<endif>:
+  <alt>
+  break;
+}; separator = "\n">
 }
 >>
 
+StarBlockHeader(choice, alts, sync, iteration) ::= "<! Unused but must be present. !>"
 StarBlock(choice, alts, sync, iteration) ::= <<
 setState(<choice.stateNumber>);
-_errHandler.sync(this);
-_alt = getInterpreter().adaptivePredict(_input,<choice.decision>,_ctx);
-while ( _alt!=<choice.exitAlt> && _alt!=-1 ) {
-	if ( _alt==1<if(!choice.ast.greedy)>+1<endif> ) {
-		<iteration>
-		<alts> <! should only be one !>
-	}
-	setState(<choice.loopBackStateNumber>);
-	_errHandler.sync(this);
-	_alt = getInterpreter().adaptivePredict(_input,<choice.decision>,_ctx);
+_errHandler->sync(this);
+alt = getInterpreter\<atn::ParserATNSimulator>()->adaptivePredict(_input, <choice.decision>, _ctx);
+while (alt != <choice.exitAlt> && alt != -1) {
+  if ( alt == 1 <if(!choice.ast.greedy)>+ 1<endif>) {
+    <iteration>
+    <alts> <! should only be one !>
+  }
+  setState(<choice.loopBackStateNumber>);
+  _errHandler->sync(this);
+  alt = getInterpreter\<atn::ParserATNSimulator>()->adaptivePredict(_input, <choice.decision>, _ctx);
 }
 >>
 
+PlusBlockHeader(choice, alts, error) ::= "<! Required to exist, but unused. !>"
 PlusBlock(choice, alts, error) ::= <<
 setState(<choice.blockStartStateNumber>); <! alt block decision !>
-_errHandler.sync(this);
-_alt = getInterpreter().adaptivePredict(_input,<choice.decision>,_ctx);
+_errHandler->sync(this);
+alt = getInterpreter\<atn::ParserATNSimulator>()->adaptivePredict(_input, <choice.decision>, _ctx);
 do {
-	switch (_alt) {
-	<alts:{alt|
-case <i><if(!choice.ast.greedy)>+1<endif>:
-	<alt>
-	break;}; separator="\n">
-	default:
-		<error>
-	}
-	setState(<choice.loopBackStateNumber>); <! loopback/exit decision !>
-	_errHandler.sync(this);
-	_alt = getInterpreter().adaptivePredict(_input,<choice.decision>,_ctx);
-} while ( _alt!=<choice.exitAlt> && _alt!=-1 );
+  switch (alt) {
+    <alts: {alt | case <i><if (!choice.ast.greedy)> + 1<endif>:
+    <alt>
+    break;
+}; separator="\n">
+  default:
+    <error>
+  }
+  setState(<choice.loopBackStateNumber>); <! loopback/exit decision !>
+  _errHandler->sync(this);
+  alt = getInterpreter\<atn::ParserATNSimulator>()->adaptivePredict(_input, <choice.decision>, _ctx);
+} while (alt != <choice.exitAlt> && alt != -1);
 >>
 
-Sync(s) ::= "sync(<s.expecting.name>);"
+Sync(s) ::= "Sync(s) sync(<s.expecting.name>);"
 
-ThrowNoViableAlt(t) ::= "throw new NoViableAltException(this);"
+ThrowNoViableAltHeader(t) ::= "<! Unused but must be present. !>"
+ThrowNoViableAlt(t) ::= "throw NoViableAltException(this);"
 
+TestSetInlineHeader(s) ::= "<! Required but unused. !>"
 TestSetInline(s) ::= <<
-<s.bitsets:{bits | <if(rest(rest(bits.ttypes)))><bitsetBitfieldComparison(s, bits)><else><bitsetInlineComparison(s, bits)><endif>}; separator=" || ">
+<s.bitsets: {bits | <if (rest(rest(bits.ttypes)))><bitsetBitfieldComparison(s, bits)><else><bitsetInlineComparison(s, bits)><endif>}; separator=" || ">
 >>
 
 // Java language spec 15.19 - shift operators mask operands rather than overflow to 0... need range test
 testShiftInRange(shiftAmount) ::= <<
-((<shiftAmount>) & ~0x3f) == 0
+((<shiftAmount> & ~(ssize_t)0x3f) == 0)
 >>
 
 // produces smaller bytecode only when bits.ttypes contains more than two items
-bitsetBitfieldComparison(s, bits) ::= <%
-(<testShiftInRange({<offsetShift(s.varName, bits.shift)>})> && ((1L \<\< <offsetShift(s.varName, bits.shift)>) & (<bits.ttypes:{ttype | (1L \<\< <offsetShift(ttype, bits.shift)>)}; separator=" | ">)) != 0)
-%>
+bitsetBitfieldComparison(s, bits) ::= <<
+(<testShiftInRange({<offsetShift(s.varName, bits.shift)>})> &&
+  ((1L \<\< <offsetShift(s.varName, bits.shift)>) & (<bits.ttypes: {ttype | (1L \<\< <offsetShift(ttype, bits.shift, true)>)}; separator = " | ">)) != 0)
+>>
 
 isZero ::= [
-"0":true,
-default:false
+  "0": true,
+  default: false
 ]
 
-offsetShift(shiftAmount, offset) ::= <%
-<if(!isZero.(offset))>(<shiftAmount> - <offset>)<else><shiftAmount><endif>
+offsetShift(shiftAmount, offset, prefix = false) ::= <%
+<if (!isZero.(offset))>(<if (prefix)><parser.name>::<endif><shiftAmount> - <offset>)<else><if (prefix)><parser.name>::<endif><shiftAmount><endif>
 %>
 
 // produces more efficient bytecode when bits.ttypes contains at most two items
 bitsetInlineComparison(s, bits) ::= <%
-<bits.ttypes:{ttype | <s.varName>==<ttype>}; separator=" || ">
+<bits.ttypes: {ttype | <s.varName> == <parser.name>::<ttype>}; separator = " || ">
 %>
 
 cases(ttypes) ::= <<
-<ttypes:{t | case <t>:}; separator="\n">
+<ttypes: {t | case <parser.name>::<t>:}; separator="\n">
 >>
+
+InvokeRuleHeader(r, argExprsChunks) ::= "InvokeRuleHeader"
 
 InvokeRule(r, argExprsChunks) ::= <<
-setState(<r.stateNumber>); <if(r.labels)><r.labels:{l | <labelref(l)> = }><endif><r.name>(<if(r.ast.options.p)><r.ast.options.p><if(argExprsChunks)>,<endif><endif><argExprsChunks>);
+setState(<r.stateNumber>);
+<if(r.labels)><r.labels: {l | <labelref(l)> = }><endif><r.name>(<if(r.ast.options.p)><r.ast.options.p><if(argExprsChunks)>,<endif><endif><argExprsChunks>);
 >>
 
+MatchTokenHeader(m) ::= "<! Required but unused. !>"
 MatchToken(m) ::= <<
-setState(<m.stateNumber>); <if(m.labels)><m.labels:{l | <labelref(l)> = }><endif>match(<m.name>);
+setState(<m.stateNumber>);
+<if (m.labels)><m.labels: {l | <labelref(l)> = }><endif>match(<parser.name>::<m.name>);
 >>
 
+MatchSetHeader(m, expr, capture) ::= "<! Required but unused. !>"
 MatchSet(m, expr, capture) ::= "<CommonSetStuff(m, expr, capture, false)>"
 
+MatchNotSetHeader(m, expr, capture) ::= "<! Required but unused. !>"
 MatchNotSet(m, expr, capture) ::= "<CommonSetStuff(m, expr, capture, true)>"
 
 CommonSetStuff(m, expr, capture, invert) ::= <<
 setState(<m.stateNumber>);
-<if(m.labels)><m.labels:{l | <labelref(l)> = }>_input.LT(1);<endif>
+<if (m.labels)><m.labels: {l | <labelref(l)> = }>_input->LT(1);<endif>
 <capture>
-if ( <if(invert)><m.varName> \<= 0 || <else>!<endif>(<expr>) ) {
-	<if(m.labels)><m.labels:{l | <labelref(l)> = (Token)}><endif>_errHandler.recoverInline(this);
+if (<if (invert)><m.varName> \<= 0 || <else>!<endif>(<expr>)) {
+    <if (m.labels)><m.labels:{l | <labelref(l)> = }><endif>_errHandler->recoverInline(this);
 }
 consume();
 >>
 
+WildcardHeader(w) ::= "<! Required but unused. !>"
 Wildcard(w) ::= <<
 setState(<w.stateNumber>);
-<if(w.labels)><w.labels:{l | <labelref(l)> = }><endif>matchWildcard();
+<! TODO: w.lables untested!>
+<if (w.labels)>Wildcard() <w.labels: {l | <labelref(l)> = }><endif>matchWildcard();
 >>
 
 // ACTION STUFF
 
+ActionHeader(a, foo, chunks) ::= "<chunks>"
 Action(a, foo, chunks) ::= "<chunks>"
 
-ArgAction(a, chunks) ::= "<chunks>"
+ArgAction(a, chunks) ::= "ArgAction(a, chunks) <chunks>"
 
+SemPredHeader(p, chunks, failChunks) ::= "<! Required but unused. !>"
 SemPred(p, chunks, failChunks) ::= <<
 setState(<p.stateNumber>);
-if (!(<chunks>)) throw new FailedPredicateException(this, <p.predicate><if(failChunks)>, <failChunks><elseif(p.msg)>, <p.msg><endif>);
+
+<! TODO: failChunks + p.msg untested !>
+if (!(<chunks>)) throw FailedPredicateException(this, <p.predicate><if (failChunks)>, <failChunks><elseif (p.msg)>, <p.msg><endif>);
 >>
 
+ExceptionClauseHeader(e, catchArg, catchAction) ::= "<! Required but unused. !>"
 ExceptionClause(e, catchArg, catchAction) ::= <<
 catch (<catchArg>) {
-	<catchAction>
+  <catchAction>
 }
 >>
 
-// lexer actions are not associated with model objects
+// Lexer actions are not associated with model objects.
 
 LexerSkipCommand()  ::= "skip();"
 LexerMoreCommand()  ::= "more();"
 LexerPopModeCommand() ::= "popMode();"
 
-LexerTypeCommand(arg)      ::= "_type = <arg>;"
-LexerChannelCommand(arg)   ::= "_channel = <arg>;"
-LexerModeCommand(arg)      ::= "_mode = <arg>;"
-LexerPushModeCommand(arg)  ::= "pushMode(<arg>);"
+LexerTypeCommand(arg, grammar)      ::= "type = <grammar.name>::<arg>;"
+LexerChannelCommand(arg, grammar)   ::= "channel = <arg>;"
+LexerModeCommand(arg, grammar)      ::= "mode = <grammar.name>Mode::<arg>;"
+LexerPushModeCommand(arg, grammar)  ::= "pushMode(<grammar.name>Mode::<arg>);"
 
-DefaultParserSuperClass(s) ::= "Parser"
-DefaultLexerSuperClass(s)  ::= "Lexer"
-
+ActionTextHeader(t) ::= "<t.text>"
 ActionText(t) ::= "<t.text>"
+
+ActionTemplateHeader(t) ::= "<! Required but unused. !>"
 ActionTemplate(t) ::= "<t.st>"
-ArgRef(a) ::= "_localctx.<a.name>"
-LocalRef(a) ::= "_localctx.<a.name>"
-RetValueRef(a) ::= "_localctx.<a.name>"
-QRetValueRef(a) ::= "<ctx(a)>.<a.dict>.<a.name>"
+
+ArgRefHeader(t) ::= "<! Required but unused. !>"
+ArgRef(a) ::= "_localctx-><a.name>"
+
+LocalRefHeader(t) ::= "<! Required but unused. !>"
+LocalRef(a) ::= "_localctx-><a.name>"
+
+RetValueRefHeader(t) ::= "<! Required but unused. !>"
+RetValueRef(a) ::= "_localctx-><a.name>"
+
+QRetValueRefHeader(t) ::= "<! Required but unused. !>"
+QRetValueRef(a) ::= "<ctx(a)>-><a.dict>.<a.name>"
 /** How to translate $tokenLabel */
-TokenRef(t) ::= "<ctx(t)>.<t.name>"
-LabelRef(t) ::= "<ctx(t)>.<t.name>"
-ListLabelRef(t) ::= "<ctx(t)>.<ListLabelName(t.name)>"
-SetAttr(s,rhsChunks) ::= "<ctx(s)>.<s.name> = <rhsChunks>;"
 
-TokenLabelType() ::= "<file.TokenLabelType; null={Token}>"
-InputSymbolType() ::= "<file.InputSymbolType; null={Token}>"
+TokenRefHeader(t) ::= "<! Required but unused. !>"
+TokenRef(t) ::= "<ctx(t)>-><t.name>"
 
-TokenPropertyRef_text(t) ::= "(<ctx(t)>.<t.label>!=null?<ctx(t)>.<t.label>.getText():null)"
-TokenPropertyRef_type(t) ::= "(<ctx(t)>.<t.label>!=null?<ctx(t)>.<t.label>.getType():0)"
-TokenPropertyRef_line(t) ::= "(<ctx(t)>.<t.label>!=null?<ctx(t)>.<t.label>.getLine():0)"
-TokenPropertyRef_pos(t) ::= "(<ctx(t)>.<t.label>!=null?<ctx(t)>.<t.label>.getCharPositionInLine():0)"
-TokenPropertyRef_channel(t) ::= "(<ctx(t)>.<t.label>!=null?<ctx(t)>.<t.label>.getChannel():0)"
-TokenPropertyRef_index(t) ::= "(<ctx(t)>.<t.label>!=null?<ctx(t)>.<t.label>.getTokenIndex():0)"
-TokenPropertyRef_int(t) ::= "(<ctx(t)>.<t.label>!=null?Integer.valueOf(<ctx(t)>.<t.label>.getText()):0)"
+LabelRefHeader(t) ::= "<! Required but unused. !>"
+LabelRef(t) ::= "<ctx(t)>-><t.name>"
 
-RulePropertyRef_start(r) ::= "(<ctx(r)>.<r.label>!=null?(<ctx(r)>.<r.label>.start):null)"
-RulePropertyRef_stop(r)	 ::= "(<ctx(r)>.<r.label>!=null?(<ctx(r)>.<r.label>.stop):null)"
-RulePropertyRef_text(r)	 ::= "(<ctx(r)>.<r.label>!=null?_input.getText(<ctx(r)>.<r.label>.start,<ctx(r)>.<r.label>.stop):null)"
-RulePropertyRef_ctx(r)	 ::= "<ctx(r)>.<r.label>"
+ListLabelRefHeader(t) ::= "<! Required but unused. !>"
+ListLabelRef(t) ::= "<ctx(t)>-><ListLabelName(t.name)>"
 
-ThisRulePropertyRef_start(r) ::= "_localctx.start"
-ThisRulePropertyRef_stop(r)	 ::= "_localctx.stop"
-ThisRulePropertyRef_text(r)	 ::= "_input.getText(_localctx.start, _input.LT(-1))"
-ThisRulePropertyRef_ctx(r)	 ::= "_localctx"
+SetAttrHeader(t) ::= "<! Required but unused. !>"
+SetAttr(s,rhsChunks) ::= "<ctx(s)>-><s.name> = <rhsChunks>;"
 
-NonLocalAttrRef(s)		 ::= "((<s.ruleName; format=\"cap\">Context)getInvokingContext(<s.ruleIndex>)).<s.name>"
-SetNonLocalAttr(s, rhsChunks)	  ::=
-	"((<s.ruleName; format=\"cap\">Context)getInvokingContext(<s.ruleIndex>)).<s.name> = <rhsChunks>;"
+InputSymbolType() ::= "<file.InputSymbolType; null = {Token}> *"
 
-AddToLabelList(a) ::= "<ctx(a.label)>.<a.listName>.add(<labelref(a.label)>);"
+TokenPropertyRef_textHeader(t) ::= "<! Required but unused. !>"
+TokenPropertyRef_text(t) ::= <<(<ctx(t)>-><t.label> != nullptr ? <ctx(t)>-><t.label>->getText() : "")>>
 
-TokenDecl(t) ::= "<TokenLabelType()> <t.name>;"
-TokenTypeDecl(t) ::= "int <t.name>;"
-TokenListDecl(t) ::= "List\<Token> <t.name> = new ArrayList\<Token>();"
-RuleContextDecl(r) ::= "<r.ctxName> <r.name>;"
-RuleContextListDecl(rdecl) ::= "List\<<rdecl.ctxName>> <rdecl.name> = new ArrayList\<<rdecl.ctxName>>();"
+TokenPropertyRef_typeHeader(t) ::= "<! Required but unused. !>"
+TokenPropertyRef_type(t) ::= "(<ctx(t)>-><t.label> != nullptr ? <ctx(t)>-><t.label>->getType() : 0)"
 
-ContextTokenGetterDecl(t) ::= "TerminalNode <t.name>() { return getToken(<parser.name>.<t.name>, 0); }"
-ContextTokenListGetterDecl(t) ::= "List\<TerminalNode> <t.name>() { return getTokens(<parser.name>.<t.name>); }"
+TokenPropertyRef_lineHeader(t) ::= "<! Required but unused. !>"
+TokenPropertyRef_line(t) ::= "(<ctx(t)>-><t.label> != nullptr ? <ctx(t)>-><t.label>->getLine() : 0)"
+
+TokenPropertyRef_posHeader(t) ::= "<! Required but unused. !>"
+TokenPropertyRef_pos(t) ::= "(<ctx(t)>-><t.label> != nullptr ? <ctx(t)>-><t.label>->getCharPositionInLine() : 0)"
+
+TokenPropertyRef_channelHeader(t) ::= "<! Required but unused. !>"
+TokenPropertyRef_channel(t) ::= "(<ctx(t)>-><t.label> != nullptr ? <ctx(t)>-><t.label>->getChannel() : 0)"
+
+TokenPropertyRef_indexHeader(t) ::= "<! Required but unused. !>"
+TokenPropertyRef_index(t) ::= "(<ctx(t)>-><t.label> != nullptr ? <ctx(t)>-><t.label>->getTokenIndex() : 0)"
+
+TokenPropertyRef_intHeader(t) ::= "<! Required but unused. !>"
+TokenPropertyRef_int(t) ::= "(<ctx(t)>-><t.label> != nullptr ? std::stol(<ctx(t)>-><t.label>->getText()) : 0)"
+
+
+RulePropertyRef_start(r) ::= "RulePropertyRef_start(r) (<ctx(r)>.<r.label> != nullptr ? (<ctx(r)>.<r.label>.start) : null)"
+RulePropertyRef_stop(r)  ::= "RulePropertyRef_stop(r)   (<ctx(r)>.<r.label> != nullptr ? (<ctx(r)>.<r.label>.stop) : null)"
+RulePropertyRef_text(r)  ::= "RulePropertyRef_text(r)   (<ctx(r)>.<r.label> != nullptr ? _input->getText(<ctx(r)>.<r.label>.start,<ctx(r)>.<r.label>.stop) : null)"
+RulePropertyRef_ctx(r)   ::= "RulePropertyRef_ctx(r)<ctx(r)>.<r.label>"
+
+ThisRulePropertyRef_start(r) ::= "ThisRulePropertyRef_start(r) _localctx->start"
+ThisRulePropertyRef_stop(r)  ::= "ThisRulePropertyRef_stop(r)   _localctx->stop"
+ThisRulePropertyRef_text(r)  ::= "ThisRulePropertyRef_text(r)   input->getText(_localctx->start, _input->LT(-1))"
+ThisRulePropertyRef_ctx(r)   ::= "ThisRulePropertyRef_ctx(r)    _localctx"
+
+NonLocalAttrRef(s) ::= "NonLocalAttrRef(s) ((<s.ruleName; format=\"cap\">Context)getInvokingContext(<s.ruleIndex>)).<s.name>"
+SetNonLocalAttr(s, rhsChunks) ::=
+  "SetNonLocalAttr(s, rhsChunks) ((<s.ruleName; format=\"cap\">Context)getInvokingContext(<s.ruleIndex>)).<s.name> = <rhsChunks>;"
+
+AddToLabelListHeader(a) ::= "<! Required but unused. !>"
+AddToLabelList(a) ::= <<
+<ctx(a.label)>-><a.listName>.push_back(<labelref(a.label)>);
+>>
+
+TokenLabelType() ::= "Ref\<<file.TokenLabelType; null = {Token}>>"
+
+TokenDeclHeader(t) ::= "<TokenLabelType()> <t.name>" 
+TokenDecl(t) ::= "<! Variable Declaration !>"
+
+TokenTypeDeclHeader(t) ::= "<! Local Variable !>"
+TokenTypeDecl(t) ::= "ssize_t <t.name>;"
+
+TokenListDeclHeader(t) ::= "std::vector\<Ref\<Token>> <t.name>"
+TokenListDecl(t) ::= "<! Variable Declaration !>"
+
+RuleContextDeclHeader(r) ::= "Ref\<<parser.name>::<r.ctxName>> <r.name>"
+RuleContextDecl(r) ::= "<! Variable Declaration !>"
+
+RuleContextListDeclHeader(rdecl) ::= "std::vector\<Ref\<<rdecl.ctxName>>> <rdecl.name>"
+RuleContextListDecl(rdecl) ::= "<! Variable Declaration !>"
+
+ContextTokenGetterDeclHeader(t) ::= "Ref\<tree::TerminalNode> <t.name>();"
+ContextTokenGetterDecl(t) ::= <<
+Ref\<tree::TerminalNode> <parser.name>::<t.ctx.name>::<t.name>() {
+  return getToken(<parser.name>::<t.name>, 0);
+}
+
+>>
+
+ContextTokenListGetterDeclHeader(t) ::= "std::vector\<Ref\<tree::TerminalNode>> <t.name>();"
+ContextTokenListGetterDecl(t) ::= <<
+std::vector\<Ref\<tree::TerminalNode>\> <parser.name>::<t.ctx.name>::<t.name>() {
+  return getTokens(<parser.name>::<t.name>);
+}
+
+>>
+
+ContextTokenListIndexedGetterDeclHeader(t) ::= "Ref\<tree::TerminalNode> <t.name>(int i);"
 ContextTokenListIndexedGetterDecl(t)  ::= <<
-TerminalNode <t.name>(int i) {
-	return getToken(<parser.name>.<t.name>, i);
+Ref\<tree::TerminalNode> <parser.name>::<t.ctx.name>::<t.name>(int i) {
+  return getToken(<parser.name>::<t.name>, (size_t)i);
 }
+
 >>
-ContextRuleGetterDecl(r)       ::= <<
-<r.ctxName> <r.name>() {
-	return getRuleContext(<r.ctxName>.class,0);
+
+ContextRuleGetterDeclHeader(r) ::= "Ref\<<r.ctxName>> <r.name>();"
+ContextRuleGetterDecl(r) ::= <<
+<! Note: ctxName is the name of the context to return, while ctx is the owning context. !>
+Ref\<<parser.name>::<r.ctxName>\> <parser.name>::<r.ctx.name>::<r.name>() {
+  return getRuleContext\<<parser.name>::<r.ctxName>\>(0);
 }
+
 >>
-ContextRuleListGetterDecl(r)   ::= <<
-List\<<r.ctxName>\> <r.name>() {
-	return getRuleContexts(<r.ctxName>.class);
+
+ContextRuleListGetterDeclHeader(r) ::= "std::vector\<Ref\<<r.ctxName>>> <r.name>();"
+ContextRuleListGetterDecl(r) ::= <<
+std::vector\<Ref\<<parser.name>::<r.ctxName>\>> <parser.name>::<r.ctx.name>::<r.name>() {
+  return getRuleContexts\<<parser.name>::<r.ctxName>\>();
 }
+
 >>
-ContextRuleListIndexedGetterDecl(r)   ::= <<
-<r.ctxName> <r.name>(int i) {
-	return getRuleContext(<r.ctxName>.class,i);
+
+ContextRuleListIndexedGetterDeclHeader(r) ::= "Ref\<<r.ctxName>> <r.name>(int i);"
+ContextRuleListIndexedGetterDecl(r) ::= <<
+Ref\<<parser.name>::<r.ctxName>\> <parser.name>::<r.ctx.name>::<r.name>(int i) {
+  return getRuleContext\<<parser.name>::<r.ctxName>\>((size_t)i);
 }
+
 >>
 
 LexerRuleContext() ::= "RuleContext"
 
-/** The rule context name is the rule followed by a suffix; e.g.,
- *	r becomes rContext.
- */
+// The rule context name is the rule followed by a suffix; e.g. r becomes rContext.
 RuleContextNameSuffix() ::= "Context"
 
-ImplicitTokenLabel(tokenName) ::= "<tokenName>"
-ImplicitRuleLabel(ruleName)	  ::= "<ruleName>"
-ImplicitSetLabel(id)		  ::= "_tset<id>"
-ListLabelName(label)		  ::= "<label>"
-
-CaptureNextToken(d) ::= "<d.varName> = _input.LT(1);"
-CaptureNextTokenType(d) ::= "<d.varName> = _input.LA(1);"
-
-StructDecl(struct,attrs,getters,dispatchMethods,interfaces,extensionMembers,
-           superClass={ParserRuleContext}) ::= <<
-class <struct.name> : public <superClass> {
-	<attrs:{a | <a>}; separator="\n">
-	<getters:{g | <g>}; separator="\n">
-	<if(struct.ctorAttrs)><struct.name>(ParserRuleContext parent, int invokingState) { super(parent, invokingState); }<endif>
-	<struct.name>(ParserRuleContext parent, int invokingState<struct.ctorAttrs:{a | , <a>}>) {
-		super(parent, invokingState);
-		<struct.ctorAttrs:{a | this.<a.name> = <a.name>;}; separator="\n">
-	}
-	int getRuleIndex() { return RULE_<struct.derivedFromName>; }
-<if(struct.provideCopyFrom)> <! don't need copy unless we have subclasses !>
-	<struct.name>() { }
-	void copyFrom(<struct.name> ctx) {
-		super.copyFrom(ctx);
-		<struct.attrs:{a | this.<a.name> = ctx.<a.name>;}; separator="\n">
-	}
-<endif>
-	<dispatchMethods; separator="\n">
-	<extensionMembers; separator="\n">
-};
+ImplicitTokenLabel(tokenName) ::= <<
+<tokenName; format = "lower">Token
 >>
 
-AltLabelStructDecl(struct,attrs,getters,dispatchMethods) ::= <<
-class <struct.name> : public <currentRule.name; format="cap">Context {
-	<attrs:{a | <a>}; separator="\n">
-	<getters:{g | <g>}; separator="\n">
-	public <struct.name>(<currentRule.name; format="cap">Context ctx) { copyFrom(ctx); }
-	<dispatchMethods; separator="\n">
-};
->>
+ImplicitRuleLabel(ruleName) ::= "<ruleName>Context"
+ImplicitSetLabel(id) ::= "ImplicitSetLabel(id) _tset<id>"
+ListLabelName(label) ::= "<label>"
 
+CaptureNextToken(d) ::= "CaptureNextToken(d) <d.varName> = _input->LT(1);"
+
+CaptureNextTokenTypeHeader(d) ::= "<! Required but unused. !>"
+CaptureNextTokenType(d) ::= "<d.varName> = _input->LA(1);"
+
+ListenerDispatchMethodHeader(method) ::= <<
+virtual void <if (method.isEnter)>enter<else>exit<endif>Rule(Ref\<tree::ParseTreeListener> listener) override;
+>>
 ListenerDispatchMethod(method) ::= <<
-void <if(method.isEnter)>enter<else>exit<endif>Rule(ParseTreeListener listener) {
-	if ( listener instanceof <parser.grammarName>Listener ) ((<parser.grammarName>Listener)listener).<if(method.isEnter)>enter<else>exit<endif><struct.derivedFromName; format="cap">(this);
+void <method.factory.grammar.name>::<struct.name>::<if (method.isEnter)>enter<else>exit<endif>Rule(Ref\<tree::ParseTreeListener> listener) {
+  auto parserListener = std::dynamic_pointer_cast\<<parser.grammarName>Listener>(listener);
+  if (parserListener)
+    parserListener-><if(method.isEnter)>enter<else>exit<endif><struct.derivedFromName; format="cap">(this);
 }
 >>
 
-VisitorDispatchMethod(method) ::= <<
-template T
-T accept(ParseTreeVisitor\<T> visitor) {
-	if ( visitor instanceof <parser.grammarName>Visitor ) return ((<parser.grammarName>Visitor\<? : T>)visitor).visit<struct.derivedFromName; format="cap">(this);
-	else return visitor.visitChildren(this);
+VisitorDispatchMethodHeader(method) ::= <<
+
+template \<typename T>
+T* accept(tree::ParseTreeVisitor\<T> *visitor) {
+  if (dynamic_cast\<<parser.grammarName>Visitor\<T>*>(visitor) != nullptr)
+    return ((<parser.grammarName>Visitor\<T> *)visitor)->visit<struct.derivedFromName; format="cap">(this);
+  else
+    return visitor->visitChildren(this);
 }
 >>
+VisitorDispatchMethod(method) ::= "<! Template function, must be implemented in the header. !>"
 
-AttributeDecl(d) ::= "<d.decl>;"
+AttributeDeclHeader(d) ::= "<d.type> <d.name><if(d.initValue)> = <d.initValue><endif>"
+AttributeDecl(d) ::= "<d.type> <d.name>"
 
 /** If we don't know location of label def x, use this template */
-labelref(x) ::= "<if(!x.isLocal)>((<x.ctx.name>)_localctx).<endif><x.name>"
+labelref(x) ::= "<if (!x.isLocal)>_localctx<endif>-><x.name>"
 
 /** For any action chunk, what is correctly-typed context struct ptr? */
-ctx(actionChunk) ::= "((<actionChunk.ctx.name>)_localctx)"
+ctx(actionChunk) ::= "_localctx"
 
 // used for left-recursive rules
-recRuleAltPredicate(ruleName,opPrec)  ::= "precpred(_ctx, <opPrec>)"
-recRuleSetReturnAction(src,name)	  ::= "$<name>=$<src>.<name>;"
-recRuleSetStopToken()                 ::= "_ctx.stop = _input.LT(-1);"
+recRuleAltPredicate(ruleName,opPrec) ::= "precpred(_ctx, <opPrec>)"
+recRuleSetReturnAction(src,name) ::= "recRuleSetReturnAction(src,name) $<name>=$<src>.<name>;"
+recRuleSetStopToken() ::= "_ctx->stop = _input->LT(-1);"
 
 recRuleAltStartAction(ruleName, ctxName, label) ::= <<
-_localctx = new <ctxName>Context(_parentctx, _parentState);
-<if(label)>_localctx.<label> = _prevctx;<endif>
+_localctx = std::make_shared\<<ctxName>Context>(parentContext, parentState);
+<if (label)>_localctx-><label> = previousContext;<endif>
+pushNewRecursionContext(_localctx, startState, <parser.name>::Rule<ruleName; format = "cap">);
+>>
+
+recRuleLabeledAltStartAction(ruleName, currentAltLabel, label) ::= <<recRuleLabeledAltStartAction
+_localctx = std::make_shared\<<currentAltLabel; format = "cap">Context>(new <ruleName; format="cap">Context(_parentctx, _parentState));
+<if(label)>((<currentAltLabel; format="cap">Context*)_localctx).<label> = previousContext;<endif>
 pushNewRecursionContext(_localctx, _startState, RULE_<ruleName>);
 >>
 
-recRuleLabeledAltStartAction(ruleName, currentAltLabel, label) ::= <<
-_localctx = new <currentAltLabel; format="cap">Context(new <ruleName; format="cap">Context(_parentctx, _parentState));
-<if(label)>((<currentAltLabel; format="cap">Context)_localctx).<label> = _prevctx;<endif>
-pushNewRecursionContext(_localctx, _startState, RULE_<ruleName>);
->>
-
-recRuleReplaceContext(ctxName) ::= <<
-_localctx = new <ctxName>Context(_localctx);
-_ctx = _localctx;
-_prevctx = _localctx;
+recRuleReplaceContext(ctxName) ::= <<recRuleReplaceContext
+_localctx = std::make_shared\<<ctxName>Context>(_localctx);
+ctx = _localctx;
+previousContext = _localctx;
 >>
 
 recRuleSetPrevCtx() ::= <<
-if ( _parseListeners!=null ) triggerExitRuleEvent();
-_prevctx = _localctx;
->>
-
-
-LexerFile(lexerFile, lexer, namedActions) ::= <<
-<fileHeader(lexerFile.grammarFileName, lexerFile.ANTLRVersion)>
-<if(lexerFile.genPackage)>
-namespace <lexerFile.genPackage> {
-<endif>
-<namedActions.header>
-#include "Lexer.h"
-#include "CharStream.h"
-#include "Token.h"
-#include "TokenStream.h"
-#include "PredictionContextCache.h"
-#include "DFA.h"
-#include "ATN.h"
-
-<lexer>
-<if(lexerFile.genPackage)>
-}  // namespace <lexerFile.genPackage>
-<endif>
->>
-
-Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass) ::= <<
-class <lexer.name> : public org::antlr::v4::runtime::<superClass> {
-	static org::antlr::v4::runtime::dfa::DFA _decisionToDFA[];
-	 org::antlr::v4::runtime::atn::PredictionContextCache *_sharedContextCache =
-		new org::antlr::v4::runtime::atn::PredictionContextCache();
-	 int
-		<lexer.tokens:{k | <k>=<lexer.tokens.(k)>}; separator=", ", wrap, anchor>;
-	<rest(lexer.modes):{m| public static final int <m> = <i>;}; separator="\n">
-	
-	static std::vector\<std::wstring> ruleNames = {
-		<lexer.ruleNames:{r | "<r>"}; separator=", ", wrap, anchor>
-	};
-
-	<namedActions.members>
-
-	<lexer.name>(CharStream input) {
-		super(input);
-		_interp = new LexerATNSimulator(this,_ATN,_decisionToDFA,_sharedContextCache);
-		_modeNames.insert(_modeNames.end(),<lexer.modes:{m| L"<m>"}; separator=", ", wrap, anchor>);
-	    _tokenNames.insert(_tokenNames.end(),L"\<INVALID>",<lexer.tokenNames:{t | <t>}; separator=", ", wrap, anchor>);
-	}
-	
-	const std::wstring& getGrammarFileName() { return "<lexer.grammarFileName>"; }
-
-	const std::vector\<std::wstring>& getTokenNames() { return tokenNames; }
-
-	const std::vector\<std::wstring>& getRuleNames() { return ruleNames; }
-
-	const std::wstring& getSerializedATN() { return _serializedATN; }
-
-	const std::vector\<std::wstring>& getModeNames() { return modeNames; }
-
-	@Override
-	const ATN& getATN() { return _ATN; }
-
-	<dumpActions(lexer, "", actionFuncs, sempredFuncs)>
-	<atn>
-};
->>
-
-SerializedATN(model) ::= <<
-<if(rest(model.segments))>
-<! requires segmented representation !>
-static int _serializedATNSegments = <length(model.segments)>;
-<model.segments:{segment|static std::wstring _serializedATNSegment<i0> =
-	"<segment; wrap={"+<\n><\t>"}>";}; separator="\n">
-static std::wstring _serializedATN = Utils.join(
-	new std::wstring[] {
-		<model.segments:{segment | _serializedATNSegment<i0>}; separator=",\n">
-	},
-	""
-);
-<else>
-<! only one segment, can be inlined !>
-static std::wstring _serializedATN =
-	"<model.serialized; wrap={"+<\n><\t>"}>";
-<endif>
-static ATN _ATN =
-	new ATNDeserializer().deserialize(_serializedATN.toCharArray());
-static {
-	_decisionToDFA = new DFA[_ATN.getNumberOfDecisions()];
-	for (int i = 0; i \< _ATN.getNumberOfDecisions(); i++) {
-		_decisionToDFA[i] = new DFA(_ATN.getDecisionState(i), i);
-	}
-<!	org.antlr.v4.tool.DOTGenerator dot = new org.antlr.v4.tool.DOTGenerator(null);!>
-<!	System.out.println(dot.getDOT(_ATN.decisionToState.get(0), ruleNames, false));!>
-<!	System.out.println(dot.getDOT(_ATN.ruleToStartState[2], ruleNames, false));!>
-}
+if (!_parseListeners.empty())
+  triggerExitRuleEvent();
+previousContext = _localctx;
 >>
 
 /** Using a type to init value map, try to init a type; if not in table
- *	must be an object, default value is "null".
+ *  must be an object, default value is "null".
  */
 initValue(typeName) ::= <<
 <cppTypeInitMap.(typeName)>
 >>
 
-ParserHeaderFile(file, parser, namedActions) ::= <<
-FOOM1
->>
-
-DISABLEDMEGAHACKRecognizerHeaderFile(file, parser, namedActions) ::= <<
-<fileHeader(file.grammarFileName, file.ANTLRVersion)>
-<if(file.genPackage)>
-namespace <file.genPackage> {
-<endif>
-<namedActions.header>
-#include "Lexer.h"
-#include "CharStream.h"
-#include "Token.h"
-#include "TokenStream.h"
-// May also need to import *
-// May also need to import atn.*
-#include "dfa/DFA.h"
-// May also need to import misc.*
-
-<parser>
-<if(file.genPackage)>
-}  // namespace <file.genPackage>
-<endif>
->>
-
-VisitorHeaderFile(file, parser, namedActions) ::= <<
-FOOM5
->>
-
-BaseVisitorHeaderFile(file, parser, namedActions) ::= <<
-FOOM6
->>
-
-codeFileExtension() ::= ".cpp"
-headerFileExtension() ::= ".h"
