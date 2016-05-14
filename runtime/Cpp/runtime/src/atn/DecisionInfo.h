@@ -249,7 +249,7 @@ namespace atn {
     /// <param name="decision"> The decision number </param>
     DecisionInfo(size_t decision);
 
-    std::wstring toString() const;
+    std::string toString() const;
   };
 
 } // namespace atn

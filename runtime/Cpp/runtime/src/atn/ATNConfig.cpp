@@ -108,28 +108,28 @@ bool ATNConfig::operator == (const ATNConfig &other) const
     isPrecedenceFilterSuppressed() == other.isPrecedenceFilterSuppressed();
 }
 
-std::wstring ATNConfig::toString() {
+std::string ATNConfig::toString() {
   return toString(true);
 }
 
-std::wstring ATNConfig::toString(bool showAlt) {
-  std::wstringstream ss;
-  ss << L"(";
+std::string ATNConfig::toString(bool showAlt) {
+  std::stringstream ss;
+  ss << "(";
 
   ss << state->toString();
   if (showAlt) {
-    ss << L"," << alt;
+    ss << "," << alt;
   }
   if (context) {
-    ss << L",[" << context->toString() << L"]";
+    ss << ",[" << context->toString() << "]";
   }
   if (semanticContext != nullptr && semanticContext != SemanticContext::NONE) {
-    ss << L"," << semanticContext.get();
+    ss << "," << semanticContext.get();
   }
   if (getOuterContextDepth() > 0) {
-    ss << L",up=" << getOuterContextDepth();
+    ss << ",up=" << getOuterContextDepth();
   }
-  ss << L')';
+  ss << ')';
 
   return ss.str();
 }

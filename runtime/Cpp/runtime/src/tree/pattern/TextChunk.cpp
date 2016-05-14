@@ -35,17 +35,17 @@
 
 using namespace org::antlr::v4::runtime::tree::pattern;
 
-TextChunk::TextChunk(const std::wstring &text) : text(text) {
-  if (text == L"") {
-    throw IllegalArgumentException("text cannot be null");
+TextChunk::TextChunk(const std::string &text) : text(text) {
+  if (text == "") {
+    throw IllegalArgumentException("text cannot be nul");
   }
 
 }
 
-std::wstring TextChunk::getText() {
+std::string TextChunk::getText() {
   return text;
 }
 
-std::wstring TextChunk::toString() {
-  return std::wstring(L"'") + text + std::wstring(L"'");
+std::string TextChunk::toString() {
+  return std::string("'") + text + std::string("'");
 }

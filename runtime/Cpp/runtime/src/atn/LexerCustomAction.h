@@ -105,7 +105,7 @@ namespace atn {
 
     virtual size_t hashCode() const override;
     virtual bool operator == (const LexerAction &obj) const override;
-    virtual std::wstring toString() const override;
+    virtual std::string toString() const override;
 
   private:
     const int _ruleIndex;

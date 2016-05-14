@@ -42,13 +42,27 @@ namespace runtime {
 namespace atn {
 
   // Cannot use PredictionContext> here as this declared below first.
-  typedef std::set<Ref<PredictionContext>> PredictionContextCache;
+  typedef std::unordered_set<Ref<PredictionContext>> PredictionContextCache;
 
   // For the keys we use raw pointers, as we don't need to access them.
   typedef std::map<std::pair<PredictionContext *, PredictionContext *>, Ref<PredictionContext>> PredictionContextMergeCache;
 
   class ANTLR4CPP_PUBLIC PredictionContext {
   public:
+    struct PredictionContextHasher
+    {
+      size_t operator () (Ref<PredictionContext> k) const {
+        return k->hashCode();
+      }
+    };
+
+    struct PredictionContextComparer {
+      bool operator () (Ref<PredictionContext> lhs, Ref<PredictionContext> rhs) const
+      {
+        return *lhs == *rhs;
+      }
+    };
+
     /// Represents $ in local context prediction, which means wildcard.
     /// *+x = *.
     static const Ref<PredictionContext> EMPTY;
@@ -225,7 +239,7 @@ namespace atn {
     static bool combineCommonParents(std::vector<std::weak_ptr<PredictionContext>> &parents);
 
   public:
-    static std::wstring toDOTString(Ref<PredictionContext> context);
+    static std::string toDOTString(Ref<PredictionContext> context);
 
     static Ref<PredictionContext> getCachedContext(Ref<PredictionContext> context,
       Ref<PredictionContextCache> contextCache,
@@ -236,11 +250,11 @@ namespace atn {
     static void getAllContextNodes_(Ref<PredictionContext> context,
       std::vector<Ref<PredictionContext>> &nodes, std::map<Ref<PredictionContext>, Ref<PredictionContext>> &visited);
 
-    virtual std::wstring toString() const;
-    virtual std::wstring toString(Recognizer *recog) const;
+    virtual std::string toString() const;
+    virtual std::string toString(Recognizer *recog) const;
 
-    std::vector<std::wstring> toStrings(Recognizer *recognizer, int currentState);
-    std::vector<std::wstring> toStrings(Recognizer *recognizer, Ref<PredictionContext> stop, int currentState);
+    std::vector<std::string> toStrings(Recognizer *recognizer, int currentState);
+    std::vector<std::string> toStrings(Recognizer *recognizer, Ref<PredictionContext> stop, int currentState);
   };
 
 } // namespace atn
@@ -249,16 +263,3 @@ namespace atn {
 } // namespace antlr
 } // namespace org
 
-// Hash function for PredictionContext, used in the MurmurHash::update function
-
-namespace std {
-  using org::antlr::v4::runtime::atn::PredictionContext;
-
-  template <> struct hash<PredictionContext>
-  {
-    size_t operator () (const PredictionContext &x) const
-    {
-      return x.hashCode();
-    }
-  };
-}

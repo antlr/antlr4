@@ -39,13 +39,13 @@ using namespace org::antlr::v4::runtime::atn;
 DecisionInfo::DecisionInfo(size_t decision) : decision(decision) {
 }
 
-std::wstring DecisionInfo::toString() const {
-  std::wstringstream ss;
+std::string DecisionInfo::toString() const {
+  std::stringstream ss;
 
-  ss << L"{decision=" << decision << L", contextSensitivities=" << contextSensitivities.size() << L", errors=";
-  ss << errors.size() << L", ambiguities=" << ambiguities.size() << L", SLL_lookahead=" << SLL_TotalLook;
-  ss << L", SLL_ATNTransitions=" << SLL_ATNTransitions << L", SLL_DFATransitions=" << SLL_DFATransitions;
-  ss << L", LL_Fallback=" << LL_Fallback << L", LL_lookahead=" << LL_TotalLook << L", LL_ATNTransitions=" << LL_ATNTransitions << L'}';
+  ss << "{decision=" << decision << ", contextSensitivities=" << contextSensitivities.size() << ", errors=";
+  ss << errors.size() << ", ambiguities=" << ambiguities.size() << ", SLL_lookahead=" << SLL_TotalLook;
+  ss << ", SLL_ATNTransitions=" << SLL_ATNTransitions << ", SLL_DFATransitions=" << SLL_DFATransitions;
+  ss << ", LL_Fallback=" << LL_Fallback << ", LL_lookahead=" << LL_TotalLook << ", LL_ATNTransitions=" << LL_ATNTransitions << '}';
 
   return ss.str();
 }

@@ -46,6 +46,11 @@ Interval::Interval() : Interval(-1, -2) {
 Interval::Interval(int a_, int b_) {
   a = a_;
   b = b_;
+
+  // XXX: temporary hack to make the full Unicode range available.
+  if (b == 0xFFFF) {
+    b = 0x10FFFF;
+  }
 }
 
 int Interval::length() const {

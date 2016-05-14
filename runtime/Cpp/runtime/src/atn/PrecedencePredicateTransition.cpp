@@ -33,7 +33,8 @@
 
 using namespace org::antlr::v4::runtime::atn;
 
-PrecedencePredicateTransition::PrecedencePredicateTransition(ATNState *target, int precedence) : AbstractPredicateTransition(target), precedence(precedence) {
+PrecedencePredicateTransition::PrecedencePredicateTransition(ATNState *target, int precedence)
+  : AbstractPredicateTransition(target), precedence(precedence) {
 }
 
 int PrecedencePredicateTransition::getSerializationType() const {
@@ -44,7 +45,7 @@ bool PrecedencePredicateTransition::isEpsilon() const {
   return true;
 }
 
-bool PrecedencePredicateTransition::matches(int /*symbol*/, int /*minVocabSymbol*/, int /*maxVocabSymbol*/) const {
+bool PrecedencePredicateTransition::matches(size_t /*symbol*/, size_t /*minVocabSymbol*/, size_t /*maxVocabSymbol*/) const {
   return false;
 }
 
@@ -52,6 +53,6 @@ Ref<SemanticContext::PrecedencePredicate> PrecedencePredicateTransition::getPred
   return std::make_shared<SemanticContext::PrecedencePredicate>(precedence);
 }
 
-std::wstring PrecedencePredicateTransition::toString() const {
-  return L"PRECEDENCE " + Transition::toString() + L" { precedence: " + std::to_wstring(precedence) + L" }";
+std::string PrecedencePredicateTransition::toString() const {
+  return "PRECEDENCE " + Transition::toString() + " { precedence: " + std::to_string(precedence) + " }";
 }

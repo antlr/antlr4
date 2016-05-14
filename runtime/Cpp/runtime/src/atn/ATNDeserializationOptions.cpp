@@ -76,7 +76,7 @@ void ATNDeserializationOptions::setGenerateRuleBypassTransitions(bool generateRu
 
 void ATNDeserializationOptions::throwIfReadOnly() {
   if (isReadOnly()) {
-    throw L"The object is read only.";
+    throw "The object is read only.";
   }
 }
 

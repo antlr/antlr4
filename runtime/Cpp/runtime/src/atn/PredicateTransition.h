@@ -56,11 +56,11 @@ namespace atn {
     virtual int getSerializationType() const override;
 
     virtual bool isEpsilon() const override;
-    virtual bool matches(int symbol, int minVocabSymbol, int maxVocabSymbol) const override;
+    virtual bool matches(size_t symbol, size_t minVocabSymbol, size_t maxVocabSymbol) const override;
 
     Ref<SemanticContext::Predicate> getPredicate() const;
 
-    virtual std::wstring toString() const override;
+    virtual std::string toString() const override;
 
   };
 

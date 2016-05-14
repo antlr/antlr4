@@ -51,48 +51,48 @@ using namespace antlrcpp;
 Trees::Trees() {
 }
 
-std::wstring Trees::toStringTree(Ref<Tree> t) {
+std::string Trees::toStringTree(Ref<Tree> t) {
   return toStringTree(t, nullptr);
 }
 
-std::wstring Trees::toStringTree(Ref<Tree> t, Parser *recog) {
+std::string Trees::toStringTree(Ref<Tree> t, Parser *recog) {
   if (recog == nullptr)
     return toStringTree(t, {});
   return toStringTree(t, recog->getRuleNames());
 }
 
-std::wstring Trees::toStringTree(Ref<Tree> t, const std::vector<std::wstring> &ruleNames) {
-  std::wstring temp = antlrcpp::escapeWhitespace(Trees::getNodeText(t, ruleNames), false);
+std::string Trees::toStringTree(Ref<Tree> t, const std::vector<std::string> &ruleNames) {
+  std::string temp = antlrcpp::escapeWhitespace(Trees::getNodeText(t, ruleNames), false);
   if (t->getChildCount() == 0) {
     return temp;
   }
 
-  std::wstringstream ss;
-  ss << L"(" << temp << L' ';
+  std::stringstream ss;
+  ss << "(" << temp << ' ';
   for (size_t i = 0; i < t->getChildCount(); i++) {
     if (i > 0) {
-      ss << L' ';
+      ss << ' ';
     }
     ss << toStringTree(t->getChild(i), ruleNames);
   }
-  ss << L")";
+  ss << ")";
   return ss.str();
 }
 
-std::wstring Trees::getNodeText(Ref<Tree> t, Parser *recog) {
+std::string Trees::getNodeText(Ref<Tree> t, Parser *recog) {
   return getNodeText(t, recog->getRuleNames());
 }
 
-std::wstring Trees::getNodeText(Ref<Tree> t, const std::vector<std::wstring> &ruleNames) {
+std::string Trees::getNodeText(Ref<Tree> t, const std::vector<std::string> &ruleNames) {
   if (ruleNames.size() > 0) {
     if (is<RuleContext>(t)) {
       ssize_t ruleIndex = std::static_pointer_cast<RuleContext>(t)->getRuleContext()->getRuleIndex();
       if (ruleIndex < 0)
-        return L"Invalid Rule Index";
-      std::wstring ruleName = ruleNames[(size_t)ruleIndex];
+        return "Invalid Rule Index";
+      std::string ruleName = ruleNames[(size_t)ruleIndex];
       int altNumber = std::static_pointer_cast<RuleContext>(t)->getAltNumber();
       if (altNumber != atn::ATN::INVALID_ALT_NUMBER) {
-        return ruleName + L":" + std::to_wstring(altNumber);
+        return ruleName + ":" + std::to_string(altNumber);
       }
       return ruleName;
     } else if (is<ErrorNode>(t)) {
@@ -100,7 +100,7 @@ std::wstring Trees::getNodeText(Ref<Tree> t, const std::vector<std::wstring> &ru
     } else if (is<TerminalNode>(t)) {
       Ref<Token> symbol = (std::static_pointer_cast<TerminalNode>(t))->getSymbol();
       if (symbol != nullptr) {
-        std::wstring s = symbol->getText();
+        std::string s = symbol->getText();
         return s;
       }
     }
@@ -114,7 +114,7 @@ std::wstring Trees::getNodeText(Ref<Tree> t, const std::vector<std::wstring> &ru
     return std::dynamic_pointer_cast<TerminalNodeImpl>(t)->getSymbol()->getText();
   }
 
-  return L"";
+  return "";
 }
 
 std::vector<Ref<Tree>> Trees::getChildren(Ref<Tree> t) {
@@ -232,7 +232,7 @@ void Trees::stripChildrenOutOfRange(Ref<ParserRuleContext> t, Ref<ParserRuleCont
     Interval range = child->getSourceInterval();
     if (is<ParserRuleContext>(child) && (range.b < (int)startIndex || range.a > (int)stopIndex)) {
       if (isAncestorOf(child, root)) { // replace only if subtree doesn't have displayed root
-        Ref<CommonToken> abbrev = std::make_shared<CommonToken>((int)Token::INVALID_TYPE, L"...");
+        Ref<CommonToken> abbrev = std::make_shared<CommonToken>((int)Token::INVALID_TYPE, "...");
         t->children[i] = std::make_shared<TerminalNodeImpl>(abbrev);
       }
     }

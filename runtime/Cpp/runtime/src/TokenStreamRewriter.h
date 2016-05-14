@@ -114,7 +114,7 @@ namespace runtime {
    */
   class ANTLR4CPP_PUBLIC TokenStreamRewriter {
   public:
-    static const std::wstring DEFAULT_PROGRAM_NAME;
+    static const std::string DEFAULT_PROGRAM_NAME;
     static const int PROGRAM_INIT_SIZE = 100;
     static const int MIN_TOKEN_INDEX = 0;
 
@@ -130,47 +130,47 @@ namespace runtime {
     ///  the indicated instruction (via instructionIndex) is no
     ///  longer in the stream.  UNTESTED!
     /// </summary>
-    virtual void rollback(const std::wstring &programName, int instructionIndex);
+    virtual void rollback(const std::string &programName, int instructionIndex);
 
     virtual void deleteProgram();
 
     /// <summary>
     /// Reset the program so that no instructions exist </summary>
-    virtual void deleteProgram(const std::wstring &programName);
-    virtual void insertAfter(Token *t, const std::wstring& text);
-    virtual void insertAfter(size_t index, const std::wstring& text);
-    virtual void insertAfter(const std::wstring &programName, Token *t, const std::wstring& text);
-    virtual void insertAfter(const std::wstring &programName, size_t index, const std::wstring& text);
+    virtual void deleteProgram(const std::string &programName);
+    virtual void insertAfter(Token *t, const std::string& text);
+    virtual void insertAfter(size_t index, const std::string& text);
+    virtual void insertAfter(const std::string &programName, Token *t, const std::string& text);
+    virtual void insertAfter(const std::string &programName, size_t index, const std::string& text);
 
-    virtual void insertBefore(Token *t, const std::wstring& text);
-    virtual void insertBefore(size_t index, const std::wstring& text);
-    virtual void insertBefore(const std::wstring &programName, Token *t, const std::wstring& text);
-    virtual void insertBefore(const std::wstring &programName, size_t index, const std::wstring& text);
+    virtual void insertBefore(Token *t, const std::string& text);
+    virtual void insertBefore(size_t index, const std::string& text);
+    virtual void insertBefore(const std::string &programName, Token *t, const std::string& text);
+    virtual void insertBefore(const std::string &programName, size_t index, const std::string& text);
 
-    virtual void replace(size_t index, const std::wstring& text);
-    virtual void replace(size_t from, size_t to, const std::wstring& text);
-    virtual void replace(Token *indexT, const std::wstring& text);
-    virtual void replace(Token *from, Token *to, const std::wstring& text);
-    virtual void replace(const std::wstring &programName, size_t from, size_t to, const std::wstring& text);
-    virtual void replace(const std::wstring &programName, Token *from, Token *to, const std::wstring& text);
+    virtual void replace(size_t index, const std::string& text);
+    virtual void replace(size_t from, size_t to, const std::string& text);
+    virtual void replace(Token *indexT, const std::string& text);
+    virtual void replace(Token *from, Token *to, const std::string& text);
+    virtual void replace(const std::string &programName, size_t from, size_t to, const std::string& text);
+    virtual void replace(const std::string &programName, Token *from, Token *to, const std::string& text);
 
     virtual void Delete(size_t index);
     virtual void Delete(size_t from, size_t to);
     virtual void Delete(Token *indexT);
     virtual void Delete(Token *from, Token *to);
-    virtual void Delete(const std::wstring &programName, size_t from, size_t to);
-    virtual void Delete(const std::wstring &programName, Token *from, Token *to);
+    virtual void Delete(const std::string &programName, size_t from, size_t to);
+    virtual void Delete(const std::string &programName, Token *from, Token *to);
 
     virtual int getLastRewriteTokenIndex();
     
     /// Return the text from the original tokens altered per the
     ///  instructions given to this rewriter.
-    virtual std::wstring getText();
+    virtual std::string getText();
 
     /** Return the text from the original tokens altered per the
      *  instructions given to this rewriter in programName.
      */
-    std::wstring getText(std::wstring programName);
+    std::string getText(std::string programName);
     
     /// <summary>
     /// Return the text associated with the tokens in the interval from the
@@ -182,9 +182,9 @@ namespace runtime {
     ///  insertBefore on the first token, you would get that insertion.
     ///  The same is true if you do an insertAfter the stop token.
     /// </summary>
-    virtual std::wstring getText(const misc::Interval &interval);
+    virtual std::string getText(const misc::Interval &interval);
 
-    virtual std::wstring getText(const std::wstring &programName, const misc::Interval &interval);
+    virtual std::string getText(const std::string &programName, const misc::Interval &interval);
 
   protected:
     class RewriteOperation {
@@ -198,20 +198,20 @@ namespace runtime {
       /// <summary>
       /// Token buffer index. </summary>
       size_t index;
-      std::wstring text;
+      std::string text;
 
       RewriteOperation(TokenStreamRewriter *outerInstance, size_t index);
 
-      RewriteOperation(TokenStreamRewriter *outerInstance, size_t index, const std::wstring& text);
+      RewriteOperation(TokenStreamRewriter *outerInstance, size_t index, const std::string& text);
       /// <summary>
       /// Execute the rewrite operation by possibly adding to the buffer.
       ///  Return the index of the next token to operate on.
       /// </summary>
       int instructionIndex;
 
-      virtual size_t execute(std::wstring *buf);
+      virtual size_t execute(std::string *buf);
 
-      virtual std::wstring toString();
+      virtual std::string toString();
 
     private:
       void InitializeInstanceFields();
@@ -222,9 +222,9 @@ namespace runtime {
       TokenStreamRewriter *const outerInstance;
 
     public:
-      InsertBeforeOp(TokenStreamRewriter *outerInstance, size_t index, const std::wstring& text);
+      InsertBeforeOp(TokenStreamRewriter *outerInstance, size_t index, const std::string& text);
 
-      virtual size_t execute(std::wstring *buf) override;
+      virtual size_t execute(std::string *buf) override;
     };
 
     class ReplaceOp : public RewriteOperation {
@@ -234,9 +234,9 @@ namespace runtime {
     public:
       size_t lastIndex;
 
-      ReplaceOp(TokenStreamRewriter *outerInstance, size_t from, size_t to, const std::wstring& text);
-      virtual size_t execute(std::wstring *buf) override;
-      virtual std::wstring toString() override;
+      ReplaceOp(TokenStreamRewriter *outerInstance, size_t from, size_t to, const std::string& text);
+      virtual size_t execute(std::string *buf) override;
+      virtual std::string toString() override;
 
     private:
       void InitializeInstanceFields();
@@ -248,14 +248,14 @@ namespace runtime {
     /// You may have multiple, named streams of rewrite operations.
     /// I'm calling these things "programs."
     /// Maps String (name) -> rewrite (List)
-    std::map<std::wstring, std::vector<RewriteOperation*>> _programs;
+    std::map<std::string, std::vector<RewriteOperation*>> _programs;
 
     /// <summary>
     /// Map String (program name) -> Integer index </summary>
-    std::map<std::wstring, int> _lastRewriteTokenIndexes;
-    virtual int getLastRewriteTokenIndex(const std::wstring &programName);
-    virtual void setLastRewriteTokenIndex(const std::wstring &programName, int i);
-    virtual std::vector<RewriteOperation*>& getProgram(const std::wstring &name);
+    std::map<std::string, int> _lastRewriteTokenIndexes;
+    virtual int getLastRewriteTokenIndex(const std::string &programName);
+    virtual void setLastRewriteTokenIndex(const std::string &programName, int i);
+    virtual std::vector<RewriteOperation*>& getProgram(const std::string &name);
 
     /// <summary>
     /// We need to combine operations and report invalid operations (like
@@ -309,7 +309,7 @@ namespace runtime {
     /// </summary>
     virtual std::unordered_map<size_t, RewriteOperation*> reduceToSingleOperationPerIndex(std::vector<RewriteOperation*> rewrites);
 
-    virtual std::wstring catOpText(std::wstring *a, std::wstring *b);
+    virtual std::string catOpText(std::string *a, std::string *b);
 
     /// <summary>
     /// Get all operations before an index of a particular kind </summary>
@@ -329,7 +329,7 @@ namespace runtime {
     }
 
   private:
-    std::vector<RewriteOperation*> initializeProgram(const std::wstring &name);
+    std::vector<RewriteOperation*> initializeProgram(const std::string &name);
 
   };
 

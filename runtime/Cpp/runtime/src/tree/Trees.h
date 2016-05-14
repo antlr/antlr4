@@ -47,19 +47,19 @@ namespace tree {
     /// Print out a whole tree in LISP form. getNodeText is used on the
     /// node payloads to get the text for the nodes.  Detect
     /// parse trees and extract data appropriately.
-    static std::wstring toStringTree(Ref<Tree> t);
+    static std::string toStringTree(Ref<Tree> t);
 
     /// Print out a whole tree in LISP form. getNodeText is used on the
     ///  node payloads to get the text for the nodes.  Detect
     ///  parse trees and extract data appropriately.
-    static std::wstring toStringTree(Ref<Tree> t, Parser *recog);
+    static std::string toStringTree(Ref<Tree> t, Parser *recog);
 
     /// Print out a whole tree in LISP form. getNodeText is used on the
     /// node payloads to get the text for the nodes.  Detect
     /// parse trees and extract data appropriately.
-    static std::wstring toStringTree(Ref<Tree> t, const std::vector<std::wstring> &ruleNames);
-    static std::wstring getNodeText(Ref<Tree> t, Parser *recog);
-    static std::wstring getNodeText(Ref<Tree> t, const std::vector<std::wstring> &ruleNames);
+    static std::string toStringTree(Ref<Tree> t, const std::vector<std::string> &ruleNames);
+    static std::string getNodeText(Ref<Tree> t, Parser *recog);
+    static std::string getNodeText(Ref<Tree> t, const std::vector<std::string> &ruleNames);
 
     /// Return ordered list of all children of this node.
     static std::vector<Ref<Tree>> getChildren(Ref<Tree> t);

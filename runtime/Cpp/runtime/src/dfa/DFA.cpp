@@ -129,27 +129,27 @@ std::vector<DFAState *> DFA::getStates() const {
   return result;
 }
 
-std::wstring DFA::toString(const std::vector<std::wstring> &tokenNames) {
+std::string DFA::toString(const std::vector<std::string> &tokenNames) {
   if (s0 == nullptr) {
-    return L"";
+    return "";
   }
   DFASerializer serializer(this, tokenNames);
 
   return serializer.toString();
 }
 
-std::wstring DFA::toString(Ref<Vocabulary> vocabulary) const {
+std::string DFA::toString(Ref<Vocabulary> vocabulary) const {
   if (s0 == nullptr) {
-    return L"";
+    return "";
   }
 
   DFASerializer serializer(this, vocabulary);
   return serializer.toString();
 }
 
-std::wstring DFA::toLexerString() {
+std::string DFA::toLexerString() {
   if (s0 == nullptr) {
-    return L"";
+    return "";
   }
   LexerDFASerializer serializer(this);
 

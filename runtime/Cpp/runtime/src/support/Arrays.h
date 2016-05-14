@@ -37,7 +37,7 @@ namespace antlrcpp {
   class ANTLR4CPP_PUBLIC Arrays {
   public:
 
-    static std::wstring listToString(const std::vector<std::wstring> &list, const std::wstring &separator);
+    static std::string listToString(const std::vector<std::string> &list, const std::string &separator);
 
     template <typename T>
     static bool equals(const std::vector<T> &a, const std::vector<T> &b) {
@@ -84,49 +84,49 @@ namespace antlrcpp {
     */
 
     template <typename T>
-    static std::wstring toString(const std::vector<T> &source) {
-      std::wstring result = L"[";
+    static std::string toString(const std::vector<T> &source) {
+      std::string result = "[";
       bool firstEntry = true;
       for (auto &value : source) {
         result += value.toString();
         if (firstEntry) {
-          result += L", ";
+          result += ", ";
           firstEntry = false;
         }
       }
-      return result + L"]";
+      return result + "]";
     }
 
     template <typename T>
-    static std::wstring toString(const std::vector<Ref<T>> &source) {
-      std::wstring result = L"[";
+    static std::string toString(const std::vector<Ref<T>> &source) {
+      std::string result = "[";
       bool firstEntry = true;
       for (auto &value : source) {
         result += value->toString();
         if (firstEntry) {
-          result += L", ";
+          result += ", ";
           firstEntry = false;
         }
       }
-      return result + L"]";
+      return result + "]";
     }
 
     template <typename T>
-    static std::wstring toString(const std::vector<T*> &source) {
-      std::wstring result = L"[";
+    static std::string toString(const std::vector<T*> &source) {
+      std::string result = "[";
       bool firstEntry = true;
       for (auto value : source) {
         result += value->toString();
         if (firstEntry) {
-          result += L", ";
+          result += ", ";
           firstEntry = false;
         }
       }
-      return result + L"]";
+      return result + "]";
     }
 
   };
 
   template <>
-  std::wstring Arrays::toString(const std::vector<org::antlr::v4::runtime::tree::Tree*> &source);
+  std::string Arrays::toString(const std::vector<org::antlr::v4::runtime::tree::Tree*> &source);
 }

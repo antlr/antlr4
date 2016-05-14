@@ -63,13 +63,13 @@ namespace tree {
     ///  off-channel tokens (if any) so won't return whitespace and
     ///  comments if they are sent to parser on hidden channel.
     /// </summary>
-    virtual std::wstring getText() = 0;
+    virtual std::string getText() = 0;
 
     /// <summary>
     /// Specialize toStringTree so that it can print out more information
     /// 	based upon the parser.
     /// </summary>
-    virtual std::wstring toStringTree(Parser *parser) = 0;
+    virtual std::string toStringTree(Parser *parser) = 0;
   };
 
 } // namespace tree

@@ -126,11 +126,11 @@ namespace pattern {
     /// </param>
     /// <exception cref="IllegalArgumentException"> if {@code start} is {@code null} or empty. </exception>
     /// <exception cref="IllegalArgumentException"> if {@code stop} is {@code null} or empty. </exception>
-    virtual void setDelimiters(const std::wstring &start, const std::wstring &stop, const std::wstring &escapeLeft);
+    virtual void setDelimiters(const std::string &start, const std::string &stop, const std::string &escapeLeft);
 
     /// <summary>
     /// Does {@code pattern} matched as rule {@code patternRuleIndex} match {@code tree}? </summary>
-    virtual bool matches(Ref<ParseTree> tree, const std::wstring &pattern, int patternRuleIndex);
+    virtual bool matches(Ref<ParseTree> tree, const std::string &pattern, int patternRuleIndex);
 
     /// <summary>
     /// Does {@code pattern} matched as rule patternRuleIndex match tree? Pass in a
@@ -143,7 +143,7 @@ namespace pattern {
     /// {@code tree} and return a <seealso cref="ParseTreeMatch"/> object that contains the
     /// matched elements, or the node at which the match failed.
     /// </summary>
-    virtual ParseTreeMatch match(Ref<ParseTree> tree, const std::wstring &pattern, int patternRuleIndex);
+    virtual ParseTreeMatch match(Ref<ParseTree> tree, const std::string &pattern, int patternRuleIndex);
 
     /// <summary>
     /// Compare {@code pattern} matched against {@code tree} and return a
@@ -157,7 +157,7 @@ namespace pattern {
     /// For repeated use of a tree pattern, compile it to a
     /// <seealso cref="ParseTreePattern"/> using this method.
     /// </summary>
-    virtual ParseTreePattern compile(const std::wstring &pattern, int patternRuleIndex);
+    virtual ParseTreePattern compile(const std::string &pattern, int patternRuleIndex);
 
     /// <summary>
     /// Used to convert the tree pattern string into a series of tokens. The
@@ -173,15 +173,15 @@ namespace pattern {
 
     // ---- SUPPORT CODE ----
 
-    virtual std::vector<Ref<Token>> tokenize(const std::wstring &pattern);
+    virtual std::vector<Ref<Token>> tokenize(const std::string &pattern);
 
     /// Split "<ID> = <e:expr>;" into 4 chunks for tokenizing by tokenize().
-    virtual std::vector<Chunk> split(const std::wstring &pattern);
+    virtual std::vector<Chunk> split(const std::string &pattern);
     
   protected:
-    std::wstring _start;
-    std::wstring _stop;
-    std::wstring _escape; // e.g., \< and \> must escape BOTH!
+    std::string _start;
+    std::string _stop;
+    std::string _escape; // e.g., \< and \> must escape BOTH!
 
     /// Recursively walk {@code tree} against {@code patternTree}, filling
     /// {@code match.}<seealso cref="ParseTreeMatch#labels labels"/>.
@@ -191,7 +191,7 @@ namespace pattern {
     /// was successful. The specific node returned depends on the matching
     /// algorithm used by the implementation, and may be overridden. </returns>
     virtual Ref<tree::ParseTree> matchImpl(Ref<ParseTree> tree,
-      Ref<ParseTree> patternTree, std::map<std::wstring, std::vector<Ref<ParseTree>>> &labels);
+      Ref<ParseTree> patternTree, std::map<std::string, std::vector<Ref<ParseTree>>> &labels);
 
     /// Is t <expr> subtree?
     virtual Ref<RuleTagToken> getRuleTagToken(Ref<ParseTree> t);

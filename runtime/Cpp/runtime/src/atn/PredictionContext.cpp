@@ -298,8 +298,8 @@ Ref<PredictionContext> PredictionContext::mergeArrays(Ref<ArrayPredictionContext
 
   // walk and merge to yield mergedParents, mergedReturnStates
   while (i < a->returnStates.size() && j < b->returnStates.size()) {
-    Ref<PredictionContext> a_parent = a->parents[i].lock();
-    Ref<PredictionContext> b_parent = b->parents[j].lock();
+    Ref<PredictionContext> a_parent = a->parents[i];
+    Ref<PredictionContext> b_parent = b->parents[j];
     if (a->returnStates[i] == b->returnStates[j]) {
       // same payload (stack tops are equal), must yield merged singleton
       int payload = a->returnStates[i];
@@ -377,7 +377,8 @@ Ref<PredictionContext> PredictionContext::mergeArrays(Ref<ArrayPredictionContext
     return b;
   }
 
-  if (combineCommonParents(mergedParents)) // Need to recreate the context as the parents array is copied on creation.
+  // This part differs from Java code. We have to recreate the context as the parents array is copied on creation.
+  if (combineCommonParents(mergedParents))
     M = std::make_shared<ArrayPredictionContext>(mergedParents, mergedReturnStates);
 
   if (mergeCache != nullptr) {
@@ -387,9 +388,9 @@ Ref<PredictionContext> PredictionContext::mergeArrays(Ref<ArrayPredictionContext
 }
 
 bool PredictionContext::combineCommonParents(std::vector<std::weak_ptr<PredictionContext>> &parents) {
-  std::set<Ref<PredictionContext>> uniqueParents;
+  std::unordered_set<Ref<PredictionContext>, PredictionContextHasher, PredictionContextComparer> uniqueParents;
 
-  for (size_t p = 0; p < parents.size(); p++) {
+  for (size_t p = 0; p < parents.size(); ++p) {
     Ref<PredictionContext> parent = parents[p].lock();
     // ml: it's assumed that the == operator of PredictionContext kicks in here.
     if (uniqueParents.find(parent) == uniqueParents.end()) { // don't replace
@@ -400,18 +401,20 @@ bool PredictionContext::combineCommonParents(std::vector<std::weak_ptr<Predictio
   if (uniqueParents.size() == parents.size())
     return false;
 
-  parents.clear();
-  std::copy(uniqueParents.begin(), uniqueParents.end(), parents.begin());
+  // Don't resize the parents array, just update the content.
+  for (size_t p = 0; p < parents.size(); ++p) {
+    parents[p] = *uniqueParents.find(parents[p].lock());
+  }
   return true;
 }
 
-std::wstring PredictionContext::toDOTString(Ref<PredictionContext> context) {
+std::string PredictionContext::toDOTString(Ref<PredictionContext> context) {
   if (context == nullptr) {
-    return L"";
+    return "";
   }
 
-  std::wstringstream ss;
-  ss << L"digraph G {\n" << L"rankdir=LR;\n";
+  std::stringstream ss;
+  ss << "digraph G {\n" << "rankdir=LR;\n";
 
   std::vector<Ref<PredictionContext>> nodes = getAllContextNodes(context);
   std::sort(nodes.begin(), nodes.end(), [](Ref<PredictionContext> o1, Ref<PredictionContext> o2) {
@@ -420,31 +423,31 @@ std::wstring PredictionContext::toDOTString(Ref<PredictionContext> context) {
 
   for (auto current : nodes) {
     if (is<SingletonPredictionContext>(current)) {
-      std::wstring s = std::to_wstring(current->id);
-      ss << L"  s" << s;
-      std::wstring returnState = std::to_wstring(current->getReturnState(0));
+      std::string s = std::to_string(current->id);
+      ss << "  s" << s;
+      std::string returnState = std::to_string(current->getReturnState(0));
       if (is<EmptyPredictionContext>(current)) {
-        returnState = L"$";
+        returnState = "$";
       }
-      ss << L" [label=\"" << returnState << L"\"];\n";
+      ss << " [label=\"" << returnState << "\"];\n";
       continue;
     }
     Ref<ArrayPredictionContext> arr = std::static_pointer_cast<ArrayPredictionContext>(current);
-    ss << L"  s" << arr->id << L" [shape=box, label=\"" << L"[";
+    ss << "  s" << arr->id << " [shape=box, label=\"" << "[";
     bool first = true;
     for (auto inv : arr->returnStates) {
       if (!first) {
-       ss << L", ";
+       ss << ", ";
       }
       if (inv == EMPTY_RETURN_STATE) {
-        ss << L"$";
+        ss << "$";
       } else {
         ss << inv;
       }
       first = false;
     }
-    ss << L"]";
-    ss << L"\"];\n";
+    ss << "]";
+    ss << "\"];\n";
   }
 
   for (auto current : nodes) {
@@ -455,16 +458,16 @@ std::wstring PredictionContext::toDOTString(Ref<PredictionContext> context) {
       if (current->getParent(i).expired()) {
         continue;
       }
-      ss << L"  s" << current->id << L"->" << L"s" << current->getParent(i).lock()->id;
+      ss << "  s" << current->id << "->" << "s" << current->getParent(i).lock()->id;
       if (current->size() > 1) {
-        ss << L" [label=\"parent[" << i << L"]\"];\n";
+        ss << " [label=\"parent[" << i << "]\"];\n";
       } else {
-        ss << L";\n";
+        ss << ";\n";
       }
     }
   }
 
-  ss << L"}\n";
+  ss << "}\n";
   return ss.str();
 }
 
@@ -553,22 +556,22 @@ void PredictionContext::getAllContextNodes_(Ref<PredictionContext> context, std:
   }
 }
 
-std::wstring PredictionContext::toString() const {
+std::string PredictionContext::toString() const {
   
   return antlrcpp::toString(this);
 }
 
-std::wstring PredictionContext::toString(Recognizer * /*recog*/) const {
+std::string PredictionContext::toString(Recognizer * /*recog*/) const {
   return toString();
 }
 
-std::vector<std::wstring> PredictionContext::toStrings(Recognizer *recognizer, int currentState) {
+std::vector<std::string> PredictionContext::toStrings(Recognizer *recognizer, int currentState) {
   return toStrings(recognizer, EMPTY, currentState);
 }
 
-std::vector<std::wstring> PredictionContext::toStrings(Recognizer *recognizer, Ref<PredictionContext> stop, int currentState) {
+std::vector<std::string> PredictionContext::toStrings(Recognizer *recognizer, Ref<PredictionContext> stop, int currentState) {
 
-  std::vector<std::wstring> result;
+  std::vector<std::string> result;
 
   for (size_t perm = 0; ; perm++) {
     size_t offset = 0;
@@ -576,8 +579,8 @@ std::vector<std::wstring> PredictionContext::toStrings(Recognizer *recognizer, R
     PredictionContext *p = this;
     int stateNumber = currentState;
 
-    std::wstringstream ss;
-    ss << L"[";
+    std::stringstream ss;
+    ss << "[";
     bool outerContinue = false;
     while (!p->isEmpty() && p != stop.get()) {
       size_t index = 0;
@@ -600,18 +603,18 @@ std::vector<std::wstring> PredictionContext::toStrings(Recognizer *recognizer, R
       if (recognizer != nullptr) {
         if (ss.tellp() > 1) {
           // first char is '[', if more than that this isn't the first rule
-          ss << L' ';
+          ss << ' ';
         }
 
         const ATN &atn = recognizer->getATN();
         ATNState *s = atn.states[(size_t)stateNumber];
-        std::wstring ruleName = recognizer->getRuleNames()[(size_t)s->ruleIndex];
+        std::string ruleName = recognizer->getRuleNames()[(size_t)s->ruleIndex];
         ss << ruleName;
       } else if (p->getReturnState(index) != EMPTY_RETURN_STATE) {
         if (!p->isEmpty()) {
           if (ss.tellp() > 1) {
             // first char is '[', if more than that this isn't the first rule
-            ss << L' ';
+            ss << ' ';
           }
 
           ss << p->getReturnState(index);
@@ -624,7 +627,7 @@ std::vector<std::wstring> PredictionContext::toStrings(Recognizer *recognizer, R
     if (outerContinue)
       continue;
 
-    ss << L"]";
+    ss << "]";
     result.push_back(ss.str());
 
     if (last) {

@@ -74,9 +74,9 @@ namespace tree {
     /// Print out a whole tree, not just a node, in LISP format
     ///  {@code (root child1 .. childN)}. Print just a node if this is a leaf.
     /// </summary>
-    virtual std::wstring toStringTree() = 0;
+    virtual std::string toStringTree() = 0;
 
-    virtual std::wstring toString() = 0;
+    virtual std::string toString() = 0;
 
     virtual bool operator == (const Tree &other) const;
     

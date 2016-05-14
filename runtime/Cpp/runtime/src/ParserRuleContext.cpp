@@ -155,12 +155,12 @@ Ref<Token> ParserRuleContext::getStop() {
   return stop;
 }
 
-std::wstring ParserRuleContext::toInfoString(Parser *recognizer) {
-  std::vector<std::wstring> rules = recognizer->getRuleInvocationStack(shared_from_this());
+std::string ParserRuleContext::toInfoString(Parser *recognizer) {
+  std::vector<std::string> rules = recognizer->getRuleInvocationStack(shared_from_this());
   std::reverse(rules.begin(), rules.end());
-  std::wstring rulesStr = antlrcpp::arrayToString(rules);
-  return std::wstring(L"ParserRuleContext") + rulesStr + std::wstring(L"{") + std::wstring(L"start=") +
-    std::to_wstring(start->getTokenIndex())  + std::wstring(L", stop=") +
-    std::to_wstring(stop->getTokenIndex()) + L'}';
+  std::string rulesStr = antlrcpp::arrayToString(rules);
+  return std::string("ParserRuleContext") + rulesStr + std::string("{") + std::string("start=") +
+    std::to_string(start->getTokenIndex())  + std::string(", stop=") +
+    std::to_string(stop->getTokenIndex()) + '}';
 }
 

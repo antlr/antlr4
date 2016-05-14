@@ -249,28 +249,28 @@ void ATNConfigSet::setReadonly(bool readonly) {
   configLookup.reset();
 }
 
-std::wstring ATNConfigSet::toString() {
-  std::wstringstream ss;
-  ss << L"[";
+std::string ATNConfigSet::toString() {
+  std::stringstream ss;
+  ss << "[";
   for (size_t i = 0; i < elements().size(); i++) {
     ss << configs[i]->toString();
   }
-  ss << L"]";
+  ss << "]";
 
   if (hasSemanticContext) {
-    ss << L",hasSemanticContext = " <<  hasSemanticContext;
+    ss << ",hasSemanticContext = " <<  hasSemanticContext;
   }
   if (uniqueAlt != ATN::INVALID_ALT_NUMBER) {
-    ss << L",uniqueAlt = " << uniqueAlt;
+    ss << ",uniqueAlt = " << uniqueAlt;
   }
 
   if (conflictingAlts.size() > 0) {
-    ss << L",conflictingAlts = ";
+    ss << ",conflictingAlts = ";
     ss << conflictingAlts.toString();
   }
 
   if (dipsIntoOuterContext) {
-    ss << L", dipsIntoOuterContext";
+    ss << ", dipsIntoOuterContext";
   }
   return ss.str();
 }

@@ -97,10 +97,10 @@ namespace dfa {
     /**
      * @deprecated Use {@link #toString(Vocabulary)} instead.
      */
-    virtual std::wstring toString(const std::vector<std::wstring>& tokenNames);
-    std::wstring toString(Ref<Vocabulary> vocabulary) const;
+    virtual std::string toString(const std::vector<std::string>& tokenNames);
+    std::string toString(Ref<Vocabulary> vocabulary) const;
 
-    virtual std::wstring toLexerString();
+    virtual std::string toLexerString();
 
   private:
     /**

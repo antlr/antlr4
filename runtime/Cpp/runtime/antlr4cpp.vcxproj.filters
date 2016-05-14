@@ -502,6 +502,12 @@
       <Filter>Header Files\misc</Filter>
     </ClInclude>
     <ClInclude Include="src\antlrcpp-Prefix.h" />
+    <ClInclude Include="src\RuleContextWithAltNum.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RuntimeMetaData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="antlrcpp-Prefix.cpp" />
@@ -867,6 +873,12 @@
     </ClCompile>
     <ClCompile Include="src\atn\ProfilingATNSimulator.cpp">
       <Filter>Source Files\atn</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RuleContextWithAltNum.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RuntimeMetaData.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

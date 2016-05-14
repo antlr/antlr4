@@ -1,7 +1,7 @@
 /*
  * [The "BSD license"]
  *  Copyright (c) 2016 Mike Lischke
- *  Copyright (c) 2014 Dan McLaughlin
+ *  Copyright (c) 2016 Terence Parr
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -28,15 +28,25 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
+#include "ATN.h"
 
-namespace antlrcpp {
-  void replaceAll(std::wstring& str, const std::wstring& from, const std::wstring& to);
+#include "RuleContextWithAltNum.h"
 
-  std::string ws2s(const std::wstring& wstr);
+using namespace org::antlr::v4::runtime;
+using namespace org::antlr::v4::runtime::atn;
 
-  std::wstring s2ws(const std::string & str);
+RuleContextWithAltNum::RuleContextWithAltNum() : ParserRuleContext() {
+  altNum = ATN::INVALID_ALT_NUMBER;
+}
 
-  std::wstring wchar2wstring(const wchar_t & str);
+RuleContextWithAltNum::RuleContextWithAltNum(Ref<ParserRuleContext> parent, int invokingStateNumber)
+  : ParserRuleContext(parent, invokingStateNumber) {
+}
 
+int RuleContextWithAltNum::getAltNumber() const {
+  return altNum;
+}
+
+void RuleContextWithAltNum::setAltNumber(int altNum) {
+  this->altNum = altNum;
 }

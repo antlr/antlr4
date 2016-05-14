@@ -375,24 +375,24 @@ std::string BufferedTokenStream::getSourceName() const
   return _tokenSource->getSourceName();
 }
 
-std::wstring BufferedTokenStream::getText() {
+std::string BufferedTokenStream::getText() {
   lazyInit();
   fill();
   return getText(misc::Interval(0, (int)size() - 1));
 }
 
-std::wstring BufferedTokenStream::getText(const misc::Interval &interval) {
+std::string BufferedTokenStream::getText(const misc::Interval &interval) {
   int start = interval.a;
   int stop = interval.b;
   if (start < 0 || stop < 0) {
-    return L"";
+    return "";
   }
   lazyInit();
   if (stop >= (int)_tokens.size()) {
     stop = (int)_tokens.size() - 1;
   }
 
-  std::wstringstream ss;
+  std::stringstream ss;
   for (size_t i = (size_t)start; i <= (size_t)stop; i++) {
     Ref<Token> t = _tokens[i];
     if (t->getType() == Token::EOF) {
@@ -403,16 +403,16 @@ std::wstring BufferedTokenStream::getText(const misc::Interval &interval) {
   return ss.str();
 }
 
-std::wstring BufferedTokenStream::getText(RuleContext *ctx) {
+std::string BufferedTokenStream::getText(RuleContext *ctx) {
   return getText(ctx->getSourceInterval());
 }
 
-std::wstring BufferedTokenStream::getText(Ref<Token> start, Ref<Token> stop) {
+std::string BufferedTokenStream::getText(Ref<Token> start, Ref<Token> stop) {
   if (start != nullptr && stop != nullptr) {
     return getText(misc::Interval(start->getTokenIndex(), stop->getTokenIndex()));
   }
 
-  return L"";
+  return "";
 }
 
 void BufferedTokenStream::fill() {

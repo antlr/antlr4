@@ -172,21 +172,21 @@ namespace misc {
     ///  and disjoint, equals is a simple linear walk over both lists
     ///  to make sure they are the same.
     bool operator == (const IntervalSet &other) const;
-    virtual std::wstring toString() const;
-    virtual std::wstring toString(bool elemAreChar) const;
+    virtual std::string toString() const;
+    virtual std::string toString(bool elemAreChar) const;
 
     /**
      * @deprecated Use {@link #toString(Vocabulary)} instead.
      */
-    virtual std::wstring toString(const std::vector<std::wstring> &tokenNames) const;
-    virtual std::wstring toString(Ref<dfa::Vocabulary> vocabulary) const;
+    virtual std::string toString(const std::vector<std::string> &tokenNames) const;
+    virtual std::string toString(Ref<dfa::Vocabulary> vocabulary) const;
 
   protected:
     /**
      * @deprecated Use {@link #elementName(Vocabulary, int)} instead.
      */
-    virtual std::wstring elementName(const std::vector<std::wstring> &tokenNames, ssize_t a) const;
-    virtual std::wstring elementName(Ref<dfa::Vocabulary> vocabulary, ssize_t a) const;
+    virtual std::string elementName(const std::vector<std::string> &tokenNames, ssize_t a) const;
+    virtual std::string elementName(Ref<dfa::Vocabulary> vocabulary, ssize_t a) const;
 
   public:
     virtual size_t size() const;

@@ -51,12 +51,12 @@ bool RuleTransition::isEpsilon() const {
   return true;
 }
 
-bool RuleTransition::matches(int /*symbol*/, int /*minVocabSymbol*/, int /*maxVocabSymbol*/) const {
+bool RuleTransition::matches(size_t /*symbol*/, size_t /*minVocabSymbol*/, size_t /*maxVocabSymbol*/) const {
   return false;
 }
 
-std::wstring RuleTransition::toString() const {
-  std::wstringstream ss;
+std::string RuleTransition::toString() const {
+  std::stringstream ss;
   ss << "RULE " << Transition::toString() << " { ruleIndex: " << ruleIndex << ", precedence: " << precedence <<
     ", followState: " << std::hex << followState << " }";
   return ss.str();

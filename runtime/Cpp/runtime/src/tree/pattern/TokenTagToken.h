@@ -50,11 +50,11 @@ namespace pattern {
     /// This is the backing field for <seealso cref="#getTokenName"/>.
     /// </summary>
   private:
-    const std::wstring tokenName;
+    const std::string tokenName;
     /// <summary>
-    /// This is the backing field for <seealso cref="#getLabel"/>.
+    /// This is the backing field for <seealso cref="#getLabe"/>.
     /// </summary>
-    const std::wstring label;
+    const std::string label;
 
     /// <summary>
     /// Constructs a new instance of <seealso cref="TokenTagToken"/> for an unlabeled tag
@@ -63,7 +63,7 @@ namespace pattern {
     /// <param name="tokenName"> The token name. </param>
     /// <param name="type"> The token type. </param>
   public:
-    TokenTagToken(const std::wstring &tokenName, int type); //this(tokenName, type, nullptr);
+    TokenTagToken(const std::string &tokenName, int type); //this(tokenName, type, nullptr);
 
     /// <summary>
     /// Constructs a new instance of <seealso cref="TokenTagToken"/> with the specified
@@ -73,19 +73,19 @@ namespace pattern {
     /// <param name="type"> The token type. </param>
     /// <param name="label"> The label associated with the token tag, or {@code null} if
     /// the token tag is unlabeled. </param>
-    TokenTagToken(const std::wstring &tokenName, int type, const std::wstring &label);
+    TokenTagToken(const std::string &tokenName, int type, const std::string &label);
 
     /// <summary>
     /// Gets the token name. </summary>
     /// <returns> The token name. </returns>
-    std::wstring getTokenName();
+    std::string getTokenName();
 
     /// <summary>
     /// Gets the label associated with the rule tag.
     /// </summary>
     /// <returns> The name of the label associated with the rule tag, or
     /// {@code null} if this is an unlabeled rule tag. </returns>
-    std::wstring getLabel();
+    std::string getLabel();
 
     /// <summary>
     /// {@inheritDoc}
@@ -93,7 +93,7 @@ namespace pattern {
     /// The implementation for <seealso cref="TokenTagToken"/> returns the token tag
     /// formatted with {@code <} and {@code >} delimiters.
     /// </summary>
-    virtual std::wstring getText() override;
+    virtual std::string getText() override;
 
     /// <summary>
     /// {@inheritDoc}
@@ -101,7 +101,7 @@ namespace pattern {
     /// The implementation for <seealso cref="TokenTagToken"/> returns a string of the form
     /// {@code tokenName:type}.
     /// </summary>
-    virtual std::wstring toString() override;
+    virtual std::string toString() override;
   };
 
 } // namespace pattern

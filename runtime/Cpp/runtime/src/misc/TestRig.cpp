@@ -34,14 +34,14 @@
 using namespace org::antlr::v4::runtime::misc;
 
 #ifdef TODO
-const std::wstring TestRig::LEXER_START_RULE_NAME = L"tokens";
+const std::string TestRig::LEXER_START_RULE_NAME = "tokens";
 
-TestRig::TestRig(std::wstring args[]) throw(std::exception) : inputFiles(new java::util::ArrayList<String>()) {
+TestRig::TestRig(std::string args[]) throw(std::exception) : inputFiles(new java::util::ArrayList<String>()) {
   InitializeInstanceFields();
   if (sizeof(args) / sizeof(args[0]) < 2) {
-    System::err::println(std::wstring(L"java org.antlr.v4.runtime.misc.TestRig GrammarName startRuleName\n") + std::wstring(L"  [-tokens] [-tree] [-gui] [-ps file.ps] [-encoding encodingname]\n") + std::wstring(L"  [-trace] [-diagnostics] [-SLL]\n") + std::wstring(L"  [input-filename(s)]"));
-    System::err::println(L"Use startRuleName='tokens' if GrammarName is a lexer grammar.");
-    System::err::println(L"Omitting input-filename makes rig read from stdin.");
+    System::err::println(std::string("java org.antlr.v4.runtime.misc.TestRig GrammarName startRuleName\n") + std::string("  [-tokens] [-tree] [-gui] [-ps file.ps] [-encoding encodingname]\n") + std::string("  [-trace] [-diagnostics] [-SLL]\n") + std::string("  [input-filename(s)]"));
+    System::err::println("Use startRuleName='tokens' if GrammarName is a lexer grammar.");
+    System::err::println("Omitting input-filename makes rig read from stdin.");
     return;
   }
   int i = 0;
@@ -50,36 +50,36 @@ TestRig::TestRig(std::wstring args[]) throw(std::exception) : inputFiles(new jav
   startRuleName = args[i];
   i++;
   while (i < sizeof(args) / sizeof(args[0])) {
-    std::wstring arg = args[i];
+    std::string arg = args[i];
     i++;
-    if (arg[0] != L'-') { // input file name
+    if (arg[0] != '-') { // input file name
       inputFiles.push_back(arg);
       continue;
     }
-    if (arg == L"-tree") {
+    if (arg == "-tree") {
       printTree = true;
     }
-    if (arg == L"-gui") {
+    if (arg == "-gui") {
       gui = true;
     }
-    if (arg == L"-tokens") {
+    if (arg == "-tokens") {
       showTokens = true;
-    } else if (arg == L"-trace") {
+    } else if (arg == "-trace") {
       trace = true;
-    } else if (arg == L"-SLL") {
+    } else if (arg == "-SL") {
       SLL = true;
-    } else if (arg == L"-diagnostics") {
+    } else if (arg == "-diagnostics") {
       diagnostics = true;
-    } else if (arg == L"-encoding") {
+    } else if (arg == "-encoding") {
       if (i >= sizeof(args) / sizeof(args[0])) {
-        System::err::println(L"missing encoding on -encoding");
+        System::err::println("missing encoding on -encoding");
         return;
       }
       encoding = args[i];
       i++;
-    } else if (arg == L"-ps") {
+    } else if (arg == "-ps") {
       if (i >= sizeof(args) / sizeof(args[0])) {
-        System::err::println(L"missing filename on -ps");
+        System::err::println("missing filename on -ps");
         return;
       }
       psFile = args[i];
@@ -88,7 +88,7 @@ TestRig::TestRig(std::wstring args[]) throw(std::exception) : inputFiles(new jav
   }
 }
 
-void TestRig::main(std::wstring args[]) throw(std::exception) {
+void TestRig::main(std::string args[]) throw(std::exception) {
   TestRig *testRig = new TestRig(args);
   if (sizeof(args) / sizeof(args[0]) >= 2) {
     testRig->process();
@@ -97,7 +97,7 @@ void TestRig::main(std::wstring args[]) throw(std::exception) {
 
 void TestRig::process() throw(std::exception) {
   //		System.out.println("exec "+grammarName+"."+startRuleName);
-  std::wstring lexerName = grammarName + std::wstring(L"Lexer");
+  std::string lexerName = grammarName + std::string("Lexer");
   ClassLoader *cl = Thread::currentThread()->getContextClassLoader();
   Class *lexerClass = nullptr;
   try {
@@ -108,7 +108,7 @@ void TestRig::process() throw(std::exception) {
     try {
       lexerClass = cl->loadClass(lexerName)->asSubclass(Lexer::typeid);
     } catch (ClassNotFoundException cnfe2) {
-      System::err::println(std::wstring(L"Can't load ") + lexerName + std::wstring(L" as lexer or parser"));
+      System::err::println(std::string("Can't load ") + lexerName + std::string(" as lexer or parser"));
       return;
     }
   }
@@ -121,10 +121,10 @@ void TestRig::process() throw(std::exception) {
   Class *parserClass = nullptr;
   Parser *parser = nullptr;
   if (startRuleName != LEXER_START_RULE_NAME) {
-    std::wstring parserName = grammarName + std::wstring(L"Parser");
+    std::string parserName = grammarName + std::string("Parser");
     parserClass = cl->loadClass(parserName)->asSubclass(Parser::typeid);
     if (parserClass == nullptr) {
-      System::err::println(std::wstring(L"Can't load ") + parserName);
+      System::err::println(std::string("Can't load ") + parserName);
     }
     //JAVA TO C++ CONVERTER TODO TASK: Java wildcard generics are not converted to C++:
     //ORIGINAL LINE: Constructor<? extends org.antlr.v4.runtime.Parser> parserCtor = parserClass.getConstructor(org.antlr.v4.runtime.TokenStream.class);
@@ -135,7 +135,7 @@ void TestRig::process() throw(std::exception) {
   if (inputFiles.empty()) {
     InputStream *is = System::in;
     Reader *r;
-    if (encoding != L"") {
+    if (encoding != "") {
       r = new InputStreamReader(is, encoding);
     } else {
       r = new InputStreamReader(is);
@@ -150,7 +150,7 @@ void TestRig::process() throw(std::exception) {
       is = new FileInputStream(inputFile);
     }
     Reader *r;
-    if (encoding != L"") {
+    if (encoding != "") {
       r = new InputStreamReader(is, encoding);
     } else {
       r = new InputStreamReader(is);
@@ -186,7 +186,7 @@ void TestRig::process(Lexer *lexer, Class *parserClass, Parser *parser, InputStr
       parser->getInterpreter()->setPredictionMode(PredictionMode::LL_EXACT_AMBIG_DETECTION);
     }
 
-    if (printTree || gui || psFile != L"") {
+    if (printTree || gui || psFile != "") {
       parser->setBuildParseTree(true);
     }
 
@@ -207,11 +207,11 @@ void TestRig::process(Lexer *lexer, Class *parserClass, Parser *parser, InputStr
       if (gui) {
         tree->inspect(parser);
       }
-      if (psFile != L"") {
+      if (psFile != "") {
         tree->save(parser, psFile); // Generate postscript
       }
     } catch (NoSuchMethodException nsme) {
-      System::err::println(std::wstring(L"No method for rule ") + startRuleName + std::wstring(L" or it has arguments"));
+      System::err::println(std::string("No method for rule ") + startRuleName + std::string(" or it has arguments"));
     }
   } finally {
     if (r != nullptr) {
@@ -226,11 +226,11 @@ void TestRig::process(Lexer *lexer, Class *parserClass, Parser *parser, InputStr
 void TestRig::InitializeInstanceFields() {
   printTree = false;
   gui = false;
-  psFile = L"";
+  psFile = "";
   showTokens = false;
   trace = false;
   diagnostics = false;
-  encoding = L"";
+  encoding = "";
   SLL = false;
 }
 #endif

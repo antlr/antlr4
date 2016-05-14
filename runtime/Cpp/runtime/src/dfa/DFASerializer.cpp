@@ -38,27 +38,27 @@
 
 using namespace org::antlr::v4::runtime::dfa;
 
-DFASerializer::DFASerializer(const DFA *dfa, const std::vector<std::wstring>& tokenNames)
+DFASerializer::DFASerializer(const DFA *dfa, const std::vector<std::string>& tokenNames)
   : DFASerializer(dfa, VocabularyImpl::fromTokenNames(tokenNames)) {
 }
 
 DFASerializer::DFASerializer(const DFA *dfa, Ref<Vocabulary> vocabulary) : _dfa(dfa), _vocabulary(vocabulary) {
 }
 
-std::wstring DFASerializer::toString() const {
+std::string DFASerializer::toString() const {
   if (_dfa->s0 == nullptr) {
-    return L"";
+    return "";
   }
 
-  std::wstringstream ss;
+  std::stringstream ss;
   std::vector<DFAState *> states = _dfa->getStates();
   for (auto s : states) {
     for (size_t i = 0; i < s->edges.size(); i++) {
       DFAState *t = s->edges[i];
       if (t != nullptr && t->stateNumber != INT16_MAX) {
         ss << getStateString(s);
-        std::wstring label = getEdgeLabel(i);
-        ss << L"-" << label << L"->" << getStateString(t) << L"\n";
+        std::string label = getEdgeLabel(i);
+        ss << "-" << label << "->" << getStateString(t) << "\n";
       }
     }
   }
@@ -66,23 +66,23 @@ std::wstring DFASerializer::toString() const {
   return ss.str();
 }
 
-std::wstring DFASerializer::getEdgeLabel(size_t i) const {
+std::string DFASerializer::getEdgeLabel(size_t i) const {
   return _vocabulary->getDisplayName((int)i - 1);
 }
 
-std::wstring DFASerializer::getStateString(DFAState *s) const {
+std::string DFASerializer::getStateString(DFAState *s) const {
   size_t n = (size_t)s->stateNumber;
 
-  const std::wstring baseStateStr = (s->isAcceptState ? L":" : L"") + std::wstring(L"s") + std::to_wstring(n) + (s->requiresFullContext ? L"^" : L"");
+  const std::string baseStateStr = (s->isAcceptState ? ":" : "") + std::string("s") + std::to_string(n) + (s->requiresFullContext ? "^" : "");
   if (s->isAcceptState) {
     if (s->predicates.size() != 0) {
-      std::wstring buf;
+      std::string buf;
       for (size_t i = 0; i < s->predicates.size(); i++) {
         buf.append(s->predicates[i]->toString());
       }
-      return baseStateStr + L" => " + buf;
+      return baseStateStr + " => " + buf;
     } else {
-      return baseStateStr + L" => " + std::to_wstring(s->prediction);
+      return baseStateStr + " => " + std::to_string(s->prediction);
     }
   } else {
     return baseStateStr;

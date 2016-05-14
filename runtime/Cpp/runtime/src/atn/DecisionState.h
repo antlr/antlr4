@@ -52,7 +52,7 @@ namespace atn {
       InitializeInstanceFields();
     }
 
-    virtual std::wstring toString() const override;
+    virtual std::string toString() const override;
   };
 
 } // namespace atn

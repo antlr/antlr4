@@ -56,10 +56,10 @@ namespace tree {
       return visitor->visitTerminal(this);
     }
 
-    virtual std::wstring getText() override;
-    virtual std::wstring toStringTree(Parser *parser) override;
-    virtual std::wstring toString() override;
-    virtual std::wstring toStringTree() override;
+    virtual std::string getText() override;
+    virtual std::string toStringTree(Parser *parser) override;
+    virtual std::string toString() override;
+    virtual std::string toStringTree() override;
 
   protected:
     virtual std::weak_ptr<Tree> getParentReference() override;

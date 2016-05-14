@@ -35,27 +35,27 @@
 
 using namespace org::antlr::v4::runtime::tree::pattern;
 
-TagChunk::TagChunk(const std::wstring &tag) : TagChunk(L"", tag) {
+TagChunk::TagChunk(const std::string &tag) : TagChunk("", tag) {
 }
 
-TagChunk::TagChunk(const std::wstring &label, const std::wstring &tag) : _tag(tag), _label(label) {
+TagChunk::TagChunk(const std::string &label, const std::string &tag) : _tag(tag), _label(label) {
   if (tag.empty()) {
     throw IllegalArgumentException("tag cannot be null or empty");
   }
 
 }
 
-std::wstring TagChunk::getTag() {
+std::string TagChunk::getTag() {
   return _tag;
 }
 
-std::wstring TagChunk::getLabel() {
+std::string TagChunk::getLabel() {
   return _label;
 }
 
-std::wstring TagChunk::toString() {
+std::string TagChunk::toString() {
   if (!_label.empty()) {
-    return _label + L":" + _tag;
+    return _label + ":" + _tag;
   }
 
   return _tag;

@@ -41,31 +41,31 @@ namespace runtime {
   class ANTLR4CPP_PUBLIC LexerInterpreter : public Lexer {
   public:
     // @deprecated
-    LexerInterpreter(const std::wstring &grammarFileName, const std::vector<std::wstring> &tokenNames,
-                     const std::vector<std::wstring> &ruleNames, const std::vector<std::wstring> &modeNames,
+    LexerInterpreter(const std::string &grammarFileName, const std::vector<std::string> &tokenNames,
+                     const std::vector<std::string> &ruleNames, const std::vector<std::string> &modeNames,
                      const atn::ATN &atn, CharStream *input);
-    LexerInterpreter(const std::wstring &grammarFileName, Ref<dfa::Vocabulary> vocabulary,
-                     const std::vector<std::wstring> &ruleNames, const std::vector<std::wstring> &modeNames,
+    LexerInterpreter(const std::string &grammarFileName, Ref<dfa::Vocabulary> vocabulary,
+                     const std::vector<std::string> &ruleNames, const std::vector<std::string> &modeNames,
                      const atn::ATN &atn, CharStream *input);
 
     ~LexerInterpreter();
 
     virtual const atn::ATN& getATN() const override;
-    virtual std::wstring getGrammarFileName() const override;
-    virtual const std::vector<std::wstring>& getTokenNames() const override;
-    virtual const std::vector<std::wstring>& getRuleNames() const override;
-    virtual const std::vector<std::wstring>& getModeNames() const override;
+    virtual std::string getGrammarFileName() const override;
+    virtual const std::vector<std::string>& getTokenNames() const override;
+    virtual const std::vector<std::string>& getRuleNames() const override;
+    virtual const std::vector<std::string>& getModeNames() const override;
     
     virtual Ref<dfa::Vocabulary> getVocabulary() const override;
 
   protected:
-    const std::wstring _grammarFileName;
+    const std::string _grammarFileName;
     const atn::ATN &_atn;
 
     // @deprecated
-    std::vector<std::wstring> _tokenNames;
-    const std::vector<std::wstring> &_ruleNames;
-    const std::vector<std::wstring> &_modeNames;
+    std::vector<std::string> _tokenNames;
+    const std::vector<std::string> &_ruleNames;
+    const std::vector<std::string> &_modeNames;
     std::vector<dfa::DFA> _decisionToDFA;
 
     Ref<atn::PredictionContextCache> _sharedContextCache;

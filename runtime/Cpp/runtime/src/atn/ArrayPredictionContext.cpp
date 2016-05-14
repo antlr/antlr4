@@ -40,9 +40,9 @@ ArrayPredictionContext::ArrayPredictionContext(Ref<SingletonPredictionContext> a
   : ArrayPredictionContext({ a->parent }, { a->returnState }) {
 }
 
-ArrayPredictionContext::ArrayPredictionContext(const std::vector<std::weak_ptr<PredictionContext> > &parents,
+ArrayPredictionContext::ArrayPredictionContext(const std::vector<std::weak_ptr<PredictionContext> > &parents_,
                                                const std::vector<int> &returnStates)
-  : PredictionContext(calculateHashCode(parents, returnStates)), parents(parents), returnStates(returnStates) {
+  : PredictionContext(calculateHashCode(parents_, returnStates)), parents(makeRef(parents_)), returnStates(returnStates) {
     assert(parents.size() > 0);
     assert(returnStates.size() > 0);
 }
@@ -74,31 +74,40 @@ bool ArrayPredictionContext::operator == (const PredictionContext &o) const {
     return false; // can't be same if hash is different
   }
 
-  return antlrcpp::Arrays::equals(returnStates, other->returnStates) && antlrcpp::Arrays::equals(parents, other->parents);
+  return antlrcpp::Arrays::equals(returnStates, other->returnStates) &&
+    antlrcpp::Arrays::equals(parents, other->parents);
 }
 
-std::wstring ArrayPredictionContext::toString() {
+std::string ArrayPredictionContext::toString() {
   if (isEmpty()) {
-    return L"[]";
+    return "[]";
   }
 
-  std::wstringstream ss;
-  ss << L"[";
+  std::stringstream ss;
+  ss << "[";
   for (size_t i = 0; i < returnStates.size(); i++) {
     if (i > 0) {
-      ss << L", ";
+      ss << ", ";
     }
     if (returnStates[i] == EMPTY_RETURN_STATE) {
-      ss << L"$";
+      ss << "$";
       continue;
     }
     ss << returnStates[i];
-    if (!parents[i].expired()) {
-      ss << L" " << parents[i].lock()->toString();
+    if (parents[i] != nullptr) {
+      ss << " " << parents[i]->toString();
     } else {
-      ss << L"null";
+      ss << "nul";
     }
   }
-  ss << L"]";
+  ss << "]";
   return ss.str();
+}
+
+std::vector<Ref<PredictionContext>> ArrayPredictionContext::makeRef(const std::vector<std::weak_ptr<PredictionContext> > &input) {
+  std::vector<Ref<PredictionContext>> result;
+  for (auto element : input) {
+    result.push_back(element.lock());
+  }
+  return result;
 }

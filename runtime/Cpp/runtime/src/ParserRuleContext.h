@@ -180,7 +180,7 @@ namespace runtime {
 
     /// <summary>
     /// Used for rule context info debugging during parse-time, not so much for ATN debugging </summary>
-    virtual std::wstring toInfoString(Parser *recognizer);
+    virtual std::string toInfoString(Parser *recognizer);
 
   protected:
     virtual Ref<Tree> getChildReference(size_t i) override;

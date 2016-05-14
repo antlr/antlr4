@@ -87,7 +87,7 @@ namespace dfa {
     /// </param>
     /// <returns> The string literal associated with the specified token type, or
     /// {@code null} if no string literal is associated with the type. </returns>
-    virtual std::wstring getLiteralName(ssize_t tokenType) const = 0;
+    virtual std::string getLiteralName(ssize_t tokenType) const = 0;
 
     /// <summary>
     /// Gets the symbolic name associated with a token type. The string returned
@@ -131,7 +131,7 @@ namespace dfa {
     /// </param>
     /// <returns> The symbolic name associated with the specified token type, or
     /// {@code null} if no symbolic name is associated with the type. </returns>
-    virtual std::wstring getSymbolicName(ssize_t tokenType) const = 0;
+    virtual std::string getSymbolicName(ssize_t tokenType) const = 0;
 
     /// <summary>
     /// Gets the display name of a token type.
@@ -152,7 +152,7 @@ namespace dfa {
     /// </param>
     /// <returns> The display name of the token type, for use in error reporting or
     /// other user-visible messages which reference specific token types. </returns>
-    virtual std::wstring getDisplayName(ssize_t tokenType) const = 0;
+    virtual std::string getDisplayName(ssize_t tokenType) const = 0;
   };
 
 } // namespace atn

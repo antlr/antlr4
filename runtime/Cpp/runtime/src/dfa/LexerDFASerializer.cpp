@@ -38,6 +38,6 @@ using namespace org::antlr::v4::runtime::dfa;
 LexerDFASerializer::LexerDFASerializer(DFA *dfa) : DFASerializer(dfa, VocabularyImpl::EMPTY_VOCABULARY) {
 }
 
-std::wstring LexerDFASerializer::getEdgeLabel(size_t i) const {
-  return std::wstring(L"'") + static_cast<wchar_t>(i) + std::wstring(L"'");
+std::string LexerDFASerializer::getEdgeLabel(size_t i) const {
+  return std::string("'") + static_cast<char>(i) + "'";
 }

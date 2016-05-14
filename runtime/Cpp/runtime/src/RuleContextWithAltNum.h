@@ -1,8 +1,7 @@
-﻿/*
+/*
  * [The "BSD license"]
  *  Copyright (c) 2016 Mike Lischke
- *  Copyright (c) 2013 Terence Parr
- *  Copyright (c) 2013 Dan McLaughlin
+ *  Copyright (c) 2016 Terence Parr
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -31,37 +30,33 @@
 
 #pragma once
 
-#include "PredictionContext.h"
+#include "ParserRuleContext.h"
 
 namespace org {
 namespace antlr {
 namespace v4 {
 namespace runtime {
-namespace atn {
 
-  class ANTLR4CPP_PUBLIC SingletonPredictionContext : public PredictionContext {
+  /// A handy class for use with
+  ///
+  ///  options {contextSuperClass=org.antlr.v4.runtime.RuleContextWithAltNum;}
+  ///
+  ///  that provides a backing field / impl for the outer alternative number
+  ///  matched for an internal parse tree node.
+  ///
+  ///  I'm only putting into Java runtime as I'm certain I'm the only one that
+  ///  will really every use this.
+  class ANTLR4CPP_PUBLIC RuleContextWithAltNum : public ParserRuleContext {
   public:
-    // Usually a parent is linked via a weak ptr. Not so here as we have kinda reverse reference chain.
-    // There are no child contexts stored here and often the parent context is left dangling when it's
-    // owning ATNState is released. In order to avoid having this context released as well (leaving all other contexts
-    // which got this one as parent with a null reference) we use a shared_ptr here instead, to keep those left alone
-    // parent contexts alive.
-    const Ref<PredictionContext> parent;
-    const int returnState;
+    int altNum = 0;
+    
+    RuleContextWithAltNum();
+    RuleContextWithAltNum(Ref<ParserRuleContext> parent, int invokingStateNumber);
 
-    SingletonPredictionContext(std::weak_ptr<PredictionContext> parent, int returnState);
-    virtual ~SingletonPredictionContext() {};
-
-    static Ref<SingletonPredictionContext> create(std::weak_ptr<PredictionContext> parent, int returnState);
-
-    virtual size_t size() const override;
-    virtual std::weak_ptr<PredictionContext> getParent(size_t index) const override;
-    virtual int getReturnState(size_t index) const override;
-    virtual bool operator == (const PredictionContext &o) const override;
-    virtual std::string toString() const override;
+    virtual int getAltNumber() const override;
+    virtual void setAltNumber(int altNum) override;
   };
 
-} // namespace atn
 } // namespace runtime
 } // namespace v4
 } // namespace antlr

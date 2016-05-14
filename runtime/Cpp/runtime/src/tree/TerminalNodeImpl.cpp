@@ -58,22 +58,22 @@ std::size_t TerminalNodeImpl::getChildCount() {
   return 0;
 }
 
-std::wstring TerminalNodeImpl::getText() {
+std::string TerminalNodeImpl::getText() {
   return symbol->getText();
 }
 
-std::wstring TerminalNodeImpl::toStringTree(Parser * /*parser*/) {
+std::string TerminalNodeImpl::toStringTree(Parser * /*parser*/) {
   return toString();
 }
 
-std::wstring TerminalNodeImpl::toString() {
+std::string TerminalNodeImpl::toString() {
   if (symbol->getType() == Token::EOF) {
-    return L"<EOF>";
+    return "<EOF>";
   }
   return symbol->getText();
 }
 
-std::wstring TerminalNodeImpl::toStringTree() {
+std::string TerminalNodeImpl::toStringTree() {
   return toString();
 }
 

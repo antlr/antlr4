@@ -1,8 +1,7 @@
-﻿/*
+/*
  * [The "BSD license"]
  *  Copyright (c) 2016 Mike Lischke
- *  Copyright (c) 2013 Terence Parr
- *  Copyright (c) 2013 Dan McLaughlin
+ *  Copyright (c) 2014 Dan McLaughlin
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -29,40 +28,32 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
+#include "StringUtils.h"
 
-#include "PredictionContext.h"
+namespace antlrcpp {
 
-namespace org {
-namespace antlr {
-namespace v4 {
-namespace runtime {
-namespace atn {
+void replaceAll(std::string& str, const std::string& from, const std::string& to)
+{
+  if(from.empty()) {
+    return;
+  }
+  size_t start_pos = 0;
+  while((start_pos = str.find(from, start_pos)) != std::string::npos) {
+    str.replace(start_pos, from.length(), to);
+    start_pos += to.length(); // In case 'to' contains 'from', like replacing 'x' with 'yx'
+  }
+}
 
-  class ANTLR4CPP_PUBLIC SingletonPredictionContext : public PredictionContext {
-  public:
-    // Usually a parent is linked via a weak ptr. Not so here as we have kinda reverse reference chain.
-    // There are no child contexts stored here and often the parent context is left dangling when it's
-    // owning ATNState is released. In order to avoid having this context released as well (leaving all other contexts
-    // which got this one as parent with a null reference) we use a shared_ptr here instead, to keep those left alone
-    // parent contexts alive.
-    const Ref<PredictionContext> parent;
-    const int returnState;
+std::string ws2s(const std::wstring &wstr) {
+  static std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+  std::string narrow = converter.to_bytes(wstr);
+  return narrow;
+}
 
-    SingletonPredictionContext(std::weak_ptr<PredictionContext> parent, int returnState);
-    virtual ~SingletonPredictionContext() {};
+std::wstring s2ws(const std::string &str) {
+  static std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+  std::wstring wide = converter.from_bytes(str);
+  return wide;
+}
 
-    static Ref<SingletonPredictionContext> create(std::weak_ptr<PredictionContext> parent, int returnState);
-
-    virtual size_t size() const override;
-    virtual std::weak_ptr<PredictionContext> getParent(size_t index) const override;
-    virtual int getReturnState(size_t index) const override;
-    virtual bool operator == (const PredictionContext &o) const override;
-    virtual std::string toString() const override;
-  };
-
-} // namespace atn
-} // namespace runtime
-} // namespace v4
-} // namespace antlr
-} // namespace org
+} // namespace antrlcpp

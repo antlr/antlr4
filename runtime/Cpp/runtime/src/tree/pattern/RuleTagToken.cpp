@@ -35,10 +35,10 @@
 
 using namespace org::antlr::v4::runtime::tree::pattern;
 
-RuleTagToken::RuleTagToken(const std::wstring &/*ruleName*/, int _bypassTokenType) : bypassTokenType(_bypassTokenType) {
+RuleTagToken::RuleTagToken(const std::string &/*ruleName*/, int _bypassTokenType) : bypassTokenType(_bypassTokenType) {
 }
 
-RuleTagToken::RuleTagToken(const std::wstring &ruleName, int bypassTokenType, const std::wstring &label)
+RuleTagToken::RuleTagToken(const std::string &ruleName, int bypassTokenType, const std::string &label)
   : ruleName(ruleName), bypassTokenType(bypassTokenType), label(label) {
   if (ruleName.empty()) {
     throw IllegalArgumentException("ruleName cannot be null or empty.");
@@ -46,11 +46,11 @@ RuleTagToken::RuleTagToken(const std::wstring &ruleName, int bypassTokenType, co
 
 }
 
-std::wstring RuleTagToken::getRuleName() {
+std::string RuleTagToken::getRuleName() {
   return ruleName;
 }
 
-std::wstring RuleTagToken::getLabel() {
+std::string RuleTagToken::getLabel() {
   return label;
 }
 
@@ -58,12 +58,12 @@ size_t RuleTagToken::getChannel() {
   return DEFAULT_CHANNEL;
 }
 
-std::wstring RuleTagToken::getText() {
-  if (label != L"") {
-    return std::wstring(L"<") + label + std::wstring(L":") + ruleName + std::wstring(L">");
+std::string RuleTagToken::getText() {
+  if (label != "") {
+    return std::string("<") + label + std::string(":") + ruleName + std::string(">");
   }
 
-  return std::wstring(L"<") + ruleName + std::wstring(L">");
+  return std::string("<") + ruleName + std::string(">");
 }
 
 int RuleTagToken::getType() const {
@@ -98,6 +98,6 @@ org::antlr::v4::runtime::CharStream *RuleTagToken::getInputStream() {
   return nullptr;
 }
 
-std::wstring RuleTagToken::toString() {
-  return ruleName + std::wstring(L":") + std::to_wstring(bypassTokenType);
+std::string RuleTagToken::toString() {
+  return ruleName + std::string(":") + std::to_string(bypassTokenType);
 }

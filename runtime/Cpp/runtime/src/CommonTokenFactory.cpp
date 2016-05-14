@@ -46,12 +46,12 @@ CommonTokenFactory::CommonTokenFactory() : CommonTokenFactory(false) {
 }
 
 Ref<CommonToken> CommonTokenFactory::create(std::pair<TokenSource*, CharStream*> source, int type,
-  const std::wstring &text, int channel, int start, int stop, int line, int charPositionInLine) {
+  const std::string &text, int channel, int start, int stop, int line, int charPositionInLine) {
 
   Ref<CommonToken> t = std::make_shared<CommonToken>(source, type, channel, start, stop);
   t->setLine(line);
   t->setCharPositionInLine(charPositionInLine);
-  if (text != L"") {
+  if (text != "") {
     t->setText(text);
   } else if (copyText && source.second != nullptr) {
     t->setText(source.second->getText(misc::Interval(start, stop)));
@@ -60,6 +60,6 @@ Ref<CommonToken> CommonTokenFactory::create(std::pair<TokenSource*, CharStream*>
   return t;
 }
 
-Ref<CommonToken> CommonTokenFactory::create(int type, const std::wstring &text) {
+Ref<CommonToken> CommonTokenFactory::create(int type, const std::string &text) {
   return std::make_shared<CommonToken>(type, text);
 }

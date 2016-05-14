@@ -32,14 +32,14 @@
 
 namespace antlrcpp {
 
-  std::wstring join(std::vector<std::wstring> strings, const std::wstring &separator);
-  std::map<std::wstring, size_t> toMap(const std::vector<std::wstring> &keys);
-  std::wstring escapeWhitespace(std::wstring str, bool escapeSpaces);
-  std::wstring toHexString(const int t);
-  std::wstring arrayToString(const std::vector<std::wstring> &data);
-  std::wstring replaceString(const std::wstring &s, const std::wstring &from, const std::wstring &to);
-  std::vector<std::wstring> split(const std::wstring &s, const std::wstring &sep, int count);
-  std::wstring indent(const std::wstring &s, const std::wstring &indentation, bool includingFirst = true);
+  std::string join(std::vector<std::string> strings, const std::string &separator);
+  std::map<std::string, size_t> toMap(const std::vector<std::string> &keys);
+  std::string escapeWhitespace(std::string str, bool escapeSpaces);
+  std::string toHexString(const int t);
+  std::string arrayToString(const std::vector<std::string> &data);
+  std::string replaceString(const std::string &s, const std::string &from, const std::string &to);
+  std::vector<std::string> split(const std::string &s, const std::string &sep, int count);
+  std::string indent(const std::string &s, const std::string &indentation, bool includingFirst = true);
 
   // Using RAII + a lambda to implement a "finally" relacement.
   template <typename F>
@@ -72,8 +72,8 @@ namespace antlrcpp {
   }
 
   template <typename T>
-  std::wstring toString(const T &o) {
-    std::wstringstream ss;
+  std::string toString(const T &o) {
+    std::stringstream ss;
     // typeid gives the mangled class name, but that's all what's possible
     // in a portable way.
     ss << typeid(o).name() << "@" << std::hex << (size_t)&o;

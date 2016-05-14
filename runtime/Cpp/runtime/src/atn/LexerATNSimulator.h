@@ -230,13 +230,13 @@ namespace atn {
     dfa::DFA& getDFA(size_t mode);
 
     /// Get the text matched so far for the current token.
-    virtual std::wstring getText(CharStream *input);
+    virtual std::string getText(CharStream *input);
     virtual size_t getLine() const;
     virtual void setLine(size_t line);
     virtual int getCharPositionInLine();
     virtual void setCharPositionInLine(int charPositionInLine);
     virtual void consume(CharStream *input);
-    virtual std::wstring getTokenName(int t);
+    virtual std::string getTokenName(int t);
 
   private:
     void InitializeInstanceFields();

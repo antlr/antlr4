@@ -131,7 +131,7 @@ namespace atn {
     /// number {@code stateNumber} </exception>
     virtual misc::IntervalSet getExpectedTokens(int stateNumber, Ref<RuleContext> context) const;
 
-    std::wstring toString() const;
+    std::string toString() const;
   };
   
 } // namespace atn

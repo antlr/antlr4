@@ -245,13 +245,13 @@ namespace runtime {
     /// String id = m.get("ID");
     /// </pre>
     /// </summary>
-    virtual tree::pattern::ParseTreePattern compileParseTreePattern(const std::wstring &pattern, int patternRuleIndex);
+    virtual tree::pattern::ParseTreePattern compileParseTreePattern(const std::string &pattern, int patternRuleIndex);
 
     /// <summary>
     /// The same as <seealso cref="#compileParseTreePattern(String, int)"/> but specify a
     /// <seealso cref="Lexer"/> rather than trying to deduce it from this parser.
     /// </summary>
-    virtual tree::pattern::ParseTreePattern compileParseTreePattern(const std::wstring &pattern, int patternRuleIndex,
+    virtual tree::pattern::ParseTreePattern compileParseTreePattern(const std::string &pattern, int patternRuleIndex,
                                                                     Lexer *lexer);
 
     virtual Ref<ANTLRErrorStrategy> getErrorHandler();
@@ -271,9 +271,9 @@ namespace runtime {
     /// </summary>
     virtual Ref<Token> getCurrentToken();
 
-    void notifyErrorListeners(const std::wstring &msg);
+    void notifyErrorListeners(const std::string &msg);
 
-    virtual void notifyErrorListeners(Ref<Token> offendingToken, const std::wstring &msg, std::exception_ptr e);
+    virtual void notifyErrorListeners(Ref<Token> offendingToken, const std::string &msg, std::exception_ptr e);
 
     /// <summary>
     /// Consume and return the <seealso cref="#getCurrentToken current symbol"/>.
@@ -330,7 +330,7 @@ namespace runtime {
     virtual Ref<ParserRuleContext> getContext();
     virtual void setContext(Ref<ParserRuleContext> ctx);
     virtual bool precpred(Ref<RuleContext> localctx, int precedence) override;
-    virtual bool inContext(const std::wstring &context);
+    virtual bool inContext(const std::string &context);
 
     /// <summary>
     /// Checks whether or not {@code symbol} can follow the current state in the
@@ -361,7 +361,7 @@ namespace runtime {
 
     /// <summary>
     /// Get a rule's index (i.e., {@code RULE_ruleName} field) or -1 if not found. </summary>
-    virtual ssize_t getRuleIndex(const std::wstring &ruleName);
+    virtual ssize_t getRuleIndex(const std::string &ruleName);
 
     virtual Ref<ParserRuleContext> getRuleContext();
 
@@ -373,13 +373,13 @@ namespace runtime {
     ///
     ///  This is very useful for error messages.
     /// </summary>
-    virtual std::vector<std::wstring> getRuleInvocationStack();
+    virtual std::vector<std::string> getRuleInvocationStack();
 
-    virtual std::vector<std::wstring> getRuleInvocationStack(Ref<RuleContext> p);
+    virtual std::vector<std::string> getRuleInvocationStack(Ref<RuleContext> p);
 
     /// <summary>
     /// For debugging and other purposes. </summary>
-    virtual std::vector<std::wstring> getDFAStrings();
+    virtual std::vector<std::string> getDFAStrings();
 
     /// <summary>
     /// For debugging and other purposes. </summary>
@@ -460,7 +460,7 @@ namespace runtime {
     /// bypass alternatives.
     ///
     /// <seealso cref= ATNDeserializationOptions#isGenerateRuleBypassTransitions() </seealso>
-    static std::map<std::wstring, atn::ATN> bypassAltsAtnCache;
+    static std::map<std::vector<uint16_t>, atn::ATN> bypassAltsAtnCache;
 
     /// When setTrace(true) is called, a reference to the
     /// TraceListener is stored here so it can be easily removed in a

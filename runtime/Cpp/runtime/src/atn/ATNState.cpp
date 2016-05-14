@@ -48,10 +48,10 @@ ATNState::~ATNState() {
   }
 }
 
-const std::vector<std::wstring> ATNState::serializationNames = {
-  L"INVALID", L"BASIC", L"RULE_START", L"BLOCK_START",
-  L"PLUS_BLOCK_START", L"STAR_BLOCK_START", L"TOKEN_START", L"RULE_STOP",
-  L"BLOCK_END", L"STAR_LOOP_BACK", L"STAR_LOOP_ENTRY", L"PLUS_LOOP_BACK", L"LOOP_END"
+const std::vector<std::string> ATNState::serializationNames = {
+  "INVALID", "BASIC", "RULE_START", "BLOCK_START",
+  "PLUS_BLOCK_START", "STAR_BLOCK_START", "TOKEN_START", "RULE_STOP",
+  "BLOCK_END", "STAR_LOOP_BACK", "STAR_LOOP_ENTRY", "PLUS_LOOP_BACK", "LOOP_END"
 };
 
 size_t ATNState::hashCode() {
@@ -66,8 +66,8 @@ bool ATNState::isNonGreedyExitState() {
   return false;
 }
 
-std::wstring ATNState::toString() const {
-  std::wstringstream ss;
+std::string ATNState::toString() const {
+  std::stringstream ss;
   ss << "(ATNState " << std::hex << this << std::dec << ") {" << std::endl;
   if (stateNumber < 0 || stateNumber >= (int)serializationNames.size())
     ss << "  state: INVALID ";
@@ -78,7 +78,7 @@ std::wstring ATNState::toString() const {
   ss << "  transistions (" << transitions.size() << "):" << std::endl;
 
   for (auto transition : transitions) {
-    ss << indent(transition->toString(), L"    ") << std::endl;
+    ss << indent(transition->toString(), "    ") << std::endl;
   }
   ss << "}";
 
@@ -101,7 +101,7 @@ void ATNState::addTransition(int index, Transition *e) {
   if (transitions.empty()) {
     epsilonOnlyTransitions = e->isEpsilon();
   } else if (epsilonOnlyTransitions != e->isEpsilon()) {
-    std::cerr << L"ATN state %d has both epsilon and non-epsilon transitions.\n" << stateNumber;
+    std::cerr << "ATN state %d has both epsilon and non-epsilon transitions.\n" << stateNumber;
     epsilonOnlyTransitions = false;
   }
 

@@ -370,71 +370,71 @@ bool IntervalSet::operator == (const IntervalSet &other) const {
   return std::equal(_intervals.begin(), _intervals.end(), other._intervals.begin());
 }
 
-std::wstring IntervalSet::toString() const {
+std::string IntervalSet::toString() const {
   return toString(false);
 }
 
-std::wstring IntervalSet::toString(bool elemAreChar) const {
+std::string IntervalSet::toString(bool elemAreChar) const {
   if (_intervals.empty()) {
-    return L"{}";
+    return "{}";
   }
 
-  std::wstringstream ss;
+  std::stringstream ss;
   size_t effectiveSize = size();
   if (effectiveSize > 1) {
-    ss << L"{";
+    ss << "{";
   }
 
   bool firstEntry = true;
   for (auto &interval : _intervals) {
     if (!firstEntry)
-      ss << L", ";
+      ss << ", ";
     firstEntry = false;
 
     int a = interval.a;
     int b = interval.b;
     if (a == b) {
       if (a == Token::EOF) {
-        ss << L"<EOF>";
+        ss << "<EOF>";
       } else if (elemAreChar) {
-        ss << L"'" << static_cast<wchar_t>(a) << L"'";
+        ss << "'" << static_cast<char>(a) << "'";
       } else {
         ss << a;
       }
     } else {
       if (elemAreChar) {
-        ss << L"'" << static_cast<wchar_t>(a) << L"'..'" << static_cast<wchar_t>(b) << L"'";
+        ss << "'" << static_cast<char>(a) << "'..'" << static_cast<char>(b) << "'";
       } else {
-        ss << a << L".." << b;
+        ss << a << ".." << b;
       }
     }
   }
   if (effectiveSize > 1) {
-    ss << L"}";
+    ss << "}";
   }
 
   return ss.str();
 }
 
-std::wstring IntervalSet::toString(const std::vector<std::wstring> &tokenNames) const {
+std::string IntervalSet::toString(const std::vector<std::string> &tokenNames) const {
   return toString(dfa::VocabularyImpl::fromTokenNames(tokenNames));
 }
 
-std::wstring IntervalSet::toString(Ref<dfa::Vocabulary> vocabulary) const {
+std::string IntervalSet::toString(Ref<dfa::Vocabulary> vocabulary) const {
   if (_intervals.empty()) {
-    return L"{}";
+    return "{}";
   }
 
-  std::wstringstream ss;
+  std::stringstream ss;
   size_t effectiveSize = size();
   if (effectiveSize > 1) {
-    ss << L"{";
+    ss << "{";
   }
 
   bool firstEntry = true;
   for (auto &interval : _intervals) {
     if (!firstEntry)
-      ss << L", ";
+      ss << ", ";
     firstEntry = false;
 
     ssize_t a = (ssize_t)interval.a;
@@ -444,28 +444,28 @@ std::wstring IntervalSet::toString(Ref<dfa::Vocabulary> vocabulary) const {
     } else {
       for (ssize_t i = a; i <= b; i++) {
         if (i > a) {
-          ss << L", ";
+          ss << ", ";
         }
         ss << elementName(vocabulary, i);
       }
     }
   }
   if (effectiveSize > 1) {
-    ss << L"}";
+    ss << "}";
   }
 
   return ss.str();
 }
 
-std::wstring IntervalSet::elementName(const std::vector<std::wstring> &tokenNames, ssize_t a) const {
+std::string IntervalSet::elementName(const std::vector<std::string> &tokenNames, ssize_t a) const {
   return elementName(dfa::VocabularyImpl::fromTokenNames(tokenNames), a);
 }
 
-std::wstring IntervalSet::elementName(Ref<dfa::Vocabulary> vocabulary, ssize_t a) const {
+std::string IntervalSet::elementName(Ref<dfa::Vocabulary> vocabulary, ssize_t a) const {
   if (a == Token::EOF) {
-    return L"<EOF>";
+    return "<EOF>";
   } else if (a == Token::EPSILON) {
-    return L"<EPSILON>";
+    return "<EPSILON>";
   } else {
     return vocabulary->getDisplayName(a);
   }

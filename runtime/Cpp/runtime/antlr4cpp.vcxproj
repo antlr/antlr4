@@ -258,6 +258,8 @@
     <ClCompile Include="src\RecognitionException.cpp" />
     <ClCompile Include="src\Recognizer.cpp" />
     <ClCompile Include="src\RuleContext.cpp" />
+    <ClCompile Include="src\RuleContextWithAltNum.cpp" />
+    <ClCompile Include="src\RuntimeMetaData.cpp" />
     <ClCompile Include="src\support\Arrays.cpp" />
     <ClCompile Include="src\support\CPPUtils.cpp" />
     <ClCompile Include="src\support\guid.cpp" />
@@ -398,6 +400,8 @@
     <ClInclude Include="src\RecognitionException.h" />
     <ClInclude Include="src\Recognizer.h" />
     <ClInclude Include="src\RuleContext.h" />
+    <ClInclude Include="src\RuleContextWithAltNum.h" />
+    <ClInclude Include="src\RuntimeMetaData.h" />
     <ClInclude Include="src\support\Arrays.h" />
     <ClInclude Include="src\support\BitSet.h" />
     <ClInclude Include="src\support\CPPUtils.h" />

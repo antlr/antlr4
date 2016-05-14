@@ -40,7 +40,7 @@ namespace runtime {
 
   class ANTLR4CPP_PUBLIC WritableToken : public Token {
   public:
-    virtual void setText(const std::wstring &text) = 0;
+    virtual void setText(const std::string &text) = 0;
     virtual void setType(int ttype) = 0;
     virtual void setLine(int line) = 0;
     virtual void setCharPositionInLine(int pos) = 0;

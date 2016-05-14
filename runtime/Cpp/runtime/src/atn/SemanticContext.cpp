@@ -79,8 +79,8 @@ bool SemanticContext::Predicate::operator == (const SemanticContext &other) cons
   return ruleIndex == p->ruleIndex && predIndex == p->predIndex && isCtxDependent == p->isCtxDependent;
 }
 
-std::wstring SemanticContext::Predicate::toString() const {
-  return std::wstring(L"{") + std::to_wstring(ruleIndex) + std::wstring(L":") + std::to_wstring(predIndex) + std::wstring(L"}?");
+std::string SemanticContext::Predicate::toString() const {
+  return std::string("{") + std::to_string(ruleIndex) + std::string(":") + std::to_string(predIndex) + std::string("}?");
 }
 
 //------------------ PrecedencePredicate -------------------------------------------------------------------------------
@@ -126,8 +126,8 @@ bool SemanticContext::PrecedencePredicate::operator == (const SemanticContext &o
   return precedence == predicate->precedence;
 }
 
-std::wstring SemanticContext::PrecedencePredicate::toString() const {
-  return L"{" + std::to_wstring(precedence) + L">=prec}?";
+std::string SemanticContext::PrecedencePredicate::toString() const {
+  return "{" + std::to_string(precedence) + ">=prec}?";
 }
 
 //------------------ AND -----------------------------------------------------------------------------------------------
@@ -225,10 +225,10 @@ Ref<SemanticContext> SemanticContext::AND::evalPrecedence(Recognizer *parser, Re
   return result;
 }
 
-std::wstring SemanticContext::AND::toString() const {
-  std::wstring tmp;
+std::string SemanticContext::AND::toString() const {
+  std::string tmp;
   for (auto var : opnds) {
-    tmp += var->toString() + L" && ";
+    tmp += var->toString() + " && ";
   }
   return tmp;
 }
@@ -326,10 +326,10 @@ Ref<SemanticContext> SemanticContext::OR::evalPrecedence(Recognizer *parser, Ref
   return result;
 }
 
-std::wstring SemanticContext::OR::toString() const {
-  std::wstring tmp;
+std::string SemanticContext::OR::toString() const {
+  std::string tmp;
   for(auto var : opnds) {
-    tmp += var->toString() + L" || ";
+    tmp += var->toString() + " || ";
   }
   return tmp;
 }

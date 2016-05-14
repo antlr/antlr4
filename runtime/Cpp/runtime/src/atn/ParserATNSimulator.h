@@ -712,7 +712,7 @@ namespace atn {
                           bool collectPredicates, bool fullCtx, int depth, bool treatEofAsEpsilon);
 
   public:
-    virtual std::wstring getRuleName(size_t index);
+    virtual std::string getRuleName(size_t index);
 
   protected:
     virtual Ref<ATNConfig> getEpsilonTarget(Ref<ATNConfig> config, Transition *t, bool collectPredicates,
@@ -780,9 +780,9 @@ namespace atn {
     virtual antlrcpp::BitSet getConflictingAltsOrUniqueAlt(Ref<ATNConfigSet> configs);
 
   public:
-    virtual std::wstring getTokenName(ssize_t t);
+    virtual std::string getTokenName(ssize_t t);
 
-    virtual std::wstring getLookaheadName(TokenStream *input);
+    virtual std::string getLookaheadName(TokenStream *input);
 
     /// <summary>
     /// Used for debugging in adaptivePredict around execATN but I cut

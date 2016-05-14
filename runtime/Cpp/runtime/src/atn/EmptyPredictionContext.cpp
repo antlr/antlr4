@@ -56,6 +56,6 @@ bool EmptyPredictionContext::operator == (const PredictionContext &o) const {
   return this == &o;
 }
 
-std::wstring EmptyPredictionContext::toString() const {
-  return L"$";
+std::string EmptyPredictionContext::toString() const {
+  return "$";
 }
