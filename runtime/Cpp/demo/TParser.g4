@@ -105,6 +105,7 @@ expr: expr Star expr
     | identifier = id
 	| flowControl
 	| INT
+    | String
 ;
 
 flowControl:

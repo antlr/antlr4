@@ -54,7 +54,7 @@ namespace runtime {
     static const size_t DEFAULT_TOKEN_CHANNEL = Token::DEFAULT_CHANNEL;
     static const int HIDDEN = Token::HIDDEN_CHANNEL;
     static const size_t MIN_CHAR_VALUE = 0;
-    static const size_t MAX_CHAR_VALUE = 0x1FFFE;
+    static const size_t MAX_CHAR_VALUE = 0x10FFFF;
 
     CharStream *_input; // Pure reference, usually from statically allocated instance.
   protected:
@@ -211,9 +211,9 @@ namespace runtime {
 
     virtual std::string getErrorDisplay(const std::string &s);
 
-    virtual std::string getErrorDisplay(int c);
+    virtual std::string getErrorDisplay(ssize_t c);
 
-    virtual std::string getCharErrorDisplay(int c);
+    virtual std::string getCharErrorDisplay(ssize_t c);
 
     /// <summary>
     /// Lexers can normally match any char in it's vocabulary after matching

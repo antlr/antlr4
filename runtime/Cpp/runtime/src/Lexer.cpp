@@ -270,14 +270,15 @@ void Lexer::notifyListeners(const LexerNoViableAltException &e) {
 }
 
 std::string Lexer::getErrorDisplay(const std::string &s) {
+  std::u32string temp = utfConverter.from_bytes(s);
   std::stringstream ss;
-  for (auto c : s) {
+  for (auto c : temp) {
     ss << getErrorDisplay(c);
   }
   return ss.str();
 }
 
-std::string Lexer::getErrorDisplay(int c) {
+std::string Lexer::getErrorDisplay(ssize_t c) {
   std::string s;
   switch (c) {
     case EOF :
@@ -293,13 +294,13 @@ std::string Lexer::getErrorDisplay(int c) {
       s = "\\r";
       break;
     default:
-      s = utfConverter.to_bytes(c);
+      s = utfConverter.to_bytes((char32_t)c);
       break;
   }
   return s;
 }
 
-std::string Lexer::getCharErrorDisplay(int c) {
+std::string Lexer::getCharErrorDisplay(ssize_t c) {
   std::string s = getErrorDisplay(c);
   return "'" + s + "'";
 }

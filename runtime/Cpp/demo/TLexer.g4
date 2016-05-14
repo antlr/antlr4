@@ -48,7 +48,7 @@ INT: Digit+;
 Digit: [0-9];
 
 ID: LETTER (LETTER | '0'..'9')*;
-fragment LETTER : [a-zA-Z\u0080-\uFFFD] ;
+fragment LETTER : [a-zA-Z\u0080-\uFFFF];
 
 LessThan: '<';
 GreaterThan:  '>';
@@ -68,6 +68,7 @@ QuestionMark: '?';
 Comma: ',';
 Dollar: '$' -> more, mode(Mode1), type(DUMMY);
 		   
+String: '"' .*? '"';
 Foo: {canTestFoo()}? 'foo' {isItFoo()}? { myFooLexerAction(); };
 Bar: 'bar' {isItBar()}? { myBarLexerAction(); };
 Any: Foo Dot Bar? DotDot Baz;
