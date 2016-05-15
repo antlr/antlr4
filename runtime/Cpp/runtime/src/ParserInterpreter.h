@@ -32,9 +32,9 @@
 #pragma once
 
 #include "Parser.h"
-#include "ATN.h"
-#include "BitSet.h"
-#include "PredictionContext.h"
+#include "atn/ATN.h"
+#include "support/BitSet.h"
+#include "atn/PredictionContext.h"
 
 namespace org {
 namespace antlr {

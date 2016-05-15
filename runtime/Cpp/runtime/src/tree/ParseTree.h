@@ -31,7 +31,7 @@
 
 #pragma once
 
-#include "SyntaxTree.h"
+#include "tree/SyntaxTree.h"
 
 namespace org {
 namespace antlr {

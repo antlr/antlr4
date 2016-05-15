@@ -29,9 +29,9 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "NotSetTransition.h"
-#include "ATNState.h"
-#include "IntervalSet.h"
+#include "atn/NotSetTransition.h"
+#include "atn/ATNState.h"
+#include "misc/IntervalSet.h"
 
 using namespace org::antlr::v4::runtime;
 using namespace org::antlr::v4::runtime::atn;

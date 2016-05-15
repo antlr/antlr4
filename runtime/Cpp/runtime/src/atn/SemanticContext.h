@@ -32,7 +32,7 @@
 #pragma once
 
 #include "Recognizer.h"
-#include "CPPUtils.h"
+#include "support/CPPUtils.h"
 
 namespace org {
 namespace antlr {

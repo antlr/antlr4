@@ -32,11 +32,11 @@
 #pragma once
 
 #include "PredictionMode.h"
-#include "DFAState.h"
-#include "ATNSimulator.h"
-#include "PredictionContext.h"
+#include "dfa/DFAState.h"
+#include "atn/ATNSimulator.h"
+#include "atn/PredictionContext.h"
 #include "SemanticContext.h"
-#include "ATNConfig.h"
+#include "atn/ATNConfig.h"
 
 namespace org {
 namespace antlr {

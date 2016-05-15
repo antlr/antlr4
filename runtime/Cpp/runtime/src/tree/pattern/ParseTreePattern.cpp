@@ -29,11 +29,11 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "ParseTreePatternMatcher.h"
-#include "ParseTreeMatch.h"
+#include "tree/pattern/ParseTreePatternMatcher.h"
+#include "tree/pattern/ParseTreeMatch.h"
 //#include "XPath.h"
 
-#include "ParseTreePattern.h"
+#include "tree/pattern/ParseTreePattern.h"
 
 using namespace org::antlr::v4::runtime::tree;
 using namespace org::antlr::v4::runtime::tree::pattern;

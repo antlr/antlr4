@@ -31,7 +31,7 @@
 
 #pragma once
 
-#include "ParseTree.h"
+#include "tree/ParseTree.h"
 
 namespace org {
 namespace antlr {

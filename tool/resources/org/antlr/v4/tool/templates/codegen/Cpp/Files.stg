@@ -44,7 +44,7 @@ LexerFileHeader(file, lexer, namedActions) ::= <<
 <namedActions.preinclude>
 
 #include "Lexer.h"
-#include "PredictionContext.h"
+#include "atn/PredictionContext.h"
 #include "VocabularyImpl.h"
 
 <namedActions.postinclude>
@@ -65,10 +65,10 @@ LexerFile(file, lexer, namedActions) ::= <<
 
 <namedActions.preinclude>
 
-#include "ATN.h"
-#include "DFA.h"
-#include "LexerATNSimulator.h"
-#include "ATNDeserializer.h"
+#include "atn/ATN.h"
+#include "dfa/DFA.h"
+#include "atn/LexerATNSimulator.h"
+#include "atn/ATNDeserializer.h"
 #include "RuleContext.h"
 
 #include "<file.lexer.name>.h"
@@ -92,10 +92,10 @@ ParserFileHeader(file, parser, namedActions, contextSuperClass) ::= <<
 
 #include "Parser.h"
 #include "ParserRuleContext.h"
-#include "PredictionContext.h"
+#include "atn/PredictionContext.h"
 #include "VocabularyImpl.h"
 
-#include "CPPUtils.h"
+#include "support/CPPUtils.h"
 
 <namedActions.postinclude>
 
@@ -118,15 +118,15 @@ ParserFile(file, parser, namedActions, contextSuperClass) ::= <<
 
 <namedActions.preinclude>
 
-#include "ATN.h"
-#include "DFA.h"
-#include "ParserATNSimulator.h"
+#include "atn/ATN.h"
+#include "dfa/DFA.h"
+#include "atn/ParserATNSimulator.h"
 #include "ANTLRErrorStrategy.h"
 #include "FailedPredicateException.h"
 #include "NoViableAltException.h"
-#include "ATNDeserializer.h"
+#include "atn/ATNDeserializer.h"
 
-#include "ParseTreeListener.h"
+#include "tree/ParseTreeListener.h"
 <if (file.genListener)>#include "<file.parser.name>Listener.h"<endif>
 
 #include "<file.parser.name>.h"

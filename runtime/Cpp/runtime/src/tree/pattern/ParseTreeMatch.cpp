@@ -31,7 +31,7 @@
 
 #include "Exceptions.h"
 
-#include "ParseTreeMatch.h"
+#include "tree/pattern/ParseTreeMatch.h"
 
 using namespace org::antlr::v4::runtime::tree;
 using namespace org::antlr::v4::runtime::tree::pattern;

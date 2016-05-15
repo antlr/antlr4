@@ -29,14 +29,14 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "DFAState.h"
-#include "DFASerializer.h"
-#include "LexerDFASerializer.h"
-#include "CPPUtils.h"
-#include "StarLoopEntryState.h"
-#include "ATNConfigSet.h"
+#include "dfa/DFAState.h"
+#include "dfa/DFASerializer.h"
+#include "dfa/LexerDFASerializer.h"
+#include "support/CPPUtils.h"
+#include "atn/StarLoopEntryState.h"
+#include "atn/ATNConfigSet.h"
 
-#include "DFA.h"
+#include "dfa/DFA.h"
 
 using namespace org::antlr::v4::runtime;
 using namespace org::antlr::v4::runtime::dfa;

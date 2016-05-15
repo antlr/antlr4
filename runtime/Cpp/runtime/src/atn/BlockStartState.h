@@ -31,7 +31,7 @@
 
 #pragma once
 
-#include "DecisionState.h"
+#include "atn/DecisionState.h"
 
 namespace org {
 namespace antlr {

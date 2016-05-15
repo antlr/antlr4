@@ -31,7 +31,7 @@
 
 #pragma once
 
-#include "AbstractPredicateTransition.h"
+#include "atn/AbstractPredicateTransition.h"
 #include "SemanticContext.h"
 
 namespace org {

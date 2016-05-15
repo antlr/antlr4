@@ -38,11 +38,10 @@
 
 using namespace org::antlr::v4::runtime;
 
-void BailErrorStrategy::recover(Parser *recognizer, const RecognitionException &e) {
-  std::exception_ptr exception = std::make_exception_ptr(e);
+void BailErrorStrategy::recover(Parser *recognizer, std::exception_ptr e) {
   Ref<ParserRuleContext> context = recognizer->getContext();
   do {
-    context->exception = exception;
+    context->exception = e;
     if (context->getParent().expired())
       break;
     context = context->getParent().lock();
@@ -50,10 +49,10 @@ void BailErrorStrategy::recover(Parser *recognizer, const RecognitionException &
 
 #if defined(_MSC_FULL_VER) && _MSC_FULL_VER < 190023026
   // throw_with_nested is not available before VS 2015.
-  std::rethrow_exception(exception);
+  std::rethrow_exception(e);
 #else
   try {
-    std::rethrow_exception(exception); // Throw the exception to be able to catch and rethrow nested.
+    std::rethrow_exception(e); // Throw the exception to be able to catch and rethrow nested.
   } catch (RecognitionException &inner) {
     std::throw_with_nested(ParseCancellationException());
   }

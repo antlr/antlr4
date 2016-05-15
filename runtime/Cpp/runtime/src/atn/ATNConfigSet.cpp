@@ -29,13 +29,13 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "PredictionContext.h"
-#include "ATNConfig.h"
-#include "ATNSimulator.h"
+#include "atn/PredictionContext.h"
+#include "atn/ATNConfig.h"
+#include "atn/ATNSimulator.h"
 #include "Exceptions.h"
 #include "SemanticContext.h"
 
-#include "ATNConfigSet.h"
+#include "atn/ATNConfigSet.h"
 
 using namespace org::antlr::v4::runtime::atn;
 using namespace antlrcpp;

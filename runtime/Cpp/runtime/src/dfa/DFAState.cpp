@@ -29,12 +29,12 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "ATNConfigSet.h"
+#include "atn/ATNConfigSet.h"
 #include "SemanticContext.h"
-#include "ATNConfig.h"
-#include "MurmurHash.h"
+#include "atn/ATNConfig.h"
+#include "misc/MurmurHash.h"
 
-#include "DFAState.h"
+#include "dfa/DFAState.h"
 
 using namespace org::antlr::v4::runtime::dfa;
 using namespace org::antlr::v4::runtime::atn;

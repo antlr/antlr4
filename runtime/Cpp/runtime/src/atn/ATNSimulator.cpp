@@ -29,13 +29,13 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "ATNType.h"
-#include "ATNConfigSet.h"
-#include "DFAState.h"
-#include "ATNDeserializer.h"
-#include "EmptyPredictionContext.h"
+#include "atn/ATNType.h"
+#include "atn/ATNConfigSet.h"
+#include "dfa/DFAState.h"
+#include "atn/ATNDeserializer.h"
+#include "atn/EmptyPredictionContext.h"
 
-#include "ATNSimulator.h"
+#include "atn/ATNSimulator.h"
 
 using namespace org::antlr::v4::runtime;
 using namespace org::antlr::v4::runtime::dfa;

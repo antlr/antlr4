@@ -31,7 +31,7 @@
 
 #include "VocabularyImpl.h"
 
-#include "LexerDFASerializer.h"
+#include "dfa/LexerDFASerializer.h"
 
 using namespace org::antlr::v4::runtime::dfa;
 

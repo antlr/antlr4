@@ -29,10 +29,10 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "ProfilingATNSimulator.h"
-#include "DFA.h"
+#include "atn/ProfilingATNSimulator.h"
+#include "dfa/DFA.h"
 
-#include "ParseInfo.h"
+#include "atn/ParseInfo.h"
 
 using namespace org::antlr::v4::runtime::atn;
 

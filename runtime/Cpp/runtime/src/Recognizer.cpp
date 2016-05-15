@@ -31,12 +31,12 @@
 
 #include "ConsoleErrorListener.h"
 #include "RecognitionException.h"
-#include "CPPUtils.h"
-#include "StringUtils.h"
+#include "support/CPPUtils.h"
+#include "support/StringUtils.h"
 #include "Token.h"
-#include "ATN.h"
-#include "ATNSimulator.h"
-#include "CPPUtils.h"
+#include "atn/ATN.h"
+#include "atn/ATNSimulator.h"
+#include "support/CPPUtils.h"
 
 #include "Vocabulary.h"
 #include "VocabularyImpl.h"

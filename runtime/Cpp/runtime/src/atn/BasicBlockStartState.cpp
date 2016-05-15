@@ -29,9 +29,7 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "BlockStartState.h"
-
-#include "BasicBlockStartState.h"
+#include "atn/BasicBlockStartState.h"
 
 using namespace org::antlr::v4::runtime::atn;
 

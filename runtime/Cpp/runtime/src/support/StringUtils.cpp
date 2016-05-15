@@ -28,7 +28,7 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "StringUtils.h"
+#include "support/StringUtils.h"
 
 namespace antlrcpp {
 

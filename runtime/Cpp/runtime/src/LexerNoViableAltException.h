@@ -32,7 +32,7 @@
 #pragma once
 
 #include "RecognitionException.h"
-#include "ATNConfigSet.h"
+#include "atn/ATNConfigSet.h"
 
 namespace org {
 namespace antlr {

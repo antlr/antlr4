@@ -96,7 +96,7 @@ namespace runtime {
     /// <param name="e"> the recognition exception to recover from </param>
     /// <exception cref="RecognitionException"> if the error strategy could not recover from
     /// the recognition exception </exception>
-    virtual void recover(Parser *recognizer, const RecognitionException &e) = 0;
+    virtual void recover(Parser *recognizer, std::exception_ptr e) = 0;
 
     /// <summary>
     /// This method provides the error handler with an opportunity to handle
@@ -143,7 +143,7 @@ namespace runtime {
     /// </summary>
     /// <param name="recognizer"> the parser instance </param>
     /// <param name="e"> the recognition exception to report </param>
-    virtual void reportError(Parser *recognizer, const RecognitionException &e) = 0;
+    virtual void reportError(Parser *recognizer, std::exception_ptr e) = 0;
   };
 
 } // namespace runtime

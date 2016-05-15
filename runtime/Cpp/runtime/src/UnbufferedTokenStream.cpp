@@ -33,8 +33,8 @@
 #include "Exceptions.h"
 #include "assert.h"
 #include "TokenSource.h"
-#include "Arrays.h"
-#include "Interval.h"
+#include "support/Arrays.h"
+#include "misc/Interval.h"
 #include "RuleContext.h"
 #include "WritableToken.h"
 

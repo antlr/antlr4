@@ -32,7 +32,7 @@
 
 #pragma once
 
-#include "PredictionContext.h"
+#include "atn/PredictionContext.h"
 
 namespace org {
 namespace antlr {

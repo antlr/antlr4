@@ -31,7 +31,7 @@
 
 #pragma once
 
-#include "RuleNode.h"
+#include "tree/RuleNode.h"
 
 namespace org {
 namespace antlr {

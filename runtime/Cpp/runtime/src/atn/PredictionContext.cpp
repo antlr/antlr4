@@ -29,16 +29,16 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "EmptyPredictionContext.h"
-#include "MurmurHash.h"
-#include "ArrayPredictionContext.h"
+#include "atn/EmptyPredictionContext.h"
+#include "misc/MurmurHash.h"
+#include "atn/ArrayPredictionContext.h"
 #include "RuleContext.h"
 #include "ParserRuleContext.h"
-#include "RuleTransition.h"
-#include "Arrays.h"
-#include "CPPUtils.h"
+#include "atn/RuleTransition.h"
+#include "support/Arrays.h"
+#include "support/CPPUtils.h"
 
-#include "PredictionContext.h"
+#include "atn/PredictionContext.h"
 
 using namespace org::antlr::v4::runtime;
 using namespace org::antlr::v4::runtime::misc;

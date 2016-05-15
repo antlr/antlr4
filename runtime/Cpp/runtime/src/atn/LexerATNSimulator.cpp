@@ -30,24 +30,24 @@
  */
 
 #include "IntStream.h"
-#include "OrderedATNConfigSet.h"
+#include "atn/OrderedATNConfigSet.h"
 #include "Token.h"
 #include "LexerNoViableAltException.h"
-#include "RuleStopState.h"
-#include "RuleTransition.h"
-#include "SingletonPredictionContext.h"
-#include "PredicateTransition.h"
-#include "ActionTransition.h"
-#include "Interval.h"
-#include "DFA.h"
+#include "atn/RuleStopState.h"
+#include "atn/RuleTransition.h"
+#include "atn/SingletonPredictionContext.h"
+#include "atn/PredicateTransition.h"
+#include "atn/ActionTransition.h"
+#include "misc/Interval.h"
+#include "dfa/DFA.h"
 #include "Lexer.h"
 
-#include "DFAState.h"
-#include "LexerATNConfig.h"
-#include "LexerActionExecutor.h"
-#include "EmptyPredictionContext.h"
+#include "dfa/DFAState.h"
+#include "atn/LexerATNConfig.h"
+#include "atn/LexerActionExecutor.h"
+#include "atn/EmptyPredictionContext.h"
 
-#include "LexerATNSimulator.h"
+#include "atn/LexerATNSimulator.h"
 
 using namespace org::antlr::v4::runtime;
 using namespace org::antlr::v4::runtime::atn;

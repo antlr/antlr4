@@ -32,9 +32,9 @@
 #include "WritableToken.h"
 #include "Lexer.h"
 #include "RuleContext.h"
-#include "Interval.h"
+#include "misc/Interval.h"
 #include "Exceptions.h"
-#include "CPPUtils.h"
+#include "support/CPPUtils.h"
 
 #include "BufferedTokenStream.h"
 

@@ -32,7 +32,7 @@
 #pragma once
 
 #include "RuleContext.h"
-#include "LexerAction.h"
+#include "atn/LexerAction.h"
 
 namespace org {
 namespace antlr {

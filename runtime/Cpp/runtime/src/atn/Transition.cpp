@@ -30,9 +30,9 @@
  */
 
 #include "Exceptions.h"
-#include "Arrays.h"
+#include "support/Arrays.h"
 
-#include "Transition.h"
+#include "atn/Transition.h"
 
 using namespace org::antlr::v4::runtime;
 using namespace org::antlr::v4::runtime::atn;

@@ -29,7 +29,7 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "TokenTagToken.h"
+#include "tree/pattern/TokenTagToken.h"
 
 using namespace org::antlr::v4::runtime::tree::pattern;
 

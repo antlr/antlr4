@@ -32,6 +32,7 @@
 #pragma once
 
 #include "Lexer.h"
+#include "atn/PredictionContext.h"
 
 namespace org {
 namespace antlr {

@@ -29,11 +29,11 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "MurmurHash.h"
-#include "PredictionContext.h"
+#include "misc/MurmurHash.h"
+#include "atn/PredictionContext.h"
 #include "SemanticContext.h"
 
-#include "ATNConfig.h"
+#include "atn/ATNConfig.h"
 
 using namespace org::antlr::v4::runtime::atn;
 

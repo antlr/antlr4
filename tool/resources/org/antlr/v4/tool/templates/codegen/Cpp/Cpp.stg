@@ -405,12 +405,13 @@ static std::vector\<uint16_t> _serializedATN;
 // Constructs the serialized ATN and writes init code for static member vars.
 SerializedATN(model) ::= <<
 <if (rest(model.segments))>
-<model.segments: {segment | static \<uint16_t> serializedATNSegment<i0>[] = {
+<model.segments: {segment | static uint16_t serializedATNSegment<i0>[] = {
   <segment; wrap={<\n>   }>
 \};}; separator="\n">
 
-<model.segments: {segment | _serializedATN.insert(_serializedATN.end(), serializedATNSegment<i0>, serializedATNSegment<i0> + sizeof(serializedATNSegment<i0>) / sizeof(serializedATNSegment<i0>[0])
-}; separator=" +\n">;
+<model.segments: {segment | _serializedATN.insert(_serializedATN.end(), serializedATNSegment<i0>,
+  serializedATNSegment<i0> + sizeof(serializedATNSegment<i0>) / sizeof(serializedATNSegment<i0>[0]));
+}>
   
 <else>
 <! only one segment, can be inlined !>
@@ -460,8 +461,8 @@ Ref\<<parser.name>::<currentRule.ctxType>\> <parser.name>::<currentRule.name>(<a
   <else>
   catch (RecognitionException &e) {
     _localctx->exception = std::make_exception_ptr(e);
-    _errHandler->reportError(this, e);
-    _errHandler->recover(this, e);
+    _errHandler->reportError(this, _localctx->exception);
+    _errHandler->recover(this, _localctx->exception);
   }
   <endif>
 
@@ -507,8 +508,8 @@ Ref\<<parser.name>::<currentRule.ctxType>\> <parser.name>::<currentRule.name>(in
   }
   catch (RecognitionException &e) {
     _localctx->exception = std::make_exception_ptr(e);
-    _errHandler->reportError(this, e);
-    _errHandler->recover(this, e);
+    _errHandler->reportError(this, _localctx->exceptione);
+    _errHandler->recover(this, _localctx->exception);
   }
   return _localctx;
 }

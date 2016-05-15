@@ -32,8 +32,8 @@
 #pragma once
 
 #include "Recognizer.h"
-#include "ATN.h"
-#include "ATNState.h"
+#include "atn/ATN.h"
+#include "atn/ATNState.h"
 
 namespace org {
 namespace antlr {

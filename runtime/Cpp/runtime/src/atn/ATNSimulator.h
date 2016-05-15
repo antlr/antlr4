@@ -31,9 +31,9 @@
 
 #pragma once
 
-#include "ATN.h"
-#include "IntervalSet.h"
-#include "PredictionContext.h"
+#include "atn/ATN.h"
+#include "misc/IntervalSet.h"
+#include "atn/PredictionContext.h"
 
 namespace org {
 namespace antlr {

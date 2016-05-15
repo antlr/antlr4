@@ -30,11 +30,11 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "DFA.h"
-#include "DFAState.h"
+#include "dfa/DFA.h"
+#include "dfa/DFAState.h"
 #include "VocabularyImpl.h"
 
-#include "DFASerializer.h"
+#include "dfa/DFASerializer.h"
 
 using namespace org::antlr::v4::runtime::dfa;
 

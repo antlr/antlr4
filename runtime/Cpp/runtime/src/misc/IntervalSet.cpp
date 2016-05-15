@@ -29,12 +29,12 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "MurmurHash.h"
+#include "misc/MurmurHash.h"
 #include "Lexer.h"
 #include "Exceptions.h"
 #include "VocabularyImpl.h"
 
-#include "IntervalSet.h"
+#include "misc/IntervalSet.h"
 
 using namespace org::antlr::v4::runtime;
 using namespace org::antlr::v4::runtime::misc;

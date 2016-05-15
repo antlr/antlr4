@@ -31,7 +31,7 @@
 
 #include "Exceptions.h"
 
-#include "RuleTagToken.h"
+#include "tree/pattern/RuleTagToken.h"
 
 using namespace org::antlr::v4::runtime::tree::pattern;
 

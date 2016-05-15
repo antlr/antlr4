@@ -29,10 +29,10 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "RuleStopState.h"
-#include "ATNConfigSet.h"
-#include "ATNConfig.h"
-#include "MurmurHash.h"
+#include "atn/RuleStopState.h"
+#include "atn/ATNConfigSet.h"
+#include "atn/ATNConfig.h"
+#include "misc/MurmurHash.h"
 #include "SemanticContext.h"
 
 #include "PredictionMode.h"

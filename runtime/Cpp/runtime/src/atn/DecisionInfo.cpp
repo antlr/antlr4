@@ -29,10 +29,10 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "ErrorInfo.h"
-#include "LookaheadEventInfo.h"
+#include "atn/ErrorInfo.h"
+#include "atn/LookaheadEventInfo.h"
 
-#include "DecisionInfo.h"
+#include "atn/DecisionInfo.h"
 
 using namespace org::antlr::v4::runtime::atn;
 
