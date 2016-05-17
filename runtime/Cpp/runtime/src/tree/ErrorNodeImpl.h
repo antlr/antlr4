@@ -31,9 +31,9 @@
 
 #pragma once
 
-#include "ErrorNode.h"
-#include "TerminalNodeImpl.h"
-#include "Interval.h"
+#include "tree/ErrorNode.h"
+#include "tree/TerminalNodeImpl.h"
+#include "misc/Interval.h"
 
 namespace org {
 namespace antlr {

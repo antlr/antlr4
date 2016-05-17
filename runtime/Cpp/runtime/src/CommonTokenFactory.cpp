@@ -29,7 +29,7 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "Interval.h"
+#include "misc/Interval.h"
 #include "CommonToken.h"
 #include "CharStream.h"
 

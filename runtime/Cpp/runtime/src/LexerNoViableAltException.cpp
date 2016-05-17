@@ -29,8 +29,8 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "Interval.h"
-#include "CPPUtils.h"
+#include "misc/Interval.h"
+#include "support/CPPUtils.h"
 #include "CharStream.h"
 #include "Lexer.h"
 

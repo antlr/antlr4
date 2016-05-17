@@ -29,15 +29,15 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "MurmurHash.h"
-#include "DecisionState.h"
-#include "PredictionContext.h"
+#include "misc/MurmurHash.h"
+#include "atn/DecisionState.h"
+#include "atn/PredictionContext.h"
 #include "SemanticContext.h"
-#include "LexerActionExecutor.h"
+#include "atn/LexerActionExecutor.h"
 
-#include "CPPUtils.h"
+#include "support/CPPUtils.h"
 
-#include "LexerATNConfig.h"
+#include "atn/LexerATNConfig.h"
 
 using namespace org::antlr::v4::runtime::atn;
 using namespace antlrcpp;

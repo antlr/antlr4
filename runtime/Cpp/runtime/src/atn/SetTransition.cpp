@@ -30,9 +30,9 @@
  */
 
 #include "Token.h"
-#include "IntervalSet.h"
+#include "misc/IntervalSet.h"
 
-#include "SetTransition.h"
+#include "atn/SetTransition.h"
 
 using namespace org::antlr::v4::runtime;
 using namespace org::antlr::v4::runtime::atn;

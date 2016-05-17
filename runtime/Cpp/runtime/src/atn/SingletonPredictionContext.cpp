@@ -29,9 +29,9 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "EmptyPredictionContext.h"
+#include "atn/EmptyPredictionContext.h"
 
-#include "SingletonPredictionContext.h"
+#include "atn/SingletonPredictionContext.h"
 
 using namespace org::antlr::v4::runtime::atn;
 

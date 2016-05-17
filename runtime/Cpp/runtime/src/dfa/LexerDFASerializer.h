@@ -31,7 +31,7 @@
 
 #pragma once
 
-#include "DFASerializer.h"
+#include "dfa/DFASerializer.h"
 
 namespace org {
 namespace antlr {

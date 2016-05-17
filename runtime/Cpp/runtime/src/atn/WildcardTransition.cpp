@@ -29,9 +29,9 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "ATNState.h"
+#include "atn/ATNState.h"
 
-#include "WildcardTransition.h"
+#include "atn/WildcardTransition.h"
 
 using namespace org::antlr::v4::runtime::atn;
 

@@ -29,9 +29,9 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "IntervalSet.h"
+#include "misc/IntervalSet.h"
 
-#include "RangeTransition.h"
+#include "atn/RangeTransition.h"
 
 using namespace org::antlr::v4::runtime;
 using namespace org::antlr::v4::runtime::atn;

@@ -29,12 +29,12 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "ErrorNode.h"
+#include "tree/ErrorNode.h"
 #include "ParserRuleContext.h"
-#include "ParseTreeListener.h"
-#include "CPPUtils.h"
+#include "tree/ParseTreeListener.h"
+#include "support/CPPUtils.h"
 
-#include "ParseTreeWalker.h"
+#include "tree/ParseTreeWalker.h"
 
 using namespace org::antlr::v4::runtime::tree;
 using namespace antlrcpp;

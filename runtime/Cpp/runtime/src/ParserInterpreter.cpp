@@ -29,27 +29,27 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "DFA.h"
-#include "RuleStartState.h"
+#include "dfa/DFA.h"
+#include "atn/RuleStartState.h"
 #include "InterpreterRuleContext.h"
-#include "ParserATNSimulator.h"
+#include "atn/ParserATNSimulator.h"
 #include "ANTLRErrorStrategy.h"
-#include "LoopEndState.h"
+#include "atn/LoopEndState.h"
 #include "FailedPredicateException.h"
-#include "StarLoopEntryState.h"
-#include "AtomTransition.h"
-#include "RuleTransition.h"
-#include "PredicateTransition.h"
-#include "PrecedencePredicateTransition.h"
-#include "ActionTransition.h"
-#include "ATN.h"
-#include "RuleStopState.h"
+#include "atn/StarLoopEntryState.h"
+#include "atn/AtomTransition.h"
+#include "atn/RuleTransition.h"
+#include "atn/PredicateTransition.h"
+#include "atn/PrecedencePredicateTransition.h"
+#include "atn/ActionTransition.h"
+#include "atn/ATN.h"
+#include "atn/RuleStopState.h"
 #include "Token.h"
 #include "VocabularyImpl.h"
 #include "InputMismatchException.h"
 #include "CommonToken.h"
 
-#include "CPPUtils.h"
+#include "support/CPPUtils.h"
 
 #include "ParserInterpreter.h"
 
@@ -149,8 +149,9 @@ Ref<ParserRuleContext> ParserInterpreter::parse(int startRuleIndex) {
         }
         catch (RecognitionException &e) {
           setState(_atn.ruleToStopState[p->ruleIndex]->stateNumber);
-          getContext()->exception = std::make_exception_ptr(e);
-          getErrorHandler()->reportError(this, e);
+          std::exception_ptr ptr = std::make_exception_ptr(e);
+          getContext()->exception = ptr;
+          getErrorHandler()->reportError(this, ptr);
           recover(e);
         }
         
@@ -301,7 +302,7 @@ void ParserInterpreter::visitRuleStopState(atn::ATNState *p) {
 
 void ParserInterpreter::recover(RecognitionException &e) {
   size_t i = _input->index();
-  getErrorHandler()->recover(this, e);
+  getErrorHandler()->recover(this, std::make_exception_ptr(e));
 
   if (_input->index() == i) {
     // no input consumed, better add an error node

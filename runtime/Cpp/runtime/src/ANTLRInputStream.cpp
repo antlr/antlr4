@@ -30,11 +30,11 @@
  */
 
 #include "Exceptions.h"
-#include "Interval.h"
+#include "misc/Interval.h"
 #include "IntStream.h"
 
-#include "StringUtils.h"
-#include "CPPUtils.h"
+#include "support/StringUtils.h"
+#include "support/CPPUtils.h"
 
 #include "ANTLRInputStream.h"
 

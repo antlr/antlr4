@@ -31,10 +31,10 @@
 
 #pragma once
 
-#include "ContextSensitivityInfo.h"
-#include "AmbiguityInfo.h"
-#include "PredicateEvalInfo.h"
-#include "ErrorInfo.h"
+#include "atn/ContextSensitivityInfo.h"
+#include "atn/AmbiguityInfo.h"
+#include "atn/PredicateEvalInfo.h"
+#include "atn/ErrorInfo.h"
 
 namespace org {
 namespace antlr {

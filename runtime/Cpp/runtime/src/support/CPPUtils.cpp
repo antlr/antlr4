@@ -28,7 +28,7 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "CPPUtils.h"
+#include "support/CPPUtils.h"
 
 namespace antlrcpp {
 
@@ -160,4 +160,61 @@ namespace antlrcpp {
 
     return join(parts, "\n");
   }
+
+  //--------------------------------------------------------------------------------------------------
+
+  // Recursively get the error from a, possibly nested, exception.
+  template <typename T>
+  std::exception_ptr get_nested(const T &e)
+  {
+    try
+    {
+      auto nested = dynamic_cast<const std::nested_exception&>(e);
+      return nested.nested_ptr();
+    }
+    catch (const std::bad_cast &)
+    { return nullptr; }
+  }
+
+  std::string what(std::exception_ptr eptr)
+  {
+    if (!eptr) {
+      throw std::bad_exception();
+    }
+
+    std::string result;
+    std::size_t nestCount = 0;
+
+  next:
+    {
+      try
+      {
+        std::exception_ptr yeptr;
+        std::swap(eptr, yeptr);
+        std::rethrow_exception(yeptr);
+      }
+      catch (const std::exception &e) {
+        result += e.what();
+        eptr = get_nested(e);
+      }
+      catch (const std::string &e) {
+        result += e;
+      }
+      catch (const char *e) {
+        result += e;
+      }
+      catch (...) {
+        result += "cannot be determined";
+      }
+
+      if (eptr) {
+        result += " (";
+        ++nestCount;
+        goto next;
+      }
+    }
+    result += std::string(nestCount, ')');
+    return result;
+  }
+
 } // namespace antlrcpp

@@ -30,6 +30,8 @@
 
 #pragma once
 
+#include "antlr4-common.h"
+
 namespace antlrcpp {
   // For all conversions utf8 <-> utf32.
   static std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> utfConverter;

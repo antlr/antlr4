@@ -29,12 +29,12 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "ATN.h"
-#include "Transition.h"
-#include "IntervalSet.h"
-#include "CPPUtils.h"
+#include "atn/ATN.h"
+#include "atn/Transition.h"
+#include "misc/IntervalSet.h"
+#include "support/CPPUtils.h"
 
-#include "ATNState.h"
+#include "atn/ATNState.h"
 
 using namespace org::antlr::v4::runtime::atn;
 using namespace antlrcpp;

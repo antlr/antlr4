@@ -31,7 +31,7 @@
 
 #pragma once
 
-#include "DecisionEventInfo.h"
+#include "atn/DecisionEventInfo.h"
 
 namespace org {
 namespace antlr {

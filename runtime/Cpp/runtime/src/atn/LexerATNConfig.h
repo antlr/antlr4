@@ -31,7 +31,7 @@
 
 #pragma once
 
-#include "ATNConfig.h"
+#include "atn/ATNConfig.h"
 
 namespace org {
 namespace antlr {

@@ -31,7 +31,7 @@
 
 #pragma once
 
-#include "BitSet.h"
+#include "support/BitSet.h"
 
 namespace org {
 namespace antlr {

@@ -29,11 +29,11 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "ATN.h"
+#include "atn/ATN.h"
 #include "Recognizer.h"
-#include "StringUtils.h"
+#include "support/StringUtils.h"
 #include "ParserRuleContext.h"
-#include "IntervalSet.h"
+#include "misc/IntervalSet.h"
 
 #include "RecognitionException.h"
 

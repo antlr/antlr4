@@ -29,9 +29,9 @@
 *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "Interval.h"
+#include "misc/Interval.h"
 #include "Exceptions.h"
-#include "StringUtils.h"
+#include "support/StringUtils.h"
 
 #include "UnbufferedCharStream.h"
 

@@ -29,28 +29,28 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "ParseTreePattern.h"
-#include "ParseTreeMatch.h"
-#include "TerminalNode.h"
+#include "tree/pattern/ParseTreePattern.h"
+#include "tree/pattern/ParseTreeMatch.h"
+#include "tree/TerminalNode.h"
 #include "CommonTokenStream.h"
 #include "ParserInterpreter.h"
-#include "TokenTagToken.h"
+#include "tree/pattern/TokenTagToken.h"
 #include "ParserRuleContext.h"
-#include "RuleTagToken.h"
-#include "TagChunk.h"
-#include "ATN.h"
+#include "tree/pattern/RuleTagToken.h"
+#include "tree/pattern/TagChunk.h"
+#include "atn/ATN.h"
 #include "Lexer.h"
 #include "BailErrorStrategy.h"
 
 #include "ListTokenSource.h"
-#include "TextChunk.h"
+#include "tree/pattern/TextChunk.h"
 #include "ANTLRInputStream.h"
-#include "Arrays.h"
+#include "support/Arrays.h"
 #include "Exceptions.h"
-#include "StringUtils.h"
-#include "CPPUtils.h"
+#include "support/StringUtils.h"
+#include "support/CPPUtils.h"
 
-#include "ParseTreePatternMatcher.h"
+#include "tree/pattern/ParseTreePatternMatcher.h"
 
 using namespace org::antlr::v4::runtime;
 using namespace org::antlr::v4::runtime::tree;

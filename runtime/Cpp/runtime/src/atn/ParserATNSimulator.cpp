@@ -32,33 +32,33 @@
 // TODO: Using "wcout <<" for debug information is really lame, change out with
 // some kind of listener
 
-#include "DFA.h"
+#include "dfa/DFA.h"
 #include "NoViableAltException.h"
-#include "DecisionState.h"
+#include "atn/DecisionState.h"
 #include "ParserRuleContext.h"
-#include "IntervalSet.h"
+#include "misc/IntervalSet.h"
 #include "Parser.h"
 #include "CommonTokenStream.h"
-#include "EmptyPredictionContext.h"
-#include "NotSetTransition.h"
-#include "AtomTransition.h"
-#include "RuleTransition.h"
-#include "PredicateTransition.h"
-#include "PrecedencePredicateTransition.h"
-#include "ActionTransition.h"
-#include "EpsilonTransition.h"
-#include "RuleStopState.h"
-#include "ATNConfigSet.h"
-#include "ATNConfig.h"
-#include "Interval.h"
+#include "atn/EmptyPredictionContext.h"
+#include "atn/NotSetTransition.h"
+#include "atn/AtomTransition.h"
+#include "atn/RuleTransition.h"
+#include "atn/PredicateTransition.h"
+#include "atn/PrecedencePredicateTransition.h"
+#include "atn/ActionTransition.h"
+#include "atn/EpsilonTransition.h"
+#include "atn/RuleStopState.h"
+#include "atn/ATNConfigSet.h"
+#include "atn/ATNConfig.h"
+#include "misc/Interval.h"
 #include "ANTLRErrorListener.h"
 
 #include "Vocabulary.h"
 #include "VocabularyImpl.h"
 
-#include "Arrays.h"
+#include "support/Arrays.h"
 
-#include "ParserATNSimulator.h"
+#include "atn/ParserATNSimulator.h"
 
 using namespace org::antlr::v4::runtime;
 using namespace org::antlr::v4::runtime::atn;

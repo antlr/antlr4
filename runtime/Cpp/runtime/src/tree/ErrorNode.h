@@ -31,7 +31,7 @@
 
 #pragma once
 
-#include "TerminalNode.h"
+#include "tree/TerminalNode.h"
 
 namespace org {
 namespace antlr {

@@ -1,7 +1,6 @@
 /*
  * [The "BSD license"]
  *  Copyright (c) 2016 Mike Lischke
- *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -28,11 +27,7 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-// Prefix header
-//
-// Use this as (automatically included) precompiled header file.
-
-#ifdef __cplusplus
+#pragma once
 
 #include <algorithm>
 #include <assert.h>
@@ -95,8 +90,8 @@
   #define EXPIMP_TEMPLATE
 #endif
 
-#include "guid.h"
-#include "Declarations.h"
+#include "support/guid.h"
+#include "support/Declarations.h"
 
 #if !defined(HAS_NOEXCEPT)
   #if defined(__clang__)
@@ -124,5 +119,3 @@
 #endif
 
 template<class T> using Ref = std::shared_ptr<T>;
-
-#endif

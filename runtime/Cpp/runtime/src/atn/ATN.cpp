@@ -29,18 +29,18 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "LL1Analyzer.h"
+#include "atn/LL1Analyzer.h"
 #include "Token.h"
-#include "RuleTransition.h"
-#include "IntervalSet.h"
+#include "atn/RuleTransition.h"
+#include "misc/IntervalSet.h"
 #include "RuleContext.h"
-#include "DecisionState.h"
+#include "atn/DecisionState.h"
 #include "Recognizer.h"
-#include "ATNType.h"
+#include "atn/ATNType.h"
 #include "Exceptions.h"
-#include "CPPUtils.h"
+#include "support/CPPUtils.h"
 
-#include "ATN.h"
+#include "atn/ATN.h"
 
 using namespace org::antlr::v4::runtime;
 using namespace org::antlr::v4::runtime::atn;

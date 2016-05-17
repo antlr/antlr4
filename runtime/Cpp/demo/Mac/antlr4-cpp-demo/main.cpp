@@ -7,8 +7,7 @@
 
 #include <iostream>
 
-#include "ANTLRInputStream.h"
-#include "CommonTokenStream.h"
+#include "antlr4-runtime.h"
 #include "TLexer.h"
 #include "TParser.h"
 

@@ -31,7 +31,7 @@
 
 #pragma once
 
-#include "Interval.h"
+#include "misc/Interval.h"
 
 namespace org {
 namespace antlr {

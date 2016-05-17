@@ -31,9 +31,9 @@
 
 #pragma once
 
-#include "ATNSimulator.h"
-#include "LexerATNConfig.h"
-#include "ATNConfigSet.h"
+#include "atn/ATNSimulator.h"
+#include "atn/LexerATNConfig.h"
+#include "atn/ATNConfigSet.h"
 
 namespace org {
 namespace antlr {

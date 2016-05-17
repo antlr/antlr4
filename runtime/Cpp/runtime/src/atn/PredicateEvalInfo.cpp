@@ -31,7 +31,7 @@
 
 #include "SemanticContext.h"
 
-#include "PredicateEvalInfo.h"
+#include "atn/PredicateEvalInfo.h"
 
 using namespace org::antlr::v4::runtime;
 using namespace org::antlr::v4::runtime::atn;

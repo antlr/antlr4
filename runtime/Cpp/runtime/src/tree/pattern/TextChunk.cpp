@@ -31,7 +31,7 @@
 
 #include "Exceptions.h"
 
-#include "TextChunk.h"
+#include "tree/pattern/TextChunk.h"
 
 using namespace org::antlr::v4::runtime::tree::pattern;
 

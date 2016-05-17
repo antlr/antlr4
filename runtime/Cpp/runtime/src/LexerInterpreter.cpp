@@ -29,10 +29,10 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "ATNType.h"
-#include "LexerATNSimulator.h"
-#include "DFA.h"
-#include "EmptyPredictionContext.h"
+#include "atn/ATNType.h"
+#include "atn/LexerATNSimulator.h"
+#include "dfa/DFA.h"
+#include "atn/EmptyPredictionContext.h"
 #include "Exceptions.h"
 #include "VocabularyImpl.h"
 
@@ -43,7 +43,7 @@ using namespace org::antlr::v4::runtime;
 LexerInterpreter::LexerInterpreter(const std::string &grammarFileName, const std::vector<std::string> &tokenNames,
   const std::vector<std::string> &ruleNames, const std::vector<std::string> &modeNames, const atn::ATN &atn,
   CharStream *input)
-: LexerInterpreter(grammarFileName, dfa::VocabularyImpl::fromTokenNames(tokenNames), ruleNames, modeNames, atn, input) {
+  : LexerInterpreter(grammarFileName, dfa::VocabularyImpl::fromTokenNames(tokenNames), ruleNames, modeNames, atn, input) {
 }
 
 LexerInterpreter::LexerInterpreter(const std::string &grammarFileName, Ref<dfa::Vocabulary> vocabulary,

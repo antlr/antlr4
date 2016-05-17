@@ -29,10 +29,10 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "Interval.h"
+#include "misc/Interval.h"
 #include "Token.h"
 
-#include "TerminalNodeImpl.h"
+#include "tree/TerminalNodeImpl.h"
 
 using namespace org::antlr::v4::runtime;
 using namespace org::antlr::v4::runtime::tree;

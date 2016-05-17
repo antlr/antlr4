@@ -30,10 +30,10 @@
  */
 
 #include "Exceptions.h"
-#include "Interval.h"
+#include "misc/Interval.h"
 #include "Token.h"
 #include "TokenStream.h"
-#include "CPPUtils.h"
+#include "support/CPPUtils.h"
 
 #include "TokenStreamRewriter.h"
 

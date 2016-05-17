@@ -9,9 +9,6 @@
 /* Begin PBXBuildFile section */
 		270C67F31CDB4F1E00116E17 /* antlrcpp_ios.h in Headers */ = {isa = PBXBuildFile; fileRef = 270C67F21CDB4F1E00116E17 /* antlrcpp_ios.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		270C69E01CDB536A00116E17 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 270C69DF1CDB536A00116E17 /* CoreFoundation.framework */; };
-		276E5D2B1CDB57AA003FF4B4 /* antlrcpp-Prefix.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5C0B1CDB57AA003FF4B4 /* antlrcpp-Prefix.h */; };
-		276E5D2C1CDB57AA003FF4B4 /* antlrcpp-Prefix.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5C0B1CDB57AA003FF4B4 /* antlrcpp-Prefix.h */; };
-		276E5D2D1CDB57AA003FF4B4 /* antlrcpp-Prefix.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5C0B1CDB57AA003FF4B4 /* antlrcpp-Prefix.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		276E5D2E1CDB57AA003FF4B4 /* ANTLRErrorListener.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5C0C1CDB57AA003FF4B4 /* ANTLRErrorListener.h */; };
 		276E5D2F1CDB57AA003FF4B4 /* ANTLRErrorListener.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5C0C1CDB57AA003FF4B4 /* ANTLRErrorListener.h */; };
 		276E5D301CDB57AA003FF4B4 /* ANTLRErrorListener.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5C0C1CDB57AA003FF4B4 /* ANTLRErrorListener.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -833,14 +830,19 @@
 		27745F081CE49C000067C6A3 /* RuntimeMetaData.h in Headers */ = {isa = PBXBuildFile; fileRef = 27745EFC1CE49C000067C6A3 /* RuntimeMetaData.h */; };
 		27874F1E1CCB7A0700AF1C53 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 27874F1D1CCB7A0700AF1C53 /* CoreFoundation.framework */; };
 		27874F211CCB7B1700AF1C53 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 27874F1D1CCB7A0700AF1C53 /* CoreFoundation.framework */; };
+		2794D8561CE7821B00FADD0F /* antlr4-common.h in Headers */ = {isa = PBXBuildFile; fileRef = 2794D8551CE7821B00FADD0F /* antlr4-common.h */; };
+		2794D8571CE7821B00FADD0F /* antlr4-common.h in Headers */ = {isa = PBXBuildFile; fileRef = 2794D8551CE7821B00FADD0F /* antlr4-common.h */; };
+		2794D8581CE7821B00FADD0F /* antlr4-common.h in Headers */ = {isa = PBXBuildFile; fileRef = 2794D8551CE7821B00FADD0F /* antlr4-common.h */; };
+		27AC52D01CE773A80093AAAB /* antlr4-runtime.h in Headers */ = {isa = PBXBuildFile; fileRef = 27AC52CF1CE773A80093AAAB /* antlr4-runtime.h */; };
+		27AC52D11CE773A80093AAAB /* antlr4-runtime.h in Headers */ = {isa = PBXBuildFile; fileRef = 27AC52CF1CE773A80093AAAB /* antlr4-runtime.h */; };
+		27AC52D21CE773A80093AAAB /* antlr4-runtime.h in Headers */ = {isa = PBXBuildFile; fileRef = 27AC52CF1CE773A80093AAAB /* antlr4-runtime.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		270C67F01CDB4F1E00116E17 /* antlrcpp_ios.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = antlrcpp_ios.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		270C67F21CDB4F1E00116E17 /* antlrcpp_ios.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = antlrcpp_ios.h; sourceTree = "<group>"; };
+		270C67F21CDB4F1E00116E17 /* antlrcpp_ios.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = antlrcpp_ios.h; sourceTree = "<group>"; wrapsLines = 0; };
 		270C67F41CDB4F1E00116E17 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		270C69DF1CDB536A00116E17 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS9.3.sdk/System/Library/Frameworks/CoreFoundation.framework; sourceTree = DEVELOPER_DIR; };
-		276E5C0B1CDB57AA003FF4B4 /* antlrcpp-Prefix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "antlrcpp-Prefix.h"; sourceTree = "<group>"; };
 		276E5C0C1CDB57AA003FF4B4 /* ANTLRErrorListener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRErrorListener.h; sourceTree = "<group>"; };
 		276E5C0D1CDB57AA003FF4B4 /* ANTLRErrorStrategy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRErrorStrategy.h; sourceTree = "<group>"; };
 		276E5C0E1CDB57AA003FF4B4 /* ANTLRFileStream.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ANTLRFileStream.cpp; sourceTree = "<group>"; };
@@ -859,7 +861,7 @@
 		276E5C1C1CDB57AA003FF4B4 /* ATN.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ATN.h; sourceTree = "<group>"; };
 		276E5C1D1CDB57AA003FF4B4 /* ATNConfig.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ATNConfig.cpp; sourceTree = "<group>"; wrapsLines = 0; };
 		276E5C1E1CDB57AA003FF4B4 /* ATNConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ATNConfig.h; sourceTree = "<group>"; };
-		276E5C1F1CDB57AA003FF4B4 /* ATNConfigSet.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ATNConfigSet.cpp; sourceTree = "<group>"; };
+		276E5C1F1CDB57AA003FF4B4 /* ATNConfigSet.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ATNConfigSet.cpp; sourceTree = "<group>"; wrapsLines = 0; };
 		276E5C201CDB57AA003FF4B4 /* ATNConfigSet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ATNConfigSet.h; sourceTree = "<group>"; };
 		276E5C211CDB57AA003FF4B4 /* ATNDeserializationOptions.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ATNDeserializationOptions.cpp; sourceTree = "<group>"; };
 		276E5C221CDB57AA003FF4B4 /* ATNDeserializationOptions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ATNDeserializationOptions.h; sourceTree = "<group>"; };
@@ -930,7 +932,7 @@
 		276E5C651CDB57AA003FF4B4 /* LoopEndState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoopEndState.h; sourceTree = "<group>"; };
 		276E5C671CDB57AA003FF4B4 /* NotSetTransition.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NotSetTransition.cpp; sourceTree = "<group>"; wrapsLines = 0; };
 		276E5C681CDB57AA003FF4B4 /* NotSetTransition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NotSetTransition.h; sourceTree = "<group>"; };
-		276E5C691CDB57AA003FF4B4 /* OrderedATNConfigSet.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = OrderedATNConfigSet.cpp; sourceTree = "<group>"; };
+		276E5C691CDB57AA003FF4B4 /* OrderedATNConfigSet.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = OrderedATNConfigSet.cpp; sourceTree = "<group>"; wrapsLines = 0; };
 		276E5C6A1CDB57AA003FF4B4 /* OrderedATNConfigSet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OrderedATNConfigSet.h; sourceTree = "<group>"; };
 		276E5C6B1CDB57AA003FF4B4 /* ParseInfo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParseInfo.cpp; sourceTree = "<group>"; };
 		276E5C6C1CDB57AA003FF4B4 /* ParseInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParseInfo.h; sourceTree = "<group>"; };
@@ -1006,7 +1008,7 @@
 		276E5CB31CDB57AA003FF4B4 /* LexerDFASerializer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LexerDFASerializer.h; sourceTree = "<group>"; };
 		276E5CB41CDB57AA003FF4B4 /* DiagnosticErrorListener.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DiagnosticErrorListener.cpp; sourceTree = "<group>"; };
 		276E5CB51CDB57AA003FF4B4 /* DiagnosticErrorListener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DiagnosticErrorListener.h; sourceTree = "<group>"; };
-		276E5CB61CDB57AA003FF4B4 /* Exceptions.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Exceptions.cpp; sourceTree = "<group>"; };
+		276E5CB61CDB57AA003FF4B4 /* Exceptions.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Exceptions.cpp; sourceTree = "<group>"; wrapsLines = 0; };
 		276E5CB71CDB57AA003FF4B4 /* Exceptions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Exceptions.h; sourceTree = "<group>"; };
 		276E5CB81CDB57AA003FF4B4 /* FailedPredicateException.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FailedPredicateException.cpp; sourceTree = "<group>"; };
 		276E5CB91CDB57AA003FF4B4 /* FailedPredicateException.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FailedPredicateException.h; sourceTree = "<group>"; };
@@ -1019,7 +1021,7 @@
 		276E5CC01CDB57AA003FF4B4 /* IRecognizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IRecognizer.h; sourceTree = "<group>"; };
 		276E5CC11CDB57AA003FF4B4 /* Lexer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Lexer.cpp; sourceTree = "<group>"; wrapsLines = 0; };
 		276E5CC21CDB57AA003FF4B4 /* Lexer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Lexer.h; sourceTree = "<group>"; };
-		276E5CC31CDB57AA003FF4B4 /* LexerInterpreter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LexerInterpreter.cpp; sourceTree = "<group>"; };
+		276E5CC31CDB57AA003FF4B4 /* LexerInterpreter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LexerInterpreter.cpp; sourceTree = "<group>"; wrapsLines = 0; };
 		276E5CC41CDB57AA003FF4B4 /* LexerInterpreter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LexerInterpreter.h; sourceTree = "<group>"; };
 		276E5CC51CDB57AA003FF4B4 /* LexerNoViableAltException.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LexerNoViableAltException.cpp; sourceTree = "<group>"; };
 		276E5CC61CDB57AA003FF4B4 /* LexerNoViableAltException.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LexerNoViableAltException.h; sourceTree = "<group>"; };
@@ -1034,7 +1036,7 @@
 		276E5CD11CDB57AA003FF4B4 /* Predicate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Predicate.h; sourceTree = "<group>"; };
 		276E5CD21CDB57AA003FF4B4 /* TestRig.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TestRig.cpp; sourceTree = "<group>"; };
 		276E5CD31CDB57AA003FF4B4 /* TestRig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestRig.h; sourceTree = "<group>"; };
-		276E5CD41CDB57AA003FF4B4 /* NoViableAltException.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NoViableAltException.cpp; sourceTree = "<group>"; };
+		276E5CD41CDB57AA003FF4B4 /* NoViableAltException.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NoViableAltException.cpp; sourceTree = "<group>"; wrapsLines = 0; };
 		276E5CD51CDB57AA003FF4B4 /* NoViableAltException.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NoViableAltException.h; sourceTree = "<group>"; };
 		276E5CD61CDB57AA003FF4B4 /* Parser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Parser.cpp; sourceTree = "<group>"; };
 		276E5CD71CDB57AA003FF4B4 /* Parser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Parser.h; sourceTree = "<group>"; };
@@ -1115,6 +1117,8 @@
 		27745EFB1CE49C000067C6A3 /* RuntimeMetaData.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RuntimeMetaData.cpp; sourceTree = "<group>"; wrapsLines = 0; };
 		27745EFC1CE49C000067C6A3 /* RuntimeMetaData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RuntimeMetaData.h; sourceTree = "<group>"; };
 		27874F1D1CCB7A0700AF1C53 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
+		2794D8551CE7821B00FADD0F /* antlr4-common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "antlr4-common.h"; sourceTree = "<group>"; };
+		27AC52CF1CE773A80093AAAB /* antlr4-runtime.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "antlr4-runtime.h"; sourceTree = "<group>"; };
 		37C147171B4D5A04008EDDDB /* libantlrcpp_static.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libantlrcpp_static.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		37D727AA1867AF1E007B6D10 /* antlrcpp.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = antlrcpp.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -1164,7 +1168,8 @@
 				276E5CC91CDB57AA003FF4B4 /* misc */,
 				276E5CE41CDB57AA003FF4B4 /* support */,
 				276E5CF91CDB57AA003FF4B4 /* tree */,
-				276E5C0B1CDB57AA003FF4B4 /* antlrcpp-Prefix.h */,
+				2794D8551CE7821B00FADD0F /* antlr4-common.h */,
+				27AC52CF1CE773A80093AAAB /* antlr4-runtime.h */,
 				276E5C0C1CDB57AA003FF4B4 /* ANTLRErrorListener.h */,
 				276E5C0D1CDB57AA003FF4B4 /* ANTLRErrorStrategy.h */,
 				276E5C0E1CDB57AA003FF4B4 /* ANTLRFileStream.cpp */,
@@ -1534,6 +1539,7 @@
 				276E5D6F1CDB57AA003FF4B4 /* ATNDeserializationOptions.h in Headers */,
 				276E5EDD1CDB57AA003FF4B4 /* BaseErrorListener.h in Headers */,
 				276E5DB71CDB57AA003FF4B4 /* DecisionEventInfo.h in Headers */,
+				27AC52D21CE773A80093AAAB /* antlr4-runtime.h in Headers */,
 				276E5E2C1CDB57AA003FF4B4 /* LL1Analyzer.h in Headers */,
 				276E5D7B1CDB57AA003FF4B4 /* ATNSerializer.h in Headers */,
 				276E5EAD1CDB57AA003FF4B4 /* SingletonPredictionContext.h in Headers */,
@@ -1649,6 +1655,7 @@
 				276E5F071CDB57AA003FF4B4 /* DefaultErrorStrategy.h in Headers */,
 				276E5F3D1CDB57AA003FF4B4 /* InterpreterRuleContext.h in Headers */,
 				276E5F131CDB57AA003FF4B4 /* DFASerializer.h in Headers */,
+				2794D8581CE7821B00FADD0F /* antlr4-common.h in Headers */,
 				276E5F371CDB57AA003FF4B4 /* InputMismatchException.h in Headers */,
 				276E5FDC1CDB57AA003FF4B4 /* TokenSource.h in Headers */,
 				276E5ED11CDB57AA003FF4B4 /* WildcardTransition.h in Headers */,
@@ -1662,7 +1669,6 @@
 				276E5EB31CDB57AA003FF4B4 /* StarBlockStartState.h in Headers */,
 				276E5F701CDB57AA003FF4B4 /* MurmurHash.h in Headers */,
 				276E60211CDB57AA003FF4B4 /* ParseTreePatternMatcher.h in Headers */,
-				276E5D2D1CDB57AA003FF4B4 /* antlrcpp-Prefix.h in Headers */,
 				276E5D631CDB57AA003FF4B4 /* ATNConfig.h in Headers */,
 				276E5E4D1CDB57AA003FF4B4 /* ParseInfo.h in Headers */,
 				276E5F881CDB57AA003FF4B4 /* Parser.h in Headers */,
@@ -1688,6 +1694,7 @@
 				276E605F1CDB57AA003FF4B4 /* UnbufferedCharStream.h in Headers */,
 				276E5DD71CDB57AA003FF4B4 /* LexerAction.h in Headers */,
 				276E5FF61CDB57AA003FF4B4 /* ParseTree.h in Headers */,
+				27AC52D11CE773A80093AAAB /* antlr4-runtime.h in Headers */,
 				276E5DA71CDB57AA003FF4B4 /* BlockStartState.h in Headers */,
 				276E5FE11CDB57AA003FF4B4 /* TokenStream.h in Headers */,
 				276E5D6E1CDB57AA003FF4B4 /* ATNDeserializationOptions.h in Headers */,
@@ -1801,6 +1808,7 @@
 				276E60051CDB57AA003FF4B4 /* ParseTreeVisitor.h in Headers */,
 				276E5D561CDB57AA003FF4B4 /* ArrayPredictionContext.h in Headers */,
 				276E5E521CDB57AA003FF4B4 /* ParserATNSimulator.h in Headers */,
+				2794D8571CE7821B00FADD0F /* antlr4-common.h in Headers */,
 				276E60651CDB57AA003FF4B4 /* UnbufferedTokenStream.h in Headers */,
 				276E5F691CDB57AA003FF4B4 /* IntervalSet.h in Headers */,
 				276E5E641CDB57AA003FF4B4 /* PrecedencePredicateTransition.h in Headers */,
@@ -1820,7 +1828,6 @@
 				276E5EB21CDB57AA003FF4B4 /* StarBlockStartState.h in Headers */,
 				276E5F6F1CDB57AA003FF4B4 /* MurmurHash.h in Headers */,
 				276E60201CDB57AA003FF4B4 /* ParseTreePatternMatcher.h in Headers */,
-				276E5D2C1CDB57AA003FF4B4 /* antlrcpp-Prefix.h in Headers */,
 				276E5D621CDB57AA003FF4B4 /* ATNConfig.h in Headers */,
 				276E5E4C1CDB57AA003FF4B4 /* ParseInfo.h in Headers */,
 				276E5F871CDB57AA003FF4B4 /* Parser.h in Headers */,
@@ -1845,6 +1852,7 @@
 				276E605E1CDB57AA003FF4B4 /* UnbufferedCharStream.h in Headers */,
 				276E5DD61CDB57AA003FF4B4 /* LexerAction.h in Headers */,
 				276E5FF51CDB57AA003FF4B4 /* ParseTree.h in Headers */,
+				27AC52D01CE773A80093AAAB /* antlr4-runtime.h in Headers */,
 				276E5DA61CDB57AA003FF4B4 /* BlockStartState.h in Headers */,
 				276E5FE01CDB57AA003FF4B4 /* TokenStream.h in Headers */,
 				276E5D6D1CDB57AA003FF4B4 /* ATNDeserializationOptions.h in Headers */,
@@ -1958,6 +1966,7 @@
 				276E60041CDB57AA003FF4B4 /* ParseTreeVisitor.h in Headers */,
 				276E5D551CDB57AA003FF4B4 /* ArrayPredictionContext.h in Headers */,
 				276E5E511CDB57AA003FF4B4 /* ParserATNSimulator.h in Headers */,
+				2794D8561CE7821B00FADD0F /* antlr4-common.h in Headers */,
 				276E60641CDB57AA003FF4B4 /* UnbufferedTokenStream.h in Headers */,
 				276E5F681CDB57AA003FF4B4 /* IntervalSet.h in Headers */,
 				276E5E631CDB57AA003FF4B4 /* PrecedencePredicateTransition.h in Headers */,
@@ -1977,7 +1986,6 @@
 				276E5EB11CDB57AA003FF4B4 /* StarBlockStartState.h in Headers */,
 				276E5F6E1CDB57AA003FF4B4 /* MurmurHash.h in Headers */,
 				276E601F1CDB57AA003FF4B4 /* ParseTreePatternMatcher.h in Headers */,
-				276E5D2B1CDB57AA003FF4B4 /* antlrcpp-Prefix.h in Headers */,
 				276E5D611CDB57AA003FF4B4 /* ATNConfig.h in Headers */,
 				276E5E4B1CDB57AA003FF4B4 /* ParseInfo.h in Headers */,
 				276E5F861CDB57AA003FF4B4 /* Parser.h in Headers */,
@@ -2563,7 +2571,6 @@
 				GCC_ENABLE_CPP_EXCEPTIONS = YES;
 				GCC_ENABLE_CPP_RTTI = YES;
 				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
@@ -2587,7 +2594,6 @@
 				GCC_ENABLE_CPP_EXCEPTIONS = YES;
 				GCC_ENABLE_CPP_RTTI = YES;
 				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				MTL_ENABLE_DEBUG_INFO = NO;
@@ -2619,7 +2625,6 @@
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PREFIX_HEADER = "src/antlrcpp-Prefix.h";
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
@@ -2637,14 +2642,7 @@
 				GCC_WARN_UNUSED_LABEL = YES;
 				GCC_WARN_UNUSED_PARAMETER = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = (
-					src/,
-					src/atn,
-					src/dfa,
-					src/misc,
-					src/support,
-					src/tree,
-				);
+				HEADER_SEARCH_PATHS = src/;
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
@@ -2674,7 +2672,6 @@
 				ENABLE_NS_ASSERTIONS = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_PREFIX_HEADER = "src/antlrcpp-Prefix.h";
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
@@ -2687,14 +2684,7 @@
 				GCC_WARN_UNUSED_LABEL = YES;
 				GCC_WARN_UNUSED_PARAMETER = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = (
-					src/,
-					src/atn,
-					src/dfa,
-					src/misc,
-					src/support,
-					src/tree,
-				);
+				HEADER_SEARCH_PATHS = src/;
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				SDKROOT = macosx;
 			};
@@ -2704,7 +2694,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				LD_DYLIB_INSTALL_NAME = "$(EXECUTABLE_PATH)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -2714,7 +2703,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				LD_DYLIB_INSTALL_NAME = "$(EXECUTABLE_PATH)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};

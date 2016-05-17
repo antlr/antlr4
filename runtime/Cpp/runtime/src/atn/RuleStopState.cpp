@@ -29,7 +29,7 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "RuleStopState.h"
+#include "atn/RuleStopState.h"
 
 using namespace org::antlr::v4::runtime::atn;
 

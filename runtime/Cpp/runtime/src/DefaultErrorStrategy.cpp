@@ -30,18 +30,18 @@
  */
 
 #include "NoViableAltException.h"
-#include "IntervalSet.h"
-#include "ParserATNSimulator.h"
+#include "misc/IntervalSet.h"
+#include "atn/ParserATNSimulator.h"
 #include "InputMismatchException.h"
 #include "FailedPredicateException.h"
 #include "ParserRuleContext.h"
-#include "RuleTransition.h"
-#include "ATN.h"
-#include "ATNState.h"
+#include "atn/RuleTransition.h"
+#include "atn/ATN.h"
+#include "atn/ATNState.h"
 #include "Parser.h"
 #include "CommonToken.h"
 #include "Vocabulary.h"
-#include "StringUtils.h"
+#include "support/StringUtils.h"
 
 #include "DefaultErrorStrategy.h"
 
@@ -69,30 +69,28 @@ void DefaultErrorStrategy::reportMatch(Parser *recognizer) {
   endErrorCondition(recognizer);
 }
 
-void DefaultErrorStrategy::reportError(Parser *recognizer, const RecognitionException &e) {
-  // if we've already reported an error and have not matched a token
+void DefaultErrorStrategy::reportError(Parser *recognizer, std::exception_ptr e) {
+  // If we've already reported an error and have not matched a token
   // yet successfully, don't report any errors.
   if (inErrorRecoveryMode(recognizer)) {
     return; // don't report spurious errors
   }
 
   beginErrorCondition(recognizer);
-  if (is<NoViableAltException>(e)) {
-    reportNoViableAlternative(recognizer, (NoViableAltException&)e);
-  } else if (is<const InputMismatchException>(e)) {
-    reportInputMismatch(recognizer, (InputMismatchException&)e);
-  } else if (is<const FailedPredicateException>(e)) {
-    reportFailedPredicate(recognizer, (FailedPredicateException&)e);
-  } else {
-
-    // This is really bush league, I hate libraries that gratuitiously print stuff out.
-    std::cerr << std::string("unknown recognition error type: ") << typeid(e).name() << std::endl;
-
-    recognizer->notifyErrorListeners(e.getOffendingToken(), e.what(), std::make_exception_ptr(e));
+  try {
+    std::rethrow_exception(e);
+  } catch (NoViableAltException &ne) {
+    reportNoViableAlternative(recognizer, ne);
+  } catch (InputMismatchException &ne) {
+    reportInputMismatch(recognizer, ne);
+  } catch (FailedPredicateException &ne) {
+    reportFailedPredicate(recognizer, ne);
+  } catch (RecognitionException &ne) {
+    recognizer->notifyErrorListeners(ne.getOffendingToken(), ne.what(), e);
   }
 }
 
-void DefaultErrorStrategy::recover(Parser *recognizer, const RecognitionException &/*e*/) {
+void DefaultErrorStrategy::recover(Parser *recognizer, std::exception_ptr /*e*/) {
   if (lastErrorIndex == (int)recognizer->getInputStream()->index() &&
       lastErrorStates.contains(recognizer->getState())) {
 

@@ -29,13 +29,13 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "PredicateEvalInfo.h"
-#include "LookaheadEventInfo.h"
+#include "atn/PredicateEvalInfo.h"
+#include "atn/LookaheadEventInfo.h"
 #include "Parser.h"
-#include "ATNConfigSet.h"
-#include "CPPUtils.h"
+#include "atn/ATNConfigSet.h"
+#include "support/CPPUtils.h"
 
-#include "ProfilingATNSimulator.h"
+#include "atn/ProfilingATNSimulator.h"
 
 using namespace org::antlr::v4::runtime;
 using namespace org::antlr::v4::runtime::atn;

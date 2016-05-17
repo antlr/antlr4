@@ -31,8 +31,8 @@
 
 #pragma once
 
-#include "ParseTreeVisitor.h"
-#include "RuleNode.h"
+#include "tree/ParseTreeVisitor.h"
+#include "tree/RuleNode.h"
 
 namespace org {
 namespace antlr {

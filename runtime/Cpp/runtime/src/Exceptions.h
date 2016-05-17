@@ -30,6 +30,8 @@
 
 #pragma once
 
+#include "antlr4-common.h"
+
 namespace org {
 namespace antlr {
 namespace v4 {
