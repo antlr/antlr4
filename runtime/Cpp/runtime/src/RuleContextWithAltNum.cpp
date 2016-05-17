@@ -28,7 +28,7 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "ATN.h"
+#include "atn/ATN.h"
 
 #include "RuleContextWithAltNum.h"
 

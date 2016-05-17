@@ -29,10 +29,10 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "Trees.h"
-#include "Interval.h"
+#include "tree/Trees.h"
+#include "misc/Interval.h"
 #include "Parser.h"
-#include "ATN.h"
+#include "atn/ATN.h"
 
 #include "RuleContext.h"
 

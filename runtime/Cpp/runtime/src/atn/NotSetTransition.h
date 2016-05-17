@@ -31,7 +31,7 @@
 
 #pragma once
 
-#include "SetTransition.h"
+#include "atn/SetTransition.h"
 
 namespace org {
 namespace antlr {

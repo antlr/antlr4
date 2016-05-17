@@ -29,12 +29,12 @@
 *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "ParserATNSimulator.h"
+#include "atn/ParserATNSimulator.h"
 #include "Parser.h"
-#include "PredicateTransition.h"
-#include "ATN.h"
-#include "ATNState.h"
-#include "CPPUtils.h"
+#include "atn/PredicateTransition.h"
+#include "atn/ATN.h"
+#include "atn/ATNState.h"
+#include "support/CPPUtils.h"
 
 #include "FailedPredicateException.h"
 

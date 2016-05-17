@@ -29,7 +29,7 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "RuleStartState.h"
+#include "atn/RuleStartState.h"
 
 using namespace org::antlr::v4::runtime::atn;
 

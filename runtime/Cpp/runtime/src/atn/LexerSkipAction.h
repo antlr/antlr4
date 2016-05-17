@@ -31,8 +31,8 @@
 
 #pragma once
 
-#include "LexerAction.h"
-#include "LexerActionType.h"
+#include "atn/LexerAction.h"
+#include "atn/LexerActionType.h"
 
 namespace org {
 namespace antlr {

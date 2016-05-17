@@ -30,6 +30,8 @@
 
 #pragma once
 
+#include "antlr4-common.h"
+
 namespace antlrcpp {
 
   std::string join(std::vector<std::string> strings, const std::string &separator);
@@ -79,6 +81,9 @@ namespace antlrcpp {
     ss << typeid(o).name() << "@" << std::hex << (size_t)&o;
     return ss.str();
   }
+
+  // Get the error text from an exception pointer or the current exception.
+  std::string what(std::exception_ptr eptr = std::current_exception());
 
 } // namespace antlrcpp
 

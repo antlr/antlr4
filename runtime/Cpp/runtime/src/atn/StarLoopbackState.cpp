@@ -29,10 +29,10 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "StarLoopEntryState.h"
-#include "Transition.h"
+#include "atn/StarLoopEntryState.h"
+#include "atn/Transition.h"
 
-#include "StarLoopbackState.h"
+#include "atn/StarLoopbackState.h"
 
 using namespace org::antlr::v4::runtime::atn;
 

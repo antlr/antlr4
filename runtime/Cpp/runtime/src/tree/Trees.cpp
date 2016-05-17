@@ -29,18 +29,18 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "ErrorNode.h"
+#include "tree/ErrorNode.h"
 #include "Parser.h"
 #include "ParserRuleContext.h"
-#include "CPPUtils.h"
-#include "TerminalNodeImpl.h"
-#include "ATN.h"
-#include "Interval.h"
+#include "support/CPPUtils.h"
+#include "tree/TerminalNodeImpl.h"
+#include "atn/ATN.h"
+#include "misc/Interval.h"
 #include "Token.h"
 #include "CommonToken.h"
 #include "Predicate.h"
 
-#include "Trees.h"
+#include "tree/Trees.h"
 
 using namespace org::antlr::v4::runtime;
 using namespace org::antlr::v4::runtime::misc;

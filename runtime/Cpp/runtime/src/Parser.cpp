@@ -29,25 +29,25 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "ATNDeserializationOptions.h"
-#include "ParseTreePatternMatcher.h"
-#include "DFA.h"
+#include "atn/ATNDeserializationOptions.h"
+#include "tree/pattern/ParseTreePatternMatcher.h"
+#include "dfa/DFA.h"
 #include "ParserRuleContext.h"
-#include "TerminalNode.h"
+#include "tree/TerminalNode.h"
 #include "Lexer.h"
-#include "ParserATNSimulator.h"
-#include "IntervalSet.h"
-#include "RuleStartState.h"
+#include "atn/ParserATNSimulator.h"
+#include "misc/IntervalSet.h"
+#include "atn/RuleStartState.h"
 #include "DefaultErrorStrategy.h"
-#include "ATNDeserializer.h"
-#include "RuleTransition.h"
-#include "ATN.h"
+#include "atn/ATNDeserializer.h"
+#include "atn/RuleTransition.h"
+#include "atn/ATN.h"
 #include "Exceptions.h"
 #include "ANTLRErrorListener.h"
-#include "ParseTreePattern.h"
+#include "tree/pattern/ParseTreePattern.h"
 
-#include "ProfilingATNSimulator.h"
-#include "ParseInfo.h"
+#include "atn/ProfilingATNSimulator.h"
+#include "atn/ParseInfo.h"
 
 #include "Parser.h"
 

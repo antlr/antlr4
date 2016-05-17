@@ -29,11 +29,11 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "ErrorNodeImpl.h"
-#include "Interval.h"
+#include "tree/ErrorNodeImpl.h"
+#include "misc/Interval.h"
 #include "Parser.h"
 #include "Token.h"
-#include "CPPUtils.h"
+#include "support/CPPUtils.h"
 
 #include "ParserRuleContext.h"
 

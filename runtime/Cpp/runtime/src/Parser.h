@@ -32,10 +32,10 @@
 #pragma once
 
 #include "Recognizer.h"
-#include "ParseTreeListener.h"
+#include "tree/ParseTreeListener.h"
 #include "TokenStream.h"
 #include "TokenSource.h"
-#include "Interval.h"
+#include "misc/Interval.h"
 
 namespace org {
 namespace antlr {

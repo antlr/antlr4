@@ -31,8 +31,8 @@
 
 #pragma once
 
-#include "ParserATNSimulator.h"
-#include "DecisionInfo.h"
+#include "atn/ParserATNSimulator.h"
+#include "atn/DecisionInfo.h"
 
 namespace org {
 namespace antlr {

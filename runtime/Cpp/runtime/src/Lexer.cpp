@@ -29,15 +29,15 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "LexerATNSimulator.h"
+#include "atn/LexerATNSimulator.h"
 #include "Exceptions.h"
-#include "Interval.h"
+#include "misc/Interval.h"
 #include "CommonTokenFactory.h"
 #include "LexerNoViableAltException.h"
 #include "ANTLRErrorListener.h"
-#include "CPPUtils.h"
+#include "support/CPPUtils.h"
 #include "CommonToken.h"
-#include "StringUtils.h"
+#include "support/StringUtils.h"
 
 #include "Lexer.h"
 

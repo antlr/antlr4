@@ -29,11 +29,11 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "MurmurHash.h"
-#include "CPPUtils.h"
+#include "misc/MurmurHash.h"
+#include "support/CPPUtils.h"
 #include "Lexer.h"
 
-#include "LexerCustomAction.h"
+#include "atn/LexerCustomAction.h"
 
 using namespace org::antlr::v4::runtime;
 using namespace org::antlr::v4::runtime::atn;

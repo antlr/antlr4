@@ -29,10 +29,10 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "Arrays.h"
-#include "SingletonPredictionContext.h"
+#include "support/Arrays.h"
+#include "atn/SingletonPredictionContext.h"
 
-#include "ArrayPredictionContext.h"
+#include "atn/ArrayPredictionContext.h"
 
 using namespace org::antlr::v4::runtime::atn;
 

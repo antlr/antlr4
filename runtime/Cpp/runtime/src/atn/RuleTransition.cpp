@@ -29,8 +29,8 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "RuleStartState.h"
-#include "RuleTransition.h"
+#include "atn/RuleStartState.h"
+#include "atn/RuleTransition.h"
 
 using namespace org::antlr::v4::runtime::atn;
 

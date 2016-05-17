@@ -31,7 +31,7 @@
 
 #pragma once
 
-#include "BlockStartState.h"
+#include "atn/BlockStartState.h"
 
 namespace org {
 namespace antlr {

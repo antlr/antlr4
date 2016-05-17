@@ -30,6 +30,8 @@
 
 #pragma once
 
+#include "antlr4-common.h"
+
 namespace antlrcpp {
 
   class ANTLR4CPP_PUBLIC BitSet : public std::bitset<1024> {

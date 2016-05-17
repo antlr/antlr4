@@ -14,6 +14,4 @@ FOUNDATION_EXPORT double antlrcpp_iosVersionNumber;
 //! Project version string for antlrcpp-ios.
 FOUNDATION_EXPORT const unsigned char antlrcpp_iosVersionString[];
 
-// In this header, you should import all the public headers of your framework using statements like #import <antlrcpp_ios/PublicHeader.h>
-
-
+#include "antlr4-runtime.h"

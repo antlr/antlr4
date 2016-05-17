@@ -29,11 +29,11 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "Interval.h"
+#include "misc/Interval.h"
 #include "TokenSource.h"
-#include "StringUtils.h"
+#include "support/StringUtils.h"
 #include "CharStream.h"
-#include "CPPUtils.h"
+#include "support/CPPUtils.h"
 
 #include "CommonToken.h"
 

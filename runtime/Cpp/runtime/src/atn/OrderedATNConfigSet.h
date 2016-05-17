@@ -31,8 +31,8 @@
 
 #pragma once
 
-#include "ATNConfigSet.h"
-#include "ATNConfig.h"
+#include "atn/ATNConfigSet.h"
+#include "atn/ATNConfig.h"
 
 namespace org {
 namespace antlr {

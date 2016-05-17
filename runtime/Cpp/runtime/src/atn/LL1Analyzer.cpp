@@ -29,20 +29,20 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "RuleStopState.h"
-#include "Transition.h"
-#include "RuleTransition.h"
-#include "SingletonPredictionContext.h"
-#include "AbstractPredicateTransition.h"
-#include "WildcardTransition.h"
-#include "NotSetTransition.h"
-#include "IntervalSet.h"
-#include "ATNConfig.h"
-#include "EmptyPredictionContext.h"
+#include "atn/RuleStopState.h"
+#include "atn/Transition.h"
+#include "atn/RuleTransition.h"
+#include "atn/SingletonPredictionContext.h"
+#include "atn/AbstractPredicateTransition.h"
+#include "atn/WildcardTransition.h"
+#include "atn/NotSetTransition.h"
+#include "misc/IntervalSet.h"
+#include "atn/ATNConfig.h"
+#include "atn/EmptyPredictionContext.h"
 
-#include "CPPUtils.h"
+#include "support/CPPUtils.h"
 
-#include "LL1Analyzer.h"
+#include "atn/LL1Analyzer.h"
 
 using namespace org::antlr::v4::runtime;
 using namespace org::antlr::v4::runtime::atn;

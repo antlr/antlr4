@@ -29,9 +29,9 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "ATNConfigSet.h"
+#include "atn/ATNConfigSet.h"
 
-#include "ErrorInfo.h"
+#include "atn/ErrorInfo.h"
 
 using namespace org::antlr::v4::runtime;
 using namespace org::antlr::v4::runtime::atn;

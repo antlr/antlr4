@@ -31,6 +31,9 @@
 
 #pragma once
 
+#include "antlr4-common.h"
+#include "atn/BlockStartState.h"
+
 namespace org {
 namespace antlr {
 namespace v4 {

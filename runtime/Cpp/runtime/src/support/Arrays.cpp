@@ -28,7 +28,7 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "Arrays.h"
+#include "support/Arrays.h"
 #include "Exceptions.h"
 
 using namespace antlrcpp;

@@ -29,10 +29,10 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "MurmurHash.h"
+#include "misc/MurmurHash.h"
 #include "Lexer.h"
 
-#include "LexerPushModeAction.h"
+#include "atn/LexerPushModeAction.h"
 
 using namespace org::antlr::v4::runtime;
 using namespace org::antlr::v4::runtime::atn;

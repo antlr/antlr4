@@ -31,7 +31,7 @@
 
 #pragma once
 
-#include "IntervalSet.h"
+#include "misc/IntervalSet.h"
 
 namespace org {
 namespace antlr {

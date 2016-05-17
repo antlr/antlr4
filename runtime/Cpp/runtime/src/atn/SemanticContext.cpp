@@ -29,8 +29,8 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "MurmurHash.h"
-#include "CPPUtils.h"
+#include "misc/MurmurHash.h"
+#include "support/CPPUtils.h"
 
 #include "SemanticContext.h"
 

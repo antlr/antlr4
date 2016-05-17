@@ -29,12 +29,12 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "PredictionContext.h"
-#include "ATNConfig.h"
-#include "ATNConfigSet.h"
+#include "atn/PredictionContext.h"
+#include "atn/ATNConfig.h"
+#include "atn/ATNConfigSet.h"
 #include "Parser.h"
-#include "Interval.h"
-#include "DFA.h"
+#include "misc/Interval.h"
+#include "dfa/DFA.h"
 
 #include "DiagnosticErrorListener.h"
 

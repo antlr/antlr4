@@ -3,7 +3,6 @@
 #include <string>
 #include <cctype>
 #include "Lexer.h"
-#include "Declarations.h"
 
 // Generated from XPathLexer.g4 by ANTLR 4.1
 /*
@@ -45,20 +44,19 @@ protected:
     static org::antlr::v4::runtime::atn::PredictionContextCache *const _sharedContextCache;
 public:
     static const int TOKEN_REF = 1, RULE_REF = 2, ANYWHERE = 3, ROOT = 4, WILDCARD = 5, BANG = 6, ID = 7, STRING = 8;
-    static std::vector<std::wstring> _modeNames;
+    static std::vector<std::string> _modeNames;
 
-    static const std::vector<std::wstring> _tokenNames;
-    static const std::vector<std::wstring> _ruleNames;
-
+    static const std::vector<std::string> _tokenNames;
+    static const std::vector<std::string> _ruleNames;
 
     XPathLexer(org::antlr::v4::runtime::CharStream *input);
 
-    virtual std::wstring getGrammarFileName() const override;
-    virtual const std::vector<std::wstring>& getTokenNames() const override;
-    virtual const std::vector<std::wstring>& getRuleNames() const override;
-    virtual const std::vector<std::wstring>& getModeNames() const override;
+    virtual std::string getGrammarFileName() const override;
+    virtual const std::vector<std::string>& getTokenNames() const override;
+    virtual const std::vector<std::string>& getRuleNames() const override;
+    virtual const std::vector<std::string>& getModeNames() const override;
     virtual const org::antlr::v4::runtime::atn::ATN& getATN() const override;
-    virtual void action(org::antlr::v4::runtime::RuleContext *_localctx, int ruleIndex, int actionIndex) override;
+    virtual void action(Ref<org::antlr::v4::runtime::RuleContext> _localctx, int ruleIndex, int actionIndex) override;
 private:
     void ID_action(org::antlr::v4::runtime::RuleContext *_localctx, int actionIndex);
 

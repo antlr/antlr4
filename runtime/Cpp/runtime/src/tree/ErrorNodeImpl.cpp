@@ -31,7 +31,7 @@
 
 #include "Exceptions.h"
 
-#include "ErrorNodeImpl.h"
+#include "tree/ErrorNodeImpl.h"
 
 using namespace org::antlr::v4::runtime;
 using namespace org::antlr::v4::runtime::misc;

@@ -31,8 +31,8 @@
 
 #pragma once
 
-#include "DecisionEventInfo.h"
-#include "BitSet.h"
+#include "atn/DecisionEventInfo.h"
+#include "support/BitSet.h"
 
 namespace org {
 namespace antlr {

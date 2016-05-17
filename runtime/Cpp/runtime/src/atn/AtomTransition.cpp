@@ -29,10 +29,10 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "IntervalSet.h"
-#include "Transition.h"
+#include "misc/IntervalSet.h"
+#include "atn/Transition.h"
 
-#include "AtomTransition.h"
+#include "atn/AtomTransition.h"
 
 using namespace org::antlr::v4::runtime::misc;
 using namespace org::antlr::v4::runtime::atn;

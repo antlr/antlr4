@@ -31,7 +31,7 @@
 
 #pragma once
 
-#include "SingletonPredictionContext.h"
+#include "atn/SingletonPredictionContext.h"
 
 namespace org {
 namespace antlr {

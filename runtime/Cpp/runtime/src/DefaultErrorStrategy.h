@@ -32,7 +32,7 @@
 #pragma once
 
 #include "ANTLRErrorStrategy.h"
-#include "IntervalSet.h"
+#include "misc/IntervalSet.h"
 
 namespace org {
 namespace antlr {
@@ -127,7 +127,7 @@ namespace runtime {
     /// the exception</li>
     /// </ul>
     /// </summary>
-    virtual void reportError(Parser *recognizer, const RecognitionException &e) override;
+    virtual void reportError(Parser *recognizer, std::exception_ptr e) override;
 
     /// <summary>
     /// {@inheritDoc}
@@ -136,7 +136,7 @@ namespace runtime {
     /// until we find one in the resynchronization set--loosely the set of tokens
     /// that can follow the current rule.
     /// </summary>
-    virtual void recover(Parser *recognizer, const RecognitionException &e) override;
+    virtual void recover(Parser *recognizer, std::exception_ptr e) override;
 
     /**
      * The default implementation of {@link ANTLRErrorStrategy#sync} makes sure

@@ -31,9 +31,9 @@
 
 #pragma once
 
-#include "BitSet.h"
-#include "ConfigLookup.h"
-#include "PredictionContext.h"
+#include "support/BitSet.h"
+#include "atn/ConfigLookup.h"
+#include "atn/PredictionContext.h"
 
 namespace org {
 namespace antlr {
