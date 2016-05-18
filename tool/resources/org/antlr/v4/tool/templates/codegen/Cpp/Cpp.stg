@@ -460,8 +460,8 @@ Ref\<<parser.name>::<currentRule.ctxType>\> <parser.name>::<currentRule.name>(<a
   <exceptions; separator="\n">
   <else>
   catch (RecognitionException &e) {
-    _localctx->exception = std::make_exception_ptr(e);
-    _errHandler->reportError(this, _localctx->exception);
+    _errHandler->reportError(this, e);
+    _localctx->exception = std::current_exception();
     _errHandler->recover(this, _localctx->exception);
   }
   <endif>
@@ -507,8 +507,8 @@ Ref\<<parser.name>::<currentRule.ctxType>\> <parser.name>::<currentRule.name>(in
     <namedActions.after>
   }
   catch (RecognitionException &e) {
-    _localctx->exception = std::make_exception_ptr(e);
-    _errHandler->reportError(this, _localctx->exceptione);
+    _errHandler->reportError(this, e);
+    _localctx->exception = std::current_exception();
     _errHandler->recover(this, _localctx->exception);
   }
   return _localctx;
@@ -756,7 +756,7 @@ testShiftInRange(shiftAmount) ::= <<
 // produces smaller bytecode only when bits.ttypes contains more than two items
 bitsetBitfieldComparison(s, bits) ::= <<
 (<testShiftInRange({<offsetShift(s.varName, bits.shift)>})> &&
-  ((1L \<\< <offsetShift(s.varName, bits.shift)>) & (<bits.ttypes: {ttype | (1L \<\< <offsetShift(ttype, bits.shift, true)>)}; separator = " | ">)) != 0)
+  ((1L \<\< <offsetShift(s.varName, bits.shift)>) & (<bits.ttypes: {ttype | (1L \<\< <offsetShift(ttype, bits.shift, true)>)}; separator = "\n  | ">)) != 0)
 >>
 
 isZero ::= [
@@ -770,7 +770,7 @@ offsetShift(shiftAmount, offset, prefix = false) ::= <%
 
 // produces more efficient bytecode when bits.ttypes contains at most two items
 bitsetInlineComparison(s, bits) ::= <%
-<bits.ttypes: {ttype | <s.varName> == <parser.name>::<ttype>}; separator = " || ">
+<bits.ttypes: {ttype | <s.varName> == <parser.name>::<ttype>}; separator = "\n\n|| ">
 %>
 
 cases(ttypes) ::= <<

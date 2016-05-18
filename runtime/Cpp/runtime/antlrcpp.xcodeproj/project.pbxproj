@@ -1050,7 +1050,7 @@
 		276E5CDF1CDB57AA003FF4B4 /* RecognitionException.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RecognitionException.h; sourceTree = "<group>"; };
 		276E5CE01CDB57AA003FF4B4 /* Recognizer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Recognizer.cpp; sourceTree = "<group>"; };
 		276E5CE11CDB57AA003FF4B4 /* Recognizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Recognizer.h; sourceTree = "<group>"; };
-		276E5CE21CDB57AA003FF4B4 /* RuleContext.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RuleContext.cpp; sourceTree = "<group>"; };
+		276E5CE21CDB57AA003FF4B4 /* RuleContext.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RuleContext.cpp; sourceTree = "<group>"; wrapsLines = 0; };
 		276E5CE31CDB57AA003FF4B4 /* RuleContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RuleContext.h; sourceTree = "<group>"; };
 		276E5CE51CDB57AA003FF4B4 /* Arrays.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Arrays.cpp; sourceTree = "<group>"; };
 		276E5CE61CDB57AA003FF4B4 /* Arrays.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Arrays.h; sourceTree = "<group>"; };

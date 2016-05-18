@@ -79,49 +79,6 @@ else ()
 endif ()
 
 
-#==== macro for pch creation
-# taken from: https://cmake.org/pipermail/cmake/2006-December/012323.html
-MACRO(ADD_PRECOMPILED_HEADER _targetName _input )
-    GET_FILENAME_COMPONENT(_name ${_input} NAME)
-    SET(_source "${_input}")
-    SET(_outdir "${CMAKE_CURRENT_BINARY_DIR}/${_name}.gch")
-    MAKE_DIRECTORY(${_outdir})
-    SET(_output "${_outdir}/${CMAKE_BUILD_TYPE}.c++")
-    STRING(TOUPPER "CMAKE_CXX_FLAGS_${CMAKE_BUILD_TYPE}" _flags_var_name)
-    SET(_compiler_FLAGS ${${_flags_var_name}})
-    GET_DIRECTORY_PROPERTY(_directory_flags INCLUDE_DIRECTORIES)
-    FOREACH(item ${_directory_flags})
-    LIST(APPEND _compiler_FLAGS "-I${item}")
-    ENDFOREACH(item)
-
-  GET_DIRECTORY_PROPERTY(_directory_flags DEFINITIONS)
-    LIST(APPEND _compiler_FLAGS ${_directory_flags})
-
-    SEPARATE_ARGUMENTS(_compiler_FLAGS)
-    ADD_CUSTOM_COMMAND(
-        OUTPUT ${_output}
-        COMMAND ${CMAKE_CXX_COMPILER}
-        ${_compiler_FLAGS}
-        -x c++-header
-        -o ${_output} ${_source}
-        DEPENDS ${_source} )
-    ADD_CUSTOM_TARGET(${_targetName}_gch DEPENDS ${_output})
-    ADD_DEPENDENCIES(${_targetName} ${_targetName}_gch)
-    #SET(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-include ${_name} -Winvalid-pch -H")
-    #SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -include ${_name} -Winvalid-pch")
-    GET_TARGET_PROPERTY(old_compile_flags ${_targetName} COMPILE_FLAGS)
-    IF(old_compile_flags STREQUAL "old_compile_flags-NOTFOUND")
-      SET(old_compile_flags "-include ${_name} -Winvalid-pch")
-    ELSE()
-      SET(old_compile_flags "${old_compile_flags} -include ${_name} -Winvalid-pch")
-    ENDIF()
-    SET_TARGET_PROPERTIES(${_targetName} PROPERTIES
-      COMPILE_FLAGS "${old_compile_flags}"
-    )
-  
-ENDMACRO(ADD_PRECOMPILED_HEADER)
-#==== end of macro for pch creation
-
 add_subdirectory(runtime)
 if (WITH_DEMO)
  add_subdirectory(demo)

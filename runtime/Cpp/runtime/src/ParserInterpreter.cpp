@@ -149,9 +149,8 @@ Ref<ParserRuleContext> ParserInterpreter::parse(int startRuleIndex) {
         }
         catch (RecognitionException &e) {
           setState(_atn.ruleToStopState[p->ruleIndex]->stateNumber);
-          std::exception_ptr ptr = std::make_exception_ptr(e);
-          getContext()->exception = ptr;
-          getErrorHandler()->reportError(this, ptr);
+          getErrorHandler()->reportError(this, e);
+          getContext()->exception = std::current_exception();
           recover(e);
         }
         

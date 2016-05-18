@@ -172,7 +172,7 @@ std::string RuleContext::toString(Recognizer *recog) {
 
 std::string RuleContext::toString(Recognizer *recog, Ref<RuleContext> stop) {
   if (recog == nullptr)
-    return toString({}, stop);
+    return toString(std::vector<std::string>(), stop); // Don't use an initializer {} here or we end up calling ourselve recursivly.
   return toString(recog->getRuleNames(), stop);
 }
 

@@ -108,7 +108,6 @@ namespace runtime {
   public:
     virtual void reportMatch(Parser *recognizer) override;
 
-    /// <summary>
     /// {@inheritDoc}
     /// <p/>
     /// The default implementation returns immediately if the handler is already
@@ -126,8 +125,7 @@ namespace runtime {
     /// <li>All other types: calls <seealso cref="Parser#notifyErrorListeners"/> to report
     /// the exception</li>
     /// </ul>
-    /// </summary>
-    virtual void reportError(Parser *recognizer, std::exception_ptr e) override;
+    virtual void reportError(Parser *recognizer, const RecognitionException &e) override;
 
     /// <summary>
     /// {@inheritDoc}
