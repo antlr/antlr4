@@ -37,4 +37,7 @@ namespace antlrcpp {
   static std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> utfConverter;
   
   void replaceAll(std::string& str, const std::string& from, const std::string& to);
+
+  ANTLR4CPP_PUBLIC std::string ws2s(const std::wstring &wstr);
+  ANTLR4CPP_PUBLIC std::wstring s2ws(const std::string &str);
 }

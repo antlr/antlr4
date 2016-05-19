@@ -1,4 +1,4 @@
-//
+﻿//
 //  main.cpp
 //  antlr4-cpp-demo
 //
@@ -7,28 +7,27 @@
 
 #include <iostream>
 
-#include "ANTLRInputStream.h"
-#include "CommonTokenStream.h"
+#include "antlr4-runtime.h"
 #include "TLexer.h"
 #include "TParser.h"
 
-#include "Strings.h"
-
 #include <Windows.h>
+
+#pragma execution_character_set("utf-8")
 
 using namespace antlrcpptest;
 using namespace org::antlr::v4::runtime;
 
 int main(int argc, const char * argv[]) {
 
-  ANTLRInputStream input(L"(((x))) * y + z; a + (x * (y ? 0 : 1) + z);");
+  ANTLRInputStream input("🍴 = 🍐 + \"😎\";(((x * π))) * µ + ∰; a + (x * (y ? 0 : 1) + z);");
   TLexer lexer(&input);
   CommonTokenStream tokens(&lexer);
 
   TParser parser(&tokens);
   std::shared_ptr<tree::ParseTree> tree = parser.main();
 
-  std::wstring s = tree->toStringTree(&parser) + L"\n";
+  std::wstring s = antlrcpp::s2ws(tree->toStringTree(&parser)) + L"\n";
   OutputDebugString(s.data());
 
   return 0;

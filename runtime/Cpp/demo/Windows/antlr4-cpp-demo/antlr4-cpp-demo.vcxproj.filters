@@ -59,8 +59,5 @@
     <ClInclude Include="..\..\generated\TParserVisitor.h">
       <Filter>generated</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\runtime\src\antlrcpp-Prefix.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>

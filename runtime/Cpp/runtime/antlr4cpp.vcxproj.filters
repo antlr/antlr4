@@ -357,9 +357,6 @@
     <ClInclude Include="src\support\guid.h">
       <Filter>Header Files\support</Filter>
     </ClInclude>
-    <ClInclude Include="src\support\Strings.h">
-      <Filter>Header Files\support</Filter>
-    </ClInclude>
     <ClInclude Include="src\tree\AbstractParseTreeVisitor.h">
       <Filter>Header Files\tree</Filter>
     </ClInclude>
@@ -501,16 +498,17 @@
     <ClInclude Include="src\misc\Predicate.h">
       <Filter>Header Files\misc</Filter>
     </ClInclude>
-    <ClInclude Include="src\antlrcpp-Prefix.h" />
     <ClInclude Include="src\RuleContextWithAltNum.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\RuntimeMetaData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\support\StringUtils.h">
+      <Filter>Header Files\support</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="antlrcpp-Prefix.cpp" />
     <ClCompile Include="src\ANTLRFileStream.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -775,9 +773,6 @@
     <ClCompile Include="src\support\guid.cpp">
       <Filter>Source Files\support</Filter>
     </ClCompile>
-    <ClCompile Include="src\support\Strings.cpp">
-      <Filter>Source Files\support</Filter>
-    </ClCompile>
     <ClCompile Include="src\tree\ErrorNodeImpl.cpp">
       <Filter>Source Files\tree</Filter>
     </ClCompile>
@@ -879,6 +874,9 @@
     </ClCompile>
     <ClCompile Include="src\RuntimeMetaData.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\support\StringUtils.cpp">
+      <Filter>Source Files\support</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

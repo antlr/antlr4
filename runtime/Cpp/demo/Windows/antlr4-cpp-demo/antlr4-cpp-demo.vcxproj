@@ -96,7 +96,8 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>$(SolutionDir)..\generated;$(SolutionDir)..\..\runtime\src;$(SolutionDir)..\..\runtime\src\atn;$(SolutionDir)..\..\runtime\src\dfa;$(SolutionDir)..\..\runtime\src\misc;$(SolutionDir)..\..\runtime\src\support;$(SolutionDir)..\..\runtime\src\tree;$(SolutionDir)..\..\runtime\src\tree\xpath;$(SolutionDir)..\..\runtime\src\tree\pattern;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <ForcedIncludeFiles>antlrcpp-Prefix.h</ForcedIncludeFiles>
+      <ForcedIncludeFiles>
+      </ForcedIncludeFiles>
       <DisableSpecificWarnings>4251</DisableSpecificWarnings>
     </ClCompile>
     <Link>
@@ -113,7 +114,8 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>$(SolutionDir)..\generated;$(SolutionDir)..\..\runtime\src;$(SolutionDir)..\..\runtime\src\atn;$(SolutionDir)..\..\runtime\src\dfa;$(SolutionDir)..\..\runtime\src\misc;$(SolutionDir)..\..\runtime\src\support;$(SolutionDir)..\..\runtime\src\tree;$(SolutionDir)..\..\runtime\src\tree\xpath;$(SolutionDir)..\..\runtime\src\tree\pattern;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <ForcedIncludeFiles>antlrcpp-Prefix.h</ForcedIncludeFiles>
+      <ForcedIncludeFiles>
+      </ForcedIncludeFiles>
       <DisableSpecificWarnings>4251</DisableSpecificWarnings>
     </ClCompile>
     <Link>
@@ -132,7 +134,8 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>$(SolutionDir)..\generated;$(SolutionDir)..\..\runtime\src;$(SolutionDir)..\..\runtime\src\atn;$(SolutionDir)..\..\runtime\src\dfa;$(SolutionDir)..\..\runtime\src\misc;$(SolutionDir)..\..\runtime\src\support;$(SolutionDir)..\..\runtime\src\tree;$(SolutionDir)..\..\runtime\src\tree\xpath;$(SolutionDir)..\..\runtime\src\tree\pattern;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <ForcedIncludeFiles>antlrcpp-Prefix.h</ForcedIncludeFiles>
+      <ForcedIncludeFiles>
+      </ForcedIncludeFiles>
       <DisableSpecificWarnings>4251</DisableSpecificWarnings>
     </ClCompile>
     <Link>
@@ -153,7 +156,8 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>$(SolutionDir)..\generated;$(SolutionDir)..\..\runtime\src;$(SolutionDir)..\..\runtime\src\atn;$(SolutionDir)..\..\runtime\src\dfa;$(SolutionDir)..\..\runtime\src\misc;$(SolutionDir)..\..\runtime\src\support;$(SolutionDir)..\..\runtime\src\tree;$(SolutionDir)..\..\runtime\src\tree\xpath;$(SolutionDir)..\..\runtime\src\tree\pattern;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <ForcedIncludeFiles>antlrcpp-Prefix.h</ForcedIncludeFiles>
+      <ForcedIncludeFiles>
+      </ForcedIncludeFiles>
       <DisableSpecificWarnings>4251</DisableSpecificWarnings>
     </ClCompile>
     <Link>
@@ -173,7 +177,6 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\runtime\src\antlrcpp-Prefix.h" />
     <ClInclude Include="..\..\generated\TLexer.h" />
     <ClInclude Include="..\..\generated\TParser.h" />
     <ClInclude Include="..\..\generated\TParserBaseListener.h" />

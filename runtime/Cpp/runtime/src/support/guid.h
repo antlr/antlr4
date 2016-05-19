@@ -28,6 +28,7 @@
 #include <sstream>
 #include <string>
 #include <iomanip>
+#include <stdint.h>
 
 #ifdef GUID_ANDROID
 #include <jni.h>
