@@ -392,7 +392,6 @@ bool PredictionContext::combineCommonParents(std::vector<std::weak_ptr<Predictio
 
   for (size_t p = 0; p < parents.size(); ++p) {
     Ref<PredictionContext> parent = parents[p].lock();
-    // ml: it's assumed that the == operator of PredictionContext kicks in here.
     if (uniqueParents.find(parent) == uniqueParents.end()) { // don't replace
       uniqueParents.insert(parent);
     }

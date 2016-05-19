@@ -54,9 +54,6 @@ set_target_properties(antlr4_static
                                  OUTPUT_NAME antlr4
                                  COMPILE_FLAGS "${disabled_compile_warnings}")
 
-add_precompiled_header(antlr4_shared ${PROJECT_SOURCE_DIR}/runtime/src/antlrcpp-Prefix.h)
-add_precompiled_header(antlr4_static ${PROJECT_SOURCE_DIR}/runtime/src/antlrcpp-Prefix.h)
-
 install(TARGETS antlr4_shared
         DESTINATION lib)
 install(TARGETS antlr4_static

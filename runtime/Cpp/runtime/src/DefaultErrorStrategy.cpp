@@ -69,7 +69,7 @@ void DefaultErrorStrategy::reportMatch(Parser *recognizer) {
   endErrorCondition(recognizer);
 }
 
-void DefaultErrorStrategy::reportError(Parser *recognizer, std::exception_ptr e) {
+void DefaultErrorStrategy::reportError(Parser *recognizer, const RecognitionException &e) {
   // If we've already reported an error and have not matched a token
   // yet successfully, don't report any errors.
   if (inErrorRecoveryMode(recognizer)) {
@@ -77,16 +77,14 @@ void DefaultErrorStrategy::reportError(Parser *recognizer, std::exception_ptr e)
   }
 
   beginErrorCondition(recognizer);
-  try {
-    std::rethrow_exception(e);
-  } catch (NoViableAltException &ne) {
-    reportNoViableAlternative(recognizer, ne);
-  } catch (InputMismatchException &ne) {
-    reportInputMismatch(recognizer, ne);
-  } catch (FailedPredicateException &ne) {
-    reportFailedPredicate(recognizer, ne);
-  } catch (RecognitionException &ne) {
-    recognizer->notifyErrorListeners(ne.getOffendingToken(), ne.what(), e);
+  if (is<NoViableAltException>(e)) {
+    reportNoViableAlternative(recognizer, (const NoViableAltException &)e);
+  } else if (is<InputMismatchException>(e)) {
+    reportInputMismatch(recognizer, (const InputMismatchException &)e);
+  } else if (is<FailedPredicateException>(e)) {
+    reportFailedPredicate(recognizer, (const FailedPredicateException &)e);
+  } else if (is<RecognitionException>(e)) {
+    recognizer->notifyErrorListeners(e.getOffendingToken(), e.what(), std::current_exception());
   }
 }
 

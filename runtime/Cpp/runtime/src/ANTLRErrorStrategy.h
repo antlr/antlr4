@@ -143,7 +143,7 @@ namespace runtime {
     /// </summary>
     /// <param name="recognizer"> the parser instance </param>
     /// <param name="e"> the recognition exception to report </param>
-    virtual void reportError(Parser *recognizer, std::exception_ptr e) = 0;
+    virtual void reportError(Parser *recognizer, const RecognitionException &e) = 0;
   };
 
 } // namespace runtime
