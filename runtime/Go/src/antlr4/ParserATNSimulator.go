@@ -1059,7 +1059,7 @@ func (this *ParserATNSimulator) closure_(config ATNConfig, configs ATNConfigSet,
 		_, ok := t.(*ActionTransition)
 		var continueCollecting = collectPredicates && !ok
 		var c = this.getEpsilonTarget(config, t, continueCollecting, depth == 0, fullCtx, treatEofAsEpsilon)
-		if c != nil {
+		if ci, ok := c.(*BaseATNConfig); ok && ci != nil {
 			if PortDebug {
 				fmt.Println("DEBUG 1 ok")
 			}
