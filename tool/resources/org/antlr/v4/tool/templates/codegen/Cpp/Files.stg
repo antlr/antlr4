@@ -103,8 +103,12 @@ using namespace org::antlr::v4::runtime;
 
 <if (file.genPackage)>namespace <file.genPackage> {<endif>
 
+// TODO(dsisson): See if the following two lines are unnecessary.
 template \<typename T>
 class <file.parser.name>Visitor;
+  
+template \<typename T>
+class <file.grammarName>Visitor;
   
 <parser>
 
