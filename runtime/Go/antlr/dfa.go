@@ -5,7 +5,7 @@ import "sort"
 type DFA struct {
 	atnStartState DecisionState
 	decision      int
-	_states       map[string]*DFAState
+	states        map[string]*DFAState
 	s0            *DFAState
 	precedenceDfa bool
 }
@@ -19,7 +19,7 @@ func NewDFA(atnStartState DecisionState, decision int) *DFA {
 	d.decision = decision
 	// A set of all DFA states. Use {@link Map} so we can get old state back
 	// ({@link Set} only allows you to see if it's there).
-	d._states = make(map[string]*DFAState)
+	d.states = make(map[string]*DFAState)
 	d.s0 = nil
 	// {@code true} if d DFA is for a precedence decision otherwise,
 	// {@code false}. This is the backing field for {@link //isPrecedenceDfa},
@@ -98,7 +98,7 @@ func (d *DFA) setPrecedenceStartState(precedence int, startState *DFAState) {
 
 func (d *DFA) setPrecedenceDfa(precedenceDfa bool) {
 	if d.precedenceDfa != precedenceDfa {
-		d._states = make(map[string]*DFAState)
+		d.states = make(map[string]*DFAState)
 		if precedenceDfa {
 			var precedenceState = NewDFAState(-1, NewBaseATNConfigSet(false))
 			precedenceState.edges = make([]*DFAState, 0)
@@ -113,7 +113,7 @@ func (d *DFA) setPrecedenceDfa(precedenceDfa bool) {
 }
 
 func (d *DFA) GetStates() map[string]*DFAState {
-	return d._states
+	return d.states
 }
 
 type DFAStateList []*DFAState
@@ -126,9 +126,9 @@ func (a DFAStateList) Less(i, j int) bool { return a[i].stateNumber < a[j].state
 func (d *DFA) sortedStates() []*DFAState {
 
 	// extract the values
-	vs := make([]*DFAState, len(d._states))
+	vs := make([]*DFAState, len(d.states))
 	i := 0
-	for _, v := range d._states {
+	for _, v := range d.states {
 		vs[i] = v
 		i++
 	}

@@ -18,7 +18,7 @@ func NewLL1Analyzer(atn *ATN) *LL1Analyzer {
 //  a predicate during analysis if {@code seeThruPreds==false}.
 ///
 const (
-	LL1AnalyzerHIT_PRED = TokenInvalidType
+	LL1AnalyzerHitPred = TokenInvalidType
 )
 
 //*
@@ -40,10 +40,10 @@ func (la *LL1Analyzer) getDecisionLookahead(s ATNState) []*IntervalSet {
 		look[alt] = NewIntervalSet()
 		var lookBusy = NewSet(nil, nil)
 		var seeThruPreds = false // fail to get lookahead upon pred
-		la._look(s.GetTransitions()[alt].getTarget(), nil, BasePredictionContextEMPTY, look[alt], lookBusy, NewBitSet(), seeThruPreds, false)
+		la.look1(s.GetTransitions()[alt].getTarget(), nil, BasePredictionContextEMPTY, look[alt], lookBusy, NewBitSet(), seeThruPreds, false)
 		// Wipe out lookahead for la alternative if we found nothing
 		// or we had a predicate when we !seeThruPreds
-		if look[alt].length() == 0 || look[alt].contains(LL1AnalyzerHIT_PRED) {
+		if look[alt].length() == 0 || look[alt].contains(LL1AnalyzerHitPred) {
 			look[alt] = nil
 		}
 	}
@@ -85,7 +85,7 @@ func (la *LL1Analyzer) look(s, stopState ATNState, ctx RuleContext) *IntervalSet
 		fmt.Println(seeThruPreds)
 		fmt.Println("=====")
 	}
-	la._look(s, stopState, lookContext, r, NewSet(nil, nil), NewBitSet(), seeThruPreds, true)
+	la.look1(s, stopState, lookContext, r, NewSet(nil, nil), NewBitSet(), seeThruPreds, true)
 	if PortDebug {
 		fmt.Println(r)
 	}
@@ -116,13 +116,13 @@ func (la *LL1Analyzer) look(s, stopState ATNState, ctx RuleContext) *IntervalSet
 // {@code NewBitSet()} for la argument.
 // @param seeThruPreds {@code true} to true semantic predicates as
 // implicitly {@code true} and "see through them", otherwise {@code false}
-// to treat semantic predicates as opaque and add {@link //HIT_PRED} to the
+// to treat semantic predicates as opaque and add {@link //HitPred} to the
 // result if one is encountered.
 // @param addEOF Add {@link Token//EOF} to the result if the end of the
 // outermost context is reached. This parameter has no effect if {@code ctx}
 // is {@code nil}.
 
-func (la *LL1Analyzer) __look(s, stopState ATNState, ctx PredictionContext, look *IntervalSet, lookBusy *Set, calledRuleStack *BitSet, seeThruPreds, addEOF bool, i int) {
+func (la *LL1Analyzer) look2(s, stopState ATNState, ctx PredictionContext, look *IntervalSet, lookBusy *Set, calledRuleStack *BitSet, seeThruPreds, addEOF bool, i int) {
 
 	returnState := la.atn.states[ctx.getReturnState(i)]
 
@@ -135,11 +135,11 @@ func (la *LL1Analyzer) __look(s, stopState ATNState, ctx PredictionContext, look
 	}()
 
 	calledRuleStack.remove(returnState.GetRuleIndex())
-	la._look(returnState, stopState, ctx.GetParent(i), look, lookBusy, calledRuleStack, seeThruPreds, addEOF)
+	la.look1(returnState, stopState, ctx.GetParent(i), look, lookBusy, calledRuleStack, seeThruPreds, addEOF)
 
 }
 
-func (la *LL1Analyzer) _look(s, stopState ATNState, ctx PredictionContext, look *IntervalSet, lookBusy *Set, calledRuleStack *BitSet, seeThruPreds, addEOF bool) {
+func (la *LL1Analyzer) look1(s, stopState ATNState, ctx PredictionContext, look *IntervalSet, lookBusy *Set, calledRuleStack *BitSet, seeThruPreds, addEOF bool) {
 
 	c := NewBaseATNConfig6(s, 0, ctx)
 
@@ -182,7 +182,7 @@ func (la *LL1Analyzer) _look(s, stopState ATNState, ctx PredictionContext, look 
 			for i := 0; i < ctx.length(); i++ {
 
 				returnState := la.atn.states[ctx.getReturnState(i)]
-				la.__look(returnState, stopState, ctx, look, lookBusy, calledRuleStack, seeThruPreds, addEOF, i)
+				la.look2(returnState, stopState, ctx, look, lookBusy, calledRuleStack, seeThruPreds, addEOF, i)
 
 			}
 			return
@@ -205,7 +205,7 @@ func (la *LL1Analyzer) _look(s, stopState ATNState, ctx PredictionContext, look 
 
 			newContext := SingletonBasePredictionContextCreate(ctx, t1.followState.GetStateNumber())
 
-			la.___look(stopState, newContext, look, lookBusy, calledRuleStack, seeThruPreds, addEOF, t1)
+			la.look3(stopState, newContext, look, lookBusy, calledRuleStack, seeThruPreds, addEOF, t1)
 
 			if PortDebug {
 				fmt.Println(look)
@@ -216,15 +216,15 @@ func (la *LL1Analyzer) _look(s, stopState ATNState, ctx PredictionContext, look 
 				fmt.Println("DEBUG 9")
 			}
 			if seeThruPreds {
-				la._look(t2.getTarget(), stopState, ctx, look, lookBusy, calledRuleStack, seeThruPreds, addEOF)
+				la.look1(t2.getTarget(), stopState, ctx, look, lookBusy, calledRuleStack, seeThruPreds, addEOF)
 			} else {
-				look.addOne(LL1AnalyzerHIT_PRED)
+				look.addOne(LL1AnalyzerHitPred)
 			}
 		} else if t.getIsEpsilon() {
 			if PortDebug {
 				fmt.Println("DEBUG 10")
 			}
-			la._look(t.getTarget(), stopState, ctx, look, lookBusy, calledRuleStack, seeThruPreds, addEOF)
+			la.look1(t.getTarget(), stopState, ctx, look, lookBusy, calledRuleStack, seeThruPreds, addEOF)
 		} else if _, ok := t.(*WildcardTransition); ok {
 			if PortDebug {
 				fmt.Println("DEBUG 11")
@@ -248,7 +248,7 @@ func (la *LL1Analyzer) _look(s, stopState ATNState, ctx PredictionContext, look 
 	}
 }
 
-func (la *LL1Analyzer) ___look(stopState ATNState, ctx PredictionContext, look *IntervalSet, lookBusy *Set, calledRuleStack *BitSet, seeThruPreds, addEOF bool, t1 *RuleTransition) {
+func (la *LL1Analyzer) look3(stopState ATNState, ctx PredictionContext, look *IntervalSet, lookBusy *Set, calledRuleStack *BitSet, seeThruPreds, addEOF bool, t1 *RuleTransition) {
 
 	newContext := SingletonBasePredictionContextCreate(ctx, t1.followState.GetStateNumber())
 
@@ -257,6 +257,6 @@ func (la *LL1Analyzer) ___look(stopState ATNState, ctx PredictionContext, look *
 	}()
 
 	calledRuleStack.add(t1.getTarget().GetRuleIndex())
-	la._look(t1.getTarget(), stopState, newContext, look, lookBusy, calledRuleStack, seeThruPreds, addEOF)
+	la.look1(t1.getTarget(), stopState, newContext, look, lookBusy, calledRuleStack, seeThruPreds, addEOF)
 
 }

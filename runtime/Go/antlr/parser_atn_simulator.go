@@ -11,12 +11,12 @@ type ParserATNSimulator struct {
 
 	parser         Parser
 	predictionMode int
-	_input         TokenStream
-	_startIndex    int
-	_dfa           *DFA
+	input          TokenStream
+	startIndex     int
+	dfa            *DFA
 	DecisionToDFA  []*DFA
 	mergeCache     *DoubleDict
-	_outerContext  ParserRuleContext
+	outerContext   ParserRuleContext
 }
 
 func NewParserATNSimulator(parser Parser, atn *ATN, decisionToDFA []*DFA, sharedContextCache *PredictionContextCache) *ParserATNSimulator {
@@ -30,10 +30,10 @@ func NewParserATNSimulator(parser Parser, atn *ATN, decisionToDFA []*DFA, shared
 	// SLL, LL, or LL + exact ambig detection?//
 	p.predictionMode = PredictionModeLL
 	// LAME globals to avoid parameters!!!!! I need these down deep in predTransition
-	p._input = nil
-	p._startIndex = 0
-	p._outerContext = nil
-	p._dfa = nil
+	p.input = nil
+	p.startIndex = 0
+	p.outerContext = nil
+	p.dfa = nil
 	// Each prediction operation uses a cache for merge of prediction contexts.
 	//  Don't keep around as it wastes huge amounts of memory. DoubleKeyMap
 	//  isn't Synchronized but we're ok since two threads shouldn't reuse same
@@ -77,17 +77,17 @@ func (p *ParserATNSimulator) AdaptivePredict(input TokenStream, decision int, ou
 			strconv.Itoa(input.LT(1).GetColumn()))
 	}
 
-	p._input = input
-	p._startIndex = input.Index()
-	p._outerContext = outerContext
+	p.input = input
+	p.startIndex = input.Index()
+	p.outerContext = outerContext
 
 	var dfa = p.DecisionToDFA[decision]
-	p._dfa = dfa
+	p.dfa = dfa
 	var m = input.Mark()
 	var index = input.Index()
 
 	defer func() {
-		p._dfa = nil
+		p.dfa = nil
 		p.mergeCache = nil // wack cache after each prediction
 		input.Seek(index)
 		input.Release(m)
@@ -127,7 +127,7 @@ func (p *ParserATNSimulator) AdaptivePredict(input TokenStream, decision int, ou
 			}
 		}
 		var fullCtx = false
-		var s0_closure = p.computeStartState(dfa.atnStartState, RuleContextEmpty, fullCtx)
+		var s0Closure = p.computeStartState(dfa.atnStartState, RuleContextEmpty, fullCtx)
 
 		if dfa.precedenceDfa {
 			// If p is a precedence DFA, we use applyPrecedenceFilter
@@ -136,11 +136,11 @@ func (p *ParserATNSimulator) AdaptivePredict(input TokenStream, decision int, ou
 			// appropriate start state for the precedence level rather
 			// than simply setting DFA.s0.
 			//
-			s0_closure = p.applyPrecedenceFilter(s0_closure)
-			s0 = p.addDFAState(dfa, NewDFAState(-1, s0_closure))
+			s0Closure = p.applyPrecedenceFilter(s0Closure)
+			s0 = p.addDFAState(dfa, NewDFAState(-1, s0Closure))
 			dfa.setPrecedenceStartState(p.parser.GetPrecedence(), s0)
 		} else {
-			s0 = p.addDFAState(dfa, NewDFAState(-1, s0_closure))
+			s0 = p.addDFAState(dfa, NewDFAState(-1, s0Closure))
 			dfa.s0 = s0
 		}
 	}
@@ -248,9 +248,9 @@ func (p *ParserATNSimulator) execATN(dfa *DFA, s0 *DFAState, input TokenStream, 
 				fmt.Println("ctx sensitive state " + outerContext.String(nil, nil) + " in " + D.String())
 			}
 			var fullCtx = true
-			var s0_closure = p.computeStartState(dfa.atnStartState, outerContext, fullCtx)
+			var s0Closure = p.computeStartState(dfa.atnStartState, outerContext, fullCtx)
 			p.ReportAttemptingFullContext(dfa, conflictingAlts, D.configs, startIndex, input.Index())
-			alt := p.execATNWithFullContext(dfa, D, s0_closure, input, startIndex, outerContext)
+			alt := p.execATNWithFullContext(dfa, D, s0Closure, input, startIndex, outerContext)
 			return alt
 		}
 		if D.isAcceptState {
@@ -742,7 +742,7 @@ func (p *ParserATNSimulator) applyPrecedenceFilter(configs ATNConfigSet) ATNConf
 		if config.GetAlt() != 1 {
 			continue
 		}
-		var updatedContext = config.GetSemanticContext().evalPrecedence(p.parser, p._outerContext)
+		var updatedContext = config.GetSemanticContext().evalPrecedence(p.parser, p.outerContext)
 		if updatedContext == nil {
 			// the configuration was eliminated
 			continue
@@ -998,7 +998,7 @@ func (p *ParserATNSimulator) closureCheckingStopState(config ATNConfig, configs 
 		// run thru all possible stack tops in ctx
 		if !config.GetContext().isEmpty() {
 			for i := 0; i < config.GetContext().length(); i++ {
-				if config.GetContext().getReturnState(i) == BasePredictionContextEMPTY_RETURN_STATE {
+				if config.GetContext().getReturnState(i) == BasePredictionContextEmptyReturnState {
 					if fullCtx {
 						configs.Add(NewBaseATNConfig1(config, config.GetState(), BasePredictionContextEMPTY), p.mergeCache)
 						continue
@@ -1010,7 +1010,7 @@ func (p *ParserATNSimulator) closureCheckingStopState(config ATNConfig, configs 
 							}
 							fmt.Println("FALLING off rule " + p.getRuleName(config.GetState().GetRuleIndex()))
 						}
-						p.closure_(config, configs, closureBusy, collectPredicates, fullCtx, depth, treatEOFAsEpsilon)
+						p.closureWork(config, configs, closureBusy, collectPredicates, fullCtx, depth, treatEOFAsEpsilon)
 					}
 					continue
 				}
@@ -1039,13 +1039,13 @@ func (p *ParserATNSimulator) closureCheckingStopState(config ATNConfig, configs 
 			}
 		}
 	}
-	p.closure_(config, configs, closureBusy, collectPredicates, fullCtx, depth, treatEOFAsEpsilon)
+	p.closureWork(config, configs, closureBusy, collectPredicates, fullCtx, depth, treatEOFAsEpsilon)
 }
 
 // Do the actual work of walking epsilon edges//
-func (p *ParserATNSimulator) closure_(config ATNConfig, configs ATNConfigSet, closureBusy *Set, collectPredicates, fullCtx bool, depth int, treatEOFAsEpsilon bool) {
+func (p *ParserATNSimulator) closureWork(config ATNConfig, configs ATNConfigSet, closureBusy *Set, collectPredicates, fullCtx bool, depth int, treatEOFAsEpsilon bool) {
 	if PortDebug {
-		fmt.Println("closure_")
+		fmt.Println("closureWork")
 	}
 	var state = config.GetState()
 	// optimization
@@ -1094,11 +1094,11 @@ func (p *ParserATNSimulator) closure_(config ATNConfig, configs ATNConfigSet, cl
 					}
 				}
 
-				if p._dfa != nil && p._dfa.precedenceDfa {
+				if p.dfa != nil && p.dfa.precedenceDfa {
 					if PortDebug {
 						fmt.Println("DEBUG 4")
 					}
-					if t.(*EpsilonTransition).outermostPrecedenceReturn == p._dfa.atnStartState.GetRuleIndex() {
+					if t.(*EpsilonTransition).outermostPrecedenceReturn == p.dfa.atnStartState.GetRuleIndex() {
 						c.setPrecedenceFilterSuppressed(true)
 					}
 				}
@@ -1197,10 +1197,10 @@ func (p *ParserATNSimulator) precedenceTransition(config ATNConfig,
 			// during closure, which dramatically reduces the size of
 			// the config sets. It also obviates the need to test predicates
 			// later during conflict resolution.
-			var currentPosition = p._input.Index()
-			p._input.Seek(p._startIndex)
-			var predSucceeds = pt.getPredicate().evaluate(p.parser, p._outerContext)
-			p._input.Seek(currentPosition)
+			var currentPosition = p.input.Index()
+			p.input.Seek(p.startIndex)
+			var predSucceeds = pt.getPredicate().evaluate(p.parser, p.outerContext)
+			p.input.Seek(currentPosition)
 			if predSucceeds {
 				c = NewBaseATNConfig4(config, pt.getTarget()) // no pred context
 			}
@@ -1233,10 +1233,10 @@ func (p *ParserATNSimulator) predTransition(config ATNConfig, pt *PredicateTrans
 			// during closure, which dramatically reduces the size of
 			// the config sets. It also obviates the need to test predicates
 			// later during conflict resolution.
-			var currentPosition = p._input.Index()
-			p._input.Seek(p._startIndex)
-			var predSucceeds = pt.getPredicate().evaluate(p.parser, p._outerContext)
-			p._input.Seek(currentPosition)
+			var currentPosition = p.input.Index()
+			p.input.Seek(p.startIndex)
+			var predSucceeds = pt.getPredicate().evaluate(p.parser, p.outerContext)
+			p.input.Seek(currentPosition)
 			if predSucceeds {
 				c = NewBaseATNConfig4(config, pt.getTarget()) // no pred context
 			}
@@ -1410,21 +1410,21 @@ func (p *ParserATNSimulator) getUniqueAlt(configs ATNConfigSet) int {
 // otherwise p method returns the result of calling {@link //addDFAState}
 // on {@code to}
 //
-func (p *ParserATNSimulator) addDFAEdge(dfa *DFA, from_ *DFAState, t int, to *DFAState) *DFAState {
+func (p *ParserATNSimulator) addDFAEdge(dfa *DFA, from *DFAState, t int, to *DFAState) *DFAState {
 	if ParserATNSimulatorDebug {
-		fmt.Println("EDGE " + from_.String() + " -> " + to.String() + " upon " + p.GetTokenName(t))
+		fmt.Println("EDGE " + from.String() + " -> " + to.String() + " upon " + p.GetTokenName(t))
 	}
 	if to == nil {
 		return nil
 	}
 	to = p.addDFAState(dfa, to) // used existing if possible not incoming
-	if from_ == nil || t < -1 || t > p.atn.maxTokenType {
+	if from == nil || t < -1 || t > p.atn.maxTokenType {
 		return to
 	}
-	if from_.edges == nil {
-		from_.edges = make([]*DFAState, p.atn.maxTokenType+1+1)
+	if from.edges == nil {
+		from.edges = make([]*DFAState, p.atn.maxTokenType+1+1)
 	}
-	from_.edges[t+1] = to // connect
+	from.edges[t+1] = to // connect
 
 	if ParserATNSimulatorDebug {
 		var names []string

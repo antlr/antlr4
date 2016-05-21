@@ -59,7 +59,7 @@ type LexerATNSimulator struct {
 	column         int
 	mode           int
 	prevAccept     *SimState
-	Match_calls    int
+	MatchCalls     int
 }
 
 func NewLexerATNSimulator(recog Lexer, atn *ATN, decisionToDFA []*DFA, sharedContextCache *PredictionContextCache) *LexerATNSimulator {
@@ -91,10 +91,10 @@ func NewLexerATNSimulator(recog Lexer, atn *ATN, decisionToDFA []*DFA, sharedCon
 var LexerATNSimulatorDebug = false
 var LexerATNSimulatorDFADebug = false
 
-var LexerATNSimulatorMIN_DFA_EDGE = 0
-var LexerATNSimulatorMAX_DFA_EDGE = 127 // forces unicode to stay in ATN
+var LexerATNSimulatorMinDFAEdge = 0
+var LexerATNSimulatorMaxDFAEdge = 127 // forces unicode to stay in ATN
 
-var LexerATNSimulatorMatch_calls = 0
+var LexerATNSimulatorMatchCalls = 0
 
 func (l *LexerATNSimulator) copyState(simulator *LexerATNSimulator) {
 	l.column = simulator.column
@@ -109,7 +109,7 @@ func (l *LexerATNSimulator) Match(input CharStream, mode int) int {
 		fmt.Println("Match")
 	}
 
-	l.Match_calls++
+	l.MatchCalls++
 	l.mode = mode
 	var mark = input.Mark()
 
@@ -153,12 +153,12 @@ func (l *LexerATNSimulator) MatchATN(input CharStream) int {
 	if LexerATNSimulatorDebug {
 		fmt.Println("MatchATN mode " + strconv.Itoa(l.mode) + " start: " + startState.String())
 	}
-	var old_mode = l.mode
-	var s0_closure = l.computeStartState(input, startState)
-	var suppressEdge = s0_closure.hasSemanticContext
-	s0_closure.hasSemanticContext = false
+	var oldMode = l.mode
+	var s0Closure = l.computeStartState(input, startState)
+	var suppressEdge = s0Closure.hasSemanticContext
+	s0Closure.hasSemanticContext = false
 
-	var next = l.addDFAState(s0_closure)
+	var next = l.addDFAState(s0Closure)
 
 	if !suppressEdge {
 		l.DecisionToDFA[l.mode].s0 = next
@@ -167,7 +167,7 @@ func (l *LexerATNSimulator) MatchATN(input CharStream) int {
 	var predict = l.execATN(input, next)
 
 	if LexerATNSimulatorDebug {
-		fmt.Println("DFA after MatchATN: " + l.DecisionToDFA[old_mode].ToLexerString())
+		fmt.Println("DFA after MatchATN: " + l.DecisionToDFA[oldMode].ToLexerString())
 	}
 	return predict
 }
@@ -251,11 +251,11 @@ func (l *LexerATNSimulator) execATN(input CharStream, ds0 *DFAState) int {
 // {@code t}, or {@code nil} if the target state for l edge is not
 // already cached
 func (l *LexerATNSimulator) getExistingTargetState(s *DFAState, t int) *DFAState {
-	if s.edges == nil || t < LexerATNSimulatorMIN_DFA_EDGE || t > LexerATNSimulatorMAX_DFA_EDGE {
+	if s.edges == nil || t < LexerATNSimulatorMinDFAEdge || t > LexerATNSimulatorMaxDFAEdge {
 		return nil
 	}
 
-	var target = s.edges[t-LexerATNSimulatorMIN_DFA_EDGE]
+	var target = s.edges[t-LexerATNSimulatorMinDFAEdge]
 	if target == nil {
 		target = nil
 	}
@@ -431,7 +431,7 @@ func (l *LexerATNSimulator) closure(input CharStream, config *LexerATNConfig, co
 		}
 		if config.context != nil && !config.context.isEmpty() {
 			for i := 0; i < config.context.length(); i++ {
-				if config.context.getReturnState(i) != BasePredictionContextEMPTY_RETURN_STATE {
+				if config.context.getReturnState(i) != BasePredictionContextEmptyReturnState {
 					var newContext = config.context.GetParent(i) // "pop" return state
 					var returnState = l.atn.states[config.context.getReturnState(i)]
 					cfg := NewLexerATNConfig2(config, returnState, newContext)
@@ -585,7 +585,7 @@ func (l *LexerATNSimulator) captureSimState(settings *SimState, input CharStream
 	settings.dfaState = dfaState
 }
 
-func (l *LexerATNSimulator) addDFAEdge(from_ *DFAState, tk int, to *DFAState, cfgs ATNConfigSet) *DFAState {
+func (l *LexerATNSimulator) addDFAEdge(from *DFAState, tk int, to *DFAState, cfgs ATNConfigSet) *DFAState {
 	if to == nil && cfgs != nil {
 		// leading to l call, ATNConfigSet.hasSemanticContext is used as a
 		// marker indicating dynamic predicate evaluation makes l edge
@@ -608,18 +608,18 @@ func (l *LexerATNSimulator) addDFAEdge(from_ *DFAState, tk int, to *DFAState, cf
 		}
 	}
 	// add the edge
-	if tk < LexerATNSimulatorMIN_DFA_EDGE || tk > LexerATNSimulatorMAX_DFA_EDGE {
+	if tk < LexerATNSimulatorMinDFAEdge || tk > LexerATNSimulatorMaxDFAEdge {
 		// Only track edges within the DFA bounds
 		return to
 	}
 	if LexerATNSimulatorDebug {
-		fmt.Println("EDGE " + from_.String() + " -> " + to.String() + " upon " + strconv.Itoa(tk))
+		fmt.Println("EDGE " + from.String() + " -> " + to.String() + " upon " + strconv.Itoa(tk))
 	}
-	if from_.edges == nil {
+	if from.edges == nil {
 		// make room for tokens 1..n and -1 masquerading as index 0
-		from_.edges = make([]*DFAState, LexerATNSimulatorMAX_DFA_EDGE-LexerATNSimulatorMIN_DFA_EDGE+1)
+		from.edges = make([]*DFAState, LexerATNSimulatorMaxDFAEdge-LexerATNSimulatorMinDFAEdge+1)
 	}
-	from_.edges[tk-LexerATNSimulatorMIN_DFA_EDGE] = to // connect
+	from.edges[tk-LexerATNSimulatorMinDFAEdge] = to // connect
 
 	return to
 }

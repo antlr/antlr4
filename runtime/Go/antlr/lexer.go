@@ -31,16 +31,16 @@ type BaseLexer struct {
 	TokenStartColumn    int
 	ActionType          int
 
-	_input                  CharStream
-	_factory                TokenFactory
-	_tokenFactorySourcePair *TokenSourceCharStreamPair
-	_token                  Token
-	_hitEOF                 bool
-	_channel                int
-	_type                   int
-	_modeStack              IntStack
-	_mode                   int
-	_text                   string
+	input                  CharStream
+	factory                TokenFactory
+	tokenFactorySourcePair *TokenSourceCharStreamPair
+	token                  Token
+	hitEOF                 bool
+	channel                int
+	thetype                  int
+	modeStack              IntStack
+	mode                   int
+	text                   string
 }
 
 func NewBaseLexer(input CharStream) *BaseLexer {
@@ -49,9 +49,9 @@ func NewBaseLexer(input CharStream) *BaseLexer {
 
 	lexer.BaseRecognizer = NewBaseRecognizer()
 
-	lexer._input = input
-	lexer._factory = CommonTokenFactoryDEFAULT
-	lexer._tokenFactorySourcePair = &TokenSourceCharStreamPair{lexer, input}
+	lexer.input = input
+	lexer.factory = CommonTokenFactoryDEFAULT
+	lexer.tokenFactorySourcePair = &TokenSourceCharStreamPair{lexer, input}
 
 	lexer.Interpreter = nil // child classes must populate it
 
@@ -62,7 +62,7 @@ func NewBaseLexer(input CharStream) *BaseLexer {
 	// emissions, then set l to the last token to be Matched or
 	// something nonnil so that the auto token emit mechanism will not
 	// emit another token.
-	lexer._token = nil
+	lexer.token = nil
 
 	// What character index in the stream did the current token start at?
 	// Needed, for example, to get the text for current token. Set at
@@ -77,21 +77,21 @@ func NewBaseLexer(input CharStream) *BaseLexer {
 
 	// Once we see EOF on char stream, next token will be EOF.
 	// If you have DONE : EOF  then you see DONE EOF.
-	lexer._hitEOF = false
+	lexer.hitEOF = false
 
 	// The channel number for the current token///
-	lexer._channel = TokenDefaultChannel
+	lexer.channel = TokenDefaultChannel
 
 	// The token type for the current token///
-	lexer._type = TokenInvalidType
+	lexer.thetype = TokenInvalidType
 
-	lexer._modeStack = make([]int, 0)
-	lexer._mode = LexerDefaultMode
+	lexer.modeStack = make([]int, 0)
+	lexer.mode = LexerDefaultMode
 
 	// You can set the text for the current token to override what is in
 	// the input char buffer. Use setText() or can set l instance var.
 	// /
-	lexer._text = ""
+	lexer.text = ""
 
 	return lexer
 }
@@ -111,20 +111,20 @@ const (
 
 func (b *BaseLexer) reset() {
 	// wack Lexer state variables
-	if b._input != nil {
-		b._input.Seek(0) // rewind the input
+	if b.input != nil {
+		b.input.Seek(0) // rewind the input
 	}
-	b._token = nil
-	b._type = TokenInvalidType
-	b._channel = TokenDefaultChannel
+	b.token = nil
+	b.thetype = TokenInvalidType
+	b.channel = TokenDefaultChannel
 	b.TokenStartCharIndex = -1
 	b.TokenStartColumn = -1
 	b.TokenStartLine = -1
-	b._text = ""
+	b.text = ""
 
-	b._hitEOF = false
-	b._mode = LexerDefaultMode
-	b._modeStack = make([]int, 0)
+	b.hitEOF = false
+	b.mode = LexerDefaultMode
+	b.modeStack = make([]int, 0)
 
 	b.Interpreter.reset()
 }
@@ -134,7 +134,7 @@ func (b *BaseLexer) GetInterpreter() *LexerATNSimulator {
 }
 
 func (b *BaseLexer) GetInputStream() CharStream {
-	return b._input
+	return b.input
 }
 
 func (b *BaseLexer) GetSourceName() string {
@@ -142,15 +142,15 @@ func (b *BaseLexer) GetSourceName() string {
 }
 
 func (b *BaseLexer) setChannel(v int) {
-	b._channel = v
+	b.channel = v
 }
 
 func (b *BaseLexer) GetTokenFactory() TokenFactory {
-	return b._factory
+	return b.factory
 }
 
 func (b *BaseLexer) setTokenFactory(f TokenFactory) {
-	b._factory = f
+	b.factory = f
 }
 
 func (b *BaseLexer) safeMatch() (ret int) {
@@ -166,53 +166,53 @@ func (b *BaseLexer) safeMatch() (ret int) {
 		}
 	}()
 
-	return b.Interpreter.Match(b._input, b._mode)
+	return b.Interpreter.Match(b.input, b.mode)
 }
 
 // Return a token from l source i.e., Match a token on the char stream.
 func (b *BaseLexer) NextToken() Token {
-	if b._input == nil {
+	if b.input == nil {
 		panic("NextToken requires a non-nil input stream.")
 	}
 
-	var tokenStartMarker = b._input.Mark()
+	var tokenStartMarker = b.input.Mark()
 
 	// previously in finally block
 	defer func() {
 		// make sure we release marker after Match or
 		// unbuffered char stream will keep buffering
-		b._input.Release(tokenStartMarker)
+		b.input.Release(tokenStartMarker)
 	}()
 
 	for true {
-		if b._hitEOF {
+		if b.hitEOF {
 			b.emitEOF()
-			return b._token
+			return b.token
 		}
-		b._token = nil
-		b._channel = TokenDefaultChannel
-		b.TokenStartCharIndex = b._input.Index()
+		b.token = nil
+		b.channel = TokenDefaultChannel
+		b.TokenStartCharIndex = b.input.Index()
 		b.TokenStartColumn = b.Interpreter.column
 		b.TokenStartLine = b.Interpreter.line
-		b._text = ""
+		b.text = ""
 		var continueOuter = false
 		for true {
-			b._type = TokenInvalidType
+			b.thetype = TokenInvalidType
 			var ttype = LexerSkip
 
 			ttype = b.safeMatch()
 
-			if b._input.LA(1) == TokenEOF {
-				b._hitEOF = true
+			if b.input.LA(1) == TokenEOF {
+				b.hitEOF = true
 			}
-			if b._type == TokenInvalidType {
-				b._type = ttype
+			if b.thetype == TokenInvalidType {
+				b.thetype = ttype
 			}
-			if b._type == LexerSkip {
+			if b.thetype == LexerSkip {
 				continueOuter = true
 				break
 			}
-			if b._type != LexerMore {
+			if b.thetype != LexerMore {
 				break
 			}
 			if PortDebug {
@@ -226,10 +226,10 @@ func (b *BaseLexer) NextToken() Token {
 		if continueOuter {
 			continue
 		}
-		if b._token == nil {
+		if b.token == nil {
 			b.emit()
 		}
-		return b._token
+		return b.token
 	}
 
 	return nil
@@ -237,52 +237,48 @@ func (b *BaseLexer) NextToken() Token {
 
 // Instruct the lexer to Skip creating a token for current lexer rule
 // and look for another token. NextToken() knows to keep looking when
-// a lexer rule finishes with token set to SKIP_TOKEN. Recall that
+// a lexer rule finishes with token set to SKIPTOKEN. Recall that
 // if token==nil at end of any token rule, it creates one for you
 // and emits it.
 // /
 func (b *BaseLexer) Skip() {
-	b._type = LexerSkip
+	b.thetype = LexerSkip
 }
 
 func (b *BaseLexer) More() {
-	b._type = LexerMore
-}
-
-func (b *BaseLexer) mode(m int) {
-	b._mode = m
+	b.thetype = LexerMore
 }
 
 func (b *BaseLexer) pushMode(m int) {
 	if LexerATNSimulatorDebug {
 		fmt.Println("pushMode " + strconv.Itoa(m))
 	}
-	b._modeStack.Push(b._mode)
-	b.mode(m)
+	b.modeStack.Push(b.mode)
+	b.mode = m
 }
 
 func (b *BaseLexer) popMode() int {
-	if len(b._modeStack) == 0 {
+	if len(b.modeStack) == 0 {
 		panic("Empty Stack")
 	}
 	if LexerATNSimulatorDebug {
-		fmt.Println("popMode back to " + fmt.Sprint(b._modeStack[0:len(b._modeStack)-1]))
+		fmt.Println("popMode back to " + fmt.Sprint(b.modeStack[0:len(b.modeStack)-1]))
 	}
-	i, _ := b._modeStack.Pop()
-	b.mode(i)
-	return b._mode
+	i, _ := b.modeStack.Pop()
+	b.mode = i
+	return b.mode
 }
 
 func (b *BaseLexer) inputStream() CharStream {
-	return b._input
+	return b.input
 }
 
 func (b *BaseLexer) setInputStream(input CharStream) {
-	b._input = nil
-	b._tokenFactorySourcePair = &TokenSourceCharStreamPair{b, b._input}
+	b.input = nil
+	b.tokenFactorySourcePair = &TokenSourceCharStreamPair{b, b.input}
 	b.reset()
-	b._input = input
-	b._tokenFactorySourcePair = &TokenSourceCharStreamPair{b, b._input}
+	b.input = input
+	b.tokenFactorySourcePair = &TokenSourceCharStreamPair{b, b.input}
 }
 
 // By default does not support multiple emits per NextToken invocation
@@ -291,7 +287,7 @@ func (b *BaseLexer) setInputStream(input CharStream) {
 // rather than a single variable as l implementation does).
 // /
 func (b *BaseLexer) emitToken(token Token) {
-	b._token = token
+	b.token = token
 }
 
 // The standard method called to automatically emit a token at the
@@ -304,7 +300,7 @@ func (b *BaseLexer) emit() Token {
 	if PortDebug {
 		fmt.Println("emit")
 	}
-	var t = b._factory.Create(b._tokenFactorySourcePair, b._type, b._text, b._channel, b.TokenStartCharIndex, b.getCharIndex()-1, b.TokenStartLine, b.TokenStartColumn)
+	var t = b.factory.Create(b.tokenFactorySourcePair, b.thetype, b.text, b.channel, b.TokenStartCharIndex, b.getCharIndex()-1, b.TokenStartLine, b.TokenStartColumn)
 	b.emitToken(t)
 	return t
 }
@@ -315,7 +311,7 @@ func (b *BaseLexer) emitEOF() Token {
 	if PortDebug {
 		fmt.Println("emitEOF")
 	}
-	var eof = b._factory.Create(b._tokenFactorySourcePair, TokenEOF, "", TokenDefaultChannel, b._input.Index(), b._input.Index()-1, lpos, cpos)
+	var eof = b.factory.Create(b.tokenFactorySourcePair, TokenEOF, "", TokenDefaultChannel, b.input.Index(), b.input.Index()-1, lpos, cpos)
 	b.emitToken(eof)
 	return eof
 }
@@ -329,30 +325,30 @@ func (b *BaseLexer) GetLine() int {
 }
 
 func (b *BaseLexer) getType() int {
-	return b._type
+	return b.thetype
 }
 
 func (b *BaseLexer) setType(t int) {
-	b._type = t
+	b.thetype = t
 }
 
 // What is the index of the current character of lookahead?///
 func (b *BaseLexer) getCharIndex() int {
-	return b._input.Index()
+	return b.input.Index()
 }
 
 // Return the text Matched so far for the current token or any text override.
 //Set the complete text of l token it wipes any previous changes to the text.
 func (b *BaseLexer) GetText() string {
-	if b._text != "" {
-		return b._text
+	if b.text != "" {
+		return b.text
 	}
 
-	return b.Interpreter.GetText(b._input)
+	return b.Interpreter.GetText(b.input)
 }
 
 func (b *BaseLexer) SetText(text string) {
-	b._text = text
+	b.text = text
 }
 
 func (b *BaseLexer) GetATN() *ATN {
@@ -380,8 +376,8 @@ func (b *BaseLexer) getAllTokens() []Token {
 
 func (b *BaseLexer) notifyListeners(e RecognitionException) {
 	var start = b.TokenStartCharIndex
-	var stop = b._input.Index()
-	var text = b._input.GetTextFromInterval(NewInterval(start, stop))
+	var stop = b.input.Index()
+	var text = b.input.GetTextFromInterval(NewInterval(start, stop))
 	var msg = "token recognition error at: '" + text + "'"
 	var listener = b.GetErrorListenerDispatch()
 	listener.SyntaxError(b, nil, b.TokenStartLine, b.TokenStartColumn, msg, e)
@@ -411,13 +407,13 @@ func (b *BaseLexer) getCharErrorDisplay(c rune) string {
 // to do sophisticated error recovery if you are in a fragment rule.
 // /
 func (b *BaseLexer) Recover(re RecognitionException) {
-	if b._input.LA(1) != TokenEOF {
+	if b.input.LA(1) != TokenEOF {
 		if _, ok := re.(*LexerNoViableAltException); ok {
 			// Skip a char and try again
-			b.Interpreter.consume(b._input)
+			b.Interpreter.consume(b.input)
 		} else {
 			// TODO: Do we lose character or line position information?
-			b._input.Consume()
+			b.input.Consume()
 		}
 	}
 }

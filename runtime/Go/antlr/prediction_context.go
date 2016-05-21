@@ -32,12 +32,12 @@ func NewBasePredictionContext(cachedHashString string) *BasePredictionContext {
 // {@code//+x =//}.
 // /
 const (
-	BasePredictionContextEMPTY_RETURN_STATE = 0x7FFFFFFF
+	BasePredictionContextEmptyReturnState = 0x7FFFFFFF
 )
 
 // Represents {@code $} in an array in full context mode, when {@code $}
 // doesn't mean wildcard: {@code $ + x = [$,x]}. Here,
-// {@code $} = {@link //EMPTY_RETURN_STATE}.
+// {@code $} = {@link //EmptyReturnState}.
 // /
 
 var BasePredictionContextglobalNodeCount = 1
@@ -151,7 +151,7 @@ func NewBaseSingletonPredictionContext(parent PredictionContext, returnState int
 }
 
 func SingletonBasePredictionContextCreate(parent PredictionContext, returnState int) PredictionContext {
-	if returnState == BasePredictionContextEMPTY_RETURN_STATE && parent == nil {
+	if returnState == BasePredictionContextEmptyReturnState && parent == nil {
 		// someone can pass in the bits of an array ctx that mean $
 		return BasePredictionContextEMPTY
 	}
@@ -172,7 +172,7 @@ func (b *BaseSingletonPredictionContext) getReturnState(index int) int {
 }
 
 func (b *BaseSingletonPredictionContext) hasEmptyPath() bool {
-	return b.returnState == BasePredictionContextEMPTY_RETURN_STATE
+	return b.returnState == BasePredictionContextEmptyReturnState
 }
 
 func (b *BaseSingletonPredictionContext) equals(other PredictionContext) bool {
@@ -209,7 +209,7 @@ func (b *BaseSingletonPredictionContext) String() string {
 	}
 
 	if len(up) == 0 {
-		if b.returnState == BasePredictionContextEMPTY_RETURN_STATE {
+		if b.returnState == BasePredictionContextEmptyReturnState {
 			return "$"
 		}
 
@@ -229,7 +229,7 @@ func NewEmptyPredictionContext() *EmptyPredictionContext {
 
 	p := new(EmptyPredictionContext)
 
-	p.BaseSingletonPredictionContext = NewBaseSingletonPredictionContext(nil, BasePredictionContextEMPTY_RETURN_STATE)
+	p.BaseSingletonPredictionContext = NewBaseSingletonPredictionContext(nil, BasePredictionContextEmptyReturnState)
 
 	return p
 }
@@ -265,7 +265,7 @@ func NewArrayPredictionContext(parents []PredictionContext, returnStates []int) 
 	// Parent can be nil only if full ctx mode and we make an array
 	// from {@link //EMPTY} and non-empty. We merge {@link //EMPTY} by using
 	// nil parent and
-	// returnState == {@link //EMPTY_RETURN_STATE}.
+	// returnState == {@link //EmptyReturnState}.
 
 	c := new(ArrayPredictionContext)
 	c.BasePredictionContext = NewBasePredictionContext("")
@@ -285,13 +285,13 @@ func (a *ArrayPredictionContext) GetReturnStates() []int {
 }
 
 func (a *ArrayPredictionContext) hasEmptyPath() bool {
-	return a.getReturnState(a.length()-1) == BasePredictionContextEMPTY_RETURN_STATE
+	return a.getReturnState(a.length()-1) == BasePredictionContextEmptyReturnState
 }
 
 func (a *ArrayPredictionContext) isEmpty() bool {
-	// since EMPTY_RETURN_STATE can only appear in the last position, we
+	// since EmptyReturnState can only appear in the last position, we
 	// don't need to verify that size==1
-	return a.returnStates[0] == BasePredictionContextEMPTY_RETURN_STATE
+	return a.returnStates[0] == BasePredictionContextEmptyReturnState
 }
 
 func (a *ArrayPredictionContext) length() int {
@@ -327,7 +327,7 @@ func (a *ArrayPredictionContext) String() string {
 		if i > 0 {
 			s = s + ", "
 		}
-		if a.returnStates[i] == BasePredictionContextEMPTY_RETURN_STATE {
+		if a.returnStates[i] == BasePredictionContextEmptyReturnState {
 			s = s + "$"
 			continue
 		}
@@ -567,11 +567,11 @@ func mergeRoot(a, b SingletonPredictionContext, rootIsWildcard bool) PredictionC
 		if a == BasePredictionContextEMPTY && b == BasePredictionContextEMPTY {
 			return BasePredictionContextEMPTY // $ + $ = $
 		} else if a == BasePredictionContextEMPTY { // $ + x = [$,x]
-			var payloads = []int{b.getReturnState(-1), BasePredictionContextEMPTY_RETURN_STATE}
+			var payloads = []int{b.getReturnState(-1), BasePredictionContextEmptyReturnState}
 			var parents = []PredictionContext{b.GetParent(-1), nil}
 			return NewArrayPredictionContext(parents, payloads)
 		} else if b == BasePredictionContextEMPTY { // x + $ = [$,x] ($ is always first if present)
-			var payloads = []int{a.getReturnState(-1), BasePredictionContextEMPTY_RETURN_STATE}
+			var payloads = []int{a.getReturnState(-1), BasePredictionContextEmptyReturnState}
 			var parents = []PredictionContext{a.GetParent(-1), nil}
 			return NewArrayPredictionContext(parents, payloads)
 		}
@@ -619,32 +619,32 @@ func mergeArrays(a, b *ArrayPredictionContext, rootIsWildcard bool, mergeCache *
 	var mergedParents = make([]PredictionContext, 0)
 	// walk and merge to yield mergedParents, mergedReturnStates
 	for i < len(a.returnStates) && j < len(b.returnStates) {
-		var a_parent = a.parents[i]
-		var b_parent = b.parents[j]
+		var aParent = a.parents[i]
+		var bParent = b.parents[j]
 		if a.returnStates[i] == b.returnStates[j] {
 			// same payload (stack tops are equal), must yield merged singleton
 			var payload = a.returnStates[i]
 			// $+$ = $
-			var bothDollars = payload == BasePredictionContextEMPTY_RETURN_STATE && a_parent == nil && b_parent == nil
-			var ax_ax = (a_parent != nil && b_parent != nil && a_parent == b_parent) // ax+ax
+			var bothDollars = payload == BasePredictionContextEmptyReturnState && aParent == nil && bParent == nil
+			var axAX = (aParent != nil && bParent != nil && aParent == bParent) // ax+ax
 			// ->
 			// ax
-			if bothDollars || ax_ax {
-				mergedParents[k] = a_parent // choose left
+			if bothDollars || axAX {
+				mergedParents[k] = aParent // choose left
 				mergedReturnStates[k] = payload
 			} else { // ax+ay -> a'[x,y]
-				var mergedParent = merge(a_parent, b_parent, rootIsWildcard, mergeCache)
+				var mergedParent = merge(aParent, bParent, rootIsWildcard, mergeCache)
 				mergedParents[k] = mergedParent
 				mergedReturnStates[k] = payload
 			}
 			i++ // hop over left one as usual
 			j++ // but also Skip one in right side since we merge
 		} else if a.returnStates[i] < b.returnStates[j] { // copy a[i] to M
-			mergedParents[k] = a_parent
+			mergedParents[k] = aParent
 			mergedReturnStates[k] = a.returnStates[i]
 			i++
 		} else { // b > a, copy b[j] to M
-			mergedParents[k] = b_parent
+			mergedParents[k] = bParent
 			mergedReturnStates[k] = b.returnStates[j]
 			j++
 		}

@@ -42,7 +42,7 @@ type BaseToken struct {
 	tokenIndex int    // from 0..n-1 of the token object in the input stream
 	line       int    // line=1..n of the 1st character
 	column     int    // beginning of the line at which it occurs, 0..n-1
-	_text      string // text of the token.
+	text      string // text of the token.
 	readOnly   bool
 }
 
@@ -160,13 +160,13 @@ func (c *CommonToken) clone() *CommonToken {
 	t.tokenIndex = c.GetTokenIndex()
 	t.line = c.GetLine()
 	t.column = c.GetColumn()
-	t._text = c.GetText()
+	t.text = c.GetText()
 	return t
 }
 
 func (c *CommonToken) GetText() string {
-	if c._text != "" {
-		return c._text
+	if c.text != "" {
+		return c.text
 	}
 	var input = c.GetInputStream()
 	if input == nil {
@@ -180,7 +180,7 @@ func (c *CommonToken) GetText() string {
 }
 
 func (c *CommonToken) SetText(text string) {
-	c._text = text
+	c.text = text
 }
 
 func (c *CommonToken) String() string {

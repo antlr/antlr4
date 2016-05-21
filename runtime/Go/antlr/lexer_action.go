@@ -86,22 +86,22 @@ func (l *LexerSkipAction) String() string {
 type LexerTypeAction struct {
 	*BaseLexerAction
 
-	_type int
+	thetype int
 }
 
-func NewLexerTypeAction(_type int) *LexerTypeAction {
+func NewLexerTypeAction(thetype int) *LexerTypeAction {
 	l := new(LexerTypeAction)
 	l.BaseLexerAction = NewBaseLexerAction(LexerActionTypeType)
-	l._type = _type
+	l.thetype = thetype
 	return l
 }
 
 func (l *LexerTypeAction) execute(lexer Lexer) {
-	lexer.setType(l._type)
+	lexer.setType(l.thetype)
 }
 
 func (l *LexerTypeAction) Hash() string {
-	return strconv.Itoa(l.actionType) + strconv.Itoa(l._type)
+	return strconv.Itoa(l.actionType) + strconv.Itoa(l.thetype)
 }
 
 func (l *LexerTypeAction) equals(other LexerAction) bool {
@@ -110,12 +110,12 @@ func (l *LexerTypeAction) equals(other LexerAction) bool {
 	} else if _, ok := other.(*LexerTypeAction); !ok {
 		return false
 	} else {
-		return l._type == other.(*LexerTypeAction)._type
+		return l.thetype == other.(*LexerTypeAction).thetype
 	}
 }
 
 func (l *LexerTypeAction) String() string {
-	return "actionType(" + strconv.Itoa(l._type) + ")"
+	return "actionType(" + strconv.Itoa(l.thetype) + ")"
 }
 
 // Implements the {@code pushMode} lexer action by calling

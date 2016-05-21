@@ -25,7 +25,7 @@ type Recognizer interface {
 }
 
 type BaseRecognizer struct {
-	_listeners []ErrorListener
+	listeners []ErrorListener
 	state      int
 
 	RuleNames       []string
@@ -36,7 +36,7 @@ type BaseRecognizer struct {
 
 func NewBaseRecognizer() *BaseRecognizer {
 	rec := new(BaseRecognizer)
-	rec._listeners = []ErrorListener{ConsoleErrorListenerINSTANCE}
+	rec.listeners = []ErrorListener{ConsoleErrorListenerINSTANCE}
 	rec.state = -1
 	return rec
 }
@@ -56,11 +56,11 @@ func (b *BaseRecognizer) Action(context RuleContext, ruleIndex, actionIndex int)
 }
 
 func (b *BaseRecognizer) AddErrorListener(listener ErrorListener) {
-	b._listeners = append(b._listeners, listener)
+	b.listeners = append(b.listeners, listener)
 }
 
 func (b *BaseRecognizer) RemoveErrorListeners() {
-	b._listeners = make([]ErrorListener, 0)
+	b.listeners = make([]ErrorListener, 0)
 }
 
 func (b *BaseRecognizer) GetRuleNames() []string {
@@ -203,7 +203,7 @@ func (b *BaseRecognizer) GetTokenErrorDisplay(t Token) string {
 }
 
 func (b *BaseRecognizer) GetErrorListenerDispatch() ErrorListener {
-	return NewProxyErrorListener(b._listeners)
+	return NewProxyErrorListener(b.listeners)
 }
 
 // subclass needs to override these if there are sempreds or actions

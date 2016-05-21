@@ -614,7 +614,7 @@ func (a *ATNDeserializer) edgeFactory(atn *ATN, typeIndex, src, trg, arg1, arg2,
 		return NewActionTransition(target, arg1, arg2, arg3 != 0)
 	case TransitionSET:
 		return NewSetTransition(target, sets[arg1])
-	case TransitionNOT_SET:
+	case TransitionNOTSET:
 		return NewNotSetTransition(target, sets[arg1])
 	case TransitionWILDCARD:
 		return NewWildcardTransition(target)

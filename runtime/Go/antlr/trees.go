@@ -93,11 +93,11 @@ func TreesfindAllRuleNodes(t ParseTree, ruleIndex int) []ParseTree {
 
 func TreesfindAllNodes(t ParseTree, index int, findTokens bool) []ParseTree {
 	var nodes = make([]ParseTree, 0)
-	Trees_findAllNodes(t, index, findTokens, nodes)
+	TreesFindAllNodes(t, index, findTokens, nodes)
 	return nodes
 }
 
-func Trees_findAllNodes(t ParseTree, index int, findTokens bool, nodes []ParseTree) {
+func TreesFindAllNodes(t ParseTree, index int, findTokens bool, nodes []ParseTree) {
 	// check this node (the root) first
 
 	t2, ok := t.(TerminalNode)
@@ -114,7 +114,7 @@ func Trees_findAllNodes(t ParseTree, index int, findTokens bool, nodes []ParseTr
 	}
 	// check children
 	for i := 0; i < t.GetChildCount(); i++ {
-		Trees_findAllNodes(t.GetChild(i).(ParseTree), index, findTokens, nodes)
+		TreesFindAllNodes(t.GetChild(i).(ParseTree), index, findTokens, nodes)
 	}
 }
 

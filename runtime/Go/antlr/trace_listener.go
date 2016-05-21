@@ -16,13 +16,13 @@ func (t *TraceListener) VisitErrorNode(_ ErrorNode) {
 }
 
 func (t *TraceListener) EnterEveryRule(ctx ParserRuleContext) {
-	fmt.Println("enter   " + t.parser.GetRuleNames()[ctx.GetRuleIndex()] + ", LT(1)=" + t.parser._input.LT(1).GetText())
+	fmt.Println("enter   " + t.parser.GetRuleNames()[ctx.GetRuleIndex()] + ", LT(1)=" + t.parser.input.LT(1).GetText())
 }
 
 func (t *TraceListener) VisitTerminal(node TerminalNode) {
-	fmt.Println("consume " + fmt.Sprint(node.GetSymbol()) + " rule " + t.parser.GetRuleNames()[t.parser._ctx.GetRuleIndex()])
+	fmt.Println("consume " + fmt.Sprint(node.GetSymbol()) + " rule " + t.parser.GetRuleNames()[t.parser.ctx.GetRuleIndex()])
 }
 
 func (t *TraceListener) ExitEveryRule(ctx ParserRuleContext) {
-	fmt.Println("exit    " + t.parser.GetRuleNames()[ctx.GetRuleIndex()] + ", LT(1)=" + t.parser._input.LT(1).GetText())
+	fmt.Println("exit    " + t.parser.GetRuleNames()[ctx.GetRuleIndex()] + ", LT(1)=" + t.parser.input.LT(1).GetText())
 }

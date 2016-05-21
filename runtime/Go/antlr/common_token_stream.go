@@ -261,7 +261,7 @@ func (c *CommonTokenStream) getHiddenTokensToRight(tokenIndex, channel int) []To
 		panic(strconv.Itoa(tokenIndex) + " not in 0.." + strconv.Itoa(len(c.tokens)-1))
 	}
 	var nextOnChannel = c.NextTokenOnChannel(tokenIndex+1, LexerDefaultTokenChannel)
-	var from_ = tokenIndex + 1
+	var from = tokenIndex + 1
 	// if none onchannel to right, nextOnChannel=-1 so set to = last token
 	var to int
 	if nextOnChannel == -1 {
@@ -269,7 +269,7 @@ func (c *CommonTokenStream) getHiddenTokensToRight(tokenIndex, channel int) []To
 	} else {
 		to = nextOnChannel
 	}
-	return c.filterForChannel(from_, to, channel)
+	return c.filterForChannel(from, to, channel)
 }
 
 // Collect all tokens on specified channel to the left of
@@ -285,9 +285,9 @@ func (c *CommonTokenStream) getHiddenTokensToLeft(tokenIndex, channel int) []Tok
 		return nil
 	}
 	// if none on channel to left, prevOnChannel=-1 then from=0
-	var from_ = prevOnChannel + 1
+	var from = prevOnChannel + 1
 	var to = tokenIndex - 1
-	return c.filterForChannel(from_, to, channel)
+	return c.filterForChannel(from, to, channel)
 }
 
 func (c *CommonTokenStream) filterForChannel(left, right, channel int) []Token {

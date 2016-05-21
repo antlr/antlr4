@@ -26,8 +26,8 @@ type Transition interface {
 type BaseTransition struct {
 	target            ATNState
 	isEpsilon         bool
-	label_            int
-	label             *IntervalSet
+	label             int
+	intervalSet       *IntervalSet
 	serializationType int
 }
 
@@ -42,7 +42,7 @@ func NewBaseTransition(target ATNState) *BaseTransition {
 	t.target = target
 	// Are we epsilon, action, sempred?
 	t.isEpsilon = false
-	t.label = nil
+	t.intervalSet = nil
 
 	return t
 }
@@ -60,7 +60,7 @@ func (t *BaseTransition) getIsEpsilon() bool {
 }
 
 func (t *BaseTransition) getLabel() *IntervalSet {
-	return t.label
+	return t.intervalSet
 }
 
 func (t *BaseTransition) getSerializationType() int {
@@ -79,7 +79,7 @@ const (
 	TransitionATOM       = 5
 	TransitionACTION     = 6
 	TransitionSET        = 7 // ~(A|B) or ~atom, wildcard, which convert to next 2
-	TransitionNOT_SET    = 8
+	TransitionNOTSET     = 8
 	TransitionWILDCARD   = 9
 	TransitionPRECEDENCE = 10
 )
@@ -117,7 +117,7 @@ var TransitionserializationNames = []string{
 //	TransitionATOM,
 //	TransitionACTION,
 //	TransitionSET,
-//	TransitionNOT_SET,
+//	TransitionNOTSET,
 //	TransitionWILDCARD,
 //	TransitionPRECEDENCE
 //}
@@ -127,13 +127,13 @@ type AtomTransition struct {
 	*BaseTransition
 }
 
-func NewAtomTransition(target ATNState, label int) *AtomTransition {
+func NewAtomTransition(target ATNState, intervalSet int) *AtomTransition {
 
 	t := new(AtomTransition)
 	t.BaseTransition = NewBaseTransition(target)
 
-	t.label_ = label // The token type or character value or, signifies special label.
-	t.label = t.makeLabel()
+	t.label = intervalSet // The token type or character value or, signifies special intervalSet.
+	t.intervalSet = t.makeLabel()
 	t.serializationType = TransitionATOM
 
 	return t
@@ -141,16 +141,16 @@ func NewAtomTransition(target ATNState, label int) *AtomTransition {
 
 func (t *AtomTransition) makeLabel() *IntervalSet {
 	var s = NewIntervalSet()
-	s.addOne(t.label_)
+	s.addOne(t.label)
 	return s
 }
 
 func (t *AtomTransition) Matches(symbol, minVocabSymbol, maxVocabSymbol int) bool {
-	return t.label_ == symbol
+	return t.label == symbol
 }
 
 func (t *AtomTransition) String() string {
-	return strconv.Itoa(t.label_)
+	return strconv.Itoa(t.label)
 }
 
 type RuleTransition struct {
@@ -217,7 +217,7 @@ func NewRangeTransition(target ATNState, start, stop int) *RangeTransition {
 	t.serializationType = TransitionRANGE
 	t.start = start
 	t.stop = stop
-	t.label = t.makeLabel()
+	t.intervalSet = t.makeLabel()
 	return t
 }
 
@@ -325,21 +325,21 @@ func NewSetTransition(target ATNState, set *IntervalSet) *SetTransition {
 
 	t.serializationType = TransitionSET
 	if set != nil {
-		t.label = set
+		t.intervalSet = set
 	} else {
-		t.label = NewIntervalSet()
-		t.label.addOne(TokenInvalidType)
+		t.intervalSet = NewIntervalSet()
+		t.intervalSet.addOne(TokenInvalidType)
 	}
 
 	return t
 }
 
 func (t *SetTransition) Matches(symbol, minVocabSymbol, maxVocabSymbol int) bool {
-	return t.label.contains(symbol)
+	return t.intervalSet.contains(symbol)
 }
 
 func (t *SetTransition) String() string {
-	return t.label.String()
+	return t.intervalSet.String()
 }
 
 type NotSetTransition struct {
@@ -352,17 +352,17 @@ func NewNotSetTransition(target ATNState, set *IntervalSet) *NotSetTransition {
 
 	t.SetTransition = NewSetTransition(target, set)
 
-	t.serializationType = TransitionNOT_SET
+	t.serializationType = TransitionNOTSET
 
 	return t
 }
 
 func (t *NotSetTransition) Matches(symbol, minVocabSymbol, maxVocabSymbol int) bool {
-	return symbol >= minVocabSymbol && symbol <= maxVocabSymbol && !t.label.contains(symbol)
+	return symbol >= minVocabSymbol && symbol <= maxVocabSymbol && !t.intervalSet.contains(symbol)
 }
 
 func (t *NotSetTransition) String() string {
-	return "~" + t.label.String()
+	return "~" + t.intervalSet.String()
 }
 
 type WildcardTransition struct {
