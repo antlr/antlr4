@@ -114,43 +114,43 @@ func hashCode(s string) string {
 	return fmt.Sprint(h.Sum32())
 }
 
-func (this *Set) length() int {
-	return len(this.data)
+func (s *Set) length() int {
+	return len(s.data)
 }
 
-func (this *Set) add(value interface{}) interface{} {
+func (s *Set) add(value interface{}) interface{} {
 
-	var hash = this.hashFunction(value)
+	var hash = s.hashFunction(value)
 	var key = "hash_" + hashCode(hash)
 
-	values := this.data[key]
+	values := s.data[key]
 
-	if this.data[key] != nil {
+	if s.data[key] != nil {
 
 		for i := 0; i < len(values); i++ {
-			if this.equalsFunction(value, values[i]) {
+			if s.equalsFunction(value, values[i]) {
 				return values[i]
 			}
 		}
 
-		this.data[key] = append(this.data[key], value)
+		s.data[key] = append(s.data[key], value)
 		return value
 	}
 
-	this.data[key] = []interface{}{value}
+	s.data[key] = []interface{}{value}
 	return value
 }
 
-func (this *Set) contains(value interface{}) bool {
+func (s *Set) contains(value interface{}) bool {
 
-	hash := this.hashFunction(value)
+	hash := s.hashFunction(value)
 	key := "hash_" + hashCode(hash)
 
-	values := this.data[key]
+	values := s.data[key]
 
-	if this.data[key] != nil {
+	if s.data[key] != nil {
 		for i := 0; i < len(values); i++ {
-			if this.equalsFunction(value, values[i]) {
+			if s.equalsFunction(value, values[i]) {
 				return true
 			}
 		}
@@ -158,28 +158,28 @@ func (this *Set) contains(value interface{}) bool {
 	return false
 }
 
-func (this *Set) values() []interface{} {
+func (s *Set) values() []interface{} {
 	var l = make([]interface{}, 0)
 
-	for key, _ := range this.data {
+	for key, _ := range s.data {
 		if strings.Index(key, "hash_") == 0 {
-			l = append(l, this.data[key]...)
+			l = append(l, s.data[key]...)
 		}
 	}
 	return l
 }
 
-func (this *Set) String() string {
+func (s *Set) String() string {
 
-	s := ""
+	r := ""
 
-	for _, av := range this.data {
+	for _, av := range s.data {
 		for _, v := range av {
-			s += fmt.Sprint(v)
+			r += fmt.Sprint(v)
 		}
 	}
 
-	return s
+	return r
 }
 
 type BitSet struct {
@@ -192,42 +192,42 @@ func NewBitSet() *BitSet {
 	return b
 }
 
-func (this *BitSet) add(value int) {
-	this.data[value] = true
+func (b *BitSet) add(value int) {
+	b.data[value] = true
 }
 
-func (this *BitSet) clear(index int) {
-	delete(this.data, index)
+func (b *BitSet) clear(index int) {
+	delete(b.data, index)
 }
 
-func (this *BitSet) or(set *BitSet) {
+func (b *BitSet) or(set *BitSet) {
 	for k, _ := range set.data {
-		this.add(k)
+		b.add(k)
 	}
 }
 
-func (this *BitSet) remove(value int) {
-	delete(this.data, value)
+func (b *BitSet) remove(value int) {
+	delete(b.data, value)
 }
 
-func (this *BitSet) contains(value int) bool {
-	return this.data[value] == true
+func (b *BitSet) contains(value int) bool {
+	return b.data[value] == true
 }
 
-func (this *BitSet) values() []int {
-	ks := make([]int, len(this.data))
+func (b *BitSet) values() []int {
+	ks := make([]int, len(b.data))
 	i := 0
-	for k, _ := range this.data {
+	for k, _ := range b.data {
 		ks[i] = k
 		i++
 	}
 	return ks
 }
 
-func (this *BitSet) minValue() int {
+func (b *BitSet) minValue() int {
 	min := 2147483647
 
-	for k, _ := range this.data {
+	for k, _ := range b.data {
 		if k < min {
 			min = k
 		}
@@ -236,17 +236,17 @@ func (this *BitSet) minValue() int {
 	return min
 }
 
-func (this *BitSet) equals(other interface{}) bool {
+func (b *BitSet) equals(other interface{}) bool {
 	otherBitSet, ok := other.(*BitSet)
 	if !ok {
 		return false
 	}
 
-	if len(this.data) != len(otherBitSet.data) {
+	if len(b.data) != len(otherBitSet.data) {
 		return false
 	}
 
-	for k, v := range this.data {
+	for k, v := range b.data {
 		if otherBitSet.data[k] != v {
 			return false
 		}
@@ -255,12 +255,12 @@ func (this *BitSet) equals(other interface{}) bool {
 	return true
 }
 
-func (this *BitSet) length() int {
-	return len(this.data)
+func (b *BitSet) length() int {
+	return len(b.data)
 }
 
-func (this *BitSet) String() string {
-	vals := this.values()
+func (b *BitSet) String() string {
+	vals := b.values()
 	valsS := make([]string, len(vals))
 
 	for i, val := range vals {
@@ -279,20 +279,20 @@ func NewAltDict() *AltDict {
 	return d
 }
 
-func (this *AltDict) Get(key string) interface{} {
+func (a *AltDict) Get(key string) interface{} {
 	key = "k-" + key
-	return this.data[key]
+	return a.data[key]
 }
 
-func (this *AltDict) put(key string, value interface{}) {
+func (a *AltDict) put(key string, value interface{}) {
 	key = "k-" + key
-	this.data[key] = value
+	a.data[key] = value
 }
 
-func (this *AltDict) values() []interface{} {
-	vs := make([]interface{}, len(this.data))
+func (a *AltDict) values() []interface{} {
+	vs := make([]interface{}, len(a.data))
 	i := 0
-	for _, v := range this.data {
+	for _, v := range a.data {
 		vs[i] = v
 		i++
 	}
@@ -309,25 +309,25 @@ func NewDoubleDict() *DoubleDict {
 	return dd
 }
 
-func (this *DoubleDict) Get(a string, b string) interface{} {
-	var d = this.data[a]
+func (d *DoubleDict) Get(a string, b string) interface{} {
+	var data = d.data[a]
 
-	if d == nil {
+	if data == nil {
 		return nil
 	}
 
-	return d[b]
+	return data[b]
 }
 
-func (this *DoubleDict) set(a, b string, o interface{}) {
-	var d = this.data[a]
+func (d *DoubleDict) set(a, b string, o interface{}) {
+	var data = d.data[a]
 
-	if d == nil {
-		d = make(map[string]interface{})
-		this.data[a] = d
+	if data == nil {
+		data = make(map[string]interface{})
+		d.data[a] = data
 	}
 
-	d[b] = o
+	data[b] = o
 }
 
 func EscapeWhitespace(s string, escapeSpaces bool) string {

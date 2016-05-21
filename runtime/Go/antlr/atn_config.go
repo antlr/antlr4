@@ -110,48 +110,48 @@ func NewBaseATNConfig(c ATNConfig, state ATNState, context PredictionContext, se
 	return a
 }
 
-func (this *BaseATNConfig) getPrecedenceFilterSuppressed() bool {
-	return this.precedenceFilterSuppressed
+func (b *BaseATNConfig) getPrecedenceFilterSuppressed() bool {
+	return b.precedenceFilterSuppressed
 }
 
-func (this *BaseATNConfig) setPrecedenceFilterSuppressed(v bool) {
-	this.precedenceFilterSuppressed = v
+func (b *BaseATNConfig) setPrecedenceFilterSuppressed(v bool) {
+	b.precedenceFilterSuppressed = v
 }
 
-func (this *BaseATNConfig) GetState() ATNState {
-	return this.state
+func (b *BaseATNConfig) GetState() ATNState {
+	return b.state
 }
 
-func (this *BaseATNConfig) GetAlt() int {
-	return this.alt
+func (b *BaseATNConfig) GetAlt() int {
+	return b.alt
 }
 
-func (this *BaseATNConfig) SetContext(v PredictionContext) {
-	this.context = v
+func (b *BaseATNConfig) SetContext(v PredictionContext) {
+	b.context = v
 }
-func (this *BaseATNConfig) GetContext() PredictionContext {
-	return this.context
-}
-
-func (this *BaseATNConfig) GetSemanticContext() SemanticContext {
-	return this.semanticContext
+func (b *BaseATNConfig) GetContext() PredictionContext {
+	return b.context
 }
 
-func (this *BaseATNConfig) GetReachesIntoOuterContext() int {
-	return this.reachesIntoOuterContext
+func (b *BaseATNConfig) GetSemanticContext() SemanticContext {
+	return b.semanticContext
 }
 
-func (this *BaseATNConfig) SetReachesIntoOuterContext(v int) {
-	this.reachesIntoOuterContext = v
+func (b *BaseATNConfig) GetReachesIntoOuterContext() int {
+	return b.reachesIntoOuterContext
+}
+
+func (b *BaseATNConfig) SetReachesIntoOuterContext(v int) {
+	b.reachesIntoOuterContext = v
 }
 
 // An ATN configuration is equal to another if both have
 //  the same state, they predict the same alternative, and
 //  syntactic/semantic contexts are the same.
 ///
-func (this *BaseATNConfig) equals(o interface{}) bool {
+func (b *BaseATNConfig) equals(o interface{}) bool {
 
-	if this == o {
+	if b == o {
 		return true
 	}
 
@@ -161,54 +161,54 @@ func (this *BaseATNConfig) equals(o interface{}) bool {
 		return false
 	}
 
-	var b bool
-	if this.context == nil {
-		b = other.context == nil
+	var equal bool
+	if b.context == nil {
+		equal = other.context == nil
 	} else {
-		b = this.context.equals(other.context)
+		equal = b.context.equals(other.context)
 	}
 
-	return this.state.GetStateNumber() == other.state.GetStateNumber() &&
-		this.alt == other.alt &&
-		this.semanticContext.equals(other.semanticContext) &&
-		this.precedenceFilterSuppressed == other.precedenceFilterSuppressed &&
-		b
+	return b.state.GetStateNumber() == other.state.GetStateNumber() &&
+		b.alt == other.alt &&
+		b.semanticContext.equals(other.semanticContext) &&
+		b.precedenceFilterSuppressed == other.precedenceFilterSuppressed &&
+		equal
 }
 
-func (this *BaseATNConfig) shortHash() string {
-	return strconv.Itoa(this.state.GetStateNumber()) + "/" + strconv.Itoa(this.alt) + "/" + this.semanticContext.String()
+func (b *BaseATNConfig) shortHash() string {
+	return strconv.Itoa(b.state.GetStateNumber()) + "/" + strconv.Itoa(b.alt) + "/" + b.semanticContext.String()
 }
 
-func (this *BaseATNConfig) Hash() string {
+func (b *BaseATNConfig) Hash() string {
 
 	var c string
-	if this.context == nil {
+	if b.context == nil {
 		c = ""
 	} else {
-		c = this.context.Hash()
+		c = b.context.Hash()
 	}
 
-	return strconv.Itoa(this.state.GetStateNumber()) + "/" + strconv.Itoa(this.alt) + "/" + c + "/" + this.semanticContext.String()
+	return strconv.Itoa(b.state.GetStateNumber()) + "/" + strconv.Itoa(b.alt) + "/" + c + "/" + b.semanticContext.String()
 }
 
-func (this *BaseATNConfig) String() string {
+func (b *BaseATNConfig) String() string {
 
-	var a string
-	if this.context != nil {
-		a = ",[" + fmt.Sprint(this.context) + "]"
+	var s1 string
+	if b.context != nil {
+		s1 = ",[" + fmt.Sprint(b.context) + "]"
 	}
 
-	var b string
-	if this.semanticContext != SemanticContextNone {
-		b = "," + fmt.Sprint(this.semanticContext)
+	var s2 string
+	if b.semanticContext != SemanticContextNone {
+		s2 = "," + fmt.Sprint(b.semanticContext)
 	}
 
-	var c string
-	if this.reachesIntoOuterContext > 0 {
-		c = ",up=" + fmt.Sprint(this.reachesIntoOuterContext)
+	var s3 string
+	if b.reachesIntoOuterContext > 0 {
+		s3 = ",up=" + fmt.Sprint(b.reachesIntoOuterContext)
 	}
 
-	return "(" + fmt.Sprint(this.state) + "," + strconv.Itoa(this.alt) + a + b + c + ")"
+	return "(" + fmt.Sprint(b.state) + "," + strconv.Itoa(b.alt) + s1 + s2 + s3 + ")"
 }
 
 type LexerATNConfig struct {
@@ -220,95 +220,95 @@ type LexerATNConfig struct {
 
 func NewLexerATNConfig6(state ATNState, alt int, context PredictionContext) *LexerATNConfig {
 
-	this := new(LexerATNConfig)
+	l := new(LexerATNConfig)
 
-	this.BaseATNConfig = NewBaseATNConfig5(state, alt, context, SemanticContextNone)
+	l.BaseATNConfig = NewBaseATNConfig5(state, alt, context, SemanticContextNone)
 
-	this.passedThroughNonGreedyDecision = false
-	this.lexerActionExecutor = nil
-	return this
+	l.passedThroughNonGreedyDecision = false
+	l.lexerActionExecutor = nil
+	return l
 }
 
 func NewLexerATNConfig5(state ATNState, alt int, context PredictionContext, lexerActionExecutor *LexerActionExecutor) *LexerATNConfig {
 
-	this := new(LexerATNConfig)
+	l := new(LexerATNConfig)
 
-	this.BaseATNConfig = NewBaseATNConfig5(state, alt, context, SemanticContextNone)
-	this.lexerActionExecutor = lexerActionExecutor
-	this.passedThroughNonGreedyDecision = false
-	return this
+	l.BaseATNConfig = NewBaseATNConfig5(state, alt, context, SemanticContextNone)
+	l.lexerActionExecutor = lexerActionExecutor
+	l.passedThroughNonGreedyDecision = false
+	return l
 }
 
 func NewLexerATNConfig4(c *LexerATNConfig, state ATNState) *LexerATNConfig {
 
-	this := new(LexerATNConfig)
+	l := new(LexerATNConfig)
 
-	this.BaseATNConfig = NewBaseATNConfig(c, state, c.GetContext(), c.GetSemanticContext())
-	this.lexerActionExecutor = c.lexerActionExecutor
-	this.passedThroughNonGreedyDecision = checkNonGreedyDecision(c, state)
-	return this
+	l.BaseATNConfig = NewBaseATNConfig(c, state, c.GetContext(), c.GetSemanticContext())
+	l.lexerActionExecutor = c.lexerActionExecutor
+	l.passedThroughNonGreedyDecision = checkNonGreedyDecision(c, state)
+	return l
 }
 
 func NewLexerATNConfig3(c *LexerATNConfig, state ATNState, lexerActionExecutor *LexerActionExecutor) *LexerATNConfig {
 
-	this := new(LexerATNConfig)
+	l := new(LexerATNConfig)
 
-	this.BaseATNConfig = NewBaseATNConfig(c, state, c.GetContext(), c.GetSemanticContext())
-	this.lexerActionExecutor = lexerActionExecutor
-	this.passedThroughNonGreedyDecision = checkNonGreedyDecision(c, state)
-	return this
+	l.BaseATNConfig = NewBaseATNConfig(c, state, c.GetContext(), c.GetSemanticContext())
+	l.lexerActionExecutor = lexerActionExecutor
+	l.passedThroughNonGreedyDecision = checkNonGreedyDecision(c, state)
+	return l
 }
 
 func NewLexerATNConfig2(c *LexerATNConfig, state ATNState, context PredictionContext) *LexerATNConfig {
 
-	this := new(LexerATNConfig)
+	l := new(LexerATNConfig)
 
-	this.BaseATNConfig = NewBaseATNConfig(c, state, context, c.GetSemanticContext())
-	this.lexerActionExecutor = c.lexerActionExecutor
-	this.passedThroughNonGreedyDecision = checkNonGreedyDecision(c, state)
-	return this
+	l.BaseATNConfig = NewBaseATNConfig(c, state, context, c.GetSemanticContext())
+	l.lexerActionExecutor = c.lexerActionExecutor
+	l.passedThroughNonGreedyDecision = checkNonGreedyDecision(c, state)
+	return l
 }
 
 func NewLexerATNConfig1(state ATNState, alt int, context PredictionContext) *LexerATNConfig {
 
-	this := new(LexerATNConfig)
+	l := new(LexerATNConfig)
 
-	this.BaseATNConfig = NewBaseATNConfig5(state, alt, context, SemanticContextNone)
+	l.BaseATNConfig = NewBaseATNConfig5(state, alt, context, SemanticContextNone)
 
-	this.lexerActionExecutor = nil
-	this.passedThroughNonGreedyDecision = false
+	l.lexerActionExecutor = nil
+	l.passedThroughNonGreedyDecision = false
 
-	return this
+	return l
 }
 
-func (this *LexerATNConfig) Hash() string {
+func (l *LexerATNConfig) Hash() string {
 	var f string
 
-	if this.passedThroughNonGreedyDecision {
+	if l.passedThroughNonGreedyDecision {
 		f = "1"
 	} else {
 		f = "0"
 	}
 
-	return strconv.Itoa(this.state.GetStateNumber()) + strconv.Itoa(this.alt) + fmt.Sprint(this.context) +
-		fmt.Sprint(this.semanticContext) + f + fmt.Sprint(this.lexerActionExecutor)
+	return strconv.Itoa(l.state.GetStateNumber()) + strconv.Itoa(l.alt) + fmt.Sprint(l.context) +
+		fmt.Sprint(l.semanticContext) + f + fmt.Sprint(l.lexerActionExecutor)
 }
 
-func (this *LexerATNConfig) equals(other interface{}) bool {
+func (l *LexerATNConfig) equals(other interface{}) bool {
 
 	othert, ok := other.(*LexerATNConfig)
 
-	if this == other {
+	if l == other {
 		return true
 	} else if !ok {
 		return false
-	} else if this.passedThroughNonGreedyDecision != othert.passedThroughNonGreedyDecision {
+	} else if l.passedThroughNonGreedyDecision != othert.passedThroughNonGreedyDecision {
 		return false
 	}
 
 	var b bool
-	if this.lexerActionExecutor != nil {
-		b = !this.lexerActionExecutor.equals(othert.lexerActionExecutor)
+	if l.lexerActionExecutor != nil {
+		b = !l.lexerActionExecutor.equals(othert.lexerActionExecutor)
 	} else {
 		b = othert.lexerActionExecutor != nil
 	}
@@ -316,7 +316,7 @@ func (this *LexerATNConfig) equals(other interface{}) bool {
 	if b {
 		return false
 	} else {
-		return this.BaseATNConfig.equals(othert.BaseATNConfig)
+		return l.BaseATNConfig.equals(othert.BaseATNConfig)
 	}
 }
 

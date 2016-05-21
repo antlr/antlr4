@@ -44,55 +44,55 @@ func NewBaseRecognizer() *BaseRecognizer {
 var tokenTypeMapCache = make(map[string]int)
 var ruleIndexMapCache = make(map[string]int)
 
-func (this *BaseRecognizer) checkVersion(toolVersion string) {
+func (b *BaseRecognizer) checkVersion(toolVersion string) {
 	var runtimeVersion = "4.5.2"
 	if runtimeVersion != toolVersion {
 		fmt.Println("ANTLR runtime and generated code versions disagree: " + runtimeVersion + "!=" + toolVersion)
 	}
 }
 
-func (this *BaseRecognizer) Action(context RuleContext, ruleIndex, actionIndex int) {
+func (b *BaseRecognizer) Action(context RuleContext, ruleIndex, actionIndex int) {
 	panic("action not implemented on Recognizer!")
 }
 
-func (this *BaseRecognizer) AddErrorListener(listener ErrorListener) {
-	this._listeners = append(this._listeners, listener)
+func (b *BaseRecognizer) AddErrorListener(listener ErrorListener) {
+	b._listeners = append(b._listeners, listener)
 }
 
-func (this *BaseRecognizer) RemoveErrorListeners() {
-	this._listeners = make([]ErrorListener, 0)
+func (b *BaseRecognizer) RemoveErrorListeners() {
+	b._listeners = make([]ErrorListener, 0)
 }
 
-func (this *BaseRecognizer) GetRuleNames() []string {
-	return this.RuleNames
+func (b *BaseRecognizer) GetRuleNames() []string {
+	return b.RuleNames
 }
 
-func (this *BaseRecognizer) GetTokenNames() []string {
-	return this.LiteralNames
+func (b *BaseRecognizer) GetTokenNames() []string {
+	return b.LiteralNames
 }
 
-func (this *BaseRecognizer) GetSymbolicNames() []string {
-	return this.SymbolicNames
+func (b *BaseRecognizer) GetSymbolicNames() []string {
+	return b.SymbolicNames
 }
 
-func (this *BaseRecognizer) GetLiteralNames() []string {
-	return this.LiteralNames
+func (b *BaseRecognizer) GetLiteralNames() []string {
+	return b.LiteralNames
 }
 
-func (this *BaseRecognizer) GetState() int {
-	return this.state
+func (b *BaseRecognizer) GetState() int {
+	return b.state
 }
 
-func (this *BaseRecognizer) SetState(v int) {
+func (b *BaseRecognizer) SetState(v int) {
 	if PortDebug {
-		fmt.Println("SETTING STATE " + strconv.Itoa(v) + " from " + strconv.Itoa(this.state))
+		fmt.Println("SETTING STATE " + strconv.Itoa(v) + " from " + strconv.Itoa(b.state))
 	}
 
-	this.state = v
+	b.state = v
 }
 
-//func (this *Recognizer) GetTokenTypeMap() {
-//    var tokenNames = this.GetTokenNames()
+//func (b *Recognizer) GetTokenTypeMap() {
+//    var tokenNames = b.GetTokenNames()
 //    if (tokenNames==nil) {
 //        panic("The current recognizer does not provide a list of token names.")
 //    }
@@ -109,10 +109,10 @@ func (this *BaseRecognizer) SetState(v int) {
 //
 // <p>Used for XPath and tree pattern compilation.</p>
 //
-func (this *BaseRecognizer) GetRuleIndexMap() map[string]int {
+func (b *BaseRecognizer) GetRuleIndexMap() map[string]int {
 
 	panic("Method not defined!")
-	//    var ruleNames = this.GetRuleNames()
+	//    var ruleNames = b.GetRuleNames()
 	//    if (ruleNames==nil) {
 	//        panic("The current recognizer does not provide a list of rule names.")
 	//    }
@@ -125,9 +125,9 @@ func (this *BaseRecognizer) GetRuleIndexMap() map[string]int {
 	//    return result
 }
 
-func (this *BaseRecognizer) GetTokenType(tokenName string) int {
+func (b *BaseRecognizer) GetTokenType(tokenName string) int {
 	panic("Method not defined!")
-	//    var ttype = this.GetTokenTypeMap()[tokenName]
+	//    var ttype = b.GetTokenTypeMap()[tokenName]
 	//    if (ttype !=nil) {
 	//        return ttype
 	//    } else {
@@ -135,7 +135,7 @@ func (this *BaseRecognizer) GetTokenType(tokenName string) int {
 	//    }
 }
 
-//func (this *Recognizer) GetTokenTypeMap() map[string]int {
+//func (b *Recognizer) GetTokenTypeMap() map[string]int {
 //    Vocabulary vocabulary = getVocabulary();
 //
 //    Synchronized (tokenTypeMapCache) {
@@ -164,7 +164,7 @@ func (this *BaseRecognizer) GetTokenType(tokenName string) int {
 //}
 
 // What is the error header, normally line/character position information?//
-func (this *BaseRecognizer) GetErrorHeader(e RecognitionException) string {
+func (b *BaseRecognizer) GetErrorHeader(e RecognitionException) string {
 	var line = e.GetOffendingToken().GetLine()
 	var column = e.GetOffendingToken().GetColumn()
 	return "line " + strconv.Itoa(line) + ":" + strconv.Itoa(column)
@@ -183,7 +183,7 @@ func (this *BaseRecognizer) GetErrorHeader(e RecognitionException) string {
 // feature when necessary. For example, see
 // {@link DefaultErrorStrategy//GetTokenErrorDisplay}.
 //
-func (this *BaseRecognizer) GetTokenErrorDisplay(t Token) string {
+func (b *BaseRecognizer) GetTokenErrorDisplay(t Token) string {
 	if t == nil {
 		return "<no token>"
 	}
@@ -202,16 +202,16 @@ func (this *BaseRecognizer) GetTokenErrorDisplay(t Token) string {
 	return "'" + s + "'"
 }
 
-func (this *BaseRecognizer) GetErrorListenerDispatch() ErrorListener {
-	return NewProxyErrorListener(this._listeners)
+func (b *BaseRecognizer) GetErrorListenerDispatch() ErrorListener {
+	return NewProxyErrorListener(b._listeners)
 }
 
 // subclass needs to override these if there are sempreds or actions
 // that the ATN interp needs to execute
-func (this *BaseRecognizer) Sempred(localctx RuleContext, ruleIndex int, actionIndex int) bool {
+func (b *BaseRecognizer) Sempred(localctx RuleContext, ruleIndex int, actionIndex int) bool {
 	return true
 }
 
-func (this *BaseRecognizer) Precpred(localctx RuleContext, precedence int) bool {
+func (b *BaseRecognizer) Precpred(localctx RuleContext, precedence int) bool {
 	return true
 }

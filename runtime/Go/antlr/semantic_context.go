@@ -74,39 +74,39 @@ func NewPredicate(ruleIndex, predIndex int, isCtxDependent bool) *Predicate {
 
 var SemanticContextNone SemanticContext = NewPredicate(-1, -1, false)
 
-func (this *Predicate) evalPrecedence(parser Recognizer, outerContext RuleContext) SemanticContext {
-	return this
+func (p *Predicate) evalPrecedence(parser Recognizer, outerContext RuleContext) SemanticContext {
+	return p
 }
 
-func (this *Predicate) evaluate(parser Recognizer, outerContext RuleContext) bool {
+func (p *Predicate) evaluate(parser Recognizer, outerContext RuleContext) bool {
 
 	var localctx RuleContext = nil
 
-	if this.isCtxDependent {
+	if p.isCtxDependent {
 		localctx = outerContext
 	}
 
-	return parser.Sempred(localctx, this.ruleIndex, this.predIndex)
+	return parser.Sempred(localctx, p.ruleIndex, p.predIndex)
 }
 
-func (this *Predicate) Hash() string {
-	return strconv.Itoa(this.ruleIndex) + "/" + strconv.Itoa(this.predIndex) + "/" + fmt.Sprint(this.isCtxDependent)
+func (p *Predicate) Hash() string {
+	return strconv.Itoa(p.ruleIndex) + "/" + strconv.Itoa(p.predIndex) + "/" + fmt.Sprint(p.isCtxDependent)
 }
 
-func (this *Predicate) equals(other interface{}) bool {
-	if this == other {
+func (p *Predicate) equals(other interface{}) bool {
+	if p == other {
 		return true
 	} else if _, ok := other.(*Predicate); !ok {
 		return false
 	} else {
-		return this.ruleIndex == other.(*Predicate).ruleIndex &&
-			this.predIndex == other.(*Predicate).predIndex &&
-			this.isCtxDependent == other.(*Predicate).isCtxDependent
+		return p.ruleIndex == other.(*Predicate).ruleIndex &&
+			p.predIndex == other.(*Predicate).predIndex &&
+			p.isCtxDependent == other.(*Predicate).isCtxDependent
 	}
 }
 
-func (this *Predicate) String() string {
-	return "{" + strconv.Itoa(this.ruleIndex) + ":" + strconv.Itoa(this.predIndex) + "}?"
+func (p *Predicate) String() string {
+	return "{" + strconv.Itoa(p.ruleIndex) + ":" + strconv.Itoa(p.predIndex) + "}?"
 }
 
 type PrecedencePredicate struct {
@@ -115,44 +115,44 @@ type PrecedencePredicate struct {
 
 func NewPrecedencePredicate(precedence int) *PrecedencePredicate {
 
-	this := new(PrecedencePredicate)
-	this.precedence = precedence
+	p := new(PrecedencePredicate)
+	p.precedence = precedence
 
-	return this
+	return p
 }
 
-func (this *PrecedencePredicate) evaluate(parser Recognizer, outerContext RuleContext) bool {
-	return parser.Precpred(outerContext, this.precedence)
+func (p *PrecedencePredicate) evaluate(parser Recognizer, outerContext RuleContext) bool {
+	return parser.Precpred(outerContext, p.precedence)
 }
 
-func (this *PrecedencePredicate) evalPrecedence(parser Recognizer, outerContext RuleContext) SemanticContext {
-	if parser.Precpred(outerContext, this.precedence) {
+func (p *PrecedencePredicate) evalPrecedence(parser Recognizer, outerContext RuleContext) SemanticContext {
+	if parser.Precpred(outerContext, p.precedence) {
 		return SemanticContextNone
 	} else {
 		return nil
 	}
 }
 
-func (this *PrecedencePredicate) compareTo(other *PrecedencePredicate) int {
-	return this.precedence - other.precedence
+func (p *PrecedencePredicate) compareTo(other *PrecedencePredicate) int {
+	return p.precedence - other.precedence
 }
 
-func (this *PrecedencePredicate) Hash() string {
+func (p *PrecedencePredicate) Hash() string {
 	return "31"
 }
 
-func (this *PrecedencePredicate) equals(other interface{}) bool {
-	if this == other {
+func (p *PrecedencePredicate) equals(other interface{}) bool {
+	if p == other {
 		return true
 	} else if _, ok := other.(*PrecedencePredicate); !ok {
 		return false
 	} else {
-		return this.precedence == other.(*PrecedencePredicate).precedence
+		return p.precedence == other.(*PrecedencePredicate).precedence
 	}
 }
 
-func (this *PrecedencePredicate) String() string {
-	return "{" + strconv.Itoa(this.precedence) + ">=prec}?"
+func (p *PrecedencePredicate) String() string {
+	return "{" + strconv.Itoa(p.precedence) + ">=prec}?"
 }
 
 func PrecedencePredicatefilterPrecedencePredicates(set *Set) []*PrecedencePredicate {
@@ -212,20 +212,20 @@ func NewAND(a, b SemanticContext) *AND {
 		vs[i] = v.(SemanticContext)
 	}
 
-	this := new(AND)
-	this.opnds = opnds
+	and := new(AND)
+	and.opnds = opnds
 
-	return this
+	return and
 }
 
-func (this *AND) equals(other interface{}) bool {
-	if this == other {
+func (a *AND) equals(other interface{}) bool {
+	if a == other {
 		return true
 	} else if _, ok := other.(*AND); !ok {
 		return false
 	} else {
 		for i, v := range other.(*AND).opnds {
-			if !this.opnds[i].equals(v) {
+			if !a.opnds[i].equals(v) {
 				return false
 			}
 		}
@@ -233,32 +233,32 @@ func (this *AND) equals(other interface{}) bool {
 	}
 }
 
-func (this *AND) Hash() string {
-	return fmt.Sprint(this.opnds) + "/AND"
+func (a *AND) Hash() string {
+	return fmt.Sprint(a.opnds) + "/AND"
 }
 
 //
 // {@inheritDoc}
 //
 // <p>
-// The evaluation of predicates by this context is short-circuiting, but
+// The evaluation of predicates by a context is short-circuiting, but
 // unordered.</p>
 //
-func (this *AND) evaluate(parser Recognizer, outerContext RuleContext) bool {
-	for i := 0; i < len(this.opnds); i++ {
-		if !this.opnds[i].evaluate(parser, outerContext) {
+func (a *AND) evaluate(parser Recognizer, outerContext RuleContext) bool {
+	for i := 0; i < len(a.opnds); i++ {
+		if !a.opnds[i].evaluate(parser, outerContext) {
 			return false
 		}
 	}
 	return true
 }
 
-func (this *AND) evalPrecedence(parser Recognizer, outerContext RuleContext) SemanticContext {
+func (a *AND) evalPrecedence(parser Recognizer, outerContext RuleContext) SemanticContext {
 	var differs = false
 	var operands = make([]SemanticContext, 0)
 
-	for i := 0; i < len(this.opnds); i++ {
-		var context = this.opnds[i]
+	for i := 0; i < len(a.opnds); i++ {
+		var context = a.opnds[i]
 		var evaluated = context.evalPrecedence(parser, outerContext)
 		differs = differs || (evaluated != context)
 		if evaluated == nil {
@@ -270,7 +270,7 @@ func (this *AND) evalPrecedence(parser Recognizer, outerContext RuleContext) Sem
 		}
 	}
 	if !differs {
-		return this
+		return a
 	}
 
 	if len(operands) == 0 {
@@ -291,10 +291,10 @@ func (this *AND) evalPrecedence(parser Recognizer, outerContext RuleContext) Sem
 	return result
 }
 
-func (this *AND) String() string {
+func (a *AND) String() string {
 	var s = ""
 
-	for _, o := range this.opnds {
+	for _, o := range a.opnds {
 		s += "&& " + o.String()
 	}
 
@@ -353,20 +353,20 @@ func NewOR(a, b SemanticContext) *OR {
 		vs[i] = v.(SemanticContext)
 	}
 
-	this := new(OR)
-	this.opnds = opnds
+	o := new(OR)
+	o.opnds = opnds
 
-	return this
+	return o
 }
 
-func (this *OR) equals(other interface{}) bool {
-	if this == other {
+func (o *OR) equals(other interface{}) bool {
+	if o == other {
 		return true
 	} else if _, ok := other.(*OR); !ok {
 		return false
 	} else {
 		for i, v := range other.(*OR).opnds {
-			if !this.opnds[i].equals(v) {
+			if !o.opnds[i].equals(v) {
 				return false
 			}
 		}
@@ -374,28 +374,28 @@ func (this *OR) equals(other interface{}) bool {
 	}
 }
 
-func (this *OR) Hash() string {
-	return fmt.Sprint(this.opnds) + "/OR"
+func (o *OR) Hash() string {
+	return fmt.Sprint(o.opnds) + "/OR"
 }
 
 // <p>
-// The evaluation of predicates by this context is short-circuiting, but
+// The evaluation of predicates by o context is short-circuiting, but
 // unordered.</p>
 //
-func (this *OR) evaluate(parser Recognizer, outerContext RuleContext) bool {
-	for i := 0; i < len(this.opnds); i++ {
-		if this.opnds[i].evaluate(parser, outerContext) {
+func (o *OR) evaluate(parser Recognizer, outerContext RuleContext) bool {
+	for i := 0; i < len(o.opnds); i++ {
+		if o.opnds[i].evaluate(parser, outerContext) {
 			return true
 		}
 	}
 	return false
 }
 
-func (this *OR) evalPrecedence(parser Recognizer, outerContext RuleContext) SemanticContext {
+func (o *OR) evalPrecedence(parser Recognizer, outerContext RuleContext) SemanticContext {
 	var differs = false
 	var operands = make([]SemanticContext, 0)
-	for i := 0; i < len(this.opnds); i++ {
-		var context = this.opnds[i]
+	for i := 0; i < len(o.opnds); i++ {
+		var context = o.opnds[i]
 		var evaluated = context.evalPrecedence(parser, outerContext)
 		differs = differs || (evaluated != context)
 		if evaluated == SemanticContextNone {
@@ -407,7 +407,7 @@ func (this *OR) evalPrecedence(parser Recognizer, outerContext RuleContext) Sema
 		}
 	}
 	if !differs {
-		return this
+		return o
 	}
 	if len(operands) == 0 {
 		// all elements were false, so the OR context is false
@@ -426,10 +426,10 @@ func (this *OR) evalPrecedence(parser Recognizer, outerContext RuleContext) Sema
 	return result
 }
 
-func (this *OR) String() string {
+func (o *OR) String() string {
 	var s = ""
 
-	for _, o := range this.opnds {
+	for _, o := range o.opnds {
 		s += "|| " + o.String()
 	}
 

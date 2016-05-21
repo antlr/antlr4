@@ -18,9 +18,9 @@ func NewLexerActionExecutor(lexerActions []LexerAction) *LexerActionExecutor {
 		lexerActions = make([]LexerAction, 0)
 	}
 
-	this := new(LexerActionExecutor)
+	l := new(LexerActionExecutor)
 
-	this.lexerActions = lexerActions
+	l.lexerActions = lexerActions
 
 	// Caches the result of {@link //hashCode} since the hash code is an element
 	// of the performance-critical {@link LexerATNConfig//hashCode} operation.
@@ -30,9 +30,9 @@ func NewLexerActionExecutor(lexerActions []LexerAction) *LexerActionExecutor {
 		s += a.Hash()
 	}
 
-	this.cachedHashString = s // "".join([str(la) for la in
+	l.cachedHashString = s // "".join([str(la) for la in
 
-	return this
+	return l
 }
 
 // Creates a {@link LexerActionExecutor} which executes the actions for
@@ -87,30 +87,30 @@ func LexerActionExecutorappend(lexerActionExecutor *LexerActionExecutor, lexerAc
 // @return A {@link LexerActionExecutor} which stores input stream offsets
 // for all position-dependent lexer actions.
 // /
-func (this *LexerActionExecutor) fixOffsetBeforeMatch(offset int) *LexerActionExecutor {
+func (l *LexerActionExecutor) fixOffsetBeforeMatch(offset int) *LexerActionExecutor {
 	var updatedLexerActions []LexerAction = nil
-	for i := 0; i < len(this.lexerActions); i++ {
-		_, ok := this.lexerActions[i].(*LexerIndexedCustomAction)
-		if this.lexerActions[i].getIsPositionDependent() && !ok {
+	for i := 0; i < len(l.lexerActions); i++ {
+		_, ok := l.lexerActions[i].(*LexerIndexedCustomAction)
+		if l.lexerActions[i].getIsPositionDependent() && !ok {
 			if updatedLexerActions == nil {
 				updatedLexerActions = make([]LexerAction, 0)
 
-				for _, a := range this.lexerActions {
+				for _, a := range l.lexerActions {
 					updatedLexerActions = append(updatedLexerActions, a)
 				}
 			}
 
-			updatedLexerActions[i] = NewLexerIndexedCustomAction(offset, this.lexerActions[i])
+			updatedLexerActions[i] = NewLexerIndexedCustomAction(offset, l.lexerActions[i])
 		}
 	}
 	if updatedLexerActions == nil {
-		return this
+		return l
 	} else {
 		return NewLexerActionExecutor(updatedLexerActions)
 	}
 }
 
-// Execute the actions encapsulated by this executor within the context of a
+// Execute the actions encapsulated by l executor within the context of a
 // particular {@link Lexer}.
 //
 // <p>This method calls {@link IntStream//seek} to set the position of the
@@ -121,14 +121,14 @@ func (this *LexerActionExecutor) fixOffsetBeforeMatch(offset int) *LexerActionEx
 //
 // @param lexer The lexer instance.
 // @param input The input stream which is the source for the current token.
-// When this method is called, the current {@link IntStream//index} for
+// When l method is called, the current {@link IntStream//index} for
 // {@code input} should be the start of the following token, i.e. 1
 // character past the end of the current token.
 // @param startIndex The token start index. This value may be passed to
 // {@link IntStream//seek} to set the {@code input} position to the beginning
 // of the token.
 // /
-func (this *LexerActionExecutor) execute(lexer Lexer, input CharStream, startIndex int) {
+func (l *LexerActionExecutor) execute(lexer Lexer, input CharStream, startIndex int) {
 	var requiresSeek = false
 	var stopIndex = input.Index()
 
@@ -138,8 +138,8 @@ func (this *LexerActionExecutor) execute(lexer Lexer, input CharStream, startInd
 		}
 	}()
 
-	for i := 0; i < len(this.lexerActions); i++ {
-		var lexerAction LexerAction = this.lexerActions[i]
+	for i := 0; i < len(l.lexerActions); i++ {
+		var lexerAction LexerAction = l.lexerActions[i]
 		if la, ok := lexerAction.(*LexerIndexedCustomAction); ok {
 			var offset = la.offset
 			input.Seek(startIndex + offset)
@@ -153,17 +153,17 @@ func (this *LexerActionExecutor) execute(lexer Lexer, input CharStream, startInd
 	}
 }
 
-func (this *LexerActionExecutor) Hash() string {
-	return this.cachedHashString
+func (l *LexerActionExecutor) Hash() string {
+	return l.cachedHashString
 }
 
-func (this *LexerActionExecutor) equals(other interface{}) bool {
-	if this == other {
+func (l *LexerActionExecutor) equals(other interface{}) bool {
+	if l == other {
 		return true
 	} else if _, ok := other.(*LexerActionExecutor); !ok {
 		return false
 	} else {
-		return this.cachedHashString == other.(*LexerActionExecutor).cachedHashString &&
-			&this.lexerActions == &other.(*LexerActionExecutor).lexerActions
+		return l.cachedHashString == other.(*LexerActionExecutor).cachedHashString &&
+			&l.lexerActions == &other.(*LexerActionExecutor).lexerActions
 	}
 }

@@ -22,34 +22,34 @@ func NewDFASerializer(dfa *DFA, literalNames, symbolicNames []string) *DFASerial
 		symbolicNames = make([]string, 0)
 	}
 
-	this := new(DFASerializer)
+	d := new(DFASerializer)
 
-	this.dfa = dfa
-	this.literalNames = literalNames
-	this.symbolicNames = symbolicNames
+	d.dfa = dfa
+	d.literalNames = literalNames
+	d.symbolicNames = symbolicNames
 
-	return this
+	return d
 }
 
-func (this *DFASerializer) String() string {
+func (d *DFASerializer) String() string {
 
-	if this.dfa.s0 == nil {
+	if d.dfa.s0 == nil {
 		return ""
 	}
 
 	var buf = ""
-	var states = this.dfa.sortedStates()
+	var states = d.dfa.sortedStates()
 	for _, s := range states {
 		if s.edges != nil {
 			var n = len(s.edges)
 			for j := 0; j < n; j++ {
 				var t = s.edges[j]
 				if t != nil && t.stateNumber != 0x7FFFFFFF {
-					buf += this.GetStateString(s)
+					buf += d.GetStateString(s)
 					buf += "-"
-					buf += this.getEdgeLabel(j)
+					buf += d.getEdgeLabel(j)
 					buf += "->"
-					buf += this.GetStateString(t)
+					buf += d.GetStateString(t)
 					buf += "\n"
 				}
 			}
@@ -62,19 +62,19 @@ func (this *DFASerializer) String() string {
 	return buf
 }
 
-func (this *DFASerializer) getEdgeLabel(i int) string {
+func (d *DFASerializer) getEdgeLabel(i int) string {
 	if i == 0 {
 		return "EOF"
-	} else if this.literalNames != nil && i-1 < len(this.literalNames) {
-		return this.literalNames[i-1]
-	} else if this.symbolicNames != nil && i-1 < len(this.symbolicNames) {
-		return this.symbolicNames[i-1]
+	} else if d.literalNames != nil && i-1 < len(d.literalNames) {
+		return d.literalNames[i-1]
+	} else if d.symbolicNames != nil && i-1 < len(d.symbolicNames) {
+		return d.symbolicNames[i-1]
 	} else {
 		return strconv.Itoa(i - 1)
 	}
 }
 
-func (this *DFASerializer) GetStateString(s *DFAState) string {
+func (d *DFASerializer) GetStateString(s *DFAState) string {
 
 	var a, b string
 
@@ -104,25 +104,25 @@ type LexerDFASerializer struct {
 
 func NewLexerDFASerializer(dfa *DFA) *LexerDFASerializer {
 
-	this := new(LexerDFASerializer)
+	l := new(LexerDFASerializer)
 
-	this.DFASerializer = NewDFASerializer(dfa, nil, nil)
+	l.DFASerializer = NewDFASerializer(dfa, nil, nil)
 
-	return this
+	return l
 }
 
-func (this *LexerDFASerializer) getEdgeLabel(i int) string {
+func (l *LexerDFASerializer) getEdgeLabel(i int) string {
 	return "'" + string(i) + "'"
 }
 
-func (this *LexerDFASerializer) String() string {
+func (l *LexerDFASerializer) String() string {
 
-	if this.dfa.s0 == nil {
+	if l.dfa.s0 == nil {
 		return ""
 	}
 
 	var buf = ""
-	var states = this.dfa.sortedStates()
+	var states = l.dfa.sortedStates()
 	for i := 0; i < len(states); i++ {
 		var s = states[i]
 		if s.edges != nil {
@@ -130,11 +130,11 @@ func (this *LexerDFASerializer) String() string {
 			for j := 0; j < n; j++ {
 				var t = s.edges[j]
 				if t != nil && t.stateNumber != 0x7FFFFFFF {
-					buf += this.GetStateString(s)
+					buf += l.GetStateString(s)
 					buf += "-"
-					buf += this.getEdgeLabel(j)
+					buf += l.getEdgeLabel(j)
 					buf += "->"
-					buf += this.GetStateString(t)
+					buf += l.GetStateString(t)
 					buf += "\n"
 				}
 			}

@@ -47,7 +47,7 @@ func NewCommonTokenFactory(copyText bool) *CommonTokenFactory {
 //
 var CommonTokenFactoryDEFAULT = NewCommonTokenFactory(false)
 
-func (this *CommonTokenFactory) Create(source *TokenSourceCharStreamPair, ttype int, text string, channel, start, stop, line, column int) Token {
+func (c *CommonTokenFactory) Create(source *TokenSourceCharStreamPair, ttype int, text string, channel, start, stop, line, column int) Token {
 
 	if PortDebug {
 		fmt.Println("Token factory creating: " + text)
@@ -58,7 +58,7 @@ func (this *CommonTokenFactory) Create(source *TokenSourceCharStreamPair, ttype 
 	t.column = column
 	if text != "" {
 		t.SetText(text)
-	} else if this.copyText && source.charStream != nil {
+	} else if c.copyText && source.charStream != nil {
 		t.SetText(source.charStream.GetTextFromInterval(NewInterval(start, stop)))
 	}
 
@@ -66,7 +66,7 @@ func (this *CommonTokenFactory) Create(source *TokenSourceCharStreamPair, ttype 
 
 }
 
-func (this *CommonTokenFactory) createThin(ttype int, text string) Token {
+func (c *CommonTokenFactory) createThin(ttype int, text string) Token {
 
 	if PortDebug {
 		fmt.Println("Token factory creating: " + text)

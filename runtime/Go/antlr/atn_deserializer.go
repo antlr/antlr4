@@ -13,7 +13,7 @@ import (
 var BaseSerializedUUID = "AADB8D7E-AEEF-4415-AD2B-8204D6CF042E"
 
 // This list contains all of the currently supported UUIDs, ordered by when
-// the feature first appeared in this branch.
+// the feature first appeared in a branch.
 var SupportedUUIDs = []string{BaseSerializedUUID}
 
 var SerializedVersion = 3
@@ -44,11 +44,11 @@ func NewATNDeserializer(options *ATNDeserializationOptions) *ATNDeserializer {
 		options = ATNDeserializationOptionsdefaultOptions
 	}
 
-	this := new(ATNDeserializer)
+	a := new(ATNDeserializer)
 
-	this.deserializationOptions = options
+	a.deserializationOptions = options
 
-	return this
+	return a
 }
 
 func stringInSlice(a string, list []string) int {
@@ -72,7 +72,7 @@ func stringInSlice(a string, list []string) int {
 // serialized ATN at or after the feature identified by {@code feature} was
 // introduced otherwise, {@code false}.
 
-func (this *ATNDeserializer) isFeatureSupported(feature, actualUuid string) bool {
+func (a *ATNDeserializer) isFeatureSupported(feature, actualUuid string) bool {
 	var idx1 = stringInSlice(feature, SupportedUUIDs)
 	if idx1 < 0 {
 		return false
@@ -81,31 +81,31 @@ func (this *ATNDeserializer) isFeatureSupported(feature, actualUuid string) bool
 	return idx2 >= idx1
 }
 
-func (this *ATNDeserializer) DeserializeFromUInt16(data []uint16) *ATN {
+func (a *ATNDeserializer) DeserializeFromUInt16(data []uint16) *ATN {
 
-	this.reset(utf16.Decode(data))
-	this.checkVersion()
-	this.checkUUID()
-	var atn = this.readATN()
-	this.readStates(atn)
-	this.readRules(atn)
-	this.readModes(atn)
-	var sets = this.readSets(atn)
-	this.readEdges(atn, sets)
-	this.readDecisions(atn)
-	this.readLexerActions(atn)
-	this.markPrecedenceDecisions(atn)
-	this.verifyATN(atn)
-	if this.deserializationOptions.generateRuleBypassTransitions && atn.grammarType == ATNTypeParser {
-		this.generateRuleBypassTransitions(atn)
+	a.reset(utf16.Decode(data))
+	a.checkVersion()
+	a.checkUUID()
+	var atn = a.readATN()
+	a.readStates(atn)
+	a.readRules(atn)
+	a.readModes(atn)
+	var sets = a.readSets(atn)
+	a.readEdges(atn, sets)
+	a.readDecisions(atn)
+	a.readLexerActions(atn)
+	a.markPrecedenceDecisions(atn)
+	a.verifyATN(atn)
+	if a.deserializationOptions.generateRuleBypassTransitions && atn.grammarType == ATNTypeParser {
+		a.generateRuleBypassTransitions(atn)
 		// re-verify after modification
-		this.verifyATN(atn)
+		a.verifyATN(atn)
 	}
 	return atn
 
 }
 
-func (this *ATNDeserializer) reset(data []rune) {
+func (a *ATNDeserializer) reset(data []rune) {
 
 	temp := make([]rune, len(data))
 
@@ -118,55 +118,55 @@ func (this *ATNDeserializer) reset(data []rune) {
 		}
 	}
 
-	this.data = temp
-	this.pos = 0
+	a.data = temp
+	a.pos = 0
 }
 
-func (this *ATNDeserializer) checkVersion() {
-	var version = this.readInt()
+func (a *ATNDeserializer) checkVersion() {
+	var version = a.readInt()
 	if version != SerializedVersion {
 		panic("Could not deserialize ATN with version " + strconv.Itoa(version) + " (expected " + strconv.Itoa(SerializedVersion) + ").")
 	}
 }
 
-func (this *ATNDeserializer) checkUUID() {
-	var uuid = this.readUUID()
+func (a *ATNDeserializer) checkUUID() {
+	var uuid = a.readUUID()
 	if stringInSlice(uuid, SupportedUUIDs) < 0 {
 		panic("Could not deserialize ATN with UUID: " + uuid + " (expected " + SerializedUUID + " or a legacy UUID).")
 	}
-	this.uuid = uuid
+	a.uuid = uuid
 }
 
-func (this *ATNDeserializer) readATN() *ATN {
-	var grammarType = this.readInt()
-	var maxTokenType = this.readInt()
+func (a *ATNDeserializer) readATN() *ATN {
+	var grammarType = a.readInt()
+	var maxTokenType = a.readInt()
 	return NewATN(grammarType, maxTokenType)
 }
 
-func (this *ATNDeserializer) readStates(atn *ATN) {
+func (a *ATNDeserializer) readStates(atn *ATN) {
 
 	var loopBackStateNumbers = make([]LoopEndStateIntPair, 0)
 	var endStateNumbers = make([]BlockStartStateIntPair, 0)
 
-	var nstates = this.readInt()
+	var nstates = a.readInt()
 
 	for i := 0; i < nstates; i++ {
-		var stype = this.readInt()
+		var stype = a.readInt()
 		// ignore bad type of states
 		if stype == ATNStateInvalidType {
 			atn.addState(nil)
 			continue
 		}
-		var ruleIndex = this.readInt()
+		var ruleIndex = a.readInt()
 		if ruleIndex == 0xFFFF {
 			ruleIndex = -1
 		}
-		var s = this.stateFactory(stype, ruleIndex)
+		var s = a.stateFactory(stype, ruleIndex)
 		if stype == ATNStateLoopEnd {
-			var loopBackStateNumber = this.readInt()
+			var loopBackStateNumber = a.readInt()
 			loopBackStateNumbers = append(loopBackStateNumbers, LoopEndStateIntPair{s.(*LoopEndState), loopBackStateNumber})
 		} else if s2, ok := s.(BlockStartState); ok {
-			var endStateNumber = this.readInt()
+			var endStateNumber = a.readInt()
 			endStateNumbers = append(endStateNumbers, BlockStartStateIntPair{s2, endStateNumber})
 		}
 		atn.addState(s)
@@ -183,32 +183,32 @@ func (this *ATNDeserializer) readStates(atn *ATN) {
 		pair.item0.setEndState(atn.states[pair.item1].(*BlockEndState))
 	}
 
-	var numNonGreedyStates = this.readInt()
+	var numNonGreedyStates = a.readInt()
 	for j := 0; j < numNonGreedyStates; j++ {
-		stateNumber := this.readInt()
+		stateNumber := a.readInt()
 		atn.states[stateNumber].(DecisionState).setNonGreedy(true)
 	}
 
-	var numPrecedenceStates = this.readInt()
+	var numPrecedenceStates = a.readInt()
 	for j := 0; j < numPrecedenceStates; j++ {
-		stateNumber := this.readInt()
+		stateNumber := a.readInt()
 		atn.states[stateNumber].(*RuleStartState).isPrecedenceRule = true
 	}
 }
 
-func (this *ATNDeserializer) readRules(atn *ATN) {
+func (a *ATNDeserializer) readRules(atn *ATN) {
 
-	var nrules = this.readInt()
+	var nrules = a.readInt()
 	if atn.grammarType == ATNTypeLexer {
 		atn.ruleToTokenType = make([]int, nrules) // initIntArray(nrules, 0)
 	}
 	atn.ruleToStartState = make([]*RuleStartState, nrules) // initIntArray(nrules, 0)
 	for i := 0; i < nrules; i++ {
-		var s = this.readInt()
+		var s = a.readInt()
 		var startState = atn.states[s].(*RuleStartState)
 		atn.ruleToStartState[i] = startState
 		if atn.grammarType == ATNTypeLexer {
-			var tokenType = this.readInt()
+			var tokenType = a.readInt()
 			if tokenType == 0xFFFF {
 				tokenType = TokenEOF
 			}
@@ -225,45 +225,45 @@ func (this *ATNDeserializer) readRules(atn *ATN) {
 	}
 }
 
-func (this *ATNDeserializer) readModes(atn *ATN) {
-	var nmodes = this.readInt()
+func (a *ATNDeserializer) readModes(atn *ATN) {
+	var nmodes = a.readInt()
 	for i := 0; i < nmodes; i++ {
-		var s = this.readInt()
+		var s = a.readInt()
 		atn.modeToStartState = append(atn.modeToStartState, atn.states[s].(*TokensStartState))
 	}
 }
 
-func (this *ATNDeserializer) readSets(atn *ATN) []*IntervalSet {
+func (a *ATNDeserializer) readSets(atn *ATN) []*IntervalSet {
 	var sets = make([]*IntervalSet, 0)
-	var m = this.readInt()
+	var m = a.readInt()
 	for i := 0; i < m; i++ {
 		var iset = NewIntervalSet()
 		sets = append(sets, iset)
-		var n = this.readInt()
-		var containsEof = this.readInt()
+		var n = a.readInt()
+		var containsEof = a.readInt()
 		if containsEof != 0 {
 			iset.addOne(-1)
 		}
 		for j := 0; j < n; j++ {
-			var i1 = this.readInt()
-			var i2 = this.readInt()
+			var i1 = a.readInt()
+			var i2 = a.readInt()
 			iset.addRange(i1, i2)
 		}
 	}
 	return sets
 }
 
-func (this *ATNDeserializer) readEdges(atn *ATN, sets []*IntervalSet) {
+func (a *ATNDeserializer) readEdges(atn *ATN, sets []*IntervalSet) {
 
-	var nedges = this.readInt()
+	var nedges = a.readInt()
 	for i := 0; i < nedges; i++ {
-		var src = this.readInt()
-		var trg = this.readInt()
-		var ttype = this.readInt()
-		var arg1 = this.readInt()
-		var arg2 = this.readInt()
-		var arg3 = this.readInt()
-		trans := this.edgeFactory(atn, ttype, src, trg, arg1, arg2, arg3, sets)
+		var src = a.readInt()
+		var trg = a.readInt()
+		var ttype = a.readInt()
+		var arg1 = a.readInt()
+		var arg2 = a.readInt()
+		var arg3 = a.readInt()
+		trans := a.edgeFactory(atn, ttype, src, trg, arg1, arg2, arg3, sets)
 		var srcState = atn.states[src]
 		srcState.AddTransition(trans, -1)
 	}
@@ -319,47 +319,47 @@ func (this *ATNDeserializer) readEdges(atn *ATN, sets []*IntervalSet) {
 	}
 }
 
-func (this *ATNDeserializer) readDecisions(atn *ATN) {
-	var ndecisions = this.readInt()
+func (a *ATNDeserializer) readDecisions(atn *ATN) {
+	var ndecisions = a.readInt()
 	for i := 0; i < ndecisions; i++ {
-		var s = this.readInt()
+		var s = a.readInt()
 		var decState = atn.states[s].(DecisionState)
 		atn.DecisionToState = append(atn.DecisionToState, decState)
 		decState.setDecision(i)
 	}
 }
 
-func (this *ATNDeserializer) readLexerActions(atn *ATN) {
+func (a *ATNDeserializer) readLexerActions(atn *ATN) {
 	if atn.grammarType == ATNTypeLexer {
-		var count = this.readInt()
+		var count = a.readInt()
 		atn.lexerActions = make([]LexerAction, count) // initIntArray(count, nil)
 		for i := 0; i < count; i++ {
-			var actionType = this.readInt()
-			var data1 = this.readInt()
+			var actionType = a.readInt()
+			var data1 = a.readInt()
 			if data1 == 0xFFFF {
 				data1 = -1
 			}
-			var data2 = this.readInt()
+			var data2 = a.readInt()
 			if data2 == 0xFFFF {
 				data2 = -1
 			}
-			var lexerAction = this.lexerActionFactory(actionType, data1, data2)
+			var lexerAction = a.lexerActionFactory(actionType, data1, data2)
 			atn.lexerActions[i] = lexerAction
 		}
 	}
 }
 
-func (this *ATNDeserializer) generateRuleBypassTransitions(atn *ATN) {
+func (a *ATNDeserializer) generateRuleBypassTransitions(atn *ATN) {
 	var count = len(atn.ruleToStartState)
 	for i := 0; i < count; i++ {
 		atn.ruleToTokenType[i] = atn.maxTokenType + i + 1
 	}
 	for i := 0; i < count; i++ {
-		this.generateRuleBypassTransition(atn, i)
+		a.generateRuleBypassTransition(atn, i)
 	}
 }
 
-func (this *ATNDeserializer) generateRuleBypassTransition(atn *ATN, idx int) {
+func (a *ATNDeserializer) generateRuleBypassTransition(atn *ATN, idx int) {
 
 	var bypassStart = NewBasicBlockStartState()
 	bypassStart.ruleIndex = idx
@@ -383,7 +383,7 @@ func (this *ATNDeserializer) generateRuleBypassTransition(atn *ATN, idx int) {
 		endState = nil
 		for i := 0; i < len(atn.states); i++ {
 			state := atn.states[i]
-			if this.stateIsEndStateFor(state, idx) != nil {
+			if a.stateIsEndStateFor(state, idx) != nil {
 				endState = state
 				excludeTransition = state.(*StarLoopEntryState).loopBackState.GetTransitions()[0]
 				break
@@ -429,7 +429,7 @@ func (this *ATNDeserializer) generateRuleBypassTransition(atn *ATN, idx int) {
 	bypassStart.AddTransition(NewEpsilonTransition(MatchState, -1), -1)
 }
 
-func (this *ATNDeserializer) stateIsEndStateFor(state ATNState, idx int) ATNState {
+func (a *ATNDeserializer) stateIsEndStateFor(state ATNState, idx int) ATNState {
 	if state.GetRuleIndex() != idx {
 		return nil
 	}
@@ -457,12 +457,12 @@ func (this *ATNDeserializer) stateIsEndStateFor(state ATNState, idx int) ATNStat
 //
 // @param atn The ATN.
 //
-func (this *ATNDeserializer) markPrecedenceDecisions(atn *ATN) {
+func (a *ATNDeserializer) markPrecedenceDecisions(atn *ATN) {
 	for _, state := range atn.states {
 		if _, ok := state.(*StarLoopEntryState); !ok {
 			continue
 		}
-		// We analyze the ATN to determine if this ATN decision state is the
+		// We analyze the ATN to determine if a ATN decision state is the
 		// decision for the closure block that determines whether a
 		// precedence rule should continue or complete.
 		//
@@ -482,8 +482,8 @@ func (this *ATNDeserializer) markPrecedenceDecisions(atn *ATN) {
 	}
 }
 
-func (this *ATNDeserializer) verifyATN(atn *ATN) {
-	if !this.deserializationOptions.verifyATN {
+func (a *ATNDeserializer) verifyATN(atn *ATN) {
+	if !a.deserializationOptions.verifyATN {
 		return
 	}
 	// verify assumptions
@@ -493,52 +493,52 @@ func (this *ATNDeserializer) verifyATN(atn *ATN) {
 		if state == nil {
 			continue
 		}
-		this.checkCondition(state.GetEpsilonOnlyTransitions() || len(state.GetTransitions()) <= 1, "")
+		a.checkCondition(state.GetEpsilonOnlyTransitions() || len(state.GetTransitions()) <= 1, "")
 
 		switch s2 := state.(type) {
 
 		case *PlusBlockStartState:
-			this.checkCondition(s2.loopBackState != nil, "")
+			a.checkCondition(s2.loopBackState != nil, "")
 		case *StarLoopEntryState:
 
-			this.checkCondition(s2.loopBackState != nil, "")
-			this.checkCondition(len(s2.GetTransitions()) == 2, "")
+			a.checkCondition(s2.loopBackState != nil, "")
+			a.checkCondition(len(s2.GetTransitions()) == 2, "")
 
 			switch s2 := state.(type) {
 			case *StarBlockStartState:
 				_, ok2 := s2.GetTransitions()[1].getTarget().(*LoopEndState)
-				this.checkCondition(ok2, "")
-				this.checkCondition(!s2.nonGreedy, "")
+				a.checkCondition(ok2, "")
+				a.checkCondition(!s2.nonGreedy, "")
 			case *LoopEndState:
 				s3, ok2 := s2.GetTransitions()[1].getTarget().(*StarBlockStartState)
-				this.checkCondition(ok2, "")
-				this.checkCondition(s3.nonGreedy, "")
+				a.checkCondition(ok2, "")
+				a.checkCondition(s3.nonGreedy, "")
 			default:
 				panic("IllegalState")
 			}
 
 		case *StarLoopbackState:
-			this.checkCondition(len(state.GetTransitions()) == 1, "")
+			a.checkCondition(len(state.GetTransitions()) == 1, "")
 			_, ok2 := state.GetTransitions()[0].getTarget().(*StarLoopEntryState)
-			this.checkCondition(ok2, "")
+			a.checkCondition(ok2, "")
 		case *LoopEndState:
-			this.checkCondition(s2.loopBackState != nil, "")
+			a.checkCondition(s2.loopBackState != nil, "")
 		case *RuleStartState:
-			this.checkCondition(s2.stopState != nil, "")
+			a.checkCondition(s2.stopState != nil, "")
 		case *BaseBlockStartState:
-			this.checkCondition(s2.endState != nil, "")
+			a.checkCondition(s2.endState != nil, "")
 		case *BlockEndState:
-			this.checkCondition(s2.startState != nil, "")
+			a.checkCondition(s2.startState != nil, "")
 		case DecisionState:
-			this.checkCondition(len(s2.GetTransitions()) <= 1 || s2.getDecision() >= 0, "")
+			a.checkCondition(len(s2.GetTransitions()) <= 1 || s2.getDecision() >= 0, "")
 		default:
 			_, ok := s2.(*RuleStopState)
-			this.checkCondition(len(s2.GetTransitions()) <= 1 || ok, "")
+			a.checkCondition(len(s2.GetTransitions()) <= 1 || ok, "")
 		}
 	}
 }
 
-func (this *ATNDeserializer) checkCondition(condition bool, message string) {
+func (a *ATNDeserializer) checkCondition(condition bool, message string) {
 	if !condition {
 		if message == "" {
 			message = "IllegalState"
@@ -547,16 +547,16 @@ func (this *ATNDeserializer) checkCondition(condition bool, message string) {
 	}
 }
 
-func (this *ATNDeserializer) readInt() int {
-	v := this.data[this.pos]
-	this.pos += 1
+func (a *ATNDeserializer) readInt() int {
+	v := a.data[a.pos]
+	a.pos += 1
 	return int(v)
 }
 
-//func (this *ATNDeserializer) readLong() int64 {
+//func (a *ATNDeserializer) readLong() int64 {
 //    panic("Not implemented")
-//    var low = this.readInt32()
-//    var high = this.readInt32()
+//    var low = a.readInt32()
+//    var high = a.readInt32()
 //    return (low & 0x00000000FFFFFFFF) | (high << int32)
 //}
 
@@ -570,10 +570,10 @@ func createByteToHex() []string {
 
 var byteToHex = createByteToHex()
 
-func (this *ATNDeserializer) readUUID() string {
+func (a *ATNDeserializer) readUUID() string {
 	var bb = make([]int, 16)
 	for i := 7; i >= 0; i-- {
-		var integer = this.readInt()
+		var integer = a.readInt()
 		bb[(2*i)+1] = integer & 0xFF
 		bb[2*i] = (integer >> 8) & 0xFF
 	}
@@ -587,7 +587,7 @@ func (this *ATNDeserializer) readUUID() string {
 		byteToHex[bb[14]] + byteToHex[bb[15]]
 }
 
-func (this *ATNDeserializer) edgeFactory(atn *ATN, typeIndex, src, trg, arg1, arg2, arg3 int, sets []*IntervalSet) Transition {
+func (a *ATNDeserializer) edgeFactory(atn *ATN, typeIndex, src, trg, arg1, arg2, arg3 int, sets []*IntervalSet) Transition {
 
 	var target = atn.states[trg]
 
@@ -625,7 +625,7 @@ func (this *ATNDeserializer) edgeFactory(atn *ATN, typeIndex, src, trg, arg1, ar
 	panic("The specified transition type is not valid.")
 }
 
-func (this *ATNDeserializer) stateFactory(typeIndex, ruleIndex int) ATNState {
+func (a *ATNDeserializer) stateFactory(typeIndex, ruleIndex int) ATNState {
 
 	var s ATNState
 	switch typeIndex {
@@ -664,7 +664,7 @@ func (this *ATNDeserializer) stateFactory(typeIndex, ruleIndex int) ATNState {
 	return s
 }
 
-func (this *ATNDeserializer) lexerActionFactory(typeIndex, data1, data2 int) LexerAction {
+func (a *ATNDeserializer) lexerActionFactory(typeIndex, data1, data2 int) LexerAction {
 	switch typeIndex {
 	case LexerActionTypeChannel:
 		return NewLexerChannelAction(data1)

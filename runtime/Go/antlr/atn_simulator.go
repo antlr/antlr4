@@ -7,20 +7,20 @@ type BaseATNSimulator struct {
 
 func NewBaseATNSimulator(atn *ATN, sharedContextCache *PredictionContextCache) *BaseATNSimulator {
 
-	this := new(BaseATNSimulator)
+	b := new(BaseATNSimulator)
 
-	this.atn = atn
-	this.sharedContextCache = sharedContextCache
+	b.atn = atn
+	b.sharedContextCache = sharedContextCache
 
-	return this
+	return b
 }
 
 var ATNSimulatorError = NewDFAState(0x7FFFFFFF, NewBaseATNConfigSet(false))
 
-func (this *BaseATNSimulator) getCachedContext(context PredictionContext) PredictionContext {
-	if this.sharedContextCache == nil {
+func (b *BaseATNSimulator) getCachedContext(context PredictionContext) PredictionContext {
+	if b.sharedContextCache == nil {
 		return context
 	}
 	var visited = make(map[PredictionContext]PredictionContext)
-	return getCachedBasePredictionContext(context, this.sharedContextCache, visited)
+	return getCachedBasePredictionContext(context, b.sharedContextCache, visited)
 }

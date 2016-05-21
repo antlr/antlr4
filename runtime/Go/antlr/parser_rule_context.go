@@ -76,12 +76,12 @@ func (prc *BaseParserRuleContext) CopyFrom(ctx *BaseParserRuleContext) {
 	prc.stop = ctx.stop
 }
 
-func (this *BaseParserRuleContext) GetText() string {
-	if this.GetChildCount() == 0 {
+func (b *BaseParserRuleContext) GetText() string {
+	if b.GetChildCount() == 0 {
 		return ""
 	} else {
 		var s string
-		for _, child := range this.children {
+		for _, child := range b.children {
 			s += child.(ParseTree).GetText()
 		}
 
@@ -171,16 +171,16 @@ func (prc *BaseParserRuleContext) GetChildOfType(i int, childType reflect.Type) 
 	}
 }
 
-func (this *BaseParserRuleContext) ToStringTree(ruleNames []string, recog Recognizer) string {
-	return TreesStringTree(this, ruleNames, recog)
+func (b *BaseParserRuleContext) ToStringTree(ruleNames []string, recog Recognizer) string {
+	return TreesStringTree(b, ruleNames, recog)
 }
 
 func (prc *BaseParserRuleContext) GetRuleContext() RuleContext {
 	return prc
 }
 
-func (this *BaseParserRuleContext) Accept(visitor ParseTreeVisitor) interface{} {
-	return visitor.VisitChildren(this)
+func (b *BaseParserRuleContext) Accept(visitor ParseTreeVisitor) interface{} {
+	return visitor.VisitChildren(b)
 }
 
 func (prc *BaseParserRuleContext) SetStart(t Token) {
@@ -300,12 +300,12 @@ func (prc *BaseParserRuleContext) GetSourceInterval() *Interval {
 //need to manage circular dependencies, so export now
 
 // Print out a whole tree, not just a node, in LISP format
-// (root child1 .. childN). Print just a node if this is a leaf.
+// (root child1 .. childN). Print just a node if b is a leaf.
 //
 
-func (this *BaseParserRuleContext) String(ruleNames []string, stop RuleContext) string {
+func (b *BaseParserRuleContext) String(ruleNames []string, stop RuleContext) string {
 
-	var p ParserRuleContext = this
+	var p ParserRuleContext = b
 	var s = "["
 	for p != nil && p != stop {
 		if ruleNames == nil {

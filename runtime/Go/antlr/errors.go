@@ -56,40 +56,40 @@ func NewBaseRecognitionException(message string, recognizer Recognizer, input In
 	return t
 }
 
-func (this *BaseRecognitionException) GetMessage() string {
-	return this.message
+func (b *BaseRecognitionException) GetMessage() string {
+	return b.message
 }
 
-func (this *BaseRecognitionException) GetOffendingToken() Token {
-	return this.offendingToken
+func (b *BaseRecognitionException) GetOffendingToken() Token {
+	return b.offendingToken
 }
 
-func (this *BaseRecognitionException) GetInputStream() IntStream {
-	return this.input
+func (b *BaseRecognitionException) GetInputStream() IntStream {
+	return b.input
 }
 
-// <p>If the state number is not known, this method returns -1.</p>
+// <p>If the state number is not known, b method returns -1.</p>
 
 //
 // Gets the set of input symbols which could potentially follow the
-// previously Matched symbol at the time this exception was panicn.
+// previously Matched symbol at the time b exception was panicn.
 //
 // <p>If the set of expected tokens is not known and could not be computed,
-// this method returns {@code nil}.</p>
+// b method returns {@code nil}.</p>
 //
 // @return The set of token types that could potentially follow the current
 // state in the ATN, or {@code nil} if the information is not available.
 // /
-func (this *BaseRecognitionException) getExpectedTokens() *IntervalSet {
-	if this.recognizer != nil {
-		return this.recognizer.GetATN().getExpectedTokens(this.offendingState, this.ctx)
+func (b *BaseRecognitionException) getExpectedTokens() *IntervalSet {
+	if b.recognizer != nil {
+		return b.recognizer.GetATN().getExpectedTokens(b.offendingState, b.ctx)
 	} else {
 		return nil
 	}
 }
 
-func (this *BaseRecognitionException) String() string {
-	return this.message
+func (b *BaseRecognitionException) String() string {
+	return b.message
 }
 
 type LexerNoViableAltException struct {
@@ -101,20 +101,20 @@ type LexerNoViableAltException struct {
 
 func NewLexerNoViableAltException(lexer Lexer, input CharStream, startIndex int, deadEndConfigs ATNConfigSet) *LexerNoViableAltException {
 
-	this := new(LexerNoViableAltException)
+	l := new(LexerNoViableAltException)
 
-	this.BaseRecognitionException = NewBaseRecognitionException("", lexer, input, nil)
+	l.BaseRecognitionException = NewBaseRecognitionException("", lexer, input, nil)
 
-	this.startIndex = startIndex
-	this.deadEndConfigs = deadEndConfigs
+	l.startIndex = startIndex
+	l.deadEndConfigs = deadEndConfigs
 
-	return this
+	return l
 }
 
-func (this *LexerNoViableAltException) String() string {
+func (l *LexerNoViableAltException) String() string {
 	var symbol = ""
-	if this.startIndex >= 0 && this.startIndex < this.input.Size() {
-		symbol = this.input.(CharStream).GetTextFromInterval(NewInterval(this.startIndex, this.startIndex))
+	if l.startIndex >= 0 && l.startIndex < l.input.Size() {
+		symbol = l.input.(CharStream).GetTextFromInterval(NewInterval(l.startIndex, l.startIndex))
 	}
 	return "LexerNoViableAltException" + symbol
 }
@@ -151,20 +151,20 @@ func NewNoViableAltException(recognizer Parser, input TokenStream, startToken To
 		input = recognizer.GetInputStream().(TokenStream)
 	}
 
-	this := new(NoViableAltException)
-	this.BaseRecognitionException = NewBaseRecognitionException("", recognizer, input, ctx)
+	n := new(NoViableAltException)
+	n.BaseRecognitionException = NewBaseRecognitionException("", recognizer, input, ctx)
 
 	// Which configurations did we try at input.Index() that couldn't Match
 	// input.LT(1)?//
-	this.deadEndConfigs = deadEndConfigs
+	n.deadEndConfigs = deadEndConfigs
 	// The token object at the start index the input stream might
 	// not be buffering tokens so get a reference to it. (At the
 	// time the error occurred, of course the stream needs to keep a
 	// buffer all of the tokens but later we might not have access to those.)
-	this.startToken = startToken
-	this.offendingToken = offendingToken
+	n.startToken = startToken
+	n.offendingToken = offendingToken
 
-	return this
+	return n
 }
 
 type InputMisMatchException struct {
@@ -176,12 +176,12 @@ type InputMisMatchException struct {
 //
 func NewInputMisMatchException(recognizer Parser) *InputMisMatchException {
 
-	this := new(InputMisMatchException)
-	this.BaseRecognitionException = NewBaseRecognitionException("", recognizer, recognizer.GetInputStream(), recognizer.GetParserRuleContext())
+	i := new(InputMisMatchException)
+	i.BaseRecognitionException = NewBaseRecognitionException("", recognizer, recognizer.GetInputStream(), recognizer.GetParserRuleContext())
 
-	this.offendingToken = recognizer.GetCurrentToken()
+	i.offendingToken = recognizer.GetCurrentToken()
 
-	return this
+	return i
 
 }
 
@@ -200,26 +200,26 @@ type FailedPredicateException struct {
 
 func NewFailedPredicateException(recognizer Parser, predicate string, message string) *FailedPredicateException {
 
-	this := new(FailedPredicateException)
+	f := new(FailedPredicateException)
 
-	this.BaseRecognitionException = NewBaseRecognitionException(this.formatMessage(predicate, message), recognizer, recognizer.GetInputStream(), recognizer.GetParserRuleContext())
+	f.BaseRecognitionException = NewBaseRecognitionException(f.formatMessage(predicate, message), recognizer, recognizer.GetInputStream(), recognizer.GetParserRuleContext())
 
 	var s = recognizer.GetInterpreter().atn.states[recognizer.GetState()]
 	var trans = s.GetTransitions()[0]
 	if trans2, ok := trans.(*PredicateTransition); ok {
-		this.ruleIndex = trans2.ruleIndex
-		this.predicateIndex = trans2.predIndex
+		f.ruleIndex = trans2.ruleIndex
+		f.predicateIndex = trans2.predIndex
 	} else {
-		this.ruleIndex = 0
-		this.predicateIndex = 0
+		f.ruleIndex = 0
+		f.predicateIndex = 0
 	}
-	this.predicate = predicate
-	this.offendingToken = recognizer.GetCurrentToken()
+	f.predicate = predicate
+	f.offendingToken = recognizer.GetCurrentToken()
 
-	return this
+	return f
 }
 
-func (this *FailedPredicateException) formatMessage(predicate, message string) string {
+func (f *FailedPredicateException) formatMessage(predicate, message string) string {
 	if message != "" {
 		return message
 	} else {

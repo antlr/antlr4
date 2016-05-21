@@ -13,16 +13,16 @@ type PredPrediction struct {
 }
 
 func NewPredPrediction(pred SemanticContext, alt int) *PredPrediction {
-	this := new(PredPrediction)
+	p := new(PredPrediction)
 
-	this.alt = alt
-	this.pred = pred
+	p.alt = alt
+	p.pred = pred
 
-	return this
+	return p
 }
 
-func (this *PredPrediction) String() string {
-	return "(" + fmt.Sprint(this.pred) + ", " + fmt.Sprint(this.alt) + ")"
+func (p *PredPrediction) String() string {
+	return "(" + fmt.Sprint(p.pred) + ", " + fmt.Sprint(p.alt) + ")"
 }
 
 // A DFA state represents a set of possible ATN configurations.
@@ -67,30 +67,30 @@ func NewDFAState(stateNumber int, configs ATNConfigSet) *DFAState {
 		configs = NewBaseATNConfigSet(false)
 	}
 
-	this := new(DFAState)
+	d := new(DFAState)
 
-	this.stateNumber = stateNumber
-	this.configs = configs
+	d.stateNumber = stateNumber
+	d.configs = configs
 	// {@code edges[symbol]} points to target of symbol. Shift up by 1 so (-1)
 	// {@link Token//EOF} maps to {@code edges[0]}.
-	this.edges = nil
-	this.isAcceptState = false
+	d.edges = nil
+	d.isAcceptState = false
 	// if accept state, what ttype do we Match or alt do we predict?
 	// This is set to {@link ATN//INVALID_ALT_NUMBER} when {@link
 	// //predicates}{@code !=nil} or
 	// {@link //requiresFullContext}.
-	this.prediction = 0
-	this.lexerActionExecutor = nil
-	// Indicates that this state was created during SLL prediction that
+	d.prediction = 0
+	d.lexerActionExecutor = nil
+	// Indicates that d state was created during SLL prediction that
 	// discovered a conflict between the configurations in the state. Future
 	// {@link ParserATNSimulator//execATN} invocations immediately jumped doing
-	// full context prediction if this field is true.
-	this.requiresFullContext = false
-	// During SLL parsing, this is a list of predicates associated with the
+	// full context prediction if d field is true.
+	d.requiresFullContext = false
+	// During SLL parsing, d is a list of predicates associated with the
 	// ATN configurations of the DFA state. When we have predicates,
 	// {@link //requiresFullContext} is {@code false} since full context
 	// prediction evaluates predicates
-	// on-the-fly. If this is not nil, then {@link //prediction} is
+	// on-the-fly. If d is not nil, then {@link //prediction} is
 	// {@link ATN//INVALID_ALT_NUMBER}.
 	//
 	// <p>We only use these for non-{@link //requiresFullContext} but
@@ -100,16 +100,16 @@ func NewDFAState(stateNumber int, configs ATNConfigSet) *DFAState {
 	//
 	// <p>This list is computed by {@link
 	// ParserATNSimulator//predicateDFAState}.</p>
-	this.predicates = nil
-	return this
+	d.predicates = nil
+	return d
 }
 
-// Get the set of all alts mentioned by all ATN configurations in this
+// Get the set of all alts mentioned by all ATN configurations in d
 // DFA state.
-func (this *DFAState) GetAltSet() *Set {
+func (d *DFAState) GetAltSet() *Set {
 	var alts = NewSet(nil, nil)
-	if this.configs != nil {
-		for _, c := range this.configs.GetItems() {
+	if d.configs != nil {
+		for _, c := range d.configs.GetItems() {
 			alts.add(c.GetAlt())
 		}
 	}
@@ -120,8 +120,8 @@ func (this *DFAState) GetAltSet() *Set {
 	}
 }
 
-func (this *DFAState) setPrediction(v int) {
-	this.prediction = v
+func (d *DFAState) setPrediction(v int) {
+	d.prediction = v
 }
 
 // Two {@link DFAState} instances are equal if their ATN configuration sets
@@ -133,34 +133,34 @@ func (this *DFAState) setPrediction(v int) {
 //
 // <p>Cannot test the DFA state numbers here because in
 // {@link ParserATNSimulator//addDFAState} we need to know if any other state
-// exists that has this exact set of ATN configurations. The
+// exists that has d exact set of ATN configurations. The
 // {@link //stateNumber} is irrelevant.</p>
 
-func (this *DFAState) equals(other interface{}) bool {
+func (d *DFAState) equals(other interface{}) bool {
 
-	if this == other {
+	if d == other {
 		return true
 	} else if _, ok := other.(*DFAState); !ok {
 		return false
 	}
 
-	return this.configs.Equals(other.(*DFAState).configs)
+	return d.configs.Equals(other.(*DFAState).configs)
 }
 
-func (this *DFAState) String() string {
-	return strconv.Itoa(this.stateNumber) + ":" + this.Hash()
+func (d *DFAState) String() string {
+	return strconv.Itoa(d.stateNumber) + ":" + d.Hash()
 }
 
-func (this *DFAState) Hash() string {
+func (d *DFAState) Hash() string {
 
 	var s string
-	if this.isAcceptState {
-		if this.predicates != nil {
-			s = "=>" + fmt.Sprint(this.predicates)
+	if d.isAcceptState {
+		if d.predicates != nil {
+			s = "=>" + fmt.Sprint(d.predicates)
 		} else {
-			s = "=>" + fmt.Sprint(this.prediction)
+			s = "=>" + fmt.Sprint(d.prediction)
 		}
 	}
 
-	return fmt.Sprint(this.configs) + s
+	return fmt.Sprint(d.configs) + s
 }

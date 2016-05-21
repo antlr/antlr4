@@ -68,12 +68,12 @@ var BasePredictionContextid = BasePredictionContextglobalNodeCount
 // </pre>
 //
 
-func (this *BasePredictionContext) isEmpty() bool {
+func (b *BasePredictionContext) isEmpty() bool {
 	return false
 }
 
-func (this *BasePredictionContext) Hash() string {
-	return this.cachedHashString
+func (b *BasePredictionContext) Hash() string {
+	return b.cachedHashString
 }
 
 func calculateHashString(parent PredictionContext, returnState int) string {
@@ -102,24 +102,24 @@ func NewPredictionContextCache() *PredictionContextCache {
 // return that one instead and do not add a Newcontext to the cache.
 // Protect shared cache from unsafe thread access.
 //
-func (this *PredictionContextCache) add(ctx PredictionContext) PredictionContext {
+func (p *PredictionContextCache) add(ctx PredictionContext) PredictionContext {
 	if ctx == BasePredictionContextEMPTY {
 		return BasePredictionContextEMPTY
 	}
-	var existing = this.cache[ctx]
+	var existing = p.cache[ctx]
 	if existing != nil {
 		return existing
 	}
-	this.cache[ctx] = ctx
+	p.cache[ctx] = ctx
 	return ctx
 }
 
-func (this *PredictionContextCache) Get(ctx PredictionContext) PredictionContext {
-	return this.cache[ctx]
+func (p *PredictionContextCache) Get(ctx PredictionContext) PredictionContext {
+	return p.cache[ctx]
 }
 
-func (this *PredictionContextCache) length() int {
-	return len(this.cache)
+func (p *PredictionContextCache) length() int {
+	return len(p.cache)
 }
 
 type SingletonPredictionContext interface {
@@ -159,64 +159,64 @@ func SingletonBasePredictionContextCreate(parent PredictionContext, returnState 
 	}
 }
 
-func (this *BaseSingletonPredictionContext) length() int {
+func (b *BaseSingletonPredictionContext) length() int {
 	return 1
 }
 
-func (this *BaseSingletonPredictionContext) GetParent(index int) PredictionContext {
-	return this.parentCtx
+func (b *BaseSingletonPredictionContext) GetParent(index int) PredictionContext {
+	return b.parentCtx
 }
 
-func (this *BaseSingletonPredictionContext) getReturnState(index int) int {
-	return this.returnState
+func (b *BaseSingletonPredictionContext) getReturnState(index int) int {
+	return b.returnState
 }
 
-func (this *BaseSingletonPredictionContext) hasEmptyPath() bool {
-	return this.returnState == BasePredictionContextEMPTY_RETURN_STATE
+func (b *BaseSingletonPredictionContext) hasEmptyPath() bool {
+	return b.returnState == BasePredictionContextEMPTY_RETURN_STATE
 }
 
-func (this *BaseSingletonPredictionContext) equals(other PredictionContext) bool {
-	if this == other {
+func (b *BaseSingletonPredictionContext) equals(other PredictionContext) bool {
+	if b == other {
 		return true
 	} else if _, ok := other.(*BaseSingletonPredictionContext); !ok {
 		return false
-	} else if this.Hash() != other.Hash() {
+	} else if b.Hash() != other.Hash() {
 		return false // can't be same if hash is different
 	} else {
 
 		otherP := other.(*BaseSingletonPredictionContext)
 
-		if this.returnState != other.getReturnState(0) {
+		if b.returnState != other.getReturnState(0) {
 			return false
-		} else if this.parentCtx == nil {
+		} else if b.parentCtx == nil {
 			return otherP.parentCtx == nil
 		} else {
-			return this.parentCtx.equals(otherP.parentCtx)
+			return b.parentCtx.equals(otherP.parentCtx)
 		}
 	}
 }
 
-func (this *BaseSingletonPredictionContext) Hash() string {
-	return this.cachedHashString
+func (b *BaseSingletonPredictionContext) Hash() string {
+	return b.cachedHashString
 }
 
-func (this *BaseSingletonPredictionContext) String() string {
+func (b *BaseSingletonPredictionContext) String() string {
 	var up string
 
-	if this.parentCtx == nil {
+	if b.parentCtx == nil {
 		up = ""
 	} else {
-		up = this.parentCtx.String()
+		up = b.parentCtx.String()
 	}
 
 	if len(up) == 0 {
-		if this.returnState == BasePredictionContextEMPTY_RETURN_STATE {
+		if b.returnState == BasePredictionContextEMPTY_RETURN_STATE {
 			return "$"
 		} else {
-			return strconv.Itoa(this.returnState)
+			return strconv.Itoa(b.returnState)
 		}
 	} else {
-		return strconv.Itoa(this.returnState) + " " + up
+		return strconv.Itoa(b.returnState) + " " + up
 	}
 }
 
@@ -235,23 +235,23 @@ func NewEmptyPredictionContext() *EmptyPredictionContext {
 	return p
 }
 
-func (this *EmptyPredictionContext) isEmpty() bool {
+func (e *EmptyPredictionContext) isEmpty() bool {
 	return true
 }
 
-func (this *EmptyPredictionContext) GetParent(index int) PredictionContext {
+func (e *EmptyPredictionContext) GetParent(index int) PredictionContext {
 	return nil
 }
 
-func (this *EmptyPredictionContext) getReturnState(index int) int {
-	return this.returnState
+func (e *EmptyPredictionContext) getReturnState(index int) int {
+	return e.returnState
 }
 
-func (this *EmptyPredictionContext) equals(other PredictionContext) bool {
-	return this == other
+func (e *EmptyPredictionContext) equals(other PredictionContext) bool {
+	return e == other
 }
 
-func (this *EmptyPredictionContext) String() string {
+func (e *EmptyPredictionContext) String() string {
 	return "$"
 }
 
@@ -285,55 +285,55 @@ func (c *ArrayPredictionContext) GetReturnStates() []int {
 	return c.returnStates
 }
 
-func (this *ArrayPredictionContext) hasEmptyPath() bool {
-	return this.getReturnState(this.length()-1) == BasePredictionContextEMPTY_RETURN_STATE
+func (a *ArrayPredictionContext) hasEmptyPath() bool {
+	return a.getReturnState(a.length()-1) == BasePredictionContextEMPTY_RETURN_STATE
 }
 
-func (this *ArrayPredictionContext) isEmpty() bool {
+func (a *ArrayPredictionContext) isEmpty() bool {
 	// since EMPTY_RETURN_STATE can only appear in the last position, we
 	// don't need to verify that size==1
-	return this.returnStates[0] == BasePredictionContextEMPTY_RETURN_STATE
+	return a.returnStates[0] == BasePredictionContextEMPTY_RETURN_STATE
 }
 
-func (this *ArrayPredictionContext) length() int {
-	return len(this.returnStates)
+func (a *ArrayPredictionContext) length() int {
+	return len(a.returnStates)
 }
 
-func (this *ArrayPredictionContext) GetParent(index int) PredictionContext {
-	return this.parents[index]
+func (a *ArrayPredictionContext) GetParent(index int) PredictionContext {
+	return a.parents[index]
 }
 
-func (this *ArrayPredictionContext) getReturnState(index int) int {
-	return this.returnStates[index]
+func (a *ArrayPredictionContext) getReturnState(index int) int {
+	return a.returnStates[index]
 }
 
-func (this *ArrayPredictionContext) equals(other PredictionContext) bool {
+func (a *ArrayPredictionContext) equals(other PredictionContext) bool {
 	if _, ok := other.(*ArrayPredictionContext); !ok {
 		return false
-	} else if this.cachedHashString != other.Hash() {
+	} else if a.cachedHashString != other.Hash() {
 		return false // can't be same if hash is different
 	} else {
 		otherP := other.(*ArrayPredictionContext)
-		return &this.returnStates == &otherP.returnStates && &this.parents == &otherP.parents
+		return &a.returnStates == &otherP.returnStates && &a.parents == &otherP.parents
 	}
 }
 
-func (this *ArrayPredictionContext) String() string {
-	if this.isEmpty() {
+func (a *ArrayPredictionContext) String() string {
+	if a.isEmpty() {
 		return "[]"
 	} else {
 		var s = "["
-		for i := 0; i < len(this.returnStates); i++ {
+		for i := 0; i < len(a.returnStates); i++ {
 			if i > 0 {
 				s = s + ", "
 			}
-			if this.returnStates[i] == BasePredictionContextEMPTY_RETURN_STATE {
+			if a.returnStates[i] == BasePredictionContextEMPTY_RETURN_STATE {
 				s = s + "$"
 				continue
 			}
-			s = s + strconv.Itoa(this.returnStates[i])
-			if this.parents[i] != nil {
-				s = s + " " + this.parents[i].String()
+			s = s + strconv.Itoa(a.returnStates[i])
+			if a.parents[i] != nil {
+				s = s + " " + a.parents[i].String()
 			} else {
 				s = s + "nil"
 			}

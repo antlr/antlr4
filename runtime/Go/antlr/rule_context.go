@@ -5,9 +5,9 @@ package antlr
 //  naturally the invoking state is not valid.  The parent link
 //  provides a chain upwards from the current rule invocation to the root
 //  of the invocation tree, forming a stack. We actually carry no
-//  information about the rule associated with this context (except
+//  information about the rule associated with b context (except
 //  when parsing). We keep only the state number of the invoking state from
-//  the ATN submachine that invoked this. Contrast this with the s
+//  the ATN submachine that invoked b. Contrast b with the s
 //  pointer inside ParserRuleContext that tracks the current state
 //  being "executed" for the current rule.
 //
@@ -43,12 +43,12 @@ func NewBaseRuleContext(parent RuleContext, invokingState int) *BaseRuleContext 
 
 	rn := new(BaseRuleContext)
 
-	// What context invoked this rule?
+	// What context invoked b rule?
 	rn.parentCtx = parent
 
-	// What state invoked the rule associated with this context?
+	// What state invoked the rule associated with b context?
 	// The "return address" is the followState of invokingState
-	// If parent is nil, this should be -1.
+	// If parent is nil, b should be -1.
 	if parent == nil {
 		rn.invokingState = -1
 	} else {
@@ -58,40 +58,40 @@ func NewBaseRuleContext(parent RuleContext, invokingState int) *BaseRuleContext 
 	return rn
 }
 
-func (this *BaseRuleContext) GetBaseRuleContext() *BaseRuleContext {
-	return this
+func (b *BaseRuleContext) GetBaseRuleContext() *BaseRuleContext {
+	return b
 }
 
-func (this *BaseRuleContext) SetParent(v Tree) {
-	this.parentCtx = v.(RuleContext)
+func (b *BaseRuleContext) SetParent(v Tree) {
+	b.parentCtx = v.(RuleContext)
 }
 
-func (this *BaseRuleContext) GetInvokingState() int {
-	return this.invokingState
+func (b *BaseRuleContext) GetInvokingState() int {
+	return b.invokingState
 }
 
-func (this *BaseRuleContext) SetInvokingState(t int) {
-	this.invokingState = t
+func (b *BaseRuleContext) SetInvokingState(t int) {
+	b.invokingState = t
 }
 
-func (this *BaseRuleContext) GetRuleIndex() int {
-	return this.RuleIndex
+func (b *BaseRuleContext) GetRuleIndex() int {
+	return b.RuleIndex
 }
 
 // A context is empty if there is no invoking state meaning nobody call
 // current context.
-func (this *BaseRuleContext) IsEmpty() bool {
-	return this.invokingState == -1
+func (b *BaseRuleContext) IsEmpty() bool {
+	return b.invokingState == -1
 }
 
 // Return the combined text of all child nodes. This method only considers
 // tokens which have been added to the parse tree.
 // <p>
 // Since tokens on hidden channels (e.g. whitespace or comments) are not
-// added to the parse trees, they will not appear in the output of this
+// added to the parse trees, they will not appear in the output of b
 // method.
 //
 
-func (this *BaseRuleContext) GetParent() Tree {
-	return this.parentCtx
+func (b *BaseRuleContext) GetParent() Tree {
+	return b.parentCtx
 }

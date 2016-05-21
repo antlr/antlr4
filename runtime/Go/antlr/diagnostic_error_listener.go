@@ -20,7 +20,7 @@ import (
 // full-context prediction resolved an SLL conflict to a unique alternative,
 // <em>and</em> the minimum alternative of the SLL conflict was found to not be
 // a truly viable alternative. Two-stage parsing cannot be used for inputs where
-// this situation occurs.</li>
+// d situation occurs.</li>
 // </ul>
 
 type DiagnosticErrorListener struct {
@@ -38,37 +38,37 @@ func NewDiagnosticErrorListener(exactOnly bool) *DiagnosticErrorListener {
 	return n
 }
 
-func (this *DiagnosticErrorListener) ReportAmbiguity(recognizer Parser, dfa *DFA, startIndex, stopIndex int, exact bool, ambigAlts *BitSet, configs ATNConfigSet) {
-	if this.exactOnly && !exact {
+func (d *DiagnosticErrorListener) ReportAmbiguity(recognizer Parser, dfa *DFA, startIndex, stopIndex int, exact bool, ambigAlts *BitSet, configs ATNConfigSet) {
+	if d.exactOnly && !exact {
 		return
 	}
 	var msg = "reportAmbiguity d=" +
-		this.getDecisionDescription(recognizer, dfa) +
+		d.getDecisionDescription(recognizer, dfa) +
 		": ambigAlts=" +
-		this.getConflictingAlts(ambigAlts, configs).String() +
+		d.getConflictingAlts(ambigAlts, configs).String() +
 		", input='" +
 		recognizer.GetTokenStream().GetTextFromInterval(NewInterval(startIndex, stopIndex)) + "'"
 	recognizer.NotifyErrorListeners(msg, nil, nil)
 }
 
-func (this *DiagnosticErrorListener) ReportAttemptingFullContext(recognizer Parser, dfa *DFA, startIndex, stopIndex int, conflictingAlts *BitSet, configs ATNConfigSet) {
+func (d *DiagnosticErrorListener) ReportAttemptingFullContext(recognizer Parser, dfa *DFA, startIndex, stopIndex int, conflictingAlts *BitSet, configs ATNConfigSet) {
 
 	var msg = "reportAttemptingFullContext d=" +
-		this.getDecisionDescription(recognizer, dfa) +
+		d.getDecisionDescription(recognizer, dfa) +
 		", input='" +
 		recognizer.GetTokenStream().GetTextFromInterval(NewInterval(startIndex, stopIndex)) + "'"
 	recognizer.NotifyErrorListeners(msg, nil, nil)
 }
 
-func (this *DiagnosticErrorListener) ReportContextSensitivity(recognizer Parser, dfa *DFA, startIndex, stopIndex, prediction int, configs ATNConfigSet) {
+func (d *DiagnosticErrorListener) ReportContextSensitivity(recognizer Parser, dfa *DFA, startIndex, stopIndex, prediction int, configs ATNConfigSet) {
 	var msg = "reportContextSensitivity d=" +
-		this.getDecisionDescription(recognizer, dfa) +
+		d.getDecisionDescription(recognizer, dfa) +
 		", input='" +
 		recognizer.GetTokenStream().GetTextFromInterval(NewInterval(startIndex, stopIndex)) + "'"
 	recognizer.NotifyErrorListeners(msg, nil, nil)
 }
 
-func (this *DiagnosticErrorListener) getDecisionDescription(recognizer Parser, dfa *DFA) string {
+func (d *DiagnosticErrorListener) getDecisionDescription(recognizer Parser, dfa *DFA) string {
 	var decision = dfa.decision
 	var ruleIndex = dfa.atnStartState.GetRuleIndex()
 
@@ -94,7 +94,7 @@ func (this *DiagnosticErrorListener) getDecisionDescription(recognizer Parser, d
 // @return Returns {@code ReportedAlts} if it is not {@code nil}, otherwise
 // returns the set of alternatives represented in {@code configs}.
 //
-func (this *DiagnosticErrorListener) getConflictingAlts(ReportedAlts *BitSet, set ATNConfigSet) *BitSet {
+func (d *DiagnosticErrorListener) getConflictingAlts(ReportedAlts *BitSet, set ATNConfigSet) *BitSet {
 	if ReportedAlts != nil {
 		return ReportedAlts
 	}

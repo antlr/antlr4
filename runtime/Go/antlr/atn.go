@@ -60,8 +60,8 @@ func NewATN(grammarType int, maxTokenType int) *ATN {
 //  If {@code ctx} is nil, the set of tokens will not include what can follow
 //  the rule surrounding {@code s}. In other words, the set will be
 //  restricted to tokens reachable staying within {@code s}'s rule.
-func (this *ATN) NextTokensInContext(s ATNState, ctx RuleContext) *IntervalSet {
-	var anal = NewLL1Analyzer(this)
+func (a *ATN) NextTokensInContext(s ATNState, ctx RuleContext) *IntervalSet {
+	var anal = NewLL1Analyzer(a)
 	var res = anal.LOOK(s, nil, ctx)
 	return res
 }
@@ -69,7 +69,7 @@ func (this *ATN) NextTokensInContext(s ATNState, ctx RuleContext) *IntervalSet {
 // Compute the set of valid tokens that can occur starting in {@code s} and
 // staying in same rule. {@link Token//EPSILON} is in set if we reach end of
 // rule.
-func (this *ATN) NextTokensNoContext(s ATNState) *IntervalSet {
+func (a *ATN) NextTokensNoContext(s ATNState) *IntervalSet {
 	if s.GetNextTokenWithinRule() != nil {
 		if PortDebug {
 			fmt.Println("DEBUG A")
@@ -78,44 +78,44 @@ func (this *ATN) NextTokensNoContext(s ATNState) *IntervalSet {
 	}
 	if PortDebug {
 		fmt.Println("DEBUG 2")
-		fmt.Println(this.NextTokensInContext(s, nil))
+		fmt.Println(a.NextTokensInContext(s, nil))
 	}
-	s.SetNextTokenWithinRule(this.NextTokensInContext(s, nil))
+	s.SetNextTokenWithinRule(a.NextTokensInContext(s, nil))
 	s.GetNextTokenWithinRule().readOnly = true
 	return s.GetNextTokenWithinRule()
 }
 
-func (this *ATN) NextTokens(s ATNState, ctx RuleContext) *IntervalSet {
+func (a *ATN) NextTokens(s ATNState, ctx RuleContext) *IntervalSet {
 	if ctx == nil {
-		return this.NextTokensNoContext(s)
+		return a.NextTokensNoContext(s)
 	} else {
-		return this.NextTokensInContext(s, ctx)
+		return a.NextTokensInContext(s, ctx)
 	}
 }
 
-func (this *ATN) addState(state ATNState) {
+func (a *ATN) addState(state ATNState) {
 	if state != nil {
-		state.SetATN(this)
-		state.SetStateNumber(len(this.states))
+		state.SetATN(a)
+		state.SetStateNumber(len(a.states))
 	}
-	this.states = append(this.states, state)
+	a.states = append(a.states, state)
 }
 
-func (this *ATN) removeState(state ATNState) {
-	this.states[state.GetStateNumber()] = nil // just free mem, don't shift states in list
+func (a *ATN) removeState(state ATNState) {
+	a.states[state.GetStateNumber()] = nil // just free mem, don't shift states in list
 }
 
-func (this *ATN) defineDecisionState(s DecisionState) int {
-	this.DecisionToState = append(this.DecisionToState, s)
-	s.setDecision(len(this.DecisionToState) - 1)
+func (a *ATN) defineDecisionState(s DecisionState) int {
+	a.DecisionToState = append(a.DecisionToState, s)
+	s.setDecision(len(a.DecisionToState) - 1)
 	return s.getDecision()
 }
 
-func (this *ATN) getDecisionState(decision int) DecisionState {
-	if len(this.DecisionToState) == 0 {
+func (a *ATN) getDecisionState(decision int) DecisionState {
+	if len(a.DecisionToState) == 0 {
 		return nil
 	} else {
-		return this.DecisionToState[decision]
+		return a.DecisionToState[decision]
 	}
 }
 
@@ -137,12 +137,12 @@ func (this *ATN) getDecisionState(decision int) DecisionState {
 // @panics IllegalArgumentException if the ATN does not contain a state with
 // number {@code stateNumber}
 
-func (this *ATN) getExpectedTokens(stateNumber int, ctx RuleContext) *IntervalSet {
-	if stateNumber < 0 || stateNumber >= len(this.states) {
+func (a *ATN) getExpectedTokens(stateNumber int, ctx RuleContext) *IntervalSet {
+	if stateNumber < 0 || stateNumber >= len(a.states) {
 		panic("Invalid state number.")
 	}
-	var s = this.states[stateNumber]
-	var following = this.NextTokens(s, nil)
+	var s = a.states[stateNumber]
+	var following = a.NextTokens(s, nil)
 	if !following.contains(TokenEpsilon) {
 		return following
 	}
@@ -150,9 +150,9 @@ func (this *ATN) getExpectedTokens(stateNumber int, ctx RuleContext) *IntervalSe
 	expected.addSet(following)
 	expected.removeOne(TokenEpsilon)
 	for ctx != nil && ctx.GetInvokingState() >= 0 && following.contains(TokenEpsilon) {
-		var invokingState = this.states[ctx.GetInvokingState()]
+		var invokingState = a.states[ctx.GetInvokingState()]
 		var rt = invokingState.GetTransitions()[0]
-		following = this.NextTokens(rt.(*RuleTransition).followState, nil)
+		following = a.NextTokens(rt.(*RuleTransition).followState, nil)
 		expected.addSet(following)
 		expected.removeOne(TokenEpsilon)
 		ctx = ctx.GetParent().(RuleContext)

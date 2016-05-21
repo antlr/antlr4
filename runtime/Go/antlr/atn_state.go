@@ -125,33 +125,33 @@ func (as *BaseATNState) SetNextTokenWithinRule(v *IntervalSet) {
 	as.NextTokenWithinRule = v
 }
 
-func (this *BaseATNState) String() string {
-	return strconv.Itoa(this.stateNumber)
+func (as *BaseATNState) String() string {
+	return strconv.Itoa(as.stateNumber)
 }
 
-func (this *BaseATNState) equals(other interface{}) bool {
+func (as *BaseATNState) equals(other interface{}) bool {
 	if ot, ok := other.(ATNState); ok {
-		return this.stateNumber == ot.GetStateNumber()
+		return as.stateNumber == ot.GetStateNumber()
 	} else {
 		return false
 	}
 }
 
-func (this *BaseATNState) isNonGreedyExitState() bool {
+func (as *BaseATNState) isNonGreedyExitState() bool {
 	return false
 }
 
-func (this *BaseATNState) AddTransition(trans Transition, index int) {
-	if len(this.transitions) == 0 {
-		this.epsilonOnlyTransitions = trans.getIsEpsilon()
-	} else if this.epsilonOnlyTransitions != trans.getIsEpsilon() {
-		this.epsilonOnlyTransitions = false
+func (as *BaseATNState) AddTransition(trans Transition, index int) {
+	if len(as.transitions) == 0 {
+		as.epsilonOnlyTransitions = trans.getIsEpsilon()
+	} else if as.epsilonOnlyTransitions != trans.getIsEpsilon() {
+		as.epsilonOnlyTransitions = false
 	}
 	if index == -1 {
-		this.transitions = append(this.transitions, trans)
+		as.transitions = append(as.transitions, trans)
 	} else {
-		this.transitions = append(this.transitions[:index], append([]Transition{trans}, this.transitions[index:]...)...)
-		//        this.transitions.splice(index, 1, trans)
+		as.transitions = append(as.transitions[:index], append([]Transition{trans}, as.transitions[index:]...)...)
+		//        as.transitions.splice(index, 1, trans)
 	}
 }
 
@@ -160,11 +160,11 @@ type BasicState struct {
 }
 
 func NewBasicState() *BasicState {
-	this := new(BasicState)
-	this.BaseATNState = NewBaseATNState()
+	b := new(BasicState)
+	b.BaseATNState = NewBaseATNState()
 
-	this.stateType = ATNStateBasic
-	return this
+	b.stateType = ATNStateBasic
+	return b
 }
 
 type DecisionState interface {
@@ -186,14 +186,14 @@ type BaseDecisionState struct {
 
 func NewBaseDecisionState() *BaseDecisionState {
 
-	this := new(BaseDecisionState)
+	b := new(BaseDecisionState)
 
-	this.BaseATNState = NewBaseATNState()
+	b.BaseATNState = NewBaseATNState()
 
-	this.decision = -1
-	this.nonGreedy = false
+	b.decision = -1
+	b.nonGreedy = false
 
-	return this
+	return b
 }
 
 func (s *BaseDecisionState) getDecision() int {
@@ -228,12 +228,12 @@ type BaseBlockStartState struct {
 
 func NewBlockStartState() *BaseBlockStartState {
 
-	this := new(BaseBlockStartState)
+	b := new(BaseBlockStartState)
 
-	this.BaseDecisionState = NewBaseDecisionState()
-	this.endState = nil
+	b.BaseDecisionState = NewBaseDecisionState()
+	b.endState = nil
 
-	return this
+	return b
 }
 
 func (s *BaseBlockStartState) getEndState() *BlockEndState {
@@ -250,12 +250,12 @@ type BasicBlockStartState struct {
 
 func NewBasicBlockStartState() *BasicBlockStartState {
 
-	this := new(BasicBlockStartState)
+	b := new(BasicBlockStartState)
 
-	this.BaseBlockStartState = NewBlockStartState()
+	b.BaseBlockStartState = NewBlockStartState()
 
-	this.stateType = ATNStateBlockStart
-	return this
+	b.stateType = ATNStateBlockStart
+	return b
 }
 
 // Terminal node of a simple {@code (a|b|c)} block.
@@ -267,13 +267,13 @@ type BlockEndState struct {
 
 func NewBlockEndState() *BlockEndState {
 
-	this := new(BlockEndState)
+	b := new(BlockEndState)
 
-	this.BaseATNState = NewBaseATNState()
-	this.stateType = ATNStateBlockEnd
-	this.startState = nil
+	b.BaseATNState = NewBaseATNState()
+	b.stateType = ATNStateBlockEnd
+	b.startState = nil
 
-	return this
+	return b
 }
 
 // The last node in the ATN for a rule, unless that rule is the start symbol.
@@ -286,11 +286,11 @@ type RuleStopState struct {
 }
 
 func NewRuleStopState() *RuleStopState {
-	this := new(RuleStopState)
+	r := new(RuleStopState)
 
-	this.BaseATNState = NewBaseATNState()
-	this.stateType = ATNStateRuleStop
-	return this
+	r.BaseATNState = NewBaseATNState()
+	r.stateType = ATNStateRuleStop
+	return r
 }
 
 type RuleStartState struct {
@@ -302,14 +302,14 @@ type RuleStartState struct {
 
 func NewRuleStartState() *RuleStartState {
 
-	this := new(RuleStartState)
+	r := new(RuleStartState)
 
-	this.BaseATNState = NewBaseATNState()
-	this.stateType = ATNStateRuleStart
-	this.stopState = nil
-	this.isPrecedenceRule = false
+	r.BaseATNState = NewBaseATNState()
+	r.stateType = ATNStateRuleStart
+	r.stopState = nil
+	r.isPrecedenceRule = false
 
-	return this
+	return r
 }
 
 // Decision state for {@code A+} and {@code (A|B)+}.  It has two transitions:
@@ -321,12 +321,12 @@ type PlusLoopbackState struct {
 
 func NewPlusLoopbackState() *PlusLoopbackState {
 
-	this := new(PlusLoopbackState)
+	p := new(PlusLoopbackState)
 
-	this.BaseDecisionState = NewBaseDecisionState()
+	p.BaseDecisionState = NewBaseDecisionState()
 
-	this.stateType = ATNStatePlusLoopBack
-	return this
+	p.stateType = ATNStatePlusLoopBack
+	return p
 }
 
 // Start of {@code (A|B|...)+} loop. Technically a decision state, but
@@ -342,14 +342,14 @@ type PlusBlockStartState struct {
 
 func NewPlusBlockStartState() *PlusBlockStartState {
 
-	this := new(PlusBlockStartState)
+	p := new(PlusBlockStartState)
 
-	this.BaseBlockStartState = NewBlockStartState()
+	p.BaseBlockStartState = NewBlockStartState()
 
-	this.stateType = ATNStatePlusBlockStart
-	this.loopBackState = nil
+	p.stateType = ATNStatePlusBlockStart
+	p.loopBackState = nil
 
-	return this
+	return p
 }
 
 // The block that begins a closure loop.
@@ -359,13 +359,13 @@ type StarBlockStartState struct {
 
 func NewStarBlockStartState() *StarBlockStartState {
 
-	this := new(StarBlockStartState)
+	s := new(StarBlockStartState)
 
-	this.BaseBlockStartState = NewBlockStartState()
+	s.BaseBlockStartState = NewBlockStartState()
 
-	this.stateType = ATNStateStarBlockStart
+	s.stateType = ATNStateStarBlockStart
 
-	return this
+	return s
 }
 
 type StarLoopbackState struct {
@@ -374,12 +374,12 @@ type StarLoopbackState struct {
 
 func NewStarLoopbackState() *StarLoopbackState {
 
-	this := new(StarLoopbackState)
+	s := new(StarLoopbackState)
 
-	this.BaseATNState = NewBaseATNState()
+	s.BaseATNState = NewBaseATNState()
 
-	this.stateType = ATNStateStarLoopBack
-	return this
+	s.stateType = ATNStateStarLoopBack
+	return s
 }
 
 type StarLoopEntryState struct {
@@ -391,17 +391,17 @@ type StarLoopEntryState struct {
 
 func NewStarLoopEntryState() *StarLoopEntryState {
 
-	this := new(StarLoopEntryState)
+	s := new(StarLoopEntryState)
 
-	this.BaseDecisionState = NewBaseDecisionState()
+	s.BaseDecisionState = NewBaseDecisionState()
 
-	this.stateType = ATNStateStarLoopEntry
-	this.loopBackState = nil
+	s.stateType = ATNStateStarLoopEntry
+	s.loopBackState = nil
 
-	// Indicates whether this state can benefit from a precedence DFA during SLL decision making.
-	this.precedenceRuleDecision = false
+	// Indicates whether s state can benefit from a precedence DFA during SLL decision making.
+	s.precedenceRuleDecision = false
 
-	return this
+	return s
 }
 
 // Mark the end of a * or + loop.
@@ -413,14 +413,14 @@ type LoopEndState struct {
 
 func NewLoopEndState() *LoopEndState {
 
-	this := new(LoopEndState)
+	l := new(LoopEndState)
 
-	this.BaseATNState = NewBaseATNState()
+	l.BaseATNState = NewBaseATNState()
 
-	this.stateType = ATNStateLoopEnd
-	this.loopBackState = nil
+	l.stateType = ATNStateLoopEnd
+	l.loopBackState = nil
 
-	return this
+	return l
 }
 
 // The Tokens rule start state linking to each lexer rule start state */
@@ -430,10 +430,10 @@ type TokensStartState struct {
 
 func NewTokensStartState() *TokensStartState {
 
-	this := new(TokensStartState)
+	t := new(TokensStartState)
 
-	this.BaseDecisionState = NewBaseDecisionState()
+	t.BaseDecisionState = NewBaseDecisionState()
 
-	this.stateType = ATNStateTokenStart
-	return this
+	t.stateType = ATNStateTokenStart
+	return t
 }

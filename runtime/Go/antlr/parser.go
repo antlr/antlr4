@@ -315,12 +315,12 @@ func (p *BaseParser) TriggerExitRuleEvent() {
 	}
 }
 
-func (this *BaseParser) GetInterpreter() *ParserATNSimulator {
-	return this.Interpreter
+func (p *BaseParser) GetInterpreter() *ParserATNSimulator {
+	return p.Interpreter
 }
 
-func (this *BaseParser) GetATN() *ATN {
-	return this.Interpreter.atn
+func (p *BaseParser) GetATN() *ATN {
+	return p.Interpreter.atn
 }
 
 func (p *BaseParser) GetTokenFactory() TokenFactory {
@@ -664,9 +664,9 @@ func (p *BaseParser) GetRuleIndex(ruleName string) int {
 //
 // this very useful for error messages.
 
-func (this *BaseParser) GetRuleInvocationStack(p ParserRuleContext) []string {
+func (b *BaseParser) GetRuleInvocationStack(p ParserRuleContext) []string {
 	if p == nil {
-		p = this._ctx
+		p = b._ctx
 	}
 	var stack = make([]string, 0)
 	for p != nil {
@@ -675,7 +675,7 @@ func (this *BaseParser) GetRuleInvocationStack(p ParserRuleContext) []string {
 		if ruleIndex < 0 {
 			stack = append(stack, "n/a")
 		} else {
-			stack = append(stack, this.GetRuleNames()[ruleIndex])
+			stack = append(stack, b.GetRuleNames()[ruleIndex])
 		}
 
 		vp := p.GetParent()

@@ -69,48 +69,48 @@ const (
 	TokenHiddenChannel = 1
 )
 
-func (this *BaseToken) GetChannel() int {
-	return this.channel
+func (b *BaseToken) GetChannel() int {
+	return b.channel
 }
 
-func (this *BaseToken) GetStart() int {
-	return this.start
+func (b *BaseToken) GetStart() int {
+	return b.start
 }
 
-func (this *BaseToken) GetStop() int {
-	return this.stop
+func (b *BaseToken) GetStop() int {
+	return b.stop
 }
 
-func (this *BaseToken) GetLine() int {
-	return this.line
+func (b *BaseToken) GetLine() int {
+	return b.line
 }
 
-func (this *BaseToken) GetColumn() int {
-	return this.column
+func (b *BaseToken) GetColumn() int {
+	return b.column
 }
 
-func (this *BaseToken) GetTokenType() int {
-	return this.tokenType
+func (b *BaseToken) GetTokenType() int {
+	return b.tokenType
 }
 
-func (this *BaseToken) GetSource() *TokenSourceCharStreamPair {
-	return this.source
+func (b *BaseToken) GetSource() *TokenSourceCharStreamPair {
+	return b.source
 }
 
-func (this *BaseToken) GetTokenIndex() int {
-	return this.tokenIndex
+func (b *BaseToken) GetTokenIndex() int {
+	return b.tokenIndex
 }
 
-func (this *BaseToken) SetTokenIndex(v int) {
-	this.tokenIndex = v
+func (b *BaseToken) SetTokenIndex(v int) {
+	b.tokenIndex = v
 }
 
-func (this *BaseToken) GetTokenSource() TokenSource {
-	return this.source.tokenSource
+func (b *BaseToken) GetTokenSource() TokenSource {
+	return b.source.tokenSource
 }
 
-func (this *BaseToken) GetInputStream() CharStream {
-	return this.source.charStream
+func (b *BaseToken) GetInputStream() CharStream {
+	return b.source.charStream
 }
 
 type CommonToken struct {
@@ -164,28 +164,28 @@ func (ct *CommonToken) clone() *CommonToken {
 	return t
 }
 
-func (this *CommonToken) GetText() string {
-	if this._text != "" {
-		return this._text
+func (c *CommonToken) GetText() string {
+	if c._text != "" {
+		return c._text
 	}
-	var input = this.GetInputStream()
+	var input = c.GetInputStream()
 	if input == nil {
 		return ""
 	}
 	var n = input.Size()
-	if this.start < n && this.stop < n {
-		return input.GetTextFromInterval(NewInterval(this.start, this.stop))
+	if c.start < n && c.stop < n {
+		return input.GetTextFromInterval(NewInterval(c.start, c.stop))
 	} else {
 		return "<EOF>"
 	}
 }
 
-func (this *CommonToken) SetText(text string) {
-	this._text = text
+func (c *CommonToken) SetText(text string) {
+	c._text = text
 }
 
-func (this *CommonToken) String() string {
-	var txt = this.GetText()
+func (c *CommonToken) String() string {
+	var txt = c.GetText()
 	if txt != "" {
 		txt = strings.Replace(txt, "\n", "\\n", -1)
 		txt = strings.Replace(txt, "\r", "\\r", -1)
@@ -195,13 +195,13 @@ func (this *CommonToken) String() string {
 	}
 
 	var ch string
-	if this.channel > 0 {
-		ch = ",channel=" + strconv.Itoa(this.channel)
+	if c.channel > 0 {
+		ch = ",channel=" + strconv.Itoa(c.channel)
 	} else {
 		ch = ""
 	}
 
-	return "[@" + strconv.Itoa(this.tokenIndex) + "," + strconv.Itoa(this.start) + ":" + strconv.Itoa(this.stop) + "='" +
-		txt + "',<" + strconv.Itoa(this.tokenType) + ">" +
-		ch + "," + strconv.Itoa(this.line) + ":" + strconv.Itoa(this.column) + "]"
+	return "[@" + strconv.Itoa(c.tokenIndex) + "," + strconv.Itoa(c.start) + ":" + strconv.Itoa(c.stop) + "='" +
+		txt + "',<" + strconv.Itoa(c.tokenType) + ">" +
+		ch + "," + strconv.Itoa(c.line) + ":" + strconv.Itoa(c.column) + "]"
 }
