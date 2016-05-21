@@ -76,12 +76,12 @@ func (prc *BaseParserRuleContext) CopyFrom(ctx *BaseParserRuleContext) {
 	prc.stop = ctx.stop
 }
 
-func (b *BaseParserRuleContext) GetText() string {
-	if b.GetChildCount() == 0 {
+func (prc *BaseParserRuleContext) GetText() string {
+	if prc.GetChildCount() == 0 {
 		return ""
 	} else {
 		var s string
-		for _, child := range b.children {
+		for _, child := range prc.children {
 			s += child.(ParseTree).GetText()
 		}
 
@@ -171,16 +171,16 @@ func (prc *BaseParserRuleContext) GetChildOfType(i int, childType reflect.Type) 
 	}
 }
 
-func (b *BaseParserRuleContext) ToStringTree(ruleNames []string, recog Recognizer) string {
-	return TreesStringTree(b, ruleNames, recog)
+func (prc *BaseParserRuleContext) ToStringTree(ruleNames []string, recog Recognizer) string {
+	return TreesStringTree(prc, ruleNames, recog)
 }
 
 func (prc *BaseParserRuleContext) GetRuleContext() RuleContext {
 	return prc
 }
 
-func (b *BaseParserRuleContext) Accept(visitor ParseTreeVisitor) interface{} {
-	return visitor.VisitChildren(b)
+func (prc *BaseParserRuleContext) Accept(visitor ParseTreeVisitor) interface{} {
+	return visitor.VisitChildren(prc)
 }
 
 func (prc *BaseParserRuleContext) SetStart(t Token) {
@@ -303,9 +303,9 @@ func (prc *BaseParserRuleContext) GetSourceInterval() *Interval {
 // (root child1 .. childN). Print just a node if b is a leaf.
 //
 
-func (b *BaseParserRuleContext) String(ruleNames []string, stop RuleContext) string {
+func (prc *BaseParserRuleContext) String(ruleNames []string, stop RuleContext) string {
 
-	var p ParserRuleContext = b
+	var p ParserRuleContext = prc
 	var s = "["
 	for p != nil && p != stop {
 		if ruleNames == nil {

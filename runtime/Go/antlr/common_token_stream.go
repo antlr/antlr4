@@ -70,42 +70,42 @@ func NewCommonTokenStream(lexer Lexer, channel int) *CommonTokenStream {
 	return ts
 }
 
-func (bt *CommonTokenStream) GetAllTokens() []Token {
-	return bt.tokens
+func (c *CommonTokenStream) GetAllTokens() []Token {
+	return c.tokens
 }
 
-func (bt *CommonTokenStream) Mark() int {
+func (c *CommonTokenStream) Mark() int {
 	return 0
 }
 
-func (bt *CommonTokenStream) Release(marker int) {
+func (c *CommonTokenStream) Release(marker int) {
 	// no resources to release
 }
 
-func (bt *CommonTokenStream) reset() {
-	bt.Seek(0)
+func (c *CommonTokenStream) reset() {
+	c.Seek(0)
 }
 
-func (bt *CommonTokenStream) Seek(index int) {
-	bt.lazyInit()
-	bt.index = bt.adjustSeekIndex(index)
+func (c *CommonTokenStream) Seek(index int) {
+	c.lazyInit()
+	c.index = c.adjustSeekIndex(index)
 }
 
-func (bt *CommonTokenStream) Get(index int) Token {
-	bt.lazyInit()
-	return bt.tokens[index]
+func (c *CommonTokenStream) Get(index int) Token {
+	c.lazyInit()
+	return c.tokens[index]
 }
 
-func (bt *CommonTokenStream) Consume() {
+func (c *CommonTokenStream) Consume() {
 	var SkipEofCheck = false
-	if bt.index >= 0 {
-		if bt.fetchedEOF {
+	if c.index >= 0 {
+		if c.fetchedEOF {
 			// the last token in tokens is EOF. Skip check if p indexes any
 			// fetched token except the last.
-			SkipEofCheck = bt.index < len(bt.tokens)-1
+			SkipEofCheck = c.index < len(c.tokens)-1
 		} else {
 			// no EOF token in tokens. Skip check if p indexes a fetched token.
-			SkipEofCheck = bt.index < len(bt.tokens)
+			SkipEofCheck = c.index < len(c.tokens)
 		}
 	} else {
 		// not yet initialized
@@ -115,14 +115,14 @@ func (bt *CommonTokenStream) Consume() {
 	if PortDebug {
 		fmt.Println("Consume 1")
 	}
-	if !SkipEofCheck && bt.LA(1) == TokenEOF {
+	if !SkipEofCheck && c.LA(1) == TokenEOF {
 		panic("cannot consume EOF")
 	}
-	if bt.Sync(bt.index + 1) {
+	if c.Sync(c.index + 1) {
 		if PortDebug {
 			fmt.Println("Consume 2")
 		}
-		bt.index = bt.adjustSeekIndex(bt.index + 1)
+		c.index = c.adjustSeekIndex(c.index + 1)
 	}
 }
 
@@ -132,10 +132,10 @@ func (bt *CommonTokenStream) Consume() {
 // {@code false}.
 // @see //Get(int i)
 // /
-func (bt *CommonTokenStream) Sync(i int) bool {
-	var n = i - len(bt.tokens) + 1 // how many more elements we need?
+func (c *CommonTokenStream) Sync(i int) bool {
+	var n = i - len(c.tokens) + 1 // how many more elements we need?
 	if n > 0 {
-		var fetched = bt.fetch(n)
+		var fetched = c.fetch(n)
 		if PortDebug {
 			fmt.Println("Sync done")
 		}
@@ -148,20 +148,20 @@ func (bt *CommonTokenStream) Sync(i int) bool {
 //
 // @return The actual number of elements added to the buffer.
 // /
-func (bt *CommonTokenStream) fetch(n int) int {
-	if bt.fetchedEOF {
+func (c *CommonTokenStream) fetch(n int) int {
+	if c.fetchedEOF {
 		return 0
 	}
 
 	for i := 0; i < n; i++ {
-		var t Token = bt.tokenSource.NextToken()
+		var t Token = c.tokenSource.NextToken()
 		if PortDebug {
 			fmt.Println("fetch loop")
 		}
-		t.SetTokenIndex(len(bt.tokens))
-		bt.tokens = append(bt.tokens, t)
+		t.SetTokenIndex(len(c.tokens))
+		c.tokens = append(c.tokens, t)
 		if t.GetTokenType() == TokenEOF {
-			bt.fetchedEOF = true
+			c.fetchedEOF = true
 			return i + 1
 		}
 	}
@@ -173,18 +173,18 @@ func (bt *CommonTokenStream) fetch(n int) int {
 }
 
 // Get all tokens from start..stop inclusively///
-func (bt *CommonTokenStream) GetTokens(start int, stop int, types *IntervalSet) []Token {
+func (c *CommonTokenStream) GetTokens(start int, stop int, types *IntervalSet) []Token {
 
 	if start < 0 || stop < 0 {
 		return nil
 	}
-	bt.lazyInit()
+	c.lazyInit()
 	var subset = make([]Token, 0)
-	if stop >= len(bt.tokens) {
-		stop = len(bt.tokens) - 1
+	if stop >= len(c.tokens) {
+		stop = len(c.tokens) - 1
 	}
 	for i := start; i < stop; i++ {
-		var t = bt.tokens[i]
+		var t = c.tokens[i]
 		if t.GetTokenType() == TokenEOF {
 			break
 		}
@@ -195,49 +195,49 @@ func (bt *CommonTokenStream) GetTokens(start int, stop int, types *IntervalSet) 
 	return subset
 }
 
-func (bt *CommonTokenStream) LA(i int) int {
-	return bt.LT(i).GetTokenType()
+func (c *CommonTokenStream) LA(i int) int {
+	return c.LT(i).GetTokenType()
 }
 
-func (bt *CommonTokenStream) lazyInit() {
-	if bt.index == -1 {
-		bt.setup()
+func (c *CommonTokenStream) lazyInit() {
+	if c.index == -1 {
+		c.setup()
 	}
 }
 
-func (bt *CommonTokenStream) setup() {
-	bt.Sync(0)
-	bt.index = bt.adjustSeekIndex(0)
+func (c *CommonTokenStream) setup() {
+	c.Sync(0)
+	c.index = c.adjustSeekIndex(0)
 }
 
-func (bt *CommonTokenStream) GetTokenSource() TokenSource {
-	return bt.tokenSource
+func (c *CommonTokenStream) GetTokenSource() TokenSource {
+	return c.tokenSource
 }
 
-// Reset bt token stream by setting its token source.///
-func (bt *CommonTokenStream) SetTokenSource(tokenSource TokenSource) {
-	bt.tokenSource = tokenSource
-	bt.tokens = make([]Token, 0)
-	bt.index = -1
+// Reset c token stream by setting its token source.///
+func (c *CommonTokenStream) SetTokenSource(tokenSource TokenSource) {
+	c.tokenSource = tokenSource
+	c.tokens = make([]Token, 0)
+	c.index = -1
 }
 
 // Given a starting index, return the index of the next token on channel.
 // Return i if tokens[i] is on channel. Return -1 if there are no tokens
 // on channel between i and EOF.
 // /
-func (bt *CommonTokenStream) NextTokenOnChannel(i, channel int) int {
-	bt.Sync(i)
-	if i >= len(bt.tokens) {
+func (c *CommonTokenStream) NextTokenOnChannel(i, channel int) int {
+	c.Sync(i)
+	if i >= len(c.tokens) {
 		return -1
 	}
-	var token = bt.tokens[i]
-	for token.GetChannel() != bt.channel {
+	var token = c.tokens[i]
+	for token.GetChannel() != c.channel {
 		if token.GetTokenType() == TokenEOF {
 			return -1
 		}
 		i += 1
-		bt.Sync(i)
-		token = bt.tokens[i]
+		c.Sync(i)
+		token = c.tokens[i]
 	}
 	return i
 }
@@ -245,8 +245,8 @@ func (bt *CommonTokenStream) NextTokenOnChannel(i, channel int) int {
 // Given a starting index, return the index of the previous token on channel.
 // Return i if tokens[i] is on channel. Return -1 if there are no tokens
 // on channel between i and 0.
-func (bt *CommonTokenStream) previousTokenOnChannel(i, channel int) int {
-	for i >= 0 && bt.tokens[i].GetChannel() != channel {
+func (c *CommonTokenStream) previousTokenOnChannel(i, channel int) int {
+	for i >= 0 && c.tokens[i].GetChannel() != channel {
 		i -= 1
 	}
 	return i
@@ -255,45 +255,45 @@ func (bt *CommonTokenStream) previousTokenOnChannel(i, channel int) int {
 // Collect all tokens on specified channel to the right of
 // the current token up until we see a token on DEFAULT_TOKEN_CHANNEL or
 // EOF. If channel is -1, find any non default channel token.
-func (bt *CommonTokenStream) getHiddenTokensToRight(tokenIndex, channel int) []Token {
-	bt.lazyInit()
-	if tokenIndex < 0 || tokenIndex >= len(bt.tokens) {
-		panic(strconv.Itoa(tokenIndex) + " not in 0.." + strconv.Itoa(len(bt.tokens)-1))
+func (c *CommonTokenStream) getHiddenTokensToRight(tokenIndex, channel int) []Token {
+	c.lazyInit()
+	if tokenIndex < 0 || tokenIndex >= len(c.tokens) {
+		panic(strconv.Itoa(tokenIndex) + " not in 0.." + strconv.Itoa(len(c.tokens)-1))
 	}
-	var nextOnChannel = bt.NextTokenOnChannel(tokenIndex+1, LexerDefaultTokenChannel)
+	var nextOnChannel = c.NextTokenOnChannel(tokenIndex+1, LexerDefaultTokenChannel)
 	var from_ = tokenIndex + 1
 	// if none onchannel to right, nextOnChannel=-1 so set to = last token
 	var to int
 	if nextOnChannel == -1 {
-		to = len(bt.tokens) - 1
+		to = len(c.tokens) - 1
 	} else {
 		to = nextOnChannel
 	}
-	return bt.filterForChannel(from_, to, channel)
+	return c.filterForChannel(from_, to, channel)
 }
 
 // Collect all tokens on specified channel to the left of
 // the current token up until we see a token on DEFAULT_TOKEN_CHANNEL.
 // If channel is -1, find any non default channel token.
-func (bt *CommonTokenStream) getHiddenTokensToLeft(tokenIndex, channel int) []Token {
-	bt.lazyInit()
-	if tokenIndex < 0 || tokenIndex >= len(bt.tokens) {
-		panic(strconv.Itoa(tokenIndex) + " not in 0.." + strconv.Itoa(len(bt.tokens)-1))
+func (c *CommonTokenStream) getHiddenTokensToLeft(tokenIndex, channel int) []Token {
+	c.lazyInit()
+	if tokenIndex < 0 || tokenIndex >= len(c.tokens) {
+		panic(strconv.Itoa(tokenIndex) + " not in 0.." + strconv.Itoa(len(c.tokens)-1))
 	}
-	var prevOnChannel = bt.previousTokenOnChannel(tokenIndex-1, LexerDefaultTokenChannel)
+	var prevOnChannel = c.previousTokenOnChannel(tokenIndex-1, LexerDefaultTokenChannel)
 	if prevOnChannel == tokenIndex-1 {
 		return nil
 	}
 	// if none on channel to left, prevOnChannel=-1 then from=0
 	var from_ = prevOnChannel + 1
 	var to = tokenIndex - 1
-	return bt.filterForChannel(from_, to, channel)
+	return c.filterForChannel(from_, to, channel)
 }
 
-func (bt *CommonTokenStream) filterForChannel(left, right, channel int) []Token {
+func (c *CommonTokenStream) filterForChannel(left, right, channel int) []Token {
 	var hidden = make([]Token, 0)
 	for i := left; i < right+1; i++ {
-		var t = bt.tokens[i]
+		var t = c.tokens[i]
 		if channel == -1 {
 			if t.GetChannel() != LexerDefaultTokenChannel {
 				hidden = append(hidden, t)
@@ -308,40 +308,40 @@ func (bt *CommonTokenStream) filterForChannel(left, right, channel int) []Token 
 	return hidden
 }
 
-func (bt *CommonTokenStream) GetSourceName() string {
-	return bt.tokenSource.GetSourceName()
+func (c *CommonTokenStream) GetSourceName() string {
+	return c.tokenSource.GetSourceName()
 }
 
-func (bt *CommonTokenStream) Size() int {
-	return len(bt.tokens)
+func (c *CommonTokenStream) Size() int {
+	return len(c.tokens)
 }
 
-func (bt *CommonTokenStream) Index() int {
-	return bt.index
+func (c *CommonTokenStream) Index() int {
+	return c.index
 }
 
-func (bt *CommonTokenStream) GetAllText() string {
-	return bt.GetTextFromInterval(nil)
+func (c *CommonTokenStream) GetAllText() string {
+	return c.GetTextFromInterval(nil)
 }
 
-func (bt *CommonTokenStream) GetTextFromTokens(start, end Token) string {
+func (c *CommonTokenStream) GetTextFromTokens(start, end Token) string {
 	if start == nil || end == nil {
 		return ""
 	}
 
-	return bt.GetTextFromInterval(NewInterval(start.GetTokenIndex(), end.GetTokenIndex()))
+	return c.GetTextFromInterval(NewInterval(start.GetTokenIndex(), end.GetTokenIndex()))
 }
 
-func (bt *CommonTokenStream) GetTextFromRuleContext(interval RuleContext) string {
-	return bt.GetTextFromInterval(interval.GetSourceInterval())
+func (c *CommonTokenStream) GetTextFromRuleContext(interval RuleContext) string {
+	return c.GetTextFromInterval(interval.GetSourceInterval())
 }
 
-func (bt *CommonTokenStream) GetTextFromInterval(interval *Interval) string {
+func (c *CommonTokenStream) GetTextFromInterval(interval *Interval) string {
 
-	bt.lazyInit()
-	bt.Fill()
+	c.lazyInit()
+	c.Fill()
 	if interval == nil {
-		interval = NewInterval(0, len(bt.tokens)-1)
+		interval = NewInterval(0, len(c.tokens)-1)
 	}
 
 	var start = interval.start
@@ -349,13 +349,13 @@ func (bt *CommonTokenStream) GetTextFromInterval(interval *Interval) string {
 	if start < 0 || stop < 0 {
 		return ""
 	}
-	if stop >= len(bt.tokens) {
-		stop = len(bt.tokens) - 1
+	if stop >= len(c.tokens) {
+		stop = len(c.tokens) - 1
 	}
 
 	var s = ""
 	for i := start; i < stop+1; i++ {
-		var t = bt.tokens[i]
+		var t = c.tokens[i]
 		if t.GetTokenType() == TokenEOF {
 			break
 		}
@@ -366,64 +366,64 @@ func (bt *CommonTokenStream) GetTextFromInterval(interval *Interval) string {
 }
 
 // Get all tokens from lexer until EOF///
-func (bt *CommonTokenStream) Fill() {
-	bt.lazyInit()
-	for bt.fetch(1000) == 1000 {
+func (c *CommonTokenStream) Fill() {
+	c.lazyInit()
+	for c.fetch(1000) == 1000 {
 		continue
 	}
 }
 
-func (ts *CommonTokenStream) adjustSeekIndex(i int) int {
-	return ts.NextTokenOnChannel(i, ts.channel)
+func (c *CommonTokenStream) adjustSeekIndex(i int) int {
+	return c.NextTokenOnChannel(i, c.channel)
 }
 
-func (ts *CommonTokenStream) LB(k int) Token {
+func (c *CommonTokenStream) LB(k int) Token {
 
-	if k == 0 || ts.index-k < 0 {
+	if k == 0 || c.index-k < 0 {
 		return nil
 	}
-	var i = ts.index
+	var i = c.index
 	var n = 1
 	// find k good tokens looking backwards
 	for n <= k {
 		// Skip off-channel tokens
-		i = ts.previousTokenOnChannel(i-1, ts.channel)
+		i = c.previousTokenOnChannel(i-1, c.channel)
 		n += 1
 	}
 	if i < 0 {
 		return nil
 	}
-	return ts.tokens[i]
+	return c.tokens[i]
 }
 
-func (ts *CommonTokenStream) LT(k int) Token {
-	ts.lazyInit()
+func (c *CommonTokenStream) LT(k int) Token {
+	c.lazyInit()
 	if k == 0 {
 		return nil
 	}
 	if k < 0 {
-		return ts.LB(-k)
+		return c.LB(-k)
 	}
-	var i = ts.index
+	var i = c.index
 	var n = 1 // we know tokens[pos] is a good one
 	// find k good tokens
 	for n < k {
 		// Skip off-channel tokens, but make sure to not look past EOF
-		if ts.Sync(i + 1) {
-			i = ts.NextTokenOnChannel(i+1, ts.channel)
+		if c.Sync(i + 1) {
+			i = c.NextTokenOnChannel(i+1, c.channel)
 		}
 		n += 1
 	}
-	return ts.tokens[i]
+	return c.tokens[i]
 }
 
 // Count EOF just once.///
-func (ts *CommonTokenStream) getNumberOfOnChannelTokens() int {
+func (c *CommonTokenStream) getNumberOfOnChannelTokens() int {
 	var n = 0
-	ts.Fill()
-	for i := 0; i < len(ts.tokens); i++ {
-		var t = ts.tokens[i]
-		if t.GetChannel() == ts.channel {
+	c.Fill()
+	for i := 0; i < len(c.tokens); i++ {
+		var t = c.tokens[i]
+		if t.GetChannel() == c.channel {
 			n += 1
 		}
 		if t.GetTokenType() == TokenEOF {

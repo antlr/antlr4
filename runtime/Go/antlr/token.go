@@ -155,12 +155,12 @@ func NewCommonToken(source *TokenSourceCharStreamPair, tokenType, channel, start
 //
 // @param oldToken The token to copy.
 //
-func (ct *CommonToken) clone() *CommonToken {
-	var t = NewCommonToken(ct.source, ct.tokenType, ct.channel, ct.start, ct.stop)
-	t.tokenIndex = ct.GetTokenIndex()
-	t.line = ct.GetLine()
-	t.column = ct.GetColumn()
-	t._text = ct.GetText()
+func (c *CommonToken) clone() *CommonToken {
+	var t = NewCommonToken(c.source, c.tokenType, c.channel, c.start, c.stop)
+	t.tokenIndex = c.GetTokenIndex()
+	t.line = c.GetLine()
+	t.column = c.GetColumn()
+	t._text = c.GetText()
 	return t
 }
 

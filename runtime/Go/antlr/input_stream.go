@@ -105,7 +105,7 @@ func (is *InputStream) GetTextFromInterval(i *Interval) string {
 	return is.GetText(i.start, i.stop)
 }
 
-func (f *InputStream) GetSourceName() string {
+func (*InputStream) GetSourceName() string {
 	return "Obtained from string"
 }
 

@@ -67,33 +67,33 @@ func (i *IntervalSet) addRange(l, h int) {
 	i.addInterval(NewInterval(l, h+1))
 }
 
-func (is *IntervalSet) addInterval(v *Interval) {
+func (i *IntervalSet) addInterval(v *Interval) {
 	if PortDebug {
 		fmt.Println("addInterval" + v.String())
 	}
-	if is.intervals == nil {
-		is.intervals = make([]*Interval, 0)
-		is.intervals = append(is.intervals, v)
+	if i.intervals == nil {
+		i.intervals = make([]*Interval, 0)
+		i.intervals = append(i.intervals, v)
 	} else {
 		// find insert pos
-		for k := 0; k < len(is.intervals); k++ {
-			var i = is.intervals[k]
-			// distinct range -> insert
-			if v.stop < i.start {
-				// is.intervals = splice(k, 0, v)
-				is.intervals = append(is.intervals[0:k], append([]*Interval{v}, is.intervals[k:]...)...)
+		for k := 0; k < len(i.intervals); k++ {
+			var interval = i.intervals[k]
+			// ditinct range -> insert
+			if v.stop < interval.start {
+				// i.intervals = splice(k, 0, v)
+				i.intervals = append(i.intervals[0:k], append([]*Interval{v}, i.intervals[k:]...)...)
 				return
-			} else if v.stop == i.start {
-				is.intervals[k].start = v.start
+			} else if v.stop == interval.start {
+				i.intervals[k].start = v.start
 				return
-			} else if v.start <= i.stop {
-				is.intervals[k] = NewInterval(intMin(i.start, v.start), intMax(i.stop, v.stop))
-				is.reduce(k)
+			} else if v.start <= interval.stop {
+				i.intervals[k] = NewInterval(intMin(interval.start, v.start), intMax(interval.stop, v.stop))
+				i.reduce(k)
 				return
 			}
 		}
-		// greater than any existing
-		is.intervals = append(is.intervals, v)
+		// greater than any exiting
+		i.intervals = append(i.intervals, v)
 	}
 }
 
@@ -129,11 +129,11 @@ func (i *IntervalSet) reduce(k int) {
 	}
 }
 
-func (is *IntervalSet) complement(start int, stop int) *IntervalSet {
+func (i *IntervalSet) complement(start int, stop int) *IntervalSet {
 	var result = NewIntervalSet()
 	result.addInterval(NewInterval(start, stop+1))
-	for i := 0; i < len(is.intervals); i++ {
-		result.removeRange(is.intervals[i])
+	for j := 0; j < len(i.intervals); j++ {
+		result.removeRange(i.intervals[j])
 	}
 	return result
 }
@@ -151,68 +151,68 @@ func (i *IntervalSet) contains(item int) bool {
 	}
 }
 
-func (is *IntervalSet) length() int {
+func (i *IntervalSet) length() int {
 	len := 0
 
-	for _, v := range is.intervals {
+	for _, v := range i.intervals {
 		len += v.length()
 	}
 
 	return len
 }
 
-func (is *IntervalSet) removeRange(v *Interval) {
+func (i *IntervalSet) removeRange(v *Interval) {
 	if v.start == v.stop-1 {
-		is.removeOne(v.start)
-	} else if is.intervals != nil {
+		i.removeOne(v.start)
+	} else if i.intervals != nil {
 		k := 0
-		for n := 0; n < len(is.intervals); n++ {
-			var i = is.intervals[k]
+		for n := 0; n < len(i.intervals); n++ {
+			var ni = i.intervals[k]
 			// intervals are ordered
-			if v.stop <= i.start {
+			if v.stop <= ni.start {
 				return
-			} else if v.start > i.start && v.stop < i.stop {
-				is.intervals[k] = NewInterval(i.start, v.start)
-				var x = NewInterval(v.stop, i.stop)
-				// is.intervals.splice(k, 0, x)
-				is.intervals = append(is.intervals[0:k], append([]*Interval{x}, is.intervals[k:]...)...)
+			} else if v.start > ni.start && v.stop < ni.stop {
+				i.intervals[k] = NewInterval(ni.start, v.start)
+				var x = NewInterval(v.stop, ni.stop)
+				// i.intervals.splice(k, 0, x)
+				i.intervals = append(i.intervals[0:k], append([]*Interval{x}, i.intervals[k:]...)...)
 				return
-			} else if v.start <= i.start && v.stop >= i.stop {
-				//                is.intervals.splice(k, 1)
-				is.intervals = append(is.intervals[0:k], is.intervals[k+1:]...)
+			} else if v.start <= ni.start && v.stop >= ni.stop {
+				//                i.intervals.splice(k, 1)
+				i.intervals = append(i.intervals[0:k], i.intervals[k+1:]...)
 				k = k - 1 // need another pass
-			} else if v.start < i.stop {
-				is.intervals[k] = NewInterval(i.start, v.start)
-			} else if v.stop < i.stop {
-				is.intervals[k] = NewInterval(v.stop, i.stop)
+			} else if v.start < ni.stop {
+				i.intervals[k] = NewInterval(ni.start, v.start)
+			} else if v.stop < ni.stop {
+				i.intervals[k] = NewInterval(v.stop, ni.stop)
 			}
 			k += 1
 		}
 	}
 }
 
-func (is *IntervalSet) removeOne(v int) {
-	if is.intervals != nil {
-		for k := 0; k < len(is.intervals); k++ {
-			var i = is.intervals[k]
-			// intervals is ordered
-			if v < i.start {
+func (i *IntervalSet) removeOne(v int) {
+	if i.intervals != nil {
+		for k := 0; k < len(i.intervals); k++ {
+			var ki = i.intervals[k]
+			// intervals i ordered
+			if v < ki.start {
 				return
-			} else if v == i.start && v == i.stop-1 {
-				//				is.intervals.splice(k, 1);
-				is.intervals = append(is.intervals[0:k], is.intervals[k+1:]...)
+			} else if v == ki.start && v == ki.stop-1 {
+				//				i.intervals.splice(k, 1);
+				i.intervals = append(i.intervals[0:k], i.intervals[k+1:]...)
 				return
-			} else if v == i.start {
-				is.intervals[k] = NewInterval(i.start+1, i.stop)
+			} else if v == ki.start {
+				i.intervals[k] = NewInterval(ki.start+1, ki.stop)
 				return
-			} else if v == i.stop-1 {
-				is.intervals[k] = NewInterval(i.start, i.stop-1)
+			} else if v == ki.stop-1 {
+				i.intervals[k] = NewInterval(ki.start, ki.stop-1)
 				return
-			} else if v < i.stop-1 {
-				var x = NewInterval(i.start, v)
-				i.start = v + 1
-				//				is.intervals.splice(k, 0, x);
-				is.intervals = append(is.intervals[0:k], append([]*Interval{x}, is.intervals[k:]...)...)
+			} else if v < ki.stop-1 {
+				var x = NewInterval(ki.start, v)
+				ki.start = v + 1
+				//				i.intervals.splice(k, 0, x);
+				i.intervals = append(i.intervals[0:k], append([]*Interval{x}, i.intervals[k:]...)...)
 				return
 			}
 		}
@@ -236,11 +236,11 @@ func (i *IntervalSet) StringVerbose(literalNames []string, symbolicNames []strin
 	}
 }
 
-func (is *IntervalSet) toCharString() string {
-	var names = make([]string, len(is.intervals))
+func (i *IntervalSet) toCharString() string {
+	var names = make([]string, len(i.intervals))
 
-	for i := 0; i < len(is.intervals); i++ {
-		var v = is.intervals[i]
+	for j := 0; j < len(i.intervals); j++ {
+		var v = i.intervals[j]
 		if v.stop == v.start+1 {
 			if v.start == TokenEOF {
 				names = append(names, "<EOF>")
@@ -258,11 +258,11 @@ func (is *IntervalSet) toCharString() string {
 	}
 }
 
-func (is *IntervalSet) toIndexString() string {
+func (i *IntervalSet) toIndexString() string {
 
 	var names = make([]string, 0)
-	for i := 0; i < len(is.intervals); i++ {
-		var v = is.intervals[i]
+	for j := 0; j < len(i.intervals); j++ {
+		var v = i.intervals[j]
 		if v.stop == v.start+1 {
 			if v.start == TokenEOF {
 				names = append(names, "<EOF>")
@@ -280,11 +280,11 @@ func (is *IntervalSet) toIndexString() string {
 	}
 }
 
-func (is *IntervalSet) toTokenString(literalNames []string, symbolicNames []string) string {
+func (i *IntervalSet) toTokenString(literalNames []string, symbolicNames []string) string {
 	var names = make([]string, 0)
-	for _, v := range is.intervals {
+	for _, v := range i.intervals {
 		for j := v.start; j < v.stop; j++ {
-			names = append(names, is.elementName(literalNames, symbolicNames, j))
+			names = append(names, i.elementName(literalNames, symbolicNames, j))
 		}
 	}
 	if len(names) > 1 {

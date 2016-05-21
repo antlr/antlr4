@@ -281,8 +281,8 @@ func NewArrayPredictionContext(parents []PredictionContext, returnStates []int) 
 	return c
 }
 
-func (c *ArrayPredictionContext) GetReturnStates() []int {
-	return c.returnStates
+func (a *ArrayPredictionContext) GetReturnStates() []int {
+	return a.returnStates
 }
 
 func (a *ArrayPredictionContext) hasEmptyPath() bool {

@@ -664,27 +664,27 @@ func (p *BaseParser) GetRuleIndex(ruleName string) int {
 //
 // this very useful for error messages.
 
-func (b *BaseParser) GetRuleInvocationStack(p ParserRuleContext) []string {
-	if p == nil {
-		p = b._ctx
+func (p *BaseParser) GetRuleInvocationStack(c ParserRuleContext) []string {
+	if c == nil {
+		c = p._ctx
 	}
 	var stack = make([]string, 0)
-	for p != nil {
+	for c != nil {
 		// compute what follows who invoked us
-		var ruleIndex = p.GetRuleIndex()
+		var ruleIndex = c.GetRuleIndex()
 		if ruleIndex < 0 {
 			stack = append(stack, "n/a")
 		} else {
-			stack = append(stack, b.GetRuleNames()[ruleIndex])
+			stack = append(stack, p.GetRuleNames()[ruleIndex])
 		}
 
-		vp := p.GetParent()
+		vp := c.GetParent()
 
 		if vp == nil {
 			break
 		}
 
-		p = vp.(ParserRuleContext)
+		c = vp.(ParserRuleContext)
 	}
 	return stack
 }
