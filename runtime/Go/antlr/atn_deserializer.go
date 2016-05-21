@@ -549,7 +549,7 @@ func (a *ATNDeserializer) checkCondition(condition bool, message string) {
 
 func (a *ATNDeserializer) readInt() int {
 	v := a.data[a.pos]
-	a.pos += 1
+	a.pos++
 	return int(v)
 }
 

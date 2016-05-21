@@ -796,7 +796,7 @@ func (p *ParserATNSimulator) getPredsForAmbigAlts(ambigAlts *BitSet, configs ATN
 		if pred == nil {
 			altToPred[i] = SemanticContextNone
 		} else if pred != SemanticContextNone {
-			nPredAlts += 1
+			nPredAlts++
 		}
 	}
 	// nonambig alts are nil in altToPred
@@ -1112,7 +1112,7 @@ func (p *ParserATNSimulator) closure_(config ATNConfig, configs ATNConfigSet, cl
 			} else if _, ok := t.(*RuleTransition); ok {
 				// latch when newDepth goes negative - once we step out of the entry context we can't return
 				if newDepth >= 0 {
-					newDepth += 1
+					newDepth++
 				}
 			}
 			p.closureCheckingStopState(c, configs, closureBusy, continueCollecting, fullCtx, newDepth, treatEofAsEpsilon)

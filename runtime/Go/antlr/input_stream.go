@@ -30,7 +30,7 @@ func (is *InputStream) Consume() {
 		// assert is.LA(1) == TokenEOF
 		panic("cannot consume EOF")
 	}
-	is.index += 1
+	is.index++
 }
 
 func (is *InputStream) LA(offset int) int {
@@ -39,7 +39,7 @@ func (is *InputStream) LA(offset int) int {
 		return 0 // nil
 	}
 	if offset < 0 {
-		offset += 1 // e.g., translate LA(-1) to use offset=0
+		offset++ // e.g., translate LA(-1) to use offset=0
 	}
 	var pos = is.index + offset - 1
 

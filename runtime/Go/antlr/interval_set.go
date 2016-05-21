@@ -186,7 +186,7 @@ func (i *IntervalSet) removeRange(v *Interval) {
 			} else if v.stop < ni.stop {
 				i.intervals[k] = NewInterval(v.stop, ni.stop)
 			}
-			k += 1
+			k++
 		}
 	}
 }

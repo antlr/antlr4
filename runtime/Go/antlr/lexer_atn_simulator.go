@@ -109,7 +109,7 @@ func (l *LexerATNSimulator) Match(input CharStream, mode int) int {
 		fmt.Println("Match")
 	}
 
-	l.Match_calls += 1
+	l.Match_calls++
 	l.mode = mode
 	var mark = input.Mark()
 
@@ -672,10 +672,10 @@ func (l *LexerATNSimulator) GetText(input CharStream) string {
 func (l *LexerATNSimulator) consume(input CharStream) {
 	var curChar = input.LA(1)
 	if curChar == int('\n') {
-		l.line += 1
+		l.line++
 		l.column = 0
 	} else {
-		l.column += 1
+		l.column++
 	}
 	input.Consume()
 }

@@ -637,31 +637,31 @@ func mergeArrays(a, b *ArrayPredictionContext, rootIsWildcard bool, mergeCache *
 				mergedParents[k] = mergedParent
 				mergedReturnStates[k] = payload
 			}
-			i += 1 // hop over left one as usual
-			j += 1 // but also Skip one in right side since we merge
+			i++ // hop over left one as usual
+			j++ // but also Skip one in right side since we merge
 		} else if a.returnStates[i] < b.returnStates[j] { // copy a[i] to M
 			mergedParents[k] = a_parent
 			mergedReturnStates[k] = a.returnStates[i]
-			i += 1
+			i++
 		} else { // b > a, copy b[j] to M
 			mergedParents[k] = b_parent
 			mergedReturnStates[k] = b.returnStates[j]
-			j += 1
+			j++
 		}
-		k += 1
+		k++
 	}
 	// copy over any payloads remaining in either array
 	if i < len(a.returnStates) {
 		for p := i; p < len(a.returnStates); p++ {
 			mergedParents[k] = a.parents[p]
 			mergedReturnStates[k] = a.returnStates[p]
-			k += 1
+			k++
 		}
 	} else {
 		for p := j; p < len(b.returnStates); p++ {
 			mergedParents[k] = b.parents[p]
 			mergedReturnStates[k] = b.returnStates[p]
-			k += 1
+			k++
 		}
 	}
 	// trim merged if we combined a few that had same stack tops

@@ -235,7 +235,7 @@ func (c *CommonTokenStream) NextTokenOnChannel(i, channel int) int {
 		if token.GetTokenType() == TokenEOF {
 			return -1
 		}
-		i += 1
+		i++
 		c.Sync(i)
 		token = c.tokens[i]
 	}
@@ -388,7 +388,7 @@ func (c *CommonTokenStream) LB(k int) Token {
 	for n <= k {
 		// Skip off-channel tokens
 		i = c.previousTokenOnChannel(i-1, c.channel)
-		n += 1
+		n++
 	}
 	if i < 0 {
 		return nil
@@ -412,7 +412,7 @@ func (c *CommonTokenStream) LT(k int) Token {
 		if c.Sync(i + 1) {
 			i = c.NextTokenOnChannel(i+1, c.channel)
 		}
-		n += 1
+		n++
 	}
 	return c.tokens[i]
 }
@@ -424,7 +424,7 @@ func (c *CommonTokenStream) getNumberOfOnChannelTokens() int {
 	for i := 0; i < len(c.tokens); i++ {
 		var t = c.tokens[i]
 		if t.GetChannel() == c.channel {
-			n += 1
+			n++
 		}
 		if t.GetTokenType() == TokenEOF {
 			break

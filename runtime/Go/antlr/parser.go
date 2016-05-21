@@ -418,7 +418,7 @@ func (p *BaseParser) NotifyErrorListeners(msg string, offendingToken Token, err 
 	if offendingToken == nil {
 		offendingToken = p.GetCurrentToken()
 	}
-	p._SyntaxErrors += 1
+	p._SyntaxErrors++
 	var line = offendingToken.GetLine()
 	var column = offendingToken.GetColumn()
 	listener := p.GetErrorListenerDispatch()
