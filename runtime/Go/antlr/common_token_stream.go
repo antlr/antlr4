@@ -154,7 +154,7 @@ func (c *CommonTokenStream) fetch(n int) int {
 	}
 
 	for i := 0; i < n; i++ {
-		var t Token = c.tokenSource.NextToken()
+		var t = c.tokenSource.NextToken()
 		if PortDebug {
 			fmt.Println("fetch loop")
 		}
@@ -247,7 +247,7 @@ func (c *CommonTokenStream) NextTokenOnChannel(i, channel int) int {
 // on channel between i and 0.
 func (c *CommonTokenStream) previousTokenOnChannel(i, channel int) int {
 	for i >= 0 && c.tokens[i].GetChannel() != channel {
-		i --
+		i--
 	}
 	return i
 }

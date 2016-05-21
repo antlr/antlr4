@@ -605,7 +605,7 @@ func (p *BaseParser) inContext(context ParserRuleContext) bool {
 // the ATN, otherwise {@code false}.
 
 func (p *BaseParser) IsExpectedToken(symbol int) bool {
-	var atn *ATN = p.Interpreter.atn
+	var atn = p.Interpreter.atn
 	var ctx = p._ctx
 	var s = atn.states[p.state]
 	var following = atn.NextTokens(s, nil)

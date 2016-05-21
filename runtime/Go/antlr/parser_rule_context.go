@@ -165,7 +165,7 @@ func (prc *BaseParserRuleContext) GetChildOfType(i int, childType reflect.Type) 
 				return child.(RuleContext)
 			}
 
-			i --
+			i--
 		}
 	}
 
@@ -210,7 +210,7 @@ func (prc *BaseParserRuleContext) GetToken(ttype int, i int) TerminalNode {
 					return c2
 				}
 
-				i --
+				i--
 			}
 		}
 	}
@@ -245,7 +245,7 @@ func (prc *BaseParserRuleContext) getChild(ctxType reflect.Type, i int) RuleCont
 		return nil
 	}
 
-	var j int = -1 // what element have we found with ctxType?
+	var j = -1 // what element have we found with ctxType?
 	for _, o := range prc.children {
 
 		childType := reflect.TypeOf(o)

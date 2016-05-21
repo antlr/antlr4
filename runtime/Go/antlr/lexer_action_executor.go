@@ -139,7 +139,7 @@ func (l *LexerActionExecutor) execute(lexer Lexer, input CharStream, startIndex 
 	}()
 
 	for i := 0; i < len(l.lexerActions); i++ {
-		var lexerAction LexerAction = l.lexerActions[i]
+		var lexerAction = l.lexerActions[i]
 		if la, ok := lexerAction.(*LexerIndexedCustomAction); ok {
 			var offset = la.offset
 			input.Seek(startIndex + offset)
