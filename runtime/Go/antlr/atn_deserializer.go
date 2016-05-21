@@ -375,8 +375,8 @@ func (a *ATNDeserializer) generateRuleBypassTransition(atn *ATN, idx int) {
 
 	bypassStop.startState = bypassStart
 
-	var excludeTransition Transition = nil
-	var endState ATNState = nil
+	var excludeTransition Transition
+	var endState ATNState
 
 	if atn.ruleToStartState[idx].isPrecedenceRule {
 		// wrap from the beginning of the rule to the StarLoopEntryState

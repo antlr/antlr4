@@ -480,7 +480,7 @@ func mergeSingletons(a, b *BaseSingletonPredictionContext, rootIsWildcard bool, 
 	}
 	// a != b payloads differ
 	// see if we can collapse parents due to $+x parents if local ctx
-	var singleParent PredictionContext = nil
+	var singleParent PredictionContext
 	if a == b || (a.parentCtx != nil && a.parentCtx == b.parentCtx) { // ax +
 		// bx =
 		// [a,b]x
@@ -753,7 +753,7 @@ func getCachedBasePredictionContext(context PredictionContext, contextCache *Pre
 		visited[context] = context
 		return context
 	}
-	var updated PredictionContext = nil
+	var updated PredictionContext
 	if len(parents) == 0 {
 		updated = BasePredictionContextEMPTY
 	} else if len(parents) == 1 {

@@ -80,7 +80,7 @@ func (p *Predicate) evalPrecedence(parser Recognizer, outerContext RuleContext) 
 
 func (p *Predicate) evaluate(parser Recognizer, outerContext RuleContext) bool {
 
-	var localctx RuleContext = nil
+	var localctx RuleContext
 
 	if p.isCtxDependent {
 		localctx = outerContext
@@ -195,7 +195,7 @@ func NewAND(a, b SemanticContext) *AND {
 	var precedencePredicates = PrecedencePredicatefilterPrecedencePredicates(operands)
 	if len(precedencePredicates) > 0 {
 		// interested in the transition with the lowest precedence
-		var reduced *PrecedencePredicate = nil
+		var reduced *PrecedencePredicate
 
 		for _, p := range precedencePredicates {
 			if reduced == nil || p.precedence < reduced.precedence {
@@ -278,7 +278,7 @@ func (a *AND) evalPrecedence(parser Recognizer, outerContext RuleContext) Semant
 		return SemanticContextNone
 	}
 
-	var result SemanticContext = nil
+	var result SemanticContext
 
 	for _, o := range operands {
 		if result == nil {
@@ -335,7 +335,7 @@ func NewOR(a, b SemanticContext) *OR {
 	var precedencePredicates = PrecedencePredicatefilterPrecedencePredicates(operands)
 	if len(precedencePredicates) > 0 {
 		// interested in the transition with the lowest precedence
-		var reduced *PrecedencePredicate = nil
+		var reduced *PrecedencePredicate
 
 		for _, p := range precedencePredicates {
 			if reduced == nil || p.precedence > reduced.precedence {
@@ -413,7 +413,7 @@ func (o *OR) evalPrecedence(parser Recognizer, outerContext RuleContext) Semanti
 		// all elements were false, so the OR context is false
 		return nil
 	}
-	var result SemanticContext = nil
+	var result SemanticContext
 
 	for _, o := range operands {
 		if result == nil {

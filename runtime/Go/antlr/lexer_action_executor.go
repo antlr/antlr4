@@ -88,7 +88,7 @@ func LexerActionExecutorappend(lexerActionExecutor *LexerActionExecutor, lexerAc
 // for all position-dependent lexer actions.
 // /
 func (l *LexerActionExecutor) fixOffsetBeforeMatch(offset int) *LexerActionExecutor {
-	var updatedLexerActions []LexerAction = nil
+	var updatedLexerActions []LexerAction
 	for i := 0; i < len(l.lexerActions); i++ {
 		_, ok := l.lexerActions[i].(*LexerIndexedCustomAction)
 		if l.lexerActions[i].getIsPositionDependent() && !ok {

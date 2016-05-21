@@ -432,7 +432,7 @@ func PredictionModehasConflictingAltSet(altsets []*BitSet) bool {
 // others, otherwise {@code false}
 //
 func PredictionModeallSubsetsEqual(altsets []*BitSet) bool {
-	var first *BitSet = nil
+	var first *BitSet
 
 	for i := 0; i < len(altsets); i++ {
 		var alts = altsets[i]

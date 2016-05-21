@@ -631,7 +631,7 @@ func (l *LexerATNSimulator) addDFAEdge(from_ *DFAState, tk int, to *DFAState, cf
 func (l *LexerATNSimulator) addDFAState(configs ATNConfigSet) *DFAState {
 
 	var proposed = NewDFAState(-1, configs)
-	var firstConfigWithRuleStopState ATNConfig = nil
+	var firstConfigWithRuleStopState ATNConfig
 
 	for _, cfg := range configs.GetItems() {
 

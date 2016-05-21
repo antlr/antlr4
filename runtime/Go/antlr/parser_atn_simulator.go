@@ -385,7 +385,7 @@ func (p *ParserATNSimulator) execATNWithFullContext(dfa *DFA, D *DFAState, s0 AT
 
 	var fullCtx = true
 	var foundExactAmbig = false
-	var reach ATNConfigSet = nil
+	var reach ATNConfigSet
 	var previous = s0
 	input.Seek(startIndex)
 	var t = input.LA(1)
@@ -504,7 +504,7 @@ func (p *ParserATNSimulator) computeReachSet(closure ATNConfigSet, t int, fullCt
 	// ensure that the alternative Matching the longest overall sequence is
 	// chosen when multiple such configurations can Match the input.
 
-	var SkippedStopStates []*BaseATNConfig = nil
+	var SkippedStopStates []*BaseATNConfig
 
 	// First figure out where we can reach on input t
 	for _, c := range closure.GetItems() {
@@ -540,7 +540,7 @@ func (p *ParserATNSimulator) computeReachSet(closure ATNConfigSet, t int, fullCt
 		}
 	}
 	// Now figure out where the reach operation can take us...
-	var reach ATNConfigSet = nil
+	var reach ATNConfigSet
 
 	// This block optimizes the reach operation for intermediate sets which
 	// trivially indicate a termination state for the overall
@@ -1190,7 +1190,7 @@ func (p *ParserATNSimulator) precedenceTransition(config ATNConfig,
 			fmt.Println("context surrounding pred is " + fmt.Sprint(p.parser.GetRuleInvocationStack(nil)))
 		}
 	}
-	var c *BaseATNConfig = nil
+	var c *BaseATNConfig
 	if collectPredicates && inContext {
 		if fullCtx {
 			// In full context mode, we can evaluate predicates on-the-fly
@@ -1226,7 +1226,7 @@ func (p *ParserATNSimulator) predTransition(config ATNConfig, pt *PredicateTrans
 			fmt.Println("context surrounding pred is " + fmt.Sprint(p.parser.GetRuleInvocationStack(nil)))
 		}
 	}
-	var c *BaseATNConfig = nil
+	var c *BaseATNConfig
 	if collectPredicates && ((pt.isCtxDependent && inContext) || !pt.isCtxDependent) {
 		if fullCtx {
 			// In full context mode, we can evaluate predicates on-the-fly
@@ -1304,7 +1304,7 @@ func (p *ParserATNSimulator) getConflictingAlts(configs ATNConfigSet) *BitSet {
 //
 
 func (p *ParserATNSimulator) getConflictingAltsOrUniqueAlt(configs ATNConfigSet) *BitSet {
-	var conflictingAlts *BitSet = nil
+	var conflictingAlts *BitSet
 	if configs.GetUniqueAlt() != ATNInvalidAltNumber {
 		conflictingAlts = NewBitSet()
 		conflictingAlts.add(configs.GetUniqueAlt())
