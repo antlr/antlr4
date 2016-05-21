@@ -352,6 +352,5 @@ func TitleCase(str string) string {
 	//	return re.ReplaceAllStringFunc(str, func(s string) {
 	//		return strings.ToUpper(s[0:1]) + s[1:2]
 	//	})
-	return ""
 
 }

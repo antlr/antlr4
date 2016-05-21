@@ -686,5 +686,4 @@ func (this *ATNDeserializer) lexerActionFactory(typeIndex, data1, data2 int) Lex
 		message := fmt.Sprintf("The specified lexer action typeIndex%d is not valid.", typeIndex)
 		panic(message)
 	}
-	return nil
 }

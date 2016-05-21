@@ -33,7 +33,7 @@ type BaseTransition struct {
 
 func NewBaseTransition(target ATNState) *BaseTransition {
 
-	if target == nil || target == nil {
+	if target == nil {
 		panic("target cannot be nil.")
 	}
 
@@ -324,7 +324,7 @@ func NewSetTransition(target ATNState, set *IntervalSet) *SetTransition {
 	t.BaseTransition = NewBaseTransition(target)
 
 	t.serializationType = TransitionSET
-	if set != nil && set != nil {
+	if set != nil {
 		t.label = set
 	} else {
 		t.label = NewIntervalSet()
