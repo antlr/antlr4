@@ -41,28 +41,16 @@ namespace v4 {
 namespace runtime {
 namespace atn {
 
-  // Cannot use PredictionContext> here as this declared below first.
-  typedef std::unordered_set<Ref<PredictionContext>> PredictionContextCache;
+  struct PredictionContextHasher;
+  struct PredictionContextComparer;
+
+  typedef std::unordered_set<Ref<PredictionContext>, PredictionContextHasher, PredictionContextComparer> PredictionContextCache;
 
   // For the keys we use raw pointers, as we don't need to access them.
   typedef std::map<std::pair<PredictionContext *, PredictionContext *>, Ref<PredictionContext>> PredictionContextMergeCache;
 
   class ANTLR4CPP_PUBLIC PredictionContext {
   public:
-    struct PredictionContextHasher
-    {
-      size_t operator () (Ref<PredictionContext> k) const {
-        return k->hashCode();
-      }
-    };
-
-    struct PredictionContextComparer {
-      bool operator () (Ref<PredictionContext> lhs, Ref<PredictionContext> rhs) const
-      {
-        return *lhs == *rhs;
-      }
-    };
-
     /// Represents $ in local context prediction, which means wildcard.
     /// *+x = *.
     static const Ref<PredictionContext> EMPTY;
@@ -255,6 +243,19 @@ namespace atn {
 
     std::vector<std::string> toStrings(Recognizer *recognizer, int currentState);
     std::vector<std::string> toStrings(Recognizer *recognizer, Ref<PredictionContext> stop, int currentState);
+  };
+
+  struct PredictionContextHasher {
+    size_t operator () (Ref<PredictionContext> k) const {
+      return k->hashCode();
+    }
+  };
+
+  struct PredictionContextComparer {
+    bool operator () (Ref<PredictionContext> lhs, Ref<PredictionContext> rhs) const
+    {
+      return *lhs == *rhs;
+    }
   };
 
 } // namespace atn

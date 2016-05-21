@@ -60,8 +60,7 @@ IntervalSet::IntervalSet(const std::vector<Interval> &intervals) : IntervalSet()
 }
 
 IntervalSet::IntervalSet(const IntervalSet &set) : IntervalSet() {
-  _intervals.clear();
-  addAll(set);
+  _intervals = set._intervals;
 }
 
 IntervalSet::IntervalSet(int n, ...) : IntervalSet() {
@@ -303,13 +302,13 @@ IntervalSet IntervalSet::And(const IntervalSet &other) const {
 }
 
 bool IntervalSet::contains(int el) const {
+  if (_intervals.empty())
+    return false;
+  if (el < _intervals[0].a) // list is sorted and el is before first interval; not here
+    return false;
+
   for (auto &interval : _intervals) {
-    int a = interval.a;
-    int b = interval.b;
-    if (el < a) {
-      break; // list is sorted and el is before this interval; not here
-    }
-    if (el >= a && el <= b) {
+    if (el >= interval.a && el <= interval.b) {
       return true; // found in this interval
     }
   }

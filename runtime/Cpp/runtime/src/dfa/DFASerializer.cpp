@@ -31,7 +31,6 @@
  */
 
 #include "dfa/DFA.h"
-#include "dfa/DFAState.h"
 #include "VocabularyImpl.h"
 
 #include "dfa/DFASerializer.h"

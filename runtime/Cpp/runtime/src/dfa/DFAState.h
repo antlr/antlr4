@@ -136,7 +136,7 @@ namespace dfa {
     /// </summary>
     virtual std::set<int> getAltSet();
 
-    virtual size_t hashCode();
+    virtual size_t hashCode() const;
 
     /// Two DFAState instances are equal if their ATN configuration sets
     /// are the same. This method is used to see if a state already exists.
@@ -149,10 +149,24 @@ namespace dfa {
     /// ParserATNSimulator#addDFAState we need to know if any other state
     /// exists that has this exact set of ATN configurations. The
     /// stateNumber is irrelevant.
-    bool operator == (const DFAState &o);
+    bool operator == (const DFAState &o) const;
 
     virtual std::string toString();
 
+    struct Hasher
+    {
+      size_t operator()(DFAState *k) const {
+        return k->hashCode();
+      }
+    };
+
+    struct Comparer {
+      bool operator()(DFAState *lhs, DFAState *rhs) const
+      {
+        return *lhs == *rhs;
+      }
+    };
+    
   private:
     void InitializeInstanceFields();
   };

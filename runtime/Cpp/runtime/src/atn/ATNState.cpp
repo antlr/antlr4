@@ -42,6 +42,9 @@ using namespace antlrcpp;
 const int ATNState::INITIAL_NUM_TRANSITIONS = 4;
 const int ATNState::INVALID_STATE_NUMBER = -1;
 
+ATNState::ATNState() {
+}
+
 ATNState::~ATNState() {
   for (auto transition : transitions) {
     delete transition;

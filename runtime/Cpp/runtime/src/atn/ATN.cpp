@@ -111,7 +111,7 @@ misc::IntervalSet ATN::nextTokens(ATNState *s, Ref<RuleContext> ctx) const {
 
 }
 
-misc::IntervalSet ATN::nextTokens(ATNState *s) const {
+misc::IntervalSet& ATN::nextTokens(ATNState *s) const {
   if (s->nextTokenWithinRule.isEmpty()) {
     s->nextTokenWithinRule = nextTokens(s, nullptr);
     s->nextTokenWithinRule.setReadOnly(true);
