@@ -110,7 +110,7 @@ func (this *BaseRecognizer) SetState(v int) {
 // <p>Used for XPath and tree pattern compilation.</p>
 //
 func (this *BaseRecognizer) GetRuleIndexMap() map[string]int {
-	
+
 	panic("Method not defined!")
 	//    var ruleNames = this.GetRuleNames()
 	//    if (ruleNames==nil) {

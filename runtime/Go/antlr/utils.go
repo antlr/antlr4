@@ -114,7 +114,6 @@ func hashCode(s string) string {
 	return fmt.Sprint(h.Sum32())
 }
 
-
 func (this *Set) length() int {
 	return len(this.data)
 }
@@ -264,10 +263,10 @@ func (this *BitSet) String() string {
 	vals := this.values()
 	valsS := make([]string, len(vals))
 
-	for i,val := range vals {
+	for i, val := range vals {
 		valsS[i] = strconv.Itoa(val)
 	}
-	return "{" + strings.Join(valsS, ", ") + "}";
+	return "{" + strings.Join(valsS, ", ") + "}"
 }
 
 type AltDict struct {

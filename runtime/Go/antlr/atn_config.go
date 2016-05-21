@@ -2,7 +2,7 @@ package antlr
 
 import (
 	"fmt"
-//	"reflect"
+	//	"reflect"
 	"strconv"
 )
 
@@ -162,17 +162,17 @@ func (this *BaseATNConfig) equals(o interface{}) bool {
 	}
 
 	var b bool
-	if this.context==nil {
-		b = other.context==nil
+	if this.context == nil {
+		b = other.context == nil
 	} else {
 		b = this.context.equals(other.context)
 	}
 
 	return this.state.GetStateNumber() == other.state.GetStateNumber() &&
-		this.alt==other.alt &&
+		this.alt == other.alt &&
 		this.semanticContext.equals(other.semanticContext) &&
-		this.precedenceFilterSuppressed==other.precedenceFilterSuppressed &&
-		b;
+		this.precedenceFilterSuppressed == other.precedenceFilterSuppressed &&
+		b
 }
 
 func (this *BaseATNConfig) shortHash() string {

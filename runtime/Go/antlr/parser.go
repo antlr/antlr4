@@ -199,7 +199,7 @@ func (p *BaseParser) GetParserRuleContext() ParserRuleContext {
 	return p._ctx
 }
 
-func (p *BaseParser) SetParserRuleContext(v ParserRuleContext)  {
+func (p *BaseParser) SetParserRuleContext(v ParserRuleContext) {
 	p._ctx = v
 }
 
@@ -698,8 +698,8 @@ func (p *BaseParser) GetDFAStrings() string {
 func (p *BaseParser) DumpDFA() {
 	var seenOne = false
 	for _, dfa := range p.Interpreter.DecisionToDFA {
-		if ( len(dfa.GetStates()) > 0) {
-			if (seenOne) {
+		if len(dfa.GetStates()) > 0 {
+			if seenOne {
 				fmt.Println()
 			}
 			fmt.Println("Decision " + strconv.Itoa(dfa.decision) + ":")

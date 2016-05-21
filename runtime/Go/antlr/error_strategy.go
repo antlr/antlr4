@@ -543,7 +543,7 @@ func (this *DefaultErrorStrategy) getMissingSymbol(recognizer Parser) Token {
 		tokenText = "<missing EOF>"
 	} else {
 		ln := recognizer.GetLiteralNames()
-		if expectedTokenType > 0 && expectedTokenType < len(ln)  {
+		if expectedTokenType > 0 && expectedTokenType < len(ln) {
 			tokenText = "<missing " + recognizer.GetLiteralNames()[expectedTokenType] + ">"
 		} else {
 			tokenText = "<missing undefined>" // TODO matches the JS impl

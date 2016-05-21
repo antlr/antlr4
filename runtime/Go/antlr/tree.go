@@ -54,12 +54,12 @@ type ParseTreeVisitor interface {
 	VisitErrorNode(node ErrorNode) interface{}
 }
 
-type BaseParseTreeVisitor struct {}
+type BaseParseTreeVisitor struct{}
 
-func (v *BaseParseTreeVisitor) Visit(tree ParseTree) interface{} { return nil }
-func (v *BaseParseTreeVisitor) VisitChildren(node RuleNode) interface{} { return nil }
+func (v *BaseParseTreeVisitor) Visit(tree ParseTree) interface{}            { return nil }
+func (v *BaseParseTreeVisitor) VisitChildren(node RuleNode) interface{}     { return nil }
 func (v *BaseParseTreeVisitor) VisitTerminal(node TerminalNode) interface{} { return nil }
-func (v *BaseParseTreeVisitor) VisitErrorNode(node ErrorNode) interface{} { return nil }
+func (v *BaseParseTreeVisitor) VisitErrorNode(node ErrorNode) interface{}   { return nil }
 
 // TODO
 //func (this ParseTreeVisitor) Visit(ctx) {
@@ -89,11 +89,12 @@ type ParseTreeListener interface {
 	ExitEveryRule(ctx ParserRuleContext)
 }
 
-type BaseParseTreeListener struct {}
-func (l *BaseParseTreeListener) VisitTerminal(node TerminalNode){}
-func (l *BaseParseTreeListener) VisitErrorNode(node ErrorNode){}
-func (l *BaseParseTreeListener) EnterEveryRule(ctx ParserRuleContext){}
-func (l *BaseParseTreeListener) ExitEveryRule(ctx ParserRuleContext){}
+type BaseParseTreeListener struct{}
+
+func (l *BaseParseTreeListener) VisitTerminal(node TerminalNode)      {}
+func (l *BaseParseTreeListener) VisitErrorNode(node ErrorNode)        {}
+func (l *BaseParseTreeListener) EnterEveryRule(ctx ParserRuleContext) {}
+func (l *BaseParseTreeListener) ExitEveryRule(ctx ParserRuleContext)  {}
 
 type TerminalNodeImpl struct {
 	parentCtx RuleContext

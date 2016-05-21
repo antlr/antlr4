@@ -34,11 +34,9 @@ type RuleContext interface {
 }
 
 type BaseRuleContext struct {
-
 	parentCtx     RuleContext
 	invokingState int
 	RuleIndex     int
-
 }
 
 func NewBaseRuleContext(parent RuleContext, invokingState int) *BaseRuleContext {

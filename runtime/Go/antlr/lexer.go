@@ -25,11 +25,11 @@ type Lexer interface {
 type BaseLexer struct {
 	*BaseRecognizer
 
-	Interpreter *LexerATNSimulator
+	Interpreter         *LexerATNSimulator
 	TokenStartCharIndex int
-	TokenStartLine int
-	TokenStartColumn int
-	ActionType int
+	TokenStartLine      int
+	TokenStartColumn    int
+	ActionType          int
 
 	_input                  CharStream
 	_factory                TokenFactory
@@ -41,7 +41,6 @@ type BaseLexer struct {
 	_modeStack              IntStack
 	_mode                   int
 	_text                   string
-
 }
 
 func NewBaseLexer(input CharStream) *BaseLexer {

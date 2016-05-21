@@ -1,7 +1,5 @@
 package antlr
 
-import ()
-
 // The root of the ANTLR exception hierarchy. In general, ANTLR tracks just
 //  3 kinds of errors: prediction errors, failed predicate errors, and
 //  misMatched input errors. In each case, the parser knows where it is

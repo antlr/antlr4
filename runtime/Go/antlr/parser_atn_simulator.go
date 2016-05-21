@@ -14,7 +14,7 @@ type ParserATNSimulator struct {
 	_input         TokenStream
 	_startIndex    int
 	_dfa           *DFA
-	DecisionToDFA []*DFA
+	DecisionToDFA  []*DFA
 	mergeCache     *DoubleDict
 	_outerContext  ParserRuleContext
 }

@@ -3,7 +3,7 @@ package antlr
 import (
 	"reflect"
 	"strconv"
-//	"fmt"
+	//	"fmt"
 )
 
 type ParserRuleContext interface {
@@ -32,7 +32,7 @@ type BaseParserRuleContext struct {
 
 	start, stop Token
 	exception   RecognitionException
-	children []Tree
+	children    []Tree
 }
 
 func NewBaseParserRuleContext(parent ParserRuleContext, invokingStateNumber int) *BaseParserRuleContext {
@@ -233,29 +233,30 @@ func (prc *BaseParserRuleContext) GetTokens(ttype int) []TerminalNode {
 	}
 }
 
-func (prc *BaseParserRuleContext) GetPayload() interface{}{
+func (prc *BaseParserRuleContext) GetPayload() interface{} {
 	return prc
 }
 
 func (prc *BaseParserRuleContext) getChild(ctxType reflect.Type, i int) RuleContext {
-	if ( prc.children==nil || i < 0 || i >= len(prc.children) ) {
+	if prc.children == nil || i < 0 || i >= len(prc.children) {
 		return nil
 	}
 
 	var j int = -1 // what element have we found with ctxType?
-	for _,o := range prc.children {
+	for _, o := range prc.children {
 
 		childType := reflect.TypeOf(o)
 
-		if ( childType.Implements(ctxType) ) {
+		if childType.Implements(ctxType) {
 			j++
-			if ( j == i ) {
+			if j == i {
 				return o.(RuleContext)
 			}
 		}
 	}
 	return nil
 }
+
 // Go lacks generics, so it's not possible for us to return the child with the correct type, but we do
 // check for convertibility
 
@@ -270,7 +271,7 @@ func (prc *BaseParserRuleContext) GetTypedRuleContexts(ctxType reflect.Type) []R
 
 	var contexts = make([]RuleContext, 0)
 
-	for _,child := range prc.children {
+	for _, child := range prc.children {
 		childType := reflect.TypeOf(child)
 
 		if childType.ConvertibleTo(ctxType) {
@@ -335,10 +336,7 @@ func (this *BaseParserRuleContext) String(ruleNames []string, stop RuleContext) 
 	return s
 }
 
-
 var RuleContextEmpty = NewBaseParserRuleContext(nil, -1)
-
-
 
 type InterpreterRuleContext interface {
 	ParserRuleContext

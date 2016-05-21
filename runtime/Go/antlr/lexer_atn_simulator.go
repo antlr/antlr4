@@ -52,7 +52,7 @@ type LexerATNSimulator struct {
 
 	recog          Lexer
 	predictionMode int
-	DecisionToDFA []*DFA
+	DecisionToDFA  []*DFA
 	mergeCache     DoubleDict
 	startIndex     int
 	line           int
@@ -207,9 +207,9 @@ func (this *LexerATNSimulator) execATN(input CharStream, ds0 *DFAState) int {
 		// that already has lots of edges out of it. e.g., .* in comments.
 		// print("Target for:" + str(s) + " and:" + str(t))
 		var target = this.getExistingTargetState(s, t)
-//		if PortDebug {
-//			fmt.Println(target)
-//		}
+		//		if PortDebug {
+		//			fmt.Println(target)
+		//		}
 		if target == nil {
 			target = this.computeTargetState(input, s, t)
 			// print("Computed:" + str(target))

@@ -282,7 +282,7 @@ func (is *IntervalSet) toIndexString() string {
 
 func (is *IntervalSet) toTokenString(literalNames []string, symbolicNames []string) string {
 	var names = make([]string, 0)
-	for _,v := range is.intervals {
+	for _, v := range is.intervals {
 		for j := v.start; j < v.stop; j++ {
 			names = append(names, is.elementName(literalNames, symbolicNames, j))
 		}
