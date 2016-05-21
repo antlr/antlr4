@@ -501,7 +501,7 @@ func PredictionModegetConflictingAltSubsets(configs ATNConfigSet) []*BitSet {
 
 	var values = make([]*BitSet, 0)
 
-	for k, _ := range configToAlts {
+	for k := range configToAlts {
 		if strings.Index(k, "key_") != 0 {
 			continue
 		}

@@ -161,7 +161,7 @@ func (s *Set) contains(value interface{}) bool {
 func (s *Set) values() []interface{} {
 	var l = make([]interface{}, 0)
 
-	for key, _ := range s.data {
+	for key := range s.data {
 		if strings.Index(key, "hash_") == 0 {
 			l = append(l, s.data[key]...)
 		}
@@ -201,7 +201,7 @@ func (b *BitSet) clear(index int) {
 }
 
 func (b *BitSet) or(set *BitSet) {
-	for k, _ := range set.data {
+	for k := range set.data {
 		b.add(k)
 	}
 }
@@ -217,7 +217,7 @@ func (b *BitSet) contains(value int) bool {
 func (b *BitSet) values() []int {
 	ks := make([]int, len(b.data))
 	i := 0
-	for k, _ := range b.data {
+	for k := range b.data {
 		ks[i] = k
 		i++
 	}
@@ -227,7 +227,7 @@ func (b *BitSet) values() []int {
 func (b *BitSet) minValue() int {
 	min := 2147483647
 
-	for k, _ := range b.data {
+	for k := range b.data {
 		if k < min {
 			min = k
 		}
