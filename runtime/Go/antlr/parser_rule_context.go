@@ -165,7 +165,7 @@ func (prc *BaseParserRuleContext) GetChildOfType(i int, childType reflect.Type) 
 				return child.(RuleContext)
 			}
 
-			i -= 1
+			i --
 		}
 	}
 
@@ -210,7 +210,7 @@ func (prc *BaseParserRuleContext) GetToken(ttype int, i int) TerminalNode {
 					return c2
 				}
 
-				i -= 1
+				i --
 			}
 		}
 	}

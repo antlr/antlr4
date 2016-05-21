@@ -247,7 +247,7 @@ func (c *CommonTokenStream) NextTokenOnChannel(i, channel int) int {
 // on channel between i and 0.
 func (c *CommonTokenStream) previousTokenOnChannel(i, channel int) int {
 	for i >= 0 && c.tokens[i].GetChannel() != channel {
-		i -= 1
+		i --
 	}
 	return i
 }
