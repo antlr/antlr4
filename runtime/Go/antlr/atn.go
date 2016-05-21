@@ -62,7 +62,7 @@ func NewATN(grammarType int, maxTokenType int) *ATN {
 //  restricted to tokens reachable staying within {@code s}'s rule.
 func (a *ATN) NextTokensInContext(s ATNState, ctx RuleContext) *IntervalSet {
 	var anal = NewLL1Analyzer(a)
-	var res = anal.LOOK(s, nil, ctx)
+	var res = anal.look(s, nil, ctx)
 	return res
 }
 
