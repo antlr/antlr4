@@ -860,7 +860,7 @@ public abstract class BaseCppTest {
 						+ "  void enterEveryRule(Ref\\<ParserRuleContext> ctx) override {\n"
 						+ "    for (auto child : ctx->children) {\n"
 						+ "      auto parent = child->getParent();\n"
-						+ "      if (dynamic_cast<tree::RuleNode>(parent) || parent.getRuleContext() != ctx) {\n"
+						+ "      if (dynamic_cast\\<tree::RuleNode>(parent) || parent.getRuleContext() != ctx) {\n"
 						+ "        raise \"Invalid parse tree shape detected.\";\n"
 						+ "      }\n"
 						+ "    }\n"
