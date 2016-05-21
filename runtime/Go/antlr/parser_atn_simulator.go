@@ -570,9 +570,9 @@ func (p *ParserATNSimulator) computeReachSet(closure ATNConfigSet, t int, fullCt
 	if reach == nil {
 		reach = NewBaseATNConfigSet(fullCtx)
 		var closureBusy = NewSet(nil, nil)
-		var treatEofAsEpsilon = t == TokenEOF
+		var treatEOFAsEpsilon = t == TokenEOF
 		for k := 0; k < len(intermediate.configs); k++ {
-			p.closure(intermediate.configs[k], reach, closureBusy, false, fullCtx, treatEofAsEpsilon)
+			p.closure(intermediate.configs[k], reach, closureBusy, false, fullCtx, treatEOFAsEpsilon)
 		}
 	}
 	if t == TokenEOF {
@@ -976,13 +976,13 @@ func (p *ParserATNSimulator) evalSemanticContext(predPredictions []*PredPredicti
 	return predictions
 }
 
-func (p *ParserATNSimulator) closure(config ATNConfig, configs ATNConfigSet, closureBusy *Set, collectPredicates, fullCtx, treatEofAsEpsilon bool) {
+func (p *ParserATNSimulator) closure(config ATNConfig, configs ATNConfigSet, closureBusy *Set, collectPredicates, fullCtx, treatEOFAsEpsilon bool) {
 	var initialDepth = 0
 	p.closureCheckingStopState(config, configs, closureBusy, collectPredicates,
-		fullCtx, initialDepth, treatEofAsEpsilon)
+		fullCtx, initialDepth, treatEOFAsEpsilon)
 }
 
-func (p *ParserATNSimulator) closureCheckingStopState(config ATNConfig, configs ATNConfigSet, closureBusy *Set, collectPredicates, fullCtx bool, depth int, treatEofAsEpsilon bool) {
+func (p *ParserATNSimulator) closureCheckingStopState(config ATNConfig, configs ATNConfigSet, closureBusy *Set, collectPredicates, fullCtx bool, depth int, treatEOFAsEpsilon bool) {
 
 	if ParserATNSimulatorDebug {
 		fmt.Println("closure(" + config.String() + ")")
@@ -1010,7 +1010,7 @@ func (p *ParserATNSimulator) closureCheckingStopState(config ATNConfig, configs 
 							}
 							fmt.Println("FALLING off rule " + p.getRuleName(config.GetState().GetRuleIndex()))
 						}
-						p.closure_(config, configs, closureBusy, collectPredicates, fullCtx, depth, treatEofAsEpsilon)
+						p.closure_(config, configs, closureBusy, collectPredicates, fullCtx, depth, treatEOFAsEpsilon)
 					}
 					continue
 				}
@@ -1022,7 +1022,7 @@ func (p *ParserATNSimulator) closureCheckingStopState(config ATNConfig, configs 
 				// gotten that context AFTER having falling off a rule.
 				// Make sure we track that we are now out of context.
 				c.SetReachesIntoOuterContext(config.GetReachesIntoOuterContext())
-				p.closureCheckingStopState(c, configs, closureBusy, collectPredicates, fullCtx, depth-1, treatEofAsEpsilon)
+				p.closureCheckingStopState(c, configs, closureBusy, collectPredicates, fullCtx, depth-1, treatEOFAsEpsilon)
 			}
 			return
 		} else if fullCtx {
@@ -1039,11 +1039,11 @@ func (p *ParserATNSimulator) closureCheckingStopState(config ATNConfig, configs 
 			}
 		}
 	}
-	p.closure_(config, configs, closureBusy, collectPredicates, fullCtx, depth, treatEofAsEpsilon)
+	p.closure_(config, configs, closureBusy, collectPredicates, fullCtx, depth, treatEOFAsEpsilon)
 }
 
 // Do the actual work of walking epsilon edges//
-func (p *ParserATNSimulator) closure_(config ATNConfig, configs ATNConfigSet, closureBusy *Set, collectPredicates, fullCtx bool, depth int, treatEofAsEpsilon bool) {
+func (p *ParserATNSimulator) closure_(config ATNConfig, configs ATNConfigSet, closureBusy *Set, collectPredicates, fullCtx bool, depth int, treatEOFAsEpsilon bool) {
 	if PortDebug {
 		fmt.Println("closure_")
 	}
@@ -1058,7 +1058,7 @@ func (p *ParserATNSimulator) closure_(config ATNConfig, configs ATNConfigSet, cl
 		var t = state.GetTransitions()[i]
 		_, ok := t.(*ActionTransition)
 		var continueCollecting = collectPredicates && !ok
-		var c = p.getEpsilonTarget(config, t, continueCollecting, depth == 0, fullCtx, treatEofAsEpsilon)
+		var c = p.getEpsilonTarget(config, t, continueCollecting, depth == 0, fullCtx, treatEOFAsEpsilon)
 		if ci, ok := c.(*BaseATNConfig); ok && ci != nil {
 			if PortDebug {
 				fmt.Println("DEBUG 1 ok")
@@ -1115,7 +1115,7 @@ func (p *ParserATNSimulator) closure_(config ATNConfig, configs ATNConfigSet, cl
 					newDepth++
 				}
 			}
-			p.closureCheckingStopState(c, configs, closureBusy, continueCollecting, fullCtx, newDepth, treatEofAsEpsilon)
+			p.closureCheckingStopState(c, configs, closureBusy, continueCollecting, fullCtx, newDepth, treatEOFAsEpsilon)
 		}
 	}
 }
@@ -1128,7 +1128,7 @@ func (p *ParserATNSimulator) getRuleName(index int) string {
 	return "<rule " + fmt.Sprint(index) + ">"
 }
 
-func (p *ParserATNSimulator) getEpsilonTarget(config ATNConfig, t Transition, collectPredicates, inContext, fullCtx, treatEofAsEpsilon bool) ATNConfig {
+func (p *ParserATNSimulator) getEpsilonTarget(config ATNConfig, t Transition, collectPredicates, inContext, fullCtx, treatEOFAsEpsilon bool) ATNConfig {
 
 	switch t.getSerializationType() {
 	case TransitionRULE:
@@ -1144,7 +1144,7 @@ func (p *ParserATNSimulator) getEpsilonTarget(config ATNConfig, t Transition, co
 	case TransitionATOM:
 		// EOF transitions act like epsilon transitions after the first EOF
 		// transition is traversed
-		if treatEofAsEpsilon {
+		if treatEOFAsEpsilon {
 			if t.Matches(TokenEOF, 0, 1) {
 				return NewBaseATNConfig4(config, t.getTarget())
 			}
@@ -1153,7 +1153,7 @@ func (p *ParserATNSimulator) getEpsilonTarget(config ATNConfig, t Transition, co
 	case TransitionRANGE:
 		// EOF transitions act like epsilon transitions after the first EOF
 		// transition is traversed
-		if treatEofAsEpsilon {
+		if treatEOFAsEpsilon {
 			if t.Matches(TokenEOF, 0, 1) {
 				return NewBaseATNConfig4(config, t.getTarget())
 			}
@@ -1162,7 +1162,7 @@ func (p *ParserATNSimulator) getEpsilonTarget(config ATNConfig, t Transition, co
 	case TransitionSET:
 		// EOF transitions act like epsilon transitions after the first EOF
 		// transition is traversed
-		if treatEofAsEpsilon {
+		if treatEOFAsEpsilon {
 			if t.Matches(TokenEOF, 0, 1) {
 				return NewBaseATNConfig4(config, t.getTarget())
 			}

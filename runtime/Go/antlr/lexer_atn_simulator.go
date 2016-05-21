@@ -344,10 +344,10 @@ func (l *LexerATNSimulator) getReachableConfigSet(input CharStream, closure ATNC
 				if lexerActionExecutor != nil {
 					lexerActionExecutor = lexerActionExecutor.fixOffsetBeforeMatch(input.Index() - l.startIndex)
 				}
-				var treatEofAsEpsilon = (t == TokenEOF)
+				var treatEOFAsEpsilon = (t == TokenEOF)
 				var config = NewLexerATNConfig3(cfg.(*LexerATNConfig), target, lexerActionExecutor)
 				if l.closure(input, config, reach,
-					currentAltReachedAcceptState, true, treatEofAsEpsilon) {
+					currentAltReachedAcceptState, true, treatEOFAsEpsilon) {
 					// any remaining configs for l alt have a lower priority
 					// than the one that just reached an accept state.
 					SkipAlt = cfg.GetAlt()
@@ -403,7 +403,7 @@ func (l *LexerATNSimulator) computeStartState(input CharStream, p ATNState) *Ord
 // @return {@code true} if an accept state is reached, otherwise
 // {@code false}.
 func (l *LexerATNSimulator) closure(input CharStream, config *LexerATNConfig, configs ATNConfigSet,
-	currentAltReachedAcceptState, speculative, treatEofAsEpsilon bool) bool {
+	currentAltReachedAcceptState, speculative, treatEOFAsEpsilon bool) bool {
 
 	if LexerATNSimulatorDebug {
 		fmt.Println("closure(" + config.String() + ")") // config.String(l.recog, true) + ")")
@@ -435,7 +435,7 @@ func (l *LexerATNSimulator) closure(input CharStream, config *LexerATNConfig, co
 					var newContext = config.context.GetParent(i) // "pop" return state
 					var returnState = l.atn.states[config.context.getReturnState(i)]
 					cfg := NewLexerATNConfig2(config, returnState, newContext)
-					currentAltReachedAcceptState = l.closure(input, cfg, configs, currentAltReachedAcceptState, speculative, treatEofAsEpsilon)
+					currentAltReachedAcceptState = l.closure(input, cfg, configs, currentAltReachedAcceptState, speculative, treatEOFAsEpsilon)
 				}
 			}
 		}
@@ -449,10 +449,10 @@ func (l *LexerATNSimulator) closure(input CharStream, config *LexerATNConfig, co
 	}
 	for j := 0; j < len(config.state.GetTransitions()); j++ {
 		var trans = config.state.GetTransitions()[j]
-		cfg := l.getEpsilonTarget(input, config, trans, configs, speculative, treatEofAsEpsilon)
+		cfg := l.getEpsilonTarget(input, config, trans, configs, speculative, treatEOFAsEpsilon)
 		if cfg != nil {
 			currentAltReachedAcceptState = l.closure(input, cfg, configs,
-				currentAltReachedAcceptState, speculative, treatEofAsEpsilon)
+				currentAltReachedAcceptState, speculative, treatEOFAsEpsilon)
 		}
 	}
 	return currentAltReachedAcceptState
@@ -460,7 +460,7 @@ func (l *LexerATNSimulator) closure(input CharStream, config *LexerATNConfig, co
 
 // side-effect: can alter configs.hasSemanticContext
 func (l *LexerATNSimulator) getEpsilonTarget(input CharStream, config *LexerATNConfig, trans Transition,
-	configs ATNConfigSet, speculative, treatEofAsEpsilon bool) *LexerATNConfig {
+	configs ATNConfigSet, speculative, treatEOFAsEpsilon bool) *LexerATNConfig {
 
 	var cfg *LexerATNConfig
 
@@ -525,7 +525,7 @@ func (l *LexerATNSimulator) getEpsilonTarget(input CharStream, config *LexerATNC
 	} else if trans.getSerializationType() == TransitionATOM ||
 		trans.getSerializationType() == TransitionRANGE ||
 		trans.getSerializationType() == TransitionSET {
-		if treatEofAsEpsilon {
+		if treatEOFAsEpsilon {
 			if trans.Matches(TokenEOF, 0, 0xFFFF) {
 				cfg = NewLexerATNConfig4(config, trans.getTarget())
 			}

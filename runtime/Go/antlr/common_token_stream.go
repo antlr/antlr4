@@ -97,25 +97,25 @@ func (c *CommonTokenStream) Get(index int) Token {
 }
 
 func (c *CommonTokenStream) Consume() {
-	var SkipEofCheck = false
+	var SkipEOFCheck = false
 	if c.index >= 0 {
 		if c.fetchedEOF {
 			// the last token in tokens is EOF. Skip check if p indexes any
 			// fetched token except the last.
-			SkipEofCheck = c.index < len(c.tokens)-1
+			SkipEOFCheck = c.index < len(c.tokens)-1
 		} else {
 			// no EOF token in tokens. Skip check if p indexes a fetched token.
-			SkipEofCheck = c.index < len(c.tokens)
+			SkipEOFCheck = c.index < len(c.tokens)
 		}
 	} else {
 		// not yet initialized
-		SkipEofCheck = false
+		SkipEOFCheck = false
 	}
 
 	if PortDebug {
 		fmt.Println("Consume 1")
 	}
-	if !SkipEofCheck && c.LA(1) == TokenEOF {
+	if !SkipEOFCheck && c.LA(1) == TokenEOF {
 		panic("cannot consume EOF")
 	}
 	if c.Sync(c.index + 1) {

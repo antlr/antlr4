@@ -510,11 +510,11 @@ func mergeSingletons(a, b *BaseSingletonPredictionContext, rootIsWildcard bool, 
 		payloads[1] = a.returnState
 		parents = []PredictionContext{b.parentCtx, a.parentCtx}
 	}
-	var a_ = NewArrayPredictionContext(parents, payloads)
+	var apc = NewArrayPredictionContext(parents, payloads)
 	if mergeCache != nil {
-		mergeCache.set(a.Hash(), b.Hash(), a_)
+		mergeCache.set(a.Hash(), b.Hash(), apc)
 	}
-	return a_
+	return apc
 }
 
 //
@@ -667,11 +667,11 @@ func mergeArrays(a, b *ArrayPredictionContext, rootIsWildcard bool, mergeCache *
 	// trim merged if we combined a few that had same stack tops
 	if k < len(mergedParents) { // write index < last position trim
 		if k == 1 { // for just one merged element, return singleton top
-			var a_ = SingletonBasePredictionContextCreate(mergedParents[0], mergedReturnStates[0])
+			var pc = SingletonBasePredictionContextCreate(mergedParents[0], mergedReturnStates[0])
 			if mergeCache != nil {
-				mergeCache.set(a.Hash(), b.Hash(), a_)
+				mergeCache.set(a.Hash(), b.Hash(), pc)
 			}
-			return a_
+			return pc
 		}
 		mergedParents = mergedParents[0:k]
 		mergedReturnStates = mergedReturnStates[0:k]

@@ -72,12 +72,12 @@ func stringInSlice(a string, list []string) int {
 // serialized ATN at or after the feature identified by {@code feature} was
 // introduced otherwise, {@code false}.
 
-func (a *ATNDeserializer) isFeatureSupported(feature, actualUuid string) bool {
+func (a *ATNDeserializer) isFeatureSupported(feature, actualUUID string) bool {
 	var idx1 = stringInSlice(feature, SupportedUUIDs)
 	if idx1 < 0 {
 		return false
 	}
-	var idx2 = stringInSlice(actualUuid, SupportedUUIDs)
+	var idx2 = stringInSlice(actualUUID, SupportedUUIDs)
 	return idx2 >= idx1
 }
 
@@ -240,8 +240,8 @@ func (a *ATNDeserializer) readSets(atn *ATN) []*IntervalSet {
 		var iset = NewIntervalSet()
 		sets = append(sets, iset)
 		var n = a.readInt()
-		var containsEof = a.readInt()
-		if containsEof != 0 {
+		var containsEOF = a.readInt()
+		if containsEOF != 0 {
 			iset.addOne(-1)
 		}
 		for j := 0; j < n; j++ {
