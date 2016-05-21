@@ -389,7 +389,7 @@ public abstract class BaseCppTest {
 		assertTrue(success);
 		writeFile(tmpdir, "input", input);
 		writeLexerTestFile(lexerName, showDFA);
-		String output = execModule("Test.out");
+		String output = execModule("Test.cpp");
 		if ( stderrDuringParse!=null && stderrDuringParse.length()>0 ) {
 			System.err.println(stderrDuringParse);
 		}
@@ -524,7 +524,7 @@ public abstract class BaseCppTest {
 	}
 
 	public String execRecognizer() {
-		return execModule("Test.out");
+		return execModule("Test.cpp");
 	}
 
 	public String execModule(String fileName) {
@@ -534,28 +534,32 @@ public abstract class BaseCppTest {
 		String modulePath = new File(new File(tmpdir), fileName).getAbsolutePath();
 		String inputPath = new File(new File(tmpdir), "input").getAbsolutePath();
 		try {
-			ProcessBuilder builder = new ProcessBuilder( compilerPath, modulePath, inputPath );
-			builder.environment().put("CPPPATH", runtimePath);
+			ProcessBuilder builder = new ProcessBuilder(
+				compilerPath, "-I", runtimePath, "-std=c++11", "-c", modulePath);
 			builder.directory(new File(tmpdir));
 			Process process = builder.start();
 			StreamVacuum stdoutVacuum = new StreamVacuum(process.getInputStream());
 			StreamVacuum stderrVacuum = new StreamVacuum(process.getErrorStream());
 			stdoutVacuum.start();
 			stderrVacuum.start();
-			process.waitFor();
+			int errcode = process.waitFor();
 			stdoutVacuum.join();
 			stderrVacuum.join();
 			String output = stdoutVacuum.toString();
-System.out.println("exec output: " + output);
-System.err.println("exec errput: " + output);
 			if ( stderrVacuum.toString().length()>0 ) {
 				this.stderrDuringParse = stderrVacuum.toString();
 				System.err.println("exec stderrVacuum: "+ stderrVacuum);
 			}
+			if (errcode != 0) {
+				this.stderrDuringParse = "execution failed with error code: " + errcode;
+				System.err.println("exec exited with error code: " + errcode);
+			}
+			// TODO(dsisson): Implement link.
+			// TODO(dsisson): Implement run passing in inputPath.
 			return output;
 		}
 		catch (Exception e) {
-			System.err.println("can't exec recognizer");
+			System.err.println("can't exec module: " + fileName);
 			e.printStackTrace(System.err);
 		}
 		return null;
@@ -574,7 +578,7 @@ System.err.println("exec errput: " + output);
 		String propName = getPropertyPrefix() + "-compiler";
    		String prop = System.getProperty(propName);
    		if(prop==null || prop.length()==0)
-   			prop = locateTool("cpp");
+   			prop = locateTool("g++");  // Also try cc
 		File file = new File(prop);
 		if(!file.exists())
 			throw new RuntimeException("Missing system property:" + propName);
@@ -835,45 +839,55 @@ System.err.println("exec errput: " + output);
 		if(!parserStartRuleName.endsWith(")"))
 			parserStartRuleName += "()";
 		ST outputFileST = new ST(
-				"import sys\n"
-						+ "from antlr4 import *\n"
-						+ "from <lexerName> import <lexerName>\n"
-						+ "from <parserName> import <parserName>\n"
-						+ "from <listenerName> import <listenerName>\n"
-						+ "from <visitorName> import <visitorName>\n"
+				"#include \\<iostream>\n"
 						+ "\n"
-						+ "class TreeShapeListener(ParseTreeListener):\n"
+						+ "#include \"ANTLRInputStream.h\"\n"
+						+ "#include \"CommonTokenStream.h\"\n"
+						+ "#include \"<lexerName>.h\"\n"
+						+ "#include \"<parserName>.h\"\n"
+						+ "#include \"<listenerName>.h\"\n"
+						+ "#include \"<visitorName>.h\"\n"
 						+ "\n"
-						+ "    def visitTerminal(self, node):\n"
-						+ "        pass\n"
+						+ "#include \"Strings.h\"\n"
 						+ "\n"
-						+ "    def visitErrorNode(self, node):\n"
-						+ "        pass\n"
+						+ "using namespace org::antlr::v4::runtime;\n"
 						+ "\n"
-						+ "    def exitEveryRule(self, ctx):\n"
-						+ "        pass\n"
+						+ "class TreeShapeListener : public tree::ParseTreeListener {\n"
+						+ "public:\n"
+						+ "  void visitTerminal(Ref\\<tree::TerminalNode> node) override {}\n"
+						+ "  void visitErrorNode(Ref\\<tree::ErrorNode> node) override {}\n"
+						+ "  void exitEveryRule(Ref\\<ParserRuleContext> ctx) override {}\n"
+						+ "  void enterEveryRule(Ref\\<ParserRuleContext> ctx) override {\n"
+						+ "    for (auto child : ctx->children) {\n"
+						+ "      auto parent = child->getParent();\n"
+						+ "      if (dynamic_cast<tree::RuleNode>(parent) || parent.getRuleContext() != ctx) {\n"
+						+ "        raise \"Invalid parse tree shape detected.\";\n"
+						+ "      }\n"
+						+ "    }\n"
+						+ "  }\n"
+						+ "};\n"
 						+ "\n"
-						+ "    def enterEveryRule(self, ctx):\n"
-						+ "        for child in ctx.getChildren():\n"
-						+ "            parent = child.parentCtx\n"
-						+ "            if not isinstance(parent, RuleNode) or parent.getRuleContext() != ctx:\n"
-						+ "                raise IllegalStateException(\"Invalid parse tree shape detected.\")\n"
 						+ "\n"
-						+ "def main(argv):\n"
-						+ "    input = FileStream(argv[1])\n"
-						+ "    lexer = <lexerName>(input)\n"
-						+ "    stream = CommonTokenStream(lexer)\n"
+						+ "int main(int argc, const char* argv[]) {\n"
+						+ "  std::wifstream stream;\n"
+						+ "  stream.open(argv[1]);\n"
+						+ "  ANTLRInputStream input(stream);\n"
+						+ "  TLexer lexer(&input);\n"
+						+ "  CommonTokenStream tokens(&lexer);\n"
 						+ "<createParser>"
-						+ "    parser.buildParseTrees = True\n"
-						+ "    tree = parser.<parserStartRuleName>\n"
-						+ "    ParseTreeWalker.DEFAULT.walk(TreeShapeListener(), tree)\n"
-						+ "\n" + "if __name__ == '__main__':\n"
-						+ "    main(sys.argv)\n" + "\n");
-		String stSource = "    parser = <parserName>(stream)\n";
+						+ "\n"
+						+ "  Ref\\<tree::ParseTree> tree = parser.<parserStartRuleName>;\n"
+						+ "  ParseTreeWalker.DEFAULT.walk(TreeShapeListener(), tree);\n"
+						+ "\n"
+						+ "  return 0;\n"
+						+ "}\n"
+		);
+
+		String stSource = "  TParser parser(&tokens);\n";
 		if(debug)
-			stSource += "    parser.addErrorListener(DiagnosticErrorListener())\n";
+			stSource += "  parser.addErrorListener(DiagnosticErrorListener());\n";
 		if(trace)
-			stSource += "    parser.setTrace(True)\n";
+			stSource += "  parser.setTrace(True);\n";
 		ST createParserST = new ST(stSource);
 		outputFileST.add("createParser", createParserST);
 		outputFileST.add("parserName", parserName);
@@ -881,7 +895,7 @@ System.err.println("exec errput: " + output);
 		outputFileST.add("listenerName", listenerName);
 		outputFileST.add("visitorName", visitorName);
 		outputFileST.add("parserStartRuleName", parserStartRuleName);
-		writeFile(tmpdir, "Test.out", outputFileST.render());
+		writeFile(tmpdir, "Test.cpp", outputFileST.render());
 	}
 
 	protected void writeLexerTestFile(String lexerName, boolean showDFA) {
@@ -901,7 +915,7 @@ System.err.println("exec errput: " + output);
 								: "") + "\n" + "if __name__ == '__main__':\n"
 						+ "    main(sys.argv)\n" + "\n");
 		outputFileST.add("lexerName", lexerName);
-		writeFile(tmpdir, "Test.out", outputFileST.render());
+		writeFile(tmpdir, "Test.cpp", outputFileST.render());
 	}
 
 	public void writeRecognizer(String parserName, String lexerName,
