@@ -9,7 +9,7 @@
 // {@link Token//HIDDEN_CHANNEL}, use a filtering token stream such a
 // {@link CommonTokenStream}.</p>
 
-package antlr4
+package antlr
 
 import (
 	"fmt"

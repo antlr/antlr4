@@ -3,7 +3,7 @@
 // {@link CommonToken} objects.
 //
 
-package antlr4
+package antlr
 
 import "fmt"
 

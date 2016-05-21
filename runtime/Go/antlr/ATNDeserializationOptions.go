@@ -1,4 +1,4 @@
-package antlr4
+package antlr
 
 type ATNDeserializationOptions struct {
 	readOnly                      bool

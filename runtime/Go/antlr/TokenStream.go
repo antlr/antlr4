@@ -1,4 +1,4 @@
-package antlr4
+package antlr
 
 type TokenStream interface {
 	IntStream

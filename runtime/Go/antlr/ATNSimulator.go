@@ -1,4 +1,4 @@
-package antlr4
+package antlr
 
 type BaseATNSimulator struct {
 	atn                *ATN

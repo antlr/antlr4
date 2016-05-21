@@ -1,4 +1,4 @@
-package antlr4
+package antlr
 
 type CharStream interface {
 	IntStream
