@@ -115,9 +115,9 @@ func (d *DFAState) GetAltSet() *Set {
 	}
 	if alts.length() == 0 {
 		return nil
-	} else {
-		return alts
 	}
+
+	return alts
 }
 
 func (d *DFAState) setPrediction(v int) {

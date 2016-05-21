@@ -445,9 +445,9 @@ func (a *ATNDeserializer) stateIsEndStateFor(state ATNState, idx int) ATNState {
 
 	if maybeLoopEndState.(*LoopEndState).epsilonOnlyTransitions && ok {
 		return state
-	} else {
-		return nil
 	}
+
+	return nil
 }
 
 //
@@ -597,9 +597,8 @@ func (a *ATNDeserializer) edgeFactory(atn *ATN, typeIndex, src, trg, arg1, arg2,
 	case TransitionRANGE:
 		if arg3 != 0 {
 			return NewRangeTransition(target, TokenEOF, arg2)
-		} else {
-			return NewRangeTransition(target, arg1, arg2)
 		}
+		return NewRangeTransition(target, arg1, arg2)
 	case TransitionRULE:
 		return NewRuleTransition(atn.states[arg1], arg2, arg3, target)
 	case TransitionPREDICATE:
@@ -609,9 +608,8 @@ func (a *ATNDeserializer) edgeFactory(atn *ATN, typeIndex, src, trg, arg1, arg2,
 	case TransitionATOM:
 		if arg3 != 0 {
 			return NewAtomTransition(target, TokenEOF)
-		} else {
-			return NewAtomTransition(target, arg1)
 		}
+		return NewAtomTransition(target, arg1)
 	case TransitionACTION:
 		return NewActionTransition(target, arg1, arg2, arg3 != 0)
 	case TransitionSET:

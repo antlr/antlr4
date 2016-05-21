@@ -69,9 +69,9 @@ func (d *DFASerializer) getEdgeLabel(i int) string {
 		return d.literalNames[i-1]
 	} else if d.symbolicNames != nil && i-1 < len(d.symbolicNames) {
 		return d.symbolicNames[i-1]
-	} else {
-		return strconv.Itoa(i - 1)
 	}
+
+	return strconv.Itoa(i - 1)
 }
 
 func (d *DFASerializer) GetStateString(s *DFAState) string {
@@ -90,12 +90,12 @@ func (d *DFASerializer) GetStateString(s *DFAState) string {
 	if s.isAcceptState {
 		if s.predicates != nil {
 			return baseStateStr + "=>" + fmt.Sprint(s.predicates)
-		} else {
-			return baseStateStr + "=>" + fmt.Sprint(s.prediction)
 		}
-	} else {
-		return baseStateStr
+
+		return baseStateStr + "=>" + fmt.Sprint(s.prediction)
 	}
+
+	return baseStateStr
 }
 
 type LexerDFASerializer struct {

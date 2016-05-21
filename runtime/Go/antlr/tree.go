@@ -162,9 +162,9 @@ func (t *TerminalNodeImpl) GetText() string {
 func (t *TerminalNodeImpl) String() string {
 	if t.symbol.GetTokenType() == TokenEOF {
 		return "<EOF>"
-	} else {
-		return t.symbol.GetText()
 	}
+
+	return t.symbol.GetText()
 }
 
 func (t *TerminalNodeImpl) ToStringTree(s []string, r Recognizer) string {

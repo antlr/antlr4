@@ -79,14 +79,14 @@ func (prc *BaseParserRuleContext) CopyFrom(ctx *BaseParserRuleContext) {
 func (prc *BaseParserRuleContext) GetText() string {
 	if prc.GetChildCount() == 0 {
 		return ""
-	} else {
-		var s string
-		for _, child := range prc.children {
-			s += child.(ParseTree).GetText()
-		}
-
-		return s
 	}
+
+	var s string
+	for _, child := range prc.children {
+		s += child.(ParseTree).GetText()
+	}
+
+	return s
 }
 
 // Double dispatch methods for listeners
@@ -148,27 +148,28 @@ func (prc *BaseParserRuleContext) AddErrorNode(badToken Token) *ErrorNodeImpl {
 func (prc *BaseParserRuleContext) GetChild(i int) Tree {
 	if prc.children != nil && len(prc.children) >= i {
 		return prc.children[i]
-	} else {
-		return nil
 	}
+
+	return nil
 }
 
 func (prc *BaseParserRuleContext) GetChildOfType(i int, childType reflect.Type) RuleContext {
 	if childType == nil {
 		return prc.GetChild(i).(RuleContext)
-	} else {
-		for j := 0; j < len(prc.children); j++ {
-			var child = prc.children[j]
-			if reflect.TypeOf(child) == childType {
-				if i == 0 {
-					return child.(RuleContext)
-				} else {
-					i -= 1
-				}
-			}
-		}
-		return nil
 	}
+
+	for j := 0; j < len(prc.children); j++ {
+		var child = prc.children[j]
+		if reflect.TypeOf(child) == childType {
+			if i == 0 {
+				return child.(RuleContext)
+			}
+
+			i -= 1
+		}
+	}
+
+	return nil
 }
 
 func (prc *BaseParserRuleContext) ToStringTree(ruleNames []string, recog Recognizer) string {
@@ -207,9 +208,9 @@ func (prc *BaseParserRuleContext) GetToken(ttype int, i int) TerminalNode {
 			if c2.GetSymbol().GetTokenType() == ttype {
 				if i == 0 {
 					return c2
-				} else {
-					i -= 1
 				}
+
+				i -= 1
 			}
 		}
 	}
@@ -219,18 +220,20 @@ func (prc *BaseParserRuleContext) GetToken(ttype int, i int) TerminalNode {
 func (prc *BaseParserRuleContext) GetTokens(ttype int) []TerminalNode {
 	if prc.children == nil {
 		return make([]TerminalNode, 0)
-	} else {
-		var tokens = make([]TerminalNode, 0)
-		for j := 0; j < len(prc.children); j++ {
-			var child = prc.children[j]
-			if tchild, ok := child.(TerminalNode); ok {
-				if tchild.GetSymbol().GetTokenType() == ttype {
-					tokens = append(tokens, tchild)
-				}
+	}
+
+	var tokens = make([]TerminalNode, 0)
+
+	for j := 0; j < len(prc.children); j++ {
+		var child = prc.children[j]
+		if tchild, ok := child.(TerminalNode); ok {
+			if tchild.GetSymbol().GetTokenType() == ttype {
+				tokens = append(tokens, tchild)
 			}
 		}
-		return tokens
 	}
+
+	return tokens
 }
 
 func (prc *BaseParserRuleContext) GetPayload() interface{} {
@@ -284,17 +287,17 @@ func (prc *BaseParserRuleContext) GetTypedRuleContexts(ctxType reflect.Type) []R
 func (prc *BaseParserRuleContext) GetChildCount() int {
 	if prc.children == nil {
 		return 0
-	} else {
-		return len(prc.children)
 	}
+
+	return len(prc.children)
 }
 
 func (prc *BaseParserRuleContext) GetSourceInterval() *Interval {
 	if prc.start == nil || prc.stop == nil {
 		return TreeInvalidInterval
-	} else {
-		return NewInterval(prc.start.GetTokenIndex(), prc.stop.GetTokenIndex())
 	}
+
+	return NewInterval(prc.start.GetTokenIndex(), prc.stop.GetTokenIndex())
 }
 
 //need to manage circular dependencies, so export now

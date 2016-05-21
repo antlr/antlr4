@@ -132,9 +132,9 @@ func (as *BaseATNState) String() string {
 func (as *BaseATNState) equals(other interface{}) bool {
 	if ot, ok := other.(ATNState); ok {
 		return as.stateNumber == ot.GetStateNumber()
-	} else {
-		return false
 	}
+
+	return false
 }
 
 func (as *BaseATNState) isNonGreedyExitState() bool {

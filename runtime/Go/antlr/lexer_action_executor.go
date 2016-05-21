@@ -105,9 +105,9 @@ func (l *LexerActionExecutor) fixOffsetBeforeMatch(offset int) *LexerActionExecu
 	}
 	if updatedLexerActions == nil {
 		return l
-	} else {
-		return NewLexerActionExecutor(updatedLexerActions)
 	}
+
+	return NewLexerActionExecutor(updatedLexerActions)
 }
 
 // Execute the actions encapsulated by l executor within the context of a

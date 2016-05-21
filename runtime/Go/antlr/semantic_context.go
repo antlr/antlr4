@@ -31,9 +31,9 @@ func SemanticContextandContext(a, b SemanticContext) SemanticContext {
 	var result = NewAND(a, b)
 	if len(result.opnds) == 1 {
 		return result.opnds[0]
-	} else {
-		return result
 	}
+
+	return result
 }
 
 func SemanticContextorContext(a, b SemanticContext) SemanticContext {
@@ -49,9 +49,9 @@ func SemanticContextorContext(a, b SemanticContext) SemanticContext {
 	var result = NewOR(a, b)
 	if len(result.opnds) == 1 {
 		return result.opnds[0]
-	} else {
-		return result
 	}
+
+	return result
 }
 
 type Predicate struct {
@@ -128,9 +128,9 @@ func (p *PrecedencePredicate) evaluate(parser Recognizer, outerContext RuleConte
 func (p *PrecedencePredicate) evalPrecedence(parser Recognizer, outerContext RuleContext) SemanticContext {
 	if parser.Precpred(outerContext, p.precedence) {
 		return SemanticContextNone
-	} else {
-		return nil
 	}
+
+	return nil
 }
 
 func (p *PrecedencePredicate) compareTo(other *PrecedencePredicate) int {
@@ -300,9 +300,9 @@ func (a *AND) String() string {
 
 	if len(s) > 3 {
 		return s[0:3]
-	} else {
-		return s
 	}
+
+	return s
 }
 
 //
@@ -435,7 +435,7 @@ func (o *OR) String() string {
 
 	if len(s) > 3 {
 		return s[0:3]
-	} else {
-		return s
 	}
+
+	return s
 }

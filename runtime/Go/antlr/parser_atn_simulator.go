@@ -216,9 +216,9 @@ func (p *ParserATNSimulator) execATN(dfa *DFA, s0 *DFAState, input TokenStream, 
 			alt := p.getSynValidOrSemInvalidAltThatFinishedDecisionEntryRule(previousD.configs, outerContext)
 			if alt != ATNInvalidAltNumber {
 				return alt
-			} else {
-				panic(e)
 			}
+
+			panic(e)
 		}
 		if D.requiresFullContext && p.predictionMode != PredictionModeSLL {
 			// IF PREDS, MIGHT RESOLVE TO SINGLE ALT => SLL (or syntax error)
@@ -295,9 +295,9 @@ func (p *ParserATNSimulator) getExistingTargetState(previousD *DFAState, t int) 
 	var edges = previousD.edges
 	if edges == nil {
 		return nil
-	} else {
-		return edges[t+1]
 	}
+
+	return edges[t+1]
 }
 
 // Compute a target state for an edge in the DFA, and attempt to add the
@@ -408,9 +408,9 @@ func (p *ParserATNSimulator) execATNWithFullContext(dfa *DFA, D *DFAState, s0 AT
 			var alt = p.getSynValidOrSemInvalidAltThatFinishedDecisionEntryRule(previous, outerContext)
 			if alt != ATNInvalidAltNumber {
 				return alt
-			} else {
-				panic(e)
 			}
+
+			panic(e)
 		}
 		var altSubSets = PredictionModegetConflictingAltSubsets(reach)
 		if ParserATNSimulatorDebug {
@@ -610,9 +610,9 @@ func (p *ParserATNSimulator) computeReachSet(closure ATNConfigSet, t int, fullCt
 	}
 	if len(reach.GetItems()) == 0 {
 		return nil
-	} else {
-		return reach
 	}
+
+	return reach
 }
 
 //
@@ -777,9 +777,9 @@ func (p *ParserATNSimulator) applyPrecedenceFilter(configs ATNConfigSet) ATNConf
 func (p *ParserATNSimulator) getReachableTarget(trans Transition, ttype int) ATNState {
 	if trans.Matches(ttype, 0, p.atn.maxTokenType) {
 		return trans.getTarget()
-	} else {
-		return nil
 	}
+
+	return nil
 }
 
 func (p *ParserATNSimulator) getPredsForAmbigAlts(ambigAlts *BitSet, configs ATNConfigSet, nalts int) []SemanticContext {
@@ -904,9 +904,9 @@ func (p *ParserATNSimulator) GetAltThatFinishedDecisionEntryRule(configs ATNConf
 	}
 	if alts.length() == 0 {
 		return ATNInvalidAltNumber
-	} else {
-		return alts.first()
 	}
+
+	return alts.first()
 }
 
 // Walk the list of configurations and split them according to
@@ -1123,9 +1123,9 @@ func (p *ParserATNSimulator) closure_(config ATNConfig, configs ATNConfigSet, cl
 func (p *ParserATNSimulator) getRuleName(index int) string {
 	if p.parser != nil && index >= 0 {
 		return p.parser.GetRuleNames()[index]
-	} else {
-		return "<rule " + fmt.Sprint(index) + ">"
 	}
+
+	return "<rule " + fmt.Sprint(index) + ">"
 }
 
 func (p *ParserATNSimulator) getEpsilonTarget(config ATNConfig, t Transition, collectPredicates, inContext, fullCtx, treatEofAsEpsilon bool) ATNConfig {

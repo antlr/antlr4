@@ -346,9 +346,9 @@ func (b *BaseLexer) getCharIndex() int {
 func (b *BaseLexer) GetText() string {
 	if b._text != "" {
 		return b._text
-	} else {
-		return b.Interpreter.GetText(b._input)
 	}
+
+	return b.Interpreter.GetText(b._input)
 }
 
 func (b *BaseLexer) SetText(text string) {

@@ -249,9 +249,8 @@ func (d *DefaultErrorStrategy) Sync(recognizer Parser) {
 		// Report error and recover if possible
 		if d.singleTokenDeletion(recognizer) != nil {
 			return
-		} else {
-			panic(NewInputMisMatchException(recognizer))
 		}
+		panic(NewInputMisMatchException(recognizer))
 	case ATNStatePlusLoopBack:
 		fallthrough
 	case ATNStateStarLoopBack:
@@ -472,9 +471,9 @@ func (d *DefaultErrorStrategy) singleTokenInsertion(recognizer Parser) bool {
 	if expectingAtLL2.contains(currentSymbolType) {
 		d.ReportMissingToken(recognizer)
 		return true
-	} else {
-		return false
 	}
+
+	return false
 }
 
 // This method implements the single-token deletion inline error recovery
@@ -509,9 +508,9 @@ func (d *DefaultErrorStrategy) singleTokenDeletion(recognizer Parser) Token {
 		var MatchedSymbol = recognizer.GetCurrentToken()
 		d.ReportMatch(recognizer) // we know current token is correct
 		return MatchedSymbol
-	} else {
-		return nil
 	}
+
+	return nil
 }
 
 // Conjure up a missing token during error recovery.

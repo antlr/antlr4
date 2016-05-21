@@ -83,9 +83,9 @@ func (b *BaseRecognitionException) GetInputStream() IntStream {
 func (b *BaseRecognitionException) getExpectedTokens() *IntervalSet {
 	if b.recognizer != nil {
 		return b.recognizer.GetATN().getExpectedTokens(b.offendingState, b.ctx)
-	} else {
-		return nil
 	}
+
+	return nil
 }
 
 func (b *BaseRecognitionException) String() string {
@@ -222,9 +222,9 @@ func NewFailedPredicateException(recognizer Parser, predicate string, message st
 func (f *FailedPredicateException) formatMessage(predicate, message string) string {
 	if message != "" {
 		return message
-	} else {
-		return "failed predicate: {" + predicate + "}?"
 	}
+
+	return "failed predicate: {" + predicate + "}?"
 }
 
 type ParseCancellationException struct {

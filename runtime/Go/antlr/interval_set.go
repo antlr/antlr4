@@ -27,9 +27,9 @@ func (i *Interval) contains(item int) bool {
 func (i *Interval) String() string {
 	if i.start == i.stop-1 {
 		return strconv.Itoa(i.start)
-	} else {
-		return strconv.Itoa(i.start) + ".." + strconv.Itoa(i.stop-1)
 	}
+
+	return strconv.Itoa(i.start) + ".." + strconv.Itoa(i.stop-1)
 }
 
 func (i *Interval) length() int {
@@ -54,9 +54,9 @@ func NewIntervalSet() *IntervalSet {
 func (i *IntervalSet) first() int {
 	if len(i.intervals) == 0 {
 		return TokenInvalidType
-	} else {
-		return i.intervals[0].start
 	}
+
+	return i.intervals[0].start
 }
 
 func (i *IntervalSet) addOne(v int) {
@@ -141,14 +141,13 @@ func (i *IntervalSet) complement(start int, stop int) *IntervalSet {
 func (i *IntervalSet) contains(item int) bool {
 	if i.intervals == nil {
 		return false
-	} else {
-		for k := 0; k < len(i.intervals); k++ {
-			if i.intervals[k].contains(item) {
-				return true
-			}
-		}
-		return false
 	}
+	for k := 0; k < len(i.intervals); k++ {
+		if i.intervals[k].contains(item) {
+			return true
+		}
+	}
+	return false
 }
 
 func (i *IntervalSet) length() int {
@@ -231,9 +230,9 @@ func (i *IntervalSet) StringVerbose(literalNames []string, symbolicNames []strin
 		return i.toTokenString(literalNames, symbolicNames)
 	} else if elemsAreChar {
 		return i.toCharString()
-	} else {
-		return i.toIndexString()
 	}
+
+	return i.toIndexString()
 }
 
 func (i *IntervalSet) toCharString() string {
@@ -253,9 +252,9 @@ func (i *IntervalSet) toCharString() string {
 	}
 	if len(names) > 1 {
 		return "{" + strings.Join(names, ", ") + "}"
-	} else {
-		return names[0]
 	}
+
+	return names[0]
 }
 
 func (i *IntervalSet) toIndexString() string {
@@ -275,9 +274,9 @@ func (i *IntervalSet) toIndexString() string {
 	}
 	if len(names) > 1 {
 		return "{" + strings.Join(names, ", ") + "}"
-	} else {
-		return names[0]
 	}
+
+	return names[0]
 }
 
 func (i *IntervalSet) toTokenString(literalNames []string, symbolicNames []string) string {
@@ -289,9 +288,9 @@ func (i *IntervalSet) toTokenString(literalNames []string, symbolicNames []strin
 	}
 	if len(names) > 1 {
 		return "{" + strings.Join(names, ", ") + "}"
-	} else {
-		return names[0]
 	}
+
+	return names[0]
 }
 
 func (i *IntervalSet) elementName(literalNames []string, symbolicNames []string, a int) string {
@@ -302,8 +301,8 @@ func (i *IntervalSet) elementName(literalNames []string, symbolicNames []string,
 	} else {
 		if a < len(literalNames) && literalNames[a] != "" {
 			return literalNames[a]
-		} else {
-			return symbolicNames[a]
 		}
+
+		return symbolicNames[a]
 	}
 }

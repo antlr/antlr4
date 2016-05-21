@@ -154,9 +154,9 @@ func SingletonBasePredictionContextCreate(parent PredictionContext, returnState 
 	if returnState == BasePredictionContextEMPTY_RETURN_STATE && parent == nil {
 		// someone can pass in the bits of an array ctx that mean $
 		return BasePredictionContextEMPTY
-	} else {
-		return NewBaseSingletonPredictionContext(parent, returnState)
 	}
+
+	return NewBaseSingletonPredictionContext(parent, returnState)
 }
 
 func (b *BaseSingletonPredictionContext) length() int {
@@ -182,18 +182,17 @@ func (b *BaseSingletonPredictionContext) equals(other PredictionContext) bool {
 		return false
 	} else if b.Hash() != other.Hash() {
 		return false // can't be same if hash is different
-	} else {
-
-		otherP := other.(*BaseSingletonPredictionContext)
-
-		if b.returnState != other.getReturnState(0) {
-			return false
-		} else if b.parentCtx == nil {
-			return otherP.parentCtx == nil
-		} else {
-			return b.parentCtx.equals(otherP.parentCtx)
-		}
 	}
+
+	otherP := other.(*BaseSingletonPredictionContext)
+
+	if b.returnState != other.getReturnState(0) {
+		return false
+	} else if b.parentCtx == nil {
+		return otherP.parentCtx == nil
+	}
+
+	return b.parentCtx.equals(otherP.parentCtx)
 }
 
 func (b *BaseSingletonPredictionContext) Hash() string {
@@ -212,12 +211,12 @@ func (b *BaseSingletonPredictionContext) String() string {
 	if len(up) == 0 {
 		if b.returnState == BasePredictionContextEMPTY_RETURN_STATE {
 			return "$"
-		} else {
-			return strconv.Itoa(b.returnState)
 		}
-	} else {
-		return strconv.Itoa(b.returnState) + " " + up
+
+		return strconv.Itoa(b.returnState)
 	}
+
+	return strconv.Itoa(b.returnState) + " " + up
 }
 
 var BasePredictionContextEMPTY = NewEmptyPredictionContext()
@@ -321,25 +320,26 @@ func (a *ArrayPredictionContext) equals(other PredictionContext) bool {
 func (a *ArrayPredictionContext) String() string {
 	if a.isEmpty() {
 		return "[]"
-	} else {
-		var s = "["
-		for i := 0; i < len(a.returnStates); i++ {
-			if i > 0 {
-				s = s + ", "
-			}
-			if a.returnStates[i] == BasePredictionContextEMPTY_RETURN_STATE {
-				s = s + "$"
-				continue
-			}
-			s = s + strconv.Itoa(a.returnStates[i])
-			if a.parents[i] != nil {
-				s = s + " " + a.parents[i].String()
-			} else {
-				s = s + "nil"
-			}
-		}
-		return s + "]"
 	}
+
+	var s = "["
+	for i := 0; i < len(a.returnStates); i++ {
+		if i > 0 {
+			s = s + ", "
+		}
+		if a.returnStates[i] == BasePredictionContextEMPTY_RETURN_STATE {
+			s = s + "$"
+			continue
+		}
+		s = s + strconv.Itoa(a.returnStates[i])
+		if a.parents[i] != nil {
+			s = s + " " + a.parents[i].String()
+		} else {
+			s = s + "nil"
+		}
+	}
+
+	return s + "]"
 }
 
 // Convert a {@link RuleContext} tree to a {@link BasePredictionContext} graph.
@@ -477,44 +477,44 @@ func mergeSingletons(a, b *BaseSingletonPredictionContext, rootIsWildcard bool, 
 			mergeCache.set(a.Hash(), b.Hash(), spc)
 		}
 		return spc
-	} else { // a != b payloads differ
-		// see if we can collapse parents due to $+x parents if local ctx
-		var singleParent PredictionContext = nil
-		if a == b || (a.parentCtx != nil && a.parentCtx == b.parentCtx) { // ax +
-			// bx =
-			// [a,b]x
-			singleParent = a.parentCtx
-		}
-		if singleParent != nil { // parents are same
-			// sort payloads and use same parent
-			var payloads = []int{a.returnState, b.returnState}
-			if a.returnState > b.returnState {
-				payloads[0] = b.returnState
-				payloads[1] = a.returnState
-			}
-			var parents = []PredictionContext{singleParent, singleParent}
-			var apc = NewArrayPredictionContext(parents, payloads)
-			if mergeCache != nil {
-				mergeCache.set(a.Hash(), b.Hash(), apc)
-			}
-			return apc
-		}
-		// parents differ and can't merge them. Just pack together
-		// into array can't merge.
-		// ax + by = [ax,by]
+	}
+	// a != b payloads differ
+	// see if we can collapse parents due to $+x parents if local ctx
+	var singleParent PredictionContext = nil
+	if a == b || (a.parentCtx != nil && a.parentCtx == b.parentCtx) { // ax +
+		// bx =
+		// [a,b]x
+		singleParent = a.parentCtx
+	}
+	if singleParent != nil { // parents are same
+		// sort payloads and use same parent
 		var payloads = []int{a.returnState, b.returnState}
-		var parents = []PredictionContext{a.parentCtx, b.parentCtx}
-		if a.returnState > b.returnState { // sort by payload
+		if a.returnState > b.returnState {
 			payloads[0] = b.returnState
 			payloads[1] = a.returnState
-			parents = []PredictionContext{b.parentCtx, a.parentCtx}
 		}
-		var a_ = NewArrayPredictionContext(parents, payloads)
+		var parents = []PredictionContext{singleParent, singleParent}
+		var apc = NewArrayPredictionContext(parents, payloads)
 		if mergeCache != nil {
-			mergeCache.set(a.Hash(), b.Hash(), a_)
+			mergeCache.set(a.Hash(), b.Hash(), apc)
 		}
-		return a_
+		return apc
 	}
+	// parents differ and can't merge them. Just pack together
+	// into array can't merge.
+	// ax + by = [ax,by]
+	var payloads = []int{a.returnState, b.returnState}
+	var parents = []PredictionContext{a.parentCtx, b.parentCtx}
+	if a.returnState > b.returnState { // sort by payload
+		payloads[0] = b.returnState
+		payloads[1] = a.returnState
+		parents = []PredictionContext{b.parentCtx, a.parentCtx}
+	}
+	var a_ = NewArrayPredictionContext(parents, payloads)
+	if mergeCache != nil {
+		mergeCache.set(a.Hash(), b.Hash(), a_)
+	}
+	return a_
 }
 
 //

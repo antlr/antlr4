@@ -88,9 +88,9 @@ func (a *ATN) NextTokensNoContext(s ATNState) *IntervalSet {
 func (a *ATN) NextTokens(s ATNState, ctx RuleContext) *IntervalSet {
 	if ctx == nil {
 		return a.NextTokensNoContext(s)
-	} else {
-		return a.NextTokensInContext(s, ctx)
 	}
+
+	return a.NextTokensInContext(s, ctx)
 }
 
 func (a *ATN) addState(state ATNState) {
@@ -114,9 +114,9 @@ func (a *ATN) defineDecisionState(s DecisionState) int {
 func (a *ATN) getDecisionState(decision int) DecisionState {
 	if len(a.DecisionToState) == 0 {
 		return nil
-	} else {
-		return a.DecisionToState[decision]
 	}
+
+	return a.DecisionToState[decision]
 }
 
 // Computes the set of input symbols which could follow ATN state number

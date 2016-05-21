@@ -513,9 +513,9 @@ func (p *BaseParser) EnterOuterAlt(localctx ParserRuleContext, altNum int) {
 func (p *BaseParser) GetPrecedence() int {
 	if len(p._precedenceStack) == 0 {
 		return -1
-	} else {
-		return p._precedenceStack[len(p._precedenceStack)-1]
 	}
+
+	return p._precedenceStack[len(p._precedenceStack)-1]
 }
 
 func (p *BaseParser) EnterRecursionRule(localctx ParserRuleContext, state, ruleIndex, precedence int) {
@@ -626,9 +626,9 @@ func (p *BaseParser) IsExpectedToken(symbol int) bool {
 	}
 	if following.contains(TokenEpsilon) && symbol == TokenEOF {
 		return true
-	} else {
-		return false
 	}
+
+	return false
 }
 
 // Computes the set of input symbols which could follow the current parser
@@ -652,9 +652,9 @@ func (p *BaseParser) GetRuleIndex(ruleName string) int {
 	var ruleIndex, ok = p.GetRuleIndexMap()[ruleName]
 	if ok {
 		return ruleIndex
-	} else {
-		return -1
 	}
+
+	return -1
 }
 
 // Return List&ltString&gt of the rule names in your parser instance

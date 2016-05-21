@@ -175,9 +175,8 @@ func (c *CommonToken) GetText() string {
 	var n = input.Size()
 	if c.start < n && c.stop < n {
 		return input.GetTextFromInterval(NewInterval(c.start, c.stop))
-	} else {
-		return "<EOF>"
 	}
+	return "<EOF>"
 }
 
 func (c *CommonToken) SetText(text string) {

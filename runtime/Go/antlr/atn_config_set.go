@@ -221,9 +221,9 @@ func (b *BaseATNConfigSet) Hash() string {
 			b.cachedHashString = b.hashConfigs()
 		}
 		return b.cachedHashString
-	} else {
-		return b.hashConfigs()
 	}
+
+	return b.hashConfigs()
 }
 
 func (b *BaseATNConfigSet) hashConfigs() string {

@@ -88,9 +88,9 @@ func (is *InputStream) GetText(start int, stop int) string {
 	}
 	if start >= is.size {
 		return ""
-	} else {
-		return string(is.data[start : stop+1])
 	}
+
+	return string(is.data[start : stop+1])
 }
 
 func (is *InputStream) GetTextFromTokens(start, stop Token) string {

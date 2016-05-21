@@ -457,9 +457,9 @@ func PredictionModegetUniqueAlt(altsets []*BitSet) int {
 	var all = PredictionModeGetAlts(altsets)
 	if all.length() == 1 {
 		return all.minValue()
-	} else {
-		return ATNInvalidAltNumber
 	}
+
+	return ATNInvalidAltNumber
 }
 
 // Gets the complete set of represented alternatives for a collection of

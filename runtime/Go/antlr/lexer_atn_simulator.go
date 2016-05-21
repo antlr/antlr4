@@ -130,12 +130,13 @@ func (l *LexerATNSimulator) Match(input CharStream, mode int) int {
 			fmt.Println("MatchATN")
 		}
 		return l.MatchATN(input)
-	} else {
-		if PortDebug {
-			fmt.Println("execATN")
-		}
-		return l.execATN(input, dfa.s0)
 	}
+
+	if PortDebug {
+		fmt.Println("execATN")
+	}
+
+	return l.execATN(input, dfa.s0)
 }
 
 func (l *LexerATNSimulator) reset() {
@@ -303,13 +304,14 @@ func (l *LexerATNSimulator) failOrAccept(prevAccept *SimState, input CharStream,
 			fmt.Println(prevAccept.dfaState.prediction)
 		}
 		return prevAccept.dfaState.prediction
-	} else {
-		// if no accept and EOF is first char, return EOF
-		if t == TokenEOF && input.Index() == l.startIndex {
-			return TokenEOF
-		}
-		panic(NewLexerNoViableAltException(l.recog, input, l.startIndex, reach))
 	}
+
+	// if no accept and EOF is first char, return EOF
+	if t == TokenEOF && input.Index() == l.startIndex {
+		return TokenEOF
+	}
+
+	panic(NewLexerNoViableAltException(l.recog, input, l.startIndex, reach))
 }
 
 // Given a starting configuration set, figure out all ATN configurations
@@ -371,9 +373,9 @@ func (l *LexerATNSimulator) accept(input CharStream, lexerActionExecutor *LexerA
 func (l *LexerATNSimulator) getReachableTarget(trans Transition, t int) ATNState {
 	if trans.Matches(t, 0, 0xFFFE) {
 		return trans.getTarget()
-	} else {
-		return nil
 	}
+
+	return nil
 }
 
 func (l *LexerATNSimulator) computeStartState(input CharStream, p ATNState) *OrderedATNConfigSet {
@@ -422,10 +424,10 @@ func (l *LexerATNSimulator) closure(input CharStream, config *LexerATNConfig, co
 			if config.context == nil || config.context.isEmpty() {
 				configs.Add(config, nil)
 				return true
-			} else {
-				configs.Add(NewLexerATNConfig2(config, config.state, BasePredictionContextEMPTY), nil)
-				currentAltReachedAcceptState = true
 			}
+
+			configs.Add(NewLexerATNConfig2(config, config.state, BasePredictionContextEMPTY), nil)
+			currentAltReachedAcceptState = true
 		}
 		if config.context != nil && !config.context.isEmpty() {
 			for i := 0; i < config.context.length(); i++ {
@@ -686,7 +688,7 @@ func (l *LexerATNSimulator) GetTokenName(tt int) string {
 	}
 	if tt == -1 {
 		return "EOF"
-	} else {
-		return "'" + string(tt) + "'"
 	}
+
+	return "'" + string(tt) + "'"
 }
