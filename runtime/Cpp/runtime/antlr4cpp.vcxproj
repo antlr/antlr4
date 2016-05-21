@@ -88,13 +88,14 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>ANTLR4CPP_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>src;src\atn;src\dfa;src\misc;src\support;src\tree;src\tree\xpath;src\tree\pattern;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PrecompiledHeaderFile>src/antlrcpp-Prefix.h</PrecompiledHeaderFile>
-      <ForcedIncludeFiles>src/antlrcpp-Prefix.h</ForcedIncludeFiles>
+      <PrecompiledHeaderFile>
+      </PrecompiledHeaderFile>
+      <ForcedIncludeFiles>
+      </ForcedIncludeFiles>
       <DisableSpecificWarnings>4251</DisableSpecificWarnings>
     </ClCompile>
     <Link>
@@ -104,13 +105,14 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>ANTLR4CPP_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>src;src\atn;src\dfa;src\misc;src\support;src\tree;src\tree\xpath;src\tree\pattern;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PrecompiledHeaderFile>src/antlrcpp-Prefix.h</PrecompiledHeaderFile>
-      <ForcedIncludeFiles>src/antlrcpp-Prefix.h</ForcedIncludeFiles>
+      <PrecompiledHeaderFile>
+      </PrecompiledHeaderFile>
+      <ForcedIncludeFiles>
+      </ForcedIncludeFiles>
       <DisableSpecificWarnings>4251</DisableSpecificWarnings>
     </ClCompile>
     <Link>
@@ -121,14 +123,15 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <PrecompiledHeader>Use</PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>ANTLR4CPP_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>src;src\atn;src\dfa;src\misc;src\support;src\tree;src\tree\xpath;src\tree\pattern;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PrecompiledHeaderFile>src/antlrcpp-Prefix.h</PrecompiledHeaderFile>
-      <ForcedIncludeFiles>src/antlrcpp-Prefix.h</ForcedIncludeFiles>
+      <PrecompiledHeaderFile>
+      </PrecompiledHeaderFile>
+      <ForcedIncludeFiles>
+      </ForcedIncludeFiles>
       <DisableSpecificWarnings>4251</DisableSpecificWarnings>
     </ClCompile>
     <Link>
@@ -141,14 +144,15 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <PrecompiledHeader>Use</PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>ANTLR4CPP_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>src;src\atn;src\dfa;src\misc;src\support;src\tree;src\tree\xpath;src\tree\pattern;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PrecompiledHeaderFile>src/antlrcpp-Prefix.h</PrecompiledHeaderFile>
-      <ForcedIncludeFiles>src/antlrcpp-Prefix.h</ForcedIncludeFiles>
+      <PrecompiledHeaderFile>
+      </PrecompiledHeaderFile>
+      <ForcedIncludeFiles>
+      </ForcedIncludeFiles>
       <DisableSpecificWarnings>4251</DisableSpecificWarnings>
     </ClCompile>
     <Link>
@@ -263,7 +267,7 @@
     <ClCompile Include="src\support\Arrays.cpp" />
     <ClCompile Include="src\support\CPPUtils.cpp" />
     <ClCompile Include="src\support\guid.cpp" />
-    <ClCompile Include="src\support\Strings.cpp" />
+    <ClCompile Include="src\support\StringUtils.cpp" />
     <ClCompile Include="src\Token.cpp" />
     <ClCompile Include="src\TokenStream.cpp" />
     <ClCompile Include="src\TokenStreamRewriter.cpp" />
@@ -282,15 +286,8 @@
     <ClCompile Include="src\UnbufferedCharStream.cpp" />
     <ClCompile Include="src\UnbufferedTokenStream.cpp" />
     <ClCompile Include="src\VocabularyImpl.cpp" />
-    <ClCompile Include="antlrcpp-Prefix.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\antlrcpp-Prefix.h" />
     <ClInclude Include="src\ANTLRErrorListener.h" />
     <ClInclude Include="src\ANTLRErrorStrategy.h" />
     <ClInclude Include="src\ANTLRFileStream.h" />
@@ -407,7 +404,7 @@
     <ClInclude Include="src\support\CPPUtils.h" />
     <ClInclude Include="src\support\Declarations.h" />
     <ClInclude Include="src\support\guid.h" />
-    <ClInclude Include="src\support\Strings.h" />
+    <ClInclude Include="src\support\StringUtils.h" />
     <ClInclude Include="src\Token.h" />
     <ClInclude Include="src\TokenFactory.h" />
     <ClInclude Include="src\TokenSource.h" />

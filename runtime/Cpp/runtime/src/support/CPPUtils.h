@@ -43,19 +43,23 @@ namespace antlrcpp {
   std::vector<std::string> split(const std::string &s, const std::string &sep, int count);
   std::string indent(const std::string &s, const std::string &indentation, bool includingFirst = true);
 
-  // Using RAII + a lambda to implement a "finally" relacement.
-  template <typename F>
+  // Using RAII + a lambda to implement a "finally" replacement.
   struct FinalAction {
-    FinalAction(F f) : _cleanUp { f } {}
+    FinalAction(std::function<void ()> f) : _cleanUp { f } {}
+    FinalAction(FinalAction &&other) {
+      _cleanUp = other._cleanUp;
+      _enabled = other._enabled;
+      other._enabled = false; // Don't trigger the lambda after ownership has moved.
+    }
     ~FinalAction() { if (_enabled) _cleanUp(); }
+
     void disable() { _enabled = false; };
   private:
-    F _cleanUp;
+    std::function<void ()> _cleanUp;
     bool _enabled {true};
   };
 
-  template <typename F>
-  FinalAction<F> finally(F f) { return FinalAction<F>(f); }
+  ANTLR4CPP_PUBLIC FinalAction finally(std::function<void ()> f);
 
   // Convenience functions to avoid lengthy dynamic_cast() != nullptr checks in many places.
   template <typename T1, typename T2>

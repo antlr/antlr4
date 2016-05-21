@@ -169,8 +169,12 @@ namespace antlrcpp {
   {
     try
     {
+#if defined(_MSC_FULL_VER) && _MSC_FULL_VER < 190023026
+      return nullptr; // No nested exceptions before VS 2015.
+#else
       auto nested = dynamic_cast<const std::nested_exception&>(e);
       return nested.nested_ptr();
+#endif
     }
     catch (const std::bad_cast &)
     { return nullptr; }
@@ -215,6 +219,10 @@ namespace antlrcpp {
     }
     result += std::string(nestCount, ')');
     return result;
+  }
+
+  FinalAction finally(std::function<void ()> f) {
+    return FinalAction(f);
   }
 
 } // namespace antlrcpp
