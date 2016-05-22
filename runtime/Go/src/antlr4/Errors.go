@@ -1,10 +1,8 @@
 package antlr4
 
-import ()
-
 // The root of the ANTLR exception hierarchy. In general, ANTLR tracks just
 //  3 kinds of errors: prediction errors, failed predicate errors, and
-//  misMatched input errors. In each case, the parser knows where it is
+//  mismatched input errors. In each case, the parser knows where it is
 //  in the input, where it is in the ATN, the rule invocation stack,
 //  and what kind of problem occurred.
 
@@ -173,7 +171,7 @@ type InputMisMatchException struct {
 	*BaseRecognitionException
 }
 
-// This signifies any kind of misMatched input exceptions such as
+// This signifies any kind of mismatched input exceptions such as
 // when the current input does not Match the expected token.
 //
 func NewInputMisMatchException(recognizer Parser) *InputMisMatchException {
