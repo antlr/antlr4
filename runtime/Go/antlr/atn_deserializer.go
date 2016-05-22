@@ -13,7 +13,7 @@ import (
 var BaseSerializedUUID = "AADB8D7E-AEEF-4415-AD2B-8204D6CF042E"
 
 // This list contains all of the currently supported UUIDs, ordered by when
-// the feature first appeared in a branch.
+// the feature first appeared in this branch.
 var SupportedUUIDs = []string{BaseSerializedUUID}
 
 var SerializedVersion = 3
