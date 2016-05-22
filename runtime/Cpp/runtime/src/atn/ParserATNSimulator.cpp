@@ -244,7 +244,7 @@ int ParserATNSimulator::execATN(dfa::DFA &dfa, dfa::DFAState *s0, TokenStream *i
     }
 
     if (D->isAcceptState) {
-      if (D->predicates.size() == 0) {
+      if (D->predicates.empty()) {
         return D->prediction;
       }
 

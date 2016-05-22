@@ -364,7 +364,6 @@ void Parser::exitRule() {
     _ctx->stop = _input->LT(-1); // stop node is what we just matched
   }
 
-  _ctx->stop = _input->LT(-1);
   // trigger event on ctx, before it reverts to parent
   if (_parseListeners.size() > 0) {
     triggerExitRuleEvent();

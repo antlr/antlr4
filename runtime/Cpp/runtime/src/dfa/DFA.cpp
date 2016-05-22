@@ -29,7 +29,6 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "dfa/DFAState.h"
 #include "dfa/DFASerializer.h"
 #include "dfa/LexerDFASerializer.h"
 #include "support/CPPUtils.h"

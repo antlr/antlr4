@@ -101,6 +101,8 @@ namespace atn {
   /// </summary>
   class ANTLR4CPP_PUBLIC ATNState {
   public:
+    ATNState();
+    
     virtual ~ATNState();
 
     static const int INITIAL_NUM_TRANSITIONS;

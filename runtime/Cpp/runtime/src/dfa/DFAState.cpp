@@ -80,14 +80,14 @@ std::set<int> DFAState::getAltSet() {
   return alts;
 }
 
-size_t DFAState::hashCode() {
+size_t DFAState::hashCode() const {
   size_t hash = misc::MurmurHash::initialize(7);
   hash = misc::MurmurHash::update(hash, configs->hashCode());
   hash = misc::MurmurHash::finish(hash, 1);
   return hash;
 }
 
-bool DFAState::operator == (const DFAState &o) {
+bool DFAState::operator == (const DFAState &o) const {
   // compare set of ATN configurations in this set with other
   if (this == &o) {
     return true;

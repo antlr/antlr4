@@ -69,7 +69,7 @@ void ANTLRInputStream::load(std::wistream &stream) {
   stream.seekg(startPosition, std::ios::beg);
   
   stream.imbue(std::locale(stream.getloc(), new std::codecvt_utf8<char32_t>));
-  wchar_t c;
+  wchar_t c = 0xFFFE;
   stream >> std::noskipws >> c;
   if (c != 0xFFFE) // Ignore BOM if theres one.
     data += c;

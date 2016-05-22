@@ -549,9 +549,9 @@ std::string ATNSerializer::decode(const std::wstring &inpdata) {
   }
 
   if (atn->grammarType == ATNType::LEXER) {
-    int lexerActionCount = data[p++];
+    //int lexerActionCount = data[p++];
 
-    p += lexerActionCount * 3; // Instead of useless loop below.
+    //p += lexerActionCount * 3; // Instead of useless loop below.
     /*
     for (int i = 0; i < lexerActionCount; i++) {
       LexerActionType actionType = (LexerActionType)data[p++];

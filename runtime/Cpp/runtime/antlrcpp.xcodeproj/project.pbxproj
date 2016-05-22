@@ -883,7 +883,7 @@
 		276E5C331CDB57AA003FF4B4 /* BlockEndState.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BlockEndState.cpp; sourceTree = "<group>"; };
 		276E5C341CDB57AA003FF4B4 /* BlockEndState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BlockEndState.h; sourceTree = "<group>"; };
 		276E5C351CDB57AA003FF4B4 /* BlockStartState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BlockStartState.h; sourceTree = "<group>"; };
-		276E5C361CDB57AA003FF4B4 /* ConfigLookup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ConfigLookup.h; sourceTree = "<group>"; };
+		276E5C361CDB57AA003FF4B4 /* ConfigLookup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ConfigLookup.h; sourceTree = "<group>"; wrapsLines = 0; };
 		276E5C371CDB57AA003FF4B4 /* ContextSensitivityInfo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ContextSensitivityInfo.cpp; sourceTree = "<group>"; };
 		276E5C381CDB57AA003FF4B4 /* ContextSensitivityInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ContextSensitivityInfo.h; sourceTree = "<group>"; };
 		276E5C391CDB57AA003FF4B4 /* DecisionEventInfo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DecisionEventInfo.cpp; sourceTree = "<group>"; };
@@ -949,7 +949,7 @@
 		276E5C771CDB57AA003FF4B4 /* PredicateTransition.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PredicateTransition.cpp; sourceTree = "<group>"; };
 		276E5C781CDB57AA003FF4B4 /* PredicateTransition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PredicateTransition.h; sourceTree = "<group>"; };
 		276E5C791CDB57AA003FF4B4 /* PredictionContext.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PredictionContext.cpp; sourceTree = "<group>"; wrapsLines = 0; };
-		276E5C7A1CDB57AA003FF4B4 /* PredictionContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PredictionContext.h; sourceTree = "<group>"; };
+		276E5C7A1CDB57AA003FF4B4 /* PredictionContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PredictionContext.h; sourceTree = "<group>"; wrapsLines = 0; };
 		276E5C7B1CDB57AA003FF4B4 /* PredictionMode.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PredictionMode.cpp; sourceTree = "<group>"; };
 		276E5C7C1CDB57AA003FF4B4 /* PredictionMode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PredictionMode.h; sourceTree = "<group>"; };
 		276E5C7D1CDB57AA003FF4B4 /* ProfilingATNSimulator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ProfilingATNSimulator.cpp; sourceTree = "<group>"; };
@@ -999,7 +999,7 @@
 		276E5CA91CDB57AA003FF4B4 /* DefaultErrorStrategy.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DefaultErrorStrategy.cpp; sourceTree = "<group>"; };
 		276E5CAA1CDB57AA003FF4B4 /* DefaultErrorStrategy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DefaultErrorStrategy.h; sourceTree = "<group>"; };
 		276E5CAC1CDB57AA003FF4B4 /* DFA.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DFA.cpp; sourceTree = "<group>"; };
-		276E5CAD1CDB57AA003FF4B4 /* DFA.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFA.h; sourceTree = "<group>"; };
+		276E5CAD1CDB57AA003FF4B4 /* DFA.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFA.h; sourceTree = "<group>"; wrapsLines = 0; };
 		276E5CAE1CDB57AA003FF4B4 /* DFASerializer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DFASerializer.cpp; sourceTree = "<group>"; };
 		276E5CAF1CDB57AA003FF4B4 /* DFASerializer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFASerializer.h; sourceTree = "<group>"; };
 		276E5CB01CDB57AA003FF4B4 /* DFAState.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DFAState.cpp; sourceTree = "<group>"; };
@@ -1074,7 +1074,7 @@
 		276E5CFB1CDB57AA003FF4B4 /* ErrorNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ErrorNode.h; sourceTree = "<group>"; };
 		276E5CFC1CDB57AA003FF4B4 /* ErrorNodeImpl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ErrorNodeImpl.cpp; sourceTree = "<group>"; };
 		276E5CFD1CDB57AA003FF4B4 /* ErrorNodeImpl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ErrorNodeImpl.h; sourceTree = "<group>"; };
-		276E5CFE1CDB57AA003FF4B4 /* ParseTree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParseTree.h; sourceTree = "<group>"; };
+		276E5CFE1CDB57AA003FF4B4 /* ParseTree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParseTree.h; sourceTree = "<group>"; wrapsLines = 0; };
 		276E5D001CDB57AA003FF4B4 /* ParseTreeListener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParseTreeListener.h; sourceTree = "<group>"; };
 		276E5D021CDB57AA003FF4B4 /* ParseTreeProperty.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParseTreeProperty.h; sourceTree = "<group>"; };
 		276E5D031CDB57AA003FF4B4 /* ParseTreeVisitor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParseTreeVisitor.h; sourceTree = "<group>"; };

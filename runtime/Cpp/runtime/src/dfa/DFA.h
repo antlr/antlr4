@@ -31,7 +31,7 @@
 
 #pragma once
 
-#include "antlr4-common.h"
+#include "dfa/DFAState.h"
 
 namespace org {
 namespace antlr {
@@ -46,7 +46,7 @@ namespace dfa {
 
     /// From which ATN state did we create this DFA?
     atn::DecisionState *const atnStartState;
-    std::unordered_map<DFAState *, DFAState *> states; // States are owned by this class.
+    std::unordered_map<DFAState *, DFAState *, DFAState::Hasher, DFAState::Comparer> states; // States are owned by this class.
     DFAState *s0;
     const int decision;
 

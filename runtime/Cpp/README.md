@@ -36,3 +36,17 @@ The C++ target has been the work of the following people:
 The minimum C++ version to compile the ANTLR C++ runtime with is C++11. The supplied projects can built the runtime either as static or dynamic library, as both 32bit and 64bit arch. The OSX project contains a target for iOS and can also be built using cmake (instead of XCode).
 
 Include the antlr4-runtime.h umbrella header in your target application to get everything needed to use the library.
+
+#### Compiling on Windows
+Simply open the VS solution (VS 2013+) and build it.
+
+#### Compiling on OSX
+Either open the included XCode project and build that or use the cmake compilation as described for linux.
+
+#### Compiling on Linux
+- cd <antlr4-dir>/runtime/Cpp
+- mkdir build && mkdir run && cd build
+- cmake ..-DANTLR_JAR_LOCATION=full/path/to/antlr4-4.5.4-SNAPSHOT.jar -DWITH_DEMO=True
+- make
+- DESTDIR=<antlr4-dir>/runtime/Cpp/run make install
+

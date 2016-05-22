@@ -75,8 +75,7 @@ namespace runtime {
     Parser(TokenStream *input);
     virtual ~Parser();
 
-    /// <summary>
-    /// reset the parser's state </summary>
+    /// reset the parser's state
     virtual void reset();
 
     /// <summary>

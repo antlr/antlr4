@@ -102,7 +102,7 @@ void LL1Analyzer::_LOOK(ATNState *s, ATNState *stopState, Ref<PredictionContext>
 
   lookBusy.insert(c);
 
-  if (s == stopState) {
+  if (stopState != nullptr && s == stopState) {
     if (ctx == nullptr) {
       look.add(Token::EPSILON);
       return;
