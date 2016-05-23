@@ -40,16 +40,19 @@ find_package(Java REQUIRED)
 
 file(STRINGS "VERSION" ANTLR_VERSION)
 
-if (NOT ANTLR_JAR_LOCATION)
-  message(FATAL_ERROR "Missing antlr4.jar location. You can specify it's path using: -DANTLR_JAR_LOCATION=<path>")
-else()
-  get_filename_component(ANTLR_NAME ${ANTLR_JAR_LOCATION} NAME_WE)
-  if(NOT EXISTS "${ANTLR_JAR_LOCATION}")
-    message(FATAL_ERROR "Unable to find ${ANTLR_NAME} in ${ANTLR_JAR_LOCATION}")
+if (WITH_DEMO)
+  if (NOT ANTLR_JAR_LOCATION)
+    message(FATAL_ERROR "Missing antlr4.jar location. You can specify it's path using: -DANTLR_JAR_LOCATION=<path>")
   else()
-    message(STATUS "Found ${ANTLR_NAME}: ${ANTLR_JAR_LOCATION}")
+    get_filename_component(ANTLR_NAME ${ANTLR_JAR_LOCATION} NAME_WE)
+    if(NOT EXISTS "${ANTLR_JAR_LOCATION}")
+      message(FATAL_ERROR "Unable to find ${ANTLR_NAME} in ${ANTLR_JAR_LOCATION}")
+    else()
+      message(STATUS "Found ${ANTLR_NAME}: ${ANTLR_JAR_LOCATION}")
+    endif()
   endif()
-endif()
+endif(WITH_DEMO)
+
 set(MY_CXX_WARNING_FLAGS "  -Wall -pedantic -W")
 
 # Initialize CXXFLAGS.

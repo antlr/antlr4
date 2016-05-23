@@ -9,3 +9,5 @@ A few steps are necessary to get this to work:
 - Run the generation script. This will generate a test parser + lexer, along with listener + visitor classes in a subfolder named "generated". This is where the demo application looks for these files.
 - Open the project in the folder that matches your system.
 - Compile and run.
+
+Compilation is done as described in the runtime/cpp/readme.md file.
