@@ -527,15 +527,34 @@ public abstract class BaseCppTest {
 		return execModule("Test.cpp");
 	}
 
+	public List<String> allCppFiles(String path) {
+		ArrayList<String> files = new ArrayList<String>();
+		File folder = new File(path);
+		File[] listOfFiles = folder.listFiles();
+    		for (int i = 0; i < listOfFiles.length; i++) {
+			String file = listOfFiles[i].getAbsolutePath();
+			if (file.endsWith(".cpp")) {
+				files.add(file);
+			}
+		}
+		return files;
+	}
+
 	public String execModule(String fileName) {
 		String compilerPath = locateCompiler();
-		String linkerPath = locateLinker();
 		String runtimePath = locateRuntime();
-		String modulePath = new File(new File(tmpdir), fileName).getAbsolutePath();
 		String inputPath = new File(new File(tmpdir), "input").getAbsolutePath();
 		try {
-			ProcessBuilder builder = new ProcessBuilder(
-				compilerPath, "-I", runtimePath, "-std=c++11", "-c", modulePath);
+			ArrayList<String> args = new ArrayList<String>();
+			args.add(compilerPath);
+			args.add("-std=c++11");
+			args.add("-I");
+			args.add(runtimePath);
+			args.add("-L");
+			args.add(runtimePath);
+			args.add("-lantlrcpp_static");
+			args.addAll(allCppFiles(tmpdir));
+			ProcessBuilder builder = new ProcessBuilder(args.toArray(new String[0]));
 			builder.directory(new File(tmpdir));
 			Process process = builder.start();
 			StreamVacuum stdoutVacuum = new StreamVacuum(process.getInputStream());
@@ -579,17 +598,6 @@ public abstract class BaseCppTest {
    		String prop = System.getProperty(propName);
    		if(prop==null || prop.length()==0)
    			prop = locateTool("g++");  // Also try cc
-		File file = new File(prop);
-		if(!file.exists())
-			throw new RuntimeException("Missing system property:" + propName);
-		return file.getAbsolutePath();
-	}
-
-	protected String locateLinker() {
-		String propName = getPropertyPrefix() + "-linker";
-   		String prop = System.getProperty(propName);
-   		if(prop==null || prop.length()==0)
-   			prop = locateTool("ld");
 		File file = new File(prop);
 		if(!file.exists())
 			throw new RuntimeException("Missing system property:" + propName);

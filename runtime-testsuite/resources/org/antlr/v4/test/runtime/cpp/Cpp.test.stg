@@ -157,9 +157,9 @@ string(text) ::= <<
 
 writeBoolean(o) ::= "<if(o && !isEmpty.(o))>true<else>false<endif>"
 
-writeln(s) ::= <<print(<s>)>>
+writeln(s) ::= "cout << <s> << \"\\n\";"
 
-write(s) ::= <<print(<s>,end='')>>
+write(s) ::= "cout << <s>;"
 
 False() ::= "False"
 
@@ -303,7 +303,7 @@ else:
 
 class LeafListener(TListener):
     def visitTerminal(self, node):
-        print(node.symbol.text)
+        cout << node.symbol.text;
 
 >>
 
@@ -333,10 +333,11 @@ else:
 
 class LeafListener(TListener):
     def exitA(self, ctx):
-        if ctx.getChildCount()==2:
-            print(ctx.INT(0).symbol.text + ' ' + ctx.INT(1).symbol.text + ' ' + str_list(ctx.INT()))
-        else:
-            print(str(ctx.ID().symbol))
+        if (ctx.getChildCount()==2) {
+            cout << ctx.INT(0).symbol.text << ' ' << ctx.INT(1).symbol.text << ' ' << str_list(ctx.INT());
+        } else {
+            cout << str(ctx.ID().symbol);
+	}
 
 >>
 
@@ -348,10 +349,11 @@ else:
 
 class LeafListener(TListener):
     def exitA(self, ctx):
-        if ctx.getChildCount()==2:
-            print(ctx.b(0).start.text + ' ' + ctx.b(1).start.text + ' ' + ctx.b()[0].start.text)
-        else:
-            print(ctx.b(0).start.text)
+        if (ctx.getChildCount()==2) {
+            cout << ctx.b(0).start.text + ' ' + ctx.b(1).start.text + ' ' + ctx.b()[0].start.text;
+	} else {
+            cout << ctx.b(0).start.text;
+	}
 
 >>
 
@@ -365,9 +367,9 @@ else:
 class LeafListener(TListener):
     def exitE(self, ctx):
         if ctx.getChildCount()==3:
-            print(ctx.e(0).start.text + ' ' + ctx.e(1).start.text + ' ' + ctx.e()[0].start.text)
+            cout << ctx.e(0).start.text + ' ' + ctx.e(1).start.text + ' ' + ctx.e()[0].start.text;
         else:
-            print(ctx.INT().symbol.text)
+            cout << ctx.INT().symbol.text;
 
 >>
 
@@ -379,9 +381,9 @@ else:
 
 class LeafListener(TListener):
     def exitCall(self, ctx):
-        print(ctx.e().start.text + ' ' + str(ctx.eList()))
+        cout << ctx.e().start.text << ' ' << str(ctx.eList());
     def exitInt(self, ctx):
-        print(ctx.INT().symbol.text)
+        cout << ctx.INT().symbol.text;
 
 >>
 
@@ -393,13 +395,13 @@ def foo():
 >>
 
 Declare_foo() ::= <<def foo(self):
-	print('foo')
+	cout << 'foo';
 >>
 
 Invoke_foo() ::= "self.foo()"
 
 Declare_pred() ::= <<def pred(self, v):
-	print('eval=' + str(v).lower())
+	cout << "eval=" << str(v).lower();
 	return v
 
 >>

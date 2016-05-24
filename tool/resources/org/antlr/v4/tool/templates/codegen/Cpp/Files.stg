@@ -131,7 +131,7 @@ ParserFile(file, parser, namedActions, contextSuperClass) ::= <<
 #include "atn/ATNDeserializer.h"
 
 #include "tree/ParseTreeListener.h"
-<if (file.genListener)>#include "<file.parser.name>Listener.h"<endif>
+<if (file.genListener)>#include "<file.grammarName>BaseListener.h"<endif>
 
 #include "<file.parser.name>.h"
 

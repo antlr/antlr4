@@ -1008,7 +1008,7 @@ ListenerDispatchMethodHeader(method) ::= <<
 virtual void <if (method.isEnter)>enter<else>exit<endif>Rule(Ref\<tree::ParseTreeListener> listener) override;
 >>
 ListenerDispatchMethod(method) ::= <<
-void <method.factory.grammar.name>::<struct.name>::<if (method.isEnter)>enter<else>exit<endif>Rule(Ref\<tree::ParseTreeListener> listener) {
+void <parser.grammarName>Parser::<struct.name>::<if (method.isEnter)>enter<else>exit<endif>Rule(Ref\<tree::ParseTreeListener> listener) {
   auto parserListener = std::dynamic_pointer_cast\<<parser.grammarName>Listener>(listener);
   if (parserListener)
     parserListener-><if(method.isEnter)>enter<else>exit<endif><struct.derivedFromName; format="cap">(this);
