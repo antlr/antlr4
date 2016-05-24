@@ -75,7 +75,7 @@ public:
   virtual void action(Ref\<RuleContext> context, int ruleIndex, int actionIndex) override;
   <endif>
   <if (sempredFuncs)>
-  virtual bool sempred(Ref\<RuleContext> context, int ruleIndex, int predicateIndex) override;  
+  virtual bool sempred(Ref\<RuleContext> _localctx, int ruleIndex, int predicateIndex) override;  
   <endif>
   
 private:
@@ -237,11 +237,11 @@ void <r.factory.grammar.name>::<r.name>Action(Ref\<<r.ctxType>\> context, int ac
 >>
 
 RuleSempredFunctionHeader(r, actions) ::= <<
-bool <r.name>Sempred(Ref\<<r.ctxType>\> context, int predicateIndex);
+bool <r.name>Sempred(Ref\<<r.ctxType>\> _localctx, int predicateIndex);
 >>
 
 RuleSempredFunction(r, actions) ::= <<
-bool <r.factory.grammar.name>::<r.name>Sempred(Ref\<<r.ctxType>\> context, int predicateIndex) {
+bool <r.factory.grammar.name>::<r.name>Sempred(Ref\<<r.ctxType>\> _localctx, int predicateIndex) {
   switch (predicateIndex) {
     <actions: {index | case <index>: return <actions.(index)>;}; separator="\n">
     
@@ -288,7 +288,7 @@ public:
   <funcs; separator = "\n">
 
   <if (sempredFuncs)>
-  virtual bool sempred(Ref\<RuleContext> context, int ruleIndex, int predicateIndex) override;
+  virtual bool sempred(Ref\<RuleContext> _localctx, int ruleIndex, int predicateIndex) override;
   <sempredFuncs.values; separator = "\n">
   <endif>
 

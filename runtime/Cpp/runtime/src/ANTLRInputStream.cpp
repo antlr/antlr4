@@ -45,8 +45,7 @@ using misc::Interval;
 
 ANTLRInputStream::ANTLRInputStream(const std::string &input) {
   InitializeInstanceFields();
-
-  data = utfConverter.from_bytes(input);
+  load(input);
 }
 
 ANTLRInputStream::ANTLRInputStream(const char data[], size_t numberOfActualCharsInArray)
@@ -55,6 +54,11 @@ ANTLRInputStream::ANTLRInputStream(const char data[], size_t numberOfActualChars
 
 ANTLRInputStream::ANTLRInputStream(std::wistream &stream) {
   load(stream);
+}
+
+void ANTLRInputStream::load(const std::string &input) {
+  data = utfConverter.from_bytes(input);
+  p = 0;
 }
 
 void ANTLRInputStream::load(std::wistream &stream) {

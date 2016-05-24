@@ -213,6 +213,7 @@ void BufferedTokenStream::setup() {
 void BufferedTokenStream::setTokenSource(TokenSource *tokenSource) {
   _tokenSource = tokenSource;
   _tokens.clear();
+  _fetchedEOF = false;
   _needSetup = true;
 }
 

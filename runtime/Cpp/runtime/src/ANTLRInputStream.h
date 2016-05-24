@@ -57,6 +57,7 @@ namespace runtime {
     ANTLRInputStream(const char data[], size_t numberOfActualCharsInArray);
     ANTLRInputStream(std::wistream &stream);
 
+    virtual void load(const std::string &input);
     virtual void load(std::wistream &stream);
 
     /// Reset the stream so that it's in the same state it was

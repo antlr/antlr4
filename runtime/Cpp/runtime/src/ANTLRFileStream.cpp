@@ -35,10 +35,10 @@ using namespace org::antlr::v4::runtime;
 
 ANTLRFileStream::ANTLRFileStream(const std::string &fileName) {
   _fileName = fileName;
-  load(fileName);
+  loadFromFile(fileName);
 }
 
-void ANTLRFileStream::load(const std::string &fileName) {
+void ANTLRFileStream::loadFromFile(const std::string &fileName) {
   _fileName = fileName;
   if (_fileName.empty()) {
     return;

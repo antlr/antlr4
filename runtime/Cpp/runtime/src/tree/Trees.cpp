@@ -69,12 +69,43 @@ std::string Trees::toStringTree(Ref<Tree> t, const std::vector<std::string> &rul
 
   std::stringstream ss;
   ss << "(" << temp << ' ';
+  /*
   for (size_t i = 0; i < t->getChildCount(); i++) {
     if (i > 0) {
       ss << ' ';
     }
     ss << toStringTree(t->getChild(i), ruleNames);
   }
+   */
+
+  // Implement the recursive walk as iteration to avoid trouble we deep nesting.
+  std::stack<size_t> stack;
+  size_t childIndex = 0;
+  Ref<Tree> run = t;
+  while (childIndex < run->getChildCount()) {
+    if (childIndex > 0) {
+      ss << ' ';
+    }
+    Ref<Tree> child = run->getChild(childIndex);
+    std::string temp = antlrcpp::escapeWhitespace(Trees::getNodeText(child, ruleNames), false);
+    if (child->getChildCount() > 0) {
+      // Go deeper one level.
+      stack.push(childIndex + 1);
+      run = child;
+      childIndex = 0;
+      ss << "(" << temp << " ";
+    } else {
+      ss << temp;
+      if (++childIndex == run->getChildCount() && stack.size() > 0) {
+        // Reached the end of the current level. See if we can step up from here.
+        childIndex = stack.top();
+        stack.pop();
+        run = run->getParent().lock();
+        ss << ")";
+      }
+    }
+  }
+
   ss << ")";
   return ss.str();
 }
