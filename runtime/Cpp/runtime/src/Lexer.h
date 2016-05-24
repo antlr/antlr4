@@ -109,6 +109,7 @@ namespace runtime {
     /// the input char buffer. Use setText() or can set this instance var.
     std::string text;
 
+    Lexer();
     Lexer(CharStream *input);
 
     virtual void reset();

@@ -44,7 +44,12 @@
 using namespace antlrcpp;
 using namespace org::antlr::v4::runtime;
 
-Lexer::Lexer(CharStream *input) : _input(input) {
+Lexer::Lexer() : Recognizer() {
+  InitializeInstanceFields();
+  _input = nullptr;
+}
+
+Lexer::Lexer(CharStream *input) : Recognizer(), _input(input) {
   InitializeInstanceFields();
 }
 
