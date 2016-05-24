@@ -49,7 +49,7 @@ namespace runtime {
     // Assumes a file name encoded in UTF-8 and file content in the same encoding (with or w/o BOM).
     ANTLRFileStream(const std::string &fileName);
 
-    virtual void load(const std::string &fileName);
+    virtual void loadFromFile(const std::string &fileName);
     virtual std::string getSourceName() const override;
   };
 
