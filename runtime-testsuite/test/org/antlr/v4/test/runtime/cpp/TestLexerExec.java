@@ -13,13 +13,13 @@ public class TestLexerExec extends BaseCppTest {
 	public void testActionPlacement() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(228);
+		StringBuilder grammarBuilder = new StringBuilder(92);
 		grammarBuilder.append("lexer grammar L;\n");
-		grammarBuilder.append("I : ({print(\"stuff fail: \" + self.text)} 'a'\n");
-		grammarBuilder.append("| {print(\"stuff0: \" + self.text)}\n");
-		grammarBuilder.append("		'a' {print(\"stuff1: \" + self.text)}\n");
-		grammarBuilder.append("		'b' {print(\"stuff2: \" + self.text)})\n");
-		grammarBuilder.append("		{print(self.text)} ;\n");
+		grammarBuilder.append("I : ({} 'a'\n");
+		grammarBuilder.append("| {}\n");
+		grammarBuilder.append("		'a' {}\n");
+		grammarBuilder.append("		'b' {})\n");
+		grammarBuilder.append("		{} ;\n");
 		grammarBuilder.append("WS : (' '|'\\n') -> skip ;\n");
 		grammarBuilder.append("J : .;");
 		String grammar = grammarBuilder.toString();
@@ -42,9 +42,9 @@ public class TestLexerExec extends BaseCppTest {
 	public void testCharSet() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(72);
+		StringBuilder grammarBuilder = new StringBuilder(62);
 		grammarBuilder.append("lexer grammar L;\n");
-		grammarBuilder.append("I : '0'..'9'+ {print(\"I\")} ;\n");
+		grammarBuilder.append("I : '0'..'9'+ {} ;\n");
 		grammarBuilder.append("WS : [ \\n\\u000D] -> skip ;");
 		String grammar = grammarBuilder.toString();
 
@@ -67,9 +67,9 @@ public class TestLexerExec extends BaseCppTest {
 	public void testCharSetInSet() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(79);
+		StringBuilder grammarBuilder = new StringBuilder(69);
 		grammarBuilder.append("lexer grammar L;\n");
-		grammarBuilder.append("I : (~[ab \\n]|'a')  {print(\"I\")} ;\n");
+		grammarBuilder.append("I : (~[ab \\n]|'a')  {} ;\n");
 		grammarBuilder.append("WS : [ \\n\\u000D]+ -> skip ;");
 		String grammar = grammarBuilder.toString();
 
@@ -90,9 +90,9 @@ public class TestLexerExec extends BaseCppTest {
 	public void testCharSetNot() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(82);
+		StringBuilder grammarBuilder = new StringBuilder(72);
 		grammarBuilder.append("lexer grammar L;\n");
-		grammarBuilder.append("I : ~[ab \\n] ~[ \\ncd]* {print(\"I\")} ;\n");
+		grammarBuilder.append("I : ~[ab \\n] ~[ \\ncd]* {} ;\n");
 		grammarBuilder.append("WS : [ \\n\\u000D]+ -> skip ;");
 		String grammar = grammarBuilder.toString();
 
@@ -111,9 +111,9 @@ public class TestLexerExec extends BaseCppTest {
 	public void testCharSetPlus() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(73);
+		StringBuilder grammarBuilder = new StringBuilder(63);
 		grammarBuilder.append("lexer grammar L;\n");
-		grammarBuilder.append("I : '0'..'9'+ {print(\"I\")} ;\n");
+		grammarBuilder.append("I : '0'..'9'+ {} ;\n");
 		grammarBuilder.append("WS : [ \\n\\u000D]+ -> skip ;");
 		String grammar = grammarBuilder.toString();
 
@@ -136,10 +136,10 @@ public class TestLexerExec extends BaseCppTest {
 	public void testCharSetRange() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(115);
+		StringBuilder grammarBuilder = new StringBuilder(94);
 		grammarBuilder.append("lexer grammar L;\n");
-		grammarBuilder.append("I : [0-9]+ {print(\"I\")} ;\n");
-		grammarBuilder.append("ID : [a-zA-Z] [a-zA-Z0-9]* {print(\"ID\")} ;\n");
+		grammarBuilder.append("I : [0-9]+ {} ;\n");
+		grammarBuilder.append("ID : [a-zA-Z] [a-zA-Z0-9]* {} ;\n");
 		grammarBuilder.append("WS : [ \\n\\u0009\\r]+ -> skip ;");
 		String grammar = grammarBuilder.toString();
 
@@ -167,9 +167,9 @@ public class TestLexerExec extends BaseCppTest {
 	public void testCharSetWithEscapedChar() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(81);
+		StringBuilder grammarBuilder = new StringBuilder(63);
 		grammarBuilder.append("lexer grammar L;\n");
-		grammarBuilder.append("DASHBRACK : [\\-\\]]+ {print(\"DASHBRACK\")} ;\n");
+		grammarBuilder.append("DASHBRACK : [\\-\\]]+ {} ;\n");
 		grammarBuilder.append("WS : [ \\u]+ -> skip ;");
 		String grammar = grammarBuilder.toString();
 
@@ -190,9 +190,9 @@ public class TestLexerExec extends BaseCppTest {
 	public void testCharSetWithMissingEndRange() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(69);
+		StringBuilder grammarBuilder = new StringBuilder(59);
 		grammarBuilder.append("lexer grammar L;\n");
-		grammarBuilder.append("I : [0-]+ {print(\"I\")} ;\n");
+		grammarBuilder.append("I : [0-]+ {} ;\n");
 		grammarBuilder.append("WS : [ \\n\\u000D]+ -> skip ;");
 		String grammar = grammarBuilder.toString();
 
@@ -211,9 +211,9 @@ public class TestLexerExec extends BaseCppTest {
 	public void testCharSetWithMissingEscapeChar() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(64);
+		StringBuilder grammarBuilder = new StringBuilder(54);
 		grammarBuilder.append("lexer grammar L;\n");
-		grammarBuilder.append("I : [0-9]+ {print(\"I\")} ;\n");
+		grammarBuilder.append("I : [0-9]+ {} ;\n");
 		grammarBuilder.append("WS : [ \\u]+ -> skip ;");
 		String grammar = grammarBuilder.toString();
 
@@ -232,9 +232,9 @@ public class TestLexerExec extends BaseCppTest {
 	public void testCharSetWithQuote1() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(67);
+		StringBuilder grammarBuilder = new StringBuilder(57);
 		grammarBuilder.append("lexer grammar L;\n");
-		grammarBuilder.append("A : [\"a-z]+ {print(\"A\")} ;\n");
+		grammarBuilder.append("A : [\"a-z]+ {} ;\n");
 		grammarBuilder.append("WS : [ \\n\\t]+ -> skip ;");
 		String grammar = grammarBuilder.toString();
 
@@ -253,9 +253,9 @@ public class TestLexerExec extends BaseCppTest {
 	public void testCharSetWithQuote2() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(68);
+		StringBuilder grammarBuilder = new StringBuilder(58);
 		grammarBuilder.append("lexer grammar L;\n");
-		grammarBuilder.append("A : [\"\\\\ab]+ {print(\"A\")} ;\n");
+		grammarBuilder.append("A : [\"\\\\ab]+ {} ;\n");
 		grammarBuilder.append("WS : [ \\n\\t]+ -> skip ;");
 		String grammar = grammarBuilder.toString();
 
@@ -274,9 +274,9 @@ public class TestLexerExec extends BaseCppTest {
 	public void testCharSetWithReversedRange() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(65);
+		StringBuilder grammarBuilder = new StringBuilder(55);
 		grammarBuilder.append("lexer grammar L;\n");
-		grammarBuilder.append("A : [z-a9]+ {print(\"A\")} ;\n");
+		grammarBuilder.append("A : [z-a9]+ {} ;\n");
 		grammarBuilder.append("WS : [ \\u]+ -> skip ;");
 		String grammar = grammarBuilder.toString();
 
@@ -377,9 +377,9 @@ public class TestLexerExec extends BaseCppTest {
 	public void testGreedyConfigs() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(87);
+		StringBuilder grammarBuilder = new StringBuilder(71);
 		grammarBuilder.append("lexer grammar L;\n");
-		grammarBuilder.append("I : ('a' | 'ab') {print(self.text)} ;\n");
+		grammarBuilder.append("I : ('a' | 'ab') {} ;\n");
 		grammarBuilder.append("WS : (' '|'\\n') -> skip ;\n");
 		grammarBuilder.append("J : .;");
 		String grammar = grammarBuilder.toString();
@@ -4549,11 +4549,11 @@ public class TestLexerExec extends BaseCppTest {
 	public void testNonGreedyConfigs() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(110);
+		StringBuilder grammarBuilder = new StringBuilder(78);
 		grammarBuilder.append("lexer grammar L;\n");
-		grammarBuilder.append("I : .*? ('a' | 'ab') {print(self.text)} ;\n");
+		grammarBuilder.append("I : .*? ('a' | 'ab') {} ;\n");
 		grammarBuilder.append("WS : (' '|'\\n') -> skip ;\n");
-		grammarBuilder.append("J : . {print(self.text)};");
+		grammarBuilder.append("J : . {};");
 		String grammar = grammarBuilder.toString();
 
 		String input ="ab";

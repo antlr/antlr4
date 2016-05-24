@@ -121,11 +121,11 @@ public class TestSemPredEvalLexer extends BaseCppTest {
 	public void testIndent() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(135);
+		StringBuilder grammarBuilder = new StringBuilder(120);
 		grammarBuilder.append("lexer grammar L;\n");
 		grammarBuilder.append("ID : [a-z]+  ;\n");
 		grammarBuilder.append("INDENT : [ \\t]+ { self._tokenStartColumn==0 }?\n");
-		grammarBuilder.append("         { print(\"INDENT\") }  ;\n");
+		grammarBuilder.append("         {  }  ;\n");
 		grammarBuilder.append("NL : '\\n';\n");
 		grammarBuilder.append("WS : [ \\t]+ ;");
 		String grammar = grammarBuilder.toString();
@@ -160,10 +160,10 @@ public class TestSemPredEvalLexer extends BaseCppTest {
 	public void testLexerInputPositionSensitivePredicates() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(206);
+		StringBuilder grammarBuilder = new StringBuilder(174);
 		grammarBuilder.append("lexer grammar L;\n");
-		grammarBuilder.append("WORD1 : ID1+ { print(self.text) } ;\n");
-		grammarBuilder.append("WORD2 : ID2+ { print(self.text) } ;\n");
+		grammarBuilder.append("WORD1 : ID1+ {  } ;\n");
+		grammarBuilder.append("WORD2 : ID2+ {  } ;\n");
 		grammarBuilder.append("fragment ID1 : { self.column < 2 }? [a-zA-Z];\n");
 		grammarBuilder.append("fragment ID2 : { self.column >= 2 }? [a-zA-Z];\n");
 		grammarBuilder.append("WS : (' '|'\\n') -> skip;");
@@ -192,10 +192,10 @@ public class TestSemPredEvalLexer extends BaseCppTest {
 	public void testPredicatedKeywords() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(142);
+		StringBuilder grammarBuilder = new StringBuilder(104);
 		grammarBuilder.append("lexer grammar L;\n");
-		grammarBuilder.append("ENUM : [a-z]+ { self.text==\"enum\" }? { print(\"enum!\") } ;\n");
-		grammarBuilder.append("ID   : [a-z]+ { print(\"ID \" + self.text) } ;\n");
+		grammarBuilder.append("ENUM : [a-z]+ { self.text==\"enum\" }? {  } ;\n");
+		grammarBuilder.append("ID   : [a-z]+ {  } ;\n");
 		grammarBuilder.append("WS   : [ \\n] -> skip ;");
 		String grammar = grammarBuilder.toString();
 

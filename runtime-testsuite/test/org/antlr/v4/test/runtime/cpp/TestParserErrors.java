@@ -13,9 +13,9 @@ public class TestParserErrors extends BaseCppTest {
 	public void testConjuringUpToken() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(61);
+		StringBuilder grammarBuilder = new StringBuilder(33);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("a : 'a' x='b' {print(\"conjured=\" + str($x))} 'c' ;");
+		grammarBuilder.append("a : 'a' x='b' {} 'c' ;");
 		String grammar = grammarBuilder.toString();
 
 
@@ -33,9 +33,9 @@ public class TestParserErrors extends BaseCppTest {
 	public void testConjuringUpTokenFromSet() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(67);
+		StringBuilder grammarBuilder = new StringBuilder(39);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("a : 'a' x=('b'|'c') {print(\"conjured=\" + str($x))} 'd' ;");
+		grammarBuilder.append("a : 'a' x=('b'|'c') {} 'd' ;");
 		String grammar = grammarBuilder.toString();
 
 
@@ -53,7 +53,7 @@ public class TestParserErrors extends BaseCppTest {
 	public void testContextListGetters() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(160);
+		StringBuilder grammarBuilder = new StringBuilder(144);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("@parser::members{\n");
 		grammarBuilder.append("def foo():\n");
@@ -62,8 +62,8 @@ public class TestParserErrors extends BaseCppTest {
 		grammarBuilder.append("    b = s.b()\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("s : (a | b)+;\n");
-		grammarBuilder.append("a : 'a' {print('a',end='')};\n");
-		grammarBuilder.append("b : 'b' {print('b',end='')};");
+		grammarBuilder.append("a : 'a' {cout 'a';};\n");
+		grammarBuilder.append("b : 'b' {cout 'b';};");
 		String grammar = grammarBuilder.toString();
 
 
@@ -211,7 +211,7 @@ public class TestParserErrors extends BaseCppTest {
 	public void testLL1ErrorInfo() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(314);
+		StringBuilder grammarBuilder = new StringBuilder(235);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("start : animal (AND acClass)? service EOF;\n");
 		grammarBuilder.append("animal : (DOG | CAT );\n");
@@ -224,7 +224,7 @@ public class TestParserErrors extends BaseCppTest {
 		grammarBuilder.append("WS : ' ' -> skip ;\n");
 		grammarBuilder.append("acClass\n");
 		grammarBuilder.append("@init\n");
-		grammarBuilder.append("{print(self.getExpectedTokens().toString(self.literalNames, self.symbolicNames))}\n");
+		grammarBuilder.append("{}\n");
 		grammarBuilder.append("  : ;");
 		String grammar = grammarBuilder.toString();
 
@@ -440,10 +440,10 @@ public class TestParserErrors extends BaseCppTest {
 	public void testSingleSetInsertionConsumption() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(80);
+		StringBuilder grammarBuilder = new StringBuilder(52);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("myset: ('b'|'c') ;\n");
-		grammarBuilder.append("a: 'a' myset 'd' {print(\"\" + str($myset.stop))} ; ");
+		grammarBuilder.append("a: 'a' myset 'd' {} ; ");
 		String grammar = grammarBuilder.toString();
 
 
@@ -571,10 +571,10 @@ public class TestParserErrors extends BaseCppTest {
 	public void testSingleTokenDeletionConsumption() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(80);
+		StringBuilder grammarBuilder = new StringBuilder(52);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("myset: ('b'|'c') ;\n");
-		grammarBuilder.append("a: 'a' myset 'd' {print(\"\" + str($myset.stop))} ; ");
+		grammarBuilder.append("a: 'a' myset 'd' {} ; ");
 		String grammar = grammarBuilder.toString();
 
 
