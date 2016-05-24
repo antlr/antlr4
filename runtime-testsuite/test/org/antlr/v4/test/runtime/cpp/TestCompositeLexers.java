@@ -15,7 +15,7 @@ public class TestCompositeLexers extends BaseCppTest {
 
 		String slave_S =
 			"lexer grammar S;\n" +
-			"A : 'a' {};\n" +
+			"A : 'a' {std::cout << \"S.A\" << \"\\n\";};\n" +
 			"C : 'c' ;";
 		writeFile(tmpdir, "S.g4", slave_S);
 
@@ -45,14 +45,14 @@ public class TestCompositeLexers extends BaseCppTest {
 
 		String slave_S =
 			"lexer grammar S;\n" +
-			"A : 'a' {} ;\n" +
-			"B : 'b' {} ;";
+			"A : 'a' {std::cout << \"S.A\" << \"\\n\";} ;\n" +
+			"B : 'b' {std::cout << \"S.B\" << \"\\n\";} ;";
 		writeFile(tmpdir, "S.g4", slave_S);
 
-		StringBuilder grammarBuilder = new StringBuilder(67);
+		StringBuilder grammarBuilder = new StringBuilder(94);
 		grammarBuilder.append("lexer grammar M;\n");
 		grammarBuilder.append("import S;\n");
-		grammarBuilder.append("A : 'a' B {} ;\n");
+		grammarBuilder.append("A : 'a' B {std::cout << \"M.A\" << \"\\n\";} ;\n");
 		grammarBuilder.append("WS : (' '|'\\n') -> skip ;");
 		String grammar = grammarBuilder.toString();
 

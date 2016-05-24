@@ -13,16 +13,26 @@ public class TestListeners extends BaseCppTest {
 	public void testBasic() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(248);
+		StringBuilder grammarBuilder = new StringBuilder(533);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("@parser::header {\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("@parser::members {\n");
+		grammarBuilder.append("if __name__ is not None and \".\" in __name__:\n");
+		grammarBuilder.append("    from .TListener import TListener\n");
+		grammarBuilder.append("else:\n");
+		grammarBuilder.append("    from TListener import TListener\n");
+		grammarBuilder.append("\n");
+		grammarBuilder.append("class LeafListener(TListener):\n");
+		grammarBuilder.append("    def visitTerminal(self, node):\n");
+		grammarBuilder.append("        std::cout << node.symbol.text;\n");
+		grammarBuilder.append("\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("s\n");
 		grammarBuilder.append("@after {\n");
+		grammarBuilder.append("std::cout << $ctx.r.toStringTree(recog=self) << \"\\n\";\n");
 		grammarBuilder.append("walker = ParseTreeWalker()\n");
 		grammarBuilder.append("walker.walk(TParser.LeafListener(), $ctx.r)\n");
 		grammarBuilder.append("}\n");
@@ -54,16 +64,29 @@ public class TestListeners extends BaseCppTest {
 	public void testLR() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(263);
+		StringBuilder grammarBuilder = new StringBuilder(705);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("@parser::header {\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("@parser::members {\n");
+		grammarBuilder.append("if __name__ is not None and \".\" in __name__:\n");
+		grammarBuilder.append("    from .TListener import TListener\n");
+		grammarBuilder.append("else:\n");
+		grammarBuilder.append("    from TListener import TListener\n");
+		grammarBuilder.append("\n");
+		grammarBuilder.append("class LeafListener(TListener):\n");
+		grammarBuilder.append("    def exitE(self, ctx):\n");
+		grammarBuilder.append("        if ctx.getChildCount()==3:\n");
+		grammarBuilder.append("            std::cout << ctx.e(0).start.text << \" \" << ctx.e(1).start.text << \" \" << ctx.e()[0].start.text;\n");
+		grammarBuilder.append("        else:\n");
+		grammarBuilder.append("            std::cout << ctx.INT().symbol.text;\n");
+		grammarBuilder.append("\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("s\n");
 		grammarBuilder.append("@after {\n");
+		grammarBuilder.append("std::cout << $ctx.r.toStringTree(recog=self) << \"\\n\";\n");
 		grammarBuilder.append("walker = ParseTreeWalker()\n");
 		grammarBuilder.append("walker.walk(TParser.LeafListener(), $ctx.r)\n");
 		grammarBuilder.append("}\n");
@@ -99,16 +122,28 @@ public class TestListeners extends BaseCppTest {
 	public void testLRWithLabels() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(303);
+		StringBuilder grammarBuilder = new StringBuilder(683);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("@parser::header {\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("@parser::members {\n");
+		grammarBuilder.append("if __name__ is not None and \".\" in __name__:\n");
+		grammarBuilder.append("    from .TListener import TListener\n");
+		grammarBuilder.append("else:\n");
+		grammarBuilder.append("    from TListener import TListener\n");
+		grammarBuilder.append("\n");
+		grammarBuilder.append("class LeafListener(TListener):\n");
+		grammarBuilder.append("    def exitCall(self, ctx):\n");
+		grammarBuilder.append("        std::cout << ctx.e().start.text << \" \" << str(ctx.eList());\n");
+		grammarBuilder.append("    def exitInt(self, ctx):\n");
+		grammarBuilder.append("        std::cout << ctx.INT().symbol.text;\n");
+		grammarBuilder.append("\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("s\n");
 		grammarBuilder.append("@after {\n");
+		grammarBuilder.append("std::cout << $ctx.r.toStringTree(recog=self) << \"\\n\";\n");
 		grammarBuilder.append("walker = ParseTreeWalker()\n");
 		grammarBuilder.append("walker.walk(TParser.LeafListener(), $ctx.r)\n");
 		grammarBuilder.append("}\n");
@@ -143,16 +178,30 @@ public class TestListeners extends BaseCppTest {
 	public void testRuleGetters_1() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(290);
+		StringBuilder grammarBuilder = new StringBuilder(732);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("@parser::header {\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("@parser::members {\n");
+		grammarBuilder.append("if __name__ is not None and \".\" in __name__:\n");
+		grammarBuilder.append("    from .TListener import TListener\n");
+		grammarBuilder.append("else:\n");
+		grammarBuilder.append("    from TListener import TListener\n");
+		grammarBuilder.append("\n");
+		grammarBuilder.append("class LeafListener(TListener):\n");
+		grammarBuilder.append("    def exitA(self, ctx):\n");
+		grammarBuilder.append("        if (ctx.getChildCount()==2) {\n");
+		grammarBuilder.append("            std::cout << ctx.b(0).start.text << \" \" << ctx.b(1).start.text << \" \" << ctx.b()[0].start.text;\n");
+		grammarBuilder.append("	} else {\n");
+		grammarBuilder.append("            std::cout << ctx.b(0).start.text;\n");
+		grammarBuilder.append("	}\n");
+		grammarBuilder.append("\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("s\n");
 		grammarBuilder.append("@after {\n");
+		grammarBuilder.append("std::cout << $ctx.r.toStringTree(recog=self) << \"\\n\";\n");
 		grammarBuilder.append("walker = ParseTreeWalker()\n");
 		grammarBuilder.append("walker.walk(TParser.LeafListener(), $ctx.r)\n");
 		grammarBuilder.append("}\n");
@@ -184,16 +233,30 @@ public class TestListeners extends BaseCppTest {
 	public void testRuleGetters_2() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(290);
+		StringBuilder grammarBuilder = new StringBuilder(732);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("@parser::header {\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("@parser::members {\n");
+		grammarBuilder.append("if __name__ is not None and \".\" in __name__:\n");
+		grammarBuilder.append("    from .TListener import TListener\n");
+		grammarBuilder.append("else:\n");
+		grammarBuilder.append("    from TListener import TListener\n");
+		grammarBuilder.append("\n");
+		grammarBuilder.append("class LeafListener(TListener):\n");
+		grammarBuilder.append("    def exitA(self, ctx):\n");
+		grammarBuilder.append("        if (ctx.getChildCount()==2) {\n");
+		grammarBuilder.append("            std::cout << ctx.b(0).start.text << \" \" << ctx.b(1).start.text << \" \" << ctx.b()[0].start.text;\n");
+		grammarBuilder.append("	} else {\n");
+		grammarBuilder.append("            std::cout << ctx.b(0).start.text;\n");
+		grammarBuilder.append("	}\n");
+		grammarBuilder.append("\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("s\n");
 		grammarBuilder.append("@after {\n");
+		grammarBuilder.append("std::cout << $ctx.r.toStringTree(recog=self) << \"\\n\";\n");
 		grammarBuilder.append("walker = ParseTreeWalker()\n");
 		grammarBuilder.append("walker.walk(TParser.LeafListener(), $ctx.r)\n");
 		grammarBuilder.append("}\n");
@@ -225,16 +288,30 @@ public class TestListeners extends BaseCppTest {
 	public void testTokenGetters_1() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(248);
+		StringBuilder grammarBuilder = new StringBuilder(702);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("@parser::header {\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("@parser::members {\n");
+		grammarBuilder.append("if __name__ is not None and \".\" in __name__:\n");
+		grammarBuilder.append("    from .TListener import TListener\n");
+		grammarBuilder.append("else:\n");
+		grammarBuilder.append("    from TListener import TListener\n");
+		grammarBuilder.append("\n");
+		grammarBuilder.append("class LeafListener(TListener):\n");
+		grammarBuilder.append("    def exitA(self, ctx):\n");
+		grammarBuilder.append("        if (ctx.getChildCount()==2) {\n");
+		grammarBuilder.append("            std::cout << ctx.INT(0).symbol.text << \" \" << ctx.INT(1).symbol.text << \" \" << str_list(ctx.INT());\n");
+		grammarBuilder.append("        } else {\n");
+		grammarBuilder.append("            std::cout << str(ctx.ID().symbol);\n");
+		grammarBuilder.append("	}\n");
+		grammarBuilder.append("\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("s\n");
 		grammarBuilder.append("@after {\n");
+		grammarBuilder.append("std::cout << $ctx.r.toStringTree(recog=self) << \"\\n\";\n");
 		grammarBuilder.append("walker = ParseTreeWalker()\n");
 		grammarBuilder.append("walker.walk(TParser.LeafListener(), $ctx.r)\n");
 		grammarBuilder.append("}\n");
@@ -265,16 +342,30 @@ public class TestListeners extends BaseCppTest {
 	public void testTokenGetters_2() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(248);
+		StringBuilder grammarBuilder = new StringBuilder(702);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("@parser::header {\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("@parser::members {\n");
+		grammarBuilder.append("if __name__ is not None and \".\" in __name__:\n");
+		grammarBuilder.append("    from .TListener import TListener\n");
+		grammarBuilder.append("else:\n");
+		grammarBuilder.append("    from TListener import TListener\n");
+		grammarBuilder.append("\n");
+		grammarBuilder.append("class LeafListener(TListener):\n");
+		grammarBuilder.append("    def exitA(self, ctx):\n");
+		grammarBuilder.append("        if (ctx.getChildCount()==2) {\n");
+		grammarBuilder.append("            std::cout << ctx.INT(0).symbol.text << \" \" << ctx.INT(1).symbol.text << \" \" << str_list(ctx.INT());\n");
+		grammarBuilder.append("        } else {\n");
+		grammarBuilder.append("            std::cout << str(ctx.ID().symbol);\n");
+		grammarBuilder.append("	}\n");
+		grammarBuilder.append("\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("s\n");
 		grammarBuilder.append("@after {\n");
+		grammarBuilder.append("std::cout << $ctx.r.toStringTree(recog=self) << \"\\n\";\n");
 		grammarBuilder.append("walker = ParseTreeWalker()\n");
 		grammarBuilder.append("walker.walk(TParser.LeafListener(), $ctx.r)\n");
 		grammarBuilder.append("}\n");

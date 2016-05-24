@@ -13,9 +13,9 @@ public class TestParserErrors extends BaseCppTest {
 	public void testConjuringUpToken() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(33);
+		StringBuilder grammarBuilder = new StringBuilder(76);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("a : 'a' x='b' {} 'c' ;");
+		grammarBuilder.append("a : 'a' x='b' {std::cout << \"conjured=\" + str($x) << \"\\n\";} 'c' ;");
 		String grammar = grammarBuilder.toString();
 
 
@@ -33,9 +33,9 @@ public class TestParserErrors extends BaseCppTest {
 	public void testConjuringUpTokenFromSet() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(39);
+		StringBuilder grammarBuilder = new StringBuilder(82);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("a : 'a' x=('b'|'c') {} 'd' ;");
+		grammarBuilder.append("a : 'a' x=('b'|'c') {std::cout << \"conjured=\" + str($x) << \"\\n\";} 'd' ;");
 		String grammar = grammarBuilder.toString();
 
 
@@ -53,7 +53,7 @@ public class TestParserErrors extends BaseCppTest {
 	public void testContextListGetters() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(144);
+		StringBuilder grammarBuilder = new StringBuilder(160);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("@parser::members{\n");
 		grammarBuilder.append("def foo():\n");
@@ -62,8 +62,8 @@ public class TestParserErrors extends BaseCppTest {
 		grammarBuilder.append("    b = s.b()\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("s : (a | b)+;\n");
-		grammarBuilder.append("a : 'a' {cout 'a';};\n");
-		grammarBuilder.append("b : 'b' {cout 'b';};");
+		grammarBuilder.append("a : 'a' {std::cout << 'a';};\n");
+		grammarBuilder.append("b : 'b' {std::cout << 'b';};");
 		String grammar = grammarBuilder.toString();
 
 
@@ -168,10 +168,10 @@ public class TestParserErrors extends BaseCppTest {
 	public void testInvalidATNStateRemoval() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(102);
+		StringBuilder grammarBuilder = new StringBuilder(114);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("start : ID ':' expr;\n");
-		grammarBuilder.append("expr : primary expr? {pass} | expr '->' ID;\n");
+		grammarBuilder.append("expr : primary expr? {/* do nothing */} | expr '->' ID;\n");
 		grammarBuilder.append("primary : ID;\n");
 		grammarBuilder.append("ID : [a-z]+;");
 		String grammar = grammarBuilder.toString();
@@ -211,7 +211,7 @@ public class TestParserErrors extends BaseCppTest {
 	public void testLL1ErrorInfo() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(235);
+		StringBuilder grammarBuilder = new StringBuilder(329);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("start : animal (AND acClass)? service EOF;\n");
 		grammarBuilder.append("animal : (DOG | CAT );\n");
@@ -224,7 +224,7 @@ public class TestParserErrors extends BaseCppTest {
 		grammarBuilder.append("WS : ' ' -> skip ;\n");
 		grammarBuilder.append("acClass\n");
 		grammarBuilder.append("@init\n");
-		grammarBuilder.append("{}\n");
+		grammarBuilder.append("{std::cout << self.getExpectedTokens().toString(self.literalNames, self.symbolicNames) << \"\\n\";}\n");
 		grammarBuilder.append("  : ;");
 		String grammar = grammarBuilder.toString();
 
@@ -331,9 +331,9 @@ public class TestParserErrors extends BaseCppTest {
 	public void testMultiTokenDeletionBeforeLoop2() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(40);
+		StringBuilder grammarBuilder = new StringBuilder(52);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("a : 'a' ('b'|'z'{pass})* 'c';");
+		grammarBuilder.append("a : 'a' ('b'|'z'{/* do nothing */})* 'c';");
 		String grammar = grammarBuilder.toString();
 
 
@@ -373,9 +373,9 @@ public class TestParserErrors extends BaseCppTest {
 	public void testMultiTokenDeletionDuringLoop2() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(41);
+		StringBuilder grammarBuilder = new StringBuilder(53);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("a : 'a' ('b'|'z'{pass})* 'c' ;");
+		grammarBuilder.append("a : 'a' ('b'|'z'{/* do nothing */})* 'c' ;");
 		String grammar = grammarBuilder.toString();
 
 
@@ -440,10 +440,10 @@ public class TestParserErrors extends BaseCppTest {
 	public void testSingleSetInsertionConsumption() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(52);
+		StringBuilder grammarBuilder = new StringBuilder(95);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("myset: ('b'|'c') ;\n");
-		grammarBuilder.append("a: 'a' myset 'd' {} ; ");
+		grammarBuilder.append("a: 'a' myset 'd' {std::cout << \"\" + str($myset.stop) << \"\\n\";} ; ");
 		String grammar = grammarBuilder.toString();
 
 
@@ -526,9 +526,9 @@ public class TestParserErrors extends BaseCppTest {
 	public void testSingleTokenDeletionBeforeLoop2() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(36);
+		StringBuilder grammarBuilder = new StringBuilder(48);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("a : 'a' ('b'|'z'{pass})*;");
+		grammarBuilder.append("a : 'a' ('b'|'z'{/* do nothing */})*;");
 		String grammar = grammarBuilder.toString();
 
 
@@ -571,10 +571,10 @@ public class TestParserErrors extends BaseCppTest {
 	public void testSingleTokenDeletionConsumption() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(52);
+		StringBuilder grammarBuilder = new StringBuilder(95);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("myset: ('b'|'c') ;\n");
-		grammarBuilder.append("a: 'a' myset 'd' {} ; ");
+		grammarBuilder.append("a: 'a' myset 'd' {std::cout << \"\" + str($myset.stop) << \"\\n\";} ; ");
 		String grammar = grammarBuilder.toString();
 
 
@@ -612,9 +612,9 @@ public class TestParserErrors extends BaseCppTest {
 	public void testSingleTokenDeletionDuringLoop2() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(41);
+		StringBuilder grammarBuilder = new StringBuilder(53);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("a : 'a' ('b'|'z'{pass})* 'c' ;");
+		grammarBuilder.append("a : 'a' ('b'|'z'{/* do nothing */})* 'c' ;");
 		String grammar = grammarBuilder.toString();
 
 

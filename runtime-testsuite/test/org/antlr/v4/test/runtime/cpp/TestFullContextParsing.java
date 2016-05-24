@@ -38,11 +38,11 @@ public class TestFullContextParsing extends BaseCppTest {
 	public void testAmbiguityNoLoop() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(192);
+		StringBuilder grammarBuilder = new StringBuilder(221);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("prog\n");
 		grammarBuilder.append("@init {self._interp.predictionMode =  PredictionMode.LL_EXACT_AMBIG_DETECTION}\n");
-		grammarBuilder.append("	: expr expr {}\n");
+		grammarBuilder.append("	: expr expr {std::cout << \"alt 1\" << \"\\n\";}\n");
 		grammarBuilder.append("	| expr\n");
 		grammarBuilder.append("	;\n");
 		grammarBuilder.append("expr: '@'\n");
@@ -170,11 +170,11 @@ public class TestFullContextParsing extends BaseCppTest {
 	public void testExprAmbiguity_1() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(245);
+		StringBuilder grammarBuilder = new StringBuilder(301);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s\n");
 		grammarBuilder.append("@init {self._interp.predictionMode =  PredictionMode.LL_EXACT_AMBIG_DETECTION}\n");
-		grammarBuilder.append(":   expr[0] {};\n");
+		grammarBuilder.append(":   expr[0] {std::cout << $expr.ctx.toStringTree(recog=self) << \"\\n\";};\n");
 		grammarBuilder.append("	expr[int _p]\n");
 		grammarBuilder.append("		: ID \n");
 		grammarBuilder.append("		( \n");
@@ -203,11 +203,11 @@ public class TestFullContextParsing extends BaseCppTest {
 	public void testExprAmbiguity_2() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(245);
+		StringBuilder grammarBuilder = new StringBuilder(301);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s\n");
 		grammarBuilder.append("@init {self._interp.predictionMode =  PredictionMode.LL_EXACT_AMBIG_DETECTION}\n");
-		grammarBuilder.append(":   expr[0] {};\n");
+		grammarBuilder.append(":   expr[0] {std::cout << $expr.ctx.toStringTree(recog=self) << \"\\n\";};\n");
 		grammarBuilder.append("	expr[int _p]\n");
 		grammarBuilder.append("		: ID \n");
 		grammarBuilder.append("		( \n");
@@ -440,14 +440,14 @@ public class TestFullContextParsing extends BaseCppTest {
 	public void testLoopsSimulateTailRecursion() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(259);
+		StringBuilder grammarBuilder = new StringBuilder(329);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("prog\n");
 		grammarBuilder.append("@init {self._interp.predictionMode =  PredictionMode.LL_EXACT_AMBIG_DETECTION}\n");
 		grammarBuilder.append("	: expr_or_assign*;\n");
 		grammarBuilder.append("expr_or_assign\n");
-		grammarBuilder.append("	: expr '++' {}\n");
-		grammarBuilder.append("	|  expr {}\n");
+		grammarBuilder.append("	: expr '++' {std::cout << \"fail.\" << \"\\n\";}\n");
+		grammarBuilder.append("	|  expr {std::cout << \"pass: \"+$expr.text << \"\\n\";}\n");
 		grammarBuilder.append("	;\n");
 		grammarBuilder.append("expr: expr_primary ('<-' ID)?;\n");
 		grammarBuilder.append("expr_primary\n");

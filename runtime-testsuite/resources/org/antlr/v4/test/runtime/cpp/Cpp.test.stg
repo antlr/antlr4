@@ -157,15 +157,15 @@ string(text) ::= <<
 
 writeBoolean(o) ::= "<if(o && !isEmpty.(o))>true<else>false<endif>"
 
-writeln(s) ::= "cout << <s> << \"\\n\";"
+writeln(s) ::= "std::cout \<\< <s> \<\< \"\\n\";"
 
-write(s) ::= "cout << <s>;"
+write(s) ::= "std::cout \<\< <s>;"
 
-False() ::= "False"
+False() ::= "false"
 
 True() ::= "True"
 
-Not(v) ::= "not <v>"
+Not(v) ::= "!<v>"
 
 Assert(s) ::= ""
 
@@ -201,7 +201,7 @@ ModMemberNotEquals(n,m,v) ::= <%self.<n> % <m> != <v>%>
 
 DumpDFA() ::= "self.dumpDFA()"
 
-Pass() ::= "pass"
+Pass() ::= "/* do nothing */"
 
 StringList() ::= ""
 
@@ -303,7 +303,7 @@ else:
 
 class LeafListener(TListener):
     def visitTerminal(self, node):
-        cout << node.symbol.text;
+        std::cout \<\< node.symbol.text;
 
 >>
 
@@ -334,9 +334,9 @@ else:
 class LeafListener(TListener):
     def exitA(self, ctx):
         if (ctx.getChildCount()==2) {
-            cout << ctx.INT(0).symbol.text << ' ' << ctx.INT(1).symbol.text << ' ' << str_list(ctx.INT());
+            std::cout \<\< ctx.INT(0).symbol.text \<\< " " \<\< ctx.INT(1).symbol.text \<\< " " \<\< str_list(ctx.INT());
         } else {
-            cout << str(ctx.ID().symbol);
+            std::cout \<\< str(ctx.ID().symbol);
 	}
 
 >>
@@ -350,9 +350,9 @@ else:
 class LeafListener(TListener):
     def exitA(self, ctx):
         if (ctx.getChildCount()==2) {
-            cout << ctx.b(0).start.text + ' ' + ctx.b(1).start.text + ' ' + ctx.b()[0].start.text;
+            std::cout \<\< ctx.b(0).start.text \<\< " " \<\< ctx.b(1).start.text \<\< " " \<\< ctx.b()[0].start.text;
 	} else {
-            cout << ctx.b(0).start.text;
+            std::cout \<\< ctx.b(0).start.text;
 	}
 
 >>
@@ -367,9 +367,9 @@ else:
 class LeafListener(TListener):
     def exitE(self, ctx):
         if ctx.getChildCount()==3:
-            cout << ctx.e(0).start.text + ' ' + ctx.e(1).start.text + ' ' + ctx.e()[0].start.text;
+            std::cout \<\< ctx.e(0).start.text \<\< " " \<\< ctx.e(1).start.text \<\< " " \<\< ctx.e()[0].start.text;
         else:
-            cout << ctx.INT().symbol.text;
+            std::cout \<\< ctx.INT().symbol.text;
 
 >>
 
@@ -381,9 +381,9 @@ else:
 
 class LeafListener(TListener):
     def exitCall(self, ctx):
-        cout << ctx.e().start.text << ' ' << str(ctx.eList());
+        std::cout \<\< ctx.e().start.text \<\< " " \<\< str(ctx.eList());
     def exitInt(self, ctx):
-        cout << ctx.INT().symbol.text;
+        std::cout \<\< ctx.INT().symbol.text;
 
 >>
 
@@ -395,13 +395,13 @@ def foo():
 >>
 
 Declare_foo() ::= <<def foo(self):
-	cout << 'foo';
+	std::cout \<\< "foo";
 >>
 
 Invoke_foo() ::= "self.foo()"
 
 Declare_pred() ::= <<def pred(self, v):
-	cout << "eval=" << str(v).lower();
+	std::cout \<\< "eval=" \<\< str(v).lower();
 	return v
 
 >>

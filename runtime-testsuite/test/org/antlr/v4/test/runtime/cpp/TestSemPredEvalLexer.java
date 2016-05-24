@@ -15,7 +15,7 @@ public class TestSemPredEvalLexer extends BaseCppTest {
 
 		StringBuilder grammarBuilder = new StringBuilder(131);
 		grammarBuilder.append("lexer grammar L;\n");
-		grammarBuilder.append("E1 : 'enum' { False }? ;\n");
+		grammarBuilder.append("E1 : 'enum' { false }? ;\n");
 		grammarBuilder.append("E2 : 'enum' { True }? ;  // winner not E1 or ID\n");
 		grammarBuilder.append("ID : 'a'..'z'+ ;\n");
 		grammarBuilder.append("WS : (' '|'\\n') -> skip;");
@@ -69,7 +69,7 @@ public class TestSemPredEvalLexer extends BaseCppTest {
 
 		StringBuilder grammarBuilder = new StringBuilder(84);
 		grammarBuilder.append("lexer grammar L;\n");
-		grammarBuilder.append("ENUM : [a-z]+  { False }? ;\n");
+		grammarBuilder.append("ENUM : [a-z]+  { false }? ;\n");
 		grammarBuilder.append("ID : [a-z]+  ;\n");
 		grammarBuilder.append("WS : (' '|'\\n') -> skip;");
 		String grammar = grammarBuilder.toString();
@@ -93,7 +93,7 @@ public class TestSemPredEvalLexer extends BaseCppTest {
 
 		StringBuilder grammarBuilder = new StringBuilder(85);
 		grammarBuilder.append("lexer grammar L;\n");
-		grammarBuilder.append("ENUM : 'enum' { False }? ;\n");
+		grammarBuilder.append("ENUM : 'enum' { false }? ;\n");
 		grammarBuilder.append("ID : 'a'..'z'+ ;\n");
 		grammarBuilder.append("WS : (' '|'\\n') -> skip;");
 		String grammar = grammarBuilder.toString();
@@ -121,11 +121,11 @@ public class TestSemPredEvalLexer extends BaseCppTest {
 	public void testIndent() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(120);
+		StringBuilder grammarBuilder = new StringBuilder(150);
 		grammarBuilder.append("lexer grammar L;\n");
 		grammarBuilder.append("ID : [a-z]+  ;\n");
 		grammarBuilder.append("INDENT : [ \\t]+ { self._tokenStartColumn==0 }?\n");
-		grammarBuilder.append("         {  }  ;\n");
+		grammarBuilder.append("         { std::cout << \"INDENT\" << \"\\n\"; }  ;\n");
 		grammarBuilder.append("NL : '\\n';\n");
 		grammarBuilder.append("WS : [ \\t]+ ;");
 		String grammar = grammarBuilder.toString();
@@ -160,10 +160,10 @@ public class TestSemPredEvalLexer extends BaseCppTest {
 	public void testLexerInputPositionSensitivePredicates() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(174);
+		StringBuilder grammarBuilder = new StringBuilder(236);
 		grammarBuilder.append("lexer grammar L;\n");
-		grammarBuilder.append("WORD1 : ID1+ {  } ;\n");
-		grammarBuilder.append("WORD2 : ID2+ {  } ;\n");
+		grammarBuilder.append("WORD1 : ID1+ { std::cout << self.text << \"\\n\"; } ;\n");
+		grammarBuilder.append("WORD2 : ID2+ { std::cout << self.text << \"\\n\"; } ;\n");
 		grammarBuilder.append("fragment ID1 : { self.column < 2 }? [a-zA-Z];\n");
 		grammarBuilder.append("fragment ID2 : { self.column >= 2 }? [a-zA-Z];\n");
 		grammarBuilder.append("WS : (' '|'\\n') -> skip;");
@@ -192,10 +192,10 @@ public class TestSemPredEvalLexer extends BaseCppTest {
 	public void testPredicatedKeywords() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(104);
+		StringBuilder grammarBuilder = new StringBuilder(172);
 		grammarBuilder.append("lexer grammar L;\n");
-		grammarBuilder.append("ENUM : [a-z]+ { self.text==\"enum\" }? {  } ;\n");
-		grammarBuilder.append("ID   : [a-z]+ {  } ;\n");
+		grammarBuilder.append("ENUM : [a-z]+ { self.text==\"enum\" }? { std::cout << \"enum!\" << \"\\n\"; } ;\n");
+		grammarBuilder.append("ID   : [a-z]+ { std::cout << \"ID \" + self.text << \"\\n\"; } ;\n");
 		grammarBuilder.append("WS   : [ \\n] -> skip ;");
 		String grammar = grammarBuilder.toString();
 

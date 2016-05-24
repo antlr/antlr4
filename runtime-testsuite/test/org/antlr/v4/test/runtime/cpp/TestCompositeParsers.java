@@ -18,7 +18,7 @@ public class TestCompositeParsers extends BaseCppTest {
 
 		String slave_S =
 			"parser grammar S;\n" +
-			"a : '=' 'a' {cout \"S.a\";};";
+			"a : '=' 'a' {std::cout << \"S.a\";};";
 		writeFile(tmpdir, "S.g4", slave_S);
 
 		StringBuilder grammarBuilder = new StringBuilder(54);
@@ -45,7 +45,7 @@ public class TestCompositeParsers extends BaseCppTest {
 		String slave_S =
 			"parser grammar S;\n" +
 			"tokens { A, B, C }\n" +
-			"x : 'x' INT {};\n" +
+			"x : 'x' INT {std::cout << \"S.x\" << \"\\n\";};\n" +
 			"INT : '0'..'9'+ ;\n" +
 			"WS : (' '|'\\n') -> skip ;";
 		writeFile(tmpdir, "S.g4", slave_S);
@@ -78,13 +78,13 @@ public class TestCompositeParsers extends BaseCppTest {
 		String slave_S =
 			"parser grammar S;\n" +
 			"tokens { A, B, C }\n" +
-			"x : A {};";
+			"x : A {std::cout << \"S.x\" << \"\\n\";};";
 		writeFile(tmpdir, "S.g4", slave_S);
 
 		String slave_T =
 			"parser grammar T;\n" +
 			"tokens { C, B, A } // reverse order\n" +
-			"y : A {};";
+			"y : A {std::cout << \"T.y\" << \"\\n\";};";
 		writeFile(tmpdir, "T.g4", slave_T);
 
 		StringBuilder grammarBuilder = new StringBuilder(598);
@@ -137,6 +137,8 @@ public class TestCompositeParsers extends BaseCppTest {
 		String slave_S =
 			"parser grammar S;\n" +
 			"@parser::members {\n" +
+			"def foo(self):\n" +
+			"	std::cout << \"foo\";\n" +
 			"}\n" +
 			"a : B;";
 		writeFile(tmpdir, "S.g4", slave_S);
@@ -164,7 +166,7 @@ public class TestCompositeParsers extends BaseCppTest {
 
 		String slave_S =
 			"parser grammar S;\n" +
-			"a : B {};";
+			"a : B {std::cout << \"S.a\" << \"\\n\";};";
 		writeFile(tmpdir, "S.g4", slave_S);
 
 		StringBuilder grammarBuilder = new StringBuilder(104);
@@ -191,13 +193,13 @@ public class TestCompositeParsers extends BaseCppTest {
 
 		String slave_S =
 			"parser grammar S;\n" +
-			"a[int x] returns [int y] : B {cout \"S.a\";} {$y=1000;} ;";
+			"a[int x] returns [int y] : B {std::cout << \"S.a\";} {$y=1000;} ;";
 		writeFile(tmpdir, "S.g4", slave_S);
 
-		StringBuilder grammarBuilder = new StringBuilder(116);
+		StringBuilder grammarBuilder = new StringBuilder(146);
 		grammarBuilder.append("grammar M;\n");
 		grammarBuilder.append("import S;\n");
-		grammarBuilder.append("s : label=a[3] {} ;\n");
+		grammarBuilder.append("s : label=a[3] {std::cout << $label.y << \"\\n\";} ;\n");
 		grammarBuilder.append("B : 'b' ; // defines B from inherited token space\n");
 		grammarBuilder.append("WS : (' '|'\\n') -> skip ;");
 		String grammar = grammarBuilder.toString();
@@ -218,13 +220,13 @@ public class TestCompositeParsers extends BaseCppTest {
 
 		String slave_S =
 			"parser grammar S;\n" +
-			"a : B {cout \"S.a\";} ;";
+			"a : B {std::cout << \"S.a\";} ;";
 		writeFile(tmpdir, "S.g4", slave_S);
 
-		StringBuilder grammarBuilder = new StringBuilder(120);
+		StringBuilder grammarBuilder = new StringBuilder(128);
 		grammarBuilder.append("grammar M;\n");
 		grammarBuilder.append("import S;\n");
-		grammarBuilder.append("s : a {cout $a.text;} ;\n");
+		grammarBuilder.append("s : a {std::cout << $a.text;} ;\n");
 		grammarBuilder.append("B : 'b' ; // defines B from inherited token space\n");
 		grammarBuilder.append("WS : (' '|'\\n') -> skip ;");
 		String grammar = grammarBuilder.toString();
@@ -245,13 +247,13 @@ public class TestCompositeParsers extends BaseCppTest {
 
 		String slave_S =
 			"parser grammar S;\n" +
-			"a : b {};\n" +
+			"a : b {std::cout << \"S.a\" << \"\\n\";};\n" +
 			"b : B;";
 		writeFile(tmpdir, "S.g4", slave_S);
 
 		String slave_T =
 			"parser grammar T;\n" +
-			"a : B {};";
+			"a : B {std::cout << \"T.a\" << \"\\n\";};";
 		writeFile(tmpdir, "T.g4", slave_T);
 
 		StringBuilder grammarBuilder = new StringBuilder(106);
@@ -278,7 +280,7 @@ public class TestCompositeParsers extends BaseCppTest {
 
 		String slave_S =
 			"parser grammar S;\n" +
-			"a : b {cout \"S.a\";};\n" +
+			"a : b {std::cout << \"S.a\";};\n" +
 			"b : B ;";
 		writeFile(tmpdir, "S.g4", slave_S);
 
@@ -305,20 +307,20 @@ public class TestCompositeParsers extends BaseCppTest {
 
 		String slave_S =
 			"parser grammar S;\n" +
-			"a : b {};\n" +
+			"a : b {std::cout << \"S.a\" << \"\\n\";};\n" +
 			"b : 'b' ;";
 		writeFile(tmpdir, "S.g4", slave_S);
 
 		String slave_T =
 			"parser grammar T;\n" +
 			"tokens { A }\n" +
-			"b : 'b' {};";
+			"b : 'b' {std::cout << \"T.b\" << \"\\n\";};";
 		writeFile(tmpdir, "T.g4", slave_T);
 
-		StringBuilder grammarBuilder = new StringBuilder(69);
+		StringBuilder grammarBuilder = new StringBuilder(96);
 		grammarBuilder.append("grammar M;\n");
 		grammarBuilder.append("import S, T;\n");
-		grammarBuilder.append("b : 'b'|'c' {}|B|A;\n");
+		grammarBuilder.append("b : 'b'|'c' {std::cout << \"M.b\" << \"\\n\";}|B|A;\n");
 		grammarBuilder.append("WS : (' '|'\\n') -> skip ;");
 		String grammar = grammarBuilder.toString();
 
@@ -342,7 +344,7 @@ public class TestCompositeParsers extends BaseCppTest {
 			"parser grammar S;\n" +
 			"type_ : 'int' ;\n" +
 			"decl : type_ ID ';'\n" +
-			"	| type_ ID init ';' {cout \"JavaDecl: \" + $text;};\n" +
+			"	| type_ ID init ';' {std::cout << \"JavaDecl: \" + $text;};\n" +
 			"init : '=' INT;";
 		writeFile(tmpdir, "S.g4", slave_S);
 
@@ -463,11 +465,11 @@ public class TestCompositeParsers extends BaseCppTest {
 			"ID : 'a'..'z'+;";
 		writeFile(tmpdir, "S.g4", slave_S);
 
-		StringBuilder grammarBuilder = new StringBuilder(70);
+		StringBuilder grammarBuilder = new StringBuilder(136);
 		grammarBuilder.append("grammar M;\n");
 		grammarBuilder.append("import S;\n");
-		grammarBuilder.append("a : A {};\n");
-		grammarBuilder.append("A : 'abc' {};\n");
+		grammarBuilder.append("a : A {std::cout << \"M.a: \" + str($A) << \"\\n\";};\n");
+		grammarBuilder.append("A : 'abc' {std::cout << \"M.A\" << \"\\n\";};\n");
 		grammarBuilder.append("WS : (' '|'\\n') -> skip ;");
 		String grammar = grammarBuilder.toString();
 
