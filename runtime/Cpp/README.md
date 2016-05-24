@@ -44,9 +44,11 @@ Simply open the VS solution (VS 2013+) and build it.
 Either open the included XCode project and build that or use the cmake compilation as described for linux.
 
 #### Compiling on Linux
-- cd <antlr4-dir>/runtime/Cpp
+- cd <antlr4-dir>/runtime/Cpp (this is where this readme is located)
 - mkdir build && mkdir run && cd build
 - cmake ..-DANTLR_JAR_LOCATION=full/path/to/antlr4-4.5.4-SNAPSHOT.jar -DWITH_DEMO=True
 - make
 - DESTDIR=<antlr4-dir>/runtime/Cpp/run make install
+
+If you don't want to build the demo then simply run cmake without parameters.
 
