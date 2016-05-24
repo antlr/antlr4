@@ -543,7 +543,9 @@ public abstract class BaseCppTest {
 	public String execModule(String fileName) {
 		String compilerPath = locateCompiler();
 		String runtimePath = locateRuntime();
+		String binPath = new File(new File(tmpdir), "a.out").getAbsolutePath();
 		String inputPath = new File(new File(tmpdir), "input").getAbsolutePath();
+		// First compile the test code.
 		try {
 			ArrayList<String> args = new ArrayList<String>();
 			args.add(compilerPath);
@@ -564,6 +566,34 @@ public abstract class BaseCppTest {
 			int errcode = process.waitFor();
 			stdoutVacuum.join();
 			stderrVacuum.join();
+			if ( stderrVacuum.toString().length()>0 ) {
+				this.stderrDuringParse = stderrVacuum.toString();
+				System.err.println("compile stderrVacuum: "+ stderrVacuum);
+			}
+			if (errcode != 0) {
+				this.stderrDuringParse = "execution failed with error code: " + errcode;
+				System.err.println("compile exited with error code: " + errcode);
+				return null;
+			}
+		}
+		catch (Exception e) {
+			System.err.println("can't compile module: " + fileName);
+			e.printStackTrace(System.err);
+			return null;
+		}
+
+		// Now run the newly minted binary.
+		try {
+			ProcessBuilder builder = new ProcessBuilder(binPath, inputPath);
+			builder.directory(new File(tmpdir));
+			Process process = builder.start();
+			StreamVacuum stdoutVacuum = new StreamVacuum(process.getInputStream());
+			StreamVacuum stderrVacuum = new StreamVacuum(process.getErrorStream());
+			stdoutVacuum.start();
+			stderrVacuum.start();
+			int errcode = process.waitFor();
+			stdoutVacuum.join();
+			stderrVacuum.join();
 			String output = stdoutVacuum.toString();
 			if ( stderrVacuum.toString().length()>0 ) {
 				this.stderrDuringParse = stderrVacuum.toString();
@@ -573,8 +603,6 @@ public abstract class BaseCppTest {
 				this.stderrDuringParse = "execution failed with error code: " + errcode;
 				System.err.println("exec exited with error code: " + errcode);
 			}
-			// TODO(dsisson): Implement link.
-			// TODO(dsisson): Implement run passing in inputPath.
 			return output;
 		}
 		catch (Exception e) {
