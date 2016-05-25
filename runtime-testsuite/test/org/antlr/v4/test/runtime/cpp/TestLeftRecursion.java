@@ -1758,8 +1758,8 @@ public class TestLeftRecursion extends BaseCppTest {
 		StringBuilder grammarBuilder = new StringBuilder(254);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s @after {std::cout << $ctx.toStringTree(recog=self) << \"\\n\";} : e ;\n");
-		grammarBuilder.append("e : a=e op=('*'|'/') b=e  {}{True}?\n");
-		grammarBuilder.append("  | a=e op=('+'|'-') b=e  {}<p=3>{True}?<fail='Message'>\n");
+		grammarBuilder.append("e : a=e op=('*'|'/') b=e  {}{true}?\n");
+		grammarBuilder.append("  | a=e op=('+'|'-') b=e  {}<p=3>{true}?<fail='Message'>\n");
 		grammarBuilder.append("  | INT {}{}\n");
 		grammarBuilder.append("  | '(' x=e ')' {}{}\n");
 		grammarBuilder.append("  ;\n");
@@ -1784,8 +1784,8 @@ public class TestLeftRecursion extends BaseCppTest {
 		StringBuilder grammarBuilder = new StringBuilder(254);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s @after {std::cout << $ctx.toStringTree(recog=self) << \"\\n\";} : e ;\n");
-		grammarBuilder.append("e : a=e op=('*'|'/') b=e  {}{True}?\n");
-		grammarBuilder.append("  | a=e op=('+'|'-') b=e  {}<p=3>{True}?<fail='Message'>\n");
+		grammarBuilder.append("e : a=e op=('*'|'/') b=e  {}{true}?\n");
+		grammarBuilder.append("  | a=e op=('+'|'-') b=e  {}<p=3>{true}?<fail='Message'>\n");
 		grammarBuilder.append("  | INT {}{}\n");
 		grammarBuilder.append("  | '(' x=e ')' {}{}\n");
 		grammarBuilder.append("  ;\n");
@@ -1810,8 +1810,8 @@ public class TestLeftRecursion extends BaseCppTest {
 		StringBuilder grammarBuilder = new StringBuilder(254);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s @after {std::cout << $ctx.toStringTree(recog=self) << \"\\n\";} : e ;\n");
-		grammarBuilder.append("e : a=e op=('*'|'/') b=e  {}{True}?\n");
-		grammarBuilder.append("  | a=e op=('+'|'-') b=e  {}<p=3>{True}?<fail='Message'>\n");
+		grammarBuilder.append("e : a=e op=('*'|'/') b=e  {}{true}?\n");
+		grammarBuilder.append("  | a=e op=('+'|'-') b=e  {}<p=3>{true}?<fail='Message'>\n");
 		grammarBuilder.append("  | INT {}{}\n");
 		grammarBuilder.append("  | '(' x=e ')' {}{}\n");
 		grammarBuilder.append("  ;\n");
@@ -2669,7 +2669,7 @@ public class TestLeftRecursion extends BaseCppTest {
 		StringBuilder grammarBuilder = new StringBuilder(150);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s @after {std::cout << $ctx.toStringTree(recog=self) << \"\\n\";} : a ;\n");
-		grammarBuilder.append("a : a {True}? ID\n");
+		grammarBuilder.append("a : a {true}? ID\n");
 		grammarBuilder.append("  | ID\n");
 		grammarBuilder.append("  ;\n");
 		grammarBuilder.append("ID : 'a'..'z'+ ;\n");

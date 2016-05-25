@@ -13,13 +13,13 @@ public class TestLexerExec extends BaseCppTest {
 	public void testActionPlacement() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(303);
+		StringBuilder grammarBuilder = new StringBuilder(278);
 		grammarBuilder.append("lexer grammar L;\n");
-		grammarBuilder.append("I : ({std::cout << \"stuff fail: \" + self.text << \"\\n\";} 'a'\n");
-		grammarBuilder.append("| {std::cout << \"stuff0: \" + self.text << \"\\n\";}\n");
-		grammarBuilder.append("		'a' {std::cout << \"stuff1: \" + self.text << \"\\n\";}\n");
-		grammarBuilder.append("		'b' {std::cout << \"stuff2: \" + self.text << \"\\n\";})\n");
-		grammarBuilder.append("		{std::cout << self.text << \"\\n\";} ;\n");
+		grammarBuilder.append("I : ({std::cout << \"stuff fail: \" + text << \"\\n\";} 'a'\n");
+		grammarBuilder.append("| {std::cout << \"stuff0: \" + text << \"\\n\";}\n");
+		grammarBuilder.append("		'a' {std::cout << \"stuff1: \" + text << \"\\n\";}\n");
+		grammarBuilder.append("		'b' {std::cout << \"stuff2: \" + text << \"\\n\";})\n");
+		grammarBuilder.append("		{std::cout << text << \"\\n\";} ;\n");
 		grammarBuilder.append("WS : (' '|'\\n') -> skip ;\n");
 		grammarBuilder.append("J : .;");
 		String grammar = grammarBuilder.toString();
@@ -377,9 +377,9 @@ public class TestLexerExec extends BaseCppTest {
 	public void testGreedyConfigs() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(102);
+		StringBuilder grammarBuilder = new StringBuilder(97);
 		grammarBuilder.append("lexer grammar L;\n");
-		grammarBuilder.append("I : ('a' | 'ab') {std::cout << self.text << \"\\n\";} ;\n");
+		grammarBuilder.append("I : ('a' | 'ab') {std::cout << text << \"\\n\";} ;\n");
 		grammarBuilder.append("WS : (' '|'\\n') -> skip ;\n");
 		grammarBuilder.append("J : .;");
 		String grammar = grammarBuilder.toString();
@@ -4549,11 +4549,11 @@ public class TestLexerExec extends BaseCppTest {
 	public void testNonGreedyConfigs() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(140);
+		StringBuilder grammarBuilder = new StringBuilder(130);
 		grammarBuilder.append("lexer grammar L;\n");
-		grammarBuilder.append("I : .*? ('a' | 'ab') {std::cout << self.text << \"\\n\";} ;\n");
+		grammarBuilder.append("I : .*? ('a' | 'ab') {std::cout << text << \"\\n\";} ;\n");
 		grammarBuilder.append("WS : (' '|'\\n') -> skip ;\n");
-		grammarBuilder.append("J : . {std::cout << self.text << \"\\n\";};");
+		grammarBuilder.append("J : . {std::cout << text << \"\\n\";};");
 		String grammar = grammarBuilder.toString();
 
 		String input ="ab";
@@ -4683,51 +4683,51 @@ public class TestLexerExec extends BaseCppTest {
 	public void testPositionAdjustingLexer() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(1839);
+		StringBuilder grammarBuilder = new StringBuilder(1724);
 		grammarBuilder.append("lexer grammar PositionAdjustingLexer;\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("@members {\n");
 		grammarBuilder.append("def resetAcceptPosition(self, index, line, column):\n");
-		grammarBuilder.append("	self._input.seek(index)\n");
-		grammarBuilder.append("	self.line = line\n");
-		grammarBuilder.append("	self.column = column\n");
-		grammarBuilder.append("	self._interp.consume(self._input)\n");
+		grammarBuilder.append("	_input->seek(index)\n");
+		grammarBuilder.append("	this->line = line\n");
+		grammarBuilder.append("	this->column = column\n");
+		grammarBuilder.append("	_interp.consume(_input)\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("def nextToken(self):\n");
-		grammarBuilder.append("	if self._interp.__dict__.get(\"resetAcceptPosition\", None) is None:\n");
-		grammarBuilder.append("		self._interp.__dict__[\"resetAcceptPosition\"] = self.resetAcceptPosition\n");
+		grammarBuilder.append("	if _interp.__dict__.get(\"resetAcceptPosition\", None) is None:\n");
+		grammarBuilder.append("		_interp.__dict__[\"resetAcceptPosition\"] = resetAcceptPosition\n");
 		grammarBuilder.append("	return super(type(self),self).nextToken()\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("def emit(self):\n");
-		grammarBuilder.append("	if self._type==PositionAdjustingLexer.TOKENS:\n");
-		grammarBuilder.append("		self.handleAcceptPositionForKeyword(\"tokens\")\n");
-		grammarBuilder.append("	elif self._type==PositionAdjustingLexer.LABEL:\n");
-		grammarBuilder.append("		self.handleAcceptPositionForIdentifier()\n");
+		grammarBuilder.append("	if _type==PositionAdjustingLexer.TOKENS:\n");
+		grammarBuilder.append("		handleAcceptPositionForKeyword(\"tokens\")\n");
+		grammarBuilder.append("	elif _type==PositionAdjustingLexer.LABEL:\n");
+		grammarBuilder.append("		handleAcceptPositionForIdentifier()\n");
 		grammarBuilder.append("	return super(type(self),self).emit()\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("def handleAcceptPositionForIdentifier(self):\n");
-		grammarBuilder.append("	tokenText = self.text\n");
+		grammarBuilder.append("	tokenText = text\n");
 		grammarBuilder.append("	identifierLength = 0\n");
-		grammarBuilder.append("	while identifierLength < len(tokenText) and self.isIdentifierChar(tokenText[identifierLength]):\n");
+		grammarBuilder.append("	while identifierLength < len(tokenText) and isIdentifierChar(tokenText[identifierLength]):\n");
 		grammarBuilder.append("		identifierLength += 1\n");
 		grammarBuilder.append("\n");
-		grammarBuilder.append("	if self._input.index > self._tokenStartCharIndex + identifierLength:\n");
+		grammarBuilder.append("	if _input->index > _tokenStartCharIndex + identifierLength:\n");
 		grammarBuilder.append("		offset = identifierLength - 1\n");
-		grammarBuilder.append("		self._interp.resetAcceptPosition(self._tokenStartCharIndex + offset,\n");
-		grammarBuilder.append("				self._tokenStartLine, self._tokenStartColumn + offset)\n");
-		grammarBuilder.append("		return True\n");
+		grammarBuilder.append("		_interp.resetAcceptPosition(_tokenStartCharIndex + offset,\n");
+		grammarBuilder.append("				_tokenStartLine, _tokenStartColumn + offset)\n");
+		grammarBuilder.append("		return true\n");
 		grammarBuilder.append("	else:\n");
-		grammarBuilder.append("		return False\n");
+		grammarBuilder.append("		return false\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("def handleAcceptPositionForKeyword(self, keyword):\n");
-		grammarBuilder.append("	if self._input.index > self._tokenStartCharIndex + len(keyword):\n");
+		grammarBuilder.append("	if _input->index > _tokenStartCharIndex + len(keyword):\n");
 		grammarBuilder.append("		offset = len(keyword) - 1\n");
-		grammarBuilder.append("		self._interp.resetAcceptPosition(self._tokenStartCharIndex + offset,\n");
-		grammarBuilder.append("			self._tokenStartLine, self._tokenStartColumn + offset)\n");
-		grammarBuilder.append("		return True\n");
+		grammarBuilder.append("		_interp.resetAcceptPosition(_tokenStartCharIndex + offset,\n");
+		grammarBuilder.append("			_tokenStartLine, _tokenStartColumn + offset)\n");
+		grammarBuilder.append("		return true\n");
 		grammarBuilder.append("	else:\n");
-		grammarBuilder.append("		return False\n");
+		grammarBuilder.append("		return false\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("@staticmethod\n");
 		grammarBuilder.append("def isIdentifierChar(c):\n");

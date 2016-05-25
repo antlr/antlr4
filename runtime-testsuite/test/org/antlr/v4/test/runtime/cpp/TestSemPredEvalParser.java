@@ -13,9 +13,9 @@ public class TestSemPredEvalParser extends BaseCppTest {
 	public void test2UnpredicatedAlts() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(321);
+		StringBuilder grammarBuilder = new StringBuilder(316);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s : {self._interp.predictionMode =  PredictionMode.LL_EXACT_AMBIG_DETECTION} a ';' a; // do 2x: once in ATN, next in DFA\n");
+		grammarBuilder.append("s : {_interp.predictionMode =  PredictionMode.LL_EXACT_AMBIG_DETECTION} a ';' a; // do 2x: once in ATN, next in DFA\n");
 		grammarBuilder.append("a : ID {std::cout << \"alt 1\" << \"\\n\";}\n");
 		grammarBuilder.append("  | ID {std::cout << \"alt 2\" << \"\\n\";}\n");
 		grammarBuilder.append("  | {false}? ID {std::cout << \"alt 3\" << \"\\n\";}\n");
@@ -46,9 +46,9 @@ public class TestSemPredEvalParser extends BaseCppTest {
 	public void test2UnpredicatedAltsAndOneOrthogonalAlt() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(381);
+		StringBuilder grammarBuilder = new StringBuilder(376);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s : {self._interp.predictionMode =  PredictionMode.LL_EXACT_AMBIG_DETECTION} a ';' a ';' a;\n");
+		grammarBuilder.append("s : {_interp.predictionMode =  PredictionMode.LL_EXACT_AMBIG_DETECTION} a ';' a ';' a;\n");
 		grammarBuilder.append("a : INT {std::cout << \"alt 1\" << \"\\n\";}\n");
 		grammarBuilder.append("  | ID {std::cout << \"alt 2\" << \"\\n\";} // must pick this one for ID since pred is false\n");
 		grammarBuilder.append("  | ID {std::cout << \"alt 3\" << \"\\n\";}\n");
@@ -81,12 +81,12 @@ public class TestSemPredEvalParser extends BaseCppTest {
 	public void testActionHidesPreds() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(234);
+		StringBuilder grammarBuilder = new StringBuilder(214);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("@members {i = 0}\n");
 		grammarBuilder.append("s : a+ ;\n");
-		grammarBuilder.append("a : {self.i = 1} ID {self.i == 1}? {std::cout << \"alt 1\" << \"\\n\";}\n");
-		grammarBuilder.append("  | {self.i = 2} ID {self.i == 2}? {std::cout << \"alt 2\" << \"\\n\";}\n");
+		grammarBuilder.append("a : {i = 1} ID {i == 1}? {std::cout << \"alt 1\" << \"\\n\";}\n");
+		grammarBuilder.append("  | {i = 2} ID {i == 2}? {std::cout << \"alt 2\" << \"\\n\";}\n");
 		grammarBuilder.append("  ;\n");
 		grammarBuilder.append("ID : 'a'..'z'+ ;\n");
 		grammarBuilder.append("INT : '0'..'9'+;\n");
@@ -110,7 +110,7 @@ public class TestSemPredEvalParser extends BaseCppTest {
 	public void testActionsHidePredsInGlobalFOLLOW() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(292);
+		StringBuilder grammarBuilder = new StringBuilder(282);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("@members {\n");
 		grammarBuilder.append("def pred(self, v):\n");
@@ -118,8 +118,8 @@ public class TestSemPredEvalParser extends BaseCppTest {
 		grammarBuilder.append("	return v\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("}\n");
-		grammarBuilder.append("s : e {} {self.pred(True)}? {std::cout << \"parse\" << \"\\n\";} '!' ;\n");
-		grammarBuilder.append("t : e {} {self.pred(false)}? ID ;\n");
+		grammarBuilder.append("s : e {} {pred(true)}? {std::cout << \"parse\" << \"\\n\";} '!' ;\n");
+		grammarBuilder.append("t : e {} {pred(false)}? ID ;\n");
 		grammarBuilder.append("e : ID | ; // non-LL(1) so we use ATN\n");
 		grammarBuilder.append("ID : 'a'..'z'+ ;\n");
 		grammarBuilder.append("INT : '0'..'9'+;\n");
@@ -164,7 +164,7 @@ public class TestSemPredEvalParser extends BaseCppTest {
 	public void testDepedentPredsInGlobalFOLLOW() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(315);
+		StringBuilder grammarBuilder = new StringBuilder(305);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("@members {\n");
 		grammarBuilder.append("def pred(self, v):\n");
@@ -173,8 +173,8 @@ public class TestSemPredEvalParser extends BaseCppTest {
 		grammarBuilder.append("\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("s : a[99] ;\n");
-		grammarBuilder.append("a[int i] : e {self.pred($i==99)}? {std::cout << \"parse\" << \"\\n\";} '!' ;\n");
-		grammarBuilder.append("b[int i] : e {self.pred($i==99)}? ID ;\n");
+		grammarBuilder.append("a[int i] : e {pred($i==99)}? {std::cout << \"parse\" << \"\\n\";} '!' ;\n");
+		grammarBuilder.append("b[int i] : e {pred($i==99)}? ID ;\n");
 		grammarBuilder.append("e : ID | ; // non-LL(1) so we use ATN\n");
 		grammarBuilder.append("ID : 'a'..'z'+ ;\n");
 		grammarBuilder.append("INT : '0'..'9'+;\n");
@@ -252,7 +252,7 @@ public class TestSemPredEvalParser extends BaseCppTest {
 		grammarBuilder.append("b : a ;\n");
 		grammarBuilder.append("a\n");
 		grammarBuilder.append("  : {false}? ID {std::cout << \"alt 1\" << \"\\n\";}\n");
-		grammarBuilder.append("  | {True}? ID {std::cout << \"alt 2\" << \"\\n\";}\n");
+		grammarBuilder.append("  | {true}? ID {std::cout << \"alt 2\" << \"\\n\";}\n");
 		grammarBuilder.append(" ;\n");
 		grammarBuilder.append("ID : 'a'..'z'+ ;\n");
 		grammarBuilder.append("INT : '0'..'9'+;\n");
@@ -305,7 +305,7 @@ public class TestSemPredEvalParser extends BaseCppTest {
 		grammarBuilder.append("// action blocks lookahead from falling off of 'a'\n");
 		grammarBuilder.append("// and looking into 2nd 'a' ref. !ctx dependent pred\n");
 		grammarBuilder.append("a : ID {std::cout << \"alt 1\" << \"\\n\";}\n");
-		grammarBuilder.append("  | {True}?  ID {std::cout << \"alt 2\" << \"\\n\";}\n");
+		grammarBuilder.append("  | {true}?  ID {std::cout << \"alt 2\" << \"\\n\";}\n");
 		grammarBuilder.append("  ;\n");
 		grammarBuilder.append("ID : 'a'..'z'+ ;\n");
 		grammarBuilder.append("INT : '0'..'9'+;\n");
@@ -328,13 +328,13 @@ public class TestSemPredEvalParser extends BaseCppTest {
 	public void testPredFromAltTestedInLoopBack_1() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(218);
+		StringBuilder grammarBuilder = new StringBuilder(214);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("file_\n");
 		grammarBuilder.append("@after {std::cout << $ctx.toStringTree(recog=self) << \"\\n\";}\n");
 		grammarBuilder.append("  : para para EOF ;\n");
 		grammarBuilder.append("para: paraContent NL NL ;\n");
-		grammarBuilder.append("paraContent : ('s'|'x'|{self._input.LA(2)!=TParser.NL}? NL)+ ;\n");
+		grammarBuilder.append("paraContent : ('s'|'x'|{_input->LA(2)!=TParser.NL}? NL)+ ;\n");
 		grammarBuilder.append("NL : '\\n' ;\n");
 		grammarBuilder.append("s : 's' ;\n");
 		grammarBuilder.append("X : 'x' ;");
@@ -361,13 +361,13 @@ public class TestSemPredEvalParser extends BaseCppTest {
 	public void testPredFromAltTestedInLoopBack_2() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(218);
+		StringBuilder grammarBuilder = new StringBuilder(214);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("file_\n");
 		grammarBuilder.append("@after {std::cout << $ctx.toStringTree(recog=self) << \"\\n\";}\n");
 		grammarBuilder.append("  : para para EOF ;\n");
 		grammarBuilder.append("para: paraContent NL NL ;\n");
-		grammarBuilder.append("paraContent : ('s'|'x'|{self._input.LA(2)!=TParser.NL}? NL)+ ;\n");
+		grammarBuilder.append("paraContent : ('s'|'x'|{_input->LA(2)!=TParser.NL}? NL)+ ;\n");
 		grammarBuilder.append("NL : '\\n' ;\n");
 		grammarBuilder.append("s : 's' ;\n");
 		grammarBuilder.append("X : 'x' ;");
@@ -392,12 +392,12 @@ public class TestSemPredEvalParser extends BaseCppTest {
 	public void testPredTestedEvenWhenUnAmbig_1() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(211);
+		StringBuilder grammarBuilder = new StringBuilder(206);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("@members {enumKeyword = True}\n");
+		grammarBuilder.append("@members {enumKeyword = true}\n");
 		grammarBuilder.append("primary\n");
 		grammarBuilder.append("    :   ID {std::cout << \"ID \"+$ID.text << \"\\n\";}\n");
-		grammarBuilder.append("    |   {!self.enumKeyword}? 'enum' {std::cout << \"enum\" << \"\\n\";}\n");
+		grammarBuilder.append("    |   {!enumKeyword}? 'enum' {std::cout << \"enum\" << \"\\n\";}\n");
 		grammarBuilder.append("    ;\n");
 		grammarBuilder.append("ID : [a-z]+ ;\n");
 		grammarBuilder.append("WS : [ \\t\\n\\r]+ -> skip ;");
@@ -417,12 +417,12 @@ public class TestSemPredEvalParser extends BaseCppTest {
 	public void testPredTestedEvenWhenUnAmbig_2() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(211);
+		StringBuilder grammarBuilder = new StringBuilder(206);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("@members {enumKeyword = True}\n");
+		grammarBuilder.append("@members {enumKeyword = true}\n");
 		grammarBuilder.append("primary\n");
 		grammarBuilder.append("    :   ID {std::cout << \"ID \"+$ID.text << \"\\n\";}\n");
-		grammarBuilder.append("    |   {!self.enumKeyword}? 'enum' {std::cout << \"enum\" << \"\\n\";}\n");
+		grammarBuilder.append("    |   {!enumKeyword}? 'enum' {std::cout << \"enum\" << \"\\n\";}\n");
 		grammarBuilder.append("    ;\n");
 		grammarBuilder.append("ID : [a-z]+ ;\n");
 		grammarBuilder.append("WS : [ \\t\\n\\r]+ -> skip ;");
@@ -499,7 +499,7 @@ public class TestSemPredEvalParser extends BaseCppTest {
 	public void testPredsInGlobalFOLLOW() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(286);
+		StringBuilder grammarBuilder = new StringBuilder(276);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("@members {\n");
 		grammarBuilder.append("def pred(self, v):\n");
@@ -507,8 +507,8 @@ public class TestSemPredEvalParser extends BaseCppTest {
 		grammarBuilder.append("	return v\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("}\n");
-		grammarBuilder.append("s : e {self.pred(True)}? {std::cout << \"parse\" << \"\\n\";} '!' ;\n");
-		grammarBuilder.append("t : e {self.pred(false)}? ID ;\n");
+		grammarBuilder.append("s : e {pred(true)}? {std::cout << \"parse\" << \"\\n\";} '!' ;\n");
+		grammarBuilder.append("t : e {pred(false)}? ID ;\n");
 		grammarBuilder.append("e : ID | ; // non-LL(1) so we use ATN\n");
 		grammarBuilder.append("ID : 'a'..'z'+ ;\n");
 		grammarBuilder.append("INT : '0'..'9'+;\n");
@@ -531,11 +531,11 @@ public class TestSemPredEvalParser extends BaseCppTest {
 	public void testRewindBeforePredEval() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(231);
+		StringBuilder grammarBuilder = new StringBuilder(223);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s : a a;\n");
-		grammarBuilder.append("a : {self._input.LT(1).text==\"x\"}? ID INT {std::cout << \"alt 1\" << \"\\n\";}\n");
-		grammarBuilder.append("  | {self._input.LT(1).text==\"y\"}? ID INT {std::cout << \"alt 2\" << \"\\n\";}\n");
+		grammarBuilder.append("a : {_input->LT(1).text==\"x\"}? ID INT {std::cout << \"alt 1\" << \"\\n\";}\n");
+		grammarBuilder.append("  | {_input->LT(1).text==\"y\"}? ID INT {std::cout << \"alt 2\" << \"\\n\";}\n");
 		grammarBuilder.append("  ;\n");
 		grammarBuilder.append("ID : 'a'..'z'+ ;\n");
 		grammarBuilder.append("INT : '0'..'9'+;\n");
@@ -562,7 +562,7 @@ public class TestSemPredEvalParser extends BaseCppTest {
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s : a a a; // do 3x: once in ATN, next in DFA then INT in ATN\n");
 		grammarBuilder.append("a : {false}? ID {std::cout << \"alt 1\" << \"\\n\";}\n");
-		grammarBuilder.append("  | {True}?  ID {std::cout << \"alt 2\" << \"\\n\";}\n");
+		grammarBuilder.append("  | {true}?  ID {std::cout << \"alt 2\" << \"\\n\";}\n");
 		grammarBuilder.append("  | INT         {std::cout << \"alt 3\" << \"\\n\";}\n");
 		grammarBuilder.append("  ;\n");
 		grammarBuilder.append("ID : 'a'..'z'+ ;\n");
@@ -591,7 +591,7 @@ public class TestSemPredEvalParser extends BaseCppTest {
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s : a ;\n");
 		grammarBuilder.append("a : {false}? ID  {std::cout << \"alt 1\" << \"\\n\";}\n");
-		grammarBuilder.append("  | {True}?  INT {std::cout << \"alt 2\" << \"\\n\";}\n");
+		grammarBuilder.append("  | {true}?  INT {std::cout << \"alt 2\" << \"\\n\";}\n");
 		grammarBuilder.append("  ;\n");
 		grammarBuilder.append("ID : 'a'..'z'+ ;\n");
 		grammarBuilder.append("INT : '0'..'9'+;\n");
@@ -617,7 +617,7 @@ public class TestSemPredEvalParser extends BaseCppTest {
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s : a a a;\n");
 		grammarBuilder.append("a : {false}? ID  {std::cout << \"alt 1\" << \"\\n\";}\n");
-		grammarBuilder.append("  | {True}?  INT {std::cout << \"alt 2\" << \"\\n\";}\n");
+		grammarBuilder.append("  | {true}?  INT {std::cout << \"alt 2\" << \"\\n\";}\n");
 		grammarBuilder.append("  ;\n");
 		grammarBuilder.append("ID : 'a'..'z'+ ;\n");
 		grammarBuilder.append("INT : '0'..'9'+;\n");
@@ -645,7 +645,7 @@ public class TestSemPredEvalParser extends BaseCppTest {
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("	s : a+ ;\n");
 		grammarBuilder.append("a : {false}? ID {std::cout << \"alt 1\" << \"\\n\";}\n");
-		grammarBuilder.append("  | {True}?  ID {std::cout << \"alt 2\" << \"\\n\";}\n");
+		grammarBuilder.append("  | {true}?  ID {std::cout << \"alt 2\" << \"\\n\";}\n");
 		grammarBuilder.append("  ;\n");
 		grammarBuilder.append("ID : 'a'..'z'+ ;\n");
 		grammarBuilder.append("INT : '0'..'9'+;\n");
@@ -669,13 +669,13 @@ public class TestSemPredEvalParser extends BaseCppTest {
 	public void testToLeftWithVaryingPredicate() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(273);
+		StringBuilder grammarBuilder = new StringBuilder(259);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("@members {i = 0}\n");
-		grammarBuilder.append("s : ({self.i += 1\n");
-		grammarBuilder.append("std::cout << \"i=\" + str(self.i) << \"\\n\";} a)+ ;\n");
-		grammarBuilder.append("a : {self.i % 2 == 0}? ID {std::cout << \"alt 1\" << \"\\n\";}\n");
-		grammarBuilder.append("  | {self.i % 2 != 0}? ID {std::cout << \"alt 2\" << \"\\n\";}\n");
+		grammarBuilder.append("s : ({i += 1\n");
+		grammarBuilder.append("std::cout << \"i=\" + i.toString() << \"\\n\";} a)+ ;\n");
+		grammarBuilder.append("a : {i % 2 == 0}? ID {std::cout << \"alt 1\" << \"\\n\";}\n");
+		grammarBuilder.append("  | {i % 2 != 0}? ID {std::cout << \"alt 2\" << \"\\n\";}\n");
 		grammarBuilder.append("  ;\n");
 		grammarBuilder.append("ID : 'a'..'z'+ ;\n");
 		grammarBuilder.append("INT : '0'..'9'+;\n");
@@ -738,7 +738,7 @@ public class TestSemPredEvalParser extends BaseCppTest {
 		grammarBuilder.append("// 2nd 'a' reference. We our testing that the DFA also\n");
 		grammarBuilder.append("// throws an exception if the validating predicate fails\n");
 		grammarBuilder.append("a : {false}? ID  {std::cout << \"alt 1\" << \"\\n\";}\n");
-		grammarBuilder.append("  | {True}?  INT {std::cout << \"alt 2\" << \"\\n\";}\n");
+		grammarBuilder.append("  | {true}?  INT {std::cout << \"alt 2\" << \"\\n\";}\n");
 		grammarBuilder.append("  ;\n");
 		grammarBuilder.append("ID : 'a'..'z'+ ;\n");
 		grammarBuilder.append("INT : '0'..'9'+;\n");

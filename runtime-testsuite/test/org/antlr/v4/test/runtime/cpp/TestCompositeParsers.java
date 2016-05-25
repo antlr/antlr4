@@ -143,10 +143,10 @@ public class TestCompositeParsers extends BaseCppTest {
 			"a : B;";
 		writeFile(tmpdir, "S.g4", slave_S);
 
-		StringBuilder grammarBuilder = new StringBuilder(126);
+		StringBuilder grammarBuilder = new StringBuilder(121);
 		grammarBuilder.append("grammar M; // uses no rules from the import\n");
 		grammarBuilder.append("import S;\n");
-		grammarBuilder.append("s : 'b' {self.foo()} ; // gS is import pointer\n");
+		grammarBuilder.append("s : 'b' {foo()} ; // gS is import pointer\n");
 		grammarBuilder.append("WS : (' '|'\\n') -> skip ;");
 		String grammar = grammarBuilder.toString();
 

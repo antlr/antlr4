@@ -32,7 +32,7 @@ public void test<test.name>() throws Exception {
 	mkdir(tmpdir);
 
 <test.SlaveGrammars:{grammar |
-	String slave_<grammar> =<writeStringLiteral(test.SlaveGrammars.(grammar))>;
+	String slave_<grammar> = <writeStringLiteral(test.SlaveGrammars.(grammar))>;
 	writeFile(tmpdir, "<grammar>.g4", slave_<grammar>);
 	}; separator="\n">
 <test.Grammar:{grammar |
@@ -163,7 +163,7 @@ write(s) ::= "std::cout \<\< <s>;"
 
 False() ::= "false"
 
-True() ::= "True"
+True() ::= "true"
 
 Not(v) ::= "!<v>"
 
@@ -185,62 +185,63 @@ InitIntMember(n,v) ::= <%<n> = <v>%>
 
 InitBooleanMember(n,v) ::= <%<n> = <v>%>
 
-GetMember(n) ::= <%self.<n>%>
+GetMember(n) ::= <%<n>%>
 
-SetMember(n,v) ::= <%self.<n> = <v>%>
+SetMember(n,v) ::= <%<n> = <v>%>
 
-AddMember(n,v) ::= <%self.<n> += <v>%>
+AddMember(n,v) ::= <%<n> += <v>%>
 
-PlusMember(v,n) ::= <%<v> + str(self.<n>)%>
+PlusMember(v,n) ::= <%<v> + <n>.toString()%>
 
-MemberEquals(n,v) ::= <%self.<n> == <v>%>
+MemberEquals(n,v) ::= <%<n> == <v>%>
 
-ModMemberEquals(n,m,v) ::= <%self.<n> % <m> == <v>%>
+ModMemberEquals(n,m,v) ::= <%<n> % <m> == <v>%>
 
-ModMemberNotEquals(n,m,v) ::= <%self.<n> % <m> != <v>%>
+ModMemberNotEquals(n,m,v) ::= <%<n> % <m> != <v>%>
 
-DumpDFA() ::= "self.dumpDFA()"
+DumpDFA() ::= "dumpDFA()"
 
 Pass() ::= "/* do nothing */"
 
 StringList() ::= ""
 
-BuildParseTrees() ::= "self._buildParseTrees = True"
+BuildParseTrees() ::= "_buildParseTrees = true"
 
-BailErrorStrategy() ::= <%self._errHandler = BailErrorStrategy()%>
+BailErrorStrategy() ::= <%_errHandler = BailErrorStrategy()%>
 
 ToStringTree(s) ::= <%<s>.toStringTree(recog=self)%>
 
-Column() ::= "self.column"
+Column() ::= "column"
 
-Text() ::= "self.text"
+Text() ::= "text"
 
 ValEquals(a,b) ::= <%<a>==<b>%>
 
-TextEquals(a) ::= <%self.text=="<a>"%>
+TextEquals(a) ::= <%text=="<a>"%>
 
-PlusText(a) ::= <%"<a>" + self.text%>
+PlusText(a) ::= <%"<a>" + text%>
 
-InputText() ::= "self._input.getText()"
+InputText() ::= "_input->getText()"
 
-LTEquals(i, v) ::= <%self._input.LT(<i>).text==<v>%>
+LTEquals(i, v) ::= <%_input->LT(<i>).text==<v>%>
 
-LANotEquals(i, v) ::= <%self._input.LA(<i>)!=<v>%>
+LANotEquals(i, v) ::= <%_input->LA(<i>)!=<v>%>
 
-TokenStartColumnEquals(i) ::= <%self._tokenStartColumn==<i>%>
+TokenStartColumnEquals(i) ::= <%_tokenStartColumn==<i>%>
 
 ImportListener(X) ::= ""
 
-GetExpectedTokenNames() ::= "self.getExpectedTokens().toString(self.literalNames, self.symbolicNames)"
+GetExpectedTokenNames() ::= "getExpectedTokens().toString(literalNames, symbolicNames)"
 
-RuleInvocationStack() ::= "str_list(self.getRuleInvocationStack())"
+RuleInvocationStack() ::= "str_list(getRuleInvocationStack())"
 
-LL_EXACT_AMBIG_DETECTION() ::= <<self._interp.predictionMode =  PredictionMode.LL_EXACT_AMBIG_DETECTION>>
+LL_EXACT_AMBIG_DETECTION() ::= <<_interp.predictionMode =  PredictionMode.LL_EXACT_AMBIG_DETECTION>>
 
 ParserPropertyMember() ::= <<
 @members {
-def Property(self):
-    return True
+bool <X>Parser::Property() {
+	return true;
+}
 
 }
 >>
@@ -248,46 +249,46 @@ def Property(self):
 PositionAdjustingLexer() ::= <<
 
 def resetAcceptPosition(self, index, line, column):
-	self._input.seek(index)
-	self.line = line
-	self.column = column
-	self._interp.consume(self._input)
+	_input->seek(index)
+	this->line = line
+	this->column = column
+	_interp.consume(_input)
 
 def nextToken(self):
-	if self._interp.__dict__.get("resetAcceptPosition", None) is None:
-		self._interp.__dict__["resetAcceptPosition"] = self.resetAcceptPosition
+	if _interp.__dict__.get("resetAcceptPosition", None) is None:
+		_interp.__dict__["resetAcceptPosition"] = resetAcceptPosition
 	return super(type(self),self).nextToken()
 
 def emit(self):
-	if self._type==PositionAdjustingLexer.TOKENS:
-		self.handleAcceptPositionForKeyword("tokens")
-	elif self._type==PositionAdjustingLexer.LABEL:
-		self.handleAcceptPositionForIdentifier()
+	if _type==PositionAdjustingLexer.TOKENS:
+		handleAcceptPositionForKeyword("tokens")
+	elif _type==PositionAdjustingLexer.LABEL:
+		handleAcceptPositionForIdentifier()
 	return super(type(self),self).emit()
 
 def handleAcceptPositionForIdentifier(self):
-	tokenText = self.text
+	tokenText = text
 	identifierLength = 0
-	while identifierLength \< len(tokenText) and self.isIdentifierChar(tokenText[identifierLength]):
+	while identifierLength \< len(tokenText) and isIdentifierChar(tokenText[identifierLength]):
 		identifierLength += 1
 
-	if self._input.index > self._tokenStartCharIndex + identifierLength:
+	if _input->index > _tokenStartCharIndex + identifierLength:
 		offset = identifierLength - 1
-		self._interp.resetAcceptPosition(self._tokenStartCharIndex + offset,
-				self._tokenStartLine, self._tokenStartColumn + offset)
-		return True
+		_interp.resetAcceptPosition(_tokenStartCharIndex + offset,
+				_tokenStartLine, _tokenStartColumn + offset)
+		return true
 	else:
-		return False
+		return false
 
 
 def handleAcceptPositionForKeyword(self, keyword):
-	if self._input.index > self._tokenStartCharIndex + len(keyword):
+	if _input->index > _tokenStartCharIndex + len(keyword):
 		offset = len(keyword) - 1
-		self._interp.resetAcceptPosition(self._tokenStartCharIndex + offset,
-			self._tokenStartLine, self._tokenStartColumn + offset)
-		return True
+		_interp.resetAcceptPosition(_tokenStartCharIndex + offset,
+			_tokenStartLine, _tokenStartColumn + offset)
+		return true
 	else:
-		return False
+		return false
 
 @staticmethod
 def isIdentifierChar(c):
@@ -317,11 +318,11 @@ TreeNodeWithAltNumField(X) ::= <<
 class MyRuleNode(ParserRuleContext):
     def __init__(self, parent = None, invokingStateNumber = None ):
         super(<X>Parser.MyRuleNode, self).__init__(parent, invokingStateNumber)
-        self.altNum = 0;
+        altNum = 0;
     def getAltNumber(self):
-        return self.altNum
+        return altNum
     def setAltNumber(self, altNum):
-        self.altNum = altNum
+        this->altNum = altNum
 }
 >>
 
@@ -398,7 +399,7 @@ Declare_foo() ::= <<def foo(self):
 	std::cout \<\< "foo";
 >>
 
-Invoke_foo() ::= "self.foo()"
+Invoke_foo() ::= "foo()"
 
 Declare_pred() ::= <<def pred(self, v):
 	std::cout \<\< "eval=" \<\< str(v).lower();
@@ -406,7 +407,7 @@ Declare_pred() ::= <<def pred(self, v):
 
 >>
 
-Invoke_pred(v) ::= <<self.pred(<v>)>>
+Invoke_pred(v) ::= <<pred(<v>)>>
 
 isEmpty ::= [
 	"": true,

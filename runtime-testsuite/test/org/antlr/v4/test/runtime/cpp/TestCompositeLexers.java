@@ -13,7 +13,7 @@ public class TestCompositeLexers extends BaseCppTest {
 	public void testLexerDelegatorInvokesDelegateRule() throws Exception {
 		mkdir(tmpdir);
 
-		String slave_S =
+		String slave_S = 
 			"lexer grammar S;\n" +
 			"A : 'a' {std::cout << \"S.A\" << \"\\n\";};\n" +
 			"C : 'c' ;";
@@ -43,7 +43,7 @@ public class TestCompositeLexers extends BaseCppTest {
 	public void testLexerDelegatorRuleOverridesDelegate() throws Exception {
 		mkdir(tmpdir);
 
-		String slave_S =
+		String slave_S = 
 			"lexer grammar S;\n" +
 			"A : 'a' {std::cout << \"S.A\" << \"\\n\";} ;\n" +
 			"B : 'b' {std::cout << \"S.B\" << \"\\n\";} ;";

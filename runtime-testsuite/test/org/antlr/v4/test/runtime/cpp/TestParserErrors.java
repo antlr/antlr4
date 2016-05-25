@@ -211,7 +211,7 @@ public class TestParserErrors extends BaseCppTest {
 	public void testLL1ErrorInfo() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(329);
+		StringBuilder grammarBuilder = new StringBuilder(314);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("start : animal (AND acClass)? service EOF;\n");
 		grammarBuilder.append("animal : (DOG | CAT );\n");
@@ -224,7 +224,7 @@ public class TestParserErrors extends BaseCppTest {
 		grammarBuilder.append("WS : ' ' -> skip ;\n");
 		grammarBuilder.append("acClass\n");
 		grammarBuilder.append("@init\n");
-		grammarBuilder.append("{std::cout << self.getExpectedTokens().toString(self.literalNames, self.symbolicNames) << \"\\n\";}\n");
+		grammarBuilder.append("{std::cout << getExpectedTokens().toString(literalNames, symbolicNames) << \"\\n\";}\n");
 		grammarBuilder.append("  : ;");
 		String grammar = grammarBuilder.toString();
 

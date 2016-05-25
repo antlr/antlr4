@@ -666,11 +666,12 @@ public class TestParserExec extends BaseCppTest {
 	public void testParserProperty() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(168);
+		StringBuilder grammarBuilder = new StringBuilder(174);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("@members {\n");
-		grammarBuilder.append("def Property(self):\n");
-		grammarBuilder.append("    return True\n");
+		grammarBuilder.append("bool Parser::Property() {\n");
+		grammarBuilder.append("	return true;\n");
+		grammarBuilder.append("}\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("a : {$parser.Property()}? ID {std::cout << \"valid\" << \"\\n\";}\n");
@@ -693,11 +694,11 @@ public class TestParserExec extends BaseCppTest {
 	public void testPredicatedIfIfElse() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(175);
+		StringBuilder grammarBuilder = new StringBuilder(171);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s : stmt EOF ;\n");
 		grammarBuilder.append("stmt : ifStmt | ID;\n");
-		grammarBuilder.append("ifStmt : 'if' ID stmt ('else' stmt | { self._input.LA(1)!=TParser.ELSE }?);\n");
+		grammarBuilder.append("ifStmt : 'if' ID stmt ('else' stmt | { _input->LA(1)!=TParser.ELSE }?);\n");
 		grammarBuilder.append("ELSE : 'else';\n");
 		grammarBuilder.append("ID : [a-zA-Z]+;\n");
 		grammarBuilder.append("WS : [ \\n\\t]+ -> skip;");
@@ -717,10 +718,10 @@ public class TestParserExec extends BaseCppTest {
 	public void testPredictionIssue334() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(259);
+		StringBuilder grammarBuilder = new StringBuilder(254);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("file_ @init{\n");
-		grammarBuilder.append("self._errHandler = BailErrorStrategy()\n");
+		grammarBuilder.append("_errHandler = BailErrorStrategy()\n");
 		grammarBuilder.append("} \n");
 		grammarBuilder.append("@after {\n");
 		grammarBuilder.append("std::cout << $ctx.toStringTree(recog=self) << \"\\n\";\n");
