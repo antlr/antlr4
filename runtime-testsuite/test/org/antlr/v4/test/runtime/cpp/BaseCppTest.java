@@ -877,9 +877,7 @@ public abstract class BaseCppTest {
 		ST outputFileST = new ST(
 				"#include \\<iostream>\n"
 						+ "\n"
-						+ "#include \"ANTLRInputStream.h\"\n"
-						+ "#include \"CommonTokenStream.h\"\n"
-						+ "#include \"tree/ParseTreeWalker.h\"\n"
+						+ "#include \"antlr4-runtime.h\"\n"
 						+ "#include \"<lexerName>.h\"\n"
 						+ "#include \"<parserName>.h\"\n"
 						+ "#include \"<listenerName>.h\"\n"
@@ -943,20 +941,27 @@ public abstract class BaseCppTest {
 
 	protected void writeLexerTestFile(String lexerName, boolean showDFA) {
 		ST outputFileST = new ST(
-				"from __future__ import print_function\n"
-						+ "import sys\n"
-						+ "from antlr4 import *\n"
-						+ "from <lexerName> import <lexerName>\n"
-						+ "\n"
-						+ "def main(argv):\n"
-						+ "    input = FileStream(argv[1])\n"
-						+ "    lexer = <lexerName>(input)\n"
-						+ "    stream = CommonTokenStream(lexer)\n"
-						+ "    stream.fill()\n"
-						+ "    [ print(str(t)) for t in stream.tokens ]\n"
-						+ (showDFA ? "    print(lexer._interp.decisionToDFA[Lexer.DEFAULT_MODE].toLexerString(), end='')\n"
-								: "") + "\n" + "if __name__ == '__main__':\n"
-						+ "    main(sys.argv)\n" + "\n");
+			"#include \\<iostream>\n"
+					+ "\n"
+					+ "#include \"antlr4-runtime.h\"\n"
+					+ "#include \"<lexerName>.h\"\n"
+					+ "\n"
+					+ "#include \"support/StringUtils.h\"\n"
+					+ "\n"
+					+ "using namespace org::antlr::v4::runtime;\n"
+					+ "\n"
+					+ "int main(int argc, const char* argv[]) {\n"
+					+ "  std::wifstream stream;\n"
+					+ "  stream.open(argv[1]);\n"
+					+ "  ANTLRInputStream input(stream);\n"
+					+ "  TLexer lexer(&input);\n"
+					+ "  CommonTokenStream tokens(&lexer);\n"
+					+ "  tokens.fill();\n"
+				    + "  for (auto token : tokens.getTokens())\n"
+				    + "    std::cout \\<\\< token->toString() \\<\\< std::endl;\n"
+					+ (showDFA ? "    std::cout \\<\\< lexer..getInterpreter\\<LexerATNSimulator>().toLexerString();\n" : "\n")
+					+ "  return 0;\n"
+					+ "}\n");
 		outputFileST.add("lexerName", lexerName);
 		writeFile(tmpdir, "Test.cpp", outputFileST.render());
 	}
