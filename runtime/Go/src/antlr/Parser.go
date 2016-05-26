@@ -129,7 +129,7 @@ func (p *BaseParser) SetErrorHandler(e ErrorStrategy) {
 // @return the Matched symbol
 // @panics RecognitionException if the current input symbol did not Match
 // {@code ttype} and the error strategy could not recover from the
-// misMatched symbol
+// mismatched symbol
 
 func (p *BaseParser) Match(ttype int) Token {
 
@@ -175,7 +175,7 @@ func (p *BaseParser) Match(ttype int) Token {
 //
 // @return the Matched symbol
 // @panics RecognitionException if the current input symbol did not Match
-// a wildcard and the error strategy could not recover from the misMatched
+// a wildcard and the error strategy could not recover from the mismatched
 // symbol
 
 func (p *BaseParser) MatchWildcard() Token {

@@ -298,7 +298,7 @@ func (d *DefaultErrorStrategy) ReportNoViableAlternative(recognizer Parser, e *N
 // @param e the recognition exception
 //
 func (d *DefaultErrorStrategy) ReportInputMisMatch(recognizer Parser, e *InputMisMatchException) {
-	var msg = "misMatched input " + d.GetTokenErrorDisplay(e.offendingToken) +
+	var msg = "mismatched input " + d.GetTokenErrorDisplay(e.offendingToken) +
 		" expecting " + e.getExpectedTokens().StringVerbose(recognizer.GetLiteralNames(), recognizer.GetSymbolicNames(), false)
 	recognizer.NotifyErrorListeners(msg, e.offendingToken, e)
 }
@@ -325,7 +325,7 @@ func (d *DefaultErrorStrategy) ReportFailedPredicate(recognizer Parser, e *Faile
 // {@code recognizer} is in error recovery mode.
 //
 // <p>This method is called when {@link //singleTokenDeletion} identifies
-// single-token deletion as a viable recovery strategy for a misMatched
+// single-token deletion as a viable recovery strategy for a mismatched
 // input error.</p>
 //
 // <p>The default implementation simply returns if the handler is already in
@@ -354,7 +354,7 @@ func (d *DefaultErrorStrategy) ReportUnwantedToken(recognizer Parser) {
 // method returns, {@code recognizer} is in error recovery mode.
 //
 // <p>This method is called when {@link //singleTokenInsertion} identifies
-// single-token insertion as a viable recovery strategy for a misMatched
+// single-token insertion as a viable recovery strategy for a mismatched
 // input error.</p>
 //
 // <p>The default implementation simply returns if the handler is already in
@@ -376,7 +376,7 @@ func (d *DefaultErrorStrategy) ReportMissingToken(recognizer Parser) {
 	recognizer.NotifyErrorListeners(msg, t, nil)
 }
 
-// <p>The default implementation attempts to recover from the misMatched input
+// <p>The default implementation attempts to recover from the mismatched input
 // by using single token insertion and deletion as described below. If the
 // recovery attempt fails, d method panics an
 // {@link InputMisMatchException}.</p>
@@ -445,7 +445,7 @@ func (d *DefaultErrorStrategy) RecoverInline(recognizer Parser) Token {
 //
 // This method implements the single-token insertion inline error recovery
 // strategy. It is called by {@link //recoverInline} if the single-token
-// deletion strategy fails to recover from the misMatched input. If d
+// deletion strategy fails to recover from the mismatched input. If d
 // method returns {@code true}, {@code recognizer} will be in error recovery
 // mode.
 //
@@ -457,7 +457,7 @@ func (d *DefaultErrorStrategy) RecoverInline(recognizer Parser) Token {
 //
 // @param recognizer the parser instance
 // @return {@code true} if single-token insertion is a viable recovery
-// strategy for the current misMatched input, otherwise {@code false}
+// strategy for the current mismatched input, otherwise {@code false}
 //
 func (d *DefaultErrorStrategy) singleTokenInsertion(recognizer Parser) bool {
 	var currentSymbolType = recognizer.GetTokenStream().LA(1)
@@ -478,7 +478,7 @@ func (d *DefaultErrorStrategy) singleTokenInsertion(recognizer Parser) bool {
 
 // This method implements the single-token deletion inline error recovery
 // strategy. It is called by {@link //recoverInline} to attempt to recover
-// from misMatched input. If d method returns nil, the parser and error
+// from mismatched input. If d method returns nil, the parser and error
 // handler state will not have changed. If d method returns non-nil,
 // {@code recognizer} will <em>not</em> be in error recovery mode since the
 // returned token was a successful Match.
@@ -491,7 +491,7 @@ func (d *DefaultErrorStrategy) singleTokenInsertion(recognizer Parser) bool {
 //
 // @param recognizer the parser instance
 // @return the successfully Matched {@link Token} instance if single-token
-// deletion successfully recovers from the misMatched input, otherwise
+// deletion successfully recovers from the mismatched input, otherwise
 // {@code nil}
 //
 func (d *DefaultErrorStrategy) singleTokenDeletion(recognizer Parser) Token {
@@ -658,7 +658,7 @@ func (d *DefaultErrorStrategy) escapeWSAndQuote(s string) string {
 // In d case, for input "[]", LA(1) is ']' and in the set, so we would
 // not consume anything. After printing an error, rule c would
 // return normally. Rule b would not find the required '^' though.
-// At d point, it gets a misMatched token error and panics an
+// At d point, it gets a mismatched token error and panics an
 // exception (since LA(1) is not in the viable following token
 // set). The rule exception handler tries to recover, but finds
 // the same recovery set and doesn't consume anything. Rule b
