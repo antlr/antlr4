@@ -68,7 +68,7 @@ func (la *LL1Analyzer) getDecisionLookahead(s ATNState) []*IntervalSet {
 // @return The set of tokens that can follow {@code s} in the ATN in the
 // specified {@code ctx}.
 ///
-func (la *LL1Analyzer) look(s, stopState ATNState, ctx RuleContext) *IntervalSet {
+func (la *LL1Analyzer) Look(s, stopState ATNState, ctx RuleContext) *IntervalSet {
 	var r = NewIntervalSet()
 	var seeThruPreds = true // ignore preds get all lookahead
 	var lookContext PredictionContext
