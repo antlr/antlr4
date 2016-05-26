@@ -908,7 +908,10 @@ RulePropertyRef_ctx(r)   ::= "RulePropertyRef_ctx(r)<ctx(r)>.<r.label>"
 
 ThisRulePropertyRef_start(r) ::= "ThisRulePropertyRef_start(r) _localctx->start"
 ThisRulePropertyRef_stop(r)  ::= "ThisRulePropertyRef_stop(r)   _localctx->stop"
-ThisRulePropertyRef_text(r)  ::= "ThisRulePropertyRef_text(r)   input->getText(_localctx->start, _input->LT(-1))"
+
+ThisRulePropertyRef_textHeader(r)  ::= "<! Required but unused. !>"
+ThisRulePropertyRef_text(r)  ::= "input->getText(_localctx->start, _input->LT(-1))"
+
 ThisRulePropertyRef_ctx(r)   ::= "ThisRulePropertyRef_ctx(r)    _localctx"
 
 NonLocalAttrRef(s) ::= "NonLocalAttrRef(s) ((<s.ruleName; format=\"cap\">Context)getInvokingContext(<s.ruleIndex>)).<s.name>"

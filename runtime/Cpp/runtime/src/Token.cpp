@@ -35,22 +35,3 @@
 
 using namespace org::antlr::v4::runtime;
 
-std::string Token::toString() {
-  std::stringstream ss;
-
-  std::string txt = getText();
-  if (!txt.empty()) {
-
-    antlrcpp::replaceAll(txt, "\n", "\\n");
-    antlrcpp::replaceAll(txt, "\r", "\\r");
-    antlrcpp::replaceAll(txt, "\t", "\\t");
-  } else {
-    txt = "<no text>";
-  }
-
-  ss << "{Token: " << txt << ", channel: " << getChannel() << ", type: " << getType() << ", start: " << getStartIndex() <<
-    ", stop: " << getStopIndex() << ", index: " << getTokenIndex() << ", line: " << getLine() << ", offset: " <<
-  getCharPositionInLine() << "}";
-
-  return ss.str();
-}

@@ -152,31 +152,33 @@ namespace runtime {
      * of the token.
      */
     virtual void setText(const std::string &text) override;
-    virtual std::string getText() override;
+    virtual std::string getText() const override;
 
     virtual void setLine(int line) override;
-    virtual int getLine() override;
+    virtual int getLine() const override;
 
-    virtual int getCharPositionInLine() override;
+    virtual int getCharPositionInLine() const override;
     virtual void setCharPositionInLine(int charPositionInLine) override;
 
-    virtual size_t getChannel() override;
+    virtual size_t getChannel() const override;
     virtual void setChannel(int channel) override;
 
     virtual void setType(int type) override;
 
-    virtual int getStartIndex() override;
+    virtual int getStartIndex() const override;
     virtual void setStartIndex(int start);
 
-    virtual int getStopIndex() override;
+    virtual int getStopIndex() const override;
     virtual void setStopIndex(int stop);
 
-    virtual int getTokenIndex() override;
+    virtual int getTokenIndex() const override;
     virtual void setTokenIndex(int index) override;
 
-    virtual TokenSource *getTokenSource() override;
-    virtual CharStream *getInputStream() override;
+    virtual TokenSource *getTokenSource() const override;
+    virtual CharStream *getInputStream() const override;
 
+    virtual std::string toString() const override;
+    
   private:
     void InitializeInstanceFields();
   };

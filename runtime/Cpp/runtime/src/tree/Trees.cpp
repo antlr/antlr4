@@ -90,18 +90,22 @@ std::string Trees::toStringTree(Ref<Tree> t, const std::vector<std::string> &rul
     std::string temp = antlrcpp::escapeWhitespace(Trees::getNodeText(child, ruleNames), false);
     if (child->getChildCount() > 0) {
       // Go deeper one level.
-      stack.push(childIndex + 1);
+      stack.push(childIndex);
       run = child;
       childIndex = 0;
       ss << "(" << temp << " ";
     } else {
       ss << temp;
-      if (++childIndex == run->getChildCount() && stack.size() > 0) {
-        // Reached the end of the current level. See if we can step up from here.
-        childIndex = stack.top();
-        stack.pop();
-        run = run->getParent().lock();
-        ss << ")";
+      while (++childIndex == run->getChildCount()) {
+        if (stack.size() > 0) {
+          // Reached the end of the current level. See if we can step up from here.
+          childIndex = stack.top();
+          stack.pop();
+          run = run->getParent().lock();
+          ss << ")";
+        } else {
+          break;
+        }
       }
     }
   }

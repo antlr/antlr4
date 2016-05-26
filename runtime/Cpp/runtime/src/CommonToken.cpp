@@ -95,7 +95,7 @@ void CommonToken::setLine(int line) {
   _line = line;
 }
 
-std::string CommonToken::getText() {
+std::string CommonToken::getText() const {
   if (!_text.empty()) {
     return _text;
   }
@@ -116,11 +116,11 @@ void CommonToken::setText(const std::string &text) {
   _text = text;
 }
 
-int CommonToken::getLine() {
+int CommonToken::getLine() const {
   return _line;
 }
 
-int CommonToken::getCharPositionInLine() {
+int CommonToken::getCharPositionInLine() const {
   return _charPositionInLine;
 }
 
@@ -128,7 +128,7 @@ void CommonToken::setCharPositionInLine(int charPositionInLine) {
   _charPositionInLine = charPositionInLine;
 }
 
-size_t CommonToken::getChannel() {
+size_t CommonToken::getChannel() const {
   return _channel;
 }
 
@@ -140,7 +140,7 @@ void CommonToken::setType(int type) {
   _type = type;
 }
 
-int CommonToken::getStartIndex() {
+int CommonToken::getStartIndex() const {
   return _start;
 }
 
@@ -148,7 +148,7 @@ void CommonToken::setStartIndex(int start) {
   _start = start;
 }
 
-int CommonToken::getStopIndex() {
+int CommonToken::getStopIndex() const {
   return _stop;
 }
 
@@ -156,7 +156,7 @@ void CommonToken::setStopIndex(int stop) {
   _stop = stop;
 }
 
-int CommonToken::getTokenIndex() {
+int CommonToken::getTokenIndex() const {
   return _index;
 }
 
@@ -164,12 +164,34 @@ void CommonToken::setTokenIndex(int index) {
   _index = index;
 }
 
-org::antlr::v4::runtime::TokenSource *CommonToken::getTokenSource() {
+org::antlr::v4::runtime::TokenSource *CommonToken::getTokenSource() const {
   return _source.first;
 }
 
-org::antlr::v4::runtime::CharStream *CommonToken::getInputStream() {
+org::antlr::v4::runtime::CharStream *CommonToken::getInputStream() const {
   return _source.second;
+}
+
+std::string CommonToken::toString() const {
+  std::stringstream ss;
+
+  std::string channelStr;
+  if (_channel > 0) {
+    channelStr = ",channel=" + std::to_string(_channel);
+  }
+  std::string txt = getText();
+  if (!txt.empty()) {
+    antlrcpp::replaceAll(txt, "\n", "\\n");
+    antlrcpp::replaceAll(txt, "\r", "\\r");
+    antlrcpp::replaceAll(txt, "\t", "\\t");
+  } else {
+    txt = "<no text>";
+  }
+
+  ss << "[@" << getTokenIndex() << "," << _start << ":" << _stop << "='" << txt << "',<" << _type << ">" << channelStr
+    << "," << _line << ":" << getCharPositionInLine() << "]";
+
+  return ss.str();
 }
 
 void CommonToken::InitializeInstanceFields() {

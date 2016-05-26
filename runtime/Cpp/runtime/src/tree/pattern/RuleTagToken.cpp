@@ -46,19 +46,19 @@ RuleTagToken::RuleTagToken(const std::string &ruleName, int bypassTokenType, con
 
 }
 
-std::string RuleTagToken::getRuleName() {
+std::string RuleTagToken::getRuleName() const {
   return ruleName;
 }
 
-std::string RuleTagToken::getLabel() {
+std::string RuleTagToken::getLabel() const {
   return label;
 }
 
-size_t RuleTagToken::getChannel() {
+size_t RuleTagToken::getChannel() const {
   return DEFAULT_CHANNEL;
 }
 
-std::string RuleTagToken::getText() {
+std::string RuleTagToken::getText() const {
   if (label != "") {
     return std::string("<") + label + std::string(":") + ruleName + std::string(">");
   }
@@ -70,34 +70,34 @@ int RuleTagToken::getType() const {
   return bypassTokenType;
 }
 
-int RuleTagToken::getLine() {
+int RuleTagToken::getLine() const {
   return 0;
 }
 
-int RuleTagToken::getCharPositionInLine() {
+int RuleTagToken::getCharPositionInLine() const {
   return -1;
 }
 
-int RuleTagToken::getTokenIndex() {
+int RuleTagToken::getTokenIndex() const {
   return -1;
 }
 
-int RuleTagToken::getStartIndex() {
+int RuleTagToken::getStartIndex() const {
   return -1;
 }
 
-int RuleTagToken::getStopIndex() {
+int RuleTagToken::getStopIndex() const {
   return -1;
 }
 
-org::antlr::v4::runtime::TokenSource *RuleTagToken::getTokenSource() {
+org::antlr::v4::runtime::TokenSource *RuleTagToken::getTokenSource() const {
   return nullptr;
 }
 
-org::antlr::v4::runtime::CharStream *RuleTagToken::getInputStream() {
+org::antlr::v4::runtime::CharStream *RuleTagToken::getInputStream() const {
   return nullptr;
 }
 
-std::string RuleTagToken::toString() {
-  return ruleName + std::string(":") + std::to_string(bypassTokenType);
+std::string RuleTagToken::toString() const {
+  return ruleName + ":" + std::to_string(bypassTokenType);
 }
