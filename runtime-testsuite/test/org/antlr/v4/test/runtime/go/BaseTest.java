@@ -418,10 +418,21 @@ public abstract class BaseTest {
 	}
 
 	private String locateTool(String tool) {
-		String[] roots = { "/usr/bin/", "/usr/local/bin/", "/usr/local/go/bin/" };
-		for (String root : roots) {
-			if (new File(root + tool).exists()) {
-				return root + tool;
+		ArrayList<String> paths = new ArrayList<String>(); // default cap is about right
+
+		String pathEnv = System.getenv("PATH");
+		if (pathEnv != null) {
+			paths.addAll(Arrays.asList(pathEnv.split(pathSep)));
+		}
+		String goroot = System.getenv("GOROOT");
+		if (goroot != null) {
+			paths.add(goroot + File.separatorChar + "bin");
+		}
+
+		for (String path : paths) {
+			File candidate = new File(path + File.separatorChar + tool);
+			if (candidate.exists()) {
+				return candidate.getPath();
 			}
 		}
 		return null;
@@ -434,8 +445,7 @@ public abstract class BaseTest {
 		if (prop == null || prop.length() == 0) {
 			prop = locateTool("go");
 		}
-		File file = new File(prop);
-		if (!file.exists()) {
+		if (prop == null) {
 			throw new RuntimeException("Missing system property:" + propName);
 		}
 		return prop;

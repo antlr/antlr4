@@ -12,17 +12,17 @@ func NewTraceListener(parser *BaseParser) *TraceListener {
 	return tl
 }
 
-func (t *TraceListener) VisitErrorNode(_ ErrorNode) {
+func (this *TraceListener) VisitErrorNode(_ ErrorNode) {
 }
 
-func (t *TraceListener) EnterEveryRule(ctx ParserRuleContext) {
-	fmt.Println("enter   " + t.parser.GetRuleNames()[ctx.GetRuleIndex()] + ", LT(1)=" + t.parser.input.LT(1).GetText())
+func (this *TraceListener) EnterEveryRule(ctx ParserRuleContext) {
+	fmt.Println("enter   " + this.parser.GetRuleNames()[ctx.GetRuleIndex()] + ", LT(1)=" + this.parser._input.LT(1).GetText())
 }
 
-func (t *TraceListener) VisitTerminal(node TerminalNode) {
-	fmt.Println("consume " + fmt.Sprint(node.GetSymbol()) + " rule " + t.parser.GetRuleNames()[t.parser.ctx.GetRuleIndex()])
+func (this *TraceListener) VisitTerminal(node TerminalNode) {
+	fmt.Println("consume " + fmt.Sprint(node.GetSymbol()) + " rule " + this.parser.GetRuleNames()[this.parser._ctx.GetRuleIndex()])
 }
 
-func (t *TraceListener) ExitEveryRule(ctx ParserRuleContext) {
-	fmt.Println("exit    " + t.parser.GetRuleNames()[ctx.GetRuleIndex()] + ", LT(1)=" + t.parser.input.LT(1).GetText())
+func (this *TraceListener) ExitEveryRule(ctx ParserRuleContext) {
+	fmt.Println("exit    " + this.parser.GetRuleNames()[ctx.GetRuleIndex()] + ", LT(1)=" + this.parser._input.LT(1).GetText())
 }
