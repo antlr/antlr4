@@ -41,22 +41,22 @@ TokenTagToken::TokenTagToken(const std::string &tokenName, int type, const std::
   : CommonToken(type), tokenName(tokenName), label(label) {
 }
 
-std::string TokenTagToken::getTokenName() {
+std::string TokenTagToken::getTokenName() const {
   return tokenName;
 }
 
-std::string TokenTagToken::getLabel() {
+std::string TokenTagToken::getLabel() const {
   return label;
 }
 
-std::string TokenTagToken::getText() {
-  if (label != "") {
-    return std::string("<") + label + std::string(":") + tokenName + std::string(">");
+std::string TokenTagToken::getText() const {
+  if (!label.empty()) {
+    return "<" + label + ":" + tokenName + ">";
   }
 
-  return std::string("<") + tokenName + std::string(">");
+  return "<" + tokenName + ">";
 }
 
-std::string TokenTagToken::toString() {
-  return tokenName + std::string(":") + std::to_string(_type);
+std::string TokenTagToken::toString() const {
+  return tokenName + ":" + std::to_string(_type);
 }

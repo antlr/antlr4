@@ -988,7 +988,7 @@
 		276E5C9E1CDB57AA003FF4B4 /* BufferedTokenStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BufferedTokenStream.h; sourceTree = "<group>"; };
 		276E5C9F1CDB57AA003FF4B4 /* CharStream.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CharStream.cpp; sourceTree = "<group>"; };
 		276E5CA01CDB57AA003FF4B4 /* CharStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CharStream.h; sourceTree = "<group>"; };
-		276E5CA11CDB57AA003FF4B4 /* CommonToken.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CommonToken.cpp; sourceTree = "<group>"; };
+		276E5CA11CDB57AA003FF4B4 /* CommonToken.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CommonToken.cpp; sourceTree = "<group>"; wrapsLines = 0; };
 		276E5CA21CDB57AA003FF4B4 /* CommonToken.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommonToken.h; sourceTree = "<group>"; };
 		276E5CA31CDB57AA003FF4B4 /* CommonTokenFactory.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CommonTokenFactory.cpp; sourceTree = "<group>"; };
 		276E5CA41CDB57AA003FF4B4 /* CommonTokenFactory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommonTokenFactory.h; sourceTree = "<group>"; };
@@ -1062,7 +1062,7 @@
 		276E5CEC1CDB57AA003FF4B4 /* guid.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = guid.h; sourceTree = "<group>"; };
 		276E5CED1CDB57AA003FF4B4 /* StringUtils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = StringUtils.cpp; sourceTree = "<group>"; };
 		276E5CEE1CDB57AA003FF4B4 /* StringUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StringUtils.h; sourceTree = "<group>"; };
-		276E5CEF1CDB57AA003FF4B4 /* Token.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Token.cpp; sourceTree = "<group>"; };
+		276E5CEF1CDB57AA003FF4B4 /* Token.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Token.cpp; sourceTree = "<group>"; wrapsLines = 0; };
 		276E5CF01CDB57AA003FF4B4 /* Token.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Token.h; sourceTree = "<group>"; };
 		276E5CF21CDB57AA003FF4B4 /* TokenFactory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TokenFactory.h; sourceTree = "<group>"; };
 		276E5CF41CDB57AA003FF4B4 /* TokenSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TokenSource.h; sourceTree = "<group>"; };

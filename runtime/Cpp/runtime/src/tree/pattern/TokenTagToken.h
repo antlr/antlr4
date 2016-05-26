@@ -78,14 +78,14 @@ namespace pattern {
     /// <summary>
     /// Gets the token name. </summary>
     /// <returns> The token name. </returns>
-    std::string getTokenName();
+    std::string getTokenName() const;
 
     /// <summary>
     /// Gets the label associated with the rule tag.
     /// </summary>
     /// <returns> The name of the label associated with the rule tag, or
     /// {@code null} if this is an unlabeled rule tag. </returns>
-    std::string getLabel();
+    std::string getLabel() const;
 
     /// <summary>
     /// {@inheritDoc}
@@ -93,7 +93,7 @@ namespace pattern {
     /// The implementation for <seealso cref="TokenTagToken"/> returns the token tag
     /// formatted with {@code <} and {@code >} delimiters.
     /// </summary>
-    virtual std::string getText() override;
+    virtual std::string getText() const override;
 
     /// <summary>
     /// {@inheritDoc}
@@ -101,7 +101,7 @@ namespace pattern {
     /// The implementation for <seealso cref="TokenTagToken"/> returns a string of the form
     /// {@code tokenName:type}.
     /// </summary>
-    virtual std::string toString() override;
+    virtual std::string toString() const override;
   };
 
 } // namespace pattern
