@@ -19,7 +19,7 @@ type Lexer interface {
 	pushMode(int)
 	popMode() int
 	setType(int)
-	mode(int)
+	setMode(int)
 }
 
 type BaseLexer struct {
@@ -37,7 +37,7 @@ type BaseLexer struct {
 	token                  Token
 	hitEOF                 bool
 	channel                int
-	thetype                  int
+	thetype                int
 	modeStack              IntStack
 	mode                   int
 	text                   string
@@ -247,6 +247,10 @@ func (b *BaseLexer) Skip() {
 
 func (b *BaseLexer) More() {
 	b.thetype = LexerMore
+}
+
+func (b *BaseLexer) setMode(m int) {
+	b.mode = m
 }
 
 func (b *BaseLexer) pushMode(m int) {

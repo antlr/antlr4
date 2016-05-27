@@ -232,7 +232,7 @@ func NewLexerModeAction(mode int) *LexerModeAction {
 // <p>This action is implemented by calling {@link Lexer//mode} with the
 // value provided by {@link //getMode}.</p>
 func (l *LexerModeAction) execute(lexer Lexer) {
-	lexer.mode(l.mode)
+	lexer.setMode(l.mode)
 }
 
 func (l *LexerModeAction) Hash() string {
