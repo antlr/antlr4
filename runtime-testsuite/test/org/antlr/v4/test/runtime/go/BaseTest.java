@@ -390,8 +390,12 @@ public abstract class BaseTest {
 		try {
 			ProcessBuilder builder = new ProcessBuilder(goPath, "run", modulePath,
 					inputPath);
-			builder.environment().put("GOPATH",
-					builder.environment().get("GOPATH") + ":" + runtimePath + File.pathSeparator + tmpdir);
+			String gopath = builder.environment().get("GOPATH");
+			String path = runtimePath + File.pathSeparator + tmpdir;
+			if (gopath != null && gopath.length() > 0) {
+				path = gopath + File.separator + path;
+			}
+			builder.environment().put("GOPATH", path);
 			builder.directory(new File(tmpdir));
 			Process process = builder.start();
 			StreamVacuum stdoutVacuum = new StreamVacuum(
