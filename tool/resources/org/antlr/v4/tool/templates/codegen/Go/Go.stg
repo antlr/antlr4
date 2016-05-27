@@ -1,10 +1,10 @@
 fileHeader(grammarFileName, ANTLRVersion) ::= <<
 // Generated from <grammarFileName; format="java-escape"> by ANTLR <ANTLRVersion>.
-
 >>
 
 ParserFile(file, parser, namedActions) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
+
 <if(file.genPackage)>
 package <file.genPackage> // <file.grammarName>
 <else>
@@ -12,8 +12,8 @@ package parser // <file.grammarName>
 <endif>
 
 import (
-	"reflect"
 	"fmt"
+	"reflect"
 	"strconv"
 
 	"github.com/pboyer/antlr4/runtime/Go/antlr"
@@ -25,15 +25,21 @@ import (
 var _ = fmt.Printf
 var _ = reflect.Copy
 var _ = strconv.Itoa
+<if(namedActions.header)>
 
 <namedActions.header>
+<endif>
+
+<if(parser)>
 
 <parser>
+<endif>
 
 >>
 
 ListenerFile(file, header) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
+
 <if(file.genPackage)>
 package <file.genPackage> // <file.grammarName>
 <else>
@@ -42,21 +48,22 @@ package parser // <file.grammarName>
 
 import "github.com/pboyer/antlr4/runtime/Go/antlr"
 
-// A complete listener for a parse tree produced by <file.parserName>
-
+// <file.grammarName>Listener is a complete listener for a parse tree produced by <file.parserName>.
 type <file.grammarName>Listener interface {
 	antlr.ParseTreeListener
 
-<file.listenerNames:{lname |
-	Enter<lname; format="cap">(*<lname; format="cap">Context)
-	Exit<lname; format="cap">(*<lname; format="cap">Context)
-}; separator="\n">
+	<file.listenerNames:{lname | // Enter<lname; format="cap"> is called when entering the <lname> production.
+Enter<lname; format="cap">(c *<lname; format="cap">Context)}; separator="\n\n">
+
+	<file.listenerNames:{lname | // Exit<lname; format="cap"> is called when exiting the <lname> production.
+Exit<lname; format="cap">(c *<lname; format="cap">Context)}; separator="\n\n">
 }
 
 >>
 
 BaseListenerFile(file, header) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
+
 <if(file.genPackage)>
 package <file.genPackage> // <file.grammarName>
 <else>
@@ -65,30 +72,32 @@ package parser // <file.grammarName>
 
 import "github.com/pboyer/antlr4/runtime/Go/antlr"
 
-// A complete base listener for a parse tree produced by <file.parserName>
+// Base<file.grammarName>Listener is a complete listener for a parse tree produced by <file.parserName>.
+type Base<file.grammarName>Listener struct{}
 
-type Base<file.grammarName>Listener struct {
-}
+// VisitTerminal is called when a terminal node is visited.
+func (s *Base<file.grammarName>Listener) VisitTerminal(node antlr.TerminalNode) {}
 
-func (s *Base<file.grammarName>Listener) VisitTerminal(node antlr.TerminalNode){}
+// VisitErrorNode is called when an error node is visited.
+func (s *Base<file.grammarName>Listener) VisitErrorNode(node antlr.ErrorNode) {}
 
-func (s *Base<file.grammarName>Listener) VisitErrorNode(node antlr.ErrorNode){}
+// EnterEveryRule is called when any rule is entered.
+func (s *Base<file.grammarName>Listener) EnterEveryRule(ctx antlr.ParserRuleContext) {}
 
-func (s *Base<file.grammarName>Listener) EnterEveryRule(ctx antlr.ParserRuleContext){}
+// ExitEveryRule is called when any rule is exited.
+func (s *Base<file.grammarName>Listener) ExitEveryRule(ctx antlr.ParserRuleContext) {}
 
-func (s *Base<file.grammarName>Listener) ExitEveryRule(ctx antlr.ParserRuleContext){}
-
-<file.listenerNames:{lname |
-
+<file.listenerNames:{lname | // Enter<lname; format="cap"> is called when production <lname> is entered.
 func (s *Base<file.grammarName>Listener) Enter<lname; format="cap">(ctx *<lname; format="cap">Context) {\}
 
-func (s *Base<file.grammarName>Listener) Exit<lname; format="cap">(ctx *<lname; format="cap">Context){\}
-}; separator="\n">
+// Exit<lname; format="cap"> is called when production <lname> is exited.
+func (s *Base<file.grammarName>Listener) Exit<lname; format="cap">(ctx *<lname; format="cap">Context) {\}}; separator="\n\n">
 
 >>
 
 VisitorFile(file, header) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
+
 <if(file.genPackage)>
 package <file.genPackage> // <file.grammarName>
 <else>
@@ -96,11 +105,12 @@ package parser // <file.grammarName>
 <endif>
 
 import "github.com/pboyer/antlr4/runtime/Go/antlr"
+<if(header)>
 
 <header>
+<endif>
 
 // A complete Visitor for a parse tree produced by <file.parserName>.
-
 type <file.grammarName>Visitor interface {
 	antlr.ParseTreeVisitor
 
@@ -113,6 +123,7 @@ type <file.grammarName>Visitor interface {
 
 BaseVisitorFile(file, header) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
+
 <if(file.genPackage)>
 package <file.genPackage> // <file.grammarName>
 <else>
@@ -132,26 +143,54 @@ func (v *Base<file.grammarName>Visitor) Visit<lname; format="cap">(ctx *<lname; 
 >>
 
 Parser(parser, funcs, atn, sempredFuncs, superClass) ::= <<
-
 <if(superClass)>
-	import ( "./<superClass>" )
+import "./<superClass>"
+
+<endif>
+<if(atn)>
+var parserATN = <atn>
+<else>
+var parserATN []uint16
 <endif>
 
-var parserATN = <atn>
-var deserializer = antlr.NewATNDeserializer(nil)
-var deserializedATN = deserializer.DeserializeFromUInt16( parserATN )
 
-var literalNames = []string{ <parser.literalNames:{t | <t>}; null="\"\"", separator=", ", wrap, anchor> }
-var symbolicNames = []string{ <parser.symbolicNames:{t | <t>}; null="\"\"", separator=", ", wrap, anchor> }
-var ruleNames =  []string{ <parser.ruleNames:{r | "<r>"}; separator=", ", wrap, anchor> }
+var deserializer = antlr.NewATNDeserializer(nil)
+
+var deserializedATN = deserializer.DeserializeFromUInt16(parserATN)
+
+<if(parser.literalNames)>
+var literalNames = []string{
+	<parser.literalNames; null="\"\"", separator=", ", wrap>,
+}
+<else>
+var literalNames []string
+<endif>
+
+
+<if(parser.literalNames)>
+var symbolicNames = []string{
+	<parser.symbolicNames; null="\"\"", separator=", ", wrap>,
+}
+<else>
+var literalNames []string
+<endif>
+
+
+<if(parser.ruleNames)>
+var ruleNames = []string{
+	<parser.ruleNames:{r | "<r>"}; separator=", ", wrap>,
+}
+<else>
+var literalNames []string
+<endif>
+
 
 type <parser.name> struct {
 	<superClass; null="*antlr.BaseParser">
 }
 
 func New<parser.name>(input antlr.TokenStream) *<parser.name> {
-
-	var decisionToDFA = make([]*antlr.DFA,len(deserializedATN.DecisionToState))
+	var decisionToDFA = make([]*antlr.DFA, len(deserializedATN.DecisionToState))
 	var sharedContextCache = antlr.NewPredictionContextCache()
 
 	for index, ds := range deserializedATN.DecisionToState {
@@ -170,93 +209,135 @@ func New<parser.name>(input antlr.TokenStream) *<parser.name> {
 
 	return this
 }
+<if(namedActions.members)>
 
 <namedActions.members>
+<endif>
 
-const(
-	<parser.name>EOF = antlr.TokenEOF
-	<if(parser.tokens)>
-	<parser.tokens:{k | <parser.name><k> = <parser.tokens.(k)>}; separator="\n", wrap, anchor>
-	<endif>
-)
+<if(parser.tokens)>
 
+// <parser.name> tokens.
 const (
-	<parser.rules:{r | <parser.name>RULE_<r.name> = <r.index>}; separator="\n", wrap, anchor>
+	<parser.name>EOF = antlr.TokenEOF
+	<parser.tokens:{k | <parser.name><k> = <parser.tokens.(k)>}; separator="\n">
 )
+<else>
 
-<funcs; separator="\n">
+// <parser.name>EOF is the <parser.name> token.
+const <parser.name>EOF = antlr.TokenEOF
+<endif>
+
+<if(rest(parser.rules))>
+
+// <parser.name> rules.
+const (
+	<parser.rules:{r | <parser.name>RULE_<r.name> = <r.index>}; separator="\n">
+)
+<elseif(parser.rules)>
+
+// <parser.name>RULE_<first(parser.rules).name> is the <parser.name> rule.
+const <parser.name>RULE_<first(parser.rules).name> = <first(parser.rules).index>
+<endif>
+
+<if(funcs)>
+
+<funcs; separator="\n\n">
+<endif>
 
 <if(sempredFuncs)>
+
 func (p *<parser.name>) Sempred(localctx antlr.RuleContext, ruleIndex, predIndex int) bool {
 	switch ruleIndex {
+	<if(parser.sempredFuncs.values)>
 	<parser.sempredFuncs.values:{f | case <f.ruleIndex>:
 		var t *<f.name; format="cap">Context = nil
 		if localctx != nil { t = localctx.(*<f.name; format="cap">Context) \}
-		return p.<f.name; format="cap">_Sempred(t, predIndex)}; separator="\n">
+		return p.<f.name; format="cap">_Sempred(t, predIndex)}; separator="\n\n">
+
+
+	<endif>
 	default:
-		panic("No predicate with index:" + fmt.Sprint(ruleIndex))
-   }
+		panic("No predicate with index: " + fmt.Sprint(ruleIndex))
+	}
 }
+<if(sempredFuncs.values)>
 
-<sempredFuncs.values; separator="\n">
+<sempredFuncs.values; separator="\n\n">
 <endif>
-
+<endif>
 >>
 
 dumpActions(recog, argFuncs, actionFuncs, sempredFuncs) ::= <<
 <if(actionFuncs)>
+
 func (l *<lexer.name>) Action(localctx antlr.RuleContext, ruleIndex, actionIndex int) {
 	switch ruleIndex {
-		<recog.actionFuncs.values:{f | case <f.ruleIndex>:
-		<if(!f.isRuleContext)>
+	<if(recog.actionFuncs.values)>
+	<recog.actionFuncs.values:{f | case <f.ruleIndex>:
+		<if(f.isRuleContext)>
+		l.<f.name>_Action(localctx, actionIndex)
+		<else>
 		var t *<f.name; format="cap">Context = nil
 		if localctx != nil { t = localctx.(*<f.ctxType>) \}
 		l.<f.name>_Action(t, actionIndex)
-		<else>
-		l.<f.name>_Action(localctx, actionIndex)
 		<endif>
-		break}; separator="\n">
+	}; separator="\n\n">
+
+	<endif>
 	default:
-		panic("No registered action for:" + fmt.Sprint(ruleIndex))
+		panic("No registered action for: " + fmt.Sprint(ruleIndex))
 	}
 }
+<if(actionFuncs.values)>
 
 <actionFuncs.values; separator="\n">
+<endif>
+<endif>
+<if(actionFuncs && sempredFuncs)>
+
+
 <endif>
 <if(sempredFuncs)>
 func (l *<lexer.name>) Sempred(localctx antlr.RuleContext, ruleIndex, predIndex int) bool {
 	switch ruleIndex {
-		<recog.sempredFuncs.values:{f | case <f.ruleIndex>:
-			<if(!f.isRuleContext)>
-			var t *<f.name; format="cap">Context = nil
-			if localctx != nil { t = localctx.(*<f.ctxType>) \}
-			return l.<f.name>_Sempred(t, predIndex)
-			<else>
-			return l.<f.name>_Sempred(localctx, predIndex)
-			<endif>}; separator="\n">
-		default:
-			panic("No registered predicate for:" + fmt.Sprint(ruleIndex))
+	<if(recog.sempredFuncs.values)>
+	<recog.sempredFuncs.values:{f | case <f.ruleIndex>:
+		<if(f.isRuleContext)>
+		return l.<f.name>_Sempred(localctx, predIndex)
+		<else>
+		var t *<f.name; format="cap">Context = nil
+		if localctx != nil { t = localctx.(*<f.ctxType>) \}
+		return l.<f.name>_Sempred(t, predIndex)
+		<endif>
+	}; separator="\n\n">
+
+
+	<endif>
+	default:
+		panic("No registered predicate for: " + fmt.Sprint(ruleIndex))
 	}
 }
+<if(sempredFuncs.values)>
 
-<sempredFuncs.values; separator="\n">
+<sempredFuncs.values; separator="\n\n">
+<endif>
 <endif>
 >>
-
 
 /* This generates a private method since the actionIndex is generated, making an
  * overriding implementation impossible to maintain.
  */
 RuleActionFunction(r, actions) ::= <<
-
 func (l *<lexer.name>) <r.name; format="cap">_Action(localctx <if(r.isRuleContext)>antlr.RuleContext<else>*<r.ctxType><endif>, actionIndex int) {
 	switch actionIndex {
-	<actions:{index |
-case <index>:
-	<actions.(index)>
-	break}; separator="\n">
+	<if(actions)>
+	<actions:{index | case <index>:
+		<actions.(index)>}; separator="\n\n">
+
+
+	<endif>
 	default:
-		panic("No registered action for:" + fmt.Sprint(actionIndex))
+		panic("No registered action for: " + fmt.Sprint(actionIndex))
 	}
 }
 >>
@@ -267,29 +348,43 @@ case <index>:
 RuleSempredFunction(r, actions) ::= <<
 func (p *<if(parser)><parser.name><else><lexer.name><endif>) <r.name; format="cap">_Sempred(localctx antlr.RuleContext, predIndex int) bool {
 	switch predIndex {
-		<actions:{index | case <index>:
-	return <actions.(index)>;}; separator="\n">
-		default:
-			panic("No predicate with index:" + fmt.Sprint(predIndex))
+	<if(actions)>
+	<actions:{index | case <index>:
+		return <actions.(index)>}; separator="\n\n">
+
+	<endif>
+	default:
+		panic("No predicate with index: " + fmt.Sprint(predIndex))
 	}
 }
 >>
 
 RuleFunction(currentRule, args, code, locals, ruleCtx, altLabelCtxs, namedActions, finallyAction, postamble, exceptions) ::= <<
-
+<if(ruleCtx)>
 <ruleCtx>
 
-<altLabelCtxs:{l | <altLabelCtxs.(l)>}; separator="\n">
 
+<endif>
+<if(altLabelCtxs)>
+<altLabelCtxs:{l | <altLabelCtxs.(l)>}; separator="\n\n">
+
+
+<endif>
 func (p *<parser.name>) <currentRule.name; format="cap">(<currentRule.args:{a | <a.name> <a.type>}; separator=", ">) (localctx I<currentRule.ctxType>) {
-
 	localctx = New<currentRule.ctxType>(p, p.GetParserRuleContext(), p.GetState()<currentRule.args:{a | , <a.name>}>)
 	p.EnterRule(localctx, <currentRule.startState>, <parser.name>RULE_<currentRule.name>)
+	<if(namedActions.init)>
 	<namedActions.init>
-	<if(locals)>var <locals; separator="\nvar "><endif>
+	<endif>
+	<if(locals)>
+	<locals:{l | var <l>}; separator="\n">
+	<endif>
 
-	defer func(){
+
+	defer func() {
+		<if(finallyAction)>
 		<finallyAction>
+		<endif>
 		p.ExitRule()
 	}()
 
@@ -299,7 +394,7 @@ func (p *<parser.name>) <currentRule.name; format="cap">(<currentRule.args:{a | 
 			<exceptions; separator="\n">
 			<else>
 			if v, ok := err.(antlr.RecognitionException); ok {
-				localctx.SetException( v )
+				localctx.SetException(v)
 				p.GetErrorHandler().ReportError(p, v)
 				p.GetErrorHandler().Recover(p, v)
 			} else {
@@ -309,38 +404,60 @@ func (p *<parser.name>) <currentRule.name; format="cap">(<currentRule.args:{a | 
 		}
 	}()
 
+	<if(code)>
 	<code>
+
+
+	<endif>
+	<if(postamble)>
 	<postamble; separator="\n">
+
+
+	<endif>
+	<if(namedActions.after)>
 	<namedActions.after>
 
+
+	<endif>
 	return localctx
 }
-
 >>
 
 LeftRecursiveRuleFunction(currentRule, args, code, locals, ruleCtx, altLabelCtxs, namedActions, finallyAction, postamble) ::= <<
-
+<if(ruleCtx)>
 <ruleCtx>
-<altLabelCtxs:{l | <altLabelCtxs.(l)>}; separator="\n">
 
+
+<endif>
+<if(altLabelCtxs)>
+<altLabelCtxs:{l | <altLabelCtxs.(l)>}; separator="\n\n">
+
+
+<endif>
 func (p *<parser.name>) <currentRule.name; format="cap">(_p int<if(currentRule.args)>, <args:{a | , <a.name> <a.type>}><endif>) (localctx I<currentRule.ctxType>) {
-
 	var _parentctx antlr.ParserRuleContext = p.GetParserRuleContext()
 	_parentState := p.GetState()
 	localctx = New<currentRule.ctxType>(p, p.GetParserRuleContext(), _parentState<args:{a | , <a.name>}>)
 	var _prevctx I<currentRule.ctxType> = localctx
-	var _ antlr.ParserRuleContext = _prevctx // to prevent unused variable warning
+	var _ antlr.ParserRuleContext = _prevctx // TODO: To prevent unused variable warning.
 	_startState := <currentRule.startState>
 	p.EnterRecursionRule(localctx, <currentRule.startState>, <parser.name>RULE_<currentRule.name>, _p)
+	<if(namedActions.init)>
 	<namedActions.init>
-	<if(locals)>var <locals; separator="\nvar "><endif>
+	<endif>
+	<if(locals)>
+	<locals:{l | var <l>}; separator="\n">
+	<endif>
 
-	defer func(){
+
+	defer func() {
+		<if(finallyAction)>
 		<finallyAction>
+		<endif>
 		p.UnrollRecursionContexts(_parentctx)
 	}()
 
-	defer func(){
+	defer func() {
 		if err := recover(); err != nil {
 			if v, ok := err.(antlr.RecognitionException); ok {
 				localctx.SetException(v)
@@ -352,13 +469,23 @@ func (p *<parser.name>) <currentRule.name; format="cap">(_p int<if(currentRule.a
 		}
 	}()
 
+	<if(code)>
 	<code>
+
+
+	<endif>
+	<if(postamble)>
 	<postamble; separator="\n">
+
+
+	<endif>
+	<if(namedActions.after)>
 	<namedActions.after>
 
+
+	<endif>
 	return localctx
 }
-
 >>
 
 CodeBlockForOuterMostAlt(currentOuterMostAltCodeBlock, locals, preamble, ops) ::= <<
@@ -368,65 +495,116 @@ p.EnterOuterAlt(localctx, <currentOuterMostAltCodeBlock.alt.altNum>)
 >>
 
 CodeBlockForAlt(currentAltCodeBlock, locals, preamble, ops) ::= <<
-<if(locals)>var <locals; separator="\nvar "><endif>
+<if(locals)>
+<locals:{l | var <l>}; separator="\n">
+
+
+<endif>
+<if(preamble)>
 <preamble; separator="\n">
+
+
+<endif>
+<if(ops)>
 <ops; separator="\n">
+<endif>
 >>
 
 LL1AltBlock(choice, preamble, alts, error) ::= <<
 p.SetState(<choice.stateNumber>)
-<if(choice.label)><labelref(choice.label)> = p.GetTokenStream().LT(1)<endif>
+<if(choice.label)>
+<labelref(choice.label)> = p.GetTokenStream().LT(1)
+<endif>
+<if(preamble)>
+
 <preamble; separator="\n">
+<endif>
+
+
 switch p.GetTokenStream().LA(1) {
-<choice.altLook, alts:{look, alt | <cases(ttypes=look)>
-	<alt>
-	break }; separator="\n">
+<if(choice.altLook && alts)>
+<choice.altLook, alts:{look, alt | case <look:{l | <parser.name><l>}; separator=", ">:
+	<alt>}; separator="\n\n">
+
+
+<endif>
 default:
+	<if(error)>
 	<error>
+	<endif>
 }
 >>
 
 LL1OptionalBlock(choice, alts, error) ::= <<
 p.SetState(<choice.stateNumber>)
+
 switch p.GetTokenStream().LA(1) {
-<choice.altLook, alts:{look, alt | <cases(ttypes=look)>
-	<alt>
-	break }; separator="\n">
+<if(choice.altLook && alts)>
+<choice.altLook, alts:{look, alt | case <look:{l | <parser.name><l>}; separator=", ">:
+	<alt>}; separator="\n\n">
+
+
+<endif>
 default:
+	<if(error)>
 	<error>
+	<endif>
 }
 >>
 
 LL1OptionalBlockSingleAlt(choice, expr, alts, preamble, error, followExpr) ::= <<
 p.SetState(<choice.stateNumber>)
+<if(preamble)>
 <preamble; separator="\n">
+
+
+<endif>
 if <expr> {
+	<if(alts)>
 	<alts; separator="\n">
-}
-<!else if ( !(<followExpr>) ) <error>!>
+	<endif>
+}<! else if !(<followExpr>) {
+	<error>
+}!>
 >>
 
 LL1StarBlockSingleAlt(choice, loopExpr, alts, preamble, iteration) ::= <<
 p.SetState(<choice.stateNumber>)
 p.GetErrorHandler().Sync(p)
+<if(preamble)>
 <preamble; separator="\n">
+
+
+<endif>
 for <loopExpr> {
+	<if(alts)>
 	<alts; separator="\n">
+	<endif>
 	p.SetState(<choice.loopBackStateNumber>)
 	p.GetErrorHandler().Sync(p)
+	<if(iteration)>
 	<iteration>
+	<endif>
 }
 >>
 
 LL1PlusBlockSingleAlt(choice, loopExpr, alts, preamble, iteration) ::= <<
-p.SetState(<choice.blockStartStateNumber>) <! alt block decision !>
+p.SetState(<choice.blockStartStateNumber>)<! alt block decision !>
 p.GetErrorHandler().Sync(p)
+<if(preamble)>
 <preamble; separator="\n">
+
+
+<endif>
 for ok := true; ok; ok = <loopExpr> {
+	<if(alts)>
 	<alts; separator="\n">
-	p.SetState(<choice.stateNumber>); <! loopback/exit decision !>
+	<endif>
+	p.SetState(<choice.stateNumber>);<! loopback/exit decision !>
 	p.GetErrorHandler().Sync(p)
+	<if(iteration)>
 	<iteration>
+	<endif>
 }
 >>
 
@@ -435,61 +613,80 @@ for ok := true; ok; ok = <loopExpr> {
 AltBlock(choice, preamble, alts, error) ::= <<
 p.SetState(<choice.stateNumber>)
 p.GetErrorHandler().Sync(p)
-<if(choice.label)><labelref(choice.label)> = _input.LT(1)<endif>
+<if(choice.label)>
+<labelref(choice.label)> = _input.LT(1)
+
+<endif>
+<if(preamble)>
 <preamble; separator="\n">
-la_ := p.GetInterpreter().AdaptivePredict(p.GetTokenStream(),<choice.decision>,p.GetParserRuleContext())
+
+<endif>
+
+
+la_ := p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), <choice.decision>, p.GetParserRuleContext())
+
 switch la_ {
-<alts:{alt |
-case <i>:
-	<alt>
-	break
-}; separator="\n">
+<if(alts)>
+<alts:{alt | case <i>:
+	<alt>}; separator="\n\n">
+<endif>
 }
 >>
 
 OptionalBlock(choice, alts, error) ::= <<
 p.SetState(<choice.stateNumber>)
 p.GetErrorHandler().Sync(p)
-la_ := p.GetInterpreter().AdaptivePredict(p.GetTokenStream(),<choice.decision>,p.GetParserRuleContext())
-<alts:{alt |
-if la_ == <i><if(!choice.ast.greedy)>+1<endif> {
+la_ := p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), <choice.decision>, p.GetParserRuleContext())
+<if(alts)>
+
+<alts:{alt | if la_ == <i><if(!choice.ast.greedy)>+1<endif> {
 	<alt>
 }; separator="} else ">
+<endif>
 }
 >>
 
 StarBlock(choice, alts, Sync, iteration) ::= <<
 p.SetState(<choice.stateNumber>)
 p.GetErrorHandler().Sync(p)
-_alt := p.GetInterpreter().AdaptivePredict(p.GetTokenStream(),<choice.decision>,p.GetParserRuleContext())
+_alt := p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), <choice.decision>, p.GetParserRuleContext())
+
 for _alt != <choice.exitAlt> && _alt != antlr.ATNInvalidAltNumber {
-	if(_alt == 1<if(!choice.ast.greedy)>+1<endif>) {
+	if _alt == 1<if(!choice.ast.greedy)>+1<endif> {
+		<if(iteration)>
 		<iteration>
-		<alts> <! should only be one !>
+		<endif>
+		<if(alts)>
+		<alts><! should only be one !>
+		<endif>
 	}
 	p.SetState(<choice.loopBackStateNumber>)
 	p.GetErrorHandler().Sync(p)
-	_alt = p.GetInterpreter().AdaptivePredict(p.GetTokenStream(),<choice.decision>,p.GetParserRuleContext())
+	_alt = p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), <choice.decision>, p.GetParserRuleContext())
 }
-
 >>
 
 PlusBlock(choice, alts, error) ::= <<
-p.SetState(<choice.blockStartStateNumber>) <! alt block decision !>
+p.SetState(<choice.blockStartStateNumber>)<! alt block decision !>
 p.GetErrorHandler().Sync(p)
 _alt := 1<if(!choice.ast.greedy)>+1<endif>
 for ok := true; ok; ok = _alt != <choice.exitAlt> && _alt != antlr.ATNInvalidAltNumber {
 	switch _alt {
-	<alts:{alt |
-case <i><if(!choice.ast.greedy)>+1<endif>:
-	<alt>
-	break }; separator="\n">
+	<if(alts)>
+	<alts:{alt | case <i><if(!choice.ast.greedy)>+1<endif>:
+		<alt>}; separator="\n\n">
+
+
+	<endif>
 	default:
+		<if(error)>
 		<error>
+		<endif>
 	}
-	p.SetState(<choice.loopBackStateNumber>) <! loopback/exit decision !>
+
+	p.SetState(<choice.loopBackStateNumber>)<! loopback/exit decision !>
 	p.GetErrorHandler().Sync(p)
-	_alt = p.GetInterpreter().AdaptivePredict(p.GetTokenStream(),<choice.decision>, p.GetParserRuleContext())
+	_alt = p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), <choice.decision>, p.GetParserRuleContext())
 }
 >>
 
@@ -529,10 +726,6 @@ bitsetInlineComparison(s, bits) ::= <%
 <bits.ttypes:{ttype | <s.varName> == <parser.name><ttype>}; separator=" || ">
 %>
 
-cases(ttypes) ::= <<
-<ttypes:{t | case <parser.name><t>:}; separator="fallthrough \n">
->>
-
 InvokeRule(r, argExprsChunks) ::= <<
 p.SetState(<r.stateNumber>)
 <if(r.labels)><r.labels:{l | <labelref(l)> = }><endif>p.<r.name; format="cap">(<if(r.ast.options.p)><r.ast.options.p><if(argExprsChunks)>,<endif><endif><argExprsChunks>)
@@ -549,8 +742,14 @@ MatchNotSet(m, expr, capture) ::= "<CommonSetStuff(m, expr, capture, true)>"
 
 CommonSetStuff(m, expr, capture, invert) ::= <<
 p.SetState(<m.stateNumber>)
-<if(m.labels)><m.labels:{l | <labelref(l)> = }>p.GetTokenStream().LT(1);<endif>
+<if(m.labels)>
+<m.labels:{l | <labelref(l)> = }>p.GetTokenStream().LT(1);
+
+<endif>
+<if(capture)>
 <capture>
+
+<endif>
 <if(invert)>if <m.varName>\<=0 || <expr> <else>if !(<expr>)<endif> {
 	<if(m.labels)><m.labels:{l | <labelref(l)> = }><endif>p.GetErrorHandler().RecoverInline(p)
 } else {
@@ -571,8 +770,9 @@ ArgAction(a, chunks) ::= "<chunks>"
 
 SemPred(p, chunks, failChunks) ::= <<
 p.SetState(<p.stateNumber>)
-if !( <chunks>) {
-	panic( antlr.NewFailedPredicateException(p, <p.predicate><if(failChunks)>, <failChunks><elseif(p.msg)>, <p.msg><else>, ""<endif>))
+
+if !(<chunks>) {
+	panic(antlr.NewFailedPredicateException(p, <p.predicate><if(failChunks)>, <failChunks><elseif(p.msg)>, <p.msg><else>, ""<endif>))
 }
 >>
 
@@ -584,13 +784,13 @@ catch (<catchArg>) {
 
 // lexer actions are not associated with model objects
 
-LexerSkipCommand() ::="p.Skip()"
-LexerMoreCommand() ::="p.More()"
+LexerSkipCommand() ::= "p.Skip()"
+LexerMoreCommand() ::= "p.More()"
 LexerPopModeCommand() ::= "p.PopMode()"
-LexerTypeCommand(arg) ::="p.SetType(<arg>)"
-LexerChannelCommand(arg) ::="p.SetChannel(<arg>)"
-LexerModeCommand(arg) ::="p.SetMode(<arg>)"
-LexerPushModeCommand(arg) ::="p.PushMode(<arg>)"
+LexerTypeCommand(arg) ::= "p.SetType(<arg>)"
+LexerChannelCommand(arg) ::= "p.SetChannel(<arg>)"
+LexerModeCommand(arg) ::= "p.SetMode(<arg>)"
+LexerPushModeCommand(arg) ::= "p.PushMode(<arg>)"
 
 ActionText(t) ::= "<t.text>"
 ActionTemplate(t) ::= "<t.st>"
@@ -616,22 +816,22 @@ TokenPropertyRef_line(t) ::= "(func() int { if <ctx(t)>.Get<t.label; format={cap
 TokenPropertyRef_pos(t) ::= "(func() int { if <ctx(t)>.Get<t.label; format={cap}>() == nil { return 0 } else { return <ctx(t)>.Get<t.label; format={cap}>().GetColumn() }}())"
 TokenPropertyRef_channel(t) ::= "(func() int { if <ctx(t)>.Get<t.label; format={cap}>() == nil { return 0 } else { return <ctx(t)>.Get<t.label; format={cap}>().GetChannel() }}())"
 TokenPropertyRef_index(t) ::= "(func() int { if <ctx(t)>.Get<t.label; format={cap}>() == nil { return 0 } else { return <ctx(t)>.Get<t.label; format={cap}>().GetTokenIndex() }}())"
-TokenPropertyRef_int(t) ::= "(func() int { if <ctx(t)>.Get<t.label; format={cap}>() == nil { return 0 } else { i,_ := strconv.Atoi(<ctx(t)>.Get<t.label; format={cap}>().GetText()); return i }}())"
+TokenPropertyRef_int(t) ::= "(func() int { if <ctx(t)>.Get<t.label; format={cap}>() == nil { return 0 } else { i, _ := strconv.Atoi(<ctx(t)>.Get<t.label; format={cap}>().GetText()); return i }}())"
 
 RulePropertyRef_start(r) ::= "(func() antlr.Token { if <ctx(r)>.Get<r.label;format={cap}>() == nil { return nil } else { return <ctx(r)>.Get<r.label;format={cap}>().GetStart() }}())"
-RulePropertyRef_stop(r) ::="(func() antlr.Token { if <ctx(r)>.Get<r.label;format={cap}>() == nil { return nil } else { return <ctx(r)>.Get<r.label;format={cap}>().GetStop() }}())"
-RulePropertyRef_text(r) ::="(func() string { if <ctx(r)>.Get<r.label;format={cap}>() == nil { return \"\" } else { return p.GetTokenStream().GetTextFromTokens( <ctx(r)>.Get<r.label;format={cap}>().GetStart(),<ctx(r)>.<r.label>.GetStop()) }}())"
-RulePropertyRef_ctx(r) ::="<ctx(r)>.Get<r.label;format={cap}>()"
-RulePropertyRef_parser(r) ::="p"
+RulePropertyRef_stop(r) ::= "(func() antlr.Token { if <ctx(r)>.Get<r.label;format={cap}>() == nil { return nil } else { return <ctx(r)>.Get<r.label;format={cap}>().GetStop() }}())"
+RulePropertyRef_text(r) ::= "(func() string { if <ctx(r)>.Get<r.label;format={cap}>() == nil { return \"\" } else { return p.GetTokenStream().GetTextFromTokens(<ctx(r)>.Get<r.label;format={cap}>().GetStart(), <ctx(r)>.<r.label>.GetStop()) }}())"
+RulePropertyRef_ctx(r) ::= "<ctx(r)>.Get<r.label;format={cap}>()"
+RulePropertyRef_parser(r) ::= "p"
 
 ThisRulePropertyRef_start(r) ::= "localctx.GetStart()"
-ThisRulePropertyRef_stop(r) ::="localctx.GetStop()"
-ThisRulePropertyRef_text(r) ::="p.GetTokenStream().GetTextFromTokens(localctx.GetStart(), p.GetTokenStream().LT(-1))"
-ThisRulePropertyRef_ctx(r) ::="<ctx(r)>"
-ThisRulePropertyRef_parser(r) ::="p"
+ThisRulePropertyRef_stop(r) ::= "localctx.GetStop()"
+ThisRulePropertyRef_text(r) ::= "p.GetTokenStream().GetTextFromTokens(localctx.GetStart(), p.GetTokenStream().LT(-1))"
+ThisRulePropertyRef_ctx(r) ::= "<ctx(r)>"
+ThisRulePropertyRef_parser(r) ::= "p"
 
-NonLocalAttrRef(s) ::="GetInvokingContext(<s.ruleIndex>).<s.name>"
-SetNonLocalAttr(s, rhsChunks) ::="GetInvokingContext(<s.ruleIndex>).<s.name> = <rhsChunks>"
+NonLocalAttrRef(s) ::= "GetInvokingContext(<s.ruleIndex>).<s.name>"
+SetNonLocalAttr(s, rhsChunks) ::= "GetInvokingContext(<s.ruleIndex>).<s.name> = <rhsChunks>"
 
 AddToLabelList(a) ::= "<ctx(a.label)>.<a.listName> = append(<ctx(a.label)>.<a.listName>, <labelref(a.label)>)"
 
@@ -644,30 +844,30 @@ RuleContextListDecl(rdecl) ::= "<rdecl.name> []I<rdecl.ctxName>"
 
 AttributeDecl(d) ::= "<d.name> <d.type;format={lower}><if(d.initValue)>// TODO = <d.initValue><endif>"
 
-ContextTokenGetterDecl(t) ::=<<
+ContextTokenGetterDecl(t) ::= <<
 <t.name; format="cap">() antlr.TerminalNode {
 	return s.GetToken(<parser.name><t.name>, 0)
 }
 >>
 
 // should never be called
-ContextTokenListGetterDecl(t) ::=<<
+ContextTokenListGetterDecl(t) ::= <<
 fail: ContextTokenListGetterDecl should never be called!
 >>
 
-ContextTokenListIndexedGetterDecl(t) ::=<<
+ContextTokenListIndexedGetterDecl(t) ::= <<
 <t.name; format="cap">(i int) []antlr.TerminalNode {
 	if i \< 0 {
 		return s.GetTokens(<parser.name><t.name>)
 	} else {
-		return []antlr.TerminalNode{ s.GetToken(<parser.name><t.name>, i) }
+		return []antlr.TerminalNode{s.GetToken(<parser.name><t.name>, i)}
 	}
 }
 >>
 
-ContextRuleGetterDecl(r) ::=<<
+ContextRuleGetterDecl(r) ::= <<
 <r.name; format="cap">() I<r.ctxName> {
-	v := s.GetTypedRuleContext( reflect.TypeOf((*I<r.ctxName>)(nil)).Elem(),0)
+	v := s.GetTypedRuleContext(reflect.TypeOf((*I<r.ctxName>)(nil)).Elem(), 0)
 
 	if v == nil {
 		return nil
@@ -678,18 +878,18 @@ ContextRuleGetterDecl(r) ::=<<
 >>
 
 // should never be called
-ContextRuleListGetterDecl(r) ::=<<
+ContextRuleListGetterDecl(r) ::= <<
 fail: ContextRuleListGetterDecl should never be called!
 >>
 
-ContextRuleListIndexedGetterDecl(r) ::=<<
+ContextRuleListIndexedGetterDecl(r) ::= <<
 <r.name; format="cap">(i int) []I<r.ctxName> {
 	var ts []antlr.RuleContext
 
 	if i \< 0 {
-		ts = s.GetTypedRuleContexts( reflect.TypeOf((*I<r.ctxName>)(nil)).Elem())
+		ts = s.GetTypedRuleContexts(reflect.TypeOf((*I<r.ctxName>)(nil)).Elem())
 	} else {
-		ts = []antlr.RuleContext { s.GetTypedRuleContext( reflect.TypeOf((*I<r.ctxName>)(nil)).Elem(),i) }
+		ts = []antlr.RuleContext{s.GetTypedRuleContext(reflect.TypeOf((*I<r.ctxName>)(nil)).Elem(), i)}
 	}
 
 	var tst []I<r.ctxName> = make([]I<r.ctxName>, len(ts))
@@ -713,47 +913,108 @@ LexerRuleContext() ::= "RuleContext"
 RuleContextNameSuffix() ::= "Context"
 
 ImplicitTokenLabel(tokenName) ::= "_<tokenName>"
-ImplicitRuleLabel(ruleName) ::="_<ruleName>"
-ImplicitSetLabel(id) ::="_tset<id>"
-ListLabelName(label) ::="<label>"
+ImplicitRuleLabel(ruleName) ::= "_<ruleName>"
+ImplicitSetLabel(id) ::= "_tset<id>"
+ListLabelName(label) ::= "<label>"
 
 CaptureNextToken(d) ::= "<d.varName> = p.GetTokenStream().LT(1)"
-CaptureNextTokenType(d) ::= "<d.varName> = p.GetTokenStream().LA(1);"
+CaptureNextTokenType(d) ::= "<d.varName> = p.GetTokenStream().LA(1)"
 
-StructDecl(struct, ctorAttrs, attrs, getters, dispatchMethods, interfaces, extensionMembers, tokenDecls, tokenTypeDecls, tokenListDecls, ruleContextDecls, ruleContextListDecls, attributeDecls, superClass={ParserRuleContext}) ::= <<
-
-// an interface to support dynamic dispatch (subclassing)
-
+StructDecl(struct, ctorAttrs, attrs, getters, dispatchMethods, interfaces, extensionMembers, tokenDecls, tokenTypeDecls, tokenListDecls, ruleContextDecls, ruleContextListDecls, attributeDecls, superClass = {ParserRuleContext}) ::= <<
+// I<struct.name> is an interface to support dynamic dispatch.
 type I<struct.name> interface {
 	antlr.ParserRuleContext
 
+	// GetParser returns the parser.
 	GetParser() antlr.Parser
-	get<struct.name>() // to differentiate from other interfaces
+	<if(struct.tokenDecls)>
 
-	<struct.tokenDecls:{a | Get<a.name; format="cap">() <TokenLabelType()> }; separator="\n">
-	<struct.tokenDecls:{a | Set<a.name; format="cap">(<TokenLabelType()>) }; separator="\n">
-	<struct.tokenTypeDecls:{a | Get<a.name; format="cap">() int }; separator="\n">
-	<struct.tokenTypeDecls:{a | Set<a.name; format="cap">(int) }; separator="\n">
-	<struct.tokenListDecls:{a | Get<a.name; format="cap">() []<TokenLabelType()>}; separator="\n">
-	<struct.tokenListDecls:{a | Set<a.name; format="cap">([]<TokenLabelType()>)}; separator="\n">
-	<struct.ruleContextDecls:{a | Get<a.name; format="cap">() I<a.ctxName>}; separator="\n">
-	<struct.ruleContextDecls:{a | Set<a.name; format="cap">(I<a.ctxName>)}; separator="\n">
-	<struct.ruleContextListDecls:{a | Get<a.name; format="cap">() []I<a.ctxName>}; separator="\n">
-	<struct.ruleContextListDecls:{a | Set<a.name; format="cap">([]I<a.ctxName>) }; separator="\n">
-	<struct.attributeDecls:{a | Get<a.name; format="cap">() <a.type;format="lower">}; separator="\n">
-	<struct.attributeDecls:{a | Set<a.name; format="cap">(<a.type;format="lower">)}; separator="\n">
+	<struct.tokenDecls:{a | // Get<a.name; format="cap"> returns the <a.name> token.
+Get<a.name; format="cap">() <TokenLabelType()> }; separator="\n\n">
+	<endif>
+
+	<if(struct.tokenDecls)>
+
+	<struct.tokenDecls:{a | // Set<a.name; format="cap"> sets the <a.name> token.
+Set<a.name; format="cap">(<TokenLabelType()>) }; separator="\n\n">
+	<endif>
+
+	<if(struct.tokenTypeDecls)>
+
+	<struct.tokenTypeDecls:{a | // Get<a.name; format="cap"> returns the <a.name> token type.
+Get<a.name; format="cap">() int }; separator="\n\n">
+	<endif>
+
+	<if(struct.tokenTypeDecls)>
+
+	<struct.tokenTypeDecls:{a | // Set<a.name; format="cap"> sets the <a.name> token type.
+Set<a.name; format="cap">(int) }; separator="\n\n">
+	<endif>
+
+	<if(struct.tokenListDecls)>
+
+	<struct.tokenListDecls:{a | // Get<a.name; format="cap"> returns the <a.name> token list.
+Get<a.name; format="cap">() []<TokenLabelType()>}; separator="\n\n">
+	<endif>
+
+	<if(struct.tokenListDecls)>
+
+	<struct.tokenListDecls:{a | // Set<a.name; format="cap"> sets the <a.name> token list.
+Set<a.name; format="cap">([]<TokenLabelType()>)}; separator="\n\n">
+	<endif>
+
+	<if(struct.ruleContextDecls)>
+
+	<struct.ruleContextDecls:{a | // Get<a.name; format="cap"> returns the <a.name> rule contexts.
+Get<a.name; format="cap">() I<a.ctxName>}; separator="\n\n">
+	<endif>
+
+	<if(struct.ruleContextDecls)>
+
+	<struct.ruleContextDecls:{a | // Set<a.name; format="cap"> sets the <a.name> rule contexts.
+Set<a.name; format="cap">(I<a.ctxName>)}; separator="\n\n">
+	<endif>
+
+	<if(struct.ruleContextListDecls)>
+
+	<struct.ruleContextListDecls:{a | // Get<a.name; format="cap"> returns the <a.name> rule context list.
+Get<a.name; format="cap">() []I<a.ctxName>}; separator="\n\n">
+	<endif>
+
+	<if(struct.ruleContextListDecls)>
+
+	<struct.ruleContextListDecls:{a | // Set<a.name; format="cap"> sets the <a.name> rule context list.
+Set<a.name; format="cap">([]I<a.ctxName>) }; separator="\n\n">
+	<endif>
+
+	<if(struct.attributeDecls)>
+
+	<struct.attributeDecls:{a | // Get<a.name; format="cap"> returns the <a.name> attribute.
+Get<a.name; format="cap">() <a.type;format="lower">}; separator="\n\n">
+	<endif>
+
+	<if(struct.attributeDecls)>
+
+	<struct.attributeDecls:{a | // Set<a.name; format="cap"> sets the <a.name> attribute.
+Set<a.name; format="cap">(<a.type;format="lower">)}; separator="\n\n">
+	<endif>
+
+
+	// get<struct.name> differentiates from other interfaces.
+	get<struct.name>()
 }
 
 type <struct.name> struct {
 	*antlr.BaseParserRuleContext
-
 	parser antlr.Parser
-	<attrs:{a | <a>}; separator="\n">
+	<if(attrs)>
+	<attrs; separator="\n">
+	<endif>
 }
 
 func NewEmpty<struct.name>() *<struct.name> {
 	var p = new(<struct.name>)
-	p.BaseParserRuleContext = antlr.NewBaseParserRuleContext( nil, -1 )
+	p.BaseParserRuleContext = antlr.NewBaseParserRuleContext(nil, -1)
 	p.RuleIndex = <parser.name>RULE_<struct.derivedFromName>
 	return p
 }
@@ -761,61 +1022,118 @@ func NewEmpty<struct.name>() *<struct.name> {
 func (*<struct.name>) get<struct.name>() {}
 
 func New<struct.name>(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int<struct.ctorAttrs:{a | , <a.name> <a.type;format="lower">}>) *<struct.name> {
-
 	var p = new(<struct.name>)
 
-	p.BaseParserRuleContext = antlr.NewBaseParserRuleContext( parent, invokingState )
+	p.BaseParserRuleContext = antlr.NewBaseParserRuleContext(parent, invokingState)
 
 	p.parser = parser
 	p.RuleIndex = <parser.name>RULE_<struct.derivedFromName>
 
+	<if(struct.ctorAttrs)>
 	<struct.ctorAttrs:{a | p.<a.name> = <a.name>}; separator="\n">
+
+
+	<endif>
 	return p
 }
 
 func (s *<struct.name>) GetParser() antlr.Parser { return s.parser }
+<if(struct.tokenDecls)>
 
-<struct.tokenDecls:{a | func (s *<struct.name>) Get<a.name; format="cap">() <TokenLabelType()> { return s.<a.name> \} }; separator="\n">
-<struct.tokenDecls:{a | func (s *<struct.name>) Set<a.name; format="cap">(v <TokenLabelType()>) { s.<a.name> = v \} }; separator="\n">
-<struct.tokenTypeDecls:{a | func (s *<struct.name>) Get<a.name; format="cap">() int { return s.<a.name> \}  }; separator="\n">
-<struct.tokenTypeDecls:{a | func (s *<struct.name>) Set<a.name; format="cap">(v int) { s.<a.name> = v \} }; separator="\n">
-<struct.tokenListDecls:{a | func (s *<struct.name>) Get<a.name; format="cap">() []<TokenLabelType()>  { return s.<a.name> \} }; separator="\n">
-<struct.tokenListDecls:{a | func (s *<struct.name>) Set<a.name; format="cap">(v []<TokenLabelType()>) { s.<a.name> = v \}}; separator="\n">
-<struct.ruleContextDecls:{a | func (s *<struct.name>) Get<a.name; format="cap">() I<a.ctxName>  { return s.<a.name> \} }; separator="\n">
-<struct.ruleContextDecls:{a | func (s *<struct.name>) Set<a.name; format="cap">(v I<a.ctxName>) { s.<a.name> = v \}}; separator="\n">
-<struct.ruleContextListDecls:{a | func (s *<struct.name>) Get<a.name; format="cap">() []I<a.ctxName>  { return s.<a.name> \} }; separator="\n">
-<struct.ruleContextListDecls:{a | func (s *<struct.name>) Set<a.name; format="cap">(v []I<a.ctxName>) { s.<a.name> = v \} }; separator="\n">
-<struct.attributeDecls:{a | func (s *<struct.name>) Get<a.name; format="cap">() <a.type;format="lower">  { return s.<a.name> \} }; separator="\n">
-<struct.attributeDecls:{a | func (s *<struct.name>) Set<a.name; format="cap">(v <a.type;format="lower">) { s.<a.name> = v \}}; separator="\n">
+<struct.tokenDecls:{a | func (s *<struct.name>) Get<a.name; format="cap">() <TokenLabelType()> { return s.<a.name> \}}; separator="\n\n">
+<endif>
+
+<if(struct.tokenDecls)>
+
+<struct.tokenDecls:{a | func (s *<struct.name>) Set<a.name; format="cap">(v <TokenLabelType()>) { s.<a.name> = v \}}; separator="\n\n">
+<endif>
+
+<if(struct.tokenTypeDecls)>
+
+<struct.tokenTypeDecls:{a | func (s *<struct.name>) Get<a.name; format="cap">() int { return s.<a.name> \}}; separator="\n\n">
+<endif>
+
+<if(struct.tokenTypeDecls)>
+
+<struct.tokenTypeDecls:{a | func (s *<struct.name>) Set<a.name; format="cap">(v int) { s.<a.name> = v \}}; separator="\n\n">
+<endif>
+
+<if(struct.tokenListDecls)>
+
+<struct.tokenListDecls:{a | func (s *<struct.name>) Get<a.name; format="cap">() []<TokenLabelType()> { return s.<a.name> \}}; separator="\n\n">
+<endif>
+
+<if(struct.tokenListDecls)>
+
+<struct.tokenListDecls:{a | func (s *<struct.name>) Set<a.name; format="cap">(v []<TokenLabelType()>) { s.<a.name> = v \}}; separator="\n\n">
+<endif>
+
+<if(struct.ruleContextDecls)>
+
+<struct.ruleContextDecls:{a | func (s *<struct.name>) Get<a.name; format="cap">() I<a.ctxName> { return s.<a.name> \}}; separator="\n\n">
+<endif>
+
+<if(struct.ruleContextDecls)>
+
+<struct.ruleContextDecls:{a | func (s *<struct.name>) Set<a.name; format="cap">(v I<a.ctxName>) { s.<a.name> = v \}}; separator="\n\n">
+<endif>
+
+<if(struct.ruleContextListDecls)>
+
+<struct.ruleContextListDecls:{a | func (s *<struct.name>) Get<a.name; format="cap">() []I<a.ctxName> { return s.<a.name> \}}; separator="\n\n">
+<endif>
+
+<if(struct.ruleContextListDecls)>
+
+<struct.ruleContextListDecls:{a | func (s *<struct.name>) Set<a.name; format="cap">(v []I<a.ctxName>) { s.<a.name> = v \}}; separator="\n\n">
+<endif>
+
+<if(struct.attributeDecls)>
+
+<struct.attributeDecls:{a | func (s *<struct.name>) Get<a.name; format="cap">() <a.type;format="lower"> { return s.<a.name> \}}; separator="\n\n">
+<endif>
+
+<if(struct.attributeDecls)>
+
+<struct.attributeDecls:{a | func (s *<struct.name>) Set<a.name; format="cap">(v <a.type;format="lower">) { s.<a.name> = v \}}; separator="\n\n">
+<endif>
+
+<if(getters)>
 
 <getters:{g | func (s *<struct.name>) <g>}; separator="\n\n">
+<endif>
 
-<if(struct.provideCopyFrom)> <! don't need unless we have subclasses !>
+<if(struct.provideCopyFrom)><! don't need unless we have subclasses !>
 
 func (s *<struct.name>) CopyFrom(ctx *<struct.name>) {
 	s.BaseParserRuleContext.CopyFrom(ctx.BaseParserRuleContext)
-	<struct.attrs:{a | s.<a.name> = ctx.<a.name>;}; separator="\n">
+	<struct.attrs:{a | s.<a.name> = ctx.<a.name>}; separator="\n">
 }
 <endif>
 
-func (s *<struct.name>) GetRuleContext() antlr.RuleContext { return s }
+func (s *<struct.name>) GetRuleContext() antlr.RuleContext {
+	return s
+}
+<if(dispatchMethods)>
 
-<dispatchMethods; separator="\n">
-<extensionMembers; separator="\n">
+<dispatchMethods; separator="\n\n">
+<endif>
 
+<if(extensionMembers)>
+
+<extensionMembers; separator="\n\n">
+<endif>
 >>
 
-AltLabelStructDecl(struct, attrs, getters, dispatchMethods, tokenDecls, tokenTypeDecls,
-  tokenListDecls, ruleContextDecls, ruleContextListDecls, attributeDecls) ::= <<
-
+AltLabelStructDecl(struct, attrs, getters, dispatchMethods, tokenDecls, tokenTypeDecls, tokenListDecls, ruleContextDecls, ruleContextListDecls, attributeDecls) ::= <<
 type <struct.name> struct {
 	*<currentRule.name; format="cap">Context
-
-	<attrs:{a | <a>}; separator="\n">
+	<if(attrs)>
+	<attrs; separator="\n">
+	<endif>
 }
 
 func New<struct.name>(parser antlr.Parser, ctx antlr.ParserRuleContext) *<struct.name> {
-
 	var p = new(<struct.name>)
 
 	p.<currentRule.name; format="cap">Context = NewEmpty<currentRule.name; format="cap">Context()
@@ -825,24 +1143,78 @@ func New<struct.name>(parser antlr.Parser, ctx antlr.ParserRuleContext) *<struct
 	return p
 }
 
-<struct.tokenDecls:{a | func (s *<struct.name>) Get<a.name; format="cap">() <TokenLabelType()> { return s.<a.name> \} }; separator="\n">
-<struct.tokenDecls:{a | func (s *<struct.name>) Set<a.name; format="cap">(v <TokenLabelType()>) { s.<a.name> = v \} }; separator="\n">
-<struct.tokenTypeDecls:{a | func (s *<struct.name>) Get<a.name; format="cap">() int { return s.<a.name> \}  }; separator="\n">
-<struct.tokenTypeDecls:{a | func (s *<struct.name>) Set<a.name; format="cap">(v int) { s.<a.name> = v \} }; separator="\n">
-<struct.tokenListDecls:{a | func (s *<struct.name>) Get<a.name; format="cap">() []<TokenLabelType()>  { return s.<a.name> \} }; separator="\n">
-<struct.tokenListDecls:{a | func (s *<struct.name>) Set<a.name; format="cap">(v []<TokenLabelType()>) { s.<a.name> = v \}}; separator="\n">
-<struct.ruleContextDecls:{a | func (s *<struct.name>) Get<a.name; format="cap">() I<a.ctxName>  { return s.<a.name> \} }; separator="\n">
-<struct.ruleContextDecls:{a | func (s *<struct.name>) Set<a.name; format="cap">(v I<a.ctxName>) { s.<a.name> = v \}}; separator="\n">
-<struct.ruleContextListDecls:{a | func (s *<struct.name>) Get<a.name; format="cap">() []I<a.ctxName>  { return s.<a.name> \} }; separator="\n">
-<struct.ruleContextListDecls:{a | func (s *<struct.name>) Set<a.name; format="cap">(v []I<a.ctxName>) { s.<a.name> = v \} }; separator="\n">
-<struct.attributeDecls:{a | func (s *<struct.name>) Get<a.name; format="cap">() <a.type;format="lower">  { return s.<a.name> \} }; separator="\n">
-<struct.attributeDecls:{a | func (s *<struct.name>) Set<a.name; format="cap">(v <a.type;format="lower">) { s.<a.name> = v \}}; separator="\n">
+<if(struct.tokenDecls)>
 
-func (s *<struct.name>) GetRuleContext() antlr.RuleContext { return s }
+<struct.tokenDecls:{a | func (s *<struct.name>) Get<a.name; format="cap">() <TokenLabelType()> { return s.<a.name> \}}; separator="\n\n">
+<endif>
+
+<if(struct.tokenDecls)>
+
+<struct.tokenDecls:{a | func (s *<struct.name>) Set<a.name; format="cap">(v <TokenLabelType()>) { s.<a.name> = v \}}; separator="\n\n">
+<endif>
+
+<if(struct.tokenTypeDecls)>
+
+<struct.tokenTypeDecls:{a | func (s *<struct.name>) Get<a.name; format="cap">() int { return s.<a.name> \}}; separator="\n\n">
+<endif>
+
+<if(struct.tokenTypeDecls)>
+
+<struct.tokenTypeDecls:{a | func (s *<struct.name>) Set<a.name; format="cap">(v int) { s.<a.name> = v \}}; separator="\n\n">
+<endif>
+
+<if(struct.tokenListDecls)>
+
+<struct.tokenListDecls:{a | func (s *<struct.name>) Get<a.name; format="cap">() []<TokenLabelType()> { return s.<a.name> \}}; separator="\n\n">
+<endif>
+
+<if(struct.tokenListDecls)>
+
+<struct.tokenListDecls:{a | func (s *<struct.name>) Set<a.name; format="cap">(v []<TokenLabelType()>) { s.<a.name> = v \}}; separator="\n\n">
+<endif>
+
+<if(struct.ruleContextDecls)>
+
+<struct.ruleContextDecls:{a | func (s *<struct.name>) Get<a.name; format="cap">() I<a.ctxName> { return s.<a.name> \}}; separator="\n\n">
+<endif>
+
+<if(struct.ruleContextDecls)>
+
+<struct.ruleContextDecls:{a | func (s *<struct.name>) Set<a.name; format="cap">(v I<a.ctxName>) { s.<a.name> = v \}}; separator="\n\n">
+<endif>
+
+<if(struct.ruleContextListDecls)>
+
+<struct.ruleContextListDecls:{a | func (s *<struct.name>) Get<a.name; format="cap">() []I<a.ctxName> { return s.<a.name> \}}; separator="\n\n">
+<endif>
+
+<if(struct.ruleContextListDecls)>
+
+<struct.ruleContextListDecls:{a | func (s *<struct.name>) Set<a.name; format="cap">(v []I<a.ctxName>) { s.<a.name> = v \}}; separator="\n\n">
+<endif>
+
+<if(struct.attributeDecls)>
+
+<struct.attributeDecls:{a | func (s *<struct.name>) Get<a.name; format="cap">() <a.type;format="lower"> { return s.<a.name> \}}; separator="\n\n">
+<endif>
+
+<if(struct.attributeDecls)>
+
+<struct.attributeDecls:{a | func (s *<struct.name>) Set<a.name; format="cap">(v <a.type;format="lower">) { s.<a.name> = v \}}; separator="\n\n">
+<endif>
+
+func (s *<struct.name>) GetRuleContext() antlr.RuleContext {
+	return s
+}
+<if(getters)>
 
 <getters:{g | func (s *<struct.name>) <g>}; separator="\n\n">
-<dispatchMethods; separator="\n">
+<endif>
 
+<if(dispatchMethods)>
+
+<dispatchMethods; separator="\n\n">
+<endif>
 >>
 
 ListenerDispatchMethod(method) ::= <<
@@ -858,12 +1230,12 @@ func (s *<struct.name>) Accept(visitor antlr.ParseTreeVisitor) interface{} {
 	switch t := visitor.(type) {
 	case <parser.grammarName>Visitor:
 		return t.Visit<struct.derivedFromName; format="cap">(s)
+
 	default:
 		return t.VisitChildren(s)
 	}
 }
 >>
-
 
 /** If we don't know location of label def x, use this template */
 labelref(x) ::= "<if(!x.isLocal)>localctx.(*<x.ctx.name>).<endif><x.name>"
@@ -872,9 +1244,9 @@ labelref(x) ::= "<if(!x.isLocal)>localctx.(*<x.ctx.name>).<endif><x.name>"
 ctx(actionChunk) ::= "localctx.(*<actionChunk.ctx.name>)"
 
 // used for left-recursive rules
-recRuleAltPredicate(ruleName, opPrec) ::="p.Precpred(p.GetParserRuleContext(), <opPrec>)"
-recRuleSetReturnAction(src, name) ::="$<name>=$<src>.<name>"
-recRuleSetStopToken() ::="p.GetParserRuleContext().SetStop( p.GetTokenStream().LT(-1) )"
+recRuleAltPredicate(ruleName, opPrec) ::= "p.Precpred(p.GetParserRuleContext(), <opPrec>)"
+recRuleSetReturnAction(src, name) ::= "$<name>=$<src>.<name>"
+recRuleSetStopToken() ::= "p.GetParserRuleContext().SetStop(p.GetTokenStream().LT(-1))"
 
 recRuleAltStartAction(ruleName, ctxName, label) ::= <<
 localctx = New<ctxName>Context(p, _parentctx, _parentState)
@@ -886,11 +1258,13 @@ recRuleLabeledAltStartAction(ruleName, currentAltLabel, label, isListLabel) ::= 
 localctx = New<currentAltLabel; format="cap">Context(p, New<ruleName; format="cap">Context(p, _parentctx, _parentState))
 <if(label)>
 <if(isListLabel)>
-localctx.(*<currentAltLabel; format="cap">Context).<label> = append( localctx.(*<currentAltLabel; format="cap">Context).<label>, _prevctx)
+localctx.(*<currentAltLabel; format="cap">Context).<label> = append(localctx.(*<currentAltLabel; format="cap">Context).<label>, _prevctx)
 <else>
 localctx.(*<currentAltLabel; format="cap">Context).<label> = _prevctx
 <endif>
+
 <endif>
+
 p.PushNewRecursionContext(localctx, _startState, <parser.name>RULE_<ruleName>)
 >>
 
@@ -907,14 +1281,10 @@ if p.GetParseListeners() != nil {
 _prevctx = localctx
 >>
 
+LexerFile(lexerFile, lexer, namedActions) ::= <<
+<fileHeader(lexerFile.grammarFileName, lexerFile.ANTLRVersion)>
 
-LexerFile(file, lexer, namedActions) ::= <<
-<fileHeader(file.grammarFileName, file.ANTLRVersion)>
-<if(file.genPackage)>
-package <file.genPackage><! // <file.grammarName>!><! why can't we access file.grammarName here? !>
-<else>
-package parser<! // <file.grammarName>!><! why can't we access file.grammarName here? !>
-<endif>
+package parser
 
 import (
 	"fmt"
@@ -925,34 +1295,74 @@ import (
 // suppress unused import error, many tests
 // require fmt.
 var _ = fmt.Printf
+<if(namedActions.header)>
 
 <namedActions.header>
+<endif>
+
+<if(lexer)>
 
 <lexer>
+<endif>
 
 >>
 
 Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass) ::= <<
-
+<if(atn)>
 var serializedLexerAtn = <atn>
-var lexerDeserializer = antlr.NewATNDeserializer(nil)
-var lexerAtn = lexerDeserializer.DeserializeFromUInt16( serializedLexerAtn )
+<else>
+var serializedLexerAtn []uint16
+<endif>
 
-var lexerModeNames = []string{ <lexer.modes:{m | "<m>"}; separator=", ", wrap, anchor> }
-var lexerLiteralNames = []string{ <lexer.literalNames:{t | <t>}; null="\"\"", separator=", ", wrap, anchor> }
-var lexerSymbolicNames = []string{ <lexer.symbolicNames:{t | <t>}; null="\"\"", separator=", ", wrap, anchor> }
-var lexerRuleNames = []string{ <lexer.ruleNames:{r | "<r>"}; separator=", ", wrap, anchor> }
+
+var lexerDeserializer = antlr.NewATNDeserializer(nil)
+
+var lexerAtn = lexerDeserializer.DeserializeFromUInt16(serializedLexerAtn)
+
+<if(lexer.modes)>
+var lexerModeNames = []string{
+	<lexer.modes:{m | "<m>"}; separator=", ", wrap>,
+}
+<else>
+var lexerModeNames []string
+<endif>
+
+
+<if(lexer.literalNames)>
+var lexerLiteralNames = []string{
+	<lexer.literalNames; null="\"\"", separator=", ", wrap>,
+}
+<else>
+var lexerLiteralNames []string
+<endif>
+
+
+<if(lexer.symbolicNames)>
+var lexerSymbolicNames = []string{
+	<lexer.symbolicNames; null="\"\"", separator=", ", wrap>,
+}
+<else>
+var lexerSymbolicNames []string
+<endif>
+
+
+<if(lexer.ruleNames)>
+var lexerRuleNames = []string{
+	<lexer.ruleNames:{r | "<r>"}; separator=", ", wrap>,
+}
+<else>
+var lexerRuleNames []string
+<endif>
+
 
 type <lexer.name> struct {
 	*<if(superClass)><superClass><else>antlr.BaseLexer<endif>
-
 	modeNames []string
-	// EOF string
+	// TODO: EOF string
 }
 
 func New<lexer.name>(input antlr.CharStream) *<lexer.name> {
-
-	var lexerDecisionToDFA = make([]*antlr.DFA,len(lexerAtn.DecisionToState))
+	var lexerDecisionToDFA = make([]*antlr.DFA, len(lexerAtn.DecisionToState))
 
 	for index, ds := range lexerAtn.DecisionToState {
 		lexerDecisionToDFA[index] = antlr.NewDFA(ds, index)
@@ -969,28 +1379,42 @@ func New<lexer.name>(input antlr.CharStream) *<lexer.name> {
 	this.LiteralNames = lexerLiteralNames
 	this.SymbolicNames = lexerSymbolicNames
 	this.GrammarFileName = "<lexer.grammarFileName>"
-	//lex.EOF = antlr.TokenEOF
+	// TODO: lex.EOF = antlr.TokenEOF
 
 	return this
 }
+<if(rest(lexer.tokens))>
 
+// <lexer.name> tokens.
 const (
-	<lexer.tokens:{k | <lexer.name><k> = <lexer.tokens.(k)>}; separator="\n", wrap, anchor>
+	<lexer.tokens:{k | <lexer.name><k> = <lexer.tokens.(k)>}; separator="\n">
 )
+<elseif(lexer.tokens)>
 
+// <lexer.name><first(lexer.tokens)> is the <lexer.name> token.
+const <lexer.name><first(lexer.tokens)> = <lexer.tokens.(first(lexer.tokens))>
+<endif>
+
+<if(rest(rest(lexer.modes)))>
+
+// <lexer.name> modes.
 const (
-	<rest(lexer.modes):{m | <lexer.name><m> = <i>}; separator="\n">
+	<first(rest(lexer.modes)):{m | <lexer.name><m> = iota + 1}>
+	<rest(rest(lexer.modes)):{m | <lexer.name><m>}; separator="\n">
 )
+<elseif(rest(lexer.modes))>
 
+// <lexer.name><first(rest(lexer.modes))> is the <lexer.name> mode.
+const <lexer.name><first(rest(lexer.modes))> = 1
+<endif>
 
 <dumpActions(lexer, "", actionFuncs, sempredFuncs)>
-
 >>
 
 SerializedATN(model) ::= <<
-<! only one segment, can be inlined !>
-[]uint16{ <model.serialized; wrap={<\n>	}> }
-
+<if(model.serialized)>[]uint16{
+	<model.serialized; separator=", ", wrap>,
+}<endif>
 >>
 
 /**
