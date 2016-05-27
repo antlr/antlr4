@@ -766,7 +766,7 @@ public abstract class BaseTest {
 			ST outputFileST = new ST(
 					"package main\n" +
 						"import (\n"
-						+"	\"github.com/willfaught/antlr4/runtime/Go/antlr\"\n"
+						+"	\"github.com/pboyer/antlr4/runtime/Go/antlr\"\n"
 						+"	\"./parser\"\n"
 						+"	\"os\"\n"
 						+")\n"
@@ -821,7 +821,7 @@ public abstract class BaseTest {
 		ST outputFileST = new ST(
 				"package main\n" +
 				"import (\n"
-					+ "	\"github.com/willfaught/antlr4/runtime/Go/antlr\"\n"
+					+ "	\"github.com/pboyer/antlr4/runtime/Go/antlr\"\n"
 					+ "	\"./parser\"\n"
 					+ "	\"os\"\n"
 					+ "	\"fmt\"\n"
