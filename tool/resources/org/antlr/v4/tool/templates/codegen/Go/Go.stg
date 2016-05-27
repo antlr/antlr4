@@ -11,7 +11,7 @@ import (
     "fmt"
     "strconv"
 
-    "github.com/antlr/antlr4/runtime/Go/antlr"
+    "github.com/willfaught/antlr4/runtime/Go/antlr"
 )
 
 // Stopgap to suppress unused import error. We aren't certain
@@ -31,7 +31,7 @@ ListenerFile(file, header) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 package parser // <file.grammarName>
 
-import "github.com/antlr/antlr4/runtime/Go/antlr"
+import "github.com/willfaught/antlr4/runtime/Go/antlr"
 
 // A complete listener for a parse tree produced by <file.parserName>
 
@@ -50,7 +50,7 @@ BaseListenerFile(file, header) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 package parser // <file.grammarName>
 
-import "github.com/antlr/antlr4/runtime/Go/antlr"
+import "github.com/willfaught/antlr4/runtime/Go/antlr"
 
 // A complete base listener for a parse tree produced by <file.parserName>
 
@@ -78,7 +78,7 @@ VisitorFile(file, header) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 package parser // <file.grammarName>
 
-import "github.com/antlr/antlr4/runtime/Go/antlr"
+import "github.com/willfaught/antlr4/runtime/Go/antlr"
 
 <header>
 
@@ -98,7 +98,7 @@ BaseVisitorFile(file, header) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 package parser // <file.grammarName>
 
-import "github.com/antlr/antlr4/runtime/Go/antlr"
+import "github.com/willfaught/antlr4/runtime/Go/antlr"
 
 type Base<file.grammarName>Visitor struct {
     *antlr.BaseParseTreeVisitor
@@ -897,7 +897,7 @@ package parser
 import (
     "fmt"
 
-    "github.com/antlr/antlr4/runtime/Go/antlr"
+    "github.com/willfaught/antlr4/runtime/Go/antlr"
 )
 
 // suppress unused import error, many tests
