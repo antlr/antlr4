@@ -209,7 +209,7 @@ func NewAND(a, b SemanticContext) *AND {
 	vs := operands.values()
 	opnds := make([]SemanticContext, len(vs))
 	for i, v := range vs {
-		vs[i] = v.(SemanticContext)
+		opnds[i] = v.(SemanticContext)
 	}
 
 	and := new(AND)
@@ -295,7 +295,7 @@ func (a *AND) String() string {
 	var s = ""
 
 	for _, o := range a.opnds {
-		s += "&& " + o.String()
+		s += "&& " + fmt.Sprint(o)
 	}
 
 	if len(s) > 3 {
@@ -350,7 +350,7 @@ func NewOR(a, b SemanticContext) *OR {
 
 	opnds := make([]SemanticContext, len(vs))
 	for i, v := range vs {
-		vs[i] = v.(SemanticContext)
+		opnds[i] = v.(SemanticContext)
 	}
 
 	o := new(OR)
@@ -430,7 +430,7 @@ func (o *OR) String() string {
 	var s = ""
 
 	for _, o := range o.opnds {
-		s += "|| " + o.String()
+		s += "|| " + fmt.Sprint(o)
 	}
 
 	if len(s) > 3 {
