@@ -14,7 +14,7 @@ public class TestSemPredEvalParser extends BaseTest {
 		mkdir(parserpkgdir);
 		StringBuilder grammarBuilder = new StringBuilder(300);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s : {p.Interpreter.SetPredictionMode(antlr4.PredictionModeLLExactAmbigDetection);} a ';' a; // do 2x: once in ATN, next in DFA\n");
+		grammarBuilder.append("s : {p.Interpreter.SetPredictionMode(antlr.PredictionModeLLExactAmbigDetection);} a ';' a; // do 2x: once in ATN, next in DFA\n");
 		grammarBuilder.append("a : ID {fmt.Println(\"alt 1\")}\n");
 		grammarBuilder.append("  | ID {fmt.Println(\"alt 2\")}\n");
 		grammarBuilder.append("  | {false}? ID {fmt.Println(\"alt 3\")}\n");
@@ -44,7 +44,7 @@ public class TestSemPredEvalParser extends BaseTest {
 		mkdir(parserpkgdir);
 		StringBuilder grammarBuilder = new StringBuilder(351);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s : {p.Interpreter.SetPredictionMode(antlr4.PredictionModeLLExactAmbigDetection);} a ';' a ';' a;\n");
+		grammarBuilder.append("s : {p.Interpreter.SetPredictionMode(antlr.PredictionModeLLExactAmbigDetection);} a ';' a ';' a;\n");
 		grammarBuilder.append("a : INT {fmt.Println(\"alt 1\")}\n");
 		grammarBuilder.append("  | ID {fmt.Println(\"alt 2\")} // must pick this one for ID since pred is false\n");
 		grammarBuilder.append("  | ID {fmt.Println(\"alt 3\")}\n");
@@ -108,8 +108,8 @@ public class TestSemPredEvalParser extends BaseTest {
 		grammarBuilder.append("	return v\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("}\n");
-		grammarBuilder.append("s : e {} {p.pred(true)}? {fmt.Println(\"parse\")} '!' ;\n");
-		grammarBuilder.append("t : e {} {p.pred(false)}? ID ;\n");
+		grammarBuilder.append("s : e {} {pred(true)}? {fmt.Println(\"parse\")} '!' ;\n");
+		grammarBuilder.append("t : e {} {pred(false)}? ID ;\n");
 		grammarBuilder.append("e : ID | ; // non-LL(1) so we use ATN\n");
 		grammarBuilder.append("ID : 'a'..'z'+ ;\n");
 		grammarBuilder.append("INT : '0'..'9'+;\n");
@@ -157,8 +157,8 @@ public class TestSemPredEvalParser extends BaseTest {
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("s : a[99] ;\n");
-		grammarBuilder.append("a[int i] : e {p.pred($i==99)}? {fmt.Println(\"parse\")} '!' ;\n");
-		grammarBuilder.append("b[int i] : e {p.pred($i==99)}? ID ;\n");
+		grammarBuilder.append("a[int i] : e {pred($i==99)}? {fmt.Println(\"parse\")} '!' ;\n");
+		grammarBuilder.append("b[int i] : e {pred($i==99)}? ID ;\n");
 		grammarBuilder.append("e : ID | ; // non-LL(1) so we use ATN\n");
 		grammarBuilder.append("ID : 'a'..'z'+ ;\n");
 		grammarBuilder.append("INT : '0'..'9'+;\n");
@@ -300,7 +300,7 @@ public class TestSemPredEvalParser extends BaseTest {
 		grammarBuilder.append("@after {fmt.Println($ctx.ToStringTree(nil,p))}\n");
 		grammarBuilder.append("  : para para EOF ;\n");
 		grammarBuilder.append("para: paraContent NL NL ;\n");
-		grammarBuilder.append("paraContent : ('s'|'x'|{p.GetTokenStream().LA(2)!=TParser.NL}? NL)+ ;\n");
+		grammarBuilder.append("paraContent : ('s'|'x'|{p.GetTokenStream().LA(2)!=TParserNL}? NL)+ ;\n");
 		grammarBuilder.append("NL : '\\n' ;\n");
 		grammarBuilder.append("s : 's' ;\n");
 		grammarBuilder.append("X : 'x' ;");
@@ -330,7 +330,7 @@ public class TestSemPredEvalParser extends BaseTest {
 		grammarBuilder.append("@after {fmt.Println($ctx.ToStringTree(nil,p))}\n");
 		grammarBuilder.append("  : para para EOF ;\n");
 		grammarBuilder.append("para: paraContent NL NL ;\n");
-		grammarBuilder.append("paraContent : ('s'|'x'|{p.GetTokenStream().LA(2)!=TParser.NL}? NL)+ ;\n");
+		grammarBuilder.append("paraContent : ('s'|'x'|{p.GetTokenStream().LA(2)!=TParserNL}? NL)+ ;\n");
 		grammarBuilder.append("NL : '\\n' ;\n");
 		grammarBuilder.append("s : 's' ;\n");
 		grammarBuilder.append("X : 'x' ;");
@@ -455,8 +455,8 @@ public class TestSemPredEvalParser extends BaseTest {
 		grammarBuilder.append("	return v\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("}\n");
-		grammarBuilder.append("s : e {p.pred(true)}? {fmt.Println(\"parse\")} '!' ;\n");
-		grammarBuilder.append("t : e {p.pred(false)}? ID ;\n");
+		grammarBuilder.append("s : e {pred(true)}? {fmt.Println(\"parse\")} '!' ;\n");
+		grammarBuilder.append("t : e {pred(false)}? ID ;\n");
 		grammarBuilder.append("e : ID | ; // non-LL(1) so we use ATN\n");
 		grammarBuilder.append("ID : 'a'..'z'+ ;\n");
 		grammarBuilder.append("INT : '0'..'9'+;\n");

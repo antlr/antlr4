@@ -590,7 +590,7 @@ public class TestParserExec extends BaseTest {
 		grammarBuilder.append("  return true\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("}\n");
-		grammarBuilder.append("a : {$parser.Property()}? ID {fmt.Println(\"valid\")}\n");
+		grammarBuilder.append("a : {Property()}? ID {fmt.Println(\"valid\")}\n");
 		grammarBuilder.append("  ;\n");
 		grammarBuilder.append("ID : 'a'..'z'+ ;\n");
 		grammarBuilder.append("WS : (' '|'\\n') -> skip ;");
@@ -611,7 +611,7 @@ public class TestParserExec extends BaseTest {
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s : stmt EOF ;\n");
 		grammarBuilder.append("stmt : ifStmt | ID;\n");
-		grammarBuilder.append("ifStmt : 'if' ID stmt ('else' stmt | { p.GetTokenStream().LA(1)!=TParser.ELSE }?);\n");
+		grammarBuilder.append("ifStmt : 'if' ID stmt ('else' stmt | { p.GetTokenStream().LA(1)!=TParserELSE }?);\n");
 		grammarBuilder.append("ELSE : 'else';\n");
 		grammarBuilder.append("ID : [a-zA-Z]+;\n");
 		grammarBuilder.append("WS : [ \\n\\t]+ -> skip;");
