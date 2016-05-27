@@ -72,16 +72,18 @@ std::string DFASerializer::getEdgeLabel(size_t i) const {
 std::string DFASerializer::getStateString(DFAState *s) const {
   size_t n = (size_t)s->stateNumber;
 
-  const std::string baseStateStr = (s->isAcceptState ? ":" : "") + std::string("s") + std::to_string(n) + (s->requiresFullContext ? "^" : "");
+  const std::string baseStateStr = std::string(s->isAcceptState ? ":" : "") + "s" + std::to_string(n) +
+    (s->requiresFullContext ? "^" : "");
+  
   if (s->isAcceptState) {
     if (s->predicates.size() != 0) {
       std::string buf;
       for (size_t i = 0; i < s->predicates.size(); i++) {
         buf.append(s->predicates[i]->toString());
       }
-      return baseStateStr + " => " + buf;
+      return baseStateStr + "=>" + buf;
     } else {
-      return baseStateStr + " => " + std::to_string(s->prediction);
+      return baseStateStr + "=>" + std::to_string(s->prediction);
     }
   } else {
     return baseStateStr;

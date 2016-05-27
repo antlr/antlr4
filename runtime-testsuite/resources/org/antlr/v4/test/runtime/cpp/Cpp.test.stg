@@ -157,7 +157,7 @@ string(text) ::= <<
 
 writeBoolean(o) ::= "<if(o && !isEmpty.(o))>true<else>false<endif>"
 
-writeln(s) ::= "std::cout \<\< <s> \<\< \"\\n\";"
+writeln(s) ::= "std::cout \<\< <s> \<\< std::endl;"
 
 write(s) ::= "std::cout \<\< <s>;"
 
@@ -171,7 +171,7 @@ Assert(s) ::= ""
 
 Cast(t,v) ::= "<v>"
 
-Append(a,b) ::= "<a> + str(<b>)"
+Append(a,b) ::= "<a> + <b>->toString()"
 
 Concat(a,b) ::= "<a><b>"
 
@@ -181,9 +181,9 @@ AssertIsList(v) ::= "assert isinstance(v, (list, tuple))"
 
 AssignLocal(s,v) ::= "<s> = <v>"
 
-InitIntMember(n,v) ::= <%<n> = <v>%>
+InitIntMember(n,v) ::= <%int <n> = <v>;%>
 
-InitBooleanMember(n,v) ::= <%<n> = <v>%>
+InitBooleanMember(n,v) ::= <%bool <n> = <v>;%>
 
 GetMember(n) ::= <%<n>%>
 
@@ -191,7 +191,7 @@ SetMember(n,v) ::= <%<n> = <v>%>
 
 AddMember(n,v) ::= <%<n> += <v>%>
 
-PlusMember(v,n) ::= <%<v> + <n>.toString()%>
+PlusMember(v,n) ::= <%<v> + <n>->toString()%>
 
 MemberEquals(n,v) ::= <%<n> == <v>%>
 
@@ -199,47 +199,47 @@ ModMemberEquals(n,m,v) ::= <%<n> % <m> == <v>%>
 
 ModMemberNotEquals(n,m,v) ::= <%<n> % <m> != <v>%>
 
-DumpDFA() ::= "dumpDFA()"
+DumpDFA() ::= "dumpDFA();"
 
 Pass() ::= "/* do nothing */"
 
 StringList() ::= ""
 
-BuildParseTrees() ::= "_buildParseTrees = true"
+BuildParseTrees() ::= "_buildParseTrees = true;"
 
-BailErrorStrategy() ::= <%_errHandler = BailErrorStrategy()%>
+BailErrorStrategy() ::= <%_errHandler = std::make_shared\<BailErrorStrategy>();%>
 
-ToStringTree(s) ::= <%<s>.toStringTree(recog=self)%>
+ToStringTree(s) ::= <%<s>->toStringTree(this)%>
 
 Column() ::= "column"
 
 Text() ::= "text"
 
-ValEquals(a,b) ::= <%<a>==<b>%>
+ValEquals(a,b) ::= <%<a> == <b>%>
 
-TextEquals(a) ::= <%text=="<a>"%>
+TextEquals(a) ::= <%text == "<a>"%>
 
 PlusText(a) ::= <%"<a>" + text%>
 
 InputText() ::= "_input->getText()"
 
-LTEquals(i, v) ::= <%_input->LT(<i>).text==<v>%>
+LTEquals(i, v) ::= <%_input->LT(<i>).text == <v>%>
 
-LANotEquals(i, v) ::= <%_input->LA(<i>)!=<v>%>
+LANotEquals(i, v) ::= <%_input->LA(<i>) != <v>%>
 
-TokenStartColumnEquals(i) ::= <%_tokenStartColumn==<i>%>
+TokenStartColumnEquals(i) ::= <%_tokenStartColumn == <i>%>
 
 ImportListener(X) ::= ""
 
-GetExpectedTokenNames() ::= "getExpectedTokens().toString(literalNames, symbolicNames)"
+GetExpectedTokenNames() ::= "getExpectedTokens()->toString(literalNames, symbolicNames)"
 
 RuleInvocationStack() ::= "str_list(getRuleInvocationStack())"
 
-LL_EXACT_AMBIG_DETECTION() ::= <<_interp.predictionMode =  PredictionMode.LL_EXACT_AMBIG_DETECTION>>
+LL_EXACT_AMBIG_DETECTION() ::= <<getInterpreter\<atn::ParserATNSimulator>()->setPredictionMode(atn::PredictionMode::LL_EXACT_AMBIG_DETECTION);>>
 
 ParserPropertyMember() ::= <<
 @members {
-bool <X>Parser::Property() {
+bool Parser::Property() {
 	return true;
 }
 
@@ -395,16 +395,17 @@ def foo():
     b = s.b()
 >>
 
-Declare_foo() ::= <<def foo(self):
+Declare_foo() ::= <<void foo() {
 	std::cout \<\< "foo";
+}
 >>
 
-Invoke_foo() ::= "foo()"
+Invoke_foo() ::= "foo();"
 
-Declare_pred() ::= <<def pred(self, v):
-	std::cout \<\< "eval=" \<\< str(v).lower();
-	return v
-
+Declare_pred() ::= <<void pred(v) {
+	std::cout \<\< "eval=" \<\< v->toString().lower();
+	return v;
+}
 >>
 
 Invoke_pred(v) ::= <<pred(<v>)>>

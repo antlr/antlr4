@@ -13,9 +13,9 @@ public class TestFullContextParsing extends BaseCppTest {
 	public void testAmbigYieldsCtxSensitiveDFA() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(95);
+		StringBuilder grammarBuilder = new StringBuilder(96);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {dumpDFA()}\n");
+		grammarBuilder.append("s @after {dumpDFA();}\n");
 		grammarBuilder.append("	: ID | ID {} ;\n");
 		grammarBuilder.append("ID : 'a'..'z'+;\n");
 		grammarBuilder.append("WS : (' '|'\\t'|'\\n')+ -> skip ;");
@@ -38,11 +38,11 @@ public class TestFullContextParsing extends BaseCppTest {
 	public void testAmbiguityNoLoop() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(216);
+		StringBuilder grammarBuilder = new StringBuilder(264);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("prog\n");
-		grammarBuilder.append("@init {_interp.predictionMode =  PredictionMode.LL_EXACT_AMBIG_DETECTION}\n");
-		grammarBuilder.append("	: expr expr {std::cout << \"alt 1\" << \"\\n\";}\n");
+		grammarBuilder.append("@init {getInterpreter<atn::ParserATNSimulator>()->setPredictionMode(atn::PredictionMode::LL_EXACT_AMBIG_DETECTION);}\n");
+		grammarBuilder.append("	: expr expr {std::cout << \"alt 1\" << std::endl;}\n");
 		grammarBuilder.append("	| expr\n");
 		grammarBuilder.append("	;\n");
 		grammarBuilder.append("expr: '@'\n");
@@ -72,9 +72,9 @@ public class TestFullContextParsing extends BaseCppTest {
 	public void testCtxSensitiveDFATwoDiffInput() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(159);
+		StringBuilder grammarBuilder = new StringBuilder(160);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {dumpDFA()}\n");
+		grammarBuilder.append("s @after {dumpDFA();}\n");
 		grammarBuilder.append("  : ('$' a | '@' b)+ ;\n");
 		grammarBuilder.append("a : e ID ;\n");
 		grammarBuilder.append("b : e INT ID ;\n");
@@ -106,9 +106,9 @@ public class TestFullContextParsing extends BaseCppTest {
 	public void testCtxSensitiveDFA_1() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(156);
+		StringBuilder grammarBuilder = new StringBuilder(157);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {dumpDFA()}\n");
+		grammarBuilder.append("s @after {dumpDFA();}\n");
 		grammarBuilder.append("  : '$' a | '@' b ;\n");
 		grammarBuilder.append("a : e ID ;\n");
 		grammarBuilder.append("b : e INT ID ;\n");
@@ -138,9 +138,9 @@ public class TestFullContextParsing extends BaseCppTest {
 	public void testCtxSensitiveDFA_2() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(156);
+		StringBuilder grammarBuilder = new StringBuilder(157);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {dumpDFA()}\n");
+		grammarBuilder.append("s @after {dumpDFA();}\n");
 		grammarBuilder.append("  : '$' a | '@' b ;\n");
 		grammarBuilder.append("a : e ID ;\n");
 		grammarBuilder.append("b : e INT ID ;\n");
@@ -170,11 +170,11 @@ public class TestFullContextParsing extends BaseCppTest {
 	public void testExprAmbiguity_1() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(296);
+		StringBuilder grammarBuilder = new StringBuilder(339);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s\n");
-		grammarBuilder.append("@init {_interp.predictionMode =  PredictionMode.LL_EXACT_AMBIG_DETECTION}\n");
-		grammarBuilder.append(":   expr[0] {std::cout << $expr.ctx.toStringTree(recog=self) << \"\\n\";};\n");
+		grammarBuilder.append("@init {getInterpreter<atn::ParserATNSimulator>()->setPredictionMode(atn::PredictionMode::LL_EXACT_AMBIG_DETECTION);}\n");
+		grammarBuilder.append(":   expr[0] {std::cout << $expr.ctx->toStringTree(this) << std::endl;};\n");
 		grammarBuilder.append("	expr[int _p]\n");
 		grammarBuilder.append("		: ID \n");
 		grammarBuilder.append("		( \n");
@@ -203,11 +203,11 @@ public class TestFullContextParsing extends BaseCppTest {
 	public void testExprAmbiguity_2() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(296);
+		StringBuilder grammarBuilder = new StringBuilder(339);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s\n");
-		grammarBuilder.append("@init {_interp.predictionMode =  PredictionMode.LL_EXACT_AMBIG_DETECTION}\n");
-		grammarBuilder.append(":   expr[0] {std::cout << $expr.ctx.toStringTree(recog=self) << \"\\n\";};\n");
+		grammarBuilder.append("@init {getInterpreter<atn::ParserATNSimulator>()->setPredictionMode(atn::PredictionMode::LL_EXACT_AMBIG_DETECTION);}\n");
+		grammarBuilder.append(":   expr[0] {std::cout << $expr.ctx->toStringTree(this) << std::endl;};\n");
 		grammarBuilder.append("	expr[int _p]\n");
 		grammarBuilder.append("		: ID \n");
 		grammarBuilder.append("		( \n");
@@ -238,11 +238,11 @@ public class TestFullContextParsing extends BaseCppTest {
 	public void testFullContextIF_THEN_ELSEParse_1() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(230);
+		StringBuilder grammarBuilder = new StringBuilder(274);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s \n");
-		grammarBuilder.append("@init {_interp.predictionMode =  PredictionMode.LL_EXACT_AMBIG_DETECTION}\n");
-		grammarBuilder.append("@after {dumpDFA()}\n");
+		grammarBuilder.append("@init {getInterpreter<atn::ParserATNSimulator>()->setPredictionMode(atn::PredictionMode::LL_EXACT_AMBIG_DETECTION);}\n");
+		grammarBuilder.append("@after {dumpDFA();}\n");
 		grammarBuilder.append("	: '{' stat* '}' ;\n");
 		grammarBuilder.append("stat: 'if' ID 'then' stat ('else' ID)?\n");
 		grammarBuilder.append("		| 'return'\n");
@@ -267,11 +267,11 @@ public class TestFullContextParsing extends BaseCppTest {
 	public void testFullContextIF_THEN_ELSEParse_2() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(230);
+		StringBuilder grammarBuilder = new StringBuilder(274);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s \n");
-		grammarBuilder.append("@init {_interp.predictionMode =  PredictionMode.LL_EXACT_AMBIG_DETECTION}\n");
-		grammarBuilder.append("@after {dumpDFA()}\n");
+		grammarBuilder.append("@init {getInterpreter<atn::ParserATNSimulator>()->setPredictionMode(atn::PredictionMode::LL_EXACT_AMBIG_DETECTION);}\n");
+		grammarBuilder.append("@after {dumpDFA();}\n");
 		grammarBuilder.append("	: '{' stat* '}' ;\n");
 		grammarBuilder.append("stat: 'if' ID 'then' stat ('else' ID)?\n");
 		grammarBuilder.append("		| 'return'\n");
@@ -299,11 +299,11 @@ public class TestFullContextParsing extends BaseCppTest {
 	public void testFullContextIF_THEN_ELSEParse_3() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(230);
+		StringBuilder grammarBuilder = new StringBuilder(274);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s \n");
-		grammarBuilder.append("@init {_interp.predictionMode =  PredictionMode.LL_EXACT_AMBIG_DETECTION}\n");
-		grammarBuilder.append("@after {dumpDFA()}\n");
+		grammarBuilder.append("@init {getInterpreter<atn::ParserATNSimulator>()->setPredictionMode(atn::PredictionMode::LL_EXACT_AMBIG_DETECTION);}\n");
+		grammarBuilder.append("@after {dumpDFA();}\n");
 		grammarBuilder.append("	: '{' stat* '}' ;\n");
 		grammarBuilder.append("stat: 'if' ID 'then' stat ('else' ID)?\n");
 		grammarBuilder.append("		| 'return'\n");
@@ -332,11 +332,11 @@ public class TestFullContextParsing extends BaseCppTest {
 	public void testFullContextIF_THEN_ELSEParse_4() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(230);
+		StringBuilder grammarBuilder = new StringBuilder(274);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s \n");
-		grammarBuilder.append("@init {_interp.predictionMode =  PredictionMode.LL_EXACT_AMBIG_DETECTION}\n");
-		grammarBuilder.append("@after {dumpDFA()}\n");
+		grammarBuilder.append("@init {getInterpreter<atn::ParserATNSimulator>()->setPredictionMode(atn::PredictionMode::LL_EXACT_AMBIG_DETECTION);}\n");
+		grammarBuilder.append("@after {dumpDFA();}\n");
 		grammarBuilder.append("	: '{' stat* '}' ;\n");
 		grammarBuilder.append("stat: 'if' ID 'then' stat ('else' ID)?\n");
 		grammarBuilder.append("		| 'return'\n");
@@ -366,11 +366,11 @@ public class TestFullContextParsing extends BaseCppTest {
 	public void testFullContextIF_THEN_ELSEParse_5() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(230);
+		StringBuilder grammarBuilder = new StringBuilder(274);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s \n");
-		grammarBuilder.append("@init {_interp.predictionMode =  PredictionMode.LL_EXACT_AMBIG_DETECTION}\n");
-		grammarBuilder.append("@after {dumpDFA()}\n");
+		grammarBuilder.append("@init {getInterpreter<atn::ParserATNSimulator>()->setPredictionMode(atn::PredictionMode::LL_EXACT_AMBIG_DETECTION);}\n");
+		grammarBuilder.append("@after {dumpDFA();}\n");
 		grammarBuilder.append("	: '{' stat* '}' ;\n");
 		grammarBuilder.append("stat: 'if' ID 'then' stat ('else' ID)?\n");
 		grammarBuilder.append("		| 'return'\n");
@@ -403,11 +403,11 @@ public class TestFullContextParsing extends BaseCppTest {
 	public void testFullContextIF_THEN_ELSEParse_6() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(230);
+		StringBuilder grammarBuilder = new StringBuilder(274);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s \n");
-		grammarBuilder.append("@init {_interp.predictionMode =  PredictionMode.LL_EXACT_AMBIG_DETECTION}\n");
-		grammarBuilder.append("@after {dumpDFA()}\n");
+		grammarBuilder.append("@init {getInterpreter<atn::ParserATNSimulator>()->setPredictionMode(atn::PredictionMode::LL_EXACT_AMBIG_DETECTION);}\n");
+		grammarBuilder.append("@after {dumpDFA();}\n");
 		grammarBuilder.append("	: '{' stat* '}' ;\n");
 		grammarBuilder.append("stat: 'if' ID 'then' stat ('else' ID)?\n");
 		grammarBuilder.append("		| 'return'\n");
@@ -440,14 +440,14 @@ public class TestFullContextParsing extends BaseCppTest {
 	public void testLoopsSimulateTailRecursion() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(324);
+		StringBuilder grammarBuilder = new StringBuilder(377);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("prog\n");
-		grammarBuilder.append("@init {_interp.predictionMode =  PredictionMode.LL_EXACT_AMBIG_DETECTION}\n");
+		grammarBuilder.append("@init {getInterpreter<atn::ParserATNSimulator>()->setPredictionMode(atn::PredictionMode::LL_EXACT_AMBIG_DETECTION);}\n");
 		grammarBuilder.append("	: expr_or_assign*;\n");
 		grammarBuilder.append("expr_or_assign\n");
-		grammarBuilder.append("	: expr '++' {std::cout << \"fail.\" << \"\\n\";}\n");
-		grammarBuilder.append("	|  expr {std::cout << \"pass: \"+$expr.text << \"\\n\";}\n");
+		grammarBuilder.append("	: expr '++' {std::cout << \"fail.\" << std::endl;}\n");
+		grammarBuilder.append("	|  expr {std::cout << \"pass: \"+$expr.text << std::endl;}\n");
 		grammarBuilder.append("	;\n");
 		grammarBuilder.append("expr: expr_primary ('<-' ID)?;\n");
 		grammarBuilder.append("expr_primary\n");
@@ -475,9 +475,9 @@ public class TestFullContextParsing extends BaseCppTest {
 	public void testSLLSeesEOFInLLGrammar() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(143);
+		StringBuilder grammarBuilder = new StringBuilder(144);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {dumpDFA()}\n");
+		grammarBuilder.append("s @after {dumpDFA();}\n");
 		grammarBuilder.append("  : a;\n");
 		grammarBuilder.append("a : e ID ;\n");
 		grammarBuilder.append("b : e INT ID ;\n");

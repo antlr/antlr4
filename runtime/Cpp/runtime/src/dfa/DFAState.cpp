@@ -45,7 +45,7 @@ DFAState::PredPrediction::PredPrediction(Ref<SemanticContext> pred, int alt) : p
 }
 
 std::string DFAState::PredPrediction::toString() {
-  return std::string("(") + pred->toString() + std::string(", ") + std::to_string(alt) + std::string(")");
+  return std::string("(") + pred->toString() + ", " + std::to_string(alt) + ")";
 }
 
 void DFAState::PredPrediction::InitializeInstanceFields() {

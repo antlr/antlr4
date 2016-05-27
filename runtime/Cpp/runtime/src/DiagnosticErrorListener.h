@@ -71,7 +71,7 @@ namespace runtime {
     /// reports exact ambiguities.
     /// </summary>
   public:
-    DiagnosticErrorListener(); //this(true);
+    DiagnosticErrorListener();
 
     /// <summary>
     /// Initializes a new instance of <seealso cref="DiagnosticErrorListener"/>, specifying

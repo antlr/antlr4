@@ -241,7 +241,8 @@ bool <r.name>Sempred(Ref\<<r.ctxType>\> _localctx, int predicateIndex);
 >>
 
 RuleSempredFunction(r, actions) ::= <<
-bool <r.factory.grammar.name>::<r.name>Sempred(Ref\<<r.ctxType>\> _localctx, int predicateIndex) {
+<! Called for both lexer and parser. But only one of them is actually available. !>
+bool <if (parser)><parser.name><else><lexer.name><endif>::<r.name>Sempred(Ref\<<r.ctxType>\> _localctx, int predicateIndex) {
   switch (predicateIndex) {
     <actions: {index | case <index>: return <actions.(index)>;}; separator="\n">
     
@@ -562,7 +563,7 @@ ssize_t <parser.name>::<struct.name>::getRuleIndex() const {
 <if (struct.provideCopyFrom)>
 void <parser.name>::<struct.name>::copyFrom(Ref\<<struct.name>\> ctx) {
   <if (contextSuperClass)><contextSuperClass><else>ParserRuleContext<endif>::copyFrom(ctx);
-<! TODO: untested !>  <struct.attrs: {a | this-><a.name> = ctx.<a.name>;}; separator = "\n">
+  <struct.attrs: {a | this-><a.name> = ctx-><a.name>;}; separator = "\n">
 }
 <endif>
 <dispatchMethods; separator = "\n\n">
@@ -575,7 +576,7 @@ class <struct.name> : public <currentRule.name; format = "cap">Context {
 public:
   <struct.name>(Ref\<<currentRule.name; format = "cap">Context> ctx);
   
-<! TODO: untested!>  <if (attrs)><attrs: {a | <a>}; separator = "\n">bbb<endif>
+  <if (attrs)><attrs: {a | <a>}; separator = "\n"><endif>
   <getters: {g | <g>}; separator = "\n">
   <dispatchMethods; separator = "\n">
 };
@@ -587,7 +588,7 @@ AltLabelStructDecl(struct, attrs, getters, dispatchMethods) ::= <<
 
 <! TODO: untested !><if (attrs)><attrs: {a | <a>}; separator = "\n"><endif>
 <getters: {g | <g>}; separator = "\n">
-<struct.factory.grammar.name>::<struct.name>::<struct.name>(Ref\<<currentRule.name; format = "cap">Context> ctx) { copyFrom(ctx); }
+<parser.name>::<struct.name>::<struct.name>(Ref\<<currentRule.name; format = "cap">Context> ctx) { copyFrom(ctx); }
 
 <dispatchMethods; separator="\n">
 >>
@@ -862,7 +863,7 @@ RetValueRefHeader(t) ::= "<! Required but unused. !>"
 RetValueRef(a) ::= "_localctx-><a.name>"
 
 QRetValueRefHeader(t) ::= "<! Required but unused. !>"
-QRetValueRef(a) ::= "<ctx(a)>-><a.dict>.<a.name>"
+QRetValueRef(a) ::= "<ctx(a)>-><a.dict>-><a.name>"
 /** How to translate $tokenLabel */
 
 TokenRefHeader(t) ::= "<! Required but unused. !>"
@@ -903,16 +904,21 @@ TokenPropertyRef_int(t) ::= "(<ctx(t)>-><t.label> != nullptr ? std::stol(<ctx(t)
 
 RulePropertyRef_start(r) ::= "RulePropertyRef_start(r) (<ctx(r)>.<r.label> != nullptr ? (<ctx(r)>.<r.label>.start) : null)"
 RulePropertyRef_stop(r)  ::= "RulePropertyRef_stop(r)   (<ctx(r)>.<r.label> != nullptr ? (<ctx(r)>.<r.label>.stop) : null)"
-RulePropertyRef_text(r)  ::= "RulePropertyRef_text(r)   (<ctx(r)>.<r.label> != nullptr ? _input->getText(<ctx(r)>.<r.label>.start,<ctx(r)>.<r.label>.stop) : null)"
-RulePropertyRef_ctx(r)   ::= "RulePropertyRef_ctx(r)<ctx(r)>.<r.label>"
+
+RulePropertyRef_textHeader(r)  ::= "<! Required but unused. !>"
+RulePropertyRef_text(r)  ::= "(<ctx(r)>-><r.label> != nullptr ? _input->getText(<ctx(r)>-><r.label>->start, <ctx(r)>-><r.label>->stop) : nullptr)"
+
+RulePropertyRef_ctxHeader(r)   ::= "<! Required but unused. !>"
+RulePropertyRef_ctx(r)   ::= "<ctx(r)>-><r.label>"
 
 ThisRulePropertyRef_start(r) ::= "ThisRulePropertyRef_start(r) _localctx->start"
 ThisRulePropertyRef_stop(r)  ::= "ThisRulePropertyRef_stop(r)   _localctx->stop"
 
 ThisRulePropertyRef_textHeader(r)  ::= "<! Required but unused. !>"
-ThisRulePropertyRef_text(r)  ::= "input->getText(_localctx->start, _input->LT(-1))"
+ThisRulePropertyRef_text(r)  ::= "_input->getText(_localctx->start, _input->LT(-1))"
 
-ThisRulePropertyRef_ctx(r)   ::= "ThisRulePropertyRef_ctx(r)    _localctx"
+ThisRulePropertyRef_ctxHeader(r)   ::= "<! Required but unused. !>"
+ThisRulePropertyRef_ctx(r)   ::= "_localctx"
 
 NonLocalAttrRef(s) ::= "NonLocalAttrRef(s) ((<s.ruleName; format=\"cap\">Context)getInvokingContext(<s.ruleIndex>)).<s.name>"
 SetNonLocalAttr(s, rhsChunks) ::=
@@ -925,19 +931,19 @@ AddToLabelList(a) ::= <<
 
 TokenLabelType() ::= "Ref\<<file.TokenLabelType; null = {Token}>>"
 
-TokenDeclHeader(t) ::= "<TokenLabelType()> <t.name>" 
+TokenDeclHeader(t) ::= "<TokenLabelType()> <t.name>;" 
 TokenDecl(t) ::= "<! Variable Declaration !>"
 
 TokenTypeDeclHeader(t) ::= "<! Local Variable !>"
 TokenTypeDecl(t) ::= "ssize_t <t.name>;"
 
-TokenListDeclHeader(t) ::= "std::vector\<Ref\<Token>> <t.name>"
+TokenListDeclHeader(t) ::= "std::vector\<Ref\<Token>> <t.name>;"
 TokenListDecl(t) ::= "<! Variable Declaration !>"
 
-RuleContextDeclHeader(r) ::= "Ref\<<parser.name>::<r.ctxName>> <r.name>"
+RuleContextDeclHeader(r) ::= "Ref\<<parser.name>::<r.ctxName>> <r.name>;"
 RuleContextDecl(r) ::= "<! Variable Declaration !>"
 
-RuleContextListDeclHeader(rdecl) ::= "std::vector\<Ref\<<rdecl.ctxName>>> <rdecl.name>"
+RuleContextListDeclHeader(rdecl) ::= "std::vector\<Ref\<<rdecl.ctxName>>> <rdecl.name>;"
 RuleContextListDecl(rdecl) ::= "<! Variable Declaration !>"
 
 ContextTokenGetterDeclHeader(t) ::= "Ref\<tree::TerminalNode> <t.name>();"
@@ -1011,7 +1017,7 @@ ListenerDispatchMethodHeader(method) ::= <<
 virtual void <if (method.isEnter)>enter<else>exit<endif>Rule(Ref\<tree::ParseTreeListener> listener) override;
 >>
 ListenerDispatchMethod(method) ::= <<
-void <parser.grammarName>Parser::<struct.name>::<if (method.isEnter)>enter<else>exit<endif>Rule(Ref\<tree::ParseTreeListener> listener) {
+void <parser.name>::<struct.name>::<if (method.isEnter)>enter<else>exit<endif>Rule(Ref\<tree::ParseTreeListener> listener) {
   auto parserListener = std::dynamic_pointer_cast\<<parser.grammarName>Listener>(listener);
   if (parserListener)
     parserListener-><if(method.isEnter)>enter<else>exit<endif><struct.derivedFromName; format="cap">(this);
@@ -1034,10 +1040,10 @@ AttributeDeclHeader(d) ::= "<d.type> <d.name><if(d.initValue)> = <d.initValue><e
 AttributeDecl(d) ::= "<d.type> <d.name>"
 
 /** If we don't know location of label def x, use this template */
-labelref(x) ::= "<if (!x.isLocal)>_localctx<endif>-><x.name>"
+labelref(x) ::= "<if (!x.isLocal)>std::dynamic_pointer_cast\<<x.ctx.name>>(_localctx)-><endif><x.name>"
 
 /** For any action chunk, what is correctly-typed context struct ptr? */
-ctx(actionChunk) ::= "_localctx"
+ctx(actionChunk) ::= "std::dynamic_pointer_cast\<<actionChunk.ctx.name>>(_localctx)"
 
 // used for left-recursive rules
 recRuleAltPredicate(ruleName,opPrec) ::= "precpred(_ctx, <opPrec>)"
@@ -1047,18 +1053,24 @@ recRuleSetStopToken() ::= "_ctx->stop = _input->LT(-1);"
 recRuleAltStartAction(ruleName, ctxName, label) ::= <<
 _localctx = std::make_shared\<<ctxName>Context>(parentContext, parentState);
 <if (label)>_localctx-><label> = previousContext;<endif>
-pushNewRecursionContext(_localctx, startState, <parser.name>::Rule<ruleName; format = "cap">);
+pushNewRecursionContext(_localctx, startState, Rule<ruleName; format = "cap">);
 >>
 
-recRuleLabeledAltStartAction(ruleName, currentAltLabel, label) ::= <<recRuleLabeledAltStartAction
-_localctx = std::make_shared\<<currentAltLabel; format = "cap">Context>(new <ruleName; format="cap">Context(_parentctx, _parentState));
-<if(label)>((<currentAltLabel; format="cap">Context*)_localctx).<label> = previousContext;<endif>
-pushNewRecursionContext(_localctx, _startState, RULE_<ruleName>);
+recRuleLabeledAltStartAction(ruleName, currentAltLabel, label, isListLabel) ::= <<
+_localctx = std::make_shared\<<currentAltLabel; format = "cap">Context>(std::make_shared\<<ruleName; format="cap">Context>(parentContext, parentState));
+<if(label)>
+<if(isListLabel)>
+std::dynamic_pointer_cast\<<currentAltLabel; format = "cap">Context>(_localctx)-><label>.push_back(previousContext);
+<else>
+std::dynamic_pointer_cast\<<currentAltLabel; format = "cap">Context>(_localctx)-><label> = previousContext;
+<endif>
+<endif>
+pushNewRecursionContext(_localctx, startState, Rule<ruleName; format = "cap">);
 >>
 
-recRuleReplaceContext(ctxName) ::= <<recRuleReplaceContext
+recRuleReplaceContext(ctxName) ::= <<
 _localctx = std::make_shared\<<ctxName>Context>(_localctx);
-ctx = _localctx;
+_ctx = _localctx;
 previousContext = _localctx;
 >>
 

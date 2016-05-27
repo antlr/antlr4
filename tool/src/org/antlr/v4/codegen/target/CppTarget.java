@@ -173,26 +173,6 @@ public class CppTarget extends Target {
 
 	@Override
 	public String encodeIntAsCharEscape(int v) {
-		if (v < Character.MIN_VALUE || v > Character.MAX_VALUE) {
-			throw new IllegalArgumentException(String.format("Cannot encode the specified value: %d", v));
-		}
-        /*
-		if (v >= 0 && v < targetCharValueEscape.length && targetCharValueEscape[v] != null) {
-			return targetCharValueEscape[v];
-		}
-
-		if (v >= 0x20 && v < 127 && (!Character.isDigit(v) || v == '8' || v == '9')) {
-			return String.valueOf((char)v);
-		}
-
-		if ( v>=0 && v<=127 ) {
-			String oct = Integer.toOctalString(v);
-			return "\\"+ oct;
-		}
-
-		String hex = Integer.toHexString(v | 0x10000).substring(1, 5);
-		return "\\u" + hex;
-		*/
 		return "0x" + Integer.toHexString(v) + ", ";
 	}
 

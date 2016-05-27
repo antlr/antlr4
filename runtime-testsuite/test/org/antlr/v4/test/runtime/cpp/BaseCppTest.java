@@ -122,6 +122,9 @@ public abstract class BaseCppTest {
 			eraseTempDir();
 		}
 
+	   protected void starting(Description description) {
+	      System.out.println("\n>>>>> Running test: " + description.getMethodName());
+	   }
 	};
 
 	private String getPropertyPrefix() {
@@ -912,7 +915,7 @@ public abstract class BaseCppTest {
 						+ "  std::wifstream stream;\n"
 						+ "  stream.open(argv[1]);\n"
 						+ "  ANTLRInputStream input(stream);\n"
-						+ "  TLexer lexer(&input);\n"
+						+ "  <lexerName> lexer(&input);\n"
 						+ "  CommonTokenStream tokens(&lexer);\n"
 						+ "<createParser>"
 						+ "\n"
@@ -924,9 +927,11 @@ public abstract class BaseCppTest {
 						+ "}\n"
 		);
 
-		String stSource = "  TParser parser(&tokens);\n";
-		if(debug)
-			stSource += "  parser.addErrorListener(DiagnosticErrorListener());\n";
+		String stSource = "  <parserName> parser(&tokens);\n";
+		if(debug) {
+			stSource += "  DiagnosticErrorListener errorListener;\n";
+			stSource += "  parser.addErrorListener(&errorListener);\n";
+		}
 		if(trace)
 			stSource += "  parser.setTrace(True);\n";
 		ST createParserST = new ST(stSource);
@@ -954,7 +959,7 @@ public abstract class BaseCppTest {
 					+ "  std::wifstream stream;\n"
 					+ "  stream.open(argv[1]);\n"
 					+ "  ANTLRInputStream input(stream);\n"
-					+ "  TLexer lexer(&input);\n"
+					+ "  <lexerName> lexer(&input);\n"
 					+ "  CommonTokenStream tokens(&lexer);\n"
 					+ "  tokens.fill();\n"
 				    + "  for (auto token : tokens.getTokens())\n"
