@@ -393,7 +393,7 @@ public abstract class BaseTest {
 			String gopath = builder.environment().get("GOPATH");
 			String path = runtimePath + File.pathSeparator + tmpdir;
 			if (gopath != null && gopath.length() > 0) {
-				path = gopath + File.separator + path;
+				path = gopath + File.pathSeparator + path;
 			}
 			builder.environment().put("GOPATH", path);
 			builder.directory(new File(tmpdir));
