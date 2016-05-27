@@ -1,5 +1,6 @@
 fileHeader(grammarFileName, ANTLRVersion) ::= <<
 // Generated from <grammarFileName; format="java-escape"> by ANTLR <ANTLRVersion>.
+
 >>
 
 ParserFile(file, parser, namedActions) ::= <<
