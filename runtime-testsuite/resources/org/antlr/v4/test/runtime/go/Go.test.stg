@@ -227,7 +227,7 @@ GetExpectedTokenNames() ::= "p.GetExpectedTokens().StringVerbose(p.GetTokenNames
 
 RuleInvocationStack() ::= "p.GetRuleInvocationStack(nil)"
 
-LL_EXACT_AMBIG_DETECTION() ::= <<p.Interpreter.SetPredictionMode(antlr4.PredictionModeLLExactAmbigDetection);>>
+LL_EXACT_AMBIG_DETECTION() ::= <<p.Interpreter.SetPredictionMode(antlr.PredictionModeLLExactAmbigDetection);>>
 
 ParserPropertyMember() ::= <<
 @members {
@@ -241,12 +241,12 @@ PositionAdjustingLexer() ::= <<
 package antlrtest
 
 type PositionAdjustingLexer struct {
-	antlr4.*BaseLexer
+	antlr.*BaseLexer
 }
 
-func NewPositionAdjustingLexer(input antlr4.CharStream) *PositionAdjustingLexer {
+func NewPositionAdjustingLexer(input antlr.CharStream) *PositionAdjustingLexer {
 	l := new(PositionAdjustingLexer)
-	l.BaseLexer = antlr4.NewBaseLexer( input )
+	l.BaseLexer = antlr.NewBaseLexer( input )
 	return l
 }
 
@@ -308,14 +308,14 @@ func isIdentifierChar(c rune) bool {
 }
 
 type PositionAdjustingLexerATNSimulator struct {
-    *antlr4.LexerATNSimulator
+    *antlr.LexerATNSimulator
 }
 
-func NewPositionAdjustingLexerATNSimulator(recog antlr4.Lexer, atn *antlr4.ATN, decisionToDFA []*antlr4.DFA, sharedContextCache *PredictionContextCache) *PositionAdjustingLexerATNSimulator {
+func NewPositionAdjustingLexerATNSimulator(recog antlr.Lexer, atn *antlr.ATN, decisionToDFA []*antlr.DFA, sharedContextCache *PredictionContextCache) *PositionAdjustingLexerATNSimulator {
 
     l := new(PositionAdjustingLexerATNSimulator)
 
-	l.LexerATNSimulator = antlr4.NewLexerATNSimulator(recog, atn, decisionToDFA, sharedContextCache)
+	l.LexerATNSimulator = antlr.NewLexerATNSimulator(recog, atn, decisionToDFA, sharedContextCache)
 
 	return l
 }
@@ -340,13 +340,13 @@ func NewLeafListener() *LeafListener {
 	return l
 }
 
-func (this *LeafListener) VisitTerminal( node antlr4.TerminalNode ) {
+func (this *LeafListener) VisitTerminal( node antlr.TerminalNode ) {
 	fmt.Println(node.GetSymbol().GetText())
 }
 >>
 
 WalkListener(s) ::= <<
-walker := antlr4.NewParseTreeWalker();
+walker := antlr.NewParseTreeWalker();
 walker.Walk(NewLeafListener(), <s>);
 >>
 

@@ -390,8 +390,12 @@ public abstract class BaseTest {
 		try {
 			ProcessBuilder builder = new ProcessBuilder(goPath, "run", modulePath,
 					inputPath);
-			builder.environment().put("GOPATH",
-					runtimePath + File.pathSeparator + tmpdir);
+			String gopath = builder.environment().get("GOPATH");
+			String path = runtimePath + File.pathSeparator + tmpdir;
+			if (gopath != null && gopath.length() > 0) {
+				path = gopath + File.pathSeparator + path;
+			}
+			builder.environment().put("GOPATH", path);
 			builder.directory(new File(tmpdir));
 			Process process = builder.start();
 			StreamVacuum stdoutVacuum = new StreamVacuum(
@@ -766,7 +770,7 @@ public abstract class BaseTest {
 			ST outputFileST = new ST(
 					"package main\n" +
 						"import (\n"
-						+"	\"antlr4\"\n"
+						+"	\"github.com/pboyer/antlr4/runtime/Go/antlr\"\n"
 						+"	\"./parser\"\n"
 						+"	\"os\"\n"
 						+")\n"
@@ -779,10 +783,10 @@ public abstract class BaseTest {
 						+ "	return new(TreeShapeListener)\n"
 						+ "}\n"
 						+ "\n"
-						+ "func (this *TreeShapeListener) EnterEveryRule(ctx antlr4.ParserRuleContext) {\n"
+						+ "func (this *TreeShapeListener) EnterEveryRule(ctx antlr.ParserRuleContext) {\n"
 						+ "	for i := 0; i\\<ctx.GetChildCount(); i++ {\n"
 						+ "		child := ctx.GetChild(i)\n"
-						+ "		parentR,ok := child.GetParent().(antlr4.RuleNode)\n"
+						+ "		parentR,ok := child.GetParent().(antlr.RuleNode)\n"
 						+ "		if !ok || parentR.GetBaseRuleContext() != ctx.GetBaseRuleContext() {\n"
 						+ "			panic(\"Invalid parse tree shape detected.\")\n"
 						+ "		}\n"
@@ -790,13 +794,13 @@ public abstract class BaseTest {
 						+ "}\n"
 						+ "\n"
 						+ "func main() {\n"
-						+ "	input := antlr4.NewFileStream(os.Args[1])\n"
+						+ "	input := antlr.NewFileStream(os.Args[1])\n"
 						+ "	lexer := parser.New<lexerName>(input)\n"
-						+ "	stream := antlr4.NewCommonTokenStream(lexer,0)\n"
+						+ "	stream := antlr.NewCommonTokenStream(lexer,0)\n"
 						+ "<createParser>"
 						+ "	p.BuildParseTrees = true\n"
 						+ "	tree := p.<parserStartRuleName>()\n"
-						+ "	antlr4.ParseTreeWalkerDefault.Walk(NewTreeShapeListener(), tree)\n"
+						+ "	antlr.ParseTreeWalkerDefault.Walk(NewTreeShapeListener(), tree)\n"
 						+ "}\n");
 
 		ST createParserST = new ST(
@@ -804,7 +808,7 @@ public abstract class BaseTest {
 		if (debug) {
 			createParserST = new ST(
 					"	p := parser.New<parserName>(stream)\n"
-							+ "	p.AddErrorListener(antlr4.NewDiagnosticErrorListener(true))\n");
+							+ "	p.AddErrorListener(antlr.NewDiagnosticErrorListener(true))\n");
 		}
 		outputFileST.add("createParser", createParserST);
 		outputFileST.add("parserName", parserName);
@@ -821,21 +825,21 @@ public abstract class BaseTest {
 		ST outputFileST = new ST(
 				"package main\n" +
 				"import (\n"
-					+ "	\"antlr4\"\n"
+					+ "	\"github.com/pboyer/antlr4/runtime/Go/antlr\"\n"
 					+ "	\"./parser\"\n"
 					+ "	\"os\"\n"
 					+ "	\"fmt\"\n"
 					+ ")\n"
 					+ "\n"
 					+ "func main() {\n"
-					+ "	input := antlr4.NewFileStream(os.Args[1])\n"
+					+ "	input := antlr.NewFileStream(os.Args[1])\n"
 					+ "	lexer := parser.New<lexerName>(input)\n"
-					+ "	stream := antlr4.NewCommonTokenStream(lexer,0)\n"
+					+ "	stream := antlr.NewCommonTokenStream(lexer,0)\n"
 					+ "	stream.Fill()\n"
 					+ "	for _, t := range stream.GetAllTokens() {\n"
 					+ "		fmt.Println(t)\n"
 					+ "	}\n"
-					+ (showDFA ? "fmt.Print(lexer.GetInterpreter().DecisionToDFA[antlr4.LexerDefaultMode].ToLexerString())\n"
+					+ (showDFA ? "fmt.Print(lexer.GetInterpreter().DecisionToDFA[antlr.LexerDefaultMode].ToLexerString())\n"
 							: "")
 					+ "}\n"
 					+ "\n");

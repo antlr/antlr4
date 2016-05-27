@@ -37,7 +37,7 @@ public class TestFullContextParsing extends BaseTest {
 		StringBuilder grammarBuilder = new StringBuilder(218);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("prog\n");
-		grammarBuilder.append("@init {p.Interpreter.SetPredictionMode(antlr4.PredictionModeLLExactAmbigDetection);}\n");
+		grammarBuilder.append("@init {p.Interpreter.SetPredictionMode(antlr.PredictionModeLLExactAmbigDetection);}\n");
 		grammarBuilder.append("	: expr expr {fmt.Println(\"alt 1\")}\n");
 		grammarBuilder.append("	| expr\n");
 		grammarBuilder.append("	;\n");
@@ -157,7 +157,7 @@ public class TestFullContextParsing extends BaseTest {
 		StringBuilder grammarBuilder = new StringBuilder(293);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s\n");
-		grammarBuilder.append("@init {p.Interpreter.SetPredictionMode(antlr4.PredictionModeLLExactAmbigDetection);}\n");
+		grammarBuilder.append("@init {p.Interpreter.SetPredictionMode(antlr.PredictionModeLLExactAmbigDetection);}\n");
 		grammarBuilder.append(":   expr[0] {fmt.Println($expr.ctx.ToStringTree(nil,p))};\n");
 		grammarBuilder.append("	expr[int _p]\n");
 		grammarBuilder.append("		: ID \n");
@@ -187,7 +187,7 @@ public class TestFullContextParsing extends BaseTest {
 		StringBuilder grammarBuilder = new StringBuilder(293);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s\n");
-		grammarBuilder.append("@init {p.Interpreter.SetPredictionMode(antlr4.PredictionModeLLExactAmbigDetection);}\n");
+		grammarBuilder.append("@init {p.Interpreter.SetPredictionMode(antlr.PredictionModeLLExactAmbigDetection);}\n");
 		grammarBuilder.append(":   expr[0] {fmt.Println($expr.ctx.ToStringTree(nil,p))};\n");
 		grammarBuilder.append("	expr[int _p]\n");
 		grammarBuilder.append("		: ID \n");
@@ -219,7 +219,7 @@ public class TestFullContextParsing extends BaseTest {
 		StringBuilder grammarBuilder = new StringBuilder(243);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s \n");
-		grammarBuilder.append("@init {p.Interpreter.SetPredictionMode(antlr4.PredictionModeLLExactAmbigDetection);}\n");
+		grammarBuilder.append("@init {p.Interpreter.SetPredictionMode(antlr.PredictionModeLLExactAmbigDetection);}\n");
 		grammarBuilder.append("@after {p.DumpDFA()}\n");
 		grammarBuilder.append("	: '{' stat* '}' ;\n");
 		grammarBuilder.append("stat: 'if' ID 'then' stat ('else' ID)?\n");
@@ -245,7 +245,7 @@ public class TestFullContextParsing extends BaseTest {
 		StringBuilder grammarBuilder = new StringBuilder(243);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s \n");
-		grammarBuilder.append("@init {p.Interpreter.SetPredictionMode(antlr4.PredictionModeLLExactAmbigDetection);}\n");
+		grammarBuilder.append("@init {p.Interpreter.SetPredictionMode(antlr.PredictionModeLLExactAmbigDetection);}\n");
 		grammarBuilder.append("@after {p.DumpDFA()}\n");
 		grammarBuilder.append("	: '{' stat* '}' ;\n");
 		grammarBuilder.append("stat: 'if' ID 'then' stat ('else' ID)?\n");
@@ -274,7 +274,7 @@ public class TestFullContextParsing extends BaseTest {
 		StringBuilder grammarBuilder = new StringBuilder(243);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s \n");
-		grammarBuilder.append("@init {p.Interpreter.SetPredictionMode(antlr4.PredictionModeLLExactAmbigDetection);}\n");
+		grammarBuilder.append("@init {p.Interpreter.SetPredictionMode(antlr.PredictionModeLLExactAmbigDetection);}\n");
 		grammarBuilder.append("@after {p.DumpDFA()}\n");
 		grammarBuilder.append("	: '{' stat* '}' ;\n");
 		grammarBuilder.append("stat: 'if' ID 'then' stat ('else' ID)?\n");
@@ -304,7 +304,7 @@ public class TestFullContextParsing extends BaseTest {
 		StringBuilder grammarBuilder = new StringBuilder(243);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s \n");
-		grammarBuilder.append("@init {p.Interpreter.SetPredictionMode(antlr4.PredictionModeLLExactAmbigDetection);}\n");
+		grammarBuilder.append("@init {p.Interpreter.SetPredictionMode(antlr.PredictionModeLLExactAmbigDetection);}\n");
 		grammarBuilder.append("@after {p.DumpDFA()}\n");
 		grammarBuilder.append("	: '{' stat* '}' ;\n");
 		grammarBuilder.append("stat: 'if' ID 'then' stat ('else' ID)?\n");
@@ -335,7 +335,7 @@ public class TestFullContextParsing extends BaseTest {
 		StringBuilder grammarBuilder = new StringBuilder(243);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s \n");
-		grammarBuilder.append("@init {p.Interpreter.SetPredictionMode(antlr4.PredictionModeLLExactAmbigDetection);}\n");
+		grammarBuilder.append("@init {p.Interpreter.SetPredictionMode(antlr.PredictionModeLLExactAmbigDetection);}\n");
 		grammarBuilder.append("@after {p.DumpDFA()}\n");
 		grammarBuilder.append("	: '{' stat* '}' ;\n");
 		grammarBuilder.append("stat: 'if' ID 'then' stat ('else' ID)?\n");
@@ -369,7 +369,7 @@ public class TestFullContextParsing extends BaseTest {
 		StringBuilder grammarBuilder = new StringBuilder(243);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s \n");
-		grammarBuilder.append("@init {p.Interpreter.SetPredictionMode(antlr4.PredictionModeLLExactAmbigDetection);}\n");
+		grammarBuilder.append("@init {p.Interpreter.SetPredictionMode(antlr.PredictionModeLLExactAmbigDetection);}\n");
 		grammarBuilder.append("@after {p.DumpDFA()}\n");
 		grammarBuilder.append("	: '{' stat* '}' ;\n");
 		grammarBuilder.append("stat: 'if' ID 'then' stat ('else' ID)?\n");
@@ -403,7 +403,7 @@ public class TestFullContextParsing extends BaseTest {
 		StringBuilder grammarBuilder = new StringBuilder(317);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("prog\n");
-		grammarBuilder.append("@init {p.Interpreter.SetPredictionMode(antlr4.PredictionModeLLExactAmbigDetection);}\n");
+		grammarBuilder.append("@init {p.Interpreter.SetPredictionMode(antlr.PredictionModeLLExactAmbigDetection);}\n");
 		grammarBuilder.append("	: expr_or_assign*;\n");
 		grammarBuilder.append("expr_or_assign\n");
 		grammarBuilder.append("	: expr '++' {fmt.Println(\"fail.\")}\n");

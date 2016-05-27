@@ -28,7 +28,7 @@ public class TestListeners extends BaseTest {
 		grammarBuilder.append("	return l\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("\n");
-		grammarBuilder.append("func (this *LeafListener) VisitTerminal( node antlr4.TerminalNode ) {\n");
+		grammarBuilder.append("func (this *LeafListener) VisitTerminal( node antlr.TerminalNode ) {\n");
 		grammarBuilder.append("	fmt.Println(node.GetSymbol().GetText())\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("}\n");
@@ -36,7 +36,7 @@ public class TestListeners extends BaseTest {
 		grammarBuilder.append("s\n");
 		grammarBuilder.append("@after {\n");
 		grammarBuilder.append("fmt.Println($ctx.r.ToStringTree(nil,p))\n");
-		grammarBuilder.append("walker := antlr4.NewParseTreeWalker();\n");
+		grammarBuilder.append("walker := antlr.NewParseTreeWalker();\n");
 		grammarBuilder.append("walker.Walk(NewLeafListener(), $ctx.r);\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("  : r=a ;\n");
@@ -92,7 +92,7 @@ public class TestListeners extends BaseTest {
 		grammarBuilder.append("s\n");
 		grammarBuilder.append("@after {\n");
 		grammarBuilder.append("fmt.Println($ctx.r.ToStringTree(nil,p))\n");
-		grammarBuilder.append("walker := antlr4.NewParseTreeWalker();\n");
+		grammarBuilder.append("walker := antlr.NewParseTreeWalker();\n");
 		grammarBuilder.append("walker.Walk(NewLeafListener(), $ctx.r);\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("	: r=e ;\n");
@@ -152,7 +152,7 @@ public class TestListeners extends BaseTest {
 		grammarBuilder.append("s\n");
 		grammarBuilder.append("@after {\n");
 		grammarBuilder.append("fmt.Println($ctx.r.ToStringTree(nil,p))\n");
-		grammarBuilder.append("walker := antlr4.NewParseTreeWalker();\n");
+		grammarBuilder.append("walker := antlr.NewParseTreeWalker();\n");
 		grammarBuilder.append("walker.Walk(NewLeafListener(), $ctx.r);\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("  : r=e ;\n");
@@ -211,7 +211,7 @@ public class TestListeners extends BaseTest {
 		grammarBuilder.append("s\n");
 		grammarBuilder.append("@after {\n");
 		grammarBuilder.append("fmt.Println($ctx.r.ToStringTree(nil,p))\n");
-		grammarBuilder.append("walker := antlr4.NewParseTreeWalker();\n");
+		grammarBuilder.append("walker := antlr.NewParseTreeWalker();\n");
 		grammarBuilder.append("walker.Walk(NewLeafListener(), $ctx.r);\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("  : r=a ;\n");
@@ -267,7 +267,7 @@ public class TestListeners extends BaseTest {
 		grammarBuilder.append("s\n");
 		grammarBuilder.append("@after {\n");
 		grammarBuilder.append("fmt.Println($ctx.r.ToStringTree(nil,p))\n");
-		grammarBuilder.append("walker := antlr4.NewParseTreeWalker();\n");
+		grammarBuilder.append("walker := antlr.NewParseTreeWalker();\n");
 		grammarBuilder.append("walker.Walk(NewLeafListener(), $ctx.r);\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("  : r=a ;\n");
@@ -323,7 +323,7 @@ public class TestListeners extends BaseTest {
 		grammarBuilder.append("s\n");
 		grammarBuilder.append("@after {\n");
 		grammarBuilder.append("fmt.Println($ctx.r.ToStringTree(nil,p))\n");
-		grammarBuilder.append("walker := antlr4.NewParseTreeWalker();\n");
+		grammarBuilder.append("walker := antlr.NewParseTreeWalker();\n");
 		grammarBuilder.append("walker.Walk(NewLeafListener(), $ctx.r);\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("  : r=a ;\n");
@@ -378,7 +378,7 @@ public class TestListeners extends BaseTest {
 		grammarBuilder.append("s\n");
 		grammarBuilder.append("@after {\n");
 		grammarBuilder.append("fmt.Println($ctx.r.ToStringTree(nil,p))\n");
-		grammarBuilder.append("walker := antlr4.NewParseTreeWalker();\n");
+		grammarBuilder.append("walker := antlr.NewParseTreeWalker();\n");
 		grammarBuilder.append("walker.Walk(NewLeafListener(), $ctx.r);\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("  : r=a ;\n");
