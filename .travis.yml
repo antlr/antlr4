@@ -15,4 +15,4 @@ before_install:
   - sudo apt-get install -qq nodejs
   - echo "deb http://download.mono-project.com/repo/debian wheezy/snapshots/3.12.1 main" | sudo tee /etc/apt/sources.list.d/mono-xamarin.list
   - sudo apt-get install -qq mono-complete
-  
+  - curl -s https://storage.googleapis.com/golang/go1.6.2.linux-amd64.tar.gz | sudo tar -C /usr/local -xzf -
