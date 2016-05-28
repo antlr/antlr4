@@ -655,7 +655,7 @@ func (d *DefaultErrorStrategy) escapeWSAndQuote(s string) string {
 // reSync to one of those tokens. Note that FOLLOW(c)='^' and if
 // we reSync'd to that token, we'd consume until EOF. We need to
 // Sync to context-sensitive FOLLOWs for a, b, and c: {']','^'}.
-// In d case, for input "[]", LA(1) is ']' and in the set, so we would
+// In this case, for input "[]", LA(1) is ']' and in the set, so we would
 // not consume anything. After printing an error, rule c would
 // return normally. Rule b would not find the required '^' though.
 // At this point, it gets a mismatched token error and panics an

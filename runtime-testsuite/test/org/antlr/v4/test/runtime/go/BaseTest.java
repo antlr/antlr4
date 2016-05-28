@@ -444,7 +444,7 @@ public abstract class BaseTest {
 		paths.add("c:\\Go\\bin");
 
 		for (String path : paths) {
-			File candidate = new File(path + File.separatorChar + tool);
+			File candidate = new File(new File(path), tool);
 			if (candidate.exists()) {
 				return candidate.getPath();
 			}
