@@ -205,7 +205,7 @@ public class TestLeftRecursion extends BaseCppTest {
 
 		StringBuilder grammarBuilder = new StringBuilder(406);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {std::cout << $ctx.toStringTree(recog=self) << \"\\n\";} : declarator EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {std::cout << $ctx->toStringTree(this) << std::endl;} : declarator EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("declarator\n");
 		grammarBuilder.append("        : declarator '[' e ']'\n");
 		grammarBuilder.append("        | declarator '[' ']'\n");
@@ -236,7 +236,7 @@ public class TestLeftRecursion extends BaseCppTest {
 
 		StringBuilder grammarBuilder = new StringBuilder(406);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {std::cout << $ctx.toStringTree(recog=self) << \"\\n\";} : declarator EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {std::cout << $ctx->toStringTree(this) << std::endl;} : declarator EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("declarator\n");
 		grammarBuilder.append("        : declarator '[' e ']'\n");
 		grammarBuilder.append("        | declarator '[' ']'\n");
@@ -267,7 +267,7 @@ public class TestLeftRecursion extends BaseCppTest {
 
 		StringBuilder grammarBuilder = new StringBuilder(406);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {std::cout << $ctx.toStringTree(recog=self) << \"\\n\";} : declarator EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {std::cout << $ctx->toStringTree(this) << std::endl;} : declarator EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("declarator\n");
 		grammarBuilder.append("        : declarator '[' e ']'\n");
 		grammarBuilder.append("        | declarator '[' ']'\n");
@@ -298,7 +298,7 @@ public class TestLeftRecursion extends BaseCppTest {
 
 		StringBuilder grammarBuilder = new StringBuilder(406);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {std::cout << $ctx.toStringTree(recog=self) << \"\\n\";} : declarator EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {std::cout << $ctx->toStringTree(this) << std::endl;} : declarator EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("declarator\n");
 		grammarBuilder.append("        : declarator '[' e ']'\n");
 		grammarBuilder.append("        | declarator '[' ']'\n");
@@ -329,7 +329,7 @@ public class TestLeftRecursion extends BaseCppTest {
 
 		StringBuilder grammarBuilder = new StringBuilder(406);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {std::cout << $ctx.toStringTree(recog=self) << \"\\n\";} : declarator EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {std::cout << $ctx->toStringTree(this) << std::endl;} : declarator EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("declarator\n");
 		grammarBuilder.append("        : declarator '[' e ']'\n");
 		grammarBuilder.append("        | declarator '[' ']'\n");
@@ -360,7 +360,7 @@ public class TestLeftRecursion extends BaseCppTest {
 
 		StringBuilder grammarBuilder = new StringBuilder(406);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {std::cout << $ctx.toStringTree(recog=self) << \"\\n\";} : declarator EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {std::cout << $ctx->toStringTree(this) << std::endl;} : declarator EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("declarator\n");
 		grammarBuilder.append("        : declarator '[' e ']'\n");
 		grammarBuilder.append("        | declarator '[' ']'\n");
@@ -391,7 +391,7 @@ public class TestLeftRecursion extends BaseCppTest {
 
 		StringBuilder grammarBuilder = new StringBuilder(406);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {std::cout << $ctx.toStringTree(recog=self) << \"\\n\";} : declarator EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {std::cout << $ctx->toStringTree(this) << std::endl;} : declarator EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("declarator\n");
 		grammarBuilder.append("        : declarator '[' e ']'\n");
 		grammarBuilder.append("        | declarator '[' ']'\n");
@@ -422,7 +422,7 @@ public class TestLeftRecursion extends BaseCppTest {
 
 		StringBuilder grammarBuilder = new StringBuilder(406);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {std::cout << $ctx.toStringTree(recog=self) << \"\\n\";} : declarator EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {std::cout << $ctx->toStringTree(this) << std::endl;} : declarator EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("declarator\n");
 		grammarBuilder.append("        : declarator '[' e ']'\n");
 		grammarBuilder.append("        | declarator '[' ']'\n");
@@ -453,7 +453,7 @@ public class TestLeftRecursion extends BaseCppTest {
 
 		StringBuilder grammarBuilder = new StringBuilder(406);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {std::cout << $ctx.toStringTree(recog=self) << \"\\n\";} : declarator EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {std::cout << $ctx->toStringTree(this) << std::endl;} : declarator EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("declarator\n");
 		grammarBuilder.append("        : declarator '[' e ']'\n");
 		grammarBuilder.append("        | declarator '[' ']'\n");
@@ -484,7 +484,7 @@ public class TestLeftRecursion extends BaseCppTest {
 
 		StringBuilder grammarBuilder = new StringBuilder(406);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {std::cout << $ctx.toStringTree(recog=self) << \"\\n\";} : declarator EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {std::cout << $ctx->toStringTree(this) << std::endl;} : declarator EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("declarator\n");
 		grammarBuilder.append("        : declarator '[' e ']'\n");
 		grammarBuilder.append("        | declarator '[' ']'\n");
@@ -515,7 +515,7 @@ public class TestLeftRecursion extends BaseCppTest {
 
 		StringBuilder grammarBuilder = new StringBuilder(134);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("a @after {std::cout << $ctx.toStringTree(recog=self) << \"\\n\";} : a ID\n");
+		grammarBuilder.append("a @after {std::cout << $ctx->toStringTree(this) << std::endl;} : a ID\n");
 		grammarBuilder.append("  | ID\n");
 		grammarBuilder.append("  ;\n");
 		grammarBuilder.append("ID : 'a'..'z'+ ;\n");
@@ -538,7 +538,7 @@ public class TestLeftRecursion extends BaseCppTest {
 
 		StringBuilder grammarBuilder = new StringBuilder(134);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("a @after {std::cout << $ctx.toStringTree(recog=self) << \"\\n\";} : a ID\n");
+		grammarBuilder.append("a @after {std::cout << $ctx->toStringTree(this) << std::endl;} : a ID\n");
 		grammarBuilder.append("  | ID\n");
 		grammarBuilder.append("  ;\n");
 		grammarBuilder.append("ID : 'a'..'z'+ ;\n");
@@ -561,7 +561,7 @@ public class TestLeftRecursion extends BaseCppTest {
 
 		StringBuilder grammarBuilder = new StringBuilder(134);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("a @after {std::cout << $ctx.toStringTree(recog=self) << \"\\n\";} : a ID\n");
+		grammarBuilder.append("a @after {std::cout << $ctx->toStringTree(this) << std::endl;} : a ID\n");
 		grammarBuilder.append("  | ID\n");
 		grammarBuilder.append("  ;\n");
 		grammarBuilder.append("ID : 'a'..'z'+ ;\n");
@@ -584,7 +584,7 @@ public class TestLeftRecursion extends BaseCppTest {
 
 		StringBuilder grammarBuilder = new StringBuilder(265);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {std::cout << $ctx.toStringTree(recog=self) << \"\\n\";} : e EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {std::cout << $ctx->toStringTree(this) << std::endl;} : e EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("e : e '.' ID\n");
 		grammarBuilder.append("  | e '.' 'this'\n");
 		grammarBuilder.append("  | '-' e\n");
@@ -614,7 +614,7 @@ public class TestLeftRecursion extends BaseCppTest {
 
 		StringBuilder grammarBuilder = new StringBuilder(265);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {std::cout << $ctx.toStringTree(recog=self) << \"\\n\";} : e EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {std::cout << $ctx->toStringTree(this) << std::endl;} : e EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("e : e '.' ID\n");
 		grammarBuilder.append("  | e '.' 'this'\n");
 		grammarBuilder.append("  | '-' e\n");
@@ -644,7 +644,7 @@ public class TestLeftRecursion extends BaseCppTest {
 
 		StringBuilder grammarBuilder = new StringBuilder(265);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {std::cout << $ctx.toStringTree(recog=self) << \"\\n\";} : e EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {std::cout << $ctx->toStringTree(this) << std::endl;} : e EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("e : e '.' ID\n");
 		grammarBuilder.append("  | e '.' 'this'\n");
 		grammarBuilder.append("  | '-' e\n");
@@ -674,7 +674,7 @@ public class TestLeftRecursion extends BaseCppTest {
 
 		StringBuilder grammarBuilder = new StringBuilder(265);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {std::cout << $ctx.toStringTree(recog=self) << \"\\n\";} : e EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {std::cout << $ctx->toStringTree(this) << std::endl;} : e EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("e : e '.' ID\n");
 		grammarBuilder.append("  | e '.' 'this'\n");
 		grammarBuilder.append("  | '-' e\n");
@@ -704,7 +704,7 @@ public class TestLeftRecursion extends BaseCppTest {
 
 		StringBuilder grammarBuilder = new StringBuilder(265);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {std::cout << $ctx.toStringTree(recog=self) << \"\\n\";} : e EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {std::cout << $ctx->toStringTree(this) << std::endl;} : e EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("e : e '.' ID\n");
 		grammarBuilder.append("  | e '.' 'this'\n");
 		grammarBuilder.append("  | '-' e\n");
@@ -734,7 +734,7 @@ public class TestLeftRecursion extends BaseCppTest {
 
 		StringBuilder grammarBuilder = new StringBuilder(265);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {std::cout << $ctx.toStringTree(recog=self) << \"\\n\";} : e EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {std::cout << $ctx->toStringTree(this) << std::endl;} : e EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("e : e '.' ID\n");
 		grammarBuilder.append("  | e '.' 'this'\n");
 		grammarBuilder.append("  | '-' e\n");
@@ -764,7 +764,7 @@ public class TestLeftRecursion extends BaseCppTest {
 
 		StringBuilder grammarBuilder = new StringBuilder(265);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {std::cout << $ctx.toStringTree(recog=self) << \"\\n\";} : e EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {std::cout << $ctx->toStringTree(this) << std::endl;} : e EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("e : e '.' ID\n");
 		grammarBuilder.append("  | e '.' 'this'\n");
 		grammarBuilder.append("  | '-' e\n");
@@ -794,7 +794,7 @@ public class TestLeftRecursion extends BaseCppTest {
 
 		StringBuilder grammarBuilder = new StringBuilder(1262);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {std::cout << $ctx.toStringTree(recog=self) << \"\\n\";} : e EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {std::cout << $ctx->toStringTree(this) << std::endl;} : e EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("expressionList\n");
 		grammarBuilder.append("    :   e (',' e)*\n");
 		grammarBuilder.append("    ;\n");
@@ -868,7 +868,7 @@ public class TestLeftRecursion extends BaseCppTest {
 
 		StringBuilder grammarBuilder = new StringBuilder(1262);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {std::cout << $ctx.toStringTree(recog=self) << \"\\n\";} : e EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {std::cout << $ctx->toStringTree(this) << std::endl;} : e EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("expressionList\n");
 		grammarBuilder.append("    :   e (',' e)*\n");
 		grammarBuilder.append("    ;\n");
@@ -942,7 +942,7 @@ public class TestLeftRecursion extends BaseCppTest {
 
 		StringBuilder grammarBuilder = new StringBuilder(1262);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {std::cout << $ctx.toStringTree(recog=self) << \"\\n\";} : e EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {std::cout << $ctx->toStringTree(this) << std::endl;} : e EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("expressionList\n");
 		grammarBuilder.append("    :   e (',' e)*\n");
 		grammarBuilder.append("    ;\n");
@@ -1016,7 +1016,7 @@ public class TestLeftRecursion extends BaseCppTest {
 
 		StringBuilder grammarBuilder = new StringBuilder(1262);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {std::cout << $ctx.toStringTree(recog=self) << \"\\n\";} : e EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {std::cout << $ctx->toStringTree(this) << std::endl;} : e EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("expressionList\n");
 		grammarBuilder.append("    :   e (',' e)*\n");
 		grammarBuilder.append("    ;\n");
@@ -1090,7 +1090,7 @@ public class TestLeftRecursion extends BaseCppTest {
 
 		StringBuilder grammarBuilder = new StringBuilder(1262);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {std::cout << $ctx.toStringTree(recog=self) << \"\\n\";} : e EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {std::cout << $ctx->toStringTree(this) << std::endl;} : e EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("expressionList\n");
 		grammarBuilder.append("    :   e (',' e)*\n");
 		grammarBuilder.append("    ;\n");
@@ -1164,7 +1164,7 @@ public class TestLeftRecursion extends BaseCppTest {
 
 		StringBuilder grammarBuilder = new StringBuilder(1262);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {std::cout << $ctx.toStringTree(recog=self) << \"\\n\";} : e EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {std::cout << $ctx->toStringTree(this) << std::endl;} : e EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("expressionList\n");
 		grammarBuilder.append("    :   e (',' e)*\n");
 		grammarBuilder.append("    ;\n");
@@ -1238,7 +1238,7 @@ public class TestLeftRecursion extends BaseCppTest {
 
 		StringBuilder grammarBuilder = new StringBuilder(1262);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {std::cout << $ctx.toStringTree(recog=self) << \"\\n\";} : e EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {std::cout << $ctx->toStringTree(this) << std::endl;} : e EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("expressionList\n");
 		grammarBuilder.append("    :   e (',' e)*\n");
 		grammarBuilder.append("    ;\n");
@@ -1312,7 +1312,7 @@ public class TestLeftRecursion extends BaseCppTest {
 
 		StringBuilder grammarBuilder = new StringBuilder(1262);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {std::cout << $ctx.toStringTree(recog=self) << \"\\n\";} : e EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {std::cout << $ctx->toStringTree(this) << std::endl;} : e EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("expressionList\n");
 		grammarBuilder.append("    :   e (',' e)*\n");
 		grammarBuilder.append("    ;\n");
@@ -1386,7 +1386,7 @@ public class TestLeftRecursion extends BaseCppTest {
 
 		StringBuilder grammarBuilder = new StringBuilder(1262);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {std::cout << $ctx.toStringTree(recog=self) << \"\\n\";} : e EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {std::cout << $ctx->toStringTree(this) << std::endl;} : e EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("expressionList\n");
 		grammarBuilder.append("    :   e (',' e)*\n");
 		grammarBuilder.append("    ;\n");
@@ -1460,7 +1460,7 @@ public class TestLeftRecursion extends BaseCppTest {
 
 		StringBuilder grammarBuilder = new StringBuilder(1262);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {std::cout << $ctx.toStringTree(recog=self) << \"\\n\";} : e EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {std::cout << $ctx->toStringTree(this) << std::endl;} : e EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("expressionList\n");
 		grammarBuilder.append("    :   e (',' e)*\n");
 		grammarBuilder.append("    ;\n");
@@ -1534,7 +1534,7 @@ public class TestLeftRecursion extends BaseCppTest {
 
 		StringBuilder grammarBuilder = new StringBuilder(1262);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {std::cout << $ctx.toStringTree(recog=self) << \"\\n\";} : e EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {std::cout << $ctx->toStringTree(this) << std::endl;} : e EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("expressionList\n");
 		grammarBuilder.append("    :   e (',' e)*\n");
 		grammarBuilder.append("    ;\n");
@@ -1608,7 +1608,7 @@ public class TestLeftRecursion extends BaseCppTest {
 
 		StringBuilder grammarBuilder = new StringBuilder(1262);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {std::cout << $ctx.toStringTree(recog=self) << \"\\n\";} : e EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {std::cout << $ctx->toStringTree(this) << std::endl;} : e EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("expressionList\n");
 		grammarBuilder.append("    :   e (',' e)*\n");
 		grammarBuilder.append("    ;\n");
@@ -1682,7 +1682,7 @@ public class TestLeftRecursion extends BaseCppTest {
 
 		StringBuilder grammarBuilder = new StringBuilder(185);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {std::cout << $ctx.toStringTree(recog=self) << \"\\n\";} : e;\n");
+		grammarBuilder.append("s @after {std::cout << $ctx->toStringTree(this) << std::endl;} : e;\n");
 		grammarBuilder.append("e : a=e op=('*'|'/') b=e  {}\n");
 		grammarBuilder.append("  | INT {}\n");
 		grammarBuilder.append("  | '(' x=e ')' {}\n");
@@ -1707,7 +1707,7 @@ public class TestLeftRecursion extends BaseCppTest {
 
 		StringBuilder grammarBuilder = new StringBuilder(185);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {std::cout << $ctx.toStringTree(recog=self) << \"\\n\";} : e;\n");
+		grammarBuilder.append("s @after {std::cout << $ctx->toStringTree(this) << std::endl;} : e;\n");
 		grammarBuilder.append("e : a=e op=('*'|'/') b=e  {}\n");
 		grammarBuilder.append("  | INT {}\n");
 		grammarBuilder.append("  | '(' x=e ')' {}\n");
@@ -1732,7 +1732,7 @@ public class TestLeftRecursion extends BaseCppTest {
 
 		StringBuilder grammarBuilder = new StringBuilder(185);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {std::cout << $ctx.toStringTree(recog=self) << \"\\n\";} : e;\n");
+		grammarBuilder.append("s @after {std::cout << $ctx->toStringTree(this) << std::endl;} : e;\n");
 		grammarBuilder.append("e : a=e op=('*'|'/') b=e  {}\n");
 		grammarBuilder.append("  | INT {}\n");
 		grammarBuilder.append("  | '(' x=e ')' {}\n");
@@ -1757,7 +1757,7 @@ public class TestLeftRecursion extends BaseCppTest {
 
 		StringBuilder grammarBuilder = new StringBuilder(254);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {std::cout << $ctx.toStringTree(recog=self) << \"\\n\";} : e ;\n");
+		grammarBuilder.append("s @after {std::cout << $ctx->toStringTree(this) << std::endl;} : e ;\n");
 		grammarBuilder.append("e : a=e op=('*'|'/') b=e  {}{true}?\n");
 		grammarBuilder.append("  | a=e op=('+'|'-') b=e  {}<p=3>{true}?<fail='Message'>\n");
 		grammarBuilder.append("  | INT {}{}\n");
@@ -1783,7 +1783,7 @@ public class TestLeftRecursion extends BaseCppTest {
 
 		StringBuilder grammarBuilder = new StringBuilder(254);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {std::cout << $ctx.toStringTree(recog=self) << \"\\n\";} : e ;\n");
+		grammarBuilder.append("s @after {std::cout << $ctx->toStringTree(this) << std::endl;} : e ;\n");
 		grammarBuilder.append("e : a=e op=('*'|'/') b=e  {}{true}?\n");
 		grammarBuilder.append("  | a=e op=('+'|'-') b=e  {}<p=3>{true}?<fail='Message'>\n");
 		grammarBuilder.append("  | INT {}{}\n");
@@ -1809,7 +1809,7 @@ public class TestLeftRecursion extends BaseCppTest {
 
 		StringBuilder grammarBuilder = new StringBuilder(254);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {std::cout << $ctx.toStringTree(recog=self) << \"\\n\";} : e ;\n");
+		grammarBuilder.append("s @after {std::cout << $ctx->toStringTree(this) << std::endl;} : e ;\n");
 		grammarBuilder.append("e : a=e op=('*'|'/') b=e  {}{true}?\n");
 		grammarBuilder.append("  | a=e op=('+'|'-') b=e  {}<p=3>{true}?<fail='Message'>\n");
 		grammarBuilder.append("  | INT {}{}\n");
@@ -1835,7 +1835,7 @@ public class TestLeftRecursion extends BaseCppTest {
 
 		StringBuilder grammarBuilder = new StringBuilder(192);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {std::cout << $ctx.toStringTree(recog=self) << \"\\n\";} : e ;\n");
+		grammarBuilder.append("s @after {std::cout << $ctx->toStringTree(this) << std::endl;} : e ;\n");
 		grammarBuilder.append("e : a=e op=('*'|'/') b=e  {}{}\n");
 		grammarBuilder.append("  | INT {}{}\n");
 		grammarBuilder.append("  | '(' x=e ')' {}{}\n");
@@ -1860,7 +1860,7 @@ public class TestLeftRecursion extends BaseCppTest {
 
 		StringBuilder grammarBuilder = new StringBuilder(192);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {std::cout << $ctx.toStringTree(recog=self) << \"\\n\";} : e ;\n");
+		grammarBuilder.append("s @after {std::cout << $ctx->toStringTree(this) << std::endl;} : e ;\n");
 		grammarBuilder.append("e : a=e op=('*'|'/') b=e  {}{}\n");
 		grammarBuilder.append("  | INT {}{}\n");
 		grammarBuilder.append("  | '(' x=e ')' {}{}\n");
@@ -1885,7 +1885,7 @@ public class TestLeftRecursion extends BaseCppTest {
 
 		StringBuilder grammarBuilder = new StringBuilder(192);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {std::cout << $ctx.toStringTree(recog=self) << \"\\n\";} : e ;\n");
+		grammarBuilder.append("s @after {std::cout << $ctx->toStringTree(this) << std::endl;} : e ;\n");
 		grammarBuilder.append("e : a=e op=('*'|'/') b=e  {}{}\n");
 		grammarBuilder.append("  | INT {}{}\n");
 		grammarBuilder.append("  | '(' x=e ')' {}{}\n");
@@ -1905,12 +1905,13 @@ public class TestLeftRecursion extends BaseCppTest {
 
 	/* This file and method are generated by TestGenerator, any edits will be overwritten by the next generation. */
 	@Test
+	@Ignore("true")
 	public void testMultipleAlternativesWithCommonLabel_1() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(576);
+		StringBuilder grammarBuilder = new StringBuilder(581);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s : e {std::cout << $e.v << \"\\n\";};\n");
+		grammarBuilder.append("s : e {std::cout << $e.v << std::endl;};\n");
 		grammarBuilder.append("e returns [int v]\n");
 		grammarBuilder.append("  : e '*' e     {$v = $ctx.e(0).v * $ctx.e(1).v;}  # binary\n");
 		grammarBuilder.append("  | e '+' e     {$v = $ctx.e(0).v + $ctx.e(1).v;}  # binary\n");
@@ -1938,12 +1939,13 @@ public class TestLeftRecursion extends BaseCppTest {
 
 	/* This file and method are generated by TestGenerator, any edits will be overwritten by the next generation. */
 	@Test
+	@Ignore("true")
 	public void testMultipleAlternativesWithCommonLabel_2() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(576);
+		StringBuilder grammarBuilder = new StringBuilder(581);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s : e {std::cout << $e.v << \"\\n\";};\n");
+		grammarBuilder.append("s : e {std::cout << $e.v << std::endl;};\n");
 		grammarBuilder.append("e returns [int v]\n");
 		grammarBuilder.append("  : e '*' e     {$v = $ctx.e(0).v * $ctx.e(1).v;}  # binary\n");
 		grammarBuilder.append("  | e '+' e     {$v = $ctx.e(0).v + $ctx.e(1).v;}  # binary\n");
@@ -1971,12 +1973,13 @@ public class TestLeftRecursion extends BaseCppTest {
 
 	/* This file and method are generated by TestGenerator, any edits will be overwritten by the next generation. */
 	@Test
+	@Ignore("true")
 	public void testMultipleAlternativesWithCommonLabel_3() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(576);
+		StringBuilder grammarBuilder = new StringBuilder(581);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s : e {std::cout << $e.v << \"\\n\";};\n");
+		grammarBuilder.append("s : e {std::cout << $e.v << std::endl;};\n");
 		grammarBuilder.append("e returns [int v]\n");
 		grammarBuilder.append("  : e '*' e     {$v = $ctx.e(0).v * $ctx.e(1).v;}  # binary\n");
 		grammarBuilder.append("  | e '+' e     {$v = $ctx.e(0).v + $ctx.e(1).v;}  # binary\n");
@@ -2004,12 +2007,13 @@ public class TestLeftRecursion extends BaseCppTest {
 
 	/* This file and method are generated by TestGenerator, any edits will be overwritten by the next generation. */
 	@Test
+	@Ignore("true")
 	public void testMultipleAlternativesWithCommonLabel_4() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(576);
+		StringBuilder grammarBuilder = new StringBuilder(581);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s : e {std::cout << $e.v << \"\\n\";};\n");
+		grammarBuilder.append("s : e {std::cout << $e.v << std::endl;};\n");
 		grammarBuilder.append("e returns [int v]\n");
 		grammarBuilder.append("  : e '*' e     {$v = $ctx.e(0).v * $ctx.e(1).v;}  # binary\n");
 		grammarBuilder.append("  | e '+' e     {$v = $ctx.e(0).v + $ctx.e(1).v;}  # binary\n");
@@ -2043,7 +2047,7 @@ public class TestLeftRecursion extends BaseCppTest {
 		StringBuilder grammarBuilder = new StringBuilder(157);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("prog \n");
-		grammarBuilder.append("@after {std::cout << $ctx.toStringTree(recog=self) << \"\\n\";}\n");
+		grammarBuilder.append("@after {std::cout << $ctx->toStringTree(this) << std::endl;}\n");
 		grammarBuilder.append(": statement* EOF {};\n");
 		grammarBuilder.append("statement: letterA | statement letterA 'b' ;\n");
 		grammarBuilder.append("letterA: 'a';");
@@ -2065,7 +2069,7 @@ public class TestLeftRecursion extends BaseCppTest {
 
 		StringBuilder grammarBuilder = new StringBuilder(231);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {std::cout << $ctx.toStringTree(recog=self) << \"\\n\";} : expr EOF ; \n");
+		grammarBuilder.append("s @after {std::cout << $ctx->toStringTree(this) << std::endl;} : expr EOF ; \n");
 		grammarBuilder.append("expr : literal\n");
 		grammarBuilder.append("     | op expr\n");
 		grammarBuilder.append("     | expr op expr\n");
@@ -2092,7 +2096,7 @@ public class TestLeftRecursion extends BaseCppTest {
 
 		StringBuilder grammarBuilder = new StringBuilder(231);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {std::cout << $ctx.toStringTree(recog=self) << \"\\n\";} : expr EOF ; \n");
+		grammarBuilder.append("s @after {std::cout << $ctx->toStringTree(this) << std::endl;} : expr EOF ; \n");
 		grammarBuilder.append("expr : literal\n");
 		grammarBuilder.append("     | op expr\n");
 		grammarBuilder.append("     | expr op expr\n");
@@ -2114,12 +2118,13 @@ public class TestLeftRecursion extends BaseCppTest {
 
 	/* This file and method are generated by TestGenerator, any edits will be overwritten by the next generation. */
 	@Test
+	@Ignore("true")
 	public void testPrefixOpWithActionAndLabel_1() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(344);
+		StringBuilder grammarBuilder = new StringBuilder(349);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s : e {std::cout << $e.result << \"\\n\";} ;\n");
+		grammarBuilder.append("s : e {std::cout << $e.result << std::endl;} ;\n");
 		grammarBuilder.append("e returns [String result]\n");
 		grammarBuilder.append("    :   ID '=' e1=e    {$result = \"(\" + $ID.text + \"=\" + $e1.result + \")\";}\n");
 		grammarBuilder.append("    |   ID             {$result = $ID.text;}\n");
@@ -2141,12 +2146,13 @@ public class TestLeftRecursion extends BaseCppTest {
 
 	/* This file and method are generated by TestGenerator, any edits will be overwritten by the next generation. */
 	@Test
+	@Ignore("true")
 	public void testPrefixOpWithActionAndLabel_2() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(344);
+		StringBuilder grammarBuilder = new StringBuilder(349);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s : e {std::cout << $e.result << \"\\n\";} ;\n");
+		grammarBuilder.append("s : e {std::cout << $e.result << std::endl;} ;\n");
 		grammarBuilder.append("e returns [String result]\n");
 		grammarBuilder.append("    :   ID '=' e1=e    {$result = \"(\" + $ID.text + \"=\" + $e1.result + \")\";}\n");
 		grammarBuilder.append("    |   ID             {$result = $ID.text;}\n");
@@ -2168,12 +2174,13 @@ public class TestLeftRecursion extends BaseCppTest {
 
 	/* This file and method are generated by TestGenerator, any edits will be overwritten by the next generation. */
 	@Test
+	@Ignore("true")
 	public void testPrefixOpWithActionAndLabel_3() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(344);
+		StringBuilder grammarBuilder = new StringBuilder(349);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s : e {std::cout << $e.result << \"\\n\";} ;\n");
+		grammarBuilder.append("s : e {std::cout << $e.result << std::endl;} ;\n");
 		grammarBuilder.append("e returns [String result]\n");
 		grammarBuilder.append("    :   ID '=' e1=e    {$result = \"(\" + $ID.text + \"=\" + $e1.result + \")\";}\n");
 		grammarBuilder.append("    |   ID             {$result = $ID.text;}\n");
@@ -2198,9 +2205,9 @@ public class TestLeftRecursion extends BaseCppTest {
 	public void testReturnValueAndActionsAndLabels_1() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(462);
+		StringBuilder grammarBuilder = new StringBuilder(467);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s : q=e {std::cout << $e.v << \"\\n\";}; \n");
+		grammarBuilder.append("s : q=e {std::cout << $e.v << std::endl;}; \n");
 		grammarBuilder.append("e returns [int v]\n");
 		grammarBuilder.append("  : a=e op='*' b=e {$v = $a.v * $b.v;}  # mult\n");
 		grammarBuilder.append("  | a=e '+' b=e {$v = $a.v + $b.v;}     # add\n");
@@ -2229,9 +2236,9 @@ public class TestLeftRecursion extends BaseCppTest {
 	public void testReturnValueAndActionsAndLabels_2() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(462);
+		StringBuilder grammarBuilder = new StringBuilder(467);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s : q=e {std::cout << $e.v << \"\\n\";}; \n");
+		grammarBuilder.append("s : q=e {std::cout << $e.v << std::endl;}; \n");
 		grammarBuilder.append("e returns [int v]\n");
 		grammarBuilder.append("  : a=e op='*' b=e {$v = $a.v * $b.v;}  # mult\n");
 		grammarBuilder.append("  | a=e '+' b=e {$v = $a.v + $b.v;}     # add\n");
@@ -2260,9 +2267,9 @@ public class TestLeftRecursion extends BaseCppTest {
 	public void testReturnValueAndActionsAndLabels_3() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(462);
+		StringBuilder grammarBuilder = new StringBuilder(467);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s : q=e {std::cout << $e.v << \"\\n\";}; \n");
+		grammarBuilder.append("s : q=e {std::cout << $e.v << std::endl;}; \n");
 		grammarBuilder.append("e returns [int v]\n");
 		grammarBuilder.append("  : a=e op='*' b=e {$v = $a.v * $b.v;}  # mult\n");
 		grammarBuilder.append("  | a=e '+' b=e {$v = $a.v + $b.v;}     # add\n");
@@ -2291,9 +2298,9 @@ public class TestLeftRecursion extends BaseCppTest {
 	public void testReturnValueAndActionsAndLabels_4() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(462);
+		StringBuilder grammarBuilder = new StringBuilder(467);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s : q=e {std::cout << $e.v << \"\\n\";}; \n");
+		grammarBuilder.append("s : q=e {std::cout << $e.v << std::endl;}; \n");
 		grammarBuilder.append("e returns [int v]\n");
 		grammarBuilder.append("  : a=e op='*' b=e {$v = $a.v * $b.v;}  # mult\n");
 		grammarBuilder.append("  | a=e '+' b=e {$v = $a.v + $b.v;}     # add\n");
@@ -2324,7 +2331,7 @@ public class TestLeftRecursion extends BaseCppTest {
 
 		StringBuilder grammarBuilder = new StringBuilder(315);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {std::cout << $ctx.toStringTree(recog=self) << \"\\n\";} : expr EOF;\n");
+		grammarBuilder.append("s @after {std::cout << $ctx->toStringTree(this) << std::endl;} : expr EOF;\n");
 		grammarBuilder.append("expr:\n");
 		grammarBuilder.append("    a=expr '*' a=expr #Factor\n");
 		grammarBuilder.append("    | b+=expr (',' b+=expr)* '>>' c=expr #Send\n");
@@ -2354,7 +2361,7 @@ public class TestLeftRecursion extends BaseCppTest {
 
 		StringBuilder grammarBuilder = new StringBuilder(315);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {std::cout << $ctx.toStringTree(recog=self) << \"\\n\";} : expr EOF;\n");
+		grammarBuilder.append("s @after {std::cout << $ctx->toStringTree(this) << std::endl;} : expr EOF;\n");
 		grammarBuilder.append("expr:\n");
 		grammarBuilder.append("    a=expr '*' a=expr #Factor\n");
 		grammarBuilder.append("    | b+=expr (',' b+=expr)* '>>' c=expr #Send\n");
@@ -2384,7 +2391,7 @@ public class TestLeftRecursion extends BaseCppTest {
 
 		StringBuilder grammarBuilder = new StringBuilder(315);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {std::cout << $ctx.toStringTree(recog=self) << \"\\n\";} : expr EOF;\n");
+		grammarBuilder.append("s @after {std::cout << $ctx->toStringTree(this) << std::endl;} : expr EOF;\n");
 		grammarBuilder.append("expr:\n");
 		grammarBuilder.append("    a=expr '*' a=expr #Factor\n");
 		grammarBuilder.append("    | b+=expr (',' b+=expr)* '>>' c=expr #Send\n");
@@ -2414,7 +2421,7 @@ public class TestLeftRecursion extends BaseCppTest {
 
 		StringBuilder grammarBuilder = new StringBuilder(315);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {std::cout << $ctx.toStringTree(recog=self) << \"\\n\";} : expr EOF;\n");
+		grammarBuilder.append("s @after {std::cout << $ctx->toStringTree(this) << std::endl;} : expr EOF;\n");
 		grammarBuilder.append("expr:\n");
 		grammarBuilder.append("    a=expr '*' a=expr #Factor\n");
 		grammarBuilder.append("    | b+=expr (',' b+=expr)* '>>' c=expr #Send\n");
@@ -2444,7 +2451,7 @@ public class TestLeftRecursion extends BaseCppTest {
 
 		StringBuilder grammarBuilder = new StringBuilder(332);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {std::cout << $ctx.toStringTree(recog=self) << \"\\n\";} : expr EOF;\n");
+		grammarBuilder.append("s @after {std::cout << $ctx->toStringTree(this) << std::endl;} : expr EOF;\n");
 		grammarBuilder.append("expr:\n");
 		grammarBuilder.append("    a=expr '*' a=expr #Factor\n");
 		grammarBuilder.append("    | b+=expr ',' b+=expr #Comma\n");
@@ -2473,7 +2480,7 @@ public class TestLeftRecursion extends BaseCppTest {
 
 		StringBuilder grammarBuilder = new StringBuilder(332);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {std::cout << $ctx.toStringTree(recog=self) << \"\\n\";} : expr EOF;\n");
+		grammarBuilder.append("s @after {std::cout << $ctx->toStringTree(this) << std::endl;} : expr EOF;\n");
 		grammarBuilder.append("expr:\n");
 		grammarBuilder.append("    a=expr '*' a=expr #Factor\n");
 		grammarBuilder.append("    | b+=expr ',' b+=expr #Comma\n");
@@ -2502,7 +2509,7 @@ public class TestLeftRecursion extends BaseCppTest {
 
 		StringBuilder grammarBuilder = new StringBuilder(332);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {std::cout << $ctx.toStringTree(recog=self) << \"\\n\";} : expr EOF;\n");
+		grammarBuilder.append("s @after {std::cout << $ctx->toStringTree(this) << std::endl;} : expr EOF;\n");
 		grammarBuilder.append("expr:\n");
 		grammarBuilder.append("    a=expr '*' a=expr #Factor\n");
 		grammarBuilder.append("    | b+=expr ',' b+=expr #Comma\n");
@@ -2531,7 +2538,7 @@ public class TestLeftRecursion extends BaseCppTest {
 
 		StringBuilder grammarBuilder = new StringBuilder(332);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {std::cout << $ctx.toStringTree(recog=self) << \"\\n\";} : expr EOF;\n");
+		grammarBuilder.append("s @after {std::cout << $ctx->toStringTree(this) << std::endl;} : expr EOF;\n");
 		grammarBuilder.append("expr:\n");
 		grammarBuilder.append("    a=expr '*' a=expr #Factor\n");
 		grammarBuilder.append("    | b+=expr ',' b+=expr #Comma\n");
@@ -2555,12 +2562,13 @@ public class TestLeftRecursion extends BaseCppTest {
 
 	/* This file and method are generated by TestGenerator, any edits will be overwritten by the next generation. */
 	@Test
+	@Ignore("true")
 	public void testReturnValueAndActions_1() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(250);
+		StringBuilder grammarBuilder = new StringBuilder(255);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s : e {std::cout << $e.v << \"\\n\";}; \n");
+		grammarBuilder.append("s : e {std::cout << $e.v << std::endl;}; \n");
 		grammarBuilder.append("e returns [int v,  ignored]\n");
 		grammarBuilder.append("  : a=e '*' b=e {$v = $a.v * $b.v;}\n");
 		grammarBuilder.append("  | a=e '+' b=e {$v = $a.v + $b.v;}\n");
@@ -2582,12 +2590,13 @@ public class TestLeftRecursion extends BaseCppTest {
 
 	/* This file and method are generated by TestGenerator, any edits will be overwritten by the next generation. */
 	@Test
+	@Ignore("true")
 	public void testReturnValueAndActions_2() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(250);
+		StringBuilder grammarBuilder = new StringBuilder(255);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s : e {std::cout << $e.v << \"\\n\";}; \n");
+		grammarBuilder.append("s : e {std::cout << $e.v << std::endl;}; \n");
 		grammarBuilder.append("e returns [int v,  ignored]\n");
 		grammarBuilder.append("  : a=e '*' b=e {$v = $a.v * $b.v;}\n");
 		grammarBuilder.append("  | a=e '+' b=e {$v = $a.v + $b.v;}\n");
@@ -2609,12 +2618,13 @@ public class TestLeftRecursion extends BaseCppTest {
 
 	/* This file and method are generated by TestGenerator, any edits will be overwritten by the next generation. */
 	@Test
+	@Ignore("true")
 	public void testReturnValueAndActions_3() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(250);
+		StringBuilder grammarBuilder = new StringBuilder(255);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s : e {std::cout << $e.v << \"\\n\";}; \n");
+		grammarBuilder.append("s : e {std::cout << $e.v << std::endl;}; \n");
 		grammarBuilder.append("e returns [int v,  ignored]\n");
 		grammarBuilder.append("  : a=e '*' b=e {$v = $a.v * $b.v;}\n");
 		grammarBuilder.append("  | a=e '+' b=e {$v = $a.v + $b.v;}\n");
@@ -2636,12 +2646,13 @@ public class TestLeftRecursion extends BaseCppTest {
 
 	/* This file and method are generated by TestGenerator, any edits will be overwritten by the next generation. */
 	@Test
+	@Ignore("true")
 	public void testReturnValueAndActions_4() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(250);
+		StringBuilder grammarBuilder = new StringBuilder(255);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s : e {std::cout << $e.v << \"\\n\";}; \n");
+		grammarBuilder.append("s : e {std::cout << $e.v << std::endl;}; \n");
 		grammarBuilder.append("e returns [int v,  ignored]\n");
 		grammarBuilder.append("  : a=e '*' b=e {$v = $a.v * $b.v;}\n");
 		grammarBuilder.append("  | a=e '+' b=e {$v = $a.v + $b.v;}\n");
@@ -2668,7 +2679,7 @@ public class TestLeftRecursion extends BaseCppTest {
 
 		StringBuilder grammarBuilder = new StringBuilder(150);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {std::cout << $ctx.toStringTree(recog=self) << \"\\n\";} : a ;\n");
+		grammarBuilder.append("s @after {std::cout << $ctx->toStringTree(this) << std::endl;} : a ;\n");
 		grammarBuilder.append("a : a {true}? ID\n");
 		grammarBuilder.append("  | ID\n");
 		grammarBuilder.append("  ;\n");
@@ -2692,7 +2703,7 @@ public class TestLeftRecursion extends BaseCppTest {
 
 		StringBuilder grammarBuilder = new StringBuilder(174);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {std::cout << $ctx.toStringTree(recog=self) << \"\\n\";} : a ;\n");
+		grammarBuilder.append("s @after {std::cout << $ctx->toStringTree(this) << std::endl;} : a ;\n");
 		grammarBuilder.append("a : a ID {false}?<fail='custom message'>\n");
 		grammarBuilder.append("  | ID\n");
 		grammarBuilder.append("  ;\n");
@@ -2717,7 +2728,7 @@ public class TestLeftRecursion extends BaseCppTest {
 
 		StringBuilder grammarBuilder = new StringBuilder(142);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {std::cout << $ctx.toStringTree(recog=self) << \"\\n\";} : a ;\n");
+		grammarBuilder.append("s @after {std::cout << $ctx->toStringTree(this) << std::endl;} : a ;\n");
 		grammarBuilder.append("a : a ID\n");
 		grammarBuilder.append("  | ID\n");
 		grammarBuilder.append("  ;\n");
@@ -2741,7 +2752,7 @@ public class TestLeftRecursion extends BaseCppTest {
 
 		StringBuilder grammarBuilder = new StringBuilder(142);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {std::cout << $ctx.toStringTree(recog=self) << \"\\n\";} : a ;\n");
+		grammarBuilder.append("s @after {std::cout << $ctx->toStringTree(this) << std::endl;} : a ;\n");
 		grammarBuilder.append("a : a ID\n");
 		grammarBuilder.append("  | ID\n");
 		grammarBuilder.append("  ;\n");
@@ -2765,7 +2776,7 @@ public class TestLeftRecursion extends BaseCppTest {
 
 		StringBuilder grammarBuilder = new StringBuilder(142);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {std::cout << $ctx.toStringTree(recog=self) << \"\\n\";} : a ;\n");
+		grammarBuilder.append("s @after {std::cout << $ctx->toStringTree(this) << std::endl;} : a ;\n");
 		grammarBuilder.append("a : a ID\n");
 		grammarBuilder.append("  | ID\n");
 		grammarBuilder.append("  ;\n");
@@ -2789,7 +2800,7 @@ public class TestLeftRecursion extends BaseCppTest {
 
 		StringBuilder grammarBuilder = new StringBuilder(298);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {std::cout << $ctx.toStringTree(recog=self) << \"\\n\";} : e EOF; // must indicate EOF can follow or 'a<EOF>' won't match\n");
+		grammarBuilder.append("s @after {std::cout << $ctx->toStringTree(this) << std::endl;} : e EOF; // must indicate EOF can follow or 'a<EOF>' won't match\n");
 		grammarBuilder.append("e :<assoc=right> e '*' e\n");
 		grammarBuilder.append("  |<assoc=right> e '+' e\n");
 		grammarBuilder.append("  |<assoc=right> e '?' e ':' e\n");
@@ -2816,7 +2827,7 @@ public class TestLeftRecursion extends BaseCppTest {
 
 		StringBuilder grammarBuilder = new StringBuilder(298);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {std::cout << $ctx.toStringTree(recog=self) << \"\\n\";} : e EOF; // must indicate EOF can follow or 'a<EOF>' won't match\n");
+		grammarBuilder.append("s @after {std::cout << $ctx->toStringTree(this) << std::endl;} : e EOF; // must indicate EOF can follow or 'a<EOF>' won't match\n");
 		grammarBuilder.append("e :<assoc=right> e '*' e\n");
 		grammarBuilder.append("  |<assoc=right> e '+' e\n");
 		grammarBuilder.append("  |<assoc=right> e '?' e ':' e\n");
@@ -2843,7 +2854,7 @@ public class TestLeftRecursion extends BaseCppTest {
 
 		StringBuilder grammarBuilder = new StringBuilder(298);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {std::cout << $ctx.toStringTree(recog=self) << \"\\n\";} : e EOF; // must indicate EOF can follow or 'a<EOF>' won't match\n");
+		grammarBuilder.append("s @after {std::cout << $ctx->toStringTree(this) << std::endl;} : e EOF; // must indicate EOF can follow or 'a<EOF>' won't match\n");
 		grammarBuilder.append("e :<assoc=right> e '*' e\n");
 		grammarBuilder.append("  |<assoc=right> e '+' e\n");
 		grammarBuilder.append("  |<assoc=right> e '?' e ':' e\n");
@@ -2870,7 +2881,7 @@ public class TestLeftRecursion extends BaseCppTest {
 
 		StringBuilder grammarBuilder = new StringBuilder(298);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {std::cout << $ctx.toStringTree(recog=self) << \"\\n\";} : e EOF; // must indicate EOF can follow or 'a<EOF>' won't match\n");
+		grammarBuilder.append("s @after {std::cout << $ctx->toStringTree(this) << std::endl;} : e EOF; // must indicate EOF can follow or 'a<EOF>' won't match\n");
 		grammarBuilder.append("e :<assoc=right> e '*' e\n");
 		grammarBuilder.append("  |<assoc=right> e '+' e\n");
 		grammarBuilder.append("  |<assoc=right> e '?' e ':' e\n");
@@ -2897,7 +2908,7 @@ public class TestLeftRecursion extends BaseCppTest {
 
 		StringBuilder grammarBuilder = new StringBuilder(298);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {std::cout << $ctx.toStringTree(recog=self) << \"\\n\";} : e EOF; // must indicate EOF can follow or 'a<EOF>' won't match\n");
+		grammarBuilder.append("s @after {std::cout << $ctx->toStringTree(this) << std::endl;} : e EOF; // must indicate EOF can follow or 'a<EOF>' won't match\n");
 		grammarBuilder.append("e :<assoc=right> e '*' e\n");
 		grammarBuilder.append("  |<assoc=right> e '+' e\n");
 		grammarBuilder.append("  |<assoc=right> e '?' e ':' e\n");
@@ -2924,7 +2935,7 @@ public class TestLeftRecursion extends BaseCppTest {
 
 		StringBuilder grammarBuilder = new StringBuilder(298);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {std::cout << $ctx.toStringTree(recog=self) << \"\\n\";} : e EOF; // must indicate EOF can follow or 'a<EOF>' won't match\n");
+		grammarBuilder.append("s @after {std::cout << $ctx->toStringTree(this) << std::endl;} : e EOF; // must indicate EOF can follow or 'a<EOF>' won't match\n");
 		grammarBuilder.append("e :<assoc=right> e '*' e\n");
 		grammarBuilder.append("  |<assoc=right> e '+' e\n");
 		grammarBuilder.append("  |<assoc=right> e '?' e ':' e\n");
@@ -2951,7 +2962,7 @@ public class TestLeftRecursion extends BaseCppTest {
 
 		StringBuilder grammarBuilder = new StringBuilder(298);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {std::cout << $ctx.toStringTree(recog=self) << \"\\n\";} : e EOF; // must indicate EOF can follow or 'a<EOF>' won't match\n");
+		grammarBuilder.append("s @after {std::cout << $ctx->toStringTree(this) << std::endl;} : e EOF; // must indicate EOF can follow or 'a<EOF>' won't match\n");
 		grammarBuilder.append("e :<assoc=right> e '*' e\n");
 		grammarBuilder.append("  |<assoc=right> e '+' e\n");
 		grammarBuilder.append("  |<assoc=right> e '?' e ':' e\n");
@@ -2978,7 +2989,7 @@ public class TestLeftRecursion extends BaseCppTest {
 
 		StringBuilder grammarBuilder = new StringBuilder(298);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {std::cout << $ctx.toStringTree(recog=self) << \"\\n\";} : e EOF; // must indicate EOF can follow or 'a<EOF>' won't match\n");
+		grammarBuilder.append("s @after {std::cout << $ctx->toStringTree(this) << std::endl;} : e EOF; // must indicate EOF can follow or 'a<EOF>' won't match\n");
 		grammarBuilder.append("e :<assoc=right> e '*' e\n");
 		grammarBuilder.append("  |<assoc=right> e '+' e\n");
 		grammarBuilder.append("  |<assoc=right> e '?' e ':' e\n");
@@ -3005,7 +3016,7 @@ public class TestLeftRecursion extends BaseCppTest {
 
 		StringBuilder grammarBuilder = new StringBuilder(298);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {std::cout << $ctx.toStringTree(recog=self) << \"\\n\";} : e EOF; // must indicate EOF can follow or 'a<EOF>' won't match\n");
+		grammarBuilder.append("s @after {std::cout << $ctx->toStringTree(this) << std::endl;} : e EOF; // must indicate EOF can follow or 'a<EOF>' won't match\n");
 		grammarBuilder.append("e :<assoc=right> e '*' e\n");
 		grammarBuilder.append("  |<assoc=right> e '+' e\n");
 		grammarBuilder.append("  |<assoc=right> e '?' e ':' e\n");
@@ -3032,7 +3043,7 @@ public class TestLeftRecursion extends BaseCppTest {
 
 		StringBuilder grammarBuilder = new StringBuilder(273);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {std::cout << $ctx.toStringTree(recog=self) << \"\\n\";} : e EOF ; // must indicate EOF can follow or 'a<EOF>' won't match\n");
+		grammarBuilder.append("s @after {std::cout << $ctx->toStringTree(this) << std::endl;} : e EOF ; // must indicate EOF can follow or 'a<EOF>' won't match\n");
 		grammarBuilder.append("e : e '*' e\n");
 		grammarBuilder.append("  | e '+' e\n");
 		grammarBuilder.append("  |<assoc=right> e '?' e ':' e\n");
@@ -3059,7 +3070,7 @@ public class TestLeftRecursion extends BaseCppTest {
 
 		StringBuilder grammarBuilder = new StringBuilder(273);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {std::cout << $ctx.toStringTree(recog=self) << \"\\n\";} : e EOF ; // must indicate EOF can follow or 'a<EOF>' won't match\n");
+		grammarBuilder.append("s @after {std::cout << $ctx->toStringTree(this) << std::endl;} : e EOF ; // must indicate EOF can follow or 'a<EOF>' won't match\n");
 		grammarBuilder.append("e : e '*' e\n");
 		grammarBuilder.append("  | e '+' e\n");
 		grammarBuilder.append("  |<assoc=right> e '?' e ':' e\n");
@@ -3086,7 +3097,7 @@ public class TestLeftRecursion extends BaseCppTest {
 
 		StringBuilder grammarBuilder = new StringBuilder(273);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {std::cout << $ctx.toStringTree(recog=self) << \"\\n\";} : e EOF ; // must indicate EOF can follow or 'a<EOF>' won't match\n");
+		grammarBuilder.append("s @after {std::cout << $ctx->toStringTree(this) << std::endl;} : e EOF ; // must indicate EOF can follow or 'a<EOF>' won't match\n");
 		grammarBuilder.append("e : e '*' e\n");
 		grammarBuilder.append("  | e '+' e\n");
 		grammarBuilder.append("  |<assoc=right> e '?' e ':' e\n");
@@ -3113,7 +3124,7 @@ public class TestLeftRecursion extends BaseCppTest {
 
 		StringBuilder grammarBuilder = new StringBuilder(273);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {std::cout << $ctx.toStringTree(recog=self) << \"\\n\";} : e EOF ; // must indicate EOF can follow or 'a<EOF>' won't match\n");
+		grammarBuilder.append("s @after {std::cout << $ctx->toStringTree(this) << std::endl;} : e EOF ; // must indicate EOF can follow or 'a<EOF>' won't match\n");
 		grammarBuilder.append("e : e '*' e\n");
 		grammarBuilder.append("  | e '+' e\n");
 		grammarBuilder.append("  |<assoc=right> e '?' e ':' e\n");
@@ -3140,7 +3151,7 @@ public class TestLeftRecursion extends BaseCppTest {
 
 		StringBuilder grammarBuilder = new StringBuilder(273);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {std::cout << $ctx.toStringTree(recog=self) << \"\\n\";} : e EOF ; // must indicate EOF can follow or 'a<EOF>' won't match\n");
+		grammarBuilder.append("s @after {std::cout << $ctx->toStringTree(this) << std::endl;} : e EOF ; // must indicate EOF can follow or 'a<EOF>' won't match\n");
 		grammarBuilder.append("e : e '*' e\n");
 		grammarBuilder.append("  | e '+' e\n");
 		grammarBuilder.append("  |<assoc=right> e '?' e ':' e\n");
@@ -3167,7 +3178,7 @@ public class TestLeftRecursion extends BaseCppTest {
 
 		StringBuilder grammarBuilder = new StringBuilder(273);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {std::cout << $ctx.toStringTree(recog=self) << \"\\n\";} : e EOF ; // must indicate EOF can follow or 'a<EOF>' won't match\n");
+		grammarBuilder.append("s @after {std::cout << $ctx->toStringTree(this) << std::endl;} : e EOF ; // must indicate EOF can follow or 'a<EOF>' won't match\n");
 		grammarBuilder.append("e : e '*' e\n");
 		grammarBuilder.append("  | e '+' e\n");
 		grammarBuilder.append("  |<assoc=right> e '?' e ':' e\n");
@@ -3194,7 +3205,7 @@ public class TestLeftRecursion extends BaseCppTest {
 
 		StringBuilder grammarBuilder = new StringBuilder(273);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {std::cout << $ctx.toStringTree(recog=self) << \"\\n\";} : e EOF ; // must indicate EOF can follow or 'a<EOF>' won't match\n");
+		grammarBuilder.append("s @after {std::cout << $ctx->toStringTree(this) << std::endl;} : e EOF ; // must indicate EOF can follow or 'a<EOF>' won't match\n");
 		grammarBuilder.append("e : e '*' e\n");
 		grammarBuilder.append("  | e '+' e\n");
 		grammarBuilder.append("  |<assoc=right> e '?' e ':' e\n");
@@ -3221,7 +3232,7 @@ public class TestLeftRecursion extends BaseCppTest {
 
 		StringBuilder grammarBuilder = new StringBuilder(273);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {std::cout << $ctx.toStringTree(recog=self) << \"\\n\";} : e EOF ; // must indicate EOF can follow or 'a<EOF>' won't match\n");
+		grammarBuilder.append("s @after {std::cout << $ctx->toStringTree(this) << std::endl;} : e EOF ; // must indicate EOF can follow or 'a<EOF>' won't match\n");
 		grammarBuilder.append("e : e '*' e\n");
 		grammarBuilder.append("  | e '+' e\n");
 		grammarBuilder.append("  |<assoc=right> e '?' e ':' e\n");
@@ -3248,7 +3259,7 @@ public class TestLeftRecursion extends BaseCppTest {
 
 		StringBuilder grammarBuilder = new StringBuilder(273);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {std::cout << $ctx.toStringTree(recog=self) << \"\\n\";} : e EOF ; // must indicate EOF can follow or 'a<EOF>' won't match\n");
+		grammarBuilder.append("s @after {std::cout << $ctx->toStringTree(this) << std::endl;} : e EOF ; // must indicate EOF can follow or 'a<EOF>' won't match\n");
 		grammarBuilder.append("e : e '*' e\n");
 		grammarBuilder.append("  | e '+' e\n");
 		grammarBuilder.append("  |<assoc=right> e '?' e ':' e\n");

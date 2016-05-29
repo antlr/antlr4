@@ -1,4 +1,15 @@
 IgnoredTests ::= [
+  "LeftRecursion.MultipleAlternativesWithCommonLabel_1": true, // $ctx.e(0).v
+  "LeftRecursion.MultipleAlternativesWithCommonLabel_2" : true, // $ctx.e(0).v
+  "LeftRecursion.MultipleAlternativesWithCommonLabel_3": true, // $ctx.e(0).v
+  "LeftRecursion.MultipleAlternativesWithCommonLabel_4" : true, // $ctx.e(0).v
+  "LeftRecursion.ReturnValueAndActions_1" : true, // "ignored" return value
+  "LeftRecursion.ReturnValueAndActions_2" : true, // "ignored" return value
+  "LeftRecursion.ReturnValueAndActions_3" : true, // "ignored" return value
+  "LeftRecursion.ReturnValueAndActions_4" : true, // "ignored" return value
+  "LeftRecursion.PrefixOpWithActionAndLabel_1" : true, // "String" return value
+  "LeftRecursion.PrefixOpWithActionAndLabel_2" : true, // "String" return value
+  "LeftRecursion.PrefixOpWithActionAndLabel_3" : true, // "String" return value
 	default: false
 ]
 

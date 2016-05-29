@@ -57,7 +57,7 @@ std::string Trees::toStringTree(Ref<Tree> t) {
 
 std::string Trees::toStringTree(Ref<Tree> t, Parser *recog) {
   if (recog == nullptr)
-    return toStringTree(t, {});
+    return toStringTree(t, std::vector<std::string>());
   return toStringTree(t, recog->getRuleNames());
 }
 

@@ -617,9 +617,10 @@ _errHandler->sync(this);
 <! TODO: untested !><if (choice.label)>LL1AltBlock(choice, preamble, alts, error) <labelref(choice.label)> = _input->LT(1);<endif>
 <preamble; separator="\n">
 switch (_input->LA(1)) {
-  <choice.altLook, alts: {look, alt | <cases(ttypes = look)>
-  <alt>
+  <choice.altLook, alts: {look, alt | <cases(ttypes = look)> {
+  <alt>;
   break;
+\}
 }; separator = "\n">
 default:
   <error>
@@ -630,9 +631,11 @@ LL1OptionalBlockHeader(choice, alts, error) ::= "<! Required but unused. !>"
 LL1OptionalBlock(choice, alts, error) ::= <<
 setState(<choice.stateNumber>);
 switch (_input->LA(1)) {
-<choice.altLook, alts: {look, alt | <cases(ttypes = look)>
+  <choice.altLook, alts: {look, alt | <cases(ttypes = look)> {
   <alt>
-  break;}; separator="\n">
+  break;
+\}
+}; separator="\n">
 default:
   <error>
 }
@@ -683,9 +686,10 @@ _errHandler->sync(this);
 <! TODO: untested !><if (choice.label)><labelref(choice.label)> = _input->LT(1);<endif>
 <! TODO: untested !><preamble; separator = "\n">
 switch (getInterpreter\<atn::ParserATNSimulator>()->adaptivePredict(_input, <choice.decision>, _ctx)) {
-<alts: {alt | case <i>:
-  <alt>
+<alts: {alt | case <i>: {
+  <alt>;
   break;
+\}
 }; separator="\n">
 }
 >>
@@ -696,9 +700,10 @@ setState(<choice.stateNumber>);
 _errHandler->sync(this);
 
 switch (getInterpreter\<atn::ParserATNSimulator>()->adaptivePredict(_input, <choice.decision>, _ctx)) {
-<alts: {alt | case <i><if (!choice.ast.greedy)>+1<endif>:
-  <alt>
+<alts: {alt | case <i><if (!choice.ast.greedy)>+1<endif>: {
+  <alt>;
   break;
+\}
 }; separator = "\n">
 }
 >>
@@ -726,9 +731,10 @@ _errHandler->sync(this);
 alt = getInterpreter\<atn::ParserATNSimulator>()->adaptivePredict(_input, <choice.decision>, _ctx);
 do {
   switch (alt) {
-    <alts: {alt | case <i><if (!choice.ast.greedy)> + 1<endif>:
-    <alt>
-    break;
+    <alts: {alt | case <i><if (!choice.ast.greedy)> + 1<endif>: {
+      <alt>
+      break;
+    \}
 }; separator="\n">
   default:
     <error>
@@ -816,7 +822,7 @@ setState(<w.stateNumber>);
 
 // ACTION STUFF
 
-ActionHeader(a, foo, chunks) ::= "<chunks>"
+ActionHeader(a, foo, chunks) ::= "<! Required but unused. !>"
 Action(a, foo, chunks) ::= "<chunks>"
 
 ArgAction(a, chunks) ::= "ArgAction(a, chunks) <chunks>"
@@ -847,7 +853,7 @@ LexerChannelCommand(arg, grammar)   ::= "channel = <arg>;"
 LexerModeCommand(arg, grammar)      ::= "mode = <grammar.name>Mode::<arg>;"
 LexerPushModeCommand(arg, grammar)  ::= "pushMode(<grammar.name>Mode::<arg>);"
 
-ActionTextHeader(t) ::= "<t.text>"
+ActionTextHeader(t) ::= "<! Required but unused. !>"
 ActionText(t) ::= "<t.text>"
 
 ActionTemplateHeader(t) ::= "<! Required but unused. !>"
@@ -876,7 +882,7 @@ ListLabelRefHeader(t) ::= "<! Required but unused. !>"
 ListLabelRef(t) ::= "<ctx(t)>-><ListLabelName(t.name)>"
 
 SetAttrHeader(t) ::= "<! Required but unused. !>"
-SetAttr(s,rhsChunks) ::= "<ctx(s)>-><s.name> = <rhsChunks>;"
+SetAttr(s,rhsChunks) ::= "<ctx(s)>-><s.name> = <rhsChunks>"
 
 InputSymbolType() ::= "<file.InputSymbolType; null = {Token}> *"
 
@@ -899,11 +905,11 @@ TokenPropertyRef_indexHeader(t) ::= "<! Required but unused. !>"
 TokenPropertyRef_index(t) ::= "(<ctx(t)>-><t.label> != nullptr ? <ctx(t)>-><t.label>->getTokenIndex() : 0)"
 
 TokenPropertyRef_intHeader(t) ::= "<! Required but unused. !>"
-TokenPropertyRef_int(t) ::= "(<ctx(t)>-><t.label> != nullptr ? std::stol(<ctx(t)>-><t.label>->getText()) : 0)"
+TokenPropertyRef_int(t) ::= "(<ctx(t)>-><t.label> != nullptr ? std::stoi(<ctx(t)>-><t.label>->getText()) : 0)"
 
 
-RulePropertyRef_start(r) ::= "RulePropertyRef_start(r) (<ctx(r)>.<r.label> != nullptr ? (<ctx(r)>.<r.label>.start) : null)"
-RulePropertyRef_stop(r)  ::= "RulePropertyRef_stop(r)   (<ctx(r)>.<r.label> != nullptr ? (<ctx(r)>.<r.label>.stop) : null)"
+RulePropertyRef_start(r) ::= "(<ctx(r)>-><r.label> != nullptr ? (<ctx(r)>-><r.label>->start) : nullptr)"
+RulePropertyRef_stop(r)  ::= "(<ctx(r)>-><r.label> != nullptr ? (<ctx(r)>-><r.label>->stop) : nullptr)"
 
 RulePropertyRef_textHeader(r)  ::= "<! Required but unused. !>"
 RulePropertyRef_text(r)  ::= "(<ctx(r)>-><r.label> != nullptr ? _input->getText(<ctx(r)>-><r.label>->start, <ctx(r)>-><r.label>->stop) : nullptr)"
@@ -1056,16 +1062,18 @@ _localctx = std::make_shared\<<ctxName>Context>(parentContext, parentState);
 pushNewRecursionContext(_localctx, startState, Rule<ruleName; format = "cap">);
 >>
 
+// Separate context variable to avoid frequent pointer type casts.
 recRuleLabeledAltStartAction(ruleName, currentAltLabel, label, isListLabel) ::= <<
-_localctx = std::make_shared\<<currentAltLabel; format = "cap">Context>(std::make_shared\<<ruleName; format="cap">Context>(parentContext, parentState));
+auto newContext = std::make_shared\<<currentAltLabel; format = "cap">Context>(std::make_shared\<<ruleName; format="cap">Context>(parentContext, parentState));
+_localctx = newContext;
 <if(label)>
 <if(isListLabel)>
-std::dynamic_pointer_cast\<<currentAltLabel; format = "cap">Context>(_localctx)-><label>.push_back(previousContext);
+newContext-><label>.push_back(previousContext);
 <else>
-std::dynamic_pointer_cast\<<currentAltLabel; format = "cap">Context>(_localctx)-><label> = previousContext;
+newContext-><label> = previousContext;
 <endif>
 <endif>
-pushNewRecursionContext(_localctx, startState, Rule<ruleName; format = "cap">);
+pushNewRecursionContext(newContext, startState, Rule<ruleName; format = "cap">);
 >>
 
 recRuleReplaceContext(ctxName) ::= <<
