@@ -822,7 +822,7 @@ setState(<w.stateNumber>);
 
 // ACTION STUFF
 
-ActionHeader(a, foo, chunks) ::= "<! Required but unused. !>"
+ActionHeader(a, foo, chunks) ::= "<chunks>"
 Action(a, foo, chunks) ::= "<chunks>"
 
 ArgAction(a, chunks) ::= "ArgAction(a, chunks) <chunks>"
@@ -853,7 +853,7 @@ LexerChannelCommand(arg, grammar)   ::= "channel = <arg>;"
 LexerModeCommand(arg, grammar)      ::= "mode = <grammar.name>Mode::<arg>;"
 LexerPushModeCommand(arg, grammar)  ::= "pushMode(<grammar.name>Mode::<arg>);"
 
-ActionTextHeader(t) ::= "<! Required but unused. !>"
+ActionTextHeader(t) ::= "<t.text>"
 ActionText(t) ::= "<t.text>"
 
 ActionTemplateHeader(t) ::= "<! Required but unused. !>"

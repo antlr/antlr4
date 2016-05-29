@@ -150,8 +150,13 @@ void ANTLRInputStream::seek(size_t index) {
 }
 
 std::string ANTLRInputStream::getText(const Interval &interval) {
+  if (interval.a < 0 || interval.b < 0) {
+    return "";
+  }
+
   size_t start = (size_t)interval.a;
   size_t stop = (size_t)interval.b;
+
 
   if (stop >= data.size()) {
     stop = data.size() - 1;

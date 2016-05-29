@@ -13,13 +13,13 @@ public class TestLexerExec extends BaseCppTest {
 	public void testActionPlacement() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(278);
+		StringBuilder grammarBuilder = new StringBuilder(328);
 		grammarBuilder.append("lexer grammar L;\n");
-		grammarBuilder.append("I : ({std::cout << \"stuff fail: \" + text << \"\\n\";} 'a'\n");
-		grammarBuilder.append("| {std::cout << \"stuff0: \" + text << \"\\n\";}\n");
-		grammarBuilder.append("		'a' {std::cout << \"stuff1: \" + text << \"\\n\";}\n");
-		grammarBuilder.append("		'b' {std::cout << \"stuff2: \" + text << \"\\n\";})\n");
-		grammarBuilder.append("		{std::cout << text << \"\\n\";} ;\n");
+		grammarBuilder.append("I : ({std::cout << \"stuff fail: \" + getText() << std::endl;} 'a'\n");
+		grammarBuilder.append("| {std::cout << \"stuff0: \" + getText() << std::endl;}\n");
+		grammarBuilder.append("		'a' {std::cout << \"stuff1: \" + getText() << std::endl;}\n");
+		grammarBuilder.append("		'b' {std::cout << \"stuff2: \" + getText() << std::endl;})\n");
+		grammarBuilder.append("		{std::cout << getText() << std::endl;} ;\n");
 		grammarBuilder.append("WS : (' '|'\\n') -> skip ;\n");
 		grammarBuilder.append("J : .;");
 		String grammar = grammarBuilder.toString();
@@ -42,9 +42,9 @@ public class TestLexerExec extends BaseCppTest {
 	public void testCharSet() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(87);
+		StringBuilder grammarBuilder = new StringBuilder(92);
 		grammarBuilder.append("lexer grammar L;\n");
-		grammarBuilder.append("I : '0'..'9'+ {std::cout << \"I\" << \"\\n\";} ;\n");
+		grammarBuilder.append("I : '0'..'9'+ {std::cout << \"I\" << std::endl;} ;\n");
 		grammarBuilder.append("WS : [ \\n\\u000D] -> skip ;");
 		String grammar = grammarBuilder.toString();
 
@@ -67,9 +67,9 @@ public class TestLexerExec extends BaseCppTest {
 	public void testCharSetInSet() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(94);
+		StringBuilder grammarBuilder = new StringBuilder(99);
 		grammarBuilder.append("lexer grammar L;\n");
-		grammarBuilder.append("I : (~[ab \\n]|'a')  {std::cout << \"I\" << \"\\n\";} ;\n");
+		grammarBuilder.append("I : (~[ab \\n]|'a')  {std::cout << \"I\" << std::endl;} ;\n");
 		grammarBuilder.append("WS : [ \\n\\u000D]+ -> skip ;");
 		String grammar = grammarBuilder.toString();
 
@@ -90,9 +90,9 @@ public class TestLexerExec extends BaseCppTest {
 	public void testCharSetNot() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(97);
+		StringBuilder grammarBuilder = new StringBuilder(102);
 		grammarBuilder.append("lexer grammar L;\n");
-		grammarBuilder.append("I : ~[ab \\n] ~[ \\ncd]* {std::cout << \"I\" << \"\\n\";} ;\n");
+		grammarBuilder.append("I : ~[ab \\n] ~[ \\ncd]* {std::cout << \"I\" << std::endl;} ;\n");
 		grammarBuilder.append("WS : [ \\n\\u000D]+ -> skip ;");
 		String grammar = grammarBuilder.toString();
 
@@ -111,9 +111,9 @@ public class TestLexerExec extends BaseCppTest {
 	public void testCharSetPlus() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(88);
+		StringBuilder grammarBuilder = new StringBuilder(93);
 		grammarBuilder.append("lexer grammar L;\n");
-		grammarBuilder.append("I : '0'..'9'+ {std::cout << \"I\" << \"\\n\";} ;\n");
+		grammarBuilder.append("I : '0'..'9'+ {std::cout << \"I\" << std::endl;} ;\n");
 		grammarBuilder.append("WS : [ \\n\\u000D]+ -> skip ;");
 		String grammar = grammarBuilder.toString();
 
@@ -136,10 +136,10 @@ public class TestLexerExec extends BaseCppTest {
 	public void testCharSetRange() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(145);
+		StringBuilder grammarBuilder = new StringBuilder(155);
 		grammarBuilder.append("lexer grammar L;\n");
-		grammarBuilder.append("I : [0-9]+ {std::cout << \"I\" << \"\\n\";} ;\n");
-		grammarBuilder.append("ID : [a-zA-Z] [a-zA-Z0-9]* {std::cout << \"ID\" << \"\\n\";} ;\n");
+		grammarBuilder.append("I : [0-9]+ {std::cout << \"I\" << std::endl;} ;\n");
+		grammarBuilder.append("ID : [a-zA-Z] [a-zA-Z0-9]* {std::cout << \"ID\" << std::endl;} ;\n");
 		grammarBuilder.append("WS : [ \\n\\u0009\\r]+ -> skip ;");
 		String grammar = grammarBuilder.toString();
 
@@ -167,9 +167,9 @@ public class TestLexerExec extends BaseCppTest {
 	public void testCharSetWithEscapedChar() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(96);
+		StringBuilder grammarBuilder = new StringBuilder(101);
 		grammarBuilder.append("lexer grammar L;\n");
-		grammarBuilder.append("DASHBRACK : [\\-\\]]+ {std::cout << \"DASHBRACK\" << \"\\n\";} ;\n");
+		grammarBuilder.append("DASHBRACK : [\\-\\]]+ {std::cout << \"DASHBRACK\" << std::endl;} ;\n");
 		grammarBuilder.append("WS : [ \\u]+ -> skip ;");
 		String grammar = grammarBuilder.toString();
 
@@ -190,9 +190,9 @@ public class TestLexerExec extends BaseCppTest {
 	public void testCharSetWithMissingEndRange() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(84);
+		StringBuilder grammarBuilder = new StringBuilder(89);
 		grammarBuilder.append("lexer grammar L;\n");
-		grammarBuilder.append("I : [0-]+ {std::cout << \"I\" << \"\\n\";} ;\n");
+		grammarBuilder.append("I : [0-]+ {std::cout << \"I\" << std::endl;} ;\n");
 		grammarBuilder.append("WS : [ \\n\\u000D]+ -> skip ;");
 		String grammar = grammarBuilder.toString();
 
@@ -211,9 +211,9 @@ public class TestLexerExec extends BaseCppTest {
 	public void testCharSetWithMissingEscapeChar() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(79);
+		StringBuilder grammarBuilder = new StringBuilder(84);
 		grammarBuilder.append("lexer grammar L;\n");
-		grammarBuilder.append("I : [0-9]+ {std::cout << \"I\" << \"\\n\";} ;\n");
+		grammarBuilder.append("I : [0-9]+ {std::cout << \"I\" << std::endl;} ;\n");
 		grammarBuilder.append("WS : [ \\u]+ -> skip ;");
 		String grammar = grammarBuilder.toString();
 
@@ -232,9 +232,9 @@ public class TestLexerExec extends BaseCppTest {
 	public void testCharSetWithQuote1() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(82);
+		StringBuilder grammarBuilder = new StringBuilder(87);
 		grammarBuilder.append("lexer grammar L;\n");
-		grammarBuilder.append("A : [\"a-z]+ {std::cout << \"A\" << \"\\n\";} ;\n");
+		grammarBuilder.append("A : [\"a-z]+ {std::cout << \"A\" << std::endl;} ;\n");
 		grammarBuilder.append("WS : [ \\n\\t]+ -> skip ;");
 		String grammar = grammarBuilder.toString();
 
@@ -253,9 +253,9 @@ public class TestLexerExec extends BaseCppTest {
 	public void testCharSetWithQuote2() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(83);
+		StringBuilder grammarBuilder = new StringBuilder(88);
 		grammarBuilder.append("lexer grammar L;\n");
-		grammarBuilder.append("A : [\"\\\\ab]+ {std::cout << \"A\" << \"\\n\";} ;\n");
+		grammarBuilder.append("A : [\"\\\\ab]+ {std::cout << \"A\" << std::endl;} ;\n");
 		grammarBuilder.append("WS : [ \\n\\t]+ -> skip ;");
 		String grammar = grammarBuilder.toString();
 
@@ -274,9 +274,9 @@ public class TestLexerExec extends BaseCppTest {
 	public void testCharSetWithReversedRange() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(80);
+		StringBuilder grammarBuilder = new StringBuilder(85);
 		grammarBuilder.append("lexer grammar L;\n");
-		grammarBuilder.append("A : [z-a9]+ {std::cout << \"A\" << \"\\n\";} ;\n");
+		grammarBuilder.append("A : [z-a9]+ {std::cout << \"A\" << std::endl;} ;\n");
 		grammarBuilder.append("WS : [ \\u]+ -> skip ;");
 		String grammar = grammarBuilder.toString();
 
@@ -377,9 +377,9 @@ public class TestLexerExec extends BaseCppTest {
 	public void testGreedyConfigs() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(97);
+		StringBuilder grammarBuilder = new StringBuilder(107);
 		grammarBuilder.append("lexer grammar L;\n");
-		grammarBuilder.append("I : ('a' | 'ab') {std::cout << text << \"\\n\";} ;\n");
+		grammarBuilder.append("I : ('a' | 'ab') {std::cout << getText() << std::endl;} ;\n");
 		grammarBuilder.append("WS : (' '|'\\n') -> skip ;\n");
 		grammarBuilder.append("J : .;");
 		String grammar = grammarBuilder.toString();
@@ -4549,11 +4549,11 @@ public class TestLexerExec extends BaseCppTest {
 	public void testNonGreedyConfigs() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(130);
+		StringBuilder grammarBuilder = new StringBuilder(150);
 		grammarBuilder.append("lexer grammar L;\n");
-		grammarBuilder.append("I : .*? ('a' | 'ab') {std::cout << text << \"\\n\";} ;\n");
+		grammarBuilder.append("I : .*? ('a' | 'ab') {std::cout << getText() << std::endl;} ;\n");
 		grammarBuilder.append("WS : (' '|'\\n') -> skip ;\n");
-		grammarBuilder.append("J : . {std::cout << text << \"\\n\";};");
+		grammarBuilder.append("J : . {std::cout << getText() << std::endl;};");
 		String grammar = grammarBuilder.toString();
 
 		String input ="ab";
@@ -4683,56 +4683,87 @@ public class TestLexerExec extends BaseCppTest {
 	public void testPositionAdjustingLexer() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(1724);
+		StringBuilder grammarBuilder = new StringBuilder(2733);
 		grammarBuilder.append("lexer grammar PositionAdjustingLexer;\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("@members {\n");
-		grammarBuilder.append("def resetAcceptPosition(self, index, line, column):\n");
-		grammarBuilder.append("	_input->seek(index)\n");
-		grammarBuilder.append("	this->line = line\n");
-		grammarBuilder.append("	this->column = column\n");
-		grammarBuilder.append("	_interp.consume(_input)\n");
+		grammarBuilder.append("protected:\n");
+		grammarBuilder.append("  class PositionAdjustingLexerATNSimulator : public atn::LexerATNSimulator {\n");
+		grammarBuilder.append("  public:\n");
+		grammarBuilder.append("    PositionAdjustingLexerATNSimulator(Lexer *recog, const atn::ATN &atn, std::vector<dfa::DFA> &decisionToDFA,\n");
+		grammarBuilder.append("                                       Ref<atn::PredictionContextCache> sharedContextCache)\n");
+		grammarBuilder.append("      : atn::LexerATNSimulator(recog, atn, decisionToDFA, sharedContextCache) {\n");
+		grammarBuilder.append("    }\n");
 		grammarBuilder.append("\n");
-		grammarBuilder.append("def nextToken(self):\n");
-		grammarBuilder.append("	if _interp.__dict__.get(\"resetAcceptPosition\", None) is None:\n");
-		grammarBuilder.append("		_interp.__dict__[\"resetAcceptPosition\"] = resetAcceptPosition\n");
-		grammarBuilder.append("	return super(type(self),self).nextToken()\n");
+		grammarBuilder.append("    void resetAcceptPosition(CharStream *input, int index, int line, int charPositionInLine) {\n");
+		grammarBuilder.append("      input->seek(index);\n");
+		grammarBuilder.append("      _line = line;\n");
+		grammarBuilder.append("      _charPositionInLine = charPositionInLine;\n");
+		grammarBuilder.append("      consume(input);\n");
+		grammarBuilder.append("    }\n");
 		grammarBuilder.append("\n");
-		grammarBuilder.append("def emit(self):\n");
-		grammarBuilder.append("	if _type==PositionAdjustingLexer.TOKENS:\n");
-		grammarBuilder.append("		handleAcceptPositionForKeyword(\"tokens\")\n");
-		grammarBuilder.append("	elif _type==PositionAdjustingLexer.LABEL:\n");
-		grammarBuilder.append("		handleAcceptPositionForIdentifier()\n");
-		grammarBuilder.append("	return super(type(self),self).emit()\n");
+		grammarBuilder.append("  };\n");
 		grammarBuilder.append("\n");
-		grammarBuilder.append("def handleAcceptPositionForIdentifier(self):\n");
-		grammarBuilder.append("	tokenText = text\n");
-		grammarBuilder.append("	identifierLength = 0\n");
-		grammarBuilder.append("	while identifierLength < len(tokenText) and isIdentifierChar(tokenText[identifierLength]):\n");
-		grammarBuilder.append("		identifierLength += 1\n");
+		grammarBuilder.append("public:\n");
+		grammarBuilder.append("  virtual Ref<Token> nextToken() override {\n");
+		grammarBuilder.append("    if (dynamic_cast<PositionAdjustingLexerATNSimulator *>(_interpreter) == nullptr) {\n");
+		grammarBuilder.append("      delete _interpreter;\n");
+		grammarBuilder.append("      _interpreter = new PositionAdjustingLexerATNSimulator(this, _atn, _decisionToDFA, _sharedContextCache);\n");
+		grammarBuilder.append("    }\n");
 		grammarBuilder.append("\n");
-		grammarBuilder.append("	if _input->index > _tokenStartCharIndex + identifierLength:\n");
-		grammarBuilder.append("		offset = identifierLength - 1\n");
-		grammarBuilder.append("		_interp.resetAcceptPosition(_tokenStartCharIndex + offset,\n");
-		grammarBuilder.append("				_tokenStartLine, _tokenStartColumn + offset)\n");
-		grammarBuilder.append("		return true\n");
-		grammarBuilder.append("	else:\n");
-		grammarBuilder.append("		return false\n");
+		grammarBuilder.append("    return Lexer::nextToken();\n");
+		grammarBuilder.append("  }\n");
 		grammarBuilder.append("\n");
+		grammarBuilder.append("  virtual Ref<Token> emit() override {\n");
+		grammarBuilder.append("    switch (type) {\n");
+		grammarBuilder.append("      case TOKENS:\n");
+		grammarBuilder.append("        handleAcceptPositionForKeyword(\"tokens\");\n");
+		grammarBuilder.append("        break;\n");
 		grammarBuilder.append("\n");
-		grammarBuilder.append("def handleAcceptPositionForKeyword(self, keyword):\n");
-		grammarBuilder.append("	if _input->index > _tokenStartCharIndex + len(keyword):\n");
-		grammarBuilder.append("		offset = len(keyword) - 1\n");
-		grammarBuilder.append("		_interp.resetAcceptPosition(_tokenStartCharIndex + offset,\n");
-		grammarBuilder.append("			_tokenStartLine, _tokenStartColumn + offset)\n");
-		grammarBuilder.append("		return true\n");
-		grammarBuilder.append("	else:\n");
-		grammarBuilder.append("		return false\n");
+		grammarBuilder.append("      case LABEL:\n");
+		grammarBuilder.append("        handleAcceptPositionForIdentifier();\n");
+		grammarBuilder.append("        break;\n");
 		grammarBuilder.append("\n");
-		grammarBuilder.append("@staticmethod\n");
-		grammarBuilder.append("def isIdentifierChar(c):\n");
-		grammarBuilder.append("	return c.isalnum() or c == '_'\n");
+		grammarBuilder.append("      default:\n");
+		grammarBuilder.append("        break;\n");
+		grammarBuilder.append("    }\n");
+		grammarBuilder.append("    return Lexer::emit();\n");
+		grammarBuilder.append("  }\n");
 		grammarBuilder.append("\n");
+		grammarBuilder.append("private:\n");
+		grammarBuilder.append("  bool handleAcceptPositionForIdentifier() {\n");
+		grammarBuilder.append("    std::string tokenText = getText();\n");
+		grammarBuilder.append("    int identifierLength = 0;\n");
+		grammarBuilder.append("    while (identifierLength < tokenText.length() && isIdentifierChar(tokenText[identifierLength])) {\n");
+		grammarBuilder.append("      identifierLength++;\n");
+		grammarBuilder.append("    }\n");
+		grammarBuilder.append("\n");
+		grammarBuilder.append("    if (getInputStream()->index() > tokenStartCharIndex + identifierLength) {\n");
+		grammarBuilder.append("      int offset = identifierLength - 1;\n");
+		grammarBuilder.append("      getInterpreter<PositionAdjustingLexerATNSimulator>()->resetAcceptPosition(getInputStream(),\n");
+		grammarBuilder.append("        tokenStartCharIndex + offset, tokenStartLine, tokenStartCharPositionInLine + offset);\n");
+		grammarBuilder.append("      return true;\n");
+		grammarBuilder.append("    }\n");
+		grammarBuilder.append("\n");
+		grammarBuilder.append("    return false;\n");
+		grammarBuilder.append("  }\n");
+		grammarBuilder.append("\n");
+		grammarBuilder.append("  bool handleAcceptPositionForKeyword(const std::string &keyword) {\n");
+		grammarBuilder.append("    if (getInputStream()->index() > tokenStartCharIndex + keyword.length()) {\n");
+		grammarBuilder.append("      long offset = keyword.size() - 1;\n");
+		grammarBuilder.append("      getInterpreter<PositionAdjustingLexerATNSimulator>()->resetAcceptPosition(getInputStream(),\n");
+		grammarBuilder.append("        tokenStartCharIndex + offset, tokenStartLine, tokenStartCharPositionInLine + offset);\n");
+		grammarBuilder.append("      return true;\n");
+		grammarBuilder.append("    }\n");
+		grammarBuilder.append("\n");
+		grammarBuilder.append("    return false;\n");
+		grammarBuilder.append("  }\n");
+		grammarBuilder.append("\n");
+		grammarBuilder.append("  static bool isIdentifierChar(char c) {\n");
+		grammarBuilder.append("    return std::isalnum(c) || c == '_';\n");
+		grammarBuilder.append("  }\n");
+		grammarBuilder.append("\n");
+		grammarBuilder.append("public:\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("ASSIGN : '=' ;\n");

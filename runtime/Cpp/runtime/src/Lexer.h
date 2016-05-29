@@ -105,10 +105,6 @@ namespace runtime {
     std::vector<size_t> modeStack;
     size_t mode;
 
-    /// You can set the text for the current token to override what is in
-    /// the input char buffer. Use setText() or can set this instance var.
-    std::string text;
-
     Lexer();
     Lexer(CharStream *input);
 
@@ -223,6 +219,11 @@ namespace runtime {
     ///  to do sophisticated error recovery if you are in a fragment rule.
     /// </summary>
     virtual void recover(RecognitionException *re);
+
+  protected:
+    /// You can set the text for the current token to override what is in
+    /// the input char buffer (via setText()).
+    std::string _text;
 
   private:
     void InitializeInstanceFields();

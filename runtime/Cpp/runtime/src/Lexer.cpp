@@ -63,7 +63,7 @@ void Lexer::reset() {
   tokenStartCharIndex = -1;
   tokenStartCharPositionInLine = 0;
   tokenStartLine = 0;
-  text = "";
+  _text = "";
 
   hitEOF = false;
   mode = Lexer::DEFAULT_MODE;
@@ -95,7 +95,7 @@ Ref<Token> Lexer::nextToken() {
     tokenStartCharIndex = (int)_input->index();
     tokenStartCharPositionInLine = getInterpreter<atn::LexerATNSimulator>()->getCharPositionInLine();
     tokenStartLine = (int)getInterpreter<atn::LexerATNSimulator>()->getLine();
-    text = "";
+    _text = "";
     do {
       type = Token::INVALID_TYPE;
       int ttype;
@@ -178,7 +178,7 @@ void Lexer::emit(Ref<Token> token) {
 }
 
 Ref<Token> Lexer::emit() {
-  Ref<Token> t = std::dynamic_pointer_cast<Token>(_factory->create({ this, _input }, (int)type, text, channel,
+  Ref<Token> t = std::dynamic_pointer_cast<Token>(_factory->create({ this, _input }, (int)type, _text, channel,
     tokenStartCharIndex, getCharIndex() - 1, (int)tokenStartLine, tokenStartCharPositionInLine));
   emit(t);
   return t;
@@ -214,14 +214,14 @@ int Lexer::getCharIndex() {
 }
 
 std::string Lexer::getText() {
-  if (!text.empty()) {
-    return text;
+  if (!_text.empty()) {
+    return _text;
   }
   return getInterpreter<atn::LexerATNSimulator>()->getText(_input);
 }
 
 void Lexer::setText(const std::string &text) {
-  this->text = text;
+  _text = text;
 }
 
 Ref<Token> Lexer::getToken() {
