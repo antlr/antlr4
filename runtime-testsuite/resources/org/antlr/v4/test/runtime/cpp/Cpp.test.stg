@@ -224,13 +224,13 @@ ToStringTree(s) ::= <%<s>->toStringTree(this)%>
 
 Column() ::= "column"
 
-Text() ::= "text"
+Text() ::= "getText()"
 
 ValEquals(a,b) ::= <%<a> == <b>%>
 
-TextEquals(a) ::= <%text == "<a>"%>
+TextEquals(a) ::= <%getText() == "<a>"%>
 
-PlusText(a) ::= <%"<a>" + text%>
+PlusText(a) ::= <%"<a>" + getText()%>
 
 InputText() ::= "_input->getText()"
 
@@ -242,7 +242,7 @@ TokenStartColumnEquals(i) ::= <%_tokenStartColumn == <i>%>
 
 ImportListener(X) ::= ""
 
-GetExpectedTokenNames() ::= "getExpectedTokens()->toString(literalNames, symbolicNames)"
+GetExpectedTokenNames() ::= "getExpectedTokens().toString(_tokenNames)"
 
 RuleInvocationStack() ::= "str_list(getRuleInvocationStack())"
 
@@ -258,70 +258,96 @@ bool Parser::Property() {
 >>
 
 PositionAdjustingLexer() ::= <<
+protected:
+  class PositionAdjustingLexerATNSimulator : public atn::LexerATNSimulator {
+  public:
+    PositionAdjustingLexerATNSimulator(Lexer *recog, const atn::ATN &atn, std::vector\<dfa::DFA> &decisionToDFA,
+                                       Ref\<atn::PredictionContextCache> sharedContextCache)
+      : atn::LexerATNSimulator(recog, atn, decisionToDFA, sharedContextCache) {
+    }
 
-def resetAcceptPosition(self, index, line, column):
-	_input->seek(index)
-	this->line = line
-	this->column = column
-	_interp.consume(_input)
+    void resetAcceptPosition(CharStream *input, int index, int line, int charPositionInLine) {
+      input->seek(index);
+      _line = line;
+      _charPositionInLine = charPositionInLine;
+      consume(input);
+    }
 
-def nextToken(self):
-	if _interp.__dict__.get("resetAcceptPosition", None) is None:
-		_interp.__dict__["resetAcceptPosition"] = resetAcceptPosition
-	return super(type(self),self).nextToken()
+  };
+  
+public:
+  virtual Ref\<Token> nextToken() override {
+    if (dynamic_cast\<PositionAdjustingLexerATNSimulator *>(_interpreter) == nullptr) {
+      delete _interpreter;
+      _interpreter = new PositionAdjustingLexerATNSimulator(this, _atn, _decisionToDFA, _sharedContextCache);
+    }
 
-def emit(self):
-	if _type==PositionAdjustingLexer.TOKENS:
-		handleAcceptPositionForKeyword("tokens")
-	elif _type==PositionAdjustingLexer.LABEL:
-		handleAcceptPositionForIdentifier()
-	return super(type(self),self).emit()
+    return Lexer::nextToken();
+  }
 
-def handleAcceptPositionForIdentifier(self):
-	tokenText = text
-	identifierLength = 0
-	while identifierLength \< len(tokenText) and isIdentifierChar(tokenText[identifierLength]):
-		identifierLength += 1
+  virtual Ref\<Token> emit() override {
+    switch (type) {
+      case TOKENS:
+        handleAcceptPositionForKeyword("tokens");
+        break;
 
-	if _input->index > _tokenStartCharIndex + identifierLength:
-		offset = identifierLength - 1
-		_interp.resetAcceptPosition(_tokenStartCharIndex + offset,
-				_tokenStartLine, _tokenStartColumn + offset)
-		return true
-	else:
-		return false
+      case LABEL:
+        handleAcceptPositionForIdentifier();
+        break;
 
+      default:
+        break;
+    }
+    return Lexer::emit();
+  }
 
-def handleAcceptPositionForKeyword(self, keyword):
-	if _input->index > _tokenStartCharIndex + len(keyword):
-		offset = len(keyword) - 1
-		_interp.resetAcceptPosition(_tokenStartCharIndex + offset,
-			_tokenStartLine, _tokenStartColumn + offset)
-		return true
-	else:
-		return false
+private:
+  bool handleAcceptPositionForIdentifier() {
+    std::string tokenText = getText();
+    int identifierLength = 0;
+    while (identifierLength \< tokenText.length() && isIdentifierChar(tokenText[identifierLength])) {
+      identifierLength++;
+    }
 
-@staticmethod
-def isIdentifierChar(c):
-	return c.isalnum() or c == '_'
+    if (getInputStream()->index() > tokenStartCharIndex + identifierLength) {
+      int offset = identifierLength - 1;
+      getInterpreter\<PositionAdjustingLexerATNSimulator>()->resetAcceptPosition(getInputStream(),
+        tokenStartCharIndex + offset, tokenStartLine, tokenStartCharPositionInLine + offset);
+      return true;
+    }
 
+    return false;
+  }
+
+  bool handleAcceptPositionForKeyword(const std::string &keyword) {
+    if (getInputStream()->index() > tokenStartCharIndex + keyword.length()) {
+      long offset = keyword.size() - 1;
+      getInterpreter\<PositionAdjustingLexerATNSimulator>()->resetAcceptPosition(getInputStream(),
+        tokenStartCharIndex + offset, tokenStartLine, tokenStartCharPositionInLine + offset);
+      return true;
+    }
+
+    return false;
+  }
+
+  static bool isIdentifierChar(char c) {
+    return std::isalnum(c) || c == '_';
+  }
+
+public:
 >>
 
 BasicListener(X) ::= <<
-if __name__ is not None and "." in __name__:
-    from .<X>Listener import <X>Listener
-else:
-    from <X>Listener import <X>Listener
-
-class LeafListener(TListener):
-    def visitTerminal(self, node):
-        std::cout \<\< node.symbol.text;
-
+class LeafListener : public TBaseListener {
+public:
+  virtual void visitTerminal(Ref\<tree::TerminalNode> node) override {
+		std::cout \<\< node->getSymbol()->getText() \<\< std::endl;
+	}
+};
 >>
 
 WalkListener(s) ::= <<
-walker = ParseTreeWalker()
-walker.walk(TParser.LeafListener(), <s>)
+tree::ParseTreeWalker::DEFAULT->walk(std::make_shared\<LeafListener>(), <s>);
 >>
 
 TreeNodeWithAltNumField(X) ::= <<
@@ -400,10 +426,11 @@ class LeafListener(TListener):
 >>
 
 DeclareContextListGettersFunction() ::= <<
-def foo():
-    s = SContext()
-    a = s.a()
-    b = s.b()
+void foo() {
+  Ref\<SContext> s;
+  std::vector\<Ref\<AContext\>> a = s->a();
+  std::vector\<Ref\<BContext\>> b = s->b();
+}
 >>
 
 Declare_foo() ::= <<void foo() {

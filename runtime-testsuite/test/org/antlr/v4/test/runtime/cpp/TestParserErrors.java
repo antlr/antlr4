@@ -13,9 +13,9 @@ public class TestParserErrors extends BaseCppTest {
 	public void testConjuringUpToken() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(76);
+		StringBuilder grammarBuilder = new StringBuilder(88);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("a : 'a' x='b' {std::cout << \"conjured=\" + str($x) << \"\\n\";} 'c' ;");
+		grammarBuilder.append("a : 'a' x='b' {std::cout << \"conjured=\" + $x->toString() << std::endl;} 'c' ;");
 		String grammar = grammarBuilder.toString();
 
 
@@ -33,9 +33,9 @@ public class TestParserErrors extends BaseCppTest {
 	public void testConjuringUpTokenFromSet() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(82);
+		StringBuilder grammarBuilder = new StringBuilder(94);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("a : 'a' x=('b'|'c') {std::cout << \"conjured=\" + str($x) << \"\\n\";} 'd' ;");
+		grammarBuilder.append("a : 'a' x=('b'|'c') {std::cout << \"conjured=\" + $x->toString() << std::endl;} 'd' ;");
 		String grammar = grammarBuilder.toString();
 
 
@@ -53,13 +53,14 @@ public class TestParserErrors extends BaseCppTest {
 	public void testContextListGetters() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(160);
+		StringBuilder grammarBuilder = new StringBuilder(218);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("@parser::members{\n");
-		grammarBuilder.append("def foo():\n");
-		grammarBuilder.append("    s = SContext()\n");
-		grammarBuilder.append("    a = s.a()\n");
-		grammarBuilder.append("    b = s.b()\n");
+		grammarBuilder.append("void foo() {\n");
+		grammarBuilder.append("  Ref<SContext> s;\n");
+		grammarBuilder.append("  std::vector<Ref<AContext>> a = s->a();\n");
+		grammarBuilder.append("  std::vector<Ref<BContext>> b = s->b();\n");
+		grammarBuilder.append("}\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("s : (a | b)+;\n");
 		grammarBuilder.append("a : 'a' {std::cout << 'a';};\n");
@@ -211,7 +212,7 @@ public class TestParserErrors extends BaseCppTest {
 	public void testLL1ErrorInfo() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(314);
+		StringBuilder grammarBuilder = new StringBuilder(303);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("start : animal (AND acClass)? service EOF;\n");
 		grammarBuilder.append("animal : (DOG | CAT );\n");
@@ -224,7 +225,7 @@ public class TestParserErrors extends BaseCppTest {
 		grammarBuilder.append("WS : ' ' -> skip ;\n");
 		grammarBuilder.append("acClass\n");
 		grammarBuilder.append("@init\n");
-		grammarBuilder.append("{std::cout << getExpectedTokens().toString(literalNames, symbolicNames) << \"\\n\";}\n");
+		grammarBuilder.append("{std::cout << getExpectedTokens().toString(_tokenNames) << std::endl;}\n");
 		grammarBuilder.append("  : ;");
 		String grammar = grammarBuilder.toString();
 
@@ -440,10 +441,10 @@ public class TestParserErrors extends BaseCppTest {
 	public void testSingleSetInsertionConsumption() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(95);
+		StringBuilder grammarBuilder = new StringBuilder(107);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("myset: ('b'|'c') ;\n");
-		grammarBuilder.append("a: 'a' myset 'd' {std::cout << \"\" + str($myset.stop) << \"\\n\";} ; ");
+		grammarBuilder.append("a: 'a' myset 'd' {std::cout << \"\" + $myset.stop->toString() << std::endl;} ; ");
 		String grammar = grammarBuilder.toString();
 
 
@@ -571,10 +572,10 @@ public class TestParserErrors extends BaseCppTest {
 	public void testSingleTokenDeletionConsumption() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(95);
+		StringBuilder grammarBuilder = new StringBuilder(107);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("myset: ('b'|'c') ;\n");
-		grammarBuilder.append("a: 'a' myset 'd' {std::cout << \"\" + str($myset.stop) << \"\\n\";} ; ");
+		grammarBuilder.append("a: 'a' myset 'd' {std::cout << \"\" + $myset.stop->toString() << std::endl;} ; ");
 		String grammar = grammarBuilder.toString();
 
 
