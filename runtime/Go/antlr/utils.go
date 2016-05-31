@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"hash/fnv"
+	"sort"
 	"strings"
 	//	"regexp"
 	//	"bytes"
@@ -221,6 +222,7 @@ func (b *BitSet) values() []int {
 		ks[i] = k
 		i++
 	}
+	sort.Ints(ks)
 	return ks
 }
 
