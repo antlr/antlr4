@@ -66,6 +66,7 @@ import org.antlr.v4.tool.Rule;
 import org.junit.Before;
 import org.junit.rules.TestRule;
 import org.junit.rules.TestWatcher;
+import org.junit.rules.Timeout;
 import org.junit.runner.Description;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
@@ -124,6 +125,9 @@ public abstract class BaseTest {
 		}
 
 	};
+
+	@org.junit.Rule
+	public final Timeout eachTimeout = new Timeout(60000);
 
 	@Before
 	public void setUp() throws Exception {
@@ -424,17 +428,23 @@ public abstract class BaseTest {
 	private String locateTool(String tool) {
 		ArrayList<String> paths = new ArrayList<String>(); // default cap is about right
 
-		String pathEnv = System.getenv("PATH");
-		if (pathEnv != null) {
-			paths.addAll(Arrays.asList(pathEnv.split(pathSep)));
-		}
+		// GOROOT should have priority if set
 		String goroot = System.getenv("GOROOT");
 		if (goroot != null) {
 			paths.add(goroot + File.separatorChar + "bin");
 		}
 
+		String pathEnv = System.getenv("PATH");
+		if (pathEnv != null) {
+			paths.addAll(Arrays.asList(pathEnv.split(pathSep)));
+		}
+
+		// OS specific default locations of binary dist as last resort
+		paths.add("/usr/local/go/bin");
+		paths.add("c:\\Go\\bin");
+
 		for (String path : paths) {
-			File candidate = new File(path + File.separatorChar + tool);
+			File candidate = new File(new File(path), tool);
 			if (candidate.exists()) {
 				return candidate.getPath();
 			}
@@ -443,7 +453,6 @@ public abstract class BaseTest {
 	}
 
 	private String locateGo() {
-		// typically /usr/local/go/bin
 		String propName = "antlr-go";
 		String prop = System.getProperty(propName);
 		if (prop == null || prop.length() == 0) {
