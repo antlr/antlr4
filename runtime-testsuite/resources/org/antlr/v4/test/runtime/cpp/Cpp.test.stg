@@ -233,7 +233,7 @@ ImportListener(X) ::= ""
 
 GetExpectedTokenNames() ::= "getExpectedTokens().toString(_tokenNames)"
 
-RuleInvocationStack() ::= "str_list(getRuleInvocationStack())"
+RuleInvocationStack() ::= "Arrays::listToString(getRuleInvocationStack(), \", \")"
 
 LL_EXACT_AMBIG_DETECTION() ::= <<getInterpreter\<atn::ParserATNSimulator>()->setPredictionMode(atn::PredictionMode::LL_EXACT_AMBIG_DETECTION);>>
 
@@ -342,31 +342,28 @@ tree::ParseTreeWalker::DEFAULT->walk(std::make_shared\<LeafListener>(), <s>);
 
 TreeNodeWithAltNumField(X) ::= <<
 @parser::members {
-class MyRuleNode(ParserRuleContext):
-    def __init__(self, parent = None, invokingStateNumber = None ):
-        super(<X>Parser.MyRuleNode, self).__init__(parent, invokingStateNumber)
-        altNum = 0;
-    def getAltNumber(self):
-        return altNum
-    def setAltNumber(self, altNum):
-        this->altNum = altNum
+class MyRuleNode : public ParserRuleContext {
+public:
+  int altNum;
+	MyRuleNode(std::weak_ptr\<ParserRuleContext> parent, int invokingStateNumber)
+		: ParserRuleContext(parent, invokingStateNumber) {
+	}
+	virtual int getAltNumber() const override { return altNum; }
+	virtual void setAltNumber(int altNum) override { this->altNum = altNum; }
+};
 }
 >>
 
 TokenGetterListener(X) ::= <<
-if __name__ is not None and "." in __name__:
-    from .<X>Listener import <X>Listener
-else:
-    from <X>Listener import <X>Listener
-
-class LeafListener(TListener):
-    def exitA(self, ctx):
-        if (ctx.getChildCount()==2) {
-            std::cout \<\< ctx.INT(0).symbol.text \<\< " " \<\< ctx.INT(1).symbol.text \<\< " " \<\< str_list(ctx.INT());
-        } else {
-            std::cout \<\< str(ctx.ID().symbol);
+class LeafListener : TBaseListener {
+public:
+  void exitA(Ref\<TParser::AContext> ctx) {
+		if (ctx->getChildCount() == 2)
+			std::cout \<\< ctx->INT(0)->getSymbol()->getText() \<\< ctx->INT(1)->getSymbol()->getText() \<\< ctx->INT() \<\< std::endl;
+		else
+			std::cout \<\< ctx->ID()->getSymbol() \<\< std::endl;
 	}
-
+};
 >>
 
 RuleGetterListener(X) ::= <<

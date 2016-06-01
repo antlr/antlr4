@@ -37,14 +37,17 @@ std::string Arrays::listToString(const std::vector<std::string> &list, const std
 {
   std::stringstream ss;
   bool firstEntry = true;
-  
+
+  ss << '[';
   for (auto &entry : list) {
     ss << entry;
-    if (!firstEntry)
+    if (firstEntry) {
       ss << separator;
-    firstEntry = false;
+      firstEntry = false;
+    }
   }
 
+  ss << ']';
   return ss.str();
 }
 

@@ -13,14 +13,14 @@ public class TestParseTrees extends BaseCppTest {
 	public void test2AltLoop() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(146);
+		StringBuilder grammarBuilder = new StringBuilder(147);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s\n");
 		grammarBuilder.append("@init {\n");
-		grammarBuilder.append("_buildParseTrees = true\n");
+		grammarBuilder.append("_buildParseTrees = true;\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("@after {\n");
-		grammarBuilder.append("std::cout << $r.ctx.toStringTree(recog=self) << \"\\n\";\n");
+		grammarBuilder.append("std::cout << $r.ctx->toStringTree(this) << std::endl;\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("  : r=a ;\n");
 		grammarBuilder.append("a : ('x' | 'y')* 'z'\n");
@@ -41,14 +41,14 @@ public class TestParseTrees extends BaseCppTest {
 	public void test2Alts() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(139);
+		StringBuilder grammarBuilder = new StringBuilder(140);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s\n");
 		grammarBuilder.append("@init {\n");
-		grammarBuilder.append("_buildParseTrees = true\n");
+		grammarBuilder.append("_buildParseTrees = true;\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("@after {\n");
-		grammarBuilder.append("std::cout << $r.ctx.toStringTree(recog=self) << \"\\n\";\n");
+		grammarBuilder.append("std::cout << $r.ctx->toStringTree(this) << std::endl;\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("  : r=a ;\n");
 		grammarBuilder.append("a : 'x' | 'y'\n");
@@ -69,29 +69,30 @@ public class TestParseTrees extends BaseCppTest {
 	public void testAltNum() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(563);
+		StringBuilder grammarBuilder = new StringBuilder(587);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("options { contextSuperClass=MyRuleNode; }\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("@parser::members {\n");
-		grammarBuilder.append("class MyRuleNode(ParserRuleContext):\n");
-		grammarBuilder.append("    def __init__(self, parent = None, invokingStateNumber = None ):\n");
-		grammarBuilder.append("        super(TParser.MyRuleNode, self).__init__(parent, invokingStateNumber)\n");
-		grammarBuilder.append("        altNum = 0;\n");
-		grammarBuilder.append("    def getAltNumber(self):\n");
-		grammarBuilder.append("        return altNum\n");
-		grammarBuilder.append("    def setAltNumber(self, altNum):\n");
-		grammarBuilder.append("        this->altNum = altNum\n");
+		grammarBuilder.append("class MyRuleNode : public ParserRuleContext {\n");
+		grammarBuilder.append("public:\n");
+		grammarBuilder.append("  int altNum;\n");
+		grammarBuilder.append("	MyRuleNode(std::weak_ptr<ParserRuleContext> parent, int invokingStateNumber)\n");
+		grammarBuilder.append("		: ParserRuleContext(parent, invokingStateNumber) {\n");
+		grammarBuilder.append("	}\n");
+		grammarBuilder.append("	virtual int getAltNumber() const override { return altNum; }\n");
+		grammarBuilder.append("	virtual void setAltNumber(int altNum) override { this->altNum = altNum; }\n");
+		grammarBuilder.append("};\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("s\n");
 		grammarBuilder.append("@init {\n");
-		grammarBuilder.append("_buildParseTrees = true\n");
+		grammarBuilder.append("_buildParseTrees = true;\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("@after {\n");
-		grammarBuilder.append("std::cout << $r.ctx.toStringTree(recog=self) << \"\\n\";\n");
+		grammarBuilder.append("std::cout << $r.ctx->toStringTree(this) << std::endl;\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("  : r=a ;\n");
 		grammarBuilder.append("\n");
@@ -117,14 +118,14 @@ public class TestParseTrees extends BaseCppTest {
 	public void testExtraToken() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(152);
+		StringBuilder grammarBuilder = new StringBuilder(153);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s\n");
 		grammarBuilder.append("@init {\n");
-		grammarBuilder.append("_buildParseTrees = true\n");
+		grammarBuilder.append("_buildParseTrees = true;\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("@after {\n");
-		grammarBuilder.append("std::cout << $r.ctx.toStringTree(recog=self) << \"\\n\";\n");
+		grammarBuilder.append("std::cout << $r.ctx->toStringTree(this) << std::endl;\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("  : r=a ;\n");
 		grammarBuilder.append("a : 'x' 'y'\n");
@@ -149,14 +150,14 @@ public class TestParseTrees extends BaseCppTest {
 	public void testNoViableAlt() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(154);
+		StringBuilder grammarBuilder = new StringBuilder(155);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s\n");
 		grammarBuilder.append("@init {\n");
-		grammarBuilder.append("_buildParseTrees = true\n");
+		grammarBuilder.append("_buildParseTrees = true;\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("@after {\n");
-		grammarBuilder.append("std::cout << $r.ctx.toStringTree(recog=self) << \"\\n\";\n");
+		grammarBuilder.append("std::cout << $r.ctx->toStringTree(this) << std::endl;\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("  : r=a ;\n");
 		grammarBuilder.append("a : 'x' | 'y'\n");
@@ -181,14 +182,14 @@ public class TestParseTrees extends BaseCppTest {
 	public void testRuleRef() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(148);
+		StringBuilder grammarBuilder = new StringBuilder(149);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s\n");
 		grammarBuilder.append("@init {\n");
-		grammarBuilder.append("_buildParseTrees = true\n");
+		grammarBuilder.append("_buildParseTrees = true;\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("@after {\n");
-		grammarBuilder.append("std::cout << $r.ctx.toStringTree(recog=self) << \"\\n\";\n");
+		grammarBuilder.append("std::cout << $r.ctx->toStringTree(this) << std::endl;\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("  : r=a ;\n");
 		grammarBuilder.append("a : b 'x'\n");
@@ -211,14 +212,14 @@ public class TestParseTrees extends BaseCppTest {
 	public void testSync() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(155);
+		StringBuilder grammarBuilder = new StringBuilder(156);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s\n");
 		grammarBuilder.append("@init {\n");
-		grammarBuilder.append("_buildParseTrees = true\n");
+		grammarBuilder.append("_buildParseTrees = true;\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("@after {\n");
-		grammarBuilder.append("std::cout << $r.ctx.toStringTree(recog=self) << \"\\n\";\n");
+		grammarBuilder.append("std::cout << $r.ctx->toStringTree(this) << std::endl;\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("  : r=a ;\n");
 		grammarBuilder.append("a : 'x' 'y'* '!'\n");
@@ -242,14 +243,14 @@ public class TestParseTrees extends BaseCppTest {
 	public void testToken2() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(137);
+		StringBuilder grammarBuilder = new StringBuilder(138);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s\n");
 		grammarBuilder.append("@init {\n");
-		grammarBuilder.append("_buildParseTrees = true\n");
+		grammarBuilder.append("_buildParseTrees = true;\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("@after {\n");
-		grammarBuilder.append("std::cout << $r.ctx.toStringTree(recog=self) << \"\\n\";\n");
+		grammarBuilder.append("std::cout << $r.ctx->toStringTree(this) << std::endl;\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("  : r=a ;\n");
 		grammarBuilder.append("a : 'x' 'y'\n");
@@ -270,18 +271,18 @@ public class TestParseTrees extends BaseCppTest {
 	public void testTokenAndRuleContextString() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(193);
+		StringBuilder grammarBuilder = new StringBuilder(217);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s\n");
 		grammarBuilder.append("@init {\n");
-		grammarBuilder.append("_buildParseTrees = true\n");
+		grammarBuilder.append("_buildParseTrees = true;\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("@after {\n");
-		grammarBuilder.append("std::cout << $r.ctx.toStringTree(recog=self) << \"\\n\";\n");
+		grammarBuilder.append("std::cout << $r.ctx->toStringTree(this) << std::endl;\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("  : r=a ;\n");
 		grammarBuilder.append("a : 'x' { \n");
-		grammarBuilder.append("std::cout << str_list(getRuleInvocationStack()) << \"\\n\";\n");
+		grammarBuilder.append("std::cout << Arrays::listToString(getRuleInvocationStack(), \", \") << std::endl;\n");
 		grammarBuilder.append("} ;");
 		String grammar = grammarBuilder.toString();
 

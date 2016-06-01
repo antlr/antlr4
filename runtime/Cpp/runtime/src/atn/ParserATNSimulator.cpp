@@ -1037,7 +1037,7 @@ Ref<ATNConfig> ParserATNSimulator::precedenceTransition(Ref<ATNConfig> config, P
   if (debug) {
     std::cout << "PRED (collectPredicates=" << collectPredicates << ") " << pt->precedence << ">=_p" << ", ctx dependent=true" << std::endl;
     if (parser != nullptr) {
-      std::cout << "context surrounding pred is " << Arrays::listToString( parser->getRuleInvocationStack(), ", ") << std::endl;
+      std::cout << "context surrounding pred is " << Arrays::listToString(parser->getRuleInvocationStack(), ", ") << std::endl;
     }
   }
 
