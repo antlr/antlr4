@@ -407,9 +407,10 @@ Declare_pred() ::= <<def pred(self, v):
 >>
 
 Invoke_pred(v) ::= <<self.pred(<v>)>>
-
 ParserTokenType(t) ::= "Parser.<t>"
 ContextRuleFunction(ctx, rule) ::= "<ctx>.<rule>"
+StringType() ::= "String"
+ContextMember(ctx, subctx, member) ::= "<ctx>.<subctx>.<member>"
 
 isEmpty ::= [
 	"": true,

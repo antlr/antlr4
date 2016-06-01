@@ -1,15 +1,4 @@
 IgnoredTests ::= [
-  "LeftRecursion.MultipleAlternativesWithCommonLabel_1": true, // $ctx.e(0).v
-  "LeftRecursion.MultipleAlternativesWithCommonLabel_2" : true, // $ctx.e(0).v
-  "LeftRecursion.MultipleAlternativesWithCommonLabel_3": true, // $ctx.e(0).v
-  "LeftRecursion.MultipleAlternativesWithCommonLabel_4" : true, // $ctx.e(0).v
-  "LeftRecursion.ReturnValueAndActions_1" : true, // "ignored" return value
-  "LeftRecursion.ReturnValueAndActions_2" : true, // "ignored" return value
-  "LeftRecursion.ReturnValueAndActions_3" : true, // "ignored" return value
-  "LeftRecursion.ReturnValueAndActions_4" : true, // "ignored" return value
-  "LeftRecursion.PrefixOpWithActionAndLabel_1" : true, // "String" return value
-  "LeftRecursion.PrefixOpWithActionAndLabel_2" : true, // "String" return value
-  "LeftRecursion.PrefixOpWithActionAndLabel_3" : true, // "String" return value
 	default: false
 ]
 
@@ -180,7 +169,7 @@ Not(v) ::= "!<v>"
 
 Assert(s) ::= ""
 
-Cast(t,v) ::= "<v>"
+Cast(t,v) ::= "std::dynamic_pointer_cast\<<t>>(<v>)" // Should actually use a more specific name. We may have to use other casts as well.
 
 Append(a,b) ::= "<a> + <b>->toString()"
 
@@ -214,7 +203,7 @@ DumpDFA() ::= "dumpDFA();"
 
 Pass() ::= "/* do nothing */"
 
-StringList() ::= ""
+StringList() ::= "std::vector\<std::string>"
 
 BuildParseTrees() ::= "_buildParseTrees = true;"
 
@@ -449,9 +438,10 @@ void pred(v) {
 >>
 
 Invoke_pred(v) ::= <<pred(<v>)>>
-
 ParserTokenType(t) ::= "Parser::<t>"
 ContextRuleFunction(ctx, rule) ::= "<ctx>-><rule>"
+StringType() ::= "std::string"
+ContextMember(ctx, subctx, member) ::= "<ctx>-><subctx>-><member>"
 
 isEmpty ::= [
 	"": true,

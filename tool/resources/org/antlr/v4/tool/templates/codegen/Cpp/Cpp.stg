@@ -244,7 +244,7 @@ RuleSempredFunction(r, actions) ::= <<
 <! Called for both lexer and parser. But only one of them is actually available. !>
 bool <if (parser)><parser.name><else><lexer.name><endif>::<r.name>Sempred(Ref\<<r.ctxType>\> _localctx, int predicateIndex) {
   switch (predicateIndex) {
-    <actions: {index | case <index>: return <actions.(index)>;}; separator="\n">
+    <actions: {index | case <index>: return <actions.(index)>}; separator="\n">
     
   default:
     break;
@@ -618,7 +618,7 @@ _errHandler->sync(this);
 <preamble; separator="\n">
 switch (_input->LA(1)) {
   <choice.altLook, alts: {look, alt | <cases(ttypes = look)> {
-  <alt>;
+  <alt>
   break;
 \}
 }; separator = "\n">
@@ -687,7 +687,7 @@ _errHandler->sync(this);
 <! TODO: untested !><preamble; separator = "\n">
 switch (getInterpreter\<atn::ParserATNSimulator>()->adaptivePredict(_input, <choice.decision>, _ctx)) {
 <alts: {alt | case <i>: {
-  <alt>;
+  <alt>
   break;
 \}
 }; separator="\n">
@@ -701,7 +701,7 @@ _errHandler->sync(this);
 
 switch (getInterpreter\<atn::ParserATNSimulator>()->adaptivePredict(_input, <choice.decision>, _ctx)) {
 <alts: {alt | case <i><if (!choice.ast.greedy)>+1<endif>: {
-  <alt>;
+  <alt>
   break;
 \}
 }; separator = "\n">
@@ -824,7 +824,7 @@ setState(<w.stateNumber>);
 // ACTION STUFF
 
 ActionHeader(a, foo, chunks) ::= "<chunks>"
-Action(a, foo, chunks) ::= "<chunks>"
+Action(a, foo, chunks) ::= "<if (chunks)><chunks>;<endif>"
 
 ArgAction(a, chunks) ::= "ArgAction(a, chunks) <chunks>"
 
@@ -832,7 +832,6 @@ SemPredHeader(p, chunks, failChunks) ::= "<! Required but unused. !>"
 SemPred(p, chunks, failChunks) ::= <<
 setState(<p.stateNumber>);
 
-<! TODO: failChunks + p.msg untested !>
 if (!(<chunks>)) throw FailedPredicateException(this, <p.predicate><if (failChunks)>, <failChunks><elseif (p.msg)>, <p.msg><endif>);
 >>
 
@@ -1060,12 +1059,12 @@ ctx(actionChunk) ::= "std::dynamic_pointer_cast\<<actionChunk.ctx.name>>(_localc
 // used for left-recursive rules
 recRuleAltPredicate(ruleName,opPrec) ::= "precpred(_ctx, <opPrec>)"
 recRuleSetReturnAction(src,name) ::= "recRuleSetReturnAction(src,name) $<name>=$<src>.<name>;"
-recRuleSetStopToken() ::= "_ctx->stop = _input->LT(-1);"
+recRuleSetStopToken() ::= "_ctx->stop = _input->LT(-1)"
 
 recRuleAltStartAction(ruleName, ctxName, label) ::= <<
 _localctx = std::make_shared\<<ctxName>Context>(parentContext, parentState);
 <if (label)>_localctx-><label> = previousContext;<endif>
-pushNewRecursionContext(_localctx, startState, Rule<ruleName; format = "cap">);
+pushNewRecursionContext(_localctx, startState, Rule<ruleName; format = "cap">)
 >>
 
 // Separate context variable to avoid frequent pointer type casts.
@@ -1085,13 +1084,13 @@ pushNewRecursionContext(newContext, startState, Rule<ruleName; format = "cap">);
 recRuleReplaceContext(ctxName) ::= <<
 _localctx = std::make_shared\<<ctxName>Context>(_localctx);
 _ctx = _localctx;
-previousContext = _localctx;
+previousContext = _localctx
 >>
 
 recRuleSetPrevCtx() ::= <<
 if (!_parseListeners.empty())
   triggerExitRuleEvent();
-previousContext = _localctx;
+previousContext = _localctx
 >>
 
 /** Using a type to init value map, try to init a type; if not in table

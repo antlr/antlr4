@@ -430,9 +430,10 @@ Declare_pred() ::= <<this.pred = function(v) {
 >>
 
 Invoke_pred(v) ::= <<this.pred(<v>)>>
-
 ParserTokenType(t) ::= "Parser.<t>"
 ContextRuleFunction(ctx, rule) ::= "<ctx>.<rule>"
+StringType() ::= "String"
+ContextMember(ctx, subctx, member) ::= "<ctx>.<subctx>.<member>"
 
 isEmpty ::= [
 	"": true,
