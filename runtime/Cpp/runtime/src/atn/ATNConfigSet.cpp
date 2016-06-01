@@ -44,7 +44,7 @@ size_t SimpleATNConfigHasher::operator()(const Ref<ATNConfig> &k) const {
   size_t hashCode = 7;
   hashCode = 31 * hashCode + (size_t)k->state->stateNumber;
   hashCode = 31 * hashCode + (size_t)k->alt;
-  hashCode = 31 * hashCode + k->semanticContext->hashCode();
+  hashCode = 31 * hashCode + (k->semanticContext == nullptr ? 0 : k->semanticContext->hashCode());
   return hashCode;
 }
 

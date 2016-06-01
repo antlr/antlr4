@@ -247,6 +247,8 @@ def Property(self):
 }
 >>
 
+ParserPropertyCall(p, call) ::= "<p>.<call>"
+
 PositionAdjustingLexer() ::= <<
 
 def resetAcceptPosition(self, index, line, column):
@@ -387,6 +389,9 @@ Declare_pred() ::= <<def pred(self, v):
 >>
 
 Invoke_pred(v) ::= <<self.pred(<v>)>>
+
+ParserTokenType(t) ::= "Parser.<t>"
+ContextRuleFunction(ctx, rule) ::= "<ctx>.<rule>"
 
 isEmpty ::= [
 	"": true,

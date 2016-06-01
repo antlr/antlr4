@@ -1058,7 +1058,7 @@ Ref<ATNConfig> ParserATNSimulator::precedenceTransition(Ref<ATNConfig> config, P
         c = std::make_shared<ATNConfig>(config, pt->target); // no pred context
       }
     } else {
-      Ref<SemanticContext::AND> newSemCtx = std::make_shared<SemanticContext::AND>(config->semanticContext, predicate);
+      Ref<SemanticContext> newSemCtx = SemanticContext::And(config->semanticContext, predicate);
       c = std::make_shared<ATNConfig>(config, pt->target, newSemCtx);
     }
   } else {
@@ -1096,7 +1096,7 @@ Ref<ATNConfig> ParserATNSimulator::predTransition(Ref<ATNConfig> config, Predica
         c = std::make_shared<ATNConfig>(config, pt->target); // no pred context
       }
     } else {
-      Ref<SemanticContext::AND> newSemCtx = std::make_shared<SemanticContext::AND>(config->semanticContext, predicate);
+      Ref<SemanticContext> newSemCtx = SemanticContext::And(config->semanticContext, predicate);
       c = std::make_shared<ATNConfig>(config, pt->target, newSemCtx);
     }
   } else {

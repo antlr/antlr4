@@ -26,7 +26,7 @@ grammar(grammarName) ::= <<
 grammar <grammarName>;
 ifStatement
 @after {
-<AssertIsList("$ctx.elseIfStatement()")>
+<AssertIsList({<ContextRuleFunction("$ctx", "elseIfStatement()")>})>
 }
     : 'if' expression
       ( ( 'then'

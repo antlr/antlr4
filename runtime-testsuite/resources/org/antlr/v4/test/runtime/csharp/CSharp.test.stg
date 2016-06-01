@@ -235,6 +235,8 @@ bool Property() {
 }
 >>
 
+ParserPropertyCall(p, call) ::= "<p>.<call>"
+
 PositionAdjustingLexer() ::= <<
 
 public override IToken NextToken() {
@@ -416,6 +418,9 @@ Declare_pred() ::= <<bool pred(bool v) {
 >>
 
 Invoke_pred(v) ::= <<this.pred(<v>)>>
+
+ParserTokenType(t) ::= "Parser.<t>"
+ContextRuleFunction(ctx, rule) ::= "<ctx>.<rule>"
 
 isEmpty ::= [
 	"": true,

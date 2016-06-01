@@ -13,10 +13,10 @@ public class TestParserExec extends BaseCppTest {
 	public void testAPlus() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(92);
+		StringBuilder grammarBuilder = new StringBuilder(97);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("a : ID+ {\n");
-		grammarBuilder.append("std::cout << $text << \"\\n\";\n");
+		grammarBuilder.append("std::cout << $text << std::endl;\n");
 		grammarBuilder.append("};\n");
 		grammarBuilder.append("ID : 'a'..'z'+;\n");
 		grammarBuilder.append("WS : (' '|'\\n') -> skip;");
@@ -36,10 +36,10 @@ public class TestParserExec extends BaseCppTest {
 	public void testAStar_1() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(92);
+		StringBuilder grammarBuilder = new StringBuilder(97);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("a : ID* {\n");
-		grammarBuilder.append("std::cout << $text << \"\\n\";\n");
+		grammarBuilder.append("std::cout << $text << std::endl;\n");
 		grammarBuilder.append("};\n");
 		grammarBuilder.append("ID : 'a'..'z'+;\n");
 		grammarBuilder.append("WS : (' '|'\\n') -> skip;");
@@ -59,10 +59,10 @@ public class TestParserExec extends BaseCppTest {
 	public void testAStar_2() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(92);
+		StringBuilder grammarBuilder = new StringBuilder(97);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("a : ID* {\n");
-		grammarBuilder.append("std::cout << $text << \"\\n\";\n");
+		grammarBuilder.append("std::cout << $text << std::endl;\n");
 		grammarBuilder.append("};\n");
 		grammarBuilder.append("ID : 'a'..'z'+;\n");
 		grammarBuilder.append("WS : (' '|'\\n') -> skip;");
@@ -82,10 +82,10 @@ public class TestParserExec extends BaseCppTest {
 	public void testAorAPlus() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(97);
+		StringBuilder grammarBuilder = new StringBuilder(102);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("a : (ID|ID)+ {\n");
-		grammarBuilder.append("std::cout << $text << \"\\n\";\n");
+		grammarBuilder.append("std::cout << $text << std::endl;\n");
 		grammarBuilder.append("};\n");
 		grammarBuilder.append("ID : 'a'..'z'+;\n");
 		grammarBuilder.append("WS : (' '|'\\n') -> skip;");
@@ -105,10 +105,10 @@ public class TestParserExec extends BaseCppTest {
 	public void testAorAStar_1() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(97);
+		StringBuilder grammarBuilder = new StringBuilder(102);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("a : (ID|ID)* {\n");
-		grammarBuilder.append("std::cout << $text << \"\\n\";\n");
+		grammarBuilder.append("std::cout << $text << std::endl;\n");
 		grammarBuilder.append("};\n");
 		grammarBuilder.append("ID : 'a'..'z'+;\n");
 		grammarBuilder.append("WS : (' '|'\\n') -> skip;");
@@ -128,10 +128,10 @@ public class TestParserExec extends BaseCppTest {
 	public void testAorAStar_2() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(97);
+		StringBuilder grammarBuilder = new StringBuilder(102);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("a : (ID|ID)* {\n");
-		grammarBuilder.append("std::cout << $text << \"\\n\";\n");
+		grammarBuilder.append("std::cout << $text << std::endl;\n");
 		grammarBuilder.append("};\n");
 		grammarBuilder.append("ID : 'a'..'z'+;\n");
 		grammarBuilder.append("WS : (' '|'\\n') -> skip;");
@@ -151,12 +151,12 @@ public class TestParserExec extends BaseCppTest {
 	public void testAorB() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(152);
+		StringBuilder grammarBuilder = new StringBuilder(162);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("a : ID {\n");
-		grammarBuilder.append("std::cout << \"alt 1\" << \"\\n\";\n");
+		grammarBuilder.append("std::cout << \"alt 1\" << std::endl;\n");
 		grammarBuilder.append("} | INT {\n");
-		grammarBuilder.append("std::cout << \"alt 2\" << \"\\n\";\n");
+		grammarBuilder.append("std::cout << \"alt 2\" << std::endl;\n");
 		grammarBuilder.append("};\n");
 		grammarBuilder.append("ID : 'a'..'z'+ ;\n");
 		grammarBuilder.append("INT : '0'..'9'+;\n");
@@ -177,11 +177,11 @@ public class TestParserExec extends BaseCppTest {
 	public void testAorBPlus() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(120);
+		StringBuilder grammarBuilder = new StringBuilder(125);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("a : (ID|INT{\n");
 		grammarBuilder.append("})+ {\n");
-		grammarBuilder.append("std::cout << $text << \"\\n\";\n");
+		grammarBuilder.append("std::cout << $text << std::endl;\n");
 		grammarBuilder.append("};\n");
 		grammarBuilder.append("ID : 'a'..'z'+ ;\n");
 		grammarBuilder.append("INT : '0'..'9'+;\n");
@@ -202,11 +202,11 @@ public class TestParserExec extends BaseCppTest {
 	public void testAorBStar_1() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(120);
+		StringBuilder grammarBuilder = new StringBuilder(125);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("a : (ID|INT{\n");
 		grammarBuilder.append("})* {\n");
-		grammarBuilder.append("std::cout << $text << \"\\n\";\n");
+		grammarBuilder.append("std::cout << $text << std::endl;\n");
 		grammarBuilder.append("};\n");
 		grammarBuilder.append("ID : 'a'..'z'+ ;\n");
 		grammarBuilder.append("INT : '0'..'9'+;\n");
@@ -227,11 +227,11 @@ public class TestParserExec extends BaseCppTest {
 	public void testAorBStar_2() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(120);
+		StringBuilder grammarBuilder = new StringBuilder(125);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("a : (ID|INT{\n");
 		grammarBuilder.append("})* {\n");
-		grammarBuilder.append("std::cout << $text << \"\\n\";\n");
+		grammarBuilder.append("std::cout << $text << std::endl;\n");
 		grammarBuilder.append("};\n");
 		grammarBuilder.append("ID : 'a'..'z'+ ;\n");
 		grammarBuilder.append("INT : '0'..'9'+;\n");
@@ -252,10 +252,10 @@ public class TestParserExec extends BaseCppTest {
 	public void testBasic() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(113);
+		StringBuilder grammarBuilder = new StringBuilder(118);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("a : ID INT {\n");
-		grammarBuilder.append("std::cout << $text << \"\\n\";\n");
+		grammarBuilder.append("std::cout << $text << std::endl;\n");
 		grammarBuilder.append("};\n");
 		grammarBuilder.append("ID : 'a'..'z'+ ;\n");
 		grammarBuilder.append("INT : '0'..'9'+;\n");
@@ -296,12 +296,12 @@ public class TestParserExec extends BaseCppTest {
 	public void testIfIfElseGreedyBinding1() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(201);
+		StringBuilder grammarBuilder = new StringBuilder(206);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("start : statement+ ;\n");
 		grammarBuilder.append("statement : 'x' | ifStatement;\n");
 		grammarBuilder.append("ifStatement : 'if' 'y' statement ('else' statement)? {\n");
-		grammarBuilder.append("std::cout << $text << \"\\n\";\n");
+		grammarBuilder.append("std::cout << $text << std::endl;\n");
 		grammarBuilder.append("};\n");
 		grammarBuilder.append("ID : 'a'..'z'+ ;\n");
 		grammarBuilder.append("WS : (' '|'\\n') -> channel(HIDDEN);");
@@ -323,12 +323,12 @@ public class TestParserExec extends BaseCppTest {
 	public void testIfIfElseGreedyBinding2() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(201);
+		StringBuilder grammarBuilder = new StringBuilder(206);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("start : statement+ ;\n");
 		grammarBuilder.append("statement : 'x' | ifStatement;\n");
 		grammarBuilder.append("ifStatement : 'if' 'y' statement ('else' statement|) {\n");
-		grammarBuilder.append("std::cout << $text << \"\\n\";\n");
+		grammarBuilder.append("std::cout << $text << std::endl;\n");
 		grammarBuilder.append("};\n");
 		grammarBuilder.append("ID : 'a'..'z'+ ;\n");
 		grammarBuilder.append("WS : (' '|'\\n') -> channel(HIDDEN);");
@@ -350,12 +350,12 @@ public class TestParserExec extends BaseCppTest {
 	public void testIfIfElseNonGreedyBinding1() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(202);
+		StringBuilder grammarBuilder = new StringBuilder(207);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("start : statement+ ;\n");
 		grammarBuilder.append("statement : 'x' | ifStatement;\n");
 		grammarBuilder.append("ifStatement : 'if' 'y' statement ('else' statement)?? {\n");
-		grammarBuilder.append("std::cout << $text << \"\\n\";\n");
+		grammarBuilder.append("std::cout << $text << std::endl;\n");
 		grammarBuilder.append("};\n");
 		grammarBuilder.append("ID : 'a'..'z'+ ;\n");
 		grammarBuilder.append("WS : (' '|'\\n') -> channel(HIDDEN);");
@@ -377,12 +377,12 @@ public class TestParserExec extends BaseCppTest {
 	public void testIfIfElseNonGreedyBinding2() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(201);
+		StringBuilder grammarBuilder = new StringBuilder(206);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("start : statement+ ;\n");
 		grammarBuilder.append("statement : 'x' | ifStatement;\n");
 		grammarBuilder.append("ifStatement : 'if' 'y' statement (|'else' statement) {\n");
-		grammarBuilder.append("std::cout << $text << \"\\n\";\n");
+		grammarBuilder.append("std::cout << $text << std::endl;\n");
 		grammarBuilder.append("};\n");
 		grammarBuilder.append("ID : 'a'..'z'+ ;\n");
 		grammarBuilder.append("WS : (' '|'\\n') -> channel(HIDDEN);");
@@ -404,10 +404,10 @@ public class TestParserExec extends BaseCppTest {
 	public void testLL1OptionalBlock_1() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(118);
+		StringBuilder grammarBuilder = new StringBuilder(123);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("a : (ID|{}INT)? {\n");
-		grammarBuilder.append("std::cout << $text << \"\\n\";\n");
+		grammarBuilder.append("std::cout << $text << std::endl;\n");
 		grammarBuilder.append("};\n");
 		grammarBuilder.append("ID : 'a'..'z'+;\n");
 		grammarBuilder.append("INT : '0'..'9'+ ;\n");
@@ -428,10 +428,10 @@ public class TestParserExec extends BaseCppTest {
 	public void testLL1OptionalBlock_2() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(118);
+		StringBuilder grammarBuilder = new StringBuilder(123);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("a : (ID|{}INT)? {\n");
-		grammarBuilder.append("std::cout << $text << \"\\n\";\n");
+		grammarBuilder.append("std::cout << $text << std::endl;\n");
 		grammarBuilder.append("};\n");
 		grammarBuilder.append("ID : 'a'..'z'+;\n");
 		grammarBuilder.append("INT : '0'..'9'+ ;\n");
@@ -452,12 +452,12 @@ public class TestParserExec extends BaseCppTest {
 	public void testLabelAliasingAcrossLabeledAlternatives() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(187);
+		StringBuilder grammarBuilder = new StringBuilder(197);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("start : a* EOF;\n");
 		grammarBuilder.append("a\n");
-		grammarBuilder.append("  : label=subrule {std::cout << $label.text << \"\\n\";} #One\n");
-		grammarBuilder.append("  | label='y' {std::cout << $label.text << \"\\n\";} #Two\n");
+		grammarBuilder.append("  : label=subrule {std::cout << $label.text << std::endl;} #One\n");
+		grammarBuilder.append("  | label='y' {std::cout << $label.text << std::endl;} #Two\n");
 		grammarBuilder.append("  ;\n");
 		grammarBuilder.append("subrule : 'x';\n");
 		grammarBuilder.append("WS : (' '|'\\n') -> skip ;");
@@ -502,11 +502,11 @@ public class TestParserExec extends BaseCppTest {
 	public void testListLabelForClosureContext() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(456);
+		StringBuilder grammarBuilder = new StringBuilder(465);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("ifStatement\n");
 		grammarBuilder.append("@after {\n");
-		grammarBuilder.append("assert isinstance(v, (list, tuple))\n");
+		grammarBuilder.append("assert($ctx->elseIfStatement().size() >= 0);\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("    : 'if' expression\n");
 		grammarBuilder.append("      ( ( 'then'\n");
@@ -666,15 +666,14 @@ public class TestParserExec extends BaseCppTest {
 	public void testParserProperty() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(174);
+		StringBuilder grammarBuilder = new StringBuilder(162);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("@members {\n");
-		grammarBuilder.append("bool Parser::Property() {\n");
+		grammarBuilder.append("bool Property() {\n");
 		grammarBuilder.append("	return true;\n");
 		grammarBuilder.append("}\n");
-		grammarBuilder.append("\n");
 		grammarBuilder.append("}\n");
-		grammarBuilder.append("a : {$parser.Property()}? ID {std::cout << \"valid\" << \"\\n\";}\n");
+		grammarBuilder.append("a : {Property()}? ID {std::cout << \"valid\" << std::endl;}\n");
 		grammarBuilder.append("  ;\n");
 		grammarBuilder.append("ID : 'a'..'z'+ ;\n");
 		grammarBuilder.append("WS : (' '|'\\n') -> skip ;");
@@ -694,11 +693,11 @@ public class TestParserExec extends BaseCppTest {
 	public void testPredicatedIfIfElse() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(171);
+		StringBuilder grammarBuilder = new StringBuilder(174);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s : stmt EOF ;\n");
 		grammarBuilder.append("stmt : ifStmt | ID;\n");
-		grammarBuilder.append("ifStmt : 'if' ID stmt ('else' stmt | { _input->LA(1)!=TParser.ELSE }?);\n");
+		grammarBuilder.append("ifStmt : 'if' ID stmt ('else' stmt | { _input->LA(1) != TParser::ELSE }?);\n");
 		grammarBuilder.append("ELSE : 'else';\n");
 		grammarBuilder.append("ID : [a-zA-Z]+;\n");
 		grammarBuilder.append("WS : [ \\n\\t]+ -> skip;");
@@ -718,13 +717,13 @@ public class TestParserExec extends BaseCppTest {
 	public void testPredictionIssue334() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(254);
+		StringBuilder grammarBuilder = new StringBuilder(273);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("file_ @init{\n");
-		grammarBuilder.append("_errHandler = BailErrorStrategy()\n");
+		grammarBuilder.append("_errHandler = std::make_shared<BailErrorStrategy>();\n");
 		grammarBuilder.append("} \n");
 		grammarBuilder.append("@after {\n");
-		grammarBuilder.append("std::cout << $ctx.toStringTree(recog=self) << \"\\n\";\n");
+		grammarBuilder.append("std::cout << $ctx->toStringTree(this) << std::endl;\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("  :   item (SEMICOLON item)* SEMICOLON? EOF ;\n");
 		grammarBuilder.append("item : A B?;\n");
@@ -748,9 +747,9 @@ public class TestParserExec extends BaseCppTest {
 	public void testReferenceToATN_1() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(121);
+		StringBuilder grammarBuilder = new StringBuilder(126);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("a : (ID|ATN)* ATN? {std::cout << $text << \"\\n\";} ;\n");
+		grammarBuilder.append("a : (ID|ATN)* ATN? {std::cout << $text << std::endl;} ;\n");
 		grammarBuilder.append("ID : 'a'..'z'+ ;\n");
 		grammarBuilder.append("ATN : '0'..'9'+;\n");
 		grammarBuilder.append("WS : (' '|'\\n') -> skip ;");
@@ -770,9 +769,9 @@ public class TestParserExec extends BaseCppTest {
 	public void testReferenceToATN_2() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(121);
+		StringBuilder grammarBuilder = new StringBuilder(126);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("a : (ID|ATN)* ATN? {std::cout << $text << \"\\n\";} ;\n");
+		grammarBuilder.append("a : (ID|ATN)* ATN? {std::cout << $text << std::endl;} ;\n");
 		grammarBuilder.append("ID : 'a'..'z'+ ;\n");
 		grammarBuilder.append("ATN : '0'..'9'+;\n");
 		grammarBuilder.append("WS : (' '|'\\n') -> skip ;");

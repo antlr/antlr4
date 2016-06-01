@@ -188,7 +188,7 @@ Concat(a,b) ::= "<a><b>"
 
 DeclareLocal(s,v) ::= "<s> = <v>"
 
-AssertIsList(v) ::= "assert isinstance(v, (list, tuple))"
+AssertIsList(v) ::= "assert(<v>.size() >= 0);" // Use a method that exists only on a list (vector actually).
 
 AssignLocal(s,v) ::= "<s> = <v>"
 
@@ -250,12 +250,13 @@ LL_EXACT_AMBIG_DETECTION() ::= <<getInterpreter\<atn::ParserATNSimulator>()->set
 
 ParserPropertyMember() ::= <<
 @members {
-bool Parser::Property() {
+bool Property() {
 	return true;
 }
-
 }
 >>
+
+ParserPropertyCall(p, call) ::= "<call>"
 
 PositionAdjustingLexer() ::= <<
 protected:
@@ -440,13 +441,17 @@ Declare_foo() ::= <<void foo() {
 
 Invoke_foo() ::= "foo();"
 
-Declare_pred() ::= <<void pred(v) {
+Declare_pred() ::= <<
+void pred(v) {
 	std::cout \<\< "eval=" \<\< v->toString().lower();
 	return v;
 }
 >>
 
 Invoke_pred(v) ::= <<pred(<v>)>>
+
+ParserTokenType(t) ::= "Parser::<t>"
+ContextRuleFunction(ctx, rule) ::= "<ctx>-><rule>"
 
 isEmpty ::= [
 	"": true,

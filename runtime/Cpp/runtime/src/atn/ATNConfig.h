@@ -47,10 +47,21 @@ namespace atn {
   /// </summary>
   class ANTLR4CPP_PUBLIC ATNConfig {
   public:
-    struct ATNConfigHasher;
-    struct ATNConfigComparer;
+    struct Hasher
+    {
+      size_t operator()(const ATNConfig &k) const {
+        return k.hashCode();
+      }
+    };
 
-    using Set = std::unordered_set<Ref<ATNConfig>, ATNConfigHasher, ATNConfigComparer>;
+    struct Comparer {
+      bool operator()(const ATNConfig &lhs, const ATNConfig &rhs) const {
+        return lhs == rhs;
+      }
+    };
+    
+
+    using Set = std::unordered_set<Ref<ATNConfig>, Hasher, Comparer>;
     
     /// The ATN state associated with this configuration.
     ATNState * state;
@@ -107,20 +118,6 @@ namespace atn {
     virtual ~ATNConfig();
 
     virtual size_t hashCode() const;
-
-    struct ATNConfigHasher
-    {
-      size_t operator()(const ATNConfig &k) const {
-        return k.hashCode();
-      }
-    };
-
-    struct ATNConfigComparer {
-      bool operator()(const ATNConfig &lhs, const ATNConfig &rhs) const
-      {
-        return lhs == rhs;
-      }
-    };
 
     /**
      * This method gets the value of the {@link #reachesIntoOuterContext} field

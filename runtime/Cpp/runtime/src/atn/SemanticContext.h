@@ -48,6 +48,22 @@ namespace atn {
   ///  SemanticContext within the scope of this outer class.
   class ANTLR4CPP_PUBLIC SemanticContext : public std::enable_shared_from_this<SemanticContext> {
   public:
+    struct Hasher
+    {
+      size_t operator()(Ref<SemanticContext> k) const {
+        return k->hashCode();
+      }
+    };
+
+    struct Comparer {
+      bool operator()(Ref<SemanticContext> lhs, Ref<SemanticContext> rhs) const {
+        return *lhs == *rhs;
+      }
+    };
+
+
+    using Set = std::unordered_set<Ref<SemanticContext>, Hasher, Comparer>;
+
     /**
      * The default {@link SemanticContext}, which is semantically equivalent to
      * a predicate of the form {@code {true}?}.
@@ -107,18 +123,7 @@ namespace atn {
     class OR;
 
   private:
-    template<typename T1> // where T1 : SemanticContext>
-    static std::vector<Ref<PrecedencePredicate>> filterPrecedencePredicates(const std::vector<T1> &collection) {
-      std::vector<Ref<PrecedencePredicate>> result;
-      for (auto context : collection) {
-        if (antlrcpp::is<PrecedencePredicate>(context)) {
-          result.push_back(std::dynamic_pointer_cast<PrecedencePredicate>(context));
-        }
-      }
-
-      return result;
-    }
-
+    static std::vector<Ref<PrecedencePredicate>> filterPrecedencePredicates(const Set &collection);
   };
 
   class ANTLR4CPP_PUBLIC SemanticContext::Predicate : public SemanticContext {
@@ -236,7 +241,7 @@ namespace std {
 
   template <> struct hash<SemanticContext>
   {
-    size_t operator () ( SemanticContext &x) const
+    size_t operator () (SemanticContext &x) const
     {
       return x.hashCode();
     }

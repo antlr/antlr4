@@ -929,6 +929,9 @@ ThisRulePropertyRef_text(r)  ::= "_input->getText(_localctx->start, _input->LT(-
 ThisRulePropertyRef_ctxHeader(r)   ::= "<! Required but unused. !>"
 ThisRulePropertyRef_ctx(r)   ::= "_localctx"
 
+ThisRulePropertyRef_parserHeader(r)	 ::= "<! Required but unused. !>"
+ThisRulePropertyRef_parser(r)	 ::= "this"
+
 NonLocalAttrRef(s) ::= "NonLocalAttrRef(s) ((<s.ruleName; format=\"cap\">Context)getInvokingContext(<s.ruleIndex>)).<s.name>"
 SetNonLocalAttr(s, rhsChunks) ::=
   "SetNonLocalAttr(s, rhsChunks) ((<s.ruleName; format=\"cap\">Context)getInvokingContext(<s.ruleIndex>)).<s.name> = <rhsChunks>;"
@@ -1014,7 +1017,7 @@ ImplicitTokenLabel(tokenName) ::= <<
 >>
 
 ImplicitRuleLabel(ruleName) ::= "<ruleName>Context"
-ImplicitSetLabel(id) ::= "ImplicitSetLabel(id) _tset<id>"
+ImplicitSetLabel(id) ::= "_tset<id>"
 ListLabelName(label) ::= "<label>"
 
 CaptureNextToken(d) ::= "CaptureNextToken(d) <d.varName> = _input->LT(1);"

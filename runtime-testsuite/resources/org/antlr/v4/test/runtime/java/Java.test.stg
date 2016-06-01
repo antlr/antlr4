@@ -238,6 +238,8 @@ boolean Property() {
 }
 >>
 
+ParserPropertyCall(p, call) ::= "<p>.<call>"
+
 PositionAdjustingLexer() ::= <<
 
 @Override
@@ -421,6 +423,9 @@ Invoke_pred(v) ::= <<this.pred(<v>)>>
 IgnoredTests ::= [
 	default: false
 ]
+
+ParserTokenType(t) ::= "Parser.<t>"
+ContextRuleFunction(ctx, rule) ::= "<ctx>.<rule>"
 
 isEmpty ::= [
 	"": true,

@@ -58,6 +58,18 @@ namespace misc {
     /// Returns the updated intermediate hash value.
     static size_t update(size_t hash, size_t value);
 
+    /**
+     * Update the intermediate hash value for the next input {@code value}.
+     *
+     * @param hash the intermediate hash value
+     * @param value the value to add to the current hash
+     * @return the updated intermediate hash value
+     */
+    template <class T>
+    static size_t update(size_t hash, Ref<T> value) {
+      return update(hash, value != nullptr ? value->hashCode() : 0);
+    }
+
     /// <summary>
     /// Apply the final computation steps to the intermediate value {@code hash}
     /// to form the final result of the MurmurHash 3 hash function.
