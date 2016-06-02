@@ -298,6 +298,7 @@ def isIdentifierChar(c):
 >>
 
 BasicListener(X) ::= <<
+@parser::members {
 if __name__ is not None and "." in __name__:
     from .<X>Listener import <X>Listener
 else:
@@ -306,7 +307,7 @@ else:
 class LeafListener(TListener):
     def visitTerminal(self, node):
         print(node.symbol.text)
-
+}
 >>
 
 WalkListener(s) ::= <<
@@ -328,6 +329,7 @@ class MyRuleNode(ParserRuleContext):
 >>
 
 TokenGetterListener(X) ::= <<
+@parser::members {
 if __name__ is not None and "." in __name__:
     from .<X>Listener import <X>Listener
 else:
@@ -339,10 +341,11 @@ class LeafListener(TListener):
             print(ctx.INT(0).symbol.text + ' ' + ctx.INT(1).symbol.text + ' ' + str_list(ctx.INT()))
         else:
             print(str(ctx.ID().symbol))
-
+}
 >>
 
 RuleGetterListener(X) ::= <<
+@parser::members {
 if __name__ is not None and "." in __name__:
     from .<X>Listener import <X>Listener
 else:
@@ -354,11 +357,12 @@ class LeafListener(TListener):
             print(ctx.b(0).start.text + ' ' + ctx.b(1).start.text + ' ' + ctx.b()[0].start.text)
         else:
             print(ctx.b(0).start.text)
-
+}
 >>
 
 
 LRListener(X) ::= <<
+@parser::members {
 if __name__ is not None and "." in __name__:
     from .<X>Listener import <X>Listener
 else:
@@ -370,10 +374,11 @@ class LeafListener(TListener):
             print(ctx.e(0).start.text + ' ' + ctx.e(1).start.text + ' ' + ctx.e()[0].start.text)
         else:
             print(ctx.INT().symbol.text)
-
+}
 >>
 
 LRWithLabelsListener(X) ::= <<
+@parser::members {
 if __name__ is not None and "." in __name__:
     from .<X>Listener import <X>Listener
 else:
@@ -384,7 +389,7 @@ class LeafListener(TListener):
         print(ctx.e().start.text + ' ' + str(ctx.eList()))
     def exitInt(self, ctx):
         print(ctx.INT().symbol.text)
-
+}
 >>
 
 DeclareContextListGettersFunction() ::= <<

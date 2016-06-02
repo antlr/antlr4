@@ -329,10 +329,12 @@ protected static class PositionAdjustingLexerATNSimulator extends LexerATNSimula
 >>
 
 BasicListener(X) ::= <<
+@parser::members {
 public static class LeafListener extends TBaseListener {
 	public void visitTerminal(TerminalNode node) {
 		System.out.println(node.getSymbol().getText());
 	}
+}
 }
 >>
 
@@ -355,6 +357,7 @@ public static class MyRuleNode extends ParserRuleContext {
 >>
 
 TokenGetterListener(X) ::= <<
+@parser::members {
 public static class LeafListener extends TBaseListener {
 	public void exitA(TParser.AContext ctx) {
 		if (ctx.getChildCount()==2)
@@ -364,9 +367,11 @@ public static class LeafListener extends TBaseListener {
 			System.out.println(ctx.ID().getSymbol());
 	}
 }
+}
 >>
 
 RuleGetterListener(X) ::= <<
+@parser::members {
 public static class LeafListener extends TBaseListener {
 	public void exitA(TParser.AContext ctx) {
 		if (ctx.getChildCount()==2) {
@@ -376,10 +381,12 @@ public static class LeafListener extends TBaseListener {
 			System.out.println(ctx.b(0).start.getText());
 	}
 }
+}
 >>
 
 
 LRListener(X) ::= <<
+@parser::members {
 public static class LeafListener extends TBaseListener {
 	public void exitE(TParser.EContext ctx) {
 		if (ctx.getChildCount()==3) {
@@ -389,9 +396,11 @@ public static class LeafListener extends TBaseListener {
 			System.out.println(ctx.INT().getSymbol().getText());
 	}
 }
+}
 >>
 
 LRWithLabelsListener(X) ::= <<
+@parser::members {
 public static class LeafListener extends TBaseListener {
 	public void exitCall(TParser.CallContext ctx) {
 		System.out.printf("%s %s",ctx.e().start.getText(),ctx.eList());
@@ -399,6 +408,7 @@ public static class LeafListener extends TBaseListener {
 	public void exitInt(TParser.IntContext ctx) {
 		System.out.println(ctx.INT().getSymbol().getText());
 	}
+}
 }
 >>
 

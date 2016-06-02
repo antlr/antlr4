@@ -13,12 +13,12 @@ public class TestListeners extends BaseTest {
 	@Test
 	public void testBasic() throws Exception {
 		mkdir(tmpdir);
-		StringBuilder grammarBuilder = new StringBuilder(633);
+		StringBuilder grammarBuilder = new StringBuilder(632);
 		grammarBuilder.append("grammar T;\n");
+		grammarBuilder.append("\n");
 		grammarBuilder.append("@parser::header {\n");
 		grammarBuilder.append("var TListener = require('./TListener').TListener;\n");
 		grammarBuilder.append("}\n");
-		grammarBuilder.append("\n");
 		grammarBuilder.append("@parser::members {\n");
 		grammarBuilder.append("this.LeafListener = function() {\n");
 		grammarBuilder.append("    this.visitTerminal = function(node) {\n");
@@ -28,7 +28,6 @@ public class TestListeners extends BaseTest {
 		grammarBuilder.append("};\n");
 		grammarBuilder.append("this.LeafListener.prototype = Object.create(TListener.prototype);\n");
 		grammarBuilder.append("this.LeafListener.prototype.constructor = this.LeafListener;\n");
-		grammarBuilder.append("\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("s\n");
@@ -62,12 +61,12 @@ public class TestListeners extends BaseTest {
 	@Test
 	public void testLR() throws Exception {
 		mkdir(tmpdir);
-		StringBuilder grammarBuilder = new StringBuilder(843);
+		StringBuilder grammarBuilder = new StringBuilder(842);
 		grammarBuilder.append("grammar T;\n");
+		grammarBuilder.append("\n");
 		grammarBuilder.append("@parser::header {\n");
 		grammarBuilder.append("var TListener = require('./TListener').TListener;\n");
 		grammarBuilder.append("}\n");
-		grammarBuilder.append("\n");
 		grammarBuilder.append("@parser::members {\n");
 		grammarBuilder.append("this.LeafListener = function() {\n");
 		grammarBuilder.append("    this.exitE = function(ctx) {\n");
@@ -83,7 +82,6 @@ public class TestListeners extends BaseTest {
 		grammarBuilder.append("};\n");
 		grammarBuilder.append("this.LeafListener.prototype = Object.create(TListener.prototype);\n");
 		grammarBuilder.append("this.LeafListener.prototype.constructor = this.LeafListener;\n");
-		grammarBuilder.append("\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("s\n");
@@ -121,12 +119,12 @@ public class TestListeners extends BaseTest {
 	@Test
 	public void testLRWithLabels() throws Exception {
 		mkdir(tmpdir);
-		StringBuilder grammarBuilder = new StringBuilder(833);
+		StringBuilder grammarBuilder = new StringBuilder(832);
 		grammarBuilder.append("grammar T;\n");
+		grammarBuilder.append("\n");
 		grammarBuilder.append("@parser::header {\n");
 		grammarBuilder.append("var TListener = require('./TListener').TListener;\n");
 		grammarBuilder.append("}\n");
-		grammarBuilder.append("\n");
 		grammarBuilder.append("@parser::members {\n");
 		grammarBuilder.append("this.LeafListener = function() {\n");
 		grammarBuilder.append("    this.exitCall = function(ctx) {\n");
@@ -141,7 +139,6 @@ public class TestListeners extends BaseTest {
 		grammarBuilder.append("};\n");
 		grammarBuilder.append("this.LeafListener.prototype = Object.create(TListener.prototype);\n");
 		grammarBuilder.append("this.LeafListener.prototype.constructor = this.LeafListener;\n");
-		grammarBuilder.append("\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("s\n");
@@ -178,12 +175,12 @@ public class TestListeners extends BaseTest {
 	@Test
 	public void testRuleGetters_1() throws Exception {
 		mkdir(tmpdir);
-		StringBuilder grammarBuilder = new StringBuilder(868);
+		StringBuilder grammarBuilder = new StringBuilder(867);
 		grammarBuilder.append("grammar T;\n");
+		grammarBuilder.append("\n");
 		grammarBuilder.append("@parser::header {\n");
 		grammarBuilder.append("var TListener = require('./TListener').TListener;\n");
 		grammarBuilder.append("}\n");
-		grammarBuilder.append("\n");
 		grammarBuilder.append("@parser::members {\n");
 		grammarBuilder.append("this.LeafListener = function() {\n");
 		grammarBuilder.append("    this.exitA = function(ctx) {\n");
@@ -199,7 +196,6 @@ public class TestListeners extends BaseTest {
 		grammarBuilder.append("};\n");
 		grammarBuilder.append("this.LeafListener.prototype = Object.create(TListener.prototype);\n");
 		grammarBuilder.append("this.LeafListener.prototype.constructor = this.LeafListener;\n");
-		grammarBuilder.append("\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("s\n");
@@ -233,12 +229,12 @@ public class TestListeners extends BaseTest {
 	@Test
 	public void testRuleGetters_2() throws Exception {
 		mkdir(tmpdir);
-		StringBuilder grammarBuilder = new StringBuilder(868);
+		StringBuilder grammarBuilder = new StringBuilder(867);
 		grammarBuilder.append("grammar T;\n");
+		grammarBuilder.append("\n");
 		grammarBuilder.append("@parser::header {\n");
 		grammarBuilder.append("var TListener = require('./TListener').TListener;\n");
 		grammarBuilder.append("}\n");
-		grammarBuilder.append("\n");
 		grammarBuilder.append("@parser::members {\n");
 		grammarBuilder.append("this.LeafListener = function() {\n");
 		grammarBuilder.append("    this.exitA = function(ctx) {\n");
@@ -254,7 +250,6 @@ public class TestListeners extends BaseTest {
 		grammarBuilder.append("};\n");
 		grammarBuilder.append("this.LeafListener.prototype = Object.create(TListener.prototype);\n");
 		grammarBuilder.append("this.LeafListener.prototype.constructor = this.LeafListener;\n");
-		grammarBuilder.append("\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("s\n");
@@ -288,12 +283,12 @@ public class TestListeners extends BaseTest {
 	@Test
 	public void testTokenGetters_1() throws Exception {
 		mkdir(tmpdir);
-		StringBuilder grammarBuilder = new StringBuilder(855);
+		StringBuilder grammarBuilder = new StringBuilder(854);
 		grammarBuilder.append("grammar T;\n");
+		grammarBuilder.append("\n");
 		grammarBuilder.append("@parser::header {\n");
 		grammarBuilder.append("var TListener = require('./TListener').TListener;\n");
 		grammarBuilder.append("}\n");
-		grammarBuilder.append("\n");
 		grammarBuilder.append("@parser::members {\n");
 		grammarBuilder.append("this.LeafListener = function() {\n");
 		grammarBuilder.append("    this.exitA = function(ctx) {\n");
@@ -309,7 +304,6 @@ public class TestListeners extends BaseTest {
 		grammarBuilder.append("};\n");
 		grammarBuilder.append("this.LeafListener.prototype = Object.create(TListener.prototype);\n");
 		grammarBuilder.append("this.LeafListener.prototype.constructor = this.LeafListener;\n");
-		grammarBuilder.append("\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("s\n");
@@ -342,12 +336,12 @@ public class TestListeners extends BaseTest {
 	@Test
 	public void testTokenGetters_2() throws Exception {
 		mkdir(tmpdir);
-		StringBuilder grammarBuilder = new StringBuilder(855);
+		StringBuilder grammarBuilder = new StringBuilder(854);
 		grammarBuilder.append("grammar T;\n");
+		grammarBuilder.append("\n");
 		grammarBuilder.append("@parser::header {\n");
 		grammarBuilder.append("var TListener = require('./TListener').TListener;\n");
 		grammarBuilder.append("}\n");
-		grammarBuilder.append("\n");
 		grammarBuilder.append("@parser::members {\n");
 		grammarBuilder.append("this.LeafListener = function() {\n");
 		grammarBuilder.append("    this.exitA = function(ctx) {\n");
@@ -363,7 +357,6 @@ public class TestListeners extends BaseTest {
 		grammarBuilder.append("};\n");
 		grammarBuilder.append("this.LeafListener.prototype = Object.create(TListener.prototype);\n");
 		grammarBuilder.append("this.LeafListener.prototype.constructor = this.LeafListener;\n");
-		grammarBuilder.append("\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("s\n");

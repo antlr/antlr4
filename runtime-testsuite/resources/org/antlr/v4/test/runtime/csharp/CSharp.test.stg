@@ -317,10 +317,12 @@ public class PositionAdjustingLexerATNSimulator : LexerATNSimulator {
 >>
 
 BasicListener(X) ::= <<
+@parser::members {
 public class LeafListener : TBaseListener {
 	public override void VisitTerminal(ITerminalNode node) {
 		Console.WriteLine(node.Symbol.Text);
 	}
+}
 }
 >>
 
@@ -343,6 +345,7 @@ public class MyRuleNode : ParserRuleContext {
 >>
 
 TokenGetterListener(X) ::= <<
+@parser::members {
 public class LeafListener : TBaseListener {
 	public override void ExitA(TParser.AContext ctx) {
 		if (ctx.ChildCount==2)
@@ -361,9 +364,11 @@ public class LeafListener : TBaseListener {
 			Console.WriteLine(ctx.ID().Symbol);
 	}
 }
+}
 >>
 
 RuleGetterListener(X) ::= <<
+@parser::members {
 public class LeafListener : TBaseListener {
 	public override void ExitA(TParser.AContext ctx) {
 		if (ctx.ChildCount==2) {
@@ -373,10 +378,12 @@ public class LeafListener : TBaseListener {
 			Console.WriteLine(ctx.b(0).Start.Text);
 	}
 }
+}
 >>
 
 
 LRListener(X) ::= <<
+@parser::members {
 public class LeafListener : TBaseListener {
 	public override void ExitE(TParser.EContext ctx) {
 		if (ctx.ChildCount==3) {
@@ -386,9 +393,11 @@ public class LeafListener : TBaseListener {
 			Console.WriteLine(ctx.INT().Symbol.Text);
 	}
 }
+}
 >>
 
 LRWithLabelsListener(X) ::= <<
+@parser::members {
 public class LeafListener : TBaseListener {
 	public override void ExitCall(TParser.CallContext ctx) {
 		Console.Write("{0} {1}",ctx.e().Start.Text,ctx.eList());
@@ -396,6 +405,7 @@ public class LeafListener : TBaseListener {
 	public override void ExitInt(TParser.IntContext ctx) {
 		Console.WriteLine(ctx.INT().Symbol.Text);
 	}
+}
 }
 >>
 

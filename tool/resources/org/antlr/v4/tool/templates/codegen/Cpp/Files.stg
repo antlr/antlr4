@@ -142,14 +142,14 @@ public:
 <namedActions.baselistenerdeclarations>
 
 <file.listenerNames: {lname |
-  void enter<lname; format="cap">(<file.parserName>::<lname; format = "cap">Context * /*ctx*/) { \}
-  void exit<lname; format="cap">(<file.parserName>::<lname; format = "cap">Context * /*ctx*/) { \}
+  virtual void enter<lname; format="cap">(<file.parserName>::<lname; format = "cap">Context * /*ctx*/) override { \}
+  virtual void exit<lname; format="cap">(<file.parserName>::<lname; format = "cap">Context * /*ctx*/) override { \}
 }; separator="\n">
 
-  void enterEveryRule(Ref\<ParserRuleContext> /*ctx*/) { }
-  void exitEveryRule(Ref\<ParserRuleContext> /*ctx*/) { }
-  void visitTerminal(Ref\<tree::TerminalNode> /*node*/) { }
-  void visitErrorNode(Ref\<tree::ErrorNode> /*node*/) { }
+  virtual void enterEveryRule(Ref\<ParserRuleContext> /*ctx*/) override { }
+  virtual void exitEveryRule(Ref\<ParserRuleContext> /*ctx*/) override { }
+  virtual void visitTerminal(Ref\<tree::TerminalNode> /*node*/) override { }
+  virtual void visitErrorNode(Ref\<tree::ErrorNode> /*node*/) override { }
   
 <if (namedActions.baselistenermembers)>
 private:  
@@ -324,7 +324,7 @@ public:
    * Visit parse trees produced by <file.parserName>.
    */
   <file.visitorNames: {lname |
-  T* visit<lname; format = "cap">(<file.parserName>::<lname; format = "cap">Context *context) = 0;
+  virtual T* visit<lname; format = "cap">(<file.parserName>::<lname; format = "cap">Context *context) = 0;
   }; separator="\n">
 
 <if (namedActions.visitormembers)>

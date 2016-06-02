@@ -25,18 +25,14 @@ Errors() ::= ""
 
 grammar(grammarName) ::= <<
 grammar <grammarName>;
-@parser::header {
-<ImportListener(grammarName)>
-}
 
-@parser::members {
+<ImportListener(grammarName)>
 <LRListener(grammarName)>
-}
 
 s
 @after {
-<ToStringTree("$ctx.r"):writeln()>
-<WalkListener("$ctx.r")>
+<ContextRuleFunction("$ctx", "r"):ToStringTree():writeln()>
+<ContextRuleFunction("$ctx", "r"):WalkListener()>
 }
 	: r=e ;
 e : e op='*' e

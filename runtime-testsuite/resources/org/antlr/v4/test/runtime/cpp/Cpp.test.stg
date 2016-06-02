@@ -328,12 +328,14 @@ public:
 >>
 
 BasicListener(X) ::= <<
+@parser::definitions {
 class LeafListener : public TBaseListener {
 public:
   virtual void visitTerminal(Ref\<tree::TerminalNode> node) override {
-		std::cout \<\< node->getSymbol()->getText() \<\< std::endl;
-	}
+  std::cout \<\< node->getSymbol()->getText() \<\< std::endl;
+  }
 };
+}
 >>
 
 WalkListener(s) ::= <<
@@ -355,61 +357,63 @@ public:
 >>
 
 TokenGetterListener(X) ::= <<
-class LeafListener : TBaseListener {
+@parser::definitions {
+class LeafListener : public TBaseListener {
 public:
-  void exitA(Ref\<TParser::AContext> ctx) {
+  virtual void exitA(TParser::AContext *ctx) override {
 		if (ctx->getChildCount() == 2)
-			std::cout \<\< ctx->INT(0)->getSymbol()->getText() \<\< ctx->INT(1)->getSymbol()->getText() \<\< ctx->INT() \<\< std::endl;
+			std::cout \<\< ctx->INT(0)->getSymbol()->getText() \<\< " " \<\< ctx->INT(1)->getSymbol()->getText()
+        \<\< " " \<\< Arrays::toString(ctx->INT()) \<\< std::endl;
 		else
-			std::cout \<\< ctx->ID()->getSymbol() \<\< std::endl;
+			std::cout \<\< ctx->ID()->getSymbol()->toString() \<\< std::endl;
 	}
 };
+}
 >>
 
 RuleGetterListener(X) ::= <<
-if __name__ is not None and "." in __name__:
-    from .<X>Listener import <X>Listener
-else:
-    from <X>Listener import <X>Listener
-
-class LeafListener(TListener):
-    def exitA(self, ctx):
-        if (ctx.getChildCount()==2) {
-            std::cout \<\< ctx.b(0).start.text \<\< " " \<\< ctx.b(1).start.text \<\< " " \<\< ctx.b()[0].start.text;
-	} else {
-            std::cout \<\< ctx.b(0).start.text;
-	}
-
+@parser::definitions {
+class LeafListener : public TBaseListener {
+public:
+  virtual void exitA(TParser::AContext *ctx) override {
+    if (ctx->getChildCount() == 2) {
+      std::cout \<\< ctx->b(0)->start->getText() \<\< " " \<\< ctx->b(1)->start->getText() \<\< " " \<\< ctx->b()[0]->start->getText() \<\< std::endl;
+    } else {
+      std::cout \<\< ctx->b(0)->start->getText() \<\< std::endl;
+    }
+  }
+};
+}
 >>
 
 
 LRListener(X) ::= <<
-if __name__ is not None and "." in __name__:
-    from .<X>Listener import <X>Listener
-else:
-    from <X>Listener import <X>Listener
-
-class LeafListener(TListener):
-    def exitE(self, ctx):
-        if ctx.getChildCount()==3:
-            std::cout \<\< ctx.e(0).start.text \<\< " " \<\< ctx.e(1).start.text \<\< " " \<\< ctx.e()[0].start.text;
-        else:
-            std::cout \<\< ctx.INT().symbol.text;
-
+@parser::definitions {
+class LeafListener : public TBaseListener {
+public:
+  virtual void exitE(TParser::EContext *ctx) override {
+    if (ctx->getChildCount() == 3) {
+      std::cout \<\< ctx->e(0)->start->getText() \<\< " " \<\< ctx->e(1)->start->getText() \<\< " " \<\< ctx->e()[0]->start->getText() \<\< std::endl;
+    } else {
+      std::cout \<\< ctx->INT()->getSymbol()->getText() \<\< std::endl;
+    }
+  }
+};
+}
 >>
 
 LRWithLabelsListener(X) ::= <<
-if __name__ is not None and "." in __name__:
-    from .<X>Listener import <X>Listener
-else:
-    from <X>Listener import <X>Listener
-
-class LeafListener(TListener):
-    def exitCall(self, ctx):
-        std::cout \<\< ctx.e().start.text \<\< " " \<\< str(ctx.eList());
-    def exitInt(self, ctx):
-        std::cout \<\< ctx.INT().symbol.text;
-
+@parser::definitions {
+class LeafListener : public TBaseListener {
+public:
+  virtual void exitCall(TParser::CallContext *ctx) override {
+    std::cout \<\< ctx->e()->start->getText() \<\< " " \<\< ctx->eList()->toString() \<\< std::endl;
+	}
+	virtual void exitInt(TParser::IntContext *ctx) override {
+		std::cout \<\<  ctx->INT()->getSymbol()->getText() \<\< std::endl;
+	}
+};
+}
 >>
 
 DeclareContextListGettersFunction() ::= <<
