@@ -700,7 +700,7 @@ setState(<choice.stateNumber>);
 _errHandler->sync(this);
 
 switch (getInterpreter\<atn::ParserATNSimulator>()->adaptivePredict(_input, <choice.decision>, _ctx)) {
-<alts: {alt | case <i><if (!choice.ast.greedy)>+1<endif>: {
+<alts: {alt | case <i><if (!choice.ast.greedy)> + 1<endif>: {
   <alt>
   break;
 \}
@@ -714,7 +714,7 @@ setState(<choice.stateNumber>);
 _errHandler->sync(this);
 alt = getInterpreter\<atn::ParserATNSimulator>()->adaptivePredict(_input, <choice.decision>, _ctx);
 while (alt != <choice.exitAlt> && alt != -1) {
-  if ( alt == 1 <if(!choice.ast.greedy)>+ 1<endif>) {
+  if (alt == 1<if(!choice.ast.greedy)> + 1<endif>) {
     <iteration>
     <alts> <! should only be one !>
   }
@@ -728,7 +728,7 @@ PlusBlockHeader(choice, alts, error) ::= "<! Required to exist, but unused. !>"
 PlusBlock(choice, alts, error) ::= <<
 setState(<choice.blockStartStateNumber>); <! alt block decision !>
 _errHandler->sync(this);
-alt = getInterpreter\<atn::ParserATNSimulator>()->adaptivePredict(_input, <choice.decision>, _ctx);
+alt = 1<if(!choice.ast.greedy)> + 1<endif>;
 do {
   switch (alt) {
     <alts: {alt | case <i><if (!choice.ast.greedy)> + 1<endif>: {
@@ -742,7 +742,7 @@ do {
   setState(<choice.loopBackStateNumber>); <! loopback/exit decision !>
   _errHandler->sync(this);
   alt = getInterpreter\<atn::ParserATNSimulator>()->adaptivePredict(_input, <choice.decision>, _ctx);
-} while (alt != <choice.exitAlt> && alt != -1);
+} while (alt != <choice.exitAlt> && alt != atn::ATN::INVALID_ALT_NUMBER);
 >>
 
 Sync(s) ::= "Sync(s) sync(<s.expecting.name>);"

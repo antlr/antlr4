@@ -158,75 +158,49 @@ string(text) ::= <<
 writeBoolean(o) ::= "<if(o && !isEmpty.(o))>true<else>false<endif>"
 
 writeln(s) ::= "std::cout \<\< <s> \<\< std::endl;"
-
 write(s) ::= "std::cout \<\< <s>;"
+writeList(s) ::= << std::cout \<\< <s; separator=" \<\< "> \<\< std::endl;>>
 
 False() ::= "false"
-
 True() ::= "true"
-
 Not(v) ::= "!<v>"
-
 Assert(s) ::= ""
-
 Cast(t,v) ::= "std::dynamic_pointer_cast\<<t>>(<v>)" // Should actually use a more specific name. We may have to use other casts as well.
-
 Append(a,b) ::= "<a> + <b>->toString()"
-
 Concat(a,b) ::= "<a><b>"
 
 DeclareLocal(s,v) ::= "<s> = <v>"
 
 AssertIsList(v) ::= "assert(<v>.size() >= 0);" // Use a method that exists only on a list (vector actually).
-
 AssignLocal(s,v) ::= "<s> = <v>"
 
-InitIntMember(n,v) ::= <%int <n> = <v>;%>
+InitIntMember(n,v) ::= "int <n> = <v>;"
+InitBooleanMember(n,v) ::= "bool <n> = <v>;"
 
-InitBooleanMember(n,v) ::= <%bool <n> = <v>;%>
-
-GetMember(n) ::= <%<n>%>
-
-SetMember(n,v) ::= <%<n> = <v>%>
-
-AddMember(n,v) ::= <%<n> += <v>%>
-
-PlusMember(v,n) ::= <%<v> + <n>->toString()%>
-
-MemberEquals(n,v) ::= <%<n> == <v>%>
-
-ModMemberEquals(n,m,v) ::= <%<n> % <m> == <v>%>
-
-ModMemberNotEquals(n,m,v) ::= <%<n> % <m> != <v>%>
+GetMember(n) ::= "<n>"
+SetMember(n,v) ::= "<n> = <v>;"
+AddMember(n,v) ::= "<n> += <v>;"
+PlusMember(v,n) ::= "<v> + <n>"
+MemberEquals(n,v) ::= "<n> == <v>"
+ModMemberEquals(n,m,v) ::= "<n> % <m> == <v>"
+ModMemberNotEquals(n,m,v) ::= "<n> % <m> != <v>"
 
 DumpDFA() ::= "dumpDFA();"
-
 Pass() ::= "/* do nothing */"
 
 StringList() ::= "std::vector\<std::string>"
-
-BuildParseTrees() ::= "setBuildParseTrees(true);"
-
+BuildParseTrees() ::= "setBuildParseTree(true);"
 BailErrorStrategy() ::= "_errHandler = std::make_shared\<BailErrorStrategy>();"
 
 ToStringTree(s) ::= "<s>->toStringTree(this)"
-
 Column() ::= "getCharPositionInLine()"
-
 Text() ::= "getText()"
-
 ValEquals(a,b) ::= "<a> == <b>"
-
 TextEquals(a) ::= "getText() == \"<a>\""
-
 PlusText(a) ::="\"<a>\" + getText()"
-
 InputText() ::= "_input->getText()"
-
-LTEquals(i, v) ::= "_input->LT(<i>).text == <v>"
-
+LTEquals(i, v) ::= "_input->LT(<i>)->getText() == <v>"
 LANotEquals(i, v) ::= "_input->LA(<i>) != <v>"
-
 TokenStartColumnEquals(i) ::= "tokenStartCharPositionInLine == <i>"
 
 ImportListener(X) ::= ""
@@ -432,13 +406,14 @@ Declare_foo() ::= <<void foo() {
 Invoke_foo() ::= "foo();"
 
 Declare_pred() ::= <<
-void pred(v) {
-	std::cout \<\< "eval=" \<\< v->toString().lower();
+bool pred(bool v) {
+	std::cout \<\< "eval=" \<\< std::boolalpha \<\< v \<\< std::endl;
 	return v;
 }
 >>
 
 Invoke_pred(v) ::= <<pred(<v>)>>
+
 ParserTokenType(t) ::= "Parser::<t>"
 ContextRuleFunction(ctx, rule) ::= "<ctx>-><rule>"
 StringType() ::= "std::string"

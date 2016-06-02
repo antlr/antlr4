@@ -194,9 +194,9 @@ int ParserATNSimulator::execATN(dfa::DFA &dfa, dfa::DFAState *s0, TokenStream *i
       // ATN states in SLL implies LL will also get nowhere.
       // If conflict in states that dip out, choose min since we
       // will get error no matter what.
-      int alt = getAltThatFinishedDecisionEntryRule(previousD->configs);
+      input->seek(startIndex);
+      int alt = getSynValidOrSemInvalidAltThatFinishedDecisionEntryRule(previousD->configs, outerContext);
       if (alt != ATN::INVALID_ALT_NUMBER) {
-        // return w/o altering DFA
         return alt;
       }
 

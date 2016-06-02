@@ -148,8 +148,8 @@ string(text) ::= <<
 writeBoolean(o) ::= "<if(o && !isEmpty.(o))>true<else>false<endif>"
 
 writeln(s) ::= <<Console.WriteLine(<s>);>>
-
 write(s) ::= <<Console.Write(<s>);>>
+writeList(s) ::= <<Console.WriteLine(<s; separator="+">);>>
 
 False() ::= "false"
 

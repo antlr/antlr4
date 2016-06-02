@@ -13,9 +13,9 @@ public class TestSets extends BaseCppTest {
 	public void testCharSetLiteral() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(93);
+		StringBuilder grammarBuilder = new StringBuilder(98);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("a : (A {std::cout << $A.text << \"\\n\";})+ ;\n");
+		grammarBuilder.append("a : (A {std::cout << $A.text << std::endl;})+ ;\n");
 		grammarBuilder.append("A : [AaBb] ;\n");
 		grammarBuilder.append("WS : (' '|'\\n')+ -> skip ;");
 		String grammar = grammarBuilder.toString();
@@ -61,9 +61,9 @@ public class TestSets extends BaseCppTest {
 	public void testLexerOptionalSet() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(81);
+		StringBuilder grammarBuilder = new StringBuilder(86);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("a : A {std::cout << _input->getText() << \"\\n\";} ;\n");
+		grammarBuilder.append("a : A {std::cout << _input->getText() << std::endl;} ;\n");
 		grammarBuilder.append("A : ('a'|'b')? 'c' ;");
 		String grammar = grammarBuilder.toString();
 
@@ -81,9 +81,9 @@ public class TestSets extends BaseCppTest {
 	public void testLexerPlusSet() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(81);
+		StringBuilder grammarBuilder = new StringBuilder(86);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("a : A {std::cout << _input->getText() << \"\\n\";} ;\n");
+		grammarBuilder.append("a : A {std::cout << _input->getText() << std::endl;} ;\n");
 		grammarBuilder.append("A : ('a'|'b')+ 'c' ;");
 		String grammar = grammarBuilder.toString();
 
@@ -101,9 +101,9 @@ public class TestSets extends BaseCppTest {
 	public void testLexerStarSet() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(81);
+		StringBuilder grammarBuilder = new StringBuilder(86);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("a : A {std::cout << _input->getText() << \"\\n\";} ;\n");
+		grammarBuilder.append("a : A {std::cout << _input->getText() << std::endl;} ;\n");
 		grammarBuilder.append("A : ('a'|'b')* 'c' ;");
 		String grammar = grammarBuilder.toString();
 
@@ -121,9 +121,9 @@ public class TestSets extends BaseCppTest {
 	public void testNotChar() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(61);
+		StringBuilder grammarBuilder = new StringBuilder(66);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("a : A {std::cout << $A.text << \"\\n\";} ;\n");
+		grammarBuilder.append("a : A {std::cout << $A.text << std::endl;} ;\n");
 		grammarBuilder.append("A : ~'b' ;");
 		String grammar = grammarBuilder.toString();
 
@@ -141,9 +141,9 @@ public class TestSets extends BaseCppTest {
 	public void testNotCharSet() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(67);
+		StringBuilder grammarBuilder = new StringBuilder(72);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("a : A {std::cout << $A.text << \"\\n\";} ;\n");
+		grammarBuilder.append("a : A {std::cout << $A.text << std::endl;} ;\n");
 		grammarBuilder.append("A : ~('b'|'c') ;");
 		String grammar = grammarBuilder.toString();
 
@@ -161,9 +161,9 @@ public class TestSets extends BaseCppTest {
 	public void testNotCharSetWithLabel() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(69);
+		StringBuilder grammarBuilder = new StringBuilder(74);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("a : A {std::cout << $A.text << \"\\n\";} ;\n");
+		grammarBuilder.append("a : A {std::cout << $A.text << std::endl;} ;\n");
 		grammarBuilder.append("A : h=~('b'|'c') ;");
 		String grammar = grammarBuilder.toString();
 
@@ -181,9 +181,9 @@ public class TestSets extends BaseCppTest {
 	public void testNotCharSetWithRuleRef3() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(133);
+		StringBuilder grammarBuilder = new StringBuilder(138);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("a : A {std::cout << $A.text << \"\\n\";} ;\n");
+		grammarBuilder.append("a : A {std::cout << $A.text << std::endl;} ;\n");
 		grammarBuilder.append("A : ('a'|B) ;  // this doesn't collapse to set but works\n");
 		grammarBuilder.append("fragment\n");
 		grammarBuilder.append("B : ~('a'|'c') ;");
@@ -203,9 +203,9 @@ public class TestSets extends BaseCppTest {
 	public void testOptionalLexerSingleElement() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(75);
+		StringBuilder grammarBuilder = new StringBuilder(80);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("a : A {std::cout << _input->getText() << \"\\n\";} ;\n");
+		grammarBuilder.append("a : A {std::cout << _input->getText() << std::endl;} ;\n");
 		grammarBuilder.append("A : 'b'? 'c' ;");
 		String grammar = grammarBuilder.toString();
 
@@ -223,9 +223,9 @@ public class TestSets extends BaseCppTest {
 	public void testOptionalSet() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(73);
+		StringBuilder grammarBuilder = new StringBuilder(78);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("a : ('a'|'b')? 'c' {std::cout << _input->getText() << \"\\n\";} ;");
+		grammarBuilder.append("a : ('a'|'b')? 'c' {std::cout << _input->getText() << std::endl;} ;");
 		String grammar = grammarBuilder.toString();
 
 
@@ -242,9 +242,9 @@ public class TestSets extends BaseCppTest {
 	public void testOptionalSingleElement() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(75);
+		StringBuilder grammarBuilder = new StringBuilder(80);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("a : A? 'c' {std::cout << _input->getText() << \"\\n\";} ;\n");
+		grammarBuilder.append("a : A? 'c' {std::cout << _input->getText() << std::endl;} ;\n");
 		grammarBuilder.append("A : 'b' ;");
 		String grammar = grammarBuilder.toString();
 
@@ -262,9 +262,9 @@ public class TestSets extends BaseCppTest {
 	public void testParserNotSet() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(65);
+		StringBuilder grammarBuilder = new StringBuilder(70);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("a : t=~('x'|'y') 'z' {std::cout << $t.text << \"\\n\";} ;");
+		grammarBuilder.append("a : t=~('x'|'y') 'z' {std::cout << $t.text << std::endl;} ;");
 		String grammar = grammarBuilder.toString();
 
 
@@ -281,9 +281,9 @@ public class TestSets extends BaseCppTest {
 	public void testParserNotToken() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(67);
+		StringBuilder grammarBuilder = new StringBuilder(72);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("a : ~'x' 'z' {std::cout << _input->getText() << \"\\n\";} ;");
+		grammarBuilder.append("a : ~'x' 'z' {std::cout << _input->getText() << std::endl;} ;");
 		String grammar = grammarBuilder.toString();
 
 
@@ -300,9 +300,9 @@ public class TestSets extends BaseCppTest {
 	public void testParserNotTokenWithLabel() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(59);
+		StringBuilder grammarBuilder = new StringBuilder(64);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("a : t=~'x' 'z' {std::cout << $t.text << \"\\n\";} ;");
+		grammarBuilder.append("a : t=~'x' 'z' {std::cout << $t.text << std::endl;} ;");
 		String grammar = grammarBuilder.toString();
 
 
@@ -319,9 +319,9 @@ public class TestSets extends BaseCppTest {
 	public void testParserSet() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(60);
+		StringBuilder grammarBuilder = new StringBuilder(65);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("a : t=('x'|'y') {std::cout << $t.text << \"\\n\";} ;");
+		grammarBuilder.append("a : t=('x'|'y') {std::cout << $t.text << std::endl;} ;");
 		String grammar = grammarBuilder.toString();
 
 
@@ -338,9 +338,9 @@ public class TestSets extends BaseCppTest {
 	public void testPlusLexerSingleElement() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(75);
+		StringBuilder grammarBuilder = new StringBuilder(80);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("a : A {std::cout << _input->getText() << \"\\n\";} ;\n");
+		grammarBuilder.append("a : A {std::cout << _input->getText() << std::endl;} ;\n");
 		grammarBuilder.append("A : 'b'+ 'c' ;");
 		String grammar = grammarBuilder.toString();
 
@@ -358,9 +358,9 @@ public class TestSets extends BaseCppTest {
 	public void testPlusSet() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(73);
+		StringBuilder grammarBuilder = new StringBuilder(78);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("a : ('a'|'b')+ 'c' {std::cout << _input->getText() << \"\\n\";} ;");
+		grammarBuilder.append("a : ('a'|'b')+ 'c' {std::cout << _input->getText() << std::endl;} ;");
 		String grammar = grammarBuilder.toString();
 
 
@@ -377,9 +377,9 @@ public class TestSets extends BaseCppTest {
 	public void testRuleAsSet() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(80);
+		StringBuilder grammarBuilder = new StringBuilder(85);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("a @after {std::cout << _input->getText() << \"\\n\";} : 'a' | 'b' |'c' ;");
+		grammarBuilder.append("a @after {std::cout << _input->getText() << std::endl;} : 'a' | 'b' |'c' ;");
 		String grammar = grammarBuilder.toString();
 
 
@@ -396,9 +396,9 @@ public class TestSets extends BaseCppTest {
 	public void testSeqDoesNotBecomeSet() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(117);
+		StringBuilder grammarBuilder = new StringBuilder(122);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("a : C {std::cout << _input->getText() << \"\\n\";} ;\n");
+		grammarBuilder.append("a : C {std::cout << _input->getText() << std::endl;} ;\n");
 		grammarBuilder.append("fragment A : '1' | '2';\n");
 		grammarBuilder.append("fragment B : '3' '4';\n");
 		grammarBuilder.append("C : A | B;");
@@ -418,9 +418,9 @@ public class TestSets extends BaseCppTest {
 	public void testStarLexerSingleElement_1() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(75);
+		StringBuilder grammarBuilder = new StringBuilder(80);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("a : A {std::cout << _input->getText() << \"\\n\";} ;\n");
+		grammarBuilder.append("a : A {std::cout << _input->getText() << std::endl;} ;\n");
 		grammarBuilder.append("A : 'b'* 'c' ;");
 		String grammar = grammarBuilder.toString();
 
@@ -438,9 +438,9 @@ public class TestSets extends BaseCppTest {
 	public void testStarLexerSingleElement_2() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(75);
+		StringBuilder grammarBuilder = new StringBuilder(80);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("a : A {std::cout << _input->getText() << \"\\n\";} ;\n");
+		grammarBuilder.append("a : A {std::cout << _input->getText() << std::endl;} ;\n");
 		grammarBuilder.append("A : 'b'* 'c' ;");
 		String grammar = grammarBuilder.toString();
 
@@ -458,9 +458,9 @@ public class TestSets extends BaseCppTest {
 	public void testStarSet() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(73);
+		StringBuilder grammarBuilder = new StringBuilder(78);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("a : ('a'|'b')* 'c' {std::cout << _input->getText() << \"\\n\";} ;");
+		grammarBuilder.append("a : ('a'|'b')* 'c' {std::cout << _input->getText() << std::endl;} ;");
 		String grammar = grammarBuilder.toString();
 
 

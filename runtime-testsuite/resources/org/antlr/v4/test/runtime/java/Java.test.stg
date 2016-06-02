@@ -155,8 +155,8 @@ string(text) ::= <<
 writeBoolean(o) ::= "<if(o && !isEmpty.(o))>true<else>false<endif>"
 
 writeln(s) ::= <<System.out.println(<s>);>>
-
 write(s) ::= <<System.out.print(<s>);>>
+writeList(s) ::= <<System.out.println(<s; separator="+">);>>
 
 False() ::= "false"
 

@@ -158,8 +158,8 @@ string(text) ::= <<
 writeBoolean(o) ::= "<if(o && !isEmpty.(o))>true<else>false<endif>"
 
 writeln(s) ::= <<print(<s>)>>
-
 write(s) ::= <<print(<s>,end='')>>
+writeList(s) ::= <<print(<s: {v | str(<v>)}; separator="+">)>>
 
 False() ::= "False"
 

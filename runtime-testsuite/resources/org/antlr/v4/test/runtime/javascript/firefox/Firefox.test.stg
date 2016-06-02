@@ -154,8 +154,8 @@ string(text) ::= <<
 writeBoolean(o) ::= "<if(o && !isEmpty.(o))>true<else>false<endif>"
 
 writeln(s) ::= <<document.getElementById('output').value += <s> + '\\n';>>
-
 write(s) ::= <<document.getElementById('output').value += <s>;>>
+writeList(s) ::= <<document.getElementById('output').value += <s; separator="+">;>>
 
 False() ::= "false"
 
