@@ -964,7 +964,7 @@ public abstract class BaseCppTest {
 					+ "  tokens.fill();\n"
 				    + "  for (auto token : tokens.getTokens())\n"
 				    + "    std::cout \\<\\< token->toString() \\<\\< std::endl;\n"
-					+ (showDFA ? "    std::cout \\<\\< lexer..getInterpreter\\<LexerATNSimulator>().toLexerString();\n" : "\n")
+					+ (showDFA ? "  std::cout \\<\\< lexer.getInterpreter\\<atn::LexerATNSimulator>()->getDFA(Lexer::DEFAULT_MODE).toLexerString();\n" : "\n")
 					+ "  return 0;\n"
 					+ "}\n");
 		outputFileST.add("lexerName", lexerName);

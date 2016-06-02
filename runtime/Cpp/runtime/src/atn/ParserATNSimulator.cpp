@@ -29,9 +29,6 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-// TODO: Using "wcout <<" for debug information is really lame, change out with
-// some kind of listener
-
 #include "dfa/DFA.h"
 #include "NoViableAltException.h"
 #include "atn/DecisionState.h"

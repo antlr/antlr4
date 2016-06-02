@@ -205,29 +205,29 @@ Pass() ::= "/* do nothing */"
 
 StringList() ::= "std::vector\<std::string>"
 
-BuildParseTrees() ::= "_buildParseTrees = true;"
+BuildParseTrees() ::= "setBuildParseTrees(true);"
 
-BailErrorStrategy() ::= <%_errHandler = std::make_shared\<BailErrorStrategy>();%>
+BailErrorStrategy() ::= "_errHandler = std::make_shared\<BailErrorStrategy>();"
 
-ToStringTree(s) ::= <%<s>->toStringTree(this)%>
+ToStringTree(s) ::= "<s>->toStringTree(this)"
 
-Column() ::= "column"
+Column() ::= "getCharPositionInLine()"
 
 Text() ::= "getText()"
 
-ValEquals(a,b) ::= <%<a> == <b>%>
+ValEquals(a,b) ::= "<a> == <b>"
 
-TextEquals(a) ::= <%getText() == "<a>"%>
+TextEquals(a) ::= "getText() == \"<a>\""
 
-PlusText(a) ::= <%"<a>" + getText()%>
+PlusText(a) ::="\"<a>\" + getText()"
 
 InputText() ::= "_input->getText()"
 
-LTEquals(i, v) ::= <%_input->LT(<i>).text == <v>%>
+LTEquals(i, v) ::= "_input->LT(<i>).text == <v>"
 
-LANotEquals(i, v) ::= <%_input->LA(<i>) != <v>%>
+LANotEquals(i, v) ::= "_input->LA(<i>) != <v>"
 
-TokenStartColumnEquals(i) ::= <%_tokenStartColumn == <i>%>
+TokenStartColumnEquals(i) ::= "tokenStartCharPositionInLine == <i>"
 
 ImportListener(X) ::= ""
 

@@ -54,7 +54,7 @@ std::string DFASerializer::toString() const {
   for (auto s : states) {
     for (size_t i = 0; i < s->edges.size(); i++) {
       DFAState *t = s->edges[i];
-      if (t != nullptr && t->stateNumber != INT16_MAX) {
+      if (t != nullptr && t->stateNumber != INT32_MAX) {
         ss << getStateString(s);
         std::string label = getEdgeLabel(i);
         ss << "-" << label << "->" << getStateString(t) << "\n";
@@ -76,7 +76,7 @@ std::string DFASerializer::getStateString(DFAState *s) const {
     (s->requiresFullContext ? "^" : "");
   
   if (s->isAcceptState) {
-    if (s->predicates.size() != 0) {
+    if (!s->predicates.empty()) {
       std::string buf;
       for (size_t i = 0; i < s->predicates.size(); i++) {
         buf.append(s->predicates[i]->toString());
