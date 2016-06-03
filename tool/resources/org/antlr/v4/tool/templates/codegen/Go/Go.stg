@@ -5,7 +5,11 @@ fileHeader(grammarFileName, ANTLRVersion) ::= <<
 
 ParserFile(file, parser, namedActions) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
+<if(file.genPackage)>
+package <file.genPackage> // <file.grammarName>
+<else>
 package parser // <file.grammarName>
+<endif>
 
 import (
     "reflect"
@@ -30,7 +34,11 @@ var _ = strconv.Itoa
 
 ListenerFile(file, header) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
+<if(file.genPackage)>
+package <file.genPackage> // <file.grammarName>
+<else>
 package parser // <file.grammarName>
+<endif>
 
 import "github.com/pboyer/antlr4/runtime/Go/antlr"
 
@@ -49,7 +57,11 @@ type <file.grammarName>Listener interface {
 
 BaseListenerFile(file, header) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
+<if(file.genPackage)>
+package <file.genPackage> // <file.grammarName>
+<else>
 package parser // <file.grammarName>
+<endif>
 
 import "github.com/pboyer/antlr4/runtime/Go/antlr"
 
@@ -77,7 +89,11 @@ func (s *Base<file.grammarName>Listener) Exit<lname; format="cap">(ctx *<lname; 
 
 VisitorFile(file, header) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
+<if(file.genPackage)>
+package <file.genPackage> // <file.grammarName>
+<else>
 package parser // <file.grammarName>
+<endif>
 
 import "github.com/pboyer/antlr4/runtime/Go/antlr"
 
@@ -97,7 +113,11 @@ type <file.grammarName>Visitor interface {
 
 BaseVisitorFile(file, header) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
+<if(file.genPackage)>
+package <file.genPackage> // <file.grammarName>
+<else>
 package parser // <file.grammarName>
+<endif>
 
 import "github.com/pboyer/antlr4/runtime/Go/antlr"
 
@@ -891,9 +911,13 @@ _prevctx = localctx
 >>
 
 
-LexerFile(lexerFile, lexer, namedActions) ::= <<
-<fileHeader(lexerFile.grammarFileName, lexerFile.ANTLRVersion)>
-package parser
+LexerFile(file, lexer, namedActions) ::= <<
+<fileHeader(file.grammarFileName, file.ANTLRVersion)>
+<if(file.genPackage)>
+package <file.genPackage><! // <file.grammarName>!><! why can't we access file.grammarName here? !>
+<else>
+package parser<! // <file.grammarName>!><! why can't we access file.grammarName here? !>
+<endif>
 
 import (
     "fmt"
