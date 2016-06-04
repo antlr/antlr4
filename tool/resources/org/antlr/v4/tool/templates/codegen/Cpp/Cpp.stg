@@ -241,8 +241,7 @@ bool <r.name>Sempred(Ref\<<r.ctxType>\> _localctx, int predicateIndex);
 >>
 
 RuleSempredFunction(r, actions) ::= <<
-<! Called for both lexer and parser. But only one of them is actually available. !>
-bool <if (parser)><parser.name><else><lexer.name><endif>::<r.name>Sempred(Ref\<<r.ctxType>\> _localctx, int predicateIndex) {
+bool <r.factory.grammar.name>::<r.name>Sempred(Ref\<<r.ctxType>\> _localctx, int predicateIndex) {
   switch (predicateIndex) {
     <actions: {index | case <index>: return <actions.(index)>}; separator="\n">
     
