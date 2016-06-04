@@ -55,7 +55,7 @@ namespace runtime {
 
   private:
     /// Which configurations did we try at input.index() that couldn't match input.LT(1)?
-    std::shared_ptr<atn::ATNConfigSet> _deadEndConfigs;
+    Ref<atn::ATNConfigSet> _deadEndConfigs;
 
     /// The token object at the start index; the input stream might
     /// not be buffering tokens so get a reference to it. (At the
