@@ -71,3 +71,57 @@ int main(int argc, const char* argv[]) {
 ```
  
 This example assumes your grammar contains a parser rule named `key` for which the enterKey function was generated. The `Ref<>` template is an alias for `std::shared_ptr<>` to simplify the runtime source code which often makes use of smart pointers.
+
+### Specialities of this ANTLR target
+
+### Memory Management
+Caused by the nature of C++ there are a couple of things that only the C++ ANTLR target has. Since C++ has no built-in memory management we need to take extra care for that. For that we rely mostly on smart pointers, which however might cause time penalties or memory side effects (like cyclic references) if not used with care. Currently however the memory household looks very stable.
+
+### Named Actions
+In order to help customizing the generated files there are a number of additional socalled **named actions**. These actions are tight to specific areas in the generated code and allow to add custom (target specific) code. All targets support these actions 
+
+* @parser::header
+* @parser::members
+* @lexer::header
+* @lexer::members
+
+
+(and their scopeless alternatives `@header` and `@members`) where header doesn't mean a C/C++ header file, but the top of a code file. The content of the header action appears in all generated files at the first line. So it's good for things like license/copyright information.
+
+The content of a *members* action is placed in the public section of lexer or parser class declarations. Hence it can be used for public variables or predicate functions used in a grammar predicate. Since all targets support *header* + *members* they are the best place for stuff that should be available also in generated files for other languages.
+
+In addition to that the C++ target supports many more such named actions. Unfortunately, it's not possible to define new scopes (e.g. *listener* in addition to *parser*) so they had to be defined as part of the existing scopes (*lexer* or *parser*). The grammar in the demo application contains all of the named actions as well for reference. Here's the list:
+
+* **@lexer::preinclude** - Placed right before the first #include (e.g. good for headers that must appear first, for system headers etc.). Appears in both lexer h and cpp file.
+* **@lexer::postinclude** - Placed right after the last #include, but before any class code (e.g. for additional namespaces). Appears in both lexer h and cpp file.
+* **@lexer::context** - Placed right before the lexer class declaration. Use for e.g. additional types, aliases, forward declarations and the like. Appears in the lexer h file.
+* **@lexer::declarations** - Placed in the private section of the lexer declaration (generated sections in all classes strictly follow the pattern: public, protected, privat, from top to bottom). Use this for private vars etc.
+* **@lexer::definitions** - Placed before other implementations in the cpp file (but after *@postinclude*). Use this to implement e.g. private types.
+
+For the parser there are the same for actions as shown above for the lexer. In addition to that there are even more actions for visitor and listener classes, which are:
+
+* **@parser::listenerpreinclude**
+* **@parser::listenerpostinclude**
+* **@parser::listenerdeclarations**
+* **@parser::listenermembers**
+* **@parser::listenerdefinitions**
+* 
+* **@parser::baselistenerpreinclude**
+* **@parser::baselistenerpostinclude**
+* **@parser::baselistenerdeclarations**
+* **@parser::baselistenermembers**
+* **@parser::baselistenerdefinitions**
+* 
+* **@parser::visitorpreinclude**
+* **@parser::visitorpostinclude**
+* **@parser::visitordeclarations**
+* **@parser::visitormembers**
+* **@parser::visitordefinitions**
+* 
+* **@parser::basevisitorpreinclude**
+* **@parser::basevisitorpostinclude**
+* **@parser::basevisitordeclarations**
+* **@parser::basevisitormembers**
+* **@parser::basevisitordefinitions**
+
+and should be self explanatory now. Note: there is no *context* action for listeners or visitors, simply because they would be even less used than the other actions and there are so many already.
