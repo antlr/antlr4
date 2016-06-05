@@ -298,9 +298,7 @@ func (p *<parser.name>) <currentRule.name; format="cap">(<currentRule.args:{a | 
 
 >>
 
-LeftRecursiveRuleFunction(currentRule, args, code, locals, ruleCtx, altLabelCtxs,
-	namedActions, finallyAction, postamble) ::=
-<<
+LeftRecursiveRuleFunction(currentRule, args, code, locals, ruleCtx, altLabelCtxs, namedActions, finallyAction, postamble) ::= <<
 
 <ruleCtx>
 <altLabelCtxs:{l | <altLabelCtxs.(l)>}; separator="\n">
@@ -702,8 +700,7 @@ ListLabelName(label) ::="<label>"
 CaptureNextToken(d) ::= "<d.varName> = p.GetTokenStream().LT(1)"
 CaptureNextTokenType(d) ::= "<d.varName> = p.GetTokenStream().LA(1);"
 
-StructDecl(struct, ctorAttrs, attrs, getters, dispatchMethods, interfaces, extensionMembers, tokenDecls, tokenTypeDecls,
-	tokenListDecls, ruleContextDecls, ruleContextListDecls, attributeDecls, superClass={ParserRuleContext}) ::= <<
+StructDecl(struct, ctorAttrs, attrs, getters, dispatchMethods, interfaces, extensionMembers, tokenDecls, tokenTypeDecls, tokenListDecls, ruleContextDecls, ruleContextListDecls, attributeDecls, superClass={ParserRuleContext}) ::= <<
 
 // an interface to support dynamic dispatch (subclassing)
 
