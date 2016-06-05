@@ -1,4 +1,4 @@
-## ANTLR4 Language Target, Runtime for Go
+# ANTLR4 Language Target, Runtime for Go
 
 ### Usage
 
