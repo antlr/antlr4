@@ -1,3 +1,23 @@
+## ANTLR4 Language Target, Runtime for Go
+
+### Usage
+
+1. `go get http://github.com/pboyer/antlr4`
+2. Get [StringTemplate](http://www.stringtemplate.org/)
+3. Get [Maven](https://maven.apache.org/download.cgi)
+  - Put `mvn` in your PATH (e.g. in `~/.bashrc` add `export PATH=$PATH:/path/to/apache-maven-3.3.9/bin`)
+4. From the repo directory, `mvn install` (add `-DskipTests` to skip the tests)
+5. Put StringTemplate and ANTLR binaries on your `CLASSPATH`
+  - `export CLASSPATH=".:/path/to/ST-4.0.8.jar:$CLASSPATH"`
+  - `export CLASSPATH=".:$GOPATH/src/github.com/pboyer/antlr4/tool/target/antlr4-4.5.2-SNAPSHOT.jar:$CLASSPATH"`
+5. (Optional) Add an alias for calling antlr
+  - `alias antlr='java -jar $GOPATH/src/github.com/pboyer/antlr4/tool/target/antlr4-4.5.2-SNAPSHOT.jar'`
+6. Now, `antlr Grammar.g4 -Dlanguage=Go`
+
+### Discuss
+
+[gitter](https://gitter.im/pboyer/antlr4)
+
 # ANTLR v4
 
 **ANTLR** (ANother Tool for Language Recognition) is a powerful parser generator for reading, processing, executing, or translating structured text or binary files. It's widely used to build languages, tools, and frameworks. From a grammar, ANTLR generates a parser that can build parse trees and also generates a listener interface (or visitor) that makes it easy to respond to the recognition of phrases of interest.
