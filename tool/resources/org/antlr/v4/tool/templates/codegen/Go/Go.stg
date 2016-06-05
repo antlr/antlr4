@@ -255,7 +255,7 @@ func (p *<if(parser)><parser.name><else><lexer.name><endif>) <r.name; format="ca
 }
 >>
 
-RuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,namedActions,finallyAction,postamble,exceptions) ::= <<
+RuleFunction(currentRule, args, code, locals, ruleCtx, altLabelCtxs, namedActions, finallyAction, postamble, exceptions) ::= <<
 
 <ruleCtx>
 
@@ -298,8 +298,8 @@ func (p *<parser.name>) <currentRule.name; format="cap">(<currentRule.args:{a | 
 
 >>
 
-LeftRecursiveRuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,
-	namedActions,finallyAction,postamble) ::=
+LeftRecursiveRuleFunction(currentRule, args, code, locals, ruleCtx, altLabelCtxs,
+	namedActions, finallyAction, postamble) ::=
 <<
 
 <ruleCtx>
@@ -360,7 +360,7 @@ p.SetState(<choice.stateNumber>)
 <if(choice.label)><labelref(choice.label)> = p.GetTokenStream().LT(1)<endif>
 <preamble; separator="\n">
 switch p.GetTokenStream().LA(1) {
-<choice.altLook,alts:{look,alt | <cases(ttypes=look)>
+<choice.altLook, alts:{look, alt | <cases(ttypes=look)>
 	<alt>
 	break }; separator="\n">
 default:
@@ -371,7 +371,7 @@ default:
 LL1OptionalBlock(choice, alts, error) ::= <<
 p.SetState(<choice.stateNumber>)
 switch p.GetTokenStream().LA(1) {
-<choice.altLook,alts:{look,alt | <cases(ttypes=look)>
+<choice.altLook, alts:{look, alt | <cases(ttypes=look)>
 	<alt>
 	break }; separator="\n">
 default:
@@ -587,7 +587,7 @@ TokenRef(t) ::= "<ctx(t)>.Get<t.name;format={cap}>()"
 LabelRef(t) ::= "<ctx(t)>.Get<t.name;format={cap}>()"
 ListLabelRef(t) ::= "<ctx(t)>.Get<ListLabelName(t.name);format={cap}>"
 
-SetAttr(s,rhsChunks) ::= "<ctx(s)>.Set<s.name; format={cap}>(<rhsChunks>)"
+SetAttr(s, rhsChunks) ::= "<ctx(s)>.Set<s.name; format={cap}>(<rhsChunks>)"
 
 TokenLabelType() ::= "<file.TokenLabelType; null={antlr.Token}>"
 InputSymbolType() ::= "<file.InputSymbolType; null={antlr.Token}>"
@@ -702,8 +702,8 @@ ListLabelName(label) ::="<label>"
 CaptureNextToken(d) ::= "<d.varName> = p.GetTokenStream().LT(1)"
 CaptureNextTokenType(d) ::= "<d.varName> = p.GetTokenStream().LA(1);"
 
-StructDecl(struct,ctorAttrs,attrs,getters,dispatchMethods,interfaces,extensionMembers,tokenDecls,tokenTypeDecls,
-	tokenListDecls,ruleContextDecls,ruleContextListDecls,attributeDecls,superClass={ParserRuleContext}) ::= <<
+StructDecl(struct, ctorAttrs, attrs, getters, dispatchMethods, interfaces, extensionMembers, tokenDecls, tokenTypeDecls,
+	tokenListDecls, ruleContextDecls, ruleContextListDecls, attributeDecls, superClass={ParserRuleContext}) ::= <<
 
 // an interface to support dynamic dispatch (subclassing)
 
@@ -788,8 +788,8 @@ func (s *<struct.name>) GetRuleContext() antlr.RuleContext { return s }
 
 >>
 
-AltLabelStructDecl(struct,attrs,getters,dispatchMethods,tokenDecls,tokenTypeDecls,
-  tokenListDecls,ruleContextDecls,ruleContextListDecls,attributeDecls) ::= <<
+AltLabelStructDecl(struct, attrs, getters, dispatchMethods, tokenDecls, tokenTypeDecls,
+  tokenListDecls, ruleContextDecls, ruleContextListDecls, attributeDecls) ::= <<
 
 type <struct.name> struct {
 	*<currentRule.name; format="cap">Context
@@ -855,8 +855,8 @@ labelref(x) ::= "<if(!x.isLocal)>localctx.(*<x.ctx.name>).<endif><x.name>"
 ctx(actionChunk) ::= "localctx.(*<actionChunk.ctx.name>)"
 
 // used for left-recursive rules
-recRuleAltPredicate(ruleName,opPrec) ::="p.Precpred(p.GetParserRuleContext(), <opPrec>)"
-recRuleSetReturnAction(src,name) ::="$<name>=$<src>.<name>"
+recRuleAltPredicate(ruleName, opPrec) ::="p.Precpred(p.GetParserRuleContext(), <opPrec>)"
+recRuleSetReturnAction(src, name) ::="$<name>=$<src>.<name>"
 recRuleSetStopToken() ::="p.GetParserRuleContext().SetStop( p.GetTokenStream().LT(-1) )"
 
 recRuleAltStartAction(ruleName, ctxName, label) ::= <<
@@ -980,7 +980,7 @@ initValue(typeName) ::= <<
 <javaTypeInitMap.(typeName)>
 >>
 
-RecognizerFileName(name,type) ::= "<name; format={lower}>_<type; format={lower}>"
+RecognizerFileName(name, type) ::= "<name; format={lower}>_<type; format={lower}>"
 ListenerFileName(name) ::= "<name; format={lower}>_listener"
 VisitorFileName(name) ::= "<name; format={lower}>_visitor"
 BaseListenerFileName(name) ::= "<name; format={lower}>_base_listener"
