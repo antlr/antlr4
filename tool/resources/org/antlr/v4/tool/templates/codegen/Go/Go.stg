@@ -210,9 +210,9 @@ func (l *<lexer.name>) Sempred(localctx antlr.RuleContext, ruleIndex, predIndex 
 			<if(!f.isRuleContext)>
 			var t *<f.name; format="cap">Context = nil
 			if localctx != nil { t = localctx.(*<f.ctxType>) \}
-			return l.<f.name>_Sempred(t, predIndex);
+			return l.<f.name>_Sempred(t, predIndex)
 			<else>
-			return l.<f.name>_Sempred(localctx, predIndex);
+			return l.<f.name>_Sempred(localctx, predIndex)
 			<endif>}; separator="\n">
 		default:
 			panic("No registered predicate for:" + fmt.Sprint(ruleIndex))
@@ -649,7 +649,7 @@ ContextTokenListIndexedGetterDecl(t) ::=<<
 
 ContextRuleGetterDecl(r) ::=<<
 <r.name; format="cap">() I<r.ctxName> {
-	v := s.GetTypedRuleContext( reflect.TypeOf((*I<r.ctxName>)(nil)).Elem(),0);
+	v := s.GetTypedRuleContext( reflect.TypeOf((*I<r.ctxName>)(nil)).Elem(),0)
 
 	if v == nil {
 		return nil
@@ -666,7 +666,7 @@ fail: ContextRuleListGetterDecl should never be called!
 
 ContextRuleListIndexedGetterDecl(r) ::=<<
 <r.name; format="cap">(i int) []I<r.ctxName> {
-	var ts []antlr.RuleContext;
+	var ts []antlr.RuleContext
 
 	if i \< 0 {
 		ts = s.GetTypedRuleContexts( reflect.TypeOf((*I<r.ctxName>)(nil)).Elem())
