@@ -241,9 +241,11 @@ bool <r.name>Sempred(Ref\<<r.ctxType>\> _localctx, int predicateIndex);
 >>
 
 RuleSempredFunction(r, actions) ::= <<
-bool <r.factory.grammar.name>::<r.name>Sempred(Ref\<<r.ctxType>\> _localctx, int predicateIndex) {
+<! Called for both lexer and parser. But only one of them is actually available. Testing for the parser directly
+   generates a warning, however. So do the check via the factory instead. !>
+bool <if (parser)><parser.name><else><lexer.name><endif>::<r.name>Sempred(Ref\<<r.ctxType>\> _localctx, int predicateIndex) {
   switch (predicateIndex) {
-    <actions: {index | case <index>: return <actions.(index)>}; separator="\n">
+    <actions: {index | case <index>: return <actions.(index)>}; separator=";\n">;
     
   default:
     break;
@@ -762,7 +764,7 @@ testShiftInRange(shiftAmount) ::= <<
 // produces smaller bytecode only when bits.ttypes contains more than two items
 bitsetBitfieldComparison(s, bits) ::= <<
 (<testShiftInRange({<offsetShift(s.varName, bits.shift)>})> &&
-  ((1L \<\< <offsetShift(s.varName, bits.shift)>) & (<bits.ttypes: {ttype | (1L \<\< <offsetShift(ttype, bits.shift, true)>)}; separator = "\n  | ">)) != 0)
+  ((1ULL \<\< <offsetShift(s.varName, bits.shift)>) & (<bits.ttypes: {ttype | (1ULL \<\< <offsetShift(ttype, bits.shift, true)>)}; separator = "\n  | ">)) != 0)
 >>
 
 isZero ::= [
@@ -823,7 +825,7 @@ setState(<w.stateNumber>);
 // ACTION STUFF
 
 ActionHeader(a, foo, chunks) ::= "<chunks>"
-Action(a, foo, chunks) ::= "<if (chunks)><chunks>;<endif>"
+Action(a, foo, chunks) ::= "<chunks>"
 
 ArgAction(a, chunks) ::= "ArgAction(a, chunks) <chunks>"
 
@@ -881,7 +883,7 @@ ListLabelRefHeader(t) ::= "<! Required but unused. !>"
 ListLabelRef(t) ::= "<ctx(t)>-><ListLabelName(t.name)>"
 
 SetAttrHeader(t) ::= "<! Required but unused. !>"
-SetAttr(s,rhsChunks) ::= "<ctx(s)>-><s.name> = <rhsChunks>"
+SetAttr(s,rhsChunks) ::= "<ctx(s)>-><s.name> = <rhsChunks>;"
 
 InputSymbolType() ::= "<file.InputSymbolType; null = {Token}> *"
 
@@ -1058,12 +1060,12 @@ ctx(actionChunk) ::= "std::dynamic_pointer_cast\<<actionChunk.ctx.name>>(_localc
 // used for left-recursive rules
 recRuleAltPredicate(ruleName,opPrec) ::= "precpred(_ctx, <opPrec>)"
 recRuleSetReturnAction(src,name) ::= "recRuleSetReturnAction(src,name) $<name>=$<src>.<name>;"
-recRuleSetStopToken() ::= "_ctx->stop = _input->LT(-1)"
+recRuleSetStopToken() ::= "_ctx->stop = _input->LT(-1);"
 
 recRuleAltStartAction(ruleName, ctxName, label) ::= <<
 _localctx = std::make_shared\<<ctxName>Context>(parentContext, parentState);
 <if (label)>_localctx-><label> = previousContext;<endif>
-pushNewRecursionContext(_localctx, startState, Rule<ruleName; format = "cap">)
+pushNewRecursionContext(_localctx, startState, Rule<ruleName; format = "cap">);
 >>
 
 // Separate context variable to avoid frequent pointer type casts.
@@ -1083,13 +1085,13 @@ pushNewRecursionContext(newContext, startState, Rule<ruleName; format = "cap">);
 recRuleReplaceContext(ctxName) ::= <<
 _localctx = std::make_shared\<<ctxName>Context>(_localctx);
 _ctx = _localctx;
-previousContext = _localctx
+previousContext = _localctx;
 >>
 
 recRuleSetPrevCtx() ::= <<
 if (!_parseListeners.empty())
   triggerExitRuleEvent();
-previousContext = _localctx
+previousContext = _localctx;
 >>
 
 /** Using a type to init value map, try to init a type; if not in table

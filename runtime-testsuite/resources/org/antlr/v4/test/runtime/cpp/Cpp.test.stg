@@ -172,7 +172,7 @@ Concat(a,b) ::= "<a><b>"
 DeclareLocal(s,v) ::= "<s> = <v>"
 
 AssertIsList(v) ::= "assert(<v>.size() >= 0);" // Use a method that exists only on a list (vector actually).
-AssignLocal(s,v) ::= "<s> = <v>"
+AssignLocal(s,v) ::= "<s> = <v>;"
 
 InitIntMember(n,v) ::= "int <n> = <v>;"
 InitBooleanMember(n,v) ::= "bool <n> = <v>;"

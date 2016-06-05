@@ -1755,7 +1755,7 @@ public class TestLeftRecursion extends BaseCppTest {
 	public void testMultipleActionsPredicatesOptions_1() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(254);
+		StringBuilder grammarBuilder = new StringBuilder(253);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s @after {std::cout << $ctx->toStringTree(this) << std::endl;} : e ;\n");
 		grammarBuilder.append("e : a=e op=('*'|'/') b=e  {}{true}?\n");
@@ -1764,7 +1764,7 @@ public class TestLeftRecursion extends BaseCppTest {
 		grammarBuilder.append("  | '(' x=e ')' {}{}\n");
 		grammarBuilder.append("  ;\n");
 		grammarBuilder.append("INT : '0'..'9'+ ;\n");
-		grammarBuilder.append("WS : (' '|'\\n') -> skip ;");
+		grammarBuilder.append("WS : (' '|'\\n') -> skip;");
 		String grammar = grammarBuilder.toString();
 
 
@@ -1781,7 +1781,7 @@ public class TestLeftRecursion extends BaseCppTest {
 	public void testMultipleActionsPredicatesOptions_2() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(254);
+		StringBuilder grammarBuilder = new StringBuilder(253);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s @after {std::cout << $ctx->toStringTree(this) << std::endl;} : e ;\n");
 		grammarBuilder.append("e : a=e op=('*'|'/') b=e  {}{true}?\n");
@@ -1790,7 +1790,7 @@ public class TestLeftRecursion extends BaseCppTest {
 		grammarBuilder.append("  | '(' x=e ')' {}{}\n");
 		grammarBuilder.append("  ;\n");
 		grammarBuilder.append("INT : '0'..'9'+ ;\n");
-		grammarBuilder.append("WS : (' '|'\\n') -> skip ;");
+		grammarBuilder.append("WS : (' '|'\\n') -> skip;");
 		String grammar = grammarBuilder.toString();
 
 
@@ -1807,7 +1807,7 @@ public class TestLeftRecursion extends BaseCppTest {
 	public void testMultipleActionsPredicatesOptions_3() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(254);
+		StringBuilder grammarBuilder = new StringBuilder(253);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s @after {std::cout << $ctx->toStringTree(this) << std::endl;} : e ;\n");
 		grammarBuilder.append("e : a=e op=('*'|'/') b=e  {}{true}?\n");
@@ -1816,7 +1816,7 @@ public class TestLeftRecursion extends BaseCppTest {
 		grammarBuilder.append("  | '(' x=e ')' {}{}\n");
 		grammarBuilder.append("  ;\n");
 		grammarBuilder.append("INT : '0'..'9'+ ;\n");
-		grammarBuilder.append("WS : (' '|'\\n') -> skip ;");
+		grammarBuilder.append("WS : (' '|'\\n') -> skip;");
 		String grammar = grammarBuilder.toString();
 
 
@@ -1918,13 +1918,13 @@ public class TestLeftRecursion extends BaseCppTest {
 		grammarBuilder.append("  | '(' e ')'   {$v = $e.v;}                       # parens\n");
 		grammarBuilder.append("  | left=e INC  {$v = $left.v + 1;}      # unary\n");
 		grammarBuilder.append("  | left=e DEC  {$v = $left.v - 1;}      # unary\n");
-		grammarBuilder.append("  | ID          {$v = 3}                                                     # anID\n");
+		grammarBuilder.append("  | ID          {$v = 3;}                                                     # anID\n");
 		grammarBuilder.append("  ;\n");
 		grammarBuilder.append("ID : 'a'..'z'+ ;\n");
 		grammarBuilder.append("INT : '0'..'9'+ ;\n");
 		grammarBuilder.append("INC : '++' ;\n");
 		grammarBuilder.append("DEC : '--' ;\n");
-		grammarBuilder.append("WS : (' '|'\\n') -> skip ;");
+		grammarBuilder.append("WS : (' '|'\\n') -> skip;");
 		String grammar = grammarBuilder.toString();
 
 
@@ -1951,13 +1951,13 @@ public class TestLeftRecursion extends BaseCppTest {
 		grammarBuilder.append("  | '(' e ')'   {$v = $e.v;}                       # parens\n");
 		grammarBuilder.append("  | left=e INC  {$v = $left.v + 1;}      # unary\n");
 		grammarBuilder.append("  | left=e DEC  {$v = $left.v - 1;}      # unary\n");
-		grammarBuilder.append("  | ID          {$v = 3}                                                     # anID\n");
+		grammarBuilder.append("  | ID          {$v = 3;}                                                     # anID\n");
 		grammarBuilder.append("  ;\n");
 		grammarBuilder.append("ID : 'a'..'z'+ ;\n");
 		grammarBuilder.append("INT : '0'..'9'+ ;\n");
 		grammarBuilder.append("INC : '++' ;\n");
 		grammarBuilder.append("DEC : '--' ;\n");
-		grammarBuilder.append("WS : (' '|'\\n') -> skip ;");
+		grammarBuilder.append("WS : (' '|'\\n') -> skip;");
 		String grammar = grammarBuilder.toString();
 
 
@@ -1984,13 +1984,13 @@ public class TestLeftRecursion extends BaseCppTest {
 		grammarBuilder.append("  | '(' e ')'   {$v = $e.v;}                       # parens\n");
 		grammarBuilder.append("  | left=e INC  {$v = $left.v + 1;}      # unary\n");
 		grammarBuilder.append("  | left=e DEC  {$v = $left.v - 1;}      # unary\n");
-		grammarBuilder.append("  | ID          {$v = 3}                                                     # anID\n");
+		grammarBuilder.append("  | ID          {$v = 3;}                                                     # anID\n");
 		grammarBuilder.append("  ;\n");
 		grammarBuilder.append("ID : 'a'..'z'+ ;\n");
 		grammarBuilder.append("INT : '0'..'9'+ ;\n");
 		grammarBuilder.append("INC : '++' ;\n");
 		grammarBuilder.append("DEC : '--' ;\n");
-		grammarBuilder.append("WS : (' '|'\\n') -> skip ;");
+		grammarBuilder.append("WS : (' '|'\\n') -> skip;");
 		String grammar = grammarBuilder.toString();
 
 
@@ -2017,13 +2017,13 @@ public class TestLeftRecursion extends BaseCppTest {
 		grammarBuilder.append("  | '(' e ')'   {$v = $e.v;}                       # parens\n");
 		grammarBuilder.append("  | left=e INC  {$v = $left.v + 1;}      # unary\n");
 		grammarBuilder.append("  | left=e DEC  {$v = $left.v - 1;}      # unary\n");
-		grammarBuilder.append("  | ID          {$v = 3}                                                     # anID\n");
+		grammarBuilder.append("  | ID          {$v = 3;}                                                     # anID\n");
 		grammarBuilder.append("  ;\n");
 		grammarBuilder.append("ID : 'a'..'z'+ ;\n");
 		grammarBuilder.append("INT : '0'..'9'+ ;\n");
 		grammarBuilder.append("INC : '++' ;\n");
 		grammarBuilder.append("DEC : '--' ;\n");
-		grammarBuilder.append("WS : (' '|'\\n') -> skip ;");
+		grammarBuilder.append("WS : (' '|'\\n') -> skip;");
 		String grammar = grammarBuilder.toString();
 
 
