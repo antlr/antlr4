@@ -187,7 +187,7 @@ dumpActions(recog, argFuncs, actionFuncs, sempredFuncs) ::= <<
 <if(actionFuncs)>
 func (l *<lexer.name>) Action(localctx antlr.RuleContext, ruleIndex, actionIndex int) {
 	switch ruleIndex {
-		<recog.actionFuncs.values:{f|case <f.ruleIndex>:
+		<recog.actionFuncs.values:{f | case <f.ruleIndex>:
 		<if(!f.isRuleContext)>
 		var t *<f.name; format="cap">Context = nil
 		if localctx != nil { t = localctx.(*<f.ctxType>) \}
@@ -206,7 +206,7 @@ func (l *<lexer.name>) Action(localctx antlr.RuleContext, ruleIndex, actionIndex
 <if(sempredFuncs)>
 func (l *<lexer.name>) Sempred(localctx antlr.RuleContext, ruleIndex, predIndex int) bool {
 	switch ruleIndex {
-		<recog.sempredFuncs.values:{f| case <f.ruleIndex>:
+		<recog.sempredFuncs.values:{f | case <f.ruleIndex>:
 			<if(!f.isRuleContext)>
 			var t *<f.name; format="cap">Context = nil
 			if localctx != nil { t = localctx.(*<f.ctxType>) \}
@@ -231,7 +231,7 @@ RuleActionFunction(r, actions) ::= <<
 
 func (l *<lexer.name>) <r.name; format="cap">_Action(localctx <if(r.isRuleContext)>antlr.RuleContext<else>*<r.ctxType><endif>, actionIndex int) {
 	switch actionIndex {
-	<actions:{index|
+	<actions:{index |
 case <index>:
 	<actions.(index)>
 	break}; separator="\n">
@@ -247,7 +247,7 @@ case <index>:
 RuleSempredFunction(r, actions) ::= <<
 func (p *<if(parser)><parser.name><else><lexer.name><endif>) <r.name; format="cap">_Sempred(localctx antlr.RuleContext, predIndex int) bool {
 	switch predIndex {
-		<actions:{index| case <index>:
+		<actions:{index | case <index>:
 	return <actions.(index)>;}; separator="\n">
 		default:
 			panic("No predicate with index:" + fmt.Sprint(predIndex))
@@ -360,7 +360,7 @@ p.SetState(<choice.stateNumber>)
 <if(choice.label)><labelref(choice.label)> = p.GetTokenStream().LT(1)<endif>
 <preamble; separator="\n">
 switch p.GetTokenStream().LA(1) {
-<choice.altLook,alts:{look,alt| <cases(ttypes=look)>
+<choice.altLook,alts:{look,alt | <cases(ttypes=look)>
 	<alt>
 	break }; separator="\n">
 default:
@@ -371,7 +371,7 @@ default:
 LL1OptionalBlock(choice, alts, error) ::= <<
 p.SetState(<choice.stateNumber>)
 switch p.GetTokenStream().LA(1) {
-<choice.altLook,alts:{look,alt| <cases(ttypes=look)>
+<choice.altLook,alts:{look,alt | <cases(ttypes=look)>
 	<alt>
 	break }; separator="\n">
 default:
@@ -462,7 +462,7 @@ p.GetErrorHandler().Sync(p)
 _alt := 1<if(!choice.ast.greedy)>+1<endif>
 for ok := true; ok; ok = _alt != <choice.exitAlt> && _alt != antlr.ATNInvalidAltNumber {
 	switch _alt {
-	<alts:{alt|
+	<alts:{alt |
 case <i><if(!choice.ast.greedy)>+1<endif>:
 	<alt>
 	break }; separator="\n">
@@ -917,7 +917,7 @@ var serializedLexerAtn = <atn>
 var lexerDeserializer = antlr.NewATNDeserializer(nil)
 var lexerAtn = lexerDeserializer.DeserializeFromUInt16( serializedLexerAtn )
 
-var lexerModeNames = []string{ <lexer.modes:{m| "<m>"}; separator=", ", wrap, anchor> }
+var lexerModeNames = []string{ <lexer.modes:{m | "<m>"}; separator=", ", wrap, anchor> }
 var lexerLiteralNames = []string{ <lexer.literalNames:{t | <t>}; null="\"\"", separator=", ", wrap, anchor> }
 var lexerSymbolicNames = []string{ <lexer.symbolicNames:{t | <t>}; null="\"\"", separator=", ", wrap, anchor> }
 var lexerRuleNames = []string{ <lexer.ruleNames:{r | "<r>"}; separator=", ", wrap, anchor> }
@@ -958,7 +958,7 @@ const (
 )
 
 const (
-	<rest(lexer.modes):{m| <lexer.name><m> = <i>}; separator="\n">
+	<rest(lexer.modes):{m | <lexer.name><m> = <i>}; separator="\n">
 )
 
 
