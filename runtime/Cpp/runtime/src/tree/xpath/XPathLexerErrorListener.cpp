@@ -31,6 +31,7 @@
 
 #include "XPathLexerErrorListener.h"
 
+using namespace antlr4;
 using namespace antlr4::tree::xpath;
 
 void XPathLexerErrorListener::syntaxError(IRecognizer * /*recognizer*/, Ref<Token> /*offendingSymbol*/, size_t /*line*/,

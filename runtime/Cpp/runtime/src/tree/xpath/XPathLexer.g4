@@ -26,7 +26,7 @@ BANG	 : '!' ;
 
 ID			:	NameStartChar NameChar*
 				{
-				if (std::isupper(getText()[0]))
+				if (isupper(getText()[0]))
 				  setType(TOKEN_REF);
 				else
 				  setType(RULE_REF);

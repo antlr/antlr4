@@ -56,7 +56,7 @@ void XPathLexer::action(Ref<RuleContext> context, int ruleIndex, int actionIndex
 void XPathLexer::IDAction(Ref<RuleContext> /*context*/, int actionIndex) {
   switch (actionIndex) {
     case 0: 
-    				if (std::isupper(getText()[0]))
+    				if (isupper(getText()[0]))
     				  setType(TOKEN_REF);
     				else
     				  setType(RULE_REF);
