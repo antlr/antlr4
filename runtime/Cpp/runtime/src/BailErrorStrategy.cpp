@@ -74,7 +74,7 @@ Ref<Token> BailErrorStrategy::recoverInline(Parser *recognizer)  {
     throw e;
   } catch (InputMismatchException &inner) {
 #if defined(_MSC_FULL_VER) && _MSC_FULL_VER < 190023026
-    throw throw ParseCancellationException(inner.what());
+    throw ParseCancellationException(inner.what());
 #else
     std::throw_with_nested(ParseCancellationException());
 #endif

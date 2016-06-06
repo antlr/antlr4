@@ -29,6 +29,7 @@ int main(int argc, const char * argv[]) {
 
   std::wstring s = antlrcpp::s2ws(tree->toStringTree(&parser)) + L"\n";
   OutputDebugString(s.data());
+  std::wcout << "Parse Tree: " << s << std::endl;
 
   return 0;
 }
