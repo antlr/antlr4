@@ -33,7 +33,7 @@
 
 #include "tree/pattern/TextChunk.h"
 
-using namespace org::antlr::v4::runtime::tree::pattern;
+using namespace antlr4::tree::pattern;
 
 TextChunk::TextChunk(const std::string &text) : text(text) {
   if (text == "") {

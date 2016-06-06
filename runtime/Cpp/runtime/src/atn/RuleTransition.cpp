@@ -32,7 +32,7 @@
 #include "atn/RuleStartState.h"
 #include "atn/RuleTransition.h"
 
-using namespace org::antlr::v4::runtime::atn;
+using namespace antlr4::atn;
 
 RuleTransition::RuleTransition(RuleStartState *ruleStart, int ruleIndex, ATNState *followState)
   : RuleTransition(ruleStart, ruleIndex, 0, followState) {

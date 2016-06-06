@@ -33,17 +33,11 @@
 
 #include "tree/TerminalNode.h"
 
-namespace org {
-namespace antlr {
-namespace v4 {
-namespace runtime {
+namespace antlr4 {
 namespace tree {
 
   class ANTLR4CPP_PUBLIC ErrorNode : public virtual TerminalNode {
   };
 
 } // namespace tree
-} // namespace runtime
-} // namespace v4
-} // namespace antlr
-} // namespace org
+} // namespace antlr4

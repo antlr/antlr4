@@ -49,8 +49,8 @@
 
 #include "atn/LexerATNSimulator.h"
 
-using namespace org::antlr::v4::runtime;
-using namespace org::antlr::v4::runtime::atn;
+using namespace antlr4;
+using namespace antlr4::atn;
 using namespace antlrcpp;
 
 void LexerATNSimulator::SimState::reset() {
@@ -661,5 +661,5 @@ void LexerATNSimulator::InitializeInstanceFields() {
   _startIndex = -1;
   _line = 1;
   _charPositionInLine = 0;
-  _mode = org::antlr::v4::runtime::Lexer::DEFAULT_MODE;
+  _mode = antlr4::Lexer::DEFAULT_MODE;
 }

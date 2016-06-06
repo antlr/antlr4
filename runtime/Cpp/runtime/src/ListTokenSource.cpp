@@ -35,7 +35,7 @@
 
 #include "ListTokenSource.h"
 
-using namespace org::antlr::v4::runtime;
+using namespace antlr4;
 
 int ListTokenSource::getCharPositionInLine() {
   if (i < tokens.size()) {

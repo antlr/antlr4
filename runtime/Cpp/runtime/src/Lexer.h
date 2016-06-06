@@ -36,10 +36,7 @@
 #include "CharStream.h"
 #include "Token.h"
 
-namespace org {
-namespace antlr {
-namespace v4 {
-namespace runtime {
+namespace antlr4 {
 
   /// A lexer is recognizer that draws input symbols from a character stream.
   /// lexer grammars result in a subclass of this object. A Lexer object
@@ -229,7 +226,4 @@ namespace runtime {
     void InitializeInstanceFields();
   };
 
-} // namespace runtime
-} // namespace v4
-} // namespace antlr
-} // namespace org
+} // namespace antlr4

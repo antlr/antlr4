@@ -33,10 +33,7 @@
 
 #include "TokenStream.h"
 
-namespace org {
-namespace antlr {
-namespace v4 {
-namespace runtime {
+namespace antlr4 {
 
   class ANTLR4CPP_PUBLIC UnbufferedTokenStream : public TokenStream {
   public:
@@ -138,7 +135,4 @@ namespace runtime {
     void InitializeInstanceFields();
   };
 
-} // namespace runtime
-} // namespace v4
-} // namespace antlr
-} // namespace org
+} // namespace antlr4

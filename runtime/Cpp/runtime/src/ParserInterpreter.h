@@ -36,10 +36,7 @@
 #include "support/BitSet.h"
 #include "atn/PredictionContext.h"
 
-namespace org {
-namespace antlr {
-namespace v4 {
-namespace runtime {
+namespace antlr4 {
 
   /// <summary>
   /// A parser simulator that mimics what ANTLR's generated
@@ -204,7 +201,4 @@ namespace runtime {
     Ref<dfa::Vocabulary> _vocabulary;
   };
 
-} // namespace runtime
-} // namespace v4
-} // namespace antlr
-} // namespace org
+} // namespace antlr4

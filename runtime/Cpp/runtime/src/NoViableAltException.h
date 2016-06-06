@@ -35,10 +35,7 @@
 #include "Token.h"
 #include "atn/ATNConfigSet.h"
 
-namespace org {
-namespace antlr {
-namespace v4 {
-namespace runtime {
+namespace antlr4 {
 
   /// Indicates that the parser could not decide which of two or more paths
   /// to take based upon the remaining input. It tracks the starting token
@@ -65,7 +62,4 @@ namespace runtime {
    
   };
 
-} // namespace runtime
-} // namespace v4
-} // namespace antlr
-} // namespace org
+} // namespace antlr4

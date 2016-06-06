@@ -43,7 +43,7 @@
 
 #include "Recognizer.h"
 
-using namespace org::antlr::v4::runtime;
+using namespace antlr4;
 
 std::map<Ref<dfa::Vocabulary>, std::map<std::string, size_t>> Recognizer::_tokenTypeMapCache;
 std::map<std::vector<std::string>, std::map<std::string, size_t>> Recognizer::_ruleIndexMapCache;

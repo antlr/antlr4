@@ -34,10 +34,7 @@
 #include "ProxyErrorListener.h"
 #include "IRecognizer.h"
 
-namespace org {
-namespace antlr {
-namespace v4 {
-namespace runtime {
+namespace antlr4 {
 
   class ANTLR4CPP_PUBLIC Recognizer : public IRecognizer {
   public:
@@ -192,7 +189,4 @@ namespace runtime {
 
   };
 
-} // namespace runtime
-} // namespace v4
-} // namespace antlr
-} // namespace org
+} // namespace antlr4

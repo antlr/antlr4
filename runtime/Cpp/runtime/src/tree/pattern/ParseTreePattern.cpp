@@ -31,46 +31,47 @@
 
 #include "tree/pattern/ParseTreePatternMatcher.h"
 #include "tree/pattern/ParseTreeMatch.h"
-//#include "XPath.h"
+
+#include "tree/xpath/XPath.h"
+#include "tree/xpath/XPathElement.h"
 
 #include "tree/pattern/ParseTreePattern.h"
 
-using namespace org::antlr::v4::runtime::tree;
-using namespace org::antlr::v4::runtime::tree::pattern;
+using namespace antlr4::tree;
+using namespace antlr4::tree::pattern;
 
 ParseTreePattern::ParseTreePattern(ParseTreePatternMatcher *matcher, const std::string &pattern, int patternRuleIndex,
   Ref<ParseTree> patternTree)
-  : patternRuleIndex(patternRuleIndex), pattern(pattern), patternTree(patternTree), matcher(matcher) {
+  : patternRuleIndex(patternRuleIndex), _pattern(pattern), _patternTree(patternTree), _matcher(matcher) {
 }
 
 ParseTreeMatch ParseTreePattern::match(Ref<ParseTree> tree) {
-  return matcher->match(tree, *this);
+  return _matcher->match(tree, *this);
 }
 
 bool ParseTreePattern::matches(Ref<ParseTree> tree) {
-  return matcher->match(tree, *this).succeeded();
+  return _matcher->match(tree, *this).succeeded();
 }
 
-/*
-std::vector<ParseTreeMatch*> ParseTreePattern::findAll(ParseTree *tree, const std::string &xpath) {
-  std::vector<ParseTree*> subtrees = xpath::XPath::findAll(tree, xpath, matcher->getParser());
-  std::vector<ParseTreeMatch*> matches = std::vector<ParseTreeMatch*>();
+std::vector<ParseTreeMatch> ParseTreePattern::findAll(Ref<ParseTree> tree, const std::string &xpath) {
+  std::vector<Ref<ParseTree>> subtrees = xpath::XPath::findAll(tree, xpath, _matcher->getParser());
+  std::vector<ParseTreeMatch> matches;
   for (auto t : subtrees) {
-    ParseTreeMatch *aMatch = match(t);
-    if (aMatch->succeeded()) {
+    ParseTreeMatch aMatch = match(t);
+    if (aMatch.succeeded()) {
       matches.push_back(aMatch);
     }
   }
   return matches;
 }
-*/
+
 
 ParseTreePatternMatcher *ParseTreePattern::getMatcher() const {
-  return matcher;
+  return _matcher;
 }
 
 std::string ParseTreePattern::getPattern() const {
-  return pattern;
+  return _pattern;
 }
 
 int ParseTreePattern::getPatternRuleIndex() const {
@@ -78,5 +79,5 @@ int ParseTreePattern::getPatternRuleIndex() const {
 }
 
 Ref<ParseTree> ParseTreePattern::getPatternTree() const {
-  return patternTree;
+  return _patternTree;
 }

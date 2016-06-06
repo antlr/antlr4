@@ -47,7 +47,7 @@ LexerFileHeader(file, lexer, namedActions) ::= <<
 
 <namedActions.postinclude>
 
-using namespace org::antlr::v4::runtime;
+using namespace antlr4;
 
 <if(file.genPackage)>namespace <file.genPackage> {<endif>
 
@@ -67,7 +67,7 @@ LexerFile(file, lexer, namedActions) ::= <<
 
 <namedActions.postinclude>
 
-using namespace org::antlr::v4::runtime;
+using namespace antlr4;
 
 <if (file.genPackage)>using namespace <file.genPackage>;<endif>
 
@@ -86,7 +86,7 @@ ParserFileHeader(file, parser, namedActions, contextSuperClass) ::= <<
 
 <namedActions.postinclude>
 
-using namespace org::antlr::v4::runtime;
+using namespace antlr4;
 
 <if (file.genPackage)>namespace <file.genPackage> {<endif>
 
@@ -197,7 +197,7 @@ namespace <file.genPackage> {
 /**
  * This interface defines an abstract listener for a parse tree produced by <file.parserName>.
  */
-class <file.grammarName>Listener : public org::antlr::v4::runtime::tree::ParseTreeListener {
+class <file.grammarName>Listener : public antlr4::tree::ParseTreeListener {
 public:
 <namedActions.listenerdeclarations>
 
@@ -316,7 +316,7 @@ VisitorFileHeader(file, header, namedActions) ::= <<
  * operations with no return type.
  */
 template \<typename T>
-class <file.grammarName>Visitor : public org::antlr::v4::runtime::tree::ParseTreeVisitor\<T> {
+class <file.grammarName>Visitor : public antlr4::tree::ParseTreeVisitor\<T> {
 public:
   <namedActions.visitordeclarations>
   

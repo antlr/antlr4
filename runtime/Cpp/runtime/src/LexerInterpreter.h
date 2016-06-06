@@ -34,10 +34,7 @@
 #include "Lexer.h"
 #include "atn/PredictionContext.h"
 
-namespace org {
-namespace antlr {
-namespace v4 {
-namespace runtime {
+namespace antlr4 {
 
   class ANTLR4CPP_PUBLIC LexerInterpreter : public Lexer {
   public:
@@ -75,7 +72,4 @@ namespace runtime {
     Ref<dfa::Vocabulary> _vocabulary;
   };
 
-} // namespace runtime
-} // namespace v4
-} // namespace antlr
-} // namespace org
+} // namespace antlr4

@@ -33,7 +33,7 @@
 
 #include "tree/pattern/TagChunk.h"
 
-using namespace org::antlr::v4::runtime::tree::pattern;
+using namespace antlr4::tree::pattern;
 
 TagChunk::TagChunk(const std::string &tag) : TagChunk("", tag) {
 }

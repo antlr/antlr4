@@ -31,7 +31,7 @@
 
 #include "atn/PlusBlockStartState.h"
 
-using namespace org::antlr::v4::runtime::atn;
+using namespace antlr4::atn;
 
 int PlusBlockStartState::getStateType() {
   return PLUS_BLOCK_START;

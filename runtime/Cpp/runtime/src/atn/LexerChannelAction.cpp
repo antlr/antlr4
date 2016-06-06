@@ -34,8 +34,8 @@
 
 #include "atn/LexerChannelAction.h"
 
-using namespace org::antlr::v4::runtime::atn;
-using namespace org::antlr::v4::runtime::misc;
+using namespace antlr4::atn;
+using namespace antlr4::misc;
 
 LexerChannelAction::LexerChannelAction(int channel) : _channel(channel) {
 }

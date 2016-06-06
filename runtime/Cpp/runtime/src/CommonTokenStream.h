@@ -33,10 +33,7 @@
 
 #include "BufferedTokenStream.h"
 
-namespace org {
-namespace antlr {
-namespace v4 {
-namespace runtime {
+namespace antlr4 {
 
   /**
    * This class extends {@link BufferedTokenStream} with functionality to filter
@@ -109,7 +106,4 @@ namespace runtime {
     void InitializeInstanceFields();
   };
 
-} // namespace runtime
-} // namespace v4
-} // namespace antlr
-} // namespace org
+} // namespace antlr4

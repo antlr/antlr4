@@ -33,10 +33,7 @@
 
 #include "antlr4-common.h"
 
-namespace org {
-namespace antlr {
-namespace v4 {
-namespace runtime {
+namespace antlr4 {
 namespace tree {
 
   /** This interface describes the minimal core of methods triggered
@@ -65,7 +62,4 @@ namespace tree {
   };
 
 } // namespace tree
-} // namespace runtime
-} // namespace v4
-} // namespace antlr
-} // namespace org
+} // namespace antlr4

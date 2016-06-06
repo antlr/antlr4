@@ -37,7 +37,7 @@
 
 #include "atn/ATNConfigSet.h"
 
-using namespace org::antlr::v4::runtime::atn;
+using namespace antlr4::atn;
 using namespace antlrcpp;
 
 size_t SimpleATNConfigHasher::operator()(const Ref<ATNConfig> &k) const {

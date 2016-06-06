@@ -37,10 +37,7 @@ namespace antlrcpp {
   class BitSet;
 }
 
-namespace org {
-namespace antlr {
-namespace v4 {
-namespace runtime {
+namespace antlr4 {
 
   /// How to emit recognition errors (an interface in Java).
   class ANTLR4CPP_PUBLIC ANTLRErrorListener {
@@ -193,7 +190,4 @@ namespace runtime {
       int prediction, Ref<atn::ATNConfigSet> configs) = 0;
   };
 
-} // namespace runtime
-} // namespace v4
-} // namespace antlr
-} // namespace org
+} // namespace antlr4

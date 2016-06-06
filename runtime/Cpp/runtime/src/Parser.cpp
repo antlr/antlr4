@@ -51,7 +51,7 @@
 
 #include "Parser.h"
 
-using namespace org::antlr::v4::runtime;
+using namespace antlr4;
 using namespace antlrcpp;
 
 std::map<std::vector<uint16_t>, atn::ATN> Parser::bypassAltsAtnCache;

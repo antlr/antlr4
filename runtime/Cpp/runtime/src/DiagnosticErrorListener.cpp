@@ -38,7 +38,7 @@
 
 #include "DiagnosticErrorListener.h"
 
-using namespace org::antlr::v4::runtime;
+using namespace antlr4;
 
 DiagnosticErrorListener::DiagnosticErrorListener() : DiagnosticErrorListener(true) {
 }

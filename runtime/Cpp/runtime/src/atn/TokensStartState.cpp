@@ -31,7 +31,7 @@
 
 #include "atn/TokensStartState.h"
 
-using namespace org::antlr::v4::runtime::atn;
+using namespace antlr4::atn;
 
 int TokensStartState::getStateType() {
   return TOKEN_START;

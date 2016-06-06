@@ -31,7 +31,7 @@
 
 #include "atn/BasicBlockStartState.h"
 
-using namespace org::antlr::v4::runtime::atn;
+using namespace antlr4::atn;
 
 int BasicBlockStartState::getStateType() {
   return BLOCK_START;

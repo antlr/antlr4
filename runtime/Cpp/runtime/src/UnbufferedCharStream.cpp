@@ -36,7 +36,7 @@
 #include "UnbufferedCharStream.h"
 
 using namespace antlrcpp;
-using namespace org::antlr::v4::runtime;
+using namespace antlr4;
 
 UnbufferedCharStream::UnbufferedCharStream(std::wistream &input) : _input(input) {
   InitializeInstanceFields();

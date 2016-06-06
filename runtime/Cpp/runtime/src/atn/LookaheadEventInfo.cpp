@@ -31,8 +31,8 @@
 
 #include "atn/LookaheadEventInfo.h"
 
-using namespace org::antlr::v4::runtime;
-using namespace org::antlr::v4::runtime::atn;
+using namespace antlr4;
+using namespace antlr4::atn;
 
 LookaheadEventInfo::LookaheadEventInfo(int decision, Ref<ATNConfigSet> configs, int predictedAlt, TokenStream *input,
   int startIndex, int stopIndex, bool fullCtx)

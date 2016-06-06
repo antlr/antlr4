@@ -52,9 +52,9 @@
 
 #include "tree/pattern/ParseTreePatternMatcher.h"
 
-using namespace org::antlr::v4::runtime;
-using namespace org::antlr::v4::runtime::tree;
-using namespace org::antlr::v4::runtime::tree::pattern;
+using namespace antlr4;
+using namespace antlr4::tree;
+using namespace antlr4::tree::pattern;
 using namespace antlrcpp;
 
 ParseTreePatternMatcher::CannotInvokeStartRule::CannotInvokeStartRule(const RuntimeException &e) : RuntimeException(e.what()) {

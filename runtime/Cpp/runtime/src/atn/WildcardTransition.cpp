@@ -33,7 +33,7 @@
 
 #include "atn/WildcardTransition.h"
 
-using namespace org::antlr::v4::runtime::atn;
+using namespace antlr4::atn;
 
 WildcardTransition::WildcardTransition(ATNState *target) : Transition(target) {
 }

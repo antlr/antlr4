@@ -36,8 +36,8 @@
 
 #include "misc/IntervalSet.h"
 
-using namespace org::antlr::v4::runtime;
-using namespace org::antlr::v4::runtime::misc;
+using namespace antlr4;
+using namespace antlr4::misc;
 
 IntervalSet const IntervalSet::COMPLETE_CHAR_SET = []() {
   IntervalSet complete = IntervalSet::of(Lexer::MIN_CHAR_VALUE, Lexer::MAX_CHAR_VALUE);
@@ -60,7 +60,7 @@ IntervalSet::IntervalSet(const std::vector<Interval> &intervals) : IntervalSet()
 }
 
 IntervalSet::IntervalSet(const IntervalSet &set) : IntervalSet() {
-  _intervals = set._intervals;
+  addAll(set);
 }
 
 IntervalSet::IntervalSet(int n, ...) : IntervalSet() {

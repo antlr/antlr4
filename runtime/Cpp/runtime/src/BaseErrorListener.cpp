@@ -32,7 +32,7 @@
 #include "BaseErrorListener.h"
 #include "RecognitionException.h"
 
-using namespace org::antlr::v4::runtime;
+using namespace antlr4;
 
 void BaseErrorListener::syntaxError(IRecognizer * /*recognizer*/, Ref<Token> /*offendingSymbol*/, size_t /*line*/,
   int /*charPositionInLine*/, const std::string &/*msg*/, std::exception_ptr /*e*/) {

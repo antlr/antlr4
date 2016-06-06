@@ -31,7 +31,7 @@
 
 #include "misc/MurmurHash.h"
 
-using namespace org::antlr::v4::runtime::misc;
+using namespace antlr4::misc;
 
 // A variation of the MurmurHash3 implementation (https://github.com/aappleby/smhasher/blob/master/src/MurmurHash3.cpp)
 // Here we unrolled the loop used there into individual calls to update(), as we usually hash object fields

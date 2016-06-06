@@ -33,10 +33,7 @@
 
 #include "antlr4-common.h"
 
-namespace org {
-namespace antlr {
-namespace v4 {
-namespace runtime {
+namespace antlr4 {
 namespace tree {
 namespace pattern {
 
@@ -87,7 +84,7 @@ namespace pattern {
 
     // A full blown XPath implementation just for this single function which is nowhere used?
     // Readd the XPath stuff from ANTLR if you really need that.
-    //virtual std::vector<ParseTreeMatch*> findAll(ParseTree *tree, const std::string &xpath);
+    virtual std::vector<ParseTreeMatch> findAll(Ref<ParseTree> tree, const std::string &xpath);
 
     /// <summary>
     /// Get the <seealso cref="ParseTreePatternMatcher"/> which created this tree pattern.
@@ -121,23 +118,18 @@ namespace pattern {
   private:
     const int patternRuleIndex;
 
-    /// <summary>
     /// This is the backing field for <seealso cref="#getPattern()"/>.
-    /// </summary>
-    const std::string pattern;
+    const std::string _pattern;
 
     /// This is the backing field for <seealso cref="#getPatternTree()"/>.
-    Ref<ParseTree> patternTree;
+    Ref<ParseTree> _patternTree;
 
     /// <summary>
     /// This is the backing field for <seealso cref="#getMatcher()"/>.
     /// </summary>
-    ParseTreePatternMatcher *const matcher;
+    ParseTreePatternMatcher *const _matcher;
   };
 
 } // namespace pattern
 } // namespace tree
-} // namespace runtime
-} // namespace v4
-} // namespace antlr
-} // namespace org
+} // namespace antlr4

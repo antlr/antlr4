@@ -38,7 +38,7 @@
 
 #include "LexerInterpreter.h"
 
-using namespace org::antlr::v4::runtime;
+using namespace antlr4;
 
 LexerInterpreter::LexerInterpreter(const std::string &grammarFileName, const std::vector<std::string> &tokenNames,
   const std::vector<std::string> &ruleNames, const std::vector<std::string> &modeNames, const atn::ATN &atn,

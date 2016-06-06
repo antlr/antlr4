@@ -33,9 +33,9 @@
 
 #include "tree/ErrorNodeImpl.h"
 
-using namespace org::antlr::v4::runtime;
-using namespace org::antlr::v4::runtime::misc;
-using namespace org::antlr::v4::runtime::tree;
+using namespace antlr4;
+using namespace antlr4::misc;
+using namespace antlr4::tree;
 
 ErrorNodeImpl::ErrorNodeImpl(Ref<Token> token) : TerminalNodeImpl(token) {
 }

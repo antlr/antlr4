@@ -40,9 +40,9 @@
 
 #include "atn/PredictionContext.h"
 
-using namespace org::antlr::v4::runtime;
-using namespace org::antlr::v4::runtime::misc;
-using namespace org::antlr::v4::runtime::atn;
+using namespace antlr4;
+using namespace antlr4::misc;
+using namespace antlr4::atn;
 
 using namespace antlrcpp;
 

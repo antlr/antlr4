@@ -31,7 +31,7 @@
 
 #include "atn/RuleStopState.h"
 
-using namespace org::antlr::v4::runtime::atn;
+using namespace antlr4::atn;
 
 int RuleStopState::getStateType() {
   return RULE_STOP;

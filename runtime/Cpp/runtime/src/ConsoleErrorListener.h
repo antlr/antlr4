@@ -33,10 +33,7 @@
 
 #include "BaseErrorListener.h"
 
-namespace org {
-namespace antlr {
-namespace v4 {
-namespace runtime {
+namespace antlr4 {
 
   class ANTLR4CPP_PUBLIC ConsoleErrorListener : public BaseErrorListener {
   public:
@@ -61,7 +58,4 @@ namespace runtime {
                              const std::string &msg, std::exception_ptr e) override;
   };
 
-} // namespace runtime
-} // namespace v4
-} // namespace antlr
-} // namespace org
+} // namespace antlr4

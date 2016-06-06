@@ -33,7 +33,7 @@
 
 #include "InputMismatchException.h"
 
-using namespace org::antlr::v4::runtime;
+using namespace antlr4;
 
 InputMismatchException::InputMismatchException(Parser *recognizer)
   : RecognitionException(recognizer, recognizer->getInputStream(), recognizer->getContext(),

@@ -582,12 +582,6 @@
 		276E5F741CDB57AA003FF4B4 /* Predicate.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5CD11CDB57AA003FF4B4 /* Predicate.h */; };
 		276E5F751CDB57AA003FF4B4 /* Predicate.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5CD11CDB57AA003FF4B4 /* Predicate.h */; };
 		276E5F761CDB57AA003FF4B4 /* Predicate.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5CD11CDB57AA003FF4B4 /* Predicate.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		276E5F771CDB57AA003FF4B4 /* TestRig.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5CD21CDB57AA003FF4B4 /* TestRig.cpp */; };
-		276E5F781CDB57AA003FF4B4 /* TestRig.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5CD21CDB57AA003FF4B4 /* TestRig.cpp */; };
-		276E5F791CDB57AA003FF4B4 /* TestRig.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5CD21CDB57AA003FF4B4 /* TestRig.cpp */; };
-		276E5F7A1CDB57AA003FF4B4 /* TestRig.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5CD31CDB57AA003FF4B4 /* TestRig.h */; };
-		276E5F7B1CDB57AA003FF4B4 /* TestRig.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5CD31CDB57AA003FF4B4 /* TestRig.h */; };
-		276E5F7C1CDB57AA003FF4B4 /* TestRig.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5CD31CDB57AA003FF4B4 /* TestRig.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		276E5F7D1CDB57AA003FF4B4 /* NoViableAltException.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5CD41CDB57AA003FF4B4 /* NoViableAltException.cpp */; };
 		276E5F7E1CDB57AA003FF4B4 /* NoViableAltException.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5CD41CDB57AA003FF4B4 /* NoViableAltException.cpp */; };
 		276E5F7F1CDB57AA003FF4B4 /* NoViableAltException.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5CD41CDB57AA003FF4B4 /* NoViableAltException.cpp */; };
@@ -836,6 +830,66 @@
 		27AC52D01CE773A80093AAAB /* antlr4-runtime.h in Headers */ = {isa = PBXBuildFile; fileRef = 27AC52CF1CE773A80093AAAB /* antlr4-runtime.h */; };
 		27AC52D11CE773A80093AAAB /* antlr4-runtime.h in Headers */ = {isa = PBXBuildFile; fileRef = 27AC52CF1CE773A80093AAAB /* antlr4-runtime.h */; };
 		27AC52D21CE773A80093AAAB /* antlr4-runtime.h in Headers */ = {isa = PBXBuildFile; fileRef = 27AC52CF1CE773A80093AAAB /* antlr4-runtime.h */; };
+		27DB449D1D045537007E790B /* XPath.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 27DB448B1D045537007E790B /* XPath.cpp */; };
+		27DB449E1D045537007E790B /* XPath.h in Headers */ = {isa = PBXBuildFile; fileRef = 27DB448C1D045537007E790B /* XPath.h */; };
+		27DB449F1D045537007E790B /* XPathElement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 27DB448D1D045537007E790B /* XPathElement.cpp */; };
+		27DB44A01D045537007E790B /* XPathElement.h in Headers */ = {isa = PBXBuildFile; fileRef = 27DB448E1D045537007E790B /* XPathElement.h */; };
+		27DB44A11D045537007E790B /* XPathLexerErrorListener.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 27DB448F1D045537007E790B /* XPathLexerErrorListener.cpp */; };
+		27DB44A21D045537007E790B /* XPathLexerErrorListener.h in Headers */ = {isa = PBXBuildFile; fileRef = 27DB44901D045537007E790B /* XPathLexerErrorListener.h */; };
+		27DB44A31D045537007E790B /* XPathRuleAnywhereElement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 27DB44911D045537007E790B /* XPathRuleAnywhereElement.cpp */; };
+		27DB44A41D045537007E790B /* XPathRuleAnywhereElement.h in Headers */ = {isa = PBXBuildFile; fileRef = 27DB44921D045537007E790B /* XPathRuleAnywhereElement.h */; };
+		27DB44A51D045537007E790B /* XPathRuleElement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 27DB44931D045537007E790B /* XPathRuleElement.cpp */; };
+		27DB44A61D045537007E790B /* XPathRuleElement.h in Headers */ = {isa = PBXBuildFile; fileRef = 27DB44941D045537007E790B /* XPathRuleElement.h */; };
+		27DB44A71D045537007E790B /* XPathTokenAnywhereElement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 27DB44951D045537007E790B /* XPathTokenAnywhereElement.cpp */; };
+		27DB44A81D045537007E790B /* XPathTokenAnywhereElement.h in Headers */ = {isa = PBXBuildFile; fileRef = 27DB44961D045537007E790B /* XPathTokenAnywhereElement.h */; };
+		27DB44A91D045537007E790B /* XPathTokenElement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 27DB44971D045537007E790B /* XPathTokenElement.cpp */; };
+		27DB44AA1D045537007E790B /* XPathTokenElement.h in Headers */ = {isa = PBXBuildFile; fileRef = 27DB44981D045537007E790B /* XPathTokenElement.h */; };
+		27DB44AB1D045537007E790B /* XPathWildcardAnywhereElement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 27DB44991D045537007E790B /* XPathWildcardAnywhereElement.cpp */; };
+		27DB44AC1D045537007E790B /* XPathWildcardAnywhereElement.h in Headers */ = {isa = PBXBuildFile; fileRef = 27DB449A1D045537007E790B /* XPathWildcardAnywhereElement.h */; };
+		27DB44AD1D045537007E790B /* XPathWildcardElement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 27DB449B1D045537007E790B /* XPathWildcardElement.cpp */; };
+		27DB44AE1D045537007E790B /* XPathWildcardElement.h in Headers */ = {isa = PBXBuildFile; fileRef = 27DB449C1D045537007E790B /* XPathWildcardElement.h */; };
+		27DB44B11D0463CC007E790B /* XPathLexer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 27DB44AF1D0463CC007E790B /* XPathLexer.cpp */; };
+		27DB44B21D0463CC007E790B /* XPathLexer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 27DB44AF1D0463CC007E790B /* XPathLexer.cpp */; };
+		27DB44B31D0463CC007E790B /* XPathLexer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 27DB44AF1D0463CC007E790B /* XPathLexer.cpp */; };
+		27DB44B41D0463CC007E790B /* XPathLexer.h in Headers */ = {isa = PBXBuildFile; fileRef = 27DB44B01D0463CC007E790B /* XPathLexer.h */; };
+		27DB44B51D0463CC007E790B /* XPathLexer.h in Headers */ = {isa = PBXBuildFile; fileRef = 27DB44B01D0463CC007E790B /* XPathLexer.h */; };
+		27DB44B61D0463CC007E790B /* XPathLexer.h in Headers */ = {isa = PBXBuildFile; fileRef = 27DB44B01D0463CC007E790B /* XPathLexer.h */; };
+		27DB44B71D0463DA007E790B /* XPath.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 27DB448B1D045537007E790B /* XPath.cpp */; };
+		27DB44B81D0463DA007E790B /* XPath.h in Headers */ = {isa = PBXBuildFile; fileRef = 27DB448C1D045537007E790B /* XPath.h */; };
+		27DB44B91D0463DA007E790B /* XPathElement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 27DB448D1D045537007E790B /* XPathElement.cpp */; };
+		27DB44BA1D0463DA007E790B /* XPathElement.h in Headers */ = {isa = PBXBuildFile; fileRef = 27DB448E1D045537007E790B /* XPathElement.h */; };
+		27DB44BB1D0463DA007E790B /* XPathLexerErrorListener.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 27DB448F1D045537007E790B /* XPathLexerErrorListener.cpp */; };
+		27DB44BC1D0463DA007E790B /* XPathLexerErrorListener.h in Headers */ = {isa = PBXBuildFile; fileRef = 27DB44901D045537007E790B /* XPathLexerErrorListener.h */; };
+		27DB44BD1D0463DA007E790B /* XPathRuleAnywhereElement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 27DB44911D045537007E790B /* XPathRuleAnywhereElement.cpp */; };
+		27DB44BE1D0463DA007E790B /* XPathRuleAnywhereElement.h in Headers */ = {isa = PBXBuildFile; fileRef = 27DB44921D045537007E790B /* XPathRuleAnywhereElement.h */; };
+		27DB44BF1D0463DA007E790B /* XPathRuleElement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 27DB44931D045537007E790B /* XPathRuleElement.cpp */; };
+		27DB44C01D0463DA007E790B /* XPathRuleElement.h in Headers */ = {isa = PBXBuildFile; fileRef = 27DB44941D045537007E790B /* XPathRuleElement.h */; };
+		27DB44C11D0463DA007E790B /* XPathTokenAnywhereElement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 27DB44951D045537007E790B /* XPathTokenAnywhereElement.cpp */; };
+		27DB44C21D0463DA007E790B /* XPathTokenAnywhereElement.h in Headers */ = {isa = PBXBuildFile; fileRef = 27DB44961D045537007E790B /* XPathTokenAnywhereElement.h */; };
+		27DB44C31D0463DA007E790B /* XPathTokenElement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 27DB44971D045537007E790B /* XPathTokenElement.cpp */; };
+		27DB44C41D0463DA007E790B /* XPathTokenElement.h in Headers */ = {isa = PBXBuildFile; fileRef = 27DB44981D045537007E790B /* XPathTokenElement.h */; };
+		27DB44C51D0463DA007E790B /* XPathWildcardAnywhereElement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 27DB44991D045537007E790B /* XPathWildcardAnywhereElement.cpp */; };
+		27DB44C61D0463DA007E790B /* XPathWildcardAnywhereElement.h in Headers */ = {isa = PBXBuildFile; fileRef = 27DB449A1D045537007E790B /* XPathWildcardAnywhereElement.h */; };
+		27DB44C71D0463DA007E790B /* XPathWildcardElement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 27DB449B1D045537007E790B /* XPathWildcardElement.cpp */; };
+		27DB44C81D0463DA007E790B /* XPathWildcardElement.h in Headers */ = {isa = PBXBuildFile; fileRef = 27DB449C1D045537007E790B /* XPathWildcardElement.h */; };
+		27DB44C91D0463DB007E790B /* XPath.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 27DB448B1D045537007E790B /* XPath.cpp */; };
+		27DB44CA1D0463DB007E790B /* XPath.h in Headers */ = {isa = PBXBuildFile; fileRef = 27DB448C1D045537007E790B /* XPath.h */; };
+		27DB44CB1D0463DB007E790B /* XPathElement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 27DB448D1D045537007E790B /* XPathElement.cpp */; };
+		27DB44CC1D0463DB007E790B /* XPathElement.h in Headers */ = {isa = PBXBuildFile; fileRef = 27DB448E1D045537007E790B /* XPathElement.h */; };
+		27DB44CD1D0463DB007E790B /* XPathLexerErrorListener.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 27DB448F1D045537007E790B /* XPathLexerErrorListener.cpp */; };
+		27DB44CE1D0463DB007E790B /* XPathLexerErrorListener.h in Headers */ = {isa = PBXBuildFile; fileRef = 27DB44901D045537007E790B /* XPathLexerErrorListener.h */; };
+		27DB44CF1D0463DB007E790B /* XPathRuleAnywhereElement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 27DB44911D045537007E790B /* XPathRuleAnywhereElement.cpp */; };
+		27DB44D01D0463DB007E790B /* XPathRuleAnywhereElement.h in Headers */ = {isa = PBXBuildFile; fileRef = 27DB44921D045537007E790B /* XPathRuleAnywhereElement.h */; };
+		27DB44D11D0463DB007E790B /* XPathRuleElement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 27DB44931D045537007E790B /* XPathRuleElement.cpp */; };
+		27DB44D21D0463DB007E790B /* XPathRuleElement.h in Headers */ = {isa = PBXBuildFile; fileRef = 27DB44941D045537007E790B /* XPathRuleElement.h */; };
+		27DB44D31D0463DB007E790B /* XPathTokenAnywhereElement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 27DB44951D045537007E790B /* XPathTokenAnywhereElement.cpp */; };
+		27DB44D41D0463DB007E790B /* XPathTokenAnywhereElement.h in Headers */ = {isa = PBXBuildFile; fileRef = 27DB44961D045537007E790B /* XPathTokenAnywhereElement.h */; };
+		27DB44D51D0463DB007E790B /* XPathTokenElement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 27DB44971D045537007E790B /* XPathTokenElement.cpp */; };
+		27DB44D61D0463DB007E790B /* XPathTokenElement.h in Headers */ = {isa = PBXBuildFile; fileRef = 27DB44981D045537007E790B /* XPathTokenElement.h */; };
+		27DB44D71D0463DB007E790B /* XPathWildcardAnywhereElement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 27DB44991D045537007E790B /* XPathWildcardAnywhereElement.cpp */; };
+		27DB44D81D0463DB007E790B /* XPathWildcardAnywhereElement.h in Headers */ = {isa = PBXBuildFile; fileRef = 27DB449A1D045537007E790B /* XPathWildcardAnywhereElement.h */; };
+		27DB44D91D0463DB007E790B /* XPathWildcardElement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 27DB449B1D045537007E790B /* XPathWildcardElement.cpp */; };
+		27DB44DA1D0463DB007E790B /* XPathWildcardElement.h in Headers */ = {isa = PBXBuildFile; fileRef = 27DB449C1D045537007E790B /* XPathWildcardElement.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -1034,8 +1088,6 @@
 		276E5CCE1CDB57AA003FF4B4 /* MurmurHash.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MurmurHash.cpp; sourceTree = "<group>"; };
 		276E5CCF1CDB57AA003FF4B4 /* MurmurHash.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MurmurHash.h; sourceTree = "<group>"; };
 		276E5CD11CDB57AA003FF4B4 /* Predicate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Predicate.h; sourceTree = "<group>"; };
-		276E5CD21CDB57AA003FF4B4 /* TestRig.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TestRig.cpp; sourceTree = "<group>"; };
-		276E5CD31CDB57AA003FF4B4 /* TestRig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestRig.h; sourceTree = "<group>"; };
 		276E5CD41CDB57AA003FF4B4 /* NoViableAltException.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NoViableAltException.cpp; sourceTree = "<group>"; wrapsLines = 0; };
 		276E5CD51CDB57AA003FF4B4 /* NoViableAltException.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NoViableAltException.h; sourceTree = "<group>"; };
 		276E5CD61CDB57AA003FF4B4 /* Parser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Parser.cpp; sourceTree = "<group>"; };
@@ -1047,7 +1099,7 @@
 		276E5CDC1CDB57AA003FF4B4 /* ProxyErrorListener.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ProxyErrorListener.cpp; sourceTree = "<group>"; };
 		276E5CDD1CDB57AA003FF4B4 /* ProxyErrorListener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProxyErrorListener.h; sourceTree = "<group>"; };
 		276E5CDE1CDB57AA003FF4B4 /* RecognitionException.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RecognitionException.cpp; sourceTree = "<group>"; };
-		276E5CDF1CDB57AA003FF4B4 /* RecognitionException.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RecognitionException.h; sourceTree = "<group>"; };
+		276E5CDF1CDB57AA003FF4B4 /* RecognitionException.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RecognitionException.h; sourceTree = "<group>"; wrapsLines = 0; };
 		276E5CE01CDB57AA003FF4B4 /* Recognizer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Recognizer.cpp; sourceTree = "<group>"; };
 		276E5CE11CDB57AA003FF4B4 /* Recognizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Recognizer.h; sourceTree = "<group>"; };
 		276E5CE21CDB57AA003FF4B4 /* RuleContext.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RuleContext.cpp; sourceTree = "<group>"; wrapsLines = 0; };
@@ -1119,6 +1171,26 @@
 		27874F1D1CCB7A0700AF1C53 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
 		2794D8551CE7821B00FADD0F /* antlr4-common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "antlr4-common.h"; sourceTree = "<group>"; };
 		27AC52CF1CE773A80093AAAB /* antlr4-runtime.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "antlr4-runtime.h"; sourceTree = "<group>"; };
+		27DB448B1D045537007E790B /* XPath.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = XPath.cpp; sourceTree = "<group>"; wrapsLines = 0; };
+		27DB448C1D045537007E790B /* XPath.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XPath.h; sourceTree = "<group>"; wrapsLines = 0; };
+		27DB448D1D045537007E790B /* XPathElement.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = XPathElement.cpp; sourceTree = "<group>"; wrapsLines = 0; };
+		27DB448E1D045537007E790B /* XPathElement.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XPathElement.h; sourceTree = "<group>"; wrapsLines = 0; };
+		27DB448F1D045537007E790B /* XPathLexerErrorListener.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = XPathLexerErrorListener.cpp; sourceTree = "<group>"; wrapsLines = 0; };
+		27DB44901D045537007E790B /* XPathLexerErrorListener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XPathLexerErrorListener.h; sourceTree = "<group>"; wrapsLines = 0; };
+		27DB44911D045537007E790B /* XPathRuleAnywhereElement.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = XPathRuleAnywhereElement.cpp; sourceTree = "<group>"; wrapsLines = 0; };
+		27DB44921D045537007E790B /* XPathRuleAnywhereElement.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XPathRuleAnywhereElement.h; sourceTree = "<group>"; wrapsLines = 0; };
+		27DB44931D045537007E790B /* XPathRuleElement.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = XPathRuleElement.cpp; sourceTree = "<group>"; wrapsLines = 0; };
+		27DB44941D045537007E790B /* XPathRuleElement.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XPathRuleElement.h; sourceTree = "<group>"; wrapsLines = 0; };
+		27DB44951D045537007E790B /* XPathTokenAnywhereElement.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = XPathTokenAnywhereElement.cpp; sourceTree = "<group>"; wrapsLines = 0; };
+		27DB44961D045537007E790B /* XPathTokenAnywhereElement.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XPathTokenAnywhereElement.h; sourceTree = "<group>"; wrapsLines = 0; };
+		27DB44971D045537007E790B /* XPathTokenElement.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = XPathTokenElement.cpp; sourceTree = "<group>"; wrapsLines = 0; };
+		27DB44981D045537007E790B /* XPathTokenElement.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XPathTokenElement.h; sourceTree = "<group>"; wrapsLines = 0; };
+		27DB44991D045537007E790B /* XPathWildcardAnywhereElement.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = XPathWildcardAnywhereElement.cpp; sourceTree = "<group>"; wrapsLines = 0; };
+		27DB449A1D045537007E790B /* XPathWildcardAnywhereElement.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XPathWildcardAnywhereElement.h; sourceTree = "<group>"; wrapsLines = 0; };
+		27DB449B1D045537007E790B /* XPathWildcardElement.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = XPathWildcardElement.cpp; sourceTree = "<group>"; wrapsLines = 0; };
+		27DB449C1D045537007E790B /* XPathWildcardElement.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XPathWildcardElement.h; sourceTree = "<group>"; wrapsLines = 0; };
+		27DB44AF1D0463CC007E790B /* XPathLexer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = XPathLexer.cpp; sourceTree = "<group>"; };
+		27DB44B01D0463CC007E790B /* XPathLexer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XPathLexer.h; sourceTree = "<group>"; wrapsLines = 0; };
 		37C147171B4D5A04008EDDDB /* libantlrcpp_static.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libantlrcpp_static.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		37D727AA1867AF1E007B6D10 /* antlrcpp.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = antlrcpp.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -1419,8 +1491,6 @@
 				276E5CCE1CDB57AA003FF4B4 /* MurmurHash.cpp */,
 				276E5CCF1CDB57AA003FF4B4 /* MurmurHash.h */,
 				276E5CD11CDB57AA003FF4B4 /* Predicate.h */,
-				276E5CD21CDB57AA003FF4B4 /* TestRig.cpp */,
-				276E5CD31CDB57AA003FF4B4 /* TestRig.h */,
 			);
 			path = misc;
 			sourceTree = "<group>";
@@ -1446,6 +1516,7 @@
 			isa = PBXGroup;
 			children = (
 				276E5D061CDB57AA003FF4B4 /* pattern */,
+				27DB448A1D045537007E790B /* xpath */,
 				276E5CFA1CDB57AA003FF4B4 /* AbstractParseTreeVisitor.h */,
 				276E5CFB1CDB57AA003FF4B4 /* ErrorNode.h */,
 				276E5CFC1CDB57AA003FF4B4 /* ErrorNodeImpl.cpp */,
@@ -1500,6 +1571,33 @@
 			name = "Linked Frameworks";
 			sourceTree = "<group>";
 		};
+		27DB448A1D045537007E790B /* xpath */ = {
+			isa = PBXGroup;
+			children = (
+				27DB448B1D045537007E790B /* XPath.cpp */,
+				27DB448C1D045537007E790B /* XPath.h */,
+				27DB448D1D045537007E790B /* XPathElement.cpp */,
+				27DB448E1D045537007E790B /* XPathElement.h */,
+				27DB44AF1D0463CC007E790B /* XPathLexer.cpp */,
+				27DB44B01D0463CC007E790B /* XPathLexer.h */,
+				27DB448F1D045537007E790B /* XPathLexerErrorListener.cpp */,
+				27DB44901D045537007E790B /* XPathLexerErrorListener.h */,
+				27DB44911D045537007E790B /* XPathRuleAnywhereElement.cpp */,
+				27DB44921D045537007E790B /* XPathRuleAnywhereElement.h */,
+				27DB44931D045537007E790B /* XPathRuleElement.cpp */,
+				27DB44941D045537007E790B /* XPathRuleElement.h */,
+				27DB44951D045537007E790B /* XPathTokenAnywhereElement.cpp */,
+				27DB44961D045537007E790B /* XPathTokenAnywhereElement.h */,
+				27DB44971D045537007E790B /* XPathTokenElement.cpp */,
+				27DB44981D045537007E790B /* XPathTokenElement.h */,
+				27DB44991D045537007E790B /* XPathWildcardAnywhereElement.cpp */,
+				27DB449A1D045537007E790B /* XPathWildcardAnywhereElement.h */,
+				27DB449B1D045537007E790B /* XPathWildcardElement.cpp */,
+				27DB449C1D045537007E790B /* XPathWildcardElement.h */,
+			);
+			path = xpath;
+			sourceTree = "<group>";
+		};
 		37D727A11867AF1E007B6D10 = {
 			isa = PBXGroup;
 			children = (
@@ -1537,8 +1635,10 @@
 				276E5DA81CDB57AA003FF4B4 /* BlockStartState.h in Headers */,
 				276E5FE21CDB57AA003FF4B4 /* TokenStream.h in Headers */,
 				276E5D6F1CDB57AA003FF4B4 /* ATNDeserializationOptions.h in Headers */,
+				27DB44CA1D0463DB007E790B /* XPath.h in Headers */,
 				276E5EDD1CDB57AA003FF4B4 /* BaseErrorListener.h in Headers */,
 				276E5DB71CDB57AA003FF4B4 /* DecisionEventInfo.h in Headers */,
+				27DB44D01D0463DB007E790B /* XPathRuleAnywhereElement.h in Headers */,
 				27AC52D21CE773A80093AAAB /* antlr4-runtime.h in Headers */,
 				276E5E2C1CDB57AA003FF4B4 /* LL1Analyzer.h in Headers */,
 				276E5D7B1CDB57AA003FF4B4 /* ATNSerializer.h in Headers */,
@@ -1546,6 +1646,7 @@
 				276E5E1A1CDB57AA003FF4B4 /* LexerPushModeAction.h in Headers */,
 				276E5ECB1CDB57AA003FF4B4 /* Transition.h in Headers */,
 				276E5EA11CDB57AA003FF4B4 /* SemanticContext.h in Headers */,
+				27DB44DA1D0463DB007E790B /* XPathWildcardElement.h in Headers */,
 				276E5F5E1CDB57AA003FF4B4 /* ListTokenSource.h in Headers */,
 				276E5F8E1CDB57AA003FF4B4 /* ParserInterpreter.h in Headers */,
 				276E603C1CDB57AA003FF4B4 /* RuleNode.h in Headers */,
@@ -1602,15 +1703,17 @@
 				276E5F251CDB57AA003FF4B4 /* DiagnosticErrorListener.h in Headers */,
 				276E5E141CDB57AA003FF4B4 /* LexerPopModeAction.h in Headers */,
 				276E5ED71CDB57AA003FF4B4 /* BailErrorStrategy.h in Headers */,
+				27DB44CE1D0463DB007E790B /* XPathLexerErrorListener.h in Headers */,
 				276E5DCF1CDB57AA003FF4B4 /* EpsilonTransition.h in Headers */,
 				276E5FBE1CDB57AA003FF4B4 /* Declarations.h in Headers */,
 				276E600C1CDB57AA003FF4B4 /* ParseTreeWalker.h in Headers */,
 				276E5E771CDB57AA003FF4B4 /* PredictionContext.h in Headers */,
 				276E60151CDB57AA003FF4B4 /* ParseTreeMatch.h in Headers */,
-				276E5F7C1CDB57AA003FF4B4 /* TestRig.h in Headers */,
+				27DB44CC1D0463DB007E790B /* XPathElement.h in Headers */,
 				276E5F581CDB57AA003FF4B4 /* LexerNoViableAltException.h in Headers */,
 				276E5D811CDB57AA003FF4B4 /* ATNSimulator.h in Headers */,
 				276E5F461CDB57AA003FF4B4 /* IRecognizer.h in Headers */,
+				27DB44B61D0463CC007E790B /* XPathLexer.h in Headers */,
 				276E5FC41CDB57AA003FF4B4 /* guid.h in Headers */,
 				276E602D1CDB57AA003FF4B4 /* TagChunk.h in Headers */,
 				276E5E951CDB57AA003FF4B4 /* RuleStopState.h in Headers */,
@@ -1635,6 +1738,7 @@
 				276E5F9A1CDB57AA003FF4B4 /* ProxyErrorListener.h in Headers */,
 				276E5E411CDB57AA003FF4B4 /* NotSetTransition.h in Headers */,
 				276E5E891CDB57AA003FF4B4 /* RangeTransition.h in Headers */,
+				27DB44D21D0463DB007E790B /* XPathRuleElement.h in Headers */,
 				276E601B1CDB57AA003FF4B4 /* ParseTreePattern.h in Headers */,
 				276E5DFC1CDB57AA003FF4B4 /* LexerCustomAction.h in Headers */,
 				276E5FE81CDB57AA003FF4B4 /* TokenStreamRewriter.h in Headers */,
@@ -1642,6 +1746,7 @@
 				276E5DAB1CDB57AA003FF4B4 /* ConfigLookup.h in Headers */,
 				276E5DD51CDB57AA003FF4B4 /* ErrorInfo.h in Headers */,
 				276E5E261CDB57AA003FF4B4 /* LexerTypeAction.h in Headers */,
+				27DB44D61D0463DB007E790B /* XPathTokenElement.h in Headers */,
 				276E5DE41CDB57AA003FF4B4 /* LexerActionType.h in Headers */,
 				276E5D511CDB57AA003FF4B4 /* AmbiguityInfo.h in Headers */,
 				276E5E711CDB57AA003FF4B4 /* PredicateTransition.h in Headers */,
@@ -1670,6 +1775,8 @@
 				276E5F701CDB57AA003FF4B4 /* MurmurHash.h in Headers */,
 				276E60211CDB57AA003FF4B4 /* ParseTreePatternMatcher.h in Headers */,
 				276E5D631CDB57AA003FF4B4 /* ATNConfig.h in Headers */,
+				27DB44D41D0463DB007E790B /* XPathTokenAnywhereElement.h in Headers */,
+				27DB44D81D0463DB007E790B /* XPathWildcardAnywhereElement.h in Headers */,
 				276E5E4D1CDB57AA003FF4B4 /* ParseInfo.h in Headers */,
 				276E5F881CDB57AA003FF4B4 /* Parser.h in Headers */,
 				276E603F1CDB57AA003FF4B4 /* SyntaxTree.h in Headers */,
@@ -1701,6 +1808,7 @@
 				276E5EDC1CDB57AA003FF4B4 /* BaseErrorListener.h in Headers */,
 				276E5DB61CDB57AA003FF4B4 /* DecisionEventInfo.h in Headers */,
 				276E5E2B1CDB57AA003FF4B4 /* LL1Analyzer.h in Headers */,
+				27DB44BA1D0463DA007E790B /* XPathElement.h in Headers */,
 				276E5D7A1CDB57AA003FF4B4 /* ATNSerializer.h in Headers */,
 				276E5EAC1CDB57AA003FF4B4 /* SingletonPredictionContext.h in Headers */,
 				276E5E191CDB57AA003FF4B4 /* LexerPushModeAction.h in Headers */,
@@ -1713,9 +1821,12 @@
 				276E5F4B1CDB57AA003FF4B4 /* Lexer.h in Headers */,
 				276E5F631CDB57AA003FF4B4 /* Interval.h in Headers */,
 				276E5DA41CDB57AA003FF4B4 /* BlockEndState.h in Headers */,
+				27DB44C21D0463DA007E790B /* XPathTokenAnywhereElement.h in Headers */,
 				276E5E821CDB57AA003FF4B4 /* ProfilingATNSimulator.h in Headers */,
+				27DB44C41D0463DA007E790B /* XPathTokenElement.h in Headers */,
 				276E5D981CDB57AA003FF4B4 /* BasicBlockStartState.h in Headers */,
 				276E5E9A1CDB57AA003FF4B4 /* RuleTransition.h in Headers */,
+				27DB44B81D0463DA007E790B /* XPath.h in Headers */,
 				276E60021CDB57AA003FF4B4 /* ParseTreeProperty.h in Headers */,
 				276E5D8C1CDB57AA003FF4B4 /* ATNType.h in Headers */,
 				276E5FFC1CDB57AA003FF4B4 /* ParseTreeListener.h in Headers */,
@@ -1731,6 +1842,7 @@
 				276E5E371CDB57AA003FF4B4 /* LoopEndState.h in Headers */,
 				276E5D681CDB57AA003FF4B4 /* ATNConfigSet.h in Headers */,
 				276E5D381CDB57AA003FF4B4 /* ANTLRFileStream.h in Headers */,
+				27DB44C01D0463DA007E790B /* XPathRuleElement.h in Headers */,
 				276E5D2F1CDB57AA003FF4B4 /* ANTLRErrorListener.h in Headers */,
 				276E5FC91CDB57AA003FF4B4 /* StringUtils.h in Headers */,
 				276E5EF41CDB57AA003FF4B4 /* CommonTokenFactory.h in Headers */,
@@ -1741,10 +1853,12 @@
 				276E5FCF1CDB57AA003FF4B4 /* Token.h in Headers */,
 				276E60411CDB57AA003FF4B4 /* TerminalNode.h in Headers */,
 				276E5D741CDB57AA003FF4B4 /* ATNDeserializer.h in Headers */,
+				27DB44B51D0463CC007E790B /* XPathLexer.h in Headers */,
 				276E5D861CDB57AA003FF4B4 /* ATNState.h in Headers */,
 				276E5E7C1CDB57AA003FF4B4 /* PredictionMode.h in Headers */,
 				276E5EBE1CDB57AA003FF4B4 /* StarLoopEntryState.h in Headers */,
 				276E5F9F1CDB57AA003FF4B4 /* RecognitionException.h in Headers */,
+				27DB44BE1D0463DA007E790B /* XPathRuleAnywhereElement.h in Headers */,
 				27745F071CE49C000067C6A3 /* RuntimeMetaData.h in Headers */,
 				276E5EA61CDB57AA003FF4B4 /* SetTransition.h in Headers */,
 				276E5F1E1CDB57AA003FF4B4 /* LexerDFASerializer.h in Headers */,
@@ -1759,6 +1873,7 @@
 				276E5DC81CDB57AA003FF4B4 /* EmptyPredictionContext.h in Headers */,
 				276E5D441CDB57AA003FF4B4 /* AbstractPredicateTransition.h in Headers */,
 				276E5F2A1CDB57AA003FF4B4 /* Exceptions.h in Headers */,
+				27DB44C61D0463DA007E790B /* XPathWildcardAnywhereElement.h in Headers */,
 				276E5F241CDB57AA003FF4B4 /* DiagnosticErrorListener.h in Headers */,
 				276E5E131CDB57AA003FF4B4 /* LexerPopModeAction.h in Headers */,
 				276E5ED61CDB57AA003FF4B4 /* BailErrorStrategy.h in Headers */,
@@ -1767,7 +1882,6 @@
 				276E600B1CDB57AA003FF4B4 /* ParseTreeWalker.h in Headers */,
 				276E5E761CDB57AA003FF4B4 /* PredictionContext.h in Headers */,
 				276E60141CDB57AA003FF4B4 /* ParseTreeMatch.h in Headers */,
-				276E5F7B1CDB57AA003FF4B4 /* TestRig.h in Headers */,
 				276E5F571CDB57AA003FF4B4 /* LexerNoViableAltException.h in Headers */,
 				276E5D801CDB57AA003FF4B4 /* ATNSimulator.h in Headers */,
 				276E5F451CDB57AA003FF4B4 /* IRecognizer.h in Headers */,
@@ -1814,6 +1928,7 @@
 				276E5E641CDB57AA003FF4B4 /* PrecedencePredicateTransition.h in Headers */,
 				276E5F061CDB57AA003FF4B4 /* DefaultErrorStrategy.h in Headers */,
 				276E5F3C1CDB57AA003FF4B4 /* InterpreterRuleContext.h in Headers */,
+				27DB44BC1D0463DA007E790B /* XPathLexerErrorListener.h in Headers */,
 				276E5F121CDB57AA003FF4B4 /* DFASerializer.h in Headers */,
 				276E5F361CDB57AA003FF4B4 /* InputMismatchException.h in Headers */,
 				276E5FDB1CDB57AA003FF4B4 /* TokenSource.h in Headers */,
@@ -1827,6 +1942,7 @@
 				276E5EFA1CDB57AA003FF4B4 /* CommonTokenStream.h in Headers */,
 				276E5EB21CDB57AA003FF4B4 /* StarBlockStartState.h in Headers */,
 				276E5F6F1CDB57AA003FF4B4 /* MurmurHash.h in Headers */,
+				27DB44C81D0463DA007E790B /* XPathWildcardElement.h in Headers */,
 				276E60201CDB57AA003FF4B4 /* ParseTreePatternMatcher.h in Headers */,
 				276E5D621CDB57AA003FF4B4 /* ATNConfig.h in Headers */,
 				276E5E4C1CDB57AA003FF4B4 /* ParseInfo.h in Headers */,
@@ -1846,11 +1962,13 @@
 			files = (
 				276E5FE91CDB57AA003FF4B4 /* AbstractParseTreeVisitor.h in Headers */,
 				27745F001CE49C000067C6A3 /* RuleContextWithAltNum.h in Headers */,
+				27DB44AC1D045537007E790B /* XPathWildcardAnywhereElement.h in Headers */,
 				276E60311CDB57AA003FF4B4 /* TextChunk.h in Headers */,
 				276E5F411CDB57AA003FF4B4 /* IntStream.h in Headers */,
 				276E5D5B1CDB57AA003FF4B4 /* ATN.h in Headers */,
 				276E605E1CDB57AA003FF4B4 /* UnbufferedCharStream.h in Headers */,
 				276E5DD61CDB57AA003FF4B4 /* LexerAction.h in Headers */,
+				27DB44A41D045537007E790B /* XPathRuleAnywhereElement.h in Headers */,
 				276E5FF51CDB57AA003FF4B4 /* ParseTree.h in Headers */,
 				27AC52D01CE773A80093AAAB /* antlr4-runtime.h in Headers */,
 				276E5DA61CDB57AA003FF4B4 /* BlockStartState.h in Headers */,
@@ -1889,6 +2007,7 @@
 				276E5E361CDB57AA003FF4B4 /* LoopEndState.h in Headers */,
 				276E5D671CDB57AA003FF4B4 /* ATNConfigSet.h in Headers */,
 				276E5D371CDB57AA003FF4B4 /* ANTLRFileStream.h in Headers */,
+				27DB44B41D0463CC007E790B /* XPathLexer.h in Headers */,
 				276E5D2E1CDB57AA003FF4B4 /* ANTLRErrorListener.h in Headers */,
 				276E5FC81CDB57AA003FF4B4 /* StringUtils.h in Headers */,
 				276E5EF31CDB57AA003FF4B4 /* CommonTokenFactory.h in Headers */,
@@ -1918,6 +2037,7 @@
 				276E5D431CDB57AA003FF4B4 /* AbstractPredicateTransition.h in Headers */,
 				276E5F291CDB57AA003FF4B4 /* Exceptions.h in Headers */,
 				276E5F231CDB57AA003FF4B4 /* DiagnosticErrorListener.h in Headers */,
+				27DB449E1D045537007E790B /* XPath.h in Headers */,
 				276E5E121CDB57AA003FF4B4 /* LexerPopModeAction.h in Headers */,
 				276E5ED51CDB57AA003FF4B4 /* BailErrorStrategy.h in Headers */,
 				276E5DCD1CDB57AA003FF4B4 /* EpsilonTransition.h in Headers */,
@@ -1925,7 +2045,6 @@
 				276E600A1CDB57AA003FF4B4 /* ParseTreeWalker.h in Headers */,
 				276E5E751CDB57AA003FF4B4 /* PredictionContext.h in Headers */,
 				276E60131CDB57AA003FF4B4 /* ParseTreeMatch.h in Headers */,
-				276E5F7A1CDB57AA003FF4B4 /* TestRig.h in Headers */,
 				276E5F561CDB57AA003FF4B4 /* LexerNoViableAltException.h in Headers */,
 				276E5D7F1CDB57AA003FF4B4 /* ATNSimulator.h in Headers */,
 				276E5F441CDB57AA003FF4B4 /* IRecognizer.h in Headers */,
@@ -1942,6 +2061,7 @@
 				276E5D911CDB57AA003FF4B4 /* AtomTransition.h in Headers */,
 				276E604C1CDB57AA003FF4B4 /* Tree.h in Headers */,
 				276E5F501CDB57AA003FF4B4 /* LexerInterpreter.h in Headers */,
+				27DB44AE1D045537007E790B /* XPathWildcardElement.h in Headers */,
 				276E60671CDB57AA003FF4B4 /* Vocabulary.h in Headers */,
 				276E5F2F1CDB57AA003FF4B4 /* FailedPredicateException.h in Headers */,
 				276E5E301CDB57AA003FF4B4 /* LookaheadEventInfo.h in Headers */,
@@ -1949,6 +2069,7 @@
 				276E606D1CDB57AA003FF4B4 /* VocabularyImpl.h in Headers */,
 				276E60521CDB57AA003FF4B4 /* Trees.h in Headers */,
 				276E5FB31CDB57AA003FF4B4 /* BitSet.h in Headers */,
+				27DB44AA1D045537007E790B /* XPathTokenElement.h in Headers */,
 				276E5F981CDB57AA003FF4B4 /* ProxyErrorListener.h in Headers */,
 				276E5E3F1CDB57AA003FF4B4 /* NotSetTransition.h in Headers */,
 				276E5E871CDB57AA003FF4B4 /* RangeTransition.h in Headers */,
@@ -1957,6 +2078,7 @@
 				276E5FE61CDB57AA003FF4B4 /* TokenStreamRewriter.h in Headers */,
 				276E5DEE1CDB57AA003FF4B4 /* LexerATNSimulator.h in Headers */,
 				276E5DA91CDB57AA003FF4B4 /* ConfigLookup.h in Headers */,
+				27DB44A61D045537007E790B /* XPathRuleElement.h in Headers */,
 				276E5DD31CDB57AA003FF4B4 /* ErrorInfo.h in Headers */,
 				276E5E241CDB57AA003FF4B4 /* LexerTypeAction.h in Headers */,
 				276E5DE21CDB57AA003FF4B4 /* LexerActionType.h in Headers */,
@@ -1981,15 +2103,18 @@
 				276E5EE11CDB57AA003FF4B4 /* BufferedTokenStream.h in Headers */,
 				276E5DAF1CDB57AA003FF4B4 /* ContextSensitivityInfo.h in Headers */,
 				276E5E001CDB57AA003FF4B4 /* LexerIndexedCustomAction.h in Headers */,
+				27DB44A81D045537007E790B /* XPathTokenAnywhereElement.h in Headers */,
 				276E5FD41CDB57AA003FF4B4 /* TokenFactory.h in Headers */,
 				276E5EF91CDB57AA003FF4B4 /* CommonTokenStream.h in Headers */,
 				276E5EB11CDB57AA003FF4B4 /* StarBlockStartState.h in Headers */,
 				276E5F6E1CDB57AA003FF4B4 /* MurmurHash.h in Headers */,
 				276E601F1CDB57AA003FF4B4 /* ParseTreePatternMatcher.h in Headers */,
 				276E5D611CDB57AA003FF4B4 /* ATNConfig.h in Headers */,
+				27DB44A21D045537007E790B /* XPathLexerErrorListener.h in Headers */,
 				276E5E4B1CDB57AA003FF4B4 /* ParseInfo.h in Headers */,
 				276E5F861CDB57AA003FF4B4 /* Parser.h in Headers */,
 				276E603D1CDB57AA003FF4B4 /* SyntaxTree.h in Headers */,
+				27DB44A01D045537007E790B /* XPathElement.h in Headers */,
 				276E5DBB1CDB57AA003FF4B4 /* DecisionInfo.h in Headers */,
 				276E5DC11CDB57AA003FF4B4 /* DecisionState.h in Headers */,
 				276E5E691CDB57AA003FF4B4 /* PredicateEvalInfo.h in Headers */,
@@ -2129,6 +2254,7 @@
 				276E5E051CDB57AA003FF4B4 /* LexerModeAction.cpp in Sources */,
 				276E5F491CDB57AA003FF4B4 /* Lexer.cpp in Sources */,
 				276E5EDA1CDB57AA003FF4B4 /* BaseErrorListener.cpp in Sources */,
+				27DB44C91D0463DB007E790B /* XPath.cpp in Sources */,
 				276E5DBA1CDB57AA003FF4B4 /* DecisionInfo.cpp in Sources */,
 				276E5F611CDB57AA003FF4B4 /* Interval.cpp in Sources */,
 				276E5F911CDB57AA003FF4B4 /* ParserRuleContext.cpp in Sources */,
@@ -2137,7 +2263,9 @@
 				276E5E7A1CDB57AA003FF4B4 /* PredictionMode.cpp in Sources */,
 				276E605D1CDB57AA003FF4B4 /* UnbufferedCharStream.cpp in Sources */,
 				276E5F341CDB57AA003FF4B4 /* InputMismatchException.cpp in Sources */,
+				27DB44D91D0463DB007E790B /* XPathWildcardElement.cpp in Sources */,
 				276E5E741CDB57AA003FF4B4 /* PredictionContext.cpp in Sources */,
+				27DB44CB1D0463DB007E790B /* XPathElement.cpp in Sources */,
 				276E5E171CDB57AA003FF4B4 /* LexerPushModeAction.cpp in Sources */,
 				276E5DA21CDB57AA003FF4B4 /* BlockEndState.cpp in Sources */,
 				276E5EF21CDB57AA003FF4B4 /* CommonTokenFactory.cpp in Sources */,
@@ -2156,6 +2284,8 @@
 				276E5FA31CDB57AA003FF4B4 /* Recognizer.cpp in Sources */,
 				276E5D6C1CDB57AA003FF4B4 /* ATNDeserializationOptions.cpp in Sources */,
 				276E60361CDB57AA003FF4B4 /* TokenTagToken.cpp in Sources */,
+				27DB44D51D0463DB007E790B /* XPathTokenElement.cpp in Sources */,
+				27DB44D11D0463DB007E790B /* XPathRuleElement.cpp in Sources */,
 				276E5DED1CDB57AA003FF4B4 /* LexerATNSimulator.cpp in Sources */,
 				276E606C1CDB57AA003FF4B4 /* VocabularyImpl.cpp in Sources */,
 				276E5F1C1CDB57AA003FF4B4 /* LexerDFASerializer.cpp in Sources */,
@@ -2167,6 +2297,7 @@
 				276E5D4E1CDB57AA003FF4B4 /* AmbiguityInfo.cpp in Sources */,
 				276E5F161CDB57AA003FF4B4 /* DFAState.cpp in Sources */,
 				276E60091CDB57AA003FF4B4 /* ParseTreeWalker.cpp in Sources */,
+				27DB44CD1D0463DB007E790B /* XPathLexerErrorListener.cpp in Sources */,
 				276E5F9D1CDB57AA003FF4B4 /* RecognitionException.cpp in Sources */,
 				276E5E8C1CDB57AA003FF4B4 /* RuleStartState.cpp in Sources */,
 				276E5EA41CDB57AA003FF4B4 /* SetTransition.cpp in Sources */,
@@ -2184,7 +2315,6 @@
 				276E5ECE1CDB57AA003FF4B4 /* WildcardTransition.cpp in Sources */,
 				276E5E861CDB57AA003FF4B4 /* RangeTransition.cpp in Sources */,
 				276E5D7E1CDB57AA003FF4B4 /* ATNSimulator.cpp in Sources */,
-				276E5F791CDB57AA003FF4B4 /* TestRig.cpp in Sources */,
 				276E5D9C1CDB57AA003FF4B4 /* BasicState.cpp in Sources */,
 				276E5FC11CDB57AA003FF4B4 /* guid.cpp in Sources */,
 				276E5E801CDB57AA003FF4B4 /* ProfilingATNSimulator.cpp in Sources */,
@@ -2193,10 +2323,13 @@
 				276E5F6D1CDB57AA003FF4B4 /* MurmurHash.cpp in Sources */,
 				276E5FDF1CDB57AA003FF4B4 /* TokenStream.cpp in Sources */,
 				276E5FF11CDB57AA003FF4B4 /* ErrorNodeImpl.cpp in Sources */,
+				27DB44D71D0463DB007E790B /* XPathWildcardAnywhereElement.cpp in Sources */,
 				276E5D961CDB57AA003FF4B4 /* BasicBlockStartState.cpp in Sources */,
 				276E5E4A1CDB57AA003FF4B4 /* ParseInfo.cpp in Sources */,
 				276E5E3E1CDB57AA003FF4B4 /* NotSetTransition.cpp in Sources */,
+				27DB44B31D0463CC007E790B /* XPathLexer.cpp in Sources */,
 				276E60301CDB57AA003FF4B4 /* TextChunk.cpp in Sources */,
+				27DB44CF1D0463DB007E790B /* XPathRuleAnywhereElement.cpp in Sources */,
 				276E5E441CDB57AA003FF4B4 /* OrderedATNConfigSet.cpp in Sources */,
 				276E5DCC1CDB57AA003FF4B4 /* EpsilonTransition.cpp in Sources */,
 				276E5D5A1CDB57AA003FF4B4 /* ATN.cpp in Sources */,
@@ -2227,6 +2360,7 @@
 				276E5F4F1CDB57AA003FF4B4 /* LexerInterpreter.cpp in Sources */,
 				276E5E291CDB57AA003FF4B4 /* LL1Analyzer.cpp in Sources */,
 				276E5EB01CDB57AA003FF4B4 /* StarBlockStartState.cpp in Sources */,
+				27DB44D31D0463DB007E790B /* XPathTokenAnywhereElement.cpp in Sources */,
 				276E5FB81CDB57AA003FF4B4 /* CPPUtils.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2260,6 +2394,7 @@
 				276E5E041CDB57AA003FF4B4 /* LexerModeAction.cpp in Sources */,
 				276E5F481CDB57AA003FF4B4 /* Lexer.cpp in Sources */,
 				276E5ED91CDB57AA003FF4B4 /* BaseErrorListener.cpp in Sources */,
+				27DB44B71D0463DA007E790B /* XPath.cpp in Sources */,
 				276E5DB91CDB57AA003FF4B4 /* DecisionInfo.cpp in Sources */,
 				276E5F601CDB57AA003FF4B4 /* Interval.cpp in Sources */,
 				276E5F901CDB57AA003FF4B4 /* ParserRuleContext.cpp in Sources */,
@@ -2268,7 +2403,9 @@
 				276E5E791CDB57AA003FF4B4 /* PredictionMode.cpp in Sources */,
 				276E605C1CDB57AA003FF4B4 /* UnbufferedCharStream.cpp in Sources */,
 				276E5F331CDB57AA003FF4B4 /* InputMismatchException.cpp in Sources */,
+				27DB44C71D0463DA007E790B /* XPathWildcardElement.cpp in Sources */,
 				276E5E731CDB57AA003FF4B4 /* PredictionContext.cpp in Sources */,
+				27DB44B91D0463DA007E790B /* XPathElement.cpp in Sources */,
 				276E5E161CDB57AA003FF4B4 /* LexerPushModeAction.cpp in Sources */,
 				276E5DA11CDB57AA003FF4B4 /* BlockEndState.cpp in Sources */,
 				276E5EF11CDB57AA003FF4B4 /* CommonTokenFactory.cpp in Sources */,
@@ -2287,6 +2424,8 @@
 				276E5FA21CDB57AA003FF4B4 /* Recognizer.cpp in Sources */,
 				276E5D6B1CDB57AA003FF4B4 /* ATNDeserializationOptions.cpp in Sources */,
 				276E60351CDB57AA003FF4B4 /* TokenTagToken.cpp in Sources */,
+				27DB44C31D0463DA007E790B /* XPathTokenElement.cpp in Sources */,
+				27DB44BF1D0463DA007E790B /* XPathRuleElement.cpp in Sources */,
 				276E5DEC1CDB57AA003FF4B4 /* LexerATNSimulator.cpp in Sources */,
 				276E606B1CDB57AA003FF4B4 /* VocabularyImpl.cpp in Sources */,
 				276E5F1B1CDB57AA003FF4B4 /* LexerDFASerializer.cpp in Sources */,
@@ -2298,6 +2437,7 @@
 				276E5D4D1CDB57AA003FF4B4 /* AmbiguityInfo.cpp in Sources */,
 				276E5F151CDB57AA003FF4B4 /* DFAState.cpp in Sources */,
 				276E60081CDB57AA003FF4B4 /* ParseTreeWalker.cpp in Sources */,
+				27DB44BB1D0463DA007E790B /* XPathLexerErrorListener.cpp in Sources */,
 				276E5F9C1CDB57AA003FF4B4 /* RecognitionException.cpp in Sources */,
 				276E5E8B1CDB57AA003FF4B4 /* RuleStartState.cpp in Sources */,
 				276E5EA31CDB57AA003FF4B4 /* SetTransition.cpp in Sources */,
@@ -2315,7 +2455,6 @@
 				276E5ECD1CDB57AA003FF4B4 /* WildcardTransition.cpp in Sources */,
 				276E5E851CDB57AA003FF4B4 /* RangeTransition.cpp in Sources */,
 				276E5D7D1CDB57AA003FF4B4 /* ATNSimulator.cpp in Sources */,
-				276E5F781CDB57AA003FF4B4 /* TestRig.cpp in Sources */,
 				276E5D9B1CDB57AA003FF4B4 /* BasicState.cpp in Sources */,
 				276E5FC01CDB57AA003FF4B4 /* guid.cpp in Sources */,
 				276E5E7F1CDB57AA003FF4B4 /* ProfilingATNSimulator.cpp in Sources */,
@@ -2324,10 +2463,13 @@
 				276E5F6C1CDB57AA003FF4B4 /* MurmurHash.cpp in Sources */,
 				276E5FDE1CDB57AA003FF4B4 /* TokenStream.cpp in Sources */,
 				276E5FF01CDB57AA003FF4B4 /* ErrorNodeImpl.cpp in Sources */,
+				27DB44C51D0463DA007E790B /* XPathWildcardAnywhereElement.cpp in Sources */,
 				276E5D951CDB57AA003FF4B4 /* BasicBlockStartState.cpp in Sources */,
 				276E5E491CDB57AA003FF4B4 /* ParseInfo.cpp in Sources */,
 				276E5E3D1CDB57AA003FF4B4 /* NotSetTransition.cpp in Sources */,
+				27DB44B21D0463CC007E790B /* XPathLexer.cpp in Sources */,
 				276E602F1CDB57AA003FF4B4 /* TextChunk.cpp in Sources */,
+				27DB44BD1D0463DA007E790B /* XPathRuleAnywhereElement.cpp in Sources */,
 				276E5E431CDB57AA003FF4B4 /* OrderedATNConfigSet.cpp in Sources */,
 				276E5DCB1CDB57AA003FF4B4 /* EpsilonTransition.cpp in Sources */,
 				276E5D591CDB57AA003FF4B4 /* ATN.cpp in Sources */,
@@ -2358,6 +2500,7 @@
 				276E5F4E1CDB57AA003FF4B4 /* LexerInterpreter.cpp in Sources */,
 				276E5E281CDB57AA003FF4B4 /* LL1Analyzer.cpp in Sources */,
 				276E5EAF1CDB57AA003FF4B4 /* StarBlockStartState.cpp in Sources */,
+				27DB44C11D0463DA007E790B /* XPathTokenAnywhereElement.cpp in Sources */,
 				276E5FB71CDB57AA003FF4B4 /* CPPUtils.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2374,6 +2517,7 @@
 				276E5D521CDB57AA003FF4B4 /* ArrayPredictionContext.cpp in Sources */,
 				276E5F081CDB57AA003FF4B4 /* DFA.cpp in Sources */,
 				276E5E211CDB57AA003FF4B4 /* LexerTypeAction.cpp in Sources */,
+				27DB449F1D045537007E790B /* XPathElement.cpp in Sources */,
 				276E5EC01CDB57AA003FF4B4 /* TokensStartState.cpp in Sources */,
 				276E5DB21CDB57AA003FF4B4 /* DecisionEventInfo.cpp in Sources */,
 				276E60431CDB57AA003FF4B4 /* TerminalNodeImpl.cpp in Sources */,
@@ -2388,6 +2532,7 @@
 				276E604F1CDB57AA003FF4B4 /* Trees.cpp in Sources */,
 				276E5EB41CDB57AA003FF4B4 /* StarLoopbackState.cpp in Sources */,
 				276E5E601CDB57AA003FF4B4 /* PrecedencePredicateTransition.cpp in Sources */,
+				27DB44A31D045537007E790B /* XPathRuleAnywhereElement.cpp in Sources */,
 				276E5E031CDB57AA003FF4B4 /* LexerModeAction.cpp in Sources */,
 				276E5F471CDB57AA003FF4B4 /* Lexer.cpp in Sources */,
 				276E5ED81CDB57AA003FF4B4 /* BaseErrorListener.cpp in Sources */,
@@ -2407,9 +2552,12 @@
 				276E5E901CDB57AA003FF4B4 /* RuleStopState.cpp in Sources */,
 				276E60611CDB57AA003FF4B4 /* UnbufferedTokenStream.cpp in Sources */,
 				276E5DD91CDB57AA003FF4B4 /* LexerActionExecutor.cpp in Sources */,
+				27DB449D1D045537007E790B /* XPath.cpp in Sources */,
 				276E5E9C1CDB57AA003FF4B4 /* SemanticContext.cpp in Sources */,
+				27DB44AD1D045537007E790B /* XPathWildcardElement.cpp in Sources */,
 				276E5EC61CDB57AA003FF4B4 /* Transition.cpp in Sources */,
 				276E601C1CDB57AA003FF4B4 /* ParseTreePatternMatcher.cpp in Sources */,
+				27DB44A51D045537007E790B /* XPathRuleElement.cpp in Sources */,
 				276E5F201CDB57AA003FF4B4 /* DiagnosticErrorListener.cpp in Sources */,
 				276E5D461CDB57AA003FF4B4 /* ActionTransition.cpp in Sources */,
 				276E60491CDB57AA003FF4B4 /* Tree.cpp in Sources */,
@@ -2425,6 +2573,7 @@
 				276E5DE51CDB57AA003FF4B4 /* LexerATNConfig.cpp in Sources */,
 				276E5F0E1CDB57AA003FF4B4 /* DFASerializer.cpp in Sources */,
 				276E5F2C1CDB57AA003FF4B4 /* FailedPredicateException.cpp in Sources */,
+				27DB44A71D045537007E790B /* XPathTokenAnywhereElement.cpp in Sources */,
 				276E5F891CDB57AA003FF4B4 /* ParserInterpreter.cpp in Sources */,
 				276E5D4C1CDB57AA003FF4B4 /* AmbiguityInfo.cpp in Sources */,
 				276E5F141CDB57AA003FF4B4 /* DFAState.cpp in Sources */,
@@ -2446,7 +2595,6 @@
 				276E5ECC1CDB57AA003FF4B4 /* WildcardTransition.cpp in Sources */,
 				276E5E841CDB57AA003FF4B4 /* RangeTransition.cpp in Sources */,
 				276E5D7C1CDB57AA003FF4B4 /* ATNSimulator.cpp in Sources */,
-				276E5F771CDB57AA003FF4B4 /* TestRig.cpp in Sources */,
 				276E5D9A1CDB57AA003FF4B4 /* BasicState.cpp in Sources */,
 				276E5FBF1CDB57AA003FF4B4 /* guid.cpp in Sources */,
 				276E5E7E1CDB57AA003FF4B4 /* ProfilingATNSimulator.cpp in Sources */,
@@ -2463,13 +2611,16 @@
 				276E5DCA1CDB57AA003FF4B4 /* EpsilonTransition.cpp in Sources */,
 				276E5D581CDB57AA003FF4B4 /* ATN.cpp in Sources */,
 				276E5EE41CDB57AA003FF4B4 /* CharStream.cpp in Sources */,
+				27DB44AB1D045537007E790B /* XPathWildcardAnywhereElement.cpp in Sources */,
 				276E5EDE1CDB57AA003FF4B4 /* BufferedTokenStream.cpp in Sources */,
 				276E5F021CDB57AA003FF4B4 /* DefaultErrorStrategy.cpp in Sources */,
 				276E5D401CDB57AA003FF4B4 /* AbstractPredicateTransition.cpp in Sources */,
 				276E5E5A1CDB57AA003FF4B4 /* PlusLoopbackState.cpp in Sources */,
 				276E5E331CDB57AA003FF4B4 /* LoopEndState.cpp in Sources */,
 				276E5FE31CDB57AA003FF4B4 /* TokenStreamRewriter.cpp in Sources */,
+				27DB44A11D045537007E790B /* XPathLexerErrorListener.cpp in Sources */,
 				276E5FA71CDB57AA003FF4B4 /* RuleContext.cpp in Sources */,
+				27DB44B11D0463CC007E790B /* XPathLexer.cpp in Sources */,
 				276E5D5E1CDB57AA003FF4B4 /* ATNConfig.cpp in Sources */,
 				276E5EFC1CDB57AA003FF4B4 /* ConsoleErrorListener.cpp in Sources */,
 				276E5EA81CDB57AA003FF4B4 /* SingletonPredictionContext.cpp in Sources */,
@@ -2489,6 +2640,7 @@
 				276E5F4D1CDB57AA003FF4B4 /* LexerInterpreter.cpp in Sources */,
 				276E5E271CDB57AA003FF4B4 /* LL1Analyzer.cpp in Sources */,
 				276E5EAE1CDB57AA003FF4B4 /* StarBlockStartState.cpp in Sources */,
+				27DB44A91D045537007E790B /* XPathTokenElement.cpp in Sources */,
 				276E5FB61CDB57AA003FF4B4 /* CPPUtils.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

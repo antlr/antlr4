@@ -33,10 +33,7 @@
 
 #include "BaseErrorListener.h"
 
-namespace org {
-namespace antlr {
-namespace v4 {
-namespace runtime {
+namespace antlr4 {
 
   /// <summary>
   /// This implementation of <seealso cref="ANTLRErrorListener"/> can be used to identify
@@ -106,7 +103,4 @@ namespace runtime {
     virtual antlrcpp::BitSet getConflictingAlts(const antlrcpp::BitSet &reportedAlts, Ref<atn::ATNConfigSet> configs);
   };
 
-} // namespace runtime
-} // namespace v4
-} // namespace antlr
-} // namespace org
+} // namespace antlr4

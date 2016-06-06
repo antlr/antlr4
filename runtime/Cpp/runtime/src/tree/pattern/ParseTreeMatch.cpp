@@ -33,8 +33,8 @@
 
 #include "tree/pattern/ParseTreeMatch.h"
 
-using namespace org::antlr::v4::runtime::tree;
-using namespace org::antlr::v4::runtime::tree::pattern;
+using namespace antlr4::tree;
+using namespace antlr4::tree::pattern;
 
 ParseTreeMatch::ParseTreeMatch(Ref<ParseTree> tree, const ParseTreePattern &pattern,
                                const std::map<std::string, std::vector<Ref<ParseTree>>> &labels,

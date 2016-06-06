@@ -34,10 +34,7 @@
 #include "atn/LexerActionType.h"
 #include "atn/LexerAction.h"
 
-namespace org {
-namespace antlr {
-namespace v4 {
-namespace runtime {
+namespace antlr4 {
 namespace atn {
 
   /// Implements the {@code type} lexer action by calling <seealso cref="Lexer#setType"/>
@@ -81,7 +78,4 @@ namespace atn {
   };
 
 } // namespace atn
-} // namespace runtime
-} // namespace v4
-} // namespace antlr
-} // namespace org
+} // namespace antlr4

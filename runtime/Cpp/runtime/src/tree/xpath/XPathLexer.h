@@ -1,68 +1,59 @@
-﻿#pragma once
 
-#include <string>
-#include <cctype>
-#include "Lexer.h"
+// Generated from XPathLexer.g4 by ANTLR 4.5.3
 
-// Generated from XPathLexer.g4 by ANTLR 4.1
-/*
- * [The "BSD license"]
- *  Copyright (c) 2016 Mike Lischke
- *  Copyright (c) 2013 Terence Parr
- *  Copyright (c) 2013 Dan McLaughlin
- *  All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions
- *  are met:
- *
- *  1. Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *  2. Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *  3. The name of the author may not be used to endorse or promote products
- *     derived from this software without specific prior written permission.
- *
- *  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- *  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- *  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- *  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
+#pragma once
 
-class XPathLexer : public org::antlr::v4::runtime::Lexer {
 
-protected:
-    //ORIGINAL LINE: protected static final org.antlr.v4.runtime.dfa.DFA[] _decisionToDFA;
-    static const org::antlr::v4::runtime::dfa::DFA *_decisionToDFA;
-    static org::antlr::v4::runtime::atn::PredictionContextCache *const _sharedContextCache;
+#include "antlr4-runtime.h"
+
+
+namespace antlr4 {
+
+class XPathLexer : public Lexer {
 public:
-    static const int TOKEN_REF = 1, RULE_REF = 2, ANYWHERE = 3, ROOT = 4, WILDCARD = 5, BANG = 6, ID = 7, STRING = 8;
-    static std::vector<std::string> _modeNames;
+  enum {
+    TOKEN_REF = 1, RULE_REF = 2, ANYWHERE = 3, ROOT = 4, WILDCARD = 5, BANG = 6, 
+    ID = 7, STRING = 8
+  };
 
-    static const std::vector<std::string> _tokenNames;
-    static const std::vector<std::string> _ruleNames;
+  XPathLexer(CharStream *input);
+  ~XPathLexer();
 
-    XPathLexer(org::antlr::v4::runtime::CharStream *input);
+  virtual std::string getGrammarFileName() const override;
+  virtual const std::vector<std::string>& getRuleNames() const override;
 
-    virtual std::string getGrammarFileName() const override;
-    virtual const std::vector<std::string>& getTokenNames() const override;
-    virtual const std::vector<std::string>& getRuleNames() const override;
-    virtual const std::vector<std::string>& getModeNames() const override;
-    virtual const org::antlr::v4::runtime::atn::ATN& getATN() const override;
-    virtual void action(Ref<org::antlr::v4::runtime::RuleContext> _localctx, int ruleIndex, int actionIndex) override;
+  virtual const std::vector<std::string>& getModeNames() const override;
+  virtual const std::vector<std::string>& getTokenNames() const override; // deprecated, use vocabulary instead
+  virtual Ref<dfa::Vocabulary> getVocabulary() const override;
+
+  virtual const std::vector<uint16_t> getSerializedATN() const;
+  virtual const atn::ATN& getATN() const override;
+
+  virtual void action(Ref<RuleContext> context, int ruleIndex, int actionIndex) override;
+
 private:
-    void ID_action(org::antlr::v4::runtime::RuleContext *_localctx, int actionIndex);
+  static std::vector<dfa::DFA> _decisionToDFA;
+  static Ref<atn::PredictionContextCache> _sharedContextCache;
+  static std::vector<std::string> _ruleNames;
+  static std::vector<std::string> _tokenNames;
+  static std::vector<std::string> _modeNames;
 
-public:
-    static const std::wstring _serializedATN;
-    static org::antlr::v4::runtime::atn::ATN _ATN;
+  static std::vector<std::string> _literalNames;
+  static std::vector<std::string> _symbolicNames;
+  static Ref<dfa::Vocabulary> _vocabulary;
+  static atn::ATN _atn;
+  static std::vector<uint16_t> _serializedATN;
 
-    XPathLexer();
+
+  // Individual action functions triggered by action() above.
+  void IDAction(Ref<RuleContext> context, int actionIndex);
+
+  // Individual semantic predicate functions triggered by sempred() above.
+
+  struct Initializer {
+    Initializer();
+  };
+  static Initializer _init;
 };
+
+}  // namespace antlr4

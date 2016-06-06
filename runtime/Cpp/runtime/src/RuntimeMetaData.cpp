@@ -31,7 +31,7 @@
 
 #include "RuntimeMetaData.h"
 
-using namespace org::antlr::v4::runtime;
+using namespace antlr4;
 
 const std::string RuntimeMetaData::VERSION = "4.5.3";
 

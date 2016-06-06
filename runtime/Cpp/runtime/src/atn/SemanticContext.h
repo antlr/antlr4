@@ -34,10 +34,7 @@
 #include "Recognizer.h"
 #include "support/CPPUtils.h"
 
-namespace org {
-namespace antlr {
-namespace v4 {
-namespace runtime {
+namespace antlr4 {
 namespace atn {
 
   /// A tree structure used to record the semantic context in which
@@ -229,15 +226,12 @@ namespace atn {
   };
   
 } // namespace atn
-} // namespace runtime
-} // namespace v4
-} // namespace antlr
-} // namespace org
+} // namespace antlr4
 
 // Hash function for SemanticContext, used in the MurmurHash::update function
 
 namespace std {
-  using org::antlr::v4::runtime::atn::SemanticContext;
+  using antlr4::atn::SemanticContext;
 
   template <> struct hash<SemanticContext>
   {

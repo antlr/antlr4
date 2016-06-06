@@ -33,10 +33,7 @@
 
 #include "misc/Interval.h"
 
-namespace org {
-namespace antlr {
-namespace v4 {
-namespace runtime {
+namespace antlr4 {
 namespace misc {
 
   /**
@@ -208,15 +205,12 @@ namespace misc {
   };
   
 } // namespace atn
-} // namespace runtime
-} // namespace v4
-} // namespace antlr
-} // namespace org
+} // namespace antlr4
 
 // Hash function for IntervalSet.
 
 namespace std {
-  using org::antlr::v4::runtime::misc::IntervalSet;
+  using antlr4::misc::IntervalSet;
 
   template <> struct hash<IntervalSet>
   {

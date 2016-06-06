@@ -31,10 +31,7 @@
 
 #pragma once
 
-namespace org {
-namespace antlr {
-namespace v4 {
-namespace runtime {
+namespace antlr4 {
 namespace atn {
 
   /// <summary>
@@ -146,16 +143,13 @@ namespace atn {
   };
 
 } // namespace atn
-} // namespace runtime
-} // namespace v4
-} // namespace antlr
-} // namespace org
+} // namespace antlr4
 
 
 // Hash function for ATNConfig.
 
 namespace std {
-  using org::antlr::v4::runtime::atn::ATNConfig;
+  using antlr4::atn::ATNConfig;
 
   template <> struct hash<ATNConfig>
   {

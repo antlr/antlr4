@@ -44,8 +44,8 @@
 
 #include "atn/LL1Analyzer.h"
 
-using namespace org::antlr::v4::runtime;
-using namespace org::antlr::v4::runtime::atn;
+using namespace antlr4;
+using namespace antlr4::atn;
 using namespace antlrcpp;
 
 LL1Analyzer::LL1Analyzer(const ATN &atn) : _atn(atn) {

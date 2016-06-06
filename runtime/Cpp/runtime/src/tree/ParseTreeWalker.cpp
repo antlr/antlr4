@@ -36,7 +36,7 @@
 
 #include "tree/ParseTreeWalker.h"
 
-using namespace org::antlr::v4::runtime::tree;
+using namespace antlr4::tree;
 using namespace antlrcpp;
 
 const Ref<ParseTreeWalker> ParseTreeWalker::DEFAULT = std::make_shared<ParseTreeWalker>();

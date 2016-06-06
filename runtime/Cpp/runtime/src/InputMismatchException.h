@@ -33,10 +33,7 @@
 
 #include "RecognitionException.h"
 
-namespace org {
-namespace antlr {
-namespace v4 {
-namespace runtime {
+namespace antlr4 {
 
   /// <summary>
   /// This signifies any kind of mismatched input exceptions such as
@@ -47,7 +44,4 @@ namespace runtime {
     InputMismatchException(Parser *recognizer);
   };
 
-} // namespace runtime
-} // namespace v4
-} // namespace antlr
-} // namespace org
+} // namespace antlr4

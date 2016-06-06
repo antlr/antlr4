@@ -34,7 +34,7 @@
 
 #include "atn/ParseInfo.h"
 
-using namespace org::antlr::v4::runtime::atn;
+using namespace antlr4::atn;
 
 ParseInfo::ParseInfo(ProfilingATNSimulator *atnSimulator) : _atnSimulator(atnSimulator) {
 }

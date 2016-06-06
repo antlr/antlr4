@@ -31,7 +31,7 @@
 
 #include "atn/ActionTransition.h"
 
-using namespace org::antlr::v4::runtime::atn;
+using namespace antlr4::atn;
 
 ActionTransition::ActionTransition(ATNState *target, int ruleIndex)
   : Transition(target), ruleIndex(ruleIndex), actionIndex(0), isCtxDependent(false) {

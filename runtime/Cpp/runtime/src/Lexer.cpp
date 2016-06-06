@@ -42,7 +42,7 @@
 #include "Lexer.h"
 
 using namespace antlrcpp;
-using namespace org::antlr::v4::runtime;
+using namespace antlr4;
 
 Lexer::Lexer() : Recognizer() {
   InitializeInstanceFields();

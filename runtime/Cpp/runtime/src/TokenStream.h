@@ -33,10 +33,7 @@
 
 #include "IntStream.h"
 
-namespace org {
-namespace antlr {
-namespace v4 {
-namespace runtime {
+namespace antlr4 {
 
   /// <summary>
   /// An <seealso cref="IntStream"/> whose symbols are <seealso cref="Token"/> instances.
@@ -163,7 +160,4 @@ namespace runtime {
     virtual std::string getText(Ref<Token> start, Ref<Token> stop) = 0;
   };
 
-} // namespace runtime
-} // namespace v4
-} // namespace antlr
-} // namespace org
+} // namespace antlr4

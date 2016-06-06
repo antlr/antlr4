@@ -31,7 +31,7 @@
 
 #include "atn/PlusLoopbackState.h"
 
-using namespace org::antlr::v4::runtime::atn;
+using namespace antlr4::atn;
 
 int PlusLoopbackState::getStateType() {
   return PLUS_LOOP_BACK;

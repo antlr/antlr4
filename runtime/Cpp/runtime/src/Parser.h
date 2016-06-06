@@ -37,10 +37,7 @@
 #include "TokenSource.h"
 #include "misc/Interval.h"
 
-namespace org {
-namespace antlr {
-namespace v4 {
-namespace runtime {
+namespace antlr4 {
 
   /// This is all the parsing support code essentially; most of it is error recovery stuff.
   class ANTLR4CPP_PUBLIC Parser : public Recognizer {
@@ -471,7 +468,4 @@ namespace runtime {
     void InitializeInstanceFields();
   };
 
-} // namespace runtime
-} // namespace v4
-} // namespace antlr
-} // namespace org
+} // namespace antlr4

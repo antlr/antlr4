@@ -315,7 +315,7 @@ private:
 >>
 
 Parser(parser, funcs, atn, sempredFuncs, superClass = {Parser}) ::= <<
-using namespace org::antlr::v4::runtime;
+using namespace antlr4;
 
 <parser.name>::<parser.name>(TokenStream *input) : <superClass>(input) {
   _interpreter = new atn::ParserATNSimulator(this, _atn, _decisionToDFA, _sharedContextCache);

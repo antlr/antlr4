@@ -39,7 +39,7 @@
 
 #include "atn/LexerATNConfig.h"
 
-using namespace org::antlr::v4::runtime::atn;
+using namespace antlr4::atn;
 using namespace antlrcpp;
 
 LexerATNConfig::LexerATNConfig(ATNState *state, int alt, Ref<PredictionContext> context)

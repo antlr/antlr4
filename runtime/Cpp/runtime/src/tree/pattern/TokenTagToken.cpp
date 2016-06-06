@@ -31,7 +31,7 @@
 
 #include "tree/pattern/TokenTagToken.h"
 
-using namespace org::antlr::v4::runtime::tree::pattern;
+using namespace antlr4::tree::pattern;
 
 TokenTagToken::TokenTagToken(const std::string &/*tokenName*/, int type)
   : CommonToken(type), tokenName(""), label("") {

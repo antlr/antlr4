@@ -33,8 +33,8 @@
 
 #include "atn/RangeTransition.h"
 
-using namespace org::antlr::v4::runtime;
-using namespace org::antlr::v4::runtime::atn;
+using namespace antlr4;
+using namespace antlr4::atn;
 
 RangeTransition::RangeTransition(ATNState *target, size_t from, size_t to) : Transition(target), from(from), to(to) {
 }

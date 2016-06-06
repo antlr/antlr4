@@ -35,7 +35,7 @@
 
 #include "dfa/DFASerializer.h"
 
-using namespace org::antlr::v4::runtime::dfa;
+using namespace antlr4::dfa;
 
 DFASerializer::DFASerializer(const DFA *dfa, const std::vector<std::string>& tokenNames)
   : DFASerializer(dfa, VocabularyImpl::fromTokenNames(tokenNames)) {

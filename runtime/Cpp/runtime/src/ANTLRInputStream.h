@@ -33,10 +33,7 @@
 
 #include "CharStream.h"
 
-namespace org {
-namespace antlr {
-namespace v4 {
-namespace runtime {
+namespace antlr4 {
 
   // Vacuum all input from a stream and then treat it
   // like a string. Can also pass in a string or char[] to use.
@@ -94,7 +91,4 @@ namespace runtime {
     void InitializeInstanceFields();
   };
 
-} // namespace runtime
-} // namespace v4
-} // namespace antlr
-} // namespace org
+} // namespace antlr4

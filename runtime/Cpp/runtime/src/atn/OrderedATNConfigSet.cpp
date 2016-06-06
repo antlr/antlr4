@@ -31,7 +31,7 @@
 
 #include "atn/OrderedATNConfigSet.h"
 
-using namespace org::antlr::v4::runtime::atn;
+using namespace antlr4::atn;
 
 OrderedATNConfigSet::OrderedATNConfigSet() : ATNConfigSet() {
   configLookup = Ref<ConfigLookup>(

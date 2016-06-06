@@ -31,7 +31,7 @@
 
 #include "tree/Tree.h"
 
-using namespace org::antlr::v4::runtime::tree;
+using namespace antlr4::tree;
 
 bool Tree::operator == (const Tree &other) const {
   return &other == this;

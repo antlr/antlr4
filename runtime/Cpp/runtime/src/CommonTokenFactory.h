@@ -33,10 +33,7 @@
 
 #include "TokenFactory.h"
 
-namespace org {
-namespace antlr {
-namespace v4 {
-namespace runtime {
+namespace antlr4 {
 
   /**
    * This default implementation of {@link TokenFactory} creates
@@ -100,7 +97,4 @@ namespace runtime {
     virtual Ref<CommonToken> create(int type, const std::string &text) override;
   };
 
-} // namespace runtime
-} // namespace v4
-} // namespace antlr
-} // namespace org
+} // namespace antlr4

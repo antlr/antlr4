@@ -33,7 +33,7 @@
 
 #include "CommonTokenStream.h"
 
-using namespace org::antlr::v4::runtime;
+using namespace antlr4;
 
 CommonTokenStream::CommonTokenStream(TokenSource *tokenSource) : BufferedTokenStream(tokenSource) {
   InitializeInstanceFields();

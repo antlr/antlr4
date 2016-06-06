@@ -36,8 +36,8 @@
 #include "StringUtils.h"
 
 using namespace antlrcpp;
-using namespace org::antlr::v4::runtime;
-using namespace org::antlr::v4::runtime::misc;
+using namespace antlr4;
+using namespace antlr4::misc;
 
 @interface InputHandlingTests : XCTestCase
 

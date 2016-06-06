@@ -34,10 +34,7 @@
 #include "TokenSource.h"
 #include "CommonTokenFactory.h"
 
-namespace org {
-namespace antlr {
-namespace v4 {
-namespace runtime {
+namespace antlr4 {
 
   /// <summary>
   /// Provides an implementation of <seealso cref="TokenSource"/> as a wrapper around a list
@@ -131,7 +128,4 @@ namespace runtime {
     void InitializeInstanceFields();
   };
 
-} // namespace runtime
-} // namespace v4
-} // namespace antlr
-} // namespace org
+} // namespace antlr4

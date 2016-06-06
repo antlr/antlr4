@@ -33,7 +33,7 @@
 
 #include "dfa/LexerDFASerializer.h"
 
-using namespace org::antlr::v4::runtime::dfa;
+using namespace antlr4::dfa;
 
 LexerDFASerializer::LexerDFASerializer(DFA *dfa) : DFASerializer(dfa, VocabularyImpl::EMPTY_VOCABULARY) {
 }

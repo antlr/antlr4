@@ -77,8 +77,8 @@
 
 #include "atn/ATNDeserializer.h"
 
-using namespace org::antlr::v4::runtime;
-using namespace org::antlr::v4::runtime::atn;
+using namespace antlr4;
+using namespace antlr4::atn;
 using namespace antlrcpp;
 
 const size_t ATNDeserializer::SERIALIZED_VERSION = 3;

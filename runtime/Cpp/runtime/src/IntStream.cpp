@@ -31,6 +31,6 @@
 
 #include "IntStream.h"
 
-using namespace org::antlr::v4::runtime;
+using namespace antlr4;
 
 const std::string IntStream::UNKNOWN_SOURCE_NAME = "<unknown>";

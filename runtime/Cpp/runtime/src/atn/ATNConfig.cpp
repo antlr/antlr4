@@ -35,7 +35,7 @@
 
 #include "atn/ATNConfig.h"
 
-using namespace org::antlr::v4::runtime::atn;
+using namespace antlr4::atn;
 
 const size_t ATNConfig::SUPPRESS_PRECEDENCE_FILTER = 0x40000000;
 

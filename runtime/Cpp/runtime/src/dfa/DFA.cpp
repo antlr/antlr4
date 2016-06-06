@@ -37,8 +37,8 @@
 
 #include "dfa/DFA.h"
 
-using namespace org::antlr::v4::runtime;
-using namespace org::antlr::v4::runtime::dfa;
+using namespace antlr4;
+using namespace antlr4::dfa;
 using namespace antlrcpp;
 
 DFA::DFA(atn::DecisionState *atnStartState) : DFA(atnStartState, 0) {

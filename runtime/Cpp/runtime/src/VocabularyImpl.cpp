@@ -33,7 +33,7 @@
 
 #include "VocabularyImpl.h"
 
-using namespace org::antlr::v4::runtime::dfa;
+using namespace antlr4::dfa;
 
 const std::vector<std::string> VocabularyImpl::EMPTY_NAMES;
 const Ref<Vocabulary> VocabularyImpl::EMPTY_VOCABULARY = std::make_shared<VocabularyImpl>(EMPTY_NAMES, EMPTY_NAMES, EMPTY_NAMES);

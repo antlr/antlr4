@@ -33,8 +33,8 @@
 
 #include "atn/PredicateEvalInfo.h"
 
-using namespace org::antlr::v4::runtime;
-using namespace org::antlr::v4::runtime::atn;
+using namespace antlr4;
+using namespace antlr4::atn;
 
 PredicateEvalInfo::PredicateEvalInfo(int decision, TokenStream *input, int startIndex, int stopIndex,
   Ref<SemanticContext> semctx, bool evalResult, int predictedAlt, bool fullCtx)

@@ -34,10 +34,7 @@
 #include "RecognitionException.h"
 #include "atn/ATNConfigSet.h"
 
-namespace org {
-namespace antlr {
-namespace v4 {
-namespace runtime {
+namespace antlr4 {
 
   class ANTLR4CPP_PUBLIC LexerNoViableAltException : public RecognitionException {
   public:
@@ -57,7 +54,4 @@ namespace runtime {
     
   };
 
-} // namespace runtime
-} // namespace v4
-} // namespace antlr
-} // namespace org
+} // namespace antlr4

@@ -36,8 +36,8 @@
 
 #include "dfa/DFAState.h"
 
-using namespace org::antlr::v4::runtime::dfa;
-using namespace org::antlr::v4::runtime::atn;
+using namespace antlr4::dfa;
+using namespace antlr4::atn;
 
 DFAState::PredPrediction::PredPrediction(Ref<SemanticContext> pred, int alt) : pred(pred) {
   InitializeInstanceFields();
