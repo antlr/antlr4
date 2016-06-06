@@ -936,16 +936,16 @@ public abstract class BaseTest {
 
 	protected static void eraseDirectory(File dir) {
 		File[] files = dir.listFiles();
-		if (files == null) {
-			dir.delete();
-		}
-		for (File file : files) {
-			if (file.isDirectory()) {
-				eraseDirectory(file);
-			} else {
-				file.delete();
+		if (files != null) {
+			for (File file : files) {
+				if (file.isDirectory()) {
+					eraseDirectory(file);
+				} else {
+					file.delete();
+				}
 			}
 		}
+		dir.delete();
 	}
 
 	protected void eraseTempDir() {
