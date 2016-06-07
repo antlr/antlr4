@@ -39,7 +39,7 @@
 using namespace antlr4::dfa;
 using namespace antlr4::atn;
 
-DFAState::PredPrediction::PredPrediction(Ref<SemanticContext> pred, int alt) : pred(pred) {
+DFAState::PredPrediction::PredPrediction(const Ref<SemanticContext> &pred, int alt) : pred(pred) {
   InitializeInstanceFields();
   this->alt = alt;
 }
@@ -60,7 +60,7 @@ DFAState::DFAState(int state) : DFAState() {
   stateNumber = state;
 }
 
-DFAState::DFAState(Ref<ATNConfigSet> configs) : DFAState() {
+DFAState::DFAState(const Ref<ATNConfigSet> &configs) : DFAState() {
   this->configs = configs;
 }
 

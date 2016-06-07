@@ -97,7 +97,7 @@ namespace dfa {
      * @deprecated Use {@link #toString(Vocabulary)} instead.
      */
     virtual std::string toString(const std::vector<std::string>& tokenNames);
-    std::string toString(Ref<Vocabulary> vocabulary) const;
+    std::string toString(const Vocabulary &vocabulary) const;
 
     virtual std::string toLexerString();
 

@@ -146,8 +146,8 @@ public:
   virtual void exit<lname; format="cap">(<file.parserName>::<lname; format = "cap">Context * /*ctx*/) override { \}
 }; separator="\n">
 
-  virtual void enterEveryRule(Ref\<ParserRuleContext> /*ctx*/) override { }
-  virtual void exitEveryRule(Ref\<ParserRuleContext> /*ctx*/) override { }
+  virtual void enterEveryRule(ParserRuleContext * /*ctx*/) override { }
+  virtual void exitEveryRule(ParserRuleContext * /*ctx*/) override { }
   virtual void visitTerminal(Ref\<tree::TerminalNode> /*node*/) override { }
   virtual void visitErrorNode(Ref\<tree::ErrorNode> /*node*/) override { }
   

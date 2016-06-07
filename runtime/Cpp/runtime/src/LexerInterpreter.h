@@ -33,6 +33,7 @@
 
 #include "Lexer.h"
 #include "atn/PredictionContext.h"
+#include "Vocabulary.h"
 
 namespace antlr4 {
 
@@ -42,7 +43,7 @@ namespace antlr4 {
     LexerInterpreter(const std::string &grammarFileName, const std::vector<std::string> &tokenNames,
                      const std::vector<std::string> &ruleNames, const std::vector<std::string> &modeNames,
                      const atn::ATN &atn, CharStream *input);
-    LexerInterpreter(const std::string &grammarFileName, Ref<dfa::Vocabulary> vocabulary,
+    LexerInterpreter(const std::string &grammarFileName, const dfa::Vocabulary &vocabulary,
                      const std::vector<std::string> &ruleNames, const std::vector<std::string> &modeNames,
                      const atn::ATN &atn, CharStream *input);
 
@@ -54,7 +55,7 @@ namespace antlr4 {
     virtual const std::vector<std::string>& getRuleNames() const override;
     virtual const std::vector<std::string>& getModeNames() const override;
     
-    virtual Ref<dfa::Vocabulary> getVocabulary() const override;
+    virtual const dfa::Vocabulary& getVocabulary() const override;
 
   protected:
     const std::string _grammarFileName;
@@ -66,10 +67,10 @@ namespace antlr4 {
     const std::vector<std::string> &_modeNames;
     std::vector<dfa::DFA> _decisionToDFA;
 
-    Ref<atn::PredictionContextCache> _sharedContextCache;
+    atn::PredictionContextCache _sharedContextCache;
 
   private:
-    Ref<dfa::Vocabulary> _vocabulary;
+    dfa::Vocabulary _vocabulary;
   };
 
 } // namespace antlr4

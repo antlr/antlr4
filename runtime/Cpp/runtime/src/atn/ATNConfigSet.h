@@ -54,7 +54,7 @@ namespace atn {
   public:
     /// All configs but hashed by (s, i, _, pi) not including context. Wiped out
     /// when we go readonly as this set becomes a DFA state.
-    Ref<ConfigLookup> configLookup;
+    ConfigLookup *configLookup;
 
     /// <summary>
     /// Track the elements as they are added to the set; supports get(i) </summary>
@@ -84,11 +84,11 @@ namespace atn {
     const bool fullCtx;
 
     ATNConfigSet(bool fullCtx = true);
-    ATNConfigSet(Ref<ATNConfigSet> old);
+    ATNConfigSet(const Ref<ATNConfigSet> &old);
 
     virtual ~ATNConfigSet();
 
-    virtual bool add(Ref<ATNConfig> config);
+    virtual bool add(const Ref<ATNConfig> &config);
 
     /// <summary>
     /// Adding a new config means merging contexts with existing configs for
@@ -100,7 +100,7 @@ namespace atn {
     /// This method updates <seealso cref="#dipsIntoOuterContext"/> and
     /// <seealso cref="#hasSemanticContext"/> when necessary.
     /// </summary>
-    virtual bool add(Ref<ATNConfig> config, PredictionContextMergeCache *mergeCache);
+    virtual bool add(const Ref<ATNConfig> &config, PredictionContextMergeCache *mergeCache);
 
     /// <summary>
     /// Return a List holding list of configs </summary>
@@ -123,13 +123,13 @@ namespace atn {
 
     virtual void optimizeConfigs(ATNSimulator *interpreter);
 
-    bool addAll(Ref<ATNConfigSet> other);
+    bool addAll(const Ref<ATNConfigSet> &other);
 
     bool operator == (const ATNConfigSet &other);
     virtual size_t hashCode();
     virtual size_t size();
     virtual bool isEmpty();
-    virtual bool contains(Ref<ATNConfig> o);
+    virtual bool contains(const Ref<ATNConfig> &o);
     virtual void clear();
     virtual bool isReadonly();
     virtual void setReadonly(bool readonly);

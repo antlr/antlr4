@@ -49,8 +49,8 @@ namespace antlr4 {
      *
      * @deprecated Use {@link #getVocabulary()} instead.
      */
-    virtual const std::vector<std::string>& getTokenNames() const = 0;
-    virtual const std::vector<std::string>& getRuleNames() const = 0;
+    virtual std::vector<std::string> const& getTokenNames() const = 0;
+    virtual std::vector<std::string> const& getRuleNames() const = 0;
 
     /**
      * Get the vocabulary used by the recognizer.
@@ -58,7 +58,7 @@ namespace antlr4 {
      * @return A {@link Vocabulary} instance providing information about the
      * vocabulary used by the grammar.
      */
-    virtual Ref<dfa::Vocabulary> getVocabulary() const;
+    virtual dfa::Vocabulary const& getVocabulary() const;
 
     /// <summary>
     /// Get a map from token names to token types.
@@ -144,11 +144,11 @@ namespace antlr4 {
 
     // subclass needs to override these if there are sempreds or actions
     // that the ATN interp needs to execute
-    virtual bool sempred(Ref<RuleContext> localctx, int ruleIndex, int actionIndex);
+    virtual bool sempred(RuleContext *localctx, int ruleIndex, int actionIndex);
 
-    virtual bool precpred(Ref<RuleContext> localctx, int precedence);
+    virtual bool precpred(RuleContext *localctx, int precedence);
 
-    virtual void action(Ref<RuleContext> localctx, int ruleIndex, int actionIndex);
+    virtual void action(RuleContext *localctx, int ruleIndex, int actionIndex);
 
     int getState();
 
@@ -175,7 +175,7 @@ namespace antlr4 {
     atn::ATNSimulator *_interpreter; // Set and deleted in descendants (or the profiler).
 
   private:
-    static std::map<Ref<dfa::Vocabulary>, std::map<std::string, size_t>> _tokenTypeMapCache;
+    static std::map<const dfa::Vocabulary*, std::map<std::string, size_t>> _tokenTypeMapCache;
     static std::map<std::vector<std::string>, std::map<std::string, size_t>> _ruleIndexMapCache;
 
     ProxyErrorListener _proxListener; // Manages a collection of listeners.

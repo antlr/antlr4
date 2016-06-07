@@ -45,7 +45,7 @@
 #include "atn/ATN.h"
 #include "atn/RuleStopState.h"
 #include "Token.h"
-#include "VocabularyImpl.h"
+#include "Vocabulary.h"
 #include "InputMismatchException.h"
 #include "CommonToken.h"
 
@@ -59,16 +59,15 @@ using namespace antlrcpp;
 
 ParserInterpreter::ParserInterpreter(const std::string &grammarFileName, const std::vector<std::string>& tokenNames,
   const std::vector<std::string>& ruleNames, const atn::ATN &atn, TokenStream *input)
-  : ParserInterpreter(grammarFileName, dfa::VocabularyImpl::fromTokenNames(tokenNames), ruleNames, atn, input) {
+  : ParserInterpreter(grammarFileName, dfa::Vocabulary::fromTokenNames(tokenNames), ruleNames, atn, input) {
 }
 
-ParserInterpreter::ParserInterpreter(const std::string &grammarFileName, Ref<dfa::Vocabulary> vocabulary,
+ParserInterpreter::ParserInterpreter(const std::string &grammarFileName, const dfa::Vocabulary &vocabulary,
   const std::vector<std::string> &ruleNames, const atn::ATN &atn, TokenStream *input)
   : Parser(input), _grammarFileName(grammarFileName), _atn(atn), _ruleNames(ruleNames), _vocabulary(vocabulary) {
 
-  _sharedContextCache = std::make_shared<atn::PredictionContextCache>();
   for (size_t i = 0; i < atn.maxTokenType; ++i) {
-    _tokenNames.push_back(vocabulary->getDisplayName(i));
+    _tokenNames.push_back(vocabulary.getDisplayName(i));
   }
 
   // init decision DFA
@@ -99,7 +98,7 @@ const std::vector<std::string>& ParserInterpreter::getTokenNames() const {
   return _tokenNames;
 }
 
-Ref<dfa::Vocabulary> ParserInterpreter::getVocabulary() const {
+const dfa::Vocabulary& ParserInterpreter::getVocabulary() const {
   return _vocabulary;
 }
 
@@ -235,7 +234,7 @@ void ParserInterpreter::visitState(atn::ATNState *p) {
     case atn::Transition::PREDICATE:
     {
       atn::PredicateTransition *predicateTransition = (atn::PredicateTransition*)(transition);
-      if (!sempred(_ctx, predicateTransition->ruleIndex, predicateTransition->predIndex)) {
+      if (!sempred(_ctx.get(), predicateTransition->ruleIndex, predicateTransition->predIndex)) {
         throw FailedPredicateException(this);
       }
     }
@@ -244,13 +243,13 @@ void ParserInterpreter::visitState(atn::ATNState *p) {
     case atn::Transition::ACTION:
     {
       atn::ActionTransition *actionTransition = (atn::ActionTransition*)(transition);
-      action(_ctx, actionTransition->ruleIndex, actionTransition->actionIndex);
+      action(_ctx.get(), actionTransition->ruleIndex, actionTransition->actionIndex);
     }
       break;
 
     case atn::Transition::PRECEDENCE:
     {
-      if (!precpred(_ctx, ((atn::PrecedencePredicateTransition*)(transition))->precedence)) {
+      if (!precpred(_ctx.get(), ((atn::PrecedencePredicateTransition*)(transition))->precedence)) {
         throw FailedPredicateException(this, "precpred(_ctx, " + std::to_string(((atn::PrecedencePredicateTransition*)(transition))->precedence) +  ")");
       }
     }

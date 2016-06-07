@@ -34,6 +34,5 @@
 using namespace antlr4::atn;
 
 OrderedATNConfigSet::OrderedATNConfigSet() : ATNConfigSet() {
-  configLookup = Ref<ConfigLookup>(
-    new ConfigLookupImpl<OrderedATNConfigHasher, OrderedATNConfigComparer>()); /* mem-check: managed by shared_ptr in ConfigLookupImpl */
+  configLookup = new ConfigLookupImpl<OrderedATNConfigHasher, OrderedATNConfigComparer>(); /* mem-check: deleted in ATNConfigSet d-tor */
 }

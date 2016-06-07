@@ -136,7 +136,7 @@ std::string DFA::toString(const std::vector<std::string> &tokenNames) {
   return serializer.toString();
 }
 
-std::string DFA::toString(Ref<Vocabulary> vocabulary) const {
+std::string DFA::toString(const Vocabulary &vocabulary) const {
   if (s0 == nullptr) {
     return "";
   }

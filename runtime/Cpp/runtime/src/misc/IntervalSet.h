@@ -176,14 +176,14 @@ namespace misc {
      * @deprecated Use {@link #toString(Vocabulary)} instead.
      */
     virtual std::string toString(const std::vector<std::string> &tokenNames) const;
-    virtual std::string toString(Ref<dfa::Vocabulary> vocabulary) const;
+    virtual std::string toString(const dfa::Vocabulary &vocabulary) const;
 
   protected:
     /**
      * @deprecated Use {@link #elementName(Vocabulary, int)} instead.
      */
     virtual std::string elementName(const std::vector<std::string> &tokenNames, ssize_t a) const;
-    virtual std::string elementName(Ref<dfa::Vocabulary> vocabulary, ssize_t a) const;
+    virtual std::string elementName(const dfa::Vocabulary &vocabulary, ssize_t a) const;
 
   public:
     virtual size_t size() const;

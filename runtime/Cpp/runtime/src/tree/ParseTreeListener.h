@@ -53,8 +53,8 @@ namespace tree {
     
     virtual void visitTerminal(Ref<TerminalNode> node) = 0;
     virtual void visitErrorNode(Ref<ErrorNode> node) = 0;
-    virtual void enterEveryRule(Ref<ParserRuleContext> ctx) = 0;
-    virtual void exitEveryRule(Ref<ParserRuleContext> ctx) = 0;
+    virtual void enterEveryRule(ParserRuleContext *ctx) = 0;
+    virtual void exitEveryRule(ParserRuleContext *ctx) = 0;
 
     bool operator == (const ParseTreeListener &other) {
       return this == &other;

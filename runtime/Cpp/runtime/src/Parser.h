@@ -48,10 +48,10 @@ namespace antlr4 {
       TraceListener(Parser *outerInstance);
       virtual ~TraceListener() {};
 
-      virtual void enterEveryRule(Ref<ParserRuleContext> ctx) override;
+      virtual void enterEveryRule(ParserRuleContext *ctx) override;
       virtual void visitTerminal(Ref<tree::TerminalNode> node) override;
       virtual void visitErrorNode(Ref<tree::ErrorNode> node) override;
-      virtual void exitEveryRule(Ref<ParserRuleContext> ctx) override;
+      virtual void exitEveryRule(ParserRuleContext *ctx) override;
 
     private:
       Parser *const outerInstance;
@@ -63,10 +63,10 @@ namespace antlr4 {
 
       virtual ~TrimToSizeListener() {};
 
-      virtual void enterEveryRule(Ref<ParserRuleContext> ctx) override;
+      virtual void enterEveryRule(ParserRuleContext *ctx) override;
       virtual void visitTerminal(Ref<tree::TerminalNode> node) override;
       virtual void visitErrorNode(Ref<tree::ErrorNode> node) override;
-      virtual void exitEveryRule(Ref<ParserRuleContext> ctx) override;
+      virtual void exitEveryRule(ParserRuleContext *ctx) override;
     };
 
     Parser(TokenStream *input);
@@ -325,7 +325,7 @@ namespace antlr4 {
     virtual Ref<ParserRuleContext> getInvokingContext(int ruleIndex);
     virtual Ref<ParserRuleContext> getContext();
     virtual void setContext(Ref<ParserRuleContext> ctx);
-    virtual bool precpred(Ref<RuleContext> localctx, int precedence) override;
+    virtual bool precpred(RuleContext *localctx, int precedence) override;
     virtual bool inContext(const std::string &context);
 
     /// <summary>

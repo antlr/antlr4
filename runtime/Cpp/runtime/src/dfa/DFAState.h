@@ -68,7 +68,7 @@ namespace dfa {
       Ref<atn::SemanticContext> pred; // never null; at least SemanticContext.NONE
       int alt;
 
-      PredPrediction(Ref<atn::SemanticContext> pred, int alt);
+      PredPrediction(const Ref<atn::SemanticContext> &pred, int alt);
       virtual ~PredPrediction() {};
 
       virtual std::string toString();
@@ -124,7 +124,7 @@ namespace dfa {
     /// Map a predicate to a predicted alternative.
     DFAState();
     DFAState(int state);
-    DFAState(Ref<atn::ATNConfigSet> configs);
+    DFAState(const Ref<atn::ATNConfigSet> &configs);
     virtual ~DFAState();
 
     /// <summary>

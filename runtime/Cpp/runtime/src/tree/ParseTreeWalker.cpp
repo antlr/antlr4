@@ -60,12 +60,12 @@ void ParseTreeWalker::walk(Ref<ParseTreeListener> listener, Ref<ParseTree> t) {
 
 void ParseTreeWalker::enterRule(Ref<ParseTreeListener> listener, Ref<RuleNode> r) {
   Ref<ParserRuleContext> ctx = std::dynamic_pointer_cast<ParserRuleContext>(r->getRuleContext());
-  listener->enterEveryRule(ctx);
+  listener->enterEveryRule(ctx.get());
   ctx->enterRule(listener);
 }
 
 void ParseTreeWalker::exitRule(Ref<ParseTreeListener> listener, Ref<RuleNode> r) {
   Ref<ParserRuleContext> ctx = std::dynamic_pointer_cast<ParserRuleContext>(r->getRuleContext());
   ctx->exitRule(listener);
-  listener->exitEveryRule(ctx);
+  listener->exitEveryRule(ctx.get());
 }

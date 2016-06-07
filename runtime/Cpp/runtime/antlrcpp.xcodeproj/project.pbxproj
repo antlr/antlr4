@@ -798,15 +798,12 @@
 		276E60641CDB57AA003FF4B4 /* UnbufferedTokenStream.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5D251CDB57AA003FF4B4 /* UnbufferedTokenStream.h */; };
 		276E60651CDB57AA003FF4B4 /* UnbufferedTokenStream.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5D251CDB57AA003FF4B4 /* UnbufferedTokenStream.h */; };
 		276E60661CDB57AA003FF4B4 /* UnbufferedTokenStream.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5D251CDB57AA003FF4B4 /* UnbufferedTokenStream.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		276E60671CDB57AA003FF4B4 /* Vocabulary.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5D261CDB57AA003FF4B4 /* Vocabulary.h */; };
-		276E60681CDB57AA003FF4B4 /* Vocabulary.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5D261CDB57AA003FF4B4 /* Vocabulary.h */; };
-		276E60691CDB57AA003FF4B4 /* Vocabulary.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5D261CDB57AA003FF4B4 /* Vocabulary.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		276E606A1CDB57AA003FF4B4 /* VocabularyImpl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5D271CDB57AA003FF4B4 /* VocabularyImpl.cpp */; };
-		276E606B1CDB57AA003FF4B4 /* VocabularyImpl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5D271CDB57AA003FF4B4 /* VocabularyImpl.cpp */; };
-		276E606C1CDB57AA003FF4B4 /* VocabularyImpl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5D271CDB57AA003FF4B4 /* VocabularyImpl.cpp */; };
-		276E606D1CDB57AA003FF4B4 /* VocabularyImpl.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5D281CDB57AA003FF4B4 /* VocabularyImpl.h */; };
-		276E606E1CDB57AA003FF4B4 /* VocabularyImpl.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5D281CDB57AA003FF4B4 /* VocabularyImpl.h */; };
-		276E606F1CDB57AA003FF4B4 /* VocabularyImpl.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5D281CDB57AA003FF4B4 /* VocabularyImpl.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		276E606A1CDB57AA003FF4B4 /* Vocabulary.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5D271CDB57AA003FF4B4 /* Vocabulary.cpp */; };
+		276E606B1CDB57AA003FF4B4 /* Vocabulary.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5D271CDB57AA003FF4B4 /* Vocabulary.cpp */; };
+		276E606C1CDB57AA003FF4B4 /* Vocabulary.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5D271CDB57AA003FF4B4 /* Vocabulary.cpp */; };
+		276E606D1CDB57AA003FF4B4 /* Vocabulary.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5D281CDB57AA003FF4B4 /* Vocabulary.h */; };
+		276E606E1CDB57AA003FF4B4 /* Vocabulary.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5D281CDB57AA003FF4B4 /* Vocabulary.h */; };
+		276E606F1CDB57AA003FF4B4 /* Vocabulary.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5D281CDB57AA003FF4B4 /* Vocabulary.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		276E60731CDB57AA003FF4B4 /* WritableToken.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5D2A1CDB57AA003FF4B4 /* WritableToken.h */; };
 		276E60741CDB57AA003FF4B4 /* WritableToken.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5D2A1CDB57AA003FF4B4 /* WritableToken.h */; };
 		276E60751CDB57AA003FF4B4 /* WritableToken.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5D2A1CDB57AA003FF4B4 /* WritableToken.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -1016,7 +1013,7 @@
 		276E5C841CDB57AA003FF4B4 /* RuleStopState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RuleStopState.h; sourceTree = "<group>"; };
 		276E5C851CDB57AA003FF4B4 /* RuleTransition.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RuleTransition.cpp; sourceTree = "<group>"; };
 		276E5C861CDB57AA003FF4B4 /* RuleTransition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RuleTransition.h; sourceTree = "<group>"; };
-		276E5C871CDB57AA003FF4B4 /* SemanticContext.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SemanticContext.cpp; sourceTree = "<group>"; };
+		276E5C871CDB57AA003FF4B4 /* SemanticContext.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SemanticContext.cpp; sourceTree = "<group>"; wrapsLines = 0; };
 		276E5C881CDB57AA003FF4B4 /* SemanticContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SemanticContext.h; sourceTree = "<group>"; };
 		276E5C891CDB57AA003FF4B4 /* SetTransition.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SetTransition.cpp; sourceTree = "<group>"; };
 		276E5C8A1CDB57AA003FF4B4 /* SetTransition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SetTransition.h; sourceTree = "<group>"; };
@@ -1092,8 +1089,8 @@
 		276E5CD51CDB57AA003FF4B4 /* NoViableAltException.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NoViableAltException.h; sourceTree = "<group>"; };
 		276E5CD61CDB57AA003FF4B4 /* Parser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Parser.cpp; sourceTree = "<group>"; };
 		276E5CD71CDB57AA003FF4B4 /* Parser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Parser.h; sourceTree = "<group>"; };
-		276E5CD81CDB57AA003FF4B4 /* ParserInterpreter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParserInterpreter.cpp; sourceTree = "<group>"; };
-		276E5CD91CDB57AA003FF4B4 /* ParserInterpreter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParserInterpreter.h; sourceTree = "<group>"; };
+		276E5CD81CDB57AA003FF4B4 /* ParserInterpreter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParserInterpreter.cpp; sourceTree = "<group>"; wrapsLines = 0; };
+		276E5CD91CDB57AA003FF4B4 /* ParserInterpreter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParserInterpreter.h; sourceTree = "<group>"; wrapsLines = 0; };
 		276E5CDA1CDB57AA003FF4B4 /* ParserRuleContext.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParserRuleContext.cpp; sourceTree = "<group>"; };
 		276E5CDB1CDB57AA003FF4B4 /* ParserRuleContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParserRuleContext.h; sourceTree = "<group>"; };
 		276E5CDC1CDB57AA003FF4B4 /* ProxyErrorListener.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ProxyErrorListener.cpp; sourceTree = "<group>"; };
@@ -1160,9 +1157,8 @@
 		276E5D231CDB57AA003FF4B4 /* UnbufferedCharStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UnbufferedCharStream.h; sourceTree = "<group>"; };
 		276E5D241CDB57AA003FF4B4 /* UnbufferedTokenStream.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UnbufferedTokenStream.cpp; sourceTree = "<group>"; };
 		276E5D251CDB57AA003FF4B4 /* UnbufferedTokenStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UnbufferedTokenStream.h; sourceTree = "<group>"; };
-		276E5D261CDB57AA003FF4B4 /* Vocabulary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Vocabulary.h; sourceTree = "<group>"; };
-		276E5D271CDB57AA003FF4B4 /* VocabularyImpl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = VocabularyImpl.cpp; sourceTree = "<group>"; };
-		276E5D281CDB57AA003FF4B4 /* VocabularyImpl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VocabularyImpl.h; sourceTree = "<group>"; };
+		276E5D271CDB57AA003FF4B4 /* Vocabulary.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Vocabulary.cpp; sourceTree = "<group>"; wrapsLines = 0; };
+		276E5D281CDB57AA003FF4B4 /* Vocabulary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Vocabulary.h; sourceTree = "<group>"; };
 		276E5D2A1CDB57AA003FF4B4 /* WritableToken.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WritableToken.h; sourceTree = "<group>"; };
 		27745EF91CE49C000067C6A3 /* RuleContextWithAltNum.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RuleContextWithAltNum.cpp; sourceTree = "<group>"; wrapsLines = 0; };
 		27745EFA1CE49C000067C6A3 /* RuleContextWithAltNum.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RuleContextWithAltNum.h; sourceTree = "<group>"; wrapsLines = 0; };
@@ -1319,9 +1315,8 @@
 				276E5D231CDB57AA003FF4B4 /* UnbufferedCharStream.h */,
 				276E5D241CDB57AA003FF4B4 /* UnbufferedTokenStream.cpp */,
 				276E5D251CDB57AA003FF4B4 /* UnbufferedTokenStream.h */,
-				276E5D261CDB57AA003FF4B4 /* Vocabulary.h */,
-				276E5D271CDB57AA003FF4B4 /* VocabularyImpl.cpp */,
-				276E5D281CDB57AA003FF4B4 /* VocabularyImpl.h */,
+				276E5D271CDB57AA003FF4B4 /* Vocabulary.cpp */,
+				276E5D281CDB57AA003FF4B4 /* Vocabulary.h */,
 				276E5D2A1CDB57AA003FF4B4 /* WritableToken.h */,
 			);
 			name = runtime;
@@ -1728,11 +1723,10 @@
 				276E5D931CDB57AA003FF4B4 /* AtomTransition.h in Headers */,
 				276E604E1CDB57AA003FF4B4 /* Tree.h in Headers */,
 				276E5F521CDB57AA003FF4B4 /* LexerInterpreter.h in Headers */,
-				276E60691CDB57AA003FF4B4 /* Vocabulary.h in Headers */,
 				276E5F311CDB57AA003FF4B4 /* FailedPredicateException.h in Headers */,
 				276E5E321CDB57AA003FF4B4 /* LookaheadEventInfo.h in Headers */,
 				276E5F0D1CDB57AA003FF4B4 /* DFA.h in Headers */,
-				276E606F1CDB57AA003FF4B4 /* VocabularyImpl.h in Headers */,
+				276E606F1CDB57AA003FF4B4 /* Vocabulary.h in Headers */,
 				276E60541CDB57AA003FF4B4 /* Trees.h in Headers */,
 				276E5FB51CDB57AA003FF4B4 /* BitSet.h in Headers */,
 				276E5F9A1CDB57AA003FF4B4 /* ProxyErrorListener.h in Headers */,
@@ -1898,11 +1892,10 @@
 				276E5D921CDB57AA003FF4B4 /* AtomTransition.h in Headers */,
 				276E604D1CDB57AA003FF4B4 /* Tree.h in Headers */,
 				276E5F511CDB57AA003FF4B4 /* LexerInterpreter.h in Headers */,
-				276E60681CDB57AA003FF4B4 /* Vocabulary.h in Headers */,
 				276E5F301CDB57AA003FF4B4 /* FailedPredicateException.h in Headers */,
 				276E5E311CDB57AA003FF4B4 /* LookaheadEventInfo.h in Headers */,
 				276E5F0C1CDB57AA003FF4B4 /* DFA.h in Headers */,
-				276E606E1CDB57AA003FF4B4 /* VocabularyImpl.h in Headers */,
+				276E606E1CDB57AA003FF4B4 /* Vocabulary.h in Headers */,
 				276E60531CDB57AA003FF4B4 /* Trees.h in Headers */,
 				276E5FB41CDB57AA003FF4B4 /* BitSet.h in Headers */,
 				276E5F991CDB57AA003FF4B4 /* ProxyErrorListener.h in Headers */,
@@ -2062,11 +2055,10 @@
 				276E604C1CDB57AA003FF4B4 /* Tree.h in Headers */,
 				276E5F501CDB57AA003FF4B4 /* LexerInterpreter.h in Headers */,
 				27DB44AE1D045537007E790B /* XPathWildcardElement.h in Headers */,
-				276E60671CDB57AA003FF4B4 /* Vocabulary.h in Headers */,
 				276E5F2F1CDB57AA003FF4B4 /* FailedPredicateException.h in Headers */,
 				276E5E301CDB57AA003FF4B4 /* LookaheadEventInfo.h in Headers */,
 				276E5F0B1CDB57AA003FF4B4 /* DFA.h in Headers */,
-				276E606D1CDB57AA003FF4B4 /* VocabularyImpl.h in Headers */,
+				276E606D1CDB57AA003FF4B4 /* Vocabulary.h in Headers */,
 				276E60521CDB57AA003FF4B4 /* Trees.h in Headers */,
 				276E5FB31CDB57AA003FF4B4 /* BitSet.h in Headers */,
 				27DB44AA1D045537007E790B /* XPathTokenElement.h in Headers */,
@@ -2287,7 +2279,7 @@
 				27DB44D51D0463DB007E790B /* XPathTokenElement.cpp in Sources */,
 				27DB44D11D0463DB007E790B /* XPathRuleElement.cpp in Sources */,
 				276E5DED1CDB57AA003FF4B4 /* LexerATNSimulator.cpp in Sources */,
-				276E606C1CDB57AA003FF4B4 /* VocabularyImpl.cpp in Sources */,
+				276E606C1CDB57AA003FF4B4 /* Vocabulary.cpp in Sources */,
 				276E5F1C1CDB57AA003FF4B4 /* LexerDFASerializer.cpp in Sources */,
 				276E60181CDB57AA003FF4B4 /* ParseTreePattern.cpp in Sources */,
 				276E5DE71CDB57AA003FF4B4 /* LexerATNConfig.cpp in Sources */,
@@ -2427,7 +2419,7 @@
 				27DB44C31D0463DA007E790B /* XPathTokenElement.cpp in Sources */,
 				27DB44BF1D0463DA007E790B /* XPathRuleElement.cpp in Sources */,
 				276E5DEC1CDB57AA003FF4B4 /* LexerATNSimulator.cpp in Sources */,
-				276E606B1CDB57AA003FF4B4 /* VocabularyImpl.cpp in Sources */,
+				276E606B1CDB57AA003FF4B4 /* Vocabulary.cpp in Sources */,
 				276E5F1B1CDB57AA003FF4B4 /* LexerDFASerializer.cpp in Sources */,
 				276E60171CDB57AA003FF4B4 /* ParseTreePattern.cpp in Sources */,
 				276E5DE61CDB57AA003FF4B4 /* LexerATNConfig.cpp in Sources */,
@@ -2567,7 +2559,7 @@
 				276E5D6A1CDB57AA003FF4B4 /* ATNDeserializationOptions.cpp in Sources */,
 				276E60341CDB57AA003FF4B4 /* TokenTagToken.cpp in Sources */,
 				276E5DEB1CDB57AA003FF4B4 /* LexerATNSimulator.cpp in Sources */,
-				276E606A1CDB57AA003FF4B4 /* VocabularyImpl.cpp in Sources */,
+				276E606A1CDB57AA003FF4B4 /* Vocabulary.cpp in Sources */,
 				276E5F1A1CDB57AA003FF4B4 /* LexerDFASerializer.cpp in Sources */,
 				276E60161CDB57AA003FF4B4 /* ParseTreePattern.cpp in Sources */,
 				276E5DE51CDB57AA003FF4B4 /* LexerATNConfig.cpp in Sources */,

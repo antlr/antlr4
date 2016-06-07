@@ -39,13 +39,12 @@
 #include "support/CPPUtils.h"
 
 #include "Vocabulary.h"
-#include "VocabularyImpl.h"
 
 #include "Recognizer.h"
 
 using namespace antlr4;
 
-std::map<Ref<dfa::Vocabulary>, std::map<std::string, size_t>> Recognizer::_tokenTypeMapCache;
+std::map<const dfa::Vocabulary*, std::map<std::string, size_t>> Recognizer::_tokenTypeMapCache;
 std::map<std::vector<std::string>, std::map<std::string, size_t>> Recognizer::_ruleIndexMapCache;
 
 Recognizer::Recognizer() {
@@ -53,32 +52,33 @@ Recognizer::Recognizer() {
   _proxListener.addErrorListener(&ConsoleErrorListener::INSTANCE);
 }
 
-Ref<dfa::Vocabulary> Recognizer::getVocabulary() const {
-  return dfa::VocabularyImpl::fromTokenNames(getTokenNames());
+dfa::Vocabulary const& Recognizer::getVocabulary() const {
+  static dfa::Vocabulary vocabulary = dfa::Vocabulary::fromTokenNames(getTokenNames());
+  return vocabulary;
 }
 
 std::map<std::string, size_t> Recognizer::getTokenTypeMap() {
-  Ref<dfa::Vocabulary> vocabulary = getVocabulary();
+  const dfa::Vocabulary& vocabulary = getVocabulary();
 
   std::lock_guard<std::recursive_mutex> lck(mtx);
   std::map<std::string, size_t> result;
-  auto iterator = _tokenTypeMapCache.find(vocabulary);
+  auto iterator = _tokenTypeMapCache.find(&vocabulary);
   if (iterator != _tokenTypeMapCache.end()) {
     result = iterator->second;
   } else {
     for (size_t i = 0; i < getATN().maxTokenType; ++i) {
-      std::string literalName = vocabulary->getLiteralName(i);
+      std::string literalName = vocabulary.getLiteralName(i);
       if (!literalName.empty()) {
         result[literalName] = i;
       }
 
-      std::string symbolicName = vocabulary->getSymbolicName(i);
+      std::string symbolicName = vocabulary.getSymbolicName(i);
       if (!symbolicName.empty()) {
         result[symbolicName] = i;
       }
 				}
     result["EOF"] = EOF;
-    _tokenTypeMapCache[vocabulary] = result;
+    _tokenTypeMapCache[&vocabulary] = result;
   }
 
   return result;
@@ -148,7 +148,7 @@ std::string Recognizer::getTokenErrorDisplay(Token *t) {
   antlrcpp::replaceAll(s, "\r","\\r");
   antlrcpp::replaceAll(s, "\t", "\\t");
 
-  return std::string("'") + s + std::string("'");
+  return "'" + s + "'";
 }
 
 void Recognizer::addErrorListener(ANTLRErrorListener *listener) {
@@ -167,15 +167,15 @@ ProxyErrorListener& Recognizer::getErrorListenerDispatch() {
   return _proxListener;
 }
 
-bool Recognizer::sempred(Ref<RuleContext> /*localctx*/, int /*ruleIndex*/, int /*actionIndex*/) {
+bool Recognizer::sempred(RuleContext * /*localctx*/, int /*ruleIndex*/, int /*actionIndex*/) {
   return true;
 }
 
-bool Recognizer::precpred(Ref<RuleContext> /*localctx*/, int /*precedence*/) {
+bool Recognizer::precpred(RuleContext * /*localctx*/, int /*precedence*/) {
   return true;
 }
 
-void Recognizer::action(Ref<RuleContext> /*localctx*/, int /*ruleIndex*/, int /*actionIndex*/) {
+void Recognizer::action(RuleContext * /*localctx*/, int /*ruleIndex*/, int /*actionIndex*/) {
 }
 
 int Recognizer::getState() {

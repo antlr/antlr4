@@ -52,7 +52,7 @@ bool SemanticContext::Predicate::eval(Recognizer *parser, Ref<RuleContext> parse
   Ref<RuleContext> localctx;
   if (isCtxDependent)
     localctx = parserCallStack;
-  return parser->sempred(localctx, ruleIndex, predIndex);
+  return parser->sempred(localctx.get(), ruleIndex, predIndex);
 }
 
 size_t SemanticContext::Predicate::hashCode() const {
@@ -92,11 +92,11 @@ SemanticContext::PrecedencePredicate::PrecedencePredicate(int precedence) : prec
 }
 
 bool SemanticContext::PrecedencePredicate::eval(Recognizer *parser, Ref<RuleContext> parserCallStack) {
-  return parser->precpred(parserCallStack, precedence);
+  return parser->precpred(parserCallStack.get(), precedence);
 }
 
 Ref<SemanticContext> SemanticContext::PrecedencePredicate::evalPrecedence(Recognizer *parser, Ref<RuleContext> parserCallStack) {
-  if (parser->precpred(parserCallStack, precedence)) {
+  if (parser->precpred(parserCallStack.get(), precedence)) {
     return SemanticContext::NONE;
   }
   else {

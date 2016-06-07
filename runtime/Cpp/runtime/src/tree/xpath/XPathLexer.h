@@ -5,7 +5,7 @@
 
 
 #include "antlr4-runtime.h"
-
+#include "Vocabulary.h"
 
 namespace antlr4 {
 
@@ -24,29 +24,29 @@ public:
 
   virtual const std::vector<std::string>& getModeNames() const override;
   virtual const std::vector<std::string>& getTokenNames() const override; // deprecated, use vocabulary instead
-  virtual Ref<dfa::Vocabulary> getVocabulary() const override;
+  virtual const dfa::Vocabulary& getVocabulary() const override;
 
   virtual const std::vector<uint16_t> getSerializedATN() const;
   virtual const atn::ATN& getATN() const override;
 
-  virtual void action(Ref<RuleContext> context, int ruleIndex, int actionIndex) override;
+  virtual void action(RuleContext *context, int ruleIndex, int actionIndex) override;
 
 private:
   static std::vector<dfa::DFA> _decisionToDFA;
-  static Ref<atn::PredictionContextCache> _sharedContextCache;
+  static atn::PredictionContextCache _sharedContextCache;
   static std::vector<std::string> _ruleNames;
   static std::vector<std::string> _tokenNames;
   static std::vector<std::string> _modeNames;
 
   static std::vector<std::string> _literalNames;
   static std::vector<std::string> _symbolicNames;
-  static Ref<dfa::Vocabulary> _vocabulary;
+  static dfa::Vocabulary _vocabulary;
   static atn::ATN _atn;
   static std::vector<uint16_t> _serializedATN;
 
 
   // Individual action functions triggered by action() above.
-  void IDAction(Ref<RuleContext> context, int actionIndex);
+  void IDAction(RuleContext *context, int actionIndex);
 
   // Individual semantic predicate functions triggered by sempred() above.
 

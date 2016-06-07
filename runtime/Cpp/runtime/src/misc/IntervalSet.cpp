@@ -32,7 +32,7 @@
 #include "misc/MurmurHash.h"
 #include "Lexer.h"
 #include "Exceptions.h"
-#include "VocabularyImpl.h"
+#include "Vocabulary.h"
 
 #include "misc/IntervalSet.h"
 
@@ -416,10 +416,10 @@ std::string IntervalSet::toString(bool elemAreChar) const {
 }
 
 std::string IntervalSet::toString(const std::vector<std::string> &tokenNames) const {
-  return toString(dfa::VocabularyImpl::fromTokenNames(tokenNames));
+  return toString(dfa::Vocabulary::fromTokenNames(tokenNames));
 }
 
-std::string IntervalSet::toString(Ref<dfa::Vocabulary> vocabulary) const {
+std::string IntervalSet::toString(const dfa::Vocabulary &vocabulary) const {
   if (_intervals.empty()) {
     return "{}";
   }
@@ -457,16 +457,16 @@ std::string IntervalSet::toString(Ref<dfa::Vocabulary> vocabulary) const {
 }
 
 std::string IntervalSet::elementName(const std::vector<std::string> &tokenNames, ssize_t a) const {
-  return elementName(dfa::VocabularyImpl::fromTokenNames(tokenNames), a);
+  return elementName(dfa::Vocabulary::fromTokenNames(tokenNames), a);
 }
 
-std::string IntervalSet::elementName(Ref<dfa::Vocabulary> vocabulary, ssize_t a) const {
+std::string IntervalSet::elementName(const dfa::Vocabulary &vocabulary, ssize_t a) const {
   if (a == Token::EOF) {
     return "<EOF>";
   } else if (a == Token::EPSILON) {
     return "<EPSILON>";
   } else {
-    return vocabulary->getDisplayName(a);
+    return vocabulary.getDisplayName(a);
   }
 }
 

@@ -43,7 +43,7 @@ using namespace antlr4::atn;
 
 const Ref<DFAState> ATNSimulator::ERROR = std::make_shared<DFAState>(INT32_MAX);
 
-ATNSimulator::ATNSimulator(const ATN &atn, Ref<PredictionContextCache> sharedContextCache)
+ATNSimulator::ATNSimulator(const ATN &atn, PredictionContextCache &sharedContextCache)
 : atn(atn), _sharedContextCache(sharedContextCache) {
 }
 
@@ -51,7 +51,7 @@ void ATNSimulator::clearDFA() {
   throw UnsupportedOperationException("This ATN simulator does not support clearing the DFA.");
 }
 
-Ref<PredictionContextCache> ATNSimulator::getSharedContextCache() {
+PredictionContextCache& ATNSimulator::getSharedContextCache() {
   return _sharedContextCache;
 }
 

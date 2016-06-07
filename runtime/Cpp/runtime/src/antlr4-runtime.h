@@ -75,7 +75,7 @@
 #include "UnbufferedCharStream.h"
 #include "UnbufferedTokenStream.h"
 #include "Vocabulary.h"
-#include "VocabularyImpl.h"
+#include "Vocabulary.h"
 #include "WritableToken.h"
 #include "atn/ATN.h"
 #include "atn/ATNConfig.h"

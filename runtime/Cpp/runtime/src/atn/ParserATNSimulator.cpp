@@ -51,7 +51,7 @@
 #include "ANTLRErrorListener.h"
 
 #include "Vocabulary.h"
-#include "VocabularyImpl.h"
+#include "Vocabulary.h"
 
 #include "support/Arrays.h"
 
@@ -63,12 +63,12 @@ using namespace antlr4::atn;
 using namespace antlrcpp;
 
 ParserATNSimulator::ParserATNSimulator(const ATN &atn, std::vector<dfa::DFA> &decisionToDFA,
-                                       Ref<PredictionContextCache> sharedContextCache)
+                                       PredictionContextCache &sharedContextCache)
 : ParserATNSimulator(nullptr, atn, decisionToDFA, sharedContextCache) {
 }
 
 ParserATNSimulator::ParserATNSimulator(Parser *parser, const ATN &atn, std::vector<dfa::DFA> &decisionToDFA,
-                                       Ref<PredictionContextCache> sharedContextCache)
+                                       PredictionContextCache &sharedContextCache)
 : ATNSimulator(atn, sharedContextCache), parser(parser), decisionToDFA(decisionToDFA) {
   InitializeInstanceFields();
 }
@@ -1137,8 +1137,8 @@ std::string ParserATNSimulator::getTokenName(ssize_t t) {
     return "EOF";
   }
 
-  Ref<dfa::Vocabulary> vocabulary = parser != nullptr ? parser->getVocabulary() : dfa::VocabularyImpl::EMPTY_VOCABULARY;
-  std::string displayName = vocabulary->getDisplayName(t);
+  const dfa::Vocabulary &vocabulary = parser != nullptr ? parser->getVocabulary() : dfa::Vocabulary::EMPTY_VOCABULARY;
+  std::string displayName = vocabulary.getDisplayName(t);
   if (displayName == std::to_string(t)) {
     return displayName;
   }
@@ -1210,11 +1210,13 @@ dfa::DFAState *ParserATNSimulator::addDFAEdge(dfa::DFA &dfa, dfa::DFAState *from
   }
 
   if (debug) {
-    Ref<dfa::Vocabulary> vocabulary = dfa::VocabularyImpl::EMPTY_VOCABULARY;
+    std::string dfaText;
     if (parser != nullptr) {
-      vocabulary = parser->getVocabulary();
+      dfaText = dfa.toString(parser->getVocabulary());
+    } else {
+      dfaText = dfa.toString(dfa::Vocabulary::EMPTY_VOCABULARY);
     }
-    std::cout << "DFA=\n" << dfa.toString(vocabulary) << std::endl;
+    std::cout << "DFA=\n" << dfaText << std::endl;
   }
 
   return to;
