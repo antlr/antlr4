@@ -31,7 +31,7 @@
 
 #include "atn/EpsilonTransition.h"
 
-using namespace org::antlr::v4::runtime::atn;
+using namespace antlr4::atn;
 
 EpsilonTransition::EpsilonTransition(ATNState *target) : EpsilonTransition(target, -1) {
 }

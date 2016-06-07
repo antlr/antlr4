@@ -35,9 +35,9 @@
 
 #include "atn/LexerCustomAction.h"
 
-using namespace org::antlr::v4::runtime;
-using namespace org::antlr::v4::runtime::atn;
-using namespace org::antlr::v4::runtime::misc;
+using namespace antlr4;
+using namespace antlr4::atn;
+using namespace antlr4::misc;
 
 LexerCustomAction::LexerCustomAction(int ruleIndex, int actionIndex) : _ruleIndex(ruleIndex), _actionIndex(actionIndex) {
 }

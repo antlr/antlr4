@@ -36,16 +36,16 @@
 
 #include "dfa/DFAState.h"
 
-using namespace org::antlr::v4::runtime::dfa;
-using namespace org::antlr::v4::runtime::atn;
+using namespace antlr4::dfa;
+using namespace antlr4::atn;
 
-DFAState::PredPrediction::PredPrediction(Ref<SemanticContext> pred, int alt) : pred(pred) {
+DFAState::PredPrediction::PredPrediction(const Ref<SemanticContext> &pred, int alt) : pred(pred) {
   InitializeInstanceFields();
   this->alt = alt;
 }
 
 std::string DFAState::PredPrediction::toString() {
-  return std::string("(") + pred->toString() + std::string(", ") + std::to_string(alt) + std::string(")");
+  return std::string("(") + pred->toString() + ", " + std::to_string(alt) + ")";
 }
 
 void DFAState::PredPrediction::InitializeInstanceFields() {
@@ -60,7 +60,7 @@ DFAState::DFAState(int state) : DFAState() {
   stateNumber = state;
 }
 
-DFAState::DFAState(Ref<ATNConfigSet> configs) : DFAState() {
+DFAState::DFAState(const Ref<ATNConfigSet> &configs) : DFAState() {
   this->configs = configs;
 }
 

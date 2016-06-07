@@ -42,9 +42,9 @@
 
 #include "tree/Trees.h"
 
-using namespace org::antlr::v4::runtime;
-using namespace org::antlr::v4::runtime::misc;
-using namespace org::antlr::v4::runtime::tree;
+using namespace antlr4;
+using namespace antlr4::misc;
+using namespace antlr4::tree;
 
 using namespace antlrcpp;
 
@@ -57,7 +57,7 @@ std::string Trees::toStringTree(Ref<Tree> t) {
 
 std::string Trees::toStringTree(Ref<Tree> t, Parser *recog) {
   if (recog == nullptr)
-    return toStringTree(t, {});
+    return toStringTree(t, std::vector<std::string>());
   return toStringTree(t, recog->getRuleNames());
 }
 

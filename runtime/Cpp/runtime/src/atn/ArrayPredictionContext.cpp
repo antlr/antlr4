@@ -34,7 +34,7 @@
 
 #include "atn/ArrayPredictionContext.h"
 
-using namespace org::antlr::v4::runtime::atn;
+using namespace antlr4::atn;
 
 ArrayPredictionContext::ArrayPredictionContext(Ref<SingletonPredictionContext> a)
   : ArrayPredictionContext({ a->parent }, { a->returnState }) {

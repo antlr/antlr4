@@ -38,9 +38,9 @@
 
 #include "DiagnosticErrorListener.h"
 
-using namespace org::antlr::v4::runtime;
+using namespace antlr4;
 
-DiagnosticErrorListener::DiagnosticErrorListener() : exactOnly(true) {
+DiagnosticErrorListener::DiagnosticErrorListener() : DiagnosticErrorListener(true) {
 }
 
 DiagnosticErrorListener::DiagnosticErrorListener(bool exactOnly) : exactOnly(exactOnly) {
@@ -55,8 +55,8 @@ void DiagnosticErrorListener::reportAmbiguity(Parser *recognizer, const dfa::DFA
   std::string decision = getDecisionDescription(recognizer, dfa);
   antlrcpp::BitSet conflictingAlts = getConflictingAlts(ambigAlts, configs);
   std::string text = recognizer->getTokenStream()->getText(misc::Interval((int)startIndex, (int)stopIndex));
-  std::string message = "reportAmbiguity d = " + decision + ": ambigAlts = " + conflictingAlts.toString() +
-    ", input = '" + text + "'";
+  std::string message = "reportAmbiguity d=" + decision + ": ambigAlts=" + conflictingAlts.toString() +
+    ", input='" + text + "'";
 
   recognizer->notifyErrorListeners(message);
 }
@@ -65,7 +65,7 @@ void DiagnosticErrorListener::reportAttemptingFullContext(Parser *recognizer, co
   size_t stopIndex, const antlrcpp::BitSet &/*conflictingAlts*/, Ref<atn::ATNConfigSet> /*configs*/) {
   std::string decision = getDecisionDescription(recognizer, dfa);
   std::string text = recognizer->getTokenStream()->getText(misc::Interval((int)startIndex, (int)stopIndex));
-  std::string message = "reportAttemptingFullContext d = " + decision + ", input = '" + text + "'";
+  std::string message = "reportAttemptingFullContext d=" + decision + ", input='" + text + "'";
   recognizer->notifyErrorListeners(message);
 }
 
@@ -73,7 +73,7 @@ void DiagnosticErrorListener::reportContextSensitivity(Parser *recognizer, const
   size_t stopIndex, int /*prediction*/, Ref<atn::ATNConfigSet> /*configs*/) {
   std::string decision = getDecisionDescription(recognizer, dfa);
   std::string text = recognizer->getTokenStream()->getText(misc::Interval((int)startIndex, (int)stopIndex));
-  std::string message = "reportContextSensitivity d = " + decision + ", input = '" + text + "'";
+  std::string message = "reportContextSensitivity d=" + decision + ", input='" + text + "'";
   recognizer->notifyErrorListeners(message);
 }
 
@@ -91,7 +91,7 @@ std::string DiagnosticErrorListener::getDecisionDescription(Parser *recognizer, 
     return std::to_string(decision);
   }
 
-  return std::to_string(decision) + "(" + ruleName + ")";
+  return std::to_string(decision) + " (" + ruleName + ")";
 }
 
 antlrcpp::BitSet DiagnosticErrorListener::getConflictingAlts(const antlrcpp::BitSet &reportedAlts,

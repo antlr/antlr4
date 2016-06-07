@@ -45,7 +45,7 @@
 
 #include "DefaultErrorStrategy.h"
 
-using namespace org::antlr::v4::runtime;
+using namespace antlr4;
 using namespace antlrcpp;
 
 void DefaultErrorStrategy::reset(Parser *recognizer) {
@@ -269,7 +269,7 @@ Ref<Token> DefaultErrorStrategy::getMissingSymbol(Parser *recognizer) {
   if (expectedTokenType == Token::EOF) {
     tokenText = "<missing EOF>";
   } else {
-    tokenText = "<missing " + recognizer->getVocabulary()->getDisplayName(expectedTokenType) + ">";
+    tokenText = "<missing " + recognizer->getVocabulary().getDisplayName(expectedTokenType) + ">";
   }
   Ref<Token> current = currentSymbol;
   Ref<Token> lookback = recognizer->getTokenStream()->LT(-1);

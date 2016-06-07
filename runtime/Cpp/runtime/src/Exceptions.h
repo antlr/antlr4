@@ -32,10 +32,7 @@
 
 #include "antlr4-common.h"
 
-namespace org {
-namespace antlr {
-namespace v4 {
-namespace runtime {
+namespace antlr4 {
 
   // An exception hierarchy modelled loosely after java.lang.* exceptions.
   class ANTLR4CPP_PUBLIC RuntimeException : public std::exception {
@@ -99,7 +96,4 @@ namespace runtime {
     ParseCancellationException(const std::string &msg = "") : CancellationException(msg) {};
   };
 
-} // namespace runtime
-} // namespace v4
-} // namespace antlr
-} // namespace org
+} // namespace antlr4

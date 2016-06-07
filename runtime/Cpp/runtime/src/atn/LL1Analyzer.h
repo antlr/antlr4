@@ -36,10 +36,7 @@
 #include "atn/PredictionContext.h"
 #include "atn/ATNConfig.h"
 
-namespace org {
-namespace antlr {
-namespace v4 {
-namespace runtime {
+namespace antlr4 {
 namespace atn {
 
   class ANTLR4CPP_PUBLIC LL1Analyzer {
@@ -135,7 +132,4 @@ namespace atn {
   };
 
 } // namespace atn
-} // namespace runtime
-} // namespace v4
-} // namespace antlr
-} // namespace org
+} // namespace antlr4

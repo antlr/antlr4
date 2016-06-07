@@ -38,10 +38,7 @@
 #include "SemanticContext.h"
 #include "atn/ATNConfig.h"
 
-namespace org {
-namespace antlr {
-namespace v4 {
-namespace runtime {
+namespace antlr4 {
 namespace atn {
 
   /**
@@ -313,10 +310,10 @@ namespace atn {
   public:
     /// Testing only!
     ParserATNSimulator(const ATN &atn, std::vector<dfa::DFA> &decisionToDFA,
-                       Ref<PredictionContextCache> sharedContextCache);
+                       PredictionContextCache &sharedContextCache);
 
     ParserATNSimulator(Parser *parser, const ATN &atn, std::vector<dfa::DFA> &decisionToDFA,
-                       Ref<PredictionContextCache> sharedContextCache);
+                       PredictionContextCache &sharedContextCache);
 
     virtual void reset() override;
     virtual void clearDFA() override;
@@ -859,7 +856,4 @@ namespace atn {
   };
 
 } // namespace atn
-} // namespace runtime
-} // namespace v4
-} // namespace antlr
-} // namespace org
+} // namespace antlr4

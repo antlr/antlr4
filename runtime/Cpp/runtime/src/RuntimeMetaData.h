@@ -33,10 +33,7 @@
 
 #include "antlr4-common.h"
 
-namespace org {
-namespace antlr {
-namespace v4 {
-namespace runtime {
+namespace antlr4 {
 
   /// <summary>
   /// This class provides access to the current version of the ANTLR 4 runtime
@@ -181,7 +178,4 @@ namespace runtime {
     static std::string getMajorMinorVersion(const std::string &version);
   };
 
-} // namespace runtime
-} // namespace v4
-} // namespace antlr
-} // namespace org
+} // namespace antlr4

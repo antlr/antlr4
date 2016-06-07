@@ -34,8 +34,8 @@
 
 #include "atn/AtomTransition.h"
 
-using namespace org::antlr::v4::runtime::misc;
-using namespace org::antlr::v4::runtime::atn;
+using namespace antlr4::misc;
+using namespace antlr4::atn;
 
 AtomTransition::AtomTransition(ATNState *target, size_t label) : Transition(target), _label(label) {
 }

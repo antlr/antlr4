@@ -35,7 +35,7 @@
 
 #include "atn/ATNConfig.h"
 
-using namespace org::antlr::v4::runtime::atn;
+using namespace antlr4::atn;
 
 const size_t ATNConfig::SUPPRESS_PRECEDENCE_FILTER = 0x40000000;
 
@@ -78,8 +78,8 @@ size_t ATNConfig::hashCode() const {
   size_t hashCode = misc::MurmurHash::initialize(7);
   hashCode = misc::MurmurHash::update(hashCode, (size_t)state->stateNumber);
   hashCode = misc::MurmurHash::update(hashCode, (size_t)alt);
-  hashCode = misc::MurmurHash::update(hashCode, context ? context->hashCode() : 0);
-  hashCode = misc::MurmurHash::update(hashCode, semanticContext->hashCode());
+  hashCode = misc::MurmurHash::update(hashCode, context);
+  hashCode = misc::MurmurHash::update(hashCode, semanticContext);
   hashCode = misc::MurmurHash::finish(hashCode, 4);
   return hashCode;
 }

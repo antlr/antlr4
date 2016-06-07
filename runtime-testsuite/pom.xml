@@ -71,6 +71,7 @@
         <configuration>
           <includes>
             <include>**/csharp/Test*.java</include>
+            <include>**/cpp/Test*.java</include>
             <include>**/java/Test*.java</include>
             <include>**/javascript/node/Test*.java</include>
             <include>**/python2/Test*.java</include> 

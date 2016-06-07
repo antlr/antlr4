@@ -31,7 +31,7 @@
 
 #include "atn/LoopEndState.h"
 
-using namespace org::antlr::v4::runtime::atn;
+using namespace antlr4::atn;
 
 int LoopEndState::getStateType() {
   return LOOP_END;

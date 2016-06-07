@@ -31,7 +31,7 @@
 
 #include "TokenStream.h"
 
-using namespace org::antlr::v4::runtime;
+using namespace antlr4;
 
 TokenStream::~TokenStream() {
 }

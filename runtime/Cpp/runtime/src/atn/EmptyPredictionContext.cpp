@@ -31,7 +31,7 @@
 
 #include "atn/EmptyPredictionContext.h"
 
-using namespace org::antlr::v4::runtime::atn;
+using namespace antlr4::atn;
 
 EmptyPredictionContext::EmptyPredictionContext() : SingletonPredictionContext(std::weak_ptr<PredictionContext>(), EMPTY_RETURN_STATE) {
 }

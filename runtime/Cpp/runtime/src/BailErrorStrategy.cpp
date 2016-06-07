@@ -36,7 +36,7 @@
 
 #include "BailErrorStrategy.h"
 
-using namespace org::antlr::v4::runtime;
+using namespace antlr4;
 
 void BailErrorStrategy::recover(Parser *recognizer, std::exception_ptr e) {
   Ref<ParserRuleContext> context = recognizer->getContext();
@@ -47,16 +47,15 @@ void BailErrorStrategy::recover(Parser *recognizer, std::exception_ptr e) {
     context = context->getParent().lock();
   } while (true);
 
-#if defined(_MSC_FULL_VER) && _MSC_FULL_VER < 190023026
-  // throw_with_nested is not available before VS 2015.
-  std::rethrow_exception(e);
-#else
   try {
     std::rethrow_exception(e); // Throw the exception to be able to catch and rethrow nested.
   } catch (RecognitionException &inner) {
+#if defined(_MSC_FULL_VER) && _MSC_FULL_VER < 190023026
+    throw ParseCancellationException(inner.what());
+#else
     std::throw_with_nested(ParseCancellationException());
-  }
 #endif
+  }
 }
 
 Ref<Token> BailErrorStrategy::recoverInline(Parser *recognizer)  {
@@ -71,15 +70,15 @@ Ref<Token> BailErrorStrategy::recoverInline(Parser *recognizer)  {
     context = context->getParent().lock();
   } while (true);
 
-#if defined(_MSC_FULL_VER) && _MSC_FULL_VER < 190023026
-  throw e;
-#else
   try {
     throw e;
   } catch (InputMismatchException &inner) {
+#if defined(_MSC_FULL_VER) && _MSC_FULL_VER < 190023026
+    throw ParseCancellationException(inner.what());
+#else
     std::throw_with_nested(ParseCancellationException());
-  }
 #endif
+  }
 }
 
 void BailErrorStrategy::sync(Parser * /*recognizer*/) {

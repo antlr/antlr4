@@ -33,10 +33,7 @@
 
 #include "ANTLRInputStream.h"
 
-namespace org {
-namespace antlr {
-namespace v4 {
-namespace runtime {
+namespace antlr4 {
 
   /// This is an ANTLRInputStream that is loaded from a file all at once
   /// when you construct the object (or call load()).
@@ -53,7 +50,4 @@ namespace runtime {
     virtual std::string getSourceName() const override;
   };
 
-} // namespace runtime
-} // namespace v4
-} // namespace antlr
-} // namespace org
+} // namespace antlr4

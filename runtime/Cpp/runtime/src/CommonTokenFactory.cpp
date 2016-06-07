@@ -35,7 +35,7 @@
 
 #include "CommonTokenFactory.h"
 
-using namespace org::antlr::v4::runtime;
+using namespace antlr4;
 
 const Ref<TokenFactory<CommonToken>> CommonTokenFactory::DEFAULT = std::make_shared<CommonTokenFactory>();
 

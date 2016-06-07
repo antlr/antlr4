@@ -36,7 +36,7 @@
 
 #include "RuleContext.h"
 
-using namespace org::antlr::v4::runtime;
+using namespace antlr4;
 
 const Ref<RuleContext> RuleContext::EMPTY = std::make_shared<ParserRuleContext>();
 

@@ -34,8 +34,8 @@
 
 #include "tree/TerminalNodeImpl.h"
 
-using namespace org::antlr::v4::runtime;
-using namespace org::antlr::v4::runtime::tree;
+using namespace antlr4;
+using namespace antlr4::tree;
 
 TerminalNodeImpl::TerminalNodeImpl(Ref<Token> symbol) {
   this->symbol = symbol;

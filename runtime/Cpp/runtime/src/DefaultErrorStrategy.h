@@ -34,10 +34,7 @@
 #include "ANTLRErrorStrategy.h"
 #include "misc/IntervalSet.h"
 
-namespace org {
-namespace antlr {
-namespace v4 {
-namespace runtime {
+namespace antlr4 {
 
   /**
    * This is the default implementation of {@link ANTLRErrorStrategy} used for
@@ -490,7 +487,4 @@ namespace runtime {
 
   };
 
-} // namespace runtime
-} // namespace v4
-} // namespace antlr
-} // namespace org
+} // namespace antlr4

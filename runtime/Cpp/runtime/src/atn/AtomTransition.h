@@ -33,10 +33,7 @@
 
 #include "atn/Transition.h"
 
-namespace org {
-namespace antlr {
-namespace v4 {
-namespace runtime {
+namespace antlr4 {
 namespace atn {
 
   /// TO_DO: make all transitions sets? no, should remove set edges.
@@ -56,7 +53,4 @@ namespace atn {
   };
 
 } // namespace atn
-} // namespace runtime
-} // namespace v4
-} // namespace antlr
-} // namespace org
+} // namespace antlr4

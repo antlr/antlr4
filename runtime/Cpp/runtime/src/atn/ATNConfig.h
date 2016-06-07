@@ -31,10 +31,7 @@
 
 #pragma once
 
-namespace org {
-namespace antlr {
-namespace v4 {
-namespace runtime {
+namespace antlr4 {
 namespace atn {
 
   /// <summary>
@@ -47,10 +44,21 @@ namespace atn {
   /// </summary>
   class ANTLR4CPP_PUBLIC ATNConfig {
   public:
-    struct ATNConfigHasher;
-    struct ATNConfigComparer;
+    struct Hasher
+    {
+      size_t operator()(const ATNConfig &k) const {
+        return k.hashCode();
+      }
+    };
 
-    using Set = std::unordered_set<Ref<ATNConfig>, ATNConfigHasher, ATNConfigComparer>;
+    struct Comparer {
+      bool operator()(const ATNConfig &lhs, const ATNConfig &rhs) const {
+        return lhs == rhs;
+      }
+    };
+    
+
+    using Set = std::unordered_set<Ref<ATNConfig>, Hasher, Comparer>;
     
     /// The ATN state associated with this configuration.
     ATNState * state;
@@ -76,7 +84,7 @@ namespace atn {
      * <p>
      * closure() tracks the depth of how far we dip into the outer context:
      * depth > 0.  Note that it may not be totally accurate depth since I
-     * don't ever decrement. TODO: make it a boolean then</p>
+     * don't ever decrement. TO_DO: make it a boolean then</p>
      *
      * <p>
      * For memory efficiency, the {@link #isPrecedenceFilterSuppressed} method
@@ -108,20 +116,6 @@ namespace atn {
 
     virtual size_t hashCode() const;
 
-    struct ATNConfigHasher
-    {
-      size_t operator()(const ATNConfig &k) const {
-        return k.hashCode();
-      }
-    };
-
-    struct ATNConfigComparer {
-      bool operator()(const ATNConfig &lhs, const ATNConfig &rhs) const
-      {
-        return lhs == rhs;
-      }
-    };
-
     /**
      * This method gets the value of the {@link #reachesIntoOuterContext} field
      * as it existed prior to the introduction of the
@@ -149,16 +143,13 @@ namespace atn {
   };
 
 } // namespace atn
-} // namespace runtime
-} // namespace v4
-} // namespace antlr
-} // namespace org
+} // namespace antlr4
 
 
 // Hash function for ATNConfig.
 
 namespace std {
-  using org::antlr::v4::runtime::atn::ATNConfig;
+  using antlr4::atn::ATNConfig;
 
   template <> struct hash<ATNConfig>
   {

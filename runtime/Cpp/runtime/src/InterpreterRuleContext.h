@@ -33,10 +33,7 @@
 
 #include "ParserRuleContext.h"
 
-namespace org {
-namespace antlr {
-namespace v4 {
-namespace runtime {
+namespace antlr4 {
 
   /**
    * This class extends {@link ParserRuleContext} by allowing the value of
@@ -71,7 +68,4 @@ namespace runtime {
     const ssize_t _ruleIndex = -1;
 };
 
-} // namespace runtime
-} // namespace v4
-} // namespace antlr
-} // namespace org
+} // namespace antlr4

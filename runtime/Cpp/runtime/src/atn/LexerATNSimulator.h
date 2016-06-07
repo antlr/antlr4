@@ -35,10 +35,7 @@
 #include "atn/LexerATNConfig.h"
 #include "atn/ATNConfigSet.h"
 
-namespace org {
-namespace antlr {
-namespace v4 {
-namespace runtime {
+namespace antlr4 {
 namespace atn {
 
   /// "dup" of ParserInterpreter
@@ -110,6 +107,7 @@ namespace atn {
 
   public:
     std::vector<dfa::DFA> &_decisionToDFA;
+
   protected:
     size_t _mode;
 
@@ -120,9 +118,9 @@ namespace atn {
     static int match_calls;
 
     LexerATNSimulator(const ATN &atn, std::vector<dfa::DFA> &decisionToDFA,
-                      Ref<PredictionContextCache> sharedContextCache);
+                      PredictionContextCache &sharedContextCache);
     LexerATNSimulator(Lexer *recog, const ATN &atn, std::vector<dfa::DFA> &decisionToDFA,
-                      Ref<PredictionContextCache> sharedContextCache);
+                      PredictionContextCache &sharedContextCache);
 
     virtual void copyState(LexerATNSimulator *simulator);
     virtual int match(CharStream *input, size_t mode);
@@ -159,17 +157,17 @@ namespace atn {
     /// returns <seealso cref="#ERROR"/>. </returns>
     virtual dfa::DFAState *computeTargetState(CharStream *input, dfa::DFAState *s, ssize_t t);
 
-    virtual int failOrAccept(CharStream *input, Ref<ATNConfigSet> reach, ssize_t t);
+    virtual int failOrAccept(CharStream *input, const Ref<ATNConfigSet> &reach, ssize_t t);
 
     /// <summary>
     /// Given a starting configuration set, figure out all ATN configurations
     ///  we can reach upon input {@code t}. Parameter {@code reach} is a return
     ///  parameter.
     /// </summary>
-    void getReachableConfigSet(CharStream *input, Ref<ATNConfigSet> closure_, // closure_ as we have a closure() already
-                               Ref<ATNConfigSet> reach, ssize_t t);
+    void getReachableConfigSet(CharStream *input, const Ref<ATNConfigSet> &closure_, // closure_ as we have a closure() already
+                               const Ref<ATNConfigSet> &reach, ssize_t t);
 
-    virtual void accept(CharStream *input, Ref<LexerActionExecutor> lexerActionExecutor, int startIndex, size_t index,
+    virtual void accept(CharStream *input, const Ref<LexerActionExecutor> &lexerActionExecutor, int startIndex, size_t index,
                         size_t line, size_t charPos);
 
     virtual ATNState *getReachableTarget(Transition *trans, ssize_t t);
@@ -185,12 +183,12 @@ namespace atn {
     /// </summary>
     /// <returns> {@code true} if an accept state is reached, otherwise
     /// {@code false}. </returns>
-    virtual bool closure(CharStream *input, Ref<LexerATNConfig> config, Ref<ATNConfigSet> configs,
+    virtual bool closure(CharStream *input, const Ref<LexerATNConfig> &config, const Ref<ATNConfigSet> &configs,
                          bool currentAltReachedAcceptState, bool speculative, bool treatEofAsEpsilon);
 
     // side-effect: can alter configs.hasSemanticContext
-    virtual Ref<LexerATNConfig> getEpsilonTarget(CharStream *input, Ref<LexerATNConfig> config, Transition *t,
-      Ref<ATNConfigSet> configs, bool speculative, bool treatEofAsEpsilon);
+    virtual Ref<LexerATNConfig> getEpsilonTarget(CharStream *input, const Ref<LexerATNConfig> &config, Transition *t,
+      const Ref<ATNConfigSet> &configs, bool speculative, bool treatEofAsEpsilon);
 
     /// <summary>
     /// Evaluate a predicate specified in the lexer.
@@ -215,7 +213,7 @@ namespace atn {
     virtual bool evaluatePredicate(CharStream *input, int ruleIndex, int predIndex, bool speculative);
 
     virtual void captureSimState(CharStream *input, dfa::DFAState *dfaState);
-    virtual dfa::DFAState* addDFAEdge(dfa::DFAState *from, ssize_t t, Ref<ATNConfigSet> q);
+    virtual dfa::DFAState* addDFAEdge(dfa::DFAState *from, ssize_t t, const Ref<ATNConfigSet> &q);
     virtual void addDFAEdge(dfa::DFAState *p, ssize_t t, dfa::DFAState *q);
 
     /// <summary>
@@ -224,7 +222,7 @@ namespace atn {
     /// configuration containing an ATN rule stop state. Later, when
     /// traversing the DFA, we will know which rule to accept.
     /// </summary>
-    virtual dfa::DFAState *addDFAState(Ref<ATNConfigSet> configs);
+    virtual dfa::DFAState *addDFAState(const Ref<ATNConfigSet> &configs);
 
   public:
     dfa::DFA& getDFA(size_t mode);
@@ -243,7 +241,4 @@ namespace atn {
   };
 
 } // namespace atn
-} // namespace runtime
-} // namespace v4
-} // namespace antlr
-} // namespace org
+} // namespace antlr4

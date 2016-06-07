@@ -31,7 +31,7 @@
 
 #include "atn/StarBlockStartState.h"
 
-using namespace org::antlr::v4::runtime::atn;
+using namespace antlr4::atn;
 
 int StarBlockStartState::getStateType() {
   return STAR_BLOCK_START;

@@ -34,19 +34,19 @@
 #include "dfa/DFA.h"
 #include "atn/EmptyPredictionContext.h"
 #include "Exceptions.h"
-#include "VocabularyImpl.h"
+#include "Vocabulary.h"
 
 #include "LexerInterpreter.h"
 
-using namespace org::antlr::v4::runtime;
+using namespace antlr4;
 
 LexerInterpreter::LexerInterpreter(const std::string &grammarFileName, const std::vector<std::string> &tokenNames,
   const std::vector<std::string> &ruleNames, const std::vector<std::string> &modeNames, const atn::ATN &atn,
   CharStream *input)
-  : LexerInterpreter(grammarFileName, dfa::VocabularyImpl::fromTokenNames(tokenNames), ruleNames, modeNames, atn, input) {
+  : LexerInterpreter(grammarFileName, dfa::Vocabulary::fromTokenNames(tokenNames), ruleNames, modeNames, atn, input) {
 }
 
-LexerInterpreter::LexerInterpreter(const std::string &grammarFileName, Ref<dfa::Vocabulary> vocabulary,
+LexerInterpreter::LexerInterpreter(const std::string &grammarFileName, const dfa::Vocabulary &vocabulary,
   const std::vector<std::string> &ruleNames, const std::vector<std::string> &modeNames, const atn::ATN &atn,
   CharStream *input)
   : Lexer(input), _grammarFileName(grammarFileName), _atn(atn), _ruleNames(ruleNames), _modeNames(modeNames),
@@ -57,10 +57,9 @@ LexerInterpreter::LexerInterpreter(const std::string &grammarFileName, Ref<dfa::
   }
 
   for (size_t i = 0; i < atn.maxTokenType; i++) {
-    _tokenNames.push_back(vocabulary->getDisplayName(i));
+    _tokenNames.push_back(vocabulary.getDisplayName(i));
   }
 
-  _sharedContextCache = std::make_shared<atn::PredictionContextCache>();
   for (size_t i = 0; i < (size_t)atn.getNumberOfDecisions(); ++i) {
     _decisionToDFA.push_back(dfa::DFA(_atn.getDecisionState((int)i), (int)i));
   }
@@ -92,10 +91,6 @@ const std::vector<std::string>& LexerInterpreter::getModeNames() const {
   return _modeNames;
 }
 
-Ref<dfa::Vocabulary> LexerInterpreter::getVocabulary() const {
-  if (_vocabulary != nullptr) {
-    return _vocabulary;
-  }
-
-  return Lexer::getVocabulary();
+const dfa::Vocabulary& LexerInterpreter::getVocabulary() const {
+  return _vocabulary;
 }

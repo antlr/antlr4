@@ -39,7 +39,7 @@
 
 #include "atn/LexerATNConfig.h"
 
-using namespace org::antlr::v4::runtime::atn;
+using namespace antlr4::atn;
 using namespace antlrcpp;
 
 LexerATNConfig::LexerATNConfig(ATNState *state, int alt, Ref<PredictionContext> context)
@@ -79,8 +79,8 @@ size_t LexerATNConfig::hashCode() const {
   size_t hashCode = misc::MurmurHash::initialize(7);
   hashCode = misc::MurmurHash::update(hashCode, (size_t)state->stateNumber);
   hashCode = misc::MurmurHash::update(hashCode, (size_t)alt);
-  hashCode = misc::MurmurHash::update(hashCode, context->hashCode());
-  hashCode = misc::MurmurHash::update(hashCode, semanticContext->hashCode());
+  hashCode = misc::MurmurHash::update(hashCode, context);
+  hashCode = misc::MurmurHash::update(hashCode, semanticContext);
   hashCode = misc::MurmurHash::update(hashCode, _passedThroughNonGreedyDecision ? 1 : 0);
   hashCode = misc::MurmurHash::update(hashCode, _lexerActionExecutor ? _lexerActionExecutor->hashCode() : 0);
   hashCode = misc::MurmurHash::finish(hashCode, 6);

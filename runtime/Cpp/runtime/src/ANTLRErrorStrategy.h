@@ -33,10 +33,7 @@
 
 #include "Token.h"
 
-namespace org {
-namespace antlr {
-namespace v4 {
-namespace runtime {
+namespace antlr4 {
 
   /// <summary>
   /// The interface for defining strategies to deal with syntax errors encountered
@@ -146,7 +143,4 @@ namespace runtime {
     virtual void reportError(Parser *recognizer, const RecognitionException &e) = 0;
   };
 
-} // namespace runtime
-} // namespace v4
-} // namespace antlr
-} // namespace org
+} // namespace antlr4

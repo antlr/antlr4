@@ -34,10 +34,7 @@
 #include "ANTLRErrorListener.h"
 #include "Exceptions.h"
 
-namespace org {
-namespace antlr {
-namespace v4 {
-namespace runtime {
+namespace antlr4 {
 
   /// This implementation of ANTLRErrorListener dispatches all calls to a
   /// collection of delegate listeners. This reduces the effort required to support multiple
@@ -64,7 +61,4 @@ namespace runtime {
                                           int prediction, Ref<atn::ATNConfigSet> configs) override;
   };
 
-} // namespace runtime
-} // namespace v4
-} // namespace antlr
-} // namespace org
+} // namespace antlr4

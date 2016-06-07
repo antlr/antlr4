@@ -31,10 +31,7 @@
 
 #pragma once
 
-namespace org {
-namespace antlr {
-namespace v4 {
-namespace runtime {
+namespace antlr4 {
 
   /// The default mechanism for creating tokens. It's used by default in Lexer and
   ///  the error handling strategy (to create missing tokens).  Notifying the parser
@@ -54,7 +51,4 @@ namespace runtime {
     virtual Ref<Symbol> create(int type, const std::string &text) = 0;
   };
 
-} // namespace runtime
-} // namespace v4
-} // namespace antlr
-} // namespace org
+} // namespace antlr4

@@ -34,10 +34,7 @@
 #include "RuleContext.h"
 #include "support/CPPUtils.h"
 
-namespace org {
-namespace antlr {
-namespace v4 {
-namespace runtime {
+namespace antlr4 {
 
   /// <summary>
   /// A rule invocation record for parsing.
@@ -186,7 +183,4 @@ namespace runtime {
     virtual Ref<Tree> getChildReference(size_t i) override;
   };
 
-} // namespace runtime
-} // namespace v4
-} // namespace antlr
-} // namespace org
+} // namespace antlr4

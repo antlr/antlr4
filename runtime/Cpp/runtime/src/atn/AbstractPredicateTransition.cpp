@@ -31,7 +31,7 @@
 
 #include "atn/AbstractPredicateTransition.h"
 
-using namespace org::antlr::v4::runtime::atn;
+using namespace antlr4::atn;
 
 AbstractPredicateTransition::AbstractPredicateTransition(ATNState *target) : Transition(target) {
 }

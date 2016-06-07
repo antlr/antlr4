@@ -34,7 +34,7 @@
 
 #include "atn/StarLoopbackState.h"
 
-using namespace org::antlr::v4::runtime::atn;
+using namespace antlr4::atn;
 
 StarLoopEntryState *StarLoopbackState::getLoopEntryState() {
   return static_cast<StarLoopEntryState*>(transition(0)->target);

@@ -43,13 +43,11 @@ LexerFileHeader(file, lexer, namedActions) ::= <<
 
 <namedActions.preinclude>
 
-#include "Lexer.h"
-#include "atn/PredictionContext.h"
-#include "VocabularyImpl.h"
+#include "antlr4-runtime.h"
 
 <namedActions.postinclude>
 
-using namespace org::antlr::v4::runtime;
+using namespace antlr4;
 
 <if(file.genPackage)>namespace <file.genPackage> {<endif>
 
@@ -65,17 +63,11 @@ LexerFile(file, lexer, namedActions) ::= <<
 
 <namedActions.preinclude>
 
-#include "atn/ATN.h"
-#include "dfa/DFA.h"
-#include "atn/LexerATNSimulator.h"
-#include "atn/ATNDeserializer.h"
-#include "RuleContext.h"
-
 #include "<file.lexer.name>.h"
 
 <namedActions.postinclude>
 
-using namespace org::antlr::v4::runtime;
+using namespace antlr4;
 
 <if (file.genPackage)>using namespace <file.genPackage>;<endif>
 
@@ -90,22 +82,16 @@ ParserFileHeader(file, parser, namedActions, contextSuperClass) ::= <<
 
 <namedActions.preinclude>
 
-#include "Parser.h"
-#include "ParserRuleContext.h"
-#include "atn/PredictionContext.h"
-#include "VocabularyImpl.h"
-
-#include "support/CPPUtils.h"
+#include "antlr4-runtime.h"
 
 <namedActions.postinclude>
 
-using namespace org::antlr::v4::runtime;
+using namespace antlr4;
 
 <if (file.genPackage)>namespace <file.genPackage> {<endif>
 
 template \<typename T>
-class <file.parser.name>Visitor;
-  
+class <file.grammarName>Visitor;
 <parser>
 
 <if (file.genPackage)>
@@ -118,16 +104,7 @@ ParserFile(file, parser, namedActions, contextSuperClass) ::= <<
 
 <namedActions.preinclude>
 
-#include "atn/ATN.h"
-#include "dfa/DFA.h"
-#include "atn/ParserATNSimulator.h"
-#include "ANTLRErrorStrategy.h"
-#include "FailedPredicateException.h"
-#include "NoViableAltException.h"
-#include "atn/ATNDeserializer.h"
-
-#include "tree/ParseTreeListener.h"
-<if (file.genListener)>#include "<file.parser.name>Listener.h"<endif>
+<if (file.genListener)>#include "<file.grammarName>BaseListener.h"<endif>
 
 #include "<file.parser.name>.h"
 
@@ -146,9 +123,7 @@ BaseListenerFileHeader(file, header, namedActions) ::= <<
 
 <namedActions.baselistenerpreinclude>
 
-#include "ParserRuleContext.h"
-#include "tree/ErrorNode.h"
-#include "tree/TerminalNode.h"
+#include "antlr4-runtime.h"
 #include "<file.grammarName>Listener.h"
 
 <namedActions.baselistenerpostinclude>
@@ -167,14 +142,14 @@ public:
 <namedActions.baselistenerdeclarations>
 
 <file.listenerNames: {lname |
-  void enter<lname; format="cap">(<file.parserName>::<lname; format = "cap">Context * /*ctx*/) { \}
-  void exit<lname; format="cap">(<file.parserName>::<lname; format = "cap">Context * /*ctx*/) { \}
+  virtual void enter<lname; format="cap">(<file.parserName>::<lname; format = "cap">Context * /*ctx*/) override { \}
+  virtual void exit<lname; format="cap">(<file.parserName>::<lname; format = "cap">Context * /*ctx*/) override { \}
 }; separator="\n">
 
-  void enterEveryRule(Ref\<ParserRuleContext> /*ctx*/) { }
-  void exitEveryRule(Ref\<ParserRuleContext> /*ctx*/) { }
-  void visitTerminal(Ref\<tree::TerminalNode> /*node*/) { }
-  void visitErrorNode(Ref\<tree::ErrorNode> /*node*/) { }
+  virtual void enterEveryRule(ParserRuleContext * /*ctx*/) override { }
+  virtual void exitEveryRule(ParserRuleContext * /*ctx*/) override { }
+  virtual void visitTerminal(Ref\<tree::TerminalNode> /*node*/) override { }
+  virtual void visitErrorNode(Ref\<tree::ErrorNode> /*node*/) override { }
   
 <if (namedActions.baselistenermembers)>
 private:  
@@ -210,7 +185,7 @@ ListenerFileHeader(file, header, namedActions) ::= <<
 
 <namedActions.listenerpreinclude>
 
-#include "tree/ParseTreeListener.h"
+#include "antlr4-runtime.h"
 #include "<file.parserName>.h"
 
 <namedActions.listenerpostinclude>
@@ -222,7 +197,7 @@ namespace <file.genPackage> {
 /**
  * This interface defines an abstract listener for a parse tree produced by <file.parserName>.
  */
-class <file.grammarName>Listener : public tree::ParseTreeListener {
+class <file.grammarName>Listener : public antlr4::tree::ParseTreeListener {
 public:
 <namedActions.listenerdeclarations>
 
@@ -265,7 +240,7 @@ BaseVisitorFileHeader(file, header, namedActions) ::= <<
 
 <namedActions.basevisitorpreinclude>
 
-#include "tree/AbstractParseTreeVisitor.h"
+#include "antlr4-runtime.h"
 #include "<file.grammarName>Visitor.h"
 
 <namedActions.basevisitorpostinclude>
@@ -326,8 +301,8 @@ VisitorFileHeader(file, header, namedActions) ::= <<
 
 <namedActions.visitorpreinclude>
 
+#include "antlr4-runtime.h"
 #include "<file.parserName>.h"
-#include "tree/ParseTreeVisitor.h"
 
 <namedActions.visitorpostinclude>
 
@@ -341,7 +316,7 @@ VisitorFileHeader(file, header, namedActions) ::= <<
  * operations with no return type.
  */
 template \<typename T>
-class <file.grammarName>Visitor : public org::antlr::v4::runtime::tree::ParseTreeVisitor\<T> {
+class <file.grammarName>Visitor : public antlr4::tree::ParseTreeVisitor\<T> {
 public:
   <namedActions.visitordeclarations>
   
@@ -349,7 +324,7 @@ public:
    * Visit parse trees produced by <file.parserName>.
    */
   <file.visitorNames: {lname |
-  T* visit<lname; format = "cap">(<file.parserName>::<lname; format = "cap">Context *context) = 0;
+  virtual T* visit<lname; format = "cap">(<file.parserName>::<lname; format = "cap">Context *context) = 0;
   }; separator="\n">
 
 <if (namedActions.visitormembers)>

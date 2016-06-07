@@ -34,10 +34,7 @@
 #include "CharStream.h"
 #include "atn/LexerAction.h"
 
-namespace org {
-namespace antlr {
-namespace v4 {
-namespace runtime {
+namespace antlr4 {
 namespace atn {
 
   /// Represents an executor for a sequence of lexer actions which traversed during
@@ -139,7 +136,4 @@ namespace atn {
   };
 
 } // namespace atn
-} // namespace runtime
-} // namespace v4
-} // namespace antlr
-} // namespace org
+} // namespace antlr4

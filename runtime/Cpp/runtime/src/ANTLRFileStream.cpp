@@ -31,7 +31,7 @@
 
 #include "ANTLRFileStream.h"
 
-using namespace org::antlr::v4::runtime;
+using namespace antlr4;
 
 ANTLRFileStream::ANTLRFileStream(const std::string &fileName) {
   _fileName = fileName;

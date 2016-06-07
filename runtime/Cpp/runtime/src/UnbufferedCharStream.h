@@ -33,10 +33,7 @@
 
 #include "CharStream.h"
 
-namespace org {
-namespace antlr {
-namespace v4 {
-namespace runtime {
+namespace antlr4 {
 
   /// Do not buffer up the entire char stream. It does keep a small buffer
   /// for efficiency and also buffers while a mark exists (set by the
@@ -142,7 +139,4 @@ namespace runtime {
     void InitializeInstanceFields();
   };
 
-} // namespace runtime
-} // namespace v4
-} // namespace antlr
-} // namespace org
+} // namespace antlr4

@@ -1715,7 +1715,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testMultipleActionsPredicatesOptions_1() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(247);
+		StringBuilder grammarBuilder = new StringBuilder(246);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s @after {System.out.println($ctx.toStringTree(this));} : e ;\n");
 		grammarBuilder.append("e : a=e op=('*'|'/') b=e  {}{true}?\n");
@@ -1724,7 +1724,7 @@ public class TestLeftRecursion extends BaseTest {
 		grammarBuilder.append("  | '(' x=e ')' {}{}\n");
 		grammarBuilder.append("  ;\n");
 		grammarBuilder.append("INT : '0'..'9'+ ;\n");
-		grammarBuilder.append("WS : (' '|'\\n') -> skip ;");
+		grammarBuilder.append("WS : (' '|'\\n') -> skip;");
 		String grammar = grammarBuilder.toString();
 
 
@@ -1740,7 +1740,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testMultipleActionsPredicatesOptions_2() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(247);
+		StringBuilder grammarBuilder = new StringBuilder(246);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s @after {System.out.println($ctx.toStringTree(this));} : e ;\n");
 		grammarBuilder.append("e : a=e op=('*'|'/') b=e  {}{true}?\n");
@@ -1749,7 +1749,7 @@ public class TestLeftRecursion extends BaseTest {
 		grammarBuilder.append("  | '(' x=e ')' {}{}\n");
 		grammarBuilder.append("  ;\n");
 		grammarBuilder.append("INT : '0'..'9'+ ;\n");
-		grammarBuilder.append("WS : (' '|'\\n') -> skip ;");
+		grammarBuilder.append("WS : (' '|'\\n') -> skip;");
 		String grammar = grammarBuilder.toString();
 
 
@@ -1765,7 +1765,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testMultipleActionsPredicatesOptions_3() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(247);
+		StringBuilder grammarBuilder = new StringBuilder(246);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s @after {System.out.println($ctx.toStringTree(this));} : e ;\n");
 		grammarBuilder.append("e : a=e op=('*'|'/') b=e  {}{true}?\n");
@@ -1774,7 +1774,7 @@ public class TestLeftRecursion extends BaseTest {
 		grammarBuilder.append("  | '(' x=e ')' {}{}\n");
 		grammarBuilder.append("  ;\n");
 		grammarBuilder.append("INT : '0'..'9'+ ;\n");
-		grammarBuilder.append("WS : (' '|'\\n') -> skip ;");
+		grammarBuilder.append("WS : (' '|'\\n') -> skip;");
 		String grammar = grammarBuilder.toString();
 
 
@@ -1862,7 +1862,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testMultipleAlternativesWithCommonLabel_1() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(730);
+		StringBuilder grammarBuilder = new StringBuilder(729);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s : e {System.out.println($e.v);};\n");
 		grammarBuilder.append("e returns [int v]\n");
@@ -1878,7 +1878,7 @@ public class TestLeftRecursion extends BaseTest {
 		grammarBuilder.append("INT : '0'..'9'+ ;\n");
 		grammarBuilder.append("INC : '++' ;\n");
 		grammarBuilder.append("DEC : '--' ;\n");
-		grammarBuilder.append("WS : (' '|'\\n') -> skip ;");
+		grammarBuilder.append("WS : (' '|'\\n') -> skip;");
 		String grammar = grammarBuilder.toString();
 
 
@@ -1894,7 +1894,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testMultipleAlternativesWithCommonLabel_2() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(730);
+		StringBuilder grammarBuilder = new StringBuilder(729);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s : e {System.out.println($e.v);};\n");
 		grammarBuilder.append("e returns [int v]\n");
@@ -1910,7 +1910,7 @@ public class TestLeftRecursion extends BaseTest {
 		grammarBuilder.append("INT : '0'..'9'+ ;\n");
 		grammarBuilder.append("INC : '++' ;\n");
 		grammarBuilder.append("DEC : '--' ;\n");
-		grammarBuilder.append("WS : (' '|'\\n') -> skip ;");
+		grammarBuilder.append("WS : (' '|'\\n') -> skip;");
 		String grammar = grammarBuilder.toString();
 
 
@@ -1926,7 +1926,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testMultipleAlternativesWithCommonLabel_3() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(730);
+		StringBuilder grammarBuilder = new StringBuilder(729);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s : e {System.out.println($e.v);};\n");
 		grammarBuilder.append("e returns [int v]\n");
@@ -1942,7 +1942,7 @@ public class TestLeftRecursion extends BaseTest {
 		grammarBuilder.append("INT : '0'..'9'+ ;\n");
 		grammarBuilder.append("INC : '++' ;\n");
 		grammarBuilder.append("DEC : '--' ;\n");
-		grammarBuilder.append("WS : (' '|'\\n') -> skip ;");
+		grammarBuilder.append("WS : (' '|'\\n') -> skip;");
 		String grammar = grammarBuilder.toString();
 
 
@@ -1958,7 +1958,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testMultipleAlternativesWithCommonLabel_4() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(730);
+		StringBuilder grammarBuilder = new StringBuilder(729);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s : e {System.out.println($e.v);};\n");
 		grammarBuilder.append("e returns [int v]\n");
@@ -1974,7 +1974,7 @@ public class TestLeftRecursion extends BaseTest {
 		grammarBuilder.append("INT : '0'..'9'+ ;\n");
 		grammarBuilder.append("INC : '++' ;\n");
 		grammarBuilder.append("DEC : '--' ;\n");
-		grammarBuilder.append("WS : (' '|'\\n') -> skip ;");
+		grammarBuilder.append("WS : (' '|'\\n') -> skip;");
 		String grammar = grammarBuilder.toString();
 
 

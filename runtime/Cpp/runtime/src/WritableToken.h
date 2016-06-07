@@ -33,10 +33,7 @@
 
 #include "Token.h"
 
-namespace org {
-namespace antlr {
-namespace v4 {
-namespace runtime {
+namespace antlr4 {
 
   class ANTLR4CPP_PUBLIC WritableToken : public Token {
   public:
@@ -48,7 +45,4 @@ namespace runtime {
     virtual void setTokenIndex(int index) = 0;
   };
 
-} // namespace runtime
-} // namespace v4
-} // namespace antlr
-} // namespace org
+} // namespace antlr4

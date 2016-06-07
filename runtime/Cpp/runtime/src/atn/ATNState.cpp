@@ -36,7 +36,7 @@
 
 #include "atn/ATNState.h"
 
-using namespace org::antlr::v4::runtime::atn;
+using namespace antlr4::atn;
 using namespace antlrcpp;
 
 const int ATNState::INITIAL_NUM_TRANSITIONS = 4;

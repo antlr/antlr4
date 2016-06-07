@@ -12,10 +12,9 @@
 #include "TParser.h"
 
 using namespace antlrcpptest;
-using namespace org::antlr::v4::runtime;
+using namespace antlr4;
 
 int main(int , const char **) {
-
   ANTLRInputStream input(u8"🍴 = 🍐 + \"😎\";(((x * π))) * µ + ∰; a + (x * (y ? 0 : 1) + z);");
   TLexer lexer(&input);
   CommonTokenStream tokens(&lexer);

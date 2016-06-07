@@ -148,8 +148,8 @@ string(text) ::= <<
 writeBoolean(o) ::= "<if(o && !isEmpty.(o))>true<else>false<endif>"
 
 writeln(s) ::= <<Console.WriteLine(<s>);>>
-
 write(s) ::= <<Console.Write(<s>);>>
+writeList(s) ::= <<Console.WriteLine(<s; separator="+">);>>
 
 False() ::= "false"
 
@@ -235,6 +235,8 @@ bool Property() {
 }
 >>
 
+ParserPropertyCall(p, call) ::= "<p>.<call>"
+
 PositionAdjustingLexer() ::= <<
 
 public override IToken NextToken() {
@@ -315,10 +317,12 @@ public class PositionAdjustingLexerATNSimulator : LexerATNSimulator {
 >>
 
 BasicListener(X) ::= <<
+@parser::members {
 public class LeafListener : TBaseListener {
 	public override void VisitTerminal(ITerminalNode node) {
 		Console.WriteLine(node.Symbol.Text);
 	}
+}
 }
 >>
 
@@ -341,6 +345,7 @@ public class MyRuleNode : ParserRuleContext {
 >>
 
 TokenGetterListener(X) ::= <<
+@parser::members {
 public class LeafListener : TBaseListener {
 	public override void ExitA(TParser.AContext ctx) {
 		if (ctx.ChildCount==2)
@@ -359,9 +364,11 @@ public class LeafListener : TBaseListener {
 			Console.WriteLine(ctx.ID().Symbol);
 	}
 }
+}
 >>
 
 RuleGetterListener(X) ::= <<
+@parser::members {
 public class LeafListener : TBaseListener {
 	public override void ExitA(TParser.AContext ctx) {
 		if (ctx.ChildCount==2) {
@@ -371,10 +378,12 @@ public class LeafListener : TBaseListener {
 			Console.WriteLine(ctx.b(0).Start.Text);
 	}
 }
+}
 >>
 
 
 LRListener(X) ::= <<
+@parser::members {
 public class LeafListener : TBaseListener {
 	public override void ExitE(TParser.EContext ctx) {
 		if (ctx.ChildCount==3) {
@@ -384,9 +393,11 @@ public class LeafListener : TBaseListener {
 			Console.WriteLine(ctx.INT().Symbol.Text);
 	}
 }
+}
 >>
 
 LRWithLabelsListener(X) ::= <<
+@parser::members {
 public class LeafListener : TBaseListener {
 	public override void ExitCall(TParser.CallContext ctx) {
 		Console.Write("{0} {1}",ctx.e().Start.Text,ctx.eList());
@@ -394,6 +405,7 @@ public class LeafListener : TBaseListener {
 	public override void ExitInt(TParser.IntContext ctx) {
 		Console.WriteLine(ctx.INT().Symbol.Text);
 	}
+}
 }
 >>
 
@@ -416,6 +428,10 @@ Declare_pred() ::= <<bool pred(bool v) {
 >>
 
 Invoke_pred(v) ::= <<this.pred(<v>)>>
+ParserTokenType(t) ::= "Parser.<t>"
+ContextRuleFunction(ctx, rule) ::= "<ctx>.<rule>"
+StringType() ::= "String"
+ContextMember(ctx, subctx, member) ::= "<ctx>.<subctx>.<member>"
 
 isEmpty ::= [
 	"": true,

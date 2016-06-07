@@ -33,7 +33,7 @@
 
 #include "tree/pattern/RuleTagToken.h"
 
-using namespace org::antlr::v4::runtime::tree::pattern;
+using namespace antlr4::tree::pattern;
 
 RuleTagToken::RuleTagToken(const std::string &/*ruleName*/, int _bypassTokenType) : bypassTokenType(_bypassTokenType) {
 }
@@ -90,11 +90,11 @@ int RuleTagToken::getStopIndex() const {
   return -1;
 }
 
-org::antlr::v4::runtime::TokenSource *RuleTagToken::getTokenSource() const {
+antlr4::TokenSource *RuleTagToken::getTokenSource() const {
   return nullptr;
 }
 
-org::antlr::v4::runtime::CharStream *RuleTagToken::getInputStream() const {
+antlr4::CharStream *RuleTagToken::getInputStream() const {
   return nullptr;
 }
 

@@ -37,7 +37,7 @@
 
 #include "CommonToken.h"
 
-using namespace org::antlr::v4::runtime;
+using namespace antlr4;
 using namespace antlrcpp;
 
 const std::pair<TokenSource*, CharStream*> CommonToken::EMPTY_SOURCE;
@@ -164,11 +164,11 @@ void CommonToken::setTokenIndex(int index) {
   _index = index;
 }
 
-org::antlr::v4::runtime::TokenSource *CommonToken::getTokenSource() const {
+antlr4::TokenSource *CommonToken::getTokenSource() const {
   return _source.first;
 }
 
-org::antlr::v4::runtime::CharStream *CommonToken::getInputStream() const {
+antlr4::CharStream *CommonToken::getInputStream() const {
   return _source.second;
 }
 

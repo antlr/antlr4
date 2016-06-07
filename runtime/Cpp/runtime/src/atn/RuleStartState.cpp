@@ -31,7 +31,7 @@
 
 #include "atn/RuleStartState.h"
 
-using namespace org::antlr::v4::runtime::atn;
+using namespace antlr4::atn;
 
 RuleStartState::RuleStartState() {
   isLeftRecursiveRule = false;

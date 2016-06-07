@@ -37,14 +37,14 @@
 
 #include "atn/ATNConfigSet.h"
 
-using namespace org::antlr::v4::runtime::atn;
+using namespace antlr4::atn;
 using namespace antlrcpp;
 
 size_t SimpleATNConfigHasher::operator()(const Ref<ATNConfig> &k) const {
   size_t hashCode = 7;
   hashCode = 31 * hashCode + (size_t)k->state->stateNumber;
   hashCode = 31 * hashCode + (size_t)k->alt;
-  hashCode = 31 * hashCode + k->semanticContext->hashCode();
+  hashCode = 31 * hashCode + (k->semanticContext == nullptr ? 0 : k->semanticContext->hashCode());
   return hashCode;
 }
 
@@ -59,7 +59,7 @@ ATNConfigSet::ATNConfigSet(bool fullCtx) : fullCtx(fullCtx) {
   InitializeInstanceFields();
 }
 
-ATNConfigSet::ATNConfigSet(Ref<ATNConfigSet> old) : ATNConfigSet(old->fullCtx) {
+ATNConfigSet::ATNConfigSet(const Ref<ATNConfigSet> &old) : ATNConfigSet(old->fullCtx) {
   addAll(old);
   uniqueAlt = old->uniqueAlt;
   conflictingAlts = old->conflictingAlts;
@@ -68,13 +68,14 @@ ATNConfigSet::ATNConfigSet(Ref<ATNConfigSet> old) : ATNConfigSet(old->fullCtx) {
 }
 
 ATNConfigSet::~ATNConfigSet() {
+  delete configLookup;
 }
 
-bool ATNConfigSet::add(Ref<ATNConfig> config) {
+bool ATNConfigSet::add(const Ref<ATNConfig> &config) {
   return add(config, nullptr);
 }
 
-bool ATNConfigSet::add(Ref<ATNConfig> config, PredictionContextMergeCache *mergeCache) {
+bool ATNConfigSet::add(const Ref<ATNConfig> &config, PredictionContextMergeCache *mergeCache) {
   if (_readonly) {
     throw IllegalStateException("This set is readonly");
   }
@@ -112,7 +113,7 @@ bool ATNConfigSet::add(Ref<ATNConfig> config, PredictionContextMergeCache *merge
   return true;
 }
 
-bool ATNConfigSet::addAll(Ref<ATNConfigSet> other) {
+bool ATNConfigSet::addAll(const Ref<ATNConfigSet> &other) {
   for (auto &c : other->configs) {
     add(c);
   }
@@ -223,7 +224,7 @@ bool ATNConfigSet::isEmpty() {
   return configs.empty();
 }
 
-bool ATNConfigSet::contains(Ref<ATNConfig> o) {
+bool ATNConfigSet::contains(const Ref<ATNConfig> &o) {
   if (configLookup == nullptr) {
     throw UnsupportedOperationException("This method is not implemented for readonly sets.");
   }
@@ -246,7 +247,8 @@ bool ATNConfigSet::isReadonly() {
 
 void ATNConfigSet::setReadonly(bool readonly) {
   _readonly = readonly;
-  configLookup.reset();
+  delete configLookup;
+  configLookup = nullptr;
 }
 
 std::string ATNConfigSet::toString() {
@@ -280,7 +282,7 @@ bool ATNConfigSet::remove(void * /*o*/) {
 }
 
 void ATNConfigSet::InitializeInstanceFields() {
-  configLookup = Ref<ConfigLookup>(new ConfigLookupImpl<SimpleATNConfigHasher, SimpleATNConfigComparer>());
+  configLookup = new ConfigLookupImpl<SimpleATNConfigHasher, SimpleATNConfigComparer>();
   uniqueAlt = 0;
   hasSemanticContext = false;
   dipsIntoOuterContext = false;

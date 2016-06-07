@@ -29,9 +29,6 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-// TODO: Using "wcout <<" for debug information is really lame, change out with
-// some kind of listener
-
 #include "dfa/DFA.h"
 #include "NoViableAltException.h"
 #include "atn/DecisionState.h"
@@ -54,24 +51,24 @@
 #include "ANTLRErrorListener.h"
 
 #include "Vocabulary.h"
-#include "VocabularyImpl.h"
+#include "Vocabulary.h"
 
 #include "support/Arrays.h"
 
 #include "atn/ParserATNSimulator.h"
 
-using namespace org::antlr::v4::runtime;
-using namespace org::antlr::v4::runtime::atn;
+using namespace antlr4;
+using namespace antlr4::atn;
 
 using namespace antlrcpp;
 
 ParserATNSimulator::ParserATNSimulator(const ATN &atn, std::vector<dfa::DFA> &decisionToDFA,
-                                       Ref<PredictionContextCache> sharedContextCache)
+                                       PredictionContextCache &sharedContextCache)
 : ParserATNSimulator(nullptr, atn, decisionToDFA, sharedContextCache) {
 }
 
 ParserATNSimulator::ParserATNSimulator(Parser *parser, const ATN &atn, std::vector<dfa::DFA> &decisionToDFA,
-                                       Ref<PredictionContextCache> sharedContextCache)
+                                       PredictionContextCache &sharedContextCache)
 : ATNSimulator(atn, sharedContextCache), parser(parser), decisionToDFA(decisionToDFA) {
   InitializeInstanceFields();
 }
@@ -197,13 +194,14 @@ int ParserATNSimulator::execATN(dfa::DFA &dfa, dfa::DFAState *s0, TokenStream *i
       // ATN states in SLL implies LL will also get nowhere.
       // If conflict in states that dip out, choose min since we
       // will get error no matter what.
-      int alt = getAltThatFinishedDecisionEntryRule(previousD->configs);
+      NoViableAltException e = noViableAlt(input, outerContext, previousD->configs, startIndex);
+      input->seek(startIndex);
+      int alt = getSynValidOrSemInvalidAltThatFinishedDecisionEntryRule(previousD->configs, outerContext);
       if (alt != ATN::INVALID_ALT_NUMBER) {
-        // return w/o altering DFA
         return alt;
       }
 
-      throw noViableAlt(input, outerContext, previousD->configs, startIndex);
+      throw e;
     }
 
     if (D->requiresFullContext && mode != PredictionMode::SLL) {
@@ -1037,7 +1035,7 @@ Ref<ATNConfig> ParserATNSimulator::precedenceTransition(Ref<ATNConfig> config, P
   if (debug) {
     std::cout << "PRED (collectPredicates=" << collectPredicates << ") " << pt->precedence << ">=_p" << ", ctx dependent=true" << std::endl;
     if (parser != nullptr) {
-      std::cout << "context surrounding pred is " << Arrays::listToString( parser->getRuleInvocationStack(), ", ") << std::endl;
+      std::cout << "context surrounding pred is " << Arrays::listToString(parser->getRuleInvocationStack(), ", ") << std::endl;
     }
   }
 
@@ -1058,7 +1056,7 @@ Ref<ATNConfig> ParserATNSimulator::precedenceTransition(Ref<ATNConfig> config, P
         c = std::make_shared<ATNConfig>(config, pt->target); // no pred context
       }
     } else {
-      Ref<SemanticContext::AND> newSemCtx = std::make_shared<SemanticContext::AND>(config->semanticContext, predicate);
+      Ref<SemanticContext> newSemCtx = SemanticContext::And(config->semanticContext, predicate);
       c = std::make_shared<ATNConfig>(config, pt->target, newSemCtx);
     }
   } else {
@@ -1096,7 +1094,7 @@ Ref<ATNConfig> ParserATNSimulator::predTransition(Ref<ATNConfig> config, Predica
         c = std::make_shared<ATNConfig>(config, pt->target); // no pred context
       }
     } else {
-      Ref<SemanticContext::AND> newSemCtx = std::make_shared<SemanticContext::AND>(config->semanticContext, predicate);
+      Ref<SemanticContext> newSemCtx = SemanticContext::And(config->semanticContext, predicate);
       c = std::make_shared<ATNConfig>(config, pt->target, newSemCtx);
     }
   } else {
@@ -1139,8 +1137,8 @@ std::string ParserATNSimulator::getTokenName(ssize_t t) {
     return "EOF";
   }
 
-  Ref<dfa::Vocabulary> vocabulary = parser != nullptr ? parser->getVocabulary() : dfa::VocabularyImpl::EMPTY_VOCABULARY;
-  std::string displayName = vocabulary->getDisplayName(t);
+  const dfa::Vocabulary &vocabulary = parser != nullptr ? parser->getVocabulary() : dfa::Vocabulary::EMPTY_VOCABULARY;
+  std::string displayName = vocabulary.getDisplayName(t);
   if (displayName == std::to_string(t)) {
     return displayName;
   }
@@ -1212,11 +1210,13 @@ dfa::DFAState *ParserATNSimulator::addDFAEdge(dfa::DFA &dfa, dfa::DFAState *from
   }
 
   if (debug) {
-    Ref<dfa::Vocabulary> vocabulary = dfa::VocabularyImpl::EMPTY_VOCABULARY;
+    std::string dfaText;
     if (parser != nullptr) {
-      vocabulary = parser->getVocabulary();
+      dfaText = dfa.toString(parser->getVocabulary());
+    } else {
+      dfaText = dfa.toString(dfa::Vocabulary::EMPTY_VOCABULARY);
     }
-    std::cout << "DFA=\n" << dfa.toString(vocabulary) << std::endl;
+    std::cout << "DFA=\n" << dfaText << std::endl;
   }
 
   return to;

@@ -32,10 +32,7 @@
 
 #include "ParserRuleContext.h"
 
-namespace org {
-namespace antlr {
-namespace v4 {
-namespace runtime {
+namespace antlr4 {
 
   /// A handy class for use with
   ///
@@ -57,7 +54,4 @@ namespace runtime {
     virtual void setAltNumber(int altNum) override;
   };
 
-} // namespace runtime
-} // namespace v4
-} // namespace antlr
-} // namespace org
+} // namespace antlr4

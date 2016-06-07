@@ -40,7 +40,7 @@
 
 #include "UnbufferedTokenStream.h"
 
-using namespace org::antlr::v4::runtime;
+using namespace antlr4;
 
 UnbufferedTokenStream::UnbufferedTokenStream(TokenSource *tokenSource) : UnbufferedTokenStream(tokenSource, 256) {
 }

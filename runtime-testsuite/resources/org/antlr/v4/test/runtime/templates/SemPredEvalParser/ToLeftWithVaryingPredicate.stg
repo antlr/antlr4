@@ -33,7 +33,7 @@ grammar(grammarName) ::= <<
 grammar <grammarName>;
 @members {<InitIntMember("i","0")>}
 s : ({<AddMember("i","1")>
-<PlusMember("\"i=\"","i"):writeln()>} a)+ ;
+<writeList(["\"i=\"", "i"])>} a)+ ;
 a : {<ModMemberEquals("i","2","0")>}? ID {<writeln("\"alt 1\"")>}
   | {<ModMemberNotEquals("i","2","0")>}? ID {<writeln("\"alt 2\"")>}
   ;

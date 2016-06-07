@@ -36,7 +36,7 @@
 
 #include "LexerNoViableAltException.h"
 
-using namespace org::antlr::v4::runtime;
+using namespace antlr4;
 
 LexerNoViableAltException::LexerNoViableAltException(Lexer *lexer, CharStream *input, size_t startIndex,
                                                      Ref<atn::ATNConfigSet> deadEndConfigs)

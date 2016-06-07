@@ -33,7 +33,7 @@
 
 #include "atn/SingletonPredictionContext.h"
 
-using namespace org::antlr::v4::runtime::atn;
+using namespace antlr4::atn;
 
 SingletonPredictionContext::SingletonPredictionContext(std::weak_ptr<PredictionContext> parent, int returnState)
   : PredictionContext(!parent.expired() ? calculateHashCode(parent, returnState) : calculateEmptyHashCode()),

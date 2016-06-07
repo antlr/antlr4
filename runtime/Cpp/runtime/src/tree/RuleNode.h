@@ -33,20 +33,13 @@
 
 #include "tree/ParseTree.h"
 
-namespace org {
-namespace antlr {
-namespace v4 {
-namespace runtime {
+namespace antlr4 {
 namespace tree {
 
   class ANTLR4CPP_PUBLIC RuleNode : public ParseTree {
   public:
-    // Because of cross references (RuleNode <-> RuleContext) we cannot use RuleContext> here.
-    virtual Ref<runtime::RuleContext> getRuleContext() = 0;
+    virtual Ref<RuleContext> getRuleContext() = 0;
   };
 
 } // namespace tree
-} // namespace runtime
-} // namespace v4
-} // namespace antlr
-} // namespace org
+} // namespace antlr4

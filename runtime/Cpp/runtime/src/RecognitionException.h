@@ -33,10 +33,7 @@
 
 #include "Exceptions.h"
 
-namespace org {
-namespace antlr {
-namespace v4 {
-namespace runtime {
+namespace antlr4 {
 
   /// The root of the ANTLR exception hierarchy. In general, ANTLR tracks just
   /// 3 kinds of errors: prediction errors, failed predicate errors, and
@@ -62,7 +59,8 @@ namespace runtime {
                          Ref<Token> offendingToken = Ref<Token>());
     RecognitionException(const std::string &message, IRecognizer *recognizer, IntStream *input,
                          Ref<ParserRuleContext> ctx, Ref<Token> offendingToken = Ref<Token>());
-
+    ~RecognitionException() {}
+    
     /// Get the ATN state number the parser was in at the time the error
     /// occurred. For NoViableAltException and
     /// LexerNoViableAltException exceptions, this is the
@@ -121,7 +119,4 @@ namespace runtime {
     void InitializeInstanceFields();
   };
 
-} // namespace runtime
-} // namespace v4
-} // namespace antlr
-} // namespace org
+} // namespace antlr4

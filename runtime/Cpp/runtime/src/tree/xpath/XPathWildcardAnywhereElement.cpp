@@ -1,8 +1,8 @@
-﻿/*
+/*
  * [The "BSD license"]
  *  Copyright (c) 2016 Mike Lischke
+ *  Copyright (c) 2014 Sam Harwell
  *  Copyright (c) 2013 Terence Parr
- *  Copyright (c) 2013 Dan McLaughlin
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -29,64 +29,21 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
+#include "XPath.h"
+#include "ParseTree.h"
+#include "Trees.h"
 
-#include "antlr4-common.h"
+#include "XPathWildcardAnywhereElement.h"
 
-namespace org {
-namespace antlr {
-namespace v4 {
-namespace runtime {
-namespace misc {
+using namespace antlr4::tree;
+using namespace antlr4::tree::xpath;
 
-  /// <summary>
-  /// Run a lexer/parser combo, optionally printing tree string or generating
-  ///  postscript file. Optionally taking input file.
-  ///
-  ///  $ java org.antlr.v4.runtime.misc.TestRig GrammarName startRuleName
-  ///        [-tree]
-  ///        [-tokens] [-gui] [-ps file.ps]
-  ///        [-trace]
-  ///        [-diagnostics]
-  ///        [-SLL]
-  ///        [input-filename(s)]
-  /// </summary>
-  class ANTLR4CPP_PUBLIC TestRig {
-  public:
-    static const std::string LEXER_START_RULE_NAME;
+XPathWildcardAnywhereElement::XPathWildcardAnywhereElement() : XPathElement(XPath::WILDCARD) {
+}
 
-    virtual ~TestRig() {};
-
-  protected:
-    std::string grammarName;
-    std::string startRuleName;
-    const std::vector<std::string> inputFiles;
-    bool printTree;
-    bool gui;
-    std::string psFile;
-    bool showTokens;
-    bool trace;
-    bool diagnostics;
-    std::string encoding;
-    bool SLL;
-
-  public:
-    TestRig(std::string args[]);
-
-    static void main(std::string args[]);
-
-    virtual void process();
-
-  protected:
-#ifdef TODO
-    virtual void process(Lexer *lexer, Class *parserClass, Parser *parser, InputStream *is, Reader *r) throw(IOException, IllegalAccessException, InvocationTargetException, PrintException);
-#endif
-  private:
-    void InitializeInstanceFields();
-  };
-
-} // namespace atn
-} // namespace runtime
-} // namespace v4
-} // namespace antlr
-} // namespace org
+std::vector<Ref<ParseTree>> XPathWildcardAnywhereElement::evaluate(const Ref<ParseTree> &t) {
+  if (_invert) {
+    return {}; // !* is weird but valid (empty)
+  }
+  return Trees::getDescendants(t);
+}

@@ -37,10 +37,7 @@
 #include "TokenSource.h"
 #include "misc/Interval.h"
 
-namespace org {
-namespace antlr {
-namespace v4 {
-namespace runtime {
+namespace antlr4 {
 
   /// This is all the parsing support code essentially; most of it is error recovery stuff.
   class ANTLR4CPP_PUBLIC Parser : public Recognizer {
@@ -51,10 +48,10 @@ namespace runtime {
       TraceListener(Parser *outerInstance);
       virtual ~TraceListener() {};
 
-      virtual void enterEveryRule(Ref<ParserRuleContext> ctx) override;
+      virtual void enterEveryRule(ParserRuleContext *ctx) override;
       virtual void visitTerminal(Ref<tree::TerminalNode> node) override;
       virtual void visitErrorNode(Ref<tree::ErrorNode> node) override;
-      virtual void exitEveryRule(Ref<ParserRuleContext> ctx) override;
+      virtual void exitEveryRule(ParserRuleContext *ctx) override;
 
     private:
       Parser *const outerInstance;
@@ -66,10 +63,10 @@ namespace runtime {
 
       virtual ~TrimToSizeListener() {};
 
-      virtual void enterEveryRule(Ref<ParserRuleContext> ctx) override;
+      virtual void enterEveryRule(ParserRuleContext *ctx) override;
       virtual void visitTerminal(Ref<tree::TerminalNode> node) override;
       virtual void visitErrorNode(Ref<tree::ErrorNode> node) override;
-      virtual void exitEveryRule(Ref<ParserRuleContext> ctx) override;
+      virtual void exitEveryRule(ParserRuleContext *ctx) override;
     };
 
     Parser(TokenStream *input);
@@ -328,7 +325,7 @@ namespace runtime {
     virtual Ref<ParserRuleContext> getInvokingContext(int ruleIndex);
     virtual Ref<ParserRuleContext> getContext();
     virtual void setContext(Ref<ParserRuleContext> ctx);
-    virtual bool precpred(Ref<RuleContext> localctx, int precedence) override;
+    virtual bool precpred(RuleContext *localctx, int precedence) override;
     virtual bool inContext(const std::string &context);
 
     /// <summary>
@@ -471,7 +468,4 @@ namespace runtime {
     void InitializeInstanceFields();
   };
 
-} // namespace runtime
-} // namespace v4
-} // namespace antlr
-} // namespace org
+} // namespace antlr4

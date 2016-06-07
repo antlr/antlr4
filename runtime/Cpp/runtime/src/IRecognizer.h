@@ -31,10 +31,7 @@
 
 #pragma once
 
-namespace org {
-namespace antlr {
-namespace v4 {
-namespace runtime {
+namespace antlr4 {
 
   class ANTLR4CPP_PUBLIC IRecognizer {
   public:
@@ -47,7 +44,4 @@ namespace runtime {
 
   };
 
-} // namespace runtime
-} // namespace v4
-} // namespace antlr
-} // namespace org
+} // namespace antlr4

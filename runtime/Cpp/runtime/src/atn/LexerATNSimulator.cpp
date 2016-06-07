@@ -49,8 +49,8 @@
 
 #include "atn/LexerATNSimulator.h"
 
-using namespace org::antlr::v4::runtime;
-using namespace org::antlr::v4::runtime::atn;
+using namespace antlr4;
+using namespace antlr4::atn;
 using namespace antlrcpp;
 
 void LexerATNSimulator::SimState::reset() {
@@ -70,12 +70,12 @@ int LexerATNSimulator::match_calls = 0;
 
 
 LexerATNSimulator::LexerATNSimulator(const ATN &atn, std::vector<dfa::DFA> &decisionToDFA,
-                                     Ref<PredictionContextCache> sharedContextCache)
+                                     PredictionContextCache &sharedContextCache)
 : LexerATNSimulator(nullptr, atn, decisionToDFA, sharedContextCache) {
 }
 
 LexerATNSimulator::LexerATNSimulator(Lexer *recog, const ATN &atn, std::vector<dfa::DFA> &decisionToDFA,
-                                     Ref<PredictionContextCache> sharedContextCache)
+                                     PredictionContextCache &sharedContextCache)
   : ATNSimulator(atn, sharedContextCache), _recog(recog), _decisionToDFA(decisionToDFA) {
   InitializeInstanceFields();
 }
@@ -255,7 +255,7 @@ dfa::DFAState *LexerATNSimulator::computeTargetState(CharStream *input, dfa::DFA
   return addDFAEdge(s, t, reach);
 }
 
-int LexerATNSimulator::failOrAccept(CharStream *input, Ref<ATNConfigSet> reach, ssize_t t) {
+int LexerATNSimulator::failOrAccept(CharStream *input, const Ref<ATNConfigSet> &reach, ssize_t t) {
   if (_prevAccept.dfaState != nullptr) {
     Ref<LexerActionExecutor> lexerActionExecutor = _prevAccept.dfaState->lexerActionExecutor;
     accept(input, lexerActionExecutor, _startIndex, (size_t)_prevAccept.index, _prevAccept.line, (size_t)_prevAccept.charPos);
@@ -270,8 +270,8 @@ int LexerATNSimulator::failOrAccept(CharStream *input, Ref<ATNConfigSet> reach, 
   }
 }
 
-void LexerATNSimulator::getReachableConfigSet(CharStream *input, Ref<ATNConfigSet> closure_,
-                                              Ref<ATNConfigSet> reach, ssize_t t) {
+void LexerATNSimulator::getReachableConfigSet(CharStream *input, const Ref<ATNConfigSet> &closure_,
+                                              const Ref<ATNConfigSet> &reach, ssize_t t) {
   // this is used to skip processing for configs which have a lower priority
   // than a config that already reached an accept state for the same rule
   int skipAlt = ATN::INVALID_ALT_NUMBER;
@@ -311,7 +311,7 @@ void LexerATNSimulator::getReachableConfigSet(CharStream *input, Ref<ATNConfigSe
   }
 }
 
-void LexerATNSimulator::accept(CharStream *input, Ref<LexerActionExecutor> lexerActionExecutor, int /*startIndex*/,
+void LexerATNSimulator::accept(CharStream *input, const Ref<LexerActionExecutor> &lexerActionExecutor, int /*startIndex*/,
                                size_t index, size_t line, size_t charPos) {
   if (debug) {
     std::cout << "ACTION ";
@@ -347,7 +347,7 @@ Ref<ATNConfigSet> LexerATNSimulator::computeStartState(CharStream *input, ATNSta
   return configs;
 }
 
-bool LexerATNSimulator::closure(CharStream *input, Ref<LexerATNConfig> config, Ref<ATNConfigSet> configs,
+bool LexerATNSimulator::closure(CharStream *input, const Ref<LexerATNConfig> &config, const Ref<ATNConfigSet> & configs,
                                 bool currentAltReachedAcceptState, bool speculative, bool treatEofAsEpsilon) {
   if (debug) {
     std::cout << "closure(" << config->toString(true) << ")" << std::endl;
@@ -405,8 +405,8 @@ bool LexerATNSimulator::closure(CharStream *input, Ref<LexerATNConfig> config, R
   return currentAltReachedAcceptState;
 }
 
-Ref<LexerATNConfig> LexerATNSimulator::getEpsilonTarget(CharStream *input, Ref<LexerATNConfig> config, Transition *t,
-  Ref<ATNConfigSet> configs, bool speculative, bool treatEofAsEpsilon) {
+Ref<LexerATNConfig> LexerATNSimulator::getEpsilonTarget(CharStream *input, const Ref<LexerATNConfig> &config, Transition *t,
+  const Ref<ATNConfigSet> &configs, bool speculative, bool treatEofAsEpsilon) {
   
   Ref<LexerATNConfig> c = nullptr;
   switch (t->getSerializationType()) {
@@ -454,7 +454,7 @@ Ref<LexerATNConfig> LexerATNSimulator::getEpsilonTarget(CharStream *input, Ref<L
       if (config->context == nullptr|| config->context->hasEmptyPath()) {
         // execute actions anywhere in the start rule for a token.
         //
-        // TODO: if the entry rule is invoked recursively, some
+        // TO_DO: if the entry rule is invoked recursively, some
         // actions may be executed during the recursive call. The
         // problem can appear when hasEmptyPath() is true but
         // isEmpty() is false. In this case, the config needs to be
@@ -528,7 +528,7 @@ void LexerATNSimulator::captureSimState(CharStream *input, dfa::DFAState *dfaSta
   _prevAccept.dfaState = dfaState;
 }
 
-dfa::DFAState *LexerATNSimulator::addDFAEdge(dfa::DFAState *from, ssize_t t, Ref<ATNConfigSet> q) {
+dfa::DFAState *LexerATNSimulator::addDFAEdge(dfa::DFAState *from, ssize_t t, const Ref<ATNConfigSet> &q) {
   /* leading to this call, ATNConfigSet.hasSemanticContext is used as a
    * marker indicating dynamic predicate evaluation makes this edge
    * dependent on the specific input sequence, so the static edge in the
@@ -571,7 +571,7 @@ void LexerATNSimulator::addDFAEdge(dfa::DFAState *p, ssize_t t, dfa::DFAState *q
   p->edges[(size_t)(t - MIN_DFA_EDGE)] = q; // connect
 }
 
-dfa::DFAState *LexerATNSimulator::addDFAState(Ref<ATNConfigSet> configs) {
+dfa::DFAState *LexerATNSimulator::addDFAState(const Ref<ATNConfigSet> &configs) {
   /* the lexer evaluates predicates on-the-fly; by this point configs
    * should not contain any configurations with unevaluated predicates.
    */
@@ -580,7 +580,7 @@ dfa::DFAState *LexerATNSimulator::addDFAState(Ref<ATNConfigSet> configs) {
   dfa::DFAState *proposed = new dfa::DFAState(configs); /* mem-check: managed by the DFA or deleted below */
   Ref<ATNConfig> firstConfigWithRuleStopState = nullptr;
   for (auto c : configs->configs) {
-    if (is<RuleStopState*>(c->state)) {
+    if (is<RuleStopState *>(c->state)) {
       firstConfigWithRuleStopState = c;
       break;
     }
@@ -661,5 +661,5 @@ void LexerATNSimulator::InitializeInstanceFields() {
   _startIndex = -1;
   _line = 1;
   _charPositionInLine = 0;
-  _mode = org::antlr::v4::runtime::Lexer::DEFAULT_MODE;
+  _mode = antlr4::Lexer::DEFAULT_MODE;
 }

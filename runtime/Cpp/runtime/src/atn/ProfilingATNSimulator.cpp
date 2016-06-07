@@ -37,9 +37,9 @@
 
 #include "atn/ProfilingATNSimulator.h"
 
-using namespace org::antlr::v4::runtime;
-using namespace org::antlr::v4::runtime::atn;
-using namespace org::antlr::v4::runtime::dfa;
+using namespace antlr4;
+using namespace antlr4::atn;
+using namespace antlr4::dfa;
 using namespace antlrcpp;
 
 using namespace std::chrono;
@@ -125,7 +125,7 @@ Ref<ATNConfigSet> ProfilingATNSimulator::computeReachSet(Ref<ATNConfigSet> closu
     _decisions[_currentDecision].LL_ATNTransitions++; // count computation even if error
     if (reachConfigs != nullptr) {
     } else { // no reach on current lookahead symbol. ERROR.
-      // TODO: does not handle delayed errors per getSynValidOrSemInvalidAltThatFinishedDecisionEntryRule()
+      // TO_DO: does not handle delayed errors per getSynValidOrSemInvalidAltThatFinishedDecisionEntryRule()
       _decisions[_currentDecision].errors.push_back(ErrorInfo(_currentDecision, closure, _input, _startIndex, _llStopIndex, true));
     }
   } else {

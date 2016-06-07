@@ -35,10 +35,7 @@
 #include "tree/TerminalNodeImpl.h"
 #include "misc/Interval.h"
 
-namespace org {
-namespace antlr {
-namespace v4 {
-namespace runtime {
+namespace antlr4 {
 namespace tree {
 
   /// <summary>
@@ -59,7 +56,4 @@ namespace tree {
   };
 
 } // namespace tree
-} // namespace runtime
-} // namespace v4
-} // namespace antlr
-} // namespace org
+} // namespace antlr4

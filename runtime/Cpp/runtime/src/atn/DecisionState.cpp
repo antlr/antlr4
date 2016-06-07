@@ -31,7 +31,7 @@
 
 #include "atn/DecisionState.h"
 
-using namespace org::antlr::v4::runtime::atn;
+using namespace antlr4::atn;
 
 void DecisionState::InitializeInstanceFields() {
   decision = -1;

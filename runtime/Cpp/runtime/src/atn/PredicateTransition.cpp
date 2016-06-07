@@ -31,7 +31,7 @@
 
 #include "atn/PredicateTransition.h"
 
-using namespace org::antlr::v4::runtime::atn;
+using namespace antlr4::atn;
 
 PredicateTransition::PredicateTransition(ATNState *target, int ruleIndex, int predIndex, bool isCtxDependent) : AbstractPredicateTransition(target), ruleIndex(ruleIndex), predIndex(predIndex), isCtxDependent(isCtxDependent) {
 }

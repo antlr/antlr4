@@ -36,10 +36,7 @@
 #include "CharStream.h"
 #include "Token.h"
 
-namespace org {
-namespace antlr {
-namespace v4 {
-namespace runtime {
+namespace antlr4 {
 
   /// A lexer is recognizer that draws input symbols from a character stream.
   /// lexer grammars result in a subclass of this object. A Lexer object
@@ -104,10 +101,6 @@ namespace runtime {
     // Use the vector as a stack.
     std::vector<size_t> modeStack;
     size_t mode;
-
-    /// You can set the text for the current token to override what is in
-    /// the input char buffer. Use setText() or can set this instance var.
-    std::string text;
 
     Lexer();
     Lexer(CharStream *input);
@@ -224,11 +217,13 @@ namespace runtime {
     /// </summary>
     virtual void recover(RecognitionException *re);
 
+  protected:
+    /// You can set the text for the current token to override what is in
+    /// the input char buffer (via setText()).
+    std::string _text;
+
   private:
     void InitializeInstanceFields();
   };
 
-} // namespace runtime
-} // namespace v4
-} // namespace antlr
-} // namespace org
+} // namespace antlr4

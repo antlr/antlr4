@@ -67,7 +67,7 @@
 #include "atn/ATNSerializer.h"
 
 using namespace antlrcpp;
-using namespace org::antlr::v4::runtime::atn;
+using namespace antlr4::atn;
 
 ATNSerializer::ATNSerializer(ATN *atn) { this->atn = atn; }
 

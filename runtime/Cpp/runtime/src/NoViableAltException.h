@@ -35,10 +35,7 @@
 #include "Token.h"
 #include "atn/ATNConfigSet.h"
 
-namespace org {
-namespace antlr {
-namespace v4 {
-namespace runtime {
+namespace antlr4 {
 
   /// Indicates that the parser could not decide which of two or more paths
   /// to take based upon the remaining input. It tracks the starting token
@@ -55,7 +52,7 @@ namespace runtime {
 
   private:
     /// Which configurations did we try at input.index() that couldn't match input.LT(1)?
-    std::shared_ptr<atn::ATNConfigSet> _deadEndConfigs;
+    Ref<atn::ATNConfigSet> _deadEndConfigs;
 
     /// The token object at the start index; the input stream might
     /// not be buffering tokens so get a reference to it. (At the
@@ -65,7 +62,4 @@ namespace runtime {
    
   };
 
-} // namespace runtime
-} // namespace v4
-} // namespace antlr
-} // namespace org
+} // namespace antlr4

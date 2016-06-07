@@ -33,10 +33,7 @@
 
 #include "RecognitionException.h"
 
-namespace org {
-namespace antlr {
-namespace v4 {
-namespace runtime {
+namespace antlr4 {
 
   /// A semantic predicate failed during validation.  Validation of predicates
   /// occurs when normally parsing the alternative just like matching a token.
@@ -58,7 +55,4 @@ namespace runtime {
     std::string _predicate;
   };
 
-} // namespace runtime
-} // namespace v4
-} // namespace antlr
-} // namespace org
+} // namespace antlr4

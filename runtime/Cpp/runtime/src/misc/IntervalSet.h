@@ -33,10 +33,7 @@
 
 #include "misc/Interval.h"
 
-namespace org {
-namespace antlr {
-namespace v4 {
-namespace runtime {
+namespace antlr4 {
 namespace misc {
 
   /**
@@ -179,14 +176,14 @@ namespace misc {
      * @deprecated Use {@link #toString(Vocabulary)} instead.
      */
     virtual std::string toString(const std::vector<std::string> &tokenNames) const;
-    virtual std::string toString(Ref<dfa::Vocabulary> vocabulary) const;
+    virtual std::string toString(const dfa::Vocabulary &vocabulary) const;
 
   protected:
     /**
      * @deprecated Use {@link #elementName(Vocabulary, int)} instead.
      */
     virtual std::string elementName(const std::vector<std::string> &tokenNames, ssize_t a) const;
-    virtual std::string elementName(Ref<dfa::Vocabulary> vocabulary, ssize_t a) const;
+    virtual std::string elementName(const dfa::Vocabulary &vocabulary, ssize_t a) const;
 
   public:
     virtual size_t size() const;
@@ -208,15 +205,12 @@ namespace misc {
   };
   
 } // namespace atn
-} // namespace runtime
-} // namespace v4
-} // namespace antlr
-} // namespace org
+} // namespace antlr4
 
 // Hash function for IntervalSet.
 
 namespace std {
-  using org::antlr::v4::runtime::misc::IntervalSet;
+  using antlr4::misc::IntervalSet;
 
   template <> struct hash<IntervalSet>
   {

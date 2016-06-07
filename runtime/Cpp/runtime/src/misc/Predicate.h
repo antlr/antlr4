@@ -31,10 +31,7 @@
 
 #pragma once
 
-namespace org {
-namespace antlr {
-namespace v4 {
-namespace runtime {
+namespace antlr4 {
 namespace misc {
 
   template<typename T>
@@ -46,7 +43,4 @@ namespace misc {
   };
 
 } // namespace tree
-} // namespace runtime
-} // namespace v4
-} // namespace antlr
-} // namespace org
+} // namespace antlr4

@@ -33,7 +33,7 @@
 
 #include "NoViableAltException.h"
 
-using namespace org::antlr::v4::runtime;
+using namespace antlr4;
 
 NoViableAltException::NoViableAltException(Parser *recognizer)
   : NoViableAltException(recognizer, recognizer->getTokenStream(), recognizer->getCurrentToken(),

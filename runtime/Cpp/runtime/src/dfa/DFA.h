@@ -33,10 +33,7 @@
 
 #include "dfa/DFAState.h"
 
-namespace org {
-namespace antlr {
-namespace v4 {
-namespace runtime {
+namespace antlr4 {
 namespace dfa {
 
   class ANTLR4CPP_PUBLIC DFA {
@@ -100,7 +97,7 @@ namespace dfa {
      * @deprecated Use {@link #toString(Vocabulary)} instead.
      */
     virtual std::string toString(const std::vector<std::string>& tokenNames);
-    std::string toString(Ref<Vocabulary> vocabulary) const;
+    std::string toString(const Vocabulary &vocabulary) const;
 
     virtual std::string toLexerString();
 
@@ -115,7 +112,4 @@ namespace dfa {
   };
 
 } // namespace atn
-} // namespace runtime
-} // namespace v4
-} // namespace antlr
-} // namespace org
+} // namespace antlr4

@@ -36,7 +36,7 @@
 
 #include <vector>
 
-using namespace org::antlr::v4::runtime;
+using namespace antlr4;
 
 @interface antlrcpp_Tests : XCTestCase
 
@@ -59,7 +59,7 @@ using namespace org::antlr::v4::runtime;
       std::vector<dfa::DFA> decisionToDFA;
       atn::ATN atn;
 
-      org::antlr::v4::runtime::atn::ParserATNSimulator foo(nullptr, atn, decisionToDFA, nullptr);
+      antlr4::atn::ParserATNSimulator foo(nullptr, atn, decisionToDFA, nullptr);
     }
     catch (std::exception &e) {
         

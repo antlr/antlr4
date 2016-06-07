@@ -507,6 +507,33 @@
     <ClInclude Include="src\support\StringUtils.h">
       <Filter>Header Files\support</Filter>
     </ClInclude>
+    <ClInclude Include="src\tree\xpath\XPath.h">
+      <Filter>Header Files\tree\xpath</Filter>
+    </ClInclude>
+    <ClInclude Include="src\tree\xpath\XPathElement.h">
+      <Filter>Header Files\tree\xpath</Filter>
+    </ClInclude>
+    <ClInclude Include="src\tree\xpath\XPathLexerErrorListener.h">
+      <Filter>Header Files\tree\xpath</Filter>
+    </ClInclude>
+    <ClInclude Include="src\tree\xpath\XPathRuleAnywhereElement.h">
+      <Filter>Header Files\tree\xpath</Filter>
+    </ClInclude>
+    <ClInclude Include="src\tree\xpath\XPathRuleElement.h">
+      <Filter>Header Files\tree\xpath</Filter>
+    </ClInclude>
+    <ClInclude Include="src\tree\xpath\XPathTokenAnywhereElement.h">
+      <Filter>Header Files\tree\xpath</Filter>
+    </ClInclude>
+    <ClInclude Include="src\tree\xpath\XPathTokenElement.h">
+      <Filter>Header Files\tree\xpath</Filter>
+    </ClInclude>
+    <ClInclude Include="src\tree\xpath\XPathWildcardAnywhereElement.h">
+      <Filter>Header Files\tree\xpath</Filter>
+    </ClInclude>
+    <ClInclude Include="src\tree\xpath\XPathWildcardElement.h">
+      <Filter>Header Files\tree\xpath</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\ANTLRFileStream.cpp">
@@ -877,6 +904,36 @@
     </ClCompile>
     <ClCompile Include="src\support\StringUtils.cpp">
       <Filter>Source Files\support</Filter>
+    </ClCompile>
+    <ClCompile Include="src\tree\xpath\XPath.cpp">
+      <Filter>Source Files\tree\xpath</Filter>
+    </ClCompile>
+    <ClCompile Include="src\tree\xpath\XPathElement.cpp">
+      <Filter>Source Files\tree\xpath</Filter>
+    </ClCompile>
+    <ClCompile Include="src\tree\xpath\XPathLexer.cpp">
+      <Filter>Source Files\tree\xpath</Filter>
+    </ClCompile>
+    <ClCompile Include="src\tree\xpath\XPathLexerErrorListener.cpp">
+      <Filter>Source Files\tree\xpath</Filter>
+    </ClCompile>
+    <ClCompile Include="src\tree\xpath\XPathRuleAnywhereElement.cpp">
+      <Filter>Source Files\tree\xpath</Filter>
+    </ClCompile>
+    <ClCompile Include="src\tree\xpath\XPathRuleElement.cpp">
+      <Filter>Source Files\tree\xpath</Filter>
+    </ClCompile>
+    <ClCompile Include="src\tree\xpath\XPathTokenAnywhereElement.cpp">
+      <Filter>Source Files\tree\xpath</Filter>
+    </ClCompile>
+    <ClCompile Include="src\tree\xpath\XPathTokenElement.cpp">
+      <Filter>Source Files\tree\xpath</Filter>
+    </ClCompile>
+    <ClCompile Include="src\tree\xpath\XPathWildcardAnywhereElement.cpp">
+      <Filter>Source Files\tree\xpath</Filter>
+    </ClCompile>
+    <ClCompile Include="src\tree\xpath\XPathWildcardElement.cpp">
+      <Filter>Source Files\tree\xpath</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

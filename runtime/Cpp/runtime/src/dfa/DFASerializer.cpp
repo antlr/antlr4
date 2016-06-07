@@ -31,17 +31,17 @@
  */
 
 #include "dfa/DFA.h"
-#include "VocabularyImpl.h"
+#include "Vocabulary.h"
 
 #include "dfa/DFASerializer.h"
 
-using namespace org::antlr::v4::runtime::dfa;
+using namespace antlr4::dfa;
 
 DFASerializer::DFASerializer(const DFA *dfa, const std::vector<std::string>& tokenNames)
-  : DFASerializer(dfa, VocabularyImpl::fromTokenNames(tokenNames)) {
+  : DFASerializer(dfa, Vocabulary::fromTokenNames(tokenNames)) {
 }
 
-DFASerializer::DFASerializer(const DFA *dfa, Ref<Vocabulary> vocabulary) : _dfa(dfa), _vocabulary(vocabulary) {
+DFASerializer::DFASerializer(const DFA *dfa, const Vocabulary &vocabulary) : _dfa(dfa), _vocabulary(vocabulary) {
 }
 
 std::string DFASerializer::toString() const {
@@ -54,7 +54,7 @@ std::string DFASerializer::toString() const {
   for (auto s : states) {
     for (size_t i = 0; i < s->edges.size(); i++) {
       DFAState *t = s->edges[i];
-      if (t != nullptr && t->stateNumber != INT16_MAX) {
+      if (t != nullptr && t->stateNumber != INT32_MAX) {
         ss << getStateString(s);
         std::string label = getEdgeLabel(i);
         ss << "-" << label << "->" << getStateString(t) << "\n";
@@ -66,22 +66,24 @@ std::string DFASerializer::toString() const {
 }
 
 std::string DFASerializer::getEdgeLabel(size_t i) const {
-  return _vocabulary->getDisplayName((int)i - 1);
+  return _vocabulary.getDisplayName((int)i - 1);
 }
 
 std::string DFASerializer::getStateString(DFAState *s) const {
   size_t n = (size_t)s->stateNumber;
 
-  const std::string baseStateStr = (s->isAcceptState ? ":" : "") + std::string("s") + std::to_string(n) + (s->requiresFullContext ? "^" : "");
+  const std::string baseStateStr = std::string(s->isAcceptState ? ":" : "") + "s" + std::to_string(n) +
+    (s->requiresFullContext ? "^" : "");
+  
   if (s->isAcceptState) {
-    if (s->predicates.size() != 0) {
+    if (!s->predicates.empty()) {
       std::string buf;
       for (size_t i = 0; i < s->predicates.size(); i++) {
         buf.append(s->predicates[i]->toString());
       }
-      return baseStateStr + " => " + buf;
+      return baseStateStr + "=>" + buf;
     } else {
-      return baseStateStr + " => " + std::to_string(s->prediction);
+      return baseStateStr + "=>" + std::to_string(s->prediction);
     }
   } else {
     return baseStateStr;

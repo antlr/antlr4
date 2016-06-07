@@ -33,10 +33,7 @@
 
 #include "TokenStream.h"
 
-namespace org {
-namespace antlr {
-namespace v4 {
-namespace runtime {
+namespace antlr4 {
 
   /**
    * This implementation of {@link TokenStream} loads tokens from a
@@ -224,7 +221,4 @@ namespace runtime {
     void InitializeInstanceFields();
   };
 
-} // namespace runtime
-} // namespace v4
-} // namespace antlr
-} // namespace org
+} // namespace antlr4

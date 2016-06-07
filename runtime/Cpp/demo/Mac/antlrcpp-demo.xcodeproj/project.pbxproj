@@ -79,7 +79,7 @@
 		27A23EA11CC2A8D60036D8A3 /* TLexer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TLexer.cpp; path = ../generated/TLexer.cpp; sourceTree = "<group>"; wrapsLines = 0; };
 		27A23EA21CC2A8D60036D8A3 /* TLexer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TLexer.h; path = ../generated/TLexer.h; sourceTree = "<group>"; };
 		27C66A671C9591280021E494 /* antlr4-cpp-demo */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "antlr4-cpp-demo"; sourceTree = BUILT_PRODUCTS_DIR; };
-		27C66A691C9591280021E494 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		27C66A691C9591280021E494 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; wrapsLines = 0; };
 		27C66A731C9592400021E494 /* TLexer.g4 */ = {isa = PBXFileReference; lastKnownFileType = text; name = TLexer.g4; path = ../../TLexer.g4; sourceTree = "<group>"; };
 		27C66A741C9592400021E494 /* TParser.g4 */ = {isa = PBXFileReference; lastKnownFileType = text; name = TParser.g4; path = ../../TParser.g4; sourceTree = "<group>"; };
 		27C6E1741C972FFC0079AF06 /* TParser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TParser.cpp; path = ../generated/TParser.cpp; sourceTree = "<group>"; wrapsLines = 0; };

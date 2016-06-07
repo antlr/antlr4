@@ -37,10 +37,7 @@ namespace antlrcpp {
   class BitSet;
 }
 
-namespace org {
-namespace antlr {
-namespace v4 {
-namespace runtime {
+namespace antlr4 {
 
   /**
    * Provides an empty default implementation of {@link ANTLRErrorListener}. The
@@ -62,7 +59,4 @@ namespace runtime {
       int prediction, Ref<atn::ATNConfigSet> configs) override;
   };
 
-} // namespace runtime
-} // namespace v4
-} // namespace antlr
-} // namespace org
+} // namespace antlr4

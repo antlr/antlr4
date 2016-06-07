@@ -32,8 +32,8 @@
 
 #include "RuleContextWithAltNum.h"
 
-using namespace org::antlr::v4::runtime;
-using namespace org::antlr::v4::runtime::atn;
+using namespace antlr4;
+using namespace antlr4::atn;
 
 RuleContextWithAltNum::RuleContextWithAltNum() : ParserRuleContext() {
   altNum = ATN::INVALID_ALT_NUMBER;

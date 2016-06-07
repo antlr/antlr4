@@ -37,19 +37,22 @@ std::string Arrays::listToString(const std::vector<std::string> &list, const std
 {
   std::stringstream ss;
   bool firstEntry = true;
-  
+
+  ss << '[';
   for (auto &entry : list) {
     ss << entry;
-    if (!firstEntry)
+    if (firstEntry) {
       ss << separator;
-    firstEntry = false;
+      firstEntry = false;
+    }
   }
 
+  ss << ']';
   return ss.str();
 }
 
 template <>
-std::string Arrays::toString(const std::vector<org::antlr::v4::runtime::tree::Tree*> &source) {
+std::string Arrays::toString(const std::vector<antlr4::tree::Tree*> &source) {
   std::string result = "[";
   bool firstEntry = true;
   for (auto value : source) {

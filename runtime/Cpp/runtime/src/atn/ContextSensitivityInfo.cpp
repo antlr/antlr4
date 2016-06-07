@@ -31,8 +31,8 @@
 
 #include "atn/ContextSensitivityInfo.h"
 
-using namespace org::antlr::v4::runtime;
-using namespace org::antlr::v4::runtime::atn;
+using namespace antlr4;
+using namespace antlr4::atn;
 
 ContextSensitivityInfo::ContextSensitivityInfo(int decision, Ref<ATNConfigSet> configs, TokenStream *input,
   size_t startIndex, size_t stopIndex)

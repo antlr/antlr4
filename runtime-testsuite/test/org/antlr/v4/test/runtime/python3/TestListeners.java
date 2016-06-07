@@ -13,18 +13,17 @@ public class TestListeners extends BasePython3Test {
 	public void testBasic() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(588);
+		StringBuilder grammarBuilder = new StringBuilder(587);
 		grammarBuilder.append("grammar T;\n");
+		grammarBuilder.append("\n");
 		grammarBuilder.append("@parser::header {\n");
 		grammarBuilder.append("class MockListener:\n");
 		grammarBuilder.append("    pass\n");
 		grammarBuilder.append("}\n");
-		grammarBuilder.append("\n");
 		grammarBuilder.append("@parser::members {\n");
 		grammarBuilder.append("class LeafListener(MockListener):\n");
 		grammarBuilder.append("    def visitTerminal(self, node):\n");
 		grammarBuilder.append("        print(node.symbol.text)\n");
-		grammarBuilder.append("\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("s\n");
@@ -66,13 +65,13 @@ public class TestListeners extends BasePython3Test {
 	public void testLR() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(749);
+		StringBuilder grammarBuilder = new StringBuilder(748);
 		grammarBuilder.append("grammar T;\n");
+		grammarBuilder.append("\n");
 		grammarBuilder.append("@parser::header {\n");
 		grammarBuilder.append("class MockListener:\n");
 		grammarBuilder.append("    pass\n");
 		grammarBuilder.append("}\n");
-		grammarBuilder.append("\n");
 		grammarBuilder.append("@parser::members {\n");
 		grammarBuilder.append("class LeafListener(MockListener):\n");
 		grammarBuilder.append("    def exitE(self, ctx):\n");
@@ -80,7 +79,6 @@ public class TestListeners extends BasePython3Test {
 		grammarBuilder.append("            print(ctx.e(0).start.text + ' ' + ctx.e(1).start.text + ' ' + ctx.e()[0].start.text)\n");
 		grammarBuilder.append("        else:\n");
 		grammarBuilder.append("            print(ctx.INT().symbol.text)\n");
-		grammarBuilder.append("\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("s\n");
@@ -126,20 +124,19 @@ public class TestListeners extends BasePython3Test {
 	public void testLRWithLabels() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(729);
+		StringBuilder grammarBuilder = new StringBuilder(728);
 		grammarBuilder.append("grammar T;\n");
+		grammarBuilder.append("\n");
 		grammarBuilder.append("@parser::header {\n");
 		grammarBuilder.append("class MockListener:\n");
 		grammarBuilder.append("    pass\n");
 		grammarBuilder.append("}\n");
-		grammarBuilder.append("\n");
 		grammarBuilder.append("@parser::members {\n");
 		grammarBuilder.append("class LeafListener(MockListener):\n");
 		grammarBuilder.append("    def exitCall(self, ctx):\n");
 		grammarBuilder.append("        print(ctx.e().start.text + ' ' + str(ctx.eList()))\n");
 		grammarBuilder.append("    def exitInt(self, ctx):\n");
 		grammarBuilder.append("        print(ctx.INT().symbol.text)\n");
-		grammarBuilder.append("\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("s\n");
@@ -184,13 +181,13 @@ public class TestListeners extends BasePython3Test {
 	public void testRuleGetters_1() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(774);
+		StringBuilder grammarBuilder = new StringBuilder(773);
 		grammarBuilder.append("grammar T;\n");
+		grammarBuilder.append("\n");
 		grammarBuilder.append("@parser::header {\n");
 		grammarBuilder.append("class MockListener:\n");
 		grammarBuilder.append("    pass\n");
 		grammarBuilder.append("}\n");
-		grammarBuilder.append("\n");
 		grammarBuilder.append("@parser::members {\n");
 		grammarBuilder.append("class LeafListener(MockListener):\n");
 		grammarBuilder.append("    def exitA(self, ctx):\n");
@@ -198,7 +195,6 @@ public class TestListeners extends BasePython3Test {
 		grammarBuilder.append("            print(ctx.b(0).start.text + ' ' + ctx.b(1).start.text + ' ' + ctx.b()[0].start.text)\n");
 		grammarBuilder.append("        else:\n");
 		grammarBuilder.append("            print(ctx.b(0).start.text)\n");
-		grammarBuilder.append("\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("s\n");
@@ -240,13 +236,13 @@ public class TestListeners extends BasePython3Test {
 	public void testRuleGetters_2() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(774);
+		StringBuilder grammarBuilder = new StringBuilder(773);
 		grammarBuilder.append("grammar T;\n");
+		grammarBuilder.append("\n");
 		grammarBuilder.append("@parser::header {\n");
 		grammarBuilder.append("class MockListener:\n");
 		grammarBuilder.append("    pass\n");
 		grammarBuilder.append("}\n");
-		grammarBuilder.append("\n");
 		grammarBuilder.append("@parser::members {\n");
 		grammarBuilder.append("class LeafListener(MockListener):\n");
 		grammarBuilder.append("    def exitA(self, ctx):\n");
@@ -254,7 +250,6 @@ public class TestListeners extends BasePython3Test {
 		grammarBuilder.append("            print(ctx.b(0).start.text + ' ' + ctx.b(1).start.text + ' ' + ctx.b()[0].start.text)\n");
 		grammarBuilder.append("        else:\n");
 		grammarBuilder.append("            print(ctx.b(0).start.text)\n");
-		grammarBuilder.append("\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("s\n");
@@ -296,13 +291,13 @@ public class TestListeners extends BasePython3Test {
 	public void testTokenGetters_1() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(737);
+		StringBuilder grammarBuilder = new StringBuilder(736);
 		grammarBuilder.append("grammar T;\n");
+		grammarBuilder.append("\n");
 		grammarBuilder.append("@parser::header {\n");
 		grammarBuilder.append("class MockListener:\n");
 		grammarBuilder.append("    pass\n");
 		grammarBuilder.append("}\n");
-		grammarBuilder.append("\n");
 		grammarBuilder.append("@parser::members {\n");
 		grammarBuilder.append("class LeafListener(MockListener):\n");
 		grammarBuilder.append("    def exitA(self, ctx):\n");
@@ -310,7 +305,6 @@ public class TestListeners extends BasePython3Test {
 		grammarBuilder.append("            print(ctx.INT(0).symbol.text + ' ' + ctx.INT(1).symbol.text + ' ' + str_list(ctx.INT()))\n");
 		grammarBuilder.append("        else:\n");
 		grammarBuilder.append("            print(str(ctx.ID().symbol))\n");
-		grammarBuilder.append("\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("s\n");
@@ -351,13 +345,13 @@ public class TestListeners extends BasePython3Test {
 	public void testTokenGetters_2() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(737);
+		StringBuilder grammarBuilder = new StringBuilder(736);
 		grammarBuilder.append("grammar T;\n");
+		grammarBuilder.append("\n");
 		grammarBuilder.append("@parser::header {\n");
 		grammarBuilder.append("class MockListener:\n");
 		grammarBuilder.append("    pass\n");
 		grammarBuilder.append("}\n");
-		grammarBuilder.append("\n");
 		grammarBuilder.append("@parser::members {\n");
 		grammarBuilder.append("class LeafListener(MockListener):\n");
 		grammarBuilder.append("    def exitA(self, ctx):\n");
@@ -365,7 +359,6 @@ public class TestListeners extends BasePython3Test {
 		grammarBuilder.append("            print(ctx.INT(0).symbol.text + ' ' + ctx.INT(1).symbol.text + ' ' + str_list(ctx.INT()))\n");
 		grammarBuilder.append("        else:\n");
 		grammarBuilder.append("            print(str(ctx.ID().symbol))\n");
-		grammarBuilder.append("\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("s\n");

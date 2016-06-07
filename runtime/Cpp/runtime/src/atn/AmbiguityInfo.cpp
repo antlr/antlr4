@@ -31,8 +31,8 @@
 
 #include "atn/AmbiguityInfo.h"
 
-using namespace org::antlr::v4::runtime;
-using namespace org::antlr::v4::runtime::atn;
+using namespace antlr4;
+using namespace antlr4::atn;
 
 AmbiguityInfo::AmbiguityInfo(int decision, Ref<ATNConfigSet> configs, const antlrcpp::BitSet &ambigAlts,
                              TokenStream *input, size_t startIndex, size_t stopIndex, bool fullCtx)

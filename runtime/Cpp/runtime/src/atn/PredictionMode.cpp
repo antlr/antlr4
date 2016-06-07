@@ -37,8 +37,8 @@
 
 #include "PredictionMode.h"
 
-using namespace org::antlr::v4::runtime;
-using namespace org::antlr::v4::runtime::atn;
+using namespace antlr4;
+using namespace antlr4::atn;
 using namespace antlrcpp;
 
 struct AltAndContextConfigHasher
@@ -50,7 +50,7 @@ struct AltAndContextConfigHasher
   size_t operator () (const ATNConfig &o) const {
     size_t hashCode = misc::MurmurHash::initialize(7);
     hashCode = misc::MurmurHash::update(hashCode, (size_t)o.state->stateNumber);
-    hashCode = misc::MurmurHash::update(hashCode, o.context->hashCode());
+    hashCode = misc::MurmurHash::update(hashCode, o.context);
     return misc::MurmurHash::finish(hashCode, 2);
   }
 };

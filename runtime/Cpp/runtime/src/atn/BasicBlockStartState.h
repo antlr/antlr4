@@ -34,10 +34,7 @@
 #include "antlr4-common.h"
 #include "atn/BlockStartState.h"
 
-namespace org {
-namespace antlr {
-namespace v4 {
-namespace runtime {
+namespace antlr4 {
 namespace atn {
 
   class ANTLR4CPP_PUBLIC BasicBlockStartState final : public BlockStartState {
@@ -48,7 +45,4 @@ namespace atn {
   };
 
 } // namespace atn
-} // namespace runtime
-} // namespace v4
-} // namespace antlr
-} // namespace org
+} // namespace antlr4

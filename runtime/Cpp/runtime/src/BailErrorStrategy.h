@@ -33,10 +33,7 @@
 
 #include "DefaultErrorStrategy.h"
 
-namespace org {
-namespace antlr {
-namespace v4 {
-namespace runtime {
+namespace antlr4 {
 
   /**
    * This implementation of {@link ANTLRErrorStrategy} responds to syntax errors
@@ -87,7 +84,4 @@ namespace runtime {
     virtual void sync(Parser *recognizer) override;
   };
 
-} // namespace runtime
-} // namespace v4
-} // namespace antlr
-} // namespace org
+} // namespace antlr4

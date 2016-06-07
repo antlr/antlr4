@@ -37,10 +37,10 @@
 
 #include "TokenStreamRewriter.h"
 
-using namespace org::antlr::v4::runtime;
+using namespace antlr4;
 using namespace antlrcpp;
 
-using org::antlr::v4::runtime::misc::Interval;
+using antlr4::misc::Interval;
 
 TokenStreamRewriter::RewriteOperation::RewriteOperation(TokenStreamRewriter *outerInstance, size_t index) : outerInstance(outerInstance) {
 

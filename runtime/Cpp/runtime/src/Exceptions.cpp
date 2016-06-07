@@ -30,7 +30,7 @@
 
 #include "Exceptions.h"
 
-using namespace org::antlr::v4::runtime;
+using namespace antlr4;
 
 RuntimeException::RuntimeException(const std::string &msg) : std::exception(), _message(msg) {
 }

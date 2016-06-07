@@ -34,10 +34,7 @@
 #include "IntStream.h"
 #include "misc/Interval.h"
 
-namespace org {
-namespace antlr {
-namespace v4 {
-namespace runtime {
+namespace antlr4 {
 
   /// A source of characters for an ANTLR lexer.
   class ANTLR4CPP_PUBLIC CharStream : public IntStream {
@@ -63,7 +60,4 @@ namespace runtime {
     virtual std::string toString() const = 0;
   };
 
-} // namespace runtime
-} // namespace v4
-} // namespace antlr
-} // namespace org
+} // namespace antlr4

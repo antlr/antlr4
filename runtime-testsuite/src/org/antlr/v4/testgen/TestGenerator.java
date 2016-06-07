@@ -46,7 +46,7 @@ import org.stringtemplate.v4.gui.STViz;
 
 public class TestGenerator {
 	
-	public final static String[] targets = {"CSharp", "Java", "Python2", "Python3", "JavaScript/Node", "JavaScript/Safari", "JavaScript/Firefox", "JavaScript/Explorer", "JavaScript/Chrome"};
+	public final static String[] targets = {"Cpp", "CSharp", "Java", "Python2", "Python3", "JavaScript/Node", "JavaScript/Safari", "JavaScript/Firefox", "JavaScript/Explorer", "JavaScript/Chrome"};
 
 	/** Execute from antlr4 root dir:
 	 * *

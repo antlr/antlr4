@@ -34,17 +34,14 @@
 
 #include "Vocabulary.h"
 
-namespace org {
-namespace antlr {
-namespace v4 {
-namespace runtime {
+namespace antlr4 {
 namespace dfa {
 
   /// A DFA walker that knows how to dump them to serialized strings.
   class ANTLR4CPP_PUBLIC DFASerializer {
   public:
     DFASerializer(const DFA *dfa, const std::vector<std::string>& tnames);
-    DFASerializer(const DFA *dfa, Ref<Vocabulary> vocabulary);
+    DFASerializer(const DFA *dfa, const Vocabulary &vocabulary);
     virtual ~DFASerializer() {};
 
     virtual std::string toString() const;
@@ -55,11 +52,8 @@ namespace dfa {
 
   private:
     const DFA *_dfa;
-    Ref<Vocabulary> const _vocabulary;
+    const Vocabulary &_vocabulary;
   };
 
 } // namespace atn
-} // namespace runtime
-} // namespace v4
-} // namespace antlr
-} // namespace org
+} // namespace antlr4

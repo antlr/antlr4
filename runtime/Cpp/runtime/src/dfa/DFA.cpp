@@ -37,8 +37,8 @@
 
 #include "dfa/DFA.h"
 
-using namespace org::antlr::v4::runtime;
-using namespace org::antlr::v4::runtime::dfa;
+using namespace antlr4;
+using namespace antlr4::dfa;
 using namespace antlrcpp;
 
 DFA::DFA(atn::DecisionState *atnStartState) : DFA(atnStartState, 0) {
@@ -51,6 +51,7 @@ DFA::DFA(atn::DecisionState *atnStartState, int decision)
   if (is<atn::StarLoopEntryState *>(atnStartState)) {
     if (static_cast<atn::StarLoopEntryState *>(atnStartState)->isPrecedenceDecision) {
       _precedenceDfa = true;
+      // ml: this state should probably be added to the states list to be freed on destruction.
       DFAState *precedenceState = new DFAState(std::make_shared<atn::ATNConfigSet>()); // TODO: mem leak
       precedenceState->isAcceptState = false;
       precedenceState->requiresFullContext = false;
@@ -103,8 +104,6 @@ void DFA::setPrecedenceStartState(int precedence, DFAState *startState) {
     return;
   }
 
-  // synchronization on s0 here is ok. when the DFA is turned into a
-  // precedence DFA, s0 will be initialized once and not updated again
   std::unique_lock<std::recursive_mutex> lock(_lock);
   {
     // s0.edges is never null for a precedence DFA
@@ -121,8 +120,8 @@ std::vector<DFAState *> DFA::getStates() const {
   for (auto state : states)
     result.push_back(state.first);
 
-  std::sort(result.begin(), result.end(), [](DFAState *o1, DFAState *o2) {
-    return o1->stateNumber - o2->stateNumber;
+  std::sort(result.begin(), result.end(), [](DFAState *o1, DFAState *o2) -> bool {
+    return o1->stateNumber < o2->stateNumber;
   });
 
   return result;
@@ -137,7 +136,7 @@ std::string DFA::toString(const std::vector<std::string> &tokenNames) {
   return serializer.toString();
 }
 
-std::string DFA::toString(Ref<Vocabulary> vocabulary) const {
+std::string DFA::toString(const Vocabulary &vocabulary) const {
   if (s0 == nullptr) {
     return "";
   }

@@ -51,7 +51,7 @@
 
 #include "Parser.h"
 
-using namespace org::antlr::v4::runtime;
+using namespace antlr4;
 using namespace antlrcpp;
 
 std::map<std::vector<uint16_t>, atn::ATN> Parser::bypassAltsAtnCache;
@@ -59,7 +59,7 @@ std::map<std::vector<uint16_t>, atn::ATN> Parser::bypassAltsAtnCache;
 Parser::TraceListener::TraceListener(Parser *outerInstance) : outerInstance(outerInstance) {
 }
 
-void Parser::TraceListener::enterEveryRule(Ref<ParserRuleContext> ctx) {
+void Parser::TraceListener::enterEveryRule(ParserRuleContext *ctx) {
   std::cout << "enter   " << outerInstance->getRuleNames()[(size_t)ctx->getRuleIndex()]
     << ", LT(1)=" << outerInstance->_input->LT(1)->getText() << std::endl;
 }
@@ -72,7 +72,7 @@ void Parser::TraceListener::visitTerminal(Ref<tree::TerminalNode> node) {
 void Parser::TraceListener::visitErrorNode(Ref<tree::ErrorNode> /*node*/) {
 }
 
-void Parser::TraceListener::exitEveryRule(Ref<ParserRuleContext> ctx) {
+void Parser::TraceListener::exitEveryRule(ParserRuleContext *ctx) {
   std::cout << "exit    " << outerInstance->getRuleNames()[(size_t)ctx->getRuleIndex()]
     << ", LT(1)=" << outerInstance->_input->LT(1)->getText() << std::endl;
 }
@@ -80,7 +80,7 @@ void Parser::TraceListener::exitEveryRule(Ref<ParserRuleContext> ctx) {
 const Ref<Parser::TrimToSizeListener> Parser::TrimToSizeListener::INSTANCE =
   std::make_shared<Parser::TrimToSizeListener>();
 
-void Parser::TrimToSizeListener::enterEveryRule(Ref<ParserRuleContext> /*ctx*/) {
+void Parser::TrimToSizeListener::enterEveryRule(ParserRuleContext * /*ctx*/) {
 }
 
 void Parser::TrimToSizeListener::visitTerminal(Ref<tree::TerminalNode> /*node*/) {
@@ -89,7 +89,7 @@ void Parser::TrimToSizeListener::visitTerminal(Ref<tree::TerminalNode> /*node*/)
 void Parser::TrimToSizeListener::visitErrorNode(Ref<tree::ErrorNode> /*node*/) {
 }
 
-void Parser::TrimToSizeListener::exitEveryRule(Ref<ParserRuleContext> ctx) {
+void Parser::TrimToSizeListener::exitEveryRule(ParserRuleContext *ctx) {
   ctx->children.shrink_to_fit();
 }
 
@@ -203,7 +203,7 @@ void Parser::removeParseListeners() {
 
 void Parser::triggerEnterRuleEvent() {
   for (auto listener : _parseListeners) {
-    listener->enterEveryRule(_ctx);
+    listener->enterEveryRule(_ctx.get());
     _ctx->enterRule(listener);
   }
 }
@@ -212,7 +212,7 @@ void Parser::triggerExitRuleEvent() {
   // reverse order walk of listeners
   for (auto it = _parseListeners.rbegin(); it != _parseListeners.rend(); ++it) {
     _ctx->exitRule(*it);
-    (*it)->exitEveryRule(_ctx);
+    (*it)->exitEveryRule(_ctx.get());
   }
 }
 
@@ -471,7 +471,7 @@ void Parser::setContext(Ref<ParserRuleContext> ctx) {
   _ctx = ctx;
 }
 
-bool Parser::precpred(Ref<RuleContext> /*localctx*/, int precedence) {
+bool Parser::precpred(RuleContext * /*localctx*/, int precedence) {
   return precedence >= _precedenceStack.back();
 }
 

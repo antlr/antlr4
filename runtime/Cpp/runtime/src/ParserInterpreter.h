@@ -35,11 +35,9 @@
 #include "atn/ATN.h"
 #include "support/BitSet.h"
 #include "atn/PredictionContext.h"
+#include "Vocabulary.h"
 
-namespace org {
-namespace antlr {
-namespace v4 {
-namespace runtime {
+namespace antlr4 {
 
   /// <summary>
   /// A parser simulator that mimics what ANTLR's generated
@@ -60,7 +58,7 @@ namespace runtime {
     // @deprecated
     ParserInterpreter(const std::string &grammarFileName, const std::vector<std::string>& tokenNames,
       const std::vector<std::string>& ruleNames, const atn::ATN &atn, TokenStream *input);
-    ParserInterpreter(const std::string &grammarFileName, Ref<dfa::Vocabulary> vocabulary,
+    ParserInterpreter(const std::string &grammarFileName, const dfa::Vocabulary &vocabulary,
                       const std::vector<std::string> &ruleNames, const atn::ATN &atn, TokenStream *input);
     ~ParserInterpreter();
 
@@ -71,7 +69,7 @@ namespace runtime {
     // @deprecated
     virtual const std::vector<std::string>& getTokenNames() const override;
 
-    virtual Ref<dfa::Vocabulary> getVocabulary() const override;
+    virtual const dfa::Vocabulary& getVocabulary() const override;
     
     virtual const std::vector<std::string>& getRuleNames() const override;
     virtual std::string getGrammarFileName() const override;
@@ -144,7 +142,7 @@ namespace runtime {
     std::vector<std::string> _ruleNames;
 
     std::vector<dfa::DFA> _decisionToDFA; // not shared like it is for generated parsers
-    Ref<atn::PredictionContextCache> _sharedContextCache;
+    atn::PredictionContextCache _sharedContextCache;
 
     /** This stack corresponds to the _parentctx, _parentState pair of locals
      *  that would exist on call stack frames with a recursive descent parser;
@@ -201,10 +199,7 @@ namespace runtime {
     Ref<Token> recoverInline();
 
   private:
-    Ref<dfa::Vocabulary> _vocabulary;
+    const dfa::Vocabulary &_vocabulary;
   };
 
-} // namespace runtime
-} // namespace v4
-} // namespace antlr
-} // namespace org
+} // namespace antlr4

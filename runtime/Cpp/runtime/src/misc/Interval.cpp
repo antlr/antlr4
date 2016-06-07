@@ -31,7 +31,7 @@
 
 #include "misc/Interval.h"
 
-using namespace org::antlr::v4::runtime::misc;
+using namespace antlr4::misc;
 
 Interval const Interval::INVALID;
 

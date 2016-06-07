@@ -13,10 +13,8 @@ public class TestListeners extends BaseTest {
 	public void testBasic() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(473);
+		StringBuilder grammarBuilder = new StringBuilder(453);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("@parser::header {\n");
-		grammarBuilder.append("}\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("@parser::members {\n");
 		grammarBuilder.append("public static class LeafListener extends TBaseListener {\n");
@@ -59,10 +57,8 @@ public class TestListeners extends BaseTest {
 	public void testLR() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(653);
+		StringBuilder grammarBuilder = new StringBuilder(633);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("@parser::header {\n");
-		grammarBuilder.append("}\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("@parser::members {\n");
 		grammarBuilder.append("public static class LeafListener extends TBaseListener {\n");
@@ -113,10 +109,8 @@ public class TestListeners extends BaseTest {
 	public void testLRWithLabels() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(650);
+		StringBuilder grammarBuilder = new StringBuilder(630);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("@parser::header {\n");
-		grammarBuilder.append("}\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("@parser::members {\n");
 		grammarBuilder.append("public static class LeafListener extends TBaseListener {\n");
@@ -165,10 +159,8 @@ public class TestListeners extends BaseTest {
 	public void testRuleGetters_1() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(670);
+		StringBuilder grammarBuilder = new StringBuilder(650);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("@parser::header {\n");
-		grammarBuilder.append("}\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("@parser::members {\n");
 		grammarBuilder.append("public static class LeafListener extends TBaseListener {\n");
@@ -215,10 +207,8 @@ public class TestListeners extends BaseTest {
 	public void testRuleGetters_2() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(670);
+		StringBuilder grammarBuilder = new StringBuilder(650);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("@parser::header {\n");
-		grammarBuilder.append("}\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("@parser::members {\n");
 		grammarBuilder.append("public static class LeafListener extends TBaseListener {\n");
@@ -265,10 +255,8 @@ public class TestListeners extends BaseTest {
 	public void testTokenGetters_1() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(615);
+		StringBuilder grammarBuilder = new StringBuilder(595);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("@parser::header {\n");
-		grammarBuilder.append("}\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("@parser::members {\n");
 		grammarBuilder.append("public static class LeafListener extends TBaseListener {\n");
@@ -314,10 +302,8 @@ public class TestListeners extends BaseTest {
 	public void testTokenGetters_2() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(615);
+		StringBuilder grammarBuilder = new StringBuilder(595);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("@parser::header {\n");
-		grammarBuilder.append("}\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("@parser::members {\n");
 		grammarBuilder.append("public static class LeafListener extends TBaseListener {\n");

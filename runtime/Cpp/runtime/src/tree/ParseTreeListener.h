@@ -33,10 +33,7 @@
 
 #include "antlr4-common.h"
 
-namespace org {
-namespace antlr {
-namespace v4 {
-namespace runtime {
+namespace antlr4 {
 namespace tree {
 
   /** This interface describes the minimal core of methods triggered
@@ -56,8 +53,8 @@ namespace tree {
     
     virtual void visitTerminal(Ref<TerminalNode> node) = 0;
     virtual void visitErrorNode(Ref<ErrorNode> node) = 0;
-    virtual void enterEveryRule(Ref<ParserRuleContext> ctx) = 0;
-    virtual void exitEveryRule(Ref<ParserRuleContext> ctx) = 0;
+    virtual void enterEveryRule(ParserRuleContext *ctx) = 0;
+    virtual void exitEveryRule(ParserRuleContext *ctx) = 0;
 
     bool operator == (const ParseTreeListener &other) {
       return this == &other;
@@ -65,7 +62,4 @@ namespace tree {
   };
 
 } // namespace tree
-} // namespace runtime
-} // namespace v4
-} // namespace antlr
-} // namespace org
+} // namespace antlr4

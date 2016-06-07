@@ -33,10 +33,7 @@
 
 #include "TokenFactory.h"
 
-namespace org {
-namespace antlr {
-namespace v4 {
-namespace runtime {
+namespace antlr4 {
 
   /// <summary>
   /// A source of tokens must provide a sequence of tokens via <seealso cref="#nextToken()"/>
@@ -111,7 +108,4 @@ namespace runtime {
     virtual Ref<TokenFactory<CommonToken>> getTokenFactory() = 0;
   };
 
-} // namespace runtime
-} // namespace v4
-} // namespace antlr
-} // namespace org
+} // namespace antlr4

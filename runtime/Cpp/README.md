@@ -14,9 +14,9 @@ ANTLR 4 is the result of substantial effort of the following people:
 
 The C++ target has been the work of the following people:
 
-* Dan McLaughlin, dan.mclaughlin@gmail.com C++ Target project leader
-* David Sisson, dsisson@google.com
-* [Mike Lischke](www.soft-gems.net), mike@lischke-online.de
+* Dan McLaughlin, dan.mclaughlin@gmail.com (initial port, got code to compile)
+* David Sisson, dsisson@google.com (initial port, made the runtime C++ tests runnable)
+* [Mike Lischke](www.soft-gems.net), mike@lischke-online.de (brought the initial port to a working library, made most runtime tests passing)
 
 ## Other contributors
 
@@ -30,6 +30,7 @@ The C++ target has been the work of the following people:
 * Some unit tests in the OSX project, for important base classes with almost 100% code coverage.
 * All memory allocations checked
 * Simple command line demo application working on all supported platforms.
+* All runtime tests pass.
 
 ### Build + Usage Notes
 

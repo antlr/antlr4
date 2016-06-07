@@ -128,5 +128,5 @@ namespace antlrcpp {
   };
 
   template <>
-  std::string Arrays::toString(const std::vector<org::antlr::v4::runtime::tree::Tree*> &source);
+  std::string Arrays::toString(const std::vector<antlr4::tree::Tree*> &source);
 }

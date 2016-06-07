@@ -33,10 +33,7 @@
 
 #include "antlr4-common.h"
 
-namespace org {
-namespace antlr {
-namespace v4 {
-namespace runtime {
+namespace antlr4 {
 namespace dfa {
 
   /// <summary>
@@ -71,7 +68,7 @@ namespace dfa {
       Ref<atn::SemanticContext> pred; // never null; at least SemanticContext.NONE
       int alt;
 
-      PredPrediction(Ref<atn::SemanticContext> pred, int alt);
+      PredPrediction(const Ref<atn::SemanticContext> &pred, int alt);
       virtual ~PredPrediction() {};
 
       virtual std::string toString();
@@ -127,7 +124,7 @@ namespace dfa {
     /// Map a predicate to a predicted alternative.
     DFAState();
     DFAState(int state);
-    DFAState(Ref<atn::ATNConfigSet> configs);
+    DFAState(const Ref<atn::ATNConfigSet> &configs);
     virtual ~DFAState();
 
     /// <summary>
@@ -172,7 +169,4 @@ namespace dfa {
   };
 
 } // namespace atn
-} // namespace runtime
-} // namespace v4
-} // namespace antlr
-} // namespace org
+} // namespace antlr4

@@ -35,10 +35,7 @@
 #include "ParserRuleContext.h"
 #include "Recognizer.h"
 
-namespace org {
-namespace antlr {
-namespace v4 {
-namespace runtime {
+namespace antlr4 {
 namespace tree {
 
   /// A set of utility routines useful for all kinds of ANTLR trees.
@@ -118,7 +115,4 @@ namespace tree {
   };
 
 } // namespace tree
-} // namespace runtime
-} // namespace v4
-} // namespace antlr
-} // namespace org
+} // namespace antlr4

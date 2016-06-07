@@ -82,14 +82,14 @@ namespace antlrcpp {
     std::string toString(){
       std::stringstream stream;
       stream << "{";
-      size_t total = count();
-      for (size_t i = 0; i < size(); i++){
+      bool valueAdded = false;
+      for (size_t i = 0; i < size(); ++i){
         if (test(i)){
-          stream << i;
-          --total;
-          if (total > 1){
+          if (valueAdded) {
             stream << ", ";
           }
+          stream << i;
+          valueAdded = true;
         }
       }
 

@@ -34,7 +34,7 @@
 
 #include "atn/DecisionInfo.h"
 
-using namespace org::antlr::v4::runtime::atn;
+using namespace antlr4::atn;
 
 DecisionInfo::DecisionInfo(size_t decision) : decision(decision) {
 }

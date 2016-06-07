@@ -34,13 +34,10 @@
 #include "atn/LexerAction.h"
 #include "atn/LexerActionType.h"
 
-namespace org {
-namespace antlr {
-namespace v4 {
-namespace runtime {
+namespace antlr4 {
 namespace atn {
 
-  using org::antlr::v4::runtime::Lexer;
+  using antlr4::Lexer;
 
   /// <summary>
   /// Implements the {@code channel} lexer action by calling
@@ -89,7 +86,4 @@ namespace atn {
   };
 
 } // namespace atn
-} // namespace runtime
-} // namespace v4
-} // namespace antlr
-} // namespace org
+} // namespace antlr4
