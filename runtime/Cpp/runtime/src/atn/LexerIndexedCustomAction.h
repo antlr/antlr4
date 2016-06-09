@@ -64,7 +64,7 @@ namespace atn {
     /// executed. </param>
     /// <param name="action"> The lexer action to execute at a particular offset in the
     /// input <seealso cref="CharStream"/>. </param>
-    LexerIndexedCustomAction(int offset, Ref<LexerAction> action);
+    LexerIndexedCustomAction(int offset, Ref<LexerAction> const& action);
 
     /// <summary>
     /// Gets the location in the input <seealso cref="CharStream"/> at which the lexer

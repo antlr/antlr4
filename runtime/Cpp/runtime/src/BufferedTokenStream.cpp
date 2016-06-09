@@ -408,7 +408,7 @@ std::string BufferedTokenStream::getText(RuleContext *ctx) {
   return getText(ctx->getSourceInterval());
 }
 
-std::string BufferedTokenStream::getText(Ref<Token> start, Ref<Token> stop) {
+std::string BufferedTokenStream::getText(Ref<Token> const& start, Ref<Token> const& stop) {
   if (start != nullptr && stop != nullptr) {
     return getText(misc::Interval(start->getTokenIndex(), stop->getTokenIndex()));
   }

@@ -37,7 +37,7 @@
 using namespace antlr4;
 using namespace antlr4::tree;
 
-TerminalNodeImpl::TerminalNodeImpl(Ref<Token> symbol) {
+TerminalNodeImpl::TerminalNodeImpl(Ref<Token> const& symbol) {
   this->symbol = symbol;
 }
 

@@ -104,7 +104,7 @@ std::string UnbufferedTokenStream::getText(RuleContext* ctx)
   return getText(ctx->getSourceInterval());
 }
 
-std::string UnbufferedTokenStream::getText(Ref<Token> start, Ref<Token> stop)
+std::string UnbufferedTokenStream::getText(Ref<Token> const& start, Ref<Token> const& stop)
 {
   return getText(misc::Interval(start->getTokenIndex(), stop->getTokenIndex()));
 }

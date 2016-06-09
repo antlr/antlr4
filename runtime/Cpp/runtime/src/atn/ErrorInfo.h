@@ -61,7 +61,8 @@ namespace atn {
     /// <param name="fullCtx"> {@code true} if the syntax error was identified during LL
     /// prediction; otherwise, {@code false} if the syntax error was identified
     /// during SLL prediction </param>
-    ErrorInfo(int decision, Ref<ATNConfigSet> configs, TokenStream *input, int startIndex, int stopIndex, bool fullCtx);
+    ErrorInfo(int decision, Ref<ATNConfigSet> const& configs, TokenStream *input, int startIndex, int stopIndex,
+              bool fullCtx);
   };
 
 } // namespace atn

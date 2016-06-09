@@ -80,7 +80,7 @@ namespace atn {
     /// </param>
     /// <seealso cref= ParserATNSimulator#evalSemanticContext(SemanticContext, ParserRuleContext, int, boolean) </seealso>
     /// <seealso cref= SemanticContext#eval(Recognizer, RuleContext) </seealso>
-    PredicateEvalInfo(int decision, TokenStream *input, int startIndex, int stopIndex, Ref<SemanticContext> semctx,
+    PredicateEvalInfo(int decision, TokenStream *input, int startIndex, int stopIndex, Ref<SemanticContext> const& semctx,
                       bool evalResult, int predictedAlt, bool fullCtx);
   };
 

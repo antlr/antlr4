@@ -63,7 +63,7 @@ namespace pattern {
     /// <returns> A <seealso cref="ParseTreeMatch"/> object describing the result of the
     /// match operation. The <seealso cref="ParseTreeMatch#succeeded()"/> method can be
     /// used to determine whether or not the match was successful. </returns>
-    virtual ParseTreeMatch match(Ref<ParseTree> tree);
+    virtual ParseTreeMatch match(Ref<ParseTree> const& tree);
 
     /// <summary>
     /// Determine whether or not a parse tree matches this tree pattern.
@@ -71,7 +71,7 @@ namespace pattern {
     /// <param name="tree"> The parse tree to match against this tree pattern. </param>
     /// <returns> {@code true} if {@code tree} is a match for the current tree
     /// pattern; otherwise, {@code false}. </returns>
-    virtual bool matches(Ref<ParseTree> tree);
+    virtual bool matches(Ref<ParseTree> const& tree);
 
     /// Find all nodes using XPath and then try to match those subtrees against
     /// this tree pattern.
@@ -84,7 +84,7 @@ namespace pattern {
 
     // A full blown XPath implementation just for this single function which is nowhere used?
     // Readd the XPath stuff from ANTLR if you really need that.
-    virtual std::vector<ParseTreeMatch> findAll(Ref<ParseTree> tree, const std::string &xpath);
+    virtual std::vector<ParseTreeMatch> findAll(Ref<ParseTree> const& tree, const std::string &xpath);
 
     /// <summary>
     /// Get the <seealso cref="ParseTreePatternMatcher"/> which created this tree pattern.

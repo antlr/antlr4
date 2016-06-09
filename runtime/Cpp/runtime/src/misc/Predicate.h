@@ -39,7 +39,7 @@ namespace misc {
   public:
     virtual ~Predicate() {};
     
-    virtual bool test(Ref<T> t) = 0;
+    virtual bool test(Ref<T> const& t) = 0;
   };
 
 } // namespace tree

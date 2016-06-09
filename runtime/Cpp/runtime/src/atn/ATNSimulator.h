@@ -62,7 +62,7 @@ namespace atn {
      */
     virtual void clearDFA();
     virtual PredictionContextCache& getSharedContextCache();
-    virtual Ref<PredictionContext> getCachedContext(Ref<PredictionContext> context);
+    virtual Ref<PredictionContext> getCachedContext(Ref<PredictionContext> const& context);
 
     /// @deprecated Use <seealso cref="ATNDeserializer#deserialize"/> instead.
     static ATN deserialize(const std::vector<uint16_t> &data);

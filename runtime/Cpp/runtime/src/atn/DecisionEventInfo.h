@@ -88,8 +88,8 @@ namespace atn {
     /// </summary>
     const bool fullCtx;
 
-    DecisionEventInfo(int decision, Ref<ATNConfigSet> configs, TokenStream *input, size_t startIndex, size_t stopIndex,
-                      bool fullCtx);
+    DecisionEventInfo(int decision, Ref<ATNConfigSet> const& configs, TokenStream *input, size_t startIndex,
+                      size_t stopIndex, bool fullCtx);
   };
 
 } // namespace atn

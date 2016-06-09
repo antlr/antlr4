@@ -51,9 +51,9 @@ namespace atn {
     /// Sorted for merge, no duplicates; if present, EMPTY_RETURN_STATE is always last.
     const std::vector<int> returnStates;
 
-    ArrayPredictionContext(Ref<SingletonPredictionContext> a);
-    ArrayPredictionContext(const std::vector<std::weak_ptr<PredictionContext>> &parents_,
-                           const std::vector<int> &returnStates);
+    ArrayPredictionContext(Ref<SingletonPredictionContext> const& a);
+    ArrayPredictionContext(std::vector<std::weak_ptr<PredictionContext>> parents_,
+                           std::vector<int> const& returnStates);
     virtual ~ArrayPredictionContext() {};
 
     virtual bool isEmpty() const override;

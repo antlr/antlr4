@@ -41,7 +41,7 @@ namespace atn {
   public:
     ProfilingATNSimulator(Parser *parser);
 
-    virtual int adaptivePredict(TokenStream *input, int decision, Ref<ParserRuleContext> outerContext) override;
+    virtual int adaptivePredict(TokenStream *input, int decision, Ref<ParserRuleContext> const& outerContext) override;
 
     virtual std::vector<DecisionInfo> getDecisionInfo() const;
     virtual dfa::DFAState* getCurrentState() const;
@@ -72,15 +72,15 @@ namespace atn {
 
     virtual dfa::DFAState* getExistingTargetState(dfa::DFAState *previousD, ssize_t t) override;
     virtual dfa::DFAState* computeTargetState(dfa::DFA &dfa, dfa::DFAState *previousD, ssize_t t) override;
-    virtual Ref<ATNConfigSet> computeReachSet(Ref<ATNConfigSet> closure, ssize_t t, bool fullCtx) override;
-    virtual bool evalSemanticContext(Ref<SemanticContext> pred, Ref<ParserRuleContext> parserCallStack,
+    virtual Ref<ATNConfigSet> computeReachSet(Ref<ATNConfigSet> const& closure, ssize_t t, bool fullCtx) override;
+    virtual bool evalSemanticContext(Ref<SemanticContext> const& pred, Ref<ParserRuleContext> const& parserCallStack,
                                      int alt, bool fullCtx) override;
-    virtual void reportAttemptingFullContext(dfa::DFA &dfa, const antlrcpp::BitSet &conflictingAlts, Ref<ATNConfigSet> configs,
+    virtual void reportAttemptingFullContext(dfa::DFA &dfa, const antlrcpp::BitSet &conflictingAlts, Ref<ATNConfigSet> const& configs,
                                              size_t startIndex, size_t stopIndex) override;
-    virtual void reportContextSensitivity(dfa::DFA &dfa, int prediction, Ref<ATNConfigSet> configs,
+    virtual void reportContextSensitivity(dfa::DFA &dfa, int prediction, Ref<ATNConfigSet> const& configs,
                                           size_t startIndex, size_t stopIndex) override;
     virtual void reportAmbiguity(dfa::DFA &dfa, dfa::DFAState *D, size_t startIndex, size_t stopIndex, bool exact,
-                                 const antlrcpp::BitSet &ambigAlts, Ref<ATNConfigSet> configs) override;
+                                 const antlrcpp::BitSet &ambigAlts, Ref<ATNConfigSet> const& configs) override;
   };
 
 } // namespace atn

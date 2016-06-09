@@ -39,7 +39,8 @@ using namespace antlr4;
 using namespace antlr4::atn;
 using namespace antlr4::misc;
 
-LexerIndexedCustomAction::LexerIndexedCustomAction(int offset, Ref<LexerAction> action) : _offset(offset), _action(action) {
+LexerIndexedCustomAction::LexerIndexedCustomAction(int offset, Ref<LexerAction> const& action)
+  : _offset(offset), _action(action) {
 }
 
 int LexerIndexedCustomAction::getOffset() const {

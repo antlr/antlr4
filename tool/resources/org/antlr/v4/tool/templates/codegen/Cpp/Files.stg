@@ -148,8 +148,8 @@ public:
 
   virtual void enterEveryRule(ParserRuleContext * /*ctx*/) override { }
   virtual void exitEveryRule(ParserRuleContext * /*ctx*/) override { }
-  virtual void visitTerminal(Ref\<tree::TerminalNode> /*node*/) override { }
-  virtual void visitErrorNode(Ref\<tree::ErrorNode> /*node*/) override { }
+  virtual void visitTerminal(Ref\<tree::TerminalNode> const& /*node*/) override { }
+  virtual void visitErrorNode(Ref\<tree::ErrorNode> const& /*node*/) override { }
   
 <if (namedActions.baselistenermembers)>
 private:  

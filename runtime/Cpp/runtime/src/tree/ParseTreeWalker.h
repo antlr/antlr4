@@ -40,7 +40,7 @@ namespace tree {
 
     virtual ~ParseTreeWalker() {};
     
-    virtual void walk(Ref<ParseTreeListener> listener, Ref<ParseTree> t);
+    virtual void walk(Ref<ParseTreeListener> const& listener, Ref<ParseTree> const& t);
 
     /// <summary>
     /// The discovery of a rule node, involves sending two events: the generic
@@ -49,9 +49,9 @@ namespace tree {
     /// the rule specific. We to them in reverse order upon finishing the node.
     /// </summary>
   protected:
-    virtual void enterRule(Ref<ParseTreeListener> listener, Ref<RuleNode> r);
+    virtual void enterRule(Ref<ParseTreeListener> const& listener, Ref<RuleNode> const& r);
 
-    virtual void exitRule(Ref<ParseTreeListener> listener, Ref<RuleNode> r);
+    virtual void exitRule(Ref<ParseTreeListener> const& listener, Ref<RuleNode> const& r);
   };
 
 } // namespace tree

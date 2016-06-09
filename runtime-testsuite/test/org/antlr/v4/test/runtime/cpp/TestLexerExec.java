@@ -4683,7 +4683,7 @@ public class TestLexerExec extends BaseCppTest {
 	public void testPositionAdjustingLexer() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(2733);
+		StringBuilder grammarBuilder = new StringBuilder(2729);
 		grammarBuilder.append("lexer grammar PositionAdjustingLexer;\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("@members {\n");
@@ -4691,7 +4691,7 @@ public class TestLexerExec extends BaseCppTest {
 		grammarBuilder.append("  class PositionAdjustingLexerATNSimulator : public atn::LexerATNSimulator {\n");
 		grammarBuilder.append("  public:\n");
 		grammarBuilder.append("    PositionAdjustingLexerATNSimulator(Lexer *recog, const atn::ATN &atn, std::vector<dfa::DFA> &decisionToDFA,\n");
-		grammarBuilder.append("                                       Ref<atn::PredictionContextCache> sharedContextCache)\n");
+		grammarBuilder.append("                                       atn::PredictionContextCache &sharedContextCache)\n");
 		grammarBuilder.append("      : atn::LexerATNSimulator(recog, atn, decisionToDFA, sharedContextCache) {\n");
 		grammarBuilder.append("    }\n");
 		grammarBuilder.append("\n");

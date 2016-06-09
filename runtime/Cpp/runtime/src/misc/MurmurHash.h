@@ -63,7 +63,7 @@ namespace misc {
      * @return the updated intermediate hash value
      */
     template <class T>
-    static size_t update(size_t hash, Ref<T> value) {
+    static size_t update(size_t hash, Ref<T> const& value) {
       return update(hash, value != nullptr ? value->hashCode() : 0);
     }
 

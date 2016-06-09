@@ -87,8 +87,6 @@ namespace antlr4 {
    */
   class ANTLR4CPP_PUBLIC RuleContext : public tree::RuleNode, public std::enable_shared_from_this<RuleContext> {
   public:
-    static const Ref<RuleContext> EMPTY;
-
     /// What context invoked this rule?
     std::weak_ptr<RuleContext> parent;
 
@@ -162,9 +160,9 @@ namespace antlr4 {
     std::string toString(const std::vector<std::string> &ruleNames);
 
     // recog null unless ParserRuleContext, in which case we use subclass toString(...)
-    std::string toString(Recognizer *recog, Ref<RuleContext> stop);
+    std::string toString(Recognizer *recog, Ref<RuleContext> const& stop);
 
-    virtual std::string toString(const std::vector<std::string> &ruleNames, Ref<RuleContext> stop);
+    virtual std::string toString(const std::vector<std::string> &ruleNames, Ref<RuleContext> const& stop);
 
     bool operator == (const RuleContext &other) { return this == &other; } // Simple address comparison.
     

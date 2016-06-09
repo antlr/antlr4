@@ -49,8 +49,8 @@ namespace antlr4 {
       virtual ~TraceListener() {};
 
       virtual void enterEveryRule(ParserRuleContext *ctx) override;
-      virtual void visitTerminal(Ref<tree::TerminalNode> node) override;
-      virtual void visitErrorNode(Ref<tree::ErrorNode> node) override;
+      virtual void visitTerminal(Ref<tree::TerminalNode> const& node) override;
+      virtual void visitErrorNode(Ref<tree::ErrorNode> const& node) override;
       virtual void exitEveryRule(ParserRuleContext *ctx) override;
 
     private:
@@ -64,8 +64,8 @@ namespace antlr4 {
       virtual ~TrimToSizeListener() {};
 
       virtual void enterEveryRule(ParserRuleContext *ctx) override;
-      virtual void visitTerminal(Ref<tree::TerminalNode> node) override;
-      virtual void visitErrorNode(Ref<tree::ErrorNode> node) override;
+      virtual void visitTerminal(Ref<tree::TerminalNode> const& node) override;
+      virtual void visitErrorNode(Ref<tree::ErrorNode> const& node) override;
       virtual void exitEveryRule(ParserRuleContext *ctx) override;
     };
 
@@ -179,7 +179,7 @@ namespace antlr4 {
     /// <param name="listener"> the listener to add
     /// </param>
     /// <exception cref="NullPointerException"> if {@code} listener is {@code null} </exception>
-    virtual void addParseListener(Ref<tree::ParseTreeListener> listener);
+    virtual void addParseListener(Ref<tree::ParseTreeListener> const& listener);
 
     /// <summary>
     /// Remove {@code listener} from the list of parse listeners.
@@ -190,7 +190,7 @@ namespace antlr4 {
     /// <seealso cref= #addParseListener
     /// </seealso>
     /// <param name="listener"> the listener to remove </param>
-    virtual void removeParseListener(Ref<tree::ParseTreeListener> listener);
+    virtual void removeParseListener(Ref<tree::ParseTreeListener> const& listener);
 
     /// <summary>
     /// Remove all parse listeners.
@@ -251,7 +251,7 @@ namespace antlr4 {
                                                                     Lexer *lexer);
 
     virtual Ref<ANTLRErrorStrategy> getErrorHandler();
-    virtual void setErrorHandler(Ref<ANTLRErrorStrategy> handler);
+    virtual void setErrorHandler(Ref<ANTLRErrorStrategy> const& handler);
 
     virtual IntStream* getInputStream() override;
     void setInputStream(IntStream *input) override;
@@ -269,7 +269,7 @@ namespace antlr4 {
 
     void notifyErrorListeners(const std::string &msg);
 
-    virtual void notifyErrorListeners(Ref<Token> offendingToken, const std::string &msg, std::exception_ptr e);
+    virtual void notifyErrorListeners(Ref<Token> const& offendingToken, const std::string &msg, std::exception_ptr e);
 
     /// <summary>
     /// Consume and return the <seealso cref="#getCurrentToken current symbol"/>.
@@ -298,11 +298,11 @@ namespace antlr4 {
     /// Always called by generated parsers upon entry to a rule. Access field
     /// <seealso cref="#_ctx"/> get the current context.
     /// </summary>
-    virtual void enterRule(Ref<ParserRuleContext> localctx, int state, int ruleIndex);
+    virtual void enterRule(Ref<ParserRuleContext> const& localctx, int state, int ruleIndex);
 
     virtual void exitRule();
 
-    virtual void enterOuterAlt(Ref<ParserRuleContext> localctx, int altNum);
+    virtual void enterOuterAlt(Ref<ParserRuleContext> const& localctx, int altNum);
 
     /**
      * Get the precedence level for the top-most precedence rule.
@@ -314,18 +314,18 @@ namespace antlr4 {
 
     /// @deprecated Use
     /// <seealso cref="#enterRecursionRule(ParserRuleContext, int, int, int)"/> instead.
-    virtual void enterRecursionRule(Ref<ParserRuleContext> localctx, int ruleIndex);
-    virtual void enterRecursionRule(Ref<ParserRuleContext> localctx, int state, int ruleIndex, int precedence);
+    virtual void enterRecursionRule(Ref<ParserRuleContext> const& localctx, int ruleIndex);
+    virtual void enterRecursionRule(Ref<ParserRuleContext> const& localctx, int state, int ruleIndex, int precedence);
 
     /** Like {@link #enterRule} but for recursive rules.
      *  Make the current context the child of the incoming localctx.
      */
-    virtual void pushNewRecursionContext(Ref<ParserRuleContext> localctx, int state, int ruleIndex);
-    virtual void unrollRecursionContexts(Ref<ParserRuleContext> parentctx);
+    virtual void pushNewRecursionContext(Ref<ParserRuleContext> const& localctx, int state, int ruleIndex);
+    virtual void unrollRecursionContexts(Ref<ParserRuleContext> const& parentctx);
     virtual Ref<ParserRuleContext> getInvokingContext(int ruleIndex);
     virtual Ref<ParserRuleContext> getContext();
-    virtual void setContext(Ref<ParserRuleContext> ctx);
-    virtual bool precpred(RuleContext *localctx, int precedence) override;
+    virtual void setContext(Ref<ParserRuleContext> const& ctx);
+    virtual bool precpred(Ref<RuleContext> const& localctx, int precedence) override;
     virtual bool inContext(const std::string &context);
 
     /// <summary>
@@ -371,7 +371,7 @@ namespace antlr4 {
     /// </summary>
     virtual std::vector<std::string> getRuleInvocationStack();
 
-    virtual std::vector<std::string> getRuleInvocationStack(Ref<RuleContext> p);
+    virtual std::vector<std::string> getRuleInvocationStack(Ref<RuleContext> const& p);
 
     /// <summary>
     /// For debugging and other purposes. </summary>

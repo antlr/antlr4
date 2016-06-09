@@ -72,10 +72,10 @@ public:
   virtual const atn::ATN& getATN() const override;
 
   <if (actionFuncs)>
-  virtual void action(RuleContext *context, int ruleIndex, int actionIndex) override;
+  virtual void action(Ref\<RuleContext> const& context, int ruleIndex, int actionIndex) override;
   <endif>
   <if (sempredFuncs)>
-  virtual bool sempred(RuleContext *_localctx, int ruleIndex, int predicateIndex) override;  
+  virtual bool sempred(Ref\<RuleContext> const& _localctx, int ruleIndex, int predicateIndex) override;  
   <endif>
   
 private:
@@ -145,9 +145,9 @@ const atn::ATN& <lexer.name>::getATN() const {
 <namedActions.definitions>
 
 <if (actionFuncs)>
-void <lexer.name>::action(RuleContext *context, int ruleIndex, int actionIndex) {
+void <lexer.name>::action(Ref\<RuleContext> const& context, int ruleIndex, int actionIndex) {
   switch (ruleIndex) {
-    <lexer.actionFuncs.values: {f | case <f.ruleIndex>: <f.name>Action((<f.ctxType> *)context, actionIndex); break;}; separator="\n">
+    <lexer.actionFuncs.values: {f | case <f.ruleIndex>: <f.name>Action(std::dynamic_pointer_cast\<<f.ctxType>\>(context), actionIndex); break;}; separator="\n">
 
   default:
     break;
@@ -156,9 +156,9 @@ void <lexer.name>::action(RuleContext *context, int ruleIndex, int actionIndex) 
 <endif>
 
 <if (sempredFuncs)>
-bool <lexer.name>::sempred(RuleContext *context, int ruleIndex, int predicateIndex) {
+bool <lexer.name>::sempred(Ref\<RuleContext> const& context, int ruleIndex, int predicateIndex) {
   switch (ruleIndex) {
-    <lexer.sempredFuncs.values: {f | case <f.ruleIndex>: return <f.name>Sempred((<f.ctxType> *)context, predicateIndex);}; separator="\n">
+    <lexer.sempredFuncs.values: {f | case <f.ruleIndex>: return <f.name>Sempred(std::dynamic_pointer_cast\<<f.ctxType>\>(context), predicateIndex);}; separator="\n">
 
   default:
     break;
@@ -221,11 +221,11 @@ std::vector\<std::string> <lexer.name>::_tokenNames;
 >>
 
 RuleActionFunctionHeader(r, actions) ::= <<
-void <r.name>Action(<r.ctxType> *context, int actionIndex);
+void <r.name>Action(Ref\<<r.ctxType>\> const& context, int actionIndex);
 >>
 
 RuleActionFunction(r, actions) ::= <<
-void <r.factory.grammar.name>::<r.name>Action(<r.ctxType> *context, int actionIndex) {
+void <r.factory.grammar.name>::<r.name>Action(Ref\<<r.ctxType>\> const& context, int actionIndex) {
   switch (actionIndex) {
     <actions: {index | case <index>: <actions.(index)> break;}; separator="\n">
   
@@ -237,13 +237,13 @@ void <r.factory.grammar.name>::<r.name>Action(<r.ctxType> *context, int actionIn
 >>
 
 RuleSempredFunctionHeader(r, actions) ::= <<
-bool <r.name>Sempred(<r.ctxType> *_localctx, int predicateIndex);
+bool <r.name>Sempred(Ref\<<r.ctxType>\> const& _localctx, int predicateIndex);
 >>
 
 RuleSempredFunction(r, actions) ::= <<
 <! Called for both lexer and parser. But only one of them is actually available. Testing for the parser directly
    generates a warning, however. So do the check via the factory instead. !>
-bool <if (r.factory.g.lexer)><lexer.name><else><parser.name><endif>::<r.name>Sempred(<r.ctxType> *_localctx, int predicateIndex) {
+bool <if (r.factory.g.lexer)><lexer.name><else><parser.name><endif>::<r.name>Sempred(Ref\<<r.ctxType>\> const& _localctx, int predicateIndex) {
   switch (predicateIndex) {
     <actions: {index | case <index>: return <actions.(index)>}; separator=";\n">;
     
@@ -290,7 +290,7 @@ public:
   <funcs; separator = "\n">
 
   <if (sempredFuncs)>
-  virtual bool sempred(RuleContext *_localctx, int ruleIndex, int predicateIndex) override;
+  virtual bool sempred(Ref\<RuleContext> const& _localctx, int ruleIndex, int predicateIndex) override;
   <sempredFuncs.values; separator = "\n">
   <endif>
 
@@ -342,10 +342,10 @@ dfa::Vocabulary& <parser.name>::getVocabulary() const {
 <funcs; separator = "\n\n">
 
 <if (sempredFuncs)>
-bool <parser.name>::sempred(RuleContext *context, int ruleIndex, int predicateIndex) {
+bool <parser.name>::sempred(Ref\<RuleContext> const& context, int ruleIndex, int predicateIndex) {
   switch (ruleIndex) {
   <parser.sempredFuncs.values: {f |
-  case <f.ruleIndex>: return <f.name>Sempred((<f.ctxType> *)context, predicateIndex);}; separator="\n">
+  case <f.ruleIndex>: return <f.name>Sempred(std::dynamic_pointer_cast\<<f.ctxType>\>(context), predicateIndex);}; separator="\n">
   
   default:
     break;
@@ -525,7 +525,7 @@ public:
   <struct.name>(std::weak_ptr\<ParserRuleContext> parent, int invokingState<ctorAttrs: {a | , <a>}>);
 <if (struct.provideCopyFrom)> <! don't need copy unless we have subclasses !>
   <struct.name>() { }
-  void copyFrom(Ref\<<struct.name>\> context);
+  void copyFrom(Ref\<<struct.name>\> const& context);
 <endif>
 
   virtual ssize_t getRuleIndex() const override;
@@ -562,7 +562,7 @@ ssize_t <parser.name>::<struct.name>::getRuleIndex() const {
 }
 
 <if (struct.provideCopyFrom)>
-void <parser.name>::<struct.name>::copyFrom(Ref\<<struct.name>\> ctx) {
+void <parser.name>::<struct.name>::copyFrom(Ref\<<struct.name>\> const& ctx) {
   <if (contextSuperClass)><contextSuperClass><else>ParserRuleContext<endif>::copyFrom(ctx);
   <struct.attrs: {a | this-><a.name> = ctx-><a.name>;}; separator = "\n">
 }
@@ -575,7 +575,7 @@ void <parser.name>::<struct.name>::copyFrom(Ref\<<struct.name>\> ctx) {
 AltLabelStructDeclHeader(struct, attrs, getters, dispatchMethods) ::= <<
 class <struct.name> : public <currentRule.name; format = "cap">Context {
 public:
-  <struct.name>(Ref\<<currentRule.name; format = "cap">Context> ctx);
+  <struct.name>(Ref\<<currentRule.name; format = "cap">Context> const& ctx);
   
   <if (attrs)><attrs: {a | <a>}; separator = "\n"><endif>
   <getters: {g | <g>}; separator = "\n">
@@ -589,7 +589,7 @@ AltLabelStructDecl(struct, attrs, getters, dispatchMethods) ::= <<
 
 <! TODO: untested !><if (attrs)><attrs: {a | <a>}; separator = "\n"><endif>
 <getters: {g | <g>}; separator = "\n">
-<parser.name>::<struct.name>::<struct.name>(Ref\<<currentRule.name; format = "cap">Context> ctx) { copyFrom(ctx); }
+<parser.name>::<struct.name>::<struct.name>(Ref\<<currentRule.name; format = "cap">Context> const& ctx) { copyFrom(ctx); }
 
 <dispatchMethods; separator="\n">
 >>
@@ -1026,10 +1026,10 @@ CaptureNextTokenTypeHeader(d) ::= "<! Required but unused. !>"
 CaptureNextTokenType(d) ::= "<d.varName> = _input->LA(1);"
 
 ListenerDispatchMethodHeader(method) ::= <<
-virtual void <if (method.isEnter)>enter<else>exit<endif>Rule(Ref\<tree::ParseTreeListener> listener) override;
+virtual void <if (method.isEnter)>enter<else>exit<endif>Rule(Ref\<tree::ParseTreeListener> const& listener) override;
 >>
 ListenerDispatchMethod(method) ::= <<
-void <parser.name>::<struct.name>::<if (method.isEnter)>enter<else>exit<endif>Rule(Ref\<tree::ParseTreeListener> listener) {
+void <parser.name>::<struct.name>::<if (method.isEnter)>enter<else>exit<endif>Rule(Ref\<tree::ParseTreeListener> const& listener) {
   auto parserListener = std::dynamic_pointer_cast\<<parser.grammarName>Listener>(listener);
   if (parserListener)
     parserListener-><if(method.isEnter)>enter<else>exit<endif><struct.derivedFromName; format="cap">(this);
@@ -1052,10 +1052,10 @@ AttributeDeclHeader(d) ::= "<d.type> <d.name><if(d.initValue)> = <d.initValue><e
 AttributeDecl(d) ::= "<d.type> <d.name>"
 
 /** If we don't know location of label def x, use this template */
-labelref(x) ::= "<if (!x.isLocal)>_localctx-><endif><x.name>"
+labelref(x) ::= "<if (!x.isLocal)>std::dynamic_pointer_cast\<<x.ctx.name>>(_localctx)-><endif><x.name>"
 
 /** For any action chunk, what is correctly-typed context struct ptr? */
-ctx(actionChunk) ::= "_localctx"
+ctx(actionChunk) ::= "std::dynamic_pointer_cast\<<actionChunk.ctx.name>>(_localctx)"
 
 // used for left-recursive rules
 recRuleAltPredicate(ruleName,opPrec) ::= "precpred(_ctx.get(), <opPrec>)"

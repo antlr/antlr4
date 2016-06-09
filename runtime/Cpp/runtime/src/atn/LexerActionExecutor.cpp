@@ -45,7 +45,8 @@ LexerActionExecutor::LexerActionExecutor(const std::vector<Ref<LexerAction>> &le
   : _lexerActions(lexerActions), _hashCode(generateHashCode()) {
 }
 
-Ref<LexerActionExecutor> LexerActionExecutor::append(Ref<LexerActionExecutor> lexerActionExecutor, Ref<LexerAction> lexerAction) {
+Ref<LexerActionExecutor> LexerActionExecutor::append(Ref<LexerActionExecutor> const& lexerActionExecutor,
+                                                     Ref<LexerAction> const& lexerAction) {
   if (lexerActionExecutor == nullptr) {
     return std::make_shared<LexerActionExecutor>(std::vector<Ref<LexerAction>> { lexerAction });
   }

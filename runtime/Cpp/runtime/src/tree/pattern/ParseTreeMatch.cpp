@@ -38,7 +38,7 @@ using namespace antlr4::tree::pattern;
 
 ParseTreeMatch::ParseTreeMatch(Ref<ParseTree> tree, const ParseTreePattern &pattern,
                                const std::map<std::string, std::vector<Ref<ParseTree>>> &labels,
-                               Ref<ParseTree> mismatchedNode)
+                               Ref<ParseTree> const& mismatchedNode)
   : _tree(tree), _pattern(pattern), _labels(labels), _mismatchedNode(mismatchedNode) {
   if (tree == nullptr) {
     throw IllegalArgumentException("tree cannot be nul");

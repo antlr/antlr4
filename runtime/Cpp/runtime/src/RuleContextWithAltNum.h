@@ -48,7 +48,7 @@ namespace antlr4 {
     int altNum = 0;
     
     RuleContextWithAltNum();
-    RuleContextWithAltNum(Ref<ParserRuleContext> parent, int invokingStateNumber);
+    RuleContextWithAltNum(Ref<ParserRuleContext> const& parent, int invokingStateNumber);
 
     virtual int getAltNumber() const override;
     virtual void setAltNumber(int altNum) override;

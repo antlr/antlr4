@@ -128,29 +128,24 @@ namespace antlr4 {
 
     virtual Ref<TokenFactory<CommonToken>> getTokenFactory() override;
 
-    /// <summary>
-    /// Set the char stream and reset the lexer </summary>
+    /// Set the char stream and reset the lexer
     virtual void setInputStream(IntStream *input) override;
 
     virtual std::string getSourceName() override;
 
     virtual CharStream* getInputStream() override;
 
-    /// <summary>
     /// By default does not support multiple emits per nextToken invocation
-    ///  for efficiency reasons.  Subclass and override this method, nextToken,
-    ///  and getToken (to push tokens into a list and pull from that list
-    ///  rather than a single variable as this implementation does).
-    /// </summary>
-    virtual void emit(Ref<Token> token);
+    /// for efficiency reasons.  Subclass and override this method, nextToken,
+    /// and getToken (to push tokens into a list and pull from that list
+    /// rather than a single variable as this implementation does).
+    virtual void emit(Ref<Token> const& token);
 
-    /// <summary>
     /// The standard method called to automatically emit a token at the
-    ///  outermost lexical rule.  The token object should point into the
-    ///  char buffer start..stop.  If there is a text override in 'text',
-    ///  use that to set the token's text.  Override this method to emit
-    ///  custom Token objects or provide a new factory.
-    /// </summary>
+    /// outermost lexical rule.  The token object should point into the
+    /// char buffer start..stop.  If there is a text override in 'text',
+    /// use that to set the token's text.  Override this method to emit
+    /// custom Token objects or provide a new factory.
     virtual Ref<Token> emit();
 
     virtual Ref<Token> emitEOF();
@@ -163,27 +158,22 @@ namespace antlr4 {
 
     virtual void setCharPositionInLine(int charPositionInLine);
 
-    /// <summary>
-    /// What is the index of the current character of lookahead? </summary>
+    /// What is the index of the current character of lookahead?
     virtual int getCharIndex();
 
-    /// <summary>
     /// Return the text matched so far for the current token or any
-    ///  text override.
-    /// </summary>
+    /// text override.
     virtual std::string getText();
 
-    /// <summary>
     /// Set the complete text of this token; it wipes any previous
-    ///  changes to the text.
-    /// </summary>
+    /// changes to the text.
     virtual void setText(const std::string &text);
 
     /// <summary>
     /// Override if emitting multiple tokens. </summary>
     virtual Ref<Token> getToken();
 
-    virtual void setToken(Ref<Token> token);
+    virtual void setToken(Ref<Token> const& token);
 
     virtual void setType(ssize_t ttype);
 
@@ -209,12 +199,10 @@ namespace antlr4 {
 
     virtual std::string getCharErrorDisplay(ssize_t c);
 
-    /// <summary>
     /// Lexers can normally match any char in it's vocabulary after matching
-    ///  a token, so do the easy thing and just kill a character and hope
-    ///  it all works out.  You can instead use the rule invocation stack
-    ///  to do sophisticated error recovery if you are in a fragment rule.
-    /// </summary>
+    /// a token, so do the easy thing and just kill a character and hope
+    /// it all works out.  You can instead use the rule invocation stack
+    /// to do sophisticated error recovery if you are in a fragment rule.
     virtual void recover(RecognitionException *re);
 
   protected:

@@ -310,7 +310,7 @@ std::vector<size_t> ATNSerializer::serialize() {
   // LEXER ACTIONS
   if (atn->grammarType == ATNType::LEXER) {
     data.push_back(atn->lexerActions.size());
-    for (Ref<LexerAction> action : atn->lexerActions) {
+    for (Ref<LexerAction> &action : atn->lexerActions) {
       data.push_back((size_t)action->getActionType());
       switch (action->getActionType()) {
         case LexerActionType::CHANNEL:

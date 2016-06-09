@@ -226,7 +226,7 @@ protected:
   class PositionAdjustingLexerATNSimulator : public atn::LexerATNSimulator {
   public:
     PositionAdjustingLexerATNSimulator(Lexer *recog, const atn::ATN &atn, std::vector\<dfa::DFA> &decisionToDFA,
-                                       Ref\<atn::PredictionContextCache> sharedContextCache)
+                                       atn::PredictionContextCache &sharedContextCache)
       : atn::LexerATNSimulator(recog, atn, decisionToDFA, sharedContextCache) {
     }
 

@@ -62,7 +62,7 @@ Ref<PredictionContext> PredictionContext::fromRuleContext(const ATN &atn, const 
 
   // if we are in RuleContext of start rule, s, then PredictionContext
   // is EMPTY. Nobody called us. (if we are empty, return empty)
-  if (outerContext->parent.expired() || outerContext == RuleContext::EMPTY) {
+  if (outerContext->parent.expired() || outerContext == ParserRuleContext::EMPTY) {
     return PredictionContext::EMPTY;
   }
 
@@ -98,7 +98,7 @@ size_t PredictionContext::calculateEmptyHashCode() {
 
 size_t PredictionContext::calculateHashCode(std::weak_ptr<PredictionContext> parent, int returnState) {
   size_t hash = MurmurHash::initialize(INITIAL_HASH);
-  hash = MurmurHash::update(hash, parent.lock()->hashCode());
+  hash = MurmurHash::update(hash, parent.lock());
   hash = MurmurHash::update(hash, (size_t)returnState);
   hash = MurmurHash::finish(hash, 2);
   return hash;
@@ -112,7 +112,7 @@ size_t PredictionContext::calculateHashCode(const std::vector<std::weak_ptr<Pred
     if (parent.expired())
       hash = MurmurHash::update(hash, 0);
     else
-      hash = MurmurHash::update(hash, parent.lock()->hashCode());
+      hash = MurmurHash::update(hash, parent.lock());
   }
 
   for (auto returnState : returnStates) {

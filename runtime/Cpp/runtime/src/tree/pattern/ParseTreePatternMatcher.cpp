@@ -78,23 +78,23 @@ void ParseTreePatternMatcher::setDelimiters(const std::string &start, const std:
   _escape = escapeLeft;
 }
 
-bool ParseTreePatternMatcher::matches(Ref<ParseTree> tree, const std::string &pattern, int patternRuleIndex) {
+bool ParseTreePatternMatcher::matches(Ref<ParseTree> const& tree, const std::string &pattern, int patternRuleIndex) {
   ParseTreePattern p = compile(pattern, patternRuleIndex);
   return matches(tree, p);
 }
 
-bool ParseTreePatternMatcher::matches(Ref<ParseTree> tree, const ParseTreePattern &pattern) {
+bool ParseTreePatternMatcher::matches(Ref<ParseTree> const& tree, const ParseTreePattern &pattern) {
   std::map<std::string, std::vector<Ref<ParseTree>>> labels;
   Ref<ParseTree> mismatchedNode = matchImpl(tree, pattern.getPatternTree(), labels);
   return mismatchedNode == nullptr;
 }
 
-ParseTreeMatch ParseTreePatternMatcher::match(Ref<ParseTree> tree, const std::string &pattern, int patternRuleIndex) {
+ParseTreeMatch ParseTreePatternMatcher::match(Ref<ParseTree> const& tree, const std::string &pattern, int patternRuleIndex) {
   ParseTreePattern p = compile(pattern, patternRuleIndex);
   return match(tree, p);
 }
 
-ParseTreeMatch ParseTreePatternMatcher::match(Ref<ParseTree> tree, const ParseTreePattern &pattern) {
+ParseTreeMatch ParseTreePatternMatcher::match(Ref<ParseTree> const& tree, const ParseTreePattern &pattern) {
   std::map<std::string, std::vector<Ref<ParseTree>>> labels;
   Ref<tree::ParseTree> mismatchedNode = matchImpl(tree, pattern.getPatternTree(), labels);
   return ParseTreeMatch(tree, pattern, labels, mismatchedNode);
@@ -151,8 +151,8 @@ Parser* ParseTreePatternMatcher::getParser() {
   return _parser;
 }
 
-Ref<ParseTree> ParseTreePatternMatcher::matchImpl(Ref<ParseTree> tree,
-  Ref<ParseTree> patternTree, std::map<std::string, std::vector<Ref<ParseTree>>> &labels) {
+Ref<ParseTree> ParseTreePatternMatcher::matchImpl(Ref<ParseTree> const& tree,
+  Ref<ParseTree> const& patternTree, std::map<std::string, std::vector<Ref<ParseTree>>> &labels) {
   if (tree == nullptr) {
     throw IllegalArgumentException("tree cannot be nul");
   }
@@ -242,7 +242,7 @@ Ref<ParseTree> ParseTreePatternMatcher::matchImpl(Ref<ParseTree> tree,
   return tree;
 }
 
-Ref<RuleTagToken> ParseTreePatternMatcher::getRuleTagToken(Ref<ParseTree> t) {
+Ref<RuleTagToken> ParseTreePatternMatcher::getRuleTagToken(Ref<ParseTree> const& t) {
   if (is<RuleNode>(t)) {
     Ref<RuleNode> r = std::dynamic_pointer_cast<RuleNode>(t);
     if (r->getChildCount() == 1 && is<TerminalNode>(r->getChild(0))) {
@@ -262,7 +262,7 @@ std::vector<Ref<Token>> ParseTreePatternMatcher::tokenize(const std::string &pat
   // create token stream from text and tags
   std::vector<Ref<Token>> tokens;
   for (auto chunk : chunks) {
-    if (is<TagChunk>(chunk)) {
+    if (is<TagChunk *>(&chunk)) {
       TagChunk &tagChunk = (TagChunk&)chunk;
       // add special rule token or conjure up new token from name
       if (isupper(tagChunk.getTag()[0])) {
@@ -375,7 +375,7 @@ std::vector<Chunk> ParseTreePatternMatcher::split(const std::string &pattern) {
   // strip out all backslashes from text chunks but not tags
   for (size_t i = 0; i < chunks.size(); i++) {
     Chunk &c = chunks[i];
-    if (is<TextChunk>(c)) {
+    if (is<TextChunk *>(&c)) {
       TextChunk &tc = (TextChunk&)c;
       std::string unescaped = tc.getText();
       unescaped.erase(std::remove(unescaped.begin(), unescaped.end(), '\\'), unescaped.end());

@@ -34,7 +34,7 @@
 using namespace antlr4;
 using namespace antlr4::atn;
 
-AmbiguityInfo::AmbiguityInfo(int decision, Ref<ATNConfigSet> configs, const antlrcpp::BitSet &ambigAlts,
+AmbiguityInfo::AmbiguityInfo(int decision, Ref<ATNConfigSet> const& configs, const antlrcpp::BitSet &ambigAlts,
                              TokenStream *input, size_t startIndex, size_t stopIndex, bool fullCtx)
   : DecisionEventInfo(decision, configs, input, startIndex, stopIndex, fullCtx) {
     

@@ -61,6 +61,8 @@ namespace antlr4 {
   /// </summary>
   class ANTLR4CPP_PUBLIC ParserRuleContext : public RuleContext {
   public:
+    static const Ref<ParserRuleContext> EMPTY;
+
     /// If we are debugging or building a parse tree for a visitor,
     ///  we need to track all of the tokens and rule invocations associated
     ///  with this rule's context. This is empty for parsing w/o tree constr.
@@ -101,27 +103,27 @@ namespace antlr4 {
     /** COPY a ctx (I'm deliberately not using copy constructor) to avoid
      *  confusion with creating node with parent. Does not copy children.
      */
-    virtual void copyFrom(Ref<ParserRuleContext> ctx);
+    virtual void copyFrom(Ref<ParserRuleContext> const& ctx);
 
     ParserRuleContext(std::weak_ptr<ParserRuleContext> parent, int invokingStateNumber);
 
     // Double dispatch methods for listeners
 
-    virtual void enterRule(Ref<tree::ParseTreeListener> listener);
-    virtual void exitRule(Ref<tree::ParseTreeListener> listener);
+    virtual void enterRule(Ref<tree::ParseTreeListener> const& listener);
+    virtual void exitRule(Ref<tree::ParseTreeListener> const& listener);
 
     /// Does not set parent link; other add methods do that.
-    virtual Ref<tree::TerminalNode> addChild(Ref<tree::TerminalNode> t);
-    virtual Ref<RuleContext> addChild(Ref<RuleContext> ruleInvocation);
+    virtual Ref<tree::TerminalNode> addChild(Ref<tree::TerminalNode> const& t);
+    virtual Ref<RuleContext> addChild(Ref<RuleContext> const& ruleInvocation);
 
     /// Used by enterOuterAlt to toss out a RuleContext previously added as
     /// we entered a rule. If we have # label, we will need to remove
     /// generic ruleContext object.
     virtual void removeLastChild();
 
-    virtual Ref<tree::TerminalNode> addChild(Ref<Token> matchedToken);
+    virtual Ref<tree::TerminalNode> addChild(Ref<Token> const& matchedToken);
 
-    virtual Ref<tree::ErrorNode> addErrorNode(Ref<Token> badToken);
+    virtual Ref<tree::ErrorNode> addErrorNode(Ref<Token> const& badToken);
 
     std::weak_ptr<ParserRuleContext> getParent() { return std::dynamic_pointer_cast<ParserRuleContext>(getParentReference().lock()); };
 

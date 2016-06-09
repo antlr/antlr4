@@ -36,12 +36,12 @@
 
 using namespace antlr4::atn;
 
-ArrayPredictionContext::ArrayPredictionContext(Ref<SingletonPredictionContext> a)
+ArrayPredictionContext::ArrayPredictionContext(Ref<SingletonPredictionContext> const& a)
   : ArrayPredictionContext({ a->parent }, { a->returnState }) {
 }
 
-ArrayPredictionContext::ArrayPredictionContext(const std::vector<std::weak_ptr<PredictionContext> > &parents_,
-                                               const std::vector<int> &returnStates)
+ArrayPredictionContext::ArrayPredictionContext(std::vector<std::weak_ptr<PredictionContext>> parents_,
+                                               std::vector<int> const& returnStates)
   : PredictionContext(calculateHashCode(parents_, returnStates)), parents(makeRef(parents_)), returnStates(returnStates) {
     assert(parents.size() > 0);
     assert(returnStates.size() > 0);
@@ -64,7 +64,7 @@ int ArrayPredictionContext::getReturnState(size_t index) const {
   return returnStates[index];
 }
 
-bool ArrayPredictionContext::operator == (const PredictionContext &o) const {
+bool ArrayPredictionContext::operator == (PredictionContext const& o) const {
   if (this == &o) {
     return true;
   }

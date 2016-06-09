@@ -51,9 +51,9 @@ namespace atn {
     virtual ~ConfigLookup() {}
 
     // Java iterator interface.
-    virtual Ref<ATNConfig> getOrAdd(Ref<ATNConfig> config) = 0;
+    virtual Ref<ATNConfig> getOrAdd(Ref<ATNConfig> const& config) = 0;
     virtual bool isEmpty() const = 0;
-    virtual bool contains(Ref<ATNConfig> config) const = 0;
+    virtual bool contains(Ref<ATNConfig> const& config) const = 0;
     virtual void clear() = 0;
 
     // STL iterator interface.
@@ -79,7 +79,7 @@ namespace atn {
   public:
     using Set = std::unordered_set<Ref<ATNConfig>, Hasher, Comparer>;
 
-    virtual Ref<ATNConfig> getOrAdd(Ref<ATNConfig> config) override {
+    virtual Ref<ATNConfig> getOrAdd(Ref<ATNConfig> const& config) override {
       auto result = Set::find(config);
       if (result != Set::end())
         // Can potentially be a different config instance which however is considered equal to the given config
@@ -94,7 +94,7 @@ namespace atn {
       return Set::empty();
     }
 
-    virtual bool contains(Ref<ATNConfig> config) const override {
+    virtual bool contains(Ref<ATNConfig> const& config) const override {
       return Set::count(config) > 0;
     }
 

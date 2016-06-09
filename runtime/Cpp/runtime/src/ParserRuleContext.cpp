@@ -40,10 +40,12 @@
 using namespace antlr4;
 using namespace antlrcpp;
 
+const Ref<ParserRuleContext> ParserRuleContext::EMPTY = std::make_shared<ParserRuleContext>();
+
 ParserRuleContext::ParserRuleContext() {
 }
 
-void ParserRuleContext::copyFrom(Ref<ParserRuleContext> ctx) {
+void ParserRuleContext::copyFrom(Ref<ParserRuleContext> const& ctx) {
   // from RuleContext
   this->parent = ctx->parent;
   this->invokingState = ctx->invokingState;
@@ -56,18 +58,18 @@ ParserRuleContext::ParserRuleContext(std::weak_ptr<ParserRuleContext> parent, in
   : RuleContext(parent, invokingStateNumber) {
 }
 
-void ParserRuleContext::enterRule(Ref<tree::ParseTreeListener> /*listener*/) {
+void ParserRuleContext::enterRule(Ref<tree::ParseTreeListener> const& /*listener*/) {
 }
 
-void ParserRuleContext::exitRule(Ref<tree::ParseTreeListener> /*listener*/) {
+void ParserRuleContext::exitRule(Ref<tree::ParseTreeListener> const& /*listener*/) {
 }
 
-Ref<tree::TerminalNode> ParserRuleContext::addChild(Ref<tree::TerminalNode> t) {
+Ref<tree::TerminalNode> ParserRuleContext::addChild(Ref<tree::TerminalNode> const& t) {
   children.push_back(t);
   return t;
 }
 
-Ref<RuleContext> ParserRuleContext::addChild(Ref<RuleContext> ruleInvocation) {
+Ref<RuleContext> ParserRuleContext::addChild(Ref<RuleContext> const& ruleInvocation) {
   children.push_back(ruleInvocation);
   return ruleInvocation;
 }
@@ -78,14 +80,14 @@ void ParserRuleContext::removeLastChild() {
   }
 }
 
-Ref<tree::TerminalNode> ParserRuleContext::addChild(Ref<Token> matchedToken) {
+Ref<tree::TerminalNode> ParserRuleContext::addChild(Ref<Token> const& matchedToken) {
   Ref<tree::TerminalNodeImpl> t = std::make_shared<tree::TerminalNodeImpl>(matchedToken);
   addChild(t);
   t->parent = shared_from_this();
   return t;
 }
 
-Ref<tree::ErrorNode> ParserRuleContext::addErrorNode(Ref<Token> badToken) {
+Ref<tree::ErrorNode> ParserRuleContext::addErrorNode(Ref<Token> const& badToken) {
   Ref<tree::ErrorNodeImpl> t = std::make_shared<tree::ErrorNodeImpl>(badToken);
   addChild(t);
   t->parent = shared_from_this();

@@ -64,12 +64,12 @@ void Parser::TraceListener::enterEveryRule(ParserRuleContext *ctx) {
     << ", LT(1)=" << outerInstance->_input->LT(1)->getText() << std::endl;
 }
 
-void Parser::TraceListener::visitTerminal(Ref<tree::TerminalNode> node) {
+void Parser::TraceListener::visitTerminal(Ref<tree::TerminalNode> const& node) {
   std::cout << "consume " << node->getSymbol() << " rule "
     << outerInstance->getRuleNames()[(size_t)outerInstance->getContext()->getRuleIndex()] << std::endl;
 }
 
-void Parser::TraceListener::visitErrorNode(Ref<tree::ErrorNode> /*node*/) {
+void Parser::TraceListener::visitErrorNode(Ref<tree::ErrorNode> const& /*node*/) {
 }
 
 void Parser::TraceListener::exitEveryRule(ParserRuleContext *ctx) {
@@ -83,13 +83,13 @@ const Ref<Parser::TrimToSizeListener> Parser::TrimToSizeListener::INSTANCE =
 void Parser::TrimToSizeListener::enterEveryRule(ParserRuleContext * /*ctx*/) {
 }
 
-void Parser::TrimToSizeListener::visitTerminal(Ref<tree::TerminalNode> /*node*/) {
+void Parser::TrimToSizeListener::visitTerminal(Ref<tree::TerminalNode> const& /*node*/) {
 }
 
-void Parser::TrimToSizeListener::visitErrorNode(Ref<tree::ErrorNode> /*node*/) {
+void Parser::TrimToSizeListener::visitErrorNode(Ref<tree::ErrorNode> const& /*node*/) {
 }
 
-void Parser::TrimToSizeListener::exitEveryRule(ParserRuleContext *ctx) {
+void Parser::TrimToSizeListener::exitEveryRule(ParserRuleContext * ctx) {
   ctx->children.shrink_to_fit();
 }
 
@@ -180,7 +180,7 @@ std::vector<Ref<tree::ParseTreeListener>> Parser::getParseListeners() {
   return _parseListeners;
 }
 
-void Parser::addParseListener(Ref<tree::ParseTreeListener> listener) {
+void Parser::addParseListener(Ref<tree::ParseTreeListener> const& listener) {
   if (!listener) {
     throw NullPointerException("listener");
   }
@@ -188,7 +188,7 @@ void Parser::addParseListener(Ref<tree::ParseTreeListener> listener) {
   this->_parseListeners.push_back(listener);
 }
 
-void Parser::removeParseListener(Ref<tree::ParseTreeListener> listener) {
+void Parser::removeParseListener(Ref<tree::ParseTreeListener> const& listener) {
   if (!_parseListeners.empty()) {
     auto it = std::find(_parseListeners.begin(), _parseListeners.end(), listener);
     if (it != _parseListeners.end()) {
@@ -268,7 +268,7 @@ Ref<ANTLRErrorStrategy> Parser::getErrorHandler() {
   return _errHandler;
 }
 
-void Parser::setErrorHandler(Ref<ANTLRErrorStrategy> handler) {
+void Parser::setErrorHandler(Ref<ANTLRErrorStrategy> const& handler) {
   _errHandler = handler;
 }
 
@@ -298,7 +298,7 @@ void Parser::notifyErrorListeners(const std::string &msg) {
   notifyErrorListeners(getCurrentToken(), msg, nullptr);
 }
 
-void Parser::notifyErrorListeners(Ref<Token> offendingToken, const std::string &msg, std::exception_ptr e) {
+void Parser::notifyErrorListeners(Ref<Token> const& offendingToken, const std::string &msg, std::exception_ptr e) {
   _syntaxErrors++;
   int line = -1;
   int charPositionInLine = -1;
@@ -344,7 +344,7 @@ void Parser::addContextToParseTree() {
   parent->addChild(_ctx);
 }
 
-void Parser::enterRule(Ref<ParserRuleContext> localctx, int state, int /*ruleIndex*/) {
+void Parser::enterRule(Ref<ParserRuleContext> const& localctx, int state, int /*ruleIndex*/) {
   setState(state);
   _ctx = localctx;
   _ctx->start = _input->LT(1);
@@ -372,7 +372,7 @@ void Parser::exitRule() {
   _ctx = std::dynamic_pointer_cast<ParserRuleContext>(_ctx->parent.lock());
 }
 
-void Parser::enterOuterAlt(Ref<ParserRuleContext> localctx, int altNum) {
+void Parser::enterOuterAlt(Ref<ParserRuleContext> const& localctx, int altNum) {
   localctx->setAltNumber(altNum);
 
   // if we have new localctx, make sure we replace existing ctx
@@ -395,11 +395,11 @@ int Parser::getPrecedence() const {
   return _precedenceStack.back();
 }
 
-void Parser::enterRecursionRule(Ref<ParserRuleContext> localctx, int ruleIndex) {
+void Parser::enterRecursionRule(Ref<ParserRuleContext> const& localctx, int ruleIndex) {
   enterRecursionRule(localctx, getATN().ruleToStartState[(size_t)ruleIndex]->stateNumber, ruleIndex, 0);
 }
 
-void Parser::enterRecursionRule(Ref<ParserRuleContext> localctx, int state, int /*ruleIndex*/, int precedence) {
+void Parser::enterRecursionRule(Ref<ParserRuleContext> const& localctx, int state, int /*ruleIndex*/, int precedence) {
   setState(state);
   _precedenceStack.push_back(precedence);
   _ctx = localctx;
@@ -409,7 +409,7 @@ void Parser::enterRecursionRule(Ref<ParserRuleContext> localctx, int state, int 
   }
 }
 
-void Parser::pushNewRecursionContext(Ref<ParserRuleContext> localctx, int state, int /*ruleIndex*/) {
+void Parser::pushNewRecursionContext(Ref<ParserRuleContext> const& localctx, int state, int /*ruleIndex*/) {
   Ref<ParserRuleContext> previous = _ctx;
   previous->parent = localctx;
   previous->invokingState = state;
@@ -426,7 +426,7 @@ void Parser::pushNewRecursionContext(Ref<ParserRuleContext> localctx, int state,
   }
 }
 
-void Parser::unrollRecursionContexts(Ref<ParserRuleContext> parentctx) {
+void Parser::unrollRecursionContexts(Ref<ParserRuleContext> const& parentctx) {
   _precedenceStack.pop_back();
   _ctx->stop = _input->LT(-1);
   Ref<ParserRuleContext> retctx = _ctx; // save current ctx (return value)
@@ -467,11 +467,11 @@ Ref<ParserRuleContext> Parser::getContext() {
   return _ctx;
 }
 
-void Parser::setContext(Ref<ParserRuleContext> ctx) {
+void Parser::setContext(Ref<ParserRuleContext> const& ctx) {
   _ctx = ctx;
 }
 
-bool Parser::precpred(RuleContext * /*localctx*/, int precedence) {
+bool Parser::precpred(Ref<RuleContext> const& /*localctx*/, int precedence) {
   return precedence >= _precedenceStack.back();
 }
 
@@ -543,10 +543,11 @@ std::vector<std::string> Parser::getRuleInvocationStack() {
   return getRuleInvocationStack(_ctx);
 }
 
-std::vector<std::string> Parser::getRuleInvocationStack(Ref<RuleContext> p) {
+std::vector<std::string> Parser::getRuleInvocationStack(Ref<RuleContext> const& p) {
   std::vector<std::string> ruleNames = getRuleNames();
   std::vector<std::string> stack = std::vector<std::string>();
-  while (p) {
+  RuleContext *run = p.get();
+  while (run != nullptr) {
     // compute what follows who invoked us
     ssize_t ruleIndex = p->getRuleIndex();
     if (ruleIndex < 0) {
@@ -556,7 +557,7 @@ std::vector<std::string> Parser::getRuleInvocationStack(Ref<RuleContext> p) {
     }
     if (p->parent.expired())
       break;
-    p = p->parent.lock();
+    run = run->parent.lock().get();
   }
   return stack;
 }
@@ -588,7 +589,6 @@ void Parser::dumpDFA() {
           std::cout << std::endl;
         }
         std::cout << "Decision " << dfa.decision << ":" << std::endl;
-								dfa.toString(getTokenNames());
         std::cout << dfa.toString(getVocabulary());
         seenOne = true;
       }

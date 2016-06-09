@@ -51,8 +51,8 @@ namespace tree {
   public:
     virtual ~ParseTreeListener() {};
     
-    virtual void visitTerminal(Ref<TerminalNode> node) = 0;
-    virtual void visitErrorNode(Ref<ErrorNode> node) = 0;
+    virtual void visitTerminal(Ref<TerminalNode> const& node) = 0;
+    virtual void visitErrorNode(Ref<ErrorNode> const& node) = 0;
     virtual void enterEveryRule(ParserRuleContext *ctx) = 0;
     virtual void exitEveryRule(ParserRuleContext *ctx) = 0;
 

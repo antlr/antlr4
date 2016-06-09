@@ -144,11 +144,11 @@ namespace antlr4 {
 
     // subclass needs to override these if there are sempreds or actions
     // that the ATN interp needs to execute
-    virtual bool sempred(RuleContext *localctx, int ruleIndex, int actionIndex);
+    virtual bool sempred(Ref<RuleContext> const& localctx, int ruleIndex, int actionIndex);
 
-    virtual bool precpred(RuleContext *localctx, int precedence);
+    virtual bool precpred(Ref<RuleContext> const& localctx, int precedence);
 
-    virtual void action(RuleContext *localctx, int ruleIndex, int actionIndex);
+    virtual void action(Ref<RuleContext> const& localctx, int ruleIndex, int actionIndex);
 
     int getState();
 

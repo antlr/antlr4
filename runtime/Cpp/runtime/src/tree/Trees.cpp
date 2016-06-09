@@ -51,17 +51,17 @@ using namespace antlrcpp;
 Trees::Trees() {
 }
 
-std::string Trees::toStringTree(Ref<Tree> t) {
+std::string Trees::toStringTree(Ref<Tree> const& t) {
   return toStringTree(t, nullptr);
 }
 
-std::string Trees::toStringTree(Ref<Tree> t, Parser *recog) {
+std::string Trees::toStringTree(Ref<Tree> const& t, Parser *recog) {
   if (recog == nullptr)
     return toStringTree(t, std::vector<std::string>());
   return toStringTree(t, recog->getRuleNames());
 }
 
-std::string Trees::toStringTree(Ref<Tree> t, const std::vector<std::string> &ruleNames) {
+std::string Trees::toStringTree(Ref<Tree> const& t, const std::vector<std::string> &ruleNames) {
   std::string temp = antlrcpp::escapeWhitespace(Trees::getNodeText(t, ruleNames), false);
   if (t->getChildCount() == 0) {
     return temp;
@@ -114,11 +114,11 @@ std::string Trees::toStringTree(Ref<Tree> t, const std::vector<std::string> &rul
   return ss.str();
 }
 
-std::string Trees::getNodeText(Ref<Tree> t, Parser *recog) {
+std::string Trees::getNodeText(Ref<Tree> const& t, Parser *recog) {
   return getNodeText(t, recog->getRuleNames());
 }
 
-std::string Trees::getNodeText(Ref<Tree> t, const std::vector<std::string> &ruleNames) {
+std::string Trees::getNodeText(Ref<Tree> const& t, const std::vector<std::string> &ruleNames) {
   if (ruleNames.size() > 0) {
     if (is<RuleContext>(t)) {
       ssize_t ruleIndex = std::static_pointer_cast<RuleContext>(t)->getRuleContext()->getRuleIndex();
@@ -152,7 +152,7 @@ std::string Trees::getNodeText(Ref<Tree> t, const std::vector<std::string> &rule
   return "";
 }
 
-std::vector<Ref<Tree>> Trees::getChildren(Ref<Tree> t) {
+std::vector<Ref<Tree>> Trees::getChildren(Ref<Tree> const& t) {
   std::vector<Ref<Tree>> kids;
   for (size_t i = 0; i < t->getChildCount(); i++) {
     kids.push_back(t->getChild(i));
@@ -160,17 +160,18 @@ std::vector<Ref<Tree>> Trees::getChildren(Ref<Tree> t) {
   return kids;
 }
 
-std::vector<std::weak_ptr<Tree>> Trees::getAncestors(Ref<Tree> t) {
+std::vector<std::weak_ptr<Tree>> Trees::getAncestors(Ref<Tree> const& t) {
   std::vector<std::weak_ptr<Tree>> ancestors;
-  while (!t->getParent().expired()) {
-    t = t->getParent().lock();
-    ancestors.insert(ancestors.begin(), t); // insert at start
+  std::weak_ptr<Tree> parent = t->getParent();
+  while (!parent.expired()) {
+    ancestors.insert(ancestors.begin(), parent); // insert at start
+    parent = parent.lock()->getParent();
   }
   return ancestors;
 }
 
 template<typename T>
-static void _findAllNodes(Ref<ParseTree> t, int index, bool findTokens, std::vector<T> &nodes) {
+static void _findAllNodes(Ref<ParseTree> const& t, int index, bool findTokens, std::vector<T> &nodes) {
   // check this node (the root) first
   if (findTokens && is<TerminalNode>(t)) {
     Ref<TerminalNode> tnode = std::dynamic_pointer_cast<TerminalNode>(t);
@@ -189,7 +190,7 @@ static void _findAllNodes(Ref<ParseTree> t, int index, bool findTokens, std::vec
   }
 }
 
-bool Trees::isAncestorOf(Ref<Tree> t, Ref<Tree> u) {
+bool Trees::isAncestorOf(Ref<Tree> const& t, Ref<Tree> const& u) {
   if (t == nullptr || u == nullptr || t->getParent().expired()) {
     return false;
   }
@@ -204,21 +205,21 @@ bool Trees::isAncestorOf(Ref<Tree> t, Ref<Tree> u) {
   return false;
 }
 
-std::vector<Ref<ParseTree>> Trees::findAllTokenNodes(Ref<ParseTree> t, int ttype) {
+std::vector<Ref<ParseTree>> Trees::findAllTokenNodes(Ref<ParseTree> const& t, int ttype) {
   return findAllNodes(t, ttype, true);
 }
 
-std::vector<Ref<ParseTree>> Trees::findAllRuleNodes(Ref<ParseTree> t, int ruleIndex) {
+std::vector<Ref<ParseTree>> Trees::findAllRuleNodes(Ref<ParseTree> const& t, int ruleIndex) {
   return findAllNodes(t, ruleIndex, false);
 }
 
-std::vector<Ref<ParseTree>> Trees::findAllNodes(Ref<ParseTree> t, int index, bool findTokens) {
+std::vector<Ref<ParseTree>> Trees::findAllNodes(Ref<ParseTree> const& t, int index, bool findTokens) {
   std::vector<Ref<ParseTree>> nodes;
   _findAllNodes<Ref<ParseTree>>(t, index, findTokens, nodes);
   return nodes;
 }
 
-std::vector<Ref<ParseTree>> Trees::getDescendants(Ref<ParseTree> t) {
+std::vector<Ref<ParseTree>> Trees::getDescendants(Ref<ParseTree> const& t) {
   std::vector<Ref<ParseTree>> nodes;
   nodes.push_back(t);
   std::size_t n = t->getChildCount();
@@ -231,11 +232,11 @@ std::vector<Ref<ParseTree>> Trees::getDescendants(Ref<ParseTree> t) {
   return nodes;
 }
 
-std::vector<Ref<ParseTree>> Trees::descendants(Ref<ParseTree> t) {
+std::vector<Ref<ParseTree>> Trees::descendants(Ref<ParseTree> const& t) {
   return getDescendants(t);
 }
 
-Ref<ParserRuleContext> Trees::getRootOfSubtreeEnclosingRegion(Ref<ParseTree> t, size_t startTokenIndex,
+Ref<ParserRuleContext> Trees::getRootOfSubtreeEnclosingRegion(Ref<ParseTree> const& t, size_t startTokenIndex,
                                                               size_t stopTokenIndex) {
   size_t n = t->getChildCount();
   for (size_t i = 0; i<n; i++) {
@@ -257,7 +258,8 @@ Ref<ParserRuleContext> Trees::getRootOfSubtreeEnclosingRegion(Ref<ParseTree> t, 
   return nullptr;
 }
 
-void Trees::stripChildrenOutOfRange(Ref<ParserRuleContext> t, Ref<ParserRuleContext> root, size_t startIndex, size_t stopIndex) {
+void Trees::stripChildrenOutOfRange(Ref<ParserRuleContext> const& t, Ref<ParserRuleContext> const& root,
+                                    size_t startIndex, size_t stopIndex) {
   if (t == nullptr) {
     return;
   }
@@ -274,7 +276,7 @@ void Trees::stripChildrenOutOfRange(Ref<ParserRuleContext> t, Ref<ParserRuleCont
   }
 }
 
-Ref<Tree> Trees::findNodeSuchThat(Ref<Tree> t, Ref<Predicate<Tree>> pred) {
+Ref<Tree> Trees::findNodeSuchThat(Ref<Tree> const& t, Ref<Predicate<Tree>> const& pred) {
   if (pred->test(t)) {
     return t;
   }

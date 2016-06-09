@@ -65,7 +65,8 @@ namespace atn {
     /// </param>
     /// <returns> A <seealso cref="LexerActionExecutor"/> for executing the combine actions
     /// of {@code lexerActionExecutor} and {@code lexerAction}. </returns>
-    static Ref<LexerActionExecutor> append(Ref<LexerActionExecutor> lexerActionExecutor, const Ref<LexerAction> lexerAction);
+    static Ref<LexerActionExecutor> append(Ref<LexerActionExecutor> const& lexerActionExecutor,
+                                           Ref<LexerAction> const& lexerAction);
 
     /// <summary>
     /// Creates a <seealso cref="LexerActionExecutor"/> which encodes the current offset

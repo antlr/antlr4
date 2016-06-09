@@ -36,6 +36,6 @@
 using namespace antlr4;
 using namespace antlr4::atn;
 
-ErrorInfo::ErrorInfo(int decision, Ref<ATNConfigSet> configs, TokenStream *input, int startIndex, int stopIndex, bool fullCtx)
+ErrorInfo::ErrorInfo(int decision, Ref<ATNConfigSet> const& configs, TokenStream *input, int startIndex, int stopIndex, bool fullCtx)
   : DecisionEventInfo(decision, configs, input, startIndex, stopIndex, fullCtx) {
 }

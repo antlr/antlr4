@@ -38,12 +38,12 @@ namespace atn {
 
   class ANTLR4CPP_PUBLIC LexerATNConfig : public ATNConfig {
   public:
-    LexerATNConfig(ATNState *state, int alt, Ref<PredictionContext> context);
-    LexerATNConfig(ATNState *state, int alt, Ref<PredictionContext> context, Ref<LexerActionExecutor> lexerActionExecutor);
+    LexerATNConfig(ATNState *state, int alt, Ref<PredictionContext> const& context);
+    LexerATNConfig(ATNState *state, int alt, Ref<PredictionContext> const& context, Ref<LexerActionExecutor> const& lexerActionExecutor);
 
-    LexerATNConfig(Ref<LexerATNConfig> c, ATNState *state);
-    LexerATNConfig(Ref<LexerATNConfig> c, ATNState *state, Ref<LexerActionExecutor> lexerActionExecutor);
-    LexerATNConfig(Ref<LexerATNConfig> c, ATNState *state, Ref<PredictionContext> context);
+    LexerATNConfig(Ref<LexerATNConfig> const& c, ATNState *state);
+    LexerATNConfig(Ref<LexerATNConfig> const& c, ATNState *state, Ref<LexerActionExecutor> const& lexerActionExecutor);
+    LexerATNConfig(Ref<LexerATNConfig> const& c, ATNState *state, Ref<PredictionContext> const& context);
 
     /**
      * Gets the {@link LexerActionExecutor} capable of executing the embedded
@@ -63,7 +63,7 @@ namespace atn {
     const Ref<LexerActionExecutor> _lexerActionExecutor;
     const bool _passedThroughNonGreedyDecision;
 
-    static bool checkNonGreedyDecision(Ref<LexerATNConfig> source, ATNState *target);
+    static bool checkNonGreedyDecision(Ref<LexerATNConfig> const& source, ATNState *target);
   };
 
 } // namespace atn

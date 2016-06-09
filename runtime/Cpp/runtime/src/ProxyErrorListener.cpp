@@ -49,7 +49,7 @@ void ProxyErrorListener::removeErrorListeners() {
   _delegates.clear();
 }
 
-void ProxyErrorListener::syntaxError(IRecognizer *recognizer, Ref<Token> offendingSymbol, size_t line,
+void ProxyErrorListener::syntaxError(IRecognizer *recognizer, Ref<Token> const& offendingSymbol, size_t line,
   int charPositionInLine, const std::string &msg, std::exception_ptr e) {
 
   for (auto listener : _delegates) {
@@ -58,21 +58,21 @@ void ProxyErrorListener::syntaxError(IRecognizer *recognizer, Ref<Token> offendi
 }
 
 void ProxyErrorListener::reportAmbiguity(Parser *recognizer, const dfa::DFA &dfa, size_t startIndex, size_t stopIndex,
-  bool exact, const antlrcpp::BitSet &ambigAlts, Ref<atn::ATNConfigSet> configs) {
+  bool exact, const antlrcpp::BitSet &ambigAlts, Ref<atn::ATNConfigSet> const& configs) {
   for (auto listener : _delegates) {
     listener->reportAmbiguity(recognizer, dfa, startIndex, stopIndex, exact, ambigAlts, configs);
   }
 }
 
 void ProxyErrorListener::reportAttemptingFullContext(Parser *recognizer, const dfa::DFA &dfa, size_t startIndex,
-  size_t stopIndex, const antlrcpp::BitSet &conflictingAlts, Ref<atn::ATNConfigSet> configs) {
+  size_t stopIndex, const antlrcpp::BitSet &conflictingAlts, Ref<atn::ATNConfigSet> const& configs) {
   for (auto listener : _delegates) {
     listener->reportAttemptingFullContext(recognizer, dfa, startIndex, stopIndex, conflictingAlts, configs);
   }
 }
 
 void ProxyErrorListener::reportContextSensitivity(Parser *recognizer, const dfa::DFA &dfa, size_t startIndex, size_t stopIndex,
-  int prediction, Ref<atn::ATNConfigSet> configs) {
+  int prediction, Ref<atn::ATNConfigSet> const& configs) {
   for (auto listener : _delegates) {
     listener->reportContextSensitivity(recognizer, dfa, startIndex, stopIndex, prediction, configs);
   }

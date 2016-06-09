@@ -173,7 +173,7 @@ CharStream* Lexer::getInputStream() {
   return _input;
 }
 
-void Lexer::emit(Ref<Token> token) {
+void Lexer::emit(Ref<Token> const& token) {
   this->token = token;
 }
 
@@ -228,7 +228,7 @@ Ref<Token> Lexer::getToken() {
   return token;
 }
 
-void Lexer::setToken(Ref<Token> token) {
+void Lexer::setToken(Ref<Token> const& token) {
   this->token = token;
 }
 

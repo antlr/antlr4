@@ -47,7 +47,7 @@ namespace tree {
   /// </summary>
   class ANTLR4CPP_PUBLIC ErrorNodeImpl : public virtual TerminalNodeImpl, public virtual ErrorNode {
   public:
-    ErrorNodeImpl(Ref<Token> token);
+    ErrorNodeImpl(Ref<Token> const& token);
 
     template<typename T, typename T1>
     T accept(ParseTreeVisitor<T1> *visitor)  {

@@ -44,8 +44,8 @@ namespace antlr4 {
   class ANTLR4CPP_PUBLIC NoViableAltException : public RecognitionException {
   public:
     NoViableAltException(Parser *recognizer); // LL(1) error
-    NoViableAltException(Parser *recognizer, TokenStream *input, Ref<Token> startToken, Ref<Token> offendingToken,
-                         Ref<atn::ATNConfigSet> deadEndConfigs, Ref<ParserRuleContext> ctx);
+    NoViableAltException(Parser *recognizer, TokenStream *input, Ref<Token> const& startToken,
+      Ref<Token> const& offendingToken, Ref<atn::ATNConfigSet> const& deadEndConfigs, Ref<ParserRuleContext> const& ctx);
 
     virtual Ref<Token> getStartToken() const;
     virtual Ref<atn::ATNConfigSet> getDeadEndConfigs() const;

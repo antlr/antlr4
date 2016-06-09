@@ -105,7 +105,7 @@ ATN& ATN::operator = (ATN &&other) NOEXCEPT {
   return *this;
 }
 
-misc::IntervalSet ATN::nextTokens(ATNState *s, Ref<RuleContext> ctx) const {
+misc::IntervalSet ATN::nextTokens(ATNState *s, Ref<RuleContext> const& ctx) const {
   LL1Analyzer analyzer(*this);
   return analyzer.LOOK(s, ctx);
 
@@ -150,7 +150,7 @@ int ATN::getNumberOfDecisions() const {
   return (int)decisionToState.size();
 }
 
-misc::IntervalSet ATN::getExpectedTokens(int stateNumber, Ref<RuleContext> context) const {
+misc::IntervalSet ATN::getExpectedTokens(int stateNumber, Ref<RuleContext> const& context) const {
   if (stateNumber < 0 || stateNumber >= (int)states.size()) {
     throw IllegalArgumentException("Invalid state number.");
   }

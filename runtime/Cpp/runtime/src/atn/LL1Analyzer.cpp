@@ -76,11 +76,11 @@ std::vector<misc::IntervalSet> LL1Analyzer::getDecisionLookahead(ATNState *s) co
   return look;
 }
 
-misc::IntervalSet LL1Analyzer::LOOK(ATNState *s, Ref<RuleContext> ctx) const {
+misc::IntervalSet LL1Analyzer::LOOK(ATNState *s, Ref<RuleContext> const& ctx) const {
   return LOOK(s, nullptr, ctx);
 }
 
-misc::IntervalSet LL1Analyzer::LOOK(ATNState *s, ATNState *stopState, Ref<RuleContext> ctx) const {
+misc::IntervalSet LL1Analyzer::LOOK(ATNState *s, ATNState *stopState, Ref<RuleContext> const& ctx) const {
   misc::IntervalSet r;
   bool seeThruPreds = true; // ignore preds; get all lookahead
   Ref<PredictionContext> lookContext = ctx != nullptr ? PredictionContext::fromRuleContext(_atn, ctx) : nullptr;
@@ -92,7 +92,7 @@ misc::IntervalSet LL1Analyzer::LOOK(ATNState *s, ATNState *stopState, Ref<RuleCo
   return r;
 }
 
-void LL1Analyzer::_LOOK(ATNState *s, ATNState *stopState, Ref<PredictionContext> ctx, misc::IntervalSet &look,
+void LL1Analyzer::_LOOK(ATNState *s, ATNState *stopState, Ref<PredictionContext> const& ctx, misc::IntervalSet &look,
   ATNConfig::Set &lookBusy, antlrcpp::BitSet &calledRuleStack, bool seeThruPreds, bool addEOF) const {
   
   Ref<ATNConfig> c = std::make_shared<ATNConfig>(s, 0, ctx);

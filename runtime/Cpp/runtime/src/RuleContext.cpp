@@ -38,8 +38,6 @@
 
 using namespace antlr4;
 
-const Ref<RuleContext> RuleContext::EMPTY = std::make_shared<ParserRuleContext>();
-
 RuleContext::RuleContext() {
   InitializeInstanceFields();
 }
@@ -132,7 +130,7 @@ std::string RuleContext::toString(const std::vector<std::string> &ruleNames) {
 }
 
 
-std::string RuleContext::toString(const std::vector<std::string> &ruleNames, Ref<RuleContext> stop) {
+std::string RuleContext::toString(const std::vector<std::string> &ruleNames, Ref<RuleContext> const& stop) {
   std::stringstream ss;
 
   Ref<RuleContext> parent = shared_from_this();
@@ -170,7 +168,7 @@ std::string RuleContext::toString(Recognizer *recog) {
   return toString(recog, ParserRuleContext::EMPTY);
 }
 
-std::string RuleContext::toString(Recognizer *recog, Ref<RuleContext> stop) {
+std::string RuleContext::toString(Recognizer *recog, Ref<RuleContext> const& stop) {
   if (recog == nullptr)
     return toString(std::vector<std::string>(), stop); // Don't use an initializer {} here or we end up calling ourselve recursivly.
   return toString(recog->getRuleNames(), stop);

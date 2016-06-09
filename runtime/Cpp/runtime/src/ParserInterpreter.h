@@ -77,7 +77,7 @@ namespace antlr4 {
     /// Begin parsing at startRuleIndex
     virtual Ref<ParserRuleContext> parse(int startRuleIndex);
 
-    virtual void enterRecursionRule(Ref<ParserRuleContext> localctx, int state, int ruleIndex, int precedence) override;
+    virtual void enterRecursionRule(Ref<ParserRuleContext> const& localctx, int state, int ruleIndex, int precedence) override;
 
 
     /** Override this parser interpreters normal decision-making process

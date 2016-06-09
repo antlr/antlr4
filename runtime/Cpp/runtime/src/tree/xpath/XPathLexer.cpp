@@ -44,16 +44,16 @@ const atn::ATN& XPathLexer::getATN() const {
 }
 
 
-void XPathLexer::action(RuleContext *context, int ruleIndex, int actionIndex) {
+void XPathLexer::action(Ref<RuleContext> const& context, int ruleIndex, int actionIndex) {
   switch (ruleIndex) {
-    case 4: IDAction((RuleContext*)context, actionIndex); break;
+    case 4: IDAction(std::dynamic_pointer_cast<RuleContext>(context), actionIndex); break;
 
   default:
     break;
   }
 }
 
-void XPathLexer::IDAction(RuleContext * /*context*/, int actionIndex) {
+void XPathLexer::IDAction(Ref<RuleContext> const& /*context*/, int actionIndex) {
   switch (actionIndex) {
     case 0: 
     				if (isupper(getText()[0]))

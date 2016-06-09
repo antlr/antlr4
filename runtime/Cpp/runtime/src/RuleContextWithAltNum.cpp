@@ -39,7 +39,7 @@ RuleContextWithAltNum::RuleContextWithAltNum() : ParserRuleContext() {
   altNum = ATN::INVALID_ALT_NUMBER;
 }
 
-RuleContextWithAltNum::RuleContextWithAltNum(Ref<ParserRuleContext> parent, int invokingStateNumber)
+RuleContextWithAltNum::RuleContextWithAltNum(Ref<ParserRuleContext> const& parent, int invokingStateNumber)
   : ParserRuleContext(parent, invokingStateNumber) {
 }
 

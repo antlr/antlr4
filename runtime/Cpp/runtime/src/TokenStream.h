@@ -157,7 +157,7 @@ namespace antlr4 {
     /// </returns>
     /// <exception cref="UnsupportedOperationException"> if this stream does not support
     /// this method for the specified tokens </exception>
-    virtual std::string getText(Ref<Token> start, Ref<Token> stop) = 0;
+    virtual std::string getText(Ref<Token> const& start, Ref<Token> const& stop) = 0;
   };
 
 } // namespace antlr4

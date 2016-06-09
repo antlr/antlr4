@@ -112,7 +112,7 @@ namespace antlr4 {
     virtual std::string getText() override;
     virtual std::string getText(const misc::Interval &interval) override;
     virtual std::string getText(RuleContext *ctx) override;
-    virtual std::string getText(Ref<Token> start, Ref<Token> stop) override;
+    virtual std::string getText(Ref<Token> const& start, Ref<Token> const& stop) override;
 
     /// <summary>
     /// Get all tokens from lexer until EOF </summary>

@@ -376,11 +376,11 @@ namespace antlr4 {
     ///  your token objects because you don't have to go modify your lexer
     ///  so that it creates a new class.
     /// </summary>
-    virtual std::string getTokenErrorDisplay(Ref<Token> t);
+    virtual std::string getTokenErrorDisplay(Ref<Token> const& t);
 
-    virtual std::string getSymbolText(Ref<Token> symbol);
+    virtual std::string getSymbolText(Ref<Token> const& symbol);
 
-    virtual int getSymbolType(Ref<Token> symbol);
+    virtual int getSymbolType(Ref<Token> const& symbol);
 
     virtual std::string escapeWSAndQuote(std::string &s);
 

@@ -55,10 +55,10 @@ namespace antlr4 {
     int _offendingState;
 
   public:
-    RecognitionException(IRecognizer *recognizer, IntStream *input, Ref<ParserRuleContext> ctx,
-                         Ref<Token> offendingToken = Ref<Token>());
+    RecognitionException(IRecognizer *recognizer, IntStream *input, Ref<ParserRuleContext> const& ctx,
+                         Ref<Token> const& offendingToken = Ref<Token>());
     RecognitionException(const std::string &message, IRecognizer *recognizer, IntStream *input,
-                         Ref<ParserRuleContext> ctx, Ref<Token> offendingToken = Ref<Token>());
+                         Ref<ParserRuleContext> const& ctx, Ref<Token> const& offendingToken = Ref<Token>());
     ~RecognitionException() {}
     
     /// Get the ATN state number the parser was in at the time the error

@@ -579,7 +579,7 @@ dfa::DFAState *LexerATNSimulator::addDFAState(const Ref<ATNConfigSet> &configs) 
 
   dfa::DFAState *proposed = new dfa::DFAState(configs); /* mem-check: managed by the DFA or deleted below */
   Ref<ATNConfig> firstConfigWithRuleStopState = nullptr;
-  for (auto c : configs->configs) {
+  for (auto &c : configs->configs) {
     if (is<RuleStopState *>(c->state)) {
       firstConfigWithRuleStopState = c;
       break;

@@ -158,7 +158,7 @@ Ref<ParserRuleContext> ParserInterpreter::parse(int startRuleIndex) {
   }
 }
 
-void ParserInterpreter::enterRecursionRule(Ref<ParserRuleContext> localctx, int state, int ruleIndex, int precedence) {
+void ParserInterpreter::enterRecursionRule(Ref<ParserRuleContext> const& localctx, int state, int ruleIndex, int precedence) {
   _parentContextStack.push({ _ctx, localctx->invokingState });
   Parser::enterRecursionRule(localctx, state, ruleIndex, precedence);
 }
@@ -234,7 +234,7 @@ void ParserInterpreter::visitState(atn::ATNState *p) {
     case atn::Transition::PREDICATE:
     {
       atn::PredicateTransition *predicateTransition = (atn::PredicateTransition*)(transition);
-      if (!sempred(_ctx.get(), predicateTransition->ruleIndex, predicateTransition->predIndex)) {
+      if (!sempred(_ctx, predicateTransition->ruleIndex, predicateTransition->predIndex)) {
         throw FailedPredicateException(this);
       }
     }
@@ -243,13 +243,13 @@ void ParserInterpreter::visitState(atn::ATNState *p) {
     case atn::Transition::ACTION:
     {
       atn::ActionTransition *actionTransition = (atn::ActionTransition*)(transition);
-      action(_ctx.get(), actionTransition->ruleIndex, actionTransition->actionIndex);
+      action(_ctx, actionTransition->ruleIndex, actionTransition->actionIndex);
     }
       break;
 
     case atn::Transition::PRECEDENCE:
     {
-      if (!precpred(_ctx.get(), ((atn::PrecedencePredicateTransition*)(transition))->precedence)) {
+      if (!precpred(_ctx, ((atn::PrecedencePredicateTransition*)(transition))->precedence)) {
         throw FailedPredicateException(this, "precpred(_ctx, " + std::to_string(((atn::PrecedencePredicateTransition*)(transition))->precedence) +  ")");
       }
     }
@@ -304,7 +304,7 @@ void ParserInterpreter::recover(RecognitionException &e) {
 
   if (_input->index() == i) {
     // no input consumed, better add an error node
-    if (is<InputMismatchException>(e)) {
+    if (is<InputMismatchException *>(&e)) {
       InputMismatchException &ime = (InputMismatchException&)e;
       Ref<Token> tok = e.getOffendingToken();
       int expectedTokenType = ime.getExpectedTokens().getMinElement(); // get any element

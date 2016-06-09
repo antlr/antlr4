@@ -45,15 +45,15 @@ ParseTreePattern::ParseTreePattern(ParseTreePatternMatcher *matcher, const std::
   : patternRuleIndex(patternRuleIndex), _pattern(pattern), _patternTree(patternTree), _matcher(matcher) {
 }
 
-ParseTreeMatch ParseTreePattern::match(Ref<ParseTree> tree) {
+ParseTreeMatch ParseTreePattern::match(Ref<ParseTree> const& tree) {
   return _matcher->match(tree, *this);
 }
 
-bool ParseTreePattern::matches(Ref<ParseTree> tree) {
+bool ParseTreePattern::matches(Ref<ParseTree> const& tree) {
   return _matcher->match(tree, *this).succeeded();
 }
 
-std::vector<ParseTreeMatch> ParseTreePattern::findAll(Ref<ParseTree> tree, const std::string &xpath) {
+std::vector<ParseTreeMatch> ParseTreePattern::findAll(Ref<ParseTree> const& tree, const std::string &xpath) {
   std::vector<Ref<ParseTree>> subtrees = xpath::XPath::findAll(tree, xpath, _matcher->getParser());
   std::vector<ParseTreeMatch> matches;
   for (auto t : subtrees) {

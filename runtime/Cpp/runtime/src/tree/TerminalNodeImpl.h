@@ -41,7 +41,7 @@ namespace tree {
     Ref<Token> symbol;
     std::weak_ptr<ParseTree> parent;
 
-    TerminalNodeImpl(Ref<Token> symbol);
+    TerminalNodeImpl(Ref<Token> const& symbol);
 
     virtual Ref<Token> getSymbol() override;
     virtual misc::Interval getSourceInterval() override;

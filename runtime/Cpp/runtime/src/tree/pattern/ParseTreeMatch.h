@@ -69,7 +69,7 @@ namespace pattern {
   public:
     ParseTreeMatch(Ref<ParseTree> tree, const ParseTreePattern &pattern,
                    const std::map<std::string, std::vector<Ref<ParseTree>>> &labels,
-                   Ref<ParseTree> mismatchedNode);
+                   Ref<ParseTree> const& mismatchedNode);
     virtual ~ParseTreeMatch() {};
     
     /// <summary>

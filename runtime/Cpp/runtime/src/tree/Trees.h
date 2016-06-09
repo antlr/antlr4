@@ -44,52 +44,52 @@ namespace tree {
     /// Print out a whole tree in LISP form. getNodeText is used on the
     /// node payloads to get the text for the nodes.  Detect
     /// parse trees and extract data appropriately.
-    static std::string toStringTree(Ref<Tree> t);
+    static std::string toStringTree(Ref<Tree> const& t);
 
     /// Print out a whole tree in LISP form. getNodeText is used on the
     ///  node payloads to get the text for the nodes.  Detect
     ///  parse trees and extract data appropriately.
-    static std::string toStringTree(Ref<Tree> t, Parser *recog);
+    static std::string toStringTree(Ref<Tree> const& t, Parser *recog);
 
     /// Print out a whole tree in LISP form. getNodeText is used on the
     /// node payloads to get the text for the nodes.  Detect
     /// parse trees and extract data appropriately.
-    static std::string toStringTree(Ref<Tree> t, const std::vector<std::string> &ruleNames);
-    static std::string getNodeText(Ref<Tree> t, Parser *recog);
-    static std::string getNodeText(Ref<Tree> t, const std::vector<std::string> &ruleNames);
+    static std::string toStringTree(Ref<Tree> const& t, const std::vector<std::string> &ruleNames);
+    static std::string getNodeText(Ref<Tree> const& t, Parser *recog);
+    static std::string getNodeText(Ref<Tree> const& t, const std::vector<std::string> &ruleNames);
 
     /// Return ordered list of all children of this node.
-    static std::vector<Ref<Tree>> getChildren(Ref<Tree> t);
+    static std::vector<Ref<Tree>> getChildren(Ref<Tree> const& t);
 
     /// Return a list of all ancestors of this node.  The first node of
     ///  list is the root and the last is the parent of this node.
-    static std::vector<std::weak_ptr<Tree>> getAncestors(Ref<Tree> t);
+    static std::vector<std::weak_ptr<Tree>> getAncestors(Ref<Tree> const& t);
 
     /** Return true if t is u's parent or a node on path to root from u.
      *  Use == not equals().
      *
      *  @since 4.5.1
      */
-    static bool isAncestorOf(Ref<Tree> t, Ref<Tree> u);    
-    static std::vector<Ref<ParseTree>> findAllTokenNodes(Ref<ParseTree> t, int ttype);
-    static std::vector<Ref<ParseTree>> findAllRuleNodes(Ref<ParseTree> t, int ruleIndex);
-    static std::vector<Ref<ParseTree>> findAllNodes(Ref<ParseTree> t, int index, bool findTokens);
+    static bool isAncestorOf(Ref<Tree> const& t, Ref<Tree> const& u);
+    static std::vector<Ref<ParseTree>> findAllTokenNodes(Ref<ParseTree> const& t, int ttype);
+    static std::vector<Ref<ParseTree>> findAllRuleNodes(Ref<ParseTree> const& t, int ruleIndex);
+    static std::vector<Ref<ParseTree>> findAllNodes(Ref<ParseTree> const& t, int index, bool findTokens);
 
     /** Get all descendents; includes t itself.
      *
      * @since 4.5.1
      */
-    static std::vector<Ref<ParseTree>> getDescendants(Ref<ParseTree> t);
+    static std::vector<Ref<ParseTree>> getDescendants(Ref<ParseTree> const& t);
 
     /** @deprecated */
-    static std::vector<Ref<ParseTree>> descendants(Ref<ParseTree> t);
+    static std::vector<Ref<ParseTree>> descendants(Ref<ParseTree> const& t);
     
     /** Find smallest subtree of t enclosing range startTokenIndex..stopTokenIndex
      *  inclusively using postorder traversal.  Recursive depth-first-search.
      *
      *  @since 4.5.1
      */
-    static Ref<ParserRuleContext> getRootOfSubtreeEnclosingRegion(Ref<ParseTree> t,
+    static Ref<ParserRuleContext> getRootOfSubtreeEnclosingRegion(Ref<ParseTree> const& t,
                                                                   size_t startTokenIndex, // inclusive
                                                                   size_t stopTokenIndex); // inclusive
    
@@ -101,14 +101,14 @@ namespace tree {
      *
      *  @since 4.5.1
      */
-    static void stripChildrenOutOfRange(Ref<ParserRuleContext> t, Ref<ParserRuleContext> root, size_t startIndex,
-                                        size_t stopIndex);
+    static void stripChildrenOutOfRange(Ref<ParserRuleContext> const& t, Ref<ParserRuleContext> const& root,
+                                        size_t startIndex, size_t stopIndex);
     
     /** Return first node satisfying the pred
      *
      *  @since 4.5.1
      */
-    static Ref<Tree> findNodeSuchThat(Ref<Tree> t, Ref<misc::Predicate<Tree>> pred);
+    static Ref<Tree> findNodeSuchThat(Ref<Tree> const& t, Ref<misc::Predicate<Tree>> const& pred);
     
   private:
     Trees();

@@ -77,13 +77,13 @@ void DefaultErrorStrategy::reportError(Parser *recognizer, const RecognitionExce
   }
 
   beginErrorCondition(recognizer);
-  if (is<NoViableAltException>(e)) {
+  if (is<const NoViableAltException *>(&e)) {
     reportNoViableAlternative(recognizer, (const NoViableAltException &)e);
-  } else if (is<InputMismatchException>(e)) {
+  } else if (is<const InputMismatchException *>(&e)) {
     reportInputMismatch(recognizer, (const InputMismatchException &)e);
-  } else if (is<FailedPredicateException>(e)) {
+  } else if (is<const FailedPredicateException *>(&e)) {
     reportFailedPredicate(recognizer, (const FailedPredicateException &)e);
-  } else if (is<RecognitionException>(e)) {
+  } else if (is<const RecognitionException *>(&e)) {
     recognizer->notifyErrorListeners(e.getOffendingToken(), e.what(), std::current_exception());
   }
 }
@@ -285,7 +285,7 @@ misc::IntervalSet DefaultErrorStrategy::getExpectedTokens(Parser *recognizer) {
   return recognizer->getExpectedTokens();
 }
 
-std::string DefaultErrorStrategy::getTokenErrorDisplay(Ref<Token> t) {
+std::string DefaultErrorStrategy::getTokenErrorDisplay(Ref<Token> const& t) {
   if (t == nullptr) {
     return "<no Token>";
   }
@@ -300,11 +300,11 @@ std::string DefaultErrorStrategy::getTokenErrorDisplay(Ref<Token> t) {
   return escapeWSAndQuote(s);
 }
 
-std::string DefaultErrorStrategy::getSymbolText(Ref<Token> symbol) {
+std::string DefaultErrorStrategy::getSymbolText(Ref<Token> const& symbol) {
   return symbol->getText();
 }
 
-int DefaultErrorStrategy::getSymbolType(Ref<Token> symbol) {
+int DefaultErrorStrategy::getSymbolType(Ref<Token> const& symbol) {
   return symbol->getType();
 }
 
