@@ -181,23 +181,16 @@ bool ATNConfigSet::operator == (const ATNConfigSet &other) {
     return true;
   }
 
-  bool configEquals = true;
-  if (configs.size() == other.configs.size()) {
-    for (size_t i = 0; i < configs.size(); i++) {
-      if (other.configs.size() < i) {
-        configEquals = false;
-        break;
-      }
-      if (configs[i] != other.configs[i]) {
-        configEquals = false;
-        break;
-      }
+  if (configs.size() != other.configs.size())
+    return false;
+
+  for (size_t i = 0; i < configs.size(); i++) {
+    if (configs[i] != other.configs[i]) {
+      return false;
     }
-  } else {
-    configEquals = false;
   }
 
-  bool same = configs.size() > 0 && configEquals && fullCtx == other.fullCtx && uniqueAlt == other.uniqueAlt &&
+  bool same = fullCtx == other.fullCtx && uniqueAlt == other.uniqueAlt &&
     conflictingAlts == other.conflictingAlts && hasSemanticContext == other.hasSemanticContext &&
     dipsIntoOuterContext == other.dipsIntoOuterContext; // includes stack context
 
@@ -205,15 +198,14 @@ bool ATNConfigSet::operator == (const ATNConfigSet &other) {
 }
 
 size_t ATNConfigSet::hashCode() {
-  if (isReadonly()) {
-    if (_cachedHashCode == 0) {
-      _cachedHashCode = std::hash<std::vector<Ref<ATNConfig>>>()(configs);
+  if (!isReadonly() || _cachedHashCode == 0) {
+    _cachedHashCode = 1;
+    for (auto &i : configs) {
+      _cachedHashCode = 31 * _cachedHashCode + i->hashCode(); // Same as Java's list hashCode impl.
     }
-
-    return _cachedHashCode;
   }
 
-  return std::hash<std::vector<Ref<ATNConfig>>>()(configs);
+  return _cachedHashCode;
 }
 
 size_t ATNConfigSet::size() {

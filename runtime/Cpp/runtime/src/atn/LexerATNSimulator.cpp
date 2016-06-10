@@ -596,11 +596,13 @@ dfa::DFAState *LexerATNSimulator::addDFAState(const Ref<ATNConfigSet> &configs) 
 
   {
     std::lock_guard<std::recursive_mutex> lck(mtx);
-    
-    auto iterator = dfa.states.find(proposed);
-    if (iterator != dfa.states.end()) {
-      delete proposed;
-      return iterator->second;
+
+    if (!dfa.states.empty()) {
+      auto iterator = dfa.states.find(proposed);
+      if (iterator != dfa.states.end()) {
+        delete proposed;
+        return iterator->second;
+      }
     }
 
     dfa::DFAState *newState = proposed;
