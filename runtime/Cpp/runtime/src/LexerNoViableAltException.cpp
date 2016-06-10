@@ -39,7 +39,7 @@
 using namespace antlr4;
 
 LexerNoViableAltException::LexerNoViableAltException(Lexer *lexer, CharStream *input, size_t startIndex,
-                                                     Ref<atn::ATNConfigSet> deadEndConfigs)
+                                                     atn::ATNConfigSet *deadEndConfigs)
   : RecognitionException(lexer, input, nullptr, nullptr), _startIndex(startIndex), _deadEndConfigs(deadEndConfigs) {
 }
 
@@ -47,7 +47,7 @@ size_t LexerNoViableAltException::getStartIndex() {
   return _startIndex;
 }
 
-Ref<atn::ATNConfigSet> LexerNoViableAltException::getDeadEndConfigs() {
+atn::ATNConfigSet* LexerNoViableAltException::getDeadEndConfigs() {
   return _deadEndConfigs;
 }
 

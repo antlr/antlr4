@@ -34,7 +34,7 @@
 using namespace antlr4;
 using namespace antlr4::atn;
 
-LookaheadEventInfo::LookaheadEventInfo(int decision, Ref<ATNConfigSet> const& configs, int predictedAlt,
+LookaheadEventInfo::LookaheadEventInfo(int decision, ATNConfigSet *configs, int predictedAlt,
   TokenStream *input, int startIndex, int stopIndex, bool fullCtx)
   : DecisionEventInfo(decision, configs, input, startIndex, stopIndex, fullCtx) {
     

@@ -58,21 +58,21 @@ void ProxyErrorListener::syntaxError(IRecognizer *recognizer, Ref<Token> const& 
 }
 
 void ProxyErrorListener::reportAmbiguity(Parser *recognizer, const dfa::DFA &dfa, size_t startIndex, size_t stopIndex,
-  bool exact, const antlrcpp::BitSet &ambigAlts, Ref<atn::ATNConfigSet> const& configs) {
+  bool exact, const antlrcpp::BitSet &ambigAlts, atn::ATNConfigSet *configs) {
   for (auto listener : _delegates) {
     listener->reportAmbiguity(recognizer, dfa, startIndex, stopIndex, exact, ambigAlts, configs);
   }
 }
 
 void ProxyErrorListener::reportAttemptingFullContext(Parser *recognizer, const dfa::DFA &dfa, size_t startIndex,
-  size_t stopIndex, const antlrcpp::BitSet &conflictingAlts, Ref<atn::ATNConfigSet> const& configs) {
+  size_t stopIndex, const antlrcpp::BitSet &conflictingAlts, atn::ATNConfigSet *configs) {
   for (auto listener : _delegates) {
     listener->reportAttemptingFullContext(recognizer, dfa, startIndex, stopIndex, conflictingAlts, configs);
   }
 }
 
 void ProxyErrorListener::reportContextSensitivity(Parser *recognizer, const dfa::DFA &dfa, size_t startIndex, size_t stopIndex,
-  int prediction, Ref<atn::ATNConfigSet> const& configs) {
+  int prediction, atn::ATNConfigSet *configs) {
   for (auto listener : _delegates) {
     listener->reportContextSensitivity(recognizer, dfa, startIndex, stopIndex, prediction, configs);
   }

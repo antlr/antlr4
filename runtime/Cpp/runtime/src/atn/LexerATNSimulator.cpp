@@ -132,32 +132,21 @@ int LexerATNSimulator::matchATN(CharStream *input) {
     std::cout << "matchATN mode" << _mode << " start: " << startState << std::endl;
   }
 
-  size_t old_mode = _mode;
-
-  Ref<ATNConfigSet> s0_closure = computeStartState(input, startState);
+  std::unique_ptr<ATNConfigSet> s0_closure = computeStartState(input, startState);
   bool suppressEdge = s0_closure->hasSemanticContext;
   s0_closure->hasSemanticContext = false;
 
-  dfa::DFAState *next = addDFAState(s0_closure);
+  dfa::DFAState *next = addDFAState(s0_closure.release());
   if (!suppressEdge) {
     _decisionToDFA[_mode].s0 = next;
   }
 
   int predict = execATN(input, next);
 
-  if (debug) {
-    std::cout << "DFA after matchATN: " << _decisionToDFA[old_mode].toLexerString() << std::endl;
-  }
-
   return predict;
 }
 
 int LexerATNSimulator::execATN(CharStream *input, dfa::DFAState *ds0) {
-  //System.out.println("enter exec index "+input.index()+" from "+ds0.configs);
-  if (debug) {
-    std::cout << "start state closure=" << ds0->configs << std::endl;
-  }
-
   if (ds0->isAcceptState) {
     // allow zero-length tokens
     // ml: in Java code this method uses 3 params. The first is a member var of the class anyway (_prevAccept), so why pass it here?
@@ -168,10 +157,6 @@ int LexerATNSimulator::execATN(CharStream *input, dfa::DFAState *ds0) {
   dfa::DFAState *s = ds0; // s is current/from DFA state
 
   while (true) { // while more work
-    if (debug) {
-      std::cout << "execATN loop starting closure: " << s->configs << std::endl;
-    }
-
     // As we move src->trg, src->trg, we keep track of the previous trg to
     // avoid looking up the DFA state again, which is expensive.
     // If the previous target was already part of the DFA, we might
@@ -217,7 +202,7 @@ int LexerATNSimulator::execATN(CharStream *input, dfa::DFAState *ds0) {
     s = target; // flip; current DFA target becomes new src/from state
   }
 
-  return failOrAccept(input, s->configs, t);
+  return failOrAccept(input, s->configs.get(), t);
 }
 
 dfa::DFAState *LexerATNSimulator::getExistingTargetState(dfa::DFAState *s, ssize_t t) {
@@ -234,16 +219,17 @@ dfa::DFAState *LexerATNSimulator::getExistingTargetState(dfa::DFAState *s, ssize
 }
 
 dfa::DFAState *LexerATNSimulator::computeTargetState(CharStream *input, dfa::DFAState *s, ssize_t t) {
-  Ref<OrderedATNConfigSet> reach = std::make_shared<OrderedATNConfigSet>();
+  OrderedATNConfigSet *reach = new OrderedATNConfigSet(); /* mem-check: deleted on error or managed by new DFA state. */
 
   // if we don't find an existing DFA state
   // Fill reach starting from closure, following t transitions
-  getReachableConfigSet(input, s->configs, reach, t);
+  getReachableConfigSet(input, s->configs.get(), reach, t);
 
   if (reach->isEmpty()) { // we got nowhere on t from s
     if (!reach->hasSemanticContext) {
       // we got nowhere on t, don't throw out this knowledge; it'd
       // cause a failover from DFA later.
+      delete reach;
       addDFAEdge(s, t, ERROR.get());
     }
 
@@ -255,7 +241,7 @@ dfa::DFAState *LexerATNSimulator::computeTargetState(CharStream *input, dfa::DFA
   return addDFAEdge(s, t, reach);
 }
 
-int LexerATNSimulator::failOrAccept(CharStream *input, const Ref<ATNConfigSet> &reach, ssize_t t) {
+int LexerATNSimulator::failOrAccept(CharStream *input, ATNConfigSet *reach, ssize_t t) {
   if (_prevAccept.dfaState != nullptr) {
     Ref<LexerActionExecutor> lexerActionExecutor = _prevAccept.dfaState->lexerActionExecutor;
     accept(input, lexerActionExecutor, _startIndex, (size_t)_prevAccept.index, _prevAccept.line, (size_t)_prevAccept.charPos);
@@ -270,8 +256,7 @@ int LexerATNSimulator::failOrAccept(CharStream *input, const Ref<ATNConfigSet> &
   }
 }
 
-void LexerATNSimulator::getReachableConfigSet(CharStream *input, const Ref<ATNConfigSet> &closure_,
-                                              const Ref<ATNConfigSet> &reach, ssize_t t) {
+void LexerATNSimulator::getReachableConfigSet(CharStream *input, ATNConfigSet *closure_, ATNConfigSet *reach, ssize_t t) {
   // this is used to skip processing for configs which have a lower priority
   // than a config that already reached an accept state for the same rule
   int skipAlt = ATN::INVALID_ALT_NUMBER;
@@ -336,18 +321,18 @@ atn::ATNState *LexerATNSimulator::getReachableTarget(Transition *trans, ssize_t 
   return nullptr;
 }
 
-Ref<ATNConfigSet> LexerATNSimulator::computeStartState(CharStream *input, ATNState *p) {
+std::unique_ptr<ATNConfigSet> LexerATNSimulator::computeStartState(CharStream *input, ATNState *p) {
   Ref<PredictionContext> initialContext  = PredictionContext::EMPTY; // ml: the purpose of this assignment is unclear
-  Ref<ATNConfigSet> configs = std::make_shared<OrderedATNConfigSet>();
+  std::unique_ptr<ATNConfigSet> configs(new OrderedATNConfigSet());
   for (size_t i = 0; i < p->getNumberOfTransitions(); i++) {
     ATNState *target = p->transition(i)->target;
     Ref<LexerATNConfig> c = std::make_shared<LexerATNConfig>(target, (int)(i + 1), initialContext);
-    closure(input, c, configs, false, false, false);
+    closure(input, c, configs.get(), false, false, false);
   }
   return configs;
 }
 
-bool LexerATNSimulator::closure(CharStream *input, const Ref<LexerATNConfig> &config, const Ref<ATNConfigSet> & configs,
+bool LexerATNSimulator::closure(CharStream *input, const Ref<LexerATNConfig> &config, ATNConfigSet *configs,
                                 bool currentAltReachedAcceptState, bool speculative, bool treatEofAsEpsilon) {
   if (debug) {
     std::cout << "closure(" << config->toString(true) << ")" << std::endl;
@@ -406,7 +391,7 @@ bool LexerATNSimulator::closure(CharStream *input, const Ref<LexerATNConfig> &co
 }
 
 Ref<LexerATNConfig> LexerATNSimulator::getEpsilonTarget(CharStream *input, const Ref<LexerATNConfig> &config, Transition *t,
-  const Ref<ATNConfigSet> &configs, bool speculative, bool treatEofAsEpsilon) {
+  ATNConfigSet *configs, bool speculative, bool treatEofAsEpsilon) {
   
   Ref<LexerATNConfig> c = nullptr;
   switch (t->getSerializationType()) {
@@ -528,7 +513,7 @@ void LexerATNSimulator::captureSimState(CharStream *input, dfa::DFAState *dfaSta
   _prevAccept.dfaState = dfaState;
 }
 
-dfa::DFAState *LexerATNSimulator::addDFAEdge(dfa::DFAState *from, ssize_t t, const Ref<ATNConfigSet> &q) {
+dfa::DFAState *LexerATNSimulator::addDFAEdge(dfa::DFAState *from, ssize_t t, ATNConfigSet *q) {
   /* leading to this call, ATNConfigSet.hasSemanticContext is used as a
    * marker indicating dynamic predicate evaluation makes this edge
    * dependent on the specific input sequence, so the static edge in the
@@ -559,10 +544,6 @@ void LexerATNSimulator::addDFAEdge(dfa::DFAState *p, ssize_t t, dfa::DFAState *q
     return;
   }
 
-  if (debug) {
-    std::cerr << std::string("EDGE ") << p << std::string(" -> ") << q << std::string(" upon ") << (static_cast<char>(t)) << std::endl;
-  }
-
   std::lock_guard<std::recursive_mutex> lck(mtx);
   if (p->edges.empty()) {
     //  make room for tokens 1..n and -1 masquerading as index 0
@@ -571,13 +552,13 @@ void LexerATNSimulator::addDFAEdge(dfa::DFAState *p, ssize_t t, dfa::DFAState *q
   p->edges[(size_t)(t - MIN_DFA_EDGE)] = q; // connect
 }
 
-dfa::DFAState *LexerATNSimulator::addDFAState(const Ref<ATNConfigSet> &configs) {
+dfa::DFAState *LexerATNSimulator::addDFAState(ATNConfigSet *configs) {
   /* the lexer evaluates predicates on-the-fly; by this point configs
    * should not contain any configurations with unevaluated predicates.
    */
   assert(!configs->hasSemanticContext);
 
-  dfa::DFAState *proposed = new dfa::DFAState(configs); /* mem-check: managed by the DFA or deleted below */
+  dfa::DFAState *proposed = new dfa::DFAState(std::unique_ptr<ATNConfigSet>(configs)); /* mem-check: managed by the DFA or deleted below */
   Ref<ATNConfig> firstConfigWithRuleStopState = nullptr;
   for (auto &c : configs->configs) {
     if (is<RuleStopState *>(c->state)) {
@@ -605,13 +586,10 @@ dfa::DFAState *LexerATNSimulator::addDFAState(const Ref<ATNConfigSet> &configs) 
       }
     }
 
-    dfa::DFAState *newState = proposed;
-
-    newState->stateNumber = (int)dfa.states.size();
-    configs->setReadonly(true);
-    newState->configs = configs;
-    dfa.states[newState] = newState;
-    return newState;
+    proposed->stateNumber = (int)dfa.states.size();
+    proposed->configs->setReadonly(true);
+    dfa.states[proposed] = proposed;
+    return proposed;
   }
 }
 

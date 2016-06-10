@@ -52,7 +52,7 @@ DFA::DFA(atn::DecisionState *atnStartState, int decision)
     if (static_cast<atn::StarLoopEntryState *>(atnStartState)->isPrecedenceDecision) {
       _precedenceDfa = true;
       // ml: this state should probably be added to the states list to be freed on destruction.
-      DFAState *precedenceState = new DFAState(std::make_shared<atn::ATNConfigSet>()); // TODO: mem leak
+      DFAState *precedenceState = new DFAState(std::unique_ptr<atn::ATNConfigSet>(new atn::ATNConfigSet())); // TODO: mem leak
       precedenceState->isAcceptState = false;
       precedenceState->requiresFullContext = false;
       s0 = precedenceState;

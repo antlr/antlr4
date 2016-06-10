@@ -60,8 +60,8 @@ DFAState::DFAState(int state) : DFAState() {
   stateNumber = state;
 }
 
-DFAState::DFAState(const Ref<ATNConfigSet> &configs) : DFAState() {
-  this->configs = configs;
+DFAState::DFAState(std::unique_ptr<ATNConfigSet> configs_) : DFAState() {
+  configs = std::move(configs_);
 }
 
 DFAState::~DFAState() {

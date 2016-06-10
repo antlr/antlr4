@@ -947,7 +947,7 @@
 		276E5C401CDB57AA003FF4B4 /* EmptyPredictionContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EmptyPredictionContext.h; sourceTree = "<group>"; };
 		276E5C411CDB57AA003FF4B4 /* EpsilonTransition.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EpsilonTransition.cpp; sourceTree = "<group>"; };
 		276E5C421CDB57AA003FF4B4 /* EpsilonTransition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EpsilonTransition.h; sourceTree = "<group>"; };
-		276E5C431CDB57AA003FF4B4 /* ErrorInfo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ErrorInfo.cpp; sourceTree = "<group>"; };
+		276E5C431CDB57AA003FF4B4 /* ErrorInfo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ErrorInfo.cpp; sourceTree = "<group>"; wrapsLines = 0; };
 		276E5C441CDB57AA003FF4B4 /* ErrorInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ErrorInfo.h; sourceTree = "<group>"; wrapsLines = 0; };
 		276E5C451CDB57AA003FF4B4 /* LexerAction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LexerAction.h; sourceTree = "<group>"; };
 		276E5C461CDB57AA003FF4B4 /* LexerActionExecutor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LexerActionExecutor.cpp; sourceTree = "<group>"; wrapsLines = 0; };
@@ -956,7 +956,7 @@
 		276E5C4A1CDB57AA003FF4B4 /* LexerATNConfig.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LexerATNConfig.cpp; sourceTree = "<group>"; wrapsLines = 0; };
 		276E5C4B1CDB57AA003FF4B4 /* LexerATNConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LexerATNConfig.h; sourceTree = "<group>"; wrapsLines = 0; };
 		276E5C4C1CDB57AA003FF4B4 /* LexerATNSimulator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LexerATNSimulator.cpp; sourceTree = "<group>"; wrapsLines = 0; };
-		276E5C4D1CDB57AA003FF4B4 /* LexerATNSimulator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LexerATNSimulator.h; sourceTree = "<group>"; };
+		276E5C4D1CDB57AA003FF4B4 /* LexerATNSimulator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LexerATNSimulator.h; sourceTree = "<group>"; wrapsLines = 0; };
 		276E5C4E1CDB57AA003FF4B4 /* LexerChannelAction.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LexerChannelAction.cpp; sourceTree = "<group>"; };
 		276E5C4F1CDB57AA003FF4B4 /* LexerChannelAction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LexerChannelAction.h; sourceTree = "<group>"; };
 		276E5C501CDB57AA003FF4B4 /* LexerCustomAction.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LexerCustomAction.cpp; sourceTree = "<group>"; };
@@ -1049,7 +1049,7 @@
 		276E5CA81CDB57AA003FF4B4 /* ConsoleErrorListener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ConsoleErrorListener.h; sourceTree = "<group>"; wrapsLines = 0; };
 		276E5CA91CDB57AA003FF4B4 /* DefaultErrorStrategy.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DefaultErrorStrategy.cpp; sourceTree = "<group>"; };
 		276E5CAA1CDB57AA003FF4B4 /* DefaultErrorStrategy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DefaultErrorStrategy.h; sourceTree = "<group>"; };
-		276E5CAC1CDB57AA003FF4B4 /* DFA.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DFA.cpp; sourceTree = "<group>"; };
+		276E5CAC1CDB57AA003FF4B4 /* DFA.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DFA.cpp; sourceTree = "<group>"; wrapsLines = 0; };
 		276E5CAD1CDB57AA003FF4B4 /* DFA.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFA.h; sourceTree = "<group>"; wrapsLines = 0; };
 		276E5CAE1CDB57AA003FF4B4 /* DFASerializer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DFASerializer.cpp; sourceTree = "<group>"; wrapsLines = 0; };
 		276E5CAF1CDB57AA003FF4B4 /* DFASerializer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFASerializer.h; sourceTree = "<group>"; };
@@ -1058,7 +1058,7 @@
 		276E5CB21CDB57AA003FF4B4 /* LexerDFASerializer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LexerDFASerializer.cpp; sourceTree = "<group>"; };
 		276E5CB31CDB57AA003FF4B4 /* LexerDFASerializer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LexerDFASerializer.h; sourceTree = "<group>"; };
 		276E5CB41CDB57AA003FF4B4 /* DiagnosticErrorListener.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DiagnosticErrorListener.cpp; sourceTree = "<group>"; wrapsLines = 0; };
-		276E5CB51CDB57AA003FF4B4 /* DiagnosticErrorListener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DiagnosticErrorListener.h; sourceTree = "<group>"; };
+		276E5CB51CDB57AA003FF4B4 /* DiagnosticErrorListener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DiagnosticErrorListener.h; sourceTree = "<group>"; wrapsLines = 0; };
 		276E5CB61CDB57AA003FF4B4 /* Exceptions.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Exceptions.cpp; sourceTree = "<group>"; wrapsLines = 0; };
 		276E5CB71CDB57AA003FF4B4 /* Exceptions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Exceptions.h; sourceTree = "<group>"; };
 		276E5CB81CDB57AA003FF4B4 /* FailedPredicateException.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FailedPredicateException.cpp; sourceTree = "<group>"; };

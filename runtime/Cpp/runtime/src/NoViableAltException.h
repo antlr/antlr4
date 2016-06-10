@@ -45,14 +45,14 @@ namespace antlr4 {
   public:
     NoViableAltException(Parser *recognizer); // LL(1) error
     NoViableAltException(Parser *recognizer, TokenStream *input, Ref<Token> const& startToken,
-      Ref<Token> const& offendingToken, Ref<atn::ATNConfigSet> const& deadEndConfigs, Ref<ParserRuleContext> const& ctx);
+      Ref<Token> const& offendingToken, atn::ATNConfigSet *deadEndConfigs, Ref<ParserRuleContext> const& ctx);
 
     virtual Ref<Token> getStartToken() const;
-    virtual Ref<atn::ATNConfigSet> getDeadEndConfigs() const;
+    virtual atn::ATNConfigSet* getDeadEndConfigs() const;
 
   private:
     /// Which configurations did we try at input.index() that couldn't match input.LT(1)?
-    Ref<atn::ATNConfigSet> _deadEndConfigs;
+    atn::ATNConfigSet* _deadEndConfigs;
 
     /// The token object at the start index; the input stream might
     /// not be buffering tokens so get a reference to it. (At the

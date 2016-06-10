@@ -38,6 +38,6 @@ using namespace antlr4::atn;
 
 PredicateEvalInfo::PredicateEvalInfo(int decision, TokenStream *input, int startIndex, int stopIndex,
   Ref<SemanticContext> const& semctx, bool evalResult, int predictedAlt, bool fullCtx)
-  : DecisionEventInfo(decision, Ref<ATNConfigSet>(), input, startIndex, stopIndex, fullCtx),
+  : DecisionEventInfo(decision, nullptr, input, startIndex, stopIndex, fullCtx),
     semctx(semctx), predictedAlt(predictedAlt), evalResult(evalResult) {
 }

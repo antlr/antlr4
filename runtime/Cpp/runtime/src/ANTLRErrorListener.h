@@ -120,7 +120,7 @@ namespace antlr4 {
      * identified
      */
     virtual void reportAmbiguity(Parser *recognizer, const dfa::DFA &dfa, size_t startIndex, size_t stopIndex, bool exact,
-      const antlrcpp::BitSet &ambigAlts, Ref<atn::ATNConfigSet> const& configs) = 0;
+      const antlrcpp::BitSet &ambigAlts, atn::ATNConfigSet *configs) = 0;
 
     /**
      * This method is called when an SLL conflict occurs and the parser is about
@@ -146,7 +146,7 @@ namespace antlr4 {
      * detected
      */
     virtual void reportAttemptingFullContext(Parser *recognizer, const dfa::DFA &dfa, size_t startIndex, size_t stopIndex,
-      const antlrcpp::BitSet &conflictingAlts, Ref<atn::ATNConfigSet> const& configs) = 0;
+      const antlrcpp::BitSet &conflictingAlts, atn::ATNConfigSet *configs) = 0;
 
     /**
      * This method is called by the parser when a full-context prediction has a
@@ -187,7 +187,7 @@ namespace antlr4 {
      * was determined
      */
     virtual void reportContextSensitivity(Parser *recognizer, const dfa::DFA &dfa, size_t startIndex, size_t stopIndex,
-      int prediction, Ref<atn::ATNConfigSet> const& configs) = 0;
+      int prediction, atn::ATNConfigSet *configs) = 0;
   };
 
 } // namespace antlr4

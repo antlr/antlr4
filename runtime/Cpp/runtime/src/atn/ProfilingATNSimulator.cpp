@@ -98,7 +98,7 @@ DFAState* ProfilingATNSimulator::getExistingTargetState(DFAState *previousD, ssi
     _decisions[_currentDecision].SLL_DFATransitions++; // count only if we transition over a DFA state
     if (existingTargetState == ERROR.get()) {
       _decisions[_currentDecision].errors.push_back(
-        ErrorInfo(_currentDecision, previousD->configs, _input, _startIndex, _sllStopIndex, false)
+        ErrorInfo(_currentDecision, previousD->configs.get(), _input, _startIndex, _sllStopIndex, false)
       );
     }
   }
@@ -113,14 +113,14 @@ DFAState* ProfilingATNSimulator::computeTargetState(DFA &dfa, DFAState *previous
   return state;
 }
 
-Ref<ATNConfigSet> ProfilingATNSimulator::computeReachSet(Ref<ATNConfigSet> const& closure, ssize_t t, bool fullCtx) {
+std::unique_ptr<ATNConfigSet> ProfilingATNSimulator::computeReachSet(ATNConfigSet *closure, ssize_t t, bool fullCtx) {
   if (fullCtx) {
     // this method is called after each time the input position advances
     // during full context prediction
     _llStopIndex = (int)_input->index();
   }
 
-  Ref<ATNConfigSet> reachConfigs = ParserATNSimulator::computeReachSet(closure, t, fullCtx);
+  std::unique_ptr<ATNConfigSet> reachConfigs = ParserATNSimulator::computeReachSet(closure, t, fullCtx);
   if (fullCtx) {
     _decisions[_currentDecision].LL_ATNTransitions++; // count computation even if error
     if (reachConfigs != nullptr) {
@@ -151,7 +151,7 @@ bool ProfilingATNSimulator::evalSemanticContext(Ref<SemanticContext> const& pred
   return result;
 }
 
-void ProfilingATNSimulator::reportAttemptingFullContext(DFA &dfa, const BitSet &conflictingAlts, Ref<ATNConfigSet> const& configs,
+void ProfilingATNSimulator::reportAttemptingFullContext(DFA &dfa, const BitSet &conflictingAlts, ATNConfigSet *configs,
                                                         size_t startIndex, size_t stopIndex) {
   if (conflictingAlts.count() > 0) {
     conflictingAltResolvedBySLL = conflictingAlts.nextSetBit(0);
@@ -162,7 +162,7 @@ void ProfilingATNSimulator::reportAttemptingFullContext(DFA &dfa, const BitSet &
   ParserATNSimulator::reportAttemptingFullContext(dfa, conflictingAlts, configs, startIndex, stopIndex);
 }
 
-void ProfilingATNSimulator::reportContextSensitivity(DFA &dfa, int prediction, Ref<ATNConfigSet> const& configs,
+void ProfilingATNSimulator::reportContextSensitivity(DFA &dfa, int prediction, ATNConfigSet *configs,
                                                      size_t startIndex, size_t stopIndex) {
   if (prediction != conflictingAltResolvedBySLL) {
     _decisions[_currentDecision].contextSensitivities.push_back(
@@ -173,7 +173,7 @@ void ProfilingATNSimulator::reportContextSensitivity(DFA &dfa, int prediction, R
 }
 
 void ProfilingATNSimulator::reportAmbiguity(DFA &dfa, DFAState *D, size_t startIndex, size_t stopIndex, bool exact,
-                                            const BitSet &ambigAlts, Ref<ATNConfigSet> const& configs) {
+                                            const BitSet &ambigAlts, ATNConfigSet *configs) {
   int prediction;
   if (ambigAlts.count() > 0) {
     prediction = ambigAlts.nextSetBit(0);

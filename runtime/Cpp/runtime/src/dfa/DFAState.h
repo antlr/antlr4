@@ -79,7 +79,7 @@ namespace dfa {
 
     int stateNumber;
 
-    Ref<atn::ATNConfigSet> configs;
+    std::unique_ptr<atn::ATNConfigSet> configs;
 
     /// <summary>
     /// {@code edges[symbol]} points to target of symbol. Shift up by 1 so (-1)
@@ -124,7 +124,7 @@ namespace dfa {
     /// Map a predicate to a predicted alternative.
     DFAState();
     DFAState(int state);
-    DFAState(const Ref<atn::ATNConfigSet> &configs);
+    DFAState(std::unique_ptr<atn::ATNConfigSet> configs);
     virtual ~DFAState();
 
     /// <summary>

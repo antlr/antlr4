@@ -50,13 +50,13 @@ namespace antlr4 {
       const std::string &msg, std::exception_ptr e) override;
 
     virtual void reportAmbiguity(Parser *recognizer, const dfa::DFA &dfa, size_t startIndex, size_t stopIndex, bool exact,
-      const antlrcpp::BitSet &ambigAlts, Ref<atn::ATNConfigSet> const& configs) override;
+      const antlrcpp::BitSet &ambigAlts, atn::ATNConfigSet *configs) override;
 
     virtual void reportAttemptingFullContext(Parser *recognizer, const dfa::DFA &dfa, size_t startIndex, size_t stopIndex,
-      const antlrcpp::BitSet &conflictingAlts, Ref<atn::ATNConfigSet> const& configs) override;
+      const antlrcpp::BitSet &conflictingAlts, atn::ATNConfigSet *configs) override;
 
     virtual void reportContextSensitivity(Parser *recognizer, const dfa::DFA &dfa, size_t startIndex, size_t stopIndex,
-      int prediction, Ref<atn::ATNConfigSet> const& configs) override;
+      int prediction, atn::ATNConfigSet *configs) override;
   };
 
 } // namespace antlr4

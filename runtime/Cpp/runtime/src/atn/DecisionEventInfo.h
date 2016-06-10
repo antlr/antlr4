@@ -64,7 +64,7 @@ namespace atn {
     /// prediction state when the current event occurred, or {@code null} if no
     /// additional information is relevant or available.
     /// </summary>
-    const Ref<ATNConfigSet> configs;
+    const ATNConfigSet *configs;
 
     /// <summary>
     /// The input token stream which is being parsed.
@@ -88,7 +88,7 @@ namespace atn {
     /// </summary>
     const bool fullCtx;
 
-    DecisionEventInfo(int decision, Ref<ATNConfigSet> const& configs, TokenStream *input, size_t startIndex,
+    DecisionEventInfo(int decision, ATNConfigSet *configs, TokenStream *input, size_t startIndex,
                       size_t stopIndex, bool fullCtx);
   };
 

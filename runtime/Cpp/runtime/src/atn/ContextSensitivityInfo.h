@@ -66,7 +66,7 @@ namespace atn {
     /// <param name="startIndex"> The start index for the current prediction </param>
     /// <param name="stopIndex"> The index at which the context sensitivity was
     /// identified during full-context prediction </param>
-    ContextSensitivityInfo(int decision, Ref<ATNConfigSet> const& configs, TokenStream *input, size_t startIndex, size_t stopIndex);
+    ContextSensitivityInfo(int decision, ATNConfigSet *configs, TokenStream *input, size_t startIndex, size_t stopIndex);
   };
 
 } // namespace atn

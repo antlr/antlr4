@@ -382,10 +382,10 @@ namespace atn {
     virtual void predicateDFAState(dfa::DFAState *dfaState, DecisionState *decisionState);
 
     // comes back with reach.uniqueAlt set to a valid alt
-    virtual int execATNWithFullContext(dfa::DFA &dfa, dfa::DFAState *D, Ref<ATNConfigSet> const& s0,
+    virtual int execATNWithFullContext(dfa::DFA &dfa, dfa::DFAState *D, ATNConfigSet *s0,
       TokenStream *input, size_t startIndex, Ref<ParserRuleContext> const& outerContext); // how far we got before failing over
 
-    virtual Ref<ATNConfigSet> computeReachSet(Ref<ATNConfigSet> const& closure, ssize_t t, bool fullCtx);
+    virtual std::unique_ptr<ATNConfigSet> computeReachSet(ATNConfigSet *closure, ssize_t t, bool fullCtx);
 
     /// <summary>
     /// Return a configuration set containing only the configurations from
@@ -406,9 +406,9 @@ namespace atn {
     /// <returns> {@code configs} if all configurations in {@code configs} are in a
     /// rule stop state, otherwise return a new configuration set containing only
     /// the configurations from {@code configs} which are in a rule stop state </returns>
-    virtual Ref<ATNConfigSet> removeAllConfigsNotInRuleStopState(Ref<ATNConfigSet> const& configs, bool lookToEndOfRule);
+    virtual ATNConfigSet* removeAllConfigsNotInRuleStopState(ATNConfigSet *configs, bool lookToEndOfRule);
 
-    virtual Ref<ATNConfigSet> computeStartState(ATNState *p, Ref<RuleContext> const& ctx, bool fullCtx);
+    virtual std::unique_ptr<ATNConfigSet> computeStartState(ATNState *p, Ref<RuleContext> const& ctx, bool fullCtx);
 
     /* parrt internal source braindump that doesn't mess up
      * external API spec.
@@ -577,12 +577,12 @@ namespace atn {
      * for a precedence DFA at a particular precedence level (determined by
      * calling {@link Parser#getPrecedence}).
      */
-    Ref<ATNConfigSet> applyPrecedenceFilter(Ref<ATNConfigSet> const& configs);
+    std::unique_ptr<ATNConfigSet> applyPrecedenceFilter(ATNConfigSet *configs);
     
     virtual ATNState *getReachableTarget(Transition *trans, int ttype);
 
     virtual std::vector<Ref<SemanticContext>> getPredsForAmbigAlts(const antlrcpp::BitSet &ambigAlts,
-      Ref<ATNConfigSet> configs, size_t nalts);
+      ATNConfigSet *configs, size_t nalts);
 
     virtual std::vector<dfa::DFAState::PredPrediction*> getPredicatePredictions(const antlrcpp::BitSet &ambigAlts,
       std::vector<Ref<SemanticContext>> altToPred);
@@ -633,10 +633,10 @@ namespace atn {
      * {@link ATN#INVALID_ALT_NUMBER} if a suitable alternative was not
      * identified and {@link #adaptivePredict} should report an error instead.
      */
-    int getSynValidOrSemInvalidAltThatFinishedDecisionEntryRule(Ref<ATNConfigSet> const& configs,
+    int getSynValidOrSemInvalidAltThatFinishedDecisionEntryRule(ATNConfigSet *configs,
                                                                 Ref<ParserRuleContext> const& outerContext);
 
-    virtual int getAltThatFinishedDecisionEntryRule(Ref<ATNConfigSet> const& configs);
+    virtual int getAltThatFinishedDecisionEntryRule(ATNConfigSet *configs);
 
     /** Walk the list of configurations and split them according to
      *  those that have preds evaluating to true/false.  If no pred, assume
@@ -647,7 +647,7 @@ namespace atn {
      *  Assumption: the input stream has been restored to the starting point
      *  prediction, which is where predicates need to evaluate.
      */
-    std::pair<Ref<ATNConfigSet>, Ref<ATNConfigSet>> splitAccordingToSemanticValidity(Ref<ATNConfigSet> const& configs,
+    std::pair<ATNConfigSet *, ATNConfigSet *> splitAccordingToSemanticValidity(ATNConfigSet *configs,
       Ref<ParserRuleContext> const& outerContext);
 
     /// <summary>
@@ -700,14 +700,14 @@ namespace atn {
      waste to pursue the closure. Might have to advance when we do
      ambig detection thought :(
      */
-    virtual void closure(Ref<ATNConfig> const& config, Ref<ATNConfigSet> const& configs, ATNConfig::Set &closureBusy,
+    virtual void closure(Ref<ATNConfig> const& config, ATNConfigSet *configs, ATNConfig::Set &closureBusy,
                          bool collectPredicates, bool fullCtx, bool treatEofAsEpsilon);
 
-    virtual void closureCheckingStopState(Ref<ATNConfig> const& config, Ref<ATNConfigSet> const& configs, ATNConfig::Set &closureBusy,
+    virtual void closureCheckingStopState(Ref<ATNConfig> const& config, ATNConfigSet *configs, ATNConfig::Set &closureBusy,
                                           bool collectPredicates, bool fullCtx, int depth, bool treatEofAsEpsilon);
 
     /// Do the actual work of walking epsilon edges.
-    virtual void closure_(Ref<ATNConfig> const& config, Ref<ATNConfigSet> const& configs, ATNConfig::Set &closureBusy,
+    virtual void closure_(Ref<ATNConfig> const& config, ATNConfigSet *configs, ATNConfig::Set &closureBusy,
                           bool collectPredicates, bool fullCtx, int depth, bool treatEofAsEpsilon);
 
   public:
@@ -737,7 +737,7 @@ namespace atn {
      * conflicting alternative subsets. If {@code configs} does not contain any
      * conflicting subsets, this method returns an empty {@link BitSet}.
      */
-    virtual antlrcpp::BitSet getConflictingAlts(Ref<ATNConfigSet> const& configs);
+    virtual antlrcpp::BitSet getConflictingAlts(ATNConfigSet *configs);
 
     /// <summary>
     /// Sam pointed out a problem with the previous definition, v3, of
@@ -776,7 +776,7 @@ namespace atn {
     /// that we still need to pursue.
     /// </summary>
 
-    virtual antlrcpp::BitSet getConflictingAltsOrUniqueAlt(Ref<ATNConfigSet> const& configs);
+    virtual antlrcpp::BitSet getConflictingAltsOrUniqueAlt(ATNConfigSet *configs);
 
   public:
     virtual std::string getTokenName(ssize_t t);
@@ -792,9 +792,9 @@ namespace atn {
 
   protected:
     virtual NoViableAltException noViableAlt(TokenStream *input, Ref<ParserRuleContext> const& outerContext,
-                                              Ref<ATNConfigSet> const& configs, size_t startIndex);
+                                              ATNConfigSet *configs, size_t startIndex);
 
-    static int getUniqueAlt(Ref<ATNConfigSet> const& configs);
+    static int getUniqueAlt(ATNConfigSet *configs);
 
     /// <summary>
     /// Add an edge to the DFA, if possible. This method calls
@@ -834,9 +834,9 @@ namespace atn {
     virtual dfa::DFAState *addDFAState(dfa::DFA &dfa, dfa::DFAState *D);
 
     virtual void reportAttemptingFullContext(dfa::DFA &dfa, const antlrcpp::BitSet &conflictingAlts,
-      Ref<ATNConfigSet> const& configs, size_t startIndex, size_t stopIndex);
+      ATNConfigSet *configs, size_t startIndex, size_t stopIndex);
 
-    virtual void reportContextSensitivity(dfa::DFA &dfa, int prediction, Ref<ATNConfigSet> const& configs,
+    virtual void reportContextSensitivity(dfa::DFA &dfa, int prediction, ATNConfigSet *configs,
                                           size_t startIndex, size_t stopIndex);
 
     /// If context sensitive parsing, we know it's ambiguity not conflict.
@@ -845,7 +845,7 @@ namespace atn {
                                  size_t startIndex, size_t stopIndex,
                                  bool exact,
                                  const antlrcpp::BitSet &ambigAlts,
-                                 Ref<ATNConfigSet> const& configs); // configs that LL not SLL considered conflicting
+                                 ATNConfigSet *configs); // configs that LL not SLL considered conflicting
 
   public:
     void setPredictionMode(PredictionMode mode);

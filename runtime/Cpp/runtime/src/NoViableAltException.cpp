@@ -41,7 +41,7 @@ NoViableAltException::NoViableAltException(Parser *recognizer)
 }
 
 NoViableAltException::NoViableAltException(Parser *recognizer, TokenStream *input, Ref<Token> const& startToken,
-  Ref<Token> const& offendingToken, Ref<atn::ATNConfigSet> const& deadEndConfigs, Ref<ParserRuleContext> const& ctx)
+  Ref<Token> const& offendingToken, atn::ATNConfigSet *deadEndConfigs, Ref<ParserRuleContext> const& ctx)
   : RecognitionException("No viable alternative", recognizer, input, ctx, offendingToken), _deadEndConfigs(deadEndConfigs), _startToken(startToken) {
 }
 
@@ -49,6 +49,6 @@ Ref<Token> NoViableAltException::getStartToken() const {
   return _startToken;
 }
 
-Ref<atn::ATNConfigSet> NoViableAltException::getDeadEndConfigs() const {
+atn::ATNConfigSet* NoViableAltException::getDeadEndConfigs() const {
   return _deadEndConfigs;
 }

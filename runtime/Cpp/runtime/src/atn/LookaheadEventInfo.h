@@ -60,7 +60,7 @@ namespace atn {
     /// <param name="fullCtx"> {@code true} if the current lookahead is part of an LL
     /// prediction; otherwise, {@code false} if the current lookahead is part of
     /// an SLL prediction </param>
-    LookaheadEventInfo(int decision, Ref<ATNConfigSet> const& configs, int predictedAlt, TokenStream *input, int startIndex,
+    LookaheadEventInfo(int decision, ATNConfigSet *configs, int predictedAlt, TokenStream *input, int startIndex,
                        int stopIndex, bool fullCtx);
   };
 
