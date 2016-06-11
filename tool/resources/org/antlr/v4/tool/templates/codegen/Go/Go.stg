@@ -139,7 +139,8 @@ type Base<file.grammarName>Visitor struct {
 <file.visitorNames:{lname |
 func (v *Base<file.grammarName>Visitor) Visit<lname; format="cap">(ctx *<lname; format="cap">Context) interface{\} {
 	return v.VisitChildren(ctx)
-\}}; separator="\n">
+\}}; separator="\n\n">
+
 >>
 
 Parser(parser, funcs, atn, sempredFuncs, superClass) ::= <<
@@ -167,12 +168,12 @@ var literalNames []string
 <endif>
 
 
-<if(parser.literalNames)>
+<if(parser.symbolicNames)>
 var symbolicNames = []string{
 	<parser.symbolicNames; null="\"\"", separator=", ", wrap>,
 }
 <else>
-var literalNames []string
+var symbolicNames []string
 <endif>
 
 
@@ -181,7 +182,7 @@ var ruleNames = []string{
 	<parser.ruleNames:{r | "<r>"}; separator=", ", wrap>,
 }
 <else>
-var literalNames []string
+var ruleNames []string
 <endif>
 
 
@@ -353,7 +354,7 @@ func (p *<if(parser)><parser.name><else><lexer.name><endif>) <r.name; format="ca
 		return <actions.(index)>}; separator="\n\n">
 
 	<endif>
-	default:
+	default:<! TODO: Should this return true like C#/Java? !>
 		panic("No predicate with index: " + fmt.Sprint(predIndex))
 	}
 }
@@ -600,7 +601,7 @@ for ok := true; ok; ok = <loopExpr> {
 	<if(alts)>
 	<alts; separator="\n">
 	<endif>
-	p.SetState(<choice.stateNumber>);<! loopback/exit decision !>
+	p.SetState(<choice.stateNumber>)<! loopback/exit decision !>
 	p.GetErrorHandler().Sync(p)
 	<if(iteration)>
 	<iteration>
@@ -728,12 +729,26 @@ bitsetInlineComparison(s, bits) ::= <%
 
 InvokeRule(r, argExprsChunks) ::= <<
 p.SetState(<r.stateNumber>)
-<if(r.labels)><r.labels:{l | <labelref(l)> = }><endif>p.<r.name; format="cap">(<if(r.ast.options.p)><r.ast.options.p><if(argExprsChunks)>,<endif><endif><argExprsChunks>)
+<if(r.labels)>
+
+var _x = p.<r.name; format="cap">(<if(r.ast.options.p)><r.ast.options.p><if(argExprsChunks)>,<endif><endif><argExprsChunks>)
+
+<r.labels:{l | <labelref(l)> = _x}; separator="\n">
+<else>
+p.<r.name; format="cap">(<if(r.ast.options.p)><r.ast.options.p><if(argExprsChunks)>,<endif><endif><argExprsChunks>)
+<endif>
 >>
 
 MatchToken(m) ::= <<
 p.SetState(<m.stateNumber>)
-<if(m.labels)><m.labels:{l | <labelref(l)> = }><endif>p.Match(<parser.name><m.name>)
+<if(m.labels)>
+
+var _m = p.Match(<parser.name><m.name>)
+
+<m.labels:{l | <labelref(l)> = _m}; separator="\n">
+<else>
+p.Match(<parser.name><m.name>)
+<endif>
 >>
 
 MatchSet(m, expr, capture) ::= "<CommonSetStuff(m, expr, capture, false)>"
@@ -743,15 +758,24 @@ MatchNotSet(m, expr, capture) ::= "<CommonSetStuff(m, expr, capture, true)>"
 CommonSetStuff(m, expr, capture, invert) ::= <<
 p.SetState(<m.stateNumber>)
 <if(m.labels)>
-<m.labels:{l | <labelref(l)> = }>p.GetTokenStream().LT(1);
+
+var _lt = p.GetTokenStream().LT(1)<! TODO: Should LT be called always like InvokeRule and MatchToken? !>
+
+<m.labels:{l | <labelref(l)> = _lt}; separator="\n">
 
 <endif>
 <if(capture)>
 <capture>
 
 <endif>
-<if(invert)>if <m.varName>\<=0 || <expr> <else>if !(<expr>)<endif> {
-	<if(m.labels)><m.labels:{l | <labelref(l)> = }><endif>p.GetErrorHandler().RecoverInline(p)
+<if(invert)>if <m.varName> \<= 0 || <expr> <else>if !(<expr>)<endif> {
+	<if(m.labels)>
+	var _ri = p.GetErrorHandler().RecoverInline(p)
+
+	<m.labels:{l | <labelref(l)> = _ri}; separator="\n">
+	<else>
+	p.GetErrorHandler().RecoverInline(p)
+	<endif>
 } else {
 	p.Consume()
 }
@@ -759,7 +783,14 @@ p.SetState(<m.stateNumber>)
 
 Wildcard(w) ::= <<
 p.SetState(<w.stateNumber>)
-<if(w.labels)><w.labels:{l | <labelref(l)> = }><endif>p.MatchWildcard()
+<if(w.labels)>
+
+var _mwc = p.MatchWildcard()
+
+<w.labels:{l | <labelref(l)> = _mwc}; separator="\n">
+<else>
+p.MatchWildcard()
+<endif>
 >>
 
 // ACTION STUFF
@@ -1245,7 +1276,7 @@ ctx(actionChunk) ::= "localctx.(*<actionChunk.ctx.name>)"
 
 // used for left-recursive rules
 recRuleAltPredicate(ruleName, opPrec) ::= "p.Precpred(p.GetParserRuleContext(), <opPrec>)"
-recRuleSetReturnAction(src, name) ::= "$<name>=$<src>.<name>"
+recRuleSetReturnAction(src, name) ::= "$<name> = $<src>.<name>" // TODO: Is this valid Go syntax?
 recRuleSetStopToken() ::= "p.GetParserRuleContext().SetStop(p.GetTokenStream().LT(-1))"
 
 recRuleAltStartAction(ruleName, ctxName, label) ::= <<
