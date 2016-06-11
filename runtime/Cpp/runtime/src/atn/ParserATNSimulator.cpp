@@ -1197,7 +1197,7 @@ dfa::DFAState *ParserATNSimulator::addDFAState(dfa::DFA &dfa, dfa::DFAState *D) 
 
     auto existing = dfa.states.find(D);
     if (existing != dfa.states.end()) {
-      return existing->second;
+      return *existing;
     }
 
     D->stateNumber = (int)dfa.states.size();
@@ -1205,7 +1205,7 @@ dfa::DFAState *ParserATNSimulator::addDFAState(dfa::DFA &dfa, dfa::DFAState *D) 
       D->configs->optimizeConfigs(this);
       D->configs->setReadonly(true);
     }
-    dfa.states[D] = D;
+    dfa.states.insert(D);
     if (debug) {
       std::cout << "adding new DFA state: " << D << std::endl;
     }

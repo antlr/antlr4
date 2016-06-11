@@ -43,7 +43,7 @@ namespace dfa {
 
     /// From which ATN state did we create this DFA?
     atn::DecisionState *const atnStartState;
-    std::unordered_map<DFAState *, DFAState *, DFAState::Hasher, DFAState::Comparer> states; // States are owned by this class.
+    std::unordered_set<DFAState *, DFAState::Hasher, DFAState::Comparer> states; // States are owned by this class.
     DFAState *s0;
     const int decision;
 

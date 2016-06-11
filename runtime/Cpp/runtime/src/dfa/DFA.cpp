@@ -74,7 +74,7 @@ DFA::DFA(const DFA &other) : atnStartState(other.atnStartState), decision(other.
 
 DFA::~DFA() {
   for (auto state : states) {
-    delete state.second;
+    delete state;
   }
 }
 
@@ -118,7 +118,7 @@ void DFA::setPrecedenceStartState(int precedence, DFAState *startState) {
 std::vector<DFAState *> DFA::getStates() const {
   std::vector<DFAState *> result;
   for (auto state : states)
-    result.push_back(state.first);
+    result.push_back(state);
 
   std::sort(result.begin(), result.end(), [](DFAState *o1, DFAState *o2) -> bool {
     return o1->stateNumber < o2->stateNumber;

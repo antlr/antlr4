@@ -79,7 +79,7 @@ std::set<int> DFAState::getAltSet() {
   }
   return alts;
 }
-
+ 
 size_t DFAState::hashCode() const {
   size_t hash = misc::MurmurHash::initialize(7);
   hash = misc::MurmurHash::update(hash, configs->hashCode());
@@ -93,7 +93,7 @@ bool DFAState::operator == (const DFAState &o) const {
     return true;
   }
 
-  return configs == o.configs;
+  return *configs == *o.configs;
 }
 
 std::string DFAState::toString() {

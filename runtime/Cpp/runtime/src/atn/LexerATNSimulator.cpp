@@ -322,7 +322,7 @@ atn::ATNState *LexerATNSimulator::getReachableTarget(Transition *trans, ssize_t 
 }
 
 std::unique_ptr<ATNConfigSet> LexerATNSimulator::computeStartState(CharStream *input, ATNState *p) {
-  Ref<PredictionContext> initialContext  = PredictionContext::EMPTY; // ml: the purpose of this assignment is unclear
+  Ref<PredictionContext> initialContext = PredictionContext::EMPTY; // ml: the purpose of this assignment is unclear
   std::unique_ptr<ATNConfigSet> configs(new OrderedATNConfigSet());
   for (size_t i = 0; i < p->getNumberOfTransitions(); i++) {
     ATNState *target = p->transition(i)->target;
@@ -582,13 +582,13 @@ dfa::DFAState *LexerATNSimulator::addDFAState(ATNConfigSet *configs) {
       auto iterator = dfa.states.find(proposed);
       if (iterator != dfa.states.end()) {
         delete proposed;
-        return iterator->second;
+        return *iterator;
       }
     }
 
     proposed->stateNumber = (int)dfa.states.size();
     proposed->configs->setReadonly(true);
-    dfa.states[proposed] = proposed;
+    dfa.states.insert(proposed);
     return proposed;
   }
 }

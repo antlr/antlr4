@@ -64,7 +64,7 @@ namespace atn {
 
     virtual std::string toString();
   private:
-    std::vector<Ref<PredictionContext>> makeRef(const std::vector<std::weak_ptr<PredictionContext> > &input);
+    std::vector<Ref<PredictionContext>> makeRef(const std::vector<std::weak_ptr<PredictionContext>> &input);
   };
 
 } // namespace atn
