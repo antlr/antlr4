@@ -63,7 +63,11 @@ func (b *BaseRuleContext) GetBaseRuleContext() *BaseRuleContext {
 }
 
 func (b *BaseRuleContext) SetParent(v Tree) {
-	b.parentCtx = v.(RuleContext)
+	if v == nil {
+		b.parentCtx = nil
+	} else {
+		b.parentCtx = v.(RuleContext)
+	}
 }
 
 func (b *BaseRuleContext) GetInvokingState() int {

@@ -147,17 +147,5 @@ public class GoTarget extends Target {
 		}
 
 	}
-
-	public boolean wantsBaseListener() {
-		return true;
-	}
-
-	public boolean wantsBaseVisitor() {
-		return true;
-	}
-
-	public boolean supportsOverloadedMethods() {
-		return false;
-	}
 }
 

@@ -235,6 +235,10 @@ LL_EXACT_AMBIG_DETECTION() ::= <<this._interp.predictionMode = antlr4.atn.Predic
 
 ParserToken(parser, token) ::= <%<parser>.<token>%>
 
+Production(p) ::= <%<p>%>
+
+Result(r) ::= <%<r>%>
+
 ParserPropertyMember() ::= <<
 @members {
 this.Property = function() {
