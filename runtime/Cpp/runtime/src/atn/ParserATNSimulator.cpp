@@ -51,8 +51,6 @@
 #include "ANTLRErrorListener.h"
 
 #include "Vocabulary.h"
-#include "Vocabulary.h"
-
 #include "support/Arrays.h"
 
 #include "atn/ParserATNSimulator.h"

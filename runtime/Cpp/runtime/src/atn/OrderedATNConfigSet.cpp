@@ -33,6 +33,6 @@
 
 using namespace antlr4::atn;
 
-OrderedATNConfigSet::OrderedATNConfigSet() : ATNConfigSet() {
-  configLookup = new ConfigLookupImpl<OrderedATNConfigHasher, OrderedATNConfigComparer>(); /* mem-check: deleted in ATNConfigSet d-tor */
+size_t OrderedATNConfigSet::getHash(ATNConfig *c) {
+  return c->hashCode();
 }

@@ -40,21 +40,6 @@
 using namespace antlr4::atn;
 using namespace antlrcpp;
 
-size_t SimpleATNConfigHasher::operator()(const Ref<ATNConfig> &k) const {
-  size_t hashCode = 7;
-  hashCode = 31 * hashCode + (size_t)k->state->stateNumber;
-  hashCode = 31 * hashCode + (size_t)k->alt;
-  hashCode = 31 * hashCode + (k->semanticContext == nullptr ? 0 : k->semanticContext->hashCode());
-  return hashCode;
-}
-
-bool SimpleATNConfigComparer::operator () (const Ref<ATNConfig> &lhs, const Ref<ATNConfig> &rhs) const {
-  return lhs->state->stateNumber == rhs->state->stateNumber && lhs->alt == rhs->alt &&
-    lhs->semanticContext == rhs->semanticContext;
-}
-
-//------------------ ATNConfigSet --------------------------------------------------------------------------------------
-
 ATNConfigSet::ATNConfigSet(bool fullCtx) : fullCtx(fullCtx) {
   InitializeInstanceFields();
 }
@@ -68,7 +53,6 @@ ATNConfigSet::ATNConfigSet(const Ref<ATNConfigSet> &old) : ATNConfigSet(old->ful
 }
 
 ATNConfigSet::~ATNConfigSet() {
-  delete configLookup;
 }
 
 bool ATNConfigSet::add(const Ref<ATNConfig> &config) {
@@ -85,15 +69,17 @@ bool ATNConfigSet::add(const Ref<ATNConfig> &config, PredictionContextMergeCache
   if (config->getOuterContextDepth() > 0) {
     dipsIntoOuterContext = true;
   }
-  
-  Ref<ATNConfig> existing = configLookup->getOrAdd(config);
-  if (existing.get() == config.get()) { // Compare mem addresses, not content (which would happen when we compare the refs).
+
+  size_t hash = getHash(config.get());
+  ATNConfig *existing = _configLookup[hash];
+  if (existing == nullptr) {
+    _configLookup[hash] = config.get();
     _cachedHashCode = 0;
     configs.push_back(config); // track order here
 
-    assert(configLookup->size() == configs.size());
     return true;
   }
+
   // a previous (s,i,pi,_), merge with it and save result
   bool rootIsWildcard = !fullCtx;
   Ref<PredictionContext> merged = PredictionContext::merge(existing->context, config->context, rootIsWildcard, mergeCache);
@@ -109,7 +95,6 @@ bool ATNConfigSet::add(const Ref<ATNConfig> &config, PredictionContextMergeCache
   
   existing->context = merged; // replace context; no need to alt mapping
 
-  assert(configLookup->size() == configs.size());
   return true;
 }
 
@@ -118,10 +103,6 @@ bool ATNConfigSet::addAll(const Ref<ATNConfigSet> &other) {
     add(c);
   }
   return false;
-}
-
-std::vector<Ref<ATNConfig>> ATNConfigSet::elements() {
-  return configs;
 }
 
 std::vector<ATNState*> ATNConfigSet::getStates() {
@@ -167,9 +148,8 @@ void ATNConfigSet::optimizeConfigs(ATNSimulator *interpreter) {
   if (_readonly) {
     throw IllegalStateException("This set is readonly");
   }
-  if (configLookup->isEmpty()) {
+  if (_configLookup.empty())
     return;
-  }
 
   for (auto &config : configs) {
     config->context = interpreter->getCachedContext(config->context);
@@ -216,21 +196,13 @@ bool ATNConfigSet::isEmpty() {
   return configs.empty();
 }
 
-bool ATNConfigSet::contains(const Ref<ATNConfig> &o) {
-  if (configLookup == nullptr) {
-    throw UnsupportedOperationException("This method is not implemented for readonly sets.");
-  }
-
-  return configLookup->contains(o);
-}
-
 void ATNConfigSet::clear() {
   if (_readonly) {
     throw IllegalStateException("This set is readonly");
   }
   configs.clear();
   _cachedHashCode = 0;
-  configLookup->clear();
+  _configLookup.clear();
 }
 
 bool ATNConfigSet::isReadonly() {
@@ -239,14 +211,13 @@ bool ATNConfigSet::isReadonly() {
 
 void ATNConfigSet::setReadonly(bool readonly) {
   _readonly = readonly;
-  delete configLookup;
-  configLookup = nullptr;
+  _configLookup.clear();
 }
 
 std::string ATNConfigSet::toString() {
   std::stringstream ss;
   ss << "[";
-  for (size_t i = 0; i < elements().size(); i++) {
+  for (size_t i = 0; i < configs.size(); i++) {
     ss << configs[i]->toString();
   }
   ss << "]";
@@ -269,12 +240,15 @@ std::string ATNConfigSet::toString() {
   return ss.str();
 }
 
-bool ATNConfigSet::remove(void * /*o*/) {
-  throw UnsupportedOperationException();
+size_t ATNConfigSet::getHash(ATNConfig *c) {
+  size_t hashCode = 7;
+  hashCode = 31 * hashCode + (size_t)c->state->stateNumber;
+  hashCode = 31 * hashCode + (size_t)c->alt;
+  hashCode = 31 * hashCode + c->semanticContext->hashCode();
+  return hashCode;
 }
 
 void ATNConfigSet::InitializeInstanceFields() {
-  configLookup = new ConfigLookupImpl<SimpleATNConfigHasher, SimpleATNConfigComparer>();
   uniqueAlt = 0;
   hasSemanticContext = false;
   dipsIntoOuterContext = false;

@@ -129,9 +129,6 @@
 		276E5DA61CDB57AA003FF4B4 /* BlockStartState.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5C351CDB57AA003FF4B4 /* BlockStartState.h */; };
 		276E5DA71CDB57AA003FF4B4 /* BlockStartState.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5C351CDB57AA003FF4B4 /* BlockStartState.h */; };
 		276E5DA81CDB57AA003FF4B4 /* BlockStartState.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5C351CDB57AA003FF4B4 /* BlockStartState.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		276E5DA91CDB57AA003FF4B4 /* ConfigLookup.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5C361CDB57AA003FF4B4 /* ConfigLookup.h */; };
-		276E5DAA1CDB57AA003FF4B4 /* ConfigLookup.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5C361CDB57AA003FF4B4 /* ConfigLookup.h */; };
-		276E5DAB1CDB57AA003FF4B4 /* ConfigLookup.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5C361CDB57AA003FF4B4 /* ConfigLookup.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		276E5DAC1CDB57AA003FF4B4 /* ContextSensitivityInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5C371CDB57AA003FF4B4 /* ContextSensitivityInfo.cpp */; };
 		276E5DAD1CDB57AA003FF4B4 /* ContextSensitivityInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5C371CDB57AA003FF4B4 /* ContextSensitivityInfo.cpp */; };
 		276E5DAE1CDB57AA003FF4B4 /* ContextSensitivityInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5C371CDB57AA003FF4B4 /* ContextSensitivityInfo.cpp */; };
@@ -913,7 +910,7 @@
 		276E5C1D1CDB57AA003FF4B4 /* ATNConfig.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; path = ATNConfig.cpp; sourceTree = "<group>"; wrapsLines = 0; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
 		276E5C1E1CDB57AA003FF4B4 /* ATNConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = ATNConfig.h; sourceTree = "<group>"; wrapsLines = 0; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		276E5C1F1CDB57AA003FF4B4 /* ATNConfigSet.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ATNConfigSet.cpp; sourceTree = "<group>"; wrapsLines = 0; };
-		276E5C201CDB57AA003FF4B4 /* ATNConfigSet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ATNConfigSet.h; sourceTree = "<group>"; };
+		276E5C201CDB57AA003FF4B4 /* ATNConfigSet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ATNConfigSet.h; sourceTree = "<group>"; wrapsLines = 0; };
 		276E5C211CDB57AA003FF4B4 /* ATNDeserializationOptions.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ATNDeserializationOptions.cpp; sourceTree = "<group>"; };
 		276E5C221CDB57AA003FF4B4 /* ATNDeserializationOptions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ATNDeserializationOptions.h; sourceTree = "<group>"; };
 		276E5C231CDB57AA003FF4B4 /* ATNDeserializer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ATNDeserializer.cpp; sourceTree = "<group>"; };
@@ -934,7 +931,6 @@
 		276E5C331CDB57AA003FF4B4 /* BlockEndState.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BlockEndState.cpp; sourceTree = "<group>"; };
 		276E5C341CDB57AA003FF4B4 /* BlockEndState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BlockEndState.h; sourceTree = "<group>"; };
 		276E5C351CDB57AA003FF4B4 /* BlockStartState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BlockStartState.h; sourceTree = "<group>"; };
-		276E5C361CDB57AA003FF4B4 /* ConfigLookup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = ConfigLookup.h; sourceTree = "<group>"; wrapsLines = 0; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		276E5C371CDB57AA003FF4B4 /* ContextSensitivityInfo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ContextSensitivityInfo.cpp; sourceTree = "<group>"; };
 		276E5C381CDB57AA003FF4B4 /* ContextSensitivityInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ContextSensitivityInfo.h; sourceTree = "<group>"; wrapsLines = 0; };
 		276E5C391CDB57AA003FF4B4 /* DecisionEventInfo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DecisionEventInfo.cpp; sourceTree = "<group>"; wrapsLines = 0; };
@@ -1360,7 +1356,6 @@
 				276E5C331CDB57AA003FF4B4 /* BlockEndState.cpp */,
 				276E5C341CDB57AA003FF4B4 /* BlockEndState.h */,
 				276E5C351CDB57AA003FF4B4 /* BlockStartState.h */,
-				276E5C361CDB57AA003FF4B4 /* ConfigLookup.h */,
 				276E5C371CDB57AA003FF4B4 /* ContextSensitivityInfo.cpp */,
 				276E5C381CDB57AA003FF4B4 /* ContextSensitivityInfo.h */,
 				276E5C391CDB57AA003FF4B4 /* DecisionEventInfo.cpp */,
@@ -1737,7 +1732,6 @@
 				276E5DFC1CDB57AA003FF4B4 /* LexerCustomAction.h in Headers */,
 				276E5FE81CDB57AA003FF4B4 /* TokenStreamRewriter.h in Headers */,
 				276E5DF01CDB57AA003FF4B4 /* LexerATNSimulator.h in Headers */,
-				276E5DAB1CDB57AA003FF4B4 /* ConfigLookup.h in Headers */,
 				276E5DD51CDB57AA003FF4B4 /* ErrorInfo.h in Headers */,
 				276E5E261CDB57AA003FF4B4 /* LexerTypeAction.h in Headers */,
 				27DB44D61D0463DB007E790B /* XPathTokenElement.h in Headers */,
@@ -1905,7 +1899,6 @@
 				276E5DFB1CDB57AA003FF4B4 /* LexerCustomAction.h in Headers */,
 				276E5FE71CDB57AA003FF4B4 /* TokenStreamRewriter.h in Headers */,
 				276E5DEF1CDB57AA003FF4B4 /* LexerATNSimulator.h in Headers */,
-				276E5DAA1CDB57AA003FF4B4 /* ConfigLookup.h in Headers */,
 				276E5DD41CDB57AA003FF4B4 /* ErrorInfo.h in Headers */,
 				276E5E251CDB57AA003FF4B4 /* LexerTypeAction.h in Headers */,
 				276E5DE31CDB57AA003FF4B4 /* LexerActionType.h in Headers */,
@@ -2069,7 +2062,6 @@
 				276E5DFA1CDB57AA003FF4B4 /* LexerCustomAction.h in Headers */,
 				276E5FE61CDB57AA003FF4B4 /* TokenStreamRewriter.h in Headers */,
 				276E5DEE1CDB57AA003FF4B4 /* LexerATNSimulator.h in Headers */,
-				276E5DA91CDB57AA003FF4B4 /* ConfigLookup.h in Headers */,
 				27DB44A61D045537007E790B /* XPathRuleElement.h in Headers */,
 				276E5DD31CDB57AA003FF4B4 /* ErrorInfo.h in Headers */,
 				276E5E241CDB57AA003FF4B4 /* LexerTypeAction.h in Headers */,

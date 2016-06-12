@@ -95,7 +95,6 @@
 #include "atn/BasicState.h"
 #include "atn/BlockEndState.h"
 #include "atn/BlockStartState.h"
-#include "atn/ConfigLookup.h"
 #include "atn/ContextSensitivityInfo.h"
 #include "atn/DecisionEventInfo.h"
 #include "atn/DecisionInfo.h"

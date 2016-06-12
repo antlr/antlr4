@@ -37,23 +37,9 @@
 namespace antlr4 {
 namespace atn {
 
-  struct OrderedATNConfigHasher
-  {
-    size_t operator()(const Ref<ATNConfig> &config) const {
-      return config->hashCode();
-    }
-  };
-
-  struct OrderedATNConfigComparer {
-    bool operator()(const Ref<ATNConfig> &lhs, const Ref<ATNConfig> &rhs) const
-    {
-      return lhs == rhs;
-    }
-  };
-  
   class ANTLR4CPP_PUBLIC OrderedATNConfigSet : public ATNConfigSet {
-  public:
-    OrderedATNConfigSet();
+  protected:
+    virtual size_t getHash(ATNConfig *c) override;
   };
 
 } // namespace atn

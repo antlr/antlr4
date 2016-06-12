@@ -32,32 +32,16 @@
 #pragma once
 
 #include "support/BitSet.h"
-#include "atn/ConfigLookup.h"
 #include "atn/PredictionContext.h"
 
 namespace antlr4 {
 namespace atn {
 
-  // Simpler hasher and comparer variants than those in ATNConfig (less fields, no murmur hash).
-  struct SimpleATNConfigHasher
-  {
-    size_t operator()(const Ref<ATNConfig> &k) const;
-  };
-
-  struct SimpleATNConfigComparer {
-    bool operator()(const Ref<ATNConfig> &lhs, const Ref<ATNConfig> &rhs) const;
-  };
-  
   /// Specialized set that can track info about the set, with support for combining similar configurations using a
   /// graph-structured stack.
   class ANTLR4CPP_PUBLIC ATNConfigSet {
   public:
-    /// All configs but hashed by (s, i, _, pi) not including context. Wiped out
-    /// when we go readonly as this set becomes a DFA state.
-    ConfigLookup *configLookup;
-
-    /// <summary>
-    /// Track the elements as they are added to the set; supports get(i) </summary>
+    /// Track the elements as they are added to the set; supports get(i)
     std::vector<Ref<ATNConfig>> configs;
 
     // TO_DO: these fields make me pretty uncomfortable but nice to pack up info together, saves recomputation
@@ -102,10 +86,6 @@ namespace atn {
     /// </summary>
     virtual bool add(const Ref<ATNConfig> &config, PredictionContextMergeCache *mergeCache);
 
-    /// <summary>
-    /// Return a List holding list of configs </summary>
-    virtual std::vector<Ref<ATNConfig>> elements();
-
     virtual std::vector<ATNState *> getStates();
 
     /**
@@ -129,20 +109,26 @@ namespace atn {
     virtual size_t hashCode();
     virtual size_t size();
     virtual bool isEmpty();
-    virtual bool contains(const Ref<ATNConfig> &o);
     virtual void clear();
     virtual bool isReadonly();
     virtual void setReadonly(bool readonly);
     virtual std::string toString();
-    virtual bool remove(void *o);
 
   protected:
+    /// All configs but hashed by (s, i, _, pi) not including context. Wiped out
+    /// when we go readonly as this set becomes a DFA state.
+    // ml: no need for a comparer here as by definition there can be no hash clashes.
+    //     (same hashes always mean same object).
+    std::unordered_map<size_t, ATNConfig *> _configLookup;
+
     /// Indicates that the set of configurations is read-only. Do not
-    ///  allow any code to manipulate the set; DFA states will point at
-    ///  the sets and they must not change. This does not protect the other
-    ///  fields; in particular, conflictingAlts is set after
-    ///  we've made this readonly.
+    /// allow any code to manipulate the set; DFA states will point at
+    /// the sets and they must not change. This does not protect the other
+    /// fields; in particular, conflictingAlts is set after
+    /// we've made this readonly.
     bool _readonly;
+
+    virtual size_t getHash(ATNConfig *c); // Hash differs depending on set type.
 
   private:
     size_t _cachedHashCode;
