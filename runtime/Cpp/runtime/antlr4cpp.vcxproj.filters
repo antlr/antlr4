@@ -429,9 +429,6 @@
     <ClInclude Include="src\Vocabulary.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\VocabularyImpl.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\atn\AmbiguityInfo.h">
       <Filter>Header Files\atn</Filter>
     </ClInclude>
@@ -836,9 +833,6 @@
     <ClCompile Include="src\tree\pattern\TokenTagToken.cpp">
       <Filter>Source Files\tree\pattern</Filter>
     </ClCompile>
-    <ClCompile Include="src\VocabularyImpl.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\atn\AmbiguityInfo.cpp">
       <Filter>Source Files\atn</Filter>
     </ClCompile>
@@ -934,6 +928,9 @@
     </ClCompile>
     <ClCompile Include="src\tree\xpath\XPathWildcardElement.cpp">
       <Filter>Source Files\tree\xpath</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Vocabulary.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

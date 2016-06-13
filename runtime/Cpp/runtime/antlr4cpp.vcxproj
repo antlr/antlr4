@@ -295,7 +295,7 @@
     <ClCompile Include="src\tree\xpath\XPathWildcardElement.cpp" />
     <ClCompile Include="src\UnbufferedCharStream.cpp" />
     <ClCompile Include="src\UnbufferedTokenStream.cpp" />
-    <ClCompile Include="src\VocabularyImpl.cpp" />
+    <ClCompile Include="src\Vocabulary.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\ANTLRErrorListener.h" />
@@ -455,7 +455,6 @@
     <ClInclude Include="src\UnbufferedCharStream.h" />
     <ClInclude Include="src\UnbufferedTokenStream.h" />
     <ClInclude Include="src\Vocabulary.h" />
-    <ClInclude Include="src\VocabularyImpl.h" />
     <ClInclude Include="src\WritableToken.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
