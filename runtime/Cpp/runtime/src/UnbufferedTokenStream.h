@@ -39,7 +39,10 @@ namespace antlr4 {
   public:
     UnbufferedTokenStream(TokenSource *tokenSource);
     UnbufferedTokenStream(TokenSource *tokenSource, int bufferSize);
+    UnbufferedTokenStream(const UnbufferedTokenStream& other) = delete;
     virtual ~UnbufferedTokenStream();
+
+    UnbufferedTokenStream& operator = (const UnbufferedTokenStream& other) = delete;
 
     virtual Token* get(size_t i) const override;
     virtual Token* LT(ssize_t i) override;

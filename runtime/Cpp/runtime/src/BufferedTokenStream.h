@@ -50,6 +50,9 @@ namespace antlr4 {
   class ANTLR4CPP_PUBLIC BufferedTokenStream : public TokenStream {
   public:
     BufferedTokenStream(TokenSource *tokenSource);
+    BufferedTokenStream(const BufferedTokenStream& other) = delete;
+
+    BufferedTokenStream& operator = (const BufferedTokenStream& other) = delete;
 
     virtual TokenSource* getTokenSource() const override;
     virtual size_t index() override;

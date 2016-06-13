@@ -76,6 +76,9 @@ namespace antlr4 {
     /// <seealso cref="TokenSource"/>. </param>
     /// <exception cref="NullPointerException"> if {@code tokens} is {@code null} </exception>
     ListTokenSource(std::vector<std::unique_ptr<Token>> tokens);
+    ListTokenSource(const ListTokenSource& other) = delete;
+
+    ListTokenSource& operator = (const ListTokenSource& other) = delete;
 
     /// <summary>
     /// Constructs a new <seealso cref="ListTokenSource"/> instance from the specified
