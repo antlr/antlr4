@@ -93,17 +93,6 @@ namespace tree {
                                                                   size_t startTokenIndex, // inclusive
                                                                   size_t stopTokenIndex); // inclusive
    
-    /** Replace any subtree siblings of root that are completely to left
-     *  or right of lookahead range with a CommonToken(Token.INVALID_TYPE,"...")
-     *  node. The source interval for t is not altered to suit smaller range!
-     *
-     *  WARNING: destructive to t.
-     *
-     *  @since 4.5.1
-     */
-    static void stripChildrenOutOfRange(Ref<ParserRuleContext> const& t, Ref<ParserRuleContext> const& root,
-                                        size_t startIndex, size_t stopIndex);
-    
     /** Return first node satisfying the pred
      *
      *  @since 4.5.1

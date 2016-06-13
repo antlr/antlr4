@@ -50,15 +50,15 @@ namespace antlr4 {
     /// The current Token when an error occurred. Since not all streams
     /// support accessing symbols by index, we have to track the Token
     /// instance itself.
-    Ref<Token> _offendingToken;
+    Token *_offendingToken;
 
     int _offendingState;
 
   public:
     RecognitionException(IRecognizer *recognizer, IntStream *input, Ref<ParserRuleContext> const& ctx,
-                         Ref<Token> const& offendingToken = Ref<Token>());
+                         Token *offendingToken = nullptr);
     RecognitionException(const std::string &message, IRecognizer *recognizer, IntStream *input,
-                         Ref<ParserRuleContext> const& ctx, Ref<Token> const& offendingToken = Ref<Token>());
+                         Ref<ParserRuleContext> const& ctx, Token *offendingToken = nullptr);
     ~RecognitionException() {}
     
     /// Get the ATN state number the parser was in at the time the error
@@ -104,7 +104,7 @@ namespace antlr4 {
     /// available. </returns>
     virtual IntStream* getInputStream() const;
 
-    virtual Ref<Token> getOffendingToken() const;
+    virtual Token* getOffendingToken() const;
 
     /// <summary>
     /// Gets the <seealso cref="Recognizer"/> where this exception occurred.

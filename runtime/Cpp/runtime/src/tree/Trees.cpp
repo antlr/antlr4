@@ -133,7 +133,7 @@ std::string Trees::getNodeText(Ref<Tree> const& t, const std::vector<std::string
     } else if (is<ErrorNode>(t)) {
       return t->toString();
     } else if (is<TerminalNode>(t)) {
-      Ref<Token> symbol = (std::static_pointer_cast<TerminalNode>(t))->getSymbol();
+      Token *symbol = (std::static_pointer_cast<TerminalNode>(t))->getSymbol();
       if (symbol != nullptr) {
         std::string s = symbol->getText();
         return s;
@@ -256,24 +256,6 @@ Ref<ParserRuleContext> Trees::getRootOfSubtreeEnclosingRegion(Ref<ParseTree> con
     }
   }
   return nullptr;
-}
-
-void Trees::stripChildrenOutOfRange(Ref<ParserRuleContext> const& t, Ref<ParserRuleContext> const& root,
-                                    size_t startIndex, size_t stopIndex) {
-  if (t == nullptr) {
-    return;
-  }
-
-  for (size_t i = 0; i < t->getChildCount(); ++i) {
-    Ref<ParseTree> child = t->getChild(i);
-    Interval range = child->getSourceInterval();
-    if (is<ParserRuleContext>(child) && (range.b < (int)startIndex || range.a > (int)stopIndex)) {
-      if (isAncestorOf(child, root)) { // replace only if subtree doesn't have displayed root
-        Ref<CommonToken> abbrev = std::make_shared<CommonToken>((int)Token::INVALID_TYPE, "...");
-        t->children[i] = std::make_shared<TerminalNodeImpl>(abbrev);
-      }
-    }
-  }
 }
 
 Ref<Tree> Trees::findNodeSuchThat(Ref<Tree> const& t, Ref<Predicate<Tree>> const& pred) {

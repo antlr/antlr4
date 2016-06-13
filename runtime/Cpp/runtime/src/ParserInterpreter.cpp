@@ -306,23 +306,23 @@ void ParserInterpreter::recover(RecognitionException &e) {
     // no input consumed, better add an error node
     if (is<InputMismatchException *>(&e)) {
       InputMismatchException &ime = (InputMismatchException&)e;
-      Ref<Token> tok = e.getOffendingToken();
+      Token *tok = e.getOffendingToken();
       int expectedTokenType = ime.getExpectedTokens().getMinElement(); // get any element
-      auto errToken = getTokenFactory()->create({ tok->getTokenSource(), tok->getTokenSource()->getInputStream() },
+      _errorToken = getTokenFactory()->create({ tok->getTokenSource(), tok->getTokenSource()->getInputStream() },
         expectedTokenType, tok->getText(), Token::DEFAULT_CHANNEL, -1, -1, // invalid start/stop
         tok->getLine(), tok->getCharPositionInLine());
-      _ctx->addErrorNode(std::dynamic_pointer_cast<Token>(errToken));
+      _ctx->addErrorNode(_errorToken.get());
     }
     else { // NoViableAlt
-      Ref<Token> tok = e.getOffendingToken();
-      auto errToken = getTokenFactory()->create({ tok->getTokenSource(), tok->getTokenSource()->getInputStream() },
+      Token *tok = e.getOffendingToken();
+      _errorToken = getTokenFactory()->create({ tok->getTokenSource(), tok->getTokenSource()->getInputStream() },
         Token::INVALID_TYPE, tok->getText(), Token::DEFAULT_CHANNEL, -1, -1, // invalid start/stop
         tok->getLine(), tok->getCharPositionInLine());
-      _ctx->addErrorNode(std::dynamic_pointer_cast<Token>(errToken));
+      _ctx->addErrorNode(_errorToken.get());
     }
   }
 }
 
-Ref<Token> ParserInterpreter::recoverInline() {
+Token* ParserInterpreter::recoverInline() {
   return _errHandler->recoverInline(this);
 }

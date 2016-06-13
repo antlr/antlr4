@@ -58,7 +58,7 @@ void BailErrorStrategy::recover(Parser *recognizer, std::exception_ptr e) {
   }
 }
 
-Ref<Token> BailErrorStrategy::recoverInline(Parser *recognizer)  {
+Token* BailErrorStrategy::recoverInline(Parser *recognizer)  {
   InputMismatchException e(recognizer);
   std::exception_ptr exception = std::make_exception_ptr(e);
 

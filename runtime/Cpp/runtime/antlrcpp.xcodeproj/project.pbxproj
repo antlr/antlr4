@@ -1073,7 +1073,7 @@
 		276E5CC51CDB57AA003FF4B4 /* LexerNoViableAltException.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LexerNoViableAltException.cpp; sourceTree = "<group>"; };
 		276E5CC61CDB57AA003FF4B4 /* LexerNoViableAltException.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LexerNoViableAltException.h; sourceTree = "<group>"; };
 		276E5CC71CDB57AA003FF4B4 /* ListTokenSource.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ListTokenSource.cpp; sourceTree = "<group>"; wrapsLines = 0; };
-		276E5CC81CDB57AA003FF4B4 /* ListTokenSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ListTokenSource.h; sourceTree = "<group>"; };
+		276E5CC81CDB57AA003FF4B4 /* ListTokenSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ListTokenSource.h; sourceTree = "<group>"; wrapsLines = 0; };
 		276E5CCA1CDB57AA003FF4B4 /* Interval.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Interval.cpp; sourceTree = "<group>"; };
 		276E5CCB1CDB57AA003FF4B4 /* Interval.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Interval.h; sourceTree = "<group>"; };
 		276E5CCC1CDB57AA003FF4B4 /* IntervalSet.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = IntervalSet.cpp; sourceTree = "<group>"; };
@@ -1151,7 +1151,7 @@
 		276E5D1E1CDB57AA003FF4B4 /* Trees.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Trees.h; sourceTree = "<group>"; wrapsLines = 0; };
 		276E5D221CDB57AA003FF4B4 /* UnbufferedCharStream.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UnbufferedCharStream.cpp; sourceTree = "<group>"; wrapsLines = 0; };
 		276E5D231CDB57AA003FF4B4 /* UnbufferedCharStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UnbufferedCharStream.h; sourceTree = "<group>"; };
-		276E5D241CDB57AA003FF4B4 /* UnbufferedTokenStream.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UnbufferedTokenStream.cpp; sourceTree = "<group>"; };
+		276E5D241CDB57AA003FF4B4 /* UnbufferedTokenStream.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UnbufferedTokenStream.cpp; sourceTree = "<group>"; wrapsLines = 0; };
 		276E5D251CDB57AA003FF4B4 /* UnbufferedTokenStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UnbufferedTokenStream.h; sourceTree = "<group>"; };
 		276E5D271CDB57AA003FF4B4 /* Vocabulary.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Vocabulary.cpp; sourceTree = "<group>"; wrapsLines = 0; };
 		276E5D281CDB57AA003FF4B4 /* Vocabulary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Vocabulary.h; sourceTree = "<group>"; };

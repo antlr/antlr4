@@ -37,95 +37,58 @@
 
 using namespace antlr4;
 
+ListTokenSource::ListTokenSource(std::vector<std::unique_ptr<Token>> tokens) : ListTokenSource(std::move(tokens), "") {
+}
+
+ListTokenSource::ListTokenSource(std::vector<std::unique_ptr<Token>> tokens_, const std::string &sourceName_)
+  : tokens(std::move(tokens_)), sourceName(sourceName_) {
+  InitializeInstanceFields();
+  if (tokens.empty()) {
+    throw "tokens cannot be null";
+  }
+
+  // Check if there is an eof token and create one if not.
+  if (tokens.back()->getType() != Token::EOF) {
+    Token *lastToken = tokens.back().get();
+    int start = -1;
+    int previousStop = lastToken->getStopIndex();
+    if (previousStop != -1) {
+      start = previousStop + 1;
+    }
+
+    int stop = std::max(-1, start - 1);
+    tokens.emplace_back((_factory->create({ this, getInputStream() }, Token::EOF, "EOF",
+      Token::DEFAULT_CHANNEL, start, stop, (int)lastToken->getLine(), lastToken->getCharPositionInLine())));
+  }
+}
+
 int ListTokenSource::getCharPositionInLine() {
   if (i < tokens.size()) {
     return tokens[i]->getCharPositionInLine();
-  } else if (eofToken != nullptr) {
-    return eofToken->getCharPositionInLine();
-  } else if (tokens.size() > 0) {
-    // have to calculate the result from the line/column of the previous
-    // token, along with the text of the token.
-    Ref<Token> lastToken = tokens.back();
-    std::string tokenText = lastToken->getText();
-    if (tokenText != "") {
-      int lastNewLine = (int)tokenText.rfind('\n');
-      if (lastNewLine >= 0) {
-        return (int)tokenText.length() - lastNewLine - 1;
-      }
-    }
-
-    return lastToken->getCharPositionInLine() + lastToken->getStopIndex() - lastToken->getStartIndex() + 1;
   }
-
-  // only reach this if tokens is empty, meaning EOF occurs at the first
-  // position in the input
   return 0;
 }
 
-Ref<Token> ListTokenSource::nextToken() {
-  if (i >= tokens.size()) {
-    if (eofToken == nullptr) {
-      int start = -1;
-      if (tokens.size() > 0) {
-        int previousStop = tokens.back()->getStopIndex();
-        if (previousStop != -1) {
-          start = previousStop + 1;
-        }
-      }
-
-      int stop = std::max(-1, start - 1);
-      eofToken = std::dynamic_pointer_cast<Token>(_factory->create({ this, getInputStream() }, Token::EOF, "EOF",
-        Token::DEFAULT_CHANNEL, start, stop, (int)getLine(), getCharPositionInLine()));
-    }
-
-    return eofToken;
+std::unique_ptr<Token> ListTokenSource::nextToken() {
+  if (i < tokens.size()) {
+    return std::move(tokens[i++]);
   }
-
-  Ref<Token> t = tokens[i];
-  if (i == tokens.size() - 1 && t->getType() == Token::EOF) {
-    eofToken = t;
-  }
-
-  i++;
-  return t;
+  return nullptr;
 }
 
 size_t ListTokenSource::getLine() const {
   if (i < tokens.size()) {
     return (size_t)tokens[i]->getLine();
-  } else if (eofToken != nullptr) {
-    return (size_t)eofToken->getLine();
-  } else if (tokens.size() > 0) {
-    // have to calculate the result from the line/column of the previous
-    // token, along with the text of the token.
-    Ref<Token> lastToken = tokens.back();
-    int line = lastToken->getLine();
-
-    std::string tokenText = lastToken->getText();
-    if (tokenText != "") {
-      for (size_t i = 0; i < tokenText.length(); i++) {
-        if (tokenText[i] == '\n') {
-          line++;
-        }
-      }
-    }
-
-    // if no text is available, assume the token did not contain any newline characters.
-    return (size_t)line;
   }
 
-  // only reach this if tokens is empty, meaning EOF occurs at the first
-  // position in the input
   return 1;
 }
 
 CharStream *ListTokenSource::getInputStream() {
   if (i < tokens.size()) {
     return tokens[i]->getInputStream();
-  } else if (eofToken != nullptr) {
-    return eofToken->getInputStream();
-  } else if (tokens.size() > 0) {
-    return tokens[tokens.size() - 1]->getInputStream();
+  } else if (!tokens.empty()) {
+    return tokens.back()->getInputStream();
   }
 
   // no input stream information is available

@@ -38,7 +38,7 @@ namespace tree {
 
   class ANTLR4CPP_PUBLIC TerminalNode : public ParseTree {
   public:
-    virtual Ref<Token> getSymbol() = 0;
+    virtual Token* getSymbol() = 0;
   };
 
 } // namespace tree

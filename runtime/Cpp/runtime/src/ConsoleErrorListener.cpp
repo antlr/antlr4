@@ -35,7 +35,7 @@ using namespace antlr4;
 
 ConsoleErrorListener ConsoleErrorListener::INSTANCE;
 
-void ConsoleErrorListener::syntaxError(IRecognizer * /*recognizer*/, Ref<Token> const& /*offendingSymbol*/,
+void ConsoleErrorListener::syntaxError(IRecognizer * /*recognizer*/, Token * /*offendingSymbol*/,
   size_t line, int charPositionInLine, const std::string &msg, std::exception_ptr /*e*/)  {
   std::cerr << "line " << line << ":" << charPositionInLine << " " << msg << std::endl;
 }

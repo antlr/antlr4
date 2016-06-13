@@ -50,7 +50,7 @@ namespace antlr4 {
   public:
     virtual ~TokenStream();
 
-    virtual Ref<Token> LT(ssize_t k) = 0;
+    virtual Token* LT(ssize_t k) = 0;
 
     /// <summary>
     /// Gets the <seealso cref="Token"/> at the specified {@code index} in the stream. When
@@ -69,7 +69,7 @@ namespace antlr4 {
     /// <exception cref="IllegalArgumentException"> if {code index} is less than 0 </exception>
     /// <exception cref="UnsupportedOperationException"> if the stream does not support
     /// retrieving the token at the specified index </exception>
-    virtual Ref<Token> get(size_t index) const = 0;
+    virtual Token* get(size_t index) const = 0;
 
     /// Gets the underlying TokenSource which provides tokens for this stream.
     virtual TokenSource* getTokenSource() const = 0;
@@ -157,7 +157,7 @@ namespace antlr4 {
     /// </returns>
     /// <exception cref="UnsupportedOperationException"> if this stream does not support
     /// this method for the specified tokens </exception>
-    virtual std::string getText(Ref<Token> const& start, Ref<Token> const& stop) = 0;
+    virtual std::string getText(Token *start, Token *stop) = 0;
   };
 
 } // namespace antlr4

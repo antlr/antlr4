@@ -105,7 +105,7 @@ namespace xpath {
     /// Convert word like {@code *} or {@code ID} or {@code expr} to a path
     /// element. {@code anywhere} is {@code true} if {@code //} precedes the
     /// word.
-    virtual XPathElement getXPathElement(const std::shared_ptr<Token> &wordToken, bool anywhere);
+    virtual XPathElement getXPathElement(Token *wordToken, bool anywhere);
   };
 
 } // namespace xpath

@@ -48,6 +48,13 @@
 using namespace antlr4;
 using namespace antlrcpp;
 
+DefaultErrorStrategy::DefaultErrorStrategy() {
+  InitializeInstanceFields();
+}
+
+DefaultErrorStrategy::~DefaultErrorStrategy() {
+}
+
 void DefaultErrorStrategy::reset(Parser *recognizer) {
   endErrorCondition(recognizer);
 }
@@ -188,7 +195,7 @@ void DefaultErrorStrategy::reportUnwantedToken(Parser *recognizer) {
 
   beginErrorCondition(recognizer);
 
-  Ref<Token> t = recognizer->getCurrentToken();
+  Token *t = recognizer->getCurrentToken();
   std::string tokenName = getTokenErrorDisplay(t);
   misc::IntervalSet expecting = getExpectedTokens(recognizer);
 
@@ -204,16 +211,16 @@ void DefaultErrorStrategy::reportMissingToken(Parser *recognizer) {
 
   beginErrorCondition(recognizer);
 
-  Ref<Token> t = recognizer->getCurrentToken();
+  Token *t = recognizer->getCurrentToken();
   misc::IntervalSet expecting = getExpectedTokens(recognizer);
   std::string msg = "missing " + expecting.toString(recognizer->getVocabulary()) + " at " + getTokenErrorDisplay(t);
 
   recognizer->notifyErrorListeners(t, msg, nullptr);
 }
 
-Ref<Token> DefaultErrorStrategy::recoverInline(Parser *recognizer) {
+Token* DefaultErrorStrategy::recoverInline(Parser *recognizer) {
   // SINGLE TOKEN DELETION
-  Ref<Token> matchedSymbol = singleTokenDeletion(recognizer);
+  Token *matchedSymbol = singleTokenDeletion(recognizer);
   if (matchedSymbol) {
     // we have deleted the extra token.
     // now, move past ttype token as if all were ok
@@ -247,22 +254,22 @@ bool DefaultErrorStrategy::singleTokenInsertion(Parser *recognizer) {
   return false;
 }
 
-Ref<Token> DefaultErrorStrategy::singleTokenDeletion(Parser *recognizer) {
+Token* DefaultErrorStrategy::singleTokenDeletion(Parser *recognizer) {
   ssize_t nextTokenType = recognizer->getInputStream()->LA(2);
   misc::IntervalSet expecting = getExpectedTokens(recognizer);
   if (expecting.contains((int)nextTokenType)) {
     reportUnwantedToken(recognizer);
     recognizer->consume(); // simply delete extra token
                            // we want to return the token we're actually matching
-    Ref<Token> matchedSymbol = recognizer->getCurrentToken();
+    Token *matchedSymbol = recognizer->getCurrentToken();
     reportMatch(recognizer); // we know current token is correct
     return matchedSymbol;
   }
   return nullptr;
 }
 
-Ref<Token> DefaultErrorStrategy::getMissingSymbol(Parser *recognizer) {
-  Ref<Token> currentSymbol = recognizer->getCurrentToken();
+Token* DefaultErrorStrategy::getMissingSymbol(Parser *recognizer) {
+  Token *currentSymbol = recognizer->getCurrentToken();
   misc::IntervalSet expecting = getExpectedTokens(recognizer);
   ssize_t expectedTokenType = expecting.getMinElement(); // get any element
   std::string tokenText;
@@ -271,21 +278,24 @@ Ref<Token> DefaultErrorStrategy::getMissingSymbol(Parser *recognizer) {
   } else {
     tokenText = "<missing " + recognizer->getVocabulary().getDisplayName(expectedTokenType) + ">";
   }
-  Ref<Token> current = currentSymbol;
-  Ref<Token> lookback = recognizer->getTokenStream()->LT(-1);
+  Token *current = currentSymbol;
+  Token *lookback = recognizer->getTokenStream()->LT(-1);
   if (current->getType() == Token::EOF && lookback != nullptr) {
     current = lookback;
   }
-  return std::dynamic_pointer_cast<Token>(recognizer->getTokenFactory()->create({ current->getTokenSource(),
+
+  _missingSymbol = recognizer->getTokenFactory()->create({ current->getTokenSource(),
     current->getTokenSource()->getInputStream() }, (int)expectedTokenType, tokenText, Token::DEFAULT_CHANNEL, -1, -1,
-    current->getLine(), current->getCharPositionInLine()));
+    current->getLine(), current->getCharPositionInLine());
+  
+  return _missingSymbol.get();
 }
 
 misc::IntervalSet DefaultErrorStrategy::getExpectedTokens(Parser *recognizer) {
   return recognizer->getExpectedTokens();
 }
 
-std::string DefaultErrorStrategy::getTokenErrorDisplay(Ref<Token> const& t) {
+std::string DefaultErrorStrategy::getTokenErrorDisplay(Token *t) {
   if (t == nullptr) {
     return "<no Token>";
   }
@@ -300,11 +310,11 @@ std::string DefaultErrorStrategy::getTokenErrorDisplay(Ref<Token> const& t) {
   return escapeWSAndQuote(s);
 }
 
-std::string DefaultErrorStrategy::getSymbolText(Ref<Token> const& symbol) {
+std::string DefaultErrorStrategy::getSymbolText(Token *symbol) {
   return symbol->getText();
 }
 
-int DefaultErrorStrategy::getSymbolType(Ref<Token> const& symbol) {
+int DefaultErrorStrategy::getSymbolType(Token *symbol) {
   return symbol->getType();
 }
 
@@ -347,4 +357,5 @@ void DefaultErrorStrategy::consumeUntil(Parser *recognizer, const misc::Interval
 void DefaultErrorStrategy::InitializeInstanceFields() {
   errorRecoveryMode = false;
   lastErrorIndex = -1;
+  _missingSymbol = nullptr;
 }

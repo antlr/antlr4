@@ -941,7 +941,7 @@ AddToLabelList(a) ::= <<
 <ctx(a.label)>-><a.listName>.push_back(<labelref(a.label)>);
 >>
 
-TokenLabelType() ::= "Ref\<<file.TokenLabelType; null = {Token}>>"
+TokenLabelType() ::= "<file.TokenLabelType; null = {Token}>*"
 
 TokenDeclHeader(t) ::= "<TokenLabelType()> <t.name>;" 
 TokenDecl(t) ::= "<! Variable Declaration !>"
@@ -949,7 +949,7 @@ TokenDecl(t) ::= "<! Variable Declaration !>"
 TokenTypeDeclHeader(t) ::= "<! Local Variable !>"
 TokenTypeDecl(t) ::= "ssize_t <t.name>;"
 
-TokenListDeclHeader(t) ::= "std::vector\<Ref\<Token>> <t.name>;"
+TokenListDeclHeader(t) ::= "std::vector\<Token *> <t.name>;"
 TokenListDecl(t) ::= "<! Variable Declaration !>"
 
 RuleContextDeclHeader(r) ::= "Ref\<<parser.name>::<r.ctxName>> <r.name>;"
@@ -1058,7 +1058,7 @@ labelref(x) ::= "<if (!x.isLocal)>std::dynamic_pointer_cast\<<x.ctx.name>>(_loca
 ctx(actionChunk) ::= "std::dynamic_pointer_cast\<<actionChunk.ctx.name>>(_localctx)"
 
 // used for left-recursive rules
-recRuleAltPredicate(ruleName,opPrec) ::= "precpred(_ctx.get(), <opPrec>)"
+recRuleAltPredicate(ruleName,opPrec) ::= "precpred(_ctx, <opPrec>)"
 recRuleSetReturnAction(src,name) ::= "recRuleSetReturnAction(src,name) $<name>=$<src>.<name>;"
 recRuleSetStopToken() ::= "_ctx->stop = _input->LT(-1);"
 

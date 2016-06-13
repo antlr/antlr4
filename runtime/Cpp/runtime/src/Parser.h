@@ -92,7 +92,7 @@ namespace antlr4 {
     /// <exception cref="RecognitionException"> if the current input symbol did not match
     /// {@code ttype} and the error strategy could not recover from the
     /// mismatched symbol </exception>
-    virtual Ref<Token> match(int ttype);
+    virtual Token* match(int ttype);
 
     /// <summary>
     /// Match current input symbol as a wildcard. If the symbol type matches
@@ -110,7 +110,7 @@ namespace antlr4 {
     /// <exception cref="RecognitionException"> if the current input symbol did not match
     /// a wildcard and the error strategy could not recover from the mismatched
     /// symbol </exception>
-    virtual Ref<Token> matchWildcard();
+    virtual Token* matchWildcard();
 
     /// <summary>
     /// Track the <seealso cref="ParserRuleContext"/> objects during the parse and hook
@@ -265,11 +265,11 @@ namespace antlr4 {
     /// Match needs to return the current input symbol, which gets put
     ///  into the label for the associated token ref; e.g., x=ID.
     /// </summary>
-    virtual Ref<Token> getCurrentToken();
+    virtual Token* getCurrentToken();
 
     void notifyErrorListeners(const std::string &msg);
 
-    virtual void notifyErrorListeners(Ref<Token> const& offendingToken, const std::string &msg, std::exception_ptr e);
+    virtual void notifyErrorListeners(Token *offendingToken, const std::string &msg, std::exception_ptr e);
 
     /// <summary>
     /// Consume and return the <seealso cref="#getCurrentToken current symbol"/>.
@@ -292,7 +292,7 @@ namespace antlr4 {
     /// <seealso cref="ParseTreeListener#visitErrorNode"/> is called on any parse
     /// listeners.
     /// </summary>
-    virtual Ref<Token> consume();
+    virtual Token* consume();
     
     /// <summary>
     /// Always called by generated parsers upon entry to a rule. Access field

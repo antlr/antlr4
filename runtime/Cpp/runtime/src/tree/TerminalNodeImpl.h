@@ -38,12 +38,12 @@ namespace tree {
 
   class ANTLR4CPP_PUBLIC TerminalNodeImpl : public virtual TerminalNode {
   public:
-    Ref<Token> symbol;
+    Token *symbol;
     std::weak_ptr<ParseTree> parent;
 
-    TerminalNodeImpl(Ref<Token> const& symbol);
+    TerminalNodeImpl(Token *symbol);
 
-    virtual Ref<Token> getSymbol() override;
+    virtual Token* getSymbol() override;
     virtual misc::Interval getSourceInterval() override;
 
     virtual std::size_t getChildCount() override;

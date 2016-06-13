@@ -170,7 +170,7 @@ namespace pattern {
 
     // ---- SUPPORT CODE ----
 
-    virtual std::vector<Ref<Token>> tokenize(const std::string &pattern);
+    virtual std::vector<std::unique_ptr<Token>> tokenize(const std::string &pattern);
 
     /// Split "<ID> = <e:expr>;" into 4 chunks for tokenizing by tokenize().
     virtual std::vector<Chunk> split(const std::string &pattern);
@@ -191,7 +191,7 @@ namespace pattern {
       Ref<ParseTree> const& patternTree, std::map<std::string, std::vector<Ref<ParseTree>>> &labels);
 
     /// Is t <expr> subtree?
-    virtual Ref<RuleTagToken> getRuleTagToken(Ref<ParseTree> const& t);
+    virtual RuleTagToken* getRuleTagToken(Ref<ParseTree> const& t);
 
   private:
     Lexer *_lexer;

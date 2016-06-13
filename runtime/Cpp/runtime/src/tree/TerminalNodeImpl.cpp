@@ -37,11 +37,10 @@
 using namespace antlr4;
 using namespace antlr4::tree;
 
-TerminalNodeImpl::TerminalNodeImpl(Ref<Token> const& symbol) {
-  this->symbol = symbol;
+TerminalNodeImpl::TerminalNodeImpl(Token *symbol_) : symbol(symbol_) {
 }
 
-Ref<Token> TerminalNodeImpl::getSymbol() {
+Token* TerminalNodeImpl::getSymbol() {
   return symbol;
 }
 

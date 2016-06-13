@@ -45,7 +45,8 @@ using namespace antlr4;
 UnbufferedTokenStream::UnbufferedTokenStream(TokenSource *tokenSource) : UnbufferedTokenStream(tokenSource, 256) {
 }
 
-UnbufferedTokenStream::UnbufferedTokenStream(TokenSource *tokenSource, int /*bufferSize*/) : _tokenSource(tokenSource)
+UnbufferedTokenStream::UnbufferedTokenStream(TokenSource *tokenSource, int /*bufferSize*/)
+  : _tokenSource(tokenSource), _lastToken(nullptr), _lastTokenBufferStart(nullptr)
 {
   InitializeInstanceFields();
   fill(1); // prime the pump
@@ -54,17 +55,17 @@ UnbufferedTokenStream::UnbufferedTokenStream(TokenSource *tokenSource, int /*buf
 UnbufferedTokenStream::~UnbufferedTokenStream() {
 }
 
-Ref<Token> UnbufferedTokenStream::get(size_t i) const
+Token* UnbufferedTokenStream::get(size_t i) const
 { // get absolute index
   size_t bufferStartIndex = getBufferStartIndex();
   if (i < bufferStartIndex || i >= bufferStartIndex + _tokens.size()) {
     throw IndexOutOfBoundsException(std::string("get(") + std::to_string(i) + std::string(") outside buffer: ")
       + std::to_string(bufferStartIndex) + std::string("..") + std::to_string(bufferStartIndex + _tokens.size()));
   }
-  return _tokens[i - bufferStartIndex];
+  return _tokens[i - bufferStartIndex].get();
 }
 
-Ref<Token> UnbufferedTokenStream::LT(ssize_t i)
+Token* UnbufferedTokenStream::LT(ssize_t i)
 {
   if (i == -1) {
     return _lastToken;
@@ -78,10 +79,10 @@ Ref<Token> UnbufferedTokenStream::LT(ssize_t i)
 
   if (index >= (ssize_t)_tokens.size()) {
     assert(_tokens.size() > 0 && _tokens.back()->getType() == EOF);
-    return _tokens.back();
+    return _tokens.back().get();
   }
 
-  return _tokens[(size_t)index];
+  return _tokens[(size_t)index].get();
 }
 
 ssize_t UnbufferedTokenStream::LA(ssize_t i)
@@ -104,7 +105,7 @@ std::string UnbufferedTokenStream::getText(RuleContext* ctx)
   return getText(ctx->getSourceInterval());
 }
 
-std::string UnbufferedTokenStream::getText(Ref<Token> const& start, Ref<Token> const& stop)
+std::string UnbufferedTokenStream::getText(Token *start, Token *stop)
 {
   return getText(misc::Interval(start->getTokenIndex(), stop->getTokenIndex()));
 }
@@ -116,7 +117,7 @@ void UnbufferedTokenStream::consume()
   }
 
   // buf always has at least tokens[p==0] in this method due to ctor
-  _lastToken = _tokens[_p]; // track last token for LT(-1)
+  _lastToken = _tokens[_p].get(); // track last token for LT(-1)
 
   // if we're at last token and no markers, opportunity to flush buffer
   if (_p == _tokens.size() - 1 && _numMarkers == 0) {
@@ -156,21 +157,20 @@ size_t UnbufferedTokenStream::fill(size_t n)
       return i;
     }
 
-    Ref<Token> t = _tokenSource->nextToken();
-    add(t);
+    add(_tokenSource->nextToken());
   }
 
   return n;
 }
 
-void UnbufferedTokenStream::add(Ref<Token> t)
+void UnbufferedTokenStream::add(std::unique_ptr<Token> t)
 {
-  Ref<WritableToken> writable = std::dynamic_pointer_cast<WritableToken>(t);
-  if (writable) {
+  WritableToken *writable = dynamic_cast<WritableToken *>(t.get());
+  if (writable != nullptr) {
     writable->setTokenIndex(int(getBufferStartIndex() + _tokens.size()));
   }
 
-  _tokens.push_back(t);
+  _tokens.push_back(std::move(t));
 }
 
 /// <summary>
@@ -203,7 +203,7 @@ void UnbufferedTokenStream::release(ssize_t marker)
     if (_p > 0) {
       // Copy tokens[p]..tokens[n-1] to tokens[0]..tokens[(n-1)-p], reset ptrs
       // p is last valid token; move nothing if p==n as we have no valid char
-      std::vector<Ref<Token>>(_tokens.begin() + (ssize_t)_p, _tokens.end()).swap(_tokens);
+      _tokens.erase(_tokens.begin(), _tokens.begin() + (ssize_t)_p);
       _p = 0;
     }
 
@@ -243,7 +243,7 @@ void UnbufferedTokenStream::seek(size_t index)
   if (_p == 0) {
     _lastToken = _lastTokenBufferStart;
   } else {
-    _lastToken = _tokens[_p - 1];
+    _lastToken = _tokens[_p - 1].get();
   }
 }
 
@@ -274,7 +274,7 @@ std::string UnbufferedTokenStream::getText(const misc::Interval &interval)
 
   std::stringstream ss;
   for (size_t i = a; i <= b; i++) {
-    Ref<Token> t = _tokens[i];
+    Token *t = _tokens[i].get();
     if (i > 0)
       ss << ", ";
     ss << t->getText();

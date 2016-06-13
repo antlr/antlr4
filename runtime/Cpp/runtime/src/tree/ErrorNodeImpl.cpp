@@ -37,5 +37,5 @@ using namespace antlr4;
 using namespace antlr4::misc;
 using namespace antlr4::tree;
 
-ErrorNodeImpl::ErrorNodeImpl(Ref<Token> const& token) : TerminalNodeImpl(token) {
+ErrorNodeImpl::ErrorNodeImpl(Token *token) : TerminalNodeImpl(token) {
 }

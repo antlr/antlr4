@@ -117,8 +117,8 @@ void Parser::reset() {
   }
 }
 
-Ref<Token> Parser::match(int ttype) {
-  Ref<Token> t = getCurrentToken();
+Token* Parser::match(int ttype) {
+  Token *t = getCurrentToken();
   if (t->getType() == ttype) {
     if (ttype == EOF) {
       _matchedEOF = true;
@@ -136,8 +136,8 @@ Ref<Token> Parser::match(int ttype) {
   return t;
 }
 
-Ref<Token> Parser::matchWildcard() {
-  Ref<Token> t = getCurrentToken();
+Token* Parser::matchWildcard() {
+  Token *t = getCurrentToken();
   if (t->getType() > 0) {
     _errHandler->reportMatch(this);
     consume();
@@ -290,7 +290,7 @@ void Parser::setTokenStream(TokenStream *input) {
   _input = input;
 }
 
-Ref<Token> Parser::getCurrentToken() {
+Token* Parser::getCurrentToken() {
   return _input->LT(1);
 }
 
@@ -298,7 +298,7 @@ void Parser::notifyErrorListeners(const std::string &msg) {
   notifyErrorListeners(getCurrentToken(), msg, nullptr);
 }
 
-void Parser::notifyErrorListeners(Ref<Token> const& offendingToken, const std::string &msg, std::exception_ptr e) {
+void Parser::notifyErrorListeners(Token *offendingToken, const std::string &msg, std::exception_ptr e) {
   _syntaxErrors++;
   int line = -1;
   int charPositionInLine = -1;
@@ -309,8 +309,8 @@ void Parser::notifyErrorListeners(Ref<Token> const& offendingToken, const std::s
   listener.syntaxError(this, offendingToken, (size_t)line, charPositionInLine, msg, e);
 }
 
-Ref<Token> Parser::consume() {
-  Ref<Token> o = getCurrentToken();
+Token* Parser::consume() {
+  Token *o = getCurrentToken();
   if (o->getType() != EOF) {
     getInputStream()->consume();
   }

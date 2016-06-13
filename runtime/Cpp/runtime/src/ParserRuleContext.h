@@ -91,7 +91,8 @@ namespace antlr4 {
     /// </summary>
     //	public List<Integer> states;
 
-    Ref<Token> start, stop;
+    Token *start;
+    Token *stop;
 
     /// The exception that forced this rule to return. If the rule successfully
     /// completed, this is "null exception pointer".
@@ -121,11 +122,12 @@ namespace antlr4 {
     /// generic ruleContext object.
     virtual void removeLastChild();
 
-    virtual Ref<tree::TerminalNode> addChild(Ref<Token> const& matchedToken);
+    virtual Ref<tree::TerminalNode> addChild(Token *matchedToken);
+    virtual Ref<tree::ErrorNode> addErrorNode(Token *badToken);
 
-    virtual Ref<tree::ErrorNode> addErrorNode(Ref<Token> const& badToken);
-
-    std::weak_ptr<ParserRuleContext> getParent() { return std::dynamic_pointer_cast<ParserRuleContext>(getParentReference().lock()); };
+    std::weak_ptr<ParserRuleContext> getParent() {
+      return std::dynamic_pointer_cast<ParserRuleContext>(getParentReference().lock());
+    };
 
     virtual Ref<tree::TerminalNode> getToken(int ttype, std::size_t i);
 
@@ -168,14 +170,14 @@ namespace antlr4 {
      * Note that the range from start to stop is inclusive, so for rules that do not consume anything
      * (for example, zero length or error productions) this token may exceed stop.
      */
-    virtual Ref<Token> getStart();
+    virtual Token*getStart();
 
     /**
      * Get the final token in this context.
      * Note that the range from start to stop is inclusive, so for rules that do not consume anything
      * (for example, zero length or error productions) this token may precede start.
      */
-    virtual Ref<Token> getStop();
+    virtual Token* getStop();
 
     /// <summary>
     /// Used for rule context info debugging during parse-time, not so much for ATN debugging </summary>

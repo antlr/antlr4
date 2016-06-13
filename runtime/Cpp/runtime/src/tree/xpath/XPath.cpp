@@ -71,14 +71,14 @@ std::vector<XPathElement> XPath::split(const std::string &path) {
     throw IllegalArgumentException(msg);
   }
 
-  std::vector<Ref<Token>> tokens = tokenStream.getTokens();
+  std::vector<Token *> tokens = tokenStream.getTokens();
   std::vector<XPathElement> elements;
   size_t n = tokens.size();
   size_t i = 0;
   bool done = false;
   while (!done && i < n) {
-    Ref<Token> el = tokens[i];
-    Ref<Token> next = nullptr;
+    Token *el = tokens[i];
+    Token *next = nullptr;
     switch (el->getType()) {
       case XPathLexer::ROOT:
       case XPathLexer::ANYWHERE: {
@@ -116,7 +116,7 @@ std::vector<XPathElement> XPath::split(const std::string &path) {
   return elements;
 }
 
-XPathElement XPath::getXPathElement(const Ref<Token> &wordToken, bool anywhere) {
+XPathElement XPath::getXPathElement(Token *wordToken, bool anywhere) {
   if (wordToken->getType() == Token::EOF) {
     throw IllegalArgumentException("Missing path element at end of path");
   }

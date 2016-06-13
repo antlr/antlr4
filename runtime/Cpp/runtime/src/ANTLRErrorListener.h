@@ -76,7 +76,7 @@ namespace antlr4 {
     ///        the reporting of an error. It is null in the case where
     ///        the parser was able to recover in line without exiting the
     ///        surrounding rule. </param>
-    virtual void syntaxError(IRecognizer *recognizer, Ref<Token> const& offendingSymbol, size_t line,
+    virtual void syntaxError(IRecognizer *recognizer, Token *offendingSymbol, size_t line,
                              int charPositionInLine, const std::string &msg, std::exception_ptr e) = 0;
 
     /**

@@ -101,17 +101,11 @@ ParseTreeMatch ParseTreePatternMatcher::match(Ref<ParseTree> const& tree, const 
 }
 
 ParseTreePattern ParseTreePatternMatcher::compile(const std::string &pattern, int patternRuleIndex) {
-  std::vector<Ref<Token>> tokenList = tokenize(pattern);
-
-  ListTokenSource *tokenSrc = new ListTokenSource(tokenList); /* mem-check: deleted in finally block */
-  CommonTokenStream *tokens = new CommonTokenStream(tokenSrc); /* mem-check: deleted in finally block */
-  auto onExit = finally([tokenSrc, tokens]() {
-    delete tokenSrc;
-    delete tokens;
-  });
+  ListTokenSource tokenSrc(std::move(tokenize(pattern)));
+  CommonTokenStream tokens(&tokenSrc);
 
   ParserInterpreter parserInterp(_parser->getGrammarFileName(), _parser->getVocabulary(),
-                                 _parser->getRuleNames(), _parser->getATNWithBypassAlts(), tokens);
+                                 _parser->getRuleNames(), _parser->getATNWithBypassAlts(), &tokens);
 
   Ref<ParserRuleContext> tree;
   try {
@@ -136,7 +130,7 @@ ParseTreePattern ParseTreePatternMatcher::compile(const std::string &pattern, in
   }
 
   // Make sure tree pattern compilation checks for a complete parse
-  if (tokens->LA(1) != Token::EOF) {
+  if (tokens.LA(1) != Token::EOF) {
     throw StartRuleDoesNotConsumeFullPattern();
   }
   
@@ -169,8 +163,8 @@ Ref<ParseTree> ParseTreePatternMatcher::matchImpl(Ref<ParseTree> const& tree,
     Ref<ParseTree> mismatchedNode;
     // both are tokens and they have same type
     if (t1->getSymbol()->getType() == t2->getSymbol()->getType()) {
-      if (is<TokenTagToken>(t2->getSymbol())) { // x and <ID>
-        Ref<TokenTagToken> tokenTagToken = std::dynamic_pointer_cast<TokenTagToken>(t2->getSymbol());
+      if (is<TokenTagToken *>(t2->getSymbol())) { // x and <ID>
+        TokenTagToken *tokenTagToken = dynamic_cast<TokenTagToken *>(t2->getSymbol());
 
         // track label->list-of-nodes for both token name and label (if any)
         labels[tokenTagToken->getTokenName()].push_back(tree);
@@ -200,7 +194,7 @@ Ref<ParseTree> ParseTreePatternMatcher::matchImpl(Ref<ParseTree> const& tree,
     Ref<ParseTree> mismatchedNode;
 
     // (expr ...) and <expr>
-    Ref<RuleTagToken> ruleTagToken = getRuleTagToken(r2);
+    RuleTagToken *ruleTagToken = getRuleTagToken(r2);
     if (ruleTagToken != nullptr) {
       //ParseTreeMatch *m = nullptr; // unused?
       if (r1->RuleContext::getRuleContext()->getRuleIndex() == r2->RuleContext::getRuleContext()->getRuleIndex()) {
@@ -242,25 +236,25 @@ Ref<ParseTree> ParseTreePatternMatcher::matchImpl(Ref<ParseTree> const& tree,
   return tree;
 }
 
-Ref<RuleTagToken> ParseTreePatternMatcher::getRuleTagToken(Ref<ParseTree> const& t) {
+RuleTagToken* ParseTreePatternMatcher::getRuleTagToken(Ref<ParseTree> const& t) {
   if (is<RuleNode>(t)) {
     Ref<RuleNode> r = std::dynamic_pointer_cast<RuleNode>(t);
     if (r->getChildCount() == 1 && is<TerminalNode>(r->getChild(0))) {
       Ref<TerminalNode> c = std::dynamic_pointer_cast<TerminalNode>(r->getChild(0));
-      if (is<RuleTagToken>(c->getSymbol())) {
-        return std::dynamic_pointer_cast<RuleTagToken>(c->getSymbol());
+      if (is<RuleTagToken *>(c->getSymbol())) {
+        return dynamic_cast<RuleTagToken *>(c->getSymbol());
       }
     }
   }
   return nullptr;
 }
 
-std::vector<Ref<Token>> ParseTreePatternMatcher::tokenize(const std::string &pattern) {
+std::vector<std::unique_ptr<Token>> ParseTreePatternMatcher::tokenize(const std::string &pattern) {
   // split pattern into chunks: sea (raw input) and islands (<ID>, <expr>)
   std::vector<Chunk> chunks = split(pattern);
 
   // create token stream from text and tags
-  std::vector<Ref<Token>> tokens;
+  std::vector<std::unique_ptr<Token>> tokens;
   for (auto chunk : chunks) {
     if (is<TagChunk *>(&chunk)) {
       TagChunk &tagChunk = (TagChunk&)chunk;
@@ -270,15 +264,14 @@ std::vector<Ref<Token>> ParseTreePatternMatcher::tokenize(const std::string &pat
         if (ttype == Token::INVALID_TYPE) {
           throw IllegalArgumentException("Unknown token " + tagChunk.getTag() + " in pattern: " + pattern);
         }
-        Ref<TokenTagToken> t = std::make_shared<TokenTagToken>(tagChunk.getTag(), (int)ttype, tagChunk.getLabel());
-        tokens.push_back(t);
+        tokens.emplace_back(new TokenTagToken(tagChunk.getTag(), (int)ttype, tagChunk.getLabel()));
       } else if (islower(tagChunk.getTag()[0])) {
         ssize_t ruleIndex = _parser->getRuleIndex(tagChunk.getTag());
         if (ruleIndex == -1) {
           throw IllegalArgumentException("Unknown rule " + tagChunk.getTag() + " in pattern: " + pattern);
         }
         int ruleImaginaryTokenType = _parser->getATNWithBypassAlts().ruleToTokenType[(size_t)ruleIndex];
-        tokens.push_back(std::make_shared<RuleTagToken>(tagChunk.getTag(), ruleImaginaryTokenType, tagChunk.getLabel()));
+        tokens.emplace_back(new RuleTagToken(tagChunk.getTag(), ruleImaginaryTokenType, tagChunk.getLabel()));
       } else {
         throw IllegalArgumentException("invalid tag: " + tagChunk.getTag() + " in pattern: " + pattern);
       }
@@ -286,9 +279,9 @@ std::vector<Ref<Token>> ParseTreePatternMatcher::tokenize(const std::string &pat
       TextChunk &textChunk = (TextChunk&)chunk;
       ANTLRInputStream input(textChunk.getText());
       _lexer->setInputStream(&input);
-      Ref<Token> t = _lexer->nextToken();
+      std::unique_ptr<Token> t(_lexer->nextToken());
       while (t->getType() != Token::EOF) {
-        tokens.push_back(t);
+        tokens.push_back(std::move(t));
         t = _lexer->nextToken();
       }
       _lexer->setInputStream(nullptr);
@@ -347,6 +340,7 @@ std::vector<Chunk> ParseTreePatternMatcher::split(const std::string &pattern) {
     std::string text = pattern.substr(0, starts[0]);
     chunks.push_back(TextChunk(text));
   }
+  
   for (size_t i = 0; i < ntags; i++) {
     // copy inside of <tag>
     std::string tag = pattern.substr(starts[i] + _start.length(), stops[i] - (starts[i] + _start.length()));
@@ -364,6 +358,7 @@ std::vector<Chunk> ParseTreePatternMatcher::split(const std::string &pattern) {
       chunks.push_back(TextChunk(text));
     }
   }
+
   if (ntags > 0) {
     size_t afterLastTag = stops[ntags - 1] + _stop.length();
     if (afterLastTag < n) { // copy text from end of last tag to end

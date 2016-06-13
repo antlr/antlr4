@@ -49,7 +49,7 @@ void ProxyErrorListener::removeErrorListeners() {
   _delegates.clear();
 }
 
-void ProxyErrorListener::syntaxError(IRecognizer *recognizer, Ref<Token> const& offendingSymbol, size_t line,
+void ProxyErrorListener::syntaxError(IRecognizer *recognizer, Token *offendingSymbol, size_t line,
   int charPositionInLine, const std::string &msg, std::exception_ptr e) {
 
   for (auto listener : _delegates) {

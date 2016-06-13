@@ -34,7 +34,7 @@
 
 using namespace antlr4;
 
-void BaseErrorListener::syntaxError(IRecognizer * /*recognizer*/, Ref<Token> const& /*offendingSymbol*/, size_t /*line*/,
+void BaseErrorListener::syntaxError(IRecognizer * /*recognizer*/, Token * /*offendingSymbol*/, size_t /*line*/,
   int /*charPositionInLine*/, const std::string &/*msg*/, std::exception_ptr /*e*/) {
 }
 

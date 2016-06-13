@@ -58,7 +58,7 @@ namespace antlr4 {
     /// <seealso cref="CharStream"/>). Do not fail/return upon lexing error; keep chewing
     /// on the characters until you get a good one; errors are not passed through
     /// to the parser.
-    virtual Ref<Token> nextToken() = 0;
+    virtual std::unique_ptr<Token> nextToken() = 0;
 
     /// <summary>
     /// Get the line number for the current position in the input stream. The

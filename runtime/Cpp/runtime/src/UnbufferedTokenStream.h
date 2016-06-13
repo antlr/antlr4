@@ -41,8 +41,8 @@ namespace antlr4 {
     UnbufferedTokenStream(TokenSource *tokenSource, int bufferSize);
     virtual ~UnbufferedTokenStream();
 
-    virtual Ref<Token> get(size_t i) const override;
-    virtual Ref<Token> LT(ssize_t i) override;
+    virtual Token* get(size_t i) const override;
+    virtual Token* LT(ssize_t i) override;
     virtual ssize_t LA(ssize_t i) override;
 
     virtual TokenSource* getTokenSource() const override;
@@ -50,7 +50,7 @@ namespace antlr4 {
     virtual std::string getText(const misc::Interval &interval) override;
     virtual std::string getText() override;
     virtual std::string getText(RuleContext *ctx) override;
-    virtual std::string getText(Ref<Token> const& start, Ref<Token> const& stop) override;
+    virtual std::string getText(Token *start, Token *stop) override;
 
     virtual void consume() override;
 
@@ -80,7 +80,7 @@ namespace antlr4 {
     /// we start filling at index 0 again.
     /// </summary>
 
-    std::vector<Ref<Token>> _tokens;
+    std::vector<std::unique_ptr<Token>> _tokens;
 
     /// <summary>
     /// 0..n-1 index into <seealso cref="#tokens tokens"/> of next token.
@@ -101,13 +101,13 @@ namespace antlr4 {
     /// <summary>
     /// This is the {@code LT(-1)} token for the current position.
     /// </summary>
-    Ref<Token> _lastToken;
+    Token *_lastToken;
 
     /// <summary>
     /// When {@code numMarkers > 0}, this is the {@code LT(-1)} token for the
     /// first token in <seealso cref="#tokens"/>. Otherwise, this is {@code null}.
     /// </summary>
-    Ref<Token> _lastTokenBufferStart;
+    Token *_lastTokenBufferStart;
 
     /// <summary>
     /// Absolute token index. It's the index of the token about to be read via
@@ -127,7 +127,7 @@ namespace antlr4 {
     /// then EOF was reached before {@code n} tokens could be added.
     /// </summary>
     virtual size_t fill(size_t n);
-    virtual void add(Ref<Token> t);
+    virtual void add(std::unique_ptr<Token> t);
 
     size_t getBufferStartIndex() const;
 

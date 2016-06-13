@@ -42,9 +42,8 @@ namespace antlr4 {
    */
   class ANTLR4CPP_PUBLIC DefaultErrorStrategy : public ANTLRErrorStrategy {
   public:
-    DefaultErrorStrategy() {
-      InitializeInstanceFields();
-    }
+    DefaultErrorStrategy();
+    virtual ~DefaultErrorStrategy();
 
   protected:
     /**
@@ -302,7 +301,7 @@ namespace antlr4 {
      * is in the set of tokens that can follow the {@code ')'} token reference
      * in rule {@code atom}. It can assume that you forgot the {@code ')'}.
      */
-    virtual Ref<Token> recoverInline(Parser *recognizer) override;
+    virtual Token* recoverInline(Parser *recognizer) override;
 
     /// <summary>
     /// This method implements the single-token insertion inline error recovery
@@ -341,7 +340,7 @@ namespace antlr4 {
     /// <returns> the successfully matched <seealso cref="Token"/> instance if single-token
     /// deletion successfully recovers from the mismatched input, otherwise
     /// {@code null} </returns>
-    virtual Ref<Token> singleTokenDeletion(Parser *recognizer);
+    virtual Token* singleTokenDeletion(Parser *recognizer);
 
     /// <summary>
     /// Conjure up a missing token during error recovery.
@@ -363,7 +362,7 @@ namespace antlr4 {
     ///  If you change what tokens must be created by the lexer,
     ///  override this method to create the appropriate tokens.
     /// </summary>
-    virtual Ref<Token> getMissingSymbol(Parser *recognizer);
+    virtual Token* getMissingSymbol(Parser *recognizer);
 
     virtual misc::IntervalSet getExpectedTokens(Parser *recognizer);
 
@@ -376,11 +375,11 @@ namespace antlr4 {
     ///  your token objects because you don't have to go modify your lexer
     ///  so that it creates a new class.
     /// </summary>
-    virtual std::string getTokenErrorDisplay(Ref<Token> const& t);
+    virtual std::string getTokenErrorDisplay(Token *t);
 
-    virtual std::string getSymbolText(Ref<Token> const& symbol);
+    virtual std::string getSymbolText(Token *symbol);
 
-    virtual int getSymbolType(Ref<Token> const& symbol);
+    virtual int getSymbolType(Token *symbol);
 
     virtual std::string escapeWSAndQuote(std::string &s);
 
@@ -483,8 +482,8 @@ namespace antlr4 {
     virtual void consumeUntil(Parser *recognizer, const misc::IntervalSet &set);
 
   private:
+    std::unique_ptr<Token> _missingSymbol; // Temporarily created token.
     void InitializeInstanceFields();
-
   };
 
 } // namespace antlr4

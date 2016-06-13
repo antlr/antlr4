@@ -4683,7 +4683,7 @@ public class TestLexerExec extends BaseCppTest {
 	public void testPositionAdjustingLexer() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(2729);
+		StringBuilder grammarBuilder = new StringBuilder(2721);
 		grammarBuilder.append("lexer grammar PositionAdjustingLexer;\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("@members {\n");
@@ -4705,7 +4705,7 @@ public class TestLexerExec extends BaseCppTest {
 		grammarBuilder.append("  };\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("public:\n");
-		grammarBuilder.append("  virtual Ref<Token> nextToken() override {\n");
+		grammarBuilder.append("  virtual Token* nextToken() override {\n");
 		grammarBuilder.append("    if (dynamic_cast<PositionAdjustingLexerATNSimulator *>(_interpreter) == nullptr) {\n");
 		grammarBuilder.append("      delete _interpreter;\n");
 		grammarBuilder.append("      _interpreter = new PositionAdjustingLexerATNSimulator(this, _atn, _decisionToDFA, _sharedContextCache);\n");
@@ -4714,7 +4714,7 @@ public class TestLexerExec extends BaseCppTest {
 		grammarBuilder.append("    return Lexer::nextToken();\n");
 		grammarBuilder.append("  }\n");
 		grammarBuilder.append("\n");
-		grammarBuilder.append("  virtual Ref<Token> emit() override {\n");
+		grammarBuilder.append("  virtual Token* emit() override {\n");
 		grammarBuilder.append("    switch (type) {\n");
 		grammarBuilder.append("      case TOKENS:\n");
 		grammarBuilder.append("        handleAcceptPositionForKeyword(\"tokens\");\n");

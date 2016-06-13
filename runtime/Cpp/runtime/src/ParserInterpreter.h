@@ -196,10 +196,11 @@ namespace antlr4 {
      *  tree.
      */
     void recover(RecognitionException &e);
-    Ref<Token> recoverInline();
+    Token* recoverInline();
 
   private:
     const dfa::Vocabulary &_vocabulary;
+    std::unique_ptr<Token> _errorToken;
   };
 
 } // namespace antlr4

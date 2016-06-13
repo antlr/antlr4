@@ -80,7 +80,7 @@ namespace antlr4 {
      * @throws RecognitionException if the error strategy was not able to
      * recover from the unexpected input symbol
      */
-    virtual Ref<Token> recoverInline(Parser *recognizer) = 0;
+    virtual Token* recoverInline(Parser *recognizer) = 0;
 
     /// <summary>
     /// This method is called to recover from exception {@code e}. This method is

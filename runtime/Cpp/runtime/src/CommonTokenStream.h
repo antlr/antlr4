@@ -94,10 +94,10 @@ namespace antlr4 {
   protected:
     virtual ssize_t adjustSeekIndex(size_t i) override;
 
-    virtual Ref<Token> LB(size_t k) override;
+    virtual Token* LB(size_t k) override;
 
   public:
-    virtual Ref<Token> LT(ssize_t k) override;
+    virtual Token* LT(ssize_t k) override;
 
     /// Count EOF just once.
     virtual int getNumberOfOnChannelTokens();

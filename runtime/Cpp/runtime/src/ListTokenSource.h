@@ -36,59 +36,46 @@
 
 namespace antlr4 {
 
-  /// <summary>
   /// Provides an implementation of <seealso cref="TokenSource"/> as a wrapper around a list
   /// of <seealso cref="Token"/> objects.
-  /// <p/>
+  ///
   /// If the final token in the list is an <seealso cref="Token#EOF"/> token, it will be used
   /// as the EOF token for every call to <seealso cref="#nextToken"/> after the end of the
   /// list is reached. Otherwise, an EOF token will be created.
-  /// </summary>
   class ANTLR4CPP_PUBLIC ListTokenSource : public TokenSource {
   protected:
-    const std::vector<Ref<Token>> tokens;
+    // This list will be emptied token by token as we call nextToken().
+    // Token streams can be used to buffer tokens for a while.
+    std::vector<std::unique_ptr<Token>> tokens;
 
+  private:
     /// <summary>
     /// The name of the input source. If this value is {@code null}, a call to
     /// <seealso cref="#getSourceName"/> should return the source name used to create the
     /// the next token in <seealso cref="#tokens"/> (or the previous token if the end of
     /// the input has been reached).
     /// </summary>
-  private:
     const std::string sourceName;
 
-    /// <summary>
+  protected:
     /// The index into <seealso cref="#tokens"/> of token to return by the next call to
     /// <seealso cref="#nextToken"/>. The end of the input is indicated by this value
     /// being greater than or equal to the number of items in <seealso cref="#tokens"/>.
-    /// </summary>
-  protected:
     size_t i;
 
-    /// <summary>
-    /// This field caches the EOF token for the token source.
-    /// </summary>
-    Ref<Token> eofToken;
-
-    /// <summary>
+  private:
     /// This is the backing field for <seealso cref="#getTokenFactory"/> and
     /// <seealso cref="setTokenFactory"/>.
-    /// </summary>
-  private:
     Ref<TokenFactory<CommonToken>> _factory = CommonTokenFactory::DEFAULT;
 
-    /// <summary>
+  public:
     /// Constructs a new <seealso cref="ListTokenSource"/> instance from the specified
     /// collection of <seealso cref="Token"/> objects.
-    /// </summary>
+    ///
     /// <param name="tokens"> The collection of <seealso cref="Token"/> objects to provide as a
     /// <seealso cref="TokenSource"/>. </param>
     /// <exception cref="NullPointerException"> if {@code tokens} is {@code null} </exception>
-  public:
-
-    template<typename T1>
-    ListTokenSource(std::vector<T1> tokens) : ListTokenSource(tokens, "") {
-    }
+    ListTokenSource(std::vector<std::unique_ptr<Token>> tokens);
 
     /// <summary>
     /// Constructs a new <seealso cref="ListTokenSource"/> instance from the specified
@@ -102,17 +89,10 @@ namespace antlr4 {
     /// been reached).
     /// </param>
     /// <exception cref="NullPointerException"> if {@code tokens} is {@code null} </exception>
-    template<typename T1>
-    ListTokenSource(std::vector<T1> tokens, const std::string &/*sourceName*/) {
-      InitializeInstanceFields();
-      if (tokens.empty()) {
-        throw "tokens cannot be nul";
-      }
-
-    }
+    ListTokenSource(std::vector<std::unique_ptr<Token>> tokens_, const std::string &sourceName_);
 
     virtual int getCharPositionInLine() override;
-    virtual Ref<Token> nextToken() override;
+    virtual std::unique_ptr<Token> nextToken() override;
     virtual size_t getLine() const override;
     virtual CharStream* getInputStream() override;
     virtual std::string getSourceName() override;

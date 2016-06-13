@@ -67,7 +67,11 @@ namespace antlr4 {
     ///  emissions, then set this to the last token to be matched or
     ///  something nonnull so that the auto token emit mechanism will not
     ///  emit another token.
-    Ref<Token> token;
+
+    // Life cycle of a token is this:
+    // Created by emit() (via the token factory) or by action code, holding ownership of it.
+    // Ownership is handed over to the token stream when calling nextToken().
+    std::unique_ptr<Token> token;
 
     /// <summary>
     /// What character index in the stream did the current token start at?
@@ -108,7 +112,7 @@ namespace antlr4 {
     virtual void reset();
 
     /// Return a token from this source; i.e., match a token on the char stream.
-    virtual Ref<Token> nextToken() override;
+    virtual std::unique_ptr<Token> nextToken() override;
 
     /// Instruct the lexer to skip creating a token for current lexer rule
     /// and look for another token.  nextToken() knows to keep looking when
@@ -139,16 +143,16 @@ namespace antlr4 {
     /// for efficiency reasons.  Subclass and override this method, nextToken,
     /// and getToken (to push tokens into a list and pull from that list
     /// rather than a single variable as this implementation does).
-    virtual void emit(Ref<Token> const& token);
+    virtual void emit(std::unique_ptr<Token> token);
 
     /// The standard method called to automatically emit a token at the
     /// outermost lexical rule.  The token object should point into the
     /// char buffer start..stop.  If there is a text override in 'text',
     /// use that to set the token's text.  Override this method to emit
     /// custom Token objects or provide a new factory.
-    virtual Ref<Token> emit();
+    virtual Token* emit();
 
-    virtual Ref<Token> emitEOF();
+    virtual Token* emitEOF();
 
     virtual size_t getLine() const override;
 
@@ -169,11 +173,10 @@ namespace antlr4 {
     /// changes to the text.
     virtual void setText(const std::string &text);
 
-    /// <summary>
-    /// Override if emitting multiple tokens. </summary>
-    virtual Ref<Token> getToken();
+    /// Override if emitting multiple tokens.
+    virtual std::unique_ptr<Token> getToken();
 
-    virtual void setToken(Ref<Token> const& token);
+    virtual void setToken(std::unique_ptr<Token> token);
 
     virtual void setType(ssize_t ttype);
 
@@ -187,7 +190,7 @@ namespace antlr4 {
 
     /// Return a list of all Token objects in input char stream.
     /// Forces load of all tokens. Does not include EOF token.
-    virtual std::vector<Ref<Token>> getAllTokens();
+    virtual std::vector<std::unique_ptr<Token>> getAllTokens();
 
     virtual void recover(const LexerNoViableAltException &e);
 

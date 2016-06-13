@@ -45,10 +45,10 @@ CommonTokenFactory::CommonTokenFactory(bool copyText) : copyText(copyText) {
 CommonTokenFactory::CommonTokenFactory() : CommonTokenFactory(false) {
 }
 
-Ref<CommonToken> CommonTokenFactory::create(std::pair<TokenSource*, CharStream*> source, int type,
+std::unique_ptr<CommonToken> CommonTokenFactory::create(std::pair<TokenSource*, CharStream*> source, int type,
   const std::string &text, int channel, int start, int stop, int line, int charPositionInLine) {
 
-  Ref<CommonToken> t = std::make_shared<CommonToken>(source, type, channel, start, stop);
+  std::unique_ptr<CommonToken> t(new CommonToken(source, type, channel, start, stop));
   t->setLine(line);
   t->setCharPositionInLine(charPositionInLine);
   if (text != "") {
@@ -60,6 +60,6 @@ Ref<CommonToken> CommonTokenFactory::create(std::pair<TokenSource*, CharStream*>
   return t;
 }
 
-Ref<CommonToken> CommonTokenFactory::create(int type, const std::string &text) {
-  return std::make_shared<CommonToken>(type, text);
+std::unique_ptr<CommonToken> CommonTokenFactory::create(int type, const std::string &text) {
+  return std::unique_ptr<CommonToken>(new CommonToken(type, text));
 }
