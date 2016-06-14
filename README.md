@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/pboyer/antlr4.svg?branch=master)](https://travis-ci.org/pboyer/antlr4)
+
 # ANTLR4 Language Target, Runtime for Go
 
 ### Usage
