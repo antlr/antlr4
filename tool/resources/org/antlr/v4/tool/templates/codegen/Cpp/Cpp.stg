@@ -714,7 +714,7 @@ StarBlock(choice, alts, sync, iteration) ::= <<
 setState(<choice.stateNumber>);
 _errHandler->sync(this);
 alt = getInterpreter\<atn::ParserATNSimulator>()->adaptivePredict(_input, <choice.decision>, _ctx);
-while (alt != <choice.exitAlt> && alt != -1) {
+while (alt != <choice.exitAlt> && alt != atn::ATN::INVALID_ALT_NUMBER) {
   if (alt == 1<if(!choice.ast.greedy)> + 1<endif>) {
     <iteration>
     <alts> <! should only be one !>
