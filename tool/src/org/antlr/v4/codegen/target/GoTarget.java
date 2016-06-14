@@ -1,4 +1,3 @@
-
 package org.antlr.v4.codegen.target;
 
 import org.antlr.v4.codegen.CodeGenerator;
@@ -66,7 +65,7 @@ public class GoTarget extends Target {
 
 	@Override
 	public String encodeIntAsCharEscape(int v) {
-		return Integer.toString(v) + ",";
+		return Integer.toString(v);
 	}
 
 	@Override
