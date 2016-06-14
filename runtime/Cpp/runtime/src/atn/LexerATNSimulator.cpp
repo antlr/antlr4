@@ -128,11 +128,8 @@ void LexerATNSimulator::clearDFA() {
 int LexerATNSimulator::matchATN(CharStream *input) {
   ATNState *startState = (ATNState *)atn.modeToStartState[_mode];
 
-  if (debug) {
-    std::cout << "matchATN mode" << _mode << " start: " << startState << std::endl;
-  }
-
   std::unique_ptr<ATNConfigSet> s0_closure = computeStartState(input, startState);
+
   bool suppressEdge = s0_closure->hasSemanticContext;
   s0_closure->hasSemanticContext = false;
 
@@ -329,6 +326,7 @@ std::unique_ptr<ATNConfigSet> LexerATNSimulator::computeStartState(CharStream *i
     Ref<LexerATNConfig> c = std::make_shared<LexerATNConfig>(target, (int)(i + 1), initialContext);
     closure(input, c, configs.get(), false, false, false);
   }
+
   return configs;
 }
 

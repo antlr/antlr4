@@ -117,8 +117,10 @@ size_t BufferedTokenStream::fetch(size_t n) {
     return 0;
   }
 
-  for (size_t i = 0; i < n; i++) {
+  size_t i = 0;
+  while (i < n) {
     std::unique_ptr<Token> t(_tokenSource->nextToken());
+
     if (is<WritableToken *>(t.get())) {
       (static_cast<WritableToken *>(t.get()))->setTokenIndex((int)_tokens.size());
     }
@@ -126,11 +128,12 @@ size_t BufferedTokenStream::fetch(size_t n) {
     _tokens.push_back(std::move(t));
     if (_tokens.back()->getType() == Token::EOF) {
       _fetchedEOF = true;
-      return i + 1;
+      break;
     }
+    ++i;
   }
 
-  return n;
+  return i;
 }
 
 Token* BufferedTokenStream::get(size_t i) const {
