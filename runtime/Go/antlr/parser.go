@@ -41,7 +41,7 @@ type BaseParser struct {
 
 	tracer         *TraceListener
 	parseListeners []ParseTreeListener
-	_SyntaxErrors   int
+	_SyntaxErrors  int
 }
 
 // p.is all the parsing support code essentially most of it is error

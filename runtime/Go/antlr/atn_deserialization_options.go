@@ -1,5 +1,7 @@
 package antlr
 
+var ATNDeserializationOptionsdefaultOptions = &ATNDeserializationOptions{true, false, false}
+
 type ATNDeserializationOptions struct {
 	readOnly                      bool
 	verifyATN                     bool
@@ -7,7 +9,7 @@ type ATNDeserializationOptions struct {
 }
 
 func NewATNDeserializationOptions(CopyFrom *ATNDeserializationOptions) *ATNDeserializationOptions {
-	o := new(ATNDeserializationOptions)
+	var o = new(ATNDeserializationOptions)
 
 	if CopyFrom != nil {
 		o.readOnly = CopyFrom.readOnly
@@ -17,5 +19,3 @@ func NewATNDeserializationOptions(CopyFrom *ATNDeserializationOptions) *ATNDeser
 
 	return o
 }
-
-var ATNDeserializationOptionsdefaultOptions = &ATNDeserializationOptions{true, false, false}

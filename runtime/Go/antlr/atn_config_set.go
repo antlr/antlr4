@@ -1,8 +1,6 @@
 package antlr
 
-import (
-	"fmt"
-)
+import "fmt"
 
 type ATNConfigSet interface {
 	Hasher
@@ -43,114 +41,114 @@ type ATNConfigSet interface {
 	SetDipsIntoOuterContext(bool)
 }
 
-// Specialized {@link Set}{@code <}{@link ATNConfig}{@code >} that can track
-// info about the set, with support for combining similar configurations using a
+// BaseATNConfigSet is a specialized set of ATNConfig that tracks information
+// about its elements and can combine similar configurations using a
 // graph-structured stack.
-
 type BaseATNConfigSet struct {
-	readOnly             bool
-	fullCtx              bool
-	configLookup         *Set
-	conflictingAlts      *BitSet
-	cachedHashString     string
-	hasSemanticContext   bool
+	cachedHashString string
+
+	// configLookup is used to determine whether two BaseATNConfigSets are equal. We
+	// need all configurations with the same (s, i, _, semctx) to be equal. A key
+	// effectively doubles the number of objects associated with ATNConfigs. All
+	// keys are hashed by (s, i, _, pi), not including the context. Wiped out when
+	// read-only because a set becomes a DFA state.
+	configLookup *Set
+
+	// configs is the added elements.
+	configs []ATNConfig
+
+	// TODO: These fields make me pretty uncomfortable, but it is nice to pack up
+	// info together because it saves recomputation. Can we track conflicts as they
+	// are added to save scanning configs later?
+	conflictingAlts *BitSet
+
+	// dipsIntoOuterContext is used by parsers and lexers. In a lexer, it indicates
+	// we hit a pred while computing a closure operation. Do not make a DFA state
+	// from the BaseATNConfigSet in this case. TODO: How is this used by parsers?
 	dipsIntoOuterContext bool
-	configs              []ATNConfig
-	uniqueAlt            int
-}
 
-func NewBaseATNConfigSet(fullCtx bool) *BaseATNConfigSet {
-
-	a := new(BaseATNConfigSet)
-
-	// The reason that we need a.is because we don't want the hash map to use
-	// the standard hash code and equals. We need all configurations with the
-	// same
-	// {@code (s,i,_,semctx)} to be equal. Unfortunately, a.key effectively
-	// doubles
-	// the number of objects associated with ATNConfigs. The other solution is
-	// to
-	// use a hash table that lets us specify the equals/hashcode operation.
-	// All configs but hashed by (s, i, _, pi) not including context. Wiped out
-	// when we go readonly as a.set becomes a DFA state.
-	a.configLookup = NewSet(hashATNConfig, equalATNConfigs)
-	// Indicates that a.configuration set is part of a full context
-	// LL prediction. It will be used to determine how to merge $. With SLL
-	// it's a wildcard whereas it is not for LL context merge.
-	a.fullCtx = fullCtx
-	// Indicates that the set of configurations is read-only. Do not
-	// allow any code to manipulate the set DFA states will point at
-	// the sets and they must not change. a.does not protect the other
-	// fields in particular, conflictingAlts is set after
-	// we've made a.readonly.
-	a.readOnly = false
-	// Track the elements as they are added to the set supports Get(i)///
-	a.configs = make([]ATNConfig, 0)
-
-	// TODO: these fields make me pretty uncomfortable but nice to pack up info
-	// together, saves recomputation
-	// TODO: can we track conflicts as they are added to save scanning configs
-	// later?
-	a.uniqueAlt = 0
-	a.conflictingAlts = nil
+	// fullCtx is whether it is part of a full context LL prediction. Used to
+	// determine how to merge $. It is a wildcard with SLL, but not for an LL
+	// context merge.
+	fullCtx bool
 
 	// Used in parser and lexer. In lexer, it indicates we hit a pred
 	// while computing a closure operation. Don't make a DFA state from a.
-	a.hasSemanticContext = false
-	a.dipsIntoOuterContext = false
+	hasSemanticContext bool
 
-	a.cachedHashString = "-1"
+	// readOnly is whether it is read-only. Do not
+	// allow any code to manipulate the set if true because DFA states will point at
+	// sets and those must not change. It not protect other fields; conflictingAlts
+	// in particular, which is assigned after readOnly.
+	readOnly bool
 
-	return a
+	// TODO: These fields make me pretty uncomfortable, but it is nice to pack up
+	// info together because it saves recomputation. Can we track conflicts as they
+	// are added to save scanning configs later?
+	uniqueAlt int
 }
 
-// Adding a Newconfig means merging contexts with existing configs for
-// {@code (s, i, pi, _)}, where {@code s} is the
-// {@link ATNConfig//state}, {@code i} is the {@link ATNConfig//alt}, and
-// {@code pi} is the {@link ATNConfig//semanticContext}. We use
-// {@code (s,i,pi)} as key.
-//
-// <p>This method updates {@link //dipsIntoOuterContext} and
-// {@link //hasSemanticContext} when necessary.</p>
-// /
-func (b *BaseATNConfigSet) Add(config ATNConfig, mergeCache *DoubleDict) bool {
-
-	if b.readOnly {
-		panic("This set is readonly")
+func NewBaseATNConfigSet(fullCtx bool) *BaseATNConfigSet {
+	return &BaseATNConfigSet{
+		cachedHashString: "-1",
+		configLookup:     NewSet(hashATNConfig, equalATNConfigs),
+		fullCtx:          fullCtx,
 	}
+}
+
+// Add merges contexts with existing configs for (s, i, pi, _), where s is the
+// ATNConfig.state, i is the ATNConfig.alt, and pi is the
+// ATNConfig.semanticContext. We use (s,i,pi) as the key. Updates
+// dipsIntoOuterContext and hasSemanticContext when necessary.
+func (b *BaseATNConfigSet) Add(config ATNConfig, mergeCache *DoubleDict) bool {
+	if b.readOnly {
+		panic("set is read-only")
+	}
+
 	if config.GetSemanticContext() != SemanticContextNone {
 		b.hasSemanticContext = true
 	}
+
 	if config.GetReachesIntoOuterContext() > 0 {
 		b.dipsIntoOuterContext = true
 	}
+
 	var existing = b.configLookup.add(config).(ATNConfig)
+
 	if existing == config {
 		b.cachedHashString = "-1"
-		b.configs = append(b.configs, config) // track order here
+		b.configs = append(b.configs, config) // Track order here
+
 		return true
 	}
-	// a previous (s,i,pi,_), merge with it and save result
+
+	// Merge a previous (s, i, pi, _) with it and save the result
 	var rootIsWildcard = !b.fullCtx
 	var merged = merge(existing.GetContext(), config.GetContext(), rootIsWildcard, mergeCache)
-	// no need to check for existing.context, config.context in cache
-	// since only way to create Newgraphs is "call rule" and here. We
-	// cache at both places.
+
+	// No need to check for existing.context because config.context is in the cache,
+	// since the only way to create new graphs is the "call rule" and here. We cache
+	// at both places.
 	existing.SetReachesIntoOuterContext(intMax(existing.GetReachesIntoOuterContext(), config.GetReachesIntoOuterContext()))
-	// make sure to preserve the precedence filter suppression during the merge
+
+	// Preserve the precedence filter suppression during the merge
 	if config.getPrecedenceFilterSuppressed() {
 		existing.setPrecedenceFilterSuppressed(true)
 	}
-	existing.SetContext(merged) // replace context no need to alt mapping
+
+	// Replace the context because there is no need to do alt mapping
+	existing.SetContext(merged)
 
 	return true
 }
 
 func (b *BaseATNConfigSet) GetStates() *Set {
 	var states = NewSet(nil, nil)
+
 	for i := 0; i < len(b.configs); i++ {
 		states.add(b.configs[i].GetState())
 	}
+
 	return states
 }
 
@@ -164,12 +162,15 @@ func (b *BaseATNConfigSet) SetHasSemanticContext(v bool) {
 
 func (b *BaseATNConfigSet) GetPredicates() []SemanticContext {
 	var preds = make([]SemanticContext, 0)
+
 	for i := 0; i < len(b.configs); i++ {
-		c := b.configs[i].GetSemanticContext()
+		var c = b.configs[i].GetSemanticContext()
+
 		if c != SemanticContextNone {
 			preds = append(preds, c)
 		}
 	}
+
 	return preds
 }
 
@@ -179,13 +180,16 @@ func (b *BaseATNConfigSet) GetItems() []ATNConfig {
 
 func (b *BaseATNConfigSet) OptimizeConfigs(interpreter *BaseATNSimulator) {
 	if b.readOnly {
-		panic("This set is readonly")
+		panic("set is read-only")
 	}
+
 	if b.configLookup.length() == 0 {
 		return
 	}
+
 	for i := 0; i < len(b.configs); i++ {
 		var config = b.configs[i]
+
 		config.SetContext(interpreter.getCachedContext(config.GetContext()))
 	}
 }
@@ -194,6 +198,7 @@ func (b *BaseATNConfigSet) AddAll(coll []ATNConfig) bool {
 	for i := 0; i < len(coll); i++ {
 		b.Add(coll[i], nil)
 	}
+
 	return false
 }
 
@@ -204,10 +209,10 @@ func (b *BaseATNConfigSet) Equals(other interface{}) bool {
 		return false
 	}
 
-	other2 := other.(*BaseATNConfigSet)
+	var other2 = other.(*BaseATNConfigSet)
 
 	return b.configs != nil &&
-		//			b.configs.equals(other2.configs) && // TODO is b necessary?
+		// TODO: b.configs.equals(other2.configs) && // TODO: Is b necessary?
 		b.fullCtx == other2.fullCtx &&
 		b.uniqueAlt == other2.uniqueAlt &&
 		b.conflictingAlts == other2.conflictingAlts &&
@@ -220,6 +225,7 @@ func (b *BaseATNConfigSet) Hash() string {
 		if b.cachedHashString == "-1" {
 			b.cachedHashString = b.hashConfigs()
 		}
+
 		return b.cachedHashString
 	}
 
@@ -228,9 +234,11 @@ func (b *BaseATNConfigSet) Hash() string {
 
 func (b *BaseATNConfigSet) hashConfigs() string {
 	var s = ""
+
 	for _, c := range b.configs {
 		s += fmt.Sprint(c)
 	}
+
 	return s
 }
 
@@ -244,22 +252,25 @@ func (b *BaseATNConfigSet) IsEmpty() bool {
 
 func (b *BaseATNConfigSet) Contains(item ATNConfig) bool {
 	if b.configLookup == nil {
-		panic("This method is not implemented for readonly sets.")
+		panic("not implemented for read-only sets")
 	}
+
 	return b.configLookup.contains(item)
 }
 
 func (b *BaseATNConfigSet) ContainsFast(item ATNConfig) bool {
 	if b.configLookup == nil {
-		panic("This method is not implemented for readonly sets.")
+		panic("not implemented for read-only sets")
 	}
-	return b.configLookup.contains(item) // TODO containsFast is not implemented for Set
+
+	return b.configLookup.contains(item) // TODO: containsFast is not implemented for Set
 }
 
 func (b *BaseATNConfigSet) Clear() {
 	if b.readOnly {
-		panic("This set is readonly")
+		panic("set is read-only")
 	}
+
 	b.configs = make([]ATNConfig, 0)
 	b.cachedHashString = "-1"
 	b.configLookup = NewSet(hashATNConfig, equalATNConfigs)
@@ -299,8 +310,9 @@ func (b *BaseATNConfigSet) ReadOnly() bool {
 
 func (b *BaseATNConfigSet) SetReadOnly(readOnly bool) {
 	b.readOnly = readOnly
+
 	if readOnly {
-		b.configLookup = nil // can't mod, no need for lookup cache
+		b.configLookup = nil // Read only, so no need for the lookup cache
 	}
 }
 
@@ -309,6 +321,7 @@ func (b *BaseATNConfigSet) String() string {
 
 	for i, c := range b.configs {
 		s += c.String()
+
 		if i != len(b.configs)-1 {
 			s += ", "
 		}
@@ -340,13 +353,11 @@ type OrderedATNConfigSet struct {
 }
 
 func NewOrderedATNConfigSet() *OrderedATNConfigSet {
+	var b = NewBaseATNConfigSet(false)
 
-	o := new(OrderedATNConfigSet)
+	b.configLookup = NewSet(nil, nil)
 
-	o.BaseATNConfigSet = NewBaseATNConfigSet(false)
-	o.configLookup = NewSet(nil, nil)
-
-	return o
+	return &OrderedATNConfigSet{BaseATNConfigSet: b}
 }
 
 func hashATNConfig(c interface{}) string {
@@ -354,7 +365,6 @@ func hashATNConfig(c interface{}) string {
 }
 
 func equalATNConfigs(a, b interface{}) bool {
-
 	if a == nil || b == nil {
 		return false
 	}
@@ -363,14 +373,16 @@ func equalATNConfigs(a, b interface{}) bool {
 		return true
 	}
 
-	ai, ok := a.(ATNConfig)
-	bi, ok1 := b.(ATNConfig)
+	var ai, ok = a.(ATNConfig)
+	var bi, ok1 = b.(ATNConfig)
 
 	if !ok || !ok1 {
 		return false
 	}
 
-	return ai.GetState().GetStateNumber() == bi.GetState().GetStateNumber() &&
-		ai.GetAlt() == bi.GetAlt() &&
-		ai.GetSemanticContext().equals(bi.GetSemanticContext())
+	var nums = ai.GetState().GetStateNumber() == bi.GetState().GetStateNumber()
+	var alts = ai.GetAlt() == bi.GetAlt()
+	var cons = ai.GetSemanticContext().equals(bi.GetSemanticContext())
+
+	return nums && alts && cons
 }

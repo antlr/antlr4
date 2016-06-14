@@ -42,7 +42,7 @@ type BaseToken struct {
 	tokenIndex int    // from 0..n-1 of the token object in the input stream
 	line       int    // line=1..n of the 1st character
 	column     int    // beginning of the line at which it occurs, 0..n-1
-	text      string // text of the token.
+	text       string // text of the token.
 	readOnly   bool
 }
 
