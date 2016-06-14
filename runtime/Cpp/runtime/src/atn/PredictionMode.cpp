@@ -56,7 +56,7 @@ struct AltAndContextConfigHasher
 };
 
 struct AltAndContextConfigComparer {
-  bool operator()(const ATNConfig &a, const ATNConfig &b) const
+  bool operator() (const ATNConfig &a, const ATNConfig &b) const
   {
     if (&a == &b) {
       return true;
@@ -88,7 +88,7 @@ bool PredictionModeClass::hasSLLConflictTerminatingPrediction(PredictionMode mod
     // dup configs, tossing out semantic predicates
     ATNConfigSet dup(true);
     for (auto &config : configs->configs) {
-      Ref<ATNConfig> c = std::make_shared<ATNConfig>(config, SemanticContext::NONE);
+      Ref<ATNConfig> c = std::make_shared<ATNConfig>(config.get(), SemanticContext::NONE);
       dup.add(c);
     }
     std::vector<antlrcpp::BitSet> altsets = getConflictingAltSubsets(&dup);
@@ -184,9 +184,9 @@ antlrcpp::BitSet PredictionModeClass::getAlts(ATNConfigSet *configs) {
 }
 
 std::vector<antlrcpp::BitSet> PredictionModeClass::getConflictingAltSubsets(ATNConfigSet *configs) {
-  std::unordered_map<Ref<ATNConfig>, antlrcpp::BitSet, AltAndContextConfigHasher, AltAndContextConfigComparer> configToAlts;
+  std::unordered_map<ATNConfig *, antlrcpp::BitSet, AltAndContextConfigHasher, AltAndContextConfigComparer> configToAlts;
   for (auto &config : configs->configs) {
-    configToAlts[config].set(config->alt);
+    configToAlts[config.get()].set(config->alt);
   }
   std::vector<antlrcpp::BitSet> values;
   for (auto it : configToAlts) {

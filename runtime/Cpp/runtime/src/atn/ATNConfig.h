@@ -46,13 +46,13 @@ namespace atn {
   public:
     struct Hasher
     {
-      size_t operator()(ATNConfig const& k) const {
-        return k.hashCode();
+      size_t operator()(Ref<ATNConfig> const& k) const {
+        return k->hashCode();
       }
     };
 
     struct Comparer {
-      bool operator()(ATNConfig const& lhs, ATNConfig const& rhs) const {
+      bool operator()(Ref<ATNConfig> const& lhs, Ref<ATNConfig> const& rhs) const {
         return lhs == rhs;
       }
     };
@@ -105,12 +105,12 @@ namespace atn {
     ATNConfig(ATNState *state, int alt, Ref<PredictionContext> const& context);
     ATNConfig(ATNState *state, int alt, Ref<PredictionContext> const& context, Ref<SemanticContext> const& semanticContext);
 
-    ATNConfig(Ref<ATNConfig> const& c); // dup
-    ATNConfig(Ref<ATNConfig> const& c, ATNState *state);
-    ATNConfig(Ref<ATNConfig> const& c, ATNState *state, Ref<SemanticContext> const& semanticContext);
-    ATNConfig(Ref<ATNConfig> const& c, Ref<SemanticContext> const& semanticContext);
-    ATNConfig(Ref<ATNConfig> const& c, ATNState *state, Ref<PredictionContext> const& context);
-    ATNConfig(Ref<ATNConfig> const& c, ATNState *state, Ref<PredictionContext> const& context, Ref<SemanticContext> const& semanticContext);
+    ATNConfig(ATNConfig *c); // dup
+    ATNConfig(ATNConfig *c, ATNState *state);
+    ATNConfig(ATNConfig *c, ATNState *state, Ref<SemanticContext> const& semanticContext);
+    ATNConfig(ATNConfig *c, Ref<SemanticContext> const& semanticContext);
+    ATNConfig(ATNConfig *c, ATNState *state, Ref<PredictionContext> const& context);
+    ATNConfig(ATNConfig *c, ATNState *state, Ref<PredictionContext> const& context, Ref<SemanticContext> const& semanticContext);
 
     virtual ~ATNConfig();
 
