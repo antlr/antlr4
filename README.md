@@ -1,6 +1,9 @@
-[![Build Status](https://travis-ci.org/pboyer/antlr4.svg?branch=master)](https://travis-ci.org/pboyer/antlr4)
+
 
 # ANTLR4 Language Target, Runtime for Go
+
+[![Join the chat at https://gitter.im/pboyer/antlr4](https://badges.gitter.im/pboyer/antlr4.svg)](https://gitter.im/pboyer/antlr4?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Build Status](https://travis-ci.org/pboyer/antlr4.svg?branch=master)](https://travis-ci.org/pboyer/antlr4)
 
 ### Usage
 
@@ -15,10 +18,6 @@
 5. (Optional) Add an alias for calling antlr
   - `alias antlr='java -jar $GOPATH/src/github.com/pboyer/antlr4/tool/target/antlr4-4.5.2-SNAPSHOT.jar'`
 6. Now, `antlr Grammar.g4 -Dlanguage=Go`
-
-### Discuss
-
-[gitter](https://gitter.im/pboyer/antlr4)
 
 ---
 
