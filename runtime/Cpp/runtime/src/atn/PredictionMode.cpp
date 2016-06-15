@@ -47,21 +47,21 @@ struct AltAndContextConfigHasher
    * The hash code is only a function of the {@link ATNState#stateNumber}
    * and {@link ATNConfig#context}.
    */
-  size_t operator () (const ATNConfig &o) const {
+  size_t operator () (ATNConfig *o) const {
     size_t hashCode = misc::MurmurHash::initialize(7);
-    hashCode = misc::MurmurHash::update(hashCode, (size_t)o.state->stateNumber);
-    hashCode = misc::MurmurHash::update(hashCode, o.context);
+    hashCode = misc::MurmurHash::update(hashCode, (size_t)o->state->stateNumber);
+    hashCode = misc::MurmurHash::update(hashCode, o->context);
     return misc::MurmurHash::finish(hashCode, 2);
   }
 };
 
 struct AltAndContextConfigComparer {
-  bool operator()(const ATNConfig &a, const ATNConfig &b) const
+  bool operator()(ATNConfig *a, ATNConfig *b) const
   {
-    if (&a == &b) {
+    if (a == b) {
       return true;
     }
-    return a.state->stateNumber == b.state->stateNumber && a.context == b.context;
+    return a->state->stateNumber == b->state->stateNumber && a->context == b->context;
   }
 };
 
@@ -184,9 +184,9 @@ antlrcpp::BitSet PredictionModeClass::getAlts(ATNConfigSet *configs) {
 }
 
 std::vector<antlrcpp::BitSet> PredictionModeClass::getConflictingAltSubsets(ATNConfigSet *configs) {
-  std::unordered_map<Ref<ATNConfig>, antlrcpp::BitSet, AltAndContextConfigHasher, AltAndContextConfigComparer> configToAlts;
+  std::unordered_map<ATNConfig *, antlrcpp::BitSet, AltAndContextConfigHasher, AltAndContextConfigComparer> configToAlts;
   for (auto &config : configs->configs) {
-    configToAlts[config].set(config->alt);
+    configToAlts[config.get()].set(config->alt);
   }
   std::vector<antlrcpp::BitSet> values;
   for (auto it : configToAlts) {
