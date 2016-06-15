@@ -68,11 +68,11 @@ namespace atn {
     const bool fullCtx;
 
     ATNConfigSet(bool fullCtx = true);
-    ATNConfigSet(Ref<ATNConfigSet> const& old);
+    ATNConfigSet(const Ref<ATNConfigSet> &old);
 
     virtual ~ATNConfigSet();
 
-    virtual bool add(Ref<ATNConfig> const& config);
+    virtual bool add(const Ref<ATNConfig> &config);
 
     /// <summary>
     /// Adding a new config means merging contexts with existing configs for
@@ -84,7 +84,7 @@ namespace atn {
     /// This method updates <seealso cref="#dipsIntoOuterContext"/> and
     /// <seealso cref="#hasSemanticContext"/> when necessary.
     /// </summary>
-    virtual bool add(Ref<ATNConfig> const& config, PredictionContextMergeCache *mergeCache);
+    virtual bool add(const Ref<ATNConfig> &config, PredictionContextMergeCache *mergeCache);
 
     virtual std::vector<ATNState *> getStates();
 
@@ -99,7 +99,7 @@ namespace atn {
     antlrcpp::BitSet getAlts();
     virtual std::vector<Ref<SemanticContext>> getPredicates();
 
-    virtual Ref<ATNConfig> const& get(size_t i) const;
+    virtual Ref<ATNConfig> get(size_t i) const;
 
     virtual void optimizeConfigs(ATNSimulator *interpreter);
 

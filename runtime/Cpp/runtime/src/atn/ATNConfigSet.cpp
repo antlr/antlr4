@@ -55,11 +55,11 @@ ATNConfigSet::ATNConfigSet(const Ref<ATNConfigSet> &old) : ATNConfigSet(old->ful
 ATNConfigSet::~ATNConfigSet() {
 }
 
-bool ATNConfigSet::add(Ref<ATNConfig> const& config) {
+bool ATNConfigSet::add(const Ref<ATNConfig> &config) {
   return add(config, nullptr);
 }
 
-bool ATNConfigSet::add(Ref<ATNConfig> const& config, PredictionContextMergeCache *mergeCache) {
+bool ATNConfigSet::add(const Ref<ATNConfig> &config, PredictionContextMergeCache *mergeCache) {
   if (_readonly) {
     throw IllegalStateException("This set is readonly");
   }
@@ -107,7 +107,7 @@ bool ATNConfigSet::addAll(const Ref<ATNConfigSet> &other) {
 
 std::vector<ATNState*> ATNConfigSet::getStates() {
   std::vector<ATNState*> states;
-  for (auto &c : configs) {
+  for (auto c : configs) {
     states.push_back(c->state);
   }
   return states;
@@ -124,15 +124,15 @@ std::vector<ATNState*> ATNConfigSet::getStates() {
 
 BitSet ATNConfigSet::getAlts() {
   BitSet alts;
-  for (auto &config : configs) {
-    alts.set(config->alt);
+  for (ATNConfig config : configs) {
+    alts.set(config.alt);
   }
   return alts;
 }
 
 std::vector<Ref<SemanticContext>> ATNConfigSet::getPredicates() {
   std::vector<Ref<SemanticContext>> preds;
-  for (auto &c : configs) {
+  for (auto c : configs) {
     if (c->semanticContext != SemanticContext::NONE) {
       preds.push_back(c->semanticContext);
     }
@@ -140,7 +140,7 @@ std::vector<Ref<SemanticContext>> ATNConfigSet::getPredicates() {
   return preds;
 }
 
-Ref<ATNConfig> const& ATNConfigSet::get(size_t i) const {
+Ref<ATNConfig> ATNConfigSet::get(size_t i) const {
   return configs[i];
 }
 
@@ -217,8 +217,8 @@ void ATNConfigSet::setReadonly(bool readonly) {
 std::string ATNConfigSet::toString() {
   std::stringstream ss;
   ss << "[";
-  for (auto &config : configs) {
-    ss << config->toString();
+  for (size_t i = 0; i < configs.size(); i++) {
+    ss << configs[i]->toString();
   }
   ss << "]";
 

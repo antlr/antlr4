@@ -714,17 +714,17 @@ namespace atn {
     virtual std::string getRuleName(size_t index);
 
   protected:
-    virtual Ref<ATNConfig> getEpsilonTarget(Ref<ATNConfig> const& config, Transition *t,
-      bool collectPredicates, bool inContext, bool fullCtx, bool treatEofAsEpsilon);
+    virtual Ref<ATNConfig> getEpsilonTarget(Ref<ATNConfig> const& config, Transition *t, bool collectPredicates,
+                                            bool inContext, bool fullCtx, bool treatEofAsEpsilon);
     virtual Ref<ATNConfig> actionTransition(Ref<ATNConfig> const& config, ActionTransition *t);
 
   public:
-    virtual Ref<ATNConfig> precedenceTransition(Ref<ATNConfig> const& config,
-      PrecedencePredicateTransition *pt, bool collectPredicates, bool inContext, bool fullCtx);
+    virtual Ref<ATNConfig> precedenceTransition(Ref<ATNConfig> const& config, PrecedencePredicateTransition *pt,
+                                                bool collectPredicates, bool inContext, bool fullCtx);
 
   protected:
-    virtual Ref<ATNConfig> predTransition(Ref<ATNConfig> const& config, PredicateTransition *pt,
-      bool collectPredicates, bool inContext, bool fullCtx);
+    virtual Ref<ATNConfig> predTransition(Ref<ATNConfig> const& config, PredicateTransition *pt, bool collectPredicates,
+                                          bool inContext, bool fullCtx);
 
     virtual Ref<ATNConfig> ruleTransition(Ref<ATNConfig> const& config, RuleTransition *t);
 
