@@ -5,15 +5,15 @@ import (
 	"strconv"
 )
 
-// A DFA walker that knows how to dump them to serialized strings.
-
+// DFASerializer is a DFA walker that knows how to dump them to serialized
+// strings.
 type DFASerializer struct {
-	dfa                         *DFA
-	literalNames, symbolicNames []string
+	dfa           *DFA
+	literalNames  []string
+	symbolicNames []string
 }
 
 func NewDFASerializer(dfa *DFA, literalNames, symbolicNames []string) *DFASerializer {
-
 	if literalNames == nil {
 		literalNames = make([]string, 0)
 	}
@@ -22,28 +22,28 @@ func NewDFASerializer(dfa *DFA, literalNames, symbolicNames []string) *DFASerial
 		symbolicNames = make([]string, 0)
 	}
 
-	d := new(DFASerializer)
-
-	d.dfa = dfa
-	d.literalNames = literalNames
-	d.symbolicNames = symbolicNames
-
-	return d
+	return &DFASerializer{
+		dfa:           dfa,
+		literalNames:  literalNames,
+		symbolicNames: symbolicNames,
+	}
 }
 
 func (d *DFASerializer) String() string {
-
 	if d.dfa.s0 == nil {
 		return ""
 	}
 
 	var buf = ""
 	var states = d.dfa.sortedStates()
+
 	for _, s := range states {
 		if s.edges != nil {
 			var n = len(s.edges)
+
 			for j := 0; j < n; j++ {
 				var t = s.edges[j]
+
 				if t != nil && t.stateNumber != 0x7FFFFFFF {
 					buf += d.GetStateString(s)
 					buf += "-"
@@ -55,6 +55,7 @@ func (d *DFASerializer) String() string {
 			}
 		}
 	}
+
 	if len(buf) == 0 {
 		return ""
 	}
@@ -75,7 +76,6 @@ func (d *DFASerializer) getEdgeLabel(i int) string {
 }
 
 func (d *DFASerializer) GetStateString(s *DFAState) string {
-
 	var a, b string
 
 	if s.isAcceptState {
@@ -87,6 +87,7 @@ func (d *DFASerializer) GetStateString(s *DFAState) string {
 	}
 
 	var baseStateStr = a + "s" + strconv.Itoa(s.stateNumber) + b
+
 	if s.isAcceptState {
 		if s.predicates != nil {
 			return baseStateStr + "=>" + fmt.Sprint(s.predicates)
@@ -103,12 +104,7 @@ type LexerDFASerializer struct {
 }
 
 func NewLexerDFASerializer(dfa *DFA) *LexerDFASerializer {
-
-	l := new(LexerDFASerializer)
-
-	l.DFASerializer = NewDFASerializer(dfa, nil, nil)
-
-	return l
+	return &LexerDFASerializer{DFASerializer: NewDFASerializer(dfa, nil, nil)}
 }
 
 func (l *LexerDFASerializer) getEdgeLabel(i int) string {
@@ -116,19 +112,22 @@ func (l *LexerDFASerializer) getEdgeLabel(i int) string {
 }
 
 func (l *LexerDFASerializer) String() string {
-
 	if l.dfa.s0 == nil {
 		return ""
 	}
 
 	var buf = ""
 	var states = l.dfa.sortedStates()
+
 	for i := 0; i < len(states); i++ {
 		var s = states[i]
+
 		if s.edges != nil {
 			var n = len(s.edges)
+
 			for j := 0; j < n; j++ {
 				var t = s.edges[j]
+
 				if t != nil && t.stateNumber != 0x7FFFFFFF {
 					buf += l.GetStateString(s)
 					buf += "-"
@@ -140,6 +139,7 @@ func (l *LexerDFASerializer) String() string {
 			}
 		}
 	}
+
 	if len(buf) == 0 {
 		return ""
 	}
