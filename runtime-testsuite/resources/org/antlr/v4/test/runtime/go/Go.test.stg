@@ -229,6 +229,8 @@ RuleInvocationStack() ::= "p.GetRuleInvocationStack(nil)"
 
 LL_EXACT_AMBIG_DETECTION() ::= <<p.Interpreter.SetPredictionMode(antlr.PredictionModeLLExactAmbigDetection);>>
 
+ParserToken(parser, token) ::= <%<parser><token>%>
+
 ParserPropertyMember() ::= <<
 @members {
 func Property() bool {
