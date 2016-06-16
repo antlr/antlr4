@@ -26,7 +26,7 @@ type Recognizer interface {
 
 type BaseRecognizer struct {
 	listeners []ErrorListener
-	state      int
+	state     int
 
 	RuleNames       []string
 	LiteralNames    []string
