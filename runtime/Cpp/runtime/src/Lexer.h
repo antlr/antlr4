@@ -140,7 +140,7 @@ namespace antlr4 {
     virtual CharStream* getInputStream() override;
 
     /// By default does not support multiple emits per nextToken invocation
-    /// for efficiency reasons.  Subclass and override this method, nextToken,
+    /// for efficiency reasons. Subclasses can override this method, nextToken,
     /// and getToken (to push tokens into a list and pull from that list
     /// rather than a single variable as this implementation does).
     virtual void emit(std::unique_ptr<Token> token);

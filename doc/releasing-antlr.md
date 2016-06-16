@@ -17,8 +17,7 @@ $ git push upstream :refs/tags/4.5.2
 Edit the repository looking for 4.5 or whatever and update it. Bump version in the following files:
 
  * runtime/Cpp/VERSION
- * runtime/Cpp/runtime/antlr4cpp.vcxproj
- * runtime/Cpp/runtime/antlrcpp.xcodeproj
+ * runtime/Cpp/RuntimeMetaData.cpp
  * runtime/Java/src/org/antlr/v4/runtime/RuntimeMetaData.java
  * runtime/Python2/setup.py
  * runtime/Python2/src/antlr4/Recognizer.py

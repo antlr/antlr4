@@ -13,13 +13,13 @@ public class TestListeners extends BaseCppTest {
 	public void testBasic() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(484);
+		StringBuilder grammarBuilder = new StringBuilder(491);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("@parser::definitions {\n");
 		grammarBuilder.append("class LeafListener : public TBaseListener {\n");
 		grammarBuilder.append("public:\n");
-		grammarBuilder.append("  virtual void visitTerminal(Ref<tree::TerminalNode> node) override {\n");
+		grammarBuilder.append("  virtual void visitTerminal(Ref<tree::TerminalNode> const& node) override {\n");
 		grammarBuilder.append("  std::cout << node->getSymbol()->getText() << std::endl;\n");
 		grammarBuilder.append("  }\n");
 		grammarBuilder.append("};\n");

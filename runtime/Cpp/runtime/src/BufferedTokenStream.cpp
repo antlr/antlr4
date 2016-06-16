@@ -126,11 +126,12 @@ size_t BufferedTokenStream::fetch(size_t n) {
     }
 
     _tokens.push_back(std::move(t));
+    ++i;
+
     if (_tokens.back()->getType() == Token::EOF) {
       _fetchedEOF = true;
       break;
     }
-    ++i;
   }
 
   return i;

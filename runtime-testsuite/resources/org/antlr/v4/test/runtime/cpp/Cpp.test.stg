@@ -240,7 +240,7 @@ protected:
   };
   
 public:
-  virtual Token* nextToken() override {
+  virtual std::unique_ptr\<Token> nextToken() override {
     if (dynamic_cast\<PositionAdjustingLexerATNSimulator *>(_interpreter) == nullptr) {
       delete _interpreter;
       _interpreter = new PositionAdjustingLexerATNSimulator(this, _atn, _decisionToDFA, _sharedContextCache);
@@ -305,7 +305,7 @@ BasicListener(X) ::= <<
 @parser::definitions {
 class LeafListener : public TBaseListener {
 public:
-  virtual void visitTerminal(Ref\<tree::TerminalNode> node) override {
+  virtual void visitTerminal(Ref\<tree::TerminalNode> const& node) override {
   std::cout \<\< node->getSymbol()->getText() \<\< std::endl;
   }
 };

@@ -544,12 +544,12 @@ std::vector<std::string> Parser::getRuleInvocationStack() {
 }
 
 std::vector<std::string> Parser::getRuleInvocationStack(Ref<RuleContext> const& p) {
-  std::vector<std::string> ruleNames = getRuleNames();
-  std::vector<std::string> stack = std::vector<std::string>();
+  std::vector<std::string> const& ruleNames = getRuleNames();
+  std::vector<std::string> stack;
   RuleContext *run = p.get();
   while (run != nullptr) {
     // compute what follows who invoked us
-    ssize_t ruleIndex = p->getRuleIndex();
+    ssize_t ruleIndex = run->getRuleIndex();
     if (ruleIndex < 0) {
       stack.push_back("n/a");
     } else {
@@ -610,7 +610,7 @@ Ref<atn::ParseInfo> Parser::getParseInfo() const {
 
 void Parser::setProfile(bool profile) {
   atn::ParserATNSimulator *interp = getInterpreter<atn::ProfilingATNSimulator>();
-  atn::PredictionMode saveMode = interp->getPredictionMode();
+  atn::PredictionMode saveMode = interp != nullptr ? interp->getPredictionMode() : atn::PredictionMode::LL;
   if (profile) {
     if (!is<atn::ProfilingATNSimulator *>(interp)) {
       setInterpreter(new atn::ProfilingATNSimulator(this)); /* mem-check: replacing existing interpreter which gets deleted. */

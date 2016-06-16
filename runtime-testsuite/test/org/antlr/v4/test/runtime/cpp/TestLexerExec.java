@@ -4683,7 +4683,7 @@ public class TestLexerExec extends BaseCppTest {
 	public void testPositionAdjustingLexer() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(2721);
+		StringBuilder grammarBuilder = new StringBuilder(2737);
 		grammarBuilder.append("lexer grammar PositionAdjustingLexer;\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("@members {\n");
@@ -4705,7 +4705,7 @@ public class TestLexerExec extends BaseCppTest {
 		grammarBuilder.append("  };\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("public:\n");
-		grammarBuilder.append("  virtual Token* nextToken() override {\n");
+		grammarBuilder.append("  virtual std::unique_ptr<Token> nextToken() override {\n");
 		grammarBuilder.append("    if (dynamic_cast<PositionAdjustingLexerATNSimulator *>(_interpreter) == nullptr) {\n");
 		grammarBuilder.append("      delete _interpreter;\n");
 		grammarBuilder.append("      _interpreter = new PositionAdjustingLexerATNSimulator(this, _atn, _decisionToDFA, _sharedContextCache);\n");
