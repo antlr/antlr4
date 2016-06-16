@@ -39,7 +39,7 @@ public void test<test.name>() throws Exception {
 	<else>
 	assertNull(this.stderrDuringParse);
 	<endif>
-    }>
+	}>
 }
 >>
 
@@ -66,15 +66,14 @@ public void test<test.name>() throws Exception {
 	<test.afterGrammar>
 	String input =<writeStringLiteral(test.Input)>;
 	String found = execParser("<grammar>.g4", grammar, "<grammar>Parser", "<grammar>Lexer",
-	                          "<grammar>Listener", "<grammar>Visitor",
-	                          "<test.Rule>", input, <writeBoolean(test.Options.("Debug"))>);
+		"<grammar>Listener", "<grammar>Visitor", "<test.Rule>", input, <writeBoolean(test.Options.("Debug"))>);
 	assertEquals(<writeStringLiteral(test.Output)>, found);
 	<if(!isEmpty.(test.Errors))>
 	assertEquals(<writeStringLiteral(test.Errors)>, this.stderrDuringParse);
 	<else>
 	assertNull(this.stderrDuringParse);
 	<endif>
-    }>
+	}>
 }
 >>
 
@@ -139,10 +138,6 @@ writeLines(textLines) ::= <%
 <endif>
 %>
 
-
-
-
-
 string(text) ::= <<
 "<escape.(text)>"
 >>
@@ -167,29 +162,29 @@ Append(a,b) ::= "<a> + fmt.Sprint(<b>)"
 
 Concat(a,b) ::= "<a><b>"
 
-DeclareLocal(s,v) ::= "<s> := <v>"
+DeclareLocal(s, v) ::= "var <s> = <v>"
 
 AssertIsList(v) ::= ""
 
-AssignLocal(s,v) ::= "<s> = <v>;"
+AssignLocal(s, v) ::= "<s> = <v>;"
 
-InitIntMember(n,v) ::= <%var <n> int = <v>; var _ int = <n>; %>
+InitIntMember(n, v) ::= <%var <n> int = <v>; var _ int = <n>; %>
 
-InitBooleanMember(n,v) ::= <%var <n> bool= <v>; var _ bool = <n>; %>
+InitBooleanMember(n, v) ::= <%var <n> bool = <v>; var _ bool = <n>; %>
 
 GetMember(n) ::= <%<n>%>
 
-SetMember(n,v) ::= <%<n> = <v>;%>
+SetMember(n, v) ::= <%<n> = <v>;%>
 
-AddMember(n,v) ::= <%<n> += <v>;%>
+AddMember(n, v) ::= <%<n> += <v>;%>
 
-PlusMember(v,n) ::= <%<v> + fmt.Sprint(<n>)%>
+PlusMember(v, n) ::= <%<v> + fmt.Sprint(<n>)%>
 
-MemberEquals(n,v) ::= <%<n> == <v>%>
+MemberEquals(n, v) ::= <%<n> == <v>%>
 
-ModMemberEquals(n,m,v) ::= <%<n> % <m> == <v>%>
+ModMemberEquals(n, m, v) ::= <%<n> % <m> == <v>%>
 
-ModMemberNotEquals(n,m,v) ::= <%<n> % <m> != <v>%>
+ModMemberNotEquals(n, m, v) ::= <%<n> % <m> != <v>%>
 
 DumpDFA() ::= "p.DumpDFA()"
 
@@ -201,13 +196,13 @@ BuildParseTrees() ::= "p.BuildParseTrees = true"
 
 BailErrorStrategy() ::= <%p.SetErrorHandler(p.NewBailErrorStrategy())%>
 
-ToStringTree(s) ::= <%<s>.ToStringTree(nil,p)%>
+ToStringTree(s) ::= <%<s>.ToStringTree(nil, p)%>
 
 Column() ::= "p.GetCharPositionInLine()"
 
 Text() ::= "l.GetText()"
 
-ValEquals(a,b) ::= <%<a>==<b>%>
+ValEquals(a, b) ::= <%<a> == <b>%>
 
 TextEquals(a) ::= <%p.GetText() == "<a>"%>
 
@@ -217,9 +212,9 @@ InputText() ::= "p.GetTokenStream().GetAllText()"
 
 LTEquals(i, v) ::= <%p.GetTokenStream().LT(<i>).GetText() == <v>%>
 
-LANotEquals(i, v) ::= <%p.GetTokenStream().LA(<i>)!=<v>%>
+LANotEquals(i, v) ::= <%p.GetTokenStream().LA(<i>) != <v>%>
 
-TokenStartColumnEquals(i) ::= <%p.TokenStartColumn==<i>%>
+TokenStartColumnEquals(i) ::= <%p.TokenStartColumn == <i>%>
 
 ImportListener(X) ::= ""
 
@@ -234,7 +229,7 @@ ParserToken(parser, token) ::= <%<parser><token>%>
 ParserPropertyMember() ::= <<
 @members {
 func Property() bool {
-  return true
+	return true
 }
 }
 >>
@@ -247,62 +242,64 @@ type PositionAdjustingLexer struct {
 }
 
 func NewPositionAdjustingLexer(input antlr.CharStream) *PositionAdjustingLexer {
-	l := new(PositionAdjustingLexer)
-	l.BaseLexer = antlr.NewBaseLexer( input )
-	return l
+	return &PositionAdjustingLexer{BaseLexer: antlr.NewBaseLexer(input)}
 }
 
-func (this *PositionAdjustingLexer) NextToken() *Token {
-
-	_,ok := this._interp.(*PositionAdjustingLexerATNSimulator)
+func (p *PositionAdjustingLexer) NextToken() *Token {
+	var _, ok = p._interp.(*PositionAdjustingLexerATNSimulator)
 
 	if !ok {
-		this._interp = NewPositionAdjustingLexerATNSimulator(this, _ATN, _decisionToDFA, _sharedContextCache)
+		p._interp = NewPositionAdjustingLexerATNSimulator(p, _ATN, _decisionToDFA, _sharedContextCache)
 	}
 
-	return this.BaseLexer.NextToken()
+	return p.BaseLexer.NextToken()
 }
 
-func (this *PositionAdjustingLexer) Emit() *Token {
-	switch (_type) {
+func (p *PositionAdjustingLexer) Emit() *Token {
+	switch _type {
 	case TOKENS:
-		this.HandleAcceptPositionForKeyword("tokens")
+		p.HandleAcceptPositionForKeyword("tokens")
 
 	case LABEL:
-		this.HandleAcceptPositionForIdentifier()
+		p.HandleAcceptPositionForIdentifier()
 	}
 
-	return this.BaseLexer.Emit()
+	return p.BaseLexer.Emit()
 }
 
-func (this *PositionAdjustingLexer) HandleAcceptPositionForIdentifier() bool {
- 	tokenText := GetText()
-	identifierLength int = 0
+func (p *PositionAdjustingLexer) HandleAcceptPositionForIdentifier() bool {
+	var tokenText = GetText()
+	var identifierLength int
+
 	for identifierLength \< len(tokenText) && isIdentifierChar(tokenText.charAt(identifierLength)) {
-		identifierLength += 1
+		identifierLength++
 	}
 
-	if GetInputStream().Index() > _tokenStartCharIndex + identifierLength {
-		offset int = identifierLength - 1
-		this.GetInterpreter().ResetAcceptPosition(this.GetInputStream(), this.TokenStartCharIndex + offset, this.TokenStartLine, this.TokenStartCharPositionInLine + offset)
-		return true
+	if GetInputStream().Index() \<= _tokenStartCharIndex + identifierLength {
+		return false
 	}
 
-	return false
+	var offset = identifierLength - 1
+
+	p.GetInterpreter().ResetAcceptPosition(p.GetInputStream(), p.TokenStartCharIndex + offset, p.TokenStartLine, p.TokenStartCharPositionInLine + offset)
+
+	return true
 }
 
-func (this *PositionAdjustingLexer) HandleAcceptPositionForKeyword(keyword string) bool {
-	if this.GetInputStream().Index() > this.TokenStartCharIndex + len(keyword) {
-		offset := len(keyword) - 1
-		this.GetInterpreter().ResetAcceptPosition(this.GetInputStream(), this.TokenStartCharIndex + offset, this.TokenStartLine, this.TokenStartCharPositionInLine + offset)
-		return true
+func (p *PositionAdjustingLexer) HandleAcceptPositionForKeyword(keyword string) bool {
+	if p.GetInputStream().Index() \<= p.TokenStartCharIndex + len(keyword) {
+		return false
 	}
 
-	return false
+	var offset = len(keyword) - 1
+
+	p.GetInterpreter().ResetAcceptPosition(p.GetInputStream(), p.TokenStartCharIndex + offset, p.TokenStartLine, p.TokenStartCharPositionInLine + offset)
+
+	return true
 }
 
 func (s *PositionAdjustingLexer) GetInterpreter() *LexerATNSimulator {
-	return s // return super.(*PositionAdjustingLexerATNSimulator).GetInterpreter()
+	return s // TODO: return super.(*PositionAdjustingLexerATNSimulator).GetInterpreter()
 }
 
 func isIdentifierChar(c rune) bool {
@@ -310,134 +307,122 @@ func isIdentifierChar(c rune) bool {
 }
 
 type PositionAdjustingLexerATNSimulator struct {
-    *antlr.LexerATNSimulator
+	*antlr.LexerATNSimulator
 }
 
 func NewPositionAdjustingLexerATNSimulator(recog antlr.Lexer, atn *antlr.ATN, decisionToDFA []*antlr.DFA, sharedContextCache *PredictionContextCache) *PositionAdjustingLexerATNSimulator {
-
-    l := new(PositionAdjustingLexerATNSimulator)
-
-	l.LexerATNSimulator = antlr.NewLexerATNSimulator(recog, atn, decisionToDFA, sharedContextCache)
-
-	return l
+	return &PositionAdjustingLexerATNSimulator{
+		LexerATNSimulator: antlr.NewLexerATNSimulator(recog, atn, decisionToDFA, sharedContextCache),
+	}
 }
 
-func (this *NewPositionAdjustingLexerATNSimulator) ResetAcceptPosition(input CharStream, index, line, charPositionInLine int) {
-    this.GetInputStream().Seek(index);
-    this.Line = line;
-    this.CharPositionInLine = charPositionInLine;
-    this.Consume(input);
+func (p *NewPositionAdjustingLexerATNSimulator) ResetAcceptPosition(input CharStream, index, line, charPositionInLine int) {
+	p.GetInputStream().Seek(index)
+	p.Line = line
+	p.CharPositionInLine = charPositionInLine
+	p.Consume(input)
 }
 
 >>
 
-BasicListener(X) ::= <<
+BasicListener(notused) ::= <<
 type LeafListener struct {
 	*BaseTListener
 }
 
 func NewLeafListener() *LeafListener {
-	l := new(LeafListener)
-	l.BaseTListener = new(BaseTListener)
-	return l
+	return &LeafListener{BaseTListener: &BaseTListener{}}
 }
 
-func (this *LeafListener) VisitTerminal( node antlr.TerminalNode ) {
+func (*LeafListener) VisitTerminal(node antlr.TerminalNode) {
 	fmt.Println(node.GetSymbol().GetText())
 }
 >>
 
 WalkListener(s) ::= <<
-walker := antlr.NewParseTreeWalker();
-walker.Walk(NewLeafListener(), <s>);
+var walker = antlr.NewParseTreeWalker()
+
+walker.Walk(NewLeafListener(), <s>)
 >>
 
-TokenGetterListener(X) ::= <<
+TokenGetterListener(notused) ::= <<
 type LeafListener struct {
 	*BaseTListener
 }
 
 func NewLeafListener() *LeafListener {
-	l := new(LeafListener)
-	l.BaseTListener = new(BaseTListener)
-	return l
+	return &LeafListener{BaseTListener: &BaseTListener{}}
 }
 
-func (this *LeafListener) ExitA(ctx *AContext) {
-	if (ctx.GetChildCount()==2){
-		fmt.Printf("%s %s %s",ctx.INT(0)[0].GetSymbol().GetText(), ctx.INT(1)[0].GetSymbol().GetText(),ctx.INT(0)[0]);
+func (*LeafListener) ExitA(ctx *AContext) {
+	if ctx.GetChildCount() == 2 {
+		fmt.Printf("%s %s %s", ctx.INT(0)[0].GetSymbol().GetText(), ctx.INT(1)[0].GetSymbol().GetText(), ctx.INT(0)[0])
 	} else {
 		fmt.Println(ctx.ID().GetSymbol())
 	}
 }
 >>
 
-RuleGetterListener(X) ::= <<
+RuleGetterListener(notused) ::= <<
 type LeafListener struct {
 	*BaseTListener
 }
 
 func NewLeafListener() *LeafListener {
-	l := new(LeafListener)
-	l.BaseTListener = new(BaseTListener)
-	return l
+	return &LeafListener{BaseTListener: &BaseTListener{}}
 }
 
-func (this *LeafListener) ExitA(ctx *AContext) {
-	if (ctx.GetChildCount()==2) {
-		fmt.Printf("%s %s %s",ctx.B(0)[0].GetStart().GetText(),ctx.B(1)[0].GetStart().GetText(),ctx.B(-1)[0].GetStart().GetText());
+func (*LeafListener) ExitA(ctx *AContext) {
+	if ctx.GetChildCount() == 2 {
+		fmt.Printf("%s %s %s", ctx.B(0)[0].GetStart().GetText(), ctx.B(1)[0].GetStart().GetText(), ctx.B(-1)[0].GetStart().GetText())
 	} else {
-		fmt.Println(ctx.B(0)[0].GetStart().GetText());
+		fmt.Println(ctx.B(0)[0].GetStart().GetText())
 	}
 }
 >>
 
-LRListener(X) ::= <<
+LRListener(notused) ::= <<
 type LeafListener struct {
 	*BaseTListener
 }
 
 func NewLeafListener() *LeafListener {
-	l := new(LeafListener)
-	l.BaseTListener = new(BaseTListener)
-	return l
+	return &LeafListener{BaseTListener: &BaseTListener{}}
 }
 
-func (this *LeafListener) ExitE(ctx *EContext) {
-	if (ctx.GetChildCount()==3) {
-		fmt.Printf("%s %s %s\n",ctx.E(0)[0].GetStart().GetText(), ctx.E(1)[0].GetStart().GetText(), ctx.E(-1)[0].GetStart().GetText());
+func (*LeafListener) ExitE(ctx *EContext) {
+	if ctx.GetChildCount() == 3 {
+		fmt.Printf("%s %s %s\n", ctx.E(0)[0].GetStart().GetText(), ctx.E(1)[0].GetStart().GetText(), ctx.E(-1)[0].GetStart().GetText())
 	} else {
 		fmt.Println(ctx.INT().GetSymbol().GetText())
 	}
 }
 >>
 
-LRWithLabelsListener(X) ::= <<
+LRWithLabelsListener(notused) ::= <<
 type LeafListener struct {
 	*BaseTListener
 }
 
 func NewLeafListener() *LeafListener {
-	l := new(LeafListener)
-	l.BaseTListener = new(BaseTListener)
-	return l
+	return &LeafListener{BaseTListener: &BaseTListener{}}
 }
 
-func (this *LeafListener) ExitCall(ctx *CallContext) {
-	fmt.Printf("%s %s",ctx.E().GetStart().GetText(),ctx.EList());
+func (*LeafListener) ExitCall(ctx *CallContext) {
+	fmt.Printf("%s %s", ctx.E().GetStart().GetText(), ctx.EList())
 }
 
-func (this *LeafListener) ExitInt(ctx *IntContext) {
-	fmt.Println(ctx.INT().GetSymbol().GetText());
+func (*LeafListener) ExitInt(ctx *IntContext) {
+	fmt.Println(ctx.INT().GetSymbol().GetText())
 }
 >>
 
 DeclareContextListGettersFunction() ::= <<
 func foo() {
-//TODO
-//SContext s = null;
-//List\<? extends AContext> a = s.A();
-//List\<? extends BContext> b = s.B();
+	// TODO
+	// var s SContext
+	// var a = s.A()
+	// var b = s.B()
 }
 >>
 
@@ -451,7 +436,8 @@ Invoke_foo() ::= "foo()"
 
 Declare_pred() ::= <<
 func pred(v bool) bool {
-	fmt.Println("eval="+fmt.Sprint(v))
+	fmt.Println("eval=" + fmt.Sprint(v))
+
 	return v
 }
 >>
