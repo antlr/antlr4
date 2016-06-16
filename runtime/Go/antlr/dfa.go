@@ -3,104 +3,80 @@ package antlr
 import "sort"
 
 type DFA struct {
+	// atnStartState is the ATN state in which this was created
 	atnStartState DecisionState
-	decision      int
-	states        map[string]*DFAState
-	s0            *DFAState
+
+	decision int
+
+	// states is all the DFA states. Use Map to get the old state back; Set can only
+	// indicate whether it is there.
+	states map[string]*DFAState
+
+	s0 *DFAState
+
+	// precedenceDfa is the backing field for isPrecedenceDfa and setPrecedenceDfa.
+	// True if the DFA is for a precedence decision and false otherwise.
 	precedenceDfa bool
 }
 
 func NewDFA(atnStartState DecisionState, decision int) *DFA {
-
-	d := new(DFA)
-
-	// From which ATN state did we create d DFA?
-	d.atnStartState = atnStartState
-	d.decision = decision
-	// A set of all DFA states. Use {@link Map} so we can get old state back
-	// ({@link Set} only allows you to see if it's there).
-	d.states = make(map[string]*DFAState)
-	d.s0 = nil
-	// {@code true} if d DFA is for a precedence decision otherwise,
-	// {@code false}. This is the backing field for {@link //isPrecedenceDfa},
-	// {@link //setPrecedenceDfa}.
-	d.precedenceDfa = false
-
-	return d
+	return &DFA{
+		atnStartState: atnStartState,
+		decision:      decision,
+		states:        make(map[string]*DFAState),
+	}
 }
 
-// Get the start state for a specific precedence value.
-//
-// @param precedence The current precedence.
-// @return The start state corresponding to the specified precedence, or
-// {@code nil} if no start state exists for the specified precedence.
-//
-// @panics IllegalStateException if d is not a precedence DFA.
-// @see //isPrecedenceDfa()
-
+// getPrecedenceStartState gets the start state for the current precedence and
+// returns the start state corresponding to the specified precedence if a start
+// state exists for the specified precedence and nil otherwise. d must be a
+// precedence DFA. See also isPrecedenceDfa.
 func (d *DFA) getPrecedenceStartState(precedence int) *DFAState {
-	if !(d.precedenceDfa) {
-		panic("Only precedence DFAs may contain a precedence start state.")
+	if !d.precedenceDfa {
+		panic("only precedence DFAs may contain a precedence start state")
 	}
+
 	// s0.edges is never nil for a precedence DFA
 	if precedence < 0 || precedence >= len(d.s0.edges) {
 		return nil
 	}
+
 	return d.s0.edges[precedence]
 }
 
-// Set the start state for a specific precedence value.
-//
-// @param precedence The current precedence.
-// @param startState The start state corresponding to the specified
-// precedence.
-//
-// @panics IllegalStateException if d is not a precedence DFA.
-// @see //isPrecedenceDfa()
-//
+// setPrecedenceStartState sets the start state for the current precedence. d
+// must be a precedence DFA. See also isPrecedenceDfa.
 func (d *DFA) setPrecedenceStartState(precedence int, startState *DFAState) {
-	if !(d.precedenceDfa) {
-		panic("Only precedence DFAs may contain a precedence start state.")
+	if !d.precedenceDfa {
+		panic("only precedence DFAs may contain a precedence start state")
 	}
+
 	if precedence < 0 {
 		return
 	}
 
-	// Synchronization on s0 here is ok. when the DFA is turned into a
-	// precedence DFA, s0 will be initialized once and not updated again
-	// s0.edges is never nil for a precedence DFA
-
-	// s0.edges is never null for a precedence DFA
+	// Synchronization on s0 here is ok. When the DFA is turned into a
+	// precedence DFA, s0 will be initialized once and not updated again. s0.edges
+	// is never nil for a precedence DFA.
 	if precedence >= len(d.s0.edges) {
-		// enlarge the slice
 		d.s0.edges = append(d.s0.edges, make([]*DFAState, precedence+1-len(d.s0.edges))...)
 	}
 
 	d.s0.edges[precedence] = startState
 }
 
-//
-// Sets whether d is a precedence DFA. If the specified value differs
-// from the current DFA configuration, the following actions are taken
-// otherwise no changes are made to the current DFA.
-//
-// <ul>
-// <li>The {@link //states} map is cleared</li>
-// <li>If {@code precedenceDfa} is {@code false}, the initial state
-// {@link //s0} is set to {@code nil} otherwise, it is initialized to a new
-// {@link DFAState} with an empty outgoing {@link DFAState//edges} array to
-// store the start states for individual precedence values.</li>
-// <li>The {@link //precedenceDfa} field is updated</li>
-// </ul>
-//
-// @param precedenceDfa {@code true} if d is a precedence DFA otherwise,
-// {@code false}
-
+// setPrecedenceDfa sets whether d is a precedence DFA. If precedenceDfa differs
+// from the current DFA configuration, then d.states is cleared, the initial
+// state s0 is set to a new DFAState with an empty outgoing DFAState.edges to
+// store the start states for individual precedence values if precedenceDfa is
+// true or nil otherwise, and d.precedenceDfa is updated.
 func (d *DFA) setPrecedenceDfa(precedenceDfa bool) {
 	if d.precedenceDfa != precedenceDfa {
 		d.states = make(map[string]*DFAState)
+
 		if precedenceDfa {
 			var precedenceState = NewDFAState(-1, NewBaseATNConfigSet(false))
+
 			precedenceState.edges = make([]*DFAState, 0)
 			precedenceState.isAcceptState = false
 			precedenceState.requiresFullContext = false
@@ -108,6 +84,7 @@ func (d *DFA) setPrecedenceDfa(precedenceDfa bool) {
 		} else {
 			d.s0 = nil
 		}
+
 		d.precedenceDfa = precedenceDfa
 	}
 }
@@ -118,22 +95,20 @@ func (d *DFA) GetStates() map[string]*DFAState {
 
 type DFAStateList []*DFAState
 
-func (a DFAStateList) Len() int           { return len(a) }
-func (a DFAStateList) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
-func (a DFAStateList) Less(i, j int) bool { return a[i].stateNumber < a[j].stateNumber }
+func (d DFAStateList) Len() int           { return len(d) }
+func (d DFAStateList) Less(i, j int) bool { return d[i].stateNumber < d[j].stateNumber }
+func (d DFAStateList) Swap(i, j int)      { d[i], d[j] = d[j], d[i] }
 
-// Return a list of all states in d DFA, ordered by state number.
+// sortedStates returns the states in d sorted by their state number.
 func (d *DFA) sortedStates() []*DFAState {
+	var vs = make([]*DFAState, 0, len(d.states))
 
-	// extract the values
-	vs := make([]*DFAState, len(d.states))
-	i := 0
 	for _, v := range d.states {
-		vs[i] = v
-		i++
+		vs = append(vs, v)
 	}
 
 	sort.Sort(DFAStateList(vs))
+
 	return vs
 }
 
@@ -141,14 +116,14 @@ func (d *DFA) String(literalNames []string, symbolicNames []string) string {
 	if d.s0 == nil {
 		return ""
 	}
-	var serializer = NewDFASerializer(d, literalNames, symbolicNames)
-	return serializer.String()
+
+	return NewDFASerializer(d, literalNames, symbolicNames).String()
 }
 
 func (d *DFA) ToLexerString() string {
 	if d.s0 == nil {
 		return ""
 	}
-	var serializer = NewLexerDFASerializer(d)
-	return serializer.String()
+
+	return NewLexerDFASerializer(d).String()
 }
