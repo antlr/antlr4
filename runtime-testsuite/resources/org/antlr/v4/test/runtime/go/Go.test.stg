@@ -199,7 +199,7 @@ StringList() ::= "[]string"
 
 BuildParseTrees() ::= "p.BuildParseTrees = true"
 
-BailErrorStrategy() ::= <%SetErrorHandler(NewBailErrorStrategy())%>
+BailErrorStrategy() ::= <%p.SetErrorHandler(p.NewBailErrorStrategy())%>
 
 ToStringTree(s) ::= <%<s>.ToStringTree(nil,p)%>
 
