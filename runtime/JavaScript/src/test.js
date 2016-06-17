@@ -1,9 +1,7 @@
-PORT_DEBUG = false
-
 var antlr4 = require('./antlr4/index');
-var TLexer = require('./TLexer');
-var TParser = require('./TParser');
-var TListener = require('./TListener').TListener;
+var DesignScriptLexer = require('./DesignScriptLexer');
+var DesignScriptParser = require('./DesignScriptParser');
+var DesignScriptListener = require('./DesignScriptListener').DesignScriptListener;
 // var TVisitor = require('./parser/TVisitor').TVisitor;
 
 function TreeShapeListener() {
@@ -25,10 +23,11 @@ TreeShapeListener.prototype.enterEveryRule = function(ctx) {
 };
 
 function main(argv) {
+	PORT_DEBUG =true 
     var input = new antlr4.FileStream(argv[2]);
-    var lexer = new TLexer.TLexer(input);
+    var lexer = new DesignScriptLexer.DesignScriptLexer(input);
     var stream = new antlr4.CommonTokenStream(lexer);
-	var parser = new TParser.TParser(stream);
+	var parser = new DesignScriptParser.DesignScriptParser(stream);
     parser.buildParseTrees = true;
 	printer = function() {
 		this.println = function(s) { console.log(s); }
