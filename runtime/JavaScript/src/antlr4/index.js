@@ -1,3 +1,5 @@
+PORT_DEBUG = false; // TODO(pboyer) remove
+
 exports.atn = require('./atn/index');
 exports.dfa = require('./dfa/index');
 exports.tree = require('./tree/index');
