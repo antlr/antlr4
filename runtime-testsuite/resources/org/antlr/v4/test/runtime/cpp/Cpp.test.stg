@@ -305,7 +305,7 @@ BasicListener(X) ::= <<
 @parser::definitions {
 class LeafListener : public TBaseListener {
 public:
-  virtual void visitTerminal(tree::TerminalNode *node) override {
+  virtual void visitTerminal(Ref\<tree::TerminalNode> const& node) override {
   std::cout \<\< node->getSymbol()->getText() \<\< std::endl;
   }
 };
@@ -313,7 +313,8 @@ public:
 >>
 
 WalkListener(s) ::= <<
-tree::ParseTreeWalker::DEFAULT->walk(std::make_shared\<LeafListener>(), <s>);
+LeafListener listener;
+tree::ParseTreeWalker::DEFAULT.walk(&listener, <s>);
 >>
 
 TreeNodeWithAltNumField(X) ::= <<

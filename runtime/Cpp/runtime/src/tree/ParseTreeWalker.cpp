@@ -39,9 +39,9 @@
 using namespace antlr4::tree;
 using namespace antlrcpp;
 
-const Ref<ParseTreeWalker> ParseTreeWalker::DEFAULT = std::make_shared<ParseTreeWalker>();
+ParseTreeWalker ParseTreeWalker::DEFAULT;
 
-void ParseTreeWalker::walk(Ref<ParseTreeListener> const& listener, Ref<ParseTree> const& t) {
+void ParseTreeWalker::walk(ParseTreeListener *listener, Ref<ParseTree> const& t) {
   if (is<ErrorNode>(t)) {
     listener->visitErrorNode(std::dynamic_pointer_cast<ErrorNode>(t));
     return;
@@ -58,13 +58,13 @@ void ParseTreeWalker::walk(Ref<ParseTreeListener> const& listener, Ref<ParseTree
   exitRule(listener, r);
 }
 
-void ParseTreeWalker::enterRule(Ref<ParseTreeListener> const& listener, Ref<RuleNode> const& r) {
+void ParseTreeWalker::enterRule(ParseTreeListener *listener, Ref<RuleNode> const& r) {
   Ref<ParserRuleContext> ctx = std::dynamic_pointer_cast<ParserRuleContext>(r->getRuleContext());
   listener->enterEveryRule(ctx.get());
   ctx->enterRule(listener);
 }
 
-void ParseTreeWalker::exitRule(Ref<ParseTreeListener> const& listener, Ref<RuleNode> const& r) {
+void ParseTreeWalker::exitRule(ParseTreeListener *listener, Ref<RuleNode> const& r) {
   Ref<ParserRuleContext> ctx = std::dynamic_pointer_cast<ParserRuleContext>(r->getRuleContext());
   ctx->exitRule(listener);
   listener->exitEveryRule(ctx.get());

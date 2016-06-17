@@ -36,22 +36,20 @@ namespace tree {
 
   class ANTLR4CPP_PUBLIC ParseTreeWalker {
   public:
-    static const Ref<ParseTreeWalker> DEFAULT;
+    static ParseTreeWalker DEFAULT;
 
     virtual ~ParseTreeWalker() {};
     
-    virtual void walk(Ref<ParseTreeListener> const& listener, Ref<ParseTree> const& t);
+    virtual void walk(ParseTreeListener *listener, Ref<ParseTree> const& t);
 
-    /// <summary>
     /// The discovery of a rule node, involves sending two events: the generic
     /// <seealso cref="ParseTreeListener#enterEveryRule"/> and a
     /// <seealso cref="RuleContext"/>-specific event. First we trigger the generic and then
-    /// the rule specific. We to them in reverse order upon finishing the node.
-    /// </summary>
+    /// the rule specific. We do them in reverse order upon finishing the node.
   protected:
-    virtual void enterRule(Ref<ParseTreeListener> const& listener, Ref<RuleNode> const& r);
+    virtual void enterRule(ParseTreeListener *listener, Ref<RuleNode> const& r);
 
-    virtual void exitRule(Ref<ParseTreeListener> const& listener, Ref<RuleNode> const& r);
+    virtual void exitRule(ParseTreeListener *listener, Ref<RuleNode> const& r);
   };
 
 } // namespace tree
