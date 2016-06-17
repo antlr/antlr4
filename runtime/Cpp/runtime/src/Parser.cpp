@@ -77,8 +77,7 @@ void Parser::TraceListener::exitEveryRule(ParserRuleContext *ctx) {
     << ", LT(1)=" << outerInstance->_input->LT(1)->getText() << std::endl;
 }
 
-const Ref<Parser::TrimToSizeListener> Parser::TrimToSizeListener::INSTANCE =
-  std::make_shared<Parser::TrimToSizeListener>();
+Parser::TrimToSizeListener Parser::TrimToSizeListener::INSTANCE;
 
 void Parser::TrimToSizeListener::enterEveryRule(ParserRuleContext * /*ctx*/) {
 }
@@ -99,6 +98,7 @@ Parser::Parser(TokenStream *input) {
 }
 
 Parser::~Parser() {
+  delete _tracer;
 }
 
 void Parser::reset() {
@@ -166,21 +166,21 @@ void Parser::setTrimParseTree(bool trimParseTrees) {
     if (getTrimParseTree()) {
       return;
     }
-    addParseListener(TrimToSizeListener::INSTANCE);
+    addParseListener(&TrimToSizeListener::INSTANCE);
   } else {
-    removeParseListener(TrimToSizeListener::INSTANCE);
+    removeParseListener(&TrimToSizeListener::INSTANCE);
   }
 }
 
 bool Parser::getTrimParseTree() {
-  return std::find(getParseListeners().begin(), getParseListeners().end(), TrimToSizeListener::INSTANCE) != getParseListeners().end();
+  return std::find(getParseListeners().begin(), getParseListeners().end(), &TrimToSizeListener::INSTANCE) != getParseListeners().end();
 }
 
-std::vector<Ref<tree::ParseTreeListener>> Parser::getParseListeners() {
+std::vector<tree::ParseTreeListener *> Parser::getParseListeners() {
   return _parseListeners;
 }
 
-void Parser::addParseListener(Ref<tree::ParseTreeListener> const& listener) {
+void Parser::addParseListener(tree::ParseTreeListener *listener) {
   if (!listener) {
     throw NullPointerException("listener");
   }
@@ -188,7 +188,7 @@ void Parser::addParseListener(Ref<tree::ParseTreeListener> const& listener) {
   this->_parseListeners.push_back(listener);
 }
 
-void Parser::removeParseListener(Ref<tree::ParseTreeListener> const& listener) {
+void Parser::removeParseListener(tree::ParseTreeListener *listener) {
   if (!_parseListeners.empty()) {
     auto it = std::find(_parseListeners.begin(), _parseListeners.end(), listener);
     if (it != _parseListeners.end()) {
@@ -627,11 +627,12 @@ void Parser::setTrace(bool trace) {
   if (!trace) {
     if (_tracer)
       removeParseListener(_tracer);
-    _tracer.reset();
+    delete _tracer;
+    _tracer = nullptr;
   } else {
     if (_tracer)
       removeParseListener(_tracer); // Just in case this is triggered multiple times.
-    _tracer = std::make_shared<TraceListener>(this);
+    _tracer = new TraceListener(this);
     addParseListener(_tracer);
   }
 }
@@ -648,5 +649,6 @@ void Parser::InitializeInstanceFields() {
   _syntaxErrors = 0;
   _matchedEOF = false;
   _input = nullptr;
+  _tracer = nullptr;
 }
 

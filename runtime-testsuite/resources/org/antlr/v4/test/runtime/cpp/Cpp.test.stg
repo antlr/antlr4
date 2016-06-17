@@ -305,7 +305,7 @@ BasicListener(X) ::= <<
 @parser::definitions {
 class LeafListener : public TBaseListener {
 public:
-  virtual void visitTerminal(Ref\<tree::TerminalNode> const& node) override {
+  virtual void visitTerminal(tree::TerminalNode *node) override {
   std::cout \<\< node->getSymbol()->getText() \<\< std::endl;
   }
 };

@@ -110,8 +110,8 @@ namespace antlr4 {
 
     // Double dispatch methods for listeners
 
-    virtual void enterRule(Ref<tree::ParseTreeListener> const& listener);
-    virtual void exitRule(Ref<tree::ParseTreeListener> const& listener);
+    virtual void enterRule(tree::ParseTreeListener *listener);
+    virtual void exitRule(tree::ParseTreeListener *listener);
 
     /// Does not set parent link; other add methods do that.
     virtual Ref<tree::TerminalNode> addChild(Ref<tree::TerminalNode> const& t);

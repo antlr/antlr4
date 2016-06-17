@@ -72,7 +72,7 @@ int main(int argc, const char* argv[]) {
  
 This example assumes your grammar contains a parser rule named `key` for which the enterKey function was generated. The `Ref<>` template is an alias for `std::shared_ptr<>` to simplify the runtime source code which often makes use of smart pointers.
 
-### Specialities of this ANTLR target
+## Specialities of this ANTLR target
 
 There are a couple of things that only the C++ ANTLR target has to deal with. They are described here.
 

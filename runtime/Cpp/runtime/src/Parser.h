@@ -59,7 +59,7 @@ namespace antlr4 {
 
     class TrimToSizeListener : public tree::ParseTreeListener {
     public:
-      static const Ref<TrimToSizeListener> INSTANCE;
+      static TrimToSizeListener INSTANCE;
 
       virtual ~TrimToSizeListener() {};
 
@@ -149,7 +149,7 @@ namespace antlr4 {
     /// using the default <seealso cref="Parser.TrimToSizeListener"/> during the parse process. </returns>
     virtual bool getTrimParseTree();
 
-    virtual std::vector<Ref<tree::ParseTreeListener>> getParseListeners();
+    virtual std::vector<tree::ParseTreeListener *> getParseListeners();
 
     /// <summary>
     /// Registers {@code listener} to receive events during the parsing process.
@@ -179,7 +179,7 @@ namespace antlr4 {
     /// <param name="listener"> the listener to add
     /// </param>
     /// <exception cref="NullPointerException"> if {@code} listener is {@code null} </exception>
-    virtual void addParseListener(Ref<tree::ParseTreeListener> const& listener);
+    virtual void addParseListener(tree::ParseTreeListener *listener);
 
     /// <summary>
     /// Remove {@code listener} from the list of parse listeners.
@@ -190,7 +190,7 @@ namespace antlr4 {
     /// <seealso cref= #addParseListener
     /// </seealso>
     /// <param name="listener"> the listener to remove </param>
-    virtual void removeParseListener(Ref<tree::ParseTreeListener> const& listener);
+    virtual void removeParseListener(tree::ParseTreeListener *listener);
 
     /// <summary>
     /// Remove all parse listeners.
@@ -433,12 +433,10 @@ namespace antlr4 {
     /// <seealso cref= #setBuildParseTree </seealso>
     bool _buildParseTrees;
 
-    /// <summary>
     /// The list of <seealso cref="ParseTreeListener"/> listeners registered to receive
     /// events during the parse.
-    /// </summary>
     /// <seealso cref= #addParseListener </seealso>
-    std::vector<Ref<tree::ParseTreeListener>> _parseListeners;
+    std::vector<tree::ParseTreeListener *> _parseListeners;
 
     /// <summary>
     /// The number of syntax errors reported during parsing. This value is
@@ -463,7 +461,7 @@ namespace antlr4 {
     /// later call to setTrace(false). The listener itself is
     /// implemented as a parser listener so this field is not directly used by
     /// other parser methods.
-    Ref<TraceListener> _tracer;
+    TraceListener *_tracer;
 
     void InitializeInstanceFields();
   };

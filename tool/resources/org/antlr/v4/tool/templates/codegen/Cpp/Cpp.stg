@@ -1026,12 +1026,12 @@ CaptureNextTokenTypeHeader(d) ::= "<! Required but unused. !>"
 CaptureNextTokenType(d) ::= "<d.varName> = _input->LA(1);"
 
 ListenerDispatchMethodHeader(method) ::= <<
-virtual void <if (method.isEnter)>enter<else>exit<endif>Rule(Ref\<tree::ParseTreeListener> const& listener) override;
+virtual void <if (method.isEnter)>enter<else>exit<endif>Rule(tree::ParseTreeListener *listener) override;
 >>
 ListenerDispatchMethod(method) ::= <<
-void <parser.name>::<struct.name>::<if (method.isEnter)>enter<else>exit<endif>Rule(Ref\<tree::ParseTreeListener> const& listener) {
-  auto parserListener = std::dynamic_pointer_cast\<<parser.grammarName>Listener>(listener);
-  if (parserListener)
+void <parser.name>::<struct.name>::<if (method.isEnter)>enter<else>exit<endif>Rule(tree::ParseTreeListener *listener) {
+  auto parserListener = dynamic_cast\<<parser.grammarName>Listener *>(listener);
+  if (parserListener != nullptr)
     parserListener-><if(method.isEnter)>enter<else>exit<endif><struct.derivedFromName; format="cap">(this);
 }
 >>
