@@ -27,8 +27,7 @@ public class TestCompositeParsers extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="=a";
 		String found = execParser("M.g4", grammar, "MParser", "MLexer",
-		                          "MListener", "MVisitor",
-		                          "s", input, false);
+			"MListener", "MVisitor", "s", input, false);
 		assertEquals("S.a\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -52,8 +51,7 @@ public class TestCompositeParsers extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="x 34 9";
 		String found = execParser("M.g4", grammar, "MParser", "MLexer",
-		                          "MListener", "MVisitor",
-		                          "s", input, false);
+			"MListener", "MVisitor", "s", input, false);
 		assertEquals("S.x\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -62,17 +60,17 @@ public class TestCompositeParsers extends BaseTest {
 	@Test
 	public void testDelegatesSeeSameTokenType() throws Exception {
 		mkdir(parserpkgdir);
-		String slave_T =
-			"parser grammar T;\n" +
-			"tokens { C, B, A } // reverse order\n" +
-			"y : A {fmt.Println(\"T.y\")};";
-		writeFile(parserpkgdir, "T.g4", slave_T);
-
 		String slave_S =
 			"parser grammar S;\n" +
 			"tokens { A, B, C }\n" +
 			"x : A {fmt.Println(\"S.x\")};";
 		writeFile(parserpkgdir, "S.g4", slave_S);
+
+		String slave_T =
+			"parser grammar T;\n" +
+			"tokens { C, B, A } // reverse order\n" +
+			"y : A {fmt.Println(\"T.y\")};";
+		writeFile(parserpkgdir, "T.g4", slave_T);
 
 		StringBuilder grammarBuilder = new StringBuilder(598);
 		grammarBuilder.append("// The lexer will create rules to match letters a, b, c.\n");
@@ -95,8 +93,7 @@ public class TestCompositeParsers extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="aa";
 		String found = execParser("M.g4", grammar, "MParser", "MLexer",
-		                          "MListener", "MVisitor",
-		                          "s", input, false);
+			"MListener", "MVisitor", "s", input, false);
 		assertEquals(
 			"S.x\n" +
 			"T.y\n", found);
@@ -125,8 +122,7 @@ public class TestCompositeParsers extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="b";
 		String found = execParser("M.g4", grammar, "MParser", "MLexer",
-		                          "MListener", "MVisitor",
-		                          "s", input, false);
+			"MListener", "MVisitor", "s", input, false);
 		assertEquals("foo\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -149,8 +145,7 @@ public class TestCompositeParsers extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="b";
 		String found = execParser("M.g4", grammar, "MParser", "MLexer",
-		                          "MListener", "MVisitor",
-		                          "s", input, false);
+			"MListener", "MVisitor", "s", input, false);
 		assertEquals("S.a\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -173,8 +168,7 @@ public class TestCompositeParsers extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="b";
 		String found = execParser("M.g4", grammar, "MParser", "MLexer",
-		                          "MListener", "MVisitor",
-		                          "s", input, false);
+			"MListener", "MVisitor", "s", input, false);
 		assertEquals("S.a1000\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -197,8 +191,7 @@ public class TestCompositeParsers extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="b";
 		String found = execParser("M.g4", grammar, "MParser", "MLexer",
-		                          "MListener", "MVisitor",
-		                          "s", input, false);
+			"MListener", "MVisitor", "s", input, false);
 		assertEquals("S.ab\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -207,16 +200,16 @@ public class TestCompositeParsers extends BaseTest {
 	@Test
 	public void testDelegatorInvokesFirstVersionOfDelegateRule() throws Exception {
 		mkdir(parserpkgdir);
-		String slave_T =
-			"parser grammar T;\n" +
-			"a : B {fmt.Println(\"T.a\")};";
-		writeFile(parserpkgdir, "T.g4", slave_T);
-
 		String slave_S =
 			"parser grammar S;\n" +
 			"a : b {fmt.Println(\"S.a\")};\n" +
 			"b : B;";
 		writeFile(parserpkgdir, "S.g4", slave_S);
+
+		String slave_T =
+			"parser grammar T;\n" +
+			"a : B {fmt.Println(\"T.a\")};";
+		writeFile(parserpkgdir, "T.g4", slave_T);
 
 		StringBuilder grammarBuilder = new StringBuilder(106);
 		grammarBuilder.append("grammar M;\n");
@@ -227,8 +220,7 @@ public class TestCompositeParsers extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="b";
 		String found = execParser("M.g4", grammar, "MParser", "MLexer",
-		                          "MListener", "MVisitor",
-		                          "s", input, false);
+			"MListener", "MVisitor", "s", input, false);
 		assertEquals("S.a\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -251,8 +243,7 @@ public class TestCompositeParsers extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="c";
 		String found = execParser("M.g4", grammar, "MParser", "MLexer",
-		                          "MListener", "MVisitor",
-		                          "a", input, false);
+			"MListener", "MVisitor", "a", input, false);
 		assertEquals("S.a\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -261,17 +252,17 @@ public class TestCompositeParsers extends BaseTest {
 	@Test
 	public void testDelegatorRuleOverridesDelegates() throws Exception {
 		mkdir(parserpkgdir);
-		String slave_T =
-			"parser grammar T;\n" +
-			"tokens { A }\n" +
-			"b : 'b' {fmt.Println(\"T.b\")};";
-		writeFile(parserpkgdir, "T.g4", slave_T);
-
 		String slave_S =
 			"parser grammar S;\n" +
 			"a : b {fmt.Println(\"S.a\")};\n" +
 			"b : 'b' ;";
 		writeFile(parserpkgdir, "S.g4", slave_S);
+
+		String slave_T =
+			"parser grammar T;\n" +
+			"tokens { A }\n" +
+			"b : 'b' {fmt.Println(\"T.b\")};";
+		writeFile(parserpkgdir, "T.g4", slave_T);
 
 		StringBuilder grammarBuilder = new StringBuilder(87);
 		grammarBuilder.append("grammar M;\n");
@@ -281,8 +272,7 @@ public class TestCompositeParsers extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="c";
 		String found = execParser("M.g4", grammar, "MParser", "MLexer",
-		                          "MListener", "MVisitor",
-		                          "a", input, false);
+			"MListener", "MVisitor", "a", input, false);
 		assertEquals(
 			"M.b\n" +
 			"S.a\n", found);
@@ -312,8 +302,7 @@ public class TestCompositeParsers extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="float x = 3;";
 		String found = execParser("M.g4", grammar, "MParser", "MLexer",
-		                          "MListener", "MVisitor",
-		                          "prog", input, false);
+			"MListener", "MVisitor", "prog", input, false);
 		assertEquals("JavaDecl: floatx=3;\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -342,8 +331,7 @@ public class TestCompositeParsers extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="test test";
 		String found = execParser("Test.g4", grammar, "TestParser", "TestLexer",
-		                          "TestListener", "TestVisitor",
-		                          "program", input, false);
+			"TestListener", "TestVisitor", "program", input, false);
 		assertEquals("", found);
 		assertNull(this.stderrDuringParse);
 
@@ -367,8 +355,7 @@ public class TestCompositeParsers extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="b";
 		String found = execParser("M.g4", grammar, "MParser", "MLexer",
-		                          "MListener", "MVisitor",
-		                          "s", input, false);
+			"MListener", "MVisitor", "s", input, false);
 		assertEquals("", found);
 		assertNull(this.stderrDuringParse);
 
@@ -391,8 +378,7 @@ public class TestCompositeParsers extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="b";
 		String found = execParser("M.g4", grammar, "MParser", "MLexer",
-		                          "MListener", "MVisitor",
-		                          "s", input, false);
+			"MListener", "MVisitor", "s", input, false);
 		assertEquals("", found);
 		assertNull(this.stderrDuringParse);
 
@@ -415,8 +401,7 @@ public class TestCompositeParsers extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="abc";
 		String found = execParser("M.g4", grammar, "MParser", "MLexer",
-		                          "MListener", "MVisitor",
-		                          "a", input, false);
+			"MListener", "MVisitor", "a", input, false);
 		assertEquals(
 			"M.A\n" +
 			"M.a: [@0,0:2='abc',<1>,1:0]\n", found);

@@ -18,8 +18,7 @@ public class TestParserErrors extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="ac";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "a", input, false);
+			"TListener", "TVisitor", "a", input, false);
 		assertEquals("conjured=[@-1,-1:-1='<missing 'b'>',<2>,1:1]\n", found);
 
 		assertEquals("line 1:1 missing 'b' at 'c'\n", this.stderrDuringParse);
@@ -35,8 +34,7 @@ public class TestParserErrors extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="ad";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "a", input, false);
+			"TListener", "TVisitor", "a", input, false);
 		assertEquals("conjured=[@-1,-1:-1='<missing 'b'>',<2>,1:1]\n", found);
 
 		assertEquals("line 1:1 missing {'b', 'c'} at 'd'\n", this.stderrDuringParse);
@@ -46,13 +44,14 @@ public class TestParserErrors extends BaseTest {
 	@Test
 	public void testContextListGetters() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(205);
+		StringBuilder grammarBuilder = new StringBuilder(175);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("@parser::members{\n");
 		grammarBuilder.append("func foo() {\n");
-		grammarBuilder.append("	SContext s = null;\n");
-		grammarBuilder.append("	List<? extends AContext> a = s.a();\n");
-		grammarBuilder.append("	List<? extends BContext> b = s.b();\n");
+		grammarBuilder.append("	// TODO\n");
+		grammarBuilder.append("	// var s SContext\n");
+		grammarBuilder.append("	// var a = s.A()\n");
+		grammarBuilder.append("	// var b = s.B()\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("s : (a | b)+;\n");
@@ -61,8 +60,7 @@ public class TestParserErrors extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="abab";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, true);
+			"TListener", "TVisitor", "s", input, true);
 		assertEquals("abab\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -80,8 +78,7 @@ public class TestParserErrors extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="x";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "start", input, true);
+			"TListener", "TVisitor", "start", input, true);
 		assertEquals("", found);
 		assertNull(this.stderrDuringParse);
 
@@ -99,8 +96,7 @@ public class TestParserErrors extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="xx";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "start", input, true);
+			"TListener", "TVisitor", "start", input, true);
 		assertEquals("", found);
 		assertNull(this.stderrDuringParse);
 
@@ -118,8 +114,7 @@ public class TestParserErrors extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="xxx";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "start", input, true);
+			"TListener", "TVisitor", "start", input, true);
 		assertEquals("", found);
 		assertNull(this.stderrDuringParse);
 
@@ -137,8 +132,7 @@ public class TestParserErrors extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="xxxx";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "start", input, true);
+			"TListener", "TVisitor", "start", input, true);
 		assertEquals("", found);
 		assertNull(this.stderrDuringParse);
 
@@ -156,8 +150,7 @@ public class TestParserErrors extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="x:x";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "start", input, false);
+			"TListener", "TVisitor", "start", input, false);
 		assertEquals("", found);
 		assertNull(this.stderrDuringParse);
 
@@ -173,8 +166,7 @@ public class TestParserErrors extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "start", input, true);
+			"TListener", "TVisitor", "start", input, true);
 		assertEquals("", found);
 
 		assertEquals("line 1:0 missing ID at '<EOF>'\n", this.stderrDuringParse);
@@ -202,8 +194,7 @@ public class TestParserErrors extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="dog and software";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "start", input, false);
+			"TListener", "TVisitor", "start", input, false);
 		assertEquals("{'hardware', 'software'}\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -221,8 +212,7 @@ public class TestParserErrors extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="ae";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "a", input, false);
+			"TListener", "TVisitor", "a", input, false);
 		assertEquals("", found);
 
 		assertEquals("line 1:1 no viable alternative at input 'ae'\n", this.stderrDuringParse);
@@ -241,8 +231,7 @@ public class TestParserErrors extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="abe";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "a", input, false);
+			"TListener", "TVisitor", "a", input, false);
 		assertEquals("", found);
 
 		assertEquals("line 1:2 no viable alternative at input 'abe'\n", this.stderrDuringParse);
@@ -261,8 +250,7 @@ public class TestParserErrors extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="aaae";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "a", input, false);
+			"TListener", "TVisitor", "a", input, false);
 		assertEquals("", found);
 
 		assertEquals("line 1:3 no viable alternative at input 'aaae'\n", this.stderrDuringParse);
@@ -278,8 +266,7 @@ public class TestParserErrors extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="aacabc";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "a", input, false);
+			"TListener", "TVisitor", "a", input, false);
 		assertEquals("", found);
 
 		assertEquals("line 1:1 extraneous input 'a' expecting {'b', 'c'}\n", this.stderrDuringParse);
@@ -295,8 +282,7 @@ public class TestParserErrors extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="aacabc";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "a", input, false);
+			"TListener", "TVisitor", "a", input, false);
 		assertEquals("", found);
 
 		assertEquals("line 1:1 extraneous input 'a' expecting {'b', 'z', 'c'}\n", this.stderrDuringParse);
@@ -312,8 +298,7 @@ public class TestParserErrors extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="abaaababc";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "a", input, false);
+			"TListener", "TVisitor", "a", input, false);
 		assertEquals("", found);
 
 		assertEquals(
@@ -331,8 +316,7 @@ public class TestParserErrors extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="abaaababc";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "a", input, false);
+			"TListener", "TVisitor", "a", input, false);
 		assertEquals("", found);
 
 		assertEquals(
@@ -355,8 +339,7 @@ public class TestParserErrors extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="a.";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("", found);
 
 		assertEquals("line 1:1 mismatched input '.' expecting '!'\n", this.stderrDuringParse);
@@ -372,8 +355,7 @@ public class TestParserErrors extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="ad";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "a", input, false);
+			"TListener", "TVisitor", "a", input, false);
 		assertEquals("", found);
 
 		assertEquals("line 1:1 missing {'b', 'c'} at 'd'\n", this.stderrDuringParse);
@@ -390,8 +372,7 @@ public class TestParserErrors extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="ad";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "a", input, false);
+			"TListener", "TVisitor", "a", input, false);
 		assertEquals("[@0,0:0='a',<3>,1:0]\n", found);
 
 		assertEquals("line 1:1 missing {'b', 'c'} at 'd'\n", this.stderrDuringParse);
@@ -407,8 +388,7 @@ public class TestParserErrors extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="aab";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "a", input, false);
+			"TListener", "TVisitor", "a", input, false);
 		assertEquals("", found);
 
 		assertEquals("line 1:1 extraneous input 'a' expecting 'b'\n", this.stderrDuringParse);
@@ -427,8 +407,7 @@ public class TestParserErrors extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="ac";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "a", input, false);
+			"TListener", "TVisitor", "a", input, false);
 		assertEquals("", found);
 
 		assertEquals("line 1:0 extraneous input 'a' expecting {'b', 'c'}\n", this.stderrDuringParse);
@@ -444,8 +423,7 @@ public class TestParserErrors extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="aabc";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "a", input, false);
+			"TListener", "TVisitor", "a", input, false);
 		assertEquals("", found);
 
 		assertEquals(
@@ -463,8 +441,7 @@ public class TestParserErrors extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="aabc";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "a", input, false);
+			"TListener", "TVisitor", "a", input, false);
 		assertEquals("", found);
 
 		assertEquals(
@@ -485,8 +462,7 @@ public class TestParserErrors extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="caaab";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "a", input, false);
+			"TListener", "TVisitor", "a", input, false);
 		assertEquals("", found);
 
 		assertEquals("line 1:0 extraneous input 'c' expecting 'a'\n", this.stderrDuringParse);
@@ -503,8 +479,7 @@ public class TestParserErrors extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="aabd";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "a", input, false);
+			"TListener", "TVisitor", "a", input, false);
 		assertEquals("[@2,2:2='b',<1>,1:2]\n", found);
 
 		assertEquals("line 1:1 extraneous input 'a' expecting {'b', 'c'}\n", this.stderrDuringParse);
@@ -520,8 +495,7 @@ public class TestParserErrors extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="ababbc";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "a", input, false);
+			"TListener", "TVisitor", "a", input, false);
 		assertEquals("", found);
 
 		assertEquals("line 1:2 extraneous input 'a' expecting {'b', 'c'}\n", this.stderrDuringParse);
@@ -537,8 +511,7 @@ public class TestParserErrors extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="ababbc";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "a", input, false);
+			"TListener", "TVisitor", "a", input, false);
 		assertEquals("", found);
 
 		assertEquals("line 1:2 extraneous input 'a' expecting {'b', 'z', 'c'}\n", this.stderrDuringParse);
@@ -554,8 +527,7 @@ public class TestParserErrors extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="aab";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "a", input, false);
+			"TListener", "TVisitor", "a", input, false);
 		assertEquals("", found);
 
 		assertEquals("line 1:1 extraneous input 'a' expecting {'b', 'c'}\n", this.stderrDuringParse);
@@ -571,8 +543,7 @@ public class TestParserErrors extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="ac";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "a", input, false);
+			"TListener", "TVisitor", "a", input, false);
 		assertEquals("", found);
 
 		assertEquals("line 1:1 missing 'b' at 'c'\n", this.stderrDuringParse);
@@ -588,8 +559,7 @@ public class TestParserErrors extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="aa";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "a", input, false);
+			"TListener", "TVisitor", "a", input, false);
 		assertEquals("", found);
 
 		assertEquals("line 1:1 mismatched input 'a' expecting 'b'\n", this.stderrDuringParse);
@@ -612,8 +582,7 @@ public class TestParserErrors extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="( ~FORCE_ERROR~ ";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "stat", input, false);
+			"TListener", "TVisitor", "stat", input, false);
 		assertEquals("", found);
 
 		assertEquals("line 1:2 mismatched input '~FORCE_ERROR~' expecting ')'\n", this.stderrDuringParse);

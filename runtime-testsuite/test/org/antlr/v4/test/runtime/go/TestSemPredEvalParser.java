@@ -12,7 +12,7 @@ public class TestSemPredEvalParser extends BaseTest {
 	@Test
 	public void test2UnpredicatedAlts() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(300);
+		StringBuilder grammarBuilder = new StringBuilder(299);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s : {p.Interpreter.SetPredictionMode(antlr.PredictionModeLLExactAmbigDetection);} a ';' a; // do 2x: once in ATN, next in DFA\n");
 		grammarBuilder.append("a : ID {fmt.Println(\"alt 1\")}\n");
@@ -25,8 +25,7 @@ public class TestSemPredEvalParser extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="x; y";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, true);
+			"TListener", "TVisitor", "s", input, true);
 		assertEquals(
 			"alt 1\n" +
 			"alt 1\n", found);
@@ -42,7 +41,7 @@ public class TestSemPredEvalParser extends BaseTest {
 	@Test
 	public void test2UnpredicatedAltsAndOneOrthogonalAlt() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(351);
+		StringBuilder grammarBuilder = new StringBuilder(350);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s : {p.Interpreter.SetPredictionMode(antlr.PredictionModeLLExactAmbigDetection);} a ';' a ';' a;\n");
 		grammarBuilder.append("a : INT {fmt.Println(\"alt 1\")}\n");
@@ -56,8 +55,7 @@ public class TestSemPredEvalParser extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="34; x; y";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, true);
+			"TListener", "TVisitor", "s", input, true);
 		assertEquals(
 			"alt 1\n" +
 			"alt 2\n" +
@@ -87,8 +85,7 @@ public class TestSemPredEvalParser extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="x x y";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals(
 			"alt 1\n" +
 			"alt 1\n" +
@@ -100,11 +97,12 @@ public class TestSemPredEvalParser extends BaseTest {
 	@Test
 	public void testActionsHidePredsInGlobalFOLLOW() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(279);
+		StringBuilder grammarBuilder = new StringBuilder(278);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("@members {\n");
 		grammarBuilder.append("func pred(v bool) bool {\n");
-		grammarBuilder.append("	fmt.Println(\"eval=\"+fmt.Sprint(v))\n");
+		grammarBuilder.append("	fmt.Println(\"eval=\" + fmt.Sprint(v))\n");
+		grammarBuilder.append("\n");
 		grammarBuilder.append("	return v\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("}\n");
@@ -117,8 +115,7 @@ public class TestSemPredEvalParser extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="a!";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals(
 			"eval=true\n" +
 			"parse\n", found);
@@ -138,8 +135,7 @@ public class TestSemPredEvalParser extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="a+b+a";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "start", input, false);
+			"TListener", "TVisitor", "start", input, false);
 		assertEquals("", found);
 		assertNull(this.stderrDuringParse);
 
@@ -148,17 +144,18 @@ public class TestSemPredEvalParser extends BaseTest {
 	@Test
 	public void testDepedentPredsInGlobalFOLLOW() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(302);
+		StringBuilder grammarBuilder = new StringBuilder(305);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("@members {\n");
 		grammarBuilder.append("func pred(v bool) bool {\n");
-		grammarBuilder.append("	fmt.Println(\"eval=\"+fmt.Sprint(v))\n");
+		grammarBuilder.append("	fmt.Println(\"eval=\" + fmt.Sprint(v))\n");
+		grammarBuilder.append("\n");
 		grammarBuilder.append("	return v\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("s : a[99] ;\n");
-		grammarBuilder.append("a[int i] : e {pred($i==99)}? {fmt.Println(\"parse\")} '!' ;\n");
-		grammarBuilder.append("b[int i] : e {pred($i==99)}? ID ;\n");
+		grammarBuilder.append("a[int i] : e {pred($i == 99)}? {fmt.Println(\"parse\")} '!' ;\n");
+		grammarBuilder.append("b[int i] : e {pred($i == 99)}? ID ;\n");
 		grammarBuilder.append("e : ID | ; // non-LL(1) so we use ATN\n");
 		grammarBuilder.append("ID : 'a'..'z'+ ;\n");
 		grammarBuilder.append("INT : '0'..'9'+;\n");
@@ -166,8 +163,7 @@ public class TestSemPredEvalParser extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="a!";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals(
 			"eval=true\n" +
 			"parse\n", found);
@@ -178,13 +174,13 @@ public class TestSemPredEvalParser extends BaseTest {
 	@Test
 	public void testDependentPredNotInOuterCtxShouldBeIgnored() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(268);
+		StringBuilder grammarBuilder = new StringBuilder(272);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s : b[2] ';' |  b[2] '.' ; // decision in s drills down to ctx-dependent pred in a;\n");
 		grammarBuilder.append("b[int i] : a[i] ;\n");
 		grammarBuilder.append("a[int i]\n");
-		grammarBuilder.append("  : {$i==1}? ID {fmt.Println(\"alt 1\")}\n");
-		grammarBuilder.append("    | {$i==2}? ID {fmt.Println(\"alt 2\")}\n");
+		grammarBuilder.append("  : {$i == 1}? ID {fmt.Println(\"alt 1\")}\n");
+		grammarBuilder.append("    | {$i == 2}? ID {fmt.Println(\"alt 2\")}\n");
 		grammarBuilder.append("    ;\n");
 		grammarBuilder.append("ID : 'a'..'z'+ ;\n");
 		grammarBuilder.append("INT : '0'..'9'+;\n");
@@ -192,8 +188,7 @@ public class TestSemPredEvalParser extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="a;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("alt 2\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -211,8 +206,7 @@ public class TestSemPredEvalParser extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="hello";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "cppCompilationUnit", input, false);
+			"TListener", "TVisitor", "cppCompilationUnit", input, false);
 		assertEquals("", found);
 		assertNull(this.stderrDuringParse);
 
@@ -235,8 +229,7 @@ public class TestSemPredEvalParser extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="a;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("alt 2\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -257,8 +250,7 @@ public class TestSemPredEvalParser extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="y 3 x 4";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("", found);
 
 		assertEquals("line 1:0 no viable alternative at input 'y'\n", this.stderrDuringParse);
@@ -282,8 +274,7 @@ public class TestSemPredEvalParser extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="x y";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals(
 			"alt 1\n" +
 			"alt 1\n", found);
@@ -294,13 +285,13 @@ public class TestSemPredEvalParser extends BaseTest {
 	@Test
 	public void testPredFromAltTestedInLoopBack_1() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(211);
+		StringBuilder grammarBuilder = new StringBuilder(213);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("file_\n");
-		grammarBuilder.append("@after {fmt.Println($ctx.ToStringTree(nil,p))}\n");
+		grammarBuilder.append("@after {fmt.Println($ctx.ToStringTree(nil, p))}\n");
 		grammarBuilder.append("  : para para EOF ;\n");
 		grammarBuilder.append("para: paraContent NL NL ;\n");
-		grammarBuilder.append("paraContent : ('s'|'x'|{p.GetTokenStream().LA(2)!=TParserNL}? NL)+ ;\n");
+		grammarBuilder.append("paraContent : ('s'|'x'|{p.GetTokenStream().LA(2) != TParserNL}? NL)+ ;\n");
 		grammarBuilder.append("NL : '\\n' ;\n");
 		grammarBuilder.append("s : 's' ;\n");
 		grammarBuilder.append("X : 'x' ;");
@@ -311,8 +302,7 @@ public class TestSemPredEvalParser extends BaseTest {
 			"\n" +
 			"x\n";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "file_", input, true);
+			"TListener", "TVisitor", "file_", input, true);
 		assertEquals("(file_ (para (paraContent s) \\n \\n) (para (paraContent \\n x \\n)) <EOF>)\n", found);
 
 		assertEquals(
@@ -324,13 +314,13 @@ public class TestSemPredEvalParser extends BaseTest {
 	@Test
 	public void testPredFromAltTestedInLoopBack_2() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(211);
+		StringBuilder grammarBuilder = new StringBuilder(213);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("file_\n");
-		grammarBuilder.append("@after {fmt.Println($ctx.ToStringTree(nil,p))}\n");
+		grammarBuilder.append("@after {fmt.Println($ctx.ToStringTree(nil, p))}\n");
 		grammarBuilder.append("  : para para EOF ;\n");
 		grammarBuilder.append("para: paraContent NL NL ;\n");
-		grammarBuilder.append("paraContent : ('s'|'x'|{p.GetTokenStream().LA(2)!=TParserNL}? NL)+ ;\n");
+		grammarBuilder.append("paraContent : ('s'|'x'|{p.GetTokenStream().LA(2) != TParserNL}? NL)+ ;\n");
 		grammarBuilder.append("NL : '\\n' ;\n");
 		grammarBuilder.append("s : 's' ;\n");
 		grammarBuilder.append("X : 'x' ;");
@@ -342,8 +332,7 @@ public class TestSemPredEvalParser extends BaseTest {
 			"x\n" +
 			"\n";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "file_", input, true);
+			"TListener", "TVisitor", "file_", input, true);
 		assertEquals("(file_ (para (paraContent s) \\n \\n) (para (paraContent \\n x) \\n \\n) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -352,9 +341,9 @@ public class TestSemPredEvalParser extends BaseTest {
 	@Test
 	public void testPredTestedEvenWhenUnAmbig_1() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(224);
+		StringBuilder grammarBuilder = new StringBuilder(225);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("@members {var enumKeyword bool= true; var _ bool = enumKeyword; }\n");
+		grammarBuilder.append("@members {var enumKeyword bool = true; var _ bool = enumKeyword; }\n");
 		grammarBuilder.append("primary\n");
 		grammarBuilder.append("    :   ID {fmt.Println(\"ID \"+$ID.text)}\n");
 		grammarBuilder.append("    |   {!enumKeyword}? 'enum' {fmt.Println(\"enum\")}\n");
@@ -364,8 +353,7 @@ public class TestSemPredEvalParser extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="abc";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "primary", input, false);
+			"TListener", "TVisitor", "primary", input, false);
 		assertEquals("ID abc\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -374,9 +362,9 @@ public class TestSemPredEvalParser extends BaseTest {
 	@Test
 	public void testPredTestedEvenWhenUnAmbig_2() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(224);
+		StringBuilder grammarBuilder = new StringBuilder(225);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("@members {var enumKeyword bool= true; var _ bool = enumKeyword; }\n");
+		grammarBuilder.append("@members {var enumKeyword bool = true; var _ bool = enumKeyword; }\n");
 		grammarBuilder.append("primary\n");
 		grammarBuilder.append("    :   ID {fmt.Println(\"ID \"+$ID.text)}\n");
 		grammarBuilder.append("    |   {!enumKeyword}? 'enum' {fmt.Println(\"enum\")}\n");
@@ -386,8 +374,7 @@ public class TestSemPredEvalParser extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="enum";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "primary", input, false);
+			"TListener", "TVisitor", "primary", input, false);
 		assertEquals("", found);
 
 		assertEquals("line 1:0 no viable alternative at input 'enum'\n", this.stderrDuringParse);
@@ -397,13 +384,13 @@ public class TestSemPredEvalParser extends BaseTest {
 	@Test
 	public void testPredicateDependentOnArg() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(218);
+		StringBuilder grammarBuilder = new StringBuilder(222);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("@members {var i int = 0; var _ int = i; }\n");
 		grammarBuilder.append("s : a[2] a[1];\n");
 		grammarBuilder.append("a[int i]\n");
-		grammarBuilder.append("  : {$i==1}? ID {fmt.Println(\"alt 1\")}\n");
-		grammarBuilder.append("  | {$i==2}? ID {fmt.Println(\"alt 2\")}\n");
+		grammarBuilder.append("  : {$i == 1}? ID {fmt.Println(\"alt 1\")}\n");
+		grammarBuilder.append("  | {$i == 2}? ID {fmt.Println(\"alt 2\")}\n");
 		grammarBuilder.append("  ;\n");
 		grammarBuilder.append("ID : 'a'..'z'+ ;\n");
 		grammarBuilder.append("INT : '0'..'9'+;\n");
@@ -411,8 +398,7 @@ public class TestSemPredEvalParser extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="a b";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals(
 			"alt 2\n" +
 			"alt 1\n", found);
@@ -423,13 +409,13 @@ public class TestSemPredEvalParser extends BaseTest {
 	@Test
 	public void testPredicateDependentOnArg2() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(174);
+		StringBuilder grammarBuilder = new StringBuilder(178);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("@members {var i int = 0; var _ int = i; }\n");
 		grammarBuilder.append("s : a[2] a[1];\n");
 		grammarBuilder.append("a[int i]\n");
-		grammarBuilder.append("  : {$i==1}? ID \n");
-		grammarBuilder.append("  | {$i==2}? ID \n");
+		grammarBuilder.append("  : {$i == 1}? ID \n");
+		grammarBuilder.append("  | {$i == 2}? ID \n");
 		grammarBuilder.append("  ;\n");
 		grammarBuilder.append("ID : 'a'..'z'+ ;\n");
 		grammarBuilder.append("INT : '0'..'9'+;\n");
@@ -437,8 +423,7 @@ public class TestSemPredEvalParser extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="a b";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("", found);
 		assertNull(this.stderrDuringParse);
 
@@ -447,11 +432,12 @@ public class TestSemPredEvalParser extends BaseTest {
 	@Test
 	public void testPredsInGlobalFOLLOW() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(273);
+		StringBuilder grammarBuilder = new StringBuilder(272);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("@members {\n");
 		grammarBuilder.append("func pred(v bool) bool {\n");
-		grammarBuilder.append("	fmt.Println(\"eval=\"+fmt.Sprint(v))\n");
+		grammarBuilder.append("	fmt.Println(\"eval=\" + fmt.Sprint(v))\n");
+		grammarBuilder.append("\n");
 		grammarBuilder.append("	return v\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("}\n");
@@ -464,8 +450,7 @@ public class TestSemPredEvalParser extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="a!";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals(
 			"eval=true\n" +
 			"parse\n", found);
@@ -488,8 +473,7 @@ public class TestSemPredEvalParser extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="y 3 x 4";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals(
 			"alt 2\n" +
 			"alt 1\n", found);
@@ -513,8 +497,7 @@ public class TestSemPredEvalParser extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="x y 3";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals(
 			"alt 2\n" +
 			"alt 2\n" +
@@ -538,8 +521,7 @@ public class TestSemPredEvalParser extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="x";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("", found);
 
 		assertEquals("line 1:0 no viable alternative at input 'x'\n", this.stderrDuringParse);
@@ -561,8 +543,7 @@ public class TestSemPredEvalParser extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="3 4 x";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals(
 			"alt 2\n" +
 			"alt 2\n", found);
@@ -586,8 +567,7 @@ public class TestSemPredEvalParser extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="x x y";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals(
 			"alt 2\n" +
 			"alt 2\n" +
@@ -613,8 +593,7 @@ public class TestSemPredEvalParser extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="x x y";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals(
 			"i=1\n" +
 			"alt 2\n" +
@@ -645,8 +624,7 @@ public class TestSemPredEvalParser extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="x 4";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("alt 1\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -670,8 +648,7 @@ public class TestSemPredEvalParser extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="x ; y";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("", found);
 
 		assertEquals(

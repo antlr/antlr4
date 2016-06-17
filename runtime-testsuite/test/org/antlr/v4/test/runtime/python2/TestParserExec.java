@@ -666,14 +666,14 @@ public class TestParserExec extends BasePython2Test {
 	public void testParserProperty() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(153);
+		StringBuilder grammarBuilder = new StringBuilder(145);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("@members {\n");
 		grammarBuilder.append("def Property(self):\n");
 		grammarBuilder.append("    return True\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("}\n");
-		grammarBuilder.append("a : {$parser.Property()}? ID {print(\"valid\")}\n");
+		grammarBuilder.append("a : {Property()}? ID {print(\"valid\")}\n");
 		grammarBuilder.append("  ;\n");
 		grammarBuilder.append("ID : 'a'..'z'+ ;\n");
 		grammarBuilder.append("WS : (' '|'\\n') -> skip ;");

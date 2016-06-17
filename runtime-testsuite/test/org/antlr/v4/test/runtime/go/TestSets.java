@@ -20,8 +20,7 @@ public class TestSets extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="A a B b";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "a", input, false);
+			"TListener", "TVisitor", "a", input, false);
 		assertEquals(
 			"A\n" +
 			"a\n" +
@@ -41,8 +40,7 @@ public class TestSets extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="a";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "parse", input, false);
+			"TListener", "TVisitor", "parse", input, false);
 		assertEquals("", found);
 
 		assertEquals(
@@ -61,8 +59,7 @@ public class TestSets extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="ac";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "a", input, false);
+			"TListener", "TVisitor", "a", input, false);
 		assertEquals("ac\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -78,8 +75,7 @@ public class TestSets extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="abaac";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "a", input, false);
+			"TListener", "TVisitor", "a", input, false);
 		assertEquals("abaac\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -95,8 +91,7 @@ public class TestSets extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="abaac";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "a", input, false);
+			"TListener", "TVisitor", "a", input, false);
 		assertEquals("abaac\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -112,8 +107,7 @@ public class TestSets extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="x";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "a", input, false);
+			"TListener", "TVisitor", "a", input, false);
 		assertEquals("x\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -129,8 +123,7 @@ public class TestSets extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="x";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "a", input, false);
+			"TListener", "TVisitor", "a", input, false);
 		assertEquals("x\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -146,8 +139,7 @@ public class TestSets extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="x";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "a", input, false);
+			"TListener", "TVisitor", "a", input, false);
 		assertEquals("x\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -165,8 +157,7 @@ public class TestSets extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="x";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "a", input, false);
+			"TListener", "TVisitor", "a", input, false);
 		assertEquals("x\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -182,8 +173,7 @@ public class TestSets extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="bc";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "a", input, false);
+			"TListener", "TVisitor", "a", input, false);
 		assertEquals("bc\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -198,8 +188,7 @@ public class TestSets extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="ac";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "a", input, false);
+			"TListener", "TVisitor", "a", input, false);
 		assertEquals("ac\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -215,8 +204,7 @@ public class TestSets extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="bc";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "a", input, false);
+			"TListener", "TVisitor", "a", input, false);
 		assertEquals("bc\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -231,8 +219,7 @@ public class TestSets extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="zz";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "a", input, false);
+			"TListener", "TVisitor", "a", input, false);
 		assertEquals("z\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -247,8 +234,7 @@ public class TestSets extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="zz";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "a", input, false);
+			"TListener", "TVisitor", "a", input, false);
 		assertEquals("zz\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -263,8 +249,7 @@ public class TestSets extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="zz";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "a", input, false);
+			"TListener", "TVisitor", "a", input, false);
 		assertEquals("z\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -279,8 +264,7 @@ public class TestSets extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="x";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "a", input, false);
+			"TListener", "TVisitor", "a", input, false);
 		assertEquals("x\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -296,8 +280,7 @@ public class TestSets extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="bbbbc";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "a", input, false);
+			"TListener", "TVisitor", "a", input, false);
 		assertEquals("bbbbc\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -312,8 +295,7 @@ public class TestSets extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="abaac";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "a", input, false);
+			"TListener", "TVisitor", "a", input, false);
 		assertEquals("abaac\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -328,8 +310,7 @@ public class TestSets extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="b";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "a", input, false);
+			"TListener", "TVisitor", "a", input, false);
 		assertEquals("b\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -347,8 +328,7 @@ public class TestSets extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="34";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "a", input, false);
+			"TListener", "TVisitor", "a", input, false);
 		assertEquals("34\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -364,8 +344,7 @@ public class TestSets extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="bbbbc";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "a", input, false);
+			"TListener", "TVisitor", "a", input, false);
 		assertEquals("bbbbc\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -381,8 +360,7 @@ public class TestSets extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="c";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "a", input, false);
+			"TListener", "TVisitor", "a", input, false);
 		assertEquals("c\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -397,8 +375,7 @@ public class TestSets extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="abaac";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "a", input, false);
+			"TListener", "TVisitor", "a", input, false);
 		assertEquals("abaac\n", found);
 		assertNull(this.stderrDuringParse);
 

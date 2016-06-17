@@ -75,17 +75,17 @@ public class TestCompositeParsers extends BasePython2Test {
 	public void testDelegatesSeeSameTokenType() throws Exception {
 		mkdir(tmpdir);
 
-		String slave_T =
-			"parser grammar T;\n" +
-			"tokens { C, B, A } // reverse order\n" +
-			"y : A {print(\"T.y\")};";
-		writeFile(tmpdir, "T.g4", slave_T);
-
 		String slave_S =
 			"parser grammar S;\n" +
 			"tokens { A, B, C }\n" +
 			"x : A {print(\"S.x\")};";
 		writeFile(tmpdir, "S.g4", slave_S);
+
+		String slave_T =
+			"parser grammar T;\n" +
+			"tokens { C, B, A } // reverse order\n" +
+			"y : A {print(\"T.y\")};";
+		writeFile(tmpdir, "T.g4", slave_T);
 
 		StringBuilder grammarBuilder = new StringBuilder(598);
 		grammarBuilder.append("// The lexer will create rules to match letters a, b, c.\n");
@@ -245,16 +245,16 @@ public class TestCompositeParsers extends BasePython2Test {
 	public void testDelegatorInvokesFirstVersionOfDelegateRule() throws Exception {
 		mkdir(tmpdir);
 
-		String slave_T =
-			"parser grammar T;\n" +
-			"a : B {print(\"T.a\")};";
-		writeFile(tmpdir, "T.g4", slave_T);
-
 		String slave_S =
 			"parser grammar S;\n" +
 			"a : b {print(\"S.a\")};\n" +
 			"b : B;";
 		writeFile(tmpdir, "S.g4", slave_S);
+
+		String slave_T =
+			"parser grammar T;\n" +
+			"a : B {print(\"T.a\")};";
+		writeFile(tmpdir, "T.g4", slave_T);
 
 		StringBuilder grammarBuilder = new StringBuilder(106);
 		grammarBuilder.append("grammar M;\n");
@@ -305,17 +305,17 @@ public class TestCompositeParsers extends BasePython2Test {
 	public void testDelegatorRuleOverridesDelegates() throws Exception {
 		mkdir(tmpdir);
 
-		String slave_T =
-			"parser grammar T;\n" +
-			"tokens { A }\n" +
-			"b : 'b' {print(\"T.b\")};";
-		writeFile(tmpdir, "T.g4", slave_T);
-
 		String slave_S =
 			"parser grammar S;\n" +
 			"a : b {print(\"S.a\")};\n" +
 			"b : 'b' ;";
 		writeFile(tmpdir, "S.g4", slave_S);
+
+		String slave_T =
+			"parser grammar T;\n" +
+			"tokens { A }\n" +
+			"b : 'b' {print(\"T.b\")};";
+		writeFile(tmpdir, "T.g4", slave_T);
 
 		StringBuilder grammarBuilder = new StringBuilder(81);
 		grammarBuilder.append("grammar M;\n");
