@@ -239,21 +239,13 @@ func (d *DefaultErrorStrategy) Sync(recognizer Parser) {
 	}
 
 	switch s.GetStateType() {
-	case ATNStateBlockStart:
-		fallthrough
-	case ATNStateStarBlockStart:
-		fallthrough
-	case ATNStatePlusBlockStart:
-		fallthrough
-	case ATNStateStarLoopEntry:
+	case ATNStateBlockStart, ATNStateStarBlockStart, ATNStatePlusBlockStart, ATNStateStarLoopEntry:
 		// Report error and recover if possible
-		if d.singleTokenDeletion(recognizer) != nil {
+		if d.SingleTokenDeletion(recognizer) != nil {
 			return
 		}
 		panic(NewInputMisMatchException(recognizer))
-	case ATNStatePlusLoopBack:
-		fallthrough
-	case ATNStateStarLoopBack:
+	case ATNStatePlusLoopBack, ATNStateStarLoopBack:
 		d.ReportUnwantedToken(recognizer)
 		var expecting = NewIntervalSet()
 		expecting.addSet(recognizer.GetExpectedTokens())
@@ -342,7 +334,7 @@ func (d *DefaultErrorStrategy) ReportUnwantedToken(recognizer Parser) {
 	d.beginErrorCondition(recognizer)
 	var t = recognizer.GetCurrentToken()
 	var tokenName = d.GetTokenErrorDisplay(t)
-	var expecting = d.getExpectedTokens(recognizer)
+	var expecting = d.GetExpectedTokens(recognizer)
 	var msg = "extraneous input " + tokenName + " expecting " +
 		expecting.StringVerbose(recognizer.GetLiteralNames(), recognizer.GetSymbolicNames(), false)
 	recognizer.NotifyErrorListeners(msg, t, nil)
@@ -370,7 +362,7 @@ func (d *DefaultErrorStrategy) ReportMissingToken(recognizer Parser) {
 	}
 	d.beginErrorCondition(recognizer)
 	var t = recognizer.GetCurrentToken()
-	var expecting = d.getExpectedTokens(recognizer)
+	var expecting = d.GetExpectedTokens(recognizer)
 	var msg = "missing " + expecting.StringVerbose(recognizer.GetLiteralNames(), recognizer.GetSymbolicNames(), false) +
 		" at " + d.GetTokenErrorDisplay(t)
 	recognizer.NotifyErrorListeners(msg, t, nil)
@@ -427,7 +419,7 @@ func (d *DefaultErrorStrategy) ReportMissingToken(recognizer Parser) {
 //
 func (d *DefaultErrorStrategy) RecoverInline(recognizer Parser) Token {
 	// SINGLE TOKEN DELETION
-	var MatchedSymbol = d.singleTokenDeletion(recognizer)
+	var MatchedSymbol = d.SingleTokenDeletion(recognizer)
 	if MatchedSymbol != nil {
 		// we have deleted the extra token.
 		// now, move past ttype token as if all were ok
@@ -435,8 +427,8 @@ func (d *DefaultErrorStrategy) RecoverInline(recognizer Parser) Token {
 		return MatchedSymbol
 	}
 	// SINGLE TOKEN INSERTION
-	if d.singleTokenInsertion(recognizer) {
-		return d.getMissingSymbol(recognizer)
+	if d.SingleTokenInsertion(recognizer) {
+		return d.GetMissingSymbol(recognizer)
 	}
 	// even that didn't work must panic the exception
 	panic(NewInputMisMatchException(recognizer))
@@ -459,7 +451,7 @@ func (d *DefaultErrorStrategy) RecoverInline(recognizer Parser) Token {
 // @return {@code true} if single-token insertion is a viable recovery
 // strategy for the current mismatched input, otherwise {@code false}
 //
-func (d *DefaultErrorStrategy) singleTokenInsertion(recognizer Parser) bool {
+func (d *DefaultErrorStrategy) SingleTokenInsertion(recognizer Parser) bool {
 	var currentSymbolType = recognizer.GetTokenStream().LA(1)
 	// if current token is consistent with what could come after current
 	// ATN state, then we know we're missing a token error recovery
@@ -494,9 +486,9 @@ func (d *DefaultErrorStrategy) singleTokenInsertion(recognizer Parser) bool {
 // deletion successfully recovers from the mismatched input, otherwise
 // {@code nil}
 //
-func (d *DefaultErrorStrategy) singleTokenDeletion(recognizer Parser) Token {
+func (d *DefaultErrorStrategy) SingleTokenDeletion(recognizer Parser) Token {
 	var NextTokenType = recognizer.GetTokenStream().LA(2)
-	var expecting = d.getExpectedTokens(recognizer)
+	var expecting = d.GetExpectedTokens(recognizer)
 	if expecting.contains(NextTokenType) {
 		d.ReportUnwantedToken(recognizer)
 		// print("recoverFromMisMatchedToken deleting " \
@@ -532,9 +524,9 @@ func (d *DefaultErrorStrategy) singleTokenDeletion(recognizer Parser) Token {
 // If you change what tokens must be created by the lexer,
 // override d method to create the appropriate tokens.
 //
-func (d *DefaultErrorStrategy) getMissingSymbol(recognizer Parser) Token {
+func (d *DefaultErrorStrategy) GetMissingSymbol(recognizer Parser) Token {
 	var currentSymbol = recognizer.GetCurrentToken()
-	var expecting = d.getExpectedTokens(recognizer)
+	var expecting = d.GetExpectedTokens(recognizer)
 	var expectedTokenType = expecting.first()
 	var tokenText string
 
@@ -562,7 +554,7 @@ func (d *DefaultErrorStrategy) getMissingSymbol(recognizer Parser) Token {
 	return tf.Create(current.GetSource(), expectedTokenType, tokenText, TokenDefaultChannel, -1, -1, current.GetLine(), current.GetColumn())
 }
 
-func (d *DefaultErrorStrategy) getExpectedTokens(recognizer Parser) *IntervalSet {
+func (d *DefaultErrorStrategy) GetExpectedTokens(recognizer Parser) *IntervalSet {
 	return recognizer.GetExpectedTokens()
 }
 
