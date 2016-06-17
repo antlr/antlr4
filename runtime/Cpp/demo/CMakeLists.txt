@@ -46,7 +46,7 @@ endforeach( src_file ${antlr4-demo_SRC} )
 add_executable(antlr4-demo
   ${antlr4-demo_SRC}
   )
-add_precompiled_header(antlr4-demo ${PROJECT_SOURCE_DIR}/runtime/src/antlrcpp-Prefix.h)
+#add_precompiled_header(antlr4-demo ${PROJECT_SOURCE_DIR}/runtime/src/antlrcpp-Prefix.h)
 
 add_dependencies(antlr4-demo GenerateParser)
 
