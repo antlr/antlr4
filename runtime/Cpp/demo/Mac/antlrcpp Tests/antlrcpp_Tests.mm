@@ -54,18 +54,4 @@ using namespace antlr4;
     [super tearDown];
 }
 
-- (void)testExample {
-    try {
-      std::vector<dfa::DFA> decisionToDFA;
-      atn::ATN atn;
-
-      antlr4::atn::ParserATNSimulator foo(nullptr, atn, decisionToDFA, nullptr);
-    }
-    catch (std::exception &e) {
-        
-        XCTAssert(NO, @"Fail");
-    }
-    XCTAssert(YES, @"Pass");
-}
-
 @end

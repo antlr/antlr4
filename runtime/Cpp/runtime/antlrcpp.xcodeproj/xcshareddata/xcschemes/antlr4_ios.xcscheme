@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "37D727A91867AF1E007B6D10"
-               BuildableName = "antlrcpp.dylib"
-               BlueprintName = "antlrcpp"
+               BlueprintIdentifier = "270C67EF1CDB4F1E00116E17"
+               BuildableName = "antlr4_ios.framework"
+               BlueprintName = "antlr4_ios"
                ReferencedContainer = "container:antlrcpp.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -28,26 +28,7 @@
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "37F135671B4AC02800E0CACF"
-               BuildableName = "antlrcpp Tests.xctest"
-               BlueprintName = "antlrcpp Tests"
-               ReferencedContainer = "container:antlrcpp.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
       </Testables>
-      <MacroExpansion>
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "37D727A91867AF1E007B6D10"
-            BuildableName = "antlrcpp.dylib"
-            BlueprintName = "antlrcpp"
-            ReferencedContainer = "container:antlrcpp.xcodeproj">
-         </BuildableReference>
-      </MacroExpansion>
       <AdditionalOptions>
       </AdditionalOptions>
    </TestAction>
@@ -64,9 +45,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "37D727A91867AF1E007B6D10"
-            BuildableName = "antlrcpp.dylib"
-            BlueprintName = "antlrcpp"
+            BlueprintIdentifier = "270C67EF1CDB4F1E00116E17"
+            BuildableName = "antlr4_ios.framework"
+            BlueprintName = "antlr4_ios"
             ReferencedContainer = "container:antlrcpp.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -82,9 +63,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "37D727A91867AF1E007B6D10"
-            BuildableName = "antlrcpp.dylib"
-            BlueprintName = "antlrcpp"
+            BlueprintIdentifier = "270C67EF1CDB4F1E00116E17"
+            BuildableName = "antlr4_ios.framework"
+            BlueprintName = "antlr4_ios"
             ReferencedContainer = "container:antlrcpp.xcodeproj">
          </BuildableReference>
       </MacroExpansion>

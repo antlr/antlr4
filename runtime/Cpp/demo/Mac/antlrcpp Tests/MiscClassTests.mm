@@ -29,13 +29,7 @@
 
 #import <XCTest/XCTest.h>
 
-#include "MurmurHash.h"
-#include "Interval.h"
-#include "IntervalSet.h"
-#include "Token.h"
-#include "Exceptions.h"
-#include "Lexer.h"
-#include "CPPUtils.h"
+#include "antlr4-runtime.h"
 
 using namespace antlr4;
 using namespace antlr4::misc;
@@ -64,35 +58,6 @@ using namespace antlrcpp;
   class C : public A { public: virtual ~C() {}; };
   class D : public C { public: virtual ~D() {}; };
 
-  {
-    A a; B b; C c; D d;
-    const A &cc = d;
-    XCTAssert(is<A>(b));
-    XCTAssertFalse(is<B>(a));
-    XCTAssert(is<A>(c));
-    XCTAssertFalse(is<B>(c));
-    XCTAssert(is<A>(d));
-    XCTAssert(is<C>(d));
-    XCTAssertFalse(is<B>(d));
-    XCTAssert(is<C>(cc));
-
-    auto isA = [&](const A &aa) { XCTAssert(is<A>(aa)); };
-    isA(a);
-    isA(b);
-    isA(c);
-    isA(d);
-
-    auto isC = [&](const A &aa, bool mustBeTrue) {
-      if (mustBeTrue)
-        XCTAssert(is<C>(aa));
-      else
-        XCTAssertFalse(is<C>(aa));
-    };
-    isC(a, false);
-    isC(b, false);
-    isC(c, true);
-    isC(d, true);
-  }
   {
     A *a = new A(); B *b = new B(); C *c = new C(); D *d = new D();
     XCTAssert(is<A*>(b));

@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "270C67EF1CDB4F1E00116E17"
-               BuildableName = "antlrcpp_ios.framework"
-               BlueprintName = "antlrcpp_ios"
+               BlueprintIdentifier = "37C147161B4D5A04008EDDDB"
+               BuildableName = "libantlr4_static.a"
+               BlueprintName = "antlr4_static"
                ReferencedContainer = "container:antlrcpp.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -45,9 +45,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "270C67EF1CDB4F1E00116E17"
-            BuildableName = "antlrcpp_ios.framework"
-            BlueprintName = "antlrcpp_ios"
+            BlueprintIdentifier = "37C147161B4D5A04008EDDDB"
+            BuildableName = "libantlr4_static.a"
+            BlueprintName = "antlr4_static"
             ReferencedContainer = "container:antlrcpp.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -63,9 +63,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "270C67EF1CDB4F1E00116E17"
-            BuildableName = "antlrcpp_ios.framework"
-            BlueprintName = "antlrcpp_ios"
+            BlueprintIdentifier = "37C147161B4D5A04008EDDDB"
+            BuildableName = "libantlr4_static.a"
+            BlueprintName = "antlr4_static"
             ReferencedContainer = "container:antlrcpp.xcodeproj">
          </BuildableReference>
       </MacroExpansion>

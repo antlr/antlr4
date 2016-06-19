@@ -44,13 +44,13 @@ endif()
 set_target_properties(antlr4_shared
                       PROPERTIES VERSION   ${ANTLR_VERSION}
                                  SOVERSION ${ANTLR_VERSION}
-                                 OUTPUT_NAME antlr4
+                                 OUTPUT_NAME libantlr4-runtime
                                  COMPILE_FLAGS "${disabled_compile_warnings}")
 
 set_target_properties(antlr4_static
                       PROPERTIES VERSION   ${ANTLR_VERSION}
                                  SOVERSION ${ANTLR_VERSION}
-                                 OUTPUT_NAME antlr4
+                                 OUTPUT_NAME libantlr4-runtime
                                  COMPILE_FLAGS "${disabled_compile_warnings}")
 
 install(TARGETS antlr4_shared

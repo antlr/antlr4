@@ -16,8 +16,6 @@ $ git push upstream :refs/tags/4.5.2
 
 Edit the repository looking for 4.5 or whatever and update it. Bump version in the following files:
 
- * runtime/Cpp/VERSION
- * runtime/Cpp/RuntimeMetaData.cpp
  * runtime/Java/src/org/antlr/v4/runtime/RuntimeMetaData.java
  * runtime/Python2/setup.py
  * runtime/Python2/src/antlr4/Recognizer.py
@@ -31,7 +29,9 @@ Edit the repository looking for 4.5 or whatever and update it. Bump version in t
  * tool/src/org/antlr/v4/codegen/target/JavaScriptTarget.java
  * tool/src/org/antlr/v4/codegen/target/Python2Target.java
  * tool/src/org/antlr/v4/codegen/target/Python3Target.java
-
+ * runtime/Cpp/VERSION
+ * runtime/Cpp/RuntimeMetaData.cpp
+ 
 Here is a simple script to display any line from the critical files with, say, `4.5` in it:
 
 ```bash
@@ -242,6 +242,52 @@ python setup.py sdist bdist_wininst upload -r pypi
 ```
 
 Add links to the artifacts from download.html
+
+### C++
+
+The C++ target is the most complex one, because it addresses multiple platforms, which require individual handling. We have 4 scenarios to cover:
+
+* **Windows**: static and dynamic libraries for the VC++ runtime 2013 and 2015 (corresponding to Visual Studio 2013 and 2015) + header files. All that in 32 and 64bit, debug + release.
+* **MacOS**: static and dynamic libraries + header files.
+* **iOS**: no prebuilt binaries, but just a zip of the source, including the XCode project to build everything from source.
+* **Linux**: no prebuilt binaries, but just a zip of the source code, including the cmake file to build everything from source there.
+
+In theory we could also create a library for iOS, but that requires to sign it, which depends on an active iOS developer account. So we leave this up to the ANTLR user to build the iOS lib, like we do for Linux builds.
+
+For each platform there's a deployment script which generates zip archives and copies them to the target folder. The Windows deployment script must be run on a machine with VS 2013 + VS 2015 installed. The Mac script must be run on a machine with XCode 7+ installed. The source script can be executed on any Linux or Mac box.
+
+On a Mac (with XCode 7+ installed):
+
+```bash
+cd runtime/Cpp/runtime
+./deploy-macos.sh
+```
+
+On any Mac or Linux machine:
+
+```bash
+cd runtime/Cpp/runtime
+./deploy-source.sh
+```
+
+On a Windows machine (with VS 2013 and VS 2015 installed):
+
+```bash
+cd runtime/Cpp/runtime
+./deploy-windows.sh
+```
+
+Move target to website (**_rename to a specific ANTLR version first if needed_**):
+
+```bash
+pushd ~/antlr/sites/website-antlr4/download
+git add antlr4cpp-runtime-macos.zip
+git add antlr4cpp-runtime-windows.zip
+git add antlr4cpp-runtime-source.zip
+git commit -a -m 'update C++ runtime'
+git push origin gh-pages
+popd
+```
 
 ## Update javadoc for runtime and tool
 

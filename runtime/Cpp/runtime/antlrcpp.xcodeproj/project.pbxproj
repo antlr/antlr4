@@ -887,7 +887,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		270C67F01CDB4F1E00116E17 /* antlrcpp_ios.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = antlrcpp_ios.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		270C67F01CDB4F1E00116E17 /* antlr4_ios.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = antlr4_ios.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		270C67F21CDB4F1E00116E17 /* antlrcpp_ios.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = antlrcpp_ios.h; sourceTree = "<group>"; wrapsLines = 0; };
 		270C67F41CDB4F1E00116E17 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		270C69DF1CDB536A00116E17 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS9.3.sdk/System/Library/Frameworks/CoreFoundation.framework; sourceTree = DEVELOPER_DIR; };
@@ -1183,8 +1183,8 @@
 		27DB449C1D045537007E790B /* XPathWildcardElement.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XPathWildcardElement.h; sourceTree = "<group>"; wrapsLines = 0; };
 		27DB44AF1D0463CC007E790B /* XPathLexer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = XPathLexer.cpp; sourceTree = "<group>"; };
 		27DB44B01D0463CC007E790B /* XPathLexer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XPathLexer.h; sourceTree = "<group>"; wrapsLines = 0; };
-		37C147171B4D5A04008EDDDB /* libantlrcpp_static.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libantlrcpp_static.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		37D727AA1867AF1E007B6D10 /* antlrcpp.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = antlrcpp.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
+		37C147171B4D5A04008EDDDB /* libantlr4-runtime.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libantlr4-runtime.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		37D727AA1867AF1E007B6D10 /* libantlr4-runtime.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = "libantlr4-runtime.dylib"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1601,9 +1601,9 @@
 		37D727AB1867AF1E007B6D10 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				37D727AA1867AF1E007B6D10 /* antlrcpp.dylib */,
-				37C147171B4D5A04008EDDDB /* libantlrcpp_static.a */,
-				270C67F01CDB4F1E00116E17 /* antlrcpp_ios.framework */,
+				37D727AA1867AF1E007B6D10 /* libantlr4-runtime.dylib */,
+				37C147171B4D5A04008EDDDB /* libantlr4-runtime.a */,
+				270C67F01CDB4F1E00116E17 /* antlr4_ios.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -2110,9 +2110,9 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
-		270C67EF1CDB4F1E00116E17 /* antlrcpp_ios */ = {
+		270C67EF1CDB4F1E00116E17 /* antlr4_ios */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 270C67F71CDB4F1E00116E17 /* Build configuration list for PBXNativeTarget "antlrcpp_ios" */;
+			buildConfigurationList = 270C67F71CDB4F1E00116E17 /* Build configuration list for PBXNativeTarget "antlr4_ios" */;
 			buildPhases = (
 				270C67EB1CDB4F1E00116E17 /* Sources */,
 				270C67EC1CDB4F1E00116E17 /* Frameworks */,
@@ -2123,14 +2123,14 @@
 			);
 			dependencies = (
 			);
-			name = antlrcpp_ios;
+			name = antlr4_ios;
 			productName = "antlrcpp-ios";
-			productReference = 270C67F01CDB4F1E00116E17 /* antlrcpp_ios.framework */;
+			productReference = 270C67F01CDB4F1E00116E17 /* antlr4_ios.framework */;
 			productType = "com.apple.product-type.framework";
 		};
-		37C147161B4D5A04008EDDDB /* antlrcpp_static */ = {
+		37C147161B4D5A04008EDDDB /* antlr4_static */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 37C147211B4D5A04008EDDDB /* Build configuration list for PBXNativeTarget "antlrcpp_static" */;
+			buildConfigurationList = 37C147211B4D5A04008EDDDB /* Build configuration list for PBXNativeTarget "antlr4_static" */;
 			buildPhases = (
 				37C147131B4D5A04008EDDDB /* Sources */,
 				37C147141B4D5A04008EDDDB /* Frameworks */,
@@ -2140,14 +2140,14 @@
 			);
 			dependencies = (
 			);
-			name = antlrcpp_static;
+			name = antlr4_static;
 			productName = antlrcpp_static;
-			productReference = 37C147171B4D5A04008EDDDB /* libantlrcpp_static.a */;
+			productReference = 37C147171B4D5A04008EDDDB /* libantlr4-runtime.a */;
 			productType = "com.apple.product-type.library.static";
 		};
-		37D727A91867AF1E007B6D10 /* antlrcpp */ = {
+		37D727A91867AF1E007B6D10 /* antlr4 */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 37D727B71867AF1E007B6D10 /* Build configuration list for PBXNativeTarget "antlrcpp" */;
+			buildConfigurationList = 37D727B71867AF1E007B6D10 /* Build configuration list for PBXNativeTarget "antlr4" */;
 			buildPhases = (
 				37D727A61867AF1E007B6D10 /* Sources */,
 				37D727A71867AF1E007B6D10 /* Frameworks */,
@@ -2157,9 +2157,9 @@
 			);
 			dependencies = (
 			);
-			name = antlrcpp;
+			name = antlr4;
 			productName = antlrcpp;
-			productReference = 37D727AA1867AF1E007B6D10 /* antlrcpp.dylib */;
+			productReference = 37D727AA1867AF1E007B6D10 /* libantlr4-runtime.dylib */;
 			productType = "com.apple.product-type.library.dynamic";
 		};
 /* End PBXNativeTarget section */
@@ -2191,9 +2191,9 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				37D727A91867AF1E007B6D10 /* antlrcpp */,
-				37C147161B4D5A04008EDDDB /* antlrcpp_static */,
-				270C67EF1CDB4F1E00116E17 /* antlrcpp_ios */,
+				37D727A91867AF1E007B6D10 /* antlr4 */,
+				37C147161B4D5A04008EDDDB /* antlr4_static */,
+				270C67EF1CDB4F1E00116E17 /* antlr4_ios */,
 			);
 		};
 /* End PBXProject section */
@@ -2714,7 +2714,7 @@
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				MTL_ENABLE_DEBUG_INFO = YES;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = "antlr4-runtime";
 			};
 			name = Debug;
 		};
@@ -2733,7 +2733,7 @@
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				MTL_ENABLE_DEBUG_INFO = NO;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = "antlr4-runtime";
 			};
 			name = Release;
 		};
@@ -2830,8 +2830,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
+				EXECUTABLE_PREFIX = lib;
 				LD_DYLIB_INSTALL_NAME = "$(EXECUTABLE_PATH)";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = "$(TARGET_NAME)-runtime";
 			};
 			name = Debug;
 		};
@@ -2839,15 +2840,16 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
+				EXECUTABLE_PREFIX = lib;
 				LD_DYLIB_INSTALL_NAME = "$(EXECUTABLE_PATH)";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = "$(TARGET_NAME)-runtime";
 			};
 			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		270C67F71CDB4F1E00116E17 /* Build configuration list for PBXNativeTarget "antlrcpp_ios" */ = {
+		270C67F71CDB4F1E00116E17 /* Build configuration list for PBXNativeTarget "antlr4_ios" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				270C67F51CDB4F1E00116E17 /* Debug */,
@@ -2856,7 +2858,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		37C147211B4D5A04008EDDDB /* Build configuration list for PBXNativeTarget "antlrcpp_static" */ = {
+		37C147211B4D5A04008EDDDB /* Build configuration list for PBXNativeTarget "antlr4_static" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				37C1471F1B4D5A04008EDDDB /* Debug */,
@@ -2874,7 +2876,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		37D727B71867AF1E007B6D10 /* Build configuration list for PBXNativeTarget "antlrcpp" */ = {
+		37D727B71867AF1E007B6D10 /* Build configuration list for PBXNativeTarget "antlr4" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				37D727B81867AF1E007B6D10 /* Debug */,
