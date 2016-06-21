@@ -1,4 +1,5 @@
 # ANTLR v4
+[![Build Status](https://travis-ci.org/antlr/antlr4.png?branch=master)](https://travis-ci.org/antlr/antlr4) [![Java 6+](https://img.shields.io/badge/java-6+-4c7e9f.svg)](http://java.oracle.com) [![License](https://img.shields.io/badge/license-BSD-blue.svg)](https://raw.githubusercontent.com/antlr/antlr4/master/LICENSE.txt) [![Download](https://img.shields.io/badge/download-v4.5.3-ec312e.svg)](http://www.antlr.org/download/antlr-4.5.3-complete.jar)
 
 **ANTLR** (ANother Tool for Language Recognition) is a powerful parser generator for reading, processing, executing, or translating structured text or binary files. It's widely used to build languages, tools, and frameworks. From a grammar, ANTLR generates a parser that can build parse trees and also generates a listener interface (or visitor) that makes it easy to respond to the recognition of phrases of interest.
 
@@ -40,8 +41,3 @@ You will find the [Book source code](http://pragprog.com/titles/tpantlr2/source_
 [This repository](https://github.com/antlr/grammars-v4) is a collection of grammars without actions where the
 root directory name is the all-lowercase name of the language parsed
 by the grammar. For example, java, cpp, csharp, c, etc...
-
-Travis Status
----------
-
-<a href="https://travis-ci.org/antlr/antlr4"><img src="https://api.travis-ci.org/antlr/antlr4.png"></a>
