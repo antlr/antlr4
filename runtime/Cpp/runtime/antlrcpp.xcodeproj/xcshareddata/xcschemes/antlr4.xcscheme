@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "37D727A91867AF1E007B6D10"
-               BuildableName = "libantlr4.dylib"
+               BuildableName = "libantlr4-runtime.dylib"
                BlueprintName = "antlr4"
                ReferencedContainer = "container:antlrcpp.xcodeproj">
             </BuildableReference>
@@ -46,7 +46,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "37D727A91867AF1E007B6D10"
-            BuildableName = "libantlr4.dylib"
+            BuildableName = "libantlr4-runtime.dylib"
             BlueprintName = "antlr4"
             ReferencedContainer = "container:antlrcpp.xcodeproj">
          </BuildableReference>
@@ -64,7 +64,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "37D727A91867AF1E007B6D10"
-            BuildableName = "libantlr4.dylib"
+            BuildableName = "libantlr4-runtime.dylib"
             BlueprintName = "antlr4"
             ReferencedContainer = "container:antlrcpp.xcodeproj">
          </BuildableReference>
