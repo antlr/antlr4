@@ -29,6 +29,8 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "StringUtils.h"
+
 #include "ANTLRFileStream.h"
 
 using namespace antlr4;
@@ -44,7 +46,12 @@ void ANTLRFileStream::loadFromFile(const std::string &fileName) {
     return;
   }
 
-  std::wifstream stream(fileName, std::ios::binary);
+#ifdef _WIN32
+  std::ifstream stream(antlrcpp::s2ws(fileName), std::ios::binary);
+#else
+  std::ifstream stream(fileName, std::ios::binary);
+#endif
+
   ANTLRInputStream::load(stream);
 }
 

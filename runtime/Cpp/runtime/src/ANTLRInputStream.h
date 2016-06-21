@@ -57,10 +57,10 @@ namespace antlr4 {
 
     ANTLRInputStream(const std::string &input = "");
     ANTLRInputStream(const char data_[], size_t numberOfActualCharsInArray);
-    ANTLRInputStream(std::wistream &stream);
+    ANTLRInputStream(std::istream &stream);
 
     virtual void load(const std::string &input);
-    virtual void load(std::wistream &stream);
+    virtual void load(std::istream &stream);
 
     /// Reset the stream so that it's in the same state it was
     /// when the object was created *except* the data array is not

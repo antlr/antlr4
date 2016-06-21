@@ -52,7 +52,7 @@ ANTLRInputStream::ANTLRInputStream(const char data_[], size_t numberOfActualChar
   : ANTLRInputStream(std::string(data_, numberOfActualCharsInArray)) {
 }
 
-ANTLRInputStream::ANTLRInputStream(std::wistream &stream) {
+ANTLRInputStream::ANTLRInputStream(std::istream &stream) {
   load(stream);
 }
 
@@ -61,29 +61,15 @@ void ANTLRInputStream::load(const std::string &input) {
   p = 0;
 }
 
-void ANTLRInputStream::load(std::wistream &stream) {
+void ANTLRInputStream::load(std::istream &stream) {
   if (!stream.good() || stream.eof()) // No fail, bad or EOF.
     return;
 
   _data.clear();
   p = 0;
-  std::streampos startPosition = stream.tellg();
-  stream.seekg(0, std::ios::end);
-  _data.reserve(size_t(stream.tellg() - startPosition));
-  stream.seekg(startPosition, std::ios::beg);
-  
-#if defined(_MSC_VER) && _MSC_VER == 1900
-  stream.imbue(std::locale(stream.getloc(), new std::codecvt_utf8<__int32>));
-#else
-  stream.imbue(std::locale(stream.getloc(), new std::codecvt_utf8<char32_t>));
-#endif
-  wchar_t c = 0xFFFE;
-  stream >> std::noskipws >> c;
-  if (c != 0xFFFE) // Ignore BOM if theres one.
-    _data += c;
 
-  for ( ; stream >> c; )
-    _data += c;
+  std::string s((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
+  _data = antlrcpp::utfConverter.from_bytes(s);
 }
 
 void ANTLRInputStream::reset() {

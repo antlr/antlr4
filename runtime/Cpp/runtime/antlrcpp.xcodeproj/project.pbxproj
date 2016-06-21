@@ -657,9 +657,6 @@
 		276E5FC81CDB57AA003FF4B4 /* StringUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5CEE1CDB57AA003FF4B4 /* StringUtils.h */; };
 		276E5FC91CDB57AA003FF4B4 /* StringUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5CEE1CDB57AA003FF4B4 /* StringUtils.h */; };
 		276E5FCA1CDB57AA003FF4B4 /* StringUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5CEE1CDB57AA003FF4B4 /* StringUtils.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		276E5FCB1CDB57AA003FF4B4 /* Token.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5CEF1CDB57AA003FF4B4 /* Token.cpp */; };
-		276E5FCC1CDB57AA003FF4B4 /* Token.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5CEF1CDB57AA003FF4B4 /* Token.cpp */; };
-		276E5FCD1CDB57AA003FF4B4 /* Token.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5CEF1CDB57AA003FF4B4 /* Token.cpp */; };
 		276E5FCE1CDB57AA003FF4B4 /* Token.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5CF01CDB57AA003FF4B4 /* Token.h */; };
 		276E5FCF1CDB57AA003FF4B4 /* Token.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5CF01CDB57AA003FF4B4 /* Token.h */; };
 		276E5FD01CDB57AA003FF4B4 /* Token.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5CF01CDB57AA003FF4B4 /* Token.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -1107,7 +1104,6 @@
 		276E5CEC1CDB57AA003FF4B4 /* guid.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = guid.h; sourceTree = "<group>"; };
 		276E5CED1CDB57AA003FF4B4 /* StringUtils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = StringUtils.cpp; sourceTree = "<group>"; };
 		276E5CEE1CDB57AA003FF4B4 /* StringUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StringUtils.h; sourceTree = "<group>"; };
-		276E5CEF1CDB57AA003FF4B4 /* Token.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Token.cpp; sourceTree = "<group>"; wrapsLines = 0; };
 		276E5CF01CDB57AA003FF4B4 /* Token.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Token.h; sourceTree = "<group>"; };
 		276E5CF21CDB57AA003FF4B4 /* TokenFactory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TokenFactory.h; sourceTree = "<group>"; };
 		276E5CF41CDB57AA003FF4B4 /* TokenSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TokenSource.h; sourceTree = "<group>"; };
@@ -1299,7 +1295,6 @@
 				27745EFA1CE49C000067C6A3 /* RuleContextWithAltNum.h */,
 				27745EFB1CE49C000067C6A3 /* RuntimeMetaData.cpp */,
 				27745EFC1CE49C000067C6A3 /* RuntimeMetaData.h */,
-				276E5CEF1CDB57AA003FF4B4 /* Token.cpp */,
 				276E5CF01CDB57AA003FF4B4 /* Token.h */,
 				276E5CF21CDB57AA003FF4B4 /* TokenFactory.h */,
 				276E5CF41CDB57AA003FF4B4 /* TokenSource.h */,
@@ -2286,7 +2281,6 @@
 				276E5E8C1CDB57AA003FF4B4 /* RuleStartState.cpp in Sources */,
 				276E5EA41CDB57AA003FF4B4 /* SetTransition.cpp in Sources */,
 				276E5D841CDB57AA003FF4B4 /* ATNState.cpp in Sources */,
-				276E5FCD1CDB57AA003FF4B4 /* Token.cpp in Sources */,
 				276E60241CDB57AA003FF4B4 /* RuleTagToken.cpp in Sources */,
 				276E5E501CDB57AA003FF4B4 /* ParserATNSimulator.cpp in Sources */,
 				276E602A1CDB57AA003FF4B4 /* TagChunk.cpp in Sources */,
@@ -2426,7 +2420,6 @@
 				276E5E8B1CDB57AA003FF4B4 /* RuleStartState.cpp in Sources */,
 				276E5EA31CDB57AA003FF4B4 /* SetTransition.cpp in Sources */,
 				276E5D831CDB57AA003FF4B4 /* ATNState.cpp in Sources */,
-				276E5FCC1CDB57AA003FF4B4 /* Token.cpp in Sources */,
 				276E60231CDB57AA003FF4B4 /* RuleTagToken.cpp in Sources */,
 				276E5E4F1CDB57AA003FF4B4 /* ParserATNSimulator.cpp in Sources */,
 				276E60291CDB57AA003FF4B4 /* TagChunk.cpp in Sources */,
@@ -2566,7 +2559,6 @@
 				276E5E8A1CDB57AA003FF4B4 /* RuleStartState.cpp in Sources */,
 				276E5EA21CDB57AA003FF4B4 /* SetTransition.cpp in Sources */,
 				276E5D821CDB57AA003FF4B4 /* ATNState.cpp in Sources */,
-				276E5FCB1CDB57AA003FF4B4 /* Token.cpp in Sources */,
 				276E60221CDB57AA003FF4B4 /* RuleTagToken.cpp in Sources */,
 				276E5E4E1CDB57AA003FF4B4 /* ParserATNSimulator.cpp in Sources */,
 				276E60281CDB57AA003FF4B4 /* TagChunk.cpp in Sources */,
