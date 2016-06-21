@@ -54,9 +54,9 @@ public:
 
 
 int main(int argc, const char* argv[]) {
-  std::wifstream stream;
+  std::ifstream stream;
   stream.open(argv[1]);
-  ANTLRInputStream input("ae");
+  ANTLRInputStream input(stream);
   MyGrammarLexer lexer(&input);
   CommonTokenStream tokens(&lexer);
   MyGrammarParser parser(&tokens);

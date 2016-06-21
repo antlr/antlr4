@@ -557,7 +557,7 @@ public abstract class BaseCppTest {
 			args.add(runtimePath);
 			args.add("-L");
 			args.add(runtimePath);
-			args.add("-lantlrcpp_static");
+			args.add("-lantlr4-runtime");
 			args.addAll(allCppFiles(tmpdir));
 			ProcessBuilder builder = new ProcessBuilder(args.toArray(new String[0]));
 			builder.directory(new File(tmpdir));
@@ -912,9 +912,7 @@ public abstract class BaseCppTest {
 						+ "\n"
 						+ "\n"
 						+ "int main(int argc, const char* argv[]) {\n"
-						+ "  std::wifstream stream;\n"
-						+ "  stream.open(argv[1]);\n"
-						+ "  ANTLRInputStream input(stream);\n"
+						+ "  ANTLRFileStream input(argv[1]);\n"
 						+ "  <lexerName> lexer(&input);\n"
 						+ "  CommonTokenStream tokens(&lexer);\n"
 						+ "<createParser>"
@@ -956,9 +954,7 @@ public abstract class BaseCppTest {
 					+ "using namespace antlr4;\n"
 					+ "\n"
 					+ "int main(int argc, const char* argv[]) {\n"
-					+ "  std::wifstream stream;\n"
-					+ "  stream.open(argv[1]);\n"
-					+ "  ANTLRInputStream input(stream);\n"
+					+ "  ANTLRFileStream input(argv[1]);\n"
 					+ "  <lexerName> lexer(&input);\n"
 					+ "  CommonTokenStream tokens(&lexer);\n"
 					+ "  tokens.fill();\n"
