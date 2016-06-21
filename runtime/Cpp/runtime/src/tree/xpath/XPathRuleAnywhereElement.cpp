@@ -29,10 +29,10 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "ParseTree.h"
-#include "Trees.h"
+#include "tree/ParseTree.h"
+#include "tree/Trees.h"
 
-#include "XPathRuleAnywhereElement.h"
+#include "tree/xpath/XPathRuleAnywhereElement.h"
 
 using namespace antlr4::tree;
 using namespace antlr4::tree::xpath;

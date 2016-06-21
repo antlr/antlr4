@@ -38,7 +38,7 @@
 #include "misc/Interval.h"
 #include "Token.h"
 #include "CommonToken.h"
-#include "Predicate.h"
+#include "misc/Predicate.h"
 
 #include "tree/Trees.h"
 

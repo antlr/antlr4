@@ -49,10 +49,11 @@ void BailErrorStrategy::recover(Parser *recognizer, std::exception_ptr e) {
 
   try {
     std::rethrow_exception(e); // Throw the exception to be able to catch and rethrow nested.
-  } catch (RecognitionException &inner) {
 #if defined(_MSC_FULL_VER) && _MSC_FULL_VER < 190023026
+  } catch (RecognitionException &inner) {
     throw ParseCancellationException(inner.what());
 #else
+  } catch (RecognitionException & /*inner*/) {
     std::throw_with_nested(ParseCancellationException());
 #endif
   }
@@ -72,10 +73,11 @@ Token* BailErrorStrategy::recoverInline(Parser *recognizer)  {
 
   try {
     throw e;
-  } catch (InputMismatchException &inner) {
 #if defined(_MSC_FULL_VER) && _MSC_FULL_VER < 190023026
+  } catch (InputMismatchException &inner) {
     throw ParseCancellationException(inner.what());
 #else
+  } catch (InputMismatchException & /*inner*/) {
     std::throw_with_nested(ParseCancellationException());
 #endif
   }

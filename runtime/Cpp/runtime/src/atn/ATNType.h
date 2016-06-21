@@ -37,7 +37,7 @@ namespace antlr4 {
 namespace atn {
 
   /// Represents the type of recognizer an ATN applies to.
-  ANTLR4CPP_PUBLIC enum class ATNType {
+  enum class ATNType {
     LEXER = 0,
     PARSER = 1,
   };

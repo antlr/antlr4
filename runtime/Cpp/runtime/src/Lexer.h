@@ -198,10 +198,6 @@ namespace antlr4 {
 
     virtual std::string getErrorDisplay(const std::string &s);
 
-    virtual std::string getErrorDisplay(ssize_t c);
-
-    virtual std::string getCharErrorDisplay(ssize_t c);
-
     /// Lexers can normally match any char in it's vocabulary after matching
     /// a token, so do the easy thing and just kill a character and hope
     /// it all works out.  You can instead use the rule invocation stack

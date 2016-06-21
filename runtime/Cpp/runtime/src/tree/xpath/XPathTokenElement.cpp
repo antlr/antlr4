@@ -29,9 +29,9 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "ParseTree.h"
-#include "Trees.h"
-#include "CPPUtils.h"
+#include "tree/ParseTree.h"
+#include "tree/Trees.h"
+#include "support/CPPUtils.h"
 #include "Token.h"
 
 #include "XPathTokenElement.h"

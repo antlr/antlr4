@@ -34,8 +34,13 @@
 
 namespace antlrcpp {
   // For all conversions utf8 <-> utf32.
+  // VS 2015 has a bug in std::codecvt_utf8<char32_t> (VS 2013 works fine).
+#if defined(_MSC_VER) && _MSC_VER == 1900
+  static std::wstring_convert<std::codecvt_utf8<__int32>, __int32> utfConverter;
+#else
   static std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> utfConverter;
-  
+#endif
+
   void replaceAll(std::string& str, const std::string& from, const std::string& to);
 
   ANTLR4CPP_PUBLIC std::string ws2s(const std::wstring &wstr);

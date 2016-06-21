@@ -30,8 +30,8 @@
  */
 
 #include "XPath.h"
-#include "ParseTree.h"
-#include "Trees.h"
+#include "tree/ParseTree.h"
+#include "tree/Trees.h"
 
 #include "XPathWildcardAnywhereElement.h"
 

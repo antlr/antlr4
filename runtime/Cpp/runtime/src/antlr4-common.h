@@ -35,6 +35,7 @@
 #include <chrono>
 #include <fstream>
 #include <iostream>
+#include <iterator>
 #include <limits.h>
 #include <list>
 #include <map>
@@ -67,7 +68,13 @@
     typedef int ssize_t;
   #endif
 
-  #ifdef _DLL
+  #if _MSC_VER == 1900
+    // VS 2015 has a known bug when using std::codecvt_utf8<char32_t>
+    // so we have to temporarily use __int32 instead.
+    typedef std::basic_string<__int32> i32string;
+  #endif
+
+  #ifdef _WINDLL
     #ifdef ANTLR4CPP_EXPORTS
       #define ANTLR4CPP_PUBLIC __declspec(dllexport)
       #define EXPIMP_TEMPLATE
@@ -79,6 +86,8 @@
     #define ANTLR4CPP_PUBLIC
     #define EXPIMP_TEMPLATE
   #endif
+
+  EXPIMP_TEMPLATE class ANTLR4CPP_PUBLIC std::exception; // Needed for VS 2015.
 
 #elif __APPLE__
   #define GUID_CFUUID

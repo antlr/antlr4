@@ -77,7 +77,12 @@ namespace antlr4 {
     /// A moving window buffer of the data being scanned. While there's a marker,
     /// we keep adding to buffer. Otherwise, <seealso cref="#consume consume()"/> resets so
     /// we start filling at index 0 again.
-    std::u32string _data; // UTF-32 encoded.
+    // UTF-32 encoded.
+#if defined(_MSC_VER) && _MSC_VER == 1900
+    i32string _data; // Custom type for VS 2015.
+#else
+    std::u32string _data;
+#endif
 
     /// <summary>
     /// 0..n-1 index into <seealso cref="#data data"/> of next character.

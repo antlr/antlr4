@@ -30,7 +30,7 @@
  */
 
 #include "atn/ATNConfigSet.h"
-#include "SemanticContext.h"
+#include "atn/SemanticContext.h"
 #include "atn/ATNConfig.h"
 #include "misc/MurmurHash.h"
 

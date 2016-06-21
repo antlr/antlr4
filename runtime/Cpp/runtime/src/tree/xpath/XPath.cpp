@@ -39,7 +39,7 @@
 #include "XPathRuleAnywhereElement.h"
 #include "XPathRuleElement.h"
 
-#include "ParseTree.h"
+#include "tree/ParseTree.h"
 
 #include "XPath.h"
 
@@ -65,7 +65,7 @@ std::vector<XPathElement> XPath::split(const std::string &path) {
   CommonTokenStream tokenStream(&lexer);
   try {
     tokenStream.fill();
-  } catch (LexerNoViableAltException &e) {
+  } catch (LexerNoViableAltException &) {
     int pos = lexer.getCharPositionInLine();
     std::string msg = "Invalid tokens or characters at index " + std::to_string(pos) + " in path '" + path + "'";
     throw IllegalArgumentException(msg);

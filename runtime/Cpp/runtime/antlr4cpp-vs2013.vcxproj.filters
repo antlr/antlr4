@@ -531,6 +531,12 @@
     <ClInclude Include="src\tree\xpath\XPathWildcardElement.h">
       <Filter>Header Files\tree\xpath</Filter>
     </ClInclude>
+    <ClInclude Include="src\antlr4-common.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\antlr4-runtime.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\ANTLRFileStream.cpp">
@@ -618,9 +624,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\RuleContext.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Token.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\TokenStream.cpp">

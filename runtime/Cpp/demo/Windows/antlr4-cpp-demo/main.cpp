@@ -16,7 +16,7 @@
 #pragma execution_character_set("utf-8")
 
 using namespace antlrcpptest;
-using namespace org::antlr::v4::runtime;
+using namespace antlr4;
 
 int main(int argc, const char * argv[]) {
 
@@ -28,6 +28,11 @@ int main(int argc, const char * argv[]) {
   std::shared_ptr<tree::ParseTree> tree = parser.main();
 
   std::wstring s = antlrcpp::s2ws(tree->toStringTree(&parser)) + L"\n";
+
+  // Unfortunately, there is no way of showing the Unicode output properly in either the Intermediate Window in VS
+  // (when using OutputDebugString), nor in a terminal (when using wcout). Instead set a breakpoint and view the
+  // content of s in the debugger, which works fine.
+
   OutputDebugString(s.data());
   std::wcout << "Parse Tree: " << s << std::endl;
 

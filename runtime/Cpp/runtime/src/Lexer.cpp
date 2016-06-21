@@ -273,39 +273,24 @@ void Lexer::notifyListeners(const LexerNoViableAltException &e) {
 }
 
 std::string Lexer::getErrorDisplay(const std::string &s) {
-  std::u32string temp = utfConverter.from_bytes(s);
   std::stringstream ss;
-  for (auto c : temp) {
-    ss << getErrorDisplay(c);
-  }
-  return ss.str();
-}
-
-std::string Lexer::getErrorDisplay(ssize_t c) {
-  std::string s;
-  switch (c) {
-    case EOF :
-      s = "<EOF>";
+  for (auto c : s) {
+    switch (c) {
+    case '\n':
+      ss << "\\n";
       break;
-    case '\n' :
-      s = "\\n";
+    case '\t':
+      ss << "\\t";
       break;
-    case '\t' :
-      s = "\\t";
-      break;
-    case '\r' :
-      s = "\\r";
+    case '\r':
+      ss << "\\r";
       break;
     default:
-      s = utfConverter.to_bytes((char32_t)c);
+      ss << c;
       break;
+    }
   }
-  return s;
-}
-
-std::string Lexer::getCharErrorDisplay(ssize_t c) {
-  std::string s = getErrorDisplay(c);
-  return "'" + s + "'";
+  return ss.str();
 }
 
 void Lexer::recover(RecognitionException * /*re*/) {

@@ -41,7 +41,12 @@ namespace antlr4 {
   class ANTLR4CPP_PUBLIC ANTLRInputStream : public CharStream {
   protected:
     /// The data being scanned.
-    std::u32string data; // UTF-32
+    // UTF-32
+#if defined(_MSC_VER) && _MSC_VER == 1900
+    i32string _data; // Custom type for VS 2015.
+#else
+    std::u32string _data;
+#endif
 
     /// 0..n-1 index into string of next char </summary>
     size_t p;
@@ -51,7 +56,7 @@ namespace antlr4 {
     std::string name;
 
     ANTLRInputStream(const std::string &input = "");
-    ANTLRInputStream(const char data[], size_t numberOfActualCharsInArray);
+    ANTLRInputStream(const char data_[], size_t numberOfActualCharsInArray);
     ANTLRInputStream(std::wistream &stream);
 
     virtual void load(const std::string &input);

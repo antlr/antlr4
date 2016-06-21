@@ -185,7 +185,7 @@
     <ClInclude Include="..\..\generated\TParserVisitor.h" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\runtime\antlr4cpp.vcxproj">
+    <ProjectReference Include="..\..\..\runtime\antlr4cpp-vs2013.vcxproj">
       <Project>{a9762991-1b57-4dce-90c0-ee42b96947be}</Project>
     </ProjectReference>
   </ItemGroup>

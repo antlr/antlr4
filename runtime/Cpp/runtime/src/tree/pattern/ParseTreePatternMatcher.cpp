@@ -120,11 +120,12 @@ ParseTreePattern ParseTreePatternMatcher::compile(const std::string &pattern, in
 #endif
   } catch (RecognitionException &re) {
     throw re;
-  } catch (std::exception &e) {
 #if defined(_MSC_FULL_VER) && _MSC_FULL_VER < 190023026
+  } catch (std::exception &e) {
     // throw_with_nested is not available before VS 2015.
     throw e;
 #else
+  } catch (std::exception & /*e*/) {
     std::throw_with_nested("Cannot invoke start rule"); // Wrap any other exception. We should however probably use one of the ANTLR exceptions here.
 #endif
   }
