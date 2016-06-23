@@ -470,7 +470,8 @@ class PredictionMode(Enum):
     def getUniqueAlt(cls, altsets:list):
         all = cls.getAlts(altsets)
         if len(all)==1:
-            return all[0]
+            for one in all:
+                return one
         else:
             return ATN.INVALID_ALT_NUMBER
 

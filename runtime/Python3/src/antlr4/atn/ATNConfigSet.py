@@ -108,8 +108,8 @@ class ATNConfigSet(object):
         rootIsWildcard = not self.fullCtx
         merged = merge(existing.context, config.context, rootIsWildcard, mergeCache)
         # no need to check for existing.context, config.context in cache
-        # since only way to create new graphs is "call rule" and here. We
-        # cache at both places.
+        # since only way to create new graphs is "call rule" and here.
+        # We cache at both places.
         existing.reachesIntoOuterContext = max(existing.reachesIntoOuterContext, config.reachesIntoOuterContext)
         # make sure to preserve the precedence filter suppression during the merge
         if config.precedenceFilterSuppressed:
@@ -118,11 +118,11 @@ class ATNConfigSet(object):
         return True
 
     def getOrAdd(self, config:ATNConfig):
-        h = hash(config)
+        h = config.hashCodeForConfigSet()
         l = self.configLookup.get(h, None)
         if l is not None:
             for c in l:
-                if c==config:
+                if config.equalsForConfigSet(c):
                     return c
         if l is None:
             l = [config]
