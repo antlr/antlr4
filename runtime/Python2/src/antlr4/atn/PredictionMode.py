@@ -467,7 +467,8 @@ class PredictionMode(object):
     def getUniqueAlt(cls, altsets):
         all = cls.getAlts(altsets)
         if len(all)==1:
-            return all[0]
+            for one in all:
+                return one
         else:
             return ATN.INVALID_ALT_NUMBER
 
