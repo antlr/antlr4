@@ -199,8 +199,8 @@ void DefaultErrorStrategy::reportUnwantedToken(Parser *recognizer) {
   std::string tokenName = getTokenErrorDisplay(t);
   misc::IntervalSet expecting = getExpectedTokens(recognizer);
 
-  std::string msg = std::string("extraneous input ") + tokenName + std::string(" expecting ") +
-    expecting.toString(recognizer->getVocabulary());
+  std::string vocabulary = expecting.toString(recognizer->getVocabulary());
+  std::string msg = std::string("extraneous input ") + tokenName + std::string(" expecting ") + escapeWSAndQuote(vocabulary);
   recognizer->notifyErrorListeners(t, msg, nullptr);
 }
 
