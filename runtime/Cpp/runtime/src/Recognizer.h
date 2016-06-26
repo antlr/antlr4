@@ -83,7 +83,7 @@ namespace antlr4 {
     /// For interpreters, we don't know their serialized ATN despite having
     /// created the interpreter from it.
     /// </summary>
-    virtual std::vector<uint16_t> getSerializedATN() {
+    virtual const std::vector<uint16_t> getSerializedATN() const {
       throw "there is no serialized ATN";
     }
 

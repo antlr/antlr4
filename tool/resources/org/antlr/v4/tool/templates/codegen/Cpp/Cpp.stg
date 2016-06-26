@@ -68,7 +68,7 @@ public:
   virtual const std::vector\<std::string>& getTokenNames() const override; // deprecated, use vocabulary instead
   virtual dfa::Vocabulary& getVocabulary() const override;
   
-  virtual const std::vector\<uint16_t> getSerializedATN() const;
+  virtual const std::vector\<uint16_t> getSerializedATN() const override;
   virtual const atn::ATN& getATN() const override;
 
   <if (actionFuncs)>
