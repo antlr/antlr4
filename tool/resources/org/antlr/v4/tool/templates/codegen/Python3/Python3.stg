@@ -383,7 +383,7 @@ while True:
 
 AltBlock(choice, preamble, alts, error) ::= <<
 self.state = <choice.stateNumber>
-self._errHandler.sync(self);
+self._errHandler.sync(self)
 <if(choice.label)><labelref(choice.label)> = _input.LT(1)<endif>
 <preamble; separator="\n">
 la_ = self._interp.adaptivePredict(self._input,<choice.decision>,self._ctx)
@@ -397,7 +397,7 @@ if la_ == <i>:
 
 OptionalBlock(choice, alts, error) ::= <<
 self.state = <choice.stateNumber>
-self._errHandler.sync(self);
+self._errHandler.sync(self)
 la_ = self._interp.adaptivePredict(self._input,<choice.decision>,self._ctx)
 <alts:{alt |
 if la_ == <i><if(!choice.ast.greedy)>+1<endif>:
