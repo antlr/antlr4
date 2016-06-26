@@ -146,7 +146,6 @@ void DefaultErrorStrategy::sync(Parser *recognizer) {
 
     case atn::ATNState::PLUS_LOOP_BACK:
     case atn::ATNState::STAR_LOOP_BACK: {
-      //			System.err.println("at loop back: "+s.getClass().getSimpleName());
       reportUnwantedToken(recognizer);
       misc::IntervalSet expecting = recognizer->getExpectedTokens();
       misc::IntervalSet whatFollowsLoopIterationOrRule = expecting.Or(getErrorRecoverySet(recognizer));
@@ -172,20 +171,20 @@ void DefaultErrorStrategy::reportNoViableAlternative(Parser *recognizer, const N
   } else {
     input = "<unknown input>";
   }
-  std::string msg = std::string("no viable alternative at input ") + escapeWSAndQuote(input);
+  std::string msg = "no viable alternative at input " + escapeWSAndQuote(input);
   recognizer->notifyErrorListeners(e.getOffendingToken(), msg, std::make_exception_ptr(e));
 }
 
 void DefaultErrorStrategy::reportInputMismatch(Parser *recognizer, const InputMismatchException &e) {
-  std::string msg = std::string("mismatched input ") + getTokenErrorDisplay(e.getOffendingToken()) +
-  std::string(" expecting ") + e.getExpectedTokens().toString(recognizer->getVocabulary());
+  std::string msg = "mismatched input " + getTokenErrorDisplay(e.getOffendingToken()) +
+  " expecting " + e.getExpectedTokens().toString(recognizer->getVocabulary());
   recognizer->notifyErrorListeners(e.getOffendingToken(), msg, std::make_exception_ptr(e));
 }
 
 void DefaultErrorStrategy::reportFailedPredicate(Parser *recognizer, const FailedPredicateException &e) {
   const std::string& ruleName = recognizer->getRuleNames()[(size_t)recognizer->getContext()->getRuleIndex()];
   std::string msg = "rule " + ruleName + " " + e.what();
-  recognizer->notifyErrorListeners(e.getOffendingToken(), msg, std::make_exception_ptr(e));
+  recognizer->notifyErrorListeners(e.getOffendingToken(), escapeWSAndQuote(msg), std::make_exception_ptr(e));
 }
 
 void DefaultErrorStrategy::reportUnwantedToken(Parser *recognizer) {
@@ -199,8 +198,8 @@ void DefaultErrorStrategy::reportUnwantedToken(Parser *recognizer) {
   std::string tokenName = getTokenErrorDisplay(t);
   misc::IntervalSet expecting = getExpectedTokens(recognizer);
 
-  std::string vocabulary = expecting.toString(recognizer->getVocabulary());
-  std::string msg = std::string("extraneous input ") + tokenName + std::string(" expecting ") + escapeWSAndQuote(vocabulary);
+  std::string expectedText = expecting.toString(recognizer->getVocabulary());
+  std::string msg = "extraneous input " + tokenName + " expecting " + escapeWSAndQuote(expectedText);
   recognizer->notifyErrorListeners(t, msg, nullptr);
 }
 
@@ -213,27 +212,28 @@ void DefaultErrorStrategy::reportMissingToken(Parser *recognizer) {
 
   Token *t = recognizer->getCurrentToken();
   misc::IntervalSet expecting = getExpectedTokens(recognizer);
-  std::string msg = "missing " + expecting.toString(recognizer->getVocabulary()) + " at " + getTokenErrorDisplay(t);
+  std::string expectedText = expecting.toString(recognizer->getVocabulary());
+  std::string msg = "missing " + escapeWSAndQuote(expectedText) + " at " + getTokenErrorDisplay(t);
 
   recognizer->notifyErrorListeners(t, msg, nullptr);
 }
 
 Token* DefaultErrorStrategy::recoverInline(Parser *recognizer) {
-  // SINGLE TOKEN DELETION
+  // Single token deletion.
   Token *matchedSymbol = singleTokenDeletion(recognizer);
   if (matchedSymbol) {
-    // we have deleted the extra token.
-    // now, move past ttype token as if all were ok
+    // We have deleted the extra token.
+    // Now, move past ttype token as if all were ok.
     recognizer->consume();
     return matchedSymbol;
   }
 
-  // SINGLE TOKEN INSERTION
+  // Single token insertion.
   if (singleTokenInsertion(recognizer)) {
     return getMissingSymbol(recognizer);
   }
 
-  // even that didn't work; must throw the exception
+  // Even that didn't work; must throw the exception.
   throw InputMismatchException(recognizer);
 }
 
@@ -284,8 +284,9 @@ Token* DefaultErrorStrategy::getMissingSymbol(Parser *recognizer) {
     current = lookback;
   }
 
-  _missingSymbol = recognizer->getTokenFactory()->create({ current->getTokenSource(),
-    current->getTokenSource()->getInputStream() }, (int)expectedTokenType, tokenText, Token::DEFAULT_CHANNEL, -1, -1,
+  _missingSymbol = recognizer->getTokenFactory()->create(
+    { current->getTokenSource(), current->getTokenSource()->getInputStream() },
+    (int)expectedTokenType, tokenText, Token::DEFAULT_CHANNEL, -1, -1,
     current->getLine(), current->getCharPositionInLine());
   
   return _missingSymbol.get();
@@ -304,7 +305,7 @@ std::string DefaultErrorStrategy::getTokenErrorDisplay(Token *t) {
     if (getSymbolType(t) == Token::EOF) {
       s = "<EOF>";
     } else {
-      s = std::string("<") + std::to_string(getSymbolType(t)) + std::string(">");
+      s = "<" + std::to_string(getSymbolType(t)) + ">";
     }
   }
   return escapeWSAndQuote(s);
@@ -319,11 +320,10 @@ int DefaultErrorStrategy::getSymbolType(Token *symbol) {
 }
 
 std::string DefaultErrorStrategy::escapeWSAndQuote(std::string &s) {
-  //		if ( s==null ) return s;
   antlrcpp::replaceAll(s, "\n", "\\n");
   antlrcpp::replaceAll(s, "\r","\\r");
   antlrcpp::replaceAll(s, "\t","\\t");
-  return std::string("'") + s + std::string("'");
+  return "'" + s + "'";
 }
 
 misc::IntervalSet DefaultErrorStrategy::getErrorRecoverySet(Parser *recognizer) {
