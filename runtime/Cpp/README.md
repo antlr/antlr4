@@ -38,6 +38,8 @@ The minimum C++ version to compile the ANTLR C++ runtime with is C++11. The supp
 
 Include the antlr4-runtime.h umbrella header in your target application to get everything needed to use the library.
 
+If you are compiling with cmake, the minimum version required is cmake 3.3. 
+
 #### Compiling on Windows
 Simply open the VS solution (VS 2013+) and build it.
 
@@ -47,7 +49,7 @@ Either open the included XCode project and build that or use the cmake compilati
 #### Compiling on Linux
 - cd <antlr4-dir>/runtime/Cpp (this is where this readme is located)
 - mkdir build && mkdir run && cd build
-- cmake ..-DANTLR_JAR_LOCATION=full/path/to/antlr4-4.5.4-SNAPSHOT.jar -DWITH_DEMO=True
+- cmake .. -DANTLR_JAR_LOCATION=full/path/to/antlr4-4.5.4-SNAPSHOT.jar -DWITH_DEMO=True
 - make
 - DESTDIR=<antlr4-dir>/runtime/Cpp/run make install
 
