@@ -37,8 +37,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="1\n";
 		String found = execParser("Expr.g4", grammar, "ExprParser", "ExprLexer",
-		                          "ExprListener", "ExprVisitor",
-		                          "prog", input, true);
+			"ExprListener", "ExprVisitor", "prog", input, true);
 		assertEquals("", found);
 		assertNull(this.stderrDuringParse);
 
@@ -72,8 +71,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="a = 5\n";
 		String found = execParser("Expr.g4", grammar, "ExprParser", "ExprLexer",
-		                          "ExprListener", "ExprVisitor",
-		                          "prog", input, true);
+			"ExprListener", "ExprVisitor", "prog", input, true);
 		assertEquals("", found);
 		assertNull(this.stderrDuringParse);
 
@@ -107,8 +105,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="b = 6\n";
 		String found = execParser("Expr.g4", grammar, "ExprParser", "ExprLexer",
-		                          "ExprListener", "ExprVisitor",
-		                          "prog", input, true);
+			"ExprListener", "ExprVisitor", "prog", input, true);
 		assertEquals("", found);
 		assertNull(this.stderrDuringParse);
 
@@ -142,8 +139,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="a+b*2\n";
 		String found = execParser("Expr.g4", grammar, "ExprParser", "ExprLexer",
-		                          "ExprListener", "ExprVisitor",
-		                          "prog", input, true);
+			"ExprListener", "ExprVisitor", "prog", input, true);
 		assertEquals("", found);
 		assertNull(this.stderrDuringParse);
 
@@ -177,8 +173,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="(1+2)*3\n";
 		String found = execParser("Expr.g4", grammar, "ExprParser", "ExprLexer",
-		                          "ExprListener", "ExprVisitor",
-		                          "prog", input, true);
+			"ExprListener", "ExprVisitor", "prog", input, true);
 		assertEquals("", found);
 		assertNull(this.stderrDuringParse);
 
@@ -187,9 +182,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testDeclarations_1() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(392);
+		StringBuilder grammarBuilder = new StringBuilder(393);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil,p))} : declarator EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil, p))} : declarator EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("declarator\n");
 		grammarBuilder.append("        : declarator '[' e ']'\n");
 		grammarBuilder.append("        | declarator '[' ']'\n");
@@ -205,8 +200,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="a";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("(s (declarator a) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -215,9 +209,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testDeclarations_10() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(392);
+		StringBuilder grammarBuilder = new StringBuilder(393);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil,p))} : declarator EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil, p))} : declarator EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("declarator\n");
 		grammarBuilder.append("        : declarator '[' e ']'\n");
 		grammarBuilder.append("        | declarator '[' ']'\n");
@@ -233,8 +227,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="(*a)[]";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("(s (declarator (declarator ( (declarator * (declarator a)) )) [ ]) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -243,9 +236,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testDeclarations_2() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(392);
+		StringBuilder grammarBuilder = new StringBuilder(393);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil,p))} : declarator EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil, p))} : declarator EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("declarator\n");
 		grammarBuilder.append("        : declarator '[' e ']'\n");
 		grammarBuilder.append("        | declarator '[' ']'\n");
@@ -261,8 +254,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="*a";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("(s (declarator * (declarator a)) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -271,9 +263,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testDeclarations_3() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(392);
+		StringBuilder grammarBuilder = new StringBuilder(393);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil,p))} : declarator EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil, p))} : declarator EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("declarator\n");
 		grammarBuilder.append("        : declarator '[' e ']'\n");
 		grammarBuilder.append("        | declarator '[' ']'\n");
@@ -289,8 +281,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="**a";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("(s (declarator * (declarator * (declarator a))) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -299,9 +290,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testDeclarations_4() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(392);
+		StringBuilder grammarBuilder = new StringBuilder(393);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil,p))} : declarator EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil, p))} : declarator EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("declarator\n");
 		grammarBuilder.append("        : declarator '[' e ']'\n");
 		grammarBuilder.append("        | declarator '[' ']'\n");
@@ -317,8 +308,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="a[3]";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("(s (declarator (declarator a) [ (e 3) ]) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -327,9 +317,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testDeclarations_5() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(392);
+		StringBuilder grammarBuilder = new StringBuilder(393);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil,p))} : declarator EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil, p))} : declarator EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("declarator\n");
 		grammarBuilder.append("        : declarator '[' e ']'\n");
 		grammarBuilder.append("        | declarator '[' ']'\n");
@@ -345,8 +335,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="b[]";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("(s (declarator (declarator b) [ ]) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -355,9 +344,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testDeclarations_6() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(392);
+		StringBuilder grammarBuilder = new StringBuilder(393);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil,p))} : declarator EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil, p))} : declarator EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("declarator\n");
 		grammarBuilder.append("        : declarator '[' e ']'\n");
 		grammarBuilder.append("        | declarator '[' ']'\n");
@@ -373,8 +362,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="(a)";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("(s (declarator ( (declarator a) )) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -383,9 +371,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testDeclarations_7() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(392);
+		StringBuilder grammarBuilder = new StringBuilder(393);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil,p))} : declarator EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil, p))} : declarator EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("declarator\n");
 		grammarBuilder.append("        : declarator '[' e ']'\n");
 		grammarBuilder.append("        | declarator '[' ']'\n");
@@ -401,8 +389,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="a[]()";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("(s (declarator (declarator (declarator a) [ ]) ( )) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -411,9 +398,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testDeclarations_8() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(392);
+		StringBuilder grammarBuilder = new StringBuilder(393);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil,p))} : declarator EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil, p))} : declarator EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("declarator\n");
 		grammarBuilder.append("        : declarator '[' e ']'\n");
 		grammarBuilder.append("        | declarator '[' ']'\n");
@@ -429,8 +416,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="a[][]";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("(s (declarator (declarator (declarator a) [ ]) [ ]) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -439,9 +425,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testDeclarations_9() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(392);
+		StringBuilder grammarBuilder = new StringBuilder(393);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil,p))} : declarator EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil, p))} : declarator EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("declarator\n");
 		grammarBuilder.append("        : declarator '[' e ']'\n");
 		grammarBuilder.append("        | declarator '[' ']'\n");
@@ -457,8 +443,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="*a[]";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("(s (declarator * (declarator (declarator a) [ ])) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -467,9 +452,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testDirectCallToLeftRecursiveRule_1() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(120);
+		StringBuilder grammarBuilder = new StringBuilder(121);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("a @after {fmt.Println($ctx.ToStringTree(nil,p))} : a ID\n");
+		grammarBuilder.append("a @after {fmt.Println($ctx.ToStringTree(nil, p))} : a ID\n");
 		grammarBuilder.append("  | ID\n");
 		grammarBuilder.append("  ;\n");
 		grammarBuilder.append("ID : 'a'..'z'+ ;\n");
@@ -477,8 +462,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="x";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "a", input, false);
+			"TListener", "TVisitor", "a", input, false);
 		assertEquals("(a x)\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -487,9 +471,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testDirectCallToLeftRecursiveRule_2() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(120);
+		StringBuilder grammarBuilder = new StringBuilder(121);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("a @after {fmt.Println($ctx.ToStringTree(nil,p))} : a ID\n");
+		grammarBuilder.append("a @after {fmt.Println($ctx.ToStringTree(nil, p))} : a ID\n");
 		grammarBuilder.append("  | ID\n");
 		grammarBuilder.append("  ;\n");
 		grammarBuilder.append("ID : 'a'..'z'+ ;\n");
@@ -497,8 +481,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="x y";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "a", input, false);
+			"TListener", "TVisitor", "a", input, false);
 		assertEquals("(a (a x) y)\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -507,9 +490,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testDirectCallToLeftRecursiveRule_3() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(120);
+		StringBuilder grammarBuilder = new StringBuilder(121);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("a @after {fmt.Println($ctx.ToStringTree(nil,p))} : a ID\n");
+		grammarBuilder.append("a @after {fmt.Println($ctx.ToStringTree(nil, p))} : a ID\n");
 		grammarBuilder.append("  | ID\n");
 		grammarBuilder.append("  ;\n");
 		grammarBuilder.append("ID : 'a'..'z'+ ;\n");
@@ -517,8 +500,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="x y z";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "a", input, false);
+			"TListener", "TVisitor", "a", input, false);
 		assertEquals("(a (a (a x) y) z)\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -527,9 +509,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testExpressions_1() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(251);
+		StringBuilder grammarBuilder = new StringBuilder(252);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil,p))} : e EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil, p))} : e EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("e : e '.' ID\n");
 		grammarBuilder.append("  | e '.' 'this'\n");
 		grammarBuilder.append("  | '-' e\n");
@@ -544,8 +526,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="a";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("(s (e a) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -554,9 +535,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testExpressions_2() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(251);
+		StringBuilder grammarBuilder = new StringBuilder(252);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil,p))} : e EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil, p))} : e EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("e : e '.' ID\n");
 		grammarBuilder.append("  | e '.' 'this'\n");
 		grammarBuilder.append("  | '-' e\n");
@@ -571,8 +552,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="1";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("(s (e 1) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -581,9 +561,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testExpressions_3() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(251);
+		StringBuilder grammarBuilder = new StringBuilder(252);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil,p))} : e EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil, p))} : e EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("e : e '.' ID\n");
 		grammarBuilder.append("  | e '.' 'this'\n");
 		grammarBuilder.append("  | '-' e\n");
@@ -598,8 +578,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="a-1";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("(s (e (e a) - (e 1)) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -608,9 +587,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testExpressions_4() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(251);
+		StringBuilder grammarBuilder = new StringBuilder(252);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil,p))} : e EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil, p))} : e EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("e : e '.' ID\n");
 		grammarBuilder.append("  | e '.' 'this'\n");
 		grammarBuilder.append("  | '-' e\n");
@@ -625,8 +604,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="a.b";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("(s (e (e a) . b) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -635,9 +613,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testExpressions_5() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(251);
+		StringBuilder grammarBuilder = new StringBuilder(252);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil,p))} : e EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil, p))} : e EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("e : e '.' ID\n");
 		grammarBuilder.append("  | e '.' 'this'\n");
 		grammarBuilder.append("  | '-' e\n");
@@ -652,8 +630,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="a.this";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("(s (e (e a) . this) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -662,9 +639,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testExpressions_6() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(251);
+		StringBuilder grammarBuilder = new StringBuilder(252);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil,p))} : e EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil, p))} : e EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("e : e '.' ID\n");
 		grammarBuilder.append("  | e '.' 'this'\n");
 		grammarBuilder.append("  | '-' e\n");
@@ -679,8 +656,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="-a";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("(s (e - (e a)) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -689,9 +665,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testExpressions_7() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(251);
+		StringBuilder grammarBuilder = new StringBuilder(252);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil,p))} : e EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil, p))} : e EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("e : e '.' ID\n");
 		grammarBuilder.append("  | e '.' 'this'\n");
 		grammarBuilder.append("  | '-' e\n");
@@ -706,8 +682,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="-a+b";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("(s (e (e - (e a)) + (e b)) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -716,9 +691,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testJavaExpressions_1() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(1248);
+		StringBuilder grammarBuilder = new StringBuilder(1249);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil,p))} : e EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil, p))} : e EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("expressionList\n");
 		grammarBuilder.append("    :   e (',' e)*\n");
 		grammarBuilder.append("    ;\n");
@@ -777,8 +752,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="a|b&c";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("(s (e (e a) | (e (e b) & (e c))) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -787,9 +761,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testJavaExpressions_10() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(1248);
+		StringBuilder grammarBuilder = new StringBuilder(1249);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil,p))} : e EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil, p))} : e EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("expressionList\n");
 		grammarBuilder.append("    :   e (',' e)*\n");
 		grammarBuilder.append("    ;\n");
@@ -848,8 +822,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="a.f(x)==T.c";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("(s (e (e (e (e a) . f) ( (expressionList (e x)) )) == (e (e T) . c)) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -858,9 +831,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testJavaExpressions_11() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(1248);
+		StringBuilder grammarBuilder = new StringBuilder(1249);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil,p))} : e EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil, p))} : e EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("expressionList\n");
 		grammarBuilder.append("    :   e (',' e)*\n");
 		grammarBuilder.append("    ;\n");
@@ -919,8 +892,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="a.f().g(x,1)";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("(s (e (e (e (e (e a) . f) ( )) . g) ( (expressionList (e x) , (e 1)) )) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -929,9 +901,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testJavaExpressions_12() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(1248);
+		StringBuilder grammarBuilder = new StringBuilder(1249);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil,p))} : e EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil, p))} : e EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("expressionList\n");
 		grammarBuilder.append("    :   e (',' e)*\n");
 		grammarBuilder.append("    ;\n");
@@ -990,8 +962,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="new T[((n-1) * x) + 1]";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("(s (e new (typespec T) [ (e (e ( (e (e ( (e (e n) - (e 1)) )) * (e x)) )) + (e 1)) ]) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -1000,9 +971,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testJavaExpressions_2() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(1248);
+		StringBuilder grammarBuilder = new StringBuilder(1249);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil,p))} : e EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil, p))} : e EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("expressionList\n");
 		grammarBuilder.append("    :   e (',' e)*\n");
 		grammarBuilder.append("    ;\n");
@@ -1061,8 +1032,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="(a|b)&c";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("(s (e (e ( (e (e a) | (e b)) )) & (e c)) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -1071,9 +1041,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testJavaExpressions_3() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(1248);
+		StringBuilder grammarBuilder = new StringBuilder(1249);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil,p))} : e EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil, p))} : e EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("expressionList\n");
 		grammarBuilder.append("    :   e (',' e)*\n");
 		grammarBuilder.append("    ;\n");
@@ -1132,8 +1102,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="a > b";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("(s (e (e a) > (e b)) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -1142,9 +1111,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testJavaExpressions_4() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(1248);
+		StringBuilder grammarBuilder = new StringBuilder(1249);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil,p))} : e EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil, p))} : e EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("expressionList\n");
 		grammarBuilder.append("    :   e (',' e)*\n");
 		grammarBuilder.append("    ;\n");
@@ -1203,8 +1172,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="a >> b";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("(s (e (e a) >> (e b)) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -1213,9 +1181,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testJavaExpressions_5() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(1248);
+		StringBuilder grammarBuilder = new StringBuilder(1249);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil,p))} : e EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil, p))} : e EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("expressionList\n");
 		grammarBuilder.append("    :   e (',' e)*\n");
 		grammarBuilder.append("    ;\n");
@@ -1274,8 +1242,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="a=b=c";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("(s (e (e a) = (e (e b) = (e c))) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -1284,9 +1251,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testJavaExpressions_6() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(1248);
+		StringBuilder grammarBuilder = new StringBuilder(1249);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil,p))} : e EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil, p))} : e EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("expressionList\n");
 		grammarBuilder.append("    :   e (',' e)*\n");
 		grammarBuilder.append("    ;\n");
@@ -1345,8 +1312,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="a^b^c";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("(s (e (e a) ^ (e (e b) ^ (e c))) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -1355,9 +1321,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testJavaExpressions_7() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(1248);
+		StringBuilder grammarBuilder = new StringBuilder(1249);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil,p))} : e EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil, p))} : e EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("expressionList\n");
 		grammarBuilder.append("    :   e (',' e)*\n");
 		grammarBuilder.append("    ;\n");
@@ -1416,8 +1382,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="(T)x";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("(s (e ( (typespec T) ) (e x)) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -1426,9 +1391,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testJavaExpressions_8() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(1248);
+		StringBuilder grammarBuilder = new StringBuilder(1249);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil,p))} : e EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil, p))} : e EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("expressionList\n");
 		grammarBuilder.append("    :   e (',' e)*\n");
 		grammarBuilder.append("    ;\n");
@@ -1487,8 +1452,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="new A().b";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("(s (e (e new (typespec A) ( )) . b) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -1497,9 +1461,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testJavaExpressions_9() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(1248);
+		StringBuilder grammarBuilder = new StringBuilder(1249);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil,p))} : e EOF ; // must indicate EOF can follow\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil, p))} : e EOF ; // must indicate EOF can follow\n");
 		grammarBuilder.append("expressionList\n");
 		grammarBuilder.append("    :   e (',' e)*\n");
 		grammarBuilder.append("    ;\n");
@@ -1558,8 +1522,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="(T)t.f()";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("(s (e (e ( (typespec T) ) (e (e t) . f)) ( )) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -1568,9 +1531,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testLabelsOnOpSubrule_1() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(171);
+		StringBuilder grammarBuilder = new StringBuilder(172);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil,p))} : e;\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil, p))} : e;\n");
 		grammarBuilder.append("e : a=e op=('*'|'/') b=e  {}\n");
 		grammarBuilder.append("  | INT {}\n");
 		grammarBuilder.append("  | '(' x=e ')' {}\n");
@@ -1580,8 +1543,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="4";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("(s (e 4))\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -1590,9 +1552,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testLabelsOnOpSubrule_2() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(171);
+		StringBuilder grammarBuilder = new StringBuilder(172);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil,p))} : e;\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil, p))} : e;\n");
 		grammarBuilder.append("e : a=e op=('*'|'/') b=e  {}\n");
 		grammarBuilder.append("  | INT {}\n");
 		grammarBuilder.append("  | '(' x=e ')' {}\n");
@@ -1602,8 +1564,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="1*2/3";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("(s (e (e (e 1) * (e 2)) / (e 3)))\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -1612,9 +1573,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testLabelsOnOpSubrule_3() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(171);
+		StringBuilder grammarBuilder = new StringBuilder(172);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil,p))} : e;\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil, p))} : e;\n");
 		grammarBuilder.append("e : a=e op=('*'|'/') b=e  {}\n");
 		grammarBuilder.append("  | INT {}\n");
 		grammarBuilder.append("  | '(' x=e ')' {}\n");
@@ -1624,8 +1585,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="(1/2)*3";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("(s (e (e ( (e (e 1) / (e 2)) )) * (e 3)))\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -1634,9 +1594,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testMultipleActionsPredicatesOptions_1() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(240);
+		StringBuilder grammarBuilder = new StringBuilder(241);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil,p))} : e ;\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil, p))} : e ;\n");
 		grammarBuilder.append("e : a=e op=('*'|'/') b=e  {}{true}?\n");
 		grammarBuilder.append("  | a=e op=('+'|'-') b=e  {}<p=3>{true}?<fail='Message'>\n");
 		grammarBuilder.append("  | INT {}{}\n");
@@ -1647,8 +1607,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="4";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("(s (e 4))\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -1657,9 +1616,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testMultipleActionsPredicatesOptions_2() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(240);
+		StringBuilder grammarBuilder = new StringBuilder(241);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil,p))} : e ;\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil, p))} : e ;\n");
 		grammarBuilder.append("e : a=e op=('*'|'/') b=e  {}{true}?\n");
 		grammarBuilder.append("  | a=e op=('+'|'-') b=e  {}<p=3>{true}?<fail='Message'>\n");
 		grammarBuilder.append("  | INT {}{}\n");
@@ -1670,8 +1629,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="1*2/3";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("(s (e (e (e 1) * (e 2)) / (e 3)))\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -1680,9 +1638,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testMultipleActionsPredicatesOptions_3() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(240);
+		StringBuilder grammarBuilder = new StringBuilder(241);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil,p))} : e ;\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil, p))} : e ;\n");
 		grammarBuilder.append("e : a=e op=('*'|'/') b=e  {}{true}?\n");
 		grammarBuilder.append("  | a=e op=('+'|'-') b=e  {}<p=3>{true}?<fail='Message'>\n");
 		grammarBuilder.append("  | INT {}{}\n");
@@ -1693,8 +1651,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="(1/2)*3";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("(s (e (e ( (e (e 1) / (e 2)) )) * (e 3)))\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -1703,9 +1660,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testMultipleActions_1() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(178);
+		StringBuilder grammarBuilder = new StringBuilder(179);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil,p))} : e ;\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil, p))} : e ;\n");
 		grammarBuilder.append("e : a=e op=('*'|'/') b=e  {}{}\n");
 		grammarBuilder.append("  | INT {}{}\n");
 		grammarBuilder.append("  | '(' x=e ')' {}{}\n");
@@ -1715,8 +1672,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="4";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("(s (e 4))\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -1725,9 +1681,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testMultipleActions_2() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(178);
+		StringBuilder grammarBuilder = new StringBuilder(179);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil,p))} : e ;\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil, p))} : e ;\n");
 		grammarBuilder.append("e : a=e op=('*'|'/') b=e  {}{}\n");
 		grammarBuilder.append("  | INT {}{}\n");
 		grammarBuilder.append("  | '(' x=e ')' {}{}\n");
@@ -1737,8 +1693,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="1*2/3";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("(s (e (e (e 1) * (e 2)) / (e 3)))\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -1747,9 +1702,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testMultipleActions_3() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(178);
+		StringBuilder grammarBuilder = new StringBuilder(179);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil,p))} : e ;\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil, p))} : e ;\n");
 		grammarBuilder.append("e : a=e op=('*'|'/') b=e  {}{}\n");
 		grammarBuilder.append("  | INT {}{}\n");
 		grammarBuilder.append("  | '(' x=e ')' {}{}\n");
@@ -1759,8 +1714,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="(1/2)*3";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("(s (e (e ( (e (e 1) / (e 2)) )) * (e 3)))\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -1789,8 +1743,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="4";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("4\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -1819,8 +1772,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="1+2";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("3\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -1849,8 +1801,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="1+2*3";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("7\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -1879,8 +1830,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="i++*3";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("12\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -1889,18 +1839,17 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testPrecedenceFilterConsidersContext() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(143);
+		StringBuilder grammarBuilder = new StringBuilder(144);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("prog \n");
-		grammarBuilder.append("@after {fmt.Println($ctx.ToStringTree(nil,p))}\n");
+		grammarBuilder.append("@after {fmt.Println($ctx.ToStringTree(nil, p))}\n");
 		grammarBuilder.append(": statement* EOF {};\n");
 		grammarBuilder.append("statement: letterA | statement letterA 'b' ;\n");
 		grammarBuilder.append("letterA: 'a';");
 		String grammar = grammarBuilder.toString();
 		String input ="aa";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "prog", input, false);
+			"TListener", "TVisitor", "prog", input, false);
 		assertEquals("(prog (statement (letterA a)) (statement (letterA a)) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -1923,8 +1872,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="a";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("a\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -1947,8 +1895,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="a+b";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("(a+b)\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -1971,8 +1918,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="a=b+c";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("((a=b)+c)\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -1999,8 +1945,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="4";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("4\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -2027,8 +1972,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="1+2";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("3\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -2055,8 +1999,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="1+2*3";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("7\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -2083,8 +2026,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="i++*3";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("12\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -2093,9 +2035,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testReturnValueAndActionsList1_1() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(301);
+		StringBuilder grammarBuilder = new StringBuilder(302);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil,p))} : expr EOF;\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil, p))} : expr EOF;\n");
 		grammarBuilder.append("expr:\n");
 		grammarBuilder.append("    a=expr '*' a=expr #Factor\n");
 		grammarBuilder.append("    | b+=expr (',' b+=expr)* '>>' c=expr #Send\n");
@@ -2110,8 +2052,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="a*b";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("(s (expr (expr a) * (expr b)) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -2120,9 +2061,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testReturnValueAndActionsList1_2() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(301);
+		StringBuilder grammarBuilder = new StringBuilder(302);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil,p))} : expr EOF;\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil, p))} : expr EOF;\n");
 		grammarBuilder.append("expr:\n");
 		grammarBuilder.append("    a=expr '*' a=expr #Factor\n");
 		grammarBuilder.append("    | b+=expr (',' b+=expr)* '>>' c=expr #Send\n");
@@ -2137,8 +2078,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="a,c>>x";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("(s (expr (expr a) , (expr c) >> (expr x)) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -2147,9 +2087,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testReturnValueAndActionsList1_3() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(301);
+		StringBuilder grammarBuilder = new StringBuilder(302);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil,p))} : expr EOF;\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil, p))} : expr EOF;\n");
 		grammarBuilder.append("expr:\n");
 		grammarBuilder.append("    a=expr '*' a=expr #Factor\n");
 		grammarBuilder.append("    | b+=expr (',' b+=expr)* '>>' c=expr #Send\n");
@@ -2164,8 +2104,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="x";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("(s (expr x) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -2174,9 +2113,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testReturnValueAndActionsList1_4() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(301);
+		StringBuilder grammarBuilder = new StringBuilder(302);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil,p))} : expr EOF;\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil, p))} : expr EOF;\n");
 		grammarBuilder.append("expr:\n");
 		grammarBuilder.append("    a=expr '*' a=expr #Factor\n");
 		grammarBuilder.append("    | b+=expr (',' b+=expr)* '>>' c=expr #Send\n");
@@ -2191,8 +2130,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="a*b,c,x*y>>r";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("(s (expr (expr (expr a) * (expr b)) , (expr c) , (expr (expr x) * (expr y)) >> (expr r)) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -2201,9 +2139,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testReturnValueAndActionsList2_1() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(318);
+		StringBuilder grammarBuilder = new StringBuilder(319);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil,p))} : expr EOF;\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil, p))} : expr EOF;\n");
 		grammarBuilder.append("expr:\n");
 		grammarBuilder.append("    a=expr '*' a=expr #Factor\n");
 		grammarBuilder.append("    | b+=expr ',' b+=expr #Comma\n");
@@ -2217,8 +2155,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="a*b";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("(s (expr (expr a) * (expr b)) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -2227,9 +2164,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testReturnValueAndActionsList2_2() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(318);
+		StringBuilder grammarBuilder = new StringBuilder(319);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil,p))} : expr EOF;\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil, p))} : expr EOF;\n");
 		grammarBuilder.append("expr:\n");
 		grammarBuilder.append("    a=expr '*' a=expr #Factor\n");
 		grammarBuilder.append("    | b+=expr ',' b+=expr #Comma\n");
@@ -2243,8 +2180,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="a,c>>x";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("(s (expr (expr (expr a) , (expr c)) >> (expr x)) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -2253,9 +2189,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testReturnValueAndActionsList2_3() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(318);
+		StringBuilder grammarBuilder = new StringBuilder(319);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil,p))} : expr EOF;\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil, p))} : expr EOF;\n");
 		grammarBuilder.append("expr:\n");
 		grammarBuilder.append("    a=expr '*' a=expr #Factor\n");
 		grammarBuilder.append("    | b+=expr ',' b+=expr #Comma\n");
@@ -2269,8 +2205,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="x";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("(s (expr x) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -2279,9 +2214,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testReturnValueAndActionsList2_4() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(318);
+		StringBuilder grammarBuilder = new StringBuilder(319);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil,p))} : expr EOF;\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil, p))} : expr EOF;\n");
 		grammarBuilder.append("expr:\n");
 		grammarBuilder.append("    a=expr '*' a=expr #Factor\n");
 		grammarBuilder.append("    | b+=expr ',' b+=expr #Comma\n");
@@ -2295,8 +2230,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="a*b,c,x*y>>r";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("(s (expr (expr (expr (expr (expr a) * (expr b)) , (expr c)) , (expr (expr x) * (expr y))) >> (expr r)) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -2319,8 +2253,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="4";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("4\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -2343,8 +2276,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="1+2";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("3\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -2367,8 +2299,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="1+2*3";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("7\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -2391,8 +2322,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="(1+2)*3";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("9\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -2401,9 +2331,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testSemPred() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(136);
+		StringBuilder grammarBuilder = new StringBuilder(137);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil,p))} : a ;\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil, p))} : a ;\n");
 		grammarBuilder.append("a : a {true}? ID\n");
 		grammarBuilder.append("  | ID\n");
 		grammarBuilder.append("  ;\n");
@@ -2412,8 +2342,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="x y z";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("(s (a (a (a x) y) z))\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -2422,9 +2351,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testSemPredFailOption() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(160);
+		StringBuilder grammarBuilder = new StringBuilder(161);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil,p))} : a ;\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil, p))} : a ;\n");
 		grammarBuilder.append("a : a ID {false}?<fail='custom message'>\n");
 		grammarBuilder.append("  | ID\n");
 		grammarBuilder.append("  ;\n");
@@ -2433,8 +2362,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="x y z";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("(s (a (a x) y z))\n", found);
 
 		assertEquals("line 1:4 rule a custom message\n", this.stderrDuringParse);
@@ -2444,9 +2372,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testSimple_1() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(128);
+		StringBuilder grammarBuilder = new StringBuilder(129);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil,p))} : a ;\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil, p))} : a ;\n");
 		grammarBuilder.append("a : a ID\n");
 		grammarBuilder.append("  | ID\n");
 		grammarBuilder.append("  ;\n");
@@ -2455,8 +2383,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="x";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("(s (a x))\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -2465,9 +2392,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testSimple_2() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(128);
+		StringBuilder grammarBuilder = new StringBuilder(129);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil,p))} : a ;\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil, p))} : a ;\n");
 		grammarBuilder.append("a : a ID\n");
 		grammarBuilder.append("  | ID\n");
 		grammarBuilder.append("  ;\n");
@@ -2476,8 +2403,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="x y";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("(s (a (a x) y))\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -2486,9 +2412,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testSimple_3() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(128);
+		StringBuilder grammarBuilder = new StringBuilder(129);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil,p))} : a ;\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil, p))} : a ;\n");
 		grammarBuilder.append("a : a ID\n");
 		grammarBuilder.append("  | ID\n");
 		grammarBuilder.append("  ;\n");
@@ -2497,8 +2423,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="x y z";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("(s (a (a (a x) y) z))\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -2507,9 +2432,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testTernaryExprExplicitAssociativity_1() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(284);
+		StringBuilder grammarBuilder = new StringBuilder(285);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil,p))} : e EOF; // must indicate EOF can follow or 'a<EOF>' won't match\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil, p))} : e EOF; // must indicate EOF can follow or 'a<EOF>' won't match\n");
 		grammarBuilder.append("e :<assoc=right> e '*' e\n");
 		grammarBuilder.append("  |<assoc=right> e '+' e\n");
 		grammarBuilder.append("  |<assoc=right> e '?' e ':' e\n");
@@ -2521,8 +2446,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="a";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("(s (e a) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -2531,9 +2455,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testTernaryExprExplicitAssociativity_2() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(284);
+		StringBuilder grammarBuilder = new StringBuilder(285);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil,p))} : e EOF; // must indicate EOF can follow or 'a<EOF>' won't match\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil, p))} : e EOF; // must indicate EOF can follow or 'a<EOF>' won't match\n");
 		grammarBuilder.append("e :<assoc=right> e '*' e\n");
 		grammarBuilder.append("  |<assoc=right> e '+' e\n");
 		grammarBuilder.append("  |<assoc=right> e '?' e ':' e\n");
@@ -2545,8 +2469,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="a+b";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("(s (e (e a) + (e b)) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -2555,9 +2478,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testTernaryExprExplicitAssociativity_3() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(284);
+		StringBuilder grammarBuilder = new StringBuilder(285);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil,p))} : e EOF; // must indicate EOF can follow or 'a<EOF>' won't match\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil, p))} : e EOF; // must indicate EOF can follow or 'a<EOF>' won't match\n");
 		grammarBuilder.append("e :<assoc=right> e '*' e\n");
 		grammarBuilder.append("  |<assoc=right> e '+' e\n");
 		grammarBuilder.append("  |<assoc=right> e '?' e ':' e\n");
@@ -2569,8 +2492,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="a*b";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("(s (e (e a) * (e b)) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -2579,9 +2501,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testTernaryExprExplicitAssociativity_4() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(284);
+		StringBuilder grammarBuilder = new StringBuilder(285);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil,p))} : e EOF; // must indicate EOF can follow or 'a<EOF>' won't match\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil, p))} : e EOF; // must indicate EOF can follow or 'a<EOF>' won't match\n");
 		grammarBuilder.append("e :<assoc=right> e '*' e\n");
 		grammarBuilder.append("  |<assoc=right> e '+' e\n");
 		grammarBuilder.append("  |<assoc=right> e '?' e ':' e\n");
@@ -2593,8 +2515,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="a?b:c";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("(s (e (e a) ? (e b) : (e c)) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -2603,9 +2524,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testTernaryExprExplicitAssociativity_5() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(284);
+		StringBuilder grammarBuilder = new StringBuilder(285);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil,p))} : e EOF; // must indicate EOF can follow or 'a<EOF>' won't match\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil, p))} : e EOF; // must indicate EOF can follow or 'a<EOF>' won't match\n");
 		grammarBuilder.append("e :<assoc=right> e '*' e\n");
 		grammarBuilder.append("  |<assoc=right> e '+' e\n");
 		grammarBuilder.append("  |<assoc=right> e '?' e ':' e\n");
@@ -2617,8 +2538,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="a=b=c";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("(s (e (e a) = (e (e b) = (e c))) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -2627,9 +2547,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testTernaryExprExplicitAssociativity_6() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(284);
+		StringBuilder grammarBuilder = new StringBuilder(285);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil,p))} : e EOF; // must indicate EOF can follow or 'a<EOF>' won't match\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil, p))} : e EOF; // must indicate EOF can follow or 'a<EOF>' won't match\n");
 		grammarBuilder.append("e :<assoc=right> e '*' e\n");
 		grammarBuilder.append("  |<assoc=right> e '+' e\n");
 		grammarBuilder.append("  |<assoc=right> e '?' e ':' e\n");
@@ -2641,8 +2561,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="a?b+c:d";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("(s (e (e a) ? (e (e b) + (e c)) : (e d)) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -2651,9 +2570,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testTernaryExprExplicitAssociativity_7() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(284);
+		StringBuilder grammarBuilder = new StringBuilder(285);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil,p))} : e EOF; // must indicate EOF can follow or 'a<EOF>' won't match\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil, p))} : e EOF; // must indicate EOF can follow or 'a<EOF>' won't match\n");
 		grammarBuilder.append("e :<assoc=right> e '*' e\n");
 		grammarBuilder.append("  |<assoc=right> e '+' e\n");
 		grammarBuilder.append("  |<assoc=right> e '?' e ':' e\n");
@@ -2665,8 +2584,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="a?b=c:d";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("(s (e (e a) ? (e (e b) = (e c)) : (e d)) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -2675,9 +2593,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testTernaryExprExplicitAssociativity_8() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(284);
+		StringBuilder grammarBuilder = new StringBuilder(285);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil,p))} : e EOF; // must indicate EOF can follow or 'a<EOF>' won't match\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil, p))} : e EOF; // must indicate EOF can follow or 'a<EOF>' won't match\n");
 		grammarBuilder.append("e :<assoc=right> e '*' e\n");
 		grammarBuilder.append("  |<assoc=right> e '+' e\n");
 		grammarBuilder.append("  |<assoc=right> e '?' e ':' e\n");
@@ -2689,8 +2607,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="a? b?c:d : e";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("(s (e (e a) ? (e (e b) ? (e c) : (e d)) : (e e)) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -2699,9 +2616,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testTernaryExprExplicitAssociativity_9() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(284);
+		StringBuilder grammarBuilder = new StringBuilder(285);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil,p))} : e EOF; // must indicate EOF can follow or 'a<EOF>' won't match\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil, p))} : e EOF; // must indicate EOF can follow or 'a<EOF>' won't match\n");
 		grammarBuilder.append("e :<assoc=right> e '*' e\n");
 		grammarBuilder.append("  |<assoc=right> e '+' e\n");
 		grammarBuilder.append("  |<assoc=right> e '?' e ':' e\n");
@@ -2713,8 +2630,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="a?b: c?d:e";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("(s (e (e a) ? (e b) : (e (e c) ? (e d) : (e e))) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -2723,9 +2639,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testTernaryExpr_1() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(259);
+		StringBuilder grammarBuilder = new StringBuilder(260);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil,p))} : e EOF ; // must indicate EOF can follow or 'a<EOF>' won't match\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil, p))} : e EOF ; // must indicate EOF can follow or 'a<EOF>' won't match\n");
 		grammarBuilder.append("e : e '*' e\n");
 		grammarBuilder.append("  | e '+' e\n");
 		grammarBuilder.append("  |<assoc=right> e '?' e ':' e\n");
@@ -2737,8 +2653,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="a";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("(s (e a) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -2747,9 +2662,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testTernaryExpr_2() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(259);
+		StringBuilder grammarBuilder = new StringBuilder(260);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil,p))} : e EOF ; // must indicate EOF can follow or 'a<EOF>' won't match\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil, p))} : e EOF ; // must indicate EOF can follow or 'a<EOF>' won't match\n");
 		grammarBuilder.append("e : e '*' e\n");
 		grammarBuilder.append("  | e '+' e\n");
 		grammarBuilder.append("  |<assoc=right> e '?' e ':' e\n");
@@ -2761,8 +2676,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="a+b";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("(s (e (e a) + (e b)) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -2771,9 +2685,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testTernaryExpr_3() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(259);
+		StringBuilder grammarBuilder = new StringBuilder(260);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil,p))} : e EOF ; // must indicate EOF can follow or 'a<EOF>' won't match\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil, p))} : e EOF ; // must indicate EOF can follow or 'a<EOF>' won't match\n");
 		grammarBuilder.append("e : e '*' e\n");
 		grammarBuilder.append("  | e '+' e\n");
 		grammarBuilder.append("  |<assoc=right> e '?' e ':' e\n");
@@ -2785,8 +2699,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="a*b";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("(s (e (e a) * (e b)) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -2795,9 +2708,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testTernaryExpr_4() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(259);
+		StringBuilder grammarBuilder = new StringBuilder(260);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil,p))} : e EOF ; // must indicate EOF can follow or 'a<EOF>' won't match\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil, p))} : e EOF ; // must indicate EOF can follow or 'a<EOF>' won't match\n");
 		grammarBuilder.append("e : e '*' e\n");
 		grammarBuilder.append("  | e '+' e\n");
 		grammarBuilder.append("  |<assoc=right> e '?' e ':' e\n");
@@ -2809,8 +2722,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="a?b:c";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("(s (e (e a) ? (e b) : (e c)) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -2819,9 +2731,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testTernaryExpr_5() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(259);
+		StringBuilder grammarBuilder = new StringBuilder(260);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil,p))} : e EOF ; // must indicate EOF can follow or 'a<EOF>' won't match\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil, p))} : e EOF ; // must indicate EOF can follow or 'a<EOF>' won't match\n");
 		grammarBuilder.append("e : e '*' e\n");
 		grammarBuilder.append("  | e '+' e\n");
 		grammarBuilder.append("  |<assoc=right> e '?' e ':' e\n");
@@ -2833,8 +2745,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="a=b=c";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("(s (e (e a) = (e (e b) = (e c))) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -2843,9 +2754,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testTernaryExpr_6() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(259);
+		StringBuilder grammarBuilder = new StringBuilder(260);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil,p))} : e EOF ; // must indicate EOF can follow or 'a<EOF>' won't match\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil, p))} : e EOF ; // must indicate EOF can follow or 'a<EOF>' won't match\n");
 		grammarBuilder.append("e : e '*' e\n");
 		grammarBuilder.append("  | e '+' e\n");
 		grammarBuilder.append("  |<assoc=right> e '?' e ':' e\n");
@@ -2857,8 +2768,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="a?b+c:d";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("(s (e (e a) ? (e (e b) + (e c)) : (e d)) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -2867,9 +2777,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testTernaryExpr_7() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(259);
+		StringBuilder grammarBuilder = new StringBuilder(260);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil,p))} : e EOF ; // must indicate EOF can follow or 'a<EOF>' won't match\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil, p))} : e EOF ; // must indicate EOF can follow or 'a<EOF>' won't match\n");
 		grammarBuilder.append("e : e '*' e\n");
 		grammarBuilder.append("  | e '+' e\n");
 		grammarBuilder.append("  |<assoc=right> e '?' e ':' e\n");
@@ -2881,8 +2791,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="a?b=c:d";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("(s (e (e a) ? (e (e b) = (e c)) : (e d)) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -2891,9 +2800,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testTernaryExpr_8() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(259);
+		StringBuilder grammarBuilder = new StringBuilder(260);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil,p))} : e EOF ; // must indicate EOF can follow or 'a<EOF>' won't match\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil, p))} : e EOF ; // must indicate EOF can follow or 'a<EOF>' won't match\n");
 		grammarBuilder.append("e : e '*' e\n");
 		grammarBuilder.append("  | e '+' e\n");
 		grammarBuilder.append("  |<assoc=right> e '?' e ':' e\n");
@@ -2905,8 +2814,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="a? b?c:d : e";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("(s (e (e a) ? (e (e b) ? (e c) : (e d)) : (e e)) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -2915,9 +2823,9 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testTernaryExpr_9() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(259);
+		StringBuilder grammarBuilder = new StringBuilder(260);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil,p))} : e EOF ; // must indicate EOF can follow or 'a<EOF>' won't match\n");
+		grammarBuilder.append("s @after {fmt.Println($ctx.ToStringTree(nil, p))} : e EOF ; // must indicate EOF can follow or 'a<EOF>' won't match\n");
 		grammarBuilder.append("e : e '*' e\n");
 		grammarBuilder.append("  | e '+' e\n");
 		grammarBuilder.append("  |<assoc=right> e '?' e ':' e\n");
@@ -2929,8 +2837,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="a?b: c?d:e";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals("(s (e (e a) ? (e b) : (e (e c) ? (e d) : (e e))) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 
@@ -2992,8 +2899,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="Test(1,3)";
 		String found = execParser("Expr.g4", grammar, "ExprParser", "ExprLexer",
-		                          "ExprListener", "ExprVisitor",
-		                          "prog", input, false);
+			"ExprListener", "ExprVisitor", "prog", input, false);
 		assertEquals("", found);
 		assertNull(this.stderrDuringParse);
 
@@ -3055,8 +2961,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="Test(1, 3)";
 		String found = execParser("Expr.g4", grammar, "ExprParser", "ExprLexer",
-		                          "ExprListener", "ExprVisitor",
-		                          "prog", input, false);
+			"ExprListener", "ExprVisitor", "prog", input, false);
 		assertEquals("", found);
 		assertNull(this.stderrDuringParse);
 

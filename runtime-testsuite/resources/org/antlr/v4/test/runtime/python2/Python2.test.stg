@@ -237,6 +237,8 @@ RuleInvocationStack() ::= "str_list(self.getRuleInvocationStack())"
 
 LL_EXACT_AMBIG_DETECTION() ::= <<self._interp.predictionMode =  PredictionMode.LL_EXACT_AMBIG_DETECTION>>
 
+ParserToken(parser, token) ::= <%<parser>.<token>%>
+
 ParserPropertyMember() ::= <<
 @members {
 def Property(self):

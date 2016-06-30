@@ -227,6 +227,8 @@ RuleInvocationStack() ::= "GetRuleInvocationStackAsString()"
 
 LL_EXACT_AMBIG_DETECTION() ::= <<Interpreter.PredictionMode = PredictionMode.LlExactAmbigDetection;>>
 
+ParserToken(parser, token) ::= <%<parser>.<token>%>
+
 ParserPropertyMember() ::= <<
 @members {
 bool Property() {

@@ -12,7 +12,7 @@ public class TestListeners extends BaseTest {
 	@Test
 	public void testBasic() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(569);
+		StringBuilder grammarBuilder = new StringBuilder(546);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("@parser::header {\n");
 		grammarBuilder.append("}\n");
@@ -23,21 +23,20 @@ public class TestListeners extends BaseTest {
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("func NewLeafListener() *LeafListener {\n");
-		grammarBuilder.append("	l := new(LeafListener)\n");
-		grammarBuilder.append("	l.BaseTListener = new(BaseTListener)\n");
-		grammarBuilder.append("	return l\n");
+		grammarBuilder.append("	return &LeafListener{BaseTListener: &BaseTListener{}}\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("\n");
-		grammarBuilder.append("func (this *LeafListener) VisitTerminal( node antlr.TerminalNode ) {\n");
+		grammarBuilder.append("func (*LeafListener) VisitTerminal(node antlr.TerminalNode) {\n");
 		grammarBuilder.append("	fmt.Println(node.GetSymbol().GetText())\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("s\n");
 		grammarBuilder.append("@after {\n");
-		grammarBuilder.append("fmt.Println($ctx.r.ToStringTree(nil,p))\n");
-		grammarBuilder.append("walker := antlr.NewParseTreeWalker();\n");
-		grammarBuilder.append("walker.Walk(NewLeafListener(), $ctx.r);\n");
+		grammarBuilder.append("fmt.Println($ctx.r.ToStringTree(nil, p))\n");
+		grammarBuilder.append("var walker = antlr.NewParseTreeWalker()\n");
+		grammarBuilder.append("\n");
+		grammarBuilder.append("walker.Walk(NewLeafListener(), $ctx.r)\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("  : r=a ;\n");
 		grammarBuilder.append("a : INT INT\n");
@@ -51,8 +50,7 @@ public class TestListeners extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="1 2";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals(
 			"(a 1 2)\n" +
 			"1\n" +
@@ -64,7 +62,7 @@ public class TestListeners extends BaseTest {
 	@Test
 	public void testLR() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(743);
+		StringBuilder grammarBuilder = new StringBuilder(723);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("@parser::header {\n");
 		grammarBuilder.append("}\n");
@@ -75,14 +73,12 @@ public class TestListeners extends BaseTest {
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("func NewLeafListener() *LeafListener {\n");
-		grammarBuilder.append("	l := new(LeafListener)\n");
-		grammarBuilder.append("	l.BaseTListener = new(BaseTListener)\n");
-		grammarBuilder.append("	return l\n");
+		grammarBuilder.append("	return &LeafListener{BaseTListener: &BaseTListener{}}\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("\n");
-		grammarBuilder.append("func (this *LeafListener) ExitE(ctx *EContext) {\n");
-		grammarBuilder.append("	if (ctx.GetChildCount()==3) {\n");
-		grammarBuilder.append("		fmt.Printf(\"%s %s %s\\n\",ctx.E(0)[0].GetStart().GetText(), ctx.E(1)[0].GetStart().GetText(), ctx.E(-1)[0].GetStart().GetText());\n");
+		grammarBuilder.append("func (*LeafListener) ExitE(ctx *EContext) {\n");
+		grammarBuilder.append("	if ctx.GetChildCount() == 3 {\n");
+		grammarBuilder.append("		fmt.Printf(\"%s %s %s\\n\", ctx.E(0)[0].GetStart().GetText(), ctx.E(1)[0].GetStart().GetText(), ctx.E(-1)[0].GetStart().GetText())\n");
 		grammarBuilder.append("	} else {\n");
 		grammarBuilder.append("		fmt.Println(ctx.INT().GetSymbol().GetText())\n");
 		grammarBuilder.append("	}\n");
@@ -91,9 +87,10 @@ public class TestListeners extends BaseTest {
 		grammarBuilder.append("\n");
 		grammarBuilder.append("s\n");
 		grammarBuilder.append("@after {\n");
-		grammarBuilder.append("fmt.Println($ctx.r.ToStringTree(nil,p))\n");
-		grammarBuilder.append("walker := antlr.NewParseTreeWalker();\n");
-		grammarBuilder.append("walker.Walk(NewLeafListener(), $ctx.r);\n");
+		grammarBuilder.append("fmt.Println($ctx.r.ToStringTree(nil, p))\n");
+		grammarBuilder.append("var walker = antlr.NewParseTreeWalker()\n");
+		grammarBuilder.append("\n");
+		grammarBuilder.append("walker.Walk(NewLeafListener(), $ctx.r)\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("	: r=e ;\n");
 		grammarBuilder.append("e : e op='*' e\n");
@@ -108,8 +105,7 @@ public class TestListeners extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="1+2*3";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals(
 			"(e (e 1) + (e (e 2) * (e 3)))\n" +
 			"1\n" +
@@ -124,7 +120,7 @@ public class TestListeners extends BaseTest {
 	@Test
 	public void testLRWithLabels() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(734);
+		StringBuilder grammarBuilder = new StringBuilder(709);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("@parser::header {\n");
 		grammarBuilder.append("}\n");
@@ -135,25 +131,24 @@ public class TestListeners extends BaseTest {
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("func NewLeafListener() *LeafListener {\n");
-		grammarBuilder.append("	l := new(LeafListener)\n");
-		grammarBuilder.append("	l.BaseTListener = new(BaseTListener)\n");
-		grammarBuilder.append("	return l\n");
+		grammarBuilder.append("	return &LeafListener{BaseTListener: &BaseTListener{}}\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("\n");
-		grammarBuilder.append("func (this *LeafListener) ExitCall(ctx *CallContext) {\n");
-		grammarBuilder.append("	fmt.Printf(\"%s %s\",ctx.E().GetStart().GetText(),ctx.EList());\n");
+		grammarBuilder.append("func (*LeafListener) ExitCall(ctx *CallContext) {\n");
+		grammarBuilder.append("	fmt.Printf(\"%s %s\", ctx.E().GetStart().GetText(), ctx.EList())\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("\n");
-		grammarBuilder.append("func (this *LeafListener) ExitInt(ctx *IntContext) {\n");
-		grammarBuilder.append("	fmt.Println(ctx.INT().GetSymbol().GetText());\n");
+		grammarBuilder.append("func (*LeafListener) ExitInt(ctx *IntContext) {\n");
+		grammarBuilder.append("	fmt.Println(ctx.INT().GetSymbol().GetText())\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("s\n");
 		grammarBuilder.append("@after {\n");
-		grammarBuilder.append("fmt.Println($ctx.r.ToStringTree(nil,p))\n");
-		grammarBuilder.append("walker := antlr.NewParseTreeWalker();\n");
-		grammarBuilder.append("walker.Walk(NewLeafListener(), $ctx.r);\n");
+		grammarBuilder.append("fmt.Println($ctx.r.ToStringTree(nil, p))\n");
+		grammarBuilder.append("var walker = antlr.NewParseTreeWalker()\n");
+		grammarBuilder.append("\n");
+		grammarBuilder.append("walker.Walk(NewLeafListener(), $ctx.r)\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("  : r=e ;\n");
 		grammarBuilder.append("e : e '(' eList ')' # Call\n");
@@ -168,8 +163,7 @@ public class TestListeners extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="1(2,3)";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals(
 			"(e (e 1) ( (eList (e 2) , (e 3)) ))\n" +
 			"1\n" +
@@ -183,7 +177,7 @@ public class TestListeners extends BaseTest {
 	@Test
 	public void testRuleGetters_1() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(768);
+		StringBuilder grammarBuilder = new StringBuilder(749);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("@parser::header {\n");
 		grammarBuilder.append("}\n");
@@ -194,25 +188,24 @@ public class TestListeners extends BaseTest {
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("func NewLeafListener() *LeafListener {\n");
-		grammarBuilder.append("	l := new(LeafListener)\n");
-		grammarBuilder.append("	l.BaseTListener = new(BaseTListener)\n");
-		grammarBuilder.append("	return l\n");
+		grammarBuilder.append("	return &LeafListener{BaseTListener: &BaseTListener{}}\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("\n");
-		grammarBuilder.append("func (this *LeafListener) ExitA(ctx *AContext) {\n");
-		grammarBuilder.append("	if (ctx.GetChildCount()==2) {\n");
-		grammarBuilder.append("		fmt.Printf(\"%s %s %s\",ctx.B(0)[0].GetStart().GetText(),ctx.B(1)[0].GetStart().GetText(),ctx.B(-1)[0].GetStart().GetText());\n");
+		grammarBuilder.append("func (*LeafListener) ExitA(ctx *AContext) {\n");
+		grammarBuilder.append("	if ctx.GetChildCount() == 2 {\n");
+		grammarBuilder.append("		fmt.Printf(\"%s %s %s\", ctx.B(0)[0].GetStart().GetText(), ctx.B(1)[0].GetStart().GetText(), ctx.B(-1)[0].GetStart().GetText())\n");
 		grammarBuilder.append("	} else {\n");
-		grammarBuilder.append("		fmt.Println(ctx.B(0)[0].GetStart().GetText());\n");
+		grammarBuilder.append("		fmt.Println(ctx.B(0)[0].GetStart().GetText())\n");
 		grammarBuilder.append("	}\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("s\n");
 		grammarBuilder.append("@after {\n");
-		grammarBuilder.append("fmt.Println($ctx.r.ToStringTree(nil,p))\n");
-		grammarBuilder.append("walker := antlr.NewParseTreeWalker();\n");
-		grammarBuilder.append("walker.Walk(NewLeafListener(), $ctx.r);\n");
+		grammarBuilder.append("fmt.Println($ctx.r.ToStringTree(nil, p))\n");
+		grammarBuilder.append("var walker = antlr.NewParseTreeWalker()\n");
+		grammarBuilder.append("\n");
+		grammarBuilder.append("walker.Walk(NewLeafListener(), $ctx.r)\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("  : r=a ;\n");
 		grammarBuilder.append("a : b b		// forces list\n");
@@ -227,8 +220,7 @@ public class TestListeners extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="1 2";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals(
 			"(a (b 1) (b 2))\n" +
 			"1 2 1\n", found);
@@ -239,7 +231,7 @@ public class TestListeners extends BaseTest {
 	@Test
 	public void testRuleGetters_2() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(768);
+		StringBuilder grammarBuilder = new StringBuilder(749);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("@parser::header {\n");
 		grammarBuilder.append("}\n");
@@ -250,25 +242,24 @@ public class TestListeners extends BaseTest {
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("func NewLeafListener() *LeafListener {\n");
-		grammarBuilder.append("	l := new(LeafListener)\n");
-		grammarBuilder.append("	l.BaseTListener = new(BaseTListener)\n");
-		grammarBuilder.append("	return l\n");
+		grammarBuilder.append("	return &LeafListener{BaseTListener: &BaseTListener{}}\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("\n");
-		grammarBuilder.append("func (this *LeafListener) ExitA(ctx *AContext) {\n");
-		grammarBuilder.append("	if (ctx.GetChildCount()==2) {\n");
-		grammarBuilder.append("		fmt.Printf(\"%s %s %s\",ctx.B(0)[0].GetStart().GetText(),ctx.B(1)[0].GetStart().GetText(),ctx.B(-1)[0].GetStart().GetText());\n");
+		grammarBuilder.append("func (*LeafListener) ExitA(ctx *AContext) {\n");
+		grammarBuilder.append("	if ctx.GetChildCount() == 2 {\n");
+		grammarBuilder.append("		fmt.Printf(\"%s %s %s\", ctx.B(0)[0].GetStart().GetText(), ctx.B(1)[0].GetStart().GetText(), ctx.B(-1)[0].GetStart().GetText())\n");
 		grammarBuilder.append("	} else {\n");
-		grammarBuilder.append("		fmt.Println(ctx.B(0)[0].GetStart().GetText());\n");
+		grammarBuilder.append("		fmt.Println(ctx.B(0)[0].GetStart().GetText())\n");
 		grammarBuilder.append("	}\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("s\n");
 		grammarBuilder.append("@after {\n");
-		grammarBuilder.append("fmt.Println($ctx.r.ToStringTree(nil,p))\n");
-		grammarBuilder.append("walker := antlr.NewParseTreeWalker();\n");
-		grammarBuilder.append("walker.Walk(NewLeafListener(), $ctx.r);\n");
+		grammarBuilder.append("fmt.Println($ctx.r.ToStringTree(nil, p))\n");
+		grammarBuilder.append("var walker = antlr.NewParseTreeWalker()\n");
+		grammarBuilder.append("\n");
+		grammarBuilder.append("walker.Walk(NewLeafListener(), $ctx.r)\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("  : r=a ;\n");
 		grammarBuilder.append("a : b b		// forces list\n");
@@ -283,8 +274,7 @@ public class TestListeners extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="abc";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals(
 			"(a (b abc))\n" +
 			"abc\n", found);
@@ -295,7 +285,7 @@ public class TestListeners extends BaseTest {
 	@Test
 	public void testTokenGetters_1() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(699);
+		StringBuilder grammarBuilder = new StringBuilder(681);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("@parser::header {\n");
 		grammarBuilder.append("}\n");
@@ -306,14 +296,12 @@ public class TestListeners extends BaseTest {
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("func NewLeafListener() *LeafListener {\n");
-		grammarBuilder.append("	l := new(LeafListener)\n");
-		grammarBuilder.append("	l.BaseTListener = new(BaseTListener)\n");
-		grammarBuilder.append("	return l\n");
+		grammarBuilder.append("	return &LeafListener{BaseTListener: &BaseTListener{}}\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("\n");
-		grammarBuilder.append("func (this *LeafListener) ExitA(ctx *AContext) {\n");
-		grammarBuilder.append("	if (ctx.GetChildCount()==2){\n");
-		grammarBuilder.append("		fmt.Printf(\"%s %s %s\",ctx.INT(0)[0].GetSymbol().GetText(), ctx.INT(1)[0].GetSymbol().GetText(),ctx.INT(0)[0]);\n");
+		grammarBuilder.append("func (*LeafListener) ExitA(ctx *AContext) {\n");
+		grammarBuilder.append("	if ctx.GetChildCount() == 2 {\n");
+		grammarBuilder.append("		fmt.Printf(\"%s %s %s\", ctx.INT(0)[0].GetSymbol().GetText(), ctx.INT(1)[0].GetSymbol().GetText(), ctx.INT(0)[0])\n");
 		grammarBuilder.append("	} else {\n");
 		grammarBuilder.append("		fmt.Println(ctx.ID().GetSymbol())\n");
 		grammarBuilder.append("	}\n");
@@ -322,9 +310,10 @@ public class TestListeners extends BaseTest {
 		grammarBuilder.append("\n");
 		grammarBuilder.append("s\n");
 		grammarBuilder.append("@after {\n");
-		grammarBuilder.append("fmt.Println($ctx.r.ToStringTree(nil,p))\n");
-		grammarBuilder.append("walker := antlr.NewParseTreeWalker();\n");
-		grammarBuilder.append("walker.Walk(NewLeafListener(), $ctx.r);\n");
+		grammarBuilder.append("fmt.Println($ctx.r.ToStringTree(nil, p))\n");
+		grammarBuilder.append("var walker = antlr.NewParseTreeWalker()\n");
+		grammarBuilder.append("\n");
+		grammarBuilder.append("walker.Walk(NewLeafListener(), $ctx.r)\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("  : r=a ;\n");
 		grammarBuilder.append("a : INT INT\n");
@@ -338,8 +327,7 @@ public class TestListeners extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="1 2";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals(
 			"(a 1 2)\n" +
 			"1 2 [1, 2]\n", found);
@@ -350,7 +338,7 @@ public class TestListeners extends BaseTest {
 	@Test
 	public void testTokenGetters_2() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(699);
+		StringBuilder grammarBuilder = new StringBuilder(681);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("@parser::header {\n");
 		grammarBuilder.append("}\n");
@@ -361,14 +349,12 @@ public class TestListeners extends BaseTest {
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("func NewLeafListener() *LeafListener {\n");
-		grammarBuilder.append("	l := new(LeafListener)\n");
-		grammarBuilder.append("	l.BaseTListener = new(BaseTListener)\n");
-		grammarBuilder.append("	return l\n");
+		grammarBuilder.append("	return &LeafListener{BaseTListener: &BaseTListener{}}\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("\n");
-		grammarBuilder.append("func (this *LeafListener) ExitA(ctx *AContext) {\n");
-		grammarBuilder.append("	if (ctx.GetChildCount()==2){\n");
-		grammarBuilder.append("		fmt.Printf(\"%s %s %s\",ctx.INT(0)[0].GetSymbol().GetText(), ctx.INT(1)[0].GetSymbol().GetText(),ctx.INT(0)[0]);\n");
+		grammarBuilder.append("func (*LeafListener) ExitA(ctx *AContext) {\n");
+		grammarBuilder.append("	if ctx.GetChildCount() == 2 {\n");
+		grammarBuilder.append("		fmt.Printf(\"%s %s %s\", ctx.INT(0)[0].GetSymbol().GetText(), ctx.INT(1)[0].GetSymbol().GetText(), ctx.INT(0)[0])\n");
 		grammarBuilder.append("	} else {\n");
 		grammarBuilder.append("		fmt.Println(ctx.ID().GetSymbol())\n");
 		grammarBuilder.append("	}\n");
@@ -377,9 +363,10 @@ public class TestListeners extends BaseTest {
 		grammarBuilder.append("\n");
 		grammarBuilder.append("s\n");
 		grammarBuilder.append("@after {\n");
-		grammarBuilder.append("fmt.Println($ctx.r.ToStringTree(nil,p))\n");
-		grammarBuilder.append("walker := antlr.NewParseTreeWalker();\n");
-		grammarBuilder.append("walker.Walk(NewLeafListener(), $ctx.r);\n");
+		grammarBuilder.append("fmt.Println($ctx.r.ToStringTree(nil, p))\n");
+		grammarBuilder.append("var walker = antlr.NewParseTreeWalker()\n");
+		grammarBuilder.append("\n");
+		grammarBuilder.append("walker.Walk(NewLeafListener(), $ctx.r)\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("  : r=a ;\n");
 		grammarBuilder.append("a : INT INT\n");
@@ -393,8 +380,7 @@ public class TestListeners extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="abc";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, false);
+			"TListener", "TVisitor", "s", input, false);
 		assertEquals(
 			"(a abc)\n" +
 			"[@0,0:2='abc',<4>,1:0]\n", found);

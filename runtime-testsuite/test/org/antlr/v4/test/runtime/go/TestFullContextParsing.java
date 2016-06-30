@@ -21,8 +21,7 @@ public class TestFullContextParsing extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="abc";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, true);
+			"TListener", "TVisitor", "s", input, true);
 		assertEquals(
 			"Decision 0:\n" +
 			"s0-ID->:s1^=>1\n", found);
@@ -34,7 +33,7 @@ public class TestFullContextParsing extends BaseTest {
 	@Test
 	public void testAmbiguityNoLoop() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(218);
+		StringBuilder grammarBuilder = new StringBuilder(217);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("prog\n");
 		grammarBuilder.append("@init {p.Interpreter.SetPredictionMode(antlr.PredictionModeLLExactAmbigDetection);}\n");
@@ -50,8 +49,7 @@ public class TestFullContextParsing extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="a@";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "prog", input, true);
+			"TListener", "TVisitor", "prog", input, true);
 		assertEquals("alt 1\n", found);
 
 		assertEquals(
@@ -78,8 +76,7 @@ public class TestFullContextParsing extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="$ 34 abc @ 34 abc";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, true);
+			"TListener", "TVisitor", "s", input, true);
 		assertEquals(
 			"Decision 2:\n" +
 			"s0-INT->s1\n" +
@@ -109,8 +106,7 @@ public class TestFullContextParsing extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="$ 34 abc";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, true);
+			"TListener", "TVisitor", "s", input, true);
 		assertEquals(
 			"Decision 1:\n" +
 			"s0-INT->s1\n" +
@@ -138,8 +134,7 @@ public class TestFullContextParsing extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="@ 34 abc";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, true);
+			"TListener", "TVisitor", "s", input, true);
 		assertEquals(
 			"Decision 1:\n" +
 			"s0-INT->s1\n" +
@@ -158,7 +153,7 @@ public class TestFullContextParsing extends BaseTest {
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s\n");
 		grammarBuilder.append("@init {p.Interpreter.SetPredictionMode(antlr.PredictionModeLLExactAmbigDetection);}\n");
-		grammarBuilder.append(":   expr[0] {fmt.Println($expr.ctx.ToStringTree(nil,p))};\n");
+		grammarBuilder.append(":   expr[0] {fmt.Println($expr.ctx.ToStringTree(nil, p))};\n");
 		grammarBuilder.append("	expr[int _p]\n");
 		grammarBuilder.append("		: ID \n");
 		grammarBuilder.append("		( \n");
@@ -171,8 +166,7 @@ public class TestFullContextParsing extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="a+b";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, true);
+			"TListener", "TVisitor", "s", input, true);
 		assertEquals("(expr a + (expr b))\n", found);
 
 		assertEquals(
@@ -188,7 +182,7 @@ public class TestFullContextParsing extends BaseTest {
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s\n");
 		grammarBuilder.append("@init {p.Interpreter.SetPredictionMode(antlr.PredictionModeLLExactAmbigDetection);}\n");
-		grammarBuilder.append(":   expr[0] {fmt.Println($expr.ctx.ToStringTree(nil,p))};\n");
+		grammarBuilder.append(":   expr[0] {fmt.Println($expr.ctx.ToStringTree(nil, p))};\n");
 		grammarBuilder.append("	expr[int _p]\n");
 		grammarBuilder.append("		: ID \n");
 		grammarBuilder.append("		( \n");
@@ -201,8 +195,7 @@ public class TestFullContextParsing extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="a+b*c";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, true);
+			"TListener", "TVisitor", "s", input, true);
 		assertEquals("(expr a + (expr b * (expr c)))\n", found);
 
 		assertEquals(
@@ -216,7 +209,7 @@ public class TestFullContextParsing extends BaseTest {
 	@Test
 	public void testFullContextIF_THEN_ELSEParse_1() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(243);
+		StringBuilder grammarBuilder = new StringBuilder(242);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s \n");
 		grammarBuilder.append("@init {p.Interpreter.SetPredictionMode(antlr.PredictionModeLLExactAmbigDetection);}\n");
@@ -230,8 +223,7 @@ public class TestFullContextParsing extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="{ if x then return }";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, true);
+			"TListener", "TVisitor", "s", input, true);
 		assertEquals(
 			"Decision 1:\n" +
 			"s0-'}'->:s1=>2\n", found);
@@ -242,7 +234,7 @@ public class TestFullContextParsing extends BaseTest {
 	@Test
 	public void testFullContextIF_THEN_ELSEParse_2() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(243);
+		StringBuilder grammarBuilder = new StringBuilder(242);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s \n");
 		grammarBuilder.append("@init {p.Interpreter.SetPredictionMode(antlr.PredictionModeLLExactAmbigDetection);}\n");
@@ -256,8 +248,7 @@ public class TestFullContextParsing extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="{ if x then return else foo }";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, true);
+			"TListener", "TVisitor", "s", input, true);
 		assertEquals(
 			"Decision 1:\n" +
 			"s0-'else'->:s1^=>1\n", found);
@@ -271,7 +262,7 @@ public class TestFullContextParsing extends BaseTest {
 	@Test
 	public void testFullContextIF_THEN_ELSEParse_3() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(243);
+		StringBuilder grammarBuilder = new StringBuilder(242);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s \n");
 		grammarBuilder.append("@init {p.Interpreter.SetPredictionMode(antlr.PredictionModeLLExactAmbigDetection);}\n");
@@ -285,8 +276,7 @@ public class TestFullContextParsing extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="{ if x then if y then return else foo }";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, true);
+			"TListener", "TVisitor", "s", input, true);
 		assertEquals(
 			"Decision 1:\n" +
 			"s0-'}'->:s2=>2\n" +
@@ -301,7 +291,7 @@ public class TestFullContextParsing extends BaseTest {
 	@Test
 	public void testFullContextIF_THEN_ELSEParse_4() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(243);
+		StringBuilder grammarBuilder = new StringBuilder(242);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s \n");
 		grammarBuilder.append("@init {p.Interpreter.SetPredictionMode(antlr.PredictionModeLLExactAmbigDetection);}\n");
@@ -315,8 +305,7 @@ public class TestFullContextParsing extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="{ if x then if y then return else foo else bar }";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, true);
+			"TListener", "TVisitor", "s", input, true);
 		assertEquals(
 			"Decision 1:\n" +
 			"s0-'else'->:s1^=>1\n", found);
@@ -332,7 +321,7 @@ public class TestFullContextParsing extends BaseTest {
 	@Test
 	public void testFullContextIF_THEN_ELSEParse_5() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(243);
+		StringBuilder grammarBuilder = new StringBuilder(242);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s \n");
 		grammarBuilder.append("@init {p.Interpreter.SetPredictionMode(antlr.PredictionModeLLExactAmbigDetection);}\n");
@@ -348,8 +337,7 @@ public class TestFullContextParsing extends BaseTest {
 			"{ if x then return else foo\n" +
 			"if x then if y then return else foo }";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, true);
+			"TListener", "TVisitor", "s", input, true);
 		assertEquals(
 			"Decision 1:\n" +
 			"s0-'}'->:s2=>2\n" +
@@ -366,7 +354,7 @@ public class TestFullContextParsing extends BaseTest {
 	@Test
 	public void testFullContextIF_THEN_ELSEParse_6() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(243);
+		StringBuilder grammarBuilder = new StringBuilder(242);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s \n");
 		grammarBuilder.append("@init {p.Interpreter.SetPredictionMode(antlr.PredictionModeLLExactAmbigDetection);}\n");
@@ -382,8 +370,7 @@ public class TestFullContextParsing extends BaseTest {
 			"{ if x then return else foo\n" +
 			"if x then if y then return else foo }";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, true);
+			"TListener", "TVisitor", "s", input, true);
 		assertEquals(
 			"Decision 1:\n" +
 			"s0-'}'->:s2=>2\n" +
@@ -400,7 +387,7 @@ public class TestFullContextParsing extends BaseTest {
 	@Test
 	public void testLoopsSimulateTailRecursion() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(317);
+		StringBuilder grammarBuilder = new StringBuilder(316);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("prog\n");
 		grammarBuilder.append("@init {p.Interpreter.SetPredictionMode(antlr.PredictionModeLLExactAmbigDetection);}\n");
@@ -419,8 +406,7 @@ public class TestFullContextParsing extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="a(i)<-x";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "prog", input, true);
+			"TListener", "TVisitor", "prog", input, true);
 		assertEquals("pass: a(i)<-x\n", found);
 
 		assertEquals(
@@ -445,8 +431,7 @@ public class TestFullContextParsing extends BaseTest {
 		String grammar = grammarBuilder.toString();
 		String input ="34 abc";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-		                          "TListener", "TVisitor",
-		                          "s", input, true);
+			"TListener", "TVisitor", "s", input, true);
 		assertEquals(
 			"Decision 0:\n" +
 			"s0-INT->s1\n" +

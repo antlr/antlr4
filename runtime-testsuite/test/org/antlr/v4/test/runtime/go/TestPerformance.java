@@ -43,8 +43,7 @@ public class TestPerformance extends BaseTest {
 			"not X1 and not X2 and not X3 and not X4 and not X5 and not X6 and not X7 and not X8 and not X9 and not X10 and     X11 and not X12 or\n" +
 			"not X1 and not X2 and not X3 and not X4 and not X5 and not X6 and not X7 and not X8 and not X9 and not X10 and not X11 and     X12";
 		String found = execParser("Expr.g4", grammar, "ExprParser", "ExprLexer",
-		                          "ExprListener", "ExprVisitor",
-		                          "program", input, false);
+			"ExprListener", "ExprVisitor", "program", input, false);
 		assertEquals("", found);
 		assertNull(this.stderrDuringParse);
 
@@ -201,8 +200,7 @@ public class TestPerformance extends BaseTest {
 			"not X1 and not X2 and not X3 and not X4 and not X5 and not X6 and not X7 and not X8 and not X9 and not X10 and     X11 and not X12 or\n" +
 			"not X1 and not X2 and not X3 and not X4 and not X5 and not X6 and not X7 and not X8 and not X9 and not X10 and not X11 and     X12";
 		String found = execParser("Expr.g4", grammar, "ExprParser", "ExprLexer",
-		                          "ExprListener", "ExprVisitor",
-		                          "program", input, false);
+			"ExprListener", "ExprVisitor", "program", input, false);
 		assertEquals("", found);
 		assertNull(this.stderrDuringParse);
 
