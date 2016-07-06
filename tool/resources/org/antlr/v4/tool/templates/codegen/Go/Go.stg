@@ -75,6 +75,8 @@ import "github.com/pboyer/antlr4/runtime/Go/antlr"
 // Base<file.grammarName>Listener is a complete listener for a parse tree produced by <file.parserName>.
 type Base<file.grammarName>Listener struct{}
 
+var _ <file.grammarName>Listener = &Base<file.grammarName>Listener{}
+
 // VisitTerminal is called when a terminal node is visited.
 func (s *Base<file.grammarName>Listener) VisitTerminal(node antlr.TerminalNode) {}
 
