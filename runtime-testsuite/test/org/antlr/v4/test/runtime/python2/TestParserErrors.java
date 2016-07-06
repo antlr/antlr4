@@ -62,8 +62,8 @@ public class TestParserErrors extends BasePython2Test {
 		grammarBuilder.append("    b = s.b()\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("s : (a | b)+;\n");
-		grammarBuilder.append("a : 'a' {print('a',end='')};\n");
-		grammarBuilder.append("b : 'b' {print('b',end='')};");
+		grammarBuilder.append("a : 'a' {print(\"a\",end='')};\n");
+		grammarBuilder.append("b : 'b' {print(\"b\",end='')};");
 		String grammar = grammarBuilder.toString();
 
 

@@ -61,8 +61,8 @@ public class TestParserErrors extends BaseTest {
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("s : (a | b)+;\n");
-		grammarBuilder.append("a : 'a' {System.out.print('a');};\n");
-		grammarBuilder.append("b : 'b' {System.out.print('b');};");
+		grammarBuilder.append("a : 'a' {System.out.print(\"a\");};\n");
+		grammarBuilder.append("b : 'b' {System.out.print(\"b\");};");
 		String grammar = grammarBuilder.toString();
 
 

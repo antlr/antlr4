@@ -55,8 +55,8 @@ public class TestParserErrors extends BaseTest {
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("s : (a | b)+;\n");
-		grammarBuilder.append("a : 'a' {fmt.Print('a')};\n");
-		grammarBuilder.append("b : 'b' {fmt.Print('b')};");
+		grammarBuilder.append("a : 'a' {fmt.Print(\"a\")};\n");
+		grammarBuilder.append("b : 'b' {fmt.Print(\"b\")};");
 		String grammar = grammarBuilder.toString();
 		String input ="abab";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
