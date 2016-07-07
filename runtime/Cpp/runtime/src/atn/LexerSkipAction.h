@@ -33,7 +33,6 @@
 
 #include "atn/LexerAction.h"
 #include "atn/LexerActionType.h"
-#include <memory>
 
 namespace antlr4 {
 namespace atn {

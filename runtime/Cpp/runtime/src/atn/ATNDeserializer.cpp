@@ -392,9 +392,7 @@ ATN ATNDeserializer::deserialize(const std::vector<uint16_t>& input) {
           data2 = -1;
         }
 
-        auto la = lexerActionFactory(actionType, data1, data2);
-        assert(la != nullptr);
-        atn.lexerActions[i] = la;
+        atn.lexerActions[i] = lexerActionFactory(actionType, data1, data2);
       }
     } else {
       // for compatibility with older serialized ATNs, convert the old
@@ -723,7 +721,7 @@ Ref<LexerAction> ATNDeserializer::lexerActionFactory(LexerActionType type, int d
       return LexerMoreAction::getInstance();
 
     case LexerActionType::POP_MODE:
-	  return LexerPopModeAction::getInstance();
+      return LexerPopModeAction::getInstance();
 
     case LexerActionType::PUSH_MODE:
       return std::make_shared<LexerPushModeAction>(data1);
