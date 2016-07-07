@@ -51,6 +51,12 @@ public:
   };
 <endif>
 
+<if (lexer.channels)>
+  enum {
+    <lexer.channels: {k | <k> = <lexer.channels.(k)>}; separator=", ", wrap, anchor>
+  };
+<endif>
+
 <if (rest(lexer.modes))>
   enum {
     <rest(lexer.modes): {m | <m> = <i>,}; separator="\n", anchor>
