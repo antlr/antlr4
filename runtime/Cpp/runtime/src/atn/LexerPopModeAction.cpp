@@ -38,13 +38,17 @@ using namespace antlr4;
 using namespace antlr4::atn;
 using namespace antlr4::misc;
 
-const Ref<LexerPopModeAction> LexerPopModeAction::INSTANCE { new LexerPopModeAction() };
+const Ref<LexerPopModeAction> LexerPopModeAction::getInstance() {
+	static Ref<LexerPopModeAction> instance = std::shared_ptr<LexerPopModeAction>(
+			new LexerPopModeAction());
+	return instance;
+}
 
 LexerPopModeAction::LexerPopModeAction() {
 }
 
 LexerActionType LexerPopModeAction::getActionType() const {
-  return LexerActionType::POP_MODE;
+	return LexerActionType::POP_MODE;
 }
 
 bool LexerPopModeAction::isPositionDependent() const {

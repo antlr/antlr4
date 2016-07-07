@@ -38,33 +38,37 @@ using namespace antlr4;
 using namespace antlr4::atn;
 using namespace antlr4::misc;
 
-const Ref<LexerSkipAction> LexerSkipAction::INSTANCE { new LexerSkipAction() };
+const Ref<LexerSkipAction> LexerSkipAction::getInstance() {
+	static Ref<LexerSkipAction> instance = std::shared_ptr<LexerSkipAction>(
+			new LexerSkipAction());
+	return instance;
+}
 
 LexerSkipAction::LexerSkipAction() {
 }
 
 LexerActionType LexerSkipAction::getActionType() const {
-  return LexerActionType::SKIP;
+	return LexerActionType::SKIP;
 }
 
 bool LexerSkipAction::isPositionDependent() const {
-  return false;
+	return false;
 }
 
 void LexerSkipAction::execute(Lexer *lexer) {
-  lexer->skip();
+	lexer->skip();
 }
 
 size_t LexerSkipAction::hashCode() const {
-  size_t hash = MurmurHash::initialize();
-  hash = MurmurHash::update(hash, (size_t)getActionType());
-  return MurmurHash::finish(hash, 1);
+	size_t hash = MurmurHash::initialize();
+	hash = MurmurHash::update(hash, (size_t) getActionType());
+	return MurmurHash::finish(hash, 1);
 }
 
-bool LexerSkipAction::operator == (const LexerAction &obj) const {
-  return &obj == this;
+bool LexerSkipAction::operator ==(const LexerAction &obj) const {
+	return &obj == this;
 }
 
 std::string LexerSkipAction::toString() const {
-  return "skip";
+	return "skip";
 }

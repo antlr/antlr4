@@ -34,6 +34,8 @@
 #include "atn/LexerAction.h"
 #include "atn/LexerActionType.h"
 
+#include <memory>
+
 namespace antlr4 {
 namespace atn {
 
@@ -51,7 +53,7 @@ namespace atn {
     /// <summary>
     /// Provides a singleton instance of this parameterless lexer action.
     /// </summary>
-    static const Ref<LexerPopModeAction> INSTANCE;
+    static const Ref<LexerPopModeAction> getInstance();
 
     /// <summary>
     /// {@inheritDoc} </summary>
