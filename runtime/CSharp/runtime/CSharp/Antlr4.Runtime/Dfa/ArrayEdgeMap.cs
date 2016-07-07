@@ -34,7 +34,7 @@ using Antlr4.Runtime.Dfa;
 using Antlr4.Runtime.Sharpen;
 using Interlocked = System.Threading.Interlocked;
 
-#if NET45PLUS
+#if NET45PLUS || DOTNETCORE
 using Volatile = System.Threading.Volatile;
 #elif !PORTABLE && !COMPACT
 using Thread = System.Threading.Thread;
@@ -60,7 +60,7 @@ namespace Antlr4.Runtime.Dfa
         {
             get
             {
-#if NET45PLUS
+#if NET45PLUS || DOTNETCORE
                 return Volatile.Read(ref size);
 #elif !PORTABLE && !COMPACT
                 return Thread.VolatileRead(ref size);

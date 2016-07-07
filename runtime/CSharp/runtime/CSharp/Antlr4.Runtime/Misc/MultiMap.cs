@@ -34,7 +34,9 @@ using Antlr4.Runtime.Sharpen;
 
 namespace Antlr4.Runtime.Misc
 {
+#if !DOTNETCORE
     [System.Serializable]
+#endif
     public class MultiMap<K, V> : Dictionary<K, IList<V>>
     {
         private const long serialVersionUID = -4956746660057462312L;
