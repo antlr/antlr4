@@ -17,6 +17,8 @@ user.build.properties
 bin/
 obj/
 *.userprefs
+*.user
+.vs/
 
 # NetBeans user configuration files
 nbactions*.xml
