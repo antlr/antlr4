@@ -19,6 +19,7 @@ obj/
 *.userprefs
 *.user
 .vs/
+project.lock.json
 
 # NetBeans user configuration files
 nbactions*.xml
