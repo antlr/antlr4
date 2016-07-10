@@ -44,9 +44,7 @@ namespace Antlr4.Runtime
     /// of the offending input and also knows where the parser was
     /// in the various paths when the error. Reported by reportNoViableAlternative()
     /// </remarks>
-#if !DOTNETCORE
     [System.Serializable]
-#endif
     public class NoViableAltException : RecognitionException
     {
         private const long serialVersionUID = 5096000008992867052L;

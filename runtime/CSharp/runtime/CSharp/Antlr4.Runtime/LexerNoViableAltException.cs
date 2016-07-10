@@ -35,9 +35,7 @@ using Antlr4.Runtime.Sharpen;
 
 namespace Antlr4.Runtime
 {
-#if !DOTNETCORE
     [System.Serializable]
-#endif
     public class LexerNoViableAltException : RecognitionException
     {
         private const long serialVersionUID = -730999203913001726L;

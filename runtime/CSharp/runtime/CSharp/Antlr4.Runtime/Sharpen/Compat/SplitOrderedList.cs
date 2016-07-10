@@ -28,9 +28,6 @@ using System;
 using System.Threading;
 using System.Collections;
 using System.Collections.Generic;
-#if !DOTNETCORE
-using System.Runtime.Serialization;
-#endif
 
 namespace Antlr4.Runtime.Sharpen
 {

@@ -34,9 +34,7 @@ using Antlr4.Runtime.Sharpen;
 
 namespace Antlr4.Runtime
 {
-#if !DOTNETCORE
     [System.Serializable]
-#endif
     public class CommonToken : IWritableToken
     {
         private const long serialVersionUID = -6708843461296520577L;

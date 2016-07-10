@@ -1,4 +1,5 @@
-﻿#if PORTABLE
+﻿
+#if PORTABLE || DOTNETCORE
 
 namespace System
 {
