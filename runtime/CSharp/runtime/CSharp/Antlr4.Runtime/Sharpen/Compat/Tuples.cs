@@ -27,7 +27,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-#if !NET40PLUS && !DOTNETCORE
+#if !NET40PLUS
 
 using System;
 using System.Collections;

@@ -1,6 +1,6 @@
 {
   "buildOptions": {
-    "define": [ "DEBUG", "TRACE", "DOTNETCORE" ],
+    "define": [ "DEBUG", "TRACE", "DOTNETCORE", "NET40PLUS", "NET45PLUS" ],
     "keyFile": "../Antlr4.snk",
     "xmlDoc": true
   },
