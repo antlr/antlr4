@@ -413,7 +413,7 @@ func NewLeafListener() *LeafListener {
 }
 
 func (*LeafListener) ExitCall(ctx *CallContext) {
-	fmt.Printf("%s %s", ctx.E().GetStart().GetText(), ctx.EList())
+	fmt.Printf("%s %s", ctx.E().GetStart().GetText(), ctx.EList().String(nil, nil))
 }
 
 func (*LeafListener) ExitInt(ctx *IntContext) {
