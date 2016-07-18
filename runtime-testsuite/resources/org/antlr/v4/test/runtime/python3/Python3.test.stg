@@ -241,6 +241,10 @@ LL_EXACT_AMBIG_DETECTION() ::= <<self._interp.predictionMode =  PredictionMode.L
 
 ParserToken(parser, token) ::= <%<parser>.<token>%>
 
+Production(p) ::= <%<p>%>
+
+Result(r) ::= <%<r>%>
+
 ParserPropertyMember() ::= <<
 @members {
 def Property(self):

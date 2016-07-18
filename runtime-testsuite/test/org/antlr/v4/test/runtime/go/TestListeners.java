@@ -62,7 +62,7 @@ public class TestListeners extends BaseTest {
 	@Test
 	public void testLR() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(723);
+		StringBuilder grammarBuilder = new StringBuilder(718);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("@parser::header {\n");
 		grammarBuilder.append("}\n");
@@ -78,7 +78,7 @@ public class TestListeners extends BaseTest {
 		grammarBuilder.append("\n");
 		grammarBuilder.append("func (*LeafListener) ExitE(ctx *EContext) {\n");
 		grammarBuilder.append("	if ctx.GetChildCount() == 3 {\n");
-		grammarBuilder.append("		fmt.Printf(\"%s %s %s\\n\", ctx.E(0)[0].GetStart().GetText(), ctx.E(1)[0].GetStart().GetText(), ctx.E(-1)[0].GetStart().GetText())\n");
+		grammarBuilder.append("		fmt.Printf(\"%s %s %s\\n\", ctx.E(0).GetStart().GetText(), ctx.E(1).GetStart().GetText(), ctx.AllE()[0].GetStart().GetText())\n");
 		grammarBuilder.append("	} else {\n");
 		grammarBuilder.append("		fmt.Println(ctx.INT().GetSymbol().GetText())\n");
 		grammarBuilder.append("	}\n");
@@ -177,7 +177,7 @@ public class TestListeners extends BaseTest {
 	@Test
 	public void testRuleGetters_1() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(749);
+		StringBuilder grammarBuilder = new StringBuilder(741);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("@parser::header {\n");
 		grammarBuilder.append("}\n");
@@ -193,9 +193,9 @@ public class TestListeners extends BaseTest {
 		grammarBuilder.append("\n");
 		grammarBuilder.append("func (*LeafListener) ExitA(ctx *AContext) {\n");
 		grammarBuilder.append("	if ctx.GetChildCount() == 2 {\n");
-		grammarBuilder.append("		fmt.Printf(\"%s %s %s\", ctx.B(0)[0].GetStart().GetText(), ctx.B(1)[0].GetStart().GetText(), ctx.B(-1)[0].GetStart().GetText())\n");
+		grammarBuilder.append("		fmt.Printf(\"%s %s %s\", ctx.B(0).GetStart().GetText(), ctx.B(1).GetStart().GetText(), ctx.AllB()[0].GetStart().GetText())\n");
 		grammarBuilder.append("	} else {\n");
-		grammarBuilder.append("		fmt.Println(ctx.B(0)[0].GetStart().GetText())\n");
+		grammarBuilder.append("		fmt.Println(ctx.B(0).GetStart().GetText())\n");
 		grammarBuilder.append("	}\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("}\n");
@@ -231,7 +231,7 @@ public class TestListeners extends BaseTest {
 	@Test
 	public void testRuleGetters_2() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(749);
+		StringBuilder grammarBuilder = new StringBuilder(741);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("@parser::header {\n");
 		grammarBuilder.append("}\n");
@@ -247,9 +247,9 @@ public class TestListeners extends BaseTest {
 		grammarBuilder.append("\n");
 		grammarBuilder.append("func (*LeafListener) ExitA(ctx *AContext) {\n");
 		grammarBuilder.append("	if ctx.GetChildCount() == 2 {\n");
-		grammarBuilder.append("		fmt.Printf(\"%s %s %s\", ctx.B(0)[0].GetStart().GetText(), ctx.B(1)[0].GetStart().GetText(), ctx.B(-1)[0].GetStart().GetText())\n");
+		grammarBuilder.append("		fmt.Printf(\"%s %s %s\", ctx.B(0).GetStart().GetText(), ctx.B(1).GetStart().GetText(), ctx.AllB()[0].GetStart().GetText())\n");
 		grammarBuilder.append("	} else {\n");
-		grammarBuilder.append("		fmt.Println(ctx.B(0)[0].GetStart().GetText())\n");
+		grammarBuilder.append("		fmt.Println(ctx.B(0).GetStart().GetText())\n");
 		grammarBuilder.append("	}\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("}\n");
@@ -285,7 +285,7 @@ public class TestListeners extends BaseTest {
 	@Test
 	public void testTokenGetters_1() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(681);
+		StringBuilder grammarBuilder = new StringBuilder(674);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("@parser::header {\n");
 		grammarBuilder.append("}\n");
@@ -301,7 +301,7 @@ public class TestListeners extends BaseTest {
 		grammarBuilder.append("\n");
 		grammarBuilder.append("func (*LeafListener) ExitA(ctx *AContext) {\n");
 		grammarBuilder.append("	if ctx.GetChildCount() == 2 {\n");
-		grammarBuilder.append("		fmt.Printf(\"%s %s %s\", ctx.INT(0)[0].GetSymbol().GetText(), ctx.INT(1)[0].GetSymbol().GetText(), ctx.INT(0)[0])\n");
+		grammarBuilder.append("		fmt.Printf(\"%s %s %s\", ctx.INT(0).GetSymbol().GetText(), ctx.INT(1).GetSymbol().GetText(), ctx.AllINT())\n");
 		grammarBuilder.append("	} else {\n");
 		grammarBuilder.append("		fmt.Println(ctx.ID().GetSymbol())\n");
 		grammarBuilder.append("	}\n");
@@ -338,7 +338,7 @@ public class TestListeners extends BaseTest {
 	@Test
 	public void testTokenGetters_2() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(681);
+		StringBuilder grammarBuilder = new StringBuilder(674);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("@parser::header {\n");
 		grammarBuilder.append("}\n");
@@ -354,7 +354,7 @@ public class TestListeners extends BaseTest {
 		grammarBuilder.append("\n");
 		grammarBuilder.append("func (*LeafListener) ExitA(ctx *AContext) {\n");
 		grammarBuilder.append("	if ctx.GetChildCount() == 2 {\n");
-		grammarBuilder.append("		fmt.Printf(\"%s %s %s\", ctx.INT(0)[0].GetSymbol().GetText(), ctx.INT(1)[0].GetSymbol().GetText(), ctx.INT(0)[0])\n");
+		grammarBuilder.append("		fmt.Printf(\"%s %s %s\", ctx.INT(0).GetSymbol().GetText(), ctx.INT(1).GetSymbol().GetText(), ctx.AllINT())\n");
 		grammarBuilder.append("	} else {\n");
 		grammarBuilder.append("		fmt.Println(ctx.ID().GetSymbol())\n");
 		grammarBuilder.append("	}\n");

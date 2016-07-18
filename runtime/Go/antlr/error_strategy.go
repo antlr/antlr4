@@ -26,6 +26,8 @@ type DefaultErrorStrategy struct {
 	lastErrorStates   *IntervalSet
 }
 
+var _ ErrorStrategy = &DefaultErrorStrategy{}
+
 func NewDefaultErrorStrategy() *DefaultErrorStrategy {
 
 	d := new(DefaultErrorStrategy)
@@ -737,6 +739,8 @@ type BailErrorStrategy struct {
 	*DefaultErrorStrategy
 }
 
+var _ ErrorStrategy = &BailErrorStrategy{}
+
 func NewBailErrorStrategy() *BailErrorStrategy {
 
 	b := new(BailErrorStrategy)
@@ -763,8 +767,10 @@ func (b *BailErrorStrategy) Recover(recognizer Parser, e RecognitionException) {
 // Make sure we don't attempt to recover inline if the parser
 // successfully recovers, it won't panic an exception.
 //
-func (b *BailErrorStrategy) RecoverInline(recognizer Parser) {
+func (b *BailErrorStrategy) RecoverInline(recognizer Parser) Token {
 	b.Recover(recognizer, NewInputMisMatchException(recognizer))
+
+	return nil
 }
 
 // Make sure we don't attempt to recover from problems in subrules.//

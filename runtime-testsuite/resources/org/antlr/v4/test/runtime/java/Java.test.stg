@@ -235,6 +235,10 @@ LL_EXACT_AMBIG_DETECTION() ::= <<_interp.setPredictionMode(PredictionMode.LL_EXA
 
 ParserToken(parser, token) ::= <%<parser>.<token>%>
 
+Production(p) ::= <%<p>%>
+
+Result(r) ::= <%<r>%>
+
 ParserPropertyMember() ::= <<
 @members {
 boolean Property() {

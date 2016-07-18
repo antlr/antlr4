@@ -599,10 +599,10 @@ public class TestParserExec extends BaseTest {
 	@Test
 	public void testPredictionIssue334() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(251);
+		StringBuilder grammarBuilder = new StringBuilder(255);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("file_ @init{\n");
-		grammarBuilder.append("p.SetErrorHandler(p.NewBailErrorStrategy())\n");
+		grammarBuilder.append("p.SetErrorHandler(antlr.NewBailErrorStrategy())\n");
 		grammarBuilder.append("} \n");
 		grammarBuilder.append("@after {\n");
 		grammarBuilder.append("fmt.Println($ctx.ToStringTree(nil, p))\n");

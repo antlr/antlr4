@@ -347,7 +347,7 @@ func (l *<lexer.name>) <r.name; format="cap">_Action(localctx <if(r.isRuleContex
  * overriding implementation impossible to maintain.
  */
 RuleSempredFunction(r, actions) ::= <<
-func (p *<if(parser)><parser.name><else><lexer.name><endif>) <r.name; format="cap">_Sempred(localctx antlr.RuleContext, predIndex int) bool {
+func (p *<r.recognizerName>) <r.name; format="cap">_Sempred(localctx antlr.RuleContext, predIndex int) bool {
 	switch predIndex {
 	<if(actions)>
 	<actions:{index | case <index>:
@@ -371,7 +371,7 @@ RuleFunction(currentRule, args, code, locals, ruleCtx, altLabelCtxs, namedAction
 
 
 <endif>
-func (p *<parser.name>) <currentRule.name; format="cap">(<currentRule.args:{a | <a.name> <a.type>}; separator=", ">) (localctx I<currentRule.ctxType>) {
+func (p *<currentRule.recognizerName>) <currentRule.name; format="cap">(<currentRule.args:{a | <a.name> <a.type>}; separator=", ">) (localctx I<currentRule.ctxType>) {
 	localctx = New<currentRule.ctxType>(p, p.GetParserRuleContext(), p.GetState()<currentRule.args:{a | , <a.name>}>)
 	p.EnterRule(localctx, <currentRule.startState>, <parser.name>RULE_<currentRule.name>)
 	<if(namedActions.init)>
@@ -429,13 +429,18 @@ LeftRecursiveRuleFunction(currentRule, args, code, locals, ruleCtx, altLabelCtxs
 <ruleCtx>
 
 
+
 <endif>
 <if(altLabelCtxs)>
 <altLabelCtxs:{l | <altLabelCtxs.(l)>}; separator="\n\n">
 
 
 <endif>
-func (p *<parser.name>) <currentRule.name; format="cap">(_p int<if(currentRule.args)>, <args:{a | , <a.name> <a.type>}><endif>) (localctx I<currentRule.ctxType>) {
+func (p *<currentRule.recognizerName>) <currentRule.name; format="cap">(<args:{a | <a.name> <a.type>}; separator=", ">) (localctx I<currentRule.ctxType>) {
+	return p.<currentRule.name>(0<args:{a | , <a.name>}>)
+}
+
+func (p *<currentRule.recognizerName>) <currentRule.name>(_p int<args:{a | , <a.name> <a.type>}>) (localctx I<currentRule.ctxType>) {
 	var _parentctx antlr.ParserRuleContext = p.GetParserRuleContext()
 	_parentState := p.GetState()
 	localctx = New<currentRule.ctxType>(p, p.GetParserRuleContext(), _parentState<args:{a | , <a.name>}>)
@@ -731,11 +736,20 @@ InvokeRule(r, argExprsChunks) ::= <<
 p.SetState(<r.stateNumber>)
 <if(r.labels)>
 
-var _x = p.<r.name; format="cap">(<if(r.ast.options.p)><r.ast.options.p><if(argExprsChunks)>,<endif><endif><argExprsChunks>)
+<if(r.ast.options.p)>
+var _x = p.<r.name>(<r.ast.options.p><if(argExprsChunks)>, <endif><argExprsChunks>)
+<else>
+var _x = p.<r.name; format="cap">(<argExprsChunks>)
+<endif>
+
 
 <r.labels:{l | <labelref(l)> = _x}; separator="\n">
 <else>
-p.<r.name; format="cap">(<if(r.ast.options.p)><r.ast.options.p><if(argExprsChunks)>,<endif><endif><argExprsChunks>)
+<if(r.ast.options.p)>
+p.<r.name>(<r.ast.options.p><if(argExprsChunks)>, <endif><argExprsChunks>)
+<else>
+p.<r.name; format="cap">(<argExprsChunks>)
+<endif>
 <endif>
 >>
 
@@ -881,58 +895,54 @@ ContextTokenGetterDecl(t) ::= <<
 }
 >>
 
-// should never be called
 ContextTokenListGetterDecl(t) ::= <<
-fail: ContextTokenListGetterDecl should never be called!
+All<t.name; format="cap">() []antlr.TerminalNode {
+	return s.GetTokens(<parser.name><t.name>)
+}
 >>
 
 ContextTokenListIndexedGetterDecl(t) ::= <<
-<t.name; format="cap">(i int) []antlr.TerminalNode {
-	if i \< 0 {
-		return s.GetTokens(<parser.name><t.name>)
-	} else {
-		return []antlr.TerminalNode{s.GetToken(<parser.name><t.name>, i)}
-	}
+<t.name; format="cap">(i int) antlr.TerminalNode {
+	return s.GetToken(<parser.name><t.name>, i)
 }
 >>
 
 ContextRuleGetterDecl(r) ::= <<
 <r.name; format="cap">() I<r.ctxName> {
-	v := s.GetTypedRuleContext(reflect.TypeOf((*I<r.ctxName>)(nil)).Elem(), 0)
+	var t = s.GetTypedRuleContext(reflect.TypeOf((*I<r.ctxName>)(nil)).Elem(), 0)
 
-	if v == nil {
+	if t == nil {
 		return nil
 	}
 
-	return v.(I<r.ctxName>)
+	return t.(I<r.ctxName>)
 }
 >>
 
-// should never be called
 ContextRuleListGetterDecl(r) ::= <<
-fail: ContextRuleListGetterDecl should never be called!
->>
+All<r.name; format="cap">() []I<r.ctxName> {
+	var ts = s.GetTypedRuleContexts(reflect.TypeOf((*I<r.ctxName>)(nil)).Elem())
+	var tst = make([]I<r.ctxName>, len(ts))
 
-ContextRuleListIndexedGetterDecl(r) ::= <<
-<r.name; format="cap">(i int) []I<r.ctxName> {
-	var ts []antlr.RuleContext
-
-	if i \< 0 {
-		ts = s.GetTypedRuleContexts(reflect.TypeOf((*I<r.ctxName>)(nil)).Elem())
-	} else {
-		ts = []antlr.RuleContext{s.GetTypedRuleContext(reflect.TypeOf((*I<r.ctxName>)(nil)).Elem(), i)}
-	}
-
-	var tst []I<r.ctxName> = make([]I<r.ctxName>, len(ts))
 	for i, t := range ts {
-		if t == nil {
-			tst[i] = nil
-		} else {
+		if t != nil {
 			tst[i] = t.(I<r.ctxName>)
 		}
 	}
 
 	return tst
+}
+>>
+
+ContextRuleListIndexedGetterDecl(r) ::= <<
+<r.name; format="cap">(i int) I<r.ctxName> {
+	var t = s.GetTypedRuleContext(reflect.TypeOf((*I<r.ctxName>)(nil)).Elem(), i)
+
+	if t == nil {
+		return nil
+	}
+
+	return t.(I<r.ctxName>)
 }
 >>
 
