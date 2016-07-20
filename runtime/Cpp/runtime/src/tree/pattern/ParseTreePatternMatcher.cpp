@@ -101,7 +101,7 @@ ParseTreeMatch ParseTreePatternMatcher::match(Ref<ParseTree> const& tree, const 
 }
 
 ParseTreePattern ParseTreePatternMatcher::compile(const std::string &pattern, int patternRuleIndex) {
-  ListTokenSource tokenSrc(std::move(tokenize(pattern)));
+  ListTokenSource tokenSrc(tokenize(pattern));
   CommonTokenStream tokens(&tokenSrc);
 
   ParserInterpreter parserInterp(_parser->getGrammarFileName(), _parser->getVocabulary(),
