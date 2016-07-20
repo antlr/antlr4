@@ -30,122 +30,74 @@
 
 package org.antlr.v4.runtime.tree;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
+
+import org.antlr.v4.runtime.misc.IntegerStack;
+
 /**
  * An iterative (read: non-recursive) pre-order and post-order tree walker that
- * doesn't use the thread stack but it's own heap-based stack using linked data
- * structures. Makes it possible to process deeply nested parse trees.
+ * doesn't use the thread stack but heap-based stacks. Makes it possible to
+ * process deeply nested parse trees.
  */
 public class IterativeParseTreeWalker extends ParseTreeWalker {
-    public static final ParseTreeWalker DEFAULT = new IterativeParseTreeWalker();
 
-    @Override
-    public void walk(final ParseTreeListener listener, final ParseTree t) {
-        for (WalkerNode<?> currentNode = createNode(null, t, 0); currentNode != null;) {
-            currentNode.enter(listener); // Pre order visit
+	@Override
+	public void walk(ParseTreeListener listener, ParseTree t) {
 
-            // Move down to first child
-            WalkerNode<?> nextNode = currentNode.getFirstChild();
-            if (nextNode != null) {
-                currentNode = nextNode;
-                continue;
-            }
+		final Deque<ParseTree> nodeStack = new ArrayDeque<ParseTree>();
+		final IntegerStack indexStack = new IntegerStack();
 
-            // No child nodes, so walk tree
-            while (currentNode != null) {
-                currentNode.exit(listener); // Post order visit
+		ParseTree currentNode = t;
+		int currentIndex = 0;
 
-                // Move to sibling if possible
-                nextNode = currentNode.getNextSibling();
-                if (nextNode != null) {
-                    currentNode = nextNode;
-                    break;
-                }
+		while (currentNode != null) {
 
-                // Move up
-                currentNode = currentNode.getParentNode();
-            }
-        }
-    }
+			// pre-order visit
+			if (currentNode instanceof ErrorNode) {
+				listener.visitErrorNode((ErrorNode) currentNode);
+			} else if (currentNode instanceof TerminalNode) {
+				listener.visitTerminal((TerminalNode) currentNode);
+			} else {
+				final RuleNode r = (RuleNode) currentNode;
+				enterRule(listener, r);
+			}
 
-    protected WalkerNode<?> createNode(final WalkerNode<?> parent, final ParseTree self, final int pos) {
-        if (self instanceof ErrorNode) {
-            return new ErrorWalkerNode(parent, (ErrorNode) self, pos);
-        } else if (self instanceof TerminalNode) {
-            return new TerminalWalkerNode(parent, (TerminalNode) self, pos);
-        } else {
-            return new RuleWalkerNode(parent, (RuleNode) self, pos);
-        }
-    }
+			// Move down to first child, if exists
+			if (currentNode.getChildCount() > 0) {
+				nodeStack.push(currentNode);
+				indexStack.push(currentIndex);
+				currentIndex = 0;
+				currentNode = currentNode.getChild(0);
+				continue;
+			}
 
-    protected abstract class WalkerNode<N extends ParseTree> {
-        private final WalkerNode<?> parent;
-        protected final N self;
-        private final int pos;
+			// No child nodes, so walk tree
+			do {
 
-        protected WalkerNode(final WalkerNode<?> parent, final N self, final int pos) {
-            this.parent = parent;
-            this.self = self;
-            this.pos = pos;
-        }
+				// post-order visit
+				if (currentNode instanceof RuleNode) {
+					exitRule(listener, (RuleNode) currentNode);
+				}
 
-        public WalkerNode<?> getFirstChild() {
-            return self.getChildCount() > 0 ? createChildNode(0) : null;
-        }
+				// No parent, so no siblings
+				if (nodeStack.isEmpty()) {
+					currentNode = null;
+					currentIndex = 0;
+					break;
+				}
 
-        public WalkerNode<?> getNextSibling() {
-            return parent != null && parent.self.getChildCount() > pos + 1 ? parent.createChildNode(pos + 1) : null;
-        }
+				// Move to next sibling if possible
+				currentNode = nodeStack.peek().getChild(++currentIndex);
+				if (currentNode != null) {
+					break;
+				}
 
-        public WalkerNode<?> getParentNode() {
-            return parent;
-        }
+				// No next, sibling, so move up
+				currentNode = nodeStack.pop();
+				currentIndex = indexStack.pop();
 
-        public abstract void enter(ParseTreeListener listener);
-
-        public void exit(final ParseTreeListener listener) {
-            // defaults to do nothing
-        }
-
-        protected WalkerNode<?> createChildNode(final int pos) {
-            return createNode(this, self.getChild(pos), pos);
-        }
-    }
-
-    protected class RuleWalkerNode extends WalkerNode<RuleNode> {
-        public RuleWalkerNode(final WalkerNode<?> parent, final RuleNode self, final int pos) {
-            super(parent, self, pos);
-        }
-
-        @Override
-        public void enter(final ParseTreeListener listener) {
-            enterRule(listener, self);
-        }
-
-        @Override
-        public void exit(final ParseTreeListener listener) {
-            exitRule(listener, self);
-        }
-    }
-
-    protected class ErrorWalkerNode extends WalkerNode<ErrorNode> {
-        public ErrorWalkerNode(final WalkerNode<?> parent, final ErrorNode self, final int pos) {
-            super(parent, self, pos);
-        }
-
-        @Override
-        public void enter(final ParseTreeListener listener) {
-            listener.visitErrorNode(self);
-        }
-    }
-
-    protected class TerminalWalkerNode extends WalkerNode<TerminalNode> {
-        public TerminalWalkerNode(final WalkerNode<?> parent, final TerminalNode self, final int pos) {
-            super(parent, self, pos);
-        }
-
-        @Override
-        public void enter(final ParseTreeListener listener) {
-            listener.visitTerminal(self);
-        }
-    }
+			} while (currentNode != null);
+		}
+	}
 }
