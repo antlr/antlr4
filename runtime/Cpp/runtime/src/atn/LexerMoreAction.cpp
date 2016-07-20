@@ -39,9 +39,8 @@ using namespace antlr4::atn;
 using namespace antlr4::misc;
 
 const Ref<LexerMoreAction> LexerMoreAction::getInstance() {
-	static Ref<LexerMoreAction> instance = std::shared_ptr<LexerMoreAction>(
-			new LexerMoreAction());
-	return instance;
+  static Ref<LexerMoreAction> instance(new LexerMoreAction());
+  return instance;
 }
 
 LexerMoreAction::LexerMoreAction() {
