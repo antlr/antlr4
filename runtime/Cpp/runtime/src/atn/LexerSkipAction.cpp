@@ -38,7 +38,11 @@ using namespace antlr4;
 using namespace antlr4::atn;
 using namespace antlr4::misc;
 
-const Ref<LexerSkipAction> LexerSkipAction::INSTANCE { new LexerSkipAction() };
+const Ref<LexerSkipAction> LexerSkipAction::getInstance() {
+  static Ref<LexerSkipAction> instance = std::shared_ptr<LexerSkipAction>(
+			new LexerSkipAction());
+  return instance;
+}
 
 LexerSkipAction::LexerSkipAction() {
 }
@@ -57,11 +61,11 @@ void LexerSkipAction::execute(Lexer *lexer) {
 
 size_t LexerSkipAction::hashCode() const {
   size_t hash = MurmurHash::initialize();
-  hash = MurmurHash::update(hash, (size_t)getActionType());
+  hash = MurmurHash::update(hash, (size_t) getActionType());
   return MurmurHash::finish(hash, 1);
 }
 
-bool LexerSkipAction::operator == (const LexerAction &obj) const {
+bool LexerSkipAction::operator ==(const LexerAction &obj) const {
   return &obj == this;
 }
 
