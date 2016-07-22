@@ -45,13 +45,14 @@ namespace tree {
   /// operations with no return type. </param>
   template<typename T>
   class ANTLR4CPP_PUBLIC ParseTreeVisitor {
-
+  public:
+    virtual ~ParseTreeVisitor() {}
+    
     /// <summary>
     /// Visit a parse tree, and return a user-defined result of the operation.
     /// </summary>
     /// <param name="tree"> The <seealso cref="ParseTree"/> to visit. </param>
     /// <returns> The result of visiting the parse tree. </returns>
-  public:
     virtual T* visit(ParseTree *tree) = 0;
 
     /// <summary>
