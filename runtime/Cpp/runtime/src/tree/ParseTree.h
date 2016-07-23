@@ -67,6 +67,7 @@ namespace tree {
     /// 	based upon the parser.
     /// </summary>
     virtual std::string toStringTree(Parser *parser) = 0;
+    using Tree::toStringTree;
   };
 
 } // namespace tree

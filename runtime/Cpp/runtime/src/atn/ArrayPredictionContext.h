@@ -62,7 +62,7 @@ namespace atn {
     virtual int getReturnState(size_t index) const override;
     bool operator == (const PredictionContext &o) const override;
 
-    virtual std::string toString();
+    virtual std::string toString() const override;
   private:
     std::vector<Ref<PredictionContext>> makeRef(const std::vector<std::weak_ptr<PredictionContext>> &input);
   };

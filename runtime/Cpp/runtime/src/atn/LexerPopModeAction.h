@@ -51,7 +51,7 @@ namespace atn {
     /// <summary>
     /// Provides a singleton instance of this parameterless lexer action.
     /// </summary>
-    static const Ref<LexerPopModeAction> INSTANCE;
+    static const Ref<LexerPopModeAction> getInstance();
 
     /// <summary>
     /// {@inheritDoc} </summary>

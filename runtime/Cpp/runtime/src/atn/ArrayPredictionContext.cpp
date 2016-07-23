@@ -78,7 +78,7 @@ bool ArrayPredictionContext::operator == (PredictionContext const& o) const {
     antlrcpp::Arrays::equals(parents, other->parents);
 }
 
-std::string ArrayPredictionContext::toString() {
+std::string ArrayPredictionContext::toString() const {
   if (isEmpty()) {
     return "[]";
   }

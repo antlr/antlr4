@@ -49,7 +49,7 @@ namespace atn {
   class ANTLR4CPP_PUBLIC LexerSkipAction final : public LexerAction {
   public:
     /// Provides a singleton instance of this parameterless lexer action.
-    static const Ref<LexerSkipAction> INSTANCE;
+    static const Ref<LexerSkipAction> getInstance();
 
     /// <summary>
     /// {@inheritDoc} </summary>

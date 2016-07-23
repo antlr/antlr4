@@ -18,6 +18,8 @@ if(NOT WITH_DEMO)
     FORCE)
 endif(NOT WITH_DEMO)
 
+option(WITH_LIBCXX "Building with clang++ and libc++(in Linux). To enable with: -DWITH_LIBCXX=On" On)
+
 project(LIBANTLR4)
 
 if(CMAKE_VERSION VERSION_EQUAL "3.0.0" OR
@@ -36,11 +38,12 @@ if(APPLE)
   find_library(COREFOUNDATION_LIBRARY CoreFoundation)
 endif()
 
-find_package(Java REQUIRED)
-
 file(STRINGS "VERSION" ANTLR_VERSION)
 
 if (WITH_DEMO)
+  # Java is not necessary if building without demos.
+  find_package(Java REQUIRED)
+
   if (NOT ANTLR_JAR_LOCATION)
     message(FATAL_ERROR "Missing antlr4.jar location. You can specify it's path using: -DANTLR_JAR_LOCATION=<path>")
   else()
@@ -56,18 +59,21 @@ endif(WITH_DEMO)
 set(MY_CXX_WARNING_FLAGS "  -Wall -pedantic -W")
 
 # Initialize CXXFLAGS.
-set(CMAKE_CXX_FLAGS                "${CMAKE_CXX_FLAGS} -Wall -std=c++11 ${MY_CXX_WARNING_FLAGS}")
-set(CMAKE_CXX_FLAGS_DEBUG          "${CMAKE_CXX_FLAGS_DEBUG} -O0 -g -std=c++11 ${MY_CXX_WARNING_FLAGS}")
-set(CMAKE_CXX_FLAGS_MINSIZEREL     "${CMAKE_CXX_FLAGS_MINSIZEREL} -Os -DNDEBUG -std=c++11 ${MY_CXX_WARNING_FLAGS}")
-set(CMAKE_CXX_FLAGS_RELEASE        "${CMAKE_CXX_FLAGS_RELEASE} -O3 -DNDEBUG -std=c++11 ${MY_CXX_WARNING_FLGAS}")
-set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -O2 -g -std=c++11 ${MY_CXX_WARNING_FLAGS}")
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_FLAGS                "${CMAKE_CXX_FLAGS} -Wall ${MY_CXX_WARNING_FLAGS}")
+set(CMAKE_CXX_FLAGS_DEBUG          "${CMAKE_CXX_FLAGS_DEBUG} -O0 -g ${MY_CXX_WARNING_FLAGS}")
+set(CMAKE_CXX_FLAGS_MINSIZEREL     "${CMAKE_CXX_FLAGS_MINSIZEREL} -Os -DNDEBUG ${MY_CXX_WARNING_FLAGS}")
+set(CMAKE_CXX_FLAGS_RELEASE        "${CMAKE_CXX_FLAGS_RELEASE} -O3 -DNDEBUG ${MY_CXX_WARNING_FLGAS}")
+set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -O2 -g ${MY_CXX_WARNING_FLAGS}")
 
 # Compiler-specific C++11 activation.
 if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
     execute_process(
         COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
-    if (NOT (GCC_VERSION VERSION_GREATER 4.7 OR GCC_VERSION VERSION_EQUAL 4.7))
-        message(FATAL_ERROR "${PROJECT_NAME} requires g++ 4.7 or greater.")
+    # Just g++-5.0 and greater contain <codecvt> header. (test in ubuntu)
+    if (NOT (GCC_VERSION VERSION_GREATER 5.0 OR GCC_VERSION VERSION_EQUAL 5.0))
+        message(FATAL_ERROR "${PROJECT_NAME} requires g++ 5.0 or greater.")
     endif ()
 elseif ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang" AND APPLE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
@@ -77,6 +83,10 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang" AND CMAKE_SYSTEM_NAME MATCHES
     if (NOT (CLANG_VERSION VERSION_GREATER 4.2.1 OR CLANG_VERSION VERSION_EQUAL 4.2.1))
         message(FATAL_ERROR "${PROJECT_NAME} requires clang 4.2.1 or greater.")
     endif ()
+    # You can use libc++ to compile this project when g++ is NOT greater than or equal to 5.0.
+    if (WITH_LIBCXX)
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
+    endif()
 else ()
     message(FATAL_ERROR "Your C++ compiler does not support C++11.")
 endif ()

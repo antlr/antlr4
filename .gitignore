@@ -64,3 +64,4 @@ tool-testsuite/target
 runtime/Cpp/demo/generated
 xcuserdata
 *.jar
+.vscode

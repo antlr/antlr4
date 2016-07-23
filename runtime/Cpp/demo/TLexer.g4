@@ -35,7 +35,7 @@ void myBarLexerAction() { /* do something*/ };
 // Appears in line with the other class member definitions in the cpp file.
 @lexer::definitions {/* lexer definitions section */}
 
-channels { COMMENTS_CHANNEL, DIRECTIVE }
+channels { CommentsChannel, DirectiveChannel }
 
 tokens {
 	DUMMY	
@@ -65,7 +65,7 @@ ClosePar: ')';
 OpenCurly: '{' -> pushMode(Mode1);
 CloseCurly: '}' -> popMode;
 QuestionMark: '?';
-Comma: ',';
+Comma: ',' -> skip;
 Dollar: '$' -> more, mode(Mode1), type(DUMMY);
 		   
 String: '"' .*? '"';
@@ -73,7 +73,7 @@ Foo: {canTestFoo()}? 'foo' {isItFoo()}? { myFooLexerAction(); };
 Bar: 'bar' {isItBar()}? { myBarLexerAction(); };
 Any: Foo Dot Bar? DotDot Baz;
 
-Comment : '#' ~[\r\n]* '\r'? '\n' -> skip ;
+Comment : '#' ~[\r\n]* '\r'? '\n' -> channel(CommentsChannel);
 WS: [ \t\r\n]+ -> channel(99);
 
 fragment Baz: 'Baz';
