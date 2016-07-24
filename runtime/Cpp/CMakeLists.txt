@@ -1,3 +1,4 @@
+# -*- mode:cmake -*-
 cmake_minimum_required (VERSION 2.8)
 # 2.8 needed because of ExternalProject
 
@@ -42,7 +43,7 @@ file(STRINGS "VERSION" ANTLR_VERSION)
 
 if (WITH_DEMO)
   # Java is not necessary if building without demos.
-  find_package(Java REQUIRED)
+  find_package(Java COMPONENTS Runtime REQUIRED)
 
   if (NOT ANTLR_JAR_LOCATION)
     message(FATAL_ERROR "Missing antlr4.jar location. You can specify it's path using: -DANTLR_JAR_LOCATION=<path>")
