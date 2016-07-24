@@ -26,6 +26,9 @@
 # 
 # LIST( APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake )
 #
+# # compiler must be 11 or 14
+# SET (CMAKE_CXX_STANDARD 11)
+#
 # # set variable pointing to the antlr tool that supports C++
 # set(ANTLR4CPP_JAR_LOCATION /home/user/antlr4-4.5.4-SNAPSHOT.jar)
 # # add external build for antlrcpp
