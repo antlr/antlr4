@@ -1,17 +1,33 @@
+# -*- mode:cmake -*-
 if(NOT UNIX)
   message(FATAL "Unsupported operating system")
 endif()
 
+set(antlr4-demo-GENERATED_SRC
+   ${PROJECT_SOURCE_DIR}/demo/generated/TLexer.cpp 
+   ${PROJECT_SOURCE_DIR}/demo/generated/TParser.cpp
+   ${PROJECT_SOURCE_DIR}/demo/generated/TParserBaseListener.cpp
+   ${PROJECT_SOURCE_DIR}/demo/generated/TParserBaseVisitor.cpp
+   ${PROJECT_SOURCE_DIR}/demo/generated/TParserListener.cpp
+   ${PROJECT_SOURCE_DIR}/demo/generated/TParserVisitor.cpp
+ )
+
+foreach( src_file ${antlr4-demo-GENERATED_SRC} )
+      set_source_files_properties(
+          ${src_file}
+          PROPERTIES
+          GENERATED TRUE
+          )
+endforeach( src_file ${antlr4-demo-GENERATED_SRC} )
 
 add_custom_target(GenerateParser
-   COMMAND
+   COMMAND 
    ${CMAKE_COMMAND} -E make_directory ${PROJECT_SOURCE_DIR}/demo/generated/
    COMMAND
-   "${Java_JAVA_EXECUTABLE}" -jar ${ANTLR_JAR_LOCATION} -Dlanguage=Cpp -listener -visitor -o ${PROJECT_SOURCE_DIR}/demo/generated/ -package antlrcpptest ${PROJECT_SOURCE_DIR}/demo/TLexer.g4 ${PROJECT_SOURCE_DIR}/demo/TParser.g4
-   WORKING_DIRECTORY
-   "${CMAKE_BINARY_DIR}")
-
-
+   "${Java_JAVA_EXECUTABLE}" -jar ${ANTLR_JAR_LOCATION} -Werror -Dlanguage=Cpp -listener -visitor -o ${PROJECT_SOURCE_DIR}/demo/generated/ -package antlrcpptest ${PROJECT_SOURCE_DIR}/demo/TLexer.g4 ${PROJECT_SOURCE_DIR}/demo/TParser.g4
+   WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
+   DEPENDS ${PROJECT_SOURCE_DIR}/demo/TLexer.g4 ${PROJECT_SOURCE_DIR}/demo/TParser.g4
+   )
 
 include_directories(
   ${PROJECT_SOURCE_DIR}/runtime/src
@@ -23,16 +39,10 @@ include_directories(
   ${PROJECT_SOURCE_DIR}/demo/generated
   )
 
-
 #file(GLOB antlr4-demo_SRC "${PROJECT_SOURCE_DIR}/demo/generated/*")
 set(antlr4-demo_SRC 
   ${PROJECT_SOURCE_DIR}/demo/Linux/main.cpp
-  ${PROJECT_SOURCE_DIR}/demo/generated/TLexer.cpp
-  ${PROJECT_SOURCE_DIR}/demo/generated/TParser.cpp
-  ${PROJECT_SOURCE_DIR}/demo/generated/TParserBaseListener.cpp
-  ${PROJECT_SOURCE_DIR}/demo/generated/TParserBaseVisitor.cpp
-  ${PROJECT_SOURCE_DIR}/demo/generated/TParserListener.cpp
-  ${PROJECT_SOURCE_DIR}/demo/generated/TParserVisitor.cpp
+  ${antlr4-demo-GENERATED_SRC}
   )
 
 foreach( src_file ${antlr4-demo_SRC} )

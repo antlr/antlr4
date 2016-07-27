@@ -96,3 +96,4 @@ YYYY/MM/DD, github id, Full name, email
 2016/07/20, chrisheller, Chris Heller, chris.heller.greyheller@gmail.com
 2016/07/20, nburles, Nathan Burles, nburles@gmail.com
 2016/07/20, kosl90, Li Liqiang, kos1990l@gmail.com
+2016/07/27, timoc, Tim O'Callaghan, timo@linux.com
