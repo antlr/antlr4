@@ -90,8 +90,6 @@ using namespace antlr4;
 
 <if (file.genPackage)>namespace <file.genPackage> {<endif>
 
-template \<typename T>
-class <file.grammarName>Visitor;
 <parser>
 
 <if (file.genPackage)>
@@ -104,7 +102,8 @@ ParserFile(file, parser, namedActions, contextSuperClass) ::= <<
 
 <namedActions.preinclude>
 
-<if (file.genListener)>#include "<file.grammarName>BaseListener.h"<endif>
+<if (file.genListener)>#include "<file.grammarName>Listener.h"<endif>
+<if (file.genVisitor)>#include "<file.grammarName>Visitor.h"<endif>
 
 #include "<file.parser.name>.h"
 
@@ -252,17 +251,14 @@ namespace <file.genPackage> {
 /**
  * This class provides an empty implementation of <file.grammarName>Visitor, which can be
  * extended to create a visitor which only needs to handle a subset of the available methods.
- *
- * @param \<T> The return type of the visit operation. Use void for operations with no return type.
  */
-template \<typename T>
-class <file.grammarName>BaseVisitor : public tree::AbstractParseTreeVisitor\<T>, public <file.grammarName>Visitor\<T> {
+class <file.grammarName>BaseVisitor : public <file.grammarName>Visitor {
 public:
 <namedActions.basevisitordeclarations>
 
 <file.visitorNames: { lname |
-  virtual T* visit<lname; format = "cap">(<file.parserName>::<lname; format = "cap">Context *ctx) override {
-    return tree::AbstractParseTreeVisitor\<T>::visitChildren(ctx);
+  virtual antlrcpp::Any visit<lname; format = "cap">(<file.parserName>::<lname; format = "cap">Context *ctx) override {
+    return visitChildren(ctx);
   \}
 }; separator="\n">
 
@@ -309,14 +305,10 @@ VisitorFileHeader(file, header, namedActions) ::= <<
 <if(file.genPackage)>namespace <file.genPackage> {<endif>
 
 /**
- * This template class defines an abstract visitor for a parse tree
+ * This class defines an abstract visitor for a parse tree
  * produced by <file.parserName>.
- *
- * @param \<T> The return type of the visit operation. Use void for
- * operations with no return type.
  */
-template \<typename T>
-class <file.grammarName>Visitor : public antlr4::tree::ParseTreeVisitor\<T> {
+class <file.grammarName>Visitor : public antlr4::tree::AbstractParseTreeVisitor {
 public:
   <namedActions.visitordeclarations>
   
@@ -324,7 +316,7 @@ public:
    * Visit parse trees produced by <file.parserName>.
    */
   <file.visitorNames: {lname |
-  virtual T* visit<lname; format = "cap">(<file.parserName>::<lname; format = "cap">Context *context) = 0;
+  virtual antlrcpp::Any visit<lname; format = "cap">(<file.parserName>::<lname; format = "cap">Context *context) = 0;
   }; separator="\n">
 
 <if (namedActions.visitormembers)>

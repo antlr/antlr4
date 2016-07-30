@@ -48,10 +48,7 @@ namespace tree {
 
     virtual std::size_t getChildCount() override;
 
-    template<typename T, typename T1>
-    T accept(ParseTreeVisitor<T1> *visitor) {
-      return visitor->visitTerminal(this);
-    }
+    virtual antlrcpp::Any accept(ParseTreeVisitor *visitor) override;
 
     virtual std::string getText() override;
     virtual std::string toStringTree(Parser *parser) override;

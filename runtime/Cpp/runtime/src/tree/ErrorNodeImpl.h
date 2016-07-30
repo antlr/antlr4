@@ -35,6 +35,8 @@
 #include "tree/TerminalNodeImpl.h"
 #include "misc/Interval.h"
 
+#include "support/Any.h"
+
 namespace antlr4 {
 namespace tree {
 
@@ -49,10 +51,7 @@ namespace tree {
   public:
     ErrorNodeImpl(Token *token);
 
-    template<typename T, typename T1>
-    T accept(ParseTreeVisitor<T1> *visitor)  {
-      return visitor->visitErrorNode(this);
-    }
+    virtual antlrcpp::Any accept(ParseTreeVisitor *visitor) override;
   };
 
 } // namespace tree

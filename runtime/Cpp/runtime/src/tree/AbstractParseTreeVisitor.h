@@ -37,16 +37,11 @@
 namespace antlr4 {
 namespace tree {
 
-  template<typename T>
-  class ANTLR4CPP_PUBLIC AbstractParseTreeVisitor : public ParseTreeVisitor<T> {
-    /// <summary>
-    /// {@inheritDoc}
-    /// <p/>
+  class ANTLR4CPP_PUBLIC AbstractParseTreeVisitor : public ParseTreeVisitor {
+  public:
     /// The default implementation calls <seealso cref="ParseTree#accept"/> on the
     /// specified tree.
-    /// </summary>
-  public:
-    virtual T* visit(ParseTree *tree) override {
+    virtual antlrcpp::Any visit(ParseTree *tree) override {
       return tree->accept(this);
     }
 
@@ -63,8 +58,8 @@ namespace tree {
      * the tree structure. Visitors that modify the tree should override this
      * method to behave properly in respect to the specific algorithm in use.</p>
      */
-    virtual T* visitChildren(RuleNode *node) override {
-      T* result = defaultResult();
+    virtual antlrcpp::Any visitChildren(RuleNode *node) override {
+      antlrcpp::Any result = defaultResult();
       size_t n = node->getChildCount();
       for (size_t i = 0; i < n; i++) {
         if (!shouldVisitNextChild(node, result)) {
@@ -72,33 +67,26 @@ namespace tree {
         }
 
         Ref<ParseTree> c = node->getChild(i);
-        T childResult = c->accept(this);
+        antlrcpp::Any childResult = c->accept(this);
         result = aggregateResult(result, childResult);
       }
 
       return result;
     }
 
-    /// <summary>
-    /// {@inheritDoc}
-    /// <p/>
     /// The default implementation returns the result of
     /// <seealso cref="#defaultResult defaultResult"/>.
-    /// </summary>
-    virtual T* visitTerminal(TerminalNode * /*node*/) override {
+    virtual antlrcpp::Any visitTerminal(TerminalNode * /*node*/) override {
       return defaultResult();
     }
 
-    /// <summary>
-    /// {@inheritDoc}
-    /// <p/>
     /// The default implementation returns the result of
     /// <seealso cref="#defaultResult defaultResult"/>.
-    /// </summary>
-    virtual T* visitErrorNode(ErrorNode * /*node*/) override {
+    virtual antlrcpp::Any visitErrorNode(ErrorNode * /*node*/) override {
       return defaultResult();
     }
 
+  protected:
     /// <summary>
     /// Gets the default value returned by visitor methods. This value is
     /// returned by the default implementations of
@@ -109,9 +97,8 @@ namespace tree {
     /// The base implementation returns {@code null}.
     /// </summary>
     /// <returns> The default value returned by visitor methods. </returns>
-  protected:
-    virtual T* defaultResult() {
-      return nullptr;
+    virtual antlrcpp::Any defaultResult() {
+      return 0;
     }
 
     /// <summary>
@@ -132,7 +119,7 @@ namespace tree {
     /// a child node.
     /// </param>
     /// <returns> The updated aggregate result. </returns>
-    virtual T* aggregateResult(T* /*aggregate*/, T* nextResult) {
+    virtual antlrcpp::Any aggregateResult(antlrcpp::Any /*aggregate*/, antlrcpp::Any nextResult) {
       return nextResult;
     }
 
@@ -159,7 +146,7 @@ namespace tree {
     /// <returns> {@code true} to continue visiting children. Otherwise return
     /// {@code false} to stop visiting children and immediately return the
     /// current aggregate result from <seealso cref="#visitChildren"/>. </returns>
-    virtual bool shouldVisitNextChild(RuleNode * /*node*/, T /*currentResult*/) {
+    virtual bool shouldVisitNextChild(RuleNode * /*node*/, antlrcpp::Any /*currentResult*/) {
       return true;
     }
 

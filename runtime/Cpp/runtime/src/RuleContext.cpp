@@ -33,6 +33,7 @@
 #include "misc/Interval.h"
 #include "Parser.h"
 #include "atn/ATN.h"
+#include "tree/ParseTreeVisitor.h"
 
 #include "RuleContext.h"
 
@@ -110,6 +111,10 @@ void RuleContext::setAltNumber(int /*altNumber*/) {
 
 std::size_t RuleContext::getChildCount() {
   return 0;
+}
+
+antlrcpp::Any RuleContext::accept(tree::ParseTreeVisitor *visitor) {
+  return visitor->visitChildren(this);
 }
 
 std::string RuleContext::toStringTree(Parser *recog) {

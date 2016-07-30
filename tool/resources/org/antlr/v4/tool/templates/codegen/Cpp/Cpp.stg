@@ -1044,15 +1044,17 @@ void <parser.name>::<struct.name>::<if (method.isEnter)>enter<else>exit<endif>Ru
 
 VisitorDispatchMethodHeader(method) ::= <<
 
-template \<typename T>
-T* accept(tree::ParseTreeVisitor\<T> *visitor) {
-  if (dynamic_cast\<<parser.grammarName>Visitor\<T>*>(visitor) != nullptr)
-    return ((<parser.grammarName>Visitor\<T> *)visitor)->visit<struct.derivedFromName; format="cap">(this);
+virtual antlrcpp::Any accept(tree::ParseTreeVisitor *visitor) override;
+>>
+VisitorDispatchMethod(method) ::=  <<
+
+antlrcpp::Any <parser.name>::<struct.name>::accept(tree::ParseTreeVisitor *visitor) {
+  if (dynamic_cast\<<parser.grammarName>Visitor*>(visitor) != nullptr)
+    return ((<parser.grammarName>Visitor *)visitor)->visit<struct.derivedFromName; format="cap">(this);
   else
     return visitor->visitChildren(this);
 }
 >>
-VisitorDispatchMethod(method) ::= "<! Template function, must be implemented in the header. !>"
 
 AttributeDeclHeader(d) ::= "<d.type> <d.name><if(d.initValue)> = <d.initValue><endif>"
 AttributeDecl(d) ::= "<d.type> <d.name>"

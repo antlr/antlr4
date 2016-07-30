@@ -32,6 +32,7 @@
 #pragma once
 
 #include "tree/SyntaxTree.h"
+#include "support/any.h"
 
 namespace antlr4 {
 namespace tree {
@@ -45,27 +46,22 @@ namespace tree {
   ///  The payload is either a <seealso cref="Token"/> or a <seealso cref="RuleContext"/> object.
   /// </summary>
   class ANTLR4CPP_PUBLIC ParseTree : public SyntaxTree {
-    // the following methods narrow the return type; they are not additional methods
   public:
+    // the following methods narrow the return type; they are not additional methods
     std::weak_ptr<ParseTree> getParent() { return std::dynamic_pointer_cast<ParseTree>(getParentReference().lock()); };
     virtual Ref<ParseTree> getChild(size_t i) { return std::dynamic_pointer_cast<ParseTree>(getChildReference(i)); };
 
-    /// <summary>
-    /// The <seealso cref="ParseTreeVisitor"/> needs a double dispatch method. </summary>
-    template<typename T, typename T1>
-    T *accept(ParseTreeVisitor<T1> *visitor);
+    /// The <seealso cref="ParseTreeVisitor"/> needs a double dispatch method.
+    // ml: This has been changed to use Any instead of a template parameter, to avoid the need of a virtual template function.
+    virtual antlrcpp::Any accept(ParseTreeVisitor *visitor) = 0;
 
-    /// <summary>
     /// Return the combined text of all leaf nodes. Does not get any
-    ///  off-channel tokens (if any) so won't return whitespace and
-    ///  comments if they are sent to parser on hidden channel.
-    /// </summary>
+    /// off-channel tokens (if any) so won't return whitespace and
+    /// comments if they are sent to parser on hidden channel.
     virtual std::string getText() = 0;
 
-    /// <summary>
     /// Specialize toStringTree so that it can print out more information
-    /// 	based upon the parser.
-    /// </summary>
+    /// based upon the parser.
     virtual std::string toStringTree(Parser *parser) = 0;
     using Tree::toStringTree;
   };

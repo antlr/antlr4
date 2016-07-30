@@ -30,6 +30,7 @@
  */
 
 #include "Exceptions.h"
+#include "tree/ParseTreeVisitor.h"
 
 #include "tree/ErrorNodeImpl.h"
 
@@ -38,4 +39,8 @@ using namespace antlr4::misc;
 using namespace antlr4::tree;
 
 ErrorNodeImpl::ErrorNodeImpl(Token *token) : TerminalNodeImpl(token) {
+}
+
+antlrcpp::Any ErrorNodeImpl::accept(ParseTreeVisitor *visitor) {
+  return visitor->visitErrorNode(this);
 }

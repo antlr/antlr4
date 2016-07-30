@@ -31,6 +31,7 @@
 
 #include "misc/Interval.h"
 #include "Token.h"
+#include "tree/ParseTreeVisitor.h"
 
 #include "tree/TerminalNodeImpl.h"
 
@@ -55,6 +56,10 @@ misc::Interval TerminalNodeImpl::getSourceInterval() {
 
 std::size_t TerminalNodeImpl::getChildCount() {
   return 0;
+}
+
+antlrcpp::Any TerminalNodeImpl::accept(ParseTreeVisitor *visitor) {
+  return visitor->visitTerminal(this);
 }
 
 std::string TerminalNodeImpl::getText() {

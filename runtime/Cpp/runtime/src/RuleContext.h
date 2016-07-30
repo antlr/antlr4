@@ -136,10 +136,7 @@ namespace antlr4 {
 
     virtual std::size_t getChildCount() override;
 
-    template<typename T, typename T1>
-    T accept(tree::ParseTreeVisitor<T1> *visitor)  {
-      return visitor->visitChildren(this);
-    }
+    virtual antlrcpp::Any accept(tree::ParseTreeVisitor *visitor) override;
 
     /// <summary>
     /// Print out a whole tree, not just a node, in LISP format

@@ -48,6 +48,7 @@
 #include <stack>
 #include <string>
 #include <typeinfo>
+#include <type_traits>
 #include <unordered_map>
 #include <unordered_set>
 #include <utility>

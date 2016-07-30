@@ -153,13 +153,13 @@ namespace antlr4 {
     class Vocabulary;
   }
   namespace tree {
-    template <typename t> class AbstractParseTreeVisitor;
+    class AbstractParseTreeVisitor;
     class ErrorNode;
     class ErrorNodeImpl;
     class ParseTree;
     class ParseTreeListener;
     template<typename T> class ParseTreeProperty;
-    template<typename T> class ParseTreeVisitor;
+    class ParseTreeVisitor;
     class ParseTreeWalker;
     class RuleNode;
     class SyntaxTree;

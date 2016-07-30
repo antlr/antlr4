@@ -881,6 +881,7 @@
 		27DB44D81D0463DB007E790B /* XPathWildcardAnywhereElement.h in Headers */ = {isa = PBXBuildFile; fileRef = 27DB449A1D045537007E790B /* XPathWildcardAnywhereElement.h */; };
 		27DB44D91D0463DB007E790B /* XPathWildcardElement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 27DB449B1D045537007E790B /* XPathWildcardElement.cpp */; };
 		27DB44DA1D0463DB007E790B /* XPathWildcardElement.h in Headers */ = {isa = PBXBuildFile; fileRef = 27DB449C1D045537007E790B /* XPathWildcardElement.h */; };
+		27F4A8561D4CEB2A00E067EE /* Any.h in Headers */ = {isa = PBXBuildFile; fileRef = 27F4A8551D4CEB2A00E067EE /* Any.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -1118,7 +1119,7 @@
 		276E5CFE1CDB57AA003FF4B4 /* ParseTree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParseTree.h; sourceTree = "<group>"; wrapsLines = 0; };
 		276E5D001CDB57AA003FF4B4 /* ParseTreeListener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParseTreeListener.h; sourceTree = "<group>"; };
 		276E5D021CDB57AA003FF4B4 /* ParseTreeProperty.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParseTreeProperty.h; sourceTree = "<group>"; };
-		276E5D031CDB57AA003FF4B4 /* ParseTreeVisitor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParseTreeVisitor.h; sourceTree = "<group>"; };
+		276E5D031CDB57AA003FF4B4 /* ParseTreeVisitor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParseTreeVisitor.h; sourceTree = "<group>"; wrapsLines = 0; };
 		276E5D041CDB57AA003FF4B4 /* ParseTreeWalker.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParseTreeWalker.cpp; sourceTree = "<group>"; };
 		276E5D051CDB57AA003FF4B4 /* ParseTreeWalker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParseTreeWalker.h; sourceTree = "<group>"; };
 		276E5D071CDB57AA003FF4B4 /* Chunk.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Chunk.h; sourceTree = "<group>"; };
@@ -1179,6 +1180,7 @@
 		27DB449C1D045537007E790B /* XPathWildcardElement.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XPathWildcardElement.h; sourceTree = "<group>"; wrapsLines = 0; };
 		27DB44AF1D0463CC007E790B /* XPathLexer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = XPathLexer.cpp; sourceTree = "<group>"; };
 		27DB44B01D0463CC007E790B /* XPathLexer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XPathLexer.h; sourceTree = "<group>"; wrapsLines = 0; };
+		27F4A8551D4CEB2A00E067EE /* Any.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Any.h; sourceTree = "<group>"; };
 		37C147171B4D5A04008EDDDB /* libantlr4-runtime.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libantlr4-runtime.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		37D727AA1867AF1E007B6D10 /* libantlr4-runtime.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = "libantlr4-runtime.dylib"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -1483,6 +1485,7 @@
 		276E5CE41CDB57AA003FF4B4 /* support */ = {
 			isa = PBXGroup;
 			children = (
+				27F4A8551D4CEB2A00E067EE /* Any.h */,
 				276E5CE51CDB57AA003FF4B4 /* Arrays.cpp */,
 				276E5CE61CDB57AA003FF4B4 /* Arrays.h */,
 				276E5CE71CDB57AA003FF4B4 /* BitSet.h */,
@@ -2085,6 +2088,7 @@
 				27DB44A81D045537007E790B /* XPathTokenAnywhereElement.h in Headers */,
 				276E5FD41CDB57AA003FF4B4 /* TokenFactory.h in Headers */,
 				276E5EF91CDB57AA003FF4B4 /* CommonTokenStream.h in Headers */,
+				27F4A8561D4CEB2A00E067EE /* Any.h in Headers */,
 				276E5EB11CDB57AA003FF4B4 /* StarBlockStartState.h in Headers */,
 				276E5F6E1CDB57AA003FF4B4 /* MurmurHash.h in Headers */,
 				276E601F1CDB57AA003FF4B4 /* ParseTreePatternMatcher.h in Headers */,

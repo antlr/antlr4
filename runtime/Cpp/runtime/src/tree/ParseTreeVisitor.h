@@ -31,7 +31,7 @@
 
 #pragma once
 
-#include "antlr4-common.h"
+#include "support/Any.h"
 
 namespace antlr4 {
 namespace tree {
@@ -43,7 +43,7 @@ namespace tree {
   /// </summary>
   /// @param <T> The return type of the visit operation. Use <seealso cref="Void"/> for
   /// operations with no return type. </param>
-  template<typename T>
+  // ml: no template parameter here, to avoid the need for virtual template functions. Instead we have our Any class.
   class ANTLR4CPP_PUBLIC ParseTreeVisitor {
   public:
     virtual ~ParseTreeVisitor() {}
@@ -53,7 +53,7 @@ namespace tree {
     /// </summary>
     /// <param name="tree"> The <seealso cref="ParseTree"/> to visit. </param>
     /// <returns> The result of visiting the parse tree. </returns>
-    virtual T* visit(ParseTree *tree) = 0;
+    virtual antlrcpp::Any visit(ParseTree *tree) = 0;
 
     /// <summary>
     /// Visit the children of a node, and return a user-defined result of the
@@ -61,21 +61,21 @@ namespace tree {
     /// </summary>
     /// <param name="node"> The <seealso cref="RuleNode"/> whose children should be visited. </param>
     /// <returns> The result of visiting the children of the node. </returns>
-    virtual T* visitChildren(RuleNode *node) = 0;
+    virtual antlrcpp::Any visitChildren(RuleNode *node) = 0;
 
     /// <summary>
     /// Visit a terminal node, and return a user-defined result of the operation.
     /// </summary>
     /// <param name="node"> The <seealso cref="TerminalNode"/> to visit. </param>
     /// <returns> The result of visiting the node. </returns>
-    virtual T* visitTerminal(TerminalNode *node) = 0;
+    virtual antlrcpp::Any visitTerminal(TerminalNode *node) = 0;
 
     /// <summary>
     /// Visit an error node, and return a user-defined result of the operation.
     /// </summary>
     /// <param name="node"> The <seealso cref="ErrorNode"/> to visit. </param>
     /// <returns> The result of visiting the node. </returns>
-    virtual T* visitErrorNode(ErrorNode *node) = 0;
+    virtual antlrcpp::Any visitErrorNode(ErrorNode *node) = 0;
 
   };
 
