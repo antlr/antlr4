@@ -40,13 +40,10 @@ template<class T>
 
 struct Any
 {
-  bool isNull() const { return !_ptr; }
-  bool isNotNull() const { return _ptr; }
+  bool isNull() const { return _ptr == nullptr; }
+  bool isNotNull() const { return _ptr != nullptr; }
 
   Any() : _ptr(nullptr) {
-  }
-
-  Any(Any& that) : _ptr(that.clone()) {
   }
 
   Any(Any&& that) : _ptr(that._ptr) {
