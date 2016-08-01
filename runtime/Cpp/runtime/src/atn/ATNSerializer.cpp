@@ -135,7 +135,7 @@ std::vector<size_t> ATNSerializer::serialize() {
       int edgeType = t->getSerializationType();
       if (edgeType == Transition::SET || edgeType == Transition::NOT_SET) {
         SetTransition *st = static_cast<SetTransition *>(t);
-        if (setIndices.find(st->set) != setIndices.end()) {
+        if (setIndices.find(st->set) == setIndices.end()) {
           sets.push_back(st->set);
           setIndices.insert({ st->set, (int)sets.size() - 1 });
         }
@@ -383,7 +383,7 @@ std::vector<size_t> ATNSerializer::serialize() {
     }
 
     size_t value = (data.at(i) + 2) & 0xFFFF;
-    data.assign(i, value);
+    data.at(i) = value;
   }
 
   return data;
@@ -625,6 +625,19 @@ std::string ATNSerializer::getDecoded(ATN *atn, std::vector<std::string> &tokenN
 }
 
 void ATNSerializer::serializeUUID(std::vector<size_t> &data, Guid uuid) {
-  for (auto &entry : uuid)
-    data.push_back(entry);
+  unsigned int twoBytes = 0;
+  bool firstByte = true;
+  for( std::vector<unsigned char>::const_reverse_iterator rit = uuid.rbegin(); rit != uuid.rend(); ++rit )
+  {
+     if (firstByte) {
+       twoBytes = *rit;
+       firstByte = false;
+     } else {
+       twoBytes |= (*rit << 8);
+       data.push_back(twoBytes);
+       firstByte = true;
+     }
+  }
+  if (!firstByte)
+     throw IllegalArgumentException( "The UUID provided is not valid (odd number of bytes)." );
 }
