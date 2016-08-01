@@ -164,17 +164,17 @@ bool ATNConfigSet::operator == (const ATNConfigSet &other) {
   if (configs.size() != other.configs.size())
     return false;
 
+  if (fullCtx != other.fullCtx || uniqueAlt != other.uniqueAlt ||
+      conflictingAlts != other.conflictingAlts || hasSemanticContext != other.hasSemanticContext ||
+      dipsIntoOuterContext != other.dipsIntoOuterContext) // includes stack context
+    return false;
+
   for (size_t i = 0; i < configs.size(); i++) {
-    if (configs[i] != other.configs[i]) {
+    if (configs[i] != other.configs[i] && *(configs[i]) != *(other.configs[i]))
       return false;
-    }
   }
 
-  bool same = fullCtx == other.fullCtx && uniqueAlt == other.uniqueAlt &&
-    conflictingAlts == other.conflictingAlts && hasSemanticContext == other.hasSemanticContext &&
-    dipsIntoOuterContext == other.dipsIntoOuterContext; // includes stack context
-
-  return same;
+  return true;
 }
 
 size_t ATNConfigSet::hashCode() {
