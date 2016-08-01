@@ -82,7 +82,7 @@ size_t LexerATNConfig::hashCode() const {
   hashCode = misc::MurmurHash::update(hashCode, context);
   hashCode = misc::MurmurHash::update(hashCode, semanticContext);
   hashCode = misc::MurmurHash::update(hashCode, _passedThroughNonGreedyDecision ? 1 : 0);
-  hashCode = misc::MurmurHash::update(hashCode, _lexerActionExecutor ? _lexerActionExecutor->hashCode() : 0);
+  hashCode = misc::MurmurHash::update(hashCode, _lexerActionExecutor);
   hashCode = misc::MurmurHash::finish(hashCode, 6);
   return hashCode;
 }
