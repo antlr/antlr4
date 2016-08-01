@@ -125,6 +125,7 @@ namespace atn {
 
     virtual size_t hashCode() const;
     virtual bool operator == (const LexerActionExecutor &obj) const;
+    virtual bool operator != (const LexerActionExecutor &obj) const;
 
   private:
     const std::vector<Ref<LexerAction>> _lexerActions;
