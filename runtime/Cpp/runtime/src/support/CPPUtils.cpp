@@ -59,7 +59,7 @@ namespace antlrcpp {
       switch (c) {
         case ' ':
           if (escapeSpaces) {
-            result += "·";
+            result += "Â·";
             break;
           } else {
             // fall through

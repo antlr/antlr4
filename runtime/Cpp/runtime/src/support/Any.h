@@ -64,10 +64,12 @@ struct Any
   Any(const Any&& that) : _ptr(that.clone()) {
   }
   
-  template<typename U> Any(U&& value) : _ptr(new Derived<StorageType<U>>(std::forward<U>(value))) {
+  template<typename U>
+  Any(U&& value) : _ptr(new Derived<StorageType<U>>(std::forward<U>(value))) {
   }
 
-  template<class U> bool is() const {
+  template<class U>
+  bool is() const {
     typedef StorageType<U> T;
 
     auto derived = dynamic_cast<Derived<T> *>(_ptr);
