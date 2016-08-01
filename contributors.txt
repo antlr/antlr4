@@ -97,3 +97,4 @@ YYYY/MM/DD, github id, Full name, email
 2016/07/20, nburles, Nathan Burles, nburles@gmail.com
 2016/07/20, kosl90, Li Liqiang, kos1990l@gmail.com
 2016/07/27, timoc, Tim O'Callaghan, timo@linux.com
+2016/07/26, nic30, Michal Orsák, michal.o.socials@gmail.com
