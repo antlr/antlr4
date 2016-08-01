@@ -129,6 +129,7 @@ namespace atn {
     /// the same state, they predict the same alternative, and
     /// syntactic/semantic contexts are the same.
     bool operator == (const ATNConfig &other) const;
+    bool operator != (const ATNConfig &other) const;
 
     virtual std::string toString();
     std::string toString(bool showAlt);

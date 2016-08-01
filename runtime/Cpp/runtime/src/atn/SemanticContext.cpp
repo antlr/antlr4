@@ -65,14 +65,10 @@ size_t SemanticContext::Predicate::hashCode() const {
 }
 
 bool SemanticContext::Predicate::operator == (const SemanticContext &other) const {
-  const Predicate *p = dynamic_cast<const Predicate*>(&other);
-  if (p == nullptr)
-    return false;
-
-  if (this == p) {
+  if (this == &other)
     return true;
-  }
 
+  const Predicate *p = dynamic_cast<const Predicate*>(&other);
   if (p == nullptr)
     return false;
 
@@ -116,13 +112,12 @@ size_t SemanticContext::PrecedencePredicate::hashCode() const {
 }
 
 bool SemanticContext::PrecedencePredicate::operator == (const SemanticContext &other) const {
+  if (this == &other)
+    return true;
+
   const PrecedencePredicate *predicate = dynamic_cast<const PrecedencePredicate *>(&other);
   if (predicate == nullptr)
     return false;
-
-  if (this == predicate) {
-    return true;
-  }
 
   return precedence == predicate->precedence;
 }
@@ -172,15 +167,21 @@ std::vector<Ref<SemanticContext>> SemanticContext::AND::getOperands() const {
 }
 
 bool SemanticContext::AND::operator == (const SemanticContext &other) const {
+  if (this == &other)
+    return true;
+
   const AND *context = dynamic_cast<const AND *>(&other);
   if (context == nullptr)
     return false;
 
-  if (this == context) {
+  if (opnds == context->opnds)
     return true;
-  }
 
-  return opnds == context->opnds;
+  for (auto opndIt = opnds.begin(), otherIt = context->opnds.begin(); opndIt < opnds.end(), otherIt < context->opnds.end(); ++opndIt, ++otherIt) {
+    if (*opndIt != *otherIt)
+      return false;
+  }
+  return true;
 }
 
 size_t SemanticContext::AND::hashCode() const {
@@ -275,15 +276,21 @@ std::vector<Ref<SemanticContext>> SemanticContext::OR::getOperands() const {
 }
 
 bool SemanticContext::OR::operator == (const SemanticContext &other) const {
+  if (this == &other)
+    return true;
+
   const OR *context = dynamic_cast<const OR *>(&other);
   if (context == nullptr)
     return false;
 
-  if (this == context) {
+  if (opnds == context->opnds)
     return true;
-  }
 
-  return opnds == context->opnds;
+  for (auto opndIt = opnds.begin(), otherIt = context->opnds.begin(); opndIt < opnds.end(), otherIt < context->opnds.end(); ++opndIt, ++otherIt ) {
+    if (*opndIt != *otherIt)
+      return false;
+  }
+  return true;
 }
 
 size_t SemanticContext::OR::hashCode() const {

@@ -115,6 +115,10 @@ bool LexerActionExecutor::operator == (const LexerActionExecutor &obj) const {
   return _hashCode == obj._hashCode && Arrays::equals(_lexerActions, obj._lexerActions);
 }
 
+bool LexerActionExecutor::operator != (const LexerActionExecutor &obj) const {
+  return !operator==(obj);
+}
+
 size_t LexerActionExecutor::generateHashCode() const {
   size_t hash = MurmurHash::initialize();
   for (auto lexerAction : _lexerActions) {

@@ -101,12 +101,15 @@ void ATNConfig::setPrecedenceFilterSuppressed(bool value) {
   }
 }
 
-bool ATNConfig::operator == (const ATNConfig &other) const
-{
+bool ATNConfig::operator == (const ATNConfig &other) const {
   return state->stateNumber == other.state->stateNumber && alt == other.alt &&
-    (context == other.context || (context != nullptr && context == other.context)) &&
-    semanticContext == other.semanticContext &&
+    (context == other.context || (context != nullptr && *context == *(other.context))) &&
+    (semanticContext == other.semanticContext || (semanticContext != nullptr && *semanticContext == *(other.semanticContext))) &&
     isPrecedenceFilterSuppressed() == other.isPrecedenceFilterSuppressed();
+}
+
+bool ATNConfig::operator != (const ATNConfig &other) const {
+  return !operator==(other);
 }
 
 std::string ATNConfig::toString() {

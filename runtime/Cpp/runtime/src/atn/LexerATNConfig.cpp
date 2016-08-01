@@ -89,10 +89,13 @@ size_t LexerATNConfig::hashCode() const {
 
 bool LexerATNConfig::operator == (const LexerATNConfig& other) const
 {
+  if (this == &other)
+    return true;
+
   if (_passedThroughNonGreedyDecision != other._passedThroughNonGreedyDecision)
     return false;
 
-  if (_lexerActionExecutor != other._lexerActionExecutor) {
+  if (_lexerActionExecutor != other._lexerActionExecutor && (_lexerActionExecutor != nullptr && *_lexerActionExecutor != *(other._lexerActionExecutor))) {
     return false;
   }
 
