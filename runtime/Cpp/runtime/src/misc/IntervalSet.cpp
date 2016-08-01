@@ -363,7 +363,7 @@ bool IntervalSet::operator == (const IntervalSet &other) const {
   if (_intervals.empty() && other._intervals.empty())
     return true;
 
-  if (_intervals.empty() || other._intervals.empty())
+  if (_intervals.size() != other._intervals.size())
     return false;
 
   return std::equal(_intervals.begin(), _intervals.end(), other._intervals.begin());
