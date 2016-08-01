@@ -138,24 +138,24 @@ std::string RuleContext::toString(const std::vector<std::string> &ruleNames) {
 std::string RuleContext::toString(const std::vector<std::string> &ruleNames, Ref<RuleContext> const& stop) {
   std::stringstream ss;
 
-  Ref<RuleContext> parent = shared_from_this();
+  Ref<RuleContext> currentParent = shared_from_this();
   ss << "[";
-  while (parent != stop) {
+  while (currentParent != stop) {
     if (ruleNames.empty()) {
-      if (!parent->isEmpty()) {
-        ss << parent->invokingState;
+      if (!currentParent->isEmpty()) {
+        ss << currentParent->invokingState;
       }
     } else {
-      ssize_t ruleIndex = parent->getRuleIndex();
+      ssize_t ruleIndex = currentParent->getRuleIndex();
 
       std::string ruleName = (ruleIndex >= 0 && ruleIndex < (ssize_t)ruleNames.size()) ? ruleNames[(size_t)ruleIndex] : std::to_string(ruleIndex);
       ss << ruleName;
     }
 
-    if (parent->parent.expired()) // No parent anymore.
+    if (currentParent->parent.expired()) // No parent anymore.
       break;
-    parent = parent->parent.lock();
-    if (!ruleNames.empty() || !parent->isEmpty()) {
+    currentParent = currentParent->parent.lock();
+    if (!ruleNames.empty() || !currentParent->isEmpty()) {
       ss << " ";
     }
   }

@@ -143,7 +143,7 @@ namespace antlr4 {
     /// for efficiency reasons. Subclasses can override this method, nextToken,
     /// and getToken (to push tokens into a list and pull from that list
     /// rather than a single variable as this implementation does).
-    virtual void emit(std::unique_ptr<Token> token);
+    virtual void emit(std::unique_ptr<Token> newToken);
 
     /// The standard method called to automatically emit a token at the
     /// outermost lexical rule.  The token object should point into the
@@ -176,13 +176,13 @@ namespace antlr4 {
     /// Override if emitting multiple tokens.
     virtual std::unique_ptr<Token> getToken();
 
-    virtual void setToken(std::unique_ptr<Token> token);
+    virtual void setToken(std::unique_ptr<Token> newToken);
 
     virtual void setType(ssize_t ttype);
 
     virtual ssize_t getType();
 
-    virtual void setChannel(int channel);
+    virtual void setChannel(int newChannel);
 
     virtual int getChannel();
 

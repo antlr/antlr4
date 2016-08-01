@@ -61,9 +61,9 @@ size_t TokenStreamRewriter::RewriteOperation::execute(std::string * /*buf*/) {
 
 std::string TokenStreamRewriter::RewriteOperation::toString() {
   std::string opName = "TokenStreamRewriter";
-  size_t index = opName.find('$');
-  opName = opName.substr(index + 1, opName.length() - (index + 1));
-  return "<" + opName + "@" + outerInstance->tokens->get(index)->getText() + ":\"" + text + "\">";
+  size_t dollarIndex = opName.find('$');
+  opName = opName.substr(dollarIndex + 1, opName.length() - (dollarIndex + 1));
+  return "<" + opName + "@" + outerInstance->tokens->get(dollarIndex)->getText() + ":\"" + text + "\">";
 }
 
 void TokenStreamRewriter::RewriteOperation::InitializeInstanceFields() {

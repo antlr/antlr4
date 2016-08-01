@@ -41,6 +41,8 @@
 
 #include "Lexer.h"
 
+#define DEBUG_LEXER 0
+
 using namespace antlrcpp;
 using namespace antlr4;
 
@@ -136,9 +138,10 @@ void Lexer::setMode(size_t m) {
 }
 
 void Lexer::pushMode(size_t m) {
-  if (atn::LexerATNSimulator::debug) {
+#if DEBUG_LEXER == 1
     std::cout << "pushMode " << m << std::endl;
-  }
+#endif
+
   modeStack.push_back(mode);
   setMode(m);
 }
@@ -147,9 +150,10 @@ size_t Lexer::popMode() {
   if (modeStack.empty()) {
     throw EmptyStackException();
   }
-  if (atn::LexerATNSimulator::debug) {
+#if DEBUG_LEXER == 1
     std::cout << std::string("popMode back to ") << modeStack.back() << std::endl;
-  }
+#endif
+
   setMode(modeStack.back());
   modeStack.pop_back();
   return mode;
@@ -173,8 +177,8 @@ CharStream* Lexer::getInputStream() {
   return _input;
 }
 
-void Lexer::emit(std::unique_ptr<Token> token) {
-  this->token = std::move(token);
+void Lexer::emit(std::unique_ptr<Token> newToken) {
+  token = std::move(newToken);
 }
 
 Token* Lexer::emit() {
@@ -226,8 +230,8 @@ std::unique_ptr<Token> Lexer::getToken() {
   return std::move(token);
 }
 
-void Lexer::setToken(std::unique_ptr<Token> token) {
-  this->token = std::move(token);
+void Lexer::setToken(std::unique_ptr<Token> newToken) {
+  token = std::move(newToken);
 }
 
 void Lexer::setType(ssize_t ttype) {
@@ -238,8 +242,8 @@ ssize_t Lexer::getType() {
   return type;
 }
 
-void Lexer::setChannel(int channel) {
-  this->channel = channel;
+void Lexer::setChannel(int newChannel) {
+  channel = newChannel;
 }
 
 int Lexer::getChannel() {

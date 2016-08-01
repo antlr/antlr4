@@ -38,15 +38,15 @@ namespace atn {
 
   class ANTLR4CPP_PUBLIC RangeTransition final : public Transition {
   public:
-    const size_t from;
-    const size_t to;
+    const ssize_t from;
+    const ssize_t to;
 
-    RangeTransition(ATNState *target, size_t from, size_t to);
+    RangeTransition(ATNState *target, ssize_t from, ssize_t to);
 
     virtual int getSerializationType() const override;
 
     virtual misc::IntervalSet label() const override;
-    virtual bool matches(size_t symbol, size_t minVocabSymbol, size_t maxVocabSymbol) const override;
+    virtual bool matches(ssize_t symbol, ssize_t minVocabSymbol, ssize_t maxVocabSymbol) const override;
 
     virtual std::string toString() const override;
   };

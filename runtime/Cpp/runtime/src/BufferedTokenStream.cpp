@@ -304,7 +304,7 @@ ssize_t BufferedTokenStream::previousTokenOnChannel(size_t i, size_t channel) {
   return i;
 }
 
-std::vector<Token *> BufferedTokenStream::getHiddenTokensToRight(size_t tokenIndex, size_t channel) {
+std::vector<Token *> BufferedTokenStream::getHiddenTokensToRight(size_t tokenIndex, ssize_t channel) {
   lazyInit();
   if (tokenIndex >= _tokens.size()) {
     throw IndexOutOfBoundsException(std::to_string(tokenIndex) + " not in 0.." + std::to_string(_tokens.size() - 1));
@@ -327,7 +327,7 @@ std::vector<Token *> BufferedTokenStream::getHiddenTokensToRight(size_t tokenInd
   return getHiddenTokensToRight(tokenIndex, -1);
 }
 
-std::vector<Token *> BufferedTokenStream::getHiddenTokensToLeft(size_t tokenIndex, size_t channel) {
+std::vector<Token *> BufferedTokenStream::getHiddenTokensToLeft(size_t tokenIndex, ssize_t channel) {
   lazyInit();
   if (tokenIndex >= _tokens.size()) {
     throw IndexOutOfBoundsException(std::to_string(tokenIndex) + " not in 0.." + std::to_string(_tokens.size() - 1));

@@ -59,7 +59,7 @@ namespace antlrcpp {
       switch (c) {
         case ' ':
           if (escapeSpaces) {
-            result += (char)'0xB7';
+            result += "·";
             break;
           } else {
             // fall through
@@ -85,7 +85,7 @@ namespace antlrcpp {
     return result;
   }
 
-  std::string toHexString(const int t){
+  std::string toHexString(const int t) {
     std::stringstream stream;
     stream << std::uppercase << std::hex << t;
     return stream.str();
@@ -105,8 +105,7 @@ namespace antlrcpp {
 
     ss = s;
     p = ss.find(from);
-    while (p != std::string::npos)
-    {
+    while (p != std::string::npos) {
       if (p > 0)
         res.append(ss.substr(0, p)).append(to);
       else
@@ -119,8 +118,6 @@ namespace antlrcpp {
     return res;
   }
 
-  //--------------------------------------------------------------------------------------------------
-  
   std::vector<std::string> split(const std::string &s, const std::string &sep, int count) {
     std::vector<std::string> parts;
     std::string ss = s;
@@ -134,13 +131,12 @@ namespace antlrcpp {
       count= -1;
 
     p = ss.find(sep);
-    while (!ss.empty() && p != std::string::npos && (count < 0 || count > 0))
-    {
+    while (!ss.empty() && p != std::string::npos && (count < 0 || count > 0)) {
       parts.push_back(ss.substr(0, p));
-      ss= ss.substr(p+sep.size());
+      ss = ss.substr(p+sep.size());
 
       --count;
-      p= ss.find(sep);
+      p = ss.find(sep);
     }
     parts.push_back(ss);
 
@@ -164,24 +160,31 @@ namespace antlrcpp {
   //--------------------------------------------------------------------------------------------------
 
   // Recursively get the error from a, possibly nested, exception.
-  template <typename T>
-  std::exception_ptr get_nested(const T &e)
-  {
-    try
-    {
 #if defined(_MSC_FULL_VER) && _MSC_FULL_VER < 190023026
-      return nullptr; // No nested exceptions before VS 2015.
+  // No nested exceptions before VS 2015.
+  template <typename T>
+  std::exception_ptr get_nested(const T &/*e*/) {
+    try {
+      return nullptr;
+    }
+    catch (const std::bad_cast &) {
+      return nullptr;
+    }
+  }
 #else
+  template <typename T>
+  std::exception_ptr get_nested(const T &e) {
+    try {
       auto nested = dynamic_cast<const std::nested_exception&>(e);
       return nested.nested_ptr();
-#endif
     }
-    catch (const std::bad_cast &)
-    { return nullptr; }
+    catch (const std::bad_cast &) {
+      return nullptr;
+    }
   }
+#endif
 
-  std::string what(std::exception_ptr eptr)
-  {
+  std::string what(std::exception_ptr eptr) {
     if (!eptr) {
       throw std::bad_exception();
     }
@@ -189,10 +192,8 @@ namespace antlrcpp {
     std::string result;
     std::size_t nestCount = 0;
 
-  next:
-    {
-      try
-      {
+  next: {
+      try {
         std::exception_ptr yeptr;
         std::swap(eptr, yeptr);
         std::rethrow_exception(yeptr);

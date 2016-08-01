@@ -89,7 +89,7 @@ namespace atn {
      */
     virtual bool isEpsilon() const;
     virtual misc::IntervalSet label() const;
-    virtual bool matches(size_t symbol, size_t minVocabSymbol, size_t maxVocabSymbol) const = 0;
+    virtual bool matches(ssize_t symbol, ssize_t minVocabSymbol, ssize_t maxVocabSymbol) const = 0;
 
     virtual std::string toString() const;
   };

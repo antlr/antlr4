@@ -99,7 +99,7 @@ size_t UnbufferedCharStream::fill(size_t n) {
 }
 
 char32_t UnbufferedCharStream::nextChar()  {
-  wchar_t result = EOF;
+  wchar_t result = 0;
   _input >> result;
   return result;
 }
@@ -226,7 +226,7 @@ size_t UnbufferedCharStream::getBufferStartIndex() const {
 void UnbufferedCharStream::InitializeInstanceFields() {
   _p = 0;
   _numMarkers = 0;
-  _lastChar = -1;
+  _lastChar = 0;
   _lastCharBufferStart = 0;
   _currentCharIndex = 0;
 }

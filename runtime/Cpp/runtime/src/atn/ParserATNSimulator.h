@@ -269,12 +269,6 @@ namespace atn {
    * the input.</p>
    */
   class ANTLR4CPP_PUBLIC ParserATNSimulator : public ATNSimulator {
-  public:
-    static const bool debug = false;
-    static const bool debug_list_atn_decisions = false;
-    static const bool dfa_debug = false;
-    static const bool retry_debug = false;
-
   protected:
     Parser *const parser;
 
@@ -848,7 +842,7 @@ namespace atn {
                                  ATNConfigSet *configs); // configs that LL not SLL considered conflicting
 
   public:
-    void setPredictionMode(PredictionMode mode);
+    void setPredictionMode(PredictionMode newMode);
     PredictionMode getPredictionMode();
 
     Parser* getParser();

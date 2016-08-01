@@ -49,7 +49,7 @@ bool ActionTransition::isEpsilon() const {
   return true; // we are to be ignored by analysis 'cept for predicates
 }
 
-bool ActionTransition::matches(size_t /*symbol*/, size_t /*minVocabSymbol*/, size_t /*maxVocabSymbol*/) const {
+bool ActionTransition::matches(ssize_t /*symbol*/, ssize_t /*minVocabSymbol*/, ssize_t /*maxVocabSymbol*/) const {
   return false;
 }
 

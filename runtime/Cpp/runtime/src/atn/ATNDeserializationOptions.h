@@ -57,11 +57,11 @@ namespace atn {
 
     bool isVerifyATN();
 
-    void setVerifyATN(bool verifyATN);
+    void setVerifyATN(bool verify);
 
     bool isGenerateRuleBypassTransitions();
 
-    void setGenerateRuleBypassTransitions(bool generateRuleBypassTransitions);
+    void setGenerateRuleBypassTransitions(bool generate);
 
   protected:
     virtual void throwIfReadOnly();

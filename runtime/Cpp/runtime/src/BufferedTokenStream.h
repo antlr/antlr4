@@ -89,7 +89,7 @@ namespace antlr4 {
     /// Collect all tokens on specified channel to the right of
     ///  the current token up until we see a token on DEFAULT_TOKEN_CHANNEL or
     ///  EOF. If channel is -1, find any non default channel token.
-    virtual std::vector<Token *> getHiddenTokensToRight(size_t tokenIndex, size_t channel);
+    virtual std::vector<Token *> getHiddenTokensToRight(size_t tokenIndex, ssize_t channel);
 
     /// <summary>
     /// Collect all hidden tokens (any off-default channel) to the right of
@@ -103,7 +103,7 @@ namespace antlr4 {
     ///  the current token up until we see a token on DEFAULT_TOKEN_CHANNEL.
     ///  If channel is -1, find any non default channel token.
     /// </summary>
-    virtual std::vector<Token *> getHiddenTokensToLeft(size_t tokenIndex, size_t channel);
+    virtual std::vector<Token *> getHiddenTokensToLeft(size_t tokenIndex, ssize_t channel);
 
     /// <summary>
     /// Collect all hidden tokens (any off-default channel) to the left of

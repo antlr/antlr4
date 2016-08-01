@@ -65,7 +65,7 @@ namespace antlr4 {
     /// <p/>
     /// Used for XPath and tree pattern compilation.
     /// </summary>
-    virtual std::map<std::string, size_t> getTokenTypeMap();
+    virtual std::map<std::string, ssize_t> getTokenTypeMap();
 
     /// <summary>
     /// Get a map from rule names to rule indexes.
@@ -74,7 +74,7 @@ namespace antlr4 {
     /// </summary>
     virtual std::map<std::string, size_t> getRuleIndexMap();
 
-    virtual size_t getTokenType(const std::string &tokenName);
+    virtual ssize_t getTokenType(const std::string &tokenName);
 
     /// <summary>
     /// If this recognizer was generated, it will have a serialized ATN
@@ -175,7 +175,7 @@ namespace antlr4 {
     atn::ATNSimulator *_interpreter; // Set and deleted in descendants (or the profiler).
 
   private:
-    static std::map<const dfa::Vocabulary*, std::map<std::string, size_t>> _tokenTypeMapCache;
+    static std::map<const dfa::Vocabulary*, std::map<std::string, ssize_t>> _tokenTypeMapCache;
     static std::map<std::vector<std::string>, std::map<std::string, size_t>> _ruleIndexMapCache;
 
     ProxyErrorListener _proxListener; // Manages a collection of listeners.

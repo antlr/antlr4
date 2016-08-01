@@ -49,6 +49,10 @@
 
 #include "atn/LexerATNSimulator.h"
 
+#define DEBUG_ATN 0
+#define DEBUG_DFA 0
+
+
 using namespace antlr4;
 using namespace antlr4::atn;
 using namespace antlrcpp;
@@ -208,9 +212,11 @@ dfa::DFAState *LexerATNSimulator::getExistingTargetState(dfa::DFAState *s, ssize
   }
 
   dfa::DFAState *target = s->edges[(size_t)(t - MIN_DFA_EDGE)];
-  if (debug && target != nullptr) {
+#if DEBUG_ATN == 1
+  if (target != nullptr) {
     std::cout << std::string("reuse state ") << s->stateNumber << std::string(" edge to ") << target->stateNumber << std::endl;
   }
+#endif
 
   return target;
 }
@@ -264,9 +270,9 @@ void LexerATNSimulator::getReachableConfigSet(CharStream *input, ATNConfigSet *c
       continue;
     }
 
-    if (debug) {
+#if DEBUG_ATN == 1
       std::cout << "testing " << getTokenName((int)t) << " at " << c->toString(true) << std::endl;
-    }
+#endif
 
     size_t n = c->state->getNumberOfTransitions();
     for (size_t ti = 0; ti < n; ti++) { // for each transition
@@ -295,10 +301,10 @@ void LexerATNSimulator::getReachableConfigSet(CharStream *input, ATNConfigSet *c
 
 void LexerATNSimulator::accept(CharStream *input, const Ref<LexerActionExecutor> &lexerActionExecutor, int /*startIndex*/,
                                size_t index, size_t line, size_t charPos) {
-  if (debug) {
+#if DEBUG_ATN == 1
     std::cout << "ACTION ";
     std::cout << toString(lexerActionExecutor) << std::endl;
-  }
+#endif
 
   // seek to after last char in token
   input->seek(index);
@@ -332,18 +338,18 @@ std::unique_ptr<ATNConfigSet> LexerATNSimulator::computeStartState(CharStream *i
 
 bool LexerATNSimulator::closure(CharStream *input, const Ref<LexerATNConfig> &config, ATNConfigSet *configs,
                                 bool currentAltReachedAcceptState, bool speculative, bool treatEofAsEpsilon) {
-  if (debug) {
+#if DEBUG_ATN == 1
     std::cout << "closure(" << config->toString(true) << ")" << std::endl;
-  }
+#endif
 
   if (is<RuleStopState *>(config->state)) {
-    if (debug) {
+#if DEBUG_ATN == 1
       if (_recog != nullptr) {
         std::cout << "closure at " << _recog->getRuleNames()[(size_t)config->state->ruleIndex] << " rule stop " << config << std::endl;
       } else {
         std::cout << "closure at rule stop " << config << std::endl;
       }
-    }
+#endif
 
     if (config->context == nullptr || config->context->hasEmptyPath()) {
       if (config->context == nullptr || config->context->isEmpty()) {
@@ -423,9 +429,11 @@ Ref<LexerATNConfig> LexerATNSimulator::getEpsilonTarget(CharStream *input, const
        test them, we cannot cash the DFA state target of ID.
        */
       PredicateTransition *pt = static_cast<PredicateTransition*>(t);
-      if (debug) {
+
+#if DEBUG_ATN == 1
         std::cout << "EVAL rule " << pt->ruleIndex << ":" << pt->predIndex << std::endl;
-      }
+#endif
+
       configs->hasSemanticContext = true;
       if (evaluatePredicate(input, pt->ruleIndex, pt->predIndex, speculative)) {
         c = std::make_shared<LexerATNConfig>(config, t->target);

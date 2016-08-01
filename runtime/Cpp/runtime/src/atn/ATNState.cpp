@@ -128,6 +128,6 @@ bool ATNState::onlyHasEpsilonTransitions() {
   return epsilonOnlyTransitions;
 }
 
-void ATNState::setRuleIndex(int ruleIndex) {
-  this->ruleIndex = ruleIndex;
+void ATNState::setRuleIndex(int index) {
+  ruleIndex = index;
 }

@@ -45,7 +45,7 @@ bool PrecedencePredicateTransition::isEpsilon() const {
   return true;
 }
 
-bool PrecedencePredicateTransition::matches(size_t /*symbol*/, size_t /*minVocabSymbol*/, size_t /*maxVocabSymbol*/) const {
+bool PrecedencePredicateTransition::matches(ssize_t /*symbol*/, ssize_t /*minVocabSymbol*/, ssize_t /*maxVocabSymbol*/) const {
   return false;
 }
 

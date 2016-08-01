@@ -60,18 +60,18 @@ bool ATNDeserializationOptions::isVerifyATN() {
   return verifyATN;
 }
 
-void ATNDeserializationOptions::setVerifyATN(bool verifyATN) {
+void ATNDeserializationOptions::setVerifyATN(bool verify) {
   throwIfReadOnly();
-  this->verifyATN = verifyATN;
+  verifyATN = verify;
 }
 
 bool ATNDeserializationOptions::isGenerateRuleBypassTransitions() {
   return generateRuleBypassTransitions;
 }
 
-void ATNDeserializationOptions::setGenerateRuleBypassTransitions(bool generateRuleBypassTransitions) {
+void ATNDeserializationOptions::setGenerateRuleBypassTransitions(bool generate) {
   throwIfReadOnly();
-  this->generateRuleBypassTransitions = generateRuleBypassTransitions;
+  generateRuleBypassTransitions = generate;
 }
 
 void ATNDeserializationOptions::throwIfReadOnly() {

@@ -152,7 +152,7 @@ namespace atn {
     virtual Transition *removeTransition(int index);
     virtual int getStateType() = 0;
     bool onlyHasEpsilonTransitions();
-    virtual void setRuleIndex(int ruleIndex);
+    virtual void setRuleIndex(int index);
 
   };
 

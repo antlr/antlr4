@@ -33,6 +33,11 @@
 
 #include "antlr4-common.h"
 
+#ifdef _WIN32
+  #pragma warning(push)
+  #pragma warning(disable: 4521) // 'antlrcpp::Any': multiple copy constructors specified
+#endif
+
 namespace antlrcpp {
 
 template<class T>
@@ -44,6 +49,9 @@ struct Any
   bool isNotNull() const { return _ptr != nullptr; }
 
   Any() : _ptr(nullptr) {
+  }
+
+  Any(Any& that) : _ptr(that.clone()) {
   }
 
   Any(Any&& that) : _ptr(that._ptr) {
@@ -147,3 +155,7 @@ private:
 };
 
 } // namespace antlrcpp
+
+#ifdef _WIN32
+#pragma warning(pop)
+#endif

@@ -42,7 +42,7 @@ int WildcardTransition::getSerializationType() const {
   return WILDCARD;
 }
 
-bool WildcardTransition::matches(size_t symbol, size_t minVocabSymbol, size_t maxVocabSymbol) const {
+bool WildcardTransition::matches(ssize_t symbol, ssize_t minVocabSymbol, ssize_t maxVocabSymbol) const {
   return symbol >= minVocabSymbol && symbol <= maxVocabSymbol;
 }
 

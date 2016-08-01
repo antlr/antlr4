@@ -537,6 +537,9 @@
     <ClInclude Include="src\antlr4-runtime.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\support\Any.h">
+      <Filter>Source Files\support</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\ANTLRFileStream.cpp">

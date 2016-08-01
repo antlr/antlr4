@@ -87,7 +87,7 @@ std::string Trees::toStringTree(Ref<Tree> const& t, const std::vector<std::strin
       ss << ' ';
     }
     Ref<Tree> child = run->getChild(childIndex);
-    std::string temp = antlrcpp::escapeWhitespace(Trees::getNodeText(child, ruleNames), false);
+    temp = antlrcpp::escapeWhitespace(Trees::getNodeText(child, ruleNames), false);
     if (child->getChildCount() > 0) {
       // Go deeper one level.
       stack.push(childIndex);

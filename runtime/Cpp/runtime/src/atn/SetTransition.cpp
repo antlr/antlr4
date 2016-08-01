@@ -49,7 +49,7 @@ misc::IntervalSet SetTransition::label() const {
   return set;
 }
 
-bool SetTransition::matches(size_t symbol, size_t /*minVocabSymbol*/, size_t /*maxVocabSymbol*/) const {
+bool SetTransition::matches(ssize_t symbol, ssize_t /*minVocabSymbol*/, ssize_t /*maxVocabSymbol*/) const {
   return set.contains((int)symbol);
 }
 

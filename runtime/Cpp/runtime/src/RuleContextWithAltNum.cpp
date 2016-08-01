@@ -47,6 +47,6 @@ int RuleContextWithAltNum::getAltNumber() const {
   return altNum;
 }
 
-void RuleContextWithAltNum::setAltNumber(int altNum) {
-  this->altNum = altNum;
+void RuleContextWithAltNum::setAltNumber(int number) {
+  altNum = number;
 }

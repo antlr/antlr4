@@ -40,14 +40,14 @@ namespace atn {
   class ANTLR4CPP_PUBLIC AtomTransition final : public Transition {
   public:
     /// The token type or character value; or, signifies special label.
-    const size_t _label;
+    const ssize_t _label;
 
-    AtomTransition(ATNState *target, size_t label);
+    AtomTransition(ATNState *target, ssize_t label);
 
     virtual int getSerializationType() const override;
 
     virtual misc::IntervalSet label() const override;
-    virtual bool matches(size_t symbol, size_t minVocabSymbol, size_t maxVocabSymbol) const override;
+    virtual bool matches(ssize_t symbol, ssize_t minVocabSymbol, ssize_t maxVocabSymbol) const override;
 
     virtual std::string toString() const override;
   };

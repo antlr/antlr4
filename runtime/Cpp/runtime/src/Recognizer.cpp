@@ -44,7 +44,7 @@
 
 using namespace antlr4;
 
-std::map<const dfa::Vocabulary*, std::map<std::string, size_t>> Recognizer::_tokenTypeMapCache;
+std::map<const dfa::Vocabulary*, std::map<std::string, ssize_t>> Recognizer::_tokenTypeMapCache;
 std::map<std::vector<std::string>, std::map<std::string, size_t>> Recognizer::_ruleIndexMapCache;
 
 Recognizer::Recognizer() {
@@ -57,11 +57,11 @@ dfa::Vocabulary const& Recognizer::getVocabulary() const {
   return vocabulary;
 }
 
-std::map<std::string, size_t> Recognizer::getTokenTypeMap() {
+std::map<std::string, ssize_t> Recognizer::getTokenTypeMap() {
   const dfa::Vocabulary& vocabulary = getVocabulary();
 
   std::lock_guard<std::recursive_mutex> lck(mtx);
-  std::map<std::string, size_t> result;
+  std::map<std::string, ssize_t> result;
   auto iterator = _tokenTypeMapCache.find(&vocabulary);
   if (iterator != _tokenTypeMapCache.end()) {
     result = iterator->second;
@@ -102,8 +102,8 @@ std::map<std::string, size_t> Recognizer::getRuleIndexMap() {
   return result;
 }
 
-size_t Recognizer::getTokenType(const std::string &tokenName) {
-  const std::map<std::string, size_t> &map = getTokenTypeMap();
+ssize_t Recognizer::getTokenType(const std::string &tokenName) {
+  const std::map<std::string, ssize_t> &map = getTokenTypeMap();
   auto iterator = map.find(tokenName);
   if (iterator == map.end())
     return Token::INVALID_TYPE;

@@ -60,6 +60,12 @@
 // Defines for the Guid class and other platform dependent stuff.
 #ifdef _WIN32
   #pragma warning (disable: 4250) // Class inherits by dominance.
+  #pragma warning (disable: 4512) // assignment operator could not be generated
+
+  #if _MSC_VER <= 1900
+    // Before VS 2015 code like "while (true)" will create a (useless) warning in level 4.
+    #pragma warning (disable: 4127) // conditional expression is constant
+  #endif
 
   #define GUID_WINDOWS
 

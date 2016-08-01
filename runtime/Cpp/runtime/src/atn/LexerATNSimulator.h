@@ -64,9 +64,6 @@ namespace atn {
 
 
   public:
-    static const bool debug = false;
-    static const bool dfa_debug = false;
-
     static const int MIN_DFA_EDGE = 0;
     static const int MAX_DFA_EDGE = 127; // forces unicode to stay in ATN
 
