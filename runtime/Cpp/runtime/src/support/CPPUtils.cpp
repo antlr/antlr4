@@ -57,14 +57,6 @@ namespace antlrcpp {
     std::string result;
     for (auto c : str) {
       switch (c) {
-        case ' ':
-          if (escapeSpaces) {
-            result += "·";
-            break;
-          } else {
-            // fall through
-          }
-
         case '\n':
           result += "\\n";
           break;
@@ -76,6 +68,13 @@ namespace antlrcpp {
         case '\t':
           result += "\\t";
           break;
+
+        case ' ':
+          if (escapeSpaces) {
+            result += "·";
+            break;
+          }
+          // else fall through
 
         default:
           result += c;
