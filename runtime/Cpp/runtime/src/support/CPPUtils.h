@@ -85,28 +85,3 @@ namespace antlrcpp {
   std::string what(std::exception_ptr eptr = std::current_exception());
 
 } // namespace antlrcpp
-
-namespace std {
-  // Comparing weak and shared pointers.
-  template <typename T>
-  bool operator == (const std::weak_ptr<T> &lhs, const std::weak_ptr<T> &rhs) {
-    if (lhs.expired() && rhs.expired())
-      return true;
-
-    if (lhs.expired() || rhs.expired())
-      return false;
-
-    return (lhs.lock() == rhs.lock());
-  }
-
-  template <typename T>
-  bool operator == (const Ref<T> &lhs, const Ref<T> &rhs) {
-    if (!lhs && !rhs)
-      return true;
-
-    if (!lhs || !rhs)
-      return false;
-
-    return (*lhs == *rhs);
-  }
-} // namespace std
