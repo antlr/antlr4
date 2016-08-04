@@ -396,6 +396,8 @@ bool PredictionContext::combineCommonParents(std::vector<std::weak_ptr<Predictio
   std::unordered_set<Ref<PredictionContext>, PredictionContextHasher, PredictionContextComparer> uniqueParents;
 
   for (size_t p = 0; p < parents.size(); ++p) {
+    if (parents[p].expired())
+      continue;
     Ref<PredictionContext> parent = parents[p].lock();
     if (uniqueParents.find(parent) == uniqueParents.end()) { // don't replace
       uniqueParents.insert(parent);
@@ -407,6 +409,8 @@ bool PredictionContext::combineCommonParents(std::vector<std::weak_ptr<Predictio
 
   // Don't resize the parents array, just update the content.
   for (size_t p = 0; p < parents.size(); ++p) {
+    if (parents[p].expired())
+      continue;
     parents[p] = *uniqueParents.find(parents[p].lock());
   }
   return true;
