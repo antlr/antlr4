@@ -116,3 +116,4 @@ flowControl:
 id: ID;
 array : OpenCurly el += INT (Comma el += INT)* CloseCurly;
 idarray : OpenCurly element += id (Comma element += id)* CloseCurly;
+any: t = .;

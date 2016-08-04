@@ -216,7 +216,7 @@ void Parser::triggerExitRuleEvent() {
   }
 }
 
-int Parser::getNumberOfSyntaxErrors() {
+size_t Parser::getNumberOfSyntaxErrors() {
   return _syntaxErrors;
 }
 

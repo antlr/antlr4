@@ -72,6 +72,7 @@ namespace atn {
     virtual size_t hashCode() const = 0;
     virtual std::string toString() const = 0;
     virtual bool operator == (const SemanticContext &other) const = 0;
+    virtual bool operator != (const SemanticContext &other) const;
 
     /// <summary>
     /// For context independent predicates, we evaluate them without a local

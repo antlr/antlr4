@@ -280,7 +280,7 @@ ATN ATNDeserializer::deserialize(const std::vector<uint16_t>& input) {
     }
 
     for (int j = 0; j < nintervals; j++) {
-      set.add(data[p], data[p + 1]);
+      set.add(data[p], data[p + 1], true);
       p += 2;
     }
     sets.push_back(set);

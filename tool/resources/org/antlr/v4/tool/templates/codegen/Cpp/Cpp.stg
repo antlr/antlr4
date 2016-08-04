@@ -792,7 +792,6 @@ cases(ttypes) ::= <<
 >>
 
 InvokeRuleHeader(r, argExprsChunks) ::= "InvokeRuleHeader"
-
 InvokeRule(r, argExprsChunks) ::= <<
 setState(<r.stateNumber>);
 <if(r.labels)><r.labels: {l | <labelref(l)> = }><endif><r.name>(<if(r.ast.options.p)><r.ast.options.p><if(argExprsChunks)>,<endif><endif><argExprsChunks>);
@@ -824,8 +823,7 @@ if (<if (invert)><m.varName> \<= 0 || <else>!<endif>(<expr>)) {
 WildcardHeader(w) ::= "<! Required but unused. !>"
 Wildcard(w) ::= <<
 setState(<w.stateNumber>);
-<! TODO: w.lables untested!>
-<if (w.labels)>Wildcard() <w.labels: {l | <labelref(l)> = }><endif>matchWildcard();
+<if (w.labels)><w.labels: {l | <labelref(l)> = }><endif>matchWildcard();
 >>
 
 // ACTION STUFF

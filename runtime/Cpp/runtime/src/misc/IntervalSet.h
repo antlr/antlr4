@@ -72,7 +72,7 @@ namespace misc {
 
     /// <summary>
     /// Create a set with all ints within range [a..b] (inclusive) </summary>
-    static IntervalSet of(int a, int b);
+    static IntervalSet of(int a, int b, bool autoExtend = false);
 
     virtual void clear();
 
@@ -90,7 +90,7 @@ namespace misc {
     ///  If this is {1..5, 10..20}, adding 6..7 yields
     ///  {1..5, 6..7, 10..20}.  Adding 4..8 yields {1..8, 10..20}.
     /// </summary>
-    virtual void add(int a, int b);
+    virtual void add(int a, int b, bool autoExtend = false);
 
   public:
     /// combine all sets in the array returned the or'd value

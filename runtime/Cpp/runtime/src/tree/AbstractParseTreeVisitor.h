@@ -119,7 +119,7 @@ namespace tree {
     /// a child node.
     /// </param>
     /// <returns> The updated aggregate result. </returns>
-    virtual antlrcpp::Any aggregateResult(antlrcpp::Any /*aggregate*/, antlrcpp::Any nextResult) {
+    virtual antlrcpp::Any aggregateResult(antlrcpp::Any /*aggregate*/, const antlrcpp::Any &nextResult) {
       return nextResult;
     }
 
@@ -146,7 +146,7 @@ namespace tree {
     /// <returns> {@code true} to continue visiting children. Otherwise return
     /// {@code false} to stop visiting children and immediately return the
     /// current aggregate result from <seealso cref="#visitChildren"/>. </returns>
-    virtual bool shouldVisitNextChild(RuleNode * /*node*/, antlrcpp::Any /*currentResult*/) {
+    virtual bool shouldVisitNextChild(RuleNode * /*node*/, const antlrcpp::Any &/*currentResult*/) {
       return true;
     }
 

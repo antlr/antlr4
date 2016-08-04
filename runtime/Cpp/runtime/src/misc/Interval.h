@@ -50,7 +50,7 @@ namespace misc {
     static int outOfRange;
 
     Interval();
-    Interval(int a_, int b_);
+    Interval(int a_, int b_, bool autoExtend = false); // Automatically extend a value of 0xFFFF to 0x10FFFF.
     virtual ~Interval() {};
 
     /// <summary>

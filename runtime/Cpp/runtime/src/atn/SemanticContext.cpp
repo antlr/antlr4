@@ -31,6 +31,7 @@
 
 #include "misc/MurmurHash.h"
 #include "support/CPPUtils.h"
+#include "support/Arrays.h"
 
 #include "SemanticContext.h"
 
@@ -174,14 +175,7 @@ bool SemanticContext::AND::operator == (const SemanticContext &other) const {
   if (context == nullptr)
     return false;
 
-  if (opnds == context->opnds)
-    return true;
-
-  for (auto opndIt = opnds.begin(), otherIt = context->opnds.begin(); opndIt < opnds.end(), otherIt < context->opnds.end(); ++opndIt, ++otherIt) {
-    if (*opndIt != *otherIt)
-      return false;
-  }
-  return true;
+  return Arrays::equals(opnds, context->opnds);
 }
 
 size_t SemanticContext::AND::hashCode() const {
@@ -283,14 +277,7 @@ bool SemanticContext::OR::operator == (const SemanticContext &other) const {
   if (context == nullptr)
     return false;
 
-  if (opnds == context->opnds)
-    return true;
-
-  for (auto opndIt = opnds.begin(), otherIt = context->opnds.begin(); opndIt < opnds.end(), otherIt < context->opnds.end(); ++opndIt, ++otherIt ) {
-    if (*opndIt != *otherIt)
-      return false;
-  }
-  return true;
+  return Arrays::equals(opnds, context->opnds);
 }
 
 size_t SemanticContext::OR::hashCode() const {
@@ -349,6 +336,10 @@ std::string SemanticContext::OR::toString() const {
 //------------------ SemanticContext -----------------------------------------------------------------------------------
 
 const Ref<SemanticContext> SemanticContext::NONE = std::make_shared<Predicate>(-1, -1, false);
+
+bool SemanticContext::operator != (const SemanticContext &other) const {
+  return !(*this == other);
+}
 
 Ref<SemanticContext> SemanticContext::evalPrecedence(Recognizer * /*parser*/, Ref<RuleContext> const& /*parserCallStack*/) {
   return shared_from_this();

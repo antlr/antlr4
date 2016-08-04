@@ -74,15 +74,19 @@ namespace antlrcpp {
 
       return true;
     }
-    /*
-    template <typename T>
-    static std::vector<T> copyOf(const std::vector<T> &source, size_t count) {
-      std::vector<T> result(std::min(source.size(), count));
-      std::copy(source.begin(), source.end(), result.begin());
-      return result;
-    }
-    */
 
+    template <typename T>
+    static bool equals(const std::vector<Ref<T>> &a, const std::vector<Ref<T>> &b) {
+      if (a.size() != b.size())
+        return false;
+
+      for (size_t i = 0; i < a.size(); ++i)
+        if (*a[i] != *b[i])
+          return false;
+
+      return true;
+    }
+    
     template <typename T>
     static std::string toString(const std::vector<T> &source) {
       std::string result = "[";
@@ -112,7 +116,7 @@ namespace antlrcpp {
     }
 
     template <typename T>
-    static std::string toString(const std::vector<T*> &source) {
+    static std::string toString(const std::vector<T *> &source) {
       std::string result = "[";
       bool firstEntry = true;
       for (auto value : source) {
@@ -128,5 +132,5 @@ namespace antlrcpp {
   };
 
   template <>
-  std::string Arrays::toString(const std::vector<antlr4::tree::Tree*> &source);
+  std::string Arrays::toString(const std::vector<antlr4::tree::Tree *> &source);
 }

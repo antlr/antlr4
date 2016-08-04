@@ -43,12 +43,12 @@ int Interval::outOfRange = 0;
 Interval::Interval() : Interval(-1, -2) {
 }
 
-Interval::Interval(int a_, int b_) {
+Interval::Interval(int a_, int b_, bool autoExtend) {
   a = a_;
   b = b_;
 
   // XXX: temporary hack to make the full Unicode range available.
-  if (b == 0xFFFF) {
+  if (autoExtend && b == 0xFFFF) {
     b = 0x10FFFF;
   }
 }

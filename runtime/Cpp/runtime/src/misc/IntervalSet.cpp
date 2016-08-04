@@ -76,8 +76,8 @@ IntervalSet IntervalSet::of(int a) {
   return IntervalSet({ Interval(a, a) });
 }
 
-IntervalSet IntervalSet::of(int a, int b) {
-  return IntervalSet({ Interval(a, b) });
+IntervalSet IntervalSet::of(int a, int b, bool autoExtend) {
+  return IntervalSet({ Interval(a, b, autoExtend) });
 }
 
 void IntervalSet::clear() {
@@ -94,8 +94,8 @@ void IntervalSet::add(int el) {
   add(el, el);
 }
 
-void IntervalSet::add(int a, int b) {
-  add(Interval(a, b));
+void IntervalSet::add(int a, int b, bool autoExtend) {
+  add(Interval(a, b, autoExtend));
 }
 
 void IntervalSet::add(const Interval &addition) {

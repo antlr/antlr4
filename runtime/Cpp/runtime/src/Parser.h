@@ -215,7 +215,7 @@ namespace antlr4 {
     /// incremented each time <seealso cref="#notifyErrorListeners"/> is called.
     /// </summary>
     /// <seealso cref= #notifyErrorListeners </seealso>
-    virtual int getNumberOfSyntaxErrors();
+    virtual size_t getNumberOfSyntaxErrors();
 
     virtual Ref<TokenFactory<CommonToken>> getTokenFactory() override;
 
@@ -442,7 +442,7 @@ namespace antlr4 {
     /// The number of syntax errors reported during parsing. This value is
     /// incremented each time <seealso cref="#notifyErrorListeners"/> is called.
     /// </summary>
-    int _syntaxErrors;
+    size_t _syntaxErrors;
     
     /** Indicates parser has match()ed EOF token. See {@link #exitRule()}. */
     bool _matchedEOF;

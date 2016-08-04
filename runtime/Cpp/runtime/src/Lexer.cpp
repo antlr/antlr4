@@ -59,6 +59,7 @@ void Lexer::reset() {
   // wack Lexer state variables
   _input->seek(0); // rewind the input
 
+  _syntaxErrors = 0;
   token.reset();
   type = Token::INVALID_TYPE;
   channel = Token::DEFAULT_CHANNEL;
@@ -268,6 +269,7 @@ void Lexer::recover(const LexerNoViableAltException &/*e*/) {
 }
 
 void Lexer::notifyListeners(const LexerNoViableAltException & /*e*/) {
+  ++_syntaxErrors;
   std::string text = _input->getText(misc::Interval(tokenStartCharIndex, (int)_input->index()));
   std::string msg = std::string("token recognition error at: '") + getErrorDisplay(text) + std::string("'");
 
@@ -301,7 +303,12 @@ void Lexer::recover(RecognitionException * /*re*/) {
   _input->consume();
 }
 
+size_t Lexer::getNumberOfSyntaxErrors() {
+  return _syntaxErrors;
+}
+
 void Lexer::InitializeInstanceFields() {
+  _syntaxErrors = 0;
   token = nullptr;
   _factory = CommonTokenFactory::DEFAULT;
   tokenStartCharIndex = -1;

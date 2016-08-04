@@ -204,12 +204,20 @@ namespace antlr4 {
     /// to do sophisticated error recovery if you are in a fragment rule.
     virtual void recover(RecognitionException *re);
 
+    /// <summary>
+    /// Gets the number of syntax errors reported during parsing. This value is
+    /// incremented each time <seealso cref="#notifyErrorListeners"/> is called.
+    /// </summary>
+    /// <seealso cref= #notifyListeners </seealso>
+    virtual size_t getNumberOfSyntaxErrors();
+
   protected:
     /// You can set the text for the current token to override what is in
     /// the input char buffer (via setText()).
     std::string _text;
 
   private:
+    size_t _syntaxErrors;
     void InitializeInstanceFields();
   };
 
