@@ -33,7 +33,8 @@
 #include "atn/ATNConfig.h"
 #include "atn/ATNSimulator.h"
 #include "Exceptions.h"
-#include "SemanticContext.h"
+#include "atn/SemanticContext.h"
+#include "support/Arrays.h"
 
 #include "atn/ATNConfigSet.h"
 
@@ -169,12 +170,7 @@ bool ATNConfigSet::operator == (const ATNConfigSet &other) {
       dipsIntoOuterContext != other.dipsIntoOuterContext) // includes stack context
     return false;
 
-  for (size_t i = 0; i < configs.size(); i++) {
-    if (configs[i] != other.configs[i] && *(configs[i]) != *(other.configs[i]))
-      return false;
-  }
-
-  return true;
+  return Arrays::equals(configs, other.configs);
 }
 
 size_t ATNConfigSet::hashCode() {

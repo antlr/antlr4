@@ -61,7 +61,7 @@ struct AltAndContextConfigComparer {
     if (a == b) {
       return true;
     }
-    return a->state->stateNumber == b->state->stateNumber && a->context == b->context;
+    return a->state->stateNumber == b->state->stateNumber && *a->context == *b->context;
   }
 };
 

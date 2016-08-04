@@ -104,7 +104,7 @@ void ATNConfig::setPrecedenceFilterSuppressed(bool value) {
 bool ATNConfig::operator == (const ATNConfig &other) const {
   return state->stateNumber == other.state->stateNumber && alt == other.alt &&
     (context == other.context || (context != nullptr && *context == *(other.context))) &&
-    (semanticContext == other.semanticContext || (semanticContext != nullptr && *semanticContext == *(other.semanticContext))) &&
+    *semanticContext == *(other.semanticContext) &&
     isPrecedenceFilterSuppressed() == other.isPrecedenceFilterSuppressed();
 }
 

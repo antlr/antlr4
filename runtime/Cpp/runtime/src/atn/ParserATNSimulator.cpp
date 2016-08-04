@@ -645,7 +645,7 @@ std::unique_ptr<ATNConfigSet> ParserATNSimulator::applyPrecedenceFilter(ATNConfi
        * (basically a graph subtraction algorithm).
        */
       auto iterator = statesFromAlt1.find(config->state->stateNumber);
-      if (iterator != statesFromAlt1.end() && iterator->second == config->context) {
+      if (iterator != statesFromAlt1.end() && *iterator->second == *config->context) {
         // eliminated
         continue;
       }
