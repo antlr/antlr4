@@ -42,9 +42,7 @@ namespace atn {
   struct PredictionContextComparer;
 
   typedef std::unordered_set<Ref<PredictionContext>, PredictionContextHasher, PredictionContextComparer> PredictionContextCache;
-
-  // For the keys we use raw pointers, as we don't need to access them.
-  typedef std::map<std::pair<PredictionContext *, PredictionContext *>, Ref<PredictionContext>> PredictionContextMergeCache;
+  typedef std::map<std::pair<Ref<PredictionContext>, Ref<PredictionContext>>, Ref<PredictionContext>> PredictionContextMergeCache;
 
   class ANTLR4CPP_PUBLIC PredictionContext {
   public:

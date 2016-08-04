@@ -168,11 +168,11 @@ Ref<PredictionContext> PredictionContext::mergeSingletons(const Ref<SingletonPre
   const Ref<SingletonPredictionContext> &b, bool rootIsWildcard, PredictionContextMergeCache *mergeCache) {
 
   if (mergeCache != nullptr) { // Can be null if not given to the ATNState from which this call originates.
-    auto iterator = mergeCache->find({ a.get(), b.get() });
+    auto iterator = mergeCache->find({ a, b });
     if (iterator != mergeCache->end()) {
       return iterator->second;
     }
-    iterator = mergeCache->find({ b.get(), a.get() });
+    iterator = mergeCache->find({ b, a });
     if (iterator != mergeCache->end()) {
       return iterator->second;
     }
@@ -181,13 +181,13 @@ Ref<PredictionContext> PredictionContext::mergeSingletons(const Ref<SingletonPre
   Ref<PredictionContext> rootMerge = mergeRoot(a, b, rootIsWildcard);
   if (rootMerge) {
     if (mergeCache != nullptr) {
-      (*mergeCache)[{ a.get(), b.get() }] = rootMerge;
+      (*mergeCache)[{ a, b }] = rootMerge;
     }
     return rootMerge;
   }
 
-  Ref<PredictionContext> parentA = a->parent;//.lock();
-  Ref<PredictionContext> parentB = b->parent;//.lock();
+  Ref<PredictionContext> parentA = a->parent;
+  Ref<PredictionContext> parentB = b->parent;
   if (a->returnState == b->returnState) { // a == b
     Ref<PredictionContext> parent = merge(parentA, parentB, rootIsWildcard, mergeCache);
 
@@ -205,7 +205,7 @@ Ref<PredictionContext> PredictionContext::mergeSingletons(const Ref<SingletonPre
     // new joined parent so create new singleton pointing to it, a'
     Ref<PredictionContext> a_ = SingletonPredictionContext::create(parent, a->returnState);
     if (mergeCache != nullptr) {
-      (*mergeCache)[{ a.get(), b.get() }] = a_;
+      (*mergeCache)[{ a, b }] = a_;
     }
     return a_;
   } else {
@@ -224,7 +224,7 @@ Ref<PredictionContext> PredictionContext::mergeSingletons(const Ref<SingletonPre
       std::vector<std::weak_ptr<PredictionContext>> parents = { singleParent, singleParent };
       Ref<PredictionContext> a_ = std::make_shared<ArrayPredictionContext>(parents, payloads);
       if (mergeCache != nullptr) {
-        (*mergeCache)[{ a.get(), b.get() }] = a_;
+        (*mergeCache)[{ a, b }] = a_;
       }
       return a_;
     }
@@ -244,7 +244,7 @@ Ref<PredictionContext> PredictionContext::mergeSingletons(const Ref<SingletonPre
     }
 
     if (mergeCache != nullptr) {
-      (*mergeCache)[{ a.get(), b.get() }] = a_;
+      (*mergeCache)[{ a, b }] = a_;
     }
     return a_;
   }
@@ -283,11 +283,11 @@ Ref<PredictionContext> PredictionContext::mergeArrays(const Ref<ArrayPredictionC
   const Ref<ArrayPredictionContext> &b, bool rootIsWildcard, PredictionContextMergeCache *mergeCache) {
 
   if (mergeCache != nullptr) {
-    auto iterator = mergeCache->find({ a.get(), b.get() });
+    auto iterator = mergeCache->find({ a, b });
     if (iterator != mergeCache->end()) {
       return iterator->second;
     }
-    iterator = mergeCache->find({ b.get(), a.get() });
+    iterator = mergeCache->find({ b, a });
     if (iterator != mergeCache->end()) {
       return iterator->second;
     }
@@ -355,7 +355,7 @@ Ref<PredictionContext> PredictionContext::mergeArrays(const Ref<ArrayPredictionC
     if (k == 1) { // for just one merged element, return singleton top
       Ref<PredictionContext> a_ = SingletonPredictionContext::create(mergedParents[0].lock(), mergedReturnStates[0]);
       if (mergeCache != nullptr) {
-        (*mergeCache)[{ a.get(), b.get() }] = a_;
+        (*mergeCache)[{ a, b }] = a_;
       }
       return a_;
     }
@@ -371,13 +371,13 @@ Ref<PredictionContext> PredictionContext::mergeArrays(const Ref<ArrayPredictionC
   // TO_DO: track whether this is possible above during merge sort for speed
   if (M == a) {
     if (mergeCache != nullptr) {
-      (*mergeCache)[{ a.get(), b.get() }] = a;
+      (*mergeCache)[{ a, b }] = a;
     }
     return a;
   }
   if (M == b) {
     if (mergeCache != nullptr) {
-      (*mergeCache)[{ a.get(), b.get() }] = b;
+      (*mergeCache)[{ a, b }] = b;
     }
     return b;
   }
@@ -387,7 +387,7 @@ Ref<PredictionContext> PredictionContext::mergeArrays(const Ref<ArrayPredictionC
     M = std::make_shared<ArrayPredictionContext>(mergedParents, mergedReturnStates);
 
   if (mergeCache != nullptr) {
-    (*mergeCache)[{ a.get(), b.get() }] = M;
+    (*mergeCache)[{ a, b }] = M;
   }
   return M;
 }
