@@ -21,6 +21,7 @@ The C++ target has been the work of the following people:
 ## Other contributors
 
 * Marcin Szalowicz, mszalowicz@mailplus.pl (cmake build setup)
+* Tim O'Callaghan, timo@linux.com (additional superbuild cmake pattern script)
 
 ## Project Status
 
@@ -54,4 +55,5 @@ Either open the included XCode project and build that or use the cmake compilati
 - DESTDIR=<antlr4-dir>/runtime/Cpp/run make install
 
 If you don't want to build the demo then simply run cmake without parameters.
+There is another cmake script available in the subfolder cmake/ for those who prefer the superbuild cmake pattern.
 

@@ -248,7 +248,7 @@ Add links to the artifacts from download.html
 The C++ target is the most complex one, because it addresses multiple platforms, which require individual handling. We have 4 scenarios to cover:
 
 * **Windows**: static and dynamic libraries for the VC++ runtime 2013 or 2015 (corresponding to Visual Studio 2013 or 2015) + header files. All that in 32 and 64bit, debug + release.
-* **MacOS**: static and dynamic libraries + header files.
+* **MacOS**: static and dynamic release libraries + header files.
 * **iOS**: no prebuilt binaries, but just a zip of the source, including the XCode project to build everything from source.
 * **Linux**: no prebuilt binaries, but just a zip of the source code, including the cmake file to build everything from source there.
 
@@ -259,21 +259,21 @@ For each platform there's a deployment script which generates zip archives and c
 On a Mac (with XCode 7+ installed):
 
 ```bash
-cd runtime/Cpp/runtime
+cd runtime/Cpp
 ./deploy-macos.sh
 ```
 
 On any Mac or Linux machine:
 
 ```bash
-cd runtime/Cpp/runtime
+cd runtime/Cpp
 ./deploy-source.sh
 ```
 
 On a Windows machine the build scripts checks if VS 2013 and/or VS 2015 are installed and builds binaries for each, if found. This script requires 7z to be installed (http://7-zip.org).
 
 ```bash
-cd runtime/Cpp/runtime
+cd runtime/Cpp
 deploy-windows.cmd
 ```
 
