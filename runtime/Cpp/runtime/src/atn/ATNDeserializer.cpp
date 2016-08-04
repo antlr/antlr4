@@ -483,7 +483,7 @@ ATN ATNDeserializer::deserialize(const std::vector<uint16_t>& input) {
             continue;
           }
 
-          if (transition->target == endState || *(transition->target) == *endState) {
+          if (transition->target == endState) {
             transition->target = bypassStop;
           }
         }
