@@ -11,9 +11,10 @@ ANTLR project lead and supreme dictator for life
 [University of San Francisco](http://www.usfca.edu/)
 * [Sam Harwell](http://tunnelvisionlabs.com/) (Tool co-author, Java and C# target)
 * Eric Vergnaud (Javascript, Python2, Python3 targets and significant work on C# target)
-* [Mike Lischke](http://www.soft-gems.net/) (most of the C++ target work)
-* David Sisson (C++ target test runtime)
-* Dan McLaughlin (C++ target project initiator, initial machine translation + Github hosting)
+* [Mike Lischke](http://www.soft-gems.net/) (C++ completed target)
+* Dan McLaughlin (C++ initial target)
+* David Sisson (C++ initial target and test)
+
 
 ## Useful information
 
