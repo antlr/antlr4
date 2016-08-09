@@ -81,7 +81,7 @@ class ListTokenSource(TokenSource):
             return self.eofToken
         t = self.tokens[self.pos]
         if self.pos == len(self.tokens) - 1 and t.type == Token.EOF:
-            eofToken = t
+            self.eofToken = t
         self.pos += 1
         return t
 
