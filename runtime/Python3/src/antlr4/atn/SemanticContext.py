@@ -115,7 +115,7 @@ def orContext(a:SemanticContext, b:SemanticContext):
     else:
         return result
 
-def filterPrecedencePredicates(collection:list):
+def filterPrecedencePredicates(collection:set):
     result = []
     for context in collection:
         if isinstance(context, PrecedencePredicate):
