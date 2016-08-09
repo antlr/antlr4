@@ -27,13 +27,6 @@ $ antlr4 -Dlanguage=JavaScript MyGrammar.g4
 
 For a full list of antlr4 tool options, please visit the [tool documentation page](tool-options.md).
 
-## Where can I get the runtime?
-
-Once you've generated the lexer and/or parser code, you need to download the runtime.
-
-The JavaScript runtime is available from the ANTLR web site [download section](http://www.antlr.org/download/index.html). The runtime is provided in the form of source code, so no additional installation is required.
-
-We will not document here how to refer to the runtime from your project, since this would differ a lot depending on your project type and IDE. 
 
 ## How do I get the runtime in my browser?
 
@@ -64,14 +57,28 @@ This will load the runtime asynchronously.
 
 ## How do I get the runtime in Node.js?
 
-Right now, there is no npm package available, so you need to register a link instead. This can be done by running the following command from the antlr4 directory:
+### Use npm 
 
-```bash
+The npm package manager is the usual way to install node.js packages.   This will install the latest stable version from [npmjs.com](https://npmjs.com/package/antlr4), and save the dependency in your project's project.json :
+
+```
+$ npm install --save antlr4
+```
+
+### Alternatively... use npm to install the runtime from local sources
+
+To install from local sources, first you need to create a link from the runtime's source directory (e.g. antlr4\runtime\JavaScript\src\antlr4), use this command:
+
+```
+$ npm link
+```
+
+Then in your target project's directory, issue this command to link to the local copy:
+
+``` 
 $ npm link antlr4
 ```
 
-This will install antlr4 using the package.son descriptor that comes with the script.
- 
 ## How do I run the generated lexer and/or parser?
 
 Let's suppose that your grammar is named, as above, "MyGrammar". Let's suppose this parser comprises a rule named "StartRule". The tool will have generated for you the following files:
