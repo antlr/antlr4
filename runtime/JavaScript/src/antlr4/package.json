@@ -15,5 +15,9 @@
   "bugs": {
     "url": "https://github.com/antlr/antlr4/issues"
   },
-  "homepage": "https://github.com/antlr/antlr4"
+  "homepage": "https://github.com/antlr/antlr4",
+  "devDependencies": {
+    "tslint": "^3.14.0",
+    "typescript": "^1.8.10"
+  }
 }

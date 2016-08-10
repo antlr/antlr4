@@ -57,3 +57,6 @@ bilder.pyc
 bild.log
 
 bild_output.txt
+
+# NPM dependencies
+node_modules

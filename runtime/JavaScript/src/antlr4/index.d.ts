@@ -1,6 +1,6 @@
 // index.d.ts - Hand-crafted typescript declarations of antlr4 runtime for JavaScript
 //
-//[The "BSD license"]
+// [The "BSD license"]
 // Copyright (c) 2016 Burt Harris
 // All rights reserved.
 //
@@ -27,44 +27,44 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-// This file includes TypeScript style declarations of the interfaces 
-// of the ANTLR4 JavaScript runtime.   This enables tools to provide more help 
+// This file includes TypeScript style declarations of the interfaces
+// of the ANTLR4 JavaScript runtime.   This enables tools to provide more help
 // by reasoning about the types object despite the fact that at runtime, JavaScript
-// is dynamicly typed.   
+// is dynamicly typed.
 //
 // The /*readonly*/ comments below can be uncommented when working with TypeScript 2.0 tool chain.
 // At this time TypeScript 2.0 is still in Beta pre-relase.
 
 export interface IntStream {
-    /*readonly*/ index : number;
-    /*readonly*/ size : number;
+    /*readonly*/ index: number;
+    /*readonly*/ size: number;
 
-    mark() : number ;
-    release( marker : number );
-    seek( index : number );
+    mark(): number;
+    release( marker: number );
+    seek( index: number );
 }
 
 export interface CharStream extends IntStream {
-    getText(interval : Interval) : string ;
+    getText(interval: Interval): string;
 }
 
 export class InputStream implements CharStream {
-    constructor( text: string );
-    /*readonly*/ index : number;
-    /*readonly*/ size : number;
+    public /*readonly*/ index: number;
+    public /*readonly*/ size: number;
 
-    mark() : number ;
-    release( marker : number );
-    seek( index : number );
-    getText(interval : Interval) : string ;
+    constructor( text: string );
+    public mark(): number;
+    public release( marker: number );
+    public seek( index: number );
+    public getText(interval: Interval): string;
 }
 
 export interface TokenStream extends IntStream {
-    LT( number ) : Token ;
-    get( number ) : Token ;
-    getTokenSource() : TokenSource ;
-    getText(spec: Interval | RuleContext) : string;
-    getText(start: Token, stop:Token ) : string;
+    LT( i: number ): Token;
+    get( i: number ): Token;
+    getTokenSource(): TokenSource;
+    getText( spec: Interval | RuleContext ): string;
+    getText( start: Token, stop: Token ): string;
 }
 
 interface Interval {}
@@ -74,47 +74,47 @@ interface Vocabulary {}
 interface ATN {}
 
 export class Recognizer {
+    public state: number;
+
     constructor()
 
-    // getVocabulary() : Vocabulary ;
-    getTokenTypeMap() : Map< string, number >;
-    getRuleIndexMap() : Map< string, number >;
-    getTokenType( tokenName: string ) : number ;
-    getSerializedATN() : string ;
-    getGrammarFileName() : string ;
-    getATN() : ATN
-    getErrorHeader(exception) : string;
-    getTokenErrorDisplay(t:Token) : string;
+    // getVocabulary(): Vocabulary;
+    public getTokenTypeMap(): Map< string, number >;
+    public getRuleIndexMap(): Map< string, number >;
+    public getTokenType( tokenName: string ): number;
+    public getSerializedATN(): string;
+    public getGrammarFileName(): string;
+    public getATN(): ATN
+    public getErrorHeader(exception): string;
+    public getTokenErrorDisplay(t: Token): string;
 
-    addErrorListener( listener ) : void; 
-    removeErrorListeners() : void ;
+    public addErrorListener( listener ): void;
+    public removeErrorListeners(): void;
 
-    sempred( localctx, ruleIndex, actionIndex) : boolean;
-    precpred( localctx , precedence ) : boolean;
-    state : number;
+    public sempred( localctx, ruleIndex, actionIndex): boolean;
+    public precpred( localctx , precedence ): boolean;
 
-} 
+}
 
-export module Tree {
+export namespace Tree {
 
     export interface Tree {
-	    // getParent() : Tree ;
-    	getPayload() : any;
-        //getChild(i : number) : Tree ;
-    	getChildCount() : number ;
-	    // toStringTree() : string;
+        // getParent(): Tree;
+        getPayload(): any;
+        // getChild(i: number): Tree;
+        getChildCount(): number;
+        // toStringTree(): string;
     }
-
 
     export interface SyntaxTree extends Tree {
-        getSourceInterval() : Interval ;
+        getSourceInterval(): Interval;
     }
 
-    export interface ParseTree extends SyntaxTree { 
-        getParent() : ParseTree ; 
-        getChild(i : number) : ParseTree;
+    export interface ParseTree extends SyntaxTree {
+        getParent(): ParseTree;
+        getChild(i: number): ParseTree;
         accept( visitor );
-        getText() : string 
+        getText(): string;
         toStringTree( parser: Parser );
     }
 
@@ -127,101 +127,100 @@ export module Tree {
     }
 
     export interface RuleNode extends ParseTree {
-        getRuleContext(): RuleContext
+        getRuleContext(): RuleContext;
     }
 
     export class ParseTreeVisitor<T> {
-        visit( tree : ParseTree ) : T ;
-        visitChildren( node: RuleNode ) : T;
-        visitTerminal( node: TerminalNode ) : T;
-        visitErrorNode( node : ErrorNode ) : T;
+        public visit( tree: ParseTree ): T;
+        public visitChildren( node: RuleNode ): T;
+        public visitTerminal( node: TerminalNode ): T;
+        public visitErrorNode( node: ErrorNode ): T;
     }
 
-    export class ParseTreeListener { 
- 	    visitTerminal(node : TerminalNode ); 
-        visitErrorNode(node : ErrorNode ); 
-        enterEveryRule(ctx : ParserRuleContext); 
-        exitEveryRule(ctx : ParserRuleContext); 
-
+    export class ParseTreeListener {
+        public visitTerminal(node: TerminalNode );
+        public visitErrorNode(node: ErrorNode );
+        public enterEveryRule(ctx: ParserRuleContext);
+        public exitEveryRule(ctx: ParserRuleContext);
     }
 
-    export class  ParseTreeWalker { 
-        walk( listener: ParseTreeListener, tree : ParseTree );
-        protected enterRule( listener: ParseTreeListener, r : RuleNode );
-        protected exitRule(  listener: ParseTreeListener, r : RuleNode );
+    export class  ParseTreeWalker {
+        public walk( listener: ParseTreeListener, tree: ParseTree );
+        protected enterRule( listener: ParseTreeListener, r: RuleNode );
+        protected exitRule(  listener: ParseTreeListener, r: RuleNode );
     }
 
 }
 
 interface RuleContext extends Tree.RuleNode {
     parent: RuleContext;
-    invokingState : number;
-    depth() : number; 
-    isEmpty() : boolean;
-    getSourceInterval() : Interval;
+    invokingState: number;
+    depth(): number;
+    isEmpty(): boolean;
+    getSourceInterval(): Interval;
 }
 
 interface ParserRuleContext extends RuleContext {
-
 }
 
 export class Lexer extends Recognizer {
-    constructor( input : InputStream );
-    reset() : void ; 
-    nextToken() : Token ;
-    skip() : void ;
-    more() : void ;
-    pushMode() : void ;
-    popMode() : number ;
-    inputStream : InputStream;
-    symbolicNames : string[];
+    public inputStream: InputStream;
+    public symbolicNames: string[];
+
+    public reset(): void;
+    public nextToken(): Token;
+    public skip(): void;
+    public more(): void;
+    public pushMode(): void;
+    public popMode(): number;
 }
 
 export class BufferedTokenStream implements TokenStream {
-    constructor( tokenSource: TokenSource );
-    
-    /*readonly*/ index : number;
-    /*readonly*/ size : number;
+    public /*readonly*/ index: number;
+    public /*readonly*/ size: number;
 
-    mark() : number ;
-    release( marker : number );
-    seek( index : number );
-    getText(interval : Interval) : string ;
-    LT( number ) : Token ;
-    get( number ) : Token ;
-    getTokenSource() : TokenSource ;
-    getText(spec: Interval | RuleContext) : string;
-    getText(start: Token, stop:Token ) : string;   
+    constructor( tokenSource: TokenSource );
+
+    public mark(): number;
+    public release( marker: number );
+    public seek( index: number );
+    public getText(interval: Interval): string;
+    public LT( i: number ): Token;
+    public get( i: number ): Token;
+    public getTokenSource(): TokenSource;
+    public getText(spec: Interval | RuleContext): string;
+    public getText(start: Token, stop: Token ): string;
 }
 
 export class CommonTokenStream extends BufferedTokenStream {
-    constructor( lexer: Lexer );
-    /*readonly*/ index : number;
-    /*readonly*/ size : number;
+    public /*readonly*/ index: number;
+    public /*readonly*/ size: number;
 
-    mark() : number ;
-    release( marker : number );
-    seek( index : number );
-    getText(interval : Interval) : string ;
-    LT( number ) : Token ;
-    get( number ) : Token ;
-    getTokenSource() : TokenSource ;
-    getText(spec: Interval | RuleContext) : string;
-    getText(start: Token, stop:Token ) : string;
-    fetch( count: number ) : number;
-    getTokens( start? : number, stop? : number, types? : number[]) : Token[];
+    constructor( lexer: Lexer );
+
+    public mark(): number;
+    public release( marker: number );
+    public seek( index: number );
+    public getText(interval: Interval): string;
+    public LT( i: number ): Token;
+    public get( i: number ): Token;
+    public getTokenSource(): TokenSource;
+    public getText(spec: Interval | RuleContext): string;
+    public getText(start: Token, stop: Token ): string;
+    public fetch( count: number ): number;
+    public getTokens( start?: number, stop?: number, types?: number[]): Token[];
 }
 
 export class Parser {
-    constructor( tokens : TokenStream )
+    constructor( tokens: TokenStream )
 }
 
 export interface TokenSource {
-    nextToken() : Token ;
-    getLine() : number ;
-    getCharPositionInLine() : number ;
-    getInputStream : CharStream ;
-    getSourceName : string ;
+    getInputStream: CharStream;
+    getSourceName: string;
+    nextToken(): Token;
+    getLine(): number;
+    getCharPositionInLine(): number;
 }
 
 export enum TokenType {
@@ -232,31 +231,23 @@ export enum TokenType {
 }
 
 export enum Channel {
-    // All tokens go to the parser (unless skip() is called in that rule)
-    // on a particular "channel". The parser tunes to a particular channel
-    // so that whitespace etc... can go to the parser on a "hidden" channel.
-
     DEFAULT_CHANNEL = 0,
-
-    // Anything on different channel than DEFAULT_CHANNEL is not parsed
-    // by parser.
-
     HIDDEN_CHANNEL = 1,
 }
 
 // Tokens and related
 
 export interface Token {
-	/*readonly*/ type       : TokenType ;
-                 text       : string ;
-	/*readonly*/ channel    : Channel ; // The parser ignores everything not on DEFAULT_CHANNEL
-	/*readonly*/ start      : number ; // optional; return -1 if not implemented.
-	/*readonly*/ stop       : number ; // optional; return -1 if not implemented.
-	/*readonly*/ tokenIndex : number ; // from 0..n-1 of the token object in the input stream
-	/*readonly*/ line       : number ; // line=1..n of the 1st character
-	/*readonly*/ column     : number ; // beginning of the line at which it occurs, 0..n-1
-                 toString() : string ;
+	/*readonly*/ type: TokenType;
+                 text: string;
+	/*readonly*/ channel: Channel; // The parser ignores everything not on DEFAULT_CHANNEL
+	/*readonly*/ start: number; // optional; return -1 if not implemented.
+	/*readonly*/ stop: number; // optional; return -1 if not implemented.
+	/*readonly*/ tokenIndex: number; // from 0..n-1 of the token object in the input stream
+	/*readonly*/ line: number; // line=1..n of the 1st character
+	/*readonly*/ column: number; // beginning of the line at which it occurs, 0..n-1
+                 toString(): string;
                  getInputStream(): CharStream;
-                 getTokenSource() : TokenSource;
+                 getTokenSource(): TokenSource;
 
 }
