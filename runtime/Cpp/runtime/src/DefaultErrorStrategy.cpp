@@ -177,7 +177,7 @@ void DefaultErrorStrategy::reportNoViableAlternative(Parser *recognizer, const N
 
 void DefaultErrorStrategy::reportInputMismatch(Parser *recognizer, const InputMismatchException &e) {
   std::string msg = "mismatched input " + getTokenErrorDisplay(e.getOffendingToken()) +
-  " expecting " + e.getExpectedTokens().toString(recognizer->getVocabulary());
+  " expecting " + escapeWSAndQuote(e.getExpectedTokens().toString(recognizer->getVocabulary()));
   recognizer->notifyErrorListeners(e.getOffendingToken(), msg, std::make_exception_ptr(e));
 }
 
@@ -198,8 +198,8 @@ void DefaultErrorStrategy::reportUnwantedToken(Parser *recognizer) {
   std::string tokenName = getTokenErrorDisplay(t);
   misc::IntervalSet expecting = getExpectedTokens(recognizer);
 
-  std::string msg = std::string("extraneous input ") + tokenName + std::string(" expecting ") +
-    expecting.toString(recognizer->getVocabulary());
+  std::string msg = "extraneous input " + tokenName + " expecting " +
+    escapeWSAndQuote(expecting.toString(recognizer->getVocabulary()));
   recognizer->notifyErrorListeners(t, msg, nullptr);
 }
 
@@ -319,11 +319,12 @@ int DefaultErrorStrategy::getSymbolType(Token *symbol) {
   return symbol->getType();
 }
 
-std::string DefaultErrorStrategy::escapeWSAndQuote(std::string &s) {
-  antlrcpp::replaceAll(s, "\n", "\\n");
-  antlrcpp::replaceAll(s, "\r","\\r");
-  antlrcpp::replaceAll(s, "\t","\\t");
-  return "'" + s + "'";
+std::string DefaultErrorStrategy::escapeWSAndQuote(const std::string &s) const {
+  std::string result = s;
+  antlrcpp::replaceAll(result, "\n", "\\n");
+  antlrcpp::replaceAll(result, "\r","\\r");
+  antlrcpp::replaceAll(result, "\t","\\t");
+  return "'" + result + "'";
 }
 
 misc::IntervalSet DefaultErrorStrategy::getErrorRecoverySet(Parser *recognizer) {

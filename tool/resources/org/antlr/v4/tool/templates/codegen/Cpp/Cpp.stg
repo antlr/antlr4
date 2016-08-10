@@ -526,12 +526,13 @@ Ref\<<parser.name>::<currentRule.ctxType>\> <parser.name>::<currentRule.name>(in
 StructDeclHeader(struct, ctorAttrs, attrs, getters, dispatchMethods, interfaces, extensionMembers) ::= <<
 class <struct.name> : public <if (contextSuperClass)><contextSuperClass><else>ParserRuleContext<endif><if(interfaces)>, <interfaces; separator=", "><endif> {
 public:
-  <if (attrs)><attrs:{a | <if (!a.isLocal)><a>;<endif>}; separator="\n"><endif>
+  <attrs: {a | <a>;}; separator="\n">
   <if (ctorAttrs)><struct.name>(std::weak_ptr\<ParserRuleContext> parent, int invokingState);<endif>
   <struct.name>(std::weak_ptr\<ParserRuleContext> parent, int invokingState<ctorAttrs: {a | , <a>}>);
 <if (struct.provideCopyFrom)> <! don't need copy unless we have subclasses !>
   <struct.name>() { }
   void copyFrom(Ref\<<struct.name>\> const& context);
+  using ParserRuleContext::copyFrom;
 <endif>
 
   virtual ssize_t getRuleIndex() const override;
@@ -539,10 +540,6 @@ public:
 
   <dispatchMethods; separator = "\n">
 <! TODO: untested !> <extensionMembers; separator = "\n">
-<if (attrs)>
-private:
-  <attrs: {a | <if (a.isLocal)><a><endif>}; separator = "\n">
-<endif>
 };
 
 >>
@@ -945,21 +942,21 @@ AddToLabelList(a) ::= <<
 <ctx(a.label)>-><a.listName>.push_back(<labelref(a.label)>);
 >>
 
-TokenLabelType() ::= "<file.TokenLabelType; null = {Token}>*"
+TokenLabelType() ::= "<file.TokenLabelType; null = {Token}> *"
 
-TokenDeclHeader(t) ::= "<TokenLabelType()> <t.name>;" 
+TokenDeclHeader(t) ::= "<TokenLabelType()><t.name> = nullptr;" 
 TokenDecl(t) ::= "<! Variable Declaration !>"
 
 TokenTypeDeclHeader(t) ::= "<! Local Variable !>"
-TokenTypeDecl(t) ::= "ssize_t <t.name>;"
+TokenTypeDecl(t) ::= "ssize_t <t.name> = 0;"
 
-TokenListDeclHeader(t) ::= "std::vector\<Token *> <t.name>;"
+TokenListDeclHeader(t) ::= "std::vector\<Token *> <t.name>"
 TokenListDecl(t) ::= "<! Variable Declaration !>"
 
-RuleContextDeclHeader(r) ::= "Ref\<<parser.name>::<r.ctxName>> <r.name>;"
+RuleContextDeclHeader(r) ::= "Ref\<<parser.name>::<r.ctxName>> <r.name>"
 RuleContextDecl(r) ::= "<! Variable Declaration !>"
 
-RuleContextListDeclHeader(rdecl) ::= "std::vector\<Ref\<<rdecl.ctxName>>> <rdecl.name>;"
+RuleContextListDeclHeader(rdecl) ::= "std::vector\<Ref\<<rdecl.ctxName>>> <rdecl.name>"
 RuleContextListDecl(rdecl) ::= "<! Variable Declaration !>"
 
 ContextTokenGetterDeclHeader(t) ::= "Ref\<tree::TerminalNode> <t.name>();"

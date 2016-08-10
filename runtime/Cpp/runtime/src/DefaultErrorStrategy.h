@@ -381,7 +381,7 @@ namespace antlr4 {
 
     virtual int getSymbolType(Token *symbol);
 
-    virtual std::string escapeWSAndQuote(std::string &s);
+    virtual std::string escapeWSAndQuote(const std::string &s) const;
 
     /*  Compute the error recovery set for the current rule.  During
      *  rule invocation, the parser pushes the set of tokens that can
