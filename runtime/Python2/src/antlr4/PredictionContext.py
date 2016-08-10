@@ -585,15 +585,14 @@ def getCachedPredictionContext(context, contextCache, visited):
         parent = getCachedPredictionContext(context.getParent(i), contextCache, visited)
         if changed or parent is not context.getParent(i):
             if not changed:
-                parents = [None] * len(context)
-                for j in range(0, len(context)):
-                    parents[j] = context.getParent(j)
+                parents = [context.getParent(j) for j in range(len(context))]
                 changed = True
             parents[i] = parent
     if not changed:
         contextCache.add(context)
         visited[context] = context
         return context
+
     updated = None
     if len(parents) == 0:
         updated = PredictionContext.EMPTY

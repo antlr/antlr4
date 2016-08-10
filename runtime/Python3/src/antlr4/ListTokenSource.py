@@ -101,9 +101,7 @@ class ListTokenSource(TokenSource):
             line = lastToken.line
             tokenText = lastToken.text
             if tokenText is not None:
-                for c in tokenText:
-                    if c  == '\n':
-                        line += 1
+                line += tokenText.count('\n')
 
             # if no text is available, assume the token did not contain any newline characters.
             return line
