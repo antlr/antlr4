@@ -1,8 +1,8 @@
 {
   "name": "antlr4",
-  "version": "4.5.3",
+  "version": "4.5.4-BurtHarris.1",
   "description": "JavaScript runtime for ANTLR4",
-  "main": "src/antlr4/index.js",
+  "main": "index.js",
   "repository": "antlr/antlr4.git",
   "keywords": [
     "lexer",
@@ -11,9 +11,13 @@
     "antlr4",
     "grammar"
   ],
-  "license": "BSD",
+  "license": "BSD-3-Clause",
   "bugs": {
     "url": "https://github.com/antlr/antlr4/issues"
   },
-  "homepage": "https://github.com/antlr/antlr4"
+  "homepage": "https://github.com/antlr/antlr4",
+  "devDependencies": {
+    "tslint": "^3.14.0",
+    "typescript": "^1.8.10"
+  }
 }
