@@ -1,5 +1,10 @@
 # Maven build folders
 target/
+!tool/src/org/antlr/v4/codegen/target/
+
+# Node.js (npm and typings) cached dependencies 
+node_modules/
+typings/
 
 # Ant build folders
 build/
