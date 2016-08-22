@@ -64,12 +64,12 @@ void Parser::TraceListener::enterEveryRule(ParserRuleContext *ctx) {
     << ", LT(1)=" << outerInstance->_input->LT(1)->getText() << std::endl;
 }
 
-void Parser::TraceListener::visitTerminal(Ref<tree::TerminalNode> const& node) {
+void Parser::TraceListener::visitTerminal(tree::TerminalNode *node) {
   std::cout << "consume " << node->getSymbol() << " rule "
     << outerInstance->getRuleNames()[(size_t)outerInstance->getContext()->getRuleIndex()] << std::endl;
 }
 
-void Parser::TraceListener::visitErrorNode(Ref<tree::ErrorNode> const& /*node*/) {
+void Parser::TraceListener::visitErrorNode(tree::ErrorNode * /*node*/) {
 }
 
 void Parser::TraceListener::exitEveryRule(ParserRuleContext *ctx) {
@@ -82,10 +82,10 @@ Parser::TrimToSizeListener Parser::TrimToSizeListener::INSTANCE;
 void Parser::TrimToSizeListener::enterEveryRule(ParserRuleContext * /*ctx*/) {
 }
 
-void Parser::TrimToSizeListener::visitTerminal(Ref<tree::TerminalNode> const& /*node*/) {
+void Parser::TrimToSizeListener::visitTerminal(tree::TerminalNode * /*node*/) {
 }
 
-void Parser::TrimToSizeListener::visitErrorNode(Ref<tree::ErrorNode> const& /*node*/) {
+void Parser::TrimToSizeListener::visitErrorNode(tree::ErrorNode * /*node*/) {
 }
 
 void Parser::TrimToSizeListener::exitEveryRule(ParserRuleContext * ctx) {
@@ -107,6 +107,7 @@ void Parser::reset() {
   }
   _errHandler->reset(this); // Watch out, this is not shared_ptr.reset().
 
+  _matchedEOF = false;
   _syntaxErrors = 0;
   setTrace(false);
   _precedenceStack.clear();
@@ -320,14 +321,14 @@ Token* Parser::consume() {
       Ref<tree::ErrorNode> node = _ctx->addErrorNode(o);
       if (_parseListeners.size() > 0) {
         for (auto listener : _parseListeners) {
-          listener->visitErrorNode(node);
+          listener->visitErrorNode(node.get());
         }
       }
     } else {
       Ref<tree::TerminalNode> node = _ctx->addChild(o);
       if (_parseListeners.size() > 0) {
         for (auto listener : _parseListeners) {
-          listener->visitTerminal(node);
+          listener->visitTerminal(node.get());
         }
       }
     }
@@ -517,7 +518,7 @@ bool Parser::isMatchedEOF() const {
 }
 
 misc::IntervalSet Parser::getExpectedTokens() {
-  return getATN().getExpectedTokens(getState(), getContext());
+  return getATN().getExpectedTokens(getState(), getContext().get());
 }
 
 misc::IntervalSet Parser::getExpectedTokensWithinCurrentRule() {
@@ -557,7 +558,7 @@ std::vector<std::string> Parser::getRuleInvocationStack(Ref<RuleContext> const& 
     }
     if (p->parent.expired())
       break;
-    run = run->parent.lock().get();
+    run = (RuleContext *)run->parent.lock().get();
   }
   return stack;
 }

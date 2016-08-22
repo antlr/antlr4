@@ -46,7 +46,7 @@ std::vector<Ref<ParseTree>> XPathWildcardElement::evaluate(const Ref<ParseTree> 
     return {}; // !* is weird but valid (empty)
   }
   std::vector<Ref<ParseTree>> kids;
-  for (auto c : Trees::getChildren(t)) {
+  for (auto c : t->children) {
     kids.push_back(std::static_pointer_cast<ParseTree>(c));
   }
   return kids;

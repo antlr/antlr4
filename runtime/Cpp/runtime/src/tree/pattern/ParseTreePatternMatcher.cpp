@@ -214,7 +214,7 @@ Ref<ParseTree> ParseTreePatternMatcher::matchImpl(Ref<ParseTree> const& tree,
     }
 
     // (expr ...) and (expr ...)
-    if (r1->getChildCount() != r2->getChildCount()) {
+    if (r1->children.size() != r2->children.size()) {
       if (mismatchedNode == nullptr) {
         mismatchedNode = r1;
       }
@@ -222,9 +222,10 @@ Ref<ParseTree> ParseTreePatternMatcher::matchImpl(Ref<ParseTree> const& tree,
       return mismatchedNode;
     }
 
-    std::size_t n = r1->getChildCount();
+    std::size_t n = r1->children.size();
     for (size_t i = 0; i < n; i++) {
-      Ref<ParseTree> childMatch = matchImpl(r1->getChild(i), patternTree->getChild(i), labels);
+      Ref<ParseTree> childMatch = matchImpl(std::dynamic_pointer_cast<ParseTree>(r1->children[i]),
+        std::dynamic_pointer_cast<ParseTree>(patternTree->children[i]), labels);
       if (childMatch) {
         return childMatch;
       }
@@ -240,8 +241,8 @@ Ref<ParseTree> ParseTreePatternMatcher::matchImpl(Ref<ParseTree> const& tree,
 RuleTagToken* ParseTreePatternMatcher::getRuleTagToken(Ref<ParseTree> const& t) {
   if (is<RuleNode>(t)) {
     Ref<RuleNode> r = std::dynamic_pointer_cast<RuleNode>(t);
-    if (r->getChildCount() == 1 && is<TerminalNode>(r->getChild(0))) {
-      Ref<TerminalNode> c = std::dynamic_pointer_cast<TerminalNode>(r->getChild(0));
+    if (r->children.size() == 1 && is<TerminalNode>(r->children[0])) {
+      Ref<TerminalNode> c = std::dynamic_pointer_cast<TerminalNode>(r->children[0]);
       if (is<RuleTagToken *>(c->getSymbol())) {
         return dynamic_cast<RuleTagToken *>(c->getSymbol());
       }

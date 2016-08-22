@@ -49,8 +49,8 @@ namespace antlr4 {
       virtual ~TraceListener() {};
 
       virtual void enterEveryRule(ParserRuleContext *ctx) override;
-      virtual void visitTerminal(Ref<tree::TerminalNode> const& node) override;
-      virtual void visitErrorNode(Ref<tree::ErrorNode> const& node) override;
+      virtual void visitTerminal(tree::TerminalNode *node) override;
+      virtual void visitErrorNode(tree::ErrorNode *node) override;
       virtual void exitEveryRule(ParserRuleContext *ctx) override;
 
     private:
@@ -64,8 +64,8 @@ namespace antlr4 {
       virtual ~TrimToSizeListener() {};
 
       virtual void enterEveryRule(ParserRuleContext *ctx) override;
-      virtual void visitTerminal(Ref<tree::TerminalNode> const& node) override;
-      virtual void visitErrorNode(Ref<tree::ErrorNode> const& node) override;
+      virtual void visitTerminal(tree::TerminalNode *node) override;
+      virtual void visitErrorNode(tree::ErrorNode *node) override;
       virtual void exitEveryRule(ParserRuleContext *ctx) override;
     };
 

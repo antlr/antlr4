@@ -63,13 +63,6 @@ namespace antlr4 {
   public:
     static const Ref<ParserRuleContext> EMPTY;
 
-    /// If we are debugging or building a parse tree for a visitor,
-    ///  we need to track all of the tokens and rule invocations associated
-    ///  with this rule's context. This is empty for parsing w/o tree constr.
-    ///  operation because we don't the need to track the details about
-    ///  how we parse this rule.
-    std::vector<Ref<ParseTree>> children;
-
     /// <summary>
     /// For debugging/tracing purposes, we want to track all of the nodes in
     ///  the ATN traversed by the parser for a particular rule.
@@ -125,10 +118,6 @@ namespace antlr4 {
     virtual Ref<tree::TerminalNode> addChild(Token *matchedToken);
     virtual Ref<tree::ErrorNode> addErrorNode(Token *badToken);
 
-    std::weak_ptr<ParserRuleContext> getParent() {
-      return std::dynamic_pointer_cast<ParserRuleContext>(getParentReference().lock());
-    };
-
     virtual Ref<tree::TerminalNode> getToken(int ttype, std::size_t i);
 
     virtual std::vector<Ref<tree::TerminalNode>> getTokens(int ttype);
@@ -162,7 +151,6 @@ namespace antlr4 {
       return contexts;
     }
 
-    virtual std::size_t getChildCount() override;
     virtual misc::Interval getSourceInterval() override;
 
     /**
@@ -182,9 +170,6 @@ namespace antlr4 {
     /// <summary>
     /// Used for rule context info debugging during parse-time, not so much for ATN debugging </summary>
     virtual std::string toInfoString(Parser *recognizer);
-
-  protected:
-    virtual Ref<Tree> getChildReference(size_t i) override;
   };
 
 } // namespace antlr4

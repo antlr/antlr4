@@ -40,16 +40,15 @@ namespace tree {
 
     virtual ~ParseTreeWalker() {};
     
-    virtual void walk(ParseTreeListener *listener, Ref<ParseTree> const& t);
+    virtual void walk(ParseTreeListener *listener, ParseTree *t) const;
 
+  protected:
     /// The discovery of a rule node, involves sending two events: the generic
     /// <seealso cref="ParseTreeListener#enterEveryRule"/> and a
     /// <seealso cref="RuleContext"/>-specific event. First we trigger the generic and then
     /// the rule specific. We do them in reverse order upon finishing the node.
-  protected:
-    virtual void enterRule(ParseTreeListener *listener, Ref<RuleNode> const& r);
-
-    virtual void exitRule(ParseTreeListener *listener, Ref<RuleNode> const& r);
+    virtual void enterRule(ParseTreeListener *listener, RuleNode *r) const;
+    virtual void exitRule(ParseTreeListener *listener, RuleNode *r) const;
   };
 
 } // namespace tree

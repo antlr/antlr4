@@ -66,6 +66,7 @@ void Lexer::reset() {
   tokenStartCharIndex = -1;
   tokenStartCharPositionInLine = 0;
   tokenStartLine = 0;
+  type = 0;
   _text = "";
 
   hitEOF = false;

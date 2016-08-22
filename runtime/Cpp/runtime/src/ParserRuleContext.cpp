@@ -42,7 +42,7 @@ using namespace antlrcpp;
 
 const Ref<ParserRuleContext> ParserRuleContext::EMPTY = std::make_shared<ParserRuleContext>();
 
-ParserRuleContext::ParserRuleContext() {
+ParserRuleContext::ParserRuleContext() : start(nullptr), stop(nullptr) {
 }
 
 void ParserRuleContext::copyFrom(Ref<ParserRuleContext> const& ctx) {
@@ -94,10 +94,6 @@ Ref<tree::ErrorNode> ParserRuleContext::addErrorNode(Token *badToken) {
   return t;
 }
 
-Ref<tree::Tree> ParserRuleContext::getChildReference(std::size_t i) {
-  return children[i];
-}
-
 Ref<tree::TerminalNode> ParserRuleContext::getToken(int ttype, std::size_t i) {
   if (i >= children.size()) {
     return nullptr;
@@ -132,10 +128,6 @@ std::vector<Ref<tree::TerminalNode>> ParserRuleContext::getTokens(int ttype) {
   }
 
   return tokens;
-}
-
-std::size_t ParserRuleContext::getChildCount() {
-  return children.size();
 }
 
 misc::Interval ParserRuleContext::getSourceInterval() {

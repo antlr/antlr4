@@ -51,11 +51,11 @@ RuleContext::RuleContext(std::weak_ptr<RuleContext> parent, int invokingState) {
 
 int RuleContext::depth() {
   int n = 1;
-  Ref<RuleContext> p = shared_from_this();
+  RuleContext *p = this;
   while (true) {
     if (p->parent.expired())
       break;
-    p = p->parent.lock();
+    p = (RuleContext *)p->parent.lock().get();
     n++;
   }
   return n;
@@ -73,21 +73,19 @@ Ref<RuleContext> RuleContext::getRuleContext() {
   return shared_from_this();
 }
 
-std::weak_ptr<tree::Tree> RuleContext::getParentReference()
-{
-  return std::dynamic_pointer_cast<tree::Tree>(parent.lock());
-}
-
 std::string RuleContext::getText() {
-  if (getChildCount() == 0) {
+  if (children.empty()) {
     return "";
   }
 
   std::stringstream ss;
-  for (size_t i = 0; i < getChildCount(); i++) {
+  for (size_t i = 0; i < children.size(); i++) {
     if (i > 0)
       ss << ", ";
-    ss << getChild(i)->getText();
+
+    Ref<ParseTree> tree = std::dynamic_pointer_cast<ParseTree>(children[i]);
+    if (tree != nullptr)
+      ss << tree->getText();
   }
 
   return ss.str();
@@ -97,20 +95,11 @@ ssize_t RuleContext::getRuleIndex() const {
   return -1;
 }
 
-Ref<tree::Tree> RuleContext::getChildReference(size_t /*i*/) {
-  return Ref<tree::Tree>();
-}
-
-
 int RuleContext::getAltNumber() const {
   return atn::ATN::INVALID_ALT_NUMBER;
 }
 
 void RuleContext::setAltNumber(int /*altNumber*/) {
-}
-
-std::size_t RuleContext::getChildCount() {
-  return 0;
 }
 
 antlrcpp::Any RuleContext::accept(tree::ParseTreeVisitor *visitor) {
@@ -138,9 +127,9 @@ std::string RuleContext::toString(const std::vector<std::string> &ruleNames) {
 std::string RuleContext::toString(const std::vector<std::string> &ruleNames, Ref<RuleContext> const& stop) {
   std::stringstream ss;
 
-  Ref<RuleContext> currentParent = shared_from_this();
+  RuleContext *currentParent = this;
   ss << "[";
-  while (currentParent != stop) {
+  while (currentParent != stop.get()) {
     if (ruleNames.empty()) {
       if (!currentParent->isEmpty()) {
         ss << currentParent->invokingState;
@@ -154,7 +143,7 @@ std::string RuleContext::toString(const std::vector<std::string> &ruleNames, Ref
 
     if (currentParent->parent.expired()) // No parent anymore.
       break;
-    currentParent = currentParent->parent.lock();
+    currentParent = (RuleContext *)currentParent->parent.lock().get();
     if (!ruleNames.empty() || !currentParent->isEmpty()) {
       ss << " ";
     }

@@ -329,7 +329,7 @@ std::string DefaultErrorStrategy::escapeWSAndQuote(const std::string &s) const {
 
 misc::IntervalSet DefaultErrorStrategy::getErrorRecoverySet(Parser *recognizer) {
   const atn::ATN &atn = recognizer->getInterpreter<atn::ATNSimulator>()->atn;
-  Ref<RuleContext> ctx = recognizer->getContext();
+  RuleContext *ctx = recognizer->getContext().get();
   misc::IntervalSet recoverSet;
   while (ctx->invokingState >= 0) {
     // compute what follows who invoked us
@@ -340,7 +340,7 @@ misc::IntervalSet DefaultErrorStrategy::getErrorRecoverySet(Parser *recognizer) 
 
     if (ctx->parent.expired())
       break;
-    ctx = ctx->parent.lock();
+    ctx = (RuleContext *)ctx->parent.lock().get();
   }
   recoverSet.remove(Token::EPSILON);
 

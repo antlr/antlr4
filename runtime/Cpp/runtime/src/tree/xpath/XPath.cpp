@@ -163,7 +163,7 @@ std::vector<Ref<ParseTree>> XPath::evaluate(const Ref<ParseTree> &t) {
   while (i < _elements.size()) {
     std::vector<Ref<ParseTree>> next;
     for (auto node : work) {
-      if (node->getChildCount() > 0) {
+      if (!node->children.empty()) {
         // only try to match next element if it has children
         // e.g., //func/*/stat might have a token node for which
         // we can't go looking for stat nodes.

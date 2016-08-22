@@ -58,9 +58,6 @@ namespace tree {
     static std::string getNodeText(Ref<Tree> const& t, Parser *recog);
     static std::string getNodeText(Ref<Tree> const& t, const std::vector<std::string> &ruleNames);
 
-    /// Return ordered list of all children of this node.
-    static std::vector<Ref<Tree>> getChildren(Ref<Tree> const& t);
-
     /// Return a list of all ancestors of this node.  The first node of
     ///  list is the root and the last is the parent of this node.
     static std::vector<std::weak_ptr<Tree>> getAncestors(Ref<Tree> const& t);

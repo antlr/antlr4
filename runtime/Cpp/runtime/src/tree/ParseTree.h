@@ -37,20 +37,14 @@
 namespace antlr4 {
 namespace tree {
 
-  /// <summary>
   /// An interface to access the tree of <seealso cref="RuleContext"/> objects created
-  ///  during a parse that makes the data structure look like a simple parse tree.
-  ///  This node represents both internal nodes, rule invocations,
-  ///  and leaf nodes, token matches.
-  /// <p/>
-  ///  The payload is either a <seealso cref="Token"/> or a <seealso cref="RuleContext"/> object.
-  /// </summary>
+  /// during a parse that makes the data structure look like a simple parse tree.
+  /// This node represents both internal nodes, rule invocations,
+  /// and leaf nodes, token matches.
+  ///
+  /// The payload is either a <seealso cref="Token"/> or a <seealso cref="RuleContext"/> object.
   class ANTLR4CPP_PUBLIC ParseTree : public SyntaxTree {
   public:
-    // the following methods narrow the return type; they are not additional methods
-    std::weak_ptr<ParseTree> getParent() { return std::dynamic_pointer_cast<ParseTree>(getParentReference().lock()); };
-    virtual Ref<ParseTree> getChild(size_t i) { return std::dynamic_pointer_cast<ParseTree>(getChildReference(i)); };
-
     /// The <seealso cref="ParseTreeVisitor"/> needs a double dispatch method.
     // ml: This has been changed to use Any instead of a template parameter, to avoid the need of a virtual template function.
     virtual antlrcpp::Any accept(ParseTreeVisitor *visitor) = 0;

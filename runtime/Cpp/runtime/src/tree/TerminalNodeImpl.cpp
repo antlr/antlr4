@@ -54,10 +54,6 @@ misc::Interval TerminalNodeImpl::getSourceInterval() {
   return misc::Interval(tokenIndex, tokenIndex);
 }
 
-std::size_t TerminalNodeImpl::getChildCount() {
-  return 0;
-}
-
 antlrcpp::Any TerminalNodeImpl::accept(ParseTreeVisitor *visitor) {
   return visitor->visitTerminal(this);
 }
@@ -79,12 +75,4 @@ std::string TerminalNodeImpl::toString() {
 
 std::string TerminalNodeImpl::toStringTree() {
   return toString();
-}
-
-std::weak_ptr<Tree> TerminalNodeImpl::getParentReference() {
-  return parent;
-}
-
-Ref<Tree> TerminalNodeImpl::getChildReference(size_t /*i*/) {
-  return Ref<Tree>();
 }

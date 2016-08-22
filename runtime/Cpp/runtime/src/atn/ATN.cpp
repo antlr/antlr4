@@ -150,12 +150,12 @@ int ATN::getNumberOfDecisions() const {
   return (int)decisionToState.size();
 }
 
-misc::IntervalSet ATN::getExpectedTokens(int stateNumber, Ref<RuleContext> const& context) const {
+misc::IntervalSet ATN::getExpectedTokens(int stateNumber, RuleContext *context) const {
   if (stateNumber < 0 || stateNumber >= (int)states.size()) {
     throw IllegalArgumentException("Invalid state number.");
   }
 
-  Ref<RuleContext> ctx = context;
+  RuleContext *ctx = context;
   ATNState *s = states.at((size_t)stateNumber);
   misc::IntervalSet following = nextTokens(s);
   if (!following.contains(Token::EPSILON)) {
@@ -175,7 +175,7 @@ misc::IntervalSet ATN::getExpectedTokens(int stateNumber, Ref<RuleContext> const
     if (ctx->parent.expired()) {
       break;
     }
-    ctx = ctx->parent.lock();
+    ctx = (RuleContext *)ctx->parent.lock().get();
   }
 
   if (following.contains(Token::EPSILON)) {

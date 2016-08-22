@@ -87,9 +87,6 @@ namespace antlr4 {
    */
   class ANTLR4CPP_PUBLIC RuleContext : public tree::RuleNode, public std::enable_shared_from_this<RuleContext> {
   public:
-    /// What context invoked this rule?
-    std::weak_ptr<RuleContext> parent;
-
     /// What state invoked the rule associated with this context?
     /// The "return address" is the followState of invokingState
     /// If parent is null, this should be -1 and this context object represents the start rule.
@@ -134,8 +131,6 @@ namespace antlr4 {
      */
     virtual void setAltNumber(int altNumber);
 
-    virtual std::size_t getChildCount() override;
-
     virtual antlrcpp::Any accept(tree::ParseTreeVisitor *visitor) override;
 
     /// <summary>
@@ -163,10 +158,6 @@ namespace antlr4 {
 
     bool operator == (const RuleContext &other) { return this == &other; } // Simple address comparison.
     
-  protected:
-    virtual std::weak_ptr<Tree> getParentReference() override;
-    virtual Ref<Tree> getChildReference(size_t i) override;
-
   private:
     void InitializeInstanceFields();
   };

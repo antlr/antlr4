@@ -63,32 +63,25 @@ std::string Trees::toStringTree(Ref<Tree> const& t, Parser *recog) {
 
 std::string Trees::toStringTree(Ref<Tree> const& t, const std::vector<std::string> &ruleNames) {
   std::string temp = antlrcpp::escapeWhitespace(Trees::getNodeText(t, ruleNames), false);
-  if (t->getChildCount() == 0) {
+  if (t->children.empty()) {
     return temp;
   }
 
   std::stringstream ss;
   ss << "(" << temp << ' ';
-  /*
-  for (size_t i = 0; i < t->getChildCount(); i++) {
-    if (i > 0) {
-      ss << ' ';
-    }
-    ss << toStringTree(t->getChild(i), ruleNames);
-  }
-   */
 
-  // Implement the recursive walk as iteration to avoid trouble we deep nesting.
+  // Implement the recursive walk as iteration to avoid trouble with deep nesting.
   std::stack<size_t> stack;
   size_t childIndex = 0;
   Ref<Tree> run = t;
-  while (childIndex < run->getChildCount()) {
+  while (childIndex < run->children.size()) {
     if (childIndex > 0) {
       ss << ' ';
     }
-    Ref<Tree> child = run->getChild(childIndex);
+    Ref<Tree> child = run->children[childIndex];
+    std::weak_ptr<Tree> parent = child->parent;
     temp = antlrcpp::escapeWhitespace(Trees::getNodeText(child, ruleNames), false);
-    if (child->getChildCount() > 0) {
+    if (!child->children.empty()) {
       // Go deeper one level.
       stack.push(childIndex);
       run = child;
@@ -96,12 +89,12 @@ std::string Trees::toStringTree(Ref<Tree> const& t, const std::vector<std::strin
       ss << "(" << temp << " ";
     } else {
       ss << temp;
-      while (++childIndex == run->getChildCount()) {
+      while (++childIndex == run->children.size()) {
         if (stack.size() > 0) {
           // Reached the end of the current level. See if we can step up from here.
           childIndex = stack.top();
           stack.pop();
-          run = run->getParent().lock();
+          run = run->parent.lock();
           ss << ")";
         } else {
           break;
@@ -152,20 +145,12 @@ std::string Trees::getNodeText(Ref<Tree> const& t, const std::vector<std::string
   return "";
 }
 
-std::vector<Ref<Tree>> Trees::getChildren(Ref<Tree> const& t) {
-  std::vector<Ref<Tree>> kids;
-  for (size_t i = 0; i < t->getChildCount(); i++) {
-    kids.push_back(t->getChild(i));
-  }
-  return kids;
-}
-
 std::vector<std::weak_ptr<Tree>> Trees::getAncestors(Ref<Tree> const& t) {
   std::vector<std::weak_ptr<Tree>> ancestors;
-  std::weak_ptr<Tree> parent = t->getParent();
+  std::weak_ptr<Tree> parent = t->parent;
   while (!parent.expired()) {
     ancestors.insert(ancestors.begin(), parent); // insert at start
-    parent = parent.lock()->getParent();
+    parent = parent.lock()->parent;
   }
   return ancestors;
 }
@@ -185,22 +170,22 @@ static void _findAllNodes(Ref<ParseTree> const& t, int index, bool findTokens, s
     }
   }
   // check children
-  for (size_t i = 0; i < t->getChildCount(); i++) {
-    _findAllNodes(t->getChild(i), index, findTokens, nodes);
+  for (size_t i = 0; i < t->children.size(); i++) {
+    _findAllNodes(std::dynamic_pointer_cast<ParseTree>(t->children[i]), index, findTokens, nodes);
   }
 }
 
 bool Trees::isAncestorOf(Ref<Tree> const& t, Ref<Tree> const& u) {
-  if (t == nullptr || u == nullptr || t->getParent().expired()) {
+  if (t == nullptr || u == nullptr || t->parent.expired()) {
     return false;
   }
 
-  Ref<Tree> p = u->getParent().lock();
+  Ref<Tree> p = u->parent.lock();
   while (p != nullptr) {
     if (t == p) {
       return true;
     }
-    p = p->getParent().lock();
+    p = p->parent.lock();
   }
   return false;
 }
@@ -222,9 +207,9 @@ std::vector<Ref<ParseTree>> Trees::findAllNodes(Ref<ParseTree> const& t, int ind
 std::vector<Ref<ParseTree>> Trees::getDescendants(Ref<ParseTree> const& t) {
   std::vector<Ref<ParseTree>> nodes;
   nodes.push_back(t);
-  std::size_t n = t->getChildCount();
+  std::size_t n = t->children.size();
   for (size_t i = 0 ; i < n ; i++) {
-    auto descentants = getDescendants(t->getChild(i));
+    auto descentants = getDescendants(std::dynamic_pointer_cast<ParseTree>(t->children[i]));
     for (auto entry: descentants) {
       nodes.push_back(entry);
     }
@@ -238,9 +223,9 @@ std::vector<Ref<ParseTree>> Trees::descendants(Ref<ParseTree> const& t) {
 
 Ref<ParserRuleContext> Trees::getRootOfSubtreeEnclosingRegion(Ref<ParseTree> const& t, size_t startTokenIndex,
                                                               size_t stopTokenIndex) {
-  size_t n = t->getChildCount();
-  for (size_t i = 0; i<n; i++) {
-    Ref<ParseTree> child = t->getChild(i);
+  size_t n = t->children.size();
+  for (size_t i = 0; i < n; i++) {
+    Ref<ParseTree> child = std::dynamic_pointer_cast<ParseTree>(t->children[i]);
     Ref<ParserRuleContext> r = getRootOfSubtreeEnclosingRegion(child, startTokenIndex, stopTokenIndex);
     if (r != nullptr) {
       return r;
@@ -263,9 +248,9 @@ Ref<Tree> Trees::findNodeSuchThat(Ref<Tree> const& t, Ref<Predicate<Tree>> const
     return t;
   }
 
-  size_t n = t->getChildCount();
+  size_t n = t->children.size();
   for (size_t i = 0 ; i < n ; ++i) {
-    Ref<Tree> u = findNodeSuchThat(t->getChild(i), pred);
+    Ref<Tree> u = findNodeSuchThat(t->children[i], pred);
     if (u != nullptr) {
       return u;
     }

@@ -36,52 +36,30 @@
 namespace antlr4 {
 namespace tree {
 
-  /// <summary>
   /// The basic notion of a tree has a parent, a payload, and a list of children.
-  ///  It is the most abstract interface for all the trees used by ANTLR.
-  /// </summary>
+  /// It is the most abstract interface for all the trees used by ANTLR.
+  // ml: deviating from Java here. This class forms a tree? Then it should also manage parent + children.
   class ANTLR4CPP_PUBLIC Tree {
   public:
     virtual ~Tree() {};
     
     /// The parent of this node. If the return value is null, then this
-    ///  node is the root of the tree.
-    std::weak_ptr<Tree> getParent() { return getParentReference(); };
+    /// node is the root of the tree.
+    std::weak_ptr<Tree> parent;
 
-    /// <summary>
-    /// This method returns whatever object represents the data at this note. For
-    /// example, for parse trees, the payload can be a <seealso cref="Token"/> representing
-    /// a leaf node or a <seealso cref="RuleContext"/> object representing a rule
-    /// invocation. For abstract syntax trees (ASTs), this is a <seealso cref="Token"/>
-    /// object.
-    /// </summary>
+    /// If we are debugging or building a parse tree for a visitor,
+    ///  we need to track all of the tokens and rule invocations associated
+    ///  with this rule's context. This is empty for parsing w/o tree constr.
+    ///  operation because we don't the need to track the details about
+    ///  how we parse this rule.
+    std::vector<Ref<Tree>> children;
 
-    // ml: there are actually only 2 occurences where this method was implemented. We use direct access instead.
-    //virtual void *getPayload() = 0;
-
-    /// <summary>
-    /// If there are children, get the {@code i}th value indexed from 0. </summary>
-    Ref<Tree> getChild(size_t i)  { return getChildReference(i); };
-
-    /// <summary>
-    /// How many children are there? If there is none, then this
-    ///  node represents a leaf node.
-    /// </summary>
-    virtual std::size_t getChildCount() = 0;
-
-    /// <summary>
     /// Print out a whole tree, not just a node, in LISP format
-    ///  {@code (root child1 .. childN)}. Print just a node if this is a leaf.
-    /// </summary>
+    /// {@code (root child1 .. childN)}. Print just a node if this is a leaf.
     virtual std::string toStringTree() = 0;
-
     virtual std::string toString() = 0;
 
     virtual bool operator == (const Tree &other) const;
-    
-  protected:
-    virtual std::weak_ptr<Tree> getParentReference() = 0;
-    virtual Ref<Tree> getChildReference(size_t i) = 0;
   };
 
 } // namespace tree

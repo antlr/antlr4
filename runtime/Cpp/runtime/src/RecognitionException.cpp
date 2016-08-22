@@ -63,7 +63,7 @@ void RecognitionException::setOffendingState(int offendingState) {
 
 misc::IntervalSet RecognitionException::getExpectedTokens() const {
   if (_recognizer) {
-    return _recognizer->getATN().getExpectedTokens(_offendingState, _ctx);
+    return _recognizer->getATN().getExpectedTokens(_offendingState, _ctx.get());
   }
   return misc::IntervalSet::EMPTY_SET;
 }

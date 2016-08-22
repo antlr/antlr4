@@ -81,11 +81,10 @@ namespace dfa {
 
     std::unique_ptr<atn::ATNConfigSet> configs;
 
-    /// <summary>
     /// {@code edges[symbol]} points to target of symbol. Shift up by 1 so (-1)
     ///  <seealso cref="Token#EOF"/> maps to {@code edges[0]}.
-    /// </summary>
-    std::vector<DFAState *> edges;
+    // ml: this is a sparse list, so we use a map instead of a vector.
+    std::unordered_map<ssize_t, DFAState *> edges;
 
     bool isAcceptState;
 

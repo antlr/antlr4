@@ -83,16 +83,13 @@ bool DFA::isPrecedenceDfa() const {
 }
 
 DFAState* DFA::getPrecedenceStartState(int precedence) const {
-  if (!isPrecedenceDfa()) {
-    throw IllegalStateException("Only precedence DFAs may contain a precedence start state.");
-  }
+  assert(_precedenceDfa); // Only precedence DFAs may contain a precedence start state.
 
-  // s0.edges is never null for a precedence DFA
-  if (precedence < 0 || precedence >= (int)s0->edges.size()) {
+  auto iterator = s0->edges.find(precedence);
+  if (iterator == s0->edges.end())
     return nullptr;
-  }
 
-  return s0->edges[precedence];
+  return iterator->second;
 }
 
 void DFA::setPrecedenceStartState(int precedence, DFAState *startState) {
@@ -104,13 +101,8 @@ void DFA::setPrecedenceStartState(int precedence, DFAState *startState) {
     return;
   }
 
-  std::unique_lock<std::recursive_mutex> lock(_lock);
   {
-    // s0.edges is never null for a precedence DFA
-    if (precedence >= (int)s0->edges.size()) {
-      s0->edges.resize(precedence + 1);
-    }
-
+    std::unique_lock<std::recursive_mutex> lock(_lock);
     s0->edges[precedence] = startState;
   }
 }

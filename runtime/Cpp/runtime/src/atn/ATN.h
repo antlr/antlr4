@@ -126,7 +126,7 @@ namespace atn {
     /// specified state in the specified context. </returns>
     /// <exception cref="IllegalArgumentException"> if the ATN does not contain a state with
     /// number {@code stateNumber} </exception>
-    virtual misc::IntervalSet getExpectedTokens(int stateNumber, Ref<RuleContext> const& context) const;
+    virtual misc::IntervalSet getExpectedTokens(int stateNumber, RuleContext *context) const;
 
     std::string toString() const;
   };

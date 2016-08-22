@@ -270,12 +270,12 @@ int ParserATNSimulator::execATN(dfa::DFA &dfa, dfa::DFAState *s0, TokenStream *i
 }
 
 dfa::DFAState *ParserATNSimulator::getExistingTargetState(dfa::DFAState *previousD, ssize_t t) {
-  std::vector<dfa::DFAState *> edges = previousD->edges;
-  if (edges.size() == 0 || t + 1 < 0 || t + 1 >= (ssize_t)edges.size()) {
+  auto iterator = previousD->edges.find(t);
+  if (iterator == previousD->edges.end()) {
     return nullptr;
   }
 
-  return edges[(size_t)t + 1];
+  return iterator->second;
 }
 
 dfa::DFAState *ParserATNSimulator::computeTargetState(dfa::DFA &dfa, dfa::DFAState *previousD, ssize_t t) {
@@ -1181,9 +1181,7 @@ dfa::DFAState *ParserATNSimulator::addDFAEdge(dfa::DFA &dfa, dfa::DFAState *from
 
   {
     std::lock_guard<std::recursive_mutex> lck(mtx);
-    if (from->edges.empty())
-      from->edges.resize(atn.maxTokenType + 1 + 1);
-    from->edges[(size_t)(t + 1)] = to; // connect
+    from->edges[t] = to; // connect
   }
 
 #if DEBUG_DFA == 1

@@ -52,7 +52,6 @@
 #define DEBUG_ATN 0
 #define DEBUG_DFA 0
 
-
 using namespace antlr4;
 using namespace antlr4::atn;
 using namespace antlrcpp;
@@ -114,8 +113,7 @@ int LexerATNSimulator::match(CharStream *input, size_t mode) {
 
 void LexerATNSimulator::reset() {
   _prevAccept.reset();
-  _startIndex = 0; // Originally -1, but that would require a signed type with many casts.
-                   // The initial value is never tested, so it doesn't matter which value is set here.
+  _startIndex = -1;
   _line = 1;
   _charPositionInLine = 0;
   _mode = Lexer::DEFAULT_MODE;
@@ -551,11 +549,7 @@ void LexerATNSimulator::addDFAEdge(dfa::DFAState *p, ssize_t t, dfa::DFAState *q
   }
 
   std::lock_guard<std::recursive_mutex> lck(mtx);
-  if (p->edges.empty()) {
-    //  make room for tokens 1..n and -1 masquerading as index 0
-    p->edges.resize(MAX_DFA_EDGE - MIN_DFA_EDGE + 1);
-  }
-  p->edges[(size_t)(t - MIN_DFA_EDGE)] = q; // connect
+  p->edges[t - MIN_DFA_EDGE] = q; // connect
 }
 
 dfa::DFAState *LexerATNSimulator::addDFAState(ATNConfigSet *configs) {

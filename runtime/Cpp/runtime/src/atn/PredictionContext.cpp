@@ -67,7 +67,7 @@ Ref<PredictionContext> PredictionContext::fromRuleContext(const ATN &atn, const 
   }
 
   // If we have a parent, convert it to a PredictionContext graph
-  Ref<PredictionContext> parent = PredictionContext::fromRuleContext(atn, outerContext->parent.lock());
+  Ref<PredictionContext> parent = PredictionContext::fromRuleContext(atn, std::dynamic_pointer_cast<RuleContext>(outerContext->parent.lock()));
 
   ATNState *state = atn.states.at((size_t)outerContext->invokingState);
   RuleTransition *transition = (RuleTransition *)state->transition(0);

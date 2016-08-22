@@ -39,12 +39,12 @@
 using namespace antlr4;
 
 void BailErrorStrategy::recover(Parser *recognizer, std::exception_ptr e) {
-  Ref<ParserRuleContext> context = recognizer->getContext();
+  ParserRuleContext *context = recognizer->getContext().get();
   do {
     context->exception = e;
-    if (context->getParent().expired())
+    if (context->parent.expired())
       break;
-    context = context->getParent().lock();
+    context = (ParserRuleContext *)context->parent.lock().get();
   } while (true);
 
   try {
@@ -63,12 +63,12 @@ Token* BailErrorStrategy::recoverInline(Parser *recognizer)  {
   InputMismatchException e(recognizer);
   std::exception_ptr exception = std::make_exception_ptr(e);
 
-  Ref<ParserRuleContext> context = recognizer->getContext();
+  ParserRuleContext *context = recognizer->getContext().get();
   do {
     context->exception = exception;
-    if (context->getParent().expired())
+    if (context->parent.expired())
       break;
-    context = context->getParent().lock();
+    context = (ParserRuleContext *)context->parent.lock().get();
   } while (true);
 
   try {

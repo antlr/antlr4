@@ -41,30 +41,30 @@ using namespace antlrcpp;
 
 ParseTreeWalker ParseTreeWalker::DEFAULT;
 
-void ParseTreeWalker::walk(ParseTreeListener *listener, Ref<ParseTree> const& t) {
-  if (is<ErrorNode>(t)) {
-    listener->visitErrorNode(std::dynamic_pointer_cast<ErrorNode>(t));
+void ParseTreeWalker::walk(ParseTreeListener *listener, ParseTree *t) const {
+  if (is<ErrorNode *>(t)) {
+    listener->visitErrorNode(dynamic_cast<ErrorNode *>(t));
     return;
-  } else if (is<TerminalNode>(t)) {
-    listener->visitTerminal(std::dynamic_pointer_cast<TerminalNode>(t));
+  } else if (is<TerminalNode *>(t)) {
+    listener->visitTerminal(dynamic_cast<TerminalNode *>(t));
     return;
   }
-  Ref<RuleNode> r = std::dynamic_pointer_cast<RuleNode>(t);
+
+  RuleNode *r = dynamic_cast<RuleNode *>(t);
   enterRule(listener, r);
-  std::size_t n = r->getChildCount();
-  for (std::size_t i = 0; i < n; i++) {
-    walk(listener, r->getChild(i));
+  for (auto &child : r->children) {
+    walk(listener, dynamic_cast<ParseTree *>(child.get()));
   }
   exitRule(listener, r);
 }
 
-void ParseTreeWalker::enterRule(ParseTreeListener *listener, Ref<RuleNode> const& r) {
+void ParseTreeWalker::enterRule(ParseTreeListener *listener, RuleNode *r) const {
   Ref<ParserRuleContext> ctx = std::dynamic_pointer_cast<ParserRuleContext>(r->getRuleContext());
   listener->enterEveryRule(ctx.get());
   ctx->enterRule(listener);
 }
 
-void ParseTreeWalker::exitRule(ParseTreeListener *listener, Ref<RuleNode> const& r) {
+void ParseTreeWalker::exitRule(ParseTreeListener *listener, RuleNode *r) const {
   Ref<ParserRuleContext> ctx = std::dynamic_pointer_cast<ParserRuleContext>(r->getRuleContext());
   ctx->exitRule(listener);
   listener->exitEveryRule(ctx.get());
