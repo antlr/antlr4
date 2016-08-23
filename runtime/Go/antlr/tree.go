@@ -56,6 +56,8 @@ type ParseTreeVisitor interface {
 
 type BaseParseTreeVisitor struct{}
 
+var _ ParseTreeVisitor = &BaseParseTreeVisitor{}
+
 func (v *BaseParseTreeVisitor) Visit(tree ParseTree) interface{}            { return nil }
 func (v *BaseParseTreeVisitor) VisitChildren(node RuleNode) interface{}     { return nil }
 func (v *BaseParseTreeVisitor) VisitTerminal(node TerminalNode) interface{} { return nil }
@@ -91,6 +93,8 @@ type ParseTreeListener interface {
 
 type BaseParseTreeListener struct{}
 
+var _ ParseTreeListener = &BaseParseTreeListener{}
+
 func (l *BaseParseTreeListener) VisitTerminal(node TerminalNode)      {}
 func (l *BaseParseTreeListener) VisitErrorNode(node ErrorNode)        {}
 func (l *BaseParseTreeListener) EnterEveryRule(ctx ParserRuleContext) {}
@@ -101,6 +105,8 @@ type TerminalNodeImpl struct {
 
 	symbol Token
 }
+
+var _ TerminalNode = &TerminalNodeImpl{}
 
 func NewTerminalNodeImpl(symbol Token) *TerminalNodeImpl {
 	tn := new(TerminalNodeImpl)
@@ -180,6 +186,8 @@ func (t *TerminalNodeImpl) ToStringTree(s []string, r Recognizer) string {
 type ErrorNodeImpl struct {
 	*TerminalNodeImpl
 }
+
+var _ ErrorNode = &ErrorNodeImpl{}
 
 func NewErrorNodeImpl(token Token) *ErrorNodeImpl {
 	en := new(ErrorNodeImpl)
