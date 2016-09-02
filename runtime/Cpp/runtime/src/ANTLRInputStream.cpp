@@ -60,7 +60,7 @@ void ANTLRInputStream::load(const std::string &input) {
   // Remove the UTF-8 BOM if present.
   const char bom[4] = "\xef\xbb\xbf";
   if (input.compare(0, 3, bom, 3) == 0)
-    _data = antlrcpp::utfConverter.from_bytes(input.data() + 3, input.data() + input.size() - 3);
+    _data = antlrcpp::utfConverter.from_bytes(input.data() + 3, input.data() + input.size());
   else
     _data = antlrcpp::utfConverter.from_bytes(input);
   p = 0;
