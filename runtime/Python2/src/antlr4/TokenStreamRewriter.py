@@ -136,21 +136,21 @@ class TokenStreamRewriter(object):
                 if iop.index == rop.index:
                     rewrites[iop.instructionIndex] = None
                     rop.text = '{}{}'.format(iop.text, rop.text)
-                elif all((iop.index > rop.index, iop.index <= rop.lastIndex)):
+                elif all((iop.index > rop.index, iop.index <= rop.last_index)):
                     rewrites[iop.instructionIndex] = None
 
             # Drop any prior replaces contained within
-            prevReplaces = [op for op in rewrites[:i] if isinstance(rop, TokenStreamRewriter.ReplaceOp)]
+            prevReplaces = [op for op in rewrites[:i] if isinstance(op, TokenStreamRewriter.ReplaceOp)]
             for prevRop in prevReplaces:
-                if all((prevRop.index >= rop.index, prevRop.lastIndex <= rop.lastIndex)):
+                if all((prevRop.index >= rop.index, prevRop.last_index <= rop.last_index)):
                     rewrites[prevRop.instructioIndex] = None
                     continue
-                isDisjoint = any((prevRop.lastIndex<rop.index, prevRop.index>rop))
-                isSame = all((prevRop.index == rop.index, prevRop.lastIndex == rop.lastIndex))
+                isDisjoint = any((prevRop.last_index<rop.index, prevRop.index>rop))
+                isSame = all((prevRop.index == rop.index, prevRop.last_index == rop.last_index))
                 if all((prevRop.text is None, rop.text is None, not isDisjoint)):
                     rewrites[prevRop.instructioIndex] = None
                     rop.index = min(prevRop.index, rop.index)
-                    rop.lastIndex = min(prevRop.lastIndex, rop.lastIndex)
+                    rop.last_index = min(prevRop.last_index, rop.last_index)
                     print('New rop {}'.format(rop))
                 elif not all((isDisjoint, isSame)):
                     raise ValueError("replace op boundaries of {} overlap with previous {}".format(rop, prevRop))
