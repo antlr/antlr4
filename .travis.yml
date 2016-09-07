@@ -17,3 +17,13 @@ before_install:
   - sudo apt-get install -qq mono-complete
   - python --version
   - python3 --version
+
+env:
+  - CXX=g++-5
+
+  addons:
+    apt:
+      sources:
+        - ubuntu-toolchain-r-test
+      packages:
+        - g++-5
