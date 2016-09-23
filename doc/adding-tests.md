@@ -63,7 +63,22 @@ TestTemplates ::= [
 ...
 ```
 
-For every name mentioned, you will find a `.stg` file with the actual test. E.g., `Sets/StarSet.stg`:
+For every name mentioned, you will find a `.stg` file with the actual test template. E.g., `Sets/StarSet.stg`.
+
+Each `.stg` file descripes the following mandatory elements for the test:
+ - the test type: "Parser" or "Lexer"
+ - some ANTLR options, such as "Debug"
+ - the grammar 
+ - the start rule
+ - the input i.e. the text to parse
+ - the expected output
+ - the expected errors
+
+The grammar can itself contain template expressions such as <something>.
+The test generator replaces these with the corresponding values from the target language template (see below).
+It then generates a unit test in which the grammar, the input and the expected output and errors are inlined.
+ 
+Here is an example test template:
 
 ```
 TestType() ::= "Parser"
@@ -91,6 +106,7 @@ grammar <grammarName>;
 a : ('a'|'b')* 'c' {<InputText():writeln()>} ;
 >>
 ```
+
 
 ### Cross-language actions embedded within grammars
 
