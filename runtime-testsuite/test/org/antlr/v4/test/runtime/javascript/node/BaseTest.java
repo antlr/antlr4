@@ -445,7 +445,14 @@ public abstract class BaseTest {
 		if ( runtimeSrc==null ) {
 			throw new RuntimeException("Cannot find JavaScript runtime");
 		}
+		if(isWindows()){
+			return runtimeSrc.getPath().replaceFirst("/", "");
+		}
 		return runtimeSrc.getPath();
+	}
+
+	private boolean isWindows() {
+		return System.getProperty("os.name").toLowerCase().contains("windows");
 	}
 
 	public void testErrors(String[] pairs, boolean printTree) {
