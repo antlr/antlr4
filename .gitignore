@@ -47,7 +47,7 @@ bld/
 # Visual Studio 2015 cache/options directory
 .vs/
 
-## NetBeans user configuration files
+# NetBeans user configuration files
 nbactions*.xml
 /nbproject/private/
 */nbproject/private/
