@@ -56,6 +56,7 @@ DefaultErrorStrategy::~DefaultErrorStrategy() {
 }
 
 void DefaultErrorStrategy::reset(Parser *recognizer) {
+  _errorSymbols.clear();
   endErrorCondition(recognizer);
 }
 
@@ -284,12 +285,12 @@ Token* DefaultErrorStrategy::getMissingSymbol(Parser *recognizer) {
     current = lookback;
   }
 
-  _missingSymbol = recognizer->getTokenFactory()->create(
+  _errorSymbols.push_back(recognizer->getTokenFactory()->create(
     { current->getTokenSource(), current->getTokenSource()->getInputStream() },
     (int)expectedTokenType, tokenText, Token::DEFAULT_CHANNEL, -1, -1,
-    current->getLine(), current->getCharPositionInLine());
+    current->getLine(), current->getCharPositionInLine()));
   
-  return _missingSymbol.get();
+  return _errorSymbols.back().get();
 }
 
 misc::IntervalSet DefaultErrorStrategy::getExpectedTokens(Parser *recognizer) {
@@ -358,5 +359,4 @@ void DefaultErrorStrategy::consumeUntil(Parser *recognizer, const misc::Interval
 void DefaultErrorStrategy::InitializeInstanceFields() {
   errorRecoveryMode = false;
   lastErrorIndex = -1;
-  _missingSymbol = nullptr;
 }

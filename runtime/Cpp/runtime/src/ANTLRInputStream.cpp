@@ -53,6 +53,7 @@ ANTLRInputStream::ANTLRInputStream(const char data_[], size_t numberOfActualChar
 }
 
 ANTLRInputStream::ANTLRInputStream(std::istream &stream) {
+  InitializeInstanceFields();
   load(stream);
 }
 
