@@ -1,4 +1,4 @@
-﻿#if PORTABLE
+﻿#if PORTABLE || NETCORE
 
 namespace System
 {
