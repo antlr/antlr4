@@ -43,7 +43,10 @@ namespace antlr4 {
   class ANTLR4CPP_PUBLIC DefaultErrorStrategy : public ANTLRErrorStrategy {
   public:
     DefaultErrorStrategy();
+    DefaultErrorStrategy(DefaultErrorStrategy const& other) = delete;
     virtual ~DefaultErrorStrategy();
+
+    DefaultErrorStrategy& operator = (DefaultErrorStrategy const& other) = delete;
 
   protected:
     /**
