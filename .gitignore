@@ -1,3 +1,11 @@
+# Maven build folders
+target/
+# ... but not code generation targets
+!tool/src/org/antlr/v4/codegen/target/
+
+# Node.js (npm and typings) cached dependencies 
+node_modules/
+typings/
 
 # Ant build folders
 build/
@@ -8,13 +16,36 @@ user.build.properties
 # MacOSX files
 .DS_Store
 
-# Python
-*.pyc
+## Python, selected lines from https://raw.githubusercontent.com/github/gitignore/master/Python.gitignore
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
 
-# CSharp
-bin/
-obj/
+## CSharp and VisualStudio, selected lines from https://raw.githubusercontent.com/github/gitignore/master/VisualStudio.gitignore
+# User-specific files
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
+
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+
+# Visual Studio 2015 cache/options directory
+.vs/
 
 # NetBeans user configuration files
 nbactions*.xml
@@ -55,13 +86,11 @@ bilder.pyc
 bild.log
 
 bild_output.txt
-antlr4cpp.suo
-antlr4-maven-plugin/target
-runtime/Java/target
-tool/target
-runtime-testsuite/target
-tool-testsuite/target
 runtime/Cpp/demo/generated
 xcuserdata
 *.jar
 .vscode
+
+# VSCode Java plugin temporary files
+javac-services.0.log
+javac-services.0.log.lck

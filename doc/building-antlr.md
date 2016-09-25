@@ -13,14 +13,14 @@ The first step is to get the Java source code from the ANTLR 4 repository at git
 
 ```bash
 $ cd /tmp
-/tmp $ git clone git@github.com:antlr/antlr4.git
+/tmp $ git clone https://github.com/antlr/antlr4.git
 Cloning into 'antlr4'...
-remote: Counting objects: 43273, done.
-remote: Compressing objects: 100% (57/57), done.
-remote: Total 43273 (delta 26), reused 0 (delta 0)
-Receiving objects: 100% (43273/43273), 18.76 MiB | 1.60 MiB/s, done.
-Resolving deltas: 100% (22419/22419), done.
+remote: Counting objects: 61480, done.
+remote: Total 61480 (delta 0), reused 0 (delta 0), pack-reused 61480
+Receiving objects: 100% (61480/61480), 31.24 MiB | 7.18 MiB/s, done.
+Resolving deltas: 100% (32970/32970), done.
 Checking connectivity... done.
+Checking out files: 100% (1427/1427), done.
 ```
 
 # Compile

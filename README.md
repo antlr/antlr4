@@ -19,18 +19,18 @@ ANTLR project lead and supreme dictator for life
 ## Useful information
 
 * [Release notes](https://github.com/antlr/antlr4/releases)
-* [Getting started with v4](https://raw.githubusercontent.com/antlr/antlr4/master/doc/getting-started.md)
+* [Getting started with v4](https://github.com/antlr/antlr4/blob/master/doc/getting-started.md)
 * [Official site](http://www.antlr.org/)
-* [Documentation](https://raw.githubusercontent.com/antlr/antlr4/master/doc/index.md)
-* [FAQ](https://raw.githubusercontent.com/antlr/antlr4/master/doc/faq/index.md)
+* [Documentation](https://github.com/antlr/antlr4/blob/master/doc/index.md)
+* [FAQ](https://github.com/antlr/antlr4/blob/master/doc/faq/index.md)
 * [API](http://www.antlr.org/api/Java/index.html)
 * [ANTLR v3](http://www.antlr3.org/)
-* [v3 to v4 Migration, differences](https://raw.githubusercontent.com/antlr/antlr4/master/doc/faq/general.md)
+* [v3 to v4 Migration, differences](https://github.com/antlr/antlr4/blob/master/doc/faq/general.md)
 
 You might also find the following pages useful, particularly if you want to mess around with the various target languages.
  
-* [How to build ANTLR itself](https://raw.githubusercontent.com/antlr/antlr4/master/doc/building-antlr.md)
-* [How we create and deploy an ANTLR release](https://raw.githubusercontent.com/antlr/antlr4/master/doc/releasing-antlr.md)
+* [How to build ANTLR itself](https://github.com/antlr/antlr4/blob/master/doc/building-antlr.md)
+* [How we create and deploy an ANTLR release](https://github.com/antlr/antlr4/blob/master/doc/releasing-antlr.md)
 
 ## The Definitive ANTLR 4 Reference
 
