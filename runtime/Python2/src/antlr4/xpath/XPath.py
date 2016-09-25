@@ -289,12 +289,7 @@ class XPathRuleElement(XPathElement):
 
     def evaluate(self, t):
         # return all children of t that match nodeName
-        nodes = []
-        for c in Trees.getChildren(t):
-            if isinstance(c, ParserRuleContext ):
-                if (c.ruleIndex == self.ruleIndex ) == (not self.invert):
-                    nodes.append(c)
-        return nodes
+        return [c for c in Trees.getChildren(t) if isinstance(c, ParserRuleContext) and (c.ruleIndex == self.ruleIndex) == (not self.invert)]
 
 class XPathTokenAnywhereElement(XPathElement):
 
@@ -314,12 +309,8 @@ class XPathTokenElement(XPathElement):
 
     def evaluate(self, t):
         # return all children of t that match nodeName
-        nodes = []
-        for c in Trees.getChildren(t):
-            if isinstance(c, TerminalNode):
-                if (c.symbol.type == self.tokenType ) == (not self.invert):
-                    nodes.append(c)
-        return nodes
+        return [c for c in Trees.getChildren(t) if isinstance(c, TerminalNode) and (c.symbol.type == self.tokenType) == (not self.invert)]
+
 
 class XPathWildcardAnywhereElement(XPathElement):
 

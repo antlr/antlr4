@@ -232,10 +232,7 @@ class PredictionMode(object):
     # {@link RuleStopState}, otherwise {@code false}
     @classmethod
     def hasConfigInRuleStopState(cls, configs):
-        for c in configs:
-            if isinstance(c.state, RuleStopState):
-                return True
-        return False
+        return any(isinstance(cfg.state, RuleStopState) for cfg in configs)
 
     # Checks if all configurations in {@code configs} are in a
     # {@link RuleStopState}. Configurations meeting this condition have reached
@@ -247,10 +244,7 @@ class PredictionMode(object):
     # {@link RuleStopState}, otherwise {@code false}
     @classmethod
     def allConfigsInRuleStopStates(cls, configs):
-        for config in configs:
-            if not isinstance(config.state, RuleStopState):
-                return False
-        return True
+        return all(isinstance(cfg.state, RuleStopState) for cfg in configs)
 
     #
     # Full LL prediction termination.
@@ -419,10 +413,7 @@ class PredictionMode(object):
     #
     @classmethod
     def hasNonConflictingAltSet(cls, altsets):
-        for alts in altsets:
-            if len(alts)==1:
-                return True
-        return False
+        return any(len(alts) == 1 for alts in altsets)
 
     #
     # Determines if any single alternative subset in {@code altsets} contains
@@ -434,10 +425,7 @@ class PredictionMode(object):
     #
     @classmethod
     def hasConflictingAltSet(cls, altsets):
-        for alts in altsets:
-            if len(alts)>1:
-                return True
-        return False
+        return any(len(alts) > 1 for alts in altsets)
 
     #
     # Determines if every alternative subset in {@code altsets} is equivalent.
@@ -448,13 +436,9 @@ class PredictionMode(object):
     #
     @classmethod
     def allSubsetsEqual(cls, altsets):
-        first = None
-        for alts in altsets:
-            if first is None:
-                first = alts
-            elif not alts==first:
-                return False
-        return True
+        if not altsets:
+            return True
+        return all(alts == altsets[0] for alts in altsets[1:])
 
     #
     # Returns the unique alternative predicted by all alternative subsets in
@@ -467,10 +451,8 @@ class PredictionMode(object):
     def getUniqueAlt(cls, altsets):
         all = cls.getAlts(altsets)
         if len(all)==1:
-            for one in all:
-                return one
-        else:
-            return ATN.INVALID_ALT_NUMBER
+            return all.pop()
+        return ATN.INVALID_ALT_NUMBER
 
     # Gets the complete set of represented alternatives for a collection of
     # alternative subsets. This method returns the union of each {@link BitSet}
@@ -481,10 +463,7 @@ class PredictionMode(object):
     #
     @classmethod
     def getAlts(cls, altsets):
-        all = set()
-        for alts in altsets:
-            all = all | alts
-        return all
+        return set.union(*altsets)
 
     #
     # This function gets the conflicting alt subsets from a configuration set.
@@ -528,11 +507,7 @@ class PredictionMode(object):
 
     @classmethod
     def hasStateAssociatedWithOneAlt(cls, configs):
-        x = cls.getStateToAltMap(configs)
-        for alts in x.values():
-            if len(alts)==1:
-                return True
-        return False
+        return any(len(alts) == 1 for alts in cls.getStateToAltMap(configs).values())
 
     @classmethod
     def getSingleViableAlt(cls, altsets):

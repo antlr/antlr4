@@ -141,10 +141,7 @@ class ATNState(object):
         return self.stateNumber
 
     def __eq__(self, other):
-        if isinstance(other, ATNState):
-            return self.stateNumber==other.stateNumber
-        else:
-            return False
+        return isinstance(other, ATNState) and self.stateNumber==other.stateNumber
 
     def onlyHasEpsilonTransitions(self):
         return self.epsilonOnlyTransitions
