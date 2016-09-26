@@ -17,7 +17,7 @@ The tests were conducted using Selenium. No issue was found, so you should find 
 
 The runtime has also been extensively tested against Node.js 0.10.33. No issue was found.
 
-## How to create a JavaScript lexer or parser?
+## How to generate a JavaScript lexer or parser?
 
 This is pretty much the same as creating a Java lexer or parser, except you need to specify the language target, for example:
 
@@ -31,7 +31,7 @@ For a full list of antlr4 tool options, please visit the [tool documentation pag
 
 Once you've generated the lexer and/or parser code, you need to download the runtime.
 
-The JavaScript runtime is available from the ANTLR web site [download section](http://www.antlr.org/download/index.html). The runtime is provided in the form of source code, so no additional installation is required.
+The JavaScript runtime is available from both pm and the ANTLR web site [download section](http://www.antlr.org/download/index.html). The runtime is provided in the form of source code, so no additional installation is required.
 
 We will not document here how to refer to the runtime from your project, since this would differ a lot depending on your project type and IDE. 
 
@@ -64,13 +64,13 @@ This will load the runtime asynchronously.
 
 ## How do I get the runtime in Node.js?
 
-Right now, there is no npm package available, so you need to register a link instead. This can be done by running the following command from the antlr4 directory:
+Simply install it from npm. This can be done by running the following command from your project directory:
 
 ```bash
-$ npm link antlr4
+$ npm install antlr4
 ```
 
-This will install antlr4 using the package.son descriptor that comes with the script.
+This will install antlr4. For more options, check the npm documentation.
  
 ## How do I run the generated lexer and/or parser?
 
