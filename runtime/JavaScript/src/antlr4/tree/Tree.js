@@ -107,10 +107,7 @@ var visitAtom = function(visitor, ctx) {
 		return;
 	}
 
-	var name = ctx.parser.ruleNames[ctx.ruleIndex];
-	var funcName = "visit" + Utils.titleCase(name);
-
-	return visitor[funcName](ctx);
+	return ctx.accept(visitor);
 };
 
 function ParseTreeListener() {
