@@ -1,4 +1,4 @@
-version: '4.5.4-SNAPSHOT+Appveyor.{build}'
+version: '4.5.4-SNAPSHOT+AppVeyor.{build}'
 os: Windows Server 2012
 build_script:
   - mvn compile --batch-mode 
