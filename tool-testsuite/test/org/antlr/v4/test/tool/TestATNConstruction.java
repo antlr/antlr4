@@ -111,14 +111,14 @@ public class TestATNConstruction extends BaseTest {
 			"A : ('0x' | '0X') ;");
 		String expecting =
 			"s0->RuleStart_A_1\n" +
-				"RuleStart_A_1->BlockStart_7\n" +
-				"BlockStart_7->s3\n" +
-				"BlockStart_7->s5\n" +
-				"s3-'0'->s4\n" +
-				"s5-'0'->s6\n" +
-				"s4-'x'->BlockEnd_8\n" +
-				"s6-'X'->BlockEnd_8\n" +
-				"BlockEnd_8->RuleStop_A_2\n";
+				"RuleStart_A_1->BlockStart_11\n" +
+				"BlockStart_11->s3\n" +
+				"BlockStart_11->s7\n" +
+				"s3-'0'->s5\n" +
+				"s7-'0'->s9\n" +
+				"s5-'x'->BlockEnd_12\n" +
+				"s9-'X'->BlockEnd_12\n" +
+				"BlockEnd_12->RuleStop_A_2\n";
 		checkTokensRule(g, null, expecting);
 	}
 	@Test public void testRange() throws Exception {
@@ -140,14 +140,14 @@ public class TestATNConstruction extends BaseTest {
 		);
 		String expecting =
 			"s0->RuleStart_A_1\n" +
-				"RuleStart_A_1->BlockStart_7\n" +
-				"BlockStart_7->s3\n" +
-				"BlockStart_7->s5\n" +
+				"RuleStart_A_1->BlockStart_9\n" +
+				"BlockStart_9->s3\n" +
+				"BlockStart_9->s6\n" +
 				"s3-'a'..'c'->s4\n" +
-				"s5-'q'->s6\n" +
-				"s4-'h'->BlockEnd_8\n" +
-				"s6-'j'..'l'->BlockEnd_8\n" +
-				"BlockEnd_8->RuleStop_A_2\n";
+				"s6-'q'->s8\n" +
+				"s4-'h'->BlockEnd_10\n" +
+				"s8-'j'..'l'->BlockEnd_10\n" +
+				"BlockEnd_10->RuleStop_A_2\n";
 		checkTokensRule(g, null, expecting);
 	}
 	@Test public void testStringLiteralInParser() throws Exception {
@@ -927,11 +927,11 @@ public class TestATNConstruction extends BaseTest {
 			"s0->RuleStart_A_2\n" +
 				"s0->RuleStart_X_4\n" +
 				"RuleStart_A_2->s10\n" +
-				"RuleStart_X_4->s12\n" +
-				"s10-'a'->s11\n" +
-				"s12-'x'->s13\n" +
-				"s11->RuleStop_A_3\n" +
-				"s13->RuleStop_X_5\n";
+				"RuleStart_X_4->s13\n" +
+				"s10-'a'->s12\n" +
+				"s13-'x'->s15\n" +
+				"s12->RuleStop_A_3\n" +
+				"s15->RuleStop_X_5\n";
 		checkTokensRule(g, "DEFAULT_MODE", expecting);
 	}
 	@Test public void testMode() throws Exception {
@@ -945,12 +945,12 @@ public class TestATNConstruction extends BaseTest {
 		String expecting =
 			"s1->RuleStart_B_6\n" +
 				"s1->RuleStart_C_8\n" +
-				"RuleStart_B_6->s14\n" +
-				"RuleStart_C_8->s16\n" +
-				"s14-'b'->s15\n" +
-				"s16-'c'->s17\n" +
-				"s15->RuleStop_B_7\n" +
-				"s17->RuleStop_C_9\n";
+				"RuleStart_B_6->s16\n" +
+				"RuleStart_C_8->s19\n" +
+				"s16-'b'->s18\n" +
+				"s19-'c'->s21\n" +
+				"s18->RuleStop_B_7\n" +
+				"s21->RuleStop_C_9\n";
 		checkTokensRule(g, "FOO", expecting);
 	}
 	void checkTokensRule(LexerGrammar g, String modeName, String expecting) {

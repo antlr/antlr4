@@ -90,6 +90,8 @@ public class Rule implements AttributeResolver {
 	/** If we're in a lexer grammar, we might be in a mode */
 	public String mode;
 
+	public boolean caseInsensitive;
+
     /** Map a name to an action for this rule like @init {...}.
      *  The code generator will use this to fill holes in the rule template.
      *  I track the AST node for the action in case I need the line number

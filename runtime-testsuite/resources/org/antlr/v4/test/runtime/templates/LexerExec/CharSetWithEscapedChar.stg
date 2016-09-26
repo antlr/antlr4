@@ -19,5 +19,5 @@ Errors() ::= ""
 grammar(grammarName) ::= <<
 lexer grammar <grammarName>;
 DASHBRACK : [\\-\]]+ {<writeln("\"DASHBRACK\"")>} ;
-WS : [ \u]+ -> skip ;
+WS : [ ]+ -> skip ;
 >>

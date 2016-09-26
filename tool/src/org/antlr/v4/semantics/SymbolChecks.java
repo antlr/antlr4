@@ -275,15 +275,17 @@ public class SymbolChecks {
 	public void checkForModeConflicts(Grammar g) {
 		if (g.isLexer()) {
 			LexerGrammar lexerGrammar = (LexerGrammar)g;
-			for (String modeName : lexerGrammar.modes.keySet()) {
-				if (!modeName.equals("DEFAULT_MODE") && reservedNames.contains(modeName)) {
-					Rule rule = lexerGrammar.modes.get(modeName).iterator().next();
-					g.tool.errMgr.grammarError(ErrorType.MODE_CONFLICTS_WITH_COMMON_CONSTANTS, g.fileName, rule.ast.parent.getToken(), modeName);
-				}
+			if (lexerGrammar.modes != null) {
+				for (String modeName : lexerGrammar.modes.keySet()) {
+					if (!modeName.equals("DEFAULT_MODE") && reservedNames.contains(modeName)) {
+						Rule rule = lexerGrammar.modes.get(modeName).iterator().next();
+						g.tool.errMgr.grammarError(ErrorType.MODE_CONFLICTS_WITH_COMMON_CONSTANTS, g.fileName, rule.ast.parent.getToken(), modeName);
+					}
 
-				if (g.getTokenType(modeName) != Token.INVALID_TYPE) {
-					Rule rule = lexerGrammar.modes.get(modeName).iterator().next();
-					g.tool.errMgr.grammarError(ErrorType.MODE_CONFLICTS_WITH_TOKEN, g.fileName, rule.ast.parent.getToken(), modeName);
+					if (g.getTokenType(modeName) != Token.INVALID_TYPE) {
+						Rule rule = lexerGrammar.modes.get(modeName).iterator().next();
+						g.tool.errMgr.grammarError(ErrorType.MODE_CONFLICTS_WITH_TOKEN, g.fileName, rule.ast.parent.getToken(), modeName);
+					}
 				}
 			}
 		}

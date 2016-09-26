@@ -105,6 +105,7 @@ public class Grammar implements AttributeResolver {
 		parserOptions.add("TokenLabelType");
 		parserOptions.add("tokenVocab");
 		parserOptions.add("language");
+		parserOptions.add("caseInsensitive");
 	}
 
 	public static final Set<String> lexerOptions = parserOptions;
@@ -443,7 +444,6 @@ public class Grammar implements AttributeResolver {
 		if ( rules.get(r.name)!=null ) {
 			return false;
 		}
-
 		rules.put(r.name, r);
 		r.index = ruleNumber++;
 		indexToRule.add(r);

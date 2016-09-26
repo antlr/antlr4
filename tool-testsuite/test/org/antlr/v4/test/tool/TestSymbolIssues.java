@@ -223,4 +223,52 @@ public class TestSymbolIssues extends BaseTest {
 
 		testErrors(test, false);
 	}
+
+	@Test public void testCharsCollision() throws  Exception {
+		String[] test = {
+			"lexer grammar L;\n" +
+			"TOKEN_RANGE:      [aa-f];\n" +
+			"TOKEN_RANGE_2:    [A-FD-J];\n" +
+			"TOKEN_RANGE_3:    'Z' | 'K'..'R' | 'O'..'V';\n" +
+			"TOKEN_RANGE_4:    'g'..'l' | [g-l];\n",             // Handling in ATNOptimizer.
+
+			"warning(" + ErrorType.CHARACTERS_COLLISION_IN_SET.code + "): L.g4:2:18: chars \"a-f\" declared multiply times in set [aa-f]\n" +
+			"warning(" + ErrorType.CHARACTERS_COLLISION_IN_SET.code + "): L.g4:3:18: chars \"D-J\" declared multiply times in set [A-FD-J]\n" +
+			"warning(" + ErrorType.CHARACTERS_COLLISION_IN_SET.code + "): L.g4:4:13: chars \"O-V\" declared multiply times in set 'Z' | 'K'..'R' | 'O'..'V'\n" +
+			"warning(" + ErrorType.CHARACTERS_COLLISION_IN_SET.code + "): L.g4::: chars \"g-l\" declared multiply times in set [g-l]\n"
+		};
+
+		testErrors(test, false);
+	}
+
+	@Test public void testCaseInsensitiveCharsCollision() throws  Exception {
+		String[] test = {
+			"lexer grammar L;\n" +
+			"options { caseInsensitive = true; }\n" +
+			"TOKEN_RANGE:      [a-fA-F0-9];\n" +
+			"TOKEN_RANGE_2:    'g'..'l' | 'G'..'L';\n",
+
+			"warning(" + ErrorType.CHARACTERS_COLLISION_IN_SET.code + "): L.g4:3:18: chars \"a-f\" declared multiply times in set [a-fA-F0-9]\n" +
+			"warning(" + ErrorType.CHARACTERS_COLLISION_IN_SET.code + "): L.g4:3:18: chars \"A-F\" declared multiply times in set [a-fA-F0-9]\n" +
+			"warning(" + ErrorType.CHARACTERS_COLLISION_IN_SET.code + "): L.g4:4:13: chars \"g-l\" declared multiply times in set 'g'..'l' | 'G'..'L'\n" +
+			"warning(" + ErrorType.CHARACTERS_COLLISION_IN_SET.code + "): L.g4:4:13: chars \"G-L\" declared multiply times in set 'g'..'l' | 'G'..'L'\n"
+		};
+
+		testErrors(test, false);
+	}
+
+	@Test public void testIllegalModeOption() throws  Exception {
+		String[] test = {
+			"lexer grammar L;\n" +
+			"options { caseInsensitive = badValue; }\n" +
+			"DEFAULT_TOKEN: [A-F]+;\n" +
+			"mode M1, wrongModeOption;\n" +
+			"TOKEN:  [a-f]+;\n",
+
+			"warning(" + ErrorType.ILLEGAL_OPTION_VALUE.code + "): L.g4:2:28: unsupported option value caseInsensitive=badValue\n" +
+			"warning(" + ErrorType.ILLEGAL_OPTION.code + "): L.g4:4:9: unsupported option wrongModeOption\n"
+		};
+
+		testErrors(test, false);
+	}
 }

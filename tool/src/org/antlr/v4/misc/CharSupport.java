@@ -52,6 +52,8 @@ public class CharSupport {
 		ANTLRLiteralEscapedCharValue['\\'] = '\\';
 		ANTLRLiteralEscapedCharValue['\''] = '\'';
 		ANTLRLiteralEscapedCharValue['"'] = '"';
+		ANTLRLiteralEscapedCharValue['-'] = '-';
+		ANTLRLiteralEscapedCharValue[']'] = ']';
 		ANTLRLiteralCharValueEscape['\n'] = "\\n";
 		ANTLRLiteralCharValueEscape['\r'] = "\\r";
 		ANTLRLiteralCharValueEscape['\t'] = "\\t";
@@ -120,7 +122,13 @@ public class CharSupport {
 				// '\u1234'
 				if ( !cstr.startsWith("\\u") ) return -1;
 				String unicodeChars = cstr.substring(2, cstr.length());
-				return Integer.parseInt(unicodeChars, 16);
+				int result = -1;
+				try {
+					result = Integer.parseInt(unicodeChars, 16);
+				}
+				catch (NumberFormatException e) {
+				}
+				return result;
 			default :
 				return -1;
 		}
@@ -134,13 +142,15 @@ public class CharSupport {
 			int end = i+1;
 			if ( literal.charAt(i) == '\\' ) {
 				end = i+2;
-				if ( (i+1)>=n ) break; // ignore spurious \ on end
+				if ( (i+1)>=n ) return null; // invalid escape sequence.
 				if ( literal.charAt(i+1) == 'u' ) end = i+6;
 			}
-			if ( end>n ) break;
+			if ( end>n ) return null; // invalid escape sequence.
 			String esc = literal.substring(i, end);
 			int c = getCharValueFromCharInGrammarLiteral(esc);
-			if ( c==-1 ) { buf.append(esc); }
+			if ( c==-1 ) {
+				return null; // invalid escape sequence.
+			}
 			else buf.append((char)c);
 			i = end;
 		}

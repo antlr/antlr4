@@ -165,6 +165,14 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 	@Override
 	protected void enterMode(GrammarAST tree) {
 		nonFragmentRuleCount = 0;
+		Tree child1 = tree.getChild(1);
+		if (!(child1 instanceof RuleAST)) {
+			String modeOptionText = child1.getText();
+			if (!modeOptionText.equals("caseSensitive") && !modeOptionText.equals("caseInsensitive")) {
+				g.tool.errMgr.grammarError(ErrorType.ILLEGAL_OPTION, g.fileName, ((GrammarAST)child1).getToken(),
+						modeOptionText);
+			}
+		}
 	}
 
 	@Override
@@ -248,6 +256,13 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 	public void grammarOption(GrammarAST ID, GrammarAST valueAST) {
 		boolean ok = checkOptions(g.ast, ID.token, valueAST);
 		//if ( ok ) g.ast.setOption(ID.getText(), value);
+		if (ID.getText().equals("caseInsensitive")) {
+			String valueText = valueAST.getText();
+			if (!valueText.equals("true") && !valueText.equals("false")) {
+				g.tool.errMgr.grammarError(ErrorType.ILLEGAL_OPTION_VALUE, g.fileName, valueAST.getToken(),
+						ID.getText(), valueText);
+			}
+		}
 	}
 
 	@Override
@@ -495,7 +510,7 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 	protected void enterTerminal(GrammarAST tree) {
 		String text = tree.getText();
 		if (text.equals("''")) {
-			g.tool.errMgr.grammarError(ErrorType.EMPTY_STRINGS_NOT_ALLOWED, g.fileName, tree.token);
+			g.tool.errMgr.grammarError(ErrorType.STRING_LITERALS_AND_SETS_CANNOT_BE_EMPTY, g.fileName, tree.token, "''");
 		}
 	}
 

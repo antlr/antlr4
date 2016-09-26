@@ -43,6 +43,7 @@ import org.junit.Test;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 /**
  * Lexer rules are little quirky when it comes to wildcards. Problem
@@ -307,6 +308,142 @@ public class TestATNLexerInterpreter extends BaseTest {
 			"A : 'a';\n");
 		String expecting = "A, DONE, EOF";
 		checkLexerMatches(lg, "a", expecting);
+	}
+
+	@Test public void testLexerCaseInsensitive() throws Exception {
+		LexerGrammar lg = new LexerGrammar(
+			"lexer grammar L;\n" +
+			"\n" +
+			"options { caseInsensitive = true; }" +
+			"\n" +
+			"WS:             [ \\t\\r\\n] -> skip;\n" +
+			"\n" +
+			"SIMPLE_TOKEN:           'and';\n" +
+			"TOKEN_WITH_SPACES:      'as' 'd' 'f';\n" +
+			"TOKEN_WITH_DIGITS:      'INT64';\n" +
+			"TOKEN_WITH_UNDERSCORE:  'TOKEN_WITH_UNDERSCORE';\n" +
+			"BOOL:                   'true' | 'FALSE';\n" +
+			"SPECIAL:                '==';\n" +
+			"RANGE:                  [a-z0-9]+;\n"    // [a-zA-Z0-9]
+			);
+
+		String inputString =
+			"and AND aND\n" +
+			"asdf ASDF\n" +
+			"int64\n" +
+			"token_WITH_underscore\n" +
+			"TRUE FALSE\n" +
+			"==\n" +
+			"A0bcDE93\n";
+
+		String expecting = Utils.join(new String[] {
+			"SIMPLE_TOKEN", "SIMPLE_TOKEN", "SIMPLE_TOKEN",
+			"TOKEN_WITH_SPACES", "TOKEN_WITH_SPACES",
+			"TOKEN_WITH_DIGITS",
+			"TOKEN_WITH_UNDERSCORE",
+			"BOOL", "BOOL",
+			"SPECIAL",
+			"RANGE", "EOF" },
+			", WS, ");
+
+		checkLexerMatches(lg, inputString, expecting);
+	}
+
+	@Test public void testLexerCaseInsensitiveWithNot() throws  Exception {
+		String grammar =
+				"lexer grammar L;\n" +
+				"options { caseInsensitive = true; }" +
+				"TOKEN_WITH_NOT:   ~'f';\n";     // ~('f' | 'F)
+		execLexer("L.g4", grammar, "L", "F");
+
+		assertEquals("line 1:0 token recognition error at: 'F'\n", stderrDuringParse);
+	}
+
+	@Test public void testLexerCaseInsensitiveFragments() throws Exception {
+		LexerGrammar lg = new LexerGrammar(
+				"lexer grammar L;\n" +
+				"options { caseInsensitive = true; }" +
+				"TOKEN_0:         FRAGMENT 'd'+;\n" +
+				"TOKEN_1:         FRAGMENT 'e'+;\n" +
+				"FRAGMENT:        'abc';\n");
+
+		String inputString =
+				"ABCDDD";
+
+		String expecting = "TOKEN_0, EOF";
+
+		checkLexerMatches(lg, inputString, expecting);
+	}
+
+	@Test public void testLexerCaseInsensitiveInModes() throws Exception {
+		String lg =
+				"lexer grammar L;\n" +
+
+				"options { caseInsensitive = true; }      \n" +   // caseInsensitive
+				"Token_0: 'abc0_' -> mode(CASE_SENSITIVE);\n" +
+
+				"mode CASE_SENSITIVE, caseSensitive;      \n" +   // caseSensitive
+				"Token_1: 'DEF1_' -> mode(CASE_INSENSITIVE);\n" +
+
+				"mode CASE_INSENSITIVE;                   \n" +   // default, i.e. caseInsensitive
+				"Token_2: 'gHi2_' -> mode(CASE_INSENSITIVE_EXPLICIT);\n" +
+
+				"mode CASE_INSENSITIVE_EXPLICIT, caseInsensitive;\n" +  // caseInsensitive
+				"Token_3: 'JkL3';";
+
+		String inputString = "ABC0_DEF1_GHI2_JKL3";
+
+		String result = execLexer("L.g4", lg, "L", "ABC0_DEF1_GHI2_JKL3", false);
+
+		assertEquals("[@0,0:4='ABC0_',<1>,1:0]\n" +
+					 "[@1,5:9='DEF1_',<2>,1:5]\n" +
+					 "[@2,10:14='GHI2_',<3>,1:10]\n" +
+					 "[@3,15:18='JKL3',<4>,1:15]\n" +
+					 "[@4,19:18='<EOF>',<-1>,1:19]\n", result);
+	}
+
+	@Test public void testLexerCaseInsensitiveInOneMode() throws Exception {
+		String lg =
+				"lexer grammar L;\n" +
+
+				"options { caseInsensitive = true; }      \n" +   // caseInsensitive
+				"Token_1: 'a_';\n" +
+
+				"mode DEFAULT_MODE, caseInsensitive;      \n" +   // caseInsensitive
+				"Token_2: 'b_';\n" +
+
+				"mode DEFAULT_MODE, caseSensitive;      \n" +     // caseSensitive
+				"Token_3: 'd';\n";
+
+		String result = execLexer("L.g4", lg, "L", "A_B_D", false);
+		assertEquals("line 1:4 token recognition error at: 'D'\n", stderrDuringParse);
+		assertEquals("[@0,0:1='A_',<1>,1:0]\n" +
+				"[@1,2:3='B_',<2>,1:2]\n" +
+				"[@2,5:4='<EOF>',<-1>,1:5]\n", result);
+	}
+
+	@Test public void testLexerCaseInsensitiveWithDifferentCultures() throws Exception {
+		// From here: http://www.periodni.com/unicode_utf-8_encoding.html
+		// TODO: Add tokens on Arabic, Japan, Chinese and other languages.
+		LexerGrammar lg = new LexerGrammar(
+				"lexer grammar L;\n" +
+				"options { caseInsensitive = true; }" +
+				"ENGLISH_TOKEN:   [a-z_]+;\n" +
+				"GERMAN_TOKEN:    [äéöüß_]+;\n" +
+				"FRENCH_TOKEN:    [àâæ-ëîïôœùûüÿ_]+;\n" +
+				"CROATIAN_TOKEN:  [ćčđšž_]+;\n" +
+				"ITALIAN_TOKEN:   [àèéìòù_]+;\n" +
+				"SPANISH_TOKEN:   [áéíñóúü¡¿_]+;\n" +
+				"GREEK_TOKEN:     [α-ω_]+;\n" +
+				"RUSSIAN_TOKEN:   [а-я_]+;\n"
+				);
+
+		String inputString = "abcXYZ_äéöüßÄÉÖÜ_àâæçÙÛÜŸ_ćčđĐŠŽ_àèéÌÒÙ_áéÚÜ¡¿_αβγΧΨΩ_абвЭЮЯ_";
+
+		String expecting = "ENGLISH_TOKEN, GERMAN_TOKEN, FRENCH_TOKEN, CROATIAN_TOKEN, ITALIAN_TOKEN, SPANISH_TOKEN, " +
+				"GREEK_TOKEN, RUSSIAN_TOKEN, EOF";
+
+		checkLexerMatches(lg, inputString, expecting);
 	}
 
 	protected void checkLexerMatches(LexerGrammar lg, String inputString, String expecting) {

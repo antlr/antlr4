@@ -32,6 +32,7 @@ package org.antlr.v4.automata;
 
 import org.antlr.runtime.CommonToken;
 import org.antlr.runtime.Token;
+import org.antlr.runtime.tree.CommonTree;
 import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.misc.CharSupport;
 import org.antlr.v4.parse.ANTLRParser;
@@ -64,6 +65,8 @@ import org.antlr.v4.tool.Rule;
 import org.antlr.v4.tool.ast.ActionAST;
 import org.antlr.v4.tool.ast.GrammarAST;
 import org.antlr.v4.tool.ast.TerminalAST;
+import org.antlr.v4.tool.ast.RangeAST;
+import org.antlr.v4.tool.ast.RuleAST;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 
@@ -268,6 +271,7 @@ public class LexerATNFactory extends ParserATNFactory {
 		ATNState right = newState(b);
 		int t1 = CharSupport.getCharValueFromGrammarCharLiteral(a.getText());
 		int t2 = CharSupport.getCharValueFromGrammarCharLiteral(b.getText());
+		checkRange(a, b, t1, t2);
 		left.addTransition(new  RangeTransition(right, t1, t2));
 		a.atnState = left;
 		b.atnState = left;
@@ -276,6 +280,7 @@ public class LexerATNFactory extends ParserATNFactory {
 
 	@Override
 	public Handle set(GrammarAST associatedAST, List<GrammarAST> alts, boolean invert) {
+		boolean caseInsensitive = isCaseInsensitive(associatedAST);
 		ATNState left = newState(associatedAST);
 		ATNState right = newState(associatedAST);
 		IntervalSet set = new IntervalSet();
@@ -283,7 +288,13 @@ public class LexerATNFactory extends ParserATNFactory {
 			if ( t.getType()==ANTLRParser.RANGE ) {
 				int a = CharSupport.getCharValueFromGrammarCharLiteral(t.getChild(0).getText());
 				int b = CharSupport.getCharValueFromGrammarCharLiteral(t.getChild(1).getText());
-				set.add(a, b);
+				if (checkRange((GrammarAST)t.getChild(0), (GrammarAST)t.getChild(1), a, b)) {
+					if (!caseInsensitive) {
+						checkAndAddToSet(associatedAST, set, a, b);
+					} else {
+						checkAndAddToSetCaseInsensitive(associatedAST, set, a, b);
+					}
+				}
 			}
 			else if ( t.getType()==ANTLRParser.LEXER_CHAR_SET ) {
 				set.addAll(getSetFromCharSetLiteral(t));
@@ -291,12 +302,15 @@ public class LexerATNFactory extends ParserATNFactory {
 			else if ( t.getType()==ANTLRParser.STRING_LITERAL ) {
 				int c = CharSupport.getCharValueFromGrammarCharLiteral(t.getText());
 				if ( c != -1 ) {
-					set.add(c);
+					if (!caseInsensitive) {
+						checkAndAddToSet(associatedAST, set, c);
+					} else {
+						checkAndAddToSetCaseInsensitive(associatedAST, set, c);
+					}
 				}
 				else {
 					g.tool.errMgr.grammarError(ErrorType.INVALID_LITERAL_IN_LEXER_SET,
 											   g.fileName, t.getToken(), t.getText());
-
 				}
 			}
 			else if ( t.getType()==ANTLRParser.TOKEN_REF ) {
@@ -322,25 +336,72 @@ public class LexerATNFactory extends ParserATNFactory {
 		return new Handle(left, right);
 	}
 
+	protected boolean checkRange(GrammarAST leftNode, GrammarAST rightNode, int leftValue, int rightValue) {
+		boolean result = true;
+		if (leftValue == -1) {
+			result = false;
+			g.tool.errMgr.grammarError(ErrorType.INVALID_LITERAL_IN_LEXER_SET,
+					g.fileName, leftNode.getToken(), leftNode.getText());
+		}
+		if (rightValue == -1) {
+			result = false;
+			g.tool.errMgr.grammarError(ErrorType.INVALID_LITERAL_IN_LEXER_SET,
+					g.fileName, rightNode.getToken(), rightNode.getText());
+		}
+		if (!result) return result;
+
+		if (rightValue < leftValue) {
+			g.tool.errMgr.grammarError(ErrorType.STRING_LITERALS_AND_SETS_CANNOT_BE_EMPTY,
+					g.fileName, leftNode.parent.getToken(), leftNode.getText() + ".." + rightNode.getText());
+		}
+		return result;
+	}
+
 	/** For a lexer, a string is a sequence of char to match.  That is,
 	 *  "fog" is treated as 'f' 'o' 'g' not as a single transition in
 	 *  the DFA.  Machine== o-'f'-&gt;o-'o'-&gt;o-'g'-&gt;o and has n+1 states
 	 *  for n characters.
+	 *  if "caseInsensitive" option enabled, "fog" will be treated as
+	 *  o-('f'|'F') -> o-('o'|'O') -> o-('g'|'G')
 	 */
 	@Override
 	public Handle stringLiteral(TerminalAST stringLiteralAST) {
 		String chars = stringLiteralAST.getText();
-		chars = CharSupport.getStringFromGrammarStringLiteral(chars);
-		int n = chars.length();
 		ATNState left = newState(stringLiteralAST);
-		ATNState prev = left;
-		ATNState right = null;
-		for (int i=0; i<n; i++) {
-			right = newState(stringLiteralAST);
-			prev.addTransition(new AtomTransition(right, chars.charAt(i)));
-			prev = right;
+		ATNState right;
+		chars = CharSupport.getStringFromGrammarStringLiteral(chars);
+		if (chars == null) {
+			right = left;
+			g.tool.errMgr.grammarError(ErrorType.INVALID_ESCAPE_SEQUENCE,
+					g.fileName, stringLiteralAST.getToken());
 		}
-		stringLiteralAST.atnState = left;
+		else {
+			int n = chars.length();
+			ATNState prev = left;
+			right = null;
+			boolean caseInsensitive = isCaseInsensitive(stringLiteralAST);
+			for (int i = 0; i < n; i++) {
+				right = newState(stringLiteralAST);
+				if (!caseInsensitive) {
+					right = newState(stringLiteralAST);
+					prev.addTransition(new AtomTransition(right, chars.charAt(i)));
+				} else {
+					char c = chars.charAt(i);
+					char lc = Character.toLowerCase(c);
+					char uc = Character.toUpperCase(c);
+					if (lc != uc) {
+						IntervalSet set = new IntervalSet();
+						set.add(lc);
+						set.add(uc);
+						prev.addTransition(new SetTransition(right, set));
+					} else {
+						prev.addTransition(new AtomTransition(right, c));
+					}
+				}
+				prev = right;
+			}
+			stringLiteralAST.atnState = left;
+		}
 		return new Handle(left, right);
 	}
 
@@ -357,32 +418,131 @@ public class LexerATNFactory extends ParserATNFactory {
 
 	public IntervalSet getSetFromCharSetLiteral(GrammarAST charSetAST) {
 		String chars = charSetAST.getText();
-		chars = chars.substring(1, chars.length()-1);
-		String cset = '"'+ chars +'"';
+		chars = chars.substring(1, chars.length() - 1);
+		String cset = '"' + chars + '"';
 		IntervalSet set = new IntervalSet();
+		boolean caseInsensitive = isCaseInsensitive(charSetAST);
 
-		// unescape all valid escape char like \n, leaving escaped dashes as '\-'
-		// so we can avoid seeing them as '-' range ops.
-		chars = CharSupport.getStringFromGrammarStringLiteral(cset);
-		// now make x-y become set of char
-		int n = chars.length();
-		for (int i=0; i< n; i++) {
-			int c = chars.charAt(i);
-			if ( c=='\\' && (i+1)<n && chars.charAt(i+1)=='-' ) { // \-
-				set.add('-');
-				i++;
-			}
-			else if ( (i+2)<n && chars.charAt(i+1)=='-' ) { // range x-y
-				int x = c;
-				int y = chars.charAt(i+2);
-				if ( x<=y ) set.add(x,y);
-				i+=2;
-			}
-			else {
-				set.add(c);
+		if (chars.length() == 0) {
+			g.tool.errMgr.grammarError(ErrorType.STRING_LITERALS_AND_SETS_CANNOT_BE_EMPTY,
+					g.fileName, charSetAST.getToken(), "[]");
+		} else {
+			// unescape all valid escape char like \n, leaving escaped dashes as '\-'
+			// so we can avoid seeing them as '-' range ops.
+			chars = CharSupport.getStringFromGrammarStringLiteral(cset);
+			if (chars == null) {
+				g.tool.errMgr.grammarError(ErrorType.INVALID_ESCAPE_SEQUENCE,
+						g.fileName, charSetAST.getToken());
+			} else {
+				int n = chars.length();
+				// now make x-y become set of char
+				for (int i = 0; i < n; i++) {
+					int c = chars.charAt(i);
+					if (c == '\\' && (i + 1) < n && chars.charAt(i + 1) == '-') { // \-
+						checkAndAddToSet(charSetAST, set, '-');
+						i++;
+					} else if ((i + 2) < n && chars.charAt(i + 1) == '-') { // range x-y
+						int x = c;
+						int y = chars.charAt(i + 2);
+						if (x <= y) {
+							if (!caseInsensitive) {
+								checkAndAddToSet(charSetAST, set, x, y);
+							} else {
+								checkAndAddToSetCaseInsensitive(charSetAST, set, x, y);
+							}
+						} else {
+							g.tool.errMgr.grammarError(ErrorType.STRING_LITERALS_AND_SETS_CANNOT_BE_EMPTY,
+									g.fileName, charSetAST.getToken(), "[" + (char) x + "-" + (char) y + "]");
+						}
+						i += 2;
+					} else {
+						if (!caseInsensitive) {
+							checkAndAddToSet(charSetAST, set, c);
+						} else {
+							checkAndAddToSetCaseInsensitive(charSetAST, set, c);
+						}
+					}
+				}
 			}
 		}
 		return set;
+	}
+
+	private boolean isCaseInsensitive(GrammarAST ast) {
+		CommonTree altAst = ast.parent;
+		while (!(altAst.getType() == ANTLRParser.RULE)) {
+			altAst = altAst.parent;
+		}
+		return (g.rules.get(((RuleAST)altAst).getRuleName())).caseInsensitive;
+	}
+
+	// TODO: not all case sensitive featuries may work correctly
+	// see here: https://en.wikipedia.org/wiki/Letter_case#Exceptional_letters_and_digraphs
+	private void checkAndAddToSetCaseInsensitive(GrammarAST charSetAST, IntervalSet set, int x, int y) {
+		char lx = Character.toLowerCase((char)x);
+		char ux = Character.toUpperCase((char)x);
+		char ly = Character.toLowerCase((char)y);
+		char uy = Character.toUpperCase((char)y);
+		if (lx != ux && uy - ux == ly - lx) {
+            checkAndAddToSet(charSetAST, set, lx, ly);
+            checkAndAddToSet(charSetAST, set, ux, uy);
+        } else if (lx == ux && uy == ly){
+            checkAndAddToSet(charSetAST, set, x, y);
+        } else {
+			g.tool.errMgr.grammarError(ErrorType.CASE_INSENSITIVE_MAY_WORKS_INCORRECTLY,
+					g.fileName, charSetAST.getToken(), charSetAST.getText());
+			checkAndAddToSet(charSetAST, set, lx, ly);
+			checkAndAddToSet(charSetAST, set, ux, uy);
+		}
+	}
+
+	private void checkAndAddToSetCaseInsensitive(GrammarAST associatedAST, IntervalSet set, int c) {
+		char lc = Character.toLowerCase((char)c);
+		char uc = Character.toUpperCase((char)c);
+		if (lc != uc) {
+			checkAndAddToSet(associatedAST, set, lc);
+			checkAndAddToSet(associatedAST, set, uc);
+		} else {
+			checkAndAddToSet(associatedAST, set, c);
+		}
+	}
+
+	private void checkAndAddToSet(GrammarAST ast, IntervalSet set, int el) {
+		if (set.contains(el)) {
+			g.tool.errMgr.grammarError(ErrorType.CHARACTERS_COLLISION_IN_SET, g.fileName, ast.getToken(),
+					(char)el, ast.getText());
+		}
+		set.add(el);
+	}
+
+	private void checkAndAddToSet(GrammarAST ast, IntervalSet set, int a, int b) {
+		for (int i = a; i <= b; i++) {
+			if (set.contains(i)) {
+				String setText;
+				if (ast.getChildren() == null) {
+					setText = ast.getText();
+				} else {
+					StringBuilder sb = new StringBuilder();
+					for (Object child : ast.getChildren()) {
+						if (child instanceof RangeAST) {
+							sb.append(((RangeAST) child).getChild(0).getText());
+							sb.append("..");
+							sb.append(((RangeAST) child).getChild(1).getText());
+						}
+						else {
+							sb.append(((GrammarAST)child).getText());
+						}
+						sb.append(" | ");
+					}
+					sb.replace(sb.length() - 3, sb.length(), "");
+					setText = sb.toString();
+				}
+				g.tool.errMgr.grammarError(ErrorType.CHARACTERS_COLLISION_IN_SET, g.fileName, ast.getToken(),
+						(char)a + "-" + (char)b, setText);
+				break;
+			}
+		}
+		set.add(a, b);
 	}
 
 	@Override

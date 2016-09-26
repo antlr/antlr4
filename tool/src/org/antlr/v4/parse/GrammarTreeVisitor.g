@@ -87,6 +87,8 @@ import java.lang.reflect.Method;
 public String grammarName;
 public GrammarAST currentRuleAST;
 public String currentModeName = LexerGrammar.DEFAULT_MODE_NAME;
+public boolean defaultCaseInsensitive = false;
+public boolean currentCaseInsensitive = false;
 public String currentRuleName;
 public GrammarAST currentOuterAltRoot;
 public int currentOuterAltNumber = 1; // 1..n
@@ -406,7 +408,11 @@ option
     	if ( block ) blockOption($ID, $v.start); // most specific first
     	else if ( rule ) ruleOption($ID, $v.start);
     	else grammarOption($ID, $v.start);
+		if ($ID.text.equals("caseInsensitive")) {
+			defaultCaseInsensitive = Boolean.parseBoolean(((GrammarAST)$v.start).getText());
+			currentCaseInsensitive = defaultCaseInsensitive;
     	}
+		}
     ;
 
 optionValue returns [String v]
@@ -510,7 +516,18 @@ mode
 @after {
 	exitMode($start);
 }
-	:	^( MODE ID {currentModeName=$ID.text; modeDef($MODE, $ID);} lexerRule* )
+	:	^( MODE modeName=ID (modeOption=ID)? 
+	{currentModeName=$modeName.text;
+	modeDef($MODE, $modeName);
+	if ($modeOption != null) {
+		if ($modeOption.text.equals("caseInsensitive"))
+			currentCaseInsensitive = true;
+		else if ($modeOption.text.equals("caseSensitive"))
+			currentCaseInsensitive = false;
+	} else {
+		currentCaseInsensitive = defaultCaseInsensitive;
+	}}
+	lexerRule* )
 	;
 
 lexerRule
