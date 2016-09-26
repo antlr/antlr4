@@ -176,7 +176,7 @@ public class TestRig {
 			parser = parserCtor.newInstance((TokenStream)null);
 		}
 
-		if ( inputFiles.size()==0 ) {
+		if (inputFiles.isEmpty()) {
 			InputStream is = System.in;
 			Reader r;
 			if ( encoding!=null ) {

@@ -128,7 +128,7 @@ public abstract class BaseTest {
 	public void setUp() throws Exception {
 		// new output dir for each test
 		String prop = System.getProperty("antlr-javascript-test-dir");
-		if (prop != null && prop.length() > 0)
+		if (prop != null && !prop.isEmpty())
 			tmpdir = prop;
 		else
 			tmpdir = new File(System.getProperty("java.io.tmpdir"), getClass()
@@ -300,7 +300,7 @@ public abstract class BaseTest {
 		writeFile(tmpdir, "input", input);
 		writeLexerTestFile(lexerName, showDFA);
 		String output = execModule("Test.js");
-		if (stderrDuringParse != null && stderrDuringParse.length() > 0) {
+		if (stderrDuringParse != null && !stderrDuringParse.isEmpty()) {
 			System.err.println(stderrDuringParse);
 		}
 		return output;
@@ -399,7 +399,7 @@ public abstract class BaseTest {
 			stdoutVacuum.join();
 			stderrVacuum.join();
 			String output = stdoutVacuum.toString();
-			if (stderrVacuum.toString().length() > 0) {
+			if (!stderrVacuum.toString().isEmpty()) {
 				this.stderrDuringParse = stderrVacuum.toString();
 				System.err.println("exec stderrVacuum: " + stderrVacuum);
 			}
@@ -426,7 +426,7 @@ public abstract class BaseTest {
 		// typically /usr/local/bin/node
 		String propName = "antlr-javascript-nodejs";
 		String prop = System.getProperty(propName);
-		if (prop == null || prop.length() == 0) {
+		if (prop == null || prop.isEmpty()) {
 			prop = locateTool("nodejs"); // seems to be nodejs on ubuntu
 		}
 		if ( prop==null ) {
@@ -866,7 +866,7 @@ public abstract class BaseTest {
 		boolean doErase = true;
 		String propName = "antlr-javascript-erase-test-dir";
 		String prop = System.getProperty(propName);
-		if (prop != null && prop.length() > 0)
+		if (prop != null && !prop.isEmpty())
 			doErase = Boolean.getBoolean(prop);
 		if (doErase) {
 			File tmpdirF = new File(tmpdir);

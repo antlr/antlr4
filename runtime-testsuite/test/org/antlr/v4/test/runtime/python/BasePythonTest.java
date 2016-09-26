@@ -134,7 +134,7 @@ public abstract class BasePythonTest {
         // new output dir for each test
     	String propName = getPropertyPrefix() + "-test-dir";
     	String prop = System.getProperty(propName);
-    	if(prop!=null && prop.length()>0)
+    	if(prop!=null && !prop.isEmpty())
     		tmpdir = prop;
     	else
     		tmpdir = new File(System.getProperty("java.io.tmpdir"), getClass().getSimpleName()+"-"+System.currentTimeMillis()).getAbsolutePath();
@@ -389,7 +389,7 @@ public abstract class BasePythonTest {
 		writeFile(tmpdir, "input", input);
 		writeLexerTestFile(lexerName, showDFA);
 		String output = execModule("Test.py");
-		if ( stderrDuringParse!=null && stderrDuringParse.length()>0 ) {
+		if ( stderrDuringParse!=null && !stderrDuringParse.isEmpty()) {
 			System.err.println(stderrDuringParse);
 		}
 		return output;
@@ -540,7 +540,7 @@ public abstract class BasePythonTest {
 			stdoutVacuum.join();
 			stderrVacuum.join();
 			String output = stdoutVacuum.toString();
-			if ( stderrVacuum.toString().length()>0 ) {
+			if (!stderrVacuum.toString().isEmpty()) {
 				this.stderrDuringParse = stderrVacuum.toString();
 				System.err.println("exec stderrVacuum: "+ stderrVacuum);
 			}
@@ -565,7 +565,7 @@ public abstract class BasePythonTest {
 	protected String locatePython() {
 		String propName = getPropertyPrefix() + "-python";
     	String prop = System.getProperty(propName);
-    	if(prop==null || prop.length()==0)
+    	if(prop==null || prop.isEmpty())
     		prop = locateTool(getPythonExecutable());
 		File file = new File(prop);
 		if(!file.exists())
@@ -907,7 +907,7 @@ public abstract class BasePythonTest {
     	boolean doErase = true;
     	String propName = getPropertyPrefix() + "-erase-test-dir";
     	String prop = System.getProperty(propName);
-    	if(prop!=null && prop.length()>0)
+    	if(prop!=null && !prop.isEmpty())
     		doErase = Boolean.getBoolean(prop);
         if(doErase) {
         	File tmpdirF = new File(tmpdir);

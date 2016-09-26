@@ -1329,7 +1329,7 @@ public class ParserATNSimulator extends ATNSimulator {
 			return alt;
 		}
 		// Is there a syntactically valid path with a failed pred?
-		if ( semInvalidConfigs.size()>0 ) {
+		if (!semInvalidConfigs.isEmpty()) {
 			alt = getAltThatFinishedDecisionEntryRule(semInvalidConfigs);
 			if ( alt!=ATN.INVALID_ALT_NUMBER ) { // syntactically viable path exists
 				return alt;

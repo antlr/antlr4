@@ -294,7 +294,7 @@ public abstract class BaseTest {
 			return stderrDuringParse;
 		}
 		String output = execTest();
-		if ( stderrDuringParse!=null && stderrDuringParse.length()>0 ) {
+		if ( stderrDuringParse!=null && !stderrDuringParse.isEmpty()) {
 			System.err.println(stderrDuringParse);
 		}
 		return output;
@@ -548,7 +548,7 @@ public abstract class BaseTest {
 			stdoutVacuum.join();
 			stderrVacuum.join();
 			String output = stdoutVacuum.toString();
-			if ( stderrVacuum.toString().length()>0 ) {
+			if (!stderrVacuum.toString().isEmpty()) {
 				this.stderrDuringParse = stderrVacuum.toString();
 				System.err.println("exec stderrVacuum: "+ stderrVacuum);
 			}
