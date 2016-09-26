@@ -6,4 +6,3 @@ test_script:
   - mvn install -q -Dantlr-python2-python="C:\Python27\python.exe" -Dantlr-python3-python="C:\Python35\python.exe" -Dantlr-javascript-nodejs="C:\Program Files (x86)\nodejs\node.exe" --batch-mode
 build:
   verbosity: minimal
-  
