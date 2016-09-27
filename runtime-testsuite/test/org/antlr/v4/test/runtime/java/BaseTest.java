@@ -648,9 +648,7 @@ public abstract class BaseTest {
 														grammarStr,
 														parserName,
 														lexerName,
-														"-visitor",
-														"-null-annotations-package",
-														"org.jetbrains.annotations");
+														"-visitor");
 		assertTrue(success);
 		writeFile(tmpdir, "input", input);
 		return rawExecRecognizer(parserName,
