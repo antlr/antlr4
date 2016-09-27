@@ -31,22 +31,65 @@
 package org.antlr.v4.misc;
 
 import java.util.HashMap;
+import java.util.Map;
 
-/** Count how many of each key we have; not thread safe */
-public class FrequencySet<T> extends HashMap<T, MutableInt> {
-	public int count(T key) {
-		MutableInt value = get(key);
-		if (value == null) return 0;
-		return value.v;
+/**
+ * Object that counts the minimum and maximum number of occurrences for each key.
+ * @param <T>
+ */
+public class FrequencySet<T> extends HashMap<T, FrequencyRange> {
+	private static final FrequencyRange ONE = new FrequencyRange(Frequency.ONE, Frequency.ONE);
+
+	public FrequencySet() {}
+
+	public FrequencySet(FrequencySet<T> that) {
+		for (Map.Entry<T, FrequencyRange> entry : that.entrySet()) {
+			add(entry.getKey(), entry.getValue());
+		}
 	}
+
+	public void union(FrequencySet<T> that) {
+		for (Map.Entry<T, FrequencyRange> thatEntry : that.entrySet()) {
+			final T key = thatEntry.getKey();
+			final FrequencyRange thatValue = thatEntry.getValue();
+			final FrequencyRange thisValue = get(key);
+			if (thisValue == null) {
+				// Key present only in that set.
+				put(key, new FrequencyRange(Frequency.NONE, thatValue.max));
+			} else {
+				// Key present in both sets.
+				thisValue.union(thatValue);
+			}
+		}
+		for (Map.Entry<T, FrequencyRange> thisEntry : this.entrySet()) {
+			final T key = thisEntry.getKey();
+			final FrequencyRange thisValue = thisEntry.getValue();
+			if (!that.containsKey(key)) {
+				// Key present only in this set.
+				thisValue.min = Frequency.NONE;
+			}
+		}
+	}
+
+	public void addAll(FrequencySet<T> that) {
+		for (Map.Entry<T, FrequencyRange> entry : that.entrySet()) {
+			add(entry.getKey(), entry.getValue());
+		}
+	}
+
 	public void add(T key) {
-		MutableInt value = get(key);
+		add(key, ONE);
+	}
+
+	public void add(T key, FrequencyRange range) {
+		FrequencyRange value = get(key);
 		if (value == null) {
-			value = new MutableInt(1);
-			put(key, value);
+			// Create a copy so 'range' doesn't get modified by subsequent
+			// operations on this FrequencySet.
+			put(key, new FrequencyRange(range));
 		}
 		else {
-			value.v++;
+			value.add(range);
 		}
 	}
 }

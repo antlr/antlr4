@@ -30,6 +30,9 @@
 
 package org.antlr.v4.codegen.model;
 
+import static org.antlr.v4.parse.ANTLRParser.RULE_REF;
+import static org.antlr.v4.parse.ANTLRParser.TOKEN_REF;
+
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.tree.CommonTreeNodeStream;
 import org.antlr.v4.codegen.OutputModelFactory;
@@ -43,6 +46,8 @@ import org.antlr.v4.codegen.model.decl.ContextTokenListGetterDecl;
 import org.antlr.v4.codegen.model.decl.ContextTokenListIndexedGetterDecl;
 import org.antlr.v4.codegen.model.decl.Decl;
 import org.antlr.v4.codegen.model.decl.StructDecl;
+import org.antlr.v4.misc.Frequency;
+import org.antlr.v4.misc.FrequencyRange;
 import org.antlr.v4.misc.FrequencySet;
 import org.antlr.v4.misc.Utils;
 import org.antlr.v4.parse.GrammarASTAdaptor;
@@ -60,14 +65,10 @@ import org.antlr.v4.tool.ast.GrammarAST;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import static org.antlr.v4.parse.ANTLRParser.RULE_REF;
-import static org.antlr.v4.parse.ANTLRParser.TOKEN_REF;
 
 /** */
 public class RuleFunction extends OutputModelObject {
@@ -81,6 +82,7 @@ public class RuleFunction extends OutputModelObject {
 	public Rule rule;
 	public AltLabelStructDecl[] altToContext;
 	public boolean hasLookaheadBlock;
+
 
 	@ModelElement public List<SrcOp> code;
 	@ModelElement public OrderedHashSet<Decl> locals; // TODO: move into ctx?
@@ -194,26 +196,27 @@ public class RuleFunction extends OutputModelObject {
 	   define as list.
 	 */
 	public Set<Decl> getDeclsForAllElements(List<AltAST> altASTs) {
-		Set<String> needsList = new HashSet<String>();
 		List<GrammarAST> allRefs = new ArrayList<GrammarAST>();
+		FrequencySet<String> frequencies = null;
 		for (AltAST ast : altASTs) {
 			IntervalSet reftypes = new IntervalSet(RULE_REF, TOKEN_REF);
 			List<GrammarAST> refs = ast.getNodesWithType(reftypes);
 			allRefs.addAll(refs);
 			FrequencySet<String> altFreq = getElementFrequenciesForAlt(ast);
-			for (GrammarAST t : refs) {
-				String refLabelName = t.getText();
-				if ( altFreq.count(refLabelName)>1 ) {
-					needsList.add(refLabelName);
-				}
+			if (frequencies == null) {
+				frequencies = altFreq;
+			} else {
+				frequencies.union(altFreq);
 			}
 		}
 		Set<Decl> decls = new LinkedHashSet<Decl>();
 		for (GrammarAST t : allRefs) {
 			String refLabelName = t.getText();
+			FrequencyRange freqRange = frequencies.get(refLabelName);
 			List<Decl> d = getDeclForAltElement(t,
 												refLabelName,
-												needsList.contains(refLabelName));
+												freqRange.min == Frequency.NONE,
+												freqRange.max == Frequency.MANY);
 			decls.addAll(d);
 		}
 		return decls;
@@ -237,7 +240,7 @@ public class RuleFunction extends OutputModelObject {
 		}
 	}
 
-	public List<Decl> getDeclForAltElement(GrammarAST t, String refLabelName, boolean needList) {
+	public List<Decl> getDeclForAltElement(GrammarAST t, String refLabelName, boolean isOptional, boolean needList) {
 		List<Decl> decls = new ArrayList<Decl>();
 		if ( t.getType()==RULE_REF ) {
 			Rule rref = factory.getGrammar().getRule(t.getText());
@@ -249,7 +252,7 @@ public class RuleFunction extends OutputModelObject {
 				decls.add( new ContextRuleListIndexedGetterDecl(factory, refLabelName, ctxName) );
 			}
 			else {
-				decls.add( new ContextRuleGetterDecl(factory, refLabelName, ctxName) );
+				decls.add( new ContextRuleGetterDecl(factory, refLabelName, ctxName, isOptional) );
 			}
 		}
 		else {
@@ -259,7 +262,7 @@ public class RuleFunction extends OutputModelObject {
 				decls.add( new ContextTokenListIndexedGetterDecl(factory, refLabelName) );
 			}
 			else {
-				decls.add( new ContextTokenGetterDecl(factory, refLabelName) );
+				decls.add( new ContextTokenGetterDecl(factory, refLabelName, isOptional) );
 			}
 		}
 		return decls;

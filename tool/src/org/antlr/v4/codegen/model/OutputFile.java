@@ -37,7 +37,8 @@ import org.antlr.v4.tool.Grammar;
 public abstract class OutputFile extends OutputModelObject {
 	public final String fileName;
 	public final String grammarFileName;
-	public final String ANTLRVersion;
+    public final String nullAnnotationsPackage;
+    public final String ANTLRVersion;
     public final String TokenLabelType;
     public final String InputSymbolType;
 
@@ -46,7 +47,8 @@ public abstract class OutputFile extends OutputModelObject {
         this.fileName = fileName;
         Grammar g = factory.getGrammar();
 		grammarFileName = g.fileName;
-		ANTLRVersion = Tool.VERSION;
+        nullAnnotationsPackage = g.tool.nullAnnotationsPackage;
+        ANTLRVersion = Tool.VERSION;
         TokenLabelType = g.getOptionString("TokenLabelType");
         InputSymbolType = TokenLabelType;
     }

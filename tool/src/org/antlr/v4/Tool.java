@@ -139,6 +139,7 @@ public class Tool {
 	public Map<String, String> grammarOptions = null;
 	public boolean warnings_are_errors = false;
 	public boolean longMessages = false;
+	public String nullAnnotationsPackage = null;
 
     public static Option[] optionDefs = {
         new Option("outputDirectory",	"-o", OptionArgType.STRING, "specify output directory where all output is generated"),
@@ -159,6 +160,7 @@ public class Tool {
 		new Option("ST_inspector_wait_for_close", "-XdbgSTWait", "wait for STViz to close before continuing"),
         new Option("force_atn",			"-Xforce-atn", "use the ATN simulator for all predictions"),
 		new Option("log",   			"-Xlog", "dump lots of logging info to antlr-timestamp.log"),
+		new Option("nullAnnotationsPackage", "-null-annotations-package", OptionArgType.STRING, "generate Java nullability annotations using specified package")
 	};
 
 	// helper vars for option management

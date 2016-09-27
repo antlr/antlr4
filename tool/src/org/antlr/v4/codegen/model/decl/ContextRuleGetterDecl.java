@@ -35,8 +35,10 @@ import org.antlr.v4.codegen.OutputModelFactory;
 /** {@code public XContext X() { }} */
 public class ContextRuleGetterDecl extends ContextGetterDecl {
 	public String ctxName;
-	public ContextRuleGetterDecl(OutputModelFactory factory, String name, String ctxName) {
+	public boolean isOptional;
+	public ContextRuleGetterDecl(OutputModelFactory factory, String name, String ctxName, boolean isOptional) {
 		super(factory, name);
 		this.ctxName = ctxName;
+		this.isOptional = isOptional;
 	}
 }

@@ -50,6 +50,7 @@ import java.util.List;
 public class StructDecl extends Decl {
 	public String derivedFromName; // rule name or label name
 	public boolean provideCopyFrom;
+	public String nullAnnotationsPackage;
 	@ModelElement public OrderedHashSet<Decl> attrs = new OrderedHashSet<Decl>();
 	@ModelElement public OrderedHashSet<Decl> getters = new OrderedHashSet<Decl>();
 	@ModelElement public Collection<AttributeDecl> ctorAttrs;
@@ -62,6 +63,7 @@ public class StructDecl extends Decl {
 		addDispatchMethods(r);
 		derivedFromName = r.name;
 		provideCopyFrom = r.hasAltSpecificContexts();
+		nullAnnotationsPackage = factory.getGrammar().tool.nullAnnotationsPackage;
 	}
 
 	public void addDispatchMethods(Rule r) {
