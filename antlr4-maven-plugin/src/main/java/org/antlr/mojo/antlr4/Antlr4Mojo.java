@@ -121,9 +121,6 @@ public class Antlr4Mojo extends AbstractMojo {
 	@Parameter(property = "antlr4.forceATN", defaultValue = "false")
 	protected boolean forceATN;
 
-	@Parameter(property = "antlr4.nullAnnotationsPackage")
-	protected String nullAnnotationsPackage;
-
 	/**
 	 * A list of grammar options to explicitly specify to the tool. These
 	 * options are passed to the tool using the
@@ -338,11 +335,6 @@ public class Antlr4Mojo extends AbstractMojo {
 
 		if (forceATN) {
 			args.add("-Xforce-atn");
-		}
-
-		if (nullAnnotationsPackage != null && !nullAnnotationsPackage.isEmpty()) {
-			args.add("-null-annotations-package");
-			args.add(nullAnnotationsPackage);
 		}
 
 		if (options != null) {

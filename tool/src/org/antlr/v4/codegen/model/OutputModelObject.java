@@ -48,6 +48,6 @@ public abstract class OutputModelObject {
 	}
 
 	public String getNullAnnotationsPackage() {
-		return factory.getGrammar().tool.nullAnnotationsPackage;
+		return factory.getGrammar().getOptionString("nullAnnotationsPackage");
 	}
 }

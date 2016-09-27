@@ -220,7 +220,7 @@ public class <file.grammarName>BaseVisitor\<T> extends AbstractParseTreeVisitor\
 >>
 
 fileHeader(grammarFileName, ANTLRVersion) ::= <<
-// Generated from <grammarFileName; format="java-escape"> by ANTLR <ANTLRVersion> (jrw)
+// Generated from <grammarFileName; format="java-escape"> by ANTLR <ANTLRVersion>
 >>
 
 importNullAnnotations(elem) ::= <<
