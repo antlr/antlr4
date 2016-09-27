@@ -1,30 +1,42 @@
 package org.antlr.v4.misc;
 
 /**
- * A range of frequencies.
+ * An immutable range of possible frequencies.
  */
 public class FrequencyRange {
-    public Frequency min;
-    public Frequency max;
+    public final Frequency min;
+    public final Frequency max;
 
-    public FrequencyRange(FrequencyRange that) {
-        this(that.min, that.max);
-    }
+    // Short names for single-value ranges.
+    public static final FrequencyRange NONE = of(Frequency.NONE, Frequency.NONE);
+    public static final FrequencyRange ONE = of(Frequency.ONE, Frequency.ONE);
+    public static final FrequencyRange MANY = of(Frequency.MANY, Frequency.MANY);
 
-    public FrequencyRange(Frequency min, Frequency max) {
+    private FrequencyRange(Frequency min, Frequency max) {
         assert min.compareTo(max) <= 0;
         this.min = min;
         this.max = max;
     }
 
-    public void add(FrequencyRange that) {
-        min = min.plus(that.min);
-        max = max.plus(that.max);
+    /**
+     * Returns a range object with the given minimum and maximum values.
+     */
+    public static FrequencyRange of(Frequency min, Frequency max) {
+        return new FrequencyRange(min, max);
     }
 
-    public void union(FrequencyRange that) {
-        min = min.min(that.min);
-        max = max.max(that.max);
+    /**
+     * Adds the values two ranges, producing a new range.
+     */
+    public FrequencyRange plus(FrequencyRange that) {
+        return FrequencyRange.of(min.plus(that.min), max.plus(that.max));
+    }
+
+    /**
+     * Produces a range that is the union of two existing ranges.
+     */
+    public FrequencyRange union(FrequencyRange that) {
+        return FrequencyRange.of(min.min(that.min), max.max(that.max));
     }
 
     @Override

@@ -1,11 +1,9 @@
 package org.antlr.v4.codegen.model;
 
 import org.antlr.runtime.tree.TreeNodeStream;
-import org.antlr.v4.misc.Frequency;
 import org.antlr.v4.misc.FrequencyRange;
 import org.antlr.v4.misc.FrequencySet;
 import org.antlr.v4.parse.GrammarTreeVisitor;
-import org.antlr.v4.tool.ErrorManager;
 import org.antlr.v4.tool.ast.ActionAST;
 import org.antlr.v4.tool.ast.AltAST;
 import org.antlr.v4.tool.ast.GrammarAST;
@@ -22,15 +20,15 @@ public class ElementFrequenciesVisitor extends GrammarTreeVisitor {
 		super(input);
 	}
 
-	/** During code gen, we can assume tree is in good shape */
-	@Override
-	public ErrorManager getErrorManager() { return super.getErrorManager(); }
-
 	/*
 	 * Common
 	 */
 
-	protected void combineUnion() {
+	private void newFrequencySet() {
+		frequencies.push(new FrequencySet<String>());
+	}
+
+	private void combineUnion() {
 		// The condition below is always true except for the very last call to this method.
 		if (frequencies.size() >= 2) {
 			FrequencySet<String> popped = frequencies.pop();
@@ -38,9 +36,17 @@ public class ElementFrequenciesVisitor extends GrammarTreeVisitor {
 		}
 	}
 
-	protected void combineSum() {
+	private void combineSum() {
 		FrequencySet<String> popped = frequencies.pop();
 		frequencies.peek().addAll(popped);
+	}
+
+	private void unionFrequencyRangesWith(FrequencyRange range) {
+		final FrequencySet<String> freqSet = frequencies.peek();
+		for (Map.Entry<String, FrequencyRange> entry : freqSet.entrySet()) {
+			final String key = entry.getKey();
+			freqSet.put(key, entry.getValue().union(range));
+		}
 	}
 
 	@Override
@@ -59,7 +65,7 @@ public class ElementFrequenciesVisitor extends GrammarTreeVisitor {
 
 	@Override
 	protected void enterAlternative(AltAST tree) {
-		frequencies.push(new FrequencySet<String>());
+		newFrequencySet();
 	}
 
 	@Override
@@ -69,7 +75,7 @@ public class ElementFrequenciesVisitor extends GrammarTreeVisitor {
 
 	@Override
 	protected void enterElement(GrammarAST tree) {
-		frequencies.push(new FrequencySet<String>());
+		newFrequencySet();
 	}
 
 	@Override
@@ -79,7 +85,7 @@ public class ElementFrequenciesVisitor extends GrammarTreeVisitor {
 
 	@Override
 	protected void enterBlockSet(GrammarAST tree) {
-		frequencies.push(new FrequencySet<String>());
+		newFrequencySet();
 	}
 
 	@Override
@@ -90,14 +96,10 @@ public class ElementFrequenciesVisitor extends GrammarTreeVisitor {
 	@Override
 	protected void exitSubrule(GrammarAST tree) {
 		if (tree.getType() == CLOSURE || tree.getType() == POSITIVE_CLOSURE) {
-			for (Map.Entry<String, FrequencyRange> entry : frequencies.peek().entrySet()) {
-				entry.getValue().max = Frequency.MANY;
-			}
+			unionFrequencyRangesWith(FrequencyRange.MANY);
 		}
 		if (tree.getType() == CLOSURE || tree.getType() == OPTIONAL) {
-			for (Map.Entry<String, FrequencyRange> entry : frequencies.peek().entrySet()) {
-				entry.getValue().min = Frequency.NONE;
-			}
+			unionFrequencyRangesWith(FrequencyRange.NONE);
 		}
 	}
 
@@ -107,7 +109,7 @@ public class ElementFrequenciesVisitor extends GrammarTreeVisitor {
 
 	@Override
 	protected void enterLexerAlternative(GrammarAST tree) {
-		frequencies.push(new FrequencySet<String>());
+		newFrequencySet();
 	}
 
 	@Override
@@ -117,7 +119,7 @@ public class ElementFrequenciesVisitor extends GrammarTreeVisitor {
 
 	@Override
 	protected void enterLexerElement(GrammarAST tree) {
-		frequencies.push(new FrequencySet<String>());
+		newFrequencySet();
 	}
 
 	@Override
@@ -127,15 +129,6 @@ public class ElementFrequenciesVisitor extends GrammarTreeVisitor {
 
 	@Override
 	protected void exitLexerSubrule(GrammarAST tree) {
-		if (tree.getType() == CLOSURE || tree.getType() == POSITIVE_CLOSURE) {
-			for (Map.Entry<String, FrequencyRange> entry : frequencies.peek().entrySet()) {
-				entry.getValue().max = Frequency.MANY;
-			}
-		}
-		if (tree.getType() == CLOSURE || tree.getType() == OPTIONAL) {
-			for (Map.Entry<String, FrequencyRange> entry : frequencies.peek().entrySet()) {
-				entry.getValue().min = Frequency.NONE;
-			}
-		}
+		exitSubrule(tree);
 	}
 }

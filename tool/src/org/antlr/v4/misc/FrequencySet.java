@@ -31,65 +31,56 @@
 package org.antlr.v4.misc;
 
 import java.util.HashMap;
-import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * Object that counts the minimum and maximum number of occurrences for each key.
- * @param <T>
  */
 public class FrequencySet<T> extends HashMap<T, FrequencyRange> {
-	private static final FrequencyRange ONE = new FrequencyRange(Frequency.ONE, Frequency.ONE);
 
 	public FrequencySet() {}
 
 	public FrequencySet(FrequencySet<T> that) {
-		for (Map.Entry<T, FrequencyRange> entry : that.entrySet()) {
-			add(entry.getKey(), entry.getValue());
-		}
+		super(that);
 	}
 
+	/**
+	 * A missing value is equivalent to a value that occurs zero times.
+     */
+	@Override
+	public FrequencyRange get(Object key) {
+		FrequencyRange value = super.get(key);
+		return value == null ? FrequencyRange.NONE : value;
+	}
+
+	/**
+	 * Updates this set to include all the possibilities allowed by another set.
+     */
 	public void union(FrequencySet<T> that) {
-		for (Map.Entry<T, FrequencyRange> thatEntry : that.entrySet()) {
+		for (Entry<T, FrequencyRange> thatEntry : that.entrySet()) {
 			final T key = thatEntry.getKey();
-			final FrequencyRange thatValue = thatEntry.getValue();
-			final FrequencyRange thisValue = get(key);
-			if (thisValue == null) {
-				// Key present only in that set.
-				put(key, new FrequencyRange(Frequency.NONE, thatValue.max));
-			} else {
-				// Key present in both sets.
-				thisValue.union(thatValue);
-			}
+			put(key, get(key).union(thatEntry.getValue()));
 		}
-		for (Map.Entry<T, FrequencyRange> thisEntry : this.entrySet()) {
+		for (Entry<T, FrequencyRange> thisEntry : entrySet()) {
 			final T key = thisEntry.getKey();
-			final FrequencyRange thisValue = thisEntry.getValue();
 			if (!that.containsKey(key)) {
 				// Key present only in this set.
-				thisValue.min = Frequency.NONE;
+				put(key, thisEntry.getValue().union(FrequencyRange.NONE));
 			}
 		}
 	}
 
 	public void addAll(FrequencySet<T> that) {
-		for (Map.Entry<T, FrequencyRange> entry : that.entrySet()) {
+		for (Entry<T, FrequencyRange> entry : that.entrySet()) {
 			add(entry.getKey(), entry.getValue());
 		}
 	}
 
 	public void add(T key) {
-		add(key, ONE);
+		add(key, FrequencyRange.ONE);
 	}
 
-	public void add(T key, FrequencyRange range) {
-		FrequencyRange value = get(key);
-		if (value == null) {
-			// Create a copy so 'range' doesn't get modified by subsequent
-			// operations on this FrequencySet.
-			put(key, new FrequencyRange(range));
-		}
-		else {
-			value.add(range);
-		}
+	public void add(T key, FrequencyRange newValue) {
+		put(key, get(key).plus(newValue));
 	}
 }
