@@ -397,7 +397,7 @@ RuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,namedActions,fina
 <ruleCtx>
 <altLabelCtxs:{l | <altLabelCtxs.(l)>}; separator="\n">
 
-<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public final <endif><currentRule.ctxType> <currentRule.name>(<args; separator=",">) throws RecognitionException {
+<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public final <endif><notNull(currentRule)><currentRule.ctxType> <currentRule.name>(<args; separator=",">) throws RecognitionException {
 	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(_ctx, getState()<currentRule.args:{a | , <a.name>}>);
 	enterRule(_localctx, <currentRule.startState>, RULE_<currentRule.name>);
 	<namedActions.init>
@@ -785,8 +785,8 @@ StructDecl(struct,ctorAttrs,attrs,getters,dispatchMethods,interfaces,extensionMe
 public static class <struct.name> extends <if(contextSuperClass)><contextSuperClass><else>ParserRuleContext<endif><if(interfaces)> implements <interfaces; separator=", "><endif> {
 	<attrs:{a | public <a>;}; separator="\n">
 	<getters:{g | <g>}; separator="\n">
-	<if(ctorAttrs)>public <struct.name>(<notNull(struct)>ParserRuleContext parent, int invokingState) { super(parent, invokingState); }<endif>
-	public <struct.name>(<notNull(struct)>ParserRuleContext parent, int invokingState<ctorAttrs:{a | , <a>}>) {
+	<if(ctorAttrs)>public <struct.name>(<nullable(struct)>ParserRuleContext parent, int invokingState) { super(parent, invokingState); }<endif>
+	public <struct.name>(<nullable(struct)>ParserRuleContext parent, int invokingState<ctorAttrs:{a | , <a>}>) {
 		super(parent, invokingState);
 		<struct.ctorAttrs:{a | this.<a.name> = <a.name>;}; separator="\n">
 	}
@@ -891,6 +891,7 @@ import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.*;
+<importNullAnnotations(lexerFile)>
 
 <lexer>
 >>
