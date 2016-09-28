@@ -134,11 +134,11 @@ public class LexerATNSimulator extends ATNSimulator {
 			this.startIndex = input.index();
 			this.prevAccept.reset();
 			DFA dfa = decisionToDFA[mode];
-			if ( dfa.s0==null ) {
+			if ( dfa.getS0() ==null ) {
 				return matchATN(input);
 			}
 			else {
-				return execATN(input, dfa.s0);
+				return execATN(input, dfa.getS0());
 			}
 		}
 		finally {
@@ -177,7 +177,7 @@ public class LexerATNSimulator extends ATNSimulator {
 
 		DFAState next = addDFAState(s0_closure);
 		if (!suppressEdge) {
-			decisionToDFA[mode].s0 = next;
+			decisionToDFA[mode].setS0(next);
 		}
 
 		int predict = execATN(input, next);
@@ -714,16 +714,16 @@ public class LexerATNSimulator extends ATNSimulator {
 		}
 
 		DFA dfa = decisionToDFA[mode];
-		synchronized (dfa.states) {
-			DFAState existing = dfa.states.get(proposed);
+		synchronized (dfa.getStatesMap()) {
+			DFAState existing = dfa.getStatesMap().get(proposed);
 			if ( existing!=null ) return existing;
 
 			DFAState newState = proposed;
 
-			newState.stateNumber = dfa.states.size();
+			newState.stateNumber = dfa.getStatesMap().size();
 			configs.setReadonly(true);
 			newState.configs = configs;
-			dfa.states.put(newState, newState);
+			dfa.getStatesMap().put(newState, newState);
 			return newState;
 		}
 	}

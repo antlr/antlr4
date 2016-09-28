@@ -82,16 +82,16 @@ public class DOTGenerator {
 	}
 
 	public String getDOT(DFA dfa, boolean isLexer) {
-		if ( dfa.s0==null )	return null;
+		if ( dfa.getS0() ==null )	return null;
 
 		ST dot = stlib.getInstanceOf("dfa");
-		dot.add("name", "DFA"+dfa.decision);
-		dot.add("startState", dfa.s0.stateNumber);
+		dot.add("name", "DFA"+ dfa.getDecision());
+		dot.add("startState", dfa.getS0().stateNumber);
 //		dot.add("useBox", Tool.internalOption_ShowATNConfigsInDFA);
 		dot.add("rankdir", rankdir);
 
 		// define stop states first; seems to be a bug in DOT where doublecircle
-		for (DFAState d : dfa.states.keySet()) {
+		for (DFAState d : dfa.getStatesMap().keySet()) {
 			if ( !d.isAcceptState ) continue;
 			ST st = stlib.getInstanceOf("stopstate");
 			st.add("name", "s"+d.stateNumber);
@@ -99,7 +99,7 @@ public class DOTGenerator {
 			dot.add("states", st);
 		}
 
-		for (DFAState d : dfa.states.keySet()) {
+		for (DFAState d : dfa.getStatesMap().keySet()) {
 			if ( d.isAcceptState ) continue;
 			if ( d.stateNumber == Integer.MAX_VALUE ) continue;
 			ST st = stlib.getInstanceOf("state");
@@ -108,7 +108,7 @@ public class DOTGenerator {
 			dot.add("states", st);
 		}
 
-		for (DFAState d : dfa.states.keySet()) {
+		for (DFAState d : dfa.getStatesMap().keySet()) {
 			if ( d.edges!=null ) {
 				for (int i = 0; i < d.edges.length; i++) {
 					DFAState target = d.edges[i];

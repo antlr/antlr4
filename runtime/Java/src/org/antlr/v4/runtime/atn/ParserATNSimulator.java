@@ -227,7 +227,7 @@ import java.util.Set;
  * safe as long as we can guarantee that all threads referencing
  * {@code s.edge[t]} get the same physical target {@link DFAState}, or
  * {@code null}. Once into the DFA, the DFA simulation does not reference the
- * {@link DFA#states} map. It follows the {@link DFAState#edges} field to new
+ * {@link DFA#statesMap} map. It follows the {@link DFAState#edges} field to new
  * targets. The DFA simulator will either find {@link DFAState#edges} to be
  * {@code null}, to be non-{@code null} and {@code dfa.edges[t]} null, or
  * {@code dfa.edges[t]} to be non-null. The
@@ -374,20 +374,20 @@ public class ParserATNSimulator extends ATNSimulator {
 			}
 			else {
 				// the start state for a "regular" DFA is just s0
-				s0 = dfa.s0;
+				s0 = dfa.getS0();
 			}
 
 			if (s0 == null) {
 				if ( outerContext ==null ) outerContext = ParserRuleContext.EMPTY;
 				if ( debug || debug_list_atn_decisions )  {
-					System.out.println("predictATN decision "+ dfa.decision+
+					System.out.println("predictATN decision "+ dfa.getDecision() +
 									   " exec LA(1)=="+ getLookaheadName(input) +
 									   ", outerContext="+ outerContext.toString(parser));
 				}
 
 				boolean fullCtx = false;
 				ATNConfigSet s0_closure =
-					computeStartState(dfa.atnStartState,
+					computeStartState(dfa.getAtnStartState(),
 									  ParserRuleContext.EMPTY,
 									  fullCtx);
 
@@ -398,14 +398,14 @@ public class ParserATNSimulator extends ATNSimulator {
 					 * appropriate start state for the precedence level rather
 					 * than simply setting DFA.s0.
 					 */
-					dfa.s0.configs = s0_closure; // not used for prediction but useful to know start configs anyway
+					dfa.getS0().configs = s0_closure; // not used for prediction but useful to know start configs anyway
 					s0_closure = applyPrecedenceFilter(s0_closure);
 					s0 = addDFAState(dfa, new DFAState(s0_closure));
 					dfa.setPrecedenceStartState(parser.getPrecedence(), s0);
 				}
 				else {
 					s0 = addDFAState(dfa, new DFAState(s0_closure));
-					dfa.s0 = s0;
+					dfa.setS0(s0);
 				}
 			}
 
@@ -456,7 +456,7 @@ public class ParserATNSimulator extends ATNSimulator {
 					   ParserRuleContext outerContext)
 	{
 		if ( debug || debug_list_atn_decisions) {
-			System.out.println("execATN decision "+dfa.decision+
+			System.out.println("execATN decision "+ dfa.getDecision() +
 							   " exec LA(1)=="+ getLookaheadName(input)+
 							   " line "+input.LT(1).getLine()+":"+input.LT(1).getCharPositionInLine());
 		}
@@ -518,7 +518,7 @@ public class ParserATNSimulator extends ATNSimulator {
 				if ( dfa_debug ) System.out.println("ctx sensitive state "+outerContext+" in "+D);
 				boolean fullCtx = true;
 				ATNConfigSet s0_closure =
-					computeStartState(dfa.atnStartState, outerContext,
+					computeStartState(dfa.getAtnStartState(), outerContext,
 									  fullCtx);
 				reportAttemptingFullContext(dfa, conflictingAlts, D.configs, startIndex, input.index());
 				int alt = execATNWithFullContext(dfa, D, s0_closure,
@@ -628,7 +628,7 @@ public class ParserATNSimulator extends ATNSimulator {
 		}
 
 		if ( D.isAcceptState && D.configs.hasSemanticContext ) {
-			predicateDFAState(D, atn.getDecisionState(dfa.decision));
+			predicateDFAState(D, atn.getDecisionState(dfa.getDecision()));
 			if (D.predicates != null) {
 				D.prediction = ATN.INVALID_ALT_NUMBER;
 			}
@@ -1583,7 +1583,7 @@ public class ParserATNSimulator extends ATNSimulator {
 
 					if (_dfa != null && _dfa.isPrecedenceDfa()) {
 						int outermostPrecedenceReturn = ((EpsilonTransition)t).outermostPrecedenceReturn();
-						if (outermostPrecedenceReturn == _dfa.atnStartState.ruleIndex) {
+						if (outermostPrecedenceReturn == _dfa.getAtnStartState().ruleIndex) {
 							c.setPrecedenceFilterSuppressed(true);
 						}
 					}
@@ -1974,16 +1974,16 @@ public class ParserATNSimulator extends ATNSimulator {
 			return D;
 		}
 
-		synchronized (dfa.states) {
-			DFAState existing = dfa.states.get(D);
+		synchronized (dfa.getStatesMap()) {
+			DFAState existing = dfa.getStatesMap().get(D);
 			if ( existing!=null ) return existing;
 
-			D.stateNumber = dfa.states.size();
+			D.stateNumber = dfa.getStatesMap().size();
 			if (!D.configs.isReadonly()) {
 				D.configs.optimizeConfigs(this);
 				D.configs.setReadonly(true);
 			}
-			dfa.states.put(D, D);
+			dfa.getStatesMap().put(D, D);
 			if ( debug ) System.out.println("adding new DFA state: "+D);
 			return D;
 		}
@@ -1992,7 +1992,7 @@ public class ParserATNSimulator extends ATNSimulator {
 	protected void reportAttemptingFullContext(DFA dfa, BitSet conflictingAlts, ATNConfigSet configs, int startIndex, int stopIndex) {
         if ( debug || retry_debug ) {
 			Interval interval = Interval.of(startIndex, stopIndex);
-			System.out.println("reportAttemptingFullContext decision="+dfa.decision+":"+configs+
+			System.out.println("reportAttemptingFullContext decision="+ dfa.getDecision() +":"+configs+
                                ", input="+parser.getTokenStream().getText(interval));
         }
         if ( parser!=null ) parser.getErrorListenerDispatch().reportAttemptingFullContext(parser, dfa, startIndex, stopIndex, conflictingAlts, configs);
@@ -2001,7 +2001,7 @@ public class ParserATNSimulator extends ATNSimulator {
 	protected void reportContextSensitivity(DFA dfa, int prediction, ATNConfigSet configs, int startIndex, int stopIndex) {
         if ( debug || retry_debug ) {
 			Interval interval = Interval.of(startIndex, stopIndex);
-            System.out.println("reportContextSensitivity decision="+dfa.decision+":"+configs+
+            System.out.println("reportContextSensitivity decision="+ dfa.getDecision() +":"+configs+
                                ", input="+parser.getTokenStream().getText(interval));
         }
         if ( parser!=null ) parser.getErrorListenerDispatch().reportContextSensitivity(parser, dfa, startIndex, stopIndex, prediction, configs);

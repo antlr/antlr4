@@ -58,7 +58,7 @@ public class DFASerializer {
 
 	@Override
 	public String toString() {
-		if ( dfa.s0==null ) return null;
+		if ( dfa.getS0() ==null ) return null;
 		StringBuilder buf = new StringBuilder();
 		List<DFAState> states = dfa.getStates();
 		for (DFAState s : states) {

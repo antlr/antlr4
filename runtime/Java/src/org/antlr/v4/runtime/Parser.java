@@ -882,9 +882,9 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 			boolean seenOne = false;
 			for (int d = 0; d < _interp.decisionToDFA.length; d++) {
 				DFA dfa = _interp.decisionToDFA[d];
-				if ( !dfa.states.isEmpty() ) {
+				if ( !dfa.getStatesMap().isEmpty() ) {
 					if ( seenOne ) System.out.println();
-					System.out.println("Decision " + dfa.decision + ":");
+					System.out.println("Decision " + dfa.getDecision() + ":");
 					System.out.print(dfa.toString(getVocabulary()));
 					seenOne = true;
 				}

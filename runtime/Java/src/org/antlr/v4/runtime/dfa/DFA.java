@@ -46,19 +46,14 @@ import java.util.Map;
 import java.util.Set;
 
 public class DFA {
-	/** A set of all DFA states. Use {@link Map} so we can get old state back
-	 *  ({@link Set} only allows you to see if it's there).
-     */
 
-	public final Map<DFAState, DFAState> states = new HashMap<DFAState, DFAState>();
+	private final Map<DFAState, DFAState> statesMap = new HashMap<DFAState, DFAState>();
 
-	public volatile DFAState s0;
+	private volatile DFAState s0;
 
-	public final int decision;
+	private final int decision;
 
-	/** From which ATN state did we create this DFA? */
-
-	public final DecisionState atnStartState;
+	private final DecisionState atnStartState;
 
 	/**
 	 * {@code true} if this DFA is for a precedence decision; otherwise,
@@ -91,7 +86,7 @@ public class DFA {
 
 	/**
 	 * Gets whether this DFA is a precedence DFA. Precedence DFAs use a special
-	 * start state {@link #s0} which is not stored in {@link #states}. The
+	 * start state {@link #s0} which is not stored in {@link #statesMap}. The
 	 * {@link DFAState#edges} array for this start state contains outgoing edges
 	 * supplying individual start states corresponding to specific precedence
 	 * values.
@@ -183,7 +178,7 @@ public class DFA {
 	 */
 
 	public List<DFAState> getStates() {
-		List<DFAState> result = new ArrayList<DFAState>(states.keySet());
+		List<DFAState> result = new ArrayList<DFAState>(statesMap.keySet());
 		Collections.sort(result, new Comparator<DFAState>() {
 			@Override
 			public int compare(DFAState o1, DFAState o2) {
@@ -222,4 +217,27 @@ public class DFA {
 		return serializer.toString();
 	}
 
+	/** A set of all DFA states. Use {@link Map} so we can get old state back
+	 *  ({@link Set} only allows you to see if it's there).
+     */
+	public Map<DFAState, DFAState> getStatesMap() {
+		return statesMap;
+	}
+
+	public DFAState getS0() {
+		return s0;
+	}
+
+	public void setS0(DFAState s0) {
+		this.s0 = s0;
+	}
+
+	public int getDecision() {
+		return decision;
+	}
+
+	/** From which ATN state did we create this DFA? */
+	public DecisionState getAtnStartState() {
+		return atnStartState;
+	}
 }
