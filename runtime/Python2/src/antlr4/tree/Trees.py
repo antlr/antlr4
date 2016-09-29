@@ -129,8 +129,7 @@ class Trees(object):
 
     @classmethod
     def descendants(cls, t):
-        nodes = []
-        nodes.append(t)
+        nodes = [t]
         for i in range(0, t.getChildCount()):
             nodes.extend(cls.descendants(t.getChild(i)))
         return nodes

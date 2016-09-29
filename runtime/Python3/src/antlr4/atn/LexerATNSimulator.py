@@ -542,11 +542,7 @@ class LexerATNSimulator(ATNSimulator):
     def addDFAState(self, configs:ATNConfigSet) -> DFAState:
 
         proposed = DFAState(configs=configs)
-        firstConfigWithRuleStopState = None
-        for c in configs:
-            if isinstance(c.state, RuleStopState):
-                firstConfigWithRuleStopState = c
-                break
+        firstConfigWithRuleStopState = next((cfg for cfg in configs if isinstance(cfg.state, RuleStopState)), None)
 
         if firstConfigWithRuleStopState is not None:
             proposed.isAcceptState = True
