@@ -82,6 +82,7 @@
   #endif
 
   #ifdef _WINDLL
+    #define SHARED_LIB 1
     #ifdef ANTLR4CPP_EXPORTS
       #define ANTLR4CPP_PUBLIC __declspec(dllexport)
       #define EXPIMP_TEMPLATE
@@ -98,11 +99,19 @@
 
 #elif __APPLE__
   #define GUID_CFUUID
-  #define ANTLR4CPP_PUBLIC
+  #if __GNUC__ >= 4
+    #define ANTLR4CPP_PUBLIC __attribute__ ((visibility ("default")))
+  #else
+    #define ANTLR4CPP_PUBLIC
+  #endif
   #define EXPIMP_TEMPLATE
 #else
   #define GUID_LIBUUID
-  #define ANTLR4CPP_PUBLIC
+  #if __GNUC__ >= 4
+    #define ANTLR4CPP_PUBLIC __attribute__ ((visibility ("default")))
+  #else
+    #define ANTLR4CPP_PUBLIC
+  #endif
   #define EXPIMP_TEMPLATE
 #endif
 
