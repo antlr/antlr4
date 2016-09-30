@@ -7,8 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		270925AC1CDB427200522D32 /* antlrcpp.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 270925A71CDB409400522D32 /* antlrcpp.dylib */; };
-		270925AF1CDB428A00522D32 /* libantlrcpp_static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 270925A91CDB409400522D32 /* libantlrcpp_static.a */; };
+		270925AC1CDB427200522D32 /* libantlr4-runtime.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 270925A71CDB409400522D32 /* libantlr4-runtime.dylib */; };
+		270925AF1CDB428A00522D32 /* libantlr4-runtime.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 270925A91CDB409400522D32 /* libantlr4-runtime.a */; };
 		270925B11CDB455B00522D32 /* TLexer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 27A23EA11CC2A8D60036D8A3 /* TLexer.cpp */; };
 		2747A7131CA6C46C0030247B /* InputHandlingTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2747A7121CA6C46C0030247B /* InputHandlingTests.mm */; };
 		274FC6D91CA96B6C008D4374 /* MiscClassTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 274FC6D81CA96B6C008D4374 /* MiscClassTests.mm */; };
@@ -102,7 +102,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				270925AC1CDB427200522D32 /* antlrcpp.dylib in Frameworks */,
+				270925AC1CDB427200522D32 /* libantlr4-runtime.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -110,7 +110,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				270925AF1CDB428A00522D32 /* libantlrcpp_static.a in Frameworks */,
+				270925AF1CDB428A00522D32 /* libantlr4-runtime.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -120,9 +120,9 @@
 		270925A21CDB409400522D32 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				270925A71CDB409400522D32 /* antlrcpp.dylib */,
-				270925A91CDB409400522D32 /* libantlrcpp_static.a */,
-				273DC2BD1CDB619900DB7B2B /* antlrcpp_ios.framework */,
+				270925A71CDB409400522D32 /* libantlr4-runtime.dylib */,
+				270925A91CDB409400522D32 /* libantlr4-runtime.a */,
+				273DC2BD1CDB619900DB7B2B /* antlr4_ios.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -250,7 +250,7 @@
 		37D727A21867AF1E007B6D10 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0730;
+				LastUpgradeCheck = 0800;
 				ORGANIZATIONNAME = "Dan McLaughlin";
 				TargetAttributes = {
 					27C66A661C9591280021E494 = {
@@ -286,24 +286,24 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
-		270925A71CDB409400522D32 /* antlrcpp.dylib */ = {
+		270925A71CDB409400522D32 /* libantlr4-runtime.dylib */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.dylib";
-			path = antlrcpp.dylib;
+			path = "libantlr4-runtime.dylib";
 			remoteRef = 270925A61CDB409400522D32 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		270925A91CDB409400522D32 /* libantlrcpp_static.a */ = {
+		270925A91CDB409400522D32 /* libantlr4-runtime.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
-			path = libantlrcpp_static.a;
+			path = "libantlr4-runtime.a";
 			remoteRef = 270925A81CDB409400522D32 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		273DC2BD1CDB619900DB7B2B /* antlrcpp_ios.framework */ = {
+		273DC2BD1CDB619900DB7B2B /* antlr4_ios.framework */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.framework;
-			path = antlrcpp_ios.framework;
+			path = antlr4_ios.framework;
 			remoteRef = 273DC2BC1CDB619900DB7B2B /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
@@ -420,14 +420,19 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
@@ -469,14 +474,19 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_SIGN_COMPARE = YES;

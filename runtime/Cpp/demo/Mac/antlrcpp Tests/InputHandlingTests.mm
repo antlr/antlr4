@@ -71,22 +71,22 @@ using namespace antlr4::misc;
   XCTAssertEqual(stream3.index(), 0U);
   XCTAssertEqual(stream3.size(), 27U);
 
-  std::wstringstream input(L"Lorem ipsum dolor sit amet");
+  std::stringstream input("Lorem ipsum dolor sit amet");
   ANTLRInputStream stream4(input);
   std::string content = stream4.toString();
   XCTAssertEqual(content, "Lorem ipsum dolor sit amet"); // Now as utf-8 string.
   XCTAssertEqual(stream4.index(), 0U);
   XCTAssertEqual(stream4.size(), 26U);
 
-  std::wstring longString(33333, 'a');
+  std::string longString(33333, 'a');
   input.str(longString);
   stream4.load(input);
   XCTAssertEqual(stream4.index(), 0U);
-  XCTAssertEqual(stream4.size(), 26U); // Nothing changed as the stream is still at eof.
+  XCTAssertEqual(stream4.size(), 33333U);
 
   input.clear();
   stream4.load(input);
-  XCTAssertEqual(stream4.size(), 33333U);
+  XCTAssertEqual(stream4.size(), 0U);
 }
 
 - (void)testANTLRInputStreamUse {
