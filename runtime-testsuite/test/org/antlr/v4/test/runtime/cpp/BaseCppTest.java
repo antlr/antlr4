@@ -543,45 +543,122 @@ public abstract class BaseCppTest {
 		return files;
 	}
 
+  private String runProcess(ProcessBuilder builder, String description) throws Exception {
+		Process process = builder.start();
+		StreamVacuum stdoutVacuum = new StreamVacuum(process.getInputStream());
+		StreamVacuum stderrVacuum = new StreamVacuum(process.getErrorStream());
+		stdoutVacuum.start();
+		stderrVacuum.start();
+		int errcode = process.waitFor();
+		stdoutVacuum.join();
+		stderrVacuum.join();
+		String output = stdoutVacuum.toString();
+		if (stderrVacuum.toString().length() > 0) {
+			this.stderrDuringParse = stderrVacuum.toString();
+			System.err.println("exec stderrVacuum: "+ stderrVacuum);
+		}
+		if (errcode != 0) {
+			this.stderrDuringParse = "execution failed with error code: " + errcode;
+			System.err.println(description + " exited with error code: " + errcode);
+		}
+		
+		return output;
+  }
+  
+  // TODO: add a buildRuntimeOnWindows variant.
+  private boolean buildRuntime() {
+    String runtimePath = locateRuntime();
+    System.out.println("Building ANTLR4 C++ runtime (if necessary) at "+ runtimePath);
+    
+    try {
+  		ArrayList<String> args = new ArrayList<String>();
+  		args.add("cmake");
+  		args.add(".");
+  		args.add("-DCMAKE_BUILD_TYPE=release");
+  		ProcessBuilder builder = new ProcessBuilder(args.toArray(new String[0]));
+  		builder.directory(new File(runtimePath));
+  		if (runProcess(builder, "antlr runtime cmake") == null)
+  		  return false;
+		}
+		catch (Exception e) {
+			System.err.println("can't configure antlr cpp runtime cmake file");
+			e.printStackTrace(System.err);
+		}
+		
+    try {
+  		ArrayList<String> args = new ArrayList<String>();
+  		args.add("make");
+  		args.add("-j");
+  		args.add("8"); // Assuming a reasonable amount of available CPU cores.
+  		ProcessBuilder builder = new ProcessBuilder(args.toArray(new String[0]));
+  		builder.directory(new File(runtimePath));
+  		if (runProcess(builder, "building antlr runtime") == null)
+  		  return false;
+		}
+		catch (Exception e) {
+			System.err.println("can't compile antlr cpp runtime");
+			//e.printStackTrace(System.err);
+		}
+		
+		return true;
+  }
+  
+  static boolean runtimeBuiltOnce = false;
+  
 	public String execModule(String fileName) {
 		String compilerPath = locateCompiler();
 		String runtimePath = locateRuntime();
+		String includePath = runtimePath + "/runtime/src";
 		String binPath = new File(new File(tmpdir), "a.out").getAbsolutePath();
 		String inputPath = new File(new File(tmpdir), "input").getAbsolutePath();
-		// First compile the test code.
+		
+    // Build runtime using cmake once.
+    if (!runtimeBuiltOnce) {
+      runtimeBuiltOnce = true;
+      if (!buildRuntime()) {
+        return null;
+      }
+    }
+    
+		// Create symlink to the runtime.
+		// TODO: make this platform neutral.
+		try {
+			ArrayList<String> args = new ArrayList<String>();
+			args.add("ln");
+			args.add("-s");
+			args.add(runtimePath + "/dist/libantlr4-runtime.dylib"); // TODO: make this platform neutral
+			ProcessBuilder builder = new ProcessBuilder(args.toArray(new String[0]));
+			builder.directory(new File(tmpdir));
+			String output = runProcess(builder, "sym linking C++ runtime");
+			if (output == null)
+			  return null;
+		}
+		catch (Exception e) {
+			System.err.println("can't exec module: " + fileName);
+			//e.printStackTrace(System.err);
+		}
+		
+		// Compile the test code.
 		try {
 			ArrayList<String> args = new ArrayList<String>();
 			args.add(compilerPath);
 			args.add("-std=c++11");
 			args.add("-I");
-			args.add(runtimePath);
+			args.add(includePath);
 			args.add("-L");
-			args.add(runtimePath);
+			args.add(".");
 			args.add("-lantlr4-runtime");
 			args.addAll(allCppFiles(tmpdir));
 			ProcessBuilder builder = new ProcessBuilder(args.toArray(new String[0]));
 			builder.directory(new File(tmpdir));
-			Process process = builder.start();
-			StreamVacuum stdoutVacuum = new StreamVacuum(process.getInputStream());
-			StreamVacuum stderrVacuum = new StreamVacuum(process.getErrorStream());
-			stdoutVacuum.start();
-			stderrVacuum.start();
-			int errcode = process.waitFor();
-			stdoutVacuum.join();
-			stderrVacuum.join();
-			if ( stderrVacuum.toString().length()>0 ) {
-				this.stderrDuringParse = stderrVacuum.toString();
-				System.err.println("compile stderrVacuum: "+ stderrVacuum);
-			}
-			if (errcode != 0) {
-				this.stderrDuringParse = "execution failed with error code: " + errcode;
-				System.err.println("compile exited with error code: " + errcode);
+			String output = runProcess(builder, "building test binary");
+			if (output == null) {
 				return null;
 			}
 		}
 		catch (Exception e) {
 			System.err.println("can't compile module: " + fileName);
-			e.printStackTrace(System.err);
+			//e.printStackTrace(System.err);
 			return null;
 		}
 
@@ -589,29 +666,15 @@ public abstract class BaseCppTest {
 		try {
 			ProcessBuilder builder = new ProcessBuilder(binPath, inputPath);
 			builder.directory(new File(tmpdir));
-			Process process = builder.start();
-			StreamVacuum stdoutVacuum = new StreamVacuum(process.getInputStream());
-			StreamVacuum stderrVacuum = new StreamVacuum(process.getErrorStream());
-			stdoutVacuum.start();
-			stderrVacuum.start();
-			int errcode = process.waitFor();
-			stdoutVacuum.join();
-			stderrVacuum.join();
-			String output = stdoutVacuum.toString();
-			if ( stderrVacuum.toString().length()>0 ) {
-				this.stderrDuringParse = stderrVacuum.toString();
-				System.err.println("exec stderrVacuum: "+ stderrVacuum);
-			}
-			if (errcode != 0) {
-				this.stderrDuringParse = "execution failed with error code: " + errcode;
-				System.err.println("exec exited with error code: " + errcode);
-			}
+			String output = runProcess(builder, "running test binary");
+		  
 			return output;
 		}
 		catch (Exception e) {
 			System.err.println("can't exec module: " + fileName);
-			e.printStackTrace(System.err);
+			//e.printStackTrace(System.err);
 		}
+		
 		return null;
 	}
 
@@ -637,8 +700,8 @@ public abstract class BaseCppTest {
 
 	protected String locateRuntime() {
 		final ClassLoader loader = Thread.currentThread().getContextClassLoader();
-		final URL runtimeSrc = loader.getResource("Cpp/runtime/src");
-		if ( runtimeSrc==null ) {
+		final URL runtimeSrc = loader.getResource("Cpp");
+		if (runtimeSrc == null) {
 			throw new RuntimeException("Cannot find runtime");
 		}
 		return runtimeSrc.getPath();
@@ -892,12 +955,12 @@ public abstract class BaseCppTest {
 						+ "\n"
 						+ "class TreeShapeListener : public tree::ParseTreeListener {\n"
 						+ "public:\n"
-						+ "  void visitTerminal(Ref\\<tree::TerminalNode> const& node) override {}\n"
-						+ "  void visitErrorNode(Ref\\<tree::ErrorNode> const& node) override {}\n"
+						+ "  void visitTerminal(tree::TerminalNode *node) override {}\n"
+						+ "  void visitErrorNode(tree::ErrorNode *node) override {}\n"
 						+ "  void exitEveryRule(ParserRuleContext *ctx) override {}\n"
 						+ "  void enterEveryRule(ParserRuleContext *ctx) override {\n"
 						+ "    for (auto child : ctx->children) {\n"
-						+ "      auto parent = child->getParent().lock();\n"
+						+ "      auto parent = child->parent.lock();\n"
 						+ "      if (!antlrcpp::is\\<tree::RuleNode>(parent)) {\n"
 						+ "        throw \"Invalid parse tree shape detected.\";\n"
 						+ "      }\n"
@@ -919,7 +982,7 @@ public abstract class BaseCppTest {
 						+ "\n"
 						+ "  Ref\\<tree::ParseTree> tree = parser.<parserStartRuleName>;\n"
 						+ "  TreeShapeListener listener;\n"
-						+ "  tree::ParseTreeWalker::DEFAULT.walk(&listener, tree);\n"
+						+ "  tree::ParseTreeWalker::DEFAULT.walk(&listener, tree.get());\n"
 						+ "\n"
 						+ "  return 0;\n"
 						+ "}\n"
@@ -931,7 +994,7 @@ public abstract class BaseCppTest {
 			stSource += "  parser.addErrorListener(&errorListener);\n";
 		}
 		if(trace)
-			stSource += "  parser.setTrace(True);\n";
+			stSource += "  parser.setTrace(true);\n";
 		ST createParserST = new ST(stSource);
 		outputFileST.add("createParser", createParserST);
 		outputFileST.add("parserName", parserName);

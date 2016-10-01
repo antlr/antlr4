@@ -303,9 +303,10 @@ public:
 
 BasicListener(X) ::= <<
 @parser::definitions {
+#include "TBaseListener.h"
 class LeafListener : public TBaseListener {
 public:
-  virtual void visitTerminal(Ref\<tree::TerminalNode> const& node) override {
+  virtual void visitTerminal(tree::TerminalNode *node) override {
   std::cout \<\< node->getSymbol()->getText() \<\< std::endl;
   }
 };
@@ -314,7 +315,7 @@ public:
 
 WalkListener(s) ::= <<
 LeafListener listener;
-tree::ParseTreeWalker::DEFAULT.walk(&listener, <s>);
+tree::ParseTreeWalker::DEFAULT.walk(&listener, <s>.get());
 >>
 
 TreeNodeWithAltNumField(X) ::= <<
@@ -333,10 +334,11 @@ public:
 
 TokenGetterListener(X) ::= <<
 @parser::definitions {
+#include "TBaseListener.h"
 class LeafListener : public TBaseListener {
 public:
   virtual void exitA(TParser::AContext *ctx) override {
-		if (ctx->getChildCount() == 2)
+		if (ctx->children.size() == 2)
 			std::cout \<\< ctx->INT(0)->getSymbol()->getText() \<\< " " \<\< ctx->INT(1)->getSymbol()->getText()
         \<\< " " \<\< Arrays::toString(ctx->INT()) \<\< std::endl;
 		else
@@ -348,10 +350,11 @@ public:
 
 RuleGetterListener(X) ::= <<
 @parser::definitions {
+#include "TBaseListener.h"
 class LeafListener : public TBaseListener {
 public:
   virtual void exitA(TParser::AContext *ctx) override {
-    if (ctx->getChildCount() == 2) {
+    if (ctx->children.size() == 2) {
       std::cout \<\< ctx->b(0)->start->getText() \<\< " " \<\< ctx->b(1)->start->getText() \<\< " " \<\< ctx->b()[0]->start->getText() \<\< std::endl;
     } else {
       std::cout \<\< ctx->b(0)->start->getText() \<\< std::endl;
@@ -364,10 +367,11 @@ public:
 
 LRListener(X) ::= <<
 @parser::definitions {
+#include "TBaseListener.h"
 class LeafListener : public TBaseListener {
 public:
   virtual void exitE(TParser::EContext *ctx) override {
-    if (ctx->getChildCount() == 3) {
+    if (ctx->children.size() == 3) {
       std::cout \<\< ctx->e(0)->start->getText() \<\< " " \<\< ctx->e(1)->start->getText() \<\< " " \<\< ctx->e()[0]->start->getText() \<\< std::endl;
     } else {
       std::cout \<\< ctx->INT()->getSymbol()->getText() \<\< std::endl;
@@ -379,6 +383,7 @@ public:
 
 LRWithLabelsListener(X) ::= <<
 @parser::definitions {
+#include "TBaseListener.h"
 class LeafListener : public TBaseListener {
 public:
   virtual void exitCall(TParser::CallContext *ctx) override {

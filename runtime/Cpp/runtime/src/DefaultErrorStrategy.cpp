@@ -178,14 +178,14 @@ void DefaultErrorStrategy::reportNoViableAlternative(Parser *recognizer, const N
 
 void DefaultErrorStrategy::reportInputMismatch(Parser *recognizer, const InputMismatchException &e) {
   std::string msg = "mismatched input " + getTokenErrorDisplay(e.getOffendingToken()) +
-  " expecting " + escapeWSAndQuote(e.getExpectedTokens().toString(recognizer->getVocabulary()));
+  " expecting " + e.getExpectedTokens().toString(recognizer->getVocabulary());
   recognizer->notifyErrorListeners(e.getOffendingToken(), msg, std::make_exception_ptr(e));
 }
 
 void DefaultErrorStrategy::reportFailedPredicate(Parser *recognizer, const FailedPredicateException &e) {
   const std::string& ruleName = recognizer->getRuleNames()[(size_t)recognizer->getContext()->getRuleIndex()];
   std::string msg = "rule " + ruleName + " " + e.what();
-  recognizer->notifyErrorListeners(e.getOffendingToken(), escapeWSAndQuote(msg), std::make_exception_ptr(e));
+  recognizer->notifyErrorListeners(e.getOffendingToken(), msg, std::make_exception_ptr(e));
 }
 
 void DefaultErrorStrategy::reportUnwantedToken(Parser *recognizer) {
@@ -199,8 +199,7 @@ void DefaultErrorStrategy::reportUnwantedToken(Parser *recognizer) {
   std::string tokenName = getTokenErrorDisplay(t);
   misc::IntervalSet expecting = getExpectedTokens(recognizer);
 
-  std::string msg = "extraneous input " + tokenName + " expecting " +
-    escapeWSAndQuote(expecting.toString(recognizer->getVocabulary()));
+  std::string msg = "extraneous input " + tokenName + " expecting " + expecting.toString(recognizer->getVocabulary());
   recognizer->notifyErrorListeners(t, msg, nullptr);
 }
 
@@ -214,7 +213,7 @@ void DefaultErrorStrategy::reportMissingToken(Parser *recognizer) {
   Token *t = recognizer->getCurrentToken();
   misc::IntervalSet expecting = getExpectedTokens(recognizer);
   std::string expectedText = expecting.toString(recognizer->getVocabulary());
-  std::string msg = "missing " + escapeWSAndQuote(expectedText) + " at " + getTokenErrorDisplay(t);
+  std::string msg = "missing " + expectedText + " at " + getTokenErrorDisplay(t);
 
   recognizer->notifyErrorListeners(t, msg, nullptr);
 }

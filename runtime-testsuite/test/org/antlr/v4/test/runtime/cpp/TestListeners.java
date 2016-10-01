@@ -13,13 +13,14 @@ public class TestListeners extends BaseCppTest {
 	public void testBasic() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(490);
+		StringBuilder grammarBuilder = new StringBuilder(512);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("@parser::definitions {\n");
+		grammarBuilder.append("#include \"TBaseListener.h\"\n");
 		grammarBuilder.append("class LeafListener : public TBaseListener {\n");
 		grammarBuilder.append("public:\n");
-		grammarBuilder.append("  virtual void visitTerminal(Ref<tree::TerminalNode> const& node) override {\n");
+		grammarBuilder.append("  virtual void visitTerminal(tree::TerminalNode *node) override {\n");
 		grammarBuilder.append("  std::cout << node->getSymbol()->getText() << std::endl;\n");
 		grammarBuilder.append("  }\n");
 		grammarBuilder.append("};\n");
@@ -29,7 +30,7 @@ public class TestListeners extends BaseCppTest {
 		grammarBuilder.append("@after {\n");
 		grammarBuilder.append("std::cout << $ctx->r->toStringTree(this) << std::endl;\n");
 		grammarBuilder.append("LeafListener listener;\n");
-		grammarBuilder.append("tree::ParseTreeWalker::DEFAULT.walk(&listener, $ctx->r);\n");
+		grammarBuilder.append("tree::ParseTreeWalker::DEFAULT.walk(&listener, $ctx->r.get());\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("  : r=a ;\n");
 		grammarBuilder.append("a : INT INT\n");
@@ -59,14 +60,15 @@ public class TestListeners extends BaseCppTest {
 	public void testLR() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(689);
+		StringBuilder grammarBuilder = new StringBuilder(722);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("@parser::definitions {\n");
+		grammarBuilder.append("#include \"TBaseListener.h\"\n");
 		grammarBuilder.append("class LeafListener : public TBaseListener {\n");
 		grammarBuilder.append("public:\n");
 		grammarBuilder.append("  virtual void exitE(TParser::EContext *ctx) override {\n");
-		grammarBuilder.append("    if (ctx->getChildCount() == 3) {\n");
+		grammarBuilder.append("    if (ctx->children.size() == 3) {\n");
 		grammarBuilder.append("      std::cout << ctx->e(0)->start->getText() << \" \" << ctx->e(1)->start->getText() << \" \" << ctx->e()[0]->start->getText() << std::endl;\n");
 		grammarBuilder.append("    } else {\n");
 		grammarBuilder.append("      std::cout << ctx->INT()->getSymbol()->getText() << std::endl;\n");
@@ -79,7 +81,7 @@ public class TestListeners extends BaseCppTest {
 		grammarBuilder.append("@after {\n");
 		grammarBuilder.append("std::cout << $ctx->r->toStringTree(this) << std::endl;\n");
 		grammarBuilder.append("LeafListener listener;\n");
-		grammarBuilder.append("tree::ParseTreeWalker::DEFAULT.walk(&listener, $ctx->r);\n");
+		grammarBuilder.append("tree::ParseTreeWalker::DEFAULT.walk(&listener, $ctx->r.get());\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("	: r=e ;\n");
 		grammarBuilder.append("e : e op='*' e\n");
@@ -113,10 +115,11 @@ public class TestListeners extends BaseCppTest {
 	public void testLRWithLabels() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(691);
+		StringBuilder grammarBuilder = new StringBuilder(724);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("@parser::definitions {\n");
+		grammarBuilder.append("#include \"TBaseListener.h\"\n");
 		grammarBuilder.append("class LeafListener : public TBaseListener {\n");
 		grammarBuilder.append("public:\n");
 		grammarBuilder.append("  virtual void exitCall(TParser::CallContext *ctx) override {\n");
@@ -132,7 +135,7 @@ public class TestListeners extends BaseCppTest {
 		grammarBuilder.append("@after {\n");
 		grammarBuilder.append("std::cout << $ctx->r->toStringTree(this) << std::endl;\n");
 		grammarBuilder.append("LeafListener listener;\n");
-		grammarBuilder.append("tree::ParseTreeWalker::DEFAULT.walk(&listener, $ctx->r);\n");
+		grammarBuilder.append("tree::ParseTreeWalker::DEFAULT.walk(&listener, $ctx->r.get());\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("  : r=e ;\n");
 		grammarBuilder.append("e : e '(' eList ')' # Call\n");
@@ -165,14 +168,15 @@ public class TestListeners extends BaseCppTest {
 	public void testRuleGetters_1() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(709);
+		StringBuilder grammarBuilder = new StringBuilder(742);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("@parser::definitions {\n");
+		grammarBuilder.append("#include \"TBaseListener.h\"\n");
 		grammarBuilder.append("class LeafListener : public TBaseListener {\n");
 		grammarBuilder.append("public:\n");
 		grammarBuilder.append("  virtual void exitA(TParser::AContext *ctx) override {\n");
-		grammarBuilder.append("    if (ctx->getChildCount() == 2) {\n");
+		grammarBuilder.append("    if (ctx->children.size() == 2) {\n");
 		grammarBuilder.append("      std::cout << ctx->b(0)->start->getText() << \" \" << ctx->b(1)->start->getText() << \" \" << ctx->b()[0]->start->getText() << std::endl;\n");
 		grammarBuilder.append("    } else {\n");
 		grammarBuilder.append("      std::cout << ctx->b(0)->start->getText() << std::endl;\n");
@@ -185,7 +189,7 @@ public class TestListeners extends BaseCppTest {
 		grammarBuilder.append("@after {\n");
 		grammarBuilder.append("std::cout << $ctx->r->toStringTree(this) << std::endl;\n");
 		grammarBuilder.append("LeafListener listener;\n");
-		grammarBuilder.append("tree::ParseTreeWalker::DEFAULT.walk(&listener, $ctx->r);\n");
+		grammarBuilder.append("tree::ParseTreeWalker::DEFAULT.walk(&listener, $ctx->r.get());\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("  : r=a ;\n");
 		grammarBuilder.append("a : b b		// forces list\n");
@@ -215,14 +219,15 @@ public class TestListeners extends BaseCppTest {
 	public void testRuleGetters_2() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(709);
+		StringBuilder grammarBuilder = new StringBuilder(742);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("@parser::definitions {\n");
+		grammarBuilder.append("#include \"TBaseListener.h\"\n");
 		grammarBuilder.append("class LeafListener : public TBaseListener {\n");
 		grammarBuilder.append("public:\n");
 		grammarBuilder.append("  virtual void exitA(TParser::AContext *ctx) override {\n");
-		grammarBuilder.append("    if (ctx->getChildCount() == 2) {\n");
+		grammarBuilder.append("    if (ctx->children.size() == 2) {\n");
 		grammarBuilder.append("      std::cout << ctx->b(0)->start->getText() << \" \" << ctx->b(1)->start->getText() << \" \" << ctx->b()[0]->start->getText() << std::endl;\n");
 		grammarBuilder.append("    } else {\n");
 		grammarBuilder.append("      std::cout << ctx->b(0)->start->getText() << std::endl;\n");
@@ -235,7 +240,7 @@ public class TestListeners extends BaseCppTest {
 		grammarBuilder.append("@after {\n");
 		grammarBuilder.append("std::cout << $ctx->r->toStringTree(this) << std::endl;\n");
 		grammarBuilder.append("LeafListener listener;\n");
-		grammarBuilder.append("tree::ParseTreeWalker::DEFAULT.walk(&listener, $ctx->r);\n");
+		grammarBuilder.append("tree::ParseTreeWalker::DEFAULT.walk(&listener, $ctx->r.get());\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("  : r=a ;\n");
 		grammarBuilder.append("a : b b		// forces list\n");
@@ -265,14 +270,15 @@ public class TestListeners extends BaseCppTest {
 	public void testTokenGetters_1() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(674);
+		StringBuilder grammarBuilder = new StringBuilder(707);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("@parser::definitions {\n");
+		grammarBuilder.append("#include \"TBaseListener.h\"\n");
 		grammarBuilder.append("class LeafListener : public TBaseListener {\n");
 		grammarBuilder.append("public:\n");
 		grammarBuilder.append("  virtual void exitA(TParser::AContext *ctx) override {\n");
-		grammarBuilder.append("		if (ctx->getChildCount() == 2)\n");
+		grammarBuilder.append("		if (ctx->children.size() == 2)\n");
 		grammarBuilder.append("			std::cout << ctx->INT(0)->getSymbol()->getText() << \" \" << ctx->INT(1)->getSymbol()->getText()\n");
 		grammarBuilder.append("        << \" \" << Arrays::toString(ctx->INT()) << std::endl;\n");
 		grammarBuilder.append("		else\n");
@@ -285,7 +291,7 @@ public class TestListeners extends BaseCppTest {
 		grammarBuilder.append("@after {\n");
 		grammarBuilder.append("std::cout << $ctx->r->toStringTree(this) << std::endl;\n");
 		grammarBuilder.append("LeafListener listener;\n");
-		grammarBuilder.append("tree::ParseTreeWalker::DEFAULT.walk(&listener, $ctx->r);\n");
+		grammarBuilder.append("tree::ParseTreeWalker::DEFAULT.walk(&listener, $ctx->r.get());\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("  : r=a ;\n");
 		grammarBuilder.append("a : INT INT\n");
@@ -314,14 +320,15 @@ public class TestListeners extends BaseCppTest {
 	public void testTokenGetters_2() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(674);
+		StringBuilder grammarBuilder = new StringBuilder(707);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("@parser::definitions {\n");
+		grammarBuilder.append("#include \"TBaseListener.h\"\n");
 		grammarBuilder.append("class LeafListener : public TBaseListener {\n");
 		grammarBuilder.append("public:\n");
 		grammarBuilder.append("  virtual void exitA(TParser::AContext *ctx) override {\n");
-		grammarBuilder.append("		if (ctx->getChildCount() == 2)\n");
+		grammarBuilder.append("		if (ctx->children.size() == 2)\n");
 		grammarBuilder.append("			std::cout << ctx->INT(0)->getSymbol()->getText() << \" \" << ctx->INT(1)->getSymbol()->getText()\n");
 		grammarBuilder.append("        << \" \" << Arrays::toString(ctx->INT()) << std::endl;\n");
 		grammarBuilder.append("		else\n");
@@ -334,7 +341,7 @@ public class TestListeners extends BaseCppTest {
 		grammarBuilder.append("@after {\n");
 		grammarBuilder.append("std::cout << $ctx->r->toStringTree(this) << std::endl;\n");
 		grammarBuilder.append("LeafListener listener;\n");
-		grammarBuilder.append("tree::ParseTreeWalker::DEFAULT.walk(&listener, $ctx->r);\n");
+		grammarBuilder.append("tree::ParseTreeWalker::DEFAULT.walk(&listener, $ctx->r.get());\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("  : r=a ;\n");
 		grammarBuilder.append("a : INT INT\n");
