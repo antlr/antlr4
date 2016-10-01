@@ -500,6 +500,10 @@ public abstract class BaseTest {
 			if (candidate.exists()) {
 				return candidate.getPath();
 			}
+			candidate = new File(new File(path), tool+".exe");
+			if (candidate.exists()) {
+				return candidate.getPath();
+			}
 		}
 		return null;
 	}
