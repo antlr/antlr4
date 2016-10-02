@@ -54,7 +54,7 @@ atn::ATNConfigSet* LexerNoViableAltException::getDeadEndConfigs() {
 std::string LexerNoViableAltException::toString() {
   std::string symbol;
   if (_startIndex < getInputStream()->size()) {
-    symbol = ((CharStream *)getInputStream())->getText(misc::Interval((int)_startIndex, (int)_startIndex));
+    symbol = ((CharStream *)getInputStream())->getText(misc::Interval(_startIndex, _startIndex));
     symbol = antlrcpp::escapeWhitespace(symbol, false);
   }
   std::string format = "LexerNoViableAltException('" + symbol + "')";

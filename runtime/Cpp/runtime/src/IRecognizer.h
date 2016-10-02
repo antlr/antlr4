@@ -37,7 +37,7 @@ namespace antlr4 {
   public:
     virtual ~IRecognizer() {};
 
-    virtual int getState() = 0;
+    virtual size_t getState() const = 0;
 
     // Get the ATN used by the recognizer for prediction.
     virtual const atn::ATN& getATN() const = 0;

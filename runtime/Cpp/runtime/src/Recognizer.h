@@ -38,7 +38,7 @@ namespace antlr4 {
 
   class ANTLR4CPP_PUBLIC Recognizer : public IRecognizer {
   public:
-    static const ssize_t EOF = -1;
+    static const size_t EOF = (size_t)-1;
 
     Recognizer();
     virtual ~Recognizer() {};
@@ -65,7 +65,7 @@ namespace antlr4 {
     /// <p/>
     /// Used for XPath and tree pattern compilation.
     /// </summary>
-    virtual std::map<std::string, ssize_t> getTokenTypeMap();
+    virtual std::map<std::string, size_t> getTokenTypeMap();
 
     /// <summary>
     /// Get a map from rule names to rule indexes.
@@ -74,7 +74,7 @@ namespace antlr4 {
     /// </summary>
     virtual std::map<std::string, size_t> getRuleIndexMap();
 
-    virtual ssize_t getTokenType(const std::string &tokenName);
+    virtual size_t getTokenType(const std::string &tokenName);
 
     /// <summary>
     /// If this recognizer was generated, it will have a serialized ATN
@@ -144,13 +144,13 @@ namespace antlr4 {
 
     // subclass needs to override these if there are sempreds or actions
     // that the ATN interp needs to execute
-    virtual bool sempred(Ref<RuleContext> const& localctx, int ruleIndex, int actionIndex);
+    virtual bool sempred(Ref<RuleContext> const& localctx, size_t ruleIndex, size_t actionIndex);
 
     virtual bool precpred(Ref<RuleContext> const& localctx, int precedence);
 
-    virtual void action(Ref<RuleContext> const& localctx, int ruleIndex, int actionIndex);
+    virtual void action(Ref<RuleContext> const& localctx, size_t ruleIndex, size_t actionIndex);
 
-    int getState();
+    virtual size_t getState() const override;
 
     /// <summary>
     /// Indicate that the recognizer has changed internal state that is
@@ -160,7 +160,7 @@ namespace antlr4 {
     ///  invoking rules. Combine this and we have complete ATN
     ///  configuration information.
     /// </summary>
-    void setState(int atnState);
+    void setState(size_t atnState);
 
     virtual IntStream* getInputStream() = 0;
 
@@ -175,7 +175,7 @@ namespace antlr4 {
     atn::ATNSimulator *_interpreter; // Set and deleted in descendants (or the profiler).
 
   private:
-    static std::map<const dfa::Vocabulary*, std::map<std::string, ssize_t>> _tokenTypeMapCache;
+    static std::map<const dfa::Vocabulary*, std::map<std::string, size_t>> _tokenTypeMapCache;
     static std::map<std::vector<std::string>, std::map<std::string, size_t>> _ruleIndexMapCache;
 
     ProxyErrorListener _proxListener; // Manages a collection of listeners.
@@ -183,7 +183,7 @@ namespace antlr4 {
     // Mutex to manage synchronized access for multithreading.
     std::recursive_mutex mtx;
 
-    int _stateNumber;
+    size_t _stateNumber;
     
     void InitializeInstanceFields();
 

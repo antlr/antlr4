@@ -121,7 +121,7 @@ namespace atn {
     /// <param name="startIndex"> The token start index. This value may be passed to
     /// <seealso cref="IntStream#seek"/> to set the {@code input} position to the beginning
     /// of the token. </param>
-    virtual void execute(Lexer *lexer, CharStream *input, int startIndex);
+    virtual void execute(Lexer *lexer, CharStream *input, size_t startIndex);
 
     virtual size_t hashCode() const;
     virtual bool operator == (const LexerActionExecutor &obj) const;

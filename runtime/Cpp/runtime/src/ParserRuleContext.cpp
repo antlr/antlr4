@@ -54,7 +54,7 @@ void ParserRuleContext::copyFrom(Ref<ParserRuleContext> const& ctx) {
   this->stop = ctx->stop;
 }
 
-ParserRuleContext::ParserRuleContext(std::weak_ptr<ParserRuleContext> parent, int invokingStateNumber)
+ParserRuleContext::ParserRuleContext(std::weak_ptr<ParserRuleContext> parent, size_t invokingStateNumber)
   : RuleContext(parent, invokingStateNumber) {
 }
 
@@ -94,7 +94,7 @@ Ref<tree::ErrorNode> ParserRuleContext::addErrorNode(Token *badToken) {
   return t;
 }
 
-Ref<tree::TerminalNode> ParserRuleContext::getToken(int ttype, std::size_t i) {
+Ref<tree::TerminalNode> ParserRuleContext::getToken(size_t ttype, size_t i) {
   if (i >= children.size()) {
     return nullptr;
   }
@@ -115,7 +115,7 @@ Ref<tree::TerminalNode> ParserRuleContext::getToken(int ttype, std::size_t i) {
   return nullptr;
 }
 
-std::vector<Ref<tree::TerminalNode>> ParserRuleContext::getTokens(int ttype) {
+std::vector<Ref<tree::TerminalNode>> ParserRuleContext::getTokens(size_t ttype) {
   std::vector<Ref<tree::TerminalNode>> tokens;
   for (auto &o : children) {
     if (is<tree::TerminalNode>(o)) {

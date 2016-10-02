@@ -47,7 +47,7 @@ namespace antlr4 {
     UnbufferedCharStream(std::wistream &input);
 
     virtual void consume() override;
-    virtual ssize_t LA(ssize_t i) override;
+    virtual size_t LA(ssize_t i) override;
 
     /// <summary>
     /// Return a marker that we can release later.

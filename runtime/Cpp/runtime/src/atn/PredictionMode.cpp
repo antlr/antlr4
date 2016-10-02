@@ -49,7 +49,7 @@ struct AltAndContextConfigHasher
    */
   size_t operator () (ATNConfig *o) const {
     size_t hashCode = misc::MurmurHash::initialize(7);
-    hashCode = misc::MurmurHash::update(hashCode, (size_t)o->state->stateNumber);
+    hashCode = misc::MurmurHash::update(hashCode, o->state->stateNumber);
     hashCode = misc::MurmurHash::update(hashCode, o->context);
     return misc::MurmurHash::finish(hashCode, 2);
   }
@@ -118,7 +118,7 @@ bool PredictionModeClass::allConfigsInRuleStopStates(ATNConfigSet *configs) {
   return true;
 }
 
-int PredictionModeClass::resolvesToJustOneViableAlt(const std::vector<antlrcpp::BitSet>& altsets) {
+size_t PredictionModeClass::resolvesToJustOneViableAlt(const std::vector<antlrcpp::BitSet>& altsets) {
   return getSingleViableAlt(altsets);
 }
 
@@ -158,7 +158,7 @@ bool PredictionModeClass::allSubsetsEqual(const std::vector<antlrcpp::BitSet>& a
   return true;
 }
 
-int PredictionModeClass::getUniqueAlt(const std::vector<antlrcpp::BitSet>& altsets) {
+size_t PredictionModeClass::getUniqueAlt(const std::vector<antlrcpp::BitSet>& altsets) {
   antlrcpp::BitSet all = getAlts(altsets);
   if (all.count() == 1) {
     return all.nextSetBit(0);
@@ -211,12 +211,12 @@ bool PredictionModeClass::hasStateAssociatedWithOneAlt(ATNConfigSet *configs) {
   return false;
 }
 
-int PredictionModeClass::getSingleViableAlt(const std::vector<antlrcpp::BitSet>& altsets) {
+size_t PredictionModeClass::getSingleViableAlt(const std::vector<antlrcpp::BitSet>& altsets) {
   antlrcpp::BitSet viableAlts;
   for (antlrcpp::BitSet alts : altsets) {
-    int minAlt = alts.nextSetBit(0);
+    size_t minAlt = alts.nextSetBit(0);
 
-    viableAlts.set((size_t)minAlt);
+    viableAlts.set(minAlt);
     if (viableAlts.count() > 1)  // more than 1 viable alt
     {
       return ATN::INVALID_ALT_NUMBER;

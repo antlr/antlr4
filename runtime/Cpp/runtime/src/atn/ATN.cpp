@@ -129,8 +129,8 @@ void ATN::addState(ATNState *state) {
 }
 
 void ATN::removeState(ATNState *state) {
-  delete states.at((size_t)state->stateNumber);// just free mem, don't shift states in list
-  states.at((size_t)state->stateNumber) = nullptr;
+  delete states.at(state->stateNumber);// just free mem, don't shift states in list
+  states.at(state->stateNumber) = nullptr;
 }
 
 int ATN::defineDecisionState(DecisionState *s) {
@@ -139,24 +139,24 @@ int ATN::defineDecisionState(DecisionState *s) {
   return s->decision;
 }
 
-DecisionState *ATN::getDecisionState(int decision) const {
+DecisionState *ATN::getDecisionState(size_t decision) const {
   if (!decisionToState.empty()) {
-    return decisionToState[(size_t)decision];
+    return decisionToState[decision];
   }
   return nullptr;
 }
 
-int ATN::getNumberOfDecisions() const {
-  return (int)decisionToState.size();
+size_t ATN::getNumberOfDecisions() const {
+  return decisionToState.size();
 }
 
-misc::IntervalSet ATN::getExpectedTokens(int stateNumber, RuleContext *context) const {
-  if (stateNumber < 0 || stateNumber >= (int)states.size()) {
+misc::IntervalSet ATN::getExpectedTokens(size_t stateNumber, RuleContext *context) const {
+  if (stateNumber == ATNState::INVALID_STATE_NUMBER || stateNumber >= states.size()) {
     throw IllegalArgumentException("Invalid state number.");
   }
 
   RuleContext *ctx = context;
-  ATNState *s = states.at((size_t)stateNumber);
+  ATNState *s = states.at(stateNumber);
   misc::IntervalSet following = nextTokens(s);
   if (!following.contains(Token::EPSILON)) {
     return following;
@@ -165,8 +165,8 @@ misc::IntervalSet ATN::getExpectedTokens(int stateNumber, RuleContext *context) 
   misc::IntervalSet expected;
   expected.addAll(following);
   expected.remove(Token::EPSILON);
-  while (ctx && ctx->invokingState >= 0 && following.contains(Token::EPSILON)) {
-    ATNState *invokingState = states.at((size_t)ctx->invokingState);
+  while (ctx && ctx->invokingState != ATNState::INVALID_STATE_NUMBER && following.contains(Token::EPSILON)) {
+    ATNState *invokingState = states.at(ctx->invokingState);
     RuleTransition *rt = static_cast<RuleTransition*>(invokingState->transition(0));
     following = nextTokens(rt->followState);
     expected.addAll(following);

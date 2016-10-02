@@ -46,7 +46,7 @@ namespace antlr4 {
 
     virtual Token* get(size_t i) const override;
     virtual Token* LT(ssize_t i) override;
-    virtual ssize_t LA(ssize_t i) override;
+    virtual size_t LA(ssize_t i) override;
 
     virtual TokenSource* getTokenSource() const override;
 

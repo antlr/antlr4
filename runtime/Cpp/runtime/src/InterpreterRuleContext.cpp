@@ -36,10 +36,11 @@ using namespace antlr4;
 InterpreterRuleContext::InterpreterRuleContext() {
 }
 
-InterpreterRuleContext::InterpreterRuleContext(std::weak_ptr<ParserRuleContext> parent, int invokingStateNumber, ssize_t ruleIndex)
+InterpreterRuleContext::InterpreterRuleContext(std::weak_ptr<ParserRuleContext> parent, size_t invokingStateNumber,
+                                               size_t ruleIndex)
   : ParserRuleContext(parent, invokingStateNumber), _ruleIndex(ruleIndex) {
 }
 
-ssize_t InterpreterRuleContext::getRuleIndex() const {
+size_t InterpreterRuleContext::getRuleIndex() const {
   return _ruleIndex;
 }

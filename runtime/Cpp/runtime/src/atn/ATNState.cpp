@@ -39,9 +39,6 @@
 using namespace antlr4::atn;
 using namespace antlrcpp;
 
-const int ATNState::INITIAL_NUM_TRANSITIONS = 4;
-const int ATNState::INVALID_STATE_NUMBER = -1;
-
 ATNState::ATNState() {
 }
 
@@ -58,7 +55,7 @@ const std::vector<std::string> ATNState::serializationNames = {
 };
 
 size_t ATNState::hashCode() {
-  return (size_t)stateNumber;
+  return stateNumber;
 }
 
 bool ATNState::operator == (const ATNState &other) {
@@ -72,10 +69,10 @@ bool ATNState::isNonGreedyExitState() {
 std::string ATNState::toString() const {
   std::stringstream ss;
   ss << "(ATNState " << std::hex << this << std::dec << ") {" << std::endl;
-  if (stateNumber < 0 || stateNumber >= (int)serializationNames.size())
+  if (stateNumber == INVALID_STATE_NUMBER || stateNumber >= serializationNames.size())
     ss << "  state: INVALID ";
   else
-    ss << "  state: " << serializationNames[(size_t)stateNumber];
+    ss << "  state: " << serializationNames[stateNumber];
   ss << " (" << stateNumber << ")" << std::endl;
   ss << "  ruleIndex: " << ruleIndex << std::endl << "  epsilonOnlyTransitions: " << epsilonOnlyTransitions << std::endl;
   ss << "  transistions (" << transitions.size() << "):" << std::endl;
@@ -100,7 +97,7 @@ void ATNState::addTransition(Transition *e) {
   addTransition((int)transitions.size(), e);
 }
 
-void ATNState::addTransition(int index, Transition *e) {
+void ATNState::addTransition(size_t index, Transition *e) {
   if (transitions.empty()) {
     epsilonOnlyTransitions = e->isEpsilon();
   } else if (epsilonOnlyTransitions != e->isEpsilon()) {
@@ -119,7 +116,7 @@ void ATNState::setTransition(size_t i, Transition *e) {
   transitions[i] = e;
 }
 
-Transition *ATNState::removeTransition(int index) {
+Transition *ATNState::removeTransition(size_t index) {
   transitions.erase(transitions.begin() + index);
   return nullptr;
 }
@@ -128,6 +125,6 @@ bool ATNState::onlyHasEpsilonTransitions() {
   return epsilonOnlyTransitions;
 }
 
-void ATNState::setRuleIndex(int index) {
+void ATNState::setRuleIndex(size_t index) {
   ruleIndex = index;
 }

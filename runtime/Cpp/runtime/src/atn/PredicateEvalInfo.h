@@ -80,8 +80,8 @@ namespace atn {
     /// </param>
     /// <seealso cref= ParserATNSimulator#evalSemanticContext(SemanticContext, ParserRuleContext, int, boolean) </seealso>
     /// <seealso cref= SemanticContext#eval(Recognizer, RuleContext) </seealso>
-    PredicateEvalInfo(int decision, TokenStream *input, int startIndex, int stopIndex, Ref<SemanticContext> const& semctx,
-                      bool evalResult, int predictedAlt, bool fullCtx);
+    PredicateEvalInfo(size_t decision, TokenStream *input, size_t startIndex, size_t stopIndex,
+                      Ref<SemanticContext> const& semctx, bool evalResult, int predictedAlt, bool fullCtx);
   };
 
 } // namespace atn

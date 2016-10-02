@@ -90,11 +90,11 @@ namespace antlr4 {
     /// What state invoked the rule associated with this context?
     /// The "return address" is the followState of invokingState
     /// If parent is null, this should be -1 and this context object represents the start rule.
-    int invokingState;
+    size_t invokingState;
 
     RuleContext();
 
-    RuleContext(std::weak_ptr<RuleContext> parent, int invokingState);
+    RuleContext(std::weak_ptr<RuleContext> parent, size_t invokingState);
 
     virtual int depth();
 
@@ -108,7 +108,7 @@ namespace antlr4 {
     virtual Ref<RuleContext> getRuleContext() override;
     virtual std::string getText() override;
 
-    virtual ssize_t getRuleIndex() const;
+    virtual size_t getRuleIndex() const;
 
     /** For rule associated with this parse tree internal node, return
      *  the outer alternative number used to match the input. Default

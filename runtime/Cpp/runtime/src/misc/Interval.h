@@ -36,28 +36,29 @@
 namespace antlr4 {
 namespace misc {
 
+  // Helpers to convert certain unsigned symbols (e.g. Token::EOF) to their original numeric value (e.g. -1)
+  // and vice version. This is needed mostly for intervals to keep their original order and for toString()
+  // methods to print the original numeric value (e.g. for tests).
+  size_t numericToSymbol(ssize_t v);
+  ssize_t symbolToNumeric(size_t v);
+
   /// An immutable inclusive interval a..b
   class ANTLR4CPP_PUBLIC Interval {
   public:
     static const Interval INVALID;
 
-    int a;
-    int b;
-
-    static int creates;
-    static int misses;
-    static int hits;
-    static int outOfRange;
+    // Must stay signed to guarantee the correct sort order.
+    ssize_t a;
+    ssize_t b;
 
     Interval();
-    Interval(int a_, int b_, bool autoExtend = false); // Automatically extend a value of 0xFFFF to 0x10FFFF.
+    explicit Interval(size_t a_, size_t b_); // For unsigned -> signed mappings.
+    Interval(ssize_t a_, ssize_t b_, bool autoExtend = false); // Automatically extend a value of 0xFFFF to 0x10FFFF.
     virtual ~Interval() {};
 
-    /// <summary>
     /// return number of elements between a and b inclusively. x..x is length 1.
     ///  if b < a, then length is 0.  9..10 has length 2.
-    /// </summary>
-    virtual int length() const;
+    virtual size_t length() const;
 
     bool operator == (const Interval &other) const;
 

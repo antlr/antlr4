@@ -33,18 +33,18 @@
 
 using namespace antlr4::atn;
 
-EpsilonTransition::EpsilonTransition(ATNState *target) : EpsilonTransition(target, -1) {
+EpsilonTransition::EpsilonTransition(ATNState *target) : EpsilonTransition(target, INVALID_INDEX) {
 }
 
-EpsilonTransition::EpsilonTransition(ATNState *target, int outermostPrecedenceReturn)
+EpsilonTransition::EpsilonTransition(ATNState *target, size_t outermostPrecedenceReturn)
   : Transition(target), _outermostPrecedenceReturn(outermostPrecedenceReturn) {
 }
 
-int EpsilonTransition::outermostPrecedenceReturn() {
+size_t EpsilonTransition::outermostPrecedenceReturn() {
   return _outermostPrecedenceReturn;
 }
 
-int EpsilonTransition::getSerializationType() const {
+Transition::SerializationType EpsilonTransition::getSerializationType() const {
   return EPSILON;
 }
 
@@ -52,7 +52,7 @@ bool EpsilonTransition::isEpsilon() const {
   return true;
 }
 
-bool EpsilonTransition::matches(ssize_t /*symbol*/, ssize_t /*minVocabSymbol*/, ssize_t /*maxVocabSymbol*/) const {
+bool EpsilonTransition::matches(size_t /*symbol*/, size_t /*minVocabSymbol*/, size_t /*maxVocabSymbol*/) const {
   return false;
 }
 

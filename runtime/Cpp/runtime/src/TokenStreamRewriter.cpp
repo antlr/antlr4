@@ -42,13 +42,15 @@ using namespace antlrcpp;
 
 using antlr4::misc::Interval;
 
-TokenStreamRewriter::RewriteOperation::RewriteOperation(TokenStreamRewriter *outerInstance, size_t index) : outerInstance(outerInstance) {
+TokenStreamRewriter::RewriteOperation::RewriteOperation(TokenStreamRewriter *outerInstance, size_t index)
+  : outerInstance(outerInstance) {
 
   InitializeInstanceFields();
   this->index = index;
 }
 
-TokenStreamRewriter::RewriteOperation::RewriteOperation(TokenStreamRewriter *outerInstance, size_t index, const std::string& text) : outerInstance(outerInstance) {
+TokenStreamRewriter::RewriteOperation::RewriteOperation(TokenStreamRewriter *outerInstance, size_t index,
+  const std::string& text) : outerInstance(outerInstance) {
 
   InitializeInstanceFields();
   this->index = index;
@@ -125,11 +127,11 @@ TokenStream *TokenStreamRewriter::getTokenStream() {
   return tokens;
 }
 
-void TokenStreamRewriter::rollback(int instructionIndex) {
+void TokenStreamRewriter::rollback(size_t instructionIndex) {
   rollback(DEFAULT_PROGRAM_NAME, instructionIndex);
 }
 
-void TokenStreamRewriter::rollback(const std::string &programName, int instructionIndex) {
+void TokenStreamRewriter::rollback(const std::string &programName, size_t instructionIndex) {
   std::vector<RewriteOperation*> is = _programs[programName];
   if (is.size() > 0) {
     _programs.insert({ programName, std::vector<RewriteOperation*>(is.begin() + MIN_TOKEN_INDEX, is.begin() + instructionIndex) });
@@ -153,7 +155,7 @@ void TokenStreamRewriter::insertAfter(size_t index, const std::string& text) {
 }
 
 void TokenStreamRewriter::insertAfter(const std::string &programName, Token *t, const std::string& text) {
-  insertAfter(programName, (size_t)t->getTokenIndex(), text);
+  insertAfter(programName, t->getTokenIndex(), text);
 }
 
 void TokenStreamRewriter::insertAfter(const std::string &programName, size_t index, const std::string& text) {
@@ -170,13 +172,13 @@ void TokenStreamRewriter::insertBefore(size_t index, const std::string& text) {
 }
 
 void TokenStreamRewriter::insertBefore(const std::string &programName, Token *t, const std::string& text) {
-  insertBefore(programName, (size_t)t->getTokenIndex(), text);
+  insertBefore(programName, t->getTokenIndex(), text);
 }
 
 void TokenStreamRewriter::insertBefore(const std::string &programName, size_t index, const std::string& text) {
   RewriteOperation *op = new InsertBeforeOp(this, index, text); /* mem-check: deleted in d-tor */
   std::vector<RewriteOperation*> &rewrites = getProgram(programName);
-  op->instructionIndex = (int)rewrites.size();
+  op->instructionIndex = rewrites.size();
   rewrites.push_back(op);
 }
 
@@ -203,12 +205,12 @@ void TokenStreamRewriter::replace(const std::string &programName, size_t from, s
   }
   RewriteOperation *op = new ReplaceOp(this, from, to, text); /* mem-check: deleted in d-tor */
   std::vector<RewriteOperation*> &rewrites = getProgram(programName);
-  op->instructionIndex = (int)rewrites.size();
+  op->instructionIndex = rewrites.size();
   rewrites.push_back(op);
 }
 
 void TokenStreamRewriter::replace(const std::string &programName, Token *from, Token *to, const std::string& text) {
-  replace(programName, (size_t)from->getTokenIndex(), (size_t)to->getTokenIndex(), text);
+  replace(programName, from->getTokenIndex(), to->getTokenIndex(), text);
 }
 
 void TokenStreamRewriter::Delete(size_t index) {
@@ -235,18 +237,18 @@ void TokenStreamRewriter::Delete(const std::string &programName, Token *from, To
   replace(programName, from, to, nullptr);
 }
 
-int TokenStreamRewriter::getLastRewriteTokenIndex() {
+size_t TokenStreamRewriter::getLastRewriteTokenIndex() {
   return getLastRewriteTokenIndex(DEFAULT_PROGRAM_NAME);
 }
 
-int TokenStreamRewriter::getLastRewriteTokenIndex(const std::string &programName) {
+size_t TokenStreamRewriter::getLastRewriteTokenIndex(const std::string &programName) {
   if (_lastRewriteTokenIndexes.find(programName) == _lastRewriteTokenIndexes.end()) {
-    return -1;
+    return INVALID_INDEX;
   }
   return _lastRewriteTokenIndexes[programName];
 }
 
-void TokenStreamRewriter::setLastRewriteTokenIndex(const std::string &programName, int i) {
+void TokenStreamRewriter::setLastRewriteTokenIndex(const std::string &programName, size_t i) {
   _lastRewriteTokenIndexes.insert({ programName, i });
 }
 
@@ -265,11 +267,11 @@ std::vector<TokenStreamRewriter::RewriteOperation*> TokenStreamRewriter::initial
 }
 
 std::string TokenStreamRewriter::getText() {
-  return getText(DEFAULT_PROGRAM_NAME, Interval(0, (int)tokens->size() - 1));
+  return getText(DEFAULT_PROGRAM_NAME, Interval(0, tokens->size() - 1));
 }
 
 std::string TokenStreamRewriter::getText(std::string programName) {
-  return getText(programName, Interval(0, (int)tokens->size() - 1));
+  return getText(programName, Interval(0, tokens->size() - 1));
 }
 
 std::string TokenStreamRewriter::getText(const Interval &interval) {
@@ -278,14 +280,14 @@ std::string TokenStreamRewriter::getText(const Interval &interval) {
 
 std::string TokenStreamRewriter::getText(const std::string &programName, const Interval &interval) {
   std::vector<TokenStreamRewriter::RewriteOperation*> rewrites = _programs[programName];
-  int start = interval.a;
-  int stop = interval.b;
+  size_t start = interval.a;
+  size_t stop = interval.b;
 
   // ensure start/end are in range
-  if (stop > (int)tokens->size() - 1) {
-    stop = (int)tokens->size() - 1;
+  if (stop > tokens->size() - 1) {
+    stop = tokens->size() - 1;
   }
-  if (start < 0) {
+  if (start == INVALID_INDEX) {
     start = 0;
   }
 
@@ -298,8 +300,8 @@ std::string TokenStreamRewriter::getText(const std::string &programName, const I
   std::unordered_map<size_t, TokenStreamRewriter::RewriteOperation*> indexToOp = reduceToSingleOperationPerIndex(rewrites);
 
   // Walk buffer, executing instructions and emitting tokens
-  size_t i = (size_t)start;
-  while (i <= (size_t)stop && i < tokens->size()) {
+  size_t i = start;
+  while (i <= stop && i < tokens->size()) {
     RewriteOperation *op = indexToOp[i];
     indexToOp.erase(i); // remove so any left have index size-1
     Token *t = tokens->get(i);
@@ -318,7 +320,7 @@ std::string TokenStreamRewriter::getText(const std::string &programName, const I
   // include stuff after end if it's last index in buffer
   // So, if they did an insertAfter(lastValidIndex, "foo"), include
   // foo if end==lastValidIndex.
-  if (stop == (int)tokens->size() - 1) {
+  if (stop == tokens->size() - 1) {
     // Scan any remaining operations after last token
     // should be included (they will be inserts).
     for (auto op : indexToOp) {
@@ -405,7 +407,7 @@ std::unordered_map<size_t, TokenStreamRewriter::RewriteOperation*> TokenStreamRe
                                           // whole token buffer so no lazy eval issue with any templates
         iop->text = catOpText(&iop->text, &prevIop->text);
         // delete redundant prior insert
-        rewrites[(size_t)prevIop->instructionIndex] = nullptr;
+        rewrites[prevIop->instructionIndex] = nullptr;
       }
     }
     // look for replaces where iop.index is in range; error

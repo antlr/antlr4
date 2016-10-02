@@ -46,7 +46,7 @@ namespace antlr4 {
    */
   class ANTLR4CPP_PUBLIC BaseErrorListener : public ANTLRErrorListener {
 
-    virtual void syntaxError(IRecognizer *recognizer, Token * offendingSymbol, size_t line, int charPositionInLine,
+    virtual void syntaxError(IRecognizer *recognizer, Token * offendingSymbol, size_t line, size_t charPositionInLine,
       const std::string &msg, std::exception_ptr e) override;
 
     virtual void reportAmbiguity(Parser *recognizer, const dfa::DFA &dfa, size_t startIndex, size_t stopIndex, bool exact,
@@ -56,7 +56,7 @@ namespace antlr4 {
       const antlrcpp::BitSet &conflictingAlts, atn::ATNConfigSet *configs) override;
 
     virtual void reportContextSensitivity(Parser *recognizer, const dfa::DFA &dfa, size_t startIndex, size_t stopIndex,
-      int prediction, atn::ATNConfigSet *configs) override;
+      size_t prediction, atn::ATNConfigSet *configs) override;
   };
 
 } // namespace antlr4

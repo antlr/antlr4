@@ -38,19 +38,19 @@ namespace atn {
 
   class ANTLR4CPP_PUBLIC ActionTransition final : public Transition {
   public:
-    const int ruleIndex;
-    const int actionIndex;
+    const size_t ruleIndex;
+    const size_t actionIndex;
     const bool isCtxDependent; // e.g., $i ref in action
 
-    ActionTransition(ATNState *target, int ruleIndex); //this(target, ruleIndex, -1, false);
+    ActionTransition(ATNState *target, size_t ruleIndex);
 
-    ActionTransition(ATNState *target, int ruleIndex, int actionIndex, bool isCtxDependent);
+    ActionTransition(ATNState *target, size_t ruleIndex, size_t actionIndex, bool isCtxDependent);
 
-    virtual int getSerializationType() const override;
+    virtual SerializationType getSerializationType() const override;
 
     virtual bool isEpsilon() const override;
 
-    virtual bool matches(ssize_t symbol, ssize_t minVocabSymbol, ssize_t maxVocabSymbol) const override;
+    virtual bool matches(size_t symbol, size_t minVocabSymbol, size_t maxVocabSymbol) const override;
 
     virtual std::string toString() const override;
   };

@@ -94,7 +94,7 @@ namespace antlr4 {
     /// <exception cref="NullPointerException"> if {@code tokens} is {@code null} </exception>
     ListTokenSource(std::vector<std::unique_ptr<Token>> tokens_, const std::string &sourceName_);
 
-    virtual int getCharPositionInLine() override;
+    virtual size_t getCharPositionInLine() override;
     virtual std::unique_ptr<Token> nextToken() override;
     virtual size_t getLine() const override;
     virtual CharStream* getInputStream() override;

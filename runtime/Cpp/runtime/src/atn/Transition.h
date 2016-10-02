@@ -52,17 +52,18 @@ namespace atn {
   class ANTLR4CPP_PUBLIC Transition {
   public:
     // constants for serialization
-    static const int EPSILON = 1;
-    static const int RANGE = 2;
-    static const int RULE = 3;
-    static const int PREDICATE = 4; // e.g., {isType(input.LT(1))}?
-    static const int ATOM = 5;
-    static const int ACTION = 6;
-    static const int SET = 7; // ~(A|B) or ~atom, wildcard, which convert to next 2
-    static const int NOT_SET = 8;
-    static const int WILDCARD = 9;
-    static const int PRECEDENCE = 10;
-
+    enum SerializationType {
+      EPSILON = 1,
+      RANGE = 2,
+      RULE = 3,
+      PREDICATE = 4, // e.g., {isType(input.LT(1))}?
+      ATOM = 5,
+      ACTION = 6,
+      SET = 7, // ~(A|B) or ~atom, wildcard, which convert to next 2
+      NOT_SET = 8,
+      WILDCARD = 9,
+      PRECEDENCE = 10,
+    };
 
     static const std::vector<std::string> serializationNames;
 
@@ -76,7 +77,7 @@ namespace atn {
     Transition(ATNState *target);
 
   public:
-    virtual int getSerializationType() const = 0;
+    virtual SerializationType getSerializationType() const = 0;
 
     /**
      * Determines if the transition is an "epsilon" transition.
@@ -89,7 +90,7 @@ namespace atn {
      */
     virtual bool isEpsilon() const;
     virtual misc::IntervalSet label() const;
-    virtual bool matches(ssize_t symbol, ssize_t minVocabSymbol, ssize_t maxVocabSymbol) const = 0;
+    virtual bool matches(size_t symbol, size_t minVocabSymbol, size_t maxVocabSymbol) const = 0;
 
     virtual std::string toString() const;
   };

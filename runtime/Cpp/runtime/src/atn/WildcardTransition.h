@@ -40,9 +40,9 @@ namespace atn {
   public:
     WildcardTransition(ATNState *target);
 
-    virtual int getSerializationType() const override;
+    virtual SerializationType getSerializationType() const override;
 
-    virtual bool matches(ssize_t symbol, ssize_t minVocabSymbol, ssize_t maxVocabSymbol) const override;
+    virtual bool matches(size_t symbol, size_t minVocabSymbol, size_t maxVocabSymbol) const override;
 
     virtual std::string toString() const override;
   };

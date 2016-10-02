@@ -40,7 +40,7 @@ namespace xpath {
   class ANTLR4CPP_PUBLIC XPathLexerErrorListener : public BaseErrorListener {
   public:
     virtual void syntaxError(IRecognizer *recognizer, Token *offendingSymbol, size_t line,
-      int charPositionInLine, const std::string &msg, std::exception_ptr e) override;
+      size_t charPositionInLine, const std::string &msg, std::exception_ptr e) override;
   };
 
 } // namespace xpath

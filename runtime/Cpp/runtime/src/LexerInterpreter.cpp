@@ -60,8 +60,8 @@ LexerInterpreter::LexerInterpreter(const std::string &grammarFileName, const dfa
     _tokenNames.push_back(vocabulary.getDisplayName(i));
   }
 
-  for (size_t i = 0; i < (size_t)atn.getNumberOfDecisions(); ++i) {
-    _decisionToDFA.push_back(dfa::DFA(_atn.getDecisionState((int)i), (int)i));
+  for (size_t i = 0; i < atn.getNumberOfDecisions(); ++i) {
+    _decisionToDFA.push_back(dfa::DFA(_atn.getDecisionState(i), i));
   }
   _interpreter = new atn::LexerATNSimulator(_atn, _decisionToDFA, _sharedContextCache); /* mem-check: deleted in d-tor */
 }

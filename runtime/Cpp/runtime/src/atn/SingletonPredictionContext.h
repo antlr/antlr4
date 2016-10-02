@@ -44,16 +44,16 @@ namespace atn {
     // which got this one as parent with a null reference) we use a shared_ptr here instead, to keep those left alone
     // parent contexts alive.
     const Ref<PredictionContext> parent;
-    const int returnState;
+    const size_t returnState;
 
-    SingletonPredictionContext(std::weak_ptr<PredictionContext> parent, int returnState);
+    SingletonPredictionContext(std::weak_ptr<PredictionContext> parent, size_t returnState);
     virtual ~SingletonPredictionContext() {};
 
-    static Ref<SingletonPredictionContext> create(std::weak_ptr<PredictionContext> parent, int returnState);
+    static Ref<SingletonPredictionContext> create(std::weak_ptr<PredictionContext> parent, size_t returnState);
 
     virtual size_t size() const override;
     virtual std::weak_ptr<PredictionContext> getParent(size_t index) const override;
-    virtual int getReturnState(size_t index) const override;
+    virtual size_t getReturnState(size_t index) const override;
     virtual bool operator == (const PredictionContext &o) const override;
     virtual std::string toString() const override;
   };

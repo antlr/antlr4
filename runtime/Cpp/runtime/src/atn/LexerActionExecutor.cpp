@@ -79,7 +79,7 @@ std::vector<Ref<LexerAction>> LexerActionExecutor::getLexerActions() const {
   return _lexerActions;
 }
 
-void LexerActionExecutor::execute(Lexer *lexer, CharStream *input, int startIndex) {
+void LexerActionExecutor::execute(Lexer *lexer, CharStream *input, size_t startIndex) {
   bool requiresSeek = false;
   size_t stopIndex = input->index();
 
@@ -93,7 +93,7 @@ void LexerActionExecutor::execute(Lexer *lexer, CharStream *input, int startInde
       int offset = (std::static_pointer_cast<LexerIndexedCustomAction>(lexerAction))->getOffset();
       input->seek(startIndex + offset);
       lexerAction = std::static_pointer_cast<LexerIndexedCustomAction>(lexerAction)->getAction();
-      requiresSeek = (size_t)(startIndex + offset) != stopIndex;
+      requiresSeek = (startIndex + offset) != stopIndex;
     } else if (lexerAction->isPositionDependent()) {
       input->seek(stopIndex);
       requiresSeek = false;

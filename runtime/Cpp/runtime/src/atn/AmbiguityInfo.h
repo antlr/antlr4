@@ -86,7 +86,7 @@ namespace atn {
     /// <param name="fullCtx"> {@code true} if the ambiguity was identified during LL
     /// prediction; otherwise, {@code false} if the ambiguity was identified
     /// during SLL prediction </param>
-    AmbiguityInfo(int decision, ATNConfigSet *configs, const antlrcpp::BitSet &ambigAlts, TokenStream *input,
+    AmbiguityInfo(size_t decision, ATNConfigSet *configs, const antlrcpp::BitSet &ambigAlts, TokenStream *input,
                   size_t startIndex, size_t stopIndex, bool fullCtx);
   };
 

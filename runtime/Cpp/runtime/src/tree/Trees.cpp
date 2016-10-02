@@ -117,7 +117,7 @@ std::string Trees::getNodeText(Ref<Tree> const& t, const std::vector<std::string
       ssize_t ruleIndex = std::static_pointer_cast<RuleContext>(t)->getRuleContext()->getRuleIndex();
       if (ruleIndex < 0)
         return "Invalid Rule Index";
-      std::string ruleName = ruleNames[(size_t)ruleIndex];
+      std::string ruleName = ruleNames[ruleIndex];
       int altNumber = std::static_pointer_cast<RuleContext>(t)->getAltNumber();
       if (altNumber != atn::ATN::INVALID_ALT_NUMBER) {
         return ruleName + ":" + std::to_string(altNumber);
@@ -156,7 +156,7 @@ std::vector<std::weak_ptr<Tree>> Trees::getAncestors(Ref<Tree> const& t) {
 }
 
 template<typename T>
-static void _findAllNodes(Ref<ParseTree> const& t, int index, bool findTokens, std::vector<T> &nodes) {
+static void _findAllNodes(Ref<ParseTree> const& t, size_t index, bool findTokens, std::vector<T> &nodes) {
   // check this node (the root) first
   if (findTokens && is<TerminalNode>(t)) {
     Ref<TerminalNode> tnode = std::dynamic_pointer_cast<TerminalNode>(t);
@@ -190,15 +190,15 @@ bool Trees::isAncestorOf(Ref<Tree> const& t, Ref<Tree> const& u) {
   return false;
 }
 
-std::vector<Ref<ParseTree>> Trees::findAllTokenNodes(Ref<ParseTree> const& t, int ttype) {
+std::vector<Ref<ParseTree>> Trees::findAllTokenNodes(Ref<ParseTree> const& t, size_t ttype) {
   return findAllNodes(t, ttype, true);
 }
 
-std::vector<Ref<ParseTree>> Trees::findAllRuleNodes(Ref<ParseTree> const& t, int ruleIndex) {
+std::vector<Ref<ParseTree>> Trees::findAllRuleNodes(Ref<ParseTree> const& t, size_t ruleIndex) {
   return findAllNodes(t, ruleIndex, false);
 }
 
-std::vector<Ref<ParseTree>> Trees::findAllNodes(Ref<ParseTree> const& t, int index, bool findTokens) {
+std::vector<Ref<ParseTree>> Trees::findAllNodes(Ref<ParseTree> const& t, size_t index, bool findTokens) {
   std::vector<Ref<ParseTree>> nodes;
   _findAllNodes<Ref<ParseTree>>(t, index, findTokens, nodes);
   return nodes;
@@ -234,8 +234,8 @@ Ref<ParserRuleContext> Trees::getRootOfSubtreeEnclosingRegion(Ref<ParseTree> con
 
   if (is<ParserRuleContext>(t)) {
     Ref<ParserRuleContext> r = std::static_pointer_cast<ParserRuleContext>(t);
-    if ((int)startTokenIndex >= r->getStart()->getTokenIndex() && // is range fully contained in t?
-        (r->getStop() == nullptr || (int)stopTokenIndex <= r->getStop()->getTokenIndex())) {
+    if (startTokenIndex >= r->getStart()->getTokenIndex() && // is range fully contained in t?
+        (r->getStop() == nullptr || stopTokenIndex <= r->getStop()->getTokenIndex())) {
       // note: r.getStop()==null likely implies that we bailed out of parser and there's nothing to the right
       return r;
     }

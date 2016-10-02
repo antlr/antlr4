@@ -44,7 +44,7 @@ using namespace antlrcpp;
 DFA::DFA(atn::DecisionState *atnStartState) : DFA(atnStartState, 0) {
 }
 
-DFA::DFA(atn::DecisionState *atnStartState, int decision)
+DFA::DFA(atn::DecisionState *atnStartState, size_t decision)
   : atnStartState(atnStartState), s0(nullptr), decision(decision) {
 
   _precedenceDfa = false;

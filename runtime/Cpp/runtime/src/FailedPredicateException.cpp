@@ -51,7 +51,7 @@ FailedPredicateException::FailedPredicateException(Parser *recognizer, const std
   : RecognitionException(!message.empty() ? message : "failed predicate: " + predicate + "?", recognizer,
                          recognizer->getInputStream(), recognizer->getContext(), recognizer->getCurrentToken()) {
 
-  atn::ATNState *s = recognizer->getInterpreter<atn::ATNSimulator>()->atn.states[(size_t)recognizer->getState()];
+  atn::ATNState *s = recognizer->getInterpreter<atn::ATNSimulator>()->atn.states[recognizer->getState()];
   atn::Transition *transition = s->transition(0);
   if (is<atn::PredicateTransition*>(transition)) {
     _ruleIndex = ((atn::PredicateTransition *)transition)->ruleIndex;
@@ -65,11 +65,11 @@ FailedPredicateException::FailedPredicateException(Parser *recognizer, const std
   _predicate = predicate;
 }
 
-int FailedPredicateException::getRuleIndex() {
+size_t FailedPredicateException::getRuleIndex() {
   return _ruleIndex;
 }
 
-int FailedPredicateException::getPredIndex() {
+size_t FailedPredicateException::getPredIndex() {
   return _predicateIndex;
 }
 

@@ -35,7 +35,7 @@
 using namespace antlr4;
 
 void BaseErrorListener::syntaxError(IRecognizer * /*recognizer*/, Token * /*offendingSymbol*/, size_t /*line*/,
-  int /*charPositionInLine*/, const std::string &/*msg*/, std::exception_ptr /*e*/) {
+  size_t /*charPositionInLine*/, const std::string &/*msg*/, std::exception_ptr /*e*/) {
 }
 
 void BaseErrorListener::reportAmbiguity(Parser * /*recognizer*/, const dfa::DFA &/*dfa*/, size_t /*startIndex*/,
@@ -47,5 +47,5 @@ void BaseErrorListener::reportAttemptingFullContext(Parser * /*recognizer*/, con
 }
 
 void BaseErrorListener::reportContextSensitivity(Parser * /*recognizer*/, const dfa::DFA &/*dfa*/, size_t /*startIndex*/,
-  size_t /*stopIndex*/, int /*prediction*/, atn::ATNConfigSet * /*configs*/) {
+  size_t /*stopIndex*/, size_t /*prediction*/, atn::ATNConfigSet * /*configs*/) {
 }

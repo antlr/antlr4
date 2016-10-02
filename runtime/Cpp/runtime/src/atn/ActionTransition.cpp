@@ -33,15 +33,15 @@
 
 using namespace antlr4::atn;
 
-ActionTransition::ActionTransition(ATNState *target, int ruleIndex)
-  : Transition(target), ruleIndex(ruleIndex), actionIndex(0), isCtxDependent(false) {
+ActionTransition::ActionTransition(ATNState *target, size_t ruleIndex)
+  : Transition(target), ruleIndex(ruleIndex), actionIndex(INVALID_INDEX), isCtxDependent(false) {
 }
 
-ActionTransition::ActionTransition(ATNState *target, int ruleIndex, int actionIndex, bool isCtxDependent)
+ActionTransition::ActionTransition(ATNState *target, size_t ruleIndex, size_t actionIndex, bool isCtxDependent)
   : Transition(target), ruleIndex(ruleIndex), actionIndex(actionIndex), isCtxDependent(isCtxDependent) {
 }
 
-int ActionTransition::getSerializationType() const {
+Transition::SerializationType ActionTransition::getSerializationType() const {
   return ACTION;
 }
 
@@ -49,7 +49,7 @@ bool ActionTransition::isEpsilon() const {
   return true; // we are to be ignored by analysis 'cept for predicates
 }
 
-bool ActionTransition::matches(ssize_t /*symbol*/, ssize_t /*minVocabSymbol*/, ssize_t /*maxVocabSymbol*/) const {
+bool ActionTransition::matches(size_t /*symbol*/, size_t /*minVocabSymbol*/, size_t /*maxVocabSymbol*/) const {
   return false;
 }
 

@@ -50,7 +50,7 @@ void ProxyErrorListener::removeErrorListeners() {
 }
 
 void ProxyErrorListener::syntaxError(IRecognizer *recognizer, Token *offendingSymbol, size_t line,
-  int charPositionInLine, const std::string &msg, std::exception_ptr e) {
+  size_t charPositionInLine, const std::string &msg, std::exception_ptr e) {
 
   for (auto listener : _delegates) {
     listener->syntaxError(recognizer, offendingSymbol, line, charPositionInLine, msg, e);
@@ -72,7 +72,7 @@ void ProxyErrorListener::reportAttemptingFullContext(Parser *recognizer, const d
 }
 
 void ProxyErrorListener::reportContextSensitivity(Parser *recognizer, const dfa::DFA &dfa, size_t startIndex, size_t stopIndex,
-  int prediction, atn::ATNConfigSet *configs) {
+  size_t prediction, atn::ATNConfigSet *configs) {
   for (auto listener : _delegates) {
     listener->reportContextSensitivity(recognizer, dfa, startIndex, stopIndex, prediction, configs);
   }

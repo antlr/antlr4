@@ -39,12 +39,12 @@ namespace xpath {
 
   class ANTLR4CPP_PUBLIC XPathTokenElement : public XPathElement {
   public:
-    XPathTokenElement(const std::string &tokenName, int tokenType);
+    XPathTokenElement(const std::string &tokenName, size_t tokenType);
 
     virtual std::vector<Ref<ParseTree>> evaluate(const std::shared_ptr<ParseTree> &t) override;
 
   protected:
-    int _tokenType = 0;
+    size_t _tokenType = 0;
   };
 
 } // namespace xpath

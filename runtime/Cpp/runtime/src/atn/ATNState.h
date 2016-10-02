@@ -102,8 +102,8 @@ namespace atn {
     
     virtual ~ATNState();
 
-    static const int INITIAL_NUM_TRANSITIONS;
-    static const int INVALID_STATE_NUMBER;
+    static const size_t INITIAL_NUM_TRANSITIONS = 4;
+    static const size_t INVALID_STATE_NUMBER = (size_t)-1;
 
     enum {
       ATN_INVALID_TYPE = 0,
@@ -124,10 +124,8 @@ namespace atn {
     static const std::vector<std::string> serializationNames;
 
     /// Which ATN are we in?
-    // ml: just a reference to the owner. Set when the state gets added to an ATN.
-    //const ATN *atn = nullptr;
-    int stateNumber = INVALID_STATE_NUMBER;
-    int ruleIndex = 0; // at runtime, we don't have Rule objects
+    size_t stateNumber = INVALID_STATE_NUMBER;
+    size_t ruleIndex = 0; // at runtime, we don't have Rule objects
     bool epsilonOnlyTransitions = false;
 
   protected:
@@ -146,13 +144,13 @@ namespace atn {
     virtual  std::vector<Transition*> getTransitions();
     virtual size_t getNumberOfTransitions();
     virtual void addTransition(Transition *e);
-    virtual void addTransition(int index, Transition *e);
+    virtual void addTransition(size_t index, Transition *e);
     virtual Transition *transition(size_t i);
     virtual void setTransition(size_t i, Transition *e);
-    virtual Transition *removeTransition(int index);
+    virtual Transition* removeTransition(size_t index);
     virtual int getStateType() = 0;
     bool onlyHasEpsilonTransitions();
-    virtual void setRuleIndex(int index);
+    virtual void setRuleIndex(size_t index);
 
   };
 

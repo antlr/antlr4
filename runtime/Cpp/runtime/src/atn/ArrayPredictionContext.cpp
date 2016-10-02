@@ -41,7 +41,7 @@ ArrayPredictionContext::ArrayPredictionContext(Ref<SingletonPredictionContext> c
 }
 
 ArrayPredictionContext::ArrayPredictionContext(std::vector<std::weak_ptr<PredictionContext>> parents_,
-                                               std::vector<int> const& returnStates)
+                                               std::vector<size_t> const& returnStates)
   : PredictionContext(calculateHashCode(parents_, returnStates)), parents(makeRef(parents_)), returnStates(returnStates) {
     assert(parents.size() > 0);
     assert(returnStates.size() > 0);
@@ -60,7 +60,7 @@ std::weak_ptr<PredictionContext> ArrayPredictionContext::getParent(size_t index)
   return parents[index];
 }
 
-int ArrayPredictionContext::getReturnState(size_t index) const {
+size_t ArrayPredictionContext::getReturnState(size_t index) const {
   return returnStates[index];
 }
 

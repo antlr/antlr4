@@ -85,16 +85,14 @@ namespace dfa {
     ///  <seealso cref="Token#EOF"/> maps to {@code edges[0]}.
     // ml: this is a sparse list, so we use a map instead of a vector.
     //     Watch out: we no longer have the -1 offset, as it isn't needed anymore.
-    std::unordered_map<ssize_t, DFAState *> edges;
+    std::unordered_map<size_t, DFAState *> edges;
 
     bool isAcceptState;
 
-    /// <summary>
     /// if accept state, what ttype do we match or alt do we predict?
-    ///  This is set to <seealso cref="ATN#INVALID_ALT_NUMBER"/> when <seealso cref="#predicates"/>{@code !=null} or
-    ///  <seealso cref="#requiresFullContext"/>.
-    /// </summary>
-    int prediction;
+    /// This is set to <seealso cref="ATN#INVALID_ALT_NUMBER"/> when <seealso cref="#predicates"/>{@code !=null} or
+    /// <seealso cref="#requiresFullContext"/>.
+    size_t prediction;
 
     Ref<atn::LexerActionExecutor> lexerActionExecutor;
 

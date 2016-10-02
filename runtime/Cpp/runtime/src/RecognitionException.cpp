@@ -53,11 +53,11 @@ RecognitionException::RecognitionException(const std::string &message, IRecogniz
   }
 }
 
-int RecognitionException::getOffendingState() const {
+size_t RecognitionException::getOffendingState() const {
   return _offendingState;
 }
 
-void RecognitionException::setOffendingState(int offendingState) {
+void RecognitionException::setOffendingState(size_t offendingState) {
   _offendingState = offendingState;
 }
 

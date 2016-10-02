@@ -37,7 +37,7 @@
 using namespace antlr4::tree;
 using namespace antlr4::tree::xpath;
 
-XPathRuleElement::XPathRuleElement(const std::string &ruleName, int ruleIndex) : XPathElement(ruleName) {
+XPathRuleElement::XPathRuleElement(const std::string &ruleName, size_t ruleIndex) : XPathElement(ruleName) {
   _ruleIndex = ruleIndex;
 }
 

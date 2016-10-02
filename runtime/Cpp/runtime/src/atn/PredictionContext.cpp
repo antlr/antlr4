@@ -46,7 +46,7 @@ using namespace antlr4::atn;
 
 using namespace antlrcpp;
 
-int PredictionContext::globalNodeCount = 0;
+size_t PredictionContext::globalNodeCount = 0;
 const Ref<PredictionContext> PredictionContext::EMPTY = std::make_shared<EmptyPredictionContext>();
 
 PredictionContext::PredictionContext(size_t cachedHashCode) : id(globalNodeCount++), cachedHashCode(cachedHashCode)  {
@@ -69,7 +69,7 @@ Ref<PredictionContext> PredictionContext::fromRuleContext(const ATN &atn, const 
   // If we have a parent, convert it to a PredictionContext graph
   Ref<PredictionContext> parent = PredictionContext::fromRuleContext(atn, std::dynamic_pointer_cast<RuleContext>(outerContext->parent.lock()));
 
-  ATNState *state = atn.states.at((size_t)outerContext->invokingState);
+  ATNState *state = atn.states.at(outerContext->invokingState);
   RuleTransition *transition = (RuleTransition *)state->transition(0);
   return SingletonPredictionContext::create(parent, transition->followState->stateNumber);
 }
@@ -96,16 +96,16 @@ size_t PredictionContext::calculateEmptyHashCode() {
   return hash;
 }
 
-size_t PredictionContext::calculateHashCode(std::weak_ptr<PredictionContext> parent, int returnState) {
+size_t PredictionContext::calculateHashCode(std::weak_ptr<PredictionContext> parent, size_t returnState) {
   size_t hash = MurmurHash::initialize(INITIAL_HASH);
   hash = MurmurHash::update(hash, parent.lock());
-  hash = MurmurHash::update(hash, (size_t)returnState);
+  hash = MurmurHash::update(hash, returnState);
   hash = MurmurHash::finish(hash, 2);
   return hash;
 }
 
 size_t PredictionContext::calculateHashCode(const std::vector<std::weak_ptr<PredictionContext>> &parents,
-                                            const std::vector<int> &returnStates) {
+                                            const std::vector<size_t> &returnStates) {
   size_t hash = MurmurHash::initialize(INITIAL_HASH);
 
   for (auto parent : parents) {
@@ -116,7 +116,7 @@ size_t PredictionContext::calculateHashCode(const std::vector<std::weak_ptr<Pred
   }
 
   for (auto returnState : returnStates) {
-    hash = MurmurHash::update(hash, (size_t)returnState);
+    hash = MurmurHash::update(hash, returnState);
   }
 
   return MurmurHash::finish(hash, parents.size() + returnStates.size());
@@ -216,7 +216,7 @@ Ref<PredictionContext> PredictionContext::mergeSingletons(const Ref<SingletonPre
       singleParent = a->parent;
     }
     if (!singleParent.expired()) { // parents are same, sort payloads and use same parent
-      std::vector<int> payloads = { a->returnState, b->returnState };
+      std::vector<size_t> payloads = { a->returnState, b->returnState };
       if (a->returnState > b->returnState) {
         payloads[0] = b->returnState;
         payloads[1] = a->returnState;
@@ -234,11 +234,11 @@ Ref<PredictionContext> PredictionContext::mergeSingletons(const Ref<SingletonPre
     // ax + by = [ax,by]
     Ref<PredictionContext> a_;
     if (a->returnState > b->returnState) { // sort by payload
-      std::vector<int> payloads = { b->returnState, a->returnState };
+      std::vector<size_t> payloads = { b->returnState, a->returnState };
       std::vector<std::weak_ptr<PredictionContext>> parents = { b->parent, a->parent };
       a_ = std::make_shared<ArrayPredictionContext>(parents, payloads);
     } else {
-      std::vector<int> payloads = {a->returnState, b->returnState};
+      std::vector<size_t> payloads = {a->returnState, b->returnState};
       std::vector<std::weak_ptr<PredictionContext>> parents = { a->parent, b->parent };
       a_ = std::make_shared<ArrayPredictionContext>(parents, payloads);
     }
@@ -264,13 +264,13 @@ Ref<PredictionContext> PredictionContext::mergeRoot(const Ref<SingletonPredictio
       return EMPTY;
     }
     if (a == EMPTY) { // $ + x = [$,x]
-      std::vector<int> payloads = { b->returnState, EMPTY_RETURN_STATE };
+      std::vector<size_t> payloads = { b->returnState, EMPTY_RETURN_STATE };
       std::vector<std::weak_ptr<PredictionContext>> parents = { b->parent, EMPTY };
       Ref<PredictionContext> joined = std::make_shared<ArrayPredictionContext>(parents, payloads);
       return joined;
     }
     if (b == EMPTY) { // x + $ = [$,x] ($ is always first if present)
-      std::vector<int> payloads = { a->returnState, EMPTY_RETURN_STATE };
+      std::vector<size_t> payloads = { a->returnState, EMPTY_RETURN_STATE };
       std::vector<std::weak_ptr<PredictionContext>> parents = { a->parent, EMPTY };
       Ref<PredictionContext> joined = std::make_shared<ArrayPredictionContext>(parents, payloads);
       return joined;
@@ -298,7 +298,7 @@ Ref<PredictionContext> PredictionContext::mergeArrays(const Ref<ArrayPredictionC
   size_t j = 0; // walks b
   size_t k = 0; // walks target M array
 
-  std::vector<int> mergedReturnStates(a->returnStates.size() + b->returnStates.size());
+  std::vector<size_t> mergedReturnStates(a->returnStates.size() + b->returnStates.size());
   std::vector<std::weak_ptr<PredictionContext>> mergedParents(a->returnStates.size() + b->returnStates.size());
 
   // walk and merge to yield mergedParents, mergedReturnStates
@@ -307,7 +307,7 @@ Ref<PredictionContext> PredictionContext::mergeArrays(const Ref<ArrayPredictionC
     Ref<PredictionContext> b_parent = b->parents[j];
     if (a->returnStates[i] == b->returnStates[j]) {
       // same payload (stack tops are equal), must yield merged singleton
-      int payload = a->returnStates[i];
+      size_t payload = a->returnStates[i];
       // $+$ = $
       bool both$ = payload == EMPTY_RETURN_STATE && a_parent && b_parent;
       bool ax_ax = (a_parent && b_parent) && a_parent == b_parent; // ax+ax -> ax
@@ -585,7 +585,7 @@ std::vector<std::string> PredictionContext::toStrings(Recognizer *recognizer, co
     size_t offset = 0;
     bool last = true;
     PredictionContext *p = this;
-    int stateNumber = currentState;
+    size_t stateNumber = currentState;
 
     std::stringstream ss;
     ss << "[";
@@ -615,8 +615,8 @@ std::vector<std::string> PredictionContext::toStrings(Recognizer *recognizer, co
         }
 
         const ATN &atn = recognizer->getATN();
-        ATNState *s = atn.states[(size_t)stateNumber];
-        std::string ruleName = recognizer->getRuleNames()[(size_t)s->ruleIndex];
+        ATNState *s = atn.states[stateNumber];
+        std::string ruleName = recognizer->getRuleNames()[s->ruleIndex];
         ss << ruleName;
       } else if (p->getReturnState(index) != EMPTY_RETURN_STATE) {
         if (!p->isEmpty()) {

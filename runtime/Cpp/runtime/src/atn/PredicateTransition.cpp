@@ -33,10 +33,10 @@
 
 using namespace antlr4::atn;
 
-PredicateTransition::PredicateTransition(ATNState *target, int ruleIndex, int predIndex, bool isCtxDependent) : AbstractPredicateTransition(target), ruleIndex(ruleIndex), predIndex(predIndex), isCtxDependent(isCtxDependent) {
+PredicateTransition::PredicateTransition(ATNState *target, size_t ruleIndex, size_t predIndex, bool isCtxDependent) : AbstractPredicateTransition(target), ruleIndex(ruleIndex), predIndex(predIndex), isCtxDependent(isCtxDependent) {
 }
 
-int PredicateTransition::getSerializationType() const {
+Transition::SerializationType PredicateTransition::getSerializationType() const {
   return PREDICATE;
 }
 
@@ -44,7 +44,7 @@ bool PredicateTransition::isEpsilon() const {
   return true;
 }
 
-bool PredicateTransition::matches(ssize_t /*symbol*/, ssize_t /*minVocabSymbol*/, ssize_t /*maxVocabSymbol*/) const {
+bool PredicateTransition::matches(size_t /*symbol*/, size_t /*minVocabSymbol*/, size_t /*maxVocabSymbol*/) const {
   return false;
 }
 

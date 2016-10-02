@@ -133,7 +133,7 @@ private:
   template<typename T>
   struct Derived : Base
   {
-    template<typename U> Derived(U&& value) : value(std::forward<U>(value)) {
+    template<typename U> Derived(U&& value_) : value(std::forward<U>(value_)) {
     }
 
     T value;

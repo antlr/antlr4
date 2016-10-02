@@ -70,7 +70,7 @@ std::string DFASerializer::getEdgeLabel(size_t i) const {
 }
 
 std::string DFASerializer::getStateString(DFAState *s) const {
-  size_t n = (size_t)s->stateNumber;
+  size_t n = s->stateNumber;
 
   const std::string baseStateStr = std::string(s->isAcceptState ? ":" : "") + "s" + std::to_string(n) +
     (s->requiresFullContext ? "^" : "");

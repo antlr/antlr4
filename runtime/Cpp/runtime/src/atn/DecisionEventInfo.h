@@ -57,7 +57,7 @@ namespace atn {
     /// The invoked decision number which this event is related to.
     /// </summary>
     /// <seealso cref= ATN#decisionToState </seealso>
-    const int decision;
+    const size_t decision;
 
     /// <summary>
     /// The configuration set containing additional information relevant to the
@@ -88,7 +88,7 @@ namespace atn {
     /// </summary>
     const bool fullCtx;
 
-    DecisionEventInfo(int decision, ATNConfigSet *configs, TokenStream *input, size_t startIndex,
+    DecisionEventInfo(size_t decision, ATNConfigSet *configs, TokenStream *input, size_t startIndex,
                       size_t stopIndex, bool fullCtx);
   };
 

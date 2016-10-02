@@ -85,7 +85,7 @@ namespace antlr4 {
       const antlrcpp::BitSet &conflictingAlts, atn::ATNConfigSet *configs) override;
 
     virtual void reportContextSensitivity(Parser *recognizer, const dfa::DFA &dfa, size_t startIndex, size_t stopIndex,
-      int prediction, atn::ATNConfigSet *configs) override;
+      size_t prediction, atn::ATNConfigSet *configs) override;
 
   protected:
     virtual std::string getDecisionDescription(Parser *recognizer, const dfa::DFA &dfa);

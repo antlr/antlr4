@@ -66,31 +66,25 @@ namespace misc {
 
     virtual ~IntervalSet() {}
 
-    /// <summary>
-    /// Create a set with a single element, el. </summary>
-    static IntervalSet of(int a);
+    /// Create a set with a single element, el.
+    static IntervalSet of(ssize_t a);
 
-    /// <summary>
-    /// Create a set with all ints within range [a..b] (inclusive) </summary>
-    static IntervalSet of(int a, int b, bool autoExtend = false);
+    /// Create a set with all ints within range [a..b] (inclusive)
+    static IntervalSet of(ssize_t a, ssize_t b, bool autoExtend = false);
 
     virtual void clear();
 
-    /// <summary>
     /// Add a single element to the set.  An isolated element is stored
-    ///  as a range el..el.
-    /// </summary>
-    virtual void add(int el);
+    /// as a range el..el.
+    virtual void add(ssize_t el);
 
-    /// <summary>
     /// Add interval; i.e., add all integers from a to b to set.
-    ///  If b<a, do nothing.
-    ///  Keep list in sorted order (by left range value).
-    ///  If overlap, combine ranges.  For example,
-    ///  If this is {1..5, 10..20}, adding 6..7 yields
-    ///  {1..5, 6..7, 10..20}.  Adding 4..8 yields {1..8, 10..20}.
-    /// </summary>
-    virtual void add(int a, int b, bool autoExtend = false);
+    /// If b<a, do nothing.
+    /// Keep list in sorted order (by left range value).
+    /// If overlap, combine ranges.  For example,
+    /// If this is {1..5, 10..20}, adding 6..7 yields
+    /// {1..5, 6..7, 10..20}.  Adding 4..8 yields {1..8, 10..20}.
+    virtual void add(ssize_t a, ssize_t b, bool autoExtend = false);
 
   public:
     /// combine all sets in the array returned the or'd value
@@ -100,7 +94,7 @@ namespace misc {
     virtual void add(const Interval &addition);
     virtual IntervalSet& addAll(const IntervalSet &set);
 
-    virtual IntervalSet complement(int minElement, int maxElement) const;
+    virtual IntervalSet complement(ssize_t minElement, ssize_t maxElement) const;
 
     /// Given the set of possible values (rather than, say UNICODE or MAXINT),
     /// return a new set containing all elements in vocabulary, but not in
@@ -124,24 +118,22 @@ namespace misc {
 
     virtual IntervalSet Or(const IntervalSet &a) const;
 
-    /// <summary>
     /// Return a new set with the intersection of this set with other.  Because
-    ///  the intervals are sorted, we can use an iterator for each list and
-    ///  just walk them together.  This is roughly O(min(n,m)) for interval
-    ///  list lengths n and m.
-    /// </summary>
+    /// the intervals are sorted, we can use an iterator for each list and
+    /// just walk them together.  This is roughly O(min(n,m)) for interval
+    /// list lengths n and m.
     virtual IntervalSet And(const IntervalSet &other) const;
 
-    /// <summary>
-    /// Is el in any range of this set? </summary>
-    virtual bool contains(int el) const;
+    /// Is el in any range of this set?
+    virtual bool contains(size_t el) const; // For mapping of e.g. Token::EOF to -1 etc.
+    virtual bool contains(ssize_t el) const;
 
     /// return true if this set has no members
     virtual bool isEmpty() const;
 
     /// <summary>
     /// If this set is a single integer, return it otherwise Token.INVALID_TYPE </summary>
-    virtual int getSingleElement() const;
+    virtual ssize_t getSingleElement() const;
 
     /**
      * Returns the maximum value contained in the set.
@@ -149,7 +141,7 @@ namespace misc {
      * @return the maximum value contained in the set. If the set is empty, this
      * method returns {@link Token#INVALID_TYPE}.
      */
-    virtual int getMaxElement() const;
+    virtual ssize_t getMaxElement() const;
 
     /**
      * Returns the minimum value contained in the set.
@@ -157,7 +149,7 @@ namespace misc {
      * @return the minimum value contained in the set. If the set is empty, this
      * method returns {@link Token#INVALID_TYPE}.
      */
-    virtual int getMinElement() const;
+    virtual ssize_t getMinElement() const;
 
     /// <summary>
     /// Return a list of Interval objects. </summary>
@@ -187,16 +179,15 @@ namespace misc {
 
   public:
     virtual size_t size() const;
-    virtual std::vector<int> toList() const;
-    virtual std::set<int> toSet() const;
+    virtual std::vector<ssize_t> toList() const;
+    virtual std::set<ssize_t> toSet() const;
 
-    /// <summary>
     /// Get the ith element of ordered set.  Used only by RandomPhrase so
-    ///  don't bother to implement if you're not doing that for a new
-    ///  ANTLR code gen target.
-    /// </summary>
-    virtual int get(int i) const;
-    virtual void remove(int el);
+    /// don't bother to implement if you're not doing that for a new
+    /// ANTLR code gen target.
+    virtual ssize_t get(size_t i) const;
+    virtual void remove(size_t el); // For mapping of e.g. Token::EOF to -1 etc.
+    virtual void remove(ssize_t el);
     virtual bool isReadOnly() const;
     virtual void setReadOnly(bool readonly);
 

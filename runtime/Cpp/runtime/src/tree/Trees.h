@@ -68,9 +68,9 @@ namespace tree {
      *  @since 4.5.1
      */
     static bool isAncestorOf(Ref<Tree> const& t, Ref<Tree> const& u);
-    static std::vector<Ref<ParseTree>> findAllTokenNodes(Ref<ParseTree> const& t, int ttype);
-    static std::vector<Ref<ParseTree>> findAllRuleNodes(Ref<ParseTree> const& t, int ruleIndex);
-    static std::vector<Ref<ParseTree>> findAllNodes(Ref<ParseTree> const& t, int index, bool findTokens);
+    static std::vector<Ref<ParseTree>> findAllTokenNodes(Ref<ParseTree> const& t, size_t ttype);
+    static std::vector<Ref<ParseTree>> findAllRuleNodes(Ref<ParseTree> const& t, size_t ruleIndex);
+    static std::vector<Ref<ParseTree>> findAllNodes(Ref<ParseTree> const& t, size_t index, bool findTokens);
 
     /** Get all descendents; includes t itself.
      *

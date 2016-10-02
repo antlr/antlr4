@@ -52,7 +52,7 @@ namespace antlr4 {
     /// instance itself.
     Token *_offendingToken;
 
-    int _offendingState;
+    size_t _offendingState;
 
   public:
     RecognitionException(IRecognizer *recognizer, IntStream *input, Ref<ParserRuleContext> const& ctx,
@@ -68,10 +68,10 @@ namespace antlr4 {
     /// edge we couldn't match.
     ///
     /// If the state number is not known, this method returns -1.
-    virtual int getOffendingState() const;
+    virtual size_t getOffendingState() const;
 
   protected:
-    void setOffendingState(int offendingState);
+    void setOffendingState(size_t offendingState);
 
     /// Gets the set of input symbols which could potentially follow the
     /// previously matched symbol at the time this exception was thrown.

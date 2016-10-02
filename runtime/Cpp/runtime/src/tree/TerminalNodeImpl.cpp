@@ -50,7 +50,7 @@ misc::Interval TerminalNodeImpl::getSourceInterval() {
     return misc::Interval::INVALID;
   }
 
-  int tokenIndex = symbol->getTokenIndex();
+  size_t tokenIndex = symbol->getTokenIndex();
   return misc::Interval(tokenIndex, tokenIndex);
 }
 

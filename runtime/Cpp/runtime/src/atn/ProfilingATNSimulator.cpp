@@ -53,16 +53,16 @@ ProfilingATNSimulator::ProfilingATNSimulator(Parser *parser)
   }
 }
 
-int ProfilingATNSimulator::adaptivePredict(TokenStream *input, int decision, Ref<ParserRuleContext> const& outerContext) {
+size_t ProfilingATNSimulator::adaptivePredict(TokenStream *input, size_t decision, Ref<ParserRuleContext> const& outerContext) {
   auto onExit = finally([this](){
-    _currentDecision = -1;
+    _currentDecision = 0; // Originally -1, but that makes no sense (index into a vector and init value is also 0).
   });
 
   _sllStopIndex = -1;
   _llStopIndex = -1;
   _currentDecision = decision;
   high_resolution_clock::time_point start = high_resolution_clock::now(); // expensive but useful info
-  int alt = ParserATNSimulator::adaptivePredict(input, decision, outerContext);
+  size_t alt = ParserATNSimulator::adaptivePredict(input, decision, outerContext);
   high_resolution_clock::time_point stop = high_resolution_clock::now();
   _decisions[decision].timeInPrediction += duration_cast<nanoseconds>(stop - start).count();
   _decisions[decision].invocations++;
@@ -88,7 +88,7 @@ int ProfilingATNSimulator::adaptivePredict(TokenStream *input, int decision, Ref
   return alt;
 }
 
-DFAState* ProfilingATNSimulator::getExistingTargetState(DFAState *previousD, ssize_t t) {
+DFAState* ProfilingATNSimulator::getExistingTargetState(DFAState *previousD, size_t t) {
   // this method is called after each time the input position advances
   // during SLL prediction
   _sllStopIndex = (int)_input->index();
@@ -107,13 +107,13 @@ DFAState* ProfilingATNSimulator::getExistingTargetState(DFAState *previousD, ssi
   return existingTargetState;
 }
 
-DFAState* ProfilingATNSimulator::computeTargetState(DFA &dfa, DFAState *previousD, ssize_t t) {
+DFAState* ProfilingATNSimulator::computeTargetState(DFA &dfa, DFAState *previousD, size_t t) {
   DFAState *state = ParserATNSimulator::computeTargetState(dfa, previousD, t);
   _currentState = state;
   return state;
 }
 
-std::unique_ptr<ATNConfigSet> ProfilingATNSimulator::computeReachSet(ATNConfigSet *closure, ssize_t t, bool fullCtx) {
+std::unique_ptr<ATNConfigSet> ProfilingATNSimulator::computeReachSet(ATNConfigSet *closure, size_t t, bool fullCtx) {
   if (fullCtx) {
     // this method is called after each time the input position advances
     // during full context prediction
@@ -162,7 +162,7 @@ void ProfilingATNSimulator::reportAttemptingFullContext(DFA &dfa, const BitSet &
   ParserATNSimulator::reportAttemptingFullContext(dfa, conflictingAlts, configs, startIndex, stopIndex);
 }
 
-void ProfilingATNSimulator::reportContextSensitivity(DFA &dfa, int prediction, ATNConfigSet *configs,
+void ProfilingATNSimulator::reportContextSensitivity(DFA &dfa, size_t prediction, ATNConfigSet *configs,
                                                      size_t startIndex, size_t stopIndex) {
   if (prediction != conflictingAltResolvedBySLL) {
     _decisions[_currentDecision].contextSensitivities.push_back(
@@ -174,7 +174,7 @@ void ProfilingATNSimulator::reportContextSensitivity(DFA &dfa, int prediction, A
 
 void ProfilingATNSimulator::reportAmbiguity(DFA &dfa, DFAState *D, size_t startIndex, size_t stopIndex, bool exact,
                                             const BitSet &ambigAlts, ATNConfigSet *configs) {
-  int prediction;
+  size_t prediction;
   if (ambigAlts.count() > 0) {
     prediction = ambigAlts.nextSetBit(0);
   } else {

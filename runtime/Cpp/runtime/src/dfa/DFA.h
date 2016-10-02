@@ -45,10 +45,10 @@ namespace dfa {
     atn::DecisionState *const atnStartState;
     std::unordered_set<DFAState *, DFAState::Hasher, DFAState::Comparer> states; // States are owned by this class.
     DFAState *s0;
-    const int decision;
+    const size_t decision;
 
     DFA(atn::DecisionState *atnStartState);
-    DFA(atn::DecisionState *atnStartState, int decision);
+    DFA(atn::DecisionState *atnStartState, size_t decision);
     DFA(const DFA &other);
     DFA(DFA &&other);
     virtual ~DFA();

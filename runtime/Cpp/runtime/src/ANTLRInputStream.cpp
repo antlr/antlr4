@@ -92,7 +92,7 @@ void ANTLRInputStream::consume() {
   }
 }
 
-ssize_t ANTLRInputStream::LA(ssize_t i) {
+size_t ANTLRInputStream::LA(ssize_t i) {
   if (i == 0) {
     return 0; // undefined
   }
@@ -112,7 +112,7 @@ ssize_t ANTLRInputStream::LA(ssize_t i) {
   return _data[(size_t)(position + i - 1)];
 }
 
-ssize_t ANTLRInputStream::LT(ssize_t i) {
+size_t ANTLRInputStream::LT(ssize_t i) {
   return LA(i);
 }
 
@@ -149,8 +149,8 @@ std::string ANTLRInputStream::getText(const Interval &interval) {
     return "";
   }
 
-  size_t start = (size_t)interval.a;
-  size_t stop = (size_t)interval.b;
+  size_t start = interval.a;
+  size_t stop = interval.b;
 
 
   if (stop >= _data.size()) {

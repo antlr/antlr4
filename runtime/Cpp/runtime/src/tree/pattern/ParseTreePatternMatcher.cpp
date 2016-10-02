@@ -268,11 +268,11 @@ std::vector<std::unique_ptr<Token>> ParseTreePatternMatcher::tokenize(const std:
         }
         tokens.emplace_back(new TokenTagToken(tagChunk.getTag(), (int)ttype, tagChunk.getLabel()));
       } else if (islower(tagChunk.getTag()[0])) {
-        ssize_t ruleIndex = _parser->getRuleIndex(tagChunk.getTag());
-        if (ruleIndex == -1) {
+        size_t ruleIndex = _parser->getRuleIndex(tagChunk.getTag());
+        if (ruleIndex == INVALID_INDEX) {
           throw IllegalArgumentException("Unknown rule " + tagChunk.getTag() + " in pattern: " + pattern);
         }
-        int ruleImaginaryTokenType = _parser->getATNWithBypassAlts().ruleToTokenType[(size_t)ruleIndex];
+        size_t ruleImaginaryTokenType = _parser->getATNWithBypassAlts().ruleToTokenType[ruleIndex];
         tokens.emplace_back(new RuleTagToken(tagChunk.getTag(), ruleImaginaryTokenType, tagChunk.getLabel()));
       } else {
         throw IllegalArgumentException("invalid tag: " + tagChunk.getTag() + " in pattern: " + pattern);

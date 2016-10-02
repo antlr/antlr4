@@ -85,7 +85,7 @@ Token* UnbufferedTokenStream::LT(ssize_t i)
   return _tokens[(size_t)index].get();
 }
 
-ssize_t UnbufferedTokenStream::LA(ssize_t i)
+size_t UnbufferedTokenStream::LA(ssize_t i)
 {
   return LT(i)->getType();
 }
@@ -262,8 +262,8 @@ std::string UnbufferedTokenStream::getText(const misc::Interval &interval)
   size_t bufferStartIndex = getBufferStartIndex();
   size_t bufferStopIndex = bufferStartIndex + _tokens.size() - 1;
 
-  size_t start = (size_t)interval.a;
-  size_t stop = (size_t)interval.b;
+  size_t start = interval.a;
+  size_t stop = interval.b;
   if (start < bufferStartIndex || stop > bufferStopIndex) {
     throw UnsupportedOperationException(std::string("interval ") + interval.toString() +
       " not in token buffer window: " + std::to_string(bufferStartIndex) + ".." + std::to_string(bufferStopIndex));

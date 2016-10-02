@@ -73,8 +73,8 @@ namespace antlr4 {
     /// stream. The first character on a line has position 0.
     /// </summary>
     /// <returns> The line number for the current position in the input stream, or
-    /// -1 if the current token source does not track character positions. </returns>
-    virtual int getCharPositionInLine() = 0;
+    /// (sze_t)-1 if the current token source does not track character positions. </returns>
+    virtual size_t getCharPositionInLine() = 0;
 
     /// <summary>
     /// Get the <seealso cref="CharStream"/> from which this token source is currently

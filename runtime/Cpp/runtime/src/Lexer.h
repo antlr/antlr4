@@ -44,12 +44,12 @@ namespace antlr4 {
   /// of speed.
   class ANTLR4CPP_PUBLIC Lexer : public Recognizer, public TokenSource {
   public:
-    static const int DEFAULT_MODE = 0;
-    static const int MORE = -2;
-    static const int SKIP = -3;
+    static const size_t DEFAULT_MODE = 0;
+    static const size_t MORE = (size_t)-2;
+    static const size_t SKIP = (size_t)-3;
 
     static const size_t DEFAULT_TOKEN_CHANNEL = Token::DEFAULT_CHANNEL;
-    static const int HIDDEN = Token::HIDDEN_CHANNEL;
+    static const size_t HIDDEN = Token::HIDDEN_CHANNEL;
     static const size_t MIN_CHAR_VALUE = 0;
     static const size_t MAX_CHAR_VALUE = 0x10FFFF;
 
@@ -78,29 +78,24 @@ namespace antlr4 {
     ///  Needed, for example, to get the text for current token.  Set at
     ///  the start of nextToken.
     /// </summary>
-    int tokenStartCharIndex;
+    size_t tokenStartCharIndex;
 
     /// <summary>
     /// The line on which the first character of the token resides </summary>
     size_t tokenStartLine;
 
-    /// <summary>
-    /// The character position of first character within the line </summary>
-    int tokenStartCharPositionInLine;
+    /// The character position of first character within the line.
+    size_t tokenStartCharPositionInLine;
 
-    /// <summary>
     /// Once we see EOF on char stream, next token will be EOF.
-    ///  If you have DONE : EOF ; then you see DONE EOF.
-    /// </summary>
+    /// If you have DONE : EOF ; then you see DONE EOF.
     bool hitEOF;
 
-    /// <summary>
-    /// The channel number for the current token </summary>
-    int channel;
+    /// The channel number for the current token.
+    size_t channel;
 
-    /// <summary>
-    /// The token type for the current token </summary>
-    ssize_t type;
+    /// The token type for the current token.
+    size_t type;
 
     // Use the vector as a stack.
     std::vector<size_t> modeStack;
@@ -156,14 +151,14 @@ namespace antlr4 {
 
     virtual size_t getLine() const override;
 
-    virtual int getCharPositionInLine() override;
+    virtual size_t getCharPositionInLine() override;
 
     virtual void setLine(size_t line);
 
-    virtual void setCharPositionInLine(int charPositionInLine);
+    virtual void setCharPositionInLine(size_t charPositionInLine);
 
     /// What is the index of the current character of lookahead?
-    virtual int getCharIndex();
+    virtual size_t getCharIndex();
 
     /// Return the text matched so far for the current token or any
     /// text override.
@@ -178,13 +173,13 @@ namespace antlr4 {
 
     virtual void setToken(std::unique_ptr<Token> newToken);
 
-    virtual void setType(ssize_t ttype);
+    virtual void setType(size_t ttype);
 
-    virtual ssize_t getType();
+    virtual size_t getType();
 
-    virtual void setChannel(int newChannel);
+    virtual void setChannel(size_t newChannel);
 
-    virtual int getChannel();
+    virtual size_t getChannel();
 
     virtual const std::vector<std::string>& getModeNames() const = 0;
 

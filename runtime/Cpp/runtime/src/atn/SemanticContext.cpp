@@ -41,10 +41,10 @@ using namespace antlrcpp;
 
 //------------------ Predicate -----------------------------------------------------------------------------------------
 
-SemanticContext::Predicate::Predicate() : Predicate(-1, -1, false) {
+SemanticContext::Predicate::Predicate() : Predicate(INVALID_INDEX, INVALID_INDEX, false) {
 }
 
-SemanticContext::Predicate::Predicate(int ruleIndex, int predIndex, bool isCtxDependent)
+SemanticContext::Predicate::Predicate(size_t ruleIndex, size_t predIndex, bool isCtxDependent)
 : ruleIndex(ruleIndex), predIndex(predIndex), isCtxDependent(isCtxDependent) {
 }
 
@@ -58,8 +58,8 @@ bool SemanticContext::Predicate::eval(Recognizer *parser, Ref<RuleContext> const
 
 size_t SemanticContext::Predicate::hashCode() const {
   size_t hashCode = misc::MurmurHash::initialize();
-  hashCode = misc::MurmurHash::update(hashCode, (size_t)ruleIndex);
-  hashCode = misc::MurmurHash::update(hashCode, (size_t)predIndex);
+  hashCode = misc::MurmurHash::update(hashCode, ruleIndex);
+  hashCode = misc::MurmurHash::update(hashCode, predIndex);
   hashCode = misc::MurmurHash::update(hashCode, isCtxDependent ? 1 : 0);
   hashCode = misc::MurmurHash::finish(hashCode, 3);
   return hashCode;
@@ -335,7 +335,7 @@ std::string SemanticContext::OR::toString() const {
 
 //------------------ SemanticContext -----------------------------------------------------------------------------------
 
-const Ref<SemanticContext> SemanticContext::NONE = std::make_shared<Predicate>(-1, -1, false);
+const Ref<SemanticContext> SemanticContext::NONE = std::make_shared<Predicate>(INVALID_INDEX, INVALID_INDEX, false);
 
 bool SemanticContext::operator != (const SemanticContext &other) const {
   return !(*this == other);

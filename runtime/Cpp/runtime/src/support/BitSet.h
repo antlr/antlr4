@@ -36,14 +36,14 @@ namespace antlrcpp {
 
   class ANTLR4CPP_PUBLIC BitSet : public std::bitset<1024> {
   public:
-    int nextSetBit(size_t pos) const {
+    size_t nextSetBit(size_t pos) const {
       for (size_t i = pos; i < size(); i++){
         if (test(i)) {
-          return (int)i;
+          return i;
         }
       }
 
-      return -1;
+      return INVALID_INDEX;
     }
 
     // Prints a list of every index for which the bitset contains a bit in true.

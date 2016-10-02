@@ -77,7 +77,7 @@ ATNConfig::~ATNConfig() {
 
 size_t ATNConfig::hashCode() const {
   size_t hashCode = misc::MurmurHash::initialize(7);
-  hashCode = misc::MurmurHash::update(hashCode, (size_t)state->stateNumber);
+  hashCode = misc::MurmurHash::update(hashCode, state->stateNumber);
   hashCode = misc::MurmurHash::update(hashCode, (size_t)alt);
   hashCode = misc::MurmurHash::update(hashCode, context);
   hashCode = misc::MurmurHash::update(hashCode, semanticContext);

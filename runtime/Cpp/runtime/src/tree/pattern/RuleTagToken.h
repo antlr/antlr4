@@ -48,16 +48,15 @@ namespace pattern {
     /// </summary>
   private:
     const std::string ruleName;
-    /// <summary>
+
     /// The token type for the current token. This is the token type assigned to
     /// the bypass alternative for the rule during ATN deserialization.
-    /// </summary>
-    const int bypassTokenType;
-    /// <summary>
+    const size_t bypassTokenType;
+
     /// This is the backing field for <seealso cref="#getLabe"/>.
-    /// </summary>
     const std::string label;
 
+  public:
     /// <summary>
     /// Constructs a new instance of <seealso cref="RuleTagToken"/> with the specified rule
     /// name and bypass token type and no label.
@@ -67,8 +66,6 @@ namespace pattern {
     /// </param>
     /// <exception cref="IllegalArgumentException"> if {@code ruleName} is {@code null}
     /// or empty. </exception>
-  public:
-
     RuleTagToken(const std::string &ruleName, int bypassTokenType); //this(ruleName, bypassTokenType, nullptr);
 
     /// <summary>
@@ -82,7 +79,7 @@ namespace pattern {
     /// </param>
     /// <exception cref="IllegalArgumentException"> if {@code ruleName} is {@code null}
     /// or empty. </exception>
-    RuleTagToken(const std::string &ruleName, int bypassTokenType, const std::string &label);
+    RuleTagToken(const std::string &ruleName, size_t bypassTokenType, const std::string &label);
 
     /// <summary>
     /// Gets the name of the rule associated with this rule tag.
@@ -112,69 +109,32 @@ namespace pattern {
     /// </summary>
     virtual std::string getText() const override;
 
-    /// <summary>
-    /// {@inheritDoc}
-    /// <p/>
     /// Rule tag tokens have types assigned according to the rule bypass
     /// transitions created during ATN deserialization.
-    /// </summary>
-    virtual int getType() const override;
+    virtual size_t getType() const override;
 
-    /// <summary>
-    /// {@inheritDoc}
-    /// <p/>
     /// The implementation for <seealso cref="RuleTagToken"/> always returns 0.
-    /// </summary>
-    virtual int getLine() const override;
+    virtual size_t getLine() const override;
 
-    /// <summary>
-    /// {@inheritDoc}
-    /// <p/>
-    /// The implementation for <seealso cref="RuleTagToken"/> always returns -1.
-    /// </summary>
-    virtual int getCharPositionInLine() const override;
+    /// The implementation for <seealso cref="RuleTagToken"/> always returns INVALID_INDEX.
+    virtual size_t getCharPositionInLine() const override;
 
-    /// <summary>
-    /// {@inheritDoc}
-    /// <p/>
-    /// The implementation for <seealso cref="RuleTagToken"/> always returns -1.
-    /// </summary>
-    virtual int getTokenIndex() const override;
+    /// The implementation for <seealso cref="RuleTagToken"/> always returns INVALID_INDEX.
+    virtual size_t getTokenIndex() const override;
 
-    /// <summary>
-    /// {@inheritDoc}
-    /// <p/>
-    /// The implementation for <seealso cref="RuleTagToken"/> always returns -1.
-    /// </summary>
-    virtual int getStartIndex() const override;
+    /// The implementation for <seealso cref="RuleTagToken"/> always returns INVALID_INDEX.
+    virtual size_t getStartIndex() const override;
 
-    /// <summary>
-    /// {@inheritDoc}
-    /// <p/>
-    /// The implementation for <seealso cref="RuleTagToken"/> always returns -1.
-    /// </summary>
-    virtual int getStopIndex() const override;
+    /// The implementation for <seealso cref="RuleTagToken"/> always returns INVALID_INDEX.
+    virtual size_t getStopIndex() const override;
 
-    /// <summary>
-    /// {@inheritDoc}
-    /// <p/>
     /// The implementation for <seealso cref="RuleTagToken"/> always returns {@code null}.
-    /// </summary>
     virtual TokenSource *getTokenSource() const override;
 
-    /// <summary>
-    /// {@inheritDoc}
-    /// <p/>
     /// The implementation for <seealso cref="RuleTagToken"/> always returns {@code null}.
-    /// </summary>
     virtual CharStream *getInputStream() const override;
 
-    /// <summary>
-    /// {@inheritDoc}
-    /// <p/>
-    /// The implementation for <seealso cref="RuleTagToken"/> returns a string of the form
-    /// {@code ruleName:bypassTokenType}.
-    /// </summary>
+    /// The implementation for <seealso cref="RuleTagToken"/> returns a string of the form {@code ruleName:bypassTokenType}.
     virtual std::string toString() const override;
   };
 

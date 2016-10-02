@@ -39,11 +39,11 @@ using namespace antlr4::atn;
 NotSetTransition::NotSetTransition(ATNState *target, const misc::IntervalSet &set) : SetTransition(target, set) {
 }
 
-int NotSetTransition::getSerializationType() const {
+Transition::SerializationType NotSetTransition::getSerializationType() const {
   return NOT_SET;
 }
 
-bool NotSetTransition::matches(ssize_t symbol, ssize_t minVocabSymbol, ssize_t maxVocabSymbol) const {
+bool NotSetTransition::matches(size_t symbol, size_t minVocabSymbol, size_t maxVocabSymbol) const {
   return symbol >= minVocabSymbol && symbol <= maxVocabSymbol
     && !SetTransition::matches(symbol, minVocabSymbol, maxVocabSymbol);
 }

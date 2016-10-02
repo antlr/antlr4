@@ -37,10 +37,10 @@
 using namespace antlr4::misc;
 using namespace antlr4::atn;
 
-AtomTransition::AtomTransition(ATNState *target, ssize_t label) : Transition(target), _label(label) {
+AtomTransition::AtomTransition(ATNState *target, size_t label) : Transition(target), _label(label) {
 }
 
-int AtomTransition::getSerializationType() const {
+Transition::SerializationType AtomTransition::getSerializationType() const {
   return ATOM;
 }
 
@@ -48,7 +48,7 @@ IntervalSet AtomTransition::label() const {
   return IntervalSet::of((int)_label);
 }
 
-bool AtomTransition::matches(ssize_t symbol, ssize_t /*minVocabSymbol*/, ssize_t /*maxVocabSymbol*/) const {
+bool AtomTransition::matches(size_t symbol, size_t /*minVocabSymbol*/, size_t /*maxVocabSymbol*/) const {
   return _label == symbol;
 }
 

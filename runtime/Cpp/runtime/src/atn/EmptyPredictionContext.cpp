@@ -48,7 +48,7 @@ std::weak_ptr<PredictionContext> EmptyPredictionContext::getParent(size_t /*inde
   return std::weak_ptr<PredictionContext>();
 }
 
-int EmptyPredictionContext::getReturnState(size_t /*index*/) const {
+size_t EmptyPredictionContext::getReturnState(size_t /*index*/) const {
   return returnState;
 }
 

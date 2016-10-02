@@ -44,9 +44,9 @@ namespace antlr4 {
 
     /// During lookahead operations, this "token" signifies we hit rule end ATN state
     /// and did not follow it despite needing to.
-    static const ssize_t EPSILON = -2;
+    static const size_t EPSILON = (size_t)-2;
     static const size_t MIN_USER_TOKEN_TYPE = 1;
-    static const ssize_t EOF = IntStream::EOF;
+    static const size_t EOF = IntStream::EOF;
 
     virtual ~Token() {};
 
@@ -72,64 +72,44 @@ namespace antlr4 {
      */
     static const size_t MIN_USER_CHANNEL_VALUE = 2;
     
-    /// <summary>
     /// Get the text of the token.
-    /// </summary>
     virtual std::string getText() const = 0;
 
-    /// <summary>
-    /// Get the token type of the token </summary>
-    virtual int getType() const = 0;
+    /// Get the token type of the token
+    virtual size_t getType() const = 0;
 
-    /// <summary>
-    /// The line number on which the 1st character of this token was matched,
-    ///  line=1..n
-    /// </summary>
-    virtual int getLine() const = 0;
+    /// The line number on which the 1st character of this token was matched,  line=1..n
+    virtual size_t getLine() const = 0;
 
-    /// <summary>
     /// The index of the first character of this token relative to the
-    ///  beginning of the line at which it occurs, 0..n-1
-    /// </summary>
-    virtual int getCharPositionInLine() const = 0;
+    /// beginning of the line at which it occurs, 0..n-1
+    virtual size_t getCharPositionInLine() const = 0;
 
-    /// <summary>
     /// Return the channel this token. Each token can arrive at the parser
-    ///  on a different channel, but the parser only "tunes" to a single channel.
-    ///  The parser ignores everything not on DEFAULT_CHANNEL.
-    /// </summary>
+    /// on a different channel, but the parser only "tunes" to a single channel.
+    /// The parser ignores everything not on DEFAULT_CHANNEL.
     virtual size_t getChannel() const = 0;
 
-    /// <summary>
     /// An index from 0..n-1 of the token object in the input stream.
-    ///  This must be valid in order to print token streams and
-    ///  use TokenRewriteStream.
+    /// This must be valid in order to print token streams and
+    /// use TokenRewriteStream.
     ///
-    ///  Return -1 to indicate that this token was conjured up since
-    ///  it doesn't have a valid index.
-    /// </summary>
-    virtual int getTokenIndex() const = 0;
+    /// Return INVALID_INDEX to indicate that this token was conjured up since
+    /// it doesn't have a valid index.
+    virtual size_t getTokenIndex() const = 0;
 
-    /// <summary>
     /// The starting character index of the token
-    ///  This method is optional; return -1 if not implemented.
-    /// </summary>
-    virtual int getStartIndex() const = 0;
+    /// This method is optional; return INVALID_INDEX if not implemented.
+    virtual size_t getStartIndex() const = 0;
 
-    /// <summary>
     /// The last character index of the token.
-    ///  This method is optional; return -1 if not implemented.
-    /// </summary>
-    virtual int getStopIndex() const = 0;
+    /// This method is optional; return INVALID_INDEX if not implemented.
+    virtual size_t getStopIndex() const = 0;
 
-    /// <summary>
     /// Gets the <seealso cref="TokenSource"/> which created this token.
-    /// </summary>
     virtual TokenSource *getTokenSource() const = 0;
 
-    /// <summary>
     /// Gets the <seealso cref="CharStream"/> from which this token was derived.
-    /// </summary>
     virtual CharStream *getInputStream() const = 0;
 
     virtual std::string toString() const = 0;

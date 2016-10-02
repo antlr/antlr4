@@ -50,6 +50,8 @@ namespace dfa {
     /// except <seealso cref="Token#EOF"/>.</para>
     static const Vocabulary EMPTY_VOCABULARY;
 
+    Vocabulary() {};
+    
     /// <summary>
     /// Constructs a new instance of <seealso cref="Vocabulary"/> from the specified
     /// literal and symbolic token names.
@@ -101,7 +103,7 @@ namespace dfa {
     /// Returns the highest token type value. It can be used to iterate from
     /// zero to that number, inclusively, thus querying all stored entries. </summary>
     /// <returns> the highest token type value </returns>
-    virtual int getMaxTokenType() const;
+    virtual size_t getMaxTokenType() const;
 
     /// <summary>
     /// Gets the string literal associated with a token type. The string returned
@@ -138,7 +140,7 @@ namespace dfa {
     /// </param>
     /// <returns> The string literal associated with the specified token type, or
     /// {@code null} if no string literal is associated with the type. </returns>
-    virtual std::string getLiteralName(ssize_t tokenType) const;
+    virtual std::string getLiteralName(size_t tokenType) const;
 
     /// <summary>
     /// Gets the symbolic name associated with a token type. The string returned
@@ -182,7 +184,7 @@ namespace dfa {
     /// </param>
     /// <returns> The symbolic name associated with the specified token type, or
     /// {@code null} if no symbolic name is associated with the type. </returns>
-    virtual std::string getSymbolicName(ssize_t tokenType) const;
+    virtual std::string getSymbolicName(size_t tokenType) const;
 
     /// <summary>
     /// Gets the display name of a token type.
@@ -203,15 +205,13 @@ namespace dfa {
     /// </param>
     /// <returns> The display name of the token type, for use in error reporting or
     /// other user-visible messages which reference specific token types. </returns>
-    virtual std::string getDisplayName(ssize_t tokenType) const;
+    virtual std::string getDisplayName(size_t tokenType) const;
 
   private:
-    static std::vector<std::string> const EMPTY_NAMES;
-
     std::vector<std::string> const _literalNames;
     std::vector<std::string> const _symbolicNames;
     std::vector<std::string> const _displayNames;
-    const int _maxTokenType;
+    const size_t _maxTokenType = 0;
   };
   
 } // namespace atn

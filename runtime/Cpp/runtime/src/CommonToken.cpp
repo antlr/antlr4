@@ -38,16 +38,18 @@
 #include "CommonToken.h"
 
 using namespace antlr4;
+using namespace antlr4::misc;
+
 using namespace antlrcpp;
 
 const std::pair<TokenSource*, CharStream*> CommonToken::EMPTY_SOURCE;
 
-CommonToken::CommonToken(int type) {
+CommonToken::CommonToken(size_t type) {
   InitializeInstanceFields();
   _type = type;
 }
 
-CommonToken::CommonToken(std::pair<TokenSource*, CharStream*> source, int type, int channel, int start, int stop) {
+CommonToken::CommonToken(std::pair<TokenSource*, CharStream*> source, size_t type, size_t channel, size_t start, size_t stop) {
   InitializeInstanceFields();
   _source = source;
   _type = type;
@@ -60,7 +62,7 @@ CommonToken::CommonToken(std::pair<TokenSource*, CharStream*> source, int type, 
   }
 }
 
-CommonToken::CommonToken(int type, const std::string &text) {
+CommonToken::CommonToken(size_t type, const std::string &text) {
   InitializeInstanceFields();
   _type = type;
   _channel = DEFAULT_CHANNEL;
@@ -87,11 +89,11 @@ CommonToken::CommonToken(Token *oldToken) {
   }
 }
 
-int CommonToken::getType() const {
+size_t CommonToken::getType() const {
   return _type;
 }
 
-void CommonToken::setLine(int line) {
+void CommonToken::setLine(size_t line) {
   _line = line;
 }
 
@@ -105,7 +107,7 @@ std::string CommonToken::getText() const {
     return "";
   }
   size_t n = input->size();
-  if ((size_t)_start < n && (size_t)_stop < n) {
+  if (_start < n && _stop < n) {
     return input->getText(misc::Interval(_start, _stop));
   } else {
     return "<EOF>";
@@ -116,15 +118,15 @@ void CommonToken::setText(const std::string &text) {
   _text = text;
 }
 
-int CommonToken::getLine() const {
+size_t CommonToken::getLine() const {
   return _line;
 }
 
-int CommonToken::getCharPositionInLine() const {
+size_t CommonToken::getCharPositionInLine() const {
   return _charPositionInLine;
 }
 
-void CommonToken::setCharPositionInLine(int charPositionInLine) {
+void CommonToken::setCharPositionInLine(size_t charPositionInLine) {
   _charPositionInLine = charPositionInLine;
 }
 
@@ -132,35 +134,35 @@ size_t CommonToken::getChannel() const {
   return _channel;
 }
 
-void CommonToken::setChannel(int channel) {
+void CommonToken::setChannel(size_t channel) {
   _channel = channel;
 }
 
-void CommonToken::setType(int type) {
+void CommonToken::setType(size_t type) {
   _type = type;
 }
 
-int CommonToken::getStartIndex() const {
+size_t CommonToken::getStartIndex() const {
   return _start;
 }
 
-void CommonToken::setStartIndex(int start) {
+void CommonToken::setStartIndex(size_t start) {
   _start = start;
 }
 
-int CommonToken::getStopIndex() const {
+size_t CommonToken::getStopIndex() const {
   return _stop;
 }
 
-void CommonToken::setStopIndex(int stop) {
+void CommonToken::setStopIndex(size_t stop) {
   _stop = stop;
 }
 
-int CommonToken::getTokenIndex() const {
+size_t CommonToken::getTokenIndex() const {
   return _index;
 }
 
-void CommonToken::setTokenIndex(int index) {
+void CommonToken::setTokenIndex(size_t index) {
   _index = index;
 }
 
@@ -188,8 +190,9 @@ std::string CommonToken::toString() const {
     txt = "<no text>";
   }
 
-  ss << "[@" << getTokenIndex() << "," << _start << ":" << _stop << "='" << txt << "',<" << _type << ">" << channelStr
-    << "," << _line << ":" << getCharPositionInLine() << "]";
+  ss << "[@" << symbolToNumeric(getTokenIndex()) << "," << symbolToNumeric(_start) << ":" << symbolToNumeric(_stop)
+    << "='" << txt << "',<" << symbolToNumeric(_type) << ">" << channelStr << "," << _line << ":"
+    << getCharPositionInLine() << "]";
 
   return ss.str();
 }
@@ -197,9 +200,9 @@ std::string CommonToken::toString() const {
 void CommonToken::InitializeInstanceFields() {
   _type = 0;
   _line = 0;
-  _charPositionInLine = -1;
+  _charPositionInLine = INVALID_INDEX;
   _channel = DEFAULT_CHANNEL;
-  _index = -1;
+  _index = INVALID_INDEX;
   _start = 0;
   _stop = 0;
   _source = EMPTY_SOURCE;

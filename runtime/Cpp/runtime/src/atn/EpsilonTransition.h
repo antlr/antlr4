@@ -39,7 +39,7 @@ namespace atn {
   class ANTLR4CPP_PUBLIC EpsilonTransition final : public Transition {
   public:
     EpsilonTransition(ATNState *target);
-    EpsilonTransition(ATNState *target, int outermostPrecedenceReturn);
+    EpsilonTransition(ATNState *target, size_t outermostPrecedenceReturn);
 
     /**
      * @return the rule index of a precedence rule for which this transition is
@@ -49,16 +49,16 @@ namespace atn {
      * @see ParserATNSimulator#applyPrecedenceFilter(ATNConfigSet)
      * @since 4.4.1
      */
-    int outermostPrecedenceReturn();
-    virtual int getSerializationType() const override;
+    size_t outermostPrecedenceReturn();
+    virtual SerializationType getSerializationType() const override;
 
     virtual bool isEpsilon() const override;
-    virtual bool matches(ssize_t symbol, ssize_t minVocabSymbol, ssize_t maxVocabSymbol) const override;
+    virtual bool matches(size_t symbol, size_t minVocabSymbol, size_t maxVocabSymbol) const override;
 
     virtual std::string toString() const override;
 
   private:
-    const int _outermostPrecedenceReturn;
+    const size_t _outermostPrecedenceReturn; // A rule index.
   };
 
 } // namespace atn

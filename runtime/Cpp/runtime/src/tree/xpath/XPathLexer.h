@@ -29,7 +29,7 @@ public:
   virtual const std::vector<uint16_t> getSerializedATN() const override;
   virtual const atn::ATN& getATN() const override;
 
-  virtual void action(Ref<RuleContext> const& context, int ruleIndex, int actionIndex) override;
+  virtual void action(Ref<RuleContext> const& context, size_t ruleIndex, size_t actionIndex) override;
 
 private:
   static std::vector<dfa::DFA> _decisionToDFA;
@@ -46,7 +46,7 @@ private:
 
 
   // Individual action functions triggered by action() above.
-  void IDAction(Ref<RuleContext> const& context, int actionIndex);
+  void IDAction(Ref<RuleContext> const& context, size_t actionIndex);
 
   // Individual semantic predicate functions triggered by sempred() above.
 

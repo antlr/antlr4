@@ -75,9 +75,9 @@ namespace antlr4 {
     virtual std::string getGrammarFileName() const override;
 
     /// Begin parsing at startRuleIndex
-    virtual Ref<ParserRuleContext> parse(int startRuleIndex);
+    virtual Ref<ParserRuleContext> parse(size_t startRuleIndex);
 
-    virtual void enterRecursionRule(Ref<ParserRuleContext> const& localctx, int state, int ruleIndex, int precedence) override;
+    virtual void enterRecursionRule(Ref<ParserRuleContext> const& localctx, size_t state, size_t ruleIndex, int precedence) override;
 
 
     /** Override this parser interpreters normal decision-making process
@@ -181,13 +181,13 @@ namespace antlr4 {
      *  a decision state (instance of DecisionState). It gives an opportunity
      *  for subclasses to track interesting things.
      */
-    int visitDecisionState(atn::DecisionState *p);
+    size_t visitDecisionState(atn::DecisionState *p);
 
     /** Provide simple "factory" for InterpreterRuleContext's.
      *  @since 4.5.1
      */
-    Ref<InterpreterRuleContext> createInterpreterRuleContext(std::weak_ptr<ParserRuleContext> parent, int invokingStateNumber,
-                                                             int ruleIndex);
+    Ref<InterpreterRuleContext> createInterpreterRuleContext(std::weak_ptr<ParserRuleContext> parent,
+      size_t invokingStateNumber, size_t ruleIndex);
 
     virtual void visitRuleStopState(atn::ATNState *p);
 

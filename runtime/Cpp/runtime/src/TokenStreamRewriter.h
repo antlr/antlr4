@@ -112,22 +112,22 @@ namespace antlr4 {
   class ANTLR4CPP_PUBLIC TokenStreamRewriter {
   public:
     static const std::string DEFAULT_PROGRAM_NAME;
-    static const int PROGRAM_INIT_SIZE = 100;
-    static const int MIN_TOKEN_INDEX = 0;
+    static const size_t PROGRAM_INIT_SIZE = 100;
+    static const size_t MIN_TOKEN_INDEX = 0;
 
     TokenStreamRewriter(TokenStream *tokens);
     virtual ~TokenStreamRewriter();
 
     TokenStream *getTokenStream();
 
-    virtual void rollback(int instructionIndex);
+    virtual void rollback(size_t instructionIndex);
 
     /// <summary>
     /// Rollback the instruction stream for a program so that
     ///  the indicated instruction (via instructionIndex) is no
     ///  longer in the stream.  UNTESTED!
     /// </summary>
-    virtual void rollback(const std::string &programName, int instructionIndex);
+    virtual void rollback(const std::string &programName, size_t instructionIndex);
 
     virtual void deleteProgram();
 
@@ -158,7 +158,7 @@ namespace antlr4 {
     virtual void Delete(const std::string &programName, size_t from, size_t to);
     virtual void Delete(const std::string &programName, Token *from, Token *to);
 
-    virtual int getLastRewriteTokenIndex();
+    virtual size_t getLastRewriteTokenIndex();
     
     /// Return the text from the original tokens altered per the
     ///  instructions given to this rewriter.
@@ -189,22 +189,20 @@ namespace antlr4 {
       TokenStreamRewriter *const outerInstance;
 
     public:
-      /// <summary>
-      /// What index into rewrites List are we? </summary>
+      /// What index into rewrites List are we?
       virtual ~RewriteOperation() {};
-      /// <summary>
-      /// Token buffer index. </summary>
+
+      /// Token buffer index.
       size_t index;
       std::string text;
 
       RewriteOperation(TokenStreamRewriter *outerInstance, size_t index);
-
       RewriteOperation(TokenStreamRewriter *outerInstance, size_t index, const std::string& text);
-      /// <summary>
+
       /// Execute the rewrite operation by possibly adding to the buffer.
       ///  Return the index of the next token to operate on.
-      /// </summary>
-      int instructionIndex;
+
+      size_t instructionIndex;
 
       virtual size_t execute(std::string *buf);
 
@@ -249,9 +247,9 @@ namespace antlr4 {
 
     /// <summary>
     /// Map String (program name) -> Integer index </summary>
-    std::map<std::string, int> _lastRewriteTokenIndexes;
-    virtual int getLastRewriteTokenIndex(const std::string &programName);
-    virtual void setLastRewriteTokenIndex(const std::string &programName, int i);
+    std::map<std::string, size_t> _lastRewriteTokenIndexes;
+    virtual size_t getLastRewriteTokenIndex(const std::string &programName);
+    virtual void setLastRewriteTokenIndex(const std::string &programName, size_t i);
     virtual std::vector<RewriteOperation*>& getProgram(const std::string &name);
 
     /// <summary>

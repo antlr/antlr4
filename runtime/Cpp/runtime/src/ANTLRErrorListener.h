@@ -77,7 +77,7 @@ namespace antlr4 {
     ///        the parser was able to recover in line without exiting the
     ///        surrounding rule. </param>
     virtual void syntaxError(IRecognizer *recognizer, Token *offendingSymbol, size_t line,
-                             int charPositionInLine, const std::string &msg, std::exception_ptr e) = 0;
+                             size_t charPositionInLine, const std::string &msg, std::exception_ptr e) = 0;
 
     /**
      * This method is called by the parser when a full-context prediction
@@ -187,7 +187,7 @@ namespace antlr4 {
      * was determined
      */
     virtual void reportContextSensitivity(Parser *recognizer, const dfa::DFA &dfa, size_t startIndex, size_t stopIndex,
-      int prediction, atn::ATNConfigSet *configs) = 0;
+      size_t prediction, atn::ATNConfigSet *configs) = 0;
   };
 
 } // namespace antlr4

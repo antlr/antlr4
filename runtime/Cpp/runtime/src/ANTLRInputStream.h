@@ -67,8 +67,8 @@ namespace antlr4 {
     /// touched.
     virtual void reset();
     virtual void consume() override;
-    virtual ssize_t LA(ssize_t i) override;
-    virtual ssize_t LT(ssize_t i);
+    virtual size_t LA(ssize_t i) override;
+    virtual size_t LT(ssize_t i);
 
     /// <summary>
     /// Return the current input symbol index 0..n where n indicates the

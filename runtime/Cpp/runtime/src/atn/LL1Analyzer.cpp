@@ -124,16 +124,16 @@ void LL1Analyzer::_LOOK(ATNState *s, ATNState *stopState, Ref<PredictionContext>
     if (ctx != PredictionContext::EMPTY) {
       // run thru all possible stack tops in ctx
       for (size_t i = 0; i < ctx->size(); i++) {
-        ATNState *returnState = _atn.states[(size_t)ctx->getReturnState(i)];
+        ATNState *returnState = _atn.states[ctx->getReturnState(i)];
 
-        bool removed = calledRuleStack.test((size_t)returnState->ruleIndex);
+        bool removed = calledRuleStack.test(returnState->ruleIndex);
         auto onExit = finally([removed, &calledRuleStack, returnState] {
           if (removed) {
-            calledRuleStack.set((size_t)returnState->ruleIndex);
+            calledRuleStack.set(returnState->ruleIndex);
           }
         });
 
-        calledRuleStack[(size_t)returnState->ruleIndex] = false;
+        calledRuleStack[returnState->ruleIndex] = false;
         _LOOK(returnState, stopState, ctx->getParent(i).lock(), look, lookBusy, calledRuleStack, seeThruPreds, addEOF);
       }
       return;
@@ -145,16 +145,16 @@ void LL1Analyzer::_LOOK(ATNState *s, ATNState *stopState, Ref<PredictionContext>
     Transition *t = s->transition(i);
 
     if (is<RuleTransition *>(t)) {
-      if (calledRuleStack[(size_t)(static_cast<RuleTransition*>(t))->target->ruleIndex]) {
+      if (calledRuleStack[(static_cast<RuleTransition*>(t))->target->ruleIndex]) {
         continue;
       }
 
       Ref<PredictionContext> newContext = SingletonPredictionContext::create(ctx, (static_cast<RuleTransition*>(t))->followState->stateNumber);
       auto onExit = finally([t, &calledRuleStack] {
-        calledRuleStack[(size_t)((static_cast<RuleTransition*>(t))->target->ruleIndex)] = false;
+        calledRuleStack[(static_cast<RuleTransition*>(t))->target->ruleIndex] = false;
       });
 
-      calledRuleStack.set((size_t)(static_cast<RuleTransition*>(t))->target->ruleIndex);
+      calledRuleStack.set((static_cast<RuleTransition*>(t))->target->ruleIndex);
       _LOOK(t->target, stopState, newContext, look, lookBusy, calledRuleStack, seeThruPreds, addEOF);
 
     } else if (is<AbstractPredicateTransition *>(t)) {

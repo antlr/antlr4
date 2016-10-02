@@ -38,7 +38,7 @@ namespace atn {
 
   class ANTLR4CPP_PUBLIC ATN {
   public:
-    static const int INVALID_ALT_NUMBER = 0;
+    static const size_t INVALID_ALT_NUMBER = 0;
 
     /// Used for runtime deserialization of ATNs from strings.
     ATN();
@@ -72,7 +72,7 @@ namespace atn {
     /// <seealso cref="ATNDeserializationOptions#isGenerateRuleBypassTransitions"/>
     /// deserialization option was specified; otherwise, this is {@code null}.
     /// </summary>
-    std::vector<int> ruleToTokenType;
+    std::vector<size_t> ruleToTokenType;
 
     /// For lexer ATNs, this is an array of {@link LexerAction} objects which may
     /// be referenced by action transitions in the ATN.
@@ -104,9 +104,9 @@ namespace atn {
 
     virtual int defineDecisionState(DecisionState *s);
 
-    virtual DecisionState *getDecisionState(int decision) const;
+    virtual DecisionState *getDecisionState(size_t decision) const;
 
-    virtual int getNumberOfDecisions() const;
+    virtual size_t getNumberOfDecisions() const;
 
     /// <summary>
     /// Computes the set of input symbols which could follow ATN state number
@@ -126,7 +126,7 @@ namespace atn {
     /// specified state in the specified context. </returns>
     /// <exception cref="IllegalArgumentException"> if the ATN does not contain a state with
     /// number {@code stateNumber} </exception>
-    virtual misc::IntervalSet getExpectedTokens(int stateNumber, RuleContext *context) const;
+    virtual misc::IntervalSet getExpectedTokens(size_t stateNumber, RuleContext *context) const;
 
     std::string toString() const;
   };

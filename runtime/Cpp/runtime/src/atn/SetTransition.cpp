@@ -41,7 +41,7 @@ SetTransition::SetTransition(ATNState *target, const misc::IntervalSet &aSet)
   : Transition(target), set(aSet.isEmpty() ? misc::IntervalSet::of(Token::INVALID_TYPE) : aSet) {
 }
 
-int SetTransition::getSerializationType() const {
+Transition::SerializationType SetTransition::getSerializationType() const {
   return SET;
 }
 
@@ -49,8 +49,8 @@ misc::IntervalSet SetTransition::label() const {
   return set;
 }
 
-bool SetTransition::matches(ssize_t symbol, ssize_t /*minVocabSymbol*/, ssize_t /*maxVocabSymbol*/) const {
-  return set.contains((int)symbol);
+bool SetTransition::matches(size_t symbol, size_t /*minVocabSymbol*/, size_t /*maxVocabSymbol*/) const {
+  return set.contains(symbol);
 }
 
 std::string SetTransition::toString() const {

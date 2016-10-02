@@ -53,14 +53,17 @@ namespace atn {
     /// Represents $ in an array in full context mode, when $
     /// doesn't mean wildcard: $ + x = [$,x]. Here,
     /// $ = EMPTY_RETURN_STATE.
-    static const int EMPTY_RETURN_STATE = INT_MAX;
+    // ml: originally Integer.MAX_VALUE, which would be (size_t)-1 for us, but this is already used in places where
+    //     -1 is converted to unsigned, so we use a different value here. Any value does the job provided it doesn't
+    //     conflict with real return states.
+    static const size_t EMPTY_RETURN_STATE = (size_t)-10;
 
   private:
-    static const int INITIAL_HASH = 1;
+    static const size_t INITIAL_HASH = 1;
 
   public:
-    static int globalNodeCount;
-    const int id;
+    static size_t globalNodeCount;
+    const size_t id;
 
     /// <summary>
     /// Stores the computed hash code of this <seealso cref="PredictionContext"/>. The hash
@@ -96,7 +99,7 @@ namespace atn {
 
     virtual size_t size() const = 0;
     virtual std::weak_ptr<PredictionContext> getParent(size_t index) const = 0;
-    virtual int getReturnState(size_t index) const = 0;
+    virtual size_t getReturnState(size_t index) const = 0;
 
     virtual bool operator == (const PredictionContext &o) const = 0;
     virtual bool operator != (const PredictionContext &o) const;
@@ -108,13 +111,14 @@ namespace atn {
 
   protected:
     static size_t calculateEmptyHashCode();
-    static size_t calculateHashCode(std::weak_ptr<PredictionContext> parent, int returnState);
-    static size_t calculateHashCode(const std::vector<std::weak_ptr<PredictionContext>> &parents, const std::vector<int> &returnStates);
+    static size_t calculateHashCode(std::weak_ptr<PredictionContext> parent, size_t returnState);
+    static size_t calculateHashCode(const std::vector<std::weak_ptr<PredictionContext>> &parents,
+                                    const std::vector<size_t> &returnStates);
 
   public:
     // dispatch
-    static Ref<PredictionContext> merge(const Ref<PredictionContext> &a,
-      const Ref<PredictionContext> &b, bool rootIsWildcard, PredictionContextMergeCache *mergeCache);
+    static Ref<PredictionContext> merge(const Ref<PredictionContext> &a, const Ref<PredictionContext> &b,
+                                        bool rootIsWildcard, PredictionContextMergeCache *mergeCache);
 
     /// <summary>
     /// Merge two <seealso cref="SingletonPredictionContext"/> instances.

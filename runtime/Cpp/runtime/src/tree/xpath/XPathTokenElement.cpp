@@ -40,7 +40,7 @@ using namespace antlr4;
 using namespace antlr4::tree;
 using namespace antlr4::tree::xpath;
 
-XPathTokenElement::XPathTokenElement(const std::string &tokenName, int tokenType) : XPathElement(tokenName) {
+XPathTokenElement::XPathTokenElement(const std::string &tokenName, size_t tokenType) : XPathElement(tokenName) {
   _tokenType = tokenType;
 }
 

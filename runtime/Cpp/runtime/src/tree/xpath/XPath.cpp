@@ -66,7 +66,7 @@ std::vector<XPathElement> XPath::split(const std::string &path) {
   try {
     tokenStream.fill();
   } catch (LexerNoViableAltException &) {
-    int pos = lexer.getCharPositionInLine();
+    size_t pos = lexer.getCharPositionInLine();
     std::string msg = "Invalid tokens or characters at index " + std::to_string(pos) + " in path '" + path + "'";
     throw IllegalArgumentException(msg);
   }

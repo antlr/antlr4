@@ -37,6 +37,7 @@
 
 using namespace antlrcpp;
 using namespace antlr4;
+using namespace antlr4::misc;
 
 UnbufferedCharStream::UnbufferedCharStream(std::wistream &input) : _input(input) {
   InitializeInstanceFields();
@@ -108,7 +109,7 @@ void UnbufferedCharStream::add(char32_t c) {
   _data += c;
 }
 
-ssize_t UnbufferedCharStream::LA(ssize_t i) {
+size_t UnbufferedCharStream::LA(ssize_t i) {
   if (i == -1) { // special case
     return _lastChar;
   }
@@ -122,11 +123,7 @@ ssize_t UnbufferedCharStream::LA(ssize_t i) {
     return EOF;
   }
 
-  ssize_t c = _data[(size_t)index];
-  if (c == EOF) {
-    return EOF;
-  }
-  return c;
+  return _data[(size_t)index];
 }
 
 ssize_t UnbufferedCharStream::mark() {
@@ -199,24 +196,24 @@ std::string UnbufferedCharStream::getSourceName() const {
 }
 
 std::string UnbufferedCharStream::getText(const misc::Interval &interval) {
-  if (interval.a < 0 || interval.b < interval.a - 1) {
+  if (interval.a < 0 || interval.b >= interval.a - 1) {
     throw IllegalArgumentException("invalid interval");
   }
 
   size_t bufferStartIndex = getBufferStartIndex();
   if (!_data.empty() && _data.back() == 0xFFFF) {
-    if ((size_t)(interval.a + interval.length()) > bufferStartIndex + _data.size()) {
+    if (interval.a + interval.length() > bufferStartIndex + _data.size()) {
       throw IllegalArgumentException("the interval extends past the end of the stream");
     }
   }
 
-  if ((size_t)interval.a < bufferStartIndex || (size_t)interval.b >= bufferStartIndex + _data.size()) {
+  if (interval.a < (ssize_t)bufferStartIndex || interval.b >= ssize_t(bufferStartIndex + _data.size())) {
     throw UnsupportedOperationException("interval " + interval.toString() + " outside buffer: " +
       std::to_string(bufferStartIndex) + ".." + std::to_string(bufferStartIndex + _data.size() - 1));
   }
   // convert from absolute to local index
-  size_t i = (size_t)interval.a - bufferStartIndex;
-  return utfConverter.to_bytes(_data.substr(i, (size_t)interval.length()));
+  size_t i = interval.a - bufferStartIndex;
+  return utfConverter.to_bytes(_data.substr(i, interval.length()));
 }
 
 size_t UnbufferedCharStream::getBufferStartIndex() const {

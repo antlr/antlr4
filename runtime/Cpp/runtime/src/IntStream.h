@@ -53,7 +53,7 @@ namespace antlr4 {
   /// </summary>
   class ANTLR4CPP_PUBLIC IntStream {
   public:
-    static const ssize_t EOF = -1;
+    static const size_t EOF = (size_t)-1;
     
     /// The value returned by <seealso cref="#LA LA()"/> when the end of the stream is
     /// reached.
@@ -124,7 +124,7 @@ namespace antlr4 {
     /// </summary>
     /// <exception cref="UnsupportedOperationException"> if the stream does not support
     /// retrieving the value of the specified symbol </exception>
-    virtual ssize_t LA(ssize_t i) = 0;
+    virtual size_t LA(ssize_t i) = 0;
 
     /// <summary>
     /// A mark provides a guarantee that <seealso cref="#seek seek()"/> operations will be

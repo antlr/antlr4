@@ -126,15 +126,15 @@ namespace atn {
 
   class ANTLR4CPP_PUBLIC SemanticContext::Predicate : public SemanticContext {
   public:
-    const int ruleIndex;
-    const int predIndex;
+    const size_t ruleIndex;
+    const size_t predIndex;
     const bool isCtxDependent; // e.g., $i ref in pred
 
   protected:
     Predicate();
 
   public:
-    Predicate(int ruleIndex, int predIndex, bool isCtxDependent);
+    Predicate(size_t ruleIndex, size_t predIndex, bool isCtxDependent);
 
     virtual bool eval(Recognizer *parser, Ref<RuleContext> const& parserCallStack) override;
     virtual size_t hashCode() const override;

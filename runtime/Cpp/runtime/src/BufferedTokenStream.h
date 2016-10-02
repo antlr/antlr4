@@ -70,21 +70,21 @@ namespace antlr4 {
     /// Get all tokens from start..stop inclusively.
     virtual std::vector<Token *> get(size_t start, size_t stop);
 
-    virtual ssize_t LA(ssize_t i) override;
+    virtual size_t LA(ssize_t i) override;
     virtual Token* LT(ssize_t k) override;
 
     /// Reset this token stream by setting its token source.
     virtual void setTokenSource(TokenSource *tokenSource);
     virtual std::vector<Token *> getTokens();
-    virtual std::vector<Token *> getTokens(int start, int stop);
+    virtual std::vector<Token *> getTokens(size_t start, size_t stop);
 
     /// <summary>
     /// Given a start and stop index, return a List of all tokens in
     ///  the token type BitSet.  Return null if no tokens were found.  This
     ///  method looks at both on and off channel tokens.
     /// </summary>
-    virtual std::vector<Token *> getTokens(int start, int stop, const std::vector<int> &types);
-    virtual std::vector<Token *> getTokens(int start, int stop, int ttype);
+    virtual std::vector<Token *> getTokens(size_t start, size_t stop, const std::vector<size_t> &types);
+    virtual std::vector<Token *> getTokens(size_t start, size_t stop, size_t ttype);
 
     /// Collect all tokens on specified channel to the right of
     ///  the current token up until we see a token on DEFAULT_TOKEN_CHANNEL or

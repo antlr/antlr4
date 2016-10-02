@@ -33,17 +33,24 @@
 
 using namespace antlr4::misc;
 
-Interval const Interval::INVALID;
 
-int Interval::creates = 0;
-int Interval::misses = 0;
-int Interval::hits = 0;
-int Interval::outOfRange = 0;
-
-Interval::Interval() : Interval(-1, -2) {
+size_t antlr4::misc::numericToSymbol(ssize_t v) {
+  return (size_t)v;
 }
 
-Interval::Interval(int a_, int b_, bool autoExtend) {
+ssize_t antlr4::misc::symbolToNumeric(size_t v) {
+  return (ssize_t)v;
+}
+
+Interval const Interval::INVALID;
+
+Interval::Interval() : Interval(-1L, -2L) {
+}
+
+Interval::Interval(size_t a_, size_t b_) : Interval(symbolToNumeric(a_), symbolToNumeric(b_)) {
+}
+
+Interval::Interval(ssize_t a_, ssize_t b_, bool autoExtend) {
   a = a_;
   b = b_;
 
@@ -53,11 +60,11 @@ Interval::Interval(int a_, int b_, bool autoExtend) {
   }
 }
 
-int Interval::length() const {
+size_t Interval::length() const {
   if (b < a) {
     return 0;
   }
-  return b - a + 1;
+  return size_t(b - a + 1);
 }
 
 bool Interval::operator == (const Interval &other) const {

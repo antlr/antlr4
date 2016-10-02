@@ -78,10 +78,10 @@ public:
   virtual const atn::ATN& getATN() const override;
 
   <if (actionFuncs)>
-  virtual void action(Ref\<RuleContext> const& context, int ruleIndex, int actionIndex) override;
+  virtual void action(Ref\<RuleContext> const& context, size_t ruleIndex, size_t actionIndex) override;
   <endif>
   <if (sempredFuncs)>
-  virtual bool sempred(Ref\<RuleContext> const& _localctx, int ruleIndex, int predicateIndex) override;  
+  virtual bool sempred(Ref\<RuleContext> const& _localctx, size_t ruleIndex, size_t predicateIndex) override;  
   <endif>
   
 private:
@@ -151,7 +151,7 @@ const atn::ATN& <lexer.name>::getATN() const {
 <namedActions.definitions>
 
 <if (actionFuncs)>
-void <lexer.name>::action(Ref\<RuleContext> const& context, int ruleIndex, int actionIndex) {
+void <lexer.name>::action(Ref\<RuleContext> const& context, size_t ruleIndex, size_t actionIndex) {
   switch (ruleIndex) {
     <lexer.actionFuncs.values: {f | case <f.ruleIndex>: <f.name>Action(std::dynamic_pointer_cast\<<f.ctxType>\>(context), actionIndex); break;}; separator="\n">
 
@@ -162,7 +162,7 @@ void <lexer.name>::action(Ref\<RuleContext> const& context, int ruleIndex, int a
 <endif>
 
 <if (sempredFuncs)>
-bool <lexer.name>::sempred(Ref\<RuleContext> const& context, int ruleIndex, int predicateIndex) {
+bool <lexer.name>::sempred(Ref\<RuleContext> const& context, size_t ruleIndex, size_t predicateIndex) {
   switch (ruleIndex) {
     <lexer.sempredFuncs.values: {f | case <f.ruleIndex>: return <f.name>Sempred(std::dynamic_pointer_cast\<<f.ctxType>\>(context), predicateIndex);}; separator="\n">
 
@@ -227,11 +227,11 @@ std::vector\<std::string> <lexer.name>::_tokenNames;
 >>
 
 RuleActionFunctionHeader(r, actions) ::= <<
-void <r.name>Action(Ref\<<r.ctxType>\> const& context, int actionIndex);
+void <r.name>Action(Ref\<<r.ctxType>\> const& context, size_t actionIndex);
 >>
 
 RuleActionFunction(r, actions) ::= <<
-void <r.factory.grammar.name>::<r.name>Action(Ref\<<r.ctxType>\> const& context, int actionIndex) {
+void <r.factory.grammar.name>::<r.name>Action(Ref\<<r.ctxType>\> const& context, size_t actionIndex) {
   switch (actionIndex) {
     <actions: {index | case <index>: <actions.(index)> break;}; separator="\n">
   
@@ -243,13 +243,13 @@ void <r.factory.grammar.name>::<r.name>Action(Ref\<<r.ctxType>\> const& context,
 >>
 
 RuleSempredFunctionHeader(r, actions) ::= <<
-bool <r.name>Sempred(Ref\<<r.ctxType>\> const& _localctx, int predicateIndex);
+bool <r.name>Sempred(Ref\<<r.ctxType>\> const& _localctx, size_t predicateIndex);
 >>
 
 RuleSempredFunction(r, actions) ::= <<
 <! Called for both lexer and parser. But only one of them is actually available. Testing for the parser directly
    generates a warning, however. So do the check via the factory instead. !>
-bool <if (r.factory.g.lexer)><lexer.name><else><parser.name><endif>::<r.name>Sempred(Ref\<<r.ctxType>\> const& _localctx, int predicateIndex) {
+bool <if (r.factory.g.lexer)><lexer.name><else><parser.name><endif>::<r.name>Sempred(Ref\<<r.ctxType>\> const& _localctx, size_t predicateIndex) {
   switch (predicateIndex) {
     <actions: {index | case <index>: return <actions.(index)>}; separator=";\n">;
     
@@ -296,7 +296,7 @@ public:
   <funcs; separator = "\n">
 
   <if (sempredFuncs)>
-  virtual bool sempred(Ref\<RuleContext> const& _localctx, int ruleIndex, int predicateIndex) override;
+  virtual bool sempred(Ref\<RuleContext> const& _localctx, size_t ruleIndex, size_t predicateIndex) override;
   <sempredFuncs.values; separator = "\n">
   <endif>
 
@@ -348,7 +348,7 @@ dfa::Vocabulary& <parser.name>::getVocabulary() const {
 <funcs; separator = "\n\n">
 
 <if (sempredFuncs)>
-bool <parser.name>::sempred(Ref\<RuleContext> const& context, int ruleIndex, int predicateIndex) {
+bool <parser.name>::sempred(Ref\<RuleContext> const& context, size_t ruleIndex, size_t predicateIndex) {
   switch (ruleIndex) {
   <parser.sempredFuncs.values: {f |
   case <f.ruleIndex>: return <f.name>Sempred(std::dynamic_pointer_cast\<<f.ctxType>\>(context), predicateIndex);}; separator="\n">
@@ -431,7 +431,7 @@ _serializedATN = {
 atn::ATNDeserializer deserializer;
 _atn = deserializer.deserialize(_serializedATN);
 
-for (int i = 0; i \< _atn.getNumberOfDecisions(); i++) { <! Rework class ATN to allow standard iterations. !>
+for (size_t i = 0; i \< _atn.getNumberOfDecisions(); i++) { <! Rework class ATN to allow standard iterations. !>
   _decisionToDFA.push_back(dfa::DFA(_atn.getDecisionState(i), i));
 }
 >>
@@ -458,7 +458,7 @@ Ref\<<parser.name>::<currentRule.ctxType>\> <parser.name>::<currentRule.name>(<a
   });
   try {
 <! TODO: untested !><if (currentRule.hasLookaheadBlock)>
-    int alt;
+    size_t alt;
     <endif>
     <code>
 <! TODO: untested !>   <postamble; separator = "\n">
@@ -495,21 +495,21 @@ Ref\<<parser.name>::<currentRule.ctxType>\> <parser.name>::<currentRule.name>(<c
 
 Ref\<<parser.name>::<currentRule.ctxType>\> <parser.name>::<currentRule.name>(int precedence<currentRule.args:{a | , <a>}>) {
   Ref\<ParserRuleContext> parentContext = _ctx;
-  int parentState = getState();
+  size_t parentState = getState();
   Ref\<<parser.name>::<currentRule.ctxType>\> _localctx = std::make_shared\<<currentRule.ctxType>\>(_ctx, parentState<currentRule.args: {a | , <a.name>}>);
   Ref\<<parser.name>::<currentRule.ctxType>\> previousContext = _localctx;
-  int startState = <currentRule.startState>;
+  size_t startState = <currentRule.startState>;
   enterRecursionRule(_localctx, <currentRule.startState>, <parser.name>::Rule<currentRule.name; format = "cap">, precedence);
   
     <namedActions.init>
 <! TODO: untested !>    <locals; separator = "\n">
   
   auto onExit = finally([=] {
-<! TODO: untested !><if (finallyAction)><finallyAction><endif>
+  <if (finallyAction)><finallyAction><endif>
     unrollRecursionContexts(parentContext);
   });
   try {
-    <if (currentRule.hasLookaheadBlock)>int alt;<endif>
+    <if (currentRule.hasLookaheadBlock)>size_t alt;<endif>
     <code>
 <! TODO: untested !><postamble; separator = "\n">
     <namedActions.after>
@@ -527,15 +527,15 @@ StructDeclHeader(struct, ctorAttrs, attrs, getters, dispatchMethods, interfaces,
 class <struct.name> : public <if (contextSuperClass)><contextSuperClass><else>ParserRuleContext<endif><if(interfaces)>, <interfaces; separator=", "><endif> {
 public:
   <attrs: {a | <a>;}; separator="\n">
-  <if (ctorAttrs)><struct.name>(std::weak_ptr\<ParserRuleContext> parent, int invokingState);<endif>
-  <struct.name>(std::weak_ptr\<ParserRuleContext> parent, int invokingState<ctorAttrs: {a | , <a>}>);
+  <if (ctorAttrs)><struct.name>(std::weak_ptr\<ParserRuleContext> parent, size_t invokingState);<endif>
+  <struct.name>(std::weak_ptr\<ParserRuleContext> parent, size_t invokingState<ctorAttrs: {a | , <a>}>);
 <if (struct.provideCopyFrom)> <! don't need copy unless we have subclasses !>
   <struct.name>() { }
   void copyFrom(Ref\<<struct.name>\> const& context);
   using ParserRuleContext::copyFrom;
 <endif>
 
-  virtual ssize_t getRuleIndex() const override;
+  virtual size_t getRuleIndex() const override;
   <getters: {g | <g>}; separator = "\n">
 
   <dispatchMethods; separator = "\n">
@@ -548,19 +548,19 @@ StructDecl(struct, ctorAttrs, attrs, getters, dispatchMethods, interfaces, exten
 //----------------- <struct.name> ------------------------------------------------------------------
 
 <if (ctorAttrs)>
-<parser.name>::<struct.name>::<struct.name>(std::weak_ptr\<ParserRuleContext> parent, int invokingState)
+<parser.name>::<struct.name>::<struct.name>(std::weak_ptr\<ParserRuleContext> parent, size_t invokingState)
   : <if (contextSuperClass)><contextSuperClass><else>ParserRuleContext<endif>(parent, invokingState) {
 }
 <endif>
 
-<parser.name>::<struct.name>::<struct.name>(std::weak_ptr\<ParserRuleContext> parent, int invokingState<ctorAttrs: {a | , <a>}>)
+<parser.name>::<struct.name>::<struct.name>(std::weak_ptr\<ParserRuleContext> parent, size_t invokingState<ctorAttrs: {a | , <a>}>)
   : <if (contextSuperClass)><contextSuperClass><else>ParserRuleContext<endif>(parent, invokingState) {
   <struct.ctorAttrs: {a | this-><a.name> = <a.name>;}; separator="\n">
 }
 
 <getters: {g | <g>}; separator = "\n">
 
-ssize_t <parser.name>::<struct.name>::getRuleIndex() const {
+size_t <parser.name>::<struct.name>::getRuleIndex() const {
   return <parser.name>::Rule<struct.derivedFromName; format = "cap">;
 }
 
@@ -761,7 +761,7 @@ TestSetInline(s) ::= <<
 
 // Java language spec 15.19 - shift operators mask operands rather than overflow to 0... need range test
 testShiftInRange(shiftAmount) ::= <<
-((<shiftAmount> & ~(ssize_t)0x3f) == 0)
+((<shiftAmount> & ~(size_t)0x3f) == 0)
 >>
 
 // produces smaller bytecode only when bits.ttypes contains more than two items
@@ -948,7 +948,7 @@ TokenDeclHeader(t) ::= "<TokenLabelType()><t.name> = nullptr;"
 TokenDecl(t) ::= "<! Variable Declaration !>"
 
 TokenTypeDeclHeader(t) ::= "<! Local Variable !>"
-TokenTypeDecl(t) ::= "ssize_t <t.name> = 0;"
+TokenTypeDecl(t) ::= "size_t <t.name> = 0;"
 
 TokenListDeclHeader(t) ::= "std::vector\<Token *> <t.name>;"
 TokenListDecl(t) ::= "<! Variable Declaration !>"
@@ -975,10 +975,10 @@ std::vector\<Ref\<tree::TerminalNode>\> <parser.name>::<t.ctx.name>::<t.name>() 
 
 >>
 
-ContextTokenListIndexedGetterDeclHeader(t) ::= "Ref\<tree::TerminalNode> <t.name>(int i);"
+ContextTokenListIndexedGetterDeclHeader(t) ::= "Ref\<tree::TerminalNode> <t.name>(size_t i);"
 ContextTokenListIndexedGetterDecl(t)  ::= <<
-Ref\<tree::TerminalNode> <parser.name>::<t.ctx.name>::<t.name>(int i) {
-  return getToken(<parser.name>::<t.name>, (size_t)i);
+Ref\<tree::TerminalNode> <parser.name>::<t.ctx.name>::<t.name>(size_t i) {
+  return getToken(<parser.name>::<t.name>, i);
 }
 
 >>
@@ -1000,10 +1000,10 @@ std::vector\<Ref\<<parser.name>::<r.ctxName>\>> <parser.name>::<r.ctx.name>::<r.
 
 >>
 
-ContextRuleListIndexedGetterDeclHeader(r) ::= "Ref\<<r.ctxName>> <r.name>(int i);"
+ContextRuleListIndexedGetterDeclHeader(r) ::= "Ref\<<r.ctxName>> <r.name>(size_t i);"
 ContextRuleListIndexedGetterDecl(r) ::= <<
-Ref\<<parser.name>::<r.ctxName>\> <parser.name>::<r.ctx.name>::<r.name>(int i) {
-  return getRuleContext\<<parser.name>::<r.ctxName>\>((size_t)i);
+Ref\<<parser.name>::<r.ctxName>\> <parser.name>::<r.ctx.name>::<r.name>(size_t i) {
+  return getRuleContext\<<parser.name>::<r.ctxName>\>(i);
 }
 
 >>

@@ -44,7 +44,7 @@ const atn::ATN& XPathLexer::getATN() const {
 }
 
 
-void XPathLexer::action(Ref<RuleContext> const& context, int ruleIndex, int actionIndex) {
+void XPathLexer::action(Ref<RuleContext> const& context, size_t ruleIndex, size_t actionIndex) {
   switch (ruleIndex) {
     case 4: IDAction(std::dynamic_pointer_cast<RuleContext>(context), actionIndex); break;
 
@@ -53,7 +53,7 @@ void XPathLexer::action(Ref<RuleContext> const& context, int ruleIndex, int acti
   }
 }
 
-void XPathLexer::IDAction(Ref<RuleContext> const& /*context*/, int actionIndex) {
+void XPathLexer::IDAction(Ref<RuleContext> const& /*context*/, size_t actionIndex) {
   switch (actionIndex) {
     case 0: 
     				if (isupper(getText()[0]))
@@ -158,7 +158,7 @@ XPathLexer::Initializer::Initializer() {
   atn::ATNDeserializer deserializer;
   _atn = deserializer.deserialize(_serializedATN);
 
-  for (int i = 0; i < _atn.getNumberOfDecisions(); i++) { 
+  for (size_t i = 0; i < _atn.getNumberOfDecisions(); i++) { 
     _decisionToDFA.push_back(dfa::DFA(_atn.getDecisionState(i), i));
   }
 }

@@ -46,18 +46,18 @@ namespace antlr4 {
     /**
      * This is the backing field for {@link #getType} and {@link #setType}.
      */
-    int _type;
+    size_t _type;
 
     /**
      * This is the backing field for {@link #getLine} and {@link #setLine}.
      */
-    int _line;
+    size_t _line;
 
     /**
      * This is the backing field for {@link #getCharPositionInLine} and
      * {@link #setCharPositionInLine}.
      */
-    int _charPositionInLine; // set to invalid position
+    size_t _charPositionInLine; // set to invalid position
 
     /**
      * This is the backing field for {@link #getChannel} and
@@ -90,19 +90,19 @@ namespace antlr4 {
      * This is the backing field for {@link #getTokenIndex} and
      * {@link #setTokenIndex}.
      */
-    int _index;
+    size_t _index;
 
     /**
      * This is the backing field for {@link #getStartIndex} and
      * {@link #setStartIndex}.
      */
-    int _start;
+    size_t _start;
 
     /**
      * This is the backing field for {@link #getStopIndex} and
      * {@link #setStopIndex}.
      */
-    int _stop;
+    size_t _stop;
 
   public:
     /**
@@ -110,8 +110,8 @@ namespace antlr4 {
      *
      * @param type The token type.
      */
-    CommonToken(int type);
-    CommonToken(std::pair<TokenSource*, CharStream*> source, int type, int channel, int start, int stop);
+    CommonToken(size_t type);
+    CommonToken(std::pair<TokenSource*, CharStream*> source, size_t type, size_t channel, size_t start, size_t stop);
 
     /**
      * Constructs a new {@link CommonToken} with the specified token type and
@@ -120,7 +120,7 @@ namespace antlr4 {
      * @param type The token type.
      * @param text The text of the token.
      */
-    CommonToken(int type, const std::string &text);
+    CommonToken(size_t type, const std::string &text);
 
     /**
      * Constructs a new {@link CommonToken} as a copy of another {@link Token}.
@@ -137,7 +137,7 @@ namespace antlr4 {
      */
     CommonToken(Token *oldToken);
 
-    virtual int getType() const override;
+    virtual size_t getType() const override;
 
     /**
      * Explicitly set the text for this token. If {code text} is not
@@ -151,25 +151,25 @@ namespace antlr4 {
     virtual void setText(const std::string &text) override;
     virtual std::string getText() const override;
 
-    virtual void setLine(int line) override;
-    virtual int getLine() const override;
+    virtual void setLine(size_t line) override;
+    virtual size_t getLine() const override;
 
-    virtual int getCharPositionInLine() const override;
-    virtual void setCharPositionInLine(int charPositionInLine) override;
+    virtual size_t getCharPositionInLine() const override;
+    virtual void setCharPositionInLine(size_t charPositionInLine) override;
 
     virtual size_t getChannel() const override;
-    virtual void setChannel(int channel) override;
+    virtual void setChannel(size_t channel) override;
 
-    virtual void setType(int type) override;
+    virtual void setType(size_t type) override;
 
-    virtual int getStartIndex() const override;
-    virtual void setStartIndex(int start);
+    virtual size_t getStartIndex() const override;
+    virtual void setStartIndex(size_t start);
 
-    virtual int getStopIndex() const override;
-    virtual void setStopIndex(int stop);
+    virtual size_t getStopIndex() const override;
+    virtual void setStopIndex(size_t stop);
 
-    virtual int getTokenIndex() const override;
-    virtual void setTokenIndex(int index) override;
+    virtual size_t getTokenIndex() const override;
+    virtual void setTokenIndex(size_t index) override;
 
     virtual TokenSource *getTokenSource() const override;
     virtual CharStream *getInputStream() const override;

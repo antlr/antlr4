@@ -50,19 +50,19 @@ ListTokenSource::ListTokenSource(std::vector<std::unique_ptr<Token>> tokens_, co
   // Check if there is an eof token and create one if not.
   if (tokens.back()->getType() != Token::EOF) {
     Token *lastToken = tokens.back().get();
-    int start = -1;
-    int previousStop = lastToken->getStopIndex();
-    if (previousStop != -1) {
+    size_t start = INVALID_INDEX;
+    size_t previousStop = lastToken->getStopIndex();
+    if (previousStop != INVALID_INDEX) {
       start = previousStop + 1;
     }
 
-    int stop = std::max(-1, start - 1);
+    size_t stop = std::max(INVALID_INDEX, start - 1);
     tokens.emplace_back((_factory->create({ this, getInputStream() }, Token::EOF, "EOF",
       Token::DEFAULT_CHANNEL, start, stop, (int)lastToken->getLine(), lastToken->getCharPositionInLine())));
   }
 }
 
-int ListTokenSource::getCharPositionInLine() {
+size_t ListTokenSource::getCharPositionInLine() {
   if (i < tokens.size()) {
     return tokens[i]->getCharPositionInLine();
   }
@@ -78,7 +78,7 @@ std::unique_ptr<Token> ListTokenSource::nextToken() {
 
 size_t ListTokenSource::getLine() const {
   if (i < tokens.size()) {
-    return (size_t)tokens[i]->getLine();
+    return tokens[i]->getLine();
   }
 
   return 1;

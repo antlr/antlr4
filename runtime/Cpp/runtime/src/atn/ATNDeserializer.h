@@ -57,10 +57,10 @@ namespace atn {
     static void checkCondition(bool condition);
     static void checkCondition(bool condition, const std::string &message);
 
-    static Transition *edgeFactory(const ATN &atn, int type, int src, int trg, int arg1, int arg2, int arg3,
-                                   const std::vector<misc::IntervalSet> &sets);
+    static Transition *edgeFactory(const ATN &atn, size_t type, size_t src, size_t trg, size_t arg1, size_t arg2,
+                                   size_t arg3, const std::vector<misc::IntervalSet> &sets);
 
-    static ATNState *stateFactory(int type, int ruleIndex);
+    static ATNState *stateFactory(size_t type, size_t ruleIndex);
 
   protected:
     /// Determines if a particular serialized representation of an ATN supports

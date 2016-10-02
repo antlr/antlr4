@@ -143,4 +143,5 @@
 #undef EOF
 #endif
 
+#define INVALID_INDEX (size_t)-1
 template<class T> using Ref = std::shared_ptr<T>;

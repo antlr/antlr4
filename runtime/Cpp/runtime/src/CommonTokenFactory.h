@@ -91,10 +91,10 @@ namespace antlr4 {
      */
     CommonTokenFactory();
 
-    virtual std::unique_ptr<CommonToken> create(std::pair<TokenSource*, CharStream*> source, int type,
-      const std::string &text, int channel, int start, int stop, int line, int charPositionInLine) override;
+    virtual std::unique_ptr<CommonToken> create(std::pair<TokenSource*, CharStream*> source, size_t type,
+      const std::string &text, size_t channel, size_t start, size_t stop, size_t line, size_t charPositionInLine) override;
 
-    virtual std::unique_ptr<CommonToken> create(int type, const std::string &text) override;
+    virtual std::unique_ptr<CommonToken> create(size_t type, const std::string &text) override;
   };
 
 } // namespace antlr4

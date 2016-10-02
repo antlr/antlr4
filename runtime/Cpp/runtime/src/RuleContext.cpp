@@ -33,17 +33,19 @@
 #include "misc/Interval.h"
 #include "Parser.h"
 #include "atn/ATN.h"
+#include "atn/ATNState.h"
 #include "tree/ParseTreeVisitor.h"
 
 #include "RuleContext.h"
 
 using namespace antlr4;
+using namespace antlr4::atn;
 
 RuleContext::RuleContext() {
   InitializeInstanceFields();
 }
 
-RuleContext::RuleContext(std::weak_ptr<RuleContext> parent, int invokingState) {
+RuleContext::RuleContext(std::weak_ptr<RuleContext> parent, size_t invokingState) {
   InitializeInstanceFields();
   this->parent = parent;
   this->invokingState = invokingState;
@@ -62,7 +64,7 @@ int RuleContext::depth() {
 }
 
 bool RuleContext::isEmpty() {
-  return invokingState == -1;
+  return invokingState == ATNState::INVALID_STATE_NUMBER;
 }
 
 misc::Interval RuleContext::getSourceInterval() {
@@ -91,8 +93,8 @@ std::string RuleContext::getText() {
   return ss.str();
 }
 
-ssize_t RuleContext::getRuleIndex() const {
-  return -1;
+size_t RuleContext::getRuleIndex() const {
+  return INVALID_INDEX;
 }
 
 int RuleContext::getAltNumber() const {
@@ -135,9 +137,9 @@ std::string RuleContext::toString(const std::vector<std::string> &ruleNames, Ref
         ss << currentParent->invokingState;
       }
     } else {
-      ssize_t ruleIndex = currentParent->getRuleIndex();
+      size_t ruleIndex = currentParent->getRuleIndex();
 
-      std::string ruleName = (ruleIndex >= 0 && ruleIndex < (ssize_t)ruleNames.size()) ? ruleNames[(size_t)ruleIndex] : std::to_string(ruleIndex);
+      std::string ruleName = (ruleIndex < ruleNames.size()) ? ruleNames[ruleIndex] : std::to_string(ruleIndex);
       ss << ruleName;
     }
 
@@ -169,5 +171,5 @@ std::string RuleContext::toString(Recognizer *recog, Ref<RuleContext> const& sto
 }
 
 void RuleContext::InitializeInstanceFields() {
-  invokingState = -1;
+  invokingState = INVALID_INDEX;
 }

@@ -99,7 +99,7 @@ namespace antlr4 {
      */
     virtual void copyFrom(Ref<ParserRuleContext> const& ctx);
 
-    ParserRuleContext(std::weak_ptr<ParserRuleContext> parent, int invokingStateNumber);
+    ParserRuleContext(std::weak_ptr<ParserRuleContext> parent, size_t invokingStateNumber);
 
     // Double dispatch methods for listeners
 
@@ -118,9 +118,9 @@ namespace antlr4 {
     virtual Ref<tree::TerminalNode> addChild(Token *matchedToken);
     virtual Ref<tree::ErrorNode> addErrorNode(Token *badToken);
 
-    virtual Ref<tree::TerminalNode> getToken(int ttype, std::size_t i);
+    virtual Ref<tree::TerminalNode> getToken(size_t ttype, std::size_t i);
 
-    virtual std::vector<Ref<tree::TerminalNode>> getTokens(int ttype);
+    virtual std::vector<Ref<tree::TerminalNode>> getTokens(size_t ttype);
 
     template<typename T>
     Ref<T> getRuleContext(size_t i) {

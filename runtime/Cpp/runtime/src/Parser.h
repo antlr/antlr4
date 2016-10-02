@@ -92,7 +92,7 @@ namespace antlr4 {
     /// <exception cref="RecognitionException"> if the current input symbol did not match
     /// {@code ttype} and the error strategy could not recover from the
     /// mismatched symbol </exception>
-    virtual Token* match(int ttype);
+    virtual Token* match(size_t ttype);
 
     /// <summary>
     /// Match current input symbol as a wildcard. If the symbol type matches
@@ -298,7 +298,7 @@ namespace antlr4 {
     /// Always called by generated parsers upon entry to a rule. Access field
     /// <seealso cref="#_ctx"/> get the current context.
     /// </summary>
-    virtual void enterRule(Ref<ParserRuleContext> const& localctx, int state, int ruleIndex);
+    virtual void enterRule(Ref<ParserRuleContext> const& localctx, size_t state, size_t ruleIndex);
 
     virtual void exitRule();
 
@@ -314,15 +314,15 @@ namespace antlr4 {
 
     /// @deprecated Use
     /// <seealso cref="#enterRecursionRule(ParserRuleContext, int, int, int)"/> instead.
-    virtual void enterRecursionRule(Ref<ParserRuleContext> const& localctx, int ruleIndex);
-    virtual void enterRecursionRule(Ref<ParserRuleContext> const& localctx, int state, int ruleIndex, int precedence);
+    virtual void enterRecursionRule(Ref<ParserRuleContext> const& localctx, size_t ruleIndex);
+    virtual void enterRecursionRule(Ref<ParserRuleContext> const& localctx, size_t state, size_t ruleIndex, int precedence);
 
     /** Like {@link #enterRule} but for recursive rules.
      *  Make the current context the child of the incoming localctx.
      */
-    virtual void pushNewRecursionContext(Ref<ParserRuleContext> const& localctx, int state, int ruleIndex);
+    virtual void pushNewRecursionContext(Ref<ParserRuleContext> const& localctx, size_t state, size_t ruleIndex);
     virtual void unrollRecursionContexts(Ref<ParserRuleContext> const& parentctx);
-    virtual Ref<ParserRuleContext> getInvokingContext(int ruleIndex);
+    virtual Ref<ParserRuleContext> getInvokingContext(size_t ruleIndex);
     virtual Ref<ParserRuleContext> getContext();
     virtual void setContext(Ref<ParserRuleContext> const& ctx);
     virtual bool precpred(Ref<RuleContext> const& localctx, int precedence) override;
@@ -341,7 +341,7 @@ namespace antlr4 {
     /// <param name="symbol"> the symbol type to check </param>
     /// <returns> {@code true} if {@code symbol} can follow the current state in
     /// the ATN, otherwise {@code false}. </returns>
-    virtual bool isExpectedToken(int symbol);
+    virtual bool isExpectedToken(size_t symbol);
 
     bool isMatchedEOF() const;
 
@@ -355,9 +355,8 @@ namespace antlr4 {
 
     virtual misc::IntervalSet getExpectedTokensWithinCurrentRule();
 
-    /// <summary>
-    /// Get a rule's index (i.e., {@code RULE_ruleName} field) or -1 if not found. </summary>
-    virtual ssize_t getRuleIndex(const std::string &ruleName);
+    /// Get a rule's index (i.e., {@code RULE_ruleName} field) or INVALID_INDEX if not found.
+    virtual size_t getRuleIndex(const std::string &ruleName);
 
     virtual Ref<ParserRuleContext> getRuleContext();
 

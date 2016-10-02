@@ -35,5 +35,5 @@ using namespace antlr4;
 using namespace antlr4::tree::xpath;
 
 void XPathLexerErrorListener::syntaxError(IRecognizer * /*recognizer*/, Token * /*offendingSymbol*/,
-  size_t /*line*/, int /*charPositionInLine*/, const std::string &/*msg*/, std::exception_ptr /*e*/) {
+  size_t /*line*/, size_t /*charPositionInLine*/, const std::string &/*msg*/, std::exception_ptr /*e*/) {
 }

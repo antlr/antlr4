@@ -297,7 +297,7 @@ namespace atn {
 
     // LAME globals to avoid parameters!!!!! I need these down deep in predTransition
     TokenStream *_input;
-    int _startIndex;
+    size_t _startIndex;
     Ref<ParserRuleContext> _outerContext;
     dfa::DFA *_dfa; // Reference into the decisionToDFA vector.
 
@@ -311,7 +311,7 @@ namespace atn {
 
     virtual void reset() override;
     virtual void clearDFA() override;
-    virtual int adaptivePredict(TokenStream *input, int decision, Ref<ParserRuleContext> const& outerContext);
+    virtual size_t adaptivePredict(TokenStream *input, size_t decision, Ref<ParserRuleContext> const& outerContext);
 
     /// <summary>
     /// Performs ATN simulation to compute a predicted alternative based
@@ -345,8 +345,8 @@ namespace atn {
     ///    conflict + preds
     /// </summary>
   protected:
-    virtual int execATN(dfa::DFA &dfa, dfa::DFAState *s0, TokenStream *input, size_t startIndex,
-                        Ref<ParserRuleContext> outerContext);
+    virtual size_t execATN(dfa::DFA &dfa, dfa::DFAState *s0, TokenStream *input, size_t startIndex,
+                           Ref<ParserRuleContext> outerContext);
 
     /// <summary>
     /// Get an existing target state for an edge in the DFA. If the target state
@@ -358,7 +358,7 @@ namespace atn {
     /// <returns> The existing target DFA state for the given input symbol
     /// {@code t}, or {@code null} if the target state for this edge is not
     /// already cached </returns>
-    virtual dfa::DFAState* getExistingTargetState(dfa::DFAState *previousD, ssize_t t);
+    virtual dfa::DFAState* getExistingTargetState(dfa::DFAState *previousD, size_t t);
 
     /// <summary>
     /// Compute a target state for an edge in the DFA, and attempt to add the
@@ -371,15 +371,15 @@ namespace atn {
     /// <returns> The computed target DFA state for the given input symbol
     /// {@code t}. If {@code t} does not lead to a valid DFA state, this method
     /// returns <seealso cref="#ERROR"/>. </returns>
-    virtual dfa::DFAState *computeTargetState(dfa::DFA &dfa, dfa::DFAState *previousD, ssize_t t);
+    virtual dfa::DFAState *computeTargetState(dfa::DFA &dfa, dfa::DFAState *previousD, size_t t);
 
     virtual void predicateDFAState(dfa::DFAState *dfaState, DecisionState *decisionState);
 
     // comes back with reach.uniqueAlt set to a valid alt
-    virtual int execATNWithFullContext(dfa::DFA &dfa, dfa::DFAState *D, ATNConfigSet *s0,
+    virtual size_t execATNWithFullContext(dfa::DFA &dfa, dfa::DFAState *D, ATNConfigSet *s0,
       TokenStream *input, size_t startIndex, Ref<ParserRuleContext> const& outerContext); // how far we got before failing over
 
-    virtual std::unique_ptr<ATNConfigSet> computeReachSet(ATNConfigSet *closure, ssize_t t, bool fullCtx);
+    virtual std::unique_ptr<ATNConfigSet> computeReachSet(ATNConfigSet *closure, size_t t, bool fullCtx);
 
     /// <summary>
     /// Return a configuration set containing only the configurations from
@@ -573,7 +573,7 @@ namespace atn {
      */
     std::unique_ptr<ATNConfigSet> applyPrecedenceFilter(ATNConfigSet *configs);
     
-    virtual ATNState *getReachableTarget(Transition *trans, int ttype);
+    virtual ATNState *getReachableTarget(Transition *trans, size_t ttype);
 
     virtual std::vector<Ref<SemanticContext>> getPredsForAmbigAlts(const antlrcpp::BitSet &ambigAlts,
       ATNConfigSet *configs, size_t nalts);
@@ -627,10 +627,10 @@ namespace atn {
      * {@link ATN#INVALID_ALT_NUMBER} if a suitable alternative was not
      * identified and {@link #adaptivePredict} should report an error instead.
      */
-    int getSynValidOrSemInvalidAltThatFinishedDecisionEntryRule(ATNConfigSet *configs,
-                                                                Ref<ParserRuleContext> const& outerContext);
+    size_t getSynValidOrSemInvalidAltThatFinishedDecisionEntryRule(ATNConfigSet *configs,
+      Ref<ParserRuleContext> const& outerContext);
 
-    virtual int getAltThatFinishedDecisionEntryRule(ATNConfigSet *configs);
+    virtual size_t getAltThatFinishedDecisionEntryRule(ATNConfigSet *configs);
 
     /** Walk the list of configurations and split them according to
      *  those that have preds evaluating to true/false.  If no pred, assume
@@ -773,7 +773,7 @@ namespace atn {
     virtual antlrcpp::BitSet getConflictingAltsOrUniqueAlt(ATNConfigSet *configs);
 
   public:
-    virtual std::string getTokenName(ssize_t t);
+    virtual std::string getTokenName(size_t t);
 
     virtual std::string getLookaheadName(TokenStream *input);
 
@@ -830,7 +830,7 @@ namespace atn {
     virtual void reportAttemptingFullContext(dfa::DFA &dfa, const antlrcpp::BitSet &conflictingAlts,
       ATNConfigSet *configs, size_t startIndex, size_t stopIndex);
 
-    virtual void reportContextSensitivity(dfa::DFA &dfa, int prediction, ATNConfigSet *configs,
+    virtual void reportContextSensitivity(dfa::DFA &dfa, size_t prediction, ATNConfigSet *configs,
                                           size_t startIndex, size_t stopIndex);
 
     /// If context sensitive parsing, we know it's ambiguity not conflict.
