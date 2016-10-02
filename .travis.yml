@@ -2,10 +2,12 @@ sudo: true
 language: java
 script:
   - mvn install
+
 jdk:
   - openjdk6
   - oraclejdk7
   - oraclejdk8
+
 before_install:
   - sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF
   - sudo add-apt-repository ppa:fkrull/deadsnakes -y
@@ -17,3 +19,13 @@ before_install:
   - sudo apt-get install -qq mono-complete
   - python --version
   - python3 --version
+
+env:
+  - CXX=g++-5
+
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - g++-5
