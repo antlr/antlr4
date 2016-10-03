@@ -198,7 +198,7 @@ std::vector<antlrcpp::BitSet> PredictionModeClass::getConflictingAltSubsets(ATNC
 std::map<ATNState*, antlrcpp::BitSet> PredictionModeClass::getStateToAltMap(ATNConfigSet *configs) {
   std::map<ATNState*, antlrcpp::BitSet> m;
   for (auto &c : configs->configs) {
-    m[c->state].set((size_t)c->alt);
+    m[c->state].set(c->alt);
   }
   return m;
 }

@@ -260,7 +260,7 @@ size_t LexerATNSimulator::failOrAccept(CharStream *input, ATNConfigSet *reach, s
 void LexerATNSimulator::getReachableConfigSet(CharStream *input, ATNConfigSet *closure_, ATNConfigSet *reach, size_t t) {
   // this is used to skip processing for configs which have a lower priority
   // than a config that already reached an accept state for the same rule
-  int skipAlt = ATN::INVALID_ALT_NUMBER;
+  size_t skipAlt = ATN::INVALID_ALT_NUMBER;
 
   for (auto c : closure_->configs) {
     bool currentAltReachedAcceptState = c->alt == skipAlt;

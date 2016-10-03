@@ -129,7 +129,7 @@ namespace dfa {
     /// Get the set of all alts mentioned by all ATN configurations in this
     ///  DFA state.
     /// </summary>
-    virtual std::set<int> getAltSet();
+    virtual std::set<size_t> getAltSet();
 
     virtual size_t hashCode() const;
 

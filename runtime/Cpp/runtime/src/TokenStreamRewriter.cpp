@@ -352,12 +352,12 @@ std::unordered_map<size_t, TokenStreamRewriter::RewriteOperation*> TokenStreamRe
       if (iop->index == rop->index) {
         // E.g., insert before 2, delete 2..2; update replace
         // text to include insert before, kill insert
-        rewrites[(size_t)iop->instructionIndex] = nullptr;
+        rewrites[iop->instructionIndex] = nullptr;
         rop->text = iop->text + (!rop->text.empty() ? rop->text : "");
       }
       else if (iop->index > rop->index && iop->index <= rop->lastIndex) {
         // delete insert as it's a no-op.
-        rewrites[(size_t)iop->instructionIndex] = nullptr;
+        rewrites[iop->instructionIndex] = nullptr;
       }
     }
     // Drop any prior replaces contained within
@@ -366,7 +366,7 @@ std::unordered_map<size_t, TokenStreamRewriter::RewriteOperation*> TokenStreamRe
     for (auto prevRop : prevReplaces) {
       if (prevRop->index >= rop->index && prevRop->lastIndex <= rop->lastIndex) {
         // delete replace as it's a no-op.
-        rewrites[(size_t)prevRop->instructionIndex] = nullptr;
+        rewrites[prevRop->instructionIndex] = nullptr;
         continue;
       }
       // throw exception unless disjoint or identical
@@ -376,7 +376,7 @@ std::unordered_map<size_t, TokenStreamRewriter::RewriteOperation*> TokenStreamRe
       // D.i-j.u D.x-y.v    | boundaries overlap    combine to max(min)..max(right)
       if (prevRop->text.empty() && rop->text.empty() && !disjoint) {
         //System.out.println("overlapping deletes: "+prevRop+", "+rop);
-        rewrites[(size_t)prevRop->instructionIndex] = nullptr; // kill first delete
+        rewrites[prevRop->instructionIndex] = nullptr; // kill first delete
         rop->index = std::min(prevRop->index, rop->index);
         rop->lastIndex = std::max(prevRop->lastIndex, rop->lastIndex);
         std::cout << "new rop " << rop << std::endl;

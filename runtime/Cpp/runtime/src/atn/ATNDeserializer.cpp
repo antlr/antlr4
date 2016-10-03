@@ -192,7 +192,7 @@ ATN ATNDeserializer::deserialize(const std::vector<uint16_t>& input) {
 
   // delay the assignment of loop back and end states until we know all the state instances have been initialized
   for (auto &pair : loopBackStateNumbers) {
-    pair.first->loopBackState = atn.states[(size_t)pair.second];
+    pair.first->loopBackState = atn.states[pair.second];
   }
 
   for (auto &pair : endStateNumbers) {
@@ -224,7 +224,7 @@ ATN ATNDeserializer::deserialize(const std::vector<uint16_t>& input) {
   }
 
   for (size_t i = 0; i < nrules; i++) {
-    size_t s = (size_t)data[p++];
+    size_t s = data[p++];
     // Also here, the serialized atn must ensure to point to the correct class type.
     RuleStartState *startState = (RuleStartState*)atn.states[s];
     atn.ruleToStartState.push_back(startState);
@@ -298,7 +298,7 @@ ATN ATNDeserializer::deserialize(const std::vector<uint16_t>& input) {
     size_t arg2 = data[p + 4];
     size_t arg3 = data[p + 5];
     Transition *trans = edgeFactory(atn, ttype, src, trg, arg1, arg2, arg3, sets);
-    ATNState *srcState = atn.states[(size_t)src];
+    ATNState *srcState = atn.states[src];
     srcState->addTransition(trans);
     p += 6;
   }
@@ -363,7 +363,7 @@ ATN ATNDeserializer::deserialize(const std::vector<uint16_t>& input) {
   //
   // DECISIONS
   //
-  size_t ndecisions = (size_t)data[p++];
+  size_t ndecisions = data[p++];
   for (size_t i = 1; i <= ndecisions; i++) {
     size_t s = data[p++];
     DecisionState *decState = dynamic_cast<DecisionState*>(atn.states[s]);

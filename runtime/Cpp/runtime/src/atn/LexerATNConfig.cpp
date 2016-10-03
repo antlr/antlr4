@@ -78,7 +78,7 @@ bool LexerATNConfig::hasPassedThroughNonGreedyDecision() {
 size_t LexerATNConfig::hashCode() const {
   size_t hashCode = misc::MurmurHash::initialize(7);
   hashCode = misc::MurmurHash::update(hashCode, state->stateNumber);
-  hashCode = misc::MurmurHash::update(hashCode, (size_t)alt);
+  hashCode = misc::MurmurHash::update(hashCode, alt);
   hashCode = misc::MurmurHash::update(hashCode, context);
   hashCode = misc::MurmurHash::update(hashCode, semanticContext);
   hashCode = misc::MurmurHash::update(hashCode, _passedThroughNonGreedyDecision ? 1 : 0);

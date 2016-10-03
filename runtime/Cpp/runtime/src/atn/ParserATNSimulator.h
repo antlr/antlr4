@@ -686,7 +686,7 @@ namespace atn {
      * @since 4.3
      */
     virtual bool evalSemanticContext(Ref<SemanticContext> const& pred, Ref<ParserRuleContext> const& parserCallStack,
-                                     int alt, bool fullCtx);
+                                     size_t alt, bool fullCtx);
 
     /* TO_DO: If we are doing predicates, there is no point in pursuing
      closure operations if we reach a DFA state that uniquely predicts
@@ -788,7 +788,7 @@ namespace atn {
     virtual NoViableAltException noViableAlt(TokenStream *input, Ref<ParserRuleContext> const& outerContext,
                                               ATNConfigSet *configs, size_t startIndex);
 
-    static int getUniqueAlt(ATNConfigSet *configs);
+    static size_t getUniqueAlt(ATNConfigSet *configs);
 
     /// <summary>
     /// Add an edge to the DFA, if possible. This method calls

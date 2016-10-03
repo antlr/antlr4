@@ -139,7 +139,7 @@ std::unique_ptr<ATNConfigSet> ProfilingATNSimulator::computeReachSet(ATNConfigSe
 }
 
 bool ProfilingATNSimulator::evalSemanticContext(Ref<SemanticContext> const& pred, Ref<ParserRuleContext> const& parserCallStack,
-                                                int alt, bool fullCtx) {
+                                                size_t alt, bool fullCtx) {
   bool result = ParserATNSimulator::evalSemanticContext(pred, parserCallStack, alt, fullCtx);
   if (!(std::dynamic_pointer_cast<SemanticContext::PrecedencePredicate>(pred) != nullptr)) {
     bool fullContext = _llStopIndex >= 0;

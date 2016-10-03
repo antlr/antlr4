@@ -46,7 +46,7 @@ namespace atn {
 
     // TO_DO: these fields make me pretty uncomfortable but nice to pack up info together, saves recomputation
     // TO_DO: can we track conflicts as they are added to save scanning configs later?
-    int uniqueAlt;
+    size_t uniqueAlt;
 
     /** Currently this is only used when we detect SLL conflict; this does
      *  not necessarily represent the ambiguous alternatives. In fact,

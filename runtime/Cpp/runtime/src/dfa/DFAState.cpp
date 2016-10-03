@@ -70,8 +70,8 @@ DFAState::~DFAState() {
   }
 }
 
-std::set<int> DFAState::getAltSet() {
-  std::set<int> alts;
+std::set<size_t> DFAState::getAltSet() {
+  std::set<size_t> alts;
   if (configs != nullptr) {
     for (size_t i = 0; i < configs->size(); i++) {
       alts.insert(configs->get(i)->alt);

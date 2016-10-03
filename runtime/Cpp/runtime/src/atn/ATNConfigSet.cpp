@@ -239,7 +239,7 @@ std::string ATNConfigSet::toString() {
 size_t ATNConfigSet::getHash(ATNConfig *c) {
   size_t hashCode = 7;
   hashCode = 31 * hashCode + c->state->stateNumber;
-  hashCode = 31 * hashCode + (size_t)c->alt;
+  hashCode = 31 * hashCode + c->alt;
   hashCode = 31 * hashCode + c->semanticContext->hashCode();
   return hashCode;
 }

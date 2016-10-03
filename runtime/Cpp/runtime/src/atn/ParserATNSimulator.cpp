@@ -289,7 +289,7 @@ dfa::DFAState *ParserATNSimulator::computeTargetState(dfa::DFA &dfa, dfa::DFASta
 
   // create new target state; we'll add to DFA after it's complete
   dfa::DFAState *D = new dfa::DFAState(std::move(reach)); /* mem-check: managed by the DFA or deleted below, "reach" is no longer valid now. */
-  int predictedAlt = getUniqueAlt(D->configs.get());
+  size_t predictedAlt = getUniqueAlt(D->configs.get());
 
   if (predictedAlt != ATN::INVALID_ALT_NUMBER) {
     // NO CONFLICT, UNIQUELY PREDICTED ALT
@@ -685,8 +685,8 @@ std::vector<Ref<SemanticContext>> ParserATNSimulator::getPredsForAmbigAlts(const
   std::vector<Ref<SemanticContext>> altToPred(nalts + 1);
 
   for (auto &c : configs->configs) {
-    if (ambigAlts.test((size_t)c->alt)) {
-      altToPred[(size_t)c->alt] = SemanticContext::Or(altToPred[(size_t)c->alt], c->semanticContext);
+    if (ambigAlts.test(c->alt)) {
+      altToPred[c->alt] = SemanticContext::Or(altToPred[c->alt], c->semanticContext);
     }
   }
 
@@ -794,7 +794,7 @@ BitSet ParserATNSimulator::evalSemanticContext(std::vector<dfa::DFAState::PredPr
   BitSet predictions;
   for (auto prediction : predPredictions) {
     if (prediction->pred == SemanticContext::NONE) {
-      predictions.set((size_t)prediction->alt);
+      predictions.set(prediction->alt);
       if (!complete) {
         break;
       }
@@ -812,7 +812,7 @@ BitSet ParserATNSimulator::evalSemanticContext(std::vector<dfa::DFAState::PredPr
         std::cout << "PREDICT " << prediction->alt << std::endl;
 #endif
 
-      predictions.set((size_t)prediction->alt);
+      predictions.set(prediction->alt);
       if (!complete) {
         break;
       }
@@ -823,7 +823,7 @@ BitSet ParserATNSimulator::evalSemanticContext(std::vector<dfa::DFAState::PredPr
 }
 
 bool ParserATNSimulator::evalSemanticContext(Ref<SemanticContext> const& pred, Ref<ParserRuleContext> const& parserCallStack,
-                                             int /*alt*/, bool /*fullCtx*/) {
+                                             size_t /*alt*/, bool /*fullCtx*/) {
   return pred->eval(parser, parserCallStack);
 }
 
@@ -1104,7 +1104,7 @@ BitSet ParserATNSimulator::getConflictingAlts(ATNConfigSet *configs) {
 BitSet ParserATNSimulator::getConflictingAltsOrUniqueAlt(ATNConfigSet *configs) {
   BitSet conflictingAlts;
   if (configs->uniqueAlt != ATN::INVALID_ALT_NUMBER) {
-    conflictingAlts.set((size_t)configs->uniqueAlt);
+    conflictingAlts.set(configs->uniqueAlt);
   } else {
     conflictingAlts = configs->conflictingAlts;
   }
@@ -1155,8 +1155,8 @@ NoViableAltException ParserATNSimulator::noViableAlt(TokenStream *input, Ref<Par
   return NoViableAltException(parser, input, input->get(startIndex), input->LT(1), configs, outerContext);
 }
 
-int ParserATNSimulator::getUniqueAlt(ATNConfigSet *configs) {
-  int alt = ATN::INVALID_ALT_NUMBER;
+size_t ParserATNSimulator::getUniqueAlt(ATNConfigSet *configs) {
+  size_t alt = ATN::INVALID_ALT_NUMBER;
   for (auto &c : configs->configs) {
     if (alt == ATN::INVALID_ALT_NUMBER) {
       alt = c->alt; // found first alt

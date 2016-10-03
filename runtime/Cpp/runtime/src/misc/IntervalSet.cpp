@@ -478,7 +478,7 @@ std::string IntervalSet::elementName(const dfa::Vocabulary &vocabulary, ssize_t 
 size_t IntervalSet::size() const {
   size_t result = 0;
   for (auto &interval : _intervals) {
-    result += (size_t)(interval.b - interval.a + 1);
+    result += size_t(interval.b - interval.a + 1);
   }
   return result;
 }
@@ -556,9 +556,9 @@ void IntervalSet::remove(ssize_t el) {
     }
     // if in middle a..x..b, split interval
     if (el > a && el < b) { // found in this interval
-      size_t oldb = (size_t)interval.b;
+      ssize_t oldb = interval.b;
       interval.b = el - 1; // [a..x-1]
-      add(el + 1, (int)oldb); // add [x+1..b]
+      add(el + 1, oldb); // add [x+1..b]
 
       break; // ml: not in the Java code but I believe we also should stop searching here, as we found x.
     }

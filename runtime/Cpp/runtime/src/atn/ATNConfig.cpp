@@ -39,11 +39,11 @@ using namespace antlr4::atn;
 
 const size_t ATNConfig::SUPPRESS_PRECEDENCE_FILTER = 0x40000000;
 
-ATNConfig::ATNConfig(ATNState *state, int alt, Ref<PredictionContext> const& context)
+ATNConfig::ATNConfig(ATNState *state, size_t alt, Ref<PredictionContext> const& context)
   : ATNConfig(state, alt, context, SemanticContext::NONE) {
 }
 
-ATNConfig::ATNConfig(ATNState *state, int alt, Ref<PredictionContext> const& context, Ref<SemanticContext> const& semanticContext)
+ATNConfig::ATNConfig(ATNState *state, size_t alt, Ref<PredictionContext> const& context, Ref<SemanticContext> const& semanticContext)
   : state(state), alt(alt), context(context), semanticContext(semanticContext) {
   reachesIntoOuterContext = 0;
 }
@@ -78,14 +78,14 @@ ATNConfig::~ATNConfig() {
 size_t ATNConfig::hashCode() const {
   size_t hashCode = misc::MurmurHash::initialize(7);
   hashCode = misc::MurmurHash::update(hashCode, state->stateNumber);
-  hashCode = misc::MurmurHash::update(hashCode, (size_t)alt);
+  hashCode = misc::MurmurHash::update(hashCode, alt);
   hashCode = misc::MurmurHash::update(hashCode, context);
   hashCode = misc::MurmurHash::update(hashCode, semanticContext);
   hashCode = misc::MurmurHash::finish(hashCode, 4);
   return hashCode;
 }
 
-int ATNConfig::getOuterContextDepth() const {
+size_t ATNConfig::getOuterContextDepth() const {
   return reachesIntoOuterContext & ~SUPPRESS_PRECEDENCE_FILTER;
 }
 

@@ -63,9 +63,8 @@ namespace atn {
     /// The ATN state associated with this configuration.
     ATNState * state;
 
-    /// <summary>
-    /// What alt (or lexer rule) is predicted by this configuration </summary>
-    const int alt;
+    /// What alt (or lexer rule) is predicted by this configuration.
+    const size_t alt;
 
     /// The stack of invoking states leading to the rule/states associated
     /// with this config.  We track only those contexts pushed during
@@ -97,13 +96,13 @@ namespace atn {
      * {@link ATNConfigSet#add(ATNConfig, DoubleKeyMap)} method are
      * <em>completely</em> unaffected by the change.</p>
      */
-    int reachesIntoOuterContext;
+    size_t reachesIntoOuterContext;
 
     /// Can be shared between multiple ATNConfig instances.
     Ref<SemanticContext> semanticContext;
 
-    ATNConfig(ATNState *state, int alt, Ref<PredictionContext> const& context);
-    ATNConfig(ATNState *state, int alt, Ref<PredictionContext> const& context, Ref<SemanticContext> const& semanticContext);
+    ATNConfig(ATNState *state, size_t alt, Ref<PredictionContext> const& context);
+    ATNConfig(ATNState *state, size_t alt, Ref<PredictionContext> const& context, Ref<SemanticContext> const& semanticContext);
 
     ATNConfig(Ref<ATNConfig> const& c); // dup
     ATNConfig(Ref<ATNConfig> const& c, ATNState *state);
@@ -121,7 +120,7 @@ namespace atn {
      * as it existed prior to the introduction of the
      * {@link #isPrecedenceFilterSuppressed} method.
      */
-    int getOuterContextDepth() const ;
+    size_t getOuterContextDepth() const ;
     bool isPrecedenceFilterSuppressed() const;
     void setPrecedenceFilterSuppressed(bool value);
 

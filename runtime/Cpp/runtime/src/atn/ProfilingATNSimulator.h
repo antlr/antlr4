@@ -73,7 +73,7 @@ namespace atn {
     virtual dfa::DFAState* computeTargetState(dfa::DFA &dfa, dfa::DFAState *previousD, size_t t) override;
     virtual std::unique_ptr<ATNConfigSet> computeReachSet(ATNConfigSet *closure, size_t t, bool fullCtx) override;
     virtual bool evalSemanticContext(Ref<SemanticContext> const& pred, Ref<ParserRuleContext> const& parserCallStack,
-                                     int alt, bool fullCtx) override;
+                                     size_t alt, bool fullCtx) override;
     virtual void reportAttemptingFullContext(dfa::DFA &dfa, const antlrcpp::BitSet &conflictingAlts, ATNConfigSet *configs,
                                              size_t startIndex, size_t stopIndex) override;
     virtual void reportContextSensitivity(dfa::DFA &dfa, size_t prediction, ATNConfigSet *configs,

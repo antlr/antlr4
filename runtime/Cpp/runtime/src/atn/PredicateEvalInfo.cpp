@@ -37,7 +37,7 @@ using namespace antlr4;
 using namespace antlr4::atn;
 
 PredicateEvalInfo::PredicateEvalInfo(size_t decision, TokenStream *input, size_t startIndex, size_t stopIndex,
-  Ref<SemanticContext> const& semctx, bool evalResult, int predictedAlt, bool fullCtx)
+  Ref<SemanticContext> const& semctx, bool evalResult, size_t predictedAlt, bool fullCtx)
   : DecisionEventInfo(decision, nullptr, input, startIndex, stopIndex, fullCtx),
     semctx(semctx), predictedAlt(predictedAlt), evalResult(evalResult) {
 }

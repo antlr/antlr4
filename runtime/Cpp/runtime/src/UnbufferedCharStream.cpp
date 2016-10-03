@@ -78,7 +78,7 @@ void UnbufferedCharStream::sync(size_t want) {
 
 size_t UnbufferedCharStream::fill(size_t n) {
   for (size_t i = 0; i < n; i++) {
-    if (_data.size() > 0 && _data.back() == EOF) {
+    if (_data.size() > 0 && (size_t)_data.back() == EOF) {
       return i;
     }
 
