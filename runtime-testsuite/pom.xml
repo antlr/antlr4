@@ -70,7 +70,7 @@
         <version>2.12.4</version>
         <configuration>
           <includes>
-            <include>**/cpp/TestParserErrors.java</include>
+            <include>**/cpp/Test*.java</include>
             <!--include>**/csharp/Test*.java</include>
             <include>**/java/Test*.java</include>
             <include>**/javascript/node/Test*.java</include>

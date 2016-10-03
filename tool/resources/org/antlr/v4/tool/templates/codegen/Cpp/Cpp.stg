@@ -810,8 +810,8 @@ CommonSetStuff(m, expr, capture, invert) ::= <<
 setState(<m.stateNumber>);
 <if (m.labels)><m.labels: {l | <labelref(l)> = }>_input->LT(1);<endif>
 <capture>
-if (<if (invert)><m.varName> \<= 0 || <else>!<endif>(<expr>)) {
-    <if (m.labels)><m.labels:{l | <labelref(l)> = }><endif>_errHandler->recoverInline(this);
+if (<if (invert)><m.varName> == 0 || <m.varName> == Token::EOF || <else>!<endif>(<expr>)) {
+  <if (m.labels)><m.labels: {l | <labelref(l)> = }><endif>_errHandler->recoverInline(this);
 } else {
   consume();
 }
