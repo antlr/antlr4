@@ -39,14 +39,14 @@ using namespace antlr4;
 using namespace antlr4::atn;
 using namespace antlr4::misc;
 
-LexerCustomAction::LexerCustomAction(int ruleIndex, int actionIndex) : _ruleIndex(ruleIndex), _actionIndex(actionIndex) {
+LexerCustomAction::LexerCustomAction(size_t ruleIndex, size_t actionIndex) : _ruleIndex(ruleIndex), _actionIndex(actionIndex) {
 }
 
-int LexerCustomAction::getRuleIndex() const {
+size_t LexerCustomAction::getRuleIndex() const {
   return _ruleIndex;
 }
 
-int LexerCustomAction::getActionIndex() const {
+size_t LexerCustomAction::getActionIndex() const {
   return _actionIndex;
 }
 

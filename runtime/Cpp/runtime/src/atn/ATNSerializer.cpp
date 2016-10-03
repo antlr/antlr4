@@ -99,7 +99,7 @@ std::vector<size_t> ATNSerializer::serialize() {
       continue;
     }
 
-    int stateType = s->getStateType();
+    size_t stateType = s->getStateType();
     if (is<DecisionState *>(s) && (static_cast<DecisionState *>(s))->nonGreedy) {
       nonGreedyStates.push_back(s->stateNumber);
     }
@@ -108,7 +108,7 @@ std::vector<size_t> ATNSerializer::serialize() {
       precedenceStates.push_back(s->stateNumber);
     }
 
-    data.push_back((size_t)stateType);
+    data.push_back(stateType);
 
     if (s->ruleIndex == INVALID_INDEX) {
       data.push_back(0xFFFF);
@@ -324,10 +324,10 @@ std::vector<size_t> ATNSerializer::serialize() {
 
         case LexerActionType::CUSTOM:
         {
-          int ruleIndex = std::dynamic_pointer_cast<LexerCustomAction>(action)->getRuleIndex();
-          int actionIndex = std::dynamic_pointer_cast<LexerCustomAction>(action)->getActionIndex();
-          data.push_back(ruleIndex != -1 ? ruleIndex : 0xFFFF);
-          data.push_back(actionIndex != -1 ? actionIndex : 0xFFFF);
+          size_t ruleIndex = std::dynamic_pointer_cast<LexerCustomAction>(action)->getRuleIndex();
+          size_t actionIndex = std::dynamic_pointer_cast<LexerCustomAction>(action)->getActionIndex();
+          data.push_back(ruleIndex != INVALID_INDEX ? ruleIndex : 0xFFFF);
+          data.push_back(actionIndex != INVALID_INDEX ? actionIndex : 0xFFFF);
           break;
         }
 
@@ -405,7 +405,7 @@ std::string ATNSerializer::decode(const std::wstring &inpdata) {
   }
 
   std::string buf;
-  int p = 0;
+  size_t p = 0;
   size_t version = data[p++];
   if (version != ATNDeserializer::SERIALIZED_VERSION) {
     std::string reason = "Could not deserialize ATN with version " + std::to_string(version) + "(expected " +
@@ -422,17 +422,17 @@ std::string ATNSerializer::decode(const std::wstring &inpdata) {
   }
 
   p++;  // skip grammarType
-  int maxType = data[p++];
+  size_t maxType = data[p++];
   buf.append("max type ").append(std::to_string(maxType)).append("\n");
-  int nstates = data[p++];
-  for (int i = 0; i < nstates; i++) {
+  size_t nstates = data[p++];
+  for (size_t i = 0; i < nstates; i++) {
     size_t stype = data[p++];
     if (stype == ATNState::ATN_INVALID_TYPE) {  // ignore bad type of states
       continue;
     }
     size_t ruleIndex = data[p++];
     if (ruleIndex == 0xFFFF) {
-      ruleIndex = -1;
+      ruleIndex = INVALID_INDEX;
     }
 
     std::string arg = "";
@@ -601,7 +601,7 @@ std::string ATNSerializer::getTokenName(size_t t) {
   }
 
   if (_tokenNames.size() > 0 && t < _tokenNames.size()) {
-    return _tokenNames[(size_t)t];
+    return _tokenNames[t];
   }
 
   return std::to_string(t);

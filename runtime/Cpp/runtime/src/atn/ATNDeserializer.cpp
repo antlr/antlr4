@@ -176,7 +176,7 @@ ATN ATNDeserializer::deserialize(const std::vector<uint16_t>& input) {
 
     size_t ruleIndex = data[p++];
     if (ruleIndex == 0xFFFF) { // Max Unicode char limit imposed by ANTLR.
-      ruleIndex = -1;
+      ruleIndex = INVALID_INDEX;
     }
 
     ATNState *s = stateFactory(stype, ruleIndex);
@@ -612,7 +612,7 @@ void ATNDeserializer::checkCondition(bool condition, const std::string &message)
   }
 }
 
-Guid ATNDeserializer::toUUID(const unsigned short *data, int offset) {
+Guid ATNDeserializer::toUUID(const unsigned short *data, size_t offset) {
   return Guid((uint16_t *)data + offset, true);
 }
 

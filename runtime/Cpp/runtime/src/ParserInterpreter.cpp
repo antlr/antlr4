@@ -287,7 +287,7 @@ Ref<InterpreterRuleContext> ParserInterpreter::createInterpreterRuleContext(std:
 void ParserInterpreter::visitRuleStopState(atn::ATNState *p) {
   atn::RuleStartState *ruleStartState = _atn.ruleToStartState[p->ruleIndex];
   if (ruleStartState->isLeftRecursiveRule) {
-    std::pair<Ref<ParserRuleContext>, int> parentContext = _parentContextStack.top();
+    std::pair<Ref<ParserRuleContext>, size_t> parentContext = _parentContextStack.top();
     _parentContextStack.pop();
 
     unrollRecursionContexts(parentContext.first);
@@ -311,14 +311,14 @@ void ParserInterpreter::recover(RecognitionException &e) {
       Token *tok = e.getOffendingToken();
       size_t expectedTokenType = ime.getExpectedTokens().getMinElement(); // get any element
       _errorToken = getTokenFactory()->create({ tok->getTokenSource(), tok->getTokenSource()->getInputStream() },
-        expectedTokenType, tok->getText(), Token::DEFAULT_CHANNEL, -1, -1, // invalid start/stop
+        expectedTokenType, tok->getText(), Token::DEFAULT_CHANNEL, INVALID_INDEX, INVALID_INDEX, // invalid start/stop
         tok->getLine(), tok->getCharPositionInLine());
       _ctx->addErrorNode(_errorToken.get());
     }
     else { // NoViableAlt
       Token *tok = e.getOffendingToken();
       _errorToken = getTokenFactory()->create({ tok->getTokenSource(), tok->getTokenSource()->getInputStream() },
-        Token::INVALID_TYPE, tok->getText(), Token::DEFAULT_CHANNEL, -1, -1, // invalid start/stop
+        Token::INVALID_TYPE, tok->getText(), Token::DEFAULT_CHANNEL, INVALID_INDEX, INVALID_INDEX, // invalid start/stop
         tok->getLine(), tok->getCharPositionInLine());
       _ctx->addErrorNode(_errorToken.get());
     }

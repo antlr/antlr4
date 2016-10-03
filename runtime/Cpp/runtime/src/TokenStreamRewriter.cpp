@@ -267,11 +267,11 @@ std::vector<TokenStreamRewriter::RewriteOperation*> TokenStreamRewriter::initial
 }
 
 std::string TokenStreamRewriter::getText() {
-  return getText(DEFAULT_PROGRAM_NAME, Interval(0, tokens->size() - 1));
+  return getText(DEFAULT_PROGRAM_NAME, Interval(0UL, tokens->size() - 1));
 }
 
 std::string TokenStreamRewriter::getText(std::string programName) {
-  return getText(programName, Interval(0, tokens->size() - 1));
+  return getText(programName, Interval(0UL, tokens->size() - 1));
 }
 
 std::string TokenStreamRewriter::getText(const Interval &interval) {

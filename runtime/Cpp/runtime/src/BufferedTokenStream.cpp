@@ -386,7 +386,7 @@ std::string BufferedTokenStream::getSourceName() const
 std::string BufferedTokenStream::getText() {
   lazyInit();
   fill();
-  return getText(misc::Interval(0, size() - 1));
+  return getText(misc::Interval(0U, size() - 1));
 }
 
 std::string BufferedTokenStream::getText(const misc::Interval &interval) {

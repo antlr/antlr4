@@ -85,5 +85,5 @@ IRecognizer* RecognitionException::getRecognizer() const {
 }
 
 void RecognitionException::InitializeInstanceFields() {
-  _offendingState = -1;
+  _offendingState = INVALID_INDEX;
 }

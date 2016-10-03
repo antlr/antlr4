@@ -63,7 +63,7 @@ void Lexer::reset() {
   token.reset();
   type = Token::INVALID_TYPE;
   channel = Token::DEFAULT_CHANNEL;
-  tokenStartCharIndex = -1;
+  tokenStartCharIndex = INVALID_INDEX;
   tokenStartCharPositionInLine = 0;
   tokenStartLine = 0;
   type = 0;
@@ -311,7 +311,7 @@ void Lexer::InitializeInstanceFields() {
   _syntaxErrors = 0;
   token = nullptr;
   _factory = CommonTokenFactory::DEFAULT;
-  tokenStartCharIndex = -1;
+  tokenStartCharIndex = INVALID_INDEX;
   tokenStartLine = 0;
   tokenStartCharPositionInLine = 0;
   hitEOF = false;

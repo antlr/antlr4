@@ -57,16 +57,16 @@ using namespace antlr4::atn;
 using namespace antlrcpp;
 
 void LexerATNSimulator::SimState::reset() {
-  index = -1;
+  index = INVALID_INDEX;
   line = 0;
-  charPos = -1;
+  charPos = INVALID_INDEX;
   dfaState = nullptr; // Don't delete. It's just a reference.
 }
 
 void LexerATNSimulator::SimState::InitializeInstanceFields() {
-  index = -1;
+  index = INVALID_INDEX;
   line = 0;
-  charPos = -1;
+  charPos = INVALID_INDEX;
 }
 
 int LexerATNSimulator::match_calls = 0;

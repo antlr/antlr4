@@ -44,7 +44,7 @@ ssize_t antlr4::misc::symbolToNumeric(size_t v) {
 
 Interval const Interval::INVALID;
 
-Interval::Interval() : Interval(-1L, -2L) {
+Interval::Interval() : Interval((ssize_t)-1, -2) { // Need an explicit cast here for VS.
 }
 
 Interval::Interval(size_t a_, size_t b_) : Interval(symbolToNumeric(a_), symbolToNumeric(b_)) {

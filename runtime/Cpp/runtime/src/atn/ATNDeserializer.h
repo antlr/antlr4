@@ -49,7 +49,7 @@ namespace atn {
     ATNDeserializer(const ATNDeserializationOptions& dso);
     virtual ~ATNDeserializer() {};
 
-    static Guid toUUID(const unsigned short *data, int offset);
+    static Guid toUUID(const unsigned short *data, size_t offset);
 
     virtual ATN deserialize(const std::vector<uint16_t> &input);
     virtual void verifyATN(const ATN &atn);

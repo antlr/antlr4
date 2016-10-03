@@ -288,7 +288,7 @@ Token* DefaultErrorStrategy::getMissingSymbol(Parser *recognizer) {
 
   _errorSymbols.push_back(recognizer->getTokenFactory()->create(
     { current->getTokenSource(), current->getTokenSource()->getInputStream() },
-    (int)expectedTokenType, tokenText, Token::DEFAULT_CHANNEL, -1, -1,
+    expectedTokenType, tokenText, Token::DEFAULT_CHANNEL, INVALID_INDEX, INVALID_INDEX,
     current->getLine(), current->getCharPositionInLine()));
   
   return _errorSymbols.back().get();
