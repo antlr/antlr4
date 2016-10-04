@@ -21,7 +21,8 @@ before_install:
   - python3 --version
 
 env:
-  - CXX=g++-5
+  - CXX=gcc-5
+  - CC=gcc=5
 
 addons:
   apt:
