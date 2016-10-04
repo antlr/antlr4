@@ -33,19 +33,9 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.antlr</groupId>
-			<artifactId>antlr4-runtime-test-annotations</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.antlr</groupId>
-			<artifactId>antlr4-runtime-test-annotation-processors</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.12</version>
+			<version>4.11</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -60,9 +50,16 @@
 			<version>8.1.16.v20140903</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.glassfish</groupId>
+			<artifactId>javax.json</artifactId>
+			<version>1.0.4</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 
 	<build>
+		<sourceDirectory>src</sourceDirectory>
 		<testSourceDirectory>test</testSourceDirectory>
 		<resources>
 			<resource>
@@ -85,7 +82,7 @@
 						<include>**/javascript/node/Test*.java</include>
 						<include>**/python2/Test*.java</include>
 						<include>**/python3/Test*.java</include>
-						<include>**/cpp/Test*.java</include>
+						<include>**/swift/Test*.java</include>
 					</includes>
 				</configuration>
 			</plugin>
@@ -103,4 +100,54 @@
 			</plugin>
 		</plugins>
 	</build>
+
+	<profiles>
+		<profile>
+			<id>gen</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>exec-maven-plugin</artifactId>
+						<version>1.4.0</version>
+						<executions>
+							<execution>
+								<phase>generate-test-sources</phase>
+								<goals>
+									<goal>java</goal>
+								</goals>
+								<configuration>
+									<mainClass>org.antlr.v4.testgen.TestGenerator</mainClass>
+									<arguments>
+										<argument>-root</argument>
+										<argument>${basedir}</argument>
+										<argument>-outdir</argument>
+										<argument>${basedir}/test</argument>
+										<argument>-templates</argument>
+										<argument>${basedir}/resources/org/antlr/v4/test/runtime/templates</argument>
+									</arguments>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>tests</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<configuration>
+							<includes>
+								<include>**/Test*.java</include>
+							</includes>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 </project>
