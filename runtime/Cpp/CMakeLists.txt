@@ -1,6 +1,6 @@
 # -*- mode:cmake -*-
-cmake_minimum_required (VERSION 2.8)
-# 2.8 needed because of ExternalProject
+cmake_minimum_required (VERSION 3.1)
+# 3.1 needed to allow enabling C++11
 
 # Detect build type, fallback to release and throw a warning if use didn't specify any
 if(NOT CMAKE_BUILD_TYPE)
