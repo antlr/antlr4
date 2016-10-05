@@ -220,7 +220,7 @@ ImportListener(X) ::= ""
 
 GetExpectedTokenNames() ::= "p.GetExpectedTokens().StringVerbose(p.GetTokenNames(), nil, false)"
 
-RuleInvocationStack() ::= "p.GetRuleInvocationStack(nil)"
+RuleInvocationStack() ::= "antlr.PrintArrayJavaStyle(p.GetRuleInvocationStack(nil))"
 
 LL_EXACT_AMBIG_DETECTION() ::= <<p.Interpreter.SetPredictionMode(antlr.PredictionModeLLExactAmbigDetection);>>
 
@@ -360,7 +360,7 @@ func NewLeafListener() *LeafListener {
 
 func (*LeafListener) ExitA(ctx *AContext) {
 	if ctx.GetChildCount() == 2 {
-		fmt.Printf("%s %s %s", ctx.INT(0).GetSymbol().GetText(), ctx.INT(1).GetSymbol().GetText(), ctx.AllINT())
+		fmt.Printf("%s %s %s", ctx.INT(0).GetSymbol().GetText(), ctx.INT(1).GetSymbol().GetText(), antlr.PrintArrayJavaStyle(antlr.TerminalNodeToStringArray(ctx.AllINT())))
 	} else {
 		fmt.Println(ctx.ID().GetSymbol())
 	}
