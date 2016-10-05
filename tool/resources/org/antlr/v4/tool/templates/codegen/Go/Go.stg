@@ -1327,7 +1327,11 @@ _prevctx = localctx
 LexerFile(lexerFile, lexer, namedActions) ::= <<
 <fileHeader(lexerFile.grammarFileName, lexerFile.ANTLRVersion)>
 
+<if(lexerFile.genPackage)>
+package <lexerFile.genPackage>
+<else>
 package parser
+<endif>
 
 import (
 	"fmt"
