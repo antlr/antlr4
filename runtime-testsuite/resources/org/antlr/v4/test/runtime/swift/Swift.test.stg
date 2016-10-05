@@ -340,6 +340,10 @@ let walker =  ParseTreeWalker()
 try! walker.walk(LeafListener(), <s>)
 >>
 
+TreeNodeWithAltNumField(X) ::= <<
+// TODO
+>>
+
 TokenGetterListener(X) ::= <<
 open class LeafListener: TBaseListener {
     override
