@@ -332,7 +332,6 @@ func pred(v bool) bool {
 >>
 
 Invoke_pred(v) ::= <<pred(<v>)>>
-
 ContextRuleFunction(ctx, rule) ::= "<ctx>.<rule>"
 StringType() ::= "String"
 ContextMember(ctx, subctx, member) ::= "<ctx>.<subctx>.<member; format={cap}>"

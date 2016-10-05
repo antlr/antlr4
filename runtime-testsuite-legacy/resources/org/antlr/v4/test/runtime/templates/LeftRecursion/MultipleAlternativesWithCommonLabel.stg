@@ -35,5 +35,3 @@ INC : '++' ;
 DEC : '--' ;
 WS : (' '|'\n') -> skip;
 >>
-
-/* other targets'.test.stg added:  OptionalValue(value) ::= "<value>"  */
