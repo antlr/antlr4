@@ -1,0 +1,10 @@
+import "RuleGetters.stg"
+
+Input() ::= "1 2"
+
+Output() ::= <<
+(a (b 1) (b 2))
+1 2 1<\n>
+>>
+
+Errors() ::= ""
