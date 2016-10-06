@@ -114,7 +114,7 @@ using namespace antlr4::misc;
   stream.reset();
   XCTAssertEqual(stream.index(), 0U);
 
-  XCTAssertEqual(stream.LA(0), 0);
+  XCTAssertEqual(stream.LA(0), 0ULL);
   for (size_t i = 1; i < wtext.size(); ++i) {
     XCTAssertEqual(stream.LA((ssize_t)i), wtext[i - 1]); // LA(1) means: current char.
     XCTAssertEqual(stream.LT((ssize_t)i), wtext[i - 1]); // LT is mapped to LA.
@@ -134,7 +134,7 @@ using namespace antlr4::misc;
     XCTAssertEqual(stream.index(), wtext.size() - 1); // No consumption when looking ahead.
   }
 
-  XCTAssertEqual((int)stream.LA(-10000), IntStream::EOF);
+  XCTAssertEqual(stream.LA(-10000), IntStream::EOF);
 
   // Mark and release do nothing.
   stream.reset();
@@ -148,16 +148,16 @@ using namespace antlr4::misc;
   stream.release(marker);
   XCTAssertEqual(stream.index(), 10U);
 
-  misc::Interval interval1(2, 10); // From - to, inclusive.
+  misc::Interval interval1(2, 10UL); // From - to, inclusive.
   std::string output = stream.getText(interval1);
   std::string sub = utfConverter.to_bytes(wtext.substr(2, 9));
   XCTAssertEqual(output, sub);
 
-  misc::Interval interval2(200, 10); // Start beyond bounds.
+  misc::Interval interval2(200, 10UL); // Start beyond bounds.
   output = stream.getText(interval2);
   XCTAssert(output.empty());
 
-  misc::Interval interval3(0, 200); // End beyond bounds.
+  misc::Interval interval3(0, 200UL); // End beyond bounds.
   output = stream.getText(interval3);
   XCTAssertEqual(output, text);
 

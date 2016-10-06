@@ -129,20 +129,20 @@ using namespace antlrcpp;
 - (void)testInterval {
   // The Interval class contains no error handling (checks for invalid intervals), hence some of the results
   // look strange as we test of course such intervals as well.
-  XCTAssertEqual(Interval().length(), 0);
-  XCTAssertEqual(Interval(0, 0).length(), 1); // Remember: it's an inclusive interval.
-  XCTAssertEqual(Interval(100, 100).length(), 1);
-  XCTAssertEqual(Interval(-1, -1).length(), 1); // Unwanted behavior: negative ranges.
-  XCTAssertEqual(Interval(-1, -2).length(), 0);
-  XCTAssertEqual(Interval(100, 50).length(), 0);
+  XCTAssertEqual(Interval().length(), 0UL);
+  XCTAssertEqual(Interval(0, 0UL).length(), 1UL); // Remember: it's an inclusive interval.
+  XCTAssertEqual(Interval(100, 100UL).length(), 1UL);
+  XCTAssertEqual(Interval(-1L, -1).length(), 1UL); // Unwanted behavior: negative ranges.
+  XCTAssertEqual(Interval(-1L, -2).length(), 0UL);
+  XCTAssertEqual(Interval(100, 50UL).length(), 0UL);
 
-  XCTAssert(Interval() == Interval(-1, -2));
-  XCTAssert(Interval(0, 0) == Interval(0, 0));
-  XCTAssertFalse(Interval(0, 1) == Interval(1, 2));
+  XCTAssert(Interval() == Interval(-1L, -2));
+  XCTAssert(Interval(0, 0UL) == Interval(0, 0UL));
+  XCTAssertFalse(Interval(0, 1UL) == Interval(1, 2UL));
 
   XCTAssertEqual(Interval().hashCode(), 22070U);
-  XCTAssertEqual(Interval(0, 0).hashCode(), 22103U);
-  XCTAssertEqual(Interval(10, 2000).hashCode(), 24413U);
+  XCTAssertEqual(Interval(0, 0UL).hashCode(), 22103U);
+  XCTAssertEqual(Interval(10, 2000UL).hashCode(), 24413U);
 
   // Results for the interval test functions in this order:
   // startsBeforeDisjoint
@@ -158,78 +158,78 @@ using namespace antlrcpp;
   struct TestEntry { size_t runningNumber; Interval interval1, interval2; TestResults results; };
   std::vector<TestEntry> testData = {
     // Extreme cases + invalid intervals.
-    { 0, Interval(), Interval(10, 20), { true, false, false, false, false, true, false, false } },
-    { 1, Interval(1, 1), Interval(1, 1), { false, true, false, false, false, false, false, true } },
-    { 2, Interval(10000, 10000), Interval(10000, 10000), { false, true, false, false, false, false, false, true } },
-    { 3, Interval(100, 10), Interval(100, 10), { false, false, false, true, false, true, false, true } },
-    { 4, Interval(100, 10), Interval(10, 100), { false, false, true, false, true, false, false, false } },
-    { 5, Interval(10, 100), Interval(100, 10), { false, true, false, false, false, false, false, true } },
+    { 0, Interval(), Interval(10, 20UL), { true, false, false, false, false, true, false, false } },
+    { 1, Interval(1, 1UL), Interval(1, 1UL), { false, true, false, false, false, false, false, true } },
+    { 2, Interval(10000, 10000UL), Interval(10000, 10000UL), { false, true, false, false, false, false, false, true } },
+    { 3, Interval(100, 10UL), Interval(100, 10UL), { false, false, false, true, false, true, false, true } },
+    { 4, Interval(100, 10UL), Interval(10, 100UL), { false, false, true, false, true, false, false, false } },
+    { 5, Interval(10, 100UL), Interval(100, 10UL), { false, true, false, false, false, false, false, true } },
 
     // First starts before second. End varies.
-    { 20, Interval(10, 12), Interval(12, 100), { false, true, false, false, false, false, false, false } },
-    { 21, Interval(10, 12), Interval(13, 100), { true, false, false, false, false, true, true, false } },
-    { 22, Interval(10, 12), Interval(14, 100), { true, false, false, false, false, true, false, false } },
-    { 23, Interval(10, 13), Interval(12, 100), { false, true, false, false, false, false, false, false } },
-    { 24, Interval(10, 14), Interval(12, 100), { false, true, false, false, false, false, false, false } },
-    { 25, Interval(10, 99), Interval(12, 100), { false, true, false, false, false, false, false, false } },
-    { 26, Interval(10, 100), Interval(12, 100), { false, true, false, false, false, false, false, true } },
-    { 27, Interval(10, 101), Interval(12, 100), { false, true, false, false, false, false, false, true } },
-    { 28, Interval(10, 1000), Interval(12, 100), { false, true, false, false, false, false, false, true } },
+    { 20, Interval(10, 12UL), Interval(12, 100UL), { false, true, false, false, false, false, false, false } },
+    { 21, Interval(10, 12UL), Interval(13, 100UL), { true, false, false, false, false, true, true, false } },
+    { 22, Interval(10, 12UL), Interval(14, 100UL), { true, false, false, false, false, true, false, false } },
+    { 23, Interval(10, 13UL), Interval(12, 100UL), { false, true, false, false, false, false, false, false } },
+    { 24, Interval(10, 14UL), Interval(12, 100UL), { false, true, false, false, false, false, false, false } },
+    { 25, Interval(10, 99UL), Interval(12, 100UL), { false, true, false, false, false, false, false, false } },
+    { 26, Interval(10, 100UL), Interval(12, 100UL), { false, true, false, false, false, false, false, true } },
+    { 27, Interval(10, 101UL), Interval(12, 100UL), { false, true, false, false, false, false, false, true } },
+    { 28, Interval(10, 1000UL), Interval(12, 100UL), { false, true, false, false, false, false, false, true } },
 
     // First and second start equal. End varies.
-    { 30, Interval(12, 12), Interval(12, 100), { false, true, false, false, false, false, false, false } },
-    { 31, Interval(12, 12), Interval(13, 100), { true, false, false, false, false, true, true, false } },
-    { 32, Interval(12, 12), Interval(14, 100), { true, false, false, false, false, true, false, false } },
-    { 33, Interval(12, 13), Interval(12, 100), { false, true, false, false, false, false, false, false } },
-    { 34, Interval(12, 14), Interval(12, 100), { false, true, false, false, false, false, false, false } },
-    { 35, Interval(12, 99), Interval(12, 100), { false, true, false, false, false, false, false, false } },
-    { 36, Interval(12, 100), Interval(12, 100), { false, true, false, false, false, false, false, true } },
-    { 37, Interval(12, 101), Interval(12, 100), { false, true, false, false, false, false, false, true } },
-    { 38, Interval(12, 1000), Interval(12, 100), { false, true, false, false, false, false, false, true } },
+    { 30, Interval(12, 12UL), Interval(12, 100UL), { false, true, false, false, false, false, false, false } },
+    { 31, Interval(12, 12UL), Interval(13, 100UL), { true, false, false, false, false, true, true, false } },
+    { 32, Interval(12, 12UL), Interval(14, 100UL), { true, false, false, false, false, true, false, false } },
+    { 33, Interval(12, 13UL), Interval(12, 100UL), { false, true, false, false, false, false, false, false } },
+    { 34, Interval(12, 14UL), Interval(12, 100UL), { false, true, false, false, false, false, false, false } },
+    { 35, Interval(12, 99UL), Interval(12, 100UL), { false, true, false, false, false, false, false, false } },
+    { 36, Interval(12, 100UL), Interval(12, 100UL), { false, true, false, false, false, false, false, true } },
+    { 37, Interval(12, 101UL), Interval(12, 100UL), { false, true, false, false, false, false, false, true } },
+    { 38, Interval(12, 1000UL), Interval(12, 100UL), { false, true, false, false, false, false, false, true } },
 
     // First starts after second. End varies.
-    { 40, Interval(15, 12), Interval(12, 100), { false, false, true, false, true, false, false, false } },
-    { 41, Interval(15, 12), Interval(13, 100), { false, false, true, false, true, false, true, false } },
-    { 42, Interval(15, 12), Interval(14, 100), { false, false, true, false, true, false, false, false } },
-    { 43, Interval(15, 13), Interval(12, 100), { false, false, true, false, true, false, false, false } },
-    { 44, Interval(15, 14), Interval(12, 100), { false, false, true, false, true, false, false, false } },
-    { 45, Interval(15, 99), Interval(12, 100), { false, false, true, false, true, false, false, false } },
-    { 46, Interval(15, 100), Interval(12, 100), { false, false, true, false, true, false, false, false } },
-    { 47, Interval(15, 101), Interval(12, 100), { false, false, true, false, true, false, false, false } },
-    { 48, Interval(15, 1000), Interval(12, 100), { false, false, true, false, true, false, false, false } },
+    { 40, Interval(15, 12UL), Interval(12, 100UL), { false, false, true, false, true, false, false, false } },
+    { 41, Interval(15, 12UL), Interval(13, 100UL), { false, false, true, false, true, false, true, false } },
+    { 42, Interval(15, 12UL), Interval(14, 100UL), { false, false, true, false, true, false, false, false } },
+    { 43, Interval(15, 13UL), Interval(12, 100UL), { false, false, true, false, true, false, false, false } },
+    { 44, Interval(15, 14UL), Interval(12, 100UL), { false, false, true, false, true, false, false, false } },
+    { 45, Interval(15, 99UL), Interval(12, 100UL), { false, false, true, false, true, false, false, false } },
+    { 46, Interval(15, 100UL), Interval(12, 100UL), { false, false, true, false, true, false, false, false } },
+    { 47, Interval(15, 101UL), Interval(12, 100UL), { false, false, true, false, true, false, false, false } },
+    { 48, Interval(15, 1000UL), Interval(12, 100UL), { false, false, true, false, true, false, false, false } },
 
     // First ends before second. Start varies.
-    { 50, Interval(10, 90), Interval(20, 100), { false, true, false, false, false, false, false, false } },
-    { 51, Interval(19, 90), Interval(20, 100), { false, true, false, false, false, false, false, false } },
-    { 52, Interval(20, 90), Interval(20, 100), { false, true, false, false, false, false, false, false } },
-    { 53, Interval(21, 90), Interval(20, 100), { false, false, true, false, true, false, false, false } },
-    { 54, Interval(98, 90), Interval(20, 100), { false, false, true, false, true, false, false, false } },
-    { 55, Interval(99, 90), Interval(20, 100), { false, false, true, false, true, false, false, false } },
-    { 56, Interval(100, 90), Interval(20, 100), { false, false, true, false, true, false, false, false } },
-    { 57, Interval(101, 90), Interval(20, 100), { false, false, true, true, false, true, true, false } },
-    { 58, Interval(1000, 90), Interval(20, 100), { false, false, true, true, false, true, false, false } },
+    { 50, Interval(10, 90UL), Interval(20, 100UL), { false, true, false, false, false, false, false, false } },
+    { 51, Interval(19, 90UL), Interval(20, 100UL), { false, true, false, false, false, false, false, false } },
+    { 52, Interval(20, 90UL), Interval(20, 100UL), { false, true, false, false, false, false, false, false } },
+    { 53, Interval(21, 90UL), Interval(20, 100UL), { false, false, true, false, true, false, false, false } },
+    { 54, Interval(98, 90UL), Interval(20, 100UL), { false, false, true, false, true, false, false, false } },
+    { 55, Interval(99, 90UL), Interval(20, 100UL), { false, false, true, false, true, false, false, false } },
+    { 56, Interval(100, 90UL), Interval(20, 100UL), { false, false, true, false, true, false, false, false } },
+    { 57, Interval(101, 90UL), Interval(20, 100UL), { false, false, true, true, false, true, true, false } },
+    { 58, Interval(1000, 90UL), Interval(20, 100UL), { false, false, true, true, false, true, false, false } },
 
     // First and second end equal. Start varies.
-    { 60, Interval(10, 100), Interval(20, 100), { false, true, false, false, false, false, false, true } },
-    { 61, Interval(19, 100), Interval(20, 100), { false, true, false, false, false, false, false, true } },
-    { 62, Interval(20, 100), Interval(20, 100), { false, true, false, false, false, false, false, true } },
-    { 63, Interval(21, 100), Interval(20, 100), { false, false, true, false, true, false, false, false } },
-    { 64, Interval(98, 100), Interval(20, 100), { false, false, true, false, true, false, false, false } },
-    { 65, Interval(99, 100), Interval(20, 100), { false, false, true, false, true, false, false, false } },
-    { 66, Interval(100, 100), Interval(20, 100), { false, false, true, false, true, false, false, false } },
-    { 67, Interval(101, 100), Interval(20, 100), { false, false, true, true, false, true, true, false } },
-    { 68, Interval(1000, 100), Interval(20, 100), { false, false, true, true, false, true, false, false } },
+    { 60, Interval(10, 100UL), Interval(20, 100UL), { false, true, false, false, false, false, false, true } },
+    { 61, Interval(19, 100UL), Interval(20, 100UL), { false, true, false, false, false, false, false, true } },
+    { 62, Interval(20, 100UL), Interval(20, 100UL), { false, true, false, false, false, false, false, true } },
+    { 63, Interval(21, 100UL), Interval(20, 100UL), { false, false, true, false, true, false, false, false } },
+    { 64, Interval(98, 100UL), Interval(20, 100UL), { false, false, true, false, true, false, false, false } },
+    { 65, Interval(99, 100UL), Interval(20, 100UL), { false, false, true, false, true, false, false, false } },
+    { 66, Interval(100, 100UL), Interval(20, 100UL), { false, false, true, false, true, false, false, false } },
+    { 67, Interval(101, 100UL), Interval(20, 100UL), { false, false, true, true, false, true, true, false } },
+    { 68, Interval(1000, 100UL), Interval(20, 100UL), { false, false, true, true, false, true, false, false } },
 
     // First ends after second. Start varies.
-    { 70, Interval(10, 1000), Interval(20, 100), { false, true, false, false, false, false, false, true } },
-    { 71, Interval(19, 1000), Interval(20, 100), { false, true, false, false, false, false, false, true } },
-    { 72, Interval(20, 1000), Interval(20, 100), { false, true, false, false, false, false, false, true } },
-    { 73, Interval(21, 1000), Interval(20, 100), { false, false, true, false, true, false, false, false } },
-    { 74, Interval(98, 1000), Interval(20, 100), { false, false, true, false, true, false, false, false } },
-    { 75, Interval(99, 1000), Interval(20, 100), { false, false, true, false, true, false, false, false } },
-    { 76, Interval(100, 1000), Interval(20, 100), { false, false, true, false, true, false, false, false } },
-    { 77, Interval(101, 1000), Interval(20, 100), { false, false, true, true, false, true, true, false } },
-    { 78, Interval(1000, 1000), Interval(20, 100), { false, false, true, true, false, true, false, false } },
+    { 70, Interval(10, 1000UL), Interval(20, 100UL), { false, true, false, false, false, false, false, true } },
+    { 71, Interval(19, 1000UL), Interval(20, 100UL), { false, true, false, false, false, false, false, true } },
+    { 72, Interval(20, 1000UL), Interval(20, 100UL), { false, true, false, false, false, false, false, true } },
+    { 73, Interval(21, 1000UL), Interval(20, 100UL), { false, false, true, false, true, false, false, false } },
+    { 74, Interval(98, 1000UL), Interval(20, 100UL), { false, false, true, false, true, false, false, false } },
+    { 75, Interval(99, 1000UL), Interval(20, 100UL), { false, false, true, false, true, false, false, false } },
+    { 76, Interval(100, 1000UL), Interval(20, 100UL), { false, false, true, false, true, false, false, false } },
+    { 77, Interval(101, 1000UL), Interval(20, 100UL), { false, false, true, true, false, true, true, false } },
+    { 78, Interval(1000, 1000UL), Interval(20, 100UL), { false, false, true, true, false, true, false, false } },
 
     // It's possible to add more tests with borders that touch each other (e.g. first starts before/on/after second
     // and first ends directly before/after second. However, such cases are not handled differently in the Interval class
@@ -247,26 +247,26 @@ using namespace antlrcpp;
     XCTAssert(entry.interval1.properlyContains(entry.interval2) == entry.results[7], @"entry: %zu", entry.runningNumber);
   }
 
-  XCTAssert(Interval().Union(Interval(10, 100)) == Interval(-1, 100));
-  XCTAssert(Interval(10, 10).Union(Interval(10, 100)) == Interval(10, 100));
-  XCTAssert(Interval(10, 11).Union(Interval(10, 100)) == Interval(10, 100));
-  XCTAssert(Interval(10, 1000).Union(Interval(10, 100)) == Interval(10, 1000));
-  XCTAssert(Interval(1000, 30).Union(Interval(10, 100)) == Interval(10, 100));
-  XCTAssert(Interval(1000, 2000).Union(Interval(10, 100)) == Interval(10, 2000));
-  XCTAssert(Interval(500, 2000).Union(Interval(10, 1000)) == Interval(10, 2000));
+  XCTAssert(Interval().Union(Interval(10, 100UL)) == Interval(-1L, 100));
+  XCTAssert(Interval(10, 10UL).Union(Interval(10, 100UL)) == Interval(10, 100UL));
+  XCTAssert(Interval(10, 11UL).Union(Interval(10, 100UL)) == Interval(10, 100UL));
+  XCTAssert(Interval(10, 1000UL).Union(Interval(10, 100UL)) == Interval(10, 1000UL));
+  XCTAssert(Interval(1000, 30UL).Union(Interval(10, 100UL)) == Interval(10, 100UL));
+  XCTAssert(Interval(1000, 2000UL).Union(Interval(10, 100UL)) == Interval(10, 2000UL));
+  XCTAssert(Interval(500, 2000UL).Union(Interval(10, 1000UL)) == Interval(10, 2000UL));
 
-  XCTAssert(Interval().intersection(Interval(10, 100)) == Interval(10, -2));
-  XCTAssert(Interval(10, 10).intersection(Interval(10, 100)) == Interval(10, 10));
-  XCTAssert(Interval(10, 11).intersection(Interval(10, 100)) == Interval(10, 11));
-  XCTAssert(Interval(10, 1000).intersection(Interval(10, 100)) == Interval(10, 100));
-  XCTAssert(Interval(1000, 30).intersection(Interval(10, 100)) == Interval(1000, 30));
-  XCTAssert(Interval(1000, 2000).intersection(Interval(10, 100)) == Interval(1000, 100));
-  XCTAssert(Interval(500, 2000).intersection(Interval(10, 1000)) == Interval(500, 1000));
+  XCTAssert(Interval().intersection(Interval(10, 100UL)) == Interval(10, -2L));
+  XCTAssert(Interval(10, 10UL).intersection(Interval(10, 100UL)) == Interval(10, 10UL));
+  XCTAssert(Interval(10, 11UL).intersection(Interval(10, 100UL)) == Interval(10, 11UL));
+  XCTAssert(Interval(10, 1000UL).intersection(Interval(10, 100UL)) == Interval(10, 100UL));
+  XCTAssert(Interval(1000, 30UL).intersection(Interval(10, 100UL)) == Interval(1000, 30UL));
+  XCTAssert(Interval(1000, 2000UL).intersection(Interval(10, 100UL)) == Interval(1000, 100UL));
+  XCTAssert(Interval(500, 2000UL).intersection(Interval(10, 1000UL)) == Interval(500, 1000UL));
 
   XCTAssert(Interval().toString() == "-1..-2");
-  XCTAssert(Interval(10, 10).toString() == "10..10");
-  XCTAssert(Interval(1000, 2000).toString() == "1000..2000");
-  XCTAssert(Interval(500, INT_MAX).toString() == "500.." + std::to_string(INT_MAX));
+  XCTAssert(Interval(10, 10UL).toString() == "10..10");
+  XCTAssert(Interval(1000, 2000UL).toString() == "1000..2000");
+  XCTAssert(Interval(500UL, INT_MAX).toString() == "500.." + std::to_string(INT_MAX));
 }
 
 - (void)testIntervalSet {
@@ -279,36 +279,36 @@ using namespace antlrcpp;
 
   XCTAssert(IntervalSet() == IntervalSet::EMPTY_SET);
 
-  std::vector<Interval> intervals = { Interval(), Interval(10, 20), Interval(20, 100), Interval(1000, 2000) };
+  std::vector<Interval> intervals = { Interval(), Interval(10, 20UL), Interval(20, 100UL), Interval(1000, 2000UL) };
   IntervalSet set2(intervals);
   XCTAssertFalse(set2.isEmpty());
-  XCTAssertFalse(set2.contains(9));
-  XCTAssert(set2.contains(10));
-  XCTAssert(set2.contains(20));
-  XCTAssertTrue(set2.contains(22));
-  XCTAssert(set2.contains(1111));
-  XCTAssertFalse(set2.contains(10000));
+  XCTAssertFalse(set2.contains(9UL));
+  XCTAssert(set2.contains(10UL));
+  XCTAssert(set2.contains(20UL));
+  XCTAssertTrue(set2.contains(22UL));
+  XCTAssert(set2.contains(1111UL));
+  XCTAssertFalse(set2.contains(10000UL));
   XCTAssertEqual(set2.getSingleElement(), Token::INVALID_TYPE);
   XCTAssertEqual(set2.getMinElement(), -1);
   XCTAssertEqual(set2.getMaxElement(), 2000);
 
   IntervalSet set3(set2);
   XCTAssertFalse(set3.isEmpty());
-  XCTAssertFalse(set3.contains(9));
-  XCTAssert(set3.contains(10));
-  XCTAssert(set3.contains(20));
-  XCTAssertTrue(set3.contains(22));
-  XCTAssert(set3.contains(1111));
-  XCTAssertFalse(set3.contains(10000));
+  XCTAssertFalse(set3.contains(9UL));
+  XCTAssert(set3.contains(10UL));
+  XCTAssert(set3.contains(20UL));
+  XCTAssertTrue(set3.contains(22UL));
+  XCTAssert(set3.contains(1111UL));
+  XCTAssertFalse(set3.contains(10000UL));
   XCTAssertEqual(set3.getSingleElement(), Token::INVALID_TYPE);
   XCTAssertEqual(set3.getMinElement(), 10);
   XCTAssertEqual(set3.getMaxElement(), 2000);
 
-  set3.add(Interval(100, 1000));
+  set3.add(Interval(100, 1000UL));
   XCTAssertEqual(set3.getMinElement(), 10);
-  set3.add(Interval(9, 1000));
+  set3.add(Interval(9, 1000UL));
   XCTAssertEqual(set3.getMinElement(), 9);
-  set3.add(Interval(1, 1));
+  set3.add(Interval(1, 1UL));
   XCTAssertEqual(set3.getMinElement(), 1);
 
   IntervalSet set4;
@@ -319,7 +319,7 @@ using namespace antlrcpp;
 
   set4.clear();
   XCTAssert(set4.isEmpty());
-  set4.add(Interval(10, 10));
+  set4.add(Interval(10, 10UL));
   XCTAssertEqual(set4.getSingleElement(), 10);
   XCTAssertEqual(set4.getMinElement(), 10);
   XCTAssertEqual(set4.getMaxElement(), 10);
@@ -353,13 +353,13 @@ using namespace antlrcpp;
   XCTAssertEqual(set5.size(), 30U); // (10, 10), (12, 18), (20, 20), (25, 25) and (30, 30) replaced by (9, 33)
 
   XCTAssert(IntervalSet(3, 1, 2, 10).Or(IntervalSet(3, 1, 2, 5)) == IntervalSet(4, 1, 2, 5, 10));
-  XCTAssert(IntervalSet({ Interval(2, 10) }).Or(IntervalSet({ Interval(5, 8) })) == IntervalSet({ Interval(2, 10) }));
+  XCTAssert(IntervalSet({ Interval(2, 10UL) }).Or(IntervalSet({ Interval(5, 8UL) })) == IntervalSet({ Interval(2, 10UL) }));
 
   XCTAssert(IntervalSet::of(1, 10).complement(IntervalSet::of(7, 55)) == IntervalSet::of(11, 55));
   XCTAssert(IntervalSet::of(1, 10).complement(IntervalSet::of(20, 55)) == IntervalSet::of(20, 55));
   XCTAssert(IntervalSet::of(1, 10).complement(IntervalSet::of(5, 6)) == IntervalSet::EMPTY_SET);
-  XCTAssert(IntervalSet::of(15, 20).complement(IntervalSet::of(7, 55)) == IntervalSet({ Interval(7, 14), Interval(21, 55) }));
-  XCTAssert(IntervalSet({ Interval(1, 10), Interval(30, 35) }).complement(IntervalSet::of(7, 55)) == IntervalSet({ Interval(11, 29), Interval(36, 55) }));
+  XCTAssert(IntervalSet::of(15, 20).complement(IntervalSet::of(7, 55)) == IntervalSet({ Interval(7, 14UL), Interval(21, 55UL) }));
+  XCTAssert(IntervalSet({ Interval(1, 10UL), Interval(30, 35UL) }).complement(IntervalSet::of(7, 55)) == IntervalSet({ Interval(11, 29UL), Interval(36, 55UL) }));
 
   XCTAssert(IntervalSet::of(1, 10).And(IntervalSet::of(7, 55)) == IntervalSet::of(7, 10));
   XCTAssert(IntervalSet::of(1, 10).And(IntervalSet::of(20, 55)) == IntervalSet::EMPTY_SET);
@@ -368,7 +368,7 @@ using namespace antlrcpp;
 
   XCTAssert(IntervalSet::of(1, 10).subtract(IntervalSet::of(7, 55)) == IntervalSet::of(1, 6));
   XCTAssert(IntervalSet::of(1, 10).subtract(IntervalSet::of(20, 55)) == IntervalSet::of(1, 10));
-  XCTAssert(IntervalSet::of(1, 10).subtract(IntervalSet::of(5, 6)) == IntervalSet({ Interval(1, 4), Interval(7, 10) }));
+  XCTAssert(IntervalSet::of(1, 10).subtract(IntervalSet::of(5, 6)) == IntervalSet({ Interval(1, 4UL), Interval(7, 10UL) }));
   XCTAssert(IntervalSet::of(15, 20).subtract(IntervalSet::of(7, 55)) == IntervalSet::EMPTY_SET);
 }
 
