@@ -413,7 +413,7 @@ public abstract class BaseTest {
 	}
 
 	private String locateTool(String tool) {
-		String[] roots = { "/usr/bin/", "/usr/local/bin/" };
+		String[] roots = { "/usr/bin/", "/usr/local/bin/", "/Users/christian/.nvm/versions/node/v6.6.0/bin/" };
 		for (String root : roots) {
 			if (new File(root + tool).exists()) {
 				return root + tool;
