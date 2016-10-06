@@ -105,7 +105,7 @@ function <file.grammarName>Visitor() {
 <file.visitorNames:{lname |
 // Visit a parse tree produced by <file.parserName>#<lname>.
 <file.grammarName>Visitor.prototype.visit<lname; format="cap"> = function(ctx) {
-  this.visitChildren(ctx);
+  return this.visitChildren(ctx);
 \};
 
 }; separator="\n">

@@ -327,7 +327,7 @@ walker.walk(new this.LeafListener(), <s>);
 BasicVisitor(X) ::= <<
 this.LeafVisitor = function() {
     this.visitTerminal = function(node) {
-        console.log(node.symbol.text);
+        return node.symbol.text;
     };
     return this;
 };
@@ -338,7 +338,7 @@ this.LeafVisitor.prototype.constructor = this.LeafVisitor;
 
 WalkVisitor(s) ::= <<
 var visitor = new this.LeafVisitor();
-<s>.accept(visitor);
+console.log(<s>.accept(visitor));
 >>
 
 
@@ -381,14 +381,13 @@ this.LeafListener.prototype.constructor = this.LeafListener;
 TokenGetterVisitor(X) ::= <<
 this.LeafVisitor = function() {
     this.visitA = function(ctx) {
-      this.visitChildren(ctx);
         var str;
         if(ctx.getChildCount()===2) {
             str = ctx.INT(0).symbol.text + ' ' + ctx.INT(1).symbol.text + ' ' + antlr4.Utils.arrayToString(ctx.INT());
         } else {
             str = ctx.ID().symbol.toString();
         }
-        console.log(str);
+        return this.visitChildren(ctx) + str;
     };
     return this;
 };
@@ -418,14 +417,13 @@ this.LeafListener.prototype.constructor = this.LeafListener;
 RuleGetterVisitor(X) ::= <<
 this.LeafVisitor = function() {
     this.visitA = function(ctx) {
-      this.visitChildren(ctx);
         var str;
         if(ctx.getChildCount()===2) {
             str = ctx.b(0).start.text + ' ' + ctx.b(1).start.text + ' ' + ctx.b()[0].start.text;
         } else {
             str = ctx.b(0).start.text;
         }
-        console.log(str);
+        return this.visitChildren(ctx) + str;
     };
     return this;
 };
@@ -456,14 +454,13 @@ this.LeafListener.prototype.constructor = this.LeafListener;
 LRVisitor(X) ::= <<
 this.LeafVisitor = function() {
     this.visitE = function(ctx) {
-      this.visitChildren(ctx);
         var str;
         if(ctx.getChildCount()===3) {
             str = ctx.e(0).start.text + ' ' + ctx.e(1).start.text + ' ' + ctx.e()[0].start.text;
         } else {
             str = ctx.INT().symbol.text;
         }
-        console.log(str);
+        return this.visitChildren(ctx) + str;
     };
     return this;
 };
@@ -492,14 +489,12 @@ this.LeafListener.prototype.constructor = this.LeafListener;
 LRWithLabelsVisitor(X) ::= <<
 this.LeafVisitor = function() {
     this.visitCall = function(ctx) {
-      this.visitChildren(ctx);
         var str = ctx.e().start.text + ' ' + ctx.eList();
-        console.log(str);
+        return this.visitChildren(ctx) + str;
     };
     this.visitInt = function(ctx) {
-        this.visitChildren(ctx);
         var str = ctx.INT().symbol.text;
-        console.log(str);
+        return this.visitChildren(ctx) + str;
     };
     return this;
 };
