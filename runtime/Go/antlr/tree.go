@@ -45,6 +45,8 @@ type TerminalNode interface {
 
 type ErrorNode interface {
 	TerminalNode
+
+	errorNode()
 }
 
 type ParseTreeVisitor interface {
@@ -195,9 +197,7 @@ func NewErrorNodeImpl(token Token) *ErrorNodeImpl {
 	return en
 }
 
-func (e *ErrorNodeImpl) IsErrorNode() bool {
-	return true
-}
+func (e *ErrorNodeImpl) errorNode() {}
 
 func (e *ErrorNodeImpl) Accept(v ParseTreeVisitor) interface{} {
 	return v.VisitErrorNode(e)
@@ -211,12 +211,12 @@ func NewParseTreeWalker() *ParseTreeWalker {
 }
 
 func (p *ParseTreeWalker) Walk(listener ParseTreeListener, t Tree) {
-
-	if errorNode, ok := t.(ErrorNode); ok {
-		listener.VisitErrorNode(errorNode)
-	} else if term, ok := t.(TerminalNode); ok {
-		listener.VisitTerminal(term)
-	} else {
+	switch tt := t.(type) {
+	case ErrorNode:
+		listener.VisitErrorNode(tt)
+	case TerminalNode:
+		listener.VisitTerminal(tt)
+	default:
 		p.EnterRule(listener, t.(RuleNode))
 		for i := 0; i < t.GetChildCount(); i++ {
 			var child = t.GetChild(i)
