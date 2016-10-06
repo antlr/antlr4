@@ -383,7 +383,7 @@ func merge(a, b PredictionContext, rootIsWildcard bool, mergeCache *DoubleDict) 
 	}
 
 	ac, ok1 := a.(*BaseSingletonPredictionContext)
-	bc, ok2 := a.(*BaseSingletonPredictionContext)
+	bc, ok2 := b.(*BaseSingletonPredictionContext)
 
 	if ok1 && ok2 {
 		return mergeSingletons(ac, bc, rootIsWildcard, mergeCache)
@@ -615,8 +615,8 @@ func mergeArrays(a, b *ArrayPredictionContext, rootIsWildcard bool, mergeCache *
 	var j = 0 // walks b
 	var k = 0 // walks target M array
 
-	var mergedReturnStates = make([]int, 0)
-	var mergedParents = make([]PredictionContext, 0)
+	var mergedReturnStates = make([]int, len(a.returnStates) + len(b.returnStates))
+	var mergedParents = make([]PredictionContext, len(a.returnStates) + len(b.returnStates))
 	// walk and merge to yield mergedParents, mergedReturnStates
 	for i < len(a.returnStates) && j < len(b.returnStates) {
 		var aParent = a.parents[i]
