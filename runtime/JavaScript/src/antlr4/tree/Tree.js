@@ -107,10 +107,7 @@ ParseTreeVisitor.prototype.visitErrorNode = function(node) {
 
 
 var visitAtom = function(visitor, ctx) {
-	var name = ctx.parser.ruleNames[ctx.ruleIndex];
-	var funcName = "visit" + Utils.titleCase(name);
-
-	return visitor[funcName](ctx);
+	return ctx.accept(visitor);
 };
 
 function ParseTreeListener() {
