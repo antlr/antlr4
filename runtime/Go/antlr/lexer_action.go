@@ -196,8 +196,8 @@ type LexerMoreAction struct {
 	*BaseLexerAction
 }
 
-func NewLexerMoreAction() *LexerModeAction {
-	l := new(LexerModeAction)
+func NewLexerMoreAction() *LexerMoreAction {
+	l := new(LexerMoreAction)
 	l.BaseLexerAction = NewBaseLexerAction(LexerActionTypeMore)
 
 	return l
