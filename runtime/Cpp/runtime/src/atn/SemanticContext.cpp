@@ -49,8 +49,8 @@ SemanticContext::Predicate::Predicate(size_t ruleIndex, size_t predIndex, bool i
 }
 
 
-bool SemanticContext::Predicate::eval(Recognizer *parser, Ref<RuleContext> const& parserCallStack) {
-  Ref<RuleContext> localctx;
+bool SemanticContext::Predicate::eval(Recognizer *parser, RuleContext *parserCallStack) {
+  RuleContext *localctx = nullptr;
   if (isCtxDependent)
     localctx = parserCallStack;
   return parser->sempred(localctx, ruleIndex, predIndex);
@@ -88,12 +88,12 @@ SemanticContext::PrecedencePredicate::PrecedencePredicate() : precedence(0) {
 SemanticContext::PrecedencePredicate::PrecedencePredicate(int precedence) : precedence(precedence) {
 }
 
-bool SemanticContext::PrecedencePredicate::eval(Recognizer *parser, Ref<RuleContext> const& parserCallStack) {
+bool SemanticContext::PrecedencePredicate::eval(Recognizer *parser, RuleContext *parserCallStack) {
   return parser->precpred(parserCallStack, precedence);
 }
 
 Ref<SemanticContext> SemanticContext::PrecedencePredicate::evalPrecedence(Recognizer *parser,
-  Ref<RuleContext> const& parserCallStack) {
+  RuleContext *parserCallStack) {
   if (parser->precpred(parserCallStack, precedence)) {
     return SemanticContext::NONE;
   }
@@ -182,7 +182,7 @@ size_t SemanticContext::AND::hashCode() const {
   return misc::MurmurHash::hashCode(opnds, typeid(AND).hash_code());
 }
 
-bool SemanticContext::AND::eval(Recognizer *parser, Ref<RuleContext> const& parserCallStack) {
+bool SemanticContext::AND::eval(Recognizer *parser, RuleContext *parserCallStack) {
   for (auto opnd : opnds) {
     if (!opnd->eval(parser, parserCallStack)) {
       return false;
@@ -191,7 +191,7 @@ bool SemanticContext::AND::eval(Recognizer *parser, Ref<RuleContext> const& pars
   return true;
 }
 
-Ref<SemanticContext> SemanticContext::AND::evalPrecedence(Recognizer *parser, Ref<RuleContext> const& parserCallStack) {
+Ref<SemanticContext> SemanticContext::AND::evalPrecedence(Recognizer *parser, RuleContext *parserCallStack) {
   bool differs = false;
   std::vector<Ref<SemanticContext>> operands;
   for (auto context : opnds) {
@@ -284,7 +284,7 @@ size_t SemanticContext::OR::hashCode() const {
   return misc::MurmurHash::hashCode(opnds, typeid(OR).hash_code());
 }
 
-bool SemanticContext::OR::eval(Recognizer *parser, Ref<RuleContext> const& parserCallStack) {
+bool SemanticContext::OR::eval(Recognizer *parser, RuleContext *parserCallStack) {
   for (auto opnd : opnds) {
     if (opnd->eval(parser, parserCallStack)) {
       return true;
@@ -293,7 +293,7 @@ bool SemanticContext::OR::eval(Recognizer *parser, Ref<RuleContext> const& parse
   return false;
 }
 
-Ref<SemanticContext> SemanticContext::OR::evalPrecedence(Recognizer *parser, Ref<RuleContext> const& parserCallStack) {
+Ref<SemanticContext> SemanticContext::OR::evalPrecedence(Recognizer *parser, RuleContext *parserCallStack) {
   bool differs = false;
   std::vector<Ref<SemanticContext>> operands;
   for (auto context : opnds) {
@@ -341,7 +341,7 @@ bool SemanticContext::operator != (const SemanticContext &other) const {
   return !(*this == other);
 }
 
-Ref<SemanticContext> SemanticContext::evalPrecedence(Recognizer * /*parser*/, Ref<RuleContext> const& /*parserCallStack*/) {
+Ref<SemanticContext> SemanticContext::evalPrecedence(Recognizer * /*parser*/, RuleContext */*parserCallStack*/) {
   return shared_from_this();
 }
 

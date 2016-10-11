@@ -89,7 +89,7 @@ namespace atn {
     ///  the rule surrounding {@code s}. In other words, the set will be
     ///  restricted to tokens reachable staying within {@code s}'s rule.
     /// </summary>
-    virtual misc::IntervalSet nextTokens(ATNState *s, Ref<RuleContext> const& ctx) const;
+    virtual misc::IntervalSet nextTokens(ATNState *s, RuleContext *ctx) const;
 
     /// <summary>
     /// Compute the set of valid tokens that can occur starting in {@code s} and

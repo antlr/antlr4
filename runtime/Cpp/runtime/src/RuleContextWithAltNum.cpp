@@ -39,14 +39,14 @@ RuleContextWithAltNum::RuleContextWithAltNum() : ParserRuleContext() {
   altNum = ATN::INVALID_ALT_NUMBER;
 }
 
-RuleContextWithAltNum::RuleContextWithAltNum(Ref<ParserRuleContext> const& parent, int invokingStateNumber)
+RuleContextWithAltNum::RuleContextWithAltNum(ParserRuleContext *parent, int invokingStateNumber)
   : ParserRuleContext(parent, invokingStateNumber) {
 }
 
-int RuleContextWithAltNum::getAltNumber() const {
+size_t RuleContextWithAltNum::getAltNumber() const {
   return altNum;
 }
 
-void RuleContextWithAltNum::setAltNumber(int number) {
+void RuleContextWithAltNum::setAltNumber(size_t number) {
   altNum = number;
 }

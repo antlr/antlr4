@@ -74,7 +74,7 @@ int LexerATNSimulator::match_calls = 0;
 
 LexerATNSimulator::LexerATNSimulator(const ATN &atn, std::vector<dfa::DFA> &decisionToDFA,
                                      PredictionContextCache &sharedContextCache)
-: LexerATNSimulator(nullptr, atn, decisionToDFA, sharedContextCache) {
+  : LexerATNSimulator(nullptr, atn, decisionToDFA, sharedContextCache) {
 }
 
 LexerATNSimulator::LexerATNSimulator(Lexer *recog, const ATN &atn, std::vector<dfa::DFA> &decisionToDFA,
@@ -120,9 +120,9 @@ void LexerATNSimulator::reset() {
 }
 
 void LexerATNSimulator::clearDFA() {
-  int size = (int)_decisionToDFA.size();
+  size_t size = _decisionToDFA.size();
   _decisionToDFA.clear();
-  for (int d = 0; d < size; ++d) {
+  for (size_t d = 0; d < size; ++d) {
     _decisionToDFA.push_back(dfa::DFA(atn.getDecisionState(d), d));
   }
 }

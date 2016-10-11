@@ -112,10 +112,6 @@ size_t Recognizer::getTokenType(const std::string &tokenName) {
   return iterator->second;
 }
 
-Ref<atn::ParseInfo> Recognizer::getParseInfo() const {
-  return nullptr;
-}
-
 void Recognizer::setInterpreter(atn::ATNSimulator *interpreter) {
   // Usually the interpreter is set by the descendant (lexer or parser (simulator), but can also be exchanged
   // by the profiling ATN simulator.
@@ -168,15 +164,15 @@ ProxyErrorListener& Recognizer::getErrorListenerDispatch() {
   return _proxListener;
 }
 
-bool Recognizer::sempred(Ref<RuleContext> const& /*localctx*/, size_t /*ruleIndex*/, size_t /*actionIndex*/) {
+bool Recognizer::sempred(RuleContext * /*localctx*/, size_t /*ruleIndex*/, size_t /*actionIndex*/) {
   return true;
 }
 
-bool Recognizer::precpred(Ref<RuleContext> const& /*localctx*/, int /*precedence*/) {
+bool Recognizer::precpred(RuleContext * /*localctx*/, int /*precedence*/) {
   return true;
 }
 
-void Recognizer::action(Ref<RuleContext> const& /*localctx*/, size_t /*ruleIndex*/, size_t /*actionIndex*/) {
+void Recognizer::action(RuleContext * /*localctx*/, size_t /*ruleIndex*/, size_t /*actionIndex*/) {
 }
 
 size_t Recognizer::getState() const {

@@ -33,6 +33,7 @@
 
 #include "Recognizer.h"
 #include "tree/ParseTreeListener.h"
+#include "tree/ParseTree.h"
 #include "TokenStream.h"
 #include "TokenSource.h"
 #include "misc/Interval.h"
@@ -271,7 +272,6 @@ namespace antlr4 {
 
     virtual void notifyErrorListeners(Token *offendingToken, const std::string &msg, std::exception_ptr e);
 
-    /// <summary>
     /// Consume and return the <seealso cref="#getCurrentToken current symbol"/>.
     /// <p/>
     /// E.g., given the following input with {@code A} being the current
@@ -291,18 +291,15 @@ namespace antlr4 {
     /// <seealso cref="ParserRuleContext#addErrorNode(Token)"/>, and
     /// <seealso cref="ParseTreeListener#visitErrorNode"/> is called on any parse
     /// listeners.
-    /// </summary>
     virtual Token* consume();
-    
-    /// <summary>
+
     /// Always called by generated parsers upon entry to a rule. Access field
     /// <seealso cref="#_ctx"/> get the current context.
-    /// </summary>
-    virtual void enterRule(Ref<ParserRuleContext> const& localctx, size_t state, size_t ruleIndex);
+    virtual void enterRule(ParserRuleContext *localctx, size_t state, size_t ruleIndex);
 
     virtual void exitRule();
 
-    virtual void enterOuterAlt(Ref<ParserRuleContext> const& localctx, int altNum);
+    virtual void enterOuterAlt(ParserRuleContext *localctx, size_t altNum);
 
     /**
      * Get the precedence level for the top-most precedence rule.
@@ -314,18 +311,18 @@ namespace antlr4 {
 
     /// @deprecated Use
     /// <seealso cref="#enterRecursionRule(ParserRuleContext, int, int, int)"/> instead.
-    virtual void enterRecursionRule(Ref<ParserRuleContext> const& localctx, size_t ruleIndex);
-    virtual void enterRecursionRule(Ref<ParserRuleContext> const& localctx, size_t state, size_t ruleIndex, int precedence);
+    virtual void enterRecursionRule(ParserRuleContext *localctx, size_t ruleIndex);
+    virtual void enterRecursionRule(ParserRuleContext *localctx, size_t state, size_t ruleIndex, int precedence);
 
     /** Like {@link #enterRule} but for recursive rules.
      *  Make the current context the child of the incoming localctx.
      */
-    virtual void pushNewRecursionContext(Ref<ParserRuleContext> const& localctx, size_t state, size_t ruleIndex);
-    virtual void unrollRecursionContexts(Ref<ParserRuleContext> const& parentctx);
-    virtual Ref<ParserRuleContext> getInvokingContext(size_t ruleIndex);
-    virtual Ref<ParserRuleContext> getContext();
-    virtual void setContext(Ref<ParserRuleContext> const& ctx);
-    virtual bool precpred(Ref<RuleContext> const& localctx, int precedence) override;
+    virtual void pushNewRecursionContext(ParserRuleContext *localctx, size_t state, size_t ruleIndex);
+    virtual void unrollRecursionContexts(ParserRuleContext *parentctx);
+    virtual ParserRuleContext* getInvokingContext(size_t ruleIndex);
+    virtual ParserRuleContext* getContext();
+    virtual void setContext(ParserRuleContext *ctx);
+    virtual bool precpred(RuleContext *localctx, int precedence) override;
     virtual bool inContext(const std::string &context);
 
     /// <summary>
@@ -358,7 +355,7 @@ namespace antlr4 {
     /// Get a rule's index (i.e., {@code RULE_ruleName} field) or INVALID_INDEX if not found.
     virtual size_t getRuleIndex(const std::string &ruleName);
 
-    virtual Ref<ParserRuleContext> getRuleContext();
+    virtual ParserRuleContext* getRuleContext();
 
     /// <summary>
     /// Return List&lt;String&gt; of the rule names in your parser instance
@@ -370,7 +367,7 @@ namespace antlr4 {
     /// </summary>
     virtual std::vector<std::string> getRuleInvocationStack();
 
-    virtual std::vector<std::string> getRuleInvocationStack(Ref<RuleContext> const& p);
+    virtual std::vector<std::string> getRuleInvocationStack(RuleContext *p);
 
     /// <summary>
     /// For debugging and other purposes. </summary>
@@ -382,7 +379,7 @@ namespace antlr4 {
 
     virtual std::string getSourceName();
 
-    virtual Ref<atn::ParseInfo> getParseInfo() const override;
+    atn::ParseInfo getParseInfo() const;
     
     /**
      * @since 4.3
@@ -403,10 +400,13 @@ namespace antlr4 {
      */
     bool isTrace() const;
 
+    tree::ParseTreeTracker& getTreeTracker() { return _tracker; };
+
   protected:
     /// The ParserRuleContext object for the currently executing rule.
     /// This is always non-null during the parsing process.
-    Ref<ParserRuleContext> _ctx;
+    // ml: this is one of the contexts tracked in _allocatedContexts.
+    ParserRuleContext *_ctx;
 
     /// The error handling strategy for the parser. The default is DefaultErrorStrategy.
     /// See also getErrorHandler.
@@ -421,7 +421,7 @@ namespace antlr4 {
 
     std::vector<int> _precedenceStack;
     
-    //Mutex to manage synchronized access for multithreading in the parser
+    // Mutex to manage synchronized access for multithreading in the parser
     std::recursive_mutex mtx;
 
     /// <summary>
@@ -447,6 +447,9 @@ namespace antlr4 {
     bool _matchedEOF;
     
     virtual void addContextToParseTree();
+
+    // All rule contexts created during a parse run. This is cleared when calling reset().
+    tree::ParseTreeTracker _tracker;
 
   private:
     /// This field maps from the serialized ATN string to the deserialized <seealso cref="ATN"/> with

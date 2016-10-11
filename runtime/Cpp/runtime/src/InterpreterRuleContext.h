@@ -59,7 +59,7 @@ namespace antlr4 {
      * @param invokingStateNumber The invoking state number.
      * @param ruleIndex The rule index for the current context.
      */
-    InterpreterRuleContext(std::weak_ptr<ParserRuleContext> parent, size_t invokingStateNumber, size_t ruleIndex);
+    InterpreterRuleContext(ParserRuleContext *parent, size_t invokingStateNumber, size_t ruleIndex);
 
     virtual size_t getRuleIndex() const override;
 

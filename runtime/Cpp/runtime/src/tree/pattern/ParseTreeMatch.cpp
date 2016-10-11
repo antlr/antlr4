@@ -36,16 +36,16 @@
 using namespace antlr4::tree;
 using namespace antlr4::tree::pattern;
 
-ParseTreeMatch::ParseTreeMatch(Ref<ParseTree> tree, const ParseTreePattern &pattern,
-                               const std::map<std::string, std::vector<Ref<ParseTree>>> &labels,
-                               Ref<ParseTree> const& mismatchedNode)
+ParseTreeMatch::ParseTreeMatch(ParseTree *tree, const ParseTreePattern &pattern,
+                               const std::map<std::string, std::vector<ParseTree *>> &labels,
+                               ParseTree *mismatchedNode)
   : _tree(tree), _pattern(pattern), _labels(labels), _mismatchedNode(mismatchedNode) {
   if (tree == nullptr) {
     throw IllegalArgumentException("tree cannot be nul");
   }
 }
 
-Ref<ParseTree> ParseTreeMatch::get(const std::string &label) {
+ParseTree* ParseTreeMatch::get(const std::string &label) {
   auto iterator = _labels.find(label);
   if (iterator == _labels.end() || iterator->second.empty()) {
     return nullptr;
@@ -54,20 +54,20 @@ Ref<ParseTree> ParseTreeMatch::get(const std::string &label) {
   return iterator->second.back(); // return last if multiple
 }
 
-std::vector<Ref<ParseTree>> ParseTreeMatch::getAll(const std::string &label) {
+std::vector<ParseTree *> ParseTreeMatch::getAll(const std::string &label) {
   auto iterator = _labels.find(label);
   if (iterator == _labels.end()) {
-    return std::vector<Ref<ParseTree>>();
+    return {};
   }
 
   return iterator->second;
 }
 
-std::map<std::string, std::vector<Ref<ParseTree>>>& ParseTreeMatch::getLabels() {
+std::map<std::string, std::vector<ParseTree *>>& ParseTreeMatch::getLabels() {
   return _labels;
 }
 
-Ref<ParseTree> ParseTreeMatch::getMismatchedNode() {
+ParseTree *ParseTreeMatch::getMismatchedNode() {
   return _mismatchedNode;
 }
 
@@ -79,7 +79,7 @@ const ParseTreePattern& ParseTreeMatch::getPattern() {
   return _pattern;
 }
 
-Ref<ParseTree>  ParseTreeMatch::getTree() {
+ParseTree * ParseTreeMatch::getTree() {
   return _tree;
 }
 

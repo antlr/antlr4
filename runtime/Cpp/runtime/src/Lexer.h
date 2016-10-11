@@ -54,9 +54,9 @@ namespace antlr4 {
     static const size_t MAX_CHAR_VALUE = 0x10FFFF;
 
     CharStream *_input; // Pure reference, usually from statically allocated instance.
+
   protected:
-     /// <summary>
-    /// How to create token objects </summary>
+    /// How to create token objects.
     Ref<TokenFactory<CommonToken>> _factory;
 
   public:
@@ -103,6 +103,7 @@ namespace antlr4 {
 
     Lexer();
     Lexer(CharStream *input);
+    virtual ~Lexer() {}
 
     virtual void reset();
 

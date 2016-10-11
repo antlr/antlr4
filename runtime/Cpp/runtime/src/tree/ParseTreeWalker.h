@@ -47,8 +47,8 @@ namespace tree {
     /// <seealso cref="ParseTreeListener#enterEveryRule"/> and a
     /// <seealso cref="RuleContext"/>-specific event. First we trigger the generic and then
     /// the rule specific. We do them in reverse order upon finishing the node.
-    virtual void enterRule(ParseTreeListener *listener, RuleNode *r) const;
-    virtual void exitRule(ParseTreeListener *listener, RuleNode *r) const;
+    virtual void enterRule(ParseTreeListener *listener, ParseTree *r) const;
+    virtual void exitRule(ParseTreeListener *listener, ParseTree *r) const;
   };
 
 } // namespace tree

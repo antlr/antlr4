@@ -43,7 +43,7 @@ namespace xpath {
   public:
     XPathTokenAnywhereElement(const std::string &tokenName, int tokenType);
 
-    virtual std::vector<Ref<ParseTree>> evaluate(const std::shared_ptr<ParseTree> &t) override;
+    virtual std::vector<ParseTree *> evaluate(ParseTree *t) override;
   };
 
 } // namespace xpath

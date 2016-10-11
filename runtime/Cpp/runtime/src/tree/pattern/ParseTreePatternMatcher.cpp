@@ -78,25 +78,25 @@ void ParseTreePatternMatcher::setDelimiters(const std::string &start, const std:
   _escape = escapeLeft;
 }
 
-bool ParseTreePatternMatcher::matches(Ref<ParseTree> const& tree, const std::string &pattern, int patternRuleIndex) {
+bool ParseTreePatternMatcher::matches(ParseTree *tree, const std::string &pattern, int patternRuleIndex) {
   ParseTreePattern p = compile(pattern, patternRuleIndex);
   return matches(tree, p);
 }
 
-bool ParseTreePatternMatcher::matches(Ref<ParseTree> const& tree, const ParseTreePattern &pattern) {
-  std::map<std::string, std::vector<Ref<ParseTree>>> labels;
-  Ref<ParseTree> mismatchedNode = matchImpl(tree, pattern.getPatternTree(), labels);
+bool ParseTreePatternMatcher::matches(ParseTree *tree, const ParseTreePattern &pattern) {
+  std::map<std::string, std::vector<ParseTree *>> labels;
+  ParseTree *mismatchedNode = matchImpl(tree, pattern.getPatternTree(), labels);
   return mismatchedNode == nullptr;
 }
 
-ParseTreeMatch ParseTreePatternMatcher::match(Ref<ParseTree> const& tree, const std::string &pattern, int patternRuleIndex) {
+ParseTreeMatch ParseTreePatternMatcher::match(ParseTree *tree, const std::string &pattern, int patternRuleIndex) {
   ParseTreePattern p = compile(pattern, patternRuleIndex);
   return match(tree, p);
 }
 
-ParseTreeMatch ParseTreePatternMatcher::match(Ref<ParseTree> const& tree, const ParseTreePattern &pattern) {
-  std::map<std::string, std::vector<Ref<ParseTree>>> labels;
-  Ref<tree::ParseTree> mismatchedNode = matchImpl(tree, pattern.getPatternTree(), labels);
+ParseTreeMatch ParseTreePatternMatcher::match(ParseTree *tree, const ParseTreePattern &pattern) {
+  std::map<std::string, std::vector<ParseTree *>> labels;
+  tree::ParseTree *mismatchedNode = matchImpl(tree, pattern.getPatternTree(), labels);
   return ParseTreeMatch(tree, pattern, labels, mismatchedNode);
 }
 
@@ -107,7 +107,7 @@ ParseTreePattern ParseTreePatternMatcher::compile(const std::string &pattern, in
   ParserInterpreter parserInterp(_parser->getGrammarFileName(), _parser->getVocabulary(),
                                  _parser->getRuleNames(), _parser->getATNWithBypassAlts(), &tokens);
 
-  Ref<ParserRuleContext> tree;
+  ParserRuleContext *tree = nullptr;
   try {
     parserInterp.setErrorHandler(std::make_shared<BailErrorStrategy>());
     tree = parserInterp.parse(patternRuleIndex);
@@ -146,8 +146,8 @@ Parser* ParseTreePatternMatcher::getParser() {
   return _parser;
 }
 
-Ref<ParseTree> ParseTreePatternMatcher::matchImpl(Ref<ParseTree> const& tree,
-  Ref<ParseTree> const& patternTree, std::map<std::string, std::vector<Ref<ParseTree>>> &labels) {
+ParseTree* ParseTreePatternMatcher::matchImpl(ParseTree *tree, ParseTree *patternTree,
+                                              std::map<std::string, std::vector<ParseTree *>> &labels) {
   if (tree == nullptr) {
     throw IllegalArgumentException("tree cannot be nul");
   }
@@ -157,11 +157,11 @@ Ref<ParseTree> ParseTreePatternMatcher::matchImpl(Ref<ParseTree> const& tree,
   }
 
   // x and <ID>, x and y, or x and x; or could be mismatched types
-  if (is<TerminalNode>(tree) && is<TerminalNode>(patternTree)) {
-    Ref<TerminalNode> t1 = std::static_pointer_cast<TerminalNode>(tree);
-    Ref<TerminalNode> t2 = std::static_pointer_cast<TerminalNode>(patternTree);
+  if (is<TerminalNode *>(tree) && is<TerminalNode *>(patternTree)) {
+    TerminalNode *t1 = dynamic_cast<TerminalNode *>(tree);
+    TerminalNode *t2 = dynamic_cast<TerminalNode *>(patternTree);
 
-    Ref<ParseTree> mismatchedNode;
+    ParseTree *mismatchedNode = nullptr;
     // both are tokens and they have same type
     if (t1->getSymbol()->getType() == t2->getSymbol()->getType()) {
       if (is<TokenTagToken *>(t2->getSymbol())) { // x and <ID>
@@ -189,16 +189,16 @@ Ref<ParseTree> ParseTreePatternMatcher::matchImpl(Ref<ParseTree> const& tree,
     return mismatchedNode;
   }
 
-  if (is<ParserRuleContext>(tree) && is<ParserRuleContext>(patternTree)) {
-    Ref<ParserRuleContext> r1 = std::dynamic_pointer_cast<ParserRuleContext>(tree);
-    Ref<ParserRuleContext> r2 = std::dynamic_pointer_cast<ParserRuleContext>(patternTree);
-    Ref<ParseTree> mismatchedNode;
+  if (is<ParserRuleContext *>(tree) && is<ParserRuleContext *>(patternTree)) {
+    ParserRuleContext *r1 = dynamic_cast<ParserRuleContext *>(tree);
+    ParserRuleContext *r2 = dynamic_cast<ParserRuleContext *>(patternTree);
+    ParseTree *mismatchedNode = nullptr;
 
     // (expr ...) and <expr>
     RuleTagToken *ruleTagToken = getRuleTagToken(r2);
     if (ruleTagToken != nullptr) {
       //ParseTreeMatch *m = nullptr; // unused?
-      if (r1->RuleContext::getRuleContext()->getRuleIndex() == r2->RuleContext::getRuleContext()->getRuleIndex()) {
+      if (r1->getRuleIndex() == r2->getRuleIndex()) {
         // track label->list-of-nodes for both rule name and label (if any)
         labels[ruleTagToken->getRuleName()].push_back(tree);
         if (ruleTagToken->getLabel() != "") {
@@ -224,8 +224,7 @@ Ref<ParseTree> ParseTreePatternMatcher::matchImpl(Ref<ParseTree> const& tree,
 
     std::size_t n = r1->children.size();
     for (size_t i = 0; i < n; i++) {
-      Ref<ParseTree> childMatch = matchImpl(std::dynamic_pointer_cast<ParseTree>(r1->children[i]),
-        std::dynamic_pointer_cast<ParseTree>(patternTree->children[i]), labels);
+      ParseTree *childMatch = matchImpl(r1->children[i], patternTree->children[i], labels);
       if (childMatch) {
         return childMatch;
       }
@@ -238,14 +237,11 @@ Ref<ParseTree> ParseTreePatternMatcher::matchImpl(Ref<ParseTree> const& tree,
   return tree;
 }
 
-RuleTagToken* ParseTreePatternMatcher::getRuleTagToken(Ref<ParseTree> const& t) {
-  if (is<RuleNode>(t)) {
-    Ref<RuleNode> r = std::dynamic_pointer_cast<RuleNode>(t);
-    if (r->children.size() == 1 && is<TerminalNode>(r->children[0])) {
-      Ref<TerminalNode> c = std::dynamic_pointer_cast<TerminalNode>(r->children[0]);
-      if (is<RuleTagToken *>(c->getSymbol())) {
-        return dynamic_cast<RuleTagToken *>(c->getSymbol());
-      }
+RuleTagToken* ParseTreePatternMatcher::getRuleTagToken(ParseTree *t) {
+  if (t->children.size() == 1 && is<TerminalNode *>(t->children[0])) {
+    TerminalNode *c = dynamic_cast<TerminalNode *>(t->children[0]);
+    if (is<RuleTagToken *>(c->getSymbol())) {
+      return dynamic_cast<RuleTagToken *>(c->getSymbol());
     }
   }
   return nullptr;

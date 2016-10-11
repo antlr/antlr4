@@ -55,19 +55,19 @@ PredictionContext::PredictionContext(size_t cachedHashCode) : id(globalNodeCount
 PredictionContext::~PredictionContext() {
 }
 
-Ref<PredictionContext> PredictionContext::fromRuleContext(const ATN &atn, const Ref<RuleContext> &outerContext) {
+Ref<PredictionContext> PredictionContext::fromRuleContext(const ATN &atn, RuleContext *outerContext) {
   if (outerContext == nullptr) {
     return PredictionContext::EMPTY;
   }
 
   // if we are in RuleContext of start rule, s, then PredictionContext
   // is EMPTY. Nobody called us. (if we are empty, return empty)
-  if (outerContext->parent.expired() || outerContext == ParserRuleContext::EMPTY) {
+  if (outerContext->parent == nullptr || outerContext == &ParserRuleContext::EMPTY) {
     return PredictionContext::EMPTY;
   }
 
   // If we have a parent, convert it to a PredictionContext graph
-  Ref<PredictionContext> parent = PredictionContext::fromRuleContext(atn, std::dynamic_pointer_cast<RuleContext>(outerContext->parent.lock()));
+  Ref<PredictionContext> parent = PredictionContext::fromRuleContext(atn, dynamic_cast<RuleContext *>(outerContext->parent));
 
   ATNState *state = atn.states.at(outerContext->invokingState);
   RuleTransition *transition = (RuleTransition *)state->transition(0);

@@ -100,6 +100,7 @@ Parser::Parser(TokenStream *input) {
 }
 
 Parser::~Parser() {
+  _tracker.reset();
   delete _tracer;
 }
 
@@ -114,6 +115,9 @@ void Parser::reset() {
   setTrace(false);
   _precedenceStack.clear();
   _precedenceStack.push_back(0);
+  _ctx = nullptr;
+  _tracker.reset();
+
   atn::ATNSimulator *interpreter = getInterpreter<atn::ParserATNSimulator>();
   if (interpreter != nullptr) {
     interpreter->reset();
@@ -133,7 +137,7 @@ Token* Parser::match(size_t ttype) {
     if (_buildParseTrees && t->getTokenIndex() == INVALID_INDEX) {
       // we must have conjured up a new token during single token insertion
       // if it's not the current symbol
-      _ctx->addErrorNode(t);
+      _ctx->addErrorNode(_tracker, t);
     }
   }
   return t;
@@ -149,7 +153,7 @@ Token* Parser::matchWildcard() {
     if (_buildParseTrees && t->getTokenIndex() == INVALID_INDEX) {
       // we must have conjured up a new token during single token insertion
       // if it's not the current symbol
-      _ctx->addErrorNode(t);
+      _ctx->addErrorNode(_tracker, t);
     }
   }
 
@@ -206,7 +210,7 @@ void Parser::removeParseListeners() {
 
 void Parser::triggerEnterRuleEvent() {
   for (auto listener : _parseListeners) {
-    listener->enterEveryRule(_ctx.get());
+    listener->enterEveryRule(_ctx);
     _ctx->enterRule(listener);
   }
 }
@@ -215,7 +219,7 @@ void Parser::triggerExitRuleEvent() {
   // reverse order walk of listeners
   for (auto it = _parseListeners.rbegin(); it != _parseListeners.rend(); ++it) {
     _ctx->exitRule(*it);
-    (*it)->exitEveryRule(_ctx.get());
+    (*it)->exitEveryRule(_ctx);
   }
 }
 
@@ -318,17 +322,17 @@ Token* Parser::consume() {
   bool hasListener = _parseListeners.size() > 0 && !_parseListeners.empty();
   if (_buildParseTrees || hasListener) {
     if (_errHandler->inErrorRecoveryMode(this)) {
-      Ref<tree::ErrorNode> node = _ctx->addErrorNode(o);
+      tree::ErrorNode* node = _ctx->addErrorNode(_tracker, o);
       if (_parseListeners.size() > 0) {
         for (auto listener : _parseListeners) {
-          listener->visitErrorNode(node.get());
+          listener->visitErrorNode(node);
         }
       }
     } else {
-      Ref<tree::TerminalNode> node = _ctx->addChild(o);
+      tree::TerminalNode *node = _ctx->addChild(_tracker, o);
       if (_parseListeners.size() > 0) {
         for (auto listener : _parseListeners) {
-          listener->visitTerminal(node.get());
+          listener->visitTerminal(node);
         }
       }
     }
@@ -338,14 +342,14 @@ Token* Parser::consume() {
 
 void Parser::addContextToParseTree() {
   // Add current context to parent if we have a parent.
-  if (_ctx->parent.expired())
+  if (_ctx->parent == nullptr)
     return;
 
-  Ref<ParserRuleContext> parent = std::dynamic_pointer_cast<ParserRuleContext>(_ctx->parent.lock());
+  ParserRuleContext *parent = dynamic_cast<ParserRuleContext *>(_ctx->parent);
   parent->addChild(_ctx);
 }
 
-void Parser::enterRule(Ref<ParserRuleContext> const& localctx, size_t state, size_t /*ruleIndex*/) {
+void Parser::enterRule(ParserRuleContext *localctx, size_t state, size_t /*ruleIndex*/) {
   setState(state);
   _ctx = localctx;
   _ctx->start = _input->LT(1);
@@ -370,17 +374,17 @@ void Parser::exitRule() {
     triggerExitRuleEvent();
   }
   setState(_ctx->invokingState);
-  _ctx = std::dynamic_pointer_cast<ParserRuleContext>(_ctx->parent.lock());
+  _ctx = dynamic_cast<ParserRuleContext *>(_ctx->parent);
 }
 
-void Parser::enterOuterAlt(Ref<ParserRuleContext> const& localctx, int altNum) {
+void Parser::enterOuterAlt(ParserRuleContext *localctx, size_t altNum) {
   localctx->setAltNumber(altNum);
 
   // if we have new localctx, make sure we replace existing ctx
   // that is previous child of parse tree
   if (_buildParseTrees && _ctx != localctx) {
-    if (!_ctx->parent.expired()) {
-      Ref<ParserRuleContext> parent = std::dynamic_pointer_cast<ParserRuleContext>(_ctx->parent.lock());
+    if (_ctx->parent != nullptr) {
+      ParserRuleContext *parent = dynamic_cast<ParserRuleContext *>(_ctx->parent);
       parent->removeLastChild();
       parent->addChild(localctx);
     }
@@ -396,11 +400,11 @@ int Parser::getPrecedence() const {
   return _precedenceStack.back();
 }
 
-void Parser::enterRecursionRule(Ref<ParserRuleContext> const& localctx, size_t ruleIndex) {
+void Parser::enterRecursionRule(ParserRuleContext *localctx, size_t ruleIndex) {
   enterRecursionRule(localctx, getATN().ruleToStartState[ruleIndex]->stateNumber, ruleIndex, 0);
 }
 
-void Parser::enterRecursionRule(Ref<ParserRuleContext> const& localctx, size_t state, size_t /*ruleIndex*/, int precedence) {
+void Parser::enterRecursionRule(ParserRuleContext *localctx, size_t state, size_t /*ruleIndex*/, int precedence) {
   setState(state);
   _precedenceStack.push_back(precedence);
   _ctx = localctx;
@@ -410,8 +414,8 @@ void Parser::enterRecursionRule(Ref<ParserRuleContext> const& localctx, size_t s
   }
 }
 
-void Parser::pushNewRecursionContext(Ref<ParserRuleContext> const& localctx, size_t state, size_t /*ruleIndex*/) {
-  Ref<ParserRuleContext> previous = _ctx;
+void Parser::pushNewRecursionContext(ParserRuleContext *localctx, size_t state, size_t /*ruleIndex*/) {
+  ParserRuleContext *previous = _ctx;
   previous->parent = localctx;
   previous->invokingState = state;
   previous->stop = _input->LT(-1);
@@ -427,16 +431,16 @@ void Parser::pushNewRecursionContext(Ref<ParserRuleContext> const& localctx, siz
   }
 }
 
-void Parser::unrollRecursionContexts(Ref<ParserRuleContext> const& parentctx) {
+void Parser::unrollRecursionContexts(ParserRuleContext *parentctx) {
   _precedenceStack.pop_back();
   _ctx->stop = _input->LT(-1);
-  Ref<ParserRuleContext> retctx = _ctx; // save current ctx (return value)
+  ParserRuleContext *retctx = _ctx; // save current ctx (return value)
 
   // unroll so ctx is as it was before call to recursive method
   if (_parseListeners.size() > 0) {
     while (_ctx != parentctx) {
       triggerExitRuleEvent();
-      _ctx = std::dynamic_pointer_cast<ParserRuleContext>(_ctx->parent.lock());
+      _ctx = dynamic_cast<ParserRuleContext *>(_ctx->parent);
     }
   } else {
     _ctx = parentctx;
@@ -451,28 +455,28 @@ void Parser::unrollRecursionContexts(Ref<ParserRuleContext> const& parentctx) {
   }
 }
 
-Ref<ParserRuleContext> Parser::getInvokingContext(size_t ruleIndex) {
-  Ref<ParserRuleContext> p = _ctx;
+ParserRuleContext* Parser::getInvokingContext(size_t ruleIndex) {
+  ParserRuleContext *p = _ctx;
   while (p) {
     if (p->getRuleIndex() == ruleIndex) {
       return p;
     }
-    if (p->parent.expired())
+    if (p->parent == nullptr)
       break;
-    p = std::dynamic_pointer_cast<ParserRuleContext>(p->parent.lock());
+    p = dynamic_cast<ParserRuleContext *>(p->parent);
   }
-  return Ref<ParserRuleContext>();
+  return nullptr;
 }
 
-Ref<ParserRuleContext> Parser::getContext() {
+ParserRuleContext* Parser::getContext() {
   return _ctx;
 }
 
-void Parser::setContext(Ref<ParserRuleContext> const& ctx) {
+void Parser::setContext(ParserRuleContext *ctx) {
   _ctx = ctx;
 }
 
-bool Parser::precpred(Ref<RuleContext> const& /*localctx*/, int precedence) {
+bool Parser::precpred(RuleContext * /*localctx*/, int precedence) {
   return precedence >= _precedenceStack.back();
 }
 
@@ -483,7 +487,7 @@ bool Parser::inContext(const std::string &/*context*/) {
 
 bool Parser::isExpectedToken(size_t symbol) {
   const atn::ATN &atn = getInterpreter<atn::ParserATNSimulator>()->atn;
-  Ref<ParserRuleContext> ctx = _ctx;
+  ParserRuleContext *ctx = _ctx;
   atn::ATNState *s = atn.states[getState()];
   misc::IntervalSet following = atn.nextTokens(s);
 
@@ -503,7 +507,7 @@ bool Parser::isExpectedToken(size_t symbol) {
       return true;
     }
 
-    ctx = std::dynamic_pointer_cast<ParserRuleContext>(ctx->parent.lock());
+    ctx = dynamic_cast<ParserRuleContext *>(ctx->parent);
   }
 
   if (following.contains(Token::EPSILON) && symbol == EOF) {
@@ -518,7 +522,7 @@ bool Parser::isMatchedEOF() const {
 }
 
 misc::IntervalSet Parser::getExpectedTokens() {
-  return getATN().getExpectedTokens(getState(), getContext().get());
+  return getATN().getExpectedTokens(getState(), getContext());
 }
 
 misc::IntervalSet Parser::getExpectedTokensWithinCurrentRule() {
@@ -536,7 +540,7 @@ size_t Parser::getRuleIndex(const std::string &ruleName) {
   return iterator->second;
 }
 
-Ref<ParserRuleContext> Parser::getRuleContext() {
+ParserRuleContext* Parser::getRuleContext() {
   return _ctx;
 }
 
@@ -544,10 +548,10 @@ std::vector<std::string> Parser::getRuleInvocationStack() {
   return getRuleInvocationStack(_ctx);
 }
 
-std::vector<std::string> Parser::getRuleInvocationStack(Ref<RuleContext> const& p) {
+std::vector<std::string> Parser::getRuleInvocationStack(RuleContext *p) {
   std::vector<std::string> const& ruleNames = getRuleNames();
   std::vector<std::string> stack;
-  RuleContext *run = p.get();
+  RuleContext *run = p;
   while (run != nullptr) {
     // compute what follows who invoked us
     size_t ruleIndex = run->getRuleIndex();
@@ -556,9 +560,9 @@ std::vector<std::string> Parser::getRuleInvocationStack(Ref<RuleContext> const& 
     } else {
       stack.push_back(ruleNames[ruleIndex]);
     }
-    if (p->parent.expired())
+    if (p->parent == nullptr)
       break;
-    run = (RuleContext *)run->parent.lock().get();
+    run = dynamic_cast<RuleContext *>(run->parent);
   }
   return stack;
 }
@@ -601,12 +605,9 @@ std::string Parser::getSourceName() {
   return _input->getSourceName();
 }
 
-Ref<atn::ParseInfo> Parser::getParseInfo() const {
+atn::ParseInfo Parser::getParseInfo() const {
   atn::ProfilingATNSimulator *interp = getInterpreter<atn::ProfilingATNSimulator>();
-  if (interp != nullptr) {
-    return std::make_shared<atn::ParseInfo>(interp);
-  }
-  return nullptr;
+  return atn::ParseInfo(interp);
 }
 
 void Parser::setProfile(bool profile) {
@@ -651,5 +652,6 @@ void Parser::InitializeInstanceFields() {
   _matchedEOF = false;
   _input = nullptr;
   _tracer = nullptr;
+  _ctx = nullptr;
 }
 

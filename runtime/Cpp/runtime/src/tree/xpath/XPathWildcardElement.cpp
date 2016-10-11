@@ -41,13 +41,10 @@ using namespace antlr4::tree::xpath;
 XPathWildcardElement::XPathWildcardElement() : XPathElement(XPath::WILDCARD) {
 }
 
-std::vector<Ref<ParseTree>> XPathWildcardElement::evaluate(const Ref<ParseTree> &t) {
+std::vector<ParseTree *> XPathWildcardElement::evaluate(ParseTree *t) {
   if (_invert) {
     return {}; // !* is weird but valid (empty)
   }
-  std::vector<Ref<ParseTree>> kids;
-  for (auto c : t->children) {
-    kids.push_back(std::static_pointer_cast<ParseTree>(c));
-  }
-  return kids;
+
+  return t->children;
 }

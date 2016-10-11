@@ -34,12 +34,11 @@
 namespace antlr4 {
 namespace misc {
 
-  template<typename T>
   class ANTLR4CPP_PUBLIC Predicate {
   public:
     virtual ~Predicate() {};
     
-    virtual bool test(Ref<T> const& t) = 0;
+    virtual bool test(tree::ParseTree *t) = 0;
   };
 
 } // namespace tree

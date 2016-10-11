@@ -41,7 +41,7 @@ namespace xpath {
   public:
     XPathRuleElement(const std::string &ruleName, size_t ruleIndex);
 
-    virtual std::vector<Ref<ParseTree>> evaluate(const Ref<ParseTree> &t) override;
+    virtual std::vector<ParseTree *> evaluate(ParseTree *t) override;
     
   protected:
     size_t _ruleIndex = 0;

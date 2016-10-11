@@ -90,12 +90,10 @@ namespace xpath {
     // TO_DO: check for invalid token/rule names, bad syntax
     virtual std::vector<XPathElement> split(const std::string &path);
 
-    static std::vector<Ref<ParseTree>> findAll(const Ref<ParseTree> &tree, const std::string &xpath, Parser *parser);
-
     /// Return a list of all nodes starting at {@code t} as root that satisfy the
     /// path. The root {@code /} is relative to the node passed to
     /// <seealso cref="#evaluate"/>.
-    virtual std::vector<Ref<ParseTree>> evaluate(const Ref<ParseTree> &t);
+    virtual std::vector<ParseTree *> evaluate(ParseTree *t);
 
   protected:
     std::string _path;

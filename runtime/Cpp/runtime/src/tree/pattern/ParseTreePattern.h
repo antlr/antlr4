@@ -53,7 +53,7 @@ namespace pattern {
     /// tree pattern. </param>
     /// <param name="patternTree"> The tree pattern in <seealso cref="ParseTree"/> form. </param>
     ParseTreePattern(ParseTreePatternMatcher *matcher, const std::string &pattern, int patternRuleIndex,
-                     Ref<ParseTree> patternTree);
+                     ParseTree *patternTree);
     virtual ~ParseTreePattern() {};
 
     /// <summary>
@@ -63,7 +63,7 @@ namespace pattern {
     /// <returns> A <seealso cref="ParseTreeMatch"/> object describing the result of the
     /// match operation. The <seealso cref="ParseTreeMatch#succeeded()"/> method can be
     /// used to determine whether or not the match was successful. </returns>
-    virtual ParseTreeMatch match(Ref<ParseTree> const& tree);
+    virtual ParseTreeMatch match(ParseTree *tree);
 
     /// <summary>
     /// Determine whether or not a parse tree matches this tree pattern.
@@ -71,7 +71,7 @@ namespace pattern {
     /// <param name="tree"> The parse tree to match against this tree pattern. </param>
     /// <returns> {@code true} if {@code tree} is a match for the current tree
     /// pattern; otherwise, {@code false}. </returns>
-    virtual bool matches(Ref<ParseTree> const& tree);
+    virtual bool matches(ParseTree *tree);
 
     /// Find all nodes using XPath and then try to match those subtrees against
     /// this tree pattern.
@@ -81,10 +81,7 @@ namespace pattern {
     /// @returns A collection of ParseTreeMatch objects describing the
     /// successful matches. Unsuccessful matches are omitted from the result,
     /// regardless of the reason for the failure.
-
-    // A full blown XPath implementation just for this single function which is nowhere used?
-    // Readd the XPath stuff from ANTLR if you really need that.
-    virtual std::vector<ParseTreeMatch> findAll(Ref<ParseTree> const& tree, const std::string &xpath);
+    virtual std::vector<ParseTreeMatch> findAll(ParseTree *tree, const std::string &xpath);
 
     /// <summary>
     /// Get the <seealso cref="ParseTreePatternMatcher"/> which created this tree pattern.
@@ -113,7 +110,7 @@ namespace pattern {
     /// of type <seealso cref="RuleTagToken"/> or <seealso cref="TokenTagToken"/>.
     /// </summary>
     /// <returns> The tree pattern as a <seealso cref="ParseTree"/>. </returns>
-    virtual Ref<ParseTree> getPatternTree() const;
+    virtual ParseTree* getPatternTree() const;
 
   private:
     const int patternRuleIndex;
@@ -122,11 +119,9 @@ namespace pattern {
     const std::string _pattern;
 
     /// This is the backing field for <seealso cref="#getPatternTree()"/>.
-    Ref<ParseTree> _patternTree;
+    ParseTree *_patternTree;
 
-    /// <summary>
     /// This is the backing field for <seealso cref="#getMatcher()"/>.
-    /// </summary>
     ParseTreePatternMatcher *const _matcher;
   };
 

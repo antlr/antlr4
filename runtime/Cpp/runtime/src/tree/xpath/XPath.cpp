@@ -39,8 +39,6 @@
 #include "XPathRuleAnywhereElement.h"
 #include "XPathRuleElement.h"
 
-#include "tree/ParseTree.h"
-
 #include "XPath.h"
 
 using namespace antlr4;
@@ -148,20 +146,16 @@ XPathElement XPath::getXPathElement(Token *wordToken, bool anywhere) {
   }
 }
 
-std::vector<Ref<ParseTree>> XPath::findAll(const Ref<ParseTree> &tree, const std::string &xpath, Parser *parser) {
-  Ref<XPath> p = std::make_shared<XPath>(parser, xpath);
-  return p->evaluate(tree);
-}
+static ParserRuleContext dummyRoot;
 
-std::vector<Ref<ParseTree>> XPath::evaluate(const Ref<ParseTree> &t) {
-  std::shared_ptr<ParserRuleContext> dummyRoot = std::make_shared<ParserRuleContext>();
-  dummyRoot->children = { t }; // don't set t's parent.
+std::vector<ParseTree *> XPath::evaluate(ParseTree *t) {
+  dummyRoot.children = { t }; // don't set t's parent.
 
-  std::vector<Ref<ParseTree>> work = { dummyRoot };
+  std::vector<ParseTree *> work = { &dummyRoot };
 
   size_t i = 0;
   while (i < _elements.size()) {
-    std::vector<Ref<ParseTree>> next;
+    std::vector<ParseTree *> next;
     for (auto node : work) {
       if (!node->children.empty()) {
         // only try to match next element if it has children

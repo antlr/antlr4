@@ -53,7 +53,7 @@ ProfilingATNSimulator::ProfilingATNSimulator(Parser *parser)
   }
 }
 
-size_t ProfilingATNSimulator::adaptivePredict(TokenStream *input, size_t decision, Ref<ParserRuleContext> const& outerContext) {
+size_t ProfilingATNSimulator::adaptivePredict(TokenStream *input, size_t decision, ParserRuleContext *outerContext) {
   auto onExit = finally([this](){
     _currentDecision = 0; // Originally -1, but that makes no sense (index into a vector and init value is also 0).
   });
@@ -138,7 +138,7 @@ std::unique_ptr<ATNConfigSet> ProfilingATNSimulator::computeReachSet(ATNConfigSe
   return reachConfigs;
 }
 
-bool ProfilingATNSimulator::evalSemanticContext(Ref<SemanticContext> const& pred, Ref<ParserRuleContext> const& parserCallStack,
+bool ProfilingATNSimulator::evalSemanticContext(Ref<SemanticContext> const& pred, ParserRuleContext *parserCallStack,
                                                 size_t alt, bool fullCtx) {
   bool result = ParserATNSimulator::evalSemanticContext(pred, parserCallStack, alt, fullCtx);
   if (!(std::dynamic_pointer_cast<SemanticContext::PrecedencePredicate>(pred) != nullptr)) {

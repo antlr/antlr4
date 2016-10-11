@@ -30,7 +30,7 @@
 
 #pragma once
 
-#include "tree/Tree.h"
+#include "antlr4-common.h"
 
 namespace antlrcpp {
   
@@ -132,5 +132,5 @@ namespace antlrcpp {
   };
 
   template <>
-  std::string Arrays::toString(const std::vector<antlr4::tree::Tree *> &source);
+  std::string Arrays::toString(const std::vector<antlr4::tree::ParseTree *> &source);
 }

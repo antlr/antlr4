@@ -76,11 +76,11 @@ std::vector<misc::IntervalSet> LL1Analyzer::getDecisionLookahead(ATNState *s) co
   return look;
 }
 
-misc::IntervalSet LL1Analyzer::LOOK(ATNState *s, Ref<RuleContext> const& ctx) const {
+misc::IntervalSet LL1Analyzer::LOOK(ATNState *s, RuleContext *ctx) const {
   return LOOK(s, nullptr, ctx);
 }
 
-misc::IntervalSet LL1Analyzer::LOOK(ATNState *s, ATNState *stopState, Ref<RuleContext> const& ctx) const {
+misc::IntervalSet LL1Analyzer::LOOK(ATNState *s, ATNState *stopState, RuleContext *ctx) const {
   misc::IntervalSet r;
   bool seeThruPreds = true; // ignore preds; get all lookahead
   Ref<PredictionContext> lookContext = ctx != nullptr ? PredictionContext::fromRuleContext(_atn, ctx) : nullptr;

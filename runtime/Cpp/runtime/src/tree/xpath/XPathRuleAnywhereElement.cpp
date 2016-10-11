@@ -41,6 +41,6 @@ XPathRuleAnywhereElement::XPathRuleAnywhereElement(const std::string &ruleName, 
   _ruleIndex = ruleIndex;
 }
 
-std::vector<Ref<ParseTree>> XPathRuleAnywhereElement::evaluate(const Ref<ParseTree> &t) {
+std::vector<ParseTree *> XPathRuleAnywhereElement::evaluate(ParseTree *t) {
   return Trees::findAllRuleNodes(t, _ruleIndex);
 }

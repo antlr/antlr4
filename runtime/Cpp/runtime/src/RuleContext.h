@@ -31,7 +31,7 @@
 
 #pragma once
 
-#include "tree/RuleNode.h"
+#include "tree/ParseTree.h"
 
 namespace antlr4 {
 
@@ -85,7 +85,7 @@ namespace antlr4 {
    *
    *  @see ParserRuleContext
    */
-  class ANTLR4CPP_PUBLIC RuleContext : public tree::RuleNode, public std::enable_shared_from_this<RuleContext> {
+  class ANTLR4CPP_PUBLIC RuleContext : public tree::ParseTree {
   public:
     /// What state invoked the rule associated with this context?
     /// The "return address" is the followState of invokingState
@@ -93,8 +93,7 @@ namespace antlr4 {
     size_t invokingState;
 
     RuleContext();
-
-    RuleContext(std::weak_ptr<RuleContext> parent, size_t invokingState);
+    RuleContext(RuleContext *parent, size_t invokingState);
 
     virtual int depth();
 
@@ -105,7 +104,6 @@ namespace antlr4 {
 
     virtual misc::Interval getSourceInterval() override;
 
-    virtual Ref<RuleContext> getRuleContext() override;
     virtual std::string getText() override;
 
     virtual size_t getRuleIndex() const;
@@ -119,7 +117,7 @@ namespace antlr4 {
      *
      *  @since 4.5.3
      */
-    virtual int getAltNumber() const;
+    virtual size_t getAltNumber() const;
 
     /** Set the outer alternative number for this context node. Default
      *  implementation does nothing to avoid backing field overhead for
@@ -129,7 +127,7 @@ namespace antlr4 {
      *
      *  @since 4.5.3
      */
-    virtual void setAltNumber(int altNumber);
+    virtual void setAltNumber(size_t altNumber);
 
     virtual antlrcpp::Any accept(tree::ParseTreeVisitor *visitor) override;
 
@@ -152,9 +150,9 @@ namespace antlr4 {
     std::string toString(const std::vector<std::string> &ruleNames);
 
     // recog null unless ParserRuleContext, in which case we use subclass toString(...)
-    std::string toString(Recognizer *recog, Ref<RuleContext> const& stop);
+    std::string toString(Recognizer *recog, RuleContext *stop);
 
-    virtual std::string toString(const std::vector<std::string> &ruleNames, Ref<RuleContext> const& stop);
+    virtual std::string toString(const std::vector<std::string> &ruleNames, RuleContext *stop);
 
     bool operator == (const RuleContext &other) { return this == &other; } // Simple address comparison.
     

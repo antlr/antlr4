@@ -61,7 +61,7 @@ namespace antlr4 {
   /// </summary>
   class ANTLR4CPP_PUBLIC ParserRuleContext : public RuleContext {
   public:
-    static const Ref<ParserRuleContext> EMPTY;
+    static ParserRuleContext EMPTY;
 
     /// <summary>
     /// For debugging/tracing purposes, we want to track all of the nodes in
@@ -92,14 +92,14 @@ namespace antlr4 {
     std::exception_ptr exception;
 
     ParserRuleContext();
+    ParserRuleContext(ParserRuleContext *parent, size_t invokingStateNumber);
     virtual ~ParserRuleContext() {}
 
     /** COPY a ctx (I'm deliberately not using copy constructor) to avoid
      *  confusion with creating node with parent. Does not copy children.
      */
-    virtual void copyFrom(Ref<ParserRuleContext> const& ctx);
+    virtual void copyFrom(ParserRuleContext *ctx);
 
-    ParserRuleContext(std::weak_ptr<ParserRuleContext> parent, size_t invokingStateNumber);
 
     // Double dispatch methods for listeners
 
@@ -107,32 +107,32 @@ namespace antlr4 {
     virtual void exitRule(tree::ParseTreeListener *listener);
 
     /// Does not set parent link; other add methods do that.
-    virtual Ref<tree::TerminalNode> addChild(Ref<tree::TerminalNode> const& t);
-    virtual Ref<RuleContext> addChild(Ref<RuleContext> const& ruleInvocation);
+    tree::TerminalNode* addChild(tree::TerminalNode *t);
+    RuleContext* addChild(RuleContext *ruleInvocation);
 
     /// Used by enterOuterAlt to toss out a RuleContext previously added as
     /// we entered a rule. If we have # label, we will need to remove
     /// generic ruleContext object.
     virtual void removeLastChild();
 
-    virtual Ref<tree::TerminalNode> addChild(Token *matchedToken);
-    virtual Ref<tree::ErrorNode> addErrorNode(Token *badToken);
+    virtual tree::TerminalNode* addChild(tree::ParseTreeTracker &tracker, Token *matchedToken);
+    virtual tree::ErrorNode* addErrorNode(tree::ParseTreeTracker &tracker, Token *badToken);
 
-    virtual Ref<tree::TerminalNode> getToken(size_t ttype, std::size_t i);
+    virtual tree::TerminalNode* getToken(size_t ttype, std::size_t i);
 
-    virtual std::vector<Ref<tree::TerminalNode>> getTokens(size_t ttype);
+    virtual std::vector<tree::TerminalNode *> getTokens(size_t ttype);
 
     template<typename T>
-    Ref<T> getRuleContext(size_t i) {
+    T* getRuleContext(size_t i) {
       if (children.empty()) {
         return nullptr;
       }
 
       size_t j = 0; // what element have we found with ctxType?
       for (auto &child : children) {
-        if (antlrcpp::is<T>(child)) {
+        if (antlrcpp::is<T *>(child)) {
           if (j++ == i) {
-            return std::dynamic_pointer_cast<T>(child);
+            return dynamic_cast<T *>(child);
           }
         }
       }
@@ -140,11 +140,11 @@ namespace antlr4 {
     }
 
     template<typename T>
-    std::vector<Ref<T>> getRuleContexts() {
-      std::vector<Ref<T>> contexts;
-      for (auto &child : children) {
-        if (antlrcpp::is<T>(child)) {
-          contexts.push_back(std::dynamic_pointer_cast<T>(child));
+    std::vector<T *> getRuleContexts() {
+      std::vector<T *> contexts;
+      for (auto child : children) {
+        if (antlrcpp::is<T *>(child)) {
+          contexts.push_back(dynamic_cast<T *>(child));
         }
       }
 

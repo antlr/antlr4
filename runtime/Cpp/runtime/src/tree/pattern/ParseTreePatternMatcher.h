@@ -127,20 +127,20 @@ namespace pattern {
 
     /// <summary>
     /// Does {@code pattern} matched as rule {@code patternRuleIndex} match {@code tree}? </summary>
-    virtual bool matches(Ref<ParseTree> const& tree, const std::string &pattern, int patternRuleIndex);
+    virtual bool matches(ParseTree *tree, const std::string &pattern, int patternRuleIndex);
 
     /// <summary>
     /// Does {@code pattern} matched as rule patternRuleIndex match tree? Pass in a
     ///  compiled pattern instead of a string representation of a tree pattern.
     /// </summary>
-    virtual bool matches(Ref<ParseTree> const& tree, const ParseTreePattern &pattern);
+    virtual bool matches(ParseTree *tree, const ParseTreePattern &pattern);
 
     /// <summary>
     /// Compare {@code pattern} matched as rule {@code patternRuleIndex} against
     /// {@code tree} and return a <seealso cref="ParseTreeMatch"/> object that contains the
     /// matched elements, or the node at which the match failed.
     /// </summary>
-    virtual ParseTreeMatch match(Ref<ParseTree> const& tree, const std::string &pattern, int patternRuleIndex);
+    virtual ParseTreeMatch match(ParseTree *tree, const std::string &pattern, int patternRuleIndex);
 
     /// <summary>
     /// Compare {@code pattern} matched against {@code tree} and return a
@@ -148,7 +148,7 @@ namespace pattern {
     /// node at which the match failed. Pass in a compiled pattern instead of a
     /// string representation of a tree pattern.
     /// </summary>
-    virtual ParseTreeMatch match(Ref<ParseTree> const& tree, const ParseTreePattern &pattern);
+    virtual ParseTreeMatch match(ParseTree *tree, const ParseTreePattern &pattern);
 
     /// <summary>
     /// For repeated use of a tree pattern, compile it to a
@@ -187,11 +187,10 @@ namespace pattern {
     /// a corresponding node in {@code patternTree}, or {@code null} if the match
     /// was successful. The specific node returned depends on the matching
     /// algorithm used by the implementation, and may be overridden. </returns>
-    virtual Ref<tree::ParseTree> matchImpl(Ref<ParseTree> const& tree,
-      Ref<ParseTree> const& patternTree, std::map<std::string, std::vector<Ref<ParseTree>>> &labels);
+    virtual ParseTree* matchImpl(ParseTree *tree, ParseTree *patternTree, std::map<std::string, std::vector<ParseTree *>> &labels);
 
     /// Is t <expr> subtree?
-    virtual RuleTagToken* getRuleTagToken(Ref<ParseTree> const& t);
+    virtual RuleTagToken* getRuleTagToken(ParseTree *t);
 
   private:
     Lexer *_lexer;

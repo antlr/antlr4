@@ -87,7 +87,7 @@ namespace antlr4 {
     class MurmurHash;
     class ParseCancellationException;
     class Utils;
-    template <typename T> class Predicate;
+    class Predicate;
   }
   namespace atn {
     class ATN;
@@ -161,7 +161,6 @@ namespace antlr4 {
     template<typename T> class ParseTreeProperty;
     class ParseTreeVisitor;
     class ParseTreeWalker;
-    class RuleNode;
     class SyntaxTree;
     class TerminalNode;
     class TerminalNodeImpl;

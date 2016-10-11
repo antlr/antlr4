@@ -87,7 +87,7 @@ void ParserATNSimulator::clearDFA() {
   }
 }
 
-size_t ParserATNSimulator::adaptivePredict(TokenStream *input, size_t decision, Ref<ParserRuleContext> const& outerContext) {
+size_t ParserATNSimulator::adaptivePredict(TokenStream *input, size_t decision, ParserRuleContext *outerContext) {
   
 #if DEBUG_ATN == 1 || DEBUG_LIST_ATN_DECISIONS == 1
     std::cout << "adaptivePredict decision " << decision << " exec LA(1)==" << getLookaheadName(input) << " line "
@@ -126,7 +126,7 @@ size_t ParserATNSimulator::adaptivePredict(TokenStream *input, size_t decision, 
   if (s0 == nullptr) {
     bool fullCtx = false;
     std::unique_ptr<ATNConfigSet> s0_closure = computeStartState(dynamic_cast<ATNState *>(dfa.atnStartState),
-                                                                 ParserRuleContext::EMPTY, fullCtx);
+                                                                 &ParserRuleContext::EMPTY, fullCtx);
     if (dfa.isPrecedenceDfa()) {
       /* If this is a precedence DFA, we use applyPrecedenceFilter
        * to convert the computed start state to a precedence start
@@ -152,13 +152,13 @@ size_t ParserATNSimulator::adaptivePredict(TokenStream *input, size_t decision, 
   }
 
   // We can start with an existing DFA.
-  size_t alt = execATN(dfa, s0, input, index, outerContext != nullptr ? outerContext : ParserRuleContext::EMPTY);
+  size_t alt = execATN(dfa, s0, input, index, outerContext != nullptr ? outerContext : &ParserRuleContext::EMPTY);
 
   return alt;
 }
 
 size_t ParserATNSimulator::execATN(dfa::DFA &dfa, dfa::DFAState *s0, TokenStream *input, size_t startIndex,
-                                   Ref<ParserRuleContext> outerContext) {
+                                   ParserRuleContext *outerContext) {
   
 #if DEBUG_ATN == 1 || DEBUG_LIST_ATN_DECISIONS == 1
     std::cout << "execATN decision " << dfa.decision << " exec LA(1)==" << getLookaheadName(input) <<
@@ -341,7 +341,7 @@ void ParserATNSimulator::predicateDFAState(dfa::DFAState *dfaState, DecisionStat
 }
 
 size_t ParserATNSimulator::execATNWithFullContext(dfa::DFA &dfa, dfa::DFAState *D, ATNConfigSet *s0,
-  TokenStream *input, size_t startIndex, Ref<ParserRuleContext> const& outerContext) {
+  TokenStream *input, size_t startIndex, ParserRuleContext *outerContext) {
 
   bool fullCtx = true;
   bool foundExactAmbig = false;
@@ -596,7 +596,7 @@ ATNConfigSet* ParserATNSimulator::removeAllConfigsNotInRuleStopState(ATNConfigSe
   return result;
 }
 
-std::unique_ptr<ATNConfigSet> ParserATNSimulator::computeStartState(ATNState *p, Ref<RuleContext> const& ctx, bool fullCtx) {
+std::unique_ptr<ATNConfigSet> ParserATNSimulator::computeStartState(ATNState *p, RuleContext *ctx, bool fullCtx) {
   // always at least the implicit call to start rule
   Ref<PredictionContext> initialContext = PredictionContext::fromRuleContext(atn, ctx);
   std::unique_ptr<ATNConfigSet> configs(new ATNConfigSet(fullCtx));
@@ -736,7 +736,7 @@ std::vector<dfa::DFAState::PredPrediction *> ParserATNSimulator::getPredicatePre
 }
 
 size_t ParserATNSimulator::getSynValidOrSemInvalidAltThatFinishedDecisionEntryRule(ATNConfigSet *configs,
-  Ref<ParserRuleContext> const& outerContext)
+  ParserRuleContext *outerContext)
 {
   std::pair<ATNConfigSet *, ATNConfigSet *> sets = splitAccordingToSemanticValidity(configs, outerContext);
   std::unique_ptr<ATNConfigSet> semValidConfigs(sets.first);
@@ -769,7 +769,7 @@ size_t ParserATNSimulator::getAltThatFinishedDecisionEntryRule(ATNConfigSet *con
 }
 
 std::pair<ATNConfigSet *, ATNConfigSet *> ParserATNSimulator::splitAccordingToSemanticValidity(ATNConfigSet *configs,
-  Ref<ParserRuleContext> const& outerContext) {
+  ParserRuleContext *outerContext) {
 
   // mem-check: both pointers must be freed by the caller.
   ATNConfigSet *succeeded(new ATNConfigSet(configs->fullCtx));
@@ -790,7 +790,7 @@ std::pair<ATNConfigSet *, ATNConfigSet *> ParserATNSimulator::splitAccordingToSe
 }
 
 BitSet ParserATNSimulator::evalSemanticContext(std::vector<dfa::DFAState::PredPrediction*> predPredictions,
-                                               Ref<ParserRuleContext> const& outerContext, bool complete) {
+                                               ParserRuleContext *outerContext, bool complete) {
   BitSet predictions;
   for (auto prediction : predPredictions) {
     if (prediction->pred == SemanticContext::NONE) {
@@ -822,7 +822,7 @@ BitSet ParserATNSimulator::evalSemanticContext(std::vector<dfa::DFAState::PredPr
   return predictions;
 }
 
-bool ParserATNSimulator::evalSemanticContext(Ref<SemanticContext> const& pred, Ref<ParserRuleContext> const& parserCallStack,
+bool ParserATNSimulator::evalSemanticContext(Ref<SemanticContext> const& pred, ParserRuleContext *parserCallStack,
                                              size_t /*alt*/, bool /*fullCtx*/) {
   return pred->eval(parser, parserCallStack);
 }
@@ -1150,7 +1150,7 @@ void ParserATNSimulator::dumpDeadEndConfigs(NoViableAltException &nvae) {
   }
 }
 
-NoViableAltException ParserATNSimulator::noViableAlt(TokenStream *input, Ref<ParserRuleContext> const& outerContext,
+NoViableAltException ParserATNSimulator::noViableAlt(TokenStream *input, ParserRuleContext *outerContext,
   ATNConfigSet *configs, size_t startIndex) {
   return NoViableAltException(parser, input, input->get(startIndex), input->LT(1), configs, outerContext);
 }

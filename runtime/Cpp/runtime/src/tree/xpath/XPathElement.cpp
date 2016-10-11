@@ -40,7 +40,7 @@ XPathElement::XPathElement(const std::string &nodeName) {
   _nodeName = nodeName;
 }
 
-std::vector<Ref<ParseTree>> XPathElement::evaluate(const Ref<ParseTree> &/*t*/) {
+std::vector<ParseTree *> XPathElement::evaluate(ParseTree * /*t*/) {
   return {};
 }
 

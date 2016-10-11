@@ -331,7 +331,7 @@ std::string DefaultErrorStrategy::escapeWSAndQuote(const std::string &s) const {
 
 misc::IntervalSet DefaultErrorStrategy::getErrorRecoverySet(Parser *recognizer) {
   const atn::ATN &atn = recognizer->getInterpreter<atn::ATNSimulator>()->atn;
-  RuleContext *ctx = recognizer->getContext().get();
+  RuleContext *ctx = recognizer->getContext();
   misc::IntervalSet recoverSet;
   while (ctx->invokingState != ATNState::INVALID_STATE_NUMBER) {
     // compute what follows who invoked us
@@ -340,9 +340,9 @@ misc::IntervalSet DefaultErrorStrategy::getErrorRecoverySet(Parser *recognizer) 
     misc::IntervalSet follow = atn.nextTokens(rt->followState);
     recoverSet.addAll(follow);
 
-    if (ctx->parent.expired())
+    if (ctx->parent == nullptr)
       break;
-    ctx = (RuleContext *)ctx->parent.lock().get();
+    ctx = (RuleContext *)ctx->parent;
   }
   recoverSet.remove(Token::EPSILON);
 

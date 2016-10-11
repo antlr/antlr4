@@ -100,13 +100,6 @@ namespace antlr4 {
       return dynamic_cast<T *>(_interpreter);
     }
 
-    /** If profiling during the parse/lex, this will return DecisionInfo records
-     *  for each decision in recognizer in a ParseInfo object.
-     *
-     * @since 4.3
-     */
-    virtual Ref<atn::ParseInfo> getParseInfo() const;
-    
     /**
      * Set the ATN interpreter used by the recognizer for prediction.
      *
@@ -144,11 +137,11 @@ namespace antlr4 {
 
     // subclass needs to override these if there are sempreds or actions
     // that the ATN interp needs to execute
-    virtual bool sempred(Ref<RuleContext> const& localctx, size_t ruleIndex, size_t actionIndex);
+    virtual bool sempred(RuleContext *localctx, size_t ruleIndex, size_t actionIndex);
 
-    virtual bool precpred(Ref<RuleContext> const& localctx, int precedence);
+    virtual bool precpred(RuleContext *localctx, int precedence);
 
-    virtual void action(Ref<RuleContext> const& localctx, size_t ruleIndex, size_t actionIndex);
+    virtual void action(RuleContext *localctx, size_t ruleIndex, size_t actionIndex);
 
     virtual size_t getState() const override;
 

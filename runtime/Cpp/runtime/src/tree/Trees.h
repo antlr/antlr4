@@ -44,57 +44,57 @@ namespace tree {
     /// Print out a whole tree in LISP form. getNodeText is used on the
     /// node payloads to get the text for the nodes.  Detect
     /// parse trees and extract data appropriately.
-    static std::string toStringTree(Ref<Tree> const& t);
+    static std::string toStringTree(ParseTree *t);
 
     /// Print out a whole tree in LISP form. getNodeText is used on the
     ///  node payloads to get the text for the nodes.  Detect
     ///  parse trees and extract data appropriately.
-    static std::string toStringTree(Ref<Tree> const& t, Parser *recog);
+    static std::string toStringTree(ParseTree *t, Parser *recog);
 
     /// Print out a whole tree in LISP form. getNodeText is used on the
     /// node payloads to get the text for the nodes.  Detect
     /// parse trees and extract data appropriately.
-    static std::string toStringTree(Ref<Tree> const& t, const std::vector<std::string> &ruleNames);
-    static std::string getNodeText(Ref<Tree> const& t, Parser *recog);
-    static std::string getNodeText(Ref<Tree> const& t, const std::vector<std::string> &ruleNames);
+    static std::string toStringTree(ParseTree *t, const std::vector<std::string> &ruleNames);
+    static std::string getNodeText(ParseTree *t, Parser *recog);
+    static std::string getNodeText(ParseTree *t, const std::vector<std::string> &ruleNames);
 
     /// Return a list of all ancestors of this node.  The first node of
     ///  list is the root and the last is the parent of this node.
-    static std::vector<std::weak_ptr<Tree>> getAncestors(Ref<Tree> const& t);
+    static std::vector<ParseTree *> getAncestors(ParseTree *t);
 
     /** Return true if t is u's parent or a node on path to root from u.
      *  Use == not equals().
      *
      *  @since 4.5.1
      */
-    static bool isAncestorOf(Ref<Tree> const& t, Ref<Tree> const& u);
-    static std::vector<Ref<ParseTree>> findAllTokenNodes(Ref<ParseTree> const& t, size_t ttype);
-    static std::vector<Ref<ParseTree>> findAllRuleNodes(Ref<ParseTree> const& t, size_t ruleIndex);
-    static std::vector<Ref<ParseTree>> findAllNodes(Ref<ParseTree> const& t, size_t index, bool findTokens);
+    static bool isAncestorOf(ParseTree *t, ParseTree *u);
+    static std::vector<ParseTree *> findAllTokenNodes(ParseTree *t, size_t ttype);
+    static std::vector<ParseTree *> findAllRuleNodes(ParseTree *t, size_t ruleIndex);
+    static std::vector<ParseTree *> findAllNodes(ParseTree *t, size_t index, bool findTokens);
 
     /** Get all descendents; includes t itself.
      *
      * @since 4.5.1
      */
-    static std::vector<Ref<ParseTree>> getDescendants(Ref<ParseTree> const& t);
+    static std::vector<ParseTree *> getDescendants(ParseTree *t);
 
     /** @deprecated */
-    static std::vector<Ref<ParseTree>> descendants(Ref<ParseTree> const& t);
+    static std::vector<ParseTree *> descendants(ParseTree *t);
     
     /** Find smallest subtree of t enclosing range startTokenIndex..stopTokenIndex
      *  inclusively using postorder traversal.  Recursive depth-first-search.
      *
      *  @since 4.5.1
      */
-    static Ref<ParserRuleContext> getRootOfSubtreeEnclosingRegion(Ref<ParseTree> const& t,
-                                                                  size_t startTokenIndex, // inclusive
-                                                                  size_t stopTokenIndex); // inclusive
-   
+    static ParserRuleContext* getRootOfSubtreeEnclosingRegion(ParseTree *t,
+                                                              size_t startTokenIndex, // inclusive
+                                                              size_t stopTokenIndex); // inclusive
+
     /** Return first node satisfying the pred
      *
      *  @since 4.5.1
      */
-    static Ref<Tree> findNodeSuchThat(Ref<Tree> const& t, Ref<misc::Predicate<Tree>> const& pred);
+    static ParseTree* findNodeSuchThat(ParseTree *t, Ref<misc::Predicate> const& pred);
     
   private:
     Trees();

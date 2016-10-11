@@ -75,9 +75,9 @@ namespace antlr4 {
     virtual std::string getGrammarFileName() const override;
 
     /// Begin parsing at startRuleIndex
-    virtual Ref<ParserRuleContext> parse(size_t startRuleIndex);
+    virtual ParserRuleContext* parse(size_t startRuleIndex);
 
-    virtual void enterRecursionRule(Ref<ParserRuleContext> const& localctx, size_t state, size_t ruleIndex, int precedence) override;
+    virtual void enterRecursionRule(ParserRuleContext *localctx, size_t state, size_t ruleIndex, int precedence) override;
 
 
     /** Override this parser interpreters normal decision-making process
@@ -132,7 +132,7 @@ namespace antlr4 {
      *
      * @since 4.5.1
      */
-    Ref<InterpreterRuleContext> getRootContext();
+    InterpreterRuleContext* getRootContext();
 
   protected:
     const std::string _grammarFileName;
@@ -157,14 +157,14 @@ namespace antlr4 {
      *  Those values are used to create new recursive rule invocation contexts
      *  associated with left operand of an alt like "expr '*' expr".
      */
-    std::stack<std::pair<Ref<ParserRuleContext>, size_t>> _parentContextStack;
+    std::stack<std::pair<ParserRuleContext *, size_t>> _parentContextStack;
     
     /** We need a map from (decision,inputIndex)->forced alt for computing ambiguous
      *  parse trees. For now, we allow exactly one override.
      */
     int _overrideDecision = -1;
-    int _overrideDecisionInputIndex = -1;
-    int _overrideDecisionAlt = -1;
+    size_t _overrideDecisionInputIndex = INVALID_INDEX;
+    size_t _overrideDecisionAlt = INVALID_INDEX;
     bool _overrideDecisionReached = false; // latch and only override once; error might trigger infinite loop
 
     /** What is the current context when we override a decision? This tells
@@ -172,7 +172,7 @@ namespace antlr4 {
      *  for an ambiguity/lookahead check.
      */
     Ref<InterpreterRuleContext> _overrideDecisionRoot;
-    Ref<InterpreterRuleContext> _rootContext;
+    InterpreterRuleContext* _rootContext;
     
     virtual atn::ATNState *getATNState();
     virtual void visitState(atn::ATNState *p);
@@ -186,8 +186,7 @@ namespace antlr4 {
     /** Provide simple "factory" for InterpreterRuleContext's.
      *  @since 4.5.1
      */
-    Ref<InterpreterRuleContext> createInterpreterRuleContext(std::weak_ptr<ParserRuleContext> parent,
-      size_t invokingStateNumber, size_t ruleIndex);
+    InterpreterRuleContext* createInterpreterRuleContext(ParserRuleContext *parent, size_t invokingStateNumber, size_t ruleIndex);
 
     virtual void visitRuleStopState(atn::ATNState *p);
 

@@ -298,7 +298,7 @@ namespace atn {
     // LAME globals to avoid parameters!!!!! I need these down deep in predTransition
     TokenStream *_input;
     size_t _startIndex;
-    Ref<ParserRuleContext> _outerContext;
+    ParserRuleContext *_outerContext;
     dfa::DFA *_dfa; // Reference into the decisionToDFA vector.
 
   public:
@@ -311,7 +311,7 @@ namespace atn {
 
     virtual void reset() override;
     virtual void clearDFA() override;
-    virtual size_t adaptivePredict(TokenStream *input, size_t decision, Ref<ParserRuleContext> const& outerContext);
+    virtual size_t adaptivePredict(TokenStream *input, size_t decision, ParserRuleContext *outerContext);
 
     /// <summary>
     /// Performs ATN simulation to compute a predicted alternative based
@@ -346,7 +346,7 @@ namespace atn {
     /// </summary>
   protected:
     virtual size_t execATN(dfa::DFA &dfa, dfa::DFAState *s0, TokenStream *input, size_t startIndex,
-                           Ref<ParserRuleContext> outerContext);
+                           ParserRuleContext *outerContext);
 
     /// <summary>
     /// Get an existing target state for an edge in the DFA. If the target state
@@ -377,7 +377,7 @@ namespace atn {
 
     // comes back with reach.uniqueAlt set to a valid alt
     virtual size_t execATNWithFullContext(dfa::DFA &dfa, dfa::DFAState *D, ATNConfigSet *s0,
-      TokenStream *input, size_t startIndex, Ref<ParserRuleContext> const& outerContext); // how far we got before failing over
+      TokenStream *input, size_t startIndex, ParserRuleContext *outerContext); // how far we got before failing over
 
     virtual std::unique_ptr<ATNConfigSet> computeReachSet(ATNConfigSet *closure, size_t t, bool fullCtx);
 
@@ -402,7 +402,7 @@ namespace atn {
     /// the configurations from {@code configs} which are in a rule stop state </returns>
     virtual ATNConfigSet* removeAllConfigsNotInRuleStopState(ATNConfigSet *configs, bool lookToEndOfRule);
 
-    virtual std::unique_ptr<ATNConfigSet> computeStartState(ATNState *p, Ref<RuleContext> const& ctx, bool fullCtx);
+    virtual std::unique_ptr<ATNConfigSet> computeStartState(ATNState *p, RuleContext *ctx, bool fullCtx);
 
     /* parrt internal source braindump that doesn't mess up
      * external API spec.
@@ -628,7 +628,7 @@ namespace atn {
      * identified and {@link #adaptivePredict} should report an error instead.
      */
     size_t getSynValidOrSemInvalidAltThatFinishedDecisionEntryRule(ATNConfigSet *configs,
-      Ref<ParserRuleContext> const& outerContext);
+      ParserRuleContext *outerContext);
 
     virtual size_t getAltThatFinishedDecisionEntryRule(ATNConfigSet *configs);
 
@@ -642,7 +642,7 @@ namespace atn {
      *  prediction, which is where predicates need to evaluate.
      */
     std::pair<ATNConfigSet *, ATNConfigSet *> splitAccordingToSemanticValidity(ATNConfigSet *configs,
-      Ref<ParserRuleContext> const& outerContext);
+      ParserRuleContext *outerContext);
 
     /// <summary>
     /// Look through a list of predicate/alt pairs, returning alts for the
@@ -652,7 +652,7 @@ namespace atn {
     ///  includes pairs with null predicates.
     /// </summary>
     virtual antlrcpp::BitSet evalSemanticContext(std::vector<dfa::DFAState::PredPrediction*> predPredictions,
-                                                 Ref<ParserRuleContext> const& outerContext, bool complete);
+                                                 ParserRuleContext *outerContext, bool complete);
 
 
     /**
@@ -685,7 +685,7 @@ namespace atn {
      *
      * @since 4.3
      */
-    virtual bool evalSemanticContext(Ref<SemanticContext> const& pred, Ref<ParserRuleContext> const& parserCallStack,
+    virtual bool evalSemanticContext(Ref<SemanticContext> const& pred, ParserRuleContext *parserCallStack,
                                      size_t alt, bool fullCtx);
 
     /* TO_DO: If we are doing predicates, there is no point in pursuing
@@ -785,7 +785,7 @@ namespace atn {
     virtual void dumpDeadEndConfigs(NoViableAltException &nvae);
 
   protected:
-    virtual NoViableAltException noViableAlt(TokenStream *input, Ref<ParserRuleContext> const& outerContext,
+    virtual NoViableAltException noViableAlt(TokenStream *input, ParserRuleContext *outerContext,
                                               ATNConfigSet *configs, size_t startIndex);
 
     static size_t getUniqueAlt(ATNConfigSet *configs);

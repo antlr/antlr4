@@ -76,7 +76,7 @@ namespace atn {
     /// </param>
     /// <returns> The set of tokens that can follow {@code s} in the ATN in the
     /// specified {@code ctx}. </returns>
-    virtual misc::IntervalSet LOOK(ATNState *s, Ref<RuleContext> const& ctx) const;
+    virtual misc::IntervalSet LOOK(ATNState *s, RuleContext *ctx) const;
 
     /// <summary>
     /// Compute set of tokens that can follow {@code s} in the ATN in the
@@ -95,7 +95,7 @@ namespace atn {
     /// </param>
     /// <returns> The set of tokens that can follow {@code s} in the ATN in the
     /// specified {@code ctx}. </returns>
-    virtual misc::IntervalSet LOOK(ATNState *s, ATNState *stopState, Ref<RuleContext> const& ctx) const;
+    virtual misc::IntervalSet LOOK(ATNState *s, ATNState *stopState, RuleContext *ctx) const;
 
     /// <summary>
     /// Compute set of tokens that can follow {@code s} in the ATN in the

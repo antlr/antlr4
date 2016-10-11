@@ -59,9 +59,9 @@ namespace tree {
     /// Visit the children of a node, and return a user-defined result of the
     /// operation.
     /// </summary>
-    /// <param name="node"> The <seealso cref="RuleNode"/> whose children should be visited. </param>
+    /// <param name="node"> The <seealso cref="ParseTree"/> whose children should be visited. </param>
     /// <returns> The result of visiting the children of the node. </returns>
-    virtual antlrcpp::Any visitChildren(RuleNode *node) = 0;
+    virtual antlrcpp::Any visitChildren(ParseTree *node) = 0;
 
     /// <summary>
     /// Visit a terminal node, and return a user-defined result of the operation.

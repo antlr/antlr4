@@ -623,33 +623,33 @@ Transition *ATNDeserializer::edgeFactory(const ATN &atn, size_t type, size_t /*s
   
   ATNState *target = atn.states[trg];
   switch (type) {
-    case Transition::EPSILON :
+    case Transition::EPSILON:
       return new EpsilonTransition(target);
-    case Transition::RANGE :
+    case Transition::RANGE:
       if (arg3 != 0) {
         return new RangeTransition(target, Token::EOF, arg2);
       } else {
         return new RangeTransition(target, arg1, arg2);
       }
-    case Transition::RULE :
+    case Transition::RULE:
       return new RuleTransition(static_cast<RuleStartState*>(atn.states[arg1]), arg2, (int)arg3, target);
-    case Transition::PREDICATE :
+    case Transition::PREDICATE:
       return new PredicateTransition(target, arg1, arg2, arg3 != 0);
     case Transition::PRECEDENCE:
       return new PrecedencePredicateTransition(target, (int)arg1);
-    case Transition::ATOM :
+    case Transition::ATOM:
       if (arg3 != 0) {
         return new AtomTransition(target, Token::EOF);
       } else {
         return new AtomTransition(target, arg1);
       }
-    case Transition::ACTION :
+    case Transition::ACTION:
       return new ActionTransition(target, arg1, arg2, arg3 != 0);
-    case Transition::SET :
+    case Transition::SET:
       return new SetTransition(target, sets[arg1]);
-    case Transition::NOT_SET :
+    case Transition::NOT_SET:
       return new NotSetTransition(target, sets[arg1]);
-    case Transition::WILDCARD :
+    case Transition::WILDCARD:
       return new WildcardTransition(target);
   }
 

@@ -105,7 +105,7 @@ ATN& ATN::operator = (ATN &&other) NOEXCEPT {
   return *this;
 }
 
-misc::IntervalSet ATN::nextTokens(ATNState *s, Ref<RuleContext> const& ctx) const {
+misc::IntervalSet ATN::nextTokens(ATNState *s, RuleContext *ctx) const {
   LL1Analyzer analyzer(*this);
   return analyzer.LOOK(s, ctx);
 
@@ -172,10 +172,10 @@ misc::IntervalSet ATN::getExpectedTokens(size_t stateNumber, RuleContext *contex
     expected.addAll(following);
     expected.remove(Token::EPSILON);
 
-    if (ctx->parent.expired()) {
+    if (ctx->parent == nullptr) {
       break;
     }
-    ctx = (RuleContext *)ctx->parent.lock().get();
+    ctx = (RuleContext *)ctx->parent;
   }
 
   if (following.contains(Token::EPSILON)) {

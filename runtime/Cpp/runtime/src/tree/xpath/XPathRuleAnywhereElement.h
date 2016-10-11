@@ -42,7 +42,7 @@ namespace xpath {
   public:
     XPathRuleAnywhereElement(const std::string &ruleName, int ruleIndex);
 
-    virtual std::vector<Ref<ParseTree>> evaluate(const Ref<ParseTree> &t) override;
+    virtual std::vector<ParseTree *> evaluate(ParseTree *t) override;
 
   protected:
     int _ruleIndex = 0;

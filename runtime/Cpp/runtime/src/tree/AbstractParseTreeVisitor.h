@@ -32,7 +32,6 @@
 #pragma once
 
 #include "tree/ParseTreeVisitor.h"
-#include "tree/RuleNode.h"
 
 namespace antlr4 {
 namespace tree {
@@ -58,7 +57,7 @@ namespace tree {
      * the tree structure. Visitors that modify the tree should override this
      * method to behave properly in respect to the specific algorithm in use.</p>
      */
-    virtual antlrcpp::Any visitChildren(RuleNode *node) override {
+    virtual antlrcpp::Any visitChildren(ParseTree *node) override {
       antlrcpp::Any result = defaultResult();
       size_t n = node->children.size();
       for (size_t i = 0; i < n; i++) {
@@ -66,8 +65,7 @@ namespace tree {
           break;
         }
 
-        Ref<ParseTree> c = std::dynamic_pointer_cast<ParseTree>(node->children[i]);
-        antlrcpp::Any childResult = c->accept(this);
+        antlrcpp::Any childResult = node->children[i]->accept(this);
         result = aggregateResult(result, childResult);
       }
 
@@ -138,7 +136,7 @@ namespace tree {
     /// child has the potential to determine the result of the visit operation as
     /// a whole.
     /// </summary>
-    /// <param name="node"> The <seealso cref="RuleNode"/> whose children are currently being
+    /// <param name="node"> The <seealso cref="ParseTree"/> whose children are currently being
     /// visited. </param>
     /// <param name="currentResult"> The current aggregate result of the children visited
     /// to the current point.
@@ -146,7 +144,7 @@ namespace tree {
     /// <returns> {@code true} to continue visiting children. Otherwise return
     /// {@code false} to stop visiting children and immediately return the
     /// current aggregate result from <seealso cref="#visitChildren"/>. </returns>
-    virtual bool shouldVisitNextChild(RuleNode * /*node*/, const antlrcpp::Any &/*currentResult*/) {
+    virtual bool shouldVisitNextChild(ParseTree * /*node*/, const antlrcpp::Any &/*currentResult*/) {
       return true;
     }
 

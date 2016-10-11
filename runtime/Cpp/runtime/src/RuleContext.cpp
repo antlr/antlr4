@@ -45,7 +45,7 @@ RuleContext::RuleContext() {
   InitializeInstanceFields();
 }
 
-RuleContext::RuleContext(std::weak_ptr<RuleContext> parent, size_t invokingState) {
+RuleContext::RuleContext(RuleContext *parent, size_t invokingState) {
   InitializeInstanceFields();
   this->parent = parent;
   this->invokingState = invokingState;
@@ -55,9 +55,9 @@ int RuleContext::depth() {
   int n = 1;
   RuleContext *p = this;
   while (true) {
-    if (p->parent.expired())
+    if (p->parent == nullptr)
       break;
-    p = (RuleContext *)p->parent.lock().get();
+    p = (RuleContext *)p->parent;
     n++;
   }
   return n;
@@ -71,10 +71,6 @@ misc::Interval RuleContext::getSourceInterval() {
   return misc::Interval::INVALID;
 }
 
-Ref<RuleContext> RuleContext::getRuleContext() {
-  return shared_from_this();
-}
-
 std::string RuleContext::getText() {
   if (children.empty()) {
     return "";
@@ -85,7 +81,7 @@ std::string RuleContext::getText() {
     if (i > 0)
       ss << ", ";
 
-    Ref<ParseTree> tree = std::dynamic_pointer_cast<ParseTree>(children[i]);
+    ParseTree *tree = children[i];
     if (tree != nullptr)
       ss << tree->getText();
   }
@@ -97,11 +93,11 @@ size_t RuleContext::getRuleIndex() const {
   return INVALID_INDEX;
 }
 
-int RuleContext::getAltNumber() const {
+size_t RuleContext::getAltNumber() const {
   return atn::ATN::INVALID_ALT_NUMBER;
 }
 
-void RuleContext::setAltNumber(int /*altNumber*/) {
+void RuleContext::setAltNumber(size_t /*altNumber*/) {
 }
 
 antlrcpp::Any RuleContext::accept(tree::ParseTreeVisitor *visitor) {
@@ -109,11 +105,11 @@ antlrcpp::Any RuleContext::accept(tree::ParseTreeVisitor *visitor) {
 }
 
 std::string RuleContext::toStringTree(Parser *recog) {
-  return tree::Trees::toStringTree(shared_from_this(), recog);
+  return tree::Trees::toStringTree(this, recog);
 }
 
 std::string RuleContext::toStringTree(std::vector<std::string> &ruleNames) {
-  return tree::Trees::toStringTree(shared_from_this(), ruleNames);
+  return tree::Trees::toStringTree(this, ruleNames);
 }
 
 std::string RuleContext::toStringTree() {
@@ -122,16 +118,16 @@ std::string RuleContext::toStringTree() {
 
 
 std::string RuleContext::toString(const std::vector<std::string> &ruleNames) {
-  return toString(ruleNames, Ref<RuleContext>());
+  return toString(ruleNames, nullptr);
 }
 
 
-std::string RuleContext::toString(const std::vector<std::string> &ruleNames, Ref<RuleContext> const& stop) {
+std::string RuleContext::toString(const std::vector<std::string> &ruleNames, RuleContext *stop) {
   std::stringstream ss;
 
   RuleContext *currentParent = this;
   ss << "[";
-  while (currentParent != stop.get()) {
+  while (currentParent != stop) {
     if (ruleNames.empty()) {
       if (!currentParent->isEmpty()) {
         ss << currentParent->invokingState;
@@ -143,9 +139,9 @@ std::string RuleContext::toString(const std::vector<std::string> &ruleNames, Ref
       ss << ruleName;
     }
 
-    if (currentParent->parent.expired()) // No parent anymore.
+    if (currentParent->parent == nullptr) // No parent anymore.
       break;
-    currentParent = (RuleContext *)currentParent->parent.lock().get();
+    currentParent = (RuleContext *)currentParent->parent;
     if (!ruleNames.empty() || !currentParent->isEmpty()) {
       ss << " ";
     }
@@ -161,10 +157,10 @@ std::string RuleContext::toString() {
 }
 
 std::string RuleContext::toString(Recognizer *recog) {
-  return toString(recog, ParserRuleContext::EMPTY);
+  return toString(recog, &ParserRuleContext::EMPTY);
 }
 
-std::string RuleContext::toString(Recognizer *recog, Ref<RuleContext> const& stop) {
+std::string RuleContext::toString(Recognizer *recog, RuleContext *stop) {
   if (recog == nullptr)
     return toString(std::vector<std::string>(), stop); // Don't use an initializer {} here or we end up calling ourselve recursivly.
   return toString(recog->getRuleNames(), stop);
@@ -173,3 +169,4 @@ std::string RuleContext::toString(Recognizer *recog, Ref<RuleContext> const& sto
 void RuleContext::InitializeInstanceFields() {
   invokingState = INVALID_INDEX;
 }
+

@@ -112,10 +112,10 @@ std::string ParserInterpreter::getGrammarFileName() const {
   return _grammarFileName;
 }
 
-Ref<ParserRuleContext> ParserInterpreter::parse(size_t startRuleIndex) {
+ParserRuleContext* ParserInterpreter::parse(size_t startRuleIndex) {
   atn::RuleStartState *startRuleStartState = _atn.ruleToStartState[startRuleIndex];
 
-  _rootContext = createInterpreterRuleContext(std::weak_ptr<ParserRuleContext>(), atn::ATNState::INVALID_STATE_NUMBER, startRuleIndex);
+  _rootContext = createInterpreterRuleContext(nullptr, atn::ATNState::INVALID_STATE_NUMBER, startRuleIndex);
   
   if (startRuleStartState->isLeftRecursiveRule) {
     enterRecursionRule(_rootContext, startRuleStartState->stateNumber, startRuleIndex, 0);
@@ -130,7 +130,7 @@ Ref<ParserRuleContext> ParserInterpreter::parse(size_t startRuleIndex) {
         // pop; return from rule
         if (_ctx->isEmpty()) {
           if (startRuleStartState->isLeftRecursiveRule) {
-            Ref<ParserRuleContext> result = _ctx;
+            ParserRuleContext *result = _ctx;
             auto parentContext = _parentContextStack.top();
             _parentContextStack.pop();
             unrollRecursionContexts(parentContext.first);
@@ -160,7 +160,7 @@ Ref<ParserRuleContext> ParserInterpreter::parse(size_t startRuleIndex) {
   }
 }
 
-void ParserInterpreter::enterRecursionRule(Ref<ParserRuleContext> const& localctx, size_t state, size_t ruleIndex, int precedence) {
+void ParserInterpreter::enterRecursionRule(ParserRuleContext *localctx, size_t state, size_t ruleIndex, int precedence) {
   _parentContextStack.push({ _ctx, localctx->invokingState });
   Parser::enterRecursionRule(localctx, state, ruleIndex, precedence);
 }
@@ -175,7 +175,7 @@ Ref<InterpreterRuleContext> ParserInterpreter::getOverrideDecisionRoot() const {
   return _overrideDecisionRoot;
 }
 
-Ref<InterpreterRuleContext> ParserInterpreter::getRootContext() {
+InterpreterRuleContext* ParserInterpreter::getRootContext() {
   return _rootContext;
 }
 
@@ -197,7 +197,7 @@ void ParserInterpreter::visitState(atn::ATNState *p) {
         !is<LoopEndState *>(transition->target)) {
         // We are at the start of a left recursive rule's (...)* loop
         // and we're not taking the exit branch of loop.
-        Ref<InterpreterRuleContext> localctx = createInterpreterRuleContext(_parentContextStack.top().first,
+        InterpreterRuleContext *localctx = createInterpreterRuleContext(_parentContextStack.top().first,
           _parentContextStack.top().second, (int)_ctx->getRuleIndex());
         pushNewRecursionContext(localctx, _atn.ruleToStartState[p->ruleIndex]->stateNumber, (int)_ctx->getRuleIndex());
       }
@@ -224,7 +224,7 @@ void ParserInterpreter::visitState(atn::ATNState *p) {
     {
       atn::RuleStartState *ruleStartState = (atn::RuleStartState*)(transition->target);
       size_t ruleIndex = ruleStartState->ruleIndex;
-      Ref<InterpreterRuleContext> newctx = createInterpreterRuleContext(_ctx, p->stateNumber, ruleIndex);
+      InterpreterRuleContext *newctx = createInterpreterRuleContext(_ctx, p->stateNumber, ruleIndex);
       if (ruleStartState->isLeftRecursiveRule) {
         enterRecursionRule(newctx, ruleStartState->stateNumber, ruleIndex, ((atn::RuleTransition*)(transition))->precedence);
       } else {
@@ -269,7 +269,7 @@ size_t ParserInterpreter::visitDecisionState(DecisionState *p) {
   if (p->getNumberOfTransitions() > 1) {
     getErrorHandler()->sync(this);
     int decision = p->decision;
-    if (decision == _overrideDecision && (int)_input->index() == _overrideDecisionInputIndex && !_overrideDecisionReached) {
+    if (decision == _overrideDecision && _input->index() == _overrideDecisionInputIndex && !_overrideDecisionReached) {
       predictedAlt = _overrideDecisionAlt;
       _overrideDecisionReached = true;
     } else {
@@ -279,15 +279,15 @@ size_t ParserInterpreter::visitDecisionState(DecisionState *p) {
   return predictedAlt;
 }
 
-Ref<InterpreterRuleContext> ParserInterpreter::createInterpreterRuleContext(std::weak_ptr<ParserRuleContext> parent,
+InterpreterRuleContext* ParserInterpreter::createInterpreterRuleContext(ParserRuleContext *parent,
   size_t invokingStateNumber, size_t ruleIndex) {
-  return std::make_shared<InterpreterRuleContext>(parent, invokingStateNumber, ruleIndex);
+  return _tracker.createInstance<InterpreterRuleContext>(parent, invokingStateNumber, ruleIndex);
 }
 
 void ParserInterpreter::visitRuleStopState(atn::ATNState *p) {
   atn::RuleStartState *ruleStartState = _atn.ruleToStartState[p->ruleIndex];
   if (ruleStartState->isLeftRecursiveRule) {
-    std::pair<Ref<ParserRuleContext>, size_t> parentContext = _parentContextStack.top();
+    std::pair<ParserRuleContext *, size_t> parentContext = _parentContextStack.top();
     _parentContextStack.pop();
 
     unrollRecursionContexts(parentContext.first);
@@ -313,14 +313,14 @@ void ParserInterpreter::recover(RecognitionException &e) {
       _errorToken = getTokenFactory()->create({ tok->getTokenSource(), tok->getTokenSource()->getInputStream() },
         expectedTokenType, tok->getText(), Token::DEFAULT_CHANNEL, INVALID_INDEX, INVALID_INDEX, // invalid start/stop
         tok->getLine(), tok->getCharPositionInLine());
-      _ctx->addErrorNode(_errorToken.get());
+      _ctx->addErrorNode(_tracker, _errorToken.get());
     }
     else { // NoViableAlt
       Token *tok = e.getOffendingToken();
       _errorToken = getTokenFactory()->create({ tok->getTokenSource(), tok->getTokenSource()->getInputStream() },
         Token::INVALID_TYPE, tok->getText(), Token::DEFAULT_CHANNEL, INVALID_INDEX, INVALID_INDEX, // invalid start/stop
         tok->getLine(), tok->getCharPositionInLine());
-      _ctx->addErrorNode(_errorToken.get());
+      _ctx->addErrorNode(_tracker, _errorToken.get());
     }
   }
 }

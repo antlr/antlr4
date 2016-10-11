@@ -29,6 +29,7 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "ParseTree.h"
 #include "tree/pattern/ParseTreePatternMatcher.h"
 #include "tree/pattern/ParseTreeMatch.h"
 
@@ -40,21 +41,24 @@
 using namespace antlr4::tree;
 using namespace antlr4::tree::pattern;
 
+using namespace antlrcpp;
+
 ParseTreePattern::ParseTreePattern(ParseTreePatternMatcher *matcher, const std::string &pattern, int patternRuleIndex,
-  Ref<ParseTree> patternTree)
+                                   ParseTree *patternTree)
   : patternRuleIndex(patternRuleIndex), _pattern(pattern), _patternTree(patternTree), _matcher(matcher) {
 }
 
-ParseTreeMatch ParseTreePattern::match(Ref<ParseTree> const& tree) {
+ParseTreeMatch ParseTreePattern::match(ParseTree *tree) {
   return _matcher->match(tree, *this);
 }
 
-bool ParseTreePattern::matches(Ref<ParseTree> const& tree) {
+bool ParseTreePattern::matches(ParseTree *tree) {
   return _matcher->match(tree, *this).succeeded();
 }
 
-std::vector<ParseTreeMatch> ParseTreePattern::findAll(Ref<ParseTree> const& tree, const std::string &xpath) {
-  std::vector<Ref<ParseTree>> subtrees = xpath::XPath::findAll(tree, xpath, _matcher->getParser());
+std::vector<ParseTreeMatch> ParseTreePattern::findAll(ParseTree *tree, const std::string &xpath) {
+  xpath::XPath finder(_matcher->getParser(), xpath);
+  std::vector<ParseTree *> subtrees = finder.evaluate(tree);
   std::vector<ParseTreeMatch> matches;
   for (auto t : subtrees) {
     ParseTreeMatch aMatch = match(t);
@@ -78,6 +82,6 @@ int ParseTreePattern::getPatternRuleIndex() const {
   return patternRuleIndex;
 }
 
-Ref<ParseTree> ParseTreePattern::getPatternTree() const {
+ParseTree* ParseTreePattern::getPatternTree() const {
   return _patternTree;
 }

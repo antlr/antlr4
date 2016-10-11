@@ -95,7 +95,7 @@ namespace atn {
   public:
     /// Convert a RuleContext tree to a PredictionContext graph.
     /// Return EMPTY if outerContext is empty.
-    static Ref<PredictionContext> fromRuleContext(const ATN &atn, const Ref<RuleContext> &outerContext);
+    static Ref<PredictionContext> fromRuleContext(const ATN &atn, RuleContext *outerContext);
 
     virtual size_t size() const = 0;
     virtual std::weak_ptr<PredictionContext> getParent(size_t index) const = 0;

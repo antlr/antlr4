@@ -50,22 +50,21 @@ void ParseTreeWalker::walk(ParseTreeListener *listener, ParseTree *t) const {
     return;
   }
 
-  RuleNode *r = dynamic_cast<RuleNode *>(t);
-  enterRule(listener, r);
-  for (auto &child : r->children) {
-    walk(listener, dynamic_cast<ParseTree *>(child.get()));
+  enterRule(listener, t);
+  for (auto &child : t->children) {
+    walk(listener, dynamic_cast<ParseTree *>(child));
   }
-  exitRule(listener, r);
+  exitRule(listener, t);
 }
 
-void ParseTreeWalker::enterRule(ParseTreeListener *listener, RuleNode *r) const {
-  Ref<ParserRuleContext> ctx = std::dynamic_pointer_cast<ParserRuleContext>(r->getRuleContext());
-  listener->enterEveryRule(ctx.get());
+void ParseTreeWalker::enterRule(ParseTreeListener *listener, ParseTree *r) const {
+  ParserRuleContext *ctx = dynamic_cast<ParserRuleContext *>(r);
+  listener->enterEveryRule(ctx);
   ctx->enterRule(listener);
 }
 
-void ParseTreeWalker::exitRule(ParseTreeListener *listener, RuleNode *r) const {
-  Ref<ParserRuleContext> ctx = std::dynamic_pointer_cast<ParserRuleContext>(r->getRuleContext());
+void ParseTreeWalker::exitRule(ParseTreeListener *listener, ParseTree *r) const {
+  ParserRuleContext *ctx = dynamic_cast<ParserRuleContext *>(r);
   ctx->exitRule(listener);
-  listener->exitEveryRule(ctx.get());
+  listener->exitEveryRule(ctx);
 }

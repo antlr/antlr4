@@ -41,6 +41,6 @@ XPathTokenAnywhereElement::XPathTokenAnywhereElement(const std::string &tokenNam
   this->tokenType = tokenType;
 }
 
-std::vector<Ref<ParseTree>> XPathTokenAnywhereElement::evaluate(const std::shared_ptr<ParseTree> &t) {
+std::vector<ParseTree *> XPathTokenAnywhereElement::evaluate(ParseTree *t) {
   return Trees::findAllTokenNodes(t, tokenType);
 }

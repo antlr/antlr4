@@ -45,7 +45,7 @@ namespace antlr4 {
   public:
     NoViableAltException(Parser *recognizer); // LL(1) error
     NoViableAltException(Parser *recognizer, TokenStream *input,Token *startToken,
-      Token *offendingToken, atn::ATNConfigSet *deadEndConfigs, Ref<ParserRuleContext> const& ctx);
+      Token *offendingToken, atn::ATNConfigSet *deadEndConfigs, ParserRuleContext *ctx);
 
     virtual Token* getStartToken() const;
     virtual atn::ATNConfigSet* getDeadEndConfigs() const;

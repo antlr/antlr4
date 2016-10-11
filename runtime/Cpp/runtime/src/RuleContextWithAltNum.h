@@ -45,13 +45,13 @@ namespace antlr4 {
   ///  will really every use this.
   class ANTLR4CPP_PUBLIC RuleContextWithAltNum : public ParserRuleContext {
   public:
-    int altNum = 0;
+    size_t altNum = 0;
     
     RuleContextWithAltNum();
-    RuleContextWithAltNum(Ref<ParserRuleContext> const& parent, int invokingStateNumber);
+    RuleContextWithAltNum(ParserRuleContext *parent, int invokingStateNumber);
 
-    virtual int getAltNumber() const override;
-    virtual void setAltNumber(int altNum) override;
+    virtual size_t getAltNumber() const override;
+    virtual void setAltNumber(size_t altNum) override;
   };
 
 } // namespace antlr4

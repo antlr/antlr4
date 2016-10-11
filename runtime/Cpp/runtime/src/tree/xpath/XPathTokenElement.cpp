@@ -44,12 +44,12 @@ XPathTokenElement::XPathTokenElement(const std::string &tokenName, size_t tokenT
   _tokenType = tokenType;
 }
 
-std::vector<Ref<ParseTree>> XPathTokenElement::evaluate(const std::shared_ptr<ParseTree> &t) {
+std::vector<ParseTree *> XPathTokenElement::evaluate(ParseTree *t) {
   // return all children of t that match nodeName
-  std::vector<Ref<ParseTree>> nodes;
+  std::vector<ParseTree *> nodes;
   for (auto c : t->children) {
-    if (antlrcpp::is<TerminalNode>(c)) {
-      Ref<TerminalNode> tnode = std::static_pointer_cast<TerminalNode>(c);
+    if (antlrcpp::is<TerminalNode *>(c)) {
+      TerminalNode *tnode = dynamic_cast<TerminalNode *>(c);
       if ((tnode->getSymbol()->getType() == _tokenType && !_invert) || (tnode->getSymbol()->getType() != _tokenType && _invert)) {
         nodes.push_back(tnode);
       }

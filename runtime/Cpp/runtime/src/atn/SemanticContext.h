@@ -87,7 +87,7 @@ namespace atn {
     /// prediction, so we passed in the outer context here in case of context
     /// dependent predicate evaluation.
     /// </summary>
-    virtual bool eval(Recognizer *parser, Ref<RuleContext> const& parserCallStack) = 0;
+    virtual bool eval(Recognizer *parser, RuleContext *parserCallStack) = 0;
 
     /**
      * Evaluate the precedence predicates for the context and reduce the result.
@@ -107,7 +107,7 @@ namespace atn {
      * semantic context after precedence predicates are evaluated.</li>
      * </ul>
      */
-    virtual Ref<SemanticContext> evalPrecedence(Recognizer *parser, Ref<RuleContext> const& parserCallStack);
+    virtual Ref<SemanticContext> evalPrecedence(Recognizer *parser, RuleContext *parserCallStack);
 
     static Ref<SemanticContext> And(Ref<SemanticContext> const& a, Ref<SemanticContext> const& b);
 
@@ -136,7 +136,7 @@ namespace atn {
   public:
     Predicate(size_t ruleIndex, size_t predIndex, bool isCtxDependent);
 
-    virtual bool eval(Recognizer *parser, Ref<RuleContext> const& parserCallStack) override;
+    virtual bool eval(Recognizer *parser, RuleContext *parserCallStack) override;
     virtual size_t hashCode() const override;
     virtual bool operator == (const SemanticContext &other) const override;
     virtual std::string toString() const override;
@@ -152,8 +152,8 @@ namespace atn {
   public:
     PrecedencePredicate(int precedence);
 
-    virtual bool eval(Recognizer *parser, Ref<RuleContext> const& parserCallStack) override;
-    virtual Ref<SemanticContext> evalPrecedence(Recognizer *parser, Ref<RuleContext> const& parserCallStack) override;
+    virtual bool eval(Recognizer *parser, RuleContext *parserCallStack) override;
+    virtual Ref<SemanticContext> evalPrecedence(Recognizer *parser, RuleContext *parserCallStack) override;
     virtual int compareTo(PrecedencePredicate *o);
     virtual size_t hashCode() const override;
     virtual bool operator == (const SemanticContext &other) const override;
@@ -198,8 +198,8 @@ namespace atn {
      * The evaluation of predicates by this context is short-circuiting, but
      * unordered.</p>
      */
-    virtual bool eval(Recognizer *parser, Ref<RuleContext> const& parserCallStack) override;
-    virtual Ref<SemanticContext> evalPrecedence(Recognizer *parser, Ref<RuleContext> const& parserCallStack) override;
+    virtual bool eval(Recognizer *parser, RuleContext *parserCallStack) override;
+    virtual Ref<SemanticContext> evalPrecedence(Recognizer *parser, RuleContext *parserCallStack) override;
     virtual std::string toString() const override;
   };
 
@@ -221,8 +221,8 @@ namespace atn {
      * The evaluation of predicates by this context is short-circuiting, but
      * unordered.
      */
-    virtual bool eval(Recognizer *parser, Ref<RuleContext> const& parserCallStack) override;
-    virtual Ref<SemanticContext> evalPrecedence(Recognizer *parser, Ref<RuleContext> const& parserCallStack) override;
+    virtual bool eval(Recognizer *parser, RuleContext *parserCallStack) override;
+    virtual Ref<SemanticContext> evalPrecedence(Recognizer *parser, RuleContext *parserCallStack) override;
     virtual std::string toString() const override;
   };
   

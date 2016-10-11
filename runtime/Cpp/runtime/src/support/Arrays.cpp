@@ -28,8 +28,10 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "support/Arrays.h"
+#include "tree/ParseTree.h"
 #include "Exceptions.h"
+
+#include "support/Arrays.h"
 
 using namespace antlrcpp;
 
@@ -52,7 +54,7 @@ std::string Arrays::listToString(const std::vector<std::string> &list, const std
 }
 
 template <>
-std::string Arrays::toString(const std::vector<antlr4::tree::Tree*> &source) {
+std::string Arrays::toString(const std::vector<antlr4::tree::ParseTree*> &source) {
   std::string result = "[";
   bool firstEntry = true;
   for (auto value : source) {

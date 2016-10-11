@@ -29,10 +29,10 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "tree/Tree.h"
+#include "tree/ParseTree.h"
 
 using namespace antlr4::tree;
 
-bool Tree::operator == (const Tree &other) const {
+bool ParseTree::operator == (const ParseTree &other) const {
   return &other == this;
 }
