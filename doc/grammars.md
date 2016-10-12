@@ -83,7 +83,7 @@ $ grun MyELang stat
 
 If there were any `tokens` specifications, the main grammar would merge the token sets. Any named actions such as `@members` would be merged. In general, you should avoid named actions and actions within rules in imported grammars since that limits their reuse. ANTLR also ignores any options in imported grammars.
 
-Imported grammars can also import other grammars. ANTLR pursues all imported grammars in a depth-first fashion. If two or more imported grammars define ruler, ANTLR chooses the first version of `r` it finds. In the following diagram, ANTLR examines grammars in the following order `Nested`, `G1`, `G3`, `G2`.
+Imported grammars can also import other grammars. ANTLR pursues all imported grammars in a depth-first fashion. If two or more imported grammars define rule `r`, ANTLR chooses the first version of `r` it finds. In the following diagram, ANTLR examines grammars in the following order `Nested`, `G1`, `G3`, `G2`.
 
 <img src=images/nested.png width=350>
 

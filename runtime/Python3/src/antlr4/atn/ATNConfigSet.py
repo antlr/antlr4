@@ -34,6 +34,7 @@
 # graph-structured stack.
 #/
 from io import StringIO
+from functools import reduce
 from antlr4.PredictionContext import PredictionContext, merge
 from antlr4.Utils import str_list
 from antlr4.atn.ATN import ATN
@@ -108,8 +109,8 @@ class ATNConfigSet(object):
         rootIsWildcard = not self.fullCtx
         merged = merge(existing.context, config.context, rootIsWildcard, mergeCache)
         # no need to check for existing.context, config.context in cache
-        # since only way to create new graphs is "call rule" and here. We
-        # cache at both places.
+        # since only way to create new graphs is "call rule" and here.
+        # We cache at both places.
         existing.reachesIntoOuterContext = max(existing.reachesIntoOuterContext, config.reachesIntoOuterContext)
         # make sure to preserve the precedence filter suppression during the merge
         if config.precedenceFilterSuppressed:
@@ -118,12 +119,12 @@ class ATNConfigSet(object):
         return True
 
     def getOrAdd(self, config:ATNConfig):
-        h = hash(config)
+        h = config.hashCodeForConfigSet()
         l = self.configLookup.get(h, None)
         if l is not None:
-            for c in l:
-                if c==config:
-                    return c
+            r = next((cfg for cfg in l if config.equalsForConfigSet(cfg)), None)
+            if r is not None:
+                return r
         if l is None:
             l = [config]
             self.configLookup[h] = l
@@ -132,17 +133,10 @@ class ATNConfigSet(object):
         return config
 
     def getStates(self):
-        states = set()
-        for c in self.configs:
-            states.add(c.state)
-        return states
+        return set(c.state for c in self.configs)
 
     def getPredicates(self):
-        preds = list()
-        for c in self.configs:
-            if c.semanticContext!=SemanticContext.NONE:
-                preds.append(c.semanticContext)
-        return preds
+        return list(cfg.semanticContext for cfg in self.configs if cfg.semanticContext!=SemanticContext.NONE)
 
     def get(self, i:int):
         return self.configs[i]
@@ -184,10 +178,7 @@ class ATNConfigSet(object):
         return self.hashConfigs()
 
     def hashConfigs(self):
-        h = 0
-        for cfg in self.configs:
-            h = hash((h, cfg))
-        return h
+        return reduce(lambda h, cfg: hash((h, cfg)), self.configs, 0)
 
     def __len__(self):
         return len(self.configs)

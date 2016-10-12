@@ -2,14 +2,15 @@
 
 ## Github
 
-Create a release candidate tag 4.x-rc-1 or full 4.5 tag
-
-```bash
-git tag -a 4.5 -m 'ANTLR final release 4.5'
-git push origin 4.5
-```
-
 Create a pre-release or full release at github; [Example 4.5-rc-1](https://github.com/antlr/antlr4/releases/tag/4.5-rc-1).
+
+Wack any existing tag as mvn will create one and it fails if already there.
+
+```
+$ git tag -d 4.5.2
+$ git push origin :refs/tags/4.5.2
+$ git push upstream :refs/tags/4.5.2
+```
 
 ## Bump version
 
@@ -20,7 +21,7 @@ Edit the repository looking for 4.5 or whatever and update it. Bump version in t
  * runtime/Python2/src/antlr4/Recognizer.py
  * runtime/Python3/setup.py
  * runtime/Python3/src/antlr4/Recognizer.py
- * runtime/CSharp/Antlr4.Runtime/Properties/AssemblyInfo.cs
+ * runtime/CSharp/runtime/CSharp/Antlr4.Runtime/Properties/AssemblyInfo.cs
  * runtime/JavaScript/src/antlr4/package.json
  * runtime/JavaScript/src/antlr4/Recognizer.js
  * tool/src/org/antlr/v4/codegen/target/CSharpTarget.java
@@ -89,8 +90,10 @@ The maven deploy lifecycle phased deploys the artifacts and the poms for the ANT
 mvn deploy -DskipTests
 ```
 
+With JDK 1.7 (not 6 or 8), do this:
+
 ```bash
-mvn release:prepare
+mvn release:prepare -Darguments="-DskipTests"
 ```
 
 It will start out by asking you the version number:
@@ -111,7 +114,7 @@ What is the new development version for "ANTLR 4"? (org.antlr:antlr4-master) 4.5
 Maven will go through your pom.xml files to update versions from 4.5.2-SNAPSHOT to 4.5.2 for release and then to 4.5.3-SNAPSHOT after release, which is done with:
 
 ```bash
-mvn release:perform
+mvn release:perform -Darguments="-DskipTests"
 ```
 
 Maven will use git to push pom.xml changes. (big smile)
@@ -132,15 +135,20 @@ cp ~/.m2/repository/org/antlr/antlr4/4.5.2/antlr4-4.5.2.jar ~/antlr/sites/websit
 cd ~/antlr/sites/website-antlr4/download
 git add antlr-4.5.2-complete.jar
 git add antlr-runtime-4.5.2.jar 
-git commit -a -m 'add 4.5.2 jars'
-git push origin gh-pages
 ```
 
 Update on site:
 
 *   download.html
 *   index.html
+*   api/index.html
+*   download/index.html
 *   scripts/topnav.js
+
+```
+git commit -a -m 'add 4.5.2 jars'
+git push origin gh-pages
+```
 
 ## Deploying Targets
 

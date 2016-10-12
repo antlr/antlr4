@@ -352,7 +352,7 @@ namespace Antlr4.Runtime
         /// for a newly constructed parser.
         /// </remarks>
         /// <returns>
-        /// 
+        ///
         /// <see langword="true"/>
         /// if a complete parse tree will be constructed while
         /// parsing, otherwise
@@ -378,14 +378,14 @@ namespace Antlr4.Runtime
         /// by default for a newly constructed parser.
         /// </remarks>
         /// <value>
-        /// 
+        ///
         /// <see langword="true"/>
         /// to trim the capacity of the
         /// <see cref="ParserRuleContext.children"/>
         /// list to its size after a rule is parsed.
         /// </value>
         /// <returns>
-        /// 
+        ///
         /// <see langword="true"/>
         /// if the
         /// <see cref="ParserRuleContext.children"/>
@@ -649,9 +649,9 @@ namespace Antlr4.Runtime
             }
         }
 
-        public override IIntStream InputStream 
+        public override IIntStream InputStream
 		{
-			get 
+			get
 			{
 				return _input;
 			}
@@ -659,11 +659,11 @@ namespace Antlr4.Runtime
 
 		public ITokenStream TokenStream
 		{
-			get 
+			get
 			{
 				return _input;
 			}
-			set 
+			set
 			{
 				this._input = null;
 				Reset ();
@@ -842,6 +842,7 @@ namespace Antlr4.Runtime
 
         public virtual void EnterOuterAlt(ParserRuleContext localctx, int altNum)
         {
+        	localctx.setAltNumber(altNum);
             // if we have new localctx, make sure we replace existing ctx
             // that is previous child of parse tree
             if (_buildParseTrees && _ctx != localctx)
@@ -1004,7 +1005,7 @@ namespace Antlr4.Runtime
         /// </summary>
         /// <param name="symbol">the symbol type to check</param>
         /// <returns>
-        /// 
+        ///
         /// <see langword="true"/>
         /// if
         /// <paramref name="symbol"/>

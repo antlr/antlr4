@@ -471,6 +471,7 @@ Parser.prototype.exitRule = function() {
 };
 
 Parser.prototype.enterOuterAlt = function(localctx, altNum) {
+   	localctx.setAltNumber(altNum);
 	// if we have new localctx, make sure we replace existing ctx
 	// that is previous child of parse tree
 	if (this.buildParseTrees && this._ctx !== localctx) {

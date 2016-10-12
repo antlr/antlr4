@@ -171,7 +171,7 @@ error(126): P.g4:3:4: cannot create implicit token for string literal '&' in non
 
 ## Lexer Rule Actions
 
-An ANTLR lexer creates a Token object after matching a lexical rule. Each request for a token starts in Lexer.nextToken, which calls emit once it has identified a token.emit collects information from the current state of the lexer to build the token. It accesses fields `_type`, `_text`, `_channel`, `_tokenStartCharIndex`, `_tokenStartLine`, and `_tokenStartCharPositionInLine`. You can set the state of these with the various setter methods such as `setType`. For example, the following rule turns `enum` into an identifier if `enumIsKeyword` is false.
+An ANTLR lexer creates a Token object after matching a lexical rule. Each request for a token starts in `Lexer.nextToken`, which calls `emit` once it has identified a token. `emit` collects information from the current state of the lexer to build the token. It accesses fields `_type`, `_text`, `_channel`, `_tokenStartCharIndex`, `_tokenStartLine`, and `_tokenStartCharPositionInLine`. You can set the state of these with the various setter methods such as `setType`. For example, the following rule turns `enum` into an identifier if `enumIsKeyword` is false.
 
 ```
 ENUM : 'enum' {if (!enumIsKeyword) setType(Identifier);} ;
@@ -255,7 +255,8 @@ WS     : [ \r\t\n]+    -> skip ;
 ```
 
 For multiple 'type()' commands, only the rightmost has an effect.
-channel()
+
+### channel()
 
 ```
 BLOCK_COMMENT

@@ -68,7 +68,9 @@ class Trees(object):
             ruleNames = recog.ruleNames
         if ruleNames is not None:
             if isinstance(t, RuleNode):
-                return ruleNames[t.getRuleContext().getRuleIndex()]
+                if t.getAltNumber()!=0: # should use ATN.INVALID_ALT_NUMBER but won't compile
+                    return ruleNames[t.getRuleIndex()]+":"+str(t.getAltNumber())
+                return ruleNames[t.getRuleIndex()]
             elif isinstance( t, ErrorNode):
                 return str(t)
             elif isinstance(t, TerminalNode):
@@ -128,8 +130,7 @@ class Trees(object):
 
     @classmethod
     def descendants(cls, t:ParseTree):
-        nodes = []
-        nodes.append(t)
+        nodes = [t]
         for i in range(0, t.getChildCount()):
             nodes.extend(cls.descendants(t.getChild(i)))
         return nodes

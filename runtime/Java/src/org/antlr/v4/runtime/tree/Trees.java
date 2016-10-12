@@ -33,7 +33,9 @@ package org.antlr.v4.runtime.tree;
 import org.antlr.v4.runtime.CommonToken;
 import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.Predicate;
 import org.antlr.v4.runtime.misc.Utils;
@@ -91,9 +93,13 @@ public class Trees {
 
 	public static String getNodeText(Tree t, List<String> ruleNames) {
 		if ( ruleNames!=null ) {
-			if ( t instanceof RuleNode ) {
-				int ruleIndex = ((RuleNode)t).getRuleContext().getRuleIndex();
+			if ( t instanceof RuleContext ) {
+				int ruleIndex = ((RuleContext)t).getRuleContext().getRuleIndex();
 				String ruleName = ruleNames.get(ruleIndex);
+				int altNumber = ((RuleContext) t).getAltNumber();
+				if ( altNumber!=ATN.INVALID_ALT_NUMBER ) {
+					return ruleName+":"+altNumber;
+				}
 				return ruleName;
 			}
 			else if ( t instanceof ErrorNode) {

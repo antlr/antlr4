@@ -151,7 +151,7 @@ public class GrammarParserInterpreter extends ParserInterpreter {
 	 *  it's simple. Set decisionStatesThatSetOuterAltNumInContext
 	 *  indicates which decision states should set the outer alternative number.
 	 *
-	 *  Left recursive rules are much more complicated to deal with:
+	 *  <p>Left recursive rules are much more complicated to deal with:
 	 *  there is typically a decision for the primary alternatives and a
 	 *  decision to choose between the recursive operator alternatives.
 	 *  For example, the following left recursive rule has two primary and 2

@@ -97,16 +97,10 @@ class IntervalSet(object):
         if self.intervals is None:
             return False
         else:
-            for i in self.intervals:
-                if item in i:
-                    return True
-            return False
+            return any(item in i for i in self.intervals)
 
     def __len__(self):
-        xlen = 0
-        for i in self.intervals:
-            xlen += len(i)
-        return xlen
+        return sum(len(i) for i in self.intervals)
 
     def removeRange(self, v):
         if v.start==v.stop-1:
@@ -126,7 +120,7 @@ class IntervalSet(object):
                 # check for included range, remove it
                 elif v.start<=i.start and v.stop>=i.stop:
                     self.intervals.pop(k)
-                    k = k - 1 # need another pass
+                    k -= 1 # need another pass
                 # check for lower boundary
                 elif v.start<i.stop:
                     self.intervals[k] = Interval(i.start, v.start)

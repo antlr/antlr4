@@ -320,6 +320,19 @@ walker = ParseTreeWalker()
 walker.walk(TParser.LeafListener(), <s>)
 >>
 
+TreeNodeWithAltNumField(X) ::= <<
+@parser::members {
+class MyRuleNode(ParserRuleContext):
+    def __init__(self, parent:ParserRuleContext = None, invokingStateNumber:int = None ):
+        super(<X>Parser.MyRuleNode, self).__init__(parent, invokingStateNumber)
+        self.altNum = 0;
+    def getAltNumber(self):
+        return self.altNum
+    def setAltNumber(self, altNum):
+        self.altNum = altNum
+}
+>>
+
 TokenGetterListener(X) ::= <<
 class LeafListener(MockListener):
     def exitA(self, ctx):

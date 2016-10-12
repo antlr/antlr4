@@ -50,7 +50,7 @@ public class Python3Target extends Target {
 		"abs", "all", "any", "apply", "as",
 		"bin", "bool", "buffer", "bytearray",
 		"callable", "chr", "classmethod", "coerce", "compile", "complex",
-		"delattr", "dict", "dir", "divmod",
+		"del", "delattr", "dict", "dir", "divmod",
 		"enumerate", "eval", "execfile",
 		"file", "filter", "float", "format", "frozenset",
 		"getattr", "globals",
@@ -61,7 +61,7 @@ public class Python3Target extends Target {
 		"memoryview",
 		"object", "oct", "open", "ord",
 		"pow", "print", "property",
-		"range", "raw_input", "reduce", "reload", "repr", "reversed", "round",
+		"range", "raw_input", "reduce", "reload", "repr", "return", "reversed", "round",
 		"set", "setattr", "slice", "sorted", "staticmethod", "str", "sum", "super",
 		"tuple", "type",
 		"unichr", "unicode",
@@ -119,7 +119,7 @@ public class Python3Target extends Target {
 
 	@Override
 	public String getVersion() {
-		return "4.5.2";
+		return "4.5.3";
 	}
 
 	/** Avoid grammar symbols in this set to prevent conflicts in gen'd code. */

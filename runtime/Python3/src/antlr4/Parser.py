@@ -159,7 +159,7 @@ class Parser (Recognizer):
     # @throws RecognitionException if the current input symbol did not match
     # a wildcard and the error strategy could not recover from the mismatched
     # symbol
-    
+
     def matchWildcard(self):
         t = self.getCurrentToken()
         if t.type > 0:
@@ -389,6 +389,7 @@ class Parser (Recognizer):
         self._ctx = self._ctx.parentCtx
 
     def enterOuterAlt(self, localctx:ParserRuleContext, altNum:int):
+        localctx.setAltNumber(altNum)
         # if we have new localctx, make sure we replace existing ctx
         # that is previous child of parse tree
         if self.buildParseTrees and self._ctx != localctx:

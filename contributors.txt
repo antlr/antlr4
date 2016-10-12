@@ -83,6 +83,16 @@ YYYY/MM/DD, github id, Full name, email
 2015/10/12, KvanTTT, Ivan Kochurkin, ivan.kochurkin@gmail.com
 2015/10/21, martin-probst, Martin Probst, martin-probst@web.de
 2015/10/21, hkff, Walid Benghabrit, walid.benghabrit@mines-nantes.fr
+2015/11/12, cooperra, Robbie Cooper, cooperra@users.noreply.github.com
 2015/11/25, abego, Udo Borkowski, ub@abego.org
+2015/12/17, sebadur, Sebastian Badur, sebadur@users.noreply.github.com
+2015/12/23, pboyer, Peter Boyer, peter.b.boyer@gmail.com
+2015/12/24, dtymon, David Tymon, david.tymon@gmail.com
+2016/02/18, reitzig, Raphael Reitzig, reitzig[at]cs.uni-kl.de
+2016/03/27, beardlybread, Bradley Steinbacher, bradley.j.steinbacher@gmail.com
+2016/03/29, msteiger, Martin Steiger, antlr@martin-steiger.de
+2016/03/28, gagern, Martin von Gagern, gagern@ma.tum.de
 2016/07/18, willfaught, Will Faught, will.faught@gmail.com
 2016/08/08, wjkohnen, Wolfgang Johannes Kohnen, wjkohnen-go-antlr@ko-sys.com
+2016/08/11, BurtHarris, Ralph "Burt" Harris, Burt_Harris_antlr4@azxs.33mail.com
+2016/08/19, andjo403, Andreas Jonson, andjo403@hotmail.com

@@ -482,6 +482,9 @@ public abstract class BaseTest {
 				throw new RuntimeException("C# runtime project file not found!");
 			}
 			String runtimeProjPath = runtimeProj.getPath();
+			if(isWindows()){
+				runtimeProjPath = runtimeProjPath.replaceFirst("/", "");
+			}
 			XPathExpression exp = XPathFactory.newInstance().newXPath()
 				.compile("/Project/ItemGroup/ProjectReference[@Include='" + runtimeName + "']");
 			Element node = (Element)exp.evaluate(prjXml, XPathConstants.NODE);

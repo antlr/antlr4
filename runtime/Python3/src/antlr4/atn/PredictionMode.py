@@ -235,10 +235,7 @@ class PredictionMode(Enum):
     # {@link RuleStopState}, otherwise {@code false}
     @classmethod
     def hasConfigInRuleStopState(cls, configs:ATNConfigSet):
-        for c in configs:
-            if isinstance(c.state, RuleStopState):
-                return True
-        return False
+        return any(isinstance(cfg.state, RuleStopState) for cfg in configs)
 
     # Checks if all configurations in {@code configs} are in a
     # {@link RuleStopState}. Configurations meeting this condition have reached
@@ -250,10 +247,7 @@ class PredictionMode(Enum):
     # {@link RuleStopState}, otherwise {@code false}
     @classmethod
     def allConfigsInRuleStopStates(cls, configs:ATNConfigSet):
-        for config in configs:
-            if not isinstance(config.state, RuleStopState):
-                return False
-        return True
+        return all(isinstance(cfg.state, RuleStopState) for cfg in configs)
 
     #
     # Full LL prediction termination.
@@ -422,10 +416,7 @@ class PredictionMode(Enum):
     #
     @classmethod
     def hasNonConflictingAltSet(cls, altsets:list):
-        for alts in altsets:
-            if len(alts)==1:
-                return True
-        return False
+        return any(len(alts) == 1 for alts in altsets)
 
     #
     # Determines if any single alternative subset in {@code altsets} contains
@@ -437,10 +428,7 @@ class PredictionMode(Enum):
     #
     @classmethod
     def hasConflictingAltSet(cls, altsets:list):
-        for alts in altsets:
-            if len(alts)>1:
-                return True
-        return False
+        return any(len(alts) > 1 for alts in altsets)
 
     #
     # Determines if every alternative subset in {@code altsets} is equivalent.
@@ -451,13 +439,10 @@ class PredictionMode(Enum):
     #
     @classmethod
     def allSubsetsEqual(cls, altsets:list):
-        first = None
-        for alts in altsets:
-            if first is None:
-                first = alts
-            elif not alts==first:
-                return False
-        return True
+        if not altsets:
+            return True
+        first = next(iter(altsets))
+        return all(alts == first for alts in iter(altsets))
 
     #
     # Returns the unique alternative predicted by all alternative subsets in
@@ -470,9 +455,8 @@ class PredictionMode(Enum):
     def getUniqueAlt(cls, altsets:list):
         all = cls.getAlts(altsets)
         if len(all)==1:
-            return all[0]
-        else:
-            return ATN.INVALID_ALT_NUMBER
+            return next(iter(all))
+        return ATN.INVALID_ALT_NUMBER
 
     # Gets the complete set of represented alternatives for a collection of
     # alternative subsets. This method returns the union of each {@link BitSet}
@@ -483,10 +467,7 @@ class PredictionMode(Enum):
     #
     @classmethod
     def getAlts(cls, altsets:list):
-        all = set()
-        for alts in altsets:
-            all = all | alts
-        return all
+        return set.union(*altsets)
 
     #
     # This function gets the conflicting alt subsets from a configuration set.
@@ -530,11 +511,7 @@ class PredictionMode(Enum):
 
     @classmethod
     def hasStateAssociatedWithOneAlt(cls, configs:ATNConfigSet):
-        x = cls.getStateToAltMap(configs)
-        for alts in x.values():
-            if len(alts)==1:
-                return True
-        return False
+        return any(len(alts) == 1 for alts in cls.getStateToAltMap(configs).values())
 
     @classmethod
     def getSingleViableAlt(cls, altsets:list):
