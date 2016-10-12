@@ -219,10 +219,6 @@ ATN ATNDeserializer::deserialize(const std::vector<uint16_t>& input) {
   // RULES
   //
   size_t nrules = data[p++];
-  if (atn.grammarType == ATNType::LEXER) {
-    atn.ruleToTokenType.resize(nrules);
-  }
-
   for (size_t i = 0; i < nrules; i++) {
     size_t s = data[p++];
     // Also here, the serialized atn must ensure to point to the correct class type.
@@ -234,7 +230,7 @@ ATN ATNDeserializer::deserialize(const std::vector<uint16_t>& input) {
         tokenType = Token::EOF;
       }
 
-      atn.ruleToTokenType[i] = tokenType;
+      atn.ruleToTokenType.push_back(tokenType);
 
       if (!isFeatureSupported(ADDED_LEXER_ACTIONS(), uuid)) {
         // this piece of unused metadata was serialized prior to the

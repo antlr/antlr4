@@ -159,7 +159,7 @@ XPathLexer::Initializer::Initializer() {
   _atn = deserializer.deserialize(_serializedATN);
 
   for (size_t i = 0; i < _atn.getNumberOfDecisions(); i++) { 
-    _decisionToDFA.push_back(dfa::DFA(_atn.getDecisionState(i), i));
+    _decisionToDFA.emplace_back(_atn.getDecisionState(i), i);
   }
 }
 

@@ -51,11 +51,10 @@ DFA::DFA(atn::DecisionState *atnStartState, size_t decision)
   if (is<atn::StarLoopEntryState *>(atnStartState)) {
     if (static_cast<atn::StarLoopEntryState *>(atnStartState)->isPrecedenceDecision) {
       _precedenceDfa = true;
-      // ml: this state should probably be added to the states list to be freed on destruction.
-      DFAState *precedenceState = new DFAState(std::unique_ptr<atn::ATNConfigSet>(new atn::ATNConfigSet())); // TODO: mem leak
-      precedenceState->isAcceptState = false;
-      precedenceState->requiresFullContext = false;
-      s0 = precedenceState;
+      s0 = new DFAState(std::unique_ptr<atn::ATNConfigSet>(new atn::ATNConfigSet()));
+      _s0Shadow = s0;
+      s0->isAcceptState = false;
+      s0->requiresFullContext = false;
     }
   }
 }
@@ -66,13 +65,12 @@ DFA::DFA(DFA &&other) : atnStartState(std::move(other.atnStartState)), decision(
   _precedenceDfa = std::move(other._precedenceDfa);
 }
 
-DFA::DFA(const DFA &other) : atnStartState(other.atnStartState), decision(other.decision) {
-  states = other.states;
-  s0 = other.s0;
-  _precedenceDfa = other._precedenceDfa;
-}
-
 DFA::~DFA() {
+  // ml: s0 can be set either in our constructor or by external code, so we need a way to track our own creation.
+  // We could use a shared pointer again (and force that on all external assignments etc.) or just shadow it.
+  // I hesitate moving s0 to the normal states list as this might conflict with consumers of that list.
+  delete _s0Shadow;
+
   for (auto state : states) {
     delete state;
   }

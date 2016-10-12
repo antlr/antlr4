@@ -49,7 +49,7 @@ namespace dfa {
 
     DFA(atn::DecisionState *atnStartState);
     DFA(atn::DecisionState *atnStartState, size_t decision);
-    DFA(const DFA &other);
+    DFA(const DFA &other) = delete;
     DFA(DFA &&other);
     virtual ~DFA();
 
@@ -107,6 +107,7 @@ namespace dfa {
      * {@code false}. This is the backing field for {@link #isPrecedenceDfa}.
      */
     bool _precedenceDfa;
+    DFAState *_s0Shadow = nullptr; // ml: assigned when we created s0 ourselves.
 
     std::recursive_mutex _lock; // To synchronize access to s0.
   };
