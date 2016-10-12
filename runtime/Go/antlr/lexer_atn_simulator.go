@@ -5,70 +5,37 @@ import (
 	"strconv"
 )
 
-// When we hit an accept state in either the DFA or the ATN, we
-//  have to notify the character stream to start buffering characters
-//  via {@link IntStream//mark} and record the current state. The current sim state
-//  includes the current index into the input, the current line,
-//  and current character position in that line. Note that the Lexer is
-//  tracking the starting line and characterization of the token. These
-//  variables track the "state" of the simulator when it hits an accept state.
-//
-//  <p>We track these variables separately for the DFA and ATN simulation
-//  because the DFA simulation often has to fail over to the ATN
-//  simulation. If the ATN simulation fails, we need the DFA to fall
-//  back to its previously accepted state, if any. If the ATN succeeds,
-//  then the ATN does the accept and the DFA simulator that invoked it
-//  can simply return the predicted token type.</p>
-///
+type ILexerATNSimulator interface {
+	IATNSimulator
 
-func resetSimState(sim *SimState) {
-	sim.index = -1
-	sim.line = 0
-	sim.column = -1
-	sim.dfaState = nil
-}
-
-type SimState struct {
-	index    int
-	line     int
-	column   int
-	dfaState *DFAState
-}
-
-func NewSimState() *SimState {
-
-	s := new(SimState)
-	resetSimState(s)
-	return s
-
-}
-
-func (s *SimState) reset() {
-	resetSimState(s)
+	reset()
+	Match(input CharStream, mode int) int
+	GetCharPositionInLine() int
+	GetLine() int
+	GetText(input CharStream) string
+	Consume(input CharStream)
 }
 
 type LexerATNSimulator struct {
 	*BaseATNSimulator
 
-	recog          Lexer
-	predictionMode int
-	DecisionToDFA  []*DFA
-	mergeCache     DoubleDict
-	startIndex     int
-	line           int
-	column         int
-	mode           int
-	prevAccept     *SimState
-	MatchCalls     int
+	recog              Lexer
+	predictionMode     int
+	mergeCache         DoubleDict
+	startIndex         int
+	Line               int
+	CharPositionInLine int
+	mode               int
+	prevAccept         *SimState
+	MatchCalls         int
 }
 
 func NewLexerATNSimulator(recog Lexer, atn *ATN, decisionToDFA []*DFA, sharedContextCache *PredictionContextCache) *LexerATNSimulator {
-
 	l := new(LexerATNSimulator)
 
 	l.BaseATNSimulator = NewBaseATNSimulator(atn, sharedContextCache)
 
-	l.DecisionToDFA = decisionToDFA
+	l.decisionToDFA = decisionToDFA
 	l.recog = recog
 	// The current token's starting index into the character stream.
 	// Shared across DFA to ATN simulation in case the ATN fails and the
@@ -76,10 +43,10 @@ func NewLexerATNSimulator(recog Lexer, atn *ATN, decisionToDFA []*DFA, sharedCon
 	// ATN-generated exception object.
 	l.startIndex = -1
 	// line number 1..n within the input///
-	l.line = 1
+	l.Line = 1
 	// The index of the character relative to the beginning of the line
 	// 0..n-1///
-	l.column = 0
+	l.CharPositionInLine = 0
 	l.mode = LexerDefaultMode
 	// Used during DFA/ATN exec to record the most recent accept configuration
 	// info
@@ -97,14 +64,13 @@ var LexerATNSimulatorMaxDFAEdge = 127 // forces unicode to stay in ATN
 var LexerATNSimulatorMatchCalls = 0
 
 func (l *LexerATNSimulator) copyState(simulator *LexerATNSimulator) {
-	l.column = simulator.column
-	l.line = simulator.line
+	l.CharPositionInLine = simulator.CharPositionInLine
+	l.Line = simulator.Line
 	l.mode = simulator.mode
 	l.startIndex = simulator.startIndex
 }
 
 func (l *LexerATNSimulator) Match(input CharStream, mode int) int {
-
 	if PortDebug {
 		fmt.Println("Match")
 	}
@@ -123,7 +89,7 @@ func (l *LexerATNSimulator) Match(input CharStream, mode int) int {
 	l.startIndex = input.Index()
 	l.prevAccept.reset()
 
-	var dfa = l.DecisionToDFA[mode]
+	var dfa = l.decisionToDFA[mode]
 
 	if dfa.s0 == nil {
 		if PortDebug {
@@ -134,6 +100,7 @@ func (l *LexerATNSimulator) Match(input CharStream, mode int) int {
 
 	if PortDebug {
 		fmt.Println("execATN")
+		fmt.Println("mode", mode, len(l.decisionToDFA[0].s0.edges))
 	}
 
 	return l.execATN(input, dfa.s0)
@@ -142,8 +109,8 @@ func (l *LexerATNSimulator) Match(input CharStream, mode int) int {
 func (l *LexerATNSimulator) reset() {
 	l.prevAccept.reset()
 	l.startIndex = -1
-	l.line = 1
-	l.column = 0
+	l.Line = 1
+	l.CharPositionInLine = 0
 	l.mode = LexerDefaultMode
 }
 
@@ -161,13 +128,13 @@ func (l *LexerATNSimulator) MatchATN(input CharStream) int {
 	var next = l.addDFAState(s0Closure)
 
 	if !suppressEdge {
-		l.DecisionToDFA[l.mode].s0 = next
+		l.decisionToDFA[l.mode].s0 = next
 	}
 
 	var predict = l.execATN(input, next)
 
 	if LexerATNSimulatorDebug {
-		fmt.Println("DFA after MatchATN: " + l.DecisionToDFA[oldMode].ToLexerString())
+		fmt.Println("DFA after MatchATN: " + l.decisionToDFA[oldMode].ToLexerString())
 	}
 	return predict
 }
@@ -184,7 +151,16 @@ func (l *LexerATNSimulator) execATN(input CharStream, ds0 *DFAState) int {
 	var t = input.LA(1)
 	var s = ds0 // s is current/from DFA state
 
-	for true { // while more work
+	if PortDebug {
+		fs,ok := input.(*FileStream)
+		if ok {
+			fmt.Println("enter execATN", t, len(s.edges), fs.index, fs.size)
+		} else {
+			fmt.Println("enter execATN", t, len(s.edges))
+		}
+	}
+
+	for { // while more work
 		if LexerATNSimulatorDebug {
 			fmt.Println("execATN loop starting closure: " + s.configs.String())
 		}
@@ -206,11 +182,11 @@ func (l *LexerATNSimulator) execATN(input CharStream, ds0 *DFAState) int {
 		// This optimization makes a lot of sense for loops within DFA.
 		// A character will take us back to an existing DFA state
 		// that already has lots of edges out of it. e.g., .* in comments.
-		// print("Target for:" + str(s) + " and:" + str(t))
 		var target = l.getExistingTargetState(s, t)
-		//		if PortDebug {
-		//			fmt.Println(target)
-		//		}
+		if PortDebug {
+			fmt.Println(t)
+			fmt.Println(target != nil)
+		}
 		if target == nil {
 			target = l.computeTargetState(input, s, t)
 			// print("Computed:" + str(target))
@@ -223,7 +199,10 @@ func (l *LexerATNSimulator) execATN(input CharStream, ds0 *DFAState) int {
 		// position accurately reflect the state of the interpreter at the
 		// end of the token.
 		if t != TokenEOF {
-			l.consume(input)
+			if PortDebug {
+				fmt.Println("consume", t, TokenEOF)
+			}
+			l.Consume(input)
 		}
 		if target.isAcceptState {
 			l.captureSimState(l.prevAccept, input, target)
@@ -256,9 +235,10 @@ func (l *LexerATNSimulator) getExistingTargetState(s *DFAState, t int) *DFAState
 	}
 
 	var target = s.edges[t-LexerATNSimulatorMinDFAEdge]
-	if target == nil {
-		target = nil
+	if PortDebug {
+		fmt.Println("len edges", len(s.edges), t, t-LexerATNSimulatorMinDFAEdge)
 	}
+
 	if LexerATNSimulatorDebug && target != nil {
 		fmt.Println("reuse state " + strconv.Itoa(s.stateNumber) + " edge to " + strconv.Itoa(target.stateNumber))
 	}
@@ -297,6 +277,9 @@ func (l *LexerATNSimulator) computeTargetState(input CharStream, s *DFAState, t 
 
 func (l *LexerATNSimulator) failOrAccept(prevAccept *SimState, input CharStream, reach ATNConfigSet, t int) int {
 	if l.prevAccept.dfaState != nil {
+		if PortDebug {
+			fmt.Println(prevAccept.dfaState)
+		}
 		var lexerActionExecutor = prevAccept.dfaState.lexerActionExecutor
 		l.accept(input, lexerActionExecutor, l.startIndex, prevAccept.index, prevAccept.line, prevAccept.column)
 
@@ -323,6 +306,7 @@ func (l *LexerATNSimulator) getReachableConfigSet(input CharStream, closure ATNC
 	var SkipAlt = ATNInvalidAltNumber
 
 	if PortDebug {
+		fmt.Println("getReachableConfigSet")
 		fmt.Println("CLOSURE SIZE" + strconv.Itoa(len(closure.GetItems())))
 	}
 
@@ -363,8 +347,8 @@ func (l *LexerATNSimulator) accept(input CharStream, lexerActionExecutor *LexerA
 	}
 	// seek to after last char in token
 	input.Seek(index)
-	l.line = line
-	l.column = charPos
+	l.Line = line
+	l.CharPositionInLine = charPos
 	if lexerActionExecutor != nil && l.recog != nil {
 		lexerActionExecutor.execute(l.recog, input, startIndex)
 	}
@@ -562,26 +546,29 @@ func (l *LexerATNSimulator) evaluatePredicate(input CharStream, ruleIndex, predI
 	if !speculative {
 		return l.recog.Sempred(nil, ruleIndex, predIndex)
 	}
-	var savedcolumn = l.column
-	var savedLine = l.line
+	var savedcolumn = l.CharPositionInLine
+	var savedLine = l.Line
 	var index = input.Index()
 	var marker = input.Mark()
 
 	defer func() {
-		l.column = savedcolumn
-		l.line = savedLine
+		l.CharPositionInLine = savedcolumn
+		l.Line = savedLine
 		input.Seek(index)
 		input.Release(marker)
 	}()
 
-	l.consume(input)
+	if PortDebug {
+		fmt.Println("evalPred")
+	}
+	l.Consume(input)
 	return l.recog.Sempred(nil, ruleIndex, predIndex)
 }
 
 func (l *LexerATNSimulator) captureSimState(settings *SimState, input CharStream, dfaState *DFAState) {
 	settings.index = input.Index()
-	settings.line = l.line
-	settings.column = l.column
+	settings.line = l.Line
+	settings.column = l.CharPositionInLine
 	settings.dfaState = dfaState
 }
 
@@ -648,7 +635,7 @@ func (l *LexerATNSimulator) addDFAState(configs ATNConfigSet) *DFAState {
 		proposed.setPrediction(l.atn.ruleToTokenType[firstConfigWithRuleStopState.GetState().GetRuleIndex()])
 	}
 	var hash = proposed.Hash()
-	var dfa = l.DecisionToDFA[l.mode]
+	var dfa = l.decisionToDFA[l.mode]
 	var existing = dfa.GetStates()[hash]
 	if existing != nil {
 		return existing
@@ -662,7 +649,7 @@ func (l *LexerATNSimulator) addDFAState(configs ATNConfigSet) *DFAState {
 }
 
 func (l *LexerATNSimulator) getDFA(mode int) *DFA {
-	return l.DecisionToDFA[mode]
+	return l.decisionToDFA[mode]
 }
 
 // Get the text Matched so far for the current token.
@@ -671,15 +658,26 @@ func (l *LexerATNSimulator) GetText(input CharStream) string {
 	return input.GetTextFromInterval(NewInterval(l.startIndex, input.Index()-1))
 }
 
-func (l *LexerATNSimulator) consume(input CharStream) {
+func (l *LexerATNSimulator) Consume(input CharStream) {
+	if PortDebug {
+		fmt.Println("consume", input.Index(), input.Size())
+	}
 	var curChar = input.LA(1)
 	if curChar == int('\n') {
-		l.line++
-		l.column = 0
+		l.Line++
+		l.CharPositionInLine = 0
 	} else {
-		l.column++
+		l.CharPositionInLine++
 	}
 	input.Consume()
+}
+
+func (l *LexerATNSimulator) GetCharPositionInLine() int {
+	return l.CharPositionInLine
+}
+
+func (l *LexerATNSimulator) GetLine() int {
+	return l.Line
 }
 
 func (l *LexerATNSimulator) GetTokenName(tt int) string {
@@ -691,4 +689,28 @@ func (l *LexerATNSimulator) GetTokenName(tt int) string {
 	}
 
 	return "'" + string(tt) + "'"
+}
+
+func resetSimState(sim *SimState) {
+	sim.index = -1
+	sim.line = 0
+	sim.column = -1
+	sim.dfaState = nil
+}
+
+type SimState struct {
+	index    int
+	line     int
+	column   int
+	dfaState *DFAState
+}
+
+func NewSimState() *SimState {
+	s := new(SimState)
+	resetSimState(s)
+	return s
+}
+
+func (s *SimState) reset() {
+	resetSimState(s)
 }

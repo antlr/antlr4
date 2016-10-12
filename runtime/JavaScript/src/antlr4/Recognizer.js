@@ -165,7 +165,7 @@ Object.defineProperty(Recognizer.prototype, "state", {
 	},
 	set : function(state) {
 	    if (PORT_DEBUG) {
-	        console.log("SETTING STATE" + state + " from " + this._stateNumber )
+	        console.log("SETTING STATE " + state + " from " + this._stateNumber )
 	    }
 		this._stateNumber = state;
 	}

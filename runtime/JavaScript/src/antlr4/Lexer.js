@@ -152,8 +152,17 @@ Lexer.prototype.nextToken = function() {
 				try {
 					ttype = this._interp.match(this._input, this._mode);
 				} catch (e) {
+					if (PORT_DEBUG) {
+						console.log("RecognitionException")
+					}
 					this.notifyListeners(e); // report error
 					this.recover(e);
+				}
+				if (PORT_DEBUG) {
+					console.log("ttype", ttype)
+				}
+				if (PORT_DEBUG) {
+					console.log("curType", this._type)
 				}
 				if (this._input.LA(1) === Token.EOF) {
 					this._hitEOF = true;
@@ -162,10 +171,16 @@ Lexer.prototype.nextToken = function() {
 					this._type = ttype;
 				}
 				if (this._type === Lexer.SKIP) {
+					if (PORT_DEBUG) {
+						console.log("skip")
+					}
 					continueOuter = true;
 					break;
 				}
 				if (this._type !== Lexer.MORE) {
+					if (PORT_DEBUG) {
+						console.log("no more")
+					}
 					break;
 				}
 
@@ -204,6 +219,9 @@ Lexer.prototype.skip = function() {
 };
 
 Lexer.prototype.more = function() {
+	if (PORT_DEBUG) {
+		console.log("more")
+	}
 	this._type = Lexer.MORE;
 };
 

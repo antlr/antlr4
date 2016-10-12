@@ -19,16 +19,15 @@ import (
 	"github.com/pboyer/antlr4/runtime/Go/antlr"
 )
 
-// Stopgap to suppress unused import error. We aren't certain
-// to have these imports used in the generated code below
-
-var _ = fmt.Printf
-var _ = reflect.Copy
-var _ = strconv.Itoa
 <if(namedActions.header)>
 
 <namedActions.header>
 <endif>
+
+// Suppress unused import errors
+var _ = fmt.Printf
+var _ = reflect.Copy
+var _ = strconv.Itoa
 
 <if(parser)>
 
@@ -1335,17 +1334,18 @@ package parser
 
 import (
 	"fmt"
+	"unicode"
 
 	"github.com/pboyer/antlr4/runtime/Go/antlr"
 )
-
-// suppress unused import error, many tests
-// require fmt.
-var _ = fmt.Printf
 <if(namedActions.header)>
 
 <namedActions.header>
 <endif>
+
+// Suppress unused import error
+var _ = fmt.Printf
+var _ = unicode.IsLetter
 
 <if(lexer)>
 
@@ -1363,7 +1363,6 @@ var serializedLexerAtn []uint16
 
 
 var lexerDeserializer = antlr.NewATNDeserializer(nil)
-
 var lexerAtn = lexerDeserializer.DeserializeFromUInt16(serializedLexerAtn)
 
 <if(lexer.modes)>
@@ -1415,20 +1414,19 @@ func New<lexer.name>(input antlr.CharStream) *<lexer.name> {
 		lexerDecisionToDFA[index] = antlr.NewDFA(ds, index)
 	}
 
-	this := new(<lexer.name>)
+	l := new(<lexer.name>)
 
-	this.BaseLexer = antlr.NewBaseLexer(input)
+	l.BaseLexer = antlr.NewBaseLexer(input)
+	l.Interpreter = antlr.NewLexerATNSimulator(l, lexerAtn, lexerDecisionToDFA, antlr.NewPredictionContextCache())
 
-	this.Interpreter = antlr.NewLexerATNSimulator(this, lexerAtn, lexerDecisionToDFA, antlr.NewPredictionContextCache())
+	l.modeNames = lexerModeNames
+	l.RuleNames = lexerRuleNames
+	l.LiteralNames = lexerLiteralNames
+	l.SymbolicNames = lexerSymbolicNames
+	l.GrammarFileName = "<lexer.grammarFileName>"
+	// TODO: l.EOF = antlr.TokenEOF
 
-	this.modeNames = lexerModeNames
-	this.RuleNames = lexerRuleNames
-	this.LiteralNames = lexerLiteralNames
-	this.SymbolicNames = lexerSymbolicNames
-	this.GrammarFileName = "<lexer.grammarFileName>"
-	// TODO: lex.EOF = antlr.TokenEOF
-
-	return this
+	return l
 }
 <if(rest(lexer.tokens))>
 
@@ -1444,7 +1442,7 @@ const <lexer.name><first(lexer.tokens)> = <lexer.tokens.(first(lexer.tokens))>
 
 <if(rest(rest(lexer.modes)))>
 
-// <lexer.name> modes.
+// <lexer.name> modes
 const (
 	<first(rest(lexer.modes)):{m | <lexer.name><m> = iota + 1}>
 	<rest(rest(lexer.modes)):{m | <lexer.name><m>}; separator="\n">
@@ -1453,6 +1451,10 @@ const (
 
 // <lexer.name><first(rest(lexer.modes))> is the <lexer.name> mode.
 const <lexer.name><first(rest(lexer.modes))> = 1
+<endif>
+<if(namedActions.members)>
+
+<namedActions.members>
 <endif>
 
 <dumpActions(lexer, "", actionFuncs, sempredFuncs)>

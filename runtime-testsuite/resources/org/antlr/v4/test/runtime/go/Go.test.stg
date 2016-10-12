@@ -231,7 +231,7 @@ Production(p) ::= <%<p; format="cap">%>
 Result(r) ::= <%Get<r; format="cap">()%>
 
 ParserPropertyMember() ::= <<
-@members {
+@parser::members {
 func Property() bool {
 	return true
 }
@@ -239,53 +239,46 @@ func Property() bool {
 >>
 
 PositionAdjustingLexer() ::= <<
-package antlrtest
-
-type PositionAdjustingLexer struct {
-	antlr.*BaseLexer
-}
-
-func NewPositionAdjustingLexer(input antlr.CharStream) *PositionAdjustingLexer {
-	return &PositionAdjustingLexer{BaseLexer: antlr.NewBaseLexer(input)}
-}
-
-func (p *PositionAdjustingLexer) NextToken() *Token {
-	var _, ok = p._interp.(*PositionAdjustingLexerATNSimulator)
-
-	if !ok {
-		p._interp = NewPositionAdjustingLexerATNSimulator(p, _ATN, _decisionToDFA, _sharedContextCache)
+func (p *PositionAdjustingLexer) NextToken() antlr.Token {
+	if _, ok := p.Interpreter.(*PositionAdjustingLexerATNSimulator); !ok {
+		p.Interpreter = NewPositionAdjustingLexerATNSimulator(p, lexerAtn, p.Interpreter.DecisionToDFA(), p.Interpreter.SharedContextCache())
+		p.Virt = p
 	}
 
 	return p.BaseLexer.NextToken()
 }
 
-func (p *PositionAdjustingLexer) Emit() *Token {
-	switch _type {
-	case TOKENS:
+func (p *PositionAdjustingLexer) Emit() antlr.Token {
+	switch p.GetType() {
+	case PositionAdjustingLexerTOKENS:
 		p.HandleAcceptPositionForKeyword("tokens")
 
-	case LABEL:
+	case PositionAdjustingLexerLABEL:
 		p.HandleAcceptPositionForIdentifier()
 	}
 
 	return p.BaseLexer.Emit()
 }
 
+func isIdentifierChar(c rune) bool {
+	return unicode.IsLetter(c) || unicode.IsDigit(c) || c == '_'
+}
+
 func (p *PositionAdjustingLexer) HandleAcceptPositionForIdentifier() bool {
-	var tokenText = GetText()
+	var tokenText = p.GetText()
 	var identifierLength int
 
-	for identifierLength \< len(tokenText) && isIdentifierChar(tokenText.charAt(identifierLength)) {
+	for identifierLength \< len(tokenText) && isIdentifierChar([]rune(tokenText)[identifierLength]) {
 		identifierLength++
 	}
 
-	if GetInputStream().Index() \<= _tokenStartCharIndex + identifierLength {
+	if p.GetInputStream().Index() \<= p.TokenStartCharIndex + identifierLength {
 		return false
 	}
 
 	var offset = identifierLength - 1
 
-	p.GetInterpreter().ResetAcceptPosition(p.GetInputStream(), p.TokenStartCharIndex + offset, p.TokenStartLine, p.TokenStartCharPositionInLine + offset)
+	p.GetInterpreter().(*PositionAdjustingLexerATNSimulator).ResetAcceptPosition(p.GetInputStream(), p.TokenStartCharIndex + offset, p.TokenStartLine, p.TokenStartColumn + offset)
 
 	return true
 }
@@ -297,31 +290,23 @@ func (p *PositionAdjustingLexer) HandleAcceptPositionForKeyword(keyword string) 
 
 	var offset = len(keyword) - 1
 
-	p.GetInterpreter().ResetAcceptPosition(p.GetInputStream(), p.TokenStartCharIndex + offset, p.TokenStartLine, p.TokenStartCharPositionInLine + offset)
+	p.GetInterpreter().(*PositionAdjustingLexerATNSimulator).ResetAcceptPosition(p.GetInputStream(), p.TokenStartCharIndex + offset, p.TokenStartLine, p.TokenStartColumn + offset)
 
 	return true
-}
-
-func (s *PositionAdjustingLexer) GetInterpreter() *LexerATNSimulator {
-	return s // TODO: return super.(*PositionAdjustingLexerATNSimulator).GetInterpreter()
-}
-
-func isIdentifierChar(c rune) bool {
-	return Character.isLetterOrDigit(c) || c == '_'
 }
 
 type PositionAdjustingLexerATNSimulator struct {
 	*antlr.LexerATNSimulator
 }
 
-func NewPositionAdjustingLexerATNSimulator(recog antlr.Lexer, atn *antlr.ATN, decisionToDFA []*antlr.DFA, sharedContextCache *PredictionContextCache) *PositionAdjustingLexerATNSimulator {
+func NewPositionAdjustingLexerATNSimulator(recog antlr.Lexer, atn *antlr.ATN, decisionToDFA []*antlr.DFA, sharedContextCache *antlr.PredictionContextCache) *PositionAdjustingLexerATNSimulator {
 	return &PositionAdjustingLexerATNSimulator{
 		LexerATNSimulator: antlr.NewLexerATNSimulator(recog, atn, decisionToDFA, sharedContextCache),
 	}
 }
 
-func (p *NewPositionAdjustingLexerATNSimulator) ResetAcceptPosition(input CharStream, index, line, charPositionInLine int) {
-	p.GetInputStream().Seek(index)
+func (p *PositionAdjustingLexerATNSimulator) ResetAcceptPosition(input antlr.CharStream, index, line, charPositionInLine int) {
+	input.Seek(index)
 	p.Line = line
 	p.CharPositionInLine = charPositionInLine
 	p.Consume(input)

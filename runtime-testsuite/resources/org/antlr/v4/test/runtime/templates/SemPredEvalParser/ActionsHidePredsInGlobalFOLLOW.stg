@@ -27,7 +27,7 @@ Errors() ::= ""
 
 grammar(grammarName) ::= <<
 grammar <grammarName>;
-@members {
+@parser::members {
 <Declare_pred()>
 }
 s : e {} {<True():Invoke_pred()>}? {<writeln("\"parse\"")>} '!' ;

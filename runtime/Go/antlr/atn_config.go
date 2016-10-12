@@ -94,6 +94,7 @@ func NewBaseATNConfig(c ATNConfig, state ATNState, context PredictionContext, se
 		context:                 context,
 		semanticContext:         semanticContext,
 		reachesIntoOuterContext: c.GetReachesIntoOuterContext(),
+		precedenceFilterSuppressed: c.getPrecedenceFilterSuppressed(),
 	}
 }
 
@@ -196,6 +197,8 @@ func (b *BaseATNConfig) String() string {
 
 	return fmt.Sprintf("(%v,%v%v%v%v)", b.state, b.alt, s1, s2, s3)
 }
+
+
 
 type LexerATNConfig struct {
 	*BaseATNConfig

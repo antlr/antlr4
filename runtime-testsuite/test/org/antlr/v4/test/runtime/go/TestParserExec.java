@@ -556,9 +556,9 @@ public class TestParserExec extends BaseTest {
 	@Test
 	public void testParserProperty() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(152);
+		StringBuilder grammarBuilder = new StringBuilder(160);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("@members {\n");
+		grammarBuilder.append("@parser::members {\n");
 		grammarBuilder.append("func Property() bool {\n");
 		grammarBuilder.append("	return true\n");
 		grammarBuilder.append("}\n");

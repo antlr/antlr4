@@ -134,19 +134,33 @@ LexerActionExecutor.prototype.fixOffsetBeforeMatch = function(offset) {
 // of the token.
 // /
 LexerActionExecutor.prototype.execute = function(lexer, input, startIndex) {
+	if (PORT_DEBUG) {
+		console.log("execute");
+		console.log("len(lexerActions)",this.lexerActions.length);
+	}
 	var requiresSeek = false;
 	var stopIndex = input.index;
 	try {
 		for (var i = 0; i < this.lexerActions.length; i++) {
 			var lexerAction = this.lexerActions[i];
 			if (lexerAction instanceof LexerIndexedCustomAction) {
+				if (PORT_DEBUG) {
+            		console.log("LexerIndexedCustomAction");
+            	}
 				var offset = lexerAction.offset;
 				input.seek(startIndex + offset);
 				lexerAction = lexerAction.action;
 				requiresSeek = (startIndex + offset) !== stopIndex;
 			} else if (lexerAction.isPositionDependent) {
+				if (PORT_DEBUG) {
+					console.log("posDep");
+				}
 				input.seek(stopIndex);
 				requiresSeek = false;
+			}
+			if (PORT_DEBUG) {
+				console.log("exec");
+				console.log(lexerAction.toString());
 			}
 			lexerAction.execute(lexer);
 		}

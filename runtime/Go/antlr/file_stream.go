@@ -7,10 +7,8 @@ import (
 	"os"
 )
 
-//
 //  This is an InputStream that is loaded from a file all at once
 //  when you construct the object.
-//
 
 type FileStream struct {
 	*InputStream

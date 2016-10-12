@@ -15,6 +15,8 @@ type Lexer interface {
 	TokenSource
 	Recognizer
 
+	Emit() Token
+
 	setChannel(int)
 	pushMode(int)
 	popMode() int
@@ -25,11 +27,12 @@ type Lexer interface {
 type BaseLexer struct {
 	*BaseRecognizer
 
-	Interpreter         *LexerATNSimulator
+	Interpreter         ILexerATNSimulator
 	TokenStartCharIndex int
 	TokenStartLine      int
 	TokenStartColumn    int
 	ActionType          int
+	Virt                Lexer // The most derived lexer implementation. Allows virtual method calls.
 
 	input                  CharStream
 	factory                TokenFactory
@@ -52,6 +55,8 @@ func NewBaseLexer(input CharStream) *BaseLexer {
 	lexer.input = input
 	lexer.factory = CommonTokenFactoryDEFAULT
 	lexer.tokenFactorySourcePair = &TokenSourceCharStreamPair{lexer, input}
+
+	lexer.Virt = lexer
 
 	lexer.Interpreter = nil // child classes must populate it
 
@@ -129,7 +134,7 @@ func (b *BaseLexer) reset() {
 	b.Interpreter.reset()
 }
 
-func (b *BaseLexer) GetInterpreter() *LexerATNSimulator {
+func (b *BaseLexer) GetInterpreter() ILexerATNSimulator {
 	return b.Interpreter
 }
 
@@ -154,11 +159,12 @@ func (b *BaseLexer) setTokenFactory(f TokenFactory) {
 }
 
 func (b *BaseLexer) safeMatch() (ret int) {
-
-	// previously in catch block
 	defer func() {
 		if e := recover(); e != nil {
 			if re, ok := e.(RecognitionException); ok {
+				if PortDebug {
+					fmt.Println("RecognitionException")
+				}
 				b.notifyListeners(re) // Report error
 				b.Recover(re)
 				ret = LexerSkip // default
@@ -184,23 +190,29 @@ func (b *BaseLexer) NextToken() Token {
 		b.input.Release(tokenStartMarker)
 	}()
 
-	for true {
+	for {
 		if b.hitEOF {
-			b.emitEOF()
+			b.EmitEOF()
 			return b.token
 		}
 		b.token = nil
 		b.channel = TokenDefaultChannel
 		b.TokenStartCharIndex = b.input.Index()
-		b.TokenStartColumn = b.Interpreter.column
-		b.TokenStartLine = b.Interpreter.line
+		b.TokenStartColumn = b.Interpreter.GetCharPositionInLine()
+		b.TokenStartLine = b.Interpreter.GetLine()
 		b.text = ""
-		var continueOuter = false
-		for true {
+		continueOuter := false
+		for {
 			b.thetype = TokenInvalidType
-			var ttype = LexerSkip
+			ttype := LexerSkip
 
 			ttype = b.safeMatch()
+			if PortDebug {
+				fmt.Println("ttype", ttype)
+			}
+			if PortDebug {
+				fmt.Println("curType", b.thetype)
+			}
 
 			if b.input.LA(1) == TokenEOF {
 				b.hitEOF = true
@@ -210,9 +222,15 @@ func (b *BaseLexer) NextToken() Token {
 			}
 			if b.thetype == LexerSkip {
 				continueOuter = true
+				if PortDebug {
+					fmt.Println("skip")
+				}
 				break
 			}
 			if b.thetype != LexerMore {
+				if PortDebug {
+					fmt.Println("no more")
+				}
 				break
 			}
 			if PortDebug {
@@ -227,7 +245,7 @@ func (b *BaseLexer) NextToken() Token {
 			continue
 		}
 		if b.token == nil {
-			b.emit()
+			b.Virt.Emit()
 		}
 		return b.token
 	}
@@ -246,6 +264,9 @@ func (b *BaseLexer) Skip() {
 }
 
 func (b *BaseLexer) More() {
+	if PortDebug {
+		fmt.Println("more")
+	}
 	b.thetype = LexerMore
 }
 
@@ -290,7 +311,7 @@ func (b *BaseLexer) setInputStream(input CharStream) {
 // and GetToken (to push tokens into a list and pull from that list
 // rather than a single variable as l implementation does).
 // /
-func (b *BaseLexer) emitToken(token Token) {
+func (b *BaseLexer) EmitToken(token Token) {
 	b.token = token
 }
 
@@ -300,35 +321,35 @@ func (b *BaseLexer) emitToken(token Token) {
 // use that to set the token's text. Override l method to emit
 // custom Token objects or provide a Newfactory.
 // /
-func (b *BaseLexer) emit() Token {
+func (b *BaseLexer) Emit() Token {
 	if PortDebug {
-		fmt.Println("emit")
+		fmt.Println("emit base lexer")
 	}
-	var t = b.factory.Create(b.tokenFactorySourcePair, b.thetype, b.text, b.channel, b.TokenStartCharIndex, b.getCharIndex()-1, b.TokenStartLine, b.TokenStartColumn)
-	b.emitToken(t)
+	var t = b.factory.Create(b.tokenFactorySourcePair, b.thetype, b.text, b.channel, b.TokenStartCharIndex, b.GetCharIndex()-1, b.TokenStartLine, b.TokenStartColumn)
+	b.EmitToken(t)
 	return t
 }
 
-func (b *BaseLexer) emitEOF() Token {
+func (b *BaseLexer) EmitEOF() Token {
 	cpos := b.GetCharPositionInLine()
 	lpos := b.GetLine()
 	if PortDebug {
 		fmt.Println("emitEOF")
 	}
 	var eof = b.factory.Create(b.tokenFactorySourcePair, TokenEOF, "", TokenDefaultChannel, b.input.Index(), b.input.Index()-1, lpos, cpos)
-	b.emitToken(eof)
+	b.EmitToken(eof)
 	return eof
 }
 
 func (b *BaseLexer) GetCharPositionInLine() int {
-	return b.Interpreter.column
+	return b.Interpreter.GetCharPositionInLine()
 }
 
 func (b *BaseLexer) GetLine() int {
-	return b.Interpreter.line
+	return b.Interpreter.GetLine()
 }
 
-func (b *BaseLexer) getType() int {
+func (b *BaseLexer) GetType() int {
 	return b.thetype
 }
 
@@ -337,7 +358,7 @@ func (b *BaseLexer) setType(t int) {
 }
 
 // What is the index of the current character of lookahead?///
-func (b *BaseLexer) getCharIndex() int {
+func (b *BaseLexer) GetCharIndex() int {
 	return b.input.Index()
 }
 
@@ -356,7 +377,7 @@ func (b *BaseLexer) SetText(text string) {
 }
 
 func (b *BaseLexer) GetATN() *ATN {
-	return b.Interpreter.atn
+	return b.Interpreter.ATN()
 }
 
 // Return a list of all Token objects in input char stream.
@@ -366,14 +387,15 @@ func (b *BaseLexer) getAllTokens() []Token {
 	if PortDebug {
 		fmt.Println("getAllTokens")
 	}
+	var vl = b.Virt
 	var tokens = make([]Token, 0)
-	var t = b.NextToken()
+	var t = vl.NextToken()
 	for t.GetTokenType() != TokenEOF {
 		tokens = append(tokens, t)
 		if PortDebug {
 			fmt.Println("getAllTokens")
 		}
-		t = b.NextToken()
+		t = vl.NextToken()
 	}
 	return tokens
 }
@@ -414,7 +436,7 @@ func (b *BaseLexer) Recover(re RecognitionException) {
 	if b.input.LA(1) != TokenEOF {
 		if _, ok := re.(*LexerNoViableAltException); ok {
 			// Skip a char and try again
-			b.Interpreter.consume(b.input)
+			b.Interpreter.Consume(b.input)
 		} else {
 			// TODO: Do we lose character or line position information?
 			b.input.Consume()

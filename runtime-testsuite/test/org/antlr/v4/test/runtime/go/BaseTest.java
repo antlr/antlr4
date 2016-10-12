@@ -907,7 +907,7 @@ public abstract class BaseTest {
 					+ "	for _, t := range stream.GetAllTokens() {\n"
 					+ "		fmt.Println(t)\n"
 					+ "	}\n"
-					+ (showDFA ? "fmt.Print(lexer.GetInterpreter().DecisionToDFA[antlr.LexerDefaultMode].ToLexerString())\n"
+					+ (showDFA ? "fmt.Print(lexer.GetInterpreter().DecisionToDFA()[antlr.LexerDefaultMode].ToLexerString())\n"
 							: "")
 					+ "}\n"
 					+ "\n");

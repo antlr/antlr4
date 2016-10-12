@@ -383,7 +383,13 @@ ParserATNSimulator.prototype.adaptivePredict = function(input, decision, outerCo
                 // appropriate start state for the precedence level rather
                 // than simply setting DFA.s0.
                 //
+                if (PORT_DEBUG){
+                	console.log("precfilter", s0_closure.toString())
+                }
                 s0_closure = this.applyPrecedenceFilter(s0_closure);
+				if (PORT_DEBUG){
+					console.log("precfilter", s0_closure.toString())
+				}
                 s0 = this.addDFAState(dfa, new DFAState(null, s0_closure));
                 dfa.setPrecedenceStartState(this.parser.getPrecedence(), s0);
             } else {
@@ -979,10 +985,20 @@ ParserATNSimulator.prototype.applyPrecedenceFilter = function(configs) {
 	var config;
 	var statesFromAlt1 = [];
     var configSet = new ATNConfigSet(configs.fullCtx);
+	if (PORT_DEBUG) {
+		console.log("len", configs.items.length)
+		for(var i=0; i<configs.items.length; i++) {
+			config = configs.items[i];
+			console.log(config.precedenceFilterSuppressed)
+		}
+	}
     for(var i=0; i<configs.items.length; i++) {
         config = configs.items[i];
         // handle alt 1 first
         if (config.alt !== 1) {
+        	if (PORT_DEBUG) {
+        		console.log("getalt1")
+        	}
             continue;
         }
         var updatedContext = config.semanticContext.evalPrecedence(this.parser, this._outerContext);
@@ -992,8 +1008,14 @@ ParserATNSimulator.prototype.applyPrecedenceFilter = function(configs) {
         }
         statesFromAlt1[config.state.stateNumber] = config.context;
         if (updatedContext !== config.semanticContext) {
+			if (PORT_DEBUG) {
+				console.log("add 1")
+			}
             configSet.add(new ATNConfig({semanticContext:updatedContext}, config), this.mergeCache);
         } else {
+			if (PORT_DEBUG) {
+				console.log("add 2")
+			}
             configSet.add(config, this.mergeCache);
         }
     }
@@ -1001,17 +1023,26 @@ ParserATNSimulator.prototype.applyPrecedenceFilter = function(configs) {
         config = configs.items[i];
         if (config.alt === 1) {
             // already handled
+			if (PORT_DEBUG) {
+				console.log("getalt2")
+			}
             continue;
         }
         // In the future, this elimination step could be updated to also
         // filter the prediction context for alternatives predicting alt>1
         // (basically a graph subtraction algorithm).
 		if (!config.precedenceFilterSuppressed) {
+			if (PORT_DEBUG) {
+				console.log("!precedenceFilterSuppressed")
+			}
             var context = statesFromAlt1[config.state.stateNumber] || null;
             if (context!==null && context.equals(config.context)) {
                 // eliminated
                 continue;
             }
+		}
+		if (PORT_DEBUG) {
+			console.log("add 3", config.precedenceFilterSuppressed)
 		}
         configSet.add(config, this.mergeCache);
     }
@@ -1327,6 +1358,7 @@ ParserATNSimulator.prototype.closure_ = function(config, configs, closureBusy, c
 
                 if (PORT_DEBUG) {
                     console.log("DEBUG 2")
+                    console.log(closureBusy.toString())
                 }
                 // target fell off end of rule; mark resulting c as having dipped into outer context
                 // We can't get here if incoming config was rule stop and we had context
@@ -1336,7 +1368,7 @@ ParserATNSimulator.prototype.closure_ = function(config, configs, closureBusy, c
 
                 if (closureBusy.add(c)!==c) {
                     if (PORT_DEBUG) {
-                        console.log("DEBUG 3")
+                        console.log("DEBUG 3", i, p.transitions.length)
                     }
                     // avoid infinite recursion for right-recursive rules
                     continue;
@@ -1352,6 +1384,9 @@ ParserATNSimulator.prototype.closure_ = function(config, configs, closureBusy, c
 				        console.log("DEBUG 4")
 				    }
 					if (t.outermostPrecedenceReturn === this._dfa.atnStartState.ruleIndex) {
+						if (PORT_DEBUG) {
+							console.log("precedenceFilterSuppressed")
+						}
 						c.precedenceFilterSuppressed = true;
 					}
 				}
@@ -1369,9 +1404,16 @@ ParserATNSimulator.prototype.closure_ = function(config, configs, closureBusy, c
                     newDepth += 1;
                 }
             }
+			if (PORT_DEBUG) {
+				console.log("computeCheckingStopState")
+			}
             this.closureCheckingStopState(c, configs, closureBusy, continueCollecting, fullCtx, newDepth, treatEofAsEpsilon);
         }
     }
+
+	if (PORT_DEBUG) {
+		console.log("closure_ done")
+	}
 };
 
 ParserATNSimulator.prototype.getRuleName = function( index) {

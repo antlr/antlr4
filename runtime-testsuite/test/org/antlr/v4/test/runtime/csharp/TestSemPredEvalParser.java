@@ -69,9 +69,9 @@ public class TestSemPredEvalParser extends BaseTest {
 	@Test
 	public void testActionHidesPreds() throws Exception {
 		mkdir(tmpdir);
-		StringBuilder grammarBuilder = new StringBuilder(237);
+		StringBuilder grammarBuilder = new StringBuilder(245);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("@members {int i = 0;}\n");
+		grammarBuilder.append("@parser::members {int i = 0;}\n");
 		grammarBuilder.append("s : a+ ;\n");
 		grammarBuilder.append("a : {this.i = 1;} ID {this.i == 1}? {Console.WriteLine(\"alt 1\");}\n");
 		grammarBuilder.append("  | {this.i = 2;} ID {this.i == 2}? {Console.WriteLine(\"alt 2\");}\n");
@@ -93,9 +93,9 @@ public class TestSemPredEvalParser extends BaseTest {
 	@Test
 	public void testActionsHidePredsInGlobalFOLLOW() throws Exception {
 		mkdir(tmpdir);
-		StringBuilder grammarBuilder = new StringBuilder(304);
+		StringBuilder grammarBuilder = new StringBuilder(312);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("@members {\n");
+		grammarBuilder.append("@parser::members {\n");
 		grammarBuilder.append("bool pred(bool v) {\n");
 		grammarBuilder.append("	Console.WriteLine(\"eval=\"+v.ToString().ToLower());\n");
 		grammarBuilder.append("	return v;\n");
@@ -137,9 +137,9 @@ public class TestSemPredEvalParser extends BaseTest {
 	@Test
 	public void testDepedentPredsInGlobalFOLLOW() throws Exception {
 		mkdir(tmpdir);
-		StringBuilder grammarBuilder = new StringBuilder(327);
+		StringBuilder grammarBuilder = new StringBuilder(335);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("@members {\n");
+		grammarBuilder.append("@parser::members {\n");
 		grammarBuilder.append("bool pred(bool v) {\n");
 		grammarBuilder.append("	Console.WriteLine(\"eval=\"+v.ToString().ToLower());\n");
 		grammarBuilder.append("	return v;\n");
@@ -325,9 +325,9 @@ public class TestSemPredEvalParser extends BaseTest {
 	@Test
 	public void testPredTestedEvenWhenUnAmbig_1() throws Exception {
 		mkdir(tmpdir);
-		StringBuilder grammarBuilder = new StringBuilder(213);
+		StringBuilder grammarBuilder = new StringBuilder(221);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("@members {bool enumKeyword = true;}\n");
+		grammarBuilder.append("@parser::members {bool enumKeyword = true;}\n");
 		grammarBuilder.append("primary\n");
 		grammarBuilder.append("    :   ID {Console.WriteLine(\"ID \"+$ID.text);}\n");
 		grammarBuilder.append("    |   {!this.enumKeyword}? 'enum' {Console.WriteLine(\"enum\");}\n");
@@ -345,9 +345,9 @@ public class TestSemPredEvalParser extends BaseTest {
 	@Test
 	public void testPredTestedEvenWhenUnAmbig_2() throws Exception {
 		mkdir(tmpdir);
-		StringBuilder grammarBuilder = new StringBuilder(213);
+		StringBuilder grammarBuilder = new StringBuilder(221);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("@members {bool enumKeyword = true;}\n");
+		grammarBuilder.append("@parser::members {bool enumKeyword = true;}\n");
 		grammarBuilder.append("primary\n");
 		grammarBuilder.append("    :   ID {Console.WriteLine(\"ID \"+$ID.text);}\n");
 		grammarBuilder.append("    |   {!this.enumKeyword}? 'enum' {Console.WriteLine(\"enum\");}\n");
@@ -366,9 +366,9 @@ public class TestSemPredEvalParser extends BaseTest {
 	@Test
 	public void testPredicateDependentOnArg() throws Exception {
 		mkdir(tmpdir);
-		StringBuilder grammarBuilder = new StringBuilder(212);
+		StringBuilder grammarBuilder = new StringBuilder(220);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("@members {int i = 0;}\n");
+		grammarBuilder.append("@parser::members {int i = 0;}\n");
 		grammarBuilder.append("s : a[2] a[1];\n");
 		grammarBuilder.append("a[int i]\n");
 		grammarBuilder.append("  : {$i==1}? ID {Console.WriteLine(\"alt 1\");}\n");
@@ -390,9 +390,9 @@ public class TestSemPredEvalParser extends BaseTest {
 	@Test
 	public void testPredicateDependentOnArg2() throws Exception {
 		mkdir(tmpdir);
-		StringBuilder grammarBuilder = new StringBuilder(154);
+		StringBuilder grammarBuilder = new StringBuilder(162);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("@members {int i = 0;}\n");
+		grammarBuilder.append("@parser::members {int i = 0;}\n");
 		grammarBuilder.append("s : a[2] a[1];\n");
 		grammarBuilder.append("a[int i]\n");
 		grammarBuilder.append("  : {$i==1}? ID \n");
@@ -412,9 +412,9 @@ public class TestSemPredEvalParser extends BaseTest {
 	@Test
 	public void testPredsInGlobalFOLLOW() throws Exception {
 		mkdir(tmpdir);
-		StringBuilder grammarBuilder = new StringBuilder(298);
+		StringBuilder grammarBuilder = new StringBuilder(306);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("@members {\n");
+		grammarBuilder.append("@parser::members {\n");
 		grammarBuilder.append("bool pred(bool v) {\n");
 		grammarBuilder.append("	Console.WriteLine(\"eval=\"+v.ToString().ToLower());\n");
 		grammarBuilder.append("	return v;\n");
@@ -552,9 +552,9 @@ public class TestSemPredEvalParser extends BaseTest {
 	@Test
 	public void testToLeftWithVaryingPredicate() throws Exception {
 		mkdir(tmpdir);
-		StringBuilder grammarBuilder = new StringBuilder(268);
+		StringBuilder grammarBuilder = new StringBuilder(276);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("@members {int i = 0;}\n");
+		grammarBuilder.append("@parser::members {int i = 0;}\n");
 		grammarBuilder.append("s : ({this.i += 1;\n");
 		grammarBuilder.append("Console.WriteLine(\"i=\" + this.i);} a)+ ;\n");
 		grammarBuilder.append("a : {this.i % 2 == 0}? ID {Console.WriteLine(\"alt 1\");}\n");

@@ -691,13 +691,13 @@ func (p *BaseParser) GetRuleInvocationStack(c ParserRuleContext) []string {
 
 // For debugging and other purposes.//
 func (p *BaseParser) GetDFAStrings() string {
-	return fmt.Sprint(p.Interpreter.DecisionToDFA)
+	return fmt.Sprint(p.Interpreter.decisionToDFA)
 }
 
 // For debugging and other purposes.//
 func (p *BaseParser) DumpDFA() {
 	var seenOne = false
-	for _, dfa := range p.Interpreter.DecisionToDFA {
+	for _, dfa := range p.Interpreter.decisionToDFA {
 		if len(dfa.GetStates()) > 0 {
 			if seenOne {
 				fmt.Println()
