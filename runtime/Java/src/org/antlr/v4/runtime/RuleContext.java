@@ -164,6 +164,12 @@ public class RuleContext implements RuleNode {
 		return builder.toString();
 	}
 
+	@Override
+	public String getSourceText() {
+		throw new UnsupportedOperationException("The getSourceText has not been implemented for the class "
+			+ this.getClass().getCanonicalName());
+	}
+
 	public int getRuleIndex() { return -1; }
 
 	/** For rule associated with this parse tree internal node, return

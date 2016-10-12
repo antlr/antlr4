@@ -281,6 +281,26 @@ public class ParserRuleContext extends RuleContext {
 		return Interval.of(start.getTokenIndex(), stop.getTokenIndex());
 	}
 
+	@Override
+	public String getSourceText() {
+		if (start == null) {
+			return null; // Invalid
+		}
+		if (stop == null) {
+			return getText();
+		}
+		int startIndex = start.getStartIndex();
+		int stopIndex  = stop.getStopIndex();
+		if (stopIndex < startIndex) {
+			return getText();
+		}
+		CharStream inputStream = start.getInputStream();
+		if (inputStream == null) {
+			return null;
+		}
+		return inputStream.getText(new Interval(startIndex, stopIndex));
+	}
+
 	/**
 	 * Get the initial token in this context.
 	 * Note that the range from start to stop is inclusive, so for rules that do not consume anything

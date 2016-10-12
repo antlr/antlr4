@@ -57,6 +57,14 @@ public interface ParseTree extends SyntaxTree {
 	 */
 	String getText();
 
+	/**
+	 * Return the original underlying source text of this entire ParseTree
+	 * including all leaf nodes. Also includes all off-channel tokens
+	 * (if any) so it will return whitespace and comments even if they
+	 * were not sent (or on a hidden channel) to the parser.
+	 */
+	String getSourceText();
+
 	/** Specialize toStringTree so that it can print out more information
 	 * 	based upon the parser.
 	 */
