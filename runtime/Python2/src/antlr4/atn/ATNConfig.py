@@ -95,6 +95,19 @@ class ATNConfig(object):
     def __hash__(self):
         return hash((self.state.stateNumber, self.alt, self.context, self.semanticContext))
 
+    def hashCodeForConfigSet(self):
+        return hash((self.state.stateNumber, self.alt, hash(self.semanticContext)))
+
+    def equalsForConfigSet(self, other):
+        if self is other:
+            return True
+        elif not isinstance(other, ATNConfig):
+            return False
+        else:
+            return self.state.stateNumber==other.state.stateNumber \
+                and self.alt==other.alt \
+                and self.semanticContext==other.semanticContext
+
     def __str__(self):
         return unicode(self)
 
@@ -143,6 +156,18 @@ class LexerATNConfig(ATNConfig):
         if not(self.lexerActionExecutor==other.lexerActionExecutor):
             return False
         return super(LexerATNConfig, self).__eq__(other)
+
+
+
+    def hashCodeForConfigSet(self):
+        return hash(self)
+
+
+
+    def equalsForConfigSet(self, other):
+        return self==other
+
+
 
     def checkNonGreedyDecision(self, source, target):
         return source.passedThroughNonGreedyDecision \

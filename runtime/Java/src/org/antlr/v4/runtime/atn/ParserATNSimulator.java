@@ -788,7 +788,8 @@ public class ParserATNSimulator extends ATNSimulator {
 	protected ATNConfigSet computeReachSet(ATNConfigSet closure, int t,
 										   boolean fullCtx)
 	{
-		if ( debug ) System.out.println("in computeReachSet, starting closure: " + closure);
+		if ( debug ) 
+			System.out.println("in computeReachSet, starting closure: " + closure);
 
 		if (mergeCache == null) {
 			mergeCache = new DoubleKeyMap<PredictionContext, PredictionContext, PredictionContext>();

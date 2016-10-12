@@ -39,7 +39,7 @@ import java.util.LinkedHashMap;
 import java.util.Set;
 
 /** Track the attributes within retval, arg lists etc...
- *  <p/>
+ *  <p>
  *  Each rule has potentially 3 scopes: return values,
  *  parameters, and an implicitly-named scope (i.e., a scope defined in a rule).
  *  Implicitly-defined scopes are named after the rule; rules and scopes then

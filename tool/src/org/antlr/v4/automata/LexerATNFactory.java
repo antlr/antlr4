@@ -324,7 +324,7 @@ public class LexerATNFactory extends ParserATNFactory {
 
 	/** For a lexer, a string is a sequence of char to match.  That is,
 	 *  "fog" is treated as 'f' 'o' 'g' not as a single transition in
-	 *  the DFA.  Machine== o-'f'->o-'o'->o-'g'->o and has n+1 states
+	 *  the DFA.  Machine== o-'f'-&gt;o-'o'-&gt;o-'g'-&gt;o and has n+1 states
 	 *  for n characters.
 	 */
 	@Override

@@ -95,7 +95,7 @@ def calculateHashCode(parent:PredictionContext, returnState:int):
 
 def calculateListsHashCode(parents:[], returnStates:[] ):
     h = 0
-    for parent, returnState in parents, returnStates:
+    for parent, returnState in zip(parents, returnStates):
         h = hash((h, calculateHashCode(parent, returnState)))
     return h
 
@@ -242,7 +242,7 @@ class ArrayPredictionContext(PredictionContext):
                 if self.returnStates[i]==PredictionContext.EMPTY_RETURN_STATE:
                     buf.write("$")
                     continue
-                buf.write(self.returnStates[i])
+                buf.write(str(self.returnStates[i]))
                 if self.parents[i] is not None:
                     buf.write(' ')
                     buf.write(str(self.parents[i]))
@@ -250,6 +250,10 @@ class ArrayPredictionContext(PredictionContext):
                     buf.write("null")
             buf.write("]")
             return buf.getvalue()
+
+    def __hash__(self):
+        return self.cachedHashCode
+
 
 
 #  Convert a {@link RuleContext} tree to a {@link PredictionContext} graph.
@@ -325,18 +329,18 @@ def merge(a:PredictionContext, b:PredictionContext, rootIsWildcard:bool, mergeCa
 #/
 def mergeSingletons(a:SingletonPredictionContext, b:SingletonPredictionContext, rootIsWildcard:bool, mergeCache:dict):
     if mergeCache is not None:
-        previous = mergeCache.get(a,b)
+        previous = mergeCache.get((a,b), None)
         if previous is not None:
             return previous
-        previous = mergeCache.get(b,a)
+        previous = mergeCache.get((b,a), None)
         if previous is not None:
             return previous
 
-    rootMerge = mergeRoot(a, b, rootIsWildcard)
-    if rootMerge is not None:
+    merged = mergeRoot(a, b, rootIsWildcard)
+    if merged is not None:
         if mergeCache is not None:
-            mergeCache.put(a, b, rootMerge)
-        return rootMerge
+            mergeCache[(a, b)] = merged
+        return merged
 
     if a.returnState==b.returnState:
         parent = merge(a.parentCtx, b.parentCtx, rootIsWildcard, mergeCache)
@@ -349,10 +353,10 @@ def mergeSingletons(a:SingletonPredictionContext, b:SingletonPredictionContext, 
         # merge parents x and y, giving array node with x,y then remainders
         # of those graphs.  dup a, a' points at merged array
         # new joined parent so create new singleton pointing to it, a'
-        a_ = SingletonPredictionContext.create(parent, a.returnState)
+        merged = SingletonPredictionContext.create(parent, a.returnState)
         if mergeCache is not None:
-            mergeCache.put(a, b, a_)
-        return a_
+            mergeCache[(a, b)] = merged
+        return merged
     else: # a != b payloads differ
         # see if we can collapse parents due to $+x parents if local ctx
         singleParent = None
@@ -362,26 +366,24 @@ def mergeSingletons(a:SingletonPredictionContext, b:SingletonPredictionContext, 
             # sort payloads and use same parent
             payloads = [ a.returnState, b.returnState ]
             if a.returnState > b.returnState:
-                payloads[0] = b.returnState
-                payloads[1] = a.returnState
+                payloads = [ b.returnState, a.returnState ]
             parents = [singleParent, singleParent]
-            a_ = ArrayPredictionContext(parents, payloads)
+            merged = ArrayPredictionContext(parents, payloads)
             if mergeCache is not None:
-                mergeCache.put(a, b, a_)
-            return a_
+                mergeCache[(a, b)] = merged
+            return merged
         # parents differ and can't merge them. Just pack together
         # into array; can't merge.
         # ax + by = [ax,by]
         payloads = [ a.returnState, b.returnState ]
         parents = [ a.parentCtx, b.parentCtx ]
         if a.returnState > b.returnState: # sort by payload
-            payloads[0] = b.returnState
-            payloads[1] = a.returnState
+            payloads = [ b.returnState, a.returnState ]
             parents = [ b.parentCtx, a.parentCtx ]
-        a_ = ArrayPredictionContext(parents, payloads)
+        merged = ArrayPredictionContext(parents, payloads)
         if mergeCache is not None:
-            mergeCache.put(a, b, a_)
-        return a_
+            mergeCache[(a, b)] = merged
+        return merged
 
 
 #
@@ -463,10 +465,10 @@ def mergeRoot(a:SingletonPredictionContext, b:SingletonPredictionContext, rootIs
 #/
 def mergeArrays(a:ArrayPredictionContext, b:ArrayPredictionContext, rootIsWildcard:bool, mergeCache:dict):
     if mergeCache is not None:
-        previous = mergeCache.get(a,b)
+        previous = mergeCache.get((a,b), None)
         if previous is not None:
             return previous
-        previous = mergeCache.get(b,a)
+        previous = mergeCache.get((b,a), None)
         if previous is not None:
             return previous
 
@@ -475,8 +477,8 @@ def mergeArrays(a:ArrayPredictionContext, b:ArrayPredictionContext, rootIsWildca
     j = 0 # walks b
     k = 0 # walks target M array
 
-    mergedReturnStates = [] * (len(a.returnState) + len( b.returnStates))
-    mergedParents = [] * len(mergedReturnStates)
+    mergedReturnStates = [None] * (len(a.returnStates) + len( b.returnStates))
+    mergedParents = [None] * len(mergedReturnStates)
     # walk and merge to yield mergedParents, mergedReturnStates
     while i<len(a.returnStates) and j<len(b.returnStates):
         a_parent = a.parents[i]
@@ -522,30 +524,30 @@ def mergeArrays(a:ArrayPredictionContext, b:ArrayPredictionContext, rootIsWildca
     # trim merged if we combined a few that had same stack tops
     if k < len(mergedParents): # write index < last position; trim
         if k == 1: # for just one merged element, return singleton top
-            a_ = SingletonPredictionContext.create(mergedParents[0], mergedReturnStates[0])
+            merged = SingletonPredictionContext.create(mergedParents[0], mergedReturnStates[0])
             if mergeCache is not None:
-                mergeCache.put(a,b,a_)
-            return a_
+                mergeCache[(a,b)] = merged
+            return merged
         mergedParents = mergedParents[0:k]
         mergedReturnStates = mergedReturnStates[0:k]
 
-    M = ArrayPredictionContext(mergedParents, mergedReturnStates)
+    merged = ArrayPredictionContext(mergedParents, mergedReturnStates)
 
     # if we created same array as a or b, return that instead
     # TODO: track whether this is possible above during merge sort for speed
-    if M==a:
+    if merged==a:
         if mergeCache is not None:
-            mergeCache.put(a,b,a)
+            mergeCache[(a,b)] = a
         return a
-    if M==b:
+    if merged==b:
         if mergeCache is not None:
-            mergeCache.put(a,b,b)
+            mergeCache[(a,b)] = b
         return b
     combineCommonParents(mergedParents)
 
     if mergeCache is not None:
-        mergeCache.put(a,b,M)
-    return M
+        mergeCache[(a,b)] = merged
+    return merged
 
 
 #
@@ -579,15 +581,14 @@ def getCachedPredictionContext(context:PredictionContext, contextCache:Predictio
         parent = getCachedPredictionContext(context.getParent(i), contextCache, visited)
         if changed or parent is not context.getParent(i):
             if not changed:
-                parents = [None] * len(context)
-                for j in range(0, len(context)):
-                    parents[j] = context.getParent(j)
+                parents = [context.getParent(j) for j in range(len(context))]
                 changed = True
             parents[i] = parent
     if not changed:
         contextCache.add(context)
         visited[context] = context
         return context
+
     updated = None
     if len(parents) == 0:
         updated = PredictionContext.EMPTY

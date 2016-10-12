@@ -104,14 +104,9 @@ class DFAState(object):
     # Get the set of all alts mentioned by all ATN configurations in this
     #  DFA state.
     def getAltSet(self):
-        alts = set()
         if self.configs is not None:
-            for c in self.configs:
-                alts.add(c.alt)
-        if len(alts)==0:
-            return None
-        else:
-            return alts
+            return set(cfg.alt for cfg in self.configs) or None
+        return None
 
     def __hash__(self):
         return hash(self.configs)

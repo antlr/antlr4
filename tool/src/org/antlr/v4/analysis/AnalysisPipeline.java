@@ -100,7 +100,7 @@ public class AnalysisPipeline {
 		}
 	}
 
-	/** Return whether lookahead sets are disjoint; no lookahead => not disjoint */
+	/** Return whether lookahead sets are disjoint; no lookahead ⇒ not disjoint */
 	public static boolean disjoint(IntervalSet[] altLook) {
 		boolean collision = false;
 		IntervalSet combined = new IntervalSet();

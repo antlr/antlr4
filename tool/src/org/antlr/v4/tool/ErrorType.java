@@ -34,12 +34,12 @@ import org.antlr.v4.runtime.Lexer;
 
 /**
  * A complex enumeration of all the error messages that the tool can issue.
- * <p/>
+ * <p>
  * When adding error messages, also add a description of the message to the
  * Wiki with a location under the Wiki page
  * <a href="http://www.antlr.org/wiki/display/ANTLR4/Errors+Reported+by+the+ANTLR+Tool">Errors Reported by the ANTLR Tool</a>.
  *
- * @author Jim Idle <jimi@temporal-wave.com>, Terence Parr
+ * @author Jim Idle &lt;jimi@temporal-wave.com&gt;, Terence Parr
  * @since 4.0
  */
 public enum ErrorType {
@@ -702,8 +702,8 @@ public enum ErrorType {
 	 * <p>The following rule produces this error.</p>
 	 *
 	 * <pre>
-	 * X : 'foo' -> type(Foo);  // ok
-	 * Y : 'foo' -> token(Foo); // error 149 (token is not a supported lexer command)
+	 * X : 'foo' -&gt; type(Foo);  // ok
+	 * Y : 'foo' -&gt; token(Foo); // error 149 (token is not a supported lexer command)
 	 * </pre>
 	 *
 	 * @since 4.1
@@ -719,8 +719,8 @@ public enum ErrorType {
 	 * <p>The following rule produces this error.</p>
 	 *
 	 * <pre>
-	 * X : 'foo' -> type(Foo); // ok
-	 * Y : 'foo' -> type;      // error 150 (the type command requires an argument)
+	 * X : 'foo' -&gt; type(Foo); // ok
+	 * Y : 'foo' -&gt; type;      // error 150 (the type command requires an argument)
 	 * </pre>
 	 *
 	 * @since 4.1
@@ -737,8 +737,8 @@ public enum ErrorType {
 	 * <p>The following rule produces this error.</p>
 	 *
 	 * <pre>
-	 * X : 'foo' -> popMode;    // ok
-	 * Y : 'foo' -> popMode(A); // error 151 (the popMode command does not take an argument)
+	 * X : 'foo' -&gt; popMode;    // ok
+	 * Y : 'foo' -&gt; popMode(A); // error 151 (the popMode command does not take an argument)
 	 * </pre>
 	 *
 	 * @since 4.1
@@ -825,8 +825,8 @@ public enum ErrorType {
 	 * public static final int CUSTOM = HIDDEN + 1;
 	 * }
 	 *
-	 * X : 'foo' -> channel(HIDDEN);           // ok
-	 * Y : 'bar' -> channel(CUSTOM);           // warning 155
+	 * X : 'foo' -&gt; channel(HIDDEN);           // ok
+	 * Y : 'bar' -&gt; channel(CUSTOM);           // warning 155
 	 * </pre>
 	 *
 	 * @since 4.2
@@ -891,12 +891,12 @@ public enum ErrorType {
 	 * <p>The following rule produces this warning.</p>
 	 *
 	 * <pre>
-	 * X1 : 'x' -> more    // ok
+	 * X1 : 'x' -&gt; more    // ok
 	 *    ;
 	 * Y1 : 'x' {more();}  // ok
 	 *    ;
 	 * fragment
-	 * X2 : 'x' -> more    // warning 158
+	 * X2 : 'x' -&gt; more    // warning 158
 	 *    ;
 	 * fragment
 	 * Y2 : 'x' {more();}  // warning 158

@@ -62,7 +62,13 @@
 //      anchor element as parser in that case. Thes breaks web worker support,
 //      but we don't care since these browsers also don't support web workers.
 
-    var parser = URL ? new URL(location.href) : document.createElement('A');
+    try {
+        var parser = new URL(location.href);
+    }
+    catch (e) {
+        console.warn("Honey: falling back to DOM workaround for URL parser ("+e+")");
+        parser = document.createElement('A');
+    }
 
 // INFO Module cache
 //      Contains getter functions for the exports objects of all the loaded
@@ -81,7 +87,7 @@
         delete cache.foo;
     }
     catch (e) {
-        console.warn("Honey: falling back to DOM workaround for defineProperty ("+e+")");
+        console.warn("Honey: falling back to DOM workaround for cache object ("+e+")");
         cache = document.createElement('DIV');
     }
 

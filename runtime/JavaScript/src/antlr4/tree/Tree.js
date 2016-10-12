@@ -95,6 +95,13 @@ ParseTreeVisitor.prototype.visit = function(ctx) {
 	}
 };
 
+ParseTreeVisitor.prototype.visitTerminal = function(node) {
+};
+
+ParseTreeVisitor.prototype.visitErrorNode = function(node) {
+};
+
+
 var visitAtom = function(visitor, ctx) {
 	if (ctx.parser === undefined) { //is terminal
 		return;

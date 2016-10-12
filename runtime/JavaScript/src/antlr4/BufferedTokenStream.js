@@ -321,7 +321,7 @@ BufferedTokenStream.prototype.getHiddenTokensToRight = function(tokenIndex,
 		channel = -1;
 	}
 	this.lazyInit();
-	if (this.tokenIndex < 0 || tokenIndex >= this.tokens.length) {
+	if (tokenIndex < 0 || tokenIndex >= this.tokens.length) {
 		throw "" + tokenIndex + " not in 0.." + this.tokens.length - 1;
 	}
 	var nextOnChannel = this.nextTokenOnChannel(tokenIndex + 1,

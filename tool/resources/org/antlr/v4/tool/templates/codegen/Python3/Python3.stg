@@ -46,7 +46,7 @@ pythonTypeInitMap ::= [
 
 // args must be <object-model-object>, <fields-resulting-in-STs>
 
-ParserFile(file, parser, namedActions) ::= <<
+ParserFile(file, parser, namedActions, contextSuperClass) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 # encoding: utf-8
 from antlr4 import *
@@ -327,7 +327,7 @@ self.state = <choice.stateNumber>
 token = self._input.LA(1)
 <choice.altLook,alts:{look,alt| <cases(ttypes=look)>
     <alt>
-	}; separator="\nel">
+    pass}; separator="\nel">
 else:
     <error>
 
@@ -383,7 +383,7 @@ while True:
 
 AltBlock(choice, preamble, alts, error) ::= <<
 self.state = <choice.stateNumber>
-self._errHandler.sync(self);
+self._errHandler.sync(self)
 <if(choice.label)><labelref(choice.label)> = _input.LT(1)<endif>
 <preamble; separator="\n">
 la_ = self._interp.adaptivePredict(self._input,<choice.decision>,self._ctx)
@@ -397,7 +397,7 @@ if la_ == <i>:
 
 OptionalBlock(choice, alts, error) ::= <<
 self.state = <choice.stateNumber>
-self._errHandler.sync(self);
+self._errHandler.sync(self)
 la_ = self._interp.adaptivePredict(self._input,<choice.decision>,self._ctx)
 <alts:{alt |
 if la_ == <i><if(!choice.ast.greedy)>+1<endif>:
@@ -638,9 +638,8 @@ ListLabelName(label)		  ::= "<label>"
 CaptureNextToken(d) ::= "<d.varName> = self._input.LT(1)"
 CaptureNextTokenType(d) ::= "<d.varName> = self._input.LA(1)"
 
-StructDecl(struct,ctorAttrs,attrs,getters,dispatchMethods,interfaces,extensionMembers,
-           superClass={ParserRuleContext}) ::= <<
-class <struct.name>(<superClass>):
+StructDecl(struct,ctorAttrs,attrs,getters,dispatchMethods,interfaces,extensionMembers) ::= <<
+class <struct.name>(<if(contextSuperClass)><contextSuperClass><else>ParserRuleContext<endif>):
 
     def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1<struct.ctorAttrs:{a | , <a.name><if(a.type)>:<a.type><endif>=None}>):
         super().__init__(parent, invokingState)

@@ -18,7 +18,6 @@ The [ANTLR v4 book](http://pragprog.com/book/tpantlr2/the-definitive-antlr-4-ref
 New features generally appear in the Java target and then migrate to the other targets, but these other targets don't always get updated in the same overall tool release. This section tries to identify features added to Java that have not been added to the other targets.
 
 |Feature|Java|C&sharp;|JavaScript|Python2|Python3|Swift|C++|
-|-|-|-|-|-|-|-|-|
+|---|---|---|---|---|---|---|---|
 |Ambiguous tree construction|4.5.1|-|-|-|-|-|-|
- 	 	 	 	 	 
- 	 	 	 	 	 
+
