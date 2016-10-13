@@ -12,5 +12,6 @@ TestFolders ::= [
 	"Performance": [],
 	"SemPredEvalLexer": [],
 	"SemPredEvalParser": [],
-	"Sets": []
+	"Sets": [],
+	"Visitors": []
 ]
