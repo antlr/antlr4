@@ -419,6 +419,13 @@ Declare_pred() ::= <<boolean pred(boolean v) {
 Invoke_pred(v) ::= <<this.pred(<v>)>>
 
 IgnoredTests ::= [
+	"Visitors.Basic": true,
+	"Visitors.LR": true,
+	"Visitors.LRWithLabels": true,
+	"Visitors.RuleGetters_1": true,
+	"Visitors.RuleGetters_2": true,
+	"Visitors.TokenGetters_1": true,
+	"Visitors.TokenGetters_2": true,
 	default: false
 ]
 
