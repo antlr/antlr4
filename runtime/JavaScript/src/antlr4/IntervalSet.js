@@ -33,7 +33,7 @@ function IntervalSet() {
 	this.readOnly = false;
 }
 
-IntervalSet.prototype.first = function() {
+IntervalSet.prototype.first = function(v) {
 	if (this.intervals === null || this.intervals.length===0) {
 		return Token.INVALID_TYPE;
 	} else {
@@ -50,9 +50,6 @@ IntervalSet.prototype.addRange = function(l, h) {
 };
 
 IntervalSet.prototype.addInterval = function(v) {
-	if (PORT_DEBUG) {
-		console.log("addInterval" + v.toString())
-	}
 	if (this.intervals === null) {
 		this.intervals = [];
 		this.intervals.push(v);
@@ -83,13 +80,7 @@ IntervalSet.prototype.addInterval = function(v) {
 };
 
 IntervalSet.prototype.addSet = function(other) {
-	if (PORT_DEBUG) {
-		console.log("addSet")
-	}
 	if (other.intervals !== null) {
-		if (PORT_DEBUG) {
-			console.log(other.intervals.length)
-		}
 		for (var k = 0; k < other.intervals.length; k++) {
 			var i = other.intervals[k];
 			this.addInterval(new Interval(i.start, i.stop));
@@ -105,11 +96,11 @@ IntervalSet.prototype.reduce = function(k) {
 		var r = this.intervals[k + 1];
 		// if r contained in l
 		if (l.stop >= r.stop) {
-			this.intervals.pop(k + 1); // what is intended here? pop takes no args
+			this.intervals.pop(k + 1);
 			this.reduce(k);
 		} else if (l.stop >= r.start) {
 			this.intervals[k] = new Interval(l.start, r.stop);
-			this.intervals.pop(k + 1); // what is intended here? pop takes no args
+			this.intervals.pop(k + 1);
 		}
 	}
 };
@@ -274,11 +265,6 @@ IntervalSet.prototype.toIndexString = function() {
 
 
 IntervalSet.prototype.toTokenString = function(literalNames, symbolicNames) {
-	console.log(symbolicNames)
-	console.log(literalNames)
-	console.log(symbolicNames.length)
-	console.log(literalNames.length)
-	console.log(this.toString())
 	var names = [];
 	for (var i = 0; i < this.intervals.length; i++) {
 		var v = this.intervals[i];

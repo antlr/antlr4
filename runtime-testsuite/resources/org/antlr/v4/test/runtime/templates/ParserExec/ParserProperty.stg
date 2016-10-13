@@ -27,7 +27,7 @@ Errors() ::= ""
 grammar(grammarName) ::= <<
 grammar <grammarName>;
 <ParserPropertyMember()>
-a : {Property()}? ID {<writeln("\"valid\"")>}
+a : {$parser.Property()}? ID {<writeln("\"valid\"")>}
   ;
 ID : 'a'..'z'+ ;
 WS : (' '|'\n') -> skip ;

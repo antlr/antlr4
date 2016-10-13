@@ -101,9 +101,6 @@ InputStream.prototype.mark = function() {
 };
 
 InputStream.prototype.release = function(marker) {
-	if (PORT_DEBUG) {
-		console.log("RELEASING")
-	}
 };
 
 // consume() ahead until p==_index; can't just set p=_index as we must

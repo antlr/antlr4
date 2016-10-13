@@ -556,14 +556,14 @@ public class TestParserExec extends BaseTest {
 	@Test
 	public void testParserProperty() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(160);
+		StringBuilder grammarBuilder = new StringBuilder(181);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("@parser::members {\n");
-		grammarBuilder.append("func Property() bool {\n");
+		grammarBuilder.append("func (p *TParser) Property() bool {\n");
 		grammarBuilder.append("	return true\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("}\n");
-		grammarBuilder.append("a : {Property()}? ID {fmt.Println(\"valid\")}\n");
+		grammarBuilder.append("a : {$parser.Property()}? ID {fmt.Println(\"valid\")}\n");
 		grammarBuilder.append("  ;\n");
 		grammarBuilder.append("ID : 'a'..'z'+ ;\n");
 		grammarBuilder.append("WS : (' '|'\\n') -> skip ;");

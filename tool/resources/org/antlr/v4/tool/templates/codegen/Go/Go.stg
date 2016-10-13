@@ -2,7 +2,7 @@ fileHeader(grammarFileName, ANTLRVersion) ::= <<
 // Generated from <grammarFileName; format="java-escape"> by ANTLR <ANTLRVersion>.
 >>
 
-ParserFile(file, parser, namedActions) ::= <<
+ParserFile(file, parser, namedActions, contextSuperClass) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 
 <if(file.genPackage)>
@@ -1042,12 +1042,12 @@ Set<a.name; format="cap">(<a.type;format="lower">)}; separator="\n\n">
 	<endif>
 
 
-	// get<struct.name> differentiates from other interfaces.
-	get<struct.name>()
+	// Is<struct.name> differentiates from other interfaces.
+	Is<struct.name>()
 }
 
 type <struct.name> struct {
-	*antlr.BaseParserRuleContext
+	<if(contextSuperClass)>*<contextSuperClass><else>*antlr.BaseParserRuleContext<endif>
 	parser antlr.Parser
 	<if(attrs)>
 	<attrs; separator="\n">
@@ -1056,24 +1056,23 @@ type <struct.name> struct {
 
 func NewEmpty<struct.name>() *<struct.name> {
 	var p = new(<struct.name>)
-	p.BaseParserRuleContext = antlr.NewBaseParserRuleContext(nil, -1)
+	p.<if(contextSuperClass)><contextSuperClass><else>BaseParserRuleContext<endif> = <if(contextSuperClass)>New<contextSuperClass><else>antlr.NewBaseParserRuleContext<endif>(nil, -1)
 	p.RuleIndex = <parser.name>RULE_<struct.derivedFromName>
 	return p
 }
 
-func (*<struct.name>) get<struct.name>() {}
+func (*<struct.name>) Is<struct.name>() {}
 
 func New<struct.name>(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int<struct.ctorAttrs:{a | , <a.name> <a.type;format="lower">}>) *<struct.name> {
 	var p = new(<struct.name>)
 
-	p.BaseParserRuleContext = antlr.NewBaseParserRuleContext(parent, invokingState)
+	p.<if(contextSuperClass)><contextSuperClass><else>BaseParserRuleContext<endif> = <if(contextSuperClass)>New<contextSuperClass><else>antlr.NewBaseParserRuleContext<endif>(parent, invokingState)
 
 	p.parser = parser
 	p.RuleIndex = <parser.name>RULE_<struct.derivedFromName>
 
 	<if(struct.ctorAttrs)>
 	<struct.ctorAttrs:{a | p.<a.name> = <a.name>}; separator="\n">
-
 
 	<endif>
 	return p
@@ -1145,7 +1144,7 @@ func (s *<struct.name>) GetParser() antlr.Parser { return s.parser }
 <getters:{g | func (s *<struct.name>) <g>}; separator="\n\n">
 <endif>
 
-<if(struct.provideCopyFrom)><! don't need unless we have subclasses !>
+<if(struct.provideCopyFrom)>
 
 func (s *<struct.name>) CopyFrom(ctx *<struct.name>) {
 	s.BaseParserRuleContext.CopyFrom(ctx.BaseParserRuleContext)
@@ -1156,6 +1155,11 @@ func (s *<struct.name>) CopyFrom(ctx *<struct.name>) {
 func (s *<struct.name>) GetRuleContext() antlr.RuleContext {
 	return s
 }
+
+func (s *<struct.name>) ToStringTree(ruleNames []string, recog antlr.Recognizer) string {
+	return antlr.TreesStringTree(s, ruleNames, recog)
+}
+
 <if(dispatchMethods)>
 
 <dispatchMethods; separator="\n\n">

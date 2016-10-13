@@ -494,6 +494,7 @@ func (p *BaseParser) ExitRule() {
 }
 
 func (p *BaseParser) EnterOuterAlt(localctx ParserRuleContext, altNum int) {
+	localctx.SetAltNumber(altNum)
 	// if we have Newlocalctx, make sure we replace existing ctx
 	// that is previous child of parse tree
 	if p.BuildParseTrees && p.ctx != localctx {

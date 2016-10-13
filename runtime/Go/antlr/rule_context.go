@@ -30,6 +30,9 @@ type RuleContext interface {
 	GetRuleIndex() int
 	IsEmpty() bool
 
+	GetAltNumber() int
+	SetAltNumber(altNumber int)
+
 	String([]string, RuleContext) string
 }
 
@@ -81,6 +84,12 @@ func (b *BaseRuleContext) SetInvokingState(t int) {
 func (b *BaseRuleContext) GetRuleIndex() int {
 	return b.RuleIndex
 }
+
+func (b *BaseRuleContext) GetAltNumber() int {
+	return ATNInvalidAltNumber
+}
+
+func (b *BaseRuleContext) SetAltNumber(altNumber int) {}
 
 // A context is empty if there is no invoking state meaning nobody call
 // current context.

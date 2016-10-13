@@ -3,7 +3,6 @@ package antlr
 import (
 	"reflect"
 	"strconv"
-	//	"fmt"
 )
 
 type ParserRuleContext interface {
@@ -36,7 +35,6 @@ type BaseParserRuleContext struct {
 }
 
 func NewBaseParserRuleContext(parent ParserRuleContext, invokingStateNumber int) *BaseParserRuleContext {
-
 	prc := new(BaseParserRuleContext)
 
 	prc.BaseRuleContext = NewBaseRuleContext(parent, invokingStateNumber)
@@ -56,7 +54,6 @@ func NewBaseParserRuleContext(parent ParserRuleContext, invokingStateNumber int)
 	prc.exception = nil
 
 	return prc
-
 }
 
 func (prc *BaseParserRuleContext) SetException(e RecognitionException) {

@@ -34,17 +34,23 @@ func TreesStringTree(tree Tree, ruleNames []string, recog Recognizer) string {
 }
 
 func TreesGetNodeText(t Tree, ruleNames []string, recog Parser) string {
-
 	if recog != nil {
 		ruleNames = recog.GetRuleNames()
 	}
 
 	if ruleNames != nil {
-		if t2, ok := t.(RuleNode); ok {
-			return ruleNames[t2.GetRuleContext().GetRuleIndex()]
-		} else if t2, ok := t.(ErrorNode); ok {
+		switch t2 := t.(type) {
+		case RuleNode:
+			t3 := t2.GetRuleContext()
+			var altNumber = t3.GetAltNumber()
+
+			if altNumber != ATNInvalidAltNumber {
+				return fmt.Sprintf("%s:%d", ruleNames[t3.GetRuleIndex()], altNumber)
+			}
+			return ruleNames[t3.GetRuleIndex()]
+		case ErrorNode:
 			return fmt.Sprint(t2)
-		} else if t2, ok := t.(TerminalNode); ok {
+		case TerminalNode:
 			if t2.GetSymbol() != nil {
 				return t2.GetSymbol().GetText()
 			}
@@ -83,7 +89,7 @@ func TreesgetAncestors(t Tree) []Tree {
 	return ancestors
 }
 
-func TreesfindAllTokenNodes(t ParseTree, ttype int) []ParseTree {
+func TreesFindAllTokenNodes(t ParseTree, ttype int) []ParseTree {
 	return TreesfindAllNodes(t, ttype, true)
 }
 
@@ -118,10 +124,10 @@ func TreesFindAllNodes(t ParseTree, index int, findTokens bool, nodes []ParseTre
 	}
 }
 
-func Treesdescendants(t ParseTree) []ParseTree {
+func TreesDescendants(t ParseTree) []ParseTree {
 	var nodes = []ParseTree{t}
 	for i := 0; i < t.GetChildCount(); i++ {
-		nodes = append(nodes, Treesdescendants(t.GetChild(i).(ParseTree))...)
+		nodes = append(nodes, TreesDescendants(t.GetChild(i).(ParseTree))...)
 	}
 	return nodes
 }
