@@ -1,0 +1,2 @@
+# This rule applies to all files which don't match another line below
+* text=auto
