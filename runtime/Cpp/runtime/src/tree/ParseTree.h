@@ -45,6 +45,7 @@ namespace tree {
   // ml: This class unites 4 Java classes: RuleNode, ParseTree, SyntaxTree and Tree.
   class ANTLR4CPP_PUBLIC ParseTree {
   public:
+    ParseTree();
     virtual ~ParseTree() {}
 
     /// The parent of this node. If the return value is null, then this
@@ -102,7 +103,7 @@ namespace tree {
   class ANTLR4CPP_PUBLIC ParseTreeTracker {
   public:
     template<typename T, typename ... Args>
-    T* createInstance(Args ... args) {
+    T* createInstance(Args&& ... args) {
       static_assert(std::is_base_of<ParseTree, T>::value, "Argument must be a parse tree type");
       T* result = new T(args...);
       _allocated.push_back(result);

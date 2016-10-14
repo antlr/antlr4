@@ -33,6 +33,9 @@
 
 using namespace antlr4::tree;
 
+ParseTree::ParseTree() : parent(nullptr) {
+}
+
 bool ParseTree::operator == (const ParseTree &other) const {
   return &other == this;
 }
