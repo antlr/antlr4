@@ -45,7 +45,7 @@ namespace antlr4 {
     /// The Recognizer where this exception originated.
     IRecognizer *_recognizer;
     IntStream *_input;
-    Ref<ParserRuleContext> _ctx;
+    ParserRuleContext *_ctx;
 
     /// The current Token when an error occurred. Since not all streams
     /// support accessing symbols by index, we have to track the Token
@@ -91,7 +91,7 @@ namespace antlr4 {
     /// </summary>
     /// <returns> The <seealso cref="RuleContext"/> at the time this exception was thrown.
     /// If the context is not available, this method returns {@code null}. </returns>
-    virtual Ref<RuleContext> getCtx() const;
+    virtual RuleContext* getCtx() const;
 
     /// <summary>
     /// Gets the input stream which is the symbol source for the recognizer where
