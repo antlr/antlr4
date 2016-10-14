@@ -67,34 +67,11 @@ bool ATNState::isNonGreedyExitState() {
 }
 
 std::string ATNState::toString() const {
-  std::stringstream ss;
-  ss << "(ATNState " << std::hex << this << std::dec << ") {" << std::endl;
-  if (stateNumber == INVALID_STATE_NUMBER || stateNumber >= serializationNames.size())
-    ss << "  state: INVALID ";
-  else
-    ss << "  state: " << serializationNames[stateNumber];
-  ss << " (" << stateNumber << ")" << std::endl;
-  ss << "  ruleIndex: " << ruleIndex << std::endl << "  epsilonOnlyTransitions: " << epsilonOnlyTransitions << std::endl;
-  ss << "  transistions (" << transitions.size() << "):" << std::endl;
-
-  for (auto transition : transitions) {
-    ss << indent(transition->toString(), "    ") << std::endl;
-  }
-  ss << "}";
-
-  return ss.str();
-}
-
-std::vector<Transition*> ATNState::getTransitions() {
-  return transitions;
-}
-
-size_t ATNState::getNumberOfTransitions() {
-  return transitions.size();
+  return std::to_string(stateNumber);
 }
 
 void ATNState::addTransition(Transition *e) {
-  addTransition((int)transitions.size(), e);
+  addTransition(transitions.size(), e);
 }
 
 void ATNState::addTransition(size_t index, Transition *e) {
@@ -108,23 +85,7 @@ void ATNState::addTransition(size_t index, Transition *e) {
   transitions.insert(transitions.begin() + index, e);
 }
 
-Transition *ATNState::transition(size_t i) {
-  return transitions[i];
-}
-
-void ATNState::setTransition(size_t i, Transition *e) {
-  transitions[i] = e;
-}
-
 Transition *ATNState::removeTransition(size_t index) {
   transitions.erase(transitions.begin() + index);
   return nullptr;
-}
-
-bool ATNState::onlyHasEpsilonTransitions() {
-  return epsilonOnlyTransitions;
-}
-
-void ATNState::setRuleIndex(size_t index) {
-  ruleIndex = index;
 }

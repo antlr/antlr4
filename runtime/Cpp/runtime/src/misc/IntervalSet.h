@@ -131,8 +131,7 @@ namespace misc {
     /// return true if this set has no members
     virtual bool isEmpty() const;
 
-    /// <summary>
-    /// If this set is a single integer, return it otherwise Token.INVALID_TYPE </summary>
+    /// If this set is a single integer, return it otherwise Token.INVALID_TYPE.
     virtual ssize_t getSingleElement() const;
 
     /**

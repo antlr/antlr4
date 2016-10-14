@@ -127,11 +127,11 @@ std::vector<size_t> ATNSerializer::serialize() {
     if (s->getStateType() != ATNState::RULE_STOP) {
       // the deserializer can trivially derive these edges, so there's no need
       // to serialize them
-      nedges += s->getNumberOfTransitions();
+      nedges += s->transitions.size();
     }
 
-    for (size_t i = 0; i < s->getNumberOfTransitions(); i++) {
-      Transition *t = s->transition(i);
+    for (size_t i = 0; i < s->transitions.size(); i++) {
+      Transition *t = s->transitions[i];
       Transition::SerializationType edgeType = t->getSerializationType();
       if (edgeType == Transition::SET || edgeType == Transition::NOT_SET) {
         SetTransition *st = static_cast<SetTransition *>(t);
@@ -217,8 +217,8 @@ std::vector<size_t> ATNSerializer::serialize() {
       continue;
     }
 
-    for (size_t i = 0; i < s->getNumberOfTransitions(); i++) {
-      Transition *t = s->transition(i);
+    for (size_t i = 0; i < s->transitions.size(); i++) {
+      Transition *t = s->transitions[i];
 
       if (atn->states[t->target->stateNumber] == nullptr) {
         throw IllegalStateException("Cannot serialize a transition to a removed state.");

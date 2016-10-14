@@ -117,8 +117,7 @@ namespace antlr4 {
     virtual std::string getText(RuleContext *ctx) override;
     virtual std::string getText(Token *start, Token *stop) override;
 
-    /// <summary>
-    /// Get all tokens from lexer until EOF </summary>
+    /// Get all tokens from lexer until EOF.
     virtual void fill();
 
   protected:

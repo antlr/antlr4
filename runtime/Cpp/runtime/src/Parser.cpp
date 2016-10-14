@@ -501,7 +501,7 @@ bool Parser::isExpectedToken(size_t symbol) {
 
   while (ctx && ctx->invokingState != ATNState::INVALID_STATE_NUMBER && following.contains(Token::EPSILON)) {
     atn::ATNState *invokingState = atn.states[ctx->invokingState];
-    atn::RuleTransition *rt = static_cast<atn::RuleTransition*>(invokingState->transition(0));
+    atn::RuleTransition *rt = static_cast<atn::RuleTransition*>(invokingState->transitions[0]);
     following = atn.nextTokens(rt->followState);
     if (following.contains(symbol)) {
       return true;

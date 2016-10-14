@@ -128,10 +128,6 @@ namespace atn {
     size_t ruleIndex = 0; // at runtime, we don't have Rule objects
     bool epsilonOnlyTransitions = false;
 
-  protected:
-    /// Track the transitions emanating from this ATN state.
-    std::vector<Transition*> transitions;
-
   public:
     /// Used to cache lookahead during parsing, not used during construction.
     misc::IntervalSet nextTokenWithinRule;
@@ -139,19 +135,15 @@ namespace atn {
     virtual size_t hashCode();
     bool operator == (const ATNState &other);
 
+    /// Track the transitions emanating from this ATN state.
+    std::vector<Transition*> transitions;
+
     virtual bool isNonGreedyExitState();
     virtual std::string toString() const;
-    virtual  std::vector<Transition*> getTransitions();
-    virtual size_t getNumberOfTransitions();
     virtual void addTransition(Transition *e);
     virtual void addTransition(size_t index, Transition *e);
-    virtual Transition *transition(size_t i);
-    virtual void setTransition(size_t i, Transition *e);
     virtual Transition* removeTransition(size_t index);
     virtual int getStateType() = 0;
-    bool onlyHasEpsilonTransitions();
-    virtual void setRuleIndex(size_t index);
-
   };
 
 } // namespace atn

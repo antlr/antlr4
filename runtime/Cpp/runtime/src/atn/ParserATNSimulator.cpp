@@ -323,7 +323,7 @@ dfa::DFAState *ParserATNSimulator::computeTargetState(dfa::DFA &dfa, dfa::DFASta
 void ParserATNSimulator::predicateDFAState(dfa::DFAState *dfaState, DecisionState *decisionState) {
   // We need to test all predicates, even in DFA states that
   // uniquely predict alternative.
-  size_t nalts = decisionState->getNumberOfTransitions();
+  size_t nalts = decisionState->transitions.size();
 
   // Update DFA so reach becomes accept state with (predicate,alt)
   // pairs if preds found for conflicting alts
@@ -476,9 +476,9 @@ std::unique_ptr<ATNConfigSet> ParserATNSimulator::computeReachSet(ATNConfigSet *
       continue;
     }
 
-    size_t n = c->state->getNumberOfTransitions();
+    size_t n = c->state->transitions.size();
     for (size_t ti = 0; ti < n; ti++) { // for each transition
-      Transition *trans = c->state->transition(ti);
+      Transition *trans = c->state->transitions[ti];
       ATNState *target = getReachableTarget(trans, (int)t);
       if (target != nullptr) {
         intermediate->add(std::make_shared<ATNConfig>(c, target), &mergeCache);
@@ -584,7 +584,7 @@ ATNConfigSet* ParserATNSimulator::removeAllConfigsNotInRuleStopState(ATNConfigSe
       continue;
     }
 
-    if (lookToEndOfRule && config->state->onlyHasEpsilonTransitions()) {
+    if (lookToEndOfRule && config->state->epsilonOnlyTransitions) {
       misc::IntervalSet nextTokens = atn.nextTokens(config->state);
       if (nextTokens.contains(Token::EPSILON)) {
         ATNState *endOfRuleState = atn.ruleToStopState[config->state->ruleIndex];
@@ -601,8 +601,8 @@ std::unique_ptr<ATNConfigSet> ParserATNSimulator::computeStartState(ATNState *p,
   Ref<PredictionContext> initialContext = PredictionContext::fromRuleContext(atn, ctx);
   std::unique_ptr<ATNConfigSet> configs(new ATNConfigSet(fullCtx));
 
-  for (size_t i = 0; i < p->getNumberOfTransitions(); i++) {
-    ATNState *target = p->transition(i)->target;
+  for (size_t i = 0; i < p->transitions.size(); i++) {
+    ATNState *target = p->transitions[i]->target;
     Ref<ATNConfig> c = std::make_shared<ATNConfig>(target, (int)i + 1, initialContext);
     ATNConfig::Set closureBusy;
     closure(c, configs.get(), closureBusy, true, fullCtx, false);
@@ -892,14 +892,14 @@ void ParserATNSimulator::closure_(Ref<ATNConfig> const& config, ATNConfigSet *co
                                   bool collectPredicates, bool fullCtx, int depth, bool treatEofAsEpsilon) {
   ATNState *p = config->state;
   // optimization
-  if (!p->onlyHasEpsilonTransitions()) {
+  if (!p->epsilonOnlyTransitions) {
     // make sure to not return here, because EOF transitions can act as
     // both epsilon transitions and non-epsilon transitions.
     configs->add(config, &mergeCache);
   }
 
-  for (size_t i = 0; i < p->getNumberOfTransitions(); i++) {
-    Transition *t = p->transition(i);
+  for (size_t i = 0; i < p->transitions.size(); i++) {
+    Transition *t = p->transitions[i];
     bool continueCollecting = !is<ActionTransition*>(t) && collectPredicates;
     Ref<ATNConfig> c = getEpsilonTarget(config, t, continueCollecting, depth == 0, fullCtx, treatEofAsEpsilon);
     if (c != nullptr) {
@@ -1133,8 +1133,8 @@ void ParserATNSimulator::dumpDeadEndConfigs(NoViableAltException &nvae) {
   std::cerr << "dead end configs: ";
   for (auto c : nvae.getDeadEndConfigs()->configs) {
     std::string trans = "no edges";
-    if (c->state->getNumberOfTransitions() > 0) {
-      Transition *t = c->state->transition(0);
+    if (c->state->transitions.size() > 0) {
+      Transition *t = c->state->transitions[0];
       if (is<AtomTransition*>(t)) {
         AtomTransition *at = static_cast<AtomTransition*>(t);
         trans = "Atom " + getTokenName(at->_label);

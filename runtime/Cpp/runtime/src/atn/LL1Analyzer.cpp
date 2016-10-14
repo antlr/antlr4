@@ -58,13 +58,13 @@ std::vector<misc::IntervalSet> LL1Analyzer::getDecisionLookahead(ATNState *s) co
     return look;
   }
 
-  look.resize(s->getNumberOfTransitions()); // Fills all interval sets with defaults.
-  for (size_t alt = 0; alt < s->getNumberOfTransitions(); alt++) {
+  look.resize(s->transitions.size()); // Fills all interval sets with defaults.
+  for (size_t alt = 0; alt < s->transitions.size(); alt++) {
     bool seeThruPreds = false; // fail to get lookahead upon pred
 
     ATNConfig::Set lookBusy;
     antlrcpp::BitSet callRuleStack;
-    _LOOK(s->transition(alt)->target, nullptr, PredictionContext::EMPTY,
+    _LOOK(s->transitions[alt]->target, nullptr, PredictionContext::EMPTY,
           look[alt], lookBusy, callRuleStack, seeThruPreds, false);
     
     // Wipe out lookahead for this alternative if we found nothing
@@ -140,9 +140,9 @@ void LL1Analyzer::_LOOK(ATNState *s, ATNState *stopState, Ref<PredictionContext>
     }
   }
 
-  size_t n = s->getNumberOfTransitions();
+  size_t n = s->transitions.size();
   for (size_t i = 0; i < n; i++) {
-    Transition *t = s->transition(i);
+    Transition *t = s->transitions[i];
 
     if (is<RuleTransition *>(t)) {
       if (calledRuleStack[(static_cast<RuleTransition*>(t))->target->ruleIndex]) {

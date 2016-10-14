@@ -167,7 +167,7 @@ misc::IntervalSet ATN::getExpectedTokens(size_t stateNumber, RuleContext *contex
   expected.remove(Token::EPSILON);
   while (ctx && ctx->invokingState != ATNState::INVALID_STATE_NUMBER && following.contains(Token::EPSILON)) {
     ATNState *invokingState = states.at(ctx->invokingState);
-    RuleTransition *rt = static_cast<RuleTransition*>(invokingState->transition(0));
+    RuleTransition *rt = static_cast<RuleTransition*>(invokingState->transitions[0]);
     following = nextTokens(rt->followState);
     expected.addAll(following);
     expected.remove(Token::EPSILON);

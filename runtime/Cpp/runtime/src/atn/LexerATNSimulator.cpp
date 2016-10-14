@@ -272,9 +272,9 @@ void LexerATNSimulator::getReachableConfigSet(CharStream *input, ATNConfigSet *c
       std::cout << "testing " << getTokenName((int)t) << " at " << c->toString(true) << std::endl;
 #endif
 
-    size_t n = c->state->getNumberOfTransitions();
+    size_t n = c->state->transitions.size();
     for (size_t ti = 0; ti < n; ti++) { // for each transition
-      Transition *trans = c->state->transition(ti);
+      Transition *trans = c->state->transitions[ti];
       ATNState *target = getReachableTarget(trans, (int)t);
       if (target != nullptr) {
         Ref<LexerActionExecutor> lexerActionExecutor = std::static_pointer_cast<LexerATNConfig>(c)->getLexerActionExecutor();
@@ -325,8 +325,8 @@ atn::ATNState *LexerATNSimulator::getReachableTarget(Transition *trans, size_t t
 std::unique_ptr<ATNConfigSet> LexerATNSimulator::computeStartState(CharStream *input, ATNState *p) {
   Ref<PredictionContext> initialContext = PredictionContext::EMPTY; // ml: the purpose of this assignment is unclear
   std::unique_ptr<ATNConfigSet> configs(new OrderedATNConfigSet());
-  for (size_t i = 0; i < p->getNumberOfTransitions(); i++) {
-    ATNState *target = p->transition(i)->target;
+  for (size_t i = 0; i < p->transitions.size(); i++) {
+    ATNState *target = p->transitions[i]->target;
     Ref<LexerATNConfig> c = std::make_shared<LexerATNConfig>(target, (int)(i + 1), initialContext);
     closure(input, c, configs.get(), false, false, false);
   }
@@ -374,15 +374,15 @@ bool LexerATNSimulator::closure(CharStream *input, const Ref<LexerATNConfig> &co
   }
 
   // optimization
-  if (!config->state->onlyHasEpsilonTransitions()) {
+  if (!config->state->epsilonOnlyTransitions) {
     if (!currentAltReachedAcceptState || !config->hasPassedThroughNonGreedyDecision()) {
       configs->add(config);
     }
   }
 
   ATNState *p = config->state;
-  for (size_t i = 0; i < p->getNumberOfTransitions(); i++) {
-    Transition *t = p->transition(i);
+  for (size_t i = 0; i < p->transitions.size(); i++) {
+    Transition *t = p->transitions[i];
     Ref<LexerATNConfig> c = getEpsilonTarget(input, config, t, configs, speculative, treatEofAsEpsilon);
     if (c != nullptr) {
       currentAltReachedAcceptState = closure(input, c, configs, currentAltReachedAcceptState, speculative, treatEofAsEpsilon);

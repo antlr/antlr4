@@ -52,12 +52,11 @@ FailedPredicateException::FailedPredicateException(Parser *recognizer, const std
                          recognizer->getInputStream(), recognizer->getContext(), recognizer->getCurrentToken()) {
 
   atn::ATNState *s = recognizer->getInterpreter<atn::ATNSimulator>()->atn.states[recognizer->getState()];
-  atn::Transition *transition = s->transition(0);
+  atn::Transition *transition = s->transitions[0];
   if (is<atn::PredicateTransition*>(transition)) {
     _ruleIndex = ((atn::PredicateTransition *)transition)->ruleIndex;
     _predicateIndex = ((atn::PredicateTransition *)transition)->predIndex;
-  }
-  else {
+  } else {
     _ruleIndex = 0;
     _predicateIndex = 0;
   }

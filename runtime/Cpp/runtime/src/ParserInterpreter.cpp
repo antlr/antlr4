@@ -189,7 +189,7 @@ void ParserInterpreter::visitState(atn::ATNState *p) {
     predictedAlt = visitDecisionState(dynamic_cast<DecisionState *>(p));
   }
 
-  atn::Transition *transition = p->transition(predictedAlt - 1);
+  atn::Transition *transition = p->transitions[predictedAlt - 1];
   switch (transition->getSerializationType()) {
     case atn::Transition::EPSILON:
       if (p->getStateType() == ATNState::STAR_LOOP_ENTRY &&
@@ -266,7 +266,7 @@ void ParserInterpreter::visitState(atn::ATNState *p) {
 
 size_t ParserInterpreter::visitDecisionState(DecisionState *p) {
   size_t predictedAlt = 1;
-  if (p->getNumberOfTransitions() > 1) {
+  if (p->transitions.size() > 1) {
     getErrorHandler()->sync(this);
     int decision = p->decision;
     if (decision == _overrideDecision && _input->index() == _overrideDecisionInputIndex && !_overrideDecisionReached) {
@@ -296,7 +296,7 @@ void ParserInterpreter::visitRuleStopState(atn::ATNState *p) {
     exitRule();
   }
 
-  atn::RuleTransition *ruleTransition = static_cast<atn::RuleTransition*>(_atn.states[getState()]->transition(0));
+  atn::RuleTransition *ruleTransition = static_cast<atn::RuleTransition*>(_atn.states[getState()]->transitions[0]);
   setState(ruleTransition->followState->stateNumber);
 }
 

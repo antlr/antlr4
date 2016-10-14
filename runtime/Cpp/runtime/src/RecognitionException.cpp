@@ -63,12 +63,12 @@ void RecognitionException::setOffendingState(size_t offendingState) {
 
 misc::IntervalSet RecognitionException::getExpectedTokens() const {
   if (_recognizer) {
-    return _recognizer->getATN().getExpectedTokens(_offendingState, _ctx.get());
+    return _recognizer->getATN().getExpectedTokens(_offendingState, _ctx);
   }
   return misc::IntervalSet::EMPTY_SET;
 }
 
-Ref<RuleContext> RecognitionException::getCtx() const {
+RuleContext* RecognitionException::getCtx() const {
   return _ctx;
 }
 

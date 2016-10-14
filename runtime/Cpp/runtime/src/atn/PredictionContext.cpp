@@ -70,7 +70,7 @@ Ref<PredictionContext> PredictionContext::fromRuleContext(const ATN &atn, RuleCo
   Ref<PredictionContext> parent = PredictionContext::fromRuleContext(atn, dynamic_cast<RuleContext *>(outerContext->parent));
 
   ATNState *state = atn.states.at(outerContext->invokingState);
-  RuleTransition *transition = (RuleTransition *)state->transition(0);
+  RuleTransition *transition = (RuleTransition *)state->transitions[0];
   return SingletonPredictionContext::create(parent, transition->followState->stateNumber);
 }
 

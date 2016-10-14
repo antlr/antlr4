@@ -37,7 +37,7 @@
 using namespace antlr4::atn;
 
 StarLoopEntryState *StarLoopbackState::getLoopEntryState() {
-  return static_cast<StarLoopEntryState*>(transition(0)->target);
+  return static_cast<StarLoopEntryState*>(transitions[0]->target);
 }
 
 int StarLoopbackState::getStateType() {
