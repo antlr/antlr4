@@ -68,7 +68,7 @@ func (v *BaseParseTreeVisitor) VisitErrorNode(node ErrorNode) interface{}   { re
 // TODO
 //func (this ParseTreeVisitor) Visit(ctx) {
 //	if (Utils.isArray(ctx)) {
-//		var self = this
+//		self := this
 //		return ctx.map(function(child) { return VisitAtom(self, child)})
 //	} else {
 //		return VisitAtom(this, ctx)
@@ -80,8 +80,8 @@ func (v *BaseParseTreeVisitor) VisitErrorNode(node ErrorNode) interface{}   { re
 //		return
 //	}
 //
-//	var name = ctx.parser.ruleNames[ctx.ruleIndex]
-//	var funcName = "Visit" + Utils.titleCase(name)
+//	name := ctx.parser.ruleNames[ctx.ruleIndex]
+//	funcName := "Visit" + Utils.titleCase(name)
 //
 //	return Visitor[funcName](ctx)
 //}
@@ -151,7 +151,7 @@ func (t *TerminalNodeImpl) GetSourceInterval() *Interval {
 	if t.symbol == nil {
 		return TreeInvalidInterval
 	}
-	var tokenIndex = t.symbol.GetTokenIndex()
+	tokenIndex := t.symbol.GetTokenIndex()
 	return NewInterval(tokenIndex, tokenIndex)
 }
 
@@ -219,7 +219,7 @@ func (p *ParseTreeWalker) Walk(listener ParseTreeListener, t Tree) {
 	default:
 		p.EnterRule(listener, t.(RuleNode))
 		for i := 0; i < t.GetChildCount(); i++ {
-			var child = t.GetChild(i)
+			child := t.GetChild(i)
 			p.Walk(listener, child)
 		}
 		p.ExitRule(listener, t.(RuleNode))
@@ -233,13 +233,13 @@ func (p *ParseTreeWalker) Walk(listener ParseTreeListener, t Tree) {
 // the rule specific. We to them in reverse order upon finishing the node.
 //
 func (p *ParseTreeWalker) EnterRule(listener ParseTreeListener, r RuleNode) {
-	var ctx = r.GetRuleContext().(ParserRuleContext)
+	ctx := r.GetRuleContext().(ParserRuleContext)
 	listener.EnterEveryRule(ctx)
 	ctx.EnterRule(listener)
 }
 
 func (p *ParseTreeWalker) ExitRule(listener ParseTreeListener, r RuleNode) {
-	var ctx = r.GetRuleContext().(ParserRuleContext)
+	ctx := r.GetRuleContext().(ParserRuleContext)
 	ctx.ExitRule(listener)
 	listener.ExitEveryRule(ctx)
 }

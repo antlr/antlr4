@@ -132,21 +132,21 @@ func (a *ATN) getExpectedTokens(stateNumber int, ctx RuleContext) *IntervalSet {
 		panic("Invalid state number.")
 	}
 
-	var s = a.states[stateNumber]
-	var following = a.NextTokens(s, nil)
+	s := a.states[stateNumber]
+	following := a.NextTokens(s, nil)
 
 	if !following.contains(TokenEpsilon) {
 		return following
 	}
 
-	var expected = NewIntervalSet()
+	expected := NewIntervalSet()
 
 	expected.addSet(following)
 	expected.removeOne(TokenEpsilon)
 
 	for ctx != nil && ctx.GetInvokingState() >= 0 && following.contains(TokenEpsilon) {
-		var invokingState = a.states[ctx.GetInvokingState()]
-		var rt = invokingState.GetTransitions()[0]
+		invokingState := a.states[ctx.GetInvokingState()]
+		rt := invokingState.GetTransitions()[0]
 
 		following = a.NextTokens(rt.(*RuleTransition).followState, nil)
 		expected.addSet(following)

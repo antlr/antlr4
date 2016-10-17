@@ -42,7 +42,7 @@ func (d *DiagnosticErrorListener) ReportAmbiguity(recognizer Parser, dfa *DFA, s
 	if d.exactOnly && !exact {
 		return
 	}
-	var msg = "reportAmbiguity d=" +
+	msg := "reportAmbiguity d=" +
 		d.getDecisionDescription(recognizer, dfa) +
 		": ambigAlts=" +
 		d.getConflictingAlts(ambigAlts, configs).String() +
@@ -53,7 +53,7 @@ func (d *DiagnosticErrorListener) ReportAmbiguity(recognizer Parser, dfa *DFA, s
 
 func (d *DiagnosticErrorListener) ReportAttemptingFullContext(recognizer Parser, dfa *DFA, startIndex, stopIndex int, conflictingAlts *BitSet, configs ATNConfigSet) {
 
-	var msg = "reportAttemptingFullContext d=" +
+	msg := "reportAttemptingFullContext d=" +
 		d.getDecisionDescription(recognizer, dfa) +
 		", input='" +
 		recognizer.GetTokenStream().GetTextFromInterval(NewInterval(startIndex, stopIndex)) + "'"
@@ -61,7 +61,7 @@ func (d *DiagnosticErrorListener) ReportAttemptingFullContext(recognizer Parser,
 }
 
 func (d *DiagnosticErrorListener) ReportContextSensitivity(recognizer Parser, dfa *DFA, startIndex, stopIndex, prediction int, configs ATNConfigSet) {
-	var msg = "reportContextSensitivity d=" +
+	msg := "reportContextSensitivity d=" +
 		d.getDecisionDescription(recognizer, dfa) +
 		", input='" +
 		recognizer.GetTokenStream().GetTextFromInterval(NewInterval(startIndex, stopIndex)) + "'"
@@ -69,14 +69,14 @@ func (d *DiagnosticErrorListener) ReportContextSensitivity(recognizer Parser, df
 }
 
 func (d *DiagnosticErrorListener) getDecisionDescription(recognizer Parser, dfa *DFA) string {
-	var decision = dfa.decision
-	var ruleIndex = dfa.atnStartState.GetRuleIndex()
+	decision := dfa.decision
+	ruleIndex := dfa.atnStartState.GetRuleIndex()
 
-	var ruleNames = recognizer.GetRuleNames()
+	ruleNames := recognizer.GetRuleNames()
 	if ruleIndex < 0 || ruleIndex >= len(ruleNames) {
 		return strconv.Itoa(decision)
 	}
-	var ruleName = ruleNames[ruleIndex]
+	ruleName := ruleNames[ruleIndex]
 	if ruleName == "" {
 		return strconv.Itoa(decision)
 	}
@@ -98,7 +98,7 @@ func (d *DiagnosticErrorListener) getConflictingAlts(ReportedAlts *BitSet, set A
 	if ReportedAlts != nil {
 		return ReportedAlts
 	}
-	var result = NewBitSet()
+	result := NewBitSet()
 	for _, c := range set.GetItems() {
 		result.add(c.GetAlt())
 	}

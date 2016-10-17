@@ -5,6 +5,16 @@ import (
 	"strconv"
 )
 
+var (
+	LexerATNSimulatorDebug = false
+	LexerATNSimulatorDFADebug = false
+
+	LexerATNSimulatorMinDFAEdge = 0
+	LexerATNSimulatorMaxDFAEdge = 127 // forces unicode to stay in ATN
+
+	LexerATNSimulatorMatchCalls = 0
+)
+
 type ILexerATNSimulator interface {
 	IATNSimulator
 
@@ -55,14 +65,6 @@ func NewLexerATNSimulator(recog Lexer, atn *ATN, decisionToDFA []*DFA, sharedCon
 	return l
 }
 
-var LexerATNSimulatorDebug = false
-var LexerATNSimulatorDFADebug = false
-
-var LexerATNSimulatorMinDFAEdge = 0
-var LexerATNSimulatorMaxDFAEdge = 127 // forces unicode to stay in ATN
-
-var LexerATNSimulatorMatchCalls = 0
-
 func (l *LexerATNSimulator) copyState(simulator *LexerATNSimulator) {
 	l.CharPositionInLine = simulator.CharPositionInLine
 	l.Line = simulator.Line
@@ -77,7 +79,7 @@ func (l *LexerATNSimulator) Match(input CharStream, mode int) int {
 
 	l.MatchCalls++
 	l.mode = mode
-	var mark = input.Mark()
+	mark := input.Mark()
 
 	defer func() {
 		if PortDebug {
@@ -89,7 +91,7 @@ func (l *LexerATNSimulator) Match(input CharStream, mode int) int {
 	l.startIndex = input.Index()
 	l.prevAccept.reset()
 
-	var dfa = l.decisionToDFA[mode]
+	dfa := l.decisionToDFA[mode]
 
 	if dfa.s0 == nil {
 		if PortDebug {
@@ -115,23 +117,23 @@ func (l *LexerATNSimulator) reset() {
 }
 
 func (l *LexerATNSimulator) MatchATN(input CharStream) int {
-	var startState = l.atn.modeToStartState[l.mode]
+	startState := l.atn.modeToStartState[l.mode]
 
 	if LexerATNSimulatorDebug {
 		fmt.Println("MatchATN mode " + strconv.Itoa(l.mode) + " start: " + startState.String())
 	}
-	var oldMode = l.mode
-	var s0Closure = l.computeStartState(input, startState)
-	var suppressEdge = s0Closure.hasSemanticContext
+	oldMode := l.mode
+	s0Closure := l.computeStartState(input, startState)
+	suppressEdge := s0Closure.hasSemanticContext
 	s0Closure.hasSemanticContext = false
 
-	var next = l.addDFAState(s0Closure)
+	next := l.addDFAState(s0Closure)
 
 	if !suppressEdge {
 		l.decisionToDFA[l.mode].s0 = next
 	}
 
-	var predict = l.execATN(input, next)
+	predict := l.execATN(input, next)
 
 	if LexerATNSimulatorDebug {
 		fmt.Println("DFA after MatchATN: " + l.decisionToDFA[oldMode].ToLexerString())
@@ -148,8 +150,8 @@ func (l *LexerATNSimulator) execATN(input CharStream, ds0 *DFAState) int {
 		// allow zero-length tokens
 		l.captureSimState(l.prevAccept, input, ds0)
 	}
-	var t = input.LA(1)
-	var s = ds0 // s is current/from DFA state
+	t := input.LA(1)
+	s := ds0 // s is current/from DFA state
 
 	if PortDebug {
 		fs,ok := input.(*FileStream)
@@ -182,7 +184,7 @@ func (l *LexerATNSimulator) execATN(input CharStream, ds0 *DFAState) int {
 		// This optimization makes a lot of sense for loops within DFA.
 		// A character will take us back to an existing DFA state
 		// that already has lots of edges out of it. e.g., .* in comments.
-		var target = l.getExistingTargetState(s, t)
+		target := l.getExistingTargetState(s, t)
 		if PortDebug {
 			fmt.Println(t)
 			fmt.Println(target != nil)
@@ -234,7 +236,7 @@ func (l *LexerATNSimulator) getExistingTargetState(s *DFAState, t int) *DFAState
 		return nil
 	}
 
-	var target = s.edges[t-LexerATNSimulatorMinDFAEdge]
+	target := s.edges[t-LexerATNSimulatorMinDFAEdge]
 	if PortDebug {
 		fmt.Println("len edges", len(s.edges), t, t-LexerATNSimulatorMinDFAEdge)
 	}
@@ -256,7 +258,7 @@ func (l *LexerATNSimulator) getExistingTargetState(s *DFAState, t int) *DFAState
 // {@code t}. If {@code t} does not lead to a valid DFA state, l method
 // returns {@link //ERROR}.
 func (l *LexerATNSimulator) computeTargetState(input CharStream, s *DFAState, t int) *DFAState {
-	var reach = NewOrderedATNConfigSet()
+	reach := NewOrderedATNConfigSet()
 
 	// if we don't find an existing DFA state
 	// Fill reach starting from closure, following t transitions
@@ -280,7 +282,7 @@ func (l *LexerATNSimulator) failOrAccept(prevAccept *SimState, input CharStream,
 		if PortDebug {
 			fmt.Println(prevAccept.dfaState)
 		}
-		var lexerActionExecutor = prevAccept.dfaState.lexerActionExecutor
+		lexerActionExecutor := prevAccept.dfaState.lexerActionExecutor
 		l.accept(input, lexerActionExecutor, l.startIndex, prevAccept.index, prevAccept.line, prevAccept.column)
 
 		if PortDebug {
@@ -303,7 +305,7 @@ func (l *LexerATNSimulator) failOrAccept(prevAccept *SimState, input CharStream,
 func (l *LexerATNSimulator) getReachableConfigSet(input CharStream, closure ATNConfigSet, reach ATNConfigSet, t int) {
 	// l is used to Skip processing for configs which have a lower priority
 	// than a config that already reached an accept state for the same rule
-	var SkipAlt = ATNInvalidAltNumber
+	SkipAlt := ATNInvalidAltNumber
 
 	if PortDebug {
 		fmt.Println("getReachableConfigSet")
@@ -311,7 +313,7 @@ func (l *LexerATNSimulator) getReachableConfigSet(input CharStream, closure ATNC
 	}
 
 	for _, cfg := range closure.GetItems() {
-		var currentAltReachedAcceptState = (cfg.GetAlt() == SkipAlt)
+		currentAltReachedAcceptState := (cfg.GetAlt() == SkipAlt)
 		if currentAltReachedAcceptState && cfg.(*LexerATNConfig).passedThroughNonGreedyDecision {
 			continue
 		}
@@ -322,14 +324,14 @@ func (l *LexerATNSimulator) getReachableConfigSet(input CharStream, closure ATNC
 		}
 
 		for _, trans := range cfg.GetState().GetTransitions() {
-			var target = l.getReachableTarget(trans, t)
+			target := l.getReachableTarget(trans, t)
 			if target != nil {
-				var lexerActionExecutor = cfg.(*LexerATNConfig).lexerActionExecutor
+				lexerActionExecutor := cfg.(*LexerATNConfig).lexerActionExecutor
 				if lexerActionExecutor != nil {
 					lexerActionExecutor = lexerActionExecutor.fixOffsetBeforeMatch(input.Index() - l.startIndex)
 				}
-				var treatEOFAsEpsilon = (t == TokenEOF)
-				var config = NewLexerATNConfig3(cfg.(*LexerATNConfig), target, lexerActionExecutor)
+				treatEOFAsEpsilon := (t == TokenEOF)
+				config := NewLexerATNConfig3(cfg.(*LexerATNConfig), target, lexerActionExecutor)
 				if l.closure(input, config, reach,
 					currentAltReachedAcceptState, true, treatEOFAsEpsilon) {
 					// any remaining configs for l alt have a lower priority
@@ -368,10 +370,10 @@ func (l *LexerATNSimulator) computeStartState(input CharStream, p ATNState) *Ord
 		fmt.Println("Num transitions" + strconv.Itoa(len(p.GetTransitions())))
 	}
 
-	var configs = NewOrderedATNConfigSet()
+	configs := NewOrderedATNConfigSet()
 	for i := 0; i < len(p.GetTransitions()); i++ {
-		var target = p.GetTransitions()[i].getTarget()
-		var cfg = NewLexerATNConfig6(target, i+1, BasePredictionContextEMPTY)
+		target := p.GetTransitions()[i].getTarget()
+		cfg := NewLexerATNConfig6(target, i+1, BasePredictionContextEMPTY)
 		l.closure(input, cfg, configs, false, false, false)
 	}
 
@@ -416,8 +418,8 @@ func (l *LexerATNSimulator) closure(input CharStream, config *LexerATNConfig, co
 		if config.context != nil && !config.context.isEmpty() {
 			for i := 0; i < config.context.length(); i++ {
 				if config.context.getReturnState(i) != BasePredictionContextEmptyReturnState {
-					var newContext = config.context.GetParent(i) // "pop" return state
-					var returnState = l.atn.states[config.context.getReturnState(i)]
+					newContext := config.context.GetParent(i) // "pop" return state
+					returnState := l.atn.states[config.context.getReturnState(i)]
 					cfg := NewLexerATNConfig2(config, returnState, newContext)
 					currentAltReachedAcceptState = l.closure(input, cfg, configs, currentAltReachedAcceptState, speculative, treatEOFAsEpsilon)
 				}
@@ -432,7 +434,7 @@ func (l *LexerATNSimulator) closure(input CharStream, config *LexerATNConfig, co
 		}
 	}
 	for j := 0; j < len(config.state.GetTransitions()); j++ {
-		var trans = config.state.GetTransitions()[j]
+		trans := config.state.GetTransitions()[j]
 		cfg := l.getEpsilonTarget(input, config, trans, configs, speculative, treatEOFAsEpsilon)
 		if cfg != nil {
 			currentAltReachedAcceptState = l.closure(input, cfg, configs,
@@ -451,7 +453,7 @@ func (l *LexerATNSimulator) getEpsilonTarget(input CharStream, config *LexerATNC
 	if trans.getSerializationType() == TransitionRULE {
 
 		rt := trans.(*RuleTransition)
-		var newContext = SingletonBasePredictionContextCreate(config.context, rt.followState.GetStateNumber())
+		newContext := SingletonBasePredictionContextCreate(config.context, rt.followState.GetStateNumber())
 		cfg = NewLexerATNConfig2(config, trans.getTarget(), newContext)
 
 	} else if trans.getSerializationType() == TransitionPRECEDENCE {
@@ -498,7 +500,7 @@ func (l *LexerATNSimulator) getEpsilonTarget(input CharStream, config *LexerATNC
 			// getEpsilonTarget to return two configurations, so
 			// additional modifications are needed before we can support
 			// the split operation.
-			var lexerActionExecutor = LexerActionExecutorappend(config.lexerActionExecutor, l.atn.lexerActions[trans.(*ActionTransition).actionIndex])
+			lexerActionExecutor := LexerActionExecutorappend(config.lexerActionExecutor, l.atn.lexerActions[trans.(*ActionTransition).actionIndex])
 			cfg = NewLexerATNConfig3(config, trans.getTarget(), lexerActionExecutor)
 		} else {
 			// ignore actions in referenced rules
@@ -546,10 +548,10 @@ func (l *LexerATNSimulator) evaluatePredicate(input CharStream, ruleIndex, predI
 	if !speculative {
 		return l.recog.Sempred(nil, ruleIndex, predIndex)
 	}
-	var savedcolumn = l.CharPositionInLine
-	var savedLine = l.Line
-	var index = input.Index()
-	var marker = input.Mark()
+	savedcolumn := l.CharPositionInLine
+	savedLine := l.Line
+	index := input.Index()
+	marker := input.Mark()
 
 	defer func() {
 		l.CharPositionInLine = savedcolumn
@@ -585,7 +587,7 @@ func (l *LexerATNSimulator) addDFAEdge(from *DFAState, tk int, to *DFAState, cfg
 		// If that gets us to a previously created (but dangling) DFA
 		// state, we can continue in pure DFA mode from there.
 		// /
-		var suppressEdge = cfgs.HasSemanticContext()
+		suppressEdge := cfgs.HasSemanticContext()
 		cfgs.SetHasSemanticContext(false)
 
 		to = l.addDFAState(cfgs)
@@ -617,7 +619,7 @@ func (l *LexerATNSimulator) addDFAEdge(from *DFAState, tk int, to *DFAState, cfg
 // traversing the DFA, we will know which rule to accept.
 func (l *LexerATNSimulator) addDFAState(configs ATNConfigSet) *DFAState {
 
-	var proposed = NewDFAState(-1, configs)
+	proposed := NewDFAState(-1, configs)
 	var firstConfigWithRuleStopState ATNConfig
 
 	for _, cfg := range configs.GetItems() {
@@ -634,13 +636,13 @@ func (l *LexerATNSimulator) addDFAState(configs ATNConfigSet) *DFAState {
 		proposed.lexerActionExecutor = firstConfigWithRuleStopState.(*LexerATNConfig).lexerActionExecutor
 		proposed.setPrediction(l.atn.ruleToTokenType[firstConfigWithRuleStopState.GetState().GetRuleIndex()])
 	}
-	var hash = proposed.Hash()
-	var dfa = l.decisionToDFA[l.mode]
-	var existing = dfa.GetStates()[hash]
+	hash := proposed.Hash()
+	dfa := l.decisionToDFA[l.mode]
+	existing := dfa.GetStates()[hash]
 	if existing != nil {
 		return existing
 	}
-	var newState = proposed
+	newState := proposed
 	newState.stateNumber = len(dfa.GetStates())
 	configs.SetReadOnly(true)
 	newState.configs = configs
@@ -662,7 +664,7 @@ func (l *LexerATNSimulator) Consume(input CharStream) {
 	if PortDebug {
 		fmt.Println("consume", input.Index(), input.Size())
 	}
-	var curChar = input.LA(1)
+	curChar := input.LA(1)
 	if curChar == int('\n') {
 		l.Line++
 		l.CharPositionInLine = 0

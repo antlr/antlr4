@@ -128,7 +128,7 @@ func (prc *BaseParserRuleContext) RemoveLastChild() {
 
 func (prc *BaseParserRuleContext) AddTokenNode(token Token) *TerminalNodeImpl {
 
-	var node = NewTerminalNodeImpl(token)
+	node := NewTerminalNodeImpl(token)
 	prc.addTerminalNodeChild(node)
 	node.parentCtx = prc
 	return node
@@ -136,7 +136,7 @@ func (prc *BaseParserRuleContext) AddTokenNode(token Token) *TerminalNodeImpl {
 }
 
 func (prc *BaseParserRuleContext) AddErrorNode(badToken Token) *ErrorNodeImpl {
-	var node = NewErrorNodeImpl(badToken)
+	node := NewErrorNodeImpl(badToken)
 	prc.addTerminalNodeChild(node)
 	node.parentCtx = prc
 	return node
@@ -156,7 +156,7 @@ func (prc *BaseParserRuleContext) GetChildOfType(i int, childType reflect.Type) 
 	}
 
 	for j := 0; j < len(prc.children); j++ {
-		var child = prc.children[j]
+		child := prc.children[j]
 		if reflect.TypeOf(child) == childType {
 			if i == 0 {
 				return child.(RuleContext)
@@ -200,7 +200,7 @@ func (prc *BaseParserRuleContext) GetStop() Token {
 func (prc *BaseParserRuleContext) GetToken(ttype int, i int) TerminalNode {
 
 	for j := 0; j < len(prc.children); j++ {
-		var child = prc.children[j]
+		child := prc.children[j]
 		if c2, ok := child.(TerminalNode); ok {
 			if c2.GetSymbol().GetTokenType() == ttype {
 				if i == 0 {
@@ -219,10 +219,10 @@ func (prc *BaseParserRuleContext) GetTokens(ttype int) []TerminalNode {
 		return make([]TerminalNode, 0)
 	}
 
-	var tokens = make([]TerminalNode, 0)
+	tokens := make([]TerminalNode, 0)
 
 	for j := 0; j < len(prc.children); j++ {
-		var child = prc.children[j]
+		child := prc.children[j]
 		if tchild, ok := child.(TerminalNode); ok {
 			if tchild.GetSymbol().GetTokenType() == ttype {
 				tokens = append(tokens, tchild)
@@ -242,7 +242,7 @@ func (prc *BaseParserRuleContext) getChild(ctxType reflect.Type, i int) RuleCont
 		return nil
 	}
 
-	var j = -1 // what element have we found with ctxType?
+	j := -1 // what element have we found with ctxType?
 	for _, o := range prc.children {
 
 		childType := reflect.TypeOf(o)
@@ -269,7 +269,7 @@ func (prc *BaseParserRuleContext) GetTypedRuleContexts(ctxType reflect.Type) []R
 		return make([]RuleContext, 0)
 	}
 
-	var contexts = make([]RuleContext, 0)
+	contexts := make([]RuleContext, 0)
 
 	for _, child := range prc.children {
 		childType := reflect.TypeOf(child)
@@ -305,15 +305,15 @@ func (prc *BaseParserRuleContext) GetSourceInterval() *Interval {
 
 func (prc *BaseParserRuleContext) String(ruleNames []string, stop RuleContext) string {
 
-	var p ParserRuleContext = prc
-	var s = "["
+	p := prc
+	s := "["
 	for p != nil && p != stop {
 		if ruleNames == nil {
 			if !p.IsEmpty() {
 				s += strconv.Itoa(p.GetInvokingState())
 			}
 		} else {
-			var ri = p.GetRuleIndex()
+			ri := p.GetRuleIndex()
 			var ruleName string
 			if ri >= 0 && ri < len(ruleNames) {
 				ruleName = ruleNames[ri]

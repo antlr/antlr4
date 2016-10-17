@@ -113,7 +113,7 @@ func (b *BaseATNConfigSet) Add(config ATNConfig, mergeCache *DoubleDict) bool {
 		b.dipsIntoOuterContext = true
 	}
 
-	var existing = b.configLookup.add(config).(ATNConfig)
+	existing := b.configLookup.add(config).(ATNConfig)
 
 	if existing == config {
 		b.cachedHashString = "-1"
@@ -123,8 +123,8 @@ func (b *BaseATNConfigSet) Add(config ATNConfig, mergeCache *DoubleDict) bool {
 	}
 
 	// Merge a previous (s, i, pi, _) with it and save the result
-	var rootIsWildcard = !b.fullCtx
-	var merged = merge(existing.GetContext(), config.GetContext(), rootIsWildcard, mergeCache)
+	rootIsWildcard := !b.fullCtx
+	merged := merge(existing.GetContext(), config.GetContext(), rootIsWildcard, mergeCache)
 
 	// No need to check for existing.context because config.context is in the cache,
 	// since the only way to create new graphs is the "call rule" and here. We cache
@@ -143,7 +143,7 @@ func (b *BaseATNConfigSet) Add(config ATNConfig, mergeCache *DoubleDict) bool {
 }
 
 func (b *BaseATNConfigSet) GetStates() *Set {
-	var states = NewSet(nil, nil)
+	states := NewSet(nil, nil)
 
 	for i := 0; i < len(b.configs); i++ {
 		states.add(b.configs[i].GetState())
@@ -161,10 +161,10 @@ func (b *BaseATNConfigSet) SetHasSemanticContext(v bool) {
 }
 
 func (b *BaseATNConfigSet) GetPredicates() []SemanticContext {
-	var preds = make([]SemanticContext, 0)
+	preds := make([]SemanticContext, 0)
 
 	for i := 0; i < len(b.configs); i++ {
-		var c = b.configs[i].GetSemanticContext()
+		c := b.configs[i].GetSemanticContext()
 
 		if c != SemanticContextNone {
 			preds = append(preds, c)
@@ -188,7 +188,7 @@ func (b *BaseATNConfigSet) OptimizeConfigs(interpreter *BaseATNSimulator) {
 	}
 
 	for i := 0; i < len(b.configs); i++ {
-		var config = b.configs[i]
+		config := b.configs[i]
 
 		config.SetContext(interpreter.getCachedContext(config.GetContext()))
 	}
@@ -209,7 +209,7 @@ func (b *BaseATNConfigSet) Equals(other interface{}) bool {
 		return false
 	}
 
-	var other2 = other.(*BaseATNConfigSet)
+	other2 := other.(*BaseATNConfigSet)
 
 	return b.configs != nil &&
 		// TODO: b.configs.equals(other2.configs) && // TODO: Is b necessary?
@@ -233,7 +233,7 @@ func (b *BaseATNConfigSet) Hash() string {
 }
 
 func (b *BaseATNConfigSet) hashConfigs() string {
-	var s = ""
+	s := ""
 
 	for _, c := range b.configs {
 		s += fmt.Sprint(c)
@@ -353,7 +353,7 @@ type OrderedATNConfigSet struct {
 }
 
 func NewOrderedATNConfigSet() *OrderedATNConfigSet {
-	var b = NewBaseATNConfigSet(false)
+	b := NewBaseATNConfigSet(false)
 
 	b.configLookup = NewSet(nil, nil)
 
@@ -380,9 +380,9 @@ func equalATNConfigs(a, b interface{}) bool {
 		return false
 	}
 
-	var nums = ai.GetState().GetStateNumber() == bi.GetState().GetStateNumber()
-	var alts = ai.GetAlt() == bi.GetAlt()
-	var cons = ai.GetSemanticContext().equals(bi.GetSemanticContext())
+	nums := ai.GetState().GetStateNumber() == bi.GetState().GetStateNumber()
+	alts := ai.GetAlt() == bi.GetAlt()
+	cons := ai.GetSemanticContext().equals(bi.GetSemanticContext())
 
 	return nums && alts && cons
 }

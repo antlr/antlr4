@@ -181,7 +181,7 @@ func (b *BaseLexer) NextToken() Token {
 		panic("NextToken requires a non-nil input stream.")
 	}
 
-	var tokenStartMarker = b.input.Mark()
+	tokenStartMarker := b.input.Mark()
 
 	// previously in finally block
 	defer func() {
@@ -325,7 +325,7 @@ func (b *BaseLexer) Emit() Token {
 	if PortDebug {
 		fmt.Println("emit base lexer")
 	}
-	var t = b.factory.Create(b.tokenFactorySourcePair, b.thetype, b.text, b.channel, b.TokenStartCharIndex, b.GetCharIndex()-1, b.TokenStartLine, b.TokenStartColumn)
+	t := b.factory.Create(b.tokenFactorySourcePair, b.thetype, b.text, b.channel, b.TokenStartCharIndex, b.GetCharIndex()-1, b.TokenStartLine, b.TokenStartColumn)
 	b.EmitToken(t)
 	return t
 }
@@ -336,7 +336,7 @@ func (b *BaseLexer) EmitEOF() Token {
 	if PortDebug {
 		fmt.Println("emitEOF")
 	}
-	var eof = b.factory.Create(b.tokenFactorySourcePair, TokenEOF, "", TokenDefaultChannel, b.input.Index(), b.input.Index()-1, lpos, cpos)
+	eof := b.factory.Create(b.tokenFactorySourcePair, TokenEOF, "", TokenDefaultChannel, b.input.Index(), b.input.Index()-1, lpos, cpos)
 	b.EmitToken(eof)
 	return eof
 }
@@ -387,9 +387,9 @@ func (b *BaseLexer) getAllTokens() []Token {
 	if PortDebug {
 		fmt.Println("getAllTokens")
 	}
-	var vl = b.Virt
-	var tokens = make([]Token, 0)
-	var t = vl.NextToken()
+	vl := b.Virt
+	tokens := make([]Token, 0)
+	t := vl.NextToken()
 	for t.GetTokenType() != TokenEOF {
 		tokens = append(tokens, t)
 		if PortDebug {
@@ -401,11 +401,11 @@ func (b *BaseLexer) getAllTokens() []Token {
 }
 
 func (b *BaseLexer) notifyListeners(e RecognitionException) {
-	var start = b.TokenStartCharIndex
-	var stop = b.input.Index()
-	var text = b.input.GetTextFromInterval(NewInterval(start, stop))
-	var msg = "token recognition error at: '" + text + "'"
-	var listener = b.GetErrorListenerDispatch()
+	start := b.TokenStartCharIndex
+	stop := b.input.Index()
+	text := b.input.GetTextFromInterval(NewInterval(start, stop))
+	msg := "token recognition error at: '" + text + "'"
+	listener := b.GetErrorListenerDispatch()
 	listener.SyntaxError(b, nil, b.TokenStartLine, b.TokenStartColumn, msg, e)
 }
 
