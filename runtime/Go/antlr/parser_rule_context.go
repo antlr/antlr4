@@ -305,7 +305,7 @@ func (prc *BaseParserRuleContext) GetSourceInterval() *Interval {
 
 func (prc *BaseParserRuleContext) String(ruleNames []string, stop RuleContext) string {
 
-	p := prc
+	var p ParserRuleContext = prc
 	s := "["
 	for p != nil && p != stop {
 		if ruleNames == nil {
