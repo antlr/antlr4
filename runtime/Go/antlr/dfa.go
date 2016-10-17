@@ -75,7 +75,7 @@ func (d *DFA) setPrecedenceDfa(precedenceDfa bool) {
 		d.states = make(map[string]*DFAState)
 
 		if precedenceDfa {
-			var precedenceState = NewDFAState(-1, NewBaseATNConfigSet(false))
+			precedenceState := NewDFAState(-1, NewBaseATNConfigSet(false))
 
 			precedenceState.edges = make([]*DFAState, 0)
 			precedenceState.isAcceptState = false
@@ -101,7 +101,7 @@ func (d DFAStateList) Swap(i, j int)      { d[i], d[j] = d[j], d[i] }
 
 // sortedStates returns the states in d sorted by their state number.
 func (d *DFA) sortedStates() []*DFAState {
-	var vs = make([]*DFAState, 0, len(d.states))
+	vs := make([]*DFAState, 0, len(d.states))
 
 	for _, v := range d.states {
 		vs = append(vs, v)

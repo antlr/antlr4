@@ -28,7 +28,7 @@ func SemanticContextandContext(a, b SemanticContext) SemanticContext {
 	if b == nil || b == SemanticContextNone {
 		return a
 	}
-	var result = NewAND(a, b)
+	result := NewAND(a, b)
 	if len(result.opnds) == 1 {
 		return result.opnds[0]
 	}
@@ -46,7 +46,7 @@ func SemanticContextorContext(a, b SemanticContext) SemanticContext {
 	if a == SemanticContextNone || b == SemanticContextNone {
 		return SemanticContextNone
 	}
-	var result = NewOR(a, b)
+	result := NewOR(a, b)
 	if len(result.opnds) == 1 {
 		return result.opnds[0]
 	}
@@ -156,7 +156,7 @@ func (p *PrecedencePredicate) String() string {
 }
 
 func PrecedencePredicatefilterPrecedencePredicates(set *Set) []*PrecedencePredicate {
-	var result = make([]*PrecedencePredicate, 0)
+	result := make([]*PrecedencePredicate, 0)
 
 	for _, v := range set.values() {
 		if c2, ok := v.(*PrecedencePredicate); ok {
@@ -176,7 +176,7 @@ type AND struct {
 
 func NewAND(a, b SemanticContext) *AND {
 
-	var operands = NewSet(nil, nil)
+	operands := NewSet(nil, nil)
 	if aa, ok := a.(*AND); ok {
 		for _, o := range aa.opnds {
 			operands.add(o)
@@ -192,7 +192,7 @@ func NewAND(a, b SemanticContext) *AND {
 	} else {
 		operands.add(b)
 	}
-	var precedencePredicates = PrecedencePredicatefilterPrecedencePredicates(operands)
+	precedencePredicates := PrecedencePredicatefilterPrecedencePredicates(operands)
 	if len(precedencePredicates) > 0 {
 		// interested in the transition with the lowest precedence
 		var reduced *PrecedencePredicate
@@ -254,12 +254,12 @@ func (a *AND) evaluate(parser Recognizer, outerContext RuleContext) bool {
 }
 
 func (a *AND) evalPrecedence(parser Recognizer, outerContext RuleContext) SemanticContext {
-	var differs = false
-	var operands = make([]SemanticContext, 0)
+	differs := false
+	operands := make([]SemanticContext, 0)
 
 	for i := 0; i < len(a.opnds); i++ {
-		var context = a.opnds[i]
-		var evaluated = context.evalPrecedence(parser, outerContext)
+		context := a.opnds[i]
+		evaluated := context.evalPrecedence(parser, outerContext)
 		differs = differs || (evaluated != context)
 		if evaluated == nil {
 			// The AND context is false if any element is false
@@ -292,7 +292,7 @@ func (a *AND) evalPrecedence(parser Recognizer, outerContext RuleContext) Semant
 }
 
 func (a *AND) String() string {
-	var s = ""
+	s := ""
 
 	for _, o := range a.opnds {
 		s += "&& " + fmt.Sprint(o)
@@ -316,7 +316,7 @@ type OR struct {
 
 func NewOR(a, b SemanticContext) *OR {
 
-	var operands = NewSet(nil, nil)
+	operands := NewSet(nil, nil)
 	if aa, ok := a.(*OR); ok {
 		for _, o := range aa.opnds {
 			operands.add(o)
@@ -332,7 +332,7 @@ func NewOR(a, b SemanticContext) *OR {
 	} else {
 		operands.add(b)
 	}
-	var precedencePredicates = PrecedencePredicatefilterPrecedencePredicates(operands)
+	precedencePredicates := PrecedencePredicatefilterPrecedencePredicates(operands)
 	if len(precedencePredicates) > 0 {
 		// interested in the transition with the lowest precedence
 		var reduced *PrecedencePredicate
@@ -392,11 +392,11 @@ func (o *OR) evaluate(parser Recognizer, outerContext RuleContext) bool {
 }
 
 func (o *OR) evalPrecedence(parser Recognizer, outerContext RuleContext) SemanticContext {
-	var differs = false
-	var operands = make([]SemanticContext, 0)
+	differs := false
+	operands := make([]SemanticContext, 0)
 	for i := 0; i < len(o.opnds); i++ {
-		var context = o.opnds[i]
-		var evaluated = context.evalPrecedence(parser, outerContext)
+		context := o.opnds[i]
+		evaluated := context.evalPrecedence(parser, outerContext)
 		differs = differs || (evaluated != context)
 		if evaluated == SemanticContextNone {
 			// The OR context is true if any element is true
@@ -427,7 +427,7 @@ func (o *OR) evalPrecedence(parser Recognizer, outerContext RuleContext) Semanti
 }
 
 func (o *OR) String() string {
-	var s = ""
+	s := ""
 
 	for _, o := range o.opnds {
 		s += "|| " + fmt.Sprint(o)

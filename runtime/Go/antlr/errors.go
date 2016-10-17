@@ -29,7 +29,7 @@ func NewBaseRecognitionException(message string, recognizer Recognizer, input In
 	//	if (!!Error.captureStackTrace) {
 	//        Error.captureStackTrace(this, RecognitionException)
 	//	} else {
-	//		var stack = NewError().stack
+	//		stack := NewError().stack
 	//	}
 	// TODO may be able to use - "runtime" func Stack(buf []byte, all bool) int
 
@@ -112,7 +112,7 @@ func NewLexerNoViableAltException(lexer Lexer, input CharStream, startIndex int,
 }
 
 func (l *LexerNoViableAltException) String() string {
-	var symbol = ""
+	symbol := ""
 	if l.startIndex >= 0 && l.startIndex < l.input.Size() {
 		symbol = l.input.(CharStream).GetTextFromInterval(NewInterval(l.startIndex, l.startIndex))
 	}
@@ -204,8 +204,8 @@ func NewFailedPredicateException(recognizer Parser, predicate string, message st
 
 	f.BaseRecognitionException = NewBaseRecognitionException(f.formatMessage(predicate, message), recognizer, recognizer.GetInputStream(), recognizer.GetParserRuleContext())
 
-	var s = recognizer.GetInterpreter().atn.states[recognizer.GetState()]
-	var trans = s.GetTransitions()[0]
+	s := recognizer.GetInterpreter().atn.states[recognizer.GetState()]
+	trans := s.GetTransitions()[0]
 	if trans2, ok := trans.(*PredicateTransition); ok {
 		f.ruleIndex = trans2.ruleIndex
 		f.predicateIndex = trans2.predIndex

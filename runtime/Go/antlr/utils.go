@@ -119,8 +119,8 @@ func (s *Set) length() int {
 
 func (s *Set) add(value interface{}) interface{} {
 
-	var hash = s.hashFunction(value)
-	var key = "hash_" + hashCode(hash)
+	hash := s.hashFunction(value)
+	key := "hash_" + hashCode(hash)
 
 	values := s.data[key]
 
@@ -158,7 +158,7 @@ func (s *Set) contains(value interface{}) bool {
 }
 
 func (s *Set) values() []interface{} {
-	var l = make([]interface{}, 0)
+	l := make([]interface{}, 0)
 
 	for key := range s.data {
 		if strings.Index(key, "hash_") == 0 {
@@ -310,7 +310,7 @@ func NewDoubleDict() *DoubleDict {
 }
 
 func (d *DoubleDict) Get(a string, b string) interface{} {
-	var data = d.data[a]
+	data := d.data[a]
 
 	if data == nil {
 		return nil
@@ -320,7 +320,7 @@ func (d *DoubleDict) Get(a string, b string) interface{} {
 }
 
 func (d *DoubleDict) set(a, b string, o interface{}) {
-	var data = d.data[a]
+	data := d.data[a]
 
 	if data == nil {
 		data = make(map[string]interface{})

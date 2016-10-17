@@ -154,7 +154,7 @@ func (d *DefaultErrorStrategy) Recover(recognizer Parser, e RecognitionException
 		d.lastErrorStates = NewIntervalSet()
 	}
 	d.lastErrorStates.addOne(recognizer.GetState())
-	var followSet = d.getErrorRecoverySet(recognizer)
+	followSet := d.getErrorRecoverySet(recognizer)
 	d.consumeUntil(recognizer, followSet)
 }
 
@@ -213,8 +213,8 @@ func (d *DefaultErrorStrategy) Sync(recognizer Parser) {
 		fmt.Println("STATE" + strconv.Itoa(recognizer.GetState()))
 	}
 
-	var s = recognizer.GetInterpreter().atn.states[recognizer.GetState()]
-	var la = recognizer.GetTokenStream().LA(1)
+	s := recognizer.GetInterpreter().atn.states[recognizer.GetState()]
+	la := recognizer.GetTokenStream().LA(1)
 
 	if PortDebug {
 		fmt.Println("LA" + strconv.Itoa(la))
@@ -249,9 +249,9 @@ func (d *DefaultErrorStrategy) Sync(recognizer Parser) {
 		panic(NewInputMisMatchException(recognizer))
 	case ATNStatePlusLoopBack, ATNStateStarLoopBack:
 		d.ReportUnwantedToken(recognizer)
-		var expecting = NewIntervalSet()
+		expecting := NewIntervalSet()
 		expecting.addSet(recognizer.GetExpectedTokens())
-		var whatFollowsLoopIterationOrRule = expecting.addSet(d.getErrorRecoverySet(recognizer))
+		whatFollowsLoopIterationOrRule := expecting.addSet(d.getErrorRecoverySet(recognizer))
 		d.consumeUntil(recognizer, whatFollowsLoopIterationOrRule)
 	default:
 		// do nothing if we can't identify the exact kind of ATN state
@@ -267,7 +267,7 @@ func (d *DefaultErrorStrategy) Sync(recognizer Parser) {
 // @param e the recognition exception
 //
 func (d *DefaultErrorStrategy) ReportNoViableAlternative(recognizer Parser, e *NoViableAltException) {
-	var tokens = recognizer.GetTokenStream()
+	tokens := recognizer.GetTokenStream()
 	var input string
 	if tokens != nil {
 		if e.startToken.GetTokenType() == TokenEOF {
@@ -278,7 +278,7 @@ func (d *DefaultErrorStrategy) ReportNoViableAlternative(recognizer Parser, e *N
 	} else {
 		input = "<unknown input>"
 	}
-	var msg = "no viable alternative at input " + d.escapeWSAndQuote(input)
+	msg := "no viable alternative at input " + d.escapeWSAndQuote(input)
 	recognizer.NotifyErrorListeners(msg, e.offendingToken, e)
 }
 
@@ -292,7 +292,7 @@ func (d *DefaultErrorStrategy) ReportNoViableAlternative(recognizer Parser, e *N
 // @param e the recognition exception
 //
 func (this *DefaultErrorStrategy) ReportInputMisMatch(recognizer Parser, e *InputMisMatchException) {
-	var msg = "mismatched input " + this.GetTokenErrorDisplay(e.offendingToken) +
+	msg := "mismatched input " + this.GetTokenErrorDisplay(e.offendingToken) +
 		" expecting " + e.getExpectedTokens().StringVerbose(recognizer.GetLiteralNames(), recognizer.GetSymbolicNames(), false)
 	recognizer.NotifyErrorListeners(msg, e.offendingToken, e)
 }
@@ -307,8 +307,8 @@ func (this *DefaultErrorStrategy) ReportInputMisMatch(recognizer Parser, e *Inpu
 // @param e the recognition exception
 //
 func (d *DefaultErrorStrategy) ReportFailedPredicate(recognizer Parser, e *FailedPredicateException) {
-	var ruleName = recognizer.GetRuleNames()[recognizer.GetParserRuleContext().GetRuleIndex()]
-	var msg = "rule " + ruleName + " " + e.message
+	ruleName := recognizer.GetRuleNames()[recognizer.GetParserRuleContext().GetRuleIndex()]
+	msg := "rule " + ruleName + " " + e.message
 	recognizer.NotifyErrorListeners(msg, e.offendingToken, e)
 }
 
@@ -334,10 +334,10 @@ func (d *DefaultErrorStrategy) ReportUnwantedToken(recognizer Parser) {
 		return
 	}
 	d.beginErrorCondition(recognizer)
-	var t = recognizer.GetCurrentToken()
-	var tokenName = d.GetTokenErrorDisplay(t)
-	var expecting = d.GetExpectedTokens(recognizer)
-	var msg = "extraneous input " + tokenName + " expecting " +
+	t := recognizer.GetCurrentToken()
+	tokenName := d.GetTokenErrorDisplay(t)
+	expecting := d.GetExpectedTokens(recognizer)
+	msg := "extraneous input " + tokenName + " expecting " +
 		expecting.StringVerbose(recognizer.GetLiteralNames(), recognizer.GetSymbolicNames(), false)
 	recognizer.NotifyErrorListeners(msg, t, nil)
 }
@@ -363,9 +363,9 @@ func (d *DefaultErrorStrategy) ReportMissingToken(recognizer Parser) {
 		return
 	}
 	d.beginErrorCondition(recognizer)
-	var t = recognizer.GetCurrentToken()
-	var expecting = d.GetExpectedTokens(recognizer)
-	var msg = "missing " + expecting.StringVerbose(recognizer.GetLiteralNames(), recognizer.GetSymbolicNames(), false) +
+	t := recognizer.GetCurrentToken()
+	expecting := d.GetExpectedTokens(recognizer)
+	msg := "missing " + expecting.StringVerbose(recognizer.GetLiteralNames(), recognizer.GetSymbolicNames(), false) +
 		" at " + d.GetTokenErrorDisplay(t)
 	recognizer.NotifyErrorListeners(msg, t, nil)
 }
@@ -421,7 +421,7 @@ func (d *DefaultErrorStrategy) ReportMissingToken(recognizer Parser) {
 //
 func (d *DefaultErrorStrategy) RecoverInline(recognizer Parser) Token {
 	// SINGLE TOKEN DELETION
-	var MatchedSymbol = d.SingleTokenDeletion(recognizer)
+	MatchedSymbol := d.SingleTokenDeletion(recognizer)
 	if MatchedSymbol != nil {
 		// we have deleted the extra token.
 		// now, move past ttype token as if all were ok
@@ -454,14 +454,14 @@ func (d *DefaultErrorStrategy) RecoverInline(recognizer Parser) Token {
 // strategy for the current mismatched input, otherwise {@code false}
 //
 func (d *DefaultErrorStrategy) SingleTokenInsertion(recognizer Parser) bool {
-	var currentSymbolType = recognizer.GetTokenStream().LA(1)
+	currentSymbolType := recognizer.GetTokenStream().LA(1)
 	// if current token is consistent with what could come after current
 	// ATN state, then we know we're missing a token error recovery
 	// is free to conjure up and insert the missing token
-	var atn = recognizer.GetInterpreter().atn
-	var currentState = atn.states[recognizer.GetState()]
-	var next = currentState.GetTransitions()[0].getTarget()
-	var expectingAtLL2 = atn.NextTokens(next, recognizer.GetParserRuleContext())
+	atn := recognizer.GetInterpreter().atn
+	currentState := atn.states[recognizer.GetState()]
+	next := currentState.GetTransitions()[0].getTarget()
+	expectingAtLL2 := atn.NextTokens(next, recognizer.GetParserRuleContext())
 	if expectingAtLL2.contains(currentSymbolType) {
 		d.ReportMissingToken(recognizer)
 		return true
@@ -489,8 +489,8 @@ func (d *DefaultErrorStrategy) SingleTokenInsertion(recognizer Parser) bool {
 // {@code nil}
 //
 func (d *DefaultErrorStrategy) SingleTokenDeletion(recognizer Parser) Token {
-	var NextTokenType = recognizer.GetTokenStream().LA(2)
-	var expecting = d.GetExpectedTokens(recognizer)
+	NextTokenType := recognizer.GetTokenStream().LA(2)
+	expecting := d.GetExpectedTokens(recognizer)
 	if expecting.contains(NextTokenType) {
 		d.ReportUnwantedToken(recognizer)
 		// print("recoverFromMisMatchedToken deleting " \
@@ -499,7 +499,7 @@ func (d *DefaultErrorStrategy) SingleTokenDeletion(recognizer Parser) Token {
 		// + " is what we want", file=sys.stderr)
 		recognizer.Consume() // simply delete extra token
 		// we want to return the token we're actually Matching
-		var MatchedSymbol = recognizer.GetCurrentToken()
+		MatchedSymbol := recognizer.GetCurrentToken()
 		d.ReportMatch(recognizer) // we know current token is correct
 		return MatchedSymbol
 	}
@@ -527,9 +527,9 @@ func (d *DefaultErrorStrategy) SingleTokenDeletion(recognizer Parser) Token {
 // override d method to create the appropriate tokens.
 //
 func (d *DefaultErrorStrategy) GetMissingSymbol(recognizer Parser) Token {
-	var currentSymbol = recognizer.GetCurrentToken()
-	var expecting = d.GetExpectedTokens(recognizer)
-	var expectedTokenType = expecting.first()
+	currentSymbol := recognizer.GetCurrentToken()
+	expecting := d.GetExpectedTokens(recognizer)
+	expectedTokenType := expecting.first()
 	var tokenText string
 
 	if expectedTokenType == TokenEOF {
@@ -542,8 +542,8 @@ func (d *DefaultErrorStrategy) GetMissingSymbol(recognizer Parser) Token {
 			tokenText = "<missing undefined>" // TODO matches the JS impl
 		}
 	}
-	var current = currentSymbol
-	var lookback = recognizer.GetTokenStream().LT(-1)
+	current := currentSymbol
+	lookback := recognizer.GetTokenStream().LT(-1)
 	if current.GetTokenType() == TokenEOF && lookback != nil {
 		current = lookback
 	}
@@ -572,7 +572,7 @@ func (d *DefaultErrorStrategy) GetTokenErrorDisplay(t Token) string {
 	if t == nil {
 		return "<no token>"
 	}
-	var s = t.GetText()
+	s := t.GetText()
 	if s == "" {
 		if t.GetTokenType() == TokenEOF {
 			s = "<EOF>"
@@ -683,14 +683,14 @@ func (d *DefaultErrorStrategy) escapeWSAndQuote(s string) string {
 // at run-time upon error to avoid overhead during parsing.
 //
 func (d *DefaultErrorStrategy) getErrorRecoverySet(recognizer Parser) *IntervalSet {
-	var atn = recognizer.GetInterpreter().atn
-	var ctx = recognizer.GetParserRuleContext()
-	var recoverSet = NewIntervalSet()
+	atn := recognizer.GetInterpreter().atn
+	ctx := recognizer.GetParserRuleContext()
+	recoverSet := NewIntervalSet()
 	for ctx != nil && ctx.GetInvokingState() >= 0 {
 		// compute what follows who invoked us
-		var invokingState = atn.states[ctx.GetInvokingState()]
-		var rt = invokingState.GetTransitions()[0]
-		var follow = atn.NextTokens(rt.(*RuleTransition).followState, nil)
+		invokingState := atn.states[ctx.GetInvokingState()]
+		rt := invokingState.GetTransitions()[0]
+		follow := atn.NextTokens(rt.(*RuleTransition).followState, nil)
 		recoverSet.addSet(follow)
 		ctx = ctx.GetParent().(ParserRuleContext)
 	}
@@ -700,7 +700,7 @@ func (d *DefaultErrorStrategy) getErrorRecoverySet(recognizer Parser) *IntervalS
 
 // Consume tokens until one Matches the given token set.//
 func (d *DefaultErrorStrategy) consumeUntil(recognizer Parser, set *IntervalSet) {
-	var ttype = recognizer.GetTokenStream().LA(1)
+	ttype := recognizer.GetTokenStream().LA(1)
 	for ttype != TokenEOF && !set.contains(ttype) {
 		recognizer.Consume()
 		ttype = recognizer.GetTokenStream().LA(1)
@@ -756,7 +756,7 @@ func NewBailErrorStrategy() *BailErrorStrategy {
 // original {@link RecognitionException}.
 //
 func (b *BailErrorStrategy) Recover(recognizer Parser, e RecognitionException) {
-	var context = recognizer.GetParserRuleContext()
+	context := recognizer.GetParserRuleContext()
 	for context != nil {
 		context.SetException(e)
 		context = context.GetParent().(ParserRuleContext)

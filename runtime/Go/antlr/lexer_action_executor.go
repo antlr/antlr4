@@ -57,9 +57,9 @@ func LexerActionExecutorappend(lexerActionExecutor *LexerActionExecutor, lexerAc
 		return NewLexerActionExecutor([]LexerAction{lexerAction})
 	}
 
-	var lexerActions = append(lexerActionExecutor.lexerActions, lexerAction)
+	lexerActions := append(lexerActionExecutor.lexerActions, lexerAction)
 
-	//	var lexerActions = lexerActionExecutor.lexerActions.concat([ lexerAction ])
+	//	lexerActions := lexerActionExecutor.lexerActions.concat([ lexerAction ])
 	return NewLexerActionExecutor(lexerActions)
 }
 
@@ -137,8 +137,8 @@ func (l *LexerActionExecutor) execute(lexer Lexer, input CharStream, startIndex 
 		fmt.Println("execute")
 		fmt.Println("len(lexerActions)", len(l.lexerActions))
 	}
-	var requiresSeek = false
-	var stopIndex = input.Index()
+	requiresSeek := false
+	stopIndex := input.Index()
 
 	defer func() {
 		if requiresSeek {
@@ -147,12 +147,12 @@ func (l *LexerActionExecutor) execute(lexer Lexer, input CharStream, startIndex 
 	}()
 
 	for i := 0; i < len(l.lexerActions); i++ {
-		var lexerAction = l.lexerActions[i]
+		lexerAction := l.lexerActions[i]
 		if la, ok := lexerAction.(*LexerIndexedCustomAction); ok {
 			if PortDebug {
 				fmt.Printf("LexerIndexedCustomAction")
 			}
-			var offset = la.offset
+			offset := la.offset
 			input.Seek(startIndex + offset)
 			lexerAction = la.lexerAction
 			requiresSeek = (startIndex + offset) != stopIndex

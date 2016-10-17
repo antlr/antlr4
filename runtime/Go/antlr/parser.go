@@ -136,7 +136,7 @@ func (p *BaseParser) Match(ttype int) Token {
 	if PortDebug {
 		fmt.Println("get current token")
 	}
-	var t = p.GetCurrentToken()
+	t := p.GetCurrentToken()
 
 	if PortDebug {
 		fmt.Println("TOKEN IS " + t.GetText())
@@ -179,7 +179,7 @@ func (p *BaseParser) Match(ttype int) Token {
 // symbol
 
 func (p *BaseParser) MatchWildcard() Token {
-	var t = p.GetCurrentToken()
+	t := p.GetCurrentToken()
 	if t.GetTokenType() > 0 {
 		p.errHandler.ReportMatch(p)
 		p.Consume()
@@ -288,7 +288,7 @@ func (p *BaseParser) removeParseListeners() {
 // Notify any parse listeners of an enter rule event.
 func (p *BaseParser) TriggerEnterRuleEvent() {
 	if p.parseListeners != nil {
-		var ctx = p.ctx
+		ctx := p.ctx
 		for _, listener := range p.parseListeners {
 			listener.EnterEveryRule(ctx)
 			ctx.EnterRule(listener)
@@ -343,13 +343,13 @@ func (p *BaseParser) GetATNWithBypassAlts() {
 	// TODO
 	panic("Not implemented!")
 
-	//	var serializedAtn = p.getSerializedATN()
+	//	serializedAtn := p.getSerializedATN()
 	//	if (serializedAtn == nil) {
 	//		panic("The current parser does not support an ATN with bypass alternatives.")
 	//	}
-	//	var result = p.bypassAltsAtnCache[serializedAtn]
+	//	result := p.bypassAltsAtnCache[serializedAtn]
 	//	if (result == nil) {
-	//		var deserializationOptions = NewATNDeserializationOptions(nil)
+	//		deserializationOptions := NewATNDeserializationOptions(nil)
 	//		deserializationOptions.generateRuleBypassTransitions = true
 	//		result = NewATNDeserializer(deserializationOptions).deserialize(serializedAtn)
 	//		p.bypassAltsAtnCache[serializedAtn] = result
@@ -374,7 +374,7 @@ func (p *BaseParser) compileParseTreePattern(pattern, patternRuleIndex, lexer Le
 	//
 	//	if (lexer == nil) {
 	//		if (p.GetTokenStream() != nil) {
-	//			var tokenSource = p.GetTokenStream().GetTokenSource()
+	//			tokenSource := p.GetTokenStream().GetTokenSource()
 	//			if _, ok := tokenSource.(ILexer); ok {
 	//				lexer = tokenSource
 	//			}
@@ -384,7 +384,7 @@ func (p *BaseParser) compileParseTreePattern(pattern, patternRuleIndex, lexer Le
 	//		panic("Parser can't discover a lexer to use")
 	//	}
 
-	//	var m = NewParseTreePatternMatcher(lexer, p)
+	//	m := NewParseTreePatternMatcher(lexer, p)
 	//	return m.compile(pattern, patternRuleIndex)
 }
 
@@ -419,14 +419,14 @@ func (p *BaseParser) NotifyErrorListeners(msg string, offendingToken Token, err 
 		offendingToken = p.GetCurrentToken()
 	}
 	p._SyntaxErrors++
-	var line = offendingToken.GetLine()
-	var column = offendingToken.GetColumn()
+	line := offendingToken.GetLine()
+	column := offendingToken.GetColumn()
 	listener := p.GetErrorListenerDispatch()
 	listener.SyntaxError(p, offendingToken, line, column, msg, err)
 }
 
 func (p *BaseParser) Consume() Token {
-	var o = p.GetCurrentToken()
+	o := p.GetCurrentToken()
 	if o.GetTokenType() != TokenEOF {
 		if PortDebug {
 			fmt.Println("Consuming")
@@ -436,10 +436,10 @@ func (p *BaseParser) Consume() Token {
 			fmt.Println("Done consuming")
 		}
 	}
-	var hasListener = p.parseListeners != nil && len(p.parseListeners) > 0
+	hasListener := p.parseListeners != nil && len(p.parseListeners) > 0
 	if p.BuildParseTrees || hasListener {
 		if p.errHandler.inErrorRecoveryMode(p) {
-			var node = p.ctx.AddErrorNode(o)
+			node := p.ctx.AddErrorNode(o)
 			if p.parseListeners != nil {
 				for _, l := range p.parseListeners {
 					l.VisitErrorNode(node)
@@ -534,7 +534,7 @@ func (p *BaseParser) EnterRecursionRule(localctx ParserRuleContext, state, ruleI
 // Like {@link //EnterRule} but for recursive rules.
 
 func (p *BaseParser) PushNewRecursionContext(localctx ParserRuleContext, state, ruleIndex int) {
-	var previous = p.ctx
+	previous := p.ctx
 	previous.SetParent(localctx)
 	previous.SetInvokingState(state)
 	previous.SetStop(p.input.LT(-1))
@@ -553,7 +553,7 @@ func (p *BaseParser) PushNewRecursionContext(localctx ParserRuleContext, state, 
 func (p *BaseParser) UnrollRecursionContexts(parentCtx ParserRuleContext) {
 	p.precedenceStack.Pop()
 	p.ctx.SetStop(p.input.LT(-1))
-	var retCtx = p.ctx // save current ctx (return value)
+	retCtx := p.ctx // save current ctx (return value)
 	// unroll so ctx is as it was before call to recursive method
 	if p.parseListeners != nil {
 		for p.ctx != parentCtx {
@@ -572,7 +572,7 @@ func (p *BaseParser) UnrollRecursionContexts(parentCtx ParserRuleContext) {
 }
 
 func (p *BaseParser) GetInvokingContext(ruleIndex int) ParserRuleContext {
-	var ctx = p.ctx
+	ctx := p.ctx
 	for ctx != nil {
 		if ctx.GetRuleIndex() == ruleIndex {
 			return ctx
@@ -606,10 +606,10 @@ func (p *BaseParser) inContext(context ParserRuleContext) bool {
 // the ATN, otherwise {@code false}.
 
 func (p *BaseParser) IsExpectedToken(symbol int) bool {
-	var atn = p.Interpreter.atn
-	var ctx = p.ctx
-	var s = atn.states[p.state]
-	var following = atn.NextTokens(s, nil)
+	atn := p.Interpreter.atn
+	ctx := p.ctx
+	s := atn.states[p.state]
+	following := atn.NextTokens(s, nil)
 	if following.contains(symbol) {
 		return true
 	}
@@ -617,8 +617,8 @@ func (p *BaseParser) IsExpectedToken(symbol int) bool {
 		return false
 	}
 	for ctx != nil && ctx.GetInvokingState() >= 0 && following.contains(TokenEpsilon) {
-		var invokingState = atn.states[ctx.GetInvokingState()]
-		var rt = invokingState.GetTransitions()[0]
+		invokingState := atn.states[ctx.GetInvokingState()]
+		rt := invokingState.GetTransitions()[0]
 		following = atn.NextTokens(rt.(*RuleTransition).followState, nil)
 		if following.contains(symbol) {
 			return true
@@ -643,8 +643,8 @@ func (p *BaseParser) GetExpectedTokens() *IntervalSet {
 }
 
 func (p *BaseParser) GetExpectedTokensWithinCurrentRule() *IntervalSet {
-	var atn = p.Interpreter.atn
-	var s = atn.states[p.state]
+	atn := p.Interpreter.atn
+	s := atn.states[p.state]
 	return atn.NextTokens(s, nil)
 }
 
@@ -669,10 +669,10 @@ func (p *BaseParser) GetRuleInvocationStack(c ParserRuleContext) []string {
 	if c == nil {
 		c = p.ctx
 	}
-	var stack = make([]string, 0)
+	stack := make([]string, 0)
 	for c != nil {
 		// compute what follows who invoked us
-		var ruleIndex = c.GetRuleIndex()
+		ruleIndex := c.GetRuleIndex()
 		if ruleIndex < 0 {
 			stack = append(stack, "n/a")
 		} else {
@@ -697,7 +697,7 @@ func (p *BaseParser) GetDFAStrings() string {
 
 // For debugging and other purposes.//
 func (p *BaseParser) DumpDFA() {
-	var seenOne = false
+	seenOne := false
 	for _, dfa := range p.Interpreter.decisionToDFA {
 		if len(dfa.GetStates()) > 0 {
 			if seenOne {

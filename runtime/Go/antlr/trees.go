@@ -13,14 +13,14 @@ func TreesStringTree(tree Tree, ruleNames []string, recog Recognizer) string {
 		ruleNames = recog.GetRuleNames()
 	}
 
-	var s = TreesGetNodeText(tree, ruleNames, nil)
+	s := TreesGetNodeText(tree, ruleNames, nil)
 
 	s = EscapeWhitespace(s, false)
-	var c = tree.GetChildCount()
+	c := tree.GetChildCount()
 	if c == 0 {
 		return s
 	}
-	var res = "(" + s + " "
+	res := "(" + s + " "
 	if c > 0 {
 		s = TreesStringTree(tree.GetChild(0), ruleNames, nil)
 		res += s
@@ -42,7 +42,7 @@ func TreesGetNodeText(t Tree, ruleNames []string, recog Parser) string {
 		switch t2 := t.(type) {
 		case RuleNode:
 			t3 := t2.GetRuleContext()
-			var altNumber = t3.GetAltNumber()
+			altNumber := t3.GetAltNumber()
 
 			if altNumber != ATNInvalidAltNumber {
 				return fmt.Sprintf("%s:%d", ruleNames[t3.GetRuleIndex()], altNumber)
@@ -58,7 +58,7 @@ func TreesGetNodeText(t Tree, ruleNames []string, recog Parser) string {
 	}
 
 	// no recog for rule names
-	var payload = t.GetPayload()
+	payload := t.GetPayload()
 	if p2, ok := payload.(Token); ok {
 		return p2.GetText()
 	}
@@ -68,7 +68,7 @@ func TreesGetNodeText(t Tree, ruleNames []string, recog Parser) string {
 
 // Return ordered list of all children of this node
 func TreesGetChildren(t Tree) []Tree {
-	var list = make([]Tree, 0)
+	list := make([]Tree, 0)
 	for i := 0; i < t.GetChildCount(); i++ {
 		list = append(list, t.GetChild(i))
 	}
@@ -79,7 +79,7 @@ func TreesGetChildren(t Tree) []Tree {
 //  list is the root and the last is the parent of this node.
 //
 func TreesgetAncestors(t Tree) []Tree {
-	var ancestors = make([]Tree, 0)
+	ancestors := make([]Tree, 0)
 	t = t.GetParent()
 	for t != nil {
 		f := []Tree{t}
@@ -98,7 +98,7 @@ func TreesfindAllRuleNodes(t ParseTree, ruleIndex int) []ParseTree {
 }
 
 func TreesfindAllNodes(t ParseTree, index int, findTokens bool) []ParseTree {
-	var nodes = make([]ParseTree, 0)
+	nodes := make([]ParseTree, 0)
 	TreesFindAllNodes(t, index, findTokens, nodes)
 	return nodes
 }
@@ -125,7 +125,7 @@ func TreesFindAllNodes(t ParseTree, index int, findTokens bool, nodes []ParseTre
 }
 
 func TreesDescendants(t ParseTree) []ParseTree {
-	var nodes = []ParseTree{t}
+	nodes := []ParseTree{t}
 	for i := 0; i < t.GetChildCount(); i++ {
 		nodes = append(nodes, TreesDescendants(t.GetChild(i).(ParseTree))...)
 	}

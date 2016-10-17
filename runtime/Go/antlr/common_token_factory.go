@@ -36,7 +36,7 @@ func (c *CommonTokenFactory) Create(source *TokenSourceCharStreamPair, ttype int
 		fmt.Println("Token factory creating: " + text)
 	}
 
-	var t = NewCommonToken(source, ttype, channel, start, stop)
+	t := NewCommonToken(source, ttype, channel, start, stop)
 
 	t.line = line
 	t.column = column
@@ -55,7 +55,7 @@ func (c *CommonTokenFactory) createThin(ttype int, text string) Token {
 		fmt.Println("Token factory creating: " + text)
 	}
 
-	var t = NewCommonToken(nil, ttype, TokenDefaultChannel, -1, -1)
+	t := NewCommonToken(nil, ttype, TokenDefaultChannel, -1, -1)
 
 	t.SetText(text)
 

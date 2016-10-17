@@ -5,6 +5,23 @@ import (
 	"strconv"
 )
 
+// Represents {@code $} in local context prediction, which means wildcard.
+// {@code//+x =//}.
+// /
+const (
+	BasePredictionContextEmptyReturnState = 0x7FFFFFFF
+)
+
+// Represents {@code $} in an array in full context mode, when {@code $}
+// doesn't mean wildcard: {@code $ + x = [$,x]}. Here,
+// {@code $} = {@link //EmptyReturnState}.
+// /
+
+var (
+	BasePredictionContextglobalNodeCount = 1
+	BasePredictionContextid = BasePredictionContextglobalNodeCount
+)
+
 type PredictionContext interface {
 	Hash() string
 	GetParent(int) PredictionContext
@@ -21,27 +38,11 @@ type BasePredictionContext struct {
 }
 
 func NewBasePredictionContext(cachedHashString string) *BasePredictionContext {
-
 	pc := new(BasePredictionContext)
 	pc.cachedHashString = cachedHashString
 
 	return pc
 }
-
-// Represents {@code $} in local context prediction, which means wildcard.
-// {@code//+x =//}.
-// /
-const (
-	BasePredictionContextEmptyReturnState = 0x7FFFFFFF
-)
-
-// Represents {@code $} in an array in full context mode, when {@code $}
-// doesn't mean wildcard: {@code $ + x = [$,x]}. Here,
-// {@code $} = {@link //EmptyReturnState}.
-// /
-
-var BasePredictionContextglobalNodeCount = 1
-var BasePredictionContextid = BasePredictionContextglobalNodeCount
 
 // Stores the computed hash code of this {@link BasePredictionContext}. The hash
 // code is computed in parts to Match the following reference algorithm.
@@ -106,7 +107,7 @@ func (p *PredictionContextCache) add(ctx PredictionContext) PredictionContext {
 	if ctx == BasePredictionContextEMPTY {
 		return BasePredictionContextEMPTY
 	}
-	var existing = p.cache[ctx]
+	existing := p.cache[ctx]
 	if existing != nil {
 		return existing
 	}
@@ -322,7 +323,7 @@ func (a *ArrayPredictionContext) String() string {
 		return "[]"
 	}
 
-	var s = "["
+	s := "["
 	for i := 0; i < len(a.returnStates); i++ {
 		if i > 0 {
 			s = s + ", "
@@ -355,15 +356,15 @@ func predictionContextFromRuleContext(a *ATN, outerContext RuleContext) Predicti
 		return BasePredictionContextEMPTY
 	}
 	// If we have a parent, convert it to a BasePredictionContext graph
-	var parent = predictionContextFromRuleContext(a, outerContext.GetParent().(RuleContext))
-	var state = a.states[outerContext.GetInvokingState()]
-	var transition = state.GetTransitions()[0]
+	parent := predictionContextFromRuleContext(a, outerContext.GetParent().(RuleContext))
+	state := a.states[outerContext.GetInvokingState()]
+	transition := state.GetTransitions()[0]
 
 	return SingletonBasePredictionContextCreate(parent, transition.(*RuleTransition).followState.GetStateNumber())
 }
 
 func calculateListsHashString(parents []BasePredictionContext, returnStates []int) string {
-	var s = ""
+	s := ""
 
 	for _, p := range parents {
 		s += fmt.Sprint(p)
@@ -441,7 +442,7 @@ func merge(a, b PredictionContext, rootIsWildcard bool, mergeCache *DoubleDict) 
 // /
 func mergeSingletons(a, b *BaseSingletonPredictionContext, rootIsWildcard bool, mergeCache *DoubleDict) PredictionContext {
 	if mergeCache != nil {
-		var previous = mergeCache.Get(a.Hash(), b.Hash())
+		previous := mergeCache.Get(a.Hash(), b.Hash())
 		if previous != nil {
 			return previous.(PredictionContext)
 		}
@@ -451,7 +452,7 @@ func mergeSingletons(a, b *BaseSingletonPredictionContext, rootIsWildcard bool, 
 		}
 	}
 
-	var rootMerge = mergeRoot(a, b, rootIsWildcard)
+	rootMerge := mergeRoot(a, b, rootIsWildcard)
 	if rootMerge != nil {
 		if mergeCache != nil {
 			mergeCache.set(a.Hash(), b.Hash(), rootMerge)
@@ -459,7 +460,7 @@ func mergeSingletons(a, b *BaseSingletonPredictionContext, rootIsWildcard bool, 
 		return rootMerge
 	}
 	if a.returnState == b.returnState {
-		var parent = merge(a.parentCtx, b.parentCtx, rootIsWildcard, mergeCache)
+		parent := merge(a.parentCtx, b.parentCtx, rootIsWildcard, mergeCache)
 		// if parent is same as existing a or b parent or reduced to a parent,
 		// return it
 		if parent == a.parentCtx {
@@ -472,7 +473,7 @@ func mergeSingletons(a, b *BaseSingletonPredictionContext, rootIsWildcard bool, 
 		// merge parents x and y, giving array node with x,y then remainders
 		// of those graphs. dup a, a' points at merged array
 		// Newjoined parent so create Newsingleton pointing to it, a'
-		var spc = SingletonBasePredictionContextCreate(parent, a.returnState)
+		spc := SingletonBasePredictionContextCreate(parent, a.returnState)
 		if mergeCache != nil {
 			mergeCache.set(a.Hash(), b.Hash(), spc)
 		}
@@ -488,13 +489,13 @@ func mergeSingletons(a, b *BaseSingletonPredictionContext, rootIsWildcard bool, 
 	}
 	if singleParent != nil { // parents are same
 		// sort payloads and use same parent
-		var payloads = []int{a.returnState, b.returnState}
+		payloads := []int{a.returnState, b.returnState}
 		if a.returnState > b.returnState {
 			payloads[0] = b.returnState
 			payloads[1] = a.returnState
 		}
-		var parents = []PredictionContext{singleParent, singleParent}
-		var apc = NewArrayPredictionContext(parents, payloads)
+		parents := []PredictionContext{singleParent, singleParent}
+		apc := NewArrayPredictionContext(parents, payloads)
 		if mergeCache != nil {
 			mergeCache.set(a.Hash(), b.Hash(), apc)
 		}
@@ -503,14 +504,14 @@ func mergeSingletons(a, b *BaseSingletonPredictionContext, rootIsWildcard bool, 
 	// parents differ and can't merge them. Just pack together
 	// into array can't merge.
 	// ax + by = [ax,by]
-	var payloads = []int{a.returnState, b.returnState}
-	var parents = []PredictionContext{a.parentCtx, b.parentCtx}
+	payloads := []int{a.returnState, b.returnState}
+	parents := []PredictionContext{a.parentCtx, b.parentCtx}
 	if a.returnState > b.returnState { // sort by payload
 		payloads[0] = b.returnState
 		payloads[1] = a.returnState
 		parents = []PredictionContext{b.parentCtx, a.parentCtx}
 	}
-	var apc = NewArrayPredictionContext(parents, payloads)
+	apc := NewArrayPredictionContext(parents, payloads)
 	if mergeCache != nil {
 		mergeCache.set(a.Hash(), b.Hash(), apc)
 	}
@@ -567,12 +568,12 @@ func mergeRoot(a, b SingletonPredictionContext, rootIsWildcard bool) PredictionC
 		if a == BasePredictionContextEMPTY && b == BasePredictionContextEMPTY {
 			return BasePredictionContextEMPTY // $ + $ = $
 		} else if a == BasePredictionContextEMPTY { // $ + x = [$,x]
-			var payloads = []int{b.getReturnState(-1), BasePredictionContextEmptyReturnState}
-			var parents = []PredictionContext{b.GetParent(-1), nil}
+			payloads := []int{b.getReturnState(-1), BasePredictionContextEmptyReturnState}
+			parents := []PredictionContext{b.GetParent(-1), nil}
 			return NewArrayPredictionContext(parents, payloads)
 		} else if b == BasePredictionContextEMPTY { // x + $ = [$,x] ($ is always first if present)
-			var payloads = []int{a.getReturnState(-1), BasePredictionContextEmptyReturnState}
-			var parents = []PredictionContext{a.GetParent(-1), nil}
+			payloads := []int{a.getReturnState(-1), BasePredictionContextEmptyReturnState}
+			parents := []PredictionContext{a.GetParent(-1), nil}
 			return NewArrayPredictionContext(parents, payloads)
 		}
 	}
@@ -601,7 +602,7 @@ func mergeRoot(a, b SingletonPredictionContext, rootIsWildcard bool) PredictionC
 // /
 func mergeArrays(a, b *ArrayPredictionContext, rootIsWildcard bool, mergeCache *DoubleDict) PredictionContext {
 	if mergeCache != nil {
-		var previous = mergeCache.Get(a.Hash(), b.Hash())
+		previous := mergeCache.Get(a.Hash(), b.Hash())
 		if previous != nil {
 			return previous.(PredictionContext)
 		}
@@ -611,29 +612,29 @@ func mergeArrays(a, b *ArrayPredictionContext, rootIsWildcard bool, mergeCache *
 		}
 	}
 	// merge sorted payloads a + b => M
-	var i = 0 // walks a
-	var j = 0 // walks b
-	var k = 0 // walks target M array
+	i := 0 // walks a
+	j := 0 // walks b
+	k := 0 // walks target M array
 
-	var mergedReturnStates = make([]int, len(a.returnStates) + len(b.returnStates))
-	var mergedParents = make([]PredictionContext, len(a.returnStates) + len(b.returnStates))
+	mergedReturnStates := make([]int, len(a.returnStates) + len(b.returnStates))
+	mergedParents := make([]PredictionContext, len(a.returnStates) + len(b.returnStates))
 	// walk and merge to yield mergedParents, mergedReturnStates
 	for i < len(a.returnStates) && j < len(b.returnStates) {
-		var aParent = a.parents[i]
-		var bParent = b.parents[j]
+		aParent := a.parents[i]
+		bParent := b.parents[j]
 		if a.returnStates[i] == b.returnStates[j] {
 			// same payload (stack tops are equal), must yield merged singleton
-			var payload = a.returnStates[i]
+			payload := a.returnStates[i]
 			// $+$ = $
-			var bothDollars = payload == BasePredictionContextEmptyReturnState && aParent == nil && bParent == nil
-			var axAX = (aParent != nil && bParent != nil && aParent == bParent) // ax+ax
+			bothDollars := payload == BasePredictionContextEmptyReturnState && aParent == nil && bParent == nil
+			axAX := (aParent != nil && bParent != nil && aParent == bParent) // ax+ax
 			// ->
 			// ax
 			if bothDollars || axAX {
 				mergedParents[k] = aParent // choose left
 				mergedReturnStates[k] = payload
 			} else { // ax+ay -> a'[x,y]
-				var mergedParent = merge(aParent, bParent, rootIsWildcard, mergeCache)
+				mergedParent := merge(aParent, bParent, rootIsWildcard, mergeCache)
 				mergedParents[k] = mergedParent
 				mergedReturnStates[k] = payload
 			}
@@ -667,7 +668,7 @@ func mergeArrays(a, b *ArrayPredictionContext, rootIsWildcard bool, mergeCache *
 	// trim merged if we combined a few that had same stack tops
 	if k < len(mergedParents) { // write index < last position trim
 		if k == 1 { // for just one merged element, return singleton top
-			var pc = SingletonBasePredictionContextCreate(mergedParents[0], mergedReturnStates[0])
+			pc := SingletonBasePredictionContextCreate(mergedParents[0], mergedReturnStates[0])
 			if mergeCache != nil {
 				mergeCache.set(a.Hash(), b.Hash(), pc)
 			}
@@ -677,7 +678,7 @@ func mergeArrays(a, b *ArrayPredictionContext, rootIsWildcard bool, mergeCache *
 		mergedReturnStates = mergedReturnStates[0:k]
 	}
 
-	var M = NewArrayPredictionContext(mergedParents, mergedReturnStates)
+	M := NewArrayPredictionContext(mergedParents, mergedReturnStates)
 
 	// if we created same array as a or b, return that instead
 	// TODO: track whether this is possible above during merge sort for speed
@@ -706,10 +707,10 @@ func mergeArrays(a, b *ArrayPredictionContext, rootIsWildcard bool, mergeCache *
 // ones.
 // /
 func combineCommonParents(parents []PredictionContext) {
-	var uniqueParents = make(map[PredictionContext]PredictionContext)
+	uniqueParents := make(map[PredictionContext]PredictionContext)
 
 	for p := 0; p < len(parents); p++ {
-		var parent = parents[p]
+		parent := parents[p]
 		if uniqueParents[parent] == nil {
 			uniqueParents[parent] = parent
 		}
@@ -724,7 +725,7 @@ func getCachedBasePredictionContext(context PredictionContext, contextCache *Pre
 	if context.isEmpty() {
 		return context
 	}
-	var existing = visited[context]
+	existing := visited[context]
 	if existing != nil {
 		return existing
 	}
@@ -733,10 +734,10 @@ func getCachedBasePredictionContext(context PredictionContext, contextCache *Pre
 		visited[context] = existing
 		return existing
 	}
-	var changed = false
-	var parents = make([]PredictionContext, context.length())
+	changed := false
+	parents := make([]PredictionContext, context.length())
 	for i := 0; i < len(parents); i++ {
-		var parent = getCachedBasePredictionContext(context.GetParent(i), contextCache, visited)
+		parent := getCachedBasePredictionContext(context.GetParent(i), contextCache, visited)
 		if changed || parent != context.GetParent(i) {
 			if !changed {
 				parents = make([]PredictionContext, context.length())
@@ -767,24 +768,3 @@ func getCachedBasePredictionContext(context PredictionContext, contextCache *Pre
 
 	return updated
 }
-
-// ter's recursive version of Sam's getAllNodes()
-//func getAllContextNodes(context, nodes, visited) {
-//	if (nodes == nil) {
-//		nodes = []
-//		return getAllContextNodes(context, nodes, visited)
-//	} else if (visited == nil) {
-//		visited = {}
-//		return getAllContextNodes(context, nodes, visited)
-//	} else {
-//		if (context == nil || visited[context] != nil) {
-//			return nodes
-//		}
-//		visited[context] = context
-//		nodes.push(context)
-//		for i := 0; i < len(context); i++ {
-//			getAllContextNodes(context.GetParent(i), nodes, visited)
-//		}
-//		return nodes
-//	}
-//}

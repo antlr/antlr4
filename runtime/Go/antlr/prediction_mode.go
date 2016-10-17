@@ -180,7 +180,7 @@ func PredictionModehasSLLConflictTerminatingPrediction(mode int, configs ATNConf
 		// since we'll often fail over anyway.
 		if configs.HasSemanticContext() {
 			// dup configs, tossing out semantic predicates
-			var dup = NewBaseATNConfigSet(false)
+			dup := NewBaseATNConfigSet(false)
 			for _, c := range configs.GetItems() {
 
 				//				NewBaseATNConfig({semanticContext:}, c)
@@ -192,7 +192,7 @@ func PredictionModehasSLLConflictTerminatingPrediction(mode int, configs ATNConf
 		// now we have combined contexts for configs with dissimilar preds
 	}
 	// pure SLL or combined SLL+LL mode parsing
-	var altsets = PredictionModegetConflictingAltSubsets(configs)
+	altsets := PredictionModegetConflictingAltSubsets(configs)
 	return PredictionModehasConflictingAltSet(altsets) && !PredictionModehasStateAssociatedWithOneAlt(configs)
 }
 
@@ -398,7 +398,7 @@ func PredictionModeallSubsetsConflict(altsets []*BitSet) bool {
 //
 func PredictionModehasNonConflictingAltSet(altsets []*BitSet) bool {
 	for i := 0; i < len(altsets); i++ {
-		var alts = altsets[i]
+		alts := altsets[i]
 		if alts.length() == 1 {
 			return true
 		}
@@ -416,7 +416,7 @@ func PredictionModehasNonConflictingAltSet(altsets []*BitSet) bool {
 //
 func PredictionModehasConflictingAltSet(altsets []*BitSet) bool {
 	for i := 0; i < len(altsets); i++ {
-		var alts = altsets[i]
+		alts := altsets[i]
 		if alts.length() > 1 {
 			return true
 		}
@@ -435,7 +435,7 @@ func PredictionModeallSubsetsEqual(altsets []*BitSet) bool {
 	var first *BitSet
 
 	for i := 0; i < len(altsets); i++ {
-		var alts = altsets[i]
+		alts := altsets[i]
 		if first == nil {
 			first = alts
 		} else if alts != first {
@@ -454,7 +454,7 @@ func PredictionModeallSubsetsEqual(altsets []*BitSet) bool {
 // @param altsets a collection of alternative subsets
 //
 func PredictionModegetUniqueAlt(altsets []*BitSet) int {
-	var all = PredictionModeGetAlts(altsets)
+	all := PredictionModeGetAlts(altsets)
 	if all.length() == 1 {
 		return all.minValue()
 	}
@@ -470,7 +470,7 @@ func PredictionModegetUniqueAlt(altsets []*BitSet) int {
 // @return the set of represented alternatives in {@code altsets}
 //
 func PredictionModeGetAlts(altsets []*BitSet) *BitSet {
-	var all = NewBitSet()
+	all := NewBitSet()
 	for _, alts := range altsets {
 		all.or(alts)
 	}
@@ -487,11 +487,11 @@ func PredictionModeGetAlts(altsets []*BitSet) *BitSet {
 // </pre>
 //
 func PredictionModegetConflictingAltSubsets(configs ATNConfigSet) []*BitSet {
-	var configToAlts = make(map[string]*BitSet)
+	configToAlts := make(map[string]*BitSet)
 
 	for _, c := range configs.GetItems() {
-		var key = "key_" + strconv.Itoa(c.GetState().GetStateNumber()) + "/" + c.GetContext().String()
-		var alts = configToAlts[key]
+		key := "key_" + strconv.Itoa(c.GetState().GetStateNumber()) + "/" + c.GetContext().String()
+		alts := configToAlts[key]
 		if alts == nil {
 			alts = NewBitSet()
 			configToAlts[key] = alts
@@ -499,7 +499,7 @@ func PredictionModegetConflictingAltSubsets(configs ATNConfigSet) []*BitSet {
 		alts.add(c.GetAlt())
 	}
 
-	var values = make([]*BitSet, 0)
+	values := make([]*BitSet, 0)
 
 	for k := range configToAlts {
 		if strings.Index(k, "key_") != 0 {
@@ -519,10 +519,10 @@ func PredictionModegetConflictingAltSubsets(configs ATNConfigSet) []*BitSet {
 // </pre>
 //
 func PredictionModeGetStateToAltMap(configs ATNConfigSet) *AltDict {
-	var m = NewAltDict()
+	m := NewAltDict()
 
 	for _, c := range configs.GetItems() {
-		var alts = m.Get(c.GetState().String())
+		alts := m.Get(c.GetState().String())
 		if alts == nil {
 			alts = NewBitSet()
 			m.put(c.GetState().String(), alts)
@@ -533,7 +533,7 @@ func PredictionModeGetStateToAltMap(configs ATNConfigSet) *AltDict {
 }
 
 func PredictionModehasStateAssociatedWithOneAlt(configs ATNConfigSet) bool {
-	var values = PredictionModeGetStateToAltMap(configs).values()
+	values := PredictionModeGetStateToAltMap(configs).values()
 	for i := 0; i < len(values); i++ {
 		if values[i].(*BitSet).length() == 1 {
 			return true
@@ -543,11 +543,11 @@ func PredictionModehasStateAssociatedWithOneAlt(configs ATNConfigSet) bool {
 }
 
 func PredictionModegetSingleViableAlt(altsets []*BitSet) int {
-	var result = ATNInvalidAltNumber
+	result := ATNInvalidAltNumber
 
 	for i := 0; i < len(altsets); i++ {
-		var alts = altsets[i]
-		var minAlt = alts.minValue()
+		alts := altsets[i]
+		minAlt := alts.minValue()
 		if result == ATNInvalidAltNumber {
 			result = minAlt
 		} else if result != minAlt { // more than 1 viable alt
