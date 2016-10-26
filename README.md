@@ -7,7 +7,7 @@
 
 ### Usage
 
-1. `go get http://github.com/pboyer/antlr4`
+1. `go get github.com/pboyer/antlr4`
 2. Get [StringTemplate](http://www.stringtemplate.org/)
 3. Get [Maven](https://maven.apache.org/download.cgi)
   - Put `mvn` in your PATH (e.g. in `~/.bashrc` add `export PATH=$PATH:/path/to/apache-maven-3.3.9/bin`)
