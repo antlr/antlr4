@@ -37,6 +37,6 @@ RuleStartState::RuleStartState() {
   isLeftRecursiveRule = false;
 }
 
-int RuleStartState::getStateType() {
+size_t RuleStartState::getStateType() {
   return RULE_START;
 }

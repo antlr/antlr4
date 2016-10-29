@@ -36,15 +36,14 @@
 namespace antlr4 {
 namespace atn {
 
-  /// <summary>
-  /// Terminal node of a simple {@code (a|b|c)} block. </summary>
+  /// Terminal node of a simple {@code (a|b|c)} block.
   class ANTLR4CPP_PUBLIC BlockEndState final : public ATNState {
   public:
-    BlockStartState *startState;
+    BlockStartState *startState = nullptr;
 
     BlockEndState();
 
-    virtual int getStateType() override;
+    virtual size_t getStateType() override;
   };
 
 } // namespace atn

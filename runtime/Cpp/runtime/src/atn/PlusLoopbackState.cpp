@@ -33,6 +33,6 @@
 
 using namespace antlr4::atn;
 
-int PlusLoopbackState::getStateType() {
+size_t PlusLoopbackState::getStateType() {
   return PLUS_LOOP_BACK;
 }

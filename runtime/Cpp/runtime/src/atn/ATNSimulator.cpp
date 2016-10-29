@@ -56,7 +56,7 @@ PredictionContextCache& ATNSimulator::getSharedContextCache() {
 }
 
 Ref<PredictionContext> ATNSimulator::getCachedContext(Ref<PredictionContext> const& context) {
-  std::lock_guard<std::recursive_mutex> lck(mtx);
+  std::lock_guard<std::recursive_mutex> lck(_mutex);
   std::map<Ref<PredictionContext>, Ref<PredictionContext>> visited;
   return PredictionContext::getCachedContext(context, _sharedContextCache, visited);
 }

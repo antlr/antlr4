@@ -33,6 +33,6 @@
 
 using namespace antlr4::atn;
 
-int StarBlockStartState::getStateType() {
+size_t StarBlockStartState::getStateType() {
   return STAR_BLOCK_START;
 }

@@ -238,7 +238,7 @@ const atn::ATN& Parser::getATNWithBypassAlts() {
     throw UnsupportedOperationException("The current parser does not support an ATN with bypass alternatives.");
   }
 
-  std::lock_guard<std::recursive_mutex> lck(mtx);
+  std::lock_guard<std::recursive_mutex> lck(_mutex);
 
   // XXX: using the entire serialized ATN as key into the map is a big resource waste.
   //      How large can that thing become?
@@ -570,7 +570,7 @@ std::vector<std::string> Parser::getRuleInvocationStack(RuleContext *p) {
 std::vector<std::string> Parser::getDFAStrings() {
   atn::ParserATNSimulator *simulator = getInterpreter<atn::ParserATNSimulator>();
   if (!simulator->decisionToDFA.empty()) {
-    std::lock_guard<std::recursive_mutex> lck(mtx);
+    std::lock_guard<std::recursive_mutex> lck(_mutex);
 
     std::vector<std::string> s;
     for (size_t d = 0; d < simulator->decisionToDFA.size(); d++) {
@@ -585,7 +585,7 @@ std::vector<std::string> Parser::getDFAStrings() {
 void Parser::dumpDFA() {
   atn::ParserATNSimulator *simulator = getInterpreter<atn::ParserATNSimulator>();
   if (!simulator->decisionToDFA.empty()) {
-    std::lock_guard<std::recursive_mutex> lck(mtx);
+    std::lock_guard<std::recursive_mutex> lck(_mutex);
     bool seenOne = false;
     for (size_t d = 0; d < simulator->decisionToDFA.size(); d++) {
       dfa::DFA &dfa = simulator->decisionToDFA[d];

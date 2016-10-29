@@ -40,7 +40,7 @@ namespace atn {
   class ANTLR4CPP_PUBLIC BasicBlockStartState final : public BlockStartState {
 
   public:
-    virtual int getStateType() override;
+    virtual size_t getStateType() override;
 
   };
 

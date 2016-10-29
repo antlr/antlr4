@@ -36,14 +36,12 @@
 namespace antlr4 {
 namespace atn {
 
-  /// <summary>
-  /// Decision state for {@code A+} and {@code (A|B)+}.  It has two transitions:
-  ///  one to the loop back to start of the block and one to exit.
-  /// </summary>
+  /// Decision state for {@code A+} and {@code (A|B)+}. It has two transitions:
+  /// one to the loop back to start of the block and one to exit.
   class ANTLR4CPP_PUBLIC PlusLoopbackState final : public DecisionState {
 
   public:
-    virtual int getStateType() override;
+    virtual size_t getStateType() override;
   };
 
 } // namespace atn

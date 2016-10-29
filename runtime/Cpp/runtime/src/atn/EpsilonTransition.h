@@ -43,7 +43,7 @@ namespace atn {
 
     /**
      * @return the rule index of a precedence rule for which this transition is
-     * returning from, where the precedence value is 0; otherwise, -1.
+     * returning from, where the precedence value is 0; otherwise, INVALID_INDEX.
      *
      * @see ATNConfig#isPrecedenceFilterSuppressed()
      * @see ParserATNSimulator#applyPrecedenceFilter(ATNConfigSet)

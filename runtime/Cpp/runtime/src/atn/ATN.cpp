@@ -50,6 +50,7 @@ ATN::ATN() : ATN(ATNType::LEXER, 0) {
 }
 
 ATN::ATN(ATN &&other) {
+  // All source vectors are implicitly cleared by the moves.
   states = std::move(other.states);
   decisionToState = std::move(other.decisionToState);
   ruleToStartState = std::move(other.ruleToStartState);
@@ -92,6 +93,7 @@ ATN& ATN::operator = (ATN &other) NOEXCEPT {
  * operators it seems the copy operator is preferred causing trouble when releasing the allocated ATNState instances.
  */
 ATN& ATN::operator = (ATN &&other) NOEXCEPT {
+  // All source vectors are implicitly cleared by the moves.
   states = std::move(other.states);
   decisionToState = std::move(other.decisionToState);
   ruleToStartState = std::move(other.ruleToStartState);

@@ -421,9 +421,6 @@ namespace antlr4 {
 
     std::vector<int> _precedenceStack;
     
-    // Mutex to manage synchronized access for multithreading in the parser
-    std::recursive_mutex mtx;
-
     /// <summary>
     /// Specifies whether or not the parser should construct a parse tree during
     /// the parsing process. The default value is {@code true}.

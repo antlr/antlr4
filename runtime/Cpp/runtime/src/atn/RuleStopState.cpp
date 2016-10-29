@@ -33,6 +33,6 @@
 
 using namespace antlr4::atn;
 
-int RuleStopState::getStateType() {
+size_t RuleStopState::getStateType() {
   return RULE_STOP;
 }

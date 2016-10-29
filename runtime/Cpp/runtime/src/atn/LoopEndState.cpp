@@ -33,6 +33,6 @@
 
 using namespace antlr4::atn;
 
-int LoopEndState::getStateType() {
+size_t LoopEndState::getStateType() {
   return LOOP_END;
 }

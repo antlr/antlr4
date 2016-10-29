@@ -36,6 +36,6 @@ using namespace antlr4::atn;
 StarLoopEntryState::StarLoopEntryState() : DecisionState(), isPrecedenceDecision(false) {
 }
 
-int StarLoopEntryState::getStateType() {
+size_t StarLoopEntryState::getStateType() {
   return STAR_LOOP_ENTRY;
 }

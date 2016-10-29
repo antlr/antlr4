@@ -81,8 +81,8 @@ namespace atn {
     static ATNState *stateFactory(int type, int ruleIndex);
 
   protected:
-    // Mutex to manage synchronized access for multithreading
-    std::recursive_mutex mtx;
+    // Mutex to manage synchronized access for multithreading.
+    std::recursive_mutex _mutex;
 
     /// <summary>
     /// The context cache maps all PredictionContext objects that are equals()
@@ -106,7 +106,6 @@ namespace atn {
     ///  so it's not worth the complexity.
     /// </summary>
     PredictionContextCache &_sharedContextCache;
-    
   };
 
 } // namespace atn

@@ -50,11 +50,11 @@ namespace atn {
      *
      * @see DFA#isPrecedenceDfa()
      */
-    bool isPrecedenceDecision;
+    bool isPrecedenceDecision = false;
     
-    StarLoopbackState *loopBackState;
+    StarLoopbackState *loopBackState = nullptr;
 
-    virtual int getStateType() override;
+    virtual size_t getStateType() override;
   };
 
 } // namespace atn

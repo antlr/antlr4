@@ -102,7 +102,8 @@ void LL1Analyzer::_LOOK(ATNState *s, ATNState *stopState, Ref<PredictionContext>
 
   lookBusy.insert(c);
 
-  if (stopState != nullptr && s == stopState) {
+  // ml: s can never be null, hence no need to check if stopState is != null.
+  if (s == stopState) {
     if (ctx == nullptr) {
       look.add(Token::EPSILON);
       return;
@@ -112,7 +113,7 @@ void LL1Analyzer::_LOOK(ATNState *s, ATNState *stopState, Ref<PredictionContext>
     }
   }
 
-  if (is<RuleStopState *>(s)) {
+  if (s->getStateType() == ATNState::RULE_STOP) {
     if (ctx == nullptr) {
       look.add(Token::EPSILON);
       return;
@@ -144,7 +145,7 @@ void LL1Analyzer::_LOOK(ATNState *s, ATNState *stopState, Ref<PredictionContext>
   for (size_t i = 0; i < n; i++) {
     Transition *t = s->transitions[i];
 
-    if (is<RuleTransition *>(t)) {
+    if (t->getSerializationType() == Transition::RULE) {
       if (calledRuleStack[(static_cast<RuleTransition*>(t))->target->ruleIndex]) {
         continue;
       }
@@ -165,13 +166,13 @@ void LL1Analyzer::_LOOK(ATNState *s, ATNState *stopState, Ref<PredictionContext>
       }
     } else if (t->isEpsilon()) {
       _LOOK(t->target, stopState, ctx, look, lookBusy, calledRuleStack, seeThruPreds, addEOF);
-    } else if (is<WildcardTransition *>(t)) {
-      look.addAll(misc::IntervalSet::of(Token::MIN_USER_TOKEN_TYPE, (int)_atn.maxTokenType));
+    } else if (t->getSerializationType() == Transition::WILDCARD) {
+      look.addAll(misc::IntervalSet::of(Token::MIN_USER_TOKEN_TYPE, (ssize_t)_atn.maxTokenType));
     } else {
       misc::IntervalSet set = t->label();
       if (!set.isEmpty()) {
         if (is<NotSetTransition*>(t)) {
-          set = set.complement(misc::IntervalSet::of(Token::MIN_USER_TOKEN_TYPE, (int)_atn.maxTokenType));
+          set = set.complement(misc::IntervalSet::of(Token::MIN_USER_TOKEN_TYPE, (ssize_t)_atn.maxTokenType));
         }
         look.addAll(set);
       }

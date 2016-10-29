@@ -33,6 +33,6 @@
 
 using namespace antlr4::atn;
 
-int BasicBlockStartState::getStateType() {
+size_t BasicBlockStartState::getStateType() {
   return BLOCK_START;
 }

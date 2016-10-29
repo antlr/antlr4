@@ -36,11 +36,10 @@
 namespace antlr4 {
 namespace atn {
 
-  /// <summary>
-  ///  The start of a regular {@code (...)} block. </summary>
+  ///  The start of a regular {@code (...)} block.
   class ANTLR4CPP_PUBLIC BlockStartState : public DecisionState {
   public:
-    BlockEndState *endState;
+    BlockEndState *endState = nullptr;
   };
 
 } // namespace atn

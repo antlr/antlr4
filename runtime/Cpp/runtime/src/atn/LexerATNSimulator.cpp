@@ -551,7 +551,7 @@ void LexerATNSimulator::addDFAEdge(dfa::DFAState *p, size_t t, dfa::DFAState *q)
     return;
   }
 
-  std::lock_guard<std::recursive_mutex> lck(mtx);
+  std::lock_guard<std::recursive_mutex> lck(_mutex);
   p->edges[t - MIN_DFA_EDGE] = q; // connect
 }
 
@@ -579,7 +579,7 @@ dfa::DFAState *LexerATNSimulator::addDFAState(ATNConfigSet *configs) {
   dfa::DFA &dfa = _decisionToDFA[_mode];
 
   {
-    std::lock_guard<std::recursive_mutex> lck(mtx);
+    std::lock_guard<std::recursive_mutex> lck(_mutex);
 
     if (!dfa.states.empty()) {
       auto iterator = dfa.states.find(proposed);

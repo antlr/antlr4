@@ -33,6 +33,6 @@
 
 using namespace antlr4::atn;
 
-int BasicState::getStateType() {
+size_t BasicState::getStateType() {
   return BASIC;
 }

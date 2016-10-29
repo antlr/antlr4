@@ -924,7 +924,7 @@ RulePropertyRef_ctxHeader(r)   ::= "<! Required but unused. !>"
 RulePropertyRef_ctx(r)   ::= "<ctx(r)>-><r.label>"
 
 ThisRulePropertyRef_start(r) ::= "ThisRulePropertyRef_start(r) _localctx->start"
-ThisRulePropertyRef_stop(r)  ::= "ThisRulePropertyRef_stop(r)   _localctx->stop"
+ThisRulePropertyRef_stop(r)  ::= "ThisRulePropertyRef_stop(r) _localctx->stop"
 
 ThisRulePropertyRef_textHeader(r)  ::= "<! Required but unused. !>"
 ThisRulePropertyRef_text(r)  ::= "_input->getText(_localctx->start, _input->LT(-1))"
@@ -955,7 +955,7 @@ TokenTypeDecl(t) ::= "size_t <t.name> = 0;"
 TokenListDeclHeader(t) ::= "std::vector\<Token *> <t.name>;"
 TokenListDecl(t) ::= "<! Variable Declaration !>"
 
-RuleContextDeclHeader(r) ::= "<parser.name>::<r.ctxName> *<r.name>;"
+RuleContextDeclHeader(r) ::= "<parser.name>::<r.ctxName> *<r.name> = nullptr;"
 RuleContextDecl(r) ::= "<! Variable Declaration !>"
 
 RuleContextListDeclHeader(rdecl) ::= "std::vector\<<rdecl.ctxName> *> <rdecl.name>;"

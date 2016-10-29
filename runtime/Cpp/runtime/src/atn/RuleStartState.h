@@ -40,10 +40,10 @@ namespace atn {
   public:
     RuleStartState();
 
-    RuleStopState *stopState;
-    bool isLeftRecursiveRule;
+    RuleStopState *stopState = nullptr;
+    bool isLeftRecursiveRule = false;
 
-    virtual int getStateType();
+    virtual size_t getStateType() override;
 
   };
 

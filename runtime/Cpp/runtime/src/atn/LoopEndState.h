@@ -36,13 +36,12 @@
 namespace antlr4 {
 namespace atn {
 
-  /// <summary>
-  /// Mark the end of a * or + loop. </summary>
+  /// Mark the end of a * or + loop.
   class ANTLR4CPP_PUBLIC LoopEndState final : public ATNState {
   public:
-    ATNState *loopBackState;
+    ATNState *loopBackState = nullptr;
 
-    virtual int getStateType() override;
+    virtual size_t getStateType() override;
   };
 
 } // namespace atn

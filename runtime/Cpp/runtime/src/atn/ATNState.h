@@ -123,7 +123,6 @@ namespace atn {
 
     static const std::vector<std::string> serializationNames;
 
-    /// Which ATN are we in?
     size_t stateNumber = INVALID_STATE_NUMBER;
     size_t ruleIndex = 0; // at runtime, we don't have Rule objects
     bool epsilonOnlyTransitions = false;
@@ -143,7 +142,7 @@ namespace atn {
     virtual void addTransition(Transition *e);
     virtual void addTransition(size_t index, Transition *e);
     virtual Transition* removeTransition(size_t index);
-    virtual int getStateType() = 0;
+    virtual size_t getStateType() = 0;
   };
 
 } // namespace atn

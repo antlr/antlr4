@@ -61,7 +61,7 @@ dfa::Vocabulary const& Recognizer::getVocabulary() const {
 std::map<std::string, size_t> Recognizer::getTokenTypeMap() {
   const dfa::Vocabulary& vocabulary = getVocabulary();
 
-  std::lock_guard<std::recursive_mutex> lck(mtx);
+  std::lock_guard<std::recursive_mutex> lck(_mutex);
   std::map<std::string, size_t> result;
   auto iterator = _tokenTypeMapCache.find(&vocabulary);
   if (iterator != _tokenTypeMapCache.end()) {
@@ -91,7 +91,7 @@ std::map<std::string, size_t> Recognizer::getRuleIndexMap() {
     throw "The current recognizer does not provide a list of rule names.";
   }
 
-  std::lock_guard<std::recursive_mutex> lck(mtx);
+  std::lock_guard<std::recursive_mutex> lck(_mutex);
   std::map<std::string, size_t> result;
   auto iterator = _ruleIndexMapCache.find(ruleNames);
   if (iterator != _ruleIndexMapCache.end()) {

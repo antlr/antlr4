@@ -40,7 +40,7 @@ namespace atn {
   public:
     StarLoopEntryState *getLoopEntryState();
 
-    virtual int getStateType() override;
+    virtual size_t getStateType() override;
   };
 
 } // namespace atn

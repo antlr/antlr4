@@ -37,15 +37,13 @@ namespace antlr4 {
 namespace atn {
 
   class ANTLR4CPP_PUBLIC RuleTransition : public Transition {
-    /// <summary>
-    /// Ptr to the rule definition object for this rule ref </summary>
   public:
+    /// Ptr to the rule definition object for this rule ref.
     const size_t ruleIndex; // no Rule object at runtime
 
     const int precedence;
 
-    /// <summary>
-    /// What node to begin computations following ref to rule </summary>
+    /// What node to begin computations following ref to rule.
     ATNState *followState;
 
     /// @deprecated Use

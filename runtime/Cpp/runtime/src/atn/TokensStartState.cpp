@@ -33,6 +33,6 @@
 
 using namespace antlr4::atn;
 
-int TokensStartState::getStateType() {
+size_t TokensStartState::getStateType() {
   return TOKEN_START;
 }

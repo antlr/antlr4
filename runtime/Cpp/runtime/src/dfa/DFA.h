@@ -88,7 +88,7 @@ namespace dfa {
      * @throws IllegalStateException if this is not a precedence DFA.
      * @see #isPrecedenceDfa()
      */
-    void setPrecedenceStartState(int precedence, DFAState *startState);
+    void setPrecedenceStartState(int precedence, DFAState *startState, std::recursive_mutex &mutex);
     
     /// Return a list of all states in this DFA, ordered by state number.
     virtual std::vector<DFAState *> getStates() const;
@@ -108,8 +108,6 @@ namespace dfa {
      */
     bool _precedenceDfa;
     DFAState *_s0Shadow = nullptr; // ml: assigned when we created s0 ourselves.
-
-    std::recursive_mutex _lock; // To synchronize access to s0.
   };
 
 } // namespace atn

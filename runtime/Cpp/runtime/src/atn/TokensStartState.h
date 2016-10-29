@@ -36,12 +36,11 @@
 namespace antlr4 {
 namespace atn {
 
-  /// <summary>
-  /// The Tokens rule start state linking to each lexer rule start state </summary>
+  /// The Tokens rule start state linking to each lexer rule start state.
   class ANTLR4CPP_PUBLIC TokensStartState final : public DecisionState {
 
   public:
-    virtual int getStateType();
+    virtual size_t getStateType();
   };
 
 } // namespace atn

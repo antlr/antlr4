@@ -103,8 +103,8 @@ expr: expr Star expr
     | <assoc = right> expr QuestionMark expr Colon expr
     | <assoc = right> expr Equal expr
     | identifier = id
-	| flowControl
-	| INT
+    | flowControl
+    | INT
     | String
 ;
 

@@ -60,9 +60,16 @@ DFA::DFA(atn::DecisionState *atnStartState, size_t decision)
 }
 
 DFA::DFA(DFA &&other) : atnStartState(std::move(other.atnStartState)), decision(std::move(other.decision)) {
+  // Source states are implicitly cleared by the move.
   states = std::move(other.states);
-  s0 = std::move(other.s0);
-  _precedenceDfa = std::move(other._precedenceDfa);
+
+  // Manually move s0 pointers.
+  s0 = other.s0;
+  other.s0 = nullptr;
+  _s0Shadow = other._s0Shadow;
+  other._s0Shadow = nullptr;
+  
+  _precedenceDfa = other._precedenceDfa;
 }
 
 DFA::~DFA() {
@@ -90,7 +97,7 @@ DFAState* DFA::getPrecedenceStartState(int precedence) const {
   return iterator->second;
 }
 
-void DFA::setPrecedenceStartState(int precedence, DFAState *startState) {
+void DFA::setPrecedenceStartState(int precedence, DFAState *startState, std::recursive_mutex &mutex) {
   if (!isPrecedenceDfa()) {
     throw IllegalStateException("Only precedence DFAs may contain a precedence start state.");
   }
@@ -100,7 +107,7 @@ void DFA::setPrecedenceStartState(int precedence, DFAState *startState) {
   }
 
   {
-    std::unique_lock<std::recursive_mutex> lock(_lock);
+    std::unique_lock<std::recursive_mutex> lock(mutex);
     s0->edges[precedence] = startState;
   }
 }

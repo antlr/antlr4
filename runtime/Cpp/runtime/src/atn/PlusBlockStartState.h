@@ -36,17 +36,15 @@
 namespace antlr4 {
 namespace atn {
 
-  /// <summary>
   /// Start of {@code (A|B|...)+} loop. Technically a decision state, but
-  ///  we don't use for code generation; somebody might need it, so I'm defining
-  ///  it for completeness. In reality, the <seealso cref="PlusLoopbackState"/> node is the
-  ///  real decision-making note for {@code A+}.
-  /// </summary>
+  /// we don't use for code generation; somebody might need it, so I'm defining
+  /// it for completeness. In reality, the <seealso cref="PlusLoopbackState"/> node is the
+  /// real decision-making note for {@code A+}.
   class ANTLR4CPP_PUBLIC PlusBlockStartState final : public BlockStartState {
   public:
-    PlusLoopbackState *loopBackState;
+    PlusLoopbackState *loopBackState = nullptr;
 
-    virtual int getStateType() override;
+    virtual size_t getStateType() override;
   };
 
 } // namespace atn

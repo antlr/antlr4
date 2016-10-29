@@ -39,7 +39,7 @@ namespace atn {
   class ANTLR4CPP_PUBLIC BasicState final : public ATNState {
 
   public:
-    virtual int getStateType() override;
+    virtual size_t getStateType() override;
 
   };
 
