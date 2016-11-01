@@ -96,3 +96,4 @@ YYYY/MM/DD, github id, Full name, email
 2016/08/19, andjo403, Andreas Jonson, andjo403@hotmail.com
 2016/10/13, cgudrian, Christian Gudrian, christian.gudrian@gmx.de
 2016/10/13, nielsbasjes, Niels Basjes, niels@basjes.nl
+2016/11/01, sebkur, Sebastian Kürten, sebastian@topobyte.de
