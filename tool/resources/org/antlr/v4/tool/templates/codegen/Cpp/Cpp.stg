@@ -911,7 +911,7 @@ TokenPropertyRef_index(t) ::= "(<ctx(t)>-><t.label> != nullptr ? <ctx(t)>-><t.la
 TokenPropertyRef_intHeader(t) ::= "<! Required but unused. !>"
 TokenPropertyRef_int(t) ::= "(<ctx(t)>-><t.label> != nullptr ? std::stoi(<ctx(t)>-><t.label>->getText()) : 0)"
 
-RulePropertyRef_stopHeaderHeader(r)  ::= "<! Required but unused. !>"
+RulePropertyRef_startHeader(r)  ::= "<! Required but unused. !>"
 RulePropertyRef_start(r) ::= "(<ctx(r)>-><r.label> != nullptr ? (<ctx(r)>-><r.label>->start) : nullptr)"
 
 RulePropertyRef_stopHeader(r)  ::= "<! Required but unused. !>"

@@ -50,7 +50,7 @@ ParserRuleContext::ParserRuleContext()
 }
 
 ParserRuleContext::ParserRuleContext(ParserRuleContext *parent, size_t invokingStateNumber)
-: RuleContext(parent, invokingStateNumber) {
+: RuleContext(parent, invokingStateNumber), start(nullptr), stop(nullptr) {
 }
 
 void ParserRuleContext::copyFrom(ParserRuleContext *ctx) {
