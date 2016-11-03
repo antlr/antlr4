@@ -46,6 +46,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.TreeSet;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.stringtemplate.v4.AutoIndentWriter;
@@ -59,7 +60,13 @@ import org.stringtemplate.v4.misc.STMessage;
 
 public class TestGenerator {
 	
-	public final static String[] targets = {"CSharp", "Java", "Python2", "Python3", "JavaScript/Node", "JavaScript/Safari", "JavaScript/Firefox", "JavaScript/Explorer", "JavaScript/Chrome"};
+	public final static String[] allTargets = {
+        "CSharp", "Java", "Python2", "Python3", "JavaScript/Node",
+    };
+    public final static String[] browserTargets = {
+        "JavaScript/Safari", "JavaScript/Firefox", "JavaScript/Explorer",
+        "JavaScript/Chrome",
+    };
 
     /**
      * Generate test programs for ANTLR4 runtime.
@@ -68,8 +75,13 @@ public class TestGenerator {
      * <p><code>
      * $ java org.antlr.v4.testgen.TestGenerator [-root <i>dir</i>]
      * [-outdir <i>dir</i>] [-templates <i>dir</i>] [-encoding <i>string</i>]
-     * [-target <i>string</i>] [-browsers] [-viz]
+     * [-target <i>string[, ...]</i>] [-browsers] [-exclude <i>regex[, ...]</i>]
+     * [-viz]
      * </code>
+     *
+     * <p>The -target and -exclude options can occur as many times as needed.
+     * An occurrence of -target or -exclude can be followed by multiple values
+     * if each value but the last ends with a comma.
      *
      * <p>Example:<pre>
      *   $ java org.antlr.v4.testgen.TestGenerator -root /Users/parrt/antlr/code/antlr4
@@ -108,7 +120,8 @@ public class TestGenerator {
     public String encoding = "UTF-8";
     public boolean visualize;
     public boolean browsers;
-    public String targetOption = "ALL";
+    public Collection<String> targets = new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
+    public Collection<String> excludes = new TreeSet<String>();
 
     // set during genTarget()
     protected String targetName;
@@ -144,12 +157,28 @@ public class TestGenerator {
             else if ("-browsers".equals(arg))
                 browsers = true;
             else if ("-target".equals(arg))
-                targetOption = moreArgs.next();
+                acceptOptionMulti(targets, arg, moreArgs);
+            else if ("-exclude".equals(arg))
+                acceptOptionMulti(excludes, arg, moreArgs);
             else
                 return false;   // option not recognized
             return true;        // ok, consumed
         } catch (NoSuchElementException ex) {
             throw new TestGenException("Option requires a value: %s", arg);
+        }
+    }
+
+    /** Consume one or more args, each arg but the last ending with a comma. */
+    protected static void acceptOptionMulti(Collection<String> out, String arg, Iterator<String> moreArgs) {
+        try {
+            String v = moreArgs.next();
+            while (v.endsWith(",")) {
+                out.add(v.substring(0, v.length()-1));
+                v = moreArgs.next();
+            }
+            out.add(v);
+        } catch (NoSuchElementException ex) {
+            throw new TestGenException("Expected another value for option %s", arg);
         }
     }
 
@@ -161,6 +190,27 @@ public class TestGenerator {
         outDir = absolutePath(outDir, rootDir, "test");
         testTemplatesRoot = absolutePath(testTemplatesRoot, rootDir,
                               "resources/org/antlr/v4/test/runtime/templates");
+
+        if (browsers)
+            targets.addAll(Arrays.asList(browserTargets));
+        
+        if (targets.contains("all") || targets.isEmpty()) {
+            targets.remove("all");
+            targets.addAll(Arrays.asList(allTargets));
+        }
+        
+        if (! excludes.isEmpty()) {
+            Collection<String> excluded = new TreeSet<String>();
+            for (String exclude : excludes) {
+                Matcher m = Pattern.compile(exclude, Pattern.CASE_INSENSITIVE).matcher("");
+                for (String t : targets) {
+                    if (m.reset(t).matches())
+                        excluded.add(t);
+                }
+            }
+            targets.removeAll(excluded);
+            excludes = excluded;
+        }
     }
 
     public void showOptions() {
@@ -171,19 +221,19 @@ public class TestGenerator {
 		info("    -encoding  " + encoding);
         info(visualize ? "    -viz" : " no -viz");
         info(browsers ? "    -browsers" : " no -browsers");
-		info("    -target    " + targetOption);
+        showOptionMulti("-exclude  ", excludes);
+        showOptionMulti("-target   ", targets);
+    }
+
+    protected void showOptionMulti(String flag, Collection<? extends Object> value) {
+        info(value.isEmpty() ? " no "+flag
+                             : "    "+flag+" "+join(", ", value));
     }
 
     public void execute() {
-		if ( "ALL".equalsIgnoreCase(targetOption)) {
-            for(String target : targets) {
-                if(!browsers && "JavaScript/Safari".equals(target))
-                    return;
-                genTarget(target);
-            }
+        for (String target : targets) {
+            genTarget(target);
 		} 
-        else
-			genTarget(targetOption);       
     }
 
 	public void genTarget(String target) {
@@ -442,6 +492,17 @@ public class TestGenerator {
             else
                 excludedKeys.add(k);
         }
+    }
+
+    /** Format a collection with given separator between the items. */
+    public static String join(CharSequence separator, Collection<? extends Object> c) {
+        if (c.isEmpty())
+            return "";
+        StringBuilder buf = new StringBuilder(c.size() * 40);
+        for (Object o : c)
+            buf.append(o).append(separator);
+        buf.setLength(buf.length()-separator.length());  // drop last separator
+        return buf.toString();
     }
 
     protected File outputDir(String targetName) {
