@@ -30,202 +30,315 @@
 package org.antlr.v4.testgen;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
+import java.util.Locale;
 import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.TreeSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import org.stringtemplate.v4.AutoIndentWriter;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupFile;
+import org.stringtemplate.v4.STWriter;
 import org.stringtemplate.v4.gui.STViz;
+import org.stringtemplate.v4.misc.ErrorBuffer;
+import org.stringtemplate.v4.misc.STMessage;
 
 public class TestGenerator {
 	
-	public final static String[] targets = {"CSharp", "Java", "Python2", "Python3", "JavaScript/Node", "JavaScript/Safari", "JavaScript/Firefox", "JavaScript/Explorer", "JavaScript/Chrome"};
+	public final static String[] allTargets = {
+        "CSharp", "Java", "Python2", "Python3", "JavaScript/Node",
+    };
+    public final static String[] browserTargets = {
+        "JavaScript/Safari", "JavaScript/Firefox", "JavaScript/Explorer",
+        "JavaScript/Chrome",
+    };
 
-	/** Execute from antlr4 root dir:
-	 * *
-	 * $ java TestGenerator -o output-root-dir -templates -viz
-	 *
-	 * Example:
-	 *
-	 * $ java org.antlr.v4.testgen.TestGenerator -root /Users/parrt/antlr/code/antlr4
-	 */
+    /**
+     * Generate test programs for ANTLR4 runtime.
+     *
+     * <p>Execute from antlr4 root dir:
+     * <p><code>
+     * $ java org.antlr.v4.testgen.TestGenerator [-root <i>dir</i>]
+     * [-outdir <i>dir</i>] [-templates <i>dir</i>] [-encoding <i>string</i>]
+     * [-target <i>string[, ...]</i>] [-browsers] [-exclude <i>regex[, ...]</i>]
+     * [-viz]
+     * </code>
+     *
+     * <p>The -target and -exclude options can occur as many times as needed.
+     * An occurrence of -target or -exclude can be followed by multiple values
+     * if each value but the last ends with a comma.
+     *
+     * <p>Example:<pre>
+     *   $ java org.antlr.v4.testgen.TestGenerator -root /Users/parrt/antlr/code/antlr4
+     * </pre></p>
+     */
 	public static void main(String[] args) {
-		String rootDir = null;
-		String outDir = null;
-		String templatesRoot = null;
-		String target = "ALL";
-		boolean browsers = false;
-		boolean viz = false;
+        TestGenerator gen = new TestGenerator();
 
-		int i = 0;
-		while (args != null && i < args.length) {
-			String arg = args[i];
-			if (arg.startsWith("-root")) {
-				i++;
-				rootDir = args[i];
-			}
-			else if (arg.startsWith("-outdir")) {
-				i++;
-				outDir = args[i];
-			}
-			else if (arg.startsWith("-templates")) {
-				i++;
-				templatesRoot = args[i];
-			}
-			else if (arg.startsWith("-target")) {
-				i++;
-				target = args[i];
-			}
-			else if (arg.startsWith("-browsers")) {
-				browsers = true;
-			}
-			else if (arg.startsWith("-viz")) {
-				viz = true;
-			}
-			i++;
-		}
-		
-		System.out.println("rootDir = " + rootDir);
-		System.out.println("outputDir = " + outDir);
-		System.out.println("templates = " + templatesRoot);
-		System.out.println("target = " + target);
-		System.out.println("browsers = " + browsers);
-		System.out.println("viz = " + viz);
-		
-		if(rootDir==null) {
-			System.out.println("rootDir is mandatory!" + rootDir);
-			return;
-		}
-		if(outDir==null)
-			outDir = rootDir + "/test";
-			
-		if(templatesRoot==null)
-			templatesRoot = rootDir + "/resources/org/antlr/v4/test/runtime/templates";
+        try {
+            ListIterator<String> moreArgs = Arrays.asList(args).listIterator(0);
+            while (moreArgs.hasNext()) {
+                String arg = moreArgs.next();
+                if (!gen.acceptOption(arg, moreArgs))
+                    throw new TestGenException("Option not recognized: %s", arg);
+            }
 
-		if ( "ALL".equalsIgnoreCase(target)) {
-			genAllTargets(rootDir, outDir, templatesRoot, browsers, viz);
-		} else
-			genTarget(rootDir, outDir, target, templatesRoot, viz);
+            gen.applyDefaults();
+            gen.showOptions();
+	        gen.execute();
+
+        } catch (TestGenException ex) {
+            gen.errPrintln(ex.getClass().getSimpleName() + ": " + ex.getMessage());
+            for (StackTraceElement ste : ex.getStackTrace())
+                gen.errPrintln("\tat " + ste);
+            System.exit(1);
+        }
 	}
 
-	public static void genAllTargets(String rootDir, String outDirRoot, String templatesRoot, boolean browsers, boolean viz) {
-		for(String target : targets) {
-			if(!browsers && "JavaScript/Safari".equals(target))
-				return;
-			genTarget(rootDir, outDirRoot, target, templatesRoot, viz);
-		}
-	}
-	
-	public static void genTarget(final String rootDir, final String outDir, final String fullTarget, final String templatesDir, boolean viz) {
-		String[] parts = fullTarget.split("/");
-		String target = parts[0];
-		String subTarget = parts.length>1 ? parts[1] : target;
-		String targetPackage = rootDir + "/resources/org/antlr/v4/test/runtime/" + fullTarget.toLowerCase();
-		String targetTemplate = targetPackage + "/" + subTarget + ".test.stg";
-		TestGenerator gen = new TestGenerator("UTF-8",
-					fullTarget,
-					rootDir,
-					new File(outDir),
-					new File(templatesDir),
-					new File(targetTemplate),
-					viz);
-		gen.info("Generating target " + gen.getTargetName());
-		gen.execute();
-	}
+    public TestGenerator() {
+    }
+
+    // set by acceptOption() and applyDefaults() ...
+    public File rootDir;
+    public File outDir;
+    public File testTemplatesRoot;
+    public String encoding = "UTF-8";
+    public boolean visualize;
+    public boolean browsers;
+    public Collection<String> targets = new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
+    public Collection<String> excludes = new TreeSet<String>();
+
+    // set during genTarget()
+    protected String targetName;
+    protected String lineSeparator = System.getProperty("line.separator");
+    protected ErrorBuffer errorBuffer = new ErrorBuffer();
 
 	// This project uses UTF-8, but the plugin might be used in another project
 	// which is not. Always load templates with UTF-8, but write using the
 	// specified encoding.
-	protected final String encoding;
-	protected final String targetName;
-	protected final String rootDir;
-	protected final File outputDir;
-	protected final File testTemplates;
-	protected final File runtimeTemplate;
-	protected final boolean visualize;
 
-	public TestGenerator(String encoding, String targetName, String rootDir, File outputDir, File testTemplates, File runtimeTemplate, boolean visualize) {
-		this.encoding = encoding;
-		this.targetName = targetName;
-		this.rootDir = rootDir;
-		this.outputDir = outputDir;
-		this.testTemplates = testTemplates;
-		this.runtimeTemplate = runtimeTemplate;
-		this.visualize = visualize;
-	}
+    /**
+     * Consume a command line option.
+     * 
+     * @param arg       the argument to examine
+     * @param moreArgs  The rest of the arguments.  If arg is recognized as an
+     *                  option that requires a value, the value is consumed from
+     *                  this iterator; TestGenException is thrown if not enough.
+     * @return true if option was recognized and consumed; false if unrecognized
+     * @throws TestGenException
+     */
+    public boolean acceptOption(String arg, Iterator<String> moreArgs) {
+        try {
+            if ("-root".equals(arg))
+                rootDir = new File(moreArgs.next());
+            else if ("-outdir".equals(arg))
+                outDir = new File(moreArgs.next());
+            else if ("-templates".equals(arg))
+                testTemplatesRoot = new File(moreArgs.next());
+            else if ("-encoding".equals(arg))
+                encoding = moreArgs.next();
+            else if ("viz".equals(arg))
+                visualize = true;
+            else if ("-browsers".equals(arg))
+                browsers = true;
+            else if ("-target".equals(arg))
+                acceptOptionMulti(targets, arg, moreArgs);
+            else if ("-exclude".equals(arg))
+                acceptOptionMulti(excludes, arg, moreArgs);
+            else
+                return false;   // option not recognized
+            return true;        // ok, consumed
+        } catch (NoSuchElementException ex) {
+            throw new TestGenException("Option requires a value: %s", arg);
+        }
+    }
 
-	private String getTargetName() {
-		return targetName;
-	}
+    /** Consume one or more args, each arg but the last ending with a comma. */
+    protected static void acceptOptionMulti(Collection<String> out, String arg, Iterator<String> moreArgs) {
+        try {
+            String v = moreArgs.next();
+            while (v.endsWith(",")) {
+                out.add(v.substring(0, v.length()-1));
+                v = moreArgs.next();
+            }
+            out.add(v);
+        } catch (NoSuchElementException ex) {
+            throw new TestGenException("Expected another value for option %s", arg);
+        }
+    }
 
+    /** 
+     * Finish processing the options, and fill in defaults.
+     */
+    public void applyDefaults() {
+        rootDir = absolutePath(rootDir, null, "");
+        outDir = absolutePath(outDir, rootDir, "test");
+        testTemplatesRoot = absolutePath(testTemplatesRoot, rootDir,
+                              "resources/org/antlr/v4/test/runtime/templates");
 
-	public void execute() {
-		STGroup targetGroup = new STGroupFile(runtimeTemplate.getPath());
+        if (browsers)
+            targets.addAll(Arrays.asList(browserTargets));
+        
+        if (targets.contains("all") || targets.isEmpty()) {
+            targets.remove("all");
+            targets.addAll(Arrays.asList(allTargets));
+        }
+        
+        if (! excludes.isEmpty()) {
+            Collection<String> excluded = new TreeSet<String>();
+            for (String exclude : excludes) {
+                Matcher m = Pattern.compile(exclude, Pattern.CASE_INSENSITIVE).matcher("");
+                for (String t : targets) {
+                    if (m.reset(t).matches())
+                        excluded.add(t);
+                }
+            }
+            targets.removeAll(excluded);
+            excludes = excluded;
+        }
+    }
+
+    public void showOptions() {
+        info("TestGenerator");
+		info("    -root      " + rootDir);
+		info("    -outdir    " + outDir);
+		info("    -templates " + testTemplatesRoot);
+		info("    -encoding  " + encoding);
+        info(visualize ? "    -viz" : " no -viz");
+        info(browsers ? "    -browsers" : " no -browsers");
+        showOptionMulti("-exclude  ", excludes);
+        showOptionMulti("-target   ", targets);
+    }
+
+    protected void showOptionMulti(String flag, Collection<? extends Object> value) {
+        info(value.isEmpty() ? " no "+flag
+                             : "    "+flag+" "+join(", ", value));
+    }
+
+    public void execute() {
+        for (String target : targets) {
+            genTarget(target);
+		} 
+    }
+
+	public void genTarget(String target) {
+        targetName = target;
+		File targetOutputDir = outputDir(targetName);
+		info(String.format("Generating target %s => %s", targetName, targetOutputDir));
+
+        File targetTemplatesRoot = new File(rootDir, "resources/org/antlr/v4/test/runtime");
+        File targetTemplateFile = targetTemplateFile(targetTemplatesRoot, targetName);
+
+		STGroup targetGroup = new STGroupFile(targetTemplateFile.getPath());
+        targetGroup.setListener(errorBuffer);
+
 		targetGroup.registerModelAdaptor(STGroup.class, new STGroupModelAdaptor());
 		targetGroup.defineDictionary("escape", new JavaEscapeStringMap());
 		targetGroup.defineDictionary("lines", new LinesStringMap());
 		targetGroup.defineDictionary("strlen", new StrlenStringMap());
-		generateCodeForFoldersInIndex(targetGroup);
+
+		generateCodeForFoldersInIndex(targetGroup, targetOutputDir);
+
+        if (errorBuffer.errors.size() > 0)
+            throwTemplateError();
 	}
 
-	protected void generateCodeForFoldersInIndex(STGroup targetGroup) {
-		File targetFolder = getOutputDir(testTemplates+"");
-		STGroup index = new STGroupFile(testTemplates+"/Index.stg");
-		index.load(); // make sure the index group is loaded since we call rawGetDictionary
-		Map<String, Object> folders = index.rawGetDictionary("TestFolders");
-		if (folders != null) {
-			for (String key : folders.keySet()) {
-				final String testDir = testTemplates + "/" + key;
-				STGroup testIndex = new STGroupFile(testDir + "/Index.stg");
-				testIndex.load();
-				Map<String, Object> templateNames = testIndex.rawGetDictionary("TestTemplates");
-				if ( templateNames != null && !templateNames.isEmpty() ) {
-					final ArrayList<String> sortedTemplateNames = new ArrayList<String>(templateNames.keySet());
-					Collections.sort(sortedTemplateNames);
-					generateTestFile(testIndex, targetGroup, testDir, sortedTemplateNames, targetFolder);
-				}
-			}
-		}
+	protected void generateCodeForFoldersInIndex(STGroup targetGroup, File targetOutputDir) {
+        Collection<String> testFolders = new ArrayList<String>(20);
+        Collection<String> excludeFolders = new TreeSet<String>();
+
+		STGroup rootIndex = new STGroupFile(new File(testTemplatesRoot, "Index.stg").getPath());
+
+        // let output file line endings be the same kind found in top Index.stg
+        lineSeparator = detectLineSeparator(rootIndex.getFileName(), lineSeparator);
+
+        filterIndexEntries(testFolders, excludeFolders, rootIndex, "TestFolders");
+
+        if (! excludeFolders.isEmpty()) {
+            info(String.format("  Excluding %s tests", excludeFolders));
+            testFolders.addAll(excludeFolders);
+        }
+
+        for (String testName : testFolders) {
+            Collection<String> sortedTemplateNames = new TreeSet<String>();
+            Collection<String> excludeTemplates = new TreeSet<String>();
+            Map<String, Object> fileOptions = Collections.emptyMap();
+
+            File outputFile = new File(targetOutputDir, "Test" + testName + ".java");
+            File testTemplateDir = new File(testTemplatesRoot, testName);
+
+            if (! excludeFolders.contains(testName)) {
+                STGroup testIndex = new STGroupFile(new File(testTemplateDir, "Index.stg").getPath());
+                filterIndexEntries(sortedTemplateNames, excludeTemplates, testIndex, "TestTemplates");
+                fileOptions = testIndex.rawGetDictionary("Options");
+            }
+
+            detail(String.format("  Generating %3d tests to file %s",
+                                 sortedTemplateNames.size(), outputFile));
+            if (! excludeTemplates.isEmpty())
+                detail(String.format("                  - excluding %s", excludeTemplates));
+
+            try {
+                generateTestFile(outputFile, fileOptions, targetGroup,
+                                 testTemplateDir, sortedTemplateNames);
+            } catch (RuntimeException ex) {
+                // tell which file had trouble - in case detail messages are turned off
+                error(String.format("while generating test file %s %n" +
+                             "            using target template %s %n" +
+                             "            and test templates in %s",
+                          outputFile, targetGroup.getFileName(), testTemplateDir),
+                      ex);
+                throw ex;
+            }
+        }
 	}
 
-	protected void generateTestFile(STGroup index,
+	protected void generateTestFile(File outputFile,
+									Map<String, Object> fileOptions,
 									STGroup targetGroup,
-									String testDir,
-									Collection<String> testTemplates,
-									File targetFolder)
+									File testTemplateDir,
+									Collection<String> testTemplates)
 	{
-		String testName = testDir.substring(testDir.lastIndexOf('/') + 1);
-		File targetFile = new File(targetFolder, "Test" + testName + ".java");
-		info("Generating file "+targetFile.getAbsolutePath());
-		List<ST> templates = new ArrayList<ST>();
-		for (String template : testTemplates) {
-			STGroup testGroup = new STGroupFile(testDir + "/" + template + STGroup.GROUP_FILE_EXTENSION);
+		String testName = testTemplateDir.getName();
+		List<ST> methodTemplates = new ArrayList<ST>();
+		for (String templateName : testTemplates) {
+            File testGroupFile = new File(testTemplateDir, templateName + STGroup.GROUP_FILE_EXTENSION);
+
+			STGroup testGroup = new STGroupFile(testGroupFile.getPath());
+            testGroup.setListener(errorBuffer);
 			importLanguageTemplates(testGroup, targetGroup);
+
 			ST testType = testGroup.getInstanceOf("TestType");
-			if (testType == null) {
-				warn(String.format("Unable to generate tests for %s: no TestType specified.", template));
-				continue;
-			}
+			if (testType == null)
+				throw new TestGenException("Unable to generate tests for %s: no TestType specified.",
+                                           templateName);
 
 			ST testMethodTemplate = targetGroup.getInstanceOf(testType.render() + "TestMethod");
-			if (testMethodTemplate == null) {
-				warn(String.format("Unable to generate tests for %s: TestType '%s' is not supported by the current runtime.", template, testType.render()));
-				continue;
-			}
+			if (testMethodTemplate == null)
+				throw new TestGenException("Unable to generate tests for %s: TestType '%s' is not supported by the current runtime.",
+                                           templateName, testType.render());
 
 			testMethodTemplate.add(testMethodTemplate.impl.formalArguments.keySet().iterator().next(), testGroup);
-			templates.add(testMethodTemplate);
+			methodTemplates.add(testMethodTemplate);
 		}
 
 		ST testFileTemplate = targetGroup.getInstanceOf("TestFile");
-		testFileTemplate.addAggr("file.{Options,name,tests}", index.rawGetDictionary("Options"), testName, templates);
+		testFileTemplate.addAggr("file.{Options,name,tests}", fileOptions, testName, methodTemplates);
 
 		if (visualize) {
 			STViz viz = testFileTemplate.inspect();
@@ -236,21 +349,22 @@ public class TestGenerator {
 		}
 
 		try {
-			writeFile(targetFile, testFileTemplate.render());
+			writeFile(outputFile, render(testFileTemplate));
 		}
 		catch (IOException ex) {
-			error(String.format("Failed to write output file: %s", targetFile), ex);
+			throw new TestGenException("Error writing output file %s", outputFile, ex);
 		}
+
+        if (errorBuffer.errors.size() > 0)
+            throwTemplateError();
 	}
 
 	private void importLanguageTemplates(STGroup testGroup, STGroup languageGroup) {
 		// make sure the test group is loaded
 		testGroup.load();
 
-		if (testGroup == languageGroup) {
-			assert false : "Attempted to import the language group into itself.";
-			return;
-		}
+		if (testGroup == languageGroup)
+			throw new TestGenException("Attempted to import the language group into itself.");
 
 		if (testGroup.getImportedGroups().isEmpty()) {
 			testGroup.importTemplates(languageGroup);
@@ -266,11 +380,20 @@ public class TestGenerator {
 		}
 	}
 
+    public String render(ST template) {
+        // like ST.render() but uses our lineSeparator
+        StringWriter out = new StringWriter();
+        STWriter wr = new AutoIndentWriter(out, lineSeparator);
+        wr.setLineWidth(STWriter.NO_WRAP);
+        template.write(wr, Locale.getDefault());
+        return out.toString();
+    }
+
 	public void writeFile(File file, String content) throws IOException {
 		file.getParentFile().mkdirs();
 
 		FileOutputStream fos = new FileOutputStream(file);
-		OutputStreamWriter osw = new OutputStreamWriter(fos, encoding != null ? encoding : "UTF-8");
+		OutputStreamWriter osw = new OutputStreamWriter(fos, encoding);
 		try {
 			osw.write(content);
 		}
@@ -279,25 +402,196 @@ public class TestGenerator {
 		}
 	}
 
-	public File getOutputDir(String templateFolder) {
-		if(templateFolder.startsWith(rootDir))
-			templateFolder = templateFolder.substring(rootDir.length());
-		if(templateFolder.startsWith("/resources"))
-			templateFolder = templateFolder.substring("/resources".length());
-		templateFolder = templateFolder.substring(0, templateFolder.indexOf("/templates"));
-		templateFolder += "/" + targetName.toLowerCase();
-		return new File(outputDir, templateFolder);
+    public static File absolutePath(File pathName, File defaultParent, String defaultChild) {
+        if (pathName == null || pathName.getPath().isEmpty())
+            pathName = new File(defaultParent, defaultChild);
+        return pathName.isAbsolute() ? pathName : pathName.getAbsoluteFile();
+    }
+
+    /**
+     * Return a file's first line ending.
+     *
+     * @param fileName  pathname to the file
+     * @param orElse    default returned in case file can't be read or doesn't
+     *                    have \n within its first 400 bytes
+     *
+     * @return one of: "\n", "\r\n", {@code orElse}
+     */
+    public static String detectLineSeparator(String fileName, String orElse) {
+		try {
+            FileInputStream fis = new FileInputStream(fileName);
+            try {
+                byte[] data = new byte[400];
+                int n = fis.read(data);
+                int i = 0;
+                while (i < n && data[i] != '\n')
+                    i++;
+                if (i < n)
+                    return (i > 0 && data[i-1] == '\r') ? "\r\n" : "\n";
+            } finally {
+                fis.close();
+            }
+		}
+		catch (IOException ioe) {
+        }
+        return orElse;
+    }
+
+  /**
+     * Collect "Index" dictionary keys to be included for the current target.
+     *
+     * <p>A dictionary entry's key is added to the includedKeys collection if the
+     * value is any of: true; [] (empty list); or a regex pattern string that
+     * fully matches the current target name (case-insensitive).  Otherwise the
+     * key is added to the excludedKeys collection.
+     *
+     * <p>An exclamation mark (!) can precede the regex to invert the meaning, so
+     * the key will be excluded rather than included when the pattern matches the
+     * target name.
+     *
+     * @param includedKeys  OUT: included keys are added to this collection
+     * @param excludedKeys  OUT: excluded keys are added to this collection
+     * @param dictGroup     STGroup in which the dictionary should be found
+     * @param dictName      dictionary name
+     *
+     * @throws TestGenException if dictionary isn't there
+     */
+    protected void filterIndexEntries(Collection<String> includedKeys,
+                                      Collection<String> excludedKeys,
+                                      STGroup dictGroup,
+                                      String dictName) {
+		dictGroup.load(); // make sure the index group is loaded since we call rawGetDictionary
+        Map<String, Object> dict = dictGroup.rawGetDictionary(dictName);
+        if (dict == null)
+            throw new TestGenException("Dictionary '%s' not found in %s",
+                                       dictName, dictGroup.getFileName());
+        for (Map.Entry<String, Object> e : dict.entrySet()) {
+            String k = e.getKey();
+            Object v = e.getValue();
+            boolean include = false;
+            if (v instanceof Boolean)
+                include = (Boolean) v;
+            else if (v instanceof Collection &&
+                     ((Collection) v).isEmpty())
+                include = true;
+            else if (v instanceof String) {
+                String s = (String) v;
+                char first = s.isEmpty() ? 0 : s.charAt(0);
+                if (first == '!')
+                    s = s.substring(1);
+                Pattern pat = Pattern.compile(s, Pattern.CASE_INSENSITIVE);
+                include = pat.matcher(targetName).matches();
+                if (first == '!')
+                    include = !include;
+            }
+            else
+                warn(String.format("%s dictionary %s has invalid entry %s : %s",
+                                   dictGroup.getFileName(), dictName, k, v));
+            if (include)
+                includedKeys.add(k);
+            else
+                excludedKeys.add(k);
+        }
+    }
+
+    /** Format a collection with given separator between the items. */
+    public static String join(CharSequence separator, Collection<? extends Object> c) {
+        if (c.isEmpty())
+            return "";
+        StringBuilder buf = new StringBuilder(c.size() * 40);
+        for (Object o : c)
+            buf.append(o).append(separator);
+        buf.setLength(buf.length()-separator.length());  // drop last separator
+        return buf.toString();
+    }
+
+    protected File outputDir(String targetName) {
+        // NB. In MS Windows pathnames, forward (/) or backward (\) slashes are
+        // equivalent.  However, when stored in a File object, all are converted
+        // to just one kind of slash (File.separatorChar).  A pathname obtained
+        // from a File object does not end with a slash.
+        char slash = File.separatorChar;
+        String templateFolder = testTemplatesRoot.getPath() + slash;
+
+        String chomp = rootDir.getPath() + slash;
+		if(templateFolder.startsWith(chomp))
+			templateFolder = templateFolder.substring(chomp.length());
+
+        chomp = "resources" + slash;
+		if(templateFolder.startsWith(chomp))
+			templateFolder = templateFolder.substring(chomp.length());
+
+        int i = (slash + templateFolder).indexOf(slash + "templates" + slash);
+        if (i >= 0)
+            templateFolder = templateFolder.substring(0, i);
+
+		templateFolder += slash + targetName.toLowerCase();
+		return new File(outDir, templateFolder);
+	}
+
+	protected File targetTemplateFile(File targetTemplatesRoot, String targetName) {
+		String subTarget = targetName.substring(targetName.lastIndexOf('/')+1);
+		File templateDir = new File(targetTemplatesRoot, targetName.toLowerCase());
+        File templateFile = new File(templateDir, subTarget + ".test.stg");
+        return templateFile;
+    }
+
+    /**
+     * If any ST errors have landed in errorBuffer, throw TestGenException.
+     */
+    protected void throwTemplateError() {
+        if (errorBuffer.errors.isEmpty())
+            return;
+
+        // show the messages in full
+        error(String.format("StringTemplate reported the following %d error(s):",
+                            errorBuffer.errors.size()), null);
+        for (STMessage message : errorBuffer.errors) {
+            errPrintln("  " + message);
+        }
+
+        // abbreviate the first message
+        STMessage m = errorBuffer.errors.get(0);
+        String brief = String.format(m.error.message, m.arg, m.arg2, m.arg3);
+        if (errorBuffer.errors.size() > 1)
+            brief = String.format("%s (and %d more errors)",
+                                  brief, errorBuffer.errors.size()-1);
+
+        // reset so caller can carry on if desired
+        errorBuffer.errors.clear();
+
+        throw new TestGenException("Error from StringTemplate --> %s", brief);
+    }
+
+    public static class TestGenException extends RuntimeException {
+        public TestGenException(String format, Object... args) {
+            super(String.format(format, args),
+                  (args.length > 0 && args[args.length-1] instanceof Throwable
+                      ? (Throwable)args[args.length-1] : null) );
+        }
+    }
+
+	protected void detail(String message) {
+		info(message);
 	}
 
 	protected void info(String message) {
-		// System.out.println("INFO: " + message);
+		outPrintln(message);
 	}
 
 	protected void warn(String message) {
-		System.err.println("WARNING: " + message);
+		errPrintln("WARNING: " + message);
 	}
 
 	protected void error(String message, Throwable throwable) {
-		System.err.println("ERROR: " + message);
+		errPrintln("ERROR: " + message);
 	}
+
+    protected void errPrintln(String message) {
+        System.err.println(message);
+    }
+
+    protected void outPrintln(String message) {
+        System.out.println(message);
+    }
 }
