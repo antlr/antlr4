@@ -50,6 +50,8 @@ import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupFile;
 import org.stringtemplate.v4.STWriter;
 import org.stringtemplate.v4.gui.STViz;
+import org.stringtemplate.v4.misc.ErrorBuffer;
+import org.stringtemplate.v4.misc.STMessage;
 
 public class TestGenerator {
 	
@@ -111,10 +113,17 @@ public class TestGenerator {
 		System.out.println("browsers = " + browsers);
 		System.out.println("viz = " + viz);
 		
-		if ( "ALL".equalsIgnoreCase(target)) {
-			genAllTargets(rootDir, outDir, testTemplatesRoot, browsers, viz);
-		} else
-			genTarget(rootDir, outDir, target, testTemplatesRoot, viz);
+        try {
+            if ("ALL".equalsIgnoreCase(target))
+                genAllTargets(rootDir, outDir, testTemplatesRoot, browsers, viz);
+            else
+                genTarget(rootDir, outDir, target, testTemplatesRoot, viz);
+        } catch (TestGenException ex) {
+            System.err.println(ex.getClass().getSimpleName() + ": " + ex.getMessage());
+            for (StackTraceElement ste : ex.getStackTrace())
+                System.err.println("\tat " + ste);
+            System.exit(1);
+        }
 	}
 
 	public static void genAllTargets(File rootDir, File outDir, File testTemplatesRoot, boolean browsers, boolean viz) {
@@ -146,6 +155,8 @@ public class TestGenerator {
 	protected final boolean visualize;
     protected String lineSeparator = System.getProperty("line.separator");
 
+    protected ErrorBuffer errorBuffer = new ErrorBuffer();
+
 	public TestGenerator(String encoding, String targetName, File rootDir, File outDir, File testTemplatesRoot, boolean visualize) {
 		this.encoding = encoding;
 		this.targetName = targetName;
@@ -168,6 +179,7 @@ public class TestGenerator {
         File targetTemplateFile = targetTemplateFile(targetTemplatesRoot, targetName);
 
 		STGroup targetGroup = new STGroupFile(targetTemplateFile.getPath());
+        targetGroup.setListener(errorBuffer);
 
 		targetGroup.registerModelAdaptor(STGroup.class, new STGroupModelAdaptor());
 		targetGroup.defineDictionary("escape", new JavaEscapeStringMap());
@@ -175,6 +187,9 @@ public class TestGenerator {
 		targetGroup.defineDictionary("strlen", new StrlenStringMap());
 
 		generateCodeForFoldersInIndex(targetGroup, targetOutputDir);
+
+        if (errorBuffer.errors.size() > 0)
+            throwTemplateError();
 	}
 
 	protected void generateCodeForFoldersInIndex(STGroup targetGroup, File targetOutputDir) {
@@ -212,8 +227,18 @@ public class TestGenerator {
             if (! excludeTemplates.isEmpty())
                 detail(String.format("                  - excluding %s", excludeTemplates));
 
-            generateTestFile(outputFile, fileOptions, targetGroup,
-                             testTemplateDir, sortedTemplateNames);
+            try {
+                generateTestFile(outputFile, fileOptions, targetGroup,
+                                 testTemplateDir, sortedTemplateNames);
+            } catch (RuntimeException ex) {
+                // tell which file had trouble - in case detail messages are turned off
+                error(String.format("while generating test file %s %n" +
+                             "            using target template %s %n" +
+                             "            and test templates in %s",
+                          outputFile, targetGroup.getFileName(), testTemplateDir),
+                      ex);
+                throw ex;
+            }
         }
 	}
 
@@ -227,19 +252,20 @@ public class TestGenerator {
 		List<ST> methodTemplates = new ArrayList<ST>();
 		for (String templateName : testTemplates) {
             File testGroupFile = new File(testTemplateDir, templateName + STGroup.GROUP_FILE_EXTENSION);
+
 			STGroup testGroup = new STGroupFile(testGroupFile.getPath());
+            testGroup.setListener(errorBuffer);
 			importLanguageTemplates(testGroup, targetGroup);
+
 			ST testType = testGroup.getInstanceOf("TestType");
-			if (testType == null) {
-				warn(String.format("Unable to generate tests for %s: no TestType specified.", templateName));
-				continue;
-			}
+			if (testType == null)
+				throw new TestGenException("Unable to generate tests for %s: no TestType specified.",
+                                           templateName);
 
 			ST testMethodTemplate = targetGroup.getInstanceOf(testType.render() + "TestMethod");
-			if (testMethodTemplate == null) {
-				warn(String.format("Unable to generate tests for %s: TestType '%s' is not supported by the current runtime.", templateName, testType.render()));
-				continue;
-			}
+			if (testMethodTemplate == null)
+				throw new TestGenException("Unable to generate tests for %s: TestType '%s' is not supported by the current runtime.",
+                                           templateName, testType.render());
 
 			testMethodTemplate.add(testMethodTemplate.impl.formalArguments.keySet().iterator().next(), testGroup);
 			methodTemplates.add(testMethodTemplate);
@@ -260,18 +286,19 @@ public class TestGenerator {
 			writeFile(outputFile, render(testFileTemplate));
 		}
 		catch (IOException ex) {
-			error(String.format("Failed to write output file: %s", outputFile), ex);
+			throw new TestGenException("Error writing output file %s", outputFile, ex);
 		}
+
+        if (errorBuffer.errors.size() > 0)
+            throwTemplateError();
 	}
 
 	private void importLanguageTemplates(STGroup testGroup, STGroup languageGroup) {
 		// make sure the test group is loaded
 		testGroup.load();
 
-		if (testGroup == languageGroup) {
-			assert false : "Attempted to import the language group into itself.";
-			return;
-		}
+		if (testGroup == languageGroup)
+			throw new TestGenException("Attempted to import the language group into itself.");
 
 		if (testGroup.getImportedGroups().isEmpty()) {
 			testGroup.importTemplates(languageGroup);
@@ -360,6 +387,8 @@ public class TestGenerator {
      * @param excludedKeys  OUT: excluded keys are added to this collection
      * @param dictGroup     STGroup in which the dictionary should be found
      * @param dictName      dictionary name
+     *
+     * @throws TestGenException if dictionary isn't there
      */
     protected void filterIndexEntries(Collection<String> includedKeys,
                                       Collection<String> excludedKeys,
@@ -367,13 +396,9 @@ public class TestGenerator {
                                       String dictName) {
 		dictGroup.load(); // make sure the index group is loaded since we call rawGetDictionary
         Map<String, Object> dict = dictGroup.rawGetDictionary(dictName);
-
-        if (dict == null) {
-            warn(String.format("Dictionary '%s' not found in %s",
-                               dictName, dictGroup.getFileName()));
-            return;
-        }
-
+        if (dict == null)
+            throw new TestGenException("Dictionary '%s' not found in %s",
+                                       dictName, dictGroup.getFileName());
         for (Map.Entry<String, Object> e : dict.entrySet()) {
             String k = e.getKey();
             Object v = e.getValue();
@@ -434,19 +459,62 @@ public class TestGenerator {
         return templateFile;
     }
 
+    /**
+     * If any ST errors have landed in errorBuffer, throw TestGenException.
+     */
+    protected void throwTemplateError() {
+        if (errorBuffer.errors.isEmpty())
+            return;
+
+        // show the messages in full
+        error(String.format("StringTemplate reported the following %d error(s):",
+                            errorBuffer.errors.size()), null);
+        for (STMessage message : errorBuffer.errors) {
+            errPrintln("  " + message);
+        }
+
+        // abbreviate the first message
+        STMessage m = errorBuffer.errors.get(0);
+        String brief = String.format(m.error.message, m.arg, m.arg2, m.arg3);
+        if (errorBuffer.errors.size() > 1)
+            brief = String.format("%s (and %d more errors)",
+                                  brief, errorBuffer.errors.size()-1);
+
+        // reset so caller can carry on if desired
+        errorBuffer.errors.clear();
+
+        throw new TestGenException("Error from StringTemplate --> %s", brief);
+    }
+
+    public static class TestGenException extends RuntimeException {
+        public TestGenException(String format, Object... args) {
+            super(String.format(format, args),
+                  (args.length > 0 && args[args.length-1] instanceof Throwable
+                      ? (Throwable)args[args.length-1] : null) );
+        }
+    }
+
 	protected void detail(String message) {
 		info(message);
 	}
 
 	protected void info(String message) {
-		System.out.println(message);
+		outPrintln(message);
 	}
 
 	protected void warn(String message) {
-		System.err.println("WARNING: " + message);
+		errPrintln("WARNING: " + message);
 	}
 
 	protected void error(String message, Throwable throwable) {
-		System.err.println("ERROR: " + message);
+		errPrintln("ERROR: " + message);
 	}
+
+    protected void errPrintln(String message) {
+        System.err.println(message);
+    }
+
+    protected void outPrintln(String message) {
+        System.out.println(message);
+    }
 }
