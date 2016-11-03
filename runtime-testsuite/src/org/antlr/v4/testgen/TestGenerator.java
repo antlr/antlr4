@@ -30,20 +30,25 @@
 package org.antlr.v4.testgen;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 
+import org.stringtemplate.v4.AutoIndentWriter;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupFile;
+import org.stringtemplate.v4.STWriter;
 import org.stringtemplate.v4.gui.STViz;
 
 public class TestGenerator {
@@ -139,6 +144,7 @@ public class TestGenerator {
 	protected final File outDir;
 	protected final File testTemplatesRoot;
 	protected final boolean visualize;
+    protected String lineSeparator = System.getProperty("line.separator");
 
 	public TestGenerator(String encoding, String targetName, File rootDir, File outDir, File testTemplatesRoot, boolean visualize) {
 		this.encoding = encoding;
@@ -176,6 +182,10 @@ public class TestGenerator {
         Collection<String> excludeFolders = new TreeSet<String>();
 
 		STGroup rootIndex = new STGroupFile(new File(testTemplatesRoot, "Index.stg").getPath());
+
+        // let output file line endings be the same kind found in top Index.stg
+        lineSeparator = detectLineSeparator(rootIndex.getFileName(), lineSeparator);
+
         filterIndexEntries(testFolders, excludeFolders, rootIndex, "TestFolders");
 
         if (! excludeFolders.isEmpty()) {
@@ -247,7 +257,7 @@ public class TestGenerator {
 		}
 
 		try {
-			writeFile(outputFile, testFileTemplate.render());
+			writeFile(outputFile, render(testFileTemplate));
 		}
 		catch (IOException ex) {
 			error(String.format("Failed to write output file: %s", outputFile), ex);
@@ -277,6 +287,15 @@ public class TestGenerator {
 		}
 	}
 
+    public String render(ST template) {
+        // like ST.render() but uses our lineSeparator
+        StringWriter out = new StringWriter();
+        STWriter wr = new AutoIndentWriter(out, lineSeparator);
+        wr.setLineWidth(STWriter.NO_WRAP);
+        template.write(wr, Locale.getDefault());
+        return out.toString();
+    }
+
 	public void writeFile(File file, String content) throws IOException {
 		file.getParentFile().mkdirs();
 
@@ -297,6 +316,35 @@ public class TestGenerator {
     }
 
     /**
+     * Return a file's first line ending.
+     *
+     * @param fileName  pathname to the file
+     * @param orElse    default returned in case file can't be read or doesn't
+     *                    have \n within its first 400 bytes
+     *
+     * @return one of: "\n", "\r\n", {@code orElse}
+     */
+    public static String detectLineSeparator(String fileName, String orElse) {
+		try {
+            FileInputStream fis = new FileInputStream(fileName);
+            try {
+                byte[] data = new byte[400];
+                int n = fis.read(data);
+                int i = 0;
+                while (i < n && data[i] != '\n')
+                    i++;
+                if (i < n)
+                    return (i > 0 && data[i-1] == '\r') ? "\r\n" : "\n";
+            } finally {
+                fis.close();
+            }
+		}
+		catch (IOException ioe) {
+        }
+        return orElse;
+    }
+
+  /**
      * Collect "Index" dictionary keys to be included for the current target.
      *
      * <p>A dictionary entry's key is added to the includedKeys collection if the
