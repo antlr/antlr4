@@ -38,6 +38,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeSet;
+import java.util.regex.Pattern;
 
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
@@ -170,56 +172,71 @@ public class TestGenerator {
 	}
 
 	protected void generateCodeForFoldersInIndex(STGroup targetGroup, File targetOutputDir) {
+        Collection<String> testFolders = new ArrayList<String>(20);
+        Collection<String> excludeFolders = new TreeSet<String>();
+
 		STGroup rootIndex = new STGroupFile(new File(testTemplatesRoot, "Index.stg").getPath());
-		rootIndex.load(); // make sure the index group is loaded since we call rawGetDictionary
-		Map<String, Object> folders = rootIndex.rawGetDictionary("TestFolders");
-		if (folders != null) {
-			for (String key : folders.keySet()) {
-				File testTemplateDir = new File(testTemplatesRoot, key);
-				STGroup testIndex = new STGroupFile(new File(testTemplateDir, "Index.stg").getPath());
-				testIndex.load();
-				Map<String, Object> templateNames = testIndex.rawGetDictionary("TestTemplates");
-				if ( templateNames != null && !templateNames.isEmpty() ) {
-					final ArrayList<String> sortedTemplateNames = new ArrayList<String>(templateNames.keySet());
-					Collections.sort(sortedTemplateNames);
-					generateTestFile(testIndex, targetGroup, testTemplateDir, sortedTemplateNames, targetOutputDir);
-				}
-			}
-		}
+        filterIndexEntries(testFolders, excludeFolders, rootIndex, "TestFolders");
+
+        if (! excludeFolders.isEmpty()) {
+            info(String.format("  Excluding %s tests", excludeFolders));
+            testFolders.addAll(excludeFolders);
+        }
+
+        for (String testName : testFolders) {
+            Collection<String> sortedTemplateNames = new TreeSet<String>();
+            Collection<String> excludeTemplates = new TreeSet<String>();
+            Map<String, Object> fileOptions = Collections.emptyMap();
+
+            File outputFile = new File(targetOutputDir, "Test" + testName + ".java");
+            File testTemplateDir = new File(testTemplatesRoot, testName);
+
+            if (! excludeFolders.contains(testName)) {
+                STGroup testIndex = new STGroupFile(new File(testTemplateDir, "Index.stg").getPath());
+                filterIndexEntries(sortedTemplateNames, excludeTemplates, testIndex, "TestTemplates");
+                fileOptions = testIndex.rawGetDictionary("Options");
+            }
+
+            detail(String.format("  Generating %3d tests to file %s",
+                                 sortedTemplateNames.size(), outputFile));
+            if (! excludeTemplates.isEmpty())
+                detail(String.format("                  - excluding %s", excludeTemplates));
+
+            generateTestFile(outputFile, fileOptions, targetGroup,
+                             testTemplateDir, sortedTemplateNames);
+        }
 	}
 
-	protected void generateTestFile(STGroup index,
+	protected void generateTestFile(File outputFile,
+									Map<String, Object> fileOptions,
 									STGroup targetGroup,
 									File testTemplateDir,
-									Collection<String> testTemplates,
-									File targetOutputDir)
+									Collection<String> testTemplates)
 	{
 		String testName = testTemplateDir.getName();
-		File outputFile = new File(targetOutputDir, "Test" + testName + ".java");
-		info("  Generating file "+outputFile);
-		List<ST> templates = new ArrayList<ST>();
-		for (String template : testTemplates) {
-            File testGroupFile = new File(testTemplateDir, template + STGroup.GROUP_FILE_EXTENSION);
+		List<ST> methodTemplates = new ArrayList<ST>();
+		for (String templateName : testTemplates) {
+            File testGroupFile = new File(testTemplateDir, templateName + STGroup.GROUP_FILE_EXTENSION);
 			STGroup testGroup = new STGroupFile(testGroupFile.getPath());
 			importLanguageTemplates(testGroup, targetGroup);
 			ST testType = testGroup.getInstanceOf("TestType");
 			if (testType == null) {
-				warn(String.format("Unable to generate tests for %s: no TestType specified.", template));
+				warn(String.format("Unable to generate tests for %s: no TestType specified.", templateName));
 				continue;
 			}
 
 			ST testMethodTemplate = targetGroup.getInstanceOf(testType.render() + "TestMethod");
 			if (testMethodTemplate == null) {
-				warn(String.format("Unable to generate tests for %s: TestType '%s' is not supported by the current runtime.", template, testType.render()));
+				warn(String.format("Unable to generate tests for %s: TestType '%s' is not supported by the current runtime.", templateName, testType.render()));
 				continue;
 			}
 
 			testMethodTemplate.add(testMethodTemplate.impl.formalArguments.keySet().iterator().next(), testGroup);
-			templates.add(testMethodTemplate);
+			methodTemplates.add(testMethodTemplate);
 		}
 
 		ST testFileTemplate = targetGroup.getInstanceOf("TestFile");
-		testFileTemplate.addAggr("file.{Options,name,tests}", index.rawGetDictionary("Options"), testName, templates);
+		testFileTemplate.addAggr("file.{Options,name,tests}", fileOptions, testName, methodTemplates);
 
 		if (visualize) {
 			STViz viz = testFileTemplate.inspect();
@@ -279,6 +296,65 @@ public class TestGenerator {
         return pathName.isAbsolute() ? pathName : pathName.getAbsoluteFile();
     }
 
+    /**
+     * Collect "Index" dictionary keys to be included for the current target.
+     *
+     * <p>A dictionary entry's key is added to the includedKeys collection if the
+     * value is any of: true; [] (empty list); or a regex pattern string that
+     * fully matches the current target name (case-insensitive).  Otherwise the
+     * key is added to the excludedKeys collection.
+     *
+     * <p>An exclamation mark (!) can precede the regex to invert the meaning, so
+     * the key will be excluded rather than included when the pattern matches the
+     * target name.
+     *
+     * @param includedKeys  OUT: included keys are added to this collection
+     * @param excludedKeys  OUT: excluded keys are added to this collection
+     * @param dictGroup     STGroup in which the dictionary should be found
+     * @param dictName      dictionary name
+     */
+    protected void filterIndexEntries(Collection<String> includedKeys,
+                                      Collection<String> excludedKeys,
+                                      STGroup dictGroup,
+                                      String dictName) {
+		dictGroup.load(); // make sure the index group is loaded since we call rawGetDictionary
+        Map<String, Object> dict = dictGroup.rawGetDictionary(dictName);
+
+        if (dict == null) {
+            warn(String.format("Dictionary '%s' not found in %s",
+                               dictName, dictGroup.getFileName()));
+            return;
+        }
+
+        for (Map.Entry<String, Object> e : dict.entrySet()) {
+            String k = e.getKey();
+            Object v = e.getValue();
+            boolean include = false;
+            if (v instanceof Boolean)
+                include = (Boolean) v;
+            else if (v instanceof Collection &&
+                     ((Collection) v).isEmpty())
+                include = true;
+            else if (v instanceof String) {
+                String s = (String) v;
+                char first = s.isEmpty() ? 0 : s.charAt(0);
+                if (first == '!')
+                    s = s.substring(1);
+                Pattern pat = Pattern.compile(s, Pattern.CASE_INSENSITIVE);
+                include = pat.matcher(targetName).matches();
+                if (first == '!')
+                    include = !include;
+            }
+            else
+                warn(String.format("%s dictionary %s has invalid entry %s : %s",
+                                   dictGroup.getFileName(), dictName, k, v));
+            if (include)
+                includedKeys.add(k);
+            else
+                excludedKeys.add(k);
+        }
+    }
+
     protected File outputDir(String targetName) {
         // NB. In MS Windows pathnames, forward (/) or backward (\) slashes are
         // equivalent.  However, when stored in a File object, all are converted
@@ -309,6 +385,10 @@ public class TestGenerator {
         File templateFile = new File(templateDir, subTarget + ".test.stg");
         return templateFile;
     }
+
+	protected void detail(String message) {
+		info(message);
+	}
 
 	protected void info(String message) {
 		System.out.println(message);
