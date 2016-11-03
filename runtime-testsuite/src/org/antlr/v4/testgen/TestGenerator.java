@@ -36,11 +36,15 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Locale;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 
@@ -57,121 +61,133 @@ public class TestGenerator {
 	
 	public final static String[] targets = {"CSharp", "Java", "Python2", "Python3", "JavaScript/Node", "JavaScript/Safari", "JavaScript/Firefox", "JavaScript/Explorer", "JavaScript/Chrome"};
 
-	/** Execute from antlr4 root dir:
-	 * *
-	 * $ java TestGenerator -o output-root-dir -templates -viz
-	 *
-	 * Example:
-	 *
-	 * $ java org.antlr.v4.testgen.TestGenerator -root /Users/parrt/antlr/code/antlr4
-	 */
+    /**
+     * Generate test programs for ANTLR4 runtime.
+     *
+     * <p>Execute from antlr4 root dir:
+     * <p><code>
+     * $ java org.antlr.v4.testgen.TestGenerator [-root <i>dir</i>]
+     * [-outdir <i>dir</i>] [-templates <i>dir</i>] [-encoding <i>string</i>]
+     * [-target <i>string</i>] [-browsers] [-viz]
+     * </code>
+     *
+     * <p>Example:<pre>
+     *   $ java org.antlr.v4.testgen.TestGenerator -root /Users/parrt/antlr/code/antlr4
+     * </pre></p>
+     */
 	public static void main(String[] args) {
-		File rootDir = null;
-		File outDir = null;
-		File testTemplatesRoot = null;
-		String target = "ALL";
-		boolean browsers = false;
-		boolean viz = false;
+        TestGenerator gen = new TestGenerator();
 
-		int i = 0;
-		while (args != null && i < args.length) {
-			String arg = args[i];
-			if (arg.startsWith("-root")) {
-				i++;
-				rootDir = new File(args[i]);
-			}
-			else if (arg.startsWith("-outdir")) {
-				i++;
-				outDir = new File(args[i]);
-			}
-			else if (arg.startsWith("-templates")) {
-				i++;
-				testTemplatesRoot = new File(args[i]);
-			}
-			else if (arg.startsWith("-target")) {
-				i++;
-				target = args[i];
-			}
-			else if (arg.startsWith("-browsers")) {
-				browsers = true;
-			}
-			else if (arg.startsWith("-viz")) {
-				viz = true;
-			}
-			i++;
-		}
-
-        rootDir = absolutePath(rootDir, null, "");
-        outDir = absolutePath(outDir, rootDir, "test");
-        testTemplatesRoot = absolutePath(testTemplatesRoot, rootDir,
-                              "resources/org/antlr/v4/test/runtime/templates");
-
-		System.out.println("root = " + rootDir);
-		System.out.println("outdir = " + outDir);
-		System.out.println("templates = " + testTemplatesRoot);
-		System.out.println("target = " + target);
-		System.out.println("browsers = " + browsers);
-		System.out.println("viz = " + viz);
-		
         try {
-            if ("ALL".equalsIgnoreCase(target))
-                genAllTargets(rootDir, outDir, testTemplatesRoot, browsers, viz);
-            else
-                genTarget(rootDir, outDir, target, testTemplatesRoot, viz);
+            ListIterator<String> moreArgs = Arrays.asList(args).listIterator(0);
+            while (moreArgs.hasNext()) {
+                String arg = moreArgs.next();
+                if (!gen.acceptOption(arg, moreArgs))
+                    throw new TestGenException("Option not recognized: %s", arg);
+            }
+
+            gen.applyDefaults();
+            gen.showOptions();
+	        gen.execute();
+
         } catch (TestGenException ex) {
-            System.err.println(ex.getClass().getSimpleName() + ": " + ex.getMessage());
+            gen.errPrintln(ex.getClass().getSimpleName() + ": " + ex.getMessage());
             for (StackTraceElement ste : ex.getStackTrace())
-                System.err.println("\tat " + ste);
+                gen.errPrintln("\tat " + ste);
             System.exit(1);
         }
 	}
 
-	public static void genAllTargets(File rootDir, File outDir, File testTemplatesRoot, boolean browsers, boolean viz) {
-		for(String target : targets) {
-			if(!browsers && "JavaScript/Safari".equals(target))
-				return;
-			genTarget(rootDir, outDir, target, testTemplatesRoot, viz);
-		}
-	}
-	
-	public static void genTarget(File rootDir, File outDir, String fullTarget, File testTemplatesRoot, boolean viz) {
-		TestGenerator gen = new TestGenerator("UTF-8",
-					fullTarget,
-					rootDir,
-					outDir,
-					testTemplatesRoot,
-					viz);
-		gen.execute();
-	}
+    public TestGenerator() {
+    }
+
+    // set by acceptOption() and applyDefaults() ...
+    public File rootDir;
+    public File outDir;
+    public File testTemplatesRoot;
+    public String encoding = "UTF-8";
+    public boolean visualize;
+    public boolean browsers;
+    public String targetOption = "ALL";
+
+    // set during genTarget()
+    protected String targetName;
+    protected String lineSeparator = System.getProperty("line.separator");
+    protected ErrorBuffer errorBuffer = new ErrorBuffer();
 
 	// This project uses UTF-8, but the plugin might be used in another project
 	// which is not. Always load templates with UTF-8, but write using the
 	// specified encoding.
-	protected final String encoding;
-	protected final String targetName;
-	protected final File rootDir;
-	protected final File outDir;
-	protected final File testTemplatesRoot;
-	protected final boolean visualize;
-    protected String lineSeparator = System.getProperty("line.separator");
 
-    protected ErrorBuffer errorBuffer = new ErrorBuffer();
+    /**
+     * Consume a command line option.
+     * 
+     * @param arg       the argument to examine
+     * @param moreArgs  The rest of the arguments.  If arg is recognized as an
+     *                  option that requires a value, the value is consumed from
+     *                  this iterator; TestGenException is thrown if not enough.
+     * @return true if option was recognized and consumed; false if unrecognized
+     * @throws TestGenException
+     */
+    public boolean acceptOption(String arg, Iterator<String> moreArgs) {
+        try {
+            if ("-root".equals(arg))
+                rootDir = new File(moreArgs.next());
+            else if ("-outdir".equals(arg))
+                outDir = new File(moreArgs.next());
+            else if ("-templates".equals(arg))
+                testTemplatesRoot = new File(moreArgs.next());
+            else if ("-encoding".equals(arg))
+                encoding = moreArgs.next();
+            else if ("viz".equals(arg))
+                visualize = true;
+            else if ("-browsers".equals(arg))
+                browsers = true;
+            else if ("-target".equals(arg))
+                targetOption = moreArgs.next();
+            else
+                return false;   // option not recognized
+            return true;        // ok, consumed
+        } catch (NoSuchElementException ex) {
+            throw new TestGenException("Option requires a value: %s", arg);
+        }
+    }
 
-	public TestGenerator(String encoding, String targetName, File rootDir, File outDir, File testTemplatesRoot, boolean visualize) {
-		this.encoding = encoding;
-		this.targetName = targetName;
-		this.rootDir = rootDir;
-		this.outDir = outDir;
-		this.testTemplatesRoot = testTemplatesRoot;
-		this.visualize = visualize;
-	}
+    /** 
+     * Finish processing the options, and fill in defaults.
+     */
+    public void applyDefaults() {
+        rootDir = absolutePath(rootDir, null, "");
+        outDir = absolutePath(outDir, rootDir, "test");
+        testTemplatesRoot = absolutePath(testTemplatesRoot, rootDir,
+                              "resources/org/antlr/v4/test/runtime/templates");
+    }
 
-	private String getTargetName() {
-		return targetName;
-	}
+    public void showOptions() {
+        info("TestGenerator");
+		info("    -root      " + rootDir);
+		info("    -outdir    " + outDir);
+		info("    -templates " + testTemplatesRoot);
+		info("    -encoding  " + encoding);
+        info(visualize ? "    -viz" : " no -viz");
+        info(browsers ? "    -browsers" : " no -browsers");
+		info("    -target    " + targetOption);
+    }
 
+    public void execute() {
+		if ( "ALL".equalsIgnoreCase(targetOption)) {
+            for(String target : targets) {
+                if(!browsers && "JavaScript/Safari".equals(target))
+                    return;
+                genTarget(target);
+            }
+		} 
+        else
+			genTarget(targetOption);       
+    }
 
-	public void execute() {
+	public void genTarget(String target) {
+        targetName = target;
 		File targetOutputDir = outputDir(targetName);
 		info(String.format("Generating target %s => %s", targetName, targetOutputDir));
 
@@ -327,7 +343,7 @@ public class TestGenerator {
 		file.getParentFile().mkdirs();
 
 		FileOutputStream fos = new FileOutputStream(file);
-		OutputStreamWriter osw = new OutputStreamWriter(fos, encoding != null ? encoding : "UTF-8");
+		OutputStreamWriter osw = new OutputStreamWriter(fos, encoding);
 		try {
 			osw.write(content);
 		}
