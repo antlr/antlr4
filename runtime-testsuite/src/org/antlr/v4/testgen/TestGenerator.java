@@ -57,9 +57,9 @@ public class TestGenerator {
 	 * $ java org.antlr.v4.testgen.TestGenerator -root /Users/parrt/antlr/code/antlr4
 	 */
 	public static void main(String[] args) {
-		String rootDir = null;
-		String outDir = null;
-		String templatesRoot = null;
+		File rootDir = null;
+		File outDir = null;
+		File testTemplatesRoot = null;
 		String target = "ALL";
 		boolean browsers = false;
 		boolean viz = false;
@@ -69,15 +69,15 @@ public class TestGenerator {
 			String arg = args[i];
 			if (arg.startsWith("-root")) {
 				i++;
-				rootDir = args[i];
+				rootDir = new File(args[i]);
 			}
 			else if (arg.startsWith("-outdir")) {
 				i++;
-				outDir = args[i];
+				outDir = new File(args[i]);
 			}
 			else if (arg.startsWith("-templates")) {
 				i++;
-				templatesRoot = args[i];
+				testTemplatesRoot = new File(args[i]);
 			}
 			else if (arg.startsWith("-target")) {
 				i++;
@@ -91,52 +91,40 @@ public class TestGenerator {
 			}
 			i++;
 		}
-		
-		System.out.println("rootDir = " + rootDir);
-		System.out.println("outputDir = " + outDir);
-		System.out.println("templates = " + templatesRoot);
+
+        rootDir = absolutePath(rootDir, null, "");
+        outDir = absolutePath(outDir, rootDir, "test");
+        testTemplatesRoot = absolutePath(testTemplatesRoot, rootDir,
+                              "resources/org/antlr/v4/test/runtime/templates");
+
+		System.out.println("root = " + rootDir);
+		System.out.println("outdir = " + outDir);
+		System.out.println("templates = " + testTemplatesRoot);
 		System.out.println("target = " + target);
 		System.out.println("browsers = " + browsers);
 		System.out.println("viz = " + viz);
 		
-		if(rootDir==null) {
-			System.out.println("rootDir is mandatory!" + rootDir);
-			return;
-		}
-		if(outDir==null)
-			outDir = rootDir + "/test";
-			
-		if(templatesRoot==null)
-			templatesRoot = rootDir + "/resources/org/antlr/v4/test/runtime/templates";
-
 		if ( "ALL".equalsIgnoreCase(target)) {
-			genAllTargets(rootDir, outDir, templatesRoot, browsers, viz);
+			genAllTargets(rootDir, outDir, testTemplatesRoot, browsers, viz);
 		} else
-			genTarget(rootDir, outDir, target, templatesRoot, viz);
+			genTarget(rootDir, outDir, target, testTemplatesRoot, viz);
 	}
 
-	public static void genAllTargets(String rootDir, String outDirRoot, String templatesRoot, boolean browsers, boolean viz) {
+	public static void genAllTargets(File rootDir, File outDir, File testTemplatesRoot, boolean browsers, boolean viz) {
 		for(String target : targets) {
 			if(!browsers && "JavaScript/Safari".equals(target))
 				return;
-			genTarget(rootDir, outDirRoot, target, templatesRoot, viz);
+			genTarget(rootDir, outDir, target, testTemplatesRoot, viz);
 		}
 	}
 	
-	public static void genTarget(final String rootDir, final String outDir, final String fullTarget, final String templatesDir, boolean viz) {
-		String[] parts = fullTarget.split("/");
-		String target = parts[0];
-		String subTarget = parts.length>1 ? parts[1] : target;
-		String targetPackage = rootDir + "/resources/org/antlr/v4/test/runtime/" + fullTarget.toLowerCase();
-		String targetTemplate = targetPackage + "/" + subTarget + ".test.stg";
+	public static void genTarget(File rootDir, File outDir, String fullTarget, File testTemplatesRoot, boolean viz) {
 		TestGenerator gen = new TestGenerator("UTF-8",
 					fullTarget,
 					rootDir,
-					new File(outDir),
-					new File(templatesDir),
-					new File(targetTemplate),
+					outDir,
+					testTemplatesRoot,
 					viz);
-		gen.info("Generating target " + gen.getTargetName());
 		gen.execute();
 	}
 
@@ -145,19 +133,17 @@ public class TestGenerator {
 	// specified encoding.
 	protected final String encoding;
 	protected final String targetName;
-	protected final String rootDir;
-	protected final File outputDir;
-	protected final File testTemplates;
-	protected final File runtimeTemplate;
+	protected final File rootDir;
+	protected final File outDir;
+	protected final File testTemplatesRoot;
 	protected final boolean visualize;
 
-	public TestGenerator(String encoding, String targetName, String rootDir, File outputDir, File testTemplates, File runtimeTemplate, boolean visualize) {
+	public TestGenerator(String encoding, String targetName, File rootDir, File outDir, File testTemplatesRoot, boolean visualize) {
 		this.encoding = encoding;
 		this.targetName = targetName;
 		this.rootDir = rootDir;
-		this.outputDir = outputDir;
-		this.testTemplates = testTemplates;
-		this.runtimeTemplate = runtimeTemplate;
+		this.outDir = outDir;
+		this.testTemplatesRoot = testTemplatesRoot;
 		this.visualize = visualize;
 	}
 
@@ -167,29 +153,36 @@ public class TestGenerator {
 
 
 	public void execute() {
-		STGroup targetGroup = new STGroupFile(runtimeTemplate.getPath());
+		File targetOutputDir = outputDir(targetName);
+		info(String.format("Generating target %s => %s", targetName, targetOutputDir));
+
+        File targetTemplatesRoot = new File(rootDir, "resources/org/antlr/v4/test/runtime");
+        File targetTemplateFile = targetTemplateFile(targetTemplatesRoot, targetName);
+
+		STGroup targetGroup = new STGroupFile(targetTemplateFile.getPath());
+
 		targetGroup.registerModelAdaptor(STGroup.class, new STGroupModelAdaptor());
 		targetGroup.defineDictionary("escape", new JavaEscapeStringMap());
 		targetGroup.defineDictionary("lines", new LinesStringMap());
 		targetGroup.defineDictionary("strlen", new StrlenStringMap());
-		generateCodeForFoldersInIndex(targetGroup);
+
+		generateCodeForFoldersInIndex(targetGroup, targetOutputDir);
 	}
 
-	protected void generateCodeForFoldersInIndex(STGroup targetGroup) {
-		File targetFolder = getOutputDir(testTemplates+"");
-		STGroup index = new STGroupFile(testTemplates+"/Index.stg");
-		index.load(); // make sure the index group is loaded since we call rawGetDictionary
-		Map<String, Object> folders = index.rawGetDictionary("TestFolders");
+	protected void generateCodeForFoldersInIndex(STGroup targetGroup, File targetOutputDir) {
+		STGroup rootIndex = new STGroupFile(new File(testTemplatesRoot, "Index.stg").getPath());
+		rootIndex.load(); // make sure the index group is loaded since we call rawGetDictionary
+		Map<String, Object> folders = rootIndex.rawGetDictionary("TestFolders");
 		if (folders != null) {
 			for (String key : folders.keySet()) {
-				final String testDir = testTemplates + "/" + key;
-				STGroup testIndex = new STGroupFile(testDir + "/Index.stg");
+				File testTemplateDir = new File(testTemplatesRoot, key);
+				STGroup testIndex = new STGroupFile(new File(testTemplateDir, "Index.stg").getPath());
 				testIndex.load();
 				Map<String, Object> templateNames = testIndex.rawGetDictionary("TestTemplates");
 				if ( templateNames != null && !templateNames.isEmpty() ) {
 					final ArrayList<String> sortedTemplateNames = new ArrayList<String>(templateNames.keySet());
 					Collections.sort(sortedTemplateNames);
-					generateTestFile(testIndex, targetGroup, testDir, sortedTemplateNames, targetFolder);
+					generateTestFile(testIndex, targetGroup, testTemplateDir, sortedTemplateNames, targetOutputDir);
 				}
 			}
 		}
@@ -197,16 +190,17 @@ public class TestGenerator {
 
 	protected void generateTestFile(STGroup index,
 									STGroup targetGroup,
-									String testDir,
+									File testTemplateDir,
 									Collection<String> testTemplates,
-									File targetFolder)
+									File targetOutputDir)
 	{
-		String testName = testDir.substring(testDir.lastIndexOf('/') + 1);
-		File targetFile = new File(targetFolder, "Test" + testName + ".java");
-		info("Generating file "+targetFile.getAbsolutePath());
+		String testName = testTemplateDir.getName();
+		File outputFile = new File(targetOutputDir, "Test" + testName + ".java");
+		info("  Generating file "+outputFile);
 		List<ST> templates = new ArrayList<ST>();
 		for (String template : testTemplates) {
-			STGroup testGroup = new STGroupFile(testDir + "/" + template + STGroup.GROUP_FILE_EXTENSION);
+            File testGroupFile = new File(testTemplateDir, template + STGroup.GROUP_FILE_EXTENSION);
+			STGroup testGroup = new STGroupFile(testGroupFile.getPath());
 			importLanguageTemplates(testGroup, targetGroup);
 			ST testType = testGroup.getInstanceOf("TestType");
 			if (testType == null) {
@@ -236,10 +230,10 @@ public class TestGenerator {
 		}
 
 		try {
-			writeFile(targetFile, testFileTemplate.render());
+			writeFile(outputFile, testFileTemplate.render());
 		}
 		catch (IOException ex) {
-			error(String.format("Failed to write output file: %s", targetFile), ex);
+			error(String.format("Failed to write output file: %s", outputFile), ex);
 		}
 	}
 
@@ -279,18 +273,45 @@ public class TestGenerator {
 		}
 	}
 
-	public File getOutputDir(String templateFolder) {
-		if(templateFolder.startsWith(rootDir))
-			templateFolder = templateFolder.substring(rootDir.length());
-		if(templateFolder.startsWith("/resources"))
-			templateFolder = templateFolder.substring("/resources".length());
-		templateFolder = templateFolder.substring(0, templateFolder.indexOf("/templates"));
-		templateFolder += "/" + targetName.toLowerCase();
-		return new File(outputDir, templateFolder);
+    public static File absolutePath(File pathName, File defaultParent, String defaultChild) {
+        if (pathName == null || pathName.getPath().isEmpty())
+            pathName = new File(defaultParent, defaultChild);
+        return pathName.isAbsolute() ? pathName : pathName.getAbsoluteFile();
+    }
+
+    protected File outputDir(String targetName) {
+        // NB. In MS Windows pathnames, forward (/) or backward (\) slashes are
+        // equivalent.  However, when stored in a File object, all are converted
+        // to just one kind of slash (File.separatorChar).  A pathname obtained
+        // from a File object does not end with a slash.
+        char slash = File.separatorChar;
+        String templateFolder = testTemplatesRoot.getPath() + slash;
+
+        String chomp = rootDir.getPath() + slash;
+		if(templateFolder.startsWith(chomp))
+			templateFolder = templateFolder.substring(chomp.length());
+
+        chomp = "resources" + slash;
+		if(templateFolder.startsWith(chomp))
+			templateFolder = templateFolder.substring(chomp.length());
+
+        int i = (slash + templateFolder).indexOf(slash + "templates" + slash);
+        if (i >= 0)
+            templateFolder = templateFolder.substring(0, i);
+
+		templateFolder += slash + targetName.toLowerCase();
+		return new File(outDir, templateFolder);
 	}
 
+	protected File targetTemplateFile(File targetTemplatesRoot, String targetName) {
+		String subTarget = targetName.substring(targetName.lastIndexOf('/')+1);
+		File templateDir = new File(targetTemplatesRoot, targetName.toLowerCase());
+        File templateFile = new File(templateDir, subTarget + ".test.stg");
+        return templateFile;
+    }
+
 	protected void info(String message) {
-		// System.out.println("INFO: " + message);
+		System.out.println(message);
 	}
 
 	protected void warn(String message) {
