@@ -26,11 +26,14 @@
       <groupId>org.antlr</groupId>
       <artifactId>antlr4</artifactId>
       <version>${project.version}</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
+      <!-- antlr4-runtime artifact comprises Java target only -->
       <groupId>org.antlr</groupId>
       <artifactId>antlr4-runtime</artifactId>
       <version>${project.version}</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
@@ -55,14 +58,14 @@
   <build>
     <sourceDirectory>src</sourceDirectory>
     <testSourceDirectory>test</testSourceDirectory>
-    <resources>
-      <resource>
-        <directory>resources</directory>
-      </resource>
-      <resource>
+    <testResources>
+      <testResource>
         <directory>../runtime</directory>
-      </resource>
-    </resources>
+        <excludes>
+          <exclude>Java/**</exclude>
+        </excludes>
+      </testResource>
+    </testResources>
     <plugins> 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
