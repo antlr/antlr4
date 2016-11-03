@@ -109,11 +109,15 @@
               <execution>
                 <phase>generate-test-sources</phase>
                 <goals>
-                  <goal>java</goal>
+                  <goal>exec</goal>
                 </goals>
                 <configuration>
-                  <mainClass>org.antlr.v4.testgen.TestGenerator</mainClass>
+                  <executable>java</executable>
                   <arguments>
+                    <argument>-Dline.separator="&#x000a;"</argument>
+                    <argument>-cp</argument>
+                    <classpath/>
+                    <argument>org.antlr.v4.testgen.TestGenerator</argument>
                     <argument>-root</argument>
                     <argument>${basedir}</argument>
                     <argument>-outdir</argument>
