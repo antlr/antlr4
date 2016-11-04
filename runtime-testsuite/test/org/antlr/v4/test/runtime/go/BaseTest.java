@@ -170,7 +170,8 @@ public abstract class BaseTest {
 	}
 
 	private static void cacheGoRuntime(File tmpPackageDir) throws Exception {
-		ProcessBuilder pb = new ProcessBuilder("go", "install", "-x");
+		String goExecutable = locateGo();
+		ProcessBuilder pb = new ProcessBuilder(goExecutable, "install", "-x");
 		pb.directory(tmpPackageDir);
 		pb.environment().put("GOPATH", tmpGopath.getPath());
 		pb.redirectErrorStream(true);
@@ -477,7 +478,7 @@ public abstract class BaseTest {
 		return null;
 	}
 
-	private String locateTool(String tool) {
+	private static String locateTool(String tool) {
 		ArrayList<String> paths = new ArrayList<String>(); // default cap is about right
 
 		// GOROOT should have priority if set
@@ -508,7 +509,7 @@ public abstract class BaseTest {
 		return null;
 	}
 
-	private String locateGo() {
+	private static String locateGo() {
 		String propName = "antlr-go";
 		String prop = System.getProperty(propName);
 		if (prop == null || prop.length() == 0) {

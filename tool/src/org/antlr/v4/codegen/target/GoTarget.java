@@ -84,6 +84,7 @@ public class GoTarget extends Target {
 		// because "gofmt -w" uses ioutil.WriteFile internally, which means it literally writes in-place with O_TRUNC.
 		// That could result in a race. (Why oh why doesn't it do tmpfile + rename?)
 		try {
+			// TODO: need something like: String goExecutable = locateGo();
 			ProcessBuilder gofmtBuilder = new ProcessBuilder("gofmt", "-w", "-s", fileName.getPath());
 			gofmtBuilder.redirectErrorStream(true);
 			Process gofmt = gofmtBuilder.start();
