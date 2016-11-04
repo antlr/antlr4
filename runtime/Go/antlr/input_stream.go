@@ -1,7 +1,5 @@
 package antlr
 
-import "fmt"
-
 type InputStream struct {
 	name  string
 	index int

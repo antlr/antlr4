@@ -2,7 +2,6 @@ package antlr
 
 import (
 	"bytes"
-	"fmt"
 	"io"
 	"os"
 )

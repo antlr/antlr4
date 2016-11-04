@@ -1,8 +1,5 @@
 package antlr
 
-import "fmt"
-
-
 var ATNInvalidAltNumber int
 
 type ATN struct {
