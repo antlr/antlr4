@@ -203,7 +203,6 @@ func (l *LexerATNSimulator) getExistingTargetState(s *DFAState, t int) *DFAState
 	}
 
 	target := s.edges[t-LexerATNSimulatorMinDFAEdge]
-
 	if LexerATNSimulatorDebug && target != nil {
 		fmt.Println("reuse state " + strconv.Itoa(s.stateNumber) + " edge to " + strconv.Itoa(target.stateNumber))
 	}
