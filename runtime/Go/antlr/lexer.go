@@ -162,9 +162,6 @@ func (b *BaseLexer) safeMatch() (ret int) {
 	defer func() {
 		if e := recover(); e != nil {
 			if re, ok := e.(RecognitionException); ok {
-				if PortDebug {
-					fmt.Println("RecognitionException")
-				}
 				b.notifyListeners(re) // Report error
 				b.Recover(re)
 				ret = LexerSkip // default
@@ -207,12 +204,6 @@ func (b *BaseLexer) NextToken() Token {
 			ttype := LexerSkip
 
 			ttype = b.safeMatch()
-			if PortDebug {
-				fmt.Println("ttype", ttype)
-			}
-			if PortDebug {
-				fmt.Println("curType", b.thetype)
-			}
 
 			if b.input.LA(1) == TokenEOF {
 				b.hitEOF = true
@@ -222,25 +213,13 @@ func (b *BaseLexer) NextToken() Token {
 			}
 			if b.thetype == LexerSkip {
 				continueOuter = true
-				if PortDebug {
-					fmt.Println("skip")
-				}
 				break
 			}
 			if b.thetype != LexerMore {
-				if PortDebug {
-					fmt.Println("no more")
-				}
 				break
-			}
-			if PortDebug {
-				fmt.Println("lex inner loop")
 			}
 		}
 
-		if PortDebug {
-			fmt.Println("lex loop")
-		}
 		if continueOuter {
 			continue
 		}
@@ -264,9 +243,6 @@ func (b *BaseLexer) Skip() {
 }
 
 func (b *BaseLexer) More() {
-	if PortDebug {
-		fmt.Println("more")
-	}
 	b.thetype = LexerMore
 }
 
@@ -322,9 +298,6 @@ func (b *BaseLexer) EmitToken(token Token) {
 // custom Token objects or provide a Newfactory.
 // /
 func (b *BaseLexer) Emit() Token {
-	if PortDebug {
-		fmt.Println("emit base lexer")
-	}
 	t := b.factory.Create(b.tokenFactorySourcePair, b.thetype, b.text, b.channel, b.TokenStartCharIndex, b.GetCharIndex()-1, b.TokenStartLine, b.TokenStartColumn)
 	b.EmitToken(t)
 	return t
@@ -333,9 +306,6 @@ func (b *BaseLexer) Emit() Token {
 func (b *BaseLexer) EmitEOF() Token {
 	cpos := b.GetCharPositionInLine()
 	lpos := b.GetLine()
-	if PortDebug {
-		fmt.Println("emitEOF")
-	}
 	eof := b.factory.Create(b.tokenFactorySourcePair, TokenEOF, "", TokenDefaultChannel, b.input.Index(), b.input.Index()-1, lpos, cpos)
 	b.EmitToken(eof)
 	return eof
@@ -384,17 +354,11 @@ func (b *BaseLexer) GetATN() *ATN {
 // Forces load of all tokens. Does not include EOF token.
 // /
 func (b *BaseLexer) getAllTokens() []Token {
-	if PortDebug {
-		fmt.Println("getAllTokens")
-	}
 	vl := b.Virt
 	tokens := make([]Token, 0)
 	t := vl.NextToken()
 	for t.GetTokenType() != TokenEOF {
 		tokens = append(tokens, t)
-		if PortDebug {
-			fmt.Println("getAllTokens")
-		}
 		t = vl.NextToken()
 	}
 	return tokens

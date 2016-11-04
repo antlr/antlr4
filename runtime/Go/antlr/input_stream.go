@@ -68,9 +68,6 @@ func (is *InputStream) Mark() int {
 }
 
 func (is *InputStream) Release(marker int) {
-	if PortDebug {
-		fmt.Println("RELEASING")
-	}
 }
 
 func (is *InputStream) Seek(index int) {

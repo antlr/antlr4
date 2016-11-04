@@ -25,27 +25,15 @@ func NewDefaultErrorListener() *DefaultErrorListener {
 }
 
 func (d *DefaultErrorListener) SyntaxError(recognizer Recognizer, offendingSymbol interface{}, line, column int, msg string, e RecognitionException) {
-	if PortDebug {
-		fmt.Println("SyntaxError!")
-	}
 }
 
 func (d *DefaultErrorListener) ReportAmbiguity(recognizer Parser, dfa *DFA, startIndex, stopIndex int, exact bool, ambigAlts *BitSet, configs ATNConfigSet) {
-	if PortDebug {
-		fmt.Println("ReportAmbiguity!")
-	}
 }
 
 func (d *DefaultErrorListener) ReportAttemptingFullContext(recognizer Parser, dfa *DFA, startIndex, stopIndex int, conflictingAlts *BitSet, configs ATNConfigSet) {
-	if PortDebug {
-		fmt.Println("ReportAttemptingFullContext!")
-	}
 }
 
 func (d *DefaultErrorListener) ReportContextSensitivity(recognizer Parser, dfa *DFA, startIndex, stopIndex, prediction int, configs ATNConfigSet) {
-	if PortDebug {
-		fmt.Println("ReportContextSensitivity!")
-	}
 }
 
 type ConsoleErrorListener struct {

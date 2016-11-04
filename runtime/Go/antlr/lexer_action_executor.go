@@ -133,10 +133,6 @@ func (l *LexerActionExecutor) fixOffsetBeforeMatch(offset int) *LexerActionExecu
 // of the token.
 // /
 func (l *LexerActionExecutor) execute(lexer Lexer, input CharStream, startIndex int) {
-	if PortDebug {
-		fmt.Println("execute")
-		fmt.Println("len(lexerActions)", len(l.lexerActions))
-	}
 	requiresSeek := false
 	stopIndex := input.Index()
 
@@ -149,23 +145,13 @@ func (l *LexerActionExecutor) execute(lexer Lexer, input CharStream, startIndex 
 	for i := 0; i < len(l.lexerActions); i++ {
 		lexerAction := l.lexerActions[i]
 		if la, ok := lexerAction.(*LexerIndexedCustomAction); ok {
-			if PortDebug {
-				fmt.Printf("LexerIndexedCustomAction")
-			}
 			offset := la.offset
 			input.Seek(startIndex + offset)
 			lexerAction = la.lexerAction
 			requiresSeek = (startIndex + offset) != stopIndex
 		} else if lexerAction.getIsPositionDependent() {
-			if PortDebug {
-				fmt.Printf("posDep")
-			}
 			input.Seek(stopIndex)
 			requiresSeek = false
-		}
-		if PortDebug {
-			fmt.Println("exec")
-			fmt.Println(lexerAction)
 		}
 		lexerAction.execute(lexer)
 	}
