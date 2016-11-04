@@ -42,8 +42,6 @@ import org.antlr.v4.tool.Rule;
 import org.antlr.v4.tool.ast.GrammarAST;
 
 public class LeftRecursiveRuleFunction extends RuleFunction {
-	public String recognizerName;
-
 	public LeftRecursiveRuleFunction(OutputModelFactory factory, LeftRecursiveRule r) {
 		super(factory, r);
 
@@ -74,7 +72,5 @@ public class LeftRecursiveRuleFunction extends RuleFunction {
 				struct.addDecl(d); // stick in overall rule's ctx
 			}
 		}
-
-		recognizerName = factory.getGrammar().getRecognizerName();
 	}
 }
