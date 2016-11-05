@@ -1,7 +1,5 @@
 package antlr
 
-import "fmt"
-
 type InputStream struct {
 	name  string
 	index int
@@ -68,9 +66,6 @@ func (is *InputStream) Mark() int {
 }
 
 func (is *InputStream) Release(marker int) {
-	if PortDebug {
-		fmt.Println("RELEASING")
-	}
 }
 
 func (is *InputStream) Seek(index int) {

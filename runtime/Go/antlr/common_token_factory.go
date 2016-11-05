@@ -1,7 +1,5 @@
 package antlr
 
-import "fmt"
-
 // TokenFactory creates CommonToken objects.
 type TokenFactory interface {
 	Create(source *TokenSourceCharStreamPair, ttype int, text string, channel, start, stop, line, column int) Token
@@ -32,10 +30,6 @@ func NewCommonTokenFactory(copyText bool) *CommonTokenFactory {
 var CommonTokenFactoryDEFAULT = NewCommonTokenFactory(false)
 
 func (c *CommonTokenFactory) Create(source *TokenSourceCharStreamPair, ttype int, text string, channel, start, stop, line, column int) Token {
-	if PortDebug {
-		fmt.Println("Token factory creating: " + text)
-	}
-
 	t := NewCommonToken(source, ttype, channel, start, stop)
 
 	t.line = line
@@ -51,12 +45,7 @@ func (c *CommonTokenFactory) Create(source *TokenSourceCharStreamPair, ttype int
 }
 
 func (c *CommonTokenFactory) createThin(ttype int, text string) Token {
-	if PortDebug {
-		fmt.Println("Token factory creating: " + text)
-	}
-
 	t := NewCommonToken(nil, ttype, TokenDefaultChannel, -1, -1)
-
 	t.SetText(text)
 
 	return t

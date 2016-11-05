@@ -133,14 +133,7 @@ func (p *BaseParser) SetErrorHandler(e ErrorStrategy) {
 
 func (p *BaseParser) Match(ttype int) Token {
 
-	if PortDebug {
-		fmt.Println("get current token")
-	}
 	t := p.GetCurrentToken()
-
-	if PortDebug {
-		fmt.Println("TOKEN IS " + t.GetText())
-	}
 
 	if t.GetTokenType() == ttype {
 		p.errHandler.ReportMatch(p)
@@ -153,10 +146,6 @@ func (p *BaseParser) Match(ttype int) Token {
 			// if it's not the current symbol
 			p.ctx.AddErrorNode(t)
 		}
-	}
-
-	if PortDebug {
-		fmt.Println("match done")
 	}
 
 	return t
@@ -428,13 +417,7 @@ func (p *BaseParser) NotifyErrorListeners(msg string, offendingToken Token, err 
 func (p *BaseParser) Consume() Token {
 	o := p.GetCurrentToken()
 	if o.GetTokenType() != TokenEOF {
-		if PortDebug {
-			fmt.Println("Consuming")
-		}
 		p.GetInputStream().Consume()
-		if PortDebug {
-			fmt.Println("Done consuming")
-		}
 	}
 	hasListener := p.parseListeners != nil && len(p.parseListeners) > 0
 	if p.BuildParseTrees || hasListener {

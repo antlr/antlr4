@@ -1,9 +1,5 @@
 package antlr
 
-import (
-	"fmt"
-)
-
 type LL1Analyzer struct {
 	atn *ATN
 }
@@ -75,20 +71,7 @@ func (la *LL1Analyzer) Look(s, stopState ATNState, ctx RuleContext) *IntervalSet
 	if ctx != nil {
 		lookContext = predictionContextFromRuleContext(s.GetATN(), ctx)
 	}
-	if PortDebug {
-		fmt.Println("DEBUG 5")
-		//	fmt.Println("DEBUG" + lookContext.String())
-		fmt.Println(s)
-		fmt.Println(stopState)
-		fmt.Println(lookContext)
-		fmt.Println(r)
-		fmt.Println(seeThruPreds)
-		fmt.Println("=====")
-	}
 	la.look1(s, stopState, lookContext, r, NewSet(nil, nil), NewBitSet(), seeThruPreds, true)
-	if PortDebug {
-		fmt.Println(r)
-	}
 	return r
 }
 
@@ -150,9 +133,6 @@ func (la *LL1Analyzer) look1(s, stopState ATNState, ctx PredictionContext, look 
 	lookBusy.add(c)
 
 	if s == stopState {
-		if PortDebug {
-			fmt.Println("DEBUG 6")
-		}
 		if ctx == nil {
 			look.addOne(TokenEpsilon)
 			return
@@ -174,16 +154,10 @@ func (la *LL1Analyzer) look1(s, stopState ATNState, ctx PredictionContext, look 
 		}
 
 		if ctx != BasePredictionContextEMPTY {
-			if PortDebug {
-				fmt.Println("DEBUG 7")
-			}
-
 			// run thru all possible stack tops in ctx
 			for i := 0; i < ctx.length(); i++ {
-
 				returnState := la.atn.states[ctx.getReturnState(i)]
 				la.look2(returnState, stopState, ctx, look, lookBusy, calledRuleStack, seeThruPreds, addEOF, i)
-
 			}
 			return
 		}
@@ -195,49 +169,24 @@ func (la *LL1Analyzer) look1(s, stopState ATNState, ctx PredictionContext, look 
 		t := s.GetTransitions()[i]
 
 		if t1, ok := t.(*RuleTransition); ok {
-			if PortDebug {
-				fmt.Println("DEBUG 8")
-			}
-
 			if calledRuleStack.contains(t1.getTarget().GetRuleIndex()) {
 				continue
 			}
 
 			newContext := SingletonBasePredictionContextCreate(ctx, t1.followState.GetStateNumber())
-
 			la.look3(stopState, newContext, look, lookBusy, calledRuleStack, seeThruPreds, addEOF, t1)
-
-			if PortDebug {
-				fmt.Println(look)
-			}
-
 		} else if t2, ok := t.(AbstractPredicateTransition); ok {
-			if PortDebug {
-				fmt.Println("DEBUG 9")
-			}
 			if seeThruPreds {
 				la.look1(t2.getTarget(), stopState, ctx, look, lookBusy, calledRuleStack, seeThruPreds, addEOF)
 			} else {
 				look.addOne(LL1AnalyzerHitPred)
 			}
 		} else if t.getIsEpsilon() {
-			if PortDebug {
-				fmt.Println("DEBUG 10")
-			}
 			la.look1(t.getTarget(), stopState, ctx, look, lookBusy, calledRuleStack, seeThruPreds, addEOF)
 		} else if _, ok := t.(*WildcardTransition); ok {
-			if PortDebug {
-				fmt.Println("DEBUG 11")
-			}
 			look.addRange(TokenMinUserTokenType, la.atn.maxTokenType)
 		} else {
-			if PortDebug {
-				fmt.Println("DEBUG 12")
-			}
 			set := t.getLabel()
-			if PortDebug {
-				fmt.Println(set)
-			}
 			if set != nil {
 				if _, ok := t.(*NotSetTransition); ok {
 					set = set.complement(TokenMinUserTokenType, la.atn.maxTokenType)

@@ -2,7 +2,6 @@ package antlr
 
 import (
 	"bytes"
-	"fmt"
 	"io"
 	"os"
 )
@@ -29,9 +28,6 @@ func NewFileStream(fileName string) *FileStream {
 	fs.filename = fileName
 	s := string(buf.Bytes())
 
-	if PortDebug {
-		fmt.Println(s)
-	}
 	fs.InputStream = NewInputStream(s)
 
 	return fs
