@@ -7,7 +7,7 @@
 
 ### Referencing in your code
 
-Reference the go package like this:
+Reference the go runtime package like this:
 
 ```go
 import "github.com/pboyer/antlr4/runtime/Go/antlr"
