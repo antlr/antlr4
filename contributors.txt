@@ -86,3 +86,4 @@ YYYY/MM/DD, github id, Full name, email
 2015/11/25, abego, Udo Borkowski, ub@abego.org
 2016/07/18, willfaught, Will Faught, will.faught@gmail.com
 2016/08/08, wjkohnen, Wolfgang Johannes Kohnen, wjkohnen-go-antlr@ko-sys.com
+2016/11/05, runner-mei, meifakun, runner.mei@gmail.com
