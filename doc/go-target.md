@@ -10,5 +10,5 @@
 Reference the go runtime package like this:
 
 ```go
-import "github.com/pboyer/antlr4/runtime/Go/antlr"
+import "github.com/antlr/antlr4/runtime/Go/antlr"
 ```
