@@ -95,6 +95,10 @@ ParseTreeVisitor.prototype.visit = function(ctx) {
 	}
 };
 
+ParseTreeVisitor.prototype.visitChildren = function(ctx) {
+  return this.visit(ctx.children);
+}
+
 ParseTreeVisitor.prototype.visitTerminal = function(node) {
 };
 
@@ -103,14 +107,7 @@ ParseTreeVisitor.prototype.visitErrorNode = function(node) {
 
 
 var visitAtom = function(visitor, ctx) {
-	if (ctx.parser === undefined) { //is terminal
-		return;
-	}
-
-	var name = ctx.parser.ruleNames[ctx.ruleIndex];
-	var funcName = "visit" + Utils.titleCase(name);
-
-	return visitor[funcName](ctx);
+	return ctx.accept(visitor);
 };
 
 function ParseTreeListener() {

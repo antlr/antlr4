@@ -439,6 +439,17 @@ ContextRuleFunction(ctx, rule) ::= "<ctx>.<rule>"
 StringType() ::= "String"
 ContextMember(ctx, subctx, member) ::= "<ctx>.<subctx>.<member>"
 
+IgnoredTests ::= [
+	"Visitors.Basic": true,
+	"Visitors.LR": true,
+	"Visitors.LRWithLabels": true,
+	"Visitors.RuleGetters_1": true,
+	"Visitors.RuleGetters_2": true,
+	"Visitors.TokenGetters_1": true,
+	"Visitors.TokenGetters_2": true,
+	default: false
+]
+
 isEmpty ::= [
 	"": true,
 	default: false

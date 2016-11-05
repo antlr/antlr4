@@ -96,10 +96,16 @@ ATNConfig.prototype.checkContext = function(params, config) {
 	}
 };
 
+ATNConfig.prototype.hashString = function() {
+    return "" + this.state.stateNumber + "/" + this.alt + "/" +
+        (this.context===null ? "" : this.context.hashString()) +
+        "/" + this.semanticContext.hashString();
+};
+
 // An ATN configuration is equal to another if both have
 //  the same state, they predict the same alternative, and
 //  syntactic/semantic contexts are the same.
-///
+
 ATNConfig.prototype.equals = function(other) {
     if (this === other) {
         return true;
@@ -114,15 +120,22 @@ ATNConfig.prototype.equals = function(other) {
     }
 };
 
-ATNConfig.prototype.shortHashString = function() {
+ATNConfig.prototype.hashStringForConfigSet = function() {
     return "" + this.state.stateNumber + "/" + this.alt + "/" + this.semanticContext;
 };
 
-ATNConfig.prototype.hashString = function() {
-    return "" + this.state.stateNumber + "/" + this.alt + "/" +
-             (this.context===null ? "" : this.context.hashString()) +
-             "/" + this.semanticContext.hashString();
+ATNConfig.prototype.equalsForConfigSet = function(other) {
+    if (this === other) {
+        return true;
+    } else if (! (other instanceof ATNConfig)) {
+        return false;
+    } else {
+        return this.state.stateNumber===other.state.stateNumber &&
+            this.alt===other.alt &&
+            this.semanticContext.equals(other.semanticContext);
+    }
 };
+
 
 ATNConfig.prototype.toString = function() {
     return "(" + this.state + "," + this.alt +
@@ -170,6 +183,11 @@ LexerATNConfig.prototype.equals = function(other) {
         return ATNConfig.prototype.equals.call(this, other);
     }
 };
+
+LexerATNConfig.prototype.hashStringForConfigSet = LexerATNConfig.prototype.hashString;
+
+LexerATNConfig.prototype.equalsForConfigSet = LexerATNConfig.prototype.eqials;
+
 
 LexerATNConfig.prototype.checkNonGreedyDecision = function(source, target) {
     return source.passedThroughNonGreedyDecision ||
