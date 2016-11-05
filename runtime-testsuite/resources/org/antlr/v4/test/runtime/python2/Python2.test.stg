@@ -398,6 +398,14 @@ class LeafListener(TListener):
 
 >>
 
+ImportVisitor(X) ::= ""
+BasicVisitor(X) ::= ""
+WalkVisitor(s) ::= ""
+LRWithLabelsVisitor(X) ::= ""
+RuleGetterVisitor(X) ::= ""
+LRVisitor(x) ::= ""
+TokenGetterVisitor(x) ::= ""
+
 DeclareContextListGettersFunction() ::= <<
 def foo():
     s = SContext()

@@ -14,6 +14,13 @@ templates = /Users/parrt/antlr/code/antlr4/runtime-testsuite/resources/org/antlr
 target = ALL
 browsers = false
 viz = false
+INFO: Generating target Java
+INFO: Generating target Go
+INFO: Generating target CSharp
+INFO: Generating target Python2
+INFO: Generating target Python3
+INFO: Generating target JavaScript/Node
+...
 ```
 
 It basically runs the Java program:

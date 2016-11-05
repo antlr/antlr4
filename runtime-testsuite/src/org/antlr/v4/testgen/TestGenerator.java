@@ -29,6 +29,13 @@
  */
 package org.antlr.v4.testgen;
 
+import org.stringtemplate.v4.ST;
+import org.stringtemplate.v4.STGroup;
+import org.stringtemplate.v4.STGroupFile;
+import org.stringtemplate.v4.StringRenderer;
+import org.stringtemplate.v4.gui.STViz;
+import org.stringtemplate.v4.misc.ErrorBuffer;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -39,15 +46,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.stringtemplate.v4.ST;
-import org.stringtemplate.v4.STGroup;
-import org.stringtemplate.v4.STGroupFile;
-import org.stringtemplate.v4.StringRenderer;
-import org.stringtemplate.v4.gui.STViz;
-
 public class TestGenerator {
-	
-	public final static String[] targets = {"Go", "CSharp", "Java", "Python2", "Python3", "JavaScript/Node", "JavaScript/Safari", "JavaScript/Firefox", "JavaScript/Explorer", "JavaScript/Chrome"};
+	public final static String[] targets = {
+		"Java", "Go", "CSharp", "Python2", "Python3",
+		"JavaScript/Node", "JavaScript/Safari", "JavaScript/Firefox",
+		"JavaScript/Explorer", "JavaScript/Chrome"
+	};
 
 	/** Execute from antlr4 root dir:
 	 * *
@@ -92,38 +96,41 @@ public class TestGenerator {
 			}
 			i++;
 		}
-		
+
 		System.out.println("rootDir = " + rootDir);
 		System.out.println("outputDir = " + outDir);
 		System.out.println("templates = " + templatesRoot);
 		System.out.println("target = " + target);
 		System.out.println("browsers = " + browsers);
 		System.out.println("viz = " + viz);
-		
+
 		if(rootDir==null) {
 			System.out.println("rootDir is mandatory!" + rootDir);
 			return;
 		}
 		if(outDir==null)
 			outDir = rootDir + "/test";
-			
+
 		if(templatesRoot==null)
 			templatesRoot = rootDir + "/resources/org/antlr/v4/test/runtime/templates";
 
 		if ( "ALL".equalsIgnoreCase(target)) {
 			genAllTargets(rootDir, outDir, templatesRoot, browsers, viz);
-		} else
+		}
+		else {
 			genTarget(rootDir, outDir, target, templatesRoot, viz);
+		}
 	}
 
 	public static void genAllTargets(String rootDir, String outDirRoot, String templatesRoot, boolean browsers, boolean viz) {
 		for(String target : targets) {
-			if(!browsers && "JavaScript/Safari".equals(target))
+			if(!browsers && "JavaScript/Safari".equals(target)) {
 				return;
+			}
 			genTarget(rootDir, outDirRoot, target, templatesRoot, viz);
 		}
 	}
-	
+
 	public static void genTarget(final String rootDir, final String outDir, final String fullTarget, final String templatesDir, boolean viz) {
 		String[] parts = fullTarget.split("/");
 		String target = parts[0];
@@ -203,9 +210,12 @@ public class TestGenerator {
 									Collection<String> testTemplates,
 									File targetFolder)
 	{
+		ErrorBuffer errors = new ErrorBuffer();
+		targetGroup.setListener(errors);
+
 		String testName = testDir.substring(testDir.lastIndexOf('/') + 1);
 		File targetFile = new File(targetFolder, "Test" + testName + ".java");
-		info("Generating file "+targetFile.getAbsolutePath());
+//		System.out.println("Generating file "+targetFile.getAbsolutePath());
 		List<ST> templates = new ArrayList<ST>();
 		for (String template : testTemplates) {
 			STGroup testGroup = new STGroupFile(testDir + "/" + template + STGroup.GROUP_FILE_EXTENSION);
@@ -227,7 +237,10 @@ public class TestGenerator {
 		}
 
 		ST testFileTemplate = targetGroup.getInstanceOf("TestFile");
-		testFileTemplate.addAggr("file.{Options,name,tests}", index.rawGetDictionary("Options"), testName, templates);
+		testFileTemplate.addAggr("file.{Options,name,tests}",
+		                         index.rawGetDictionary("Options"),
+		                         testName,
+		                         templates);
 
 		if (visualize) {
 			STViz viz = testFileTemplate.inspect();
@@ -238,7 +251,11 @@ public class TestGenerator {
 		}
 
 		try {
-			writeFile(targetFile, testFileTemplate.render());
+			String output = testFileTemplate.render();
+			if ( errors.errors.size()>0 ) {
+				System.err.println("errors in "+targetName+": "+errors);
+			}
+			writeFile(targetFile, output);
 		}
 		catch (IOException ex) {
 			error(String.format("Failed to write output file: %s", targetFile), ex);
@@ -282,17 +299,19 @@ public class TestGenerator {
 	}
 
 	public File getOutputDir(String templateFolder) {
-		if(templateFolder.startsWith(rootDir))
+		if(templateFolder.startsWith(rootDir)) {
 			templateFolder = templateFolder.substring(rootDir.length());
-		if(templateFolder.startsWith("/resources"))
+		}
+		if(templateFolder.startsWith("/resources")) {
 			templateFolder = templateFolder.substring("/resources".length());
+		}
 		templateFolder = templateFolder.substring(0, templateFolder.indexOf("/templates"));
 		templateFolder += "/" + targetName.toLowerCase();
 		return new File(outputDir, templateFolder);
 	}
 
 	protected void info(String message) {
-		// System.out.println("INFO: " + message);
+		System.out.println("INFO: " + message);
 	}
 
 	protected void warn(String message) {
