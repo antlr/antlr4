@@ -96,3 +96,5 @@ YYYY/MM/DD, github id, Full name, email
 2016/08/08, wjkohnen, Wolfgang Johannes Kohnen, wjkohnen-go-antlr@ko-sys.com
 2016/08/11, BurtHarris, Ralph "Burt" Harris, Burt_Harris_antlr4@azxs.33mail.com
 2016/08/19, andjo403, Andreas Jonson, andjo403@hotmail.com
+2016/10/13, cgudrian, Christian Gudrian, christian.gudrian@gmx.de
+2016/10/13, nielsbasjes, Niels Basjes, niels@basjes.nl

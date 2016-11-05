@@ -392,6 +392,55 @@ public abstract class Target {
 		return getTokenTypeAsTargetLabel(getCodeGenerator().g, ttype);
 	}
 
+	/** Generate TParser.java and TLexer.java from T.g4 if combined, else
+	 *  just use T.java as output regardless of type.
+	 */
+	public String getRecognizerFileName(boolean header) {
+		ST extST = getTemplates().getInstanceOf("codeFileExtension");
+		String recognizerName = gen.g.getRecognizerName();
+		return recognizerName+extST.render();
+	}
+
+	/** A given grammar T, return the listener name such as
+	 *  TListener.java, if we're using the Java target.
+ 	 */
+	public String getListenerFileName(boolean header) {
+		assert gen.g.name != null;
+		ST extST = getTemplates().getInstanceOf("codeFileExtension");
+		String listenerName = gen.g.name + "Listener";
+		return listenerName+extST.render();
+	}
+
+	/** A given grammar T, return the visitor name such as
+	 *  TVisitor.java, if we're using the Java target.
+ 	 */
+	public String getVisitorFileName(boolean header) {
+		assert gen.g.name != null;
+		ST extST = getTemplates().getInstanceOf("codeFileExtension");
+		String listenerName = gen.g.name + "Visitor";
+		return listenerName+extST.render();
+	}
+
+	/** A given grammar T, return a blank listener implementation
+	 *  such as TBaseListener.java, if we're using the Java target.
+ 	 */
+	public String getBaseListenerFileName(boolean header) {
+		assert gen.g.name != null;
+		ST extST = getTemplates().getInstanceOf("codeFileExtension");
+		String listenerName = gen.g.name + "BaseListener";
+		return listenerName+extST.render();
+	}
+
+	/** A given grammar T, return a blank listener implementation
+	 *  such as TBaseListener.java, if we're using the Java target.
+ 	 */
+	public String getBaseVisitorFileName(boolean header) {
+		assert gen.g.name != null;
+		ST extST = getTemplates().getInstanceOf("codeFileExtension");
+		String listenerName = gen.g.name + "BaseVisitor";
+		return listenerName+extST.render();
+	}
+
 	/**
 	 * Gets the maximum number of 16-bit unsigned integers that can be encoded
 	 * in a single segment of the serialized ATN.

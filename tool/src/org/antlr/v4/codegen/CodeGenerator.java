@@ -32,7 +32,6 @@ package org.antlr.v4.codegen;
 
 import org.antlr.v4.Tool;
 import org.antlr.v4.codegen.model.OutputModelObject;
-import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.Grammar;
@@ -237,94 +236,17 @@ public class CodeGenerator {
 		}
 	}
 
-	/** Generate TParser.java and TLexer.java from T.g4 if combined, else
-	 *  just use T.java as output regardless of type.
-	 */
-	public String getRecognizerFileName() {
-		ST extST = getTemplates().getInstanceOf("codeFileExtension");
-		ST fullST = getTemplates().getInstanceOf("RecognizerFileName");
-		if (fullST != null) {
-			switch (g.getType()) {
-				case ANTLRParser.PARSER:
-					fullST.add("name", g.name.endsWith("Parser") ? g.name.substring(0, g.name.length() - 6) : g.name); // trim off "parser"
-					fullST.add("type", "parser");
-					break;
-				case ANTLRParser.LEXER:
-					fullST.add("name", g.name.endsWith("Lexer") ?g.name.substring(0, g.name.length() - 5) : g.name); // trim off "lexer"
-					fullST.add("type", "lexer");
-					break;
-				case ANTLRParser.COMBINED:
-					fullST.add("name", g.name);
-					fullST.add("type", "parser");
-					break;
-			}
-			return fullST.render() + extST.render();
-		}
-		String recognizerName = g.getRecognizerName();
-		return recognizerName+extST.render();
-	}
+	public String getRecognizerFileName() { return getRecognizerFileName(false); }
+	public String getListenerFileName() { return getListenerFileName(false); }
+	public String getVisitorFileName() { return getVisitorFileName(false); }
+	public String getBaseListenerFileName() { return getBaseListenerFileName(false); }
+	public String getBaseVisitorFileName() { return getBaseVisitorFileName(false); }
 
-	/** A given grammar T, return the listener name such as
-	 *  TListener.java, if we're using the Java target.
- 	 */
-	public String getListenerFileName() {
-		assert g.name != null;
-		ST extST = getTemplates().getInstanceOf("codeFileExtension");
-		ST fullST = getTemplates().getInstanceOf("ListenerFileName");
-		if (fullST != null) {
-			fullST.add("name", g.name);
-			return fullST.render() + extST.render();
-		}
-		String listenerName = g.name + "Listener";
-		return listenerName+extST.render();
-	}
-
-	/** A given grammar T, return the visitor name such as
-	 *  TVisitor.java, if we're using the Java target.
- 	 */
-	public String getVisitorFileName() {
-		assert g.name != null;
-		ST extST = getTemplates().getInstanceOf("codeFileExtension");
-		ST fullST = getTemplates().getInstanceOf("VisitorFileName");
-		if (fullST != null) {
-			fullST.add("name", g.name);
-			return fullST.render() + extST.render();
-		}
-		String listenerName = g.name + "Visitor";
-		return listenerName+extST.render();
-	}
-
-	/** A given grammar T, return a blank listener implementation
-	 *  such as TBaseListener.java, if we're using the Java target.
- 	 */
-	public String getBaseListenerFileName() {
-		assert g.name != null;
-		ST extST = getTemplates().getInstanceOf("codeFileExtension");
-		ST fullST = getTemplates().getInstanceOf("BaseListenerFileName");
-		if (fullST != null) {
-			fullST.add("name", g.name);
-			return fullST.render() + extST.render();
-		}
-		String listenerName = g.name + "BaseListener";
-		return listenerName+extST.render();
-	}
-
-	/** A given grammar T, return a blank listener implementation
-	 *  such as TBaseListener.java, if we're using the Java target.
- 	 */
-	public String getBaseVisitorFileName() {
-		assert g.name != null;
-
-		ST extST = getTemplates().getInstanceOf("codeFileExtension");
-		ST fullST = getTemplates().getInstanceOf("BaseVisitorFileName");
-		if (fullST != null) {
-			fullST.add("name", g.name);
-			return fullST.render() + extST.render();
-		}
-
-		String listenerName = g.name + "BaseVisitor";
-		return listenerName+extST.render();
-	}
+	public String getRecognizerFileName(boolean header) { return getTarget().getRecognizerFileName(header); }
+	public String getListenerFileName(boolean header) { return getTarget().getListenerFileName(header); }
+	public String getVisitorFileName(boolean header) { return getTarget().getVisitorFileName(header); }
+	public String getBaseListenerFileName(boolean header) { return getTarget().getBaseListenerFileName(header); }
+	public String getBaseVisitorFileName(boolean header) { return getTarget().getBaseVisitorFileName(header); }
 
 	/** What is the name of the vocab file generated for this grammar?
 	 *  Returns null if no .tokens file should be generated.
