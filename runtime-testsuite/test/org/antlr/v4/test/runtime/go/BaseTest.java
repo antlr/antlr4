@@ -110,7 +110,7 @@ public abstract class BaseTest {
 	public File tmpdir = null;
 	public File parserpkgdir = null; // this is where the parser package is stored, typically inside the tmpdir
 	private static File tmpGopath = null;
-	private static final String GO_RUNTIME_IMPORT_PATH = "github.com/pboyer/antlr4/runtime/Go/antlr"; // TODO: Change this before merging with upstream
+	private static final String GO_RUNTIME_IMPORT_PATH = "github.com/antlr/antlr4/runtime/Go/antlr"; // TODO: Change this before merging with upstream
 
 	/**
 	 * If error during parser execution, store stderr here; can't return stdout
@@ -839,7 +839,7 @@ public abstract class BaseTest {
 			ST outputFileST = new ST(
 					"package main\n" +
 						"import (\n"
-						+"	\"github.com/pboyer/antlr4/runtime/Go/antlr\"\n"
+						+"	\"github.com/antlr/antlr4/runtime/Go/antlr\"\n"
 						+"	\"./parser\"\n"
 						+"	\"os\"\n"
 						+")\n"
@@ -894,7 +894,7 @@ public abstract class BaseTest {
 		ST outputFileST = new ST(
 				"package main\n" +
 				"import (\n"
-					+ "	\"github.com/pboyer/antlr4/runtime/Go/antlr\"\n"
+					+ "	\"github.com/antlr/antlr4/runtime/Go/antlr\"\n"
 					+ "	\"./parser\"\n"
 					+ "	\"os\"\n"
 					+ "	\"fmt\"\n"
