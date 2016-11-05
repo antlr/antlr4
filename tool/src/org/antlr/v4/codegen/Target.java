@@ -2,6 +2,7 @@
  * [The "BSD license"]
  *  Copyright (c) 2012 Terence Parr
  *  Copyright (c) 2012 Sam Harwell
+ *  Copyright (c) 2016 Mike Lischke
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -119,20 +120,6 @@ public abstract class Target {
 						   String fileName)
 	{
 		getCodeGenerator().write(outputFileST, fileName);
-	}
-
-	protected void genListenerFile(Grammar g,
-								   ST outputFileST)
-	{
-		String fileName = getCodeGenerator().getListenerFileName();
-		getCodeGenerator().write(outputFileST, fileName);
-	}
-
-	protected void genRecognizerHeaderFile(Grammar g,
-										   ST headerFileST,
-										   String extName) // e.g., ".h"
-	{
-		// no header file by default
 	}
 
 	/** Get a meaningful name for a token type useful during code generation.
@@ -573,4 +560,7 @@ public abstract class Target {
 	public boolean supportsOverloadedMethods() {
 		return true;
 	}
+
+	/** @since 4.6 */
+	public boolean needsHeader() { return false; }; // Override in targets that need header files.
 }
