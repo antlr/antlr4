@@ -3,7 +3,9 @@ package org.antlr.v4.test.runtime.python3;
 
 import org.junit.Ignore;
 import org.junit.Test;
-import static org.junit.Assert.*;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 @SuppressWarnings("unused")
 public class TestVisitors extends BasePython3Test {
