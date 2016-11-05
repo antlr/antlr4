@@ -885,7 +885,7 @@ TokenDecl(t) ::= "<t.name> <TokenLabelType()>"
 TokenTypeDecl(t) ::= "<t.name> int"
 TokenListDecl(t) ::= "<t.name> []antlr.Token"
 
-RuleContextDecl(r) ::= "<r.name> I<r.ctxName>"
+RuleContextDecl(r) ::= "<r.name> I<r.ctxName> "
 RuleContextListDecl(rdecl) ::= "<rdecl.name> []I<rdecl.ctxName>"
 
 AttributeDecl(d) ::= "<d.name> <d.type;format={lower}><if(d.initValue)>// TODO = <d.initValue><endif>"
@@ -962,7 +962,7 @@ ListLabelName(label) ::= "<label>"
 CaptureNextToken(d) ::= "<d.varName> = p.GetTokenStream().LT(1)"
 CaptureNextTokenType(d) ::= "<d.varName> = p.GetTokenStream().LA(1)"
 
-StructDecl(struct, ctorAttrs, attrs, getters, dispatchMethods, interfaces, extensionMembers, tokenDecls, tokenTypeDecls, tokenListDecls, ruleContextDecls, ruleContextListDecls, attributeDecls, superClass = {ParserRuleContext}) ::= <<
+StructDecl(struct, ctorAttrs, attrs, getters, dispatchMethods, interfaces, extensionMembers) ::= <<
 // I<struct.name> is an interface to support dynamic dispatch.
 type I<struct.name> interface {
 	antlr.ParserRuleContext
