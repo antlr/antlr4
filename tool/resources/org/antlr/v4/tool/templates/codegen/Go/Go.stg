@@ -276,7 +276,7 @@ func (l *<lexer.name>) Action(localctx antlr.RuleContext, ruleIndex, actionIndex
 	switch ruleIndex {
 	<if(recog.actionFuncs.values)>
 	<recog.actionFuncs.values:{f | case <f.ruleIndex>:
-		<if(f.isRuleContext)>
+		<if(f.factory.grammar.lexer)>
 		l.<f.name>_Action(localctx, actionIndex)
 		<else>
 		var t *<f.name; format="cap">Context = nil
@@ -304,7 +304,7 @@ func (l *<lexer.name>) Sempred(localctx antlr.RuleContext, ruleIndex, predIndex 
 	switch ruleIndex {
 	<if(recog.sempredFuncs.values)>
 	<recog.sempredFuncs.values:{f | case <f.ruleIndex>:
-		<if(f.isRuleContext)>
+		<if(f.factory.grammar.lexer)>
 		return l.<f.name>_Sempred(localctx, predIndex)
 		<else>
 		var t *<f.name; format="cap">Context = nil
@@ -330,7 +330,7 @@ func (l *<lexer.name>) Sempred(localctx antlr.RuleContext, ruleIndex, predIndex 
  * overriding implementation impossible to maintain.
  */
 RuleActionFunction(r, actions) ::= <<
-func (l *<lexer.name>) <r.name; format="cap">_Action(localctx <if(r.isRuleContext)>antlr.RuleContext<else>*<r.ctxType><endif>, actionIndex int) {
+func (l *<lexer.name>) <r.name; format="cap">_Action(localctx <if(r.factory.grammar.lexer)>antlr.RuleContext<else>*<r.ctxType><endif>, actionIndex int) {
 	switch actionIndex {
 	<if(actions)>
 	<actions:{index | case <index>:
