@@ -15,7 +15,7 @@ type BaseATNSimulator struct {
 }
 
 func NewBaseATNSimulator(atn *ATN, sharedContextCache *PredictionContextCache) *BaseATNSimulator {
-	var b = new(BaseATNSimulator)
+	b := new(BaseATNSimulator)
 
 	b.atn = atn
 	b.sharedContextCache = sharedContextCache
@@ -28,7 +28,7 @@ func (b *BaseATNSimulator) getCachedContext(context PredictionContext) Predictio
 		return context
 	}
 
-	var visited = make(map[PredictionContext]PredictionContext)
+	visited := make(map[PredictionContext]PredictionContext)
 
 	return getCachedBasePredictionContext(context, b.sharedContextCache, visited)
 }

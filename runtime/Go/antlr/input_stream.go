@@ -41,7 +41,7 @@ func (is *InputStream) LA(offset int) int {
 	if offset < 0 {
 		offset++ // e.g., translate LA(-1) to use offset=0
 	}
-	var pos = is.index + offset - 1
+	pos := is.index + offset - 1
 
 	if pos < 0 || pos >= is.size { // invalid
 		return TokenEOF

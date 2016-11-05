@@ -34,15 +34,15 @@ func (d *DFASerializer) String() string {
 		return ""
 	}
 
-	var buf = ""
-	var states = d.dfa.sortedStates()
+	buf := ""
+	states := d.dfa.sortedStates()
 
 	for _, s := range states {
 		if s.edges != nil {
-			var n = len(s.edges)
+			n := len(s.edges)
 
 			for j := 0; j < n; j++ {
-				var t = s.edges[j]
+				t := s.edges[j]
 
 				if t != nil && t.stateNumber != 0x7FFFFFFF {
 					buf += d.GetStateString(s)
@@ -86,7 +86,7 @@ func (d *DFASerializer) GetStateString(s *DFAState) string {
 		b = "^"
 	}
 
-	var baseStateStr = a + "s" + strconv.Itoa(s.stateNumber) + b
+	baseStateStr := a + "s" + strconv.Itoa(s.stateNumber) + b
 
 	if s.isAcceptState {
 		if s.predicates != nil {
@@ -116,17 +116,17 @@ func (l *LexerDFASerializer) String() string {
 		return ""
 	}
 
-	var buf = ""
-	var states = l.dfa.sortedStates()
+	buf := ""
+	states := l.dfa.sortedStates()
 
 	for i := 0; i < len(states); i++ {
-		var s = states[i]
+		s := states[i]
 
 		if s.edges != nil {
-			var n = len(s.edges)
+			n := len(s.edges)
 
 			for j := 0; j < n; j++ {
-				var t = s.edges[j]
+				t := s.edges[j]
 
 				if t != nil && t.stateNumber != 0x7FFFFFFF {
 					buf += l.GetStateString(s)

@@ -45,7 +45,7 @@ var tokenTypeMapCache = make(map[string]int)
 var ruleIndexMapCache = make(map[string]int)
 
 func (b *BaseRecognizer) checkVersion(toolVersion string) {
-	var runtimeVersion = "4.5.2"
+	runtimeVersion := "4.5.2"
 	if runtimeVersion != toolVersion {
 		fmt.Println("ANTLR runtime and generated code versions disagree: " + runtimeVersion + "!=" + toolVersion)
 	}
@@ -136,37 +136,37 @@ func (b *BaseRecognizer) GetTokenType(tokenName string) int {
 }
 
 //func (b *Recognizer) GetTokenTypeMap() map[string]int {
-//    Vocabulary vocabulary = getVocabulary();
+//    Vocabulary vocabulary = getVocabulary()
 //
 //    Synchronized (tokenTypeMapCache) {
-//        Map<String, Integer> result = tokenTypeMapCache.Get(vocabulary);
+//        Map<String, Integer> result = tokenTypeMapCache.Get(vocabulary)
 //        if (result == null) {
-//            result = new HashMap<String, Integer>();
+//            result = new HashMap<String, Integer>()
 //            for (int i = 0; i < GetATN().maxTokenType; i++) {
-//                String literalName = vocabulary.getLiteralName(i);
+//                String literalName = vocabulary.getLiteralName(i)
 //                if (literalName != null) {
-//                    result.put(literalName, i);
+//                    result.put(literalName, i)
 //                }
 //
-//                String symbolicName = vocabulary.GetSymbolicName(i);
+//                String symbolicName = vocabulary.GetSymbolicName(i)
 //                if (symbolicName != null) {
-//                    result.put(symbolicName, i);
+//                    result.put(symbolicName, i)
 //                }
 //            }
 //
-//            result.put("EOF", Token.EOF);
-//            result = Collections.unmodifiableMap(result);
-//            tokenTypeMapCache.put(vocabulary, result);
+//            result.put("EOF", Token.EOF)
+//            result = Collections.unmodifiableMap(result)
+//            tokenTypeMapCache.put(vocabulary, result)
 //        }
 //
-//        return result;
+//        return result
 //    }
 //}
 
 // What is the error header, normally line/character position information?//
 func (b *BaseRecognizer) GetErrorHeader(e RecognitionException) string {
-	var line = e.GetOffendingToken().GetLine()
-	var column = e.GetOffendingToken().GetColumn()
+	line := e.GetOffendingToken().GetLine()
+	column := e.GetOffendingToken().GetColumn()
 	return "line " + strconv.Itoa(line) + ":" + strconv.Itoa(column)
 }
 
@@ -187,7 +187,7 @@ func (b *BaseRecognizer) GetTokenErrorDisplay(t Token) string {
 	if t == nil {
 		return "<no token>"
 	}
-	var s = t.GetText()
+	s := t.GetText()
 	if s == "" {
 		if t.GetTokenType() == TokenEOF {
 			s = "<EOF>"

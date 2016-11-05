@@ -156,7 +156,7 @@ func NewCommonToken(source *TokenSourceCharStreamPair, tokenType, channel, start
 // @param oldToken The token to copy.
 //
 func (c *CommonToken) clone() *CommonToken {
-	var t = NewCommonToken(c.source, c.tokenType, c.channel, c.start, c.stop)
+	t := NewCommonToken(c.source, c.tokenType, c.channel, c.start, c.stop)
 	t.tokenIndex = c.GetTokenIndex()
 	t.line = c.GetLine()
 	t.column = c.GetColumn()
@@ -168,11 +168,11 @@ func (c *CommonToken) GetText() string {
 	if c.text != "" {
 		return c.text
 	}
-	var input = c.GetInputStream()
+	input := c.GetInputStream()
 	if input == nil {
 		return ""
 	}
-	var n = input.Size()
+	n := input.Size()
 	if c.start < n && c.stop < n {
 		return input.GetTextFromInterval(NewInterval(c.start, c.stop))
 	}
@@ -184,7 +184,7 @@ func (c *CommonToken) SetText(text string) {
 }
 
 func (c *CommonToken) String() string {
-	var txt = c.GetText()
+	txt := c.GetText()
 	if txt != "" {
 		txt = strings.Replace(txt, "\n", "\\n", -1)
 		txt = strings.Replace(txt, "\r", "\\r", -1)

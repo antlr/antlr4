@@ -154,7 +154,7 @@ type BasicState struct {
 }
 
 func NewBasicState() *BasicState {
-	var b = NewBaseATNState()
+	b := NewBaseATNState()
 
 	b.stateType = ATNStateBasic
 
@@ -227,7 +227,7 @@ type BasicBlockStartState struct {
 }
 
 func NewBasicBlockStartState() *BasicBlockStartState {
-	var b = NewBlockStartState()
+	b := NewBlockStartState()
 
 	b.stateType = ATNStateBlockStart
 
@@ -241,7 +241,7 @@ type BlockEndState struct {
 }
 
 func NewBlockEndState() *BlockEndState {
-	var b = NewBaseATNState()
+	b := NewBaseATNState()
 
 	b.stateType = ATNStateBlockEnd
 
@@ -257,7 +257,7 @@ type RuleStopState struct {
 }
 
 func NewRuleStopState() *RuleStopState {
-	var b = NewBaseATNState()
+	b := NewBaseATNState()
 
 	b.stateType = ATNStateRuleStop
 
@@ -271,7 +271,7 @@ type RuleStartState struct {
 }
 
 func NewRuleStartState() *RuleStartState {
-	var b = NewBaseATNState()
+	b := NewBaseATNState()
 
 	b.stateType = ATNStateRuleStart
 
@@ -285,7 +285,7 @@ type PlusLoopbackState struct {
 }
 
 func NewPlusLoopbackState() *PlusLoopbackState {
-	var b = NewBaseDecisionState()
+	b := NewBaseDecisionState()
 
 	b.stateType = ATNStatePlusLoopBack
 
@@ -302,7 +302,7 @@ type PlusBlockStartState struct {
 }
 
 func NewPlusBlockStartState() *PlusBlockStartState {
-	var b = NewBlockStartState()
+	b := NewBlockStartState()
 
 	b.stateType = ATNStatePlusBlockStart
 
@@ -315,7 +315,7 @@ type StarBlockStartState struct {
 }
 
 func NewStarBlockStartState() *StarBlockStartState {
-	var b = NewBlockStartState()
+	b := NewBlockStartState()
 
 	b.stateType = ATNStateStarBlockStart
 
@@ -327,7 +327,7 @@ type StarLoopbackState struct {
 }
 
 func NewStarLoopbackState() *StarLoopbackState {
-	var b = NewBaseATNState()
+	b := NewBaseATNState()
 
 	b.stateType = ATNStateStarLoopBack
 
@@ -341,7 +341,7 @@ type StarLoopEntryState struct {
 }
 
 func NewStarLoopEntryState() *StarLoopEntryState {
-	var b = NewBaseDecisionState()
+	b := NewBaseDecisionState()
 
 	b.stateType = ATNStateStarLoopEntry
 
@@ -356,7 +356,7 @@ type LoopEndState struct {
 }
 
 func NewLoopEndState() *LoopEndState {
-	var b = NewBaseATNState()
+	b := NewBaseATNState()
 
 	b.stateType = ATNStateLoopEnd
 
@@ -369,7 +369,7 @@ type TokensStartState struct {
 }
 
 func NewTokensStartState() *TokensStartState {
-	var b = NewBaseDecisionState()
+	b := NewBaseDecisionState()
 
 	b.stateType = ATNStateTokenStart
 

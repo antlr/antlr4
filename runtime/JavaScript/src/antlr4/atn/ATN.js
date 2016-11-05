@@ -75,14 +75,7 @@ ATN.prototype.nextTokensInContext = function(s, ctx) {
 // rule.
 ATN.prototype.nextTokensNoContext = function(s) {
     if (s.nextTokenWithinRule !== null ) {
-        if (PORT_DEBUG) {
-            console.log("DEBUG A")
-        }
         return s.nextTokenWithinRule;
-    }
-    if (PORT_DEBUG) {
-        console.log("DEBUG 2")
-        console.log(this.nextTokensInContext(s, null).toString())
     }
     s.nextTokenWithinRule = this.nextTokensInContext(s, null);
     s.nextTokenWithinRule.readOnly = true;

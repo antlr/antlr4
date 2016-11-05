@@ -76,7 +76,7 @@ func (c *CommonTokenStream) Get(index int) Token {
 }
 
 func (c *CommonTokenStream) Consume() {
-	var SkipEOFCheck = false
+	SkipEOFCheck := false
 
 	if c.index >= 0 {
 		if c.fetchedEOF {
@@ -112,10 +112,10 @@ func (c *CommonTokenStream) Consume() {
 // Sync makes sure index i in tokens has a token and returns true if a token is
 // located at index i and otherwise false.
 func (c *CommonTokenStream) Sync(i int) bool {
-	var n = i - len(c.tokens) + 1 // TODO: How many more elements do we need?
+	n := i - len(c.tokens) + 1 // TODO: How many more elements do we need?
 
 	if n > 0 {
-		var fetched = c.fetch(n)
+		fetched := c.fetch(n)
 
 		if PortDebug {
 			fmt.Println("Sync done")
@@ -135,7 +135,7 @@ func (c *CommonTokenStream) fetch(n int) int {
 	}
 
 	for i := 0; i < n; i++ {
-		var t = c.tokenSource.NextToken()
+		t := c.tokenSource.NextToken()
 
 		if PortDebug {
 			fmt.Println("fetch loop")
@@ -166,14 +166,14 @@ func (c *CommonTokenStream) GetTokens(start int, stop int, types *IntervalSet) [
 
 	c.lazyInit()
 
-	var subset = make([]Token, 0)
+	subset := make([]Token, 0)
 
 	if stop >= len(c.tokens) {
 		stop = len(c.tokens) - 1
 	}
 
 	for i := start; i < stop; i++ {
-		var t = c.tokens[i]
+		t := c.tokens[i]
 
 		if t.GetTokenType() == TokenEOF {
 			break
@@ -223,7 +223,7 @@ func (c *CommonTokenStream) NextTokenOnChannel(i, channel int) int {
 		return -1
 	}
 
-	var token = c.tokens[i]
+	token := c.tokens[i]
 
 	for token.GetChannel() != c.channel {
 		if token.GetTokenType() == TokenEOF {
@@ -259,8 +259,8 @@ func (c *CommonTokenStream) getHiddenTokensToRight(tokenIndex, channel int) []To
 		panic(strconv.Itoa(tokenIndex) + " not in 0.." + strconv.Itoa(len(c.tokens)-1))
 	}
 
-	var nextOnChannel = c.NextTokenOnChannel(tokenIndex+1, LexerDefaultTokenChannel)
-	var from = tokenIndex + 1
+	nextOnChannel := c.NextTokenOnChannel(tokenIndex+1, LexerDefaultTokenChannel)
+	from := tokenIndex + 1
 
 	// If no onchannel to the right, then nextOnChannel == -1, so set to to last token
 	var to int
@@ -284,24 +284,24 @@ func (c *CommonTokenStream) getHiddenTokensToLeft(tokenIndex, channel int) []Tok
 		panic(strconv.Itoa(tokenIndex) + " not in 0.." + strconv.Itoa(len(c.tokens)-1))
 	}
 
-	var prevOnChannel = c.previousTokenOnChannel(tokenIndex-1, LexerDefaultTokenChannel)
+	prevOnChannel := c.previousTokenOnChannel(tokenIndex-1, LexerDefaultTokenChannel)
 
 	if prevOnChannel == tokenIndex-1 {
 		return nil
 	}
 
 	// If there are none on channel to the left and prevOnChannel == -1 then from = 0
-	var from = prevOnChannel + 1
-	var to = tokenIndex - 1
+	from := prevOnChannel + 1
+	to := tokenIndex - 1
 
 	return c.filterForChannel(from, to, channel)
 }
 
 func (c *CommonTokenStream) filterForChannel(left, right, channel int) []Token {
-	var hidden = make([]Token, 0)
+	hidden := make([]Token, 0)
 
 	for i := left; i < right+1; i++ {
-		var t = c.tokens[i]
+		t := c.tokens[i]
 
 		if channel == -1 {
 			if t.GetChannel() != LexerDefaultTokenChannel {
@@ -355,8 +355,8 @@ func (c *CommonTokenStream) GetTextFromInterval(interval *Interval) string {
 		interval = NewInterval(0, len(c.tokens)-1)
 	}
 
-	var start = interval.start
-	var stop = interval.stop
+	start := interval.start
+	stop := interval.stop
 
 	if start < 0 || stop < 0 {
 		return ""
@@ -366,10 +366,10 @@ func (c *CommonTokenStream) GetTextFromInterval(interval *Interval) string {
 		stop = len(c.tokens) - 1
 	}
 
-	var s = ""
+	s := ""
 
 	for i := start; i < stop+1; i++ {
-		var t = c.tokens[i]
+		t := c.tokens[i]
 
 		if t.GetTokenType() == TokenEOF {
 			break
@@ -399,8 +399,8 @@ func (c *CommonTokenStream) LB(k int) Token {
 		return nil
 	}
 
-	var i = c.index
-	var n = 1
+	i := c.index
+	n := 1
 
 	// Find k good tokens looking backward
 	for n <= k {
@@ -427,8 +427,8 @@ func (c *CommonTokenStream) LT(k int) Token {
 		return c.LB(-k)
 	}
 
-	var i = c.index
-	var n = 1 // We know tokens[n] is valid
+	i := c.index
+	n := 1 // We know tokens[n] is valid
 
 	// Find k good tokens
 	for n < k {
@@ -450,7 +450,7 @@ func (c *CommonTokenStream) getNumberOfOnChannelTokens() int {
 	c.Fill()
 
 	for i := 0; i < len(c.tokens); i++ {
-		var t = c.tokens[i]
+		t := c.tokens[i]
 
 		if t.GetChannel() == c.channel {
 			n++

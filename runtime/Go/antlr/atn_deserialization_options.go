@@ -9,7 +9,7 @@ type ATNDeserializationOptions struct {
 }
 
 func NewATNDeserializationOptions(CopyFrom *ATNDeserializationOptions) *ATNDeserializationOptions {
-	var o = new(ATNDeserializationOptions)
+	o := new(ATNDeserializationOptions)
 
 	if CopyFrom != nil {
 		o.readOnly = CopyFrom.readOnly

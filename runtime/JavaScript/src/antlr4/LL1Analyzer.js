@@ -110,19 +110,7 @@ LL1Analyzer.prototype.LOOK = function(s, stopState, ctx) {
     var seeThruPreds = true; // ignore preds; get all lookahead
 	ctx = ctx || null;
     var lookContext = ctx!==null ? predictionContextFromRuleContext(s.atn, ctx) : null;
-    if (PORT_DEBUG) {
-        console.log("DEBUG 5")
-        console.log(s.toString())
-        console.log(stopState)
-        console.log(lookContext)
-        console.log(r.toString())
-        console.log(seeThruPreds)
-        console.log("=====")
-    }
     this._LOOK(s, stopState, lookContext, r, new Set(), new BitSet(), seeThruPreds, true);
-    if (PORT_DEBUG) {
-        console.log(r.toString())
-    }
     return r;
 };
     
@@ -163,9 +151,6 @@ LL1Analyzer.prototype._LOOK = function(s, stopState , ctx, look, lookBusy, calle
     }
     lookBusy.add(c);
     if (s === stopState) {
-        if (PORT_DEBUG) {
-            console.log("DEBUG 6")
-        }
         if (ctx ===null) {
             look.addOne(Token.EPSILON);
             return;
@@ -183,9 +168,6 @@ LL1Analyzer.prototype._LOOK = function(s, stopState , ctx, look, lookBusy, calle
             return;
         }
         if (ctx !== PredictionContext.EMPTY) {
-            if (PORT_DEBUG) {
-                console.log("DEBUG 7")
-            }
             // run thru all possible stack tops in ctx
             for(var i=0; i<ctx.length; i++) {
                 var returnState = this.atn.states[ctx.getReturnState(i)];
@@ -205,11 +187,6 @@ LL1Analyzer.prototype._LOOK = function(s, stopState , ctx, look, lookBusy, calle
     for(var j=0; j<s.transitions.length; j++) {
         var t = s.transitions[j];
         if (t.constructor === RuleTransition) {
-
-            if (PORT_DEBUG) {
-                console.log("DEBUG 8")
-            }
-
             if (calledRuleStack.contains(t.target.ruleIndex)) {
                 continue;
             }
@@ -220,38 +197,18 @@ LL1Analyzer.prototype._LOOK = function(s, stopState , ctx, look, lookBusy, calle
             } finally {
                 calledRuleStack.remove(t.target.ruleIndex);
             }
-
-            if (PORT_DEBUG) {
-                console.log(look.toString())
-            }
-
         } else if (t instanceof AbstractPredicateTransition ) {
-            if (PORT_DEBUG) {
-                console.log("DEBUG 9")
-            }
             if (seeThruPreds) {
                 this._LOOK(t.target, stopState, ctx, look, lookBusy, calledRuleStack, seeThruPreds, addEOF);
             } else {
                 look.addOne(LL1Analyzer.HIT_PRED);
             }
         } else if( t.isEpsilon) {
-            if (PORT_DEBUG) {
-                console.log("DEBUG 10")
-            }
             this._LOOK(t.target, stopState, ctx, look, lookBusy, calledRuleStack, seeThruPreds, addEOF);
         } else if (t.constructor === WildcardTransition) {
-            if (PORT_DEBUG) {
-                console.log("DEBUG 11")
-            }
             look.addRange( Token.MIN_USER_TOKEN_TYPE, this.atn.maxTokenType );
         } else {
-            if (PORT_DEBUG) {
-                console.log("DEBUG 12")
-            }
             var set = t.label;
-            if (PORT_DEBUG) {
-                console.log(set.toString())
-            }
             if (set !== null) {
                 if (t instanceof NotSetTransition) {
                     set = set.complement(Token.MIN_USER_TOKEN_TYPE, this.atn.maxTokenType);

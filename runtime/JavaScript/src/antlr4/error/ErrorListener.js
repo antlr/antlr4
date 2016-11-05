@@ -74,7 +74,7 @@ ConsoleErrorListener.INSTANCE = new ConsoleErrorListener();
 // </pre>
 //
 ConsoleErrorListener.prototype.syntaxError = function(recognizer, offendingSymbol, line, column, msg, e) {
-    console.log("line " + line + ":" + column + " " + msg);
+    console.error("line " + line + ":" + column + " " + msg);
 };
 
 function ProxyErrorListener(delegates) {

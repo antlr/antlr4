@@ -244,37 +244,16 @@ DefaultErrorStrategy.prototype.sync = function(recognizer) {
     if (this.inErrorRecoveryMode(recognizer)) {
         return;
     }
-
-    if (PORT_DEBUG) {
-        console.log("STATE" + recognizer.state)
-    }
-
     var s = recognizer._interp.atn.states[recognizer.state];
     var la = recognizer.getTokenStream().LA(1);
-
-    if (PORT_DEBUG) {
-        console.log("LA" + la);
-    }
-
     // try cheaper subset first; might get lucky. seems to shave a wee bit off
     if (la===Token.EOF || recognizer.atn.nextTokens(s).contains(la)) {
-        if (PORT_DEBUG) {
-            console.log("OK1")
-        }
         return;
     }
     // Return but don't end recovery. only do that upon valid token match
     if(recognizer.isExpectedToken(la)) {
-        if (PORT_DEBUG) {
-            console.log("OK2")
-        }
         return;
     }
-
-    if (PORT_DEBUG) {
-        console.log("LA" + la)
-    }
-
     switch (s.stateType) {
     case ATNState.BLOCK_START:
     case ATNState.STAR_BLOCK_START:
@@ -582,7 +561,6 @@ DefaultErrorStrategy.prototype.getMissingSymbol = function(recognizer) {
     if (current.type===Token.EOF && lookback !== null) {
         current = lookback;
     }
-
     return recognizer.getTokenFactory().create(current.source,
         expectedTokenType, tokenText, Token.DEFAULT_CHANNEL,
         -1, -1, current.line, current.column);

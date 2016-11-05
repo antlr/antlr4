@@ -639,14 +639,14 @@ public class TestParserExec extends BaseTest {
 	public void testParserProperty() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(160);
+		StringBuilder grammarBuilder = new StringBuilder(168);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("@members {\n");
 		grammarBuilder.append("boolean Property() {\n");
 		grammarBuilder.append("  return true;\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("}\n");
-		grammarBuilder.append("a : {Property()}? ID {System.out.println(\"valid\");}\n");
+		grammarBuilder.append("a : {$parser.Property()}? ID {System.out.println(\"valid\");}\n");
 		grammarBuilder.append("  ;\n");
 		grammarBuilder.append("ID : 'a'..'z'+ ;\n");
 		grammarBuilder.append("WS : (' '|'\\n') -> skip ;");
