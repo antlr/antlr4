@@ -235,6 +235,12 @@ RuleInvocationStack() ::= "antlr4.Utils.arrayToString(this.getRuleInvocationStac
 
 LL_EXACT_AMBIG_DETECTION() ::= <<this._interp.predictionMode = antlr4.atn.PredictionMode.LL_EXACT_AMBIG_DETECTION;>>
 
+ParserToken(parser, token) ::= <%<parser>.<token>%>
+
+Production(p) ::= <%<p>%>
+
+Result(r) ::= <%<r>%>
+
 ParserPropertyMember() ::= <<
 @members {
 this.Property = function() {

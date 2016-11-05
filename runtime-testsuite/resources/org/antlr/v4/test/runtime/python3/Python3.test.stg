@@ -1,4 +1,11 @@
 IgnoredTests ::= [
+	"Visitors.Basic": true,
+	"Visitors.LR": true,
+	"Visitors.LRWithLabels": true,
+	"Visitors.RuleGetters_1": true,
+	"Visitors.RuleGetters_2": true,
+	"Visitors.TokenGetters_1": true,
+	"Visitors.TokenGetters_2": true,
 	default: false
 ]
 
@@ -238,6 +245,12 @@ GetExpectedTokenNames() ::= "self.getExpectedTokens().toString(self.literalNames
 RuleInvocationStack() ::= "str_list(self.getRuleInvocationStack())"
 
 LL_EXACT_AMBIG_DETECTION() ::= <<self._interp.predictionMode =  PredictionMode.LL_EXACT_AMBIG_DETECTION>>
+
+ParserToken(parser, token) ::= <%<parser>.<token>%>
+
+Production(p) ::= <%<p>%>
+
+Result(r) ::= <%<r>%>
 
 ParserPropertyMember() ::= <<
 @members {

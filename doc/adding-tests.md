@@ -74,7 +74,7 @@ Each `.stg` file descripes the following mandatory elements for the test:
  - the expected output
  - the expected errors
 
-The grammar can itself contain template expressions such as <something>.
+The grammar can itself contain template expressions such as `<something>`.
 The test generator replaces these with the corresponding values from the target language template (see below).
 It then generates a unit test in which the grammar, the input and the expected output and errors are inlined.
  
