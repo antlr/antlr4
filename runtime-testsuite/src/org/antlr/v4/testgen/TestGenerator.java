@@ -42,11 +42,12 @@ import java.util.Map;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupFile;
+import org.stringtemplate.v4.StringRenderer;
 import org.stringtemplate.v4.gui.STViz;
 
 public class TestGenerator {
 	
-	public final static String[] targets = {"CSharp", "Java", "Python2", "Python3", "JavaScript/Node", "JavaScript/Safari", "JavaScript/Firefox", "JavaScript/Explorer", "JavaScript/Chrome"};
+	public final static String[] targets = {"Go", "CSharp", "Java", "Python2", "Python3", "JavaScript/Node", "JavaScript/Safari", "JavaScript/Firefox", "JavaScript/Explorer", "JavaScript/Chrome"};
 
 	/** Execute from antlr4 root dir:
 	 * *
@@ -169,6 +170,7 @@ public class TestGenerator {
 	public void execute() {
 		STGroup targetGroup = new STGroupFile(runtimeTemplate.getPath());
 		targetGroup.registerModelAdaptor(STGroup.class, new STGroupModelAdaptor());
+		targetGroup.registerRenderer(String.class, new StringRenderer(), true);
 		targetGroup.defineDictionary("escape", new JavaEscapeStringMap());
 		targetGroup.defineDictionary("lines", new LinesStringMap());
 		targetGroup.defineDictionary("strlen", new StrlenStringMap());

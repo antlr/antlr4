@@ -981,10 +981,6 @@ public class ParserATNSimulator extends ATNSimulator {
 
 	/* parrt internal source braindump that doesn't mess up
 	 * external API spec.
-
-		applyPrecedenceFilter is an optimization to avoid highly
-		nonlinear prediction of expressions and other left recursive
-		rules. The precedence predicates such as {3>=prec}? Are highly
 		context-sensitive in that they can only be properly evaluated
 		in the context of the proper prec argument. Without pruning,
 		these predicates are normal predicates evaluated when we reach

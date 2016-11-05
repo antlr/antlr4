@@ -144,6 +144,9 @@ writeLines(textLines) ::= <%
 <endif>
 %>
 
+
+
+
 string(text) ::= <<
 "<escape.(text)>"
 >>
@@ -229,6 +232,12 @@ GetExpectedTokenNames() ::= "this.getExpectedTokens().toString(this.tokenNames)"
 RuleInvocationStack() ::= "getRuleInvocationStack()"
 
 LL_EXACT_AMBIG_DETECTION() ::= <<_interp.setPredictionMode(PredictionMode.LL_EXACT_AMBIG_DETECTION);>>
+
+ParserToken(parser, token) ::= <%<parser>.<token>%>
+
+Production(p) ::= <%<p>%>
+
+Result(r) ::= <%<r>%>
 
 ParserPropertyMember() ::= <<
 @members {
