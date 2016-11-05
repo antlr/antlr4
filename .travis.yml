@@ -15,7 +15,7 @@ before_install:
   - sudo apt-get install -qq nodejs
   - echo "deb http://download.mono-project.com/repo/debian wheezy/snapshots/3.12.1 main" | sudo tee /etc/apt/sources.list.d/mono-xamarin.list
   - sudo apt-get install -qq mono-complete
-  - eval "$(sudo gimme 1.6.2)"
+  - eval "$(sudo gimme 1.7.3)"
   - go version ; go env
   - python --version
   - python3 --version
