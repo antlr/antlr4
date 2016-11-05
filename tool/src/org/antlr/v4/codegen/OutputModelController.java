@@ -2,6 +2,7 @@
  * [The "BSD license"]
  *  Copyright (c) 2012 Terence Parr
  *  Copyright (c) 2012 Sam Harwell
+ *  Copyright (c) 2016 Mike Lischke
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -107,24 +108,23 @@ public class OutputModelController {
 	 *  controller as factory in SourceGenTriggers so it triggers codegen
 	 *  extensions too, not just the factory functions in this factory.
 	 */
-	public OutputModelObject buildParserOutputModel() {
-		Grammar g = delegate.getGrammar();
+	public OutputModelObject buildParserOutputModel(boolean header) {
 		CodeGenerator gen = delegate.getGenerator();
-		ParserFile file = parserFile(gen.getRecognizerFileName());
+		ParserFile file = parserFile(gen.getRecognizerFileName(header));
 		setRoot(file);
-		Parser parser = parser(file);
-		file.parser = parser;
+		file.parser = parser(file);
 
+		Grammar g = delegate.getGrammar();
 		for (Rule r : g.rules.values()) {
-			buildRuleFunction(parser, r);
+			buildRuleFunction(file.parser, r);
 		}
 
 		return file;
 	}
 
-	public OutputModelObject buildLexerOutputModel() {
+	public OutputModelObject buildLexerOutputModel(boolean header) {
 		CodeGenerator gen = delegate.getGenerator();
-		LexerFile file = lexerFile(gen.getRecognizerFileName());
+		LexerFile file = lexerFile(gen.getRecognizerFileName(header));
 		setRoot(file);
 		file.lexer = lexer(file);
 
@@ -136,24 +136,24 @@ public class OutputModelController {
 		return file;
 	}
 
-	public OutputModelObject buildListenerOutputModel() {
+	public OutputModelObject buildListenerOutputModel(boolean header) {
 		CodeGenerator gen = delegate.getGenerator();
-		return new ListenerFile(delegate, gen.getListenerFileName());
+		return new ListenerFile(delegate, gen.getListenerFileName(header));
 	}
 
-	public OutputModelObject buildBaseListenerOutputModel() {
+	public OutputModelObject buildBaseListenerOutputModel(boolean header) {
 		CodeGenerator gen = delegate.getGenerator();
-		return new BaseListenerFile(delegate, gen.getBaseListenerFileName());
+		return new BaseListenerFile(delegate, gen.getBaseListenerFileName(header));
 	}
 
-	public OutputModelObject buildVisitorOutputModel() {
+	public OutputModelObject buildVisitorOutputModel(boolean header) {
 		CodeGenerator gen = delegate.getGenerator();
-		return new VisitorFile(delegate, gen.getVisitorFileName());
+		return new VisitorFile(delegate, gen.getVisitorFileName(header));
 	}
 
-	public OutputModelObject buildBaseVisitorOutputModel() {
+	public OutputModelObject buildBaseVisitorOutputModel(boolean header) {
 		CodeGenerator gen = delegate.getGenerator();
-		return new BaseVisitorFile(delegate, gen.getBaseVisitorFileName());
+		return new BaseVisitorFile(delegate, gen.getBaseVisitorFileName(header));
 	}
 
 	public ParserFile parserFile(String fileName) {
