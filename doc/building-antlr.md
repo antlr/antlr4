@@ -112,6 +112,18 @@ antlr4-tool-testsuite/4.5.2-SNAPSHOT/antlr4-tool-testsuite-4.5.2-SNAPSHOT.jar
 
 Note that ANTLR is written in itself, which is why maven downloads antlr4-4.5.jar for boostrapping 4.5.2-SNAPSHOT purposes.
 
+If the test suite fails to find some required tool, it is possible to specify a name or full path
+using a system property, i.e. using a `-Dkey=value` argument to the `mvn` invocation.
+The following keys are understood:
+
+| language   | key                        | default value (documentation might be outdated)          |
+|------------|----------------------------|----------------------------------------------------------|
+| Python     | `antlr-python2-python`     | `python2.7`                                              |
+| Python     | `antlr-python3-python`     | `python3.5`                                              |
+| JavaScript | `antlr-javascript-nodejs`  | `nodejs` if found, `node` otherwise                      |
+| C#         | `antlr-javascript-msbuild` | default MSBuild 12.0 path on Windows, `xbuild` otherwise |
+| C#         | `antlr-javascript-mono`    | omitted on Windows, `mono` otherwise                     |
+
 To build without running the tests (saves about 8 minutes), do this:
 
 ```bash

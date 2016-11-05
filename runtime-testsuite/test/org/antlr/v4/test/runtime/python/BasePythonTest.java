@@ -553,24 +553,12 @@ public abstract class BasePythonTest {
 		return null;
 	}
 
-	private String locateTool(String tool) {
-		String[] roots = { "/usr/bin/", "/usr/local/bin/" };
-		for(String root : roots) {
-			if(new File(root + tool).exists())
-				return root + tool;
-		}
-		throw new RuntimeException("Could not locate " + tool);
-	}
-
 	protected String locatePython() {
 		String propName = getPropertyPrefix() + "-python";
-    	String prop = System.getProperty(propName);
-    	if(prop==null || prop.length()==0)
-    		prop = locateTool(getPythonExecutable());
-		File file = new File(prop);
-		if(!file.exists())
-			throw new RuntimeException("Missing system property:" + propName);
-		return file.getAbsolutePath();
+		String prop = System.getProperty(propName);
+		if(prop==null || prop.length()==0)
+			prop = getPythonExecutable();
+		return prop;
 	}
 
 	protected abstract String getPythonExecutable();
