@@ -276,7 +276,7 @@ func (l *<lexer.name>) Action(localctx antlr.RuleContext, ruleIndex, actionIndex
 	switch ruleIndex {
 	<if(recog.actionFuncs.values)>
 	<recog.actionFuncs.values:{f | case <f.ruleIndex>:
-		<if(f.isRuleContext)>
+		<if(f.factory.grammar.lexer)>
 		l.<f.name>_Action(localctx, actionIndex)
 		<else>
 		var t *<f.name; format="cap">Context = nil
@@ -304,7 +304,7 @@ func (l *<lexer.name>) Sempred(localctx antlr.RuleContext, ruleIndex, predIndex 
 	switch ruleIndex {
 	<if(recog.sempredFuncs.values)>
 	<recog.sempredFuncs.values:{f | case <f.ruleIndex>:
-		<if(f.isRuleContext)>
+		<if(f.factory.grammar.lexer)>
 		return l.<f.name>_Sempred(localctx, predIndex)
 		<else>
 		var t *<f.name; format="cap">Context = nil
@@ -330,7 +330,7 @@ func (l *<lexer.name>) Sempred(localctx antlr.RuleContext, ruleIndex, predIndex 
  * overriding implementation impossible to maintain.
  */
 RuleActionFunction(r, actions) ::= <<
-func (l *<lexer.name>) <r.name; format="cap">_Action(localctx <if(r.isRuleContext)>antlr.RuleContext<else>*<r.ctxType><endif>, actionIndex int) {
+func (l *<lexer.name>) <r.name; format="cap">_Action(localctx <if(r.factory.grammar.lexer)>antlr.RuleContext<else>*<r.ctxType><endif>, actionIndex int) {
 	switch actionIndex {
 	<if(actions)>
 	<actions:{index | case <index>:
@@ -348,7 +348,7 @@ func (l *<lexer.name>) <r.name; format="cap">_Action(localctx <if(r.isRuleContex
  * overriding implementation impossible to maintain.
  */
 RuleSempredFunction(r, actions) ::= <<
-func (p *<r.recognizerName>) <r.name; format="cap">_Sempred(localctx antlr.RuleContext, predIndex int) bool {
+func (p *<r.factory.grammar.recognizerName>) <r.name; format="cap">_Sempred(localctx antlr.RuleContext, predIndex int) bool {
 	switch predIndex {
 	<if(actions)>
 	<actions:{index | case <index>:
@@ -372,7 +372,7 @@ RuleFunction(currentRule, args, code, locals, ruleCtx, altLabelCtxs, namedAction
 
 
 <endif>
-func (p *<currentRule.recognizerName>) <currentRule.name; format="cap">(<currentRule.args:{a | <a.name> <a.type>}; separator=", ">) (localctx I<currentRule.ctxType>) {
+func (p *<parser.name>) <currentRule.name; format="cap">(<currentRule.args:{a | <a.name> <a.type>}; separator=", ">) (localctx I<currentRule.ctxType>) {
 	localctx = New<currentRule.ctxType>(p, p.GetParserRuleContext(), p.GetState()<currentRule.args:{a | , <a.name>}>)
 	p.EnterRule(localctx, <currentRule.startState>, <parser.name>RULE_<currentRule.name>)
 	<if(namedActions.init)>
@@ -437,11 +437,11 @@ LeftRecursiveRuleFunction(currentRule, args, code, locals, ruleCtx, altLabelCtxs
 
 
 <endif>
-func (p *<currentRule.recognizerName>) <currentRule.name; format="cap">(<args:{a | <a.name> <a.type>}; separator=", ">) (localctx I<currentRule.ctxType>) {
+func (p *<parser.name>) <currentRule.name; format="cap">(<args:{a | <a.name> <a.type>}; separator=", ">) (localctx I<currentRule.ctxType>) {
 	return p.<currentRule.name>(0<args:{a | , <a.name>}>)
 }
 
-func (p *<currentRule.recognizerName>) <currentRule.name>(_p int<args:{a | , <a.name> <a.type>}>) (localctx I<currentRule.ctxType>) {
+func (p *<parser.name>) <currentRule.name>(_p int<args:{a | , <a.name> <a.type>}>) (localctx I<currentRule.ctxType>) {
 	var _parentctx antlr.ParserRuleContext = p.GetParserRuleContext()
 	_parentState := p.GetState()
 	localctx = New<currentRule.ctxType>(p, p.GetParserRuleContext(), _parentState<args:{a | , <a.name>}>)
@@ -885,7 +885,7 @@ TokenDecl(t) ::= "<t.name> <TokenLabelType()>"
 TokenTypeDecl(t) ::= "<t.name> int"
 TokenListDecl(t) ::= "<t.name> []antlr.Token"
 
-RuleContextDecl(r) ::= "<r.name> I<r.ctxName>"
+RuleContextDecl(r) ::= "<r.name> I<r.ctxName> "
 RuleContextListDecl(rdecl) ::= "<rdecl.name> []I<rdecl.ctxName>"
 
 AttributeDecl(d) ::= "<d.name> <d.type;format={lower}><if(d.initValue)>// TODO = <d.initValue><endif>"
@@ -962,7 +962,7 @@ ListLabelName(label) ::= "<label>"
 CaptureNextToken(d) ::= "<d.varName> = p.GetTokenStream().LT(1)"
 CaptureNextTokenType(d) ::= "<d.varName> = p.GetTokenStream().LA(1)"
 
-StructDecl(struct, ctorAttrs, attrs, getters, dispatchMethods, interfaces, extensionMembers, tokenDecls, tokenTypeDecls, tokenListDecls, ruleContextDecls, ruleContextListDecls, attributeDecls, superClass = {ParserRuleContext}) ::= <<
+StructDecl(struct, ctorAttrs, attrs, getters, dispatchMethods, interfaces, extensionMembers) ::= <<
 // I<struct.name> is an interface to support dynamic dispatch.
 type I<struct.name> interface {
 	antlr.ParserRuleContext
@@ -1477,11 +1477,5 @@ SerializedATN(model) ::= <<
 initValue(typeName) ::= <<
 <javaTypeInitMap.(typeName)>
 >>
-
-RecognizerFileName(name, type) ::= "<name; format={lower}>_<type; format={lower}>"
-ListenerFileName(name) ::= "<name; format={lower}>_listener"
-VisitorFileName(name) ::= "<name; format={lower}>_visitor"
-BaseListenerFileName(name) ::= "<name; format={lower}>_base_listener"
-BaseVisitorFileName(name) ::= "<name; format={lower}>_base_visitor"
 
 codeFileExtension() ::= ".go"

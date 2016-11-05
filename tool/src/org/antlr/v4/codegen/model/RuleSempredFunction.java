@@ -34,10 +34,7 @@ import org.antlr.v4.codegen.OutputModelFactory;
 import org.antlr.v4.tool.Rule;
 
 public class RuleSempredFunction extends RuleActionFunction {
-	public String recognizerName;
-
 	public RuleSempredFunction(OutputModelFactory factory, Rule r, String ctxType) {
 		super(factory, r, ctxType);
-		recognizerName = factory.getGrammar().getRecognizerName();
 	}
 }
