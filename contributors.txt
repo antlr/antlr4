@@ -99,3 +99,4 @@ YYYY/MM/DD, github id, Full name, email
 2016/10/13, cgudrian, Christian Gudrian, christian.gudrian@gmx.de
 2016/10/13, nielsbasjes, Niels Basjes, niels@basjes.nl
 2016/11/05, runner-mei, meifakun, runner.mei@gmail.com
+2016/11/06, NoodleOfDeath, Thom Morgan, github@bytemeapp.com
