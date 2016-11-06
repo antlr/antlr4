@@ -702,7 +702,7 @@ if (<if(invert)><m.varName> \<= 0 || <else>!<endif>(<expr>)) {
 
 Wildcard(w) ::= <<
 setState(<w.stateNumber>)
-<if(w.labels)><w.labels:{l | <labelref(l)> = }><endif>matchWildcard();
+<if(w.labels)><w.labels:{l | <labelref(l)> = }><endif>try matchWildcard();
 >>
 
 // ACTION STUFF
