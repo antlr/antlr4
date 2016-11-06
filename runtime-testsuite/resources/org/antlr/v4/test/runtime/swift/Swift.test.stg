@@ -239,6 +239,12 @@ RuleInvocationStack() ::= "getRuleInvocationStack().description.replacingOccurre
 
 LL_EXACT_AMBIG_DETECTION() ::= <<_interp.setPredictionMode(PredictionMode.LL_EXACT_AMBIG_DETECTION);>>
 
+ParserToken(parser, token) ::= <%<parser>.Tokens.<token>.rawValue%>
+
+Production(p) ::= <%<p>%>
+
+Result(r) ::= <%<r>%>
+
 ParserPropertyMember() ::= <<
 @members {
 func Property() -> Bool {
