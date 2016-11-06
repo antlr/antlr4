@@ -915,7 +915,7 @@ class CParser ( Parser ):
 
     def __init__(self, input:TokenStream):
         super().__init__(input)
-        self.checkVersion("4.5.1")
+        self.checkVersion("4.6")
         self._interp = ParserATNSimulator(self, self.atn, self.decisionsToDFA, self.sharedContextCache)
         self._predicates = None
 
