@@ -172,7 +172,7 @@ False() ::= "false"
 True() ::= "true"
 Not(v) ::= "!<v>"
 Assert(s) ::= ""
-Cast(t,v) ::= "std::dynamic_pointer_cast\<<t>>(<v>)" // Should actually use a more specific name. We may have to use other casts as well.
+Cast(t,v) ::= "dynamic_cast\<<t> *>(<v>)" // Should actually use a more specific name. We may have to use other casts as well.
 Append(a,b) ::= "<a> + <b>->toString()"
 Concat(a,b) ::= "<a><b>"
 
@@ -322,19 +322,19 @@ public:
 
 WalkListener(s) ::= <<
 LeafListener listener;
-tree::ParseTreeWalker::DEFAULT.walk(&listener, <s>.get());
+tree::ParseTreeWalker::DEFAULT.walk(&listener, <s>);
 >>
 
 TreeNodeWithAltNumField(X) ::= <<
 @parser::members {
 class MyRuleNode : public ParserRuleContext {
 public:
-  int altNum;
-	MyRuleNode(std::weak_ptr\<ParserRuleContext> parent, int invokingStateNumber)
+  size_t altNum;
+	MyRuleNode(ParserRuleContext *parent, int invokingStateNumber)
 		: ParserRuleContext(parent, invokingStateNumber) {
 	}
-	virtual int getAltNumber() const override { return altNum; }
-	virtual void setAltNumber(int altNum) override { this->altNum = altNum; }
+	virtual size_t getAltNumber() const override { return altNum; }
+	virtual void setAltNumber(size_t altNum) override { this->altNum = altNum; }
 };
 }
 >>
@@ -405,9 +405,9 @@ public:
 
 DeclareContextListGettersFunction() ::= <<
 void foo() {
-  Ref\<SContext> s;
-  std::vector\<Ref\<AContext\>> a = s->a();
-  std::vector\<Ref\<BContext\>> b = s->b();
+  SContext *s;
+  std::vector\<AContext *> a = s->a();
+  std::vector\<BContext *> b = s->b();
 }
 >>
 

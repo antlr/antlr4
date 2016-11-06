@@ -53,13 +53,13 @@ public class TestParserErrors extends BaseCppTest {
 	public void testContextListGetters() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(218);
+		StringBuilder grammarBuilder = new StringBuilder(208);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("@parser::members{\n");
 		grammarBuilder.append("void foo() {\n");
-		grammarBuilder.append("  Ref<SContext> s;\n");
-		grammarBuilder.append("  std::vector<Ref<AContext>> a = s->a();\n");
-		grammarBuilder.append("  std::vector<Ref<BContext>> b = s->b();\n");
+		grammarBuilder.append("  SContext *s;\n");
+		grammarBuilder.append("  std::vector<AContext *> a = s->a();\n");
+		grammarBuilder.append("  std::vector<BContext *> b = s->b();\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("s : (a | b)+;\n");

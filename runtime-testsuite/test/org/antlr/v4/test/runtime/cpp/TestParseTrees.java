@@ -69,7 +69,7 @@ public class TestParseTrees extends BaseCppTest {
 	public void testAltNum() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(587);
+		StringBuilder grammarBuilder = new StringBuilder(582);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("options { contextSuperClass=MyRuleNode; }\n");
@@ -77,12 +77,12 @@ public class TestParseTrees extends BaseCppTest {
 		grammarBuilder.append("@parser::members {\n");
 		grammarBuilder.append("class MyRuleNode : public ParserRuleContext {\n");
 		grammarBuilder.append("public:\n");
-		grammarBuilder.append("  int altNum;\n");
-		grammarBuilder.append("	MyRuleNode(std::weak_ptr<ParserRuleContext> parent, int invokingStateNumber)\n");
+		grammarBuilder.append("  size_t altNum;\n");
+		grammarBuilder.append("	MyRuleNode(ParserRuleContext *parent, int invokingStateNumber)\n");
 		grammarBuilder.append("		: ParserRuleContext(parent, invokingStateNumber) {\n");
 		grammarBuilder.append("	}\n");
-		grammarBuilder.append("	virtual int getAltNumber() const override { return altNum; }\n");
-		grammarBuilder.append("	virtual void setAltNumber(int altNum) override { this->altNum = altNum; }\n");
+		grammarBuilder.append("	virtual size_t getAltNumber() const override { return altNum; }\n");
+		grammarBuilder.append("	virtual void setAltNumber(size_t altNum) override { this->altNum = altNum; }\n");
 		grammarBuilder.append("};\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("\n");

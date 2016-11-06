@@ -1908,12 +1908,12 @@ public class TestLeftRecursion extends BaseCppTest {
 	public void testMultipleAlternativesWithCommonLabel_1() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(757);
+		StringBuilder grammarBuilder = new StringBuilder(713);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s : e {std::cout << $e.v << std::endl;};\n");
 		grammarBuilder.append("e returns [int v]\n");
-		grammarBuilder.append("  : e '*' e     {$v = std::dynamic_pointer_cast<BinaryContext>($ctx)->e(0)->v * std::dynamic_pointer_cast<BinaryContext>($ctx)->e(1)->v;}  # binary\n");
-		grammarBuilder.append("  | e '+' e     {$v = std::dynamic_pointer_cast<BinaryContext>($ctx)->e(0)->v + std::dynamic_pointer_cast<BinaryContext>($ctx)->e(1)->v;}  # binary\n");
+		grammarBuilder.append("  : e '*' e     {$v = dynamic_cast<BinaryContext *>($ctx)->e(0)->v * dynamic_cast<BinaryContext *>($ctx)->e(1)->v;}  # binary\n");
+		grammarBuilder.append("  | e '+' e     {$v = dynamic_cast<BinaryContext *>($ctx)->e(0)->v + dynamic_cast<BinaryContext *>($ctx)->e(1)->v;}  # binary\n");
 		grammarBuilder.append("  | INT         {$v = $INT.int;}                   # anInt\n");
 		grammarBuilder.append("  | '(' e ')'   {$v = $e.v;}                       # parens\n");
 		grammarBuilder.append("  | left=e INC  {$v = $left.v + 1;}      # unary\n");
@@ -1941,12 +1941,12 @@ public class TestLeftRecursion extends BaseCppTest {
 	public void testMultipleAlternativesWithCommonLabel_2() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(757);
+		StringBuilder grammarBuilder = new StringBuilder(713);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s : e {std::cout << $e.v << std::endl;};\n");
 		grammarBuilder.append("e returns [int v]\n");
-		grammarBuilder.append("  : e '*' e     {$v = std::dynamic_pointer_cast<BinaryContext>($ctx)->e(0)->v * std::dynamic_pointer_cast<BinaryContext>($ctx)->e(1)->v;}  # binary\n");
-		grammarBuilder.append("  | e '+' e     {$v = std::dynamic_pointer_cast<BinaryContext>($ctx)->e(0)->v + std::dynamic_pointer_cast<BinaryContext>($ctx)->e(1)->v;}  # binary\n");
+		grammarBuilder.append("  : e '*' e     {$v = dynamic_cast<BinaryContext *>($ctx)->e(0)->v * dynamic_cast<BinaryContext *>($ctx)->e(1)->v;}  # binary\n");
+		grammarBuilder.append("  | e '+' e     {$v = dynamic_cast<BinaryContext *>($ctx)->e(0)->v + dynamic_cast<BinaryContext *>($ctx)->e(1)->v;}  # binary\n");
 		grammarBuilder.append("  | INT         {$v = $INT.int;}                   # anInt\n");
 		grammarBuilder.append("  | '(' e ')'   {$v = $e.v;}                       # parens\n");
 		grammarBuilder.append("  | left=e INC  {$v = $left.v + 1;}      # unary\n");
@@ -1974,12 +1974,12 @@ public class TestLeftRecursion extends BaseCppTest {
 	public void testMultipleAlternativesWithCommonLabel_3() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(757);
+		StringBuilder grammarBuilder = new StringBuilder(713);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s : e {std::cout << $e.v << std::endl;};\n");
 		grammarBuilder.append("e returns [int v]\n");
-		grammarBuilder.append("  : e '*' e     {$v = std::dynamic_pointer_cast<BinaryContext>($ctx)->e(0)->v * std::dynamic_pointer_cast<BinaryContext>($ctx)->e(1)->v;}  # binary\n");
-		grammarBuilder.append("  | e '+' e     {$v = std::dynamic_pointer_cast<BinaryContext>($ctx)->e(0)->v + std::dynamic_pointer_cast<BinaryContext>($ctx)->e(1)->v;}  # binary\n");
+		grammarBuilder.append("  : e '*' e     {$v = dynamic_cast<BinaryContext *>($ctx)->e(0)->v * dynamic_cast<BinaryContext *>($ctx)->e(1)->v;}  # binary\n");
+		grammarBuilder.append("  | e '+' e     {$v = dynamic_cast<BinaryContext *>($ctx)->e(0)->v + dynamic_cast<BinaryContext *>($ctx)->e(1)->v;}  # binary\n");
 		grammarBuilder.append("  | INT         {$v = $INT.int;}                   # anInt\n");
 		grammarBuilder.append("  | '(' e ')'   {$v = $e.v;}                       # parens\n");
 		grammarBuilder.append("  | left=e INC  {$v = $left.v + 1;}      # unary\n");
@@ -2007,12 +2007,12 @@ public class TestLeftRecursion extends BaseCppTest {
 	public void testMultipleAlternativesWithCommonLabel_4() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(757);
+		StringBuilder grammarBuilder = new StringBuilder(713);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s : e {std::cout << $e.v << std::endl;};\n");
 		grammarBuilder.append("e returns [int v]\n");
-		grammarBuilder.append("  : e '*' e     {$v = std::dynamic_pointer_cast<BinaryContext>($ctx)->e(0)->v * std::dynamic_pointer_cast<BinaryContext>($ctx)->e(1)->v;}  # binary\n");
-		grammarBuilder.append("  | e '+' e     {$v = std::dynamic_pointer_cast<BinaryContext>($ctx)->e(0)->v + std::dynamic_pointer_cast<BinaryContext>($ctx)->e(1)->v;}  # binary\n");
+		grammarBuilder.append("  : e '*' e     {$v = dynamic_cast<BinaryContext *>($ctx)->e(0)->v * dynamic_cast<BinaryContext *>($ctx)->e(1)->v;}  # binary\n");
+		grammarBuilder.append("  | e '+' e     {$v = dynamic_cast<BinaryContext *>($ctx)->e(0)->v + dynamic_cast<BinaryContext *>($ctx)->e(1)->v;}  # binary\n");
 		grammarBuilder.append("  | INT         {$v = $INT.int;}                   # anInt\n");
 		grammarBuilder.append("  | '(' e ')'   {$v = $e.v;}                       # parens\n");
 		grammarBuilder.append("  | left=e INC  {$v = $left.v + 1;}      # unary\n");
