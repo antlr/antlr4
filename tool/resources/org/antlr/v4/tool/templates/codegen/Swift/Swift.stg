@@ -243,8 +243,10 @@ open class <parser.name>: <superClass; null="Parser"> {
      }()
 	internal static let _sharedContextCache: PredictionContextCache = PredictionContextCache()
 	<if(parser.tokens)>
-	public static let <parser.tokens:{k | <k>=<parser.tokens.(k)>}; separator=", ", wrap, anchor>
-	<endif>
+	public enum Tokens: Int {
+		case EOF = -1, <parser.tokens:{k | <k> = <parser.tokens.(k)>}; separator=", ", wrap, anchor>
+	}
+        <endif>
 	public static let <parser.rules:{r | RULE_<r.name> = <r.index>}; separator=", ", wrap, anchor>
 	public static let ruleNames: [String] = [
 		<parser.ruleNames:{r | "<r>"}; separator=", ", wrap, anchor>
@@ -492,7 +494,7 @@ setState(<choice.stateNumber>)
 <!try _errHandler.sync(self);!>
 <if(choice.label)><labelref(choice.label)> = try _input.LT(1)<endif>
 <preamble; separator="\n">
-switch (try _input.LA(1)) {
+switch (<parser.name>.Tokens(rawValue: try _input.LA(1))!) {
 <choice.altLook,alts:{look,alt | <cases(ttypes=look)>
 	<alt>
 	break}; separator="\n">
@@ -504,7 +506,7 @@ default:
 LL1OptionalBlock(choice, alts, error) ::= <<
 setState(<choice.stateNumber>)
 <!try _errHandler.sync(self);!>
-switch (try _input.LA(1)) {
+switch (<parser.name>.Tokens(rawValue: try _input.LA(1))!) {
 <choice.altLook,alts:{look,alt| <cases(ttypes=look)>
  	<alt>
 	break}; separator="\n">
@@ -649,7 +651,7 @@ isZero ::= [
 default: false
 ]
 parserName(ttype) ::= <%
- <parser.name>.<ttype>
+ <parser.name>.Tokens.<ttype>.rawValue
 %>
 offsetShift(shiftAmount, offset) ::= <%
 <if(!isZero.(offset))>(<shiftAmount> - <offset>)<else><shiftAmount><endif>
@@ -657,12 +659,12 @@ offsetShift(shiftAmount, offset) ::= <%
 
 // produces more efficient bytecode when bits.ttypes contains at most two items
 bitsetInlineComparison(s, bits) ::= <%
-<bits.ttypes:{ttype | <s.varName> == <parser.name>.<ttype>}; separator=" || ">
+<bits.ttypes:{ttype | <s.varName> == <parser.name>.Tokens.<ttype>.rawValue}; separator=" || ">
 %>
 
 cases(ttypes) ::= <<
-<trunc(ttypes): {t | case <parser.name>.<t>:fallthrough}  ; separator="\n">
-<last(ttypes): {t | case <parser.name>.<t>:}  ; separator="\n">
+<trunc(ttypes): {t | case .<t>:fallthrough}  ; separator="\n">
+<last(ttypes): {t | case .<t>:}  ; separator="\n">
 >>
 
 InvokeRule(r, argExprsChunks) ::= <<
@@ -679,10 +681,10 @@ MatchToken(m) ::= <<
 setState(<m.stateNumber>)
 <if(m.labels)>
 try {
-		let assignmentValue = try match(<parser.name>.<m.name>)
+		let assignmentValue = try match(<parser.name>.Tokens.<m.name>.rawValue)
 		<m.labels:{l | <labelref(l)> = assignmentValue}  ; separator="\n">
      }()
-<else>try match(<parser.name>.<m.name>)<endif>
+<else>try match(<parser.name>.Tokens.<m.name>.rawValue)<endif>
 >>
 
 MatchSet(m, expr, capture) ::= "<CommonSetStuff(m, expr, capture, false)>"
@@ -783,12 +785,12 @@ RuleContextDecl(r) ::= "<r.name>: <r.ctxName>!"
 RuleContextListDecl(rdecl) ::= "<rdecl.name>:Array\<<rdecl.ctxName>> = Array\<<rdecl.ctxName>>()"
 
 ContextTokenGetterDecl(t)      ::=
-    "open func <t.name>() -> TerminalNode? { return getToken(<parser.name>.<t.name>, 0) }"
+    "open func <t.name>() -> TerminalNode? { return getToken(<parser.name>.Tokens.<t.name>.rawValue, 0) }"
 ContextTokenListGetterDecl(t)  ::=
-    "open func <t.name>() -> Array\<TerminalNode> { return getTokens(<parser.name>.<t.name>) }"
+    "open func <t.name>() -> Array\<TerminalNode> { return getTokens(<parser.name>.Tokens.<t.name>.rawValue) }"
 ContextTokenListIndexedGetterDecl(t)  ::= <<
 open func <t.name>(_ i:Int) -> TerminalNode?{
-	return getToken(<parser.name>.<t.name>, i)
+	return getToken(<parser.name>.Tokens.<t.name>.rawValue, i)
 }
 >>
 ContextRuleGetterDecl(r)       ::= <<
