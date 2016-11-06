@@ -119,7 +119,6 @@ public abstract class BaseTest {
 			throw new RuntimeException("Swift runtime file not found at:" + swiftRuntime.getPath());
 		}
 		String swiftRuntimePath = swiftRuntime.getPath();
-//		String swiftRuntimePath = "/Users/janyou/OSXWorks/AntlrSwift/Antlr4/Antlr4";
 
 		//get Antlr4 framework
 
