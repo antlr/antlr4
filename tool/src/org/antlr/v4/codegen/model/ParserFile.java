@@ -30,7 +30,6 @@
 
 package org.antlr.v4.codegen.model;
 
-import org.antlr.v4.codegen.OutputModelController;
 import org.antlr.v4.codegen.OutputModelFactory;
 import org.antlr.v4.codegen.model.chunk.ActionChunk;
 import org.antlr.v4.codegen.model.chunk.ActionText;
@@ -51,7 +50,7 @@ public class ParserFile extends OutputFile {
 	public ParserFile(OutputModelFactory factory, String fileName) {
 		super(factory, fileName);
 		Grammar g = factory.getGrammar();
-		namedActions = factory.getController().buildNamedActions(g);
+		namedActions = buildNamedActions(factory.getGrammar());
 		genPackage = g.tool.genPackage;
 		// need the below members in the ST for Python, C++
 		genListener = g.tool.gen_listener;

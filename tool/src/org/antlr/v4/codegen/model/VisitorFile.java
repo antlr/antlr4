@@ -36,7 +36,6 @@ import org.antlr.v4.tool.Rule;
 import org.antlr.v4.tool.ast.ActionAST;
 import org.antlr.v4.tool.ast.AltAST;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -64,11 +63,7 @@ public class VisitorFile extends OutputFile {
 	public VisitorFile(OutputModelFactory factory, String fileName) {
 		super(factory, fileName);
 		Grammar g = factory.getGrammar();
-		namedActions = new HashMap<String, Action>();
-		for (String name : g.namedActions.keySet()) {
-			ActionAST ast = g.namedActions.get(name);
-			namedActions.put(name, new Action(factory, ast));
-		}
+		namedActions = buildNamedActions(g);
 		parserName = g.getRecognizerName();
 		grammarName = g.name;
 		for (Rule r : g.rules.values()) {
