@@ -5,10 +5,6 @@ language: java
 matrix:
   include:
   - os: linux
-    jdk: openjdk6
-  - os: linux
-    jdk: oraclejdk7
-  - os: linux
     jdk: oraclejdk8
   - os: osx
     osx_image: xcode8
