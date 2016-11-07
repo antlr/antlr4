@@ -6,6 +6,8 @@ IgnoredTests ::= [
 	"Visitors.RuleGetters_2": true,
 	"Visitors.TokenGetters_1": true,
 	"Visitors.TokenGetters_2": true,
+	"LeftRecursion.JavaExpressions_10": true,
+	"LeftRecursion.JavaExpressions_11": true,
 	default: false
 ]
 

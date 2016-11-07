@@ -2,7 +2,6 @@
 package org.antlr.v4.test.runtime.csharp;
 
 import org.junit.Test;
-import org.junit.Ignore;
 
 @SuppressWarnings("unused")
 public class TestSemPredEvalParser extends BaseTest {
@@ -552,11 +551,11 @@ public class TestSemPredEvalParser extends BaseTest {
 	@Test
 	public void testToLeftWithVaryingPredicate() throws Exception {
 		mkdir(tmpdir);
-		StringBuilder grammarBuilder = new StringBuilder(269);
+		StringBuilder grammarBuilder = new StringBuilder(276);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("@parser::members {int i = 0;}\n");
 		grammarBuilder.append("s : ({this.i += 1;\n");
-		grammarBuilder.append("Console.WriteLine(\"i=\"+i);} a)+ ;\n");
+		grammarBuilder.append("Console.WriteLine(\"i=\" + this.i);} a)+ ;\n");
 		grammarBuilder.append("a : {this.i % 2 == 0}? ID {Console.WriteLine(\"alt 1\");}\n");
 		grammarBuilder.append("  | {this.i % 2 != 0}? ID {Console.WriteLine(\"alt 2\");}\n");
 		grammarBuilder.append("  ;\n");

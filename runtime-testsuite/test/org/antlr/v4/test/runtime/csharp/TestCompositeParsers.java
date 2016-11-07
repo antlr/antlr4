@@ -2,10 +2,6 @@
 package org.antlr.v4.test.runtime.csharp;
 
 import org.junit.Test;
-import org.junit.Ignore;
-
-import org.antlr.v4.test.runtime.java.ErrorQueue;
-import org.antlr.v4.tool.Grammar;
 
 @SuppressWarnings("unused")
 public class TestCompositeParsers extends BaseTest {
@@ -58,17 +54,17 @@ public class TestCompositeParsers extends BaseTest {
 	@Test
 	public void testDelegatesSeeSameTokenType() throws Exception {
 		mkdir(tmpdir);
-		String slave_T =
-			"parser grammar T;\n" +
-			"tokens { C, B, A } // reverse order\n" +
-			"y : A {Console.WriteLine(\"T.y\");};";
-		writeFile(tmpdir, "T.g4", slave_T);
-
 		String slave_S =
 			"parser grammar S;\n" +
 			"tokens { A, B, C }\n" +
 			"x : A {Console.WriteLine(\"S.x\");};";
 		writeFile(tmpdir, "S.g4", slave_S);
+
+		String slave_T =
+			"parser grammar T;\n" +
+			"tokens { C, B, A } // reverse order\n" +
+			"y : A {Console.WriteLine(\"T.y\");};";
+		writeFile(tmpdir, "T.g4", slave_T);
 
 		StringBuilder grammarBuilder = new StringBuilder(598);
 		grammarBuilder.append("// The lexer will create rules to match letters a, b, c.\n");
@@ -191,16 +187,16 @@ public class TestCompositeParsers extends BaseTest {
 	@Test
 	public void testDelegatorInvokesFirstVersionOfDelegateRule() throws Exception {
 		mkdir(tmpdir);
-		String slave_T =
-			"parser grammar T;\n" +
-			"a : B {Console.WriteLine(\"T.a\");};";
-		writeFile(tmpdir, "T.g4", slave_T);
-
 		String slave_S =
 			"parser grammar S;\n" +
 			"a : b {Console.WriteLine(\"S.a\");};\n" +
 			"b : B;";
 		writeFile(tmpdir, "S.g4", slave_S);
+
+		String slave_T =
+			"parser grammar T;\n" +
+			"a : B {Console.WriteLine(\"T.a\");};";
+		writeFile(tmpdir, "T.g4", slave_T);
 
 		StringBuilder grammarBuilder = new StringBuilder(106);
 		grammarBuilder.append("grammar M;\n");
@@ -241,17 +237,17 @@ public class TestCompositeParsers extends BaseTest {
 	@Test
 	public void testDelegatorRuleOverridesDelegates() throws Exception {
 		mkdir(tmpdir);
-		String slave_T =
-			"parser grammar T;\n" +
-			"tokens { A }\n" +
-			"b : 'b' {Console.WriteLine(\"T.b\");};";
-		writeFile(tmpdir, "T.g4", slave_T);
-
 		String slave_S =
 			"parser grammar S;\n" +
 			"a : b {Console.WriteLine(\"S.a\");};\n" +
 			"b : 'b' ;";
 		writeFile(tmpdir, "S.g4", slave_S);
+
+		String slave_T =
+			"parser grammar T;\n" +
+			"tokens { A }\n" +
+			"b : 'b' {Console.WriteLine(\"T.b\");};";
+		writeFile(tmpdir, "T.g4", slave_T);
 
 		StringBuilder grammarBuilder = new StringBuilder(94);
 		grammarBuilder.append("grammar M;\n");
