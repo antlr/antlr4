@@ -110,7 +110,7 @@
         </os>
       </activation>
       <properties>
-        <antlr.tests.swift>**/Swift/Test*.java</antlr.tests.swift>
+        <antlr.tests.swift>**/swift/Test*.java</antlr.tests.swift>
       </properties>
     </profile>
 
