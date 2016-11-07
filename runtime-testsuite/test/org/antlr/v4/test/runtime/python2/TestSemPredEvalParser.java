@@ -670,11 +670,12 @@ public class TestSemPredEvalParser extends BasePython2Test {
 	public void testToLeftWithVaryingPredicate() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(236);
+		StringBuilder grammarBuilder = new StringBuilder(243);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("@parser::members {i = 0}\n");
 		grammarBuilder.append("s : ({self.i += 1\n");
-		grammarBuilder.append("print(\"i=\" + str(self.i))} a)+ ;\n");
+		grammarBuilder.append("print(\"i=\",end='')\n");
+		grammarBuilder.append("print(self.i)} a)+ ;\n");
 		grammarBuilder.append("a : {self.i % 2 == 0}? ID {print(\"alt 1\")}\n");
 		grammarBuilder.append("  | {self.i % 2 != 0}? ID {print(\"alt 2\")}\n");
 		grammarBuilder.append("  ;\n");

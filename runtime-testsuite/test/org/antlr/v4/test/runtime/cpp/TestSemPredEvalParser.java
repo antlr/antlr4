@@ -670,11 +670,12 @@ public class TestSemPredEvalParser extends BaseCppTest {
 	public void testToLeftWithVaryingPredicate() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(277);
+		StringBuilder grammarBuilder = new StringBuilder(289);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("@parser::members {int i = 0;}\n");
 		grammarBuilder.append("s : ({i += 1;\n");
-		grammarBuilder.append("std::cout << \"i=\" + i << std::endl;} a)+ ;\n");
+		grammarBuilder.append("std::cout << \"i=\";\n");
+		grammarBuilder.append("std::cout << i << std::endl;} a)+ ;\n");
 		grammarBuilder.append("a : {i % 2 == 0}? ID {std::cout << \"alt 1\" << std::endl;}\n");
 		grammarBuilder.append("  | {i % 2 != 0}? ID {std::cout << \"alt 2\" << std::endl;}\n");
 		grammarBuilder.append("  ;\n");

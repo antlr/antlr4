@@ -600,11 +600,12 @@ public class TestSemPredEvalParser extends BaseTest {
 	@Test
 	public void testToLeftWithVaryingPredicate() throws Exception {
 		mkdir(tmpdir);
-		StringBuilder grammarBuilder = new StringBuilder(260);
+		StringBuilder grammarBuilder = new StringBuilder(281);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("@parser::members {this.i = 0;}\n");
 		grammarBuilder.append("s : ({this.i += 1;\n");
-		grammarBuilder.append("console.log(\"i=\" + this.i);} a)+ ;\n");
+		grammarBuilder.append("process.stdout.write(\"i=\");\n");
+		grammarBuilder.append("console.log(this.i);} a)+ ;\n");
 		grammarBuilder.append("a : {this.i % 2 === 0}? ID {console.log(\"alt 1\");}\n");
 		grammarBuilder.append("  | {this.i % 2 != 0}? ID {console.log(\"alt 2\");}\n");
 		grammarBuilder.append("  ;\n");
