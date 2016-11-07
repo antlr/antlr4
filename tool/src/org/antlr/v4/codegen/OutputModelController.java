@@ -71,7 +71,9 @@ import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 
 /** This receives events from SourceGenTriggers.g and asks factory to do work.
@@ -359,6 +361,15 @@ public class OutputModelController {
 		List<SrcOp> ops = delegate.rulePostamble(function, r);
 		for (CodeGeneratorExtension ext : extensions) ops = ext.rulePostamble(ops);
 		return ops;
+	}
+
+	public Map<String, Action> buildNamedActions(Grammar g) {
+		Map<String, Action> namedActions = new HashMap<String, Action>();
+		for (String name : g.namedActions.keySet()) {
+			ActionAST ast = g.namedActions.get(name);
+			namedActions.put(name, new Action(delegate, ast));
+		}
+		return namedActions;
 	}
 
 	public Grammar getGrammar() { return delegate.getGrammar(); }
