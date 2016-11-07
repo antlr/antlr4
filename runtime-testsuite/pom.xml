@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.antlr</groupId>
     <artifactId>antlr4-master</artifactId>
-    <version>4.5.4-SNAPSHOT</version>
+    <version>4.6-SNAPSHOT</version>
   </parent>
   <artifactId>antlr4-runtime-testsuite</artifactId>
   <name>ANTLR 4 Runtime Test Generator</name>
@@ -72,8 +72,9 @@
           <includes>
             <include>**/csharp/Test*.java</include>
             <include>**/java/Test*.java</include>
+            <include>**/go/Test*.java</include>
             <include>**/javascript/node/Test*.java</include>
-            <include>**/python2/Test*.java</include> 
+            <include>**/python2/Test*.java</include>
             <include>**/python3/Test*.java</include>
             <include>**/cpp/Test*.java</include>
           </includes>

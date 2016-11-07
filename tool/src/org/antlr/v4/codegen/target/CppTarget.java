@@ -59,14 +59,14 @@ public class CppTarget extends Target {
 		"double", "dynamic_cast", "else", "enum", "explicit", "export",
 		"extern", "false", "float", "for", "friend", "goto", "if",
 		"inline", "int", "long", "mutable", "namespace", "new",
-        "noexcept", "not", "not_eq", "nullptr", "operator", "or",
-        "or_eq", "private", "protected", "public", "register",
-        "reinterpret_cast", "requires", "return", "short", "signed",
-        "sizeof", "static", "static_assert", "static_cast", "struct",
-        "switch", "template", "this", "thread_local", "throw", "true",
-        "try", "typedef", "typeid", "typename", "union", "unsigned",
-        "using", "virtual", "void", "volatile", "wchar_t", "while",
-        "xor", "xor_eq"
+		"noexcept", "not", "not_eq", "nullptr", "operator", "or",
+		"or_eq", "private", "protected", "public", "register",
+		"reinterpret_cast", "requires", "return", "short", "signed",
+		"sizeof", "static", "static_assert", "static_cast", "struct",
+		"switch", "template", "this", "thread_local", "throw", "true",
+		"try", "typedef", "typeid", "typename", "union", "unsigned",
+		"using", "virtual", "void", "volatile", "wchar_t", "while",
+		"xor", "xor_eq"
 	};
 
 	/** Avoid grammar symbols in this set to prevent conflicts in gen'd code. */
@@ -181,6 +181,45 @@ public class CppTarget extends Target {
 		// 65535 is the class file format byte limit for a UTF-8 encoded string literal
 		// 3 is the maximum number of bytes it takes to encode a value in the range 0-0xFFFF
 		return 65535 / 3;
+	}
+
+	@Override
+	public String getRecognizerFileName(boolean header) {
+		ST extST = getTemplates().getInstanceOf(header ? "headerFileExtension" : "codeFileExtension");
+		String recognizerName = gen.g.getRecognizerName();
+		return recognizerName+extST.render();
+	}
+
+	@Override
+	public String getListenerFileName(boolean header) {
+		assert gen.g.name != null;
+		ST extST = getTemplates().getInstanceOf(header ? "headerFileExtension" : "codeFileExtension");
+		String listenerName = gen.g.name + "Listener";
+		return listenerName+extST.render();
+	}
+
+	@Override
+	public String getVisitorFileName(boolean header) {
+		assert gen.g.name != null;
+		ST extST = getTemplates().getInstanceOf(header ? "headerFileExtension" : "codeFileExtension");
+		String listenerName = gen.g.name + "Visitor";
+		return listenerName+extST.render();
+	}
+
+	@Override
+	public String getBaseListenerFileName(boolean header) {
+		assert gen.g.name != null;
+		ST extST = getTemplates().getInstanceOf(header ? "headerFileExtension" : "codeFileExtension");
+		String listenerName = gen.g.name + "BaseListener";
+		return listenerName+extST.render();
+	}
+
+	@Override
+	public String getBaseVisitorFileName(boolean header) {
+		assert gen.g.name != null;
+		ST extST = getTemplates().getInstanceOf(header ? "headerFileExtension" : "codeFileExtension");
+		String listenerName = gen.g.name + "BaseVisitor";
+		return listenerName+extST.render();
 	}
 
 	@Override

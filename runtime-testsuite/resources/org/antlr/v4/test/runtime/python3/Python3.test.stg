@@ -249,6 +249,12 @@ RuleInvocationStack() ::= "str_list(self.getRuleInvocationStack())"
 
 LL_EXACT_AMBIG_DETECTION() ::= <<self._interp.predictionMode =  PredictionMode.LL_EXACT_AMBIG_DETECTION>>
 
+ParserToken(parser, token) ::= <%<parser>.<token>%>
+
+Production(p) ::= <%<p>%>
+
+Result(r) ::= <%<r>%>
+
 ParserPropertyMember() ::= <<
 @members {
 def Property(self):
@@ -383,6 +389,14 @@ class LeafListener(MockListener):
         print(ctx.INT().symbol.text)
 }
 >>
+
+ImportVisitor(X) ::= ""
+BasicVisitor(X) ::= ""
+WalkVisitor(s) ::= ""
+LRWithLabelsVisitor(X) ::= ""
+RuleGetterVisitor(X) ::= ""
+LRVisitor(x) ::= ""
+TokenGetterVisitor(x) ::= ""
 
 DeclareContextListGettersFunction() ::= <<
 def foo():

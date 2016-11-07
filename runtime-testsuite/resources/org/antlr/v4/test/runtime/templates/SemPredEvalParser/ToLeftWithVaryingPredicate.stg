@@ -31,7 +31,7 @@ Errors() ::= ""
 
 grammar(grammarName) ::= <<
 grammar <grammarName>;
-@members {<InitIntMember("i","0")>}
+@parser::members {<InitIntMember("i","0")>}
 s : ({<AddMember("i","1")>
 <writeList(["\"i=\"", "i"])>} a)+ ;
 a : {<ModMemberEquals("i","2","0")>}? ID {<writeln("\"alt 1\"")>}

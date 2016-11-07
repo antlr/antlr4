@@ -25,7 +25,7 @@ grammar(grammarName) ::= <<
 grammar <grammarName>;
 s : stmt EOF ;
 stmt : ifStmt | ID;
-ifStmt : 'if' ID stmt ('else' stmt | { <LANotEquals("1", {<grammarName><ParserTokenType("ELSE")>})> }?);
+ifStmt : 'if' ID stmt ('else' stmt | { <LANotEquals("1", {<grammarName><ParserToken("Parser", "ELSE")>})> }?);
 ELSE : 'else';
 ID : [a-zA-Z]+;
 WS : [ \\n\\t]+ -> skip;

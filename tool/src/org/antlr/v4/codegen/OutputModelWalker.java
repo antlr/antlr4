@@ -2,6 +2,7 @@
  * [The "BSD license"]
  *  Copyright (c) 2012 Terence Parr
  *  Copyright (c) 2012 Sam Harwell
+ *  Copyright (c) 2016 Mike Lischke
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -83,8 +84,9 @@ public class OutputModelWalker {
 			tool.errMgr.toolError(ErrorType.NO_MODEL_TO_TEMPLATE_MAPPING, cl.getSimpleName());
 			return new ST("["+templateName+" invalid]");
 		}
-		if (header)
-		    templateName += "Header";
+
+		if (header) templateName += "Header";
+
 		ST st = templates.getInstanceOf(templateName);
 		if ( st == null ) {
 			tool.errMgr.toolError(ErrorType.CODE_GEN_TEMPLATES_INCOMPLETE, templateName);

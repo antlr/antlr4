@@ -1,8 +1,8 @@
 /*
  * [The "BSD license"]
- *  Copyright (c) 2016 Mike Lischke
  *  Copyright (c) 2012 Terence Parr
  *  Copyright (c) 2012 Sam Harwell
+ *  Copyright (c) 2016 Mike Lischke
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -28,7 +28,6 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package org.antlr.v4.codegen;
 
 import org.antlr.v4.parse.ANTLRParser;
@@ -60,8 +59,8 @@ public class CodeGenPipeline {
 		for (GrammarAST idNode : idNodes) {
 			if ( gen.getTarget().grammarSymbolCausesIssueInGeneratedCode(idNode) ) {
 				g.tool.errMgr.grammarError(ErrorType.USE_OF_BAD_WORD,
-										   g.fileName, idNode.getToken(),
-										   idNode.getText());
+				                           g.fileName, idNode.getToken(),
+				                           idNode.getText());
 			}
 		}
 
@@ -105,17 +104,19 @@ public class CodeGenPipeline {
 				if (g.tool.errMgr.getNumErrors() == errorCount) {
 					gen.writeListener(listener, false);
 				}
-				
-			  if (gen.getTarget().needsHeader()) {
-				  ST baseListener = gen.generateBaseListener(true);
-				  if (g.tool.errMgr.getNumErrors() == errorCount) {
-					  gen.writeBaseListener(baseListener, true);
-				  }
-			  }
-			  ST baseListener = gen.generateBaseListener(false);
-			  if (g.tool.errMgr.getNumErrors() == errorCount) {
-			  	gen.writeBaseListener(baseListener, false);
-			  }
+
+				if (gen.getTarget().needsHeader()) {
+					ST baseListener = gen.generateBaseListener(true);
+					if (g.tool.errMgr.getNumErrors() == errorCount) {
+						gen.writeBaseListener(baseListener, true);
+					}
+				}
+				if (gen.getTarget().wantsBaseListener()) {
+					ST baseListener = gen.generateBaseListener(false);
+					if ( g.tool.errMgr.getNumErrors()==errorCount ) {
+						gen.writeBaseListener(baseListener, false);
+					}
+				}
 			}
 			if ( g.tool.gen_visitor ) {
 				if (gen.getTarget().needsHeader()) {
@@ -128,16 +129,18 @@ public class CodeGenPipeline {
 				if (g.tool.errMgr.getNumErrors() == errorCount) {
 					gen.writeVisitor(visitor, false);
 				}
-				
+
 				if (gen.getTarget().needsHeader()) {
 					ST baseVisitor = gen.generateBaseVisitor(true);
 					if (g.tool.errMgr.getNumErrors() == errorCount) {
 						gen.writeBaseVisitor(baseVisitor, true);
 					}
 				}
-				ST baseVisitor = gen.generateBaseVisitor(false);
-				if (g.tool.errMgr.getNumErrors() == errorCount) {
-					gen.writeBaseVisitor(baseVisitor, false);
+				if (gen.getTarget().wantsBaseVisitor()) {
+					ST baseVisitor = gen.generateBaseVisitor(false);
+					if ( g.tool.errMgr.getNumErrors()==errorCount ) {
+						gen.writeBaseVisitor(baseVisitor, false);
+					}
 				}
 			}
 		}

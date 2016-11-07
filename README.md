@@ -11,10 +11,10 @@ ANTLR project lead and supreme dictator for life
 [University of San Francisco](http://www.usfca.edu/)
 * [Sam Harwell](http://tunnelvisionlabs.com/) (Tool co-author, Java and C# target)
 * Eric Vergnaud (Javascript, Python2, Python3 targets and significant work on C# target)
+* [Peter Boyer](https://github.com/pboyer) (Go target)
 * [Mike Lischke](http://www.soft-gems.net/) (C++ completed target)
 * Dan McLaughlin (C++ initial target)
 * David Sisson (C++ initial target and test)
-
 
 ## Useful information
 
@@ -23,7 +23,8 @@ ANTLR project lead and supreme dictator for life
 * [Official site](http://www.antlr.org/)
 * [Documentation](https://github.com/antlr/antlr4/blob/master/doc/index.md)
 * [FAQ](https://github.com/antlr/antlr4/blob/master/doc/faq/index.md)
-* [API](http://www.antlr.org/api/Java/index.html)
+* [ANTLR code generation targets](https://github.com/antlr/antlr4/blob/master/doc/targets.md) (Currently: Java, C#, Python2|3, JavaScript, Go)
+* [Java API](http://www.antlr.org/api/Java/index.html)
 * [ANTLR v3](http://www.antlr3.org/)
 * [v3 to v4 Migration, differences](https://github.com/antlr/antlr4/blob/master/doc/faq/general.md)
 

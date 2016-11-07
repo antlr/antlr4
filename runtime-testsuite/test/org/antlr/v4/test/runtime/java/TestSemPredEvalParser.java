@@ -79,9 +79,9 @@ public class TestSemPredEvalParser extends BaseTest {
 	public void testActionHidesPreds() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(239);
+		StringBuilder grammarBuilder = new StringBuilder(247);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("@members {int i = 0;}\n");
+		grammarBuilder.append("@parser::members {int i = 0;}\n");
 		grammarBuilder.append("s : a+ ;\n");
 		grammarBuilder.append("a : {this.i = 1;} ID {this.i == 1}? {System.out.println(\"alt 1\");}\n");
 		grammarBuilder.append("  | {this.i = 2;} ID {this.i == 2}? {System.out.println(\"alt 2\");}\n");
@@ -107,9 +107,9 @@ public class TestSemPredEvalParser extends BaseTest {
 	public void testActionsHidePredsInGlobalFOLLOW() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(291);
+		StringBuilder grammarBuilder = new StringBuilder(299);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("@members {\n");
+		grammarBuilder.append("@parser::members {\n");
 		grammarBuilder.append("boolean pred(boolean v) {\n");
 		grammarBuilder.append("	System.out.println(\"eval=\"+v);\n");
 		grammarBuilder.append("	return v;\n");
@@ -159,9 +159,9 @@ public class TestSemPredEvalParser extends BaseTest {
 	public void testDepedentPredsInGlobalFOLLOW() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(314);
+		StringBuilder grammarBuilder = new StringBuilder(322);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("@members {\n");
+		grammarBuilder.append("@parser::members {\n");
 		grammarBuilder.append("boolean pred(boolean v) {\n");
 		grammarBuilder.append("	System.out.println(\"eval=\"+v);\n");
 		grammarBuilder.append("	return v;\n");
@@ -379,9 +379,9 @@ public class TestSemPredEvalParser extends BaseTest {
 	public void testPredTestedEvenWhenUnAmbig_1() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(218);
+		StringBuilder grammarBuilder = new StringBuilder(226);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("@members {boolean enumKeyword = true;}\n");
+		grammarBuilder.append("@parser::members {boolean enumKeyword = true;}\n");
 		grammarBuilder.append("primary\n");
 		grammarBuilder.append("    :   ID {System.out.println(\"ID \"+$ID.text);}\n");
 		grammarBuilder.append("    |   {!this.enumKeyword}? 'enum' {System.out.println(\"enum\");}\n");
@@ -403,9 +403,9 @@ public class TestSemPredEvalParser extends BaseTest {
 	public void testPredTestedEvenWhenUnAmbig_2() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(218);
+		StringBuilder grammarBuilder = new StringBuilder(226);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("@members {boolean enumKeyword = true;}\n");
+		grammarBuilder.append("@parser::members {boolean enumKeyword = true;}\n");
 		grammarBuilder.append("primary\n");
 		grammarBuilder.append("    :   ID {System.out.println(\"ID \"+$ID.text);}\n");
 		grammarBuilder.append("    |   {!this.enumKeyword}? 'enum' {System.out.println(\"enum\");}\n");
@@ -428,9 +428,9 @@ public class TestSemPredEvalParser extends BaseTest {
 	public void testPredicateDependentOnArg() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(214);
+		StringBuilder grammarBuilder = new StringBuilder(222);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("@members {int i = 0;}\n");
+		grammarBuilder.append("@parser::members {int i = 0;}\n");
 		grammarBuilder.append("s : a[2] a[1];\n");
 		grammarBuilder.append("a[int i]\n");
 		grammarBuilder.append("  : {$i==1}? ID {System.out.println(\"alt 1\");}\n");
@@ -456,9 +456,9 @@ public class TestSemPredEvalParser extends BaseTest {
 	public void testPredicateDependentOnArg2() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(154);
+		StringBuilder grammarBuilder = new StringBuilder(162);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("@members {int i = 0;}\n");
+		grammarBuilder.append("@parser::members {int i = 0;}\n");
 		grammarBuilder.append("s : a[2] a[1];\n");
 		grammarBuilder.append("a[int i]\n");
 		grammarBuilder.append("  : {$i==1}? ID \n");
@@ -482,9 +482,9 @@ public class TestSemPredEvalParser extends BaseTest {
 	public void testPredsInGlobalFOLLOW() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(285);
+		StringBuilder grammarBuilder = new StringBuilder(293);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("@members {\n");
+		grammarBuilder.append("@parser::members {\n");
 		grammarBuilder.append("boolean pred(boolean v) {\n");
 		grammarBuilder.append("	System.out.println(\"eval=\"+v);\n");
 		grammarBuilder.append("	return v;\n");
@@ -646,9 +646,9 @@ public class TestSemPredEvalParser extends BaseTest {
 	public void testToLeftWithVaryingPredicate() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(264);
+		StringBuilder grammarBuilder = new StringBuilder(272);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("@members {int i = 0;}\n");
+		grammarBuilder.append("@parser::members {int i = 0;}\n");
 		grammarBuilder.append("s : ({this.i += 1;\n");
 		grammarBuilder.append("System.out.println(\"i=\"+i);} a)+ ;\n");
 		grammarBuilder.append("a : {this.i % 2 == 0}? ID {System.out.println(\"alt 1\");}\n");

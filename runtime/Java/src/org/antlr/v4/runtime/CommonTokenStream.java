@@ -52,7 +52,7 @@ package org.antlr.v4.runtime;
  * Note: lexer rules which use the {@code ->skip} lexer command or call
  * {@link Lexer#skip} do not produce tokens at all, so input text matched by
  * such a rule will not be available as part of the token stream, regardless of
- * channel.</p>
+ * channel.</p>we
  */
 public class CommonTokenStream extends BufferedTokenStream {
 	/**

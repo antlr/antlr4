@@ -218,6 +218,12 @@ RuleInvocationStack() ::= "Arrays::listToString(getRuleInvocationStack(), \", \"
 
 LL_EXACT_AMBIG_DETECTION() ::= <<getInterpreter\<atn::ParserATNSimulator>()->setPredictionMode(atn::PredictionMode::LL_EXACT_AMBIG_DETECTION);>>
 
+ParserToken(parser, token) ::= <%<parser>::<token>%>
+
+Production(p) ::= <%<p>%>
+
+Result(r) ::= <%<r>%>
+
 ParserPropertyMember() ::= <<
 @members {
 bool Property() {
@@ -403,6 +409,14 @@ public:
 }
 >>
 
+ImportVisitor(X) ::= ""
+BasicVisitor(X) ::= ""
+WalkVisitor(s) ::= ""
+LRWithLabelsVisitor(X) ::= ""
+RuleGetterVisitor(X) ::= ""
+LRVisitor(x) ::= ""
+TokenGetterVisitor(x) ::= ""
+
 DeclareContextListGettersFunction() ::= <<
 void foo() {
   SContext *s;
@@ -427,7 +441,6 @@ bool pred(bool v) {
 
 Invoke_pred(v) ::= <<pred(<v>)>>
 
-ParserTokenType(t) ::= "Parser::<t>"
 ContextRuleFunction(ctx, rule) ::= "<ctx>-><rule>"
 StringType() ::= "std::string"
 ContextMember(ctx, subctx, member) ::= "<ctx>-><subctx>-><member>"

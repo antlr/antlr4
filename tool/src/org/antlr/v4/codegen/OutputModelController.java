@@ -2,6 +2,7 @@
  * [The "BSD license"]
  *  Copyright (c) 2012 Terence Parr
  *  Copyright (c) 2012 Sam Harwell
+ *  Copyright (c) 2016 Mike Lischke
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without

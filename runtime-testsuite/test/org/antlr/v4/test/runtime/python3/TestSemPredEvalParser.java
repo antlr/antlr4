@@ -81,9 +81,9 @@ public class TestSemPredEvalParser extends BasePython3Test {
 	public void testActionHidesPreds() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(204);
+		StringBuilder grammarBuilder = new StringBuilder(212);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("@members {i = 0}\n");
+		grammarBuilder.append("@parser::members {i = 0}\n");
 		grammarBuilder.append("s : a+ ;\n");
 		grammarBuilder.append("a : {self.i = 1} ID {self.i == 1}? {print(\"alt 1\")}\n");
 		grammarBuilder.append("  | {self.i = 2} ID {self.i == 2}? {print(\"alt 2\")}\n");
@@ -110,9 +110,9 @@ public class TestSemPredEvalParser extends BasePython3Test {
 	public void testActionsHidePredsInGlobalFOLLOW() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(269);
+		StringBuilder grammarBuilder = new StringBuilder(277);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("@members {\n");
+		grammarBuilder.append("@parser::members {\n");
 		grammarBuilder.append("def pred(self, v):\n");
 		grammarBuilder.append("	print('eval=' + str(v).lower())\n");
 		grammarBuilder.append("	return v\n");
@@ -164,9 +164,9 @@ public class TestSemPredEvalParser extends BasePython3Test {
 	public void testDepedentPredsInGlobalFOLLOW() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(292);
+		StringBuilder grammarBuilder = new StringBuilder(300);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("@members {\n");
+		grammarBuilder.append("@parser::members {\n");
 		grammarBuilder.append("def pred(self, v):\n");
 		grammarBuilder.append("	print('eval=' + str(v).lower())\n");
 		grammarBuilder.append("	return v\n");
@@ -392,9 +392,9 @@ public class TestSemPredEvalParser extends BasePython3Test {
 	public void testPredTestedEvenWhenUnAmbig_1() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(184);
+		StringBuilder grammarBuilder = new StringBuilder(192);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("@members {enumKeyword = True}\n");
+		grammarBuilder.append("@parser::members {enumKeyword = True}\n");
 		grammarBuilder.append("primary\n");
 		grammarBuilder.append("    :   ID {print(\"ID \"+$ID.text)}\n");
 		grammarBuilder.append("    |   {not self.enumKeyword}? 'enum' {print(\"enum\")}\n");
@@ -417,9 +417,9 @@ public class TestSemPredEvalParser extends BasePython3Test {
 	public void testPredTestedEvenWhenUnAmbig_2() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(184);
+		StringBuilder grammarBuilder = new StringBuilder(192);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("@members {enumKeyword = True}\n");
+		grammarBuilder.append("@parser::members {enumKeyword = True}\n");
 		grammarBuilder.append("primary\n");
 		grammarBuilder.append("    :   ID {print(\"ID \"+$ID.text)}\n");
 		grammarBuilder.append("    |   {not self.enumKeyword}? 'enum' {print(\"enum\")}\n");
@@ -443,9 +443,9 @@ public class TestSemPredEvalParser extends BasePython3Test {
 	public void testPredicateDependentOnArg() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(181);
+		StringBuilder grammarBuilder = new StringBuilder(189);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("@members {i = 0}\n");
+		grammarBuilder.append("@parser::members {i = 0}\n");
 		grammarBuilder.append("s : a[2] a[1];\n");
 		grammarBuilder.append("a[int i]\n");
 		grammarBuilder.append("  : {$i==1}? ID {print(\"alt 1\")}\n");
@@ -472,9 +472,9 @@ public class TestSemPredEvalParser extends BasePython3Test {
 	public void testPredicateDependentOnArg2() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(149);
+		StringBuilder grammarBuilder = new StringBuilder(157);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("@members {i = 0}\n");
+		grammarBuilder.append("@parser::members {i = 0}\n");
 		grammarBuilder.append("s : a[2] a[1];\n");
 		grammarBuilder.append("a[int i]\n");
 		grammarBuilder.append("  : {$i==1}? ID \n");
@@ -499,9 +499,9 @@ public class TestSemPredEvalParser extends BasePython3Test {
 	public void testPredsInGlobalFOLLOW() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(263);
+		StringBuilder grammarBuilder = new StringBuilder(271);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("@members {\n");
+		grammarBuilder.append("@parser::members {\n");
 		grammarBuilder.append("def pred(self, v):\n");
 		grammarBuilder.append("	print('eval=' + str(v).lower())\n");
 		grammarBuilder.append("	return v\n");
@@ -669,9 +669,9 @@ public class TestSemPredEvalParser extends BasePython3Test {
 	public void testToLeftWithVaryingPredicate() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(226);
+		StringBuilder grammarBuilder = new StringBuilder(234);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("@members {i = 0}\n");
+		grammarBuilder.append("@parser::members {i = 0}\n");
 		grammarBuilder.append("s : ({self.i += 1\n");
 		grammarBuilder.append("print(str(\"i=\")+str(i))} a)+ ;\n");
 		grammarBuilder.append("a : {self.i % 2 == 0}? ID {print(\"alt 1\")}\n");

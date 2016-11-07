@@ -63,8 +63,8 @@ public class TestParserErrors extends BaseCppTest {
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("s : (a | b)+;\n");
-		grammarBuilder.append("a : 'a' {std::cout << 'a';};\n");
-		grammarBuilder.append("b : 'b' {std::cout << 'b';};");
+		grammarBuilder.append("a : 'a' {std::cout << \"a\";};\n");
+		grammarBuilder.append("b : 'b' {std::cout << \"b\";};");
 		String grammar = grammarBuilder.toString();
 
 

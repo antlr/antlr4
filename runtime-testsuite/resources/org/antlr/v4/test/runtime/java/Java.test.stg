@@ -1,4 +1,11 @@
 IgnoredTests ::= [
+	"Visitors.Basic": true,
+	"Visitors.LR": true,
+	"Visitors.LRWithLabels": true,
+	"Visitors.RuleGetters_1": true,
+	"Visitors.RuleGetters_2": true,
+	"Visitors.TokenGetters_1": true,
+	"Visitors.TokenGetters_2": true,
 	default: false
 ]
 
@@ -148,6 +155,9 @@ writeLines(textLines) ::= <%
 <endif>
 %>
 
+
+
+
 string(text) ::= <<
 "<escape.(text)>"
 >>
@@ -233,6 +243,12 @@ GetExpectedTokenNames() ::= "this.getExpectedTokens().toString(this.tokenNames)"
 RuleInvocationStack() ::= "getRuleInvocationStack()"
 
 LL_EXACT_AMBIG_DETECTION() ::= <<_interp.setPredictionMode(PredictionMode.LL_EXACT_AMBIG_DETECTION);>>
+
+ParserToken(parser, token) ::= <%<parser>.<token>%>
+
+Production(p) ::= <%<p>%>
+
+Result(r) ::= <%<r>%>
 
 ParserPropertyMember() ::= <<
 @members {
@@ -412,6 +428,14 @@ public static class LeafListener extends TBaseListener {
 }
 >>
 
+ImportVisitor(X) ::= ""
+BasicVisitor(X) ::= ""
+WalkVisitor(s) ::= ""
+LRWithLabelsVisitor(X) ::= ""
+RuleGetterVisitor(X) ::= ""
+LRVisitor(x) ::= ""
+TokenGetterVisitor(x) ::= ""
+
 DeclareContextListGettersFunction() ::= <<
 void foo() {
 	SContext s = null;
@@ -438,18 +462,6 @@ ParserTokenType(t) ::= "Parser.<t>"
 ContextRuleFunction(ctx, rule) ::= "<ctx>.<rule>"
 StringType() ::= "String"
 ContextMember(ctx, subctx, member) ::= "<ctx>.<subctx>.<member>"
-
-IgnoredTests ::= [
-	"Visitors.Basic": true,
-	"Visitors.LR": true,
-	"Visitors.LRWithLabels": true,
-	"Visitors.RuleGetters_1": true,
-	"Visitors.RuleGetters_2": true,
-	"Visitors.TokenGetters_1": true,
-	"Visitors.TokenGetters_2": true,
-	default: false
-]
-
 isEmpty ::= [
 	"": true,
 	default: false

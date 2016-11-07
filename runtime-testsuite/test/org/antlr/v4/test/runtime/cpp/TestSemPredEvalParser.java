@@ -81,9 +81,9 @@ public class TestSemPredEvalParser extends BaseCppTest {
 	public void testActionHidesPreds() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(231);
+		StringBuilder grammarBuilder = new StringBuilder(239);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("@members {int i = 0;}\n");
+		grammarBuilder.append("@parser::members {int i = 0;}\n");
 		grammarBuilder.append("s : a+ ;\n");
 		grammarBuilder.append("a : {i = 1;} ID {i == 1}? {std::cout << \"alt 1\" << std::endl;}\n");
 		grammarBuilder.append("  | {i = 2;} ID {i == 2}? {std::cout << \"alt 2\" << std::endl;}\n");
@@ -110,9 +110,9 @@ public class TestSemPredEvalParser extends BaseCppTest {
 	public void testActionsHidePredsInGlobalFOLLOW() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(308);
+		StringBuilder grammarBuilder = new StringBuilder(316);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("@members {\n");
+		grammarBuilder.append("@parser::members {\n");
 		grammarBuilder.append("bool pred(bool v) {\n");
 		grammarBuilder.append("	std::cout << \"eval=\" << std::boolalpha << v << std::endl;\n");
 		grammarBuilder.append("	return v;\n");
@@ -164,9 +164,9 @@ public class TestSemPredEvalParser extends BaseCppTest {
 	public void testDepedentPredsInGlobalFOLLOW() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(335);
+		StringBuilder grammarBuilder = new StringBuilder(343);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("@members {\n");
+		grammarBuilder.append("@parser::members {\n");
 		grammarBuilder.append("bool pred(bool v) {\n");
 		grammarBuilder.append("	std::cout << \"eval=\" << std::boolalpha << v << std::endl;\n");
 		grammarBuilder.append("	return v;\n");
@@ -392,9 +392,9 @@ public class TestSemPredEvalParser extends BaseCppTest {
 	public void testPredTestedEvenWhenUnAmbig_1() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(222);
+		StringBuilder grammarBuilder = new StringBuilder(230);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("@members {bool enumKeyword = true;}\n");
+		grammarBuilder.append("@parser::members {bool enumKeyword = true;}\n");
 		grammarBuilder.append("primary\n");
 		grammarBuilder.append("    :   ID {std::cout << \"ID \"+$ID.text << std::endl;}\n");
 		grammarBuilder.append("    |   {!enumKeyword}? 'enum' {std::cout << \"enum\" << std::endl;}\n");
@@ -417,9 +417,9 @@ public class TestSemPredEvalParser extends BaseCppTest {
 	public void testPredTestedEvenWhenUnAmbig_2() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(222);
+		StringBuilder grammarBuilder = new StringBuilder(230);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("@members {bool enumKeyword = true;}\n");
+		grammarBuilder.append("@parser::members {bool enumKeyword = true;}\n");
 		grammarBuilder.append("primary\n");
 		grammarBuilder.append("    :   ID {std::cout << \"ID \"+$ID.text << std::endl;}\n");
 		grammarBuilder.append("    |   {!enumKeyword}? 'enum' {std::cout << \"enum\" << std::endl;}\n");
@@ -443,9 +443,9 @@ public class TestSemPredEvalParser extends BaseCppTest {
 	public void testPredicateDependentOnArg() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(230);
+		StringBuilder grammarBuilder = new StringBuilder(238);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("@members {int i = 0;}\n");
+		grammarBuilder.append("@parser::members {int i = 0;}\n");
 		grammarBuilder.append("s : a[2] a[1];\n");
 		grammarBuilder.append("a[int i]\n");
 		grammarBuilder.append("  : {$i == 1}? ID {std::cout << \"alt 1\" << std::endl;}\n");
@@ -472,9 +472,9 @@ public class TestSemPredEvalParser extends BaseCppTest {
 	public void testPredicateDependentOnArg2() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(158);
+		StringBuilder grammarBuilder = new StringBuilder(166);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("@members {int i = 0;}\n");
+		grammarBuilder.append("@parser::members {int i = 0;}\n");
 		grammarBuilder.append("s : a[2] a[1];\n");
 		grammarBuilder.append("a[int i]\n");
 		grammarBuilder.append("  : {$i == 1}? ID \n");
@@ -499,9 +499,9 @@ public class TestSemPredEvalParser extends BaseCppTest {
 	public void testPredsInGlobalFOLLOW() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(302);
+		StringBuilder grammarBuilder = new StringBuilder(310);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("@members {\n");
+		grammarBuilder.append("@parser::members {\n");
 		grammarBuilder.append("bool pred(bool v) {\n");
 		grammarBuilder.append("	std::cout << \"eval=\" << std::boolalpha << v << std::endl;\n");
 		grammarBuilder.append("	return v;\n");
@@ -669,9 +669,9 @@ public class TestSemPredEvalParser extends BaseCppTest {
 	public void testToLeftWithVaryingPredicate() throws Exception {
 		mkdir(tmpdir);
 
-		StringBuilder grammarBuilder = new StringBuilder(271);
+		StringBuilder grammarBuilder = new StringBuilder(279);
 		grammarBuilder.append("grammar T;\n");
-		grammarBuilder.append("@members {int i = 0;}\n");
+		grammarBuilder.append("@parser::members {int i = 0;}\n");
 		grammarBuilder.append("s : ({i += 1;\n");
 		grammarBuilder.append(" std::cout << \"i=\" << i << std::endl;} a)+ ;\n");
 		grammarBuilder.append("a : {i % 2 == 0}? ID {std::cout << \"alt 1\" << std::endl;}\n");
