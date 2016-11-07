@@ -75,7 +75,6 @@ func (i *IntervalSet) addInterval(v *Interval) {
 		for k, interval := range i.intervals {
 			// distinct range -> insert
 			if v.stop < interval.start {
-				// i.intervals = splice(k, 0, v)
 				i.intervals = append(i.intervals[0:k], append([]*Interval{v}, i.intervals[k:]...)...)
 				return
 			} else if v.stop == interval.start {
@@ -84,6 +83,7 @@ func (i *IntervalSet) addInterval(v *Interval) {
 			} else if v.start <= interval.stop {
 				i.intervals[k] = NewInterval(intMin(interval.start, v.start), intMax(interval.stop, v.stop))
 
+				// if not applying to end, merge potential overlaps
 				if k < len(i.intervals)-1 {
 					l := i.intervals[k]
 					r := i.intervals[k+1]
