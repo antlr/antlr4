@@ -12,9 +12,10 @@ public class TestListeners extends BaseTest {
 	@Test
 	public void testBasic() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(505);
+		StringBuilder grammarBuilder = new StringBuilder(526);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("\n");
+		grammarBuilder.append("@parser::members {\n");
 		grammarBuilder.append("type LeafListener struct {\n");
 		grammarBuilder.append("	*BaseTListener\n");
 		grammarBuilder.append("}\n");
@@ -25,6 +26,7 @@ public class TestListeners extends BaseTest {
 		grammarBuilder.append("\n");
 		grammarBuilder.append("func (*LeafListener) VisitTerminal(node antlr.TerminalNode) {\n");
 		grammarBuilder.append("	fmt.Println(node.GetSymbol().GetText())\n");
+		grammarBuilder.append("}\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("s\n");
@@ -58,9 +60,10 @@ public class TestListeners extends BaseTest {
 	@Test
 	public void testLR() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(677);
+		StringBuilder grammarBuilder = new StringBuilder(698);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("\n");
+		grammarBuilder.append("@parser::members {\n");
 		grammarBuilder.append("type LeafListener struct {\n");
 		grammarBuilder.append("	*BaseTListener\n");
 		grammarBuilder.append("}\n");
@@ -75,6 +78,7 @@ public class TestListeners extends BaseTest {
 		grammarBuilder.append("	} else {\n");
 		grammarBuilder.append("		fmt.Println(ctx.INT().GetSymbol().GetText())\n");
 		grammarBuilder.append("	}\n");
+		grammarBuilder.append("}\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("s\n");
@@ -112,9 +116,10 @@ public class TestListeners extends BaseTest {
 	@Test
 	public void testLRWithLabels() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(685);
+		StringBuilder grammarBuilder = new StringBuilder(706);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("\n");
+		grammarBuilder.append("@parser::members {\n");
 		grammarBuilder.append("type LeafListener struct {\n");
 		grammarBuilder.append("	*BaseTListener\n");
 		grammarBuilder.append("}\n");
@@ -129,6 +134,7 @@ public class TestListeners extends BaseTest {
 		grammarBuilder.append("\n");
 		grammarBuilder.append("func (*LeafListener) ExitInt(ctx *IntContext) {\n");
 		grammarBuilder.append("	fmt.Println(ctx.INT().GetSymbol().GetText())\n");
+		grammarBuilder.append("}\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("s\n");
@@ -165,9 +171,10 @@ public class TestListeners extends BaseTest {
 	@Test
 	public void testRuleGetters_1() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(700);
+		StringBuilder grammarBuilder = new StringBuilder(721);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("\n");
+		grammarBuilder.append("@parser::members {\n");
 		grammarBuilder.append("type LeafListener struct {\n");
 		grammarBuilder.append("	*BaseTListener\n");
 		grammarBuilder.append("}\n");
@@ -182,6 +189,7 @@ public class TestListeners extends BaseTest {
 		grammarBuilder.append("	} else {\n");
 		grammarBuilder.append("		fmt.Println(ctx.B(0).GetStart().GetText())\n");
 		grammarBuilder.append("	}\n");
+		grammarBuilder.append("}\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("s\n");
@@ -215,9 +223,10 @@ public class TestListeners extends BaseTest {
 	@Test
 	public void testRuleGetters_2() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(700);
+		StringBuilder grammarBuilder = new StringBuilder(721);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("\n");
+		grammarBuilder.append("@parser::members {\n");
 		grammarBuilder.append("type LeafListener struct {\n");
 		grammarBuilder.append("	*BaseTListener\n");
 		grammarBuilder.append("}\n");
@@ -232,6 +241,7 @@ public class TestListeners extends BaseTest {
 		grammarBuilder.append("	} else {\n");
 		grammarBuilder.append("		fmt.Println(ctx.B(0).GetStart().GetText())\n");
 		grammarBuilder.append("	}\n");
+		grammarBuilder.append("}\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("s\n");
@@ -265,9 +275,10 @@ public class TestListeners extends BaseTest {
 	@Test
 	public void testTokenGetters_1() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(693);
+		StringBuilder grammarBuilder = new StringBuilder(714);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("\n");
+		grammarBuilder.append("@parser::members {\n");
 		grammarBuilder.append("type LeafListener struct {\n");
 		grammarBuilder.append("	*BaseTListener\n");
 		grammarBuilder.append("}\n");
@@ -282,6 +293,7 @@ public class TestListeners extends BaseTest {
 		grammarBuilder.append("	} else {\n");
 		grammarBuilder.append("		fmt.Println(ctx.ID().GetSymbol())\n");
 		grammarBuilder.append("	}\n");
+		grammarBuilder.append("}\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("s\n");
@@ -314,9 +326,10 @@ public class TestListeners extends BaseTest {
 	@Test
 	public void testTokenGetters_2() throws Exception {
 		mkdir(parserpkgdir);
-		StringBuilder grammarBuilder = new StringBuilder(693);
+		StringBuilder grammarBuilder = new StringBuilder(714);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("\n");
+		grammarBuilder.append("@parser::members {\n");
 		grammarBuilder.append("type LeafListener struct {\n");
 		grammarBuilder.append("	*BaseTListener\n");
 		grammarBuilder.append("}\n");
@@ -331,6 +344,7 @@ public class TestListeners extends BaseTest {
 		grammarBuilder.append("	} else {\n");
 		grammarBuilder.append("		fmt.Println(ctx.ID().GetSymbol())\n");
 		grammarBuilder.append("	}\n");
+		grammarBuilder.append("}\n");
 		grammarBuilder.append("}\n");
 		grammarBuilder.append("\n");
 		grammarBuilder.append("s\n");

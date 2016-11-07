@@ -356,6 +356,7 @@ func (m *MyRuleNode) SetAltNumber(altNum int) {
 >>
 
 BasicListener(notused) ::= <<
+@parser::members {
 type LeafListener struct {
 	*BaseTListener
 }
@@ -367,6 +368,7 @@ func NewLeafListener() *LeafListener {
 func (*LeafListener) VisitTerminal(node antlr.TerminalNode) {
 	fmt.Println(node.GetSymbol().GetText())
 }
+}
 >>
 
 WalkListener(s) ::= <<
@@ -376,6 +378,7 @@ walker.Walk(NewLeafListener(), <s>)
 >>
 
 TokenGetterListener(notused) ::= <<
+@parser::members {
 type LeafListener struct {
 	*BaseTListener
 }
@@ -391,9 +394,11 @@ func (*LeafListener) ExitA(ctx *AContext) {
 		fmt.Println(ctx.ID().GetSymbol())
 	}
 }
+}
 >>
 
 RuleGetterListener(notused) ::= <<
+@parser::members {
 type LeafListener struct {
 	*BaseTListener
 }
@@ -409,9 +414,11 @@ func (*LeafListener) ExitA(ctx *AContext) {
 		fmt.Println(ctx.B(0).GetStart().GetText())
 	}
 }
+}
 >>
 
 LRListener(notused) ::= <<
+@parser::members {
 type LeafListener struct {
 	*BaseTListener
 }
@@ -427,9 +434,11 @@ func (*LeafListener) ExitE(ctx *EContext) {
 		fmt.Println(ctx.INT().GetSymbol().GetText())
 	}
 }
+}
 >>
 
 LRWithLabelsListener(notused) ::= <<
+@parser::members {
 type LeafListener struct {
 	*BaseTListener
 }
@@ -444,6 +453,7 @@ func (*LeafListener) ExitCall(ctx *CallContext) {
 
 func (*LeafListener) ExitInt(ctx *IntContext) {
 	fmt.Println(ctx.INT().GetSymbol().GetText())
+}
 }
 >>
 
