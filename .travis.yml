@@ -11,6 +11,7 @@ matrix:
   - os: linux
     jdk: oraclejdk8
   - os: osx
+    osx_image: xcode8
 
 script:
   - mvn -Dparallel=methods -DthreadCount=4 install
