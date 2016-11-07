@@ -60,7 +60,7 @@ var <file.grammarName>Visitor = require('./<file.grammarName>Visitor').<file.gra
 <parser>
 >>
 
-ListenerFile(file, header) ::= <<
+ListenerFile(file, header, namedActions) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 var antlr4 = require('antlr4/index');
 
@@ -88,7 +88,7 @@ exports.<file.grammarName>Listener = <file.grammarName>Listener;
 >>
 
 
-VisitorFile(file, header) ::= <<
+VisitorFile(file, header, namedActions) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 var antlr4 = require('antlr4/index');
 
@@ -556,10 +556,10 @@ catch (<catchArg>) {
 LexerSkipCommand()  ::= "this.skip()"
 LexerMoreCommand()  ::= "this.more()"
 LexerPopModeCommand() ::= "this.popMode()"
-LexerTypeCommand(arg)      ::= "this._type = <arg>"
-LexerChannelCommand(arg)   ::= "this._channel = <arg>"
-LexerModeCommand(arg)      ::= "this._mode = <arg>"
-LexerPushModeCommand(arg)  ::= "this.pushMode(<arg>)"
+LexerTypeCommand(arg, grammar)      ::= "this._type = <arg>"
+LexerChannelCommand(arg, grammar)   ::= "this._channel = <arg>"
+LexerModeCommand(arg, grammar)      ::= "this._mode = <arg>"
+LexerPushModeCommand(arg, grammar)  ::= "this.pushMode(<arg>)"
 
 ActionText(t) ::= "<t.text>"
 ActionTemplate(t) ::= "<t.st>"

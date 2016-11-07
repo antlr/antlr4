@@ -154,8 +154,8 @@ string(text) ::= <<
 writeBoolean(o) ::= "<if(o && !isEmpty.(o))>true<else>false<endif>"
 
 writeln(s) ::= <<document.getElementById('output').value += <s> + '\\n';>>
-
 write(s) ::= <<document.getElementById('output').value += <s>;>>
+writeList(s) ::= <<document.getElementById('output').value += <s; separator="+">;>>
 
 False() ::= "false"
 
@@ -225,7 +225,11 @@ LANotEquals(i, v) ::= <%this._input.LA(<i>)!=<v>%>
 
 TokenStartColumnEquals(i) ::= <%this._tokenStartColumn===<i>%>
 
-ImportListener(X) ::= <<var <X>Listener = require('./<X>Listener').<X>Listener;>>
+ImportListener(X) ::= <<
+@parser::header {
+var <X>Listener = require('./<X>Listener').<X>Listener;
+}
+>>
 
 GetExpectedTokenNames() ::= "this.getExpectedTokens().toString(this.literalNames)"
 
@@ -246,6 +250,8 @@ this.Property = function() {
 }
 }
 >>
+
+ParserPropertyCall(p, call) ::= "<p>.<call>"
 
 PositionAdjustingLexer() ::= <<
 
@@ -312,6 +318,7 @@ PositionAdjustingLexer.isIdentifierChar = function(c) {
 >>
 
 BasicListener(X) ::= <<
+@parser::members {
 this.LeafListener = function() {
     this.visitTerminal = function(node) {
     	document.getElementById('output').value += node.symbol.text + '\\n';
@@ -320,7 +327,7 @@ this.LeafListener = function() {
 };
 this.LeafListener.prototype = Object.create(<X>Listener.prototype);
 this.LeafListener.prototype.constructor = this.LeafListener;
-
+}
 >>
 
 WalkListener(s) ::= <<
@@ -329,7 +336,6 @@ walker.walk(new this.LeafListener(), <s>);
 >>
 
 TreeNodeWithAltNumField(X) ::= <<
-
 @parser::header {
 MyRuleNode = function(parent, invokingState) {
 	antlr4.ParserRuleContext.call(this, parent, invokingState);
@@ -343,6 +349,7 @@ MyRuleNode.prototype.constructor = MyRuleNode;
 >>
 
 TokenGetterListener(X) ::= <<
+@parser::members {
 this.LeafListener = function() {
     this.exitA = function(ctx) {
     	var str;
@@ -357,10 +364,11 @@ this.LeafListener = function() {
 };
 this.LeafListener.prototype = Object.create(<X>Listener.prototype);
 this.LeafListener.prototype.constructor = this.LeafListener;
-
+}
 >>
 
 RuleGetterListener(X) ::= <<
+@parser::members {
 this.LeafListener = function() {
     this.exitA = function(ctx) {
     	var str;
@@ -375,11 +383,12 @@ this.LeafListener = function() {
 };
 this.LeafListener.prototype = Object.create(<X>Listener.prototype);
 this.LeafListener.prototype.constructor = this.LeafListener;
-
+}
 >>
 
 
 LRListener(X) ::= <<
+@parser::members {
 this.LeafListener = function() {
     this.exitE = function(ctx) {
     	var str;
@@ -394,10 +403,11 @@ this.LeafListener = function() {
 };
 this.LeafListener.prototype = Object.create(<X>Listener.prototype);
 this.LeafListener.prototype.constructor = this.LeafListener;
-
+}
 >>
 
 LRWithLabelsListener(X) ::= <<
+@parser::members {
 this.LeafListener = function() {
     this.exitCall = function(ctx) {
     	var str = ctx.e().start.text + ' ' + ctx.eList();
@@ -411,7 +421,7 @@ this.LeafListener = function() {
 };
 this.LeafListener.prototype = Object.create(<X>Listener.prototype);
 this.LeafListener.prototype.constructor = this.LeafListener;
-
+}
 >>
 
 DeclareContextListGettersFunction() ::= <<
@@ -433,6 +443,10 @@ Declare_pred() ::= <<this.pred = function(v) {
 >>
 
 Invoke_pred(v) ::= <<this.pred(<v>)>>
+ParserTokenType(t) ::= "Parser.<t>"
+ContextRuleFunction(ctx, rule) ::= "<ctx>.<rule>"
+StringType() ::= "String"
+ContextMember(ctx, subctx, member) ::= "<ctx>.<subctx>.<member>"
 
 isEmpty ::= [
 	"": true,

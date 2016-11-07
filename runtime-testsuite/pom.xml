@@ -76,6 +76,7 @@
             <include>**/javascript/node/Test*.java</include>
             <include>**/python2/Test*.java</include>
             <include>**/python3/Test*.java</include>
+            <include>**/cpp/Test*.java</include>
           </includes>
         </configuration>
       </plugin>    

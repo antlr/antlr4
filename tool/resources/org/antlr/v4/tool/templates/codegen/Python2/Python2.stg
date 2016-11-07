@@ -58,7 +58,7 @@ from io import StringIO
 
 >>
 
-ListenerFile(file, header) ::= <<
+ListenerFile(file, header, namedActions) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 from antlr4 import *
 <header>
@@ -80,7 +80,7 @@ def exit<lname; format="cap">(self, ctx):
 >>
 
 
-VisitorFile(file, header) ::= <<
+VisitorFile(file, header, namedActions) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 from antlr4 import *
 <header>
@@ -526,10 +526,10 @@ LexerSkipCommand()  ::= "skip()"
 LexerMoreCommand()  ::= "more()"
 LexerPopModeCommand() ::= "popMode()"
 
-LexerTypeCommand(arg)      ::= "_type = <arg>"
-LexerChannelCommand(arg)   ::= "_channel = <arg>"
-LexerModeCommand(arg)      ::= "_mode = <arg>"
-LexerPushModeCommand(arg)  ::= "pushMode(<arg>)"
+LexerTypeCommand(arg, grammar)      ::= "_type = <arg>"
+LexerChannelCommand(arg, grammar)   ::= "_channel = <arg>"
+LexerModeCommand(arg, grammar)      ::= "_mode = <arg>"
+LexerPushModeCommand(arg, grammar)  ::= "pushMode(<arg>)"
 
 ActionText(t) ::= "<t.text>"
 ActionTemplate(t) ::= "<t.st>"

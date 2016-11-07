@@ -65,7 +65,7 @@ public abstract class Target {
 	 */
 	protected String[] targetCharValueEscape = new String[255];
 
-	private final CodeGenerator gen;
+	protected final CodeGenerator gen;
 	private final String language;
 	private STGroup templates;
 
@@ -100,7 +100,6 @@ public abstract class Target {
 	 */
 	public abstract String getVersion();
 
-
 	public STGroup getTemplates() {
 		if (templates == null) {
 			String version = getVersion();
@@ -115,9 +114,7 @@ public abstract class Target {
 		return templates;
 	}
 
-	protected void genFile(Grammar g,
-						   ST outputFileST,
-						   String fileName)
+	protected void genFile(Grammar g, ST outputFileST, String fileName)
 	{
 		getCodeGenerator().write(outputFileST, fileName);
 	}

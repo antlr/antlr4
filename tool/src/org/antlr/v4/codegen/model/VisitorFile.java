@@ -58,10 +58,12 @@ public class VisitorFile extends OutputFile {
 	public Map<String, String> visitorLabelRuleNames = new LinkedHashMap<String, String>();
 
 	@ModelElement public Action header;
+	@ModelElement public Map<String, Action> namedActions;
 
 	public VisitorFile(OutputModelFactory factory, String fileName) {
 		super(factory, fileName);
 		Grammar g = factory.getGrammar();
+		namedActions = buildNamedActions(g);
 		parserName = g.getRecognizerName();
 		grammarName = g.name;
 		for (Rule r : g.rules.values()) {

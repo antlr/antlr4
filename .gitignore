@@ -86,6 +86,10 @@ bilder.pyc
 bild.log
 
 bild_output.txt
+runtime/Cpp/demo/generated
+xcuserdata
+*.jar
+.vscode
 
 # VSCode Java plugin temporary files
 javac-services.0.log

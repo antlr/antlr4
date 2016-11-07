@@ -2,7 +2,6 @@
 package org.antlr.v4.test.runtime.csharp;
 
 import org.junit.Test;
-import org.junit.Ignore;
 
 @SuppressWarnings("unused")
 public class TestLeftRecursion extends BaseTest {
@@ -1553,7 +1552,7 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testMultipleActionsPredicatesOptions_1() throws Exception {
 		mkdir(tmpdir);
-		StringBuilder grammarBuilder = new StringBuilder(246);
+		StringBuilder grammarBuilder = new StringBuilder(245);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s @after {Console.WriteLine($ctx.ToStringTree(this));} : e ;\n");
 		grammarBuilder.append("e : a=e op=('*'|'/') b=e  {}{true}?\n");
@@ -1562,7 +1561,7 @@ public class TestLeftRecursion extends BaseTest {
 		grammarBuilder.append("  | '(' x=e ')' {}{}\n");
 		grammarBuilder.append("  ;\n");
 		grammarBuilder.append("INT : '0'..'9'+ ;\n");
-		grammarBuilder.append("WS : (' '|'\\n') -> skip ;");
+		grammarBuilder.append("WS : (' '|'\\n') -> skip;");
 		String grammar = grammarBuilder.toString();
 		String input ="4";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s", input, false);
@@ -1574,7 +1573,7 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testMultipleActionsPredicatesOptions_2() throws Exception {
 		mkdir(tmpdir);
-		StringBuilder grammarBuilder = new StringBuilder(246);
+		StringBuilder grammarBuilder = new StringBuilder(245);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s @after {Console.WriteLine($ctx.ToStringTree(this));} : e ;\n");
 		grammarBuilder.append("e : a=e op=('*'|'/') b=e  {}{true}?\n");
@@ -1583,7 +1582,7 @@ public class TestLeftRecursion extends BaseTest {
 		grammarBuilder.append("  | '(' x=e ')' {}{}\n");
 		grammarBuilder.append("  ;\n");
 		grammarBuilder.append("INT : '0'..'9'+ ;\n");
-		grammarBuilder.append("WS : (' '|'\\n') -> skip ;");
+		grammarBuilder.append("WS : (' '|'\\n') -> skip;");
 		String grammar = grammarBuilder.toString();
 		String input ="1*2/3";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s", input, false);
@@ -1595,7 +1594,7 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testMultipleActionsPredicatesOptions_3() throws Exception {
 		mkdir(tmpdir);
-		StringBuilder grammarBuilder = new StringBuilder(246);
+		StringBuilder grammarBuilder = new StringBuilder(245);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s @after {Console.WriteLine($ctx.ToStringTree(this));} : e ;\n");
 		grammarBuilder.append("e : a=e op=('*'|'/') b=e  {}{true}?\n");
@@ -1604,7 +1603,7 @@ public class TestLeftRecursion extends BaseTest {
 		grammarBuilder.append("  | '(' x=e ')' {}{}\n");
 		grammarBuilder.append("  ;\n");
 		grammarBuilder.append("INT : '0'..'9'+ ;\n");
-		grammarBuilder.append("WS : (' '|'\\n') -> skip ;");
+		grammarBuilder.append("WS : (' '|'\\n') -> skip;");
 		String grammar = grammarBuilder.toString();
 		String input ="(1/2)*3";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s", input, false);
@@ -1676,7 +1675,7 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testMultipleAlternativesWithCommonLabel_1() throws Exception {
 		mkdir(tmpdir);
-		StringBuilder grammarBuilder = new StringBuilder(741);
+		StringBuilder grammarBuilder = new StringBuilder(740);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s : e {Console.WriteLine($e.v);};\n");
 		grammarBuilder.append("e returns [int v]\n");
@@ -1692,7 +1691,7 @@ public class TestLeftRecursion extends BaseTest {
 		grammarBuilder.append("INT : '0'..'9'+ ;\n");
 		grammarBuilder.append("INC : '++' ;\n");
 		grammarBuilder.append("DEC : '--' ;\n");
-		grammarBuilder.append("WS : (' '|'\\n') -> skip ;");
+		grammarBuilder.append("WS : (' '|'\\n') -> skip;");
 		String grammar = grammarBuilder.toString();
 		String input ="4";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s", input, false);
@@ -1704,7 +1703,7 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testMultipleAlternativesWithCommonLabel_2() throws Exception {
 		mkdir(tmpdir);
-		StringBuilder grammarBuilder = new StringBuilder(741);
+		StringBuilder grammarBuilder = new StringBuilder(740);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s : e {Console.WriteLine($e.v);};\n");
 		grammarBuilder.append("e returns [int v]\n");
@@ -1720,7 +1719,7 @@ public class TestLeftRecursion extends BaseTest {
 		grammarBuilder.append("INT : '0'..'9'+ ;\n");
 		grammarBuilder.append("INC : '++' ;\n");
 		grammarBuilder.append("DEC : '--' ;\n");
-		grammarBuilder.append("WS : (' '|'\\n') -> skip ;");
+		grammarBuilder.append("WS : (' '|'\\n') -> skip;");
 		String grammar = grammarBuilder.toString();
 		String input ="1+2";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s", input, false);
@@ -1732,7 +1731,7 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testMultipleAlternativesWithCommonLabel_3() throws Exception {
 		mkdir(tmpdir);
-		StringBuilder grammarBuilder = new StringBuilder(741);
+		StringBuilder grammarBuilder = new StringBuilder(740);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s : e {Console.WriteLine($e.v);};\n");
 		grammarBuilder.append("e returns [int v]\n");
@@ -1748,7 +1747,7 @@ public class TestLeftRecursion extends BaseTest {
 		grammarBuilder.append("INT : '0'..'9'+ ;\n");
 		grammarBuilder.append("INC : '++' ;\n");
 		grammarBuilder.append("DEC : '--' ;\n");
-		grammarBuilder.append("WS : (' '|'\\n') -> skip ;");
+		grammarBuilder.append("WS : (' '|'\\n') -> skip;");
 		String grammar = grammarBuilder.toString();
 		String input ="1+2*3";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s", input, false);
@@ -1760,7 +1759,7 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testMultipleAlternativesWithCommonLabel_4() throws Exception {
 		mkdir(tmpdir);
-		StringBuilder grammarBuilder = new StringBuilder(741);
+		StringBuilder grammarBuilder = new StringBuilder(740);
 		grammarBuilder.append("grammar T;\n");
 		grammarBuilder.append("s : e {Console.WriteLine($e.v);};\n");
 		grammarBuilder.append("e returns [int v]\n");
@@ -1776,7 +1775,7 @@ public class TestLeftRecursion extends BaseTest {
 		grammarBuilder.append("INT : '0'..'9'+ ;\n");
 		grammarBuilder.append("INC : '++' ;\n");
 		grammarBuilder.append("DEC : '--' ;\n");
-		grammarBuilder.append("WS : (' '|'\\n') -> skip ;");
+		grammarBuilder.append("WS : (' '|'\\n') -> skip;");
 		String grammar = grammarBuilder.toString();
 		String input ="i++*3";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s", input, false);

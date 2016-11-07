@@ -112,7 +112,8 @@ antlr4-tool-testsuite/4.5.2-SNAPSHOT/antlr4-tool-testsuite-4.5.2-SNAPSHOT.jar
 
 Note that ANTLR is written in itself, which is why maven downloads antlr4-4.5.jar for boostrapping 4.5.2-SNAPSHOT purposes.
 
-To build without running the tests (saves about 8 minutes), do this:
+## Building without testing
+To build without running the tests (saves a lot of time), do this:
 
 ```bash
 mvn -DskipTests install

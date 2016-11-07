@@ -62,6 +62,12 @@
         <role>Developer - Maven Plugin</role>
       </roles>
     </developer>
+    <developer>
+      <name>Mike Lischke</name>
+      <roles>
+        <role>Developer - C++ Target</role>
+      </roles>
+    </developer>
   </developers>
 
   <modules>
