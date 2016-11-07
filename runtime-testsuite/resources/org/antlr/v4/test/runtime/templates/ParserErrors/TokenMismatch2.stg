@@ -16,7 +16,7 @@ Output() ::= <<
 >>
 
 Errors() ::= <<
-line 1:2 mismatched input '~FORCE_ERROR~' expecting ')'<\n>
+line 1:2 mismatched input '~FORCE_ERROR~' expecting {')', ID}<\n>
 >>
 
 grammar(grammarName) ::= <<

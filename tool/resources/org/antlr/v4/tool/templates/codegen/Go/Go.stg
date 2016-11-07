@@ -519,6 +519,7 @@ CodeBlockForAlt(currentAltCodeBlock, locals, preamble, ops) ::= <<
 
 LL1AltBlock(choice, preamble, alts, error) ::= <<
 p.SetState(<choice.stateNumber>)
+p.GetErrorHandler().Sync(p)
 <if(choice.label)>
 <labelref(choice.label)> = p.GetTokenStream().LT(1)
 <endif>
@@ -544,6 +545,7 @@ default:
 
 LL1OptionalBlock(choice, alts, error) ::= <<
 p.SetState(<choice.stateNumber>)
+p.GetErrorHandler().Sync(p)
 
 switch p.GetTokenStream().LA(1) {
 <if(choice.altLook && alts)>
@@ -561,6 +563,11 @@ default:
 
 LL1OptionalBlockSingleAlt(choice, expr, alts, preamble, error, followExpr) ::= <<
 p.SetState(<choice.stateNumber>)
+<! TODO: this should not consume anything but does I think;
+ See TokenMismatch2 test, which fails w/o this sync.
+ But, see TestLeftRecursion.testJavaExpressions_10, 11 which fails with sync()
+ !>
+p.GetErrorHandler().Sync(p)
 <if(preamble)>
 <preamble; separator="\n">
 

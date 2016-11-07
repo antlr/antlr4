@@ -2,7 +2,6 @@
 package org.antlr.v4.test.runtime.csharp;
 
 import org.junit.Test;
-import org.junit.Ignore;
 
 @SuppressWarnings("unused")
 public class TestParserErrors extends BaseTest {
@@ -551,7 +550,7 @@ public class TestParserErrors extends BaseTest {
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "stat", input, false);
 		assertEquals("", found);
 
-		assertEquals("line 1:2 mismatched input '~FORCE_ERROR~' expecting ')'\n", this.stderrDuringParse);
+		assertEquals("line 1:2 mismatched input '~FORCE_ERROR~' expecting {')', ID}\n", this.stderrDuringParse);
 
 	}
 

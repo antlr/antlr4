@@ -51,7 +51,7 @@ public class CSharpTarget extends Target {
 
     @Override
     public String getVersion() {
-        return "4.5.3";
+        return "4.6";
     }
 
 	@Override
