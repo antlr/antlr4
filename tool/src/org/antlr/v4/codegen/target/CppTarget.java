@@ -77,7 +77,7 @@ public class CppTarget extends Target {
 	}
 
 	public String getVersion() {
-		return "4.5.4";
+		return "4.6";
 	}
 
     public boolean needsHeader() { return true; }
