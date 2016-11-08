@@ -35,3 +35,4 @@ addons:
     packages:
       - g++-5
       - uuid-dev
+      - clang
