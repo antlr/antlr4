@@ -582,7 +582,7 @@ public abstract class BaseCppTest {
 		}
 		catch (Exception e) {
 			System.err.println("can't configure antlr cpp runtime cmake file");
-			e.printStackTrace(System.err);
+			//e.printStackTrace(System.err);
 		}
 		
     try {
@@ -616,8 +616,10 @@ public abstract class BaseCppTest {
     if (!runtimeBuiltOnce) {
       runtimeBuiltOnce = true;
       if (!buildRuntime()) {
+        System.out.println("C++ runtime build failed");
         return null;
       }
+      System.out.println("C++ runtime build succeeded");
     }
     
 		// Create symlink to the runtime.
