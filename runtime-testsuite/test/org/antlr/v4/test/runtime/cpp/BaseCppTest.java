@@ -583,19 +583,39 @@ public abstract class BaseCppTest {
 		return output;
   }
   
+  private String runCommand(String command[], String workPath, String description) throws Exception {
+    ProcessBuilder builder = new ProcessBuilder(command);
+		builder.directory(new File(workPath));
+		
+		Process process = builder.start();
+		StreamVacuum stdoutVacuum = new StreamVacuum(process.getInputStream());
+		StreamVacuum stderrVacuum = new StreamVacuum(process.getErrorStream());
+		stdoutVacuum.start();
+		stderrVacuum.start();
+		int errcode = process.waitFor();
+		stdoutVacuum.join();
+		stderrVacuum.join();
+		String output = stdoutVacuum.toString();
+		if (stderrVacuum.toString().length() > 0) {
+			this.stderrDuringParse = stderrVacuum.toString();
+			System.err.println("exec stderrVacuum: "+ stderrVacuum);
+		}
+		if (errcode != 0) {
+			this.stderrDuringParse = "execution failed with error code: " + errcode;
+			System.err.println(description + " exited with error code: " + errcode);
+		}
+		
+		return output;
+  }
+  
   // TODO: add a buildRuntimeOnWindows variant.
   private boolean buildRuntime() {
     String runtimePath = locateRuntime();
     System.out.println("Building ANTLR4 C++ runtime (if necessary) at "+ runtimePath);
     
     try {
-  		ArrayList<String> args = new ArrayList<String>();
-  		args.add("cmake");
-  		args.add(".");
-  		args.add("-DCMAKE_BUILD_TYPE=release");
-  		ProcessBuilder builder = new ProcessBuilder(args.toArray(new String[0]));
-  		builder.directory(new File(runtimePath));
-  		if (runProcess(builder, "antlr runtime cmake") == null)
+      String command[] = { "cmake", ".", "-DCMAKE_BUILD_TYPE=release" };
+      if (runCommand(command, runtimePath, "antlr runtime cmake") == null)
   		  return false;
 		}
 		catch (Exception e) {
@@ -603,13 +623,8 @@ public abstract class BaseCppTest {
 		}
 		
     try {
-  		ArrayList<String> args = new ArrayList<String>();
-  		args.add("make");
-  		args.add("-j");
-  		args.add("8"); // Assuming a reasonable amount of available CPU cores.
-  		ProcessBuilder builder = new ProcessBuilder(args.toArray(new String[0]));
-  		builder.directory(new File(runtimePath));
-  		String output = runProcess(builder, "building antlr runtime");
+      String command[] = { "make", "-j", "8" }; // Assuming a reasonable amount of available CPU cores.
+  		String output = runCommand(command, runtimePath, "building antlr runtime");
   		if (output == null)
   		  return false;
       System.out.println(output);
@@ -619,12 +634,8 @@ public abstract class BaseCppTest {
 		}
 		
 		try {
-			ArrayList<String> args = new ArrayList<String>();
-			args.add("ls");
-			args.add("-la");
-			ProcessBuilder builder = new ProcessBuilder(args.toArray(new String[0]));
-			builder.directory(new File(runtimePath + "/dist/"));
-			String output = runProcess(builder, "printing library folder content");
+      String command[] = { "ls", "-la" };
+  		String output = runCommand(command, runtimePath + "/dist/", "printing library folder content");
 			System.out.println(output);
 		}
 		catch (Exception e) {
@@ -637,7 +648,6 @@ public abstract class BaseCppTest {
   static boolean runtimeBuiltOnce = false;
   
 	public String execModule(String fileName) {
-		String compilerPath = "clang++"; //locateCompiler();
 		String runtimePath = locateRuntime();
 		String includePath = runtimePath + "/runtime/src";
 		String binPath = new File(new File(tmpdir), "a.out").getAbsolutePath();
@@ -646,13 +656,8 @@ public abstract class BaseCppTest {
     // Build runtime using cmake once.
     if (!runtimeBuiltOnce) {
       try {
-        System.out.println("Located compiler at: " + compilerPath);
-        ArrayList<String> args = new ArrayList<String>();
-        args.add(compilerPath);
-        args.add("--version");
-        ProcessBuilder builder = new ProcessBuilder(args.toArray(new String[0]));
-        builder.directory(new File(tmpdir));
-        String output = runProcess(builder, "printing compiler version");
+        String command[] = { "clang++", "--version" };
+        String output = runCommand(command, tmpdir, "printing compiler version");
         System.out.println("Compiler version is: " + output);
       }
       catch (Exception e) {
@@ -669,14 +674,9 @@ public abstract class BaseCppTest {
     
 		// Create symlink to the runtime.
 		String libExtension = (getOS() == "mac") ? "dylib" : "so";
-		try {
-			ArrayList<String> args = new ArrayList<String>();
-			args.add("ln");
-			args.add("-s");
-			args.add(runtimePath + "/dist/libantlr4-runtime." + libExtension);
-			ProcessBuilder builder = new ProcessBuilder(args.toArray(new String[0]));
-			builder.directory(new File(tmpdir));
-			String output = runProcess(builder, "sym linking C++ runtime");
+    try {
+      String command[] = { "ln", "-s", runtimePath + "/dist/libantlr4-runtime." + libExtension };
+      String output = runCommand(command, tmpdir, "sym linking C++ runtime");
 			if (output == null)
 			  return null;
 		}
@@ -685,33 +685,21 @@ public abstract class BaseCppTest {
 		}
 		
 		try {
-			ArrayList<String> args = new ArrayList<String>();
-			args.add(compilerPath);
-			args.add("-std=c++11");
-			args.add("-I");
-			args.add(includePath);
-			args.add("-L.");
-			args.add("-lantlr4-runtime");
-			args.addAll(allCppFiles(tmpdir));
-			ProcessBuilder builder = new ProcessBuilder(args.toArray(new String[0]));
-			builder.directory(new File(tmpdir));
-			String output = runProcess(builder, "building test binary");
+      List<String> command2 = new ArrayList<String>(Arrays.asList("clang++", "-std=c++11", "-I", includePath, "-L.", "-lantlr4-runtime"));
+      command2.addAll(allCppFiles(tmpdir));
+  		String output = runCommand(command2.toArray(new String[0]), tmpdir, "building test binary");
 			if (output == null) {
 				return null;
 			}
 		}
 		catch (Exception e) {
-			System.err.println("can't compile module: " + fileName);
+			System.err.println("can't compile test module: " + e.getMessage());
 			return null;
 		}
 
 		try {
-			ArrayList<String> args = new ArrayList<String>();
-			args.add("ls");
-			args.add("-la");
-			ProcessBuilder builder = new ProcessBuilder(args.toArray(new String[0]));
-			builder.directory(new File(tmpdir));
-			String output = runProcess(builder, "printing test case folder content");
+      String command[] = { "ls", "-la" };
+  		String output = runCommand(command, tmpdir, "printing test case folder content");
 			System.out.println(output);
 		}
 		catch (Exception e) {
@@ -740,17 +728,6 @@ public abstract class BaseCppTest {
 				return root + tool;
 		}
 		throw new RuntimeException("Could not locate " + tool);
-	}
-
-	protected String locateCompiler() {
-		String propName = getPropertyPrefix() + "-compiler";
-   		String prop = System.getProperty(propName);
-   		if(prop==null || prop.length()==0)
-   			prop = locateTool("clang-3.6++"); // Assuming a decent clang compiler being available.
-		File file = new File(prop);
-		if(!file.exists())
-			throw new RuntimeException("Missing system property:" + propName);
-		return file.getAbsolutePath();
 	}
 
 	protected String locateRuntime() {
