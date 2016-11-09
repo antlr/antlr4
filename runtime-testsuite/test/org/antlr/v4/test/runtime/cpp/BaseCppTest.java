@@ -614,6 +614,15 @@ public abstract class BaseCppTest {
 		
     // Build runtime using cmake once.
     if (!runtimeBuiltOnce) {
+      System.out.println("Located compiler at: " + compilerPath);
+      ArrayList<String> args = new ArrayList<String>();
+      args.add(compilerPath);
+      args.add("--version");
+      ProcessBuilder builder = new ProcessBuilder(args.toArray(new String[0]));
+      builder.directory(new File(tmpdir));
+      String output = runProcess(builder, "printing compiler version");
+      System.out.println("Compiler version is: " + output);
+	
       runtimeBuiltOnce = true;
       if (!buildRuntime()) {
         System.out.println("C++ runtime build failed");
