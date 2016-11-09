@@ -1,4 +1,4 @@
-sudo: true
+sudo: false
 language: java
 script:
   - mvn install
@@ -26,13 +26,16 @@ env:
   - CXX=g++-5
 
 compiler:
+  - gcc
   - clang
 
 addons:
   apt:
     sources:
       - ubuntu-toolchain-r-test
+      - llvm-toolchain-precise-3.6
     packages:
+      - gcc-5
       - g++-5
       - uuid-dev
-      - clang
+      - clang-3.6
