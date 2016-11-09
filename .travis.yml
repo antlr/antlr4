@@ -1,4 +1,4 @@
-sudo: false
+sudo: true
 language: java
 script:
   - mvn install
