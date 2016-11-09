@@ -582,7 +582,6 @@ public abstract class BaseCppTest {
 		}
 		catch (Exception e) {
 			System.err.println("can't configure antlr cpp runtime cmake file");
-			//e.printStackTrace(System.err);
 		}
 		
     try {
@@ -592,12 +591,26 @@ public abstract class BaseCppTest {
   		args.add("8"); // Assuming a reasonable amount of available CPU cores.
   		ProcessBuilder builder = new ProcessBuilder(args.toArray(new String[0]));
   		builder.directory(new File(runtimePath));
-  		if (runProcess(builder, "building antlr runtime") == null)
+  		String output = runProcess(builder, "building antlr runtime");
+  		if (output == null)
   		  return false;
+      System.out.println(output);
 		}
 		catch (Exception e) {
 			System.err.println("can't compile antlr cpp runtime");
-			//e.printStackTrace(System.err);
+		}
+		
+		try {
+			ArrayList<String> args = new ArrayList<String>();
+			args.add("ls");
+			args.add("-la");
+			ProcessBuilder builder = new ProcessBuilder(args.toArray(new String[0]));
+			builder.directory(new File(runtimePath + "/dist/"));
+			String output = runProcess(builder, "printing test case folder content");
+			System.out.println(output);
+		}
+		catch (Exception e) {
+			System.err.println("can't print folder content");
 		}
 		
 		return true;
@@ -636,7 +649,6 @@ public abstract class BaseCppTest {
       System.out.println("C++ runtime build succeeded");
     }
     
-		// Compile the test code.
 		try {
 			ArrayList<String> args = new ArrayList<String>();
 			args.add(compilerPath);
