@@ -26,16 +26,14 @@ env:
   - CXX=g++-5
 
 compiler:
-  - gcc
   - clang
 
 addons:
   apt:
     sources:
       - ubuntu-toolchain-r-test
-      - llvm-toolchain-precise-3.6
+      - llvm-toolchain-precise-3.7
     packages:
-      - gcc-5
       - g++-5
       - uuid-dev
-      - clang-3.6
+      - clang-3.7

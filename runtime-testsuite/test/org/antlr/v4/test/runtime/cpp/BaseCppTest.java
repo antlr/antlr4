@@ -606,7 +606,7 @@ public abstract class BaseCppTest {
   static boolean runtimeBuiltOnce = false;
   
 	public String execModule(String fileName) {
-		String compilerPath = locateCompiler();
+		String compilerPath = "clang++"; //locateCompiler();
 		String runtimePath = locateRuntime();
 		String includePath = runtimePath + "/runtime/src";
 		String binPath = new File(new File(tmpdir), "a.out").getAbsolutePath();
