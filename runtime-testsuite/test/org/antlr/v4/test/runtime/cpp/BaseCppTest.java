@@ -624,7 +624,7 @@ public abstract class BaseCppTest {
 			args.add("-la");
 			ProcessBuilder builder = new ProcessBuilder(args.toArray(new String[0]));
 			builder.directory(new File(runtimePath + "/dist/"));
-			String output = runProcess(builder, "printing test case folder content");
+			String output = runProcess(builder, "printing library folder content");
 			System.out.println(output);
 		}
 		catch (Exception e) {
@@ -705,6 +705,19 @@ public abstract class BaseCppTest {
 			return null;
 		}
 
+		try {
+			ArrayList<String> args = new ArrayList<String>();
+			args.add("ls");
+			args.add("-la");
+			ProcessBuilder builder = new ProcessBuilder(args.toArray(new String[0]));
+			builder.directory(new File(tmpdir));
+			String output = runProcess(builder, "printing test case folder content");
+			System.out.println(output);
+		}
+		catch (Exception e) {
+			System.err.println("can't print folder content");
+		}
+		
 		// Now run the newly minted binary.
 		try {
 			ProcessBuilder builder = new ProcessBuilder(binPath, inputPath);
