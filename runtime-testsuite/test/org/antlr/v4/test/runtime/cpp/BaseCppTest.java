@@ -636,36 +636,6 @@ public abstract class BaseCppTest {
       System.out.println("C++ runtime build succeeded");
     }
     
-		// Create symlink to the runtime.
-		// TODO: make this platform neutral.
-		try {
-			ArrayList<String> args = new ArrayList<String>();
-			args.add("ln");
-			args.add("-s");
-			args.add(runtimePath + "/dist/libantlr4-runtime.dylib"); // TODO: make this platform neutral
-			ProcessBuilder builder = new ProcessBuilder(args.toArray(new String[0]));
-			builder.directory(new File(tmpdir));
-			String output = runProcess(builder, "sym linking C++ runtime");
-			if (output == null)
-			  return null;
-		}
-		catch (Exception e) {
-			System.err.println("can't exec module: " + fileName);
-		}
-		
-		try {
-			ArrayList<String> args = new ArrayList<String>();
-			args.add("ls");
-			args.add("-la");
-			ProcessBuilder builder = new ProcessBuilder(args.toArray(new String[0]));
-			builder.directory(new File(tmpdir));
-			String output = runProcess(builder, "printing test case folder content");
-			System.out.println(output);
-		}
-		catch (Exception e) {
-			System.err.println("can't print folder content");
-		}
-		
 		// Compile the test code.
 		try {
 			ArrayList<String> args = new ArrayList<String>();
@@ -673,8 +643,7 @@ public abstract class BaseCppTest {
 			args.add("-std=c++11");
 			args.add("-I");
 			args.add(includePath);
-			args.add("-L");
-			args.add(".");
+			args.add("-L" + runtimePath + "/dist/");
 			args.add("-lantlr4-runtime");
 			args.addAll(allCppFiles(tmpdir));
 			ProcessBuilder builder = new ProcessBuilder(args.toArray(new String[0]));
