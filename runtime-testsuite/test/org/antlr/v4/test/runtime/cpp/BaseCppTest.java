@@ -93,6 +93,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.Locale;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -530,6 +531,23 @@ public abstract class BaseCppTest {
 		return execModule("Test.cpp");
 	}
 
+  private static String detectedOS;
+  public static String getOS() {
+    if (detectedOS == null) {
+      String os = System.getProperty("os.name", "generic").toLowerCase(Locale.ENGLISH);
+      if ((os.indexOf("mac") >= 0) || (os.indexOf("darwin") >= 0)) {
+        detectedOS = "mac";
+      } else if (os.indexOf("win") >= 0) {
+        detectedOS = "windows";
+      } else if (os.indexOf("nux") >= 0) {
+        detectedOS = "linux";
+      } else {
+        detectedOS = "unknown";
+      }
+    }
+    return detectedOS;
+  }
+
 	public List<String> allCppFiles(String path) {
 		ArrayList<String> files = new ArrayList<String>();
 		File folder = new File(path);
@@ -649,13 +667,30 @@ public abstract class BaseCppTest {
       System.out.println("C++ runtime build succeeded");
     }
     
+		// Create symlink to the runtime.
+		String libExtension = (getOS() == "mac") ? "dylib" : "so";
+		try {
+			ArrayList<String> args = new ArrayList<String>();
+			args.add("ln");
+			args.add("-s");
+			args.add(runtimePath + "/dist/libantlr4-runtime." + libExtension);
+			ProcessBuilder builder = new ProcessBuilder(args.toArray(new String[0]));
+			builder.directory(new File(tmpdir));
+			String output = runProcess(builder, "sym linking C++ runtime");
+			if (output == null)
+			  return null;
+		}
+		catch (Exception e) {
+			System.err.println("can't exec module: " + fileName);
+		}
+		
 		try {
 			ArrayList<String> args = new ArrayList<String>();
 			args.add(compilerPath);
 			args.add("-std=c++11");
 			args.add("-I");
 			args.add(includePath);
-			args.add("-L" + runtimePath + "/dist/");
+			args.add("-L.");
 			args.add("-lantlr4-runtime");
 			args.addAll(allCppFiles(tmpdir));
 			ProcessBuilder builder = new ProcessBuilder(args.toArray(new String[0]));
@@ -667,7 +702,6 @@ public abstract class BaseCppTest {
 		}
 		catch (Exception e) {
 			System.err.println("can't compile module: " + fileName);
-			//e.printStackTrace(System.err);
 			return null;
 		}
 
@@ -681,7 +715,6 @@ public abstract class BaseCppTest {
 		}
 		catch (Exception e) {
 			System.err.println("can't exec module: " + fileName);
-			//e.printStackTrace(System.err);
 		}
 		
 		return null;
