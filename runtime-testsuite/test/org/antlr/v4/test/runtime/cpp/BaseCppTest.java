@@ -707,7 +707,7 @@ public abstract class BaseCppTest {
 		String propName = getPropertyPrefix() + "-compiler";
    		String prop = System.getProperty(propName);
    		if(prop==null || prop.length()==0)
-   			prop = locateTool("g++");  // Also try cc
+   			prop = locateTool("g++5");
 		File file = new File(prop);
 		if(!file.exists())
 			throw new RuntimeException("Missing system property:" + propName);
