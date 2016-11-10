@@ -624,10 +624,8 @@ public abstract class BaseCppTest {
 		
     try {
       String command[] = { "make", "-j", "8" }; // Assuming a reasonable amount of available CPU cores.
-  		String output = runCommand(command, runtimePath, "building antlr runtime");
-  		if (output == null)
+  		if (runCommand(command, runtimePath, "building antlr runtime") == null)
   		  return false;
-      System.out.println(output);
 		}
 		catch (Exception e) {
 			System.err.println("can't compile antlr cpp runtime");
@@ -666,18 +664,17 @@ public abstract class BaseCppTest {
 			
       runtimeBuiltOnce = true;
       if (!buildRuntime()) {
-        System.out.println("C++ runtime build failed");
+        System.out.println("C++ runtime build failed\n");
         return null;
       }
-      System.out.println("C++ runtime build succeeded");
+      System.out.println("C++ runtime build succeeded\n");
     }
     
 		// Create symlink to the runtime.
 		String libExtension = (getOS() == "mac") ? "dylib" : "so";
     try {
       String command[] = { "ln", "-s", runtimePath + "/dist/libantlr4-runtime." + libExtension };
-      String output = runCommand(command, tmpdir, "sym linking C++ runtime");
-			if (output == null)
+      if (runCommand(command, tmpdir, "sym linking C++ runtime") == null)
 			  return null;
 		}
 		catch (Exception e) {
@@ -685,28 +682,18 @@ public abstract class BaseCppTest {
 		}
 		
 		try {
-      List<String> command2 = new ArrayList<String>(Arrays.asList("clang++", "-std=c++11", "-I", includePath, "-L.", "-lantlr4-runtime", "-Wno-type-limits"));
+      List<String> command2 = new ArrayList<String>(Arrays.asList("clang++", "-std=c++11", "-I", includePath, "-L.", "-lantlr4-runtime"));
       command2.addAll(allCppFiles(tmpdir));
-  		String output = runCommand(command2.toArray(new String[0]), tmpdir, "building test binary");
-			if (output == null) {
+  		if (runCommand(command2.toArray(new String[0]), tmpdir, "building test binary") == null)
 				return null;
-			}
 		}
 		catch (Exception e) {
 			System.err.println("can't compile test module: " + e.getMessage());
 			return null;
 		}
 
-		try {
-      String command[] = { "ls", "-la" };
-  		String output = runCommand(command, tmpdir, "printing test case folder content");
-			System.out.println(output);
-		}
-		catch (Exception e) {
-			System.err.println("can't print folder content");
-		}
-		
-		// Now run the newly minted binary.
+		// Now run the newly minted binary. Reset the error output, as we could have got compiler warnings which are not relevant here.
+		this.stderrDuringParse = null;
 		try {
 			ProcessBuilder builder = new ProcessBuilder(binPath, inputPath);
 			builder.directory(new File(tmpdir));
@@ -714,6 +701,9 @@ public abstract class BaseCppTest {
       env.put("LD_PRELOAD", runtimePath + "/dist/libantlr4-runtime.so"); // For linux.
 			String output = runProcess(builder, "running test binary");
 		  
+		  System.out.println("=========================================================");
+		  System.out.println(output);
+		  System.out.println("=========================================================");
 			return output;
 		}
 		catch (Exception e) {
