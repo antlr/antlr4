@@ -710,24 +710,17 @@ public abstract class BaseCppTest {
 		try {
 			ProcessBuilder builder = new ProcessBuilder(binPath, inputPath);
 			builder.directory(new File(tmpdir));
+			Map<String, String> env = builder.environment();
+      env.put("LD_PRELOAD", runtimePath + "/dist/libantlr4-runtime.so"); // For linux.
 			String output = runProcess(builder, "running test binary");
 		  
 			return output;
 		}
 		catch (Exception e) {
-			System.err.println("can't exec module: " + fileName);
+			System.err.println("can't exec module: " + fileName + "\nerror is: "+ e.getMessage());
 		}
 		
 		return null;
-	}
-
-	private String locateTool(String tool) {
-		String[] roots = { "/usr/bin/", "/usr/local/bin/" };
-		for(String root : roots) {
-			if(new File(root + tool).exists())
-				return root + tool;
-		}
-		throw new RuntimeException("Could not locate " + tool);
 	}
 
 	protected String locateRuntime() {
